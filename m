@@ -2,88 +2,151 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 10575C4332F
-	for <linux-block@archiver.kernel.org>; Wed,  2 Nov 2022 18:58:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77CD3C433FE
+	for <linux-block@archiver.kernel.org>; Wed,  2 Nov 2022 19:15:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231726AbiKBS61 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 2 Nov 2022 14:58:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54290 "EHLO
+        id S231224AbiKBTPZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 2 Nov 2022 15:15:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41860 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231720AbiKBS61 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Nov 2022 14:58:27 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A15C1261
-        for <linux-block@vger.kernel.org>; Wed,  2 Nov 2022 11:58:23 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        with ESMTP id S230220AbiKBTOq (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Nov 2022 15:14:46 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D33FAC5E
+        for <linux-block@vger.kernel.org>; Wed,  2 Nov 2022 12:13:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1667416435;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=sfmdRZi2oRqTqcnLT5pjPUSkV22lKIz3gi/HpKleL5o=;
+        b=CxS2qpO4ZDb0g/V7i6Tda2zTavTsWJsZd1scZRGyJEM8ivdhbXGQFBaxtcBF4nEPkCl1MZ
+        TA67do5YCGmmD/ttcDa+/dXXlfT/EpIbXo5Qw4QNRe8fIynQ6ak2LKmzRvRQ5OGwt3xysK
+        R8ff/O+ZFgtPi3P3gYA9DYYmkWYfDqY=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-262-PxzAMl8kMMG9hH5Z1BqGww-1; Wed, 02 Nov 2022 15:13:51 -0400
+X-MC-Unique: PxzAMl8kMMG9hH5Z1BqGww-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 3E61C61B7F
-        for <linux-block@vger.kernel.org>; Wed,  2 Nov 2022 18:58:23 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 27F30C433C1;
-        Wed,  2 Nov 2022 18:58:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1667415502;
-        bh=KoWsvC25pqd9GJz44PRzSoXtSOS/iLxxlcYDL+YwZqQ=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=pOp9gPjFIkpCzrlTjyW/j9lY78yfC6TXIU3E+lwfqAZwIfgnyLndRGyLUEZil7ugi
-         pa3Vx+oqN8NHZjJE4uUeTIyE81pUWRb4zFZhB3gd2gFR1uCYQeAy5TSuvHe1XYNjBU
-         LotKRdmb4tUiFOfBhjCyXQsg9t8Y9RpkSV0Cmbm/UiknzAQcF1+6ocgHYkmlPeYLuL
-         nF19FtOybXfD7fhYY/w36mQkzxsCj32+cgOvaChsGwhcIkF+Jxxq7pZrMNyInOEFi5
-         i1pVaGzIUIq3OpQCguix4JoQEmKFxJG3kf4GharFStgCY4uffWHVUPMHaQJ5pz0cZU
-         zmzRH/HtiHMzw==
-Date:   Wed, 2 Nov 2022 12:58:19 -0600
-From:   Keith Busch <kbusch@kernel.org>
-To:     Mikulas Patocka <mpatocka@redhat.com>
-Cc:     Eric Biggers <ebiggers@kernel.org>, linux-block@vger.kernel.org,
-        dm-devel@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>
-Subject: Re: [dm-devel] Regression: wrong DIO alignment check with dm-crypt
-Message-ID: <Y2K9y5zfUcn87e09@kbusch-mbp.dhcp.thefacebook.com>
-References: <Y2Hf08vIKBkl5tu0@sol.localdomain>
- <alpine.LRH.2.21.2211021434180.2087@file01.intranet.prod.int.rdu2.redhat.com>
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id ABA5E87B2A1;
+        Wed,  2 Nov 2022 19:13:50 +0000 (UTC)
+Received: from localhost (unknown [10.39.192.88])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id DC2C21121320;
+        Wed,  2 Nov 2022 19:13:49 +0000 (UTC)
+Date:   Wed, 2 Nov 2022 15:13:47 -0400
+From:   Stefan Hajnoczi <stefanha@redhat.com>
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     Stefan Hajnoczi <stefanha@gmail.com>,
+        Yongji Xie <xieyongji@bytedance.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Ming Lei <tom.leiming@gmail.com>,
+        Ziyang Zhang <ZiyangZhang@linux.alibaba.com>,
+        io-uring@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        "Denis V. Lunev" <den@openvz.org>,
+        Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>
+Subject: Re: ublk-qcow2: ublk-qcow2 is available
+Message-ID: <Y2LBa/ePKiSN2phm@fedora>
+References: <Y0lcmZTP5sr467z6@T590>
+ <CACycT3u8yYUS-WnNzgHQtQFYuK-XcyffpFc35HVZzrCS7hH5Sg@mail.gmail.com>
+ <Y05OzeC7wImts4p7@T590>
+ <CACycT3sK1AzA4RH1ZfbstV3oax-oeBVtEz+sY+8scBU0=1x46g@mail.gmail.com>
+ <CAJSP0QVevA0gvyGABAFSoMhBN9ydZqUJh4qJYgNbGeyRXL8AjA@mail.gmail.com>
+ <CACycT3udzt0nyqweGbAsZB4LDQU=a7OSWKC8ZWieoBpsSfa2FQ@mail.gmail.com>
+ <1d051d63-ce34-1bb3-2256-4ced4be6d690@redhat.com>
+ <CACycT3usE0QdJd50bSiLiPwTFxscg-Ur=iZyeGJJBPe7+KxOFQ@mail.gmail.com>
+ <CAJSP0QUGj4t8nYeJvGaO-cWJ+F3Zvxcq007RHOm-=41zaE-v0Q@mail.gmail.com>
+ <CACGkMEt+BWCUVQPnfUUd0QXkHz=90LMXxydCgBqWTDB3eGBw-w@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="jPo3x6rSJt98BRBl"
 Content-Disposition: inline
-In-Reply-To: <alpine.LRH.2.21.2211021434180.2087@file01.intranet.prod.int.rdu2.redhat.com>
+In-Reply-To: <CACGkMEt+BWCUVQPnfUUd0QXkHz=90LMXxydCgBqWTDB3eGBw-w@mail.gmail.com>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Nov 02, 2022 at 02:45:10PM -0400, Mikulas Patocka wrote:
-> On Tue, 1 Nov 2022, Eric Biggers wrote:
-> > Hi,
-> > 
-> > I happened to notice the following QEMU bug report:
-> > 
-> > https://gitlab.com/qemu-project/qemu/-/issues/1290
-> > 
-> > I believe it's a regression from the following kernel commit:
-> > 
-> >     commit b1a000d3b8ec582da64bb644be633e5a0beffcbf
-> >     Author: Keith Busch <kbusch@kernel.org>
-> >     Date:   Fri Jun 10 12:58:29 2022 -0700
-> > 
-> >         block: relax direct io memory alignment
-> 
-> I suggest to revert this patch.
 
-I hope we can make that option a last resort.
- 
-> > The bug is that if a dm-crypt device is set up with a crypto sector size (and
-> > thus also a logical_block_size) of 4096, then the block layer now lets through
-> > direct I/O requests to dm-crypt when the user buffer has only 512-byte
-> > alignment, instead of the 4096-bytes expected by dm-crypt in that case.  This is
-> > because the dma_alignment of the device-mapper device is only 511 bytes.
-> 
-> Propagating dma_alignment through the device mapper stack would be hard 
-> (because it is not in struct queue_limits). Perhaps we could set 
-> dma_alignment to be the equivalent to logical_block_size, if the above 
-> patch could not be reverted - but the we would hit the issue again when 
-> someone stacks md or other devices over dm.
+--jPo3x6rSJt98BRBl
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-It looks straight forward to relocate the attribute to the the
-queue_limits. If it stacks correctly, then no one would encounter a
-problem no matter what md/dm combination you have.
+On Tue, Nov 01, 2022 at 10:36:29AM +0800, Jason Wang wrote:
+> On Tue, Oct 25, 2022 at 8:02 PM Stefan Hajnoczi <stefanha@gmail.com> wrot=
+e:
+> >
+> > On Tue, 25 Oct 2022 at 04:17, Yongji Xie <xieyongji@bytedance.com> wrot=
+e:
+> > >
+> > > On Fri, Oct 21, 2022 at 2:30 PM Jason Wang <jasowang@redhat.com> wrot=
+e:
+> > > >
+> > > >
+> > > > =E5=9C=A8 2022/10/21 13:33, Yongji Xie =E5=86=99=E9=81=93:
+> > > > > On Tue, Oct 18, 2022 at 10:54 PM Stefan Hajnoczi <stefanha@gmail.=
+com> wrote:
+> > > > >> On Tue, 18 Oct 2022 at 09:17, Yongji Xie <xieyongji@bytedance.co=
+m> wrote:
+> > > > >>> On Tue, Oct 18, 2022 at 2:59 PM Ming Lei <tom.leiming@gmail.com=
+> wrote:
+> > > > >>>> On Mon, Oct 17, 2022 at 07:11:59PM +0800, Yongji Xie wrote:
+> > > > >>>>> On Fri, Oct 14, 2022 at 8:57 PM Ming Lei <tom.leiming@gmail.c=
+om> wrote:
+> > > > >>>>>> On Thu, Oct 13, 2022 at 02:48:04PM +0800, Yongji Xie wrote:
+> > > > >>>>>>> On Wed, Oct 12, 2022 at 10:22 PM Stefan Hajnoczi <stefanha@=
+gmail.com> wrote:
+> > > > >>>>>>>> On Sat, 8 Oct 2022 at 04:43, Ziyang Zhang <ZiyangZhang@lin=
+ux.alibaba.com> wrote:
+> > > > >>>>>>>>> On 2022/10/5 12:18, Ming Lei wrote:
+> > > > >>>>>>>>>> On Tue, Oct 04, 2022 at 09:53:32AM -0400, Stefan Hajnocz=
+i wrote:
+> > > > >>>>>>>>>>> On Tue, 4 Oct 2022 at 05:44, Ming Lei <tom.leiming@gmai=
+l.com> wrote:
+> > > > >>>>>>>>>>>> On Mon, Oct 03, 2022 at 03:53:41PM -0400, Stefan Hajno=
+czi wrote:
+> > > > >>>>>>>>>>>>> On Fri, Sep 30, 2022 at 05:24:11PM +0800, Ming Lei wr=
+ote:
+> > There are ways to minimize that cost:
+> > 1. The driver only needs to fetch the device's sq index when it has
+> > run out of sq ring space.
+> > 2. The device can include sq index updates with completions. This is
+> > what NVMe does with the CQE SQ Head Pointer field, but the
+> > disadvantage is that the driver has no way of determining the sq index
+> > until a completion occurs.
+>=20
+> Probably, but as replied in another thread, based on the numbers
+> measured from the networking test, I think the current virtio layout
+> should be sufficient for block I/O but might not fit for cases like
+> NFV.
 
-I have something that looks promising, but I'm trying to give it a
-thorough test before sending out another incomplete patch. Hopefully
-ready by end of the day.
+I remember that the Linux virtio_net driver doesn't rely on vq spinlocks
+because CPU affinity and the NAPI architecture ensure that everything is
+CPU-local. There is no need to protect the freelist explicitly because
+the functions cannot race.
+
+Maybe virtio_blk can learn from virtio_net...
+
+Stefan
+
+--jPo3x6rSJt98BRBl
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmNiwWsACgkQnKSrs4Gr
+c8gbrgf/WHP+3xc/eWo3qZHzOaLwMBStLXxphQCA3G+/eYczr4GsFdkMmSs6FiAD
+dKoF7y4iBSKkRyJk0IsDA/57yrnYv9ygPUXHYsYz0UmyJ7ax5G7t7nJZ0CpEJjsF
+/ZlpRCb4NCuW4tIYih1QW5edo564pjwF9VKH6VUu0lZhSgZSZCYh3VruUBaF4x1C
+Jsw9qxoSUb0+EyqhaS8DbKDWF7ah1TO+oXI62N4RVbimJYewxUBIveYCtGh6IPdO
+7/efT8LICrNRehiUGDzC7pnOOwc9MiKwjaIX/qFOxsmQlYr3BRZ1pd7LSvVC6s4p
+87ZYdPu20YwF1RMeDkq399nbEu8mQQ==
+=kHlQ
+-----END PGP SIGNATURE-----
+
+--jPo3x6rSJt98BRBl--
+
