@@ -2,82 +2,103 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C82C2C433FE
-	for <linux-block@archiver.kernel.org>; Wed,  2 Nov 2022 02:19:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C1AE8C4332F
+	for <linux-block@archiver.kernel.org>; Wed,  2 Nov 2022 02:24:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229949AbiKBCTc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 1 Nov 2022 22:19:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45612 "EHLO
+        id S229934AbiKBCYq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 1 Nov 2022 22:24:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48732 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230057AbiKBCTa (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Nov 2022 22:19:30 -0400
-Received: from zju.edu.cn (mail.zju.edu.cn [61.164.42.155])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 228851EEDD;
-        Tue,  1 Nov 2022 19:19:27 -0700 (PDT)
-Received: by ajax-webmail-mail-app2 (Coremail) ; Wed, 2 Nov 2022 10:19:24
- +0800 (GMT+08:00)
-X-Originating-IP: [10.14.30.50]
-Date:   Wed, 2 Nov 2022 10:19:24 +0800 (GMT+08:00)
-X-CM-HeaderCharset: UTF-8
-From:   "Jinlong Chen" <nickyc975@zju.edu.cn>
-To:     "Christoph Hellwig" <hch@lst.de>
-Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: Re: [PATCH 4/4] blk-mq: improve readability of
- blk_mq_alloc_request()
-X-Priority: 3
-X-Mailer: Coremail Webmail Server Version XT5.0.13 build 20210104(ab8c30b6)
- Copyright (c) 2002-2022 www.mailtech.cn zju.edu.cn
-In-Reply-To: <20221101173727.GC20690@lst.de>
-References: <cover.1667314759.git.nickyc975@zju.edu.cn>
- <81fcbc046c9ea96cdfd8e20d1edc8e64c4d08153.1667314759.git.nickyc975@zju.edu.cn>
- <20221101173727.GC20690@lst.de>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset=UTF-8
+        with ESMTP id S229819AbiKBCYp (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Nov 2022 22:24:45 -0400
+Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B60264DD
+        for <linux-block@vger.kernel.org>; Tue,  1 Nov 2022 19:24:44 -0700 (PDT)
+Received: by mail-pj1-x1033.google.com with SMTP id b1-20020a17090a7ac100b00213fde52d49so646871pjl.3
+        for <linux-block@vger.kernel.org>; Tue, 01 Nov 2022 19:24:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=S7UBdmk5MbBq8xf2xERnJFzAhfjmMFD1Ky4jz35lNF8=;
+        b=Ov3ploiPrzbeq6flPiF5LhBY7nXtGzNgcCAIY30CnXl+B32v/IR7MR9/Rr7Y5yuWlK
+         yzO9kkalrV7/xaphq3qK7InlXhNHnVNq0gvmWKqYQsr1S3A+U5F/XTl2w9rtiOy3zn72
+         QhjChHTrUAzLJd39wvxVjEkG4pGXGaVaBK5U4flJlX+0boaeHtRZWOuZGTIWo+dBjlv0
+         it64h/ou+b/y6xcAl7s8bSFN3dLtinvtt7Fo3iRcOSBVO1DSzdGijmNgbb4LafoQvvNq
+         yw3BWEYKEKxP9N8XKSQox7JZixChmshToPYAbDvxd9BeL5DzUEr8Aa6lKQKQTfXr4Kvd
+         EFlg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=S7UBdmk5MbBq8xf2xERnJFzAhfjmMFD1Ky4jz35lNF8=;
+        b=Vmb85heAX3LY6uNtetycfno9Yv8Zx3Kn8pjRWMRNXZutaeY/K2pSOE6CznqQfPymxk
+         uDySwCDokkts87Bharjf6urOXdpr59lq+OXVz+USThw7R2rOInKujC8GQzY0Eq6FlriP
+         NqeZeW3NqxRFsI0Km9ihYQHe3Qwy9+nhay8Mtb8RtB42YfRV/Wsjb1g4tg5bK3MruJsg
+         Vr86z12H06/hdrdu9w8WUoL/aW+idyV+d+LypjLoehTufz9CI2zvL09u1MDrjUXfSMV5
+         guQZr8uylyMIj9kbidSwy9IOyMGIGI2KMiYtPSVQR2GkW8nFEYd7PznaK4pk/dcM52bX
+         3pXA==
+X-Gm-Message-State: ACrzQf3HLDZCBhnDJqnOgCRrIovY68vCU5wnHQT4QWqiN9wjQKp4y4Hh
+        ht4XLcAtS4NIg1XUVk89TuA0QQ==
+X-Google-Smtp-Source: AMsMyM7f3lJIE5Nd37JDrODYmcoJXutEpbXq+qiZ6RiEAYOekxd2L2qLxa6g18v1swxU0Uu3FLNHng==
+X-Received: by 2002:a17:903:41cc:b0:186:b756:a5f0 with SMTP id u12-20020a17090341cc00b00186b756a5f0mr22440171ple.132.1667355884067;
+        Tue, 01 Nov 2022 19:24:44 -0700 (PDT)
+Received: from [192.168.1.136] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id z7-20020aa79587000000b0056bb4bbfb9bsm7377584pfj.95.2022.11.01.19.24.42
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 01 Nov 2022 19:24:43 -0700 (PDT)
+Message-ID: <0ddaf04b-84b5-8173-a67c-5dadce684108@kernel.dk>
+Date:   Tue, 1 Nov 2022 20:24:41 -0600
 MIME-Version: 1.0
-Message-ID: <3caa5abc.16387a.1843622d8cf.Coremail.nickyc975@zju.edu.cn>
-X-Coremail-Locale: zh_CN
-X-CM-TRANSID: by_KCgCHz1us02FjoMxcBw--.54801W
-X-CM-SenderInfo: qssqjiaqqzq6lmxovvfxof0/1tbiAgoCB1ZdtcNVXAAAs5
-X-Coremail-Antispam: 1Ur529EdanIXcx71UUUUU7IcSsGvfJ3iIAIbVAYjsxI4VWxJw
-        CS07vEb4IE77IF4wCS07vE1I0E4x80FVAKz4kxMIAIbVAFxVCaYxvI4VCIwcAKzIAtYxBI
-        daVFxhVjvjDU=
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
+ Thunderbird/102.4.0
+Subject: Re: [PATCH -next v4 1/5] block, bfq: remove set but not used variable
+ in __bfq_entity_update_weight_prio
+Content-Language: en-US
+To:     Yu Kuai <yukuai1@huaweicloud.com>, jack@suse.cz,
+        paolo.valente@linaro.org
+Cc:     cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, yi.zhang@huawei.com,
+        "yukuai (C)" <yukuai3@huawei.com>
+References: <20221102022542.3621219-1-yukuai1@huaweicloud.com>
+ <20221102022542.3621219-2-yukuai1@huaweicloud.com>
+ <7f7e59cb-e0b8-0db5-7c46-11aea963bcfa@kernel.dk>
+ <ee543096-ae21-99d3-f3a5-483deab03a5f@kernel.dk>
+ <61725ff6-6da3-3d3c-4261-7f05c57ab9da@huaweicloud.com>
+From:   Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <61725ff6-6da3-3d3c-4261-7f05c57ab9da@huaweicloud.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-PiBPbiBUdWUsIE5vdiAwMSwgMjAyMiBhdCAxMToxMTozN1BNICswODAwLCBKaW5sb25nIENoZW4g
-d3JvdGU6Cj4gPiBBZGQgYSBoZWxwZXIgYmxrX21xX2FsbG9jX3JlcXVlc3Rfbm9jYWNoZSgpIHRv
-IGFsbG9jIHJlcXVlc3Qgd2l0aG91dAo+ID4gY2FjaGUuIFRoaXMgbWFrZXMgYmxrX21xX2FsbG9j
-X3JlcXVlc3QoKSBtb3JlIHJlYWRhYmxlLgo+ID4gCj4gPiBTaWduZWQtb2ZmLWJ5OiBKaW5sb25n
-IENoZW4gPG5pY2t5Yzk3NUB6anUuZWR1LmNuPgo+ID4gLS0tCj4gPiAgYmxvY2svYmxrLW1xLmMg
-fCA0NyArKysrKysrKysrKysrKysrKysrKysrKysrKysrKy0tLS0tLS0tLS0tLS0tLS0tLQo+ID4g
-IDEgZmlsZSBjaGFuZ2VkLCAyOSBpbnNlcnRpb25zKCspLCAxOCBkZWxldGlvbnMoLSkKPiA+IAo+
-ID4gZGlmZiAtLWdpdCBhL2Jsb2NrL2Jsay1tcS5jIGIvYmxvY2svYmxrLW1xLmMKPiA+IGluZGV4
-IDg3YTYzNDhhMGQwYS4uMmZhZTExMWE0MmM4IDEwMDY0NAo+ID4gLS0tIGEvYmxvY2svYmxrLW1x
-LmMKPiA+ICsrKyBiL2Jsb2NrL2Jsay1tcS5jCj4gPiBAQCAtNTcyLDM2ICs1NzIsNDcgQEAgc3Rh
-dGljIHN0cnVjdCByZXF1ZXN0ICpibGtfbXFfYWxsb2NfY2FjaGVkX3JlcXVlc3Qoc3RydWN0IHJl
-cXVlc3RfcXVldWUgKnEsCj4gPiAgCXJldHVybiBycTsKPiA+ICB9Cj4gPiAgCj4gPiArc3RhdGlj
-IHN0cnVjdCByZXF1ZXN0ICpibGtfbXFfYWxsb2NfcmVxdWVzdF9ub2NhY2hlKHN0cnVjdCByZXF1
-ZXN0X3F1ZXVlICpxLAo+ID4gKwkJYmxrX29wZl90IG9wZiwgYmxrX21xX3JlcV9mbGFnc190IGZs
-YWdzKQo+IAo+IFRoZSBuYW1lIGlzIGEgYml0IG9kZCwgYnV0IEkgY2FuJ3QgdGhpbmsgb2ZmIGEg
-YmV0dGVyIG9uZS4KPiAKPiA+ICsJc3RydWN0IGJsa19tcV9hbGxvY19kYXRhIGRhdGEgPSB7Cj4g
-PiAgCQkJLnEJCT0gcSwKPiA+ICAJCQkuZmxhZ3MJCT0gZmxhZ3MsCj4gPiAgCQkJLmNtZF9mbGFn
-cwk9IG9wZiwKPiA+ICAJCQkubnJfdGFncwk9IDEsCj4gPiAgCQl9Owo+IAo+IEFuZCB0aGlzIG5v
-dyBoYXMgc3VwZXJmbG91cyBpbmRlbmF0aW9uLiAgT3ZlcmFsbCwgd2hpbGUgdGhlIHNlcGFyYXRl
-Cj4gaGVscGVyIGxvb2tzIG1hcmdpbmFsbHkgbmljZXIsIEknbSBub3QgcmVhbGx5IHN1cmUgaXQg
-aXMgd29ydGggdGhlCj4gY2h1cm4uCgpJJ2xsIGRyb3AgdGhlIHBhdGNoIGlmIHlvdSB0aGluayBp
-dCBpcyBub3Qgd29ydGggdGhlIGNodXJuLiBCdXQgSQpzdGFydGVkIGRvaW5nIHRoaXMgYmVjYXVz
-ZSBvZiB0aGUgZm9sbG93aW5nIGdvdG8gc3RhdGVtZW50OgoKCXJxID0gYmxrX21xX2FsbG9jX2Nh
-Y2hlZF9yZXF1ZXN0KHEsIG9wZiwgZmxhZ3MpOwoJaWYgKCFycSkgewoJCVsuLi5dCgkJcmV0ID0g
-YmxrX3F1ZXVlX2VudGVyKHEsIGZsYWdzKTsKCQlbLi4uXQoJCXJxID0gX19ibGtfbXFfYWxsb2Nf
-cmVxdWVzdHMoJmRhdGEpOwoJCWlmICghcnEpCgkJCWdvdG8gb3V0X3F1ZXVlX2V4aXQ7Cgl9Cglb
-Li4uXQpvdXRfcXVldWVfZXhpdDoKCWJsa19xdWV1ZV9leGl0KHEpOwoJcmV0dXJuIEVSUl9QVFIo
-LUVXT1VMREJMT0NLKTsKClF1ZXVlIGVudGVyaW5nIGhhcyBiZWVuIG1vdmVkIGludG8gdGhlIGZh
-bGxiYWNrIHBhdGgsIGxlZnQgcXVldWUgZXhpdGluZwpvdXRzaWRlLiBTaG91bGQgSSBqdXN0IGVs
-aW1pbmF0ZSB0aGUgZ290byBzdGF0ZW1lbnQgYW5kIG1vdmUgdGhlIGVycm9yCmhhbmRsaW5nIGlu
-dG8gdGhlIGZhbGxiYWNrIHBhdGggdG9vPyBMaWtlOgoKCXJxID0gYmxrX21xX2FsbG9jX2NhY2hl
-ZF9yZXF1ZXN0KHEsIG9wZiwgZmxhZ3MpOwoJaWYgKCFycSkgewoJCVsuLi5dCgkJcmV0ID0gYmxr
-X3F1ZXVlX2VudGVyKHEsIGZsYWdzKTsKCQlbLi4uXQoJCXJxID0gX19ibGtfbXFfYWxsb2NfcmVx
-dWVzdHMoJmRhdGEpOwoJCWlmICghcnEpIHsKCQkJYmxrX3F1ZXVlX2V4aXQocSk7CgkJCXJldHVy
-biBFUlJfUFRSKC1FV09VTERCTE9DSyk7CgkJfQoJfQoKVGhhbmtzIQpKaW5sb25nIENoZW4=
+On 11/1/22 8:18 PM, Yu Kuai wrote:
+> Hi,
+> 
+> 在 2022/11/02 10:11, Jens Axboe 写道:
+>> On 11/1/22 8:09 PM, Jens Axboe wrote:
+>>> On 11/1/22 8:25 PM, Yu Kuai wrote:
+>>>> From: Yu Kuai <yukuai3@huawei.com>
+>>>>
+>>>> After the patch "block, bfq: cleanup bfq_weights_tree add/remove apis"),
+>>>> the local variable 'bfqd' is not used anymore, thus remove it.
+>>>
+>>> Please add a Fixes tag.
+>>
+>> Looks like the rest were good to go, so I added it myself.
+> 
+> Thanks for helping out. I'm not sure which commit id to use since the
+> fixed patch is not in linux-next yet, does the commit id stay the same
+> when the patch applied from for-6.2 to next ?
+
+linux-next shas are not stable, but since you're sending this to the
+linux-block list and against the block tree, that's obviously where
+you'd find that commit.
+
+-- 
+Jens Axboe
+
+
