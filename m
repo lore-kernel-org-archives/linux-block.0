@@ -2,107 +2,81 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30FFEC4321E
-	for <linux-block@archiver.kernel.org>; Wed,  2 Nov 2022 03:06:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 56F3FC4332F
+	for <linux-block@archiver.kernel.org>; Wed,  2 Nov 2022 03:11:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229533AbiKBDGp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 1 Nov 2022 23:06:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54976 "EHLO
+        id S230228AbiKBDLT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 1 Nov 2022 23:11:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60180 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230161AbiKBDGY (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Nov 2022 23:06:24 -0400
-Received: from zju.edu.cn (spam.zju.edu.cn [61.164.42.155])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id EC54123E93;
-        Tue,  1 Nov 2022 20:06:22 -0700 (PDT)
-Received: from localhost.localdomain (unknown [10.14.30.251])
-        by mail-app2 (Coremail) with SMTP id by_KCgA3PSGf3mFjz_9cBw--.7456S4;
-        Wed, 02 Nov 2022 11:06:17 +0800 (CST)
-From:   Jinlong Chen <nickyc975@zju.edu.cn>
-To:     axboe@kernel.dk
-Cc:     hch@lst.de, chaitanyak@nvidia.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, nickyc975@zju.edu.cn
-Subject: [PATCH v3 2/2] blk-mq: use if-else instead of goto in blk_mq_alloc_cached_request()
-Date:   Wed,  2 Nov 2022 11:06:05 +0800
-Message-Id: <d3306fa4e92dc9cc614edc8f1802686096bafef2.1667358114.git.nickyc975@zju.edu.cn>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <cover.1667358114.git.nickyc975@zju.edu.cn>
-References: <cover.1667358114.git.nickyc975@zju.edu.cn>
+        with ESMTP id S230281AbiKBDLS (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Nov 2022 23:11:18 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D5EAE23BE1
+        for <linux-block@vger.kernel.org>; Tue,  1 Nov 2022 20:11:17 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 724F961799
+        for <linux-block@vger.kernel.org>; Wed,  2 Nov 2022 03:11:17 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B6E88C433C1;
+        Wed,  2 Nov 2022 03:11:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1667358676;
+        bh=HoBCmdH2JyJ9OFeROhfm/rc1VGnWZyeDz+ImLloggQQ=;
+        h=Date:From:To:Cc:Subject:From;
+        b=Q1n8uOCOSn8oanOriuGLGrlAPM2Ya8VlQLK4LMu+PFybx44K11Y8xq0OgEJ+R3SN/
+         wQt+vQGgKLhZjm6dx0XWRGsMhYRgsWDFtHFocghCzu3xwjnWNCh6UZH/jtcR7/PXCz
+         7d6ZBWDNfmTKnnXtDOBzEHZP4CUf3ztInUE+qRDqwMPE+vCApAi+m4+p2UzhHb3mI2
+         8YIRPzHfDnl6OQOgHxzthO0XojfDglcrJa9vlnvrx7/nEhj27/V5yhr1HbL8jp9wkj
+         isA/xeaRbIUkaRqaXKs9n7leoKz/Ab50SYmIE1gTFx/bT/w8cwxd0Vjp5VKlBN6Bxh
+         61wkAnUHBhicQ==
+Date:   Tue, 1 Nov 2022 20:11:15 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     linux-block@vger.kernel.org, dm-devel@redhat.com,
+        Keith Busch <kbusch@kernel.org>
+Cc:     Stefan Hajnoczi <stefanha@redhat.com>
+Subject: Regression: wrong DIO alignment check with dm-crypt
+Message-ID: <Y2Hf08vIKBkl5tu0@sol.localdomain>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: by_KCgA3PSGf3mFjz_9cBw--.7456S4
-X-Coremail-Antispam: 1UD129KBjvJXoW7AF4Dtw4DWry3ZFW7Cw4xtFb_yoW8Gry5pF
-        sxJa4qvFWFgF1xuF4rAa1fJF4rCF1rGF9rC34fAwn5Z3y5Gr4Utr1fArWFqFWSyFZ3CFWx
-        Kr4DCas5uF18XrDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUva1xkIjI8I6I8E6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AE
-        w4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2
-        IY67AKxVWDJVCq3wA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVW0oVCq3wA2z4x0Y4vEx4A2
-        jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oVCq3wAac4AC62xK8xCEY4
-        vEwIxC4wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv
-        7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r
-        1j6r4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwCF04k20xvY0x0E
-        wIxGrwCF04k20xvE74AGY7Cv6cx26r4fKr1UJr1l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2
-        IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v2
-        6r126r1DMIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_JFI_Gr1lIxAIcVC0I7IYx2
-        IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv
-        67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyT
-        uYvjfUOlksUUUUU
-X-CM-SenderInfo: qssqjiaqqzq6lmxovvfxof0/1tbiAgQCB1ZdtcNYxwAAsh
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-if-else is more readable than goto here.
+Hi,
 
-Signed-off-by: Jinlong Chen <nickyc975@zju.edu.cn>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
----
- block/blk-mq.c | 27 ++++++++++++++-------------
- 1 file changed, 14 insertions(+), 13 deletions(-)
+I happened to notice the following QEMU bug report:
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 453ad445a6bd..6ffca7af5b6f 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -544,25 +544,26 @@ static struct request *blk_mq_alloc_cached_request(struct request_queue *q,
- 
- 	if (!plug)
- 		return NULL;
-+
- 	if (rq_list_empty(plug->cached_rq)) {
- 		if (plug->nr_ios == 1)
- 			return NULL;
- 		rq = blk_mq_rq_cache_fill(q, plug, opf, flags);
--		if (rq)
--			goto got_it;
--		return NULL;
--	}
--	rq = rq_list_peek(&plug->cached_rq);
--	if (!rq || rq->q != q)
--		return NULL;
-+		if (!rq)
-+			return NULL;
-+	} else {
-+		rq = rq_list_peek(&plug->cached_rq);
-+		if (!rq || rq->q != q)
-+			return NULL;
- 
--	if (blk_mq_get_hctx_type(opf) != rq->mq_hctx->type)
--		return NULL;
--	if (op_is_flush(rq->cmd_flags) != op_is_flush(opf))
--		return NULL;
-+		if (blk_mq_get_hctx_type(opf) != rq->mq_hctx->type)
-+			return NULL;
-+		if (op_is_flush(rq->cmd_flags) != op_is_flush(opf))
-+			return NULL;
-+
-+		plug->cached_rq = rq_list_next(rq);
-+	}
- 
--	plug->cached_rq = rq_list_next(rq);
--got_it:
- 	rq->cmd_flags = opf;
- 	INIT_LIST_HEAD(&rq->queuelist);
- 	return rq;
--- 
-2.31.1
+https://gitlab.com/qemu-project/qemu/-/issues/1290
 
+I believe it's a regression from the following kernel commit:
+
+    commit b1a000d3b8ec582da64bb644be633e5a0beffcbf
+    Author: Keith Busch <kbusch@kernel.org>
+    Date:   Fri Jun 10 12:58:29 2022 -0700
+
+        block: relax direct io memory alignment
+
+The bug is that if a dm-crypt device is set up with a crypto sector size (and
+thus also a logical_block_size) of 4096, then the block layer now lets through
+direct I/O requests to dm-crypt when the user buffer has only 512-byte
+alignment, instead of the 4096-bytes expected by dm-crypt in that case.  This is
+because the dma_alignment of the device-mapper device is only 511 bytes.
+
+This has two effects in this case:
+
+    - The error code for DIO with a misaligned buffer is now EIO, instead of
+      EINVAL as expected and documented.  This is because the I/O reaches
+      dm-crypt instead of being rejected by the block layer.
+
+    - STATX_DIOALIGN reports 512 bytes for stx_dio_mem_align, instead of the
+      correct value of 4096.  (Technically not a regression since STATX_DIOALIGN
+      is new in v6.1, but still a bug.)
+
+Any thoughts on what the correct fix is here?  Maybe the device-mapper layer
+needs to set dma_alignment correctly?  Or maybe the block layer needs to set it
+to 'logical_block_size - 1' by default?
+
+- Eric
