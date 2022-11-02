@@ -2,44 +2,44 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C153C433FE
-	for <linux-block@archiver.kernel.org>; Wed,  2 Nov 2022 16:31:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D044C433FE
+	for <linux-block@archiver.kernel.org>; Wed,  2 Nov 2022 16:31:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231570AbiKBQbA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 2 Nov 2022 12:31:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52048 "EHLO
+        id S231962AbiKBQbL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 2 Nov 2022 12:31:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49834 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231406AbiKBQaa (ORCPT
+        with ESMTP id S231459AbiKBQaa (ORCPT
         <rfc822;linux-block@vger.kernel.org>); Wed, 2 Nov 2022 12:30:30 -0400
 Received: from mx1.veeam.com (mx1.veeam.com [216.253.77.21])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91F9A2DAA1;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91E902DA9F;
         Wed,  2 Nov 2022 09:27:08 -0700 (PDT)
 Received: from mail.veeam.com (prgmbx01.amust.local [172.24.128.102])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mx1.veeam.com (Postfix) with ESMTPS id 4FE044110A;
-        Wed,  2 Nov 2022 11:51:59 -0400 (EDT)
+        by mx1.veeam.com (Postfix) with ESMTPS id 466F441CB2;
+        Wed,  2 Nov 2022 11:52:07 -0400 (EDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=veeam.com;
-        s=mx1-2022; t=1667404319;
-        bh=sMx+tCVloqWsGtoNfLLhf1sI9qkGg1iVULg5OTBOaq0=;
+        s=mx1-2022; t=1667404327;
+        bh=7Gy2FlvL/wsrYyYUvsUavGTs6YWl0W4OQ5X0fITrOMM=;
         h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=dKq1trBqhdpSVVwhwlGqx3mWdVRskpehqCIH5W/BxBI75zCCOsk8kwj4R3Ku8SS+Q
-         w2pUZT4un3jANT/3ZkQBq228XA1W0JDJLqMElBTYtkJmOnhYWZjyYofXVpUiaDTE6L
-         scOuDSgOCipWst72qNyGsZnw6Sou2Esg5wKATEs13hrn0lFsGm2x2fvD6nEnLLNroc
-         Xyy83eztwmBEb2UqaseWh6f7xp+uxVdY9iQ4hsVxxrFTKaOZrQ1qNEcqbW49QXwJwL
-         OlVQhZIHNQDN4A8cmIkbFcvXL/aMA6Nv8B6eATEjJljUiFtQDDTEpSiRehwEH6VYRD
-         3J40Adw6nM52w==
+        b=Hc8/l/DvPHWVlKyIV7mr+y/cQA8a5xbBOpD6qvnVSEKHtmkQa7PP6f69zCN8kjNWG
+         e1VkhHeMD6Gzv4h2WfLBCKm7AL7T3chUNlj70kpMutAjxEJw9ujydcXnvRtnrDUWjt
+         EeNbZASMp0kpd5zLVus4VUZ8ObKr5DJXlE385HCUTP7g4meSMF4M3W1iEIkLsXHcq3
+         oqezaZTAk7ioYsvNaxjX54pJBBNolR1HgyGLitHPqpxKrGGCURBCF0tyxc91KY3N8h
+         mqqK34QYUbXRUjMnt9s5uGzyAlpCLV1awjSkqmzrus8mH/plWDqD7Ie0luuKD6mpei
+         R7F1r41zml69Q==
 Received: from ssh-deb10-ssd-vb.amust.local (172.24.10.107) by
  prgmbx01.amust.local (172.24.128.102) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.12; Wed, 2 Nov 2022 16:51:21 +0100
+ 15.2.1118.12; Wed, 2 Nov 2022 16:51:28 +0100
 From:   Sergei Shtepa <sergei.shtepa@veeam.com>
 To:     <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
         <linux-kernel@vger.kernel.org>, <hch@infradead.org>,
         <sergei.shtepa@veeam.com>
-Subject: [PATCH v1 05/17] block, blksnap: interaction with sysfs
-Date:   Wed, 2 Nov 2022 16:50:49 +0100
-Message-ID: <20221102155101.4550-6-sergei.shtepa@veeam.com>
+Subject: [PATCH v1 09/17] lock, blksnap: buffer in memory for the minimum data storage unit
+Date:   Wed, 2 Nov 2022 16:50:53 +0100
+Message-ID: <20221102155101.4550-10-sergei.shtepa@veeam.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20221102155101.4550-1-sergei.shtepa@veeam.com>
 References: <20221102155101.4550-1-sergei.shtepa@veeam.com>
@@ -56,115 +56,238 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Provides creation of a class file /sys/class/blksnap and a device file
-/dev/blksnap for module management.
+The struct diff_buffer describes a buffer in memory for the minimum data
+storage block of the original block device (struct chunk).
+Buffer allocation and release functions allow to reduce the number of
+allocations and releases of a large number of memory pages.
 
 Signed-off-by: Sergei Shtepa <sergei.shtepa@veeam.com>
 ---
- drivers/block/blksnap/sysfs.c | 79 +++++++++++++++++++++++++++++++++++
- drivers/block/blksnap/sysfs.h |  7 ++++
- 2 files changed, 86 insertions(+)
- create mode 100644 drivers/block/blksnap/sysfs.c
- create mode 100644 drivers/block/blksnap/sysfs.h
+ drivers/block/blksnap/diff_buffer.c | 132 ++++++++++++++++++++++++++++
+ drivers/block/blksnap/diff_buffer.h |  75 ++++++++++++++++
+ 2 files changed, 207 insertions(+)
+ create mode 100644 drivers/block/blksnap/diff_buffer.c
+ create mode 100644 drivers/block/blksnap/diff_buffer.h
 
-diff --git a/drivers/block/blksnap/sysfs.c b/drivers/block/blksnap/sysfs.c
+diff --git a/drivers/block/blksnap/diff_buffer.c b/drivers/block/blksnap/diff_buffer.c
 new file mode 100644
-index 000000000000..fd20336a14c7
+index 000000000000..b24dc7b71e2f
 --- /dev/null
-+++ b/drivers/block/blksnap/sysfs.c
-@@ -0,0 +1,79 @@
++++ b/drivers/block/blksnap/diff_buffer.c
+@@ -0,0 +1,132 @@
 +// SPDX-License-Identifier: GPL-2.0
-+#define pr_fmt(fmt) KBUILD_MODNAME "-sysfs: " fmt
-+#include <linux/module.h>
-+#include <linux/blkdev.h>
-+#include <linux/sysfs.h>
-+#include <linux/device.h>
-+#include <uapi/linux/blksnap.h>
-+#include "sysfs.h"
-+#include "ctrl.h"
++#define pr_fmt(fmt) KBUILD_MODNAME "-diff-buffer: " fmt
++#include "params.h"
++#include "diff_buffer.h"
++#include "diff_area.h"
 +
-+static ssize_t major_show(struct class *class, struct class_attribute *attr,
-+			  char *buf)
++static void diff_buffer_free(struct diff_buffer *diff_buffer)
 +{
-+	sprintf(buf, "%d", get_blk_snap_major());
-+	return strlen(buf);
++	size_t inx = 0;
++
++	if (unlikely(!diff_buffer))
++		return;
++
++	for (inx = 0; inx < diff_buffer->page_count; inx++) {
++		struct page *page = diff_buffer->pages[inx];
++
++		if (page)
++			__free_page(page);
++	}
++
++	kfree(diff_buffer);
 +}
 +
-+/* Declare class_attr_major */
-+CLASS_ATTR_RO(major);
-+
-+static struct class *blk_snap_class;
-+
-+static struct device *blk_snap_device;
-+
-+int sysfs_init(void)
++static struct diff_buffer *
++diff_buffer_new(size_t page_count, size_t buffer_size, gfp_t gfp_mask)
 +{
-+	struct device *dev;
-+	int res;
++	struct diff_buffer *diff_buffer;
++	size_t inx = 0;
++	struct page *page;
 +
-+	blk_snap_class = class_create(THIS_MODULE, THIS_MODULE->name);
-+	if (IS_ERR(blk_snap_class)) {
-+		res = PTR_ERR(blk_snap_class);
++	if (unlikely(page_count <= 0))
++		return NULL;
 +
-+		pr_err("Bad class create. errno=%d\n", abs(res));
-+		return res;
++	/*
++	 * In case of overflow, it is better to get a null pointer
++	 * than a pointer to some memory area. Therefore + 1.
++	 */
++	diff_buffer = kzalloc(sizeof(struct diff_buffer) +
++				      (page_count + 1) * sizeof(struct page *),
++			      gfp_mask);
++	if (!diff_buffer)
++		return NULL;
++
++	INIT_LIST_HEAD(&diff_buffer->link);
++	diff_buffer->size = buffer_size;
++	diff_buffer->page_count = page_count;
++
++	for (inx = 0; inx < page_count; inx++) {
++		page = alloc_page(gfp_mask);
++		if (!page)
++			goto fail;
++
++		diff_buffer->pages[inx] = page;
 +	}
-+
-+	pr_info("Create 'major' sysfs attribute\n");
-+	res = class_create_file(blk_snap_class, &class_attr_major);
-+	if (res) {
-+		pr_err("Failed to create 'major' sysfs file\n");
-+
-+		class_destroy(blk_snap_class);
-+		blk_snap_class = NULL;
-+		return res;
-+	}
-+
-+	dev = device_create(blk_snap_class, NULL,
-+			    MKDEV(get_blk_snap_major(), 0), NULL,
-+			    THIS_MODULE->name);
-+	if (IS_ERR(dev)) {
-+		res = PTR_ERR(dev);
-+		pr_err("Failed to create device, errno=%d\n", abs(res));
-+
-+		class_remove_file(blk_snap_class, &class_attr_major);
-+		class_destroy(blk_snap_class);
-+		blk_snap_class = NULL;
-+		return res;
-+	}
-+
-+	blk_snap_device = dev;
-+	return res;
++	return diff_buffer;
++fail:
++	diff_buffer_free(diff_buffer);
++	return NULL;
 +}
 +
-+void sysfs_done(void)
++struct diff_buffer *diff_buffer_take(struct diff_area *diff_area,
++				     const bool is_nowait)
 +{
-+	pr_info("Cleanup sysfs\n");
++	struct diff_buffer *diff_buffer = NULL;
++	sector_t chunk_sectors;
++	size_t page_count;
++	size_t buffer_size;
 +
-+	if (blk_snap_device) {
-+		device_unregister(blk_snap_device);
-+		blk_snap_device = NULL;
++	spin_lock(&diff_area->free_diff_buffers_lock);
++	diff_buffer = list_first_entry_or_null(&diff_area->free_diff_buffers,
++					       struct diff_buffer, link);
++	if (diff_buffer) {
++		list_del(&diff_buffer->link);
++		atomic_dec(&diff_area->free_diff_buffers_count);
++	}
++	spin_unlock(&diff_area->free_diff_buffers_lock);
++
++	/* Return free buffer if it was found in a pool */
++	if (diff_buffer)
++		return diff_buffer;
++
++	/* Allocate new buffer */
++	chunk_sectors = diff_area_chunk_sectors(diff_area);
++	page_count = round_up(chunk_sectors, PAGE_SECTORS) / PAGE_SECTORS;
++	buffer_size = chunk_sectors << SECTOR_SHIFT;
++
++	diff_buffer =
++		diff_buffer_new(page_count, buffer_size,
++				is_nowait ? (GFP_NOIO | GFP_NOWAIT) : GFP_NOIO);
++	if (unlikely(!diff_buffer)) {
++		if (is_nowait)
++			return ERR_PTR(-EAGAIN);
++		else
++			return ERR_PTR(-ENOMEM);
 +	}
 +
-+	if (blk_snap_class != NULL) {
-+		class_remove_file(blk_snap_class, &class_attr_major);
-+		class_destroy(blk_snap_class);
-+		blk_snap_class = NULL;
-+	}
++	return diff_buffer;
 +}
-diff --git a/drivers/block/blksnap/sysfs.h b/drivers/block/blksnap/sysfs.h
++
++void diff_buffer_release(struct diff_area *diff_area,
++			 struct diff_buffer *diff_buffer)
++{
++	if (atomic_read(&diff_area->free_diff_buffers_count) >
++	    free_diff_buffer_pool_size) {
++		diff_buffer_free(diff_buffer);
++		return;
++	}
++	spin_lock(&diff_area->free_diff_buffers_lock);
++	list_add_tail(&diff_buffer->link, &diff_area->free_diff_buffers);
++	atomic_inc(&diff_area->free_diff_buffers_count);
++	spin_unlock(&diff_area->free_diff_buffers_lock);
++}
++
++void diff_buffer_cleanup(struct diff_area *diff_area)
++{
++	struct diff_buffer *diff_buffer = NULL;
++
++	do {
++		spin_lock(&diff_area->free_diff_buffers_lock);
++		diff_buffer =
++			list_first_entry_or_null(&diff_area->free_diff_buffers,
++						 struct diff_buffer, link);
++		if (diff_buffer) {
++			list_del(&diff_buffer->link);
++			atomic_dec(&diff_area->free_diff_buffers_count);
++		}
++		spin_unlock(&diff_area->free_diff_buffers_lock);
++
++		if (diff_buffer)
++			diff_buffer_free(diff_buffer);
++	} while (diff_buffer);
++}
+diff --git a/drivers/block/blksnap/diff_buffer.h b/drivers/block/blksnap/diff_buffer.h
 new file mode 100644
-index 000000000000..66ce9d1509af
+index 000000000000..d1ff80452552
 --- /dev/null
-+++ b/drivers/block/blksnap/sysfs.h
-@@ -0,0 +1,7 @@
++++ b/drivers/block/blksnap/diff_buffer.h
+@@ -0,0 +1,75 @@
 +/* SPDX-License-Identifier: GPL-2.0 */
-+#ifndef __BLK_SNAP_SYSFS_H
-+#define __BLK_SNAP_SYSFS_H
++#ifndef __BLK_SNAP_DIFF_BUFFER_H
++#define __BLK_SNAP_DIFF_BUFFER_H
 +
-+int sysfs_init(void);
-+void sysfs_done(void);
-+#endif /* __BLK_SNAP_SYSFS_H */
++#include <linux/types.h>
++#include <linux/slab.h>
++#include <linux/list.h>
++#include <linux/blkdev.h>
++
++struct diff_area;
++
++/**
++ * struct diff_buffer - Difference buffer.
++ * @link:
++ *	The list header allows to create a pool of the diff_buffer structures.
++ * @size:
++ *	Count of bytes in the buffer.
++ * @page_count:
++ *	The number of pages reserved for the buffer.
++ * @pages:
++ *	An array of pointers to pages.
++ *
++ * Describes the memory buffer for a chunk in the memory.
++ */
++struct diff_buffer {
++	struct list_head link;
++	size_t size;
++	size_t page_count;
++	struct page *pages[0];
++};
++
++/**
++ * struct diff_buffer_iter - Iterator for &struct diff_buffer.
++ * @page:
++ *      A pointer to the current page.
++ * @offset:
++ *      The offset in bytes in the current page.
++ * @bytes:
++ *      The number of bytes that can be read or written from the current page.
++ *
++ * It is convenient to use when copying data from or to &struct bio_vec.
++ */
++struct diff_buffer_iter {
++	struct page *page;
++	size_t offset;
++	size_t bytes;
++};
++
++static inline bool diff_buffer_iter_get(struct diff_buffer *diff_buffer,
++					size_t buff_offset,
++					struct diff_buffer_iter *iter)
++{
++	if (diff_buffer->size <= buff_offset)
++		return false;
++
++	iter->page = diff_buffer->pages[buff_offset >> PAGE_SHIFT];
++	iter->offset = (size_t)(buff_offset & (PAGE_SIZE - 1));
++	/*
++	 * The size cannot exceed the size of the page, taking into account
++	 * the offset in this page.
++	 * But at the same time it is unacceptable to go beyond the allocated
++	 * buffer.
++	 */
++	iter->bytes = min_t(size_t, (PAGE_SIZE - iter->offset),
++			    (diff_buffer->size - buff_offset));
++
++	return true;
++};
++
++struct diff_buffer *diff_buffer_take(struct diff_area *diff_area,
++				     const bool is_nowait);
++void diff_buffer_release(struct diff_area *diff_area,
++			 struct diff_buffer *diff_buffer);
++void diff_buffer_cleanup(struct diff_area *diff_area);
++#endif /* __BLK_SNAP_DIFF_BUFFER_H */
 -- 
 2.20.1
 
