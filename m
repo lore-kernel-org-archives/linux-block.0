@@ -2,85 +2,111 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AFC5FC433FE
-	for <linux-block@archiver.kernel.org>; Thu,  3 Nov 2022 16:45:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BA251C433FE
+	for <linux-block@archiver.kernel.org>; Thu,  3 Nov 2022 18:14:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232083AbiKCQpt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 3 Nov 2022 12:45:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40672 "EHLO
+        id S230294AbiKCSOX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 3 Nov 2022 14:14:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50672 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232416AbiKCQpa (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 3 Nov 2022 12:45:30 -0400
-Received: from hermod.demsh.org (hermod.demsh.org [45.140.147.175])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A3FB12181E
-        for <linux-block@vger.kernel.org>; Thu,  3 Nov 2022 09:41:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=demsh.org; s=022020;
-        t=1667493703;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=bmo8YllTKr3d69x36gjkgs95Fvx7JVipXgs5l7SajpE=;
-        b=grtWx4gz27MaI1rrH8aHk4Ci/zvX0oOXqQpAYWccAluSSviu00/VA71re3t5kkYr0vharS
-        Y8wpILKpZnVRvg++jkzVLuM1GjY10GT1hSqBYYbXWYUwUpLocCtRllSUtgRCmmiI9cOLS/
-        SMiG31ityVXUgCamE6hlkRQp40x+lbX0x3xXqVRMxRP9e0J2DX8oHC3dp/oQF4PXI+L6Wp
-        6ba2R2EsrFWFLzbXhzhmaeIcAd+Qg0tYUbJ2TNtOMM7U1kQ8PmTpc5ELrpo4IIxmY0afFL
-        JSSrwPMvhC0VBME/68jo0vJySVCUJDCPHdM4vcmBl/7OjzwX06rF0YflzjPKVw==
-Received: from xps.demsh.org (algiz.demsh.org [94.103.82.47])
-        by hermod.demsh.org (OpenSMTPD) with ESMTPSA id c712456e (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO) auth=yes user=me;
-        Thu, 3 Nov 2022 16:41:43 +0000 (UTC)
-Date:   Thu, 3 Nov 2022 19:41:40 +0300
-From:   Dmitrii Tcvetkov <me@demsh.org>
-To:     Keith Busch <kbusch@meta.com>
-Cc:     <linux-block@vger.kernel.org>, <dm-devel@redhat.com>,
-        <axboe@kernel.dk>, <stefanha@redhat.com>, <ebiggers@kernel.org>,
-        <mpatocka@redhat.com>, Keith Busch <kbusch@kernel.org>
-Subject: Re: [PATCH 0/3] fix direct io errors on dm-crypt
-Message-ID: <20221103194140.06ce3d36@xps.demsh.org>
-In-Reply-To: <20221103152559.1909328-1-kbusch@meta.com>
-References: <20221103152559.1909328-1-kbusch@meta.com>
+        with ESMTP id S230165AbiKCSOW (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 3 Nov 2022 14:14:22 -0400
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13EBF6252;
+        Thu,  3 Nov 2022 11:14:22 -0700 (PDT)
+Received: by mail-pl1-f169.google.com with SMTP id d20so1628823plr.10;
+        Thu, 03 Nov 2022 11:14:22 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=AAumLxLnWfAM18CUZyhLKrEQTBxFDu0Nq3UHPT8n9DM=;
+        b=fiBPUBEIxIE3XElAT/zeDtSLPL9owi4Cu2Y7HwcnCiCYtBkLW0QZClAZ5lbtgvtbNZ
+         vqCp6yrCOlKTleMVslwJdnRmzs2LvwfFyd8fXls3GID7v77zPx+dts+PaYIjGCNBj55M
+         u93rLP75yHvKpwM1xfFgfGteCaLP1KFFQpbGsiOHIBABYvdrkpwYxx501CieBouqVvBP
+         X3Fdkedk1FAE3HMy+TviFA0/jWl59lJ5m7seNUkJ4zCB0g42I66Q1YadPYe1TGy+nAN8
+         CqTJ+jCxm83teJsmAHENq+E4ReFRXJNEYrA+tMJByXnp8HJrriyqmd+GAuttIjJTWCIU
+         Yixw==
+X-Gm-Message-State: ACrzQf3Vnx2PXwclG1NyzVb25I2fZadMZbHXxZdcqikYWtGBFVnE7MV1
+        4ZGxFZnXp/rKSOzp2wMi5c7APzsxG+M=
+X-Google-Smtp-Source: AMsMyM7EErA8tHxPvzrZVcpD4tDFhNKSgLTGblrV/zcW9vCOr6QKeDAhLbttK1YYZeyphS7cjxvfow==
+X-Received: by 2002:a17:90b:4d0e:b0:1f7:ae99:4d7f with SMTP id mw14-20020a17090b4d0e00b001f7ae994d7fmr49029090pjb.200.1667499261396;
+        Thu, 03 Nov 2022 11:14:21 -0700 (PDT)
+Received: from ?IPV6:2620:15c:211:201:881a:8a80:fdae:8683? ([2620:15c:211:201:881a:8a80:fdae:8683])
+        by smtp.gmail.com with ESMTPSA id q17-20020a17090311d100b00178b77b7e71sm958760plh.188.2022.11.03.11.14.18
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 03 Nov 2022 11:14:20 -0700 (PDT)
+Message-ID: <84af9938-81bc-7c58-2210-7da935312d6a@acm.org>
+Date:   Thu, 3 Nov 2022 11:14:17 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.3.0
+Subject: Re: [PATCH v3 03/19] scsi: Move sd_pr_type to header to share
+Content-Language: en-US
+To:     Mike Christie <michael.christie@oracle.com>, hch@lst.de,
+        martin.petersen@oracle.com, linux-scsi@vger.kernel.org,
+        james.bottomley@hansenpartnership.com, linux-block@vger.kernel.org,
+        dm-devel@redhat.com, snitzer@kernel.org, axboe@kernel.dk,
+        linux-nvme@lists.infradead.org, chaitanyak@nvidia.com,
+        kbusch@kernel.org, target-devel@vger.kernel.org
+References: <20221026231945.6609-1-michael.christie@oracle.com>
+ <20221026231945.6609-4-michael.christie@oracle.com>
+ <0123db70-6217-135a-4101-0609512e723b@acm.org>
+ <7b8cdc82-0aca-2f41-2eed-299dacf95771@oracle.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <7b8cdc82-0aca-2f41-2eed-299dacf95771@oracle.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, 3 Nov 2022 08:25:56 -0700
-Keith Busch <kbusch@meta.com> wrote:
+On 11/2/22 19:13, Mike Christie wrote:
+> On 11/2/22 5:47 PM, Bart Van Assche wrote:
+>> On 10/26/22 16:19, Mike Christie wrote:
+>>> +static inline enum scsi_pr_type block_pr_type_to_scsi(enum pr_type type)
+>>> +{
+>>> +    switch (type) {
+>>> +    case PR_WRITE_EXCLUSIVE:
+>>> +        return SCSI_PR_WRITE_EXCLUSIVE;
+>>> +    case PR_EXCLUSIVE_ACCESS:
+>>> +        return SCSI_PR_EXCLUSIVE_ACCESS;
+>>> +    case PR_WRITE_EXCLUSIVE_REG_ONLY:
+>>> +        return SCSI_PR_WRITE_EXCLUSIVE_REG_ONLY;
+>>> +    case PR_EXCLUSIVE_ACCESS_REG_ONLY:
+>>> +        return SCSI_PR_EXCLUSIVE_ACCESS_REG_ONLY;
+>>> +    case PR_WRITE_EXCLUSIVE_ALL_REGS:
+>>> +        return SCSI_PR_WRITE_EXCLUSIVE_ALL_REGS;
+>>> +    case PR_EXCLUSIVE_ACCESS_ALL_REGS:
+>>> +        return SCSI_PR_EXCLUSIVE_ACCESS_ALL_REGS;
+>>> +    default:
+>>> +        return 0;
+>>> +    }
+>>> +};
+>>
+>> Please leave out "default: return 0;" from the switch statement and add "return 0;" after the switch statement. That will make the compiler emit a warning if a value is added in enum pr_type but not in the above function.
+> 
+> Did you want that compiler warning functionality in the future code
+> or are you asking me to do the above only if we go the switch based
+> route?
+> 
+> Chaitanya requested me to make this array based in nvme/scsi. For this
+> approach, I can add a WARN or printk warning if the pr_type passed in
+> does not match a value in the array. I don't think I can do a compiler
+> warning though.
+> 
+> I didn't care, but I think the compiler warning route might be better
+> though.
 
-> From: Keith Busch <kbusch@kernel.org>
-> 
-> The 6.0 kernel made some changes to the direct io interface to allow
-> offsets in user addresses. This based on the hardware's capabilities
-> reported in the request_queue's dma_alignment attribute.
-> 
-> dm-crypt requires direct io be aligned to the block size. Since it was
-> only ever using the default 511 dma mask, this requirement may fail if
-> formatted to something larger, like 4k, which will result in
-> unexpected behavior with direct-io.
-> 
-> There are two parts to fixing this:
-> 
->   First, the attribute needs to be moved to the queue_limit so that it
->   can properly stack with device mappers.
-> 
->   Second, dm-crypt provides its minimum required limit to match the
->   logical block size.
-> 
-> Keith Busch (3):
->   block: make dma_alignment a stacking queue_limit
->   dm-crypt: provide dma_alignment limit in io_hints
->   block: make blk_set_default_limits() private
-> 
->  block/blk-core.c       |  1 -
->  block/blk-settings.c   |  9 +++++----
->  block/blk.h            |  1 +
->  drivers/md/dm-crypt.c  |  1 +
->  include/linux/blkdev.h | 16 ++++++++--------
->  5 files changed, 15 insertions(+), 13 deletions(-)
-> 
+Hi Mike,
 
-Applied on top 6.1-rc3, after that issue[1] doesn't reproduce.
+Although I do not have a strong opinion about this, keeping the switch 
+statement and moving the return statement out of the switch statement 
+has the advantage that the compiler will warn if the switch statement is 
+incomplete. I don't think that a similar warning would be emitted if the 
+switch statement would be converted into an array lookup.
 
-[1] https://lore.kernel.org/linux-block/20221101001558.648ee024@xps.demsh.org/
+Thanks,
+
+Bart.
