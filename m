@@ -2,137 +2,113 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DF59C433FE
-	for <linux-block@archiver.kernel.org>; Thu,  3 Nov 2022 16:27:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D499C4332F
+	for <linux-block@archiver.kernel.org>; Thu,  3 Nov 2022 16:37:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230423AbiKCQ05 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 3 Nov 2022 12:26:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50830 "EHLO
+        id S231601AbiKCQhJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 3 Nov 2022 12:37:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57200 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231768AbiKCQ0s (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 3 Nov 2022 12:26:48 -0400
-Received: from mail-ed1-x536.google.com (mail-ed1-x536.google.com [IPv6:2a00:1450:4864:20::536])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B257DF0C
-        for <linux-block@vger.kernel.org>; Thu,  3 Nov 2022 09:26:47 -0700 (PDT)
-Received: by mail-ed1-x536.google.com with SMTP id a13so3938666edj.0
-        for <linux-block@vger.kernel.org>; Thu, 03 Nov 2022 09:26:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1NDAA6/E/P9lXM9Ku+t+E0rrluZwqWDYrKOwSkHUnDs=;
-        b=Pm/gfINPE4LLxbTpwlYOTiaz4l3SOk0t9OltHwcjVhRDjEjuG1U04RONmR3C2lDHq/
-         ad7tnzffxg56mz5f/jxEZNm16QzPp/XXMy5lN2ldidKPteb6Sfv10YYFcFtB+9oFRrtN
-         xL/wK7smqz5prIsMRaq026zgKIL/0H0OlFtDCt6H4KtAF+PT6O0Evw/briI9n1E60iwD
-         DSFKGsaBCRfxIYhjik5Gc5JUMRc+6O9NFLuospAJhmriCwYXo1labqPUczADLKA/DyMv
-         5ZVI2UHx7e2Nlmmv8jc4JrBkNwV4cK3YH8fKWov7VDF4m7B/nEKpM4su3jmUAtdg/UYn
-         FC9g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=1NDAA6/E/P9lXM9Ku+t+E0rrluZwqWDYrKOwSkHUnDs=;
-        b=hFQU1ibPPfchgdJpwSBZ2eb/Z4Vo/XjP8CkbLnnGMJlK48HJUpC59e7FX8v2IKI0CC
-         htPdy+ZXIQ6BzoV/IdL9oLlbsrKrj7CsKVSd08vaGeSYQhp8ifmHGJs/x7wmEfyBRvv8
-         jKXGODbcX1AY8sWGagAVT75s+8Ml0Vuv7qlB4xRpEueQrps9EGWxexjMk7GWx9yeepAY
-         GEwy8Pao705vGCeXtxJ0qN/f41shiydAusKti3/lqQ1tiuiy/NgEC8nd7P0IlQ2iRc6E
-         5CqdvrKem9ij+cQO4nlKYhj4WW/QJF+3Ces4o402K5ITrnfb18nYdy1xwcYxqZbruI8P
-         XRIA==
-X-Gm-Message-State: ACrzQf0oagxyB16+cZvcVHc/mGsSD9hZCAD4afaU1MCd+LZp1Q8lS0Go
-        NtPrci0obaohYgR511MCCqGMFA==
-X-Google-Smtp-Source: AMsMyM7Z7gsABFnd5jbyemd92szqyQHJQP4shDL1yEiYB9KhJME7VKqMZz8JwwszxMvd9stGWvmfUQ==
-X-Received: by 2002:aa7:d5ca:0:b0:464:4ac8:d265 with SMTP id d10-20020aa7d5ca000000b004644ac8d265mr2389437eds.265.1667492806022;
-        Thu, 03 Nov 2022 09:26:46 -0700 (PDT)
-Received: from MBP-di-Paolo.station (net-2-35-55-161.cust.vodafonedsl.it. [2.35.55.161])
-        by smtp.gmail.com with ESMTPSA id kx9-20020a170907774900b0078116c361d9sm702507ejc.10.2022.11.03.09.26.45
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 03 Nov 2022 09:26:45 -0700 (PDT)
-From:   Paolo Valente <paolo.valente@linaro.org>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        arie.vanderhoeven@seagate.com, rory.c.chen@seagate.com,
-        Davide Zini <davidezini2@gmail.com>,
-        Paolo Valente <paolo.valente@linaro.org>
-Subject: [PATCH V6 8/8] block, bfq: balance I/O injection among underutilized actuators
-Date:   Thu,  3 Nov 2022 17:26:23 +0100
-Message-Id: <20221103162623.10286-9-paolo.valente@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20221103162623.10286-1-paolo.valente@linaro.org>
-References: <20221103162623.10286-1-paolo.valente@linaro.org>
+        with ESMTP id S232377AbiKCQgq (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 3 Nov 2022 12:36:46 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A05C41FCE3
+        for <linux-block@vger.kernel.org>; Thu,  3 Nov 2022 09:33:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1667493203;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=fUF+I8EGINVzhDXITd/3muSBjqwK5fHoHzpzwmb86fA=;
+        b=SzAJfcsKJSM8tCGv3s8VUti8mvioRZaRnL6+/B5yFwhw3MSzECAs9fWEV/i9iA9ik83UBI
+        C8i+V5TTWGMTi3kHoFtMDV8EIAlLy0ZI2Sfk0ZM5nhhzcK5mjwUmd6o70Jn3bs50wwUOS7
+        UNXpHkAbdqXbcsb4BAPDIdEdOLrnTwY=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-652-XInoI0sSPg-L9Xr7SODwAA-1; Thu, 03 Nov 2022 12:33:21 -0400
+X-MC-Unique: XInoI0sSPg-L9Xr7SODwAA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id EA37486F12E;
+        Thu,  3 Nov 2022 16:33:20 +0000 (UTC)
+Received: from file01.intranet.prod.int.rdu2.redhat.com (file01.intranet.prod.int.rdu2.redhat.com [10.11.5.7])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id B7F301415123;
+        Thu,  3 Nov 2022 16:33:20 +0000 (UTC)
+Received: from file01.intranet.prod.int.rdu2.redhat.com (localhost [127.0.0.1])
+        by file01.intranet.prod.int.rdu2.redhat.com (8.14.4/8.14.4) with ESMTP id 2A3GXKK1011752;
+        Thu, 3 Nov 2022 12:33:20 -0400
+Received: from localhost (mpatocka@localhost)
+        by file01.intranet.prod.int.rdu2.redhat.com (8.14.4/8.14.4/Submit) with ESMTP id 2A3GXJEQ011749;
+        Thu, 3 Nov 2022 12:33:19 -0400
+X-Authentication-Warning: file01.intranet.prod.int.rdu2.redhat.com: mpatocka owned process doing -bs
+Date:   Thu, 3 Nov 2022 12:33:19 -0400 (EDT)
+From:   Mikulas Patocka <mpatocka@redhat.com>
+X-X-Sender: mpatocka@file01.intranet.prod.int.rdu2.redhat.com
+To:     Keith Busch <kbusch@meta.com>
+cc:     linux-block@vger.kernel.org, dm-devel@redhat.com, axboe@kernel.dk,
+        stefanha@redhat.com, ebiggers@kernel.org, me@demsh.org,
+        Keith Busch <kbusch@kernel.org>
+Subject: Re: [PATCH 0/3] fix direct io errors on dm-crypt
+In-Reply-To: <20221103152559.1909328-1-kbusch@meta.com>
+Message-ID: <alpine.LRH.2.21.2211031224060.10758@file01.intranet.prod.int.rdu2.redhat.com>
+References: <20221103152559.1909328-1-kbusch@meta.com>
+User-Agent: Alpine 2.21 (LRH 202 2017-01-01)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.7
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Davide Zini <davidezini2@gmail.com>
+Hi
 
-Upon the invocation of its dispatch function, BFQ returns the next I/O
-request of the in-service bfq_queue, unless some exception holds. One
-such exception is that there is some underutilized actuator, different
-from the actuator for which the in-service queue contains I/O, and
-that some other bfq_queue happens to contain I/O for such an
-actuator. In this case, the next I/O request of the latter bfq_queue,
-and not of the in-service bfq_queue, is returned (I/O is injected from
-that bfq_queue). To find such an actuator, a linear scan, in
-increasing index order, is performed among actuators.
+The patchset seems OK - but dm-integrity also has a limitation that the 
+bio vectors must be aligned on logical block size.
 
-Performing a linear scan entails a prioritization among actuators: an
-underutilized actuator may be considered for injection only if all
-actuators with a lower index are currently fully utilized, or if there
-is no pending I/O for any lower-index actuator that happens to be
-underutilized.
+dm-writecache and dm-verity seem to handle unaligned bioset, but you 
+should check them anyway.
 
-This commits breaks this prioritization and tends to distribute
-injection uniformly across actuators. This is obtained by adding the
-following condition to the linear scan: even if an actuator A is
-underutilized, A is however skipped if its load is higher than that of
-the next actuator.
+I'm not sure about dm-log-writes.
 
-Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
-Signed-off-by: Davide Zini <davidezini2@gmail.com>
----
- block/bfq-iosched.c | 18 +++++++++++++-----
- 1 file changed, 13 insertions(+), 5 deletions(-)
+Mikulas
 
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index db91f1a651d3..c568a5a112a7 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -4813,10 +4813,16 @@ bfq_find_active_bfqq_for_actuator(struct bfq_data *bfqd,
- 
- /*
-  * Perform a linear scan of each actuator, until an actuator is found
-- * for which the following two conditions hold: the load of the
-- * actuator is below the threshold (see comments on actuator_load_threshold
-- * for details), and there is a queue that contains I/O for that
-- * actuator. On success, return that queue.
-+ * for which the following three conditions hold: the load of the
-+ * actuator is below the threshold (see comments on
-+ * actuator_load_threshold for details) and lower than that of the
-+ * next actuator (comments on this extra condition below), and there
-+ * is a queue that contains I/O for that actuator. On success, return
-+ * that queue.
-+ *
-+ * Performing a plain linear scan entails a prioritization among
-+ * actuators. The extra condition above breaks this prioritization and
-+ * tends to distribute injection uniformly across actuators.
-  */
- static struct bfq_queue *
- bfq_find_bfqq_for_underused_actuator(struct bfq_data *bfqd)
-@@ -4824,7 +4830,9 @@ bfq_find_bfqq_for_underused_actuator(struct bfq_data *bfqd)
- 	int i;
- 
- 	for (i = 0 ; i < bfqd->num_actuators; i++)
--		if (bfqd->rq_in_driver[i] < bfqd->actuator_load_threshold) {
-+		if (bfqd->rq_in_driver[i] < bfqd->actuator_load_threshold &&
-+		    (i == bfqd->num_actuators - 1 ||
-+		     bfqd->rq_in_driver[i] < bfqd->rq_in_driver[i+1])) {
- 			struct bfq_queue *bfqq =
- 				bfq_find_active_bfqq_for_actuator(bfqd, i);
- 
--- 
-2.20.1
+
+On Thu, 3 Nov 2022, Keith Busch wrote:
+
+> From: Keith Busch <kbusch@kernel.org>
+> 
+> The 6.0 kernel made some changes to the direct io interface to allow
+> offsets in user addresses. This based on the hardware's capabilities
+> reported in the request_queue's dma_alignment attribute.
+> 
+> dm-crypt requires direct io be aligned to the block size. Since it was
+> only ever using the default 511 dma mask, this requirement may fail if
+> formatted to something larger, like 4k, which will result in unexpected
+> behavior with direct-io.
+> 
+> There are two parts to fixing this:
+> 
+>   First, the attribute needs to be moved to the queue_limit so that it
+>   can properly stack with device mappers.
+> 
+>   Second, dm-crypt provides its minimum required limit to match the
+>   logical block size.
+> 
+> Keith Busch (3):
+>   block: make dma_alignment a stacking queue_limit
+>   dm-crypt: provide dma_alignment limit in io_hints
+>   block: make blk_set_default_limits() private
+> 
+>  block/blk-core.c       |  1 -
+>  block/blk-settings.c   |  9 +++++----
+>  block/blk.h            |  1 +
+>  drivers/md/dm-crypt.c  |  1 +
+>  include/linux/blkdev.h | 16 ++++++++--------
+>  5 files changed, 15 insertions(+), 13 deletions(-)
+> 
+> -- 
+> 2.30.2
+> 
 
