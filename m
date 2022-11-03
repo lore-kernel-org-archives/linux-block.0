@@ -2,90 +2,96 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 727F8C43219
-	for <linux-block@archiver.kernel.org>; Wed,  2 Nov 2022 22:55:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 014E7C4332F
+	for <linux-block@archiver.kernel.org>; Thu,  3 Nov 2022 01:03:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230072AbiKBWzT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 2 Nov 2022 18:55:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50408 "EHLO
+        id S229516AbiKCBDf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 2 Nov 2022 21:03:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58234 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230418AbiKBWzC (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Nov 2022 18:55:02 -0400
-Received: from mail-pg1-f174.google.com (mail-pg1-f174.google.com [209.85.215.174])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D4A2CDF87;
-        Wed,  2 Nov 2022 15:55:01 -0700 (PDT)
-Received: by mail-pg1-f174.google.com with SMTP id v3so132302pgh.4;
-        Wed, 02 Nov 2022 15:55:01 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=FhcJfbAsBWcPbIOPhmf4NmsmIT2+nCjFL2diMORdIc4=;
-        b=bzzZfRk7WGRSYoxpE3qiQ+pLdF0GfKY0zPHomZKxO/iMecZ92y/m7jsH2FjmpXArKR
-         vIjxr1759C+1s6pwJFE1Gt1RWtt6BbdW/G3f6lzYP1SkwGmEcX32/zfwyuFrl+Y1ko0F
-         /j7g83ma/Inx9gb9QuCcbzp6+/XWpn727ODds9G1OkDGpyVwy+h0wCI7Bf707O8LQou5
-         l1eZlIuOAhhxdJzLyMDT1YCbjzw4ZydKwJdILOOeLQZ12UczsNWSNp24xi7TNiecI6UM
-         CKZpXUpbNWR2S8Kt7ut7hna4hotgFzOXHkkQa3HuNgfql6UDsDhj4DIJY/w45JJDmw1/
-         hLNQ==
-X-Gm-Message-State: ACrzQf3EsZ6lN6U5CQi6RM5v9xlmVMEAFUdG53L/SPR2wj6mtFlium9k
-        EylYz0escFKfO4AJseLjQ3A=
-X-Google-Smtp-Source: AMsMyM6jm80wXzBme3fqf0bXNSyD8N9iJ7BsvU1v+V/kepBM9YQJbRErCViosW8DEAyldaWwwy8RvQ==
-X-Received: by 2002:a63:d757:0:b0:46f:9446:273d with SMTP id w23-20020a63d757000000b0046f9446273dmr20335679pgi.436.1667429701140;
-        Wed, 02 Nov 2022 15:55:01 -0700 (PDT)
-Received: from ?IPV6:2620:15c:211:201:22d3:f380:fa84:4b89? ([2620:15c:211:201:22d3:f380:fa84:4b89])
-        by smtp.gmail.com with ESMTPSA id pc3-20020a17090b3b8300b00212cf2fe8c3sm3823933pjb.1.2022.11.02.15.54.58
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 02 Nov 2022 15:55:00 -0700 (PDT)
-Message-ID: <1b4bde2b-782d-67c2-62c7-8f5c13721fa8@acm.org>
-Date:   Wed, 2 Nov 2022 15:54:57 -0700
+        with ESMTP id S229459AbiKCBDe (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Nov 2022 21:03:34 -0400
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DBAD5265B
+        for <linux-block@vger.kernel.org>; Wed,  2 Nov 2022 18:03:30 -0700 (PDT)
+Received: from mail02.huawei.com (unknown [172.30.67.143])
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4N2lnS4rqnzl9Bs
+        for <linux-block@vger.kernel.org>; Thu,  3 Nov 2022 09:01:16 +0800 (CST)
+Received: from [10.174.176.73] (unknown [10.174.176.73])
+        by APP2 (Coremail) with SMTP id Syh0CgBH39NfE2NjNdITBQ--.33068S3;
+        Thu, 03 Nov 2022 09:03:28 +0800 (CST)
+Subject: Re: [PATCH 8/7] block: don't claim devices that are not live in
+ bd_link_disk_holder
+To:     Christoph Hellwig <hch@lst.de>, Yu Kuai <yukuai1@huaweicloud.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, Alasdair Kergon <agk@redhat.com>,
+        Mike Snitzer <snitzer@kernel.org>, dm-devel@redhat.com,
+        linux-block@vger.kernel.org, "yukuai (C)" <yukuai3@huawei.com>
+References: <20221102064854.GA8950@lst.de>
+ <1dc5c1d0-72b6-5455-0b05-5c755ad69045@huaweicloud.com>
+ <20221102141700.GA4442@lst.de>
+From:   Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <3380eda2-6a38-4593-0071-6ff86dcdcda3@huaweicloud.com>
+Date:   Thu, 3 Nov 2022 09:03:26 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.3.0
-Subject: Re: [PATCH v3 04/19] scsi: Add support for block PR read
- keys/reservation
-Content-Language: en-US
-To:     Mike Christie <michael.christie@oracle.com>, hch@lst.de,
-        martin.petersen@oracle.com, linux-scsi@vger.kernel.org,
-        james.bottomley@hansenpartnership.com, linux-block@vger.kernel.org,
-        dm-devel@redhat.com, snitzer@kernel.org, axboe@kernel.dk,
-        linux-nvme@lists.infradead.org, chaitanyak@nvidia.com,
-        kbusch@kernel.org, target-devel@vger.kernel.org
-References: <20221026231945.6609-1-michael.christie@oracle.com>
- <20221026231945.6609-5-michael.christie@oracle.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20221026231945.6609-5-michael.christie@oracle.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <20221102141700.GA4442@lst.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: Syh0CgBH39NfE2NjNdITBQ--.33068S3
+X-Coremail-Antispam: 1UD129KBjvdXoWrZw1DZFW8Cw1rWF45KrW7Arb_yoWftFcEgr
+        Z5u3yDJw1UGa13KF1ftr15Wa9IqFs8Xry8Xr13ZFs5Xa4xX393JFWku348Xa15GrsxArn0
+        kryYk3s2vw4SgjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+        9fnUUIcSsGvfJTRUUUb48FF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
+        6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
+        A2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Cr0_
+        Gr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s
+        0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xII
+        jxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr
+        1lF7xvr2IY64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7Mxk0xIA0c2IEe2xFo4CEbIxv
+        r21l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxV
+        WUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI
+        7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r
+        1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWrZr1j6s0DMIIF0xvEx4A2jsIE14v26r1j6r4U
+        MIIF0xvEx4A2jsIEc7CjxVAFwI0_Jr0_GrUvcSsGvfC2KfnxnUUI43ZEXa7VUbXdbUUUUU
+        U==
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/26/22 16:19, Mike Christie wrote:
-> +static inline enum pr_type scsi_pr_type_to_block(enum scsi_pr_type type)
-> +{
-> +	switch (type) {
-> +	case SCSI_PR_WRITE_EXCLUSIVE:
-> +		return PR_WRITE_EXCLUSIVE;
-> +	case SCSI_PR_EXCLUSIVE_ACCESS:
-> +		return PR_EXCLUSIVE_ACCESS;
-> +	case SCSI_PR_WRITE_EXCLUSIVE_REG_ONLY:
-> +		return PR_WRITE_EXCLUSIVE_REG_ONLY;
-> +	case SCSI_PR_EXCLUSIVE_ACCESS_REG_ONLY:
-> +		return PR_EXCLUSIVE_ACCESS_REG_ONLY;
-> +	case SCSI_PR_WRITE_EXCLUSIVE_ALL_REGS:
-> +		return PR_WRITE_EXCLUSIVE_ALL_REGS;
-> +	case SCSI_PR_EXCLUSIVE_ACCESS_ALL_REGS:
-> +		return PR_EXCLUSIVE_ACCESS_ALL_REGS;
-> +	default:
-> +		return 0;
-> +	}
-> +}
+Hi,
 
-Also for this function, how about moving the "return 0" statement out of 
-the switch statement?
+在 2022/11/02 22:17, Christoph Hellwig 写道:
+> On Wed, Nov 02, 2022 at 08:17:37PM +0800, Yu Kuai wrote:
+>> I think this is still not safe 🤔
+> 
+> Indeed - wrong open_mutex.
+> 
+>> +       /*
+>> +        * del_gendisk drops the initial reference to bd_holder_dir, so we
+>> need
+>> +        * to keep our own here to allow for cleanup past that point.
+>> +        */
+>> +       mutex_lock(&bdev->bd_disk->open_mutex);
+>> +       if (!disk_live(bdev->bd_disk)) {
+>> +               ret = -ENODEV;
+>> +               mutex_unlock(&bdev->bd_disk->open_mutex);
+>> +               goto out_unlock;
+>> +       }
+> 
+> I think this needs to be done before taking disk->open_mutex, otherwise
+> we create a lock order dependency.  Also the comment seems to overflow
+> the usual 80 character limit, and as you noted in the next mail this
+> needs more unwinding.  But yes, otherwise this is the right thing to
+> do.  Do you want to send a replacement for this patch?
+> 
+Of course. And I just spotted a new problem here, I'll send them
+together.
 
 Thanks,
-
-Bart.
+Kuai
+> .
+> 
 
