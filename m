@@ -2,200 +2,133 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C635C4332F
-	for <linux-block@archiver.kernel.org>; Thu,  3 Nov 2022 22:21:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 66630C43217
+	for <linux-block@archiver.kernel.org>; Thu,  3 Nov 2022 22:29:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231691AbiKCWVF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 3 Nov 2022 18:21:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42862 "EHLO
+        id S231797AbiKCW3M (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 3 Nov 2022 18:29:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47454 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231378AbiKCWVA (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 3 Nov 2022 18:21:00 -0400
-Received: from mail-qk1-x72b.google.com (mail-qk1-x72b.google.com [IPv6:2607:f8b0:4864:20::72b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 43BEB21811
-        for <linux-block@vger.kernel.org>; Thu,  3 Nov 2022 15:20:58 -0700 (PDT)
-Received: by mail-qk1-x72b.google.com with SMTP id f8so2110795qkg.3
-        for <linux-block@vger.kernel.org>; Thu, 03 Nov 2022 15:20:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cmpxchg-org.20210112.gappssmtp.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=pMN0/mJYGvzCnOyvxtCJFIOn1RUzuH2afiVlhl8BJN8=;
-        b=R6DRBzl5D7PmTiScz2q1QNrg5S/EVTQpn+C3LtM9SKPmz5cwA30hjj2kpsgOy9eZIa
-         Myw7XsEbkbNfN0tnrvY0/O563gK9D+y0wMqMrdjnsBy6lIZVn7MiXBaIMIsfDB704urv
-         fKP6U3VmiAXsIfqSTLdzXkih52xtbr96MBMR/pC7TTRGId/3MknjV3tU1EVNPCIn4xKI
-         5YLvUn4crDDl0m7eR8kbF5vfBiHAe6I525XruQUlEH0EePJhA5MXVI/wGhUDlxBRV30O
-         ADJH+Df8LJaWzNuMWaZamm1CxC0v1ci3yBoZFfYZv15out2MFkOVyQqJ5huIDjV9OnHg
-         vosg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=pMN0/mJYGvzCnOyvxtCJFIOn1RUzuH2afiVlhl8BJN8=;
-        b=hFSNARsr4/a5CEPTvZ1LN6mRmSe0sAznWbb7juYerOzpBoD4gBtNmzduplo9/Y9615
-         no4A+yZ0Az1RaWMpsiOYh1jIV5nIsSCJOnDakm/m6/+yHqy6l6PQpVDAU8tAXVFxFt9H
-         9jwf/3zluQiCaS3f+Sm/dAShHEsyYDzvnsS66WoxzHX5fCCn0SsZ9GK1+UTiRHHmnsTU
-         e91g8xAqg3riwQvfr1o5g1MjrwOl6KV4p7xBqwOnzRKKARCOadRq2k5RyNcet9uboRjN
-         nMME7JG/1MPpZVO7UgOwS+f3ujkLBaAG8dELYRDEj2UoGHZa/ZYB2eCnTcCwIIlkFDpK
-         M87w==
-X-Gm-Message-State: ACrzQf0EzNIzzkNrvmq15s9tlqnTHn4LK90YmfpUJk5WW1dViAlwSaIH
-        I1P/Sr5D298WUxH6naBJxo9mJQ==
-X-Google-Smtp-Source: AMsMyM6xZDCV9zQJtAhUoSH5ufgDptRZU0dKTD699bnK6iH5NnhZ73hquRFyFxv1/SpheHjZZuwKeg==
-X-Received: by 2002:a05:620a:152e:b0:6fa:3cb8:dd9c with SMTP id n14-20020a05620a152e00b006fa3cb8dd9cmr15550460qkk.82.1667514057172;
-        Thu, 03 Nov 2022 15:20:57 -0700 (PDT)
-Received: from localhost ([2620:10d:c091:480::25f1])
-        by smtp.gmail.com with ESMTPSA id x18-20020a05620a259200b006bc192d277csm1559048qko.10.2022.11.03.15.20.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Nov 2022 15:20:56 -0700 (PDT)
-Date:   Thu, 3 Nov 2022 18:20:59 -0400
-From:   Johannes Weiner <hannes@cmpxchg.org>
-To:     Thorsten Leemhuis <linux@leemhuis.info>
-Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        Matthew Wilcox <willy@infradead.org>,
-        Suren Baghdasaryan <surenb@google.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Chris Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>,
-        David Sterba <dsterba@suse.com>, Gao Xiang <xiang@kernel.org>,
-        Chao Yu <chao@kernel.org>, linux-block@vger.kernel.org,
-        linux-btrfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-erofs@lists.ozlabs.org, linux-mm@kvack.org,
-        "regressions@lists.linux.dev" <regressions@lists.linux.dev>
-Subject: Re: [REGESSION] systemd-oomd overreacting due to PSI changes for
- Btrfs (was: Re: [PATCH 3/5] btrfs: add manual PSI accounting for compressed
- reads)
-Message-ID: <Y2Q+y8t9PV5nrjud@cmpxchg.org>
-References: <20220915094200.139713-1-hch@lst.de>
- <20220915094200.139713-4-hch@lst.de>
- <d20a0a85-e415-cf78-27f9-77dd7a94bc8d@leemhuis.info>
+        with ESMTP id S231761AbiKCW2n (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 3 Nov 2022 18:28:43 -0400
+Received: from out4-smtp.messagingengine.com (out4-smtp.messagingengine.com [66.111.4.28])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC83A2229C;
+        Thu,  3 Nov 2022 15:28:33 -0700 (PDT)
+Received: from compute1.internal (compute1.nyi.internal [10.202.2.41])
+        by mailout.nyi.internal (Postfix) with ESMTP id 41F055C00B4;
+        Thu,  3 Nov 2022 18:28:33 -0400 (EDT)
+Received: from mailfrontend1 ([10.202.2.162])
+  by compute1.internal (MEProxy); Thu, 03 Nov 2022 18:28:33 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fastmail.fm; h=
+        cc:cc:content-transfer-encoding:content-type:date:date:from:from
+        :in-reply-to:in-reply-to:message-id:mime-version:references
+        :reply-to:sender:subject:subject:to:to; s=fm1; t=1667514513; x=
+        1667600913; bh=r4LfooITf3nrWSMnfNB3pZa38Xa+sKbxYRKtKCOW6Os=; b=A
+        u4HkFYkD9K2yM9S4x/crbVwrJVxIdrWw9ItMx2xZbhoIoJo+3az8+kHU44lBfcbq
+        f2P/+Ny8ECj/v3A4cDHWciPyESQcfmJw7ftog+l+vq+SYCNKv9EmQHSYd/yXEede
+        Rae4/3rsSO2DR75rtReyG73/ndXBl2lMHfV+xJgn0RuqHwIrBZz8JhlOymaWgkUR
+        qKcSOAnqrevgtByKiWKtZJ2GOOYlqRH2U5GqcAJiloUxIgkArfFf2PjFztNnt3MU
+        lWYF9iEaXgovwmVTX9gkJ2PEwy1cMZdwR+QR4CqowP13Z+UJKoHYOQoM/qvJIpFY
+        aagiJKUeNAU+q/XGabf6Q==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:cc:content-transfer-encoding
+        :content-type:date:date:feedback-id:feedback-id:from:from
+        :in-reply-to:in-reply-to:message-id:mime-version:references
+        :reply-to:sender:subject:subject:to:to:x-me-proxy:x-me-proxy
+        :x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1667514513; x=
+        1667600913; bh=r4LfooITf3nrWSMnfNB3pZa38Xa+sKbxYRKtKCOW6Os=; b=p
+        CZyMb7rEklW13nCcpezstiy2rXbINw+KSA6ZCd7xFX0wRcu6ii9eOxTm4nQVi0rC
+        gc2ks2mIk4OFaaNmT+NPxbYK26EjxNJ3P/wnRW+9O/YmIGiFciGHLZx0H38Q6yOK
+        rGPPpN9HCZGPBLSXlHmj5Ln1V+moUrIFkMDY7vfnUdOOZJ7d2a/TQ6ho3GleNa2e
+        UBzThi1FiTJEUTNLaSATfLCAXTFgeuZxVrSxl0ovPlc+NeNy32b28pvRs08c3e00
+        2EeUvdJq41X8yAvDqcyz9j15T4uRD8OeKEsvZZgRf68ah1lr0S4WBN48TvBK0GPJ
+        iqeDhr0krhjuxdSQ1eGkw==
+X-ME-Sender: <xms:kEBkY39WMiGnBd3ZsVQ3iIgfYljLBG_qzEkiojX6MtkFALPjlND8Zg>
+    <xme:kEBkYzsKL4MXb-YTJUXhMe93QlyC15EM0ediuIFnA5UgZCxkKDmi7q4VejReCZ1FT
+    cAAmg2F0QeUsGKY>
+X-ME-Received: <xmr:kEBkY1C1_K1MQ6MBLGzCiGBMCBIrogjFPeEJXbZ86EpofDBkUx88kjdR4aUpjQhBNZyawVq2xRA3Y6JZbdoT6DtefeG8kehMtMrlFQ2KIfrlDQH778Cq>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvgedrudelgdduheeiucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    cujfgurhepkfffgggfuffvvehfhfgjtgfgsehtjeertddtfeejnecuhfhrohhmpeeuvghr
+    nhguucfutghhuhgsvghrthcuoegsvghrnhgurdhstghhuhgsvghrthesfhgrshhtmhgrih
+    hlrdhfmheqnecuggftrfgrthhtvghrnhepuedukeehleekjeehvddvieeftdeuleeiiedu
+    tdelhfevueeludfgleejveeitdfgnecuffhomhgrihhnpehgihhthhhusgdrtghomhenuc
+    evlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegsvghrnhgu
+    rdhstghhuhgsvghrthesfhgrshhtmhgrihhlrdhfmh
+X-ME-Proxy: <xmx:kEBkYzd_IurK5rInNhTl-DBZWWqwiVMjVGKFQc1EFg3JxqPe6FXE6A>
+    <xmx:kEBkY8NY8-NDih9R83qahSomueK64wiuD8Nv8W0dz4LZBPPsq9oqFw>
+    <xmx:kEBkY1mZBh84Yt93DPWNC26zGqHGD3RZ1oDG7bskvGrMidQmFsGDDg>
+    <xmx:kUBkYzeZK2JT8WtCN28f7wOTs6sQP1FH53QY73otzSnqaENChHSUhw>
+Feedback-ID: id8a24192:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
+ 3 Nov 2022 18:28:31 -0400 (EDT)
+Message-ID: <712cd802-f3bb-9840-e334-385cd42325f2@fastmail.fm>
+Date:   Thu, 3 Nov 2022 23:28:29 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d20a0a85-e415-cf78-27f9-77dd7a94bc8d@leemhuis.info>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.3.3
+Subject: Re: [RFC PATCH 4/4] ublk_drv: support splice based read/write zero
+ copy
+To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+        io-uring@vger.kernel.org
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org,
+        Miklos Szeredi <mszeredi@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        ZiyangZhang <ZiyangZhang@linux.alibaba.com>
+References: <20221103085004.1029763-1-ming.lei@redhat.com>
+ <20221103085004.1029763-5-ming.lei@redhat.com>
+Content-Language: en-US
+From:   Bernd Schubert <bernd.schubert@fastmail.fm>
+In-Reply-To: <20221103085004.1029763-5-ming.lei@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Nov 03, 2022 at 11:46:52AM +0100, Thorsten Leemhuis wrote:
-> Hi Christoph!
+
+
+On 11/3/22 09:50, Ming Lei wrote:
+> Pass ublk block IO request pages to kernel backend IO handling code via
+> pipe, and request page copy can be avoided. So far, the existed
+> pipe/splice mechanism works for handling write request only.
 > 
-> On 15.09.22 11:41, Christoph Hellwig wrote:
-> > btrfs compressed reads try to always read the entire compressed chunk,
-> > even if only a subset is requested.  Currently this is covered by the
-> > magic PSI accounting underneath submit_bio, but that is about to go
-> > away. Instead add manual psi_memstall_{enter,leave} annotations.
-> > 
-> > Note that for readahead this really should be using readahead_expand,
-> > but the additionals reads are also done for plain ->read_folio where
-> > readahead_expand can't work, so this overall logic is left as-is for
-> > now.
+> The initial idea of using splice for zero copy is from Miklos and Stefan.
 > 
-> It seems this patch makes systemd-oomd overreact on my day-to-day
-> machine and aggressively kill applications. I'm not the only one that
-> noticed such a behavior with 6.1 pre-releases:
-> https://bugzilla.redhat.com/show_bug.cgi?id=2133829
-> https://bugzilla.redhat.com/show_bug.cgi?id=2134971
+> Read request's zero copy requires pipe's change to allow one read end to
+> produce buffers for another read end to consume. The added SPLICE_F_READ_TO_READ
+> flag is for supporting this feature.
 > 
-> I think I have a pretty reliable way to trigger the issue that involves
-> starting the apps that I normally use and a VM that I occasionally use,
-> which up to now never resulted in such a behaviour.
-> 
-> On master as of today (8e5423e991e8) I can trigger the problem within a
-> minute or two. But I fail to trigger it with v6.0.6 or when I revert
-> 4088a47e78f9 ("btrfs: add manual PSI accounting for compressed reads").
-> And yes, I use btrfs with compression for / and /home/.
-> 
-> See [1] for a log msg from systemd-oomd.
-> 
-> Note, I had some trouble with bisecting[2]. This series looked
-> suspicious, so I removed it completely ontop of master and the problem
-> went away. Then I tried reverting only 4088a47e78f9 which helped, too.
-> Let me know if you want me to try another combination or need more data.
+> READ is handled by sending IORING_OP_SPLICE with SPLICE_F_DIRECT |
+> SPLICE_F_READ_TO_READ. WRITE is handled by sending IORING_OP_SPLICE with
+> SPLICE_F_DIRECT. Kernel internal pipe is used for simplifying userspace,
+> meantime potential info leak could be avoided.
 
-Oh, I think I see the bug. We can leak pressure state from the bio
-submission, which causes the task to permanently drive up pressure.
 
-Can you try this patch?
+Sorry to ask, do you have an ublk branch that gives an example how to 
+use this?
 
-From 499e5cab7b39fc4c90a0f96e33cdc03274b316fd Mon Sep 17 00:00:00 2001
-From: Johannes Weiner <hannes@cmpxchg.org>
-Date: Thu, 3 Nov 2022 17:34:31 -0400
-Subject: [PATCH] fs: btrfs: fix leaked psi pressure state
+I still have several things to fix in my branches, but I got basic fuse 
+uring with copies working. Adding back splice would be next after 
+posting rfc patches. My initial assumption was that I needed to 
+duplicate everything splice does into the fuse .uring_cmd handler - 
+obviously there is a better way with your patches.
 
-When psi annotations were added to to btrfs compression reads, the psi
-state tracking over add_ra_bio_pages and btrfs_submit_compressed_read
-was faulty. The task can remain in a stall state after the read. This
-results in incorrectly elevated pressure, which triggers OOM kills.
+This week I have a few days off, by end of next week or the week after I 
+might have patches in an rfc state (one thing I'm going to ask about is 
+how do I know what is the next CQE in the kernel handler - ublk does 
+this with tags through mq, but I don't understand yet where the tag is 
+increased and what the relation between tag and right CQE order is).
 
-pflags record the *previous* memstall state when we enter a new
-one. The code tried to initialize pflags to 1, and then optimize the
-leave call when we either didn't enter a memstall, or were already
-inside a nested stall. However, there can be multiple PageWorkingset
-pages in the bio, at which point it's that path itself that re-enters
-the state and overwrites pflags. This causes us to miss the exit.
+This got modeled a bit after ublk, but then diverged a bit.
 
-Enter the stall only once if needed, then unwind correctly.
+https://github.com/aakefbs/linux/tree/fuse-uring
+https://github.com/aakefbs/libfuse/tree/uring
 
-Reported-by: Thorsten Leemhuis <linux@leemhuis.info>
-Fixes: 4088a47e78f9 btrfs: add manual PSI accounting for compressed reads
-Signed-off-by: Johannes Weiner <hannes@cmpxchg.org>
----
- fs/btrfs/compression.c | 14 ++++++++------
- 1 file changed, 8 insertions(+), 6 deletions(-)
+(Again, the branches are not ready by any means for review yet).
 
-diff --git a/fs/btrfs/compression.c b/fs/btrfs/compression.c
-index f1f051ad3147..e6635fe70067 100644
---- a/fs/btrfs/compression.c
-+++ b/fs/btrfs/compression.c
-@@ -512,7 +512,7 @@ static u64 bio_end_offset(struct bio *bio)
- static noinline int add_ra_bio_pages(struct inode *inode,
- 				     u64 compressed_end,
- 				     struct compressed_bio *cb,
--				     unsigned long *pflags)
-+				     int *memstall, unsigned long *pflags)
- {
- 	struct btrfs_fs_info *fs_info = btrfs_sb(inode->i_sb);
- 	unsigned long end_index;
-@@ -581,8 +581,10 @@ static noinline int add_ra_bio_pages(struct inode *inode,
- 			continue;
- 		}
- 
--		if (PageWorkingset(page))
-+		if (!*memstall && PageWorkingset(page)) {
- 			psi_memstall_enter(pflags);
-+			*memstall = 1;
-+		}
- 
- 		ret = set_page_extent_mapped(page);
- 		if (ret < 0) {
-@@ -670,8 +672,8 @@ void btrfs_submit_compressed_read(struct inode *inode, struct bio *bio,
- 	u64 em_len;
- 	u64 em_start;
- 	struct extent_map *em;
--	/* Initialize to 1 to make skip psi_memstall_leave unless needed */
--	unsigned long pflags = 1;
-+	unsigned long pflags;
-+	int memstall = 0;
- 	blk_status_t ret;
- 	int ret2;
- 	int i;
-@@ -727,7 +729,7 @@ void btrfs_submit_compressed_read(struct inode *inode, struct bio *bio,
- 		goto fail;
- 	}
- 
--	add_ra_bio_pages(inode, em_start + em_len, cb, &pflags);
-+	add_ra_bio_pages(inode, em_start + em_len, cb, &memstall, &pflags);
- 
- 	/* include any pages we added in add_ra-bio_pages */
- 	cb->len = bio->bi_iter.bi_size;
-@@ -807,7 +809,7 @@ void btrfs_submit_compressed_read(struct inode *inode, struct bio *bio,
- 		}
- 	}
- 
--	if (!pflags)
-+	if (memstall)
- 		psi_memstall_leave(&pflags);
- 
- 	if (refcount_dec_and_test(&cb->pending_ios))
--- 
-2.38.1
+
+Thanks,
+Bernd
