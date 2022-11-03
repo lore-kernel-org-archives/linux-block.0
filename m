@@ -2,58 +2,58 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CCE00C4332F
-	for <linux-block@archiver.kernel.org>; Thu,  3 Nov 2022 09:18:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C662C433FE
+	for <linux-block@archiver.kernel.org>; Thu,  3 Nov 2022 09:45:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230398AbiKCJSh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 3 Nov 2022 05:18:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39646 "EHLO
+        id S230383AbiKCJpi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 3 Nov 2022 05:45:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55866 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229587AbiKCJSA (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 3 Nov 2022 05:18:00 -0400
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 241F8DEE9;
-        Thu,  3 Nov 2022 02:17:04 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.153])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4N2ykV6SVvzK9bd;
-        Thu,  3 Nov 2022 17:14:26 +0800 (CST)
+        with ESMTP id S230460AbiKCJpd (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 3 Nov 2022 05:45:33 -0400
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BCCD6FD18;
+        Thu,  3 Nov 2022 02:45:28 -0700 (PDT)
+Received: from mail02.huawei.com (unknown [172.30.67.143])
+        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4N2zMK3pMlz6PF7Y;
+        Thu,  3 Nov 2022 17:42:53 +0800 (CST)
 Received: from [10.174.176.73] (unknown [10.174.176.73])
-        by APP4 (Coremail) with SMTP id gCh0CgCntOYMh2NjRuuSAg--.21550S3;
-        Thu, 03 Nov 2022 17:17:02 +0800 (CST)
-Subject: Re: [PATCH 1/2] block: don't allow a disk link holder to itself
+        by APP2 (Coremail) with SMTP id Syh0CgA30NS1jWNjMlgnBQ--.2248S3;
+        Thu, 03 Nov 2022 17:45:26 +0800 (CST)
+Subject: Re: [PATCH 2/2] block: fix use after free for bd_holder_dir
 To:     Christoph Hellwig <hch@lst.de>, Yu Kuai <yukuai1@huaweicloud.com>
 Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org, yi.zhang@huawei.com,
         "yukuai (C)" <yukuai3@huawei.com>
 References: <20221103025541.1875809-1-yukuai1@huaweicloud.com>
- <20221103025541.1875809-2-yukuai1@huaweicloud.com>
- <20221103080628.GA3346@lst.de>
+ <20221103025541.1875809-3-yukuai1@huaweicloud.com>
+ <20221103081211.GB3346@lst.de>
 From:   Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <faabea7a-b06b-1494-59ce-e06d0a7b2882@huaweicloud.com>
-Date:   Thu, 3 Nov 2022 17:17:00 +0800
+Message-ID: <d4b7c2c7-7da5-9814-e934-174cb8cd5740@huaweicloud.com>
+Date:   Thu, 3 Nov 2022 17:45:25 +0800
 User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20221103080628.GA3346@lst.de>
-Content-Type: text/plain; charset=gbk; format=flowed
+In-Reply-To: <20221103081211.GB3346@lst.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgCntOYMh2NjRuuSAg--.21550S3
-X-Coremail-Antispam: 1UD129KBjvdXoW7Gw1DGw15WFy8uw47urWkXrb_yoWkGrbEga
-        s09r97GwnrJ3Z7tFsIyr13ZrZ09FWkWry8CrWUKF129w15XryUJF48C390qr9xGrs8tr4a
-        9rZ8W343Aw12vjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-        9fnUUIcSsGvfJTRUUUb4kFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
-        6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
-        A2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j
-        6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
-        Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
-        I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
-        4UM4x0Y48IcVAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwCYjI0SjxkI62AI1cAE67vI
-        Y487MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI
-        0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUAVWUtwCIc40Y
-        0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxV
-        WUJVW8JwCI42IY6xAIw20EY4v20xvaj40_WFyUJVCq3wCI42IY6I8E87Iv67AKxVWUJVW8
-        JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfUoOJ5UU
-        UUU
+X-CM-TRANSID: Syh0CgA30NS1jWNjMlgnBQ--.2248S3
+X-Coremail-Antispam: 1UD129KBjvJXoW7tFW7urWrAw1UuryDtF15XFb_yoW8tFW7pa
+        90qF4kK3y8JFW7Zwsrt347XFW0qw15Xa48CFWS9F4IgrZ8Xr1vyr43GFW7WF17Ar1vvr4j
+        qF1jq3ya9F1vkFJanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUkE14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+        1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+        JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+        CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+        2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+        W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lc7I2V7IY0VAS07AlzVAY
+        IcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14
+        v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_JF0_Jw1lIxkG
+        c2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI
+        0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6rWUJVWrZr1UMIIF0xvEx4A2jsIE14v26r1j
+        6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUdHU
+        DUUUUU=
 X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 X-CFilter-Loop: Reflected
 Precedence: bulk
@@ -62,37 +62,79 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 Hi,
 
-ÔÚ 2022/11/03 16:06, Christoph Hellwig Ð´µÀ:
-> Yes, this is a good one.  Please add a single sentence blurb explaing
-> the issue before the Test prodecure?
-Ok, I'll do that.
-> 
-> With that this looks good:
-> 
-> Reviewed-by: Christoph Hellwig <hch@lst.de>
-> 
-> On Thu, Nov 03, 2022 at 10:55:40AM +0800, Yu Kuai wrote:
+åœ¨ 2022/11/03 16:12, Christoph Hellwig å†™é“:
+> On Thu, Nov 03, 2022 at 10:55:41AM +0800, Yu Kuai wrote:
 >> From: Yu Kuai <yukuai3@huawei.com>
 >>
->> Test procedures:
+>> Currently, the caller of bd_link_disk_holer() get 'bdev' by
+>> blkdev_get_by_dev(), which will look up 'bdev' by inode number 'dev'.
+>> Howerver, it's possible that del_gendisk() can be called currently, and
+>> 'bd_holder_dir' can be freed before bd_link_disk_holer() access it, thus
+>> use after free is triggered.
 >>
->> 1) dmsetup create test --table "xxx sda", assume dm-0 is created
->> 2) dmsetup suspend test
->> 3) dmsetup reload test --table "xxx dm-0"
->> 4) dmsetup resume test
+>> t1:				t2:
+>> bdev = blkdev_get_by_dev
+>> 				del_gendisk
+>> 				 kobject_put(bd_holder_dir)
+>> 				  kobject_free()
+>> bd_link_disk_holder
+>>
+>> Fix the problem by checking disk is still live and grabbing a reference
+>> to 'bd_holder_dir' first in bd_link_disk_holder().
 > 
-> Can you wire this up for blocktests?
-
-Of course I can, I'm not very familiar with how to add new test in
-blktests, so I might take some time to do that.
+> Looks good with some minor stilistic nipicks:
 > 
-> I've also been wondering how we could wire your other two test cases
-> up as I think they'be very useful.  Hopefully I can find some time
-> to inject delays with eBPF or something like it.
+>> +	if (!disk_live(bdev->bd_disk)) {
+>> +		mutex_unlock(&bdev->bd_disk->open_mutex);
+>> +		return -ENODEV;
+>> +	}
+> 
+> This can use a goto out_unlock;
 
-The problem was found without the delay originally, such delay can make
-sure the problem is reproduced 100%, but it's still possible without the
-delay. Perhaps we can add the test without delay for now.
+This lock is different from current 'out_unlock', add a new lable will
+make the code more complex, I think.
+> 
+>>   		holder->refcnt++;
+>> +		kobject_put(bdev->bd_holder_dir);
+>>   		goto out_unlock;
+>>   	}
+>>   
+>>   	holder = kzalloc(sizeof(*holder), GFP_KERNEL);
+>>   	if (!holder) {
+>>   		ret = -ENOMEM;
+>> +		kobject_put(bdev->bd_holder_dir);
+>>   		goto out_unlock;
+>>   	}
+>>   
+>> @@ -101,16 +114,12 @@ int bd_link_disk_holder(struct block_device *bdev, struct gendisk *disk)
+>>   		ret = __link_disk_holder(bdev, disk);
+>>   		if (ret) {
+>>   			kfree(holder);
+>> +			kobject_put(bdev->bd_holder_dir);
+> 
+> And I think a goto out_put_holder and out_free_holder would clean this up
+> nicely.
+
+Yes, you're right.
+> 
+>>   	list_add(&holder->list, &disk->slave_bdevs);
+>> -	/*
+>> -	 * del_gendisk drops the initial reference to bd_holder_dir, so we need
+>> -	 * to keep our own here to allow for cleanup past that point.
+>> -	 */
+>> -	kobject_get(bdev->bd_holder_dir);
+> 
+> .. with this then jumping straight to out_unlock.
+
+Ok, I'll do that in next version.
+> 
+> 
+> We should repost a series with my first 7 patches and your two.  I can do
+> that, but it might take some time as I just got through (minor) knee
+> surgery and am still at the hospital, so if you have spare cycles feel
+> free to do it.
+
+I'm glad to do that, and have a good rest ðŸ˜„
 
 Thanks,
 Kuai
