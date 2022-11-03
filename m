@@ -2,85 +2,73 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C564C4332F
-	for <linux-block@archiver.kernel.org>; Thu,  3 Nov 2022 19:32:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B2200C4332F
+	for <linux-block@archiver.kernel.org>; Thu,  3 Nov 2022 20:39:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229700AbiKCTcz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 3 Nov 2022 15:32:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39324 "EHLO
+        id S229487AbiKCUjg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 3 Nov 2022 16:39:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44838 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229485AbiKCTcy (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 3 Nov 2022 15:32:54 -0400
-Received: from mail-pg1-f171.google.com (mail-pg1-f171.google.com [209.85.215.171])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DFF3E1CA
-        for <linux-block@vger.kernel.org>; Thu,  3 Nov 2022 12:32:53 -0700 (PDT)
-Received: by mail-pg1-f171.google.com with SMTP id 128so2558341pga.1
-        for <linux-block@vger.kernel.org>; Thu, 03 Nov 2022 12:32:53 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=jlfPxhhLvEQn6lsaScftYKSX3SGTGT53qHnShoVMGMg=;
-        b=CSrK7kYy7Yk8pB31ux50J1RQ8a+4wlp6WCoqCPcHKUsRgaUOVuZ+wSz12HTO+wwFZe
-         GHklo2fGnCqRRYqgUpexv+5QyudjCzPHQSqeAGgMVbik/BcBwd/g5UqehZGLCIqNVu8+
-         IRZzNdQc7jnZ6VOP5cIie3w4ulvQCL/3toraN2z/rFgBns+0cnal4DneDjqhXcyJp02E
-         LNoW6OvNdu7q1o+mFjH5JFnQmy4LhubvHcoP3T16hIO23Q5R5d38/b7Xh/5G7x+IMoue
-         Z2Z2G53/EkH87i6HgQv9GjCny10SxfXQIys3Xt2ImFAhCK0InnF1qCMkrGG5DGeMUXwI
-         Rfgw==
-X-Gm-Message-State: ACrzQf0Cax6kBi8B2X6+CsOr2PcdxbS95urXzC4yKx5WEHJJieaZI13L
-        nelNH+yzsY0f8UxJeMT6snc=
-X-Google-Smtp-Source: AMsMyM4qB4mdwznCQnp+XC/bGXo7knYQLUQ7gsbLuni/AkKQcHDKpyw0aQBhDB/J3si+YusJ82Ue0g==
-X-Received: by 2002:a05:6a00:190a:b0:56c:123e:3e61 with SMTP id y10-20020a056a00190a00b0056c123e3e61mr31743311pfi.47.1667503973229;
-        Thu, 03 Nov 2022 12:32:53 -0700 (PDT)
-Received: from ?IPV6:2620:15c:211:201:881a:8a80:fdae:8683? ([2620:15c:211:201:881a:8a80:fdae:8683])
-        by smtp.gmail.com with ESMTPSA id f5-20020aa79685000000b0056bb36c047asm1115092pfk.105.2022.11.03.12.32.51
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 03 Nov 2022 12:32:52 -0700 (PDT)
-Message-ID: <89172337-0698-e3ef-611f-5487f9ef53bb@acm.org>
-Date:   Thu, 3 Nov 2022 12:32:50 -0700
+        with ESMTP id S229481AbiKCUjf (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 3 Nov 2022 16:39:35 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF7C6DFFB
+        for <linux-block@vger.kernel.org>; Thu,  3 Nov 2022 13:39:33 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 97EAFB82A04
+        for <linux-block@vger.kernel.org>; Thu,  3 Nov 2022 20:39:32 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 85618C433C1;
+        Thu,  3 Nov 2022 20:39:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1667507971;
+        bh=RHAZe3GqgR+VgFxzGfLlFgwffbK+mipPN01FLSK7k8E=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=c475ZXwDXYcU1B1/IoE7sNlRQy6OhTPQPzrOqlFpLvlCFgLJXWsEmUhWu4W0umeLX
+         IkN9H7oC1UiIQuEViRegZvB5rEA3duHDLdlQIDTBhxJ4vpbaqVpC578ct/BxqCVP+E
+         toH9SI+ACwLVqaO/ik0TOi8EC018fGhzsQ6k1S5f2qhQdFxdRYeVIW7TpFYsCzk/WU
+         5kX507Ji0g/ThuEpJDC9z5YL7J1Ypzngz327IoqrJTBLHB4lvk4kSt2kpzfALXFHmh
+         g2uhUme5dp9GBWDfD3ZlbGREm0C95KKiQG08Xj1qcoeHXDDOL+DTeplnG8TKfG6lRI
+         ral10Qxl/LxBA==
+Date:   Thu, 3 Nov 2022 14:39:27 -0600
+From:   Keith Busch <kbusch@kernel.org>
+To:     Mikulas Patocka <mpatocka@redhat.com>
+Cc:     Keith Busch <kbusch@meta.com>, linux-block@vger.kernel.org,
+        dm-devel@redhat.com, axboe@kernel.dk, stefanha@redhat.com,
+        ebiggers@kernel.org, me@demsh.org
+Subject: Re: [PATCH 0/3] fix direct io errors on dm-crypt
+Message-ID: <Y2Qm/yGlVbDRskkr@kbusch-mbp.dhcp.thefacebook.com>
+References: <20221103152559.1909328-1-kbusch@meta.com>
+ <alpine.LRH.2.21.2211031224060.10758@file01.intranet.prod.int.rdu2.redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.3.0
-Subject: Re: [PATCH 06/10] block: Fix the number of segment calculations
-Content-Language: en-US
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>, Keith Busch <kbusch@kernel.org>
-References: <20221019222324.362705-1-bvanassche@acm.org>
- <20221019222324.362705-7-bvanassche@acm.org>
- <934d8e30-8629-d598-0214-987580c349b8@acm.org> <Y2HGOj/OCKoZr7ej@T590>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <Y2HGOj/OCKoZr7ej@T590>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <alpine.LRH.2.21.2211031224060.10758@file01.intranet.prod.int.rdu2.redhat.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 11/1/22 18:22, Ming Lei wrote:
-> On Tue, Nov 01, 2022 at 10:23:32AM -0700, Bart Van Assche wrote:
->> On 10/19/22 15:23, Bart Van Assche wrote:
->>> Since multi-page bvecs are supported there can be multiple segments per
->>> bvec (see also bvec_split_segs()). Hence this patch that calculates the
->>> number of segments per bvec instead of assuming that there is only one
->>> segment per bvec.
->>
->> (replying to my own email)
->>
->> Hi Ming,
->>
->> Do you agree that this patch fixes a bug introduced by the multi-page bvec
->> code and also that it is required even if the segment size is larger than
->> the page size?
+On Thu, Nov 03, 2022 at 12:33:19PM -0400, Mikulas Patocka wrote:
+> Hi
 > 
-> No, multi-age bvec is only applied on normal IO bvec, and it isn't used
-> in bio_add_pc_page(), so there isn't such issue in blk_rq_append_bio(),
-> that is why we needn't to split passthrough bio.
+> The patchset seems OK - but dm-integrity also has a limitation that the 
+> bio vectors must be aligned on logical block size.
+> 
+> dm-writecache and dm-verity seem to handle unaligned bioset, but you 
+> should check them anyway.
+> 
+> I'm not sure about dm-log-writes.
 
-Hi Ming,
+Yeah, dm-integrity definitly needs it too. This is easy enough to use
+the same io_hint that I added for dm-crypt.
 
-Thanks for the feedback. I will fix the description of this patch.
+dm-log-writes is doing some weird things with writes that I don't think
+would work with some low level drivers without the same alignment
+constraint.
 
-Bart.
+The other two appear to handle this fine, but I'll run everything
+through some focused test cases to be sure.
 
+In the meantime, do you want to see the remaining mappers fixed in a v2,
+or are you okay if they follow after this series?
