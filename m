@@ -2,136 +2,50 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 255C1C433FE
-	for <linux-block@archiver.kernel.org>; Thu,  3 Nov 2022 08:47:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84D73C433FE
+	for <linux-block@archiver.kernel.org>; Thu,  3 Nov 2022 08:49:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229487AbiKCIrs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 3 Nov 2022 04:47:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50598 "EHLO
+        id S229771AbiKCItR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 3 Nov 2022 04:49:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51458 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229461AbiKCIrr (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 3 Nov 2022 04:47:47 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8B50D115;
-        Thu,  3 Nov 2022 01:47:46 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 645A81F900;
-        Thu,  3 Nov 2022 08:47:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1667465265; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=6UFonw8deFLmtRHNYH88DPQPqP/PgWsObLPhXUH/f0A=;
-        b=R96pGX9gZDxTVYt1z/U805Y6gh5WdSMcAqF6csDart8vuTnWVlopmGmqNfpV6SsdtEIAVu
-        H5oJ4LIXzCa/QRcNJY6OVU+0UquwfCPeFmLpsUVkoNVg8vrsyt4XEGdE6n5ApGMRimf1Sk
-        hJHHl+JWv3WpXmoxkOPD8TRDL28yK/0=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1667465265;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=6UFonw8deFLmtRHNYH88DPQPqP/PgWsObLPhXUH/f0A=;
-        b=zvqPxzF2hrdvtsfA/r9PYM+HWJqahq54o2e9Zq4/3dXU50jFf37w74Ez5nboCyEk0H8TQJ
-        odW/TWDs7lW6zDBA==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 5247D13480;
-        Thu,  3 Nov 2022 08:47:45 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id B/MJFDGAY2NXRAAAMHmgww
-        (envelope-from <jack@suse.cz>); Thu, 03 Nov 2022 08:47:45 +0000
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-        id D7C0DA0700; Thu,  3 Nov 2022 09:47:44 +0100 (CET)
-Date:   Thu, 3 Nov 2022 09:47:44 +0100
-From:   Jan Kara <jack@suse.cz>
-To:     Yu Kuai <yukuai1@huaweicloud.com>
-Cc:     Khazhy Kumykov <khazhy@chromium.org>,
-        Paolo Valente <paolo.valente@linaro.org>,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, "yukuai (C)" <yukuai3@huawei.com>,
-        Jan Kara <jack@suse.cz>
-Subject: Re: [RFC PATCH] bfq: fix waker_bfqq inconsistency crash
-Message-ID: <20221103084744.xsvoul3hjgz7yyo7@quack3>
-References: <20221103013937.603626-1-khazhy@google.com>
- <3c0df3fa-8731-5863-ccc5-f2e60601dbf9@huaweicloud.com>
- <CACGdZYJ0WH+Y9sdchXy30UVTQgPCEo=fW+W9atZh1Ki7Ov4_Gw@mail.gmail.com>
- <f83404b4-84a4-de4e-fa4d-9ce38900d91c@huaweicloud.com>
+        with ESMTP id S231221AbiKCItO (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 3 Nov 2022 04:49:14 -0400
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 31FD2271C;
+        Thu,  3 Nov 2022 01:49:14 -0700 (PDT)
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id E521368AA6; Thu,  3 Nov 2022 09:49:09 +0100 (CET)
+Date:   Thu, 3 Nov 2022 09:49:09 +0100
+From:   Christoph Hellwig <hch@lst.de>
+To:     Chris Mason <clm@meta.com>
+Cc:     Andreas Dilger <adilger@dilger.ca>, Christoph Hellwig <hch@lst.de>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        David Sterba <dsterba@suse.cz>,
+        Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
+        Chris Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>,
+        David Sterba <dsterba@suse.com>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>,
+        Naohiro Aota <Naohiro.Aota@wdc.com>, Qu Wenruo <wqu@suse.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        "Darrick J. Wong" <djwong@kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-btrfs@vger.kernel.org" <linux-btrfs@vger.kernel.org>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>
+Subject: Re: consolidate btrfs checksumming, repair and bio splitting
+Message-ID: <20221103084909.GA6448@lst.de>
+References: <20221024144411.GA25172@lst.de> <773539e2-b5f1-8386-aa2a-96086f198bf8@meta.com> <20221024171042.GF5824@suse.cz> <9f443843-4145-155b-2fd0-50613a9f7913@wdc.com> <20221026074145.2be5ca09@gandalf.local.home> <20221031121912.GY5824@twin.jikos.cz> <20221102000022.36df0cc1@rorschach.local.home> <20221102062907.GA8619@lst.de> <8AAF3B43-BCD3-43B4-BC78-2E9E8E702792@dilger.ca> <5f742ea1-b1c2-5a61-53a7-5f144ca169f7@meta.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <f83404b4-84a4-de4e-fa4d-9ce38900d91c@huaweicloud.com>
+In-Reply-To: <5f742ea1-b1c2-5a61-53a7-5f144ca169f7@meta.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu 03-11-22 11:51:15, Yu Kuai wrote:
-> Hi,
-> 
-> 在 2022/11/03 11:05, Khazhy Kumykov 写道:
-> > On Wed, Nov 2, 2022 at 7:56 PM Yu Kuai <yukuai1@huaweicloud.com> wrote:
-> > > 
-> > > Hi,
-> > > 
-> > > 在 2022/11/03 9:39, Khazhismel Kumykov 写道:
-> > > > This fixes crashes in bfq_add_bfqq_busy due to waker_bfqq being NULL,
-> > > > but woken_list_node still being hashed. This would happen when
-> > > > bfq_init_rq() expects a brand new allocated queue to be returned from
-> > > 
-> > >   From what I see, bfqq->waker_bfqq is updated in bfq_init_rq() only if
-> > > 'new_queue' is false, but if 'new_queue' is false, the returned 'bfqq'
-> > > from bfq_get_bfqq_handle_split() will never be oom_bfqq, so I'm confused
-> > > here...
-> > There's two calls for bfq_get_bfqq_handle_split in this function - the
-> > second one is after the check you mentioned, and is the problematic
-> > one.
-> Yes, thanks for the explanation. Now I understand how the problem
-> triggers.
-> 
-> > > 
-> > > > bfq_get_bfqq_handle_split() and unconditionally updates waker_bfqq
-> > > > without resetting woken_list_node. Since we can always return oom_bfqq
-> > > > when attempting to allocate, we cannot assume waker_bfqq starts as NULL.
-> > > > We must either reset woken_list_node, or avoid setting woken_list at all
-> > > > for oom_bfqq - opt to do the former.
-> > > 
-> > > Once oom_bfqq is used, I think the io is treated as issued from root
-> > > group. Hence I don't think it's necessary to set woken_list or
-> > > waker_bfqq for oom_bfqq.
-> > Ack, I was wondering what's right here since, evidently, *someone* had
-> > already set oom_bfqq->waker_bfqq to *something* (although... maybe it
-> > was an earlier init_rq). But maybe it's better to do nothing if we
-> > *know* it's oom_bfqq.
-> 
-> I need to have a check how oom_bfqq get involved with waker_bfqq, and
-> then see if it's reasonable.
-> 
-> Probably Jan and Paolo will have better view on this.
+On Wed, Nov 02, 2022 at 06:07:27PM -0400, Chris Mason wrote:
+> We talked about this at the btrfs meeting today and I'm sure it'll get
+> resolved soon.
 
-Thanks for the CC Kuai and thanks to Khazy for spotting the bug. The
-oom_bfqq is just a fallback bfqq and as such it should be extempted from
-all special handling like waker detection etc. All this stuff is just for
-optimizing performance and when we are OOM, we have far larger troubles
-than to optimize performance.
-
-So how I think we should really fix this is that we extempt oom_bfqq from
-waker detection in bfq_check_waker() by adding:
-
-	bfqq == bfqd->oom_bfqq ||
- 	bfqd->last_completed_rq_bfq == bfqd->oom_bfqq)
-
-to the initial check and then also if bfq_get_bfqq_handle_split() returns
-oom_bfqq we should just skip carrying over the waker information.
-
-								Honza
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+Thanks.  That wasn't my impression so far, but I'm glad I was wrong.
