@@ -2,98 +2,136 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 721DFC433FE
-	for <linux-block@archiver.kernel.org>; Thu,  3 Nov 2022 08:12:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 255C1C433FE
+	for <linux-block@archiver.kernel.org>; Thu,  3 Nov 2022 08:47:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229547AbiKCIMR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 3 Nov 2022 04:12:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60008 "EHLO
+        id S229487AbiKCIrs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 3 Nov 2022 04:47:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50598 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229487AbiKCIMQ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 3 Nov 2022 04:12:16 -0400
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B887B1;
-        Thu,  3 Nov 2022 01:12:15 -0700 (PDT)
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 1C23868AA6; Thu,  3 Nov 2022 09:12:12 +0100 (CET)
-Date:   Thu, 3 Nov 2022 09:12:11 +0100
-From:   Christoph Hellwig <hch@lst.de>
+        with ESMTP id S229461AbiKCIrr (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 3 Nov 2022 04:47:47 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8B50D115;
+        Thu,  3 Nov 2022 01:47:46 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 645A81F900;
+        Thu,  3 Nov 2022 08:47:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1667465265; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=6UFonw8deFLmtRHNYH88DPQPqP/PgWsObLPhXUH/f0A=;
+        b=R96pGX9gZDxTVYt1z/U805Y6gh5WdSMcAqF6csDart8vuTnWVlopmGmqNfpV6SsdtEIAVu
+        H5oJ4LIXzCa/QRcNJY6OVU+0UquwfCPeFmLpsUVkoNVg8vrsyt4XEGdE6n5ApGMRimf1Sk
+        hJHHl+JWv3WpXmoxkOPD8TRDL28yK/0=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1667465265;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=6UFonw8deFLmtRHNYH88DPQPqP/PgWsObLPhXUH/f0A=;
+        b=zvqPxzF2hrdvtsfA/r9PYM+HWJqahq54o2e9Zq4/3dXU50jFf37w74Ez5nboCyEk0H8TQJ
+        odW/TWDs7lW6zDBA==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 5247D13480;
+        Thu,  3 Nov 2022 08:47:45 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id B/MJFDGAY2NXRAAAMHmgww
+        (envelope-from <jack@suse.cz>); Thu, 03 Nov 2022 08:47:45 +0000
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+        id D7C0DA0700; Thu,  3 Nov 2022 09:47:44 +0100 (CET)
+Date:   Thu, 3 Nov 2022 09:47:44 +0100
+From:   Jan Kara <jack@suse.cz>
 To:     Yu Kuai <yukuai1@huaweicloud.com>
-Cc:     hch@lst.de, axboe@kernel.dk, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, yukuai3@huawei.com,
-        yi.zhang@huawei.com
-Subject: Re: [PATCH 2/2] block: fix use after free for bd_holder_dir
-Message-ID: <20221103081211.GB3346@lst.de>
-References: <20221103025541.1875809-1-yukuai1@huaweicloud.com> <20221103025541.1875809-3-yukuai1@huaweicloud.com>
+Cc:     Khazhy Kumykov <khazhy@chromium.org>,
+        Paolo Valente <paolo.valente@linaro.org>,
+        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, "yukuai (C)" <yukuai3@huawei.com>,
+        Jan Kara <jack@suse.cz>
+Subject: Re: [RFC PATCH] bfq: fix waker_bfqq inconsistency crash
+Message-ID: <20221103084744.xsvoul3hjgz7yyo7@quack3>
+References: <20221103013937.603626-1-khazhy@google.com>
+ <3c0df3fa-8731-5863-ccc5-f2e60601dbf9@huaweicloud.com>
+ <CACGdZYJ0WH+Y9sdchXy30UVTQgPCEo=fW+W9atZh1Ki7Ov4_Gw@mail.gmail.com>
+ <f83404b4-84a4-de4e-fa4d-9ce38900d91c@huaweicloud.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20221103025541.1875809-3-yukuai1@huaweicloud.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <f83404b4-84a4-de4e-fa4d-9ce38900d91c@huaweicloud.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Nov 03, 2022 at 10:55:41AM +0800, Yu Kuai wrote:
-> From: Yu Kuai <yukuai3@huawei.com>
+On Thu 03-11-22 11:51:15, Yu Kuai wrote:
+> Hi,
 > 
-> Currently, the caller of bd_link_disk_holer() get 'bdev' by
-> blkdev_get_by_dev(), which will look up 'bdev' by inode number 'dev'.
-> Howerver, it's possible that del_gendisk() can be called currently, and
-> 'bd_holder_dir' can be freed before bd_link_disk_holer() access it, thus
-> use after free is triggered.
+> 在 2022/11/03 11:05, Khazhy Kumykov 写道:
+> > On Wed, Nov 2, 2022 at 7:56 PM Yu Kuai <yukuai1@huaweicloud.com> wrote:
+> > > 
+> > > Hi,
+> > > 
+> > > 在 2022/11/03 9:39, Khazhismel Kumykov 写道:
+> > > > This fixes crashes in bfq_add_bfqq_busy due to waker_bfqq being NULL,
+> > > > but woken_list_node still being hashed. This would happen when
+> > > > bfq_init_rq() expects a brand new allocated queue to be returned from
+> > > 
+> > >   From what I see, bfqq->waker_bfqq is updated in bfq_init_rq() only if
+> > > 'new_queue' is false, but if 'new_queue' is false, the returned 'bfqq'
+> > > from bfq_get_bfqq_handle_split() will never be oom_bfqq, so I'm confused
+> > > here...
+> > There's two calls for bfq_get_bfqq_handle_split in this function - the
+> > second one is after the check you mentioned, and is the problematic
+> > one.
+> Yes, thanks for the explanation. Now I understand how the problem
+> triggers.
 > 
-> t1:				t2:
-> bdev = blkdev_get_by_dev
-> 				del_gendisk
-> 				 kobject_put(bd_holder_dir)
-> 				  kobject_free()
-> bd_link_disk_holder
+> > > 
+> > > > bfq_get_bfqq_handle_split() and unconditionally updates waker_bfqq
+> > > > without resetting woken_list_node. Since we can always return oom_bfqq
+> > > > when attempting to allocate, we cannot assume waker_bfqq starts as NULL.
+> > > > We must either reset woken_list_node, or avoid setting woken_list at all
+> > > > for oom_bfqq - opt to do the former.
+> > > 
+> > > Once oom_bfqq is used, I think the io is treated as issued from root
+> > > group. Hence I don't think it's necessary to set woken_list or
+> > > waker_bfqq for oom_bfqq.
+> > Ack, I was wondering what's right here since, evidently, *someone* had
+> > already set oom_bfqq->waker_bfqq to *something* (although... maybe it
+> > was an earlier init_rq). But maybe it's better to do nothing if we
+> > *know* it's oom_bfqq.
 > 
-> Fix the problem by checking disk is still live and grabbing a reference
-> to 'bd_holder_dir' first in bd_link_disk_holder().
+> I need to have a check how oom_bfqq get involved with waker_bfqq, and
+> then see if it's reasonable.
+> 
+> Probably Jan and Paolo will have better view on this.
 
-Looks good with some minor stilistic nipicks:
+Thanks for the CC Kuai and thanks to Khazy for spotting the bug. The
+oom_bfqq is just a fallback bfqq and as such it should be extempted from
+all special handling like waker detection etc. All this stuff is just for
+optimizing performance and when we are OOM, we have far larger troubles
+than to optimize performance.
 
-> +	if (!disk_live(bdev->bd_disk)) {
-> +		mutex_unlock(&bdev->bd_disk->open_mutex);
-> +		return -ENODEV;
-> +	}
+So how I think we should really fix this is that we extempt oom_bfqq from
+waker detection in bfq_check_waker() by adding:
 
-This can use a goto out_unlock;
+	bfqq == bfqd->oom_bfqq ||
+ 	bfqd->last_completed_rq_bfq == bfqd->oom_bfqq)
 
->  		holder->refcnt++;
-> +		kobject_put(bdev->bd_holder_dir);
->  		goto out_unlock;
->  	}
->  
->  	holder = kzalloc(sizeof(*holder), GFP_KERNEL);
->  	if (!holder) {
->  		ret = -ENOMEM;
-> +		kobject_put(bdev->bd_holder_dir);
->  		goto out_unlock;
->  	}
->  
-> @@ -101,16 +114,12 @@ int bd_link_disk_holder(struct block_device *bdev, struct gendisk *disk)
->  		ret = __link_disk_holder(bdev, disk);
->  		if (ret) {
->  			kfree(holder);
-> +			kobject_put(bdev->bd_holder_dir);
+to the initial check and then also if bfq_get_bfqq_handle_split() returns
+oom_bfqq we should just skip carrying over the waker information.
 
-And I think a goto out_put_holder and out_free_holder would clean this up
-nicely.
-
->  	list_add(&holder->list, &disk->slave_bdevs);
-> -	/*
-> -	 * del_gendisk drops the initial reference to bd_holder_dir, so we need
-> -	 * to keep our own here to allow for cleanup past that point.
-> -	 */
-> -	kobject_get(bdev->bd_holder_dir);
-
-.. with this then jumping straight to out_unlock.
-
-
-We should repost a series with my first 7 patches and your two.  I can do
-that, but it might take some time as I just got through (minor) knee
-surgery and am still at the hospital, so if you have spare cycles feel
-free to do it.
+								Honza
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
