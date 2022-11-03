@@ -2,173 +2,120 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 590A0C43219
-	for <linux-block@archiver.kernel.org>; Thu,  3 Nov 2022 15:26:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 507FEC4332F
+	for <linux-block@archiver.kernel.org>; Thu,  3 Nov 2022 16:26:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231484AbiKCP0R (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 3 Nov 2022 11:26:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35914 "EHLO
+        id S230504AbiKCQ0k (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 3 Nov 2022 12:26:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50694 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231544AbiKCP0P (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 3 Nov 2022 11:26:15 -0400
-Received: from mx0b-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 569A222C
-        for <linux-block@vger.kernel.org>; Thu,  3 Nov 2022 08:26:14 -0700 (PDT)
-Received: from pps.filterd (m0148460.ppops.net [127.0.0.1])
-        by mx0a-00082601.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 2A3CAdCH010471
-        for <linux-block@vger.kernel.org>; Thu, 3 Nov 2022 08:26:13 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding : content-type; s=s2048-2021-q4;
- bh=VRuJvXeK/qEkN/Gz3nNXuaOmUIBiKtT2mf4BKmu/TR8=;
- b=ONishvUOt71bIdKPstDsIY36NzfbO1FOtWI3cBE0OsRpV6EGkjHTy71axBOYQd5OPQ41
- UsE3P3HujBXqx6N//JhftFb2LKR7gV804sdTW7JXI/60FohLBwvu64obtyp3RaqIktca
- TMiiNpOVRy+QOVHSloLj2teBNuNfdHJeK1do1SjEtR1QXUmUhc9EZbF4hTDHGcRl/+3v
- ddxXnCkrS14jhg/Om6s9iFvZ7C6M6Mvdd4VB+0OMmQs2QGef/FhdHlEEG3dozHIgOgtk
- GngjihC6HTjHW37wQv/SOoFFM+c1EBT/o6C3hKEpZ1RizGSou4tc+zbMAlcpKtC8NLfP wA== 
-Received: from mail.thefacebook.com ([163.114.132.120])
-        by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 3kmddh1kqu-5
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-        for <linux-block@vger.kernel.org>; Thu, 03 Nov 2022 08:26:13 -0700
-Received: from twshared6758.06.ash9.facebook.com (2620:10d:c085:208::11) by
- mail.thefacebook.com (2620:10d:c085:21d::5) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31; Thu, 3 Nov 2022 08:26:12 -0700
-Received: by devbig007.nao1.facebook.com (Postfix, from userid 544533)
-        id 216FFAA9A075; Thu,  3 Nov 2022 08:26:00 -0700 (PDT)
-From:   Keith Busch <kbusch@meta.com>
-To:     <linux-block@vger.kernel.org>, <dm-devel@redhat.com>,
-        <axboe@kernel.dk>
-CC:     <stefanha@redhat.com>, <ebiggers@kernel.org>, <me@demsh.org>,
-        <mpatocka@redhat.com>, Keith Busch <kbusch@kernel.org>
-Subject: [PATCH 1/3] block: make dma_alignment a stacking queue_limit
-Date:   Thu, 3 Nov 2022 08:25:57 -0700
-Message-ID: <20221103152559.1909328-2-kbusch@meta.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20221103152559.1909328-1-kbusch@meta.com>
-References: <20221103152559.1909328-1-kbusch@meta.com>
+        with ESMTP id S230194AbiKCQ0i (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 3 Nov 2022 12:26:38 -0400
+Received: from mail-ed1-x52b.google.com (mail-ed1-x52b.google.com [IPv6:2a00:1450:4864:20::52b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A3796DEF3
+        for <linux-block@vger.kernel.org>; Thu,  3 Nov 2022 09:26:37 -0700 (PDT)
+Received: by mail-ed1-x52b.google.com with SMTP id i21so3820484edj.10
+        for <linux-block@vger.kernel.org>; Thu, 03 Nov 2022 09:26:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=tt/lBSJ07NTr/8w7hhp+nZAob7j7Xiq0qJ8m0UH5/hU=;
+        b=quHYiChPb0Skd4UIuRGNpR9MbACvRzfrTff2KYgZMeH1TnKNWkV3gnKLRt4qxuItKf
+         YaAo1VtOP8uCKfoGX3pV8CaLkX2MwXikncLam1oX6JEfT9tqq+lK+jyQT0rIPskfHFz3
+         OVnMZf+5zhO5OSiDpoPXwJ7mu/VdUdM64GQ5x0kk3w9hPo+zNXvBwq7SccYSSnyx4dKM
+         XmTqzf9KXpIreBCKPTvZebeVpKydna10/mBnerbmFczViYUtcKEB0Q2AAofDyUOfDsea
+         wPk1fWl6DJSAv773+Wg5np6epQe9JIwFcPw7VYYg03srOEEouAdVNnppcaa+utCqeMp7
+         81TQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=tt/lBSJ07NTr/8w7hhp+nZAob7j7Xiq0qJ8m0UH5/hU=;
+        b=yXr1hy/TXsMOyxpoX8YArF2XYsGAdg/5AC+XLu1x07P0mANUYAZrkApsB9d35b5umY
+         vO5f/p+GbbvObh7G6HHrtxkUNZLBukQn/9PV8XGwmrb7HKNci60UddbX4uIGTB1IHpNb
+         oAeY/LorqQfX8DIRemICVoj+DYt+OiHllsqoA9+ZkboVCnEjd5P1yVgShBo6oJEKBuVB
+         4LfpcvTyqMocXfHvM90HUtcUXVAGo4WnqvyUnTJh0N8cB/pHzuvB6CQtZDnExnCsM0iW
+         UdTTLHPy1l8vU0a6aCyxyux6JqGmF8/SdmJtbL98gKtcJdUZIjgWlFCsg4TR3vgxpEpE
+         w2rQ==
+X-Gm-Message-State: ACrzQf28OamJ6fE2mKRCzIGxI22fGbj7L++HDvQ3zd5MlwPlXSG9wcqN
+        Z49iY2qwrO9c06ibaV0MuUThkNTGzMuANQ==
+X-Google-Smtp-Source: AMsMyM4On8hniExIm3sBavi2zeanTFcNEqBmzU2CfhKdD3EnXY/NiQRTzWY5qx4ZhlR25l7k2AcZGg==
+X-Received: by 2002:a05:6402:51a:b0:461:970e:2adc with SMTP id m26-20020a056402051a00b00461970e2adcmr30802753edv.44.1667492796209;
+        Thu, 03 Nov 2022 09:26:36 -0700 (PDT)
+Received: from MBP-di-Paolo.station (net-2-35-55-161.cust.vodafonedsl.it. [2.35.55.161])
+        by smtp.gmail.com with ESMTPSA id kx9-20020a170907774900b0078116c361d9sm702507ejc.10.2022.11.03.09.26.35
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 03 Nov 2022 09:26:35 -0700 (PDT)
+From:   Paolo Valente <paolo.valente@linaro.org>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        arie.vanderhoeven@seagate.com, rory.c.chen@seagate.com,
+        Paolo Valente <paolo.valente@linaro.org>
+Subject: [PATCH V6 0/8] block, bfq: extend bfq to support multi-actuator drives
+Date:   Thu,  3 Nov 2022 17:26:15 +0100
+Message-Id: <20221103162623.10286-1-paolo.valente@linaro.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-FB-Internal: Safe
-Content-Type: text/plain
-X-Proofpoint-ORIG-GUID: 1kMdJqFEVu7TgVM0V8LXDvKd-UOTAYms
-X-Proofpoint-GUID: 1kMdJqFEVu7TgVM0V8LXDvKd-UOTAYms
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
- definitions=2022-11-03_04,2022-11-03_01,2022-06-22_01
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Keith Busch <kbusch@kernel.org>
+Hi,
+this V6 differs from V5 in that it addresses the issue reported in
+[2].
 
-Device mappers had always been getting the default 511 dma mask, but
-the underlying device might have a larger alignment requirement. Since
-this value is used to determine alloweable direct-io alignment, this
-needs to be a stackable limit.
+Here is the whole description of this patch series again.  This
+extension addresses the following issue. Single-LUN multi-actuator
+SCSI drives, as well as all multi-actuator SATA drives appear as a
+single device to the I/O subsystem [1].  Yet they address commands to
+different actuators internally, as a function of Logical Block
+Addressing (LBAs). A given sector is reachable by only one of the
+actuators. For example, Seagate’s Serial Advanced Technology
+Attachment (SATA) version contains two actuators and maps the lower
+half of the SATA LBA space to the lower actuator and the upper half to
+the upper actuator.
 
-Signed-off-by: Keith Busch <kbusch@kernel.org>
----
- block/blk-core.c       |  1 -
- block/blk-settings.c   |  8 +++++---
- include/linux/blkdev.h | 15 ++++++++-------
- 3 files changed, 13 insertions(+), 11 deletions(-)
+Evidently, to fully utilize actuators, no actuator must be left idle
+or underutilized while there is pending I/O for it. To reach this
+goal, the block layer must somehow control the load of each actuator
+individually. This series enriches BFQ with such a per-actuator
+control, as a first step. Then it also adds a simple mechanism for
+guaranteeing that actuators with pending I/O are never left idle.
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 3a2ed8dadf73..9d6a947024ea 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -418,7 +418,6 @@ struct request_queue *blk_alloc_queue(int node_id)
- 				PERCPU_REF_INIT_ATOMIC, GFP_KERNEL))
- 		goto fail_stats;
-=20
--	blk_queue_dma_alignment(q, 511);
- 	blk_set_default_limits(&q->limits);
- 	q->nr_requests =3D BLKDEV_DEFAULT_RQ;
-=20
-diff --git a/block/blk-settings.c b/block/blk-settings.c
-index 8bb9eef5310e..4949ed3ce7c9 100644
---- a/block/blk-settings.c
-+++ b/block/blk-settings.c
-@@ -57,6 +57,7 @@ void blk_set_default_limits(struct queue_limits *lim)
- 	lim->misaligned =3D 0;
- 	lim->zoned =3D BLK_ZONED_NONE;
- 	lim->zone_write_granularity =3D 0;
-+	lim->dma_alignment =3D 511;
- }
- EXPORT_SYMBOL(blk_set_default_limits);
-=20
-@@ -600,6 +601,7 @@ int blk_stack_limits(struct queue_limits *t, struct q=
-ueue_limits *b,
-=20
- 	t->io_min =3D max(t->io_min, b->io_min);
- 	t->io_opt =3D lcm_not_zero(t->io_opt, b->io_opt);
-+	t->dma_alignment =3D max(t->dma_alignment, b->dma_alignment);
-=20
- 	/* Set non-power-of-2 compatible chunk_sectors boundary */
- 	if (b->chunk_sectors)
-@@ -773,7 +775,7 @@ EXPORT_SYMBOL(blk_queue_virt_boundary);
-  **/
- void blk_queue_dma_alignment(struct request_queue *q, int mask)
- {
--	q->dma_alignment =3D mask;
-+	q->limits.dma_alignment =3D mask;
- }
- EXPORT_SYMBOL(blk_queue_dma_alignment);
-=20
-@@ -795,8 +797,8 @@ void blk_queue_update_dma_alignment(struct request_qu=
-eue *q, int mask)
- {
- 	BUG_ON(mask > PAGE_SIZE);
-=20
--	if (mask > q->dma_alignment)
--		q->dma_alignment =3D mask;
-+	if (mask > q->limits.dma_alignment)
-+		q->limits.dma_alignment =3D mask;
- }
- EXPORT_SYMBOL(blk_queue_update_dma_alignment);
-=20
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 854b4745cdd1..69ee5ea29e2f 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -310,6 +310,13 @@ struct queue_limits {
- 	unsigned char		discard_misaligned;
- 	unsigned char		raid_partial_stripes_expensive;
- 	enum blk_zoned_model	zoned;
-+
-+	/*
-+	 * Drivers that set dma_alignment to less than 511 must be prepared to
-+	 * handle individual bvec's that are not a multiple of a SECTOR_SIZE
-+	 * due to possible offsets.
-+	 */
-+	unsigned int		dma_alignment;
- };
-=20
- typedef int (*report_zones_cb)(struct blk_zone *zone, unsigned int idx,
-@@ -455,12 +462,6 @@ struct request_queue {
- 	unsigned long		nr_requests;	/* Max # of requests */
-=20
- 	unsigned int		dma_pad_mask;
--	/*
--	 * Drivers that set dma_alignment to less than 511 must be prepared to
--	 * handle individual bvec's that are not a multiple of a SECTOR_SIZE
--	 * due to possible offsets.
--	 */
--	unsigned int		dma_alignment;
-=20
- #ifdef CONFIG_BLK_INLINE_ENCRYPTION
- 	struct blk_crypto_profile *crypto_profile;
-@@ -1318,7 +1319,7 @@ static inline sector_t bdev_zone_sectors(struct blo=
-ck_device *bdev)
-=20
- static inline int queue_dma_alignment(const struct request_queue *q)
- {
--	return q ? q->dma_alignment : 511;
-+	return q ? q->limits.dma_alignment : 511;
- }
-=20
- static inline unsigned int bdev_dma_alignment(struct block_device *bdev)
---=20
-2.30.2
+See [1] for a more detailed overview of the problem and of the
+solutions implemented in this patch series. There you will also find
+some preliminary performance results.
 
+Thanks,
+Paolo
+
+[1] https://www.linaro.org/blog/budget-fair-queueing-bfq-linux-io-scheduler-optimizations-for-multi-actuator-sata-hard-drives/
+[2] https://lore.kernel.org/lkml/202210301803.9wm3k7D8-lkp@intel.com/T/#m3685011dacaf0801bd084b2a3194c861a4e940ba
+
+Davide Zini (3):
+  block, bfq: split also async bfq_queues on a per-actuator basis
+  block, bfq: inject I/O to underutilized actuators
+  block, bfq: balance I/O injection among underutilized actuators
+
+Federico Gavioli (1):
+  block, bfq: retrieve independent access ranges from request queue
+
+Paolo Valente (4):
+  block, bfq: split sync bfq_queues on a per-actuator basis
+  block, bfq: forbid stable merging of queues associated with different
+    actuators
+  block, bfq: move io_cq-persistent bfqq data into a dedicated struct
+  block, bfq: turn bfqq_data into an array in bfq_io_cq
+
+ block/bfq-cgroup.c  |  97 +++++----
+ block/bfq-iosched.c | 521 ++++++++++++++++++++++++++++++--------------
+ block/bfq-iosched.h | 141 +++++++++---
+ block/bfq-wf2q.c    |   2 +-
+ 4 files changed, 528 insertions(+), 233 deletions(-)
+
+--
+2.20.1
