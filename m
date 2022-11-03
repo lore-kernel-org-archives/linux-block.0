@@ -2,135 +2,110 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 55435C433FE
-	for <linux-block@archiver.kernel.org>; Thu,  3 Nov 2022 02:56:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CAD0C4332F
+	for <linux-block@archiver.kernel.org>; Thu,  3 Nov 2022 03:05:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230304AbiKCC4E (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 2 Nov 2022 22:56:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42652 "EHLO
+        id S231285AbiKCDFc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 2 Nov 2022 23:05:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54432 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231460AbiKCCzp (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Nov 2022 22:55:45 -0400
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BAF7013F81;
-        Wed,  2 Nov 2022 19:55:42 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.143])
-        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4N2pGW6c8Vz6S341;
-        Thu,  3 Nov 2022 10:53:07 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-        by APP2 (Coremail) with SMTP id Syh0CgCXfdKpLWNjnAoYBQ--.5634S3;
-        Thu, 03 Nov 2022 10:55:38 +0800 (CST)
-Subject: Re: [RFC PATCH] bfq: fix waker_bfqq inconsistency crash
-To:     Khazhismel Kumykov <khazhy@chromium.org>,
-        Paolo Valente <paolo.valente@linaro.org>,
-        Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Khazhismel Kumykov <khazhy@google.com>,
-        "yukuai (C)" <yukuai3@huawei.com>
-References: <20221103013937.603626-1-khazhy@google.com>
-From:   Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <3c0df3fa-8731-5863-ccc5-f2e60601dbf9@huaweicloud.com>
-Date:   Thu, 3 Nov 2022 10:55:37 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        with ESMTP id S230348AbiKCDFX (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Nov 2022 23:05:23 -0400
+Received: from mail-qt1-x82d.google.com (mail-qt1-x82d.google.com [IPv6:2607:f8b0:4864:20::82d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 01048140AC
+        for <linux-block@vger.kernel.org>; Wed,  2 Nov 2022 20:05:22 -0700 (PDT)
+Received: by mail-qt1-x82d.google.com with SMTP id l2so517506qtq.11
+        for <linux-block@vger.kernel.org>; Wed, 02 Nov 2022 20:05:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=R64KECUzDbqJo0RRKWL4JjLGKACzWeVJPV2fXxBJdHw=;
+        b=ju3Dknz07FXV4Eja1inVQbLV5EziVz/npKT2GwOg4qm60L2iFaIP9e04iZ9gYRFvIy
+         oLMsDFaAW7PVgBNfjby2i8fQZmp6MrvbXW7hJDHFovM3Vh8EV1cy5UAVhJbBGIOvh6T8
+         UcwlOuYb0iPCKfeXAhU54nmrjwFKxudH6BQFw=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=R64KECUzDbqJo0RRKWL4JjLGKACzWeVJPV2fXxBJdHw=;
+        b=VEb4A4/ZwMtgKzXy9s67ddXaygliXSdkOCzxY0g1t+cUakUd+FMaxIl5bFli3KN9xJ
+         MpXa2Kgafw5DAbRctc5wxn95qj46JssQeWQC/8+GkUVx4g061YrgJlSaBECwbSYPuPS2
+         tMk93yqWNqpULaSVR31+lvB8IbVI1JOtvFFslOC8Ij1CG6x9KijEqtZ8iIvdK2pLYaer
+         ptERCn/GFcY1C/+EkrKM+JvABnyrasBIvvnkkUpfFbnnSQBBzMA6tWk1yHLS0z2v9BM+
+         0664oM7RysT0AWZYIyljX0P1xGLVJSVXfpro2XqWN9snFnHhE16NG+BddBbHbWA0ktZ3
+         X6qA==
+X-Gm-Message-State: ACrzQf1p3nGXVtwijUBuU1ci8IE8ToUAJZI6TUZa9aDRyKAu0bBk4E5E
+        9+yQKzRhOmciZfU97yx7ZlVjNoRR5cJp6g==
+X-Google-Smtp-Source: AMsMyM6GWt1B50i8JQcYfK+Dz7O7DyoGRSyRT+902kGVXII34TcbBKjKpLEeqw0OSKzAJZdTxUUHjw==
+X-Received: by 2002:ac8:48d7:0:b0:3a5:3ec4:7a31 with SMTP id l23-20020ac848d7000000b003a53ec47a31mr9000212qtr.375.1667444720851;
+        Wed, 02 Nov 2022 20:05:20 -0700 (PDT)
+Received: from mail-qv1-f53.google.com (mail-qv1-f53.google.com. [209.85.219.53])
+        by smtp.gmail.com with ESMTPSA id o6-20020a05620a2a0600b006ce3f1af120sm1949497qkp.44.2022.11.02.20.05.20
+        for <linux-block@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 02 Nov 2022 20:05:20 -0700 (PDT)
+Received: by mail-qv1-f53.google.com with SMTP id i12so348286qvs.2
+        for <linux-block@vger.kernel.org>; Wed, 02 Nov 2022 20:05:20 -0700 (PDT)
+X-Received: by 2002:a05:6214:f23:b0:4bb:f5db:39b3 with SMTP id
+ iw3-20020a0562140f2300b004bbf5db39b3mr18157941qvb.117.1667444720007; Wed, 02
+ Nov 2022 20:05:20 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20221103013937.603626-1-khazhy@google.com>
-Content-Type: text/plain; charset=gbk; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: Syh0CgCXfdKpLWNjnAoYBQ--.5634S3
-X-Coremail-Antispam: 1UD129KBjvJXoWxWr45JF15Ww1xZF1fWw1rJFb_yoW5Cryfpr
-        4fW3yj9r47J3Wa9FZrCa18uF1Fga1fWr9xJr4Fg3y7Jw17JF1IyFsIkw1Y9Fs3GrWvyry3
-        ZF10ga4Dur4DJaDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUk0b4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
-        6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-        vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7Cj
-        xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
-        0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
-        6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
-        Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JMxk0xIA0c2IEe2xFo4CEbIxvr21l42xK82IYc2Ij
-        64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x
-        8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r126r1DMIIYrxkI7VAKI48JMIIF0xvE
-        2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42
-        xK8VAvwI8IcIk0rVWrJr0_WFyUJwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv
-        6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUrR6zUUUUU
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
-X-CFilter-Loop: Reflected
+References: <20221103013937.603626-1-khazhy@google.com> <3c0df3fa-8731-5863-ccc5-f2e60601dbf9@huaweicloud.com>
+In-Reply-To: <3c0df3fa-8731-5863-ccc5-f2e60601dbf9@huaweicloud.com>
+From:   Khazhy Kumykov <khazhy@chromium.org>
+Date:   Wed, 2 Nov 2022 20:05:08 -0700
+X-Gmail-Original-Message-ID: <CACGdZYJ0WH+Y9sdchXy30UVTQgPCEo=fW+W9atZh1Ki7Ov4_Gw@mail.gmail.com>
+Message-ID: <CACGdZYJ0WH+Y9sdchXy30UVTQgPCEo=fW+W9atZh1Ki7Ov4_Gw@mail.gmail.com>
+Subject: Re: [RFC PATCH] bfq: fix waker_bfqq inconsistency crash
+To:     Yu Kuai <yukuai1@huaweicloud.com>
+Cc:     Paolo Valente <paolo.valente@linaro.org>,
+        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, "yukuai (C)" <yukuai3@huawei.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
+On Wed, Nov 2, 2022 at 7:56 PM Yu Kuai <yukuai1@huaweicloud.com> wrote:
+>
+> Hi,
+>
+> =E5=9C=A8 2022/11/03 9:39, Khazhismel Kumykov =E5=86=99=E9=81=93:
+> > This fixes crashes in bfq_add_bfqq_busy due to waker_bfqq being NULL,
+> > but woken_list_node still being hashed. This would happen when
+> > bfq_init_rq() expects a brand new allocated queue to be returned from
+>
+>  From what I see, bfqq->waker_bfqq is updated in bfq_init_rq() only if
+> 'new_queue' is false, but if 'new_queue' is false, the returned 'bfqq'
+> from bfq_get_bfqq_handle_split() will never be oom_bfqq, so I'm confused
+> here...
+There's two calls for bfq_get_bfqq_handle_split in this function - the
+second one is after the check you mentioned, and is the problematic
+one.
+>
+> > bfq_get_bfqq_handle_split() and unconditionally updates waker_bfqq
+> > without resetting woken_list_node. Since we can always return oom_bfqq
+> > when attempting to allocate, we cannot assume waker_bfqq starts as NULL=
+.
+> > We must either reset woken_list_node, or avoid setting woken_list at al=
+l
+> > for oom_bfqq - opt to do the former.
+>
+> Once oom_bfqq is used, I think the io is treated as issued from root
+> group. Hence I don't think it's necessary to set woken_list or
+> waker_bfqq for oom_bfqq.
+Ack, I was wondering what's right here since, evidently, *someone* had
+already set oom_bfqq->waker_bfqq to *something* (although... maybe it
+was an earlier init_rq). But maybe it's better to do nothing if we
+*know* it's oom_bfqq.
 
-ÔÚ 2022/11/03 9:39, Khazhismel Kumykov Ð´µÀ:
-> This fixes crashes in bfq_add_bfqq_busy due to waker_bfqq being NULL,
-> but woken_list_node still being hashed. This would happen when
-> bfq_init_rq() expects a brand new allocated queue to be returned from
+Is it a correct interpretation here that setting waker_bfqq won't
+accomplish anything anyways on oom_bfqq, so better off not?
 
- From what I see, bfqq->waker_bfqq is updated in bfq_init_rq() only if
-'new_queue' is false, but if 'new_queue' is false, the returned 'bfqq'
-from bfq_get_bfqq_handle_split() will never be oom_bfqq, so I'm confused
-here...
-
-> bfq_get_bfqq_handle_split() and unconditionally updates waker_bfqq
-> without resetting woken_list_node. Since we can always return oom_bfqq
-> when attempting to allocate, we cannot assume waker_bfqq starts as NULL.
-> We must either reset woken_list_node, or avoid setting woken_list at all
-> for oom_bfqq - opt to do the former.
-
-Once oom_bfqq is used, I think the io is treated as issued from root
-group. Hence I don't think it's necessary to set woken_list or
-waker_bfqq for oom_bfqq.
-
-Thanks,
-Kuai
-> 
-> Crashes would have a stacktrace like:
-> [160595.656560]  bfq_add_bfqq_busy+0x110/0x1ec
-> [160595.661142]  bfq_add_request+0x6bc/0x980
-> [160595.666602]  bfq_insert_request+0x8ec/0x1240
-> [160595.671762]  bfq_insert_requests+0x58/0x9c
-> [160595.676420]  blk_mq_sched_insert_request+0x11c/0x198
-> [160595.682107]  blk_mq_submit_bio+0x270/0x62c
-> [160595.686759]  __submit_bio_noacct_mq+0xec/0x178
-> [160595.691926]  submit_bio+0x120/0x184
-> [160595.695990]  ext4_mpage_readpages+0x77c/0x7c8
-> [160595.701026]  ext4_readpage+0x60/0xb0
-> [160595.705158]  filemap_read_page+0x54/0x114
-> [160595.711961]  filemap_fault+0x228/0x5f4
-> [160595.716272]  do_read_fault+0xe0/0x1f0
-> [160595.720487]  do_fault+0x40/0x1c8
-> 
-> Tested by injecting random failures into bfq_get_queue, crashes go away
-> completely.
-> 
-> Fixes: 8ef3fc3a043c ("block, bfq: make shared queues inherit wakers")
-> Signed-off-by: Khazhismel Kumykov <khazhy@google.com>
-> ---
-> RFC mainly because it's not clear to me the best policy here - but the
-> patch is tested and fixes a real crash we started seeing in 5.15
-> 
-> This is following up my ramble over at
-> https://lore.kernel.org/lkml/CACGdZYLMnfcqwbAXDx+x9vUOMn2cz55oc+8WySBS3J2Xd_q7Lg@mail.gmail.com/
-> 
->   block/bfq-iosched.c | 5 +++++
->   1 file changed, 5 insertions(+)
-> 
-> diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-> index 7ea427817f7f..5d2861119d20 100644
-> --- a/block/bfq-iosched.c
-> +++ b/block/bfq-iosched.c
-> @@ -6793,7 +6793,12 @@ static struct bfq_queue *bfq_init_rq(struct request *rq)
->   				 * reset. So insert new_bfqq into the
->   				 * woken_list of the waker. See
->   				 * bfq_check_waker for details.
-> +				 *
-> +				 * Also, if we got oom_bfqq, we must check if
-> +				 * it's already in a woken_list
->   				 */
-> +				if (unlikely(!hlist_unhashed(&bfqq->woken_list_node)))
-> +					hlist_del_init(&bfqq->woken_list_node);
->   				if (bfqq->waker_bfqq)
->   					hlist_add_head(&bfqq->woken_list_node,
->   						       &bfqq->waker_bfqq->woken_list);
-> 
-
+>
+> Thanks,
+> Kuai
