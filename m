@@ -2,360 +2,111 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DBA0C43217
-	for <linux-block@archiver.kernel.org>; Thu,  3 Nov 2022 03:09:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 39EE6C433FE
+	for <linux-block@archiver.kernel.org>; Thu,  3 Nov 2022 03:53:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229993AbiKCDJQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 2 Nov 2022 23:09:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55762 "EHLO
+        id S231339AbiKCDxj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 2 Nov 2022 23:53:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42926 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229531AbiKCDJO (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Nov 2022 23:09:14 -0400
-Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F189DF76;
-        Wed,  2 Nov 2022 20:09:10 -0700 (PDT)
-Received: from kwepemi500016.china.huawei.com (unknown [172.30.72.54])
-        by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4N2pcw3CKBz15MJq;
-        Thu,  3 Nov 2022 11:09:04 +0800 (CST)
-Received: from [10.40.193.166] (10.40.193.166) by
- kwepemi500016.china.huawei.com (7.221.188.220) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31; Thu, 3 Nov 2022 11:09:06 +0800
-Subject: Re: [PATCH RFC v3 21/22] scsi: libsas: Queue internal abort commands
- as requests
-To:     John Garry <john.g.garry@oracle.com>,
-        John Garry <john.garry@huawei.com>, <axboe@kernel.dk>,
-        <damien.lemoal@opensource.wdc.com>, <jejb@linux.ibm.com>,
-        <martin.petersen@oracle.com>, <jinpu.wang@cloud.ionos.com>,
-        <hare@suse.de>, <bvanassche@acm.org>, <hch@lst.de>,
-        <ming.lei@redhat.com>, <niklas.cassel@wdc.com>
-References: <1666693096-180008-1-git-send-email-john.garry@huawei.com>
- <1666693096-180008-22-git-send-email-john.garry@huawei.com>
- <0cbc86ea-09c9-2654-a795-9230e4b00a1e@hisilicon.com>
- <152bcd77-bcd6-ea75-0572-01e0f16902aa@oracle.com>
-CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-ide@vger.kernel.org>, <linux-scsi@vger.kernel.org>,
-        <linuxarm@huawei.com>
-From:   "chenxiang (M)" <chenxiang66@hisilicon.com>
-Message-ID: <3179b779-ef99-cec0-8524-76f1b25fb7f1@hisilicon.com>
-Date:   Thu, 3 Nov 2022 11:09:05 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
- Thunderbird/45.2.0
+        with ESMTP id S231269AbiKCDxE (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Nov 2022 23:53:04 -0400
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8EE0D19C39;
+        Wed,  2 Nov 2022 20:51:19 -0700 (PDT)
+Received: from mail02.huawei.com (unknown [172.30.67.143])
+        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4N2qVh3gYgz6PDHf;
+        Thu,  3 Nov 2022 11:48:44 +0800 (CST)
+Received: from [10.174.176.73] (unknown [10.174.176.73])
+        by APP2 (Coremail) with SMTP id Syh0CgAnDtO0OmNjIRYaBQ--.12160S3;
+        Thu, 03 Nov 2022 11:51:17 +0800 (CST)
+Subject: Re: [RFC PATCH] bfq: fix waker_bfqq inconsistency crash
+To:     Khazhy Kumykov <khazhy@chromium.org>,
+        Yu Kuai <yukuai1@huaweicloud.com>
+Cc:     Paolo Valente <paolo.valente@linaro.org>,
+        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, "yukuai (C)" <yukuai3@huawei.com>,
+        Jan Kara <jack@suse.cz>
+References: <20221103013937.603626-1-khazhy@google.com>
+ <3c0df3fa-8731-5863-ccc5-f2e60601dbf9@huaweicloud.com>
+ <CACGdZYJ0WH+Y9sdchXy30UVTQgPCEo=fW+W9atZh1Ki7Ov4_Gw@mail.gmail.com>
+From:   Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <f83404b4-84a4-de4e-fa4d-9ce38900d91c@huaweicloud.com>
+Date:   Thu, 3 Nov 2022 11:51:15 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <152bcd77-bcd6-ea75-0572-01e0f16902aa@oracle.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
+In-Reply-To: <CACGdZYJ0WH+Y9sdchXy30UVTQgPCEo=fW+W9atZh1Ki7Ov4_Gw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.40.193.166]
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- kwepemi500016.china.huawei.com (7.221.188.220)
+X-CM-TRANSID: Syh0CgAnDtO0OmNjIRYaBQ--.12160S3
+X-Coremail-Antispam: 1UD129KBjvJXoW7Aw17CFyrtFWrKry7uryDWrg_yoW8Zr15p3
+        y0gFWjgr4xJrySgrZFyw4UAFyFvr4rWrZ8KryYg3s7ArZ8Ga4xtFsFkw4ruayfGFZ3K3ZI
+        vr1Fqa45Gr1DAaDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUkE14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+        1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+        JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+        CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+        2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+        W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lc7I2V7IY0VAS07AlzVAY
+        IcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14
+        v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkG
+        c2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI
+        0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6rWUJVWrZr1UMIIF0xvEx4A2jsIE14v26r1j
+        6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUdHU
+        DUUUUU=
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Hi,
 
+在 2022/11/03 11:05, Khazhy Kumykov 写道:
+> On Wed, Nov 2, 2022 at 7:56 PM Yu Kuai <yukuai1@huaweicloud.com> wrote:
+>>
+>> Hi,
+>>
+>> 在 2022/11/03 9:39, Khazhismel Kumykov 写道:
+>>> This fixes crashes in bfq_add_bfqq_busy due to waker_bfqq being NULL,
+>>> but woken_list_node still being hashed. This would happen when
+>>> bfq_init_rq() expects a brand new allocated queue to be returned from
+>>
+>>   From what I see, bfqq->waker_bfqq is updated in bfq_init_rq() only if
+>> 'new_queue' is false, but if 'new_queue' is false, the returned 'bfqq'
+>> from bfq_get_bfqq_handle_split() will never be oom_bfqq, so I'm confused
+>> here...
+> There's two calls for bfq_get_bfqq_handle_split in this function - the
+> second one is after the check you mentioned, and is the problematic
+> one.
+Yes, thanks for the explanation. Now I understand how the problem
+triggers.
 
-在 2022/11/2 18:04, John Garry 写道:
-> On 29/10/2022 02:15, chenxiang (M) wrote:
->> Hi John,
 >>
->> For internal abort commands, it allocates and deliver requests 
->> through sdev->request_queue.
+>>> bfq_get_bfqq_handle_split() and unconditionally updates waker_bfqq
+>>> without resetting woken_list_node. Since we can always return oom_bfqq
+>>> when attempting to allocate, we cannot assume waker_bfqq starts as NULL.
+>>> We must either reset woken_list_node, or avoid setting woken_list at all
+>>> for oom_bfqq - opt to do the former.
 >>
->> Is it possible that we still need to send internal abort commands 
->> even if sdev is freed?
->>
->> I  notices that in sas_destruct_devices, it calls sas_rphy_delete() 
->> to remove target, and then call i->dft->lldd_dev_gone()
->>
->> which will call internal abort commands.
->
-> Good question. I did not properly check the removal path and, indeed, 
-> the sdev would be gone when we call lldd_dev_gone -> 
-> internal_task_abort_dev, so that should fail to execute.
->
-> However I do wonder why we really need to call internal_task_abort_dev 
-> in the lldd_dev_gone callback. At the point lldd_dev_gone is called 
-> all IO should be complete - indeed, it is now accounted for as 
-> requests associated with the sdev. If it is really required to be 
-> called (HW requirement?) then maybe it could be relocated to 
-> sdev/starget teardown callback.
+>> Once oom_bfqq is used, I think the io is treated as issued from root
+>> group. Hence I don't think it's necessary to set woken_list or
+>> waker_bfqq for oom_bfqq.
+> Ack, I was wondering what's right here since, evidently, *someone* had
+> already set oom_bfqq->waker_bfqq to *something* (although... maybe it
+> was an earlier init_rq). But maybe it's better to do nothing if we
+> *know* it's oom_bfqq.
 
-Call internal abort in lldd_dev_gone callback comes from the commit 
-(40f2702b57eb16ef "scsi: hisi_sas: add internal abort in 
-hisi_sas_dev_gone()"), and it seems not descript why adding it.
-But those internal IOs are sent to SAS controller to do something in it, 
-and it is not depend on scsi device. Like SMP IO, it allocates 
-scsi_device for expander, why not allocate a scsi_device for controller?
+I need to have a check how oom_bfqq get involved with waker_bfqq, and
+then see if it's reasonable.
 
->
-> Thanks,
-> John
->
->>
->>
->>
->> 在 2022/10/25 18:18, John Garry 写道:
->>> Like what we did for SMP commands, send internal abort commands through
->>> the block layer.
->>>
->>> At this point we can delete special handling in sas_task_abort() for 
->>> SAS
->>> "internal" commands, as every slow task now has a request associated.
->>>
->>> Function sas_task_internal_timedout() is no longer referenced, so 
->>> delete
->>> it.
->>>
->>> Signed-off-by: John Garry <john.garry@huawei.com>
->>> ---
->>>   drivers/scsi/hisi_sas/hisi_sas_main.c | 36 +++++++++----------
->>>   drivers/scsi/libsas/sas_expander.c    |  2 +-
->>>   drivers/scsi/libsas/sas_init.c        | 12 +++++--
->>>   drivers/scsi/libsas/sas_internal.h    |  3 +-
->>>   drivers/scsi/libsas/sas_scsi_host.c   | 52 
->>> ++++++---------------------
->>>   include/scsi/libsas.h                 |  1 -
->>>   6 files changed, 38 insertions(+), 68 deletions(-)
->>>
->>> diff --git a/drivers/scsi/hisi_sas/hisi_sas_main.c 
->>> b/drivers/scsi/hisi_sas/hisi_sas_main.c
->>> index fe2752d24fe8..65475775c844 100644
->>> --- a/drivers/scsi/hisi_sas/hisi_sas_main.c
->>> +++ b/drivers/scsi/hisi_sas/hisi_sas_main.c
->>> @@ -465,7 +465,7 @@ static int hisi_sas_queue_command(struct 
->>> sas_task *task, gfp_t gfp_flags)
->>>       struct hisi_sas_port *port;
->>>       struct hisi_hba *hisi_hba;
->>>       struct hisi_sas_slot *slot;
->>> -    struct request *rq = NULL;
->>> +    struct request *rq;
->>>       struct device *dev;
->>>       int rc;
->>> @@ -485,6 +485,21 @@ static int hisi_sas_queue_command(struct 
->>> sas_task *task, gfp_t gfp_flags)
->>>       hisi_hba = dev_to_hisi_hba(device);
->>>       dev = hisi_hba->dev;
->>> +    rq = sas_task_find_rq(task);
->>> +    if (rq) {
->>> +        unsigned int dq_index;
->>> +        u32 blk_tag;
->>> +
->>> +        blk_tag = blk_mq_unique_tag(rq);
->>> +        dq_index = blk_mq_unique_tag_to_hwq(blk_tag);
->>> +        dq = &hisi_hba->dq[dq_index];
->>> +    } else {
->>> +        struct Scsi_Host *shost = hisi_hba->shost;
->>> +        struct blk_mq_queue_map *qmap = 
->>> &shost->tag_set.map[HCTX_TYPE_DEFAULT];
->>> +        int queue = qmap->mq_map[raw_smp_processor_id()];
->>> +
->>> +        dq = &hisi_hba->dq[queue];
->>> +    }
->>>       switch (task->task_proto) {
->>>       case SAS_PROTOCOL_SSP:
->>> @@ -519,22 +534,6 @@ static int hisi_sas_queue_command(struct 
->>> sas_task *task, gfp_t gfp_flags)
->>>                   return -ECOMM;
->>>           }
->>> -
->>> -        rq = sas_task_find_rq(task);
->>> -        if (rq) {
->>> -            unsigned int dq_index;
->>> -            u32 blk_tag;
->>> -
->>> -            blk_tag = blk_mq_unique_tag(rq);
->>> -            dq_index = blk_mq_unique_tag_to_hwq(blk_tag);
->>> -            dq = &hisi_hba->dq[dq_index];
->>> -        } else {
->>> -            struct Scsi_Host *shost = hisi_hba->shost;
->>> -            struct blk_mq_queue_map *qmap = 
->>> &shost->tag_set.map[HCTX_TYPE_DEFAULT];
->>> -            int queue = qmap->mq_map[raw_smp_processor_id()];
->>> -
->>> -            dq = &hisi_hba->dq[queue];
->>> -        }
->>>           break;
->>>       case SAS_PROTOCOL_INTERNAL_ABORT:
->>>           if (!hisi_hba->hw->prep_abort)
->>> @@ -543,13 +542,10 @@ static int hisi_sas_queue_command(struct 
->>> sas_task *task, gfp_t gfp_flags)
->>>           if (test_bit(HISI_SAS_HW_FAULT_BIT, &hisi_hba->flags))
->>>               return -EIO;
->>> -        hisi_hba = dev_to_hisi_hba(device);
->>> -
->>>           if (unlikely(test_bit(HISI_SAS_REJECT_CMD_BIT, 
->>> &hisi_hba->flags)))
->>>               return -EINVAL;
->>>           port = to_hisi_sas_port(sas_port);
->>> -        dq = &hisi_hba->dq[task->abort_task.qid];
->>>           break;
->>>       default:
->>>           dev_err(hisi_hba->dev, "task prep: unknown/unsupported 
->>> proto (0x%x)\n",
->>> diff --git a/drivers/scsi/libsas/sas_expander.c 
->>> b/drivers/scsi/libsas/sas_expander.c
->>> index cc41127ea5cc..e852f1565fe7 100644
->>> --- a/drivers/scsi/libsas/sas_expander.c
->>> +++ b/drivers/scsi/libsas/sas_expander.c
->>> @@ -50,7 +50,7 @@ static int smp_execute_task_sg(struct 
->>> domain_device *dev,
->>>               break;
->>>           }
->>> -        task = sas_alloc_slow_task_rq(dev, GFP_KERNEL);
->>> +        task = sas_alloc_slow_task_rq(dev, GFP_KERNEL, -1U);
->>>           if (!task) {
->>>               res = -ENOMEM;
->>>               break;
->>> diff --git a/drivers/scsi/libsas/sas_init.c 
->>> b/drivers/scsi/libsas/sas_init.c
->>> index 5f9e71a54799..c3f602bd2c4c 100644
->>> --- a/drivers/scsi/libsas/sas_init.c
->>> +++ b/drivers/scsi/libsas/sas_init.c
->>> @@ -56,7 +56,7 @@ struct sas_task *sas_alloc_slow_task(gfp_t flags)
->>>       return task;
->>>   }
->>> -struct sas_task *sas_alloc_slow_task_rq(struct domain_device 
->>> *device, gfp_t flags)
->>> +struct sas_task *sas_alloc_slow_task_rq(struct domain_device 
->>> *device, gfp_t flags, unsigned int qid)
->>>   {
->>>       struct sas_ha_struct *sas_ha = device->port->ha;
->>>       struct Scsi_Host *shost = sas_ha->core.shost;
->>> @@ -86,8 +86,14 @@ struct sas_task *sas_alloc_slow_task_rq(struct 
->>> domain_device *device, gfp_t flag
->>>       task->dev = device;
->>>       task->task_done = sas_task_complete_internal;
->>> -    rq = scsi_alloc_request(sdev->request_queue, REQ_OP_DRV_IN,
->>> -                BLK_MQ_REQ_RESERVED | BLK_MQ_REQ_NOWAIT);
->>> +    if (qid == -1U) {
->>> +        rq = scsi_alloc_request(sdev->request_queue, REQ_OP_DRV_IN,
->>> +                    BLK_MQ_REQ_RESERVED | BLK_MQ_REQ_NOWAIT);
->>> +    } else {
->>> +        rq = scsi_alloc_request_hwq(sdev->request_queue, 
->>> REQ_OP_DRV_IN,
->>> +                    BLK_MQ_REQ_RESERVED | BLK_MQ_REQ_NOWAIT,
->>> +                    qid);
->>> +    }
->>>       if (IS_ERR(rq)) {
->>>           sas_free_task(task);
->>>           return NULL;
->>> diff --git a/drivers/scsi/libsas/sas_internal.h 
->>> b/drivers/scsi/libsas/sas_internal.h
->>> index 9b58948c57c2..af4a4bf88830 100644
->>> --- a/drivers/scsi/libsas/sas_internal.h
->>> +++ b/drivers/scsi/libsas/sas_internal.h
->>> @@ -54,7 +54,8 @@ void sas_free_event(struct asd_sas_event *event);
->>>   struct sas_task *sas_alloc_task(gfp_t flags);
->>>   struct sas_task *sas_alloc_slow_task(gfp_t flags);
->>> -struct sas_task *sas_alloc_slow_task_rq(struct domain_device 
->>> *device, gfp_t flags);
->>> +struct sas_task *sas_alloc_slow_task_rq(struct domain_device 
->>> *device, gfp_t flags,
->>> +                      unsigned int qid);
->>>   void sas_free_task(struct sas_task *task);
->>>   int  sas_register_ports(struct sas_ha_struct *sas_ha);
->>> diff --git a/drivers/scsi/libsas/sas_scsi_host.c 
->>> b/drivers/scsi/libsas/sas_scsi_host.c
->>> index e6ee8dd56a45..a93e019a7dbf 100644
->>> --- a/drivers/scsi/libsas/sas_scsi_host.c
->>> +++ b/drivers/scsi/libsas/sas_scsi_host.c
->>> @@ -920,23 +920,6 @@ void sas_task_complete_internal(struct sas_task 
->>> *task)
->>>       scsi_done(scmd);
->>>   }
->>> -void sas_task_internal_timedout(struct timer_list *t)
->>> -{
->>> -    struct sas_task_slow *slow = from_timer(slow, t, timer);
->>> -    struct sas_task *task = slow->task;
->>> -    bool is_completed = true;
->>> -    unsigned long flags;
->>> -
->>> -    spin_lock_irqsave(&task->task_state_lock, flags);
->>> -    if (!(task->task_state_flags & SAS_TASK_STATE_DONE)) {
->>> -        task->task_state_flags |= SAS_TASK_STATE_ABORTED;
->>> -        is_completed = false;
->>> -    }
->>> -    spin_unlock_irqrestore(&task->task_state_lock, flags);
->>> -
->>> -    if (!is_completed)
->>> -        complete(&task->slow_task->completion);
->>> -}
->>>   enum blk_eh_timer_return sas_internal_timeout(struct scsi_cmnd *scmd)
->>>   {
->>>       struct sas_task *task = TO_SAS_TASK(scmd);
->>> @@ -978,28 +961,23 @@ static int sas_execute_internal_abort(struct 
->>> domain_device *device,
->>>       int res, retry;
->>>       for (retry = 0; retry < TASK_RETRY; retry++) {
->>> -        task = sas_alloc_slow_task(GFP_KERNEL);
->>> +        struct request *rq;
->>> +
->>> +        task = sas_alloc_slow_task_rq(device, GFP_KERNEL, qid);
->>>           if (!task)
->>>               return -ENOMEM;
->>>           task->dev = device;
->>>           task->task_proto = SAS_PROTOCOL_INTERNAL_ABORT;
->>> -        task->task_done = sas_task_internal_done;
->>> -        task->slow_task->timer.function = sas_task_internal_timedout;
->>> -        task->slow_task->timer.expires = jiffies + TASK_TIMEOUT;
->>> -        add_timer(&task->slow_task->timer);
->>> +        task->task_done = sas_task_complete_internal;
->>>           task->abort_task.tag = tag;
->>>           task->abort_task.type = type;
->>> -        task->abort_task.qid = qid;
->>> -        res = i->dft->lldd_execute_task(task, GFP_KERNEL);
->>> -        if (res) {
->>> - del_timer_sync(&task->slow_task->timer);
->>> -            pr_err("Executing internal abort failed %016llx (%d)\n",
->>> -                   SAS_ADDR(device->sas_addr), res);
->>> -            break;
->>> -        }
->>> +        rq = scsi_cmd_to_rq(task->uldd_task);
->>> +        rq->timeout = TASK_TIMEOUT;
->>> +
->>> +        blk_execute_rq_nowait(rq, true);
->>> wait_for_completion(&task->slow_task->completion);
->>>           res = TMF_RESP_FUNC_FAILED;
->>> @@ -1069,7 +1047,7 @@ int sas_execute_tmf(struct domain_device 
->>> *device, void *parameter,
->>>       for (retry = 0; retry < TASK_RETRY; retry++) {
->>>           struct request *rq;
->>> -        task = sas_alloc_slow_task_rq(device, GFP_KERNEL);
->>> +        task = sas_alloc_slow_task_rq(device, GFP_KERNEL, -1U);
->>>           if (!task)
->>>               return -ENOMEM;
->>> @@ -1251,17 +1229,7 @@ void sas_task_abort(struct sas_task *task)
->>>   {
->>>       struct scsi_cmnd *sc = task->uldd_task;
->>> -    /* Escape for libsas internal commands */
->>> -    if (!sc) {
->>> -        struct sas_task_slow *slow = task->slow_task;
->>> -
->>> -        if (!slow)
->>> -            return;
->>> -        if (!del_timer(&slow->timer))
->>> -            return;
->>> -        slow->timer.function(&slow->timer);
->>> -        return;
->>> -    }
->>> +    WARN_ON_ONCE(!sc);
->>>       if (dev_is_sata(task->dev) && !task->slow_task)
->>>           sas_ata_task_abort(task);
->>> diff --git a/include/scsi/libsas.h b/include/scsi/libsas.h
->>> index f02156ccd376..60543d8b01d4 100644
->>> --- a/include/scsi/libsas.h
->>> +++ b/include/scsi/libsas.h
->>> @@ -565,7 +565,6 @@ enum sas_internal_abort {
->>>   struct sas_internal_abort_task {
->>>       enum sas_internal_abort type;
->>> -    unsigned int qid;
->>>       u16 tag;
->>>   };
->>
->>
->>
->
-> .
->
+Probably Jan and Paolo will have better view on this.
+
+Thanks,
+Kuai
+> 
+> Is it a correct interpretation here that setting waker_bfqq won't
+> accomplish anything anyways on oom_bfqq, so better off not?
 
