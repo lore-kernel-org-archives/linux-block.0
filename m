@@ -2,111 +2,68 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 39EE6C433FE
-	for <linux-block@archiver.kernel.org>; Thu,  3 Nov 2022 03:53:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A0610C433FE
+	for <linux-block@archiver.kernel.org>; Thu,  3 Nov 2022 07:49:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231339AbiKCDxj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 2 Nov 2022 23:53:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42926 "EHLO
+        id S229993AbiKCHts (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 3 Nov 2022 03:49:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43396 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231269AbiKCDxE (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Nov 2022 23:53:04 -0400
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8EE0D19C39;
-        Wed,  2 Nov 2022 20:51:19 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.143])
-        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4N2qVh3gYgz6PDHf;
-        Thu,  3 Nov 2022 11:48:44 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-        by APP2 (Coremail) with SMTP id Syh0CgAnDtO0OmNjIRYaBQ--.12160S3;
-        Thu, 03 Nov 2022 11:51:17 +0800 (CST)
-Subject: Re: [RFC PATCH] bfq: fix waker_bfqq inconsistency crash
-To:     Khazhy Kumykov <khazhy@chromium.org>,
-        Yu Kuai <yukuai1@huaweicloud.com>
-Cc:     Paolo Valente <paolo.valente@linaro.org>,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, "yukuai (C)" <yukuai3@huawei.com>,
-        Jan Kara <jack@suse.cz>
-References: <20221103013937.603626-1-khazhy@google.com>
- <3c0df3fa-8731-5863-ccc5-f2e60601dbf9@huaweicloud.com>
- <CACGdZYJ0WH+Y9sdchXy30UVTQgPCEo=fW+W9atZh1Ki7Ov4_Gw@mail.gmail.com>
-From:   Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <f83404b4-84a4-de4e-fa4d-9ce38900d91c@huaweicloud.com>
-Date:   Thu, 3 Nov 2022 11:51:15 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        with ESMTP id S229436AbiKCHtr (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 3 Nov 2022 03:49:47 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D2A0633F;
+        Thu,  3 Nov 2022 00:49:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=pZ2ykf+ZWvXHPxLN8XkQPjK779MH/q2xfMK9Fc41Z7o=; b=WJR3+pl3wPMFj+uYLUC+AUU9cp
+        I5Ehw7vKak4fmtb628r62ic4cceOmsMi8B0X0aGonesUiHyBzYqufib+m7d92hTc07UKpCnrmKRYV
+        sxIhUEktkMHuvXEs60fVAl5Fv4IQn8YcmEGiJXg3ekrFe+DZJH02W0bdQjVgYhtrX5aS92hBRmO5r
+        rtr71xlDOtoLVWtSM+EO0bWOUXEh8ixSNhgYWJ+lhGwyYktk14to9G327zqNsW7IakfGDZuIfmUNX
+        Uk8ZtW5DyLtcNholQL7UROf1NBcs9SC5Bz6JL3gZwGJewl80vRdeZUnOWtHpOObR4RUoR6D7+hiDt
+        zVuF98Vg==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1oqUyr-00GVS3-PN; Thu, 03 Nov 2022 07:49:41 +0000
+Date:   Thu, 3 Nov 2022 00:49:41 -0700
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+        linux-ide@vger.kernel.org, linux-block@vger.kernel.org,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Hannes Reinecke <hare@suse.de>
+Subject: Re: [PATCH v4 1/7] block: Prevent the use of REQ_FUA with read
+ operations
+Message-ID: <Y2NylejsWVvOeZuL@infradead.org>
+References: <20221031022642.352794-1-damien.lemoal@opensource.wdc.com>
+ <20221031022642.352794-2-damien.lemoal@opensource.wdc.com>
+ <Y2E2wFnbeUzAPjo0@infradead.org>
+ <3af6895b-b776-cf0d-fe1e-866ce5e6b0b0@opensource.wdc.com>
+ <Y2IXjzWL5eHA3Co9@infradead.org>
+ <8125e422-7bc8-46a1-792a-f31cee7a91a3@kernel.dk>
 MIME-Version: 1.0
-In-Reply-To: <CACGdZYJ0WH+Y9sdchXy30UVTQgPCEo=fW+W9atZh1Ki7Ov4_Gw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: Syh0CgAnDtO0OmNjIRYaBQ--.12160S3
-X-Coremail-Antispam: 1UD129KBjvJXoW7Aw17CFyrtFWrKry7uryDWrg_yoW8Zr15p3
-        y0gFWjgr4xJrySgrZFyw4UAFyFvr4rWrZ8KryYg3s7ArZ8Ga4xtFsFkw4ruayfGFZ3K3ZI
-        vr1Fqa45Gr1DAaDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUkE14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-        1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-        JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-        CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-        2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-        W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lc7I2V7IY0VAS07AlzVAY
-        IcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14
-        v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkG
-        c2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI
-        0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6rWUJVWrZr1UMIIF0xvEx4A2jsIE14v26r1j
-        6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUdHU
-        DUUUUU=
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <8125e422-7bc8-46a1-792a-f31cee7a91a3@kernel.dk>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
-
-在 2022/11/03 11:05, Khazhy Kumykov 写道:
-> On Wed, Nov 2, 2022 at 7:56 PM Yu Kuai <yukuai1@huaweicloud.com> wrote:
->>
->> Hi,
->>
->> 在 2022/11/03 9:39, Khazhismel Kumykov 写道:
->>> This fixes crashes in bfq_add_bfqq_busy due to waker_bfqq being NULL,
->>> but woken_list_node still being hashed. This would happen when
->>> bfq_init_rq() expects a brand new allocated queue to be returned from
->>
->>   From what I see, bfqq->waker_bfqq is updated in bfq_init_rq() only if
->> 'new_queue' is false, but if 'new_queue' is false, the returned 'bfqq'
->> from bfq_get_bfqq_handle_split() will never be oom_bfqq, so I'm confused
->> here...
-> There's two calls for bfq_get_bfqq_handle_split in this function - the
-> second one is after the check you mentioned, and is the problematic
-> one.
-Yes, thanks for the explanation. Now I understand how the problem
-triggers.
-
->>
->>> bfq_get_bfqq_handle_split() and unconditionally updates waker_bfqq
->>> without resetting woken_list_node. Since we can always return oom_bfqq
->>> when attempting to allocate, we cannot assume waker_bfqq starts as NULL.
->>> We must either reset woken_list_node, or avoid setting woken_list at all
->>> for oom_bfqq - opt to do the former.
->>
->> Once oom_bfqq is used, I think the io is treated as issued from root
->> group. Hence I don't think it's necessary to set woken_list or
->> waker_bfqq for oom_bfqq.
-> Ack, I was wondering what's right here since, evidently, *someone* had
-> already set oom_bfqq->waker_bfqq to *something* (although... maybe it
-> was an earlier init_rq). But maybe it's better to do nothing if we
-> *know* it's oom_bfqq.
-
-I need to have a check how oom_bfqq get involved with waker_bfqq, and
-then see if it's reasonable.
-
-Probably Jan and Paolo will have better view on this.
-
-Thanks,
-Kuai
+On Wed, Nov 02, 2022 at 09:17:54AM -0600, Jens Axboe wrote:
 > 
-> Is it a correct interpretation here that setting waker_bfqq won't
-> accomplish anything anyways on oom_bfqq, so better off not?
+> This looks fine, but if we're never expecting this to happen, I do think
+> it should just go into libata instead as that's the only user that
+> cares about it. Yes, that'll lose the backtrace for who submitted it
+> potentially, but you can debug it pretty easily at that point if you
+> run into it.
 
+FUA and PREFLUSH are bits only defined for writes.  libata might be the
+first thing blowing up, but it really is a block layer constraint.
+So validity checking what is being sent to the block layer at the
+highest possible lyer is a good thing to ensure we don't get us in
+trouble by someone accidentally sending one down or even expecting it
+to work.  Especially as at least SCSI actually defines semantics for FUA
+on reads, but they are completely bogus and useless.
