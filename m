@@ -2,110 +2,135 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7509EC4332F
-	for <linux-block@archiver.kernel.org>; Thu,  3 Nov 2022 02:55:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 55435C433FE
+	for <linux-block@archiver.kernel.org>; Thu,  3 Nov 2022 02:56:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231320AbiKCCzw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 2 Nov 2022 22:55:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42920 "EHLO
+        id S230304AbiKCC4E (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 2 Nov 2022 22:56:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42652 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230153AbiKCCz0 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Nov 2022 22:55:26 -0400
-Received: from outgoing.mit.edu (outgoing-auth-1.mit.edu [18.9.28.11])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF2E710FEE;
-        Wed,  2 Nov 2022 19:55:20 -0700 (PDT)
-Received: from letrec.thunk.org (guestnat-104-133-8-97.corp.google.com [104.133.8.97] (may be forged))
-        (authenticated bits=0)
-        (User authenticated as tytso@ATHENA.MIT.EDU)
-        by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 2A32snCX003837
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 2 Nov 2022 22:54:51 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mit.edu; s=outgoing;
-        t=1667444094; bh=41+/r6dUxN9gZm3tROUz2W96+3LztrQSpB7Atiqbua8=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To;
-        b=l2AskeqKk2PUolI+9Mtp/Gc9/TRlFNdwgIaffB3SUR2vzFTrJJVt3mjqu6L6T4siJ
-         UCCVzV/v1umgfTruoP8yvKDErQvVNJ/fA/+gPRDQTOL6c29VIYkXh0L+VbX3hKJv91
-         6FazH1C+obJlSUJgDKRaMq0citWM2MrG7peakp+RXgkHwTHNC6avmuEAbCrJ/HCQaJ
-         jqJnUghjMGcd5yP/+L4HVIPeBpvmFSvdrIDdS46k9jj7iVnBNZf09SKSBDdzk38ap9
-         p9ey1iqpaKDZ0GH4uDy/WzYnzMrgx3lBfSAJ7qz7WFFkIQGDAAujnLzJupmDTG0T8O
-         YAqFcTgI7o1bQ==
-Received: by letrec.thunk.org (Postfix, from userid 15806)
-        id BABF88C2A3A; Wed,  2 Nov 2022 22:54:48 -0400 (EDT)
-Date:   Wed, 2 Nov 2022 22:54:48 -0400
-From:   "Theodore Ts'o" <tytso@mit.edu>
-To:     David Sterba <dsterba@suse.cz>
-Cc:     Steven Rostedt <rostedt@goodmis.org>,
-        Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
-        Chris Mason <clm@meta.com>, Christoph Hellwig <hch@lst.de>,
-        Chris Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>,
-        David Sterba <dsterba@suse.com>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>,
-        Naohiro Aota <Naohiro.Aota@wdc.com>, Qu Wenruo <wqu@suse.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        "Darrick J. Wong" <djwong@kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-btrfs@vger.kernel.org" <linux-btrfs@vger.kernel.org>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>
-Subject: Re: consolidate btrfs checksumming, repair and bio splitting
-Message-ID: <Y2MteFkep2ko1UKA@mit.edu>
-References: <20220901074216.1849941-1-hch@lst.de>
- <347dc0b3-0388-54ee-6dcb-0c1d0ca08d05@wdc.com>
- <20221024144411.GA25172@lst.de>
- <773539e2-b5f1-8386-aa2a-96086f198bf8@meta.com>
- <20221024171042.GF5824@suse.cz>
- <9f443843-4145-155b-2fd0-50613a9f7913@wdc.com>
- <20221026074145.2be5ca09@gandalf.local.home>
- <20221031121912.GY5824@twin.jikos.cz>
+        with ESMTP id S231460AbiKCCzp (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Nov 2022 22:55:45 -0400
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BAF7013F81;
+        Wed,  2 Nov 2022 19:55:42 -0700 (PDT)
+Received: from mail02.huawei.com (unknown [172.30.67.143])
+        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4N2pGW6c8Vz6S341;
+        Thu,  3 Nov 2022 10:53:07 +0800 (CST)
+Received: from [10.174.176.73] (unknown [10.174.176.73])
+        by APP2 (Coremail) with SMTP id Syh0CgCXfdKpLWNjnAoYBQ--.5634S3;
+        Thu, 03 Nov 2022 10:55:38 +0800 (CST)
+Subject: Re: [RFC PATCH] bfq: fix waker_bfqq inconsistency crash
+To:     Khazhismel Kumykov <khazhy@chromium.org>,
+        Paolo Valente <paolo.valente@linaro.org>,
+        Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Khazhismel Kumykov <khazhy@google.com>,
+        "yukuai (C)" <yukuai3@huawei.com>
+References: <20221103013937.603626-1-khazhy@google.com>
+From:   Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <3c0df3fa-8731-5863-ccc5-f2e60601dbf9@huaweicloud.com>
+Date:   Thu, 3 Nov 2022 10:55:37 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221031121912.GY5824@twin.jikos.cz>
+In-Reply-To: <20221103013937.603626-1-khazhy@google.com>
+Content-Type: text/plain; charset=gbk; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: Syh0CgCXfdKpLWNjnAoYBQ--.5634S3
+X-Coremail-Antispam: 1UD129KBjvJXoWxWr45JF15Ww1xZF1fWw1rJFb_yoW5Cryfpr
+        4fW3yj9r47J3Wa9FZrCa18uF1Fga1fWr9xJr4Fg3y7Jw17JF1IyFsIkw1Y9Fs3GrWvyry3
+        ZF10ga4Dur4DJaDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUk0b4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
+        6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+        vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7Cj
+        xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
+        0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
+        6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
+        Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JMxk0xIA0c2IEe2xFo4CEbIxvr21l42xK82IYc2Ij
+        64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x
+        8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r126r1DMIIYrxkI7VAKI48JMIIF0xvE
+        2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42
+        xK8VAvwI8IcIk0rVWrJr0_WFyUJwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv
+        6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUrR6zUUUUU
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Oct 31, 2022 at 01:19:12PM +0100, David Sterba wrote:
-> > The policy is simple. If someone requires a copyright notice for their
-> > code, you simply add it, or do not take their code. You can be specific
-> > about what that code is that is copyrighted. Perhaps just around the code in
-> > question or a description at the top.
+Hi,
+
+ÔÚ 2022/11/03 9:39, Khazhismel Kumykov Ð´µÀ:
+> This fixes crashes in bfq_add_bfqq_busy due to waker_bfqq being NULL,
+> but woken_list_node still being hashed. This would happen when
+> bfq_init_rq() expects a brand new allocated queue to be returned from
+
+ From what I see, bfqq->waker_bfqq is updated in bfq_init_rq() only if
+'new_queue' is false, but if 'new_queue' is false, the returned 'bfqq'
+from bfq_get_bfqq_handle_split() will never be oom_bfqq, so I'm confused
+here...
+
+> bfq_get_bfqq_handle_split() and unconditionally updates waker_bfqq
+> without resetting woken_list_node. Since we can always return oom_bfqq
+> when attempting to allocate, we cannot assume waker_bfqq starts as NULL.
+> We must either reset woken_list_node, or avoid setting woken_list at all
+> for oom_bfqq - opt to do the former.
+
+Once oom_bfqq is used, I think the io is treated as issued from root
+group. Hence I don't think it's necessary to set woken_list or
+waker_bfqq for oom_bfqq.
+
+Thanks,
+Kuai
 > 
-> Let's say it's OK for substantial amount of code. What if somebody
-> moves existing code that he did not write to a new file and adds a
-> copyright notice? We got stuck there, both sides have different answer.
-> I see it at minimum as unfair to the original code authors if not
-> completely wrong because it could appear as "stealing" ownership.
+> Crashes would have a stacktrace like:
+> [160595.656560]  bfq_add_bfqq_busy+0x110/0x1ec
+> [160595.661142]  bfq_add_request+0x6bc/0x980
+> [160595.666602]  bfq_insert_request+0x8ec/0x1240
+> [160595.671762]  bfq_insert_requests+0x58/0x9c
+> [160595.676420]  blk_mq_sched_insert_request+0x11c/0x198
+> [160595.682107]  blk_mq_submit_bio+0x270/0x62c
+> [160595.686759]  __submit_bio_noacct_mq+0xec/0x178
+> [160595.691926]  submit_bio+0x120/0x184
+> [160595.695990]  ext4_mpage_readpages+0x77c/0x7c8
+> [160595.701026]  ext4_readpage+0x60/0xb0
+> [160595.705158]  filemap_read_page+0x54/0x114
+> [160595.711961]  filemap_fault+0x228/0x5f4
+> [160595.716272]  do_read_fault+0xe0/0x1f0
+> [160595.720487]  do_fault+0x40/0x1c8
+> 
+> Tested by injecting random failures into bfq_get_queue, crashes go away
+> completely.
+> 
+> Fixes: 8ef3fc3a043c ("block, bfq: make shared queues inherit wakers")
+> Signed-off-by: Khazhismel Kumykov <khazhy@google.com>
+> ---
+> RFC mainly because it's not clear to me the best policy here - but the
+> patch is tested and fixes a real crash we started seeing in 5.15
+> 
+> This is following up my ramble over at
+> https://lore.kernel.org/lkml/CACGdZYLMnfcqwbAXDx+x9vUOMn2cz55oc+8WySBS3J2Xd_q7Lg@mail.gmail.com/
+> 
+>   block/bfq-iosched.c | 5 +++++
+>   1 file changed, 5 insertions(+)
+> 
+> diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+> index 7ea427817f7f..5d2861119d20 100644
+> --- a/block/bfq-iosched.c
+> +++ b/block/bfq-iosched.c
+> @@ -6793,7 +6793,12 @@ static struct bfq_queue *bfq_init_rq(struct request *rq)
+>   				 * reset. So insert new_bfqq into the
+>   				 * woken_list of the waker. See
+>   				 * bfq_check_waker for details.
+> +				 *
+> +				 * Also, if we got oom_bfqq, we must check if
+> +				 * it's already in a woken_list
+>   				 */
+> +				if (unlikely(!hlist_unhashed(&bfqq->woken_list_node)))
+> +					hlist_del_init(&bfqq->woken_list_node);
+>   				if (bfqq->waker_bfqq)
+>   					hlist_add_head(&bfqq->woken_list_node,
+>   						       &bfqq->waker_bfqq->woken_list);
+> 
 
-So for whatever it's worth, my personal opinion is that it should be
-the Maintainer's call, subject to override by Linus.  I don't think
-it's really worthwhile to try to come up to a formal policy which
-would need to define "substantial amount of code".  This is an area
-where I think it makes sense to assume that Maintainers will be
-reasonable and make decisions that makes sense.  Ultimately, I think
-Chris's phrasing is the one that makes sense.  How much do you want
-the contribution?  If you want the contribution, and the contributor
-requests that they want an explicit copyright notification --- make a
-choice.  You can either tell Christoph no, and revert the changes, or
-accept his request to include a copyright statement.
-
-I understand your concern about "fairness" to other contributors ---
-is this a hypothetical, or actual concern?  Are there other
-significant contributors who have explicitly told you that they will
-be mortally offended if Cristoph's request is honored, and their code
-contribution was not so recognized?  It's unclear to whether this is a
-theoretical or practical concern?
-
-If it is a practical concern, how many contributors have contributed
-more than Cristoph that have asked, and how many extra lines of
-copyright statements are we're talking about?   2?  3?  10?  100?
-
-Remember, if someone sends you whitespace fixups or doubled word fixes
-found using checkpatch, and demeands a copyright acknowledgement,
-you're free to reject the patch.  (Heck, some maintainers reject
-checkpatch --file fixups on general principles.  :-) So this is why I
-think the overall "Linux project standard" should be: "maintainer
-discretion".
-
-Cheers,
-
-					- Ted
