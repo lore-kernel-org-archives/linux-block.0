@@ -2,114 +2,243 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D3F5CC4167B
-	for <linux-block@archiver.kernel.org>; Fri,  4 Nov 2022 20:42:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF076C4332F
+	for <linux-block@archiver.kernel.org>; Fri,  4 Nov 2022 21:26:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229993AbiKDUmz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 4 Nov 2022 16:42:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41206 "EHLO
+        id S229746AbiKDV0A (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 4 Nov 2022 17:26:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38830 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229445AbiKDUmy (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Nov 2022 16:42:54 -0400
-Received: from mail-oi1-x234.google.com (mail-oi1-x234.google.com [IPv6:2607:f8b0:4864:20::234])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D132F43AF0;
-        Fri,  4 Nov 2022 13:42:53 -0700 (PDT)
-Received: by mail-oi1-x234.google.com with SMTP id c129so6419916oia.0;
-        Fri, 04 Nov 2022 13:42:53 -0700 (PDT)
+        with ESMTP id S230078AbiKDVZz (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Nov 2022 17:25:55 -0400
+Received: from mail-qv1-xf2d.google.com (mail-qv1-xf2d.google.com [IPv6:2607:f8b0:4864:20::f2d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 967244E410
+        for <linux-block@vger.kernel.org>; Fri,  4 Nov 2022 14:25:46 -0700 (PDT)
+Received: by mail-qv1-xf2d.google.com with SMTP id ml12so4088151qvb.0
+        for <linux-block@vger.kernel.org>; Fri, 04 Nov 2022 14:25:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=jQ4gXr1turouEQ95+x3UakyDrVi4g3dT0y7NpfH0qPs=;
-        b=lSF8e6DLqbKKv+/YhmRhAK/T1efgb2O636TOXNjLfcC0viXP62NhHdxomxLJWtIe7d
-         2JndYje5nsRNFlqIXElcBPkKCNEcFme9PlK3C7Q1VMpYaqUkgV/gQHQcIxtcw2fILMZW
-         OKJ4E8wSXhLBL3J9S3NnNPs9rdwe6KKkDhBPqcY/XDJgpqSUigUMcqCvapDa55nrN05q
-         GmtiLLrP+Y0lcIHCsefgW4EhiR9DSJnDXwmLBbW8A31Y89yswej4P9L3XtJNKO8bMaw7
-         4czQwKTd2lx34+qzGmcV/Exm8IIRhuHeavJKESaaJd5m9cQQb9K2fLTxromO6yhuwk2D
-         Ci4w==
+        d=google.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=k0IwqT9TaepvC5EPk4FhSk8qn9R2SeNQfAmNwUdf1Gs=;
+        b=Tpw3Qz1SS3wQKYRGacEuCkYGPAfIoz5ubdN1Y34vs1v/+zLePcZc3jeUlZ207i9hj5
+         62RjP/MItH/ig0MU0UFESy2U/rE5trSLcpTwKjbct9Q38nPezu8JeFTlG2nA82OT5qlO
+         H2gMe3CqdF7PJwGbD4ko5Iz4AQqFRYJvaVCV2Ogs2GQagdKMvsWTPb9Xs0N1b4fZDFNk
+         zOT35soFtFRGkXcTBZ0TSD+5OUwWTlqzg53qXu7QyBZ2K1A9ZmZeOywBsEBe4DOluL1g
+         Rpo7PwUOXehhWQXcsvlklG++sRTEqEj51yIXKunA0RInlEjVdenCiVx1TB/+IKQOhRy6
+         BvEg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=jQ4gXr1turouEQ95+x3UakyDrVi4g3dT0y7NpfH0qPs=;
-        b=qIaki2KujX4tp/iQcD41IFYZafJq9mMbxWPCQzRiRI6pgVKHolk7EecU6P7Yq6OFcy
-         mcOf6qRXn2Hegeexyjj/J1v2sTzrzOZdJYcKAmBYg+FzfXDxdca/AXl7vNAVxrH1ws54
-         L8c65V6q1TPDdiMXABem8Rfud6yV7r/jp+LCH0dXZbWDUFM7DdbXj7GKKUWXlXDbGixT
-         RJKBgdOwqOdtZ/bvwQ95ajqH2tmOq0ypMEAuMNAp0vV5oLcR0ZxB9ax5J1A3L12ARLyU
-         TNtI14geIOBj/voUEg6r2/QDcHC6YeHfLwAsrEktoTP7qQReCYIsa/yPP/ytWg2/rMCh
-         qSxQ==
-X-Gm-Message-State: ACrzQf30tAcckecIsxC4FpMH/usI2jg7GviEFiGLyX5EMfJyJ8PWbKV+
-        MuBj4mzxlROIXyKD3k2UqBY=
-X-Google-Smtp-Source: AMsMyM6uhfbCXJb2q3AkwRuMO9Mjf9xHTKiSSXkljdTFDkgQ9gIWK1vZZlSecO9utfeB4MFPxnhffw==
-X-Received: by 2002:a54:4587:0:b0:359:c737:b2e8 with SMTP id z7-20020a544587000000b00359c737b2e8mr20212921oib.234.1667594573223;
-        Fri, 04 Nov 2022 13:42:53 -0700 (PDT)
-Received: from server.roeck-us.net ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
-        by smtp.gmail.com with ESMTPSA id f1-20020a056830204100b006619483182csm162608otp.18.2022.11.04.13.42.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 04 Nov 2022 13:42:52 -0700 (PDT)
-Sender: Guenter Roeck <groeck7@gmail.com>
-Date:   Fri, 4 Nov 2022 13:42:51 -0700
-From:   Guenter Roeck <linux@roeck-us.net>
-To:     Steven Rostedt <rostedt@goodmis.org>
-Cc:     linux-kernel@vger.kernel.org,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Stephen Boyd <sboyd@kernel.org>,
-        Anna-Maria Gleixner <anna-maria@linutronix.de>,
-        Andrew Morton <akpm@linux-foundation.org>, rcu@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-s390@vger.kernel.org,
-        linux-sh@vger.kernel.org, linux-edac@vger.kernel.org,
-        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-acpi@vger.kernel.org,
-        linux-atm-general@lists.sourceforge.net, netdev@vger.kernel.org,
-        linux-pm@vger.kernel.org, drbd-dev@lists.linbit.com,
-        linux-bluetooth@vger.kernel.org,
-        openipmi-developer@lists.sourceforge.net,
-        linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
-        linaro-mm-sig@lists.linaro.org, intel-gfx@lists.freedesktop.org,
-        linux-input@vger.kernel.org, linux-parisc@vger.kernel.org,
-        linux-leds@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
-        linux-usb@vger.kernel.org, linux-wireless@vger.kernel.org,
-        linux-scsi@vger.kernel.org, linux-staging@lists.linux.dev,
-        linux-ext4@vger.kernel.org, linux-nilfs@vger.kernel.org,
-        bridge@lists.linux-foundation.org, netfilter-devel@vger.kernel.org,
-        coreteam@netfilter.org, lvs-devel@vger.kernel.org,
-        linux-afs@lists.infradead.org, linux-nfs@vger.kernel.org,
-        tipc-discussion@lists.sourceforge.net, alsa-devel@alsa-project.org
-Subject: Re: [RFC][PATCH v3 00/33] timers: Use timer_shutdown*() before
- freeing timers
-Message-ID: <20221104204251.GB506794@roeck-us.net>
-References: <20221104054053.431922658@goodmis.org>
- <20221104192232.GA2520396@roeck-us.net>
- <20221104154209.21b26782@rorschach.local.home>
- <20221104154355.578ab689@rorschach.local.home>
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=k0IwqT9TaepvC5EPk4FhSk8qn9R2SeNQfAmNwUdf1Gs=;
+        b=Bfjhke8X1Z3XXwTn/jRxoDm9TxSDFYsbmb2r0QMgLRALR/qIPmodbRhl53ddlwzC3v
+         k9u2nSmC13/yCFFKLeY+wVeUVvsck001IGJv74bkyMf5rQjwDPokZs0K7qKMFwQSwvjx
+         RzTgXpbwO2ZJ5HM6U3BpQEKqOPx7QBZ10vCWjJaydrCvA7UKPL+SAfQsQfNbj22ToUDz
+         CI403m+OioHwceP55CFgx0rPQg9L4oDkH5aTGoFpqqZkWlmeNb6D4PldQ18obeVsIiZe
+         wiyIud9RbZ50CqgEbWsI9sBqxJ2CS3icwfkOg/mFy7eSACPgEJWH+PA30k2gk6IhXgqX
+         aarg==
+X-Gm-Message-State: ACrzQf1zxfXCmyf1CXCwuYrFoW+S7X8/WUzxVfTPUpbRymfAARBJSrlr
+        YaPfgGATHYr1fQ13lTaS3DNqAB5qfDIkWRhKtxhxuQ==
+X-Google-Smtp-Source: AMsMyM52IzLN9ehKPsYzpZFyvuc/UJu+X6DKBLnC5R9N4hUuwXnkpmvGa5BMvF7ej+siDgo5LZKXNneqi5QMFgOcs7U=
+X-Received: by 2002:a05:6214:f23:b0:4bb:f5db:39b3 with SMTP id
+ iw3-20020a0562140f2300b004bbf5db39b3mr27334848qvb.117.1667597145415; Fri, 04
+ Nov 2022 14:25:45 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221104154355.578ab689@rorschach.local.home>
+References: <20221103013937.603626-1-khazhy@google.com> <3c0df3fa-8731-5863-ccc5-f2e60601dbf9@huaweicloud.com>
+ <CACGdZYJ0WH+Y9sdchXy30UVTQgPCEo=fW+W9atZh1Ki7Ov4_Gw@mail.gmail.com>
+ <f83404b4-84a4-de4e-fa4d-9ce38900d91c@huaweicloud.com> <20221103084744.xsvoul3hjgz7yyo7@quack3>
+In-Reply-To: <20221103084744.xsvoul3hjgz7yyo7@quack3>
+From:   Khazhy Kumykov <khazhy@google.com>
+Date:   Fri, 4 Nov 2022 14:25:32 -0700
+Message-ID: <CACGdZYK7xk+CJw9_RKwceXXnREVhgHh9U-OWidnKgYp6B011xQ@mail.gmail.com>
+Subject: Re: [RFC PATCH] bfq: fix waker_bfqq inconsistency crash
+To:     Jan Kara <jack@suse.cz>
+Cc:     Yu Kuai <yukuai1@huaweicloud.com>,
+        Paolo Valente <paolo.valente@linaro.org>,
+        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, "yukuai (C)" <yukuai3@huawei.com>
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
+        boundary="00000000000082be3a05ecabb7ab"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Nov 04, 2022 at 04:38:34PM -0400, Steven Rostedt wrote:
-> On Fri, 4 Nov 2022 15:42:09 -0400
-> Steven Rostedt <rostedt@goodmis.org> wrote:
-> 
-[ ... ]
-> 
-> > drivers/clocksource/timer-fttmr010.c:   fttmr010->timer_shutdown(evt);
-> > drivers/clocksource/timer-fttmr010.c:   fttmr010->timer_shutdown(evt);
-> > drivers/clocksource/timer-fttmr010.c:   fttmr010->timer_shutdown(evt);
-> > drivers/clocksource/timer-fttmr010.c:           fttmr010->timer_shutdown = ast2600_timer_shutdown;
-> > drivers/clocksource/timer-fttmr010.c:           fttmr010->timer_shutdown = fttmr010_timer_shutdown;
-> > drivers/clocksource/timer-fttmr010.c:   fttmr010->clkevt.set_state_shutdown = fttmr010->timer_shutdown;
-> > drivers/clocksource/timer-fttmr010.c:   fttmr010->clkevt.tick_resume = fttmr010->timer_shutdown;
-> 
-> I won't touch structure fields though.
-> 
+--00000000000082be3a05ecabb7ab
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Agreed, same here.
+On Thu, Nov 3, 2022 at 1:47 AM Jan Kara <jack@suse.cz> wrote:
+>
+> On Thu 03-11-22 11:51:15, Yu Kuai wrote:
+> > Hi,
+> >
+> > =E5=9C=A8 2022/11/03 11:05, Khazhy Kumykov =E5=86=99=E9=81=93:
+> > > On Wed, Nov 2, 2022 at 7:56 PM Yu Kuai <yukuai1@huaweicloud.com> wrot=
+e:
+> > > >
+> > > > Hi,
+> > > >
+> > > > =E5=9C=A8 2022/11/03 9:39, Khazhismel Kumykov =E5=86=99=E9=81=93:
+> > > > > This fixes crashes in bfq_add_bfqq_busy due to waker_bfqq being N=
+ULL,
+> > > > > but woken_list_node still being hashed. This would happen when
+> > > > > bfq_init_rq() expects a brand new allocated queue to be returned =
+from
+> > > >
+> > > >   From what I see, bfqq->waker_bfqq is updated in bfq_init_rq() onl=
+y if
+> > > > 'new_queue' is false, but if 'new_queue' is false, the returned 'bf=
+qq'
+> > > > from bfq_get_bfqq_handle_split() will never be oom_bfqq, so I'm con=
+fused
+> > > > here...
+> > > There's two calls for bfq_get_bfqq_handle_split in this function - th=
+e
+> > > second one is after the check you mentioned, and is the problematic
+> > > one.
+> > Yes, thanks for the explanation. Now I understand how the problem
+> > triggers.
+> >
+> > > >
+> > > > > bfq_get_bfqq_handle_split() and unconditionally updates waker_bfq=
+q
+> > > > > without resetting woken_list_node. Since we can always return oom=
+_bfqq
+> > > > > when attempting to allocate, we cannot assume waker_bfqq starts a=
+s NULL.
+> > > > > We must either reset woken_list_node, or avoid setting woken_list=
+ at all
+> > > > > for oom_bfqq - opt to do the former.
+> > > >
+> > > > Once oom_bfqq is used, I think the io is treated as issued from roo=
+t
+> > > > group. Hence I don't think it's necessary to set woken_list or
+> > > > waker_bfqq for oom_bfqq.
+> > > Ack, I was wondering what's right here since, evidently, *someone* ha=
+d
+> > > already set oom_bfqq->waker_bfqq to *something* (although... maybe it
+> > > was an earlier init_rq). But maybe it's better to do nothing if we
+> > > *know* it's oom_bfqq.
+> >
+> > I need to have a check how oom_bfqq get involved with waker_bfqq, and
+> > then see if it's reasonable.
+> >
+> > Probably Jan and Paolo will have better view on this.
+>
+> Thanks for the CC Kuai and thanks to Khazy for spotting the bug. The
+> oom_bfqq is just a fallback bfqq and as such it should be extempted from
+> all special handling like waker detection etc. All this stuff is just for
+> optimizing performance and when we are OOM, we have far larger troubles
+> than to optimize performance.
+>
+> So how I think we should really fix this is that we extempt oom_bfqq from
+> waker detection in bfq_check_waker() by adding:
+>
+>         bfqq =3D=3D bfqd->oom_bfqq ||
+>         bfqd->last_completed_rq_bfq =3D=3D bfqd->oom_bfqq)
+>
+> to the initial check and then also if bfq_get_bfqq_handle_split() returns
+> oom_bfqq we should just skip carrying over the waker information.
+Thanks for the tip! I'll send a followup, including your suggestions.
 
-Guenter
+I do have some other questions in this area, if you could help me
+understand. Looking again at bfq_init_rq, inside of the !new_queue
+section - we call bfq_split_bfqq() to "split" our bfqq, then in the
+next line bfq_get_bfqq_handle_split inspects bic_to_bfqq(bic,
+is_sync), and if it's NULL, allocates a new queue. However, if we have
+an async rq, this call will return the pre-existing async bfqq, as the
+call to bfq_split_bfqq() only clears the sync bfqq, ever. The best
+understanding I have now is: "bic->bfqq[aync] is never NULL (and we
+don't merge async queues) so we'll never reach this !new_queue section
+anyways if it's async". Is that accurate?
+
+Thanks,
+Khazhy
+
+
+>
+>                                                                 Honza
+> --
+> Jan Kara <jack@suse.com>
+> SUSE Labs, CR
+
+--00000000000082be3a05ecabb7ab
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
+
+MIIPmwYJKoZIhvcNAQcCoIIPjDCCD4gCAQExDzANBglghkgBZQMEAgEFADALBgkqhkiG9w0BBwGg
+ggz1MIIEtjCCA56gAwIBAgIQeAMYYHb81ngUVR0WyMTzqzANBgkqhkiG9w0BAQsFADBMMSAwHgYD
+VQQLExdHbG9iYWxTaWduIFJvb3QgQ0EgLSBSMzETMBEGA1UEChMKR2xvYmFsU2lnbjETMBEGA1UE
+AxMKR2xvYmFsU2lnbjAeFw0yMDA3MjgwMDAwMDBaFw0yOTAzMTgwMDAwMDBaMFQxCzAJBgNVBAYT
+AkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMSowKAYDVQQDEyFHbG9iYWxTaWduIEF0bGFz
+IFIzIFNNSU1FIENBIDIwMjAwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCvLe9xPU9W
+dpiHLAvX7kFnaFZPuJLey7LYaMO8P/xSngB9IN73mVc7YiLov12Fekdtn5kL8PjmDBEvTYmWsuQS
+6VBo3vdlqqXZ0M9eMkjcKqijrmDRleudEoPDzTumwQ18VB/3I+vbN039HIaRQ5x+NHGiPHVfk6Rx
+c6KAbYceyeqqfuJEcq23vhTdium/Bf5hHqYUhuJwnBQ+dAUcFndUKMJrth6lHeoifkbw2bv81zxJ
+I9cvIy516+oUekqiSFGfzAqByv41OrgLV4fLGCDH3yRh1tj7EtV3l2TngqtrDLUs5R+sWIItPa/4
+AJXB1Q3nGNl2tNjVpcSn0uJ7aFPbAgMBAAGjggGKMIIBhjAOBgNVHQ8BAf8EBAMCAYYwHQYDVR0l
+BBYwFAYIKwYBBQUHAwIGCCsGAQUFBwMEMBIGA1UdEwEB/wQIMAYBAf8CAQAwHQYDVR0OBBYEFHzM
+CmjXouseLHIb0c1dlW+N+/JjMB8GA1UdIwQYMBaAFI/wS3+oLkUkrk1Q+mOai97i3Ru8MHsGCCsG
+AQUFBwEBBG8wbTAuBggrBgEFBQcwAYYiaHR0cDovL29jc3AyLmdsb2JhbHNpZ24uY29tL3Jvb3Ry
+MzA7BggrBgEFBQcwAoYvaHR0cDovL3NlY3VyZS5nbG9iYWxzaWduLmNvbS9jYWNlcnQvcm9vdC1y
+My5jcnQwNgYDVR0fBC8wLTAroCmgJ4YlaHR0cDovL2NybC5nbG9iYWxzaWduLmNvbS9yb290LXIz
+LmNybDBMBgNVHSAERTBDMEEGCSsGAQQBoDIBKDA0MDIGCCsGAQUFBwIBFiZodHRwczovL3d3dy5n
+bG9iYWxzaWduLmNvbS9yZXBvc2l0b3J5LzANBgkqhkiG9w0BAQsFAAOCAQEANyYcO+9JZYyqQt41
+TMwvFWAw3vLoLOQIfIn48/yea/ekOcParTb0mbhsvVSZ6sGn+txYAZb33wIb1f4wK4xQ7+RUYBfI
+TuTPL7olF9hDpojC2F6Eu8nuEf1XD9qNI8zFd4kfjg4rb+AME0L81WaCL/WhP2kDCnRU4jm6TryB
+CHhZqtxkIvXGPGHjwJJazJBnX5NayIce4fGuUEJ7HkuCthVZ3Rws0UyHSAXesT/0tXATND4mNr1X
+El6adiSQy619ybVERnRi5aDe1PTwE+qNiotEEaeujz1a/+yYaaTY+k+qJcVxi7tbyQ0hi0UB3myM
+A/z2HmGEwO8hx7hDjKmKbDCCA18wggJHoAMCAQICCwQAAAAAASFYUwiiMA0GCSqGSIb3DQEBCwUA
+MEwxIDAeBgNVBAsTF0dsb2JhbFNpZ24gUm9vdCBDQSAtIFIzMRMwEQYDVQQKEwpHbG9iYWxTaWdu
+MRMwEQYDVQQDEwpHbG9iYWxTaWduMB4XDTA5MDMxODEwMDAwMFoXDTI5MDMxODEwMDAwMFowTDEg
+MB4GA1UECxMXR2xvYmFsU2lnbiBSb290IENBIC0gUjMxEzARBgNVBAoTCkdsb2JhbFNpZ24xEzAR
+BgNVBAMTCkdsb2JhbFNpZ24wggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDMJXaQeQZ4
+Ihb1wIO2hMoonv0FdhHFrYhy/EYCQ8eyip0EXyTLLkvhYIJG4VKrDIFHcGzdZNHr9SyjD4I9DCuu
+l9e2FIYQebs7E4B3jAjhSdJqYi8fXvqWaN+JJ5U4nwbXPsnLJlkNc96wyOkmDoMVxu9bi9IEYMpJ
+pij2aTv2y8gokeWdimFXN6x0FNx04Druci8unPvQu7/1PQDhBjPogiuuU6Y6FnOM3UEOIDrAtKeh
+6bJPkC4yYOlXy7kEkmho5TgmYHWyn3f/kRTvriBJ/K1AFUjRAjFhGV64l++td7dkmnq/X8ET75ti
++w1s4FRpFqkD2m7pg5NxdsZphYIXAgMBAAGjQjBAMA4GA1UdDwEB/wQEAwIBBjAPBgNVHRMBAf8E
+BTADAQH/MB0GA1UdDgQWBBSP8Et/qC5FJK5NUPpjmove4t0bvDANBgkqhkiG9w0BAQsFAAOCAQEA
+S0DbwFCq/sgM7/eWVEVJu5YACUGssxOGhigHM8pr5nS5ugAtrqQK0/Xx8Q+Kv3NnSoPHRHt44K9u
+bG8DKY4zOUXDjuS5V2yq/BKW7FPGLeQkbLmUY/vcU2hnVj6DuM81IcPJaP7O2sJTqsyQiunwXUaM
+ld16WCgaLx3ezQA3QY/tRG3XUyiXfvNnBB4V14qWtNPeTCekTBtzc3b0F5nCH3oO4y0IrQocLP88
+q1UOD5F+NuvDV0m+4S4tfGCLw0FREyOdzvcya5QBqJnnLDMfOjsl0oZAzjsshnjJYS8Uuu7bVW/f
+hO4FCU29KNhyztNiUGUe65KXgzHZs7XKR1g/XzCCBNQwggO8oAMCAQICEAHF0zc/WzTBCzu4oGMI
+OM0wDQYJKoZIhvcNAQELBQAwVDELMAkGA1UEBhMCQkUxGTAXBgNVBAoTEEdsb2JhbFNpZ24gbnYt
+c2ExKjAoBgNVBAMTIUdsb2JhbFNpZ24gQXRsYXMgUjMgU01JTUUgQ0EgMjAyMDAeFw0yMjEwMzAw
+MDU3MTRaFw0yMzA0MjgwMDU3MTRaMCIxIDAeBgkqhkiG9w0BCQEWEWtoYXpoeUBnb29nbGUuY29t
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqAPfbG2UByhQ+lZMyn9rCOJ93P2e2Jxm
+LMeISvnz2Pudb96i8jy+6JU+xr6d3r1OERHkZlWzw1QUZC9fAJ21gwzXR4wyS14XqB7kxj6kAe80
+kWVoQHLt3pAFR/T40lHWN99v9UDZfqe/ubSv28yw8OPqPUen7Xw/NuTsZKOWjkQdmIaGrjI52lLP
+dB70dkoUjKm72Hw/Ru6q3l4aO/+Is8UjYfCG4i60A5j2T5mJSJ7iGXszLAppEs/dwJc7YTuGqg34
+p948X8/bdU4JxRh8KgW6jEWJkQtWSBDaHoB4d/u5C0tP2Tihip+H5ZCiIFWcWInJ65Iw6UNmAoJZ
+qG9NbQIDAQABo4IB0jCCAc4wHAYDVR0RBBUwE4ERa2hhemh5QGdvb2dsZS5jb20wDgYDVR0PAQH/
+BAQDAgWgMB0GA1UdJQQWMBQGCCsGAQUFBwMEBggrBgEFBQcDAjAdBgNVHQ4EFgQUxDs6D4TLQt/3
+IJ8WXTR0Vjyxk58wTAYDVR0gBEUwQzBBBgkrBgEEAaAyASgwNDAyBggrBgEFBQcCARYmaHR0cHM6
+Ly93d3cuZ2xvYmFsc2lnbi5jb20vcmVwb3NpdG9yeS8wDAYDVR0TAQH/BAIwADCBmgYIKwYBBQUH
+AQEEgY0wgYowPgYIKwYBBQUHMAGGMmh0dHA6Ly9vY3NwLmdsb2JhbHNpZ24uY29tL2NhL2dzYXRs
+YXNyM3NtaW1lY2EyMDIwMEgGCCsGAQUFBzAChjxodHRwOi8vc2VjdXJlLmdsb2JhbHNpZ24uY29t
+L2NhY2VydC9nc2F0bGFzcjNzbWltZWNhMjAyMC5jcnQwHwYDVR0jBBgwFoAUfMwKaNei6x4schvR
+zV2Vb4378mMwRgYDVR0fBD8wPTA7oDmgN4Y1aHR0cDovL2NybC5nbG9iYWxzaWduLmNvbS9jYS9n
+c2F0bGFzcjNzbWltZWNhMjAyMC5jcmwwDQYJKoZIhvcNAQELBQADggEBAKD4FWgFMRum92zuAryA
+NPkwie9CIiWkuoVdKVSeaDUd+AecUSkvRS5RtSUn261XyqWLRYRJ9DHlOvSPMkvFLYM2Nl7WKyaX
+AVjbTyFQVJ/d2k6a8/E+prQGhYdEL6gQ+0pCih+9aPXPs4T6gNfPH18eZvQWHM10laJPvSGiIN5g
+hZs2e5193mkiXAOXOYlIBc4e+oGztxLA/TInOfp/edkpWtabE8kNrpN0HrsImfjFO/cj+wvlIIew
+qjck+CiS1uR+KsnioC+pQjynP533RsDGZ0H9up7fJ8tdZAjm6nKQv3OlAsrOWfIA5TPV9BE0Qn7v
+rLDUK8SloBqzC3egcsYxggJqMIICZgIBATBoMFQxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9i
+YWxTaWduIG52LXNhMSowKAYDVQQDEyFHbG9iYWxTaWduIEF0bGFzIFIzIFNNSU1FIENBIDIwMjAC
+EAHF0zc/WzTBCzu4oGMIOM0wDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIAgN6i8p
+hAm3x7jOa4xZ20pDd5J8DKMdGwzHKn1X/Ed2MBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJ
+KoZIhvcNAQkFMQ8XDTIyMTEwNDIxMjU0NVowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASow
+CwYJYIZIAWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZI
+hvcNAQEHMAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQBJB3KrxIgPQLl9cQSZ+yfPMgQa
+8rum2WH4xt8MuMrPM/SwPhw3EHJP4mCstwnPcSW64+EPraCBbmmU3T7gfpLNKf+2QnrW2BixnicU
+qT6Iu7RAgml/LbpsOETjbf4pvV7GHuVwjpJlSZG+g4/IWdRq5gm9kYROZVoMsXPd6VHEAHUo88kS
+5K/D18RCCEEOS3tN48s3JTIkArURTEOapjD0a3Si1oCIi2oWPmkQcBWnBWRPdO5C9HVKlat0d5m2
+qvBNgHQzhqXmEZ9AJS16PgyBt/O42yyMz3vxcWNBp9MH07UG50dQGRzmGNUK/yyCUELCObdb+1e+
+tXacoov3FslV
+--00000000000082be3a05ecabb7ab--
