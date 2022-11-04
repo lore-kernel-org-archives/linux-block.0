@@ -2,125 +2,247 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7AD08C433FE
-	for <linux-block@archiver.kernel.org>; Fri,  4 Nov 2022 00:45:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C460C433FE
+	for <linux-block@archiver.kernel.org>; Fri,  4 Nov 2022 02:18:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229745AbiKDApw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 3 Nov 2022 20:45:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49002 "EHLO
+        id S230460AbiKDCSC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 3 Nov 2022 22:18:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59542 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229579AbiKDApv (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 3 Nov 2022 20:45:51 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 37B9422BD2
-        for <linux-block@vger.kernel.org>; Thu,  3 Nov 2022 17:45:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1667522701;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=hk17a/wyGHMD3AVv8URE6uxov/rnnGs5lYtB0Nz527o=;
-        b=Y+shUiXWNGR5tlp/xB69n/O1d1onBr4tbuHtc1nn13Ehcj6Aj6fI3B7et/ImM9tPgH3T0j
-        t/wKsvBw2/ryx1m9rGYrKxsjGTl+gjewk6DwzwWd9cQQIqh9VLVpl6V4fwAhSEGMzS+8kv
-        DYwt8D3ViAO9hK6sBj1BmrEWbHqA50g=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-217-VXyfvujDOkW7XH9WHCu37A-1; Thu, 03 Nov 2022 20:44:58 -0400
-X-MC-Unique: VXyfvujDOkW7XH9WHCu37A-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B62DC1C08981;
-        Fri,  4 Nov 2022 00:44:57 +0000 (UTC)
-Received: from T590 (ovpn-8-18.pek2.redhat.com [10.72.8.18])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 14B6A2166B26;
-        Fri,  4 Nov 2022 00:44:49 +0000 (UTC)
-Date:   Fri, 4 Nov 2022 08:44:42 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Bernd Schubert <bernd.schubert@fastmail.fm>
-Cc:     Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org,
-        Miklos Szeredi <mszeredi@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        ZiyangZhang <ZiyangZhang@linux.alibaba.com>
-Subject: Re: [RFC PATCH 4/4] ublk_drv: support splice based read/write zero
- copy
-Message-ID: <Y2Rgem8+oYafTLVO@T590>
-References: <20221103085004.1029763-1-ming.lei@redhat.com>
- <20221103085004.1029763-5-ming.lei@redhat.com>
- <712cd802-f3bb-9840-e334-385cd42325f2@fastmail.fm>
+        with ESMTP id S230301AbiKDCSB (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 3 Nov 2022 22:18:01 -0400
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C4BBF20F;
+        Thu,  3 Nov 2022 19:17:59 -0700 (PDT)
+Received: from mail02.huawei.com (unknown [172.30.67.143])
+        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4N3PNX0yHpz6Pspv;
+        Fri,  4 Nov 2022 10:15:24 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.175.127.227])
+        by APP2 (Coremail) with SMTP id Syh0CgB3D9RTdmRjDShNBQ--.16192S5;
+        Fri, 04 Nov 2022 10:17:58 +0800 (CST)
+From:   Yu Kuai <yukuai1@huaweicloud.com>
+To:     hch@lst.de, tj@kernel.org, josef@toxicpanda.com, axboe@kernel.dk,
+        yukuai3@huawei.com
+Cc:     cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, yukuai1@huaweicloud.com,
+        yi.zhang@huawei.com
+Subject: [PATCH v2 1/5] blk-iocost: cleanup ioc_qos_write() and ioc_cost_model_write()
+Date:   Fri,  4 Nov 2022 10:39:34 +0800
+Message-Id: <20221104023938.2346986-2-yukuai1@huaweicloud.com>
+X-Mailer: git-send-email 2.31.1
+In-Reply-To: <20221104023938.2346986-1-yukuai1@huaweicloud.com>
+References: <20221104023938.2346986-1-yukuai1@huaweicloud.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <712cd802-f3bb-9840-e334-385cd42325f2@fastmail.fm>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: Syh0CgB3D9RTdmRjDShNBQ--.16192S5
+X-Coremail-Antispam: 1UD129KBjvJXoWxur1UJF4rJFy5uFy5ZF18Krg_yoWrZr48pF
+        WF93yaq3y8Ars7Wr42yF42ga4rCwsFgry7CFWkGr1fZrnFyrnFgF109FyUurW8JFZ3JFs8
+        JFZFqrWDCayDA3DanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUBE14x267AKxVW5JVWrJwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2048vs2IY020E87I2jVAFwI0_Jr4l82xGYIkIc2
+        x26xkF7I0E14v26r1I6r4UM28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8wA2z4x0
+        Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j6F4UJw
+        A2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oVCq3wAS
+        0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2
+        IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0
+        Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2kIc2
+        xKxwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v2
+        6r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2
+        Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_
+        Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMI
+        IF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUqAp5UUUUU
+        =
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Nov 03, 2022 at 11:28:29PM +0100, Bernd Schubert wrote:
-> 
-> 
-> On 11/3/22 09:50, Ming Lei wrote:
-> > Pass ublk block IO request pages to kernel backend IO handling code via
-> > pipe, and request page copy can be avoided. So far, the existed
-> > pipe/splice mechanism works for handling write request only.
-> > 
-> > The initial idea of using splice for zero copy is from Miklos and Stefan.
-> > 
-> > Read request's zero copy requires pipe's change to allow one read end to
-> > produce buffers for another read end to consume. The added SPLICE_F_READ_TO_READ
-> > flag is for supporting this feature.
-> > 
-> > READ is handled by sending IORING_OP_SPLICE with SPLICE_F_DIRECT |
-> > SPLICE_F_READ_TO_READ. WRITE is handled by sending IORING_OP_SPLICE with
-> > SPLICE_F_DIRECT. Kernel internal pipe is used for simplifying userspace,
-> > meantime potential info leak could be avoided.
-> 
-> 
-> Sorry to ask, do you have an ublk branch that gives an example how to use
-> this?
+From: Yu Kuai <yukuai3@huawei.com>
 
-Follows the ublk splice-zc branch:
+There are no functional changes, just to make the code a litter cleaner
+and follow up patches easier.
 
-https://github.com/ming1/ubdsrv/commits/splice-zc
+Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+---
+ block/blk-iocost.c | 62 +++++++++++++++++++---------------------------
+ 1 file changed, 25 insertions(+), 37 deletions(-)
 
-which is mentioned in cover letter, but I guess it should be added to
-here too, sorry for that, so far only ublk-loop supports it by:
-
-   ublk add -t loop -f $BACKING -z
-
-without '-z', ublk-loop is created with zero copy disabled.
-
-> 
-> I still have several things to fix in my branches, but I got basic fuse
-> uring with copies working. Adding back splice would be next after posting
-> rfc patches. My initial assumption was that I needed to duplicate everything
-> splice does into the fuse .uring_cmd handler - obviously there is a better
-> way with your patches.
-> 
-> This week I have a few days off, by end of next week or the week after I
-> might have patches in an rfc state (one thing I'm going to ask about is how
-> do I know what is the next CQE in the kernel handler - ublk does this with
-> tags through mq, but I don't understand yet where the tag is increased and
-> what the relation between tag and right CQE order is).
-
-tag is one attribute of io request, which is originated from ublk
-driver, and it is unique for each request among one queue. So ublksrv
-won't change it at all, just use it, and ublk driver guarantees that
-it is unique.
-
-In ublkserv implementation, the tag info is set in cqe->user_data, so
-we can retrieve the io request via tag part of cqe->user_data.
-
-Also I may not understand your question of 'the relation between tag and right
-CQE order', io_uring provides IOSQE_IO_DRAIN/IOSQE_IO_LINK for ordering
-SQE, and ublksrv only applies IOSQE_IO_LINK in ublk-qcow2, so care to
-explain it in a bit details about the "the relation between tag and right
-CQE order"?
-
-Thanks,
-Ming
+diff --git a/block/blk-iocost.c b/block/blk-iocost.c
+index f01359906c83..fd495e823db2 100644
+--- a/block/blk-iocost.c
++++ b/block/blk-iocost.c
+@@ -3185,7 +3185,7 @@ static ssize_t ioc_qos_write(struct kernfs_open_file *of, char *input,
+ 	if (!ioc) {
+ 		ret = blk_iocost_init(disk);
+ 		if (ret)
+-			goto err;
++			goto out;
+ 		ioc = q_to_ioc(disk->queue);
+ 	}
+ 
+@@ -3197,6 +3197,7 @@ static ssize_t ioc_qos_write(struct kernfs_open_file *of, char *input,
+ 	enable = ioc->enabled;
+ 	user = ioc->user_qos_params;
+ 
++	ret = -EINVAL;
+ 	while ((p = strsep(&input, " \t\n"))) {
+ 		substring_t args[MAX_OPT_ARGS];
+ 		char buf[32];
+@@ -3218,7 +3219,7 @@ static ssize_t ioc_qos_write(struct kernfs_open_file *of, char *input,
+ 			else if (!strcmp(buf, "user"))
+ 				user = true;
+ 			else
+-				goto einval;
++				goto out_unlock;
+ 			continue;
+ 		}
+ 
+@@ -3228,39 +3229,39 @@ static ssize_t ioc_qos_write(struct kernfs_open_file *of, char *input,
+ 		case QOS_WPPM:
+ 			if (match_strlcpy(buf, &args[0], sizeof(buf)) >=
+ 			    sizeof(buf))
+-				goto einval;
++				goto out_unlock;
+ 			if (cgroup_parse_float(buf, 2, &v))
+-				goto einval;
++				goto out_unlock;
+ 			if (v < 0 || v > 10000)
+-				goto einval;
++				goto out_unlock;
+ 			qos[tok] = v * 100;
+ 			break;
+ 		case QOS_RLAT:
+ 		case QOS_WLAT:
+ 			if (match_u64(&args[0], &v))
+-				goto einval;
++				goto out_unlock;
+ 			qos[tok] = v;
+ 			break;
+ 		case QOS_MIN:
+ 		case QOS_MAX:
+ 			if (match_strlcpy(buf, &args[0], sizeof(buf)) >=
+ 			    sizeof(buf))
+-				goto einval;
++				goto out_unlock;
+ 			if (cgroup_parse_float(buf, 2, &v))
+-				goto einval;
++				goto out_unlock;
+ 			if (v < 0)
+-				goto einval;
++				goto out_unlock;
+ 			qos[tok] = clamp_t(s64, v * 100,
+ 					   VRATE_MIN_PPM, VRATE_MAX_PPM);
+ 			break;
+ 		default:
+-			goto einval;
++			goto out_unlock;
+ 		}
+ 		user = true;
+ 	}
+ 
+ 	if (qos[QOS_MIN] > qos[QOS_MAX])
+-		goto einval;
++		goto out_unlock;
+ 
+ 	if (enable) {
+ 		blk_stat_enable_accounting(disk->queue);
+@@ -3281,21 +3282,14 @@ static ssize_t ioc_qos_write(struct kernfs_open_file *of, char *input,
+ 	}
+ 
+ 	ioc_refresh_params(ioc, true);
+-	spin_unlock_irq(&ioc->lock);
++	ret = nbytes;
+ 
+-	blk_mq_unquiesce_queue(disk->queue);
+-	blk_mq_unfreeze_queue(disk->queue);
+-
+-	blkdev_put_no_open(bdev);
+-	return nbytes;
+-einval:
++out_unlock:
+ 	spin_unlock_irq(&ioc->lock);
+-
+ 	blk_mq_unquiesce_queue(disk->queue);
+ 	blk_mq_unfreeze_queue(disk->queue);
+ 
+-	ret = -EINVAL;
+-err:
++out:
+ 	blkdev_put_no_open(bdev);
+ 	return ret;
+ }
+@@ -3364,7 +3358,7 @@ static ssize_t ioc_cost_model_write(struct kernfs_open_file *of, char *input,
+ 	if (!ioc) {
+ 		ret = blk_iocost_init(bdev->bd_disk);
+ 		if (ret)
+-			goto err;
++			goto out;
+ 		ioc = q_to_ioc(q);
+ 	}
+ 
+@@ -3375,6 +3369,7 @@ static ssize_t ioc_cost_model_write(struct kernfs_open_file *of, char *input,
+ 	memcpy(u, ioc->params.i_lcoefs, sizeof(u));
+ 	user = ioc->user_cost_model;
+ 
++	ret = -EINVAL;
+ 	while ((p = strsep(&input, " \t\n"))) {
+ 		substring_t args[MAX_OPT_ARGS];
+ 		char buf[32];
+@@ -3392,20 +3387,20 @@ static ssize_t ioc_cost_model_write(struct kernfs_open_file *of, char *input,
+ 			else if (!strcmp(buf, "user"))
+ 				user = true;
+ 			else
+-				goto einval;
++				goto out_unlock;
+ 			continue;
+ 		case COST_MODEL:
+ 			match_strlcpy(buf, &args[0], sizeof(buf));
+ 			if (strcmp(buf, "linear"))
+-				goto einval;
++				goto out_unlock;
+ 			continue;
+ 		}
+ 
+ 		tok = match_token(p, i_lcoef_tokens, args);
+ 		if (tok == NR_I_LCOEFS)
+-			goto einval;
++			goto out_unlock;
+ 		if (match_u64(&args[0], &v))
+-			goto einval;
++			goto out_unlock;
+ 		u[tok] = v;
+ 		user = true;
+ 	}
+@@ -3416,23 +3411,16 @@ static ssize_t ioc_cost_model_write(struct kernfs_open_file *of, char *input,
+ 	} else {
+ 		ioc->user_cost_model = false;
+ 	}
+-	ioc_refresh_params(ioc, true);
+-	spin_unlock_irq(&ioc->lock);
+ 
+-	blk_mq_unquiesce_queue(q);
+-	blk_mq_unfreeze_queue(q);
+-
+-	blkdev_put_no_open(bdev);
+-	return nbytes;
++	ioc_refresh_params(ioc, true);
++	ret = nbytes;
+ 
+-einval:
++out_unlock:
+ 	spin_unlock_irq(&ioc->lock);
+-
+ 	blk_mq_unquiesce_queue(q);
+ 	blk_mq_unfreeze_queue(q);
+ 
+-	ret = -EINVAL;
+-err:
++out:
+ 	blkdev_put_no_open(bdev);
+ 	return ret;
+ }
+-- 
+2.31.1
 
