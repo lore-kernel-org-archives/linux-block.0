@@ -2,149 +2,251 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 735B2C4332F
-	for <linux-block@archiver.kernel.org>; Fri,  4 Nov 2022 11:42:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4EE7FC4332F
+	for <linux-block@archiver.kernel.org>; Fri,  4 Nov 2022 12:36:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230491AbiKDLmT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 4 Nov 2022 07:42:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57754 "EHLO
+        id S230240AbiKDMg1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 4 Nov 2022 08:36:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53376 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229489AbiKDLmQ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Nov 2022 07:42:16 -0400
-Received: from esa1.hgst.iphmx.com (esa1.hgst.iphmx.com [68.232.141.245])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4CE062CDF4
-        for <linux-block@vger.kernel.org>; Fri,  4 Nov 2022 04:42:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1667562136; x=1699098136;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=S6+G668Jg9xGJjmWVMAKwMIJy2RaqfOVmAJn2LyzUK8=;
-  b=I4vtjuyBltdCv9MZAIW+N4TPH8odzxI/pkSOYxLTm+AIj5DjU9fia5Qc
-   /3IoxXu+VjjKBskBMKwpGzXcNtJTXXhCAq2USIdIvOo1KD641/khbf5Q3
-   BXJXdeHt/wf0yWQTKu6i8heeM9I6kAlxiSb36FuzOhBOzcZy05F8d6u3y
-   IRQj0rK/Tb53fGcjQfSJzLc3gXp5M7OFkOcyVIbn0uFvKobwFFpmKvK6O
-   46CRzDKXNTcVTHwEzJ00nFdaz9tYqY/+yXcQO6Sw5fCSxLJyCajxoplxr
-   YHC29n2JYPHq3eHqZ75eB+7L7Q5kzPoFMtlYH1uvjL1fu7QqwtsgYokpV
-   g==;
-X-IronPort-AV: E=Sophos;i="5.96,137,1665417600"; 
-   d="scan'208";a="327595416"
-Received: from mail-bn8nam04lp2045.outbound.protection.outlook.com (HELO NAM04-BN8-obe.outbound.protection.outlook.com) ([104.47.74.45])
-  by ob1.hgst.iphmx.com with ESMTP; 04 Nov 2022 19:42:14 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=PRoc83pZ3TVuFfOwfBCnDPL71EreBaXVowWNpk1kyXJHGkZZu/7MAokmyPH76nKChdkMl9uJSR5XVfx+jdf5DOsfhATAzUuoSvvJbTqau9l6fWab1xRswTTtHLrRCXDrwiTGXZ7h/GQDRj/ImStzEi8+MnMz9+fcxQaIxv9K5rYUXa2zbrhLukMZdHhZjkE1HYZYn0xC+a8bZ6iDM1OhWg8oNc+0/AsfYd60wwGZsyoJIhQsW3MK3l+pAZ2C73wC8IpNEksgKA/kzR/JFuQIvmidqpgWcnfmORNy4ElkXdGAbaCKz0teoHi+VRsEZ8Jrb0PhOpgtimuxCjhjF28Bcg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=S6+G668Jg9xGJjmWVMAKwMIJy2RaqfOVmAJn2LyzUK8=;
- b=Qu6UvWMf42nrtmB99zRKCxTHmiJu7aVkC6SQqVQUf9c6Rg+N8GbSaJ9yUdGO6ZLGLQjHX5BNtfkZ1DT4dv/wLb1ijrpLst3+UEUcO1p9G5/ATQXC0AQJfGanZ82pW3ZFICA5hPjO78BhseBL+vZ5+kGJsLYNJvXlmsylYnxPPtMKskKNga5yx5onEfxCexexpzRzPv/phtC6cd7x/FYvaprSoFZsejPxjj4fsgTkINRxxIUxSbV/39eVxkI7SHhqCOEd2hWTFV7w8VVyZXIP3bwFNhgCRYtxiWfSXN2gwheVbxHCBAQ8XNCDwRT9Qz1yUx9s3cm7l8+OBoSC/GtD1g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
+        with ESMTP id S231761AbiKDMg1 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Nov 2022 08:36:27 -0400
+Received: from mail-qv1-xf2f.google.com (mail-qv1-xf2f.google.com [IPv6:2607:f8b0:4864:20::f2f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1CBBF29801
+        for <linux-block@vger.kernel.org>; Fri,  4 Nov 2022 05:36:21 -0700 (PDT)
+Received: by mail-qv1-xf2f.google.com with SMTP id mi9so3072745qvb.8
+        for <linux-block@vger.kernel.org>; Fri, 04 Nov 2022 05:36:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=S6+G668Jg9xGJjmWVMAKwMIJy2RaqfOVmAJn2LyzUK8=;
- b=KA8UGGtuQnivssY+g4EyoOSTCADCcIHwV9rT4tAPByN3C47D/y0PQykvFRmkEFTsVanJ3vPlGBEO6L9p+TYgGdHdgTvdsyL/YA9Udq+4yiwCr40cMU5dYV9+v3c1W1IET0izlazcwMj6P/oky+VBDp69oPqitaYQepnO3afF23c=
-Received: from DM8PR04MB8037.namprd04.prod.outlook.com (2603:10b6:8:f::6) by
- MWHPR04MB0816.namprd04.prod.outlook.com (2603:10b6:300:ff::18) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.5791.22; Fri, 4 Nov 2022 11:42:13 +0000
-Received: from DM8PR04MB8037.namprd04.prod.outlook.com
- ([fe80::d4b9:86e9:4fc8:d6e0]) by DM8PR04MB8037.namprd04.prod.outlook.com
- ([fe80::d4b9:86e9:4fc8:d6e0%5]) with mapi id 15.20.5791.022; Fri, 4 Nov 2022
- 11:42:12 +0000
-From:   Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-To:     Yi Zhang <yi.zhang@redhat.com>
-CC:     "chaitanyak@nvidia.com" <chaitanyak@nvidia.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: Re: [PATCH V2 blktests 0/3] fix and improvement for xfs log size
- change from new xfsprogs version
-Thread-Topic: [PATCH V2 blktests 0/3] fix and improvement for xfs log size
- change from new xfsprogs version
-Thread-Index: AQHY7mbYLPKYuUWNDUKQrOqIUgrDja4uqCcA
-Date:   Fri, 4 Nov 2022 11:42:12 +0000
-Message-ID: <20221104114212.vi45fza33ytlsgbx@shindev>
-References: <20221102025702.1664101-1-yi.zhang@redhat.com>
-In-Reply-To: <20221102025702.1664101-1-yi.zhang@redhat.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=wdc.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DM8PR04MB8037:EE_|MWHPR04MB0816:EE_
-x-ms-office365-filtering-correlation-id: ac56fa55-9bd9-4f97-c369-08dabe599d77
-wdcipoutbound: EOP-TRUE
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: MQHWAxXVnYC8OsuGvFrCnZree6hNjua8JEFBETrfaZrYN0ZywiftGdNP2dycybsIex52aC66sOOWoILnkjir4gvaCE2xMEhWKB3ZLSBYDs3pKhKXi7WwFJNlFJJ9RzYy0ZJU1JxOLBYmRg1S8COgtrqSsR5CTqAs72GzN/1ekngiyX9kAKllpRhvbnzqiJ8k2mMBJuPz0gNhSCl3CP0mlrzaZaZCQjv4hxinvGEgM6caWDyNM4tszApRut7TdUcCi0G+nH8OOnOmi3ZpmKg1EWBGmiErc72C1D3c+HjmgmvP2H6llTvKZqTPR4Sqrh7WMYdrLkmMf6e0FXvSUKNtH+LZn2vB3qLcCml++ZOlcVg8s5X3fsveKIKTZBqTYEYxKqO3mZKVFcyU7wIrNetRPR0ZzpuryBULpMh/WMHQ4WoEbtQLgzQEhGoBLcO38XYfoI5bzctLAswuznSbkqN1g8U6c/wliMT0zTpjlBGznVOfN//qobXbSukRJj7f6MeTo/osP1d2QPAmr4nqJlsnU+P7ljTcU3ZIxEZILWdTxzSgwhQPKp9ZsddnJtHoym21Lrkf7OpmD3N4a6ccSrq/IYFW3KbLK8wut9X+YXnE7qyCbklslhfyBg2Lx68qTTtijXNHZjVbWJtJWvkCutnI1bz6pMoJ6WfxNtMxpBexJ3t0f3RMkLTyheaekUakUMbygbTRU90N5XfacSV19Q4VK6Fj92XnUEW56c/WzcG7GpWqzayxEkTtzVOM02LPjMNh7cB0JKoQljxIDr6j6yxkEw==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR04MB8037.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(7916004)(4636009)(366004)(136003)(396003)(39860400002)(376002)(346002)(451199015)(2906002)(83380400001)(26005)(41300700001)(76116006)(6512007)(66556008)(66476007)(66446008)(9686003)(64756008)(4326008)(8676002)(38070700005)(33716001)(66946007)(122000001)(316002)(82960400001)(54906003)(6916009)(38100700002)(4744005)(86362001)(8936002)(186003)(5660300002)(1076003)(44832011)(91956017)(71200400001)(6486002)(478600001)(6506007);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?dhG3zAoHdfWrulmADNpSMZmsLc16SgPLM4zJHBQIch7RUVknq/M38cQ6jW7x?=
- =?us-ascii?Q?5va2jFFrTUrJkRFE4xY4AicKujvqHUQxBYUnkCjsQNeFXLo9IlW7Cq9eO9c9?=
- =?us-ascii?Q?Ezu7tmjZBubGgCfsLTGriOyfL0bU7XOfp6w61PJdu3uLTFZ9cSq/DkpPn6jc?=
- =?us-ascii?Q?2ndGHsmNLIL5PFVShOWWViGn9G1CbTQHLfv4QPlY/3AV0ZEoXW44tAd6OWYD?=
- =?us-ascii?Q?wdA5YTBqtwq3AqnQvSXk4wwAl/cnQ6y7jp84gVBCvvL3aE2pRnOzmPJAnDPy?=
- =?us-ascii?Q?D2qXUetGfg/VWekgsE2N3Ka5rJrRDc3w9vR2tCpALjW0aCgmcvcE9Xf0/pvx?=
- =?us-ascii?Q?fR1WWom3CmTfPXrCvVTaK8IjdFNlLZigMwnYqB0ywjxPl4zb+Nmk9hbmnHcI?=
- =?us-ascii?Q?ZnRzUrdHbMciTDzMex1ySpw4/ujAgoBhweEko2wfsXoi+f+kEG5qW50i1rKs?=
- =?us-ascii?Q?EW7FvC4zAYpQbDm+pf24aaDpIdTgT7mWQhWwdxqDvjiQSv3kjRxfyXwiSEH4?=
- =?us-ascii?Q?3gokSWNI1WacxcgHE5bwPumBE9CrzKPZaRS7a40SbsZKKcDMlidwCwdHmwj5?=
- =?us-ascii?Q?h08VmMtqEMVGsMoYF3qtpgWPZ0oqugcllwKgMmpcPa4oBq0gz0Hmq7oa2Pgv?=
- =?us-ascii?Q?uRFwBSOH5o09IceoQdODqRBytDmmHUGnR2UP9rvNlf3LnXJs70LxedouoFqq?=
- =?us-ascii?Q?9q/OYSOwNaUb1Uk01noC5qJtsQS4W3JaZdHNNU8hL1E1mSu85Qlbud8d8Alp?=
- =?us-ascii?Q?ma0Okr1eARkb4TSINyFUA16aS34Kzso7Yr4ce4a90JtkndzJrkuV/qNOCmpB?=
- =?us-ascii?Q?5xxQYuuK1UQs5z/kd0phsTd4xsMfcnqRMj6evhfHmIsTTo1Aio+297/i91f3?=
- =?us-ascii?Q?hEu9E1Ql9l1V+L762al54ClPWmYYe8IZyKNUQMIA9y7e0N6UOVC13fdzz3+v?=
- =?us-ascii?Q?yHSMsHUrJux+fQE1EnXAJkdrZz3tx8JqWGe2FibCrY5v8KCb5ynlH0U5yxq1?=
- =?us-ascii?Q?Xhlk66Klu8RYh0YEppgXtAQMJ4kgrWj88cWs0NAUzg7Pq7Ti/y92H4hWzd0e?=
- =?us-ascii?Q?NjKW8RlsYH0hU90Aon9MwLy92taKaUi8cRf0MSNKNOIrRGHYB2wZLn8Qu6JN?=
- =?us-ascii?Q?dt5rNAQzbMdjiQkXGf+s6HPEfc4LXqtau0BCCRNUSEKCIX3PSzD4m2n88yJt?=
- =?us-ascii?Q?XlNN7GKsxKGqCbBIOS+1+BpF2zhFiDnljtLxMttfOR/aWUhZmQ6Xr8iDVoSN?=
- =?us-ascii?Q?LIxVU82VIuX7T6NYcw8CBgC3tKkTJsJNaVlUugjg/0cr3nf+0WHqZwYqYIW4?=
- =?us-ascii?Q?ZceJsEKCoK7aXfQNIFdjG1yjhPiJxGSYa+lFdELraLGAmQ2gKhrVVNu4cWc/?=
- =?us-ascii?Q?Ma4nTjLjAdthGB+KWjxzREH8KTDzBTMxCRNqkLJ4NHPZgCUnAvaUV56DRWaY?=
- =?us-ascii?Q?Th56LXP1LjhdeRX6ID3S8udQHRN7xFJMDWfPCF5dC7sakcdPRPz0d4MB+EpO?=
- =?us-ascii?Q?y20tP4+30cuShzSN14CL5xmlXNiM1isAB9k3/c+vc9gvFOdafMxQEmyGQWWP?=
- =?us-ascii?Q?kQCA/RPZUXXd7EoVNbPXLoZRKDMRm0fB/+1myelNuZfPLEjS1sGdeHYk8rN8?=
- =?us-ascii?Q?3b0ZHmW/NxCLIyf2cqNkKWY=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <8224976B22FB2B40BF12BF7F40642FE7@namprd04.prod.outlook.com>
-Content-Transfer-Encoding: quoted-printable
+        d=cmpxchg-org.20210112.gappssmtp.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=cVKzsOjD+sfLgtcPLOe8okSlSe7+hnLyI1SXbQlGr1s=;
+        b=Xl+hI6yV80ad83IdDSuB/aAZDXDDtn9hvd1CvQ5JEBTksIXBr1kZXmSNNb7ySwqtI7
+         kvMbnp37uOS5VKMbxbtkmYJb7K/sUSrwgu3y2xx3bnhWuhwSBTB9YLvzBjJRLzkgKtss
+         Ntea5LBo9G+0s4G+Atso9Ic9O4yFGutuvMxIPPtaCrhqrzvw8n1+u/g4UGyIW3H05HVE
+         hPTEeIpjbnwXFzlfYqY7Og/1pSVaIDW+TF5c34O+8s/rpfUIuYn9mfeCWXw40mRXEN5T
+         Ub5FdredG/krZh1kJ8tevx4gvJi0SYth9FbNKWmNqXfG+0/czSiW9KkMSJcalWuINBcT
+         i4MQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=cVKzsOjD+sfLgtcPLOe8okSlSe7+hnLyI1SXbQlGr1s=;
+        b=sI6AO6y7DV+0u3vtOWNGeuOEx5OqXVttjFiOIQhUldU6dVsfTYWdqZbR7VioaGLXqZ
+         vFM/AZMZ2Vna/352l0KULuKlpPPcV4rN8wZ+aspvEhgqMWRj1d9MokXzjx5M+5RreFgO
+         Cn+kz2+eh8pZBjmOTaQSvpl6GDXyogLUrqBWW0GL0UvNgib/3B2GZMoM8piJlV7tjCWn
+         z7X54eqFXxtGG4+8gKeBDvPVJwvrmoqmFTrb2x+HEI0lUIlaz5Ytwb/0GCQHzaoWc9Ea
+         40ktrTpeXEPiObUu6fyl6UY8OmWWpfPKlUnID6kiIgqfuqk7NKonKkArW0g4zqUyVcHW
+         44aQ==
+X-Gm-Message-State: ACrzQf2gdsIEUHOFm35VmYOFNuS1QwbNUyksmIxUmA3NOr2D3XfrEBLc
+        +PAv4kUvumUhQk5ZKPHD+Sh1hg==
+X-Google-Smtp-Source: AMsMyM7orsCm+qY2qjv712AQbMjBnLx3DSr7IJ18oQAMH2tDtnuRQlxFQq8bAy47Si3WY93+jqxrYA==
+X-Received: by 2002:a05:6214:2601:b0:4bb:f5ef:998a with SMTP id gu1-20020a056214260100b004bbf5ef998amr24936059qvb.69.1667565380190;
+        Fri, 04 Nov 2022 05:36:20 -0700 (PDT)
+Received: from localhost ([2620:10d:c091:480::25f1])
+        by smtp.gmail.com with ESMTPSA id m4-20020ac866c4000000b0039cc7ebf46bsm2302141qtp.93.2022.11.04.05.36.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 04 Nov 2022 05:36:19 -0700 (PDT)
+Date:   Fri, 4 Nov 2022 08:36:22 -0400
+From:   Johannes Weiner <hannes@cmpxchg.org>
+To:     Andrew Morton <akpm@linux-foundation.org>
+Cc:     Thorsten Leemhuis <linux@leemhuis.info>,
+        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        Matthew Wilcox <willy@infradead.org>,
+        Suren Baghdasaryan <surenb@google.com>,
+        Chris Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>,
+        David Sterba <dsterba@suse.com>, Gao Xiang <xiang@kernel.org>,
+        Chao Yu <chao@kernel.org>, linux-block@vger.kernel.org,
+        linux-btrfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-erofs@lists.ozlabs.org, linux-mm@kvack.org,
+        "regressions@lists.linux.dev" <regressions@lists.linux.dev>
+Subject: Re: [REGESSION] systemd-oomd overreacting due to PSI changes for
+ Btrfs (was: Re: [PATCH 3/5] btrfs: add manual PSI accounting for compressed
+ reads)
+Message-ID: <Y2UHRqthNUwuIQGS@cmpxchg.org>
+References: <20220915094200.139713-1-hch@lst.de>
+ <20220915094200.139713-4-hch@lst.de>
+ <d20a0a85-e415-cf78-27f9-77dd7a94bc8d@leemhuis.info>
+ <Y2Q+y8t9PV5nrjud@cmpxchg.org>
+ <5f7bac77-c088-6fb7-ccb5-bef9267f7186@leemhuis.info>
 MIME-Version: 1.0
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DM8PR04MB8037.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ac56fa55-9bd9-4f97-c369-08dabe599d77
-X-MS-Exchange-CrossTenant-originalarrivaltime: 04 Nov 2022 11:42:12.9116
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: nGb9NsNyZrDGPcApbV7g2bclS5Dojumxjg/wArnlIbnWdKz6xmjpEreB0kL2N/GrpPbQP4eEy2xAyiCqHoCRuB0YtIrHpRCLOSWdG4Vjeco=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR04MB0816
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5f7bac77-c088-6fb7-ccb5-bef9267f7186@leemhuis.info>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Nov 02, 2022 / 10:56, Yi Zhang wrote:
-> Hi
->=20
-> The first patch addressed nvme/012 nvme/013 failure which introduced
-> from xfsprogs v5.19.0, the minimun xfs log size change to 64m
->=20
-> The second patch introduced one new function _require_test_dev_size_mb
->=20
-> The third patch add one new parameter to _run_fio_verify_io, this will
-> allow fio I/O size definition to the test case
+On Fri, Nov 04, 2022 at 08:32:22AM +0100, Thorsten Leemhuis wrote:
+> On 03.11.22 23:20, Johannes Weiner wrote:
+> > Can you try this patch?
+> 
+> It apparently does the trick -- at least my test setup that usually
+> triggers the bug within a minute or two survived for nearly an hour now, so:
+> 
+> Tested-by: Thorsten Leemhuis <linux@leemhuis.info>
 
-Have applied the patches. Please note that I took a liberty to do minor edi=
-ts in
-the second patch. Thanks!
+Great, thanks Thorsten.
 
---=20
-Shin'ichiro Kawasaki=
+> Can you please also add this tag to help future archeologists, as
+> explained by the kernel docs (for details see
+> Documentation/process/submitting-patches.rst and
+> Documentation/process/5.Posting.rst):
+> 
+> Link:
+> https://lore.kernel.org/r/d20a0a85-e415-cf78-27f9-77dd7a94bc8d@leemhuis.info/
+> 
+> It also will make my regression tracking bot see further postings of
+> this patch and mark the issue as resolved once the patch lands in mainline.
+
+Done.
+
+Looks like erofs has the same issue, I included a fix for that.
+
+Andrew would you mind picking this up and sending it Linusward? Jens
+routed the series originally, but I believe he is out today.
+
+Thanks
+
+From b668b261ed18105e91745f3d7676b6bca968476d Mon Sep 17 00:00:00 2001
+From: Johannes Weiner <hannes@cmpxchg.org>
+Date: Thu, 3 Nov 2022 17:34:31 -0400
+Subject: [PATCH] fs: fix leaked psi pressure state
+
+When psi annotations were added to to btrfs compression reads, the psi
+state tracking over add_ra_bio_pages and btrfs_submit_compressed_read
+was faulty. A pressure state, once entered, is never left. This
+results in incorrectly elevated pressure, which triggers OOM kills.
+
+pflags record the *previous* memstall state when we enter a new
+one. The code tried to initialize pflags to 1, and then optimize the
+leave call when we either didn't enter a memstall, or were already
+inside a nested stall. However, there can be multiple PageWorkingset
+pages in the bio, at which point it's that path itself that enters
+repeatedly and overwrites pflags. This causes us to miss the exit.
+
+Enter the stall only once if needed, then unwind correctly.
+
+erofs has the same problem, fix that up too. And move the memstall
+exit past submit_bio() to restore submit accounting originally added
+by b8e24a9300b0 ("block: annotate refault stalls from IO submission").
+
+Fixes: 4088a47e78f9 ("btrfs: add manual PSI accounting for compressed reads")
+Fixes: 99486c511f68 ("erofs: add manual PSI accounting for the compressed address space")
+Fixes: 118f3663fbc6 ("block: remove PSI accounting from the bio layer")
+Link: https://lore.kernel.org/r/d20a0a85-e415-cf78-27f9-77dd7a94bc8d@leemhuis.info/
+Reported-by: Thorsten Leemhuis <linux@leemhuis.info>
+Signed-off-by: Johannes Weiner <hannes@cmpxchg.org>
+Tested-by: Thorsten Leemhuis <linux@leemhuis.info>
+---
+ fs/btrfs/compression.c | 14 ++++++++------
+ fs/erofs/zdata.c       | 18 +++++++++++-------
+ 2 files changed, 19 insertions(+), 13 deletions(-)
+
+diff --git a/fs/btrfs/compression.c b/fs/btrfs/compression.c
+index f1f051ad3147..e6635fe70067 100644
+--- a/fs/btrfs/compression.c
++++ b/fs/btrfs/compression.c
+@@ -512,7 +512,7 @@ static u64 bio_end_offset(struct bio *bio)
+ static noinline int add_ra_bio_pages(struct inode *inode,
+ 				     u64 compressed_end,
+ 				     struct compressed_bio *cb,
+-				     unsigned long *pflags)
++				     int *memstall, unsigned long *pflags)
+ {
+ 	struct btrfs_fs_info *fs_info = btrfs_sb(inode->i_sb);
+ 	unsigned long end_index;
+@@ -581,8 +581,10 @@ static noinline int add_ra_bio_pages(struct inode *inode,
+ 			continue;
+ 		}
+ 
+-		if (PageWorkingset(page))
++		if (!*memstall && PageWorkingset(page)) {
+ 			psi_memstall_enter(pflags);
++			*memstall = 1;
++		}
+ 
+ 		ret = set_page_extent_mapped(page);
+ 		if (ret < 0) {
+@@ -670,8 +672,8 @@ void btrfs_submit_compressed_read(struct inode *inode, struct bio *bio,
+ 	u64 em_len;
+ 	u64 em_start;
+ 	struct extent_map *em;
+-	/* Initialize to 1 to make skip psi_memstall_leave unless needed */
+-	unsigned long pflags = 1;
++	unsigned long pflags;
++	int memstall = 0;
+ 	blk_status_t ret;
+ 	int ret2;
+ 	int i;
+@@ -727,7 +729,7 @@ void btrfs_submit_compressed_read(struct inode *inode, struct bio *bio,
+ 		goto fail;
+ 	}
+ 
+-	add_ra_bio_pages(inode, em_start + em_len, cb, &pflags);
++	add_ra_bio_pages(inode, em_start + em_len, cb, &memstall, &pflags);
+ 
+ 	/* include any pages we added in add_ra-bio_pages */
+ 	cb->len = bio->bi_iter.bi_size;
+@@ -807,7 +809,7 @@ void btrfs_submit_compressed_read(struct inode *inode, struct bio *bio,
+ 		}
+ 	}
+ 
+-	if (!pflags)
++	if (memstall)
+ 		psi_memstall_leave(&pflags);
+ 
+ 	if (refcount_dec_and_test(&cb->pending_ios))
+diff --git a/fs/erofs/zdata.c b/fs/erofs/zdata.c
+index c7f24fc7efd5..064a166324a7 100644
+--- a/fs/erofs/zdata.c
++++ b/fs/erofs/zdata.c
+@@ -1412,8 +1412,8 @@ static void z_erofs_submit_queue(struct z_erofs_decompress_frontend *f,
+ 	struct block_device *last_bdev;
+ 	unsigned int nr_bios = 0;
+ 	struct bio *bio = NULL;
+-	/* initialize to 1 to make skip psi_memstall_leave unless needed */
+-	unsigned long pflags = 1;
++	unsigned long pflags;
++	int memstall = 0;
+ 
+ 	bi_private = jobqueueset_init(sb, q, fgq, force_fg);
+ 	qtail[JQ_BYPASS] = &q[JQ_BYPASS]->head;
+@@ -1463,14 +1463,18 @@ static void z_erofs_submit_queue(struct z_erofs_decompress_frontend *f,
+ 			if (bio && (cur != last_index + 1 ||
+ 				    last_bdev != mdev.m_bdev)) {
+ submit_bio_retry:
+-				if (!pflags)
+-					psi_memstall_leave(&pflags);
+ 				submit_bio(bio);
++				if (memstall) {
++					psi_memstall_leave(&pflags);
++					memstall = 0;
++				}
+ 				bio = NULL;
+ 			}
+ 
+-			if (unlikely(PageWorkingset(page)))
++			if (unlikely(PageWorkingset(page)) && !memstall) {
+ 				psi_memstall_enter(&pflags);
++				memstall = 1;
++			}
+ 
+ 			if (!bio) {
+ 				bio = bio_alloc(mdev.m_bdev, BIO_MAX_VECS,
+@@ -1500,9 +1504,9 @@ static void z_erofs_submit_queue(struct z_erofs_decompress_frontend *f,
+ 	} while (owned_head != Z_EROFS_PCLUSTER_TAIL);
+ 
+ 	if (bio) {
+-		if (!pflags)
+-			psi_memstall_leave(&pflags);
+ 		submit_bio(bio);
++		if (memstall)
++			psi_memstall_leave(&pflags);
+ 	}
+ 
+ 	/*
+-- 
+2.38.1
+
