@@ -2,106 +2,92 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EC0CDC4332F
-	for <linux-block@archiver.kernel.org>; Fri,  4 Nov 2022 20:13:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6711FC433FE
+	for <linux-block@archiver.kernel.org>; Fri,  4 Nov 2022 20:13:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229821AbiKDUNL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 4 Nov 2022 16:13:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55572 "EHLO
+        id S229900AbiKDUNX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 4 Nov 2022 16:13:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56080 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229737AbiKDUNF (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Nov 2022 16:13:05 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AAB7B45A3F
-        for <linux-block@vger.kernel.org>; Fri,  4 Nov 2022 13:12:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1667592728;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=mVw++WwNRhJv9XuMMPj7SE5JUR1Vsk4jmONPY9jqoLM=;
-        b=OmzSpm4lAVyhtDUBwbxA194BFPpi5XPzujj6IxUDPKTycsN8stCZYEZu1ICTErl6Bb3fcN
-        7iyJwo5NxzaeSj6tqze4t5F/x7AOKN74V0OTtLREK8CTvH8TVH88B/3hhZLUILzIDbgb4J
-        M/+MR08cK+zxJH4/xV8EHlqjBa0OjXo=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-550-31-ZvFwqPWOwa4ydDYGVig-1; Fri, 04 Nov 2022 16:12:07 -0400
-X-MC-Unique: 31-ZvFwqPWOwa4ydDYGVig-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C83488039B4;
-        Fri,  4 Nov 2022 20:12:06 +0000 (UTC)
-Received: from [10.22.34.155] (unknown [10.22.34.155])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 1E2FEC2C8D9;
-        Fri,  4 Nov 2022 20:12:06 +0000 (UTC)
-Message-ID: <84fd6656-d133-b9df-c39e-fbb3a1f4a873@redhat.com>
-Date:   Fri, 4 Nov 2022 16:12:05 -0400
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.3.0
-Subject: Re: [PATCH v9 3/3] blk-cgroup: Flush stats at blkgs destruction path
-Content-Language: en-US
-To:     Tejun Heo <tj@kernel.org>
+        with ESMTP id S229906AbiKDUNQ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Nov 2022 16:13:16 -0400
+Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 93D5745A2D;
+        Fri,  4 Nov 2022 13:13:14 -0700 (PDT)
+Received: by mail-pj1-x1036.google.com with SMTP id e7-20020a17090a77c700b00216928a3917so4361384pjs.4;
+        Fri, 04 Nov 2022 13:13:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Xtk7jcohFLeQIICJ2B6kR5VUoj6ZVbcGeRiMSZFQHdg=;
+        b=E8v7jZxwUA9gU2qPlTl8J4Rg6OiD4OSKi0kctzeKiV3i+IKf+Sl/5z3x2urDsrYTVt
+         wjVDEi4/kcm1sF0fEPcDGV4mat20G0KBFoNdEqv+XmJ3cl1g6nVrvcE+nSMAvCN7de0U
+         fYLQaTK8Bvrs+VA8b40ugVlQzyiauUOEnc/QTv16FXBYGN0erJ2KPpb3wGMKcw9Dfkvm
+         GowtvrKej9023b75yQFFnY5sDs5PFzLKJR2wo/J+9I8Px7rzCvkzvqAWirFjrLWFQayZ
+         KkmyPfd0uXymiDTEItGJHnbwoFPEPIVhkGojG1fQDTmqfUCREvS4ioKUQ7rAElcQi9F0
+         Rr7g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Xtk7jcohFLeQIICJ2B6kR5VUoj6ZVbcGeRiMSZFQHdg=;
+        b=QS/IqPeW1Qu8FvIGV7qQyCt2ckI8xTqEc3UCt9xjQB3vOehzS17qyf1Piz573CpfLB
+         sq7iALFde9sv92/z8xLCPDiaQiLua/jSTHOypq16xA5pSSDqCfNt3sK+G+m+2sMHxdcp
+         VH+YW7qZ5Sva7crh7wQevH2sjCys7kgksuOA7rnyDNwNm67002EM3vBmu8AwFAjd/Ow5
+         llY1F6yLLIcRE+ULFa1KridZ7lTDBoC2S/QDhZeR3A/1m/HwR25+94Z/xX5FFPy0bDIl
+         NTB3lL8LXUS9klNVHxHnbfcz7SwZyoE81Sso3Tu2z8dmypLwqQIiRDQRIeL9iMlsrXt6
+         MOsQ==
+X-Gm-Message-State: ACrzQf1GNqqdxAEiCqtbKORW+rgXH+VAjhWYcSF9LAQitLBl6iKsulAY
+        JMDrZSbxjdQlakrk7/fA487qgPR7OFLulw==
+X-Google-Smtp-Source: AMsMyM6qd9CTC7TC6uXr7CaubdhAZp/+H2rnnYFIm09opnb0Ne+i+Zxxo2WP2y4zdAfRM2oKRx4YrA==
+X-Received: by 2002:a17:90b:4b81:b0:213:341d:3ea6 with SMTP id lr1-20020a17090b4b8100b00213341d3ea6mr38139323pjb.19.1667592793950;
+        Fri, 04 Nov 2022 13:13:13 -0700 (PDT)
+Received: from localhost (2603-800c-1a02-1bae-a7fa-157f-969a-4cde.res6.spectrum.com. [2603:800c:1a02:1bae:a7fa:157f:969a:4cde])
+        by smtp.gmail.com with ESMTPSA id d3-20020a170902cec300b001871461688esm147983plg.175.2022.11.04.13.13.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 04 Nov 2022 13:13:13 -0700 (PDT)
+Sender: Tejun Heo <htejun@gmail.com>
+Date:   Fri, 4 Nov 2022 10:13:12 -1000
+From:   Tejun Heo <tj@kernel.org>
+To:     Waiman Long <longman@redhat.com>
 Cc:     Jens Axboe <axboe@kernel.dk>, cgroups@vger.kernel.org,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         Ming Lei <ming.lei@redhat.com>,
         Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
         Andrew Morton <akpm@linux-foundation.org>,
-        =?UTF-8?Q?Michal_Koutn=c3=bd?= <mkoutny@suse.com>,
+        Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>,
         Hillf Danton <hdanton@sina.com>
+Subject: Re: [PATCH v9 3/3] blk-cgroup: Flush stats at blkgs destruction path
+Message-ID: <Y2VyWDvtwOsMBcKB@slm.duckdns.org>
 References: <20221104182050.342908-1-longman@redhat.com>
  <20221104182050.342908-4-longman@redhat.com>
  <Y2VvboMSxgF0pYpX@slm.duckdns.org>
-From:   Waiman Long <longman@redhat.com>
-In-Reply-To: <Y2VvboMSxgF0pYpX@slm.duckdns.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
+ <84fd6656-d133-b9df-c39e-fbb3a1f4a873@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <84fd6656-d133-b9df-c39e-fbb3a1f4a873@redhat.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 11/4/22 16:00, Tejun Heo wrote:
-> On Fri, Nov 04, 2022 at 02:20:50PM -0400, Waiman Long wrote:
->> +/**
->> + * cgroup_rstat_css_flush - flush stats for the given css and cpu
->> + * @css: target css to be flush
->> + * @cpu: the cpu that holds the stats to be flush
->> + *
->> + * A lightweight rstat flush operation for a given css and cpu.
->> + * Only the cpu_lock is being held for mutual exclusion, the cgroup_rstat_lock
->> + * isn't used.
->> + */
->> +void cgroup_rstat_css_flush(struct cgroup_subsys_state *css, int cpu)
->> +{
->> +	raw_spinlock_t *cpu_lock = per_cpu_ptr(&cgroup_rstat_cpu_lock, cpu);
->> +
->> +	raw_spin_lock_irq(cpu_lock);
->> +	rcu_read_lock();
->> +	css->ss->css_rstat_flush(css, cpu);
->> +	rcu_read_unlock();
->> +	raw_spin_unlock_irq(cpu_lock);
->> +}
-> Would it make sense to itereate CPUs within the helper rather than asking
-> the caller to do it? Also, in terms of patch sequencing, this introduces a
-> bug and then fixes it. Prolly better to not introduce the bug in the first
-> place.
->
-> Thanks.
+On Fri, Nov 04, 2022 at 04:12:05PM -0400, Waiman Long wrote:
+> I should have named the function cgroup_rstat_css_cpu_flush() to indicate
+> that the cpu is a needed parameter. We can have a cgroup_rstat_css_flush()
+> in the future if the need arises.
+> 
+> It is an optimization to call this function only if the corresponding cpu
+> has a pending lockless list. I could do cpu iteration here and call the
+> flushing function for all the CPUs. It is less optimized this way. Since it
+> is a slow path, I guess performance is not that critical. So I can go either
+> way. Please let me know your preference.
 
-I should have named the function cgroup_rstat_css_cpu_flush() to 
-indicate that the cpu is a needed parameter. We can have a 
-cgroup_rstat_css_flush() in the future if the need arises.
+Yeah, cpu_flush is fine. Let's leave it that way.
 
-It is an optimization to call this function only if the corresponding 
-cpu has a pending lockless list. I could do cpu iteration here and call 
-the flushing function for all the CPUs. It is less optimized this way. 
-Since it is a slow path, I guess performance is not that critical. So I 
-can go either way. Please let me know your preference.
+Thanks.
 
-Thanks,
-Longman
-
+-- 
+tejun
