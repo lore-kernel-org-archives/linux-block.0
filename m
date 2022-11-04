@@ -2,259 +2,153 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B34EC43219
-	for <linux-block@archiver.kernel.org>; Fri,  4 Nov 2022 06:27:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A297C433FE
+	for <linux-block@archiver.kernel.org>; Fri,  4 Nov 2022 06:57:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231206AbiKDG1H (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 4 Nov 2022 02:27:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55514 "EHLO
+        id S231378AbiKDG5F (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 4 Nov 2022 02:57:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42760 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230206AbiKDG1G (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Nov 2022 02:27:06 -0400
-X-Greylist: delayed 1802 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Thu, 03 Nov 2022 23:27:04 PDT
-Received: from lgeamrelo11.lge.com (lgeamrelo12.lge.com [156.147.23.52])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 16FE81A043
-        for <linux-block@vger.kernel.org>; Thu,  3 Nov 2022 23:27:02 -0700 (PDT)
-Received: from unknown (HELO lgemrelse7q.lge.com) (156.147.1.151)
-        by 156.147.23.52 with ESMTP; 4 Nov 2022 14:57:00 +0900
-X-Original-SENDERIP: 156.147.1.151
-X-Original-MAILFROM: byungchul.park@lge.com
-Received: from unknown (HELO localhost.localdomain) (10.177.244.38)
-        by 156.147.1.151 with ESMTP; 4 Nov 2022 14:57:00 +0900
-X-Original-SENDERIP: 10.177.244.38
-X-Original-MAILFROM: byungchul.park@lge.com
-From:   Byungchul Park <byungchul.park@lge.com>
-To:     linux-kernel@vger.kernel.org
-Cc:     torvalds@linux-foundation.org, damien.lemoal@opensource.wdc.com,
-        linux-ide@vger.kernel.org, adilger.kernel@dilger.ca,
-        linux-ext4@vger.kernel.org, mingo@redhat.com, peterz@infradead.org,
-        will@kernel.org, tglx@linutronix.de, rostedt@goodmis.org,
-        joel@joelfernandes.org, sashal@kernel.org, daniel.vetter@ffwll.ch,
-        chris@chris-wilson.co.uk, duyuyang@gmail.com,
-        johannes.berg@intel.com, tj@kernel.org, tytso@mit.edu,
-        willy@infradead.org, david@fromorbit.com, amir73il@gmail.com,
-        gregkh@linuxfoundation.org, kernel-team@lge.com,
-        linux-mm@kvack.org, akpm@linux-foundation.org, mhocko@kernel.org,
-        minchan@kernel.org, hannes@cmpxchg.org, vdavydov.dev@gmail.com,
-        sj@kernel.org, jglisse@redhat.com, dennis@kernel.org, cl@linux.com,
-        penberg@kernel.org, rientjes@google.com, vbabka@suse.cz,
-        ngupta@vflare.org, linux-block@vger.kernel.org,
-        paolo.valente@linaro.org, josef@toxicpanda.com,
-        linux-fsdevel@vger.kernel.org, viro@zeniv.linux.org.uk,
-        jack@suse.cz, jlayton@kernel.org, dan.j.williams@intel.com,
-        hch@infradead.org, djwong@kernel.org,
-        dri-devel@lists.freedesktop.org, rodrigosiqueiramelo@gmail.com,
-        melissa.srw@gmail.com, hamohammed.sa@gmail.com,
-        42.hyeyoo@gmail.com, chris.p.wilson@intel.com,
-        gwan-gyeong.mun@intel.com
-Subject: [QUESTION] {start,stop}_this_handle() and lockdep annotations
-Date:   Fri,  4 Nov 2022 14:56:32 +0900
-Message-Id: <1667541392-16270-1-git-send-email-byungchul.park@lge.com>
-X-Mailer: git-send-email 1.9.1
+        with ESMTP id S230342AbiKDG5E (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Nov 2022 02:57:04 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC1AC6434
+        for <linux-block@vger.kernel.org>; Thu,  3 Nov 2022 23:56:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1667544969;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=5Z8pgpEoQGeTMdYiqrUkF/Lckp8LaxoK9HC3TP6LmFk=;
+        b=CiCw683jaHHCLBOp5W/xYdsLOeCM3e9x+DTXcDxYMTeC7re3kDLQhiCFC8JXDGLhcEqJ3Y
+        ImuSGmteNOM4lA6pr8uPargqsNQxK1AB1JeepJV2xt7ClgLQyxlmAdB56KKe4t/n5IZIXd
+        PIsTQLEcVCOaZRL8XuSr6ILa2Gs4Ros=
+Received: from mail-oi1-f199.google.com (mail-oi1-f199.google.com
+ [209.85.167.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-235-E196k4EYM6itbhqOp0P0YQ-1; Fri, 04 Nov 2022 02:56:08 -0400
+X-MC-Unique: E196k4EYM6itbhqOp0P0YQ-1
+Received: by mail-oi1-f199.google.com with SMTP id h20-20020aca1814000000b003552a075929so1942467oih.3
+        for <linux-block@vger.kernel.org>; Thu, 03 Nov 2022 23:56:08 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=5Z8pgpEoQGeTMdYiqrUkF/Lckp8LaxoK9HC3TP6LmFk=;
+        b=WDn2FV/XRS1Ao9B4Kpe2gXf3zW/rvJ6fq8dlrs5pHs9tcUlvOROiESGLNI/GQZYY3Y
+         d9WATVn7EeMaGTVP1YmaJ2FL6EZkw6fhSVcwI6SpNfwV+CF/so1ig0bYrlicukS2VRPo
+         Q2TfsrEeySvDp2OQXU4xs+wxweVHxw9O6tZuNu3uLEH6Oh9v4sS3QYespTAGimAGrOk9
+         s3OOXaJ7jmmvGNLFBvoVhcc9spHYClNsFkzHjuHlE/uCZ1Qw7iunEze+WHbkJ367abTM
+         G6ijS4IJsEWpr8DBFE5E8ka8QPh3+tMxpwZ9V6I+kidrovYFKGRlMvlWJQ4VKEiLX1PC
+         607A==
+X-Gm-Message-State: ACrzQf2ZbKa9nJ3PULgTRStoTPWDqK7O5j2VroK9yNsPj7qKg6kMYvh6
+        Nwf2rTH8SvycJ1pZToCoq0NJYH2Bv/Ez8FuAD2qpoUnWH77qwcGXbYHxJSR8UKojgUSwWCCC/bt
+        +HcsuhRsQUiL2zv7X0Q8Bv7qUiWvF+Jveopml8Pc=
+X-Received: by 2002:a05:6870:9595:b0:132:7b3:29ac with SMTP id k21-20020a056870959500b0013207b329acmr187912oao.35.1667544967828;
+        Thu, 03 Nov 2022 23:56:07 -0700 (PDT)
+X-Google-Smtp-Source: AMsMyM6uOSbcIQS7KtsvJ6sUqAGVkWZj1MHAULLpUw3CyxbO8+piM4IZrUq0fI1jx3qzy5Tb12QsruflGwjcxpEXVPQ=
+X-Received: by 2002:a05:6870:9595:b0:132:7b3:29ac with SMTP id
+ k21-20020a056870959500b0013207b329acmr187905oao.35.1667544967645; Thu, 03 Nov
+ 2022 23:56:07 -0700 (PDT)
+MIME-Version: 1.0
+References: <Y0lcmZTP5sr467z6@T590> <CACycT3u8yYUS-WnNzgHQtQFYuK-XcyffpFc35HVZzrCS7hH5Sg@mail.gmail.com>
+ <Y05OzeC7wImts4p7@T590> <CACycT3sK1AzA4RH1ZfbstV3oax-oeBVtEz+sY+8scBU0=1x46g@mail.gmail.com>
+ <CAJSP0QVevA0gvyGABAFSoMhBN9ydZqUJh4qJYgNbGeyRXL8AjA@mail.gmail.com>
+ <CACycT3udzt0nyqweGbAsZB4LDQU=a7OSWKC8ZWieoBpsSfa2FQ@mail.gmail.com>
+ <1d051d63-ce34-1bb3-2256-4ced4be6d690@redhat.com> <CACycT3usE0QdJd50bSiLiPwTFxscg-Ur=iZyeGJJBPe7+KxOFQ@mail.gmail.com>
+ <CAJSP0QUGj4t8nYeJvGaO-cWJ+F3Zvxcq007RHOm-=41zaE-v0Q@mail.gmail.com>
+ <CACGkMEt+BWCUVQPnfUUd0QXkHz=90LMXxydCgBqWTDB3eGBw-w@mail.gmail.com> <Y2LBa/ePKiSN2phm@fedora>
+In-Reply-To: <Y2LBa/ePKiSN2phm@fedora>
+From:   Jason Wang <jasowang@redhat.com>
+Date:   Fri, 4 Nov 2022 14:55:55 +0800
+Message-ID: <CACGkMEvBZDxTv-DS7V6HW+GPZio5jiafmNGACa2cyWqCr_GvJg@mail.gmail.com>
+Subject: Re: ublk-qcow2: ublk-qcow2 is available
+To:     Stefan Hajnoczi <stefanha@redhat.com>
+Cc:     Stefan Hajnoczi <stefanha@gmail.com>,
+        Yongji Xie <xieyongji@bytedance.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Ming Lei <tom.leiming@gmail.com>,
+        Ziyang Zhang <ZiyangZhang@linux.alibaba.com>,
+        io-uring@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        "Denis V. Lunev" <den@openvz.org>,
+        Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
+On Thu, Nov 3, 2022 at 3:13 AM Stefan Hajnoczi <stefanha@redhat.com> wrote:
+>
+> On Tue, Nov 01, 2022 at 10:36:29AM +0800, Jason Wang wrote:
+> > On Tue, Oct 25, 2022 at 8:02 PM Stefan Hajnoczi <stefanha@gmail.com> wr=
+ote:
+> > >
+> > > On Tue, 25 Oct 2022 at 04:17, Yongji Xie <xieyongji@bytedance.com> wr=
+ote:
+> > > >
+> > > > On Fri, Oct 21, 2022 at 2:30 PM Jason Wang <jasowang@redhat.com> wr=
+ote:
+> > > > >
+> > > > >
+> > > > > =E5=9C=A8 2022/10/21 13:33, Yongji Xie =E5=86=99=E9=81=93:
+> > > > > > On Tue, Oct 18, 2022 at 10:54 PM Stefan Hajnoczi <stefanha@gmai=
+l.com> wrote:
+> > > > > >> On Tue, 18 Oct 2022 at 09:17, Yongji Xie <xieyongji@bytedance.=
+com> wrote:
+> > > > > >>> On Tue, Oct 18, 2022 at 2:59 PM Ming Lei <tom.leiming@gmail.c=
+om> wrote:
+> > > > > >>>> On Mon, Oct 17, 2022 at 07:11:59PM +0800, Yongji Xie wrote:
+> > > > > >>>>> On Fri, Oct 14, 2022 at 8:57 PM Ming Lei <tom.leiming@gmail=
+.com> wrote:
+> > > > > >>>>>> On Thu, Oct 13, 2022 at 02:48:04PM +0800, Yongji Xie wrote=
+:
+> > > > > >>>>>>> On Wed, Oct 12, 2022 at 10:22 PM Stefan Hajnoczi <stefanh=
+a@gmail.com> wrote:
+> > > > > >>>>>>>> On Sat, 8 Oct 2022 at 04:43, Ziyang Zhang <ZiyangZhang@l=
+inux.alibaba.com> wrote:
+> > > > > >>>>>>>>> On 2022/10/5 12:18, Ming Lei wrote:
+> > > > > >>>>>>>>>> On Tue, Oct 04, 2022 at 09:53:32AM -0400, Stefan Hajno=
+czi wrote:
+> > > > > >>>>>>>>>>> On Tue, 4 Oct 2022 at 05:44, Ming Lei <tom.leiming@gm=
+ail.com> wrote:
+> > > > > >>>>>>>>>>>> On Mon, Oct 03, 2022 at 03:53:41PM -0400, Stefan Haj=
+noczi wrote:
+> > > > > >>>>>>>>>>>>> On Fri, Sep 30, 2022 at 05:24:11PM +0800, Ming Lei =
+wrote:
+> > > There are ways to minimize that cost:
+> > > 1. The driver only needs to fetch the device's sq index when it has
+> > > run out of sq ring space.
+> > > 2. The device can include sq index updates with completions. This is
+> > > what NVMe does with the CQE SQ Head Pointer field, but the
+> > > disadvantage is that the driver has no way of determining the sq inde=
+x
+> > > until a completion occurs.
+> >
+> > Probably, but as replied in another thread, based on the numbers
+> > measured from the networking test, I think the current virtio layout
+> > should be sufficient for block I/O but might not fit for cases like
+> > NFV.
+>
+> I remember that the Linux virtio_net driver doesn't rely on vq spinlocks
+> because CPU affinity and the NAPI architecture ensure that everything is
+> CPU-local. There is no need to protect the freelist explicitly because
+> the functions cannot race.
+>
+> Maybe virtio_blk can learn from virtio_net...
 
-With v6.1-rc3, a deadlock in the journal code was reported by DEPT. I'd
-need to understand the journal code first before deep dive into it.
+It only works for RX where add and get could be all done in NAPI. But
+this is not the case for TX (and virtio-blk).
 
-I found a few lockdep annotations was added into the journal code by
-Peterz (commit 34a3d1e8370870 lockdep: annotate journal_start()) and
-the commit message quoted what Andrew Morton said. It was like:
+Actually, if the free_list is the one thing that needs to be
+serialized, there's no need to use lock at all. We can try to switch
+to use ptr_ring instead.
 
-> Except lockdep doesn't know about journal_start(), which has ranking
-> requirements similar to a semaphore.
+Thanks
 
-Could anyone tell what the ranking requirements in the journal code
-exactly means and what makes {start,stop}_this_handle() work for the
-requirements?
+>
+> Stefan
 
-Any comments would be appreciated. If needed, I'll explan the following
-report and scenario in detail.
-
-Just for your information, let me paste the DEPT report below.
-
-	Byungchul
-
----
-<4>[   43.124364 ] ===================================================
-<4>[   43.124366 ] DEPT: Circular dependency has been detected.
-<4>[   43.124367 ] 6.1.0-rc3-Trybot_110402v1-g601b2ef606e4+ #1 Not tainted
-<4>[   43.124369 ] ---------------------------------------------------
-<4>[   43.124369 ] summary
-<4>[   43.124370 ] ---------------------------------------------------
-<4>[   43.124370 ] *** DEADLOCK ***
-
-<4>[   43.124371 ] context A
-<4>[   43.124372 ]     [S] start_this_handle(jbd2_handle:0)
-<4>[   43.124373 ]     [W] folio_wait_bit_common(pglocked:0)
-<4>[   43.124374 ]     [E] up_read(jbd2_handle:0)
-
-<4>[   43.124376 ] context B
-<4>[   43.124377 ]     [S] (unknown)(pgwriteback:0)
-<4>[   43.124378 ]     [W] start_this_handle(jbd2_handle:0)
-<4>[   43.124379 ]     [E] folio_wake_bit(pgwriteback:0)
-
-<4>[   43.124380 ] context C
-<4>[   43.124381 ]     [S] (unknown)(pglocked:0)
-<4>[   43.124382 ]     [W] folio_wait_bit_common(pgwriteback:0)
-<4>[   43.124383 ]     [E] folio_wake_bit(pglocked:0)
-
-<4>[   43.124384 ] [S]: start of the event context
-<4>[   43.124384 ] [W]: the wait blocked
-<4>[   43.124385 ] [E]: the event not reachable
-<4>[   43.124385 ] ---------------------------------------------------
-<4>[   43.124386 ] context A's detail
-<4>[   43.124387 ] ---------------------------------------------------
-<4>[   43.124387 ] context A
-<4>[   43.124388 ]     [S] start_this_handle(jbd2_handle:0)
-<4>[   43.124389 ]     [W] folio_wait_bit_common(pglocked:0)
-<4>[   43.124389 ]     [E] up_read(jbd2_handle:0)
-
-<4>[   43.124391 ] [S] start_this_handle(jbd2_handle:0):
-<4>[   43.124392 ] [<ffffffff813e2fbc>] start_this_handle+0x4bc/0x620
-<4>[   43.124398 ] stacktrace:
-<4>[   43.124399 ]       start_this_handle+0x57c/0x620
-<4>[   43.124401 ]       jbd2__journal_start+0xe8/0x270
-<4>[   43.124404 ]       __ext4_journal_start_sb+0x147/0x190
-<4>[   43.124407 ]       ext4_writepages+0x76f/0x1120
-<4>[   43.124409 ]       do_writepages+0xc1/0x180
-<4>[   43.124412 ]       file_write_and_wait_range+0xab/0xf0
-<4>[   43.124414 ]       ext4_sync_file+0x122/0x480
-<4>[   43.124416 ]       do_fsync+0x33/0x70
-<4>[   43.124419 ]       __x64_sys_fdatasync+0xe/0x20
-<4>[   43.124421 ]       do_syscall_64+0x44/0x90
-<4>[   43.124424 ]       entry_SYSCALL_64_after_hwframe+0x63/0xcd
-
-<4>[   43.124427 ] [W] folio_wait_bit_common(pglocked:0):
-<4>[   43.124428 ] [<ffffffff81390bb6>] mpage_prepare_extent_to_map+0x446/0x7a0
-
-<4>[   43.124431 ] [E] up_read(jbd2_handle:0):
-<4>[   43.124431 ] (N/A)
-<4>[   43.124432 ] ---------------------------------------------------
-<4>[   43.124433 ] context B's detail
-<4>[   43.124433 ] ---------------------------------------------------
-<4>[   43.124434 ] context B
-<4>[   43.124434 ]     [S] (unknown)(pgwriteback:0)
-<4>[   43.124435 ]     [W] start_this_handle(jbd2_handle:0)
-<4>[   43.124436 ]     [E] folio_wake_bit(pgwriteback:0)
-
-<4>[   43.124437 ] [S] (unknown)(pgwriteback:0):
-<4>[   43.124438 ] (N/A)
-
-<4>[   43.124439 ] [W] start_this_handle(jbd2_handle:0):
-<4>[   43.124440 ] [<ffffffff813e2fbc>] start_this_handle+0x4bc/0x620
-<4>[   43.124442 ] stacktrace:
-<4>[   43.124443 ]       start_this_handle+0x557/0x620
-<4>[   43.124445 ]       jbd2_journal_start_reserved+0x4d/0x1b0
-<4>[   43.124448 ]       __ext4_journal_start_reserved+0x6d/0x190
-<4>[   43.124450 ]       ext4_convert_unwritten_io_end_vec+0x22/0xd0
-<4>[   43.124453 ]       ext4_end_io_rsv_work+0xe4/0x190
-<4>[   43.124455 ]       process_one_work+0x301/0x660
-<4>[   43.124458 ]       worker_thread+0x3a/0x3c0
-<4>[   43.124459 ]       kthread+0xef/0x120
-<4>[   43.124462 ]       ret_from_fork+0x22/0x30
-
-<4>[   43.124464 ] [E] folio_wake_bit(pgwriteback:0):
-<4>[   43.124465 ] [<ffffffff811fb9c8>] folio_end_writeback+0x78/0xf0
-<4>[   43.124467 ] stacktrace:
-<4>[   43.124468 ]       folio_wake_bit+0x194/0x1a0
-<4>[   43.124470 ]       folio_end_writeback+0x78/0xf0
-<4>[   43.124471 ]       ext4_finish_bio+0x23f/0x340
-<4>[   43.124473 ]       ext4_release_io_end+0x43/0xf0
-<4>[   43.124474 ]       ext4_end_io_rsv_work+0x90/0x190
-<4>[   43.124476 ]       process_one_work+0x301/0x660
-<4>[   43.124478 ]       worker_thread+0x3a/0x3c0
-<4>[   43.124480 ]       kthread+0xef/0x120
-<4>[   43.124481 ]       ret_from_fork+0x22/0x30
-<4>[   43.124482 ] ---------------------------------------------------
-<4>[   43.124483 ] context C's detail
-<4>[   43.124484 ] ---------------------------------------------------
-<4>[   43.124484 ] context C
-<4>[   43.124485 ]     [S] (unknown)(pglocked:0)
-<4>[   43.124485 ]     [W] folio_wait_bit_common(pgwriteback:0)
-<4>[   43.124486 ]     [E] folio_wake_bit(pglocked:0)
-
-<4>[   43.124487 ] [S] (unknown)(pglocked:0):
-<4>[   43.124488 ] (N/A)
-
-<4>[   43.124489 ] [W] folio_wait_bit_common(pgwriteback:0):
-<4>[   43.124490 ] [<ffffffff8120909d>] folio_wait_writeback+0x1d/0x110
-<4>[   43.124492 ] stacktrace:
-<4>[   43.124492 ]       folio_wait_bit_common+0x3e6/0x520
-<4>[   43.124494 ]       folio_wait_writeback+0x1d/0x110
-<4>[   43.124495 ]       mpage_prepare_extent_to_map+0x205/0x7a0
-<4>[   43.124497 ]       ext4_writepages+0x4de/0x1120
-<4>[   43.124499 ]       do_writepages+0xc1/0x180
-<4>[   43.124501 ]       __writeback_single_inode+0x53/0x600
-<4>[   43.124503 ]       writeback_sb_inodes+0x1ea/0x510
-<4>[   43.124505 ]       wb_writeback+0xe7/0x450
-<4>[   43.124506 ]       wb_workfn+0xe0/0x5e0
-<4>[   43.124508 ]       process_one_work+0x301/0x660
-<4>[   43.124510 ]       worker_thread+0x3a/0x3c0
-<4>[   43.124512 ]       kthread+0xef/0x120
-<4>[   43.124513 ]       ret_from_fork+0x22/0x30
-
-<4>[   43.124515 ] [E] folio_wake_bit(pglocked:0):
-<4>[   43.124516 ] [<ffffffff813b6f14>] ext4_bio_write_page+0x4d4/0x880
-<4>[   43.124518 ] stacktrace:
-<4>[   43.124518 ]       folio_wake_bit+0x152/0x1a0
-<4>[   43.124520 ]       ext4_bio_write_page+0x4d4/0x880
-<4>[   43.124521 ]       mpage_submit_page+0x49/0x70
-<4>[   43.124523 ]       mpage_process_page_bufs+0xfb/0x110
-<4>[   43.124525 ]       mpage_prepare_extent_to_map+0x2ab/0x7a0
-<4>[   43.124527 ]       ext4_writepages+0x4de/0x1120
-<4>[   43.124529 ]       do_writepages+0xc1/0x180
-<4>[   43.124530 ]       __writeback_single_inode+0x53/0x600
-<4>[   43.124532 ]       writeback_sb_inodes+0x1ea/0x510
-<4>[   43.124534 ]       wb_writeback+0xe7/0x450
-<4>[   43.124535 ]       wb_workfn+0xe0/0x5e0
-<4>[   43.124537 ]       process_one_work+0x301/0x660
-<4>[   43.124539 ]       worker_thread+0x3a/0x3c0
-<4>[   43.124541 ]       kthread+0xef/0x120
-<4>[   43.124542 ]       ret_from_fork+0x22/0x30
-<4>[   43.124544 ] ---------------------------------------------------
-<4>[   43.124544 ] information that might be helpful
-<4>[   43.124545 ] ---------------------------------------------------
-<4>[   43.124546 ] CPU: 0 PID: 1225 Comm: igt_runner Not tainted 6.1.0-rc3-Trybot_110402v1-g601b2ef606e4+ #1
-<4>[   43.124548 ] Hardware name: Hewlett-Packard HP Pro 3500 Series/2ABF, BIOS 8.11 10/24/2012
-<4>[   43.124549 ] Call Trace:
-<4>[   43.124550 ]  <TASK>
-<4>[   43.124551 ]  dump_stack_lvl+0x60/0x8e
-<4>[   43.124554 ]  print_circle.cold.39+0x44f/0x47e
-<4>[   43.124558 ]  ? print_circle+0xc0/0xc0
-<4>[   43.124561 ]  cb_check_dl+0x58/0x60
-<4>[   43.124564 ]  bfs+0xd3/0x1b0
-<4>[   43.124567 ]  add_dep+0xb6/0x1a0
-<4>[   43.124570 ]  add_wait+0xf0/0x440
-<4>[   43.124572 ]  ? mpage_prepare_extent_to_map+0x446/0x7a0
-<4>[   43.124575 ]  dept_wait_split_map+0x142/0x1e0
-<4>[   43.124578 ]  ? mpage_prepare_extent_to_map+0x446/0x7a0
-<4>[   43.124580 ]  __folio_lock+0x86/0x300
-<4>[   43.124582 ]  ? lock_is_held_type+0x112/0x150
-<4>[   43.124586 ]  mpage_prepare_extent_to_map+0x446/0x7a0
-<4>[   43.124588 ]  ? rcu_read_lock_sched_held+0x51/0x80
-<4>[   43.124592 ]  ? jbd2__journal_start+0x151/0x270
-<4>[   43.124595 ]  ? lock_is_held_type+0x112/0x150
-<4>[   43.124597 ]  ? do_writepages+0xc1/0x180
-<4>[   43.124599 ]  ext4_writepages+0x7b3/0x1120
-<4>[   43.124602 ]  ? pop_ecxt+0xee/0x100
-<4>[   43.124606 ]  do_writepages+0xc1/0x180
-<4>[   43.124608 ]  ? lock_is_held_type+0x112/0x150
-<4>[   43.124611 ]  file_write_and_wait_range+0xab/0xf0
-<4>[   43.124622 ]  ext4_sync_file+0x122/0x480
-<4>[   43.124624 ]  do_fsync+0x33/0x70
-<4>[   43.124627 ]  __x64_sys_fdatasync+0xe/0x20
-<4>[   43.124629 ]  do_syscall_64+0x44/0x90
-<4>[   43.124631 ]  entry_SYSCALL_64_after_hwframe+0x63/0xcd
-<4>[   43.124633 ] RIP: 0033:0x7f6f2146d3c7
-<4>[   43.124635 ] Code: 64 89 01 48 83 c8 ff c3 66 2e 0f 1f 84 00 00 00 00 00 90 f3 0f 1e fa 64 8b 04 25 18 00 00 00 85 c0 75 10 b8 4b 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 41 c3 48 83 ec 18 89 7c 24 0c e8 83 f3 f7 ff
-<4>[   43.124637 ] RSP: 002b:00007ffc4e4b8918 EFLAGS: 00000246 ORIG_RAX: 000000000000004b
-<4>[   43.124639 ] RAX: ffffffffffffffda RBX: 0000000080045705 RCX: 00007f6f2146d3c7
-<4>[   43.124640 ] RDX: 000000000000005f RSI: 00007ffc4e4b9020 RDI: 000000000000000a
-<4>[   43.124641 ] RBP: 00007ffc4e4b8a40 R08: 0000000000000000 R09: 0000000000000000
-<4>[   43.124642 ] R10: 00007ffc4e5251b0 R11: 0000000000000246 R12: 0000000000000012
-<4>[   43.124643 ] R13: 00007ffc4e4b98a0 R14: 00007ffc4e4b9020 R15: 0000000000000000
-<4>[   43.124656 ]  </TASK>
