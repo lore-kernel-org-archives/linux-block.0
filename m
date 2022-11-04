@@ -2,40 +2,61 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E9053C43217
-	for <linux-block@archiver.kernel.org>; Fri,  4 Nov 2022 05:17:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D8AF0C4332F
+	for <linux-block@archiver.kernel.org>; Fri,  4 Nov 2022 05:46:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229572AbiKDFRw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 4 Nov 2022 01:17:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44554 "EHLO
+        id S229728AbiKDFqa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 4 Nov 2022 01:46:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54484 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229553AbiKDFRv (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Nov 2022 01:17:51 -0400
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6068695B7;
-        Thu,  3 Nov 2022 22:17:50 -0700 (PDT)
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id BFB5C68AA6; Fri,  4 Nov 2022 06:17:47 +0100 (CET)
-Date:   Fri, 4 Nov 2022 06:17:47 +0100
+        with ESMTP id S229646AbiKDFq3 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Nov 2022 01:46:29 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E9DC5F94;
+        Thu,  3 Nov 2022 22:46:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+        Content-ID:Content-Description:In-Reply-To:References;
+        bh=+tnMKXf+vNlxPQqnC37CevJqqfXK3FDu+tVcxBjiuOU=; b=GLk1+8NeHrAHJbqCrl13BEEHoP
+        Vh+edhRhy3gqe7ShdokfyFSZ6rKA32YLuSGUI7PcmPoIo60fEmaGO5fPnVIoLGF8dmndcqE6PXvw1
+        LNDaSlygs0POyxEelvnnRA2ZLlnmlj1P1DO/wgt7rDWBUIigCdX9hmobDayJ6TVK10QVAffQAJ/0K
+        mpeOMUSqErJCPpoLvxCLpLl5acyRei+48G/fYYOPhXwDJV27fMb3NGhVMfEP48ruOtbtFx4KgNdhS
+        +upAkqU2cT/YfgqphgcMJyxJq42vb05kj9kGW6tnDaD3FJCLbXaTJB+V5qf39qEOJIR9PtHqVVLWD
+        ZCmZmwHw==;
+Received: from [2001:4bb8:182:29ca:9be5:7ea:ab68:47c9] (helo=localhost)
+        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1oqpX5-002S1R-La; Fri, 04 Nov 2022 05:46:24 +0000
 From:   Christoph Hellwig <hch@lst.de>
-To:     Yu Kuai <yukuai1@huaweicloud.com>
-Cc:     hch@lst.de, tj@kernel.org, josef@toxicpanda.com, axboe@kernel.dk,
-        yukuai3@huawei.com, cgroups@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        yi.zhang@huawei.com
-Subject: Re: [PATCH v2 5/5] blk-iocost: read params inside lock in sysfs
- apis
-Message-ID: <20221104051747.GC15721@lst.de>
-References: <20221104023938.2346986-1-yukuai1@huaweicloud.com> <20221104023938.2346986-6-yukuai1@huaweicloud.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Mike Snitzer <snitzer@kernel.org>,
+        "Theodore Y. Ts'o" <tytso@mit.edu>,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        Eric Biggers <ebiggers@kernel.org>, dm-devel@redhat.com,
+        linux-block@vger.kernel.org, linux-fscrypt@vger.kernel.org
+Subject: pass a struct block_device to the blk-crypto interfaces
+Date:   Fri,  4 Nov 2022 06:46:19 +0100
+Message-Id: <20221104054621.628369-1-hch@lst.de>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221104023938.2346986-6-yukuai1@huaweicloud.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Looks good:
+Hi all,
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+this series switches the blk-crypto interfaces to take block_device
+arguments instead of request_queues, and with that finishes off the
+project to hide struct request_queue from file systems.
+
+Diffstat:
+ Documentation/block/inline-encryption.rst |   24 ++++++++++++------------
+ block/blk-crypto-profile.c                |    7 +++++++
+ block/blk-crypto.c                        |   25 ++++++++++++-------------
+ drivers/md/dm-table.c                     |    2 +-
+ fs/crypto/inline_crypt.c                  |   12 ++++--------
+ include/linux/blk-crypto-profile.h        |    2 ++
+ include/linux/blk-crypto.h                |    8 ++++----
+ 7 files changed, 42 insertions(+), 38 deletions(-)
