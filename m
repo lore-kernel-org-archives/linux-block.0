@@ -2,251 +2,96 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4EE7FC4332F
-	for <linux-block@archiver.kernel.org>; Fri,  4 Nov 2022 12:36:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6F64C4332F
+	for <linux-block@archiver.kernel.org>; Fri,  4 Nov 2022 13:10:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230240AbiKDMg1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 4 Nov 2022 08:36:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53376 "EHLO
+        id S231591AbiKDNKh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 4 Nov 2022 09:10:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45770 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231761AbiKDMg1 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Nov 2022 08:36:27 -0400
-Received: from mail-qv1-xf2f.google.com (mail-qv1-xf2f.google.com [IPv6:2607:f8b0:4864:20::f2f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1CBBF29801
-        for <linux-block@vger.kernel.org>; Fri,  4 Nov 2022 05:36:21 -0700 (PDT)
-Received: by mail-qv1-xf2f.google.com with SMTP id mi9so3072745qvb.8
-        for <linux-block@vger.kernel.org>; Fri, 04 Nov 2022 05:36:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cmpxchg-org.20210112.gappssmtp.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=cVKzsOjD+sfLgtcPLOe8okSlSe7+hnLyI1SXbQlGr1s=;
-        b=Xl+hI6yV80ad83IdDSuB/aAZDXDDtn9hvd1CvQ5JEBTksIXBr1kZXmSNNb7ySwqtI7
-         kvMbnp37uOS5VKMbxbtkmYJb7K/sUSrwgu3y2xx3bnhWuhwSBTB9YLvzBjJRLzkgKtss
-         Ntea5LBo9G+0s4G+Atso9Ic9O4yFGutuvMxIPPtaCrhqrzvw8n1+u/g4UGyIW3H05HVE
-         hPTEeIpjbnwXFzlfYqY7Og/1pSVaIDW+TF5c34O+8s/rpfUIuYn9mfeCWXw40mRXEN5T
-         Ub5FdredG/krZh1kJ8tevx4gvJi0SYth9FbNKWmNqXfG+0/czSiW9KkMSJcalWuINBcT
-         i4MQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=cVKzsOjD+sfLgtcPLOe8okSlSe7+hnLyI1SXbQlGr1s=;
-        b=sI6AO6y7DV+0u3vtOWNGeuOEx5OqXVttjFiOIQhUldU6dVsfTYWdqZbR7VioaGLXqZ
-         vFM/AZMZ2Vna/352l0KULuKlpPPcV4rN8wZ+aspvEhgqMWRj1d9MokXzjx5M+5RreFgO
-         Cn+kz2+eh8pZBjmOTaQSvpl6GDXyogLUrqBWW0GL0UvNgib/3B2GZMoM8piJlV7tjCWn
-         z7X54eqFXxtGG4+8gKeBDvPVJwvrmoqmFTrb2x+HEI0lUIlaz5Ytwb/0GCQHzaoWc9Ea
-         40ktrTpeXEPiObUu6fyl6UY8OmWWpfPKlUnID6kiIgqfuqk7NKonKkArW0g4zqUyVcHW
-         44aQ==
-X-Gm-Message-State: ACrzQf2gdsIEUHOFm35VmYOFNuS1QwbNUyksmIxUmA3NOr2D3XfrEBLc
-        +PAv4kUvumUhQk5ZKPHD+Sh1hg==
-X-Google-Smtp-Source: AMsMyM7orsCm+qY2qjv712AQbMjBnLx3DSr7IJ18oQAMH2tDtnuRQlxFQq8bAy47Si3WY93+jqxrYA==
-X-Received: by 2002:a05:6214:2601:b0:4bb:f5ef:998a with SMTP id gu1-20020a056214260100b004bbf5ef998amr24936059qvb.69.1667565380190;
-        Fri, 04 Nov 2022 05:36:20 -0700 (PDT)
-Received: from localhost ([2620:10d:c091:480::25f1])
-        by smtp.gmail.com with ESMTPSA id m4-20020ac866c4000000b0039cc7ebf46bsm2302141qtp.93.2022.11.04.05.36.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 04 Nov 2022 05:36:19 -0700 (PDT)
-Date:   Fri, 4 Nov 2022 08:36:22 -0400
-From:   Johannes Weiner <hannes@cmpxchg.org>
-To:     Andrew Morton <akpm@linux-foundation.org>
-Cc:     Thorsten Leemhuis <linux@leemhuis.info>,
-        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        Matthew Wilcox <willy@infradead.org>,
-        Suren Baghdasaryan <surenb@google.com>,
-        Chris Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>,
-        David Sterba <dsterba@suse.com>, Gao Xiang <xiang@kernel.org>,
-        Chao Yu <chao@kernel.org>, linux-block@vger.kernel.org,
-        linux-btrfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-erofs@lists.ozlabs.org, linux-mm@kvack.org,
-        "regressions@lists.linux.dev" <regressions@lists.linux.dev>
-Subject: Re: [REGESSION] systemd-oomd overreacting due to PSI changes for
- Btrfs (was: Re: [PATCH 3/5] btrfs: add manual PSI accounting for compressed
- reads)
-Message-ID: <Y2UHRqthNUwuIQGS@cmpxchg.org>
-References: <20220915094200.139713-1-hch@lst.de>
- <20220915094200.139713-4-hch@lst.de>
- <d20a0a85-e415-cf78-27f9-77dd7a94bc8d@leemhuis.info>
- <Y2Q+y8t9PV5nrjud@cmpxchg.org>
- <5f7bac77-c088-6fb7-ccb5-bef9267f7186@leemhuis.info>
+        with ESMTP id S231549AbiKDNKf (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Nov 2022 09:10:35 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B0E792E6A3
+        for <linux-block@vger.kernel.org>; Fri,  4 Nov 2022 06:09:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1667567378;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=MPH7HkTo+EdGShDcB1aKfZnkizG0dH+geWqT/cE+950=;
+        b=D5DNKyy0O++FNhJZF53wvhqz1tDM3qqIVFRimFuedY07c94JhBPT3JZ0aqeUAHqgeChBBe
+        t0k6//0eqYzx/z2KJ62FV8YlyQqS9WKb7PxdIFS2+46rC1S9yi9gfFyVYNZRimsaOJO0NF
+        zFB7RT9BcM1YXX9UqFJR+IP3bFAj578=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-368-Glgj8p5CMeKJbx7i99H2TQ-1; Fri, 04 Nov 2022 09:09:33 -0400
+X-MC-Unique: Glgj8p5CMeKJbx7i99H2TQ-1
+Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id D39D38339CB;
+        Fri,  4 Nov 2022 13:09:32 +0000 (UTC)
+Received: from file01.intranet.prod.int.rdu2.redhat.com (file01.intranet.prod.int.rdu2.redhat.com [10.11.5.7])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 87E7449BB9A;
+        Fri,  4 Nov 2022 13:09:32 +0000 (UTC)
+Received: from file01.intranet.prod.int.rdu2.redhat.com (localhost [127.0.0.1])
+        by file01.intranet.prod.int.rdu2.redhat.com (8.14.4/8.14.4) with ESMTP id 2A4D9WZ5019732;
+        Fri, 4 Nov 2022 09:09:32 -0400
+Received: from localhost (mpatocka@localhost)
+        by file01.intranet.prod.int.rdu2.redhat.com (8.14.4/8.14.4/Submit) with ESMTP id 2A4D9VcB019728;
+        Fri, 4 Nov 2022 09:09:31 -0400
+X-Authentication-Warning: file01.intranet.prod.int.rdu2.redhat.com: mpatocka owned process doing -bs
+Date:   Fri, 4 Nov 2022 09:09:31 -0400 (EDT)
+From:   Mikulas Patocka <mpatocka@redhat.com>
+X-X-Sender: mpatocka@file01.intranet.prod.int.rdu2.redhat.com
+To:     Keith Busch <kbusch@kernel.org>
+cc:     Keith Busch <kbusch@meta.com>, linux-block@vger.kernel.org,
+        dm-devel@redhat.com, axboe@kernel.dk, stefanha@redhat.com,
+        ebiggers@kernel.org, me@demsh.org
+Subject: Re: [PATCH 0/3] fix direct io errors on dm-crypt
+In-Reply-To: <Y2Qm/yGlVbDRskkr@kbusch-mbp.dhcp.thefacebook.com>
+Message-ID: <alpine.LRH.2.21.2211040908140.19553@file01.intranet.prod.int.rdu2.redhat.com>
+References: <20221103152559.1909328-1-kbusch@meta.com> <alpine.LRH.2.21.2211031224060.10758@file01.intranet.prod.int.rdu2.redhat.com> <Y2Qm/yGlVbDRskkr@kbusch-mbp.dhcp.thefacebook.com>
+User-Agent: Alpine 2.21 (LRH 202 2017-01-01)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <5f7bac77-c088-6fb7-ccb5-bef9267f7186@leemhuis.info>
+Content-Type: text/plain; charset=US-ASCII
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.10
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Nov 04, 2022 at 08:32:22AM +0100, Thorsten Leemhuis wrote:
-> On 03.11.22 23:20, Johannes Weiner wrote:
-> > Can you try this patch?
+
+
+On Thu, 3 Nov 2022, Keith Busch wrote:
+
+> On Thu, Nov 03, 2022 at 12:33:19PM -0400, Mikulas Patocka wrote:
+> > Hi
+> > 
+> > The patchset seems OK - but dm-integrity also has a limitation that the 
+> > bio vectors must be aligned on logical block size.
+> > 
+> > dm-writecache and dm-verity seem to handle unaligned bioset, but you 
+> > should check them anyway.
+> > 
+> > I'm not sure about dm-log-writes.
 > 
-> It apparently does the trick -- at least my test setup that usually
-> triggers the bug within a minute or two survived for nearly an hour now, so:
+> Yeah, dm-integrity definitly needs it too. This is easy enough to use
+> the same io_hint that I added for dm-crypt.
 > 
-> Tested-by: Thorsten Leemhuis <linux@leemhuis.info>
-
-Great, thanks Thorsten.
-
-> Can you please also add this tag to help future archeologists, as
-> explained by the kernel docs (for details see
-> Documentation/process/submitting-patches.rst and
-> Documentation/process/5.Posting.rst):
+> dm-log-writes is doing some weird things with writes that I don't think
+> would work with some low level drivers without the same alignment
+> constraint.
 > 
-> Link:
-> https://lore.kernel.org/r/d20a0a85-e415-cf78-27f9-77dd7a94bc8d@leemhuis.info/
+> The other two appear to handle this fine, but I'll run everything
+> through some focused test cases to be sure.
 > 
-> It also will make my regression tracking bot see further postings of
-> this patch and mark the issue as resolved once the patch lands in mainline.
+> In the meantime, do you want to see the remaining mappers fixed in a v2,
+> or are you okay if they follow after this series?
 
-Done.
+I don't care if you make a separate patch or fold it into an existing 
+patch.
 
-Looks like erofs has the same issue, I included a fix for that.
-
-Andrew would you mind picking this up and sending it Linusward? Jens
-routed the series originally, but I believe he is out today.
-
-Thanks
-
-From b668b261ed18105e91745f3d7676b6bca968476d Mon Sep 17 00:00:00 2001
-From: Johannes Weiner <hannes@cmpxchg.org>
-Date: Thu, 3 Nov 2022 17:34:31 -0400
-Subject: [PATCH] fs: fix leaked psi pressure state
-
-When psi annotations were added to to btrfs compression reads, the psi
-state tracking over add_ra_bio_pages and btrfs_submit_compressed_read
-was faulty. A pressure state, once entered, is never left. This
-results in incorrectly elevated pressure, which triggers OOM kills.
-
-pflags record the *previous* memstall state when we enter a new
-one. The code tried to initialize pflags to 1, and then optimize the
-leave call when we either didn't enter a memstall, or were already
-inside a nested stall. However, there can be multiple PageWorkingset
-pages in the bio, at which point it's that path itself that enters
-repeatedly and overwrites pflags. This causes us to miss the exit.
-
-Enter the stall only once if needed, then unwind correctly.
-
-erofs has the same problem, fix that up too. And move the memstall
-exit past submit_bio() to restore submit accounting originally added
-by b8e24a9300b0 ("block: annotate refault stalls from IO submission").
-
-Fixes: 4088a47e78f9 ("btrfs: add manual PSI accounting for compressed reads")
-Fixes: 99486c511f68 ("erofs: add manual PSI accounting for the compressed address space")
-Fixes: 118f3663fbc6 ("block: remove PSI accounting from the bio layer")
-Link: https://lore.kernel.org/r/d20a0a85-e415-cf78-27f9-77dd7a94bc8d@leemhuis.info/
-Reported-by: Thorsten Leemhuis <linux@leemhuis.info>
-Signed-off-by: Johannes Weiner <hannes@cmpxchg.org>
-Tested-by: Thorsten Leemhuis <linux@leemhuis.info>
----
- fs/btrfs/compression.c | 14 ++++++++------
- fs/erofs/zdata.c       | 18 +++++++++++-------
- 2 files changed, 19 insertions(+), 13 deletions(-)
-
-diff --git a/fs/btrfs/compression.c b/fs/btrfs/compression.c
-index f1f051ad3147..e6635fe70067 100644
---- a/fs/btrfs/compression.c
-+++ b/fs/btrfs/compression.c
-@@ -512,7 +512,7 @@ static u64 bio_end_offset(struct bio *bio)
- static noinline int add_ra_bio_pages(struct inode *inode,
- 				     u64 compressed_end,
- 				     struct compressed_bio *cb,
--				     unsigned long *pflags)
-+				     int *memstall, unsigned long *pflags)
- {
- 	struct btrfs_fs_info *fs_info = btrfs_sb(inode->i_sb);
- 	unsigned long end_index;
-@@ -581,8 +581,10 @@ static noinline int add_ra_bio_pages(struct inode *inode,
- 			continue;
- 		}
- 
--		if (PageWorkingset(page))
-+		if (!*memstall && PageWorkingset(page)) {
- 			psi_memstall_enter(pflags);
-+			*memstall = 1;
-+		}
- 
- 		ret = set_page_extent_mapped(page);
- 		if (ret < 0) {
-@@ -670,8 +672,8 @@ void btrfs_submit_compressed_read(struct inode *inode, struct bio *bio,
- 	u64 em_len;
- 	u64 em_start;
- 	struct extent_map *em;
--	/* Initialize to 1 to make skip psi_memstall_leave unless needed */
--	unsigned long pflags = 1;
-+	unsigned long pflags;
-+	int memstall = 0;
- 	blk_status_t ret;
- 	int ret2;
- 	int i;
-@@ -727,7 +729,7 @@ void btrfs_submit_compressed_read(struct inode *inode, struct bio *bio,
- 		goto fail;
- 	}
- 
--	add_ra_bio_pages(inode, em_start + em_len, cb, &pflags);
-+	add_ra_bio_pages(inode, em_start + em_len, cb, &memstall, &pflags);
- 
- 	/* include any pages we added in add_ra-bio_pages */
- 	cb->len = bio->bi_iter.bi_size;
-@@ -807,7 +809,7 @@ void btrfs_submit_compressed_read(struct inode *inode, struct bio *bio,
- 		}
- 	}
- 
--	if (!pflags)
-+	if (memstall)
- 		psi_memstall_leave(&pflags);
- 
- 	if (refcount_dec_and_test(&cb->pending_ios))
-diff --git a/fs/erofs/zdata.c b/fs/erofs/zdata.c
-index c7f24fc7efd5..064a166324a7 100644
---- a/fs/erofs/zdata.c
-+++ b/fs/erofs/zdata.c
-@@ -1412,8 +1412,8 @@ static void z_erofs_submit_queue(struct z_erofs_decompress_frontend *f,
- 	struct block_device *last_bdev;
- 	unsigned int nr_bios = 0;
- 	struct bio *bio = NULL;
--	/* initialize to 1 to make skip psi_memstall_leave unless needed */
--	unsigned long pflags = 1;
-+	unsigned long pflags;
-+	int memstall = 0;
- 
- 	bi_private = jobqueueset_init(sb, q, fgq, force_fg);
- 	qtail[JQ_BYPASS] = &q[JQ_BYPASS]->head;
-@@ -1463,14 +1463,18 @@ static void z_erofs_submit_queue(struct z_erofs_decompress_frontend *f,
- 			if (bio && (cur != last_index + 1 ||
- 				    last_bdev != mdev.m_bdev)) {
- submit_bio_retry:
--				if (!pflags)
--					psi_memstall_leave(&pflags);
- 				submit_bio(bio);
-+				if (memstall) {
-+					psi_memstall_leave(&pflags);
-+					memstall = 0;
-+				}
- 				bio = NULL;
- 			}
- 
--			if (unlikely(PageWorkingset(page)))
-+			if (unlikely(PageWorkingset(page)) && !memstall) {
- 				psi_memstall_enter(&pflags);
-+				memstall = 1;
-+			}
- 
- 			if (!bio) {
- 				bio = bio_alloc(mdev.m_bdev, BIO_MAX_VECS,
-@@ -1500,9 +1504,9 @@ static void z_erofs_submit_queue(struct z_erofs_decompress_frontend *f,
- 	} while (owned_head != Z_EROFS_PCLUSTER_TAIL);
- 
- 	if (bio) {
--		if (!pflags)
--			psi_memstall_leave(&pflags);
- 		submit_bio(bio);
-+		if (memstall)
-+			psi_memstall_leave(&pflags);
- 	}
- 
- 	/*
--- 
-2.38.1
+Mikulas
 
