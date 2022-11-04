@@ -2,162 +2,149 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD6F7C433FE
-	for <linux-block@archiver.kernel.org>; Fri,  4 Nov 2022 18:23:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C4872C4332F
+	for <linux-block@archiver.kernel.org>; Fri,  4 Nov 2022 18:52:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231204AbiKDSXQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 4 Nov 2022 14:23:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41488 "EHLO
+        id S229536AbiKDSwR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 4 Nov 2022 14:52:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37752 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232007AbiKDSW7 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Nov 2022 14:22:59 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9918825C42
-        for <linux-block@vger.kernel.org>; Fri,  4 Nov 2022 11:21:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1667586063;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=PjL1+H6RuB7jMr/6XEfK1aTzhYLFDKOwXB8sr3ps4w8=;
-        b=bpOAy8VZaGLLKR3u7Y42mKoTA5coS8qvbeF0/m37WvMvibU396jq01xLnmmLR63FYjB45t
-        Nd/dW5qiQIyyn/LVxomr7MjjuW1Q22m2SeSA7P83VLHOnIZ6dnRIEUTU9QaMvECDZgviXQ
-        23bXm7ki5qsZ82b4ylo3QwGqtT3ULlA=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-646-mcELFn2KNKet6HaMbpKa7g-1; Fri, 04 Nov 2022 14:20:58 -0400
-X-MC-Unique: mcELFn2KNKet6HaMbpKa7g-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 17FED185A78F;
-        Fri,  4 Nov 2022 18:20:58 +0000 (UTC)
-Received: from llong.com (unknown [10.22.34.155])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 9DD9CC15BA5;
-        Fri,  4 Nov 2022 18:20:57 +0000 (UTC)
-From:   Waiman Long <longman@redhat.com>
-To:     Tejun Heo <tj@kernel.org>, Jens Axboe <axboe@kernel.dk>
-Cc:     cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        =?UTF-8?q?Michal=20Koutn=C3=BD?= <mkoutny@suse.com>,
-        Hillf Danton <hdanton@sina.com>,
-        Waiman Long <longman@redhat.com>
-Subject: [PATCH v9 3/3] blk-cgroup: Flush stats at blkgs destruction path
-Date:   Fri,  4 Nov 2022 14:20:50 -0400
-Message-Id: <20221104182050.342908-4-longman@redhat.com>
-In-Reply-To: <20221104182050.342908-1-longman@redhat.com>
-References: <20221104182050.342908-1-longman@redhat.com>
+        with ESMTP id S229516AbiKDSwQ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Nov 2022 14:52:16 -0400
+Received: from mailout2.w2.samsung.com (mailout2.w2.samsung.com [211.189.100.12])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 824C44047B
+        for <linux-block@vger.kernel.org>; Fri,  4 Nov 2022 11:52:13 -0700 (PDT)
+Received: from uscas1p2.samsung.com (unknown [182.198.245.207])
+        by mailout2.w2.samsung.com (KnoxPortal) with ESMTP id 20221104185209usoutp02c1c66a64f69b92d8a9989a862fdf5017~kdmLnEImq2106321063usoutp02o;
+        Fri,  4 Nov 2022 18:52:09 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w2.samsung.com 20221104185209usoutp02c1c66a64f69b92d8a9989a862fdf5017~kdmLnEImq2106321063usoutp02o
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1667587929;
+        bh=NOuBQosli2Y48f3Blx3x6jaEx4SXjcNBtv1ClVgFYcg=;
+        h=From:To:CC:Subject:Date:In-Reply-To:References:From;
+        b=rhCqRxgYMuO9DC2ceXwIipbgzpxb+lvCAA+pHivF4wux/gokYelhFnrrmoJX52LDn
+         wULmZ2HU+arZFjkDY4NXBNa3dXsyqq7WfJM/VaWidk7Gz9Rzq+EoNcRJEqybRskE+o
+         sYcsk4M3SOxw4wgefQcXTLlVnp+yzcO9SiiIeyUs=
+Received: from ussmges1new.samsung.com (u109.gpu85.samsung.co.kr
+        [203.254.195.109]) by uscas1p2.samsung.com (KnoxPortal) with ESMTP id
+        20221104185208uscas1p234b1e82577d2a0bc011d25b4863ee7ba~kdmLaA36o2181321813uscas1p2D;
+        Fri,  4 Nov 2022 18:52:08 +0000 (GMT)
+Received: from uscas1p2.samsung.com ( [182.198.245.207]) by
+        ussmges1new.samsung.com (USCPEMTA) with SMTP id 50.F6.65516.85F55636; Fri, 
+        4 Nov 2022 14:52:08 -0400 (EDT)
+Received: from ussmgxs1new.samsung.com (u89.gpu85.samsung.co.kr
+        [203.254.195.89]) by uscas1p2.samsung.com (KnoxPortal) with ESMTP id
+        20221104185208uscas1p21733e4e32f43eeb836b7290e6b293fb9~kdmLA5l5d2209322093uscas1p2-;
+        Fri,  4 Nov 2022 18:52:08 +0000 (GMT)
+X-AuditID: cbfec36d-5b5ff7000000ffec-12-63655f5853a2
+Received: from SSI-EX3.ssi.samsung.com ( [105.128.2.145]) by
+        ussmgxs1new.samsung.com (USCPEXMTA) with SMTP id 45.9D.19363.85F55636; Fri, 
+        4 Nov 2022 14:52:08 -0400 (EDT)
+Received: from SSI-EX3.ssi.samsung.com (105.128.2.228) by
+        SSI-EX3.ssi.samsung.com (105.128.2.228) with Microsoft SMTP Server
+        (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+        15.1.2375.24; Fri, 4 Nov 2022 11:52:07 -0700
+Received: from SSI-EX3.ssi.samsung.com ([105.128.5.228]) by
+        SSI-EX3.ssi.samsung.com ([105.128.5.228]) with mapi id 15.01.2375.024; Fri,
+        4 Nov 2022 11:52:07 -0700
+From:   Vincent Fu <vincent.fu@samsung.com>
+To:     "kch@nvidia.com" <kch@nvidia.com>,
+        Chaitanya Kulkarni <chaitanyak@nvidia.com>
+CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Vincent Fu <vincent.fu@samsung.com>
+Subject: Re: [PATCH] null_blk: allow REQ_OP_ZONE_RESET_ALL to configure
+Thread-Topic: [PATCH] null_blk: allow REQ_OP_ZONE_RESET_ALL to configure
+Thread-Index: AQHY2UFSYtFTFOUz/kSMWiXi9o84464jQiiAgAgrVgCABFI4gA==
+Date:   Fri, 4 Nov 2022 18:52:07 +0000
+Message-ID: <20221104185124.181754-1-vincent.fu@samsung.com>
+In-Reply-To: <6270de4e-9f4a-fcfc-c4f1-d0ede32352bb@nvidia.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [105.128.2.176]
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <62AE1423D51C74469A24323CB731234E@ssi.samsung.com>
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
+X-CFilter-Loop: Reflected
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFmpnleLIzCtJLcpLzFFi42LZduzred2I+NRkg2OrLSzeH3zMavH06iwm
+        i723tB2YPXqb37F5fN4kF8AUxWWTkpqTWZZapG+XwJVxo2Ura0Evd0XD7dVsDYwzOLsYOTkk
+        BEwkPj5Zwd7FyMUhJLCSUeLJl+msEE4rk8Tzh7+ZYar2r3jNCJFYyyjxu3sfG4TzkVGiZdpm
+        FghnKaPErdPPgDIcHGwCmhJv9xeAdIsIBEvMebuVDcRmFkiT+ND8jBmkRFjAXeL+e12IEg+J
+        ix272SBsJ4nuLbvYQWwWARWJo0c2g9m8AjYSf1euZgWxOQXsJKY++coIYjMKiEl8P7WGCWK8
+        uMStJ/OZII4WlFg0ew/UA2IS/3Y9ZIOwFSXuf3/JDlGvI7Fg9yeo0+wklk78CzVHW2LZwtfM
+        EHsFJU7OfMIC0SspcXDFDbB3JQTmckh09K5jBPlFQsBFouGZPUSNtMTV61OZIWraGSXmbvwC
+        1TyBUeL6EykI21riX+c19gmMKrOQ3D0LyU2zkNw0C8lNs5DctICRdRWjeGlxcW56arFhXmq5
+        XnFibnFpXrpecn7uJkZgWjn973DuDsYdtz7qHWJk4mA8xCjBwawkwvtpW3KyEG9KYmVValF+
+        fFFpTmrxIUZpDhYlcd6oGVrJQgLpiSWp2ampBalFMFkmDk6pBqbVViu47xjobrvbGG4k8n3R
+        NZskI//JwSEHbznejv82K5n76ZXgR0/9LA6VPMtgv3jj8PawZzFNO//95RI6XXLoznxRt2iR
+        uQH6z7tSuGznmkVdu+nqtWDizqTdKlcOTLyXeMw781f9Ecb2chfDSdtPm/814ItIbfHQeOr8
+        QC+6zozLpf7CZOZ5nCdUf+74G857zdn+3EHmj1pWOTZ5uhJ5ESyxr5KznjDp2VmK7M+OsXzM
+        fvHdUgOp/PUXWq4ZCUVoR10SMFeqqZyseMXuXu3uxBnnsw+wPDpyY/rmvBtNL6v23KmZe+X9
+        lpAJghYTbMrmqzJHv9m+qzA64M2mLrO1P7bulXs0q8WmT++55jslluKMREMt5qLiRABZlAsC
+        mgMAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFlrKIsWRmVeSWpSXmKPExsWS2cA0UTciPjXZ4NcZGYv3Bx+zWjy9OovJ
+        Yu8tbQdmj97md2wenzfJBTBFcdmkpOZklqUW6dslcGXcaNnKWtDLXdFwezVbA+MMzi5GTg4J
+        AROJ/SteM3YxcnEICaxmlFg4/R0LhPORUWLn1s1QzlJGiU+3fzN3MXJwsAloSrzdXwDSLSIQ
+        LDHn7VY2EJtZIE3iQ/MzsBJhAXeJ++91IUo8JC527GaDsJ0kurfsYgexWQRUJI4e2Qxm8wrY
+        SPxduZoVYtVbRolXX2czgiQ4Bewkpj75CmYzCohJfD+1hglil7jErSfzmSA+EJBYsuc8M4Qt
+        KvHy8T9WCFtR4v73l+wQ9ToSC3Z/grrTTmLpxL9Qc7Qlli18zQxxhKDEyZlPWCB6JSUOrrjB
+        MoFRYhaSdbOQjJqFZNQsJKNmIRm1gJF1FaN4aXFxbnpFsWFearlecWJucWleul5yfu4mRmBM
+        nv53OHIH49FbH/UOMTJxMB5ilOBgVhLh/bQtOVmINyWxsiq1KD++qDQntfgQozQHi5I4r5Dr
+        xHghgfTEktTs1NSC1CKYLBMHp1QD05WzU5n+pn9fyemgVWJtwjvryY21MSHXXv9fn3JSTb4v
+        LOK0TuTvouiIpI3e86yNP5UuNF0/K3bd30116QbCFsFTu3wWMW5YEHM6007s5tqHck9ec55w
+        E99g8I63WsZcy/htWVlz8MfyBI7Lrzpy1zB8cZVmvROpuWp+q3ivQbBYwRNJPzOXvRyr12u6
+        def5zRexXFCwIur+1JnVHIUMEg3GjjErp4cH33i6UnRKZgLfwadJSX4yuizLBToma/6VtfEV
+        9DnxpjxewN46qP/eUzuDx2XbHlSsePjl3wVJpr9yr8z9wubd6FmnfPXFWekK5w/T5iVOPLX3
+        fnfYaqbpzgvvmIu/1ZrgYzatuXiyEktxRqKhFnNRcSIA5Zs52zgDAAA=
+X-CMS-MailID: 20221104185208uscas1p21733e4e32f43eeb836b7290e6b293fb9
+CMS-TYPE: 301P
+X-CMS-RootMailID: 20221027200756uscas1p206196106ee2224a7653f1f2bc7ba31e9
+References: <20221006050514.5564-1-kch@nvidia.com>
+        <CGME20221027200756uscas1p206196106ee2224a7653f1f2bc7ba31e9@uscas1p2.samsung.com>
+        <20221027200654.147600-1-vincent.fu@samsung.com>
+        <6270de4e-9f4a-fcfc-c4f1-d0ede32352bb@nvidia.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-As noted by Michal, the blkg_iostat_set's in the lockless list
-hold reference to blkg's to protect against their removal. Those
-blkg's hold reference to blkcg. When a cgroup is being destroyed,
-cgroup_rstat_flush() is only called at css_release_work_fn() which is
-called when the blkcg reference count reaches 0. This circular dependency
-will prevent blkcg from being freed until some other events cause
-cgroup_rstat_flush() to be called to flush out the pending blkcg stats.
+On Wed, Nov 02, 2022 at 12:52:06AM +0000, Chaitanya Kulkarni wrote:
+>On 10/27/22 13:07, Vincent Fu wrote:
+>> On Wed, Oct 05, 2022 at 10:05:13PM -0700, Chaitanya Kulkarni wrote:
+>>> For a Zoned Block Device zone reset all is emulated if underlaying
+>>> device doesn't support REQ_OP_ZONE_RESET_ALL operation. In null_blk
+>>> Zoned mode there is no way to test zone reset all emulation present in
+>>> the block layer since we enable it by default :-
+>>>
+>>> blkdev_zone_mgmt()
+>>> blkdev_zone_reset_all_emulation() <---
+>>> blkdev_zone_reset_all()
+>>>
+>>> Add a module parameter zone_reset_all to enable or disable
+>>> REQ_OP_ZONE_RESET_ALL, enable it by default to retain the existing
+>>> behaviour.
+>>>
+>>> Signed-off-by: Chaitanya Kulkarni <kch@nvidia.com>
+>>
+>> For the sake of completeness would it be reasonable to also provide a
+>> means to set this option via configfs?
+>>
+>> Vincent
+>
+>I deliberately avoided that as I don't see any need for it as of now.
+>but if it is a hard requirement I Can certainly send V2 with configfs
+>param.
+>
+>-ck
 
-To prevent this delayed blkcg removal, add a new cgroup_rstat_css_flush()
-function to flush stats for a given css and cpu and call it at the blkgs
-destruction path, blkcg_destroy_blkgs(), whenever there are still some
-pending stats to be flushed. This will ensure that blkcg reference
-count can reach 0 ASAP.
+I think the default should be to have features available as both module
+options and via configfs unless there are good reasons to make an
+exception.
 
-Signed-off-by: Waiman Long <longman@redhat.com>
----
- block/blk-cgroup.c     | 15 ++++++++++++++-
- include/linux/cgroup.h |  1 +
- kernel/cgroup/rstat.c  | 20 ++++++++++++++++++++
- 3 files changed, 35 insertions(+), 1 deletion(-)
+https://lore.kernel.org/linux-block/f0dadb60-c02d-d569-3004-81eafeebb95f@ke=
+rnel.dk/
+https://lore.kernel.org/linux-block/ca206223-112f-2d60-34a3-bb7e6295de7a@ke=
+rnel.dk/
 
-diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-index 3e03c0d13253..fa0a366e3476 100644
---- a/block/blk-cgroup.c
-+++ b/block/blk-cgroup.c
-@@ -1084,10 +1084,12 @@ struct list_head *blkcg_get_cgwb_list(struct cgroup_subsys_state *css)
-  */
- static void blkcg_destroy_blkgs(struct blkcg *blkcg)
- {
-+	int cpu;
-+
- 	might_sleep();
- 
-+	css_get(&blkcg->css);
- 	spin_lock_irq(&blkcg->lock);
--
- 	while (!hlist_empty(&blkcg->blkg_list)) {
- 		struct blkcg_gq *blkg = hlist_entry(blkcg->blkg_list.first,
- 						struct blkcg_gq, blkcg_node);
-@@ -1110,6 +1112,17 @@ static void blkcg_destroy_blkgs(struct blkcg *blkcg)
- 	}
- 
- 	spin_unlock_irq(&blkcg->lock);
-+
-+	/*
-+	 * Flush all the non-empty percpu lockless lists.
-+	 */
-+	for_each_possible_cpu(cpu) {
-+		struct llist_head *lhead = per_cpu_ptr(blkcg->lhead, cpu);
-+
-+		if (!llist_empty(lhead))
-+			cgroup_rstat_css_flush(&blkcg->css, cpu);
-+	}
-+	css_put(&blkcg->css);
- }
- 
- /**
-diff --git a/include/linux/cgroup.h b/include/linux/cgroup.h
-index 528bd44b59e2..4a61cc5d1952 100644
---- a/include/linux/cgroup.h
-+++ b/include/linux/cgroup.h
-@@ -766,6 +766,7 @@ void cgroup_rstat_flush(struct cgroup *cgrp);
- void cgroup_rstat_flush_irqsafe(struct cgroup *cgrp);
- void cgroup_rstat_flush_hold(struct cgroup *cgrp);
- void cgroup_rstat_flush_release(void);
-+void cgroup_rstat_css_flush(struct cgroup_subsys_state *css, int cpu);
- 
- /*
-  * Basic resource stats.
-diff --git a/kernel/cgroup/rstat.c b/kernel/cgroup/rstat.c
-index 793ecff29038..28033190fb29 100644
---- a/kernel/cgroup/rstat.c
-+++ b/kernel/cgroup/rstat.c
-@@ -281,6 +281,26 @@ void cgroup_rstat_flush_release(void)
- 	spin_unlock_irq(&cgroup_rstat_lock);
- }
- 
-+/**
-+ * cgroup_rstat_css_flush - flush stats for the given css and cpu
-+ * @css: target css to be flush
-+ * @cpu: the cpu that holds the stats to be flush
-+ *
-+ * A lightweight rstat flush operation for a given css and cpu.
-+ * Only the cpu_lock is being held for mutual exclusion, the cgroup_rstat_lock
-+ * isn't used.
-+ */
-+void cgroup_rstat_css_flush(struct cgroup_subsys_state *css, int cpu)
-+{
-+	raw_spinlock_t *cpu_lock = per_cpu_ptr(&cgroup_rstat_cpu_lock, cpu);
-+
-+	raw_spin_lock_irq(cpu_lock);
-+	rcu_read_lock();
-+	css->ss->css_rstat_flush(css, cpu);
-+	rcu_read_unlock();
-+	raw_spin_unlock_irq(cpu_lock);
-+}
-+
- int cgroup_rstat_init(struct cgroup *cgrp)
- {
- 	int cpu;
--- 
-2.31.1
-
+Vincent=
