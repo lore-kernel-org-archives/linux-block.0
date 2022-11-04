@@ -2,240 +2,193 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 78F47C4321E
-	for <linux-block@archiver.kernel.org>; Fri,  4 Nov 2022 23:34:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B09B4C433FE
+	for <linux-block@archiver.kernel.org>; Fri,  4 Nov 2022 23:37:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229479AbiKDXep (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 4 Nov 2022 19:34:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56244 "EHLO
+        id S229587AbiKDXhc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 4 Nov 2022 19:37:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57954 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229445AbiKDXep (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Nov 2022 19:34:45 -0400
-Received: from mail-oa1-x30.google.com (mail-oa1-x30.google.com [IPv6:2001:4860:4864:20::30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3F2D26117;
-        Fri,  4 Nov 2022 16:34:43 -0700 (PDT)
-Received: by mail-oa1-x30.google.com with SMTP id 586e51a60fabf-13be3ef361dso7118980fac.12;
-        Fri, 04 Nov 2022 16:34:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=6hvd6urNEa2bZ2TTknP5YJ+H72Ja2eceUu/0SfBV1dc=;
-        b=Jg8jucXtBJP8myrTJM3z0Wltiv65Ikg/KpM2vg9+TBoUW8c9U6W60sIjrbQ9g2FcCc
-         31LubanrKiS7Sxd3jWqCYjN51E7mjzHAKTsl2yG3a+PmWqITk6B5s+HGczlPeMYiJFrb
-         vBZoQtVDG0kLRBI424jNNGG2b2bDrcM9K1WztoTH0rQVEK4L8GAlPvrCSGnj6IlV9xUa
-         XQ46HitYNVXogafALOjhYHs25Hj1J/FbNvVDg+CD68rFnvYhDXkugu2K8l076C7M7TZq
-         Qr6xjmcHk7Gk4pAipfE4FkxiMKzRcyJTcom7FrkAkJoEkKmmujHBgxhv3f/neLNWJFlx
-         4OcQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=6hvd6urNEa2bZ2TTknP5YJ+H72Ja2eceUu/0SfBV1dc=;
-        b=X5cKH3F/66QouUPW6NBBA75UrBnbuk/XBDybvyEhkVZT3NRqDW6Lo980Sw/d8jB6Di
-         abIqXu3S+1VtuD2JKDUj7UYYIedXqzmm2arnsEjxHMw1gtiQyC7dzR3xWnI0MMc7xLnX
-         vw3C5ZTMFXSmFhy9oJR19PP6GjG+RyR8KJDp+2tC30j6jNhtZ/T09pLn0AvqWS/89y50
-         IRoQFqpy3DWqRKZWRx8lhC2uDzja2L2B4sQSht5toOqh15uSeejvPcBbaB9KD5wChq08
-         5Vm94hy/LSjNrDn+gU20+9q1akQiy5FaWJFjcTCpynnOVxMj51sTXqh6Kowfzub0pIke
-         jaNg==
-X-Gm-Message-State: ACrzQf0ktMf5+p73LsbFHoq6Ni0Je6tYlC4T/L7ojglKMcwnF/cpa4wf
-        +xVNPPnUNPXjaHRyrepWVHOdREHU5y8=
-X-Google-Smtp-Source: AMsMyM7MF9Q/Pp9YnJEtGj4XwhLtYIPmz5/gJtrzdgqLYVrzm8NOvh6bI3lkPYE6537XupHrGdc+uQ==
-X-Received: by 2002:a05:6870:6717:b0:13d:8222:329e with SMTP id gb23-20020a056870671700b0013d8222329emr7986841oab.128.1667604883046;
-        Fri, 04 Nov 2022 16:34:43 -0700 (PDT)
-Received: from server.roeck-us.net ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
-        by smtp.gmail.com with ESMTPSA id w29-20020a056870339d00b0011e37fb5493sm183421oae.30.2022.11.04.16.34.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 04 Nov 2022 16:34:41 -0700 (PDT)
-Sender: Guenter Roeck <groeck7@gmail.com>
-Date:   Fri, 4 Nov 2022 16:34:40 -0700
-From:   Guenter Roeck <linux@roeck-us.net>
-To:     Steven Rostedt <rostedt@goodmis.org>
-Cc:     linux-kernel@vger.kernel.org,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Stephen Boyd <sboyd@kernel.org>,
-        Anna-Maria Gleixner <anna-maria@linutronix.de>,
-        Andrew Morton <akpm@linux-foundation.org>, rcu@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-s390@vger.kernel.org,
-        linux-sh@vger.kernel.org, linux-edac@vger.kernel.org,
-        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-acpi@vger.kernel.org,
-        linux-atm-general@lists.sourceforge.net, netdev@vger.kernel.org,
-        linux-pm@vger.kernel.org, drbd-dev@lists.linbit.com,
-        linux-bluetooth@vger.kernel.org,
-        openipmi-developer@lists.sourceforge.net,
-        linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
-        linaro-mm-sig@lists.linaro.org, intel-gfx@lists.freedesktop.org,
-        linux-input@vger.kernel.org, linux-parisc@vger.kernel.org,
-        linux-leds@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
-        linux-usb@vger.kernel.org, linux-wireless@vger.kernel.org,
-        linux-scsi@vger.kernel.org, linux-staging@lists.linux.dev,
-        linux-ext4@vger.kernel.org, linux-nilfs@vger.kernel.org,
-        bridge@lists.linux-foundation.org, netfilter-devel@vger.kernel.org,
-        coreteam@netfilter.org, lvs-devel@vger.kernel.org,
-        linux-afs@lists.infradead.org, linux-nfs@vger.kernel.org,
-        tipc-discussion@lists.sourceforge.net, alsa-devel@alsa-project.org
-Subject: Re: [RFC][PATCH v3 00/33] timers: Use timer_shutdown*() before
- freeing timers
-Message-ID: <20221104233440.GA2443898@roeck-us.net>
-References: <20221104054053.431922658@goodmis.org>
+        with ESMTP id S229517AbiKDXhb (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Nov 2022 19:37:31 -0400
+Received: from wout3-smtp.messagingengine.com (wout3-smtp.messagingengine.com [64.147.123.19])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DFF2E26117;
+        Fri,  4 Nov 2022 16:37:27 -0700 (PDT)
+Received: from compute1.internal (compute1.nyi.internal [10.202.2.41])
+        by mailout.west.internal (Postfix) with ESMTP id 0E06832008FB;
+        Fri,  4 Nov 2022 19:37:24 -0400 (EDT)
+Received: from mailfrontend2 ([10.202.2.163])
+  by compute1.internal (MEProxy); Fri, 04 Nov 2022 19:37:25 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fastmail.fm; h=
+        cc:cc:content-transfer-encoding:content-type:date:date:from:from
+        :in-reply-to:in-reply-to:message-id:mime-version:references
+        :reply-to:sender:subject:subject:to:to; s=fm1; t=1667605044; x=
+        1667691444; bh=KPSj58myQkOWoEMJnn+Mf3F8dNGI3qP/0VDwKyDorz0=; b=h
+        hfOv2yw3rF4PWlowL6L1d88Kh1z02uXbUQ1RaWnFSmMgauOUFqO/HzAl40VJc+Iq
+        qA9DIVVcL3RPScaZS7cUNCr9ihPV7IvdUsPtH9vPBoXSIfB0vOOD7YjjrKTOG11o
+        rStzQeNwRuXNLHNlczO3tlBkGw8wlPO4lnvscup7SOl9ef188JeNK5ru+D5j9DtS
+        XvjXfUyEEEEaxSYOtz4AX1yBsd9/bGQoW3705kEicfRaWKg2HfwIyVbT9J+koonV
+        JT1Pai6SXaomRAFlmlIjcrTXpEpPCT8SfCwDH/XksrzPFNvoi/L8ES6nCs7qpox4
+        xAYZ9uB/YAJaAq+46ye3w==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:cc:content-transfer-encoding
+        :content-type:date:date:feedback-id:feedback-id:from:from
+        :in-reply-to:in-reply-to:message-id:mime-version:references
+        :reply-to:sender:subject:subject:to:to:x-me-proxy:x-me-proxy
+        :x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1667605044; x=
+        1667691444; bh=KPSj58myQkOWoEMJnn+Mf3F8dNGI3qP/0VDwKyDorz0=; b=S
+        XQN2VEuWylrzlq+TNLLhv5pcrXqlcvxLsE9vac+kngk5ISsp3X5ZKqPuO/JVNA5x
+        oavsCVbtyf4j0Onvsy6ror852I/v5LMGMNOE8+XWL0wIpsCjvijHZa61bMq5WKCL
+        BEpX9eLePIsaZQtJ7JyrggTqRfra0dDb0AEQZgrZuPMqMrPMGg7fFkYGnsdgMS0D
+        BltXpx46eS99apnjdUV4/X+yHEJrytz97X/CJUj8sLd/cq5vRMCm55Ab/AsqKOwR
+        BYn6zD6Fs568uQ8ZzJRrnkjXo4lKHlCwv8Qf09FqRgOEB4racW+0LLVqpsiVfdOS
+        DaDpSjBov4MJ/HNDUWVkg==
+X-ME-Sender: <xms:NKJlY7_-2A2kteFlgTn4e_7EEo6QwBtytHdzvl4gNQYv0dxPWeVZcA>
+    <xme:NKJlY3stTpxcKG32pLzh8AGi79o5Oex0tmPlvJVIVMK5igxWKbP0NdNxl8lc65c3f
+    3Wo2Guk2xBLOfNj>
+X-ME-Received: <xmr:NKJlY5A36liqmk8HqHmVO57GmwFmzJhewcKGLR2rG739l1n00mA8jLOvlKKHbBqwGNX7mcizu-FbutkwOKSa589ORoHrrONAXbEEqvmjsDSoRbkAlktX>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvgedrvddvgdduudcutefuodetggdotefrodftvf
+    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
+    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
+    fjughrpefkffggfgfuvfevfhfhjggtgfesthejredttdefjeenucfhrhhomhepuegvrhhn
+    ugcuufgthhhusggvrhhtuceosggvrhhnugdrshgthhhusggvrhhtsehfrghsthhmrghilh
+    drfhhmqeenucggtffrrghtthgvrhhnpeeuudekheelkeejhedvvdeifedtueelieeiuddt
+    lefhveeuledugfeljeeviedtgfenucffohhmrghinhepghhithhhuhgsrdgtohhmnecuve
+    hluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepsggvrhhnugdr
+    shgthhhusggvrhhtsehfrghsthhmrghilhdrfhhm
+X-ME-Proxy: <xmx:NKJlY3d0SKcw6tQPE2KxiYKVibwWOL-iSqZ0Ena_I4AfZUEhv01ASA>
+    <xmx:NKJlYwNFdB78ZaixwJM58CtWzkNMM0L78CWTCgN3nMF3pJWRh-zsJw>
+    <xmx:NKJlY5mwLCeSRntx4BsZ-u1B2TTZG1FZk8VQpj9CTqkcvTBNmZjYnA>
+    <xmx:NKJlY3cMWvqBee2k0yG4N3xDMLGJwApMsdpcouJOIDuB7oDIsEaO7A>
+Feedback-ID: id8a24192:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
+ 4 Nov 2022 19:37:22 -0400 (EDT)
+Message-ID: <ead8a6cc-13eb-6dc0-2c17-a87e78d8a422@fastmail.fm>
+Date:   Sat, 5 Nov 2022 00:37:21 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221104054053.431922658@goodmis.org>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.3.3
+Subject: Re: [RFC PATCH 4/4] ublk_drv: support splice based read/write zero
+ copy
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org,
+        Miklos Szeredi <mszeredi@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        ZiyangZhang <ZiyangZhang@linux.alibaba.com>
+References: <20221103085004.1029763-1-ming.lei@redhat.com>
+ <20221103085004.1029763-5-ming.lei@redhat.com>
+ <712cd802-f3bb-9840-e334-385cd42325f2@fastmail.fm> <Y2Rgem8+oYafTLVO@T590>
+Content-Language: en-US
+From:   Bernd Schubert <bernd.schubert@fastmail.fm>
+In-Reply-To: <Y2Rgem8+oYafTLVO@T590>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Nov 04, 2022 at 01:40:53AM -0400, Steven Rostedt wrote:
+
+
+On 11/4/22 01:44, Ming Lei wrote:
+> On Thu, Nov 03, 2022 at 11:28:29PM +0100, Bernd Schubert wrote:
+>>
+>>
+>> On 11/3/22 09:50, Ming Lei wrote:
+>>> Pass ublk block IO request pages to kernel backend IO handling code via
+>>> pipe, and request page copy can be avoided. So far, the existed
+>>> pipe/splice mechanism works for handling write request only.
+>>>
+>>> The initial idea of using splice for zero copy is from Miklos and Stefan.
+>>>
+>>> Read request's zero copy requires pipe's change to allow one read end to
+>>> produce buffers for another read end to consume. The added SPLICE_F_READ_TO_READ
+>>> flag is for supporting this feature.
+>>>
+>>> READ is handled by sending IORING_OP_SPLICE with SPLICE_F_DIRECT |
+>>> SPLICE_F_READ_TO_READ. WRITE is handled by sending IORING_OP_SPLICE with
+>>> SPLICE_F_DIRECT. Kernel internal pipe is used for simplifying userspace,
+>>> meantime potential info leak could be avoided.
+>>
+>>
+>> Sorry to ask, do you have an ublk branch that gives an example how to use
+>> this?
 > 
-> Back in April, I posted an RFC patch set to help mitigate a common issue
-> where a timer gets armed just before it is freed, and when the timer
-> goes off, it crashes in the timer code without any evidence of who the
-> culprit was. I got side tracked and never finished up on that patch set.
-> Since this type of crash is still our #1 crash we are seeing in the field,
-> it has become a priority again to finish it.
+> Follows the ublk splice-zc branch:
 > 
+> https://github.com/ming1/ubdsrv/commits/splice-zc
+> 
+> which is mentioned in cover letter, but I guess it should be added to
+> here too, sorry for that, so far only ublk-loop supports it by:
+> 
+>     ublk add -t loop -f $BACKING -z
+> 
+> without '-z', ublk-loop is created with zero copy disabled.
 
-After applying the patches attached below, everything compiles for me,
-and there are no crashes. There are still various warnings, most in
-networking. I know I need to apply some patch(es) to fix the networking
-warnings, but I didn't entirely understand what exactly to apply, so
-I didn't try.
+Ah, thanks a lot! And sorry, I had missed this part in the cover letter.
 
-Complete logs are at https://kerneltests.org/builders, on the bottom half
-of the page (qemu tests, in the 'testing' column).
+I will take a look on your new zero copy code on Monday.
 
-Guenter
 
----
-Warnings:
+> 
+>>
+>> I still have several things to fix in my branches, but I got basic fuse
+>> uring with copies working. Adding back splice would be next after posting
+>> rfc patches. My initial assumption was that I needed to duplicate everything
+>> splice does into the fuse .uring_cmd handler - obviously there is a better
+>> way with your patches.
+>>
+>> This week I have a few days off, by end of next week or the week after I
+>> might have patches in an rfc state (one thing I'm going to ask about is how
+>> do I know what is the next CQE in the kernel handler - ublk does this with
+>> tags through mq, but I don't understand yet where the tag is increased and
+>> what the relation between tag and right CQE order is).
+> 
+> tag is one attribute of io request, which is originated from ublk
+> driver, and it is unique for each request among one queue. So ublksrv
+> won't change it at all, just use it, and ublk driver guarantees that
+> it is unique.
+> 
+> In ublkserv implementation, the tag info is set in cqe->user_data, so
+> we can retrieve the io request via tag part of cqe->user_data.
 
-ODEBUG: free active (active state 0) object type: timer_list hint: tcp_write_timer+0x0/0x1d0
-	from tcp_close -> __sk_destruct -> tcp_write_timer
+Yeah, this is the easy part I understood. At least I hope so :)
 
-ODEBUG: free active (active state 0) object type: timer_list hint: tcp_keepalive_timer+0x0/0x4c0
-	from tcp_close -> __sk_destruct -> tcp_keepalive_timer -> __del_timer_sync
+> 
+> Also I may not understand your question of 'the relation between tag and right
+> CQE order', io_uring provides IOSQE_IO_DRAIN/IOSQE_IO_LINK for ordering
+> SQE, and ublksrv only applies IOSQE_IO_LINK in ublk-qcow2, so care to
+> explain it in a bit details about the "the relation between tag and right
+> CQE order"?
 
-ODEBUG: free active (active state 0) object type: timer_list hint: blk_rq_timed_out_timer+0x0/0x40
-	blk_free_queue_rcu -> blk_free_queue_rcu -> blk_rq_timed_out_timer
 
----
-Changes applied on top of patch set to fix build errors:
+For fuse (kernel) a vfs request comes in and I need to choose a command 
+in the ring queue. Right now this is just an atomic counter % queue_size
 
-diff --git a/arch/arm/mach-spear/time.c b/arch/arm/mach-spear/time.c
-index e979e2197f8e..5371c824786d 100644
---- a/arch/arm/mach-spear/time.c
-+++ b/arch/arm/mach-spear/time.c
-@@ -90,7 +90,7 @@ static void __init spear_clocksource_init(void)
- 		200, 16, clocksource_mmio_readw_up);
- }
- 
--static inline void timer_shutdown(struct clock_event_device *evt)
-+static inline void spear_timer_shutdown(struct clock_event_device *evt)
- {
- 	u16 val = readw(gpt_base + CR(CLKEVT));
- 
-@@ -101,7 +101,7 @@ static inline void timer_shutdown(struct clock_event_device *evt)
- 
- static int spear_shutdown(struct clock_event_device *evt)
- {
--	timer_shutdown(evt);
-+	spear_timer_shutdown(evt);
- 
- 	return 0;
- }
-@@ -111,7 +111,7 @@ static int spear_set_oneshot(struct clock_event_device *evt)
- 	u16 val;
- 
- 	/* stop the timer */
--	timer_shutdown(evt);
-+	spear_timer_shutdown(evt);
- 
- 	val = readw(gpt_base + CR(CLKEVT));
- 	val |= CTRL_ONE_SHOT;
-@@ -126,7 +126,7 @@ static int spear_set_periodic(struct clock_event_device *evt)
- 	u16 val;
- 
- 	/* stop the timer */
--	timer_shutdown(evt);
-+	spear_timer_shutdown(evt);
- 
- 	period = clk_get_rate(gpt_clk) / HZ;
- 	period >>= CTRL_PRESCALER16;
-diff --git a/drivers/clocksource/arm_arch_timer.c b/drivers/clocksource/arm_arch_timer.c
-index a7ff77550e17..9c3420a0d19d 100644
---- a/drivers/clocksource/arm_arch_timer.c
-+++ b/drivers/clocksource/arm_arch_timer.c
-@@ -687,8 +687,8 @@ static irqreturn_t arch_timer_handler_virt_mem(int irq, void *dev_id)
- 	return timer_handler(ARCH_TIMER_MEM_VIRT_ACCESS, evt);
- }
- 
--static __always_inline int timer_shutdown(const int access,
--					  struct clock_event_device *clk)
-+static __always_inline int arch_timer_shutdown(const int access,
-+					       struct clock_event_device *clk)
- {
- 	unsigned long ctrl;
- 
-@@ -701,22 +701,22 @@ static __always_inline int timer_shutdown(const int access,
- 
- static int arch_timer_shutdown_virt(struct clock_event_device *clk)
- {
--	return timer_shutdown(ARCH_TIMER_VIRT_ACCESS, clk);
-+	return arch_timer_shutdown(ARCH_TIMER_VIRT_ACCESS, clk);
- }
- 
- static int arch_timer_shutdown_phys(struct clock_event_device *clk)
- {
--	return timer_shutdown(ARCH_TIMER_PHYS_ACCESS, clk);
-+	return arch_timer_shutdown(ARCH_TIMER_PHYS_ACCESS, clk);
- }
- 
- static int arch_timer_shutdown_virt_mem(struct clock_event_device *clk)
- {
--	return timer_shutdown(ARCH_TIMER_MEM_VIRT_ACCESS, clk);
-+	return arch_timer_shutdown(ARCH_TIMER_MEM_VIRT_ACCESS, clk);
- }
- 
- static int arch_timer_shutdown_phys_mem(struct clock_event_device *clk)
- {
--	return timer_shutdown(ARCH_TIMER_MEM_PHYS_ACCESS, clk);
-+	return arch_timer_shutdown(ARCH_TIMER_MEM_PHYS_ACCESS, clk);
- }
- 
- static __always_inline void set_next_event(const int access, unsigned long evt,
-diff --git a/drivers/clocksource/timer-sp804.c b/drivers/clocksource/timer-sp804.c
-index e6a87f4af2b5..a3c38e1343f0 100644
---- a/drivers/clocksource/timer-sp804.c
-+++ b/drivers/clocksource/timer-sp804.c
-@@ -155,14 +155,14 @@ static irqreturn_t sp804_timer_interrupt(int irq, void *dev_id)
- 	return IRQ_HANDLED;
- }
- 
--static inline void timer_shutdown(struct clock_event_device *evt)
-+static inline void sp804_timer_shutdown(struct clock_event_device *evt)
- {
- 	writel(0, common_clkevt->ctrl);
- }
- 
- static int sp804_shutdown(struct clock_event_device *evt)
- {
--	timer_shutdown(evt);
-+	sp804_timer_shutdown(evt);
- 	return 0;
- }
- 
-@@ -171,7 +171,7 @@ static int sp804_set_periodic(struct clock_event_device *evt)
- 	unsigned long ctrl = TIMER_CTRL_32BIT | TIMER_CTRL_IE |
- 			     TIMER_CTRL_PERIODIC | TIMER_CTRL_ENABLE;
- 
--	timer_shutdown(evt);
-+	sp804_timer_shutdown(evt);
- 	writel(common_clkevt->reload, common_clkevt->load);
- 	writel(ctrl, common_clkevt->ctrl);
- 	return 0;
+fuse_request_alloc_ring()
+	req_cnt = atomic_inc_return(&queue->req_cnt);
+	tag = req_cnt & (fc->ring.queue_depth - 1); /* cnt % queue_depth */
+
+	ring_req = &queue->ring_req[tag];
+
+
+
+I might be wrong, but I think that can be compared a bit to 
+ublk_queue_rq(). Looks like ublk_queue_rq gets called in blk-mq context 
+and blk-mq seems to provide rq->tag, which then determines the command 
+in the ring queue - completion of commands is done in tag-order provided 
+by blk-mq? The part I didn't figure out yet is where the tag value gets set.
+Also interesting is that there is no handler if the ring is already full 
+- like the ublk_io command is currently busy in ublksrv (user space). 
+Handled auto-magically with blk-mq?
+This is one of the parts not handled in my fuse code yet and my current 
+plan is to have a request queue on top of the (per core) ring queues. 
+Similar to the existing fuse request queue, just not one, but per ring 
+queue and processed by the ring queue. Unless there is a better way - 
+which is another reason to understand how ublk handles this.
+
+
+Thanks,
+Bernd
 
