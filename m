@@ -2,51 +2,56 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C0BA8C43217
-	for <linux-block@archiver.kernel.org>; Fri,  4 Nov 2022 02:18:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C3394C4167B
+	for <linux-block@archiver.kernel.org>; Fri,  4 Nov 2022 02:18:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231136AbiKDCSC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 3 Nov 2022 22:18:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59536 "EHLO
+        id S231294AbiKDCSF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 3 Nov 2022 22:18:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59538 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230377AbiKDCSB (ORCPT
+        with ESMTP id S230388AbiKDCSB (ORCPT
         <rfc822;linux-block@vger.kernel.org>); Thu, 3 Nov 2022 22:18:01 -0400
 Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8AC17388A;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F0A122DF4;
         Thu,  3 Nov 2022 19:17:59 -0700 (PDT)
 Received: from mail02.huawei.com (unknown [172.30.67.143])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4N3PNT4Y5rzKKd9;
-        Fri,  4 Nov 2022 10:15:21 +0800 (CST)
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4N3PNV3VVwzKKPM;
+        Fri,  4 Nov 2022 10:15:22 +0800 (CST)
 Received: from huaweicloud.com (unknown [10.175.127.227])
-        by APP2 (Coremail) with SMTP id Syh0CgB3D9RTdmRjDShNBQ--.16192S4;
-        Fri, 04 Nov 2022 10:17:57 +0800 (CST)
+        by APP2 (Coremail) with SMTP id Syh0CgB3D9RTdmRjDShNBQ--.16192S6;
+        Fri, 04 Nov 2022 10:17:58 +0800 (CST)
 From:   Yu Kuai <yukuai1@huaweicloud.com>
 To:     hch@lst.de, tj@kernel.org, josef@toxicpanda.com, axboe@kernel.dk,
         yukuai3@huawei.com
 Cc:     cgroups@vger.kernel.org, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org, yukuai1@huaweicloud.com,
         yi.zhang@huawei.com
-Subject: [PATCH v2 0/5] blk-iocost: random patches to improve configuration
-Date:   Fri,  4 Nov 2022 10:39:33 +0800
-Message-Id: <20221104023938.2346986-1-yukuai1@huaweicloud.com>
+Subject: [PATCH v2 2/5] blk-iocost: improve hanlder of match_u64()
+Date:   Fri,  4 Nov 2022 10:39:35 +0800
+Message-Id: <20221104023938.2346986-3-yukuai1@huaweicloud.com>
 X-Mailer: git-send-email 2.31.1
+In-Reply-To: <20221104023938.2346986-1-yukuai1@huaweicloud.com>
+References: <20221104023938.2346986-1-yukuai1@huaweicloud.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: Syh0CgB3D9RTdmRjDShNBQ--.16192S4
-X-Coremail-Antispam: 1UD129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7v73
-        VFW2AGmfu7bjvjm3AaLaJ3UjIYCTnIWjp_UUUY27AC8VAFwI0_Gr0_Xr1l1xkIjI8I6I8E
-        6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28Cjx
-        kF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVWDJVCq3wA2z4x0Y4vE2Ix0cI8I
-        cVCY1x0267AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87
-        Iv6xkF7I0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE
-        6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72
-        CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7
-        M4IIrI8v6xkF7I0E8cxan2IY04v7MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r
-        1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CE
-        b7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0x
-        vE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw20EY4v20xvaj40_WFyUJVCq3wCI
-        42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r1j6r4UYxBIdaVFxh
-        VjvjDU0xZFpf9x0JUdHUDUUUUU=
+X-CM-TRANSID: Syh0CgB3D9RTdmRjDShNBQ--.16192S6
+X-Coremail-Antispam: 1UD129KBjvJXoW7Zry8Cw1xWF4kuF1DAw15CFg_yoW8CFy3pF
+        Wa9rZIqFy5Jrs2gFnrCFnF9a43C397tryfGayDGa4fJr17Jr9F9Fn5JryDJFy8JrWfGws0
+        gFnay3y8G3ZrCrJanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUBE14x267AKxVWrJVCq3wAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2048vs2IY020E87I2jVAFwI0_Jryl82xGYIkIc2
+        x26xkF7I0E14v26r4j6ryUM28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8wA2z4x0
+        Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j6F4UJw
+        A2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oVCq3wAS
+        0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2
+        IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0
+        Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2kIc2
+        xKxwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v2
+        6r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2
+        Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_
+        Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMI
+        IF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUc6pPUUUUU
+        =
 X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 X-CFilter-Loop: Reflected
 Precedence: bulk
@@ -55,21 +60,79 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Yu Kuai <yukuai3@huawei.com>
 
-Changes in v2:
- - add review tag from Christoph for patch 1-3
- - add a mutex to fix warnning as suggested by Christoph
- - add patch 5
+1) There are one place that return value of match_u64() is not checked.
+2) If match_u64() failed, return value is set to -EINVAL despite that
+   there are other possible errnos.
 
-Yu Kuai (5):
-  blk-iocost: cleanup ioc_qos_write() and ioc_cost_model_write()
-  blk-iocost: improve hanlder of match_u64()
-  blk-iocost: don't allow to configure bio based device
-  blk-iocost: fix sleeping in atomic context warnning
-  blk-iocost: read params inside lock in sysfs apis
+Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+---
+ block/blk-iocost.c | 22 +++++++++++++++++++---
+ 1 file changed, 19 insertions(+), 3 deletions(-)
 
- block/blk-iocost.c | 116 +++++++++++++++++++++++++++++----------------
- 1 file changed, 74 insertions(+), 42 deletions(-)
-
+diff --git a/block/blk-iocost.c b/block/blk-iocost.c
+index fd495e823db2..c532129a1456 100644
+--- a/block/blk-iocost.c
++++ b/block/blk-iocost.c
+@@ -3202,6 +3202,7 @@ static ssize_t ioc_qos_write(struct kernfs_open_file *of, char *input,
+ 		substring_t args[MAX_OPT_ARGS];
+ 		char buf[32];
+ 		int tok;
++		int err;
+ 		s64 v;
+ 
+ 		if (!*p)
+@@ -3209,7 +3210,12 @@ static ssize_t ioc_qos_write(struct kernfs_open_file *of, char *input,
+ 
+ 		switch (match_token(p, qos_ctrl_tokens, args)) {
+ 		case QOS_ENABLE:
+-			match_u64(&args[0], &v);
++			err = match_u64(&args[0], &v);
++			if (err) {
++				ret = err;
++				goto out_unlock;
++			}
++
+ 			enable = v;
+ 			continue;
+ 		case QOS_CTRL:
+@@ -3238,8 +3244,12 @@ static ssize_t ioc_qos_write(struct kernfs_open_file *of, char *input,
+ 			break;
+ 		case QOS_RLAT:
+ 		case QOS_WLAT:
+-			if (match_u64(&args[0], &v))
++			err = match_u64(&args[0], &v);
++			if (err) {
++				ret = err;
+ 				goto out_unlock;
++			}
++
+ 			qos[tok] = v;
+ 			break;
+ 		case QOS_MIN:
+@@ -3374,6 +3384,7 @@ static ssize_t ioc_cost_model_write(struct kernfs_open_file *of, char *input,
+ 		substring_t args[MAX_OPT_ARGS];
+ 		char buf[32];
+ 		int tok;
++		int err;
+ 		u64 v;
+ 
+ 		if (!*p)
+@@ -3399,8 +3410,13 @@ static ssize_t ioc_cost_model_write(struct kernfs_open_file *of, char *input,
+ 		tok = match_token(p, i_lcoef_tokens, args);
+ 		if (tok == NR_I_LCOEFS)
+ 			goto out_unlock;
+-		if (match_u64(&args[0], &v))
++
++		err = match_u64(&args[0], &v);
++		if (err) {
++			ret = err;
+ 			goto out_unlock;
++		}
++
+ 		u[tok] = v;
+ 		user = true;
+ 	}
 -- 
 2.31.1
 
