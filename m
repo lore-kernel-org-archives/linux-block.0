@@ -2,107 +2,61 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB275C43217
-	for <linux-block@archiver.kernel.org>; Fri,  4 Nov 2022 02:18:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB6D5C4332F
+	for <linux-block@archiver.kernel.org>; Fri,  4 Nov 2022 05:14:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231334AbiKDCSG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 3 Nov 2022 22:18:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59562 "EHLO
+        id S230127AbiKDFOm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 4 Nov 2022 01:14:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43146 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230435AbiKDCSC (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 3 Nov 2022 22:18:02 -0400
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5455A5588;
-        Thu,  3 Nov 2022 19:18:01 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.143])
-        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4N3PNY5tBpz6T2Y5;
-        Fri,  4 Nov 2022 10:15:25 +0800 (CST)
-Received: from huaweicloud.com (unknown [10.175.127.227])
-        by APP2 (Coremail) with SMTP id Syh0CgB3D9RTdmRjDShNBQ--.16192S9;
-        Fri, 04 Nov 2022 10:17:59 +0800 (CST)
-From:   Yu Kuai <yukuai1@huaweicloud.com>
-To:     hch@lst.de, tj@kernel.org, josef@toxicpanda.com, axboe@kernel.dk,
-        yukuai3@huawei.com
-Cc:     cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, yukuai1@huaweicloud.com,
-        yi.zhang@huawei.com
-Subject: [PATCH v2 5/5] blk-iocost: read params inside lock in sysfs apis
-Date:   Fri,  4 Nov 2022 10:39:38 +0800
-Message-Id: <20221104023938.2346986-6-yukuai1@huaweicloud.com>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20221104023938.2346986-1-yukuai1@huaweicloud.com>
-References: <20221104023938.2346986-1-yukuai1@huaweicloud.com>
+        with ESMTP id S229563AbiKDFOm (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Nov 2022 01:14:42 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7CDA126
+        for <linux-block@vger.kernel.org>; Thu,  3 Nov 2022 22:14:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=KtnH4lY7eWCbdXk4ptyVJPyTaXTOdaPt3O3731FV9hg=; b=hxMGLirp7MKACIB12emHuxiujU
+        2pDG1iyhaNmYKrVJRaftU3JHA4Mfy8bXgylUnse7+1wXwUZK9686wuUbxw5+rU4mEF9fbUMEoj3r7
+        CIwF/OMfM63VStvVHgIYlwdEdCr4t1XlhRH1vgGCREbuxzUE0BUM8JBOfnw6NO7cZHkT5vo+gkdGO
+        VVfOjQ5SQ/x7aBpDiyQWpNDajd/YiyPX7rtYcQGt8MEqBQvTM8lo6FifkkheK6mpaBWh6ezV94G7+
+        hR/GmKLV9k7T2wY3vj/diFfd1410serE39zs4NwFb1Ct2qjYedZ3YoBGc3551U1ZZ9cdAKKb7wZvJ
+        cSJDAtkA==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1oqp2M-002Q3k-4A; Fri, 04 Nov 2022 05:14:38 +0000
+Date:   Thu, 3 Nov 2022 22:14:38 -0700
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Keith Busch <kbusch@meta.com>
+Cc:     linux-block@vger.kernel.org, dm-devel@redhat.com, axboe@kernel.dk,
+        stefanha@redhat.com, ebiggers@kernel.org, me@demsh.org,
+        mpatocka@redhat.com, Keith Busch <kbusch@kernel.org>
+Subject: Re: [PATCH 1/3] block: make dma_alignment a stacking queue_limit
+Message-ID: <Y2Sfvk1EtG9XwxPC@infradead.org>
+References: <20221103152559.1909328-1-kbusch@meta.com>
+ <20221103152559.1909328-2-kbusch@meta.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: Syh0CgB3D9RTdmRjDShNBQ--.16192S9
-X-Coremail-Antispam: 1UD129KBjvJXoW7Zr1kXFWktr13tF4kZFyDAwb_yoW8Wr4xpF
-        Z0939rK3yFqr1xJF13tF4xXwn8C3yqgr4fXrsxuFyfAr9rZr1IqFsFkrW0kw48ZFWfC390
-        gFWagr4UCr45G37anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUPF14x267AKxVWrJVCq3wAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2048vs2IY020E87I2jVAFwI0_JF0E3s1l82xGYI
-        kIc2x26xkF7I0E14v26ryj6s0DM28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8wA2
-        z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j6F
-        4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oVCq
-        3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7
-        IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4U
-        M4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2
-        kIc2xKxwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E
-        14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIx
-        kGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUCVW8JwCI42IY6xIIjxv20xvEc7CjxVAF
-        wI0_Cr0_Gr1UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJV
-        W8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfUOBTY
-        UUUUU
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221103152559.1909328-2-kbusch@meta.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Yu Kuai <yukuai3@huawei.com>
+On Thu, Nov 03, 2022 at 08:25:57AM -0700, Keith Busch wrote:
+> From: Keith Busch <kbusch@kernel.org>
+> 
+> Device mappers had always been getting the default 511 dma mask, but
+> the underlying device might have a larger alignment requirement. Since
+> this value is used to determine alloweable direct-io alignment, this
+> needs to be a stackable limit.
 
-Otherwise, user might get abnormal values if params is updated
-concurrently.
+This can also remove the just added blk_queue_dma_alignment in
+nvme_mpath_alloc_disk again as it is right next to the
+blk_set_stacking_limits call.
 
-Signed-off-by: Yu Kuai <yukuai3@huawei.com>
----
- block/blk-iocost.c | 4 ++++
- 1 file changed, 4 insertions(+)
+Otherwise looks good:
 
-diff --git a/block/blk-iocost.c b/block/blk-iocost.c
-index 192ad4e0cfc6..7d682ce0bee6 100644
---- a/block/blk-iocost.c
-+++ b/block/blk-iocost.c
-@@ -3135,6 +3135,7 @@ static u64 ioc_qos_prfill(struct seq_file *sf, struct blkg_policy_data *pd,
- 	if (!dname)
- 		return 0;
- 
-+	mutex_lock(&ioc->params_mutex);
- 	seq_printf(sf, "%s enable=%d ctrl=%s rpct=%u.%02u rlat=%u wpct=%u.%02u wlat=%u min=%u.%02u max=%u.%02u\n",
- 		   dname, ioc->enabled, ioc->user_qos_params ? "user" : "auto",
- 		   ioc->params.qos[QOS_RPPM] / 10000,
-@@ -3147,6 +3148,7 @@ static u64 ioc_qos_prfill(struct seq_file *sf, struct blkg_policy_data *pd,
- 		   ioc->params.qos[QOS_MIN] % 10000 / 100,
- 		   ioc->params.qos[QOS_MAX] / 10000,
- 		   ioc->params.qos[QOS_MAX] % 10000 / 100);
-+	mutex_unlock(&ioc->params_mutex);
- 	return 0;
- }
- 
-@@ -3331,12 +3333,14 @@ static u64 ioc_cost_model_prfill(struct seq_file *sf,
- 	if (!dname)
- 		return 0;
- 
-+	mutex_lock(&ioc->params_mutex);
- 	seq_printf(sf, "%s ctrl=%s model=linear "
- 		   "rbps=%llu rseqiops=%llu rrandiops=%llu "
- 		   "wbps=%llu wseqiops=%llu wrandiops=%llu\n",
- 		   dname, ioc->user_cost_model ? "user" : "auto",
- 		   u[I_LCOEF_RBPS], u[I_LCOEF_RSEQIOPS], u[I_LCOEF_RRANDIOPS],
- 		   u[I_LCOEF_WBPS], u[I_LCOEF_WSEQIOPS], u[I_LCOEF_WRANDIOPS]);
-+	mutex_unlock(&ioc->params_mutex);
- 	return 0;
- }
- 
--- 
-2.31.1
-
+Reviewed-by: Christoph Hellwig <hch@lst.de>
