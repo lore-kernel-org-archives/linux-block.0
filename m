@@ -2,243 +2,240 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CF076C4332F
-	for <linux-block@archiver.kernel.org>; Fri,  4 Nov 2022 21:26:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78F47C4321E
+	for <linux-block@archiver.kernel.org>; Fri,  4 Nov 2022 23:34:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229746AbiKDV0A (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 4 Nov 2022 17:26:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38830 "EHLO
+        id S229479AbiKDXep (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 4 Nov 2022 19:34:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56244 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230078AbiKDVZz (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Nov 2022 17:25:55 -0400
-Received: from mail-qv1-xf2d.google.com (mail-qv1-xf2d.google.com [IPv6:2607:f8b0:4864:20::f2d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 967244E410
-        for <linux-block@vger.kernel.org>; Fri,  4 Nov 2022 14:25:46 -0700 (PDT)
-Received: by mail-qv1-xf2d.google.com with SMTP id ml12so4088151qvb.0
-        for <linux-block@vger.kernel.org>; Fri, 04 Nov 2022 14:25:46 -0700 (PDT)
+        with ESMTP id S229445AbiKDXep (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Nov 2022 19:34:45 -0400
+Received: from mail-oa1-x30.google.com (mail-oa1-x30.google.com [IPv6:2001:4860:4864:20::30])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3F2D26117;
+        Fri,  4 Nov 2022 16:34:43 -0700 (PDT)
+Received: by mail-oa1-x30.google.com with SMTP id 586e51a60fabf-13be3ef361dso7118980fac.12;
+        Fri, 04 Nov 2022 16:34:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=k0IwqT9TaepvC5EPk4FhSk8qn9R2SeNQfAmNwUdf1Gs=;
-        b=Tpw3Qz1SS3wQKYRGacEuCkYGPAfIoz5ubdN1Y34vs1v/+zLePcZc3jeUlZ207i9hj5
-         62RjP/MItH/ig0MU0UFESy2U/rE5trSLcpTwKjbct9Q38nPezu8JeFTlG2nA82OT5qlO
-         H2gMe3CqdF7PJwGbD4ko5Iz4AQqFRYJvaVCV2Ogs2GQagdKMvsWTPb9Xs0N1b4fZDFNk
-         zOT35soFtFRGkXcTBZ0TSD+5OUwWTlqzg53qXu7QyBZ2K1A9ZmZeOywBsEBe4DOluL1g
-         Rpo7PwUOXehhWQXcsvlklG++sRTEqEj51yIXKunA0RInlEjVdenCiVx1TB/+IKQOhRy6
-         BvEg==
+        d=gmail.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=6hvd6urNEa2bZ2TTknP5YJ+H72Ja2eceUu/0SfBV1dc=;
+        b=Jg8jucXtBJP8myrTJM3z0Wltiv65Ikg/KpM2vg9+TBoUW8c9U6W60sIjrbQ9g2FcCc
+         31LubanrKiS7Sxd3jWqCYjN51E7mjzHAKTsl2yG3a+PmWqITk6B5s+HGczlPeMYiJFrb
+         vBZoQtVDG0kLRBI424jNNGG2b2bDrcM9K1WztoTH0rQVEK4L8GAlPvrCSGnj6IlV9xUa
+         XQ46HitYNVXogafALOjhYHs25Hj1J/FbNvVDg+CD68rFnvYhDXkugu2K8l076C7M7TZq
+         Qr6xjmcHk7Gk4pAipfE4FkxiMKzRcyJTcom7FrkAkJoEkKmmujHBgxhv3f/neLNWJFlx
+         4OcQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=k0IwqT9TaepvC5EPk4FhSk8qn9R2SeNQfAmNwUdf1Gs=;
-        b=Bfjhke8X1Z3XXwTn/jRxoDm9TxSDFYsbmb2r0QMgLRALR/qIPmodbRhl53ddlwzC3v
-         k9u2nSmC13/yCFFKLeY+wVeUVvsck001IGJv74bkyMf5rQjwDPokZs0K7qKMFwQSwvjx
-         RzTgXpbwO2ZJ5HM6U3BpQEKqOPx7QBZ10vCWjJaydrCvA7UKPL+SAfQsQfNbj22ToUDz
-         CI403m+OioHwceP55CFgx0rPQg9L4oDkH5aTGoFpqqZkWlmeNb6D4PldQ18obeVsIiZe
-         wiyIud9RbZ50CqgEbWsI9sBqxJ2CS3icwfkOg/mFy7eSACPgEJWH+PA30k2gk6IhXgqX
-         aarg==
-X-Gm-Message-State: ACrzQf1zxfXCmyf1CXCwuYrFoW+S7X8/WUzxVfTPUpbRymfAARBJSrlr
-        YaPfgGATHYr1fQ13lTaS3DNqAB5qfDIkWRhKtxhxuQ==
-X-Google-Smtp-Source: AMsMyM52IzLN9ehKPsYzpZFyvuc/UJu+X6DKBLnC5R9N4hUuwXnkpmvGa5BMvF7ej+siDgo5LZKXNneqi5QMFgOcs7U=
-X-Received: by 2002:a05:6214:f23:b0:4bb:f5db:39b3 with SMTP id
- iw3-20020a0562140f2300b004bbf5db39b3mr27334848qvb.117.1667597145415; Fri, 04
- Nov 2022 14:25:45 -0700 (PDT)
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=6hvd6urNEa2bZ2TTknP5YJ+H72Ja2eceUu/0SfBV1dc=;
+        b=X5cKH3F/66QouUPW6NBBA75UrBnbuk/XBDybvyEhkVZT3NRqDW6Lo980Sw/d8jB6Di
+         abIqXu3S+1VtuD2JKDUj7UYYIedXqzmm2arnsEjxHMw1gtiQyC7dzR3xWnI0MMc7xLnX
+         vw3C5ZTMFXSmFhy9oJR19PP6GjG+RyR8KJDp+2tC30j6jNhtZ/T09pLn0AvqWS/89y50
+         IRoQFqpy3DWqRKZWRx8lhC2uDzja2L2B4sQSht5toOqh15uSeejvPcBbaB9KD5wChq08
+         5Vm94hy/LSjNrDn+gU20+9q1akQiy5FaWJFjcTCpynnOVxMj51sTXqh6Kowfzub0pIke
+         jaNg==
+X-Gm-Message-State: ACrzQf0ktMf5+p73LsbFHoq6Ni0Je6tYlC4T/L7ojglKMcwnF/cpa4wf
+        +xVNPPnUNPXjaHRyrepWVHOdREHU5y8=
+X-Google-Smtp-Source: AMsMyM7MF9Q/Pp9YnJEtGj4XwhLtYIPmz5/gJtrzdgqLYVrzm8NOvh6bI3lkPYE6537XupHrGdc+uQ==
+X-Received: by 2002:a05:6870:6717:b0:13d:8222:329e with SMTP id gb23-20020a056870671700b0013d8222329emr7986841oab.128.1667604883046;
+        Fri, 04 Nov 2022 16:34:43 -0700 (PDT)
+Received: from server.roeck-us.net ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
+        by smtp.gmail.com with ESMTPSA id w29-20020a056870339d00b0011e37fb5493sm183421oae.30.2022.11.04.16.34.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 04 Nov 2022 16:34:41 -0700 (PDT)
+Sender: Guenter Roeck <groeck7@gmail.com>
+Date:   Fri, 4 Nov 2022 16:34:40 -0700
+From:   Guenter Roeck <linux@roeck-us.net>
+To:     Steven Rostedt <rostedt@goodmis.org>
+Cc:     linux-kernel@vger.kernel.org,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Stephen Boyd <sboyd@kernel.org>,
+        Anna-Maria Gleixner <anna-maria@linutronix.de>,
+        Andrew Morton <akpm@linux-foundation.org>, rcu@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-s390@vger.kernel.org,
+        linux-sh@vger.kernel.org, linux-edac@vger.kernel.org,
+        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-acpi@vger.kernel.org,
+        linux-atm-general@lists.sourceforge.net, netdev@vger.kernel.org,
+        linux-pm@vger.kernel.org, drbd-dev@lists.linbit.com,
+        linux-bluetooth@vger.kernel.org,
+        openipmi-developer@lists.sourceforge.net,
+        linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        linaro-mm-sig@lists.linaro.org, intel-gfx@lists.freedesktop.org,
+        linux-input@vger.kernel.org, linux-parisc@vger.kernel.org,
+        linux-leds@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
+        linux-usb@vger.kernel.org, linux-wireless@vger.kernel.org,
+        linux-scsi@vger.kernel.org, linux-staging@lists.linux.dev,
+        linux-ext4@vger.kernel.org, linux-nilfs@vger.kernel.org,
+        bridge@lists.linux-foundation.org, netfilter-devel@vger.kernel.org,
+        coreteam@netfilter.org, lvs-devel@vger.kernel.org,
+        linux-afs@lists.infradead.org, linux-nfs@vger.kernel.org,
+        tipc-discussion@lists.sourceforge.net, alsa-devel@alsa-project.org
+Subject: Re: [RFC][PATCH v3 00/33] timers: Use timer_shutdown*() before
+ freeing timers
+Message-ID: <20221104233440.GA2443898@roeck-us.net>
+References: <20221104054053.431922658@goodmis.org>
 MIME-Version: 1.0
-References: <20221103013937.603626-1-khazhy@google.com> <3c0df3fa-8731-5863-ccc5-f2e60601dbf9@huaweicloud.com>
- <CACGdZYJ0WH+Y9sdchXy30UVTQgPCEo=fW+W9atZh1Ki7Ov4_Gw@mail.gmail.com>
- <f83404b4-84a4-de4e-fa4d-9ce38900d91c@huaweicloud.com> <20221103084744.xsvoul3hjgz7yyo7@quack3>
-In-Reply-To: <20221103084744.xsvoul3hjgz7yyo7@quack3>
-From:   Khazhy Kumykov <khazhy@google.com>
-Date:   Fri, 4 Nov 2022 14:25:32 -0700
-Message-ID: <CACGdZYK7xk+CJw9_RKwceXXnREVhgHh9U-OWidnKgYp6B011xQ@mail.gmail.com>
-Subject: Re: [RFC PATCH] bfq: fix waker_bfqq inconsistency crash
-To:     Jan Kara <jack@suse.cz>
-Cc:     Yu Kuai <yukuai1@huaweicloud.com>,
-        Paolo Valente <paolo.valente@linaro.org>,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, "yukuai (C)" <yukuai3@huawei.com>
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-        boundary="00000000000082be3a05ecabb7ab"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221104054053.431922658@goodmis.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
---00000000000082be3a05ecabb7ab
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+On Fri, Nov 04, 2022 at 01:40:53AM -0400, Steven Rostedt wrote:
+> 
+> Back in April, I posted an RFC patch set to help mitigate a common issue
+> where a timer gets armed just before it is freed, and when the timer
+> goes off, it crashes in the timer code without any evidence of who the
+> culprit was. I got side tracked and never finished up on that patch set.
+> Since this type of crash is still our #1 crash we are seeing in the field,
+> it has become a priority again to finish it.
+> 
 
-On Thu, Nov 3, 2022 at 1:47 AM Jan Kara <jack@suse.cz> wrote:
->
-> On Thu 03-11-22 11:51:15, Yu Kuai wrote:
-> > Hi,
-> >
-> > =E5=9C=A8 2022/11/03 11:05, Khazhy Kumykov =E5=86=99=E9=81=93:
-> > > On Wed, Nov 2, 2022 at 7:56 PM Yu Kuai <yukuai1@huaweicloud.com> wrot=
-e:
-> > > >
-> > > > Hi,
-> > > >
-> > > > =E5=9C=A8 2022/11/03 9:39, Khazhismel Kumykov =E5=86=99=E9=81=93:
-> > > > > This fixes crashes in bfq_add_bfqq_busy due to waker_bfqq being N=
-ULL,
-> > > > > but woken_list_node still being hashed. This would happen when
-> > > > > bfq_init_rq() expects a brand new allocated queue to be returned =
-from
-> > > >
-> > > >   From what I see, bfqq->waker_bfqq is updated in bfq_init_rq() onl=
-y if
-> > > > 'new_queue' is false, but if 'new_queue' is false, the returned 'bf=
-qq'
-> > > > from bfq_get_bfqq_handle_split() will never be oom_bfqq, so I'm con=
-fused
-> > > > here...
-> > > There's two calls for bfq_get_bfqq_handle_split in this function - th=
-e
-> > > second one is after the check you mentioned, and is the problematic
-> > > one.
-> > Yes, thanks for the explanation. Now I understand how the problem
-> > triggers.
-> >
-> > > >
-> > > > > bfq_get_bfqq_handle_split() and unconditionally updates waker_bfq=
-q
-> > > > > without resetting woken_list_node. Since we can always return oom=
-_bfqq
-> > > > > when attempting to allocate, we cannot assume waker_bfqq starts a=
-s NULL.
-> > > > > We must either reset woken_list_node, or avoid setting woken_list=
- at all
-> > > > > for oom_bfqq - opt to do the former.
-> > > >
-> > > > Once oom_bfqq is used, I think the io is treated as issued from roo=
-t
-> > > > group. Hence I don't think it's necessary to set woken_list or
-> > > > waker_bfqq for oom_bfqq.
-> > > Ack, I was wondering what's right here since, evidently, *someone* ha=
-d
-> > > already set oom_bfqq->waker_bfqq to *something* (although... maybe it
-> > > was an earlier init_rq). But maybe it's better to do nothing if we
-> > > *know* it's oom_bfqq.
-> >
-> > I need to have a check how oom_bfqq get involved with waker_bfqq, and
-> > then see if it's reasonable.
-> >
-> > Probably Jan and Paolo will have better view on this.
->
-> Thanks for the CC Kuai and thanks to Khazy for spotting the bug. The
-> oom_bfqq is just a fallback bfqq and as such it should be extempted from
-> all special handling like waker detection etc. All this stuff is just for
-> optimizing performance and when we are OOM, we have far larger troubles
-> than to optimize performance.
->
-> So how I think we should really fix this is that we extempt oom_bfqq from
-> waker detection in bfq_check_waker() by adding:
->
->         bfqq =3D=3D bfqd->oom_bfqq ||
->         bfqd->last_completed_rq_bfq =3D=3D bfqd->oom_bfqq)
->
-> to the initial check and then also if bfq_get_bfqq_handle_split() returns
-> oom_bfqq we should just skip carrying over the waker information.
-Thanks for the tip! I'll send a followup, including your suggestions.
+After applying the patches attached below, everything compiles for me,
+and there are no crashes. There are still various warnings, most in
+networking. I know I need to apply some patch(es) to fix the networking
+warnings, but I didn't entirely understand what exactly to apply, so
+I didn't try.
 
-I do have some other questions in this area, if you could help me
-understand. Looking again at bfq_init_rq, inside of the !new_queue
-section - we call bfq_split_bfqq() to "split" our bfqq, then in the
-next line bfq_get_bfqq_handle_split inspects bic_to_bfqq(bic,
-is_sync), and if it's NULL, allocates a new queue. However, if we have
-an async rq, this call will return the pre-existing async bfqq, as the
-call to bfq_split_bfqq() only clears the sync bfqq, ever. The best
-understanding I have now is: "bic->bfqq[aync] is never NULL (and we
-don't merge async queues) so we'll never reach this !new_queue section
-anyways if it's async". Is that accurate?
+Complete logs are at https://kerneltests.org/builders, on the bottom half
+of the page (qemu tests, in the 'testing' column).
 
-Thanks,
-Khazhy
+Guenter
 
+---
+Warnings:
 
->
->                                                                 Honza
-> --
-> Jan Kara <jack@suse.com>
-> SUSE Labs, CR
+ODEBUG: free active (active state 0) object type: timer_list hint: tcp_write_timer+0x0/0x1d0
+	from tcp_close -> __sk_destruct -> tcp_write_timer
 
---00000000000082be3a05ecabb7ab
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
+ODEBUG: free active (active state 0) object type: timer_list hint: tcp_keepalive_timer+0x0/0x4c0
+	from tcp_close -> __sk_destruct -> tcp_keepalive_timer -> __del_timer_sync
 
-MIIPmwYJKoZIhvcNAQcCoIIPjDCCD4gCAQExDzANBglghkgBZQMEAgEFADALBgkqhkiG9w0BBwGg
-ggz1MIIEtjCCA56gAwIBAgIQeAMYYHb81ngUVR0WyMTzqzANBgkqhkiG9w0BAQsFADBMMSAwHgYD
-VQQLExdHbG9iYWxTaWduIFJvb3QgQ0EgLSBSMzETMBEGA1UEChMKR2xvYmFsU2lnbjETMBEGA1UE
-AxMKR2xvYmFsU2lnbjAeFw0yMDA3MjgwMDAwMDBaFw0yOTAzMTgwMDAwMDBaMFQxCzAJBgNVBAYT
-AkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMSowKAYDVQQDEyFHbG9iYWxTaWduIEF0bGFz
-IFIzIFNNSU1FIENBIDIwMjAwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCvLe9xPU9W
-dpiHLAvX7kFnaFZPuJLey7LYaMO8P/xSngB9IN73mVc7YiLov12Fekdtn5kL8PjmDBEvTYmWsuQS
-6VBo3vdlqqXZ0M9eMkjcKqijrmDRleudEoPDzTumwQ18VB/3I+vbN039HIaRQ5x+NHGiPHVfk6Rx
-c6KAbYceyeqqfuJEcq23vhTdium/Bf5hHqYUhuJwnBQ+dAUcFndUKMJrth6lHeoifkbw2bv81zxJ
-I9cvIy516+oUekqiSFGfzAqByv41OrgLV4fLGCDH3yRh1tj7EtV3l2TngqtrDLUs5R+sWIItPa/4
-AJXB1Q3nGNl2tNjVpcSn0uJ7aFPbAgMBAAGjggGKMIIBhjAOBgNVHQ8BAf8EBAMCAYYwHQYDVR0l
-BBYwFAYIKwYBBQUHAwIGCCsGAQUFBwMEMBIGA1UdEwEB/wQIMAYBAf8CAQAwHQYDVR0OBBYEFHzM
-CmjXouseLHIb0c1dlW+N+/JjMB8GA1UdIwQYMBaAFI/wS3+oLkUkrk1Q+mOai97i3Ru8MHsGCCsG
-AQUFBwEBBG8wbTAuBggrBgEFBQcwAYYiaHR0cDovL29jc3AyLmdsb2JhbHNpZ24uY29tL3Jvb3Ry
-MzA7BggrBgEFBQcwAoYvaHR0cDovL3NlY3VyZS5nbG9iYWxzaWduLmNvbS9jYWNlcnQvcm9vdC1y
-My5jcnQwNgYDVR0fBC8wLTAroCmgJ4YlaHR0cDovL2NybC5nbG9iYWxzaWduLmNvbS9yb290LXIz
-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
-IJ8WXTR0Vjyxk58wTAYDVR0gBEUwQzBBBgkrBgEEAaAyASgwNDAyBggrBgEFBQcCARYmaHR0cHM6
-Ly93d3cuZ2xvYmFsc2lnbi5jb20vcmVwb3NpdG9yeS8wDAYDVR0TAQH/BAIwADCBmgYIKwYBBQUH
-AQEEgY0wgYowPgYIKwYBBQUHMAGGMmh0dHA6Ly9vY3NwLmdsb2JhbHNpZ24uY29tL2NhL2dzYXRs
-YXNyM3NtaW1lY2EyMDIwMEgGCCsGAQUFBzAChjxodHRwOi8vc2VjdXJlLmdsb2JhbHNpZ24uY29t
-L2NhY2VydC9nc2F0bGFzcjNzbWltZWNhMjAyMC5jcnQwHwYDVR0jBBgwFoAUfMwKaNei6x4schvR
-zV2Vb4378mMwRgYDVR0fBD8wPTA7oDmgN4Y1aHR0cDovL2NybC5nbG9iYWxzaWduLmNvbS9jYS9n
-c2F0bGFzcjNzbWltZWNhMjAyMC5jcmwwDQYJKoZIhvcNAQELBQADggEBAKD4FWgFMRum92zuAryA
-NPkwie9CIiWkuoVdKVSeaDUd+AecUSkvRS5RtSUn261XyqWLRYRJ9DHlOvSPMkvFLYM2Nl7WKyaX
-AVjbTyFQVJ/d2k6a8/E+prQGhYdEL6gQ+0pCih+9aPXPs4T6gNfPH18eZvQWHM10laJPvSGiIN5g
-hZs2e5193mkiXAOXOYlIBc4e+oGztxLA/TInOfp/edkpWtabE8kNrpN0HrsImfjFO/cj+wvlIIew
-qjck+CiS1uR+KsnioC+pQjynP533RsDGZ0H9up7fJ8tdZAjm6nKQv3OlAsrOWfIA5TPV9BE0Qn7v
-rLDUK8SloBqzC3egcsYxggJqMIICZgIBATBoMFQxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9i
-YWxTaWduIG52LXNhMSowKAYDVQQDEyFHbG9iYWxTaWduIEF0bGFzIFIzIFNNSU1FIENBIDIwMjAC
-EAHF0zc/WzTBCzu4oGMIOM0wDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIAgN6i8p
-hAm3x7jOa4xZ20pDd5J8DKMdGwzHKn1X/Ed2MBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJ
-KoZIhvcNAQkFMQ8XDTIyMTEwNDIxMjU0NVowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASow
-CwYJYIZIAWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZI
-hvcNAQEHMAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQBJB3KrxIgPQLl9cQSZ+yfPMgQa
-8rum2WH4xt8MuMrPM/SwPhw3EHJP4mCstwnPcSW64+EPraCBbmmU3T7gfpLNKf+2QnrW2BixnicU
-qT6Iu7RAgml/LbpsOETjbf4pvV7GHuVwjpJlSZG+g4/IWdRq5gm9kYROZVoMsXPd6VHEAHUo88kS
-5K/D18RCCEEOS3tN48s3JTIkArURTEOapjD0a3Si1oCIi2oWPmkQcBWnBWRPdO5C9HVKlat0d5m2
-qvBNgHQzhqXmEZ9AJS16PgyBt/O42yyMz3vxcWNBp9MH07UG50dQGRzmGNUK/yyCUELCObdb+1e+
-tXacoov3FslV
---00000000000082be3a05ecabb7ab--
+ODEBUG: free active (active state 0) object type: timer_list hint: blk_rq_timed_out_timer+0x0/0x40
+	blk_free_queue_rcu -> blk_free_queue_rcu -> blk_rq_timed_out_timer
+
+---
+Changes applied on top of patch set to fix build errors:
+
+diff --git a/arch/arm/mach-spear/time.c b/arch/arm/mach-spear/time.c
+index e979e2197f8e..5371c824786d 100644
+--- a/arch/arm/mach-spear/time.c
++++ b/arch/arm/mach-spear/time.c
+@@ -90,7 +90,7 @@ static void __init spear_clocksource_init(void)
+ 		200, 16, clocksource_mmio_readw_up);
+ }
+ 
+-static inline void timer_shutdown(struct clock_event_device *evt)
++static inline void spear_timer_shutdown(struct clock_event_device *evt)
+ {
+ 	u16 val = readw(gpt_base + CR(CLKEVT));
+ 
+@@ -101,7 +101,7 @@ static inline void timer_shutdown(struct clock_event_device *evt)
+ 
+ static int spear_shutdown(struct clock_event_device *evt)
+ {
+-	timer_shutdown(evt);
++	spear_timer_shutdown(evt);
+ 
+ 	return 0;
+ }
+@@ -111,7 +111,7 @@ static int spear_set_oneshot(struct clock_event_device *evt)
+ 	u16 val;
+ 
+ 	/* stop the timer */
+-	timer_shutdown(evt);
++	spear_timer_shutdown(evt);
+ 
+ 	val = readw(gpt_base + CR(CLKEVT));
+ 	val |= CTRL_ONE_SHOT;
+@@ -126,7 +126,7 @@ static int spear_set_periodic(struct clock_event_device *evt)
+ 	u16 val;
+ 
+ 	/* stop the timer */
+-	timer_shutdown(evt);
++	spear_timer_shutdown(evt);
+ 
+ 	period = clk_get_rate(gpt_clk) / HZ;
+ 	period >>= CTRL_PRESCALER16;
+diff --git a/drivers/clocksource/arm_arch_timer.c b/drivers/clocksource/arm_arch_timer.c
+index a7ff77550e17..9c3420a0d19d 100644
+--- a/drivers/clocksource/arm_arch_timer.c
++++ b/drivers/clocksource/arm_arch_timer.c
+@@ -687,8 +687,8 @@ static irqreturn_t arch_timer_handler_virt_mem(int irq, void *dev_id)
+ 	return timer_handler(ARCH_TIMER_MEM_VIRT_ACCESS, evt);
+ }
+ 
+-static __always_inline int timer_shutdown(const int access,
+-					  struct clock_event_device *clk)
++static __always_inline int arch_timer_shutdown(const int access,
++					       struct clock_event_device *clk)
+ {
+ 	unsigned long ctrl;
+ 
+@@ -701,22 +701,22 @@ static __always_inline int timer_shutdown(const int access,
+ 
+ static int arch_timer_shutdown_virt(struct clock_event_device *clk)
+ {
+-	return timer_shutdown(ARCH_TIMER_VIRT_ACCESS, clk);
++	return arch_timer_shutdown(ARCH_TIMER_VIRT_ACCESS, clk);
+ }
+ 
+ static int arch_timer_shutdown_phys(struct clock_event_device *clk)
+ {
+-	return timer_shutdown(ARCH_TIMER_PHYS_ACCESS, clk);
++	return arch_timer_shutdown(ARCH_TIMER_PHYS_ACCESS, clk);
+ }
+ 
+ static int arch_timer_shutdown_virt_mem(struct clock_event_device *clk)
+ {
+-	return timer_shutdown(ARCH_TIMER_MEM_VIRT_ACCESS, clk);
++	return arch_timer_shutdown(ARCH_TIMER_MEM_VIRT_ACCESS, clk);
+ }
+ 
+ static int arch_timer_shutdown_phys_mem(struct clock_event_device *clk)
+ {
+-	return timer_shutdown(ARCH_TIMER_MEM_PHYS_ACCESS, clk);
++	return arch_timer_shutdown(ARCH_TIMER_MEM_PHYS_ACCESS, clk);
+ }
+ 
+ static __always_inline void set_next_event(const int access, unsigned long evt,
+diff --git a/drivers/clocksource/timer-sp804.c b/drivers/clocksource/timer-sp804.c
+index e6a87f4af2b5..a3c38e1343f0 100644
+--- a/drivers/clocksource/timer-sp804.c
++++ b/drivers/clocksource/timer-sp804.c
+@@ -155,14 +155,14 @@ static irqreturn_t sp804_timer_interrupt(int irq, void *dev_id)
+ 	return IRQ_HANDLED;
+ }
+ 
+-static inline void timer_shutdown(struct clock_event_device *evt)
++static inline void sp804_timer_shutdown(struct clock_event_device *evt)
+ {
+ 	writel(0, common_clkevt->ctrl);
+ }
+ 
+ static int sp804_shutdown(struct clock_event_device *evt)
+ {
+-	timer_shutdown(evt);
++	sp804_timer_shutdown(evt);
+ 	return 0;
+ }
+ 
+@@ -171,7 +171,7 @@ static int sp804_set_periodic(struct clock_event_device *evt)
+ 	unsigned long ctrl = TIMER_CTRL_32BIT | TIMER_CTRL_IE |
+ 			     TIMER_CTRL_PERIODIC | TIMER_CTRL_ENABLE;
+ 
+-	timer_shutdown(evt);
++	sp804_timer_shutdown(evt);
+ 	writel(common_clkevt->reload, common_clkevt->load);
+ 	writel(ctrl, common_clkevt->ctrl);
+ 	return 0;
+
