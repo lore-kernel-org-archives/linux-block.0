@@ -2,122 +2,119 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A5E03C4321E
-	for <linux-block@archiver.kernel.org>; Sat,  5 Nov 2022 14:18:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 67C00C433FE
+	for <linux-block@archiver.kernel.org>; Sat,  5 Nov 2022 14:44:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229788AbiKEOS0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 5 Nov 2022 10:18:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36440 "EHLO
+        id S229563AbiKEOol (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 5 Nov 2022 10:44:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45286 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229614AbiKEOS0 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sat, 5 Nov 2022 10:18:26 -0400
-Received: from mail-oi1-x22d.google.com (mail-oi1-x22d.google.com [IPv6:2607:f8b0:4864:20::22d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6100D8;
-        Sat,  5 Nov 2022 07:18:20 -0700 (PDT)
-Received: by mail-oi1-x22d.google.com with SMTP id t62so7927689oib.12;
-        Sat, 05 Nov 2022 07:18:20 -0700 (PDT)
+        with ESMTP id S229517AbiKEOol (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sat, 5 Nov 2022 10:44:41 -0400
+Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0BA69DFCB
+        for <linux-block@vger.kernel.org>; Sat,  5 Nov 2022 07:44:39 -0700 (PDT)
+Received: by mail-pj1-x1034.google.com with SMTP id m14-20020a17090a3f8e00b00212dab39bcdso10765735pjc.0
+        for <linux-block@vger.kernel.org>; Sat, 05 Nov 2022 07:44:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=PYhR6hYWBdnOcbKjn7H8NpQf1Qg9j5JtEEKHrz9oi/g=;
-        b=cEC5IT1XpqlAK68Dgo5+fxnDFCjVpzY0DRagRqxTDry42i1dK2tcbNHYd7Ayss+LTR
-         Zq5Ih2v2443bsxwUvCZI2AevutQelDkhHOJqQhhh90RAdGwH1ztuIkNBULvbO0OWUDyB
-         Zs3Rt+XqCTKE2Cs9eS/ndyLispMby6sUmCV9hIPpDCZ1JKOuE8AnRRE6npVgjTBnltto
-         YYH4ZircOfT5HS0GEZGZOnxYVDveuMG1fd0QtTxHxYW8Huxn/roqBK+JFSqL6Tdp87g+
-         GSZROE0361WHir4UDtfX6jA945ccs7fZ7mz9TOtoNTCBa80eZ2tSlHY0p6xlLXtkRQTo
-         pyNQ==
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=CLGRKYeIZFcNxsir6h40pgc12Om8jgMc2MuzPye2fF0=;
+        b=QByFh4opDMf6CJR9yhCF1EZgmTf2BCUa9DUgnmjrp7BK4fH27fHw0hVjKr78oX60ac
+         CUcwAM4FqScM17ZwnjZ8ofHe3JrbyrcLu4ahyglpFJkK3xre84F0AStFEQE4+ZTMgZK8
+         ktApjEWEmb3WniGt/Tf/0sMKRAarpU2X+kWJHCmmMxVEZqnphUFrRKuME2iKDLcBeBe4
+         Fr5gcn52kcvrS/GJFgnQoBKaLjXparTM/q4fKrsy4eHZNRQ4a72XVsmYYn+Zb0CQTtAV
+         xDw8g8RdL/+M9jkWwbxsa4VXl6oRn21YZHV/SyZbS2438Omz8/sITIpBrBVR1lCibqYz
+         5KIA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=PYhR6hYWBdnOcbKjn7H8NpQf1Qg9j5JtEEKHrz9oi/g=;
-        b=0L+F2Y9iQVD8xQC609r+5wtBIbz4VSSrBvwYsDE8sqfnClPBPVBbPQOCHtW+jReblG
-         sEmjRm428bVRXRcihuGA9nlbWR0DIv2H5zluwgOboNHo0lw31c/xMfGunfKLiFMd+V7w
-         qwMnOruxPwTg0g6wOIBjDlqX/mwwix4yHgLiCr/ttKljHbWH3Z3OfYEm1luKqYf9b0YZ
-         aEJ2jVAWoo89BTy5TJoucdP0dV/3eRHyHNdQdzPqFmDGGfZ6mUT134dqX9WGF0nvx8yC
-         VEes7HL/5g7/6CmUIlRYtJMPEFaDV+mxm3GGjOEQi4DvaLTtx9VsLLt9H14AGR3iig59
-         kEcg==
-X-Gm-Message-State: ACrzQf09gjQhXq48MF8zZNCAcEnjIXQLQhQeHddD0pUBo5Ys//Yua2s/
-        6aCtjDEuSx3VNdFHeHWvkzw=
-X-Google-Smtp-Source: AMsMyM5In/UjkQAOQkguZQ2rHL63I8msSs9c6an0J/9gKdjSX2hezT8PwL34Y+85tQUi0BEYyplo0Q==
-X-Received: by 2002:a05:6808:2104:b0:35a:5e9:a411 with SMTP id r4-20020a056808210400b0035a05e9a411mr18764923oiw.168.1667657900081;
-        Sat, 05 Nov 2022 07:18:20 -0700 (PDT)
-Received: from server.roeck-us.net ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
-        by smtp.gmail.com with ESMTPSA id e1-20020a056870c0c100b00132741e966asm830469oad.51.2022.11.05.07.18.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 05 Nov 2022 07:18:19 -0700 (PDT)
-Sender: Guenter Roeck <groeck7@gmail.com>
-Date:   Sat, 5 Nov 2022 07:18:17 -0700
-From:   Guenter Roeck <linux@roeck-us.net>
-To:     Steven Rostedt <rostedt@goodmis.org>
-Cc:     linux-kernel@vger.kernel.org,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Stephen Boyd <sboyd@kernel.org>,
-        Anna-Maria Gleixner <anna-maria@linutronix.de>,
-        Andrew Morton <akpm@linux-foundation.org>, rcu@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-s390@vger.kernel.org,
-        linux-sh@vger.kernel.org, linux-edac@vger.kernel.org,
-        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-acpi@vger.kernel.org,
-        linux-atm-general@lists.sourceforge.net, netdev@vger.kernel.org,
-        linux-pm@vger.kernel.org, drbd-dev@lists.linbit.com,
-        linux-bluetooth@vger.kernel.org,
-        openipmi-developer@lists.sourceforge.net,
-        linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
-        linaro-mm-sig@lists.linaro.org, intel-gfx@lists.freedesktop.org,
-        linux-input@vger.kernel.org, linux-parisc@vger.kernel.org,
-        linux-leds@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
-        linux-usb@vger.kernel.org, linux-wireless@vger.kernel.org,
-        linux-scsi@vger.kernel.org, linux-staging@lists.linux.dev,
-        linux-ext4@vger.kernel.org, linux-nilfs@vger.kernel.org,
-        bridge@lists.linux-foundation.org, netfilter-devel@vger.kernel.org,
-        coreteam@netfilter.org, lvs-devel@vger.kernel.org,
-        linux-afs@lists.infradead.org, linux-nfs@vger.kernel.org,
-        tipc-discussion@lists.sourceforge.net, alsa-devel@alsa-project.org
-Subject: Re: [PATCH v4a 00/38] timers: Use timer_shutdown*() before freeing
- timers
-Message-ID: <20221105141817.GF1606271@roeck-us.net>
-References: <20221105060024.598488967@goodmis.org>
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=CLGRKYeIZFcNxsir6h40pgc12Om8jgMc2MuzPye2fF0=;
+        b=xD9ifnGe/nZw370WAK4Opmq3NGWG5JMiWN1GvWfFQ4C6KwShVkte90WkjqpdPTHk02
+         bGfdKvuRJA7crbFo21gtgdi6MLEmjQtpRiFReoBLtFFvb1tqakuJY/C3ixVCzUGhAhc/
+         Su9fX/5hPl5mGuWM7xa1Z3svPeSWdACgc6N7hBe+eDMjsCIcVzqAhJJEz/U1tuiMigLv
+         PhLj7/Rt5m49PGXXICamGa3cwnf6ZVm0g5qaNs69IQ77sp3FSqbZ9HpI7Lx4mGaxwE37
+         ZQAAMaafHC/H95eq4q1ZcHkg1KFKIXRXOa7eENy2xnLPAybNCNsERMB4kB12C2XKzSxL
+         6t2g==
+X-Gm-Message-State: ACrzQf0UDRgu2sHLOoWHzEmVUg8Bk5ZeZ8JctQdYCE4uPN41GBhKEv4v
+        OlYn+9Y3SHtCYSxHPzBo5uVFhji7/WV+viJx
+X-Google-Smtp-Source: AMsMyM6bA5qKVCqjD27iZ1szpHGdBTGu5DuZXCZmz1X9MSRKIClRh77Dz568VELmPUFwqv5MIZ6vkw==
+X-Received: by 2002:a17:902:e154:b0:186:f0d5:1ac0 with SMTP id d20-20020a170902e15400b00186f0d51ac0mr40299272pla.15.1667659478429;
+        Sat, 05 Nov 2022 07:44:38 -0700 (PDT)
+Received: from [192.168.1.136] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id u2-20020a17090341c200b001766a3b2a26sm1779177ple.105.2022.11.05.07.44.37
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 05 Nov 2022 07:44:37 -0700 (PDT)
+Message-ID: <7ecce2b9-6a43-5597-5f7d-2679ebaff4e5@kernel.dk>
+Date:   Sat, 5 Nov 2022 08:44:36 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221105060024.598488967@goodmis.org>
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
+ Thunderbird/102.4.0
+Content-Language: en-US
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From:   Jens Axboe <axboe@kernel.dk>
+Subject: [GIT PULL] Block fixes for 6.1-rc4
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, Nov 05, 2022 at 02:00:24AM -0400, Steven Rostedt wrote:
-> 
-> Back in April, I posted an RFC patch set to help mitigate a common issue
-> where a timer gets armed just before it is freed, and when the timer
-> goes off, it crashes in the timer code without any evidence of who the
-> culprit was. I got side tracked and never finished up on that patch set.
-> Since this type of crash is still our #1 crash we are seeing in the field,
-> it has become a priority again to finish it.
-> 
-> The last version of that patch set is here:
-> 
->   https://lore.kernel.org/all/20221104054053.431922658@goodmis.org/
-> 
-> I'm calling this version 4a as it only has obvious changes were the timer that
-> is being shutdown is in the same function where it will be freed or released,
-> as this series should be "safe" for adding. I'll be calling the other patches
-> 4b for the next merge window.
-> 
+Hi Linus,
 
-Just in case you didn't notice:
+A few fixes that should go into the next rc:
 
-Looking through the resulting code, I think some of the remaining
-calls to del_singleshot_timer_sync() can be converted as well.
+- Set of fixes for the ublk driver (Ming)
 
-The calls in drivers/staging/wlan-ng/prism2usb.c:prism2sta_disconnect_usb()
-are obvious (the containing data structure is freed in the same function).
-For drivers/char/tpm/tpm-dev-common.c:tpm_common_release(), the containing
-data structure is freed in the calling code.
+- Two fixes for error handling memory leaks (Chen Jun, Chen Zhongjin)
 
-Thanks,
-Guenter
+- Explicitly clear the last request in a chain when the plug is flushed,
+  as it may have already been issued (Al)
+
+Please pull!
+
+
+The following changes since commit e3c5a78cdb6237bfb9641b63cccf366325229eec:
+
+  blk-mq: Properly init requests from blk_mq_alloc_request_hctx() (2022-10-28 07:54:47 -0600)
+
+are available in the Git repository at:
+
+  git://git.kernel.dk/linux.git tags/block-6.1-2022-11-05
+
+for you to fetch changes up to 878eb6e48f240d02ed1c9298020a0b6370695f24:
+
+  block: blk_add_rq_to_plug(): clear stale 'last' after flush (2022-10-31 20:21:38 -0600)
+
+----------------------------------------------------------------
+block-6.1-2022-11-05
+
+----------------------------------------------------------------
+Al Viro (1):
+      block: blk_add_rq_to_plug(): clear stale 'last' after flush
+
+Chen Jun (1):
+      blk-mq: Fix kmemleak in blk_mq_init_allocated_queue
+
+Chen Zhongjin (1):
+      block: Fix possible memory leak for rq_wb on add_disk failure
+
+Ming Lei (4):
+      ublk_drv: return flag of UBLK_F_URING_CMD_COMP_IN_TASK in case of module
+      ublk_drv: comment on ublk_driver entry of Kconfig
+      ublk_drv: avoid to touch io_uring cmd in blk_mq io path
+      ublk_drv: add ublk_queue_cmd() for cleanup
+
+ block/blk-mq.c           |   5 +--
+ block/genhd.c            |   1 +
+ drivers/block/Kconfig    |   6 +++
+ drivers/block/ublk_drv.c | 115 ++++++++++++++++++++++++++++-------------------
+ 4 files changed, 77 insertions(+), 50 deletions(-)
+
+-- 
+Jens Axboe
