@@ -2,101 +2,169 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 97A75C4332F
-	for <linux-block@archiver.kernel.org>; Sat,  5 Nov 2022 15:32:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B76FC4332F
+	for <linux-block@archiver.kernel.org>; Sat,  5 Nov 2022 16:00:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229894AbiKEPcn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 5 Nov 2022 11:32:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36034 "EHLO
+        id S229517AbiKEQAA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 5 Nov 2022 12:00:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41720 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229479AbiKEPcn (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sat, 5 Nov 2022 11:32:43 -0400
-Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C6869FCC
-        for <linux-block@vger.kernel.org>; Sat,  5 Nov 2022 08:32:42 -0700 (PDT)
-Received: by mail-pf1-x42a.google.com with SMTP id b185so6956738pfb.9
-        for <linux-block@vger.kernel.org>; Sat, 05 Nov 2022 08:32:42 -0700 (PDT)
+        with ESMTP id S229891AbiKEP77 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sat, 5 Nov 2022 11:59:59 -0400
+Received: from mail-qv1-xf29.google.com (mail-qv1-xf29.google.com [IPv6:2607:f8b0:4864:20::f29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3A67F597
+        for <linux-block@vger.kernel.org>; Sat,  5 Nov 2022 08:59:57 -0700 (PDT)
+Received: by mail-qv1-xf29.google.com with SMTP id x13so5381066qvn.6
+        for <linux-block@vger.kernel.org>; Sat, 05 Nov 2022 08:59:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=u6m1xWl0cTcngqkPkHG892As2RQXCoWAPr6dzQ1sZGM=;
-        b=JTyaoj59H4cWDZL3KXPYpdeVR+b9LmS5fPyBQxtXXgLQnh+yZydPbWsiDlJ1Kt22mv
-         HBSimvFze4TC9nv2jtbMXHvE0QxUoGBTyQj70IM958/D47+aq3rBMYq74yIeQ9z3wTFE
-         GW728FRB+T6IIxYWMAxaQ83aIeq2T6PPN/ysAaEJbvM//jODZK06egDXkO7C5mpo1gX+
-         SbMAMqNv9X4BsNNOleo9oV0JAazkXqj4b2jEIF4IJptT6Rg2fFcwI9zDrqmdqvcxAunV
-         5AJaUywTcTjPdszriz++tKDHe21nECoXtKDf859UkZ465COCIesGG7yykTtybsicRJYS
-         FrKQ==
+        d=linux-foundation.org; s=google;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=GP8p4dRzNVpyUotOfaypMmYTGE9lsMcq6qB3gjhmc04=;
+        b=iIDJL03zNkH0lS9YORaCB4Nnx18G1RT5PAxkqTBkren7bOYLdVGnhhilx+OlS481lw
+         gQr71gF/2R0QtX/qOni1Pt9vrqOkIr43rj0MZrH/uG69dzQgSBZeGC3nRHzTa1HEb5Zv
+         OhEAlIPPkZmfK8ER3fSUpMd0BmaBeM97bdw94=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=u6m1xWl0cTcngqkPkHG892As2RQXCoWAPr6dzQ1sZGM=;
-        b=CTBgs9xXwuacRM6Zfvc9UqukOY7cPW5soPvSYwf+5YklWfnX2aUCIjLsuyyCQvRaKr
-         LWGvgiMhvrfEFUgNkSgCMBXLSquytu8/tYtroKY6ZJI08wCOBaASkeQNVeApdbV0SUCY
-         U0uERUaPVe5zGIsAJ4WdQgE3Dqesj0VLB7SXj//L92lE7nBkzyJJJYwwI9i2bnO+r/7R
-         2HD0dhcOQaXtvPdNI6Cb2aXva/nB5Tx68cMoxEMkeOY7u/vMNcWKMK9GfSTrlxT93Lab
-         JaJ9y2sTi9WMYSHOa/2YGn1u+g6a7dhuDB+JCzfp1ubxmr9Tpl32qSZAy5j5NZHoDM8U
-         rYSw==
-X-Gm-Message-State: ACrzQf0rboYXUsbWK+nPVo7NB/agp4GOfjpPHojkJxcTMmmz1+ELRz1L
-        6sUWQIWQfzxbQ94O5uFZt66Kig==
-X-Google-Smtp-Source: AMsMyM43iwI3AlHrekdzk0svmfJr8ErR3FtBgJcfpu1Sdgg00NRTf0wngRydK/o6jUUnIvc9qwYXLA==
-X-Received: by 2002:aa7:959d:0:b0:56d:27ac:778 with SMTP id z29-20020aa7959d000000b0056d27ac0778mr38035147pfj.29.1667662361826;
-        Sat, 05 Nov 2022 08:32:41 -0700 (PDT)
-Received: from [192.168.1.136] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id q8-20020a170902dac800b0017f9021ddc6sm1798353plx.289.2022.11.05.08.32.40
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=GP8p4dRzNVpyUotOfaypMmYTGE9lsMcq6qB3gjhmc04=;
+        b=mQcuVU5bpXkFZWHzHGiX9pY7ffMgvtVJhxYRoh8xDA9lbyZcgJVWRJoZclu3GDGML2
+         RM5OoyItsnbl6htwkydgGAvu8cyXpM/9NkzfhY9QwEmPNz0iDk2aZ8zKewGc7PdfmFAF
+         KRdqJIDHk8riTh+Ynb6WYGheh5Wx5aqOjFlzehwphwONBTR25TIxsvfMQcUdSQQLPdJj
+         5gSnxaWL9Q1uRr+T12dR5+kcMismxsBrF7or46i6EV+R5tR2Se1yoFYAhyM8k6AiGs4Q
+         WTIpVgqW9jh7B4WtML013UbvSUJR5zcwF+m5VhuXTkgwMUlZTsFk3rCDPbqYhs8zaPX4
+         cE3A==
+X-Gm-Message-State: ACrzQf3JLGw0CtL/pWO8y0wfA+zoaA0me3hibJaJdsyBnOg33SblO5xA
+        Pef0m6Oc4m0gIgt09zpSnZioxlVa+rHLmw==
+X-Google-Smtp-Source: AMsMyM5cjzq8mxkn9Blea4C8zz8t/oYL6FEYeiLtereUoC2dlqv+ti8C0WaikGOJ1XWH7LzIPVo91Q==
+X-Received: by 2002:a05:6214:1d02:b0:4b7:6a28:3e85 with SMTP id e2-20020a0562141d0200b004b76a283e85mr36580112qvd.88.1667663996649;
+        Sat, 05 Nov 2022 08:59:56 -0700 (PDT)
+Received: from mail-yw1-f180.google.com (mail-yw1-f180.google.com. [209.85.128.180])
+        by smtp.gmail.com with ESMTPSA id y7-20020a05620a25c700b006ee7923c187sm2135053qko.42.2022.11.05.08.59.53
+        for <linux-block@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 05 Nov 2022 08:32:41 -0700 (PDT)
-Message-ID: <e2e297a5-b25f-dba2-bac9-dcb2342faeb5@kernel.dk>
-Date:   Sat, 5 Nov 2022 09:32:39 -0600
+        Sat, 05 Nov 2022 08:59:53 -0700 (PDT)
+Received: by mail-yw1-f180.google.com with SMTP id 00721157ae682-36ad4cf9132so68696567b3.6
+        for <linux-block@vger.kernel.org>; Sat, 05 Nov 2022 08:59:53 -0700 (PDT)
+X-Received: by 2002:a81:114e:0:b0:36a:fc80:fa62 with SMTP id
+ 75-20020a81114e000000b0036afc80fa62mr40431421ywr.58.1667663992806; Sat, 05
+ Nov 2022 08:59:52 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
- Thunderbird/102.4.0
-Subject: Re: [PATCH v4 1/7] block: Prevent the use of REQ_FUA with read
- operations
-Content-Language: en-US
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-        linux-ide@vger.kernel.org, linux-block@vger.kernel.org,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Hannes Reinecke <hare@suse.de>
-References: <20221031022642.352794-1-damien.lemoal@opensource.wdc.com>
- <20221031022642.352794-2-damien.lemoal@opensource.wdc.com>
- <Y2E2wFnbeUzAPjo0@infradead.org>
- <3af6895b-b776-cf0d-fe1e-866ce5e6b0b0@opensource.wdc.com>
- <Y2IXjzWL5eHA3Co9@infradead.org>
- <8125e422-7bc8-46a1-792a-f31cee7a91a3@kernel.dk>
- <Y2NylejsWVvOeZuL@infradead.org>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <Y2NylejsWVvOeZuL@infradead.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20221105060024.598488967@goodmis.org>
+In-Reply-To: <20221105060024.598488967@goodmis.org>
+From:   Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Sat, 5 Nov 2022 08:59:36 -0700
+X-Gmail-Original-Message-ID: <CAHk-=wi95dGkg7DiuOZ27gGW+mxJipn9ykB6LHB-HrbbLG6OMQ@mail.gmail.com>
+Message-ID: <CAHk-=wi95dGkg7DiuOZ27gGW+mxJipn9ykB6LHB-HrbbLG6OMQ@mail.gmail.com>
+Subject: Re: [PATCH v4a 00/38] timers: Use timer_shutdown*() before freeing timers
+To:     Steven Rostedt <rostedt@goodmis.org>
+Cc:     linux-kernel@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Stephen Boyd <sboyd@kernel.org>,
+        Guenter Roeck <linux@roeck-us.net>,
+        Anna-Maria Gleixner <anna-maria@linutronix.de>,
+        Andrew Morton <akpm@linux-foundation.org>, rcu@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-s390@vger.kernel.org,
+        linux-sh@vger.kernel.org, linux-edac@vger.kernel.org,
+        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-acpi@vger.kernel.org,
+        linux-atm-general@lists.sourceforge.net, netdev@vger.kernel.org,
+        linux-pm@vger.kernel.org, drbd-dev@lists.linbit.com,
+        linux-bluetooth@vger.kernel.org,
+        openipmi-developer@lists.sourceforge.net,
+        linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        linaro-mm-sig@lists.linaro.org, intel-gfx@lists.freedesktop.org,
+        linux-input@vger.kernel.org, linux-parisc@vger.kernel.org,
+        linux-leds@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
+        linux-usb@vger.kernel.org, linux-wireless@vger.kernel.org,
+        linux-scsi@vger.kernel.org, linux-staging@lists.linux.dev,
+        linux-ext4@vger.kernel.org, linux-nilfs@vger.kernel.org,
+        bridge@lists.linux-foundation.org, netfilter-devel@vger.kernel.org,
+        coreteam@netfilter.org, lvs-devel@vger.kernel.org,
+        linux-afs@lists.infradead.org, linux-nfs@vger.kernel.org,
+        tipc-discussion@lists.sourceforge.net, alsa-devel@alsa-project.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 11/3/22 1:49 AM, Christoph Hellwig wrote:
-> On Wed, Nov 02, 2022 at 09:17:54AM -0600, Jens Axboe wrote:
->>
->> This looks fine, but if we're never expecting this to happen, I do think
->> it should just go into libata instead as that's the only user that
->> cares about it. Yes, that'll lose the backtrace for who submitted it
->> potentially, but you can debug it pretty easily at that point if you
->> run into it.
-> 
-> FUA and PREFLUSH are bits only defined for writes.  libata might be the
-> first thing blowing up, but it really is a block layer constraint.
-> So validity checking what is being sent to the block layer at the
-> highest possible lyer is a good thing to ensure we don't get us in
-> trouble by someone accidentally sending one down or even expecting it
-> to work.  Especially as at least SCSI actually defines semantics for FUA
-> on reads, but they are completely bogus and useless.
+On Fri, Nov 4, 2022 at 11:01 PM Steven Rostedt <rostedt@goodmis.org> wrote:
+>
+> Patch 1 fixes an issue with sunrpc/xprt where it incorrectly uses
+> del_singleshot_timer_sync() for something that is not a oneshot timer. As this
+> will be converted to shutdown, this needs to be fixed first.
 
-OK, fair enough. I guess we can stick it in the block layer.
+So this is the kind of thing that I would *not* want to get eartly.
 
--- 
-Jens Axboe
+I really would want to get just the infrastructure in to let people
+start doing conversions.
 
+And then the "mindlessly obvious patches that are done by scripting
+and can not possibly matter".
 
+The kinds that do not *need* review, because they are mechanical, and
+that just cause pointless noise for the rest of the patches that *do*
+want review.
+
+Not this kind of thing that is so subtle that you have to explain it.
+That's not a "scripted patch for no semantic change".
+
+So leave the del_singleshot_timer_sync() cases alone, they are
+irrelevant for the new infrastructure and for the "mindless scripted
+conversion" patches.
+
+> Patches 2-4 changes existing timer_shutdown() functions used locally in ARM and
+> some drivers to better namespace names.
+
+Ok, these are relevant.
+
+> Patch 5 implements the new timer_shutdown() and timer_shutdown_sync() functions
+> that disable re-arming the timer after they are called.
+
+This is obviously what I'd want early so that people can start doign
+this in their trees.
+
+> Patches 6-28 change all the locations where there's a kfree(), kfree_rcu(),
+> kmem_cache_free() and one call_rcu() call where the RCU function frees the
+> timer (the workqueue patch) in the same function as the del_timer{,_sync}() is
+> called on that timer, and there's no extra exit path between the del_timer and
+> freeing of the timer.
+
+So honestly, I was literally hoping for a "this is the coccinelle
+script" kind of patch.
+
+Now there seems to be a number of patches here that are actualyl
+really hard to see that they are "obviously correct" and I can't tell
+if they are actually scripted or not.
+
+They don't *look* scripted, but I can't really tell.  I looked at the
+patches with ten lines of context, and I didn't see the immediately
+following kfree() even in that expanded patch context, so it's fairly
+far away.
+
+Others in the series were *definitely* not scripted, doing clearly
+manual cleanups:
+
+-    if (dch->timer.function) {
+-        del_timer(&dch->timer);
+-        dch->timer.function = NULL;
+-    }
++    timer_shutdown(&dch->timer);
+
+so no, this does *not* make me feel "ok, this is all trivial".
+
+IOW, I'd really want *just* the infrastructure and *just* the provably
+trivial stuff. If it wasn't some scripted really obvious thing that
+cannot possibly change anything and that wasn't then edited manually
+for some reason, I really don't want it early.
+
+IOW, any early conversions I'd take are literally about removing pure
+mindless noise. Not about doing conversions.
+
+And I wouldn't mind it as a single conversion patch that has the
+coccinelle script as the explanation.
+
+Really just THAT kind of "100% mindless conversion".
+
+               Linus
