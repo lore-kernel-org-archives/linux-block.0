@@ -2,162 +2,250 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E2A32C43217
-	for <linux-block@archiver.kernel.org>; Sat,  5 Nov 2022 01:01:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A8823C43217
+	for <linux-block@archiver.kernel.org>; Sat,  5 Nov 2022 06:01:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229495AbiKEBBN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 4 Nov 2022 21:01:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52578 "EHLO
+        id S229555AbiKEGBb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 5 Nov 2022 02:01:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60012 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229481AbiKEBBM (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Nov 2022 21:01:12 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66B812C66E
-        for <linux-block@vger.kernel.org>; Fri,  4 Nov 2022 17:59:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1667609966;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=TbSqpBbgk+NOPaOLl9NnIjbIwkdm/eU7seDomB5Bqqc=;
-        b=hC3W5xrv1hzpboUte+r7ZCXiko2DbKz7tJAvWpY9f/TfmOnVFZzEJSkf4oNCDkY7Joafye
-        /jT7nhodOprYfpsJLHdGgF3baXQNdZlx7KpiRenq6iRDawfJuSmyxVCW/Kh5Xg5NMGSR0B
-        v6GS31NKvzdB8te+F88ba9iNF2yyQTg=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-121-2BACaGxTOzyXSMlgs6nv3w-1; Fri, 04 Nov 2022 20:59:23 -0400
-X-MC-Unique: 2BACaGxTOzyXSMlgs6nv3w-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        with ESMTP id S229472AbiKEGBa (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sat, 5 Nov 2022 02:01:30 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 54B812D1FD;
+        Fri,  4 Nov 2022 23:01:28 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id D566F85A5B6;
-        Sat,  5 Nov 2022 00:59:22 +0000 (UTC)
-Received: from llong.com (unknown [10.22.16.12])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 60D952166B26;
-        Sat,  5 Nov 2022 00:59:22 +0000 (UTC)
-From:   Waiman Long <longman@redhat.com>
-To:     Tejun Heo <tj@kernel.org>, Jens Axboe <axboe@kernel.dk>
-Cc:     cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        =?UTF-8?q?Michal=20Koutn=C3=BD?= <mkoutny@suse.com>,
-        Hillf Danton <hdanton@sina.com>,
-        Waiman Long <longman@redhat.com>
-Subject: [PATCH v10 3/3] blk-cgroup: Flush stats at blkgs destruction path
-Date:   Fri,  4 Nov 2022 20:59:02 -0400
-Message-Id: <20221105005902.407297-4-longman@redhat.com>
-In-Reply-To: <20221105005902.407297-1-longman@redhat.com>
-References: <20221105005902.407297-1-longman@redhat.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
+        by dfw.source.kernel.org (Postfix) with ESMTPS id BD4126098A;
+        Sat,  5 Nov 2022 06:01:27 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 08B27C433C1;
+        Sat,  5 Nov 2022 06:01:27 +0000 (UTC)
+Received: from rostedt by gandalf.local.home with local (Exim 4.96)
+        (envelope-from <rostedt@goodmis.org>)
+        id 1orCFf-007Oer-03;
+        Sat, 05 Nov 2022 02:01:55 -0400
+Message-ID: <20221105060024.598488967@goodmis.org>
+User-Agent: quilt/0.66
+Date:   Sat, 05 Nov 2022 02:00:24 -0400
+From:   Steven Rostedt <rostedt@goodmis.org>
+To:     linux-kernel@vger.kernel.org
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Stephen Boyd <sboyd@kernel.org>,
+        Guenter Roeck <linux@roeck-us.net>,
+        Anna-Maria Gleixner <anna-maria@linutronix.de>,
+        Andrew Morton <akpm@linux-foundation.org>, rcu@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-s390@vger.kernel.org, linux-sh@vger.kernel.org,
+        linux-edac@vger.kernel.org, cgroups@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-acpi@vger.kernel.org,
+        linux-atm-general@lists.sourceforge.net, netdev@vger.kernel.org,
+        linux-pm@vger.kernel.org, drbd-dev@lists.linbit.com,
+        linux-bluetooth@vger.kernel.org,
+        openipmi-developer@lists.sourceforge.net,
+        linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        linaro-mm-sig@lists.linaro.org, intel-gfx@lists.freedesktop.org,
+        linux-input@vger.kernel.org, linux-parisc@vger.kernel.org,
+        linux-leds@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
+        linux-usb@vger.kernel.org, linux-wireless@vger.kernel.org,
+        linux-scsi@vger.kernel.org, linux-staging@lists.linux.dev,
+        linux-ext4@vger.kernel.org, linux-nilfs@vger.kernel.org,
+        bridge@lists.linux-foundation.org, netfilter-devel@vger.kernel.org,
+        coreteam@netfilter.org, lvs-devel@vger.kernel.org,
+        linux-afs@lists.infradead.org, linux-nfs@vger.kernel.org,
+        tipc-discussion@lists.sourceforge.net, alsa-devel@alsa-project.org
+Subject: [PATCH v4a 00/38] timers: Use timer_shutdown*() before freeing timers
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-As noted by Michal, the blkg_iostat_set's in the lockless list
-hold reference to blkg's to protect against their removal. Those
-blkg's hold reference to blkcg. When a cgroup is being destroyed,
-cgroup_rstat_flush() is only called at css_release_work_fn() which is
-called when the blkcg reference count reaches 0. This circular dependency
-will prevent blkcg from being freed until some other events cause
-cgroup_rstat_flush() to be called to flush out the pending blkcg stats.
 
-To prevent this delayed blkcg removal, add a new cgroup_rstat_css_flush()
-function to flush stats for a given css and cpu and call it at the blkgs
-destruction path, blkcg_destroy_blkgs(), whenever there are still some
-pending stats to be flushed. This will ensure that blkcg reference
-count can reach 0 ASAP.
+Back in April, I posted an RFC patch set to help mitigate a common issue
+where a timer gets armed just before it is freed, and when the timer
+goes off, it crashes in the timer code without any evidence of who the
+culprit was. I got side tracked and never finished up on that patch set.
+Since this type of crash is still our #1 crash we are seeing in the field,
+it has become a priority again to finish it.
 
-Signed-off-by: Waiman Long <longman@redhat.com>
----
- block/blk-cgroup.c     | 15 ++++++++++++++-
- include/linux/cgroup.h |  1 +
- kernel/cgroup/rstat.c  | 20 ++++++++++++++++++++
- 3 files changed, 35 insertions(+), 1 deletion(-)
+The last version of that patch set is here:
 
-diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-index 3e03c0d13253..57941d2a8ba3 100644
---- a/block/blk-cgroup.c
-+++ b/block/blk-cgroup.c
-@@ -1084,10 +1084,12 @@ struct list_head *blkcg_get_cgwb_list(struct cgroup_subsys_state *css)
-  */
- static void blkcg_destroy_blkgs(struct blkcg *blkcg)
- {
-+	int cpu;
-+
- 	might_sleep();
- 
-+	css_get(&blkcg->css);
- 	spin_lock_irq(&blkcg->lock);
--
- 	while (!hlist_empty(&blkcg->blkg_list)) {
- 		struct blkcg_gq *blkg = hlist_entry(blkcg->blkg_list.first,
- 						struct blkcg_gq, blkcg_node);
-@@ -1110,6 +1112,17 @@ static void blkcg_destroy_blkgs(struct blkcg *blkcg)
- 	}
- 
- 	spin_unlock_irq(&blkcg->lock);
-+
-+	/*
-+	 * Flush all the non-empty percpu lockless lists.
-+	 */
-+	for_each_possible_cpu(cpu) {
-+		struct llist_head *lhead = per_cpu_ptr(blkcg->lhead, cpu);
-+
-+		if (!llist_empty(lhead))
-+			cgroup_rstat_css_cpu_flush(&blkcg->css, cpu);
-+	}
-+	css_put(&blkcg->css);
- }
- 
- /**
-diff --git a/include/linux/cgroup.h b/include/linux/cgroup.h
-index 528bd44b59e2..6c4e66b3fa84 100644
---- a/include/linux/cgroup.h
-+++ b/include/linux/cgroup.h
-@@ -766,6 +766,7 @@ void cgroup_rstat_flush(struct cgroup *cgrp);
- void cgroup_rstat_flush_irqsafe(struct cgroup *cgrp);
- void cgroup_rstat_flush_hold(struct cgroup *cgrp);
- void cgroup_rstat_flush_release(void);
-+void cgroup_rstat_css_cpu_flush(struct cgroup_subsys_state *css, int cpu);
- 
- /*
-  * Basic resource stats.
-diff --git a/kernel/cgroup/rstat.c b/kernel/cgroup/rstat.c
-index 793ecff29038..910e633869b0 100644
---- a/kernel/cgroup/rstat.c
-+++ b/kernel/cgroup/rstat.c
-@@ -281,6 +281,26 @@ void cgroup_rstat_flush_release(void)
- 	spin_unlock_irq(&cgroup_rstat_lock);
- }
- 
-+/**
-+ * cgroup_rstat_css_cpu_flush - flush stats for the given css and cpu
-+ * @css: target css to be flush
-+ * @cpu: the cpu that holds the stats to be flush
-+ *
-+ * A lightweight rstat flush operation for a given css and cpu.
-+ * Only the cpu_lock is being held for mutual exclusion, the cgroup_rstat_lock
-+ * isn't used.
-+ */
-+void cgroup_rstat_css_cpu_flush(struct cgroup_subsys_state *css, int cpu)
-+{
-+	raw_spinlock_t *cpu_lock = per_cpu_ptr(&cgroup_rstat_cpu_lock, cpu);
-+
-+	raw_spin_lock_irq(cpu_lock);
-+	rcu_read_lock();
-+	css->ss->css_rstat_flush(css, cpu);
-+	rcu_read_unlock();
-+	raw_spin_unlock_irq(cpu_lock);
-+}
-+
- int cgroup_rstat_init(struct cgroup *cgrp)
- {
- 	int cpu;
--- 
-2.31.1
+  https://lore.kernel.org/all/20221104054053.431922658@goodmis.org/
 
+I'm calling this version 4a as it only has obvious changes were the timer that
+is being shutdown is in the same function where it will be freed or released,
+as this series should be "safe" for adding. I'll be calling the other patches
+4b for the next merge window.
+
+Patch 1 fixes an issue with sunrpc/xprt where it incorrectly uses
+del_singleshot_timer_sync() for something that is not a oneshot timer. As this
+will be converted to shutdown, this needs to be fixed first.
+
+Patches 2-4 changes existing timer_shutdown() functions used locally in ARM and
+some drivers to better namespace names.
+
+Patch 5 implements the new timer_shutdown() and timer_shutdown_sync() functions
+that disable re-arming the timer after they are called.
+
+Patches 6-28 change all the locations where there's a kfree(), kfree_rcu(),
+kmem_cache_free() and one call_rcu() call where the RCU function frees the
+timer (the workqueue patch) in the same function as the del_timer{,_sync}() is
+called on that timer, and there's no extra exit path between the del_timer and
+freeing of the timer.
+
+Patches 29-32 add timer_shutdown*() on on-stack timers that are about to be
+released at the end of the function.
+
+Patches 33-37 add timer_shutdown*() on module timers in the module exit code.
+
+Patch 38 simply converts an open coded "shutdown" code into timer_shutdown(),
+as a way timer_shutdown() disables the timer is by setting that timer function
+to NULL.
+
+Linus, I sorted the patches this way to let you see which you would think is
+safe to go into this -rc. I honestly believe that they are all safe, but that's
+just my own opinion.
+
+This series is here:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/rostedt/linux-trace.git
+timers-start
+
+Head SHA1: f58b516a65bac76f1bfa00126856d6c6c3d24a40
+
+
+Steven Rostedt (Google) (38):
+      SUNRPC/xprt: Use del_timer_sync() instead of del_singleshot_timer_sync()
+      ARM: spear: Do not use timer namespace for timer_shutdown() function
+      clocksource/drivers/arm_arch_timer: Do not use timer namespace for timer_shutdown() function
+      clocksource/drivers/sp804: Do not use timer namespace for timer_shutdown() function
+      timers: Add timer_shutdown_sync() and timer_shutdown() to be called before freeing timers
+      timers: sh: Use timer_shutdown_sync() before freeing timer
+      timers: block: Use timer_shutdown_sync() before freeing timer
+      timers: ACPI: Use timer_shutdown_sync() before freeing timer
+      timers: atm: Use timer_shutdown_sync() before freeing timer
+      timers: Bluetooth: Use timer_shutdown_sync() before freeing timer
+      timers: drm: Use timer_shutdown_sync() before freeing timer
+      timers: HID: Use timer_shutdown_sync() before freeing timer
+      timers: Input: Use timer_shutdown_sync() before freeing timer
+      timers: mISDN: Use timer_shutdown_sync() before freeing timer
+      timers: leds: Use timer_shutdown_sync() before freeing timer
+      timers: media: Use timer_shutdown_sync() before freeing timer
+      timers: net: Use timer_shutdown_sync() before freeing timer
+      timers: usb: Use timer_shutdown_sync() before freeing timer
+      timers: nfc: pn533: Use timer_shutdown_sync() before freeing timer
+      timers: pcmcia: Use timer_shutdown_sync() before freeing timer
+      timers: scsi: Use timer_shutdown_sync() and timer_shutdown() before freeing timer
+      timers: tty: Use timer_shutdown_sync() before freeing timer
+      timers: ext4: Use timer_shutdown_sync() before freeing timer
+      timers: fs/nilfs2: Use timer_shutdown_sync() before freeing timer
+      timers: ALSA: Use timer_shutdown_sync() before freeing timer
+      timers: jbd2: Use timer_shutdown() before freeing timer
+      timers: sched/psi: Use timer_shutdown_sync() before freeing timer
+      timers: workqueue: Use timer_shutdown_sync() before freeing timer
+      random: use timer_shutdown_sync() for on stack timers
+      timers: dma-buf: Use timer_shutdown_sync() for on stack timers
+      timers: drm: Use timer_shutdown_sync() for on stack timers
+      timers: media: Use timer_shutdown_sync() for on stack timers
+      timers: s390/cmm: Use timer_shutdown_sync() before a module is released
+      timers: atm: Use timer_shutdown_sync() before a module is released
+      timers: hangcheck: Use timer_shutdown_sync() before a module is released
+      timers: ipmi: Use timer_shutdown_sync() before a module is released
+      timers: Input: Use timer_shutdown_sync() before a module is released
+      timers: PM: Use timer_shutdown_sync()
+
+----
+ .../RCU/Design/Requirements/Requirements.rst       |  2 +-
+ Documentation/core-api/local_ops.rst               |  2 +-
+ Documentation/kernel-hacking/locking.rst           |  5 ++
+ arch/arm/mach-spear/time.c                         |  8 +--
+ arch/s390/mm/cmm.c                                 |  4 +-
+ arch/sh/drivers/push-switch.c                      |  2 +-
+ block/blk-iocost.c                                 |  2 +-
+ block/blk-iolatency.c                              |  2 +-
+ block/blk-throttle.c                               |  2 +-
+ block/kyber-iosched.c                              |  2 +-
+ drivers/acpi/apei/ghes.c                           |  2 +-
+ drivers/atm/idt77105.c                             |  4 +-
+ drivers/atm/idt77252.c                             |  4 +-
+ drivers/atm/iphase.c                               |  2 +-
+ drivers/base/power/wakeup.c                        |  7 +--
+ drivers/block/drbd/drbd_main.c                     |  2 +-
+ drivers/block/loop.c                               |  2 +-
+ drivers/block/sunvdc.c                             |  2 +-
+ drivers/bluetooth/hci_bcsp.c                       |  2 +-
+ drivers/bluetooth/hci_h5.c                         |  4 +-
+ drivers/bluetooth/hci_qca.c                        |  4 +-
+ drivers/char/hangcheck-timer.c                     |  4 +-
+ drivers/char/ipmi/ipmi_msghandler.c                |  2 +-
+ drivers/char/random.c                              |  2 +-
+ drivers/clocksource/arm_arch_timer.c               | 12 ++--
+ drivers/clocksource/timer-sp804.c                  |  6 +-
+ drivers/dma-buf/st-dma-fence.c                     |  2 +-
+ drivers/gpu/drm/gud/gud_pipe.c                     |  2 +-
+ drivers/gpu/drm/i915/i915_sw_fence.c               |  2 +-
+ drivers/hid/hid-wiimote-core.c                     |  2 +-
+ drivers/input/keyboard/locomokbd.c                 |  2 +-
+ drivers/input/keyboard/omap-keypad.c               |  2 +-
+ drivers/input/mouse/alps.c                         |  2 +-
+ drivers/input/serio/hil_mlc.c                      |  2 +-
+ drivers/isdn/hardware/mISDN/hfcmulti.c             |  5 +-
+ drivers/isdn/mISDN/l1oip_core.c                    |  4 +-
+ drivers/isdn/mISDN/timerdev.c                      |  4 +-
+ drivers/leds/trigger/ledtrig-pattern.c             |  2 +-
+ drivers/leds/trigger/ledtrig-transient.c           |  2 +-
+ drivers/media/pci/ivtv/ivtv-driver.c               |  2 +-
+ drivers/media/usb/pvrusb2/pvrusb2-hdw.c            | 18 +++---
+ drivers/media/usb/s2255/s2255drv.c                 |  4 +-
+ drivers/net/ethernet/intel/i40e/i40e_main.c        |  7 +--
+ drivers/net/ethernet/marvell/sky2.c                |  2 +-
+ drivers/net/ethernet/sun/sunvnet.c                 |  2 +-
+ drivers/net/usb/sierra_net.c                       |  2 +-
+ drivers/net/wireless/intel/iwlwifi/iwl-dbg-tlv.c   |  2 +-
+ drivers/net/wireless/intersil/hostap/hostap_ap.c   |  2 +-
+ drivers/net/wireless/marvell/mwifiex/main.c        |  2 +-
+ drivers/net/wireless/microchip/wilc1000/hif.c      |  6 +-
+ drivers/nfc/pn533/pn533.c                          |  2 +-
+ drivers/nfc/pn533/uart.c                           |  2 +-
+ drivers/pcmcia/bcm63xx_pcmcia.c                    |  2 +-
+ drivers/pcmcia/electra_cf.c                        |  2 +-
+ drivers/pcmcia/omap_cf.c                           |  2 +-
+ drivers/pcmcia/pd6729.c                            |  4 +-
+ drivers/pcmcia/yenta_socket.c                      |  4 +-
+ drivers/scsi/qla2xxx/qla_edif.c                    |  4 +-
+ drivers/staging/media/atomisp/i2c/atomisp-lm3554.c |  2 +-
+ drivers/tty/n_gsm.c                                |  2 +-
+ drivers/tty/sysrq.c                                |  2 +-
+ drivers/usb/gadget/udc/m66592-udc.c                |  2 +-
+ drivers/usb/serial/garmin_gps.c                    |  2 +-
+ drivers/usb/serial/mos7840.c                       |  2 +-
+ fs/ext4/super.c                                    |  2 +-
+ fs/jbd2/journal.c                                  |  2 +
+ fs/nilfs2/segment.c                                |  2 +-
+ include/linux/timer.h                              | 64 +++++++++++++++++++---
+ kernel/sched/psi.c                                 |  1 +
+ kernel/time/timer.c                                | 64 ++++++++++++----------
+ kernel/workqueue.c                                 |  4 +-
+ net/802/garp.c                                     |  2 +-
+ net/802/mrp.c                                      |  2 +-
+ net/bridge/br_multicast.c                          |  6 +-
+ net/bridge/br_multicast_eht.c                      |  4 +-
+ net/core/gen_estimator.c                           |  2 +-
+ net/core/neighbour.c                               |  2 +
+ net/ipv4/inet_timewait_sock.c                      |  1 +
+ net/ipv4/ipmr.c                                    |  2 +-
+ net/ipv6/ip6mr.c                                   |  2 +-
+ net/mac80211/mesh_pathtbl.c                        |  2 +-
+ net/netfilter/ipset/ip_set_list_set.c              |  2 +-
+ net/netfilter/ipvs/ip_vs_lblc.c                    |  2 +-
+ net/netfilter/ipvs/ip_vs_lblcr.c                   |  2 +-
+ net/netfilter/xt_LED.c                             |  2 +-
+ net/rxrpc/conn_object.c                            |  2 +-
+ net/sched/cls_flow.c                               |  2 +-
+ net/sunrpc/svc.c                                   |  2 +-
+ net/sunrpc/xprt.c                                  |  2 +-
+ net/tipc/discover.c                                |  2 +-
+ net/tipc/monitor.c                                 |  2 +-
+ sound/i2c/other/ak4117.c                           |  2 +-
+ sound/synth/emux/emux.c                            |  2 +-
+ 93 files changed, 227 insertions(+), 169 deletions(-)
