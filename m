@@ -2,359 +2,157 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 793D5C4332F
-	for <linux-block@archiver.kernel.org>; Sat,  5 Nov 2022 23:11:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E49D1C433FE
+	for <linux-block@archiver.kernel.org>; Sun,  6 Nov 2022 15:24:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229694AbiKEXLI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 5 Nov 2022 19:11:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56148 "EHLO
+        id S230041AbiKFPYr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 6 Nov 2022 10:24:47 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40534 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229479AbiKEXLH (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sat, 5 Nov 2022 19:11:07 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0FE1DFA1;
-        Sat,  5 Nov 2022 16:11:02 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 8E3141F37E;
-        Sat,  5 Nov 2022 23:11:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1667689861; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-        bh=tDUWZN79x9yoUZIZ4Slq0fQ9VuYoYPDPcHlKsV/Y7Vw=;
-        b=JvgCdou8o4dfS97npKZg5pRbK5fXqlCulxuCFr0+NOgh1posF9Azz8eVn+2/ZXGZ1bnCaC
-        ZcANDFb5ZWPZ+cH5f3d8EaYdUT6jEM0mmdRZdHoy5WUxf8rcoDxOPxtPzfTse0+ssQO/n0
-        SPz0uh4IY8J+ynnzL7HadbXiEbu3kLA=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1667689861;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-        bh=tDUWZN79x9yoUZIZ4Slq0fQ9VuYoYPDPcHlKsV/Y7Vw=;
-        b=4r/fLg4dmd7TNYLkI7tshDLLcmJ6apt/wIR6m/SOrYAb4Q7CLgGzQci/wfsn6I00gLvGkw
-        29ITplogIWibvGAg==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 5900913AA6;
-        Sat,  5 Nov 2022 23:11:01 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id kVepEIXtZmMTBAAAMHmgww
-        (envelope-from <krisman@suse.de>); Sat, 05 Nov 2022 23:11:01 +0000
-From:   Gabriel Krisman Bertazi <krisman@suse.de>
-To:     axboe@kernel.dk
-Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        Gabriel Krisman Bertazi <krisman@suse.de>,
-        Hugh Dickins <hughd@google.com>,
-        Keith Busch <kbusch@kernel.org>,
-        Liu Song <liusong@linux.alibaba.com>, Jan Kara <jack@suse.cz>
-Subject: [PATCH] sbitmap: Use single per-bitmap counting to wake up queued tags
-Date:   Sat,  5 Nov 2022 19:10:55 -0400
-Message-Id: <20221105231055.25953-1-krisman@suse.de>
-X-Mailer: git-send-email 2.35.3
+        with ESMTP id S229917AbiKFPYr (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 6 Nov 2022 10:24:47 -0500
+Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 137286157
+        for <linux-block@vger.kernel.org>; Sun,  6 Nov 2022 07:24:46 -0800 (PST)
+Received: by mail-il1-f198.google.com with SMTP id q10-20020a056e0220ea00b00300f474693aso4168821ilv.23
+        for <linux-block@vger.kernel.org>; Sun, 06 Nov 2022 07:24:46 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=0WExPyMyjMe3IiUa53gV64rIuVSNFwd1b1MIc+Fmyns=;
+        b=kLdh2/sCq/VegDW3OZejCUMibDK2BvF+xPiOs045M/1JIgJTw7Z8/4lCx+ElOgJAyc
+         FvWE7cPf/Q0abOudp4ZdIEfaFrhSAMC032eOX1r17tXiGoq8n8K/me6ZB06AuDg0Fy/5
+         /RvOfuOJ6sqdAHCVCr6uF94vzIsTuqkLKE8/hCGk6TBwUfoRwppsQmO34tqmP4Zm/nWe
+         7AR0V/tsxf1CELj9lBEFoERNR/M5vjszsYTZ8y2tFPyUMo5O+5NG5ud6ImQ35H6FTbYj
+         3+vduaF92aJF8RxuwZQ60WSQsM8o9KYwT2obSDXbU8D2xdcBKMsCFGSRfyjHq5WOdJ6e
+         egHg==
+X-Gm-Message-State: ACrzQf2CtPG9/HtMi2QFZrFENZPYmvkszib2kVXHvCmO2UrP3xZgwza1
+        An9Uci9YBwVK3wzafi2tyRnqOgbtCmMGRdV7p7/o8eWfXmZw
+X-Google-Smtp-Source: AMsMyM7SU5Q6Ux9kMvgdJ5fXQw6EBoo29bKvjspLB7bbRgs36JoD1SomFNOgbwNr9tEK2HlCLi4dHTwLNdYpO0WQIi2Sght+ONy0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a05:6e02:ee9:b0:300:ef0e:9381 with SMTP id
+ j9-20020a056e020ee900b00300ef0e9381mr6635492ilk.252.1667748285376; Sun, 06
+ Nov 2022 07:24:45 -0800 (PST)
+Date:   Sun, 06 Nov 2022 07:24:45 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000001ff0fa05eccee8e2@google.com>
+Subject: [syzbot] general protection fault in blk_mq_update_nr_hw_queues
+From:   syzbot <syzbot+746a4eece09f86bc39d7@syzkaller.appspotmail.com>
+To:     axboe@kernel.dk, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-sbitmap suffers from code complexity, as demonstrated by recent fixes,
-and eventual lost wake ups on nested I/O completion.  The later happens,
-from what I understand, due to the non-atomic nature of the updates to
-wait_cnt, which needs to be subtracted and eventually reset when equal
-to zero.  This two step process can eventually miss an update when a
-nested completion happens to interrupt the CPU in between the wait_cnt
-updates.  This is very hard to fix, as shown by the recent changes to
-this code.
+Hello,
 
-The code complexity arises mostly from the corner cases to avoid missed
-wakes in this scenario.  In addition, the handling of wake_batch
-recalculation plus the synchronization with sbq_queue_wake_up is
-non-trivial.
+syzbot found the following issue on:
 
-This patchset implements the idea originally proposed by Jan [1], which
-removes the need for the two-step updates of wait_cnt.  This is done by
-tracking the number of completions and wakeups in always increasing,
-per-bitmap counters.  Instead of having to reset the wait_cnt when it
-reaches zero, we simply keep counting, and attempt to wake up N threads
-in a single wait queue whenever there is enough space for a batch.
-Waking up less than batch_wake shouldn't be a problem, because we
-haven't changed the conditions for wake up, and the existing batch
-calculation guarantees at least enough remaining completions to wake up
-a batch for each queue at any time.
+HEAD commit:    61c3426aca2c Add linux-next specific files for 20221102
+git tree:       linux-next
+console+strace: https://syzkaller.appspot.com/x/log.txt?x=14473561880000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=acb529cc910d907c
+dashboard link: https://syzkaller.appspot.com/bug?extid=746a4eece09f86bc39d7
+compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=109e96a6880000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=15d036de880000
 
-Performance-wise, one should expect very similar performance to the
-original algorithm for the case where there is no queueing.  In both the
-old algorithm and this implementation, the first thing is to check
-ws_active, which bails out if there is no queueing to be managed. In the
-new code, we took care to avoid accounting completions and wakeups when
-there is no queueing, to not pay the cost of atomic operations
-unnecessarily, since it doesn't skew the numbers.
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/cc56d88dd6a3/disk-61c3426a.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/5921b65b080f/vmlinux-61c3426a.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/39cbd355fedd/bzImage-61c3426a.xz
 
-For more interesting cases, where there is queueing, we need to take
-into account the cross-communication of the atomic operations.  I've
-been benchmarking by running parallel fio jobs against a single hctx
-nullb in different hardware queue depth scenarios, and verifying both
-IOPS and queueing.
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+746a4eece09f86bc39d7@syzkaller.appspotmail.com
 
-Each experiment was repeated 5 times on a 20-CPU box, with 20 parallel
-jobs. fio was issuing fixed-size randwrites with qd=64 against nullb,
-varying only the hardware queue length per test.
+general protection fault, probably for non-canonical address 0xdffffc000000001d: 0000 [#1] PREEMPT SMP KASAN
+KASAN: null-ptr-deref in range [0x00000000000000e8-0x00000000000000ef]
+CPU: 0 PID: 5234 Comm: syz-executor931 Not tainted 6.1.0-rc3-next-20221102-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/11/2022
+RIP: 0010:__elevator_get block/elevator.h:94 [inline]
+RIP: 0010:blk_mq_elv_switch_none block/blk-mq.c:4593 [inline]
+RIP: 0010:__blk_mq_update_nr_hw_queues block/blk-mq.c:4658 [inline]
+RIP: 0010:blk_mq_update_nr_hw_queues+0x304/0xe40 block/blk-mq.c:4709
+Code: 8d 47 18 49 89 6f 10 4c 89 c0 48 c1 e8 03 80 3c 18 00 0f 85 f7 09 00 00 49 8b 47 18 48 8d b8 e8 00 00 00 48 89 fa 48 c1 ea 03 <80> 3c 1a 00 0f 85 12 09 00 00 48 8b b8 e8 00 00 00 4c 89 44 24 08
+RSP: 0018:ffffc90003cdfc08 EFLAGS: 00010206
+RAX: 0000000000000000 RBX: dffffc0000000000 RCX: 0000000000000000
+RDX: 000000000000001d RSI: 0000000000000002 RDI: 00000000000000e8
+RBP: ffff88801dbd0000 R08: ffff888027c89398 R09: ffffffff8de2e517
+R10: fffffbfff1bc5ca2 R11: 0000000000000000 R12: ffffc90003cdfc70
+R13: ffff88801dbd0008 R14: ffff88801dbd03f8 R15: ffff888027c89380
+FS:  0000555557259300(0000) GS:ffff8880b9a00000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00000000005d84c8 CR3: 000000007a7cb000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ nbd_start_device+0x153/0xc30 drivers/block/nbd.c:1355
+ nbd_start_device_ioctl drivers/block/nbd.c:1405 [inline]
+ __nbd_ioctl drivers/block/nbd.c:1481 [inline]
+ nbd_ioctl+0x5a1/0xbd0 drivers/block/nbd.c:1521
+ blkdev_ioctl+0x36e/0x800 block/ioctl.c:614
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:870 [inline]
+ __se_sys_ioctl fs/ioctl.c:856 [inline]
+ __x64_sys_ioctl+0x193/0x200 fs/ioctl.c:856
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x63/0xcd
+RIP: 0033:0x7f41f05946b9
+Code: 28 c3 e8 2a 14 00 00 66 2e 0f 1f 84 00 00 00 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 c0 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007fff1b23e808 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007f41f05946b9
+RDX: 0000000000000000 RSI: 000000000000ab03 RDI: 0000000000000006
+RBP: 00007f41f05541c0 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 00007f41f0554250
+R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
+ </TASK>
+Modules linked in:
+---[ end trace 0000000000000000 ]---
+RIP: 0010:__elevator_get block/elevator.h:94 [inline]
+RIP: 0010:blk_mq_elv_switch_none block/blk-mq.c:4593 [inline]
+RIP: 0010:__blk_mq_update_nr_hw_queues block/blk-mq.c:4658 [inline]
+RIP: 0010:blk_mq_update_nr_hw_queues+0x304/0xe40 block/blk-mq.c:4709
+Code: 8d 47 18 49 89 6f 10 4c 89 c0 48 c1 e8 03 80 3c 18 00 0f 85 f7 09 00 00 49 8b 47 18 48 8d b8 e8 00 00 00 48 89 fa 48 c1 ea 03 <80> 3c 1a 00 0f 85 12 09 00 00 48 8b b8 e8 00 00 00 4c 89 44 24 08
+RSP: 0018:ffffc90003cdfc08 EFLAGS: 00010206
+RAX: 0000000000000000 RBX: dffffc0000000000 RCX: 0000000000000000
+RDX: 000000000000001d RSI: 0000000000000002 RDI: 00000000000000e8
+RBP: ffff88801dbd0000 R08: ffff888027c89398 R09: ffffffff8de2e517
+R10: fffffbfff1bc5ca2 R11: 0000000000000000 R12: ffffc90003cdfc70
+R13: ffff88801dbd0008 R14: ffff88801dbd03f8 R15: ffff888027c89380
+FS:  0000555557259300(0000) GS:ffff8880b9a00000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00000000005d84c8 CR3: 000000007a7cb000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+----------------
+Code disassembly (best guess):
+   0:	8d 47 18             	lea    0x18(%rdi),%eax
+   3:	49 89 6f 10          	mov    %rbp,0x10(%r15)
+   7:	4c 89 c0             	mov    %r8,%rax
+   a:	48 c1 e8 03          	shr    $0x3,%rax
+   e:	80 3c 18 00          	cmpb   $0x0,(%rax,%rbx,1)
+  12:	0f 85 f7 09 00 00    	jne    0xa0f
+  18:	49 8b 47 18          	mov    0x18(%r15),%rax
+  1c:	48 8d b8 e8 00 00 00 	lea    0xe8(%rax),%rdi
+  23:	48 89 fa             	mov    %rdi,%rdx
+  26:	48 c1 ea 03          	shr    $0x3,%rdx
+* 2a:	80 3c 1a 00          	cmpb   $0x0,(%rdx,%rbx,1) <-- trapping instruction
+  2e:	0f 85 12 09 00 00    	jne    0x946
+  34:	48 8b b8 e8 00 00 00 	mov    0xe8(%rax),%rdi
+  3b:	4c 89 44 24 08       	mov    %r8,0x8(%rsp)
 
-queue size 2                 4                 8                 16                 32                 64
-6.1-rc2    1681.1K (1.6K)    2633.0K (12.7K)   6940.8K (16.3K)   8172.3K (617.5K)   8391.7K (367.1K)   8606.1K (351.2K)
-patched    1721.8K (15.1K)   3016.7K (3.8K)    7543.0K (89.4K)   8132.5K (303.4K)   8324.2K (230.6K)   8401.8K (284.7K)
 
-The following is a similar experiment, ran against a nullb with a single
-bitmap shared by 20 hctx spread across 2 NUMA nodes. This has 40
-parallel fio jobs operating on the same device
-
-queue size 2 	             4                 8              	16             	    32		       64
-6.1-rc2	   1081.0K (2.3K)    957.2K (1.5K)     1699.1K (5.7K) 	6178.2K (124.6K)    12227.9K (37.7K)   13286.6K (92.9K)
-patched	   1081.8K (2.8K)    1316.5K (5.4K)    2364.4K (1.8K) 	6151.4K  (20.0K)    11893.6K (17.5K)   12385.6K (18.4K)
-
-It has also survived blktests and a 12h-stress run against nullb. I also
-ran the code against nvme and a scsi SSD, and I didn't observe
-performance regression in those. If there are other tests you think I
-should run, please let me know and I will follow up with results.
-
-[1] https://lore.kernel.org/all/aef9de29-e9f5-259a-f8be-12d1b734e72@google.com/
-
-Cc: Hugh Dickins <hughd@google.com>
-Cc: Keith Busch <kbusch@kernel.org>
-Cc: Liu Song <liusong@linux.alibaba.com>
-Suggested-by: Jan Kara <jack@suse.cz>
-Signed-off-by: Gabriel Krisman Bertazi <krisman@suse.de>
 ---
- include/linux/sbitmap.h |  16 ++++--
- lib/sbitmap.c           | 122 +++++++++-------------------------------
- 2 files changed, 37 insertions(+), 101 deletions(-)
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-diff --git a/include/linux/sbitmap.h b/include/linux/sbitmap.h
-index 4d2d5205ab58..d662cf136021 100644
---- a/include/linux/sbitmap.h
-+++ b/include/linux/sbitmap.h
-@@ -86,11 +86,6 @@ struct sbitmap {
-  * struct sbq_wait_state - Wait queue in a &struct sbitmap_queue.
-  */
- struct sbq_wait_state {
--	/**
--	 * @wait_cnt: Number of frees remaining before we wake up.
--	 */
--	atomic_t wait_cnt;
--
- 	/**
- 	 * @wait: Wait queue.
- 	 */
-@@ -138,6 +133,17 @@ struct sbitmap_queue {
- 	 * sbitmap_queue_get_shallow()
- 	 */
- 	unsigned int min_shallow_depth;
-+
-+	/**
-+	 * @completion_cnt: Number of bits cleared passed to the
-+	 * wakeup function.
-+	 */
-+	atomic_t completion_cnt;
-+
-+	/**
-+	 * @wakeup_cnt: Number of thread wake ups issued.
-+	 */
-+	atomic_t wakeup_cnt;
- };
- 
- /**
-diff --git a/lib/sbitmap.c b/lib/sbitmap.c
-index 7280ae8ca88c..eca462cba398 100644
---- a/lib/sbitmap.c
-+++ b/lib/sbitmap.c
-@@ -434,6 +434,8 @@ int sbitmap_queue_init_node(struct sbitmap_queue *sbq, unsigned int depth,
- 	sbq->wake_batch = sbq_calc_wake_batch(sbq, depth);
- 	atomic_set(&sbq->wake_index, 0);
- 	atomic_set(&sbq->ws_active, 0);
-+	atomic_set(&sbq->completion_cnt, 0);
-+	atomic_set(&sbq->wakeup_cnt, 0);
- 
- 	sbq->ws = kzalloc_node(SBQ_WAIT_QUEUES * sizeof(*sbq->ws), flags, node);
- 	if (!sbq->ws) {
-@@ -441,40 +443,21 @@ int sbitmap_queue_init_node(struct sbitmap_queue *sbq, unsigned int depth,
- 		return -ENOMEM;
- 	}
- 
--	for (i = 0; i < SBQ_WAIT_QUEUES; i++) {
-+	for (i = 0; i < SBQ_WAIT_QUEUES; i++)
- 		init_waitqueue_head(&sbq->ws[i].wait);
--		atomic_set(&sbq->ws[i].wait_cnt, sbq->wake_batch);
--	}
- 
- 	return 0;
- }
- EXPORT_SYMBOL_GPL(sbitmap_queue_init_node);
- 
--static inline void __sbitmap_queue_update_wake_batch(struct sbitmap_queue *sbq,
--					    unsigned int wake_batch)
--{
--	int i;
--
--	if (sbq->wake_batch != wake_batch) {
--		WRITE_ONCE(sbq->wake_batch, wake_batch);
--		/*
--		 * Pairs with the memory barrier in sbitmap_queue_wake_up()
--		 * to ensure that the batch size is updated before the wait
--		 * counts.
--		 */
--		smp_mb();
--		for (i = 0; i < SBQ_WAIT_QUEUES; i++)
--			atomic_set(&sbq->ws[i].wait_cnt, 1);
--	}
--}
--
- static void sbitmap_queue_update_wake_batch(struct sbitmap_queue *sbq,
- 					    unsigned int depth)
- {
- 	unsigned int wake_batch;
- 
- 	wake_batch = sbq_calc_wake_batch(sbq, depth);
--	__sbitmap_queue_update_wake_batch(sbq, wake_batch);
-+	if (sbq->wake_batch != wake_batch)
-+		WRITE_ONCE(sbq->wake_batch, wake_batch);
- }
- 
- void sbitmap_queue_recalculate_wake_batch(struct sbitmap_queue *sbq,
-@@ -488,7 +471,8 @@ void sbitmap_queue_recalculate_wake_batch(struct sbitmap_queue *sbq,
- 
- 	wake_batch = clamp_val(depth / SBQ_WAIT_QUEUES,
- 			min_batch, SBQ_WAKE_BATCH);
--	__sbitmap_queue_update_wake_batch(sbq, wake_batch);
-+
-+	WRITE_ONCE(sbq->wake_batch, wake_batch);
- }
- EXPORT_SYMBOL_GPL(sbitmap_queue_recalculate_wake_batch);
- 
-@@ -587,7 +571,7 @@ static struct sbq_wait_state *sbq_wake_ptr(struct sbitmap_queue *sbq)
- 	for (i = 0; i < SBQ_WAIT_QUEUES; i++) {
- 		struct sbq_wait_state *ws = &sbq->ws[wake_index];
- 
--		if (waitqueue_active(&ws->wait) && atomic_read(&ws->wait_cnt)) {
-+		if (waitqueue_active(&ws->wait)) {
- 			if (wake_index != atomic_read(&sbq->wake_index))
- 				atomic_set(&sbq->wake_index, wake_index);
- 			return ws;
-@@ -599,83 +583,31 @@ static struct sbq_wait_state *sbq_wake_ptr(struct sbitmap_queue *sbq)
- 	return NULL;
- }
- 
--static bool __sbq_wake_up(struct sbitmap_queue *sbq, int *nr)
-+void sbitmap_queue_wake_up(struct sbitmap_queue *sbq, int nr)
- {
--	struct sbq_wait_state *ws;
--	unsigned int wake_batch;
--	int wait_cnt, cur, sub;
--	bool ret;
-+	unsigned int wake_batch = READ_ONCE(sbq->wake_batch);
-+	struct sbq_wait_state *ws = NULL;
-+	unsigned int wakeups;
- 
--	if (*nr <= 0)
--		return false;
-+	if (!atomic_read(&sbq->ws_active))
-+		return;
- 
--	ws = sbq_wake_ptr(sbq);
--	if (!ws)
--		return false;
-+	atomic_add(nr, &sbq->completion_cnt);
-+	wakeups = atomic_read(&sbq->wakeup_cnt);
- 
--	cur = atomic_read(&ws->wait_cnt);
- 	do {
--		/*
--		 * For concurrent callers of this, callers should call this
--		 * function again to wakeup a new batch on a different 'ws'.
--		 */
--		if (cur == 0)
--			return true;
--		sub = min(*nr, cur);
--		wait_cnt = cur - sub;
--	} while (!atomic_try_cmpxchg(&ws->wait_cnt, &cur, wait_cnt));
--
--	/*
--	 * If we decremented queue without waiters, retry to avoid lost
--	 * wakeups.
--	 */
--	if (wait_cnt > 0)
--		return !waitqueue_active(&ws->wait);
-+		if (atomic_read(&sbq->completion_cnt) - wakeups < wake_batch)
-+			return;
- 
--	*nr -= sub;
--
--	/*
--	 * When wait_cnt == 0, we have to be particularly careful as we are
--	 * responsible to reset wait_cnt regardless whether we've actually
--	 * woken up anybody. But in case we didn't wakeup anybody, we still
--	 * need to retry.
--	 */
--	ret = !waitqueue_active(&ws->wait);
--	wake_batch = READ_ONCE(sbq->wake_batch);
-+		if (!ws) {
-+			ws = sbq_wake_ptr(sbq);
-+			if (!ws)
-+				return;
-+		}
-+	} while (!atomic_try_cmpxchg(&sbq->wakeup_cnt,
-+				     &wakeups, wakeups + wake_batch));
- 
--	/*
--	 * Wake up first in case that concurrent callers decrease wait_cnt
--	 * while waitqueue is empty.
--	 */
- 	wake_up_nr(&ws->wait, wake_batch);
--
--	/*
--	 * Pairs with the memory barrier in sbitmap_queue_resize() to
--	 * ensure that we see the batch size update before the wait
--	 * count is reset.
--	 *
--	 * Also pairs with the implicit barrier between decrementing wait_cnt
--	 * and checking for waitqueue_active() to make sure waitqueue_active()
--	 * sees result of the wakeup if atomic_dec_return() has seen the result
--	 * of atomic_set().
--	 */
--	smp_mb__before_atomic();
--
--	/*
--	 * Increase wake_index before updating wait_cnt, otherwise concurrent
--	 * callers can see valid wait_cnt in old waitqueue, which can cause
--	 * invalid wakeup on the old waitqueue.
--	 */
--	sbq_index_atomic_inc(&sbq->wake_index);
--	atomic_set(&ws->wait_cnt, wake_batch);
--
--	return ret || *nr;
--}
--
--void sbitmap_queue_wake_up(struct sbitmap_queue *sbq, int nr)
--{
--	while (__sbq_wake_up(sbq, &nr))
--		;
- }
- EXPORT_SYMBOL_GPL(sbitmap_queue_wake_up);
- 
-@@ -792,9 +724,7 @@ void sbitmap_queue_show(struct sbitmap_queue *sbq, struct seq_file *m)
- 	seq_puts(m, "ws={\n");
- 	for (i = 0; i < SBQ_WAIT_QUEUES; i++) {
- 		struct sbq_wait_state *ws = &sbq->ws[i];
--
--		seq_printf(m, "\t{.wait_cnt=%d, .wait=%s},\n",
--			   atomic_read(&ws->wait_cnt),
-+		seq_printf(m, "\t{.wait=%s},\n",
- 			   waitqueue_active(&ws->wait) ? "active" : "inactive");
- 	}
- 	seq_puts(m, "}\n");
--- 
-2.35.3
-
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+syzbot can test patches for this issue, for details see:
+https://goo.gl/tpsmEJ#testing-patches
