@@ -2,180 +2,120 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F39EDC4332F
-	for <linux-block@archiver.kernel.org>; Mon,  7 Nov 2022 01:06:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 870C5C433FE
+	for <linux-block@archiver.kernel.org>; Mon,  7 Nov 2022 03:21:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229782AbiKGBGN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 6 Nov 2022 20:06:13 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60882 "EHLO
+        id S231250AbiKGDVM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 6 Nov 2022 22:21:12 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46308 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230020AbiKGBGL (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 6 Nov 2022 20:06:11 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D86DBBC84
-        for <linux-block@vger.kernel.org>; Sun,  6 Nov 2022 17:05:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1667783118;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=SNimcy03lVO1HY+U4NDPJI3Wpm45K80Mxm9Usc2lI5A=;
-        b=FPR9UNkE45KcrYzKYEUisimPX49+u7zVraXpctncRDfnZwptId9MwhztOP/ovwmmOe6E4d
-        OLT4nyNVRJUgFdL1dxxDECY5RVo0ysCG1KeTrydfAw5eaauNHs6HRxtxJ2yrrbpnVTt5k0
-        zNUlPNLv+fapK6AppBST7Rm+UP6fCpk=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-670-_RKCmUxEOBKh-hXpjIX--g-1; Sun, 06 Nov 2022 20:05:14 -0500
-X-MC-Unique: _RKCmUxEOBKh-hXpjIX--g-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 73AF78027ED;
-        Mon,  7 Nov 2022 01:05:14 +0000 (UTC)
-Received: from T590 (ovpn-8-22.pek2.redhat.com [10.72.8.22])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 652E740C6EC4;
-        Mon,  7 Nov 2022 01:05:07 +0000 (UTC)
-Date:   Mon, 7 Nov 2022 09:05:05 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Bernd Schubert <bernd.schubert@fastmail.fm>
-Cc:     Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org,
-        Miklos Szeredi <mszeredi@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        ZiyangZhang <ZiyangZhang@linux.alibaba.com>
-Subject: Re: [RFC PATCH 4/4] ublk_drv: support splice based read/write zero
- copy
-Message-ID: <Y2hZwWdY28bCn+iT@T590>
-References: <20221103085004.1029763-1-ming.lei@redhat.com>
- <20221103085004.1029763-5-ming.lei@redhat.com>
- <712cd802-f3bb-9840-e334-385cd42325f2@fastmail.fm>
- <Y2Rgem8+oYafTLVO@T590>
- <ead8a6cc-13eb-6dc0-2c17-a87e78d8a422@fastmail.fm>
+        with ESMTP id S230303AbiKGDVA (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 6 Nov 2022 22:21:00 -0500
+Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DFB3D1178;
+        Sun,  6 Nov 2022 19:18:32 -0800 (PST)
+Received: from mail02.huawei.com (unknown [172.30.67.143])
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4N5Gds5vsKz4f4Qk1;
+        Mon,  7 Nov 2022 11:18:25 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.175.127.227])
+        by APP2 (Coremail) with SMTP id Syh0CgBnfbgDeWhjLBJwAA--.9127S4;
+        Mon, 07 Nov 2022 11:18:28 +0800 (CST)
+From:   Ye Bin <yebin@huaweicloud.com>
+To:     axboe@kernel.dk, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Cc:     ming.lei@redhat.com, Ye Bin <yebin10@huawei.com>,
+        syzbot+746a4eece09f86bc39d7@syzkaller.appspotmail.com
+Subject: [PATCH] block: fix crash in 'blk_mq_elv_switch_none'
+Date:   Mon,  7 Nov 2022 11:39:56 +0800
+Message-Id: <20221107033956.3276891-1-yebin@huaweicloud.com>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ead8a6cc-13eb-6dc0-2c17-a87e78d8a422@fastmail.fm>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: Syh0CgBnfbgDeWhjLBJwAA--.9127S4
+X-Coremail-Antispam: 1UD129KBjvJXoWxGrW3Cw15KF1UuFyxtrykGrg_yoW5Zry8pr
+        47Jr4DGFW0gr17ZF48t3W7Jw1UJr9akF45Ww17ur1qyF1UCry7JF18KayUAr18Jr48JFZF
+        qr1DX3W8tw1UGaUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUkYb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
+        6cxKx2IYs7xG6r1S6rWUM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+        vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7Cj
+        xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
+        0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
+        6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
+        Cjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JMxkF7I0En4kS14v26r1q6r43MxAIw28IcxkI
+        7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxV
+        Cjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUAVWUtwCIc40Y0x0EwIxGrwCI42IY
+        6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6x
+        AIw20EY4v20xvaj40_Wr1j6rW3Jr1lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280
+        aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU17KsUUUUUU==
+X-CM-SenderInfo: p1hex046kxt4xhlfz01xgou0bp/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, Nov 05, 2022 at 12:37:21AM +0100, Bernd Schubert wrote:
-> 
-> 
-> On 11/4/22 01:44, Ming Lei wrote:
-> > On Thu, Nov 03, 2022 at 11:28:29PM +0100, Bernd Schubert wrote:
-> > > 
-> > > 
-> > > On 11/3/22 09:50, Ming Lei wrote:
-> > > > Pass ublk block IO request pages to kernel backend IO handling code via
-> > > > pipe, and request page copy can be avoided. So far, the existed
-> > > > pipe/splice mechanism works for handling write request only.
-> > > > 
-> > > > The initial idea of using splice for zero copy is from Miklos and Stefan.
-> > > > 
-> > > > Read request's zero copy requires pipe's change to allow one read end to
-> > > > produce buffers for another read end to consume. The added SPLICE_F_READ_TO_READ
-> > > > flag is for supporting this feature.
-> > > > 
-> > > > READ is handled by sending IORING_OP_SPLICE with SPLICE_F_DIRECT |
-> > > > SPLICE_F_READ_TO_READ. WRITE is handled by sending IORING_OP_SPLICE with
-> > > > SPLICE_F_DIRECT. Kernel internal pipe is used for simplifying userspace,
-> > > > meantime potential info leak could be avoided.
-> > > 
-> > > 
-> > > Sorry to ask, do you have an ublk branch that gives an example how to use
-> > > this?
-> > 
-> > Follows the ublk splice-zc branch:
-> > 
-> > https://github.com/ming1/ubdsrv/commits/splice-zc
-> > 
-> > which is mentioned in cover letter, but I guess it should be added to
-> > here too, sorry for that, so far only ublk-loop supports it by:
-> > 
-> >     ublk add -t loop -f $BACKING -z
-> > 
-> > without '-z', ublk-loop is created with zero copy disabled.
-> 
-> Ah, thanks a lot! And sorry, I had missed this part in the cover letter.
-> 
-> I will take a look on your new zero copy code on Monday.
-> 
-> 
-> > 
-> > > 
-> > > I still have several things to fix in my branches, but I got basic fuse
-> > > uring with copies working. Adding back splice would be next after posting
-> > > rfc patches. My initial assumption was that I needed to duplicate everything
-> > > splice does into the fuse .uring_cmd handler - obviously there is a better
-> > > way with your patches.
-> > > 
-> > > This week I have a few days off, by end of next week or the week after I
-> > > might have patches in an rfc state (one thing I'm going to ask about is how
-> > > do I know what is the next CQE in the kernel handler - ublk does this with
-> > > tags through mq, but I don't understand yet where the tag is increased and
-> > > what the relation between tag and right CQE order is).
-> > 
-> > tag is one attribute of io request, which is originated from ublk
-> > driver, and it is unique for each request among one queue. So ublksrv
-> > won't change it at all, just use it, and ublk driver guarantees that
-> > it is unique.
-> > 
-> > In ublkserv implementation, the tag info is set in cqe->user_data, so
-> > we can retrieve the io request via tag part of cqe->user_data.
-> 
-> Yeah, this is the easy part I understood. At least I hope so :)
-> 
-> > 
-> > Also I may not understand your question of 'the relation between tag and right
-> > CQE order', io_uring provides IOSQE_IO_DRAIN/IOSQE_IO_LINK for ordering
-> > SQE, and ublksrv only applies IOSQE_IO_LINK in ublk-qcow2, so care to
-> > explain it in a bit details about the "the relation between tag and right
-> > CQE order"?
-> 
-> 
-> For fuse (kernel) a vfs request comes in and I need to choose a command in
-> the ring queue. Right now this is just an atomic counter % queue_size
-> 
-> fuse_request_alloc_ring()
-> 	req_cnt = atomic_inc_return(&queue->req_cnt);
-> 	tag = req_cnt & (fc->ring.queue_depth - 1); /* cnt % queue_depth */
-> 
-> 	ring_req = &queue->ring_req[tag];
-> 
-> 
-> 
-> I might be wrong, but I think that can be compared a bit to ublk_queue_rq().
-> Looks like ublk_queue_rq gets called in blk-mq context and blk-mq seems to
-> provide rq->tag, which then determines the command in the ring queue -
-> completion of commands is done in tag-order provided by blk-mq? The part I
+From: Ye Bin <yebin10@huawei.com>
 
-The two are not related, blk-mq tag number means nothing wrt. io
-handling order:
+Syzbot found the following issue:
+general protection fault, probably for non-canonical address 0xdffffc000000001d: 0000 [#1] PREEMPT SMP KASAN
+KASAN: null-ptr-deref in range [0x00000000000000e8-0x00000000000000ef]
+CPU: 0 PID: 5234 Comm: syz-executor931 Not tainted 6.1.0-rc3-next-20221102-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/11/2022
+RIP: 0010:__elevator_get block/elevator.h:94 [inline]
+RIP: 0010:blk_mq_elv_switch_none block/blk-mq.c:4593 [inline]
+RIP: 0010:__blk_mq_update_nr_hw_queues block/blk-mq.c:4658 [inline]
+RIP: 0010:blk_mq_update_nr_hw_queues+0x304/0xe40 block/blk-mq.c:4709
+RSP: 0018:ffffc90003cdfc08 EFLAGS: 00010206
+RAX: 0000000000000000 RBX: dffffc0000000000 RCX: 0000000000000000
+RDX: 000000000000001d RSI: 0000000000000002 RDI: 00000000000000e8
+RBP: ffff88801dbd0000 R08: ffff888027c89398 R09: ffffffff8de2e517
+R10: fffffbfff1bc5ca2 R11: 0000000000000000 R12: ffffc90003cdfc70
+R13: ffff88801dbd0008 R14: ffff88801dbd03f8 R15: ffff888027c89380
+FS:  0000555557259300(0000) GS:ffff8880b9a00000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00000000005d84c8 CR3: 000000007a7cb000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ nbd_start_device+0x153/0xc30 drivers/block/nbd.c:1355
+ nbd_start_device_ioctl drivers/block/nbd.c:1405 [inline]
+ __nbd_ioctl drivers/block/nbd.c:1481 [inline]
+ nbd_ioctl+0x5a1/0xbd0 drivers/block/nbd.c:1521
+ blkdev_ioctl+0x36e/0x800 block/ioctl.c:614
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:870 [inline]
+ __se_sys_ioctl fs/ioctl.c:856 [inline]
+ __x64_sys_ioctl+0x193/0x200 fs/ioctl.c:856
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x63/0xcd
 
-- tag is allocated via sbitmap, which may return tag number in any
-  order, you may think the returned number is just random
-- blk-mq may re-order requests and dispatch them with any order
-- once requests are issued to io_uring, userspace may handles these IOs
-  with any order
-- after backend io is queued via io_uring or libaio or whatever to kernel, it
-could be completed at any order
+As after dd6f7f17bf58 commit move '__elevator_get(qe->type)' before set
+'qe->type', so will lead to access wild pointer.
+To solve above issue get 'qe->type' after set 'qe->type'.
 
-> didn't figure out yet is where the tag value gets set.
-> Also interesting is that there is no handler if the ring is already full -
-> like the ublk_io command is currently busy in ublksrv (user space). Handled
-> auto-magically with blk-mq?
+Reported-by: syzbot+746a4eece09f86bc39d7@syzkaller.appspotmail.com
+Fixes:dd6f7f17bf58("block: add proper helpers for elevator_type module refcount management")
+Signed-off-by: Ye Bin <yebin10@huawei.com>
+---
+ block/blk-mq.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-For ublk, the queue has fixed depth, so the pre-allocated io_uring size is
-enough, and blk-mq can throttle IOs from the beginning if the max queue depth is
-reached, so ublk needn't to worry about io_uring size/depth.
-
-But fuse may have to consider request throttle.
-
-
-Thanks, 
-Ming
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 2757368dc83f..3173d621f1f7 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -4589,9 +4589,9 @@ static bool blk_mq_elv_switch_none(struct list_head *head,
+ 
+ 	INIT_LIST_HEAD(&qe->node);
+ 	qe->q = q;
++	qe->type = q->elevator->type;
+ 	/* keep a reference to the elevator module as we'll switch back */
+ 	__elevator_get(qe->type);
+-	qe->type = q->elevator->type;
+ 	list_add(&qe->node, head);
+ 	elevator_disable(q);
+ 	mutex_unlock(&q->sysfs_lock);
+-- 
+2.31.1
 
