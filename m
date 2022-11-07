@@ -2,157 +2,196 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8525FC4332F
-	for <linux-block@archiver.kernel.org>; Mon,  7 Nov 2022 13:26:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28A0DC4332F
+	for <linux-block@archiver.kernel.org>; Mon,  7 Nov 2022 13:29:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231733AbiKGN0i (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 7 Nov 2022 08:26:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59050 "EHLO
+        id S232065AbiKGN3c (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 7 Nov 2022 08:29:32 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60560 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231712AbiKGN0e (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 7 Nov 2022 08:26:34 -0500
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E991E1A3A2;
-        Mon,  7 Nov 2022 05:26:33 -0800 (PST)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id A494D22544;
-        Mon,  7 Nov 2022 13:26:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1667827592; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=cS3muMI5WStP103zRvSh1uu1lDBE/GBlTm1cKs3o9EU=;
-        b=2PsbZxpvvUpdl6ajyETlq9RBewdCqVqAUhUciosjZbNJO4m1/RWiIuRVr+KWum+0W0qvJr
-        4FUzzGzBHSN9tgA7C/b4Xl89UPXY9NfkfkNo4RQEUOp2U+yVF1w5jvIaFhCOeEpoqIY0yr
-        sUTYEH+babpHLBVAV3q6/6tmQDUQ0kw=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1667827592;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=cS3muMI5WStP103zRvSh1uu1lDBE/GBlTm1cKs3o9EU=;
-        b=Hco5MwFj/aQmVrzqpS10vaWxW8eG2mMsd+brypV4yrr9kjVUQyCPI74FL+0GqQAho3zeOO
-        w+0Q0YJhdjqrKPBw==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 8C54F13494;
-        Mon,  7 Nov 2022 13:26:32 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id eP09IogHaWP1WQAAMHmgww
-        (envelope-from <jack@suse.cz>); Mon, 07 Nov 2022 13:26:32 +0000
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-        id 67FE5A0704; Mon,  7 Nov 2022 14:26:31 +0100 (CET)
-Date:   Mon, 7 Nov 2022 14:26:31 +0100
-From:   Jan Kara <jack@suse.cz>
-To:     Khazhy Kumykov <khazhy@google.com>
-Cc:     Jan Kara <jack@suse.cz>, Yu Kuai <yukuai1@huaweicloud.com>,
-        Paolo Valente <paolo.valente@linaro.org>,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, "yukuai (C)" <yukuai3@huawei.com>
-Subject: Re: [RFC PATCH] bfq: fix waker_bfqq inconsistency crash
-Message-ID: <20221107132631.ajhbqmgewq24jx4k@quack3>
-References: <20221103013937.603626-1-khazhy@google.com>
- <3c0df3fa-8731-5863-ccc5-f2e60601dbf9@huaweicloud.com>
- <CACGdZYJ0WH+Y9sdchXy30UVTQgPCEo=fW+W9atZh1Ki7Ov4_Gw@mail.gmail.com>
- <f83404b4-84a4-de4e-fa4d-9ce38900d91c@huaweicloud.com>
- <20221103084744.xsvoul3hjgz7yyo7@quack3>
- <CACGdZYK7xk+CJw9_RKwceXXnREVhgHh9U-OWidnKgYp6B011xQ@mail.gmail.com>
+        with ESMTP id S232075AbiKGN3U (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 7 Nov 2022 08:29:20 -0500
+Received: from esa1.hgst.iphmx.com (esa1.hgst.iphmx.com [68.232.141.245])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 194231CFC0
+        for <linux-block@vger.kernel.org>; Mon,  7 Nov 2022 05:29:18 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1667827758; x=1699363758;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=xM7DahlPgGKUJt/O+KuLXEt4qp75IJYtNN8R0W0xZRo=;
+  b=ajcsE6IK08km7pYPzJmb8sFPSO6YDbvq2q6glVqJ6m5W77XQSu0WDvvv
+   KcxnjfziRu3aa4MZJ2YHtlVRrExGbMFRc93rd/hXm+HfGrusqslw8taZA
+   RKo91uzZEyiAgaxyeCJqhspoTrn3BM6J8A7/A6W/aPdxGG5tIikXyFMnv
+   DIdVftMLuGtwsF0s9+ORw5EkZAmNsFGArd4WaWqNYhhalF3Iv1/PnFGsr
+   wtN8swUWgCOII0gJ5Nns3FVbUn0xjFeHmBavX7tPhwqV5DYoQG7UZbo+c
+   pE73gUkiA+zTKwZfqEVkJv+yzgjNhIZEiX7a7fZFaQANlpVLl/zPdYJyV
+   Q==;
+X-IronPort-AV: E=Sophos;i="5.96,145,1665417600"; 
+   d="scan'208";a="327766517"
+Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
+  by ob1.hgst.iphmx.com with ESMTP; 07 Nov 2022 21:29:17 +0800
+IronPort-SDR: UtPDOsWeA+pleuD69E+NRT0bXgmAmPkVWAoBvrO2CzjBWWQ5/5P3Albh82AUe7ezvG0Z6m6Jav
+ RwtRlqoJPCsLYbfKZiM85j+9CNsEPavS5JKESOsHo949mRg5aKt4r43FgZ3wGc+X62ZTFDsvKs
+ Gsj5wA0puEj18Nd6w1Spo0YP1dVTq7KbNCaVqGoT8uIEBqHwDVrnzb1d7b3bfrkHMhtSUUMQtb
+ 9rB1OaNEPA2DGIWqWFrhVM9v8p7rNXUdIHnrqB22B4fGA0612G9jq5IwFGgJAFEhpuAxTh/NFD
+ nEs=
+Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
+  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 07 Nov 2022 04:42:39 -0800
+IronPort-SDR: iq0uIx237gxEE/9/xkmq+l6zKH4LSzPR98n2c7IMwmdDk6sGnVmItGz9DMWQnlLQIHywTP0GMQ
+ qD5ZuV2u4XDEVTyGIc/aaQz40cQK32YZRMao2olHeB4HCNWZPbpOjKxSx9lasNSJOcm21YvOmO
+ JMNsDbxbpIkA2XP9rki5+qtmn73oVydF6V7UWtzcLDwfbnurzQArCOenIlPMYrolZow/AqLJhk
+ +AmP8HiLg2fodBZ2ha19sTm5950cil6VbN11KohKOU+re6E4OVaf5gminHCUrdVkD0DjxTTm2C
+ hfo=
+WDCIronportException: Internal
+Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
+  by uls-op-cesaip01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 07 Nov 2022 05:29:18 -0800
+Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4N5XBh5tgzz1Rwtm
+        for <linux-block@vger.kernel.org>; Mon,  7 Nov 2022 05:29:16 -0800 (PST)
+Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
+        reason="pass (just generated, assumed good)"
+        header.d=opensource.wdc.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
+        opensource.wdc.com; h=content-transfer-encoding:content-type
+        :in-reply-to:organization:from:references:to:content-language
+        :subject:user-agent:mime-version:date:message-id; s=dkim; t=
+        1667827755; x=1670419756; bh=xM7DahlPgGKUJt/O+KuLXEt4qp75IJYtNN8
+        R0W0xZRo=; b=uH5gDh+GokyRoYgTYtY/0yR1Ekg2vOZNR/N/dvNQqrsZG3uXFsD
+        zLag6FJGsC6aVhjU9ZYTGzERaddUPcirHtt7jK4nHNMUAMeMoVAo9emBlTUWXcEi
+        bljdM6xRi6Gt27TvEFiFzA0Zp4wVL6ZTvatNNb75bN0dUN1eCoSF0SJQyyPvGZ1/
+        mwUqsrO+tIp6eEfZG8DAR+Cv43k3j03SpGiDklCzJFUbM5ncvynm+3OSontUUosy
+        0ENB2pPV3SE5BkEApHENIdNCTOmX9oLGil3fYSf5VwrBF2rBGzJXw6HCTUKMy9lj
+        u9/q4bOQ0FiRMiZcuZvC32QOEc4SlHTfqMg==
+X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
+Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
+        by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
+        with ESMTP id 1C21eZDKG9q1 for <linux-block@vger.kernel.org>;
+        Mon,  7 Nov 2022 05:29:15 -0800 (PST)
+Received: from [10.225.163.31] (unknown [10.225.163.31])
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4N5XBc5CqLz1RvLy;
+        Mon,  7 Nov 2022 05:29:12 -0800 (PST)
+Message-ID: <cfb89169-77e5-b208-62e7-4cf1c660ac7a@opensource.wdc.com>
+Date:   Mon, 7 Nov 2022 22:29:11 +0900
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CACGdZYK7xk+CJw9_RKwceXXnREVhgHh9U-OWidnKgYp6B011xQ@mail.gmail.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.4.1
+Subject: Re: [PATCH RFC v3 2/7] ata: libata-scsi: Add
+ ata_internal_queuecommand()
+Content-Language: en-US
+To:     Hannes Reinecke <hare@suse.de>,
+        John Garry <john.g.garry@oracle.com>,
+        John Garry <john.garry@huawei.com>, jejb@linux.ibm.com,
+        martin.petersen@oracle.com, bvanassche@acm.org, hch@lst.de,
+        ming.lei@redhat.com, niklas.cassel@wdc.com
+Cc:     axboe@kernel.dk, jinpu.wang@cloud.ionos.com,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-ide@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linuxarm@huawei.com, john.garry2@mail.dcu.ie
+References: <1666693976-181094-1-git-send-email-john.garry@huawei.com>
+ <1666693976-181094-3-git-send-email-john.garry@huawei.com>
+ <08fdb698-0df3-7bc8-e6af-7d13cc96acfa@opensource.wdc.com>
+ <83d9dc82-ea37-4a3c-7e67-1c097f777767@huawei.com>
+ <9a2f30cc-d0e9-b454-d7cd-1b0bd3cf0bb9@opensource.wdc.com>
+ <0e60fab5-8a76-9b7e-08cf-fb791e01ae08@huawei.com>
+ <71b56949-e4d7-fd94-c44a-867080b7a4fa@opensource.wdc.com>
+ <b03b37a2-35dc-5218-7279-ae68678a47ff@huawei.com>
+ <0e4994f7-f131-39b0-c876-f447b71566cd@opensource.wdc.com>
+ <05cf6d61-987b-025d-b694-a58981226b97@oracle.com>
+ <ff0c2ab7-8e82-40d9-1adf-78ee12846e1f@opensource.wdc.com>
+ <39f9afc5-9aab-6f7c-b67a-e74e694543d4@suse.de>
+ <0de1c3fd-4be7-1690-0780-720505c3692b@opensource.wdc.com>
+ <75aea0e8-4fa4-593c-0024-3c39ac3882f3@suse.de>
+From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
+Organization: Western Digital Research
+In-Reply-To: <75aea0e8-4fa4-593c-0024-3c39ac3882f3@suse.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri 04-11-22 14:25:32, Khazhy Kumykov wrote:
-> On Thu, Nov 3, 2022 at 1:47 AM Jan Kara <jack@suse.cz> wrote:
-> >
-> > On Thu 03-11-22 11:51:15, Yu Kuai wrote:
-> > > Hi,
-> > >
-> > > 在 2022/11/03 11:05, Khazhy Kumykov 写道:
-> > > > On Wed, Nov 2, 2022 at 7:56 PM Yu Kuai <yukuai1@huaweicloud.com> wrote:
-> > > > >
-> > > > > Hi,
-> > > > >
-> > > > > 在 2022/11/03 9:39, Khazhismel Kumykov 写道:
-> > > > > > This fixes crashes in bfq_add_bfqq_busy due to waker_bfqq being NULL,
-> > > > > > but woken_list_node still being hashed. This would happen when
-> > > > > > bfq_init_rq() expects a brand new allocated queue to be returned from
-> > > > >
-> > > > >   From what I see, bfqq->waker_bfqq is updated in bfq_init_rq() only if
-> > > > > 'new_queue' is false, but if 'new_queue' is false, the returned 'bfqq'
-> > > > > from bfq_get_bfqq_handle_split() will never be oom_bfqq, so I'm confused
-> > > > > here...
-> > > > There's two calls for bfq_get_bfqq_handle_split in this function - the
-> > > > second one is after the check you mentioned, and is the problematic
-> > > > one.
-> > > Yes, thanks for the explanation. Now I understand how the problem
-> > > triggers.
-> > >
-> > > > >
-> > > > > > bfq_get_bfqq_handle_split() and unconditionally updates waker_bfqq
-> > > > > > without resetting woken_list_node. Since we can always return oom_bfqq
-> > > > > > when attempting to allocate, we cannot assume waker_bfqq starts as NULL.
-> > > > > > We must either reset woken_list_node, or avoid setting woken_list at all
-> > > > > > for oom_bfqq - opt to do the former.
-> > > > >
-> > > > > Once oom_bfqq is used, I think the io is treated as issued from root
-> > > > > group. Hence I don't think it's necessary to set woken_list or
-> > > > > waker_bfqq for oom_bfqq.
-> > > > Ack, I was wondering what's right here since, evidently, *someone* had
-> > > > already set oom_bfqq->waker_bfqq to *something* (although... maybe it
-> > > > was an earlier init_rq). But maybe it's better to do nothing if we
-> > > > *know* it's oom_bfqq.
-> > >
-> > > I need to have a check how oom_bfqq get involved with waker_bfqq, and
-> > > then see if it's reasonable.
-> > >
-> > > Probably Jan and Paolo will have better view on this.
-> >
-> > Thanks for the CC Kuai and thanks to Khazy for spotting the bug. The
-> > oom_bfqq is just a fallback bfqq and as such it should be extempted from
-> > all special handling like waker detection etc. All this stuff is just for
-> > optimizing performance and when we are OOM, we have far larger troubles
-> > than to optimize performance.
-> >
-> > So how I think we should really fix this is that we extempt oom_bfqq from
-> > waker detection in bfq_check_waker() by adding:
-> >
-> >         bfqq == bfqd->oom_bfqq ||
-> >         bfqd->last_completed_rq_bfq == bfqd->oom_bfqq)
-> >
-> > to the initial check and then also if bfq_get_bfqq_handle_split() returns
-> > oom_bfqq we should just skip carrying over the waker information.
-> Thanks for the tip! I'll send a followup, including your suggestions.
+On 11/7/22 19:12, Hannes Reinecke wrote:
+> On 11/2/22 12:25, Damien Le Moal wrote:
+>> On 11/2/22 20:12, Hannes Reinecke wrote:
+>>> On 11/2/22 11:07, Damien Le Moal wrote:
+>>>> On 11/2/22 18:52, John Garry wrote:
+>>>>> Hi Damien,
+>>>>>
+>>> [ .. ] >> So we only need to find a way of 're-using' that tag, then we won't have
+>>> to set aside a reserved tag and everything would be dandy...
+>>
+>> I tried that. It is very ugly... Problem is that integration with EH in
+>> case a real NCQ error happens when all that read-log-complete dance is
+>> happening is hard. And don't get me started with the need to save/restore
+>> the scsi command context of the command we are reusing the tag from.
+>>
+>> And given that the code is changing to use regular submission path for
+>> internal commands, right now, we need a reserved tag. Or a way to "borrow"
+>> the tag from a request that we need to check. Which means we need some
+>> additional api to not always try to allocate a tag.
+>>
+>>>
+>>> Maybe we can stop processing when we receive an error (should be doing
+>>> that anyway as otherwise the log might be overwritten), then we should
+>>> be having a pretty good chance of getting that tag.
+>>
+>> Hmmm.... that would be no better than using EH which does stop processing
+>> until the internal house keeping is done.
+>>
+>>> Or, precisely, getting _any_ tag as at least one tag is free at that point.
+>>> Hmm?
+>>
+>> See above. Not free, but usable as far as the device is concerned since we
+>> have at least on command we need to check completed at the device level
+>> (but not yet completed from scsi/block layer point of view).
+>>
+> So, having had an entire weekend pondering this issue why don't we 
+> allocate an _additional_ set of requests?
+> After all, we had been very generous with allocating queues and requests 
+> (what with us doing a full provisioning of the requests for all queues 
+> already for the non-shared tag case).
 > 
-> I do have some other questions in this area, if you could help me
-> understand. Looking again at bfq_init_rq, inside of the !new_queue
-> section - we call bfq_split_bfqq() to "split" our bfqq, then in the
-> next line bfq_get_bfqq_handle_split inspects bic_to_bfqq(bic,
-> is_sync), and if it's NULL, allocates a new queue. However, if we have
-> an async rq, this call will return the pre-existing async bfqq, as the
-> call to bfq_split_bfqq() only clears the sync bfqq, ever. The best
-> understanding I have now is: "bic->bfqq[aync] is never NULL (and we
-> don't merge async queues) so we'll never reach this !new_queue section
-> anyways if it's async". Is that accurate?
+> Idea would be to keep the single tag bitmap, but add eg a new rq state
+> MQ_RQ_ERROR. Once that flag is set we'll fetch the error request instead 
+> of the normal one:
+> 
+> @@ -761,6 +763,8 @@ static inline struct request 
+> *blk_mq_tag_to_rq(struct blk_mq_tags *tags,
+>   {
+>          if (tag < tags->nr_tags) {
+>                  prefetch(tags->rqs[tag]);
+> +               if (unlikely(blk_mq_request_error(tags->rqs[tag])))
+> +                       return tags->error_rqs[tag];
+>                  return tags->rqs[tag];
+>          }
+> 
+> and, of course, we would need to provision the error request first.
+> 
+> Rationale here is that this will be primarily for devices with a low 
+> number of tags, so doubling the number of request isn't much of an 
+> overhead (as we'll be doing it essentially anyway in the error case as 
+> we'll have to save the original request _somewhere_), and that it would 
+> remove quite some cruft from the subsystem; look at SCSI EH trying to 
+> store the original request contents and then after EH restoring them again.
 
-So you are right that async queues are never merged or split. In fact, if
-you have a look at bfq_get_queue(), you'll notice that async queue is
-common for all processes with the same ioprio & blkcg. So all these games
-with splitting, merging, waker detection etc. impact only sync queues.
+Interesting idea. I like it. It is essentially a set of reserved requests
+without reserved tags: the tag to use for these requests would be provided
+"manually" by the user. Right ?
 
-								Honza
+That should allow simplifying any processing that needs to reuse a tag,
+and currently its request. That is, CDL, but also usb-scsi, scsi EH and
+the few scsi LLDs using scsi_eh_prep_cmnd()+scsi_eh_restore_cmnd().
+Ideally, these 2 functions could go away too.
+
+> 
+> Hmm?
+> 
+> Cheers,
+> 
+> Hannes
+
 -- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+Damien Le Moal
+Western Digital Research
+
