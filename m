@@ -2,196 +2,85 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 28A0DC4332F
-	for <linux-block@archiver.kernel.org>; Mon,  7 Nov 2022 13:29:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 61360C4332F
+	for <linux-block@archiver.kernel.org>; Mon,  7 Nov 2022 14:28:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232065AbiKGN3c (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 7 Nov 2022 08:29:32 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60560 "EHLO
+        id S232391AbiKGO22 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 7 Nov 2022 09:28:28 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40278 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232075AbiKGN3U (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 7 Nov 2022 08:29:20 -0500
-Received: from esa1.hgst.iphmx.com (esa1.hgst.iphmx.com [68.232.141.245])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 194231CFC0
-        for <linux-block@vger.kernel.org>; Mon,  7 Nov 2022 05:29:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1667827758; x=1699363758;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=xM7DahlPgGKUJt/O+KuLXEt4qp75IJYtNN8R0W0xZRo=;
-  b=ajcsE6IK08km7pYPzJmb8sFPSO6YDbvq2q6glVqJ6m5W77XQSu0WDvvv
-   KcxnjfziRu3aa4MZJ2YHtlVRrExGbMFRc93rd/hXm+HfGrusqslw8taZA
-   RKo91uzZEyiAgaxyeCJqhspoTrn3BM6J8A7/A6W/aPdxGG5tIikXyFMnv
-   DIdVftMLuGtwsF0s9+ORw5EkZAmNsFGArd4WaWqNYhhalF3Iv1/PnFGsr
-   wtN8swUWgCOII0gJ5Nns3FVbUn0xjFeHmBavX7tPhwqV5DYoQG7UZbo+c
-   pE73gUkiA+zTKwZfqEVkJv+yzgjNhIZEiX7a7fZFaQANlpVLl/zPdYJyV
-   Q==;
-X-IronPort-AV: E=Sophos;i="5.96,145,1665417600"; 
-   d="scan'208";a="327766517"
-Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 07 Nov 2022 21:29:17 +0800
-IronPort-SDR: UtPDOsWeA+pleuD69E+NRT0bXgmAmPkVWAoBvrO2CzjBWWQ5/5P3Albh82AUe7ezvG0Z6m6Jav
- RwtRlqoJPCsLYbfKZiM85j+9CNsEPavS5JKESOsHo949mRg5aKt4r43FgZ3wGc+X62ZTFDsvKs
- Gsj5wA0puEj18Nd6w1Spo0YP1dVTq7KbNCaVqGoT8uIEBqHwDVrnzb1d7b3bfrkHMhtSUUMQtb
- 9rB1OaNEPA2DGIWqWFrhVM9v8p7rNXUdIHnrqB22B4fGA0612G9jq5IwFGgJAFEhpuAxTh/NFD
- nEs=
-Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
-  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 07 Nov 2022 04:42:39 -0800
-IronPort-SDR: iq0uIx237gxEE/9/xkmq+l6zKH4LSzPR98n2c7IMwmdDk6sGnVmItGz9DMWQnlLQIHywTP0GMQ
- qD5ZuV2u4XDEVTyGIc/aaQz40cQK32YZRMao2olHeB4HCNWZPbpOjKxSx9lasNSJOcm21YvOmO
- JMNsDbxbpIkA2XP9rki5+qtmn73oVydF6V7UWtzcLDwfbnurzQArCOenIlPMYrolZow/AqLJhk
- +AmP8HiLg2fodBZ2ha19sTm5950cil6VbN11KohKOU+re6E4OVaf5gminHCUrdVkD0DjxTTm2C
- hfo=
-WDCIronportException: Internal
-Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
-  by uls-op-cesaip01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 07 Nov 2022 05:29:18 -0800
-Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4N5XBh5tgzz1Rwtm
-        for <linux-block@vger.kernel.org>; Mon,  7 Nov 2022 05:29:16 -0800 (PST)
-Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
-        reason="pass (just generated, assumed good)"
-        header.d=opensource.wdc.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
-        opensource.wdc.com; h=content-transfer-encoding:content-type
-        :in-reply-to:organization:from:references:to:content-language
-        :subject:user-agent:mime-version:date:message-id; s=dkim; t=
-        1667827755; x=1670419756; bh=xM7DahlPgGKUJt/O+KuLXEt4qp75IJYtNN8
-        R0W0xZRo=; b=uH5gDh+GokyRoYgTYtY/0yR1Ekg2vOZNR/N/dvNQqrsZG3uXFsD
-        zLag6FJGsC6aVhjU9ZYTGzERaddUPcirHtt7jK4nHNMUAMeMoVAo9emBlTUWXcEi
-        bljdM6xRi6Gt27TvEFiFzA0Zp4wVL6ZTvatNNb75bN0dUN1eCoSF0SJQyyPvGZ1/
-        mwUqsrO+tIp6eEfZG8DAR+Cv43k3j03SpGiDklCzJFUbM5ncvynm+3OSontUUosy
-        0ENB2pPV3SE5BkEApHENIdNCTOmX9oLGil3fYSf5VwrBF2rBGzJXw6HCTUKMy9lj
-        u9/q4bOQ0FiRMiZcuZvC32QOEc4SlHTfqMg==
-X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
-Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
-        by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id 1C21eZDKG9q1 for <linux-block@vger.kernel.org>;
-        Mon,  7 Nov 2022 05:29:15 -0800 (PST)
-Received: from [10.225.163.31] (unknown [10.225.163.31])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4N5XBc5CqLz1RvLy;
-        Mon,  7 Nov 2022 05:29:12 -0800 (PST)
-Message-ID: <cfb89169-77e5-b208-62e7-4cf1c660ac7a@opensource.wdc.com>
-Date:   Mon, 7 Nov 2022 22:29:11 +0900
+        with ESMTP id S232399AbiKGO1l (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 7 Nov 2022 09:27:41 -0500
+Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D7791EAC8
+        for <linux-block@vger.kernel.org>; Mon,  7 Nov 2022 06:22:14 -0800 (PST)
+Received: by mail-pl1-x62e.google.com with SMTP id d20so10125106plr.10
+        for <linux-block@vger.kernel.org>; Mon, 07 Nov 2022 06:22:14 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ik2+y8IF52g+m5bk/aYkFet3pzFw8bcdKkBwNiPEt0M=;
+        b=O6GsnmkroB+yLenPGib3vLB6XCa713TB2eFHALv47vfGZ+iUkcwn72gn+eruvUNoDe
+         /DuTQVeRXHGbVb/ISMmwQ9fkihMqluxPc7VRwL2YLO9JWvpDRp6qGysP5ggH8FZ3Wmu2
+         O+M+njIVIcLy7ZiogIkVKjL96R7msY/VC7iXd2999bcVVtWMXGfzJdXxjofRUKGrPx6G
+         fPlceLpYm7eQyFlF35qtksa/JsXzxUrQLyjAHUKDgN+sxIJfp8g962yZteCu0deZ/PRA
+         LQPW6OB2CmgjJB0Quu7jAx7eLvGjKuDuzQaCzJQbQ8Pis3X5v9AABj19IKHLCpf/Ltfw
+         ldEw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ik2+y8IF52g+m5bk/aYkFet3pzFw8bcdKkBwNiPEt0M=;
+        b=WRcX/OUEZKEdlnbNylY4tQh6Dt+c1WxAfq2Z8k9n37Hef9dhDIQr5i3kU0EGPAqbM3
+         O7Yx2H0Ue4PgulmYFahiDUu2JgPCOuvdiTGJEELut8zHcygQk30Jy0kC66sQ5/x4WgGt
+         wfCQCStCjcOFsDVd1DCDowMISUsuzBMnJOGMQAQH2Zbxg0Tpun1g79Y8BqJIZl6nYv0T
+         HB33CMAvq1ebEBSmu086ybnzXd2wXCj6uibN1KgfPNoxor7zsep80lnczflNzOJjraEg
+         h7SWdffMzUX+5apleklPj57Izfe2O+vtKL+oHGPm2W/KkyUk3G1moWjJGth1Vt+6bQRR
+         entg==
+X-Gm-Message-State: ACrzQf1VxcOfFFwe0LrpJnZOhFRLxB5yo+nndze5qTE+nLemk+0EzM2q
+        AzKoS+J/LRqZj6D1VU+hI5fDJg==
+X-Google-Smtp-Source: AMsMyM5eOXuxL/d9kFFYFKnRWdYXVtHtUAmNQOKshJPGdfxXjQDv6JeTY/Ru2NGOqwuACdYvJdKj7A==
+X-Received: by 2002:a17:902:9888:b0:186:9c32:79ca with SMTP id s8-20020a170902988800b001869c3279camr50375067plp.17.1667830933937;
+        Mon, 07 Nov 2022 06:22:13 -0800 (PST)
+Received: from [127.0.0.1] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id i2-20020a170902c94200b001869394a372sm5074355pla.201.2022.11.07.06.22.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 07 Nov 2022 06:22:13 -0800 (PST)
+From:   Jens Axboe <axboe@kernel.dk>
+To:     Yang Li <yang.lee@linux.alibaba.com>
+Cc:     Abaci Robot <abaci@linux.alibaba.com>,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
+In-Reply-To: <20221107062255.2685-1-yang.lee@linux.alibaba.com>
+References: <20221107062255.2685-1-yang.lee@linux.alibaba.com>
+Subject: Re: [PATCH -next] block: Fix some kernel-doc comments
+Message-Id: <166783093301.6467.9896856409636651914.b4-ty@kernel.dk>
+Date:   Mon, 07 Nov 2022 07:22:13 -0700
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.4.1
-Subject: Re: [PATCH RFC v3 2/7] ata: libata-scsi: Add
- ata_internal_queuecommand()
-Content-Language: en-US
-To:     Hannes Reinecke <hare@suse.de>,
-        John Garry <john.g.garry@oracle.com>,
-        John Garry <john.garry@huawei.com>, jejb@linux.ibm.com,
-        martin.petersen@oracle.com, bvanassche@acm.org, hch@lst.de,
-        ming.lei@redhat.com, niklas.cassel@wdc.com
-Cc:     axboe@kernel.dk, jinpu.wang@cloud.ionos.com,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-ide@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linuxarm@huawei.com, john.garry2@mail.dcu.ie
-References: <1666693976-181094-1-git-send-email-john.garry@huawei.com>
- <1666693976-181094-3-git-send-email-john.garry@huawei.com>
- <08fdb698-0df3-7bc8-e6af-7d13cc96acfa@opensource.wdc.com>
- <83d9dc82-ea37-4a3c-7e67-1c097f777767@huawei.com>
- <9a2f30cc-d0e9-b454-d7cd-1b0bd3cf0bb9@opensource.wdc.com>
- <0e60fab5-8a76-9b7e-08cf-fb791e01ae08@huawei.com>
- <71b56949-e4d7-fd94-c44a-867080b7a4fa@opensource.wdc.com>
- <b03b37a2-35dc-5218-7279-ae68678a47ff@huawei.com>
- <0e4994f7-f131-39b0-c876-f447b71566cd@opensource.wdc.com>
- <05cf6d61-987b-025d-b694-a58981226b97@oracle.com>
- <ff0c2ab7-8e82-40d9-1adf-78ee12846e1f@opensource.wdc.com>
- <39f9afc5-9aab-6f7c-b67a-e74e694543d4@suse.de>
- <0de1c3fd-4be7-1690-0780-720505c3692b@opensource.wdc.com>
- <75aea0e8-4fa4-593c-0024-3c39ac3882f3@suse.de>
-From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
-Organization: Western Digital Research
-In-Reply-To: <75aea0e8-4fa4-593c-0024-3c39ac3882f3@suse.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-Mailer: b4 0.11.0-dev-d9ed3
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 11/7/22 19:12, Hannes Reinecke wrote:
-> On 11/2/22 12:25, Damien Le Moal wrote:
->> On 11/2/22 20:12, Hannes Reinecke wrote:
->>> On 11/2/22 11:07, Damien Le Moal wrote:
->>>> On 11/2/22 18:52, John Garry wrote:
->>>>> Hi Damien,
->>>>>
->>> [ .. ] >> So we only need to find a way of 're-using' that tag, then we won't have
->>> to set aside a reserved tag and everything would be dandy...
->>
->> I tried that. It is very ugly... Problem is that integration with EH in
->> case a real NCQ error happens when all that read-log-complete dance is
->> happening is hard. And don't get me started with the need to save/restore
->> the scsi command context of the command we are reusing the tag from.
->>
->> And given that the code is changing to use regular submission path for
->> internal commands, right now, we need a reserved tag. Or a way to "borrow"
->> the tag from a request that we need to check. Which means we need some
->> additional api to not always try to allocate a tag.
->>
->>>
->>> Maybe we can stop processing when we receive an error (should be doing
->>> that anyway as otherwise the log might be overwritten), then we should
->>> be having a pretty good chance of getting that tag.
->>
->> Hmmm.... that would be no better than using EH which does stop processing
->> until the internal house keeping is done.
->>
->>> Or, precisely, getting _any_ tag as at least one tag is free at that point.
->>> Hmm?
->>
->> See above. Not free, but usable as far as the device is concerned since we
->> have at least on command we need to check completed at the device level
->> (but not yet completed from scsi/block layer point of view).
->>
-> So, having had an entire weekend pondering this issue why don't we 
-> allocate an _additional_ set of requests?
-> After all, we had been very generous with allocating queues and requests 
-> (what with us doing a full provisioning of the requests for all queues 
-> already for the non-shared tag case).
+On Mon, 7 Nov 2022 14:22:55 +0800, Yang Li wrote:
+> Remove the description of @required_features in elevator_match()
+> to clear the below warning:
 > 
-> Idea would be to keep the single tag bitmap, but add eg a new rq state
-> MQ_RQ_ERROR. Once that flag is set we'll fetch the error request instead 
-> of the normal one:
+> block/elevator.c:103: warning: Excess function parameter 'required_features' description in 'elevator_match'
 > 
-> @@ -761,6 +763,8 @@ static inline struct request 
-> *blk_mq_tag_to_rq(struct blk_mq_tags *tags,
->   {
->          if (tag < tags->nr_tags) {
->                  prefetch(tags->rqs[tag]);
-> +               if (unlikely(blk_mq_request_error(tags->rqs[tag])))
-> +                       return tags->error_rqs[tag];
->                  return tags->rqs[tag];
->          }
 > 
-> and, of course, we would need to provision the error request first.
-> 
-> Rationale here is that this will be primarily for devices with a low 
-> number of tags, so doubling the number of request isn't much of an 
-> overhead (as we'll be doing it essentially anyway in the error case as 
-> we'll have to save the original request _somewhere_), and that it would 
-> remove quite some cruft from the subsystem; look at SCSI EH trying to 
-> store the original request contents and then after EH restoring them again.
 
-Interesting idea. I like it. It is essentially a set of reserved requests
-without reserved tags: the tag to use for these requests would be provided
-"manually" by the user. Right ?
+Applied, thanks!
 
-That should allow simplifying any processing that needs to reuse a tag,
-and currently its request. That is, CDL, but also usb-scsi, scsi EH and
-the few scsi LLDs using scsi_eh_prep_cmnd()+scsi_eh_restore_cmnd().
-Ideally, these 2 functions could go away too.
+[1/1] block: Fix some kernel-doc comments
+      commit: 5b2560c4c20e6d6933625b4b56f6843d6c7faf0f
 
-> 
-> Hmm?
-> 
-> Cheers,
-> 
-> Hannes
-
+Best regards,
 -- 
-Damien Le Moal
-Western Digital Research
+Jens Axboe
+
 
