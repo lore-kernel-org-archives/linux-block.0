@@ -2,169 +2,118 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E5DEC4332F
-	for <linux-block@archiver.kernel.org>; Mon,  7 Nov 2022 20:46:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E4407C4332F
+	for <linux-block@archiver.kernel.org>; Mon,  7 Nov 2022 21:25:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232283AbiKGUqK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 7 Nov 2022 15:46:10 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39118 "EHLO
+        id S232504AbiKGVZp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 7 Nov 2022 16:25:45 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48824 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232832AbiKGUqK (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 7 Nov 2022 15:46:10 -0500
-X-Greylist: delayed 367 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 07 Nov 2022 12:46:01 PST
-Received: from post.baikalelectronics.com (post.baikalelectronics.com [213.79.110.86])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 8A69CDF29;
-        Mon,  7 Nov 2022 12:46:01 -0800 (PST)
-Received: from post.baikalelectronics.com (localhost.localdomain [127.0.0.1])
-        by post.baikalelectronics.com (Proxmox) with ESMTP id 34930E0EAB;
-        Mon,  7 Nov 2022 23:39:52 +0300 (MSK)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        baikalelectronics.ru; h=cc:cc:content-transfer-encoding
-        :content-type:content-type:date:from:from:in-reply-to:message-id
-        :mime-version:references:reply-to:subject:subject:to:to; s=post;
-         bh=Mo1IoZxL2Rc3as4wkOOmjS2i89Ql8ugECSEPpbB7MWg=; b=HSnlfG0Qw9cV
-        EUSsAE5gB5l5RsG7gI/yi6CDe4s5N3vm3ieRL+4mVVTCib1v3Qe8hMYO5JyK1oeM
-        DkkeZ/pjHPRUfJvXkjb7UBvC3jPj7K8/3mGzx0DIQTljXbUrP99lf9FO/oXxLaBO
-        3BSmLZTy88JYSOFHHyVMBYOXodfcWjI=
-Received: from mail.baikal.int (mail.baikal.int [192.168.51.25])
-        by post.baikalelectronics.com (Proxmox) with ESMTP id EE6EAE0E1D;
-        Mon,  7 Nov 2022 23:39:51 +0300 (MSK)
-Received: from localhost (192.168.168.10) by mail (192.168.51.25) with
- Microsoft SMTP Server (TLS) id 15.0.1395.4; Mon, 7 Nov 2022 23:39:51 +0300
-From:   Serge Semin <Sergey.Semin@baikalelectronics.ru>
-To:     Jens Axboe <axboe@kernel.dk>, Jens Axboe <axboe@fb.com>,
-        Keith Busch <kbusch@kernel.org>,
-        Christoph Hellwig <hch@lst.de>,
-        Jonathan Derrick <jonathan.derrick@linux.dev>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Scott Bauer <scott.bauer@intel.com>,
-        Rafael Antognolli <Rafael.Antognolli@intel.com>
-CC:     Serge Semin <Sergey.Semin@baikalelectronics.ru>,
-        Serge Semin <fancer.lancer@gmail.com>,
-        Alexey Malahov <Alexey.Malahov@baikalelectronics.ru>,
-        Pavel Parkhomenko <Pavel.Parkhomenko@baikalelectronics.ru>,
-        <linux-nvme@lists.infradead.org>, <linux-block@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>
-Subject: [PATCH v3] block: sed-opal: kmalloc the cmd/resp buffers
-Date:   Mon, 7 Nov 2022 23:39:44 +0300
-Message-ID: <20221107203944.31686-1-Sergey.Semin@baikalelectronics.ru>
-X-Mailer: git-send-email 2.38.0
-In-Reply-To: <20220929224648.8997-4-Sergey.Semin@baikalelectronics.ru>
-References: <20220929224648.8997-4-Sergey.Semin@baikalelectronics.ru>
+        with ESMTP id S233227AbiKGVZX (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 7 Nov 2022 16:25:23 -0500
+Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF2F255AE;
+        Mon,  7 Nov 2022 13:25:19 -0800 (PST)
+Received: by mail-pj1-x1036.google.com with SMTP id u8-20020a17090a5e4800b002106dcdd4a0so15956267pji.1;
+        Mon, 07 Nov 2022 13:25:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=8wNv+1Bf4cquI/EHzjAENJoFB1/c9LVYJtIsCgpVko8=;
+        b=Jw6IIZMnJN8JA5mVqxvAC/JS5MSwwZq9MH1YW0YXr+YI0Rn6aZf1ylYXIhcjfGpccl
+         OnVT9b1yKNxTh+141tJniQkx5kDbL8zOpBv/yMPmWyshQfk7LWXZlbtDaFYtvo4yli6P
+         FUeV920E7vf0PUFor8tH/A4oRy2wFuwbOJNsCtXsBJv/12VxaLKNU1EHFvhkfK5UrpG/
+         LgrybxTGYFB6O04yCAKoC5C2gqQoyWiK+l2CP0N0bCfGC03iZT09c4Sf51xAAJyOQfBo
+         NqCjOnKXglh04J9KD7ui9eoSmj+50jYivPazBST1fT0HFTzn+qUcQAvCi1RiI75GHVbm
+         yi9Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=8wNv+1Bf4cquI/EHzjAENJoFB1/c9LVYJtIsCgpVko8=;
+        b=YsZ2uN+7sHlichWjjLhGPD/DqWHvW45btO/69z8PsrX5bxy/+aHQ5tzOqMarMAiVRN
+         KCnESU70GWjDJkam6HEEYVnhMLKcKEkGljKH4IY13aKQOpfpQiJzHwWzW9EPAnA0ZR1U
+         8qz6Bb6FrnRTS5x5J1skE8Qc29V4GE46lO7ftZw7Ihv3H23utBlhxHrVKe7gCEZK1oWN
+         zxyHrJcz2cibjcNrLqEH8f1rpRx44PxAlM1TqmZS+ntTiqIDD9NCMz2sSBu2VUI3FQ8q
+         xZcPrIwFQ/1/JY05b4OolJ6tGsW6AokGkrcOYx0vC+eiNGF3tIvGODIRozMXxsj7aIGR
+         jQZw==
+X-Gm-Message-State: ACrzQf0JVpF7H+rtrAWWz76zuYxB1N3soMkGn/UpsimPW14o6V20WKV2
+        L1dqJ7kyVLAymey2/DmZOxw=
+X-Google-Smtp-Source: AMsMyM6pg7jfZjs5E3oG1Xo6bI3H420NG+af23uX8ad0Qpws6uAeEJnrSoNhYF1g+EVi5zjcrRskjg==
+X-Received: by 2002:a17:90a:7e10:b0:213:9e81:87e2 with SMTP id i16-20020a17090a7e1000b002139e8187e2mr56152275pjl.1.1667856319181;
+        Mon, 07 Nov 2022 13:25:19 -0800 (PST)
+Received: from google.com ([2620:15c:211:201:594a:f636:e461:590b])
+        by smtp.gmail.com with ESMTPSA id h20-20020aa796d4000000b00560a25fae1fsm4887216pfq.206.2022.11.07.13.25.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 07 Nov 2022 13:25:18 -0800 (PST)
+Sender: Minchan Kim <minchan.kim@gmail.com>
+Date:   Mon, 7 Nov 2022 13:25:16 -0800
+From:   Minchan Kim <minchan@kernel.org>
+To:     Petr Vorel <pvorel@suse.cz>
+Cc:     ltp@lists.linux.it, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        Nitin Gupta <ngupta@vflare.org>,
+        Sergey Senozhatsky <senozhatsky@chromium.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>,
+        Martin Doucha <mdoucha@suse.cz>,
+        Yang Xu <xuyang2018.jy@fujitsu.com>
+Subject: Re: [PATCH 0/1] Possible bug in zram on ppc64le on vfat
+Message-ID: <Y2l3vJb1y2Jynf50@google.com>
+References: <20221107191136.18048-1-pvorel@suse.cz>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [192.168.168.10]
-X-ClientProxiedBy: MAIL.baikal.int (192.168.51.25) To mail (192.168.51.25)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221107191136.18048-1-pvorel@suse.cz>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-In accordance with [1] the DMA-able memory buffers must be
-cacheline-aligned otherwise the cache writing-back and invalidation
-performed during the mapping may cause the adjacent data being lost. It's
-specifically required for the DMA-noncoherent platforms [2]. Seeing the
-opal_dev.{cmd,resp} buffers are implicitly used for DMAs in the NVME and
-SCSI/SD drivers in framework of the nvme_sec_submit() and sd_sec_submit()
-methods respectively they must be cacheline-aligned to prevent the denoted
-problem. One of the option to guarantee that is to kmalloc the buffers
-[2]. Let's explicitly allocate them then instead of embedding into the
-opal_dev structure instance.
+On Mon, Nov 07, 2022 at 08:11:35PM +0100, Petr Vorel wrote:
+> Hi all,
+> 
+> following bug is trying to workaround an error on ppc64le, where
+> zram01.sh LTP test (there is also kernel selftest
+> tools/testing/selftests/zram/zram01.sh, but LTP test got further
+> updates) has often mem_used_total 0 although zram is already filled.
 
-Note this fix was inspired by the commit c94b7f9bab22 ("nvme-hwmon:
-kmalloc the NVME SMART log buffer").
+Hi, Petr,
 
-[1] Documentation/core-api/dma-api.rst
-[2] Documentation/core-api/dma-api-howto.rst
+Is it happening on only ppc64le?
 
-Fixes: 455a7b238cd6 ("block: Add Sed-opal library")
-Signed-off-by: Serge Semin <Sergey.Semin@baikalelectronics.ru>
+Is it a new regression? What kernel version did you use?
 
----
+Actually, mem_used_total indicates how many *physical memory* were
+currently used to keep original data size.
 
-Folks the NVME-part of the patchset has already been merged in
-Link: https://lore.kernel.org/linux-nvme/20220929224648.8997-1-Sergey.Semin@baikalelectronics.ru/
-This modification is only leftover of the original series. So I've resent
-it as a separate patch.
+However, if the test data is repeated pattern of unsigned long
+(https://github.com/torvalds/linux/blob/master/drivers/block/zram/zram_drv.c#L210)
+zram doesn't allocate the physical memory but just mark the unsigned long's value
+in meta area for decompression later.
 
-Link: https://lore.kernel.org/linux-nvme/20220929224648.8997-4-Sergey.Semin@baikalelectronics.ru/
-Changelog v3:
-- Convert to allocating the cmd-/resp-buffers instead of cache-aligning
-  them. (@Jonathan)
-- Resubmit the patch separately from the original series.
-- Rebase onto the kernel 6.1-rc3
----
- block/sed-opal.c | 32 ++++++++++++++++++++++++++++----
- 1 file changed, 28 insertions(+), 4 deletions(-)
+Not sure you hit the this case.
 
-diff --git a/block/sed-opal.c b/block/sed-opal.c
-index 2c5327a0543a..9bdb833e5817 100644
---- a/block/sed-opal.c
-+++ b/block/sed-opal.c
-@@ -87,8 +87,8 @@ struct opal_dev {
- 	u64 lowest_lba;
- 
- 	size_t pos;
--	u8 cmd[IO_BUFFER_LENGTH];
--	u8 resp[IO_BUFFER_LENGTH];
-+	u8 *cmd;
-+	u8 *resp;
- 
- 	struct parsed_resp parsed;
- 	size_t prev_d_len;
-@@ -2175,6 +2175,8 @@ void free_opal_dev(struct opal_dev *dev)
- 		return;
- 
- 	clean_opal_dev(dev);
-+	kfree(dev->resp);
-+	kfree(dev->cmd);
- 	kfree(dev);
- }
- EXPORT_SYMBOL(free_opal_dev);
-@@ -2187,6 +2189,18 @@ struct opal_dev *init_opal_dev(void *data, sec_send_recv *send_recv)
- 	if (!dev)
- 		return NULL;
- 
-+	/*
-+	 * Presumably DMA-able buffers must be cache-aligned. Kmalloc makes
-+	 * sure the allocated buffer is DMA-safe in that regard.
-+	 */
-+	dev->cmd = kmalloc(IO_BUFFER_LENGTH, GFP_KERNEL);
-+	if (!dev->cmd)
-+		goto err_free_dev;
-+
-+	dev->resp = kmalloc(IO_BUFFER_LENGTH, GFP_KERNEL);
-+	if (!dev->resp)
-+		goto err_free_cmd;
-+
- 	INIT_LIST_HEAD(&dev->unlk_lst);
- 	mutex_init(&dev->dev_lock);
- 	dev->flags = 0;
-@@ -2194,11 +2208,21 @@ struct opal_dev *init_opal_dev(void *data, sec_send_recv *send_recv)
- 	dev->send_recv = send_recv;
- 	if (check_opal_support(dev) != 0) {
- 		pr_debug("Opal is not supported on this device\n");
--		kfree(dev);
--		return NULL;
-+		goto err_free_resp;
- 	}
- 
- 	return dev;
-+
-+err_free_resp:
-+	kfree(dev->resp);
-+
-+err_free_cmd:
-+	kfree(dev->cmd);
-+
-+err_free_dev:
-+	kfree(dev);
-+
-+	return NULL;
- }
- EXPORT_SYMBOL(init_opal_dev);
- 
--- 
-2.38.0
-
-
+> 
+> Patch tries to repeatedly read /sys/block/zram*/mm_stat for 1 sec,
+> waiting for mem_used_total > 0. The question if this is expected and
+> should be workarounded or a bug which should be fixed.
+> 
+> REPRODUCE THE ISSUE
+> Quickest way to install only zram tests and their dependencies:
+> make autotools && ./configure && for i in testcases/lib/ testcases/kernel/device-drivers/zram/; do cd $i && make -j$(getconf _NPROCESSORS_ONLN) && make install && cd -; done
+> 
+> Run the test (only on vfat)
+> PATH="/opt/ltp/testcases/bin:$PATH" LTP_SINGLE_FS_TYPE=vfat zram01.sh
+> 
+> Petr Vorel (1):
+>   zram01.sh: Workaround division by 0 on vfat on ppc64le
+> 
+>  .../kernel/device-drivers/zram/zram01.sh      | 27 +++++++++++++++++--
+>  1 file changed, 25 insertions(+), 2 deletions(-)
+> 
+> -- 
+> 2.38.0
+> 
