@@ -2,129 +2,75 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A6A2C43217
-	for <linux-block@archiver.kernel.org>; Mon,  7 Nov 2022 19:12:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 95AADC4332F
+	for <linux-block@archiver.kernel.org>; Mon,  7 Nov 2022 19:55:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232282AbiKGTMN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 7 Nov 2022 14:12:13 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47896 "EHLO
+        id S231810AbiKGTza (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 7 Nov 2022 14:55:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40380 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232712AbiKGTMA (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 7 Nov 2022 14:12:00 -0500
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BEDF12A240;
-        Mon,  7 Nov 2022 11:11:59 -0800 (PST)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        with ESMTP id S231586AbiKGTz3 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 7 Nov 2022 14:55:29 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5917320BEC
+        for <linux-block@vger.kernel.org>; Mon,  7 Nov 2022 11:55:27 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 7B34422534;
-        Mon,  7 Nov 2022 19:11:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1667848318; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=IDZ+1J9gbkdeI4Dq1QHKthecD/b0UCy0MKie46ulwZw=;
-        b=oIErcstqUTvnyCIaNr2MynlO/sInNGy8OeQRYWuUtmsni2xUSucAsaolcL0hxrbvpQmM9r
-        HGZjGTkEKIX5bRip51TQwuVWmU8pMqM2erjJmzZ/NRaIM5G1ybKD++4VV4PFkuiok+v94n
-        5+8+rYslVbI7gX2sF8n6LY+eXjTUNE4=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1667848318;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=IDZ+1J9gbkdeI4Dq1QHKthecD/b0UCy0MKie46ulwZw=;
-        b=MvgZMh0mSA1s7DaPqJILE+epydRvG7/9BFn/TNq6Q2lSPtGgzuoZK1SshRKp231AyPCcTw
-        GaGcrGxbHU7jkFDw==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id A7D2A13AC7;
-        Mon,  7 Nov 2022 19:11:57 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id sLg8I31YaWMjJgAAMHmgww
-        (envelope-from <pvorel@suse.cz>); Mon, 07 Nov 2022 19:11:57 +0000
-From:   Petr Vorel <pvorel@suse.cz>
-To:     ltp@lists.linux.it
-Cc:     Petr Vorel <pvorel@suse.cz>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        Minchan Kim <minchan@kernel.org>,
-        Nitin Gupta <ngupta@vflare.org>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>,
-        Martin Doucha <mdoucha@suse.cz>,
-        Yang Xu <xuyang2018.jy@fujitsu.com>
-Subject: [PATCH 1/1] zram01.sh: Workaround division by 0 on vfat on ppc64le
-Date:   Mon,  7 Nov 2022 20:11:36 +0100
-Message-Id: <20221107191136.18048-2-pvorel@suse.cz>
-X-Mailer: git-send-email 2.38.0
-In-Reply-To: <20221107191136.18048-1-pvorel@suse.cz>
-References: <20221107191136.18048-1-pvorel@suse.cz>
+        by dfw.source.kernel.org (Postfix) with ESMTPS id A05026129B
+        for <linux-block@vger.kernel.org>; Mon,  7 Nov 2022 19:55:26 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D429DC433C1;
+        Mon,  7 Nov 2022 19:55:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1667850926;
+        bh=XXbCNstRl7sDheKpIsNu9w1XnHJ9vgekKGo3X2oGw/E=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=jUhf+bnkr6YHmzBjuWaxzTbkwzB/toalkTgOW+87vDzRHoM1z/SxX63Vk7S+AjXg/
+         vlbmwgchva+VGkbjU40QV5HGw13dppMEnzGiBPHGTosllwofuB1QJpI/Lk0VdSonR6
+         xvEJZrvpomIAJeOXeHOFxBxnkmdcc/fGt0PKVsrGr3Bfk6bxyz9AU6umsAzhjL6kHb
+         oH1V9bcwTbT957C3khvBOpnryeuu9wpm29qEx/pbPyaPZo270HeC7ZdFqB1QJpl21M
+         Rc0R4kj0FDjKyw+NzA0KZqDy9eLDYv1X6HPY9XRMHHvJi1vEi6YkR1qza82U/9aTOL
+         YS6K39D0DqiDw==
+Date:   Mon, 7 Nov 2022 11:55:24 -0800
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     axboe@kernel.dk, linux-block@vger.kernel.org
+Subject: Re: [PATCH 1/3] blk-crypto: pass a gendisk to
+ blk_crypto_sysfs_register
+Message-ID: <Y2lirLd1Gxs6+HEd@sol.localdomain>
+References: <20221105080815.775721-1-hch@lst.de>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221105080815.775721-1-hch@lst.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Repeatedly read /sys/block/zram*/mm_stat for 1 sec. This should fix bug
-on ppc64le on stable kernels, where mem_used_total is often 0.
+On Sat, Nov 05, 2022 at 09:08:13AM +0100, Christoph Hellwig wrote:
+> Prepare for changes to the block layer sysfs handling by passing the
+> readily available gendisk to blk_crypto_sysfs_register.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>  block/blk-crypto-internal.h | 4 ++--
+>  block/blk-crypto-sysfs.c    | 3 ++-
+>  block/blk-sysfs.c           | 2 +-
+>  3 files changed, 5 insertions(+), 4 deletions(-)
+> 
+> diff --git a/block/blk-crypto-internal.h b/block/blk-crypto-internal.h
+> index e6818ffaddbf8..32990299dace1 100644
+> --- a/block/blk-crypto-internal.h
+> +++ b/block/blk-crypto-internal.h
+> @@ -21,7 +21,7 @@ extern const struct blk_crypto_mode blk_crypto_modes[];
+>  
+>  #ifdef CONFIG_BLK_INLINE_ENCRYPTION
+>  
+> -int blk_crypto_sysfs_register(struct request_queue *q);
+> +int blk_crypto_sysfs_register(struct gendisk *disk);
+>  
+>  void blk_crypto_sysfs_unregister(struct request_queue *q);
 
-Signed-off-by: Petr Vorel <pvorel@suse.cz>
----
- .../kernel/device-drivers/zram/zram01.sh      | 27 +++++++++++++++++--
- 1 file changed, 25 insertions(+), 2 deletions(-)
+Shouldn't blk_crypto_sysfs_unregister() be updated to match?
 
-diff --git a/testcases/kernel/device-drivers/zram/zram01.sh b/testcases/kernel/device-drivers/zram/zram01.sh
-index 58d233f91..76a8ccab4 100755
---- a/testcases/kernel/device-drivers/zram/zram01.sh
-+++ b/testcases/kernel/device-drivers/zram/zram01.sh
-@@ -105,6 +105,26 @@ zram_mount()
- 	tst_res TPASS "mount of zram device(s) succeeded"
- }
- 
-+read_mem_used_total()
-+{
-+	echo $(awk '{print $3}' $1)
-+}
-+
-+# Reads /sys/block/zram*/mm_stat until mem_used_total is not 0.
-+loop_read_mem_used_total()
-+{
-+	local file="$1"
-+	local mem_used_total
-+
-+	tst_res TINFO "$file"
-+	cat $file >&2
-+
-+	mem_used_total=$(read_mem_used_total $file)
-+	[ "$mem_used_total" -eq 0 ] && return 1
-+
-+	return 0
-+}
-+
- zram_fill_fs()
- {
- 	local mem_used_total
-@@ -133,9 +153,12 @@ zram_fill_fs()
- 			continue
- 		fi
- 
--		mem_used_total=`awk '{print $3}' "/sys/block/zram$i/mm_stat"`
-+		TST_RETRY_FUNC "loop_read_mem_used_total /sys/block/zram$i/mm_stat" 0
-+		mem_used_total=$(read_mem_used_total /sys/block/zram$i/mm_stat)
-+		tst_res TINFO "mem_used_total: $mem_used_total"
-+
- 		v=$((100 * 1024 * $b / $mem_used_total))
--		r=`echo "scale=2; $v / 100 " | bc`
-+		r=$(echo "scale=2; $v / 100 " | bc)
- 
- 		if [ "$v" -lt 100 ]; then
- 			tst_res TFAIL "compression ratio: $r:1"
--- 
-2.38.0
-
+- Eric
