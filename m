@@ -2,95 +2,169 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 69557C433FE
-	for <linux-block@archiver.kernel.org>; Mon,  7 Nov 2022 20:24:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E5DEC4332F
+	for <linux-block@archiver.kernel.org>; Mon,  7 Nov 2022 20:46:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232909AbiKGUYD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 7 Nov 2022 15:24:03 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57120 "EHLO
+        id S232283AbiKGUqK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 7 Nov 2022 15:46:10 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39118 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231906AbiKGUYB (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 7 Nov 2022 15:24:01 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 871E962CD;
-        Mon,  7 Nov 2022 12:24:00 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 45BA8B81698;
-        Mon,  7 Nov 2022 20:23:59 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A2FEEC433C1;
-        Mon,  7 Nov 2022 20:23:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1667852637;
-        bh=3hSQMyHzzb1qvEGKfCW2d+14fPlyf1oF9apNDHd9a1U=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=C4bA668PDuYNLHpT22WxpZWlUkjohVmfdUJKoKC28CfkxY/BPvvT4OPsVovgRW7y8
-         oMMd96lkYqHujvvXlb5hmTcSH1a8cuS4gzmf6WiYrgATsH5gTza99a2++FoxZVeXkI
-         /Au1IrzluTGkW+j6VIqKsnGaINKul4ni9vRgyYvwRRT5RuV//AH3Qi4/4Gh6pPj0t4
-         MJmOBW9b2t5f6PX/wKY+UZ6wPIevhwmIyPyh3HqeYKR2yKknk69kiqBeNdgi7VwL3c
-         vZAVwx2U6gOdkQliB7xwCaQbTdpazi9ZUI9iJGNsBaZ2qxD7YDhZ/nFFL99fwuQqyy
-         8GRq3ox0vBCDg==
-Date:   Mon, 7 Nov 2022 12:23:56 -0800
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, Mike Snitzer <snitzer@kernel.org>,
-        "Theodore Y. Ts'o" <tytso@mit.edu>,
-        Jaegeuk Kim <jaegeuk@kernel.org>, dm-devel@redhat.com,
-        linux-block@vger.kernel.org, linux-fscrypt@vger.kernel.org
-Subject: Re: [PATCH 3/3] blk-crypto: move __blk_crypto_cfg_supported to
- blk-crypto-internal.h
-Message-ID: <Y2lpXPD2jlumpNfr@sol.localdomain>
-References: <20221107144229.1547370-1-hch@lst.de>
- <20221107144229.1547370-4-hch@lst.de>
+        with ESMTP id S232832AbiKGUqK (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 7 Nov 2022 15:46:10 -0500
+X-Greylist: delayed 367 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 07 Nov 2022 12:46:01 PST
+Received: from post.baikalelectronics.com (post.baikalelectronics.com [213.79.110.86])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 8A69CDF29;
+        Mon,  7 Nov 2022 12:46:01 -0800 (PST)
+Received: from post.baikalelectronics.com (localhost.localdomain [127.0.0.1])
+        by post.baikalelectronics.com (Proxmox) with ESMTP id 34930E0EAB;
+        Mon,  7 Nov 2022 23:39:52 +0300 (MSK)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        baikalelectronics.ru; h=cc:cc:content-transfer-encoding
+        :content-type:content-type:date:from:from:in-reply-to:message-id
+        :mime-version:references:reply-to:subject:subject:to:to; s=post;
+         bh=Mo1IoZxL2Rc3as4wkOOmjS2i89Ql8ugECSEPpbB7MWg=; b=HSnlfG0Qw9cV
+        EUSsAE5gB5l5RsG7gI/yi6CDe4s5N3vm3ieRL+4mVVTCib1v3Qe8hMYO5JyK1oeM
+        DkkeZ/pjHPRUfJvXkjb7UBvC3jPj7K8/3mGzx0DIQTljXbUrP99lf9FO/oXxLaBO
+        3BSmLZTy88JYSOFHHyVMBYOXodfcWjI=
+Received: from mail.baikal.int (mail.baikal.int [192.168.51.25])
+        by post.baikalelectronics.com (Proxmox) with ESMTP id EE6EAE0E1D;
+        Mon,  7 Nov 2022 23:39:51 +0300 (MSK)
+Received: from localhost (192.168.168.10) by mail (192.168.51.25) with
+ Microsoft SMTP Server (TLS) id 15.0.1395.4; Mon, 7 Nov 2022 23:39:51 +0300
+From:   Serge Semin <Sergey.Semin@baikalelectronics.ru>
+To:     Jens Axboe <axboe@kernel.dk>, Jens Axboe <axboe@fb.com>,
+        Keith Busch <kbusch@kernel.org>,
+        Christoph Hellwig <hch@lst.de>,
+        Jonathan Derrick <jonathan.derrick@linux.dev>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Scott Bauer <scott.bauer@intel.com>,
+        Rafael Antognolli <Rafael.Antognolli@intel.com>
+CC:     Serge Semin <Sergey.Semin@baikalelectronics.ru>,
+        Serge Semin <fancer.lancer@gmail.com>,
+        Alexey Malahov <Alexey.Malahov@baikalelectronics.ru>,
+        Pavel Parkhomenko <Pavel.Parkhomenko@baikalelectronics.ru>,
+        <linux-nvme@lists.infradead.org>, <linux-block@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
+Subject: [PATCH v3] block: sed-opal: kmalloc the cmd/resp buffers
+Date:   Mon, 7 Nov 2022 23:39:44 +0300
+Message-ID: <20221107203944.31686-1-Sergey.Semin@baikalelectronics.ru>
+X-Mailer: git-send-email 2.38.0
+In-Reply-To: <20220929224648.8997-4-Sergey.Semin@baikalelectronics.ru>
+References: <20220929224648.8997-4-Sergey.Semin@baikalelectronics.ru>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221107144229.1547370-4-hch@lst.de>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [192.168.168.10]
+X-ClientProxiedBy: MAIL.baikal.int (192.168.51.25) To mail (192.168.51.25)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Nov 07, 2022 at 03:42:29PM +0100, Christoph Hellwig wrote:
-> __blk_crypto_cfg_supported is only used internally by the blk-crypto
-> code now, so move it out of the public header.
+In accordance with [1] the DMA-able memory buffers must be
+cacheline-aligned otherwise the cache writing-back and invalidation
+performed during the mapping may cause the adjacent data being lost. It's
+specifically required for the DMA-noncoherent platforms [2]. Seeing the
+opal_dev.{cmd,resp} buffers are implicitly used for DMAs in the NVME and
+SCSI/SD drivers in framework of the nvme_sec_submit() and sd_sec_submit()
+methods respectively they must be cacheline-aligned to prevent the denoted
+problem. One of the option to guarantee that is to kmalloc the buffers
+[2]. Let's explicitly allocate them then instead of embedding into the
+opal_dev structure instance.
 
-"public header" is ambiguous here.  blk-crypto.h is the "public header" for
-upper layers, but blk-crypto-profile.h is the "public header" for drivers.
-Maybe write "blk-crypto-profile.h, which is included by drivers".
+Note this fix was inspired by the commit c94b7f9bab22 ("nvme-hwmon:
+kmalloc the NVME SMART log buffer").
 
-> diff --git a/block/blk-crypto-internal.h b/block/blk-crypto-internal.h
-> index e6818ffaddbf8..c587b3e1886c9 100644
-> --- a/block/blk-crypto-internal.h
-> +++ b/block/blk-crypto-internal.h
-> @@ -19,6 +19,9 @@ struct blk_crypto_mode {
->  
->  extern const struct blk_crypto_mode blk_crypto_modes[];
->  
-> +bool __blk_crypto_cfg_supported(struct blk_crypto_profile *profile,
-> +				const struct blk_crypto_config *cfg);
-> +
->  #ifdef CONFIG_BLK_INLINE_ENCRYPTION
+[1] Documentation/core-api/dma-api.rst
+[2] Documentation/core-api/dma-api-howto.rst
 
-It should go in the '#ifdef CONFIG_BLK_INLINE_ENCRYPTION' section.
+Fixes: 455a7b238cd6 ("block: Add Sed-opal library")
+Signed-off-by: Serge Semin <Sergey.Semin@baikalelectronics.ru>
 
-> diff --git a/include/linux/blk-crypto-profile.h b/include/linux/blk-crypto-profile.h
-> index bbab65bd54288..e990ec9b32aa4 100644
-> --- a/include/linux/blk-crypto-profile.h
-> +++ b/include/linux/blk-crypto-profile.h
-> @@ -144,9 +144,6 @@ blk_status_t blk_crypto_get_keyslot(struct blk_crypto_profile *profile,
->  
->  void blk_crypto_put_keyslot(struct blk_crypto_keyslot *slot);
->  
-> -bool __blk_crypto_cfg_supported(struct blk_crypto_profile *profile,
-> -				const struct blk_crypto_config *cfg);
-> -
->  int __blk_crypto_evict_key(struct blk_crypto_profile *profile,
->  			   const struct blk_crypto_key *key);
+---
 
-Otherwise I guess this patch is fine.  The exact same argument would also apply
-to blk_crypto_get_keyslot(), blk_crypto_put_keyslot(), and
-__blk_crypto_evict_key(), though.  It might be worth handling them all in one
-patch.
+Folks the NVME-part of the patchset has already been merged in
+Link: https://lore.kernel.org/linux-nvme/20220929224648.8997-1-Sergey.Semin@baikalelectronics.ru/
+This modification is only leftover of the original series. So I've resent
+it as a separate patch.
 
-- Eric
+Link: https://lore.kernel.org/linux-nvme/20220929224648.8997-4-Sergey.Semin@baikalelectronics.ru/
+Changelog v3:
+- Convert to allocating the cmd-/resp-buffers instead of cache-aligning
+  them. (@Jonathan)
+- Resubmit the patch separately from the original series.
+- Rebase onto the kernel 6.1-rc3
+---
+ block/sed-opal.c | 32 ++++++++++++++++++++++++++++----
+ 1 file changed, 28 insertions(+), 4 deletions(-)
+
+diff --git a/block/sed-opal.c b/block/sed-opal.c
+index 2c5327a0543a..9bdb833e5817 100644
+--- a/block/sed-opal.c
++++ b/block/sed-opal.c
+@@ -87,8 +87,8 @@ struct opal_dev {
+ 	u64 lowest_lba;
+ 
+ 	size_t pos;
+-	u8 cmd[IO_BUFFER_LENGTH];
+-	u8 resp[IO_BUFFER_LENGTH];
++	u8 *cmd;
++	u8 *resp;
+ 
+ 	struct parsed_resp parsed;
+ 	size_t prev_d_len;
+@@ -2175,6 +2175,8 @@ void free_opal_dev(struct opal_dev *dev)
+ 		return;
+ 
+ 	clean_opal_dev(dev);
++	kfree(dev->resp);
++	kfree(dev->cmd);
+ 	kfree(dev);
+ }
+ EXPORT_SYMBOL(free_opal_dev);
+@@ -2187,6 +2189,18 @@ struct opal_dev *init_opal_dev(void *data, sec_send_recv *send_recv)
+ 	if (!dev)
+ 		return NULL;
+ 
++	/*
++	 * Presumably DMA-able buffers must be cache-aligned. Kmalloc makes
++	 * sure the allocated buffer is DMA-safe in that regard.
++	 */
++	dev->cmd = kmalloc(IO_BUFFER_LENGTH, GFP_KERNEL);
++	if (!dev->cmd)
++		goto err_free_dev;
++
++	dev->resp = kmalloc(IO_BUFFER_LENGTH, GFP_KERNEL);
++	if (!dev->resp)
++		goto err_free_cmd;
++
+ 	INIT_LIST_HEAD(&dev->unlk_lst);
+ 	mutex_init(&dev->dev_lock);
+ 	dev->flags = 0;
+@@ -2194,11 +2208,21 @@ struct opal_dev *init_opal_dev(void *data, sec_send_recv *send_recv)
+ 	dev->send_recv = send_recv;
+ 	if (check_opal_support(dev) != 0) {
+ 		pr_debug("Opal is not supported on this device\n");
+-		kfree(dev);
+-		return NULL;
++		goto err_free_resp;
+ 	}
+ 
+ 	return dev;
++
++err_free_resp:
++	kfree(dev->resp);
++
++err_free_cmd:
++	kfree(dev->cmd);
++
++err_free_dev:
++	kfree(dev);
++
++	return NULL;
+ }
+ EXPORT_SYMBOL(init_opal_dev);
+ 
+-- 
+2.38.0
+
+
