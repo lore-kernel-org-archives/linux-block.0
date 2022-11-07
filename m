@@ -2,91 +2,157 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F3D8EC433FE
-	for <linux-block@archiver.kernel.org>; Mon,  7 Nov 2022 13:19:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8525FC4332F
+	for <linux-block@archiver.kernel.org>; Mon,  7 Nov 2022 13:26:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231963AbiKGNTu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 7 Nov 2022 08:19:50 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55202 "EHLO
+        id S231733AbiKGN0i (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 7 Nov 2022 08:26:38 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59050 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232176AbiKGNTt (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 7 Nov 2022 08:19:49 -0500
-Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A1B61B1FE
-        for <linux-block@vger.kernel.org>; Mon,  7 Nov 2022 05:19:48 -0800 (PST)
-Received: by mail-pf1-x432.google.com with SMTP id q9so10583510pfg.5
-        for <linux-block@vger.kernel.org>; Mon, 07 Nov 2022 05:19:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=rzdGFzx+TjrS2t/GJ6Iu3kMxv9cIRqVUv64fPauPFm0=;
-        b=F7cXjfSf19tEVXERpGhFZ3N96C5ZCflSrOoC5zJMo+h5rWDYg2apBlZxqwLOLJPjJz
-         yRZ8cy9QggpxoLnJ/ghZfJ6NMookoDhE+YXYRpnh+1RbzwlVT5TX5zTuNF+YTGLDN1Xm
-         CbXRGE6UPehar8BnwS5ZFoS3Ev3KL8rxgKy4sqDkV3QefmfwEoWj+gOJKcjZ/2JW3JA0
-         KBQHQpAwrkhd1g1cO4jaFzdIsO/qH6DRT3gT9dx+SoWhTt/e5bCRnbpMzlJZHqTB0nsF
-         RVcfndWHOKBj2FkaK6kNR6Wof7Hsd5cN1s0YvNUVH6F93wpPZQSFFwzmywHoQ/b1iTzu
-         fxqA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=rzdGFzx+TjrS2t/GJ6Iu3kMxv9cIRqVUv64fPauPFm0=;
-        b=j74BB9uBydVZe9a8b6hgf5RIxyOcPZh7zzbxarJIII0kieFJqBa827MGk+BRf3agjP
-         mFi/+cZ9NGD9eJt41QaEmJggCaC0tzpZW405KOD6JW7ZeE2vQ0KexmYzCFTMv11p2smh
-         Je8SftNu5qriyXRIbj4g7F6AofXYnTZXGRLG8OBXjArkGJXbuhpWazwzusUMNwxUijNd
-         mWIWAzqht2e7SLchQlc1UXqw6C+FlX/0fssVzvcnMfLQeiXIWurYZHSzAp8t2/cucNcf
-         pzvD16LJ2NqhcgMv3mF/PPuz3/H0KZeYV2MtJH82ffmH/FnlhnWLJfcVoJ2rOZ50bIG4
-         QBPQ==
-X-Gm-Message-State: ACrzQf1Gw37+9I38Gf1Qp79pk1xPHpTArcnvCYJ72Xpwrfm3XmuQDd5v
-        SaTGmQ+J2LgsB/VUlCcrfeU0EWnbEzI=
-X-Google-Smtp-Source: AMsMyM5lT8zvjKnq3E1/QSQWFZP+AZcU3UHWRAJJMiFoK6fW/0pNZeiB6CzY3m1T15KyU8J+yOS50w==
-X-Received: by 2002:a05:6a00:2386:b0:56c:b791:40f2 with SMTP id f6-20020a056a00238600b0056cb79140f2mr51038017pfc.4.1667827187893;
-        Mon, 07 Nov 2022 05:19:47 -0800 (PST)
-Received: from localhost.localdomain ([114.200.4.15])
-        by smtp.googlemail.com with ESMTPSA id m2-20020a17090a4d8200b00212d4c50647sm6097401pjh.36.2022.11.07.05.19.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Nov 2022 05:19:47 -0800 (PST)
-From:   Suwan Kim <suwan.kim027@gmail.com>
-To:     mst@redhat.com, jasowang@redhat.com, stefanha@redhat.com,
-        pbonzini@redhat.com, hch@infradead.org
-Cc:     virtualization@lists.linux-foundation.org,
-        linux-block@vger.kernel.org, Suwan Kim <suwan.kim027@gmail.com>
-Subject: [PATCH] virtio-blk: set req->state to MQ_RQ_COMPLETE after polling I/O is finished
-Date:   Mon,  7 Nov 2022 22:17:48 +0900
-Message-Id: <20221107131748.11892-1-suwan.kim027@gmail.com>
-X-Mailer: git-send-email 2.26.3
+        with ESMTP id S231712AbiKGN0e (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 7 Nov 2022 08:26:34 -0500
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E991E1A3A2;
+        Mon,  7 Nov 2022 05:26:33 -0800 (PST)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id A494D22544;
+        Mon,  7 Nov 2022 13:26:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1667827592; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=cS3muMI5WStP103zRvSh1uu1lDBE/GBlTm1cKs3o9EU=;
+        b=2PsbZxpvvUpdl6ajyETlq9RBewdCqVqAUhUciosjZbNJO4m1/RWiIuRVr+KWum+0W0qvJr
+        4FUzzGzBHSN9tgA7C/b4Xl89UPXY9NfkfkNo4RQEUOp2U+yVF1w5jvIaFhCOeEpoqIY0yr
+        sUTYEH+babpHLBVAV3q6/6tmQDUQ0kw=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1667827592;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=cS3muMI5WStP103zRvSh1uu1lDBE/GBlTm1cKs3o9EU=;
+        b=Hco5MwFj/aQmVrzqpS10vaWxW8eG2mMsd+brypV4yrr9kjVUQyCPI74FL+0GqQAho3zeOO
+        w+0Q0YJhdjqrKPBw==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 8C54F13494;
+        Mon,  7 Nov 2022 13:26:32 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id eP09IogHaWP1WQAAMHmgww
+        (envelope-from <jack@suse.cz>); Mon, 07 Nov 2022 13:26:32 +0000
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+        id 67FE5A0704; Mon,  7 Nov 2022 14:26:31 +0100 (CET)
+Date:   Mon, 7 Nov 2022 14:26:31 +0100
+From:   Jan Kara <jack@suse.cz>
+To:     Khazhy Kumykov <khazhy@google.com>
+Cc:     Jan Kara <jack@suse.cz>, Yu Kuai <yukuai1@huaweicloud.com>,
+        Paolo Valente <paolo.valente@linaro.org>,
+        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, "yukuai (C)" <yukuai3@huawei.com>
+Subject: Re: [RFC PATCH] bfq: fix waker_bfqq inconsistency crash
+Message-ID: <20221107132631.ajhbqmgewq24jx4k@quack3>
+References: <20221103013937.603626-1-khazhy@google.com>
+ <3c0df3fa-8731-5863-ccc5-f2e60601dbf9@huaweicloud.com>
+ <CACGdZYJ0WH+Y9sdchXy30UVTQgPCEo=fW+W9atZh1Ki7Ov4_Gw@mail.gmail.com>
+ <f83404b4-84a4-de4e-fa4d-9ce38900d91c@huaweicloud.com>
+ <20221103084744.xsvoul3hjgz7yyo7@quack3>
+ <CACGdZYK7xk+CJw9_RKwceXXnREVhgHh9U-OWidnKgYp6B011xQ@mail.gmail.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <CACGdZYK7xk+CJw9_RKwceXXnREVhgHh9U-OWidnKgYp6B011xQ@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Driver should set req->state to MQ_RQ_COMPLETE after it finishes to process
-req. But virtio-blk doesn't set MQ_RQ_COMPLETE after virtblk_poll() handles
-req and req->state still remains MQ_RQ_IN_FLIGHT. Fortunately so far there
-is no issue about it because blk_mq_end_request_batch() sets req->state to
-MQ_RQ_IDLE. This patch properly sets req->state after polling I/O is finished.
+On Fri 04-11-22 14:25:32, Khazhy Kumykov wrote:
+> On Thu, Nov 3, 2022 at 1:47 AM Jan Kara <jack@suse.cz> wrote:
+> >
+> > On Thu 03-11-22 11:51:15, Yu Kuai wrote:
+> > > Hi,
+> > >
+> > > 在 2022/11/03 11:05, Khazhy Kumykov 写道:
+> > > > On Wed, Nov 2, 2022 at 7:56 PM Yu Kuai <yukuai1@huaweicloud.com> wrote:
+> > > > >
+> > > > > Hi,
+> > > > >
+> > > > > 在 2022/11/03 9:39, Khazhismel Kumykov 写道:
+> > > > > > This fixes crashes in bfq_add_bfqq_busy due to waker_bfqq being NULL,
+> > > > > > but woken_list_node still being hashed. This would happen when
+> > > > > > bfq_init_rq() expects a brand new allocated queue to be returned from
+> > > > >
+> > > > >   From what I see, bfqq->waker_bfqq is updated in bfq_init_rq() only if
+> > > > > 'new_queue' is false, but if 'new_queue' is false, the returned 'bfqq'
+> > > > > from bfq_get_bfqq_handle_split() will never be oom_bfqq, so I'm confused
+> > > > > here...
+> > > > There's two calls for bfq_get_bfqq_handle_split in this function - the
+> > > > second one is after the check you mentioned, and is the problematic
+> > > > one.
+> > > Yes, thanks for the explanation. Now I understand how the problem
+> > > triggers.
+> > >
+> > > > >
+> > > > > > bfq_get_bfqq_handle_split() and unconditionally updates waker_bfqq
+> > > > > > without resetting woken_list_node. Since we can always return oom_bfqq
+> > > > > > when attempting to allocate, we cannot assume waker_bfqq starts as NULL.
+> > > > > > We must either reset woken_list_node, or avoid setting woken_list at all
+> > > > > > for oom_bfqq - opt to do the former.
+> > > > >
+> > > > > Once oom_bfqq is used, I think the io is treated as issued from root
+> > > > > group. Hence I don't think it's necessary to set woken_list or
+> > > > > waker_bfqq for oom_bfqq.
+> > > > Ack, I was wondering what's right here since, evidently, *someone* had
+> > > > already set oom_bfqq->waker_bfqq to *something* (although... maybe it
+> > > > was an earlier init_rq). But maybe it's better to do nothing if we
+> > > > *know* it's oom_bfqq.
+> > >
+> > > I need to have a check how oom_bfqq get involved with waker_bfqq, and
+> > > then see if it's reasonable.
+> > >
+> > > Probably Jan and Paolo will have better view on this.
+> >
+> > Thanks for the CC Kuai and thanks to Khazy for spotting the bug. The
+> > oom_bfqq is just a fallback bfqq and as such it should be extempted from
+> > all special handling like waker detection etc. All this stuff is just for
+> > optimizing performance and when we are OOM, we have far larger troubles
+> > than to optimize performance.
+> >
+> > So how I think we should really fix this is that we extempt oom_bfqq from
+> > waker detection in bfq_check_waker() by adding:
+> >
+> >         bfqq == bfqd->oom_bfqq ||
+> >         bfqd->last_completed_rq_bfq == bfqd->oom_bfqq)
+> >
+> > to the initial check and then also if bfq_get_bfqq_handle_split() returns
+> > oom_bfqq we should just skip carrying over the waker information.
+> Thanks for the tip! I'll send a followup, including your suggestions.
+> 
+> I do have some other questions in this area, if you could help me
+> understand. Looking again at bfq_init_rq, inside of the !new_queue
+> section - we call bfq_split_bfqq() to "split" our bfqq, then in the
+> next line bfq_get_bfqq_handle_split inspects bic_to_bfqq(bic,
+> is_sync), and if it's NULL, allocates a new queue. However, if we have
+> an async rq, this call will return the pre-existing async bfqq, as the
+> call to bfq_split_bfqq() only clears the sync bfqq, ever. The best
+> understanding I have now is: "bic->bfqq[aync] is never NULL (and we
+> don't merge async queues) so we'll never reach this !new_queue section
+> anyways if it's async". Is that accurate?
 
-Fixes: 4e0400525691 ("virtio-blk: support polling I/O")
-Signed-off-by: Suwan Kim <suwan.kim027@gmail.com>
----
- drivers/block/virtio_blk.c | 1 +
- 1 file changed, 1 insertion(+)
+So you are right that async queues are never merged or split. In fact, if
+you have a look at bfq_get_queue(), you'll notice that async queue is
+common for all processes with the same ioprio & blkcg. So all these games
+with splitting, merging, waker detection etc. impact only sync queues.
 
-diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-index 19da5defd734..cf64d256787e 100644
---- a/drivers/block/virtio_blk.c
-+++ b/drivers/block/virtio_blk.c
-@@ -839,6 +839,7 @@ static void virtblk_complete_batch(struct io_comp_batch *iob)
- 	rq_list_for_each(&iob->req_list, req) {
- 		virtblk_unmap_data(req, blk_mq_rq_to_pdu(req));
- 		virtblk_cleanup_cmd(req);
-+		blk_mq_set_request_complete(req);
- 	}
- 	blk_mq_end_request_batch(iob);
- }
+								Honza
 -- 
-2.26.3
-
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
