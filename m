@@ -2,129 +2,160 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 895EDC4332F
-	for <linux-block@archiver.kernel.org>; Tue,  8 Nov 2022 03:47:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F784C43217
+	for <linux-block@archiver.kernel.org>; Tue,  8 Nov 2022 04:07:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232847AbiKHDrg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 7 Nov 2022 22:47:36 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60100 "EHLO
+        id S232125AbiKHEHY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 7 Nov 2022 23:07:24 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42006 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232776AbiKHDrf (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 7 Nov 2022 22:47:35 -0500
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2049.outbound.protection.outlook.com [40.107.94.49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F399C2DA8D
-        for <linux-block@vger.kernel.org>; Mon,  7 Nov 2022 19:47:34 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=IyPHFUQ1YPy9S9fy77EXpdTNmEa5P6KrWDqWq7CGxa6Dl7yucksuWM13RZfIRQEwN9XB1CsLAU4DPX3IE1X+aub7BRMKUnTEHk3fJ4kj1+TiYWK7pNxJpXixus+SMctaZv4grLs5WiOYIt2F97g+Al49F0ToFVN2IDDpBfRCYc6HP5+3PGb8N8U/UUDDtcDhLExdKlh1ftGfIV1Lp+qJSOiCpu9qtAnuQjvdQDWTNir2vYUWvBCkqy3F8D5f5ZtFoxtBUo3v9BuKn5DdlEPF4ZZQT/zgcszpbkIEe2UswD58p1R40pYgpI1vm5HdOHwedagZhaM2tWxxhk3l2OuICA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=VwIn6aA+WD9mG/LofICI8WQ5b9Bu4qb5Tkp72gAlbDg=;
- b=mjCMznLzdIaOwaJqHvf+SvLN5ibtMivA1uJOOoeHpOj48fM53sxxvhao6S6mNeu9FxLIzMsLn7esJaiTAoDjPOqpCw1au/PZGyPMjGtFhkqWRIhahjYoNue1kFZSQw/BNLY7oJZY2VujbMeAOowrWNT8xFnT88Y8dT19UpaMuU/18xWiyKU02ouuqQu+05gM039ZRR2xhPVm0WnKQRtx0NWOfNyJprO/PAYg4shWBXVIWGvSuK+8oSsSIu5Tb4qDGPBCRNiXI+bwDS6YFE34SNqnzM70MW33CZSGkk1fTdrBeDe8cE+I1lrJXqVGQ5lCcjjKfK6brIutapmoPH0edQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=VwIn6aA+WD9mG/LofICI8WQ5b9Bu4qb5Tkp72gAlbDg=;
- b=R1EHzlgucCgwP1241mO2WRKTDoeWOLpWV2PFB+8IhT2mGU4NMktNQdWH9g14k2hcomUsRZ3m09wagoJ/AcBNYsiIIwrMtbdR7EErlI3wlPcICpGinOxyuNjpSUhpfXrJD6/2Ou/K5Z3soHE1r0Kdf9xGR2aEHFQEPddntxmzetvs2q3G6nBkVruePhdQ4Zy3fNjOaeBuPuiM18vBiEkTOBn783XbDnNMw7JSerdFQ2XIibz+jYGE/vQBax8uH+TglPo93q/N0g5fE0Zh8XyLJ+/b0+FnVHiabr1z72wQCEumMWIfd0XtaTFAVDnw3qRvwMfOQQiv6zuM8FL0NVQSWQ==
-Received: from MW2PR12MB4667.namprd12.prod.outlook.com (2603:10b6:302:12::28)
- by PH7PR12MB5974.namprd12.prod.outlook.com (2603:10b6:510:1d9::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5769.16; Tue, 8 Nov
- 2022 03:47:33 +0000
-Received: from MW2PR12MB4667.namprd12.prod.outlook.com
- ([fe80::eaf1:9be8:d472:ea57]) by MW2PR12MB4667.namprd12.prod.outlook.com
- ([fe80::eaf1:9be8:d472:ea57%7]) with mapi id 15.20.5791.026; Tue, 8 Nov 2022
- 03:47:33 +0000
-From:   Chaitanya Kulkarni <chaitanyak@nvidia.com>
-To:     Christoph Hellwig <hch@lst.de>, "axboe@kernel.dk" <axboe@kernel.dk>
-CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: Re: [PATCH] blk-mq: remove blk_mq_alloc_tag_set_tags
-Thread-Topic: [PATCH] blk-mq: remove blk_mq_alloc_tag_set_tags
-Thread-Index: AQHY8nCXH7r07p/oZki6E+Fi8Hvzr640ZMmA
-Date:   Tue, 8 Nov 2022 03:47:33 +0000
-Message-ID: <dd84fcba-0e2f-cd24-b019-028fe7c1be4e@nvidia.com>
-References: <20221107061706.1269999-1-hch@lst.de>
-In-Reply-To: <20221107061706.1269999-1-hch@lst.de>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-user-agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.9.0
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: MW2PR12MB4667:EE_|PH7PR12MB5974:EE_
-x-ms-office365-filtering-correlation-id: e008b83e-0b2c-4a60-c0a1-08dac13bf804
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: vVKUj7gv1CfccyvVlyy5nebWWinRyfqzmz2X39R9lLBSt/WLSHX/SPA0GsECWQFBwKTwFG/kK20EpVPOtAyA4kTqFKbtTOF0K2kaxzfRhZ6oouHZ0jyuAW58OD+7O0ySQZPu82djA5ppjpIlFnF8y0JOZkG5wd0przO3E4MtVUQpLyR/ltqzoTWzeAEuWWNARybD8cdn6LTjm7R/qt6jeUJyOSNtTkGGdebmmlUD428t0IvLWP3D5aXdswN+G1SgIJ4n/i/BZD8t41SJEIrAQ5yzHWAmb2/VMVJlmqEtWZE/RKGhw1vErfPjgGcJMXAw3n7sFSdrGs7JstVUO/zW8Gka5zO9K2s3jUfW/xqcf2EWT72nIx+6a/NBoUGQuPe1VDRiiQoz0R1s7fbOt1ogM9eBIUMMBX+N2y0M5w0eUL09TT8sBCPNGCcErqgLI7np3sk0dH11TD0q8Mr697rBGGjWc9OrDq/XArvmGavJYP6AwBBHGOR5BEbB4JyC1f7ZkxSQd8XrSv00nay4J7b9tcWidaKQF9fAbGZB7tRi3QtNyfCeEqXcJGhDvnP08+cdQVDjre4Ukni9S5bvo19nxZfn/Np/bCtpxGEpqT4Htp1QxLP8dMw1w+Ro+CUeDgMDQ+ZBi/vs5DGvG5eq6FiRjHvpoKvpC5bkIq6JnvcbE5FbtDBBBskVSzuxGiHMvLy1VDEyVGXNumx2a7EivP/lux5Z8wg0qQ6oWXopYBqWhsWhCeuoJWSum9q3A8jSfAQo6HgxJnGCbZte5WH6sDxI1DmNYfqtUp0cGWugI8mVi+1G5o/Gfyt8tEKJoCuRPI+LzLyVhhL5+ecc5RYELuqeXg==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW2PR12MB4667.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(376002)(39860400002)(396003)(366004)(136003)(346002)(451199015)(2616005)(6506007)(64756008)(186003)(4744005)(2906002)(6512007)(5660300002)(91956017)(53546011)(71200400001)(66476007)(76116006)(8936002)(8676002)(6486002)(41300700001)(4326008)(316002)(66446008)(66946007)(110136005)(83380400001)(66556008)(478600001)(86362001)(36756003)(31686004)(31696002)(38100700002)(122000001)(38070700005)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?YWRFa1R1LzZ0QUgvUjhCSjNWVWpQWkx6SXRjVmhiamdsb1Iwc1RQQStpbGE0?=
- =?utf-8?B?QmZZaTI2QUF0TGVVb0F1UkFBUmdKZGI3WmxidkRxS2hYN3dlSGEwbC9pZFZo?=
- =?utf-8?B?SnA3Qzg3dDVVZjhUQ29HdkdVQmlaMzBXOEhrelhNMTBpTVBVZlQwSDlWSy9D?=
- =?utf-8?B?a3dJSG9wQ1NqU1lxcndHODIvL2ptYWU1bllSeXgxa1lpWE9BY0NHNmpxLzVw?=
- =?utf-8?B?TEhYZy82RThEL25QbmprS2lMVGFtdWk5amY2VE5NVmdjNVdHQjU1RCt1TVhr?=
- =?utf-8?B?R05xMGJPNko2UnNzdDIvSU5pTzFSL2VZMG93TUtNTk44cjl6Y0ZJTzFISEZQ?=
- =?utf-8?B?QkRYR2VzSmNJbHlHSFF4UzhLczc3Nyt2a3ZyVmNHSEJUamFBRDk0Q28zek8z?=
- =?utf-8?B?M0NvcTByVGQ3cWUrUGtsdWhCTmxSeHpQU0NzOEtzcXozdUpUOEZ6ZE9JV2lS?=
- =?utf-8?B?a1VoTWJqRzFudUhYZlBaRTlJMDQ5SGJvWlFaWU5ldEhsaFBzM2xvZjUrMzJx?=
- =?utf-8?B?c1h3SUh0dHlHMGxSbFliZFlTTE9KaXhZMnBZeGZEVmRWN1ZhSzBNL2t2WkJM?=
- =?utf-8?B?eHhNLzZydDVyQmNPS3NVaVc1akVlZHFMQzh5bDZGYkpTT09ZK1llZC9Ha0Qy?=
- =?utf-8?B?VE1aUzhoNlBIVVBYR1hqUXFoVnZVWUMrSUdwZFptMHoxNUI1NGFYYzZrd25w?=
- =?utf-8?B?aTVKSDdFTnlodG5nYlRBeUY1VkNhaW5DanFKN3IzYjR4UGVHTDF2ZENCT3JC?=
- =?utf-8?B?TWhYTGdRQUdLR3JpQk5xTzNPZzBERUlyVjFXNXFSU3NzZlM3NWpRWGFYSkdD?=
- =?utf-8?B?WnpJN1dpTXhzTFd2MUlOaGE1SzNtcjIwWjNEZUxNeTBlcmRDTUZPQ1dsY3oy?=
- =?utf-8?B?bmljN1BRNDhleE4xVExsd3hkMzdnUEtqY3F4QVhhSGpoQkVJbTN0SmVZSXJn?=
- =?utf-8?B?Nk5tUjAzZ05MWU40bTFscmZkdkgyQmhYYlJnOHovaGtjQS8vdVgzTGcwNkUw?=
- =?utf-8?B?elBrTWNORHR3eGN3Q0tnTXJpeXMzamZOd3I4b3BKc0YwVjJYQlBPUnVCT244?=
- =?utf-8?B?WlVpS0Y0S2Qya1FJeklrMnJuNlRUYVBkcjJqamhsSGo5VGl1TjBGaDZBOGsx?=
- =?utf-8?B?U2VxYThNNzQzY1JDMFR6ZWNPZTFuQklObVdhZHk4QTM1QVkydjVybjVodlhJ?=
- =?utf-8?B?eW5xVGpiYTBuSzB5OU5VS2dPdXFVeVNhQ0l6ZnY5Nm5CbnByZHB0bzFnQXJG?=
- =?utf-8?B?T0FQcWJ3dUdVRDlnL3dtSGt5cDFsMU9KcmIvWmQ0Z3N4S3QwZzNrSEQ0eC90?=
- =?utf-8?B?YUovU002MUFPR0ZBV3V4ZmR5MkdFM3kvc3ROUUxRakpWNnJrK1d3TTBlWlV4?=
- =?utf-8?B?MEh6TkpZWUVrMUFFaVRPWDkzOTFVM1RZcjltY0N2L1Arek01Z0ZSYm1PWFJ5?=
- =?utf-8?B?NnozYzUvMU51N25xbXAzay9xc1Q5RDExbFZ6QW5OK3NKNHUrSzZnSUI5YTkx?=
- =?utf-8?B?N0dQTFZjTUtNVDc3USt5QWpiMHNWRkZKUXhLSHNaUnVwWjJPMGE3OS96Q3lN?=
- =?utf-8?B?RkZVZFVkWGZKeTRhYWw0MG1zZlo3TDJhaTZWb3gxV3NhQ2g3VWNuZGI3K09Q?=
- =?utf-8?B?cFEySlJLeitpUnpGbGR5N3N1ZFRRWmRKS3FHNlVRS1VqcUdJS1VtYklGSVoz?=
- =?utf-8?B?WUI3YVlscVh1YXBOOUw2WUZqR2VqK1R4Sjl6NTB1YXZ3OEVnNWFnUHFiRHFE?=
- =?utf-8?B?aEF0ajBJK2Y5ZCs3RWJmMkoxeU0yZnM1dTlGdW5CZTlFeG1pVkdZczY5SnFW?=
- =?utf-8?B?ZkZGb1l0ZHlYN1FGMmtKL1liZ1IwajMwLy9jRnFJTDM2NnYxVkdQbHBHM0FF?=
- =?utf-8?B?N1d0aUN0Q1VqVDRnQlNMWHVVMmMvTGdIR2hFY05Pajl2Z3ZZVjNVRmRxYjhy?=
- =?utf-8?B?SUJlNGxnbko1SFQwaE0veEJrQzFlUFJyYzJJby9Ncy9yNE00WEVvWGxMOWVN?=
- =?utf-8?B?bTRjcnZsOUE2Y1lVaEZxTzEvcGo3RmJuSmtUVnMzUkN0RHc5ZlpQWllWOS9o?=
- =?utf-8?B?MzRLemFmQmQvK2FEUmZNSGNvdHptNVRPQzBkVnRrRWcxRTN1SHUrSUZlN2dq?=
- =?utf-8?B?Y3A3TnJkc243RnBsbmFzby9DcXZBT05mWXJGNHJqWUNpVmpQZmVsL01ncGQ1?=
- =?utf-8?B?ZGc9PQ==?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <E353042F1F5AF54EA8146C445B28FE16@namprd12.prod.outlook.com>
-Content-Transfer-Encoding: base64
+        with ESMTP id S231974AbiKHEHX (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 7 Nov 2022 23:07:23 -0500
+Received: from esa1.hgst.iphmx.com (esa1.hgst.iphmx.com [68.232.141.245])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC40FD88
+        for <linux-block@vger.kernel.org>; Mon,  7 Nov 2022 20:07:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1667880441; x=1699416441;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=1R8dar92hT840ngUqhG6Zc2KHPoZV/Rc8i6ofSWNqVw=;
+  b=GJRb7pJRKd7B/WtYmatsGGl5fvIW//DqEKwJdgPITyGJI+jpUx1KvP3B
+   mZcWEtXGwdfjiyjAc3neJGMQaDEaWgpQuto9LFS0MOVWKF80mdWiSrI75
+   gpZFQQ1XO0+1hnZSBhFFTis144+CKAD7c41EQkKLJIZy6tQ7o4HLtAVhc
+   r7CIqXaddO/Mb2++N8X3hwSbBlmLJE3rh7V2V5MDxG/GPe+y6xoL2VbXX
+   f2OrtcSTYz6de+B9FlbLhRKN+NSXgYqCrkzDDhUMsplmZi6Za3DYn5gAZ
+   LfEwHTs6m/jkadTc5MGchiHEbX1x69wuVcRS1VU2KpUw8Sry5VRHdwzjS
+   w==;
+X-IronPort-AV: E=Sophos;i="5.96,145,1665417600"; 
+   d="scan'208";a="327825121"
+Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
+  by ob1.hgst.iphmx.com with ESMTP; 08 Nov 2022 12:07:21 +0800
+IronPort-SDR: OeIE+hmT0TWZqFXx/tQCUJMPxP8wG8chsDVuhLfqsARZcT6hXIqm+E+jECKHY5gHctmNydgqlI
+ f9ytHGqiNu7tlbn4Hn4bF04Boc2zLNfj37n/Btg6ffJDWJymFAWISbuhtuRL6tmVCYkN1nyqZz
+ pseNwUb2ynVNJ5LNJmKdkOZfEbx+nE2DMj0VaMI6vuAzcu+U/fZdxhz8FhRhLMXitzVIn2CoR8
+ m4x7eE10C7Qajafn8qcxOnZAUEmPTbmWMfOdtIn+Q5MbEl9eF4hVjUCNzF1k4EWu0UBebTICnQ
+ UUY=
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 07 Nov 2022 19:20:43 -0800
+IronPort-SDR: Lv9nzOngWFbAlnCBllbS+uQ4taLnibbTQMwEs+hxsXNQMEZqUjvA7zw5TcHz5MgLjYiMeAahIp
+ 6xMwmHLI/1bkKfWO/Kz4OURDXHr+gR8v6nB4beqlzCFybmoEvD5c1BvEv/P+R8tiqUDspnwEiz
+ WHhNQbKMOMBcNzb308UBZ4/yrmUcBbBto4Sihobk0cIs+l3l+HIQGU8WyJpePZGmafrAPibqLK
+ q87QqchZwBFAzyMiSGv0HPSRbzhi6ihfNiHwRGjPFCs0yOr9ezdfppa+TF43HHgl1JRwHSvB+J
+ seo=
+WDCIronportException: Internal
+Received: from unknown (HELO oryx.wdc.com) ([10.225.167.43])
+  by uls-op-cesaip02.wdc.com with ESMTP; 07 Nov 2022 20:07:20 -0800
+From:   Dmitry Fomichev <dmitry.fomichev@wdc.com>
+To:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+        Stefan Hajnoczi <stefanha@gmail.com>,
+        Hannes Reinecke <hare@suse.de>,
+        Sam Li <faithilikerun@gmail.com>
+Cc:     virtio-dev@lists.oasis-open.org,
+        Dmitry Fomichev <dmitry.fomichev@wdc.com>
+Subject: [PATCH v5 0/2] virtio-blk: support zoned block devices
+Date:   Mon,  7 Nov 2022 23:07:16 -0500
+Message-Id: <20221108040718.2785649-1-dmitry.fomichev@wdc.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: MW2PR12MB4667.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e008b83e-0b2c-4a60-c0a1-08dac13bf804
-X-MS-Exchange-CrossTenant-originalarrivaltime: 08 Nov 2022 03:47:33.4326
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: l3Ws24rRARNQoLKfcZ2V/lkqIvayg0MGcDlHfsToqaYb/wmdrBHVuNkmqwRzSxlBZuBklgxoKeAERw2bpeypug==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB5974
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-T24gMTEvNi8yMiAyMjoxNywgQ2hyaXN0b3BoIEhlbGx3aWcgd3JvdGU6DQo+IFRoaXMgaXMgYSB0
-cml2aWFsIHdyYXBwZXIgd2l0aCBhIHNpbmdsZSBjYWxsZXIsIHNvIHJlbW92ZSBpdC4NCj4gDQo+
-IFNpZ25lZC1vZmYtYnk6IENocmlzdG9waCBIZWxsd2lnIDxoY2hAbHN0LmRlPg0KPiAtLS0NCj4g
-ICBibG9jay9ibGstbXEuYyB8IDggKy0tLS0tLS0NCj4gICAxIGZpbGUgY2hhbmdlZCwgMSBpbnNl
-cnRpb24oKyksIDcgZGVsZXRpb25zKC0pDQo+IA0KDQpJIHRob3VnaHQgb2YgaXQgd2hlbiBkb2lu
-ZyBibGtfbXFfaW5pdF9hbGxvY190YWdfc2V0KCkgUkZDIDopLg0KDQpSZXZpZXdlZC1ieTogQ2hh
-aXRhbnlhIEt1bGthcm5pIDxrY2hAbnZpZGlhLmNvbT4NCg0KLWNrDQo=
+In its current form, the virtio protocol for block devices (virtio-blk)
+is not aware of zoned block devices (ZBDs) but it allows the driver to
+successfully scan a host-managed drive provided by the virtio block
+device. As the result, the host-managed drive is recognized by the
+virtio driver as a regular, non-zoned drive that will operate
+erroneously under the most common write workloads. Host-aware ZBDs are
+currently usable, but their performance may not be optimal because the
+driver can only see them as non-zoned block devices.
+
+To fix this, the virtio-blk protocol needs to be extended to add the
+capabilities to convey the zone characteristics of ZBDs at the device
+side to the driver and to provide support for ZBD-specific commands -
+Report Zones, four zone operations (Open, Close, Finish and Reset) and
+(optionally) Zone Append.
+
+The required virtio-blk protocol extensions are currently under review
+at OASIS Technical Committee and the specification patch is linked at
+
+https://github.com/oasis-tcs/virtio-spec/issues/143 .
+
+The QEMU zoned device code that implements these protocol extensions
+has been developed by Sam Li, an intern, as a part of Outreachy
+community mentorship initiative. The latest versions of the QEMU
+patch series can be found here:
+
+https://lists.gnu.org/archive/html/qemu-devel/2022-10/msg05195.html
+https://lists.gnu.org/archive/html/qemu-devel/2022-10/msg05205.html
+https://lists.gnu.org/archive/html/qemu-devel/2022-10/msg05896.html
+
+This patch series modifies the virtio block driver code to implement
+the above virtio specification extensions. This patch has been tested
+to be compatible with the QEMU implementation referred above.
+
+v4 -> v5:
+
+Address review comments from Stefan:
+
+ - Take vdev_mutex in virtblk_report_zones() to prevent a potential
+   race with virtblk_remove()
+
+ - Check the current zoned model in virtblk_revalidate_zones() and
+   reset the request queue zoned model to NONE if the reported model
+   is not VIRTIO_BLK_Z_HM
+
+ - Add the comment in virtblk_parse_zone() explaining why sanity
+   checks are not needed in that function
+
+v3 -> v4:
+
+ - Fix the units in max ZA / write granularity check
+ - Remove unneeded dev_info message
+
+v2 -> v3:
+
+ - Change the request in-header layout to always make the status byte
+   to be the last byte of the in-header. For all requests except Zone
+   Append, the in-header consists only of the status byte. For Zone
+   Append, an extended in-header is defined that consists of the zone
+   append sector followed by the status byte
+
+ - In zone report handler, validate the zone type/condition values
+   that are received from the device and convert them from the values
+   defined in the virtio_blk ZBD spec extension to the values defined
+   in the block layer
+
+ - During ZBD scan, check that max_append_sectors is not smaller than
+   the write granularity
+
+ - Fix sparse warnings
+
+v1 -> v2:
+
+ - Rebase to the current head of development. The second patch in the
+   previous version is no longer needed as the secure erase support has
+   now been added to virtio_blk driver
+
+ - Fix a couple of bugs in zone report code
+
+ - Clean up ZBD probe code
+
+This version DOESN'T include the additional request layout changes that
+are being discussed at the OASIS TC. An updated patch series will be
+posted to the list when those changes are finalized.
+
+Dmitry Fomichev (2):
+  virtio-blk: use a helper to handle request queuing errors
+  virtio-blk: add support for zoned block devices
+
+ drivers/block/virtio_blk.c      | 488 +++++++++++++++++++++++++++++---
+ include/uapi/linux/virtio_blk.h | 105 +++++++
+ 2 files changed, 561 insertions(+), 32 deletions(-)
+
+-- 
+2.34.1
+
