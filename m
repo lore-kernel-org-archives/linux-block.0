@@ -2,86 +2,57 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DDC3C433FE
-	for <linux-block@archiver.kernel.org>; Tue,  8 Nov 2022 08:30:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 033D5C433FE
+	for <linux-block@archiver.kernel.org>; Tue,  8 Nov 2022 08:52:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233498AbiKHIav (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 8 Nov 2022 03:30:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42834 "EHLO
+        id S233678AbiKHIwY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 8 Nov 2022 03:52:24 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54016 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230154AbiKHIas (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Nov 2022 03:30:48 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 31CD7F5B1
-        for <linux-block@vger.kernel.org>; Tue,  8 Nov 2022 00:29:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1667896186;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=lRojnfWUfsm0W6BCKt9OPdRubDtRX5uWnsoCtEuq6co=;
-        b=N1/NSWHOnisRJBYRxR7NCre7Lg/3qthtP0GtT7frpcbrSLVatfJwZHyuiGvHCnfGsQlpCv
-        wXW/udAF3v9NKxqqChcgvjtJXuIa1ULA++mvB18Xrcldfgr7YNBItvPnxD37hWX9Q3hVpb
-        jW+MyQK/SXjOJFSiXFBf9Hqf2DxHZe0=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-150-sZtXfLYaMcOmamX5MVNXpw-1; Tue, 08 Nov 2022 03:29:43 -0500
-X-MC-Unique: sZtXfLYaMcOmamX5MVNXpw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id D28ED101A52A;
-        Tue,  8 Nov 2022 08:29:42 +0000 (UTC)
-Received: from T590 (ovpn-8-32.pek2.redhat.com [10.72.8.32])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id A813440C94AA;
-        Tue,  8 Nov 2022 08:29:30 +0000 (UTC)
-Date:   Tue, 8 Nov 2022 16:29:24 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org,
-        Miklos Szeredi <mszeredi@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        ZiyangZhang <ZiyangZhang@linux.alibaba.com>
-Subject: Re: [RFC PATCH 3/4] io_uring/splice: support splice from
- ->splice_read to ->splice_read
-Message-ID: <Y2oTZEZiXFT4po+8@T590>
-References: <20221103085004.1029763-1-ming.lei@redhat.com>
- <20221103085004.1029763-4-ming.lei@redhat.com>
- <Y2oJAlV3xwqmJK0o@infradead.org>
+        with ESMTP id S233643AbiKHIwY (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Nov 2022 03:52:24 -0500
+X-Greylist: delayed 374 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 08 Nov 2022 00:52:23 PST
+Received: from mail.lokoho.com (mail.lokoho.com [217.61.105.98])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 832902E683
+        for <linux-block@vger.kernel.org>; Tue,  8 Nov 2022 00:52:23 -0800 (PST)
+Received: by mail.lokoho.com (Postfix, from userid 1001)
+        id 8D1B98277E; Tue,  8 Nov 2022 08:45:58 +0000 (GMT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=lokoho.com; s=mail;
+        t=1667897167; bh=Z0N5VlX9/JlryGOL5I747Le9USomZJCRNNGRT3LbbKc=;
+        h=Date:From:To:Subject:From;
+        b=ZIpAqS1b3CgWtuBQ6XrNOhbDgmP+PLXTIF3d/JDaZNbfBs9yS6Me4GIdhgknJq4s6
+         YsHj4EHriPexld54LZCrgL0GI7t6xfQSHaumjUXWmMIMV/iD4efMUk57xTktGdakK0
+         K+lPewx6N5ygeWDMHgbnEyi6VNVxnQyiLzv6VhctSICWbaAJIcgNlsb9dmZ/oZcMoO
+         TNqfWlb4wQoJyoecEfOzCVYYvxD+vBD0ZT8MQqrQUVbfLyJxXPRVHlsfahx4GEkCIE
+         Q3xP18vMEZVScT0oByNIomO+/2tzaqzzBTz5jvUhKXVTCBapUOwd7qbc4E3BhITi2y
+         9RDIUHRG4XRjw==
+Received: by mail.lokoho.com for <linux-block@vger.kernel.org>; Tue,  8 Nov 2022 08:45:46 GMT
+Message-ID: <20221108074500-0.1.24.5ncm.0.2h959hir2q@lokoho.com>
+Date:   Tue,  8 Nov 2022 08:45:46 GMT
+From:   "Adam Charachuta" <adam.charachuta@lokoho.com>
+To:     <linux-block@vger.kernel.org>
+Subject: =?UTF-8?Q?S=C5=82owa_kluczowe_do_wypozycjonowania?=
+X-Mailer: mail.lokoho.com
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Y2oJAlV3xwqmJK0o@infradead.org>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Nov 07, 2022 at 11:45:06PM -0800, Christoph Hellwig wrote:
-> On Thu, Nov 03, 2022 at 04:50:03PM +0800, Ming Lei wrote:
-> > The 1st ->splice_read produces buffer to the pipe of
-> > current->splice_pipe, and the 2nd ->splice_read consumes the buffer
-> > in this pipe.
-> 
-> This looks really ugly.  I think you want Linus and Al to look over
-> it at very least.
+Dzie=C5=84 dobry,
 
-OK, I will Cc Linus and Al in V2.
+zapozna=C5=82em si=C4=99 z Pa=C5=84stwa ofert=C4=85 i z przyjemno=C5=9Bci=
+=C4=85 przyznaj=C4=99, =C5=BCe przyci=C4=85ga uwag=C4=99 i zach=C4=99ca d=
+o dalszych rozm=C3=B3w.=20
 
-It is just another case of pipe's producer/consumer model, IMO.
+Pomy=C5=9Bla=C5=82em, =C5=BCe mo=C5=BCe m=C3=B3g=C5=82bym mie=C4=87 sw=C3=
+=B3j wk=C5=82ad w Pa=C5=84stwa rozw=C3=B3j i pom=C3=B3c dotrze=C4=87 z t=C4=
+=85 ofert=C4=85 do wi=C4=99kszego grona odbiorc=C3=B3w. Pozycjonuj=C4=99 =
+strony www, dzi=C4=99ki czemu generuj=C4=85 =C5=9Bwietny ruch w sieci.
 
-> 
-> Also, what is going to happen if your ->splice_read instance does not
-> support the flag to magically do something entirely different?
-
-If the ->splice_read() instance doesn't support this feature, then the new
-added pipe flag won't be set, this API will return -EINVAL.
+Mo=C5=BCemy porozmawia=C4=87 w najbli=C5=BCszym czasie?
 
 
-
-thanks, 
-Ming
-
+Pozdrawiam
+Adam Charachuta
