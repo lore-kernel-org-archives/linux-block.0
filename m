@@ -2,140 +2,83 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C696C433FE
-	for <linux-block@archiver.kernel.org>; Tue,  8 Nov 2022 14:13:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C4DCC4332F
+	for <linux-block@archiver.kernel.org>; Tue,  8 Nov 2022 14:16:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235282AbiKHONw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 8 Nov 2022 09:13:52 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52340 "EHLO
+        id S235166AbiKHOQP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 8 Nov 2022 09:16:15 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54666 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235284AbiKHONv (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Nov 2022 09:13:51 -0500
-Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 86A8C13E13
-        for <linux-block@vger.kernel.org>; Tue,  8 Nov 2022 06:13:50 -0800 (PST)
-Received: by mail-pj1-x1031.google.com with SMTP id z5-20020a17090a8b8500b00210a3a2364fso1661878pjn.0
-        for <linux-block@vger.kernel.org>; Tue, 08 Nov 2022 06:13:50 -0800 (PST)
+        with ESMTP id S235355AbiKHOQO (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Nov 2022 09:16:14 -0500
+Received: from mail-pg1-x533.google.com (mail-pg1-x533.google.com [IPv6:2607:f8b0:4864:20::533])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE9D569DD6
+        for <linux-block@vger.kernel.org>; Tue,  8 Nov 2022 06:16:11 -0800 (PST)
+Received: by mail-pg1-x533.google.com with SMTP id h193so13481412pgc.10
+        for <linux-block@vger.kernel.org>; Tue, 08 Nov 2022 06:16:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ZcQMPR+vY4HDnxFrn6DWfgOLsByM9wrckBFX6ElxCNo=;
-        b=Bizwli3rHid237sI4fMedw4c8a0QLD9BkHZak1F3/W2+Ttp4sBANl46L65mjSkjyYq
-         ug1PKOs0KVPJW6TP0t45QeiEMzgpMAL45uaLZDGsfzoCjFQdVqDMMaw/P40TebA8xqfC
-         umhQpYXilzAXzrE8okAaowBOjzKlr9ENR/2WOMXbDhhEHDFsIyrl7gzd70QgkJpV7/hu
-         ENG9jAn3nVRCZlRJKKK822sj5g/tY3xd099LfQgDv9nLZKIkMrlJCxGm4S4S58CxfP1M
-         Hmudfr1TOBKCEGK5pDesRmBsyUyypKca+S6KiVZbAiBZvPXIjQkqnxL32/QIYYiAYor0
-         94oA==
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=5gQ77cJYhWLwVw6OTRfByzvrqqb5ZjgfyENtp3rPeAg=;
+        b=iezbgklMmiQ+txoOM8ZHz+Rpm6lZ/v96Ztp2JfWLFvkT9z5jr9CRJkk4eXKQtURfua
+         ZroN3bbkvyx0DOr6aTsdy4a6EHDBjbeGOS4TG6ViG8IrnFIpYrmM+MiuHuj1k3FvuIUg
+         tQ7E03m5aA6aFwA0XOhcz5JDvqOPSs2Ae8U48cfWwhlS+7YFKRMTXM7+lUcZZYdyg2FL
+         wgyMDkSRVP9BW3wDjot7SMay6BQW4Q777dUlVe8YcWZ2/Rnds4nQaCo8tuZNxBkKm/PR
+         5FZjAifB8/cA0dqx2KNJKt09TgwDfMTQAQ34Hva9fouQTPLfAikNYJWI15ayjK9/ASi+
+         McMw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ZcQMPR+vY4HDnxFrn6DWfgOLsByM9wrckBFX6ElxCNo=;
-        b=T0lAMi0349H5OPlb4DrZAP8mWwGPKybPjpscYACeygbmvc22hbBmaSCjsFIOjNO1b3
-         fGJj48pkQpEto/5p1b/LRItYETx5TX6k8fTl6uCGVrcUrKKpUJJXcrLPQH4jkM0CXEMe
-         N3KEWRdT4ti69JEjCAJ/tVG2Rc1vrRjQ2BXvxe+RcjoGfIv3Ue09wvZ+eKwVpM4mrnxK
-         OAIRBJVJf52epsVxuXd36suZdPL/2hejQK4rDnM2VMCgxbq+89+pvr/+V+zji12EvS+6
-         hT67BizgFbl0cE6epWyLPld8dW7jStRJy8fU6E6Dk1w1Pytl4tCiCSEDshAWy6HId2tW
-         /HCA==
-X-Gm-Message-State: ACrzQf3YA5gHcHSr1bSEnHnochLsluPLLZE04JHXZNMwxZPYpzIvASuC
-        WK6NKoZg6cuv0DzIE7ZqkWB+wg==
-X-Google-Smtp-Source: AMsMyM5zxvdud31Qbb+bQN25uiMe9e8WvZFbz7Q1KitTWD0alMPuk/FYR15AQKD+QTt79ecUubHnAA==
-X-Received: by 2002:a17:90b:3803:b0:213:9911:5efd with SMTP id mq3-20020a17090b380300b0021399115efdmr55615477pjb.94.1667916829870;
-        Tue, 08 Nov 2022 06:13:49 -0800 (PST)
-Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id w188-20020a627bc5000000b005672daedc8fsm6425059pfc.81.2022.11.08.06.13.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 08 Nov 2022 06:13:49 -0800 (PST)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     tj@kernel.org, Yu Kuai <yukuai1@huaweicloud.com>,
-        josef@toxicpanda.com, paolo.valente@linaro.org, jack@suse.cz
-Cc:     linux-block@vger.kernel.org, yukuai3@huawei.com,
-        yi.zhang@huawei.com, linux-kernel@vger.kernel.org,
-        cgroups@vger.kernel.org
-In-Reply-To: <20221108103434.2853269-1-yukuai1@huaweicloud.com>
-References: <20221108103434.2853269-1-yukuai1@huaweicloud.com>
-Subject: Re: [PATCH] block, bfq: fix null pointer dereference in bfq_bio_bfqg()
-Message-Id: <166791682840.41277.4130538125529354302.b4-ty@kernel.dk>
-Date:   Tue, 08 Nov 2022 07:13:48 -0700
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=5gQ77cJYhWLwVw6OTRfByzvrqqb5ZjgfyENtp3rPeAg=;
+        b=oFvQlzMfcwxyx8+PbHuU9TDemRMwwYhyeAgBOAQvm8z6885vD/WP20EckCt3N4m847
+         I2ZtHjC+0m/9nxXWCUSD6Rmfi0WBYex21sl99bBVA206uahQHi9xSBvM6s0j96Pm/Q9K
+         UPpBpFzTFipMhsE72py4HpyfXqeCAT13FFB3hzB3hG/OPWa6yvsB81vNPfJ+U+2RE3ww
+         /4SJu5CBvr3sDbkr2yvirp9ZRCoiSWN9PBttRYx8ZzuQaiIWOefgJ37ooUXP2U0Uav6d
+         AjRa0TzQY59gAzfTvNY+MSefcpCUnxMRlJFrHEdxh4RL863vSYyChQ8dGAVaMOhUiCCB
+         Iisw==
+X-Gm-Message-State: ACrzQf1hF6xBhE2z05VBjX2pcaSukkP9BZ6zWvwhdrL4cFy8N8c9GG48
+        dmubWzJxwpv02Cs0CqL6YcG5Bh2r5F5O1vSY
+X-Google-Smtp-Source: AMsMyM4aSz4gtqrG/IZCsEVzearQOFoOnv5464JLmYfU7lB+JcgRzKrk85yVWbDkK+x+2fM9+2ePGA==
+X-Received: by 2002:a63:4f59:0:b0:46f:b2a4:e9d3 with SMTP id p25-20020a634f59000000b0046fb2a4e9d3mr42389169pgl.452.1667916971271;
+        Tue, 08 Nov 2022 06:16:11 -0800 (PST)
+Received: from [192.168.1.136] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id g18-20020aa796b2000000b005622f99579esm6416494pfk.160.2022.11.08.06.16.10
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 08 Nov 2022 06:16:10 -0800 (PST)
+Message-ID: <3188d3de-77ad-b0a8-b54a-f8f358c22416@kernel.dk>
+Date:   Tue, 8 Nov 2022 07:16:09 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-Mailer: b4 0.11.0-dev-d9ed3
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
+ Thunderbird/102.4.1
+Subject: Re: [PATCH] blk-mq: remove blk_mq_alloc_tag_set_tags
+Content-Language: en-US
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     linux-block@vger.kernel.org
+References: <20221107061706.1269999-1-hch@lst.de>
+ <97c6c6b7-1de5-a341-e24c-f18e62aeaae7@kernel.dk>
+ <20221108062030.GA19853@lst.de>
+From:   Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20221108062030.GA19853@lst.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, 8 Nov 2022 18:34:34 +0800, Yu Kuai wrote:
-> From: Yu Kuai <yukuai3@huawei.com>
+On 11/7/22 11:20 PM, Christoph Hellwig wrote:
+> On Mon, Nov 07, 2022 at 09:20:37PM -0700, Jens Axboe wrote:
+>> Getting rid of the helper is nice, but the realloc one is badly
+>> named imho. Can we rename that while at it? There are only 1
+>> caller after this anyway.
 > 
-> Out test found a following problem in kernel 5.10, and the same problem
-> should exist in mainline:
-> 
-> BUG: kernel NULL pointer dereference, address: 0000000000000094
-> PGD 0 P4D 0
-> Oops: 0000 [#1] SMP
-> CPU: 7 PID: 155 Comm: kworker/7:1 Not tainted 5.10.0-01932-g19e0ace2ca1d-dirty 4
-> Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS ?-20190727_073836-b4
-> Workqueue: kthrotld blk_throtl_dispatch_work_fn
-> RIP: 0010:bfq_bio_bfqg+0x52/0xc0
-> Code: 94 00 00 00 00 75 2e 48 8b 40 30 48 83 05 35 06 c8 0b 01 48 85 c0 74 3d 4b
-> RSP: 0018:ffffc90001a1fba0 EFLAGS: 00010002
-> RAX: ffff888100d60400 RBX: ffff8881132e7000 RCX: 0000000000000000
-> RDX: 0000000000000017 RSI: ffff888103580a18 RDI: ffff888103580a18
-> RBP: ffff8881132e7000 R08: 0000000000000000 R09: ffffc90001a1fe10
-> R10: 0000000000000a20 R11: 0000000000034320 R12: 0000000000000000
-> R13: ffff888103580a18 R14: ffff888114447000 R15: 0000000000000000
-> FS:  0000000000000000(0000) GS:ffff88881fdc0000(0000) knlGS:0000000000000000
-> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: 0000000000000094 CR3: 0000000100cdb000 CR4: 00000000000006e0
-> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-> Call Trace:
->  bfq_bic_update_cgroup+0x3c/0x350
->  ? ioc_create_icq+0x42/0x270
->  bfq_init_rq+0xfd/0x1060
->  bfq_insert_requests+0x20f/0x1cc0
->  ? ioc_create_icq+0x122/0x270
->  blk_mq_sched_insert_requests+0x86/0x1d0
->  blk_mq_flush_plug_list+0x193/0x2a0
->  blk_flush_plug_list+0x127/0x170
->  blk_finish_plug+0x31/0x50
->  blk_throtl_dispatch_work_fn+0x151/0x190
->  process_one_work+0x27c/0x5f0
->  worker_thread+0x28b/0x6b0
->  ? rescuer_thread+0x590/0x590
->  kthread+0x153/0x1b0
->  ? kthread_flush_work+0x170/0x170
->  ret_from_fork+0x1f/0x30
-> Modules linked in:
-> CR2: 0000000000000094
-> ---[ end trace e2e59ac014314547 ]---
-> RIP: 0010:bfq_bio_bfqg+0x52/0xc0
-> Code: 94 00 00 00 00 75 2e 48 8b 40 30 48 83 05 35 06 c8 0b 01 48 85 c0 74 3d 4b
-> RSP: 0018:ffffc90001a1fba0 EFLAGS: 00010002
-> RAX: ffff888100d60400 RBX: ffff8881132e7000 RCX: 0000000000000000
-> RDX: 0000000000000017 RSI: ffff888103580a18 RDI: ffff888103580a18
-> RBP: ffff8881132e7000 R08: 0000000000000000 R09: ffffc90001a1fe10
-> R10: 0000000000000a20 R11: 0000000000034320 R12: 0000000000000000
-> R13: ffff888103580a18 R14: ffff888114447000 R15: 0000000000000000
-> FS:  0000000000000000(0000) GS:ffff88881fdc0000(0000) knlGS:0000000000000000
-> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: 0000000000000094 CR3: 0000000100cdb000 CR4: 00000000000006e0
-> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-> 
-> [...]
+> Tell me your preferred name and I'll do it.
 
-Applied, thanks!
+Just call it blk_mq_alloc_tag_set_tags() at least and get rid of the
+realloc? Should make the patch simpler too.
 
-[1/1] block, bfq: fix null pointer dereference in bfq_bio_bfqg()
-      commit: f02be9002c480cd3ec0fcf184ad27cf531bd6ece
-
-Best regards,
 -- 
 Jens Axboe
-
-
