@@ -2,143 +2,143 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 309AAC4332F
-	for <linux-block@archiver.kernel.org>; Wed,  9 Nov 2022 11:16:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 767B8C433FE
+	for <linux-block@archiver.kernel.org>; Wed,  9 Nov 2022 11:40:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230465AbiKILQE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 9 Nov 2022 06:16:04 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59668 "EHLO
+        id S229559AbiKILkw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 9 Nov 2022 06:40:52 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55208 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229975AbiKILPf (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 9 Nov 2022 06:15:35 -0500
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75222D2C7;
-        Wed,  9 Nov 2022 03:15:11 -0800 (PST)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id E7CBF22669;
-        Wed,  9 Nov 2022 11:15:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1667992509; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=kNPmCujJY1ps+Tz3Gg/3GI/4FYCC727YNMiyNM1sohc=;
-        b=pZ199acsSOQmdv4NpOdAGxXw8IH2RzxTcCny4KsW3kQz5CbWtggHX8se2rxBGc6K4S8csM
-        Pesuc8Jy6+jxR/VZd4tRVKEkT5GhWynRCuu/MQVRntII/iRxcP5O7x6GRrs4Kkj12Of0Gm
-        doqwTG6mooOO0eu4nBq5wWnaaiz8Al4=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1667992509;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=kNPmCujJY1ps+Tz3Gg/3GI/4FYCC727YNMiyNM1sohc=;
-        b=JBg/uxE3r4syvWIReC0lQ30n5+OmAI4/klshCeOGGGUOR6QEAPvr2ySgURXzq+eZxYkD9m
-        ElVm3U/ShvgURfDg==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id CDC9E1331F;
-        Wed,  9 Nov 2022 11:15:09 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id mE47Mr2La2OjMwAAMHmgww
-        (envelope-from <jack@suse.cz>); Wed, 09 Nov 2022 11:15:09 +0000
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-        id 70B89A0704; Wed,  9 Nov 2022 12:15:09 +0100 (CET)
-Date:   Wed, 9 Nov 2022 12:15:09 +0100
-From:   Jan Kara <jack@suse.cz>
-To:     Khazhismel Kumykov <khazhy@chromium.org>
-Cc:     Paolo Valente <paolo.valente@linaro.org>,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Yu Kuai <yukuai1@huaweicloud.com>,
-        Jan Kara <jack@suse.cz>, Khazhismel Kumykov <khazhy@google.com>
-Subject: Re: [PATCH 1/2] bfq: fix waker_bfqq inconsistency crash
-Message-ID: <20221109111509.hauihlwywtjoofeq@quack3>
-References: <20221103013937.603626-1-khazhy@google.com>
- <20221108181030.1611703-1-khazhy@google.com>
+        with ESMTP id S229530AbiKILkv (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 9 Nov 2022 06:40:51 -0500
+Received: from fudo.makrotopia.org (fudo.makrotopia.org [IPv6:2a07:2ec0:3002::71])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45440264B7;
+        Wed,  9 Nov 2022 03:40:50 -0800 (PST)
+Received: from local
+        by fudo.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+         (Exim 4.94.2)
+        (envelope-from <daniel@makrotopia.org>)
+        id 1osjRQ-0007kT-Bq; Wed, 09 Nov 2022 12:40:24 +0100
+Date:   Wed, 9 Nov 2022 11:40:21 +0000
+From:   Daniel Golle <daniel@makrotopia.org>
+To:     Ard Biesheuvel <ardb@kernel.org>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        Miquel Raynal <miquel.raynal@bootlin.com>,
+        Richard Weinberger <richard@nod.at>,
+        Vignesh Raghavendra <vigneshr@ti.com>,
+        Davidlohr Bueso <dave@stgolabs.net>,
+        Matthew Wilcox <willy@infradead.org>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mtd@lists.infradead.org,
+        linux-efi@vger.kernel.org
+Subject: Re: [PATCH v4 3/5] partitions/efi: add support for uImage.FIT
+ sub-partitions
+Message-ID: <Y2uRpY8QVZMZlMCo@makrotopia.org>
+References: <Y2rgVIbtuDsySzBr@makrotopia.org>
+ <CAMj1kXG3UWUP-inYHNibJyuJfQwGzfQH8QvJqBNHZgyLc1a+6A@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20221108181030.1611703-1-khazhy@google.com>
+In-Reply-To: <CAMj1kXG3UWUP-inYHNibJyuJfQwGzfQH8QvJqBNHZgyLc1a+6A@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue 08-11-22 10:10:29, Khazhismel Kumykov wrote:
-> This fixes crashes in bfq_add_bfqq_busy due to waker_bfqq being NULL,
-> but woken_list_node still being hashed. This would happen when
-> bfq_init_rq() expects a brand new allocated queue to be returned from
-> bfq_get_bfqq_handle_split() and unconditionally updates waker_bfqq
-> without resetting woken_list_node. Since we can always return oom_bfqq
-> when attempting to allocate, we cannot assume waker_bfqq starts as NULL.
+On Wed, Nov 09, 2022 at 10:13:48AM +0100, Ard Biesheuvel wrote:
+> On Wed, 9 Nov 2022 at 00:05, Daniel Golle <daniel@makrotopia.org> wrote:
+> >
+> > Add new GUID allowing to parse uImage.FIT stored in a GPT partition
+> > and map filesystem sub-image as sub-partitions.
+> >
+> > Signed-off-by: Daniel Golle <daniel@makrotopia.org>
 > 
-> Avoid setting woken_bfqq for oom_bfqq entirely, as it's not useful.
+> I'm not sure I follow the logic here.
 > 
-> Crashes would have a stacktrace like:
-> [160595.656560]  bfq_add_bfqq_busy+0x110/0x1ec
-> [160595.661142]  bfq_add_request+0x6bc/0x980
-> [160595.666602]  bfq_insert_request+0x8ec/0x1240
-> [160595.671762]  bfq_insert_requests+0x58/0x9c
-> [160595.676420]  blk_mq_sched_insert_request+0x11c/0x198
-> [160595.682107]  blk_mq_submit_bio+0x270/0x62c
-> [160595.686759]  __submit_bio_noacct_mq+0xec/0x178
-> [160595.691926]  submit_bio+0x120/0x184
-> [160595.695990]  ext4_mpage_readpages+0x77c/0x7c8
-> [160595.701026]  ext4_readpage+0x60/0xb0
-> [160595.705158]  filemap_read_page+0x54/0x114
-> [160595.711961]  filemap_fault+0x228/0x5f4
-> [160595.716272]  do_read_fault+0xe0/0x1f0
-> [160595.720487]  do_fault+0x40/0x1c8
-> 
-> Tested by injecting random failures into bfq_get_queue, crashes go away
-> completely.
-> 
-> Fixes: 8ef3fc3a043c ("block, bfq: make shared queues inherit wakers")
-> Signed-off-by: Khazhismel Kumykov <khazhy@google.com>
+> You are adding uImage.FIT support as a pseudo-partition type right?
 
-Looks good. Thanks! Feel free to add:
+Yes, exactly.
 
-Reviewed-by: Jan Kara <jack@suse.cz>
+> And the only partition driver that supports it is GPT?
 
-								Honza
+Support for uImage.FIT subvolumes is added only for GPT partitions for
+now. Being the most flexible/modern partition table type I don't think
+anything else is actually relevant for new designs.
 
-> ---
->  block/bfq-iosched.c | 9 +++++++--
->  1 file changed, 7 insertions(+), 2 deletions(-)
+In other patches in the series following this one I also want to allow
+enabling scanning for partitions on mtdblock and ubiblock devices.
+
+On embedded devices with raw NOR or NAND storage those can then be used
+to directly store a uImage.FIT and the FIT partition parsers is then
+used on that whole block device, mapping the filesystem sub-image(s)
+as mtdblockXpY or ubiblockXpY.
+
 > 
-> diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-> index 7ea427817f7f..ca04ec868c40 100644
-> --- a/block/bfq-iosched.c
-> +++ b/block/bfq-iosched.c
-> @@ -6784,6 +6784,12 @@ static struct bfq_queue *bfq_init_rq(struct request *rq)
->  				bfqq = bfq_get_bfqq_handle_split(bfqd, bic, bio,
->  								 true, is_sync,
->  								 NULL);
-> +				if (unlikely(bfqq == &bfqd->oom_bfqq))
-> +					bfqq_already_existing = true;
-> +			} else
-> +				bfqq_already_existing = true;
-> +
-> +			if (!bfqq_already_existing) {
->  				bfqq->waker_bfqq = old_bfqq->waker_bfqq;
->  				bfqq->tentative_waker_bfqq = NULL;
->  
-> @@ -6797,8 +6803,7 @@ static struct bfq_queue *bfq_init_rq(struct request *rq)
->  				if (bfqq->waker_bfqq)
->  					hlist_add_head(&bfqq->woken_list_node,
->  						       &bfqq->waker_bfqq->woken_list);
-> -			} else
-> -				bfqq_already_existing = true;
-> +			}
->  		}
->  	}
->  
-> -- 
-> 2.38.1.431.g37b22c650d-goog
+> Does that mean that all the other types would need a similar change to
+> be able to detect these subvolumes?
+
+If you wanted to support uImage.FIT subvolumes inside other types of
+partitions, then yes, this would have to be implemented for those as
+well.
+
+I've also written a (not very clean) implementation of that for MBR
+partitions, it is needed e.g. on MT7623 because one cannot use GPT on
+the block device used for booting with that SoC as the BootROM expects
+to load the preloader exactly from where GPT would be located...
+I wasn't planning on submitting that upstream though.
+
+And other than for GPT and MBR, I don't think implementing detection of
+uImage.FIT subvolumes makes any sense (but maybe I got something wrong
+here or didn't fully understand your question).
+
 > 
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+> > ---
+> >  block/partitions/efi.c | 9 +++++++++
+> >  block/partitions/efi.h | 3 +++
+> >  2 files changed, 12 insertions(+)
+> >
+> > diff --git a/block/partitions/efi.c b/block/partitions/efi.c
+> > index 5e9be13a56a8..bf87893eabe4 100644
+> > --- a/block/partitions/efi.c
+> > +++ b/block/partitions/efi.c
+> > @@ -716,6 +716,9 @@ int efi_partition(struct parsed_partitions *state)
+> >         gpt_entry *ptes = NULL;
+> >         u32 i;
+> >         unsigned ssz = queue_logical_block_size(state->disk->queue) / 512;
+> > +#ifdef CONFIG_FIT_PARTITION
+> > +       u32 extra_slot = 65;
+> > +#endif
+> >
+> >         if (!find_valid_gpt(state, &gpt, &ptes) || !gpt || !ptes) {
+> >                 kfree(gpt);
+> > @@ -749,6 +752,12 @@ int efi_partition(struct parsed_partitions *state)
+> >                                 ARRAY_SIZE(ptes[i].partition_name));
+> >                 utf16_le_to_7bit(ptes[i].partition_name, label_max, info->volname);
+> >                 state->parts[i + 1].has_info = true;
+> > +               /* If this is a U-Boot FIT volume it may have subpartitions */
+> > +#ifdef CONFIG_FIT_PARTITION
+> > +               if (!efi_guidcmp(ptes[i].partition_type_guid, PARTITION_LINUX_FIT_GUID))
+> > +                       (void) parse_fit_partitions(state, start * ssz, size * ssz,
+> > +                                                   &extra_slot, 127, 1);
+> > +#endif
+> >         }
+> >         kfree(ptes);
+> >         kfree(gpt);
+> > diff --git a/block/partitions/efi.h b/block/partitions/efi.h
+> > index 84b9f36b9e47..06c11f6ae398 100644
+> > --- a/block/partitions/efi.h
+> > +++ b/block/partitions/efi.h
+> > @@ -51,6 +51,9 @@
+> >  #define PARTITION_LINUX_LVM_GUID \
+> >      EFI_GUID( 0xe6d6d379, 0xf507, 0x44c2, \
+> >                0xa2, 0x3c, 0x23, 0x8f, 0x2a, 0x3d, 0xf9, 0x28)
+> > +#define PARTITION_LINUX_FIT_GUID \
+> > +    EFI_GUID( 0xcae9be83, 0xb15f, 0x49cc, \
+> > +              0x86, 0x3f, 0x08, 0x1b, 0x74, 0x4a, 0x2d, 0x93)
+> >
+> >  typedef struct _gpt_header {
+> >         __le64 signature;
+> > --
+> > 2.38.1
+> >
