@@ -2,95 +2,107 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84B95C4332F
-	for <linux-block@archiver.kernel.org>; Wed,  9 Nov 2022 10:08:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 16631C4332F
+	for <linux-block@archiver.kernel.org>; Wed,  9 Nov 2022 11:15:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230129AbiKIKId (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 9 Nov 2022 05:08:33 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36486 "EHLO
+        id S230345AbiKILPv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 9 Nov 2022 06:15:51 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59546 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230163AbiKIKIb (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 9 Nov 2022 05:08:31 -0500
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 07A7B5FE2
-        for <linux-block@vger.kernel.org>; Wed,  9 Nov 2022 02:08:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
-        :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=xk841BuvR0epzPDzgT1Vm4hLiQe4Xs0h426bTakmp/w=; b=1E1hJt1EvRPqzFsunRwm2cLgQV
-        JzuWaVVv3t6JYK6IX5gBf0O63EipnvlL+f+j1Jfo7ptGkefqS+R9lQgKAzXZnUJfb6EWhhB29uOzT
-        zh7tw7vA3EQUcXZ7z0dfnJkf1j2JJnQIKGQ6b1CIQT/VzRiz/Yf2yOw0tt7Y9iFojUfrVLrFXUF3p
-        BotvQKEajmev0vWK0S4Lo2XiN4EhENrTfffarAUoyst3caCjKEWQTdsyT0Youte4poeyBeewUAWFt
-        Fiut7PHTeBOe+IQsOTU5gN1CrMNRwnUSPi6wigBzApYe9qUE2r1cV118iV8hpUTevEnoO2dzwG+On
-        nsOveClw==;
-Received: from [46.183.103.17] (helo=localhost)
-        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1osi0N-00CZrl-Mp; Wed, 09 Nov 2022 10:08:24 +0000
-From:   Christoph Hellwig <hch@lst.de>
-To:     axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org
-Subject: [PATCH 2/2] blk-mq: simplify blk_mq_realloc_tag_set_tags
-Date:   Wed,  9 Nov 2022 11:08:11 +0100
-Message-Id: <20221109100811.2413423-2-hch@lst.de>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20221109100811.2413423-1-hch@lst.de>
-References: <20221109100811.2413423-1-hch@lst.de>
+        with ESMTP id S230379AbiKILPV (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 9 Nov 2022 06:15:21 -0500
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B59F63D7;
+        Wed,  9 Nov 2022 03:14:57 -0800 (PST)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 8BA141F936;
+        Wed,  9 Nov 2022 11:14:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1667992495; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=eBJNC132wrJOYPzZz8Zdp7calOKLvevZppIFTW+gJuM=;
+        b=CVqcj5Gt3xYk90dcFGC2cxqxoQmTGXfbDZUzlUXQckr4yifsslPYqJJSQZHD5eGhOQ29L6
+        x1xgVsWku8H9SXkYIDCxTqDLIHRHUvxUxGxu4H3F0kjZDCT/jPKlZC3/0l47NHWBNBlpid
+        O13oAmJYhkVRk7bTJw6WBiCN6sD3X6U=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1667992495;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=eBJNC132wrJOYPzZz8Zdp7calOKLvevZppIFTW+gJuM=;
+        b=ijtTnpk73GGUYYvmUx+rD2j5KgO8y7hqusqNqUUxIgks/0UkffAHdqqqCMWiOYyqIL1qpN
+        I/GTIzMz1C+L5fDA==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 7B1CD1331F;
+        Wed,  9 Nov 2022 11:14:55 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id Gj8EHq+La2NUMwAAMHmgww
+        (envelope-from <jack@suse.cz>); Wed, 09 Nov 2022 11:14:55 +0000
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+        id 03B05A0704; Wed,  9 Nov 2022 12:14:54 +0100 (CET)
+Date:   Wed, 9 Nov 2022 12:14:54 +0100
+From:   Jan Kara <jack@suse.cz>
+To:     Khazhismel Kumykov <khazhy@chromium.org>
+Cc:     Paolo Valente <paolo.valente@linaro.org>,
+        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Yu Kuai <yukuai1@huaweicloud.com>,
+        Jan Kara <jack@suse.cz>, Khazhismel Kumykov <khazhy@google.com>
+Subject: Re: [PATCH 2/2] bfq: ignore oom_bfqq in bfq_check_waker
+Message-ID: <20221109111454.w7ikajdugzgsac6g@quack3>
+References: <20221103013937.603626-1-khazhy@google.com>
+ <20221108181030.1611703-1-khazhy@google.com>
+ <20221108181030.1611703-2-khazhy@google.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221108181030.1611703-2-khazhy@google.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Use set->nr_hw_queues for the current number of tags, and remove the
-duplicate set->nr_hw_queues update in the caller.
+On Tue 08-11-22 10:10:30, Khazhismel Kumykov wrote:
+> oom_bfqq is just a fallback bfqq, so shouldn't be used with waker
+> detection.
+> 
+> Suggested-by: Jan Kara <jack@suse.cz>
+> Signed-off-by: Khazhismel Kumykov <khazhy@google.com>
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- block/blk-mq.c | 10 ++++------
- 1 file changed, 4 insertions(+), 6 deletions(-)
+Looks good. Feel free to add:
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 8c630dbdf107e..9fa0b9a1435f2 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -4381,11 +4381,11 @@ static void blk_mq_update_queue_map(struct blk_mq_tag_set *set)
- }
- 
- static int blk_mq_realloc_tag_set_tags(struct blk_mq_tag_set *set,
--				  int cur_nr_hw_queues, int new_nr_hw_queues)
-+				       int new_nr_hw_queues)
- {
- 	struct blk_mq_tags **new_tags;
- 
--	if (cur_nr_hw_queues >= new_nr_hw_queues)
-+	if (set->nr_hw_queues >= new_nr_hw_queues)
- 		return 0;
- 
- 	new_tags = kcalloc_node(new_nr_hw_queues, sizeof(struct blk_mq_tags *),
-@@ -4394,7 +4394,7 @@ static int blk_mq_realloc_tag_set_tags(struct blk_mq_tag_set *set,
- 		return -ENOMEM;
- 
- 	if (set->tags)
--		memcpy(new_tags, set->tags, cur_nr_hw_queues *
-+		memcpy(new_tags, set->tags, set->nr_hw_queues *
- 		       sizeof(*set->tags));
- 	kfree(set->tags);
- 	set->tags = new_tags;
-@@ -4710,11 +4710,9 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
- 	}
- 
- 	prev_nr_hw_queues = set->nr_hw_queues;
--	if (blk_mq_realloc_tag_set_tags(set, set->nr_hw_queues, nr_hw_queues) <
--	    0)
-+	if (blk_mq_realloc_tag_set_tags(set, nr_hw_queues) < 0)
- 		goto reregister;
- 
--	set->nr_hw_queues = nr_hw_queues;
- fallback:
- 	blk_mq_update_queue_map(set);
- 	list_for_each_entry(q, &set->tag_list, tag_set_list) {
+Reviewed-by: Jan Kara <jack@suse.cz>
+
+								Honza
+
+> ---
+>  block/bfq-iosched.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+> 
+> diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+> index ca04ec868c40..267baf84870f 100644
+> --- a/block/bfq-iosched.c
+> +++ b/block/bfq-iosched.c
+> @@ -2135,7 +2135,9 @@ static void bfq_check_waker(struct bfq_data *bfqd, struct bfq_queue *bfqq,
+>  	if (!bfqd->last_completed_rq_bfqq ||
+>  	    bfqd->last_completed_rq_bfqq == bfqq ||
+>  	    bfq_bfqq_has_short_ttime(bfqq) ||
+> -	    now_ns - bfqd->last_completion >= 4 * NSEC_PER_MSEC)
+> +	    now_ns - bfqd->last_completion >= 4 * NSEC_PER_MSEC ||
+> +	    bfqd->last_completed_rq_bfqq == &bfqd->oom_bfqq ||
+> +	    bfqq == &bfqd->oom_bfqq)
+>  		return;
+>  
+>  	/*
+> -- 
+> 2.38.1.431.g37b22c650d-goog
+> 
 -- 
-2.30.2
-
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
