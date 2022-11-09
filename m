@@ -2,121 +2,144 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BA1C3C43217
-	for <linux-block@archiver.kernel.org>; Wed,  9 Nov 2022 22:08:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 076A7C4332F
+	for <linux-block@archiver.kernel.org>; Wed,  9 Nov 2022 22:48:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229615AbiKIWIJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 9 Nov 2022 17:08:09 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59298 "EHLO
+        id S229975AbiKIWsN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 9 Nov 2022 17:48:13 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48152 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229578AbiKIWIJ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 9 Nov 2022 17:08:09 -0500
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 39BBF2D771;
-        Wed,  9 Nov 2022 14:08:08 -0800 (PST)
+        with ESMTP id S229447AbiKIWsM (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 9 Nov 2022 17:48:12 -0500
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A1FD27DFE;
+        Wed,  9 Nov 2022 14:48:11 -0800 (PST)
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id DDD1F337BA;
-        Wed,  9 Nov 2022 22:08:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1668031686;
-        h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-         cc:cc:mime-version:mime-version:content-type:content-type:
+        by smtp-out2.suse.de (Postfix) with ESMTPS id C8BAF2006F;
+        Wed,  9 Nov 2022 22:48:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1668034089; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=7urUNskayTd1SGPbO2jRA+qHJ9m4P64m8g/fnY2xxEc=;
-        b=P8uXFlGhXKDLvAC/8peds9cZpAHDUAwEzRuseDyVYNHKwSPR/HYHBUm9H7Ur1a2lUIcyeH
-        qT4u4B91xFS9SKUsVBIJnSptB0p8Gm7WNZE8i+HHSIn+IFg3omAQSUapC/n6puNDwZkdU2
-        DAA/cr+hKvUlUwIoVE3nDVMIJM/Vz94=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1668031686;
-        h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-         cc:cc:mime-version:mime-version:content-type:content-type:
+        bh=XMCM7OWY+iNPSuDyAZw1JG6t45voRNJpeWU5mvT7YDk=;
+        b=ZcmhCy9UlSxOBX4+VnLZ/6sRAOTm7BRl2Nx/7AliLU0jNqXqBIzr9pJnYBIKY+trNUq8To
+        siuCJzyBf1pTfsUA89MvdBtRjz5/tZJbFUE6NU/hxWrFT4sbFwomtfTOWYD668fqpDk7Nc
+        nvdcv5A0VjPlQlh+55JnnGYSWkuBPws=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1668034089;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=7urUNskayTd1SGPbO2jRA+qHJ9m4P64m8g/fnY2xxEc=;
-        b=2KI7jo8WCBbi0rC6LB2o4uN2Dx9AP/bVharrGirY9awbEubefsqGuks6uGs9nzzo3qkxyK
-        BFrH3x45c+mNGaAQ==
+        bh=XMCM7OWY+iNPSuDyAZw1JG6t45voRNJpeWU5mvT7YDk=;
+        b=vlZ8IiSxZIS4m+I8/dLaTXhVMAgXggODzZVr/ZcTyOa/NqSfx29Htf43mF3Q9FdJMUDcXv
+        tf0vRNlmy8Zk1jCg==
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 5AB4A139F1;
-        Wed,  9 Nov 2022 22:08:06 +0000 (UTC)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 8E85F1331F;
+        Wed,  9 Nov 2022 22:48:09 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id GbG1FMYkbGM/GQAAMHmgww
-        (envelope-from <pvorel@suse.cz>); Wed, 09 Nov 2022 22:08:06 +0000
-Date:   Wed, 9 Nov 2022 23:08:04 +0100
-From:   Petr Vorel <pvorel@suse.cz>
-To:     Sergey Senozhatsky <senozhatsky@chromium.org>
-Cc:     Minchan Kim <minchan@kernel.org>, ltp@lists.linux.it,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, Nitin Gupta <ngupta@vflare.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>,
-        Martin Doucha <mdoucha@suse.cz>,
-        Yang Xu <xuyang2018.jy@fujitsu.com>
-Subject: Re: [PATCH 0/1] Possible bug in zram on ppc64le on vfat
-Message-ID: <Y2wkxBEnbP9jM0h3@pevik>
-Reply-To: Petr Vorel <pvorel@suse.cz>
-References: <20221107191136.18048-1-pvorel@suse.cz>
- <Y2l3vJb1y2Jynf50@google.com>
- <Y2l89dt/t8M6+9go@pevik>
- <Y2mJ42Ap7VIZu32Y@pevik>
- <Y2mrRxHhVi/QEiUf@google.com>
+        id 61HWHCkubGOJKwAAMHmgww
+        (envelope-from <krisman@suse.de>); Wed, 09 Nov 2022 22:48:09 +0000
+From:   Gabriel Krisman Bertazi <krisman@suse.de>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        Hugh Dickins <hughd@google.com>,
+        Keith Busch <kbusch@kernel.org>,
+        Liu Song <liusong@linux.alibaba.com>, Jan Kara <jack@suse.cz>
+Subject: Re: [PATCH] sbitmap: Use single per-bitmap counting to wake up
+ queued tags
+Organization: SUSE
+References: <20221105231055.25953-1-krisman@suse.de>
+        <cd88f306-1da4-a243-ec23-fea033142fbb@kernel.dk>
+Date:   Wed, 09 Nov 2022 17:48:08 -0500
+In-Reply-To: <cd88f306-1da4-a243-ec23-fea033142fbb@kernel.dk> (Jens Axboe's
+        message of "Wed, 9 Nov 2022 15:06:52 -0700")
+Message-ID: <87wn83eod3.fsf@suse.de>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.2 (gnu/linux)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Y2mrRxHhVi/QEiUf@google.com>
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Sergey, Minchan, all,
+Jens Axboe <axboe@kernel.dk> writes:
 
+> On 11/5/22 5:10 PM, Gabriel Krisman Bertazi wrote:
+>> Performance-wise, one should expect very similar performance to the
+>> original algorithm for the case where there is no queueing.  In both the
+>> old algorithm and this implementation, the first thing is to check
+>> ws_active, which bails out if there is no queueing to be managed. In the
+>> new code, we took care to avoid accounting completions and wakeups when
+>> there is no queueing, to not pay the cost of atomic operations
+>> unnecessarily, since it doesn't skew the numbers.
+>> 
+>> For more interesting cases, where there is queueing, we need to take
+>> into account the cross-communication of the atomic operations.  I've
+>> been benchmarking by running parallel fio jobs against a single hctx
+>> nullb in different hardware queue depth scenarios, and verifying both
+>> IOPS and queueing.
+>> 
+>> Each experiment was repeated 5 times on a 20-CPU box, with 20 parallel
+>> jobs. fio was issuing fixed-size randwrites with qd=64 against nullb,
+>> varying only the hardware queue length per test.
+>> 
+>> queue size 2                 4                 8                 16                 32                 64
+>> 6.1-rc2    1681.1K (1.6K)    2633.0K (12.7K)   6940.8K (16.3K)   8172.3K (617.5K)   8391.7K (367.1K)   8606.1K (351.2K)
+>> patched    1721.8K (15.1K)   3016.7K (3.8K)    7543.0K (89.4K)   8132.5K (303.4K)   8324.2K (230.6K)   8401.8K (284.7K)
+>> 
+>> The following is a similar experiment, ran against a nullb with a single
+>> bitmap shared by 20 hctx spread across 2 NUMA nodes. This has 40
+>> parallel fio jobs operating on the same device
+>> 
+>> queue size 2 	             4                 8              	16             	    32		       64
+>> 6.1-rc2	   1081.0K (2.3K)    957.2K (1.5K)     1699.1K (5.7K) 	6178.2K (124.6K)    12227.9K (37.7K)   13286.6K (92.9K)
+>> patched	   1081.8K (2.8K)    1316.5K (5.4K)    2364.4K (1.8K) 	6151.4K  (20.0K)    11893.6K (17.5K)   12385.6K (18.4K)
+>
+> What's the queue depth of these devices? That's the interesting question
+> here, as it'll tell us if any of these are actually hitting the slower
+> path where you made changes. 
+>
 
-> On (22/11/07 23:42), Petr Vorel wrote:
-> [..]
-> > 15859712        0        0 26214400   196608      242        0
-> > zram01 7 TINFO: /sys/block/zram1/mm_stat
-> > 15859712        0        0 26214400   196608      242        0
-> > zram01 7 TINFO: /sys/block/zram1/mm_stat
-> > 15859712        0        0 26214400   196608      242        0
-> > zram01 7 TINFO: /sys/block/zram1/mm_stat
-> > 15859712        0        0 26214400   196608      242        0
-> > zram01 7 TINFO: /sys/block/zram1/mm_stat
-> > 15859712        0        0 26214400   196608      242        0
-> > zram01 7 TINFO: /sys/block/zram1/mm_stat
-> > 15859712        0        0 26214400   196608      242        0
-> > zram01 7 TINFO: /sys/block/zram1/mm_stat
-> > 15859712        0        0 26214400   196608      242        0
-> > zram01 7 TBROK: "loop_read_mem_used_total /sys/block/zram1/mm_stat" timed out
+Hi Jens,
 
-> Looking at mm_stat_show(), mem_used can be 0 when mm_stat_show() is
-> called on un-initialized device
+The hardware queue depth is a parameter being varied in this experiment.
+Each column of the tables has a different queue depth.  Its value is the
+first line (queue size) of both tables.  For instance, looking at the
+first table, for a device with hardware queue depth=2, 6.1-rc2 gave
+1681K IOPS and the patched version gave 1721.8K IOPS.
 
-> ---
-> ...
->         u64 orig_size, mem_used = 0;
->         long max_used;
->         ssize_t ret;
+As mentioned, I monitored the size of the sbitmap wqs during the
+benchmark execution to confirm it was indeed hitting the slow path and
+queueing.  Indeed, I observed less queueing on higher QDs (16,32) and
+even less for QD=64.  For QD<=8, there was extensive queueing present
+throughout the execution.
 
->         memset(&pool_stats, 0x00, sizeof(struct zs_pool_stats));
+I should provide the queue size over time alongside the latency numbers.
+I have to rerun the benchmarks already to collect the information
+Chaitanya requested.
 
->         down_read(&zram->init_lock);
->         if (init_done(zram)) {
->                 mem_used = zs_get_total_pages(zram->mem_pool);
->                 zs_pool_stats(zram->mem_pool, &pool_stats);
->         }
-> ...
-> ---
+> I suspect you are for the second set of numbers, but not for the first
+> one?
 
-> Can you check if init_done() returns true in your tests?
+No. both tables show some level of queueing. The shared bitmap in
+table 2 surely has way more intensive queueing, though.
 
-I'm sorry, it took me some time to find machine where I'd be compile kernel.
-Yes, init_done() returns non-zero (1), code goes into if clause and sets
-mem_used. I'll check also for mem_used value.
+> Anything that isn't hitting the wait path for tags isn't a very useful
+> test, as I would not expect any changes there.
 
-Kind regards,
-Petr
+Even when there is less to no queueing (QD=64 in this data), we still
+enter sbitmap_queue_wake_up and bail out on the first line
+!wait_active. This is why I think it is important to include QD=64
+here. it is less interesting data, as I mentioned, but it shows no
+regressions of the faspath.
+
+Thanks,
+
+-- 
+Gabriel Krisman Bertazi
