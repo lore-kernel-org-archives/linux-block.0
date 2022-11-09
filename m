@@ -2,169 +2,178 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46CA2C433FE
-	for <linux-block@archiver.kernel.org>; Tue,  8 Nov 2022 23:28:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 74133C433FE
+	for <linux-block@archiver.kernel.org>; Wed,  9 Nov 2022 02:08:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229485AbiKHX2P (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 8 Nov 2022 18:28:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38572 "EHLO
+        id S229817AbiKICIV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 8 Nov 2022 21:08:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46988 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229453AbiKHX2O (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Nov 2022 18:28:14 -0500
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2087.outbound.protection.outlook.com [40.107.244.87])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 847D5BAD;
-        Tue,  8 Nov 2022 15:28:13 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=bVhSohUu6Nu5dK4tS8mWcr2SsVMbnuOdYsSbi3zBLIMjv9So4272shUIG8a2E7112fczdX3lk1PrSzRZgqPTsf+GZdfcJ75SPoi6dEP3l08n4Ev87NEgpYzdxpjrQuvOGjblSIQ0hHYtDJzmKB8lxJqD/QRLhbJ3n2zy59opiupNJRMBggK2zCyzaAoo8QC5Cm5n806p7FibV1aL9CFwPdipPMHoya6h539NyztnLYIGc7D3YKptbHtUZ6qaEUSZp43kAwo0IPU14kN48vYhMmXP9vRsiW1A/+Dz1bYf9ZEaZvPDtGutSXA8ZGMeZRqrIRnsIPmQl6dm1oyRhWVAng==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=dOT6sDaNi43wJIZnL2zAeAiTNa9KNB3uIUBILauyHZs=;
- b=h/qRndiE/yPSFTscTGpQF/hY5MlMxZk1qC8pZny4QCcGjJ5FzK2P5WFd7w3GMubLYa3pzCMEMig7otMe4bv1hoCvXE5LeT0Ww9QxcEJmArvdcPLKAtLtsO6gKMMtYSJTgREaal59YG4b2AF7+oXhpsxAlxA47KxrQOZr3SMSuw6Orymhl3O4kwhMyrM27Cm8/xTC5uGRo0thQakdNq1ijnT8tp+G5OKHP+29FGSNN//XVR+ZQF/KTRhizVLI4UZ0rdKG8zNI64+VGU0pLKBs8bda8pCbtrModpKfyREVccA0TokIKbASoFJQbpaZb1+FAq2NMCamv0ejNtPmisYFWg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=dOT6sDaNi43wJIZnL2zAeAiTNa9KNB3uIUBILauyHZs=;
- b=Jqp2e9ezE5ezC8/wZqnDmp14+AS0a/Ju1xpJ2+IG59tJU0qG5Pj/KGHqKTlEcQYEjnCwu3gzWG8YDCdhvfExJbiyRafCEc2I00lIyLSF1/TUQK114my73PemmYwx+E+bzC2PvDquS9xaOWzsuihpi5JHEv7Opb30dsNaGcat5OT8CMINGMYk2tSIHqetu4iMEAF55i9pEufxfXduE4bhcQ3Ic2B+WAEjPKZe02RJwGahj1E775n76pZoTEOud0YnxzOdmTb9rfBvyoR8D5du5CzvyI2MdPc8IFIz/dm92AxTAPap654B52kMiy7mNspOZ7IJtAh1N1ln0RhUt54S2Q==
-Received: from MW2PR12MB4667.namprd12.prod.outlook.com (2603:10b6:302:12::28)
- by CY8PR12MB7219.namprd12.prod.outlook.com (2603:10b6:930:59::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5791.27; Tue, 8 Nov
- 2022 23:28:12 +0000
-Received: from MW2PR12MB4667.namprd12.prod.outlook.com
- ([fe80::eaf1:9be8:d472:ea57]) by MW2PR12MB4667.namprd12.prod.outlook.com
- ([fe80::eaf1:9be8:d472:ea57%7]) with mapi id 15.20.5791.027; Tue, 8 Nov 2022
- 23:28:11 +0000
-From:   Chaitanya Kulkarni <chaitanyak@nvidia.com>
-To:     Gabriel Krisman Bertazi <krisman@suse.de>
-CC:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Hugh Dickins <hughd@google.com>,
-        Keith Busch <kbusch@kernel.org>,
-        "axboe@kernel.dk" <axboe@kernel.dk>,
-        Liu Song <liusong@linux.alibaba.com>, Jan Kara <jack@suse.cz>
-Subject: Re: [PATCH] sbitmap: Use single per-bitmap counting to wake up queued
- tags
-Thread-Topic: [PATCH] sbitmap: Use single per-bitmap counting to wake up
- queued tags
-Thread-Index: AQHY8Wvm+CZdxB4ohkivtu7W5Z+5TK41sLCA
-Date:   Tue, 8 Nov 2022 23:28:11 +0000
-Message-ID: <f2d6dfd6-1234-2545-7955-07db078faa54@nvidia.com>
-References: <20221105231055.25953-1-krisman@suse.de>
-In-Reply-To: <20221105231055.25953-1-krisman@suse.de>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-user-agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.9.0
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: MW2PR12MB4667:EE_|CY8PR12MB7219:EE_
-x-ms-office365-filtering-correlation-id: 251a511e-ca80-4e0e-86d7-08dac1e0e6e9
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: uwpxG9NmCd3OLEw2JOluLIz9sC6g6zOIJIBmLCJ2l5GPV4tzC8KEh+3sn4Opg5WMvU1yneBQtHXafqjFBRq0gLbMJ8hoOiVOBs9sB588uHa7RPsRr7s1dyzLQyH5R6IloqjALNybH9oV9rjpWlyqb4618k80B8nJvGZIiBaAVNt4nTRGNIYlDrbWOQ//4h4uXLhBhNvffinNiY/sa7CNbsguP3OSc1k2PG9SoPu6OEmMToRqzz8t/ywBKoFogs9us3PnacR1tUqrDe9+41lUXHniX5ONfK3dUZR9qR2nIad+haOo30zjO3vp8t405U+6qTfgvl2BTVhcNF+WGn1XHPI6YEqmX4NoUTH+0bWXYep2Qt2VFFEDBIU7RXe2zrWjrQtXGTuuOl4bvproscsmbVESpawpq3z+7J7tqjlxUkKi8/xtN9573j1ZiONQU47XLz/qi0WPVz4zaXIw4B36xUBb6QdLX9hq6PUTgbgP3hA0u5aM0tq5OJOvUbQe7gfXGTupKEAlvikwWN4j22VAHSy7D3GO+mlq4GPz3W8IDUjSlXwZ5hmjjyLqAm+AzzaYqVeBRMqxn0bcKZeLI0fWS4WJNwkzCnqoB02mPyfz8t35FYqlp0wMhW2V3tphneNk3Xz7xiuvjRYfwMHeGDqGP/4smsZo2142uBGafD/ybZFN4T0LJ3bvhy8l3Qpna36+lUaOPYUPazcmwmm3Y7sxVPZGMS0lmUj/oO88p93YeHqFObizG9/hFRvAuGbiRG1UR24szASOtj4SovZ82SNWgaArVQkN25s/RB0dZ7PtJjTcG2/VBUBIGh6f0Qkzw7CG
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW2PR12MB4667.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(136003)(346002)(396003)(376002)(39860400002)(366004)(451199015)(83380400001)(41300700001)(31696002)(86362001)(6916009)(38070700005)(122000001)(38100700002)(64756008)(66446008)(66556008)(66476007)(8936002)(76116006)(4326008)(316002)(91956017)(2906002)(8676002)(66946007)(5660300002)(6506007)(6512007)(186003)(71200400001)(54906003)(2616005)(478600001)(6486002)(31686004)(36756003)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?M3U1WWdla0hIUWZkeEhJRUI0SEp0cW1KZjdUWlUwWVRPRUlOUTRIdGdXSDNL?=
- =?utf-8?B?bjdmVWFuTGw1ZXJvNGJwc1VnOXQyaTFJbCsxUnF4QmRwYlY4cGtGenRMUStl?=
- =?utf-8?B?UGQ2azVPc0ErTXFnQzlab2MvR1pNbVNXU2ErNTl0ZElSQWVIdVUyL1IwYmRr?=
- =?utf-8?B?c0NSdlNLWGZCbXRmNjNhV1ZsYnpRaVMwSDNyN3RCN0VMVXdrSkRhYU9jNFlL?=
- =?utf-8?B?d09YYU9QT3llOEVDUElZNHZOdWluNkZLR2ZpWkhsdElzSXFhUXAwTzduVjJQ?=
- =?utf-8?B?c3E5dHQ1YmZJMVVDaTdDeGRjMlRxL09rZDVLamhObmMzd0huSFBuZmpEcTYy?=
- =?utf-8?B?QlVLMWt0OVJTZm9wenlWSEJ3ZXhFWFJ2Mm1EWktnR2M3bXBJRUl0N3Y0MUJ4?=
- =?utf-8?B?enl2b3VIU293MmVCRERtN09ZTmxIZUI5UVhtL09WZzVwMStyOXhPMCt0TmdN?=
- =?utf-8?B?ZStwNUtTQUNxbE1JNHIzUHIxUWUrRTNOa1JyZFQzd3Q4RmtHWnFkenNldkI4?=
- =?utf-8?B?VXQ1UkZpOUREZkZYZFJ5aUE1WVFyTTlJWVlPdnBpSDkzZzN1bmdKRHJMQUFq?=
- =?utf-8?B?cml6RWtPV0ZRWnBVQ00yM2tqR093azc5Nm9EMVYvWlhoQW12QzRoV1B6WXpx?=
- =?utf-8?B?elJ4OFRDcGgxV3V5VmVyUGlCUVpVSUErMlp1bkFQaitHRUNmajhoendhVndw?=
- =?utf-8?B?OXNwOTlQRVh2Q1lNQnpUaFVrQUxOZkhCQmQ4UE9leVBjV2k2N09VNmc0Y3FR?=
- =?utf-8?B?V09tTzdvZzlDdi9WcFBtbFFjd1RwMDNwTWlZVW1nVzBpQWUzV0xQcDV2YjMr?=
- =?utf-8?B?akF4ZjhoekRldXFHQzB2aHQ2bXBQdCs0RVJhQkkzbjlPMEdFNnlUNG45dW9y?=
- =?utf-8?B?VkZyUHBOREZjR1d3L1E3WlVVTVRxSnBCNWNPeUFaa3EwZ29lYkZXeVVJTFVr?=
- =?utf-8?B?UFVYYkI0OEJwT05xVEF1UGZibHpZMUNMWWEyMUJtRkN3YkhhVVpKZlNaZUVq?=
- =?utf-8?B?R0ZUUkJTNkRsN2VOL244NFFNZzdHbjVIWjlGSVY1VC93R3ZzMm1yNERyQkpH?=
- =?utf-8?B?SnJvQXgwbk9RK3U5L1puOEJ0L3JodXFRMDQ2Wm5GditOQlg3UGZWdVRWQ2Nh?=
- =?utf-8?B?RFFieTF0Y2s5akZoNVpyODA0ZmpMNnhTUEhLdVg1YlNoYXBldlVTTjNXeW9s?=
- =?utf-8?B?aTFGM3RZRktTTFRJcnZoMkI1Z3owSzF0WTZSUytzL2VhSWdZU1E0NE54eTd1?=
- =?utf-8?B?QTJNdzFnTGlQUEFVaTRrNTgrbzFEUnZsaktUbFRJcm44SHllWjR0T2tsdXhu?=
- =?utf-8?B?clIzSzVxa1BWa0t0Vml0UmVLR2JUVG0ydkZHZll2Tnd3dS9XekpTTUV2WjBW?=
- =?utf-8?B?R2pmUWh3ZW5KdmhmcHVNRWxBbnJ3NU9veU5hZ1prZ2wzRTN5RXVaYjdsNHN5?=
- =?utf-8?B?M2xXQ1hJVnJudFdpd2Y1Y0xhYXNZWGhSb2xraVV1cmJKV0pFUk5TamMzSVlZ?=
- =?utf-8?B?NnZJaEViQzRGUk9Jc0hNN1kxWWtTaFAwakpKR3Q1Z2NSNnpkWFZScnRES3pP?=
- =?utf-8?B?amJUcGd2QWt3amNMaUJkREdTR3ZIdjhNZWY3ZHNMNm5YRTNwdXQ1QjRvUHFk?=
- =?utf-8?B?Z1ZqMlNIT0g3by9oVDNYc3NEVWFzNmlieE9qeFViVXhqak9uL0c2bytBeHdR?=
- =?utf-8?B?SFU4WVZaTVp6cGpqVFhzb0UzU084MkFMdUJQMFBOMTgrcWFRZXlKT1U5Skx1?=
- =?utf-8?B?aDhKOEY5S0VTb0YyOVVUU2EvTS8wMUR3SXlOcFlPY2RRNzc1bkF2YVZZbnZF?=
- =?utf-8?B?YW9Zdko0Tm5Jd0NYb3dva0ljQnUrM01TbU9MZlpsajAyYXV2NEhxZjJMZDAy?=
- =?utf-8?B?N25UOEZMVUx4eDJXU2ZraWFSL2tSNjlFUEp4eHhncThleHc4QisxWVZyMW1G?=
- =?utf-8?B?czI5RkNXN1NNelowZEdkNHVGNXRUTnZYdUc1OE1pWmZUMUVRamN4VGtXK2RG?=
- =?utf-8?B?bzN1WmI2aVBoTEVBUW5iazk1czNuVVRwOTJyME5XYklSMlF6UTJFdyt0VVdW?=
- =?utf-8?B?VS9kYW9Xd3RuSHQwQUZaTDVob3ZPOHRsK0hpWGorakxNWTJEeVNtUzhGVVBw?=
- =?utf-8?B?Ykk2SmZvcE5lMXlLMjdNdGtRQzZHd2lpU0l0Q0R5QldGTTBWY3FxcVBWd29B?=
- =?utf-8?B?Nnc9PQ==?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <AD98F6C37BF2414F86188F29657EEFC3@namprd12.prod.outlook.com>
-Content-Transfer-Encoding: base64
+        with ESMTP id S229790AbiKICIU (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Nov 2022 21:08:20 -0500
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6090F686AD
+        for <linux-block@vger.kernel.org>; Tue,  8 Nov 2022 18:08:19 -0800 (PST)
+Received: from mail02.huawei.com (unknown [172.30.67.169])
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4N6Szx3C4kz4f3wtR
+        for <linux-block@vger.kernel.org>; Wed,  9 Nov 2022 10:08:13 +0800 (CST)
+Received: from [10.174.176.73] (unknown [10.174.176.73])
+        by APP1 (Coremail) with SMTP id cCh0CgC3YK+OC2tjAinPAA--.44026S3;
+        Wed, 09 Nov 2022 10:08:16 +0800 (CST)
+Subject: Re: [PATCH 5/7] dm: track per-add_disk holder relations in DM
+To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        Alasdair Kergon <agk@redhat.com>,
+        Mike Snitzer <snitzer@kernel.org>
+Cc:     Yu Kuai <yukuai1@huaweicloud.com>, dm-devel@redhat.com,
+        linux-block@vger.kernel.org, "yukuai (C)" <yukuai3@huawei.com>
+References: <20221030153120.1045101-1-hch@lst.de>
+ <20221030153120.1045101-6-hch@lst.de>
+From:   Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <9b5b4c2a-6566-2fb4-d3ae-4904f0889ea0@huaweicloud.com>
+Date:   Wed, 9 Nov 2022 10:08:14 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: MW2PR12MB4667.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 251a511e-ca80-4e0e-86d7-08dac1e0e6e9
-X-MS-Exchange-CrossTenant-originalarrivaltime: 08 Nov 2022 23:28:11.6620
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: LBW5upuM+mw34DGBCQelqohD9qY8NGMkzA6AdPJ+zyNITydE080bGnxrhfpWdjkhNXPuBaxfVUSxpwadLFLADQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB7219
+In-Reply-To: <20221030153120.1045101-6-hch@lst.de>
+Content-Type: text/plain; charset=gbk; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: cCh0CgC3YK+OC2tjAinPAA--.44026S3
+X-Coremail-Antispam: 1UD129KBjvJXoWxGFy7Jry7Cr4xKw48GF1fCrg_yoWrGFyfpF
+        Z8WasIqrW8JFsF9w47Xw4j9Fy5Krs5ta4F9r1xC34I9wnYyr909FWfGFy3XFyDJ397GF45
+        XFWUtrs8ua18KrJanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUkC14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+        1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+        JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+        CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+        2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+        W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lc7I2V7IY0VAS07AlzVAY
+        IcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14
+        v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkG
+        c2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI
+        0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6rW3Jr0E3s1lIxAIcVC2z280aVAFwI0_Jr0_
+        Gr1lIxAIcVC2z280aVCY1x0267AKxVWUJVW8JbIYCTnIWIevJa73UjIFyTuYvjfUoOJ5UU
+        UUU
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-DQo+IEZvciBtb3JlIGludGVyZXN0aW5nIGNhc2VzLCB3aGVyZSB0aGVyZSBpcyBxdWV1ZWluZywg
-d2UgbmVlZCB0byB0YWtlDQo+IGludG8gYWNjb3VudCB0aGUgY3Jvc3MtY29tbXVuaWNhdGlvbiBv
-ZiB0aGUgYXRvbWljIG9wZXJhdGlvbnMuICBJJ3ZlDQo+IGJlZW4gYmVuY2htYXJraW5nIGJ5IHJ1
-bm5pbmcgcGFyYWxsZWwgZmlvIGpvYnMgYWdhaW5zdCBhIHNpbmdsZSBoY3R4DQo+IG51bGxiIGlu
-IGRpZmZlcmVudCBoYXJkd2FyZSBxdWV1ZSBkZXB0aCBzY2VuYXJpb3MsIGFuZCB2ZXJpZnlpbmcg
-Ym90aA0KPiBJT1BTIGFuZCBxdWV1ZWluZy4NCj4gDQo+IEVhY2ggZXhwZXJpbWVudCB3YXMgcmVw
-ZWF0ZWQgNSB0aW1lcyBvbiBhIDIwLUNQVSBib3gsIHdpdGggMjAgcGFyYWxsZWwNCj4gam9icy4g
-ZmlvIHdhcyBpc3N1aW5nIGZpeGVkLXNpemUgcmFuZHdyaXRlcyB3aXRoIHFkPTY0IGFnYWluc3Qg
-bnVsbGIsDQo+IHZhcnlpbmcgb25seSB0aGUgaGFyZHdhcmUgcXVldWUgbGVuZ3RoIHBlciB0ZXN0
-Lg0KPiANCj4gcXVldWUgc2l6ZSAyICAgICAgICAgICAgICAgICA0ICAgICAgICAgICAgICAgICA4
-ICAgICAgICAgICAgICAgICAxNiAgICAgICAgICAgICAgICAgMzIgICAgICAgICAgICAgICAgIDY0
-DQo+IDYuMS1yYzIgICAgMTY4MS4xSyAoMS42SykgICAgMjYzMy4wSyAoMTIuN0spICAgNjk0MC44
-SyAoMTYuM0spICAgODE3Mi4zSyAoNjE3LjVLKSAgIDgzOTEuN0sgKDM2Ny4xSykgICA4NjA2LjFL
-ICgzNTEuMkspDQo+IHBhdGNoZWQgICAgMTcyMS44SyAoMTUuMUspICAgMzAxNi43SyAoMy44Sykg
-ICAgNzU0My4wSyAoODkuNEspICAgODEzMi41SyAoMzAzLjRLKSAgIDgzMjQuMksgKDIzMC42Sykg
-ICA4NDAxLjhLICgyODQuN0spDQoNCj4gDQoNClNvIGlmIEkgdW5kZXJzdGFuZCBjb3JyZWN0bHkN
-ClFEIDIsNCw4IHNob3dzIGNsZWFyIHBlcmZvcm1hbmNlIGJlbmVmaXQgZnJvbSB0aGlzIHBhdGNo
-IHdoZXJlYXMNClFEIDE2LCAzMiwgNjQgc2hvd3MgZHJvcCBpbiBwZXJmb3JtYW5jZSBpdCB0aGF0
-IGNvcnJlY3QgPw0KDQpJZiBteSBvYnNlcnZhdGlvbiBpcyBjb3JyZWN0IHRoZW4gYXBwbGljYXRp
-b25zIHdpdGggaGlnaCBRRCB3aWxsDQpvYnNlcnZlIGRyb3AgaW4gdGhlIHBlcmZvcm1hbmNlID8N
-Cg0KQWxzbywgcGxlYXNlIHNoYXJlIGEgdGFibGUgd2l0aCBibG9jayBzaXplL0lPUFMvQlcvQ1BV
-IChzeXN0ZW0vdXNlcikNCi9MQVQvU0xBVCB3aXRoICUgaW5jcmVhc2UvZGVjcmVhc2UgYW5kIGRv
-Y3VtZW50IHRoZSByYXcgbnVtYmVycyBhdCB0aGUNCmVuZCBvZiB0aGUgY292ZXItbGV0dGVyIGZv
-ciBjb21wbGV0ZW5lc3MgYWxvbmcgd2l0aCBmaW8gam9iIHRvIG90aGVycw0KY2FuIHJlcGVhdCB0
-aGUgZXhwZXJpbWVudC4uLg0KDQo+IFRoZSBmb2xsb3dpbmcgaXMgYSBzaW1pbGFyIGV4cGVyaW1l
-bnQsIHJhbiBhZ2FpbnN0IGEgbnVsbGIgd2l0aCBhIHNpbmdsZQ0KPiBiaXRtYXAgc2hhcmVkIGJ5
-IDIwIGhjdHggc3ByZWFkIGFjcm9zcyAyIE5VTUEgbm9kZXMuIFRoaXMgaGFzIDQwDQo+IHBhcmFs
-bGVsIGZpbyBqb2JzIG9wZXJhdGluZyBvbiB0aGUgc2FtZSBkZXZpY2UNCj4gDQo+IHF1ZXVlIHNp
-emUgMiAJICAgICAgICAgICAgIDQgICAgICAgICAgICAgICAgIDggICAgICAgICAgICAgIAkxNiAg
-ICAgICAgICAgICAJICAgIDMyCQkgICAgICAgNjQNCj4gNi4xLXJjMgkgICAxMDgxLjBLICgyLjNL
-KSAgICA5NTcuMksgKDEuNUspICAgICAxNjk5LjFLICg1LjdLKSAJNjE3OC4ySyAoMTI0LjZLKSAg
-ICAxMjIyNy45SyAoMzcuN0spICAgMTMyODYuNksgKDkyLjlLKQ0KPiBwYXRjaGVkCSAgIDEwODEu
-OEsgKDIuOEspICAgIDEzMTYuNUsgKDUuNEspICAgIDIzNjQuNEsgKDEuOEspIAk2MTUxLjRLICAo
-MjAuMEspICAgIDExODkzLjZLICgxNy41SykgICAxMjM4NS42SyAoMTguNEspDQo+IA0KDQpzYW1l
-IGhlcmUgLi4uDQoNCj4gSXQgaGFzIGFsc28gc3Vydml2ZWQgYmxrdGVzdHMgYW5kIGEgMTJoLXN0
-cmVzcyBydW4gYWdhaW5zdCBudWxsYi4gSSBhbHNvDQo+IHJhbiB0aGUgY29kZSBhZ2FpbnN0IG52
-bWUgYW5kIGEgc2NzaSBTU0QsIGFuZCBJIGRpZG4ndCBvYnNlcnZlDQo+IHBlcmZvcm1hbmNlIHJl
-Z3Jlc3Npb24gaW4gdGhvc2UuIElmIHRoZXJlIGFyZSBvdGhlciB0ZXN0cyB5b3UgdGhpbmsgSQ0K
-PiBzaG91bGQgcnVuLCBwbGVhc2UgbGV0IG1lIGtub3cgYW5kIEkgd2lsbCBmb2xsb3cgdXAgd2l0
-aCByZXN1bHRzLg0KPiANCi1jaw0KDQo=
+Hi,
+
+ÔÚ 2022/10/30 23:31, Christoph Hellwig Ð´µÀ:
+> dm is a bit special in that it opens the underlying devices.  Commit
+> 89f871af1b26 ("dm: delay registering the gendisk") tried to accomodate
+> that by allowing to add the holder to the list before add_gendisk and
+> then just add them to sysfs once add_disk is called.  But that leads to
+> really odd lifetime problems and error handling problems as we can't
+> know the state of the kobjects and don't unwind properly.  To fix this
+> switch to just registering all existing table_devices with the holder
+> code right after add_disk, and remove them before calling del_gendisk.
+> 
+> Fixes: 89f871af1b26 ("dm: delay registering the gendisk")
+> Reported-by: Yu Kuai <yukuai1@huaweicloud.com>
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>   drivers/md/dm.c | 45 +++++++++++++++++++++++++++++++++++++--------
+>   1 file changed, 37 insertions(+), 8 deletions(-)
+> 
+> diff --git a/drivers/md/dm.c b/drivers/md/dm.c
+> index 2917700b1e15c..7b0d6dc957549 100644
+> --- a/drivers/md/dm.c
+> +++ b/drivers/md/dm.c
+> @@ -751,9 +751,16 @@ static struct table_device *open_table_device(struct mapped_device *md,
+>   		goto out_free_td;
+>   	}
+>   
+> -	r = bd_link_disk_holder(bdev, dm_disk(md));
+> -	if (r)
+> -		goto out_blkdev_put;
+> +	/*
+> +	 * We can be called before the dm disk is added.  In that case we can't
+> +	 * register the holder relation here.  It will be done once add_disk was
+> +	 * called.
+> +	 */
+> +	if (md->disk->slave_dir) {
+If device_add_disk() or del_gendisk() can concurrent with this, It seems
+to me that using 'slave_dir' is not safe.
+
+I'm not quite familiar with dm, can we guarantee that they can't
+concurrent?
+
+Thanks,
+Kuai
+> +		r = bd_link_disk_holder(bdev, md->disk);
+> +		if (r)
+> +			goto out_blkdev_put;
+> +	}
+>   
+>   	td->dm_dev.mode = mode;
+>   	td->dm_dev.bdev = bdev;
+> @@ -774,7 +781,8 @@ static struct table_device *open_table_device(struct mapped_device *md,
+>    */
+>   static void close_table_device(struct table_device *td, struct mapped_device *md)
+>   {
+> -	bd_unlink_disk_holder(td->dm_dev.bdev, dm_disk(md));
+> +	if (md->disk->slave_dir)
+> +		bd_unlink_disk_holder(td->dm_dev.bdev, md->disk);
+>   	blkdev_put(td->dm_dev.bdev, td->dm_dev.mode | FMODE_EXCL);
+>   	put_dax(td->dm_dev.dax_dev);
+>   	list_del(&td->list);
+> @@ -1951,7 +1959,13 @@ static void cleanup_mapped_device(struct mapped_device *md)
+>   		md->disk->private_data = NULL;
+>   		spin_unlock(&_minor_lock);
+>   		if (dm_get_md_type(md) != DM_TYPE_NONE) {
+> +			struct table_device *td;
+> +
+>   			dm_sysfs_exit(md);
+> +			list_for_each_entry(td, &md->table_devices, list) {
+> +				bd_unlink_disk_holder(td->dm_dev.bdev,
+> +						      md->disk);
+> +			}
+>   			del_gendisk(md->disk);
+>   		}
+>   		dm_queue_destroy_crypto_profile(md->queue);
+> @@ -2284,6 +2298,7 @@ int dm_setup_md_queue(struct mapped_device *md, struct dm_table *t)
+>   {
+>   	enum dm_queue_mode type = dm_table_get_type(t);
+>   	struct queue_limits limits;
+> +	struct table_device *td;
+>   	int r;
+>   
+>   	switch (type) {
+> @@ -2316,13 +2331,27 @@ int dm_setup_md_queue(struct mapped_device *md, struct dm_table *t)
+>   	if (r)
+>   		return r;
+>   
+> -	r = dm_sysfs_init(md);
+> -	if (r) {
+> -		del_gendisk(md->disk);
+> -		return r;
+> +	/*
+> +	 * Register the holder relationship for devices added before the disk
+> +	 * was live.
+> +	 */
+> +	list_for_each_entry(td, &md->table_devices, list) {
+> +		r = bd_link_disk_holder(td->dm_dev.bdev, md->disk);
+> +		if (r)
+> +			goto out_undo_holders;
+>   	}
+> +
+> +	r = dm_sysfs_init(md);
+> +	if (r)
+> +		goto out_undo_holders;
+>   	md->type = type;
+>   	return 0;
+> +
+> +out_undo_holders:
+> +	list_for_each_entry_continue_reverse(td, &md->table_devices, list)
+> +		bd_unlink_disk_holder(td->dm_dev.bdev, md->disk);
+> +	del_gendisk(md->disk);
+> +	return r;
+>   }
+>   
+>   struct mapped_device *dm_get_md(dev_t dev)
+> 
+
