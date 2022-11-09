@@ -2,93 +2,80 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CFB44C4332F
-	for <linux-block@archiver.kernel.org>; Wed,  9 Nov 2022 14:49:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BA2DC433FE
+	for <linux-block@archiver.kernel.org>; Wed,  9 Nov 2022 17:21:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231642AbiKIOtA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 9 Nov 2022 09:49:00 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56724 "EHLO
+        id S231124AbiKIRVP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 9 Nov 2022 12:21:15 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46114 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231665AbiKIOsu (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 9 Nov 2022 09:48:50 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BBEFF12AFF;
-        Wed,  9 Nov 2022 06:48:49 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 5ED61617EF;
-        Wed,  9 Nov 2022 14:48:49 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 63E4AC433D6;
-        Wed,  9 Nov 2022 14:48:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1668005328;
-        bh=W0WuuVf8t/q9rQq3isA02nICwNHjjQivDzXXjUr4+hI=;
-        h=From:To:Cc:Subject:Date:From;
-        b=cEtUq/5XQkgmL1ADq2JFNbtjqCzbfmRQ5eFD5wqP1b7kTgoDvMBponlnkSf3DLTXt
-         aRjd1EZICr/EAjjuulNSElaiCy32Wts4Doe2bbST5RHDTecXts8lTNBGVe8yXDzBmZ
-         EtRnugnrrMFWgPXxkB2vEjU9+GjPmdF6d27H4Wyc=
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     axboe@kernel.dk
-Cc:     linux-kernel@vger.kernel.org,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        linux-block@vger.kernel.org
-Subject: [PATCH] blkdev: make struct block_device_operations.devnode() take a const *
-Date:   Wed,  9 Nov 2022 15:48:43 +0100
-Message-Id: <20221109144843.679668-1-gregkh@linuxfoundation.org>
-X-Mailer: git-send-email 2.38.1
+        with ESMTP id S229750AbiKIRVO (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 9 Nov 2022 12:21:14 -0500
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 551E125C8;
+        Wed,  9 Nov 2022 09:21:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=U8E7Jm8e1876qUqey5/8BiJLc1XaDBvWcjC7yx9ROzg=; b=gmH5h/mQ6qEquszdoCqVrpILhD
+        iK+Kn9JHkuehJ2b1rL/vezAXYWk0g3pgHr7Iy/bU1gc3he4FIVq3yXOY55t5UfEjBxHetnvUf7TEN
+        sA7IMRXPsK/N42x13tITnCCN/virflVFzUjbq/NWOF+5NR7/TJJCqt76qufO0ugPmwCpdfJJivc5a
+        osQkbkyKeXSgy0E4O0x9ZfTPlAFK/2N170Qq7YhrJqYEP+1KaiC2loLtcK8AdIBu3jn/6awOQon6Z
+        jv7RxpJFjzlqVSJ4ty0ykIzFEYXt2wMLx5Hh5VwgxdpsOcaf/3h9HS4qDfKuj4uHxAEnu4qohzwjs
+        2sB3e4pQ==;
+Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1osol3-00BLdJ-H0; Wed, 09 Nov 2022 17:21:01 +0000
+Date:   Wed, 9 Nov 2022 17:21:01 +0000
+From:   Matthew Wilcox <willy@infradead.org>
+To:     Daniel Golle <daniel@makrotopia.org>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        Miquel Raynal <miquel.raynal@bootlin.com>,
+        Richard Weinberger <richard@nod.at>,
+        Vignesh Raghavendra <vigneshr@ti.com>,
+        Davidlohr Bueso <dave@stgolabs.net>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mtd@lists.infradead.org,
+        linux-efi@vger.kernel.org
+Subject: Re: [PATCH v4 2/5] block: add partition parser for U-Boot uImage.FIT
+Message-ID: <Y2vhfdhvw0PADeIF@casper.infradead.org>
+References: <Y2rgNEQlxKgiIDdk@makrotopia.org>
+ <Y2uyBYyQOC4O5iep@casper.infradead.org>
+ <Y2u62z4DQVENz69L@makrotopia.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1904; i=gregkh@linuxfoundation.org; h=from:subject; bh=W0WuuVf8t/q9rQq3isA02nICwNHjjQivDzXXjUr4+hI=; b=owGbwMvMwCRo6H6F97bub03G02pJDMnZe0/d42C7L3vGWUFj2uZDG6OPtR+KOLwlqrXd/B1LZbvG xq4VHbEsDIJMDLJiiixftvEc3V9xSNHL0PY0zBxWJpAhDFycAjARlX6G+b5R+nw/P2o+q87eynRXif N/bYOKOcNcqVTNeWtrHB0XXs/IrbFY6V2teSgTAA==
-X-Developer-Key: i=gregkh@linuxfoundation.org; a=openpgp; fpr=F4B60CC5BF78C2214A313DCB3147D40DDB2DFB29
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Y2u62z4DQVENz69L@makrotopia.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The devnode() callback in struct block_device_operations should not be
-modifying the device that is passed into it, so mark it as a const * and
-propagate the function signature changes out into the one subsystem that
-actually uses this callback.
+On Wed, Nov 09, 2022 at 02:36:11PM +0000, Daniel Golle wrote:
+> On Wed, Nov 09, 2022 at 01:58:29PM +0000, Matthew Wilcox wrote:
+> > ... actually, why can't you call read_part_sector() and avoid all of
+> > this?
+> 
+> I've tried that before and the problem is that read_part_sector()
+> returns a pointer to one sector (typically 512 bytes) of data.
+> And this pointer should not be accesses beyond sector boundaries,
+> right? You'd have to call read_part_sector() again for the next
+> sector.
+> 
+> The FIT structure, however, usually exceeds the size of one sector,
+> and having a continous memory area covering the structure as a whole
+> is crucial for libfdt to do its job.
+> 
+> I could, of course, use read_part_sector() to copy all sectors
+> covering the FIT structure into a buffer, but that seemed strange
+> given that read_part_sector() actually used read_mapping_page()
+> (and now uses read_mapping_folio()) internally and then returns a
+> pointer to the offset within the page/folio. So why not read it in one
+> piece in first place instead of having it first split up to sectors
+> by read_part_sector() just to then having to reassemble it into a
+> continous buffer again.
 
-Cc: linux-block@vger.kernel.org
-Cc: Jens Axboe <axboe@kernel.dk>
-Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
----
-
-Jens, I have some dependent kobject/driver core changes that require
-this change in the works.  Can I take this through the driver core tree
-for 6.2-rc1?
-
- drivers/block/pktcdvd.c | 2 +-
- include/linux/blkdev.h  | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/block/pktcdvd.c b/drivers/block/pktcdvd.c
-index 4cea3b08087e..8dc15be95962 100644
---- a/drivers/block/pktcdvd.c
-+++ b/drivers/block/pktcdvd.c
-@@ -2632,7 +2632,7 @@ static unsigned int pkt_check_events(struct gendisk *disk,
- 	return attached_disk->fops->check_events(attached_disk, clearing);
- }
- 
--static char *pkt_devnode(struct gendisk *disk, umode_t *mode)
-+static char *pkt_devnode(const struct gendisk *disk, umode_t *mode)
- {
- 	return kasprintf(GFP_KERNEL, "pktcdvd/%s", disk->disk_name);
- }
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 50e358a19d98..2a455793462b 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -1413,7 +1413,7 @@ struct block_device_operations {
- 	void (*swap_slot_free_notify) (struct block_device *, unsigned long);
- 	int (*report_zones)(struct gendisk *, sector_t sector,
- 			unsigned int nr_zones, report_zones_cb cb, void *data);
--	char *(*devnode)(struct gendisk *disk, umode_t *mode);
-+	char *(*devnode)(const struct gendisk *disk, umode_t *mode);
- 	/* returns the length of the identifier or a negative errno: */
- 	int (*get_unique_id)(struct gendisk *disk, u8 id[16],
- 			enum blk_unique_id id_type);
--- 
-2.38.1
-
+Are you guaranteed that it's "sufficiently" aligned on storage so
+that it fits entirely within a single page?  If not, you'll have
+to copy it, vmap it, or fix libfdt to handle a segmented buffer.
