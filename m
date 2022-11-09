@@ -2,66 +2,82 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30B68C4332F
-	for <linux-block@archiver.kernel.org>; Wed,  9 Nov 2022 08:26:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 678EBC433FE
+	for <linux-block@archiver.kernel.org>; Wed,  9 Nov 2022 08:30:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229818AbiKII0v (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 9 Nov 2022 03:26:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39736 "EHLO
+        id S230078AbiKII36 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 9 Nov 2022 03:29:58 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41336 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229814AbiKII0t (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 9 Nov 2022 03:26:49 -0500
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A7D313D33
-        for <linux-block@vger.kernel.org>; Wed,  9 Nov 2022 00:26:49 -0800 (PST)
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 5473D68AFE; Wed,  9 Nov 2022 09:26:45 +0100 (CET)
-Date:   Wed, 9 Nov 2022 09:26:45 +0100
-From:   Christoph Hellwig <hch@lst.de>
-To:     Yu Kuai <yukuai1@huaweicloud.com>
-Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        Alasdair Kergon <agk@redhat.com>,
-        Mike Snitzer <snitzer@kernel.org>, dm-devel@redhat.com,
-        linux-block@vger.kernel.org, "yukuai (C)" <yukuai3@huawei.com>
-Subject: Re: [PATCH 5/7] dm: track per-add_disk holder relations in DM
-Message-ID: <20221109082645.GA14093@lst.de>
-References: <20221030153120.1045101-1-hch@lst.de> <20221030153120.1045101-6-hch@lst.de> <9b5b4c2a-6566-2fb4-d3ae-4904f0889ea0@huaweicloud.com>
+        with ESMTP id S230080AbiKII3m (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 9 Nov 2022 03:29:42 -0500
+Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 10E2728B;
+        Wed,  9 Nov 2022 00:28:53 -0800 (PST)
+Received: from canpemm500002.china.huawei.com (unknown [172.30.72.55])
+        by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4N6dQt37Fvz15MQX;
+        Wed,  9 Nov 2022 16:28:38 +0800 (CST)
+Received: from [10.169.59.127] (10.169.59.127) by
+ canpemm500002.china.huawei.com (7.192.104.244) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31; Wed, 9 Nov 2022 16:28:50 +0800
+Subject: Re: [PATCH 3/3] nvme: Convert NVMe errors to PT_STS errors
+To:     Mike Christie <michael.christie@oracle.com>, <kbusch@kernel.org>,
+        <axboe@fb.com>, <hch@lst.de>, <sagi@grimberg.me>,
+        <martin.petersen@oracle.com>, <jejb@linux.ibm.com>,
+        <linux-scsi@vger.kernel.org>, <linux-nvme@lists.infradead.org>,
+        <linux-block@vger.kernel.org>
+References: <20221109031106.201324-1-michael.christie@oracle.com>
+ <20221109031106.201324-4-michael.christie@oracle.com>
+From:   Chao Leng <lengchao@huawei.com>
+Message-ID: <9df9d0cf-5583-ccfd-ffd7-54432767fdfb@huawei.com>
+Date:   Wed, 9 Nov 2022 16:28:49 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <9b5b4c2a-6566-2fb4-d3ae-4904f0889ea0@huaweicloud.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <20221109031106.201324-4-michael.christie@oracle.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.169.59.127]
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ canpemm500002.china.huawei.com (7.192.104.244)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Nov 09, 2022 at 10:08:14AM +0800, Yu Kuai wrote:
->> diff --git a/drivers/md/dm.c b/drivers/md/dm.c
->> index 2917700b1e15c..7b0d6dc957549 100644
->> --- a/drivers/md/dm.c
->> +++ b/drivers/md/dm.c
->> @@ -751,9 +751,16 @@ static struct table_device *open_table_device(struct mapped_device *md,
->>   		goto out_free_td;
->>   	}
->>   -	r = bd_link_disk_holder(bdev, dm_disk(md));
->> -	if (r)
->> -		goto out_blkdev_put;
->> +	/*
->> +	 * We can be called before the dm disk is added.  In that case we can't
->> +	 * register the holder relation here.  It will be done once add_disk was
->> +	 * called.
->> +	 */
->> +	if (md->disk->slave_dir) {
-> If device_add_disk() or del_gendisk() can concurrent with this, It seems
-> to me that using 'slave_dir' is not safe.
->
-> I'm not quite familiar with dm, can we guarantee that they can't
-> concurrent?
 
-I assumed dm would not get itself into territory were creating /
-deleting the device could race with adding component devices, but
-digging deeper I can't find anything.  This could be done
-by holding table_devices_lock around add_disk/del_gendisk, but
-I'm not that familar with the dm code.
 
-Mike, can you help out on this?
+On 2022/11/9 11:11, Mike Christie wrote:
+> This converts the NVMe errors we could see during PR handling to PT_STS
+> errors, so pr_ops callers can handle scsi and nvme errors without knowing
+> the device types.
+> 
+> Signed-off-by: Mike Christie <michael.christie@oracle.com>
+> ---
+>   drivers/nvme/host/core.c | 42 ++++++++++++++++++++++++++++++++++++++--
+>   1 file changed, 40 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+> index dc4220600585..8f0177045a2f 100644
+> --- a/drivers/nvme/host/core.c
+> +++ b/drivers/nvme/host/core.c
+> @@ -2104,11 +2104,43 @@ static int nvme_send_ns_pr_command(struct nvme_ns *ns, struct nvme_command *c,
+>   	return nvme_submit_sync_cmd(ns->queue, c, data, 16);
+>   }
+>   
+> +static enum pr_status nvme_sc_to_pr_status(int nvme_sc)
+> +{
+> +	enum pr_status sts;
+> +
+> +	switch (nvme_sc) {
+> +	case NVME_SC_SUCCESS:
+> +		sts = PR_STS_SUCCESS;
+> +		break;
+> +	case NVME_SC_RESERVATION_CONFLICT:
+> +		sts = PR_STS_RESERVATION_CONFLICT;
+> +		break;
+> +	case NVME_SC_HOST_PATH_ERROR:
+> +		sts = PR_STS_PATH_FAILED;
+All path-related errors should be considered.
