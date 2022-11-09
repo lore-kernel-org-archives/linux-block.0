@@ -2,126 +2,78 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 68699C4332F
-	for <linux-block@archiver.kernel.org>; Wed,  9 Nov 2022 13:11:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F0E1C4332F
+	for <linux-block@archiver.kernel.org>; Wed,  9 Nov 2022 13:14:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229984AbiKINLB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 9 Nov 2022 08:11:01 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47176 "EHLO
+        id S229850AbiKINOP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 9 Nov 2022 08:14:15 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49446 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229993AbiKINK4 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 9 Nov 2022 08:10:56 -0500
-Received: from fudo.makrotopia.org (fudo.makrotopia.org [IPv6:2a07:2ec0:3002::71])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7ED8F1B1F1;
-        Wed,  9 Nov 2022 05:10:53 -0800 (PST)
-Received: from local
-        by fudo.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-         (Exim 4.94.2)
-        (envelope-from <daniel@makrotopia.org>)
-        id 1oskqh-000828-0n; Wed, 09 Nov 2022 14:10:35 +0100
-Date:   Wed, 9 Nov 2022 13:10:31 +0000
-From:   Daniel Golle <daniel@makrotopia.org>
-To:     Miquel Raynal <miquel.raynal@bootlin.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, Richard Weinberger <richard@nod.at>,
-        Vignesh Raghavendra <vigneshr@ti.com>,
-        Davidlohr Bueso <dave@stgolabs.net>,
-        Matthew Wilcox <willy@infradead.org>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mtd@lists.infradead.org,
-        linux-efi@vger.kernel.org
-Subject: Re: [PATCH v4 4/5] mtd_blkdevs: add option to enable scanning for
- partitions
-Message-ID: <Y2umx75DC8+XDlgd@makrotopia.org>
-References: <Y2rgbfpYfpbLKHaf@makrotopia.org>
- <20221109134526.158047e1@xps-13>
+        with ESMTP id S229669AbiKINOP (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 9 Nov 2022 08:14:15 -0500
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B34226ADC;
+        Wed,  9 Nov 2022 05:14:14 -0800 (PST)
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id 2991D68AA6; Wed,  9 Nov 2022 14:14:10 +0100 (CET)
+Date:   Wed, 9 Nov 2022 14:14:09 +0100
+From:   Christoph Hellwig <hch@lst.de>
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        Mike Snitzer <snitzer@kernel.org>,
+        "Theodore Y. Ts'o" <tytso@mit.edu>,
+        Jaegeuk Kim <jaegeuk@kernel.org>, dm-devel@redhat.com,
+        linux-block@vger.kernel.org, linux-fscrypt@vger.kernel.org
+Subject: Re: [PATCH 1/3] blk-crypto: don't use struct request_queue for
+ public interfaces
+Message-ID: <20221109131409.GD32628@lst.de>
+References: <20221107144229.1547370-1-hch@lst.de> <20221107144229.1547370-2-hch@lst.de> <Y2lnloNN5wovDBMF@sol.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20221109134526.158047e1@xps-13>
+In-Reply-To: <Y2lnloNN5wovDBMF@sol.localdomain>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Miquel,
+On Mon, Nov 07, 2022 at 12:16:22PM -0800, Eric Biggers wrote:
+> On Mon, Nov 07, 2022 at 03:42:27PM +0100, Christoph Hellwig wrote:
+> > diff --git a/block/blk-crypto.c b/block/blk-crypto.c
+> > index a496aaef85ba4..0e0c2fc56c428 100644
+> > --- a/block/blk-crypto.c
+> > +++ b/block/blk-crypto.c
+> > @@ -357,17 +357,18 @@ int blk_crypto_init_key(struct blk_crypto_key *blk_key, const u8 *raw_key,
+> >   * request queue it's submitted to supports inline crypto, or the
+> >   * blk-crypto-fallback is enabled and supports the cfg).
+> >   */
+> 
+> Replace "request queue" with block_device in the above comment?
 
-On Wed, Nov 09, 2022 at 01:45:26PM +0100, Miquel Raynal wrote:
-> Hi Daniel,
-> 
-> daniel@makrotopia.org wrote on Tue, 8 Nov 2022 23:04:13 +0000:
-> 
-> > Add Kconfig boolean CONFIG_MTD_BLOCK_PARTITIONS and enable block
-> > partition parsers on non-NAND mtdblock devices in case it is selected.
-> > 
-> > Signed-off-by: Daniel Golle <daniel@makrotopia.org>
-> > Acked-by: Miquel Raynal <miquel.raynal@bootlin.com>
-> > ---
-> >  drivers/mtd/Kconfig       | 11 +++++++++++
-> >  drivers/mtd/mtd_blkdevs.c |  4 +++-
-> >  2 files changed, 14 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/drivers/mtd/Kconfig b/drivers/mtd/Kconfig
-> > index 796a2eccbef0..12874dec1569 100644
-> > --- a/drivers/mtd/Kconfig
-> > +++ b/drivers/mtd/Kconfig
-> > @@ -69,6 +69,17 @@ config MTD_BLOCK_RO
-> >  	  You do not need this option for use with the DiskOnChip devices. For
-> >  	  those, enable NFTL support (CONFIG_NFTL) instead.
-> >  
-> > +config MTD_BLOCK_PARTITIONS
-> > +	bool "Scan for partitions on MTD block devices"
-> > +	depends on MTD_BLOCK || MTD_BLOCK_RO
-> > +	default y if FIT_PARTITION
-> > +	help
-> > +	  Scan MTD block devices for partitions (ie. MBR, GPT, uImage.FIT, ...).
-> > +	  (NAND devices are omitted, ubiblock should be used instead when)
-> > +
-> > +	  Unless your MTD partitions contain sub-partitions mapped using a
-> > +	  partition table, say no.
-> 
-> Actually I know I've acked this patch in the past but I am now
-> wondering again if this is the right way so I would like to discuss
-> this again. I don't feel making partitions on top of blk devices like
-> that is the right solution. Why not using the advanced partition
-> parsers that we now have in MTD to create these subpartitions and then
-> have blocks emulated on top of them?
+Done.
 
-Simply because then we would need the same parser implemented one time
-as block/partitions/fit.c (for devices booting from SATA or eMMC, for
-example) and then another time as drivers/mtd/parsers/parse_fit.c (for
-devices using raw NOR flash) and for UBI there isn't even any
-infrastructure allowing the dynamic splitting of UBI volumes (hence we
-would need to invent a new splitting/partitioning mechanism on top of
-UBI just for that).
-
-Using the block partition parser as common ground for all three storage
-types typically found in embedded devices seemed like the best idea, as
-in that way I only had to implement the uImage.FIT parser once.
-
-
+> > -	       __blk_crypto_cfg_supported(q->crypto_profile, cfg);
+> > +	       __blk_crypto_cfg_supported(bdev_get_queue(bdev)->crypto_profile,
+> > +	       				  cfg);
+> >  }
 > 
-> > +
-> >  comment "Note that in some cases UBI block is preferred. See MTD_UBI_BLOCK."
-> >  	depends on MTD_BLOCK || MTD_BLOCK_RO
-> >  
-> > diff --git a/drivers/mtd/mtd_blkdevs.c b/drivers/mtd/mtd_blkdevs.c
-> > index 60b222799871..e6f2e0888246 100644
-> > --- a/drivers/mtd/mtd_blkdevs.c
-> > +++ b/drivers/mtd/mtd_blkdevs.c
-> > @@ -359,7 +359,9 @@ int add_mtd_blktrans_dev(struct mtd_blktrans_dev *new)
-> >  	} else {
-> >  		snprintf(gd->disk_name, sizeof(gd->disk_name),
-> >  			 "%s%d", tr->name, new->devnum);
-> > -		gd->flags |= GENHD_FL_NO_PART;
-> > +
-> > +		if (!IS_ENABLED(CONFIG_MTD_BLOCK_PARTITIONS) || mtd_type_is_nand(new->mtd))
-> > +			gd->flags |= GENHD_FL_NO_PART;
-> >  	}
-> >  
-> >  	set_capacity(gd, ((u64)new->size * tr->blksize) >> 9);
+> There's a whitespace error here:
+
+Fixed.
+
+> >	/*
+> >        * If the request_queue didn't support the key, then blk-crypto-fallback
+> >        * may have been used, so try to evict the key from blk-crypto-fallback.
+> >        */
+> >	return blk_crypto_fallback_evict_key(key);
 > 
+> Likewise, s/request_queue/block_device/ in the above comment.
+
+Done.
+
+> > struct request;
+> > struct request_queue;
 > 
-> Thanks,
-> Miquèl
+> These forward declarations are no longer needed and can be removed.
+
+Done.
