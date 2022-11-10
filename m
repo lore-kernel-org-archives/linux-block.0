@@ -2,57 +2,59 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C6C2C433FE
-	for <linux-block@archiver.kernel.org>; Thu, 10 Nov 2022 09:28:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89FADC433FE
+	for <linux-block@archiver.kernel.org>; Thu, 10 Nov 2022 09:43:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229764AbiKJJ2S (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 10 Nov 2022 04:28:18 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51658 "EHLO
+        id S229625AbiKJJm6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 10 Nov 2022 04:42:58 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60370 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229791AbiKJJ2R (ORCPT
+        with ESMTP id S229530AbiKJJm5 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 10 Nov 2022 04:28:17 -0500
+        Thu, 10 Nov 2022 04:42:57 -0500
 Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E73E6A6B7;
-        Thu, 10 Nov 2022 01:28:15 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 813EB6A6B5;
+        Thu, 10 Nov 2022 01:42:55 -0800 (PST)
 Received: from mail02.huawei.com (unknown [172.30.67.153])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4N7Gj51hJjz4f3kpk;
-        Thu, 10 Nov 2022 17:28:09 +0800 (CST)
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4N7H215c4Pz4f3lXR;
+        Thu, 10 Nov 2022 17:42:49 +0800 (CST)
 Received: from [10.174.176.73] (unknown [10.174.176.73])
-        by APP4 (Coremail) with SMTP id gCh0CgDH69gqxGxjfpcmAQ--.40494S3;
-        Thu, 10 Nov 2022 17:28:12 +0800 (CST)
-Subject: Re: [PATCH] block, bfq: do the all counting of pending-request if
- CONFIG_BFQ_GROUP_IOSCHED is enabled
-To:     Yuwei Guan <ssawgyw@gmail.com>, paolo.valente@linaro.org,
-        axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Yuwei.Guan@zeekrlife.com, "yukuai (C)" <yukuai3@huawei.com>
-References: <20221109132914.438777-1-Yuwei.Guan@zeekrlife.com>
+        by APP4 (Coremail) with SMTP id gCh0CgAnmdaZx2xjKConAQ--.43490S3;
+        Thu, 10 Nov 2022 17:42:51 +0800 (CST)
+Subject: Re: [PATCH] sbitmap: Use single per-bitmap counting to wake up queued
+ tags
+To:     Gabriel Krisman Bertazi <krisman@suse.de>, axboe@kernel.dk
+Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        Hugh Dickins <hughd@google.com>,
+        Keith Busch <kbusch@kernel.org>,
+        Liu Song <liusong@linux.alibaba.com>, Jan Kara <jack@suse.cz>,
+        "yukuai (C)" <yukuai3@huawei.com>
+References: <20221105231055.25953-1-krisman@suse.de>
 From:   Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <52ccc3f0-a628-a9bf-f604-3b86dd34b006@huaweicloud.com>
-Date:   Thu, 10 Nov 2022 17:28:10 +0800
+Message-ID: <2a445c5c-fd15-c0bf-8655-2fb5bde3fe67@huaweicloud.com>
+Date:   Thu, 10 Nov 2022 17:42:49 +0800
 User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20221109132914.438777-1-Yuwei.Guan@zeekrlife.com>
+In-Reply-To: <20221105231055.25953-1-krisman@suse.de>
 Content-Type: text/plain; charset=gbk; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgDH69gqxGxjfpcmAQ--.40494S3
-X-Coremail-Antispam: 1UD129KBjvJXoW3Gw4UJr1xXF1UCw4UWFy7GFg_yoW7Xr4kpa
-        9Ig3WUCF15JrsYgry5Ja18Xr93Wrn3uF9FkFWvy34Skr47Ar9xt3ZIkr1rZryIgr95Aw47
-        ZF1FgryDZw17AFJanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUkjb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
+X-CM-TRANSID: gCh0CgAnmdaZx2xjKConAQ--.43490S3
+X-Coremail-Antispam: 1UD129KBjvJXoWfGF18Zw45uryktFyDCw1fCrg_yoWDtw4UpF
+        W3GFn7Za1ktry29r4DJr4UAa4a9w4kKr9xGr4fK34rCwsrtrnYvrn5KFZ3ZrW8Ars8Kay5
+        Jr4agrsxCa47ZaDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUk0b4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
         6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
         vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7Cj
         xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
         0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
-        6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
+        6I80ewAv7VC0I7IYx2IY67AKxVWUGVWUXwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
         Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JMxk0xIA0c2IEe2xFo4CEbIxvr21l42xK82IYc2Ij
         64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x
-        8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r126r1DMIIYrxkI7VAKI48JMIIF0xvE
-        2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42
-        xK8VAvwI8IcIk0rVWrZr1j6s0DMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIE
-        c7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x07UWE__UUUUU=
+        8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE
+        2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42
+        xK8VAvwI8IcIk0rVWrJr0_WFyUJwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv
+        6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUOyCJDUUUU
 X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 X-CFilter-Loop: Reflected
 Precedence: bulk
@@ -61,148 +63,306 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 Hi,
 
-在 2022/11/09 21:29, Yuwei Guan 写道:
-> The 'bfqd->num_groups_with_pending_reqs' is used when
-> CONFIG_BFQ_GROUP_IOSCHED is enabled, so let the variables and processes
-> take effect when ONFIG_BFQ_GROUP_IOSCHED is enabled.
+在 2022/11/06 7:10, Gabriel Krisman Bertazi 写道:
+> sbitmap suffers from code complexity, as demonstrated by recent fixes,
+> and eventual lost wake ups on nested I/O completion.  The later happens,
+> from what I understand, due to the non-atomic nature of the updates to
+> wait_cnt, which needs to be subtracted and eventually reset when equal
+> to zero.  This two step process can eventually miss an update when a
+> nested completion happens to interrupt the CPU in between the wait_cnt
+> updates.  This is very hard to fix, as shown by the recent changes to
+> this code.
 > 
-> Cc: Yu Kuai <yukuai3@huawei.com>
-> Signed-off-by: Yuwei Guan <Yuwei.Guan@zeekrlife.com>
+> The code complexity arises mostly from the corner cases to avoid missed
+> wakes in this scenario.  In addition, the handling of wake_batch
+> recalculation plus the synchronization with sbq_queue_wake_up is
+> non-trivial.
+> 
+> This patchset implements the idea originally proposed by Jan [1], which
+> removes the need for the two-step updates of wait_cnt.  This is done by
+> tracking the number of completions and wakeups in always increasing,
+> per-bitmap counters.  Instead of having to reset the wait_cnt when it
+> reaches zero, we simply keep counting, and attempt to wake up N threads
+> in a single wait queue whenever there is enough space for a batch.
+> Waking up less than batch_wake shouldn't be a problem, because we
+> haven't changed the conditions for wake up, and the existing batch
+> calculation guarantees at least enough remaining completions to wake up
+> a batch for each queue at any time.
+> 
+> Performance-wise, one should expect very similar performance to the
+> original algorithm for the case where there is no queueing.  In both the
+> old algorithm and this implementation, the first thing is to check
+> ws_active, which bails out if there is no queueing to be managed. In the
+> new code, we took care to avoid accounting completions and wakeups when
+> there is no queueing, to not pay the cost of atomic operations
+> unnecessarily, since it doesn't skew the numbers.
+> 
+> For more interesting cases, where there is queueing, we need to take
+> into account the cross-communication of the atomic operations.  I've
+> been benchmarking by running parallel fio jobs against a single hctx
+> nullb in different hardware queue depth scenarios, and verifying both
+> IOPS and queueing.
+> 
+> Each experiment was repeated 5 times on a 20-CPU box, with 20 parallel
+> jobs. fio was issuing fixed-size randwrites with qd=64 against nullb,
+> varying only the hardware queue length per test.
+> 
+> queue size 2                 4                 8                 16                 32                 64
+> 6.1-rc2    1681.1K (1.6K)    2633.0K (12.7K)   6940.8K (16.3K)   8172.3K (617.5K)   8391.7K (367.1K)   8606.1K (351.2K)
+> patched    1721.8K (15.1K)   3016.7K (3.8K)    7543.0K (89.4K)   8132.5K (303.4K)   8324.2K (230.6K)   8401.8K (284.7K)
+> 
+> The following is a similar experiment, ran against a nullb with a single
+> bitmap shared by 20 hctx spread across 2 NUMA nodes. This has 40
+> parallel fio jobs operating on the same device
+> 
+> queue size 2 	             4                 8              	16             	    32		       64
+> 6.1-rc2	   1081.0K (2.3K)    957.2K (1.5K)     1699.1K (5.7K) 	6178.2K (124.6K)    12227.9K (37.7K)   13286.6K (92.9K)
+> patched	   1081.8K (2.8K)    1316.5K (5.4K)    2364.4K (1.8K) 	6151.4K  (20.0K)    11893.6K (17.5K)   12385.6K (18.4K)
+> 
+> It has also survived blktests and a 12h-stress run against nullb. I also
+> ran the code against nvme and a scsi SSD, and I didn't observe
+> performance regression in those. If there are other tests you think I
+> should run, please let me know and I will follow up with results.
+> 
+> [1] https://lore.kernel.org/all/aef9de29-e9f5-259a-f8be-12d1b734e72@google.com/
+> 
+> Cc: Hugh Dickins <hughd@google.com>
+> Cc: Keith Busch <kbusch@kernel.org>
+> Cc: Liu Song <liusong@linux.alibaba.com>
+> Suggested-by: Jan Kara <jack@suse.cz>
+> Signed-off-by: Gabriel Krisman Bertazi <krisman@suse.de>
 > ---
->   block/bfq-iosched.c |  5 ++++-
->   block/bfq-iosched.h |  6 ++++++
->   block/bfq-wf2q.c    | 10 ++++++----
->   3 files changed, 16 insertions(+), 5 deletions(-)
+>   include/linux/sbitmap.h |  16 ++++--
+>   lib/sbitmap.c           | 122 +++++++++-------------------------------
+>   2 files changed, 37 insertions(+), 101 deletions(-)
 > 
-> diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-> index 2381cf220ba2..5a648433fd89 100644
-> --- a/block/bfq-iosched.c
-> +++ b/block/bfq-iosched.c
-> @@ -6192,8 +6192,9 @@ static void bfq_completed_request(struct bfq_queue *bfqq, struct bfq_data *bfqd)
->   		 * mechanism).
->   		 */
->   		bfqq->budget_timeout = jiffies;
+> diff --git a/include/linux/sbitmap.h b/include/linux/sbitmap.h
+> index 4d2d5205ab58..d662cf136021 100644
+> --- a/include/linux/sbitmap.h
+> +++ b/include/linux/sbitmap.h
+> @@ -86,11 +86,6 @@ struct sbitmap {
+>    * struct sbq_wait_state - Wait queue in a &struct sbitmap_queue.
+>    */
+>   struct sbq_wait_state {
+> -	/**
+> -	 * @wait_cnt: Number of frees remaining before we wake up.
+> -	 */
+> -	atomic_t wait_cnt;
 > -
-> +#ifdef CONFIG_BFQ_GROUP_IOSCHED
->   		bfq_del_bfqq_in_groups_with_pending_reqs(bfqq);
-> +#endif
->   		bfq_weights_tree_remove(bfqq);
+>   	/**
+>   	 * @wait: Wait queue.
+>   	 */
+> @@ -138,6 +133,17 @@ struct sbitmap_queue {
+>   	 * sbitmap_queue_get_shallow()
+>   	 */
+>   	unsigned int min_shallow_depth;
+> +
+> +	/**
+> +	 * @completion_cnt: Number of bits cleared passed to the
+> +	 * wakeup function.
+> +	 */
+> +	atomic_t completion_cnt;
+> +
+> +	/**
+> +	 * @wakeup_cnt: Number of thread wake ups issued.
+> +	 */
+> +	atomic_t wakeup_cnt;
+>   };
+>   
+>   /**
+> diff --git a/lib/sbitmap.c b/lib/sbitmap.c
+> index 7280ae8ca88c..eca462cba398 100644
+> --- a/lib/sbitmap.c
+> +++ b/lib/sbitmap.c
+> @@ -434,6 +434,8 @@ int sbitmap_queue_init_node(struct sbitmap_queue *sbq, unsigned int depth,
+>   	sbq->wake_batch = sbq_calc_wake_batch(sbq, depth);
+>   	atomic_set(&sbq->wake_index, 0);
+>   	atomic_set(&sbq->ws_active, 0);
+> +	atomic_set(&sbq->completion_cnt, 0);
+> +	atomic_set(&sbq->wakeup_cnt, 0);
+>   
+>   	sbq->ws = kzalloc_node(SBQ_WAIT_QUEUES * sizeof(*sbq->ws), flags, node);
+>   	if (!sbq->ws) {
+> @@ -441,40 +443,21 @@ int sbitmap_queue_init_node(struct sbitmap_queue *sbq, unsigned int depth,
+>   		return -ENOMEM;
 >   	}
+>   
+> -	for (i = 0; i < SBQ_WAIT_QUEUES; i++) {
+> +	for (i = 0; i < SBQ_WAIT_QUEUES; i++)
+>   		init_waitqueue_head(&sbq->ws[i].wait);
+> -		atomic_set(&sbq->ws[i].wait_cnt, sbq->wake_batch);
+> -	}
+>   
+>   	return 0;
+>   }
+>   EXPORT_SYMBOL_GPL(sbitmap_queue_init_node);
+>   
+> -static inline void __sbitmap_queue_update_wake_batch(struct sbitmap_queue *sbq,
+> -					    unsigned int wake_batch)
+> -{
+> -	int i;
+> -
+> -	if (sbq->wake_batch != wake_batch) {
+> -		WRITE_ONCE(sbq->wake_batch, wake_batch);
+> -		/*
+> -		 * Pairs with the memory barrier in sbitmap_queue_wake_up()
+> -		 * to ensure that the batch size is updated before the wait
+> -		 * counts.
+> -		 */
+> -		smp_mb();
+> -		for (i = 0; i < SBQ_WAIT_QUEUES; i++)
+> -			atomic_set(&sbq->ws[i].wait_cnt, 1);
+> -	}
+> -}
+> -
+>   static void sbitmap_queue_update_wake_batch(struct sbitmap_queue *sbq,
+>   					    unsigned int depth)
+>   {
+>   	unsigned int wake_batch;
+>   
+>   	wake_batch = sbq_calc_wake_batch(sbq, depth);
+> -	__sbitmap_queue_update_wake_batch(sbq, wake_batch);
+> +	if (sbq->wake_batch != wake_batch)
+> +		WRITE_ONCE(sbq->wake_batch, wake_batch);
+>   }
+>   
+>   void sbitmap_queue_recalculate_wake_batch(struct sbitmap_queue *sbq,
+> @@ -488,7 +471,8 @@ void sbitmap_queue_recalculate_wake_batch(struct sbitmap_queue *sbq,
+>   
+>   	wake_batch = clamp_val(depth / SBQ_WAIT_QUEUES,
+>   			min_batch, SBQ_WAKE_BATCH);
+> -	__sbitmap_queue_update_wake_batch(sbq, wake_batch);
+> +
+> +	WRITE_ONCE(sbq->wake_batch, wake_batch);
+>   }
+>   EXPORT_SYMBOL_GPL(sbitmap_queue_recalculate_wake_batch);
+>   
+> @@ -587,7 +571,7 @@ static struct sbq_wait_state *sbq_wake_ptr(struct sbitmap_queue *sbq)
+>   	for (i = 0; i < SBQ_WAIT_QUEUES; i++) {
+>   		struct sbq_wait_state *ws = &sbq->ws[wake_index];
+>   
+> -		if (waitqueue_active(&ws->wait) && atomic_read(&ws->wait_cnt)) {
+> +		if (waitqueue_active(&ws->wait)) {
+>   			if (wake_index != atomic_read(&sbq->wake_index))
+>   				atomic_set(&sbq->wake_index, wake_index);
+>   			return ws;
+> @@ -599,83 +583,31 @@ static struct sbq_wait_state *sbq_wake_ptr(struct sbitmap_queue *sbq)
+>   	return NULL;
+>   }
+>   
+> -static bool __sbq_wake_up(struct sbitmap_queue *sbq, int *nr)
+> +void sbitmap_queue_wake_up(struct sbitmap_queue *sbq, int nr)
+>   {
+> -	struct sbq_wait_state *ws;
+> -	unsigned int wake_batch;
+> -	int wait_cnt, cur, sub;
+> -	bool ret;
+> +	unsigned int wake_batch = READ_ONCE(sbq->wake_batch);
+> +	struct sbq_wait_state *ws = NULL;
+> +	unsigned int wakeups;
+>   
+> -	if (*nr <= 0)
+> -		return false;
+> +	if (!atomic_read(&sbq->ws_active))
+> +		return;
+>   
+> -	ws = sbq_wake_ptr(sbq);
+> -	if (!ws)
+> -		return false;
+> +	atomic_add(nr, &sbq->completion_cnt);
+> +	wakeups = atomic_read(&sbq->wakeup_cnt);
+>   
+> -	cur = atomic_read(&ws->wait_cnt);
+>   	do {
+> -		/*
+> -		 * For concurrent callers of this, callers should call this
+> -		 * function again to wakeup a new batch on a different 'ws'.
+> -		 */
+> -		if (cur == 0)
+> -			return true;
+> -		sub = min(*nr, cur);
+> -		wait_cnt = cur - sub;
+> -	} while (!atomic_try_cmpxchg(&ws->wait_cnt, &cur, wait_cnt));
+> -
+> -	/*
+> -	 * If we decremented queue without waiters, retry to avoid lost
+> -	 * wakeups.
+> -	 */
+> -	if (wait_cnt > 0)
+> -		return !waitqueue_active(&ws->wait);
+> +		if (atomic_read(&sbq->completion_cnt) - wakeups < wake_batch)
+> +			return;
 
-Thanks for the patch, this make sense. However, I prefer to
-declare a empty function if the config is disabled instead of adding
-"#ifdef" everywhere the function is called.
+Should it be considered that completion_cnt overflow and becomes
+negtive?
 
 Thanks,
 Kuai
 >   
-> @@ -7051,7 +7052,9 @@ static int bfq_init_queue(struct request_queue *q, struct elevator_type *e)
->   	bfqd->idle_slice_timer.function = bfq_idle_slice_timer;
+> -	*nr -= sub;
+> -
+> -	/*
+> -	 * When wait_cnt == 0, we have to be particularly careful as we are
+> -	 * responsible to reset wait_cnt regardless whether we've actually
+> -	 * woken up anybody. But in case we didn't wakeup anybody, we still
+> -	 * need to retry.
+> -	 */
+> -	ret = !waitqueue_active(&ws->wait);
+> -	wake_batch = READ_ONCE(sbq->wake_batch);
+> +		if (!ws) {
+> +			ws = sbq_wake_ptr(sbq);
+> +			if (!ws)
+> +				return;
+> +		}
+> +	} while (!atomic_try_cmpxchg(&sbq->wakeup_cnt,
+> +				     &wakeups, wakeups + wake_batch));
 >   
->   	bfqd->queue_weights_tree = RB_ROOT_CACHED;
-> +#ifdef CONFIG_BFQ_GROUP_IOSCHED
->   	bfqd->num_groups_with_pending_reqs = 0;
-> +#endif
->   
->   	INIT_LIST_HEAD(&bfqd->active_list);
->   	INIT_LIST_HEAD(&bfqd->idle_list);
-> diff --git a/block/bfq-iosched.h b/block/bfq-iosched.h
-> index 9fa89577322d..d6b9fad28a3b 100644
-> --- a/block/bfq-iosched.h
-> +++ b/block/bfq-iosched.h
-> @@ -197,8 +197,10 @@ struct bfq_entity {
->   	/* flag, set to request a weight, ioprio or ioprio_class change  */
->   	int prio_changed;
->   
-> +#ifdef CONFIG_BFQ_GROUP_IOSCHED
->   	/* flag, set if the entity is counted in groups_with_pending_reqs */
->   	bool in_groups_with_pending_reqs;
-> +#endif
->   
->   	/* last child queue of entity created (for non-leaf entities) */
->   	struct bfq_queue *last_bfqq_created;
-> @@ -491,6 +493,7 @@ struct bfq_data {
->   	 */
->   	struct rb_root_cached queue_weights_tree;
->   
-> +#ifdef CONFIG_BFQ_GROUP_IOSCHED
->   	/*
->   	 * Number of groups with at least one process that
->   	 * has at least one request waiting for completion. Note that
-> @@ -538,6 +541,7 @@ struct bfq_data {
->   	 * with no request waiting for completion.
->   	 */
->   	unsigned int num_groups_with_pending_reqs;
-> +#endif
->   
->   	/*
->   	 * Per-class (RT, BE, IDLE) number of bfq_queues containing
-> @@ -1074,8 +1078,10 @@ void bfq_requeue_bfqq(struct bfq_data *bfqd, struct bfq_queue *bfqq,
->   		      bool expiration);
->   void bfq_del_bfqq_busy(struct bfq_queue *bfqq, bool expiration);
->   void bfq_add_bfqq_busy(struct bfq_queue *bfqq);
-> +#ifdef CONFIG_BFQ_GROUP_IOSCHED
->   void bfq_add_bfqq_in_groups_with_pending_reqs(struct bfq_queue *bfqq);
->   void bfq_del_bfqq_in_groups_with_pending_reqs(struct bfq_queue *bfqq);
-> +#endif
->   
->   /* --------------- end of interface of B-WF2Q+ ---------------- */
->   
-> diff --git a/block/bfq-wf2q.c b/block/bfq-wf2q.c
-> index b02b53658ed4..a29187ecdc39 100644
-> --- a/block/bfq-wf2q.c
-> +++ b/block/bfq-wf2q.c
-> @@ -1610,16 +1610,15 @@ void bfq_requeue_bfqq(struct bfq_data *bfqd, struct bfq_queue *bfqq,
->   				    bfqq == bfqd->in_service_queue, expiration);
+> -	/*
+> -	 * Wake up first in case that concurrent callers decrease wait_cnt
+> -	 * while waitqueue is empty.
+> -	 */
+>   	wake_up_nr(&ws->wait, wake_batch);
+> -
+> -	/*
+> -	 * Pairs with the memory barrier in sbitmap_queue_resize() to
+> -	 * ensure that we see the batch size update before the wait
+> -	 * count is reset.
+> -	 *
+> -	 * Also pairs with the implicit barrier between decrementing wait_cnt
+> -	 * and checking for waitqueue_active() to make sure waitqueue_active()
+> -	 * sees result of the wakeup if atomic_dec_return() has seen the result
+> -	 * of atomic_set().
+> -	 */
+> -	smp_mb__before_atomic();
+> -
+> -	/*
+> -	 * Increase wake_index before updating wait_cnt, otherwise concurrent
+> -	 * callers can see valid wait_cnt in old waitqueue, which can cause
+> -	 * invalid wakeup on the old waitqueue.
+> -	 */
+> -	sbq_index_atomic_inc(&sbq->wake_index);
+> -	atomic_set(&ws->wait_cnt, wake_batch);
+> -
+> -	return ret || *nr;
+> -}
+> -
+> -void sbitmap_queue_wake_up(struct sbitmap_queue *sbq, int nr)
+> -{
+> -	while (__sbq_wake_up(sbq, &nr))
+> -		;
 >   }
+>   EXPORT_SYMBOL_GPL(sbitmap_queue_wake_up);
 >   
-> +#ifdef CONFIG_BFQ_GROUP_IOSCHED
->   void bfq_add_bfqq_in_groups_with_pending_reqs(struct bfq_queue *bfqq)
->   {
->   	struct bfq_entity *entity = &bfqq->entity;
->   
->   	if (!entity->in_groups_with_pending_reqs) {
->   		entity->in_groups_with_pending_reqs = true;
-> -#ifdef CONFIG_BFQ_GROUP_IOSCHED
->   		if (!(bfqq_group(bfqq)->num_queues_with_pending_reqs++))
->   			bfqq->bfqd->num_groups_with_pending_reqs++;
-> -#endif
+> @@ -792,9 +724,7 @@ void sbitmap_queue_show(struct sbitmap_queue *sbq, struct seq_file *m)
+>   	seq_puts(m, "ws={\n");
+>   	for (i = 0; i < SBQ_WAIT_QUEUES; i++) {
+>   		struct sbq_wait_state *ws = &sbq->ws[i];
+> -
+> -		seq_printf(m, "\t{.wait_cnt=%d, .wait=%s},\n",
+> -			   atomic_read(&ws->wait_cnt),
+> +		seq_printf(m, "\t{.wait=%s},\n",
+>   			   waitqueue_active(&ws->wait) ? "active" : "inactive");
 >   	}
->   }
->   
-> @@ -1629,12 +1628,11 @@ void bfq_del_bfqq_in_groups_with_pending_reqs(struct bfq_queue *bfqq)
->   
->   	if (entity->in_groups_with_pending_reqs) {
->   		entity->in_groups_with_pending_reqs = false;
-> -#ifdef CONFIG_BFQ_GROUP_IOSCHED
->   		if (!(--bfqq_group(bfqq)->num_queues_with_pending_reqs))
->   			bfqq->bfqd->num_groups_with_pending_reqs--;
-> -#endif
->   	}
->   }
-> +#endif
->   
->   /*
->    * Called when the bfqq no longer has requests pending, remove it from
-> @@ -1659,7 +1657,9 @@ void bfq_del_bfqq_busy(struct bfq_queue *bfqq, bool expiration)
->   	bfq_deactivate_bfqq(bfqd, bfqq, true, expiration);
->   
->   	if (!bfqq->dispatched) {
-> +#ifdef CONFIG_BFQ_GROUP_IOSCHED
->   		bfq_del_bfqq_in_groups_with_pending_reqs(bfqq);
-> +#endif
->   		/*
->   		 * Next function is invoked last, because it causes bfqq to be
->   		 * freed. DO NOT use bfqq after the next function invocation.
-> @@ -1683,7 +1683,9 @@ void bfq_add_bfqq_busy(struct bfq_queue *bfqq)
->   	bfqd->busy_queues[bfqq->ioprio_class - 1]++;
->   
->   	if (!bfqq->dispatched) {
-> +#ifdef CONFIG_BFQ_GROUP_IOSCHED
->   		bfq_add_bfqq_in_groups_with_pending_reqs(bfqq);
-> +#endif
->   		if (bfqq->wr_coeff == 1)
->   			bfq_weights_tree_add(bfqq);
->   	}
+>   	seq_puts(m, "}\n");
 > 
 
