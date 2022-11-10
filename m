@@ -2,94 +2,90 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37FA2C433FE
-	for <linux-block@archiver.kernel.org>; Thu, 10 Nov 2022 20:20:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1775BC4332F
+	for <linux-block@archiver.kernel.org>; Thu, 10 Nov 2022 20:33:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231819AbiKJUUg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 10 Nov 2022 15:20:36 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33202 "EHLO
+        id S232037AbiKJUdU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 10 Nov 2022 15:33:20 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41100 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231733AbiKJUUW (ORCPT
+        with ESMTP id S231948AbiKJUdF (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 10 Nov 2022 15:20:22 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 82AAC54B23
-        for <linux-block@vger.kernel.org>; Thu, 10 Nov 2022 12:18:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1668111532;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=RgL5/7r9Wym/g+B0pjsz3dgQTgEurnPH1LtAMA+rvcc=;
-        b=fA+MyxA8PFS7ZZaOIOfiYcH/TLQYP0xN3ikgNtyiM2Q2TNotYU9VDtBhcT3NCgpMfRGhhG
-        VTmRtMMwYIKm6jcCoH63OWDUWcRXew8QG5OvAcNeEvePDstEFIQhxPfpJAPaTntt8RJXCx
-        kiyYZKvXwv3LitqB4eok+A1eJdOps8g=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-29-x0G0q06wN6qNKRWnBYHEWQ-1; Thu, 10 Nov 2022 15:18:41 -0500
-X-MC-Unique: x0G0q06wN6qNKRWnBYHEWQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 013238582B9;
-        Thu, 10 Nov 2022 20:18:41 +0000 (UTC)
-Received: from localhost (unknown [10.39.192.6])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 768171121330;
-        Thu, 10 Nov 2022 20:18:39 +0000 (UTC)
-Date:   Thu, 10 Nov 2022 15:18:38 -0500
-From:   Stefan Hajnoczi <stefanha@redhat.com>
-To:     Angus Chen <angus.chen@jaguarmicro.com>
-Cc:     jasowang@redhat.com, mst@redhat.com, axboe@kernel.dk,
-        virtualization@lists.linux-foundation.org,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        pbonzini@redhat.com
-Subject: Re: [PATCH] virtio_blk: use UINT_MAX instead of -1U
-Message-ID: <Y21cnhr1q6e6oNhp@fedora>
-References: <20221110030124.1986-1-angus.chen@jaguarmicro.com>
+        Thu, 10 Nov 2022 15:33:05 -0500
+Received: from mail-yb1-xb29.google.com (mail-yb1-xb29.google.com [IPv6:2607:f8b0:4864:20::b29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DDED14E432
+        for <linux-block@vger.kernel.org>; Thu, 10 Nov 2022 12:33:04 -0800 (PST)
+Received: by mail-yb1-xb29.google.com with SMTP id s18so3684793ybe.10
+        for <linux-block@vger.kernel.org>; Thu, 10 Nov 2022 12:33:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=N+ymxk/qsnbKhW8YJf+YIPXdWnFarr1o3UXzpt7/nQA=;
+        b=jjCrpStI1FfNQhuzyniPwdY8XP1ZjB30bS2Bmt9EP5+LSPlXpFfXYsAPYbQYWAwF/v
+         AzO20P58nylcSRe8RV3SwXV0KcZntyUyZtLRaYTah43QJC7LkBS0yPEYsrXr6SPglp5y
+         3vY3Ehb6xcnGNhk5cPPpiBp7NRKjxlTBJvUaRqxJcL2MWTgPRZhICOQ5t0BOjSUYSpX1
+         fEjskwTolJnfKYTDoZ0gfjKvRd8FHcUn16U6uESH2SfidI1d5MNHc7lXCbZmtVHwW9Pj
+         qLRa3WQkVZTn3b5qNjX6kYeEQATMoKUIGXk79qHEhQuG6iSW32v7g4k87e7xi6u7w4yE
+         3TCg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=N+ymxk/qsnbKhW8YJf+YIPXdWnFarr1o3UXzpt7/nQA=;
+        b=rhz0RDAcT9Nw6k/vrDeDqDpjYFCyOYIpAiM0mPNnb0hXi6ig1LKlKKh9gjjKFEoaHs
+         ciB6WPGGPGOIIkPxpOMsNyVzsGD8VsrBlZw1lMiWWjcQIa7/CaO5jxXi1GU9E1YYEtpJ
+         qVU6rOLS7cW+vaKijgl7nYpGaw8GT6JdjivqIi1ytr2i6aoiG6+E/qiw4h0BWw9nQHoQ
+         DreaIVg6gasSqJ3Fe0HdO7YeV75RYQyAyiStvT7yE7LlpucZZW1+14tZkmqBvHmd9+8V
+         AY91AwlVetMebtz5O1bq9cey+KK2E2RYaE/UhGnUfWoQocFY6UjIVTWaMrhh48JkaXOA
+         MahQ==
+X-Gm-Message-State: ACrzQf10ZRg8Bk4yhJtAdpkac7EW+6vtldiR0F/utf3u2eFeBDsaeZBb
+        Z/kfIXp2bIwYWo+tmAaWY6ceF8pj3XIPfwt0UBA=
+X-Google-Smtp-Source: AMsMyM72OrWM16ASWQ0L39PC0FS2D2nEWuNTBlyxdv8KGIt0VihJF04Eb4kB4GXJpKzdfA0fV80i9pMU0lLAjXc0CUM=
+X-Received: by 2002:a05:6902:191:b0:6cd:3a43:cda3 with SMTP id
+ t17-20020a056902019100b006cd3a43cda3mr52919168ybh.207.1668112384084; Thu, 10
+ Nov 2022 12:33:04 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="EAV7xN6Mtl16GRtO"
-Content-Disposition: inline
-In-Reply-To: <20221110030124.1986-1-angus.chen@jaguarmicro.com>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
+References: <20221110053952.3378990-1-dmitry.fomichev@wdc.com>
+In-Reply-To: <20221110053952.3378990-1-dmitry.fomichev@wdc.com>
+From:   Stefan Hajnoczi <stefanha@gmail.com>
+Date:   Thu, 10 Nov 2022 15:32:52 -0500
+Message-ID: <CAJSP0QUa9R7S76SGB+d8cx0J4_0wRAQjQdxZnW4=y+GEkLPzPQ@mail.gmail.com>
+Subject: Re: [PATCH v7 0/2] virtio-blk: support zoned block devices
+To:     Dmitry Fomichev <dmitry.fomichev@wdc.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+        Hannes Reinecke <hare@suse.de>,
+        Sam Li <faithilikerun@gmail.com>,
+        virtio-dev@lists.oasis-open.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Thu, 10 Nov 2022 at 00:39, Dmitry Fomichev <dmitry.fomichev@wdc.com> wrote:
+>
+> In its current form, the virtio protocol for block devices (virtio-blk)
+> is not aware of zoned block devices (ZBDs) but it allows the driver to
+> successfully scan a host-managed drive provided by the virtio block
+> device. As the result, the host-managed drive is recognized by the
+> virtio driver as a regular, non-zoned drive that will operate
+> erroneously under the most common write workloads. Host-aware ZBDs are
+> currently usable, but their performance may not be optimal because the
+> driver can only see them as non-zoned block devices.
+>
+> To fix this, the virtio-blk protocol needs to be extended to add the
+> capabilities to convey the zone characteristics of ZBDs at the device
+> side to the driver and to provide support for ZBD-specific commands -
+> Report Zones, four zone operations (Open, Close, Finish and Reset) and
+> (optionally) Zone Append.
+>
+> The required virtio-blk protocol extensions are currently under review
+> at OASIS Technical Committee and the specification patch is linked at
+>
+> https://github.com/oasis-tcs/virtio-spec/issues/143 .
 
---EAV7xN6Mtl16GRtO
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+This patch series can be merged as soon as the VIRTIO spec change is accepted.
 
-On Thu, Nov 10, 2022 at 11:01:23AM +0800, Angus Chen wrote:
-> We use UINT_MAX to limit max_discard_sectors in virtblk_probe,
-> we can use UINT_MAX to limit max_hw_sectors for consistencies.
->=20
-> No functional change intended.
->=20
-> Signed-off-by: Angus Chen <angus.chen@jaguarmicro.com>
-> ---
->  drivers/block/virtio_blk.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-
---EAV7xN6Mtl16GRtO
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmNtXJ4ACgkQnKSrs4Gr
-c8hFTgf/VUUpU5e4Be8XmTk5FyYOu+JeRz6prpVZEnfw7rKvvZc4O2NVtavIYV/7
-LbYA3WCbconInnqACqX1fCZ300zS0cWIYx9qFWTCcekj5eTJx2iM//3PWz605Lld
-kA/B4A8Y9uJphud/8BLpVb58J8QGHPbLL5iSY9Ql/8jivezW8hniEQZVYoGjqECJ
-84BZ1KIZ7ZdTGucZq7a3f1qLrafA5f5uTRQ9qk9dEwPJlBSSZauu+k1ehQQYdNv4
-thqgGOkGl7Kygq2sGDAGP0DOTQ9f6jIACqZlaYPEPBLvXy4r4440QQt1e8gib3EN
-qUqPkkgeCxv108rW7NWZKdwYsvYtsQ==
-=L5h/
------END PGP SIGNATURE-----
-
---EAV7xN6Mtl16GRtO--
-
+Stefan
