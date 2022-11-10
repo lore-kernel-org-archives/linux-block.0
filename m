@@ -2,78 +2,216 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C4116C433FE
-	for <linux-block@archiver.kernel.org>; Thu, 10 Nov 2022 10:01:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A0EF7C433FE
+	for <linux-block@archiver.kernel.org>; Thu, 10 Nov 2022 10:54:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229571AbiKJKB1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 10 Nov 2022 05:01:27 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42722 "EHLO
+        id S229561AbiKJKyi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 10 Nov 2022 05:54:38 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46812 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229527AbiKJKB1 (ORCPT
+        with ESMTP id S229588AbiKJKyh (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 10 Nov 2022 05:01:27 -0500
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C27132DE
-        for <linux-block@vger.kernel.org>; Thu, 10 Nov 2022 02:01:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Content-Type:MIME-Version:Message-ID:
-        Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-        Content-Description:In-Reply-To:References;
-        bh=SYPASXJ2jdNa1i8h75ceFWByQEOrF1l7/PE3Mvcjeb0=; b=zZlHLh2q/wx5j5By2Rr9wgTpAF
-        vL0BdR0zkSWX7HxIWWiyz+Z8ppDJj3RmrfTnAEQBz6MK+UsrPbdMYBzxkWkRkMMjDSt5meKlY6jBD
-        wZV4fJVViaZVwhXrhkH+EmMcy+bE2d4V4nEYG3FznAgu0Rf+N8cqo00e4CmjRv9IyxbDEESzZy2+8
-        dWRMqQBNffYHjI3I5IWyKjeJpdsQbfUvpEvQ/0mZB2RwazKFuPg65yvhFf8Ek9qYqcqe8DphoCOzp
-        5/0v03aYA3qoJi0IqQg9+xaUWgj8fXtqWErtcPgpwr2zKFnA2hrz7du3yqJY5egvp9oDbqHZfUoS+
-        jwQT9DBQ==;
-Received: from [89.144.222.196] (helo=localhost)
-        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1ot4N3-004xQs-TQ; Thu, 10 Nov 2022 10:01:18 +0000
-Date:   Thu, 10 Nov 2022 11:01:07 +0100
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Chaitanya Kulkarni <kch@nvidia.com>
-Cc:     linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
-Subject: [GIT PULL] nvmes fixes for Linux 6.1
-Message-ID: <Y2zL45ll7KIIc0zF@infradead.org>
+        Thu, 10 Nov 2022 05:54:37 -0500
+Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6DBC0663E8;
+        Thu, 10 Nov 2022 02:54:36 -0800 (PST)
+Received: by mail-pj1-x1030.google.com with SMTP id e7-20020a17090a77c700b00216928a3917so4357831pjs.4;
+        Thu, 10 Nov 2022 02:54:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=wSlAzuVnCNGSUlXQbzZGzIWM/iy3zKLuKxIrZxarYYk=;
+        b=avnF6/j7/eEtMnUiXI98jhufKz9qLU7W9lvwe0XqKZgJGkOBudUedMEg+OAMMlzuVt
+         Uro3uCD/3iUuFqzmSy3e8q9L2UgrSWEihshC+uvyMBb/hIM5WIsf+FQvwm0dn/GuOKIf
+         YkzjkyM5fhP0GwQmcnB0Xj1ew93bB6kYGCDNXZpxbQ0MAF1uet6l0EX+0ND6hEJVa4V2
+         /FsvYJ/WHpY8NOHx4fRRJCDRcuhW13rQJJhyB+FvTTZSn5xkEKGcPfqZSwhV+hBIKPLh
+         wkQueoCq087hTeEuswm+551VwWWKT7tnbnGJPVd3pakNo5hTpvYIGv6Tkc05qTTt4QCM
+         9sBw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=wSlAzuVnCNGSUlXQbzZGzIWM/iy3zKLuKxIrZxarYYk=;
+        b=7USV3UHUzTnA6dM9EBi7OD555dJ36FStGxC0WRV08LATfcdKtWTHeSSazJtsNPf3TX
+         XdHamcULVOLIHsxHih8eWfI+LlvPns1XvOJJw2t9ZtNCBlorDKremSwyruUrnUyf/cf/
+         tQOBZOVE84bs3GysV6K+joRc7zQCm/PW5YiuCXu3Q5bpdilT+IFL+Vqy62MNm7OxWZat
+         DFSqHju1t/G3mpnQkIgXPiTHfR/tAYtNYYttU2D9ipGDtRtkYCzZD67S//kCDiTh2Kq8
+         SnUCxFhKhWL2C8V88P0bEtvHXWp5ymjKx12Fx9lkIUiVtRk6gUIQzPuN6vClvMHb45E9
+         PpnA==
+X-Gm-Message-State: ACrzQf0AbIxXxySotWwte4XiwWqFN1p8iFsDLFqWFEvEm2PUa29FODQw
+        csSCGYXqqv5aXQ5FL/BS9/A=
+X-Google-Smtp-Source: AMsMyM7NW8xr9yRJcNLF/VvLlayFPt5C2CTqFmYGreAZiPi+07GLrTnbj7sQkmrWFEjQi01RzssmTg==
+X-Received: by 2002:a17:902:ebce:b0:186:9905:11bf with SMTP id p14-20020a170902ebce00b00186990511bfmr65533540plg.110.1668077675784;
+        Thu, 10 Nov 2022 02:54:35 -0800 (PST)
+Received: from [10.114.96.67] ([129.227.152.6])
+        by smtp.gmail.com with ESMTPSA id iw17-20020a170903045100b00186ae20e8dcsm10798520plb.271.2022.11.10.02.54.33
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 10 Nov 2022 02:54:35 -0800 (PST)
+Message-ID: <39aef23b-877d-e49c-78ad-4b028aefc8cf@gmail.com>
+Date:   Thu, 10 Nov 2022 18:54:30 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.4.2
+Subject: Re: [PATCH] block, bfq: do the all counting of pending-request if
+ CONFIG_BFQ_GROUP_IOSCHED is enabled
+To:     Yu Kuai <yukuai1@huaweicloud.com>, paolo.valente@linaro.org,
+        axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Yuwei.Guan@zeekrlife.com, "yukuai (C)" <yukuai3@huawei.com>
+References: <20221109132914.438777-1-Yuwei.Guan@zeekrlife.com>
+ <52ccc3f0-a628-a9bf-f604-3b86dd34b006@huaweicloud.com>
+From:   Yuwei Guan <ssawgyw@gmail.com>
+In-Reply-To: <52ccc3f0-a628-a9bf-f604-3b86dd34b006@huaweicloud.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The following changes since commit f829230dd51974c1f4478900ed30bb77ba530b40:
 
-  block: sed-opal: kmalloc the cmd/resp buffers (2022-11-08 07:14:35 -0700)
+On 2022/11/10 17:28, Yu Kuai wrote:
+> Hi,
+>
+> 在 2022/11/09 21:29, Yuwei Guan 写道:
+>> The 'bfqd->num_groups_with_pending_reqs' is used when
+>> CONFIG_BFQ_GROUP_IOSCHED is enabled, so let the variables and processes
+>> take effect when ONFIG_BFQ_GROUP_IOSCHED is enabled.
+>>
+>> Cc: Yu Kuai <yukuai3@huawei.com>
+>> Signed-off-by: Yuwei Guan <Yuwei.Guan@zeekrlife.com>
+>> ---
+>>   block/bfq-iosched.c |  5 ++++-
+>>   block/bfq-iosched.h |  6 ++++++
+>>   block/bfq-wf2q.c    | 10 ++++++----
+>>   3 files changed, 16 insertions(+), 5 deletions(-)
+>>
+>> diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+>> index 2381cf220ba2..5a648433fd89 100644
+>> --- a/block/bfq-iosched.c
+>> +++ b/block/bfq-iosched.c
+>> @@ -6192,8 +6192,9 @@ static void bfq_completed_request(struct 
+>> bfq_queue *bfqq, struct bfq_data *bfqd)
+>>            * mechanism).
+>>            */
+>>           bfqq->budget_timeout = jiffies;
+>> -
+>> +#ifdef CONFIG_BFQ_GROUP_IOSCHED
+>>           bfq_del_bfqq_in_groups_with_pending_reqs(bfqq);
+>> +#endif
+>>           bfq_weights_tree_remove(bfqq);
+>>       }
+>
+> Thanks for the patch, this make sense. However, I prefer to
+> declare a empty function if the config is disabled instead of adding
+> "#ifdef" everywhere the function is called.
 
-are available in the Git repository at:
+Thanks a lot for reviewing. Get it, I will send v1 soon.
 
-  git://git.infradead.org/nvme.git tags/nvme-6.1-2022-11-10
-
-for you to fetch changes up to e65fdf530f55c5e387db14470a59a399faa29613:
-
-  nvmet: fix a memory leak (2022-11-09 14:29:13 +0100)
-
-----------------------------------------------------------------
-nvme fixes for Linux 6.1
-
- - quiet user passthrough command errors (Keith Busch)
- - fix memory leak in nvmet_subsys_attr_model_store_locked
- - fix a memory leak in nvmet-auth (Sagi Grimberg)
-
-----------------------------------------------------------------
-Aleksandr Miloserdov (1):
-      nvmet: fix memory leak in nvmet_subsys_attr_model_store_locked
-
-Keith Busch (1):
-      nvme: quiet user passthrough command errors
-
-Sagi Grimberg (1):
-      nvmet: fix a memory leak
-
- drivers/nvme/host/core.c       | 3 +--
- drivers/nvme/host/pci.c        | 2 --
- drivers/nvme/target/configfs.c | 8 ++++++--
- 3 files changed, 7 insertions(+), 6 deletions(-)
+>
+> Thanks,
+> Kuai
+>>   @@ -7051,7 +7052,9 @@ static int bfq_init_queue(struct 
+>> request_queue *q, struct elevator_type *e)
+>>       bfqd->idle_slice_timer.function = bfq_idle_slice_timer;
+>>         bfqd->queue_weights_tree = RB_ROOT_CACHED;
+>> +#ifdef CONFIG_BFQ_GROUP_IOSCHED
+>>       bfqd->num_groups_with_pending_reqs = 0;
+>> +#endif
+>>         INIT_LIST_HEAD(&bfqd->active_list);
+>>       INIT_LIST_HEAD(&bfqd->idle_list);
+>> diff --git a/block/bfq-iosched.h b/block/bfq-iosched.h
+>> index 9fa89577322d..d6b9fad28a3b 100644
+>> --- a/block/bfq-iosched.h
+>> +++ b/block/bfq-iosched.h
+>> @@ -197,8 +197,10 @@ struct bfq_entity {
+>>       /* flag, set to request a weight, ioprio or ioprio_class 
+>> change  */
+>>       int prio_changed;
+>>   +#ifdef CONFIG_BFQ_GROUP_IOSCHED
+>>       /* flag, set if the entity is counted in 
+>> groups_with_pending_reqs */
+>>       bool in_groups_with_pending_reqs;
+>> +#endif
+>>         /* last child queue of entity created (for non-leaf entities) */
+>>       struct bfq_queue *last_bfqq_created;
+>> @@ -491,6 +493,7 @@ struct bfq_data {
+>>        */
+>>       struct rb_root_cached queue_weights_tree;
+>>   +#ifdef CONFIG_BFQ_GROUP_IOSCHED
+>>       /*
+>>        * Number of groups with at least one process that
+>>        * has at least one request waiting for completion. Note that
+>> @@ -538,6 +541,7 @@ struct bfq_data {
+>>        * with no request waiting for completion.
+>>        */
+>>       unsigned int num_groups_with_pending_reqs;
+>> +#endif
+>>         /*
+>>        * Per-class (RT, BE, IDLE) number of bfq_queues containing
+>> @@ -1074,8 +1078,10 @@ void bfq_requeue_bfqq(struct bfq_data *bfqd, 
+>> struct bfq_queue *bfqq,
+>>                 bool expiration);
+>>   void bfq_del_bfqq_busy(struct bfq_queue *bfqq, bool expiration);
+>>   void bfq_add_bfqq_busy(struct bfq_queue *bfqq);
+>> +#ifdef CONFIG_BFQ_GROUP_IOSCHED
+>>   void bfq_add_bfqq_in_groups_with_pending_reqs(struct bfq_queue *bfqq);
+>>   void bfq_del_bfqq_in_groups_with_pending_reqs(struct bfq_queue *bfqq);
+>> +#endif
+>>     /* --------------- end of interface of B-WF2Q+ ---------------- */
+>>   diff --git a/block/bfq-wf2q.c b/block/bfq-wf2q.c
+>> index b02b53658ed4..a29187ecdc39 100644
+>> --- a/block/bfq-wf2q.c
+>> +++ b/block/bfq-wf2q.c
+>> @@ -1610,16 +1610,15 @@ void bfq_requeue_bfqq(struct bfq_data *bfqd, 
+>> struct bfq_queue *bfqq,
+>>                       bfqq == bfqd->in_service_queue, expiration);
+>>   }
+>>   +#ifdef CONFIG_BFQ_GROUP_IOSCHED
+>>   void bfq_add_bfqq_in_groups_with_pending_reqs(struct bfq_queue *bfqq)
+>>   {
+>>       struct bfq_entity *entity = &bfqq->entity;
+>>         if (!entity->in_groups_with_pending_reqs) {
+>>           entity->in_groups_with_pending_reqs = true;
+>> -#ifdef CONFIG_BFQ_GROUP_IOSCHED
+>>           if (!(bfqq_group(bfqq)->num_queues_with_pending_reqs++))
+>>               bfqq->bfqd->num_groups_with_pending_reqs++;
+>> -#endif
+>>       }
+>>   }
+>>   @@ -1629,12 +1628,11 @@ void 
+>> bfq_del_bfqq_in_groups_with_pending_reqs(struct bfq_queue *bfqq)
+>>         if (entity->in_groups_with_pending_reqs) {
+>>           entity->in_groups_with_pending_reqs = false;
+>> -#ifdef CONFIG_BFQ_GROUP_IOSCHED
+>>           if (!(--bfqq_group(bfqq)->num_queues_with_pending_reqs))
+>>               bfqq->bfqd->num_groups_with_pending_reqs--;
+>> -#endif
+>>       }
+>>   }
+>> +#endif
+>>     /*
+>>    * Called when the bfqq no longer has requests pending, remove it from
+>> @@ -1659,7 +1657,9 @@ void bfq_del_bfqq_busy(struct bfq_queue *bfqq, 
+>> bool expiration)
+>>       bfq_deactivate_bfqq(bfqd, bfqq, true, expiration);
+>>         if (!bfqq->dispatched) {
+>> +#ifdef CONFIG_BFQ_GROUP_IOSCHED
+>>           bfq_del_bfqq_in_groups_with_pending_reqs(bfqq);
+>> +#endif
+>>           /*
+>>            * Next function is invoked last, because it causes bfqq to be
+>>            * freed. DO NOT use bfqq after the next function invocation.
+>> @@ -1683,7 +1683,9 @@ void bfq_add_bfqq_busy(struct bfq_queue *bfqq)
+>>       bfqd->busy_queues[bfqq->ioprio_class - 1]++;
+>>         if (!bfqq->dispatched) {
+>> +#ifdef CONFIG_BFQ_GROUP_IOSCHED
+>>           bfq_add_bfqq_in_groups_with_pending_reqs(bfqq);
+>> +#endif
+>>           if (bfqq->wr_coeff == 1)
+>>               bfq_weights_tree_add(bfqq);
+>>       }
+>>
+>
