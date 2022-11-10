@@ -2,90 +2,94 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B39AEC4332F
-	for <linux-block@archiver.kernel.org>; Thu, 10 Nov 2022 20:12:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37FA2C433FE
+	for <linux-block@archiver.kernel.org>; Thu, 10 Nov 2022 20:20:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229710AbiKJUMj convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 10 Nov 2022 15:12:39 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56104 "EHLO
+        id S231819AbiKJUUg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 10 Nov 2022 15:20:36 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33202 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229461AbiKJUMh (ORCPT
+        with ESMTP id S231733AbiKJUUW (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 10 Nov 2022 15:12:37 -0500
-Received: from lithops.sigma-star.at (lithops.sigma-star.at [195.201.40.130])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A2CD2F382;
-        Thu, 10 Nov 2022 12:12:37 -0800 (PST)
-Received: from localhost (localhost [127.0.0.1])
-        by lithops.sigma-star.at (Postfix) with ESMTP id C40F863CDC5B;
-        Thu, 10 Nov 2022 21:12:35 +0100 (CET)
-Received: from lithops.sigma-star.at ([127.0.0.1])
-        by localhost (lithops.sigma-star.at [127.0.0.1]) (amavisd-new, port 10032)
-        with ESMTP id 8t93NELvwpPx; Thu, 10 Nov 2022 21:12:35 +0100 (CET)
-Received: from localhost (localhost [127.0.0.1])
-        by lithops.sigma-star.at (Postfix) with ESMTP id 632B161B8B4D;
-        Thu, 10 Nov 2022 21:12:35 +0100 (CET)
-Received: from lithops.sigma-star.at ([127.0.0.1])
-        by localhost (lithops.sigma-star.at [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id drrJ2Br71Io2; Thu, 10 Nov 2022 21:12:35 +0100 (CET)
-Received: from lithops.sigma-star.at (lithops.sigma-star.at [195.201.40.130])
-        by lithops.sigma-star.at (Postfix) with ESMTP id 3BA6463CDC5B;
-        Thu, 10 Nov 2022 21:12:35 +0100 (CET)
-Date:   Thu, 10 Nov 2022 21:12:35 +0100 (CET)
-From:   Richard Weinberger <richard@nod.at>
-To:     Daniel Golle <daniel@makrotopia.org>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        Miquel Raynal <miquel.raynal@bootlin.com>,
-        Vignesh Raghavendra <vigneshr@ti.com>,
-        Davidlohr Bueso <dave@stgolabs.net>,
-        Matthew Wilcox <willy@infradead.org>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        Ming Lei <ming.lei@redhat.com>,
-        linux-block <linux-block@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        linux-mtd <linux-mtd@lists.infradead.org>,
-        linux-efi <linux-efi@vger.kernel.org>
-Message-ID: <871124728.219224.1668111155161.JavaMail.zimbra@nod.at>
-In-Reply-To: <Y21ZXRKJF3hZg8wk@makrotopia.org>
-References: <Y2rgbfpYfpbLKHaf@makrotopia.org> <1691046252.219046.1668109493753.JavaMail.zimbra@nod.at> <Y21ZXRKJF3hZg8wk@makrotopia.org>
-Subject: Re: [PATCH v4 4/5] mtd_blkdevs: add option to enable scanning for
- partitions
+        Thu, 10 Nov 2022 15:20:22 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 82AAC54B23
+        for <linux-block@vger.kernel.org>; Thu, 10 Nov 2022 12:18:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1668111532;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=RgL5/7r9Wym/g+B0pjsz3dgQTgEurnPH1LtAMA+rvcc=;
+        b=fA+MyxA8PFS7ZZaOIOfiYcH/TLQYP0xN3ikgNtyiM2Q2TNotYU9VDtBhcT3NCgpMfRGhhG
+        VTmRtMMwYIKm6jcCoH63OWDUWcRXew8QG5OvAcNeEvePDstEFIQhxPfpJAPaTntt8RJXCx
+        kiyYZKvXwv3LitqB4eok+A1eJdOps8g=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-29-x0G0q06wN6qNKRWnBYHEWQ-1; Thu, 10 Nov 2022 15:18:41 -0500
+X-MC-Unique: x0G0q06wN6qNKRWnBYHEWQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 013238582B9;
+        Thu, 10 Nov 2022 20:18:41 +0000 (UTC)
+Received: from localhost (unknown [10.39.192.6])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 768171121330;
+        Thu, 10 Nov 2022 20:18:39 +0000 (UTC)
+Date:   Thu, 10 Nov 2022 15:18:38 -0500
+From:   Stefan Hajnoczi <stefanha@redhat.com>
+To:     Angus Chen <angus.chen@jaguarmicro.com>
+Cc:     jasowang@redhat.com, mst@redhat.com, axboe@kernel.dk,
+        virtualization@lists.linux-foundation.org,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        pbonzini@redhat.com
+Subject: Re: [PATCH] virtio_blk: use UINT_MAX instead of -1U
+Message-ID: <Y21cnhr1q6e6oNhp@fedora>
+References: <20221110030124.1986-1-angus.chen@jaguarmicro.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8BIT
-X-Originating-IP: [195.201.40.130]
-X-Mailer: Zimbra 8.8.12_GA_3807 (ZimbraWebClient - FF97 (Linux)/8.8.12_GA_3809)
-Thread-Topic: mtd_blkdevs: add option to enable scanning for partitions
-Thread-Index: JXERWtnlcCWgydDBA6DChmOXmJ0hxw==
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="EAV7xN6Mtl16GRtO"
+Content-Disposition: inline
+In-Reply-To: <20221110030124.1986-1-angus.chen@jaguarmicro.com>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
------ Ursprüngliche Mail -----
-> On Thu, Nov 10, 2022 at 08:44:53PM +0100, Richard Weinberger wrote:
->> ----- Ursprüngliche Mail -----
->> > Von: "Daniel Golle" <daniel@makrotopia.org>
->> > +
->> > +		if (!IS_ENABLED(CONFIG_MTD_BLOCK_PARTITIONS) || mtd_type_is_nand(new->mtd))
->> > +			gd->flags |= GENHD_FL_NO_PART;
->> 
->> I know that NAND should not get used with mtdblock because lack of wearleveling
->> and
->> in general too many writes. But what exactly is the rationale to deny part
->> scanning for NAND?
-> 
-> As UBI should be used on NAND, partition scanning should be enabled for
-> ubiblock devices to have uImage.FIT filesystem subimages mapped by the
-> partition parser.
-> 
-> If not skipping partition scanning on NAND-backed mtdblock devices the
-> scanning itself will already trigger multiple warnings which now happen
-> every time when a NAND-backed mtdblock device is being opened since
-> commit 96a3295c ("mtdblock: warn if opened on NAND").
 
-I see, you want to promote UBI. Makes sense.
-In case you do a v5 series, please add a comment to the code.
+--EAV7xN6Mtl16GRtO
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Thanks,
-//richard
+On Thu, Nov 10, 2022 at 11:01:23AM +0800, Angus Chen wrote:
+> We use UINT_MAX to limit max_discard_sectors in virtblk_probe,
+> we can use UINT_MAX to limit max_hw_sectors for consistencies.
+>=20
+> No functional change intended.
+>=20
+> Signed-off-by: Angus Chen <angus.chen@jaguarmicro.com>
+> ---
+>  drivers/block/virtio_blk.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+
+--EAV7xN6Mtl16GRtO
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmNtXJ4ACgkQnKSrs4Gr
+c8hFTgf/VUUpU5e4Be8XmTk5FyYOu+JeRz6prpVZEnfw7rKvvZc4O2NVtavIYV/7
+LbYA3WCbconInnqACqX1fCZ300zS0cWIYx9qFWTCcekj5eTJx2iM//3PWz605Lld
+kA/B4A8Y9uJphud/8BLpVb58J8QGHPbLL5iSY9Ql/8jivezW8hniEQZVYoGjqECJ
+84BZ1KIZ7ZdTGucZq7a3f1qLrafA5f5uTRQ9qk9dEwPJlBSSZauu+k1ehQQYdNv4
+thqgGOkGl7Kygq2sGDAGP0DOTQ9f6jIACqZlaYPEPBLvXy4r4440QQt1e8gib3EN
+qUqPkkgeCxv108rW7NWZKdwYsvYtsQ==
+=L5h/
+-----END PGP SIGNATURE-----
+
+--EAV7xN6Mtl16GRtO--
+
