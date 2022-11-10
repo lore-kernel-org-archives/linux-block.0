@@ -2,133 +2,87 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4EC7BC4332F
-	for <linux-block@archiver.kernel.org>; Thu, 10 Nov 2022 13:18:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6466DC4332F
+	for <linux-block@archiver.kernel.org>; Thu, 10 Nov 2022 13:55:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229518AbiKJNSb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 10 Nov 2022 08:18:31 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42066 "EHLO
+        id S229837AbiKJNzo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 10 Nov 2022 08:55:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38274 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229612AbiKJNS3 (ORCPT
+        with ESMTP id S230236AbiKJNzn (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 10 Nov 2022 08:18:29 -0500
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD1663A3;
-        Thu, 10 Nov 2022 05:18:25 -0800 (PST)
-Received: from mail02.huawei.com (unknown [172.30.67.153])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4N7Mpf1KwYz4f3vfX;
-        Thu, 10 Nov 2022 21:18:18 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-        by APP4 (Coremail) with SMTP id gCh0CgAnmdYb+mxjjHEvAQ--.62147S3;
-        Thu, 10 Nov 2022 21:18:21 +0800 (CST)
-Subject: Re: [PATCH] sbitmap: Use single per-bitmap counting to wake up queued
- tags
-To:     Jan Kara <jack@suse.cz>, Yu Kuai <yukuai1@huaweicloud.com>
-Cc:     Gabriel Krisman Bertazi <krisman@suse.de>, axboe@kernel.dk,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        Hugh Dickins <hughd@google.com>,
-        Keith Busch <kbusch@kernel.org>,
-        Liu Song <liusong@linux.alibaba.com>,
-        "yukuai (C)" <yukuai3@huawei.com>
-References: <20221105231055.25953-1-krisman@suse.de>
- <2a445c5c-fd15-c0bf-8655-2fb5bde3fe67@huaweicloud.com>
- <20221110111636.ufgyp4tkbzexugk2@quack3>
-From:   Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <210f2c3d-0bc1-0a5f-964b-d75020d3d9fb@huaweicloud.com>
-Date:   Thu, 10 Nov 2022 21:18:19 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        Thu, 10 Nov 2022 08:55:43 -0500
+Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06BB3F03B
+        for <linux-block@vger.kernel.org>; Thu, 10 Nov 2022 05:55:42 -0800 (PST)
+Received: by mail-pj1-x102f.google.com with SMTP id e7-20020a17090a77c700b00216928a3917so4704999pjs.4
+        for <linux-block@vger.kernel.org>; Thu, 10 Nov 2022 05:55:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=nJ9RcxcCkW2M7OPQ/OJGApyhr3Ci1CM13lpfXbD2VU0=;
+        b=UOfFvHnIDiCu0HqzK+oKurNlylWD8R28WYdw+OpALlIqhupx/zXZledxaa3H3oQN81
+         uAtpQeR9gssMjyE1hBqVnHpTq8CRMd7KiQytmDn6uF4DY18uMnxLqjpQf4ogIXk4Y+vR
+         3W9K1b/pnNZ6mpUhvxhYXlC+afQrxz/BTe+RZuBvWoNzywpLx9QeuUizkeVz37q2cx0l
+         gdX+0xby/vhBUyOW5iGs7ruddeuSfZqM19vm76nFSVX64JRS9UIj7UE0/JZcC3qWKw/R
+         hmbIm/YFamIbjPYJJSMgTm6ybdQodD2KDndWGi46W0sinTIc6pkjl6TWlcLItdy81Ovu
+         JfZQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=nJ9RcxcCkW2M7OPQ/OJGApyhr3Ci1CM13lpfXbD2VU0=;
+        b=4BWPTil4Rg5PpXP3v/e9Mrs/DG77I+IvClGmNY9iXmXY8H2kJEnXsbs/voUB5ew2Ns
+         U9PBRi3oqBMiPcA2eBHDVSHL33VIy7PHEen8iBDn1QqJR5PepGOnef+eN1uCsRH2mZfc
+         8sFmR4lwlz8/+eeXphZyEsNgzKJzvqW4O1dPHjplmVSk1de4UtWPqJ/2U6FGkbbDHF0f
+         qLeMhl3uXMs9Jil4Y55kQs2yI1Tjtfv2Zy9Gl/mvIgl17RNqNuKJHBq2mMsY7+Ox5zIp
+         JHrHqZYqf2Zj1zcKRcu5TBcuDn7waC8ZuhtGD9QnCMngiy3v585GutmhgsCMygJh783K
+         HEGw==
+X-Gm-Message-State: ACrzQf2x7BUu0OdYKMEZ0mNqb8JdpuoEwCC+WwwZUmHMy0oaKfD5qILq
+        ba9xClBhXciglVQf0inySKzXrA==
+X-Google-Smtp-Source: AMsMyM7atE7lTTwF9STan7M4HamFf6AO8qtlF/PgNBnvo15LitZ0xLgt7Fm65pCTXz4D+QkkIJTm2A==
+X-Received: by 2002:a17:90b:3148:b0:214:199e:7e6f with SMTP id ip8-20020a17090b314800b00214199e7e6fmr46727295pjb.126.1668088541372;
+        Thu, 10 Nov 2022 05:55:41 -0800 (PST)
+Received: from [192.168.1.136] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id b5-20020aa78ec5000000b0056bb7d90f0fsm10212236pfr.182.2022.11.10.05.55.39
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 10 Nov 2022 05:55:40 -0800 (PST)
+Message-ID: <8f69c93b-f1dd-e9ea-5e4e-a4caed4b983a@kernel.dk>
+Date:   Thu, 10 Nov 2022 06:55:39 -0700
 MIME-Version: 1.0
-In-Reply-To: <20221110111636.ufgyp4tkbzexugk2@quack3>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgAnmdYb+mxjjHEvAQ--.62147S3
-X-Coremail-Antispam: 1UD129KBjvJXoWxJrW5Gr1DJF1ktr47Gw45ZFb_yoW8urWxpr
-        WDGF17ZF4DXry7KrWDJw4FvayfZrWxt3s3Gr15JFy8A39Fyr4av3y8Kr1rCr4kZr4kG3W8
-        tF4Yg39xW3Wjya7anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUU9Y14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-        1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4j
-        6r4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
-        Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
-        I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
-        4UM4x0Y48IcVAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2kI
-        c2xKxwCYjI0SjxkI62AI1cAE67vIY487MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4
-        AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE
-        17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMI
-        IF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw20EY4v20xvaj40_WFyUJVCq
-        3wCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCT
-        nIWIevJa73UjIFyTuYvjfUoOJ5UUUUU
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
-X-CFilter-Loop: Reflected
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
+ Thunderbird/102.4.1
+Subject: Re: [GIT PULL] nvmes fixes for Linux 6.1
+To:     Christoph Hellwig <hch@infradead.org>,
+        Keith Busch <kbusch@kernel.org>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Chaitanya Kulkarni <kch@nvidia.com>
+Cc:     linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
+References: <Y2zL45ll7KIIc0zF@infradead.org>
+Content-Language: en-US
+From:   Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <Y2zL45ll7KIIc0zF@infradead.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
+On 11/10/22 3:01 AM, Christoph Hellwig wrote:
+> The following changes since commit f829230dd51974c1f4478900ed30bb77ba530b40:
+> 
+>   block: sed-opal: kmalloc the cmd/resp buffers (2022-11-08 07:14:35 -0700)
+> 
+> are available in the Git repository at:
+> 
+>   git://git.infradead.org/nvme.git tags/nvme-6.1-2022-11-10
 
-在 2022/11/10 19:16, Jan Kara 写道:
-> Hi!
-> 
-> On Thu 10-11-22 17:42:49, Yu Kuai wrote:
->> 在 2022/11/06 7:10, Gabriel Krisman Bertazi 写道:
->>> +void sbitmap_queue_wake_up(struct sbitmap_queue *sbq, int nr)
->>>    {
->>> -	struct sbq_wait_state *ws;
->>> -	unsigned int wake_batch;
->>> -	int wait_cnt, cur, sub;
->>> -	bool ret;
->>> +	unsigned int wake_batch = READ_ONCE(sbq->wake_batch);
->>> +	struct sbq_wait_state *ws = NULL;
->>> +	unsigned int wakeups;
->>> -	if (*nr <= 0)
->>> -		return false;
->>> +	if (!atomic_read(&sbq->ws_active))
->>> +		return;
->>> -	ws = sbq_wake_ptr(sbq);
->>> -	if (!ws)
->>> -		return false;
->>> +	atomic_add(nr, &sbq->completion_cnt);
->>> +	wakeups = atomic_read(&sbq->wakeup_cnt);
->>> -	cur = atomic_read(&ws->wait_cnt);
->>>    	do {
->>> -		/*
->>> -		 * For concurrent callers of this, callers should call this
->>> -		 * function again to wakeup a new batch on a different 'ws'.
->>> -		 */
->>> -		if (cur == 0)
->>> -			return true;
->>> -		sub = min(*nr, cur);
->>> -		wait_cnt = cur - sub;
->>> -	} while (!atomic_try_cmpxchg(&ws->wait_cnt, &cur, wait_cnt));
->>> -
->>> -	/*
->>> -	 * If we decremented queue without waiters, retry to avoid lost
->>> -	 * wakeups.
->>> -	 */
->>> -	if (wait_cnt > 0)
->>> -		return !waitqueue_active(&ws->wait);
->>> +		if (atomic_read(&sbq->completion_cnt) - wakeups < wake_batch)
->>> +			return;
->>
->> Should it be considered that completion_cnt overflow and becomes
->> negtive?
-> 
-> Yes, the counters can (and will) certainly overflow but since we only care
-> about (completion_cnt - wakeups), we should be fine - this number is always
-> sane (and relatively small) and in the kernel we do compile with signed
-> overflows being well defined.
+Pulled, thanks.
 
-I'm worried about this: for example, the extreme scenaro that there
-is only one tag, currently there are only one infight rq and one thread
-is waiting for tag. When the infight rq complete, if 'completion_cnt'
-overflow to negative, then 'atomic_read(&sbq->completion_cnt) - wakeups
-< wake_batch' will be passed unexpected, then will the thread never be
-woken up if there are no new io issued ?
+-- 
+Jens Axboe
 
-Thanks,
-Kuai
-> 
-> 								Honza
-> 
 
