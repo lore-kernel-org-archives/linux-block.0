@@ -2,85 +2,66 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A17DC433FE
-	for <linux-block@archiver.kernel.org>; Thu, 10 Nov 2022 03:30:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 26CA2C433FE
+	for <linux-block@archiver.kernel.org>; Thu, 10 Nov 2022 05:25:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232713AbiKJDax (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 9 Nov 2022 22:30:53 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41474 "EHLO
+        id S231899AbiKJFY6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 10 Nov 2022 00:24:58 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50864 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232688AbiKJDas (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 9 Nov 2022 22:30:48 -0500
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D9032EF48;
-        Wed,  9 Nov 2022 19:30:30 -0800 (PST)
-Received: from mail02.huawei.com (unknown [172.30.67.169])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4N76mH6Rvvz4f3xbk;
-        Thu, 10 Nov 2022 11:30:23 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-        by APP1 (Coremail) with SMTP id cCh0CgDXgK9RcGxjApYHAQ--.34385S3;
-        Thu, 10 Nov 2022 11:30:26 +0800 (CST)
-Subject: Re: [PATCH] block, bfq: fix null pointer dereference in
- bfq_bio_bfqg()
-To:     Chaitanya Kulkarni <chaitanyak@nvidia.com>,
-        Yu Kuai <yukuai1@huaweicloud.com>,
-        "jack@suse.cz" <jack@suse.cz>, "tj@kernel.org" <tj@kernel.org>,
-        "josef@toxicpanda.com" <josef@toxicpanda.com>,
-        "axboe@kernel.dk" <axboe@kernel.dk>,
-        "paolo.valente@linaro.org" <paolo.valente@linaro.org>
-Cc:     "cgroups@vger.kernel.org" <cgroups@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "yi.zhang@huawei.com" <yi.zhang@huawei.com>,
-        "yukuai (C)" <yukuai3@huawei.com>
-References: <20221108103434.2853269-1-yukuai1@huaweicloud.com>
- <9e0d8652-adda-3d39-88cd-d735194d4083@nvidia.com>
-From:   Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <371bdeac-7841-af8b-cb45-03e49f8589bd@huaweicloud.com>
-Date:   Thu, 10 Nov 2022 11:30:24 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        with ESMTP id S229484AbiKJFY5 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 10 Nov 2022 00:24:57 -0500
+Received: from todd.t-8ch.de (todd.t-8ch.de [159.69.126.157])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BFE06275FC;
+        Wed,  9 Nov 2022 21:24:55 -0800 (PST)
+From:   =?UTF-8?q?Thomas=20Wei=C3=9Fschuh?= <linux@weissschuh.net>
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=weissschuh.net;
+        s=mail; t=1668057892;
+        bh=SIhRYzH//kwaIhdzxST5+Pe24phe7wR7IiS7fLDVIpw=;
+        h=From:To:Cc:Subject:Date:From;
+        b=EeFpj9ulPKz3ANUzNLdzFGp0I0wnfEyPM0MMNAaFFz/+nWhods7DWc9sKzj8tPZCI
+         2+j4VswE9Abb621YrWji9yDudR+qwgbNRDdM/ZL2k8Hg+cdrUZnz15yODHCmkbtHQs
+         AH3ueKjuGAVWaMaexKLAnNhPeprXY9QeN9yWLz4I=
+To:     Josef Bacik <josef@toxicpanda.com>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org, nbd@other.debian.org
+Cc:     =?UTF-8?q?Thomas=20Wei=C3=9Fschuh?= <linux@weissschuh.net>,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH] nbd: automatically load module on genl access
+Date:   Thu, 10 Nov 2022 06:24:38 +0100
+Message-Id: <20221110052438.2188-1-linux@weissschuh.net>
+X-Mailer: git-send-email 2.38.1
 MIME-Version: 1.0
-In-Reply-To: <9e0d8652-adda-3d39-88cd-d735194d4083@nvidia.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=UTF-8
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1668057875; l=727; i=linux@weissschuh.net; s=20211113; h=from:subject; bh=SIhRYzH//kwaIhdzxST5+Pe24phe7wR7IiS7fLDVIpw=; b=TamtngLw5uGYaOiLQpg88P6iUzWfM1ZrfLyQNTSb9ffqCXcn6aghwLYi7eM0GXA0YO6yiR2sr1Hs UqDN2rPwBKx/saBBKi9xXSwr5k8/LNpPVAGDlsq5M6JV4imnTuxh
+X-Developer-Key: i=linux@weissschuh.net; a=ed25519; pk=9LP6KM4vD/8CwHW7nouRBhWLyQLcK1MkP6aTZbzUlj4=
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: cCh0CgDXgK9RcGxjApYHAQ--.34385S3
-X-Coremail-Antispam: 1UD129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7v73
-        VFW2AGmfu7bjvjm3AaLaJ3UjIYCTnIWjp_UUUYy7AC8VAFwI0_Gr0_Xr1l1xkIjI8I6I8E
-        6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28Cjx
-        kF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVWDJVCq3wA2z4x0Y4vE2Ix0cI8I
-        cVCY1x0267AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87
-        Iv6xkF7I0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE
-        6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72
-        CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7M4II
-        rI8v6xkF7I0E8cxan2IY04v7Mxk0xIA0c2IEe2xFo4CEbIxvr21l42xK82IYc2Ij64vIr4
-        1l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK
-        67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI
-        8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAv
-        wI8IcIk0rVWrZr1j6s0DMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxV
-        AFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUdHUDUUUUU=
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
-X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
+Instead of forcing the user to manually load the module do it
+automatically.
 
-在 2022/11/09 6:50, Chaitanya Kulkarni 写道:
-> 
-> 
-> Please submit the block tests for this as this is clearly non-trivial
-> issue that needs to be tested every release ..
+Signed-off-by: Thomas Weißschuh <linux@weissschuh.net>
+---
+ drivers/block/nbd.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-I wrote a c reporducer that is 100% reproducible in v5.10, I'll try to
-add a block test. However, it might take sometime because I'm not
-familar with blktests yet...
+diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+index 5cffd96ef2d7..1c38a7ea9531 100644
+--- a/drivers/block/nbd.c
++++ b/drivers/block/nbd.c
+@@ -2328,6 +2328,7 @@ static struct genl_family nbd_genl_family __ro_after_init = {
+ 	.mcgrps		= nbd_mcast_grps,
+ 	.n_mcgrps	= ARRAY_SIZE(nbd_mcast_grps),
+ };
++MODULE_ALIAS_GENL_FAMILY(NBD_GENL_FAMILY_NAME);
+ 
+ static int populate_nbd_status(struct nbd_device *nbd, struct sk_buff *reply)
+ {
 
-Thanks,
-Kuai
-> 
-> -ck
-> 
-> 
+base-commit: f67dd6ce0723ad013395f20a3f79d8a437d3f455
+-- 
+2.38.1
 
