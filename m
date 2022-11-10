@@ -2,162 +2,133 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C37C5C4332F
-	for <linux-block@archiver.kernel.org>; Thu, 10 Nov 2022 11:27:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4EC7BC4332F
+	for <linux-block@archiver.kernel.org>; Thu, 10 Nov 2022 13:18:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229719AbiKJL1N (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 10 Nov 2022 06:27:13 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38658 "EHLO
+        id S229518AbiKJNSb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 10 Nov 2022 08:18:31 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42066 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229601AbiKJL1M (ORCPT
+        with ESMTP id S229612AbiKJNS3 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 10 Nov 2022 06:27:12 -0500
-Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5F3953EDC;
-        Thu, 10 Nov 2022 03:27:11 -0800 (PST)
-Received: by mail-pj1-x1035.google.com with SMTP id v4-20020a17090a088400b00212cb0ed97eso1262810pjc.5;
-        Thu, 10 Nov 2022 03:27:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=R4JSNtBnOFBc3pGwCyNxt/wdF3MreeTClRovgXRSqJU=;
-        b=ovbGQqlcG0M/MlvAYZYDT34I/hzTHDI3pORy74lXMXlFO0ppRNriHlA+0MdN3fvAY3
-         NRUR2jJ6FyWek4QIs+bbVh4tv16g5l/vQ2vczEFxA77DgkFiY361iehUU8av2mVZkSK2
-         fqrQUwFYxnxc1u7W77JVB3NR+P2bpOdlY3d3ktnfZX4wvc3WdChIzOl/oMaRXhk85lY/
-         rhzr6fICE8C72mbnJxX8NPoNvavGAc+VBkpxOV0NY4WtH6mbuBpGT4t8m+ALS8zxaVUc
-         Sy60DSabrva+VO3UId5Z3Ytc+qc7qnO+1azVkh/ib8L7Y6tsOyRafcTJ6WinEuj03nex
-         2Kcg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=R4JSNtBnOFBc3pGwCyNxt/wdF3MreeTClRovgXRSqJU=;
-        b=PVeCuvu/EsbWNYJbl/LG9UAgSIjvIBPbAY6Hw3dR/qLemeczB6ZSZ7rwpzc1Ti8mYe
-         1cFRsYnOQ/uzj3N+2FM9PgNpn05Msv6ItdWQOn0BTE1SFIF2s8hZueNDGaMPo1prKiRu
-         SYBJqZFehW0y+xsltHj4skS99oOxPotrVRURcpLECcsMp95FgEMRP+39R6EBssU3+zJU
-         lzhaE5QwziKN99158H4nczCCyd/bkhzI9x0VoP8T9FT/WPBm8QgFNn1ue2hHhfx7FzMi
-         1eU5S2bwOGSaQdV9+w6Sd3ZP2I6keciyZJL46sYz7T+mlZYAMiG+P/rwP8DqGYZdO6ew
-         uZZA==
-X-Gm-Message-State: ACrzQf1KeNQJUg4b1uPcmLvu1iDPaC0ZamPI1ckzfI9oT6czpwCbqDJc
-        r6ukZUduuXwAAFFAISm+v5U=
-X-Google-Smtp-Source: AMsMyM7lZKjEuk7VTj8aM6WUJmeE4OQptOL+lpmAYJBZDpL0Mm2M7gc9Sp5OPtnTtLvRo3TSG5O/sA==
-X-Received: by 2002:a17:903:2490:b0:17f:bf7e:c521 with SMTP id p16-20020a170903249000b0017fbf7ec521mr64440670plw.161.1668079631085;
-        Thu, 10 Nov 2022 03:27:11 -0800 (PST)
-Received: from VirtualBox.. ([129.227.152.6])
-        by smtp.gmail.com with ESMTPSA id q12-20020a170902dacc00b001869f2120a4sm11061939plx.94.2022.11.10.03.27.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Nov 2022 03:27:10 -0800 (PST)
-From:   Yuwei Guan <ssawgyw@gmail.com>
-X-Google-Original-From: Yuwei Guan <Yuwei.Guan@zeekrlife.com>
-To:     paolo.valente@linaro.org, axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Yuwei.Guan@zeekrlife.com, Yu Kuai <yukuai3@huawei.com>
-Subject: [PATCH v1] block, bfq: do the all counting of pending-request if CONFIG_BFQ_GROUP_IOSCHED is enabled
-Date:   Thu, 10 Nov 2022 19:26:22 +0800
-Message-Id: <20221110112622.389332-1-Yuwei.Guan@zeekrlife.com>
-X-Mailer: git-send-email 2.34.1
+        Thu, 10 Nov 2022 08:18:29 -0500
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD1663A3;
+        Thu, 10 Nov 2022 05:18:25 -0800 (PST)
+Received: from mail02.huawei.com (unknown [172.30.67.153])
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4N7Mpf1KwYz4f3vfX;
+        Thu, 10 Nov 2022 21:18:18 +0800 (CST)
+Received: from [10.174.176.73] (unknown [10.174.176.73])
+        by APP4 (Coremail) with SMTP id gCh0CgAnmdYb+mxjjHEvAQ--.62147S3;
+        Thu, 10 Nov 2022 21:18:21 +0800 (CST)
+Subject: Re: [PATCH] sbitmap: Use single per-bitmap counting to wake up queued
+ tags
+To:     Jan Kara <jack@suse.cz>, Yu Kuai <yukuai1@huaweicloud.com>
+Cc:     Gabriel Krisman Bertazi <krisman@suse.de>, axboe@kernel.dk,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        Hugh Dickins <hughd@google.com>,
+        Keith Busch <kbusch@kernel.org>,
+        Liu Song <liusong@linux.alibaba.com>,
+        "yukuai (C)" <yukuai3@huawei.com>
+References: <20221105231055.25953-1-krisman@suse.de>
+ <2a445c5c-fd15-c0bf-8655-2fb5bde3fe67@huaweicloud.com>
+ <20221110111636.ufgyp4tkbzexugk2@quack3>
+From:   Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <210f2c3d-0bc1-0a5f-964b-d75020d3d9fb@huaweicloud.com>
+Date:   Thu, 10 Nov 2022 21:18:19 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
+In-Reply-To: <20221110111636.ufgyp4tkbzexugk2@quack3>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: gCh0CgAnmdYb+mxjjHEvAQ--.62147S3
+X-Coremail-Antispam: 1UD129KBjvJXoWxJrW5Gr1DJF1ktr47Gw45ZFb_yoW8urWxpr
+        WDGF17ZF4DXry7KrWDJw4FvayfZrWxt3s3Gr15JFy8A39Fyr4av3y8Kr1rCr4kZr4kG3W8
+        tF4Yg39xW3Wjya7anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUU9Y14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+        1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4j
+        6r4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
+        Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
+        I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
+        4UM4x0Y48IcVAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2kI
+        c2xKxwCYjI0SjxkI62AI1cAE67vIY487MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4
+        AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE
+        17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMI
+        IF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw20EY4v20xvaj40_WFyUJVCq
+        3wCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCT
+        nIWIevJa73UjIFyTuYvjfUoOJ5UUUUU
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The 'bfqd->num_groups_with_pending_reqs' is used when
-CONFIG_BFQ_GROUP_IOSCHED is enabled, so let the variables and processes
-take effect when ONFIG_BFQ_GROUP_IOSCHED is enabled.
+Hi,
 
-Cc: Yu Kuai <yukuai3@huawei.com>
-Signed-off-by: Yuwei Guan <Yuwei.Guan@zeekrlife.com>
----
- block/bfq-iosched.c | 2 ++
- block/bfq-iosched.h | 4 ++++
- block/bfq-wf2q.c    | 8 ++++----
- 3 files changed, 10 insertions(+), 4 deletions(-)
+在 2022/11/10 19:16, Jan Kara 写道:
+> Hi!
+> 
+> On Thu 10-11-22 17:42:49, Yu Kuai wrote:
+>> 在 2022/11/06 7:10, Gabriel Krisman Bertazi 写道:
+>>> +void sbitmap_queue_wake_up(struct sbitmap_queue *sbq, int nr)
+>>>    {
+>>> -	struct sbq_wait_state *ws;
+>>> -	unsigned int wake_batch;
+>>> -	int wait_cnt, cur, sub;
+>>> -	bool ret;
+>>> +	unsigned int wake_batch = READ_ONCE(sbq->wake_batch);
+>>> +	struct sbq_wait_state *ws = NULL;
+>>> +	unsigned int wakeups;
+>>> -	if (*nr <= 0)
+>>> -		return false;
+>>> +	if (!atomic_read(&sbq->ws_active))
+>>> +		return;
+>>> -	ws = sbq_wake_ptr(sbq);
+>>> -	if (!ws)
+>>> -		return false;
+>>> +	atomic_add(nr, &sbq->completion_cnt);
+>>> +	wakeups = atomic_read(&sbq->wakeup_cnt);
+>>> -	cur = atomic_read(&ws->wait_cnt);
+>>>    	do {
+>>> -		/*
+>>> -		 * For concurrent callers of this, callers should call this
+>>> -		 * function again to wakeup a new batch on a different 'ws'.
+>>> -		 */
+>>> -		if (cur == 0)
+>>> -			return true;
+>>> -		sub = min(*nr, cur);
+>>> -		wait_cnt = cur - sub;
+>>> -	} while (!atomic_try_cmpxchg(&ws->wait_cnt, &cur, wait_cnt));
+>>> -
+>>> -	/*
+>>> -	 * If we decremented queue without waiters, retry to avoid lost
+>>> -	 * wakeups.
+>>> -	 */
+>>> -	if (wait_cnt > 0)
+>>> -		return !waitqueue_active(&ws->wait);
+>>> +		if (atomic_read(&sbq->completion_cnt) - wakeups < wake_batch)
+>>> +			return;
+>>
+>> Should it be considered that completion_cnt overflow and becomes
+>> negtive?
+> 
+> Yes, the counters can (and will) certainly overflow but since we only care
+> about (completion_cnt - wakeups), we should be fine - this number is always
+> sane (and relatively small) and in the kernel we do compile with signed
+> overflows being well defined.
 
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index 2381cf220ba2..5f54091e7fe9 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -7051,7 +7051,9 @@ static int bfq_init_queue(struct request_queue *q, struct elevator_type *e)
- 	bfqd->idle_slice_timer.function = bfq_idle_slice_timer;
- 
- 	bfqd->queue_weights_tree = RB_ROOT_CACHED;
-+#ifdef CONFIG_BFQ_GROUP_IOSCHED
- 	bfqd->num_groups_with_pending_reqs = 0;
-+#endif
- 
- 	INIT_LIST_HEAD(&bfqd->active_list);
- 	INIT_LIST_HEAD(&bfqd->idle_list);
-diff --git a/block/bfq-iosched.h b/block/bfq-iosched.h
-index 9fa89577322d..41aa151ccc22 100644
---- a/block/bfq-iosched.h
-+++ b/block/bfq-iosched.h
-@@ -197,8 +197,10 @@ struct bfq_entity {
- 	/* flag, set to request a weight, ioprio or ioprio_class change  */
- 	int prio_changed;
- 
-+#ifdef CONFIG_BFQ_GROUP_IOSCHED
- 	/* flag, set if the entity is counted in groups_with_pending_reqs */
- 	bool in_groups_with_pending_reqs;
-+#endif
- 
- 	/* last child queue of entity created (for non-leaf entities) */
- 	struct bfq_queue *last_bfqq_created;
-@@ -491,6 +493,7 @@ struct bfq_data {
- 	 */
- 	struct rb_root_cached queue_weights_tree;
- 
-+#ifdef CONFIG_BFQ_GROUP_IOSCHED
- 	/*
- 	 * Number of groups with at least one process that
- 	 * has at least one request waiting for completion. Note that
-@@ -538,6 +541,7 @@ struct bfq_data {
- 	 * with no request waiting for completion.
- 	 */
- 	unsigned int num_groups_with_pending_reqs;
-+#endif
- 
- 	/*
- 	 * Per-class (RT, BE, IDLE) number of bfq_queues containing
-diff --git a/block/bfq-wf2q.c b/block/bfq-wf2q.c
-index b02b53658ed4..ea4c3d757fdd 100644
---- a/block/bfq-wf2q.c
-+++ b/block/bfq-wf2q.c
-@@ -1612,28 +1612,28 @@ void bfq_requeue_bfqq(struct bfq_data *bfqd, struct bfq_queue *bfqq,
- 
- void bfq_add_bfqq_in_groups_with_pending_reqs(struct bfq_queue *bfqq)
- {
-+#ifdef CONFIG_BFQ_GROUP_IOSCHED
- 	struct bfq_entity *entity = &bfqq->entity;
- 
- 	if (!entity->in_groups_with_pending_reqs) {
- 		entity->in_groups_with_pending_reqs = true;
--#ifdef CONFIG_BFQ_GROUP_IOSCHED
- 		if (!(bfqq_group(bfqq)->num_queues_with_pending_reqs++))
- 			bfqq->bfqd->num_groups_with_pending_reqs++;
--#endif
- 	}
-+#endif
- }
- 
- void bfq_del_bfqq_in_groups_with_pending_reqs(struct bfq_queue *bfqq)
- {
-+#ifdef CONFIG_BFQ_GROUP_IOSCHED
- 	struct bfq_entity *entity = &bfqq->entity;
- 
- 	if (entity->in_groups_with_pending_reqs) {
- 		entity->in_groups_with_pending_reqs = false;
--#ifdef CONFIG_BFQ_GROUP_IOSCHED
- 		if (!(--bfqq_group(bfqq)->num_queues_with_pending_reqs))
- 			bfqq->bfqd->num_groups_with_pending_reqs--;
--#endif
- 	}
-+#endif
- }
- 
- /*
--- 
-2.34.1
+I'm worried about this: for example, the extreme scenaro that there
+is only one tag, currently there are only one infight rq and one thread
+is waiting for tag. When the infight rq complete, if 'completion_cnt'
+overflow to negative, then 'atomic_read(&sbq->completion_cnt) - wakeups
+< wake_batch' will be passed unexpected, then will the thread never be
+woken up if there are no new io issued ?
+
+Thanks,
+Kuai
+> 
+> 								Honza
+> 
 
