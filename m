@@ -2,148 +2,173 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 152A7C433FE
-	for <linux-block@archiver.kernel.org>; Thu, 10 Nov 2022 15:35:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DF40C433FE
+	for <linux-block@archiver.kernel.org>; Thu, 10 Nov 2022 16:49:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230394AbiKJPfi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 10 Nov 2022 10:35:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51908 "EHLO
+        id S232484AbiKJQtE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 10 Nov 2022 11:49:04 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49566 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230470AbiKJPfh (ORCPT
+        with ESMTP id S232550AbiKJQs3 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 10 Nov 2022 10:35:37 -0500
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8FF4A1F6;
-        Thu, 10 Nov 2022 07:35:36 -0800 (PST)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 3A33021D3A;
-        Thu, 10 Nov 2022 15:35:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1668094535; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=hWtIaU1eQyQNo9BJ4fdEyNYDXwH3zBNP0e+QOrpG3gA=;
-        b=j5meRBsGYfQc4z6YLiUuRzMOOd9NW+vai8VbzCrcd3PLQbd6Cdu9XfDmqHsiVJZ7HXzk8F
-        S6g2yfrjQZ2NqE5VNHPKBxAPOOagU5zLpGQhWGDDqSQUmO4RWRVdDbBRA1dlndAeUXJkIF
-        q0hRTW1KUphy7+E0VNm372dQi3lOkx8=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1668094535;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=hWtIaU1eQyQNo9BJ4fdEyNYDXwH3zBNP0e+QOrpG3gA=;
-        b=RpAFpanbGxEqNzB1PuRmRoGhOz3MFp0TRzw491Ditpc6EsOdn5lTJf/owHe1veOeka0IW5
-        p2diGWN48n8g0rCg==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 0B88813B58;
-        Thu, 10 Nov 2022 15:35:35 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id HprGAkcabWO4SwAAMHmgww
-        (envelope-from <jack@suse.cz>); Thu, 10 Nov 2022 15:35:35 +0000
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-        id 71B97A0704; Thu, 10 Nov 2022 16:35:33 +0100 (CET)
-Date:   Thu, 10 Nov 2022 16:35:33 +0100
-From:   Jan Kara <jack@suse.cz>
-To:     Yu Kuai <yukuai1@huaweicloud.com>
-Cc:     Jan Kara <jack@suse.cz>, Gabriel Krisman Bertazi <krisman@suse.de>,
-        axboe@kernel.dk, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org, Hugh Dickins <hughd@google.com>,
-        Keith Busch <kbusch@kernel.org>,
-        Liu Song <liusong@linux.alibaba.com>,
-        "yukuai (C)" <yukuai3@huawei.com>
-Subject: Re: [PATCH] sbitmap: Use single per-bitmap counting to wake up
- queued tags
-Message-ID: <20221110153533.go5qs3psm75h27mx@quack3>
-References: <20221105231055.25953-1-krisman@suse.de>
- <2a445c5c-fd15-c0bf-8655-2fb5bde3fe67@huaweicloud.com>
- <20221110111636.ufgyp4tkbzexugk2@quack3>
- <210f2c3d-0bc1-0a5f-964b-d75020d3d9fb@huaweicloud.com>
+        Thu, 10 Nov 2022 11:48:29 -0500
+Received: from mail-pf1-x429.google.com (mail-pf1-x429.google.com [IPv6:2607:f8b0:4864:20::429])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 29D2947328
+        for <linux-block@vger.kernel.org>; Thu, 10 Nov 2022 08:47:14 -0800 (PST)
+Received: by mail-pf1-x429.google.com with SMTP id y13so2695334pfp.7
+        for <linux-block@vger.kernel.org>; Thu, 10 Nov 2022 08:47:14 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=content-disposition:mime-version:message-id:subject:cc:to:date:from
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=GceMGOT23bDdO1sSROQwcwP69H1ZqtgPMLAw5MYkScc=;
+        b=APGWSySH0nQ+8O7iWRU1RBBRPkDJD4BGBlNNvOVv2ZH8wyvRuICxAHt2mCA78hzuWr
+         a5V6f0KCzdxdcNRV+nHFWc2/hzROgVtbZ4repKZJTuhbyTJ1NoKMR/gHKFSE3NRcShEP
+         5NO7lcrAB4okpWmVROknBLQM60yTAB9q7TBwM=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-disposition:mime-version:message-id:subject:cc:to:date:from
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=GceMGOT23bDdO1sSROQwcwP69H1ZqtgPMLAw5MYkScc=;
+        b=Gxd93Lvhh3lVzGIui/YMepfXP5dASHkpm/eo/f/LbfpbDxg3sgvlsvXl2cT1TZpcco
+         WGvmS0/VMc8XVnwQ4WH2+doylHZO158vOktYHSMKFqqsr1422ZOkAEbcIFn6Qh8XPLcG
+         txIz3Ux6A7Zse+qsHtUsnVTC5YOc6BuR1uADz68WegbX8VzMXpcSa4p7Uia/M6ETXBMF
+         oVSUygw2nwgMABtF4Jrjw4dxKTlEvwCWCZwtywy4+xHllfdFEopWWsoSQn69qemH4Lw9
+         dNMkSe/RB+0OfXUFXa/n3TsIXakSe+s3at4aulQyKteTGjgfdfoILRZ7zZSFj+n+kkAz
+         9wZw==
+X-Gm-Message-State: ACrzQf1ONhXiCBOiZWE6KOa3dVTpu7JqCa9wmQbqvXhOv3a52MJo2jxw
+        ytbDEd6XZLxtO+amXBrd+kFsGw==
+X-Google-Smtp-Source: AMsMyM7q8wtqwy/hkh/glFOXuhiV3wodhFZXacYSxWn6EtsbfrHYW6QjhuJ8/1DJMeN7KpH68ghfPw==
+X-Received: by 2002:aa7:93ae:0:b0:56b:ac5c:f3dc with SMTP id x14-20020aa793ae000000b0056bac5cf3dcmr2934151pff.77.1668098833554;
+        Thu, 10 Nov 2022 08:47:13 -0800 (PST)
+Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
+        by smtp.gmail.com with ESMTPSA id r23-20020a17090b051700b001ef8ab65052sm45974pjz.11.2022.11.10.08.47.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 10 Nov 2022 08:47:13 -0800 (PST)
+From:   coverity-bot <keescook@chromium.org>
+X-Google-Original-From: coverity-bot <keescook+coverity-bot@chromium.org>
+Date:   Thu, 10 Nov 2022 08:47:12 -0800
+To:     Sergey Senozhatsky <senozhatsky@chromium.org>
+Cc:     Alexey Romanov <avromanov@sberdevices.ru>,
+        linux-kernel@vger.kernel.org, Nick Terrell <terrelln@fb.com>,
+        Minchan Kim <minchan@kernel.org>,
+        Suleiman Souhlal <suleiman@google.com>,
+        Nitin Gupta <ngupta@vflare.org>, Jens Axboe <axboe@kernel.dk>,
+        Nhat Pham <nphamcs@gmail.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        linux-block@vger.kernel.org,
+        "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
+        linux-next@vger.kernel.org, linux-hardening@vger.kernel.org
+Subject: Coverity: zram_recompress(): OVERRUN
+Message-ID: <202211100847.388C61B3@keescook>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <210f2c3d-0bc1-0a5f-964b-d75020d3d9fb@huaweicloud.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi!
+Hello!
 
-On Thu 10-11-22 21:18:19, Yu Kuai wrote:
-> 在 2022/11/10 19:16, Jan Kara 写道:
-> > Hi!
-> > 
-> > On Thu 10-11-22 17:42:49, Yu Kuai wrote:
-> > > 在 2022/11/06 7:10, Gabriel Krisman Bertazi 写道:
-> > > > +void sbitmap_queue_wake_up(struct sbitmap_queue *sbq, int nr)
-> > > >    {
-> > > > -	struct sbq_wait_state *ws;
-> > > > -	unsigned int wake_batch;
-> > > > -	int wait_cnt, cur, sub;
-> > > > -	bool ret;
-> > > > +	unsigned int wake_batch = READ_ONCE(sbq->wake_batch);
-> > > > +	struct sbq_wait_state *ws = NULL;
-> > > > +	unsigned int wakeups;
-> > > > -	if (*nr <= 0)
-> > > > -		return false;
-> > > > +	if (!atomic_read(&sbq->ws_active))
-> > > > +		return;
-> > > > -	ws = sbq_wake_ptr(sbq);
-> > > > -	if (!ws)
-> > > > -		return false;
-> > > > +	atomic_add(nr, &sbq->completion_cnt);
-> > > > +	wakeups = atomic_read(&sbq->wakeup_cnt);
-> > > > -	cur = atomic_read(&ws->wait_cnt);
-> > > >    	do {
-> > > > -		/*
-> > > > -		 * For concurrent callers of this, callers should call this
-> > > > -		 * function again to wakeup a new batch on a different 'ws'.
-> > > > -		 */
-> > > > -		if (cur == 0)
-> > > > -			return true;
-> > > > -		sub = min(*nr, cur);
-> > > > -		wait_cnt = cur - sub;
-> > > > -	} while (!atomic_try_cmpxchg(&ws->wait_cnt, &cur, wait_cnt));
-> > > > -
-> > > > -	/*
-> > > > -	 * If we decremented queue without waiters, retry to avoid lost
-> > > > -	 * wakeups.
-> > > > -	 */
-> > > > -	if (wait_cnt > 0)
-> > > > -		return !waitqueue_active(&ws->wait);
-> > > > +		if (atomic_read(&sbq->completion_cnt) - wakeups < wake_batch)
-> > > > +			return;
-> > > 
-> > > Should it be considered that completion_cnt overflow and becomes
-> > > negtive?
-> > 
-> > Yes, the counters can (and will) certainly overflow but since we only care
-> > about (completion_cnt - wakeups), we should be fine - this number is always
-> > sane (and relatively small) and in the kernel we do compile with signed
-> > overflows being well defined.
-> 
-> I'm worried about this: for example, the extreme scenaro that there
-> is only one tag, currently there are only one infight rq and one thread
-> is waiting for tag. When the infight rq complete, if 'completion_cnt'
-> overflow to negative, then 'atomic_read(&sbq->completion_cnt) - wakeups
-> < wake_batch' will be passed unexpected, then will the thread never be
-> woken up if there are no new io issued ?
+This is an experimental semi-automated report about issues detected by
+Coverity from a scan of next-20221110 as part of the linux-next scan project:
+https://scan.coverity.com/projects/linux-next-weekly-scan
 
-Well but my point is that 'wakeups' is staying close to completion_cnt. So
-if completion_cnt wraps to INT_MIN, then 'wakeups' is close to INT_MAX and
-so completion_cnt - wakeups is going to wrap back and still result in a
-small number. That is simply how wrapping arithmetics works...
+You're getting this email because you were associated with the identified
+lines of code (noted below) that were touched by commits:
 
-								Honza
+  Wed Nov 9 20:33:48 2022 -0800
+    03e6c729aa64 ("zram: introduce recompress sysfs knob")
+
+Coverity reported the following:
+
+*** CID 1527270:    (OVERRUN)
+drivers/block/zram/zram_drv.c:1727 in zram_recompress()
+1721     		zstrm = zcomp_stream_get(zram->comps[prio]);
+1722     		src = kmap_atomic(page);
+1723     		ret = zcomp_compress(zstrm, src, &comp_len_new);
+1724     		kunmap_atomic(src);
+1725
+1726     		if (ret) {
+vvv     CID 1527270:    (OVERRUN)
+vvv     Overrunning array "zram->comps" of 4 8-byte elements at element index 4 (byte offset 39) using index "prio" (which evaluates to 4).
+1727     			zcomp_stream_put(zram->comps[prio]);
+1728     			return ret;
+1729     		}
+1730
+1731     		class_index_new = zs_lookup_class_index(zram->mem_pool,
+1732     							comp_len_new);
+drivers/block/zram/zram_drv.c:1786 in zram_recompress()
+1780     	handle_new = zs_malloc(zram->mem_pool, comp_len_new,
+1781     			       __GFP_KSWAPD_RECLAIM |
+1782     			       __GFP_NOWARN |
+1783     			       __GFP_HIGHMEM |
+1784     			       __GFP_MOVABLE);
+1785     	if (IS_ERR_VALUE(handle_new)) {
+vvv     CID 1527270:    (OVERRUN)
+vvv     Overrunning array "zram->comps" of 4 8-byte elements at element index 4 (byte offset 39) using index "prio" (which evaluates to 4).
+1786     		zcomp_stream_put(zram->comps[prio]);
+1787     		return PTR_ERR((void *)handle_new);
+1788     	}
+1789
+1790     	dst = zs_map_object(zram->mem_pool, handle_new, ZS_MM_WO);
+1791     	memcpy(dst, zstrm->buffer, comp_len_new);
+drivers/block/zram/zram_drv.c:1737 in zram_recompress()
+1731     		class_index_new = zs_lookup_class_index(zram->mem_pool,
+1732     							comp_len_new);
+1733
+1734     		/* Continue until we make progress */
+1735     		if (class_index_new >= class_index_old ||
+1736     		    (threshold && comp_len_new >= threshold)) {
+vvv     CID 1527270:    (OVERRUN)
+vvv     Overrunning array "zram->comps" of 4 8-byte elements at element index 4 (byte offset 39) using index "prio" (which evaluates to 4).
+1737     			zcomp_stream_put(zram->comps[prio]);
+1738     			continue;
+1739     		}
+1740
+1741     		/* Recompression was successful so break out */
+1742     		break;
+drivers/block/zram/zram_drv.c:1721 in zram_recompress()
+1715     		 * priority algorithm (or same algorithm).
+1716     		 */
+1717     		if (prio <= zram_get_priority(zram, index))
+1718     			continue;
+1719
+1720     		num_recomps++;
+vvv     CID 1527270:    (OVERRUN)
+vvv     Overrunning array "zram->comps" of 4 8-byte elements at element index 4 (byte offset 39) using index "prio" (which evaluates to 4).
+1721     		zstrm = zcomp_stream_get(zram->comps[prio]);
+1722     		src = kmap_atomic(page);
+1723     		ret = zcomp_compress(zstrm, src, &comp_len_new);
+1724     		kunmap_atomic(src);
+1725
+1726     		if (ret) {
+drivers/block/zram/zram_drv.c:1710 in zram_recompress()
+1704     	class_index_old = zs_lookup_class_index(zram->mem_pool, comp_len_old);
+1705     	/*
+1706     	 * Iterate the secondary comp algorithms list (in order of priority)
+1707     	 * and try to recompress the page.
+1708     	 */
+1709     	for (; prio < prio_max; prio++) {
+vvv     CID 1527270:    (OVERRUN)
+vvv     Overrunning array "zram->comps" of 4 8-byte elements at element index 4 (byte offset 39) using index "prio" (which evaluates to 4).
+1710     		if (!zram->comps[prio])
+1711     			continue;
+1712
+1713     		/*
+1714     		 * Skip if the object is already re-compressed with a higher
+1715     		 * priority algorithm (or same algorithm).
+
+If this is a false positive, please let us know so we can mark it as
+such, or teach the Coverity rules to be smarter. If not, please make
+sure fixes get into linux-next. :) For patches fixing this, please
+include these lines (but double-check the "Fixes" first):
+
+Reported-by: coverity-bot <keescook+coverity-bot@chromium.org>
+Addresses-Coverity-ID: 1527270 ("OVERRUN")
+Fixes: 03e6c729aa64 ("zram: introduce recompress sysfs knob")
+
+Thanks for your attention!
+
 -- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+Coverity-bot
