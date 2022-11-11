@@ -2,132 +2,116 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 51DF3C43219
-	for <linux-block@archiver.kernel.org>; Fri, 11 Nov 2022 09:29:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B5035C4332F
+	for <linux-block@archiver.kernel.org>; Fri, 11 Nov 2022 10:32:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233642AbiKKJ3u (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 11 Nov 2022 04:29:50 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42686 "EHLO
+        id S233814AbiKKKcK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 11 Nov 2022 05:32:10 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38248 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233700AbiKKJ3d (ORCPT
+        with ESMTP id S233945AbiKKKbN (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 11 Nov 2022 04:29:33 -0500
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 152A6116;
-        Fri, 11 Nov 2022 01:29:32 -0800 (PST)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id C95E222237;
-        Fri, 11 Nov 2022 09:29:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1668158970;
-        h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-         cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=N1dVUIpFQi8O7Feo048ZZ65SBEEuoI/CXn0xkHOeIQ8=;
-        b=LZdrByDsfEwPhehQVcHHbocAJpkj6zR2HNxwZf7CERcVw9IZNSpweoj2AjG27HK+t/ZCBX
-        mZj4iULIoNXFmrloqCiJmx8LLzvB82fWehyAZyEqQKyXc8eCHrc5kNSipU7vdsNeEHkZ1k
-        p7kw37TBqMli/YQkAQpbe/zmXj4HSLU=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1668158970;
-        h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-         cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=N1dVUIpFQi8O7Feo048ZZ65SBEEuoI/CXn0xkHOeIQ8=;
-        b=ntvSU9jJFb8JO/N/C45DbT7XTcQeW8VRLcv/T1eopJaPSfX3aijtLJ7dx94qOUCXaxZ0E5
-        0E9hnRihOKha/ECQ==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 6A04B13273;
-        Fri, 11 Nov 2022 09:29:30 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id JCK3GPoVbmOQYgAAMHmgww
-        (envelope-from <pvorel@suse.cz>); Fri, 11 Nov 2022 09:29:30 +0000
-Date:   Fri, 11 Nov 2022 10:29:28 +0100
-From:   Petr Vorel <pvorel@suse.cz>
-To:     Minchan Kim <minchan@kernel.org>
-Cc:     ltp@lists.linux.it, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        Nitin Gupta <ngupta@vflare.org>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>,
-        Martin Doucha <mdoucha@suse.cz>,
-        Yang Xu <xuyang2018.jy@fujitsu.com>
-Subject: Re: [PATCH 0/1] Possible bug in zram on ppc64le on vfat
-Message-ID: <Y24V+AUuivt1F/Kw@pevik>
-Reply-To: Petr Vorel <pvorel@suse.cz>
-References: <20221107191136.18048-1-pvorel@suse.cz>
- <Y2l3vJb1y2Jynf50@google.com>
- <Y2l89dt/t8M6+9go@pevik>
- <Y22DiF5Q5EDUIrZE@google.com>
+        Fri, 11 Nov 2022 05:31:13 -0500
+Received: from mail-pg1-x52a.google.com (mail-pg1-x52a.google.com [IPv6:2607:f8b0:4864:20::52a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 34C96FF2
+        for <linux-block@vger.kernel.org>; Fri, 11 Nov 2022 02:31:00 -0800 (PST)
+Received: by mail-pg1-x52a.google.com with SMTP id q71so4085763pgq.8
+        for <linux-block@vger.kernel.org>; Fri, 11 Nov 2022 02:31:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8EoWEktzF4xunmTW3NPGj5C3ZY4hEtE5YC4CZzU3s8w=;
+        b=acyxfZqCeg1dzpt9TFsjnhQn9D441fcog0e95pfckukoQsxwDvCRQhFPgJR8Ehj06A
+         iWatB6dA0pInT1CkyiQOUD0zDDsWAN2DpZIfBoidcBu9vwJ4hHQ/cjCGAL491uyM1d5M
+         CxGvCxanZyHQXgfwaH56kiadHxDZInMg512oyn/U9JyNWJf8eVsn1yuS/eJcy20WcHbM
+         c5p3wqwWD7l00XibEwWAb2jkIBTjAEdoin7Ty3U1vGFZJnrocWcOIUXSVFiUqpPSmhKs
+         Ghb0V5BZ3jXS330npx/BMf9ZkicttdE+ysJdV8Q+Uw1Roid4AyagEcXgZQqYjYVL5WSy
+         jMtA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=8EoWEktzF4xunmTW3NPGj5C3ZY4hEtE5YC4CZzU3s8w=;
+        b=3Bdu6UG5YGcaV8N3f0E2Oi+QmB0FB59QEZpm/Qs3IIyiivob2ihOxRL2pjMJ6Ish2V
+         v2RJIqCWU5cNVTrk1HZhb9IP1I/B5Wt+utNQZtVXlG5Ibi/Tqeiv7murq004J+17TiFI
+         xyQWtZc/R41zz1FUVGzj3HyCw+ury63KUlfjIvaIVHOZEJd8QJmTTRinG/VMwmtGqOzi
+         ssO8Txb1c4UnvG4mjGIb2m1849TLItrROjGIh0HhHrbyMp96JgF2EPAJhkC4T5ittCgJ
+         uN3NnONmNkrx6E39077W0Yf31LX72dSRmcW9IBtAFKN/nY7kr/gXeHHgSyaApaUz8vzM
+         l5RA==
+X-Gm-Message-State: ANoB5pk1vHXGaeq4N5flRZDJu6nQGEmcwqx/E64R9g2BG/pgwAxfGN6F
+        cpOeDFk7gwycvZWZhk8jwX1rzgqHRX6srv/i2w9Hlw==
+X-Google-Smtp-Source: AA0mqf62BtjjmpjdtBI9U+VBt4c8CQ0WDBXW8v/LnUZ18mTN/2cC9XpELje/r/6EYWBc30pZC0IKiaa8mWK5GAWeizE=
+X-Received: by 2002:aa7:924c:0:b0:566:9f68:c0ad with SMTP id
+ 12-20020aa7924c000000b005669f68c0admr1951719pfp.57.1668162659697; Fri, 11 Nov
+ 2022 02:30:59 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Y22DiF5Q5EDUIrZE@google.com>
+References: <22aa78389c9b4613841716c5b7bd89aa@hyperstone.com>
+In-Reply-To: <22aa78389c9b4613841716c5b7bd89aa@hyperstone.com>
+From:   Ulf Hansson <ulf.hansson@linaro.org>
+Date:   Fri, 11 Nov 2022 11:30:23 +0100
+Message-ID: <CAPDyKFofO7JKpE6tEndFfYEYHAr-hHbs2rxwMfUNAK+rx0k7=Q@mail.gmail.com>
+Subject: Re: [PATCH 1/3] block: Requeue req as head if driver touched it
+To:     =?UTF-8?Q?Christian_L=C3=B6hle?= <CLoehle@hyperstone.com>
+Cc:     "axboe@kernel.dk" <axboe@kernel.dk>,
+        "linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Avri Altman <Avri.Altman@wdc.com>,
+        "adrian.hunter@intel.com" <adrian.hunter@intel.com>,
+        "vincent.whitchurch@axis.com" <vincent.whitchurch@axis.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-> On Mon, Nov 07, 2022 at 10:47:33PM +0100, Petr Vorel wrote:
-> > Hi Minchan,
+On Wed, 26 Oct 2022 at 09:30, Christian L=C3=B6hle <CLoehle@hyperstone.com>=
+ wrote:
+>
+> In case the driver set RQF_DONTPREP flag, requeue the request as head as
+> it is likely that the backing storage already had a request to an
+> adjacent region, so getting the requeued request out as soon as possible
+> may give us some performance benefit.
 
-> > > On Mon, Nov 07, 2022 at 08:11:35PM +0100, Petr Vorel wrote:
-> > > > Hi all,
+This is a bit handwavy to me. Would you mind extending this with a
+small concrete example, to better understand the benefit?
 
-> > > > following bug is trying to workaround an error on ppc64le, where
-> > > > zram01.sh LTP test (there is also kernel selftest
-> > > > tools/testing/selftests/zram/zram01.sh, but LTP test got further
-> > > > updates) has often mem_used_total 0 although zram is already filled.
+>
+> Signed-off-by: Christian Loehle <cloehle@hyperstone.com>
 
-> > > Hi, Petr,
+Other than the above nitpick, I can't think of any obvious unwanted
+side-effects this could have. So, feel free to add:
 
-> > > Is it happening on only ppc64le?
-> > I haven't seen it on other archs (x86_64, aarch64).
+Reviewed-by: Ulf Hansson <ulf.hansson@linaro.org>
 
-> > > Is it a new regression? What kernel version did you use?
-> > Found on openSUSE kernel, which uses stable kernel releases 6.0.x.
-> > It's probably much older, first I've seen it some years ago (I'm not able to find kernel version), but it was random. Now it's much more common.
+Kind regards
+Uffe
 
-> > Test runs on VM (I can give qemu command or whatever you need to know about it)
-> > I'll try to verify it on some bare metal ppc64le.
-
-> Hi Petr and Martin,
-
-> Thanks for testing and meaning information.
-
-> Could you tell how I could create VM to run ppc64le and run the test?
-> I'd like to reproduce in my local to debug it.
-I suppose you don't have ppc64le bare metal machine, thus you run on x86_64.
-
-One way would be to install on host qemu-system-ppc64, download iso image of any
-distro which supports ppc64le and install it with virt-manager (which would fill
-necessary qemu params).
-
-Other way, which I often use is to compile system with Buildroot distribution.
-You can clone my Buildroot distro fork, branch debug/zram [1].
-I put there in 3 commits my configuration.
-I added 0001-zram-Debug-mm_stat_show.patch [2] on the top of 6.0.7 with little debugging.
-
-What is now only needed is to 1) install on host qemu-system-ppc64
-(speedup build + Buildroot is configured not to compile qemu-system-ppc64),
-then:
-$ make # takes time
-$ ./output/images/start-qemu.sh serial-only
-
-When I have ppc64le host with enough space, I often use rapido [3],
-but that crashed stable kernel (another story which I'll report soon).
-
-Hope that helps.
-
-Kind regards,
-Petr
-
-[1] https://github.com/pevik/buildroot/commits/debug/zram
-[2] https://github.com/pevik/buildroot/blob/debug/zram/0001-zram-Debug-mm_stat_show.patch
-[3] https://github.com/rapido-linux/rapido
+> ---
+>  block/blk-mq.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index 33292c01875d..d863c826fb23 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -1429,7 +1429,7 @@ static void blk_mq_requeue_work(struct work_struct =
+*work)
+>                  * merge.
+>                  */
+>                 if (rq->rq_flags & RQF_DONTPREP)
+> -                       blk_mq_request_bypass_insert(rq, false, false);
+> +                       blk_mq_request_bypass_insert(rq, true, false);
+>                 else
+>                         blk_mq_sched_insert_request(rq, true, false, fals=
+e);
+>         }
+> --
+> 2.37.3
+> Hyperstone GmbH | Reichenaustr. 39a  | 78467 Konstanz
+> Managing Director: Dr. Jan Peter Berns.
+> Commercial register of local courts: Freiburg HRB381782
+>
