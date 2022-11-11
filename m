@@ -2,110 +2,100 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 07D56C4332F
-	for <linux-block@archiver.kernel.org>; Fri, 11 Nov 2022 17:30:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BDFADC433FE
+	for <linux-block@archiver.kernel.org>; Fri, 11 Nov 2022 17:57:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233491AbiKKRaS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 11 Nov 2022 12:30:18 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34564 "EHLO
+        id S233968AbiKKR5w (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 11 Nov 2022 12:57:52 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46986 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232372AbiKKRaS (ORCPT
+        with ESMTP id S234000AbiKKR5s (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 11 Nov 2022 12:30:18 -0500
-Received: from mail-io1-xd31.google.com (mail-io1-xd31.google.com [IPv6:2607:f8b0:4864:20::d31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87D241A815
-        for <linux-block@vger.kernel.org>; Fri, 11 Nov 2022 09:30:16 -0800 (PST)
-Received: by mail-io1-xd31.google.com with SMTP id s10so4021281ioa.5
-        for <linux-block@vger.kernel.org>; Fri, 11 Nov 2022 09:30:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=aXO456qaOP1M3JsJcts4UFcPXUKgBOMxL23ZB0rcMw4=;
-        b=mLUwO6TqDtBXzrrFM3raYJ5s/voj/2CABngLl5kEgbmXx5H27xhERtZwmg/2tTy1rM
-         P2syluaiRg3QUpYU3CGNrPSdu5kOIvRHN6hshAseVDet22qLw2jmTTD17V3YBIcMN7e/
-         vcynmeB2okCNwyNupTEzsgv0iNhAxQFGhV5yueEaK3A6pZlwahElRJvLv2VNIsZwqHjY
-         HeNrNvJminwUoL47a7e8n9lhSJ60MTkMgJPX+L2x3CsAFqGzkD03cggwk4gGkj9QqjPI
-         8Fd13iKbnn6CEFTFfqHATv9+pdhQrylhr9B7IZpwgpumh/G1CfRHDGBO/flByLmaDWUk
-         +CXg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=aXO456qaOP1M3JsJcts4UFcPXUKgBOMxL23ZB0rcMw4=;
-        b=1uLL3AkMV77VxVlZ4Bo8HzpPCtDANRi/fENAOTV+k5z/IA3fLPBFzpT435f057npGx
-         7kyx5pMzqPwcWZIjBE6JMYLAjU7jQLMVG3Qb0ZFIKtRhF9kqKHT2v6aBMBMAN1y9P/EE
-         iHHEjk2bjeINLx6JLujir3x0kVnT/C/gNMEKYzB2zAaZpAUZHgWMUogI5I43zMfqqeNN
-         hnV5EavGoyixyTq4UUknKWYIvA/ZQxXbHOZKoluc0fipuVKjHALIjN60VKAqtku28cnH
-         z5gYgj/YSEUCOOPeOSfkUUUNzsWsPR0/To0gHXfY62VJvLHZ+kyxbj40TdSygYOUjDMl
-         209g==
-X-Gm-Message-State: ANoB5pnqzrIsYXq44qjZ/3PFFrKJzQq+nOqSweGgZ1fgBJL0ViaNer/H
-        Xop9hPhbWB0g68PHvE/TH/krYw==
-X-Google-Smtp-Source: AA0mqf4kaujY5OpK6Ujxw29Abhy2Rzuycfz1mUU2y+kvw/dShqU187ciHHS5++sBtFImpPsluPd+/g==
-X-Received: by 2002:a02:c4d3:0:b0:363:d7b3:7d4 with SMTP id h19-20020a02c4d3000000b00363d7b307d4mr1242067jaj.166.1668187815869;
-        Fri, 11 Nov 2022 09:30:15 -0800 (PST)
-Received: from [192.168.1.94] ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id u18-20020a02b1d2000000b00375f143b0c2sm924332jah.8.2022.11.11.09.30.15
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 11 Nov 2022 09:30:15 -0800 (PST)
-Message-ID: <db6872c6-5998-c8dd-f8b0-bc71aa7a532c@kernel.dk>
-Date:   Fri, 11 Nov 2022 10:30:13 -0700
+        Fri, 11 Nov 2022 12:57:48 -0500
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 262FC6A771;
+        Fri, 11 Nov 2022 09:57:47 -0800 (PST)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id CD37222276;
+        Fri, 11 Nov 2022 17:57:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1668189465;
+        h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
+         cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=5Ps/5tt8PL9Kli93ryITYZsunBP9bcRiS3HUPMTLqE8=;
+        b=NwPSMiZ/DbpkxWCUTylmJGjJ8FYX3KHF+ZueQ2KSE7BY8J/y71tz2euMIQkBgNRtgYfutH
+        5LAjjh9XGhbdLeE/2ZS2zbWg6o0GPPVy4H+2ImW87dsAW8km/6ckB95ESjTLmAloEZxSZf
+        R0tjQagMIxnDKr63p6tDJioIJzzhlEg=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1668189465;
+        h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
+         cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=5Ps/5tt8PL9Kli93ryITYZsunBP9bcRiS3HUPMTLqE8=;
+        b=yLu2EWk7+WYKHlqBiIOAiEK5GfDDFtG1GWtiyPZRzyvkbMN+4oWzO+hT4l6foFxdUxRkN/
+        XWhK4S3AJ1/yk1BQ==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 7055613273;
+        Fri, 11 Nov 2022 17:57:45 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id 4jT8GRmNbmO9AwAAMHmgww
+        (envelope-from <dsterba@suse.cz>); Fri, 11 Nov 2022 17:57:45 +0000
+Date:   Fri, 11 Nov 2022 18:57:20 +0100
+From:   David Sterba <dsterba@suse.cz>
+To:     Steven Rostedt <rostedt@goodmis.org>
+Cc:     Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
+        "dsterba@suse.cz" <dsterba@suse.cz>, Chris Mason <clm@meta.com>,
+        Christoph Hellwig <hch@lst.de>, Chris Mason <clm@fb.com>,
+        Josef Bacik <josef@toxicpanda.com>,
+        David Sterba <dsterba@suse.com>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>,
+        Naohiro Aota <Naohiro.Aota@wdc.com>, Qu Wenruo <wqu@suse.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        "Darrick J. Wong" <djwong@kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-btrfs@vger.kernel.org" <linux-btrfs@vger.kernel.org>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>
+Subject: Re: consolidate btrfs checksumming, repair and bio splitting
+Message-ID: <20221111175720.GV5824@twin.jikos.cz>
+Reply-To: dsterba@suse.cz
+References: <20220901074216.1849941-1-hch@lst.de>
+ <347dc0b3-0388-54ee-6dcb-0c1d0ca08d05@wdc.com>
+ <20221024144411.GA25172@lst.de>
+ <773539e2-b5f1-8386-aa2a-96086f198bf8@meta.com>
+ <20221024171042.GF5824@suse.cz>
+ <9f443843-4145-155b-2fd0-50613a9f7913@wdc.com>
+ <20221026074145.2be5ca09@gandalf.local.home>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
- Thunderbird/102.4.1
-Subject: Re: [RFC PATCH v3 00/14] mm/block: add bdi sysfs knobs
-Content-Language: en-US
-To:     Stefan Roesch <shr@devkernel.io>, kernel-team@fb.com,
-        linux-block@vger.kernel.org, linux-mm@kvack.org
-Cc:     clm@meta.com, willy@infradead.org, hch@infradead.org
-References: <20221024190603.3987969-1-shr@devkernel.io>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20221024190603.3987969-1-shr@devkernel.io>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221026074145.2be5ca09@gandalf.local.home>
+User-Agent: Mutt/1.5.23.1-rc1 (2014-03-12)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/24/22 1:05 PM, Stefan Roesch wrote:
-> At meta network block devices (nbd) are used to implement remote block
-> storage. In testing and during production it has been observed that
-> these network block devices can consume a huge portion of the dirty
-> writeback cache and writeback can take a considerable time.
+On Wed, Oct 26, 2022 at 07:41:45AM -0400, Steven Rostedt wrote:
+> On Wed, 26 Oct 2022 07:36:45 +0000
+> Johannes Thumshirn <Johannes.Thumshirn@wdc.com> wrote:
 > 
-> To be able to give stricter limits, I'm proposing the following changes:
-> 
-> 1) introduce strictlimit knob
-> 
->   Currently the max_ratio knob exists to limit the dirty_memory. However
->   this knob only applies once (dirty_ratio + dirty_background_ratio) / 2
->   has been reached.
->   With the BDI_CAP_STRICTLIMIT flag, the max_ratio can be applied without
->   reaching that limit. This change exposes that knob.
-> 
->   This knob can also be useful for NFS, fuse filesystems and USB devices.
-> 
-> 2) Use part of 1000 internal calculation
-> 
->   The max_ratio is based on percentage. With the current machine sizes
->   percentage values can be very high (1% of a 256GB main memory is already
->   2.5GB). This change uses part of 1000 instead of percentages for the
->   internal calculations.
-> 
-> 3) Introduce two new sysfs knobs: min_bytes and max_bytes.
-> 
->   Currently all calculations are based on ratio, but for a user it often
->   more convenient to specify a limit in bytes. The new knobs will not
->   store bytes values, instead they will translate the byte value to a
->   corresponding ratio. As the internal values are now part of 1000, the
->   ratio is closer to the specified value. However the value should be more
->   seen as an approximation as it can fluctuate over time.
+> > [+Cc Steven ]
+> > 
+> > Steven, you're on the TAB, can you help with this issue?
+> > Or bring it up with other TAB members?
 
-Anyone have any concerns or input on this series? Would be nice to get
-it moving forward, as we do have a need for it at Meta. Outside of that,
-would be applicable for end-user use cases as well on the distro side.
+Let me reply here in summary, based on what was discussed in the btrfs
+developer group:
 
--- 
-Jens Axboe
+I got an answer from LF that I will use for contributions 'add copyright
+or reject patches', thank you Steve. Btrfs stays open to contributions,
+valid copyright notices will be added on request. I'll update the wiki
+to reflect the status. Patches from Christoph are in the backlog and are
+planned for merge.
