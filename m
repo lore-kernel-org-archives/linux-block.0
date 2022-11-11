@@ -2,126 +2,79 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B6C2BC433FE
-	for <linux-block@archiver.kernel.org>; Fri, 11 Nov 2022 03:16:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F03EC433FE
+	for <linux-block@archiver.kernel.org>; Fri, 11 Nov 2022 09:18:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232633AbiKKDQT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 10 Nov 2022 22:16:19 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53790 "EHLO
+        id S233079AbiKKJSH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 11 Nov 2022 04:18:07 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36756 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232499AbiKKDQS (ORCPT
+        with ESMTP id S232963AbiKKJSH (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 10 Nov 2022 22:16:18 -0500
-Received: from mail-pf1-x42b.google.com (mail-pf1-x42b.google.com [IPv6:2607:f8b0:4864:20::42b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 820BA265
-        for <linux-block@vger.kernel.org>; Thu, 10 Nov 2022 19:16:17 -0800 (PST)
-Received: by mail-pf1-x42b.google.com with SMTP id b29so3772222pfp.13
-        for <linux-block@vger.kernel.org>; Thu, 10 Nov 2022 19:16:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=EHYtmfAkk1aJiFrWOQcK74WseWK+F2wWdmGdTPL8r5I=;
-        b=PLhiLl2rFexSXAqPrdy+JcBIIVG9if/iJukhcki/6b31uXZj13fFwWK2CUJm1Baj2s
-         /30vEA6cCpgthMu5aerjhcoSyL3VNIf7YC6No9K3mAw9NTtQZXBxIAdl8YFcrSUNk2ax
-         PKLw8/PceYAM/t+0hRJJeWRUDRoy+1/uckzZY=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=EHYtmfAkk1aJiFrWOQcK74WseWK+F2wWdmGdTPL8r5I=;
-        b=PeSYhI7LseKM1y+8x0Fou7rjI99t6KkjJp80Vus7NCn4SJTCWj+ttva+NLDdtEoXNY
-         YVzyEjPH9OAVKdKJCwxxBAS/swwOtufIqjmEO9ccLD6o7NpUpjTCITsQWwYfkKeGy5hR
-         0qKErVlfppfRotRMK6h/C7OMdHpIXposnjsLO909rihiNrejtlIzqf4Eokl0CcW5ysiN
-         OlMnKceOjYFY9M9HIKMnyY8Roa6a2ysLpmIbJQPyPpQq3rXD8/vPF/cRT0/NDgWnviSm
-         jD9SdH+ZbpfHntdStqdUtENuSwYjk+AQ3la3rhlW1QSCebkXMSTI4p5ZbXt7TUNH5DQo
-         Yzhg==
-X-Gm-Message-State: ANoB5plaMX+M8aUkwfMkbJNUeJ/DkAEmdDaFTY6B2WyaRq5uis+yRsHv
-        DFZjD6+TbwdVXAcuAL4uXu7ZjQ==
-X-Google-Smtp-Source: AA0mqf5oumcRWXs+UNB8JbUMhp0s1tVKT0S+NPKFT46G7SRi1Mu55t1aEsRugB1x0ZpTt2hj0XpNyg==
-X-Received: by 2002:aa7:9218:0:b0:562:ce80:1417 with SMTP id 24-20020aa79218000000b00562ce801417mr692070pfo.19.1668136577012;
-        Thu, 10 Nov 2022 19:16:17 -0800 (PST)
-Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
-        by smtp.gmail.com with ESMTPSA id z28-20020aa7959c000000b0056be4dbd4besm402806pfj.111.2022.11.10.19.16.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Nov 2022 19:16:16 -0800 (PST)
-Date:   Thu, 10 Nov 2022 19:16:16 -0800
-From:   Kees Cook <keescook@chromium.org>
-To:     Sergey Senozhatsky <senozhatsky@chromium.org>
-Cc:     Alexey Romanov <avromanov@sberdevices.ru>,
-        linux-kernel@vger.kernel.org, Nick Terrell <terrelln@fb.com>,
-        Minchan Kim <minchan@kernel.org>,
-        Suleiman Souhlal <suleiman@google.com>,
-        Nitin Gupta <ngupta@vflare.org>, Jens Axboe <axboe@kernel.dk>,
-        Nhat Pham <nphamcs@gmail.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        linux-block@vger.kernel.org,
-        "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
-        linux-next@vger.kernel.org, linux-hardening@vger.kernel.org
-Subject: Re: Coverity: zram_recompress(): OVERRUN
-Message-ID: <202211101915.6A6C5758AA@keescook>
-References: <202211100847.388C61B3@keescook>
- <Y22ZNtdH9s+cuL9l@google.com>
- <Y22afneyl4pZ32ig@google.com>
+        Fri, 11 Nov 2022 04:18:07 -0500
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59F3CC18;
+        Fri, 11 Nov 2022 01:18:06 -0800 (PST)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 1330720167;
+        Fri, 11 Nov 2022 09:18:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1668158285;
+        h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
+         cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=Sg0XL9IMMLHu41b3KMPw143SB4/bUxyeRYmvJVGYUhk=;
+        b=iUiCtmLjvTRIAwo7RL0RPt0jNtLzE2wqZAEJgByrgFPpJflpTDDHxtkrKRvjRL/hgJ3Z46
+        l1B4kQUDwE6XJQ6rTrrH1WfP8LmQYB2/zW9rIPRxTQ2X8l+RXXFVKB5goaFOL1HL7Vitj4
+        fy1uLqgF3VOV4JeEXfJvkG74jMErTUo=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1668158285;
+        h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
+         cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=Sg0XL9IMMLHu41b3KMPw143SB4/bUxyeRYmvJVGYUhk=;
+        b=y+iq6ZFC1pB8zHh2yELDaOlN/q/OMvlpwdcFA+Mq//7dZ4bZpSe5yPJunv6ahmwVUp+68y
+        Q/iE3yrnO5lJ2HCg==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 7334413273;
+        Fri, 11 Nov 2022 09:18:04 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id 2YCyGUwTbmPiWwAAMHmgww
+        (envelope-from <pvorel@suse.cz>); Fri, 11 Nov 2022 09:18:04 +0000
+Date:   Fri, 11 Nov 2022 10:18:02 +0100
+From:   Petr Vorel <pvorel@suse.cz>
+To:     Martin Doucha <mdoucha@suse.cz>
+Cc:     Minchan Kim <minchan@kernel.org>, ltp@lists.linux.it,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, Nitin Gupta <ngupta@vflare.org>,
+        Sergey Senozhatsky <senozhatsky@chromium.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>,
+        Yang Xu <xuyang2018.jy@fujitsu.com>
+Subject: Re: [PATCH 0/1] Possible bug in zram on ppc64le on vfat
+Message-ID: <Y24TSnsYYCQxAJwW@pevik>
+Reply-To: Petr Vorel <pvorel@suse.cz>
+References: <20221107191136.18048-1-pvorel@suse.cz>
+ <Y2l3vJb1y2Jynf50@google.com>
+ <3ac740c0-954b-5e68-b413-0adc7bc5a2b5@suse.cz>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Y22afneyl4pZ32ig@google.com>
+In-Reply-To: <3ac740c0-954b-5e68-b413-0adc7bc5a2b5@suse.cz>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Nov 11, 2022 at 09:42:38AM +0900, Sergey Senozhatsky wrote:
-> On (22/11/11 09:37), Sergey Senozhatsky wrote:
-> > On (22/11/10 08:47), coverity-bot wrote:
-> > [..]
-> > > 1704     	class_index_old = zs_lookup_class_index(zram->mem_pool, comp_len_old);
-> > > 1705     	/*
-> > > 1706     	 * Iterate the secondary comp algorithms list (in order of priority)
-> > > 1707     	 * and try to recompress the page.
-> > > 1708     	 */
-> > > 1709     	for (; prio < prio_max; prio++) {
-> > > vvv     CID 1527270:    (OVERRUN)
-> > > vvv     Overrunning array "zram->comps" of 4 8-byte elements at element index 4 (byte offset 39) using index "prio" (which evaluates to 4).
-> > > 1710     		if (!zram->comps[prio])
-> > > 1711     			continue;
-> > > 1712
-> > > 1713     		/*
-> > > 1714     		 * Skip if the object is already re-compressed with a higher
-> > > 1715     		 * priority algorithm (or same algorithm).
-> > 
-> > prio_max is always limited and max value it can have is 4 (ZRAM_MAX_COMPS).
-> > Depending on use case we can limit prio_max even to lower values.
-> > 
-> > So we have
-> > 
-> > 	for (; prio < 4; prio++) {
-> > 		foo = comps[prio];
-> > 	}
-> > 
-> > I don't see how prio can be 4 inside of this loop.
-> 
-> Kees, if we do something like this will it make coverity happy?
-> 
-> ---
-> 
-> diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
-> index 9d33801e8ba8..e67a124f2e88 100644
-> --- a/drivers/block/zram/zram_drv.c
-> +++ b/drivers/block/zram/zram_drv.c
-> @@ -1706,6 +1706,7 @@ static int zram_recompress(struct zram *zram, u32 index, struct page *page,
->  	 * Iterate the secondary comp algorithms list (in order of priority)
->  	 * and try to recompress the page.
->  	 */
-> +	prio_max = min(prio_max, ZRAM_MAX_COMPS);
->  	for (; prio < prio_max; prio++) {
->  		if (!zram->comps[prio])
->  			continue;
+Hi Martin,
 
-It would, but given this is a clear false positive, don't feel the need
-to add this just for Coverity's sake. It is a nice bit of added
-robustness, but I leave that decision up to you! :)
+thanks a lot for providing more complete description!
 
--- 
-Kees Cook
+Kind regards,
+Petr
