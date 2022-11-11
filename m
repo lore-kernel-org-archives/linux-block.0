@@ -2,99 +2,88 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F977C4332F
-	for <linux-block@archiver.kernel.org>; Fri, 11 Nov 2022 00:37:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E52EC4332F
+	for <linux-block@archiver.kernel.org>; Fri, 11 Nov 2022 00:39:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231824AbiKKAhS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 10 Nov 2022 19:37:18 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56302 "EHLO
+        id S230280AbiKKAjh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 10 Nov 2022 19:39:37 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57630 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231812AbiKKAhR (ORCPT
+        with ESMTP id S229558AbiKKAjg (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 10 Nov 2022 19:37:17 -0500
-Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C358B959C
-        for <linux-block@vger.kernel.org>; Thu, 10 Nov 2022 16:37:16 -0800 (PST)
-Received: by mail-pj1-x102c.google.com with SMTP id v4-20020a17090a088400b00212cb0ed97eso3336712pjc.5
-        for <linux-block@vger.kernel.org>; Thu, 10 Nov 2022 16:37:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=joENuXZdCD3xg2y3vBRwMSO4BUP9wXySx77lEgOxTdU=;
-        b=Qkd/eDkw5bDGoNk59bjQkjFqB17uANwrULMAAfIyNup6NMRtIdipemKzmdRwlKvc0Y
-         m3gbegXJ41j+KOdrnFkD+PTdQd5lBs9ojFZ8toDmT0YZosaGq+j7kyrCx+8/w/qt7OMq
-         6pXoyzpiq4fgN8uf0/qpL5mYBi/vgzt6i3+1w=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=joENuXZdCD3xg2y3vBRwMSO4BUP9wXySx77lEgOxTdU=;
-        b=J8c2eFydcp9F1fd6cnmZSmAbuwjjgoQmOUAH1gVCsD+Tr8t+vjNH/cg7Z5QOuVHM4o
-         b9sc2oivRV9eTpoFG9SGKwryC1LgSiXdvxK/fyxM7fvjSg+nwLIfzk4F89paGznDCk8w
-         S5t2JopKAfgmga0GZWM6n2/CVPxekkfcGR+t/p8E86N6ce8AAokhPHHDL0iYpYXsV42S
-         AoNq44+tMaBvbRgoJF/prHug4LUiwS+8eJc/psSKgiK7AANecTd115O0+dOQZRDDDxwQ
-         BHQctmeDBE242ZVoPyVNLPgYWXMYlS9IknBy8lk5LeMrmaP4RhjUzlbJAGResq8MLFiS
-         zbUg==
-X-Gm-Message-State: ANoB5plotMQd5+toeUOtl+CB4bF82N0LxaCQYaN6PESJ43RqstvTS9ma
-        ZPHCwY7+lfhhnNaxvay2z5LtwA90xFbZJQ==
-X-Google-Smtp-Source: AA0mqf67I+mNMSyBu5fw9kL7x/lMPOnne39/x2DjuxhKeAAUDDUXN/85avp90U0klAYNieKBXS/LjA==
-X-Received: by 2002:a17:903:324d:b0:180:4030:1c7d with SMTP id ji13-20020a170903324d00b0018040301c7dmr97707plb.99.1668127036277;
-        Thu, 10 Nov 2022 16:37:16 -0800 (PST)
-Received: from google.com ([240f:75:7537:3187:8d55:c60d:579d:741c])
-        by smtp.gmail.com with ESMTPSA id j5-20020a170902c3c500b00186b138706fsm306805plj.13.2022.11.10.16.37.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Nov 2022 16:37:15 -0800 (PST)
-Date:   Fri, 11 Nov 2022 09:37:10 +0900
-From:   Sergey Senozhatsky <senozhatsky@chromium.org>
-To:     coverity-bot <keescook@chromium.org>
-Cc:     Sergey Senozhatsky <senozhatsky@chromium.org>,
-        Alexey Romanov <avromanov@sberdevices.ru>,
-        linux-kernel@vger.kernel.org, Nick Terrell <terrelln@fb.com>,
-        Minchan Kim <minchan@kernel.org>,
-        Suleiman Souhlal <suleiman@google.com>,
-        Nitin Gupta <ngupta@vflare.org>, Jens Axboe <axboe@kernel.dk>,
-        Nhat Pham <nphamcs@gmail.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        linux-block@vger.kernel.org,
-        "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
-        linux-next@vger.kernel.org, linux-hardening@vger.kernel.org
-Subject: Re: Coverity: zram_recompress(): OVERRUN
-Message-ID: <Y22ZNtdH9s+cuL9l@google.com>
-References: <202211100847.388C61B3@keescook>
+        Thu, 10 Nov 2022 19:39:36 -0500
+Received: from fudo.makrotopia.org (fudo.makrotopia.org [IPv6:2a07:2ec0:3002::71])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D6C311C21;
+        Thu, 10 Nov 2022 16:39:35 -0800 (PST)
+Received: from local
+        by fudo.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+         (Exim 4.94.2)
+        (envelope-from <daniel@makrotopia.org>)
+        id 1otI4k-0006Am-98; Fri, 11 Nov 2022 01:39:18 +0100
+Date:   Fri, 11 Nov 2022 00:39:15 +0000
+From:   Daniel Golle <daniel@makrotopia.org>
+To:     Richard Weinberger <richard@nod.at>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        Miquel Raynal <miquel.raynal@bootlin.com>,
+        Vignesh Raghavendra <vigneshr@ti.com>,
+        Davidlohr Bueso <dave@stgolabs.net>,
+        Matthew Wilcox <willy@infradead.org>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        Ming Lei <ming.lei@redhat.com>,
+        linux-block <linux-block@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        linux-mtd <linux-mtd@lists.infradead.org>,
+        linux-efi <linux-efi@vger.kernel.org>
+Subject: Re: [PATCH v4 4/5] mtd_blkdevs: add option to enable scanning for
+ partitions
+Message-ID: <Y22Zs7Jg0FNFHeHD@makrotopia.org>
+References: <Y2rgbfpYfpbLKHaf@makrotopia.org>
+ <1691046252.219046.1668109493753.JavaMail.zimbra@nod.at>
+ <Y21ZXRKJF3hZg8wk@makrotopia.org>
+ <871124728.219224.1668111155161.JavaMail.zimbra@nod.at>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <202211100847.388C61B3@keescook>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <871124728.219224.1668111155161.JavaMail.zimbra@nod.at>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On (22/11/10 08:47), coverity-bot wrote:
-[..]
-> 1704     	class_index_old = zs_lookup_class_index(zram->mem_pool, comp_len_old);
-> 1705     	/*
-> 1706     	 * Iterate the secondary comp algorithms list (in order of priority)
-> 1707     	 * and try to recompress the page.
-> 1708     	 */
-> 1709     	for (; prio < prio_max; prio++) {
-> vvv     CID 1527270:    (OVERRUN)
-> vvv     Overrunning array "zram->comps" of 4 8-byte elements at element index 4 (byte offset 39) using index "prio" (which evaluates to 4).
-> 1710     		if (!zram->comps[prio])
-> 1711     			continue;
-> 1712
-> 1713     		/*
-> 1714     		 * Skip if the object is already re-compressed with a higher
-> 1715     		 * priority algorithm (or same algorithm).
+On Thu, Nov 10, 2022 at 09:12:35PM +0100, Richard Weinberger wrote:
+> ----- Ursprüngliche Mail -----
+> > On Thu, Nov 10, 2022 at 08:44:53PM +0100, Richard Weinberger wrote:
+> >> ----- Ursprüngliche Mail -----
+> >> > Von: "Daniel Golle" <daniel@makrotopia.org>
+> >> > +
+> >> > +		if (!IS_ENABLED(CONFIG_MTD_BLOCK_PARTITIONS) || mtd_type_is_nand(new->mtd))
+> >> > +			gd->flags |= GENHD_FL_NO_PART;
+> >> 
+> >> I know that NAND should not get used with mtdblock because lack of wearleveling
+> >> and
+> >> in general too many writes. But what exactly is the rationale to deny part
+> >> scanning for NAND?
+> > 
+> > As UBI should be used on NAND, partition scanning should be enabled for
+> > ubiblock devices to have uImage.FIT filesystem subimages mapped by the
+> > partition parser.
+> > 
+> > If not skipping partition scanning on NAND-backed mtdblock devices the
+> > scanning itself will already trigger multiple warnings which now happen
+> > every time when a NAND-backed mtdblock device is being opened since
+> > commit 96a3295c ("mtdblock: warn if opened on NAND").
+> 
+> I see, you want to promote UBI. Makes sense.
+> In case you do a v5 series, please add a comment to the code.
 
-prio_max is always limited and max value it can have is 4 (ZRAM_MAX_COMPS).
-Depending on use case we can limit prio_max even to lower values.
+Will do, I'm planning to send v5 early next week.
 
-So we have
+If we are going to have only CONFIG_MTD_BLOCK_PARTITIONS and no other
+config symbol for ubiblock devices I'd also merge the two patches for
+mtdblock and ubiblock partition scanning into a single one.
 
-	for (; prio < 4; prio++) {
-		foo = comps[prio];
-	}
+Thank you for reviewing!
 
-I don't see how prio can be 4 inside of this loop.
+
+Daniel
