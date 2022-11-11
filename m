@@ -2,111 +2,127 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6BB9DC43217
-	for <linux-block@archiver.kernel.org>; Fri, 11 Nov 2022 18:31:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 26E8EC4332F
+	for <linux-block@archiver.kernel.org>; Fri, 11 Nov 2022 20:53:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231564AbiKKSbo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 11 Nov 2022 13:31:44 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34718 "EHLO
+        id S233220AbiKKUxO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 11 Nov 2022 15:53:14 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41400 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233990AbiKKSb0 (ORCPT
+        with ESMTP id S233015AbiKKUxM (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 11 Nov 2022 13:31:26 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2AA36DCD3
-        for <linux-block@vger.kernel.org>; Fri, 11 Nov 2022 10:31:25 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 5E76CB826E8
-        for <linux-block@vger.kernel.org>; Fri, 11 Nov 2022 18:31:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 528BFC433D6;
-        Fri, 11 Nov 2022 18:31:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1668191483;
-        bh=mqHRaFw9Xft7x5R8hniLax7Hzd4+8BiuWjDO6iFeN/s=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=eMnTABnYdW6B62v/QCNrU/NZIBCROCYaFK++Oc13EHFVezdaYREPgk8CZEyznWhJo
-         C8Du2rgcfdTtnE3CUBi/cv67z7SNv+MOJUI1p16kl3nWNdkjlYQ+nX4iZ0pQB8N1O0
-         c6xQyUJrBgrGHIMVpw5fOrYbNr4osNFjJEP4SMrelGJSUrUslQXzwC/8rGZP2+EuME
-         u8daGSlzEQ04EDUcYBN8TSw+cLk4Wzt8IeI0aN16z0/SOVwXJDKtZ9x/qzxXM2gACe
-         U96+/ILoLWrrYcJx6zxCQJaJ9RAl2samADvbxtoU3NsD+7qfhDny9D4A/I2Pv0iMWm
-         PdbIRFU0pANNg==
-Date:   Fri, 11 Nov 2022 11:31:19 -0700
-From:   Keith Busch <kbusch@kernel.org>
-To:     Mike Snitzer <snitzer@redhat.com>
-Cc:     Keith Busch <kbusch@meta.com>, linux-block@vger.kernel.org,
-        dm-devel@redhat.com, axboe@kernel.dk, stefanha@redhat.com,
-        ebiggers@kernel.org, me@demsh.org, mpatocka@redhat.com
-Subject: Re: [PATCHv2 0/5] fix direct io device mapper errors
-Message-ID: <Y26U91eH7NcXTlbj@kbusch-mbp.dhcp.thefacebook.com>
-References: <20221110184501.2451620-1-kbusch@meta.com>
- <Y26PSYu2nY/AE5Xh@redhat.com>
+        Fri, 11 Nov 2022 15:53:12 -0500
+Received: from mail-il1-x12a.google.com (mail-il1-x12a.google.com [IPv6:2607:f8b0:4864:20::12a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B8E386D57
+        for <linux-block@vger.kernel.org>; Fri, 11 Nov 2022 12:53:10 -0800 (PST)
+Received: by mail-il1-x12a.google.com with SMTP id i5so3064808ilc.12
+        for <linux-block@vger.kernel.org>; Fri, 11 Nov 2022 12:53:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=content-transfer-encoding:content-language:cc:to:subject:from
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=2/N5dh8Y4qp5wbIJDG1mJS9Xu2k3yzjM+oOOsvyXPMI=;
+        b=a9vs07VLkzBfwGdw4ooidPTf+zKX2WTu4p0cEwJGj0gPMB2PUso0pd9pamyu+rF0J0
+         xUCxse5IQ3LFYfmxeuWzySZCD2JrDH6Cu1J6boUZQ2BKvjZyZPsGRfpkY6DPl7DKjXgH
+         PEbBTWCNNSd6XIUEcp3LWyzmvQzfKvzejOk6dePj/9GqxVT+ltCJWyhFJ8Yv73j2Cis9
+         p+oFG3cYoUY1e2MLcmOtxE39oiO7zg+QEBN/6TL87GEBoRLsYvFO/5Tw4fbDYhbcqkDQ
+         3lbcBMfWEB4h97X1ic2jd1qBJpv+rzfCxHjeDJrdhL1kJ4m88PIjAXDKwrgT5U4ZVNrP
+         rmqA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:content-language:cc:to:subject:from
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=2/N5dh8Y4qp5wbIJDG1mJS9Xu2k3yzjM+oOOsvyXPMI=;
+        b=H03gvyHKbzFC2HyKFm3PnCQx7kehvvosIda8dl/WAxQRuScrVpm64E37XUfSVQtT/4
+         BIT+E2HnsA+Zsg0+JWQGLl9GovQLsd3ufONJQh/7jxZp6SV6Af25QXptsYmMyYpe/Uzn
+         95IbCFK9feUBZ5ax/GFA8q2NZzpkXsjGEt02aj70UnGCEVVHgZfNFWpT9zyi/sClGef1
+         uJgHTCGolaKg/mpNZHXV1ECX4uFhDu8xL+h5sYHyCxFND986jz/Gcx9T9xjpUerKMRMi
+         C+mI6QcJ5rAWsYlQFUd7bDlU0nroeZGX8biAzZcp4jXSVOjWo8qz+tnx0/0ZQck0oIKq
+         HsuQ==
+X-Gm-Message-State: ANoB5pn24CDQmoOtwFdWWnZ/NTOIa+sDOl7FCGkF9ht65gYc4v3bvrPR
+        kjif2qzFXKkmfZFV6qdsH7Rc/2TOOzF3kA==
+X-Google-Smtp-Source: AA0mqf52DVscYZLq3m2KoYKmh/j8/fhf82Eg9ZyddQBIiJOXhZtImyUmcLY8Ilf2XuOp5ov9OVcaFA==
+X-Received: by 2002:a05:6e02:1046:b0:2fa:f363:2696 with SMTP id p6-20020a056e02104600b002faf3632696mr1892913ilj.174.1668199989814;
+        Fri, 11 Nov 2022 12:53:09 -0800 (PST)
+Received: from [192.168.1.94] ([207.135.234.126])
+        by smtp.gmail.com with ESMTPSA id d123-20020a026281000000b00375126ae55fsm1056956jac.58.2022.11.11.12.53.09
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 11 Nov 2022 12:53:09 -0800 (PST)
+Message-ID: <38f29c47-61fb-3882-a054-a577ec41996c@kernel.dk>
+Date:   Fri, 11 Nov 2022 13:53:08 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Y26PSYu2nY/AE5Xh@redhat.com>
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
+ Thunderbird/102.4.1
+From:   Jens Axboe <axboe@kernel.dk>
+Subject: [GIT PULL] Block fixes for 6.1-rc5
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Nov 11, 2022 at 01:07:05PM -0500, Mike Snitzer wrote:
-> On Thu, Nov 10 2022 at  1:44P -0500,
-> Keith Busch <kbusch@meta.com> wrote:
-> 
-> > From: Keith Busch <kbusch@kernel.org>
-> > 
-> > The 6.0 kernel made some changes to the direct io interface to allow
-> > offsets in user addresses. This based on the hardware's capabilities
-> > reported in the request_queue's dma_alignment attribute.
-> > 
-> > dm-crypt, -log-writes and -integrity require direct io be aligned to the
-> > block size. Since it was only ever using the default 511 dma mask, this
-> > requirement may fail if formatted to something larger, like 4k, which
-> > will result in unexpected behavior with direct-io.
-> > 
-> > Changes since v1: Added the same fix for -integrity and -log-writes
-> > 
-> > The first three were reported successfully tested by Dmitrii Tcvetkov,
-> > but I don't have an official Tested-by: tag.
-> > 
-> >   https://lore.kernel.org/linux-block/20221103194140.06ce3d36@xps.demsh.org/T/#mba1d0b13374541cdad3b669ec4257a11301d1860
-> > 
-> > Keitio errors on Busch (5):
-> >   block: make dma_alignment a stacking queue_limit
-> >   dm-crypt: provide dma_alignment limit in io_hints
-> >   block: make blk_set_default_limits() private
-> >   dm-integrity: set dma_alignment limit in io_hints
-> >   dm-log-writes: set dma_alignment limit in io_hints
-> > 
-> >  block/blk-core.c           |  1 -
-> >  block/blk-settings.c       |  9 +++++----
-> >  block/blk.h                |  1 +
-> >  drivers/md/dm-crypt.c      |  1 +
-> >  drivers/md/dm-integrity.c  |  1 +
-> >  drivers/md/dm-log-writes.c |  1 +
-> >  include/linux/blkdev.h     | 16 ++++++++--------
-> >  7 files changed, 17 insertions(+), 13 deletions(-)
-> > 
-> > -- 
-> > 2.30.2
-> > 
-> 
-> There are other DM targets that override logical_block_size in their
-> .io_hints hook (writecache, ebs, zoned). Have you reasoned through why
-> those do _not_ need updating too?
+Hi Linus,
 
-Yeah, that's a good question. The ones that have a problem all make
-assumptions about a bio's bv_offset being logical block size aligned,
-and each of those is accounted for here. Everything else looks fine with
-respect to handling offsets.
+A few fixes for this release:
 
-> Is there any risk of just introducing a finalization method in block
-> core (that DM's .io_hints would call) that would ensure limits that
-> are a funtion of another are always in sync?  Would avoid whack-a-mole
-> issues in the future.
+- NVMe pull request via Christoph
+	- Quiet user passthrough command errors (Keith Busch)
+	- Fix memory leak in nvmet_subsys_attr_model_store_locked
+	- Fix a memory leak in nvmet-auth (Sagi Grimberg)
 
-I don't think we can this particular limit issue. A lot of drivers and
-devices can use a smaller dma_alignment than the logical block size, so
-the generic block layer wouldn't really know the driver's intentions for
-the relationship of these limits.
+- Fix a potential NULL point deref in bfq (Yu)
+
+- Allocate command/response buffers separately for DMA for sed-opal,
+  rather than rely on embedded alignment (Serge)
+
+Please pull!
+
+
+The following changes since commit 878eb6e48f240d02ed1c9298020a0b6370695f24:
+
+  block: blk_add_rq_to_plug(): clear stale 'last' after flush (2022-10-31 20:21:38 -0600)
+
+are available in the Git repository at:
+
+  git://git.kernel.dk/linux.git tags/block-6.1-2022-11-11
+
+for you to fetch changes up to df24560d058d11f02b7493bdfc553131ef60b23d:
+
+  Merge tag 'nvme-6.1-2022-11-10' of git://git.infradead.org/nvme into block-6.1 (2022-11-10 06:55:02 -0700)
+
+----------------------------------------------------------------
+block-6.1-2022-11-11
+
+----------------------------------------------------------------
+Aleksandr Miloserdov (1):
+      nvmet: fix memory leak in nvmet_subsys_attr_model_store_locked
+
+Jens Axboe (1):
+      Merge tag 'nvme-6.1-2022-11-10' of git://git.infradead.org/nvme into block-6.1
+
+Keith Busch (1):
+      nvme: quiet user passthrough command errors
+
+Sagi Grimberg (1):
+      nvmet: fix a memory leak
+
+Serge Semin (1):
+      block: sed-opal: kmalloc the cmd/resp buffers
+
+Yu Kuai (1):
+      block, bfq: fix null pointer dereference in bfq_bio_bfqg()
+
+ block/bfq-cgroup.c             |  4 ++++
+ block/sed-opal.c               | 32 ++++++++++++++++++++++++++++----
+ drivers/nvme/host/core.c       |  3 +--
+ drivers/nvme/host/pci.c        |  2 --
+ drivers/nvme/target/configfs.c |  8 ++++++--
+ 5 files changed, 39 insertions(+), 10 deletions(-)
+
+-- 
+Jens Axboe
