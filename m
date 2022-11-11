@@ -2,107 +2,85 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB94FC4332F
-	for <linux-block@archiver.kernel.org>; Thu, 10 Nov 2022 23:04:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DEEAC43217
+	for <linux-block@archiver.kernel.org>; Fri, 11 Nov 2022 00:26:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229655AbiKJXEp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 10 Nov 2022 18:04:45 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55226 "EHLO
+        id S231207AbiKKA0s (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 10 Nov 2022 19:26:48 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53128 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229528AbiKJXEo (ORCPT
+        with ESMTP id S231586AbiKKA0r (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 10 Nov 2022 18:04:44 -0500
-Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94D031DA41;
-        Thu, 10 Nov 2022 15:04:43 -0800 (PST)
-Received: by mail-pl1-x636.google.com with SMTP id u6so2783684plq.12;
-        Thu, 10 Nov 2022 15:04:43 -0800 (PST)
+        Thu, 10 Nov 2022 19:26:47 -0500
+Received: from mail-pg1-x52a.google.com (mail-pg1-x52a.google.com [IPv6:2607:f8b0:4864:20::52a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 988945EF8B
+        for <linux-block@vger.kernel.org>; Thu, 10 Nov 2022 16:26:42 -0800 (PST)
+Received: by mail-pg1-x52a.google.com with SMTP id q1so3091783pgl.11
+        for <linux-block@vger.kernel.org>; Thu, 10 Nov 2022 16:26:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
+        d=chromium.org; s=google;
         h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=8PxXXft/nkkyC+qO3NZ0NZRsgWMaldSAxbQ9lxvKRGY=;
-        b=T6C7YIAMYHacLdrESecsyvPNePaxfqKM6ZzXAgY/O9enpon/fyk4AwNgl21buw2/tg
-         xmg6tTuw9bDi37AmyBpjGUQbxADCwvSk8/Cm7Q5ceUWvRAb3jTO8xLahRHhj13EQv2+C
-         L8roGgR/WnzAEfbC/SBSxdDo7OjR6NNkhheKPiuQQJxhZhhcVpC60ppB5Uocn9O26SNO
-         K7f01Uy0UWye2FRcS/mAfg3t/m/H7du4d81vo66lkm7yS2742p05r2+fFnuwWjSbTWse
-         rg/sN8qJQyOgFL/8eTz2ab00JzSmsiBefMNT6JbZs1bpZmwEKonlZa0TS0beQpAeJ0Eg
-         a1Hw==
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=z5NGc0Wtc/LAmeM4ZbbbL8b0+UEPmBPAYTp12Vkl1o0=;
+        b=OYVMNqSYsFjm1l8Gb77rL89LoGY1zcp9Xm6VxVICPuHEclqOVJvgjkuoDATdF3jc9z
+         WQ362RA9vIleTOkpT9IQ12tgbW8mtK8oT7L3E9avA34iV1hjk3pk/jNAVGr2HGyTnBTF
+         IFnm+HQJ7g8P5sFjNIAVrYXFIK5sf1GV4jQYo=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=8PxXXft/nkkyC+qO3NZ0NZRsgWMaldSAxbQ9lxvKRGY=;
-        b=dQlmBTPnBUbRmea2h5O1TY5BTKTp07CuEk28CxoRTUZB55ie7FDlRoWWf7UOnGi0IY
-         MBRtX92ri6gDdtz43yHIF1Vh5kMQVjIdSLA/NLSQgSqRVzvriMuh0wnnL2MbL7FAeW+Z
-         AvadSU351VctUjnetQNUlNQ8s8pBWEm+31/rsLSo/zGVtoI11fMSRJKldDk1jwe2yFbE
-         3GANfhiOV1FtE6kh8bMeVhi+S+cMI4wjn25rF+/3p2nAAfLS51HEcH9lY0RiAL3+5R4x
-         bnPd6iDMuDbh1NaOg8v/iXmyOjnxQgHSNVs4XpVxUNPUro1OPL5o/bIUiBNiQS0Pxn9z
-         2o0A==
-X-Gm-Message-State: ACrzQf3KUGeDbbSQYA3O46ZcVPwpXW8embX3bPwqf26KZl8vNjIqbZ/R
-        KNbhso4fCJjB/UhYQFXgG00=
-X-Google-Smtp-Source: AMsMyM4KtyUZ+RLI3SgeEuwc5nKbDYT6Ih/qwJK99ZzTPQW52wv+CeCQTrbrzNKVmuN6P5egPGp+Gg==
-X-Received: by 2002:a17:90b:3d8d:b0:212:ccda:88bc with SMTP id pq13-20020a17090b3d8d00b00212ccda88bcmr2476638pjb.212.1668121483057;
-        Thu, 10 Nov 2022 15:04:43 -0800 (PST)
-Received: from google.com ([2620:15c:211:201:8c0b:3260:c81c:119d])
-        by smtp.gmail.com with ESMTPSA id a15-20020a170902710f00b0018875b76945sm185565pll.274.2022.11.10.15.04.41
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=z5NGc0Wtc/LAmeM4ZbbbL8b0+UEPmBPAYTp12Vkl1o0=;
+        b=sqNe/DVOPWzakiO27K+OXPxnnAh57/HRk90gs5jQ6MrJTFbwV68EpuVpvKg3gFbi6C
+         vvNMaib3quO4l1cCvihe4mIhfKgPf8psO4JEKLUvISBMwWATgx/JFZeFJw5Tt+AH1NLJ
+         cYEgKAjIl7GvZlZ7v/PGm+syq7g9JMJYlOcbcngFRnqld9VNcJl0xfwj4g+aqeeTp74u
+         DdpdsGoc860UQFtC2hOQUU4Jg5L5pyUrLKRWgGkpbQTXGe8dA8xliMQU/CRLzcC6qhLZ
+         u8q9FunNLVxokEBJUy6/zTFWxbg8HOIIM0hUDpyDSPNvW+SuR3B0Ighw6qIEg04hopUw
+         SURQ==
+X-Gm-Message-State: ACrzQf1ZI4VJu6G4hRHKhTvmEMUx2j5YERPy+c1I2vfVNFGdc47UZWuN
+        cH17+uACRnVrVcA/C4LYuU7zsw==
+X-Google-Smtp-Source: AMsMyM7Kh7CVcxqJugz4JnRLlCyj+VNc2Jl1ZCgSFYUBWm/peCV0U9rmVHoHIjznkrpRLbvkAA1Bdw==
+X-Received: by 2002:a63:5543:0:b0:46f:ed3a:f38b with SMTP id f3-20020a635543000000b0046fed3af38bmr3803064pgm.387.1668126397981;
+        Thu, 10 Nov 2022 16:26:37 -0800 (PST)
+Received: from google.com ([240f:75:7537:3187:8d55:c60d:579d:741c])
+        by smtp.gmail.com with ESMTPSA id t6-20020a1709027fc600b0018703bf3ec9sm288513plb.61.2022.11.10.16.26.33
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Nov 2022 15:04:42 -0800 (PST)
-Sender: Minchan Kim <minchan.kim@gmail.com>
-Date:   Thu, 10 Nov 2022 15:04:40 -0800
-From:   Minchan Kim <minchan@kernel.org>
-To:     Petr Vorel <pvorel@suse.cz>
-Cc:     ltp@lists.linux.it, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        Nitin Gupta <ngupta@vflare.org>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>,
-        Martin Doucha <mdoucha@suse.cz>,
-        Yang Xu <xuyang2018.jy@fujitsu.com>
-Subject: Re: [PATCH 0/1] Possible bug in zram on ppc64le on vfat
-Message-ID: <Y22DiF5Q5EDUIrZE@google.com>
-References: <20221107191136.18048-1-pvorel@suse.cz>
- <Y2l3vJb1y2Jynf50@google.com>
- <Y2l89dt/t8M6+9go@pevik>
+        Thu, 10 Nov 2022 16:26:37 -0800 (PST)
+Date:   Fri, 11 Nov 2022 09:26:31 +0900
+From:   Sergey Senozhatsky <senozhatsky@chromium.org>
+To:     coverity-bot <keescook@chromium.org>
+Cc:     Sergey Senozhatsky <senozhatsky@chromium.org>,
+        Alexey Romanov <avromanov@sberdevices.ru>,
+        linux-kernel@vger.kernel.org, Nick Terrell <terrelln@fb.com>,
+        Minchan Kim <minchan@kernel.org>,
+        Suleiman Souhlal <suleiman@google.com>,
+        Nitin Gupta <ngupta@vflare.org>, Jens Axboe <axboe@kernel.dk>,
+        Nhat Pham <nphamcs@gmail.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        linux-block@vger.kernel.org,
+        "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
+        linux-next@vger.kernel.org, linux-hardening@vger.kernel.org
+Subject: Re: Coverity: zram_recompress(): OVERRUN
+Message-ID: <Y22WtxzDXM5PfFnb@google.com>
+References: <202211100847.388C61B3@keescook>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Y2l89dt/t8M6+9go@pevik>
+In-Reply-To: <202211100847.388C61B3@keescook>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Nov 07, 2022 at 10:47:33PM +0100, Petr Vorel wrote:
-> Hi Minchan,
-> 
-> > On Mon, Nov 07, 2022 at 08:11:35PM +0100, Petr Vorel wrote:
-> > > Hi all,
-> 
-> > > following bug is trying to workaround an error on ppc64le, where
-> > > zram01.sh LTP test (there is also kernel selftest
-> > > tools/testing/selftests/zram/zram01.sh, but LTP test got further
-> > > updates) has often mem_used_total 0 although zram is already filled.
-> 
-> > Hi, Petr,
-> 
-> > Is it happening on only ppc64le?
-> I haven't seen it on other archs (x86_64, aarch64).
-> 
-> > Is it a new regression? What kernel version did you use?
-> Found on openSUSE kernel, which uses stable kernel releases 6.0.x.
-> It's probably much older, first I've seen it some years ago (I'm not able to find kernel version), but it was random. Now it's much more common.
-> 
-> Test runs on VM (I can give qemu command or whatever you need to know about it)
-> I'll try to verify it on some bare metal ppc64le.
+On (22/11/10 08:47), coverity-bot wrote:
+> *** CID 1527270:    (OVERRUN)
+> drivers/block/zram/zram_drv.c:1727 in zram_recompress()
+> 1721     		zstrm = zcomp_stream_get(zram->comps[prio]);
+> 1722     		src = kmap_atomic(page);
+> 1723     		ret = zcomp_compress(zstrm, src, &comp_len_new);
+> 1724     		kunmap_atomic(src);
+> 1725
+> 1726     		if (ret) {
+> vvv     CID 1527270:    (OVERRUN)
+> vvv     Overrunning array "zram->comps" of 4 8-byte elements at element index 4 (byte offset 39) using index "prio" (which evaluates to 4).
 
-Hi Petr and Martin,
-
-Thanks for testing and meaning information.
-
-Could you tell how I could create VM to run ppc64le and run the test?
-I'd like to reproduce in my local to debug it.
-
-Thanks!
+Hmm... I don't really see how prio can evaluate to 4.
