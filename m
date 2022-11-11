@@ -2,82 +2,95 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B2DD9C433FE
-	for <linux-block@archiver.kernel.org>; Fri, 11 Nov 2022 02:34:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC933C433FE
+	for <linux-block@archiver.kernel.org>; Fri, 11 Nov 2022 03:15:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232805AbiKKCev (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 10 Nov 2022 21:34:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47142 "EHLO
+        id S231765AbiKKDPK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 10 Nov 2022 22:15:10 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53046 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232734AbiKKCeR (ORCPT
+        with ESMTP id S231888AbiKKDPI (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 10 Nov 2022 21:34:17 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB669663CA;
-        Thu, 10 Nov 2022 18:34:03 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 7967BB822ED;
-        Fri, 11 Nov 2022 02:34:02 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 87455C433D6;
-        Fri, 11 Nov 2022 02:34:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1668134041;
-        bh=/rp34yeGFKsFhtHhn2MEDPm5v0CJcRrSiHHjvvOT3j0=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=EDOZJjleH+mGHD79za0KdkPsoeFfFetqkhrJXh0sO/wW8hEsy4geiI4KnetMwv/eW
-         q+d0RoG+vpHpjJlNUYmGpS83Kwr41xOWz1lorQ67VWOnTVjZtq7DvELm5HrSM6JCNy
-         U0udeNEQ1eI8959DlF2Y2aEvkIB6HF1ycRyxuuZNwEHUaKfqOD/fGlwxN4IAJb8l2j
-         7A8/h8O4o9w9MvG6ZEw0H1tKCRk3KZ7iRbkllLXsXaZUB+2mH0TYohcgxZXBd8nm0v
-         89DAATQEgXwWmzUaIOsJEvbIPMMkT4Ql0yhp0NrgiX+di781CN+eXq+RYHhrqr0I1q
-         iCcOLNcz0ouig==
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Al Viro <viro@zeniv.linux.org.uk>, Jens Axboe <axboe@kernel.dk>,
-        Sasha Levin <sashal@kernel.org>, linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.0 11/30] block: blk_add_rq_to_plug(): clear stale 'last' after flush
-Date:   Thu, 10 Nov 2022 21:33:19 -0500
-Message-Id: <20221111023340.227279-11-sashal@kernel.org>
-X-Mailer: git-send-email 2.35.1
-In-Reply-To: <20221111023340.227279-1-sashal@kernel.org>
-References: <20221111023340.227279-1-sashal@kernel.org>
+        Thu, 10 Nov 2022 22:15:08 -0500
+Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B98ADC746
+        for <linux-block@vger.kernel.org>; Thu, 10 Nov 2022 19:15:07 -0800 (PST)
+Received: by mail-pf1-x42e.google.com with SMTP id 140so2333907pfz.6
+        for <linux-block@vger.kernel.org>; Thu, 10 Nov 2022 19:15:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=bwfTiLzBNiq3UGSuRV53jnzzUVq8yp9gLs6VSoyYYIY=;
+        b=gZCI8KVjBN7kl3vowgoO723z9038r1Q7Rn824uf1rMAzO0KPmQmYS9isn/OEPBSsHO
+         zqAHD0ToyrZis6ESaYLdJB/CrYW2eQk/qY9eKlpAmGIGLtdM+yhpN7Y6RZTOz8SJ9h5u
+         XE2xv1pKPkSpLbPoeUm/+tihq4ihjbcCBwBv0=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=bwfTiLzBNiq3UGSuRV53jnzzUVq8yp9gLs6VSoyYYIY=;
+        b=xm9umGN/QcII/SE2gthNBs7WKPtFxyymgShG2jeEPY4jgFT6GtizCcJvGy0Zgm90W3
+         MeFT1GZVbJM087kMJQ4zsdY3tn5ot9nBoss3lw7MOu5ShZieXMBbxBMc6WG3GhpNunyV
+         3i+TfANNUOY/zBmbz/LftQwLmL1vzFcmx9X5eho9Ll+XDaqu6KWRig2YZMAtCTydGR4w
+         6EYtFrceSIsQFDH2TbalU2VIe1Td/BXuzDbsROQS3L8pE0002LeK4yp5koEfy6hVuMfJ
+         2SQpjir/vQ5drPy5X2BA8D4kLOwSCuwaaoKsDqRz4mNgQLbQdR/z9nVUETotfLtsBWcG
+         u3kQ==
+X-Gm-Message-State: ANoB5pl5z/VYZ+vS80PZYnxHjLmhk3QpdCQaKh0MyUYrCU6od5wuhTkO
+        7a9jQD51bern0Qw2Xv3iMOJOJA==
+X-Google-Smtp-Source: AA0mqf7TQE+OkvPXRKVatlxKEdVrVGcR694siFnt5CSyd0ClsvheQbjo5FKS5cSiQ1WfM8aY/5cU9A==
+X-Received: by 2002:a63:d111:0:b0:473:ef9c:e1e5 with SMTP id k17-20020a63d111000000b00473ef9ce1e5mr1759870pgg.241.1668136507168;
+        Thu, 10 Nov 2022 19:15:07 -0800 (PST)
+Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
+        by smtp.gmail.com with ESMTPSA id 186-20020a6206c3000000b00553d573222fsm387724pfg.199.2022.11.10.19.15.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 10 Nov 2022 19:15:06 -0800 (PST)
+Date:   Thu, 10 Nov 2022 19:15:05 -0800
+From:   Kees Cook <keescook@chromium.org>
+To:     Sergey Senozhatsky <senozhatsky@chromium.org>
+Cc:     Alexey Romanov <avromanov@sberdevices.ru>,
+        linux-kernel@vger.kernel.org, Nick Terrell <terrelln@fb.com>,
+        Minchan Kim <minchan@kernel.org>,
+        Suleiman Souhlal <suleiman@google.com>,
+        Nitin Gupta <ngupta@vflare.org>, Jens Axboe <axboe@kernel.dk>,
+        Nhat Pham <nphamcs@gmail.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        linux-block@vger.kernel.org,
+        "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
+        linux-next@vger.kernel.org, linux-hardening@vger.kernel.org
+Subject: Re: Coverity: zram_recompress(): OVERRUN
+Message-ID: <202211101904.7A0B0C3@keescook>
+References: <202211100847.388C61B3@keescook>
+ <Y22WtxzDXM5PfFnb@google.com>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Y22WtxzDXM5PfFnb@google.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Al Viro <viro@zeniv.linux.org.uk>
+On Fri, Nov 11, 2022 at 09:26:31AM +0900, Sergey Senozhatsky wrote:
+> On (22/11/10 08:47), coverity-bot wrote:
+> > *** CID 1527270:    (OVERRUN)
+> > drivers/block/zram/zram_drv.c:1727 in zram_recompress()
+> > 1721     		zstrm = zcomp_stream_get(zram->comps[prio]);
+> > 1722     		src = kmap_atomic(page);
+> > 1723     		ret = zcomp_compress(zstrm, src, &comp_len_new);
+> > 1724     		kunmap_atomic(src);
+> > 1725
+> > 1726     		if (ret) {
+> > vvv     CID 1527270:    (OVERRUN)
+> > vvv     Overrunning array "zram->comps" of 4 8-byte elements at element index 4 (byte offset 39) using index "prio" (which evaluates to 4).
+> 
+> Hmm... I don't really see how prio can evaluate to 4.
 
-[ Upstream commit 878eb6e48f240d02ed1c9298020a0b6370695f24 ]
+Yeah, I agree. This looks like a false positive. I'm not sure why
+Coverity triggered for it. Looking at the extended report, it seems to
+not have any idea that prio_max is correctly bounded.
 
-blk_mq_flush_plug_list() empties ->mq_list and request we'd peeked there
-before that call is gone; in any case, we are not dealing with a mix
-of requests for different queues now - there's no requests left in the
-plug.
+Sorry for the noise!
 
-Signed-off-by: Al Viro <viro@zeniv.linux.org.uk>
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- block/blk-mq.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index fe840536e6ac..d1326d48b45e 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1183,6 +1183,7 @@ static void blk_add_rq_to_plug(struct blk_plug *plug, struct request *rq)
- 		   (!blk_queue_nomerges(rq->q) &&
- 		    blk_rq_bytes(last) >= BLK_PLUG_FLUSH_SIZE)) {
- 		blk_mq_flush_plug_list(plug, false);
-+		last = NULL;
- 		trace_block_plug(rq->q);
- 	}
- 
 -- 
-2.35.1
-
+Kees Cook
