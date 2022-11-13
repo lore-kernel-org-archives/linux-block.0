@@ -2,394 +2,1436 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB8F5C433FE
-	for <linux-block@archiver.kernel.org>; Sun, 13 Nov 2022 13:00:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC163C4332F
+	for <linux-block@archiver.kernel.org>; Sun, 13 Nov 2022 23:23:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235264AbiKMNAP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 13 Nov 2022 08:00:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40994 "EHLO
+        id S235416AbiKMXXv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 13 Nov 2022 18:23:51 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44678 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235258AbiKMNAO (ORCPT
+        with ESMTP id S235410AbiKMXXu (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 13 Nov 2022 08:00:14 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 65524F5B
-        for <linux-block@vger.kernel.org>; Sun, 13 Nov 2022 04:59:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1668344359;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=YDbE9HMitpVMVBGcKpaPg+t4NbUTfc5Zmsj/A5QLKDM=;
-        b=KGfoqf5JlZkFslfwN11/yAmJJ66TDA5cEWX26HFPjtaJnCahWaJYQ2t/GZh2Akacb/7kXI
-        EEHgplBMQjCA15AdEwIPEGES+XkxChgoNKmw4t7WNy06JHgYexkxkDoyX2wNgEBr3c4Gp1
-        IcQWx+shp5NewXQH+32rn0pFrYIQOQw=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-414-CwWK8VmtPg6BaLbBCm4Fkg-1; Sun, 13 Nov 2022 07:59:18 -0500
-X-MC-Unique: CwWK8VmtPg6BaLbBCm4Fkg-1
-Received: by mail-wm1-f72.google.com with SMTP id bg21-20020a05600c3c9500b003c2acbff422so5185213wmb.0
-        for <linux-block@vger.kernel.org>; Sun, 13 Nov 2022 04:59:18 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=YDbE9HMitpVMVBGcKpaPg+t4NbUTfc5Zmsj/A5QLKDM=;
-        b=xEchG05llhtXVjA0167PrgWHU5D7rVMC09S8zM/RCvc+6yitJVT8ET6L39drxE0l+u
-         3QsIgEjSU1N5bCOGVlya7QIeYOfg0t2OSMUOQuvFyxIrILr21YVfucxPObWgQ2gXlbUy
-         npHBq1TDKjy2RsU3hl28MU8c72/V/l+vJKjcb4+7NZPWcWGzVsJqSIpTf+1XJdpfHUEJ
-         6Lob8iy8JYTc2nYeshP6PCPxpuOQZ5xMdE7gRsSqmEIg6AJmuiXyDRSIwKQW2wd3kdDD
-         whXoXYduGqTSafTY+7Z6mmLws+8btg1c1DJeIdIMSA+qH/iTXMuUSxey7L3eG97qPFZR
-         3aAg==
-X-Gm-Message-State: ANoB5pnLFneOwovEuyQbVkcwjhKM41h+zgdxR49lzICufbmm81n08f4J
-        gqP6O6UyjovEH0NOhoruoHl37EA6iqEVoKn26lAiWi0biw/ZT8RcMDHccG12PZmZde2grom9L6g
-        lGyucgSQHmgsdTVyS7MMLVPk=
-X-Received: by 2002:a5d:456e:0:b0:236:8fab:b373 with SMTP id a14-20020a5d456e000000b002368fabb373mr5198718wrc.9.1668344356021;
-        Sun, 13 Nov 2022 04:59:16 -0800 (PST)
-X-Google-Smtp-Source: AA0mqf6XEoOofo0Ti278J5VtVjhKCdhb5zVhuqiJzinzghrlzRAp95NyIWTF+6qNJSzm6UB3SF3Eow==
-X-Received: by 2002:a5d:456e:0:b0:236:8fab:b373 with SMTP id a14-20020a5d456e000000b002368fabb373mr5198706wrc.9.1668344355705;
-        Sun, 13 Nov 2022 04:59:15 -0800 (PST)
-Received: from redhat.com ([2.52.4.127])
-        by smtp.gmail.com with ESMTPSA id a16-20020a056000051000b002365730eae8sm6885228wrf.55.2022.11.13.04.59.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 13 Nov 2022 04:59:14 -0800 (PST)
-Date:   Sun, 13 Nov 2022 07:59:11 -0500
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Angus Chen <angus.chen@jaguarmicro.com>
-Cc:     Thomas Gleixner <tglx@linutronix.de>,
-        "jasowang@redhat.com" <jasowang@redhat.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "axboe@kernel.dk" <axboe@kernel.dk>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Liming Wu <liming.wu@jaguarmicro.com>,
-        "stefanha@redhat.com" <stefanha@redhat.com>,
-        Christoph Hellwig <hch@lst.de>
-Subject: Re: [PATCH v1] virtio_blk: should not use IRQD_AFFINITY_MANAGED in
- init_rq
-Message-ID: <20221113075617-mutt-send-email-mst@kernel.org>
-References: <20220924034854.323-1-angus.chen@jaguarmicro.com>
- <20220927163723-mutt-send-email-mst@kernel.org>
- <TY2PR06MB3424C2AD8F7AC77DA83FB4C685549@TY2PR06MB3424.apcprd06.prod.outlook.com>
- <TY2PR06MB34249F3D2DE2C30BB324E5A385039@TY2PR06MB3424.apcprd06.prod.outlook.com>
+        Sun, 13 Nov 2022 18:23:50 -0500
+Received: from esa3.hgst.iphmx.com (esa3.hgst.iphmx.com [216.71.153.141])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 702F42BC7
+        for <linux-block@vger.kernel.org>; Sun, 13 Nov 2022 15:23:47 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1668381827; x=1699917827;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=IUsp1Seorhp2LO60JA6GIfXWEzx3uacpOVbnMwX1zNQ=;
+  b=mQlvXkYCFwfZ2Pb6ogVhC9aiLUwhMEQ9SQ2eiDOMABHVEQ3sSjcvDs8t
+   FWcezzNyIuo0WGBk6BOE+Z4OdINqkxPszHKplGdjVD6AstFC4SV4SAzYZ
+   xXwZc76AR2jD4u8djmc/5mKzbnXn4dl9cWIWNFErxz66jbK5o0Y518s3/
+   KU5gmGwo0RtgIj96ZJCHJj6GJ19+zzyrYcD5IpoY99vpFKS2YaJzH3n1P
+   N+UANLyrwBVN5v9QKWjQVOOZE/EE0yL7kr0+S9zZtL5Lr3u8qh/vbukBr
+   wuOWKv3RijUrVE+IbHVhzbOcbONaSLAHVwuuyE0fdhAkNW/n0+1aTdqUe
+   g==;
+X-IronPort-AV: E=Sophos;i="5.96,161,1665417600"; 
+   d="scan'208";a="221328999"
+Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
+  by ob1.hgst.iphmx.com with ESMTP; 14 Nov 2022 07:23:46 +0800
+IronPort-SDR: 0fTbY9EpA+8tfm4KNbtwYFWGgds+tA88DyJOxWdpwCqM8FCwJn4ZTaGkKf3ElNun9l4XHSxXvG
+ cuuFPd/WM5HeXn++eDhBCu7qX6ujzqzzwFuZniElNrHc3Arjtlxz66EsASt0gP2ONV2gQpTcK7
+ gHVl0KlIXu+ElUYtot7L5eO7JvdbmJNPtYElNZgw0IvTZcdrUjDaNZM1IPQHK5FQyPwDRBXPux
+ Yy2gtzgoR2jXE8NFRPsSd/eY1l9nUW4LOyjssXoHggOJnweVwX3ATVn8xscxi8BkC3oIQ1VTzX
+ qC4=
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 13 Nov 2022 14:42:45 -0800
+IronPort-SDR: fvw7IAIxVUx1wg78wfa2E5a9OtnT+uxzuDjkn4hRVPYMQFcyY/+7J2X5n1LLEFfBan1VBWuNPS
+ LrKE82BHqXIOxSmCY2eCwepbXuNTzwXVapwE/l7xbUmMNVla+GlqXBwptHTuh7SFQfOgND/SzY
+ DaaxOwAh1dAz5Os9Z49v19+v4QZHYY3N+mKBaPPfuUzKvCevkO89Tj4umVFChPvpQ5Tp2FlWXL
+ raO8jHXZuS2XUPWfQh1GnY4StY9Bo3TSOM+q9jeejZM/wO/1+snF1l6z4wdTT7F+F0uf7vhK+I
+ Z30=
+WDCIronportException: Internal
+Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
+  by uls-op-cesaip02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 13 Nov 2022 15:23:46 -0800
+Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4N9T5t0tsPz1RvTr
+        for <linux-block@vger.kernel.org>; Sun, 13 Nov 2022 15:23:46 -0800 (PST)
+Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
+        reason="pass (just generated, assumed good)"
+        header.d=opensource.wdc.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
+        opensource.wdc.com; h=content-transfer-encoding:content-type
+        :in-reply-to:organization:from:content-language:references:to
+        :subject:user-agent:mime-version:date:message-id; s=dkim; t=
+        1668381820; x=1670973821; bh=IUsp1Seorhp2LO60JA6GIfXWEzx3uacpOVb
+        nMwX1zNQ=; b=VY+2nSehj6DY25Jl+6k3/sHzHEuHtAxWShynXOVBt5Cj0a5th6e
+        P+dzsRhESa5wNnLvwF1iwOK8OsCqem9d2zg9d+olLKPBQba1NxhilNGYz4e5qz48
+        LZKBpUeESSPVEbKGALQZF0fy21Nt8Z2r1NMyonvj8T5gU8EzES8OjAmgzwhm40Fk
+        MRSypxeb+2r9hkd+FAqBggpBlzmDLYvSAvPRUI8l5728htp8YnxeZch3N7RfTDAJ
+        HIrweCPoV6oJWN2WjPC5cdAwilzsMrPEanPUPkSiylbhWStFVj5YpCbXd9qwjazP
+        fQsNyurM0i5kym353nfTzI2rMJNthjn1K+A==
+X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
+Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
+        by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
+        with ESMTP id Q3p0ylMO8PXz for <linux-block@vger.kernel.org>;
+        Sun, 13 Nov 2022 15:23:40 -0800 (PST)
+Received: from [10.225.163.46] (unknown [10.225.163.46])
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4N9T5l27m3z1RvLy;
+        Sun, 13 Nov 2022 15:23:39 -0800 (PST)
+Message-ID: <51bb45e2-6de5-3608-0ccf-7ee78071fa05@opensource.wdc.com>
+Date:   Mon, 14 Nov 2022 08:23:37 +0900
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <TY2PR06MB34249F3D2DE2C30BB324E5A385039@TY2PR06MB3424.apcprd06.prod.outlook.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.4.1
+Subject: Re: [PATCH] pata_parport: add driver (PARIDE replacement)
+To:     Ondrej Zary <linux@zary.sk>, Christoph Hellwig <hch@lst.de>
+Cc:     Sergey Shtylyov <s.shtylyov@omp.ru>, Jens Axboe <axboe@kernel.dk>,
+        Tim Waugh <tim@cyberelk.net>, linux-block@vger.kernel.org,
+        linux-parport@lists.infradead.org, linux-ide@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20220312144415.20010-1-linux@zary.sk>
+ <202203161358.06506.linux@zary.sk> <20221019073431.GA12124@lst.de>
+ <202211121217.03948.linux@zary.sk>
+Content-Language: en-US
+From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
+Organization: Western Digital Research
+In-Reply-To: <202211121217.03948.linux@zary.sk>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, Nov 12, 2022 at 03:28:37AM +0000, Angus Chen wrote:
-> Hi.
-> I use the patch to workaround irq resource exhausted.
-> Although mst helped me to fix the intx irq resource in virtio_pci_common.c,
-> Link: https://lore.kernel.org/virtualization/20221014013156-mutt-send-email-mst@kernel.org/
+On 11/12/22 20:17, Ondrej Zary wrote:
+> On Wednesday 19 October 2022 09:34:31 Christoph Hellwig wrote:
+>> It's been a while - did you get a chance to make some progress on
+>> this?  Do you need any help to unblock you?
+>>
 > 
-> As mst said,the bug will still be there.
-> The dpu can provide more than 512 virtio_blk in one machine. 
-> Could you pls provide more suggestion?
+> Sorry again, I'm back now. Trying to fix locking problems.
+> Added this to each function for analysis how the functions are called wrt.
+> locking:
 > 
-> Thanks.
+> 	printk("%s, locked=%d\n", __FUNCTION__, spin_is_locked(ap->lock));
 
-I think you need to write a new message documenting the
-behaviour on new kernels (with the crash fixed).
+Do you have your code somewhere that we can look at ?
 
-
-> > -----Original Message-----
-> > From: Angus Chen
-> > Sent: Wednesday, September 28, 2022 11:25 AM
-> > To: Michael S. Tsirkin <mst@redhat.com>
-> > Cc: jasowang@redhat.com; pbonzini@redhat.com; axboe@kernel.dk;
-> > virtualization@lists.linux-foundation.org; linux-block@vger.kernel.org;
-> > linux-kernel@vger.kernel.org; Liming Wu <liming.wu@jaguarmicro.com>;
-> > stefanha@redhat.com; Christoph Hellwig <hch@lst.de>
-> > Subject: RE: [PATCH v1] virtio_blk: should not use IRQD_AFFINITY_MANAGED in
-> > init_rq
-> > 
-> > 
-> > 
-> > > -----Original Message-----
-> > > From: Michael S. Tsirkin <mst@redhat.com>
-> > > Sent: Wednesday, September 28, 2022 4:47 AM
-> > > To: Angus Chen <angus.chen@jaguarmicro.com>
-> > > Cc: jasowang@redhat.com; pbonzini@redhat.com; axboe@kernel.dk;
-> > > virtualization@lists.linux-foundation.org; linux-block@vger.kernel.org;
-> > > linux-kernel@vger.kernel.org; Liming Wu <liming.wu@jaguarmicro.com>;
-> > > stefanha@redhat.com; Christoph Hellwig <hch@lst.de>
-> > > Subject: Re: [PATCH v1] virtio_blk: should not use IRQD_AFFINITY_MANAGED
-> > in
-> > > init_rq
-> > >
-> > > On Sat, Sep 24, 2022 at 11:48:54AM +0800, Angus Chen wrote:
-> > > > The background is that we use dpu in cloud computing,the arch is x86,80
-> > > > cores.We will have a lots of virtio devices,like 512 or more.
-> > > > When we probe about 200 virtio_blk devices,it will fail and
-> > > > the stack is print as follows:
-> > > >
-> > > > [25338.485128] virtio-pci 0000:b3:00.0: virtio_pci: leaving for legacy driver
-> > > > [25338.496174] genirq: Flags mismatch irq 0. 00000080 (virtio418) vs.
-> > > 00015a00 (timer)
-> > > > [25338.503822] CPU: 20 PID: 5431 Comm: kworker/20:0 Kdump: loaded
-> > > Tainted: G           OE    --------- -  - 4.18.0-305.30.1.el8.x86_64
-> > > > [25338.516403] Hardware name: Inspur NF5280M5/YZMB-00882-10E, BIOS
-> > > 4.1.21 08/25/2021
-> > > > [25338.523881] Workqueue: events work_for_cpu_fn
-> > > > [25338.528235] Call Trace:
-> > > > [25338.530687]  dump_stack+0x5c/0x80
-> > > > [25338.534000]  __setup_irq.cold.53+0x7c/0xd3
-> > > > [25338.538098]  request_threaded_irq+0xf5/0x160
-> > > > [25338.542371]  vp_find_vqs+0xc7/0x190
-> > > > [25338.545866]  init_vq+0x17c/0x2e0 [virtio_blk]
-> > > > [25338.550223]  ? ncpus_cmp_func+0x10/0x10
-> > > > [25338.554061]  virtblk_probe+0xe6/0x8a0 [virtio_blk]
-> > > > [25338.558846]  virtio_dev_probe+0x158/0x1f0
-> > > > [25338.562861]  really_probe+0x255/0x4a0
-> > > > [25338.566524]  ? __driver_attach_async_helper+0x90/0x90
-> > > > [25338.571567]  driver_probe_device+0x49/0xc0
-> > > > [25338.575660]  bus_for_each_drv+0x79/0xc0
-> > > > [25338.579499]  __device_attach+0xdc/0x160
-> > > > [25338.583337]  bus_probe_device+0x9d/0xb0
-> > > > [25338.587167]  device_add+0x418/0x780
-> > > > [25338.590654]  register_virtio_device+0x9e/0xe0
-> > > > [25338.595011]  virtio_pci_probe+0xb3/0x140
-> > > > [25338.598941]  local_pci_probe+0x41/0x90
-> > > > [25338.602689]  work_for_cpu_fn+0x16/0x20
-> > > > [25338.606443]  process_one_work+0x1a7/0x360
-> > > > [25338.610456]  ? create_worker+0x1a0/0x1a0
-> > > > [25338.614381]  worker_thread+0x1cf/0x390
-> > > > [25338.618132]  ? create_worker+0x1a0/0x1a0
-> > > > [25338.622051]  kthread+0x116/0x130
-> > > > [25338.625283]  ? kthread_flush_work_fn+0x10/0x10
-> > > > [25338.629731]  ret_from_fork+0x1f/0x40
-> > > > [25338.633395] virtio_blk: probe of virtio418 failed with error -16
-> > > >
-> > > > After I did some work of this stack,took stap and crash to get more
-> > > > information,I found that the auto irq_affinity affect this.
-> > > > When "vp_find_vqs" call "vp_find_vqs_msix" failed,it will be go back
-> > > > to call vp_find_vqs_msix again with ctx be false, and when it failed again,
-> > > > we will call vp_find_vqs_intx,if the vp_dev->pci_dev->irq is zero,
-> > > > we will get a backtrace like above.
-> > > >
-> > > > The log :
-> > > > "genirq: Flags mismatch irq 0. 00000080 (virtio418) vs. 00015a00 (timer)"
-> > > > was print because of the irq 0 is used by timer exclusive,and when
-> > > > vp_find_vqs called vp_find_vqs_msix and return false twice,then it will
-> > > > call vp_find_vqs_intx for the last try.
-> > > > Because vp_dev->pci_dev->irq is zero,so it will be request irq 0 with
-> > > > flag IRQF_SHARED.
-> > >
-> > > First this is a bug. We can fix that so it will fail more cleanly.
-> > >
-> > > We should check pci_dev->pin and if 0 do not try to use INT#x
-> > > at all.
-> > Yes, I will send a patch for this only.
-> > Thank you.
-> > > It will still fail, just with a nicer backtrace.
-> > >
-> > >
-> > >
-> > >
-> > > > without config CONFIG_GENERIC_IRQ_DEBUGFS,
-> > > > I found that we called vp_find_vqs_msix failed twice because of
-> > > > the irq resource was exhausted.
-> > >
-> > > I see. I don't know enough about how this work, but roughly
-> > > I think the issue is at a high level
-> > >
-> > > - because of auto affinity, we try to reserve an interrupt on all CPUs
-> > > - as there are 512 devices with a single vector per VQ we would
-> > >   have no issue as they would be spread between CPUs,
-> > >   but allocating on all CPUs fails.
-> > >
-> > >
-> > > I don't think the issue should be fixed at blk level - it is not
-> > > blk specifix - but yes this looks like a problem.
-> > > Christoph, any idea?
-> > >
-> > >
-> > >
-> > > > crash> irq_domain.name,parent 0xffff9bff87d4dec0
-> > > >   name = 0xffff9bff87c1fd60 "INTEL-IR-MSI-1-2"
-> > > >   parent = 0xffff9bff87400000
-> > > > crash> irq_domain.name,parent 0xffff9bff87400000
-> > > >   name = 0xffff9bff87c24300 "INTEL-IR-1"
-> > > >   parent = 0xffff9bff87c6c900
-> > > > crash> irq_domain.name,parent 0xffff9bff87c6c900
-> > > >   name = 0xffff9bff87c3ecd0 "VECTOR"
-> > > >   parent = 0x0----------------------the highest level
-> > > >
-> > > > and stap irq_matrix_alloc_managed get return value -ENOSPC.
-> > > >
-> > > > When no virtio_blk device probe,the vctor_matrix is:
-> > > > crash>  p *vector_matrix
-> > > > $1 = {
-> > > >   matrix_bits = 256,
-> > > >   alloc_start = 32,
-> > > >   alloc_end = 236,
-> > > >   alloc_size = 204,
-> > > >   global_available = 15593,
-> > > >   global_reserved = 149,
-> > > >   systembits_inalloc = 3,
-> > > >   total_allocated = 409,
-> > > >   online_maps = 80,
-> > > >   maps = 0x2ff20,
-> > > >   scratch_map = {1161063342014463, 0, 1, 18446726481523507200,
-> > > >  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-> > > >  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-> > > >   system_map = {1125904739729407, 0, 1, 18446726481523507200,
-> > > >  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-> > > >  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
-> > > > }
-> > > >
-> > > > When the dump stack occur,the vector_matrix of system is exhausted.
-> > > > crash> p *vector_matrix
-> > > > $82 = {
-> > > >   matrix_bits = 256,
-> > > >   alloc_start = 32,
-> > > >   alloc_end = 236,
-> > > >   alloc_size = 204,
-> > > >   global_available = 0,//caq:irq left
-> > > >   global_reserved = 151,
-> > > >   systembits_inalloc = 3,
-> > > >   total_allocated = 1922,//caq:irq that allocated
-> > > >   online_maps = 80,
-> > > >   maps = 0x2ff20,
-> > > >   scratch_map = {18446744069952503807, 18446744073709551615,
-> > > >  18446744073709551615, 18446735277616529407, 0, 0, 0, 0, 0,
-> > > >  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-> > > >   system_map = {1125904739729407, 0, 1, 18446726481523507200,
-> > > >  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-> > > >  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
-> > > > }
-> > > >
-> > > > And we tested the virtio_blk device which request irq success,
-> > > > we found that in a system with 80 cores and two numa ,one
-> > > > virtio_blk device with just two data queues consume 81 irqs capacity,
-> > > > Although it just only three irqs in /proc/interrupt,80 irqs capacity
-> > > > is effected by function "irq_build_affinity_masks" with 2*40.
-> > > >
-> > > > before one virtio_blk device hotplug out:
-> > > > crash> p *vector_matrix
-> > > > $2 = {
-> > > >   matrix_bits = 256,
-> > > >   alloc_start = 32,
-> > > >   alloc_end = 236,
-> > > >   alloc_size = 204,
-> > > >   global_available = 15215,
-> > > >   global_reserved = 150,
-> > > >   systembits_inalloc = 3,
-> > > >   total_allocated = 553,
-> > > >   online_maps = 80,
-> > > >   maps = 0x2ff20,
-> > > >   scratch_map = {1179746449752063, 0, 1, 18446726481523507200, 0, 0,
-> > 0,
-> > > >  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-> > > >  0, 0, 0, 0, 0},
-> > > >   system_map = {1125904739729407, 0, 1, 18446726481523507200, 0, 0,
-> > 0,
-> > > >  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-> > > >  0, 0, 0, 0, 0}
-> > > > }
-> > > >
-> > > > after one virtio_blk device hotplug out:
-> > > > crash> p *vector_matrix
-> > > > $3 = {
-> > > >   matrix_bits = 256,
-> > > >   alloc_start = 32,
-> > > >   alloc_end = 236,
-> > > >   alloc_size = 204,
-> > > >   global_available = 15296,---it increase 81,include 1 config irq.
-> > > >   global_reserved = 150,
-> > > >   systembits_inalloc = 3,
-> > > >   total_allocated = 550,------it just decrease 3.
-> > > >   online_maps = 80,
-> > > >   maps = 0x2ff20,
-> > > >   scratch_map = {481036337152, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-> > > >  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-> > > >  0, 0, 0, 0},
-> > > >   system_map = {1125904739729407, 0, 1, 18446726481523507200, 0, 0,
-> > 0,
-> > > >  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-> > > >  0, 0, 0, 0, 0}
-> > > > }
-> > > >
-> > > > We test the new kernel also,it occur the same result.
-> > > > [Fri Sep 23 04:51:42 2022] genirq: Flags mismatch irq 0. 00000080 (virtio608)
-> > > vs. 00015a00 (timer)
-> > > > [Fri Sep 23 04:51:42 2022] CPU: 0 PID: 5749 Comm: kworker/0:0 Kdump:
-> > > loaded Tainted: G        W  OE      6.0.0-rc6+ #5
-> > > > [Fri Sep 23 04:51:42 2022] Hardware name: Inspur
-> > > NF5280M5/YZMB-00882-10E, BIOS 4.1.19 06/16/2021
-> > > > [Fri Sep 23 04:51:42 2022] Workqueue: events work_for_cpu_fn
-> > > > [Fri Sep 23 04:51:42 2022] Call Trace:
-> > > > [Fri Sep 23 04:51:42 2022]  <TASK>
-> > > > [Fri Sep 23 04:51:42 2022]  dump_stack_lvl+0x33/0x46
-> > > > [Fri Sep 23 04:51:42 2022]  __setup_irq+0x705/0x770
-> > > > [Fri Sep 23 04:51:42 2022]  request_threaded_irq+0x109/0x170
-> > > > [Fri Sep 23 04:51:42 2022]  vp_find_vqs+0xc4/0x190
-> > > > [Fri Sep 23 04:51:42 2022]  init_vqs+0x348/0x580 [virtio_net]
-> > > > [Fri Sep 23 04:51:42 2022]  virtnet_probe+0x54d/0xa80 [virtio_net]
-> > > > [Fri Sep 23 04:51:42 2022]  virtio_dev_probe+0x19c/0x240
-> > > > [Fri Sep 23 04:51:42 2022]  really_probe+0x106/0x3e0
-> > > > [Fri Sep 23 04:51:42 2022]  ? pm_runtime_barrier+0x4f/0xa0
-> > > > [Fri Sep 23 04:51:42 2022]  __driver_probe_device+0x79/0x170
-> > > > [Fri Sep 23 04:51:42 2022]  driver_probe_device+0x1f/0xa0
-> > > > [Fri Sep 23 04:51:42 2022]  __device_attach_driver+0x85/0x110
-> > > > [Fri Sep 23 04:51:42 2022]  ? driver_allows_async_probing+0x60/0x60
-> > > > [Fri Sep 23 04:51:42 2022]  ? driver_allows_async_probing+0x60/0x60
-> > > > [Fri Sep 23 04:51:42 2022]  bus_for_each_drv+0x67/0xb0
-> > > > [Fri Sep 23 04:51:42 2022]  __device_attach+0xe9/0x1b0
-> > > > [Fri Sep 23 04:51:42 2022]  bus_probe_device+0x87/0xa0
-> > > > [Fri Sep 23 04:51:42 2022]  device_add+0x59f/0x950
-> > > > [Fri Sep 23 04:51:42 2022]  ? dev_set_name+0x4e/0x70
-> > > > [Fri Sep 23 04:51:42 2022]  register_virtio_device+0xac/0xf0
-> > > > [Fri Sep 23 04:51:42 2022]  virtio_pci_probe+0x101/0x170
-> > > > [Fri Sep 23 04:51:42 2022]  local_pci_probe+0x42/0xa0
-> > > > [Fri Sep 23 04:51:42 2022]  work_for_cpu_fn+0x13/0x20
-> > > > [Fri Sep 23 04:51:42 2022]  process_one_work+0x1c2/0x3d0
-> > > > [Fri Sep 23 04:51:42 2022]  ? process_one_work+0x3d0/0x3d0
-> > > > [Fri Sep 23 04:51:42 2022]  worker_thread+0x1b9/0x360
-> > > > [Fri Sep 23 04:51:42 2022]  ? process_one_work+0x3d0/0x3d0
-> > > > [Fri Sep 23 04:51:42 2022]  kthread+0xe6/0x110
-> > > > [Fri Sep 23 04:51:42 2022]  ? kthread_complete_and_exit+0x20/0x20
-> > > > [Fri Sep 23 04:51:42 2022]  ret_from_fork+0x1f/0x30
-> > > > [Fri Sep 23 04:51:42 2022]  </TASK>
-> > > > [Fri Sep 23 04:51:43 2022] virtio_net: probe of virtio608 failed with error -16
-> > > >
-> > > > Fixes: ad71473d9c43 ("virtio_blk: use virtio IRQ affinity")
-> > > > Signed-off-by: Angus Chen <angus.chen@jaguarmicro.com>
-> > > > Tested-by: Liming Wu <liming.wu@jaguarmicro.com>
-> > > > ---
-> > > >  drivers/block/virtio_blk.c | 3 +--
-> > > >  1 file changed, 1 insertion(+), 2 deletions(-)
-> > > >
-> > > > diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-> > > > index a8bcf3f664af..075de30a9bb4 100644
-> > > > --- a/drivers/block/virtio_blk.c
-> > > > +++ b/drivers/block/virtio_blk.c
-> > > > @@ -513,7 +513,6 @@ static int init_vq(struct virtio_blk *vblk)
-> > > >  	struct virtqueue **vqs;
-> > > >  	unsigned short num_vqs;
-> > > >  	struct virtio_device *vdev = vblk->vdev;
-> > > > -	struct irq_affinity desc = { 0, };
-> > > >
-> > > >  	err = virtio_cread_feature(vdev, VIRTIO_BLK_F_MQ,
-> > > >  				   struct virtio_blk_config, num_queues,
-> > > > @@ -548,7 +547,7 @@ static int init_vq(struct virtio_blk *vblk)
-> > > >  	}
-> > > >
-> > > >  	/* Discover virtqueues and write information to configuration.  */
-> > > > -	err = virtio_find_vqs(vdev, num_vqs, vqs, callbacks, names, &desc);
-> > > > +	err = virtio_find_vqs(vdev, num_vqs, vqs, callbacks, names, NULL);
-> > > >  	if (err)
-> > > >  		goto out;
-> > > >
-> > > > --
-> > > > 2.17.1
 > 
+> result (tail -n 4064 /var/log/messages | cut -d\] -f 2- | cut -d\  -f 2- | uniq -c)
+> 
+>       1 pata_parport: protocol epat registered
+>       1 (null): epat 1.02, Shuttle EPAT chip c6 at 0x378,
+>       1 mode 5 (EPP-32), delay 1
+>       1 pata_parport_check_status, locked=1
+>       1 scsi host4: pata_parport
+>       1 ata5: PATA max PIO0 port parport0 protocol epat
+>      85 pata_parport_check_status, locked=0
+>       1 ata5: link is slow to respond, please be patient (ready=0)
+>      83 pata_parport_check_status, locked=0
+>       1 ata5: device not ready (errno=-16), forcing hardreset
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_softreset, locked=0
+>       1 pata_parport_devchk, locked=0
+>       1 pata_parport_dev_select, locked=0
+>       1 pata_parport_check_altstatus, locked=0
+>       1 pata_parport_devchk, locked=0
+>       1 pata_parport_dev_select, locked=0
+>       1 pata_parport_check_altstatus, locked=0
+>       1 pata_parport_dev_select, locked=0
+>       1 pata_parport_check_altstatus, locked=0
+>       1 pata_parport_bus_softreset, locked=0
+>       1 pata_parport_check_status, locked=0
+>       1 pata_parport_dev_select, locked=0
+>       1 pata_parport_check_altstatus, locked=0
+>       1 pata_parport_dev_select, locked=0
+>       1 pata_parport_check_altstatus, locked=0
+>       1 pata_parport_tf_read, locked=0
+>       1 pata_parport_dev_select, locked=0
+>       1 pata_parport_check_altstatus, locked=0
+>       1 pata_parport_tf_read, locked=0
+>    1001 pata_parport_check_status, locked=1
+>       1 pata_parport_dev_select, locked=0
+>       1 pata_parport_check_altstatus, locked=0
+>    1000 pata_parport_check_status, locked=1
+>       1 pata_parport_dev_select, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_load, locked=1
+>       2 pata_parport_check_status, locked=1
+>       1 pata_parport_exec_command, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       2 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_read, locked=1
+>       1 ata5.00: ATAPI: TOSHIBA CD-ROM XM-6202B, 1108, max MWDMA2
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_dev_select, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_load, locked=1
+>       2 pata_parport_check_status, locked=1
+>       1 pata_parport_exec_command, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       3 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_read, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_dev_select, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_load, locked=1
+>       2 pata_parport_check_status, locked=1
+>       1 pata_parport_exec_command, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       3 pata_parport_check_status, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       2 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_read, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_dev_select, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_load, locked=1
+>       2 pata_parport_check_status, locked=1
+>       1 pata_parport_exec_command, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       3 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_read, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_dev_select, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_load, locked=1
+>       2 pata_parport_check_status, locked=1
+>       1 pata_parport_exec_command, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       6 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_read, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_read, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       2 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_read, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_dev_select, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_load, locked=1
+>       2 pata_parport_check_status, locked=1
+>       1 pata_parport_exec_command, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       7 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_read, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_dev_select, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_load, locked=1
+>       2 pata_parport_check_status, locked=1
+>       1 pata_parport_exec_command, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       6 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_read, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       3 pata_parport_check_status, locked=1
+>       1 pata_parport_dev_select, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_load, locked=1
+>       2 pata_parport_check_status, locked=1
+>       1 pata_parport_exec_command, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       6 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_read, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       2 pata_parport_check_status, locked=1
+>       1 scsi 4:0:0:0: CD-ROM            TOSHIBA  CD-ROM XM-6202B  1108 PQ: 0 ANSI: 5
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_dev_select, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_load, locked=1
+>       2 pata_parport_check_status, locked=1
+>       1 pata_parport_exec_command, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       5 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_read, locked=1
+>       1 pata_parport_drain_fifo, locked=1
+>       2 pata_parport_check_status, locked=1
+>       1 pata_parport_dev_select, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_load, locked=1
+>       2 pata_parport_check_status, locked=1
+>       1 pata_parport_exec_command, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       6 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_read, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_read, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       2 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_read, locked=1
+>       1 scsi 4:0:0:0: Attached scsi generic sg1 type 5
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_dev_select, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_load, locked=1
+>       2 pata_parport_check_status, locked=1
+>       1 pata_parport_exec_command, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       5 pata_parport_check_status, locked=1
+>       1 pata_parport_dev_select, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_load, locked=1
+>       2 pata_parport_check_status, locked=1
+>       1 pata_parport_exec_command, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       6 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_read, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       2 pata_parport_check_status, locked=1
+>       1 sr 4:0:0:0: [sr0] scsi3-mmc drive: 32x/32x cd/rw xa/form2 cdda tray
+>       1 cdrom: Uniform CD-ROM driver Revision: 3.20
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_dev_select, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_load, locked=1
+>       2 pata_parport_check_status, locked=1
+>       1 pata_parport_exec_command, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       5 pata_parport_check_status, locked=1
+>       1 pata_parport_dev_select, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_load, locked=1
+>       2 pata_parport_check_status, locked=1
+>       1 pata_parport_exec_command, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       6 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_read, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       3 pata_parport_check_status, locked=1
+>       1 pata_parport_dev_select, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_load, locked=1
+>       2 pata_parport_check_status, locked=1
+>       1 pata_parport_exec_command, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       6 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_read, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       5 pata_parport_check_status, locked=1
+>       1 pata_parport_dev_select, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_load, locked=1
+>       2 pata_parport_check_status, locked=1
+>       1 pata_parport_exec_command, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       6 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_read, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       3 pata_parport_check_status, locked=1
+>       1 pata_parport_dev_select, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_load, locked=1
+>       2 pata_parport_check_status, locked=1
+>       1 pata_parport_exec_command, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       5 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_read, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       3 pata_parport_check_status, locked=1
+>       1 pata_parport_dev_select, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_load, locked=1
+>       2 pata_parport_check_status, locked=1
+>       1 pata_parport_exec_command, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       6 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_read, locked=1
+>       1 pata_parport_drain_fifo, locked=1
+>       2 pata_parport_check_status, locked=1
+>       1 pata_parport_dev_select, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_load, locked=1
+>       2 pata_parport_check_status, locked=1
+>       1 pata_parport_exec_command, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       6 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_read, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_read, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       2 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_read, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_dev_select, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_load, locked=1
+>       2 pata_parport_check_status, locked=1
+>       1 pata_parport_exec_command, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       6 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_read, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       3 pata_parport_check_status, locked=1
+>       1 pata_parport_dev_select, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_load, locked=1
+>       2 pata_parport_check_status, locked=1
+>       1 pata_parport_exec_command, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       5 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_read, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       3 pata_parport_check_status, locked=1
+>       1 pata_parport_dev_select, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_load, locked=1
+>       2 pata_parport_check_status, locked=1
+>       1 pata_parport_exec_command, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       5 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_read, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       3 pata_parport_check_status, locked=1
+>       1 pata_parport_dev_select, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_load, locked=1
+>       2 pata_parport_check_status, locked=1
+>       1 pata_parport_exec_command, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       5 pata_parport_check_status, locked=1
+>       1 pata_parport_dev_select, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_load, locked=1
+>       2 pata_parport_check_status, locked=1
+>       1 pata_parport_exec_command, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       4 pata_parport_check_status, locked=1
+>       1 pata_parport_dev_select, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_load, locked=1
+>       2 pata_parport_check_status, locked=1
+>       1 pata_parport_exec_command, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       6 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_read, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       3 pata_parport_check_status, locked=1
+>       1 pata_parport_dev_select, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_load, locked=1
+>       2 pata_parport_check_status, locked=1
+>       1 pata_parport_exec_command, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       6 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_read, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       3 pata_parport_check_status, locked=1
+>       1 pata_parport_dev_select, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_load, locked=1
+>       2 pata_parport_check_status, locked=1
+>       1 pata_parport_exec_command, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       6 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_read, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       3 pata_parport_check_status, locked=1
+>       1 pata_parport_dev_select, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_load, locked=1
+>       2 pata_parport_check_status, locked=1
+>       1 pata_parport_exec_command, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       6 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_read, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       3 pata_parport_check_status, locked=1
+>       1 pata_parport_dev_select, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_load, locked=1
+>       2 pata_parport_check_status, locked=1
+>       1 pata_parport_exec_command, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       5 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_read, locked=1
+>       1 pata_parport_drain_fifo, locked=1
+>       2 pata_parport_check_status, locked=1
+>       1 pata_parport_dev_select, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_load, locked=1
+>       2 pata_parport_check_status, locked=1
+>       1 pata_parport_exec_command, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       6 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_read, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_read, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       2 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_read, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_dev_select, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_load, locked=1
+>       2 pata_parport_check_status, locked=1
+>       1 pata_parport_exec_command, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       6 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_read, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       3 pata_parport_check_status, locked=1
+>       1 pata_parport_dev_select, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_load, locked=1
+>       2 pata_parport_check_status, locked=1
+>       1 pata_parport_exec_command, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       6 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_read, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       3 pata_parport_check_status, locked=1
+>       1 pata_parport_dev_select, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_load, locked=1
+>       2 pata_parport_check_status, locked=1
+>       1 pata_parport_exec_command, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       4 pata_parport_check_status, locked=1
+>       1 pata_parport_dev_select, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_load, locked=1
+>       2 pata_parport_check_status, locked=1
+>       1 pata_parport_exec_command, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       5 pata_parport_check_status, locked=1
+>       1 pata_parport_dev_select, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_load, locked=1
+>       2 pata_parport_check_status, locked=1
+>       1 pata_parport_exec_command, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       6 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_read, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       3 pata_parport_check_status, locked=1
+>       1 pata_parport_dev_select, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_load, locked=1
+>       2 pata_parport_check_status, locked=1
+>       1 pata_parport_exec_command, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       5 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_read, locked=1
+>       1 pata_parport_drain_fifo, locked=1
+>       2 pata_parport_check_status, locked=1
+>       1 pata_parport_dev_select, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_load, locked=1
+>       2 pata_parport_check_status, locked=1
+>       1 pata_parport_exec_command, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       6 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_read, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_read, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       2 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_read, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_dev_select, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_load, locked=1
+>       2 pata_parport_check_status, locked=1
+>       1 pata_parport_exec_command, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       5 pata_parport_check_status, locked=1
+>       1 pata_parport_dev_select, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_load, locked=1
+>       2 pata_parport_check_status, locked=1
+>       1 pata_parport_exec_command, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       6 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_read, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       3 pata_parport_check_status, locked=1
+>       1 pata_parport_dev_select, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_load, locked=1
+>       2 pata_parport_check_status, locked=1
+>       1 pata_parport_exec_command, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       5 pata_parport_check_status, locked=1
+>       1 pata_parport_dev_select, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_load, locked=1
+>       2 pata_parport_check_status, locked=1
+>       1 pata_parport_exec_command, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       6 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_read, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       3 pata_parport_check_status, locked=1
+>       1 pata_parport_dev_select, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_load, locked=1
+>       2 pata_parport_check_status, locked=1
+>       1 pata_parport_exec_command, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       5 pata_parport_check_status, locked=1
+>       1 pata_parport_dev_select, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_load, locked=1
+>       2 pata_parport_check_status, locked=1
+>       1 pata_parport_exec_command, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       6 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_read, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       3 pata_parport_check_status, locked=1
+>       1 pata_parport_dev_select, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_load, locked=1
+>       2 pata_parport_check_status, locked=1
+>       1 pata_parport_exec_command, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       2 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_read, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_dev_select, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_load, locked=1
+>       2 pata_parport_check_status, locked=1
+>       1 pata_parport_exec_command, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       6 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_read, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       3 pata_parport_check_status, locked=1
+>       1 pata_parport_dev_select, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_load, locked=1
+>       2 pata_parport_check_status, locked=1
+>       1 pata_parport_exec_command, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       5 pata_parport_check_status, locked=1
+>       1 pata_parport_dev_select, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_load, locked=1
+>       2 pata_parport_check_status, locked=1
+>       1 pata_parport_exec_command, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       6 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_read, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       3 pata_parport_check_status, locked=1
+>       1 pata_parport_dev_select, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_load, locked=1
+>       2 pata_parport_check_status, locked=1
+>       1 pata_parport_exec_command, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       5 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_read, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       3 pata_parport_check_status, locked=1
+>       1 pata_parport_dev_select, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_load, locked=1
+>       2 pata_parport_check_status, locked=1
+>       1 pata_parport_exec_command, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       7 pata_parport_check_status, locked=1
+>       1 pata_parport_dev_select, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_load, locked=1
+>       2 pata_parport_check_status, locked=1
+>       1 pata_parport_exec_command, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       2 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_read, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_dev_select, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_load, locked=1
+>       2 pata_parport_check_status, locked=1
+>       1 pata_parport_exec_command, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       6 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_read, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       3 pata_parport_check_status, locked=1
+>       1 pata_parport_dev_select, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_load, locked=1
+>       2 pata_parport_check_status, locked=1
+>       1 pata_parport_exec_command, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       4 pata_parport_check_status, locked=1
+>       1 pata_parport_dev_select, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_load, locked=1
+>       2 pata_parport_check_status, locked=1
+>       1 pata_parport_exec_command, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       5 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_read, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       3 pata_parport_check_status, locked=1
+>       1 pata_parport_dev_select, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_load, locked=1
+>       2 pata_parport_check_status, locked=1
+>       1 pata_parport_exec_command, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       4 pata_parport_check_status, locked=1
+>       1 pata_parport_dev_select, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_load, locked=1
+>       2 pata_parport_check_status, locked=1
+>       1 pata_parport_exec_command, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       6 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_read, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       3 pata_parport_check_status, locked=1
+>       1 pata_parport_dev_select, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_load, locked=1
+>       2 pata_parport_check_status, locked=1
+>       1 pata_parport_exec_command, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       5 pata_parport_check_status, locked=1
+>       1 pata_parport_dev_select, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_load, locked=1
+>       2 pata_parport_check_status, locked=1
+>       1 pata_parport_exec_command, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       8 pata_parport_check_status, locked=1
+>       1 pata_parport_dev_select, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_load, locked=1
+>       2 pata_parport_check_status, locked=1
+>       1 pata_parport_exec_command, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       6 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_read, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       3 pata_parport_check_status, locked=1
+>       1 pata_parport_dev_select, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_load, locked=1
+>       2 pata_parport_check_status, locked=1
+>       1 pata_parport_exec_command, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       6 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_read, locked=1
+>       1 pata_parport_drain_fifo, locked=1
+>       2 pata_parport_check_status, locked=1
+>       1 pata_parport_dev_select, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_load, locked=1
+>       2 pata_parport_check_status, locked=1
+>       1 pata_parport_exec_command, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       6 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_read, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_read, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       2 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_read, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_dev_select, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_load, locked=1
+>       2 pata_parport_check_status, locked=1
+>       1 pata_parport_exec_command, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       5 pata_parport_check_status, locked=1
+>       1 pata_parport_dev_select, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_load, locked=1
+>       2 pata_parport_check_status, locked=1
+>       1 pata_parport_exec_command, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       5 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_read, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       3 pata_parport_check_status, locked=1
+>       1 pata_parport_dev_select, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_load, locked=1
+>       2 pata_parport_check_status, locked=1
+>       1 pata_parport_exec_command, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       5 pata_parport_check_status, locked=1
+>       1 pata_parport_dev_select, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_load, locked=1
+>       2 pata_parport_check_status, locked=1
+>       1 pata_parport_exec_command, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       5 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_read, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       3 pata_parport_check_status, locked=1
+>       1 pata_parport_dev_select, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_load, locked=1
+>       2 pata_parport_check_status, locked=1
+>       1 pata_parport_exec_command, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       5 pata_parport_check_status, locked=1
+>       1 pata_parport_dev_select, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_load, locked=1
+>       2 pata_parport_check_status, locked=1
+>       1 pata_parport_exec_command, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       6 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_read, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       3 pata_parport_check_status, locked=1
+>       1 pata_parport_dev_select, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_load, locked=1
+>       2 pata_parport_check_status, locked=1
+>       1 pata_parport_exec_command, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       2 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_read, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_dev_select, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_load, locked=1
+>       2 pata_parport_check_status, locked=1
+>       1 pata_parport_exec_command, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       5 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_read, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       3 pata_parport_check_status, locked=1
+>       1 pata_parport_dev_select, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_load, locked=1
+>       2 pata_parport_check_status, locked=1
+>       1 pata_parport_exec_command, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       8 pata_parport_check_status, locked=1
+>       1 pata_parport_dev_select, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_load, locked=1
+>       2 pata_parport_check_status, locked=1
+>       1 pata_parport_exec_command, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       6 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_read, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       3 pata_parport_check_status, locked=1
+>       1 pata_parport_dev_select, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_load, locked=1
+>       2 pata_parport_check_status, locked=1
+>       1 pata_parport_exec_command, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       4 pata_parport_check_status, locked=1
+>       1 pata_parport_dev_select, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_load, locked=1
+>       2 pata_parport_check_status, locked=1
+>       1 pata_parport_exec_command, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       6 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_read, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       3 pata_parport_check_status, locked=1
+>       1 pata_parport_dev_select, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_load, locked=1
+>       2 pata_parport_check_status, locked=1
+>       1 pata_parport_exec_command, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       4 pata_parport_check_status, locked=1
+>       1 pata_parport_dev_select, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_load, locked=1
+>       2 pata_parport_check_status, locked=1
+>       1 pata_parport_exec_command, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       2 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_read, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_dev_select, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_load, locked=1
+>       2 pata_parport_check_status, locked=1
+>       1 pata_parport_exec_command, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       6 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_read, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       3 pata_parport_check_status, locked=1
+>       1 pata_parport_dev_select, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_load, locked=1
+>       2 pata_parport_check_status, locked=1
+>       1 pata_parport_exec_command, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       4 pata_parport_check_status, locked=1
+>       1 pata_parport_dev_select, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_load, locked=1
+>       2 pata_parport_check_status, locked=1
+>       1 pata_parport_exec_command, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       5 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_read, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       3 pata_parport_check_status, locked=1
+>       1 pata_parport_dev_select, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_load, locked=1
+>       2 pata_parport_check_status, locked=1
+>       1 pata_parport_exec_command, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       5 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_read, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       3 pata_parport_check_status, locked=1
+>       1 pata_parport_dev_select, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_load, locked=1
+>       2 pata_parport_check_status, locked=1
+>       1 pata_parport_exec_command, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       6 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_read, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       3 pata_parport_check_status, locked=1
+>       1 pata_parport_dev_select, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_load, locked=1
+>       2 pata_parport_check_status, locked=1
+>       1 pata_parport_exec_command, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       6 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_read, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       3 pata_parport_check_status, locked=1
+>       1 pata_parport_dev_select, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_load, locked=1
+>       2 pata_parport_check_status, locked=1
+>       1 pata_parport_exec_command, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       6 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_read, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       3 pata_parport_check_status, locked=1
+>       1 pata_parport_dev_select, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_load, locked=1
+>       2 pata_parport_check_status, locked=1
+>       1 pata_parport_exec_command, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       6 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_read, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       4 pata_parport_check_status, locked=1
+>       1 pata_parport_dev_select, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_load, locked=1
+>       2 pata_parport_check_status, locked=1
+>       1 pata_parport_exec_command, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       6 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_read, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       3 pata_parport_check_status, locked=1
+>       1 pata_parport_dev_select, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_load, locked=1
+>       2 pata_parport_check_status, locked=1
+>       1 pata_parport_exec_command, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       6 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_read, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       3 pata_parport_check_status, locked=1
+>       1 pata_parport_dev_select, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_load, locked=1
+>       2 pata_parport_check_status, locked=1
+>       1 pata_parport_exec_command, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       5 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_read, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       3 pata_parport_check_status, locked=1
+>       1 pata_parport_dev_select, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_load, locked=1
+>       2 pata_parport_check_status, locked=1
+>       1 pata_parport_exec_command, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       6 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_read, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       3 pata_parport_check_status, locked=1
+>       1 pata_parport_dev_select, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_load, locked=1
+>       2 pata_parport_check_status, locked=1
+>       1 pata_parport_exec_command, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       5 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_read, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       3 pata_parport_check_status, locked=1
+>       1 pata_parport_dev_select, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_load, locked=1
+>       2 pata_parport_check_status, locked=1
+>       1 pata_parport_exec_command, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       6 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_read, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       3 pata_parport_check_status, locked=1
+>       1 pata_parport_dev_select, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_load, locked=1
+>       2 pata_parport_check_status, locked=1
+>       1 pata_parport_exec_command, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       6 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_read, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       3 pata_parport_check_status, locked=1
+>       1 pata_parport_dev_select, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_load, locked=1
+>       2 pata_parport_check_status, locked=1
+>       1 pata_parport_exec_command, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       1 pata_parport_check_status, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       6 pata_parport_check_status, locked=1
+>       1 pata_parport_tf_read, locked=1
+>       1 pata_parport_data_xfer, locked=1
+>       1 pata_parport_check_altstatus, locked=1
+>       2 pata_parport_check_status, locked=1
+>       1 ata5.00: disable device
+>       1 pata_parport_check_status, locked=1
+> 
+> 
+
+-- 
+Damien Le Moal
+Western Digital Research
 
