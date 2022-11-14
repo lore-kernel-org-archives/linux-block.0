@@ -2,177 +2,191 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1ED38C4332F
-	for <linux-block@archiver.kernel.org>; Mon, 14 Nov 2022 03:41:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D0FD9C433FE
+	for <linux-block@archiver.kernel.org>; Mon, 14 Nov 2022 04:03:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235416AbiKNDlz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 13 Nov 2022 22:41:55 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60086 "EHLO
+        id S235625AbiKNEDA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 13 Nov 2022 23:03:00 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36250 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235249AbiKNDlz (ORCPT
+        with ESMTP id S235564AbiKNEC7 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 13 Nov 2022 22:41:55 -0500
-Received: from mxct.zte.com.cn (mxct.zte.com.cn [58.251.27.85])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 22CA9DFD5;
-        Sun, 13 Nov 2022 19:41:54 -0800 (PST)
-Received: from mxde.zte.com.cn (unknown [10.35.20.121])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mxct.zte.com.cn (FangMail) with ESMTPS id 4N9Zqh2y7zz1DF1;
-        Mon, 14 Nov 2022 11:41:52 +0800 (CST)
-Received: from mxus.zte.com.cn (unknown [10.207.168.8])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mxde.zte.com.cn (FangMail) with ESMTPS id 4N9Zqc4tQLz9vSpk;
-        Mon, 14 Nov 2022 11:41:48 +0800 (CST)
-Received: from mxhk.zte.com.cn (unknown [192.168.250.138])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mxus.zte.com.cn (FangMail) with ESMTPS id 4N9ZqY18v1zdmYkm;
-        Mon, 14 Nov 2022 11:41:45 +0800 (CST)
-Received: from mse-fl2.zte.com.cn (unknown [10.5.228.133])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mxhk.zte.com.cn (FangMail) with ESMTPS id 4N9ZqT4Xpsz4xVnZ;
-        Mon, 14 Nov 2022 11:41:41 +0800 (CST)
-Received: from szxlzmapp05.zte.com.cn ([10.5.230.85])
-        by mse-fl2.zte.com.cn with SMTP id 2AE3fcEJ087398;
-        Mon, 14 Nov 2022 11:41:38 +0800 (+08)
-        (envelope-from yang.yang29@zte.com.cn)
-Received: from mapi (szxlzmapp04[null])
-        by mapi (Zmail) with MAPI id mid14;
-        Mon, 14 Nov 2022 11:41:40 +0800 (CST)
-Date:   Mon, 14 Nov 2022 11:41:40 +0800 (CST)
-X-Zmail-TransId: 2b066371b8f4ffffffff83808b3c
-X-Mailer: Zmail v1.0
-Message-ID: <202211141141400847357@zte.com.cn>
-Mime-Version: 1.0
-From:   <yang.yang29@zte.com.cn>
-To:     <minchan@kernel.org>
-Cc:     <ngupta@vflare.org>, <senozhatsky@chromium.org>, <axboe@kernel.dk>,
-        <linux-kernel@vger.kernel.org>, <linux-block@vger.kernel.org>,
-        <xu.panda@zte.com.cn>, <yang.yang29@zte.com.cn>
-Subject: =?UTF-8?B?W1BBVENIIGxpbnV4LW5leHRdIHpyYW06IHVzZSBzeXNmc19lbWl0KCkgdG8gaW5zdGVhZCBvZiBzY25wcmludGYoKQ==?=
-Content-Type: text/plain;
-        charset="UTF-8"
-X-MAIL: mse-fl2.zte.com.cn 2AE3fcEJ087398
-X-Fangmail-Gw-Spam-Type: 0
-X-FangMail-Miltered: at cgslv5.04-192.168.251.14.novalocal with ID 6371B8FF.000 by FangMail milter!
-X-FangMail-Envelope: 1668397312/4N9Zqh2y7zz1DF1/6371B8FF.000/10.35.20.121/[10.35.20.121]/mxde.zte.com.cn/<yang.yang29@zte.com.cn>
-X-Fangmail-Anti-Spam-Filtered: true
-X-Fangmail-MID-QID: 6371B8FF.000/4N9Zqh2y7zz1DF1
+        Sun, 13 Nov 2022 23:02:59 -0500
+Received: from mail-pg1-x52d.google.com (mail-pg1-x52d.google.com [IPv6:2607:f8b0:4864:20::52d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 95F6C13CCA
+        for <linux-block@vger.kernel.org>; Sun, 13 Nov 2022 20:02:57 -0800 (PST)
+Received: by mail-pg1-x52d.google.com with SMTP id q1so9218178pgl.11
+        for <linux-block@vger.kernel.org>; Sun, 13 Nov 2022 20:02:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=AZVouTJdT6m/9WEf41/GvLl8YStUJpgeqkaMfyjFk98=;
+        b=bPhj18ns1d9UqFc4xmE6cjMX7LPa5LT1Hs30thmFJRKAZ2UZU4MVVJU3qTa3O+g93+
+         T50wxxrdI2E77j4L26SXMiuGz6X5hbZvhKxq6vctBd/7aWw5tV1Z5dL862gA6LY/D3Gy
+         GivwAD995KjW4xNlyqwcyKFrZU9dKwrb+FIao=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=AZVouTJdT6m/9WEf41/GvLl8YStUJpgeqkaMfyjFk98=;
+        b=TyYRsF41DxngpMW1sT2fq6x58t03iMimSbh9jU7Rn9aInksnUjUu+umnZ/wnwtb82G
+         /IkvQuuWzwqXyhPQYlv4V9SGemve2eauakolUAt5Wz8UOXraigNK7B36Q/+hlHhtEFG2
+         /jvHPSc3IIuiG/sYwz9+wdfaanClMEu46zzdtc+ZqGO7ofWcGyWdrCywgou5iKl0IXC+
+         b3R3jtDfUOxf68kM6xyjWkfIAI3eNEM7X6EvaE2Cwf0wSn9ZeZHAaIxQBPyZAHC/wmpT
+         ZGlDyzmEEJQaYogXoBOH/BlqNji3Z5lAU+turDZ+0oiRY/diy1aphA6LJgAo/hnfDuMZ
+         TbLA==
+X-Gm-Message-State: ANoB5pkSbCn2Mm0fA7uOa5wNGe/j8CspWTDsEDqigcOrf/FGoeEaJuKp
+        bpuSOulbejPsbPPP15vSCcecObYQdcN0yA==
+X-Google-Smtp-Source: AA0mqf7dHYQAXiJUo77CJ3XYezvkEz26h0Kg4ieqiv54LqBBcz84X6DKscefko4d01n0uAd/dzDWoQ==
+X-Received: by 2002:a63:4e13:0:b0:46f:c465:5848 with SMTP id c19-20020a634e13000000b0046fc4655848mr10330801pgb.148.1668398577047;
+        Sun, 13 Nov 2022 20:02:57 -0800 (PST)
+Received: from google.com ([240f:75:7537:3187:68f5:86c0:dcaa:df5])
+        by smtp.gmail.com with ESMTPSA id t184-20020a625fc1000000b00562ef28aac6sm5476625pfb.185.2022.11.13.20.02.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 13 Nov 2022 20:02:56 -0800 (PST)
+Date:   Mon, 14 Nov 2022 13:02:51 +0900
+From:   Sergey Senozhatsky <senozhatsky@chromium.org>
+To:     yang.yang29@zte.com.cn
+Cc:     Andrew Morton <akpm@linux-foundation.org>, minchan@kernel.org,
+        ngupta@vflare.org, senozhatsky@chromium.org, axboe@kernel.dk,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        xu.panda@zte.com.cn
+Subject: Re: [PATCH linux-next] zram: use sysfs_emit() to instead of
+ scnprintf()
+Message-ID: <Y3G9649G6j99N/F2@google.com>
+References: <202211141141400847357@zte.com.cn>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <202211141141400847357@zte.com.cn>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Xu Panda <xu.panda@zte.com.cn>
+On (22/11/14 11:41), yang.yang29@zte.com.cn wrote:
+[..]
+>  static ssize_t max_comp_streams_store(struct device *dev,
+> @@ -1191,8 +1191,7 @@ static ssize_t io_stat_show(struct device *dev,
+>  	ssize_t ret;
+> 
+>  	down_read(&zram->init_lock);
+> -	ret = scnprintf(buf, PAGE_SIZE,
+> -			"%8llu %8llu %8llu %8llu\n",
+> +	ret = sysfs_emit(buf, "%8llu %8llu %8llu %8llu\n",
+>  			(u64)atomic64_read(&zram->stats.failed_reads),
+>  			(u64)atomic64_read(&zram->stats.failed_writes),
+>  			(u64)atomic64_read(&zram->stats.invalid_io),
 
-Replace the open-code with sysfs_emit() to simplify the code.
+sysfs_emit() params need to be realigned to match (.
 
-Signed-off-by: Xu Panda <xu.panda@zte.com.cn>
-Signed-off-by: Yang Yang <yang.yang29@zte.com>
+> @@ -1222,8 +1221,7 @@ static ssize_t mm_stat_show(struct device *dev,
+>  	orig_size = atomic64_read(&zram->stats.pages_stored);
+>  	max_used = atomic_long_read(&zram->stats.max_used_pages);
+> 
+> -	ret = scnprintf(buf, PAGE_SIZE,
+> -			"%8llu %8llu %8llu %8lu %8ld %8llu %8lu %8llu %8llu\n",
+> +	ret = sysfs_emit(buf, "%8llu %8llu %8llu %8lu %8ld %8llu %8lu %8llu %8llu\n",
+>  			orig_size << PAGE_SHIFT,
+>  			(u64)atomic64_read(&zram->stats.compr_data_size),
+>  			mem_used << PAGE_SHIFT,
+
+Ditto.
+
+> @@ -1247,8 +1245,7 @@ static ssize_t bd_stat_show(struct device *dev,
+>  	ssize_t ret;
+> 
+>  	down_read(&zram->init_lock);
+> -	ret = scnprintf(buf, PAGE_SIZE,
+> -		"%8llu %8llu %8llu\n",
+> +	ret = sysfs_emit(buf, "%8llu %8llu %8llu\n",
+>  			FOUR_K((u64)atomic64_read(&zram->stats.bd_count)),
+>  			FOUR_K((u64)atomic64_read(&zram->stats.bd_reads)),
+>  			FOUR_K((u64)atomic64_read(&zram->stats.bd_writes)));
+
+Ditto.
+
+> @@ -1266,9 +1263,7 @@ static ssize_t debug_stat_show(struct device *dev,
+>  	ssize_t ret;
+> 
+>  	down_read(&zram->init_lock);
+> -	ret = scnprintf(buf, PAGE_SIZE,
+> -			"version: %d\n%8llu %8llu\n",
+> -			version,
+> +	ret = sysfs_emit(buf, "version: %d\n%8llu %8llu\n", version,
+>  			(u64)atomic64_read(&zram->stats.writestall),
+>  			(u64)atomic64_read(&zram->stats.miss_free));
+
+Ditto.
+
 ---
- drivers/block/zram/zram_drv.c | 25 ++++++++++---------------
- 1 file changed, 10 insertions(+), 15 deletions(-)
 
 diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
-index 171eccc2249d..67aeb668f623 100644
+index 01ab32f2897e..430933b73c1b 100644
 --- a/drivers/block/zram/zram_drv.c
 +++ b/drivers/block/zram/zram_drv.c
-@@ -255,7 +255,7 @@ static ssize_t initstate_show(struct device *dev,
- 	val = init_done(zram);
- 	up_read(&zram->init_lock);
-
--	return scnprintf(buf, PAGE_SIZE, "%u\n", val);
-+	return sysfs_emit(buf, "%u\n", val);
- }
-
- static ssize_t disksize_show(struct device *dev,
-@@ -263,7 +263,7 @@ static ssize_t disksize_show(struct device *dev,
- {
- 	struct zram *zram = dev_to_zram(dev);
-
--	return scnprintf(buf, PAGE_SIZE, "%llu\n", zram->disksize);
-+	return sysfs_emit(buf, "%llu\n", zram->disksize);
- }
-
- static ssize_t mem_limit_store(struct device *dev,
-@@ -404,7 +404,7 @@ static ssize_t writeback_limit_enable_show(struct device *dev,
- 	spin_unlock(&zram->wb_limit_lock);
- 	up_read(&zram->init_lock);
-
--	return scnprintf(buf, PAGE_SIZE, "%d\n", val);
-+	return sysfs_emit(buf, "%d\n", val);
- }
-
- static ssize_t writeback_limit_store(struct device *dev,
-@@ -439,7 +439,7 @@ static ssize_t writeback_limit_show(struct device *dev,
- 	spin_unlock(&zram->wb_limit_lock);
- 	up_read(&zram->init_lock);
-
--	return scnprintf(buf, PAGE_SIZE, "%llu\n", val);
-+	return sysfs_emit(buf, "%llu\n", val);
- }
-
- static void reset_bdev(struct zram *zram)
-@@ -1020,7 +1020,7 @@ static void zram_debugfs_unregister(struct zram *zram) {};
- static ssize_t max_comp_streams_show(struct device *dev,
- 		struct device_attribute *attr, char *buf)
- {
--	return scnprintf(buf, PAGE_SIZE, "%d\n", num_online_cpus());
-+	return sysfs_emit(buf, "%d\n", num_online_cpus());
- }
-
- static ssize_t max_comp_streams_store(struct device *dev,
-@@ -1191,8 +1191,7 @@ static ssize_t io_stat_show(struct device *dev,
- 	ssize_t ret;
-
+@@ -1192,10 +1192,10 @@ static ssize_t io_stat_show(struct device *dev,
+ 
  	down_read(&zram->init_lock);
--	ret = scnprintf(buf, PAGE_SIZE,
--			"%8llu %8llu %8llu %8llu\n",
-+	ret = sysfs_emit(buf, "%8llu %8llu %8llu %8llu\n",
- 			(u64)atomic64_read(&zram->stats.failed_reads),
- 			(u64)atomic64_read(&zram->stats.failed_writes),
- 			(u64)atomic64_read(&zram->stats.invalid_io),
-@@ -1222,8 +1221,7 @@ static ssize_t mm_stat_show(struct device *dev,
- 	orig_size = atomic64_read(&zram->stats.pages_stored);
+ 	ret = sysfs_emit(buf, "%8llu %8llu %8llu %8llu\n",
+-			(u64)atomic64_read(&zram->stats.failed_reads),
+-			(u64)atomic64_read(&zram->stats.failed_writes),
+-			(u64)atomic64_read(&zram->stats.invalid_io),
+-			(u64)atomic64_read(&zram->stats.notify_free));
++			 (u64)atomic64_read(&zram->stats.failed_reads),
++			 (u64)atomic64_read(&zram->stats.failed_writes),
++			 (u64)atomic64_read(&zram->stats.invalid_io),
++			 (u64)atomic64_read(&zram->stats.notify_free));
+ 	up_read(&zram->init_lock);
+ 
+ 	return ret;
+@@ -1222,15 +1222,15 @@ static ssize_t mm_stat_show(struct device *dev,
  	max_used = atomic_long_read(&zram->stats.max_used_pages);
-
--	ret = scnprintf(buf, PAGE_SIZE,
--			"%8llu %8llu %8llu %8lu %8ld %8llu %8lu %8llu %8llu\n",
-+	ret = sysfs_emit(buf, "%8llu %8llu %8llu %8lu %8ld %8llu %8lu %8llu %8llu\n",
- 			orig_size << PAGE_SHIFT,
- 			(u64)atomic64_read(&zram->stats.compr_data_size),
- 			mem_used << PAGE_SHIFT,
-@@ -1247,8 +1245,7 @@ static ssize_t bd_stat_show(struct device *dev,
- 	ssize_t ret;
-
- 	down_read(&zram->init_lock);
--	ret = scnprintf(buf, PAGE_SIZE,
--		"%8llu %8llu %8llu\n",
-+	ret = sysfs_emit(buf, "%8llu %8llu %8llu\n",
- 			FOUR_K((u64)atomic64_read(&zram->stats.bd_count)),
- 			FOUR_K((u64)atomic64_read(&zram->stats.bd_reads)),
- 			FOUR_K((u64)atomic64_read(&zram->stats.bd_writes)));
-@@ -1266,9 +1263,7 @@ static ssize_t debug_stat_show(struct device *dev,
- 	ssize_t ret;
-
- 	down_read(&zram->init_lock);
--	ret = scnprintf(buf, PAGE_SIZE,
--			"version: %d\n%8llu %8llu\n",
--			version,
-+	ret = sysfs_emit(buf, "version: %d\n%8llu %8llu\n", version,
- 			(u64)atomic64_read(&zram->stats.writestall),
- 			(u64)atomic64_read(&zram->stats.miss_free));
+ 
+ 	ret = sysfs_emit(buf, "%8llu %8llu %8llu %8lu %8ld %8llu %8lu %8llu %8llu\n",
+-			orig_size << PAGE_SHIFT,
+-			(u64)atomic64_read(&zram->stats.compr_data_size),
+-			mem_used << PAGE_SHIFT,
+-			zram->limit_pages << PAGE_SHIFT,
+-			max_used << PAGE_SHIFT,
+-			(u64)atomic64_read(&zram->stats.same_pages),
+-			atomic_long_read(&pool_stats.pages_compacted),
+-			(u64)atomic64_read(&zram->stats.huge_pages),
+-			(u64)atomic64_read(&zram->stats.huge_pages_since));
++			 orig_size << PAGE_SHIFT,
++			 (u64)atomic64_read(&zram->stats.compr_data_size),
++			 mem_used << PAGE_SHIFT,
++			 zram->limit_pages << PAGE_SHIFT,
++			 max_used << PAGE_SHIFT,
++			 (u64)atomic64_read(&zram->stats.same_pages),
++			 atomic_long_read(&pool_stats.pages_compacted),
++			 (u64)atomic64_read(&zram->stats.huge_pages),
++			 (u64)atomic64_read(&zram->stats.huge_pages_since));
  	up_read(&zram->init_lock);
-@@ -2504,7 +2499,7 @@ static ssize_t hot_add_show(struct class *class,
-
- 	if (ret < 0)
- 		return ret;
--	return scnprintf(buf, PAGE_SIZE, "%d\n", ret);
-+	return sysfs_emit(buf, "%d\n", ret);
- }
- static struct class_attribute class_attr_hot_add =
- 	__ATTR(hot_add, 0400, hot_add_show, NULL);
--- 
-2.15.2
+ 
+ 	return ret;
+@@ -1246,9 +1246,9 @@ static ssize_t bd_stat_show(struct device *dev,
+ 
+ 	down_read(&zram->init_lock);
+ 	ret = sysfs_emit(buf, "%8llu %8llu %8llu\n",
+-			FOUR_K((u64)atomic64_read(&zram->stats.bd_count)),
+-			FOUR_K((u64)atomic64_read(&zram->stats.bd_reads)),
+-			FOUR_K((u64)atomic64_read(&zram->stats.bd_writes)));
++			 FOUR_K((u64)atomic64_read(&zram->stats.bd_count)),
++			 FOUR_K((u64)atomic64_read(&zram->stats.bd_reads)),
++			 FOUR_K((u64)atomic64_read(&zram->stats.bd_writes)));
+ 	up_read(&zram->init_lock);
+ 
+ 	return ret;
+@@ -1264,8 +1264,8 @@ static ssize_t debug_stat_show(struct device *dev,
+ 
+ 	down_read(&zram->init_lock);
+ 	ret = sysfs_emit(buf, "version: %d\n%8llu %8llu\n", version,
+-			(u64)atomic64_read(&zram->stats.writestall),
+-			(u64)atomic64_read(&zram->stats.miss_free));
++			 (u64)atomic64_read(&zram->stats.writestall),
++			 (u64)atomic64_read(&zram->stats.miss_free));
+ 	up_read(&zram->init_lock);
+ 
+ 	return ret;
