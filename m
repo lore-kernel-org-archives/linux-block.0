@@ -2,90 +2,147 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D29CC433FE
-	for <linux-block@archiver.kernel.org>; Mon, 14 Nov 2022 11:32:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49CF7C4332F
+	for <linux-block@archiver.kernel.org>; Mon, 14 Nov 2022 13:23:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235947AbiKNLcq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 14 Nov 2022 06:32:46 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58428 "EHLO
+        id S236005AbiKNNXS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 14 Nov 2022 08:23:18 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49816 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236173AbiKNLcj (ORCPT
+        with ESMTP id S230030AbiKNNXQ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 14 Nov 2022 06:32:39 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CDF63B92
-        for <linux-block@vger.kernel.org>; Mon, 14 Nov 2022 03:31:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1668425501;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=tnnWYWYI7dFaj5KtBqG0kHqgTQYW9D1P7isI3/GaYGU=;
-        b=bWuBt+GGezut99E/niGHA9Pk1FadahsCbev73/VKL8OjuQsDLFWsW4WjMC3ffJI04UtRS/
-        CVubu8YswkiNYRuSuxWQTkudFs2RNHtUYXJDQwPthPOR9CWyH5ejepj1UrhQmjKnmqIi4G
-        jMNYQhOuvy6N+t+zQ/g9IhcTr2Is5Rg=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-133-vNs0dXefN4yN-K7NmV_Obw-1; Mon, 14 Nov 2022 06:31:37 -0500
-X-MC-Unique: vNs0dXefN4yN-K7NmV_Obw-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        Mon, 14 Nov 2022 08:23:16 -0500
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CBB4D289;
+        Mon, 14 Nov 2022 05:23:15 -0800 (PST)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 637B685A59D;
-        Mon, 14 Nov 2022 11:31:37 +0000 (UTC)
-Received: from file01.intranet.prod.int.rdu2.redhat.com (file01.intranet.prod.int.rdu2.redhat.com [10.11.5.7])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 2895C477F55;
-        Mon, 14 Nov 2022 11:31:37 +0000 (UTC)
-Received: from file01.intranet.prod.int.rdu2.redhat.com (localhost [127.0.0.1])
-        by file01.intranet.prod.int.rdu2.redhat.com (8.14.4/8.14.4) with ESMTP id 2AEBVb7h028036;
-        Mon, 14 Nov 2022 06:31:37 -0500
-Received: from localhost (mpatocka@localhost)
-        by file01.intranet.prod.int.rdu2.redhat.com (8.14.4/8.14.4/Submit) with ESMTP id 2AEBVa9L028032;
-        Mon, 14 Nov 2022 06:31:36 -0500
-X-Authentication-Warning: file01.intranet.prod.int.rdu2.redhat.com: mpatocka owned process doing -bs
-Date:   Mon, 14 Nov 2022 06:31:36 -0500 (EST)
-From:   Mikulas Patocka <mpatocka@redhat.com>
-X-X-Sender: mpatocka@file01.intranet.prod.int.rdu2.redhat.com
-To:     Keith Busch <kbusch@kernel.org>
-cc:     Mike Snitzer <snitzer@redhat.com>, Keith Busch <kbusch@meta.com>,
-        linux-block@vger.kernel.org, dm-devel@redhat.com, axboe@kernel.dk,
-        stefanha@redhat.com, ebiggers@kernel.org, me@demsh.org
-Subject: Re: [PATCHv2 0/5] fix direct io device mapper errors
-In-Reply-To: <Y26U91eH7NcXTlbj@kbusch-mbp.dhcp.thefacebook.com>
-Message-ID: <alpine.LRH.2.21.2211140627080.25281@file01.intranet.prod.int.rdu2.redhat.com>
-References: <20221110184501.2451620-1-kbusch@meta.com> <Y26PSYu2nY/AE5Xh@redhat.com> <Y26U91eH7NcXTlbj@kbusch-mbp.dhcp.thefacebook.com>
-User-Agent: Alpine 2.21 (LRH 202 2017-01-01)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 7B4CA1FFC2;
+        Mon, 14 Nov 2022 13:23:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1668432194; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=xgngAVDEPp8EfnFAkGovAM0IoAOtRXmUhxn9JytQBRU=;
+        b=QaX1bmsOwlS7n+JHBoAG9LGcDphDpD6JHyPsfBZnTZpRnkwPy50oc94lQX93JkzCUOIR7c
+        XlyIR6OmEG0zGvAo/0TItE9ToCl/wB3Y/aCe0pi1TsHVxnJj3YiFcQ8BfwL73jBd3nXQGr
+        QUEqg5/YToKNWcVxX7xTt9KOIpHWcvo=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1668432194;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=xgngAVDEPp8EfnFAkGovAM0IoAOtRXmUhxn9JytQBRU=;
+        b=h7dIhAmyLiiT2zNqT0H+llkwqR1qNlDpSX2CWc2v2sGymNc9ER0iOkQCKPIPSGfFtPN/QW
+        5xMO/d3cfy0ISCBQ==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 5F07D13A8C;
+        Mon, 14 Nov 2022 13:23:14 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id VWYrF0JBcmN0RQAAMHmgww
+        (envelope-from <jack@suse.cz>); Mon, 14 Nov 2022 13:23:14 +0000
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+        id 8FFDDA0709; Mon, 14 Nov 2022 14:23:13 +0100 (CET)
+Date:   Mon, 14 Nov 2022 14:23:13 +0100
+From:   Jan Kara <jack@suse.cz>
+To:     Gabriel Krisman Bertazi <krisman@suse.de>
+Cc:     axboe@kernel.dk, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org, Hugh Dickins <hughd@google.com>,
+        Keith Busch <kbusch@kernel.org>,
+        Liu Song <liusong@linux.alibaba.com>, Jan Kara <jack@suse.cz>
+Subject: Re: [PATCH] sbitmap: Use single per-bitmap counting to wake up
+ queued tags
+Message-ID: <20221114132313.5cqhvzxarm7rwvmt@quack3>
+References: <20221105231055.25953-1-krisman@suse.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221105231055.25953-1-krisman@suse.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Gabriel, when looking through this patch, I've noticed we can loose wakeups
+after your latest simplifications. See below for details:
 
+On Sat 05-11-22 19:10:55, Gabriel Krisman Bertazi wrote:
+> @@ -587,7 +571,7 @@ static struct sbq_wait_state *sbq_wake_ptr(struct sbitmap_queue *sbq)
+>  	for (i = 0; i < SBQ_WAIT_QUEUES; i++) {
+>  		struct sbq_wait_state *ws = &sbq->ws[wake_index];
+>  
+> -		if (waitqueue_active(&ws->wait) && atomic_read(&ws->wait_cnt)) {
+> +		if (waitqueue_active(&ws->wait)) {
+>  			if (wake_index != atomic_read(&sbq->wake_index))
+>  				atomic_set(&sbq->wake_index, wake_index);
+>  			return ws;
 
-On Fri, 11 Nov 2022, Keith Busch wrote:
+Neither sbq_wake_ptr() nor sbitmap_queue_wake_up() now increment the
+wake_index after performing the wakeup. Thus we would effectively keep
+waking tasks from a single waitqueue until it becomes empty and only then
+go for the next waitqueue. This creates unnecessary unfairness in task
+wakeups and even possible starvation issues. So I think we need to advance
+wake_index somewhere. Perhaps here before returning waitqueue.
 
-> > There are other DM targets that override logical_block_size in their
-> > .io_hints hook (writecache, ebs, zoned). Have you reasoned through why
-> > those do _not_ need updating too?
-> 
-> Yeah, that's a good question. The ones that have a problem all make
-> assumptions about a bio's bv_offset being logical block size aligned,
-> and each of those is accounted for here. Everything else looks fine with
-> respect to handling offsets.
+> @@ -599,83 +583,31 @@ static struct sbq_wait_state *sbq_wake_ptr(struct sbitmap_queue *sbq)
+>  	return NULL;
+>  }
+>  
+> -static bool __sbq_wake_up(struct sbitmap_queue *sbq, int *nr)
+> +void sbitmap_queue_wake_up(struct sbitmap_queue *sbq, int nr)
+>  {
+> +	unsigned int wake_batch = READ_ONCE(sbq->wake_batch);
+> +	struct sbq_wait_state *ws = NULL;
+> +	unsigned int wakeups;
+>  
+> +	if (!atomic_read(&sbq->ws_active))
+> +		return;
+>  
+> +	atomic_add(nr, &sbq->completion_cnt);
+> +	wakeups = atomic_read(&sbq->wakeup_cnt);
+>  
+>  	do {
+> +		if (atomic_read(&sbq->completion_cnt) - wakeups < wake_batch)
+> +			return;
+>  
+> +		if (!ws) {
+> +			ws = sbq_wake_ptr(sbq);
+> +			if (!ws)
+> +				return;
+> +		}
+> +	} while (!atomic_try_cmpxchg(&sbq->wakeup_cnt,
+> +				     &wakeups, wakeups + wake_batch));
+>  
+>  	wake_up_nr(&ws->wait, wake_batch);
 
-Unaligned bv_offset should work - because XFS is sending such bios. If you 
-compile the kernel with memory debugging, kmalloc returns unaligned 
-memory. XFS will allocate a buffer with kmalloc, test if it crosses a page 
-boundary, if not, use the buffer, if yes, free the buffer and allocate a 
-full page.
+Now this may be also problematic - when we were checking the number of woken
+waiters in the older version of the patch (for others: internal version of
+the patch) this was fine but now it may happen that the 'ws' we have
+selected has no waiters anymore. And in that case we need to find another
+waitqueue because otherwise we'd be loosing too many wakeups and we could
+deadlock. So I think this rather needs to be something like:
 
-There have been device mapper problems about unaligned bv_offset in the 
-past and I have fixed them.
+	do {
+		if (atomic_read(&sbq->completion_cnt) - wakeups < wake_batch)
+			return;
+	} while (!atomic_try_cmpxchg(&sbq->wakeup_cnt,
+				     &wakeups, wakeups + wake_batch));
 
-Unaligned bv_length is a problem for the affected targets.
+	do {
+		ws = sbq_wake_ptr(sbq);
+		if (!ws)
+			return;
+	} while (!wake_up_nr(&ws->wait, wake_batch));
 
-Mikulas
+with our original version of wake_up_nr() returning number of woken
+waiters. What do you think?
 
+								Honza
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
