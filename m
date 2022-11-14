@@ -2,85 +2,97 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3126FC433FE
-	for <linux-block@archiver.kernel.org>; Mon, 14 Nov 2022 19:13:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A4CFC433FE
+	for <linux-block@archiver.kernel.org>; Mon, 14 Nov 2022 19:26:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236947AbiKNTNk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 14 Nov 2022 14:13:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53666 "EHLO
+        id S237071AbiKNTZ6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 14 Nov 2022 14:25:58 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34696 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237006AbiKNTNj (ORCPT
+        with ESMTP id S235772AbiKNTZ6 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 14 Nov 2022 14:13:39 -0500
-Received: from mail-il1-x135.google.com (mail-il1-x135.google.com [IPv6:2607:f8b0:4864:20::135])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9544021B5
-        for <linux-block@vger.kernel.org>; Mon, 14 Nov 2022 11:13:36 -0800 (PST)
-Received: by mail-il1-x135.google.com with SMTP id m15so6238719ilq.2
-        for <linux-block@vger.kernel.org>; Mon, 14 Nov 2022 11:13:36 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=jWoUo8dmGgVm8bdHXsx3SaIM8PPKLWFRvVphT7R1JZk=;
-        b=2R2YVPVVF+58UpTRevTkArlSKla7wWVDcdoaqxkQQSILevAUH0zaG/QCy0yaVUAC5R
-         vOy9tcW5TVTIjaXn6GCtn2MQcVkZN7COfMWi5iMXFt95kZ1gVnOwWtJZAdXoQ5DYdJ9t
-         +7q/wvyDUY/cKHw5qw5rSU5c9ZL6GFqllf37t6DFM3134wuL8sQwuzjdwJjyGLOYz3aU
-         WG9pNxTQW+ZtZwXkP93mMcj6Oh334u4xZZeEPX5dtOy9j7XAPn/S3HQ/fKnZI6YOajzX
-         g5CCZxix9qjnwlqv4FNyACeHXITWqR3j8MajzNwgToB9zMC71h9wbIe21NDVECH7Hp4l
-         51dA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=jWoUo8dmGgVm8bdHXsx3SaIM8PPKLWFRvVphT7R1JZk=;
-        b=j3BfLUYZzG3hG+l+ZtQK0zESXj+jWqT/ghJXNHsEHYecem/8WyhkYOWAeO2b6Ikp/f
-         Esa5BHPtjgRIXaiWhbD8SsL+BO+o1m8W9vQ19k4iFJzVvCJXvMOh5Hnelxi8tbOzqP9M
-         lVoGQZAz3RFZytAMeQ+xc4C1q8TO0qSJUDYWBTB/4EGSoIBxfxfDLk1lWw+2PRaeObVH
-         qoxmErWT2NJdAWM9f/Nq1sk991fYrw+FpD6UxAMzJZ2EYvPrIik1ZehSULFBPIRMA0Bn
-         Koe5qxflJM/RIHkvW/DEr3Hx/XT+YSw+igcJNzj+eY1ADnbW0RamwR/sLPobrQgB8Mpj
-         ScPw==
-X-Gm-Message-State: ANoB5plz7kj0HIuTi5D7kDPhiwRMGFnkwO1RjFnuSU9kw2Zi1rasitHf
-        kmD97t1AWlcFZWDHDhubgbkT4g==
-X-Google-Smtp-Source: AA0mqf5ydQO6C5Sls6HIBpDtP51IkcN+8+IypW+Nx65ZS3sZ6NiGmxyVhmqNizJosIMfanolvf8ftA==
-X-Received: by 2002:a92:c0ca:0:b0:2ff:dfa7:f306 with SMTP id t10-20020a92c0ca000000b002ffdfa7f306mr6627669ilf.9.1668453216189;
-        Mon, 14 Nov 2022 11:13:36 -0800 (PST)
-Received: from [127.0.0.1] ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id j18-20020a056e02015200b0030005ae9241sm4106641ilr.43.2022.11.14.11.13.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 14 Nov 2022 11:13:35 -0800 (PST)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     hannes@cmpxchg.org, Chris Mason <clm@fb.com>, tj@kernel.org,
-        riel@surriel.com, hch@infradead.org, linux-block@vger.kernel.org
-In-Reply-To: <20221114181930.2093706-1-clm@fb.com>
-References: <20221114181930.2093706-1-clm@fb.com>
-Subject: Re: [PATCH] blk-cgroup: properly pin the parent in blkcg_css_online
-Message-Id: <166845321457.38124.12926398545778302638.b4-ty@kernel.dk>
-Date:   Mon, 14 Nov 2022 12:13:34 -0700
+        Mon, 14 Nov 2022 14:25:58 -0500
+Received: from hosting.gsystem.sk (hosting.gsystem.sk [212.5.213.30])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id DEC1423387;
+        Mon, 14 Nov 2022 11:25:55 -0800 (PST)
+Received: from [192.168.0.2] (chello089173232159.chello.sk [89.173.232.159])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by hosting.gsystem.sk (Postfix) with ESMTPSA id 961FB7A0344;
+        Mon, 14 Nov 2022 20:25:54 +0100 (CET)
+From:   Ondrej Zary <linux@zary.sk>
+To:     Damien Le Moal <damien.lemoal@opensource.wdc.com>
+Subject: Re: [PATCH] pata_parport: add driver (PARIDE replacement)
+Date:   Mon, 14 Nov 2022 20:25:46 +0100
+User-Agent: KMail/1.9.10
+Cc:     Christoph Hellwig <hch@lst.de>,
+        Sergey Shtylyov <s.shtylyov@omp.ru>,
+        Jens Axboe <axboe@kernel.dk>, Tim Waugh <tim@cyberelk.net>,
+        linux-block@vger.kernel.org, linux-parport@lists.infradead.org,
+        linux-ide@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20220312144415.20010-1-linux@zary.sk> <202211140853.11115.linux@zary.sk> <f8ce8ecd-cadd-d9ca-d2fa-1251804344f0@opensource.wdc.com>
+In-Reply-To: <f8ce8ecd-cadd-d9ca-d2fa-1251804344f0@opensource.wdc.com>
+X-KMail-QuotePrefix: > 
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-Mailer: b4 0.11.0-dev-d9ed3
+Content-Type: Text/Plain;
+  charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+Message-Id: <202211142025.46723.linux@zary.sk>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, 14 Nov 2022 10:19:30 -0800, Chris Mason wrote:
-> blkcg_css_online is supposed to pin the blkcg of the parent, but
-> 397c9f46ee4d refactored things and along the way, changed it to pin the
-> css instead.  This results in extra pins, and we end up leaking blkcgs
-> and cgroups.
+On Monday 14 November 2022 09:03:28 Damien Le Moal wrote:
+> On 11/14/22 16:53, Ondrej Zary wrote:
+> > On Monday 14 November 2022, Damien Le Moal wrote:
+> >> On 11/12/22 20:17, Ondrej Zary wrote:
+> >>> On Wednesday 19 October 2022 09:34:31 Christoph Hellwig wrote:
+> >>>> It's been a while - did you get a chance to make some progress on
+> >>>> this?  Do you need any help to unblock you?
+> >>>>
+> >>>
+> >>> Sorry again, I'm back now. Trying to fix locking problems.
+> >>> Added this to each function for analysis how the functions are called wrt.
+> >>> locking:
+> >>>
+> >>> 	printk("%s, locked=%d\n", __FUNCTION__, spin_is_locked(ap->lock));
+> >>
+> >> Do you have your code somewhere that we can look at ?
+> > 
+> > This is the current version with debug printks. I've also added dump_stack()
+> > to find out the code path but haven't analyzed the output yet.
 > 
-> 
+> Can you send a proper patch ? Or a link to a git tree ? That is easier to
+> handle than pasted code in an email...
 
-Applied, thanks!
+Patch against what? I don't have a git server.
 
-[1/1] blk-cgroup: properly pin the parent in blkcg_css_online
-      commit: d7dbd43f4a828fa1d9a8614d5b0ac40aee6375fe
+I've done some call trace analysis. These code paths are calling
+pata_parport functions with ap->lock locked during init.
 
-Best regards,
+Comm: kworker, Workqueue: ata_sff ata_sff_pio_task
+ata_sff_hsm_move -> ata_pio_sectors-> ata_sff_altstatus -> pata_parport_tf_read -> pata_parport_check_altstatus
+ata_sff_hsm_move -> ata_sff_altstatus -> pata_parport_tf_read -> pata_parport_check_altstatus
+ata_sff_pio_task -> ata_sff_busy_wait -> pata_parport_check_status
+ata_sff_hsm_move -> ata_wait_idle -> ata_sff_busy_wait -> pata_parport_check_status
+ata_sff_hsm_move -> ata_hsm_qc_complete -> ata_sff_irq_on -> ata_wait_idle -> ata_sff_busy_wait -> pata_parport_check_status
+ata_sff_pio_task -> ata_sff_hsm_move -> ata_pio_sectors -> ata_pio_sector -> ata_pio_xfer -> pata_parport_data_xfer
+ata_sff_pio_task -> ata_sff_hsm_move -> pata_parport_data_xfer
+ata_sff_pio_task -> ata_sff_hsm_move -> pata_parport_tf_read
+ata_sff_hsm_move -> ata_hsm_qc_complete -> ata_qc_complete -> fill_result_tf -> ata_sff_qc_fill_rtf -> pata_parport_tf_read
+ata_sff_hsm_move -> ata_pio_sectors -> ata_sff_altstatus -> pata_parport_check_altstatus
+ata_sff_hsm_move -> ata_sff_altstatus -> pata_parport_check_altstatus
+
+Comm: modprobe
+ata_host_start -> ata_eh_freeze_port -> ata_sff_freeze -> pata_parport_check_status
+
+Comm: scsi_eh_4
+ata_eh_recover -> ata_eh_reset -> ata_eh_thaw_port -> ata_sff_thaw -> ata_sff_irq_on -> ata_wait_idle -> ata_sff_busy_wait -> pata_parport_check_status
+ata_eh_reset -> ata_eh_freeze_port -> ata_sff_freeze -> pata_parport_check_status
+ata_scsi_error -> ata_scsi_port_error_handler -> ata_port_freeze -> ata_sff_freeze -> pata_parport_check_status
+ata_sff_error_handler -> pata_parport_drain_fifo -> pata_parport_check_status
+
+
 -- 
-Jens Axboe
-
-
+Ondrej Zary
