@@ -2,159 +2,169 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 80EFEC4332F
-	for <linux-block@archiver.kernel.org>; Mon, 14 Nov 2022 02:09:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71B99C4332F
+	for <linux-block@archiver.kernel.org>; Mon, 14 Nov 2022 03:33:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234264AbiKNCJD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 13 Nov 2022 21:09:03 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32914 "EHLO
+        id S235468AbiKNDdW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 13 Nov 2022 22:33:22 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56774 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229692AbiKNCJC (ORCPT
+        with ESMTP id S235376AbiKNDdV (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 13 Nov 2022 21:09:02 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB9B7DFA1
-        for <linux-block@vger.kernel.org>; Sun, 13 Nov 2022 18:08:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1668391685;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=Ts9U6w5n6BGeeWKUtrtGgB4Re7OUzK6+ZorIGzZLcIM=;
-        b=NjUrzRgHZFzi/YB4k7VCWevvva6Gesb1SnoU8nuPDkJfHe5gR68A8QQWVnRVZNFrKAgAQr
-        T9gdqoBGkFqppUEZirfGQ2MiT14mxUr4rCHJnUTfj/DWymz3Fb4y0Oafi+sqjscf/F8Qex
-        LB3Bzh700tSElhEhP7X3iBcgYOSE9S4=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-444-FpkZavv7Olq1dhrf_P8MEg-1; Sun, 13 Nov 2022 21:08:03 -0500
-X-MC-Unique: FpkZavv7Olq1dhrf_P8MEg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id EFCF73C01D82;
-        Mon, 14 Nov 2022 02:08:02 +0000 (UTC)
-Received: from T590 (ovpn-8-19.pek2.redhat.com [10.72.8.19])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 1D078111F3CB;
-        Mon, 14 Nov 2022 02:07:58 +0000 (UTC)
-Date:   Mon, 14 Nov 2022 10:07:53 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Ye Bin <yebin@huaweicloud.com>
-Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Ye Bin <yebin10@huawei.com>
-Subject: Re: [PATCH -next] blk-mq: fix warning when unregister mq sysfs
-Message-ID: <Y3Gi+Yt0nyYPx6hX@T590>
-References: <20221112082813.704873-1-yebin@huaweicloud.com>
+        Sun, 13 Nov 2022 22:33:21 -0500
+Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC9E515838;
+        Sun, 13 Nov 2022 19:33:19 -0800 (PST)
+Received: from mail02.huawei.com (unknown [172.30.67.153])
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4N9Zdj6MLcz4f3jqv;
+        Mon, 14 Nov 2022 11:33:13 +0800 (CST)
+Received: from [10.174.176.73] (unknown [10.174.176.73])
+        by APP1 (Coremail) with SMTP id cCh0CgAH_qz7tnFjWPXbAQ--.18277S3;
+        Mon, 14 Nov 2022 11:33:16 +0800 (CST)
+Subject: Re: [PATCH v1] block, bfq: do the all counting of pending-request if
+ CONFIG_BFQ_GROUP_IOSCHED is enabled
+To:     Yuwei Guan <ssawgyw@gmail.com>, paolo.valente@linaro.org,
+        axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Yuwei.Guan@zeekrlife.com, "yukuai (C)" <yukuai3@huawei.com>
+References: <20221110112622.389332-1-Yuwei.Guan@zeekrlife.com>
+From:   Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <3153dcb3-dd9b-7a2b-a15a-8244d805f246@huaweicloud.com>
+Date:   Mon, 14 Nov 2022 11:33:15 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221112082813.704873-1-yebin@huaweicloud.com>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
+In-Reply-To: <20221110112622.389332-1-Yuwei.Guan@zeekrlife.com>
+Content-Type: text/plain; charset=gbk; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: cCh0CgAH_qz7tnFjWPXbAQ--.18277S3
+X-Coremail-Antispam: 1UD129KBjvJXoWxGFWxtrWxZFW7Gry7tF48Xrb_yoW5tF1kpa
+        98K3W5CF1rJrs5Wry5A3W8Xr93Wr95ZFy2kF4qy34Skr47ZF9aq3ZIkr1Fvr1Igr93Awsr
+        ZF10grWDZw17taUanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUyEb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
+        6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+        vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7Cj
+        xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
+        0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
+        6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
+        Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JMxk0xIA0c2IEe2xFo4CEbIxvr21l42xK82IYc2Ij
+        64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x
+        8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r126r1DMIIYrxkI7VAKI48JMIIF0xvE
+        2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42
+        xK8VAvwI8IcIk0rVWrZr1j6s0DMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIE
+        c7CjxVAFwI0_Jr0_GrUvcSsGvfC2KfnxnUUI43ZEXa7IU1zuWJUUUUU==
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, Nov 12, 2022 at 04:28:13PM +0800, Ye Bin wrote:
-> From: Ye Bin <yebin10@huawei.com>
-> 
-> There's issue as follows when do fault injection test:
-> ------------[ cut here ]------------
-> kernfs: can not remove 'nr_tags', no directory
-> WARNING: CPU: 8 PID: 2308 at fs/kernfs/dir.c:1635 kernfs_remove_by_name_ns+0xdd/0x100
-> Modules linked in: null_blk(-)
-> CPU: 8 PID: 2308 Comm: rmmod Not tainted 6.1.0-rc4-next-20221111+ #131
-> RIP: 0010:kernfs_remove_by_name_ns+0xdd/0x100
-> RSP: 0018:ffff88812149fbc8 EFLAGS: 00010282
-> RAX: 0000000000000000 RBX: ffffffffb8137508 RCX: 0000000000000000
-> RDX: 0000000000000001 RSI: ffffffffb6b49ae0 RDI: ffffed1024293f6b
-> RBP: ffffffffb8137600 R08: 0000000000000001 R09: ffffed1024293f3d
-> R10: ffff88812149f9e7 R11: ffffed1024293f3c R12: 0000000000000000
-> R13: ffffffffb6b2d2a0 R14: ffffffffb6b2d1e0 R15: ffff88822f7f14b8
-> FS:  00007f97eacb9740(0000) GS:ffff8883ace00000(0000) knlGS:0000000000000000
-> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: 00007f97e9b72b81 CR3: 000000022fbda000 CR4: 00000000000006e0
-> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-> Call Trace:
->  <TASK>
->  remove_files.isra.0+0x6c/0x170
->  sysfs_remove_group+0x9b/0x180
->  sysfs_remove_groups+0x4f/0xa0
->  __kobject_del+0x7d/0x1d0
->  kobject_del+0x32/0x50
->  blk_mq_sysfs_unregister.cold+0x8/0xd
->  blk_unregister_queue+0xed/0x260
->  del_gendisk+0x27e/0x900
->  null_del_dev.part.0+0x166/0x510 [null_blk]
->  null_destroy_dev+0x37/0x5c [null_blk]
->  null_exit+0x4c/0x9d [null_blk]
->  __do_sys_delete_module.isra.0+0x2f3/0x520
->  do_syscall_64+0x3b/0x90
->  entry_SYSCALL_64_after_hwframe+0x72/0xdc
->  </TASK>
-> 
-> Fault injection context as follows:
->  kobject_add
->  blk_mq_register_hctx
->  blk_mq_sysfs_register
->  blk_register_queue
->  device_add_disk
->  null_add_dev.part.0 [null_blk]
-> 
-> As 'blk_mq_sysfs_register' may failed, but when unregister mq sysfs don't
-> judge sysfs if registered. 'blk_mq_sysfs_register' also didn't handle
-> error correctly.
-> To solve above issue, if sysfs is unregstered just exit.
-> 
-> Signed-off-by: Ye Bin <yebin10@huawei.com>
-> ---
->  block/blk-mq-sysfs.c | 13 +++++++++++--
->  1 file changed, 11 insertions(+), 2 deletions(-)
-> 
-> diff --git a/block/blk-mq-sysfs.c b/block/blk-mq-sysfs.c
-> index 93997d297d42..0cda0a729f3c 100644
-> --- a/block/blk-mq-sysfs.c
-> +++ b/block/blk-mq-sysfs.c
-> @@ -185,7 +185,7 @@ static int blk_mq_register_hctx(struct blk_mq_hw_ctx *hctx)
->  {
->  	struct request_queue *q = hctx->queue;
->  	struct blk_mq_ctx *ctx;
-> -	int i, ret;
-> +	int i, j, ret;
->  
->  	if (!hctx->nr_ctx)
->  		return 0;
-> @@ -197,9 +197,16 @@ static int blk_mq_register_hctx(struct blk_mq_hw_ctx *hctx)
->  	hctx_for_each_ctx(hctx, ctx, i) {
->  		ret = kobject_add(&ctx->kobj, &hctx->kobj, "cpu%u", ctx->cpu);
->  		if (ret)
-> -			break;
-> +			goto out;
->  	}
->  
-> +	return 0;
-> +out:
-> +	hctx_for_each_ctx(hctx, ctx, j) {
-> +		if (j < i)
-> +			kobject_del(&ctx->kobj);
-> +	}
-> +	kobject_del(&hctx->kobj);
+Hi,
 
-The above change looks fine.
+ÔÚ 2022/11/10 19:26, Yuwei Guan Ð´µÀ:
+> The 'bfqd->num_groups_with_pending_reqs' is used when
+> CONFIG_BFQ_GROUP_IOSCHED is enabled, so let the variables and processes
+> take effect when ONFIG_BFQ_GROUP_IOSCHED is enabled.
+> 
 
->  	return ret;
->  }
->  
-> @@ -278,6 +285,8 @@ void blk_mq_sysfs_unregister(struct gendisk *disk)
->  	struct blk_mq_hw_ctx *hctx;
->  	unsigned long i;
->  
-> +	if (!q->mq_sysfs_init_done)
-> +		return;
+This patch looks good to me, fell free to add:
+Reviewed-by: Yu Kuai <yukuai3@huawei.com>
 
-The above should be one warning, and I suggest to handle failure of blk_mq_sysfs_register
-from blk_register_queue() in this patch too.
+BTW, this patch need to be reviewed by Jan or Paolo before it can be
+applied.
 
 Thanks,
-Ming
+Kuai
+
+> Cc: Yu Kuai <yukuai3@huawei.com>
+> Signed-off-by: Yuwei Guan <Yuwei.Guan@zeekrlife.com>
+> ---
+>   block/bfq-iosched.c | 2 ++
+>   block/bfq-iosched.h | 4 ++++
+>   block/bfq-wf2q.c    | 8 ++++----
+>   3 files changed, 10 insertions(+), 4 deletions(-)
+> 
+> diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+> index 2381cf220ba2..5f54091e7fe9 100644
+> --- a/block/bfq-iosched.c
+> +++ b/block/bfq-iosched.c
+> @@ -7051,7 +7051,9 @@ static int bfq_init_queue(struct request_queue *q, struct elevator_type *e)
+>   	bfqd->idle_slice_timer.function = bfq_idle_slice_timer;
+>   
+>   	bfqd->queue_weights_tree = RB_ROOT_CACHED;
+> +#ifdef CONFIG_BFQ_GROUP_IOSCHED
+>   	bfqd->num_groups_with_pending_reqs = 0;
+> +#endif
+>   
+>   	INIT_LIST_HEAD(&bfqd->active_list);
+>   	INIT_LIST_HEAD(&bfqd->idle_list);
+> diff --git a/block/bfq-iosched.h b/block/bfq-iosched.h
+> index 9fa89577322d..41aa151ccc22 100644
+> --- a/block/bfq-iosched.h
+> +++ b/block/bfq-iosched.h
+> @@ -197,8 +197,10 @@ struct bfq_entity {
+>   	/* flag, set to request a weight, ioprio or ioprio_class change  */
+>   	int prio_changed;
+>   
+> +#ifdef CONFIG_BFQ_GROUP_IOSCHED
+>   	/* flag, set if the entity is counted in groups_with_pending_reqs */
+>   	bool in_groups_with_pending_reqs;
+> +#endif
+>   
+>   	/* last child queue of entity created (for non-leaf entities) */
+>   	struct bfq_queue *last_bfqq_created;
+> @@ -491,6 +493,7 @@ struct bfq_data {
+>   	 */
+>   	struct rb_root_cached queue_weights_tree;
+>   
+> +#ifdef CONFIG_BFQ_GROUP_IOSCHED
+>   	/*
+>   	 * Number of groups with at least one process that
+>   	 * has at least one request waiting for completion. Note that
+> @@ -538,6 +541,7 @@ struct bfq_data {
+>   	 * with no request waiting for completion.
+>   	 */
+>   	unsigned int num_groups_with_pending_reqs;
+> +#endif
+>   
+>   	/*
+>   	 * Per-class (RT, BE, IDLE) number of bfq_queues containing
+> diff --git a/block/bfq-wf2q.c b/block/bfq-wf2q.c
+> index b02b53658ed4..ea4c3d757fdd 100644
+> --- a/block/bfq-wf2q.c
+> +++ b/block/bfq-wf2q.c
+> @@ -1612,28 +1612,28 @@ void bfq_requeue_bfqq(struct bfq_data *bfqd, struct bfq_queue *bfqq,
+>   
+>   void bfq_add_bfqq_in_groups_with_pending_reqs(struct bfq_queue *bfqq)
+>   {
+> +#ifdef CONFIG_BFQ_GROUP_IOSCHED
+>   	struct bfq_entity *entity = &bfqq->entity;
+>   
+>   	if (!entity->in_groups_with_pending_reqs) {
+>   		entity->in_groups_with_pending_reqs = true;
+> -#ifdef CONFIG_BFQ_GROUP_IOSCHED
+>   		if (!(bfqq_group(bfqq)->num_queues_with_pending_reqs++))
+>   			bfqq->bfqd->num_groups_with_pending_reqs++;
+> -#endif
+>   	}
+> +#endif
+>   }
+>   
+>   void bfq_del_bfqq_in_groups_with_pending_reqs(struct bfq_queue *bfqq)
+>   {
+> +#ifdef CONFIG_BFQ_GROUP_IOSCHED
+>   	struct bfq_entity *entity = &bfqq->entity;
+>   
+>   	if (entity->in_groups_with_pending_reqs) {
+>   		entity->in_groups_with_pending_reqs = false;
+> -#ifdef CONFIG_BFQ_GROUP_IOSCHED
+>   		if (!(--bfqq_group(bfqq)->num_queues_with_pending_reqs))
+>   			bfqq->bfqd->num_groups_with_pending_reqs--;
+> -#endif
+>   	}
+> +#endif
+>   }
+>   
+>   /*
+> 
 
