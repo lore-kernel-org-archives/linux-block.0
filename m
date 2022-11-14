@@ -2,170 +2,110 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A4BE0C433FE
-	for <linux-block@archiver.kernel.org>; Mon, 14 Nov 2022 20:37:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AA518C433FE
+	for <linux-block@archiver.kernel.org>; Mon, 14 Nov 2022 22:07:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235995AbiKNUhh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 14 Nov 2022 15:37:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53622 "EHLO
+        id S236810AbiKNWHt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 14 Nov 2022 17:07:49 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48444 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235636AbiKNUhg (ORCPT
+        with ESMTP id S236124AbiKNWHs (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 14 Nov 2022 15:37:36 -0500
-X-Greylist: delayed 150 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 14 Nov 2022 12:37:34 PST
-Received: from resdmta-h1p-028597.sys.comcast.net (resdmta-h1p-028597.sys.comcast.net [IPv6:2001:558:fd02:2446::d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 506F0101D5
-        for <linux-block@vger.kernel.org>; Mon, 14 Nov 2022 12:37:34 -0800 (PST)
-Received: from resomta-h1p-027908.sys.comcast.net ([96.102.179.197])
-        by resdmta-h1p-028597.sys.comcast.net with ESMTP
-        id uYh7omcd3fagrugAYoTiJx; Mon, 14 Nov 2022 20:35:02 +0000
+        Mon, 14 Nov 2022 17:07:48 -0500
+Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7FB4210573;
+        Mon, 14 Nov 2022 14:07:47 -0800 (PST)
+Received: by mail-pj1-x1029.google.com with SMTP id d59-20020a17090a6f4100b00213202d77e1so15126690pjk.2;
+        Mon, 14 Nov 2022 14:07:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=comcastmailservice.net; s=20211018a; t=1668458102;
-        bh=tOQ2uBUDLF0h8iyRoUOUMg45l54ag5/2AuUbFTQSgiA=;
-        h=Received:Received:From:To:Subject:Date:Message-Id:MIME-Version:
-         Xfinity-Spam-Result;
-        b=gPH0t0KjXi/MM+A9tWkZ0UOubkAQ6azean+yu7/OLggOwsodcmtWaaIn7oW7BaVKD
-         /akgDvVLONgWPGmmH78o3OOTWay+IrodbV5cDbbv1hOeKoAWCA3aZ77J5Pvzu1+Mqo
-         booF3VRY/az1ZqAsJ60oRLcWs7hDxSAdEXCPC3el+M2pZsChZsdLRXnvDuQLvHTUJc
-         tdEe83MwaG/Fc4eyk6llA06WKve5gle/9FOdM7eePUC2r2P4g12hfPOPXfF7i1xpB4
-         CzNgYGxiWNNAEbbJrmytnZRGBrO8Mnyrifs/6beOa9+tgha3aQiLAiz5UpoirHasRC
-         UdrnXIBU2qd7A==
-Received: from jderrick-mobl4.solidigmtechnology.com ([137.83.219.25])
-        by resomta-h1p-027908.sys.comcast.net with ESMTPA
-        id ug9moRZwyxQh3ug9ros9eM; Mon, 14 Nov 2022 20:34:38 +0000
-X-Xfinity-VAAS: gggruggvucftvghtrhhoucdtuddrgedvgedrgedvgdduudduucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuvehomhgtrghsthdqtfgvshhipdfqfgfvpdfpqffurfetoffkrfenuceurghilhhouhhtmecufedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhephffvvefufffkofgggfestdekredtredttdenucfhrhhomheplfhonhgrthhhrghnucffvghrrhhitghkuceojhhonhgrthhhrghnrdguvghrrhhitghksehlihhnuhigrdguvghvqeenucggtffrrghtthgvrhhnpeeugeduvedvffeffedvkeejgfeutefghffgtdeuueefvedtleefudetffdtkeeuveenucffohhmrghinhepkhgvrhhnvghlrdhorhhgnecukfhppedufeejrdekfedrvdduledrvdehnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehhvghlohepjhguvghrrhhitghkqdhmohgslhegrdhsohhlihguihhgmhhtvggthhhnohhlohhghidrtghomhdpihhnvghtpedufeejrdekfedrvdduledrvdehpdhmrghilhhfrhhomhepjhhonhgrthhhrghnrdguvghrrhhitghksehlihhnuhigrdguvghvpdhnsggprhgtphhtthhopeeipdhrtghpthhtoheplhhinhhugidqnhhvmhgvsehlihhsthhsrdhinhhfrhgruggvrggurdhorhhgpdhrtghpthhtoheplhhinhhugidqsghlohgtkhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehshhhinhhitghhihhrohdrkhgrfigrsh
- grkhhiseifuggtrdgtohhmpdhrtghpthhtohepkhgsuhhstghhsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehoshgrnhguohhvsehoshgrnhguohhvrdgtohhmpdhrtghpthhtohepjhhonhgrthhhrghnrdguvghrrhhitghksehlihhnuhigrdguvghv
-X-Xfinity-VMeta: sc=-100.00;st=legit
-From:   Jonathan Derrick <jonathan.derrick@linux.dev>
-To:     <linux-nvme@lists.infradead.org>, <linux-block@vger.kernel.org>,
-        "Shin\\'ichiro Kawasaki" <shinichiro.kawasaki@wdc.com>
-Cc:     Keith Busch <kbusch@kernel.org>,
-        Omar Sandoval <osandov@osandov.com>,
-        Jonathan Derrick <jonathan.derrick@linux.dev>
-Subject: [PATCH] tests/nvme: Add admin-passthru+reset race test
-Date:   Mon, 14 Nov 2022 13:34:12 -0700
-Message-Id: <20221114203412.383-1-jonathan.derrick@linux.dev>
-X-Mailer: git-send-email 2.30.2
+        d=gmail.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=MWARFSddCBGf3aDJ1ajp1vvhpqhBLlESZgXSjfkXOvE=;
+        b=Rj3+QSD9G8LsBjjcl+TZ+GbTq/H+NRXDvqWs514daNHR6TDjwFkYDPf1p7/YOF7hO6
+         Tb+lHshVBcpxKv2DQ1iH59S8BS+QoFNTkf1gRW2LnSsr8EkGAL351/5lMZioGE7gAVT+
+         Uv9bbkWdcUahORFNMt6ilxcyZ+7jjA0wayeIGf9nKRcJjikKX7tI6XB2R/4AJhHWaumP
+         Blb+W0FP+SPDMTFOyNx335xcG/5z/pQcPEBZ80MC0OyrPSAltOXYzi6RRjUOfGYqpwAN
+         5ZRxTO930TiFg4XjmFKFIujDHdHsJ4gFbylwG7bIzdOJvbwo4FXiC2D46TLjfpQTVEdl
+         1ogQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=MWARFSddCBGf3aDJ1ajp1vvhpqhBLlESZgXSjfkXOvE=;
+        b=kL3sPANvix+rzH0MvFtgiRJlO9JYfTBKzWnOv396ULm27L9K7zY/hXiBwbPsDTriWt
+         o6JYSJqIKrmeG94sCkkftWVjYwu24xfkwoRyi3HtJWBV3dQi69t0+wo3DbonPwXRCGKB
+         +UysruK3S1yGNVCgC6j5YOwHlYyeS3JdOQuIxi5UltoT3gqsWm+ROQtF8GbpfL63O95q
+         ed6ZUau1/my8e1dv+pu/dm3RsIhh/ZKd3h06D7rO55CtmCajf5Y7I5TWXOdGXPQSEs+i
+         50im1YRtQvUU5p+lfPTwhjXLxmyKIRGyaWUH/sHnJgTxdeKnUNWUcKHPPcNEBYesiDhb
+         Jw5g==
+X-Gm-Message-State: ANoB5plY9l+Q4hYXCWPNWALUbeJdl7dUFD4lexRDVPKfcVTCPkZjq3uF
+        VxYvdA+jWNliSrUV7JobfAQ=
+X-Google-Smtp-Source: AA0mqf7z3tfsEDF0z9zOgjV8fKWd3eM5PIm06JgkDK57etMWkwtmG4gq68q+UzssaSIpVTh5IayIRQ==
+X-Received: by 2002:a17:903:2790:b0:188:62b7:1d6b with SMTP id jw16-20020a170903279000b0018862b71d6bmr1106996plb.106.1668463666833;
+        Mon, 14 Nov 2022 14:07:46 -0800 (PST)
+Received: from localhost (2603-800c-1a02-1bae-a7fa-157f-969a-4cde.res6.spectrum.com. [2603:800c:1a02:1bae:a7fa:157f:969a:4cde])
+        by smtp.gmail.com with ESMTPSA id l2-20020a170902f68200b00186e2123506sm8101483plg.300.2022.11.14.14.07.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 14 Nov 2022 14:07:46 -0800 (PST)
+Sender: Tejun Heo <htejun@gmail.com>
+Date:   Mon, 14 Nov 2022 12:07:45 -1000
+From:   Tejun Heo <tj@kernel.org>
+To:     Yu Kuai <yukuai1@huaweicloud.com>
+Cc:     hch@lst.de, josef@toxicpanda.com, axboe@kernel.dk,
+        yukuai3@huawei.com, cgroups@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yi.zhang@huawei.com
+Subject: Re: [PATCH v2 4/5] blk-iocost: fix sleeping in atomic context
+ warnning
+Message-ID: <Y3K8MSFWw8eTnxtm@slm.duckdns.org>
+References: <20221104023938.2346986-1-yukuai1@huaweicloud.com>
+ <20221104023938.2346986-5-yukuai1@huaweicloud.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221104023938.2346986-5-yukuai1@huaweicloud.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Adds a test which runs many formats and reset_controllers in parallel.
-The intent is to expose timing holes in the controller state machine
-which will lead to hung task timing and the controller becoming
-unavailable.
+On Fri, Nov 04, 2022 at 10:39:37AM +0800, Yu Kuai wrote:
+> From: Yu Kuai <yukuai3@huawei.com>
+> 
+> match_u64() is called inside ioc->lock, which causes smatch static
+> checker warnings:
+> 
+> block/blk-iocost.c:3211 ioc_qos_write() warn: sleeping in atomic context
+> block/blk-iocost.c:3240 ioc_qos_write() warn: sleeping in atomic context
+> block/blk-iocost.c:3407 ioc_cost_model_write() warn: sleeping in atomic
+> context
+> 
+> Fix the problem by introducing a mutex and using it while prasing input
+> params.
 
-Reported by https://bugzilla.kernel.org/show_bug.cgi?id=216354
+It bothers me that parsing an u64 string requires a GFP_KERNEL memory
+allocation.
 
-Signed-off-by: Jonathan Derrick <jonathan.derrick@linux.dev>
----
- tests/nvme/046     | 85 ++++++++++++++++++++++++++++++++++++++++++++++
- tests/nvme/046.out |  2 ++
- 2 files changed, 87 insertions(+)
- create mode 100755 tests/nvme/046
- create mode 100644 tests/nvme/046.out
+> @@ -2801,9 +2806,11 @@ static void ioc_rqos_queue_depth_changed(struct rq_qos *rqos)
+>  {
+>  	struct ioc *ioc = rqos_to_ioc(rqos);
+>  
+> +	mutex_lock(&ioc->params_mutex);
+>  	spin_lock_irq(&ioc->lock);
+>  	ioc_refresh_params(ioc, false);
+>  	spin_unlock_irq(&ioc->lock);
+> +	mutex_unlock(&ioc->params_mutex);
+>  }
 
-diff --git a/tests/nvme/046 b/tests/nvme/046
-new file mode 100755
-index 0000000..4b47783
---- /dev/null
-+++ b/tests/nvme/046
-@@ -0,0 +1,85 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-3.0+
-+# Copyright (C) 2022 Jonathan Derrick <jonathan.derrick@linux.dev>
-+#
-+# Test nvme reset controller during admin passthru
-+#
-+# Regression for issue reported by
-+# https://bugzilla.kernel.org/show_bug.cgi?id=216354
-+
-+. tests/nvme/rc
-+
-+#restrict test to nvme-pci only
-+nvme_trtype=pci
-+
-+DESCRIPTION="test nvme reset controller during admin passthru"
-+QUICK=1
-+CAN_BE_ZONED=1
-+
-+requires() {
-+	_nvme_requires
-+}
-+
-+device_requires() {
-+	_require_test_dev_is_nvme
-+}
-+
-+test_device() {
-+	echo "Running ${TEST_NAME}"
-+
-+	local sysfs
-+	local attr
-+	local m
-+
-+	sysfs="$TEST_DEV_SYSFS/device"
-+	timeout=$(($(cat /proc/sys/kernel/hung_task_timeout_secs) / 2))
-+
-+	sleep 5
-+
-+	if [[ ! -d "$sysfs" ]]; then
-+		echo "$sysfs doesn't exist"
-+	fi
-+
-+	# do reset controller/format loops
-+	# don't check status now because a timing race is desired
-+	i=0
-+	start=0
-+	timing_out=false
-+	while [[ $i -le 1000 ]]; do
-+		start=$SECONDS
-+		if [[ -f "$sysfs/reset_controller" ]]; then
-+			echo 1 > "$sysfs/reset_controller" 2>/dev/null &
-+			i=$((i+1))
-+		fi
-+		nvme format -l 0 -f $TEST_DEV 2>/dev/null &
-+
-+		#Assume the controller is hung and unrecoverable
-+		if [[ $(($SECONDS - $start)) -gt $timeout ]]; then
-+			echo "nvme controller timing out"
-+			timing_out=true
-+			break
-+		fi
-+	done
-+
-+	{ kill $!; wait; } &> /dev/null
-+
-+	# at this point it may have waited hung_task_timeout / 2 already, so
-+	# only wait 25% longer for a total of about 75% of allowed timeout
-+	m=0
-+	while [[ $m -le $((timeout / 2)) ]]; do
-+		if [[ $timing_out == true ]]; then
-+			break
-+		fi
-+		if grep -q live "$sysfs/state"; then
-+			break
-+		fi
-+		sleep 1
-+		m=$((m+1))
-+	done
-+	if ! grep -q live "$sysfs/state"; then
-+		echo "nvme still not live after $(($SECONDS - $start)) seconds!"
-+	fi
-+	udevadm settle
-+
-+	echo "Test complete"
-+}
-diff --git a/tests/nvme/046.out b/tests/nvme/046.out
-new file mode 100644
-index 0000000..2b5fa6a
---- /dev/null
-+++ b/tests/nvme/046.out
-@@ -0,0 +1,2 @@
-+Running nvme/046
-+Test complete
+Aren't the params still protected by ioc->lock? Why do we need to grab both?
+
+Any chance I can persuade you into updating match_NUMBER() helpers to not
+use match_strdup()? They can easily disable irq/preemption and use percpu
+buffers and we won't need most of this patchset.
+
+Thanks.
+
 -- 
-2.31.1
-
+tejun
