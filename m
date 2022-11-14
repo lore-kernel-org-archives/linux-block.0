@@ -2,108 +2,95 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AA518C433FE
-	for <linux-block@archiver.kernel.org>; Mon, 14 Nov 2022 22:07:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 14586C433FE
+	for <linux-block@archiver.kernel.org>; Mon, 14 Nov 2022 22:44:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236810AbiKNWHt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 14 Nov 2022 17:07:49 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48444 "EHLO
+        id S237723AbiKNWoM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 14 Nov 2022 17:44:12 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40658 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236124AbiKNWHs (ORCPT
+        with ESMTP id S237735AbiKNWoD (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 14 Nov 2022 17:07:48 -0500
-Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7FB4210573;
-        Mon, 14 Nov 2022 14:07:47 -0800 (PST)
-Received: by mail-pj1-x1029.google.com with SMTP id d59-20020a17090a6f4100b00213202d77e1so15126690pjk.2;
-        Mon, 14 Nov 2022 14:07:47 -0800 (PST)
+        Mon, 14 Nov 2022 17:44:03 -0500
+Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A9E88B867;
+        Mon, 14 Nov 2022 14:43:59 -0800 (PST)
+Received: by mail-pf1-x42a.google.com with SMTP id z26so12451241pff.1;
+        Mon, 14 Nov 2022 14:43:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=MWARFSddCBGf3aDJ1ajp1vvhpqhBLlESZgXSjfkXOvE=;
-        b=Rj3+QSD9G8LsBjjcl+TZ+GbTq/H+NRXDvqWs514daNHR6TDjwFkYDPf1p7/YOF7hO6
-         Tb+lHshVBcpxKv2DQ1iH59S8BS+QoFNTkf1gRW2LnSsr8EkGAL351/5lMZioGE7gAVT+
-         Uv9bbkWdcUahORFNMt6ilxcyZ+7jjA0wayeIGf9nKRcJjikKX7tI6XB2R/4AJhHWaumP
-         Blb+W0FP+SPDMTFOyNx335xcG/5z/pQcPEBZ80MC0OyrPSAltOXYzi6RRjUOfGYqpwAN
-         5ZRxTO930TiFg4XjmFKFIujDHdHsJ4gFbylwG7bIzdOJvbwo4FXiC2D46TLjfpQTVEdl
-         1ogQ==
+        bh=0RkJm12EG/9E1zu6+WxpU+WvUvpr5g7TNGosiBHQiqs=;
+        b=jYAlB6T2TOHN4HHkErKWne7mc4i/zPhe9R0lfnOngKXiyPq+Thno7P922IY0g2Drfo
+         zvMAURArSuTKAOkCVgvtw8DdpP+waWCjdJVBV2MPvJy0U5fEMxvbv9oJU1Yvqvi7ZwI3
+         MdCzo2QiIy6QfCkY9NXyfO4WARTbk2aCPgkra7SKKT7OVnq7mo/yQ3s47NIWmF0M3SaV
+         C4SM8YaSmL44dmp3qy76n+uT0BGCC8pfD9cjtdrWJ3byNruYi7ZjKZuPsdpRO+DRhhrW
+         YjkTPG+8ov3sd+PIIwOneVmRl54qzgpz4b1UL6k4R+WAm4RtjtG//UAJlWK7/IlY0iGU
+         xAtw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=MWARFSddCBGf3aDJ1ajp1vvhpqhBLlESZgXSjfkXOvE=;
-        b=kL3sPANvix+rzH0MvFtgiRJlO9JYfTBKzWnOv396ULm27L9K7zY/hXiBwbPsDTriWt
-         o6JYSJqIKrmeG94sCkkftWVjYwu24xfkwoRyi3HtJWBV3dQi69t0+wo3DbonPwXRCGKB
-         +UysruK3S1yGNVCgC6j5YOwHlYyeS3JdOQuIxi5UltoT3gqsWm+ROQtF8GbpfL63O95q
-         ed6ZUau1/my8e1dv+pu/dm3RsIhh/ZKd3h06D7rO55CtmCajf5Y7I5TWXOdGXPQSEs+i
-         50im1YRtQvUU5p+lfPTwhjXLxmyKIRGyaWUH/sHnJgTxdeKnUNWUcKHPPcNEBYesiDhb
-         Jw5g==
-X-Gm-Message-State: ANoB5plY9l+Q4hYXCWPNWALUbeJdl7dUFD4lexRDVPKfcVTCPkZjq3uF
-        VxYvdA+jWNliSrUV7JobfAQ=
-X-Google-Smtp-Source: AA0mqf7z3tfsEDF0z9zOgjV8fKWd3eM5PIm06JgkDK57etMWkwtmG4gq68q+UzssaSIpVTh5IayIRQ==
-X-Received: by 2002:a17:903:2790:b0:188:62b7:1d6b with SMTP id jw16-20020a170903279000b0018862b71d6bmr1106996plb.106.1668463666833;
-        Mon, 14 Nov 2022 14:07:46 -0800 (PST)
+        bh=0RkJm12EG/9E1zu6+WxpU+WvUvpr5g7TNGosiBHQiqs=;
+        b=agQD7C2Vya5zCmw1vX++NTq8JS9rNDghAHOr15Afa7+rE24GEzk+iQFMQbhRdHhyEK
+         st/cPani+ARFC8YMLs3NRMPA2CLpXEBYXHNNDBLhxrMW9fH1IEvLHSt69EA1nOYtHuEB
+         j8FJWmtX9AYGspM4RvEMK4M7zjK/EAH3/96YolELK5whkDF2Vz4Mes7ROR7PCUN7IL4D
+         qOoKVDZYeVO1up+G1KojeJnJRLA2txYyXsWnTy8nJ5jlDE8VEmYlCjOZLGkRt3MGuPlm
+         fgivQ0PnKFjBkz1pweO6VcT8yFg5GSU/aJ+lu5iF8MgiLrZ/32kqLa+TXwwtiVQrNpAH
+         awQA==
+X-Gm-Message-State: ANoB5pmRRqR0YCBVb2/K984sFA+IaWMYXDd3ySystnX1Q6DnLx9zTeSI
+        KBQZy0zg6goC9xfwkZAgpjw=
+X-Google-Smtp-Source: AA0mqf7lxEb0AxXbQvRejZp/swbVSzCxMl3BbaFVMt0CGZXBh+TOySlOfwrJwHd4vyTH5k4jO2VSJA==
+X-Received: by 2002:aa7:8155:0:b0:572:725f:33e6 with SMTP id d21-20020aa78155000000b00572725f33e6mr188590pfn.46.1668465838739;
+        Mon, 14 Nov 2022 14:43:58 -0800 (PST)
 Received: from localhost (2603-800c-1a02-1bae-a7fa-157f-969a-4cde.res6.spectrum.com. [2603:800c:1a02:1bae:a7fa:157f:969a:4cde])
-        by smtp.gmail.com with ESMTPSA id l2-20020a170902f68200b00186e2123506sm8101483plg.300.2022.11.14.14.07.46
+        by smtp.gmail.com with ESMTPSA id l2-20020a635702000000b0046ec057243asm6258029pgb.12.2022.11.14.14.43.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 14 Nov 2022 14:07:46 -0800 (PST)
+        Mon, 14 Nov 2022 14:43:58 -0800 (PST)
 Sender: Tejun Heo <htejun@gmail.com>
-Date:   Mon, 14 Nov 2022 12:07:45 -1000
+Date:   Mon, 14 Nov 2022 12:43:57 -1000
 From:   Tejun Heo <tj@kernel.org>
-To:     Yu Kuai <yukuai1@huaweicloud.com>
-Cc:     hch@lst.de, josef@toxicpanda.com, axboe@kernel.dk,
-        yukuai3@huawei.com, cgroups@vger.kernel.org,
+To:     Waiman Long <longman@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, cgroups@vger.kernel.org,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        yi.zhang@huawei.com
-Subject: Re: [PATCH v2 4/5] blk-iocost: fix sleeping in atomic context
- warnning
-Message-ID: <Y3K8MSFWw8eTnxtm@slm.duckdns.org>
-References: <20221104023938.2346986-1-yukuai1@huaweicloud.com>
- <20221104023938.2346986-5-yukuai1@huaweicloud.com>
+        Ming Lei <ming.lei@redhat.com>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>,
+        Hillf Danton <hdanton@sina.com>
+Subject: Re: [PATCH v10 3/3] blk-cgroup: Flush stats at blkgs destruction path
+Message-ID: <Y3LErVJiFL9wSGGl@slm.duckdns.org>
+References: <20221105005902.407297-1-longman@redhat.com>
+ <20221105005902.407297-4-longman@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20221104023938.2346986-5-yukuai1@huaweicloud.com>
+In-Reply-To: <20221105005902.407297-4-longman@redhat.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Nov 04, 2022 at 10:39:37AM +0800, Yu Kuai wrote:
-> From: Yu Kuai <yukuai3@huawei.com>
+On Fri, Nov 04, 2022 at 08:59:02PM -0400, Waiman Long wrote:
+> As noted by Michal, the blkg_iostat_set's in the lockless list
+> hold reference to blkg's to protect against their removal. Those
+> blkg's hold reference to blkcg. When a cgroup is being destroyed,
+> cgroup_rstat_flush() is only called at css_release_work_fn() which is
+> called when the blkcg reference count reaches 0. This circular dependency
+> will prevent blkcg from being freed until some other events cause
+> cgroup_rstat_flush() to be called to flush out the pending blkcg stats.
 > 
-> match_u64() is called inside ioc->lock, which causes smatch static
-> checker warnings:
+> To prevent this delayed blkcg removal, add a new cgroup_rstat_css_flush()
+> function to flush stats for a given css and cpu and call it at the blkgs
+> destruction path, blkcg_destroy_blkgs(), whenever there are still some
+> pending stats to be flushed. This will ensure that blkcg reference
+> count can reach 0 ASAP.
 > 
-> block/blk-iocost.c:3211 ioc_qos_write() warn: sleeping in atomic context
-> block/blk-iocost.c:3240 ioc_qos_write() warn: sleeping in atomic context
-> block/blk-iocost.c:3407 ioc_cost_model_write() warn: sleeping in atomic
-> context
-> 
-> Fix the problem by introducing a mutex and using it while prasing input
-> params.
+> Signed-off-by: Waiman Long <longman@redhat.com>
 
-It bothers me that parsing an u64 string requires a GFP_KERNEL memory
-allocation.
-
-> @@ -2801,9 +2806,11 @@ static void ioc_rqos_queue_depth_changed(struct rq_qos *rqos)
->  {
->  	struct ioc *ioc = rqos_to_ioc(rqos);
->  
-> +	mutex_lock(&ioc->params_mutex);
->  	spin_lock_irq(&ioc->lock);
->  	ioc_refresh_params(ioc, false);
->  	spin_unlock_irq(&ioc->lock);
-> +	mutex_unlock(&ioc->params_mutex);
->  }
-
-Aren't the params still protected by ioc->lock? Why do we need to grab both?
-
-Any chance I can persuade you into updating match_NUMBER() helpers to not
-use match_strdup()? They can easily disable irq/preemption and use percpu
-buffers and we won't need most of this patchset.
+Acked-by: Tejun Heo <tj@kernel.org>
 
 Thanks.
 
