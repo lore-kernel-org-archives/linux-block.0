@@ -2,125 +2,295 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12BDFC4332F
-	for <linux-block@archiver.kernel.org>; Mon, 14 Nov 2022 15:29:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30397C4321E
+	for <linux-block@archiver.kernel.org>; Mon, 14 Nov 2022 16:47:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236612AbiKNP3c convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 14 Nov 2022 10:29:32 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51946 "EHLO
+        id S237628AbiKNQrL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 14 Nov 2022 11:47:11 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55662 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236618AbiKNP3I (ORCPT
+        with ESMTP id S238050AbiKNQq5 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 14 Nov 2022 10:29:08 -0500
-Received: from mail4.swissbit.com (mail4.swissbit.com [176.95.1.100])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 082FC24962;
-        Mon, 14 Nov 2022 07:29:02 -0800 (PST)
-Received: from mail4.swissbit.com (localhost [127.0.0.1])
-        by DDEI (Postfix) with ESMTP id 3217A1230E8;
-        Mon, 14 Nov 2022 16:29:01 +0100 (CET)
-Received: from mail4.swissbit.com (localhost [127.0.0.1])
-        by DDEI (Postfix) with ESMTP id 21F79120790;
-        Mon, 14 Nov 2022 16:29:01 +0100 (CET)
-X-TM-AS-ERS: 10.149.2.42-127.5.254.253
-X-TM-AS-SMTP: 1.0 ZXguc3dpc3NiaXQuY29t Y2xvZWhsZUBoeXBlcnN0b25lLmNvbQ==
-X-DDEI-TLS-USAGE: Used
-Received: from ex.swissbit.com (unknown [10.149.2.42])
-        by mail4.swissbit.com (Postfix) with ESMTPS;
-        Mon, 14 Nov 2022 16:29:01 +0100 (CET)
-Received: from sbdeex04.sbitdom.lan (10.149.2.42) by sbdeex04.sbitdom.lan
- (10.149.2.42) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.9; Mon, 14 Nov
- 2022 16:29:00 +0100
-Received: from sbdeex04.sbitdom.lan ([fe80::2047:4968:b5a0:1818]) by
- sbdeex04.sbitdom.lan ([fe80::2047:4968:b5a0:1818%9]) with mapi id
- 15.02.1118.009; Mon, 14 Nov 2022 16:29:00 +0100
-From:   =?iso-8859-1?Q?Christian_L=F6hle?= <CLoehle@hyperstone.com>
-To:     "ulf.hansson@linaro.org" <ulf.hansson@linaro.org>,
-        "axboe@kernel.dk" <axboe@kernel.dk>,
-        "linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-CC:     Avri Altman <Avri.Altman@wdc.com>,
-        "adrian.hunter@intel.com" <adrian.hunter@intel.com>,
-        "vincent.whitchurch@axis.com" <vincent.whitchurch@axis.com>
-Subject: [PATCHv2 1/3] block: Requeue req as head if driver touched it
-Thread-Topic: [PATCHv2 1/3] block: Requeue req as head if driver touched it
-Thread-Index: Adj4PXuDZfY1WtSKRa+v2dLTyrmYTw==
-Date:   Mon, 14 Nov 2022 15:29:00 +0000
-Message-ID: <2c8d249c6bb74d688a625654559bacbb@hyperstone.com>
-Accept-Language: en-US, de-DE
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.153.3.46]
-Content-Type: text/plain;
-        charset="iso-8859-1"
-Content-Transfer-Encoding: 8BIT
+        Mon, 14 Nov 2022 11:46:57 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 25CD52F389;
+        Mon, 14 Nov 2022 08:46:56 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id CE789B8109D;
+        Mon, 14 Nov 2022 16:46:54 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DA2D8C433D6;
+        Mon, 14 Nov 2022 16:46:49 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="BGo0Nnsy"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1668444407;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=AO9qv9PVxuvkGc2dPFGpTuEOOKGUqBaDWRAo2MY9Jus=;
+        b=BGo0NnsymG8dRA9vuBIjHmvSc3v4DRywM6GlnEigjsrR+iV8bi5/V2ukeEGIYbBO6C1NrZ
+        Zmy49IsfUWdfeQec2yQLTcXvDgVnO9E3IFf+MBMEfFn4eg5NkivImNrSyo7xAASTw609jY
+        //YJPrGKaZH1vrj0XWbV690rFBvQmH0=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 23208aca (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+        Mon, 14 Nov 2022 16:46:46 +0000 (UTC)
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+To:     linux-kernel@vger.kernel.org, patches@lists.linux.dev
+Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Kees Cook <keescook@chromium.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Russell King <linux@armlinux.org.uk>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        =?UTF-8?q?Christoph=20B=C3=B6hmwalder?= 
+        <christoph.boehmwalder@linbit.com>,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Sakari Ailus <sakari.ailus@linux.intel.com>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Theodore Ts'o <tytso@mit.edu>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        Richard Weinberger <richard@nod.at>,
+        "Darrick J . Wong" <djwong@kernel.org>,
+        SeongJae Park <sj@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Helge Deller <deller@gmx.de>, netdev@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-media@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, loongarch@lists.linux.dev,
+        linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        linux-mmc@vger.kernel.org, linux-parisc@vger.kernel.org
+Subject: [PATCH v2 0/3] convert tree to get_random_u32_{below,above,between}()
+Date:   Mon, 14 Nov 2022 17:45:55 +0100
+Message-Id: <20221114164558.1180362-1-Jason@zx2c4.com>
 MIME-Version: 1.0
-X-TMASE-Version: DDEI-5.1-9.0.1002-27264.000
-X-TMASE-Result: 10--6.185200-10.000000
-X-TMASE-MatchedRID: dwNgap4H9hget1TxvngNg/ZNLVgVojn/9v33UW8WNYDIgofMgahPrccI
-        2NN8y25x99RfPuwPDMiWnP12ew6mUUD5iYRASGy630kDaWZBE1QbVzFi+tzvL/Jdr/uA7ez9InV
-        hPozbL+l1UTTFSIyEQhLzQdapWbf8S8HyT+bcVCpO5y1KmK5bJRSLgSFq3TnjoxCLfriDzzh56/
-        J0VoTFPbvefB/iWELMdZWyEkHMiANJI5ZUl647UBM0JxSxHjFJ3QfwsVk0UbtuRXh7bFKB7vts2
-        wqf9xJ4aWfS/64JbSctl/noW5MuQKYt2j5uobqalExlQIQeRG0=
-X-TMASE-SNAP-Result: 1.821001.0001-0-1-22:0,33:0,34:0-0
-X-TMASE-INERTIA: 0-0;;;;
-X-TMASE-XGENCLOUD: eefad72f-5701-42d5-9167-65d0d841a444-0-0-200-0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-In case the driver set RQF_DONTPREP flag, requeue the request as head as
-it is likely that the backing storage already had a request to an
-adjacent region, so getting the requeued request out as soon as possible
-may give us some performance benefit.
+Hey everyone,
 
-The are various reasons a driver may requeue a request
-(and therefore RQF_DONTPREP being set).
-One reason may be that the driver or the hardware cannot satisfy
-the block layer alignment/sizes.
+[Changes v1->v2: Jakub asked me to send a v2 around now in the current
+ cycle to minimize potential conflicts with the net tree. So this is
+ rebased and stripped down to just the treewide parts. As well, the
+ removal function is deferred until the end of 6.2 in a separate pull so
+ that we don't have merge issues.]
 
-This for example is the case with mmcblk with a host driver that
-cannot deal with multiple block transfers.
-Consider a request for lba 42 for one page so 4K or 8 blocks.
-mmcblk will do a single block request for lba 42 and requeue for
-the rest if the host can only perform single block transfers.
-In this case the device only delivered 512 bytes of data at lba 42,
-but may have performed a readahead itself for the following lbas,
-or do an 'implicit' readahead as it only deals with larger block
-size mappings itself.
-In that case it would be beneificial if the request for lba 43 and
-the rest of the remaining blocks follow immediately after the initial
-lba 42 request.
-Requeueing already partially processed requests as head preserves the
-intended request order (unless the driver has a queue of its own)
-and therefore mitigates this problem .
+This series is the second tranche of tree-wide conversions to get random
+integer handling a bit tamer. It's another Coccinelle-based patchset.
 
-Signed-off-by: Christian Loehle <cloehle@hyperstone.com>
----
--v2: Extended commit message with example use case, no code change
+First we s/prandom_u32_max/get_random_u32_below/, since the former is
+just a deprecated alias for the latter. Then later, we can remove
+prandom_u32_max all together. I'm quite happy about finally being able
+to do that. It means that prandom.h is now only for deterministic and
+repeatable randomness, not non-deterministic/cryptographic randomness.
+That line is no longer blurred.
 
- block/blk-mq.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+In order to clean up a bunch of inefficient patterns, we use two simple
+helper functions built on top of get_random_u32_below:
+get_random_u32_above and get_random_u32_between. The next two patches
+convert some gnarly open-coded number juggling to use these helpers.
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 33292c01875d..d863c826fb23 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1429,7 +1429,7 @@ static void blk_mq_requeue_work(struct work_struct *work)
- 		 * merge.
- 		 */
- 		if (rq->rq_flags & RQF_DONTPREP)
--			blk_mq_request_bypass_insert(rq, false, false);
-+			blk_mq_request_bypass_insert(rq, true, false);
- 		else
- 			blk_mq_sched_insert_request(rq, true, false, false);
- 	}
+I've used Coccinelle for these three treewide patches, so hopefully
+review is rather uneventful. I didn't accept all of the changes that
+Coccinelle proposed, though, as these tend to be somewhat
+context-specific. I erred on the side of just going with the most
+obvious cases, at least this time through. And then we can address more
+complicated cases through actual maintainer trees.
+
+Since get_random_u32_below() and others sits in my random.git tree,
+these patches too will flow through that same tree.
+
+Regards,
+Jason
+
+Cc: Kees Cook <keescook@chromium.org>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: Russell King <linux@armlinux.org.uk>
+Cc: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Thomas Bogendoerfer <tsbogend@alpha.franken.de>
+Cc: Heiko Carstens <hca@linux.ibm.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Christoph Böhmwalder <christoph.boehmwalder@linbit.com>
+Cc: Jani Nikula <jani.nikula@linux.intel.com>
+Cc: Jason Gunthorpe <jgg@nvidia.com>
+Cc: Sakari Ailus <sakari.ailus@linux.intel.com>
+Cc: Martin K. Petersen <martin.petersen@oracle.com>
+Cc: Theodore Ts'o <tytso@mit.edu>
+Cc: Andreas Dilger <adilger.kernel@dilger.ca>
+Cc: Jaegeuk Kim <jaegeuk@kernel.org>
+Cc: Richard Weinberger <richard@nod.at>
+Cc: Darrick J. Wong <djwong@kernel.org>
+Cc: SeongJae Park <sj@kernel.org>
+Cc: Thomas Gleixner <tglx@linutronix.de>
+Cc: Andrew Morton <akpm@linux-foundation.org>
+Cc: Michael Ellerman <mpe@ellerman.id.au>
+Cc: Helge Deller <deller@gmx.de>
+Cc: netdev@vger.kernel.org
+Cc: linux-crypto@vger.kernel.org
+Cc: linux-block@vger.kernel.org
+Cc: linux-fsdevel@vger.kernel.org
+Cc: linux-media@vger.kernel.org
+Cc: linux-arm-kernel@lists.infradead.org
+Cc: loongarch@lists.linux.dev
+Cc: linux-mips@vger.kernel.org
+Cc: linuxppc-dev@lists.ozlabs.org
+Cc: linux-mmc@vger.kernel.org
+Cc: linux-parisc@vger.kernel.org
+
+Jason A. Donenfeld (3):
+  treewide: use get_random_u32_below() instead of deprecated function
+  treewide: use get_random_u32_{above,below}() instead of manual loop
+  treewide: use get_random_u32_between() when possible
+
+ arch/arm/kernel/process.c                     |  2 +-
+ arch/arm64/kernel/process.c                   |  2 +-
+ arch/loongarch/kernel/process.c               |  2 +-
+ arch/loongarch/kernel/vdso.c                  |  2 +-
+ arch/mips/kernel/process.c                    |  2 +-
+ arch/mips/kernel/vdso.c                       |  2 +-
+ arch/parisc/kernel/vdso.c                     |  2 +-
+ arch/powerpc/crypto/crc-vpmsum_test.c         |  4 +-
+ arch/powerpc/kernel/process.c                 |  2 +-
+ arch/s390/kernel/process.c                    |  2 +-
+ arch/s390/kernel/vdso.c                       |  2 +-
+ arch/sparc/vdso/vma.c                         |  2 +-
+ arch/um/kernel/process.c                      |  2 +-
+ arch/x86/entry/vdso/vma.c                     |  2 +-
+ arch/x86/kernel/module.c                      |  2 +-
+ arch/x86/kernel/process.c                     |  2 +-
+ arch/x86/mm/pat/cpa-test.c                    |  4 +-
+ crypto/rsa-pkcs1pad.c                         |  2 +-
+ crypto/testmgr.c                              | 86 +++++++++----------
+ drivers/block/drbd/drbd_receiver.c            |  4 +-
+ drivers/bus/mhi/host/internal.h               |  2 +-
+ drivers/dma-buf/st-dma-fence-chain.c          |  6 +-
+ .../gpu/drm/i915/gem/i915_gem_execbuffer.c    |  2 +-
+ .../drm/i915/gt/intel_execlists_submission.c  |  2 +-
+ drivers/gpu/drm/i915/intel_memory_region.c    |  4 +-
+ drivers/infiniband/core/cma.c                 |  2 +-
+ drivers/infiniband/hw/cxgb4/id_table.c        |  4 +-
+ drivers/infiniband/hw/hns/hns_roce_ah.c       |  5 +-
+ drivers/infiniband/ulp/rtrs/rtrs-clt.c        |  2 +-
+ drivers/md/bcache/request.c                   |  2 +-
+ drivers/media/common/v4l2-tpg/v4l2-tpg-core.c |  8 +-
+ .../media/test-drivers/vidtv/vidtv_demod.c    |  8 +-
+ .../test-drivers/vivid/vivid-kthread-cap.c    |  2 +-
+ .../test-drivers/vivid/vivid-kthread-out.c    |  2 +-
+ .../media/test-drivers/vivid/vivid-radio-rx.c |  4 +-
+ .../media/test-drivers/vivid/vivid-sdr-cap.c  |  2 +-
+ .../test-drivers/vivid/vivid-touch-cap.c      |  2 +-
+ drivers/mmc/core/core.c                       |  4 +-
+ drivers/mmc/host/dw_mmc.c                     |  2 +-
+ drivers/mtd/nand/raw/nandsim.c                |  4 +-
+ drivers/mtd/tests/mtd_nandecctest.c           | 10 +--
+ drivers/mtd/tests/stresstest.c                |  8 +-
+ drivers/mtd/ubi/debug.c                       |  2 +-
+ drivers/mtd/ubi/debug.h                       |  6 +-
+ drivers/net/ethernet/broadcom/cnic.c          |  2 +-
+ .../chelsio/inline_crypto/chtls/chtls_io.c    |  4 +-
+ drivers/net/phy/at803x.c                      |  2 +-
+ drivers/net/team/team_mode_random.c           |  2 +-
+ drivers/net/wireguard/selftest/allowedips.c   | 20 ++---
+ drivers/net/wireguard/timers.c                |  4 +-
+ .../broadcom/brcm80211/brcmfmac/p2p.c         |  2 +-
+ .../net/wireless/intel/iwlwifi/mvm/mac-ctxt.c |  2 +-
+ drivers/pci/p2pdma.c                          |  2 +-
+ drivers/s390/scsi/zfcp_fc.c                   |  2 +-
+ drivers/scsi/fcoe/fcoe_ctlr.c                 |  4 +-
+ drivers/scsi/qedi/qedi_main.c                 |  2 +-
+ drivers/scsi/scsi_debug.c                     |  6 +-
+ fs/ceph/inode.c                               |  2 +-
+ fs/ceph/mdsmap.c                              |  2 +-
+ fs/ext2/ialloc.c                              |  2 +-
+ fs/ext4/ialloc.c                              |  2 +-
+ fs/ext4/mmp.c                                 |  8 +-
+ fs/ext4/super.c                               |  5 +-
+ fs/f2fs/gc.c                                  |  2 +-
+ fs/f2fs/segment.c                             |  8 +-
+ fs/ubifs/debug.c                              |  8 +-
+ fs/ubifs/lpt_commit.c                         | 14 +--
+ fs/ubifs/tnc_commit.c                         |  2 +-
+ fs/xfs/libxfs/xfs_alloc.c                     |  2 +-
+ fs/xfs/libxfs/xfs_ialloc.c                    |  2 +-
+ fs/xfs/xfs_error.c                            |  2 +-
+ include/linux/damon.h                         |  2 +-
+ include/linux/nodemask.h                      |  2 +-
+ kernel/bpf/core.c                             |  4 +-
+ kernel/kcsan/selftest.c                       |  4 +-
+ kernel/locking/test-ww_mutex.c                |  4 +-
+ kernel/time/clocksource.c                     |  2 +-
+ lib/fault-inject.c                            |  2 +-
+ lib/find_bit_benchmark.c                      |  4 +-
+ lib/kobject.c                                 |  2 +-
+ lib/reed_solomon/test_rslib.c                 |  6 +-
+ lib/sbitmap.c                                 |  4 +-
+ lib/test-string_helpers.c                     |  2 +-
+ lib/test_fprobe.c                             |  5 +-
+ lib/test_hexdump.c                            | 10 +--
+ lib/test_kprobes.c                            |  5 +-
+ lib/test_list_sort.c                          |  2 +-
+ lib/test_printf.c                             |  2 +-
+ lib/test_rhashtable.c                         |  6 +-
+ lib/test_vmalloc.c                            |  8 +-
+ mm/kasan/kasan_test.c                         |  6 +-
+ mm/kfence/core.c                              |  4 +-
+ mm/kfence/kfence_test.c                       |  4 +-
+ mm/slub.c                                     |  2 +-
+ mm/swapfile.c                                 |  5 +-
+ net/802/garp.c                                |  2 +-
+ net/802/mrp.c                                 |  2 +-
+ net/batman-adv/bat_iv_ogm.c                   |  4 +-
+ net/batman-adv/bat_v_elp.c                    |  2 +-
+ net/batman-adv/bat_v_ogm.c                    |  4 +-
+ net/batman-adv/network-coding.c               |  2 +-
+ net/bluetooth/mgmt.c                          |  5 +-
+ net/can/j1939/socket.c                        |  2 +-
+ net/can/j1939/transport.c                     |  2 +-
+ net/ceph/mon_client.c                         |  2 +-
+ net/ceph/osd_client.c                         |  2 +-
+ net/core/neighbour.c                          |  4 +-
+ net/core/pktgen.c                             | 37 ++++----
+ net/core/stream.c                             |  2 +-
+ net/ipv4/icmp.c                               |  2 +-
+ net/ipv4/igmp.c                               |  6 +-
+ net/ipv4/inet_connection_sock.c               |  2 +-
+ net/ipv4/inet_hashtables.c                    |  2 +-
+ net/ipv4/route.c                              |  4 +-
+ net/ipv4/tcp_bbr.c                            |  2 +-
+ net/ipv4/tcp_input.c                          |  3 +-
+ net/ipv6/addrconf.c                           |  8 +-
+ net/ipv6/mcast.c                              | 10 +--
+ net/ipv6/output_core.c                        |  8 +-
+ net/ipv6/route.c                              |  2 +-
+ net/netfilter/ipvs/ip_vs_twos.c               |  4 +-
+ net/netfilter/nf_conntrack_core.c             |  4 +-
+ net/netfilter/nf_nat_helper.c                 |  2 +-
+ net/netlink/af_netlink.c                      |  2 +-
+ net/packet/af_packet.c                        |  4 +-
+ net/sched/act_gact.c                          |  2 +-
+ net/sched/act_sample.c                        |  2 +-
+ net/sched/sch_choke.c                         |  2 +-
+ net/sched/sch_netem.c                         |  4 +-
+ net/sctp/socket.c                             |  2 +-
+ net/sctp/transport.c                          |  2 +-
+ net/sunrpc/cache.c                            |  2 +-
+ net/sunrpc/xprtsock.c                         |  2 +-
+ net/tipc/socket.c                             |  2 +-
+ net/vmw_vsock/af_vsock.c                      |  3 +-
+ net/xfrm/xfrm_state.c                         |  2 +-
+ 136 files changed, 286 insertions(+), 313 deletions(-)
+
 -- 
-2.37.3
-Hyperstone GmbH | Reichenaustr. 39a  | 78467 Konstanz
-Managing Director: Dr. Jan Peter Berns.
-Commercial register of local courts: Freiburg HRB381782
+2.38.1
 
