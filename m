@@ -2,83 +2,87 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42C63C43217
-	for <linux-block@archiver.kernel.org>; Mon, 14 Nov 2022 18:13:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 033B7C4332F
+	for <linux-block@archiver.kernel.org>; Mon, 14 Nov 2022 18:20:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238204AbiKNSMk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 14 Nov 2022 13:12:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40910 "EHLO
+        id S236334AbiKNSUF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 14 Nov 2022 13:20:05 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49932 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238227AbiKNSMX (ORCPT
+        with ESMTP id S236120AbiKNSUB (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 14 Nov 2022 13:12:23 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 01D6D24976
-        for <linux-block@vger.kernel.org>; Mon, 14 Nov 2022 10:12:22 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 8400561342
-        for <linux-block@vger.kernel.org>; Mon, 14 Nov 2022 18:12:22 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 37BD8C433D6;
-        Mon, 14 Nov 2022 18:12:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1668449541;
-        bh=rR6p9mCylDPSNDzrBso16rE7PC2mLZj0DgfpLFq9shg=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=lLCyD/OSk38dLY0ZVjjD87dwje/zJDu3FI2QZCObfkInJqjQ8Ad44ZhdwxhMaweXE
-         b/FFQNzySq4Nz4C/y7xNwS47JaMDqby4TCuxPJhEAMMfSubSmDPJ0OW9p+FYiDk0yq
-         aseYg3TJhr69hcvD1e1RJU/VFyxGxMi0U+4mdz4ek3ArqYMrRS5/Fg9dPYUBqczHXA
-         pSvnq+qb3OoC5sk889CdyjGOylgMaOB3FSwjT9inS6IDsK5ZWvuiizwzdrUV3/vffS
-         HL5jimtsYmvAVS/jeNnexF7kDjJ72NomOUBEVdRUsoqD3IHUl+5C3aQ71b2J2KcbeA
-         epNK15Bup5ihg==
-Date:   Mon, 14 Nov 2022 11:12:18 -0700
-From:   Keith Busch <kbusch@kernel.org>
-To:     Mikulas Patocka <mpatocka@redhat.com>
-Cc:     Mike Snitzer <snitzer@redhat.com>, Keith Busch <kbusch@meta.com>,
-        linux-block@vger.kernel.org, dm-devel@redhat.com, axboe@kernel.dk,
-        stefanha@redhat.com, ebiggers@kernel.org, me@demsh.org
-Subject: Re: [PATCHv2 0/5] fix direct io device mapper errors
-Message-ID: <Y3KFAr16W/LfJ5ms@kbusch-mbp.dhcp.thefacebook.com>
-References: <20221110184501.2451620-1-kbusch@meta.com>
- <Y26PSYu2nY/AE5Xh@redhat.com>
- <Y26U91eH7NcXTlbj@kbusch-mbp.dhcp.thefacebook.com>
- <alpine.LRH.2.21.2211140627080.25281@file01.intranet.prod.int.rdu2.redhat.com>
+        Mon, 14 Nov 2022 13:20:01 -0500
+Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 722DE252
+        for <linux-block@vger.kernel.org>; Mon, 14 Nov 2022 10:20:00 -0800 (PST)
+Received: from pps.filterd (m0044012.ppops.net [127.0.0.1])
+        by mx0a-00082601.pphosted.com (8.17.1.19/8.17.1.5) with ESMTP id 2AEH5K4t005657
+        for <linux-block@vger.kernel.org>; Mon, 14 Nov 2022 10:20:00 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.com; h=from : to : subject :
+ date : message-id : mime-version : content-transfer-encoding :
+ content-type; s=facebook; bh=E4ef4u8dxXIoaQywGKWE+lnCHBO7RxCb5CWRxp9lxT4=;
+ b=nQfp8TE7YPjIblXkzHayBU08jKRuOe3vPqJEU3blH5pnKHhd+Q+xY6SaqJqzDrfKwRoa
+ UdNZKUrgB5Z/NUe7TyQujgpjVsrj8tqRWWHGQrQbMs7x9snWvArZ3f5gBoMn1ZNBuhNj
+ wD9bdRLwmIme+lOXKYvflH1dwwEb6Z9k3GE= 
+Received: from mail.thefacebook.com ([163.114.132.120])
+        by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 3kupbjtyc9-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
+        for <linux-block@vger.kernel.org>; Mon, 14 Nov 2022 10:19:59 -0800
+Received: from twshared14438.02.ash8.facebook.com (2620:10d:c085:208::11) by
+ mail.thefacebook.com (2620:10d:c085:21d::5) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31; Mon, 14 Nov 2022 10:19:59 -0800
+Received: by devbig003.nao1.facebook.com (Postfix, from userid 8731)
+        id A2580C22ABEB; Mon, 14 Nov 2022 10:19:53 -0800 (PST)
+From:   Chris Mason <clm@fb.com>
+To:     <hch@infradead.org>, <axboe@kernel.dk>,
+        <linux-block@vger.kernel.org>, <tj@kernel.org>, <riel@surriel.com>,
+        <hannes@cmpxchg.org>
+Subject: [PATCH] blk-cgroup: properly pin the parent in blkcg_css_online
+Date:   Mon, 14 Nov 2022 10:19:30 -0800
+Message-ID: <20221114181930.2093706-1-clm@fb.com>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <alpine.LRH.2.21.2211140627080.25281@file01.intranet.prod.int.rdu2.redhat.com>
+Content-Transfer-Encoding: quoted-printable
+X-FB-Internal: Safe
+Content-Type: text/plain
+X-Proofpoint-GUID: W2ko28UVdav3ZwqV2p8174QjPmVHIApP
+X-Proofpoint-ORIG-GUID: W2ko28UVdav3ZwqV2p8174QjPmVHIApP
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
+ definitions=2022-11-14_13,2022-11-11_01,2022-06-22_01
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Nov 14, 2022 at 06:31:36AM -0500, Mikulas Patocka wrote:
-> 
-> 
-> On Fri, 11 Nov 2022, Keith Busch wrote:
-> 
-> > > There are other DM targets that override logical_block_size in their
-> > > .io_hints hook (writecache, ebs, zoned). Have you reasoned through why
-> > > those do _not_ need updating too?
-> > 
-> > Yeah, that's a good question. The ones that have a problem all make
-> > assumptions about a bio's bv_offset being logical block size aligned,
-> > and each of those is accounted for here. Everything else looks fine with
-> > respect to handling offsets.
-> 
-> Unaligned bv_offset should work - because XFS is sending such bios. If you 
-> compile the kernel with memory debugging, kmalloc returns unaligned 
-> memory. XFS will allocate a buffer with kmalloc, test if it crosses a page 
-> boundary, if not, use the buffer, if yes, free the buffer and allocate a 
-> full page.
-> 
-> There have been device mapper problems about unaligned bv_offset in the 
-> past and I have fixed them.
-> 
-> Unaligned bv_length is a problem for the affected targets.
+blkcg_css_online is supposed to pin the blkcg of the parent, but
+397c9f46ee4d refactored things and along the way, changed it to pin the
+css instead.  This results in extra pins, and we end up leaking blkcgs
+and cgroups.
 
-kmalloc is physically contiguous, and bio's support multi-page bvecs for
-these, so the bv_len is always aligned if the kmalloc is sized
-correctly. The unaligned offsets become a problem with virtually
-contiguous buffers since individual bv lengths might not be block size
-aligned when bv offsets exist.
+Fixes: 397c9f46ee4d ("blk-cgroup: move blkcg_{pin,unpin}_online out of li=
+ne")
+Signed-off-by: Chris Mason <clm@fb.com>
+Spotted-by: Rik van Riel <riel@surriel.com>
+Cc: <stable@vger.kernel.org> # v5.19+
+---
+ block/blk-cgroup.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+index 6a5c849ee061..ed761c62ad0a 100644
+--- a/block/blk-cgroup.c
++++ b/block/blk-cgroup.c
+@@ -1213,7 +1213,7 @@ static int blkcg_css_online(struct cgroup_subsys_st=
+ate *css)
+ 	 * parent so that offline always happens towards the root.
+ 	 */
+ 	if (parent)
+-		blkcg_pin_online(css);
++		blkcg_pin_online(&parent->css);
+ 	return 0;
+ }
+=20
+--=20
+2.30.2
+
