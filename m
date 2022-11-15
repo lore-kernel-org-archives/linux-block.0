@@ -2,158 +2,100 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E5298C4332F
-	for <linux-block@archiver.kernel.org>; Tue, 15 Nov 2022 22:46:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1384C4332F
+	for <linux-block@archiver.kernel.org>; Tue, 15 Nov 2022 23:07:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238403AbiKOWq0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 15 Nov 2022 17:46:26 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43276 "EHLO
+        id S229651AbiKOXHc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 15 Nov 2022 18:07:32 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55346 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231754AbiKOWqT (ORCPT
+        with ESMTP id S229607AbiKOXHc (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 15 Nov 2022 17:46:19 -0500
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 147B61FCFE;
-        Tue, 15 Nov 2022 14:46:15 -0800 (PST)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        Tue, 15 Nov 2022 18:07:32 -0500
+Received: from sin.source.kernel.org (sin.source.kernel.org [145.40.73.55])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 47C1D2C674
+        for <linux-block@vger.kernel.org>; Tue, 15 Nov 2022 15:07:31 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 7A5CF20A90;
-        Tue, 15 Nov 2022 22:46:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1668552374; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=d3jRfb3u2UMhELX3RFNE2yKyqYVqcOMcurpZIDpUfqQ=;
-        b=ICr7+PbdeP+cvI4LbyR8wehVSKXI9D+8UYj/5EI5AZlluzxdnsPEZEd1qGvXKzSRNwdWEr
-        3+iX//2sCDWNtPdX61Ol2e1nAgZu7aUFQtYsYgMWy5NTcfMyT56IdlHqUfIoPx/JnyVmvA
-        SbBZmECalYSPPyWnXXAK1mCm2KXGpBs=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1668552374;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=d3jRfb3u2UMhELX3RFNE2yKyqYVqcOMcurpZIDpUfqQ=;
-        b=a5XL0CFX5ESUe67zQsjAkZjjyX5RwRLma+q2/quZ8SEzsSCciMKWsyEY+8PctohwjOaoRd
-        XgjXOpMSoqafK9DQ==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id D122213273;
-        Tue, 15 Nov 2022 22:46:13 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id nvQtI7UWdGPzSwAAMHmgww
-        (envelope-from <krisman@suse.de>); Tue, 15 Nov 2022 22:46:13 +0000
-From:   Gabriel Krisman Bertazi <krisman@suse.de>
-To:     axboe@kernel.dk
-Cc:     mingo@redhat.com, peterz@infradead.org, jack@suse.cz,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        liusong@linux.alibaba.com, chaitanyak@nvidia.com,
-        Gabriel Krisman Bertazi <krisman@suse.de>
-Subject: [PATCH 3/3] sbitmap: Try each queue to wake up at least one waiter
-Date:   Tue, 15 Nov 2022 17:45:53 -0500
-Message-Id: <20221115224553.23594-4-krisman@suse.de>
-X-Mailer: git-send-email 2.35.3
-In-Reply-To: <20221115224553.23594-1-krisman@suse.de>
-References: <20221115224553.23594-1-krisman@suse.de>
+        by sin.source.kernel.org (Postfix) with ESMTPS id B2AEECE19A7
+        for <linux-block@vger.kernel.org>; Tue, 15 Nov 2022 23:07:29 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8AA20C433C1;
+        Tue, 15 Nov 2022 23:07:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1668553648;
+        bh=saQ8CFN9k/04GT3jsFLnu9AakHqfR/AzeQx3kPTzKak=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=GJouLVJ32LVDu3T9KZlr/41Nt4HS3j624ZKHFjROQOpGiaUGk5GxydTzduoGaLbZs
+         syJZQD7wXutOQgdrByh9P7x9sIulAql34UBj0Jkc+xAHTrWrRmoqL1xfWAXBHyljOV
+         EEbOsTLGFGgJZhErD/42F6BAq1WzNoIImgLovSsYZPomatFY5VHRYSHaPvZ15vR9Zh
+         gHMLQwYuGDyZ/kEl0GFv7t7PXBnOSXoIyl9B6ONaLfz2KdQL6D6HkbJHHLftN0bXvX
+         cmBpKqlG27mm+BCuqj6R7QH67Gl4aPL2AgCOU0h19h0grH9xGHY2dWpKkXCdiJQMbK
+         Xq4sbM9DK+y7g==
+Date:   Tue, 15 Nov 2022 16:07:24 -0700
+From:   Keith Busch <kbusch@kernel.org>
+To:     Jonathan Derrick <jonathan.derrick@linux.dev>
+Cc:     linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+        "Shin\\'ichiro Kawasaki" <shinichiro.kawasaki@wdc.com>,
+        Omar Sandoval <osandov@osandov.com>
+Subject: Re: [PATCH] tests/nvme: Add admin-passthru+reset race test
+Message-ID: <Y3QbrKaQdffR/HcX@kbusch-mbp.dhcp.thefacebook.com>
+References: <20221114203412.383-1-jonathan.derrick@linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221114203412.383-1-jonathan.derrick@linux.dev>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Jan reported the new algorithm as merged might be problematic if the
-queue being awaken becomes empty between the waitqueue_active inside
-sbq_wake_ptr check and the wake up.  If that happens, wake_up_nr will
-not wake up any waiter and we loose too many wake ups.  In order to
-guarantee progress, we need to wake up at least one waiter here, if
-there are any.  This now requires trying to wake up from every queue.
+On Mon, Nov 14, 2022 at 01:34:12PM -0700, Jonathan Derrick wrote:
+> +	echo "Running ${TEST_NAME}"
+> +
+> +	local sysfs
+> +	local attr
+> +	local m
+> +
+> +	sysfs="$TEST_DEV_SYSFS/device"
 
-Instead of walking through all the queues with sbq_wake_ptr, this call
-moves the wake up inside that function.  In a previous version of the
-patch, I found that updating wake_index several times when walking
-through queues had a measurable overhead.  This ensures we only update
-it once, at the end.
+That's not the correct directory when the device is using native
+nvme-multipath.
 
-Fixes: 4f8126bb2308 ("sbitmap: Use single per-bitmap counting to wake up queued tags")
-Reported-by: Jan Kara <jack@suse.cz>
-Signed-off-by: Gabriel Krisman Bertazi <krisman@suse.de>
----
- lib/sbitmap.c | 28 ++++++++++++----------------
- 1 file changed, 12 insertions(+), 16 deletions(-)
+> +	timeout=$(($(cat /proc/sys/kernel/hung_task_timeout_secs) / 2))
+> +
+> +	sleep 5
+> +
+> +	if [[ ! -d "$sysfs" ]]; then
+> +		echo "$sysfs doesn't exist"
+> +	fi
+> +
+> +	# do reset controller/format loops
+> +	# don't check status now because a timing race is desired
+> +	i=0
+> +	start=0
+> +	timing_out=false
+> +	while [[ $i -le 1000 ]]; do
+> +		start=$SECONDS
+> +		if [[ -f "$sysfs/reset_controller" ]]; then
+> +			echo 1 > "$sysfs/reset_controller" 2>/dev/null &
+> +			i=$((i+1))
+> +		fi
+> +		nvme format -l 0 -f $TEST_DEV 2>/dev/null &
+> +
+> +		#Assume the controller is hung and unrecoverable
+> +		if [[ $(($SECONDS - $start)) -gt $timeout ]]; then
+> +			echo "nvme controller timing out"
+> +			timing_out=true
+> +			break
+> +		fi
+> +	done
 
-diff --git a/lib/sbitmap.c b/lib/sbitmap.c
-index bea7984f7987..586deb333237 100644
---- a/lib/sbitmap.c
-+++ b/lib/sbitmap.c
-@@ -560,12 +560,12 @@ void sbitmap_queue_min_shallow_depth(struct sbitmap_queue *sbq,
- }
- EXPORT_SYMBOL_GPL(sbitmap_queue_min_shallow_depth);
- 
--static struct sbq_wait_state *sbq_wake_ptr(struct sbitmap_queue *sbq)
-+static void __sbitmap_queue_wake_up(struct sbitmap_queue *sbq, int nr)
- {
- 	int i, wake_index;
- 
- 	if (!atomic_read(&sbq->ws_active))
--		return NULL;
-+		return;
- 
- 	wake_index = atomic_read(&sbq->wake_index);
- 	for (i = 0; i < SBQ_WAIT_QUEUES; i++) {
-@@ -579,20 +579,22 @@ static struct sbq_wait_state *sbq_wake_ptr(struct sbitmap_queue *sbq)
- 		 */
- 		wake_index = sbq_index_inc(wake_index);
- 
--		if (waitqueue_active(&ws->wait)) {
--			if (wake_index != atomic_read(&sbq->wake_index))
--				atomic_set(&sbq->wake_index, wake_index);
--			return ws;
--		}
-+		/*
-+		 * It is sufficient to wake up at least one waiter to
-+		 * guarantee forward progress.
-+		 */
-+		if (waitqueue_active(&ws->wait) &&
-+		    wake_up_nr(&ws->wait, nr))
-+			break;
- 	}
- 
--	return NULL;
-+	if (wake_index != atomic_read(&sbq->wake_index))
-+		atomic_set(&sbq->wake_index, wake_index);
- }
- 
- void sbitmap_queue_wake_up(struct sbitmap_queue *sbq, int nr)
- {
- 	unsigned int wake_batch = READ_ONCE(sbq->wake_batch);
--	struct sbq_wait_state *ws = NULL;
- 	unsigned int wakeups;
- 
- 	if (!atomic_read(&sbq->ws_active))
-@@ -604,16 +606,10 @@ void sbitmap_queue_wake_up(struct sbitmap_queue *sbq, int nr)
- 	do {
- 		if (atomic_read(&sbq->completion_cnt) - wakeups < wake_batch)
- 			return;
--
--		if (!ws) {
--			ws = sbq_wake_ptr(sbq);
--			if (!ws)
--				return;
--		}
- 	} while (!atomic_try_cmpxchg(&sbq->wakeup_cnt,
- 				     &wakeups, wakeups + wake_batch));
- 
--	wake_up_nr(&ws->wait, wake_batch);
-+	__sbitmap_queue_wake_up(sbq, wake_batch);
- }
- EXPORT_SYMBOL_GPL(sbitmap_queue_wake_up);
- 
--- 
-2.35.3
+If the controller is already undergoing a reset, then writing to the
+reset_controller file becomes a no-op. Unless your "reset_controller"
+completes near instantaneously, I find that this loop tears through 1000
+iterations, forks 1000 formats, and only 1 reset_controller actually
+gets through.
 
+If I remove the upper limit, then I can also see the stalled task, but
+it is only temporary and gets itself out of it after the admin timeout
+(1 minute). Is that also your observation, or is it stuck forever?
