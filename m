@@ -2,100 +2,90 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1384C4332F
-	for <linux-block@archiver.kernel.org>; Tue, 15 Nov 2022 23:07:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 32F33C433FE
+	for <linux-block@archiver.kernel.org>; Tue, 15 Nov 2022 23:32:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229651AbiKOXHc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 15 Nov 2022 18:07:32 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55346 "EHLO
+        id S229495AbiKOXcu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 15 Nov 2022 18:32:50 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38620 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229607AbiKOXHc (ORCPT
+        with ESMTP id S229560AbiKOXcu (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 15 Nov 2022 18:07:32 -0500
-Received: from sin.source.kernel.org (sin.source.kernel.org [145.40.73.55])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 47C1D2C674
-        for <linux-block@vger.kernel.org>; Tue, 15 Nov 2022 15:07:31 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by sin.source.kernel.org (Postfix) with ESMTPS id B2AEECE19A7
-        for <linux-block@vger.kernel.org>; Tue, 15 Nov 2022 23:07:29 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8AA20C433C1;
-        Tue, 15 Nov 2022 23:07:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1668553648;
-        bh=saQ8CFN9k/04GT3jsFLnu9AakHqfR/AzeQx3kPTzKak=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=GJouLVJ32LVDu3T9KZlr/41Nt4HS3j624ZKHFjROQOpGiaUGk5GxydTzduoGaLbZs
-         syJZQD7wXutOQgdrByh9P7x9sIulAql34UBj0Jkc+xAHTrWrRmoqL1xfWAXBHyljOV
-         EEbOsTLGFGgJZhErD/42F6BAq1WzNoIImgLovSsYZPomatFY5VHRYSHaPvZ15vR9Zh
-         gHMLQwYuGDyZ/kEl0GFv7t7PXBnOSXoIyl9B6ONaLfz2KdQL6D6HkbJHHLftN0bXvX
-         cmBpKqlG27mm+BCuqj6R7QH67Gl4aPL2AgCOU0h19h0grH9xGHY2dWpKkXCdiJQMbK
-         Xq4sbM9DK+y7g==
-Date:   Tue, 15 Nov 2022 16:07:24 -0700
-From:   Keith Busch <kbusch@kernel.org>
-To:     Jonathan Derrick <jonathan.derrick@linux.dev>
-Cc:     linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-        "Shin\\'ichiro Kawasaki" <shinichiro.kawasaki@wdc.com>,
-        Omar Sandoval <osandov@osandov.com>
-Subject: Re: [PATCH] tests/nvme: Add admin-passthru+reset race test
-Message-ID: <Y3QbrKaQdffR/HcX@kbusch-mbp.dhcp.thefacebook.com>
-References: <20221114203412.383-1-jonathan.derrick@linux.dev>
+        Tue, 15 Nov 2022 18:32:50 -0500
+Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6CF8E959E;
+        Tue, 15 Nov 2022 15:32:49 -0800 (PST)
+Received: by mail-pj1-x1033.google.com with SMTP id m14-20020a17090a3f8e00b00212dab39bcdso705918pjc.0;
+        Tue, 15 Nov 2022 15:32:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=sgz5o5DfbV3xr4Xq9yVshHOHM8PL4ue2OQGWIUkyU1s=;
+        b=bvYH+xNXVvSAx6vKiudIS7G2gSJ2PXBec57nPAoCI7pb8hJJVorTvTe5Db4rDHP767
+         0n9W2FIPaIYlx5/n/E3ALoMcbBc75QD7im8Xau1UITFiysk7f05bXYx7pfJRtEkec3SP
+         Ho5R/aC2Yi7x7mnwtf7e7SFceKI5SJupC16pBGjlJvfrtnt5eYRs054Aqas/cB9A7Sbo
+         ePWdhJaWPzkbfp49I9NvV3T6DypSO/ZcLa3fHE/ThfoMKidxs6M9DagoDpaVVtyyfsUl
+         AgwZLLk3me+xp+Zqi2wWku4Yq10ZEGdRkjPCv34ylfieTD+GFlM+SxcHEk3E2wW2wwvm
+         +wGw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=sgz5o5DfbV3xr4Xq9yVshHOHM8PL4ue2OQGWIUkyU1s=;
+        b=J/qfq3RqCpgGKtU4h6tH/TFlbRaf2wBCSUhLWqcG2aZpiskqBwjLTzU0qPJw9VF7jj
+         czDCaUdpLkR1TPfouRF16L1YQktLa6gOOZof7o/n5MhQYBMbqDQL5F1Vx7qBOIqlzR+1
+         feJUaoI0vT3ZKkRC+B7E4mNe1ZA9pxQLR72VwBJ4zmBQxjVNkNSj4Hx9rXcNxYiGRo7Q
+         hCvw/oBGCi1g5sBaYkPUjkGiDteP9Io9tdMECkChRcJj6FqZTYZJjQtBpcHE8xbSbOEi
+         OIv9RjCIYcnci3uDzFpZlSwKHLDQFeT1Eo0i9sZ/uHTgnTvuNhQPNQQMAysWxR9UXjBS
+         klKw==
+X-Gm-Message-State: ANoB5plaSqgfvgQpNxW2c0s9qsY3F3CUIMble2LbSWwUDO5mld+g0T7S
+        kyNXebECjYF5RtP05ZGE3vs=
+X-Google-Smtp-Source: AA0mqf4ULM0GXAw7L905+KueIktR4Owb1uKikfXE00JzU8UHVdytaYIkBI6dzOEscrtWWbNl8x2LfQ==
+X-Received: by 2002:a17:90b:3756:b0:20a:92d2:226a with SMTP id ne22-20020a17090b375600b0020a92d2226amr746946pjb.155.1668555168942;
+        Tue, 15 Nov 2022 15:32:48 -0800 (PST)
+Received: from google.com ([2620:15c:211:201:6ff2:4caf:5d97:1932])
+        by smtp.gmail.com with ESMTPSA id b193-20020a621bca000000b0056ddd2ac8f1sm9351873pfb.211.2022.11.15.15.32.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 15 Nov 2022 15:32:48 -0800 (PST)
+Sender: Minchan Kim <minchan.kim@gmail.com>
+Date:   Tue, 15 Nov 2022 15:32:46 -0800
+From:   Minchan Kim <minchan@kernel.org>
+To:     yang.yang29@zte.com.cn
+Cc:     ngupta@vflare.org, senozhatsky@chromium.org, axboe@kernel.dk,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        xu.panda@zte.com.cn
+Subject: Re: [PATCH linux-next v2] zram: use sysfs_emit() to instead of
+ scnprintf()
+Message-ID: <Y3QhnpQQ/y58XyVh@google.com>
+References: <202211152004478289568@zte.com.cn>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20221114203412.383-1-jonathan.derrick@linux.dev>
+In-Reply-To: <202211152004478289568@zte.com.cn>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Nov 14, 2022 at 01:34:12PM -0700, Jonathan Derrick wrote:
-> +	echo "Running ${TEST_NAME}"
-> +
-> +	local sysfs
-> +	local attr
-> +	local m
-> +
-> +	sysfs="$TEST_DEV_SYSFS/device"
+Hi,
 
-That's not the correct directory when the device is using native
-nvme-multipath.
+On Tue, Nov 15, 2022 at 08:04:47PM +0800, yang.yang29@zte.com.cn wrote:
+> From: Xu Panda <xu.panda@zte.com.cn>
+> 
+> Replace the open-code with sysfs_emit() to simplify the code.
+> ---
+> change for v2
+>  - realign params of sysfs_emit().
+> ---
+> 
+> Signed-off-by: Xu Panda <xu.panda@zte.com.cn>
+> Signed-off-by: Yang Yang <yang.yang29@zte.com>
 
-> +	timeout=$(($(cat /proc/sys/kernel/hung_task_timeout_secs) / 2))
-> +
-> +	sleep 5
-> +
-> +	if [[ ! -d "$sysfs" ]]; then
-> +		echo "$sysfs doesn't exist"
-> +	fi
-> +
-> +	# do reset controller/format loops
-> +	# don't check status now because a timing race is desired
-> +	i=0
-> +	start=0
-> +	timing_out=false
-> +	while [[ $i -le 1000 ]]; do
-> +		start=$SECONDS
-> +		if [[ -f "$sysfs/reset_controller" ]]; then
-> +			echo 1 > "$sysfs/reset_controller" 2>/dev/null &
-> +			i=$((i+1))
-> +		fi
-> +		nvme format -l 0 -f $TEST_DEV 2>/dev/null &
-> +
-> +		#Assume the controller is hung and unrecoverable
-> +		if [[ $(($SECONDS - $start)) -gt $timeout ]]; then
-> +			echo "nvme controller timing out"
-> +			timing_out=true
-> +			break
-> +		fi
-> +	done
+Recently, we added one more stat is using the scnprintf in mm-unstable
+tree? recomp_algorithm_show 
 
-If the controller is already undergoing a reset, then writing to the
-reset_controller file becomes a no-op. Unless your "reset_controller"
-completes near instantaneously, I find that this loop tears through 1000
-iterations, forks 1000 formats, and only 1 reset_controller actually
-gets through.
+Could you also change it?
 
-If I remove the upper limit, then I can also see the stalled task, but
-it is only temporary and gets itself out of it after the admin timeout
-(1 minute). Is that also your observation, or is it stuck forever?
+Thanks!
