@@ -2,208 +2,121 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23D14C43217
-	for <linux-block@archiver.kernel.org>; Tue, 15 Nov 2022 12:06:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B433C43217
+	for <linux-block@archiver.kernel.org>; Tue, 15 Nov 2022 13:16:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238028AbiKOMGH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 15 Nov 2022 07:06:07 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54790 "EHLO
+        id S232437AbiKONQw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 15 Nov 2022 08:16:52 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48452 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238029AbiKOMFv (ORCPT
+        with ESMTP id S230400AbiKONQu (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 15 Nov 2022 07:05:51 -0500
-X-Greylist: delayed 116593 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 15 Nov 2022 04:04:55 PST
-Received: from mxhk.zte.com.cn (mxhk.zte.com.cn [63.216.63.35])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88AE17645;
-        Tue, 15 Nov 2022 04:04:55 -0800 (PST)
-Received: from mxct.zte.com.cn (unknown [192.168.251.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mxhk.zte.com.cn (FangMail) with ESMTPS id 4NBPxd6zL4z5BNRf;
-        Tue, 15 Nov 2022 20:04:53 +0800 (CST)
-Received: from mse-fl2.zte.com.cn (unknown [10.5.228.133])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mxct.zte.com.cn (FangMail) with ESMTPS id 4NBPxc2PY2z501Qf;
-        Tue, 15 Nov 2022 20:04:52 +0800 (CST)
-Received: from szxlzmapp03.zte.com.cn ([10.5.231.207])
-        by mse-fl2.zte.com.cn with SMTP id 2AFC4igd026858;
-        Tue, 15 Nov 2022 20:04:44 +0800 (+08)
-        (envelope-from yang.yang29@zte.com.cn)
-Received: from mapi (szxlzmapp04[null])
-        by mapi (Zmail) with MAPI id mid14;
-        Tue, 15 Nov 2022 20:04:47 +0800 (CST)
-Date:   Tue, 15 Nov 2022 20:04:47 +0800 (CST)
-X-Zmail-TransId: 2b066373805f52ffd351
-X-Mailer: Zmail v1.0
-Message-ID: <202211152004478289568@zte.com.cn>
-Mime-Version: 1.0
-From:   <yang.yang29@zte.com.cn>
-To:     <minchan@kernel.org>
-Cc:     <ngupta@vflare.org>, <senozhatsky@chromium.org>, <axboe@kernel.dk>,
-        <linux-kernel@vger.kernel.org>, <linux-block@vger.kernel.org>,
-        <xu.panda@zte.com.cn>, <yang.yang29@zte.com.cn>
-Subject: =?UTF-8?B?W1BBVENIIGxpbnV4LW5leHQgdjJdIHpyYW06IHVzZSBzeXNmc19lbWl0KCkgdG8gaW5zdGVhZCBvZiBzY25wcmludGYoKQ==?=
-Content-Type: text/plain;
-        charset="UTF-8"
-X-MAIL: mse-fl2.zte.com.cn 2AFC4igd026858
-X-Fangmail-Gw-Spam-Type: 0
-X-FangMail-Miltered: at cgslv5.04-192.168.250.138.novalocal with ID 63738065.000 by FangMail milter!
-X-FangMail-Envelope: 1668513893/4NBPxd6zL4z5BNRf/63738065.000/192.168.251.13/[192.168.251.13]/mxct.zte.com.cn/<yang.yang29@zte.com.cn>
-X-Fangmail-Anti-Spam-Filtered: true
-X-Fangmail-MID-QID: 63738065.000/4NBPxd6zL4z5BNRf
+        Tue, 15 Nov 2022 08:16:50 -0500
+Received: from mail-wr1-x42b.google.com (mail-wr1-x42b.google.com [IPv6:2a00:1450:4864:20::42b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C533129344;
+        Tue, 15 Nov 2022 05:16:48 -0800 (PST)
+Received: by mail-wr1-x42b.google.com with SMTP id cl5so24195866wrb.9;
+        Tue, 15 Nov 2022 05:16:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=PBoJDQnhlmWZlV1VrcsZgizsnIm6qCYmmX9Ncnb4i4Y=;
+        b=dkckIW1PVglmNO6MtTydvtrSHdn8XftgrOE0/j3P3C0l90RJJG+MFkv5wPUKQVyCvL
+         ZqsdfvMEgw250jSUd7Yg89ETICa1EpJqkZgH/4lhiF34kqRmCHO76VhmZtIXHLg5jMZo
+         ttixW1zvox8Z+GdXVEPHQ9Fqy9HZAhnRT5NjO2elAb/2a+lHYAWvFKvK4XlVZFWKBGrM
+         VRlGlVyOgsDPrEzh/Wv4QEk2gR/5j4Z3MR8ZUZsU1C5AjAUWoFWZXvcYQRdC+Wrm2bvj
+         J4X6cslSnS7fTd89LOBpxInv/HP8H9xSs51/Zj9oAKaZK6gFTyUHeVVPaAjt+JeV8tiU
+         hUeA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=PBoJDQnhlmWZlV1VrcsZgizsnIm6qCYmmX9Ncnb4i4Y=;
+        b=H9eheFE3NnFBCvP0/sxBFmJL54gdaqpVOoxZrgK2SSdASD39nU1FBTaH5GmMS6/FOy
+         dV1gfKBPhCwu8yO3UWycmnpdpzYipuVkvqoc+BQ0EIER239snh9CObSAmcz6TvgI7KF9
+         sUQ1jn5lgDhkKCqQ/Z+TLWLnurCDuDMWajJU6XR1BRAyyEvJJhA/dKzHVx+d1YwNWAU/
+         rafoD2Dzc/JAsfqyaTfMNSDr+YpCEsLbVWgmPf1SDN24e+c4UYsaYxA9TFoUVdtY3zwO
+         uQH9dVC6I1Xz9uypt0SumeYnnHiQeLeMOc6XfZpT2McRUzaab+oxk7KJLBLS6zWhlaSb
+         ZgdA==
+X-Gm-Message-State: ANoB5pnFdwegCertKCI+5/jn7442z6hmGE54mDhaBT3NHFi+9aVPKFhR
+        RabeLqN2Yn5tBXLMIL14eNc=
+X-Google-Smtp-Source: AA0mqf4oQzxbBTQYDlzEXnGARcEIi7wxDyi7MBe1ZuPB1+4ZO4/fj69rdF4JEloD5NtpcD7tQQqBGg==
+X-Received: by 2002:adf:a3de:0:b0:236:5655:13a5 with SMTP id m30-20020adfa3de000000b00236565513a5mr10625325wrb.477.1668518207324;
+        Tue, 15 Nov 2022 05:16:47 -0800 (PST)
+Received: from localhost ([102.36.222.112])
+        by smtp.gmail.com with ESMTPSA id n18-20020a7bcbd2000000b003cf9bf5208esm20580871wmi.19.2022.11.15.05.16.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 15 Nov 2022 05:16:47 -0800 (PST)
+Date:   Tue, 15 Nov 2022 16:16:43 +0300
+From:   Dan Carpenter <error27@gmail.com>
+To:     Philipp Reisner <philipp.reisner@linbit.com>
+Cc:     Lars Ellenberg <lars.ellenberg@linbit.com>,
+        Christoph =?iso-8859-1?Q?B=F6hmwalder?= 
+        <christoph.boehmwalder@linbit.com>, Jens Axboe <axboe@kernel.dk>,
+        Andreas Gruenbacher <agruen@linbit.com>,
+        drbd-dev@lists.linbit.com, linux-block@vger.kernel.org,
+        kernel-janitors@vger.kernel.org
+Subject: [PATCH] drbd: use after free in drbd_create_device()
+Message-ID: <Y3Jd5iZRbNQ9w6gm@kili>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Mailer: git-send-email haha only kidding
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Xu Panda <xu.panda@zte.com.cn>
+The drbd_destroy_connection() frees the "connection" so use the _safe()
+iterator to prevent a use after free.
 
-Replace the open-code with sysfs_emit() to simplify the code.
+Fixes: b6f85ef9538b ("drbd: Iterate over all connections")
+Signed-off-by: Dan Carpenter <error27@gmail.com>
 ---
-change for v2
- - realign params of sysfs_emit().
----
+Smatch assumes that kref_put() generally calls the free function so it
+gets very confused by drbd_delete_device() which calls:
 
-Signed-off-by: Xu Panda <xu.panda@zte.com.cn>
-Signed-off-by: Yang Yang <yang.yang29@zte.com>
----
- drivers/block/zram/zram_drv.c | 61 ++++++++++++++++++++-----------------------
- 1 file changed, 28 insertions(+), 33 deletions(-)
+	kref_put(&device->kref, drbd_destroy_device);
 
-diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
-index 9d33801e8ba8..251a142a1f0e 100644
---- a/drivers/block/zram/zram_drv.c
-+++ b/drivers/block/zram/zram_drv.c
-@@ -255,7 +255,7 @@ static ssize_t initstate_show(struct device *dev,
- 	val = init_done(zram);
- 	up_read(&zram->init_lock);
+Four times in a row.  (Smatch has some checking for incremented
+reference counts but even there it assumes that people are going to hold
+one reference and not four).
 
--	return scnprintf(buf, PAGE_SIZE, "%u\n", val);
-+	return sysfs_emit(buf, "%u\n", val);
- }
+drivers/block/drbd/drbd_main.c:2831 drbd_delete_device() error: dereferencing freed memory 'device'
+drivers/block/drbd/drbd_main.c:2833 drbd_delete_device() warn: passing freed memory 'device'
+drivers/block/drbd/drbd_main.c:2835 drbd_delete_device() error: dereferencing freed memory 'device'
 
- static ssize_t disksize_show(struct device *dev,
-@@ -263,7 +263,7 @@ static ssize_t disksize_show(struct device *dev,
+The drbd_adm_get_status_all() function makes me itch as well.  It seems
+like we drop a reference and then take it again?
+
+drivers/block/drbd/drbd_nl.c:4019 drbd_adm_get_status_all() warn: 'resource' was already freed.
+drivers/block/drbd/drbd_nl.c:4021 drbd_adm_get_status_all() warn: 'resource' was already freed.
+
+ drivers/block/drbd/drbd_main.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/block/drbd/drbd_main.c b/drivers/block/drbd/drbd_main.c
+index f3e4db16fd07..8532b839a343 100644
+--- a/drivers/block/drbd/drbd_main.c
++++ b/drivers/block/drbd/drbd_main.c
+@@ -2672,7 +2672,7 @@ static int init_submitter(struct drbd_device *device)
+ enum drbd_ret_code drbd_create_device(struct drbd_config_context *adm_ctx, unsigned int minor)
  {
- 	struct zram *zram = dev_to_zram(dev);
-
--	return scnprintf(buf, PAGE_SIZE, "%llu\n", zram->disksize);
-+	return sysfs_emit(buf, "%llu\n", zram->disksize);
- }
-
- static ssize_t mem_limit_store(struct device *dev,
-@@ -404,7 +404,7 @@ static ssize_t writeback_limit_enable_show(struct device *dev,
- 	spin_unlock(&zram->wb_limit_lock);
- 	up_read(&zram->init_lock);
-
--	return scnprintf(buf, PAGE_SIZE, "%d\n", val);
-+	return sysfs_emit(buf, "%d\n", val);
- }
-
- static ssize_t writeback_limit_store(struct device *dev,
-@@ -439,7 +439,7 @@ static ssize_t writeback_limit_show(struct device *dev,
- 	spin_unlock(&zram->wb_limit_lock);
- 	up_read(&zram->init_lock);
-
--	return scnprintf(buf, PAGE_SIZE, "%llu\n", val);
-+	return sysfs_emit(buf, "%llu\n", val);
- }
-
- static void reset_bdev(struct zram *zram)
-@@ -1020,7 +1020,7 @@ static void zram_debugfs_unregister(struct zram *zram) {};
- static ssize_t max_comp_streams_show(struct device *dev,
- 		struct device_attribute *attr, char *buf)
- {
--	return scnprintf(buf, PAGE_SIZE, "%d\n", num_online_cpus());
-+	return sysfs_emit(buf, "%d\n", num_online_cpus());
- }
-
- static ssize_t max_comp_streams_store(struct device *dev,
-@@ -1191,12 +1191,11 @@ static ssize_t io_stat_show(struct device *dev,
- 	ssize_t ret;
-
- 	down_read(&zram->init_lock);
--	ret = scnprintf(buf, PAGE_SIZE,
--			"%8llu %8llu %8llu %8llu\n",
--			(u64)atomic64_read(&zram->stats.failed_reads),
--			(u64)atomic64_read(&zram->stats.failed_writes),
--			(u64)atomic64_read(&zram->stats.invalid_io),
--			(u64)atomic64_read(&zram->stats.notify_free));
-+	ret = sysfs_emit(buf, "%8llu %8llu %8llu %8llu\n",
-+			 (u64)atomic64_read(&zram->stats.failed_reads),
-+			 (u64)atomic64_read(&zram->stats.failed_writes),
-+			 (u64)atomic64_read(&zram->stats.invalid_io),
-+			 (u64)atomic64_read(&zram->stats.notify_free));
- 	up_read(&zram->init_lock);
-
- 	return ret;
-@@ -1222,17 +1221,16 @@ static ssize_t mm_stat_show(struct device *dev,
- 	orig_size = atomic64_read(&zram->stats.pages_stored);
- 	max_used = atomic_long_read(&zram->stats.max_used_pages);
-
--	ret = scnprintf(buf, PAGE_SIZE,
--			"%8llu %8llu %8llu %8lu %8ld %8llu %8lu %8llu %8llu\n",
--			orig_size << PAGE_SHIFT,
--			(u64)atomic64_read(&zram->stats.compr_data_size),
--			mem_used << PAGE_SHIFT,
--			zram->limit_pages << PAGE_SHIFT,
--			max_used << PAGE_SHIFT,
--			(u64)atomic64_read(&zram->stats.same_pages),
--			atomic_long_read(&pool_stats.pages_compacted),
--			(u64)atomic64_read(&zram->stats.huge_pages),
--			(u64)atomic64_read(&zram->stats.huge_pages_since));
-+	ret = sysfs_emit(buf, "%8llu %8llu %8llu %8lu %8ld %8llu %8lu %8llu %8llu\n",
-+			 orig_size << PAGE_SHIFT,
-+			 (u64)atomic64_read(&zram->stats.compr_data_size),
-+			 mem_used << PAGE_SHIFT,
-+			 zram->limit_pages << PAGE_SHIFT,
-+			 max_used << PAGE_SHIFT,
-+			 (u64)atomic64_read(&zram->stats.same_pages),
-+			 atomic_long_read(&pool_stats.pages_compacted),
-+			 (u64)atomic64_read(&zram->stats.huge_pages),
-+			 (u64)atomic64_read(&zram->stats.huge_pages_since));
- 	up_read(&zram->init_lock);
-
- 	return ret;
-@@ -1247,11 +1245,10 @@ static ssize_t bd_stat_show(struct device *dev,
- 	ssize_t ret;
-
- 	down_read(&zram->init_lock);
--	ret = scnprintf(buf, PAGE_SIZE,
--		"%8llu %8llu %8llu\n",
--			FOUR_K((u64)atomic64_read(&zram->stats.bd_count)),
--			FOUR_K((u64)atomic64_read(&zram->stats.bd_reads)),
--			FOUR_K((u64)atomic64_read(&zram->stats.bd_writes)));
-+	ret = sysfs_emit(buf, "%8llu %8llu %8llu\n",
-+			 FOUR_K((u64)atomic64_read(&zram->stats.bd_count)),
-+			 FOUR_K((u64)atomic64_read(&zram->stats.bd_reads)),
-+			 FOUR_K((u64)atomic64_read(&zram->stats.bd_writes)));
- 	up_read(&zram->init_lock);
-
- 	return ret;
-@@ -1266,11 +1263,9 @@ static ssize_t debug_stat_show(struct device *dev,
- 	ssize_t ret;
-
- 	down_read(&zram->init_lock);
--	ret = scnprintf(buf, PAGE_SIZE,
--			"version: %d\n%8llu %8llu\n",
--			version,
--			(u64)atomic64_read(&zram->stats.writestall),
--			(u64)atomic64_read(&zram->stats.miss_free));
-+	ret = sysfs_emit(buf, "version: %d\n%8llu %8llu\n", version,
-+			 (u64)atomic64_read(&zram->stats.writestall),
-+			 (u64)atomic64_read(&zram->stats.miss_free));
- 	up_read(&zram->init_lock);
-
- 	return ret;
-@@ -2504,7 +2499,7 @@ static ssize_t hot_add_show(struct class *class,
-
- 	if (ret < 0)
- 		return ret;
--	return scnprintf(buf, PAGE_SIZE, "%d\n", ret);
-+	return sysfs_emit(buf, "%d\n", ret);
- }
- static struct class_attribute class_attr_hot_add =
- 	__ATTR(hot_add, 0400, hot_add_show, NULL);
+ 	struct drbd_resource *resource = adm_ctx->resource;
+-	struct drbd_connection *connection;
++	struct drbd_connection *connection, *n;
+ 	struct drbd_device *device;
+ 	struct drbd_peer_device *peer_device, *tmp_peer_device;
+ 	struct gendisk *disk;
+@@ -2789,7 +2789,7 @@ enum drbd_ret_code drbd_create_device(struct drbd_config_context *adm_ctx, unsig
+ 	return NO_ERROR;
+ 
+ out_idr_remove_from_resource:
+-	for_each_connection(connection, resource) {
++	for_each_connection_safe(connection, n, resource) {
+ 		peer_device = idr_remove(&connection->peer_devices, vnr);
+ 		if (peer_device)
+ 			kref_put(&connection->kref, drbd_destroy_connection);
 -- 
-2.15.2
+2.35.1
+
