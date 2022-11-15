@@ -2,25 +2,25 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C4ADC4332F
-	for <linux-block@archiver.kernel.org>; Tue, 15 Nov 2022 21:48:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E7683C433FE
+	for <linux-block@archiver.kernel.org>; Tue, 15 Nov 2022 21:49:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231327AbiKOVst (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 15 Nov 2022 16:48:49 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39484 "EHLO
+        id S231465AbiKOVtD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 15 Nov 2022 16:49:03 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39956 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231540AbiKOVsl (ORCPT
+        with ESMTP id S231650AbiKOVtB (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 15 Nov 2022 16:48:41 -0500
+        Tue, 15 Nov 2022 16:49:01 -0500
 Received: from fudo.makrotopia.org (fudo.makrotopia.org [IPv6:2a07:2ec0:3002::71])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18CD1B1EF;
-        Tue, 15 Nov 2022 13:48:41 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F412462FA;
+        Tue, 15 Nov 2022 13:48:59 -0800 (PST)
 Received: from local
         by fudo.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
          (Exim 4.94.2)
         (envelope-from <daniel@makrotopia.org>)
-        id 1ov3nD-0005Jl-C3; Tue, 15 Nov 2022 22:48:31 +0100
-Date:   Tue, 15 Nov 2022 21:47:06 +0000
+        id 1ov3nW-0005KN-32; Tue, 15 Nov 2022 22:48:50 +0100
+Date:   Tue, 15 Nov 2022 21:47:25 +0000
 From:   Daniel Golle <daniel@makrotopia.org>
 To:     Jens Axboe <axboe@kernel.dk>,
         Miquel Raynal <miquel.raynal@bootlin.com>,
@@ -33,9 +33,8 @@ To:     Jens Axboe <axboe@kernel.dk>,
         Michal Orzel <michalorzel.eng@gmail.com>,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-mtd@lists.infradead.org
-Subject: [PATCH v5 3/4] partitions/efi: add support for uImage.FIT
- sub-partitions
-Message-ID: <7526fc5a461a0d68eb1dab575f9c1950638fc21a.1668548123.git.daniel@makrotopia.org>
+Subject: [PATCH v5 4/4] mtd: add option to enable scanning for partitions
+Message-ID: <88d7c15691af5d956275b5326303d5aeb3ea1d2f.1668548123.git.daniel@makrotopia.org>
 References: <cover.1668548123.git.daniel@makrotopia.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
@@ -45,56 +44,73 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Add new GUID allowing to parse uImage.FIT stored in a GPT partition
-and map filesystem sub-image as sub-partitions.
+Add Kconfig boolean CONFIG_MTD_BLOCK_PARTITIONS and enable block
+partition parsers on non-NAND mtdblock as well as ubiblock devices
+in case it is selected.
+Never scan partitions on NAND-backed mtdblock devices, ubiblock
+should be used instead.
 
 Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+Acked-by: Miquel Raynal <miquel.raynal@bootlin.com>
 ---
- block/partitions/efi.c | 9 +++++++++
- block/partitions/efi.h | 3 +++
- 2 files changed, 12 insertions(+)
+ drivers/mtd/Kconfig       | 11 +++++++++++
+ drivers/mtd/mtd_blkdevs.c |  4 +++-
+ drivers/mtd/ubi/block.c   |  5 ++++-
+ 3 files changed, 18 insertions(+), 2 deletions(-)
 
-diff --git a/block/partitions/efi.c b/block/partitions/efi.c
-index 5e9be13a56a8..f4406b443f04 100644
---- a/block/partitions/efi.c
-+++ b/block/partitions/efi.c
-@@ -716,6 +716,9 @@ int efi_partition(struct parsed_partitions *state)
- 	gpt_entry *ptes = NULL;
- 	u32 i;
- 	unsigned ssz = queue_logical_block_size(state->disk->queue) / 512;
-+#ifdef CONFIG_FIT_PARTITION
-+	u32 extra_slot = 65;
-+#endif
+diff --git a/drivers/mtd/Kconfig b/drivers/mtd/Kconfig
+index 796a2eccbef0..12874dec1569 100644
+--- a/drivers/mtd/Kconfig
++++ b/drivers/mtd/Kconfig
+@@ -69,6 +69,17 @@ config MTD_BLOCK_RO
+ 	  You do not need this option for use with the DiskOnChip devices. For
+ 	  those, enable NFTL support (CONFIG_NFTL) instead.
  
- 	if (!find_valid_gpt(state, &gpt, &ptes) || !gpt || !ptes) {
- 		kfree(gpt);
-@@ -749,6 +752,12 @@ int efi_partition(struct parsed_partitions *state)
- 				ARRAY_SIZE(ptes[i].partition_name));
- 		utf16_le_to_7bit(ptes[i].partition_name, label_max, info->volname);
- 		state->parts[i + 1].has_info = true;
-+		/* If this is a U-Boot FIT volume it may have subpartitions */
-+#ifdef CONFIG_FIT_PARTITION
-+		if (!efi_guidcmp(ptes[i].partition_type_guid, PARTITION_LINUX_FIT_GUID))
-+			(void) parse_fit_partitions(state, start * ssz, size * ssz,
-+						    &extra_slot, 127, 1);
-+#endif
++config MTD_BLOCK_PARTITIONS
++	bool "Scan for partitions on MTD block devices"
++	depends on MTD_BLOCK || MTD_BLOCK_RO
++	default y if FIT_PARTITION
++	help
++	  Scan MTD block devices for partitions (ie. MBR, GPT, uImage.FIT, ...).
++	  (NAND devices are omitted, ubiblock should be used instead when)
++
++	  Unless your MTD partitions contain sub-partitions mapped using a
++	  partition table, say no.
++
+ comment "Note that in some cases UBI block is preferred. See MTD_UBI_BLOCK."
+ 	depends on MTD_BLOCK || MTD_BLOCK_RO
+ 
+diff --git a/drivers/mtd/mtd_blkdevs.c b/drivers/mtd/mtd_blkdevs.c
+index 60b222799871..e6f2e0888246 100644
+--- a/drivers/mtd/mtd_blkdevs.c
++++ b/drivers/mtd/mtd_blkdevs.c
+@@ -359,7 +359,9 @@ int add_mtd_blktrans_dev(struct mtd_blktrans_dev *new)
+ 	} else {
+ 		snprintf(gd->disk_name, sizeof(gd->disk_name),
+ 			 "%s%d", tr->name, new->devnum);
+-		gd->flags |= GENHD_FL_NO_PART;
++
++		if (!IS_ENABLED(CONFIG_MTD_BLOCK_PARTITIONS) || mtd_type_is_nand(new->mtd))
++			gd->flags |= GENHD_FL_NO_PART;
  	}
- 	kfree(ptes);
- 	kfree(gpt);
-diff --git a/block/partitions/efi.h b/block/partitions/efi.h
-index 84b9f36b9e47..06c11f6ae398 100644
---- a/block/partitions/efi.h
-+++ b/block/partitions/efi.h
-@@ -51,6 +51,9 @@
- #define PARTITION_LINUX_LVM_GUID \
-     EFI_GUID( 0xe6d6d379, 0xf507, 0x44c2, \
-               0xa2, 0x3c, 0x23, 0x8f, 0x2a, 0x3d, 0xf9, 0x28)
-+#define PARTITION_LINUX_FIT_GUID \
-+    EFI_GUID( 0xcae9be83, 0xb15f, 0x49cc, \
-+              0x86, 0x3f, 0x08, 0x1b, 0x74, 0x4a, 0x2d, 0x93)
  
- typedef struct _gpt_header {
- 	__le64 signature;
+ 	set_capacity(gd, ((u64)new->size * tr->blksize) >> 9);
+diff --git a/drivers/mtd/ubi/block.c b/drivers/mtd/ubi/block.c
+index 75eaecc8639f..e617635ff6e6 100644
+--- a/drivers/mtd/ubi/block.c
++++ b/drivers/mtd/ubi/block.c
+@@ -430,7 +430,10 @@ int ubiblock_create(struct ubi_volume_info *vi)
+ 		ret = -ENODEV;
+ 		goto out_cleanup_disk;
+ 	}
+-	gd->flags |= GENHD_FL_NO_PART;
++
++	if (!IS_ENABLED(CONFIG_MTD_BLOCK_PARTITIONS))
++		gd->flags |= GENHD_FL_NO_PART;
++
+ 	gd->private_data = dev;
+ 	sprintf(gd->disk_name, "ubiblock%d_%d", dev->ubi_num, dev->vol_id);
+ 	set_capacity(gd, disk_capacity);
 -- 
 2.38.1
 
