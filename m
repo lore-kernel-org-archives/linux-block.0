@@ -2,100 +2,48 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F024C433FE
-	for <linux-block@archiver.kernel.org>; Tue, 15 Nov 2022 03:52:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 578A8C4332F
+	for <linux-block@archiver.kernel.org>; Tue, 15 Nov 2022 07:58:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232355AbiKODwi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 14 Nov 2022 22:52:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41540 "EHLO
+        id S229455AbiKOH6B (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 15 Nov 2022 02:58:01 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60502 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232093AbiKODwh (ORCPT
+        with ESMTP id S229998AbiKOH5v (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 14 Nov 2022 22:52:37 -0500
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40A5838AC;
-        Mon, 14 Nov 2022 19:52:37 -0800 (PST)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id C304F1F88D;
-        Tue, 15 Nov 2022 03:52:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1668484355; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=F68rcKpvQBDy4nKu9n/1sp/nPoHRcsFqu67ojS0Ng6E=;
-        b=ZKsK2tXxTn8uMekhf7Yx4oFilvEr4W58doFTwYAWqtFRGGsYTTB1NwJ2/kILVCReVOr9S1
-        U7o6whBN2KKw1NvkX1BiNVW+73POuCxzfWdt9GRPtIlS3HXcZ5l9U7SriNDNeg/hfubtIT
-        HksODj8/pCbg9upZrHhs8oB1FObTScw=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1668484355;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=F68rcKpvQBDy4nKu9n/1sp/nPoHRcsFqu67ojS0Ng6E=;
-        b=59gI+r6Uk0DyFD7O9xcqJxSoNSJdP/TiSRrWQ+JHbBVP/uTB8X5hYGKuQdYVQ9/zlpxd47
-        Oq5NBCuqoV9D4wDQ==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 4A11713A18;
-        Tue, 15 Nov 2022 03:52:35 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id sh1mAAMNc2PeVgAAMHmgww
-        (envelope-from <krisman@suse.de>); Tue, 15 Nov 2022 03:52:35 +0000
-From:   Gabriel Krisman Bertazi <krisman@suse.de>
-To:     Jan Kara <jack@suse.cz>
-Cc:     axboe@kernel.dk, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org, Hugh Dickins <hughd@google.com>,
-        Keith Busch <kbusch@kernel.org>,
-        Liu Song <liusong@linux.alibaba.com>
-Subject: Re: [PATCH] sbitmap: Use single per-bitmap counting to wake up
- queued tags
-Organization: SUSE
-References: <20221105231055.25953-1-krisman@suse.de>
-        <20221114132313.5cqhvzxarm7rwvmt@quack3>
-Date:   Mon, 14 Nov 2022 22:52:32 -0500
-In-Reply-To: <20221114132313.5cqhvzxarm7rwvmt@quack3> (Jan Kara's message of
-        "Mon, 14 Nov 2022 14:23:13 +0100")
-Message-ID: <87cz9odgcf.fsf@suse.de>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.2 (gnu/linux)
+        Tue, 15 Nov 2022 02:57:51 -0500
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 89DDC186C5
+        for <linux-block@vger.kernel.org>; Mon, 14 Nov 2022 23:57:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=M7NmYC/Iylm9myghHwqILim55SAUt9QrM+UZYk0eJlw=; b=0WNlDzWmFMY3O6fQLAv9QhLuu1
+        Ln6mepJV+KKC8hfzqRg/QAgGOau+DkocLvbzMUkDQPE/VOYyyUl9o6samDVGCRQyiIwhvhgjK5iC4
+        CmzKK0Ybt5f4Geoc8m+/Qw/0qpMZJI4aknEm/mHGogr6XeKMPnhkkvJvvolWarOgYxDKAx/65CBT5
+        lUMDVgPtiEqRy+8Zx66yrZMZGEkLE0kCFlYzoeyzA14MwTybu3B/igYnJ1rv7199ZqyDT+uyQ4QxT
+        pslPcCCIDvnmAz28V2iScu8lPqrzARIQnUdI3KRHWWG/yoRpMhV57JSLUshIS7Bz3dixoPOIrobYq
+        Gi0zjvqw==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1ouqpK-008nnA-42; Tue, 15 Nov 2022 07:57:50 +0000
+Date:   Mon, 14 Nov 2022 23:57:50 -0800
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Chris Mason <clm@fb.com>
+Cc:     hch@infradead.org, axboe@kernel.dk, linux-block@vger.kernel.org,
+        tj@kernel.org, riel@surriel.com, hannes@cmpxchg.org
+Subject: Re: [PATCH] blk-cgroup: properly pin the parent in blkcg_css_online
+Message-ID: <Y3NGfng0gNnbnbRS@infradead.org>
+References: <20221114181930.2093706-1-clm@fb.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221114181930.2093706-1-clm@fb.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Jan Kara <jack@suse.cz> writes:
+Looks good:
 
-> Now this may be also problematic - when we were checking the number of woken
-> waiters in the older version of the patch (for others: internal version of
-> the patch) this was fine but now it may happen that the 'ws' we have
-> selected has no waiters anymore. And in that case we need to find another
-> waitqueue because otherwise we'd be loosing too many wakeups and we could
-> deadlock. So I think this rather needs to be something like:
->
-> 	do {
-> 		if (atomic_read(&sbq->completion_cnt) - wakeups < wake_batch)
-> 			return;
-> 	} while (!atomic_try_cmpxchg(&sbq->wakeup_cnt,
-> 				     &wakeups, wakeups + wake_batch));
->
-> 	do {
-> 		ws = sbq_wake_ptr(sbq);
-> 		if (!ws)
-> 			return;
-
-Jan,
-
-Does this really solve it? There is no guarantee there will be another
-waiter in the queues when we check here.  So, once again we could not
-wake up anyone and return it this if leg.  If that is the case, don't we
-end up overshooting wakeups and end up again with less completions than
-required to wake up an incoming io?
-
--- 
-Gabriel Krisman Bertazi
+Reviewed-by: Christoph Hellwig <hch@lst.de>
