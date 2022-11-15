@@ -2,155 +2,110 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B62DC433FE
-	for <linux-block@archiver.kernel.org>; Tue, 15 Nov 2022 14:18:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B93BC433FE
+	for <linux-block@archiver.kernel.org>; Tue, 15 Nov 2022 14:57:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229576AbiKOOS0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 15 Nov 2022 09:18:26 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42552 "EHLO
+        id S229948AbiKOO5J (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 15 Nov 2022 09:57:09 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39684 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229970AbiKOOSY (ORCPT
+        with ESMTP id S229814AbiKOO5B (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 15 Nov 2022 09:18:24 -0500
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E236E2C135;
-        Tue, 15 Nov 2022 06:18:19 -0800 (PST)
-Received: from canpemm500010.china.huawei.com (unknown [172.30.72.55])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4NBSqC1hj0zqSLC;
-        Tue, 15 Nov 2022 22:14:31 +0800 (CST)
-Received: from [10.174.178.185] (10.174.178.185) by
- canpemm500010.china.huawei.com (7.192.105.118) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31; Tue, 15 Nov 2022 22:18:17 +0800
-Subject: Re: [PATCH -next] blk-mq: fix warning when unregister mq sysfs
-To:     Ming Lei <ming.lei@redhat.com>, Ye Bin <yebin@huaweicloud.com>
-References: <20221112082813.704873-1-yebin@huaweicloud.com>
- <Y3Gi+Yt0nyYPx6hX@T590>
-CC:     <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>
-From:   "yebin (H)" <yebin10@huawei.com>
-Message-ID: <63739FA9.2010701@huawei.com>
-Date:   Tue, 15 Nov 2022 22:18:17 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:38.0) Gecko/20100101
- Thunderbird/38.1.0
+        Tue, 15 Nov 2022 09:57:01 -0500
+Received: from hosting.gsystem.sk (hosting.gsystem.sk [212.5.213.30])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 2BDD5F00E;
+        Tue, 15 Nov 2022 06:56:58 -0800 (PST)
+Received: from [192.168.1.3] (gsystem.sk [85.248.217.30])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by hosting.gsystem.sk (Postfix) with ESMTPSA id 6F3107A0426;
+        Tue, 15 Nov 2022 15:56:56 +0100 (CET)
+From:   Ondrej Zary <linux@zary.sk>
+To:     Damien Le Moal <damien.lemoal@opensource.wdc.com>
+Subject: Re: [PATCH] pata_parport: add driver (PARIDE replacement)
+Date:   Tue, 15 Nov 2022 15:56:52 +0100
+User-Agent: KMail/1.9.10
+Cc:     Christoph Hellwig <hch@lst.de>,
+        Sergey Shtylyov <s.shtylyov@omp.ru>,
+        Jens Axboe <axboe@kernel.dk>, Tim Waugh <tim@cyberelk.net>,
+        linux-block@vger.kernel.org, linux-parport@lists.infradead.org,
+        linux-ide@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20220312144415.20010-1-linux@zary.sk> <202211142025.46723.linux@zary.sk> <dc4e757a-737d-0bfa-c85d-9521feaa8d5f@opensource.wdc.com>
+In-Reply-To: <dc4e757a-737d-0bfa-c85d-9521feaa8d5f@opensource.wdc.com>
+X-KMail-QuotePrefix: > 
 MIME-Version: 1.0
-In-Reply-To: <Y3Gi+Yt0nyYPx6hX@T590>
-Content-Type: text/plain; charset="windows-1252"; format=flowed
+Content-Type: Text/Plain;
+  charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.174.178.185]
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- canpemm500010.china.huawei.com (7.192.105.118)
-X-CFilter-Loop: Reflected
+Content-Disposition: inline
+Message-Id: <202211151556.52895.linux@zary.sk>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Tuesday 15 November 2022, Damien Le Moal wrote:
+> On 11/15/22 04:25, Ondrej Zary wrote:
+> > On Monday 14 November 2022 09:03:28 Damien Le Moal wrote:
+> >> On 11/14/22 16:53, Ondrej Zary wrote:
+> >>> On Monday 14 November 2022, Damien Le Moal wrote:
+> >>>> On 11/12/22 20:17, Ondrej Zary wrote:
+> >>>>> On Wednesday 19 October 2022 09:34:31 Christoph Hellwig wrote:
+> >>>>>> It's been a while - did you get a chance to make some progress on
+> >>>>>> this?  Do you need any help to unblock you?
+> >>>>>>
+> >>>>>
+> >>>>> Sorry again, I'm back now. Trying to fix locking problems.
+> >>>>> Added this to each function for analysis how the functions are called wrt.
+> >>>>> locking:
+> >>>>>
+> >>>>> 	printk("%s, locked=%d\n", __FUNCTION__, spin_is_locked(ap->lock));
+> >>>>
+> >>>> Do you have your code somewhere that we can look at ?
+> >>>
+> >>> This is the current version with debug printks. I've also added dump_stack()
+> >>> to find out the code path but haven't analyzed the output yet.
+> >>
+> >> Can you send a proper patch ? Or a link to a git tree ? That is easier to
+> >> handle than pasted code in an email...
+> > 
+> > Patch against what? I don't have a git server.
+> 
+> patch against current 6.1-rc, or against an older kernel should be OK too.
+> But please "git send-email" a patch, or push your dev tree to github ?
+> 
+> > I've done some call trace analysis. These code paths are calling
+> > pata_parport functions with ap->lock locked during init.
+> > 
+> > Comm: kworker, Workqueue: ata_sff ata_sff_pio_task
+> > ata_sff_hsm_move -> ata_pio_sectors-> ata_sff_altstatus -> pata_parport_tf_read -> pata_parport_check_altstatus
+> > ata_sff_hsm_move -> ata_sff_altstatus -> pata_parport_tf_read -> pata_parport_check_altstatus
+> > ata_sff_pio_task -> ata_sff_busy_wait -> pata_parport_check_status
+> > ata_sff_hsm_move -> ata_wait_idle -> ata_sff_busy_wait -> pata_parport_check_status
+> > ata_sff_hsm_move -> ata_hsm_qc_complete -> ata_sff_irq_on -> ata_wait_idle -> ata_sff_busy_wait -> pata_parport_check_status
+> > ata_sff_pio_task -> ata_sff_hsm_move -> ata_pio_sectors -> ata_pio_sector -> ata_pio_xfer -> pata_parport_data_xfer
+> > ata_sff_pio_task -> ata_sff_hsm_move -> pata_parport_data_xfer
+> > ata_sff_pio_task -> ata_sff_hsm_move -> pata_parport_tf_read
+> > ata_sff_hsm_move -> ata_hsm_qc_complete -> ata_qc_complete -> fill_result_tf -> ata_sff_qc_fill_rtf -> pata_parport_tf_read
+> > ata_sff_hsm_move -> ata_pio_sectors -> ata_sff_altstatus -> pata_parport_check_altstatus
+> > ata_sff_hsm_move -> ata_sff_altstatus -> pata_parport_check_altstatus
+> > 
+> > Comm: modprobe
+> > ata_host_start -> ata_eh_freeze_port -> ata_sff_freeze -> pata_parport_check_status
+> > 
+> > Comm: scsi_eh_4
+> > ata_eh_recover -> ata_eh_reset -> ata_eh_thaw_port -> ata_sff_thaw -> ata_sff_irq_on -> ata_wait_idle -> ata_sff_busy_wait -> pata_parport_check_status
+> > ata_eh_reset -> ata_eh_freeze_port -> ata_sff_freeze -> pata_parport_check_status
+> > ata_scsi_error -> ata_scsi_port_error_handler -> ata_port_freeze -> ata_sff_freeze -> pata_parport_check_status
+> > ata_sff_error_handler -> pata_parport_drain_fifo -> pata_parport_check_status
+> 
+> What exactly are the issues you are having with ap->lock ? It looks like
+> you have done a lot of analysis of the code, but without any context about
+> the problem, I do not understand what I am looking at.
+> 
 
+The problem is that pi_connect() can sleep because it calls
+parport_claim_or_block(). And any access (even reading ATA status register)
+requires pi_connect.
 
-On 2022/11/14 10:07, Ming Lei wrote:
-> On Sat, Nov 12, 2022 at 04:28:13PM +0800, Ye Bin wrote:
->> From: Ye Bin <yebin10@huawei.com>
->>
->> There's issue as follows when do fault injection test:
->> ------------[ cut here ]------------
->> kernfs: can not remove 'nr_tags', no directory
->> WARNING: CPU: 8 PID: 2308 at fs/kernfs/dir.c:1635 kernfs_remove_by_name_ns+0xdd/0x100
->> Modules linked in: null_blk(-)
->> CPU: 8 PID: 2308 Comm: rmmod Not tainted 6.1.0-rc4-next-20221111+ #131
->> RIP: 0010:kernfs_remove_by_name_ns+0xdd/0x100
->> RSP: 0018:ffff88812149fbc8 EFLAGS: 00010282
->> RAX: 0000000000000000 RBX: ffffffffb8137508 RCX: 0000000000000000
->> RDX: 0000000000000001 RSI: ffffffffb6b49ae0 RDI: ffffed1024293f6b
->> RBP: ffffffffb8137600 R08: 0000000000000001 R09: ffffed1024293f3d
->> R10: ffff88812149f9e7 R11: ffffed1024293f3c R12: 0000000000000000
->> R13: ffffffffb6b2d2a0 R14: ffffffffb6b2d1e0 R15: ffff88822f7f14b8
->> FS:  00007f97eacb9740(0000) GS:ffff8883ace00000(0000) knlGS:0000000000000000
->> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
->> CR2: 00007f97e9b72b81 CR3: 000000022fbda000 CR4: 00000000000006e0
->> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
->> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
->> Call Trace:
->>   <TASK>
->>   remove_files.isra.0+0x6c/0x170
->>   sysfs_remove_group+0x9b/0x180
->>   sysfs_remove_groups+0x4f/0xa0
->>   __kobject_del+0x7d/0x1d0
->>   kobject_del+0x32/0x50
->>   blk_mq_sysfs_unregister.cold+0x8/0xd
->>   blk_unregister_queue+0xed/0x260
->>   del_gendisk+0x27e/0x900
->>   null_del_dev.part.0+0x166/0x510 [null_blk]
->>   null_destroy_dev+0x37/0x5c [null_blk]
->>   null_exit+0x4c/0x9d [null_blk]
->>   __do_sys_delete_module.isra.0+0x2f3/0x520
->>   do_syscall_64+0x3b/0x90
->>   entry_SYSCALL_64_after_hwframe+0x72/0xdc
->>   </TASK>
->>
->> Fault injection context as follows:
->>   kobject_add
->>   blk_mq_register_hctx
->>   blk_mq_sysfs_register
->>   blk_register_queue
->>   device_add_disk
->>   null_add_dev.part.0 [null_blk]
->>
->> As 'blk_mq_sysfs_register' may failed, but when unregister mq sysfs don't
->> judge sysfs if registered. 'blk_mq_sysfs_register' also didn't handle
->> error correctly.
->> To solve above issue, if sysfs is unregstered just exit.
->>
->> Signed-off-by: Ye Bin <yebin10@huawei.com>
->> ---
->>   block/blk-mq-sysfs.c | 13 +++++++++++--
->>   1 file changed, 11 insertions(+), 2 deletions(-)
->>
->> diff --git a/block/blk-mq-sysfs.c b/block/blk-mq-sysfs.c
->> index 93997d297d42..0cda0a729f3c 100644
->> --- a/block/blk-mq-sysfs.c
->> +++ b/block/blk-mq-sysfs.c
->> @@ -185,7 +185,7 @@ static int blk_mq_register_hctx(struct blk_mq_hw_ctx *hctx)
->>   {
->>   	struct request_queue *q = hctx->queue;
->>   	struct blk_mq_ctx *ctx;
->> -	int i, ret;
->> +	int i, j, ret;
->>   
->>   	if (!hctx->nr_ctx)
->>   		return 0;
->> @@ -197,9 +197,16 @@ static int blk_mq_register_hctx(struct blk_mq_hw_ctx *hctx)
->>   	hctx_for_each_ctx(hctx, ctx, i) {
->>   		ret = kobject_add(&ctx->kobj, &hctx->kobj, "cpu%u", ctx->cpu);
->>   		if (ret)
->> -			break;
->> +			goto out;
->>   	}
->>   
->> +	return 0;
->> +out:
->> +	hctx_for_each_ctx(hctx, ctx, j) {
->> +		if (j < i)
->> +			kobject_del(&ctx->kobj);
->> +	}
->> +	kobject_del(&hctx->kobj);
-> The above change looks fine.
-I will send v2 patch for this part.
->>   	return ret;
->>   }
->>   
->> @@ -278,6 +285,8 @@ void blk_mq_sysfs_unregister(struct gendisk *disk)
->>   	struct blk_mq_hw_ctx *hctx;
->>   	unsigned long i;
->>   
->> +	if (!q->mq_sysfs_init_done)
->> +		return;
-> The above should be one warning, and I suggest to handle failure of blk_mq_sysfs_register
-> from blk_register_queue() in this patch too.
->
-> Thanks,
-> Ming
->
-> .
-I think "[PATCH 3/5] block: fix error unwinding in blk_register_queue" 
-already do what your suggest.
-
+-- 
+Ondrej Zary
