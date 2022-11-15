@@ -2,109 +2,96 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FC33C433FE
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0EB1FC4332F
 	for <linux-block@archiver.kernel.org>; Tue, 15 Nov 2022 13:49:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238351AbiKONth (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S238222AbiKONth (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Tue, 15 Nov 2022 08:49:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49674 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49676 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229546AbiKONtg (ORCPT
+        with ESMTP id S230207AbiKONtg (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Tue, 15 Nov 2022 08:49:36 -0500
-Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 107A92497E;
+Received: from dggsgout12.his.huawei.com (unknown [45.249.212.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 34F442497F;
         Tue, 15 Nov 2022 05:49:33 -0800 (PST)
 Received: from mail02.huawei.com (unknown [172.30.67.153])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4NBSGG6C49z4f3vdx;
+        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4NBSGG0jBXz4f41hZ;
         Tue, 15 Nov 2022 21:49:26 +0800 (CST)
 Received: from huaweicloud.com (unknown [10.175.127.227])
-        by APP4 (Coremail) with SMTP id gCh0CgBni9jnmHNjrPFIAg--.61645S6;
+        by APP4 (Coremail) with SMTP id gCh0CgBni9jnmHNjrPFIAg--.61645S4;
         Tue, 15 Nov 2022 21:49:29 +0800 (CST)
 From:   Yu Kuai <yukuai1@huaweicloud.com>
 To:     hch@lst.de, axboe@kernel.dk, agk@redhat.com, snitzer@kernel.org,
         dm-devel@redhat.com
 Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         yukuai3@huawei.com, yukuai1@huaweicloud.com, yi.zhang@huawei.com
-Subject: [PATCH v3 02/10] dm: remove free_table_devices
-Date:   Tue, 15 Nov 2022 22:10:46 +0800
-Message-Id: <20221115141054.1051801-3-yukuai1@huaweicloud.com>
+Subject: [PATCH v3 00/10] fix delayed holder tracking
+Date:   Tue, 15 Nov 2022 22:10:44 +0800
+Message-Id: <20221115141054.1051801-1-yukuai1@huaweicloud.com>
 X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20221115141054.1051801-1-yukuai1@huaweicloud.com>
-References: <20221115141054.1051801-1-yukuai1@huaweicloud.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgBni9jnmHNjrPFIAg--.61645S6
-X-Coremail-Antispam: 1UD129KBjvJXoW7ZFyxWFWrZFy8KF1DtryDGFg_yoW8XF43pF
-        13Xa42yrW5Wrs29w4UZr1Uua43Kan0y3yrKrW5Cw1v93W5A34FvFWxJFyrXFy5Jay8GF43
-        WFy7tr18Cay8Kr7anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUBE14x267AKxVWrJVCq3wAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2048vs2IY020E87I2jVAFwI0_Jryl82xGYIkIc2
-        x26xkF7I0E14v26r4j6ryUM28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8wA2z4x0
-        Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j6F4UJw
-        A2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oVCq3wAS
-        0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2
-        IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0
-        Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2kIc2
-        xKxwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v2
-        6r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2
-        Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_
-        Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMI
-        IF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUc6pPUUUUU
-        =
+X-CM-TRANSID: gCh0CgBni9jnmHNjrPFIAg--.61645S4
+X-Coremail-Antispam: 1UD129KBjvJXoWruFyUZr1fuw1DAw17Jw1rXrb_yoW8JF48pF
+        ZxWa4fKFyUurWIqa13Aw17XFyrGan7K3WxJry7Kr1Fqry5Cry5ZF1xtF18tFyUGrZ7trnr
+        Xry7t3yfGw4vk3DanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUvY14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+        1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+        JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+        CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+        2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+        W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2
+        Y2ka0xkIwI1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4
+        xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43
+        MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I
+        0E14v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWrZr1j6s0DMIIF0xvEx4A2jsIE14v2
+        6r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0J
+        UdHUDUUUUU=
 X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Christoph Hellwig <hch@lst.de>
+From: Yu Kuai <yukuai3@huawei.com>
 
-free_table_devices just warns and frees all table_device structures when
-the target removal did not remove them.  This should never happen, but
-if it did, just freeing the structure without deleting them from the
-list or cleaning up the resources would not help at all.  So just WARN on
-a non-empty list instead.
+Hi all,
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Yu Kuai <yukuai3@huawei.com>
----
- drivers/md/dm.c | 15 +--------------
- 1 file changed, 1 insertion(+), 14 deletions(-)
+this series tries to fix the delayed holder tracking that is only used by
+dm by moving it into dm, where we can track the lifetimes much better.
+v2 is from Christoph, here I send v3 with some additional fixes.
 
-diff --git a/drivers/md/dm.c b/drivers/md/dm.c
-index 95a1ee3d314e..19d25bf997be 100644
---- a/drivers/md/dm.c
-+++ b/drivers/md/dm.c
-@@ -833,19 +833,6 @@ void dm_put_table_device(struct mapped_device *md, struct dm_dev *d)
- 	mutex_unlock(&md->table_devices_lock);
- }
- 
--static void free_table_devices(struct list_head *devices)
--{
--	struct list_head *tmp, *next;
--
--	list_for_each_safe(tmp, next, devices) {
--		struct table_device *td = list_entry(tmp, struct table_device, list);
--
--		DMWARN("dm_destroy: %s still exists with %d references",
--		       td->dm_dev.name, refcount_read(&td->count));
--		kfree(td);
--	}
--}
--
- /*
-  * Get the geometry associated with a dm device
-  */
-@@ -2122,7 +2109,7 @@ static void free_dev(struct mapped_device *md)
- 
- 	cleanup_mapped_device(md);
- 
--	free_table_devices(&md->table_devices);
-+	WARN_ON_ONCE(!list_empty(&md->table_devices));
- 	dm_stats_cleanup(&md->stats);
- 	free_minor(minor);
- 
+Changes since v2:
+ - add patch 5 8 and 10 to this series.
+ - rewrite last cleanup patch from v2.
+Changes since v1:
+ - don't blow away ->bd_holder_dir in del_gendisk or add_disk failure
+   as the holder unregistration references it
+ - add an extra cleanup patch
+
+Christoph Hellwig (6):
+  block: clear ->slave_dir when dropping the main slave_dir reference
+  dm: remove free_table_devices
+  dm: cleanup open_table_device
+  dm: cleanup close_table_device
+  dm: track per-add_disk holder relations in DM
+  block: remove delayed holder registration
+
+Yu Kuai (4):
+  dm: make sure create and remove dm device won't race with open and
+    close table
+  block: fix use after free for bd_holder_dir
+  block: store the holder kobject in bd_holder_disk
+  block: don't allow a disk link holder to itself
+
+ block/genhd.c          |   6 +-
+ block/holder.c         | 103 +++++++++++++-----------------
+ drivers/md/dm.c        | 138 ++++++++++++++++++++++++-----------------
+ include/linux/blkdev.h |   5 --
+ 4 files changed, 126 insertions(+), 126 deletions(-)
+
 -- 
 2.31.1
 
