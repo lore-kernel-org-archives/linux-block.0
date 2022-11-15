@@ -2,133 +2,116 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C77CFC4332F
-	for <linux-block@archiver.kernel.org>; Tue, 15 Nov 2022 01:13:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6938C433FE
+	for <linux-block@archiver.kernel.org>; Tue, 15 Nov 2022 01:17:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230520AbiKOBNB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 14 Nov 2022 20:13:01 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56574 "EHLO
+        id S231500AbiKOBRC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 14 Nov 2022 20:17:02 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59320 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230072AbiKOBNA (ORCPT
+        with ESMTP id S231425AbiKOBRA (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 14 Nov 2022 20:13:00 -0500
-Received: from mxct.zte.com.cn (mxct.zte.com.cn [58.251.27.85])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 86482FAC6;
-        Mon, 14 Nov 2022 17:12:58 -0800 (PST)
-Received: from mxde.zte.com.cn (unknown [10.35.20.165])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mxct.zte.com.cn (FangMail) with ESMTPS id 4NB7TN3Gkrz1DDK;
-        Tue, 15 Nov 2022 09:12:56 +0800 (CST)
-Received: from mxus.zte.com.cn (unknown [10.207.168.8])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mxde.zte.com.cn (FangMail) with ESMTPS id 4NB7TJ38wbz4xD2y;
-        Tue, 15 Nov 2022 09:12:52 +0800 (CST)
-Received: from mxhk.zte.com.cn (unknown [192.168.250.137])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mxus.zte.com.cn (FangMail) with ESMTPS id 4NB7TF08q7zdmc16;
-        Tue, 15 Nov 2022 09:12:49 +0800 (CST)
-Received: from mse-fl2.zte.com.cn (unknown [10.5.228.133])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mxhk.zte.com.cn (FangMail) with ESMTPS id 4NB7T95QW7z8RV7D;
-        Tue, 15 Nov 2022 09:12:45 +0800 (CST)
-Received: from xaxapp01.zte.com.cn ([10.88.40.50])
-        by mse-fl2.zte.com.cn with SMTP id 2AF1CAIh093991;
-        Tue, 15 Nov 2022 09:12:40 +0800 (+08)
-        (envelope-from guo.ziliang@zte.com.cn)
-Received: from mapi (xaxapp03[null])
-        by mapi (Zmail) with MAPI id mid32;
-        Tue, 15 Nov 2022 09:12:08 +0800 (CST)
-Date:   Tue, 15 Nov 2022 09:12:08 +0800 (CST)
-X-Zmail-TransId: 2afb6372e7687810efd4
-X-Mailer: Zmail v1.0
-Message-ID: <202211150912088591872@zte.com.cn>
-Mime-Version: 1.0
-From:   <guo.ziliang@zte.com.cn>
-To:     <ngupta@vflare.org>
-Cc:     <senozhatsky@chromium.org>, <minchan@kernel.org>,
-        <axboe@kernel.dk>, <linux-kernel@vger.kernel.org>,
-        <linux-block@vger.kernel.org>, <guo.ziliang@zte.com.cn>
-Subject: =?UTF-8?B?W1BBVENIIGxpbnV4LW5leHRdIHpyYW06IHVzZSBzeXNmc19lbWl0KCkgdG8gaW5zdGVhZCBvZiBzY25wcmludGYoKQ==?=
-Content-Type: text/plain;
-        charset="UTF-8"
-X-MAIL: mse-fl2.zte.com.cn 2AF1CAIh093991
-X-Fangmail-Gw-Spam-Type: 0
-X-FangMail-Miltered: at cgslv5.04-192.168.251.14.novalocal with ID 6372E797.000 by FangMail milter!
-X-FangMail-Envelope: 1668474776/4NB7TN3Gkrz1DDK/6372E797.000/10.35.20.165/[10.35.20.165]/mxde.zte.com.cn/<guo.ziliang@zte.com.cn>
-X-Fangmail-Anti-Spam-Filtered: true
-X-Fangmail-MID-QID: 6372E797.000/4NB7TN3Gkrz1DDK
+        Mon, 14 Nov 2022 20:17:00 -0500
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 932A512ADC;
+        Mon, 14 Nov 2022 17:16:57 -0800 (PST)
+Received: from mail02.huawei.com (unknown [172.30.67.153])
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4NB7Yv3Jjlz4f3m6v;
+        Tue, 15 Nov 2022 09:16:51 +0800 (CST)
+Received: from [10.174.176.73] (unknown [10.174.176.73])
+        by APP4 (Coremail) with SMTP id gCh0CgC329iE6HJjpFosAg--.10568S3;
+        Tue, 15 Nov 2022 09:16:54 +0800 (CST)
+Subject: Re: [PATCH v2 4/5] blk-iocost: fix sleeping in atomic context
+ warnning
+To:     Tejun Heo <tj@kernel.org>, Yu Kuai <yukuai1@huaweicloud.com>
+Cc:     hch@lst.de, josef@toxicpanda.com, axboe@kernel.dk,
+        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, yi.zhang@huawei.com,
+        "yukuai (C)" <yukuai3@huawei.com>
+References: <20221104023938.2346986-1-yukuai1@huaweicloud.com>
+ <20221104023938.2346986-5-yukuai1@huaweicloud.com>
+ <Y3K8MSFWw8eTnxtm@slm.duckdns.org>
+From:   Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <1644d8fd-a0b4-a6fd-63a2-6309db1bfa11@huaweicloud.com>
+Date:   Tue, 15 Nov 2022 09:16:52 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
+MIME-Version: 1.0
+In-Reply-To: <Y3K8MSFWw8eTnxtm@slm.duckdns.org>
+Content-Type: text/plain; charset=gbk; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: gCh0CgC329iE6HJjpFosAg--.10568S3
+X-Coremail-Antispam: 1UD129KBjvJXoW7KF13ur48JFWrCry3uw1kGrg_yoW8WrWrpF
+        yag3Wqyw4jqFnF9wsFyw1SvF1Skw109w4rA3s7Gasayr9rWrn3KFn5trWF9r10vry3XrWj
+        vF4FqrW5Zr1UA3DanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUU9Y14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+        1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+        JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+        CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+        2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+        W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka
+        0xkIwI1lc7I2V7IY0VAS07AlzVAYIcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7x
+        kEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E
+        67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCw
+        CI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6rW3Jr0E
+        3s1lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVWUJVW8JbIYCT
+        nIWIevJa73UjIFyTuYvjfUoOJ5UUUUU
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: guo ziliang <guo.ziliang@zte.com.cn>
-Replace the open-code with sysfs_emit() to simplify the code.)
+Hi,
 
-Signed-off-by: guo ziliang <guo.ziliang@zte.com.cn>
----
- drivers/block/zram/zram_drv.c | 11 ++++++-----
- 1 file changed, 6 insertions(+), 5 deletions(-)
+ÔÚ 2022/11/15 6:07, Tejun Heo Ð´µÀ:
+> On Fri, Nov 04, 2022 at 10:39:37AM +0800, Yu Kuai wrote:
+>> From: Yu Kuai <yukuai3@huawei.com>
+>>
+>> match_u64() is called inside ioc->lock, which causes smatch static
+>> checker warnings:
+>>
+>> block/blk-iocost.c:3211 ioc_qos_write() warn: sleeping in atomic context
+>> block/blk-iocost.c:3240 ioc_qos_write() warn: sleeping in atomic context
+>> block/blk-iocost.c:3407 ioc_cost_model_write() warn: sleeping in atomic
+>> context
+>>
+>> Fix the problem by introducing a mutex and using it while prasing input
+>> params.
+> 
+> It bothers me that parsing an u64 string requires a GFP_KERNEL memory
+> allocation.
+> 
+>> @@ -2801,9 +2806,11 @@ static void ioc_rqos_queue_depth_changed(struct rq_qos *rqos)
+>>   {
+>>   	struct ioc *ioc = rqos_to_ioc(rqos);
+>>   
+>> +	mutex_lock(&ioc->params_mutex);
+>>   	spin_lock_irq(&ioc->lock);
+>>   	ioc_refresh_params(ioc, false);
+>>   	spin_unlock_irq(&ioc->lock);
+>> +	mutex_unlock(&ioc->params_mutex);
+>>   }
+> 
+> Aren't the params still protected by ioc->lock? Why do we need to grab both?
 
-diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
-index 171eccc..a0399ee 100644
---- a/drivers/block/zram/zram_drv.c
-+++ b/drivers/block/zram/zram_drv.c
-@@ -255,7 +255,7 @@ static ssize_t initstate_show(struct device *dev,
-        val = init_done(zram);
-        up_read(&zram->init_lock);
+Yes, the params is updated inside ioc->lock, but they can be read
+without the lock before updating them, which is protected by mutex
+instead.
 
--       return scnprintf(buf, PAGE_SIZE, "%u\n", val);
-+       return sysfs_emit(buf, "%u\n", val);
- }
+> 
+> Any chance I can persuade you into updating match_NUMBER() helpers to not
+> use match_strdup()? They can easily disable irq/preemption and use percpu
+> buffers and we won't need most of this patchset.
 
- static ssize_t disksize_show(struct device *dev,
-@@ -263,7 +263,7 @@ static ssize_t disksize_show(struct device *dev,
- {
-        struct zram *zram = dev_to_zram(dev);
+Do you mean preallocated percpu buffer? Is there any example I can
+learn? Anyway, replace match_strdup() to avoid memory allocation sounds
+good.
 
--       return scnprintf(buf, PAGE_SIZE, "%llu\n", zram->disksize);
-+       return sysfs_emit(buf, "%llu\n", zram->disksize);
- }
+Thanks,
+Kuai
+> 
+> Thanks.
+> 
 
- static ssize_t mem_limit_store(struct device *dev,
-@@ -404,7 +404,7 @@ static ssize_t writeback_limit_enable_show(struct device *dev,
-        spin_unlock(&zram->wb_limit_lock);
-        up_read(&zram->init_lock);
-
--       return scnprintf(buf, PAGE_SIZE, "%d\n", val);
-+       return sysfs_emit(buf, "%d\n", val);
- }
-
- static ssize_t writeback_limit_store(struct device *dev,
-@@ -439,7 +439,7 @@ static ssize_t writeback_limit_show(struct device *dev,
-        spin_unlock(&zram->wb_limit_lock);
-        up_read(&zram->init_lock);
-
--       return scnprintf(buf, PAGE_SIZE, "%llu\n", val);
-+       return sysfs_emit(buf, "%llu\n", val);
- }
-
- static void reset_bdev(struct zram *zram)
-@@ -1021,6 +1021,7 @@ static ssize_t max_comp_streams_show(struct device *dev,
-                struct device_attribute *attr, char *buf)
- {
-        return scnprintf(buf, PAGE_SIZE, "%d\n", num_online_cpus());
-+       return sysfs_emit(buf, "%d\n", num_online_cpus());
- }
-
- static ssize_t max_comp_streams_store(struct device *dev,
-@@ -2504,7 +2505,7 @@ static ssize_t hot_add_show(struct class *class,
-
-        if (ret < 0)
-                return ret;
--       return scnprintf(buf, PAGE_SIZE, "%d\n", ret);
-+       return sysfs_emit(buf, "%d\n", ret);
- }
- static struct class_attribute class_attr_hot_add =
-        __ATTR(hot_add, 0400, hot_add_show, NULL);
---
-1.8.3.1
