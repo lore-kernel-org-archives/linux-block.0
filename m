@@ -2,89 +2,75 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 79FC5C4332F
-	for <linux-block@archiver.kernel.org>; Tue, 15 Nov 2022 00:33:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78FF3C433FE
+	for <linux-block@archiver.kernel.org>; Tue, 15 Nov 2022 00:40:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230520AbiKOAdx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 14 Nov 2022 19:33:53 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40282 "EHLO
+        id S231201AbiKOAkD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 14 Nov 2022 19:40:03 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41934 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229865AbiKOAdw (ORCPT
+        with ESMTP id S229967AbiKOAkC (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 14 Nov 2022 19:33:52 -0500
-Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18257E0D
-        for <linux-block@vger.kernel.org>; Mon, 14 Nov 2022 16:33:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1668472431; x=1700008431;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=2SXILu42ZF80KNGoxelf/WosLvSlJNbz2CfkArbmfUs=;
-  b=YxcFwRyo/CO2Yb7iM7DmZe8RJnG7kSsNpF6eSZcr4qG661WAIkd5Inq2
-   5RQVqGtxnJKS9XGUVzCoho0fN8HtwEtp/3/5rX9TgaPzzjq9VRtoWWYuA
-   9a1PkvXZu2qV/XitdzO02kvIA8tUe2PigcyCFrXr2TxRLrXnDeT9+vDrs
-   hMHwf+mUMH4qabBvdy1j3BQPUyKbLM8oXfAKWhQIJ+RNlzIrE/wLrrdy5
-   B8fRDWdy6SOuxcXttVs1IkJL/sQnar3r/31KjfoZJwUkl+BZBaxQ5fzQs
-   vkTzVY4KpwsUqqk4ucC8GU/PkjAIw+t7mXyplFxqirxerBP+gOpLaOH9T
-   A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10531"; a="309748769"
-X-IronPort-AV: E=Sophos;i="5.96,164,1665471600"; 
-   d="scan'208";a="309748769"
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Nov 2022 16:33:50 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10531"; a="781139055"
-X-IronPort-AV: E=Sophos;i="5.96,164,1665471600"; 
-   d="scan'208";a="781139055"
-Received: from lkp-server01.sh.intel.com (HELO ebd99836cbe0) ([10.239.97.150])
-  by fmsmga001.fm.intel.com with ESMTP; 14 Nov 2022 16:33:49 -0800
-Received: from kbuild by ebd99836cbe0 with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1oujtc-0000s5-1S;
-        Tue, 15 Nov 2022 00:33:48 +0000
-Date:   Tue, 15 Nov 2022 08:33:28 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Jonathan Derrick <jonathan.derrick@linux.dev>,
-        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-        Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Cc:     oe-kbuild-all@lists.linux.dev, Keith Busch <kbusch@kernel.org>,
-        Omar Sandoval <osandov@osandov.com>,
-        Jonathan Derrick <jonathan.derrick@linux.dev>
-Subject: Re: [PATCH] tests/nvme: Add admin-passthru+reset race test
-Message-ID: <202211150846.9Fnwxsg4-lkp@intel.com>
-References: <20221114203412.383-1-jonathan.derrick@linux.dev>
+        Mon, 14 Nov 2022 19:40:02 -0500
+Received: from mail-pg1-f171.google.com (mail-pg1-f171.google.com [209.85.215.171])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A63411AD95;
+        Mon, 14 Nov 2022 16:40:01 -0800 (PST)
+Received: by mail-pg1-f171.google.com with SMTP id q1so11765748pgl.11;
+        Mon, 14 Nov 2022 16:40:01 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=U9WtyFjfUCr3EXsv59jM0Uq8xTAz5w+9nR4N7uzysOg=;
+        b=vn4cdZ7U8kBsNsO+Pi5HfO9LqYqEQvW4eUbb6TkNnfFTLapA16EYNcFXZ10xJFh2HG
+         JSnt6QJztDJ0A/bITWpVx//JXR//kFXBTuXHZ0Ffe7g+wFUAXlu7lbq3Nwyn0wZTJySI
+         lmvjV2zw1fFljLJsj53qD9mnxhBgfdOAYQxqm0nJJurvbk0PCs5GSgRrMtXvosywCPkx
+         6lGc/95fncfrGTXSBsF/HnpjCND9cGJpL1wKGLBgfVHQ4Cghn45fpKug/yaLtgLfiFNg
+         EM87LpIjNY5V1BA+f8q+xaFK1AExqw/FRJtB0995En+BqkPubgp+RLoybd+cbuLcGxFv
+         wz2Q==
+X-Gm-Message-State: ANoB5pkbe1Iy/KR/CuUFATFa/CXazbbxlPdOgmtA0vTHucQzGUNWakk/
+        HHpZXoviAoZYA1+sMOAWq+xrJzs/sXo=
+X-Google-Smtp-Source: AA0mqf7fhCduzJzmk0XAdVLf8vaZzU3QksDMtaJkAD1rKSXJ5IcBeuc9UF+9PGVFEonMbATAqOpNPg==
+X-Received: by 2002:aa7:9902:0:b0:56e:8ed7:569f with SMTP id z2-20020aa79902000000b0056e8ed7569fmr16006453pff.19.1668472800948;
+        Mon, 14 Nov 2022 16:40:00 -0800 (PST)
+Received: from ?IPV6:2620:15c:211:201:637b:9535:5168:c84f? ([2620:15c:211:201:637b:9535:5168:c84f])
+        by smtp.gmail.com with ESMTPSA id f15-20020a62380f000000b0056c360af4e3sm7326858pfa.9.2022.11.14.16.39.59
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 14 Nov 2022 16:40:00 -0800 (PST)
+Message-ID: <ffeb482e-9369-621d-7537-e48c8436de76@acm.org>
+Date:   Mon, 14 Nov 2022 16:39:58 -0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221114203412.383-1-jonathan.derrick@linux.dev>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.3.0
+Subject: Re: [PATCH V2 3/7] null_blk: initialize cmd->bio in __alloc_cmd()
+Content-Language: en-US
+To:     Chaitanya Kulkarni <kch@nvidia.com>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Cc:     axboe@kernel.dk, damien.lemoal@opensource.wdc.com,
+        johannes.thumshirn@wdc.com, ming.lei@redhat.com,
+        shinichiro.kawasaki@wdc.com, vincent.fu@samsung.com,
+        yukuai3@huawei.com
+References: <20221006031829.37741-1-kch@nvidia.com>
+ <20221006031829.37741-4-kch@nvidia.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20221006031829.37741-4-kch@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Jonathan,
+On 10/5/22 20:18, Chaitanya Kulkarni wrote:
+> The function __alloc_cmd() is responsible to allocate tag and
+> initializae the different members of the null_cmd structure e.g.
 
-I love your patch! Perhaps something to improve:
+initializae -> initialize?
 
-[auto build test WARNING on linus/master]
-[also build test WARNING on v6.1-rc5 next-20221114]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+> cmd->tag, cmd->error, and cmd->nq, Move only member bio that is initialized
+> from alloc_cmd() into __alloc_cmd().
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Jonathan-Derrick/tests-nvme-Add-admin-passthru-reset-race-test/20221115-043752
-patch link:    https://lore.kernel.org/r/20221114203412.383-1-jonathan.derrick%40linux.dev
-patch subject: [PATCH] tests/nvme: Add admin-passthru+reset race test
-reproduce:
-        scripts/spdxcheck.py
+Thanks,
 
-If you fix the issue, kindly add following tag where applicable
-| Reported-by: kernel test robot <lkp@intel.com>
+Bart.
 
-spdxcheck warnings: (new ones prefixed by >>)
-   drivers/cpufreq/amd-pstate-ut.c: 1:28 Invalid License ID: GPL-1.0-or-later
->> tests/nvme/046: 2:27 Invalid License ID: GPL-3.0+
-
--- 
-0-DAY CI Kernel Test Service
-https://01.org/lkp
