@@ -2,136 +2,135 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A987C4321E
-	for <linux-block@archiver.kernel.org>; Tue, 15 Nov 2022 13:49:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 22882C433FE
+	for <linux-block@archiver.kernel.org>; Tue, 15 Nov 2022 14:06:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230118AbiKONto (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 15 Nov 2022 08:49:44 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49704 "EHLO
+        id S230317AbiKOOGC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 15 Nov 2022 09:06:02 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32858 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238116AbiKONth (ORCPT
+        with ESMTP id S238408AbiKOOFu (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 15 Nov 2022 08:49:37 -0500
-Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E1760264A7;
-        Tue, 15 Nov 2022 05:49:35 -0800 (PST)
-Received: from mail02.huawei.com (unknown [172.30.67.153])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4NBSGK2h05z4f3kJs;
-        Tue, 15 Nov 2022 21:49:29 +0800 (CST)
-Received: from huaweicloud.com (unknown [10.175.127.227])
-        by APP4 (Coremail) with SMTP id gCh0CgBni9jnmHNjrPFIAg--.61645S12;
-        Tue, 15 Nov 2022 21:49:32 +0800 (CST)
-From:   Yu Kuai <yukuai1@huaweicloud.com>
-To:     hch@lst.de, axboe@kernel.dk, agk@redhat.com, snitzer@kernel.org,
-        dm-devel@redhat.com
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        yukuai3@huawei.com, yukuai1@huaweicloud.com, yi.zhang@huawei.com
-Subject: [PATCH v3 08/10] block: fix use after free for bd_holder_dir
-Date:   Tue, 15 Nov 2022 22:10:52 +0800
-Message-Id: <20221115141054.1051801-9-yukuai1@huaweicloud.com>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20221115141054.1051801-1-yukuai1@huaweicloud.com>
-References: <20221115141054.1051801-1-yukuai1@huaweicloud.com>
+        Tue, 15 Nov 2022 09:05:50 -0500
+Received: from mail-ed1-x52a.google.com (mail-ed1-x52a.google.com [IPv6:2a00:1450:4864:20::52a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 107A62B248
+        for <linux-block@vger.kernel.org>; Tue, 15 Nov 2022 06:05:49 -0800 (PST)
+Received: by mail-ed1-x52a.google.com with SMTP id i21so22000078edj.10
+        for <linux-block@vger.kernel.org>; Tue, 15 Nov 2022 06:05:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linbit-com.20210112.gappssmtp.com; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=f7WFciVvNJW7kEDkH94rbryN71vzfH3OABZXCo397cs=;
+        b=ROtTyEPYbFH/w4ZblcsCZ+Sxy8nc+iKOmY5mKS0BFp/MGlPuoaBsfFwY2vt7ZRLqAy
+         8bVe6U94REHuHKNmJ9ckXPjlvZfQbaPfeFklKJPJjaR5188C+ZSoRbgFTe7NeP12XHx4
+         X5kkYusxFJpbKrMMKsCbbRjr7C37mNwqlwMtKCxCWj7qPNYEkePyPs7q3A24rqEwXwoC
+         KjAZ6C/L6K/1h5z1LU1EOy3Jy+pTV8xtSLtXFFcC0UvRFOQPzWryDdQNKi3+L3j/KLXm
+         xQEXg6Kp+P99RqNWLFTgEhH3W0KV9/3kq2fhwNmQzhXotFSLKjvhv0g1vGeBFok8z5mc
+         SW9A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=f7WFciVvNJW7kEDkH94rbryN71vzfH3OABZXCo397cs=;
+        b=qbvcoAygVl+XWaSTuePHqezE2CEUVZecBJeFPVwhEkgtL4/37w2IcjWPcbS6yuGMc6
+         gDMNJprAotqQFhvNTs+sbCNdidQIB5vRQNtmof0ojos1wx1SYmEcW5Zfkk4wu99ys+GU
+         RrQ5UmOFdj6YACPxJxfhkSFcWWmLD202rQ06mdeZN0yrvvYrdJNkoLEWpDBwbKjU/3qq
+         YFGuTffb1m/6VDRHwXF6G1mSC6CGcK8u4hexJouA6VNPNk3TCEWqnFT6wdF0islx3KkI
+         52JmJFKN4GapKwOKyqEx5KqqRySLUzQPfUA8jHmlwf1evlFWlgdVoSgGLzU5q/4kI6mb
+         ljaA==
+X-Gm-Message-State: ANoB5plS4IPtlLy2l/i2Aj1YtdKjOLobC0aG5q6lle6DcWWkztQ4cFaI
+        /jBI/WVXzzvqEoOrj+QWQysK5w==
+X-Google-Smtp-Source: AA0mqf7oxrRdM64h8FAoN9EbCTeSOds03YFY2tUoVdCPVV0reOQy2CW6ku26YqTBbiFTvwmZuBSx1Q==
+X-Received: by 2002:aa7:da13:0:b0:461:ed76:cb42 with SMTP id r19-20020aa7da13000000b00461ed76cb42mr15587691eds.229.1668521147538;
+        Tue, 15 Nov 2022 06:05:47 -0800 (PST)
+Received: from [192.168.178.55] (h082218028181.host.wavenet.at. [82.218.28.181])
+        by smtp.gmail.com with ESMTPSA id cf6-20020a170906b2c600b007ad94fd48dfsm5509478ejb.139.2022.11.15.06.05.46
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 15 Nov 2022 06:05:47 -0800 (PST)
+Message-ID: <d0ff33bf-d39b-005c-ab62-42cae97e3b8c@linbit.com>
+Date:   Tue, 15 Nov 2022 15:05:46 +0100
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.4.0
+Subject: Re: [PATCH] drbd: use after free in drbd_create_device()
+To:     Dan Carpenter <error27@gmail.com>
+Cc:     Philipp Reisner <philipp.reisner@linbit.com>,
+        Lars Ellenberg <lars.ellenberg@linbit.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Andreas Gruenbacher <agruen@linbit.com>,
+        drbd-dev@lists.linbit.com, linux-block@vger.kernel.org,
+        kernel-janitors@vger.kernel.org
+References: <Y3Jd5iZRbNQ9w6gm@kili>
+Content-Language: en-US
+From:   =?UTF-8?Q?Christoph_B=c3=b6hmwalder?= 
+        <christoph.boehmwalder@linbit.com>
+In-Reply-To: <Y3Jd5iZRbNQ9w6gm@kili>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgBni9jnmHNjrPFIAg--.61645S12
-X-Coremail-Antispam: 1UD129KBjvJXoW7tr1rGFyxAFWxAFy3Ar1DKFg_yoW8KFWUpF
-        Z0gFyrKry8GrsrZrsrt347XFWjg3W8W3W8AFW29F4I9rZxArsI9r1xAFy7WF1xKrWIvF4q
-        qF1UX3yFvF10kFDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUPF14x267AKxVWrJVCq3wAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2048vs2IY020E87I2jVAFwI0_JF0E3s1l82xGYI
-        kIc2x26xkF7I0E14v26ryj6s0DM28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8wA2
-        z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j6F
-        4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oVCq
-        3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7
-        IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4U
-        M4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2
-        kIc2xKxwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E
-        14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIx
-        kGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUCVW8JwCI42IY6xIIjxv20xvEc7CjxVAF
-        wI0_Cr0_Gr1UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJV
-        W8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfUOBTY
-        UUUUU
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
-X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Yu Kuai <yukuai3@huawei.com>
+Am 15.11.22 um 14:16 schrieb Dan Carpenter:
+> The drbd_destroy_connection() frees the "connection" so use the _safe()
+> iterator to prevent a use after free.
+> 
+> Fixes: b6f85ef9538b ("drbd: Iterate over all connections")
+> Signed-off-by: Dan Carpenter <error27@gmail.com>
+> ---
+> Smatch assumes that kref_put() generally calls the free function so it
+> gets very confused by drbd_delete_device() which calls:
+> 
+> 	kref_put(&device->kref, drbd_destroy_device);
+> 
+> Four times in a row.  (Smatch has some checking for incremented
+> reference counts but even there it assumes that people are going to hold
+> one reference and not four).
+> 
+> drivers/block/drbd/drbd_main.c:2831 drbd_delete_device() error: dereferencing freed memory 'device'
+> drivers/block/drbd/drbd_main.c:2833 drbd_delete_device() warn: passing freed memory 'device'
+> drivers/block/drbd/drbd_main.c:2835 drbd_delete_device() error: dereferencing freed memory 'device'
+> 
+> The drbd_adm_get_status_all() function makes me itch as well.  It seems
+> like we drop a reference and then take it again?
+> 
+> drivers/block/drbd/drbd_nl.c:4019 drbd_adm_get_status_all() warn: 'resource' was already freed.
+> drivers/block/drbd/drbd_nl.c:4021 drbd_adm_get_status_all() warn: 'resource' was already freed.
+> 
+>  drivers/block/drbd/drbd_main.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/block/drbd/drbd_main.c b/drivers/block/drbd/drbd_main.c
+> index f3e4db16fd07..8532b839a343 100644
+> --- a/drivers/block/drbd/drbd_main.c
+> +++ b/drivers/block/drbd/drbd_main.c
+> @@ -2672,7 +2672,7 @@ static int init_submitter(struct drbd_device *device)
+>  enum drbd_ret_code drbd_create_device(struct drbd_config_context *adm_ctx, unsigned int minor)
+>  {
+>  	struct drbd_resource *resource = adm_ctx->resource;
+> -	struct drbd_connection *connection;
+> +	struct drbd_connection *connection, *n;
+>  	struct drbd_device *device;
+>  	struct drbd_peer_device *peer_device, *tmp_peer_device;
+>  	struct gendisk *disk;
+> @@ -2789,7 +2789,7 @@ enum drbd_ret_code drbd_create_device(struct drbd_config_context *adm_ctx, unsig
+>  	return NO_ERROR;
+>  
+>  out_idr_remove_from_resource:
+> -	for_each_connection(connection, resource) {
+> +	for_each_connection_safe(connection, n, resource) {
+>  		peer_device = idr_remove(&connection->peer_devices, vnr);
+>  		if (peer_device)
+>  			kref_put(&connection->kref, drbd_destroy_connection);
 
-Currently, the caller of bd_link_disk_holer() get 'bdev' by
-blkdev_get_by_dev(), which will look up 'bdev' by inode number 'dev'.
-Howerver, it's possible that del_gendisk() can be called currently, and
-'bd_holder_dir' can be freed before bd_link_disk_holer() access it, thus
-use after free is triggered.
+Thanks!
 
-t1:				t2:
-bdev = blkdev_get_by_dev
-				del_gendisk
-				 kobject_put(bd_holder_dir)
-				  kobject_free()
-bd_link_disk_holder
+Reviewed-by: Christoph Böhmwalder <christoph.boehmwalder@linbit.com>
 
-Fix the problem by checking disk is still live and grabbing a reference
-to 'bd_holder_dir' first in bd_link_disk_holder().
-
-Signed-off-by: Yu Kuai <yukuai3@huawei.com>
----
- block/holder.c | 21 +++++++++++++++------
- 1 file changed, 15 insertions(+), 6 deletions(-)
-
-diff --git a/block/holder.c b/block/holder.c
-index dd9327b43ce0..c8e462053f49 100644
---- a/block/holder.c
-+++ b/block/holder.c
-@@ -65,12 +65,24 @@ int bd_link_disk_holder(struct block_device *bdev, struct gendisk *disk)
- 	if (WARN_ON_ONCE(!disk->slave_dir))
- 		return -EINVAL;
- 
--	mutex_lock(&disk->open_mutex);
-+	/*
-+	 * del_gendisk drops the initial reference to bd_holder_dir, so we
-+	 * need to keep our own here to allow for cleanup past that point.
-+	 */
-+	mutex_lock(&bdev->bd_disk->open_mutex);
-+	if (!disk_live(bdev->bd_disk)) {
-+		mutex_unlock(&bdev->bd_disk->open_mutex);
-+		return -ENODEV;
-+	}
-+	kobject_get(bdev->bd_holder_dir);
-+	mutex_unlock(&bdev->bd_disk->open_mutex);
- 
-+	mutex_lock(&disk->open_mutex);
- 	WARN_ON_ONCE(!bdev->bd_holder);
- 
- 	holder = bd_find_holder_disk(bdev, disk);
- 	if (holder) {
-+		kobject_put(bdev->bd_holder_dir);
- 		holder->refcnt++;
- 		goto out_unlock;
- 	}
-@@ -92,11 +104,6 @@ int bd_link_disk_holder(struct block_device *bdev, struct gendisk *disk)
- 		goto out_del_symlink;
- 	list_add(&holder->list, &disk->slave_bdevs);
- 
--	/*
--	 * del_gendisk drops the initial reference to bd_holder_dir, so we need
--	 * to keep our own here to allow for cleanup past that point.
--	 */
--	kobject_get(bdev->bd_holder_dir);
- 	mutex_unlock(&disk->open_mutex);
- 	return 0;
- 
-@@ -106,6 +113,8 @@ int bd_link_disk_holder(struct block_device *bdev, struct gendisk *disk)
- 	kfree(holder);
- out_unlock:
- 	mutex_unlock(&disk->open_mutex);
-+	if (ret)
-+		kobject_put(bdev->bd_holder_dir);
- 	return ret;
- }
- EXPORT_SYMBOL_GPL(bd_link_disk_holder);
 -- 
-2.31.1
-
+Christoph Böhmwalder
+LINBIT | Keeping the Digital World Running
+DRBD HA —  Disaster Recovery — Software defined Storage
