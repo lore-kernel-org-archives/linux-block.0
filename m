@@ -2,43 +2,43 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 807C0C433FE
-	for <linux-block@archiver.kernel.org>; Tue, 15 Nov 2022 13:49:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A987C4321E
+	for <linux-block@archiver.kernel.org>; Tue, 15 Nov 2022 13:49:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238339AbiKONtn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 15 Nov 2022 08:49:43 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49708 "EHLO
+        id S230118AbiKONto (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 15 Nov 2022 08:49:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49704 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238142AbiKONth (ORCPT
+        with ESMTP id S238116AbiKONth (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Tue, 15 Nov 2022 08:49:37 -0500
 Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3864526AD1;
-        Tue, 15 Nov 2022 05:49:36 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E1760264A7;
+        Tue, 15 Nov 2022 05:49:35 -0800 (PST)
 Received: from mail02.huawei.com (unknown [172.30.67.153])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4NBSGL1hhXz4f3kJw;
-        Tue, 15 Nov 2022 21:49:30 +0800 (CST)
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4NBSGK2h05z4f3kJs;
+        Tue, 15 Nov 2022 21:49:29 +0800 (CST)
 Received: from huaweicloud.com (unknown [10.175.127.227])
-        by APP4 (Coremail) with SMTP id gCh0CgBni9jnmHNjrPFIAg--.61645S14;
-        Tue, 15 Nov 2022 21:49:33 +0800 (CST)
+        by APP4 (Coremail) with SMTP id gCh0CgBni9jnmHNjrPFIAg--.61645S12;
+        Tue, 15 Nov 2022 21:49:32 +0800 (CST)
 From:   Yu Kuai <yukuai1@huaweicloud.com>
 To:     hch@lst.de, axboe@kernel.dk, agk@redhat.com, snitzer@kernel.org,
         dm-devel@redhat.com
 Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         yukuai3@huawei.com, yukuai1@huaweicloud.com, yi.zhang@huawei.com
-Subject: [PATCH v3 10/10] block: don't allow a disk link holder to itself
-Date:   Tue, 15 Nov 2022 22:10:54 +0800
-Message-Id: <20221115141054.1051801-11-yukuai1@huaweicloud.com>
+Subject: [PATCH v3 08/10] block: fix use after free for bd_holder_dir
+Date:   Tue, 15 Nov 2022 22:10:52 +0800
+Message-Id: <20221115141054.1051801-9-yukuai1@huaweicloud.com>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20221115141054.1051801-1-yukuai1@huaweicloud.com>
 References: <20221115141054.1051801-1-yukuai1@huaweicloud.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgBni9jnmHNjrPFIAg--.61645S14
-X-Coremail-Antispam: 1UD129KBjvJXoWxXw4kCFy5Xw1kuF1fWrWDXFb_yoWrurWkpr
-        1jqr4UGr48Jr1UXF4UAr1UJr1UJrW8AF48Jr17Xr1DJF15W3WUZr1UJrWUAr15Jr4Yqr17
-        tw4DXw18tryUKaUanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUPI14x267AKxVWrJVCq3wAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+X-CM-TRANSID: gCh0CgBni9jnmHNjrPFIAg--.61645S12
+X-Coremail-Antispam: 1UD129KBjvJXoW7tr1rGFyxAFWxAFy3Ar1DKFg_yoW8KFWUpF
+        Z0gFyrKry8GrsrZrsrt347XFWjg3W8W3W8AFW29F4I9rZxArsI9r1xAFy7WF1xKrWIvF4q
+        qF1UX3yFvF10kFDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUPF14x267AKxVWrJVCq3wAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
         rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2048vs2IY020E87I2jVAFwI0_JF0E3s1l82xGYI
         kIc2x26xkF7I0E14v26ryj6s0DM28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8wA2
         z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j6F
@@ -48,10 +48,10 @@ X-Coremail-Antispam: 1UD129KBjvJXoWxXw4kCFy5Xw1kuF1fWrWDXFb_yoWrurWkpr
         M4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2
         kIc2xKxwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E
         14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIx
-        kGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVW8JVW5JwCI42IY6xIIjxv20xvEc7CjxVAF
-        wI0_Gr1j6F4UJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Gr
-        0_Cr1lIxAIcVC2z280aVCY1x0267AKxVW8Jr0_Cr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUQ
-        SdkUUUUU=
+        kGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUCVW8JwCI42IY6xIIjxv20xvEc7CjxVAF
+        wI0_Cr0_Gr1UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJV
+        W8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfUOBTY
+        UUUUU
 X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 X-CFilter-Loop: Reflected
 Precedence: bulk
@@ -60,97 +60,78 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Yu Kuai <yukuai3@huawei.com>
 
-After creating a dm device, then user can reload such dm with itself,
-and dead loop will be triggered because dm keep looking up to itself.
+Currently, the caller of bd_link_disk_holer() get 'bdev' by
+blkdev_get_by_dev(), which will look up 'bdev' by inode number 'dev'.
+Howerver, it's possible that del_gendisk() can be called currently, and
+'bd_holder_dir' can be freed before bd_link_disk_holer() access it, thus
+use after free is triggered.
 
-Test procedures:
+t1:				t2:
+bdev = blkdev_get_by_dev
+				del_gendisk
+				 kobject_put(bd_holder_dir)
+				  kobject_free()
+bd_link_disk_holder
 
-1) dmsetup create test --table "xxx sda", assume dm-0 is created
-2) dmsetup suspend test
-3) dmsetup reload test --table "xxx dm-0"
-4) dmsetup resume test
-
-Test result:
-
-BUG: TASK stack guard page was hit at 00000000736a261f (stack is 000000008d12c88d..00000000c8dd82d5)
-stack guard page: 0000 [#1] PREEMPT SMP
-CPU: 29 PID: 946 Comm: systemd-udevd Not tainted 6.1.0-rc3-next-20221101-00006-g17640ca3b0ee #1295
-Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS ?-20190727_073836-buildvm-ppc64le-16.ppc.fedoraproject.org-3.fc31 04/01/2014
-RIP: 0010:dm_prepare_ioctl+0xf/0x1e0
-Code: da 48 83 05 4a 7c 99 0b 01 41 89 c4 eb cd e8 b8 1f 40 00 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 41 57 48 83 05 a1 5a 99 0b 01 <41> 56 49 89 d6 41 55 4c 8d af 90 02 00 00 9
-RSP: 0018:ffffc90002090000 EFLAGS: 00010206
-RAX: ffff8881049d6800 RBX: ffff88817e589000 RCX: 0000000000000000
-RDX: ffffc90002090010 RSI: ffffc9000209001c RDI: ffff88817e589000
-RBP: 00000000484a101d R08: 0000000000000000 R09: 0000000000000007
-R10: 0000000000000000 R11: 0000000000000000 R12: 0000000000005331
-R13: 0000000000005331 R14: 0000000000000000 R15: 0000000000000000
-FS:  00007fddf9609200(0000) GS:ffff889fbfd40000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: ffffc9000208fff8 CR3: 0000000179043000 CR4: 00000000000006e0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- dm_blk_ioctl+0x50/0x1c0
- ? dm_prepare_ioctl+0xe0/0x1e0
- dm_blk_ioctl+0x88/0x1c0
- dm_blk_ioctl+0x88/0x1c0
- ......(a lot of same lines)
- dm_blk_ioctl+0x88/0x1c0
- dm_blk_ioctl+0x88/0x1c0
- blkdev_ioctl+0x184/0x3e0
- __x64_sys_ioctl+0xa3/0x110
- do_syscall_64+0x35/0x80
- entry_SYSCALL_64_after_hwframe+0x63/0xcd
-RIP: 0033:0x7fddf7306577
-Code: b3 66 90 48 8b 05 11 89 2c 00 64 c7 00 26 00 00 00 48 c7 c0 ff ff ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 b8 10 00 00 00 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 8b 0d e1 88 8
-RSP: 002b:00007ffd0b2ec318 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-RAX: ffffffffffffffda RBX: 00005634ef478320 RCX: 00007fddf7306577
-RDX: 0000000000000000 RSI: 0000000000005331 RDI: 0000000000000007
-RBP: 0000000000000007 R08: 00005634ef4843e0 R09: 0000000000000080
-R10: 00007fddf75cfb38 R11: 0000000000000246 R12: 00000000030d4000
-R13: 0000000000000000 R14: 0000000000000000 R15: 00005634ef48b800
- </TASK>
-Modules linked in:
----[ end trace 0000000000000000 ]---
-RIP: 0010:dm_prepare_ioctl+0xf/0x1e0
-Code: da 48 83 05 4a 7c 99 0b 01 41 89 c4 eb cd e8 b8 1f 40 00 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 41 57 48 83 05 a1 5a 99 0b 01 <41> 56 49 89 d6 41 55 4c 8d af 90 02 00 00 9
-RSP: 0018:ffffc90002090000 EFLAGS: 00010206
-RAX: ffff8881049d6800 RBX: ffff88817e589000 RCX: 0000000000000000
-RDX: ffffc90002090010 RSI: ffffc9000209001c RDI: ffff88817e589000
-RBP: 00000000484a101d R08: 0000000000000000 R09: 0000000000000007
-R10: 0000000000000000 R11: 0000000000000000 R12: 0000000000005331
-R13: 0000000000005331 R14: 0000000000000000 R15: 0000000000000000
-FS:  00007fddf9609200(0000) GS:ffff889fbfd40000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: ffffc9000208fff8 CR3: 0000000179043000 CR4: 00000000000006e0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Kernel panic - not syncing: Fatal exception in interrupt
-Kernel Offset: disabled
----[ end Kernel panic - not syncing: Fatal exception in interrupt ]---
-
-Fix the problem by forbidding a disk to create link to itself.
+Fix the problem by checking disk is still live and grabbing a reference
+to 'bd_holder_dir' first in bd_link_disk_holder().
 
 Signed-off-by: Yu Kuai <yukuai3@huawei.com>
 ---
- block/holder.c | 3 +++
- 1 file changed, 3 insertions(+)
+ block/holder.c | 21 +++++++++++++++------
+ 1 file changed, 15 insertions(+), 6 deletions(-)
 
 diff --git a/block/holder.c b/block/holder.c
-index 3332142bb867..37d18c13d958 100644
+index dd9327b43ce0..c8e462053f49 100644
 --- a/block/holder.c
 +++ b/block/holder.c
-@@ -65,6 +65,9 @@ int bd_link_disk_holder(struct block_device *bdev, struct gendisk *disk)
+@@ -65,12 +65,24 @@ int bd_link_disk_holder(struct block_device *bdev, struct gendisk *disk)
  	if (WARN_ON_ONCE(!disk->slave_dir))
  		return -EINVAL;
  
-+	if (bdev->bd_disk == disk)
-+		return -EINVAL;
-+
- 	/*
- 	 * del_gendisk drops the initial reference to bd_holder_dir, so we
- 	 * need to keep our own here to allow for cleanup past that point.
+-	mutex_lock(&disk->open_mutex);
++	/*
++	 * del_gendisk drops the initial reference to bd_holder_dir, so we
++	 * need to keep our own here to allow for cleanup past that point.
++	 */
++	mutex_lock(&bdev->bd_disk->open_mutex);
++	if (!disk_live(bdev->bd_disk)) {
++		mutex_unlock(&bdev->bd_disk->open_mutex);
++		return -ENODEV;
++	}
++	kobject_get(bdev->bd_holder_dir);
++	mutex_unlock(&bdev->bd_disk->open_mutex);
+ 
++	mutex_lock(&disk->open_mutex);
+ 	WARN_ON_ONCE(!bdev->bd_holder);
+ 
+ 	holder = bd_find_holder_disk(bdev, disk);
+ 	if (holder) {
++		kobject_put(bdev->bd_holder_dir);
+ 		holder->refcnt++;
+ 		goto out_unlock;
+ 	}
+@@ -92,11 +104,6 @@ int bd_link_disk_holder(struct block_device *bdev, struct gendisk *disk)
+ 		goto out_del_symlink;
+ 	list_add(&holder->list, &disk->slave_bdevs);
+ 
+-	/*
+-	 * del_gendisk drops the initial reference to bd_holder_dir, so we need
+-	 * to keep our own here to allow for cleanup past that point.
+-	 */
+-	kobject_get(bdev->bd_holder_dir);
+ 	mutex_unlock(&disk->open_mutex);
+ 	return 0;
+ 
+@@ -106,6 +113,8 @@ int bd_link_disk_holder(struct block_device *bdev, struct gendisk *disk)
+ 	kfree(holder);
+ out_unlock:
+ 	mutex_unlock(&disk->open_mutex);
++	if (ret)
++		kobject_put(bdev->bd_holder_dir);
+ 	return ret;
+ }
+ EXPORT_SYMBOL_GPL(bd_link_disk_holder);
 -- 
 2.31.1
 
