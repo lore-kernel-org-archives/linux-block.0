@@ -2,56 +2,56 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1052C4167B
-	for <linux-block@archiver.kernel.org>; Tue, 15 Nov 2022 13:49:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C936C4332F
+	for <linux-block@archiver.kernel.org>; Tue, 15 Nov 2022 13:49:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230369AbiKONtj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 15 Nov 2022 08:49:39 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49694 "EHLO
+        id S238313AbiKONtk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 15 Nov 2022 08:49:40 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49698 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231161AbiKONth (ORCPT
+        with ESMTP id S231163AbiKONth (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Tue, 15 Nov 2022 08:49:37 -0500
 Received: from dggsgout12.his.huawei.com (unknown [45.249.212.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A069024F10;
-        Tue, 15 Nov 2022 05:49:33 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E12424F35;
+        Tue, 15 Nov 2022 05:49:34 -0800 (PST)
 Received: from mail02.huawei.com (unknown [172.30.67.153])
-        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4NBSGH2dckz4f41hb;
-        Tue, 15 Nov 2022 21:49:27 +0800 (CST)
+        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4NBSGK0N6Sz4f41hQ;
+        Tue, 15 Nov 2022 21:49:29 +0800 (CST)
 Received: from huaweicloud.com (unknown [10.175.127.227])
-        by APP4 (Coremail) with SMTP id gCh0CgBni9jnmHNjrPFIAg--.61645S7;
-        Tue, 15 Nov 2022 21:49:30 +0800 (CST)
+        by APP4 (Coremail) with SMTP id gCh0CgBni9jnmHNjrPFIAg--.61645S11;
+        Tue, 15 Nov 2022 21:49:32 +0800 (CST)
 From:   Yu Kuai <yukuai1@huaweicloud.com>
 To:     hch@lst.de, axboe@kernel.dk, agk@redhat.com, snitzer@kernel.org,
         dm-devel@redhat.com
 Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         yukuai3@huawei.com, yukuai1@huaweicloud.com, yi.zhang@huawei.com
-Subject: [PATCH v3 03/10] dm: cleanup open_table_device
-Date:   Tue, 15 Nov 2022 22:10:47 +0800
-Message-Id: <20221115141054.1051801-4-yukuai1@huaweicloud.com>
+Subject: [PATCH v3 07/10] block: remove delayed holder registration
+Date:   Tue, 15 Nov 2022 22:10:51 +0800
+Message-Id: <20221115141054.1051801-8-yukuai1@huaweicloud.com>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20221115141054.1051801-1-yukuai1@huaweicloud.com>
 References: <20221115141054.1051801-1-yukuai1@huaweicloud.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgBni9jnmHNjrPFIAg--.61645S7
-X-Coremail-Antispam: 1UD129KBjvJXoWxWFWUJr48uF13Wry8CrWDCFg_yoW5AF1Dp3
-        W3JayYqryrGryxur4xZw429r13tw4jk3yrury3Gwn2kws8Zr9YkFW8tFyYvrykJ3y8WFy5
-        Wry7tFW8ua10gr7anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUBE14x267AKxVWrJVCq3wAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2048vs2IY020E87I2jVAFwI0_JrWl82xGYIkIc2
-        x26xkF7I0E14v26ryj6s0DM28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8wA2z4x0
-        Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j6F4UJw
-        A2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oVCq3wAS
-        0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2
-        IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0
-        Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2kIc2
-        xKxwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v2
-        6r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2
-        Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_
-        Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMI
-        IF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUd8n5UUUUU
-        =
+X-CM-TRANSID: gCh0CgBni9jnmHNjrPFIAg--.61645S11
+X-Coremail-Antispam: 1UD129KBjvJXoW3GF1DZFyUur4fZr4rGryfZwb_yoW7Zr13pF
+        W5GFWxtrW8JF4DuF4qqw47XF1Ygw1jg3WxCFWfKryI9rZxAr4v9F13Jry7XFyrtr92gF43
+        tF45XrWY9F10krJanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUPF14x267AKxVWrJVCq3wAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2048vs2IY020E87I2jVAFwI0_JF0E3s1l82xGYI
+        kIc2x26xkF7I0E14v26ryj6s0DM28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8wA2
+        z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j6F
+        4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oVCq
+        3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7
+        IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4U
+        M4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2
+        kIc2xKxwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E
+        14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIx
+        kGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUCVW8JwCI42IY6xIIjxv20xvEc7CjxVAF
+        wI0_Cr0_Gr1UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJV
+        W8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfUOBTY
+        UUUUU
 X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 X-CFilter-Loop: Reflected
 Precedence: bulk
@@ -60,108 +60,179 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Christoph Hellwig <hch@lst.de>
 
-Move all the logic for allocation the table_device and linking it into
-the list into the open_table_device.  This keeps the code tidy and
-ensures that the table_devices only exist in fully initialized state.
+Now that dm has been fixed to track of holder registrations before
+add_disk, the somewhat buggy block layer code can be safely removed.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 Signed-off-by: Yu Kuai <yukuai3@huawei.com>
 ---
- drivers/md/dm.c | 56 ++++++++++++++++++++++++-------------------------
- 1 file changed, 27 insertions(+), 29 deletions(-)
+ block/genhd.c          |  4 ---
+ block/holder.c         | 72 ++++++++++++------------------------------
+ include/linux/blkdev.h |  5 ---
+ 3 files changed, 21 insertions(+), 60 deletions(-)
 
-diff --git a/drivers/md/dm.c b/drivers/md/dm.c
-index 19d25bf997be..28d7581b6a82 100644
---- a/drivers/md/dm.c
-+++ b/drivers/md/dm.c
-@@ -732,28 +732,41 @@ static char *_dm_claim_ptr = "I belong to device-mapper";
- /*
-  * Open a table device so we can use it as a map destination.
-  */
--static int open_table_device(struct table_device *td, dev_t dev,
--			     struct mapped_device *md)
-+static struct table_device *open_table_device(struct mapped_device *md,
-+		dev_t dev, fmode_t mode)
- {
-+	struct table_device *td;
- 	struct block_device *bdev;
- 	u64 part_off;
- 	int r;
+diff --git a/block/genhd.c b/block/genhd.c
+index e9501c66ba4d..dcf200bcbd3e 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -479,10 +479,6 @@ int __must_check device_add_disk(struct device *parent, struct gendisk *disk,
+ 		goto out_put_holder_dir;
+ 	}
  
--	BUG_ON(td->dm_dev.bdev);
-+	td = kmalloc_node(sizeof(*td), GFP_KERNEL, md->numa_node_id);
-+	if (!td)
-+		return ERR_PTR(-ENOMEM);
-+	refcount_set(&td->count, 1);
- 
--	bdev = blkdev_get_by_dev(dev, td->dm_dev.mode | FMODE_EXCL, _dm_claim_ptr);
--	if (IS_ERR(bdev))
--		return PTR_ERR(bdev);
-+	bdev = blkdev_get_by_dev(dev, mode | FMODE_EXCL, _dm_claim_ptr);
-+	if (IS_ERR(bdev)) {
-+		r = PTR_ERR(bdev);
-+		goto out_free_td;
-+	}
- 
- 	r = bd_link_disk_holder(bdev, dm_disk(md));
--	if (r) {
--		blkdev_put(bdev, td->dm_dev.mode | FMODE_EXCL);
--		return r;
--	}
-+	if (r)
-+		goto out_blkdev_put;
- 
-+	td->dm_dev.mode = mode;
- 	td->dm_dev.bdev = bdev;
- 	td->dm_dev.dax_dev = fs_dax_get_by_bdev(bdev, &part_off, NULL, NULL);
--	return 0;
-+	format_dev_t(td->dm_dev.name, dev);
-+	list_add(&td->list, &md->table_devices);
-+	return td;
-+
-+out_blkdev_put:
-+	blkdev_put(bdev, mode | FMODE_EXCL);
-+out_free_td:
-+	kfree(td);
-+	return ERR_PTR(r);
+-	ret = bd_register_pending_holders(disk);
+-	if (ret < 0)
+-		goto out_put_slave_dir;
+-
+ 	ret = blk_register_queue(disk);
+ 	if (ret)
+ 		goto out_put_slave_dir;
+diff --git a/block/holder.c b/block/holder.c
+index 5283bc804cc1..dd9327b43ce0 100644
+--- a/block/holder.c
++++ b/block/holder.c
+@@ -29,19 +29,6 @@ static void del_symlink(struct kobject *from, struct kobject *to)
+ 	sysfs_remove_link(from, kobject_name(to));
  }
  
- /*
-@@ -786,31 +799,16 @@ static struct table_device *find_table_device(struct list_head *l, dev_t dev,
- int dm_get_table_device(struct mapped_device *md, dev_t dev, fmode_t mode,
- 			struct dm_dev **result)
- {
--	int r;
- 	struct table_device *td;
+-static int __link_disk_holder(struct block_device *bdev, struct gendisk *disk)
+-{
+-	int ret;
+-
+-	ret = add_symlink(disk->slave_dir, bdev_kobj(bdev));
+-	if (ret)
+-		return ret;
+-	ret = add_symlink(bdev->bd_holder_dir, &disk_to_dev(disk)->kobj);
+-	if (ret)
+-		del_symlink(disk->slave_dir, bdev_kobj(bdev));
+-	return ret;
+-}
+-
+ /**
+  * bd_link_disk_holder - create symlinks between holding disk and slave bdev
+  * @bdev: the claimed slave bdev
+@@ -75,6 +62,9 @@ int bd_link_disk_holder(struct block_device *bdev, struct gendisk *disk)
+ 	struct bd_holder_disk *holder;
+ 	int ret = 0;
  
- 	mutex_lock(&md->table_devices_lock);
- 	td = find_table_device(&md->table_devices, dev, mode);
- 	if (!td) {
--		td = kmalloc_node(sizeof(*td), GFP_KERNEL, md->numa_node_id);
--		if (!td) {
--			mutex_unlock(&md->table_devices_lock);
--			return -ENOMEM;
++	if (WARN_ON_ONCE(!disk->slave_dir))
++		return -EINVAL;
++
+ 	mutex_lock(&disk->open_mutex);
+ 
+ 	WARN_ON_ONCE(!bdev->bd_holder);
+@@ -94,34 +84,32 @@ int bd_link_disk_holder(struct block_device *bdev, struct gendisk *disk)
+ 	INIT_LIST_HEAD(&holder->list);
+ 	holder->bdev = bdev;
+ 	holder->refcnt = 1;
+-	if (disk->slave_dir) {
+-		ret = __link_disk_holder(bdev, disk);
+-		if (ret) {
+-			kfree(holder);
+-			goto out_unlock;
 -		}
+-	}
 -
--		td->dm_dev.mode = mode;
--		td->dm_dev.bdev = NULL;
++	ret = add_symlink(disk->slave_dir, bdev_kobj(bdev));
++	if (ret)
++		goto out_free_holder;
++	ret = add_symlink(bdev->bd_holder_dir, &disk_to_dev(disk)->kobj);
++	if (ret)
++		goto out_del_symlink;
+ 	list_add(&holder->list, &disk->slave_bdevs);
++
+ 	/*
+ 	 * del_gendisk drops the initial reference to bd_holder_dir, so we need
+ 	 * to keep our own here to allow for cleanup past that point.
+ 	 */
+ 	kobject_get(bdev->bd_holder_dir);
++	mutex_unlock(&disk->open_mutex);
++	return 0;
+ 
++out_del_symlink:
++	del_symlink(disk->slave_dir, bdev_kobj(bdev));
++out_free_holder:
++	kfree(holder);
+ out_unlock:
+ 	mutex_unlock(&disk->open_mutex);
+ 	return ret;
+ }
+ EXPORT_SYMBOL_GPL(bd_link_disk_holder);
+ 
+-static void __unlink_disk_holder(struct block_device *bdev,
+-		struct gendisk *disk)
+-{
+-	del_symlink(disk->slave_dir, bdev_kobj(bdev));
+-	del_symlink(bdev->bd_holder_dir, &disk_to_dev(disk)->kobj);
+-}
 -
--		if ((r = open_table_device(td, dev, md))) {
-+		td = open_table_device(md, dev, mode);
-+		if (IS_ERR(td)) {
- 			mutex_unlock(&md->table_devices_lock);
--			kfree(td);
--			return r;
-+			return PTR_ERR(td);
- 		}
+ /**
+  * bd_unlink_disk_holder - destroy symlinks created by bd_link_disk_holder()
+  * @bdev: the calimed slave bdev
+@@ -136,11 +124,14 @@ void bd_unlink_disk_holder(struct block_device *bdev, struct gendisk *disk)
+ {
+ 	struct bd_holder_disk *holder;
+ 
++	if (WARN_ON_ONCE(!disk->slave_dir))
++		return;
++
+ 	mutex_lock(&disk->open_mutex);
+ 	holder = bd_find_holder_disk(bdev, disk);
+ 	if (!WARN_ON_ONCE(holder == NULL) && !--holder->refcnt) {
+-		if (disk->slave_dir)
+-			__unlink_disk_holder(bdev, disk);
++		del_symlink(disk->slave_dir, bdev_kobj(bdev));
++		del_symlink(bdev->bd_holder_dir, &disk_to_dev(disk)->kobj);
+ 		kobject_put(bdev->bd_holder_dir);
+ 		list_del_init(&holder->list);
+ 		kfree(holder);
+@@ -148,24 +139,3 @@ void bd_unlink_disk_holder(struct block_device *bdev, struct gendisk *disk)
+ 	mutex_unlock(&disk->open_mutex);
+ }
+ EXPORT_SYMBOL_GPL(bd_unlink_disk_holder);
 -
--		format_dev_t(td->dm_dev.name, dev);
+-int bd_register_pending_holders(struct gendisk *disk)
+-{
+-	struct bd_holder_disk *holder;
+-	int ret;
 -
--		refcount_set(&td->count, 1);
--		list_add(&td->list, &md->table_devices);
- 	} else {
- 		refcount_inc(&td->count);
- 	}
+-	mutex_lock(&disk->open_mutex);
+-	list_for_each_entry(holder, &disk->slave_bdevs, list) {
+-		ret = __link_disk_holder(holder->bdev, disk);
+-		if (ret)
+-			goto out_undo;
+-	}
+-	mutex_unlock(&disk->open_mutex);
+-	return 0;
+-
+-out_undo:
+-	list_for_each_entry_continue_reverse(holder, &disk->slave_bdevs, list)
+-		__unlink_disk_holder(holder->bdev, disk);
+-	mutex_unlock(&disk->open_mutex);
+-	return ret;
+-}
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 9188aa3f6259..516e45246868 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -833,7 +833,6 @@ void set_capacity(struct gendisk *disk, sector_t size);
+ #ifdef CONFIG_BLOCK_HOLDER_DEPRECATED
+ int bd_link_disk_holder(struct block_device *bdev, struct gendisk *disk);
+ void bd_unlink_disk_holder(struct block_device *bdev, struct gendisk *disk);
+-int bd_register_pending_holders(struct gendisk *disk);
+ #else
+ static inline int bd_link_disk_holder(struct block_device *bdev,
+ 				      struct gendisk *disk)
+@@ -844,10 +843,6 @@ static inline void bd_unlink_disk_holder(struct block_device *bdev,
+ 					 struct gendisk *disk)
+ {
+ }
+-static inline int bd_register_pending_holders(struct gendisk *disk)
+-{
+-	return 0;
+-}
+ #endif /* CONFIG_BLOCK_HOLDER_DEPRECATED */
+ 
+ dev_t part_devt(struct gendisk *disk, u8 partno);
 -- 
 2.31.1
 
