@@ -2,203 +2,142 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 604D2C4332F
-	for <linux-block@archiver.kernel.org>; Tue, 15 Nov 2022 03:49:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 29C5FC433FE
+	for <linux-block@archiver.kernel.org>; Tue, 15 Nov 2022 03:49:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235613AbiKODtA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 14 Nov 2022 22:49:00 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40692 "EHLO
+        id S232314AbiKODtk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 14 Nov 2022 22:49:40 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40834 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232129AbiKODs7 (ORCPT
+        with ESMTP id S232129AbiKODtj (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 14 Nov 2022 22:48:59 -0500
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2050.outbound.protection.outlook.com [40.107.92.50])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1F16838AC
-        for <linux-block@vger.kernel.org>; Mon, 14 Nov 2022 19:48:58 -0800 (PST)
+        Mon, 14 Nov 2022 22:49:39 -0500
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2045.outbound.protection.outlook.com [40.107.94.45])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C437EE1B;
+        Mon, 14 Nov 2022 19:49:38 -0800 (PST)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=nY/jZtYVLVxDPa1QCzX8xgV46DMRKkaGlrMkYQYD3gfou7lOVidBuFWNBlgYabbtOGSrofM1QkyDa1apwoW1arLKxWl4bsmmrQ9e+Eh7veevAN4uk9DnFigET5k9X6eMMaJEUuHL4isQdFzDlp46ErD6wnslDtsHtnvJvvWSsHMzegN0Iorz/18Fl7qzOG1SQRUtaqkb0pFZBmF84tQ/cNSSa+D5CVnCVer9T9htwBwdwYhxjSHLuqe8lSOuNxHfVLT0vy7LhPnFQ2PM/9l6CI4c5KPnKOlQYqwc8KdyoE2/Ml9NJN5YGgWOmme1S45k7qJCaVT5xfdjT6+8ofjmXQ==
+ b=djlGHK1p+J8dQ0qfp95Ws9BjU4xqH8BGAKOyt2M/BBwwOFCcOh9x5VupCkZowxERPE1PxCRVPnCYjpG+g1dU1P5TgF1DEID7+zxNcBmgkX1oz7YG3+0MbefRqTtQeL+i2oGK9TI8k4OMwgNmje/v+FIt2SJjVEMCN9kESHTROYmOh1gbGWqwhHpQlO97ttFn1HBZtxj5n7M6b5auk03//kFbsLbE/+X0UGm5OPTcXdUl1cStgdtnT5CtnRLiuawE+JHNZAdEDdyQTVsD0sICJRPEcNaglf/sHOUUKbWxBeBsb8DM368Pxy+8E02Zg2dTARFFCYTYzVSRALna2wnxwg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=4BWOIgHkSL7mPUwk6cyqC54bOj3z+S/B8bI4nF3ByqQ=;
- b=mx7KcwVZE/+cAbuTFH08u53t4jzm7owNI70xBf1iGgax5S+aorOev1hoFc/C51ZJqLi7v00+Yp/V4Og5NL1L+A5OIETL5lVaVfxF1gO25mdjFcFI4+sySQ+2eRNa5ucLM9cUW1qXN3v64iTAU41g+3dtuDMstsV44YO8RaZJpZkxDlqMpxIwKXpETVOkJ5v+E5HPaJuGeZBbVE03zKArFJyoQXgmTaQl2vIfHv2uWQk0zzXUnri0OfH9RSZMf5oh3dEzy8NeJLOljHdibePoWhTzFCCPoq8dyATssrB/4pr98Rp15GcYhlXzFx22Tb5sRu3UnXfWaglThUwryTz2RA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none
+ bh=wS9B7wxuAhQoIv4S2JclC3+9m6hWPeiEx1kqOdLWZxk=;
+ b=OzOYSvR6Nw1wvDmlFd4R65w71oyHfuDjJXPm0eZRNA/cDE3oTIMYBDet6/hC1F5jAVJFXedu5HiBVSYgn0lQYV/SITdW3v6DfD0wwBF0SMwlEfNEIqHW2zsUGXytNudFwXIKnDYE+DZwQhv6YCN/GjA92/eFNOOb3lPBkNcR4U2vEZILDc/UdzTcDbtgRIzgec19NjNTmxeoGOgeWU2n2g16jc0Qn+IE+Ap8jKKF5iT2DtCq3AZ+CH9tH+SAq3k+4kSMueTiXIjr5jTB0eZQaYWfRf3tin8n7EYA0tnHGk2WeuRbwt8T1wnJvEkbUkNprvSaDOaObTAvLfksn5XVzg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=4BWOIgHkSL7mPUwk6cyqC54bOj3z+S/B8bI4nF3ByqQ=;
- b=JHqaSyqbfJDkZv+EeYtjd7icna9xJBsd+6WTsxk7vulZk7OLlEpF5fhOyo08R4W6DKJCDAaqJu5TiVWgYhY6tdA6eQLMM1orSvxrIr/IixGAv/N8wI5XYQ0CaXK7M1/+Jvr0jAT3H6d8uB4mBrxz9OLcb9mdRap3EKI1hNsSkJWNN4dC2pCZOS+J+q2IZAhsvWf8QDuUJAg9poDNVCpanxdK66lq4W7jPOwS+SUK8IIeq9rtTC0ahzXWcVikkMsM5FRUf8dlbSK/IIJp+AlO/zxclXU1EKHECoCBIEn6EaEubqX47tPGXLrmdTvFODlY/Sd4hgIxKUG5h4vq/2uCOw==
-Received: from DS7PR05CA0064.namprd05.prod.outlook.com (2603:10b6:8:57::26) by
- BY5PR12MB4099.namprd12.prod.outlook.com (2603:10b6:a03:20f::21) with
+ bh=wS9B7wxuAhQoIv4S2JclC3+9m6hWPeiEx1kqOdLWZxk=;
+ b=FrbfALLk7zE7umyuHCO7ZDB/jpyxij1lPSsC65XOzL3cw3zihZqBdvXycm5TQAOv06tYNHhA/RwWUg9MumvoYU0jaoTieXELnufQZDN8SFUioeffq/9KywQd+DCG6CjtnzQ0TzyL+SLdzheRHrpriYZ6JEAyHRZzb6tRfCRl6B/zE4bFroouQhnrFm/752L3V2t1iW5yiqFYgBY9uG9c8+CJchxUV5vjAIsL7hFVVg98Xymvk2QqaFkzawcwFjUlUEChkmJujRKT5QzB8hoWHiySDrHeeFbJH5jXQg3zEOVYXsOHCghGpmnrJJkgPx6eeLhn4o0G9GuPcW5685ujQA==
+Received: from MW2PR12MB4667.namprd12.prod.outlook.com (2603:10b6:302:12::28)
+ by CY5PR12MB6600.namprd12.prod.outlook.com (2603:10b6:930:40::13) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5813.17; Tue, 15 Nov
- 2022 03:48:56 +0000
-Received: from DM6NAM11FT084.eop-nam11.prod.protection.outlook.com
- (2603:10b6:8:57:cafe::58) by DS7PR05CA0064.outlook.office365.com
- (2603:10b6:8:57::26) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5813.8 via Frontend
- Transport; Tue, 15 Nov 2022 03:48:55 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- DM6NAM11FT084.mail.protection.outlook.com (10.13.172.132) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.5813.12 via Frontend Transport; Tue, 15 Nov 2022 03:48:55 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.36; Mon, 14 Nov
- 2022 19:48:46 -0800
-Received: from dev.nvidia.com (10.126.231.35) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.36; Mon, 14 Nov
- 2022 19:48:46 -0800
-From:   Chaitanya Kulkarni <kch@nvidia.com>
-To:     <linux-block@vger.kernel.org>
-CC:     <axboe@kernel.dk>, <vincent.fu@samsung.com>,
-        <damien.lemoal@opensource.wdc.com>,
-        Chaitanya Kulkarni <kch@nvidia.com>
-Subject: [PATCH V3] null-blk: allow REQ_OP_ZONE_RESET_ALL to configure
-Date:   Mon, 14 Nov 2022 19:48:34 -0800
-Message-ID: <20221115034834.44142-1-kch@nvidia.com>
-X-Mailer: git-send-email 2.29.0
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5813.14; Tue, 15 Nov
+ 2022 03:49:36 +0000
+Received: from MW2PR12MB4667.namprd12.prod.outlook.com
+ ([fe80::eaf1:9be8:d472:ea57]) by MW2PR12MB4667.namprd12.prod.outlook.com
+ ([fe80::eaf1:9be8:d472:ea57%7]) with mapi id 15.20.5813.017; Tue, 15 Nov 2022
+ 03:49:35 +0000
+From:   Chaitanya Kulkarni <chaitanyak@nvidia.com>
+To:     Bart Van Assche <bvanassche@acm.org>,
+        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+CC:     "axboe@kernel.dk" <axboe@kernel.dk>,
+        "damien.lemoal@opensource.wdc.com" <damien.lemoal@opensource.wdc.com>,
+        "johannes.thumshirn@wdc.com" <johannes.thumshirn@wdc.com>,
+        "ming.lei@redhat.com" <ming.lei@redhat.com>,
+        "shinichiro.kawasaki@wdc.com" <shinichiro.kawasaki@wdc.com>,
+        "vincent.fu@samsung.com" <vincent.fu@samsung.com>,
+        "yukuai3@huawei.com" <yukuai3@huawei.com>
+Subject: Re: [PATCH V2 4/7] null_blk: don't use magic numbers in the code
+Thread-Topic: [PATCH V2 4/7] null_blk: don't use magic numbers in the code
+Thread-Index: AQHY2TJ1xH49Ed40BkazSiu/xoMjeK4/Y00AgAA024A=
+Date:   Tue, 15 Nov 2022 03:49:35 +0000
+Message-ID: <f563e7d4-6409-5571-9cba-045c1e42d5f9@nvidia.com>
+References: <20221006031829.37741-1-kch@nvidia.com>
+ <20221006031829.37741-5-kch@nvidia.com>
+ <475fba10-c471-4922-91d5-3b84c4cce149@acm.org>
+In-Reply-To: <475fba10-c471-4922-91d5-3b84c4cce149@acm.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+user-agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.9.0
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: MW2PR12MB4667:EE_|CY5PR12MB6600:EE_
+x-ms-office365-filtering-correlation-id: 5efeb463-67f2-474e-df24-08dac6bc69da
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: /x7JL6bGh0Sf6UYwlbZOunYgw4shZiVCKYoAB9EasSIJXDymeP7dDQV4E+anz72Ae1rcF4MHa/ZVOOeGjAG/z3I4wAF+ezeYw/n95NaEw6qMHKjY75Gq+w4scIMV3Q9to9IBUw5k9d7aeye9DTWEA0MY4oixFxO5gyvQUqFso9UXYqel0bYtCPCTJbtY3+sPlWWLZvt/BiX+fR8JoYrT0/YcuxM016jD0ooRbyYcEVQOvZ6brO3qmc7z/InW5xJPPD5Tmr1To3rwlcryFMREqFr2eemws5uj1BNCQi0QPT4JxCUjAh8dKUyBNwlxhKs+HIiFa0/ZfWWK7lU/qQ+fP8qcYJ1oy+3zfsJ5a1xuCvA+qNAIK+jJlddlodNqDIggvTPyVm7wQCG8ME/nEhluyvQf3K5zQspEZ0f+fcqM7iWCbWl8IzqZVRIAYTwWdktPMKZZebFxONMemmw6DnVi2jGbqooGIZX3XbrNG0itIPnIbJfdcd8oQGDrVO0xMlwhjS4lkkVBvRChNGxTNfa4CmvPBLyr9SwrVA+Te3QkfyC/2yo3tUKaBKYypmRTitM9CZzLybHwtQkVZp9B6N4EEdpNrC7ORMQZc6Jw81qj1pGOikf5ygjrELA1FEu6bA/C9Or5z2c/mhyNYsl2gTggIY/Hp9tbS7ZJvmewSSuYwjR7ukzzB9OzzXKV9qw86CxsdJN/YrX8+Yh23drIXM7tD2/XNM+BAV8kJapg8FPpY/cxI61WbH29+hzvwN9dIXnmMBAxDa6Hol9lXqvbKYUD6OYfgb/CqqbhRCWAWK3jffMpqHgwc9YR644lEU9DF8Uiz45NITr4zOWDfBbRpPLnJw==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW2PR12MB4667.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(39860400002)(376002)(366004)(136003)(346002)(396003)(451199015)(31696002)(86362001)(66446008)(38070700005)(2906002)(4744005)(38100700002)(8936002)(4326008)(7416002)(53546011)(316002)(66476007)(66556008)(64756008)(122000001)(41300700001)(5660300002)(8676002)(66946007)(76116006)(6512007)(71200400001)(6506007)(186003)(110136005)(6486002)(478600001)(2616005)(36756003)(54906003)(91956017)(31686004)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?NHFCR0tuZ3A1dlJTOHB2SzZhc3d6MG42QW5vSzhBd3NwcXdvWlBpVlc5L0p1?=
+ =?utf-8?B?ckVVRys1ZVBUVEN3eDdZMVVXTnNVVmh3OGwxUG5tcHV1VnpXRy9nMmc0VEhm?=
+ =?utf-8?B?TXM3bVR2aXZkVzRTM2U3bit4c0JBSW14a2JwemgvM3RJeVJLc2Q0T3NVNEZ2?=
+ =?utf-8?B?VnlRdkFjS2FPTWFBejR4aFVod3JPeFpJNG1kZjBTUFhPSjhCZTNnZWV4VDlU?=
+ =?utf-8?B?QXdwMHAzdTBFSGpVWXByRFBBYWduTVRrTFhNV1BzcEZEYVJjRE1DVWtkUGls?=
+ =?utf-8?B?bkJaWlNMbDlRay83V0NMYWpXdzYxc3VNT2ZBL2tJTUFtZjJxcDMvTW5OWUhp?=
+ =?utf-8?B?dlA1clNiZVRNVkRpanBFaURyZldUYS8wRDEzbXVYSm5tbWFZdkhqTlVtaUN5?=
+ =?utf-8?B?TjFsajRzUlNKRjZ4WGNoYnRETjBSc1pCdERFQlBEMEROMllFbDN1TlJsUUVW?=
+ =?utf-8?B?K3hSNUZPdXNIL01CSW1ubnNKV0N2YnAxWm1tV0c0WHdML0V4S3JXQW0zdzJU?=
+ =?utf-8?B?N2ROWEJJY1VacnZKNlBoeW1KalFhZEx0bmVVY0VYN282U1IxQWNwTXlJSXVS?=
+ =?utf-8?B?eFBwUE1kTG05cWNXQ1ZEaC9LYS95U1ZSQzl0ZUhWWlZmaFYzRnFVdGRYb1gr?=
+ =?utf-8?B?S3dWYmh1UmV6T3BHRWRMNHNTUFFXaUpYaWNnSlVFdHdTVWNxVklBNm9Fbk5j?=
+ =?utf-8?B?RGlrSjdrcytwaHdTS2F0SFphTzRwb25pSi9tRkgzaTBYYWNWNENiMVZSNzVq?=
+ =?utf-8?B?NWtSSFYrR3JQOGJPSVpaSnQ3UCszWDJUMEJPRXlFUnJIdCtkdWRHSzk0R0xX?=
+ =?utf-8?B?Z2ZEbDQ4UDFuMG9ReTFvWHoxZFR4SmZ2MFdhb2tzUTd2N2tGcEcycGh0QThx?=
+ =?utf-8?B?K0V2Q1AxckVGLzdLamwzZU56WGExbmhXWC9tdHN0TFA4d2xJSTdrU0tFK285?=
+ =?utf-8?B?Z2lDNHZ6OFV3alZDc3Jucm0vVGlaeE52WHh4ZXQrMkFaTGVOM2g4eDVBODZy?=
+ =?utf-8?B?YndjZThGd1V6Vk1SRndPVGhWd2xUQXduaWVRRG5ydGVoWDNQNE16OWZZbjVY?=
+ =?utf-8?B?UVUxYmd4OVNsZnNrSDAyeEFzUGYzN1Fva1NYYUhDcUVJUVhaMkl0YWhuWVd1?=
+ =?utf-8?B?QThYdlFVYkJ2c1grVVRhanh5dDBIb0RvMkJPb05rREtaRU1NcFQxZTUyR2t1?=
+ =?utf-8?B?ZjZnaHljQkpPcU5rL0t6cVR2MFZqejNpck1XbXBMZjV3bkdROXJ1VU5KSjBF?=
+ =?utf-8?B?RURKYWNJRzRZN2c1QTNHeFF0cEZyMlBDSUsvcThxR2VqYWt0Y2NSbCtPVnEz?=
+ =?utf-8?B?bE9PcFZmWE8rSmppWi9UWjRPemMxeFY4bU5pSUFvV0lONzRCWGJPLytnTkQr?=
+ =?utf-8?B?SXZYK0JRRTd6VGtGRXZGYzN3anpWbmpkUVJBVkt1R2g5K0FxWDFvWjd2UUJP?=
+ =?utf-8?B?eENIZEhISUVqbHpOM29PTWFpSERnTTZaM3owc1d3Ym5MMklKZ280ZmVuMXRC?=
+ =?utf-8?B?RWxpWmU2M1RJREVNYWllbU9NV0RQeEhOQkVUeVZmbERXTmRSNlkyV0pKckFK?=
+ =?utf-8?B?bDVFZWpyYi9DaXBOVEVsTXQvaXVteG9JRllOVUd3TEQya2dnQzJmdHpUbjFm?=
+ =?utf-8?B?Y3R4REhNaXB3NjRrSHRMbE1mOENvUmhIM2NHZTNsZG5hbitINzd4OVZtNVl2?=
+ =?utf-8?B?Q2NJTnFxWnFnZnFmUHkrRnh6YTFZVXZyMFBXRlJscUJDT0JLK2IvbkJjcWY1?=
+ =?utf-8?B?Qm16dlovNU5CU21vLzFyRHlMLzdzb01IOGwrbFFpR05xQ2grUUYzczNVTzF4?=
+ =?utf-8?B?SFZIZ0ZiTVRtbEFlS2EvV3hSdzl3NlBDczQ3TTdGQVY2NnQraUlTTTJua3RW?=
+ =?utf-8?B?Y3NRV2pBeGR4OFdaTGwrNnJqdk5KTlhNWUVXZ29TNExHcXBlRmxIZ0hNOHZM?=
+ =?utf-8?B?MTlFTUlNU01YdTJPT0hLZ3M5ZXBzS00yRXhMVTlpL3VwMGI2bWpIRjhWbnJS?=
+ =?utf-8?B?N3dHRXZJTk5aZDd4SFoyUWZtRzIzYnpESitaN0tLRTJ0a3ZyWlNsL3NRM3lq?=
+ =?utf-8?B?ZlE3UytjU1M3dE82ZnJmTkU5VGJXdkNjMS9QTWM4bFZ3SzVVNnpwbjhZYWRp?=
+ =?utf-8?B?bzlsOVdla2M0VTlvMUhrZXRVOFlVUEpOMis0Umt5bFkxbkdacVlMSEErcytP?=
+ =?utf-8?Q?jdZGp5fBHnBpZwi5HdWfhmxnChM9NRLGqAbBTUoAH9qL?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <626836767FBCF747A9A1671CB63EEC4D@namprd12.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.126.231.35]
-X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6NAM11FT084:EE_|BY5PR12MB4099:EE_
-X-MS-Office365-Filtering-Correlation-Id: 75db5e1b-b7ba-4691-74b5-08dac6bc5211
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: I+k0EnxGHG1GKxY626LPkbHOgZ10RTXELN14hZQRbJabn5IroasjqfODKMCabPfDPO0G2dG3fOC0N9J38K4RUrW7IzguSQxYO4yiTADN23jW1wN+yL5Xs6s3AQTtBm75T00+T4alyRpXD/JnF3gOlPk8JpuT4RZCXngcKVqS9ZXGLpUMAId/XhveNI3XocMBcyvkdSi2aDGw5AuqqVcbBOQsheRWiGt38fXUDbAM6eWmF4zeSH84AV1XNjf73kqh6hGoSI+F2oEezcsjz95XneHt0mbZKGChdmBb1p92o91NSAQIy3bNS3DVJnnbp0otaEpuy3Ejt/gMGziYIvPxsPO6qG09OnuZwkeQuTfRSJQmC4b61KTIDQDXDNkS8l+pagvsh36L0SN8fkbqlrgUQa6HG1S6pLWXo5ceLAv9MyYMo8Bt3v0s07KpdoEB2jt+gTdZ1qPUkMBpnLs0L2IepTf0IMBcy6Yta2yLgjunSg3PI+1MBXv3AKprxoT9ZLbhabrnMHMqgU6o4skEgZaZnSRZh1JK4gQbgkdDNxUW9PZ5eis/MbPZivljL7YgbhSEe02vHLOgvbKvVPSakasXeF/fhkfWjRlcvFn0VtWfDRDp3csYpR9dqw11VrFzyMslbh2wAj5Q6WM/YgFLLgpBe/KsPh1VolFXtNo3u3S0ERGzxg/tABCGbXwe7m9e3j4rrZa6xBMw6jXNSYrXJW4u7+2JGbBJ+Za3K46pDoA8rYs3SZlRynaPlcjYPJpOlpc6Y08i9DNbj7EZRyZ1WgqYuQ==
-X-Forefront-Antispam-Report: CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230022)(4636009)(376002)(346002)(136003)(39860400002)(396003)(451199015)(46966006)(36840700001)(40470700004)(426003)(6916009)(54906003)(316002)(36860700001)(7696005)(40460700003)(2906002)(83380400001)(41300700001)(186003)(8936002)(16526019)(5660300002)(36756003)(47076005)(1076003)(40480700001)(70206006)(8676002)(336012)(4326008)(26005)(70586007)(478600001)(82310400005)(107886003)(82740400003)(6666004)(2616005)(356005)(7636003);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Nov 2022 03:48:55.7967
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: MW2PR12MB4667.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5efeb463-67f2-474e-df24-08dac6bc69da
+X-MS-Exchange-CrossTenant-originalarrivaltime: 15 Nov 2022 03:49:35.8136
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 75db5e1b-b7ba-4691-74b5-08dac6bc5211
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT084.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR12MB4099
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: xGfken+Ft0SiwXTMcm0IZBEQKdhft1JFjqH6I8lw6qWQD+Hn/WAUWH+j+vGER0Pct+sGcYhCEUcJLYiZAvE/Kw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY5PR12MB6600
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-For a Zoned Block Device zone reset all is emulated if underlaying
-device doesn't support REQ_OP_ZONE_RESET_ALL operation. In null_blk
-Zoned mode there is no way to test zone reset all emulation present in
-the block layer since we enable it by default :-
-
-blkdev_zone_mgmt()
- blkdev_zone_reset_all_emulation() <---
- blkdev_zone_reset_all()
-
-Add a module parameter zone_reset_all to enable or disable
-REQ_OP_ZONE_RESET_ALL, enable it by default to retain the existing
-behaviour.
-
-Signed-off-by: Chaitanya Kulkarni <kch@nvidia.com>
----
-v2->v3:-
-
-Update the string in memb_group_features_show() with zone_reset_all.
-
-v1->v2:-
-
-Add configfs parameter to set the zone reset all.
-
- drivers/block/null_blk/main.c     | 9 ++++++++-
- drivers/block/null_blk/null_blk.h | 1 +
- drivers/block/null_blk/zoned.c    | 3 ++-
- 3 files changed, 11 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
-index 8b7f42024f14..5dc69f42b46c 100644
---- a/drivers/block/null_blk/main.c
-+++ b/drivers/block/null_blk/main.c
-@@ -260,6 +260,10 @@ static unsigned int g_zone_max_active;
- module_param_named(zone_max_active, g_zone_max_active, uint, 0444);
- MODULE_PARM_DESC(zone_max_active, "Maximum number of active zones when block device is zoned. Default: 0 (no limit)");
- 
-+static bool g_zone_reset_all = true;
-+module_param_named(zone_reset_all, g_zone_reset_all, bool, 0444);
-+MODULE_PARM_DESC(zone_reset_all, "Allow REQ_OP_ZONE_RESET_ALL. Default: true");
-+
- static struct nullb_device *null_alloc_dev(void);
- static void null_free_dev(struct nullb_device *dev);
- static void null_del_dev(struct nullb *nullb);
-@@ -446,6 +450,7 @@ NULLB_DEVICE_ATTR(zone_capacity, ulong, NULL);
- NULLB_DEVICE_ATTR(zone_nr_conv, uint, NULL);
- NULLB_DEVICE_ATTR(zone_max_open, uint, NULL);
- NULLB_DEVICE_ATTR(zone_max_active, uint, NULL);
-+NULLB_DEVICE_ATTR(zone_reset_all, bool, NULL);
- NULLB_DEVICE_ATTR(virt_boundary, bool, NULL);
- NULLB_DEVICE_ATTR(no_sched, bool, NULL);
- NULLB_DEVICE_ATTR(shared_tag_bitmap, bool, NULL);
-@@ -574,6 +579,7 @@ static struct configfs_attribute *nullb_device_attrs[] = {
- 	&nullb_device_attr_zone_nr_conv,
- 	&nullb_device_attr_zone_max_open,
- 	&nullb_device_attr_zone_max_active,
-+	&nullb_device_attr_zone_reset_all,
- 	&nullb_device_attr_virt_boundary,
- 	&nullb_device_attr_no_sched,
- 	&nullb_device_attr_shared_tag_bitmap,
-@@ -639,7 +645,7 @@ static ssize_t memb_group_features_show(struct config_item *item, char *page)
- 			"poll_queues,power,queue_mode,shared_tag_bitmap,size,"
- 			"submit_queues,use_per_node_hctx,virt_boundary,zoned,"
- 			"zone_capacity,zone_max_active,zone_max_open,"
--			"zone_nr_conv,zone_size,write_zeroes\n");
-+			"zone_nr_conv,zone_size,zone_reset_all,write_zeroes\n");
- }
- 
- CONFIGFS_ATTR_RO(memb_group_, features);
-@@ -715,6 +721,7 @@ static struct nullb_device *null_alloc_dev(void)
- 	dev->zone_nr_conv = g_zone_nr_conv;
- 	dev->zone_max_open = g_zone_max_open;
- 	dev->zone_max_active = g_zone_max_active;
-+	dev->zone_reset_all = g_zone_reset_all;
- 	dev->virt_boundary = g_virt_boundary;
- 	dev->no_sched = g_no_sched;
- 	dev->shared_tag_bitmap = g_shared_tag_bitmap;
-diff --git a/drivers/block/null_blk/null_blk.h b/drivers/block/null_blk/null_blk.h
-index e692c2a7369e..e7efe8de4ebf 100644
---- a/drivers/block/null_blk/null_blk.h
-+++ b/drivers/block/null_blk/null_blk.h
-@@ -115,6 +115,7 @@ struct nullb_device {
- 	bool discard; /* if support discard */
- 	bool write_zeroes; /* if support write_zeroes */
- 	bool zoned; /* if device is zoned */
-+	bool zone_reset_all; /* if support REQ_OP_ZONE_RESET_ALL */
- 	bool virt_boundary; /* virtual boundary on/off for the device */
- 	bool no_sched; /* no IO scheduler for the device */
- 	bool shared_tag_bitmap; /* use hostwide shared tags */
-diff --git a/drivers/block/null_blk/zoned.c b/drivers/block/null_blk/zoned.c
-index 55a69e48ef8b..7310d1c3f9ec 100644
---- a/drivers/block/null_blk/zoned.c
-+++ b/drivers/block/null_blk/zoned.c
-@@ -160,7 +160,8 @@ int null_register_zoned_dev(struct nullb *nullb)
- 	struct request_queue *q = nullb->q;
- 
- 	disk_set_zoned(nullb->disk, BLK_ZONED_HM);
--	blk_queue_flag_set(QUEUE_FLAG_ZONE_RESETALL, q);
-+	if (dev->zone_reset_all)
-+		blk_queue_flag_set(QUEUE_FLAG_ZONE_RESETALL, q);
- 	blk_queue_required_elevator_features(q, ELEVATOR_F_ZBD_SEQ_WRITE);
- 
- 	if (queue_is_mq(q)) {
--- 
-2.29.0
-
+T24gMTEvMTQvMjIgMTY6NDAsIEJhcnQgVmFuIEFzc2NoZSB3cm90ZToNCj4gT24gMTAvNS8yMiAy
+MDoxOCwgQ2hhaXRhbnlhIEt1bGthcm5pIHdyb3RlOg0KPj4gSW5zdGVhc2Qgb2YgdXNpbmcgdGhl
+IGhhcmRjb2RlZCB2YWx1ZSB1c2UgbWVhbmluZ2Z1bCBtYWNybyBmb3IgdGFnDQo+IA0KPiBJbnN0
+ZWFzZCAtPiBJbnN0ZWFkPw0KPiANCj4+IGF2YWlsYWJsZSB2YWx1ZSBvZiAtMVUgaW4gZ2V0X3Rh
+ZygpIGFuZCBfX2FsbG9jX2NtZCgpLg0KPj4NCj4+IFdoaWxlIGF0IGl0IHJldHVybiBlYXJseSBv
+biBlcnJvciB0byBnZXQgcmlkIG9mIHRoZSBleHRyYSBpbmRlbnRhdGlvbg0KPj4gaW4gX19hbGxv
+Y19jbWQoKS4NCj4gDQo+IFRoYW5rcywNCj4gDQo+IEJhcnQuDQo+IA0KDQp0aGFua3MgZm9yIHlv
+dXIgY29tbWVudCBCYXJ0LCBJJ2xsIHNlbmQgb3V0IFYzIHdpdGggZml4ZXMuLg0KDQotY2sNCg0K
