@@ -2,43 +2,43 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 80C64C43217
-	for <linux-block@archiver.kernel.org>; Tue, 15 Nov 2022 13:49:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5983C4332F
+	for <linux-block@archiver.kernel.org>; Tue, 15 Nov 2022 13:49:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238119AbiKONtl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 15 Nov 2022 08:49:41 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49700 "EHLO
+        id S238477AbiKONtm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 15 Nov 2022 08:49:42 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49702 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232817AbiKONth (ORCPT
+        with ESMTP id S237946AbiKONth (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Tue, 15 Nov 2022 08:49:37 -0500
 Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4218525E82;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D68CB25E9D;
         Tue, 15 Nov 2022 05:49:35 -0800 (PST)
 Received: from mail02.huawei.com (unknown [172.30.67.153])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4NBSGJ15WDz4f3k6c;
-        Tue, 15 Nov 2022 21:49:28 +0800 (CST)
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4NBSGK5khYz4f3vf7;
+        Tue, 15 Nov 2022 21:49:29 +0800 (CST)
 Received: from huaweicloud.com (unknown [10.175.127.227])
-        by APP4 (Coremail) with SMTP id gCh0CgBni9jnmHNjrPFIAg--.61645S9;
-        Tue, 15 Nov 2022 21:49:31 +0800 (CST)
+        by APP4 (Coremail) with SMTP id gCh0CgBni9jnmHNjrPFIAg--.61645S13;
+        Tue, 15 Nov 2022 21:49:32 +0800 (CST)
 From:   Yu Kuai <yukuai1@huaweicloud.com>
 To:     hch@lst.de, axboe@kernel.dk, agk@redhat.com, snitzer@kernel.org,
         dm-devel@redhat.com
 Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         yukuai3@huawei.com, yukuai1@huaweicloud.com, yi.zhang@huawei.com
-Subject: [PATCH RFC v3 05/10] dm: make sure create and remove dm device won't race with open and close table
-Date:   Tue, 15 Nov 2022 22:10:49 +0800
-Message-Id: <20221115141054.1051801-6-yukuai1@huaweicloud.com>
+Subject: [PATCH v3 09/10] block: store the holder kobject in bd_holder_disk
+Date:   Tue, 15 Nov 2022 22:10:53 +0800
+Message-Id: <20221115141054.1051801-10-yukuai1@huaweicloud.com>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20221115141054.1051801-1-yukuai1@huaweicloud.com>
 References: <20221115141054.1051801-1-yukuai1@huaweicloud.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgBni9jnmHNjrPFIAg--.61645S9
-X-Coremail-Antispam: 1UD129KBjvJXoW7Zw43tFWkKF1ftF4rCr18AFb_yoW8Wr4UpF
-        1YgrWavry5WrsrZw1UZr1Uuw15twsY93y8Jr9xGa4a9a4UZFy7ZFWIyF93X3WkJa97KF98
-        WFW7trs5Gw48Kr7anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUPF14x267AKxVWrJVCq3wAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+X-CM-TRANSID: gCh0CgBni9jnmHNjrPFIAg--.61645S13
+X-Coremail-Antispam: 1UD129KBjvJXoW7CFW3JryrJF17AF43CFW3Jrb_yoW8ZF1fpF
+        Z8Xa48JrW8Ga1UWw4qqw4UGFy29rWUJ3WxGFyIkrWS9rW3Jr4kCF13Jr1UXFWrKrWxKrsI
+        qF17X3yFyF4vkaDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUP214x267AKxVWrJVCq3wAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
         rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2048vs2IY020E87I2jVAFwI0_JF0E3s1l82xGYI
         kIc2x26xkF7I0E14v26ryj6s0DM28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8wA2
         z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j6F
@@ -49,9 +49,9 @@ X-Coremail-Antispam: 1UD129KBjvJXoW7Zw43tFWkKF1ftF4rCr18AFb_yoW8Wr4UpF
         kIc2xKxwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E
         14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIx
         kGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUCVW8JwCI42IY6xIIjxv20xvEc7CjxVAF
-        wI0_Cr0_Gr1UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJV
-        W8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfUOBTY
-        UUUUU
+        wI0_Cr0_Gr1UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVW8JV
+        WxJwCI42IY6I8E87Iv6xkF7I0E14v26r4UJVWxJrUvcSsGvfC2KfnxnUUI43ZEXa7VUbmZ
+        X7UUUUU==
 X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 X-CFilter-Loop: Reflected
 Precedence: bulk
@@ -60,61 +60,62 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Yu Kuai <yukuai3@huawei.com>
 
-open_table_device() and close_table_device() is protected by
-table_devices_lock, hence use it to protect add_disk() and
-del_gendisk().
+We hold a reference to the holder kobject for each bd_holder_disk,
+so to make the code a bit more robust, use a reference to it instead
+of the block_device.  As long as no one clears ->bd_holder_dir in
+before freeing the disk, this isn't strictly required, but it does
+make the code more clear and more robust.
 
-Prepare to track per-add_disk holder relations in dm.
-
+Orignally-From: Christoph Hellwig <hch@lst.de>
 Signed-off-by: Yu Kuai <yukuai3@huawei.com>
 ---
- drivers/md/dm.c | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+ block/holder.c | 11 ++++++-----
+ 1 file changed, 6 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/md/dm.c b/drivers/md/dm.c
-index 2917700b1e15..3728b56b364b 100644
---- a/drivers/md/dm.c
-+++ b/drivers/md/dm.c
-@@ -1952,7 +1952,14 @@ static void cleanup_mapped_device(struct mapped_device *md)
- 		spin_unlock(&_minor_lock);
- 		if (dm_get_md_type(md) != DM_TYPE_NONE) {
- 			dm_sysfs_exit(md);
-+
-+			/*
-+			 * Hold lock to make sure del_gendisk() won't concurrent
-+			 * with open/close_table_device().
-+			 */
-+			mutex_lock(&md->table_devices_lock);
- 			del_gendisk(md->disk);
-+			mutex_unlock(&md->table_devices_lock);
- 		}
- 		dm_queue_destroy_crypto_profile(md->queue);
- 		put_disk(md->disk);
-@@ -2312,15 +2319,24 @@ int dm_setup_md_queue(struct mapped_device *md, struct dm_table *t)
- 	if (r)
- 		return r;
+diff --git a/block/holder.c b/block/holder.c
+index c8e462053f49..3332142bb867 100644
+--- a/block/holder.c
++++ b/block/holder.c
+@@ -4,7 +4,7 @@
  
-+	/*
-+	 * Hold lock to make sure add_disk() and del_gendisk() won't concurrent
-+	 * with open_table_device() and close_table_device().
-+	 */
-+	mutex_lock(&md->table_devices_lock);
- 	r = add_disk(md->disk);
-+	mutex_unlock(&md->table_devices_lock);
- 	if (r)
- 		return r;
+ struct bd_holder_disk {
+ 	struct list_head	list;
+-	struct block_device	*bdev;
++	struct kobject		*holder_dir;
+ 	int			refcnt;
+ };
  
- 	r = dm_sysfs_init(md);
- 	if (r) {
-+		mutex_lock(&md->table_devices_lock);
- 		del_gendisk(md->disk);
-+		mutex_unlock(&md->table_devices_lock);
- 		return r;
- 	}
-+
- 	md->type = type;
- 	return 0;
+@@ -14,7 +14,7 @@ static struct bd_holder_disk *bd_find_holder_disk(struct block_device *bdev,
+ 	struct bd_holder_disk *holder;
+ 
+ 	list_for_each_entry(holder, &disk->slave_bdevs, list)
+-		if (holder->bdev == bdev)
++		if (holder->holder_dir == bdev->bd_holder_dir)
+ 			return holder;
+ 	return NULL;
  }
+@@ -94,8 +94,9 @@ int bd_link_disk_holder(struct block_device *bdev, struct gendisk *disk)
+ 	}
+ 
+ 	INIT_LIST_HEAD(&holder->list);
+-	holder->bdev = bdev;
+ 	holder->refcnt = 1;
++	holder->holder_dir = bdev->bd_holder_dir;
++
+ 	ret = add_symlink(disk->slave_dir, bdev_kobj(bdev));
+ 	if (ret)
+ 		goto out_free_holder;
+@@ -140,8 +141,8 @@ void bd_unlink_disk_holder(struct block_device *bdev, struct gendisk *disk)
+ 	holder = bd_find_holder_disk(bdev, disk);
+ 	if (!WARN_ON_ONCE(holder == NULL) && !--holder->refcnt) {
+ 		del_symlink(disk->slave_dir, bdev_kobj(bdev));
+-		del_symlink(bdev->bd_holder_dir, &disk_to_dev(disk)->kobj);
+-		kobject_put(bdev->bd_holder_dir);
++		del_symlink(holder->holder_dir, &disk_to_dev(disk)->kobj);
++		kobject_put(holder->holder_dir);
+ 		list_del_init(&holder->list);
+ 		kfree(holder);
+ 	}
 -- 
 2.31.1
 
