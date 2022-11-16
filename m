@@ -2,62 +2,64 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DFB9C433FE
-	for <linux-block@archiver.kernel.org>; Wed, 16 Nov 2022 18:52:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 40599C433FE
+	for <linux-block@archiver.kernel.org>; Wed, 16 Nov 2022 18:53:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234379AbiKPSwz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 16 Nov 2022 13:52:55 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48722 "EHLO
+        id S234536AbiKPSw6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 16 Nov 2022 13:52:58 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50572 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239368AbiKPSw2 (ORCPT
+        with ESMTP id S239373AbiKPSw3 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 16 Nov 2022 13:52:28 -0500
-Received: from mail-io1-xd35.google.com (mail-io1-xd35.google.com [IPv6:2607:f8b0:4864:20::d35])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63663663FC
-        for <linux-block@vger.kernel.org>; Wed, 16 Nov 2022 10:49:36 -0800 (PST)
-Received: by mail-io1-xd35.google.com with SMTP id h206so13919896iof.10
-        for <linux-block@vger.kernel.org>; Wed, 16 Nov 2022 10:49:36 -0800 (PST)
+        Wed, 16 Nov 2022 13:52:29 -0500
+Received: from mail-io1-xd31.google.com (mail-io1-xd31.google.com [IPv6:2607:f8b0:4864:20::d31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 44F8D663FD
+        for <linux-block@vger.kernel.org>; Wed, 16 Nov 2022 10:49:37 -0800 (PST)
+Received: by mail-io1-xd31.google.com with SMTP id r81so13952775iod.2
+        for <linux-block@vger.kernel.org>; Wed, 16 Nov 2022 10:49:37 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20210112.gappssmtp.com; s=20210112;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=dBeqtc5M+tLwfUtRyMfu4WiiuBiwZMRVYN499g+Yfdc=;
-        b=wt9vl5qkviMyOCyVwVqPF8c10BRr7xBkyxnMD5w6UMUpBCf+AWlLsJeRcUmJDHraPw
-         1n0wfR8iWdYwZ+Odd8h728nOydGXayWiLNU07DK7byPGdg1QrZqxc50Di7ezWO8emCot
-         5UN/IRtia4glQE/dSGMzhQ39WURHdZfezHc39S7Naw415r61NNLMRNIgie2fixjKozfl
-         6J94kEFW0nMxTC+j/yu6jWyM06W6ZE48VJhCQ4HDgIIOfpDpqrZLeWhWoplKv0Op44Dd
-         /hSpzoy/jil83Lc+GHQTdYqycJ+zmduSlMUnCFULTp4cwKHe2PnnjIFd8WuAADF7DKzL
-         0T5Q==
+        bh=U+5NOj/eN7Sd6zRcjl8U07Wqml0C/EahqV1VAbj3kLI=;
+        b=3a+/zkDiOpLfoSG+mtPZSx/BkQe0mtIT+bCyIDz99pulN7wgz1ryTHjFU576r5zr47
+         BYY7bRC7QNjQdh0AthCUEclr2OFeRxAe2kY6VQGAvLp3aY2L8ZyCiLMkBvS5YqQ+HoiY
+         zrH4jji0EHBd+pGd9mYnIcN0SBFm6Gve0vSZ1M5w5J7Ufb9lU+XUcyp4arSJbnaA3wJ3
+         Rb7b4U4FSgi6F41tpOwgBUtdXEotp0FKO2a7h42O1ONT8uU8Meefc4e+Iv9mPYHYjK4Y
+         FvOrP5fvbYAOAP4+hLKYhQq93TWz5coOUpxrHR3zA3O4YCP3Jr2vyRBSF8tfcrD7S5jL
+         5Hsg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=dBeqtc5M+tLwfUtRyMfu4WiiuBiwZMRVYN499g+Yfdc=;
-        b=EPMKN7TmOp42OhfbxvJyY/meOoNYnMfRjMm3uAw5NQOfOLjBHaCkmIcbfWMGm0Qn1/
-         FjjmVlcwm629ViW1EKIK67rh4qQykkRE18nnrT0KG2MpUHeuvtLreXB3fUIBCIYD4ayc
-         f/fDJN9dRlA0AxnC4MUqu5AM9kbjp8Q2BUNKZkp5Pb8Bt5viY4UMD5uvS/4uxElqIcH/
-         7VjYAN4Tv+IhMx9NC0OKeAmOSCT5tzbZSoQRxGRvoB10sZBSbaCFFhnAZkyeM+pDymWC
-         HHT45rgJm9n+RccMEfQIotfWCEHleOgTx6ed7Vh3fk0DHjJfPDYgcG6UOh+O02YZikWF
-         46lQ==
-X-Gm-Message-State: ANoB5pn09kOWxzCuFGj4pK3I1ck5DMMfFAMpbhCvsbLvywmSyURw7Dd0
-        OlNrl3L4rV1jnhEulil8FjloZ5TUTlZKoA==
-X-Google-Smtp-Source: AA0mqf5B9Y8SqTUVpLKT6eSxTGLQYb+Opu/ud1uxi7OkQeoJzGbjpIFowc4W97y5V0Lys1WcTQ6a8w==
-X-Received: by 2002:a02:6208:0:b0:376:22d5:a030 with SMTP id d8-20020a026208000000b0037622d5a030mr4392191jac.17.1668624575540;
-        Wed, 16 Nov 2022 10:49:35 -0800 (PST)
+        bh=U+5NOj/eN7Sd6zRcjl8U07Wqml0C/EahqV1VAbj3kLI=;
+        b=E3hC1WkDvUnfHgnqzYWUAYYDRb+zSYqeVjh5Acwc5X37/g3ehEEbYrz9uUWZQkdfWN
+         WrKvlZhweWns6Z27FVoRN2inGSe6abLPKCppjcVVvsCMdm2wides2Gowhv2Ixgi0Bb+n
+         n1PwWsXa6osKv1IReuYaAROnnIbuJ70fGkm6XTX4igrCgabFHMCnrL2m9QVRQycUI1Z3
+         s5e5On54BcBf+Qw30r8kvuV4UU4TNifaARRQgMBonpsY+57RfO4h5+55JmLBsz9t6388
+         FMeYBUSpjI7+X2Vos4uCwwqxiZaEJjK4IUHcD3pkX6xz3UrF0FpCzIIB9RhksyhvWf9d
+         vwYg==
+X-Gm-Message-State: ANoB5plcXnVuZpmWBG98wAbjQWsdq3QS2XpI9u0n5za+2OnIggqlvfDB
+        asZoBcZ90fozfbEWG7IgjIE/A6vJvnvQEA==
+X-Google-Smtp-Source: AA0mqf7vRHK9SdHOKCvaaWwNJAo58DVTBKpqQuukd1w41sRkOWimHGDz5HNQTHZi3PKUV8M8AOvWCQ==
+X-Received: by 2002:a5d:948b:0:b0:6bc:2a47:a874 with SMTP id v11-20020a5d948b000000b006bc2a47a874mr10180859ioj.126.1668624576555;
+        Wed, 16 Nov 2022 10:49:36 -0800 (PST)
 Received: from [127.0.0.1] ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id m1-20020a0566022ac100b0067b75781af9sm6913174iov.37.2022.11.16.10.49.34
+        by smtp.gmail.com with ESMTPSA id m1-20020a0566022ac100b0067b75781af9sm6913174iov.37.2022.11.16.10.49.35
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 16 Nov 2022 10:49:34 -0800 (PST)
+        Wed, 16 Nov 2022 10:49:36 -0800 (PST)
 From:   Jens Axboe <axboe@kernel.dk>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     linux-block@vger.kernel.org
-In-Reply-To: <20221116132035.2192924-1-hch@lst.de>
-References: <20221116132035.2192924-1-hch@lst.de>
-Subject: Re: [PATCH] block: remove blkdev_writepages
-Message-Id: <166862457466.199729.5782233523467662330.b4-ty@kernel.dk>
-Date:   Wed, 16 Nov 2022 11:49:34 -0700
+To:     Gabriel Krisman Bertazi <krisman@suse.de>
+Cc:     mingo@redhat.com, linux-kernel@vger.kernel.org, jack@suse.cz,
+        chaitanyak@nvidia.com, peterz@infradead.org,
+        liusong@linux.alibaba.com, linux-block@vger.kernel.org
+In-Reply-To: <20221115224553.23594-1-krisman@suse.de>
+References: <20221115224553.23594-1-krisman@suse.de>
+Subject: Re: [PATCH 0/3] sbitmap: Fix two issues in the per-bitmap wakeup counter code
+Message-Id: <166862457559.199729.5082175605885412089.b4-ty@kernel.dk>
+Date:   Wed, 16 Nov 2022 11:49:35 -0700
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
@@ -66,21 +68,27 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, 16 Nov 2022 14:20:35 +0100, Christoph Hellwig wrote:
-> While the block device code should switch to implementing
-> ->writepages instead of ->writepage eventually, the current
-> implementation is entirely pointless as it does the same looping over
-> ->writepage as the generic code if no ->writepages is present.
+On Tue, 15 Nov 2022 17:45:50 -0500, Gabriel Krisman Bertazi wrote:
+> Jan reported two issues in the original thread.
 > 
-> Remove blkdev_writepages so that we can eventually unexport
-> generic_writepages.
+> The first is that wake_index was not updated after returning from
+> sbq_wake_ptr which meant we'd have to empty the wq before moving to the
+> next one.  Patch 1/3 in this series reorders the code to avoid this
+> condition, increasing fairness of queue selection and preventing
+> starvation.  I sent this patch already on the other thread and Jan
+> reviewed it, but since it is a small one, and a dependency for the
+> other, I'm resending it a along this series.
 > 
 > [...]
 
 Applied, thanks!
 
-[1/1] block: remove blkdev_writepages
-      commit: 470373e888f494a52f9916bf3eeea41fe819d031
+[1/3] sbitmap: Advance the queue index before waking up a queue
+      commit: 976570b4ecd30d3ec6e1b0910da8e5edc591f2b6
+[2/3] wait: Return number of exclusive waiters awaken
+      commit: ee7dc86b6d3e3b86c2c487f713eda657850de238
+[3/3] sbitmap: Try each queue to wake up at least one waiter
+      commit: 26edb30dd1c0c9be11fa676b4f330ada7b794ba6
 
 Best regards,
 -- 
