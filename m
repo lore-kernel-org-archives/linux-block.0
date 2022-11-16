@@ -2,127 +2,117 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2DB4C4332F
-	for <linux-block@archiver.kernel.org>; Wed, 16 Nov 2022 23:56:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E71AC433FE
+	for <linux-block@archiver.kernel.org>; Wed, 16 Nov 2022 23:58:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233438AbiKPX4C (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 16 Nov 2022 18:56:02 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44636 "EHLO
+        id S230287AbiKPX6l (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 16 Nov 2022 18:58:41 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46374 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231871AbiKPX4B (ORCPT
+        with ESMTP id S229834AbiKPX6j (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 16 Nov 2022 18:56:01 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61175657E5;
-        Wed, 16 Nov 2022 15:56:00 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id F15466205D;
-        Wed, 16 Nov 2022 23:55:59 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AABDBC433D6;
-        Wed, 16 Nov 2022 23:55:55 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="goQ4eWiA"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1668642952;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=sM9LBQZ376u5w/8PZH+YQVlUaxTNIyanmkjPT3FYfMU=;
-        b=goQ4eWiAvkZqWkfss8gq1ex5AtlA/ahfxEBk6r2fheEdHDzxQqDvdaI7jHnRtKQZacSknN
-        xALKJahBGIU2w4KpYkodsz6zSfQUgQjwtn/9XiLQzmbduxm8SAGcIyMTbNpEffPJ6eVtj8
-        fknlTQXlnEW5l9AjbJbPQ6U48mWYP8U=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 48c033fa (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-        Wed, 16 Nov 2022 23:55:51 +0000 (UTC)
-Date:   Thu, 17 Nov 2022 00:55:47 +0100
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-To:     Kees Cook <keescook@chromium.org>
-Cc:     linux-kernel@vger.kernel.org, patches@lists.linux.dev,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Russell King <linux@armlinux.org.uk>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Christoph =?utf-8?Q?B=C3=B6hmwalder?= 
-        <christoph.boehmwalder@linbit.com>,
-        Jani Nikula <jani.nikula@linux.intel.com>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Sakari Ailus <sakari.ailus@linux.intel.com>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Theodore Ts'o <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        Richard Weinberger <richard@nod.at>,
-        "Darrick J . Wong" <djwong@kernel.org>,
-        SeongJae Park <sj@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Helge Deller <deller@gmx.de>, netdev@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-media@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, loongarch@lists.linux.dev,
-        linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        linux-mmc@vger.kernel.org, linux-parisc@vger.kernel.org,
-        ydroneaud@opteya.com
-Subject: Re: [PATCH v2 3/3] treewide: use get_random_u32_between() when
- possible
-Message-ID: <Y3V4g8eorwiU++Y3@zx2c4.com>
-References: <20221114164558.1180362-1-Jason@zx2c4.com>
- <20221114164558.1180362-4-Jason@zx2c4.com>
- <202211161436.A45AD719A@keescook>
+        Wed, 16 Nov 2022 18:58:39 -0500
+Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A3CB1037
+        for <linux-block@vger.kernel.org>; Wed, 16 Nov 2022 15:58:37 -0800 (PST)
+Received: by mail-pj1-x102d.google.com with SMTP id b11so154831pjp.2
+        for <linux-block@vger.kernel.org>; Wed, 16 Nov 2022 15:58:37 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=kojRkknuzQaruikj1Bw1AgCPwluH/lc+Fu21L+WOJJc=;
+        b=RwvO8tezPJW+rHCmdRbQ+mADp1YnOCxf4exyMImXeZ746yvzytYOZgond8mRARU4tL
+         pQ0qeYVAciS4yBF7nk1nbOofVyL4B0d4vDYyWLrCKCqfEo7QbjYmVUIae6tmOGUCGZRX
+         fBpiXhZ1Dwi9HbTy3EYf8cIC4PNO85VbxGM3vhCGU8/Ag91kGCbRgGflI5IITZxfo1/2
+         ZJMk2wHlXJVUeD46A9eZFQaUKXVCSIiP4XB44lA7MDEobMur/ZeYiUenuLAulsMFYKz3
+         RbUnHNs3xlJr6g0xMtTRbBgwgAl36Yar5dWjaYRwWoPQqagB5508qtDcaTqP1yrdGiQQ
+         E9lw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=kojRkknuzQaruikj1Bw1AgCPwluH/lc+Fu21L+WOJJc=;
+        b=le2P83HF5SaerqQHDoLoN5MKt0KbcDIVexZNfdjYQ97uBQhYqNsoz7wcIFlFVSc9xA
+         x3WkVe/tv/OspkqnkfDlmiRANDNWzLcByiahITqqZmVbqAbosm8ESE28KUQRspzGtZSm
+         elaenyKE9wEuuuNfT6M7wUUBXInmIyJWAOBAOAd3r3uXN4NalrCdJNuJwrgn/vo/oj44
+         Vya4e/nmjg9ZEsHdd4JBLDr5jO1o5exQkNwb5SLJ0r3PVpchHgVGnUXM5wKbUmju/NTL
+         ViQAl2v2a963vOk6LMPeqScuz58PFKQnuBW9R2Oae4XZ9rj0XXWiDeOpRTs4AZTdQ8YD
+         0dPQ==
+X-Gm-Message-State: ANoB5pnLZ++y8MruI11kVSY4H9fdi/kGchlr0cccDeYsvUUeyn0169Ag
+        AoPAhl+6CI5PTtJI0f3Mz2KnIA==
+X-Google-Smtp-Source: AA0mqf6NGk2RuTo6aGaFr95auX8C3f+sgHmdR9BqJEXf7pgDbmWsgSj2ySTo9oGGDAcTDjfogAu8kQ==
+X-Received: by 2002:a17:90b:d13:b0:217:ecbd:5ae with SMTP id n19-20020a17090b0d1300b00217ecbd05aemr5831869pjz.17.1668643116857;
+        Wed, 16 Nov 2022 15:58:36 -0800 (PST)
+Received: from [192.168.1.136] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id nh9-20020a17090b364900b00212d9a06edcsm2173613pjb.42.2022.11.16.15.58.35
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 16 Nov 2022 15:58:36 -0800 (PST)
+Message-ID: <5e885fce-a0b4-559f-5498-4402080f6a2e@kernel.dk>
+Date:   Wed, 16 Nov 2022 16:58:34 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <202211161436.A45AD719A@keescook>
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
+ Thunderbird/102.4.1
+Subject: Re: [PATCH v10 0/3] blk-cgroup: Optimize blkcg_rstat_flush()
+Content-Language: en-US
+To:     Waiman Long <longman@redhat.com>
+Cc:     cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        =?UTF-8?Q?Michal_Koutn=c3=bd?= <mkoutny@suse.com>,
+        Hillf Danton <hdanton@sina.com>, Tejun Heo <tj@kernel.org>
+References: <20221105005902.407297-1-longman@redhat.com>
+ <4b5142be-6a47-9dfd-a238-5b9d29b296b8@redhat.com>
+From:   Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <4b5142be-6a47-9dfd-a238-5b9d29b296b8@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Nov 16, 2022 at 02:43:13PM -0800, Kees Cook wrote:
-> On Mon, Nov 14, 2022 at 05:45:58PM +0100, Jason A. Donenfeld wrote:
-> > -				(get_random_u32_below(1024) + 1) * PAGE_SIZE;
-> > +				get_random_u32_between(1, 1024 + 1) * PAGE_SIZE;
+On 11/16/22 4:06 PM, Waiman Long wrote:
+> On 11/4/22 20:58, Waiman Long wrote:
+>> ? v10:
+>> ?? - Update patch 3 to rename the rstat function to
+>> ???? cgroup_rstat_css_cpu_flush().
+>>
+>> ? v9:
+>> ?? - Remove patch "llist: Allow optional sentinel node terminated lockless
+>> ???? list" for now. This will be done as a follow-up patch.
+>> ?? - Add a new lqueued field to blkg_iostat_set to store the status of
+>> ???? whether lnode is in a lockless list.
+>> ?? - Add a new patch 3 to speed up the freeing of blkcg by flushing out
+>> ???? the rstat lockless lists at blkcg offline time.
+>>
+>> ? v8:
+>> ?? - Update the llist patch to make existing llist functions and macros
+>> ???? work for both NULL and sentinel terminated lockless list as much
+>> ???? as possible and leave only the initialization and removal functions
+>> ???? to have a sentinel terminated llist variants.
+>>
+>> This patch series improves blkcg_rstat_flush() performance by eliminating
+>> unnecessary blkg enumeration and flush operations for those blkg's and
+>> blkg_iostat_set's that haven't been updated since the last flush.
+>>
+>> Waiman Long (3):
+>> ?? blk-cgroup: Return -ENOMEM directly in blkcg_css_alloc() error path
+>> ?? blk-cgroup: Optimize blkcg_rstat_flush()
+>> ?? blk-cgroup: Flush stats at blkgs destruction path
+>>
+>> ? block/blk-cgroup.c???? | 103 +++++++++++++++++++++++++++++++++++------
+>> ? block/blk-cgroup.h???? |? 10 ++++
+>> ? include/linux/cgroup.h |?? 1 +
+>> ? kernel/cgroup/rstat.c? |? 20 ++++++++
+>> ? 4 files changed, 119 insertions(+), 15 deletions(-)
 > 
-> I really don't like "between". Can't this be named "inclusive" (and
-> avoid adding 1 everywhere, which seems ugly), or at least named
-> something less ambiguous?
-> 
-> > -		n = get_random_u32_below(100) + 1;
-> > +		n = get_random_u32_between(1, 101);
-> 
-> Because I find this much less readable. "Below 100" is clear: 0-99
-> inclusive, plus 1, so 1-100 inclusive. "Between 1 and 101" is not obvious
-> to me to mean: 1-100 inclusive.
-> 
-> These seem so much nicer:
-> 	get_random_u32_inclusive(1, 1024)
-> 	get_random_u32_inclusive(1, 100)
+> Jens, do you have any further comment on this patchset? Is it possible
+> to queue it for the next Linux version?
 
-Yann pointed out something similar -- the half-closed interval being
-confusing -- and while I was initially dismissive, I've warmed up to
-doing this fully closed after sending a diff of that:
+Looks good to me, I'll queue it up.
 
-https://lore.kernel.org/lkml/Y3Qt8HiXj8giOnZy@zx2c4.com/
-
-So okay, let's say that I'll implement the inclusive version instead. We
-now have two problems to solve:
-
-1) How/whether to make f(0, UR2_MAX) safe,
-   - without additional 64-bit arithmetic,
-   - minimizing the number of branches.
-   I have a few ideas I'll code golf for a bit.
-
-2) What to call it:
-   - between I still like, because it mirrors "I'm thinking of a number
-     between 1 and 10 and..." that everybody knows,
-   - inclusive I guess works, but it's not a preposition,
-   - bikeshed color #3?
-
-I think I can make progress with (1) alone by fiddling around with
-godbolt enough, like usual. I could use some more ideas for (2) though.
-
-Jason
+-- 
+Jens Axboe
