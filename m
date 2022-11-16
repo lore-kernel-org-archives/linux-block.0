@@ -2,171 +2,138 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 28EA3C4332F
-	for <linux-block@archiver.kernel.org>; Wed, 16 Nov 2022 11:21:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 86818C43217
+	for <linux-block@archiver.kernel.org>; Wed, 16 Nov 2022 12:52:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238994AbiKPLV2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 16 Nov 2022 06:21:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37838 "EHLO
+        id S233082AbiKPMwp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 16 Nov 2022 07:52:45 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43858 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238971AbiKPLVK (ORCPT
+        with ESMTP id S231712AbiKPMwo (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 16 Nov 2022 06:21:10 -0500
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 97BAD4E41D;
-        Wed, 16 Nov 2022 03:09:06 -0800 (PST)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 57081336F8;
-        Wed, 16 Nov 2022 11:09:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1668596945; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=0A7d1xzwheDqkXg7izTobfs56vTna3Rm7EV61mYuosY=;
-        b=HIH0uKbOsn3eGop72mSfQJlx484DBh9V4E/05LrCn+nmjelHDtWJt4iSOghOq3ca0TuDrD
-        TfsbceBYcfAlJbzeAF3Dg7YWjDy+b3IuQBYF4F/UqLzDrWm01ZkdI2a8uB22kEJQfP0//W
-        c+mD4PUazw74Qm04tc/6z5Zi1E14JY8=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1668596945;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=0A7d1xzwheDqkXg7izTobfs56vTna3Rm7EV61mYuosY=;
-        b=lXq2kmiQ5yHWm57D2vr6XcBF41+i/Q8Sq5YMEqO6/hfSkQCtSmO70IsdWCh6hVY00XmJFE
-        xd/pbLUBSXAq9RCw==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 4990613480;
-        Wed, 16 Nov 2022 11:09:05 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id XATyEdHEdGMRZQAAMHmgww
-        (envelope-from <jack@suse.cz>); Wed, 16 Nov 2022 11:09:05 +0000
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-        id 81F25A0709; Wed, 16 Nov 2022 12:09:04 +0100 (CET)
-Date:   Wed, 16 Nov 2022 12:09:04 +0100
-From:   Jan Kara <jack@suse.cz>
-To:     Gabriel Krisman Bertazi <krisman@suse.de>
-Cc:     axboe@kernel.dk, mingo@redhat.com, peterz@infradead.org,
-        jack@suse.cz, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org, liusong@linux.alibaba.com,
-        chaitanyak@nvidia.com
-Subject: Re: [PATCH 3/3] sbitmap: Try each queue to wake up at least one
- waiter
-Message-ID: <20221116110904.trhcoxqa6tipevdr@quack3>
-References: <20221115224553.23594-1-krisman@suse.de>
- <20221115224553.23594-4-krisman@suse.de>
+        Wed, 16 Nov 2022 07:52:44 -0500
+Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD05E25C7F
+        for <linux-block@vger.kernel.org>; Wed, 16 Nov 2022 04:52:43 -0800 (PST)
+Received: by mail-pl1-x634.google.com with SMTP id l2so16304101pld.13
+        for <linux-block@vger.kernel.org>; Wed, 16 Nov 2022 04:52:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1RZGzo0g5YiKQNzOpKzrK1gUhH6Ui/pzSnhn6q3izHk=;
+        b=oTm5T88WAIt5VT3YxL8Civfnv02MHz2mxQfaxnURIcZoihPKJ5jU9swyhQi95XrntS
+         mZNsj5x2fDFxaWs/KIMcAEyIjs7ifEwJoNCj+UE5j+gvBrGmzKdUSJwxIei0e4le5oF6
+         UYO6kdoadAJ3+MdBNmzToEBaX2iX9+5hM00it9fbAdYJTJRGbW4Ayy4Z61MG6BGf6dzH
+         FCfMyc0qeAKBW5wnGgFfsLEZeHNbrDAqIMd6/p/Pu9fXf5zhMlF7FMZkrAnP2mEqL5BB
+         dPl1jJL7gGPR9gRAiigt+svasc6MAW1owd5y+AD7gVZndDvYYL/WTtEFZpFai216qb73
+         ifKg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=1RZGzo0g5YiKQNzOpKzrK1gUhH6Ui/pzSnhn6q3izHk=;
+        b=q5Ora93kSQvAjJDpRzR2YjGBa+AiwrwdiX1YU5q3cuI0yaIyXQM1jYmvzvPCBR4YOy
+         hbCn4gRCc7Ry8SzSaJnPjfA4BlQTDv1LpbRNZ3nGchRY2mSWPzY7rKERB/NEDcltyFJ+
+         R039gI8xG4cBpvFQSO3cNNVFm/PC3LzqRXIQFQb60idC3a3JPjEt2rdE7eP3muhqr1Hy
+         MwPrv3YBsDOQ3DEvMA1UbhQkkHzM/tgqtqX1K/gXvXX/4U1jGTKm3xT7lGmXMvVnLzNH
+         2cFFIBC73KG5l6VbeHG+KUCqybRhf1Ci5YSlxzje0toSzjD1chq/eggydWiMce8C442k
+         WwLw==
+X-Gm-Message-State: ANoB5pnYwMhzrbJcUJnicSlLGxT9UBA50pWBrcHxlWhH18nHfb8Btzp1
+        ZOJOppkjVe2mybTdffIF3kzHl2q22U/JpHn+wLPSHg==
+X-Google-Smtp-Source: AA0mqf573iUOuohxs/WDJJF3vSdEApKn5V6LsqvAYLzFM6odtTKa0xju8NCcUFP4RfQv05qQZMRKdgUirwhVv/TsKiE=
+X-Received: by 2002:a17:902:d48a:b0:188:6baf:2011 with SMTP id
+ c10-20020a170902d48a00b001886baf2011mr8329879plg.165.1668603162940; Wed, 16
+ Nov 2022 04:52:42 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221115224553.23594-4-krisman@suse.de>
+References: <2c8d249c6bb74d688a625654559bacbb@hyperstone.com>
+In-Reply-To: <2c8d249c6bb74d688a625654559bacbb@hyperstone.com>
+From:   Ulf Hansson <ulf.hansson@linaro.org>
+Date:   Wed, 16 Nov 2022 13:52:06 +0100
+Message-ID: <CAPDyKFooANh5Jj1tjG+JriK2vrC4DxK0JGiR5bEtJ1iCMu78QA@mail.gmail.com>
+Subject: Re: [PATCHv2 1/3] block: Requeue req as head if driver touched it
+To:     =?UTF-8?Q?Christian_L=C3=B6hle?= <CLoehle@hyperstone.com>
+Cc:     "axboe@kernel.dk" <axboe@kernel.dk>,
+        "linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Avri Altman <Avri.Altman@wdc.com>,
+        "adrian.hunter@intel.com" <adrian.hunter@intel.com>,
+        "vincent.whitchurch@axis.com" <vincent.whitchurch@axis.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue 15-11-22 17:45:53, Gabriel Krisman Bertazi wrote:
-> Jan reported the new algorithm as merged might be problematic if the
-> queue being awaken becomes empty between the waitqueue_active inside
-> sbq_wake_ptr check and the wake up.  If that happens, wake_up_nr will
-> not wake up any waiter and we loose too many wake ups.  In order to
-> guarantee progress, we need to wake up at least one waiter here, if
-> there are any.  This now requires trying to wake up from every queue.
-> 
-> Instead of walking through all the queues with sbq_wake_ptr, this call
-> moves the wake up inside that function.  In a previous version of the
-> patch, I found that updating wake_index several times when walking
-> through queues had a measurable overhead.  This ensures we only update
-> it once, at the end.
-> 
-> Fixes: 4f8126bb2308 ("sbitmap: Use single per-bitmap counting to wake up queued tags")
-> Reported-by: Jan Kara <jack@suse.cz>
-> Signed-off-by: Gabriel Krisman Bertazi <krisman@suse.de>
+On Mon, 14 Nov 2022 at 16:29, Christian L=C3=B6hle <CLoehle@hyperstone.com>=
+ wrote:
+>
+> In case the driver set RQF_DONTPREP flag, requeue the request as head as
+> it is likely that the backing storage already had a request to an
+> adjacent region, so getting the requeued request out as soon as possible
+> may give us some performance benefit.
+>
+> The are various reasons a driver may requeue a request
+> (and therefore RQF_DONTPREP being set).
+> One reason may be that the driver or the hardware cannot satisfy
+> the block layer alignment/sizes.
+>
+> This for example is the case with mmcblk with a host driver that
+> cannot deal with multiple block transfers.
+> Consider a request for lba 42 for one page so 4K or 8 blocks.
+> mmcblk will do a single block request for lba 42 and requeue for
+> the rest if the host can only perform single block transfers.
+> In this case the device only delivered 512 bytes of data at lba 42,
+> but may have performed a readahead itself for the following lbas,
+> or do an 'implicit' readahead as it only deals with larger block
+> size mappings itself.
+> In that case it would be beneificial if the request for lba 43 and
+> the rest of the remaining blocks follow immediately after the initial
+> lba 42 request.
+> Requeueing already partially processed requests as head preserves the
+> intended request order (unless the driver has a queue of its own)
+> and therefore mitigates this problem .
+>
+> Signed-off-by: Christian Loehle <cloehle@hyperstone.com>
 
-Elegant and looks good to me! Feel free to add:
+Thanks for updating the commit message!
 
-Reviewed-by: Jan Kara <jack@suse.cz>
+Reviewed-by: Ulf Hansson <ulf.hansson@linaro.org>
 
-								Honza
+As I said for v1, this seems reasonable to me, but I am deferring to
+Jens to get his opinion. Beyond that, I will have a look at pacth2 and
+patch3 too.
+
+Kind regards
+Uffe
 
 > ---
->  lib/sbitmap.c | 28 ++++++++++++----------------
->  1 file changed, 12 insertions(+), 16 deletions(-)
-> 
-> diff --git a/lib/sbitmap.c b/lib/sbitmap.c
-> index bea7984f7987..586deb333237 100644
-> --- a/lib/sbitmap.c
-> +++ b/lib/sbitmap.c
-> @@ -560,12 +560,12 @@ void sbitmap_queue_min_shallow_depth(struct sbitmap_queue *sbq,
->  }
->  EXPORT_SYMBOL_GPL(sbitmap_queue_min_shallow_depth);
->  
-> -static struct sbq_wait_state *sbq_wake_ptr(struct sbitmap_queue *sbq)
-> +static void __sbitmap_queue_wake_up(struct sbitmap_queue *sbq, int nr)
->  {
->  	int i, wake_index;
->  
->  	if (!atomic_read(&sbq->ws_active))
-> -		return NULL;
-> +		return;
->  
->  	wake_index = atomic_read(&sbq->wake_index);
->  	for (i = 0; i < SBQ_WAIT_QUEUES; i++) {
-> @@ -579,20 +579,22 @@ static struct sbq_wait_state *sbq_wake_ptr(struct sbitmap_queue *sbq)
->  		 */
->  		wake_index = sbq_index_inc(wake_index);
->  
-> -		if (waitqueue_active(&ws->wait)) {
-> -			if (wake_index != atomic_read(&sbq->wake_index))
-> -				atomic_set(&sbq->wake_index, wake_index);
-> -			return ws;
-> -		}
-> +		/*
-> +		 * It is sufficient to wake up at least one waiter to
-> +		 * guarantee forward progress.
-> +		 */
-> +		if (waitqueue_active(&ws->wait) &&
-> +		    wake_up_nr(&ws->wait, nr))
-> +			break;
->  	}
->  
-> -	return NULL;
-> +	if (wake_index != atomic_read(&sbq->wake_index))
-> +		atomic_set(&sbq->wake_index, wake_index);
->  }
->  
->  void sbitmap_queue_wake_up(struct sbitmap_queue *sbq, int nr)
->  {
->  	unsigned int wake_batch = READ_ONCE(sbq->wake_batch);
-> -	struct sbq_wait_state *ws = NULL;
->  	unsigned int wakeups;
->  
->  	if (!atomic_read(&sbq->ws_active))
-> @@ -604,16 +606,10 @@ void sbitmap_queue_wake_up(struct sbitmap_queue *sbq, int nr)
->  	do {
->  		if (atomic_read(&sbq->completion_cnt) - wakeups < wake_batch)
->  			return;
-> -
-> -		if (!ws) {
-> -			ws = sbq_wake_ptr(sbq);
-> -			if (!ws)
-> -				return;
-> -		}
->  	} while (!atomic_try_cmpxchg(&sbq->wakeup_cnt,
->  				     &wakeups, wakeups + wake_batch));
->  
-> -	wake_up_nr(&ws->wait, wake_batch);
-> +	__sbitmap_queue_wake_up(sbq, wake_batch);
->  }
->  EXPORT_SYMBOL_GPL(sbitmap_queue_wake_up);
->  
-> -- 
-> 2.35.3
-> 
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+> -v2: Extended commit message with example use case, no code change
+>
+>  block/blk-mq.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index 33292c01875d..d863c826fb23 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -1429,7 +1429,7 @@ static void blk_mq_requeue_work(struct work_struct =
+*work)
+>                  * merge.
+>                  */
+>                 if (rq->rq_flags & RQF_DONTPREP)
+> -                       blk_mq_request_bypass_insert(rq, false, false);
+> +                       blk_mq_request_bypass_insert(rq, true, false);
+>                 else
+>                         blk_mq_sched_insert_request(rq, true, false, fals=
+e);
+>         }
+> --
+> 2.37.3
+> Hyperstone GmbH | Reichenaustr. 39a  | 78467 Konstanz
+> Managing Director: Dr. Jan Peter Berns.
+> Commercial register of local courts: Freiburg HRB381782
+>
