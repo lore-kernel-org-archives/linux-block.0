@@ -2,108 +2,113 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D01EC43217
-	for <linux-block@archiver.kernel.org>; Wed, 16 Nov 2022 22:40:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 90FB3C4332F
+	for <linux-block@archiver.kernel.org>; Wed, 16 Nov 2022 22:43:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233423AbiKPWkD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 16 Nov 2022 17:40:03 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57322 "EHLO
+        id S233277AbiKPWnj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 16 Nov 2022 17:43:39 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60004 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232341AbiKPWjy (ORCPT
+        with ESMTP id S234337AbiKPWnZ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 16 Nov 2022 17:39:54 -0500
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5679558002
-        for <linux-block@vger.kernel.org>; Wed, 16 Nov 2022 14:39:52 -0800 (PST)
-Received: from pps.filterd (m0246632.ppops.net [127.0.0.1])
-        by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2AGLdK1i016874;
-        Wed, 16 Nov 2022 22:39:48 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id : mime-version : content-transfer-encoding;
- s=corp-2022-7-12; bh=l14U5Jkv9etIkJoKML6/3Kbi8x0GUvPi8CsuovaXEy0=;
- b=1c2QQK05HjJ3v5pykkDHLsQLIR1esPlfIKp35lYRPbONHrCbk/rbNUz3VKi596POazvo
- QVO7Y7DNvIQNowp+Mai6Itg8ILuJjNf534OjEUGJX9cm5NZn8W2GKGutQINzezR7SBN8
- bT9rECOPWXB5/Fwe47NOrmEiATeWexzc6DjIjlvzDrhCA+5aGfXXsLf2TbhU1ZdDjAzj
- CLw+Be1drGi2bJLtFYFBkxAwGTvk7O/yq4PnO7rwyO72wzDzMjuJDEWA9ssFM2c55GIA
- z4IJC86SJvrZ0BIGk1BVXk92LJ5/ZQm3Q794luH6e4vRY/G2fbImovXWAyTn/Mk041lE qA== 
-Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.appoci.oracle.com [130.35.100.223])
-        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3kv3htxxnd-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 16 Nov 2022 22:39:47 +0000
-Received: from pps.filterd (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-        by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.5/8.17.1.5) with ESMTP id 2AGMQL0h034762;
-        Wed, 16 Nov 2022 22:39:47 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-        by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3kw2dcmwfb-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 16 Nov 2022 22:39:47 +0000
-Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2AGMdkue020661;
-        Wed, 16 Nov 2022 22:39:46 GMT
-Received: from ca-dev94.us.oracle.com (ca-dev94.us.oracle.com [10.129.136.30])
-        by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 3kw2dcmwes-1;
-        Wed, 16 Nov 2022 22:39:46 +0000
-From:   Alan Adamson <alan.adamson@oracle.com>
-To:     linux-block@vger.kernel.org
-Cc:     alan.adamson@oracle.com, linux-nvme@lists.infradead.org,
-        shinichiro.kawasaki@wdc.com
-Subject: [PATCH v2] tests/nvme/039: Remove passthrough command tests
-Date:   Wed, 16 Nov 2022 14:39:45 -0800
-Message-Id: <20221116223945.1043785-1-alan.adamson@oracle.com>
-X-Mailer: git-send-email 2.31.1
+        Wed, 16 Nov 2022 17:43:25 -0500
+Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 15DDB6BDD1
+        for <linux-block@vger.kernel.org>; Wed, 16 Nov 2022 14:43:15 -0800 (PST)
+Received: by mail-pl1-x62d.google.com with SMTP id y4so17802966plb.2
+        for <linux-block@vger.kernel.org>; Wed, 16 Nov 2022 14:43:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Wf2gFJO0eZI55pjXm8OYjMYkGLte7QuRao7+IuvSaqE=;
+        b=D2amVl9V9KQfzLW2zaIS23IBouuPji7hB+OAx+ZhW9BBCDB5OKBikMdNxb0VPTDxJj
+         csClJ0YRCWBC/mBx5CM8cmRfxBeg4UGIi36VQSyP9C8PzSygpHTtXYMcx806fNdiiKsi
+         DAssScFkYAwJ1pFNUcIn3ZWqN1hBHz6LpWnys=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Wf2gFJO0eZI55pjXm8OYjMYkGLte7QuRao7+IuvSaqE=;
+        b=ZmDuX0QGKHYEGeZelmKTo0O91RhwMAHtRYBx4HlOEimKybGnuYLTnOdSuhGhNQIa/T
+         AYiEGnXkGEhme958swDnft8VmqqjZNsHyu+TjvSqJB6IS3Xqp0jYgdSDJ0TjuYVVoQWQ
+         dIoqVY/+Z/TFVs/9uauL2V/UQJLLUhYQ0dglOKodeR5kYUJt4igtfQ5MSO/KMWStpHua
+         UweSd/ZudtJVjfjYj6COGBeIGXAMyhQDqC9nHG6+wL57FXRk8zFyRV7KLnSmQfDtohoX
+         Ze0l93wGDX3ok9Vhsr/akCN4DTkcjGUzw4C580d4g894adYSeZE1Fm1j+DSwaaT/RH2L
+         GFkQ==
+X-Gm-Message-State: ANoB5pmXyAP27lYGacJKqdx6wJgBIMAndHrmlPZepthi9FnS6O9fNqIY
+        P5YA4tBZ4HPZ6w+vcRhTpyv3CA==
+X-Google-Smtp-Source: AA0mqf5VxV4Cbn3MvfOzCKh9TKzLZskissYVmNmiO/kVOhEqnlwi5i8J4bomSjPXRjnnkIIEn4wz5w==
+X-Received: by 2002:a17:90b:3c42:b0:213:1ce7:d962 with SMTP id pm2-20020a17090b3c4200b002131ce7d962mr6007688pjb.63.1668638594628;
+        Wed, 16 Nov 2022 14:43:14 -0800 (PST)
+Received: from www.outflux.net (198-0-35-241-static.hfc.comcastbusiness.net. [198.0.35.241])
+        by smtp.gmail.com with ESMTPSA id a9-20020a170902710900b00183c6784704sm12680746pll.291.2022.11.16.14.43.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 16 Nov 2022 14:43:14 -0800 (PST)
+Date:   Wed, 16 Nov 2022 14:43:13 -0800
+From:   Kees Cook <keescook@chromium.org>
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc:     linux-kernel@vger.kernel.org, patches@lists.linux.dev,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Russell King <linux@armlinux.org.uk>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Christoph =?iso-8859-1?Q?B=F6hmwalder?= 
+        <christoph.boehmwalder@linbit.com>,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Sakari Ailus <sakari.ailus@linux.intel.com>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Theodore Ts'o <tytso@mit.edu>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        Richard Weinberger <richard@nod.at>,
+        "Darrick J . Wong" <djwong@kernel.org>,
+        SeongJae Park <sj@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Helge Deller <deller@gmx.de>, netdev@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-media@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, loongarch@lists.linux.dev,
+        linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        linux-mmc@vger.kernel.org, linux-parisc@vger.kernel.org
+Subject: Re: [PATCH v2 3/3] treewide: use get_random_u32_between() when
+ possible
+Message-ID: <202211161436.A45AD719A@keescook>
+References: <20221114164558.1180362-1-Jason@zx2c4.com>
+ <20221114164558.1180362-4-Jason@zx2c4.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
- definitions=2022-11-16_03,2022-11-16_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 phishscore=0
- malwarescore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2210170000 definitions=main-2211160154
-X-Proofpoint-GUID: KAhcvVkQ0BggpM-dSGZ1uDlRGDzB05B6
-X-Proofpoint-ORIG-GUID: KAhcvVkQ0BggpM-dSGZ1uDlRGDzB05B6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221114164558.1180362-4-Jason@zx2c4.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Commit d7ac8dca938c ("nvme: quiet user passthrough command errors")
-disabled error logging for passthrough commands so the associated
-tests should be removed.
+On Mon, Nov 14, 2022 at 05:45:58PM +0100, Jason A. Donenfeld wrote:
+> -				(get_random_u32_below(1024) + 1) * PAGE_SIZE;
+> +				get_random_u32_between(1, 1024 + 1) * PAGE_SIZE;
 
-When an error logging opt-in mechanism for passthrough commands is
-provided, the tests can be added back.
+I really don't like "between". Can't this be named "inclusive" (and
+avoid adding 1 everywhere, which seems ugly), or at least named
+something less ambiguous?
 
-Signed-off-by: Alan Adamson <alan.adamson@oracle.com>
----
- tests/nvme/039     | 3 ---
- tests/nvme/039.out | 2 --
- 2 files changed, 5 deletions(-)
+> -		n = get_random_u32_below(100) + 1;
+> +		n = get_random_u32_between(1, 101);
 
-diff --git a/tests/nvme/039 b/tests/nvme/039
-index e175055ddb06..11d6d24b6025 100755
---- a/tests/nvme/039
-+++ b/tests/nvme/039
-@@ -143,9 +143,6 @@ test_device() {
- 	inject_invalid_status_on_read "${ns_dev}"
- 	inject_write_fault_on_write "${ns_dev}"
- 
--	inject_access_denied_on_identify "${ctrl_dev}"
--	inject_invalid_admin_cmd "${ctrl_dev}"
--
- 	_nvme_err_inject_cleanup "${ns_dev}" "${ctrl_dev}"
- 
- 	echo "Test complete"
-diff --git a/tests/nvme/039.out b/tests/nvme/039.out
-index 162935eb1d7b..139070d22240 100644
---- a/tests/nvme/039.out
-+++ b/tests/nvme/039.out
-@@ -2,6 +2,4 @@ Running nvme/039
-  Read(0x2) @ LBA 0, 1 blocks, Unrecovered Read Error (sct 0x2 / sc 0x81) DNR 
-  Read(0x2) @ LBA 0, 1 blocks, Unknown (sct 0x3 / sc 0x75) DNR 
-  Write(0x1) @ LBA 0, 1 blocks, Write Fault (sct 0x2 / sc 0x80) DNR 
-- Identify(0x6), Access Denied (sct 0x2 / sc 0x86) DNR 
-- Unknown(0x96), Invalid Command Opcode (sct 0x0 / sc 0x1) DNR 
- Test complete
+Because I find this much less readable. "Below 100" is clear: 0-99
+inclusive, plus 1, so 1-100 inclusive. "Between 1 and 101" is not obvious
+to me to mean: 1-100 inclusive.
+
+These seem so much nicer:
+	get_random_u32_inclusive(1, 1024)
+	get_random_u32_inclusive(1, 100)
+
 -- 
-2.31.1
-
+Kees Cook
