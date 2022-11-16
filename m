@@ -2,103 +2,175 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9922EC4332F
-	for <linux-block@archiver.kernel.org>; Wed, 16 Nov 2022 23:07:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 88E6BC43219
+	for <linux-block@archiver.kernel.org>; Wed, 16 Nov 2022 23:17:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234176AbiKPXHW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 16 Nov 2022 18:07:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43566 "EHLO
+        id S233199AbiKPXRI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 16 Nov 2022 18:17:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48568 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229641AbiKPXHT (ORCPT
+        with ESMTP id S233646AbiKPXRF (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 16 Nov 2022 18:07:19 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 60FB9317CD
-        for <linux-block@vger.kernel.org>; Wed, 16 Nov 2022 15:06:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1668639980;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=fWNz/QE0hFws1BC7T/rZzODjo9Sug+sYTjrv+WWI+bk=;
-        b=Brb1a3sloUczU+r95lyoX3/7S6WV1NVpaNwUINt6YEmAjcPZRqe8pq46BV49Lvy8AcOhMT
-        S6H/ewvUcaf2mfux9QCoOF0EmXXgGdbm0EwmFP+mdwe2ikb7rcxrIqxd3v8hCN34ngpBRq
-        nx4Le3cIqUN1vdH0YtkGFwXko3RMZh0=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-321-Kh4_YGnwNsCefQGPtUsbUA-1; Wed, 16 Nov 2022 18:06:16 -0500
-X-MC-Unique: Kh4_YGnwNsCefQGPtUsbUA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id ED237811E67;
-        Wed, 16 Nov 2022 23:06:15 +0000 (UTC)
-Received: from [10.22.10.207] (unknown [10.22.10.207])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 35079C1908A;
-        Wed, 16 Nov 2022 23:06:15 +0000 (UTC)
-Message-ID: <4b5142be-6a47-9dfd-a238-5b9d29b296b8@redhat.com>
-Date:   Wed, 16 Nov 2022 18:06:13 -0500
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.4.0
-Subject: Re: [PATCH v10 0/3] blk-cgroup: Optimize blkcg_rstat_flush()
-Content-Language: en-US
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        =?UTF-8?Q?Michal_Koutn=c3=bd?= <mkoutny@suse.com>,
-        Hillf Danton <hdanton@sina.com>, Tejun Heo <tj@kernel.org>
-References: <20221105005902.407297-1-longman@redhat.com>
-From:   Waiman Long <longman@redhat.com>
-In-Reply-To: <20221105005902.407297-1-longman@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+        Wed, 16 Nov 2022 18:17:05 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A614813F66;
+        Wed, 16 Nov 2022 15:16:57 -0800 (PST)
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2AGN4b6d017900;
+        Wed, 16 Nov 2022 23:16:39 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : reply-to : to : cc : date : in-reply-to : references : content-type
+ : mime-version : content-transfer-encoding; s=pp1;
+ bh=RbDAiw4mR9OgYWByLQm1coMXC3xW/DqD1ayeJLp5/Uw=;
+ b=pgx35/orgdJq38D5TELt20UBRpEkb5kHXmGzVSjtwvETSLl+kye+P7XJmdZx+DDEFLTC
+ MYVhE1O0ztneXFEVpp7qI1d/cZGEcD2TY4CK+vl3nqMbgV99+96u2a49cn9Qn5hgXbgw
+ MzugbftfSuad2ZnomLZwCedcZTvEnRAXbJAYdBhKk7aVgiVl6tMS+vj7CTDqdNrPd0MY
+ L/atb8Idlih0b63crKblmLY+p0q0SLmwLYDS6sbBBMcUTuMjwMmuyFz/vPWcqglkVfzJ
+ NP4k/vOY0JGjKCfxKQpRjH1RxTjsvcSlwbSQxm+/kKaxhs2OwGQSAwZ+lDLwZyKOyoTB OA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3kw97h07se-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 16 Nov 2022 23:16:39 +0000
+Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2AGNGc03030755;
+        Wed, 16 Nov 2022 23:16:39 GMT
+Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.10])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3kw97h07s8-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 16 Nov 2022 23:16:38 +0000
+Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
+        by ppma02dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2AGN5RZv004528;
+        Wed, 16 Nov 2022 23:16:38 GMT
+Received: from b03cxnp07028.gho.boulder.ibm.com (b03cxnp07028.gho.boulder.ibm.com [9.17.130.15])
+        by ppma02dal.us.ibm.com with ESMTP id 3kt34a4uxy-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 16 Nov 2022 23:16:38 +0000
+Received: from smtpav05.dal12v.mail.ibm.com ([9.208.128.132])
+        by b03cxnp07028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2AGNGcRx35521266
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 16 Nov 2022 23:16:38 GMT
+Received: from smtpav05.dal12v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 9A3AB5805D;
+        Wed, 16 Nov 2022 23:16:36 +0000 (GMT)
+Received: from smtpav05.dal12v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 67E105804C;
+        Wed, 16 Nov 2022 23:16:35 +0000 (GMT)
+Received: from sig-9-65-207-159.ibm.com (unknown [9.65.207.159])
+        by smtpav05.dal12v.mail.ibm.com (Postfix) with ESMTP;
+        Wed, 16 Nov 2022 23:16:35 +0000 (GMT)
+Message-ID: <c13702d0d79628f0cece42e842bf2cc704bd0821.camel@linux.vnet.ibm.com>
+Subject: Re: [PATCH v4 3/3] block: sed-opal: keystore access for SED Opal
+ keys
+From:   Greg Joyce <gjoyce@linux.vnet.ibm.com>
+Reply-To: gjoyce@linux.vnet.ibm.com
+To:     Jonathan Derrick <jonathan.derrick@linux.dev>,
+        linux-block@vger.kernel.org
+Cc:     linuxppc-dev@lists.ozlabs.org, brking@linux.vnet.ibm.com,
+        msuchanek@suse.de, mpe@ellerman.id.au, nayna@linux.ibm.com,
+        axboe@kernel.dk, akpm@linux-foundation.org,
+        linux-efi@vger.kernel.org, keyrings@vger.kernel.org,
+        dhowells@redhat.com, jarkko@kernel.org
+Date:   Wed, 16 Nov 2022 17:16:34 -0600
+In-Reply-To: <9b68f825-675c-ff78-cd83-fb4f9428940b@linux.dev>
+References: <20220819223138.1457091-1-gjoyce@linux.vnet.ibm.com>
+         <20220819223138.1457091-4-gjoyce@linux.vnet.ibm.com>
+         <9b68f825-675c-ff78-cd83-fb4f9428940b@linux.dev>
+Content-Type: text/plain; charset="UTF-8"
+X-Mailer: Evolution 3.28.5 (3.28.5-18.el8) 
+Mime-Version: 1.0
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: tkd7vCQpT5_30aoc4oG5-KuxGqxOvoto
+X-Proofpoint-GUID: 6tu25jHSWztGnQwHMyaP0m9Tmw_Ptz07
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
+ definitions=2022-11-16_03,2022-11-16_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ impostorscore=0 malwarescore=0 suspectscore=0 clxscore=1011
+ priorityscore=1501 mlxscore=0 mlxlogscore=999 spamscore=0 bulkscore=0
+ adultscore=0 phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2210170000 definitions=main-2211160157
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 11/4/22 20:58, Waiman Long wrote:
->   v10:
->    - Update patch 3 to rename the rstat function to
->      cgroup_rstat_css_cpu_flush().
->
->   v9:
->    - Remove patch "llist: Allow optional sentinel node terminated lockless
->      list" for now. This will be done as a follow-up patch.
->    - Add a new lqueued field to blkg_iostat_set to store the status of
->      whether lnode is in a lockless list.
->    - Add a new patch 3 to speed up the freeing of blkcg by flushing out
->      the rstat lockless lists at blkcg offline time.
->
->   v8:
->    - Update the llist patch to make existing llist functions and macros
->      work for both NULL and sentinel terminated lockless list as much
->      as possible and leave only the initialization and removal functions
->      to have a sentinel terminated llist variants.
->
-> This patch series improves blkcg_rstat_flush() performance by eliminating
-> unnecessary blkg enumeration and flush operations for those blkg's and
-> blkg_iostat_set's that haven't been updated since the last flush.
->
-> Waiman Long (3):
->    blk-cgroup: Return -ENOMEM directly in blkcg_css_alloc() error path
->    blk-cgroup: Optimize blkcg_rstat_flush()
->    blk-cgroup: Flush stats at blkgs destruction path
->
->   block/blk-cgroup.c     | 103 +++++++++++++++++++++++++++++++++++------
->   block/blk-cgroup.h     |  10 ++++
->   include/linux/cgroup.h |   1 +
->   kernel/cgroup/rstat.c  |  20 ++++++++
->   4 files changed, 119 insertions(+), 15 deletions(-)
+On Fri, 2022-10-07 at 12:21 -0600, Jonathan Derrick wrote:
+> LGTM besides comment below
+> 
+> Reviewed-by: Jonathan Derrick <jonathan.derrick@linux.dev>
+> 
+> On 8/19/2022 4:31 PM, gjoyce@linux.vnet.ibm.com wrote:
+> > From: Greg Joyce <gjoyce@linux.vnet.ibm.com>
+> > 
+> > Allow for permanent SED authentication keys by
+> > reading/writing to the SED Opal non-volatile keystore.
+> > 
+> > Signed-off-by: Greg Joyce <gjoyce@linux.vnet.ibm.com>
+> > ---
+> >  block/sed-opal.c | 18 ++++++++++++++++--
+> >  1 file changed, 16 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/block/sed-opal.c b/block/sed-opal.c
+> > index 3bdb31cf3e7c..11b0eb3a656b 100644
+> > --- a/block/sed-opal.c
+> > +++ b/block/sed-opal.c
+> > @@ -18,6 +18,7 @@
+> >  #include <linux/uaccess.h>
+> >  #include <uapi/linux/sed-opal.h>
+> >  #include <linux/sed-opal.h>
+> > +#include <linux/sed-opal-key.h>
+> >  #include <linux/string.h>
+> >  #include <linux/kdev_t.h>
+> >  #include <linux/key.h>
+> > @@ -2697,7 +2698,13 @@ static int opal_set_new_pw(struct opal_dev
+> > *dev, struct opal_new_pw *opal_pw)
+> >  	if (ret)
+> >  		return ret;
+> >  
+> > -	/* update keyring with new password */
+> > +	/* update keyring and arch var with new password */
+> > +	ret = sed_write_key(OPAL_AUTH_KEY,
+> > +			    opal_pw->new_user_pw.opal_key.key,
+> > +			    opal_pw->new_user_pw.opal_key.key_len);
+> > +	if (ret != -EOPNOTSUPP)
+> > +		pr_warn("error updating SED key: %d\n", ret);
+> I cant see any reason this would fail and make the keys inconsistent,
+> but it seems
+> like update_sed_opal_key() should be dependent on sed_write_key()
+> succeeding
 
-Jens, do you have any further comment on this patchset? Is it possible 
-to queue it for the next Linux version?
+The thought was that since the key was already updated on the SED
+drive, there should be an attempt to update it in the key store
+even in the unlikely event the keyring update failed.
 
-Cheers,
-Longman
+> 
+> > +
+> >  	ret = update_sed_opal_key(OPAL_AUTH_KEY,
+> >  				  opal_pw->new_user_pw.opal_key.key,
+> >  				  opal_pw-
+> > >new_user_pw.opal_key.key_len);
+> > @@ -2920,6 +2927,8 @@ EXPORT_SYMBOL_GPL(sed_ioctl);
+> >  static int __init sed_opal_init(void)
+> >  {
+> >  	struct key *kr;
+> > +	char init_sed_key[OPAL_KEY_MAX];
+> > +	int keylen = OPAL_KEY_MAX;
+> >  
+> >  	kr = keyring_alloc(".sed_opal",
+> >  			   GLOBAL_ROOT_UID, GLOBAL_ROOT_GID,
+> > current_cred(),
+> > @@ -2932,6 +2941,11 @@ static int __init sed_opal_init(void)
+> >  
+> >  	sed_opal_keyring = kr;
+> >  
+> > -	return 0;
+> > +	if (sed_read_key(OPAL_AUTH_KEY, init_sed_key, &keylen) < 0) {
+> > +		memset(init_sed_key, '\0', sizeof(init_sed_key));
+> > +		keylen = OPAL_KEY_MAX;
+> > +	}
+> > +
+> > +	return update_sed_opal_key(OPAL_AUTH_KEY, init_sed_key,
+> > keylen);
+> >  }
+> >  late_initcall(sed_opal_init);
 
