@@ -2,155 +2,167 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 62440C4332F
-	for <linux-block@archiver.kernel.org>; Wed, 16 Nov 2022 11:18:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28EA3C4332F
+	for <linux-block@archiver.kernel.org>; Wed, 16 Nov 2022 11:21:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239189AbiKPLSA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 16 Nov 2022 06:18:00 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33726 "EHLO
+        id S238994AbiKPLV2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 16 Nov 2022 06:21:28 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37838 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237845AbiKPLRi (ORCPT
+        with ESMTP id S238971AbiKPLVK (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 16 Nov 2022 06:17:38 -0500
+        Wed, 16 Nov 2022 06:21:10 -0500
 Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88C3D2ED56;
-        Wed, 16 Nov 2022 03:06:05 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 97BAD4E41D;
+        Wed, 16 Nov 2022 03:09:06 -0800 (PST)
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 48532336F3;
-        Wed, 16 Nov 2022 11:06:04 +0000 (UTC)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 57081336F8;
+        Wed, 16 Nov 2022 11:09:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1668596764; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+        t=1668596945; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=XH+WwbRJQ41jjX52JCMwciyjC/IToO3NGdpBZjwirKA=;
-        b=vXxZfM8SzWrMncwtQu8dwsdM7I9+mxNBsUUrabi+G/surBd/JeW/L7cEEE7YQyFsgZcImc
-        D9Isv35LGjeZ9nEkZ23bb+rzhjCi08gAjaFKsjKClxh7+qLiMLopXqJ+CUzkKR7xH7yxLM
-        vQr7sWPY+fAvVO/sESxAAfmG/FBuoPw=
+        bh=0A7d1xzwheDqkXg7izTobfs56vTna3Rm7EV61mYuosY=;
+        b=HIH0uKbOsn3eGop72mSfQJlx484DBh9V4E/05LrCn+nmjelHDtWJt4iSOghOq3ca0TuDrD
+        TfsbceBYcfAlJbzeAF3Dg7YWjDy+b3IuQBYF4F/UqLzDrWm01ZkdI2a8uB22kEJQfP0//W
+        c+mD4PUazw74Qm04tc/6z5Zi1E14JY8=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1668596764;
+        s=susede2_ed25519; t=1668596945;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=XH+WwbRJQ41jjX52JCMwciyjC/IToO3NGdpBZjwirKA=;
-        b=w9T+qm/fU+luAhmRTIv97xTItj/rvZ4ohnv0TQQV5Rj7z2XNhiZDarx17klBvJH8zbwBjS
-        TlsDeswKTpbmc9BA==
+        bh=0A7d1xzwheDqkXg7izTobfs56vTna3Rm7EV61mYuosY=;
+        b=lXq2kmiQ5yHWm57D2vr6XcBF41+i/Q8Sq5YMEqO6/hfSkQCtSmO70IsdWCh6hVY00XmJFE
+        xd/pbLUBSXAq9RCw==
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 39C6313480;
-        Wed, 16 Nov 2022 11:06:04 +0000 (UTC)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 4990613480;
+        Wed, 16 Nov 2022 11:09:05 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id IUYSDhzEdGMvYwAAMHmgww
-        (envelope-from <jack@suse.cz>); Wed, 16 Nov 2022 11:06:04 +0000
+        id XATyEdHEdGMRZQAAMHmgww
+        (envelope-from <jack@suse.cz>); Wed, 16 Nov 2022 11:09:05 +0000
 Received: by quack3.suse.cz (Postfix, from userid 1000)
-        id CBC73A0709; Wed, 16 Nov 2022 12:06:03 +0100 (CET)
-Date:   Wed, 16 Nov 2022 12:06:03 +0100
+        id 81F25A0709; Wed, 16 Nov 2022 12:09:04 +0100 (CET)
+Date:   Wed, 16 Nov 2022 12:09:04 +0100
 From:   Jan Kara <jack@suse.cz>
 To:     Gabriel Krisman Bertazi <krisman@suse.de>
 Cc:     axboe@kernel.dk, mingo@redhat.com, peterz@infradead.org,
         jack@suse.cz, linux-kernel@vger.kernel.org,
         linux-block@vger.kernel.org, liusong@linux.alibaba.com,
         chaitanyak@nvidia.com
-Subject: Re: [PATCH 2/3] wait: Return number of exclusive waiters awaken
-Message-ID: <20221116110603.6rndj2eei6mi6k33@quack3>
+Subject: Re: [PATCH 3/3] sbitmap: Try each queue to wake up at least one
+ waiter
+Message-ID: <20221116110904.trhcoxqa6tipevdr@quack3>
 References: <20221115224553.23594-1-krisman@suse.de>
- <20221115224553.23594-3-krisman@suse.de>
+ <20221115224553.23594-4-krisman@suse.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20221115224553.23594-3-krisman@suse.de>
+In-Reply-To: <20221115224553.23594-4-krisman@suse.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue 15-11-22 17:45:52, Gabriel Krisman Bertazi wrote:
-> Sbitmap code will need to know how many waiters were actually woken for
-> its batched wakeups implementation.  Return the number of woken
-> exclusive waiters from __wake_up() to facilitate that.
+On Tue 15-11-22 17:45:53, Gabriel Krisman Bertazi wrote:
+> Jan reported the new algorithm as merged might be problematic if the
+> queue being awaken becomes empty between the waitqueue_active inside
+> sbq_wake_ptr check and the wake up.  If that happens, wake_up_nr will
+> not wake up any waiter and we loose too many wake ups.  In order to
+> guarantee progress, we need to wake up at least one waiter here, if
+> there are any.  This now requires trying to wake up from every queue.
 > 
-> Suggested-by: Jan Kara <jack@suse.cz>
+> Instead of walking through all the queues with sbq_wake_ptr, this call
+> moves the wake up inside that function.  In a previous version of the
+> patch, I found that updating wake_index several times when walking
+> through queues had a measurable overhead.  This ensures we only update
+> it once, at the end.
+> 
+> Fixes: 4f8126bb2308 ("sbitmap: Use single per-bitmap counting to wake up queued tags")
+> Reported-by: Jan Kara <jack@suse.cz>
 > Signed-off-by: Gabriel Krisman Bertazi <krisman@suse.de>
 
-Looks good. Feel free to add:
+Elegant and looks good to me! Feel free to add:
 
 Reviewed-by: Jan Kara <jack@suse.cz>
 
 								Honza
 
 > ---
->  include/linux/wait.h |  2 +-
->  kernel/sched/wait.c  | 18 +++++++++++-------
->  2 files changed, 12 insertions(+), 8 deletions(-)
+>  lib/sbitmap.c | 28 ++++++++++++----------------
+>  1 file changed, 12 insertions(+), 16 deletions(-)
 > 
-> diff --git a/include/linux/wait.h b/include/linux/wait.h
-> index 7f5a51aae0a7..a0307b516b09 100644
-> --- a/include/linux/wait.h
-> +++ b/include/linux/wait.h
-> @@ -209,7 +209,7 @@ __remove_wait_queue(struct wait_queue_head *wq_head, struct wait_queue_entry *wq
->  	list_del(&wq_entry->entry);
+> diff --git a/lib/sbitmap.c b/lib/sbitmap.c
+> index bea7984f7987..586deb333237 100644
+> --- a/lib/sbitmap.c
+> +++ b/lib/sbitmap.c
+> @@ -560,12 +560,12 @@ void sbitmap_queue_min_shallow_depth(struct sbitmap_queue *sbq,
 >  }
+>  EXPORT_SYMBOL_GPL(sbitmap_queue_min_shallow_depth);
 >  
-> -void __wake_up(struct wait_queue_head *wq_head, unsigned int mode, int nr, void *key);
-> +int __wake_up(struct wait_queue_head *wq_head, unsigned int mode, int nr, void *key);
->  void __wake_up_locked_key(struct wait_queue_head *wq_head, unsigned int mode, void *key);
->  void __wake_up_locked_key_bookmark(struct wait_queue_head *wq_head,
->  		unsigned int mode, void *key, wait_queue_entry_t *bookmark);
-> diff --git a/kernel/sched/wait.c b/kernel/sched/wait.c
-> index 9860bb9a847c..133b74730738 100644
-> --- a/kernel/sched/wait.c
-> +++ b/kernel/sched/wait.c
-> @@ -121,11 +121,12 @@ static int __wake_up_common(struct wait_queue_head *wq_head, unsigned int mode,
->  	return nr_exclusive;
->  }
->  
-> -static void __wake_up_common_lock(struct wait_queue_head *wq_head, unsigned int mode,
-> +static int __wake_up_common_lock(struct wait_queue_head *wq_head, unsigned int mode,
->  			int nr_exclusive, int wake_flags, void *key)
+> -static struct sbq_wait_state *sbq_wake_ptr(struct sbitmap_queue *sbq)
+> +static void __sbitmap_queue_wake_up(struct sbitmap_queue *sbq, int nr)
 >  {
->  	unsigned long flags;
->  	wait_queue_entry_t bookmark;
-> +	int remaining = nr_exclusive;
+>  	int i, wake_index;
 >  
->  	bookmark.flags = 0;
->  	bookmark.private = NULL;
-> @@ -134,10 +135,12 @@ static void __wake_up_common_lock(struct wait_queue_head *wq_head, unsigned int
+>  	if (!atomic_read(&sbq->ws_active))
+> -		return NULL;
+> +		return;
 >  
+>  	wake_index = atomic_read(&sbq->wake_index);
+>  	for (i = 0; i < SBQ_WAIT_QUEUES; i++) {
+> @@ -579,20 +579,22 @@ static struct sbq_wait_state *sbq_wake_ptr(struct sbitmap_queue *sbq)
+>  		 */
+>  		wake_index = sbq_index_inc(wake_index);
+>  
+> -		if (waitqueue_active(&ws->wait)) {
+> -			if (wake_index != atomic_read(&sbq->wake_index))
+> -				atomic_set(&sbq->wake_index, wake_index);
+> -			return ws;
+> -		}
+> +		/*
+> +		 * It is sufficient to wake up at least one waiter to
+> +		 * guarantee forward progress.
+> +		 */
+> +		if (waitqueue_active(&ws->wait) &&
+> +		    wake_up_nr(&ws->wait, nr))
+> +			break;
+>  	}
+>  
+> -	return NULL;
+> +	if (wake_index != atomic_read(&sbq->wake_index))
+> +		atomic_set(&sbq->wake_index, wake_index);
+>  }
+>  
+>  void sbitmap_queue_wake_up(struct sbitmap_queue *sbq, int nr)
+>  {
+>  	unsigned int wake_batch = READ_ONCE(sbq->wake_batch);
+> -	struct sbq_wait_state *ws = NULL;
+>  	unsigned int wakeups;
+>  
+>  	if (!atomic_read(&sbq->ws_active))
+> @@ -604,16 +606,10 @@ void sbitmap_queue_wake_up(struct sbitmap_queue *sbq, int nr)
 >  	do {
->  		spin_lock_irqsave(&wq_head->lock, flags);
-> -		nr_exclusive = __wake_up_common(wq_head, mode, nr_exclusive,
-> +		remaining = __wake_up_common(wq_head, mode, remaining,
->  						wake_flags, key, &bookmark);
->  		spin_unlock_irqrestore(&wq_head->lock, flags);
->  	} while (bookmark.flags & WQ_FLAG_BOOKMARK);
-> +
-> +	return nr_exclusive - remaining;
->  }
+>  		if (atomic_read(&sbq->completion_cnt) - wakeups < wake_batch)
+>  			return;
+> -
+> -		if (!ws) {
+> -			ws = sbq_wake_ptr(sbq);
+> -			if (!ws)
+> -				return;
+> -		}
+>  	} while (!atomic_try_cmpxchg(&sbq->wakeup_cnt,
+>  				     &wakeups, wakeups + wake_batch));
 >  
->  /**
-> @@ -147,13 +150,14 @@ static void __wake_up_common_lock(struct wait_queue_head *wq_head, unsigned int
->   * @nr_exclusive: how many wake-one or wake-many threads to wake up
->   * @key: is directly passed to the wakeup function
->   *
-> - * If this function wakes up a task, it executes a full memory barrier before
-> - * accessing the task state.
-> + * If this function wakes up a task, it executes a full memory barrier
-> + * before accessing the task state.  Returns the number of exclusive
-> + * tasks that were awaken.
->   */
-> -void __wake_up(struct wait_queue_head *wq_head, unsigned int mode,
-> -			int nr_exclusive, void *key)
-> +int __wake_up(struct wait_queue_head *wq_head, unsigned int mode,
-> +	      int nr_exclusive, void *key)
->  {
-> -	__wake_up_common_lock(wq_head, mode, nr_exclusive, 0, key);
-> +	return __wake_up_common_lock(wq_head, mode, nr_exclusive, 0, key);
+> -	wake_up_nr(&ws->wait, wake_batch);
+> +	__sbitmap_queue_wake_up(sbq, wake_batch);
 >  }
->  EXPORT_SYMBOL(__wake_up);
+>  EXPORT_SYMBOL_GPL(sbitmap_queue_wake_up);
 >  
 > -- 
 > 2.35.3
