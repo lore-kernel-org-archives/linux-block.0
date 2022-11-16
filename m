@@ -2,89 +2,79 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CD08C4332F
-	for <linux-block@archiver.kernel.org>; Wed, 16 Nov 2022 21:20:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 23493C433FE
+	for <linux-block@archiver.kernel.org>; Wed, 16 Nov 2022 21:29:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233199AbiKPVUa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 16 Nov 2022 16:20:30 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36000 "EHLO
+        id S231342AbiKPV3A (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 16 Nov 2022 16:29:00 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39522 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229834AbiKPVUa (ORCPT
+        with ESMTP id S232774AbiKPV26 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 16 Nov 2022 16:20:30 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C88EC60691
-        for <linux-block@vger.kernel.org>; Wed, 16 Nov 2022 13:19:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1668633566;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=vCYGmyLDobaOWhMO5cqt6VIfl5tBZ1SXgoRZ3UG9G7A=;
-        b=RG56Ca3ELSzcr9QR4D8vZmY2ESo2k3W4tnsuLgSPq+NSXZszUnLd+EfboUrgR7/KoHBUlX
-        HpwEZhewhvGw1MvwlpXlYOmSzWvY0LjHDLzlJIlAtiRvfI92n0zzNeQ9EYgxhklkXX+VRS
-        qWQYXMGkbmWccSeW19vpG/hVbIJoiIs=
-Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
- [209.85.160.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-664-A2Njg2vfM0yS0zXI6Cf2bA-1; Wed, 16 Nov 2022 16:19:25 -0500
-X-MC-Unique: A2Njg2vfM0yS0zXI6Cf2bA-1
-Received: by mail-qt1-f200.google.com with SMTP id cd6-20020a05622a418600b003a54cb17ad9so14083247qtb.0
-        for <linux-block@vger.kernel.org>; Wed, 16 Nov 2022 13:19:25 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vCYGmyLDobaOWhMO5cqt6VIfl5tBZ1SXgoRZ3UG9G7A=;
-        b=Fz2zmOh1IaKS5GO2JfTZsr3gdJ9gaok9Zwqk2oxN/sDI8im2AdePvAQkCRYEADrmxM
-         mHK5r0rq9YmEaeaxzLl50wN5s9timzV+GrKGHkNYEH85/L054o49+lDwj6HIjNhE37UO
-         6lgj29xdvBZIjD/5QIPAh9H1RIcebyE9yqLxM48eRSXWE2+ryju3Kbyny3QI2oUpMc+3
-         wnEcZbBWGfU4NVQxCkW819jXNUFdfYIBnsasIqzajiHjs4Mzn918/w9fyWE925tEOZry
-         nvD6g/2J54dKgW71j4h5HFZuQ/CriXvrcYF2vEq44G0Um4jNlleSvAhdB3ofbFyhyrWI
-         7FWw==
-X-Gm-Message-State: ANoB5pn7vRPosYSQoQ4T/gVeb8B08C7cIdHMnaqaoWLSgPPmRQwvksYT
-        lh2RFzMTXMi0ltclOfmJ1YWfio3DXu3YpLR956uCwyOnNJ9tg/FfQ/gBA1nYQPww/hYldmJpr0q
-        xF1HtrNdQkzmQoHWWb1u4ng==
-X-Received: by 2002:ae9:e00a:0:b0:6fa:dde:394b with SMTP id m10-20020ae9e00a000000b006fa0dde394bmr20880851qkk.265.1668633565301;
-        Wed, 16 Nov 2022 13:19:25 -0800 (PST)
-X-Google-Smtp-Source: AA0mqf79d3ufTC3euri2dfEG/6gEWLrTi+hGugOKpv+coUCcCq4MU9SJtMQwDTIFAPdLoCphODrNwg==
-X-Received: by 2002:ae9:e00a:0:b0:6fa:dde:394b with SMTP id m10-20020ae9e00a000000b006fa0dde394bmr20880827qkk.265.1668633565092;
-        Wed, 16 Nov 2022 13:19:25 -0800 (PST)
-Received: from localhost (pool-68-160-173-162.bstnma.fios.verizon.net. [68.160.173.162])
-        by smtp.gmail.com with ESMTPSA id bj17-20020a05620a191100b006cfc1d827cbsm10879419qkb.9.2022.11.16.13.19.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 16 Nov 2022 13:19:24 -0800 (PST)
-Date:   Wed, 16 Nov 2022 16:19:23 -0500
-From:   Mike Snitzer <snitzer@redhat.com>
-To:     Yu Kuai <yukuai1@huaweicloud.com>
-Cc:     hch@lst.de, axboe@kernel.dk, agk@redhat.com, snitzer@kernel.org,
-        dm-devel@redhat.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, yukuai3@huawei.com,
-        yi.zhang@huawei.com
-Subject: Re: [PATCH v3 03/10] dm: cleanup open_table_device
-Message-ID: <Y3VT22zmwOlrxdsw@redhat.com>
-References: <20221115141054.1051801-1-yukuai1@huaweicloud.com>
- <20221115141054.1051801-4-yukuai1@huaweicloud.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221115141054.1051801-4-yukuai1@huaweicloud.com>
+        Wed, 16 Nov 2022 16:28:58 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E79D21E1A
+        for <linux-block@vger.kernel.org>; Wed, 16 Nov 2022 13:28:58 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id B525E61F8E
+        for <linux-block@vger.kernel.org>; Wed, 16 Nov 2022 21:28:57 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C8A42C433D6;
+        Wed, 16 Nov 2022 21:28:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linux-foundation.org;
+        s=korg; t=1668634137;
+        bh=/9l0Nf4U9WJvdT9Wc61RdT3/RrfG2M/RnBHBsLG8M94=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=KvovNXgtvaouAjH2iKqipsJoslPMbuawfIKg+OM9a8F+3WpVOijHt8yn6xaUAO5HT
+         xQnaYkg/ILGIesKQ03EFkTo8LSvJBEwatobpG37stPoWlVwLQYaRsCxNmtP+puO+Ap
+         P9w+Wwvuc0d6agsz3kUd3T5bJ5123NTJcDujCuu0=
+Date:   Wed, 16 Nov 2022 13:28:56 -0800
+From:   Andrew Morton <akpm@linux-foundation.org>
+To:     Stefan Roesch <shr@devkernel.io>
+Cc:     kernel-team@fb.com, linux-block@vger.kernel.org,
+        linux-mm@kvack.org, axboe@kernel.dk, clm@meta.com,
+        willy@infradead.org, hch@infradead.org
+Subject: Re: [RFC PATCH v3 01/14] mm: add bdi_set_strict_limit() function
+Message-Id: <20221116132856.b3403e3ae1e39cc3a7a4f865@linux-foundation.org>
+In-Reply-To: <20221024190603.3987969-2-shr@devkernel.io>
+References: <20221024190603.3987969-1-shr@devkernel.io>
+        <20221024190603.3987969-2-shr@devkernel.io>
+X-Mailer: Sylpheed 3.7.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Nov 15 2022 at  9:10P -0500,
-Yu Kuai <yukuai1@huaweicloud.com> wrote:
+On Mon, 24 Oct 2022 12:05:50 -0700 Stefan Roesch <shr@devkernel.io> wrote:
 
-> From: Christoph Hellwig <hch@lst.de>
+> This adds the bdi_set_strict_limit function to be able to set/unset the
+> BDI_CAP_STRICTLIMIT flag.
 > 
-> Move all the logic for allocation the table_device and linking it into
-> the list into the open_table_device.  This keeps the code tidy and
-> ensures that the table_devices only exist in fully initialized state.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+> ...
+>
+> --- a/mm/page-writeback.c
+> +++ b/mm/page-writeback.c
+> @@ -698,6 +698,22 @@ int bdi_set_max_ratio(struct backing_dev_info *bdi, unsigned max_ratio)
+>  }
+>  EXPORT_SYMBOL(bdi_set_max_ratio);
+>  
+> +int bdi_set_strict_limit(struct backing_dev_info *bdi, unsigned int strict_limit)
+> +{
+> +	if (strict_limit > 1)
+> +		return -EINVAL;
+> +
+> +	spin_lock_bh(&bdi_lock);
+> +	if (strict_limit)
+> +		bdi->capabilities |= BDI_CAP_STRICTLIMIT;
+> +	else
+> +		bdi->capabilities &= ~BDI_CAP_STRICTLIMIT;
+> +	spin_unlock_bh(&bdi_lock);
+> +
+> +	return 0;
+> +}
+> +EXPORT_SYMBOL_GPL(bdi_set_strict_limit);
 
-Reviewed-by: Mike Snitzer <snitzer@kernel.org>
-
+I don't believe the export is needed?
