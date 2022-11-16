@@ -2,87 +2,69 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25D8BC433FE
-	for <linux-block@archiver.kernel.org>; Wed, 16 Nov 2022 20:08:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B002C4332F
+	for <linux-block@archiver.kernel.org>; Wed, 16 Nov 2022 20:22:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232197AbiKPUIL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 16 Nov 2022 15:08:11 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37654 "EHLO
+        id S229931AbiKPUWb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 16 Nov 2022 15:22:31 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46494 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232905AbiKPUII (ORCPT
+        with ESMTP id S233488AbiKPUWa (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 16 Nov 2022 15:08:08 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA4A765E51
-        for <linux-block@vger.kernel.org>; Wed, 16 Nov 2022 12:07:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1668629236;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=pyb9R3Z9t9f8WkvXA0nuu3YJepmBztVFz76Ik7BRpJA=;
-        b=Oje2vdl243QdqRpz32MAAxiIkhR0Ie6Fte1eXt27Xahfh18I/0XRDe3fUYwx0u7bSN6pT0
-        Gb5U6LYnZ5UIOwhLpuXv4UdnpaxC3/+bQlEphfLBoYZdhL5N1X9x68NkpBv0TWFBm9Xwn3
-        4hfN9eWstQskGBZBrZG/8frdAlfrn6U=
-Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
- [209.85.160.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-244-tw-pJqfQN3mSt1YLcqXRVQ-1; Wed, 16 Nov 2022 15:07:14 -0500
-X-MC-Unique: tw-pJqfQN3mSt1YLcqXRVQ-1
-Received: by mail-qt1-f199.google.com with SMTP id gc12-20020a05622a59cc00b003a5444280e1so14011138qtb.13
-        for <linux-block@vger.kernel.org>; Wed, 16 Nov 2022 12:07:14 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=pyb9R3Z9t9f8WkvXA0nuu3YJepmBztVFz76Ik7BRpJA=;
-        b=2HYzcEwklkRFqNcDqvnCoOMlXZXwLsBfHayyWUm5RWEKmG9jS4KMg8r2gVNcKv4wJD
-         9Xzcbmr3zm/vHRaYpVKXhklsm3ZUoEo/LAOOBUh8LCmMpPOVaTIWjKFWpPzpnJJqlbGZ
-         MeVwKPzZtq3qnl9t2QBULT+3o11qElSRVmvMQvoozsAhRaiVZflDSI42ToIQLwqQsDHx
-         N8BDJxW/+rR6sDZrFqxEUJOd9pPOW61v17/TWXKRayIS/JkuRCu23fJh9sI/ENlqQupp
-         eAhOhhwKpltN/bOxJhL04uNOFq7b4UbP2a9O1c0+/FB70GhUSqay5F64fQXrqTh8xt0r
-         kEHA==
-X-Gm-Message-State: ANoB5plvxiGCx2D9S1G4ujvpMUiAQOpI3ZSIoiCa+Kv3vyz90VniaGG1
-        Gntx/OgVPjlJm3p8BH5UHyo62wHKWslW/VchRs3PRHehbFkZ2Q4Hkq0/9L0BPQljD65Q7XIkfe1
-        wWcrgqm9C9jBXc0vG3oPfjg==
-X-Received: by 2002:ad4:404d:0:b0:4b1:166:bd26 with SMTP id r13-20020ad4404d000000b004b10166bd26mr22167362qvp.21.1668629234531;
-        Wed, 16 Nov 2022 12:07:14 -0800 (PST)
-X-Google-Smtp-Source: AA0mqf7NSDvq8EIsPma17Eq/R3cpKE8X0kD6fDGjVmLxSHuH7Ap7Fm5PIdEa0EcdSMfpGQIjfXQKYg==
-X-Received: by 2002:ad4:404d:0:b0:4b1:166:bd26 with SMTP id r13-20020ad4404d000000b004b10166bd26mr22167342qvp.21.1668629234296;
-        Wed, 16 Nov 2022 12:07:14 -0800 (PST)
-Received: from localhost (pool-68-160-173-162.bstnma.fios.verizon.net. [68.160.173.162])
-        by smtp.gmail.com with ESMTPSA id t19-20020ac865d3000000b003a527d29a41sm9173559qto.75.2022.11.16.12.07.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 16 Nov 2022 12:07:13 -0800 (PST)
-Date:   Wed, 16 Nov 2022 15:07:12 -0500
-From:   Mike Snitzer <snitzer@redhat.com>
-To:     Keith Busch <kbusch@meta.com>
-Cc:     linux-block@vger.kernel.org, dm-devel@redhat.com, axboe@kernel.dk,
-        stefanha@redhat.com, ebiggers@kernel.org, me@demsh.org,
-        mpatocka@redhat.com, Keith Busch <kbusch@kernel.org>
-Subject: Re: [PATCHv2 5/5] dm-log-writes: set dma_alignment limit in io_hints
-Message-ID: <Y3VC8MQaIN4oc1+V@redhat.com>
-References: <20221110184501.2451620-1-kbusch@meta.com>
- <20221110184501.2451620-6-kbusch@meta.com>
+        Wed, 16 Nov 2022 15:22:30 -0500
+Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83C34391EA;
+        Wed, 16 Nov 2022 12:22:29 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=hH19YGq1y0eRu9Lz4t4Ti6l6o3b8IXO3bDhzZqQwNaE=; b=E8C5WnIHLdEd9OcjaESPE2e+yG
+        It9TH+s1V2kojVcvngPQK5OzfSjbvShhkX5JnONkhFvqpuph9NP4hDQ7WKSDjQNe6LCJUP2jQfVDh
+        lvTDyPqVYIW01UVilV8SLdejTPr52jdXnIMFCXeFxohb9zMJecbJZHwj6iImS0RarSmW1Dp2t08sW
+        DvQrrABoofo0DkGsZnHtmP3NyJS6aPCQ1ls64W9gS1UUXv6asuDhHSS0wWhWkOUuy7+0Jfcqj4Ktq
+        w/IQ65hnJLqYwQtxmvyfgwsCTLqt5X4Al0MdBB4n5ofWsBgAAtfXfiray32/8okWcb+Gin8PPnYDS
+        s0HhXcIQ==;
+Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
+        by desiato.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1ovOvJ-001SdE-8G; Wed, 16 Nov 2022 20:22:18 +0000
+Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (Client did not present a certificate)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id D18B830002E;
+        Wed, 16 Nov 2022 21:22:15 +0100 (CET)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id BA003206A3E3D; Wed, 16 Nov 2022 21:22:15 +0100 (CET)
+Date:   Wed, 16 Nov 2022 21:22:15 +0100
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     Gabriel Krisman Bertazi <krisman@suse.de>
+Cc:     axboe@kernel.dk, mingo@redhat.com, jack@suse.cz,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        liusong@linux.alibaba.com, chaitanyak@nvidia.com
+Subject: Re: [PATCH 2/3] wait: Return number of exclusive waiters awaken
+Message-ID: <Y3VGd4f/nk7r+Eoc@hirez.programming.kicks-ass.net>
+References: <20221115224553.23594-1-krisman@suse.de>
+ <20221115224553.23594-3-krisman@suse.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20221110184501.2451620-6-kbusch@meta.com>
+In-Reply-To: <20221115224553.23594-3-krisman@suse.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Nov 10 2022 at  1:45P -0500,
-Keith Busch <kbusch@meta.com> wrote:
-
-> From: Keith Busch <kbusch@kernel.org>
+On Tue, Nov 15, 2022 at 05:45:52PM -0500, Gabriel Krisman Bertazi wrote:
+> Sbitmap code will need to know how many waiters were actually woken for
+> its batched wakeups implementation.  Return the number of woken
+> exclusive waiters from __wake_up() to facilitate that.
 > 
-> This device mapper needs bio vectors to be sized and memory aligned to
-> the logical block size. Set the minimum required queue limit
-> accordingly.
-> 
-> Signed-off-by: Keith Busch <kbusch@kernel.org>
+> Suggested-by: Jan Kara <jack@suse.cz>
+> Signed-off-by: Gabriel Krisman Bertazi <krisman@suse.de>
 
-Reviewed-by: Mike Snitzer <snitzer@kernel.org>
+Acked-by: Peter Zijlstra (Intel) <peterz@infradead.org>
 
+> ---
+>  include/linux/wait.h |  2 +-
+>  kernel/sched/wait.c  | 18 +++++++++++-------
+>  2 files changed, 12 insertions(+), 8 deletions(-)
