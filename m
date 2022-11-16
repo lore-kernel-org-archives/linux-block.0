@@ -2,90 +2,93 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 32F33C433FE
-	for <linux-block@archiver.kernel.org>; Tue, 15 Nov 2022 23:32:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 217EAC4332F
+	for <linux-block@archiver.kernel.org>; Wed, 16 Nov 2022 00:12:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229495AbiKOXcu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 15 Nov 2022 18:32:50 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38620 "EHLO
+        id S231194AbiKPAMp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 15 Nov 2022 19:12:45 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52310 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229560AbiKOXcu (ORCPT
+        with ESMTP id S229953AbiKPAMn (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 15 Nov 2022 18:32:50 -0500
-Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6CF8E959E;
-        Tue, 15 Nov 2022 15:32:49 -0800 (PST)
-Received: by mail-pj1-x1033.google.com with SMTP id m14-20020a17090a3f8e00b00212dab39bcdso705918pjc.0;
-        Tue, 15 Nov 2022 15:32:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=sgz5o5DfbV3xr4Xq9yVshHOHM8PL4ue2OQGWIUkyU1s=;
-        b=bvYH+xNXVvSAx6vKiudIS7G2gSJ2PXBec57nPAoCI7pb8hJJVorTvTe5Db4rDHP767
-         0n9W2FIPaIYlx5/n/E3ALoMcbBc75QD7im8Xau1UITFiysk7f05bXYx7pfJRtEkec3SP
-         Ho5R/aC2Yi7x7mnwtf7e7SFceKI5SJupC16pBGjlJvfrtnt5eYRs054Aqas/cB9A7Sbo
-         ePWdhJaWPzkbfp49I9NvV3T6DypSO/ZcLa3fHE/ThfoMKidxs6M9DagoDpaVVtyyfsUl
-         AgwZLLk3me+xp+Zqi2wWku4Yq10ZEGdRkjPCv34ylfieTD+GFlM+SxcHEk3E2wW2wwvm
-         +wGw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=sgz5o5DfbV3xr4Xq9yVshHOHM8PL4ue2OQGWIUkyU1s=;
-        b=J/qfq3RqCpgGKtU4h6tH/TFlbRaf2wBCSUhLWqcG2aZpiskqBwjLTzU0qPJw9VF7jj
-         czDCaUdpLkR1TPfouRF16L1YQktLa6gOOZof7o/n5MhQYBMbqDQL5F1Vx7qBOIqlzR+1
-         feJUaoI0vT3ZKkRC+B7E4mNe1ZA9pxQLR72VwBJ4zmBQxjVNkNSj4Hx9rXcNxYiGRo7Q
-         hCvw/oBGCi1g5sBaYkPUjkGiDteP9Io9tdMECkChRcJj6FqZTYZJjQtBpcHE8xbSbOEi
-         OIv9RjCIYcnci3uDzFpZlSwKHLDQFeT1Eo0i9sZ/uHTgnTvuNhQPNQQMAysWxR9UXjBS
-         klKw==
-X-Gm-Message-State: ANoB5plaSqgfvgQpNxW2c0s9qsY3F3CUIMble2LbSWwUDO5mld+g0T7S
-        kyNXebECjYF5RtP05ZGE3vs=
-X-Google-Smtp-Source: AA0mqf4ULM0GXAw7L905+KueIktR4Owb1uKikfXE00JzU8UHVdytaYIkBI6dzOEscrtWWbNl8x2LfQ==
-X-Received: by 2002:a17:90b:3756:b0:20a:92d2:226a with SMTP id ne22-20020a17090b375600b0020a92d2226amr746946pjb.155.1668555168942;
-        Tue, 15 Nov 2022 15:32:48 -0800 (PST)
-Received: from google.com ([2620:15c:211:201:6ff2:4caf:5d97:1932])
-        by smtp.gmail.com with ESMTPSA id b193-20020a621bca000000b0056ddd2ac8f1sm9351873pfb.211.2022.11.15.15.32.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 15 Nov 2022 15:32:48 -0800 (PST)
-Sender: Minchan Kim <minchan.kim@gmail.com>
-Date:   Tue, 15 Nov 2022 15:32:46 -0800
-From:   Minchan Kim <minchan@kernel.org>
-To:     yang.yang29@zte.com.cn
-Cc:     ngupta@vflare.org, senozhatsky@chromium.org, axboe@kernel.dk,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        xu.panda@zte.com.cn
-Subject: Re: [PATCH linux-next v2] zram: use sysfs_emit() to instead of
- scnprintf()
-Message-ID: <Y3QhnpQQ/y58XyVh@google.com>
-References: <202211152004478289568@zte.com.cn>
+        Tue, 15 Nov 2022 19:12:43 -0500
+Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 95F1D2A716
+        for <linux-block@vger.kernel.org>; Tue, 15 Nov 2022 16:12:42 -0800 (PST)
+Received: from pps.filterd (m0246627.ppops.net [127.0.0.1])
+        by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2AFME4Jo020916;
+        Wed, 16 Nov 2022 00:12:37 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-transfer-encoding;
+ s=corp-2022-7-12; bh=TfNZuRSK1rYDWpaEmMVhVZSMlQ8Ufn3t/rR4cl1Jzso=;
+ b=ObOf2ox951EOPcH+r/r5ipq9fP8eNuO2PjT2CP8klD7wRF4fZdKwVelSyQd6rdA1Xn30
+ 2QBhQiIyyB7g9vDOycKAGED8/7df8TYLZt4wKrTOA/A+7zo5QTyJ0c2w3RoDLGoZxfVi
+ XBCwUMRnPwSvqJJmqlnbuj1WLnPcKDQgBiZwDROkHlOf/WpS14KZjLB7oVGiWVkTwybA
+ x7aGeZquHEPKw2LuodJy556UfjAgJORolMfzqrEFu2ASGut84shUIBUX1H9g3fGhoB35
+ 9gFtt0xh0KF91K3risvgldB+93Gc+jEF0S7teCTVizHL3WhmMPM0cqIMBHu16xEOUbz5 rA== 
+Received: from iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta03.appoci.oracle.com [130.35.103.27])
+        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3kv8ykjmyy-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 16 Nov 2022 00:12:37 +0000
+Received: from pps.filterd (iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+        by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.5/8.17.1.5) with ESMTP id 2AFNcc7X004768;
+        Wed, 16 Nov 2022 00:12:35 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+        by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3ku3k7dqf4-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 16 Nov 2022 00:12:35 +0000
+Received: from iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2AG0CZsq013984;
+        Wed, 16 Nov 2022 00:12:35 GMT
+Received: from ca-dev94.us.oracle.com (ca-dev94.us.oracle.com [10.129.136.30])
+        by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 3ku3k7dqee-1;
+        Wed, 16 Nov 2022 00:12:35 +0000
+From:   Alan Adamson <alan.adamson@oracle.com>
+To:     linux-block@vger.kernel.org
+Cc:     alan.adamson@oracle.com, linux-nvme@lists.infradead.org,
+        shinichiro.kawasaki@wdc.com
+Subject: [PATCH] tests/nvme: Remove test output for passthrough error logging
+Date:   Tue, 15 Nov 2022 16:12:34 -0800
+Message-Id: <20221116001234.581003-1-alan.adamson@oracle.com>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <202211152004478289568@zte.com.cn>
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
+ definitions=2022-11-15_08,2022-11-15_03,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 mlxscore=0 adultscore=0
+ phishscore=0 malwarescore=0 suspectscore=0 mlxlogscore=999 spamscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2210170000
+ definitions=main-2211150166
+X-Proofpoint-GUID: -FSbXsoXg8FdkoJdlK8wof_DkiRueA6l
+X-Proofpoint-ORIG-GUID: -FSbXsoXg8FdkoJdlK8wof_DkiRueA6l
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
+Commit d7ac8dca938c ("nvme: quiet user passthrough command errors")
+disabled error logging for passthrough commands so the associated
+error output in nvme/039.out should be removed.
 
-On Tue, Nov 15, 2022 at 08:04:47PM +0800, yang.yang29@zte.com.cn wrote:
-> From: Xu Panda <xu.panda@zte.com.cn>
-> 
-> Replace the open-code with sysfs_emit() to simplify the code.
-> ---
-> change for v2
->  - realign params of sysfs_emit().
-> ---
-> 
-> Signed-off-by: Xu Panda <xu.panda@zte.com.cn>
-> Signed-off-by: Yang Yang <yang.yang29@zte.com>
+When an error logging opt-in mechanism for passthrough commands is
+provided, the error output can be added back.
 
-Recently, we added one more stat is using the scnprintf in mm-unstable
-tree? recomp_algorithm_show 
+Signed-off-by: Alan Adamson <alan.adamson@oracle.com>
+---
+ tests/nvme/039.out | 2 --
+ 1 file changed, 2 deletions(-)
 
-Could you also change it?
+diff --git a/tests/nvme/039.out b/tests/nvme/039.out
+index 162935eb1d7b..139070d22240 100644
+--- a/tests/nvme/039.out
++++ b/tests/nvme/039.out
+@@ -2,6 +2,4 @@ Running nvme/039
+  Read(0x2) @ LBA 0, 1 blocks, Unrecovered Read Error (sct 0x2 / sc 0x81) DNR 
+  Read(0x2) @ LBA 0, 1 blocks, Unknown (sct 0x3 / sc 0x75) DNR 
+  Write(0x1) @ LBA 0, 1 blocks, Write Fault (sct 0x2 / sc 0x80) DNR 
+- Identify(0x6), Access Denied (sct 0x2 / sc 0x86) DNR 
+- Unknown(0x96), Invalid Command Opcode (sct 0x0 / sc 0x1) DNR 
+ Test complete
+-- 
+2.31.1
 
-Thanks!
