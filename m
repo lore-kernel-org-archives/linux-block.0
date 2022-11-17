@@ -2,78 +2,80 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 833BBC4332F
-	for <linux-block@archiver.kernel.org>; Thu, 17 Nov 2022 06:00:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24B81C433FE
+	for <linux-block@archiver.kernel.org>; Thu, 17 Nov 2022 06:50:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239283AbiKQGAo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 17 Nov 2022 01:00:44 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51558 "EHLO
+        id S233394AbiKQGuQ convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 17 Nov 2022 01:50:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41594 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239246AbiKQGAi (ORCPT
+        with ESMTP id S233502AbiKQGuP (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 17 Nov 2022 01:00:38 -0500
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A58A16581;
-        Wed, 16 Nov 2022 22:00:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=Ka0zWX28jwmPVoBvV9gqCxIV7SNbOuU8UYsaU9048Q8=; b=D6quLTD6qQFeVVAaaaR6f+qtrB
-        z/Jom9O6meODBzgm1GH6/KunvdEvNQY7XIMs3gRtEKvbWXXa0owllsCKvC3e/LR+J2U+yyyudYQU3
-        cIwBElUPrpB+w4DOQzPLlDLltNf0nD842kVjXsMvIjNHdVMo9VKHypAipsl/xkIqF2x1vRzJ302e8
-        A+rOQp3h5vyXKSjjFD6NWl6ApWw0PmKNAX6b2mmxML0xZTIy8NJqVDcXaaN1Ti/enDG8WX6Jw7rcd
-        9YwizRkHVVMoYixOy/i5yrS50o27AXxVMY1VrnEc8rWUL6FMm3kFLxHWgwyF5e1vRlq1eNC3QjxmH
-        RyZ8oQUg==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1ovXwn-00AcUt-IU; Thu, 17 Nov 2022 06:00:25 +0000
-Date:   Wed, 16 Nov 2022 22:00:25 -0800
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Daniel Golle <daniel@makrotopia.org>
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        Jens Axboe <axboe@kernel.dk>,
+        Thu, 17 Nov 2022 01:50:15 -0500
+Received: from lithops.sigma-star.at (lithops.sigma-star.at [195.201.40.130])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E61395CD3C;
+        Wed, 16 Nov 2022 22:50:12 -0800 (PST)
+Received: from localhost (localhost [127.0.0.1])
+        by lithops.sigma-star.at (Postfix) with ESMTP id 0BA0063E5142;
+        Thu, 17 Nov 2022 07:50:10 +0100 (CET)
+Received: from lithops.sigma-star.at ([127.0.0.1])
+        by localhost (lithops.sigma-star.at [127.0.0.1]) (amavisd-new, port 10032)
+        with ESMTP id C-8DFjzXAIMN; Thu, 17 Nov 2022 07:50:08 +0100 (CET)
+Received: from localhost (localhost [127.0.0.1])
+        by lithops.sigma-star.at (Postfix) with ESMTP id BD56263E514E;
+        Thu, 17 Nov 2022 07:50:08 +0100 (CET)
+Received: from lithops.sigma-star.at ([127.0.0.1])
+        by localhost (lithops.sigma-star.at [127.0.0.1]) (amavisd-new, port 10026)
+        with ESMTP id SXXDuArp9_Qv; Thu, 17 Nov 2022 07:50:08 +0100 (CET)
+Received: from lithops.sigma-star.at (lithops.sigma-star.at [195.201.40.130])
+        by lithops.sigma-star.at (Postfix) with ESMTP id 868FA63E5142;
+        Thu, 17 Nov 2022 07:50:08 +0100 (CET)
+Date:   Thu, 17 Nov 2022 07:50:08 +0100 (CET)
+From:   Richard Weinberger <richard@nod.at>
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Daniel Golle <daniel@makrotopia.org>, Jens Axboe <axboe@kernel.dk>,
         Miquel Raynal <miquel.raynal@bootlin.com>,
-        Richard Weinberger <richard@nod.at>,
         Vignesh Raghavendra <vigneshr@ti.com>,
         Matthew Wilcox <willy@infradead.org>,
         "Martin K. Petersen" <martin.petersen@oracle.com>,
         Chaitanya Kulkarni <kch@nvidia.com>,
         Michal Orzel <michalorzel.eng@gmail.com>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mtd@lists.infradead.org
+        linux-block <linux-block@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        linux-mtd <linux-mtd@lists.infradead.org>
+Message-ID: <271114315.250800.1668667808308.JavaMail.zimbra@nod.at>
+In-Reply-To: <Y3XN+fDTjHz09qEE@infradead.org>
+References: <cover.1668548123.git.daniel@makrotopia.org> <7526fc5a461a0d68eb1dab575f9c1950638fc21a.1668548123.git.daniel@makrotopia.org> <Y3R8oQXRQ8uq8p4P@infradead.org> <Y3V9/pmHs7ypE7lb@makrotopia.org> <Y3XN+fDTjHz09qEE@infradead.org>
 Subject: Re: [PATCH v5 3/4] partitions/efi: add support for uImage.FIT
  sub-partitions
-Message-ID: <Y3XN+fDTjHz09qEE@infradead.org>
-References: <cover.1668548123.git.daniel@makrotopia.org>
- <7526fc5a461a0d68eb1dab575f9c1950638fc21a.1668548123.git.daniel@makrotopia.org>
- <Y3R8oQXRQ8uq8p4P@infradead.org>
- <Y3V9/pmHs7ypE7lb@makrotopia.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Y3V9/pmHs7ypE7lb@makrotopia.org>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8BIT
+X-Originating-IP: [195.201.40.130]
+X-Mailer: Zimbra 8.8.12_GA_3807 (ZimbraWebClient - FF97 (Linux)/8.8.12_GA_3809)
+Thread-Topic: partitions/efi: add support for uImage.FIT sub-partitions
+Thread-Index: ujVCwDZmDXzDbx5XljCrk+OdLhc8MQ==
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Nov 17, 2022 at 12:19:10AM +0000, Daniel Golle wrote:
-> While weirdness is certainly subjective, uImage.FIT is not just a
-> random image format but used by a great majority of headless embedded
-> Linux devices out there. It's the default image format of many of the
-> SDKs distributed by chip vendors such as Allwinner, Marvell, MediaTek,
-> NXP, Qualcomm/Atheros, ...
+----- Ursprüngliche Mail -----
+> Von: "Christoph Hellwig" <hch@infradead.org>
+> On Thu, Nov 17, 2022 at 12:19:10AM +0000, Daniel Golle wrote:
+>> While weirdness is certainly subjective, uImage.FIT is not just a
+>> random image format but used by a great majority of headless embedded
+>> Linux devices out there. It's the default image format of many of the
+>> SDKs distributed by chip vendors such as Allwinner, Marvell, MediaTek,
+>> NXP, Qualcomm/Atheros, ...
+> 
+> "Look see, my weird format is used by all these companies building
+> crappy SOCs, it is not weird.."
 
-"Look see, my weird format is used by all these companies building
-crappy SOCs, it is not weird.."
+Well, FIT is not something strange invented by SoC companies, it comes from u-boot
+and is more or less a de-facto standard.
+While I agree that using the block layer for partition parsing is questionable
+I think supporting these images in Linux is a worthwhile goal.
 
-> Please let me know if this sounds acceptable, so I won't put effort
-> into implementing something which will then be rejected again after 5
-> iterations on the mailing list for reasons which could have been
-> expressed from the beginning. An RFC for this series was posted on
-> 2022-04-25 [1], I wouldn't have worked months to fix all requests of
-> other maintainers and tested it on a variety of different hardware
-> knowing that the whole approach will be NACK'ed...
-
-If people ignore something that is obviously broken they might just hope
-for it to go away, becaue often it does.
+Thanks,
+//richard
