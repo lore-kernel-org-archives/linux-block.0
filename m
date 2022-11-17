@@ -2,82 +2,111 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 41A1CC4332F
-	for <linux-block@archiver.kernel.org>; Thu, 17 Nov 2022 00:43:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D3A7C4321E
+	for <linux-block@archiver.kernel.org>; Thu, 17 Nov 2022 00:44:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233486AbiKQAne (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 16 Nov 2022 19:43:34 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36900 "EHLO
+        id S233958AbiKQAoR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 16 Nov 2022 19:44:17 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38300 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234042AbiKQAnT (ORCPT
+        with ESMTP id S233963AbiKQAoQ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 16 Nov 2022 19:43:19 -0500
-Received: from fudo.makrotopia.org (fudo.makrotopia.org [IPv6:2a07:2ec0:3002::71])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27EC964A1B;
-        Wed, 16 Nov 2022 16:43:16 -0800 (PST)
-Received: from local
-        by fudo.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-         (Exim 4.94.2)
-        (envelope-from <daniel@makrotopia.org>)
-        id 1ovSzk-0002VB-PV; Thu, 17 Nov 2022 01:43:08 +0100
-Date:   Thu, 17 Nov 2022 00:43:03 +0000
-From:   Daniel Golle <daniel@makrotopia.org>
-To:     Christoph Hellwig <hch@infradead.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        Wolfram Sang <wsa+renesas@sang-engineering.com>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [RFC PATCH 2/4] block: add new flag to add partitions read-only
-Message-ID: <31b78b87ece4e095aa082d09ca3d4058a2484f3c.1668644705.git.daniel@makrotopia.org>
-References: <cover.1668644705.git.daniel@makrotopia.org>
+        Wed, 16 Nov 2022 19:44:16 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B1C802B622;
+        Wed, 16 Nov 2022 16:44:08 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 71B77B81F6A;
+        Thu, 17 Nov 2022 00:44:06 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9D214C433C1;
+        Thu, 17 Nov 2022 00:44:01 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="N4yvuS4q"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1668645839;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=o11kryBEJKQUBcciv1YGNpGcl9GzU1jQr08TEiO/WZo=;
+        b=N4yvuS4qyMfxtARqyPHRBhk1SEXxz/3WJew88lI6NMO4+fa/MCaJBZuB/2QrKCXtuhKI0R
+        o+j7S1e3eQB22ynfMfsCp3AmUWUXzjYsWW7wUl/69cBI5Z/naX7VjRMFejW8Owc2sNFQI3
+        bMKj7v4gh+/iKlR/7cv7MrrI9ssFAS8=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 39d4929e (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+        Thu, 17 Nov 2022 00:43:58 +0000 (UTC)
+Date:   Thu, 17 Nov 2022 01:43:54 +0100
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+To:     Kees Cook <keescook@chromium.org>
+Cc:     linux-kernel@vger.kernel.org, patches@lists.linux.dev,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Russell King <linux@armlinux.org.uk>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Christoph =?utf-8?Q?B=C3=B6hmwalder?= 
+        <christoph.boehmwalder@linbit.com>,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Sakari Ailus <sakari.ailus@linux.intel.com>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Theodore Ts'o <tytso@mit.edu>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        Richard Weinberger <richard@nod.at>,
+        "Darrick J . Wong" <djwong@kernel.org>,
+        SeongJae Park <sj@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Helge Deller <deller@gmx.de>, netdev@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-media@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, loongarch@lists.linux.dev,
+        linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        linux-mmc@vger.kernel.org, linux-parisc@vger.kernel.org,
+        ydroneaud@opteya.com
+Subject: Re: [PATCH v2 3/3] treewide: use get_random_u32_between() when
+ possible
+Message-ID: <Y3WDyl8ArQgeEoUU@zx2c4.com>
+References: <20221114164558.1180362-1-Jason@zx2c4.com>
+ <20221114164558.1180362-4-Jason@zx2c4.com>
+ <202211161436.A45AD719A@keescook>
+ <Y3V4g8eorwiU++Y3@zx2c4.com>
+ <Y3V6QtYMayODVDOk@zx2c4.com>
+ <202211161628.164F47F@keescook>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <cover.1668644705.git.daniel@makrotopia.org>
+In-Reply-To: <202211161628.164F47F@keescook>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Add flag ADDPART_FLAG_READONLY to allow partition parsers marking a
-partition to be set read-only.
-This is needed for the uImage.FIT partition parser added by a follow-up
-commit: we need to be sure the contents of uImage.FIT sub-images
-remain unaltered they are validated using a hash within the uImage.FIT
-structure which also serves as partition table.
+On Wed, Nov 16, 2022 at 04:31:18PM -0800, Kees Cook wrote:
+> On Thu, Nov 17, 2022 at 01:03:14AM +0100, Jason A. Donenfeld wrote:
+> > On Thu, Nov 17, 2022 at 12:55:47AM +0100, Jason A. Donenfeld wrote:
+> > > 2) What to call it:
+> > >    - between I still like, because it mirrors "I'm thinking of a number
+> > >      between 1 and 10 and..." that everybody knows,
+> > >    - inclusive I guess works, but it's not a preposition,
+> > >    - bikeshed color #3?
+> > 
+> > - between
+> > - ranged
+> > - spanning
+> > 
+> > https://www.thefreedictionary.com/List-of-prepositions.htm
+> > - amid
+> > 
+> > Sigh, names.
+> 
+> I think "inclusive" is best.
 
-Signed-off-by: Daniel Golle <daniel@makrotopia.org>
----
- block/blk.h             | 1 +
- block/partitions/core.c | 3 +++
- 2 files changed, 4 insertions(+)
+I find it not very descriptive of what the function does. Is there one
+you like second best? Or are you convinced they're all much much much
+worse than "inclusive" that they shouldn't be considered?
 
-diff --git a/block/blk.h b/block/blk.h
-index e85703ae81dd..05ac426350b2 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -414,6 +414,7 @@ void blk_free_ext_minor(unsigned int minor);
- #define ADDPART_FLAG_NONE	0
- #define ADDPART_FLAG_RAID	1
- #define ADDPART_FLAG_WHOLEDISK	2
-+#define ADDPART_FLAG_READONLY	4
- int bdev_add_partition(struct gendisk *disk, int partno, sector_t start,
- 		sector_t length);
- int bdev_del_partition(struct gendisk *disk, int partno);
-diff --git a/block/partitions/core.c b/block/partitions/core.c
-index b8112f52d388..355646b0707d 100644
---- a/block/partitions/core.c
-+++ b/block/partitions/core.c
-@@ -398,6 +398,9 @@ static struct block_device *add_partition(struct gendisk *disk, int partno,
- 			goto out_del;
- 	}
- 
-+	if (flags & ADDPART_FLAG_READONLY)
-+		bdev->bd_read_only = true;
-+
- 	/* everything is up and running, commence */
- 	err = xa_insert(&disk->part_tbl, partno, bdev, GFP_KERNEL);
- 	if (err)
--- 
-2.38.1
-
+Jason
