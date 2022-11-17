@@ -2,119 +2,113 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84F7EC43217
-	for <linux-block@archiver.kernel.org>; Thu, 17 Nov 2022 00:31:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 979C0C433FE
+	for <linux-block@archiver.kernel.org>; Thu, 17 Nov 2022 00:42:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233637AbiKQAbV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 16 Nov 2022 19:31:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59868 "EHLO
+        id S229910AbiKQAmb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 16 Nov 2022 19:42:31 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36394 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234401AbiKQAbU (ORCPT
+        with ESMTP id S229703AbiKQAma (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 16 Nov 2022 19:31:20 -0500
-Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 96D3848767
-        for <linux-block@vger.kernel.org>; Wed, 16 Nov 2022 16:31:19 -0800 (PST)
-Received: by mail-pj1-x102f.google.com with SMTP id b1-20020a17090a7ac100b00213fde52d49so426224pjl.3
-        for <linux-block@vger.kernel.org>; Wed, 16 Nov 2022 16:31:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=bfYTHCNCtdWeHJf9pplhisQ2FfqYgZ1s/D8ukZJ0aF0=;
-        b=noLKefdE/A5/nbmTvR6mJw3cGxk/a7fIL83IBp5Ph1Sax30+McHCvDQ9202nLf5uce
-         hPc2gZOe0LsvudzlGDyBmEAgwDGtCwPT27+S6nCdQzTHR81ueFyHGEG25Bj0t5HJUYw6
-         csu11i/pEoPga4S6lvqc8FbzvURZMsHN35+PY=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=bfYTHCNCtdWeHJf9pplhisQ2FfqYgZ1s/D8ukZJ0aF0=;
-        b=Rsaq1bWMK5zGtlM5PjhHrUYM8Z78n3lYdh6yVBSiqkfbUs/m6piwtA2xWxEQuzz9IW
-         oTCjAenpt332A0HWjZ2MXp7WPrWpftDBYT3mbeB1yyCgIt+91JRJuzBFH60Jedbdi5QE
-         z/QNoSfI0OFYl54xU06DNoGkmk1EQleFAt7hIWi74lEK3BQeZwYDOMQIsLHgaBiVhK2G
-         pczTPab8ZmJXJcV5fBRkNiHrcJ4cpimDRwg62a9QSPfy7PKdGyC0P9WYL3BKiSZEVlaQ
-         e6jtF1prgHvYA5PnpDaSsYT+4KcGObuhqwU2HIVP6aGCcHuRCEhPN/QZksvEWPuYT76p
-         Sm1Q==
-X-Gm-Message-State: ANoB5pnadwX24Vry1gB0fMnR1IoQvSCoJeBzyWebxocUUHulsFDw42aD
-        wxzt1I2fu+an1rZeEYB6PA8dsg==
-X-Google-Smtp-Source: AA0mqf5LCeBMlQYf9iRokqtAPq5JSpm9R+EnXlxq59oA8dqbtgC+he2PCZJy9QgLdGN/YL6SFM4OFA==
-X-Received: by 2002:a17:90a:6949:b0:213:188c:158d with SMTP id j9-20020a17090a694900b00213188c158dmr343097pjm.11.1668645079035;
-        Wed, 16 Nov 2022 16:31:19 -0800 (PST)
-Received: from www.outflux.net (198-0-35-241-static.hfc.comcastbusiness.net. [198.0.35.241])
-        by smtp.gmail.com with ESMTPSA id s1-20020a170902ea0100b00174f61a7d09sm12946657plg.247.2022.11.16.16.31.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 16 Nov 2022 16:31:18 -0800 (PST)
-Date:   Wed, 16 Nov 2022 16:31:18 -0800
-From:   Kees Cook <keescook@chromium.org>
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     linux-kernel@vger.kernel.org, patches@lists.linux.dev,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Russell King <linux@armlinux.org.uk>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Christoph =?iso-8859-1?Q?B=F6hmwalder?= 
-        <christoph.boehmwalder@linbit.com>,
-        Jani Nikula <jani.nikula@linux.intel.com>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Sakari Ailus <sakari.ailus@linux.intel.com>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Theodore Ts'o <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        Richard Weinberger <richard@nod.at>,
-        "Darrick J . Wong" <djwong@kernel.org>,
-        SeongJae Park <sj@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Helge Deller <deller@gmx.de>, netdev@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-media@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, loongarch@lists.linux.dev,
-        linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        linux-mmc@vger.kernel.org, linux-parisc@vger.kernel.org,
-        ydroneaud@opteya.com
-Subject: Re: [PATCH v2 3/3] treewide: use get_random_u32_between() when
- possible
-Message-ID: <202211161628.164F47F@keescook>
-References: <20221114164558.1180362-1-Jason@zx2c4.com>
- <20221114164558.1180362-4-Jason@zx2c4.com>
- <202211161436.A45AD719A@keescook>
- <Y3V4g8eorwiU++Y3@zx2c4.com>
- <Y3V6QtYMayODVDOk@zx2c4.com>
+        Wed, 16 Nov 2022 19:42:30 -0500
+Received: from fudo.makrotopia.org (fudo.makrotopia.org [IPv6:2a07:2ec0:3002::71])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C83066175B;
+        Wed, 16 Nov 2022 16:42:29 -0800 (PST)
+Received: from local
+        by fudo.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+         (Exim 4.94.2)
+        (envelope-from <daniel@makrotopia.org>)
+        id 1ovSyx-0002UU-VU; Thu, 17 Nov 2022 01:42:20 +0100
+Date:   Thu, 17 Nov 2022 00:42:13 +0000
+From:   Daniel Golle <daniel@makrotopia.org>
+To:     Christoph Hellwig <hch@infradead.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        Wolfram Sang <wsa+renesas@sang-engineering.com>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [RFC PATCH 0/4] block: uImage.FIT filesystem image mapper
+Message-ID: <cover.1668644705.git.daniel@makrotopia.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Y3V6QtYMayODVDOk@zx2c4.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Nov 17, 2022 at 01:03:14AM +0100, Jason A. Donenfeld wrote:
-> On Thu, Nov 17, 2022 at 12:55:47AM +0100, Jason A. Donenfeld wrote:
-> > 2) What to call it:
-> >    - between I still like, because it mirrors "I'm thinking of a number
-> >      between 1 and 10 and..." that everybody knows,
-> >    - inclusive I guess works, but it's not a preposition,
-> >    - bikeshed color #3?
-> 
-> - between
-> - ranged
-> - spanning
-> 
-> https://www.thefreedictionary.com/List-of-prepositions.htm
-> - amid
-> 
-> Sigh, names.
+uImage.FIT is the default image format of Das U-Boot bootloader which
+is used on the great majority of embedded Linux devices.
 
-I think "inclusive" is best. The other words still don't provide
-unambiguous language. It's the language used in formal math, e.g.
-sigma-notation, etc. It's an adjective for "get random" (verb, noun).
+Using uImage.FIT to also store the root filesystem besides kernel and
+dtb has several obvious advantages which are hard to obtain in any
+other way:
+ * single image accross different storage types (mmcblk, mtdblock, ubiblock)
+ * dynamically sized partitions for kernel and rootfs
+ * hash also for rootfs checked by U-Boot before launching kernel
+ * images may include additional filesystems e.g. for localization or
+   branding
+
+Add uImage.FIT partition parser, this time implemented as a tiny block
+driver which can be built as a module. Being an early RFC, module
+unloading by now has only been implemented rudimentary without removing
+partitions added by the driver on unload. If the overall approach looks
+acceptable, this can of course be improved.
+
+For this to work, the image has to be created with external data and
+sub-images aligned to the system's memory page boundaries, ie.
+ mkimage -E -B 0x1000 -p 0x1000 ...
+
+Booting such images has been supported by Das U-Boot since v2018.01.
+
+A previous version of this partition parser is in production use on some
+OpenWrt devices, eg. the BananaPi R64 where using the FIT parser allows
+booting the very same image from eMMC, SD Card or SPI-NAND/UBI and also
+using it as a firmware-upgrade image at the same time.
+The Ubiquiti UniFi 6 LR access point served as a reference board with
+SPI-NOR flash and use of the partition parser on top of a mtdblock
+device.
+
+As Das U-Boot by now also passes down the selected configuration node
+name via device tree this allows the partition parser (or userspace
+process via sysfs) to identify the selected image configuration.
+
+Device Tree schema for that has also been merged already[1].
+
+In most cases this partition parser can be used without relying on the
+bootloader to pass-down the configuration node name. The default
+configuration node is used then in that case.
+
+A check of the chosen/u-boot,version node is used to make sure that
+Das U-Boot has been used to boot the system and the user (or the
+bootloader) is required to specify the lower block device to be used
+by the parser. In case any of the two is missing, this driver won't
+start.
+
+This RFC presents an alternative implementation of the previously
+posted patch series "partition parser for U-Boot's uImage.FIT"[1].
+
+[1]: https://github.com/devicetree-org/dt-schema/commit/a24d97d43491e55d4def006213213a6c4045b646
+[2]: https://patchwork.kernel.org/project/linux-block/list/?series=695709
+
+Daniel Golle (4):
+  init: move block device helpers from init/do_mounts.c
+  block: add new flag to add partitions read-only
+  blkdev: add function to add named read-only partitions
+  block: add uImage.FIT block partition driver
+
+ MAINTAINERS             |   6 +
+ block/bdev.c            | 166 ++++++++++++++++++
+ block/blk.h             |   1 +
+ block/partitions/core.c |  37 ++++
+ drivers/block/Kconfig   |   6 +
+ drivers/block/Makefile  |   2 +
+ drivers/block/fitblk.c  | 364 ++++++++++++++++++++++++++++++++++++++++
+ include/linux/blkdev.h  |  22 +++
+ init/do_mounts.c        | 166 +-----------------
+ 9 files changed, 606 insertions(+), 164 deletions(-)
+ create mode 100644 drivers/block/fitblk.c
 
 -- 
-Kees Cook
+2.38.1
+
