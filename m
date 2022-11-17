@@ -2,111 +2,126 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D3A7C4321E
-	for <linux-block@archiver.kernel.org>; Thu, 17 Nov 2022 00:44:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D92CCC433FE
+	for <linux-block@archiver.kernel.org>; Thu, 17 Nov 2022 00:45:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233958AbiKQAoR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 16 Nov 2022 19:44:17 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38300 "EHLO
+        id S234913AbiKQApw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 16 Nov 2022 19:45:52 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39128 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233963AbiKQAoQ (ORCPT
+        with ESMTP id S238401AbiKQAp1 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 16 Nov 2022 19:44:16 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B1C802B622;
-        Wed, 16 Nov 2022 16:44:08 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 71B77B81F6A;
-        Thu, 17 Nov 2022 00:44:06 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9D214C433C1;
-        Thu, 17 Nov 2022 00:44:01 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="N4yvuS4q"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1668645839;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=o11kryBEJKQUBcciv1YGNpGcl9GzU1jQr08TEiO/WZo=;
-        b=N4yvuS4qyMfxtARqyPHRBhk1SEXxz/3WJew88lI6NMO4+fa/MCaJBZuB/2QrKCXtuhKI0R
-        o+j7S1e3eQB22ynfMfsCp3AmUWUXzjYsWW7wUl/69cBI5Z/naX7VjRMFejW8Owc2sNFQI3
-        bMKj7v4gh+/iKlR/7cv7MrrI9ssFAS8=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 39d4929e (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-        Thu, 17 Nov 2022 00:43:58 +0000 (UTC)
-Date:   Thu, 17 Nov 2022 01:43:54 +0100
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-To:     Kees Cook <keescook@chromium.org>
-Cc:     linux-kernel@vger.kernel.org, patches@lists.linux.dev,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Russell King <linux@armlinux.org.uk>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Christoph =?utf-8?Q?B=C3=B6hmwalder?= 
-        <christoph.boehmwalder@linbit.com>,
-        Jani Nikula <jani.nikula@linux.intel.com>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Sakari Ailus <sakari.ailus@linux.intel.com>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Theodore Ts'o <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        Richard Weinberger <richard@nod.at>,
-        "Darrick J . Wong" <djwong@kernel.org>,
-        SeongJae Park <sj@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Helge Deller <deller@gmx.de>, netdev@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-media@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, loongarch@lists.linux.dev,
-        linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        linux-mmc@vger.kernel.org, linux-parisc@vger.kernel.org,
-        ydroneaud@opteya.com
-Subject: Re: [PATCH v2 3/3] treewide: use get_random_u32_between() when
- possible
-Message-ID: <Y3WDyl8ArQgeEoUU@zx2c4.com>
-References: <20221114164558.1180362-1-Jason@zx2c4.com>
- <20221114164558.1180362-4-Jason@zx2c4.com>
- <202211161436.A45AD719A@keescook>
- <Y3V4g8eorwiU++Y3@zx2c4.com>
- <Y3V6QtYMayODVDOk@zx2c4.com>
- <202211161628.164F47F@keescook>
+        Wed, 16 Nov 2022 19:45:27 -0500
+Received: from fudo.makrotopia.org (fudo.makrotopia.org [IPv6:2a07:2ec0:3002::71])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74F906CA3B;
+        Wed, 16 Nov 2022 16:44:54 -0800 (PST)
+Received: from local
+        by fudo.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+         (Exim 4.94.2)
+        (envelope-from <daniel@makrotopia.org>)
+        id 1ovT1K-0002WL-6H; Thu, 17 Nov 2022 01:44:46 +0100
+Date:   Thu, 17 Nov 2022 00:44:40 +0000
+From:   Daniel Golle <daniel@makrotopia.org>
+To:     Christoph Hellwig <hch@infradead.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        Wolfram Sang <wsa+renesas@sang-engineering.com>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [RFC PATCH 3/4] blkdev: add function to add named read-only
+ partitions
+Message-ID: <2015e6097f7166915d829740ff33aab506948a0a.1668644705.git.daniel@makrotopia.org>
+References: <cover.1668644705.git.daniel@makrotopia.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <202211161628.164F47F@keescook>
+In-Reply-To: <cover.1668644705.git.daniel@makrotopia.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Nov 16, 2022 at 04:31:18PM -0800, Kees Cook wrote:
-> On Thu, Nov 17, 2022 at 01:03:14AM +0100, Jason A. Donenfeld wrote:
-> > On Thu, Nov 17, 2022 at 12:55:47AM +0100, Jason A. Donenfeld wrote:
-> > > 2) What to call it:
-> > >    - between I still like, because it mirrors "I'm thinking of a number
-> > >      between 1 and 10 and..." that everybody knows,
-> > >    - inclusive I guess works, but it's not a preposition,
-> > >    - bikeshed color #3?
-> > 
-> > - between
-> > - ranged
-> > - spanning
-> > 
-> > https://www.thefreedictionary.com/List-of-prepositions.htm
-> > - amid
-> > 
-> > Sigh, names.
-> 
-> I think "inclusive" is best.
+Add function bdev_add_partition_ro() which can be used by drivers to
+register named read-only partitions on a disk device.
+Unlike the existing bdev_add_partition() function, there is also no
+check for overlapping partitions.
+This new function is going to be used by the uImage.FIT parser.
 
-I find it not very descriptive of what the function does. Is there one
-you like second best? Or are you convinced they're all much much much
-worse than "inclusive" that they shouldn't be considered?
+Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+---
+ block/partitions/core.c | 34 ++++++++++++++++++++++++++++++++++
+ include/linux/blkdev.h  |  7 +++++++
+ 2 files changed, 41 insertions(+)
 
-Jason
+diff --git a/block/partitions/core.c b/block/partitions/core.c
+index 355646b0707d..060a6585a387 100644
+--- a/block/partitions/core.c
++++ b/block/partitions/core.c
+@@ -469,6 +469,40 @@ int bdev_add_partition(struct gendisk *disk, int partno, sector_t start,
+ 	return ret;
+ }
+ 
++int bdev_add_partition_ro(struct gendisk *disk, int partno, sector_t start,
++			  sector_t length, const char *volname)
++{
++	struct block_device *part;
++	struct partition_meta_info *info;
++	int ret;
++
++	mutex_lock(&disk->open_mutex);
++	if (!disk_live(disk)) {
++		ret = -ENXIO;
++		goto out;
++	}
++
++	part = add_partition(disk, partno, start, length,
++			     ADDPART_FLAG_READONLY, NULL);
++	ret = PTR_ERR_OR_ZERO(part);
++	if (ret)
++		goto out;
++
++	if (volname) {
++		info = kzalloc(sizeof(struct partition_meta_info), GFP_KERNEL);
++		if (!info) {
++			ret = -ENOMEM;
++			goto out;
++		}
++		strscpy(info->volname, volname, sizeof(info->volname));
++		part->bd_meta_info = info;
++	}
++out:
++	mutex_unlock(&disk->open_mutex);
++	return ret;
++}
++EXPORT_SYMBOL_GPL(bdev_add_partition_ro);
++
+ int bdev_del_partition(struct gendisk *disk, int partno)
+ {
+ 	struct block_device *part = NULL;
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index b45cdcdccc6d..6e468a2fc4ec 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -1504,6 +1504,8 @@ int sync_blockdev_nowait(struct block_device *bdev);
+ void sync_bdevs(bool wait);
+ void bdev_statx_dioalign(struct inode *inode, struct kstat *stat);
+ void printk_all_partitions(void);
++int bdev_add_partition_ro(struct gendisk *disk, int partno, sector_t start,
++			  sector_t length, const char *volname);
+ #else
+ static inline dev_t devt_from_partuuid(const char *uuid_str, int *root_wait)
+ {
+@@ -1537,6 +1539,11 @@ static inline void bdev_statx_dioalign(struct inode *inode, struct kstat *stat)
+ static inline void printk_all_partitions(void)
+ {
+ }
++static inline int bdev_add_partition_ro(struct gendisk *disk, int partno, sector_t start,
++			  sector_t length, const char *volname)
++{
++	return 0;
++}
+ #endif /* CONFIG_BLOCK */
+ 
+ int fsync_bdev(struct block_device *bdev);
+-- 
+2.38.1
+
