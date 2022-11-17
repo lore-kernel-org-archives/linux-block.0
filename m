@@ -2,110 +2,119 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D0484C4332F
-	for <linux-block@archiver.kernel.org>; Thu, 17 Nov 2022 00:19:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84F7EC43217
+	for <linux-block@archiver.kernel.org>; Thu, 17 Nov 2022 00:31:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231840AbiKQATl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 16 Nov 2022 19:19:41 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53740 "EHLO
+        id S233637AbiKQAbV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 16 Nov 2022 19:31:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59868 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230103AbiKQATk (ORCPT
+        with ESMTP id S234401AbiKQAbU (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 16 Nov 2022 19:19:40 -0500
-Received: from fudo.makrotopia.org (fudo.makrotopia.org [IPv6:2a07:2ec0:3002::71])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B582547328;
-        Wed, 16 Nov 2022 16:19:37 -0800 (PST)
-Received: from local
-        by fudo.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-         (Exim 4.94.2)
-        (envelope-from <daniel@makrotopia.org>)
-        id 1ovScc-0002P6-CE; Thu, 17 Nov 2022 01:19:14 +0100
-Date:   Thu, 17 Nov 2022 00:19:10 +0000
-From:   Daniel Golle <daniel@makrotopia.org>
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        Miquel Raynal <miquel.raynal@bootlin.com>,
+        Wed, 16 Nov 2022 19:31:20 -0500
+Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 96D3848767
+        for <linux-block@vger.kernel.org>; Wed, 16 Nov 2022 16:31:19 -0800 (PST)
+Received: by mail-pj1-x102f.google.com with SMTP id b1-20020a17090a7ac100b00213fde52d49so426224pjl.3
+        for <linux-block@vger.kernel.org>; Wed, 16 Nov 2022 16:31:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=bfYTHCNCtdWeHJf9pplhisQ2FfqYgZ1s/D8ukZJ0aF0=;
+        b=noLKefdE/A5/nbmTvR6mJw3cGxk/a7fIL83IBp5Ph1Sax30+McHCvDQ9202nLf5uce
+         hPc2gZOe0LsvudzlGDyBmEAgwDGtCwPT27+S6nCdQzTHR81ueFyHGEG25Bj0t5HJUYw6
+         csu11i/pEoPga4S6lvqc8FbzvURZMsHN35+PY=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=bfYTHCNCtdWeHJf9pplhisQ2FfqYgZ1s/D8ukZJ0aF0=;
+        b=Rsaq1bWMK5zGtlM5PjhHrUYM8Z78n3lYdh6yVBSiqkfbUs/m6piwtA2xWxEQuzz9IW
+         oTCjAenpt332A0HWjZ2MXp7WPrWpftDBYT3mbeB1yyCgIt+91JRJuzBFH60Jedbdi5QE
+         z/QNoSfI0OFYl54xU06DNoGkmk1EQleFAt7hIWi74lEK3BQeZwYDOMQIsLHgaBiVhK2G
+         pczTPab8ZmJXJcV5fBRkNiHrcJ4cpimDRwg62a9QSPfy7PKdGyC0P9WYL3BKiSZEVlaQ
+         e6jtF1prgHvYA5PnpDaSsYT+4KcGObuhqwU2HIVP6aGCcHuRCEhPN/QZksvEWPuYT76p
+         Sm1Q==
+X-Gm-Message-State: ANoB5pnadwX24Vry1gB0fMnR1IoQvSCoJeBzyWebxocUUHulsFDw42aD
+        wxzt1I2fu+an1rZeEYB6PA8dsg==
+X-Google-Smtp-Source: AA0mqf5LCeBMlQYf9iRokqtAPq5JSpm9R+EnXlxq59oA8dqbtgC+he2PCZJy9QgLdGN/YL6SFM4OFA==
+X-Received: by 2002:a17:90a:6949:b0:213:188c:158d with SMTP id j9-20020a17090a694900b00213188c158dmr343097pjm.11.1668645079035;
+        Wed, 16 Nov 2022 16:31:19 -0800 (PST)
+Received: from www.outflux.net (198-0-35-241-static.hfc.comcastbusiness.net. [198.0.35.241])
+        by smtp.gmail.com with ESMTPSA id s1-20020a170902ea0100b00174f61a7d09sm12946657plg.247.2022.11.16.16.31.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 16 Nov 2022 16:31:18 -0800 (PST)
+Date:   Wed, 16 Nov 2022 16:31:18 -0800
+From:   Kees Cook <keescook@chromium.org>
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc:     linux-kernel@vger.kernel.org, patches@lists.linux.dev,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Russell King <linux@armlinux.org.uk>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Christoph =?iso-8859-1?Q?B=F6hmwalder?= 
+        <christoph.boehmwalder@linbit.com>,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Sakari Ailus <sakari.ailus@linux.intel.com>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Theodore Ts'o <tytso@mit.edu>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
         Richard Weinberger <richard@nod.at>,
-        Vignesh Raghavendra <vigneshr@ti.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        Michal Orzel <michalorzel.eng@gmail.com>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mtd@lists.infradead.org
-Subject: Re: [PATCH v5 3/4] partitions/efi: add support for uImage.FIT
- sub-partitions
-Message-ID: <Y3V9/pmHs7ypE7lb@makrotopia.org>
-References: <cover.1668548123.git.daniel@makrotopia.org>
- <7526fc5a461a0d68eb1dab575f9c1950638fc21a.1668548123.git.daniel@makrotopia.org>
- <Y3R8oQXRQ8uq8p4P@infradead.org>
+        "Darrick J . Wong" <djwong@kernel.org>,
+        SeongJae Park <sj@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Helge Deller <deller@gmx.de>, netdev@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-media@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, loongarch@lists.linux.dev,
+        linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        linux-mmc@vger.kernel.org, linux-parisc@vger.kernel.org,
+        ydroneaud@opteya.com
+Subject: Re: [PATCH v2 3/3] treewide: use get_random_u32_between() when
+ possible
+Message-ID: <202211161628.164F47F@keescook>
+References: <20221114164558.1180362-1-Jason@zx2c4.com>
+ <20221114164558.1180362-4-Jason@zx2c4.com>
+ <202211161436.A45AD719A@keescook>
+ <Y3V4g8eorwiU++Y3@zx2c4.com>
+ <Y3V6QtYMayODVDOk@zx2c4.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Y3R8oQXRQ8uq8p4P@infradead.org>
+In-Reply-To: <Y3V6QtYMayODVDOk@zx2c4.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Christoph,
-
-On Tue, Nov 15, 2022 at 10:01:05PM -0800, Christoph Hellwig wrote:
-> On Tue, Nov 15, 2022 at 09:47:06PM +0000, Daniel Golle wrote:
-> > Add new GUID allowing to parse uImage.FIT stored in a GPT partition
-> > and map filesystem sub-image as sub-partitions.
+On Thu, Nov 17, 2022 at 01:03:14AM +0100, Jason A. Donenfeld wrote:
+> On Thu, Nov 17, 2022 at 12:55:47AM +0100, Jason A. Donenfeld wrote:
+> > 2) What to call it:
+> >    - between I still like, because it mirrors "I'm thinking of a number
+> >      between 1 and 10 and..." that everybody knows,
+> >    - inclusive I guess works, but it's not a preposition,
+> >    - bikeshed color #3?
 > 
-> NAK, we should not go out from the partition code to parse random
-> weird image formats.
+> - between
+> - ranged
+> - spanning
+> 
+> https://www.thefreedictionary.com/List-of-prepositions.htm
+> - amid
+> 
+> Sigh, names.
 
-While weirdness is certainly subjective, uImage.FIT is not just a
-random image format but used by a great majority of headless embedded
-Linux devices out there. It's the default image format of many of the
-SDKs distributed by chip vendors such as Allwinner, Marvell, MediaTek,
-NXP, Qualcomm/Atheros, ...
+I think "inclusive" is best. The other words still don't provide
+unambiguous language. It's the language used in formal math, e.g.
+sigma-notation, etc. It's an adjective for "get random" (verb, noun).
 
-Having better support for it in Linux hence doesn't seem too far-fetched
-to me, especially given that we got partition parsers for all sorts of
-historic (Acorn, Amiga, Atari, ...) or actually exotic (Karma?) formats.
-Even Microsoft Windows' Logical Disk Manager is supported natively by
-the kernel...
-
-> If you want to support uImage.FIT just write a tiny stackable block
-> driver or dm table for it.
-
-As this is used on rather tiny embedded devices my hope was to keep
-things simple and not having to enable device mapper on systems which
-have anyway only very small amounts of storage and won't ever need
-most of the device mapper features.
-
-Using a tiny block driver instead is an option, I've implemented this
-approach in the past couple of hours and it works just as fine.
-
-In this case I would introduce a new kernel cmdline option allowing
-to specify which block device (ie. a partition on eMMC, or mtdblock
-or ubiblock device) to launch the uImage.FIT parser on.
-
-Allowing this new driver to add block partitions by exporting a new
-helper functions for that in block/partition/core.c would greatly
-simplify things, as then the existing partitioning code could still
-be used (instead of basically having to re-implement loopdev and
-introduce a whole new type of block devices).
-
-I will post an RFC series illustrating this approach.
-
-Please let me know if this sounds acceptable, so I won't put effort
-into implementing something which will then be rejected again after 5
-iterations on the mailing list for reasons which could have been
-expressed from the beginning. An RFC for this series was posted on
-2022-04-25 [1], I wouldn't have worked months to fix all requests of
-other maintainers and tested it on a variety of different hardware
-knowing that the whole approach will be NACK'ed...
-
-And, of course, thank you anyway for reviewing!
-
-
-Cheers
-
-
-Daniel
-
-[1]: https://patchwork.kernel.org/project/linux-block/list/?series=635369&state=*
+-- 
+Kees Cook
