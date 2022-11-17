@@ -2,100 +2,110 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EA465C43219
-	for <linux-block@archiver.kernel.org>; Thu, 17 Nov 2022 00:03:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D0484C4332F
+	for <linux-block@archiver.kernel.org>; Thu, 17 Nov 2022 00:19:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233188AbiKQAD2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 16 Nov 2022 19:03:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48100 "EHLO
+        id S231840AbiKQATl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 16 Nov 2022 19:19:41 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53740 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232527AbiKQAD0 (ORCPT
+        with ESMTP id S230103AbiKQATk (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 16 Nov 2022 19:03:26 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D5EDA287;
-        Wed, 16 Nov 2022 16:03:25 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 3310F6204E;
-        Thu, 17 Nov 2022 00:03:25 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 148F7C433D6;
-        Thu, 17 Nov 2022 00:03:20 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="DDPLmlvq"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1668643399;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=w0AD3Tr58GtUJ9Kv6i6itZC3jzhNZgyVC+4VKe1NEok=;
-        b=DDPLmlvqGCydFG2ungFT1RZWdxcCp8OkwUGh/9TR2kjRISFQ4pEtNgOpmTH2NPcqUdcG6o
-        I/FANGR7sGyNugj9iH8lSaSbSlp7Eo18gRYINb1RpCQp6aeqprML9KXAznslynx0MWLa+Y
-        zK0isK7HUkZ/WTiYMkCVQ5FYJls563o=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 96a20c4a (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-        Thu, 17 Nov 2022 00:03:19 +0000 (UTC)
-Date:   Thu, 17 Nov 2022 01:03:14 +0100
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-To:     Kees Cook <keescook@chromium.org>
-Cc:     linux-kernel@vger.kernel.org, patches@lists.linux.dev,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Russell King <linux@armlinux.org.uk>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Christoph =?utf-8?Q?B=C3=B6hmwalder?= 
-        <christoph.boehmwalder@linbit.com>,
-        Jani Nikula <jani.nikula@linux.intel.com>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Sakari Ailus <sakari.ailus@linux.intel.com>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Theodore Ts'o <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
+        Wed, 16 Nov 2022 19:19:40 -0500
+Received: from fudo.makrotopia.org (fudo.makrotopia.org [IPv6:2a07:2ec0:3002::71])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B582547328;
+        Wed, 16 Nov 2022 16:19:37 -0800 (PST)
+Received: from local
+        by fudo.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+         (Exim 4.94.2)
+        (envelope-from <daniel@makrotopia.org>)
+        id 1ovScc-0002P6-CE; Thu, 17 Nov 2022 01:19:14 +0100
+Date:   Thu, 17 Nov 2022 00:19:10 +0000
+From:   Daniel Golle <daniel@makrotopia.org>
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        Miquel Raynal <miquel.raynal@bootlin.com>,
         Richard Weinberger <richard@nod.at>,
-        "Darrick J . Wong" <djwong@kernel.org>,
-        SeongJae Park <sj@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Helge Deller <deller@gmx.de>, netdev@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-media@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, loongarch@lists.linux.dev,
-        linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        linux-mmc@vger.kernel.org, linux-parisc@vger.kernel.org,
-        ydroneaud@opteya.com
-Subject: Re: [PATCH v2 3/3] treewide: use get_random_u32_between() when
- possible
-Message-ID: <Y3V6QtYMayODVDOk@zx2c4.com>
-References: <20221114164558.1180362-1-Jason@zx2c4.com>
- <20221114164558.1180362-4-Jason@zx2c4.com>
- <202211161436.A45AD719A@keescook>
- <Y3V4g8eorwiU++Y3@zx2c4.com>
+        Vignesh Raghavendra <vigneshr@ti.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        Michal Orzel <michalorzel.eng@gmail.com>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mtd@lists.infradead.org
+Subject: Re: [PATCH v5 3/4] partitions/efi: add support for uImage.FIT
+ sub-partitions
+Message-ID: <Y3V9/pmHs7ypE7lb@makrotopia.org>
+References: <cover.1668548123.git.daniel@makrotopia.org>
+ <7526fc5a461a0d68eb1dab575f9c1950638fc21a.1668548123.git.daniel@makrotopia.org>
+ <Y3R8oQXRQ8uq8p4P@infradead.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Y3V4g8eorwiU++Y3@zx2c4.com>
+In-Reply-To: <Y3R8oQXRQ8uq8p4P@infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Nov 17, 2022 at 12:55:47AM +0100, Jason A. Donenfeld wrote:
-> 2) What to call it:
->    - between I still like, because it mirrors "I'm thinking of a number
->      between 1 and 10 and..." that everybody knows,
->    - inclusive I guess works, but it's not a preposition,
->    - bikeshed color #3?
+Hi Christoph,
 
-- between
-- ranged
-- spanning
+On Tue, Nov 15, 2022 at 10:01:05PM -0800, Christoph Hellwig wrote:
+> On Tue, Nov 15, 2022 at 09:47:06PM +0000, Daniel Golle wrote:
+> > Add new GUID allowing to parse uImage.FIT stored in a GPT partition
+> > and map filesystem sub-image as sub-partitions.
+> 
+> NAK, we should not go out from the partition code to parse random
+> weird image formats.
 
-https://www.thefreedictionary.com/List-of-prepositions.htm
-- amid
+While weirdness is certainly subjective, uImage.FIT is not just a
+random image format but used by a great majority of headless embedded
+Linux devices out there. It's the default image format of many of the
+SDKs distributed by chip vendors such as Allwinner, Marvell, MediaTek,
+NXP, Qualcomm/Atheros, ...
 
-Sigh, names.
+Having better support for it in Linux hence doesn't seem too far-fetched
+to me, especially given that we got partition parsers for all sorts of
+historic (Acorn, Amiga, Atari, ...) or actually exotic (Karma?) formats.
+Even Microsoft Windows' Logical Disk Manager is supported natively by
+the kernel...
 
+> If you want to support uImage.FIT just write a tiny stackable block
+> driver or dm table for it.
+
+As this is used on rather tiny embedded devices my hope was to keep
+things simple and not having to enable device mapper on systems which
+have anyway only very small amounts of storage and won't ever need
+most of the device mapper features.
+
+Using a tiny block driver instead is an option, I've implemented this
+approach in the past couple of hours and it works just as fine.
+
+In this case I would introduce a new kernel cmdline option allowing
+to specify which block device (ie. a partition on eMMC, or mtdblock
+or ubiblock device) to launch the uImage.FIT parser on.
+
+Allowing this new driver to add block partitions by exporting a new
+helper functions for that in block/partition/core.c would greatly
+simplify things, as then the existing partitioning code could still
+be used (instead of basically having to re-implement loopdev and
+introduce a whole new type of block devices).
+
+I will post an RFC series illustrating this approach.
+
+Please let me know if this sounds acceptable, so I won't put effort
+into implementing something which will then be rejected again after 5
+iterations on the mailing list for reasons which could have been
+expressed from the beginning. An RFC for this series was posted on
+2022-04-25 [1], I wouldn't have worked months to fix all requests of
+other maintainers and tested it on a variety of different hardware
+knowing that the whole approach will be NACK'ed...
+
+And, of course, thank you anyway for reviewing!
+
+
+Cheers
+
+
+Daniel
+
+[1]: https://patchwork.kernel.org/project/linux-block/list/?series=635369&state=*
