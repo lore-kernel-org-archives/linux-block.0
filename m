@@ -2,120 +2,111 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AB910C4332F
-	for <linux-block@archiver.kernel.org>; Thu, 17 Nov 2022 10:33:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 99848C433FE
+	for <linux-block@archiver.kernel.org>; Thu, 17 Nov 2022 11:29:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233223AbiKQKdF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 17 Nov 2022 05:33:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60482 "EHLO
+        id S234609AbiKQL27 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 17 Nov 2022 06:28:59 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39542 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229931AbiKQKdE (ORCPT
+        with ESMTP id S231911AbiKQL26 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 17 Nov 2022 05:33:04 -0500
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1C6259841;
-        Thu, 17 Nov 2022 02:33:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=2BgNwLdh+HBA4xrzyykRGd8e3nHfE6jHoZjPyIO7tQ8=; b=vf0GDy8lKzIs95KZT9hTDN9bLB
-        KkkakBOovK/EhU72ZwXcJFd6ZXnYeh5hWZFAO+QwAUy+Iil38BRQKWQA/ovqtD2R3k/zIRWUVleNY
-        mI6EufB0EHT9QlEKH1MxQI8dlYgzNxWxQ/KJJ0HUSUpP7NgTBBgzbRiK7voh4pixtxFai3XdS+4CH
-        KUkR3sQ10UY1J1DLrBw2+xk4ToBWEQq3GT1Ou599VPaU5ywBw9TAIVKjU75NdNZTSPprpMUx5CQP1
-        Y51nu+1iINv9JXk8aPYDqbEhMoPEahldPraSq7QM6Racs8sRYiTunUTXpT5cPjddHYjb4UQdEZEgF
-        MxQo2C5A==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:35306)
-        by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.94.2)
-        (envelope-from <linux@armlinux.org.uk>)
-        id 1ovcCQ-0004Iz-Pt; Thu, 17 Nov 2022 10:32:50 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-        (envelope-from <linux@shell.armlinux.org.uk>)
-        id 1ovcCG-0006jE-Em; Thu, 17 Nov 2022 10:32:40 +0000
-Date:   Thu, 17 Nov 2022 10:32:40 +0000
-From:   "Russell King (Oracle)" <linux@armlinux.org.uk>
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     Kees Cook <keescook@chromium.org>, linux-kernel@vger.kernel.org,
-        patches@lists.linux.dev,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Christoph =?iso-8859-1?Q?B=F6hmwalder?= 
-        <christoph.boehmwalder@linbit.com>,
-        Jani Nikula <jani.nikula@linux.intel.com>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Sakari Ailus <sakari.ailus@linux.intel.com>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Theodore Ts'o <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        Richard Weinberger <richard@nod.at>,
-        "Darrick J . Wong" <djwong@kernel.org>,
-        SeongJae Park <sj@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Helge Deller <deller@gmx.de>, netdev@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-media@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, loongarch@lists.linux.dev,
-        linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        linux-mmc@vger.kernel.org, linux-parisc@vger.kernel.org,
-        ydroneaud@opteya.com
-Subject: Re: [PATCH v2 3/3] treewide: use get_random_u32_between() when
- possible
-Message-ID: <Y3YNyJ8oeixYuvdI@shell.armlinux.org.uk>
-References: <20221114164558.1180362-1-Jason@zx2c4.com>
- <20221114164558.1180362-4-Jason@zx2c4.com>
- <202211161436.A45AD719A@keescook>
- <Y3V4g8eorwiU++Y3@zx2c4.com>
- <Y3WW2lOgoYLKQeve@zx2c4.com>
+        Thu, 17 Nov 2022 06:28:58 -0500
+Received: from dggsgout12.his.huawei.com (unknown [45.249.212.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D395242996;
+        Thu, 17 Nov 2022 03:28:55 -0800 (PST)
+Received: from mail02.huawei.com (unknown [172.30.67.153])
+        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4NCd355dTcz4f3mH3;
+        Thu, 17 Nov 2022 19:28:49 +0800 (CST)
+Received: from [10.174.176.73] (unknown [10.174.176.73])
+        by APP1 (Coremail) with SMTP id cCh0CgAn0a_zGnZjPOSPAg--.8579S3;
+        Thu, 17 Nov 2022 19:28:52 +0800 (CST)
+Subject: Re: [PATCH v2 4/5] blk-iocost: fix sleeping in atomic context
+ warnning
+To:     Tejun Heo <tj@kernel.org>, Yu Kuai <yukuai1@huaweicloud.com>
+Cc:     hch@lst.de, josef@toxicpanda.com, axboe@kernel.dk,
+        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, yi.zhang@huawei.com,
+        "yukuai (C)" <yukuai3@huawei.com>
+References: <20221104023938.2346986-1-yukuai1@huaweicloud.com>
+ <20221104023938.2346986-5-yukuai1@huaweicloud.com>
+ <Y3K8MSFWw8eTnxtm@slm.duckdns.org>
+From:   Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <3da991c6-21e4-8ed8-ba75-ccb92059f0ae@huaweicloud.com>
+Date:   Thu, 17 Nov 2022 19:28:50 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Y3WW2lOgoYLKQeve@zx2c4.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+In-Reply-To: <Y3K8MSFWw8eTnxtm@slm.duckdns.org>
+Content-Type: text/plain; charset=gbk; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: cCh0CgAn0a_zGnZjPOSPAg--.8579S3
+X-Coremail-Antispam: 1UD129KBjvdXoW7Jry3WF13Jr47Wr48XFWxCrg_yoWfuFc_CF
+        Wv9r4qq3Z8ZanY9FyUtFWDtrWrA34aqr1xWr48XF98tw1jvw15Ga17Jry0qw45JFWF9F4D
+        CrW5Crsagr47XjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+        9fnUUIcSsGvfJTRUUUb3kFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
+        6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
+        A2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j
+        6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
+        Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
+        I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
+        4UM4x0Y48IcVAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2kI
+        c2xKxwCYjI0SjxkI62AI1cAE67vIY487MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4
+        AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE
+        17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMI
+        IF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw20EY4v20xvaj40_WFyUJVCq
+        3wCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r1j6r4UYxBIda
+        VFxhVjvjDU0xZFpf9x0JUdHUDUUUUU=
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Nov 17, 2022 at 03:05:14AM +0100, Jason A. Donenfeld wrote:
-> On Thu, Nov 17, 2022 at 12:55:47AM +0100, Jason A. Donenfeld wrote:
-> > 1) How/whether to make f(0, UR2_MAX) safe,
-> >    - without additional 64-bit arithmetic,
-> >    - minimizing the number of branches.
-> >    I have a few ideas I'll code golf for a bit.
-> > I think I can make progress with (1) alone by fiddling around with
-> > godbolt enough, like usual.
-> 
-> The code gen is definitely worse.
-> 
-> Original half-open interval:
-> 
->     return floor + get_random_u32_below(ceil - floor);
-> 
-> Suggested fully closed interval:
-> 	
->     ceil = ceil - floor + 1;
->     return likely(ceil) ? floor + get_random_u32_below(ceil) : get_random_u32();
+Hi, Tejun!
 
-How many of these uses are going to have ceil and floor as a variable?
-If they're constants (e.g. due to being in an inline function with
-constant arguments) then the compiler will optimise all of the above
-and the assembly code will just be either:
+ÔÚ 2022/11/15 6:07, Tejun Heo Ð´µÀ:
 
-1. a call to get_random_u32()
-2. a call to get_random_u32_below() and an addition.
+> 
+> Any chance I can persuade you into updating match_NUMBER() helpers to not
+> use match_strdup()? They can easily disable irq/preemption and use percpu
+> buffers and we won't need most of this patchset.
 
-If one passes ceil or floor as a variable, then yes, the code gen is
-going to be as complicated as you suggest above.
+Does the following patch match your proposal?
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 40Mbps down 10Mbps up. Decent connectivity at last!
+diff --git a/lib/parser.c b/lib/parser.c
+index bcb23484100e..ded652471919 100644
+--- a/lib/parser.c
++++ b/lib/parser.c
+@@ -11,6 +11,24 @@
+  #include <linux/slab.h>
+  #include <linux/string.h>
+
++#define U64_MAX_SIZE 20
++
++static DEFINE_PER_CPU(char, buffer[U64_MAX_SIZE]);
++
++static char *get_buffer(void)
++{
++       preempt_disable();
++       local_irq_disable();
++
++       return this_cpu_ptr(buffer);
++}
++
++static void put_buffer(void)
++{
++       local_irq_enable();
++       preempt_enable();
++}
++
+
+Then match_strdup() and kfree() in match_NUMBER() can be replaced with
+get_buffer() and put_buffer().
+
+Thanks,
+Kuai
+> 
+> Thanks.
+> 
+
