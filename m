@@ -2,95 +2,113 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 761F4C4332F
-	for <linux-block@archiver.kernel.org>; Thu, 17 Nov 2022 00:49:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D92AAC43219
+	for <linux-block@archiver.kernel.org>; Thu, 17 Nov 2022 00:49:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239006AbiKQAtE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 16 Nov 2022 19:49:04 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38888 "EHLO
+        id S238534AbiKQAtn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 16 Nov 2022 19:49:43 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39474 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234544AbiKQAsb (ORCPT
+        with ESMTP id S238857AbiKQAt1 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 16 Nov 2022 19:48:31 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3EF73701A3
-        for <linux-block@vger.kernel.org>; Wed, 16 Nov 2022 16:46:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1668645962;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=dLyYTR0vgDLPN4t0KFfB1sbFaXYNr5zBEhazg8jRdTg=;
-        b=YA5/PL0RJD7i5zxLdjyCOd2T2cAFrXdjB3cBkrJip9/QIOL+0yAchnz34oUx1U7m8aIljL
-        ZpX1NBzO1/ruWwCP0nxCsFIl3zS8lcyx0YTANVI2VxBtv1IvJG69HCruOEOmmPFswjn+0D
-        3THPtBE8P/mOMpfOEZj+8k9alL7+dL0=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-557-o_RZ1q1TMTGEFSZIqGMhOQ-1; Wed, 16 Nov 2022 19:45:57 -0500
-X-MC-Unique: o_RZ1q1TMTGEFSZIqGMhOQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        Wed, 16 Nov 2022 19:49:27 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 513566EB5A;
+        Wed, 16 Nov 2022 16:47:30 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 3EEAA811E75;
-        Thu, 17 Nov 2022 00:45:57 +0000 (UTC)
-Received: from [10.22.10.207] (unknown [10.22.10.207])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 69BC72024CC8;
-        Thu, 17 Nov 2022 00:45:56 +0000 (UTC)
-Message-ID: <26c4e6ab-52ca-e258-bf8d-d4beb86e9c9a@redhat.com>
-Date:   Wed, 16 Nov 2022 19:45:54 -0500
+        by ams.source.kernel.org (Postfix) with ESMTPS id 209FFB81F6A;
+        Thu, 17 Nov 2022 00:47:29 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BB8FBC433C1;
+        Thu, 17 Nov 2022 00:47:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1668646047;
+        bh=guj/solGyKYsGM3X50ye22aBLwCmKYGrl61AHGGkEhE=;
+        h=Date:From:To:CC:Subject:In-Reply-To:References:From;
+        b=sjDtqHkF0xLcJiWNqyyDHGsDobgvPbfsokLdvow1ubzRNPmvBoIvJzHi8Yvqb4Pia
+         HGnNQCiHG1RVXNT6hd1LZczDgT6F6qeXv8kJeuvGJn8/+br1/937HnYvk/G8IGtl+Q
+         ZFQtIA7mOoXoRnyX6MG86ilsJRRpQYAqs3JYwVGnUz8zmv/S71R/vUNqVudKP5d8I/
+         ngbo5GGVXMVg4tvgdFr9Scm7j09sy5k6AryrwAM5JfM8N31vtbPnEIZ3gh0dJd/VXg
+         XOgCVYXFpotxvKQyMUSDn+SRaAJK+w/ApIZQhMRnYYGss7TFYZd8CE/hTnB50vXpx1
+         xZriYx3JI13JA==
+Date:   Wed, 16 Nov 2022 16:47:27 -0800
+From:   Kees Cook <kees@kernel.org>
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Kees Cook <keescook@chromium.org>
+CC:     linux-kernel@vger.kernel.org, patches@lists.linux.dev,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Russell King <linux@armlinux.org.uk>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        =?ISO-8859-1?Q?Christoph_B=F6hmwalder?= 
+        <christoph.boehmwalder@linbit.com>,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Sakari Ailus <sakari.ailus@linux.intel.com>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Theodore Ts'o <tytso@mit.edu>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        Richard Weinberger <richard@nod.at>,
+        "Darrick J . Wong" <djwong@kernel.org>,
+        SeongJae Park <sj@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Helge Deller <deller@gmx.de>, netdev@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-media@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, loongarch@lists.linux.dev,
+        linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        linux-mmc@vger.kernel.org, linux-parisc@vger.kernel.org,
+        ydroneaud@opteya.com
+Subject: =?US-ASCII?Q?Re=3A_=5BPATCH_v2_3/3=5D_treewide=3A_use_ge?= =?US-ASCII?Q?t=5Frandom=5Fu32=5Fbetween=28=29_when_possible?=
+User-Agent: K-9 Mail for Android
+In-Reply-To: <Y3WDyl8ArQgeEoUU@zx2c4.com>
+References: <20221114164558.1180362-1-Jason@zx2c4.com> <20221114164558.1180362-4-Jason@zx2c4.com> <202211161436.A45AD719A@keescook> <Y3V4g8eorwiU++Y3@zx2c4.com> <Y3V6QtYMayODVDOk@zx2c4.com> <202211161628.164F47F@keescook> <Y3WDyl8ArQgeEoUU@zx2c4.com>
+Message-ID: <0EE39896-C7B6-4CB6-87D5-22AA787740A9@kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.4.0
-Subject: Re: [PATCH v10 0/3] blk-cgroup: Optimize blkcg_rstat_flush()
-Content-Language: en-US
-To:     Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>
-Cc:     Andrew Morton <akpm@linux-foundation.org>,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Hillf Danton <hdanton@sina.com>, cgroups@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        =?UTF-8?Q?Michal_Koutn=c3=bd?= <mkoutny@suse.com>,
-        Ming Lei <ming.lei@redhat.com>
-References: <20221105005902.407297-1-longman@redhat.com>
- <166864313668.13217.6182708630212912209.b4-ty@kernel.dk>
-From:   Waiman Long <longman@redhat.com>
-In-Reply-To: <166864313668.13217.6182708630212912209.b4-ty@kernel.dk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 11/16/22 18:58, Jens Axboe wrote:
-> On Fri, 4 Nov 2022 20:58:59 -0400, Waiman Long wrote:
->>   v10:
->>    - Update patch 3 to rename the rstat function to
->>      cgroup_rstat_css_cpu_flush().
->>
->>   v9:
->>    - Remove patch "llist: Allow optional sentinel node terminated lockless
->>      list" for now. This will be done as a follow-up patch.
->>    - Add a new lqueued field to blkg_iostat_set to store the status of
->>      whether lnode is in a lockless list.
->>    - Add a new patch 3 to speed up the freeing of blkcg by flushing out
->>      the rstat lockless lists at blkcg offline time.
->>
->> [...]
-> Applied, thanks!
+On November 16, 2022 4:43:54 PM PST, "Jason A=2E Donenfeld" <Jason@zx2c4=2E=
+com> wrote:
+>On Wed, Nov 16, 2022 at 04:31:18PM -0800, Kees Cook wrote:
+>> On Thu, Nov 17, 2022 at 01:03:14AM +0100, Jason A=2E Donenfeld wrote:
+>> > On Thu, Nov 17, 2022 at 12:55:47AM +0100, Jason A=2E Donenfeld wrote:
+>> > > 2) What to call it:
+>> > >    - between I still like, because it mirrors "I'm thinking of a nu=
+mber
+>> > >      between 1 and 10 and=2E=2E=2E" that everybody knows,
+>> > >    - inclusive I guess works, but it's not a preposition,
+>> > >    - bikeshed color #3?
+>> >=20
+>> > - between
+>> > - ranged
+>> > - spanning
+>> >=20
+>> > https://www=2Ethefreedictionary=2Ecom/List-of-prepositions=2Ehtm
+>> > - amid
+>> >=20
+>> > Sigh, names=2E
+>>=20
+>> I think "inclusive" is best=2E
 >
-> [1/3] blk-cgroup: Return -ENOMEM directly in blkcg_css_alloc() error path
->        commit: b5a9adcbd5dc95d34d1f5fc84eff9af6fc60d284
-> [2/3] blk-cgroup: Optimize blkcg_rstat_flush()
->        commit: 3b8cc6298724021da845f2f9fd7dd4b6829a6817
-> [3/3] blk-cgroup: Flush stats at blkgs destruction path
->        commit: dae590a6c96c799434e0ff8156ef29b88c257e60
->
-> Best regards,
+>I find it not very descriptive of what the function does=2E Is there one
+>you like second best? Or are you convinced they're all much much much
+>worse than "inclusive" that they shouldn't be considered?
 
-Thanks a lot!
+Right, I don't think any are sufficiently descriptive=2E "Incluisve" with =
+two arguments seems unambiguous and complete to me=2E :)
 
-Cheers,
-Longman
 
+--=20
+Kees Cook
