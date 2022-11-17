@@ -2,220 +2,205 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4410BC4332F
-	for <linux-block@archiver.kernel.org>; Thu, 17 Nov 2022 21:26:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 74941C4332F
+	for <linux-block@archiver.kernel.org>; Thu, 17 Nov 2022 21:58:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240934AbiKQV0U (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 17 Nov 2022 16:26:20 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43856 "EHLO
+        id S241134AbiKQV6W (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 17 Nov 2022 16:58:22 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36776 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239980AbiKQVZ1 (ORCPT
+        with ESMTP id S241093AbiKQV5u (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 17 Nov 2022 16:25:27 -0500
-X-Greylist: delayed 150 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Thu, 17 Nov 2022 13:25:13 PST
-Received: from resdmta-c1p-023852.sys.comcast.net (resdmta-c1p-023852.sys.comcast.net [IPv6:2001:558:fd00:56::c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B6E9490B4
-        for <linux-block@vger.kernel.org>; Thu, 17 Nov 2022 13:25:13 -0800 (PST)
-Received: from resomta-c1p-023269.sys.comcast.net ([96.102.18.227])
-        by resdmta-c1p-023852.sys.comcast.net with ESMTP
-        id vlsEo1dFn9RorvmLKoymbH; Thu, 17 Nov 2022 21:22:42 +0000
+        Thu, 17 Nov 2022 16:57:50 -0500
+Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BBE9C7DED8
+        for <linux-block@vger.kernel.org>; Thu, 17 Nov 2022 13:57:15 -0800 (PST)
+Received: by mail-pj1-x1031.google.com with SMTP id d13-20020a17090a3b0d00b00213519dfe4aso3283528pjc.2
+        for <linux-block@vger.kernel.org>; Thu, 17 Nov 2022 13:57:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=comcastmailservice.net; s=20211018a; t=1668720162;
-        bh=ZFnTdm2gyyk3AIYG+7WjvGTFAbvC92e2yMedMg6h24U=;
-        h=Received:Received:From:To:Subject:Date:Message-Id:MIME-Version:
-         Xfinity-Spam-Result;
-        b=IsTRE0zd8xcQbDBpR/WIN65xhhDwekJGczFgp78Pm9Nl69CdsjA5PlPbN4FqaRoA1
-         o5k39+BF13+XQ7UI7/wOCDfPBNfb3tS1Q/1RQu5mnNryEAC6qVHAh86u59EfGS++sS
-         wlm4XT1On29X73ULLaNmFfQUi7JtdlPePzhQf8W4jlgC5ekfrH7F9r+uZCbEXjutwz
-         1OEMOe2y8zAhYpuXcqULy1X7uusbAbDgFJsDlhR7orPiQGqpTlNg1uHs18b3pQDzGy
-         ffujIiKIy8TWXC47XarSA+t39EK7nCyMGPrdFTA6Ecbi8JDg+/bVp0CGsswv4gU6a9
-         jAdBGW4Qk6f7g==
-Received: from jderrick-mobl4.amr.corp.intel.com ([71.205.181.50])
-        by resomta-c1p-023269.sys.comcast.net with ESMTPA
-        id vmKqoGUS3xf0xvmKvowVoN; Thu, 17 Nov 2022 21:22:21 +0000
-X-Xfinity-VAAS: gggruggvucftvghtrhhoucdtuddrgedvgedrgeekgddugeejucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuvehomhgtrghsthdqtfgvshhipdfqfgfvpdfpqffurfetoffkrfenuceurghilhhouhhtmecufedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhephffvvefufffkofgggfestdekredtredttdenucfhrhhomheplfhonhgrthhhrghnucffvghrrhhitghkuceojhhonhgrthhhrghnrdguvghrrhhitghksehlihhnuhigrdguvghvqeenucggtffrrghtthgvrhhnpeeugeduvedvffeffedvkeejgfeutefghffgtdeuueefvedtleefudetffdtkeeuveenucffohhmrghinhepkhgvrhhnvghlrdhorhhgnecukfhppeejuddrvddthedrudekuddrhedtnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehhvghlohepjhguvghrrhhitghkqdhmohgslhegrdgrmhhrrdgtohhrphdrihhnthgvlhdrtghomhdpihhnvghtpeejuddrvddthedrudekuddrhedtpdhmrghilhhfrhhomhepjhhonhgrthhhrghnrdguvghrrhhitghksehlihhnuhigrdguvghvpdhnsggprhgtphhtthhopeekpdhrtghpthhtoheplhhinhhugidqnhhvmhgvsehlihhsthhsrdhinhhfrhgruggvrggurdhorhhgpdhrtghpthhtoheplhhinhhugidqsghlohgtkhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehshhhinhhitghhihhrohdrkhgrfigrshgrkhhise
- ifuggtrdgtohhmpdhrtghpthhtoheptghhrghithgrnhihrghksehnvhhiughirgdrtghomhdprhgtphhtthhopehksghushgthheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohephhgthheslhhsthdruggvpdhrtghpthhtohepshgrghhisehgrhhimhgsvghrghdrmhgvpdhrtghpthhtohepjhhonhgrthhhrghnrdguvghrrhhitghksehlihhnuhigrdguvghv
-X-Xfinity-VMeta: sc=-100.00;st=legit
-From:   Jonathan Derrick <jonathan.derrick@linux.dev>
-To:     <linux-nvme@lists.infradead.org>
-Cc:     <linux-block@vger.kernel.org>,
-        "Shin\\'ichiro Kawasaki" <shinichiro.kawasaki@wdc.com>,
-        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
-        Keith Busch <kbusch@kernel.org>,
-        Christoph Hellwig <hch@lst.de>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Jonathan Derrick <jonathan.derrick@linux.dev>
-Subject: [PATCH v2] tests/nvme: Add admin-passthru+reset race test
-Date:   Thu, 17 Nov 2022 14:22:10 -0700
-Message-Id: <20221117212210.934-1-jonathan.derrick@linux.dev>
-X-Mailer: git-send-email 2.30.2
+        d=chromium.org; s=google;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=IIh+nGIerLfk4ZB9SpoRZWMODmjSUqXiyhjydKb0Cds=;
+        b=PJZ6jbnQhQq9tru88c3QcgjfZaJDnoJRCzzf1bX0/gWQf6BO1kYnGuZiAkcQbfZxF1
+         wVZdaktXE7y7G0iGR9w0mDib97tK+9Z1KEN4DGKZzUJEwZpO/1SRERjEZW4dZS1lSmQm
+         6pLSDQke2I1tY0Rbt7braOr4eQDXUxJpKb4Zg=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=IIh+nGIerLfk4ZB9SpoRZWMODmjSUqXiyhjydKb0Cds=;
+        b=ThIhrPmDz8ak2ghAoGPYaN4h2CFlJrak76qiKA3OUfQLumc2YWAqE1GS1bkFk1ffUT
+         8rRS8nZwDCvxOVdlkaz8Y+zgHOGmd0MX6paPivY4GdvM52kZcrF1yGoyAlbMWZVjTZIo
+         rtDUjXoAvRVyGzckTzt21YFse3V04msERvda9O0Z5895ZKtlb4YHwef3xVnBd191jend
+         BusRjjeOSs8IbS7qg4ARGRH8+p5vb26FpyuA6U32ZmWu9BLWfhfpszNlsNaGldlT4Rg+
+         1q+1OXHDtPLhV1N2VIQynWsk1cOkoJNUKoWk0BwZNVCLh2xOoILBuuFoM8t992SDBg7L
+         cvrA==
+X-Gm-Message-State: ANoB5pmYyssnkMaL+YtRFWOO/uAOV4lWePS/65KSfSzTDVXP3VbKUyGf
+        8eBO1n8SVqSINZQUWpmDLKufVA==
+X-Google-Smtp-Source: AA0mqf5F2mDePv/SsUAusLJAu22vdbKLGH3peZOY+MZBhXcyEG7NIlWlaGpyKLA4kx4t011dWowR5A==
+X-Received: by 2002:a17:90a:dd82:b0:212:fdb1:720b with SMTP id l2-20020a17090add8200b00212fdb1720bmr10785160pjv.66.1668722234748;
+        Thu, 17 Nov 2022 13:57:14 -0800 (PST)
+Received: from www.outflux.net (198-0-35-241-static.hfc.comcastbusiness.net. [198.0.35.241])
+        by smtp.gmail.com with ESMTPSA id a28-20020aa795bc000000b0056beae3dee2sm1674860pfk.145.2022.11.17.13.57.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 17 Nov 2022 13:57:14 -0800 (PST)
+Date:   Thu, 17 Nov 2022 13:57:13 -0800
+From:   Kees Cook <keescook@chromium.org>
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc:     linux-kernel@vger.kernel.org, patches@lists.linux.dev,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Russell King <linux@armlinux.org.uk>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Christoph =?iso-8859-1?Q?B=F6hmwalder?= 
+        <christoph.boehmwalder@linbit.com>,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Sakari Ailus <sakari.ailus@linux.intel.com>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Theodore Ts'o <tytso@mit.edu>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        Richard Weinberger <richard@nod.at>,
+        "Darrick J . Wong" <djwong@kernel.org>,
+        SeongJae Park <sj@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Helge Deller <deller@gmx.de>, netdev@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-media@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, loongarch@lists.linux.dev,
+        linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        linux-mmc@vger.kernel.org, linux-parisc@vger.kernel.org
+Subject: Re: [PATCH v3 3/3] treewide: use get_random_u32_inclusive() when
+ possible
+Message-ID: <202211171349.F42BA5B0@keescook>
+References: <20221114164558.1180362-1-Jason@zx2c4.com>
+ <20221117202906.2312482-1-Jason@zx2c4.com>
+ <20221117202906.2312482-4-Jason@zx2c4.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221117202906.2312482-4-Jason@zx2c4.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Adds a test which runs many formats and reset_controllers in parallel.
-The intent is to expose timing holes in the controller state machine
-which will lead to hung task timeouts and the controller becoming
-unavailable.
+On Thu, Nov 17, 2022 at 09:29:06PM +0100, Jason A. Donenfeld wrote:
+> These cases were done with this Coccinelle:
+> 
+> @@
+> expression H;
+> expression L;
+> @@
+> - (get_random_u32_below(H) + L)
+> + get_random_u32_inclusive(L, H + L - 1)
+> 
+> @@
+> expression H;
+> expression L;
+> expression E;
+> @@
+>   get_random_u32_inclusive(L,
+>   H
+> - + E
+> - - E
+>   )
+> 
+> @@
+> expression H;
+> expression L;
+> expression E;
+> @@
+>   get_random_u32_inclusive(L,
+>   H
+> - - E
+> - + E
+>   )
+> 
+> @@
+> expression H;
+> expression L;
+> expression E;
+> expression F;
+> @@
+>   get_random_u32_inclusive(L,
+>   H
+> - - E
+>   + F
+> - + E
+>   )
+> 
+> @@
+> expression H;
+> expression L;
+> expression E;
+> expression F;
+> @@
+>   get_random_u32_inclusive(L,
+>   H
+> - + E
+>   + F
+> - - E
+>   )
+> 
+> And then subsequently cleaned up by hand, with several automatic cases
+> rejected if it didn't make sense contextually.
+> 
+> Reviewed-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+> Reviewed-by: Jason Gunthorpe <jgg@nvidia.com> # for infiniband
+> Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+> ---
+>  arch/x86/kernel/module.c                      |  2 +-
+>  crypto/rsa-pkcs1pad.c                         |  2 +-
+>  crypto/testmgr.c                              | 10 ++++----
+>  drivers/bus/mhi/host/internal.h               |  2 +-
+>  drivers/dma-buf/st-dma-fence-chain.c          |  2 +-
+>  drivers/infiniband/core/cma.c                 |  2 +-
+>  drivers/infiniband/hw/hns/hns_roce_ah.c       |  5 ++--
+>  drivers/mtd/nand/raw/nandsim.c                |  2 +-
+>  drivers/net/wireguard/selftest/allowedips.c   |  8 +++---
+>  .../broadcom/brcm80211/brcmfmac/p2p.c         |  2 +-
+>  .../net/wireless/intel/iwlwifi/mvm/mac-ctxt.c |  2 +-
+>  fs/f2fs/segment.c                             |  6 ++---
+>  kernel/kcsan/selftest.c                       |  2 +-
+>  lib/test_hexdump.c                            | 10 ++++----
+>  lib/test_printf.c                             |  2 +-
+>  lib/test_vmalloc.c                            |  6 ++---
+>  mm/kasan/kasan_test.c                         |  6 ++---
+>  mm/kfence/kfence_test.c                       |  2 +-
+>  mm/swapfile.c                                 |  5 ++--
+>  net/bluetooth/mgmt.c                          |  5 ++--
+>  net/core/pktgen.c                             | 25 ++++++++-----------
+>  net/ipv4/tcp_input.c                          |  2 +-
+>  net/ipv6/addrconf.c                           |  6 ++---
+>  net/netfilter/nf_nat_helper.c                 |  2 +-
+>  net/xfrm/xfrm_state.c                         |  2 +-
+>  25 files changed, 56 insertions(+), 64 deletions(-)
 
-Reported by https://bugzilla.kernel.org/show_bug.cgi?id=216354
+Even the diffstat agrees this is a nice clean-up. :)
 
-Signed-off-by: Jonathan Derrick <jonathan.derrick@linux.dev>
----
-I seem to have isolated the error mechanism for older kernels, but 6.2.0-rc2
-reliably segfaults my QEMU instance (something else to look into) and I don't
-have any 'real' hardware to test this on at the moment. It looks like several
-passthru commands are able to enqueue prior/during/after resetting/connecting.
+Reviewed-by: Kees Cook <keescook@chromium.org>
 
-The issue seems to be very heavily timing related, so the loop in the header is
-a lot more forceful in this approach.
+The only comment I have is that maybe these cases can just be left as-is
+with _below()?
 
-As far as the loop goes, I've noticed it will typically repro immediately or
-pass the whole test.
+> -             size_t len = get_random_u32_below(rs) + gs;
+> +             size_t len = get_random_u32_inclusive(gs, rs + gs - 1);
 
- tests/nvme/047     | 121 +++++++++++++++++++++++++++++++++++++++++++++
- tests/nvme/047.out |   2 +
- 2 files changed, 123 insertions(+)
- create mode 100755 tests/nvme/047
- create mode 100644 tests/nvme/047.out
+It seems like writing it in the form of base plus [0, limit) is clearer?
 
-diff --git a/tests/nvme/047 b/tests/nvme/047
-new file mode 100755
-index 0000000..fb8609c
---- /dev/null
-+++ b/tests/nvme/047
-@@ -0,0 +1,121 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-3.0+
-+# Copyright (C) 2022 Jonathan Derrick <jonathan.derrick@linux.dev>
-+#
-+# Test nvme reset controller during admin passthru
-+#
-+# Regression for issue reported by
-+# https://bugzilla.kernel.org/show_bug.cgi?id=216354
-+#
-+# Simpler form:
-+# for i in {1..50}; do
-+#	nvme format -f /dev/nvme0n1 &
-+#	echo 1 > /sys/block/nvme0n1/device/reset_controller &
-+# done
-+
-+. tests/nvme/rc
-+
-+#restrict test to nvme-pci only
-+nvme_trtype=pci
-+
-+DESCRIPTION="test nvme reset controller during admin passthru"
-+QUICK=1
-+CAN_BE_ZONED=1
-+
-+RUN_TIME=300
-+RESET_PCIE=true
-+
-+requires() {
-+	_nvme_requires
-+}
-+
-+device_requires() {
-+	_require_test_dev_is_nvme
-+}
-+
-+remove_and_rescan() {
-+	local pdev=$1
-+	echo 1 > /sys/bus/pci/devices/"$pdev"/remove
-+	echo 1 > /sys/bus/pci/rescan
-+}
-+
-+test_device() {
-+	echo "Running ${TEST_NAME}"
-+
-+	local pdev
-+	local blkdev
-+	local ctrldev
-+	local sysfs
-+	local max_timeout
-+	local timeout
-+	local timeleft
-+	local start
-+	local last_live
-+	local i
-+
-+	pdev="$(_get_pci_dev_from_blkdev)"
-+	blkdev="${TEST_DEV_SYSFS##*/}"
-+	ctrldev="$(echo "$blkdev" | grep -Eo 'nvme[0-9]+')"
-+	sysfs="/sys/block/$blkdev/device"
-+	max_timeout=$(cat /proc/sys/kernel/hung_task_timeout_secs)
-+	timeout=$((max_timeout * 3 / 4))
-+
-+	sleep 5
-+
-+	start=$SECONDS
-+	while [[ $((SECONDS - start)) -le $RUN_TIME ]]; do
-+		if [[ $(cat "$sysfs/state") == "live" ]]; then
-+			last_live=$SECONDS
-+		fi
-+
-+		# Failure case appears to stack up formats while controller is resetting/connecting
-+		if [[ $(pgrep -cf "nvme format") -lt 100 ]]; then
-+			for ((i=0; i<100; i++)); do
-+				nvme format -f "$TEST_DEV" &
-+				echo 1 > "$sysfs/reset_controller" &
-+			done &> /dev/null
-+		fi
-+
-+		# Might have failed probe, so reset and continue test
-+		if [[ $((SECONDS - last_live)) -gt 10 && \
-+		      ! -c "/dev/$ctrldev" && "$RESET_PCIE" == true ]]; then
-+			{
-+				echo 1 > /sys/bus/pci/devices/"$pdev"/remove
-+				echo 1 > /sys/bus/pci/rescan
-+			} &
-+
-+			timeleft=$((max_timeout - timeout))
-+			sleep $((timeleft < 30 ? timeleft : 30))
-+			if [[ ! -c "/dev/$ctrldev" ]]; then
-+				echo "/dev/$ctrldev missing"
-+				echo "failed to reset $ctrldev's pcie device $pdev"
-+				break
-+			fi
-+			sleep 5
-+			continue
-+		fi
-+
-+		if [[ $((SECONDS - last_live)) -gt $timeout ]]; then
-+			if [[ ! -c "/dev/$ctrldev" ]]; then
-+				echo "/dev/$ctrldev missing"
-+				break
-+			fi
-+
-+			# Assume the controller is hung and unrecoverable
-+			if [[ -f "$sysfs/state" ]]; then
-+				echo "nvme controller hung ($(cat "$sysfs/state"))"
-+				break
-+			else
-+				echo "nvme controller hung"
-+				break
-+			fi
-+		fi
-+	done
-+
-+	if [[ ! -c "/dev/$ctrldev" || $(cat "$sysfs/state") != "live" ]]; then
-+		echo "nvme still not live after $((SECONDS - last_live)) seconds!"
-+	fi
-+	udevadm settle
-+
-+	echo "Test complete"
-+}
-diff --git a/tests/nvme/047.out b/tests/nvme/047.out
-new file mode 100644
-index 0000000..915d0a2
---- /dev/null
-+++ b/tests/nvme/047.out
-@@ -0,0 +1,2 @@
-+Running nvme/047
-+Test complete
+		size_t len = gs + get_random_u32_below(rs);
+
+But there is only a handful, so *shrug*
+
+All the others are much cleaner rewritten as _inclusive().
+
 -- 
-2.27.0
-
+Kees Cook
