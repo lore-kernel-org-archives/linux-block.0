@@ -2,453 +2,420 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 91976C4332F
-	for <linux-block@archiver.kernel.org>; Thu, 17 Nov 2022 13:19:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E597DC4332F
+	for <linux-block@archiver.kernel.org>; Thu, 17 Nov 2022 13:39:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234725AbiKQNTO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 17 Nov 2022 08:19:14 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37556 "EHLO
+        id S240156AbiKQNjM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 17 Nov 2022 08:39:12 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51646 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234843AbiKQNTK (ORCPT
+        with ESMTP id S240158AbiKQNjJ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 17 Nov 2022 08:19:10 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5AD585A6D1
-        for <linux-block@vger.kernel.org>; Thu, 17 Nov 2022 05:18:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1668691094;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=KvsFNY2b3ztJU9jbTNiiuJoNU7Fad8Upm+UYYrPZKGw=;
-        b=Z+NALLnA1mf42DEJNfz3v8R9ryrkmu0OA80uKD94dWTcFaRglP2ZWErKD6t/qMZAaYLBuV
-        LMwD4kairo+MFR9Kbt+8CVdLtMTyA3mERof/zm/0Vi+01pLPxI2zCnBXx5vh+k8EwRluid
-        jSs8Bm0B3Iu8qYrU/jpFKue0AsDY5bk=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-643-s_bzSL6XNAueTKfTrFOv8A-1; Thu, 17 Nov 2022 08:18:00 -0500
-X-MC-Unique: s_bzSL6XNAueTKfTrFOv8A-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 8A03A1C087A7;
-        Thu, 17 Nov 2022 13:18:00 +0000 (UTC)
-Received: from T590 (ovpn-8-16.pek2.redhat.com [10.72.8.16])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 4A13C49BB62;
-        Thu, 17 Nov 2022 13:17:55 +0000 (UTC)
-Date:   Thu, 17 Nov 2022 21:17:50 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org,
-        ZiyangZhang <ZiyangZhang@linux.alibaba.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>, ming.lei@redhat.com
-Subject: Re: [PATCH 6/6] ublk_drv: add mechanism for supporting unprivileged
- ublk device
-Message-ID: <Y3Y0fgqrMMwiV97x@T590>
-References: <20221116060835.159945-1-ming.lei@redhat.com>
- <20221116060835.159945-7-ming.lei@redhat.com>
+        Thu, 17 Nov 2022 08:39:09 -0500
+Received: from esa3.hgst.iphmx.com (esa3.hgst.iphmx.com [216.71.153.141])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C2B6722BEA
+        for <linux-block@vger.kernel.org>; Thu, 17 Nov 2022 05:39:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1668692347; x=1700228347;
+  h=references:from:to:cc:subject:date:in-reply-to:
+   message-id:mime-version;
+  bh=c6Nyf4wQd3BITAduWCB+zc1WUaXg4p8nwarlaJF/o4w=;
+  b=Ntalh54X5jYb0xCLW5rnNxetudJa7f0e//f1cpHxPBBHSqDM4ZvjI2Kl
+   CH8HBkjArECHfeWJU/5s9EyGFZu1NbVUqRX3cKPJglLE0auLcruuAyA45
+   mRSbdlRG1DYp1AQmGMBjRyHgrCHJHwswUFae+eParEdK6NO4Tqwods2dZ
+   sfRIb+t5ZKfjXV+4aqoktSOrr4Tam7LLBXrFnujhfiwkHBhGjFHuetP37
+   WdeySCNqxg1MMtbN2EcIUg6APDSnm53vssf23Lsa9sjVueiHMrx6sBp2A
+   VsAW1P6ULS7VoWlBGdJTrd8uNMrn05JvxdZlLlIWqeFDTQ08nXwDbJr3/
+   w==;
+X-IronPort-AV: E=Sophos;i="5.96,171,1665417600"; 
+   d="scan'208";a="221675993"
+Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
+  by ob1.hgst.iphmx.com with ESMTP; 17 Nov 2022 21:39:05 +0800
+IronPort-SDR: aqv+tj2K+nkb0IhHTazZ9nZIO5tDLY0mYFLhNjC7WyKER9o4tzY9xuy9JQZeTKbNwawclAwLnL
+ 244Ip2tqfTcmWMzfaxQaxh6jZllGllMmvn+3DGDHi/Vc9wmTV+coewqv4NM4FdZnMO72G8WPjF
+ Zxq1A58LcTRn9+hUAxPeDldo+etAwy07wtkSz0HFQShrk7FufAoxwC24ClrYIeLypnnTWz1914
+ WuPMgr2CPBNOulOqytYFZ72Asl5b9jrvw4eeDDfMqCTojUXCGVwGtp+IoTEBY3JLiiG+kQBAdx
+ g+s=
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 17 Nov 2022 04:52:15 -0800
+IronPort-SDR: ZY+/dJwObYNuobTgZNPEp77SNZgvaIKrXQ7MJ+c/UJ7IPhTFougBUYyLqFSeM+bwxck1YUutGu
+ 0e0LdWaMSumZr52xc4eH6A2umBct3k/miP8SQVACPWOt5EJkxQH5DMlrVCHx4YHu7SsFE4hBFC
+ VU8xBOYvwEZCcmDuEjIGduWuV4uTNzwC0OR+NdEOQsELsylBKKmeUs3gu+QtyzwuWyzYJgujYJ
+ 3Nl58hISiKyv+acUzILebANhKSGTKJVvf0Zmy9MwJx2Q7AMsA58ZhJmL2p+/jCw5BKlAIfsIfG
+ aDM=
+WDCIronportException: Internal
+Received: from dellx5.wdc.com (HELO localhost) ([10.200.210.81])
+  by uls-op-cesaip02.wdc.com with ESMTP; 17 Nov 2022 05:39:04 -0800
+References: <87sfii99e7.fsf@wdc.com> <Y3WZ41tKFZHkTSHL@T590>
+ <87o7t67zzv.fsf@wdc.com> <Y3X2M3CSULigQr4f@T590> <87k03u7x3r.fsf@wdc.com>
+ <Y3YfUjrrLJzPWc4H@T590> <87fseh92aa.fsf@wdc.com>
+ <b8c15259-f8ab-6c47-46ab-872c658f1052@opensource.wdc.com>
+User-agent: mu4e 1.8.11; emacs 28.2.50
+From:   Andreas Hindborg <andreas.hindborg@wdc.com>
+To:     Damien Le Moal <damien.lemoal@opensource.wdc.com>
+Cc:     Andreas Hindborg <andreas.hindborg@wdc.com>,
+        Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org
+Subject: Re: Reordering of ublk IO requests
+Date:   Thu, 17 Nov 2022 14:31:39 +0100
+In-reply-to: <b8c15259-f8ab-6c47-46ab-872c658f1052@opensource.wdc.com>
+Message-ID: <87bkp58zuw.fsf@wdc.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221116060835.159945-7-ming.lei@redhat.com>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Nov 16, 2022 at 02:08:35PM +0800, Ming Lei wrote:
-> unprivileged ublk device is helpful for container use case, such
-> as: ublk device created in one unprivileged container can be controlled
-> and accessed by this container only.
 
-BTW, this patch may cause kernel panic after allocating one un-privileged
-device for a while, and one security hole, follows the fixed version:
+Damien Le Moal <damien.lemoal@opensource.wdc.com> writes:
 
-From 0edcd7d7513cab2982b37d8e9a7224762f42e262 Mon Sep 17 00:00:00 2001
-From: Ming Lei <ming.lei@redhat.com>
-Date: Mon, 14 Nov 2022 07:50:41 +0000
-Subject: [PATCH fixed] ublk_drv: add mechanism for supporting unprivileged ublk
- device
+> On 11/17/22 20:59, Andreas Hindborg wrote:
+>> 
+>> Ming Lei <ming.lei@redhat.com> writes:
+>> 
+>>> On Thu, Nov 17, 2022 at 10:07:14AM +0100, Andreas Hindborg wrote:
+>>>>
+>>>> Ming Lei <ming.lei@redhat.com> writes:
+>>>>
+>>>>> On Thu, Nov 17, 2022 at 09:05:48AM +0100, Andreas Hindborg wrote:
+>>>>>>
+>>>>>> Ming Lei <ming.lei@redhat.com> writes:
+>>>>>>
+>>>>>>> Hi Andreas,
+>>>>>>>
+>>>>>>> On Wed, Nov 16, 2022 at 04:00:15PM +0100, Andreas Hindborg wrote:
+>>>>>>>>
+>>>>>>>> Hi Ming,
+>>>>>>>>
+>>>>>>>> I have a question regarding ublk. For context, I am working on adding
+>>>>>>>> zoned storage support to ublk, and you have been very kind to help me on
+>>>>>>>> Github [1].
+>>>>>>>>
+>>>>>>>> I have a problem with ordering of requests after they are issued to the
+>>>>>>>> ublk driver. Basically ublk will reverse the ordering of requests that are
+>>>>>>>> batched. The behavior can be observed with the following fio workload:
+>>>>>>>>
+>>>>>>>>> fio --name=test --ioengine=io_uring --rw=read --bs=4m --direct=1
+>>>>>>>>> --size=4m --filename=/dev/ublkb0
+>>>>>>>>
+>>>>>>>> For a loopback ublk target I get the following from blktrace:
+>>>>>>>>
+>>>>>>>>> 259,2    0     3469   286.337681303   724  D   R 0 + 1024 [fio]
+>>>>>>>>> 259,2    0     3470   286.337691313   724  D   R 1024 + 1024 [fio]
+>>>>>>>>> 259,2    0     3471   286.337694423   724  D   R 2048 + 1024 [fio]
+>>>>>>>>> 259,2    0     3472   286.337696583   724  D   R 3072 + 1024 [fio]
+>>>>>>>>> 259,2    0     3473   286.337698433   724  D   R 4096 + 1024 [fio]
+>>>>>>>>> 259,2    0     3474   286.337700213   724  D   R 5120 + 1024 [fio]
+>>>>>>>>> 259,2    0     3475   286.337702723   724  D   R 6144 + 1024 [fio]
+>>>>>>>>> 259,2    0     3476   286.337704323   724  D   R 7168 + 1024 [fio]
+>>>>>>>>> 259,1    0     1794   286.337794934   390  D   R 6144 + 2048 [ublk]
+>>>>>>>>> 259,1    0     1795   286.337805504   390  D   R 4096 + 2048 [ublk]
+>>>>>>>>> 259,1    0     1796   286.337816274   390  D   R 2048 + 2048 [ublk]
+>>>>>>>>> 259,1    0     1797   286.337821744   390  D   R 0 + 2048 [ublk]
+>>>>>>>>
+>>>>>>>> And enabling debug prints in ublk shows that the reversal happens when
+>>>>>>>> ublk defers work to the io_uring context:
+>>>>>>>>
+>>>>>>>>> kernel: ublk_queue_rq: qid 0, tag 180, sect 0
+>>>>>>>>> kernel: ublk_queue_rq: qid 0, tag 181, sect 1024
+>>>>>>>>> kernel: ublk_queue_rq: qid 0, tag 182, sect 2048
+>>>>>>>>> kernel: ublk_queue_rq: qid 0, tag 183, sect 3072
+>>>>>>>>> kernel: ublk_queue_rq: qid 0, tag 184, sect 4096
+>>>>>>>>> kernel: ublk_queue_rq: qid 0, tag 185, sect 5120
+>>>>>>>>> kernel: ublk_queue_rq: qid 0, tag 186, sect 6144
+>>>>>>>>> kernel: ublk_queue_rq: qid 0, tag 187, sect 7168
+>>>>>>>>> kernel: __ublk_rq_task_work: complete: op 33, qid 0 tag 187 io_flags 1 addr 7f245d359000, sect 7168
+>>>>>>>>> kernel: __ublk_rq_task_work: complete: op 33, qid 0 tag 186 io_flags 1 addr 7f245fcfd000, sect 6144
+>>>>>>>>> kernel: __ublk_rq_task_work: complete: op 33, qid 0 tag 185 io_flags 1 addr 7f245fd7f000, sect 5120
+>>>>>>>>> kernel: __ublk_rq_task_work: complete: op 33, qid 0 tag 184 io_flags 1 addr 7f245fe01000, sect 4096
+>>>>>>>>> kernel: __ublk_rq_task_work: complete: op 33, qid 0 tag 183 io_flags 1 addr 7f245fe83000, sect 3072
+>>>>>>>>> kernel: __ublk_rq_task_work: complete: op 33, qid 0 tag 182 io_flags 1 addr 7f245ff05000, sect 2048
+>>>>>>>>> kernel: __ublk_rq_task_work: complete: op 33, qid 0 tag 181 io_flags 1 addr 7f245ff87000, sect 1024
+>>>>>>>>> kernel: __ublk_rq_task_work: complete: op 33, qid 0 tag 180 io_flags 1 addr 7f2460009000, sect 0
+>>>>>>>>
+>>>>>>>> The problem seems to be that the method used to defer work to the
+>>>>>>>> io_uring context, task_work_add(), is using a stack to queue the
+>>>>>>>> callbacks.
+>>>>>>>
+>>>>>>> Is the observation done on zoned ublk or plain ublk-loop?
+>>>>>>
+>>>>>> I collected this trace on my fork, but since the behavior comes from
+>>>>>> task_work.c using a stack to queue work, it would be present on upstream
+>>>>>> ublk as well. For completeness, I have verified that this is the case.
+>>>>>>
+>>>>>>> If it is plain ublk-loop, the reverse order can be started from
+>>>>>>> blk_add_rq_to_plug(), but it won't happen for zoned write request
+>>>>>>> which isn't queued to plug list.
+>>>>>>
+>>>>>> I forgot to mention that I set the deadline scheduler for both ublkb0
+>>>>>> and the loopback target. No reordering should happen in mq with the
+>>>>>> deadline scheduler, as far as I understand.
+>>>>>
+>>>>> I meant you need to setup one zoned ublk-loop for observing write request
+>>>>> order, block layer never guarantees request order for other devices.
+>>>>>
+>>>>>>
+>>>>>>>
+>>>>>>> Otherwise, can you observe zoned write req reorder from ublksrv side?
+>>>>>>>
+>>>>>>
+>>>>>> Yes, the reverse order is observable in ublk server. Reordering happens
+>>>>>> in ublk kernel driver.
+>>>>>>
+>>>>>>>>
+>>>>>>>> As you probably are aware, writes to zoned storage must
+>>>>>>>> happen at the write pointer, so when order is lost there is a problem.
+>>>>>>>> But I would assume that this behavior is also undesirable in other
+>>>>>>>> circumstances.
+>>>>>>>>
+>>>>>>>> I am not sure what is the best approach to change this behavor. Maybe
+>>>>>>>> having a separate queue for the requests and then only scheduling work
+>>>>>>>> if a worker is not already processing the queue?
+>>>>>>>>
+>>>>>>>> If you like, I can try to implement a fix?
+>>>>>>>
+>>>>>>> Yeah, I think zoned write requests could be forwarded to ublk server out of order.
+>>>>>>
+>>>>>> In reverse order for requests that are issued without a context switch,
+>>>>>> as far as I can tell.
+>>>>>>
+>>>>>>>
+>>>>>>> Is it possible for re-order the writes in ublksrv side? I guess it is
+>>>>>>> be doable:
+>>>>>>>
+>>>>>>> 1) zoned write request is sent to ublk_queue_rq() in order always
+>>>>>>>
+>>>>>>> 2) when ublksrv zone target/backend code gets zoned write request in each
+>>>>>>> zone, it can wait until the next expected write comes, then handle the
+>>>>>>> write and advance write pointer, then repeat the whole process.
+>>>>>>>
+>>>>>>> 3) because of 1), the next expected zoned write req is guaranteed to
+>>>>>>> come without much delay, and the per-zone queue won't be long.
+>>>>>>
+>>>>>> I think it is not feasible to have per zone data structures. Instead, I
+>>>>>
+>>>>> If one mapping data structure is used for ordering per-zone write
+>>>>> request, it could be pretty easy, such as C++'s map or hash table, and it
+>>>>> won't take much memory given the max in-flight IOs are very limited and
+>>>>> the zone mapping entry can be reused among different zone, and quite easy
+>>>>> to implement.
+>>>>>
+>>>>> Also most of times, the per-zone ordering can be completed in current
+>>>>> batch(requests completed from single io_uring_enter()), then the extra
+>>>>> cost could be close to zero, you can simply run the per-zone ordering in
+>>>>> ->handle_io_background() callback, when all requests could come for each
+>>>>> zone most of times.
+>>>>>
+>>>>>> considered adding a sequence number to each request, and then queue up
+>>>>>> requests if there is a gap in the numbering.
+>>>>>
+>>>>> IMO, that won't be doable, given you don't know when the sequence will be over.
+>>>>
+>>>> We would not need to know when the sequence is over. If in ubdsrv we see
+>>>> request number 1,2,4, we could hold 4 until 3 shows up. When 3 shows up
+>>>> we go ahead and submit all requests from 3 and up, until there is
+>>>> another gap. If ublk_drv is setting the sequence numbers,
+>>>> cancelled/aborted requests would not be an issue.
+>>>>
+>>>> I think this would be less overhead than having per zone data structure.
+>>>
+>>> You can only assign it to zoned write request, but you still have to check
+>>> the sequence inside each zone, right? Then why not just check LBAs in
+>>> each zone simply?
+>> 
+>> We would need to know the zone map, which is not otherwise required.
+>> Then we would need to track the write pointer for each open zone for
+>> each queue, so that we can stall writes that are not issued at the write
+>> pointer. This is in effect all zones, because we cannot track when zones
+>> are implicitly closed. Then, if different queues are issuing writes to
+>> the same zone, we need to sync across queues. Userspace may have
+>> synchronization in place to issue writes with multiple threads while
+>> still hitting the write pointer.
+>> 
+>> It is not good enough to only impose ordering within a zone if we have
+>> requests in flight for that zone. For the first write to a zone when there
+>> are no writes in flight to that zone, we can not know if the write is at
+>> the write pointer, or if more writes to lower LBA is on the way. Not
+>> without tracking the write pointer.
+>> 
+>> With a sequence number, the sequence number can be queue local. It would
+>> not guarantee that writes always happen at the write pointer, but it
+>> would guarantee that requests are not reordered by ublk_drv, which is
+>> all that is required. As long as userspace is issuing at the write
+>> pointer (as they are required to for zoned storage), this solution would
+>> work, even across multiple queues issuing writes to the same zone.
+>> 
+>>>
+>>>>
+>>>> But I still think it is an unnecessary hack. We could just fix the driver.
+>>>
+>>> But not sure if it is easy to make io_uring_cmd_complete_in_task() or
+>>> task_work_add to complete request in order efficiently.
+>>>
+>>>>
+>>>>>
+>>>>>>
+>>>>>> But really, the issue should be resolved by changing the way
+>>>>>> ublk_queue_rq() is sending work to uring context with task_add_work().
+>>>>>
+>>>>> Not sure it can be solved easily given llist is implemented in this way.
+>>>>
+>>>> If we queue requests on a separate queue, we are fine. I can make a
+>>>> patch suggestion.
+>>>
+>>> The problem is that io_uring_cmd_complete_in_task() or task_work_add() may
+>>> re-order the request, can you explain why the issue can be solved by
+>>> separate queue?
+>> 
+>> I would suggest to still use task_work_add() to queue a callback, but
+>> instead of carrying the pdu as the callback argument, use it as a
+>> notification that one or more work items are queued. Then we add the pdu
+>> to a hwctx local FIFO queue.
+>> 
+>> __ublk_rq_task_work() would then check this FIFO queue and submit all
+>> the requests on the queue to userspace.
+>> 
+>> Without further optimization __ublk_rq_task_work() would some times be
+>> called with an empty queue, but this should not be too much overhead.
+>> Maybe we could decide to not call task_work_add() if the hwctx local
+>> queue of pdus is not empty.
+>> 
+>>>
+>>>>
+>>>>>
+>>>>>> Fixing in ublksrv is a bit of a hack and will have performance penalty.
+>>>>>
+>>>>> As I mentioned, ordering zoned write request in each zone just takes
+>>>>> a little memory(mapping, or hashing) and the max size of the mapping
+>>>>> table is queue depth, and basically zero cpu cost, not see extra
+>>>>> performance penalty is involved.
+>>>>
+>>>> I could implement all three solutions. 1) fix the dirver, 2) per zone
+>>>> structure and 3) sequence numbers. Then I benchmark them and we will
+>>>> know what works. It's a lot of work though.
+>>>
+>>> Let's prove if the theory for each solution is correct first.
+>> 
+>> Alright.
+>> 
+>>>
+>>>>
+>>>>>
+>>>>>>
+>>>>>> Also, it can not be good for any storage device to have sequential
+>>>>>> requests delivered in reverse order? Fixing this would benefit all targets.
+>>>>>
+>>>>> Only zoned target has strict ordering requirement which does take cost, block
+>>>>> layer never guarantees request order. As I mentioned, blk_add_rq_to_plug()
+>>>>> can re-order requests in reverse order too.
+>>>>
+>>>> When mq-deadline scheduler is set for a queue, requests are not
+>>>> reordered, right?
+>>>
+>>> In case of batching submission, mq-deadline will order requests by
+>>> LBA in this whole batch.
+>> 
+>> That is not what I am seeing in practice. I tried looking through
+>> mq-deadline.c, but I could not find code that would order by LBA. Could
+>> you point me to the code that implements this policy?
+>
+> see the use of the rb tree, deadline_add_rq_rb() and friends. The rb tree
+> maintains the requests in LBA order. The fifo list, maintains an arrival
+> order for starvation control.
 
-unprivileged ublk device is helpful for container use case, such
-as: ublk device created in one unprivileged container can be controlled
-and accessed by this container only.
+Thanks!
 
-Implement this feature by adding flag of UBLK_F_UNPRIVILEGED_DEV, and if
-this flag isn't set, any control command has been run from privileged
-user. Otherwise, any control command can be sent from any unprivileged
-user, but the user has to be permitted to access the ublk char device
-to be controlled.
+>
+>> 
+>>>
+>>>>
+>>>> I am no block layer expert, so I cannot argue about the implementation.
+>>>> But I think that both spinning rust and flash would benefit from having
+>>>> sequential requests delivered in order? Would it not hurt performance to
+>>>> reverse order for sequential requests all the time? I have a hard time
+>>>> understanding why the block layer would do this by default.
+>>>>
+>>>> One thing is to offer no guarantees, but to _always_ reverse the
+>>>> ordering of sequential requests seem a little counter productive to me.
+>>>
+>>> If io_uring_cmd_complete_in_task()/task_work_add() can complete io
+>>> commands to ublksrv in order without extra cost, that is better.
+>> 
+>> I agree :)
+>> 
+>>>
+>>> But I don't think it is a big deal for HDD. because when these requests
+>>> are re-issued from ublksrv to block layer, deadline or bfq will order
+>>> them too since all are submitted via io_uring in batch.
+>> 
+>> As I wrote, that is not what I am seeing in my experiment. Repeating the
+>> output of blktrace from the top of this email:
+>> 
+>> 259,2    0     3469   286.337681303   724  D   R 0 + 1024 [fio]
+>> 259,2    0     3470   286.337691313   724  D   R 1024 + 1024 [fio]
+>> 259,2    0     3471   286.337694423   724  D   R 2048 + 1024 [fio]
+>> 259,2    0     3472   286.337696583   724  D   R 3072 + 1024 [fio]
+>> 259,2    0     3473   286.337698433   724  D   R 4096 + 1024 [fio]
+>> 259,2    0     3474   286.337700213   724  D   R 5120 + 1024 [fio]
+>> 259,2    0     3475   286.337702723   724  D   R 6144 + 1024 [fio]
+>> 259,2    0     3476   286.337704323   724  D   R 7168 + 1024 [fio]
+>> 259,1    0     1794   286.337794934   390  D   R 6144 + 2048 [ublk]
+>> 259,1    0     1795   286.337805504   390  D   R 4096 + 2048 [ublk]
+>> 259,1    0     1796   286.337816274   390  D   R 2048 + 2048 [ublk]
+>> 259,1    0     1797   286.337821744   390  D   R 0 + 2048 [ublk]
+>> 
+>> Here the read of 6144:
+>> 259,1    0     1794   286.337794934   390  D   R 6144 + 2048 [ublk]
+>> 
+>> is clearly issued before the read of 4096:
+>> 259,1    0     1795   286.337805504   390  D   R 4096 + 2048 [ublk]
+>> 
+>> It is not because there are no IO in flight for the target device. Here
+>> is he trace with completions included:
+>> 
+>> 259,2   10        1     0.000000000   468  D   R 0 + 1024 [fio]
+>> 259,2   10        2     0.000005680   468  D   R 1024 + 1024 [fio]
+>> 259,2   10        3     0.000007760   468  D   R 2048 + 1024 [fio]
+>> 259,2   10        4     0.000009140   468  D   R 3072 + 1024 [fio]
+>> 259,2   10        5     0.000010420   468  D   R 4096 + 1024 [fio]
+>> 259,2   10        6     0.000011640   468  D   R 5120 + 1024 [fio]
+>> 259,2   10        7     0.000013350   468  D   R 6144 + 1024 [fio]
+>> 259,2   10        8     0.000014350   468  D   R 7168 + 1024 [fio]
+>> 259,1   10        1     0.000280540   412  D   R 6144 + 2048 [ublk]
+>> 259,1   10        2     0.000433260   412  D   R 4096 + 2048 [ublk]
+>> 259,1   10        3     0.000603920   412  D   R 2048 + 2048 [ublk]
+>> 259,1   10        4     0.000698070   412  D   R 0 + 2048 [ublk]
+>> 259,1   10        5     0.000839250     0  C   R 6144 + 2048 [0]
+>> 259,2   10        9     0.000891270   412  C   R 7168 + 1024 [0]
+>> 259,2   10       10     0.000919780   412  C   R 6144 + 1024 [0]
+>> 259,1   10        6     0.001258791     0  C   R 4096 + 2048 [0]
+>> 259,2   10       11     0.001306541   412  C   R 5120 + 1024 [0]
+>> 259,2   10       12     0.001335291   412  C   R 4096 + 1024 [0]
+>> 259,1   10        7     0.001469911     0  C   R 2048 + 2048 [0]
+>> 259,2   10       13     0.001518281   412  C   R 3072 + 1024 [0]
+>> 259,2   10       14     0.001547041   412  C   R 2048 + 1024 [0]
+>> 259,1   10        8     0.001600801     0  C   R 0 + 2048 [0]
+>> 259,2   10       15     0.001641871   412  C   R 1024 + 1024 [0]
+>> 259,2   10       16     0.001671921   412  C   R 0 + 1024 [0]
+>> 
+>> This last trace is vanilla Linux 6.0 with mq-deadline enabled for ublkb0(259,2)
+>> and the loopback target nvme0n1(259,1).
+>
+> queue at head that should be queue at tail ? if nvme0n1 is a multi queue
+> device and does not have a scheduler, there may be a lot of "issue
+> directly" that can really destroy the order of requests.
 
-In case of UBLK_F_UNPRIVILEGED_DEV:
+It is a regular nvme drive handled by the nvme driver. So multi queue
+with mq-deadline set.
 
-1) for command UBLK_CMD_ADD_DEV, it is always allowed, and user needs
-to provide owner's uid/gid in this command, so that udev can set correct
-ownership for the created ublk device, since the device owner uid/gid
-can be queried via command of UBLK_CMD_GET_DEV_INFO.
+Unless I am reading the trace wrong there are 3 reads issued to 259,1
+sectors 6144, 4096 and 2048 in that order. This is the order userspace
+is issuing the reads, so the trace matches what I would expect. But now
+you tell me that the mq-deadline scheduler should reorder the requests
+based on LBA? But maybe the ordering by LBA is only for writes? I'll
+rerun the test with writes.
 
-2) for other control commands, they can only be run successfully if the
-current user is allowed to access the specified ublk char device, for
-running the permission check, path of the ublk char device has to be
-provided by these commands.
-
-Also add one control of command UBLK_CMD_GET_DEV_INFO2 which always
-include the char dev path in payload since userspace may not have
-knowledge if this device is created in unprivileged mode.
-
-For applying this mechanism, system administrator needs to take
-the following policies:
-
-1) chmod 0666 /dev/ublk-control
-
-2) change ownership of ublkcN & ublkbN
-- chown owner_uid:owner_gid /dev/ublkcN
-- chown owner_uid:owner_gid /dev/ublkbN
-
-Both can be done via one simple udev rule.
-
-Userspace:
-
-	https://github.com/ming1/ubdsrv/tree/unprivileged-ublk
-
-'ublk add -t $TYPE --un_privileged' is for creating one un-privileged
-ublk device.
-
-Link: https://lore.kernel.org/linux-block/YoOr6jBfgVm8GvWg@stefanha-x1.localdomain/
-Suggested-by: Stefan Hajnoczi <stefanha@redhat.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- Documentation/block/ublk.rst  |  18 ++---
- drivers/block/ublk_drv.c      | 147 ++++++++++++++++++++++++++++++++--
- include/uapi/linux/ublk_cmd.h |  36 ++++++++-
- 3 files changed, 184 insertions(+), 17 deletions(-)
-
-diff --git a/Documentation/block/ublk.rst b/Documentation/block/ublk.rst
-index ba45c46cc0da..403ffd0f4511 100644
---- a/Documentation/block/ublk.rst
-+++ b/Documentation/block/ublk.rst
-@@ -180,6 +180,15 @@ managing and controlling ublk devices with help of several control commands:
-   double-write since the driver may issue the same I/O request twice. It
-   might be useful to a read-only FS or a VM backend.
- 
-+Unprivileged ublk device is supported by passing UBLK_F_UNPRIVILEGED_DEV.
-+Once the flag is set, all control commands can be sent by unprivileged
-+user. Except for command of ``UBLK_CMD_ADD_DEV``, permission check on
-+the specified char device(``/dev/ublkc*``) is done for all other control
-+commands by ublk driver, for doing that, path of the char device has to
-+be provided in these commands' payload from ublk server. With this way,
-+ublk device becomes container-ware, and device created in one container
-+can be controlled/accessed just inside this container.
-+
- Data plane
- ----------
- 
-@@ -254,15 +263,6 @@ with specified IO tag in the command data:
- Future development
- ==================
- 
--Container-aware ublk deivice
------------------------------
--
--ublk driver doesn't handle any IO logic. Its function is well defined
--for now and very limited userspace interfaces are needed, which is also
--well defined too. It is possible to make ublk devices container-aware block
--devices in future as Stefan Hajnoczi suggested [#stefan]_, by removing
--ADMIN privilege.
--
- Zero copy
- ---------
- 
-diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-index 28e9f1a19c9e..69049172b036 100644
---- a/drivers/block/ublk_drv.c
-+++ b/drivers/block/ublk_drv.c
-@@ -42,6 +42,7 @@
- #include <linux/mm.h>
- #include <asm/page.h>
- #include <linux/task_work.h>
-+#include <linux/namei.h>
- #include <uapi/linux/ublk_cmd.h>
- 
- #define UBLK_MINORS		(1U << MINORBITS)
-@@ -51,7 +52,8 @@
- 		| UBLK_F_URING_CMD_COMP_IN_TASK \
- 		| UBLK_F_NEED_GET_DATA \
- 		| UBLK_F_USER_RECOVERY \
--		| UBLK_F_USER_RECOVERY_REISSUE)
-+		| UBLK_F_USER_RECOVERY_REISSUE \
-+		| UBLK_F_UNPRIVILEGED_DEV)
- 
- /* All UBLK_PARAM_TYPE_* should be included here */
- #define UBLK_PARAM_TYPE_ALL (UBLK_PARAM_TYPE_BASIC | \
-@@ -1651,15 +1653,33 @@ static int ublk_ctrl_add_dev(struct io_uring_cmd *cmd)
- 			__func__, header->queue_id);
- 		return -EINVAL;
- 	}
-+
- 	if (copy_from_user(&info, argp, sizeof(info)))
- 		return -EFAULT;
--	ublk_dump_dev_info(&info);
-+
-+	if (info.flags & UBLK_F_UNPRIVILEGED_DEV) {
-+		/*
-+		 * user needs to provide proper owner_uid/owner_gid,
-+		 * which will be provided to udev rule for setting
-+		 * ownership on the ublk device to be created.
-+		 */
-+		;
-+	} else {
-+		if (!capable(CAP_SYS_ADMIN))
-+			return -EPERM;
-+
-+		if (info.owner_uid != 0 || info.owner_gid != 0)
-+			return -EINVAL;
-+	}
-+
- 	if (header->dev_id != info.dev_id) {
- 		pr_warn("%s: dev id not match %u %u\n",
- 			__func__, header->dev_id, info.dev_id);
- 		return -EINVAL;
- 	}
- 
-+	ublk_dump_dev_info(&info);
-+
- 	ret = mutex_lock_killable(&ublk_ctl_mutex);
- 	if (ret)
- 		return ret;
-@@ -1991,6 +2011,114 @@ static int ublk_ctrl_end_recovery(struct ublk_device *ub,
- 	return ret;
- }
- 
-+/*
-+ * All control commands are sent via /dev/ublk-control, so we have to check
-+ * the destination device's permission
-+ */
-+static int ublk_char_dev_permission(struct ublk_device *ub,
-+		const char *dev_path, int mask)
-+{
-+	int err;
-+	struct path path;
-+	struct kstat stat;
-+
-+	err = kern_path(dev_path, LOOKUP_FOLLOW, &path);
-+	if (err)
-+		return err;
-+
-+	err = vfs_getattr(&path, &stat, STATX_TYPE, AT_STATX_SYNC_AS_STAT);
-+	if (err)
-+		goto exit;
-+
-+	err = -EINVAL;
-+	if (stat.rdev != ub->cdev_dev.devt || !S_ISCHR(stat.mode))
-+		goto exit;
-+
-+	err = inode_permission(&init_user_ns,
-+			d_backing_inode(path.dentry), mask);
-+exit:
-+	path_put(&path);
-+	return err;
-+}
-+
-+static int ublk_ctrl_uring_cmd_permission(struct ublk_device *ub,
-+		struct io_uring_cmd *cmd)
-+{
-+	struct ublksrv_ctrl_cmd *header = (struct ublksrv_ctrl_cmd *)cmd->cmd;
-+	bool unprivileged = ub->dev_info.flags & UBLK_F_UNPRIVILEGED_DEV;
-+	void __user *argp = (void __user *)(unsigned long)header->addr;
-+	char *dev_path = NULL;
-+	int ret = 0;
-+	int mask;
-+
-+	if (!unprivileged) {
-+		if (!capable(CAP_SYS_ADMIN))
-+			return -EPERM;
-+		/*
-+		 * The new added command of UBLK_CMD_GET_DEV_INFO2 includes
-+		 * char_dev_path in payload too, since userspace may not
-+		 * know if the specified device is created as unprivileged
-+		 * mode.
-+		 */
-+		if (cmd->cmd_op != UBLK_CMD_GET_DEV_INFO2)
-+			return 0;
-+	}
-+
-+	/*
-+	 * User has to provide the char device path for unprivileged ublk
-+	 *
-+	 * header->addr always points to the dev path buffer, and
-+	 * header->dev_path_len records length of dev path buffer.
-+	 */
-+	if (!header->dev_path_len || header->dev_path_len > PATH_MAX)
-+		return -EINVAL;
-+
-+	if (header->len < header->dev_path_len)
-+		return -EINVAL;
-+
-+	dev_path = kmalloc(header->dev_path_len + 1, GFP_KERNEL);
-+	if (!dev_path)
-+		return -ENOMEM;
-+
-+	ret = -EFAULT;
-+	if (copy_from_user(dev_path, argp, header->dev_path_len))
-+		goto exit;
-+	dev_path[header->dev_path_len] = 0;
-+
-+	switch (cmd->cmd_op) {
-+	case UBLK_CMD_GET_DEV_INFO:
-+	case UBLK_CMD_GET_DEV_INFO2:
-+	case UBLK_CMD_GET_QUEUE_AFFINITY:
-+	case UBLK_CMD_GET_PARAMS:
-+		mask = MAY_READ;
-+		break;
-+	case UBLK_CMD_START_DEV:
-+	case UBLK_CMD_STOP_DEV:
-+	case UBLK_CMD_ADD_DEV:
-+	case UBLK_CMD_DEL_DEV:
-+	case UBLK_CMD_SET_PARAMS:
-+	case UBLK_CMD_START_USER_RECOVERY:
-+	case UBLK_CMD_END_USER_RECOVERY:
-+		mask = MAY_READ | MAY_WRITE;
-+		break;
-+	default:
-+		break;
-+	}
-+
-+	ret = ublk_char_dev_permission(ub, dev_path, mask);
-+	if (!ret) {
-+		header->len -= header->dev_path_len;
-+		header->addr += header->dev_path_len;
-+	}
-+	pr_devel("%s: dev id %d cmd_op %x uid %d gid %d path %s ret %d\n",
-+			__func__, ub->ub_number, cmd->cmd_op,
-+			ub->dev_info.owner_uid, ub->dev_info.owner_gid,
-+			dev_path, ret);
-+exit:
-+	kfree(dev_path);
-+	return ret;
-+}
-+
- static int ublk_ctrl_uring_cmd(struct io_uring_cmd *cmd,
- 		unsigned int issue_flags)
- {
-@@ -2003,17 +2131,21 @@ static int ublk_ctrl_uring_cmd(struct io_uring_cmd *cmd,
- 	if (!(issue_flags & IO_URING_F_SQE128))
- 		goto out;
- 
--	ret = -EPERM;
--	if (!capable(CAP_SYS_ADMIN))
--		goto out;
--
- 	if (cmd->cmd_op != UBLK_CMD_ADD_DEV) {
- 		ret = -ENODEV;
- 		ub = ublk_get_device_from_id(header->dev_id);
- 		if (!ub)
- 			goto out;
-+
-+		ret = ublk_ctrl_uring_cmd_permission(ub, cmd);
-+	} else {
-+		/* ADD_DEV permission check is done in command handler */
-+		ret = 0;
- 	}
- 
-+	if (ret)
-+		goto put_dev;
-+
- 	switch (cmd->cmd_op) {
- 	case UBLK_CMD_START_DEV:
- 		ret = ublk_ctrl_start_dev(ub, cmd);
-@@ -2022,6 +2154,7 @@ static int ublk_ctrl_uring_cmd(struct io_uring_cmd *cmd,
- 		ret = ublk_ctrl_stop_dev(ub);
- 		break;
- 	case UBLK_CMD_GET_DEV_INFO:
-+	case UBLK_CMD_GET_DEV_INFO2:
- 		ret = ublk_ctrl_get_dev_info(ub, cmd);
- 		break;
- 	case UBLK_CMD_ADD_DEV:
-@@ -2049,6 +2182,8 @@ static int ublk_ctrl_uring_cmd(struct io_uring_cmd *cmd,
- 		ret = -ENOTSUPP;
- 		break;
- 	}
-+
-+ put_dev:
- 	if (ub)
- 		ublk_put_device(ub);
-  out:
-diff --git a/include/uapi/linux/ublk_cmd.h b/include/uapi/linux/ublk_cmd.h
-index 4e38b9aa0293..ae80bfef3b9f 100644
---- a/include/uapi/linux/ublk_cmd.h
-+++ b/include/uapi/linux/ublk_cmd.h
-@@ -19,6 +19,8 @@
- #define	UBLK_CMD_GET_PARAMS	0x09
- #define	UBLK_CMD_START_USER_RECOVERY	0x10
- #define	UBLK_CMD_END_USER_RECOVERY	0x11
-+#define	UBLK_CMD_GET_DEV_INFO2		0x12
-+
- /*
-  * IO commands, issued by ublk server, and handled by ublk driver.
-  *
-@@ -79,6 +81,27 @@
- 
- #define UBLK_F_USER_RECOVERY_REISSUE	(1UL << 4)
- 
-+/*
-+ * Unprivileged user can create /dev/ublkcN and /dev/ublkbN.
-+ *
-+ * /dev/ublk-control needs to be available for unprivileged user, and it
-+ * can be done via udev rule to make all control commands available to
-+ * unprivileged user. Except for the command of UBLK_CMD_ADD_DEV, all
-+ * other commands are only allowed for the owner of the specified device.
-+ *
-+ * When userspace sends UBLK_CMD_ADD_DEV, the device pair's owner_uid and
-+ * owner_gid need to be provided via ublksrv_ctrl_dev_info, and the two
-+ * ids need to match with ublk server's uid/gid, otherwise the created
-+ * ublk device can't be started successfully.
-+ *
-+ * We still need udev rule to set correct OWNER/GROUP with the stored
-+ * owner_uid and owner_gid.
-+ *
-+ * Then ublk server can be run as unprivileged user, and /dev/ublkbN can
-+ * be accessed by user of owner_uid/owner_gid.
-+ */
-+#define UBLK_F_UNPRIVILEGED_DEV	(1UL << 5)
-+
- /* device state */
- #define UBLK_S_DEV_DEAD	0
- #define UBLK_S_DEV_LIVE	1
-@@ -98,7 +121,15 @@ struct ublksrv_ctrl_cmd {
- 	__u64	addr;
- 
- 	/* inline data */
--	__u64	data[2];
-+	__u64	data[1];
-+
-+	/*
-+	 * Used for UBLK_F_UNPRIVILEGED_DEV and UBLK_CMD_GET_DEV_INFO2
-+	 * only, include null char
-+	 */
-+	__u16	dev_path_len;
-+	__u16	pad;
-+	__u32	reserved;
- };
- 
- struct ublksrv_ctrl_dev_info {
-@@ -118,7 +149,8 @@ struct ublksrv_ctrl_dev_info {
- 	/* For ublksrv internal use, invisible to ublk driver */
- 	__u64	ublksrv_flags;
- 
--	__u64	reserved0;
-+	__u32	owner_uid;
-+	__u32	owner_gid;
- 	__u64	reserved1;
- 	__u64   reserved2;
- };
--- 
-2.37.3
-
-
-
-
-Thanks, 
-Ming
+Best regards,
+Andreas
 
