@@ -2,111 +2,70 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D0F21C4332F
-	for <linux-block@archiver.kernel.org>; Fri, 18 Nov 2022 17:27:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9EBA5C433FE
+	for <linux-block@archiver.kernel.org>; Fri, 18 Nov 2022 20:32:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235408AbiKRR1V (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 18 Nov 2022 12:27:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58812 "EHLO
+        id S230438AbiKRUcw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 18 Nov 2022 15:32:52 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36026 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235254AbiKRR1U (ORCPT
+        with ESMTP id S231534AbiKRUcq (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 18 Nov 2022 12:27:20 -0500
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C54B5DF8B;
-        Fri, 18 Nov 2022 09:27:16 -0800 (PST)
-Received: by mail-pl1-f174.google.com with SMTP id 4so5179911pli.0;
-        Fri, 18 Nov 2022 09:27:16 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=JSuXoCSwNdmGNsrLkM16f100zMEsciiCUvb+fP2+8Zo=;
-        b=cPawLvqXPC8cgWmN4KX9KxRu94EJIvO2dV/L78M/j4Vk7fAKxjlI/918HZCqToKKE5
-         RtmlLF1MkTfNFdYQVrxcGP0fWpRlL3unrHDcT/fY2KgQjO+O26d+MoUPLbdbwNUZWudA
-         oXH5J1YFGQvl9NofnJM9Y6yhxXzByb5lwTrw54sHOuIBXqjhvpVSqTKGGmufnPrOiFej
-         BiD45hKw0XtcpWKMRMNZ+YIpgvWWfIyGL3mnvxdbVuxLx0qmEXcuSzNeSny7frzqr0gW
-         dde/PFWwEHBhv/dCSogKS68TpDOx6ycFSM+beUl14JsHsT02lBP3nlPnCULOp8agpkAf
-         TOCA==
-X-Gm-Message-State: ANoB5pmWZuRa5F240n6zPzMbcw12DRXlrg6j0UsZ2m0rzGQuG0p4U7Lw
-        OHFiuppM7G+2Rjw20/odmIM=
-X-Google-Smtp-Source: AA0mqf5ld9uUcm0BwXCXF/PhDgLbpxrFnPF34jlEiWKP2fqKrPMG4CMgkRh5sVdmyM/XgB/03ZXnQg==
-X-Received: by 2002:a17:902:ec01:b0:186:878e:3b0d with SMTP id l1-20020a170902ec0100b00186878e3b0dmr357399pld.149.1668792436174;
-        Fri, 18 Nov 2022 09:27:16 -0800 (PST)
-Received: from ?IPV6:2620:15c:211:201:5392:f94c:13ff:af1a? ([2620:15c:211:201:5392:f94c:13ff:af1a])
-        by smtp.gmail.com with ESMTPSA id h2-20020a63c002000000b0046b1dabf9a8sm3049437pgg.70.2022.11.18.09.27.14
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 18 Nov 2022 09:27:15 -0800 (PST)
-Message-ID: <d1a1340a-f5f8-6953-e066-b8c6095d63fd@acm.org>
-Date:   Fri, 18 Nov 2022 09:27:13 -0800
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.3.0
-Subject: Re: [PATCH 0/3] mmc: Improve block layer requeueing behavior
-Content-Language: en-US
-To:     Adrian Hunter <adrian.hunter@intel.com>,
-        =?UTF-8?Q?Christian_L=c3=b6hle?= <CLoehle@hyperstone.com>,
-        "axboe@kernel.dk" <axboe@kernel.dk>,
-        "ulf.hansson@linaro.org" <ulf.hansson@linaro.org>,
-        "linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Christoph Hellwig <hch@lst.de>
-Cc:     Avri Altman <Avri.Altman@wdc.com>,
-        "vincent.whitchurch@axis.com" <vincent.whitchurch@axis.com>
-References: <f30ec7fe7d834c1d8e116508500110cf@hyperstone.com>
- <c1e1281e-0977-cbf7-041e-db911ee722a7@intel.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <c1e1281e-0977-cbf7-041e-db911ee722a7@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+        Fri, 18 Nov 2022 15:32:46 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08A34167D2
+        for <linux-block@vger.kernel.org>; Fri, 18 Nov 2022 12:32:45 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 924226276A
+        for <linux-block@vger.kernel.org>; Fri, 18 Nov 2022 20:32:45 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id EE6DFC433D6;
+        Fri, 18 Nov 2022 20:32:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1668803565;
+        bh=EPzZa94bHFk6zHFIjU9I48vu5sTEjvXsDiB4t2Q3G8A=;
+        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+        b=bbQXb0EePUkj8CU2HzDUWAKWXxtwMpU86tx2oCW3Y799L4cVPCZxFJ+BCpd0IELeL
+         FpucBQYJYhSLUAfjHPY84wqQOleTJKirFI2gX42LoQy+2GrEujXAk5vx+b7beynYwS
+         z/i2T3G1dgl1mKbE9BFxqFNTaHYY1JYueBvYRanqwHi1QgENdnhLmqiMS2N/1wyt61
+         bAh1uQ1Cb3RvG4LdcXnUyUZfCGcqx8TS4w0fKgKGfeynAdJgRSZRncFEyQOX48YilC
+         qQamsBjqkvFAPIZZdl6bEyQwg3PgO5lMV9b3VkKLMqLQ+0bk/bMvsJ3uTZt9XNQB6u
+         bY+T2McW4rZrQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id D9F00E270F6;
+        Fri, 18 Nov 2022 20:32:44 +0000 (UTC)
+Subject: Re: [dm-devel] [git pull] device mapper fixes for 6.1-rc6
+From:   pr-tracker-bot@kernel.org
+In-Reply-To: <Y3e8nulXd803OoEn@redhat.com>
+References: <Y3e8nulXd803OoEn@redhat.com>
+X-PR-Tracked-List-Id: device-mapper development <dm-devel.redhat.com>
+X-PR-Tracked-Message-Id: <Y3e8nulXd803OoEn@redhat.com>
+X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git tags/for-6.1/dm-fixes-2
+X-PR-Tracked-Commit-Id: 984bf2cc531e778e49298fdf6730e0396166aa21
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 5556a78c744347216cff46f20359412445278ac2
+Message-Id: <166880356488.16518.18059020681333009152.pr-tracker-bot@kernel.org>
+Date:   Fri, 18 Nov 2022 20:32:44 +0000
+To:     Mike Snitzer <snitzer@kernel.org>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        linux-block@vger.kernel.org, Mikulas Patocka <mpatocka@redhat.com>,
+        dm-devel@redhat.com, Zhihao Cheng <chengzhihao1@huawei.com>,
+        Alasdair G Kergon <agk@redhat.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 11/18/22 02:47, Adrian Hunter wrote:
-> On 26/10/22 10:30, Christian Löhle wrote:
->> Mmcblk relies on block layer requeueing to fulfill some requests under
->> certain conditions. Improve the handling to get nicely ordered requests.
->>
->> Using the terms a bit loosely to get a point across:
->> Current behavior for 512 blksz and max_blk_count = 1 the scenario would
->> be as follows:
->>
->> - request for page 0 lba 0 to 7
->> - request for page 1 lba 8 to 15
->> - request for page 2 lba 16 to 23
->> - request for page 3 lba 24 to 31
->>
->> mmcblk modifies data->blocks = 1 for each and requeues,
->> this leads to:
->>
->> Access lba 0
->> Access lba 8
->> Access lba 16
->> Access lba 24
->> Access lba 1 (1. Requeue for page 0)
->> Access lba 9 (1. Requeue for page 1)
->> Access lba 17 (1. Requeue for page 2)
->> Access lba 25 (1. Requeue for page 3)
->> Access lba 2 (2. Requeue for page 0)
->> ...
->>
->> Of course we would rather have lbas consecutive.
-> 
-> Does anyone know why the block layer does not support
-> (max_hw_sectors << 9) < PAGE_SIZE ?
+The pull request you sent on Fri, 18 Nov 2022 12:10:54 -0500:
 
-Hi Adrian,
+> git://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git tags/for-6.1/dm-fixes-2
 
-Does this mean that the following patch series would not only be
-useful for UFS but also for MMC? "[PATCH 00/10] Support DMA segments
-smaller than the page size"
-(https://lore.kernel.org/linux-block/20221019222324.362705-1-bvanassche@acm.org/).
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/5556a78c744347216cff46f20359412445278ac2
 
-Thanks,
+Thank you!
 
-Bart.
-
-
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
