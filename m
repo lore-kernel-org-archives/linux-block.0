@@ -2,111 +2,98 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BCE51C433FE
-	for <linux-block@archiver.kernel.org>; Fri, 18 Nov 2022 10:04:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3897CC433FE
+	for <linux-block@archiver.kernel.org>; Fri, 18 Nov 2022 10:47:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241531AbiKRKD7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 18 Nov 2022 05:03:59 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38314 "EHLO
+        id S241586AbiKRKrl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 18 Nov 2022 05:47:41 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36870 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234664AbiKRKD6 (ORCPT
+        with ESMTP id S241569AbiKRKri (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 18 Nov 2022 05:03:58 -0500
-Received: from out30-132.freemail.mail.aliyun.com (out30-132.freemail.mail.aliyun.com [115.124.30.132])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C7DC220D5
-        for <linux-block@vger.kernel.org>; Fri, 18 Nov 2022 02:03:56 -0800 (PST)
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R121e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046056;MF=ziyangzhang@linux.alibaba.com;NM=1;PH=DS;RN=4;SR=0;TI=SMTPD_---0VV4z6YF_1668765833;
-Received: from 30.97.56.214(mailfrom:ZiyangZhang@linux.alibaba.com fp:SMTPD_---0VV4z6YF_1668765833)
-          by smtp.aliyun-inc.com;
-          Fri, 18 Nov 2022 18:03:54 +0800
-Message-ID: <9512a7d2-8109-95bd-ba88-f6256b0ea292@linux.alibaba.com>
-Date:   Fri, 18 Nov 2022 18:03:48 +0800
+        Fri, 18 Nov 2022 05:47:38 -0500
+Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F821326F3;
+        Fri, 18 Nov 2022 02:47:37 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1668768457; x=1700304457;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=LZLmUknSd1/aIfUwWzdJ0VDIOATUMOVkhWKDwKyeJuA=;
+  b=V++wbEwMv4nIeYmHAwlmzWVRMNpiWXZgD1SboDeEFJSl/Mv6ttfwVqDM
+   7k1xNTjoMTGk2p8pqOL5UCuigIUefihfH0ux/UFksJdh6+m1ms/RfGX9R
+   8IDTM3ueTH7UgxKXwbYEzaGVSA02/ZxyeNUOBbzSt3pxW97FUsbTjZk/A
+   /n72S3Jfev2hkiw1gIpb5FTRGnZKWRriDWBjrF/t90cw1Yb659GmZaf/x
+   ibHtdzPC1BfIy7OKz7hwcc5mKqlIG9fGnUxKcwXA7HV0cWkkP9cRHBZl9
+   DlthzfJWOUaS5ubZdJuz8y/BOyqNYZ5IYrUKv4XLqHJ8VIZXU91jkYxHS
+   A==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10534"; a="293500091"
+X-IronPort-AV: E=Sophos;i="5.96,174,1665471600"; 
+   d="scan'208";a="293500091"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Nov 2022 02:47:37 -0800
+X-IronPort-AV: E=McAfee;i="6500,9779,10534"; a="782605566"
+X-IronPort-AV: E=Sophos;i="5.96,174,1665471600"; 
+   d="scan'208";a="782605566"
+Received: from ahunter6-mobl1.ger.corp.intel.com (HELO [10.0.2.15]) ([10.252.61.138])
+  by fmsmga001-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Nov 2022 02:47:34 -0800
+Message-ID: <c1e1281e-0977-cbf7-041e-db911ee722a7@intel.com>
+Date:   Fri, 18 Nov 2022 12:47:29 +0200
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.13.1
-Subject: Re: [PATCH 2/6] ublk_drv: don't probe partitions if the ubq daemon
- isn't trusted
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Firefox/102.0 Thunderbird/102.5.0
+Subject: Re: [PATCH 0/3] mmc: Improve block layer requeueing behavior
 Content-Language: en-US
-To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Stefan Hajnoczi <stefanha@redhat.com>
-References: <20221116060835.159945-1-ming.lei@redhat.com>
- <20221116060835.159945-3-ming.lei@redhat.com>
-From:   Ziyang Zhang <ZiyangZhang@linux.alibaba.com>
-In-Reply-To: <20221116060835.159945-3-ming.lei@redhat.com>
+To:     =?UTF-8?Q?Christian_L=c3=b6hle?= <CLoehle@hyperstone.com>,
+        "axboe@kernel.dk" <axboe@kernel.dk>,
+        "ulf.hansson@linaro.org" <ulf.hansson@linaro.org>,
+        "linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Christoph Hellwig <hch@lst.de>
+Cc:     Avri Altman <Avri.Altman@wdc.com>,
+        "vincent.whitchurch@axis.com" <vincent.whitchurch@axis.com>
+References: <f30ec7fe7d834c1d8e116508500110cf@hyperstone.com>
+From:   Adrian Hunter <adrian.hunter@intel.com>
+Organization: Intel Finland Oy, Registered Address: PL 281, 00181 Helsinki,
+ Business Identity Code: 0357606 - 4, Domiciled in Helsinki
+In-Reply-To: <f30ec7fe7d834c1d8e116508500110cf@hyperstone.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2022/11/16 14:08, Ming Lei wrote:
-> If any ubq daemon is unprivileged, the ublk char device is allowed
-> for unprivileged user, and we can't trust the current user, so not
-> probe partitions.
+On 26/10/22 10:30, Christian Löhle wrote:
+> Mmcblk relies on block layer requeueing to fulfill some requests under
+> certain conditions. Improve the handling to get nicely ordered requests.
 > 
-> Fixes: 71f28f3136af ("ublk_drv: add io_uring based userspace block driver")
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> ---
->  drivers/block/ublk_drv.c | 14 +++++++++++++-
->  1 file changed, 13 insertions(+), 1 deletion(-)
+> Using the terms a bit loosely to get a point across:
+> Current behavior for 512 blksz and max_blk_count = 1 the scenario would
+> be as follows:
 > 
-> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-> index fe997848c1ff..a5f3d8330be5 100644
-> --- a/drivers/block/ublk_drv.c
-> +++ b/drivers/block/ublk_drv.c
-> @@ -149,6 +149,7 @@ struct ublk_device {
->  
->  #define UB_STATE_OPEN		0
->  #define UB_STATE_USED		1
-> +#define UB_STATE_PRIVILEGED	2
->  	unsigned long		state;
->  	int			ub_number;
->  
-> @@ -161,6 +162,7 @@ struct ublk_device {
->  
->  	struct completion	completion;
->  	unsigned int		nr_queues_ready;
-> +	unsigned int		nr_privileged_daemon;
->  
->  	/*
->  	 * Our ubq->daemon may be killed without any notification, so
-> @@ -1184,9 +1186,15 @@ static void ublk_mark_io_ready(struct ublk_device *ub, struct ublk_queue *ubq)
->  		ubq->ubq_daemon = current;
->  		get_task_struct(ubq->ubq_daemon);
->  		ub->nr_queues_ready++;
-> +
-> +		if (capable(CAP_SYS_ADMIN))
-> +			ub->nr_privileged_daemon++;
->  	}
-> -	if (ub->nr_queues_ready == ub->dev_info.nr_hw_queues)
-> +	if (ub->nr_queues_ready == ub->dev_info.nr_hw_queues) {
-> +		if (ub->nr_privileged_daemon == ub->nr_queues_ready)
+> - request for page 0 lba 0 to 7
+> - request for page 1 lba 8 to 15
+> - request for page 2 lba 16 to 23
+> - request for page 3 lba 24 to 31
+> 
+> mmcblk modifies data->blocks = 1 for each and requeues,
+> this leads to:
+> 
+> Access lba 0
+> Access lba 8
+> Access lba 16
+> Access lba 24
+> Access lba 1 (1. Requeue for page 0)
+> Access lba 9 (1. Requeue for page 1)
+> Access lba 17 (1. Requeue for page 2)
+> Access lba 25 (1. Requeue for page 3)
+> Access lba 2 (2. Requeue for page 0)
+> ...
+> 
+> Of course we would rather have lbas consecutive.
 
-Hi, Ming.
+Does anyone know why the block layer does not support
+(max_hw_sectors << 9) < PAGE_SIZE ?
 
-Just like nr_queues_ready, ub->nr_privileged_daemon should be reset
-to zero in ublk_ctrl_start_recovery(). otherwise new ubq_daemons are
-always treated as unprivileged.
-
-> +			set_bit(UB_STATE_PRIVILEGED, &ub->state);
->  		complete_all(&ub->completion);
-> +	}
->  	mutex_unlock(&ub->mutex);
->  }
->  
-> @@ -1540,6 +1548,10 @@ static int ublk_ctrl_start_dev(struct io_uring_cmd *cmd)
->  	if (ret)
->  		goto out_put_disk;
->  
-> +	/* don't probe partitions if any one ubq daemon is un-trusted */
-> +	if (!test_bit(UB_STATE_PRIVILEGED, &ub->state))
-> +		set_bit(GD_SUPPRESS_PART_SCAN, &disk->state);
-
-Can we simply check if nr_queues_ready == nr_privileged_daemon here
-instead of adding a new bit UB_STATE_PRIVILEGED?
-
-BTW, I think exposing whether ub's state is privileged/unprivileged
-to users(./ublk list) is a good idea.
-
-Regards,
-Zhang
