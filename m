@@ -2,147 +2,467 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 07502C43217
-	for <linux-block@archiver.kernel.org>; Fri, 18 Nov 2022 01:51:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97160C4332F
+	for <linux-block@archiver.kernel.org>; Fri, 18 Nov 2022 01:51:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240653AbiKRBvG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 17 Nov 2022 20:51:06 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59794 "EHLO
+        id S233780AbiKRBv4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 17 Nov 2022 20:51:56 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60332 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234053AbiKRBum (ORCPT
+        with ESMTP id S232050AbiKRBvz (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 17 Nov 2022 20:50:42 -0500
-Received: from esa5.hgst.iphmx.com (esa5.hgst.iphmx.com [216.71.153.144])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9E381ADB4
-        for <linux-block@vger.kernel.org>; Thu, 17 Nov 2022 17:50:40 -0800 (PST)
+        Thu, 17 Nov 2022 20:51:55 -0500
+Received: from esa1.hgst.iphmx.com (esa1.hgst.iphmx.com [68.232.141.245])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7FFB1ADB4
+        for <linux-block@vger.kernel.org>; Thu, 17 Nov 2022 17:51:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1668736240; x=1700272240;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=tUsYQxa5dGUsgJPHVNzhYbldS3qgV9RifEbWEvpbNdM=;
-  b=G2eTHUhriO+KY2Kpouo7JDWGFofIisrnpQ7GRXcNmpLzPR5N2rfi7Abq
-   knDJiNrlbjct9rrDZ8w14/yoshh8/HtEXdlrKJLvVlRHzmkb+XLczPcWh
-   CnLvTKZED6nRuKeKpU0S5LAe7e5cXL0QHHYy7L7GD686VSKsrEk+jVvPv
-   n1nAAg/DSCafoNjap+A5MIw1U6fMNK3+g4B9TBf6Tyjzkff90sjjW8ems
-   rh/Zgy4V+Cuf1L2UuP3eZ6d+i7ojBpMYOljQavifVnh1faRtjDO+92e80
-   A6wli8SBl34tjJ48mgBt5W3mK77DnVkEOKalyG6VlWqR7aGl0aaxmjloE
+  t=1668736313; x=1700272313;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=eVYIumUrfyCAQ4SC9FSPKid1CWSFQ3W2L42G6q/cqyM=;
+  b=fuP4sj2jRIxnpTbv8fIj4H8LO7e06nPTwR86hxyHevEMQTUvxN1bFz8/
+   GjibR4Dsp7sBw/DAZcmXYp1KIIW8QEPth1ZZgk5w591dXSgRRfUl0qcOi
+   jAjS/f6mywra+nmCIERUeX3E8hcpjpt8QG3ibqmR1zBMKb1HGcOwcoVSZ
+   FZ7F2rMggc8XXaxKhPyPbqEnx6KenBeJTl/pgiQg0tqErv4jvrk5kS9Zv
+   A0pnrG2DCBme8UuEMNRth9LpBQBHCqZznkSfLF/p2y8LI+yEF8uDsJWgn
+   fD4mBoi5qsRl0aBrcDv7M/BUme9sz9SQbFRSyg9FpbCqvqKm2enwXFhlW
    A==;
 X-IronPort-AV: E=Sophos;i="5.96,172,1665417600"; 
-   d="scan'208";a="216574027"
-Received: from mail-mw2nam10lp2109.outbound.protection.outlook.com (HELO NAM10-MW2-obe.outbound.protection.outlook.com) ([104.47.55.109])
-  by ob1.hgst.iphmx.com with ESMTP; 18 Nov 2022 09:50:40 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=fu5/3HrkHaYNGDEOyHIeDuQ6zMF+DigH28O2OhjSIM6z/vk19YVP6O5QyhM7+3qQ/UgZxCLNA5MU9+MKocPuGSPxY2MAoYmSf3nPeotWZTJo28/TW2bXs/sDkGsxm15K4RssuoKPavAJ5VwuvHuDx8th0COLH6HdUUWshqLo5Lfk85BeNsZljMWBBNBBDSnXgraQgKEj9b0XcXbkCQ6avXOc/bZxEmgx3+JRj8lA5McZ79D2Exs2Bys38urMNHOcpBaOH1B5GycpKGS8QOlzQKd/nod2vnt4oegCm41RnSjhZLv9UOOgvS4TP2KSiAZ6LIZ1LHGZq/Yz1TT5VcykVw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=tUsYQxa5dGUsgJPHVNzhYbldS3qgV9RifEbWEvpbNdM=;
- b=n6cFMFCY5V2mChDyl4vRSbGEVvLPBnVSQ6V62tcN0KiYvgWqbEls9C4YzsSSseO6m8pL5wyqr2D8j7hITUY5sHKnq/iw6/KDPfFvNe5UPxEY67ljbeksHtBVG2N7EaU+2eCvjwXfUjNQlM00dVTSeZ0ivMc5jtqRwiDE9C6Fe2x5xE1OpCqjKIHRKDs7yrgE6/0QnOryIss1sWAPOPRQEEr80k7adFDcOpesd/166sj+qXwld/DVQP5MJ3X3fM0VNeftHhpXuk83/E0UXGUr1TP1Zd3vXSLO0eHLu20AE19iQ1b6bzJVGIairHQo9yMXRTomLjM3AxfdJfBhgKqX6w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=tUsYQxa5dGUsgJPHVNzhYbldS3qgV9RifEbWEvpbNdM=;
- b=vQ+WkIxvXg43lqGsRKDi1bZhDBl+eRIe7t/YEEi6i0Dy29VnWA6V/zlrx4O096ZTSZIovNJ4V1bs34Ex0TflhXtXK35WTb7/U1JSnO8xl/Z3tHKe3RKpM7s+XWfIcMPvvO726S62CwJmT2cVIKZO8mWLhk5Dtt6csF8hfdUyVx8=
-Received: from DM8PR04MB8037.namprd04.prod.outlook.com (2603:10b6:8:f::6) by
- SJ0PR04MB8344.namprd04.prod.outlook.com (2603:10b6:a03:3db::9) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.5813.17; Fri, 18 Nov 2022 01:50:36 +0000
-Received: from DM8PR04MB8037.namprd04.prod.outlook.com
- ([fe80::d4b9:86e9:4fc8:d6e0]) by DM8PR04MB8037.namprd04.prod.outlook.com
- ([fe80::d4b9:86e9:4fc8:d6e0%6]) with mapi id 15.20.5813.017; Fri, 18 Nov 2022
- 01:50:36 +0000
-From:   Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-To:     Alan Adamson <alan.adamson@oracle.com>
-CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
-Subject: Re: [PATCH v2] tests/nvme/039: Remove passthrough command tests
-Thread-Topic: [PATCH v2] tests/nvme/039: Remove passthrough command tests
-Thread-Index: AQHY+gxjZPpHQBBRv02g9jdU1ch8MK5D7DIA
-Date:   Fri, 18 Nov 2022 01:50:36 +0000
-Message-ID: <20221118015034.i6ystd6uyxxyti6o@shindev>
-References: <20221116223945.1043785-1-alan.adamson@oracle.com>
-In-Reply-To: <20221116223945.1043785-1-alan.adamson@oracle.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=wdc.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DM8PR04MB8037:EE_|SJ0PR04MB8344:EE_
-x-ms-office365-filtering-correlation-id: 39839f1b-3b29-441e-ee65-08dac90749c3
-wdcipoutbound: EOP-TRUE
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 09Cl2IWW7ivPLagfksoMQaOghdc4crrNkMAhLDfxlveIM6uKFobNBWZW0GD7vQCNv4dRthKuQP06emDRkHOgzrrFlWE8QVneEQFKbkBNXYl1lFS/cfMr2oGD9xpQmnA1Kz1G7xSQLs9XfGXTqzIDayZa5zzztEaAwnYLIg8nvEfZmZQxOmtIrm/CqnfA2L6RbIhAs6XK//wOtAle8dRmiMKMC2ZAmEOzp8G76xSrH6CdG1gRyXbicLYtZEcwj8E7wbOdMBkibzSc7sUmvB1Mmvi2r3ovdtGlePgOthbqtErEOqAP+Bdpr8DvuQFW7bF23GB/PlQ5getVOWMVa4sCEcwG+v9xEcyCzhuISoJpDXHIY6e4+1Aur7m+gvI+Ce6ertRulghOFq2tJg88NyUsJbo55tyjXJ8ZEcoxTLfnWg523F0DC1uhh5vdf+Y95Uj2dzQ52PXTC+bKLdUofV+1SpZ4QI29NexeaFuj/kxPqgM3otzGPWNhmeMuHELAr4/UqpFeJxXS1ul84eoVzei+yf6ZzrNfuTb26oblfpoaipKPa0xSmDrGpf5mkR9XjeXTTb2gI1+Wl80tnOGe8uSFAoCRieDX9Nb8FstqbkYWNF+ytHbXP28HvlP26oEY3DyGRAZVlik5ovfl28I27ws/3vu50WoDhlDNtrywyMqJcm9TR44Tayj/hBCbsNQx8yeUwWQksd7P5ixb/LeS9mxadA==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR04MB8037.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(7916004)(346002)(136003)(396003)(39860400002)(376002)(366004)(451199015)(38070700005)(1076003)(54906003)(83380400001)(8936002)(38100700002)(122000001)(82960400001)(44832011)(4744005)(5660300002)(6486002)(71200400001)(33716001)(66556008)(6506007)(66446008)(64756008)(41300700001)(26005)(9686003)(66946007)(2906002)(4326008)(8676002)(66476007)(76116006)(6512007)(6916009)(91956017)(186003)(478600001)(316002)(86362001);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?Lz8gNnrYVUL7gJamT5n2b4n4UAdofcX4xZtuNn2OGjNJ2XNhRelEbHrQ7wD4?=
- =?us-ascii?Q?Dx3Yhua6P4tBgKk+Leg7lk9MahCohO5Avdositbd0yeq7X9PL8HCCjB5HYwc?=
- =?us-ascii?Q?/rOWv2Kd1NthnfBrtLVvux8cy0g001MxW0GgdtT1P10bTAeQeFEh9felxRXu?=
- =?us-ascii?Q?SEi1oclTEYj3n39mHTBUtUmoOfBcASw3ijUZukfpEBzfXi2Ch23vL2U3/fFZ?=
- =?us-ascii?Q?CLknPYean0s7Dv1Ix6tzJyi+tfsowc7Rcst6ufwb4WqZW6W4dgrB1lq81JKj?=
- =?us-ascii?Q?R+seXI0QU1d3Vfu5vcEOMVcvowxZiGhS10jHTXLe29PoLBoDYWILFNTiulM9?=
- =?us-ascii?Q?fSpq/FC+8tQq3r3jcvWRhVQjiizANQJv+CogEedT6XGvgaNUdWjTZjLyMW18?=
- =?us-ascii?Q?KaAAqIJTJRt3ZWSyaABPek5pt/3eEMg6+UaG38D7Qvl7Z1i6IoFlgar722zk?=
- =?us-ascii?Q?a/z4cc8Eb9ExF+IpzPmPJcGa3NQSJ6g63rz7g9SRqtKhnSwsszt90fN4+6RB?=
- =?us-ascii?Q?7i8a3Q9ZkeKriULdOnpUO3itJv7IOE3lCIAFe9u7Rzw69X0uOIjKrO2v74XK?=
- =?us-ascii?Q?/629DJ6G1x56rfKn5rkSi8TLxKcUHf+gdgKPyRh4BLvEi+YvxsxN7sBBQifu?=
- =?us-ascii?Q?ysh1Okj6YPxpYG/+eQbB0nW0bEXdbmSel2oIagtp97jgd0rw4oxdKoeOGOFZ?=
- =?us-ascii?Q?IN0JptnpZqVfVceTsW0Z2MCdlWJsJx0zGzGUVG1FFkAVC/OG6Kcw9AMyPROO?=
- =?us-ascii?Q?6hyKhHTjUrkcHYdUVC8p679rrkUWF13mRTMCgnQ4XtSRtCozm6ap2O39wFGr?=
- =?us-ascii?Q?Yhrw4IxX6WlLmpPzHQFM19QNlFRlmyDjyopHqO8U1moOfTWR5VH8ChyNqCtJ?=
- =?us-ascii?Q?cLJBLBLpumtvZpj1g5IVYqDcprzGgB2bcj3mheMhKjJAY9CFSlgLnhYhq0aC?=
- =?us-ascii?Q?ICDI6fwJzV8zOKF7LLVmUhqz5UPmDTj00CRfJSL4Ooy2AE4XSyZuG9GVouax?=
- =?us-ascii?Q?pQ7bVm1/5Jric5hVkoMAxV/hDi9L1IW/5/SUnGxMg/OA7X1w3h45BVmuMmLq?=
- =?us-ascii?Q?3B9R1YDpH4G0+TAoOkQ+1MSkguRRp5yz1VVbwQ3Ny1HhehLq8yqBiE/nCoUF?=
- =?us-ascii?Q?hsK91vCV88irUd84QB3kzNh3WkhMa3vEn2p6IZztBkKSFbwilzdfFMNEuDdt?=
- =?us-ascii?Q?Ntv35JW2Uyo60kWM77D5XUaRIFHedOOCOjAqOOPUMnbGLYeD7x7Onj1Np4wK?=
- =?us-ascii?Q?3PwzIHTUt1Wu8qn/cg4lhXV2mvB48zYxfZ4BuBmr5L2UnTcfxCwqX0kdDP73?=
- =?us-ascii?Q?QCBA1RbTVlSMmc6nZ2DX3aETz35Ec+GSQPOM0Q7CiS/3EJiXY85C37CoLP3S?=
- =?us-ascii?Q?H3+V8HgPtCr0SYgg4u3uQDUKGy5usgAFwAcJyHF1+Zs5qcZnvncbC2ftRZMw?=
- =?us-ascii?Q?2ydbiuKNJ3JUs2lO2AnepuuqcrnHLVLGcwHVvbfbFeD9bWx6gw6iR7YWniQ1?=
- =?us-ascii?Q?hOrhIrr+82xwn7HCxN15ixM214H33RBuLoR1rIhaytQ7w0UnEC6Cm4LlWYlM?=
- =?us-ascii?Q?AZadbEWE5ZunHAoDyE00Od1bv4RyBlyIq+RACDgJ8+jcY4uxWhCDhmk3tMFq?=
- =?us-ascii?Q?2J97opQErcJ7tRkPOglakvQ=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <16F512FBA8C09D4BB0E2A4CD74FC4296@namprd04.prod.outlook.com>
-Content-Transfer-Encoding: quoted-printable
+   d="scan'208";a="328672573"
+Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
+  by ob1.hgst.iphmx.com with ESMTP; 18 Nov 2022 09:51:53 +0800
+IronPort-SDR: LYjSAeZMTz8ez2D6cRbF+3D37uAaIAHHzQIgPz2BKmObLFtyjwG9rzb/HGLCGiPAaX8T4wx8og
+ Mxf7p6uVqSW5hgvLeetWtfjMqm+YgVyROLNkrweLFfBHWyl0MQizeYBVjqYzzxuTb6Uo8STFXz
+ s6LA80xehVBPUEi9V9pO1/tgZSFdNz67bqGt7VzzFA2e4xq0R3P54ASf7p5XlUFHnBPKH7y4qB
+ WEwNSoEzPoQdckaygHm64G31xo1PX061WRdBKrl2pjxj6+rjWprLt7RvBj3TPKSn80mbnoTeqZ
+ nbQ=
+Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
+  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 17 Nov 2022 17:05:02 -0800
+IronPort-SDR: xmKwqJOxZInxKj/DEAKz6QmKMr+ZSSYuy+722+R8T+lJixOG/6jKvQFH3nbbhknPrOuhLf916o
+ NuLHGq8MpYs6j3YZ/SbwvQ3VQD3GCGbxMBBdFyEIlacAaS2Py0PinOXYXcrvpYyUswrnEDAO5H
+ A3y9AoTVJAKn3JGTaYhO4dnmA+cmcbx0oaSYMjeOQfT44q95SkdArKFYd1DXZeEM4Z4C/02OZq
+ yeSRBbn78/z2tKeEyz/ZG7EbInY0kaPrxte177uCrAud7GFld5VsBuTlP7ml+ws1ZKf2gmkp14
+ KHA=
+WDCIronportException: Internal
+Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
+  by uls-op-cesaip01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 17 Nov 2022 17:51:52 -0800
+Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4ND0Bw0LNCz1RvTr
+        for <linux-block@vger.kernel.org>; Thu, 17 Nov 2022 17:51:52 -0800 (PST)
+Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
+        reason="pass (just generated, assumed good)"
+        header.d=opensource.wdc.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
+        opensource.wdc.com; h=content-transfer-encoding:content-type
+        :in-reply-to:organization:from:references:to:content-language
+        :subject:user-agent:mime-version:date:message-id; s=dkim; t=
+        1668736310; x=1671328311; bh=eVYIumUrfyCAQ4SC9FSPKid1CWSFQ3W2L42
+        G6q/cqyM=; b=hoZUSUuTTqL3N8PP8xE0UbHFrFkoNMHhlTDX3r7sxfYUGJOO5Jm
+        Q3qtvHeqgy6vmeP95VZpq//QQwHndzJWo/WMQ4YQ7z9ZlehH9HrYLi9mbNTl5vir
+        FtCOes8sS9r60A05KGzw1/zpqB5XHfSpNOFGinLL3uhT0F4W0NfsgUNXAy+Xvb7c
+        P46wgk5LEnlC3arzOYucGVJyq3ZuLZHZRGf9DQ6gtL706UtdNYnrqkGamGaelLSn
+        h2qfzhzr71Y7PzGBWpDHUQxY+aea0WrOXdpT2dsFVUxkZR/D2GuvINKnkNdsyv/H
+        D1NyFzSYGYw95HGVl0W8XAoDgQzPijTgUkw==
+X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
+Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
+        by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
+        with ESMTP id 5dXvt7JIqoPx for <linux-block@vger.kernel.org>;
+        Thu, 17 Nov 2022 17:51:50 -0800 (PST)
+Received: from [10.225.163.51] (unknown [10.225.163.51])
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4ND0Bs5Vxkz1RvLy;
+        Thu, 17 Nov 2022 17:51:49 -0800 (PST)
+Message-ID: <0f0ef3e2-5585-6187-6f61-d2fb1af54441@opensource.wdc.com>
+Date:   Fri, 18 Nov 2022 10:51:47 +0900
 MIME-Version: 1.0
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: inARqPfyEQ0Zgmiv5gxHx7PDHwTMO3KnFqP3i3tRlEiweCRzKLKcd7LdCEw64W9zZi6uTp3M9pHRx1mAM/ZKsBOl9+4QI1YnklhVVnopAuUzxFNgyZbHiSJ7lziSyDjQhmmOkPH5p9bRWZ5iFXTihmhis+CI9u/8N20shngeqTonqybsAZcecsWM0v2iH/P4n/Ai6BlqkG03ui058Q+WidiNwBEKt6hfeLXj90Ss7C90Suq/4YY8iA5Kk8+b3pIKThl1Leym/xzsrHk2FZx0DUn6+wJeNd1/u7K1ETgZdQtUofwPm/QVWrjLOmRiuU1xoOXpHHvQoY9E3igd+7AAcmDMEvYMR0Wwl+eE+iXqiqvtSVqeVbT9jPmbHCA4cc0uEBlXN0nW8EAwroGA7DU0GzAJ/M+GZiNkcOHqGOnt4uqESvvtKIykYgwGJfyp3QO0PkQGm+TT/97cNTnnm+lL1VqQu6JwUf4DJzNysOq5r/HH6OFZqoRCsOL40hkGBSCYUYeHpSDt0v3Ri3kN3f2NR+2/5ABj47TvCEYypQE0/6mQICN5Te1lMwgx7COgXwgqMciYLvI/Gup4M9qzAFP5di6aJEgtEF26dZpniSc2j+dmyHxzYN7p5KqpiJpLJVRmuTrwcXrTUI4fOvGfMTBtMMsHM+tt8YKMsDjFJxpkIVW7yggZ5LJUN3t+w5qcZQPmR97uUtai74LkDuhb1fHxYPzr558mPrPIBHvqwhM657x+MxjbT0rSzP23eoXwCVbYAo6j7v+SVf7yxVVPBh+S6Z6sb/L5eqSrjtDc9Yn0DG7KxhTzw8fQYRochVngLsr3y8iqEkKy1Z/8W0lSaXJSrT+iuGhsHJPh503L9YeBJSs=
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DM8PR04MB8037.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 39839f1b-3b29-441e-ee65-08dac90749c3
-X-MS-Exchange-CrossTenant-originalarrivaltime: 18 Nov 2022 01:50:36.5565
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: PAn+zxiG9dRoyiBlGzwFDGu3a5rVbvIIT7ZcyH13FV388w3kjeLaWhNw5ck+IAxqdQ+iRkJg53/jOj6FuZ+QASDV4Pd5f6pkJVwUnynGW1M=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR04MB8344
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.4.1
+Subject: Re: Reordering of ublk IO requests
+Content-Language: en-US
+To:     Andreas Hindborg <andreas.hindborg@wdc.com>
+Cc:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org
+References: <87sfii99e7.fsf@wdc.com> <Y3WZ41tKFZHkTSHL@T590>
+ <87o7t67zzv.fsf@wdc.com> <Y3X2M3CSULigQr4f@T590> <87k03u7x3r.fsf@wdc.com>
+ <Y3YfUjrrLJzPWc4H@T590> <87fseh92aa.fsf@wdc.com>
+ <b8c15259-f8ab-6c47-46ab-872c658f1052@opensource.wdc.com>
+ <87bkp58zuw.fsf@wdc.com>
+From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
+Organization: Western Digital Research
+In-Reply-To: <87bkp58zuw.fsf@wdc.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Nov 16, 2022 / 14:39, Alan Adamson wrote:
-> Commit d7ac8dca938c ("nvme: quiet user passthrough command errors")
-> disabled error logging for passthrough commands so the associated
-> tests should be removed.
->=20
-> When an error logging opt-in mechanism for passthrough commands is
-> provided, the tests can be added back.
->=20
-> Signed-off-by: Alan Adamson <alan.adamson@oracle.com>
+On 11/17/22 22:31, Andreas Hindborg wrote:
+> 
+> Damien Le Moal <damien.lemoal@opensource.wdc.com> writes:
+> 
+>> On 11/17/22 20:59, Andreas Hindborg wrote:
+>>>
+>>> Ming Lei <ming.lei@redhat.com> writes:
+>>>
+>>>> On Thu, Nov 17, 2022 at 10:07:14AM +0100, Andreas Hindborg wrote:
+>>>>>
+>>>>> Ming Lei <ming.lei@redhat.com> writes:
+>>>>>
+>>>>>> On Thu, Nov 17, 2022 at 09:05:48AM +0100, Andreas Hindborg wrote:
+>>>>>>>
+>>>>>>> Ming Lei <ming.lei@redhat.com> writes:
+>>>>>>>
+>>>>>>>> Hi Andreas,
+>>>>>>>>
+>>>>>>>> On Wed, Nov 16, 2022 at 04:00:15PM +0100, Andreas Hindborg wrote:
+>>>>>>>>>
+>>>>>>>>> Hi Ming,
+>>>>>>>>>
+>>>>>>>>> I have a question regarding ublk. For context, I am working on adding
+>>>>>>>>> zoned storage support to ublk, and you have been very kind to help me on
+>>>>>>>>> Github [1].
+>>>>>>>>>
+>>>>>>>>> I have a problem with ordering of requests after they are issued to the
+>>>>>>>>> ublk driver. Basically ublk will reverse the ordering of requests that are
+>>>>>>>>> batched. The behavior can be observed with the following fio workload:
+>>>>>>>>>
+>>>>>>>>>> fio --name=test --ioengine=io_uring --rw=read --bs=4m --direct=1
+>>>>>>>>>> --size=4m --filename=/dev/ublkb0
+>>>>>>>>>
+>>>>>>>>> For a loopback ublk target I get the following from blktrace:
+>>>>>>>>>
+>>>>>>>>>> 259,2    0     3469   286.337681303   724  D   R 0 + 1024 [fio]
+>>>>>>>>>> 259,2    0     3470   286.337691313   724  D   R 1024 + 1024 [fio]
+>>>>>>>>>> 259,2    0     3471   286.337694423   724  D   R 2048 + 1024 [fio]
+>>>>>>>>>> 259,2    0     3472   286.337696583   724  D   R 3072 + 1024 [fio]
+>>>>>>>>>> 259,2    0     3473   286.337698433   724  D   R 4096 + 1024 [fio]
+>>>>>>>>>> 259,2    0     3474   286.337700213   724  D   R 5120 + 1024 [fio]
+>>>>>>>>>> 259,2    0     3475   286.337702723   724  D   R 6144 + 1024 [fio]
+>>>>>>>>>> 259,2    0     3476   286.337704323   724  D   R 7168 + 1024 [fio]
+>>>>>>>>>> 259,1    0     1794   286.337794934   390  D   R 6144 + 2048 [ublk]
+>>>>>>>>>> 259,1    0     1795   286.337805504   390  D   R 4096 + 2048 [ublk]
+>>>>>>>>>> 259,1    0     1796   286.337816274   390  D   R 2048 + 2048 [ublk]
+>>>>>>>>>> 259,1    0     1797   286.337821744   390  D   R 0 + 2048 [ublk]
+>>>>>>>>>
+>>>>>>>>> And enabling debug prints in ublk shows that the reversal happens when
+>>>>>>>>> ublk defers work to the io_uring context:
+>>>>>>>>>
+>>>>>>>>>> kernel: ublk_queue_rq: qid 0, tag 180, sect 0
+>>>>>>>>>> kernel: ublk_queue_rq: qid 0, tag 181, sect 1024
+>>>>>>>>>> kernel: ublk_queue_rq: qid 0, tag 182, sect 2048
+>>>>>>>>>> kernel: ublk_queue_rq: qid 0, tag 183, sect 3072
+>>>>>>>>>> kernel: ublk_queue_rq: qid 0, tag 184, sect 4096
+>>>>>>>>>> kernel: ublk_queue_rq: qid 0, tag 185, sect 5120
+>>>>>>>>>> kernel: ublk_queue_rq: qid 0, tag 186, sect 6144
+>>>>>>>>>> kernel: ublk_queue_rq: qid 0, tag 187, sect 7168
+>>>>>>>>>> kernel: __ublk_rq_task_work: complete: op 33, qid 0 tag 187 io_flags 1 addr 7f245d359000, sect 7168
+>>>>>>>>>> kernel: __ublk_rq_task_work: complete: op 33, qid 0 tag 186 io_flags 1 addr 7f245fcfd000, sect 6144
+>>>>>>>>>> kernel: __ublk_rq_task_work: complete: op 33, qid 0 tag 185 io_flags 1 addr 7f245fd7f000, sect 5120
+>>>>>>>>>> kernel: __ublk_rq_task_work: complete: op 33, qid 0 tag 184 io_flags 1 addr 7f245fe01000, sect 4096
+>>>>>>>>>> kernel: __ublk_rq_task_work: complete: op 33, qid 0 tag 183 io_flags 1 addr 7f245fe83000, sect 3072
+>>>>>>>>>> kernel: __ublk_rq_task_work: complete: op 33, qid 0 tag 182 io_flags 1 addr 7f245ff05000, sect 2048
+>>>>>>>>>> kernel: __ublk_rq_task_work: complete: op 33, qid 0 tag 181 io_flags 1 addr 7f245ff87000, sect 1024
+>>>>>>>>>> kernel: __ublk_rq_task_work: complete: op 33, qid 0 tag 180 io_flags 1 addr 7f2460009000, sect 0
+>>>>>>>>>
+>>>>>>>>> The problem seems to be that the method used to defer work to the
+>>>>>>>>> io_uring context, task_work_add(), is using a stack to queue the
+>>>>>>>>> callbacks.
+>>>>>>>>
+>>>>>>>> Is the observation done on zoned ublk or plain ublk-loop?
+>>>>>>>
+>>>>>>> I collected this trace on my fork, but since the behavior comes from
+>>>>>>> task_work.c using a stack to queue work, it would be present on upstream
+>>>>>>> ublk as well. For completeness, I have verified that this is the case.
+>>>>>>>
+>>>>>>>> If it is plain ublk-loop, the reverse order can be started from
+>>>>>>>> blk_add_rq_to_plug(), but it won't happen for zoned write request
+>>>>>>>> which isn't queued to plug list.
+>>>>>>>
+>>>>>>> I forgot to mention that I set the deadline scheduler for both ublkb0
+>>>>>>> and the loopback target. No reordering should happen in mq with the
+>>>>>>> deadline scheduler, as far as I understand.
+>>>>>>
+>>>>>> I meant you need to setup one zoned ublk-loop for observing write request
+>>>>>> order, block layer never guarantees request order for other devices.
+>>>>>>
+>>>>>>>
+>>>>>>>>
+>>>>>>>> Otherwise, can you observe zoned write req reorder from ublksrv side?
+>>>>>>>>
+>>>>>>>
+>>>>>>> Yes, the reverse order is observable in ublk server. Reordering happens
+>>>>>>> in ublk kernel driver.
+>>>>>>>
+>>>>>>>>>
+>>>>>>>>> As you probably are aware, writes to zoned storage must
+>>>>>>>>> happen at the write pointer, so when order is lost there is a problem.
+>>>>>>>>> But I would assume that this behavior is also undesirable in other
+>>>>>>>>> circumstances.
+>>>>>>>>>
+>>>>>>>>> I am not sure what is the best approach to change this behavor. Maybe
+>>>>>>>>> having a separate queue for the requests and then only scheduling work
+>>>>>>>>> if a worker is not already processing the queue?
+>>>>>>>>>
+>>>>>>>>> If you like, I can try to implement a fix?
+>>>>>>>>
+>>>>>>>> Yeah, I think zoned write requests could be forwarded to ublk server out of order.
+>>>>>>>
+>>>>>>> In reverse order for requests that are issued without a context switch,
+>>>>>>> as far as I can tell.
+>>>>>>>
+>>>>>>>>
+>>>>>>>> Is it possible for re-order the writes in ublksrv side? I guess it is
+>>>>>>>> be doable:
+>>>>>>>>
+>>>>>>>> 1) zoned write request is sent to ublk_queue_rq() in order always
+>>>>>>>>
+>>>>>>>> 2) when ublksrv zone target/backend code gets zoned write request in each
+>>>>>>>> zone, it can wait until the next expected write comes, then handle the
+>>>>>>>> write and advance write pointer, then repeat the whole process.
+>>>>>>>>
+>>>>>>>> 3) because of 1), the next expected zoned write req is guaranteed to
+>>>>>>>> come without much delay, and the per-zone queue won't be long.
+>>>>>>>
+>>>>>>> I think it is not feasible to have per zone data structures. Instead, I
+>>>>>>
+>>>>>> If one mapping data structure is used for ordering per-zone write
+>>>>>> request, it could be pretty easy, such as C++'s map or hash table, and it
+>>>>>> won't take much memory given the max in-flight IOs are very limited and
+>>>>>> the zone mapping entry can be reused among different zone, and quite easy
+>>>>>> to implement.
+>>>>>>
+>>>>>> Also most of times, the per-zone ordering can be completed in current
+>>>>>> batch(requests completed from single io_uring_enter()), then the extra
+>>>>>> cost could be close to zero, you can simply run the per-zone ordering in
+>>>>>> ->handle_io_background() callback, when all requests could come for each
+>>>>>> zone most of times.
+>>>>>>
+>>>>>>> considered adding a sequence number to each request, and then queue up
+>>>>>>> requests if there is a gap in the numbering.
+>>>>>>
+>>>>>> IMO, that won't be doable, given you don't know when the sequence will be over.
+>>>>>
+>>>>> We would not need to know when the sequence is over. If in ubdsrv we see
+>>>>> request number 1,2,4, we could hold 4 until 3 shows up. When 3 shows up
+>>>>> we go ahead and submit all requests from 3 and up, until there is
+>>>>> another gap. If ublk_drv is setting the sequence numbers,
+>>>>> cancelled/aborted requests would not be an issue.
+>>>>>
+>>>>> I think this would be less overhead than having per zone data structure.
+>>>>
+>>>> You can only assign it to zoned write request, but you still have to check
+>>>> the sequence inside each zone, right? Then why not just check LBAs in
+>>>> each zone simply?
+>>>
+>>> We would need to know the zone map, which is not otherwise required.
+>>> Then we would need to track the write pointer for each open zone for
+>>> each queue, so that we can stall writes that are not issued at the write
+>>> pointer. This is in effect all zones, because we cannot track when zones
+>>> are implicitly closed. Then, if different queues are issuing writes to
+>>> the same zone, we need to sync across queues. Userspace may have
+>>> synchronization in place to issue writes with multiple threads while
+>>> still hitting the write pointer.
+>>>
+>>> It is not good enough to only impose ordering within a zone if we have
+>>> requests in flight for that zone. For the first write to a zone when there
+>>> are no writes in flight to that zone, we can not know if the write is at
+>>> the write pointer, or if more writes to lower LBA is on the way. Not
+>>> without tracking the write pointer.
+>>>
+>>> With a sequence number, the sequence number can be queue local. It would
+>>> not guarantee that writes always happen at the write pointer, but it
+>>> would guarantee that requests are not reordered by ublk_drv, which is
+>>> all that is required. As long as userspace is issuing at the write
+>>> pointer (as they are required to for zoned storage), this solution would
+>>> work, even across multiple queues issuing writes to the same zone.
+>>>
+>>>>
+>>>>>
+>>>>> But I still think it is an unnecessary hack. We could just fix the driver.
+>>>>
+>>>> But not sure if it is easy to make io_uring_cmd_complete_in_task() or
+>>>> task_work_add to complete request in order efficiently.
+>>>>
+>>>>>
+>>>>>>
+>>>>>>>
+>>>>>>> But really, the issue should be resolved by changing the way
+>>>>>>> ublk_queue_rq() is sending work to uring context with task_add_work().
+>>>>>>
+>>>>>> Not sure it can be solved easily given llist is implemented in this way.
+>>>>>
+>>>>> If we queue requests on a separate queue, we are fine. I can make a
+>>>>> patch suggestion.
+>>>>
+>>>> The problem is that io_uring_cmd_complete_in_task() or task_work_add() may
+>>>> re-order the request, can you explain why the issue can be solved by
+>>>> separate queue?
+>>>
+>>> I would suggest to still use task_work_add() to queue a callback, but
+>>> instead of carrying the pdu as the callback argument, use it as a
+>>> notification that one or more work items are queued. Then we add the pdu
+>>> to a hwctx local FIFO queue.
+>>>
+>>> __ublk_rq_task_work() would then check this FIFO queue and submit all
+>>> the requests on the queue to userspace.
+>>>
+>>> Without further optimization __ublk_rq_task_work() would some times be
+>>> called with an empty queue, but this should not be too much overhead.
+>>> Maybe we could decide to not call task_work_add() if the hwctx local
+>>> queue of pdus is not empty.
+>>>
+>>>>
+>>>>>
+>>>>>>
+>>>>>>> Fixing in ublksrv is a bit of a hack and will have performance penalty.
+>>>>>>
+>>>>>> As I mentioned, ordering zoned write request in each zone just takes
+>>>>>> a little memory(mapping, or hashing) and the max size of the mapping
+>>>>>> table is queue depth, and basically zero cpu cost, not see extra
+>>>>>> performance penalty is involved.
+>>>>>
+>>>>> I could implement all three solutions. 1) fix the dirver, 2) per zone
+>>>>> structure and 3) sequence numbers. Then I benchmark them and we will
+>>>>> know what works. It's a lot of work though.
+>>>>
+>>>> Let's prove if the theory for each solution is correct first.
+>>>
+>>> Alright.
+>>>
+>>>>
+>>>>>
+>>>>>>
+>>>>>>>
+>>>>>>> Also, it can not be good for any storage device to have sequential
+>>>>>>> requests delivered in reverse order? Fixing this would benefit all targets.
+>>>>>>
+>>>>>> Only zoned target has strict ordering requirement which does take cost, block
+>>>>>> layer never guarantees request order. As I mentioned, blk_add_rq_to_plug()
+>>>>>> can re-order requests in reverse order too.
+>>>>>
+>>>>> When mq-deadline scheduler is set for a queue, requests are not
+>>>>> reordered, right?
+>>>>
+>>>> In case of batching submission, mq-deadline will order requests by
+>>>> LBA in this whole batch.
+>>>
+>>> That is not what I am seeing in practice. I tried looking through
+>>> mq-deadline.c, but I could not find code that would order by LBA. Could
+>>> you point me to the code that implements this policy?
+>>
+>> see the use of the rb tree, deadline_add_rq_rb() and friends. The rb tree
+>> maintains the requests in LBA order. The fifo list, maintains an arrival
+>> order for starvation control.
+> 
+> Thanks!
+> 
+>>
+>>>
+>>>>
+>>>>>
+>>>>> I am no block layer expert, so I cannot argue about the implementation.
+>>>>> But I think that both spinning rust and flash would benefit from having
+>>>>> sequential requests delivered in order? Would it not hurt performance to
+>>>>> reverse order for sequential requests all the time? I have a hard time
+>>>>> understanding why the block layer would do this by default.
+>>>>>
+>>>>> One thing is to offer no guarantees, but to _always_ reverse the
+>>>>> ordering of sequential requests seem a little counter productive to me.
+>>>>
+>>>> If io_uring_cmd_complete_in_task()/task_work_add() can complete io
+>>>> commands to ublksrv in order without extra cost, that is better.
+>>>
+>>> I agree :)
+>>>
+>>>>
+>>>> But I don't think it is a big deal for HDD. because when these requests
+>>>> are re-issued from ublksrv to block layer, deadline or bfq will order
+>>>> them too since all are submitted via io_uring in batch.
+>>>
+>>> As I wrote, that is not what I am seeing in my experiment. Repeating the
+>>> output of blktrace from the top of this email:
+>>>
+>>> 259,2    0     3469   286.337681303   724  D   R 0 + 1024 [fio]
+>>> 259,2    0     3470   286.337691313   724  D   R 1024 + 1024 [fio]
+>>> 259,2    0     3471   286.337694423   724  D   R 2048 + 1024 [fio]
+>>> 259,2    0     3472   286.337696583   724  D   R 3072 + 1024 [fio]
+>>> 259,2    0     3473   286.337698433   724  D   R 4096 + 1024 [fio]
+>>> 259,2    0     3474   286.337700213   724  D   R 5120 + 1024 [fio]
+>>> 259,2    0     3475   286.337702723   724  D   R 6144 + 1024 [fio]
+>>> 259,2    0     3476   286.337704323   724  D   R 7168 + 1024 [fio]
+>>> 259,1    0     1794   286.337794934   390  D   R 6144 + 2048 [ublk]
+>>> 259,1    0     1795   286.337805504   390  D   R 4096 + 2048 [ublk]
+>>> 259,1    0     1796   286.337816274   390  D   R 2048 + 2048 [ublk]
+>>> 259,1    0     1797   286.337821744   390  D   R 0 + 2048 [ublk]
+>>>
+>>> Here the read of 6144:
+>>> 259,1    0     1794   286.337794934   390  D   R 6144 + 2048 [ublk]
+>>>
+>>> is clearly issued before the read of 4096:
+>>> 259,1    0     1795   286.337805504   390  D   R 4096 + 2048 [ublk]
+>>>
+>>> It is not because there are no IO in flight for the target device. Here
+>>> is he trace with completions included:
+>>>
+>>> 259,2   10        1     0.000000000   468  D   R 0 + 1024 [fio]
+>>> 259,2   10        2     0.000005680   468  D   R 1024 + 1024 [fio]
+>>> 259,2   10        3     0.000007760   468  D   R 2048 + 1024 [fio]
+>>> 259,2   10        4     0.000009140   468  D   R 3072 + 1024 [fio]
+>>> 259,2   10        5     0.000010420   468  D   R 4096 + 1024 [fio]
+>>> 259,2   10        6     0.000011640   468  D   R 5120 + 1024 [fio]
+>>> 259,2   10        7     0.000013350   468  D   R 6144 + 1024 [fio]
+>>> 259,2   10        8     0.000014350   468  D   R 7168 + 1024 [fio]
+>>> 259,1   10        1     0.000280540   412  D   R 6144 + 2048 [ublk]
+>>> 259,1   10        2     0.000433260   412  D   R 4096 + 2048 [ublk]
+>>> 259,1   10        3     0.000603920   412  D   R 2048 + 2048 [ublk]
+>>> 259,1   10        4     0.000698070   412  D   R 0 + 2048 [ublk]
+>>> 259,1   10        5     0.000839250     0  C   R 6144 + 2048 [0]
+>>> 259,2   10        9     0.000891270   412  C   R 7168 + 1024 [0]
+>>> 259,2   10       10     0.000919780   412  C   R 6144 + 1024 [0]
+>>> 259,1   10        6     0.001258791     0  C   R 4096 + 2048 [0]
+>>> 259,2   10       11     0.001306541   412  C   R 5120 + 1024 [0]
+>>> 259,2   10       12     0.001335291   412  C   R 4096 + 1024 [0]
+>>> 259,1   10        7     0.001469911     0  C   R 2048 + 2048 [0]
+>>> 259,2   10       13     0.001518281   412  C   R 3072 + 1024 [0]
+>>> 259,2   10       14     0.001547041   412  C   R 2048 + 1024 [0]
+>>> 259,1   10        8     0.001600801     0  C   R 0 + 2048 [0]
+>>> 259,2   10       15     0.001641871   412  C   R 1024 + 1024 [0]
+>>> 259,2   10       16     0.001671921   412  C   R 0 + 1024 [0]
+>>>
+>>> This last trace is vanilla Linux 6.0 with mq-deadline enabled for ublkb0(259,2)
+>>> and the loopback target nvme0n1(259,1).
+>>
+>> queue at head that should be queue at tail ? if nvme0n1 is a multi queue
+>> device and does not have a scheduler, there may be a lot of "issue
+>> directly" that can really destroy the order of requests.
+> 
+> It is a regular nvme drive handled by the nvme driver. So multi queue
+> with mq-deadline set.
+> 
+> Unless I am reading the trace wrong there are 3 reads issued to 259,1
+> sectors 6144, 4096 and 2048 in that order. This is the order userspace
+> is issuing the reads, so the trace matches what I would expect. But now
+> you tell me that the mq-deadline scheduler should reorder the requests
+> based on LBA? But maybe the ordering by LBA is only for writes? I'll
+> rerun the test with writes.
 
-Thanks, applied. I confirmed it does not fail with kernel v6.0. Good :)
+Nope. Reordering is for reads too. But reordering happens only if the
+commands are issued in batch or if the drive is busy (all tags used) and
+commands accumulate in the scheduler.
 
---=20
-Shin'ichiro Kawasaki=
+If the user issues these reads one at a time, they will go through the
+scheduler without reordering. You can see that with blktrace:
+If you see a G-Q-I-D sequence for each read, then it is not a batch and
+they are going through as is. If you see G-Q-I-G-Q-I-G-Q-I-D-D-D, then
+that was a batch and the "D" should be ordered in increasing LBA, even if
+the I (insert) where out of order.
+
+> 
+> Best regards,
+> Andreas
+> 
+
+-- 
+Damien Le Moal
+Western Digital Research
+
