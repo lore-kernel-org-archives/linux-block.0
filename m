@@ -2,76 +2,208 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53EC0C43217
-	for <linux-block@archiver.kernel.org>; Fri, 18 Nov 2022 12:31:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D2505C433FE
+	for <linux-block@archiver.kernel.org>; Fri, 18 Nov 2022 12:48:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235256AbiKRMb5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 18 Nov 2022 07:31:57 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37434 "EHLO
+        id S242001AbiKRMs5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 18 Nov 2022 07:48:57 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56758 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241718AbiKRMb1 (ORCPT
+        with ESMTP id S241993AbiKRMsz (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 18 Nov 2022 07:31:27 -0500
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 96F7713D2A
-        for <linux-block@vger.kernel.org>; Fri, 18 Nov 2022 04:31:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Content-Type:MIME-Version:Message-ID:
-        Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-        Content-Description:In-Reply-To:References;
-        bh=7HRUTm/HDd/79pZLj7ke4I0y92JSxt5kxA62qQmyk08=; b=s+wSsIHSef/g30huvesGT7FxTj
-        FlYUPCiFLTPg8FyuYaxAllb32errcCNzuoNS3Q+h3yOmovot/kHdBn64oK0B53M+dEs7G/rOQPVyj
-        K80uorj8yrQGg91WlIQ9bB4Il6aR397ZcZpCHpbhmN3XzozGZihUSvXjSx1ZgSTBhbXjZcAwJrLZs
-        DRUWguSFUsdqm2YS061xdU4ciJ7Nz3nxVgdY75DPsqMaqWmlBBHlAtQbCFxKCoEDSvEgBT5GR73j4
-        SNOz3K3uuNSpMqwsfHKB6w4bLAiglRFn5gRPgctmlMlCFopzZuM0a45est1IXHWOt/tjxxbx6hGqZ
-        9mFG4fzw==;
-Received: from [2001:4bb8:191:a0ee:6e05:c552:a35b:761c] (helo=localhost)
-        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1ow0WZ-003tUb-A5; Fri, 18 Nov 2022 12:31:15 +0000
-Date:   Fri, 18 Nov 2022 13:31:12 +0100
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
-Subject: [GIT PULL] nvmes fixes for Linux 6.1
-Message-ID: <Y3d7EA+VHiylXGu+@infradead.org>
+        Fri, 18 Nov 2022 07:48:55 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 07588903B4
+        for <linux-block@vger.kernel.org>; Fri, 18 Nov 2022 04:47:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1668775674;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=QuJM6Q+PvGZmgsUmn5eTgKuDeG5FBgtl0wlJyelxxdU=;
+        b=cKdOOQQAzKIo5PdFAgc5vy0bQx9AsmYJKVTPpNR/H2tXuKN1PMjKnBgW6XgxrQpwYbkdvE
+        q/R8DBeKxPsnOaN2wP6jvlRcanRHtgiwPTcICDY+3ne9C3mhvgj/39iTw+M2+mIwAvRM//
+        YWlxa+uQ4tARF0ipqs/h12goFqydmpA=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-638-5Bcfl6QBM_S9WLa8rmvSzg-1; Fri, 18 Nov 2022 07:47:53 -0500
+X-MC-Unique: 5Bcfl6QBM_S9WLa8rmvSzg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 515558339C8;
+        Fri, 18 Nov 2022 12:47:53 +0000 (UTC)
+Received: from T590 (ovpn-8-16.pek2.redhat.com [10.72.8.16])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 7189E40C6EC3;
+        Fri, 18 Nov 2022 12:47:48 +0000 (UTC)
+Date:   Fri, 18 Nov 2022 20:47:43 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Andreas Hindborg <andreas.hindborg@wdc.com>
+Cc:     Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        ming.lei@redhat.com
+Subject: Re: Reordering of ublk IO requests
+Message-ID: <Y3d+78qMOusdYUAG@T590>
+References: <Y3X2M3CSULigQr4f@T590>
+ <87k03u7x3r.fsf@wdc.com>
+ <Y3YfUjrrLJzPWc4H@T590>
+ <87fseh92aa.fsf@wdc.com>
+ <Y3cGM0es14vj3n3N@T590>
+ <2f86eb58-148b-03ac-d2bf-d67c5756a7a6@opensource.wdc.com>
+ <Y3chDDdbuN99l7v7@T590>
+ <8735ag8ueg.fsf@wdc.com>
+ <Y3dscKle5oqLjSNT@T590>
+ <87v8nc79cv.fsf@wdc.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <87v8nc79cv.fsf@wdc.com>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The following changes since commit d7dbd43f4a828fa1d9a8614d5b0ac40aee6375fe:
+On Fri, Nov 18, 2022 at 12:49:15PM +0100, Andreas Hindborg wrote:
+> 
+> Ming Lei <ming.lei@redhat.com> writes:
+> 
+> > CAUTION: This email originated from outside of Western Digital. Do not click on
+> > links or open attachments unless you recognize the sender and know that the
+> > content is safe.
+> >
+> >
+> > On Fri, Nov 18, 2022 at 10:41:31AM +0100, Andreas Hindborg wrote:
+> >>
+> >> Ming Lei <ming.lei@redhat.com> writes:
+> >>
+> >> > CAUTION: This email originated from outside of Western Digital. Do not click on
+> >> > links or open attachments unless you recognize the sender and know that the
+> >> > content is safe.
+> >> >
+> >> >
+> >> > On Fri, Nov 18, 2022 at 01:35:29PM +0900, Damien Le Moal wrote:
+> >> >> On 11/18/22 13:12, Ming Lei wrote:
+> >> >> [...]
+> >> >> >>> You can only assign it to zoned write request, but you still have to check
+> >> >> >>> the sequence inside each zone, right? Then why not just check LBAs in
+> >> >> >>> each zone simply?
+> >> >> >>
+> >> >> >> We would need to know the zone map, which is not otherwise required.
+> >> >> >> Then we would need to track the write pointer for each open zone for
+> >> >> >> each queue, so that we can stall writes that are not issued at the write
+> >> >> >> pointer. This is in effect all zones, because we cannot track when zones
+> >> >> >> are implicitly closed. Then, if different queues are issuing writes to
+> >> >> >
+> >> >> > Can you explain "implicitly closed" state a bit?
+> >> >> >
+> >> >> > From https://zonedstorage.io/docs/introduction/zoned-storage, only the
+> >> >> > following words are mentioned about closed state:
+> >> >> >
+> >> >> >     ```Conversely, implicitly or explicitly opened zoned can be transitioned to the
+> >> >> >     closed state using the CLOSE ZONE command.```
+> >> >>
+> >> >> When a write is issued to an empty or closed zone, the drive will
+> >> >> automatically transition the zone into the implicit open state. This is
+> >> >> called implicit open because the host did not (explicitly) issue an open
+> >> >> zone command.
+> >> >>
+> >> >> When there are too many implicitly open zones, the drive may choose to
+> >> >> close one of the implicitly opened zone to implicitly open the zone that
+> >> >> is a target for a write command.
+> >> >>
+> >> >> Simple in a nutshell. This is done so that the drive can work with a
+> >> >> limited set of resources needed to handle open zones, that is, zones that
+> >> >> are being written. There are some more nasty details to all this with
+> >> >> limits on the number of open zones and active zones that a zoned drive may
+> >> >> have.
+> >> >
+> >> > OK, thanks for the clarification about implicitly closed, but I
+> >> > understand this close can't change the zone's write pointer.
+> >>
+> >> You are right, it does not matter if the zone is implicitly closed, I
+> >> was mistaken. But we still have to track the write pointer of every zone
+> >> in open or active state, otherwise we cannot know if a write that arrive
+> >> to a zone with no outstanding IO is actually at the write pointer, or
+> >> whether we need to hold it.
+> >>
+> >> >
+> >> >>
+> >> >> >
+> >> >> > zone info can be cached in the mapping(hash table)(zone sector is the key, and zone
+> >> >> > info is the value), which can be implemented as one LRU style. If any zone
+> >> >> > info isn't hit in the mapping table, ioctl(BLKREPORTZONE) can be called for
+> >> >> > obtaining the zone info.
+> >> >> >
+> >> >> >> the same zone, we need to sync across queues. Userspace may have
+> >> >> >> synchronization in place to issue writes with multiple threads while
+> >> >> >> still hitting the write pointer.
+> >> >> >
+> >> >> > You can trust mq-dealine, which guaranteed that write IO is sent to ->queue_rq()
+> >> >> > in order, no matter MQ or SQ.
+> >> >> >
+> >> >> > Yes, it could be issue from multiple queues for ublksrv, which doesn't sync
+> >> >> > among multiple queues.
+> >> >> >
+> >> >> > But per-zone re-order still can solve the issue, just need one lock
+> >> >> > for each zone to cover the MQ re-order.
+> >> >>
+> >> >> That lock is already there and using it, mq-deadline will never dispatch
+> >> >> more than one write per zone at any time. This is to avoid write
+> >> >> reordering. So multi queue or not, for any zone, there is no possibility
+> >> >> of having writes reordered.
+> >> >
+> >> > oops, I miss the single queue depth point per zone, so ublk won't break
+> >> > zoned write at all, and I agree order of batch IOs is one problem, but
+> >> > not hard to solve.
+> >>
+> >> The current implementation _does_ break zoned write because it reverses
+> >> batched writes. But if it is an easy fix, that is cool :)
+> >
+> > Please look at Damien's comment:
+> >
+> >>> That lock is already there and using it, mq-deadline will never dispatch
+> >>> more than one write per zone at any time. This is to avoid write
+> >>> reordering. So multi queue or not, for any zone, there is no possibility
+> >>> of having writes reordered.
+> >
+> > For zoned write, mq-deadline is used to limit at most one inflight write
+> > for each zone.
+> >
+> > So can you explain a bit how the current implementation breaks zoned
+> > write?
+> 
+> Like Damien wrote in another email, mq-deadline will only impose
+> ordering for requests submitted in batch. The flow we have is the
+> following:
+> 
+>  - Userspace sends requests to ublk gendisk
+>  - Requests go through block layer and is _not_ reordered when using
+>    mq-deadline. They may be split.
+>  - Requests hit ublk_drv and ublk_drv will reverse order of _all_
+>    batched up requests (including split requests).
 
-  blk-cgroup: properly pin the parent in blkcg_css_online (2022-11-14 12:13:19 -0700)
+For ublk-zone, ublk driver needs to be exposed as zoned device by
+calling disk_set_zoned() finally, which definitely isn't supported now,
+so mq-deadline at most sends one write IO for each zone after ublk-zone
+is supported, see blk_req_can_dispatch_to_zone().
 
-are available in the Git repository at:
+>  - ublk_drv sends request to ublksrv in _reverse_ order.
+>  - ublksrv sends requests _not_ batched up to target device.
+>  - Requests that enter mq-deadline at the same time are reordered in LBA
+>    order, that is all good.
+>  - Requests that enter the kernel in different batches are not reordered
+>    in LBA order and end up missing the write pointer. This is bad.
 
-  git://git.infradead.org/nvme.git tags/nvme-6.1-2022-11-18
+Again, please read Damien's comment:
 
-for you to fetch changes up to 0a52566279b4ee65ecd2503d7b7342851f84755c:
+>> That lock is already there and using it, mq-deadline will never dispatch
+>> more than one write per zone at any time.
 
-  nvmet: fix a memory leak in nvmet_auth_set_key (2022-11-16 07:20:56 +0100)
+Anytime, there is at most one write IO for each zone, how can the single
+write IO be re-order?
 
-----------------------------------------------------------------
-nvme fixes for Linux 6.1
 
- - two more bogus nid quirks (Bean Huo, Tiago Dias Ferreira)
- - memory leak fix in nvmet (Sagi Grimberg)
+Thanks,
+Ming
 
-----------------------------------------------------------------
-Bean Huo (1):
-      nvme-pci: add NVME_QUIRK_BOGUS_NID for Micron Nitro
-
-Sagi Grimberg (1):
-      nvmet: fix a memory leak in nvmet_auth_set_key
-
-Tiago Dias Ferreira (1):
-      nvme-pci: add NVME_QUIRK_BOGUS_NID for Netac NV7000
-
- drivers/nvme/host/pci.c    | 4 ++++
- drivers/nvme/target/auth.c | 2 ++
- 2 files changed, 6 insertions(+)
