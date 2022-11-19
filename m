@@ -2,28 +2,28 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E6C97C433FE
-	for <linux-block@archiver.kernel.org>; Sat, 19 Nov 2022 01:52:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E0C74C433FE
+	for <linux-block@archiver.kernel.org>; Sat, 19 Nov 2022 01:52:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232239AbiKSBvv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 18 Nov 2022 20:51:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51106 "EHLO
+        id S233117AbiKSBwi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 18 Nov 2022 20:52:38 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52038 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231872AbiKSBv3 (ORCPT
+        with ESMTP id S234874AbiKSBwP (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 18 Nov 2022 20:51:29 -0500
+        Fri, 18 Nov 2022 20:52:15 -0500
 Received: from 66-220-144-178.mail-mxout.facebook.com (66-220-144-178.mail-mxout.facebook.com [66.220.144.178])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3FA11EAD1
-        for <linux-block@vger.kernel.org>; Fri, 18 Nov 2022 17:27:38 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4528154B35
+        for <linux-block@vger.kernel.org>; Fri, 18 Nov 2022 17:33:39 -0800 (PST)
 Received: by dev0134.prn3.facebook.com (Postfix, from userid 425415)
-        id 6FA0819380D8; Fri, 18 Nov 2022 16:52:18 -0800 (PST)
+        id 670C619380D4; Fri, 18 Nov 2022 16:52:18 -0800 (PST)
 From:   Stefan Roesch <shr@devkernel.io>
 To:     kernel-team@fb.com, linux-block@vger.kernel.org, linux-mm@kvack.org
 Cc:     shr@devkernel.io, axboe@kernel.dk, clm@meta.com,
         akpm@linux-foundation.org
-Subject: [RFC PATCH v4 09/20] mm: document /sys/class/bdi/<bdi>/max_bytes knob
-Date:   Fri, 18 Nov 2022 16:52:04 -0800
-Message-Id: <20221119005215.3052436-10-shr@devkernel.io>
+Subject: [RFC PATCH v4 07/20] mm: add bdi_set_max_bytes() function.
+Date:   Fri, 18 Nov 2022 16:52:02 -0800
+Message-Id: <20221119005215.3052436-8-shr@devkernel.io>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20221119005215.3052436-1-shr@devkernel.io>
 References: <20221119005215.3052436-1-shr@devkernel.io>
@@ -33,39 +33,94 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This documents the new /sys/class/bdi/<bdi>/max_bytes knob.
+This introduces the bdi_set_max_bytes() function. The max_bytes function
+does not store the max_bytes value. Instead it converts the max_bytes
+value into the corresponding ratio value.
 
 Signed-off-by: Stefan Roesch <shr@devkernel.io>
 ---
- Documentation/ABI/testing/sysfs-class-bdi | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
+ include/linux/backing-dev.h |  1 +
+ mm/page-writeback.c         | 37 +++++++++++++++++++++++++++++++++++++
+ 2 files changed, 38 insertions(+)
 
-diff --git a/Documentation/ABI/testing/sysfs-class-bdi b/Documentation/AB=
-I/testing/sysfs-class-bdi
-index 68b5d4018c2f..580f723de049 100644
---- a/Documentation/ABI/testing/sysfs-class-bdi
-+++ b/Documentation/ABI/testing/sysfs-class-bdi
-@@ -56,6 +56,20 @@ Description:
- 	be trusted to play fair.
+diff --git a/include/linux/backing-dev.h b/include/linux/backing-dev.h
+index 473686c32775..ea6c993433d5 100644
+--- a/include/linux/backing-dev.h
++++ b/include/linux/backing-dev.h
+@@ -108,6 +108,7 @@ static inline unsigned long wb_stat_error(void)
+ u64 bdi_get_max_bytes(struct backing_dev_info *bdi);
+ int bdi_set_min_ratio(struct backing_dev_info *bdi, unsigned int min_rat=
+io);
+ int bdi_set_max_ratio(struct backing_dev_info *bdi, unsigned int max_rat=
+io);
++int bdi_set_max_bytes(struct backing_dev_info *bdi, u64 max_bytes);
+ int bdi_set_strict_limit(struct backing_dev_info *bdi, unsigned int stri=
+ct_limit);
 =20
- 	(read-write)
+ /*
+diff --git a/mm/page-writeback.c b/mm/page-writeback.c
+index e74ef596dc27..20ae9adeb22f 100644
+--- a/mm/page-writeback.c
++++ b/mm/page-writeback.c
+@@ -13,6 +13,7 @@
+  */
+=20
+ #include <linux/kernel.h>
++#include <linux/math64.h>
+ #include <linux/export.h>
+ #include <linux/spinlock.h>
+ #include <linux/fs.h>
+@@ -650,6 +651,28 @@ void wb_domain_exit(struct wb_domain *dom)
+  */
+ static unsigned int bdi_min_ratio;
+=20
++static int bdi_check_pages_limit(unsigned long pages)
++{
++	unsigned long max_dirty_pages =3D global_dirtyable_memory();
 +
-+What:		/sys/class/bdi/<bdi>/max_bytes
-+Date:		October 2022
-+Contact:	Stefan Roesch <shr@devkernel.io>
-+Description:
-+	Allows limiting a particular device to use not more than the
-+	given 'max_bytes' of the write-back cache.  This is useful in
-+	situations where we want to avoid one device taking all or
-+	most of the write-back cache.  For example in case of an NFS
-+	mount that is prone to get stuck, a FUSE mount which cannot be
-+	trusted to play fair, or a nbd device.
++	if (pages > max_dirty_pages)
++		return -EINVAL;
 +
-+	(read-write)
++	return 0;
++}
 +
- What:		/sys/class/bdi/<bdi>/strict_limit
- Date:		October 2022
- Contact:	Stefan Roesch <shr@devkernel.io>
++static unsigned long bdi_ratio_from_pages(unsigned long pages)
++{
++	unsigned long background_thresh;
++	unsigned long dirty_thresh;
++	unsigned long ratio;
++
++	global_dirty_limits(&background_thresh, &dirty_thresh);
++	ratio =3D div64_u64(pages * 100ULL * BDI_RATIO_SCALE, dirty_thresh);
++
++	return ratio;
++}
++
+ static u64 bdi_get_bytes(unsigned int ratio)
+ {
+ 	unsigned long background_thresh;
+@@ -722,6 +745,20 @@ u64 bdi_get_max_bytes(struct backing_dev_info *bdi)
+ 	return bdi_get_bytes(bdi->max_ratio);
+ }
+=20
++int bdi_set_max_bytes(struct backing_dev_info *bdi, u64 max_bytes)
++{
++	int ret;
++	unsigned long pages =3D max_bytes >> PAGE_SHIFT;
++	unsigned long max_ratio;
++
++	ret =3D bdi_check_pages_limit(pages);
++	if (ret)
++		return ret;
++
++	max_ratio =3D bdi_ratio_from_pages(pages);
++	return __bdi_set_max_ratio(bdi, max_ratio);
++}
++
+ int bdi_set_strict_limit(struct backing_dev_info *bdi, unsigned int stri=
+ct_limit)
+ {
+ 	if (strict_limit > 1)
 --=20
 2.30.2
 
