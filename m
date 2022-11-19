@@ -2,199 +2,120 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 919C9C433FE
-	for <linux-block@archiver.kernel.org>; Sat, 19 Nov 2022 02:26:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 826C0C4332F
+	for <linux-block@archiver.kernel.org>; Sat, 19 Nov 2022 02:33:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236059AbiKSC0r (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 18 Nov 2022 21:26:47 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48358 "EHLO
+        id S229884AbiKSCdi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 18 Nov 2022 21:33:38 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38180 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235732AbiKSCZf (ORCPT
+        with ESMTP id S231417AbiKSCdY (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 18 Nov 2022 21:25:35 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0699380980;
-        Fri, 18 Nov 2022 18:15:59 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id B0563B8267A;
-        Sat, 19 Nov 2022 02:15:57 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 59DF5C43146;
-        Sat, 19 Nov 2022 02:15:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1668824156;
-        bh=etXcCxGSg/0QBSP5ra2+KJCEm7VId0RuvOovDnxRx34=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=GhQBq0hOnsEYYGtmSKRW01EOstTniPPBnkxZlxLBUlYWw4Q5XmCkIIQFaNjyPYet+
-         5650L2SxEXzcqyG+RSiLIi+of+lL3JlgsNq3AtAlHrcs/8Yzmi1TJwAydVdS8rOHjl
-         g/+t3kc+Oh2AhlML6VdY9Rq6eHaKLT1puPTsygIZgZ6pMcZZYbKegtnx7OqzqLGANx
-         lX3GOssynPhft5NkfaylFmtCIm8fMP/UjBhOYWiBguFVe6CBxYQtZSMauyl6JxYm5L
-         mHfqoAzJXL7Z8c8bR8K+UWETjhqf73kGaCy5Be7RTQFkKsS+6kEURYILsFZLFYQHi+
-         zJqr8AgnQLTkQ==
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Yu Kuai <yukuai3@huawei.com>, Jan Kara <jack@suse.cz>,
-        Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
-        tj@kernel.org, josef@toxicpanda.com, paolo.valente@linaro.org,
-        cgroups@vger.kernel.org, linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.4 08/11] block, bfq: fix null pointer dereference in bfq_bio_bfqg()
-Date:   Fri, 18 Nov 2022 21:15:40 -0500
-Message-Id: <20221119021543.1775315-8-sashal@kernel.org>
-X-Mailer: git-send-email 2.35.1
-In-Reply-To: <20221119021543.1775315-1-sashal@kernel.org>
-References: <20221119021543.1775315-1-sashal@kernel.org>
+        Fri, 18 Nov 2022 21:33:24 -0500
+Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [IPv6:2a03:a000:7:0:5054:ff:fe1c:15ff])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 705EBCB969
+        for <linux-block@vger.kernel.org>; Fri, 18 Nov 2022 18:19:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=linux.org.uk; s=zeniv-20220401; h=Sender:In-Reply-To:Content-Type:
+        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=dIO5XSXejWrRTqUhCAd0BrkP1TqT4A2bGj1dzMsGG9Q=; b=opl/0OFefmq5R8HWbgP6328Cz7
+        MoYq3niZG+n346iue5N3XtbqEK7ccwe9y0QQsYVJztmBOWfBPIKK/uusYPnfm/JmyI+8KMR/+aPa8
+        UDIbYt4Kg9l3mMBn2T2VkmHurSMFPx+01rAL1SabUI7kfnHtrdYu+Uoeyp63JS3/4F99YyUI36Tq1
+        AXysGVnCVsHOShu9hLH/t87vW3/7/ZL0kgVoa856/cjF7ZfbXxW8+hdNAvQrJJuC4wqSjECI/RgFw
+        /3GgmyYRrur5X0uK+r2WLLd9Ezbz26yu/8u6nZF7VbekpeEqakQ3hHJ6DdE3QNiRyJ4QFhDfqf5f3
+        B2EGLvgQ==;
+Received: from viro by zeniv.linux.org.uk with local (Exim 4.96 #2 (Red Hat Linux))
+        id 1owDSK-004xtE-04;
+        Sat, 19 Nov 2022 02:19:44 +0000
+Date:   Sat, 19 Nov 2022 02:19:43 +0000
+From:   Al Viro <viro@zeniv.linux.org.uk>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, Eric Biggers <ebiggers@kernel.org>,
+        linux-block@vger.kernel.org
+Subject: Re: untangle the request_queue refcounting from the queue kobject v2
+Message-ID: <Y3g9P8NB+ubuKaqA@ZenIV>
+References: <20221114042637.1009333-1-hch@lst.de>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221114042637.1009333-1-hch@lst.de>
+Sender: Al Viro <viro@ftp.linux.org.uk>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Yu Kuai <yukuai3@huawei.com>
+On Mon, Nov 14, 2022 at 05:26:32AM +0100, Christoph Hellwig wrote:
+> Hi Jens,
+> 
+> this series cleans up the registration of the "queue/" kobject, and given
+> untangles it from the request_queue refcounting.
+> 
+> Changes since v1:
+>  - also change the blk_crypto_sysfs_unregister prototype
+>  - add two patches to fix the error handling in blk_register_queue
 
-[ Upstream commit f02be9002c480cd3ec0fcf184ad27cf531bd6ece ]
+Umm...  Do we ever want access to queue parameters of the stuff that has
+a queue, but no associated gendisk?  SCSI tape, for example...
 
-Out test found a following problem in kernel 5.10, and the same problem
-should exist in mainline:
+	Re refcounting: AFAICS, blk_mq_alloc_disk_for_queue() is broken.
+__alloc_disk_node() consumes queue reference (and stuffs it into gendisk->queue)
+on success; on failure it leaves the reference alone.  E.g. this
 
-BUG: kernel NULL pointer dereference, address: 0000000000000094
-PGD 0 P4D 0
-Oops: 0000 [#1] SMP
-CPU: 7 PID: 155 Comm: kworker/7:1 Not tainted 5.10.0-01932-g19e0ace2ca1d-dirty 4
-Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS ?-20190727_073836-b4
-Workqueue: kthrotld blk_throtl_dispatch_work_fn
-RIP: 0010:bfq_bio_bfqg+0x52/0xc0
-Code: 94 00 00 00 00 75 2e 48 8b 40 30 48 83 05 35 06 c8 0b 01 48 85 c0 74 3d 4b
-RSP: 0018:ffffc90001a1fba0 EFLAGS: 00010002
-RAX: ffff888100d60400 RBX: ffff8881132e7000 RCX: 0000000000000000
-RDX: 0000000000000017 RSI: ffff888103580a18 RDI: ffff888103580a18
-RBP: ffff8881132e7000 R08: 0000000000000000 R09: ffffc90001a1fe10
-R10: 0000000000000a20 R11: 0000000000034320 R12: 0000000000000000
-R13: ffff888103580a18 R14: ffff888114447000 R15: 0000000000000000
-FS:  0000000000000000(0000) GS:ffff88881fdc0000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000000000094 CR3: 0000000100cdb000 CR4: 00000000000006e0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- bfq_bic_update_cgroup+0x3c/0x350
- ? ioc_create_icq+0x42/0x270
- bfq_init_rq+0xfd/0x1060
- bfq_insert_requests+0x20f/0x1cc0
- ? ioc_create_icq+0x122/0x270
- blk_mq_sched_insert_requests+0x86/0x1d0
- blk_mq_flush_plug_list+0x193/0x2a0
- blk_flush_plug_list+0x127/0x170
- blk_finish_plug+0x31/0x50
- blk_throtl_dispatch_work_fn+0x151/0x190
- process_one_work+0x27c/0x5f0
- worker_thread+0x28b/0x6b0
- ? rescuer_thread+0x590/0x590
- kthread+0x153/0x1b0
- ? kthread_flush_work+0x170/0x170
- ret_from_fork+0x1f/0x30
-Modules linked in:
-CR2: 0000000000000094
----[ end trace e2e59ac014314547 ]---
-RIP: 0010:bfq_bio_bfqg+0x52/0xc0
-Code: 94 00 00 00 00 75 2e 48 8b 40 30 48 83 05 35 06 c8 0b 01 48 85 c0 74 3d 4b
-RSP: 0018:ffffc90001a1fba0 EFLAGS: 00010002
-RAX: ffff888100d60400 RBX: ffff8881132e7000 RCX: 0000000000000000
-RDX: 0000000000000017 RSI: ffff888103580a18 RDI: ffff888103580a18
-RBP: ffff8881132e7000 R08: 0000000000000000 R09: ffffc90001a1fe10
-R10: 0000000000000a20 R11: 0000000000034320 R12: 0000000000000000
-R13: ffff888103580a18 R14: ffff888114447000 R15: 0000000000000000
-FS:  0000000000000000(0000) GS:ffff88881fdc0000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000000000094 CR3: 0000000100cdb000 CR4: 00000000000006e0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+struct gendisk *__blk_mq_alloc_disk(struct blk_mq_tag_set *set, void *queuedata,
+		struct lock_class_key *lkclass)
+{
+	struct request_queue *q;
+	struct gendisk *disk;
 
-Root cause is quite complex:
+	q = blk_mq_init_queue_data(set, queuedata);
+	if (IS_ERR(q))
+		return ERR_CAST(q);
 
-1) use bfq elevator for the test device.
-2) create a cgroup CG
-3) config blk throtl in CG
+// we hold the initial reference to q
+	disk = __alloc_disk_node(q, set->numa_node, lkclass);
+	if (!disk) {
+// __alloc_disk_node() failed, we are still holding q
+		blk_mq_destroy_queue(q);
+		blk_put_queue(q);
+// reference dropped
+		return ERR_PTR(-ENOMEM);
+	}
+	set_bit(GD_OWNS_QUEUE, &disk->state);
+	return disk;
+// ... and on success, the reference is consumed by disk, which is returned to caller
+}
 
-   blkg_conf_prep
-    blkg_create
+is fine; however, this
+struct gendisk *blk_mq_alloc_disk_for_queue(struct request_queue *q,
+		struct lock_class_key *lkclass)
+{
+	if (!blk_get_queue(q))
+		return NULL;
+	return __alloc_disk_node(q, NUMA_NO_NODE, lkclass);
+}
+can't be right - we might fail in blk_get_queue(), returning NULL with
+unchanged refcount, we might succeed and return the new gendisk that
+has consumed the extra reference grabbed by blk_get_queue() *OR*
+we might grab an extra reference, fail in __alloc_disk_node() and
+return NULL with refcount on q bumped.  No way for caller to tell these
+failure modes from each other...  The callers (both sd and sr) treat
+both as "no reference grabbed", i.e. leak the queue refcount if they
+fail past grabbing the queue.
 
-4) create a thread T1 and issue async io in CG:
+Looks like we should drop the queue if __alloc_disk_node() fails.  As in
 
-   bio_init
-    bio_associate_blkg
-   ...
-   submit_bio
-    submit_bio_noacct
-     blk_throtl_bio -> io is throttled
-     // io submit is done
+struct gendisk *blk_mq_alloc_disk_for_queue(struct request_queue *q,
+		struct lock_class_key *lkclass)
+{
+	struct gendisk *disk;
 
-5) switch elevator:
+	if (!blk_get_queue(q))
+		return NULL;
+	disk = __alloc_disk_node(q, NUMA_NO_NODE, lkclass);
+	if (!disk)
+		blk_put_queue(q);
+	return disk;
+}
 
-   bfq_exit_queue
-    blkcg_deactivate_policy
-     list_for_each_entry(blkg, &q->blkg_list, q_node)
-      blkg->pd[] = NULL
-      // bfq policy is removed
-
-5) thread t1 exist, then remove the cgroup CG:
-
-   blkcg_unpin_online
-    blkcg_destroy_blkgs
-     blkg_destroy
-      list_del_init(&blkg->q_node)
-      // blkg is removed from queue list
-
-6) switch elevator back to bfq
-
- bfq_init_queue
-  bfq_create_group_hierarchy
-   blkcg_activate_policy
-    list_for_each_entry_reverse(blkg, &q->blkg_list)
-     // blkg is removed from list, hence bfq policy is still NULL
-
-7) throttled io is dispatched to bfq:
-
- bfq_insert_requests
-  bfq_init_rq
-   bfq_bic_update_cgroup
-    bfq_bio_bfqg
-     bfqg = blkg_to_bfqg(blkg)
-     // bfqg is NULL because bfq policy is NULL
-
-The problem is only possible in bfq because only bfq can be deactivated and
-activated while queue is online, while others can only be deactivated while
-the device is removed.
-
-Fix the problem in bfq by checking if blkg is online before calling
-blkg_to_bfqg().
-
-Signed-off-by: Yu Kuai <yukuai3@huawei.com>
-Reviewed-by: Jan Kara <jack@suse.cz>
-Link: https://lore.kernel.org/r/20221108103434.2853269-1-yukuai1@huaweicloud.com
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- block/bfq-cgroup.c | 4 ++++
- 1 file changed, 4 insertions(+)
-
-diff --git a/block/bfq-cgroup.c b/block/bfq-cgroup.c
-index 09d721b1f6ac..59fd1b10b5f3 100644
---- a/block/bfq-cgroup.c
-+++ b/block/bfq-cgroup.c
-@@ -594,6 +594,10 @@ struct bfq_group *bfq_bio_bfqg(struct bfq_data *bfqd, struct bio *bio)
- 	struct bfq_group *bfqg;
- 
- 	while (blkg) {
-+		if (!blkg->online) {
-+			blkg = blkg->parent;
-+			continue;
-+		}
- 		bfqg = blkg_to_bfqg(blkg);
- 		if (bfqg->online) {
- 			bio_associate_blkg_from_css(bio, &blkg->blkcg->css);
--- 
-2.35.1
-
+Objections?
