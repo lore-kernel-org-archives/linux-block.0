@@ -2,77 +2,77 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B45CFC433FE
-	for <linux-block@archiver.kernel.org>; Sat, 19 Nov 2022 01:14:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6877C4332F
+	for <linux-block@archiver.kernel.org>; Sat, 19 Nov 2022 01:17:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230290AbiKSBOZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 18 Nov 2022 20:14:25 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46614 "EHLO
+        id S230032AbiKSBRr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 18 Nov 2022 20:17:47 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49816 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231745AbiKSBOK (ORCPT
+        with ESMTP id S230058AbiKSBR3 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 18 Nov 2022 20:14:10 -0500
+        Fri, 18 Nov 2022 20:17:29 -0500
 Received: from wnew2-smtp.messagingengine.com (wnew2-smtp.messagingengine.com [64.147.123.27])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5DB416B9EA
-        for <linux-block@vger.kernel.org>; Fri, 18 Nov 2022 16:12:18 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5ED3016811F
+        for <linux-block@vger.kernel.org>; Fri, 18 Nov 2022 16:15:05 -0800 (PST)
 Received: from compute1.internal (compute1.nyi.internal [10.202.2.41])
-        by mailnew.west.internal (Postfix) with ESMTP id 8F2422B05A6B;
-        Fri, 18 Nov 2022 19:11:49 -0500 (EST)
+        by mailnew.west.internal (Postfix) with ESMTP id C803C2B0734F;
+        Fri, 18 Nov 2022 19:15:04 -0500 (EST)
 Received: from mailfrontend2 ([10.202.2.163])
-  by compute1.internal (MEProxy); Fri, 18 Nov 2022 19:11:50 -0500
+  by compute1.internal (MEProxy); Fri, 18 Nov 2022 19:15:05 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=devkernel.io; h=
         cc:cc:content-type:date:date:from:from:in-reply-to:in-reply-to
         :message-id:mime-version:references:reply-to:sender:subject
-        :subject:to:to; s=fm2; t=1668816709; x=1668820309; bh=Zh0+uHjgzY
-        D7ldqTEsbNdbOwiFL6yteWUBYRj+CHcgI=; b=rNSOHdLHJDT+FAS3o7AFaN7RrI
-        U5G3OqxCI6R32QYiSVFC20y/pcozVLtPoaZhBxvqS7FfwL8rm9nB6tqOvUc9B7F0
-        X7+JcHlttK3gXf5BahGK3tyaSf/rHrMscN1K52hP4czWkF11tg8kMn9PEo8DN0xA
-        01fHZReI4WBFk8JqthPiwnR3bwnSrb821N3Udr3ddVE9TBpzl2qcpKGQGkp/GrjR
-        koaiJS2+rji1932HaM0S0rZa7FthmR+5QzMGK70h1F8w6boovmle3KBqMi1iA3Jz
-        yiJsp/Y8ZR4lKrWjJ5p6vh1yRyg8/Ubl9LHmTYcvDbjPGUU4VfWf9Vqx/8yQ==
+        :subject:to:to; s=fm2; t=1668816904; x=1668820504; bh=vYshvlUCFO
+        duyzjRxT5gWAZISjMz1/wRvk7ABmxlu9I=; b=ty47UutXUmggBC8sPvCJzvwpnU
+        A1AhFBWtLmWvCP7feuD9FD90QD5/OMYvWW/3jO/9bSprbT6IhWGQpCM1kSDXGWq8
+        UoHVVyiEejy8069xN5gfbuDcW8wCZeHlunkTjD3l5Hz8nUMY6fAolmQ9b04qpX7v
+        Z2IBsHtS3p0KR9keu5ylbHgcz9C/5YU5MUI4fyrKdLx44aedVW1AgNN18MJFOPNS
+        3kMD2+TFzBGlrNcJXd1WzBlI0rvZA+DpA2JXjvMR5F9+5UZTfi92BeEmp6F7Ch+7
+        8hkRfSH+KKgpr1ZJeSzf+WTBIw+UbfhHiNBimWmSPRHxQy67ctrGUAZZogxA==
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
         messagingengine.com; h=cc:cc:content-type:date:date:feedback-id
         :feedback-id:from:from:in-reply-to:in-reply-to:message-id
         :mime-version:references:reply-to:sender:subject:subject:to:to
         :x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
-        fm1; t=1668816709; x=1668820309; bh=Zh0+uHjgzYD7ldqTEsbNdbOwiFL6
-        yteWUBYRj+CHcgI=; b=o9yHfHMWbXgOisMI++TPg78I9D8JT39PhWE2KJwQ7Xib
-        JBmHJW2/XR0TYJMMFSDezAegORGZW3vgRdDfPZ2km8lBZAPk8PFIZ0ObVrEPERNZ
-        6uLTD1KUMCRgbXfyxyVqvFsf0gQ02wCV01wOHIPPk+kFTtiL+WZJ5QqmMij8Fbym
-        kTXRIAgGCIfucM6a0OYOyqoFdzNc7G6Ji1AktkakqE7GZmCdzbU2eIPxvgARlHU8
-        d+s3NE4r4Kv4dPXdrR54nGCkHE3feu/5JLybsT0zGSqJVNUL9QmpdoXvy111/3Ne
-        ZRoYx9W8QEq40BSbA4NORvdCwF36oUQgSXF4D2zfAg==
-X-ME-Sender: <xms:RB94Y2FIlJnFBeLH65LR4DrcV0YEBGUsKjn4TobFW5LJod4nBCegEw>
-    <xme:RB94Y3UTjLwo1ePSb2pIZyQ-mlVLYqdJeVvRJKTCMky_aFWCWPuaB2jp21J3JuroC
-    Pya4-vEmAxFUkJnkx4>
-X-ME-Received: <xmr:RB94YwK_W34PjLXPtOdKJ-_AH-CmC_9KUK7G2MBrtv6CMm5vAHb7VWhKu9ArLxPfnMza3vLQMC9UdDEC6ojVo-YCcjAxEBMd2qPSs-J_Rg>
+        fm1; t=1668816904; x=1668820504; bh=vYshvlUCFOduyzjRxT5gWAZISjMz
+        1/wRvk7ABmxlu9I=; b=GdCONXenBqlcyDXwVjHol2Ypb+7IIkXigvuT/Q31c9wa
+        X1M3wZIlehmHnySrXW1eoEW15nvT4zzHFLVvEBb4Ju0DQwPQgYy8myr9MLNJdYHK
+        trjlrfhwOw6iO/1h7I5B5JFg5cEpJWpKnyXh1dqGfOMdwZ65yOceHJn2DUK1vH57
+        4Qnq+ZSyiiuzj+EgB8brqyx8bER0b9K/41g7lmmedJ+9Ixlg0tZAGSZ8jtO1D7z0
+        ggGNA2caALUO7D0HHPnZIGFMvOlNHQgbWtgHwATrqm/7sNHBBjfEQq1dUcruFYy8
+        eIZ66vdJBPsaan/bY86hvzxuh0Bf3U6DVYFk9UQMpw==
+X-ME-Sender: <xms:CCB4Y2oCgSdTktmdOQdC0-BpYTphXD9MfTDLyKAve3Vci_ztWTDPLw>
+    <xme:CCB4Y0pfxydkV_M_P-qgE9O2xC8wwGNhb7ENz6LxoPGXg4nH0yiAFAPNPVA5wDz-U
+    _gB8C2PF_qRdi6AuFU>
+X-ME-Received: <xmr:CCB4Y7NmGAtR9DZSMYEwCyddFcmuNdcPkC6njtQ3AaLgoSQcCcJZjPa_42_f-lfXXSyveI8q7OKfLUvXTm4gnulvKFSIYwfQ_BZNyS8O>
 X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvgedrhedugddvtdcutefuodetggdotefrodftvf
     curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
     uegrihhlohhuthemuceftddtnecunecujfgurhepfhgfhffvvefuffgjkfggtgesthdtre
     dttdertdenucfhrhhomhepufhtvghfrghnucftohgvshgthhcuoehshhhrseguvghvkhgv
     rhhnvghlrdhioheqnecuggftrfgrthhtvghrnhepveelgffghfehudeitdehjeevhedthf
-    etvdfhledutedvgeeikeeggefgudeguedtnecuvehluhhsthgvrhfuihiivgeptdenucfr
+    etvdfhledutedvgeeikeeggefgudeguedtnecuvehluhhsthgvrhfuihiivgepudenucfr
     rghrrghmpehmrghilhhfrhhomhepshhhrhesuggvvhhkvghrnhgvlhdrihho
-X-ME-Proxy: <xmx:RB94YwGMZ1FHsUh_IsKxLWqgLyNwCc5WOYWUiD48Rkryp4g1P8w28Q>
-    <xmx:RB94Y8VGD9xJrnhhvZuwFdXAcLiCgHZv5ITPtpmFYSyR5waofdkkBA>
-    <xmx:RB94YzO8mAAB8xknEB7xCcmeYbftr51PJxTEmGl7vyDuXhNCgT2KQg>
-    <xmx:RR94Y-KHmP7d6_yHpoGS1kE2VfZIIaALbAbVfk-uZSK5HdBrMuoZnBVsYrc>
+X-ME-Proxy: <xmx:CCB4Y174j9F71bSXxPYehUB6TAVZMyE7rV1fjYDrf5aTiA2pq2kGgA>
+    <xmx:CCB4Y174XEqD6meOzzi5Jggh63WH-aU33fw8Pq-YwguAPiXhW0aoQw>
+    <xmx:CCB4Y1jQSCxLzQH8K52eUZAh_Dpaqe-X4RljFEyjFPuoroqah64gnA>
+    <xmx:CCB4YyvWO41ta4Y5H-QDpO8bxZrZqwbgzXK3evLYsUP22VILjExbwNzaELM>
 Feedback-ID: i84614614:Fastmail
 Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
- 18 Nov 2022 19:11:48 -0500 (EST)
+ 18 Nov 2022 19:15:03 -0500 (EST)
 References: <20221024190603.3987969-1-shr@devkernel.io>
- <20221024190603.3987969-6-shr@devkernel.io>
- <20221116132904.516884bc7eec135cfcd326a7@linux-foundation.org>
+ <20221024190603.3987969-8-shr@devkernel.io>
+ <20221116132913.7105e98f7c7111f87ad37797@linux-foundation.org>
 User-agent: mu4e 1.6.11; emacs 28.2.50
 From:   Stefan Roesch <shr@devkernel.io>
 To:     Andrew Morton <akpm@linux-foundation.org>
 Cc:     kernel-team@fb.com, linux-block@vger.kernel.org,
         linux-mm@kvack.org, axboe@kernel.dk, clm@meta.com,
         willy@infradead.org, hch@infradead.org
-Subject: Re: [RFC PATCH v3 05/14] mm: add bdi_get_max_bytes() function
-Date:   Fri, 18 Nov 2022 16:10:43 -0800
-In-reply-to: <20221116132904.516884bc7eec135cfcd326a7@linux-foundation.org>
-Message-ID: <qvqwo7t39519.fsf@dev0134.prn3.facebook.com>
+Subject: Re: [RFC PATCH v3 07/14] mm: add bdi_set_max_bytes() function.
+Date:   Fri, 18 Nov 2022 16:14:33 -0800
+In-reply-to: <20221116132913.7105e98f7c7111f87ad37797@linux-foundation.org>
+Message-ID: <qvqwk03r94vt.fsf@dev0134.prn3.facebook.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Precedence: bulk
@@ -82,31 +82,16 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 Andrew Morton <akpm@linux-foundation.org> writes:
 
-> On Mon, 24 Oct 2022 12:05:54 -0700 Stefan Roesch <shr@devkernel.io> wrote:
+> On Mon, 24 Oct 2022 12:05:56 -0700 Stefan Roesch <shr@devkernel.io> wrote:
 >
->> This adds a function to return the specified value for max_bytes. It
->> converts the stored max_ratio of the bdi to the corresponding bytes
->> value. It introduces the bdi_get_bytes helper function to do the
->> conversion. This is an approximation as it is based on the value that is
->> returned by global_dirty_limits(), which can change. The helper function
->> will also be used by the min_bytes bdi knob.
+>> This introduces the bdi_set_max_bytes() function. The max_bytes function
+>> does not store the max_bytes value. Instead it converts the max_bytes
+>> value into the corresponding ratio value.
 >>
->> --- a/include/linux/backing-dev.h
->> +++ b/include/linux/backing-dev.h
->> @@ -105,6 +105,7 @@ static inline unsigned long wb_stat_error(void)
->>  /* BDI ratio is expressed as part per 1000 for finer granularity. */
->>  #define BDI_RATIO_SCALE 10
+>> ...
 >>
->> +unsigned long long bdi_get_max_bytes(struct backing_dev_info *bdi);
+>> +EXPORT_SYMBOL_GPL(bdi_set_max_bytes);
 >
-> We don't use unsigned long long much.  If you want a 64-bit unsigned,
-> use u64?
->
+> Is this needed?
 
-The next version will use u64.
-
->> +EXPORT_SYMBOL_GPL(bdi_get_max_bytes);
->
-> Is this symbol to be used by modules?
-
-The next version will remove the export.
+I removed the export in the next version.
