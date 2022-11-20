@@ -2,196 +2,111 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9574BC4332F
-	for <linux-block@archiver.kernel.org>; Sun, 20 Nov 2022 07:29:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7CE89C433FE
+	for <linux-block@archiver.kernel.org>; Sun, 20 Nov 2022 12:47:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229543AbiKTH3e (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 20 Nov 2022 02:29:34 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57896 "EHLO
+        id S229490AbiKTMrr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 20 Nov 2022 07:47:47 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38108 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229542AbiKTH3c (ORCPT
+        with ESMTP id S229455AbiKTMrq (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 20 Nov 2022 02:29:32 -0500
-Received: from mail-ej1-x632.google.com (mail-ej1-x632.google.com [IPv6:2a00:1450:4864:20::632])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A43111ADA6
-        for <linux-block@vger.kernel.org>; Sat, 19 Nov 2022 23:29:31 -0800 (PST)
-Received: by mail-ej1-x632.google.com with SMTP id me22so5634177ejb.8
-        for <linux-block@vger.kernel.org>; Sat, 19 Nov 2022 23:29:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=to:references:message-id:content-transfer-encoding:cc:date
-         :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ZhaA28SrbPMMmFWQjGS1ZDklxowb9TkOu4xMxzc8d8s=;
-        b=THTybPzTOccPoBPrtNh/yFrEN8Fn3JOm27nd3lag4ZfqVRfRnBT2SzHjZsifyLRLLC
-         Dl7XIGh8hMZOmmq4BkRdMctUfNnUkX0WSPdpZb4VI6BeaWAPV3FLLOQxaBAIi6C7svFR
-         QKlfkp9s2XLfqo50f7b45ZQUAYUTkFFpS38Mtpt8xp9gSSjcWNVGw1lnGzpdT79zSOT9
-         Sn1DTf+W4vJDBKO5kYHQ0bkBozIbwk5rACSJCS8EdMHkzLqzsqtF7HNRq0W5dm0AoZe5
-         ybKImoUBHS2wqpBuD0d8c2UiqajIZ2l59z+Dhrg623CEd1m8aJA44xdisMr0Wl8fWxNm
-         eK/w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=to:references:message-id:content-transfer-encoding:cc:date
-         :in-reply-to:from:subject:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ZhaA28SrbPMMmFWQjGS1ZDklxowb9TkOu4xMxzc8d8s=;
-        b=bKrZKxcvFpfMS2Jfj8hd9Ef2H2U3ompTPPYjMb1V7PXKGE69TwzAMBzQ1GXeUH0N8B
-         13Gdb2WpDOXMRCiidRwVq++gOclCr+2uLkpJZaKGldQ15NnA+nRpcjd/zj1/BSPCwcE+
-         lTHe4cOOVKOi+1Y4/MgukaTgqXGr2BLPQXe6piLaY9ee0RBLbBeRcCB4C5mNXTGJJrq4
-         VMNACYG2QW/5N4GGTiFD3tldl9jobU81/3UDvxfL8VvlfmMaSPNgjn9YxS3txc+FLhIa
-         PsdcVR48rOdkeHkr6yBlk8FgLwcGxt3oGQ8DHAN5mWifeXpdkNdQADgGKLgq6+J1Jt66
-         02gA==
-X-Gm-Message-State: ANoB5pk5eVtBG/LzEbhWswTNE36mQtmDv9iocX8guOzL94uGBPMK2a4b
-        D3cKEsKImh4/iZDg11ZeieL6Bw==
-X-Google-Smtp-Source: AA0mqf5opWFpeAqRtfpfduqQL0eR4TzB+zc8IRQD96xlLhkkOIOElywDwZ1p/u4yl+uIZ2c3eLTgpg==
-X-Received: by 2002:a17:906:8d86:b0:78d:4742:bb62 with SMTP id ry6-20020a1709068d8600b0078d4742bb62mr443963ejc.43.1668929370113;
-        Sat, 19 Nov 2022 23:29:30 -0800 (PST)
-Received: from [192.168.0.13] ([83.216.184.132])
-        by smtp.gmail.com with ESMTPSA id 12-20020a170906300c00b0078194737761sm3670640ejz.124.2022.11.19.23.29.29
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Sat, 19 Nov 2022 23:29:29 -0800 (PST)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
-Subject: Re: [PATCH V6 8/8] block, bfq: balance I/O injection among
- underutilized actuators
-From:   Paolo Valente <paolo.valente@linaro.org>
-In-Reply-To: <PH7PR20MB5058FFC62E46AB2AE3AB0F38F1019@PH7PR20MB5058.namprd20.prod.outlook.com>
-Date:   Sun, 20 Nov 2022 08:29:27 +0100
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Rory Chen <rory.c.chen@seagate.com>,
-        Davide Zini <davidezini2@gmail.com>,
-        Damien Le Moal <damien.lemoal@opensource.wdc.com>
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <FB99E53F-886D-4193-9B38-32452E70A35B@linaro.org>
-References: <20221103162623.10286-1-paolo.valente@linaro.org>
- <20221103162623.10286-9-paolo.valente@linaro.org>
- <PH7PR20MB5058FFC62E46AB2AE3AB0F38F1019@PH7PR20MB5058.namprd20.prod.outlook.com>
-To:     Arie van der Hoeven <arie.vanderhoeven@seagate.com>
-X-Mailer: Apple Mail (2.3445.104.11)
+        Sun, 20 Nov 2022 07:47:46 -0500
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE0CD2BC3;
+        Sun, 20 Nov 2022 04:47:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+        Content-ID:Content-Description:In-Reply-To:References;
+        bh=OSHVCyrxQkeV4gAG1qYXat9Mie+lxTI3guPqxQgb2Qw=; b=wCXRUYXWhmDyQR6TNc8Fk6q8PS
+        ZVGPlebSHl2PkwGiHUZClQ1b10S1Jt4oGFIRH5IgTvs+fCa2k/VOq77ukY+N7EAVlNVkFk7NtGYww
+        +S1zBaZW2HXJqHYFPHP8KfIkQSRD/aIZL3UkXMbGXCXqLQGQ/sENRzUUx+eFHTyX6cZqYJ9gz+qNb
+        21hJKd8Q2tZhh10jPN0M/CWz6Xyv9Ho+/rb0I8QAesuETqFQvgVN1QMcuLPXfroxiC+cHgpEsD/Qm
+        04I1ZBujqOlki3bMtKL4YZKd3VVge+rBE+c3KnDQ59OdpH8WY+skbamYKa+56LK4fHjKGHYJ2JZri
+        xzFy2t3Q==;
+Received: from [2001:4bb8:181:6f70:ae5d:6675:76b9:6fc3] (helo=localhost)
+        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1owjjU-004I4U-NT; Sun, 20 Nov 2022 12:47:37 +0000
+From:   Christoph Hellwig <hch@lst.de>
+To:     Chris Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>,
+        David Sterba <dsterba@suse.com>
+Cc:     Damien Le Moal <damien.lemoal@wdc.com>,
+        Naohiro Aota <naohiro.aota@wdc.com>,
+        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+        Qu Wenruo <wqu@suse.com>, Jens Axboe <axboe@kernel.dk>,
+        "Darrick J. Wong" <djwong@kernel.org>, linux-block@vger.kernel.org,
+        linux-btrfs@vger.kernel.org, linux-fsdevel@vger.kernel.org
+Subject: consolidate btrfs checksumming, repair and bio splitting v2
+Date:   Sun, 20 Nov 2022 13:47:15 +0100
+Message-Id: <20221120124734.18634-1-hch@lst.de>
+X-Mailer: git-send-email 2.30.2
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Hi all,
 
+this series moves a large amount of duplicate code below btrfs_submit_bio
+into what I call the 'storage' layer.  Instead of duplicating code to
+checksum, check checksums and repair and split bios in all the caller
+of btrfs_submit_bio (buffered I/O, direct I/O, compressed I/O, encoded
+I/O), the work is done one in a central place, often more optiomal and
+without slight changes in behavior.  Once that is done the upper layers
+also don't need to split the bios for extent boundaries, as the storage
+layer can do that itself, including splitting the bios for the zone
+append limits for zoned I/O.
 
-> Il giorno 10 nov 2022, alle ore 16:25, Arie van der Hoeven =
-<arie.vanderhoeven@seagate.com> ha scritto:
->=20
-> Checking in on this series and what we can communicate to partners as =
-to potential integration into Linux.  Is 6.1 viable?
+The split work is inspired by an earlier series from Qu, from which it
+also reuses a few patches.
 
-Hi Arie,
-definitely too late for 6.1.
+The rebasing against the latest misc-next was a bit painful due to the
+various large cleanups, but very little logic changed, so I've kept the
+review tags for now, but I'd appreciated another careful round of eyes.
 
-Jens, could you enqueue this for 6.2?  Unless Damien, or anybody else
-still sees issues to address.
+A git tree is also available:
 
-Thanks,
-Paolo
+    git://git.infradead.org/users/hch/misc.git btrfs-bio-split
 
->=20
-> We have at least one big partner whose launch schedule is gated on =
-these changes.
->=20
-> Regards,  --Arie
->=20
->=20
-> From: Paolo Valente <paolo.valente@linaro.org>
-> Sent: Thursday, November 3, 2022 9:26 AM
-> To: Jens Axboe <axboe@kernel.dk>
-> Cc: linux-block@vger.kernel.org <linux-block@vger.kernel.org>; =
-linux-kernel@vger.kernel.org <linux-kernel@vger.kernel.org>; Arie van =
-der Hoeven <arie.vanderhoeven@seagate.com>; Rory Chen =
-<rory.c.chen@seagate.com>; Davide Zini <davidezini2@gmail.com>; Paolo =
-Valente <paolo.valente@linaro.org>
-> Subject: [PATCH V6 8/8] block, bfq: balance I/O injection among =
-underutilized actuators
->=20
->=20
-> This message has originated from an External Source. Please use proper =
-judgment and caution when opening attachments, clicking links, or =
-responding to this email.
->=20
->=20
-> From: Davide Zini <davidezini2@gmail.com>
->=20
-> Upon the invocation of its dispatch function, BFQ returns the next I/O
-> request of the in-service bfq_queue, unless some exception holds. One
-> such exception is that there is some underutilized actuator, different
-> from the actuator for which the in-service queue contains I/O, and
-> that some other bfq_queue happens to contain I/O for such an
-> actuator. In this case, the next I/O request of the latter bfq_queue,
-> and not of the in-service bfq_queue, is returned (I/O is injected from
-> that bfq_queue). To find such an actuator, a linear scan, in
-> increasing index order, is performed among actuators.
->=20
-> Performing a linear scan entails a prioritization among actuators: an
-> underutilized actuator may be considered for injection only if all
-> actuators with a lower index are currently fully utilized, or if there
-> is no pending I/O for any lower-index actuator that happens to be
-> underutilized.
->=20
-> This commits breaks this prioritization and tends to distribute
-> injection uniformly across actuators. This is obtained by adding the
-> following condition to the linear scan: even if an actuator A is
-> underutilized, A is however skipped if its load is higher than that of
-> the next actuator.
->=20
-> Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
-> Signed-off-by: Davide Zini <davidezini2@gmail.com>
-> ---
-> block/bfq-iosched.c | 18 +++++++++++++-----
-> 1 file changed, 13 insertions(+), 5 deletions(-)
->=20
-> diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-> index db91f1a651d3..c568a5a112a7 100644
-> --- a/block/bfq-iosched.c
-> +++ b/block/bfq-iosched.c
-> @@ -4813,10 +4813,16 @@ bfq_find_active_bfqq_for_actuator(struct =
-bfq_data *bfqd,
->=20
-> /*
->  * Perform a linear scan of each actuator, until an actuator is found
-> - * for which the following two conditions hold: the load of the
-> - * actuator is below the threshold (see comments on =
-actuator_load_threshold
-> - * for details), and there is a queue that contains I/O for that
-> - * actuator. On success, return that queue.
-> + * for which the following three conditions hold: the load of the
-> + * actuator is below the threshold (see comments on
-> + * actuator_load_threshold for details) and lower than that of the
-> + * next actuator (comments on this extra condition below), and there
-> + * is a queue that contains I/O for that actuator. On success, return
-> + * that queue.
-> + *
-> + * Performing a plain linear scan entails a prioritization among
-> + * actuators. The extra condition above breaks this prioritization =
-and
-> + * tends to distribute injection uniformly across actuators.
->  */
-> static struct bfq_queue *
-> bfq_find_bfqq_for_underused_actuator(struct bfq_data *bfqd)
-> @@ -4824,7 +4830,9 @@ bfq_find_bfqq_for_underused_actuator(struct =
-bfq_data *bfqd)
->        int i;
->=20
->        for (i =3D 0 ; i < bfqd->num_actuators; i++)
-> -               if (bfqd->rq_in_driver[i] < =
-bfqd->actuator_load_threshold) {
-> +               if (bfqd->rq_in_driver[i] < =
-bfqd->actuator_load_threshold &&
-> +                   (i =3D=3D bfqd->num_actuators - 1 ||
-> +                    bfqd->rq_in_driver[i] < bfqd->rq_in_driver[i+1])) =
-{
->                        struct bfq_queue *bfqq =3D
->                                bfq_find_active_bfqq_for_actuator(bfqd, =
-i);
->=20
-> --
-> 2.20.1
->=20
-> Seagate Internal
+Gitweb:
 
+    http://git.infradead.org/users/hch/misc.git/shortlog/refs/heads/btrfs-bio-split
+
+Changes since v1:
+ - rebased to latest btrfs/misc-next
+ - added a new patch to remove the fs_info argument to btrfs_submit_bio
+ - clean up the repair_one_sector calling convention a bit
+ - don't move file_offset for ONE_ORDERED bios in btrfs_split_bio
+ - temporarily use btrfs_zoned_get_device in alloc_compressed_bio
+ - minor refactoring of some of the checksum helpers
+ - split up a few patches
+ - drop a few of the blk_status_t to int conversion for now
+ - various whitespace fixes
+
+Diffstat:
+ block/blk-merge.c         |    3 
+ fs/btrfs/bio.c            |  547 ++++++++++++++++++++++++++++++++++++----
+ fs/btrfs/bio.h            |   67 +---
+ fs/btrfs/btrfs_inode.h    |   22 -
+ fs/btrfs/compression.c    |  273 +++-----------------
+ fs/btrfs/compression.h    |    3 
+ fs/btrfs/disk-io.c        |  199 +-------------
+ fs/btrfs/disk-io.h        |   11 
+ fs/btrfs/extent-io-tree.h |    1 
+ fs/btrfs/extent_io.c      |  554 +++--------------------------------------
+ fs/btrfs/extent_io.h      |   31 --
+ fs/btrfs/file-item.c      |   74 +----
+ fs/btrfs/file-item.h      |    8 
+ fs/btrfs/fs.h             |    5 
+ fs/btrfs/inode.c          |  621 ++++++----------------------------------------
+ fs/btrfs/volumes.c        |  115 ++------
+ fs/btrfs/volumes.h        |   18 -
+ fs/btrfs/zoned.c          |   85 ++----
+ fs/btrfs/zoned.h          |   16 -
+ fs/iomap/direct-io.c      |   10 
+ include/linux/bio.h       |    4 
+ include/linux/iomap.h     |    1 
+ 22 files changed, 817 insertions(+), 1851 deletions(-)
