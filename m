@@ -2,109 +2,121 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 94DA0C433FE
-	for <linux-block@archiver.kernel.org>; Sat, 19 Nov 2022 16:03:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 43787C4332F
+	for <linux-block@archiver.kernel.org>; Sun, 20 Nov 2022 03:14:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230180AbiKSQDg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 19 Nov 2022 11:03:36 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54472 "EHLO
+        id S229533AbiKTDOd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 19 Nov 2022 22:14:33 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53202 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229689AbiKSQDe (ORCPT
+        with ESMTP id S229455AbiKTDOd (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 19 Nov 2022 11:03:34 -0500
-Received: from fudo.makrotopia.org (fudo.makrotopia.org [IPv6:2a07:2ec0:3002::71])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42CB7167E6;
-        Sat, 19 Nov 2022 08:03:32 -0800 (PST)
-Received: from local
-        by fudo.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-         (Exim 4.94.2)
-        (envelope-from <daniel@makrotopia.org>)
-        id 1owQJG-0004Da-58; Sat, 19 Nov 2022 17:03:14 +0100
-Date:   Sat, 19 Nov 2022 16:03:11 +0000
-From:   Daniel Golle <daniel@makrotopia.org>
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     Richard Weinberger <richard@nod.at>,
-        Matthew Wilcox <willy@infradead.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        Wolfram Sang <wsa+renesas@sang-engineering.com>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH 1/4] init: move block device helpers from
- init/do_mounts.c
-Message-ID: <Y3j+Pzy1JpqG8Yd8@makrotopia.org>
-References: <cover.1668644705.git.daniel@makrotopia.org>
- <e5e0ab0429b1fc8a4e3f9614d2d1cc43dea78093.1668644705.git.daniel@makrotopia.org>
- <Y3XM62P7CaeKXFsz@infradead.org>
+        Sat, 19 Nov 2022 22:14:33 -0500
+Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [IPv6:2a03:a000:7:0:5054:ff:fe1c:15ff])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A6799A26D;
+        Sat, 19 Nov 2022 19:14:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=linux.org.uk; s=zeniv-20220401; h=Sender:Content-Type:MIME-Version:
+        Message-ID:Subject:Cc:To:From:Date:Reply-To:Content-Transfer-Encoding:
+        Content-ID:Content-Description:In-Reply-To:References;
+        bh=KMKfHSu6apMfgPIdOsoq6k6Aa8UTe85BtVoAlZrfyCo=; b=dQDm+gAL6Ya9r/NBfrRe24ehIm
+        +QVWG74pU7HAq25XAVQqTOeQX0uKd10tvkGW3my5ZPHa7xvq1HlXPpYGO2RXEtWww2K7KhBWqi+wN
+        lPg+iSKN5PqBetBVLGKBlPrs0dtg9jUyQoAcYh8VDYeCvMbIJdQbznxZRMPuD5XHD1StGyd9lsTsM
+        dTUxoPiZUcOftCTJTFOCJbhN4ZwL1jEeeiih7hHxNTzXix+HHO0uUYJjtamYtxzH6yLwJz2nKqDi1
+        TssUtkKrUg1jKAZox1VIQirYMBSnebcdLDxf8Nrv2eV182VDDHOMrfzsJJCRON4LyPSExpyvu0YZw
+        iXAfjpHQ==;
+Received: from viro by zeniv.linux.org.uk with local (Exim 4.96 #2 (Red Hat Linux))
+        id 1owamn-005CZ0-1o;
+        Sun, 20 Nov 2022 03:14:25 +0000
+Date:   Sun, 20 Nov 2022 03:14:25 +0000
+From:   Al Viro <viro@zeniv.linux.org.uk>
+To:     linux-block@vger.kernel.org
+Cc:     linux-scsi@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        FUJITA Tomonori <fujita.tomonori@lab.ntt.co.jp>
+Subject: [PATCH][RFC] fix a race between bsg_open() and bsg_unregister_queue()
+Message-ID: <Y3mbkZCESLLRMQNq@ZenIV>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Y3XM62P7CaeKXFsz@infradead.org>
+Sender: Al Viro <viro@ftp.linux.org.uk>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Christoph,
+	Consider the following scenario:
 
-On Wed, Nov 16, 2022 at 09:55:55PM -0800, Christoph Hellwig wrote:
-> On Thu, Nov 17, 2022 at 12:42:43AM +0000, Daniel Golle wrote:
-> > In init/do_mounts.c there are helper functions devt_from_partuuid,
-> > devt_from_partlabel and devt_from_devname. In order to make these
-> > functions available to other users, move them to block/bdev.c.
-> 
-> Yes, they should be moved and I have an old patch to do this a bit
-> smarter.  But that doesn't mean anyone else should call them.
+task A: open() on /dev/bsg/<something>
+	calls chrdev_open()
+	finds and grabs a reference to bsg_device.cdev in inode->i_cdev
+	refcount on that cdev is 2 now (1 from creation + 1 we'd just grabbed)
+	calls bsg_open().
+	fetches to_bsg_device(inode)->queue - that would be ->queue in the
+	same bsg_device instance.
+	gets preempted away and loses CPU before it gets to calling blk_get_queue().
 
-I have followed your advise and implemented a "real" block driver
-stacking on top of an existing block device to expose uImage.FIT
-filesystem subimages as block devices. It mangles any bio submitted to
-it and re-submits the bio with changed bi_bdev and sector offset added
-to bi_iter.bi_sector for all list elements.
+task B: calls bsg_unregister_queue() on the same queue, which calls
+	cdev_device_del(), which makes cdev impossible to look up and
+	drops the reference to that cdev; refcount is 1 now, so nothing gets
+	freed yet.
+	caller of bsg_unregister_queue() proceeds to destroy the queue and
+	free it, allowing reuse of memory that used to contain it.
 
-That works, but has slightly less utility value than the partition
-parser approach as in this way I cannot easily populate the PARTNAME
-uevent which can later help userspace to identify a device by the FIT
-subimage name -- I'd have to either invent a new bus_type or
-device_type, both seem inappropriate and have unwanted side effects.
-Or am I missing something and there is a way to use add_uevent_var()
-for a disk_type device?
+task A: regains CPU
+	calls blk_get_queue() on something that no longer points to
+	a request_queue instance.  In particular, "dying" flag is no longer
+	guaranteed to be there, so we proceed to increment what we think is
+	a queue refcount, corrupting whatever lives in that memory now.
 
-In exchange, instead of using the PARTNAME= uevent var, I can now
-freely name the device node by setting the disk_name string in
-struct gendisk. While this doesn't offer the same amount of freedom, it
-is sufficient for our use-case.
+Usually we'll end up with memory not reused yet, and blk_get_queue() will
+fail without buggering anything up.  Not guaranteed, though...
 
-However, I don't see a way to avoid using (or duplicating)
-devt_from_devname() to select the lower device somehow without having
-to probe and parse *all* block devices present (which is, from what I
-understood, what you want to avoid, and I agree that it is more safe to
-not do that...)
+AFAICS, the fact that request_queue freeing is RCU-delayed means that
+it can be fixed by the following:
+	* mark bsg_device on bsg_unregister_queue() as goner
+	* have bsg_open() do rcu_read_lock(), then check that flag and do
+blk_get_queue() only if the flag hadn't been set yet.  If we did not observe
+the flag after rcu_read_lock(), we know that queue have been freed yet
+- RCU delay couldn't have run out.
 
-Can you or anyone give some advise on how this should be done?
+Comments?
 
-As block partitions are not present in device tree, using a cmdline
-argument (with similar semantics to 'root=') specifying the lower block
-device seems unavoidable.
-
-Also note that due to libfdt not exporting symbols, the driver
-currently cannot be built as a module. Hence, I would either need to
-export most of libfdt API or only allow the driver to be built-into the
-kernel. I don't see a problem with having it always built-in.
-
-Yet another (imho not terrible) problem is removal of the lower device.
-Many of the supported SBC use a micro SD card to boot, which can be
-removed by the user while the system is running (which is generally not
-a good idea, but anyway). For partitions this is handled automatically
-by blk_drop_partitions() called directly from genhd.c.
-I'm currently playing with doing something similar using the bus device
-removal notification, but it doesn't seem to work for all cases, e.g.
-mmcblk device do not seem to have the ->bus pointer populated at all
-(ie. disk_to_dev(disk)->bus == NULL for mmcblk devices).
-
-Any ideas regarding that?
-
-
-Thank you for your advise!
-
-
-Daniel
+Signed-off-by: Al Viro <viro@zeniv.linux.org.uk>
+---
+diff --git a/block/bsg.c b/block/bsg.c
+index 2ab1351eb082..643641087691 100644
+--- a/block/bsg.c
++++ b/block/bsg.c
+@@ -28,6 +28,7 @@ struct bsg_device {
+ 	unsigned int timeout;
+ 	unsigned int reserved_size;
+ 	bsg_sg_io_fn *sg_io_fn;
++	bool goner;
+ };
+ 
+ static inline struct bsg_device *to_bsg_device(struct inode *inode)
+@@ -71,9 +72,14 @@ static int bsg_sg_io(struct bsg_device *bd, fmode_t mode, void __user *uarg)
+ 
+ static int bsg_open(struct inode *inode, struct file *file)
+ {
+-	if (!blk_get_queue(to_bsg_device(inode)->queue))
+-		return -ENXIO;
+-	return 0;
++	struct bsg_device *bd = to_bsg_device(inode);
++	int err = 0;
++
++	rcu_read_lock();
++	if (bd->goner || !blk_get_queue(bd->queue))
++		err = -ENXIO;
++	rcu_read_unlock();
++	return err;
+ }
+ 
+ static int bsg_release(struct inode *inode, struct file *file)
+@@ -175,6 +181,7 @@ static void bsg_device_release(struct device *dev)
+ 
+ void bsg_unregister_queue(struct bsg_device *bd)
+ {
++	bd->goner = true;
+ 	if (bd->queue->kobj.sd)
+ 		sysfs_remove_link(&bd->queue->kobj, "bsg");
+ 	cdev_device_del(&bd->cdev, &bd->device);
