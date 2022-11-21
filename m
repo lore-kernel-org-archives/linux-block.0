@@ -2,103 +2,48 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93267C4332F
-	for <linux-block@archiver.kernel.org>; Mon, 21 Nov 2022 11:58:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A84DC4332F
+	for <linux-block@archiver.kernel.org>; Mon, 21 Nov 2022 13:19:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231210AbiKUL6K (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 21 Nov 2022 06:58:10 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57338 "EHLO
+        id S229533AbiKUNTI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 21 Nov 2022 08:19:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56994 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230438AbiKUL6J (ORCPT
+        with ESMTP id S229885AbiKUNTH (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 21 Nov 2022 06:58:09 -0500
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 166ABCC5
-        for <linux-block@vger.kernel.org>; Mon, 21 Nov 2022 03:58:01 -0800 (PST)
-Received: from dggpemm500024.china.huawei.com (unknown [172.30.72.56])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4NG5QQ5c87zqSYr;
-        Mon, 21 Nov 2022 19:54:06 +0800 (CST)
-Received: from dggpemm500015.china.huawei.com (7.185.36.181) by
- dggpemm500024.china.huawei.com (7.185.36.203) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31; Mon, 21 Nov 2022 19:58:00 +0800
-Received: from [10.174.177.133] (10.174.177.133) by
- dggpemm500015.china.huawei.com (7.185.36.181) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31; Mon, 21 Nov 2022 19:57:59 +0800
-Subject: Re: [PATCH] drbd: destroy workqueue when drbd device was freed
-To:     =?UTF-8?Q?Christoph_B=c3=b6hmwalder?= 
-        <christoph.boehmwalder@linbit.com>
-CC:     <liwei391@huawei.com>, <linux-block@vger.kernel.org>,
-        <drbd-dev@lists.linbit.com>, <axboe@kernel.dk>
-References: <20221121111138.3665586-1-bobo.shaobowang@huawei.com>
- <3603e71c-cd9d-fd27-7c52-1eed263e8717@linbit.com>
-From:   "Wangshaobo (bobo)" <bobo.shaobowang@huawei.com>
-Message-ID: <ff347eb2-d36a-480c-8de7-cb01a2ee35e0@huawei.com>
-Date:   Mon, 21 Nov 2022 19:57:53 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.0
+        Mon, 21 Nov 2022 08:19:07 -0500
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA35575D86
+        for <linux-block@vger.kernel.org>; Mon, 21 Nov 2022 05:19:06 -0800 (PST)
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id 5853B68CFE; Mon, 21 Nov 2022 14:19:03 +0100 (CET)
+Date:   Mon, 21 Nov 2022 14:19:03 +0100
+From:   Christoph Hellwig <hch@lst.de>
+To:     Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Cc:     Christoph Hellwig <hch@lst.de>,
+        "axboe@kernel.dk" <axboe@kernel.dk>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "kch@nvidia.com" <kch@nvidia.com>
+Subject: Re: [PATCH 2/2] blk-mq: simplify blk_mq_realloc_tag_set_tags
+Message-ID: <20221121131903.GA15981@lst.de>
+References: <20221109100811.2413423-1-hch@lst.de> <20221109100811.2413423-2-hch@lst.de> <20221118140640.featvt3fxktfquwh@shindev> <20221121075857.GA24878@lst.de> <20221121111442.qxyqtsac2bhzhyjd@shindev>
 MIME-Version: 1.0
-In-Reply-To: <3603e71c-cd9d-fd27-7c52-1eed263e8717@linbit.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.174.177.133]
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- dggpemm500015.china.huawei.com (7.185.36.181)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221121111442.qxyqtsac2bhzhyjd@shindev>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Mon, Nov 21, 2022 at 11:14:44AM +0000, Shinichiro Kawasaki wrote:
+> Thanks, this fix is the better. And I reconfirmed it avoids the block/029 and
+> block/030 failures.
+> 
+> I guess it is too late for Jens to fold-in this fix in the for-next branch.
+> Christoph, would you prepare a formal fix patch? Or if it helps, I can send out
+> the patch with your authorship and SoB tag (with Co-developed-by tag of mine).
 
-在 2022/11/21 19:51, Christoph Böhmwalder 写道:
-> Am 21.11.22 um 12:11 schrieb Wang ShaoBo:
->> A submitter workqueue is dynamically allocated by init_submitter()
->> called by drbd_create_device(), we should destroy it when this
->> device was not needed or destroyed.
->>
->> Fixes: 113fef9e20e0 ("drbd: prepare to queue write requests on a submit worker")
->> Signed-off-by: Wang ShaoBo <bobo.shaobowang@huawei.com>
->> ---
->>   drivers/block/drbd/drbd_main.c | 5 +++++
->>   1 file changed, 5 insertions(+)
->>
->> diff --git a/drivers/block/drbd/drbd_main.c b/drivers/block/drbd/drbd_main.c
->> index 8532b839a343..467c498e3add 100644
->> --- a/drivers/block/drbd/drbd_main.c
->> +++ b/drivers/block/drbd/drbd_main.c
->> @@ -2218,6 +2218,9 @@ void drbd_destroy_device(struct kref *kref)
->>   		kfree(peer_device);
->>   	}
->>   	memset(device, 0xfd, sizeof(*device));
->> +
->> +	if (device->submit.wq)
->> +		destroy_workqueue(device->submit.wq);
->>   	kfree(device);
->>   	kref_put(&resource->kref, drbd_destroy_resource);
->>   }
->> @@ -2810,6 +2813,8 @@ enum drbd_ret_code drbd_create_device(struct drbd_config_context *adm_ctx, unsig
->>   	put_disk(disk);
->>   out_no_disk:
->>   	kref_put(&resource->kref, drbd_destroy_resource);
->> +	if (device->submit.wq)
->> +		destroy_workqueue(device->submit.wq);
->>   	kfree(device);
->>   	return err;
->>   }
-> Thanks for the patch.
->
-> Unfortunately, (at least) the first hunk is buggy: we memset() the
-> device to all 0xfd, and try to access it immediately afterwards.
->
-> This obviously leads to invalid memory access.
-
-Hi Christoph,
-
-I found that error, so I have sent a RESEND version, i would be appreciated
-
-if you could help check my patch.^-^
-
--- Wang ShaoBo
-
->
+I can send the patch.  But I'd also be perfectly happy with you
+sending it as the auther, as my version is just a tiny incremental
+cleanup.
