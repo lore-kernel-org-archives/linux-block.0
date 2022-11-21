@@ -2,62 +2,66 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46FA9C4332F
-	for <linux-block@archiver.kernel.org>; Mon, 21 Nov 2022 07:59:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 66237C433FE
+	for <linux-block@archiver.kernel.org>; Mon, 21 Nov 2022 08:03:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229613AbiKUH7C (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 21 Nov 2022 02:59:02 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35926 "EHLO
+        id S229747AbiKUIDW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 21 Nov 2022 03:03:22 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38342 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229590AbiKUH7B (ORCPT
+        with ESMTP id S229490AbiKUIDQ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 21 Nov 2022 02:59:01 -0500
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD2A9D65
-        for <linux-block@vger.kernel.org>; Sun, 20 Nov 2022 23:59:00 -0800 (PST)
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 9F8D768AA6; Mon, 21 Nov 2022 08:58:57 +0100 (CET)
-Date:   Mon, 21 Nov 2022 08:58:57 +0100
-From:   Christoph Hellwig <hch@lst.de>
-To:     Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Cc:     Christoph Hellwig <hch@lst.de>,
-        "axboe@kernel.dk" <axboe@kernel.dk>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "kch@nvidia.com" <kch@nvidia.com>
-Subject: Re: [PATCH 2/2] blk-mq: simplify blk_mq_realloc_tag_set_tags
-Message-ID: <20221121075857.GA24878@lst.de>
-References: <20221109100811.2413423-1-hch@lst.de> <20221109100811.2413423-2-hch@lst.de> <20221118140640.featvt3fxktfquwh@shindev>
+        Mon, 21 Nov 2022 03:03:16 -0500
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2D6B15A28
+        for <linux-block@vger.kernel.org>; Mon, 21 Nov 2022 00:03:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=q/Aw0d5SsfCgXASAqR1GOUs8jYTu2jmEGDGWZFKrLWE=; b=cw5741AAxC3jVCcMqaCq/4puOw
+        xgmU46gbuX9MXImvd2SC9GLgwZkq9E5snR+5mrwtedkYkfnFQTdUJBpZyHKKMxT/m3Qkt7GfWFWf9
+        Jr+qHDCTxcNhekBH//iU0ffditzC20oXs2ojHxkuxtiK3TgYBclwS5j8yxOmdqtneBpleM7gHYl9I
+        I0mjT1vURvLAN7ZxleFHsW015/s/yOZ8+9G+f6ZyaOJLlFTo/F7GHtkjuIynO37Vh+T7PTIgOZl+t
+        Bo/SA812gF0j7O/L4GbMLETEyv//jiblWlM4OjFCF6/5fOceRY7OPaG6vQ/fMrHiFVlFoKp2qxplx
+        eFLEuZ7A==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1ox1le-00AsJO-W7; Mon, 21 Nov 2022 08:03:03 +0000
+Date:   Mon, 21 Nov 2022 00:03:02 -0800
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Damien Le Moal <damien.lemoal@opensource.wdc.com>
+Cc:     Ming Lei <ming.lei@redhat.com>,
+        Andreas Hindborg <andreas.hindborg@wdc.com>,
+        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
+Subject: Re: Reordering of ublk IO requests
+Message-ID: <Y3swtrdPaI5lGMpj@infradead.org>
+References: <Y3YfUjrrLJzPWc4H@T590>
+ <87fseh92aa.fsf@wdc.com>
+ <Y3cGM0es14vj3n3N@T590>
+ <2f86eb58-148b-03ac-d2bf-d67c5756a7a6@opensource.wdc.com>
+ <Y3chDDdbuN99l7v7@T590>
+ <8735ag8ueg.fsf@wdc.com>
+ <Y3dscKle5oqLjSNT@T590>
+ <87v8nc79cv.fsf@wdc.com>
+ <Y3d+78qMOusdYUAG@T590>
+ <be6940cf-7b23-4b11-1f6f-f3d4853d9a34@opensource.wdc.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20221118140640.featvt3fxktfquwh@shindev>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <be6940cf-7b23-4b11-1f6f-f3d4853d9a34@opensource.wdc.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The fix looks good, but could be simplified a bit more:
+I've been wading through this thread a bit, and while I can't follow
+everything due some pretty bad reply trimming I'm really really
+confused by this whole discussion.
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index ee16b4c34c6a5..cdd8efcec1916 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -4381,7 +4381,7 @@ static int blk_mq_realloc_tag_set_tags(struct blk_mq_tag_set *set,
- 	struct blk_mq_tags **new_tags;
- 
- 	if (set->nr_hw_queues >= new_nr_hw_queues)
--		return 0;
-+		goto done;
- 
- 	new_tags = kcalloc_node(new_nr_hw_queues, sizeof(struct blk_mq_tags *),
- 				GFP_KERNEL, set->numa_node);
-@@ -4393,8 +4393,8 @@ static int blk_mq_realloc_tag_set_tags(struct blk_mq_tag_set *set,
- 		       sizeof(*set->tags));
- 	kfree(set->tags);
- 	set->tags = new_tags;
-+done:
- 	set->nr_hw_queues = new_nr_hw_queues;
--
- 	return 0;
- }
- 
+Every single storage system, be that hard drives, SSDs, file systems
+or what else much preferres sequential write.  Any code that turns
+perfectly sequential writes into reverse sequential writes is a massive
+performance bug, zoned or not.
+
+So totally independent of zone device support in ublk this needs to be
+fixed ASAP.
