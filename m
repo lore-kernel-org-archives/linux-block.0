@@ -2,93 +2,115 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 859E9C433FE
-	for <linux-block@archiver.kernel.org>; Mon, 21 Nov 2022 22:47:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D92EC433FE
+	for <linux-block@archiver.kernel.org>; Mon, 21 Nov 2022 22:49:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230442AbiKUWrg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 21 Nov 2022 17:47:36 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48664 "EHLO
+        id S229658AbiKUWtw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 21 Nov 2022 17:49:52 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49428 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230123AbiKUWre (ORCPT
+        with ESMTP id S229639AbiKUWtv (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 21 Nov 2022 17:47:34 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C9591161
-        for <linux-block@vger.kernel.org>; Mon, 21 Nov 2022 14:47:28 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 86CBC614ED
-        for <linux-block@vger.kernel.org>; Mon, 21 Nov 2022 22:47:28 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 60AC9C433C1;
-        Mon, 21 Nov 2022 22:47:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1669070848;
-        bh=rupfA7QgttNtvcAds+s7jyNT0wRc3bEiCsYNLN49KQE=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=D9ZfIsUtxeuA1852d+UCrNWaEOk6PxCV3Z3yvQyDnfHiyDQ04DqsKdUFWQV/ty+tX
-         0Sa1JkpXsANIGE66aeQdWNL4S4YGCENUSga7cW6xmmZcu20mwD6C7mHYNU0S+gBOXP
-         fcmKEQs4aOlTqk1qEgdADFGKrKstRlvKmGVb4KW1JbPkihku+DpIY3sl6XU1f0vacu
-         oJZYySatSWBNhwHzK9qk2pv5VfPIh6sapq3vgr2DEbHgUP8CNn4oX4JdyOg47Rys/8
-         Q6NrpCvUU0SWmL+P7mJt2YO8OmmdPaXFMbF7XhJpq1scpgHCNTLbVHEjJ4KBSyJOW0
-         rHh2dm0ufTObQ==
-Date:   Mon, 21 Nov 2022 15:47:24 -0700
-From:   Keith Busch <kbusch@kernel.org>
-To:     Jonathan Derrick <jonathan.derrick@linux.dev>
+        Mon, 21 Nov 2022 17:49:51 -0500
+Received: from out2.migadu.com (out2.migadu.com [188.165.223.204])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 46E09B8561
+        for <linux-block@vger.kernel.org>; Mon, 21 Nov 2022 14:49:50 -0800 (PST)
+Message-ID: <7dcb9e3c-aa3e-b7b9-fc30-59281d581fd0@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1669070988;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Vjlz97aL/TKdxSLuP55Wz1sOalHXhaCNvKjwbOHrxzo=;
+        b=LYfiAROylvJXRVvUOuIzB1CCRPF0ff5n7vAs47qvW+HCOcrbiTpy4sBp7Ht0Z/fzkTUopy
+        ywgg4JxRajmW2pTYPcyKvxitl0QandnPQ288efyH1EZTL6OJS5DvnT7Rhgm2dFdflLm3wn
+        MIsFh2zZtWncLlTaRJ0xf6OmJLROhrU=
+Date:   Mon, 21 Nov 2022 15:49:45 -0700
+MIME-Version: 1.0
+Subject: Re: [PATCH v2] tests/nvme: Add admin-passthru+reset race test
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From:   Jonathan Derrick <jonathan.derrick@linux.dev>
+To:     Keith Busch <kbusch@kernel.org>
 Cc:     linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
         Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
         Chaitanya Kulkarni <chaitanyak@nvidia.com>,
         Christoph Hellwig <hch@lst.de>,
         Sagi Grimberg <sagi@grimberg.me>
-Subject: Re: [PATCH v2] tests/nvme: Add admin-passthru+reset race test
-Message-ID: <Y3v//NgG3xw8w/xS@kbusch-mbp>
 References: <20221117212210.934-1-jonathan.derrick@linux.dev>
  <Y3vlsF7KcRrY7vCW@kbusch-mbp>
  <e99fef7c-1b48-61e2-b503-a2363968d5fc@linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
 In-Reply-To: <e99fef7c-1b48-61e2-b503-a2363968d5fc@linux.dev>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Nov 21, 2022 at 03:34:44PM -0700, Jonathan Derrick wrote:
-> On 11/21/2022 1:55 PM, Keith Busch wrote:
-> > On Thu, Nov 17, 2022 at 02:22:10PM -0700, Jonathan Derrick wrote:
-> >> I seem to have isolated the error mechanism for older kernels, but 6.2.0-rc2
-> >> reliably segfaults my QEMU instance (something else to look into) and I don't
-> >> have any 'real' hardware to test this on at the moment. It looks like several
-> >> passthru commands are able to enqueue prior/during/after resetting/connecting.
-> > 
-> > I'm not seeing any problem with the latest nvme-qemu after several dozen
-> > iterations of this test case. In that environment, the formats and
-> > resets complete practically synchronously with the call, so everything
-> > proceeds quickly. Is there anything special I need to change?
-> >  
-> I can still repro this with nvme-fixes tag, so I'll have to dig into it myself
-> Does the tighter loop in the test comment header produce results?
 
-My qemu's backing storage is a nullblk which makes format a no-op, but I
-can try something slower if you think that will have different results.
-These kinds of tests are definitely more pleasant to run under
-emulation, so having the recipe to recreate there is a boon.
- 
-> >> The issue seems to be very heavily timing related, so the loop in the header is
-> >> a lot more forceful in this approach.
-> >>
-> >> As far as the loop goes, I've noticed it will typically repro immediately or
-> >> pass the whole test.
-> > 
-> > I can only get possible repro in scenarios that have multi-second long,
-> > serialized format times. Even then, it still appears that everything
-> > fixes itself after a waiting. Are you observing the same, or is it stuck
-> > forever in your observations?
+
+On 11/21/2022 3:34 PM, Jonathan Derrick wrote:
+> 
+> 
+> On 11/21/2022 1:55 PM, Keith Busch wrote:
+>> On Thu, Nov 17, 2022 at 02:22:10PM -0700, Jonathan Derrick wrote:
+>>> I seem to have isolated the error mechanism for older kernels, but 6.2.0-rc2
+>>> reliably segfaults my QEMU instance (something else to look into) and I don't
+>>> have any 'real' hardware to test this on at the moment. It looks like several
+>>> passthru commands are able to enqueue prior/during/after resetting/connecting.
+>>
+>> I'm not seeing any problem with the latest nvme-qemu after several dozen
+>> iterations of this test case. In that environment, the formats and
+>> resets complete practically synchronously with the call, so everything
+>> proceeds quickly. Is there anything special I need to change?
+>>  
+> I can still repro this with nvme-fixes tag, so I'll have to dig into it myself
+Here's a backtrace:
+
+Thread 1 "qemu-system-x86" received signal SIGSEGV, Segmentation fault.
+[Switching to Thread 0x7ffff7554400 (LWP 531154)]
+0x000055555597a9d5 in nvme_ctrl (req=0x7fffec892780) at ../hw/nvme/nvme.h:539
+539         return sq->ctrl;
+(gdb) backtrace
+#0  0x000055555597a9d5 in nvme_ctrl (req=0x7fffec892780) at ../hw/nvme/nvme.h:539
+#1  0x0000555555994360 in nvme_format_bh (opaque=0x5555579dd000) at ../hw/nvme/ctrl.c:5852
+#2  0x0000555555f4db15 in aio_bh_call (bh=0x7fffec279910) at ../util/async.c:150
+#3  0x0000555555f4dc24 in aio_bh_poll (ctx=0x55555688fa00) at ../util/async.c:178
+#4  0x0000555555f34df0 in aio_dispatch (ctx=0x55555688fa00) at ../util/aio-posix.c:421
+#5  0x0000555555f4e083 in aio_ctx_dispatch (source=0x55555688fa00, callback=0x0, user_data=0x0) at ../util/async.c:320
+#6  0x00007ffff7bd717d in g_main_context_dispatch () at /lib/x86_64-linux-gnu/libglib-2.0.so.0
+#7  0x0000555555f600c2 in glib_pollfds_poll () at ../util/main-loop.c:297
+#8  0x0000555555f60140 in os_host_main_loop_wait (timeout=0) at ../util/main-loop.c:320
+#9  0x0000555555f60251 in main_loop_wait (nonblocking=0) at ../util/main-loop.c:596
+#10 0x0000555555a8f27c in qemu_main_loop () at ../softmmu/runstate.c:739
+#11 0x000055555582b77a in qemu_default_main () at ../softmmu/main.c:37
+#12 0x000055555582b7b4 in main (argc=53, argv=0x7fffffffdf88) at ../softmmu/main.c:48
+
+
+
+> Does the tighter loop in the test comment header produce results?
+> 
+> 
+>>> The issue seems to be very heavily timing related, so the loop in the header is
+>>> a lot more forceful in this approach.
+>>>
+>>> As far as the loop goes, I've noticed it will typically repro immediately or
+>>> pass the whole test.
+>>
+>> I can only get possible repro in scenarios that have multi-second long,
+>> serialized format times. Even then, it still appears that everything
+>> fixes itself after a waiting. Are you observing the same, or is it stuck
+>> forever in your observations?
 > In 5.19, it gets stuck forever with lots of formats outstanding and
 > controller stuck in resetting. I'll keep digging. Thanks Keith
-
-At the moment I'm interested in upstream, so either Linus' latest
-6.1-rc, or the nvme-6.2 branch. If you can confirm these are okay (which
-appears to be the case on my side), then I can definitely shift focus to
-stable back-ports. But if they're not okay, then I want to straighten
-that side out first.
+> 
+>>
+>>> +remove_and_rescan() {
+>>> +	local pdev=$1
+>>> +	echo 1 > /sys/bus/pci/devices/"$pdev"/remove
+>>> +	echo 1 > /sys/bus/pci/rescan
+>>> +}
+>>
+>> This function isn't called anywhere.
