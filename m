@@ -2,117 +2,83 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A3B2C43217
-	for <linux-block@archiver.kernel.org>; Mon, 21 Nov 2022 10:17:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F597C433FE
+	for <linux-block@archiver.kernel.org>; Mon, 21 Nov 2022 11:18:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231252AbiKUKRt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 21 Nov 2022 05:17:49 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55974 "EHLO
+        id S230259AbiKULSu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 21 Nov 2022 06:18:50 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47028 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229905AbiKUKRs (ORCPT
+        with ESMTP id S230319AbiKULS2 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 21 Nov 2022 05:17:48 -0500
-Received: from esa2.hgst.iphmx.com (esa2.hgst.iphmx.com [68.232.143.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 767D612ACF
-        for <linux-block@vger.kernel.org>; Mon, 21 Nov 2022 02:17:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1669025862; x=1700561862;
-  h=references:from:to:cc:subject:date:in-reply-to:
-   message-id:mime-version;
-  bh=U9te+FvGTRyaYt+gf96c00lFB2CXMQmEQSehS1RuRC4=;
-  b=Alrg4c8onr8OG68Lh3RveoPdGbGuhNXKW0GvFBQNmmId7T00aqg8271o
-   UCggiPos5Rbj12OuyEHCG/trYx5ZTAbRxSgGNPYKz0Rn9yKX61XaDiU9C
-   MV7UeFSaCYRHpWOrQNvUlt+5RrLArawPUdXGxYefxUk37kH9yJuFlBdnb
-   bqBXWryRpUKM1vznAE9qCQpZYewSH3uKisE6tjuOPYgi/m3eifqK+7Izd
-   a/Osff/QQMreW1yCmJmbxCnVbCNpuZ5iy6uQyH7Te2rG20soWFCv8seEy
-   vV26VCXR2qeSm2QTPFg5/d51enybLZsu29apxfQ379eOOM9jIfAaiCgM2
-   Q==;
-X-IronPort-AV: E=Sophos;i="5.96,181,1665417600"; 
-   d="scan'208";a="321129220"
-Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 21 Nov 2022 18:17:40 +0800
-IronPort-SDR: nKvgoCPXmiIzavFKd0Abj4LP8ssb62stG2dXYUCSA99LmcEQK6O3NM1xHMSR7MKgMN1kwfaM8K
- f0C+s4y7kQdwrPIsLmd9XlY9lEZh2vojzGtByPikCsOHqPE5m0HHtrS7UCbJHklIiqyscLhgx/
- jRfwC96ZHGrNleQes9uoZVVY156euode+f8KXQ36Hhiv4HjDLyeLTiBv4fZCTtksHIt8xi+Usu
- 6apRmFH2chvBLfR8L9dbNCMJgvUAUJY+g4/6M3dbUOCqx6/0ELwkyJ7lqo8b3yBqVY2KUxiVkM
- wL8=
-Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 21 Nov 2022 01:36:30 -0800
-IronPort-SDR: yilgiRCR3qOlnchThYwirL3M8EeXEbeVmcriMZj9qmXN/2z8VXvKMkzJxXODC8oG9xND0TIijW
- lSadzQJCzeYM9ujVQjmHgASvJ/05c9NvksisPHa723KQc+XhzI57n6AL1uSXQzW4ofSGUvPqiP
- sunR13ZPelcej1momBSaqfESTJSy/hXo+C+2Qa+KWjG1s0t/Us/pbwZucAtu6vdsLS4gWtsI40
- vexvICl2o4Qo4uQ9LgnjwsXhZ+QQSrmowKn1jD7Y7BGbPga0pCh8u4bKVQLwjf7cE1W/LhbsTY
- r80=
-WDCIronportException: Internal
-Received: from dellx5.wdc.com (HELO localhost) ([10.200.210.81])
-  by uls-op-cesaip02.wdc.com with ESMTP; 21 Nov 2022 02:17:40 -0800
-References: <Y3X2M3CSULigQr4f@T590> <87k03u7x3r.fsf@wdc.com>
- <Y3YfUjrrLJzPWc4H@T590> <87fseh92aa.fsf@wdc.com> <Y3cGM0es14vj3n3N@T590>
- <2f86eb58-148b-03ac-d2bf-d67c5756a7a6@opensource.wdc.com>
- <Y3chDDdbuN99l7v7@T590> <8735ag8ueg.fsf@wdc.com> <Y3dscKle5oqLjSNT@T590>
- <87v8nc79cv.fsf@wdc.com> <Y3d+78qMOusdYUAG@T590>
- <be6940cf-7b23-4b11-1f6f-f3d4853d9a34@opensource.wdc.com>
- <87cz9j75l5.fsf@wdc.com>
-User-agent: mu4e 1.8.11; emacs 28.2.50
-From:   Andreas Hindborg <andreas.hindborg@wdc.com>
-To:     Andreas Hindborg <andreas.hindborg@wdc.com>
-Cc:     Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-        Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org
-Subject: Re: Reordering of ublk IO requests
-Date:   Mon, 21 Nov 2022 11:15:02 +0100
-In-reply-to: <87cz9j75l5.fsf@wdc.com>
-Message-ID: <878rk47gsd.fsf@wdc.com>
+        Mon, 21 Nov 2022 06:18:28 -0500
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD5FDC4966
+        for <linux-block@vger.kernel.org>; Mon, 21 Nov 2022 03:13:48 -0800 (PST)
+Received: from dggpemm500021.china.huawei.com (unknown [172.30.72.53])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4NG4Vg2RCMzHw0v;
+        Mon, 21 Nov 2022 19:12:43 +0800 (CST)
+Received: from dggpemm500015.china.huawei.com (7.185.36.181) by
+ dggpemm500021.china.huawei.com (7.185.36.109) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31; Mon, 21 Nov 2022 19:13:18 +0800
+Received: from huawei.com (10.175.103.91) by dggpemm500015.china.huawei.com
+ (7.185.36.181) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.31; Mon, 21 Nov
+ 2022 19:13:17 +0800
+From:   Wang ShaoBo <bobo.shaobowang@huawei.com>
+CC:     <liwei391@huawei.com>, <linux-block@vger.kernel.org>,
+        <drbd-dev@lists.linbit.com>, <axboe@kernel.dk>,
+        <christoph.boehmwalder@linbit.com>
+Subject: [PATCH] drbd: destroy workqueue when drbd device was freed
+Date:   Mon, 21 Nov 2022 19:11:38 +0800
+Message-ID: <20221121111138.3665586-1-bobo.shaobowang@huawei.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.175.103.91]
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+ dggpemm500015.china.huawei.com (7.185.36.181)
+X-CFilter-Loop: Reflected
+To:     unlisted-recipients:; (no To-header on input)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+A submitter workqueue is dynamically allocated by init_submitter()
+called by drbd_create_device(), we should destroy it when this
+device was not needed or destroyed.
 
-Andreas Hindborg <andreas.hindborg@wdc.com> writes:
+Fixes: 113fef9e20e0 ("drbd: prepare to queue write requests on a submit worker")
+Signed-off-by: Wang ShaoBo <bobo.shaobowang@huawei.com>
+---
+ drivers/block/drbd/drbd_main.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-> Damien Le Moal <damien.lemoal@opensource.wdc.com> writes:
->
->> On 11/18/22 21:47, Ming Lei wrote:
->>> Anytime, there is at most one write IO for each zone, how can the single
->>> write IO be re-order?
->>
->> If the user issues writes one at a time out of order (not aligned to the
->> write pointer), mq-deadline will not help at all. The zone write locking
->> will still limit write dispatching to one per zone, but the writes will fail.
->>
->> mq-deadline will reorder write commands in the correct lba order only if:
->> - the commands are inserted as a batch (more than on request passed to
->> ->insert_requests)
->> - commands are inserted individually when the target zone is locked (a
->> write is already being executed)
->>
->> This has been the semantic from the start: the block layer has no
->> guarantees about the correct ordering of writes to zoned drive. What is
->> guaranteed is that (1) if the user issues writes in order AND (2)
->> mq-deadline is used, then writes will be dispatched in the same order to
->> the device.
->>
->> I have not looked at the details of ublk, but from the thread, I think (1)
->> is not done and (2) is missing-ish as the ublk device is not marked as zoned.
->
-> I have a patch in the works for adding zoned storage support to ublk. It
-> sets up the ublk device as a zoned device. It is very much work in
-> progress, but it lives here [1] for now.
->
-> I am pretty sure that I saw large writes to zoned ublk device being
-> split and issued to the device (same zone) with multiple outstanding
-> requests at the same time. I'll verify on Monday and provide a test case
-> if that is the case. Might be I configured the ublk device wrong? I set
-> it up as host managed zoned and set up zone size, max active, max open.
+diff --git a/drivers/block/drbd/drbd_main.c b/drivers/block/drbd/drbd_main.c
+index 8532b839a343..467c498e3add 100644
+--- a/drivers/block/drbd/drbd_main.c
++++ b/drivers/block/drbd/drbd_main.c
+@@ -2218,6 +2218,9 @@ void drbd_destroy_device(struct kref *kref)
+ 		kfree(peer_device);
+ 	}
+ 	memset(device, 0xfd, sizeof(*device));
++
++	if (device->submit.wq)
++		destroy_workqueue(device->submit.wq);
+ 	kfree(device);
+ 	kref_put(&resource->kref, drbd_destroy_resource);
+ }
+@@ -2810,6 +2813,8 @@ enum drbd_ret_code drbd_create_device(struct drbd_config_context *adm_ctx, unsig
+ 	put_disk(disk);
+ out_no_disk:
+ 	kref_put(&resource->kref, drbd_destroy_resource);
++	if (device->submit.wq)
++		destroy_workqueue(device->submit.wq);
+ 	kfree(device);
+ 	return err;
+ }
+-- 
+2.25.1
 
-Turns out I was not setting up the zone bitmaps. I was missing a call to
-blk_revalidate_disk_zones() and that took out the zone lock in the
-deadline scheduler. With that in place, everything works as it should.
-
-Thanks for the help everyone!
-
-Best regards,
-Andreas
