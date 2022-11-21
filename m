@@ -2,50 +2,50 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 71092C433FE
-	for <linux-block@archiver.kernel.org>; Mon, 21 Nov 2022 19:42:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E52FEC43217
+	for <linux-block@archiver.kernel.org>; Mon, 21 Nov 2022 20:00:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229641AbiKUTms (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 21 Nov 2022 14:42:48 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35244 "EHLO
+        id S231752AbiKUUAg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 21 Nov 2022 15:00:36 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51286 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229501AbiKUTmr (ORCPT
+        with ESMTP id S229808AbiKUUAf (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 21 Nov 2022 14:42:47 -0500
-Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2673FD116;
-        Mon, 21 Nov 2022 11:42:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1669059767; x=1700595767;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=hWmAqluuQ5/3puqN3B6aykKHCk3Z+rkcmnnsHtMfROk=;
-  b=GXh6CtHT8xbLYvhFkj7CLYbd1UsdAY8igpNiazeCowXsnsyXTQwxzFrf
-   tqBVJUq6NmdHnz+mCMk04xL/X0xyziXoifr+0lhGJQ45zaCD6tKK+hIH+
-   z6EyjsxzTNJIRodojbOS2JL+WS8i46kfmwlKMfKWbgmSmC9yb82Cb01oL
-   e+ymKjFQB1Ob6CvUkSnJ20IzVTdsKPgXR5h/mFkf7r0sR5sLQypq0Zjj9
-   hLvC9KlYIyiKQrglWwyXCeedVLlpY2L9yu4Ki7jllgM/q7apJaCO0BFZr
-   iJCqSTBrNPmEAiQIclXillKSDyx78iNVJWMHek4ZWW6WV2Ay/xOHVo/tA
-   A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10538"; a="297004546"
-X-IronPort-AV: E=Sophos;i="5.96,182,1665471600"; 
-   d="scan'208";a="297004546"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Nov 2022 11:42:46 -0800
-X-IronPort-AV: E=McAfee;i="6500,9779,10538"; a="672211423"
-X-IronPort-AV: E=Sophos;i="5.96,182,1665471600"; 
-   d="scan'208";a="672211423"
-Received: from ahunter6-mobl1.ger.corp.intel.com (HELO [10.0.2.15]) ([10.252.35.94])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Nov 2022 11:42:43 -0800
-Message-ID: <1c9b3db6-3443-5580-08f2-42520d6a3318@intel.com>
-Date:   Mon, 21 Nov 2022 21:42:39 +0200
+        Mon, 21 Nov 2022 15:00:35 -0500
+Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3EA92C6D32;
+        Mon, 21 Nov 2022 12:00:35 -0800 (PST)
+Received: by mail-pj1-f47.google.com with SMTP id ci10so5169171pjb.1;
+        Mon, 21 Nov 2022 12:00:35 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=/NU44cfudtq3+kL/Ca5qkgDeVjL7u3LaS55isxaZE3Q=;
+        b=6/pbJ7+NxPM7gjrzW8ZVpX2xoQvXrZOU2Ka4FCHXEd4l6j2dCZELZ/4EfT3uSEZOoJ
+         iy79KUuDrMS6bOCBPHV2cqjnIRvDXlKs82E9oMkkEbkXsVb1+YoMyKKrXoy1D2g6S/RJ
+         dJuzvEBlR6ruXhiVEllZaukNFeWX3rSf1rF2iBndbknheDqA+sVstRmD2od+LKiwINER
+         AxHaGziQhHzJZvu0OfMEOeIhAjsEbfOhqohbSo9fPdXsj8EaIXs4GUGhk/WfnRjgOVG+
+         G2QGTYHWpv1uhatsE4YFBsvCjLTe30QWOl1/RadzAa0mFHzW0oBmbxQq7JXE8maTm1dq
+         VNTA==
+X-Gm-Message-State: ANoB5pnLtR2QBRf7hqYAbbASvCztp9lwx/XzMGvocnaSK+JC0hiziU9T
+        WyEl5DeR50YKsIDaNWFwsv4=
+X-Google-Smtp-Source: AA0mqf4zskjGaSZ7xf9xsEvpIAP+nhi6wrHmOytdL+C1UG9sSxJnJARRJ74/LngsmoLyB0cWTMSJSQ==
+X-Received: by 2002:a17:902:aa0c:b0:180:4030:1c7d with SMTP id be12-20020a170902aa0c00b0018040301c7dmr271689plb.99.1669060834619;
+        Mon, 21 Nov 2022 12:00:34 -0800 (PST)
+Received: from ?IPV6:2620:15c:211:201:545d:bfd:7b53:8e94? ([2620:15c:211:201:545d:bfd:7b53:8e94])
+        by smtp.gmail.com with ESMTPSA id x18-20020a17090300d200b00186b138706fsm10148952plc.13.2022.11.21.12.00.32
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 21 Nov 2022 12:00:33 -0800 (PST)
+Message-ID: <4bba6b72-c361-f212-a8c3-9e33aab80c99@acm.org>
+Date:   Mon, 21 Nov 2022 12:00:32 -0800
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Firefox/102.0 Thunderbird/102.5.0
+ Thunderbird/102.4.0
 Subject: Re: [PATCH 0/3] mmc: Improve block layer requeueing behavior
 Content-Language: en-US
-To:     Bart Van Assche <bvanassche@acm.org>,
+To:     Adrian Hunter <adrian.hunter@intel.com>,
         =?UTF-8?Q?Christian_L=c3=b6hle?= <CLoehle@hyperstone.com>,
         "axboe@kernel.dk" <axboe@kernel.dk>,
         "ulf.hansson@linaro.org" <ulf.hansson@linaro.org>,
@@ -60,34 +60,24 @@ References: <f30ec7fe7d834c1d8e116508500110cf@hyperstone.com>
  <d1a1340a-f5f8-6953-e066-b8c6095d63fd@acm.org>
  <5df2c4d5-f426-e3ea-8e6d-f772ec7091b6@intel.com>
  <bade026a-ec83-7516-d5ef-bb373df48a6e@acm.org>
-From:   Adrian Hunter <adrian.hunter@intel.com>
-Organization: Intel Finland Oy, Registered Address: PL 281, 00181 Helsinki,
- Business Identity Code: 0357606 - 4, Domiciled in Helsinki
-In-Reply-To: <bade026a-ec83-7516-d5ef-bb373df48a6e@acm.org>
-Content-Type: text/plain; charset=UTF-8
+ <1c9b3db6-3443-5580-08f2-42520d6a3318@intel.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <1c9b3db6-3443-5580-08f2-42520d6a3318@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 21/11/22 21:14, Bart Van Assche wrote:
-> On 11/21/22 00:25, Adrian Hunter wrote:
->> On 18/11/22 19:27, Bart Van Assche wrote:
->>> On 11/18/22 02:47, Adrian Hunter wrote:
->>>> Does anyone know why the block layer does not support
->>>> (max_hw_sectors << 9) < PAGE_SIZE ?
->>>
->>> Does this mean that the following patch series would not only be
->>> useful for UFS but also for MMC? "[PATCH 00/10] Support DMA segments
->>> smaller than the page size"
->>> (https://lore.kernel.org/linux-block/20221019222324.362705-1-bvanassche@acm.org/).
->>
->> That patchset still does not allow max_hw_sectors = 1 which is
->> what Christian's case needs.
-> 
-> Hi Adrian,
-> 
-> Why would that patch series not support max_hw_sectors = 1? What am I overlooking?
+On 11/21/22 11:42, Adrian Hunter wrote:
+> blk_queue_max_hw_sectors() does not allow it.
 
-blk_queue_max_hw_sectors() does not allow it.
+Right, I modified blk_queue_max_segment_size() in my patch series but 
+not blk_queue_max_hw_sectors(). Adding a change for 
+blk_queue_max_hw_sectors() to that patch series should be easy since 
+that patch series already adds support for max_sectors being smaller 
+than the page size.
 
+Thanks,
+
+Bart.
