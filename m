@@ -2,140 +2,108 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2AC13C433FE
-	for <linux-block@archiver.kernel.org>; Mon, 21 Nov 2022 13:59:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 12C33C4332F
+	for <linux-block@archiver.kernel.org>; Mon, 21 Nov 2022 14:30:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231602AbiKUN7b (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 21 Nov 2022 08:59:31 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36850 "EHLO
+        id S230236AbiKUOaw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 21 Nov 2022 09:30:52 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43100 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231462AbiKUN7F (ORCPT
+        with ESMTP id S230208AbiKUOat (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 21 Nov 2022 08:59:05 -0500
-Received: from mail-wr1-x42f.google.com (mail-wr1-x42f.google.com [IPv6:2a00:1450:4864:20::42f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CCB9517071
-        for <linux-block@vger.kernel.org>; Mon, 21 Nov 2022 05:57:43 -0800 (PST)
-Received: by mail-wr1-x42f.google.com with SMTP id s5so2771207wru.1
-        for <linux-block@vger.kernel.org>; Mon, 21 Nov 2022 05:57:43 -0800 (PST)
+        Mon, 21 Nov 2022 09:30:49 -0500
+Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3FD23AB0C0
+        for <linux-block@vger.kernel.org>; Mon, 21 Nov 2022 06:30:47 -0800 (PST)
+Received: by mail-pl1-x634.google.com with SMTP id y10so9547559plp.3
+        for <linux-block@vger.kernel.org>; Mon, 21 Nov 2022 06:30:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ionos.com; s=google;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=iF/t8apUyWuhDIryZyYBVw69J04guPwa/Q1m0PGtgj4=;
-        b=NTH1gFTQhD35MwNnKxHma+Dne19TTBr9hsuIMfgWyipYlc+hQpXP0YHxMy7h8Gc9/P
-         0f25YPA/9D37uxZ1XTs2rIwDzIlXHO27c7qFKIEdA4pT2otaDRECGXrh0ynhMkm/7lQI
-         NlLhp7csumAx4/4Dt0zetWAyTt+6qhR2oVrm9cmLg85/agpLojhCQA+M/Sybnh5wdfSE
-         5Bo0BIxNpf6aGi0bv2Q+oF14l67NmrgFMkRtwD81OXBwkpAC819yFFFUwy2dIZlilt47
-         VlmoWs5ZGzAxPsLy958luCizhuz0UKuMOh7xZynKuj11VHOVWbrDj+uwE4LRi8DQewCd
-         VmUQ==
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=fKdPBgf4F1DbPho+543ze8p/JJM5iKRRHyH33ew0++Y=;
+        b=jrZpJYDRNZTvL91G/bFgw/1STzMW33rYKTqBLYy3vYffZlw43RahxhV6wxQRpWZIxX
+         x6HipJ6s1wVjbg2BH9m2MwYh8gKj0JTDaxUmGi1o5nakjAaUciEROc15usDK0vKqyhOl
+         9L7usg5AghzAPNpNNYrHDerJTUfeA1BB08UKuRUzfDCVZWX65+0/8j9Y54d4vjEVy8vJ
+         921jD7JwFe6auLnSeXFhtVGp8RvIuE0XdQmcpeaEyKdtvhjB40A7Ef/vjR69OgPMAtrt
+         HqjR+34LdHESiPMp+x6DE+vgGi2UGolxpohdnwzGLJ6mkV/cPANuyPR+RgqjiZKvK7Ll
+         MXmg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=iF/t8apUyWuhDIryZyYBVw69J04guPwa/Q1m0PGtgj4=;
-        b=HOzp712R1Gj3tIsOhY1QBNlsaOJz8GY3LIkmdIrFUSHZK9ynGP05GMLeI9cGDMINWQ
-         LXSlhcojyYKjuD6lKoPPnocQ4vPjrPMY3olPezDPDCkGou2Mmbn/oOz3xUI7xLZqLDa9
-         sj546HNswD3uyZ2N9ZS6di+GkATXcYt6hIqx2rD1iS667ujmj1vSf0SKKmjab+Uu+061
-         Rb+grkuZBph7Tk4riefAbcz37E4l/2yvYDfFxGgZK+6cPLwMuJ6LppU7JeDh1OAIG3Om
-         wUvsKNvmZTo0s5ShYDqfz3fkc3JQ1HbiZMa6Sl67WpPUbbVEmPWZRMLNHvlEI8BiwEF9
-         2DGA==
-X-Gm-Message-State: ANoB5pmDfkCKkkh6tyH8p7tDTXj3bFAjOeZgp5gDEntPD5HhHTeKJmlx
-        iY7jLgkYRZyFqF+iFtHr48AWQv4s8HhTfmMMPVQJcw==
-X-Google-Smtp-Source: AA0mqf61vjT7gCdQcTsAcZAYE1/8Ro4EWqaK2HE4/5KcS+UqmBGZszawiFOhM+JSqSfT37FAFwbLoGXKdjqDAzCV9K0=
-X-Received: by 2002:a5d:4247:0:b0:241:a82b:5dee with SMTP id
- s7-20020a5d4247000000b00241a82b5deemr533360wrr.425.1669039062122; Mon, 21 Nov
- 2022 05:57:42 -0800 (PST)
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=fKdPBgf4F1DbPho+543ze8p/JJM5iKRRHyH33ew0++Y=;
+        b=DyiqrSRPQzLWFL9PrIcBSpAO6RXZsdYDktcdYrXKGJXUmvbifhIA/Av3DkNgQk4xPI
+         sXpDAZ1sE4BcWrFnSUYZY4PvqTuFiiL6HQn7+7XWmJi9NNfRnQ39Tg8sTrpB4AjghAsI
+         wM1pg0e5a38/VjaC3m9Junqo2yKunwsy4YZCtpbcEcbhk9cZQCyydEbNuY9o21CUsCT7
+         3tfHWU6QML1Gim7o+vny+dAGOFL7OrcbnbYwYk8Umjkv0BbAlKBic/4RHwV5p7Y5dws7
+         XoAN3I4RUuTK+29ACxHoOTQMtSBtPqORHR8rj1ySRO2vnvS0zkluTGXeF5S3T19TSOS8
+         hZxQ==
+X-Gm-Message-State: ANoB5pnqbMjIsV/lGRcSFl9ukhWhT5tdNjPCe/k3oI/UFYTGXWURC/oD
+        zbHJ8DEW3ebR+Mqy22aoxO7xQg==
+X-Google-Smtp-Source: AA0mqf6/+g7r5XsHDkk4PBUMLfIhfGYA2phFatP0/v3K1w6nUxS3oOR1xEvbfvt5d9rob8XbgwhAWw==
+X-Received: by 2002:a17:90a:8c96:b0:218:7e9d:8d0a with SMTP id b22-20020a17090a8c9600b002187e9d8d0amr17088134pjo.41.1669041046463;
+        Mon, 21 Nov 2022 06:30:46 -0800 (PST)
+Received: from [192.168.1.136] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id z2-20020a626502000000b0057255b7c8easm8776251pfb.33.2022.11.21.06.30.45
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 21 Nov 2022 06:30:46 -0800 (PST)
+Message-ID: <c0e639ea-caa0-f76c-c369-0d22a49047ca@kernel.dk>
+Date:   Mon, 21 Nov 2022 07:30:44 -0700
 MIME-Version: 1.0
-References: <CAHg0Huzvhg7ZizbCGQyyVNdnAWmQCsypRWvdBzm0GWwPzXD0dw@mail.gmail.com>
- <3b2f6267-e7a0-4266-867d-b0109d5a7cb4@acm.org> <CAHg0HuyGr8BfgBvXUG7N5WYyXKEzyh3i7eA=2XZxbW3zyXLTsA@mail.gmail.com>
- <cc14aa58-254e-5c33-89ab-6f3900143164@acm.org> <CAHg0Huw35m_WiwFqcTEHpCz94=JhaKZdEuV-F=aetQ_SEQgauA@mail.gmail.com>
-In-Reply-To: <CAHg0Huw35m_WiwFqcTEHpCz94=JhaKZdEuV-F=aetQ_SEQgauA@mail.gmail.com>
-From:   Haris Iqbal <haris.iqbal@ionos.com>
-Date:   Mon, 21 Nov 2022 14:57:31 +0100
-Message-ID: <CAJpMwyh-cihwNyMyTFE-f2HQqOnLydNB+TiGcq5UTMkgwU0yNA@mail.gmail.com>
-Subject: Re: [RFC] Reliable Multicast on top of RTRS
-To:     Bart Van Assche <bvanassche@acm.org>, linux-rdma@vger.kernel.org,
-        linux-block@vger.kernel.org, Aleksei Marov <alexv.marov@gmail.com>
-Cc:     danil.kipnis@posteo.net, Jinpu Wang <jinpu.wang@ionos.com>
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
+ Thunderbird/102.4.1
+Subject: Re: [RESEND PATCH] drbd: destroy workqueue when drbd device was freed
+Content-Language: en-US
+To:     Wang ShaoBo <bobo.shaobowang@huawei.com>
+Cc:     liwei391@huawei.com, linux-block@vger.kernel.org,
+        drbd-dev@lists.linbit.com, christoph.boehmwalder@linbit.com
+References: <20221121115047.3828385-1-bobo.shaobowang@huawei.com>
+From:   Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20221121115047.3828385-1-bobo.shaobowang@huawei.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hey there,
+On 11/21/22 4:50 AM, Wang ShaoBo wrote:
+> A submitter workqueue is dynamically allocated by init_submitter()
+> called by drbd_create_device(), we should destroy it when this
+> device is not needed or destroyed.
+> 
+> Fixes: 113fef9e20e0 ("drbd: prepare to queue write requests on a submit worker")
+> Signed-off-by: Wang ShaoBo <bobo.shaobowang@huawei.com>
+> ---
+> 
+> Changes in RESEND:
+>   put destroy_workqueue() before memset(device, ...)
+> 
+>  drivers/block/drbd/drbd_main.c | 7 +++++++
+>  1 file changed, 7 insertions(+)
+> 
+> diff --git a/drivers/block/drbd/drbd_main.c b/drivers/block/drbd/drbd_main.c
+> index 8532b839a343..082bc34cd317 100644
+> --- a/drivers/block/drbd/drbd_main.c
+> +++ b/drivers/block/drbd/drbd_main.c
+> @@ -2217,7 +2217,12 @@ void drbd_destroy_device(struct kref *kref)
+>  		kref_put(&peer_device->connection->kref, drbd_destroy_connection);
+>  		kfree(peer_device);
+>  	}
+> +
+> +	if (device->submit.wq)
+> +		destroy_workqueue(device->submit.wq);
+> +
+>  	memset(device, 0xfd, sizeof(*device));
+> +
+>  	kfree(device);
 
-We've got a prototype version working in-house. We've also implemented
-a block device client and server. Another client and server could
-probably be rbd and dm-thin. Will update as soon as we have a github
-link.
+Maybe you can send a separate patch killing that very odd (and useless)
+memset as well?
 
-Some technical details
+-- 
+Jens Axboe
 
-- Ability to perform sync across storage nodes without the involvement
-of the client.
 
-- This helps performing sync, extending/adding legs/members without
-the help of the client.
-
-Candidate users
-
-- We've implemented a stand-alone replicating block device. The client
-is similar to the rnbd-clt and our own corresponding "store"/server
-does linear mapping on the server side.
-
-- rbd could be a client of rmr-clt. The rmr-srv (store) would talk to
-lvm. rbd would provide the block device (over multiple objects) on the
-client side. Lvm would function as the store on the server side. One
-object would be stored on one dm-thin volume. rmr would provide for
-the replication in the network.
-
-Setups: RMR vs MD-RAID vs DRBD
-
-- Active-active
-
-- RMR as means of replication over network differs from the md-raid
-configuration because sync traffic goes directly between servers. The
-difference to the drbd setup is that the IO traffic goes to both legs
-in a single hop.
-
-How does RMR solve the activity log issue
-
-- Synchronous replication; much like Protocol C of DRBD.
-
-- RMR tracks all successful queue_depth (max number of IOs that can be
-inflight at any moment) worth of last IOs on each storage node.
-
-Best,
-Haris
-
-Signed-off: alexv.marov@gmail.com
-Reviewed-by: danil.kipnis@posteo.net
-
-On Sun, Nov 22, 2020 at 5:20 PM Danil Kipnis
-<danil.kipnis@cloud.ionos.com> wrote:
->
-> On Fri, Sep 4, 2020 at 5:33 PM Bart Van Assche <bvanassche@acm.org> wrote:
-> >
-> > On 2020-09-04 04:35, Danil Kipnis wrote:
-> > > On Thu, Sep 3, 2020 at 1:07 AM Bart Van Assche <bvanassche@acm.org> wrote:
-> > >> How will it be guaranteed that the resulting software does
-> > >> not suffer from the problems that have been solved by the introduction
-> > >> of the DRBD activity log
-> > >> (https://www.linbit.com/drbd-user-guide/users-guide-drbd-8-4/#s-activity-log)?
-> > >
-> > > The above would require some kind of activity log also, I'm afraid.
-> >
-> > How about collaborating with the DRBD team? My concern is that otherwise
-> > we will end up with two drivers in the kernel that implement block device
-> > replication between servers connected over a network.
->
-> Will take a closer look at drbd,
->
-> Thank you,
-> Danil.
->
-> >
-> > Thanks,
-> >
-> > Bart.
