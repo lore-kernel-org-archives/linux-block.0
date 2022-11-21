@@ -2,235 +2,114 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1433AC4332F
-	for <linux-block@archiver.kernel.org>; Mon, 21 Nov 2022 15:57:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5326C4332F
+	for <linux-block@archiver.kernel.org>; Mon, 21 Nov 2022 17:07:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229617AbiKUP5t (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 21 Nov 2022 10:57:49 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57506 "EHLO
+        id S230510AbiKURHb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 21 Nov 2022 12:07:31 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57216 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229476AbiKUP5t (ORCPT
+        with ESMTP id S230456AbiKURHV (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 21 Nov 2022 10:57:49 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD00ACFB8E
-        for <linux-block@vger.kernel.org>; Mon, 21 Nov 2022 07:57:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1669046220;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=DhpkkZl5aEqLFEHm7V5EYpzIW066FUkw2UjfwCuCjoQ=;
-        b=Um6IsxjEbdLHeLucX4r++GijWBMmwXzT/deKINgDFf/TemfIf4ta5FmbH+0EJ9KW/OliKF
-        iznJ8jUvSLDaXEW8bk4z/GbkWB6X2sXuZSu/fDS0Pja+hwmJiGrAD2iZysQZsL/2burYCX
-        V4Zch+Laho7C3m3ARhvjPeTvTgrMQHU=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-522-9qeLsTO8MaGT_4GLHaj4Rw-1; Mon, 21 Nov 2022 10:56:56 -0500
-X-MC-Unique: 9qeLsTO8MaGT_4GLHaj4Rw-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        Mon, 21 Nov 2022 12:07:21 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EFE3FCB9FB;
+        Mon, 21 Nov 2022 09:07:20 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 30515101AA47;
-        Mon, 21 Nov 2022 15:56:56 +0000 (UTC)
-Received: from localhost (ovpn-8-16.pek2.redhat.com [10.72.8.16])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 30ED51400C3A;
-        Mon, 21 Nov 2022 15:56:54 +0000 (UTC)
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org,
-        ZiyangZhang <ZiyangZhang@linux.alibaba.com>,
-        Ming Lei <ming.lei@redhat.com>,
-        Andreas Hindborg <andreas.hindborg@wdc.com>,
+        by ams.source.kernel.org (Postfix) with ESMTPS id AF9FCB811CF;
+        Mon, 21 Nov 2022 17:07:19 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 70374C43147;
+        Mon, 21 Nov 2022 17:07:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1669050438;
+        bh=cvbAIL8ABqguUdYNOpewAXmrRYY5b+E1vamA4+6bEfc=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=rRB1S4S5SxF4ImnqIXzJ3lqGi0vtoNBwxqmc4GX4ehBYFQfIbyUEzkA2GeQ9TU3mk
+         Ao5HqFem8FOe6PJajkpnIjO+5Ri8ck2ah9hCV7FLxgg4zDf4Wk3eHtO5r+bCE0gB4/
+         GXX9vCPbfE0sZUYdFtXQFaf/73KSl5HbEIbOcRR70Fg0Yx+7a2nLmoSJ/BKhpIUBvJ
+         FwvBj0x/wiUlQVIctlErQ3ABwhkYgRHdwfDXo2N+KNmKLJ+EFcV+MxrMGNEWhzRBGJ
+         p3BP5SsFp5hSINV5gxyfjg5w8qqHweuA6Wdwjq/uaDlx9nzAm3bqs0NtUgalByCsBC
+         C3KcoojzkACAA==
+Date:   Mon, 21 Nov 2022 09:07:18 -0800
+From:   "Darrick J. Wong" <djwong@kernel.org>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Chris Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>,
+        David Sterba <dsterba@suse.com>,
+        Damien Le Moal <damien.lemoal@wdc.com>,
+        Naohiro Aota <naohiro.aota@wdc.com>,
+        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+        Qu Wenruo <wqu@suse.com>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org, linux-btrfs@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org,
         Damien Le Moal <damien.lemoal@opensource.wdc.com>
-Subject: [PATCH] ublk_drv: don't forward io commands in reserve order
-Date:   Mon, 21 Nov 2022 23:56:45 +0800
-Message-Id: <20221121155645.396272-1-ming.lei@redhat.com>
+Subject: Re: [PATCH 19/19] iomap: remove IOMAP_F_ZONE_APPEND
+Message-ID: <Y3uwRr9XQSKzBp1g@magnolia>
+References: <20221120124734.18634-1-hch@lst.de>
+ <20221120124734.18634-20-hch@lst.de>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.7
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221120124734.18634-20-hch@lst.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Either ublk_can_use_task_work() is true or not, io commands are
-forwarded to ublk server in reverse order, since llist_add() is
-always to add one element to the head of the list.
+On Sun, Nov 20, 2022 at 01:47:34PM +0100, Christoph Hellwig wrote:
+> No users left now that btrfs takes REQ_OP_WRITE bios from iomap and
+> splits and converts them to REQ_OP_ZONE_APPEND internally.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> Reviewed-by: Damien Le Moal <damien.lemoal@opensource.wdc.com>
+> Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
 
-Even though block layer doesn't guarantee request dispatch order,
-requests should be sent to hardware in the sequence order generated
-from io scheduler, which usually considers the request's LBA, and
-order is often important for HDD.
+I suspect the flags definition changes will collide with Dave's write
+race fix, but otherwise this looks ok,
+Reviewed-by: Darrick J. Wong <djwong@kernel.org>
 
-So forward io commands in the sequence made from io scheduler by
-aligning task work with current io_uring command's batch handling,
-and it has been observed that both can get similar performance data
-if IORING_SETUP_COOP_TASKRUN is set from ublk server.
+--D
 
-Reported-by: Andreas Hindborg <andreas.hindborg@wdc.com>
-Cc: Damien Le Moal <damien.lemoal@opensource.wdc.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- drivers/block/ublk_drv.c | 82 +++++++++++++++++++---------------------
- 1 file changed, 38 insertions(+), 44 deletions(-)
-
-diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-index f96cb01e9604..e9de9d846b73 100644
---- a/drivers/block/ublk_drv.c
-+++ b/drivers/block/ublk_drv.c
-@@ -57,10 +57,8 @@
- #define UBLK_PARAM_TYPE_ALL (UBLK_PARAM_TYPE_BASIC | UBLK_PARAM_TYPE_DISCARD)
- 
- struct ublk_rq_data {
--	union {
--		struct callback_head work;
--		struct llist_node node;
--	};
-+	struct llist_node node;
-+	struct callback_head work;
- };
- 
- struct ublk_uring_cmd_pdu {
-@@ -766,15 +764,31 @@ static inline void __ublk_rq_task_work(struct request *req)
- 	ubq_complete_io_cmd(io, UBLK_IO_RES_OK);
- }
- 
-+static inline void ublk_forward_io_cmds(struct ublk_queue *ubq)
-+{
-+	struct llist_node *io_cmds = llist_del_all(&ubq->io_cmds);
-+	struct ublk_rq_data *data, *tmp;
-+
-+	io_cmds = llist_reverse_order(io_cmds);
-+	llist_for_each_entry_safe(data, tmp, io_cmds, node)
-+		__ublk_rq_task_work(blk_mq_rq_from_pdu(data));
-+}
-+
-+static inline void ublk_abort_io_cmds(struct ublk_queue *ubq)
-+{
-+	struct llist_node *io_cmds = llist_del_all(&ubq->io_cmds);
-+	struct ublk_rq_data *data, *tmp;
-+
-+	llist_for_each_entry_safe(data, tmp, io_cmds, node)
-+		__ublk_abort_rq(ubq, blk_mq_rq_from_pdu(data));
-+}
-+
- static void ublk_rq_task_work_cb(struct io_uring_cmd *cmd)
- {
- 	struct ublk_uring_cmd_pdu *pdu = ublk_get_uring_cmd_pdu(cmd);
- 	struct ublk_queue *ubq = pdu->ubq;
--	struct llist_node *io_cmds = llist_del_all(&ubq->io_cmds);
--	struct ublk_rq_data *data;
- 
--	llist_for_each_entry(data, io_cmds, node)
--		__ublk_rq_task_work(blk_mq_rq_from_pdu(data));
-+	ublk_forward_io_cmds(ubq);
- }
- 
- static void ublk_rq_task_work_fn(struct callback_head *work)
-@@ -782,14 +796,20 @@ static void ublk_rq_task_work_fn(struct callback_head *work)
- 	struct ublk_rq_data *data = container_of(work,
- 			struct ublk_rq_data, work);
- 	struct request *req = blk_mq_rq_from_pdu(data);
-+	struct ublk_queue *ubq = req->mq_hctx->driver_data;
- 
--	__ublk_rq_task_work(req);
-+	ublk_forward_io_cmds(ubq);
- }
- 
--static void ublk_submit_cmd(struct ublk_queue *ubq, const struct request *rq)
-+static void ublk_queue_cmd(struct ublk_queue *ubq, struct request *rq)
- {
--	struct ublk_io *io = &ubq->ios[rq->tag];
-+	struct ublk_rq_data *data = blk_mq_rq_to_pdu(rq);
-+	struct ublk_io *io;
- 
-+	if (!llist_add(&data->node, &ubq->io_cmds))
-+		return;
-+
-+	io = &ubq->ios[rq->tag];
- 	/*
- 	 * If the check pass, we know that this is a re-issued request aborted
- 	 * previously in monitor_work because the ubq_daemon(cmd's task) is
-@@ -803,11 +823,11 @@ static void ublk_submit_cmd(struct ublk_queue *ubq, const struct request *rq)
- 	 * guarantees that here is a re-issued request aborted previously.
- 	 */
- 	if (unlikely(io->flags & UBLK_IO_FLAG_ABORTED)) {
--		struct llist_node *io_cmds = llist_del_all(&ubq->io_cmds);
--		struct ublk_rq_data *data;
--
--		llist_for_each_entry(data, io_cmds, node)
--			__ublk_abort_rq(ubq, blk_mq_rq_from_pdu(data));
-+		ublk_abort_io_cmds(ubq);
-+	} else if (ublk_can_use_task_work(ubq)) {
-+		if (task_work_add(ubq->ubq_daemon, &data->work,
-+					TWA_SIGNAL_NO_IPI))
-+			ublk_abort_io_cmds(ubq);
- 	} else {
- 		struct io_uring_cmd *cmd = io->cmd;
- 		struct ublk_uring_cmd_pdu *pdu = ublk_get_uring_cmd_pdu(cmd);
-@@ -817,23 +837,6 @@ static void ublk_submit_cmd(struct ublk_queue *ubq, const struct request *rq)
- 	}
- }
- 
--static void ublk_queue_cmd(struct ublk_queue *ubq, struct request *rq,
--		bool last)
--{
--	struct ublk_rq_data *data = blk_mq_rq_to_pdu(rq);
--
--	if (ublk_can_use_task_work(ubq)) {
--		enum task_work_notify_mode notify_mode = last ?
--			TWA_SIGNAL_NO_IPI : TWA_NONE;
--
--		if (task_work_add(ubq->ubq_daemon, &data->work, notify_mode))
--			__ublk_abort_rq(ubq, rq);
--	} else {
--		if (llist_add(&data->node, &ubq->io_cmds))
--			ublk_submit_cmd(ubq, rq);
--	}
--}
--
- static blk_status_t ublk_queue_rq(struct blk_mq_hw_ctx *hctx,
- 		const struct blk_mq_queue_data *bd)
- {
-@@ -865,19 +868,11 @@ static blk_status_t ublk_queue_rq(struct blk_mq_hw_ctx *hctx,
- 		return BLK_STS_OK;
- 	}
- 
--	ublk_queue_cmd(ubq, rq, bd->last);
-+	ublk_queue_cmd(ubq, rq);
- 
- 	return BLK_STS_OK;
- }
- 
--static void ublk_commit_rqs(struct blk_mq_hw_ctx *hctx)
--{
--	struct ublk_queue *ubq = hctx->driver_data;
--
--	if (ublk_can_use_task_work(ubq))
--		__set_notify_signal(ubq->ubq_daemon);
--}
--
- static int ublk_init_hctx(struct blk_mq_hw_ctx *hctx, void *driver_data,
- 		unsigned int hctx_idx)
- {
-@@ -899,7 +894,6 @@ static int ublk_init_rq(struct blk_mq_tag_set *set, struct request *req,
- 
- static const struct blk_mq_ops ublk_mq_ops = {
- 	.queue_rq       = ublk_queue_rq,
--	.commit_rqs     = ublk_commit_rqs,
- 	.init_hctx	= ublk_init_hctx,
- 	.init_request   = ublk_init_rq,
- };
-@@ -1197,7 +1191,7 @@ static void ublk_handle_need_get_data(struct ublk_device *ub, int q_id,
- 	struct ublk_queue *ubq = ublk_get_queue(ub, q_id);
- 	struct request *req = blk_mq_tag_to_rq(ub->tag_set.tags[q_id], tag);
- 
--	ublk_queue_cmd(ubq, req, true);
-+	ublk_queue_cmd(ubq, req);
- }
- 
- static int ublk_ch_uring_cmd(struct io_uring_cmd *cmd, unsigned int issue_flags)
--- 
-2.31.1
-
+> ---
+>  fs/iomap/direct-io.c  | 10 ++--------
+>  include/linux/iomap.h |  1 -
+>  2 files changed, 2 insertions(+), 9 deletions(-)
+> 
+> diff --git a/fs/iomap/direct-io.c b/fs/iomap/direct-io.c
+> index 4eb559a16c9ed..9e883a9f80388 100644
+> --- a/fs/iomap/direct-io.c
+> +++ b/fs/iomap/direct-io.c
+> @@ -217,16 +217,10 @@ static inline blk_opf_t iomap_dio_bio_opflags(struct iomap_dio *dio,
+>  {
+>  	blk_opf_t opflags = REQ_SYNC | REQ_IDLE;
+>  
+> -	if (!(dio->flags & IOMAP_DIO_WRITE)) {
+> -		WARN_ON_ONCE(iomap->flags & IOMAP_F_ZONE_APPEND);
+> +	if (!(dio->flags & IOMAP_DIO_WRITE))
+>  		return REQ_OP_READ;
+> -	}
+> -
+> -	if (iomap->flags & IOMAP_F_ZONE_APPEND)
+> -		opflags |= REQ_OP_ZONE_APPEND;
+> -	else
+> -		opflags |= REQ_OP_WRITE;
+>  
+> +	opflags |= REQ_OP_WRITE;
+>  	if (use_fua)
+>  		opflags |= REQ_FUA;
+>  	else
+> diff --git a/include/linux/iomap.h b/include/linux/iomap.h
+> index 238a03087e17e..ee6d511ef29dd 100644
+> --- a/include/linux/iomap.h
+> +++ b/include/linux/iomap.h
+> @@ -55,7 +55,6 @@ struct vm_fault;
+>  #define IOMAP_F_SHARED		0x04
+>  #define IOMAP_F_MERGED		0x08
+>  #define IOMAP_F_BUFFER_HEAD	0x10
+> -#define IOMAP_F_ZONE_APPEND	0x20
+>  
+>  /*
+>   * Flags set by the core iomap code during operations:
+> -- 
+> 2.30.2
+> 
