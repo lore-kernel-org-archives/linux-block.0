@@ -2,35 +2,164 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 54774C433FE
-	for <linux-block@archiver.kernel.org>; Mon, 21 Nov 2022 08:27:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C74EC43217
+	for <linux-block@archiver.kernel.org>; Mon, 21 Nov 2022 09:00:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229632AbiKUI1V (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 21 Nov 2022 03:27:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54460 "EHLO
+        id S229712AbiKUJAA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 21 Nov 2022 04:00:00 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50366 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229982AbiKUI1U (ORCPT
+        with ESMTP id S229446AbiKUI77 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 21 Nov 2022 03:27:20 -0500
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2847860F7
-        for <linux-block@vger.kernel.org>; Mon, 21 Nov 2022 00:27:20 -0800 (PST)
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 469C068AA6; Mon, 21 Nov 2022 09:27:17 +0100 (CET)
-Date:   Mon, 21 Nov 2022 09:27:17 +0100
-From:   Christoph Hellwig <hch@lst.de>
-To:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-Subject: Re: untangle the request_queue refcounting from the queue kobject
- v2
-Message-ID: <20221121082717.GA27080@lst.de>
-References: <20221114042637.1009333-1-hch@lst.de>
+        Mon, 21 Nov 2022 03:59:59 -0500
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9978CDF95;
+        Mon, 21 Nov 2022 00:59:58 -0800 (PST)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 463F61F897;
+        Mon, 21 Nov 2022 08:59:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1669021197;
+        h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
+         cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=v9eI0l3L5J3waSLvW+eC332jj5gD4Rcqx/oy4092T7U=;
+        b=uJNWoBaxwvTkrgcPCkmSH5N8lmksBFO6vBhMcKeC2W7lOUh2gTFKNUCWjI6fbYlxpP4bPc
+        FekS8LKjm1E6B5wm3peAwXuznfWm6rE2l2WmGEaZSqIF05/CrJqQtHQvIhenohiltd0lPR
+        V2J68v0dm4icKuYkLMj6IUjdDe79bbc=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1669021197;
+        h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
+         cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=v9eI0l3L5J3waSLvW+eC332jj5gD4Rcqx/oy4092T7U=;
+        b=mwKTVaxEkEJfXDxmby4hh4uyjgP5plQNW4zg0K0s18PEbBjnSvse2OmeQrilKUMTFtMoFK
+        tjiy0rAVGrz7aCDA==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id F0E0D1376E;
+        Mon, 21 Nov 2022 08:59:56 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id BGsKOQw+e2MxXQAAMHmgww
+        (envelope-from <pvorel@suse.cz>); Mon, 21 Nov 2022 08:59:56 +0000
+Date:   Mon, 21 Nov 2022 09:59:55 +0100
+From:   Petr Vorel <pvorel@suse.cz>
+To:     Li Wang <liwang@redhat.com>
+Cc:     ltp@lists.linux.it, Jens Axboe <axboe@kernel.dk>,
+        Minchan Kim <minchan@kernel.org>, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org,
+        OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>,
+        linux-kselftest@vger.kernel.org,
+        Sergey Senozhatsky <senozhatsky@chromium.org>,
+        Nitin Gupta <ngupta@vflare.org>
+Subject: Re: [LTP] [PATCH 1/1] zram01.sh: Workaround division by 0 on vfat on
+ ppc64le
+Message-ID: <Y3s+Czg8sBsGYO+1@pevik>
+Reply-To: Petr Vorel <pvorel@suse.cz>
+References: <20221107191136.18048-1-pvorel@suse.cz>
+ <20221107191136.18048-2-pvorel@suse.cz>
+ <CAEemH2fYv_=9UWdWB7VDiFOd8EC89qdCbxnPcTPAtGnkwLOYFg@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20221114042637.1009333-1-hch@lst.de>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <CAEemH2fYv_=9UWdWB7VDiFOd8EC89qdCbxnPcTPAtGnkwLOYFg@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Any comments on the actual series?
+Hi Li,
+
+> Hi Petr,
+
+> On Tue, Nov 8, 2022 at 3:12 AM Petr Vorel <pvorel@suse.cz> wrote:
+
+> > Repeatedly read /sys/block/zram*/mm_stat for 1 sec. This should fix bug
+> > on ppc64le on stable kernels, where mem_used_total is often 0.
+
+> > Signed-off-by: Petr Vorel <pvorel@suse.cz>
+> > ---
+> >  .../kernel/device-drivers/zram/zram01.sh      | 27 +++++++++++++++++--
+> >  1 file changed, 25 insertions(+), 2 deletions(-)
+
+> > diff --git a/testcases/kernel/device-drivers/zram/zram01.sh
+> > b/testcases/kernel/device-drivers/zram/zram01.sh
+> > index 58d233f91..76a8ccab4 100755
+> > --- a/testcases/kernel/device-drivers/zram/zram01.sh
+> > +++ b/testcases/kernel/device-drivers/zram/zram01.sh
+> > @@ -105,6 +105,26 @@ zram_mount()
+> >         tst_res TPASS "mount of zram device(s) succeeded"
+> >  }
+
+> > +read_mem_used_total()
+> > +{
+> > +       echo $(awk '{print $3}' $1)
+> > +}
+> > +
+> > +# Reads /sys/block/zram*/mm_stat until mem_used_total is not 0.
+> > +loop_read_mem_used_total()
+
+
+> This is not a looping function to check if mem_used_total is equal to zero,
+> the loop part is by means of the TST_RETRY_FUNC macro.
+Thanks for your review!
+
+> So, I'd suggest renaming it to check_read_mem_used_total().
+Agree. Unfortunately even this didn't help on ppc64le system where I was able to
+reproduce it, thus probably not worth to merge.
+
+Unfortunately later I was not able to reproduce the problem any more, I'll try
+it more this week.
+
+Kind regards,
+Petr
+
+> Reviewed-by: Li Wang <liwang@redhat.com>
+
+
+
+> > +{
+> > +       local file="$1"
+> > +       local mem_used_total
+> > +
+> > +       tst_res TINFO "$file"
+> > +       cat $file >&2
+> > +
+> > +       mem_used_total=$(read_mem_used_total $file)
+> > +       [ "$mem_used_total" -eq 0 ] && return 1
+> > +
+> > +       return 0
+> > +}
+> > +
+> >  zram_fill_fs()
+> >  {
+> >         local mem_used_total
+> > @@ -133,9 +153,12 @@ zram_fill_fs()
+> >                         continue
+> >                 fi
+
+> > -               mem_used_total=`awk '{print $3}'
+> > "/sys/block/zram$i/mm_stat"`
+> > +               TST_RETRY_FUNC "loop_read_mem_used_total
+> > /sys/block/zram$i/mm_stat" 0
+> > +               mem_used_total=$(read_mem_used_total
+> > /sys/block/zram$i/mm_stat)
+> > +               tst_res TINFO "mem_used_total: $mem_used_total"
+> > +
+> >                 v=$((100 * 1024 * $b / $mem_used_total))
+> > -               r=`echo "scale=2; $v / 100 " | bc`
+> > +               r=$(echo "scale=2; $v / 100 " | bc)
+
+> >                 if [ "$v" -lt 100 ]; then
+> >                         tst_res TFAIL "compression ratio: $r:1"
+> > --
+> > 2.38.0
+
+
+> > --
+> > Mailing list info: https://lists.linux.it/listinfo/ltp
