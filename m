@@ -2,108 +2,113 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12C33C4332F
-	for <linux-block@archiver.kernel.org>; Mon, 21 Nov 2022 14:30:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4720EC4332F
+	for <linux-block@archiver.kernel.org>; Mon, 21 Nov 2022 14:37:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230236AbiKUOaw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 21 Nov 2022 09:30:52 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43100 "EHLO
+        id S230456AbiKUOhO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 21 Nov 2022 09:37:14 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47050 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230208AbiKUOat (ORCPT
+        with ESMTP id S230376AbiKUOgq (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 21 Nov 2022 09:30:49 -0500
-Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3FD23AB0C0
-        for <linux-block@vger.kernel.org>; Mon, 21 Nov 2022 06:30:47 -0800 (PST)
-Received: by mail-pl1-x634.google.com with SMTP id y10so9547559plp.3
-        for <linux-block@vger.kernel.org>; Mon, 21 Nov 2022 06:30:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=fKdPBgf4F1DbPho+543ze8p/JJM5iKRRHyH33ew0++Y=;
-        b=jrZpJYDRNZTvL91G/bFgw/1STzMW33rYKTqBLYy3vYffZlw43RahxhV6wxQRpWZIxX
-         x6HipJ6s1wVjbg2BH9m2MwYh8gKj0JTDaxUmGi1o5nakjAaUciEROc15usDK0vKqyhOl
-         9L7usg5AghzAPNpNNYrHDerJTUfeA1BB08UKuRUzfDCVZWX65+0/8j9Y54d4vjEVy8vJ
-         921jD7JwFe6auLnSeXFhtVGp8RvIuE0XdQmcpeaEyKdtvhjB40A7Ef/vjR69OgPMAtrt
-         HqjR+34LdHESiPMp+x6DE+vgGi2UGolxpohdnwzGLJ6mkV/cPANuyPR+RgqjiZKvK7Ll
-         MXmg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=fKdPBgf4F1DbPho+543ze8p/JJM5iKRRHyH33ew0++Y=;
-        b=DyiqrSRPQzLWFL9PrIcBSpAO6RXZsdYDktcdYrXKGJXUmvbifhIA/Av3DkNgQk4xPI
-         sXpDAZ1sE4BcWrFnSUYZY4PvqTuFiiL6HQn7+7XWmJi9NNfRnQ39Tg8sTrpB4AjghAsI
-         wM1pg0e5a38/VjaC3m9Junqo2yKunwsy4YZCtpbcEcbhk9cZQCyydEbNuY9o21CUsCT7
-         3tfHWU6QML1Gim7o+vny+dAGOFL7OrcbnbYwYk8Umjkv0BbAlKBic/4RHwV5p7Y5dws7
-         XoAN3I4RUuTK+29ACxHoOTQMtSBtPqORHR8rj1ySRO2vnvS0zkluTGXeF5S3T19TSOS8
-         hZxQ==
-X-Gm-Message-State: ANoB5pnqbMjIsV/lGRcSFl9ukhWhT5tdNjPCe/k3oI/UFYTGXWURC/oD
-        zbHJ8DEW3ebR+Mqy22aoxO7xQg==
-X-Google-Smtp-Source: AA0mqf6/+g7r5XsHDkk4PBUMLfIhfGYA2phFatP0/v3K1w6nUxS3oOR1xEvbfvt5d9rob8XbgwhAWw==
-X-Received: by 2002:a17:90a:8c96:b0:218:7e9d:8d0a with SMTP id b22-20020a17090a8c9600b002187e9d8d0amr17088134pjo.41.1669041046463;
-        Mon, 21 Nov 2022 06:30:46 -0800 (PST)
-Received: from [192.168.1.136] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id z2-20020a626502000000b0057255b7c8easm8776251pfb.33.2022.11.21.06.30.45
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 21 Nov 2022 06:30:46 -0800 (PST)
-Message-ID: <c0e639ea-caa0-f76c-c369-0d22a49047ca@kernel.dk>
-Date:   Mon, 21 Nov 2022 07:30:44 -0700
+        Mon, 21 Nov 2022 09:36:46 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F21DA4162
+        for <linux-block@vger.kernel.org>; Mon, 21 Nov 2022 06:35:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1669041303;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=181ZHweS4wHRSdLySvK3fpfT7WMJLPwn/rNHBgW8rAk=;
+        b=FRBRYMuD6hZhCYCxVRwZRgJ8ck3pHEBHmbmFxJ0T19hA5C3adeOKBQLUVS8O/+8axWjap6
+        vGGrN6UfeJSag0OV+Csxdo/4B1dXSsFFDK4GH4h++n0e7SUJ2bpSok3ZujHeHyKziqtkCA
+        vLnTMwEOuAgklcJM8Xlm+welG63feW8=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-220-cKpJPG72PVO5ijDDtOCqbA-1; Mon, 21 Nov 2022 09:34:58 -0500
+X-MC-Unique: cKpJPG72PVO5ijDDtOCqbA-1
+Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 1521B811E7A;
+        Mon, 21 Nov 2022 14:34:56 +0000 (UTC)
+Received: from [172.16.176.1] (unknown [10.22.50.7])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 61D8E492B06;
+        Mon, 21 Nov 2022 14:34:47 +0000 (UTC)
+From:   Benjamin Coddington <bcodding@redhat.com>
+To:     David Howells <dhowells@redhat.com>
+Cc:     netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Philipp Reisner <philipp.reisner@linbit.com>,
+        Lars Ellenberg <lars.ellenberg@linbit.com>,
+        =?utf-8?q?Christoph_B=C3=B6hmwalder?= 
+        <christoph.boehmwalder@linbit.com>, Jens Axboe <axboe@kernel.dk>,
+        Josef Bacik <josef@toxicpanda.com>,
+        Keith Busch <kbusch@kernel.org>,
+        Christoph Hellwig <hch@lst.de>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Lee Duncan <lduncan@suse.com>, Chris Leech <cleech@redhat.com>,
+        Mike Christie <michael.christie@oracle.com>,
+        "James E.J. Bottomley" <jejb@linux.ibm.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Valentina Manea <valentina.manea.m@gmail.com>,
+        Shuah Khan <shuah@kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Marc Dionne <marc.dionne@auristor.com>,
+        Steve French <sfrench@samba.org>,
+        Christine Caulfield <ccaulfie@redhat.com>,
+        David Teigland <teigland@redhat.com>,
+        Mark Fasheh <mark@fasheh.com>,
+        Joel Becker <jlbec@evilplan.org>,
+        Joseph Qi <joseph.qi@linux.alibaba.com>,
+        Eric Van Hensbergen <ericvh@gmail.com>,
+        Latchesar Ionkov <lucho@ionkov.net>,
+        Dominique Martinet <asmadeus@codewreck.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Ilya Dryomov <idryomov@gmail.com>,
+        Xiubo Li <xiubli@redhat.com>,
+        Trond Myklebust <trond.myklebust@hammerspace.com>,
+        Anna Schumaker <anna@kernel.org>,
+        Chuck Lever <chuck.lever@oracle.com>,
+        Jeff Layton <jlayton@kernel.org>, drbd-dev@lists.linbit.com,
+        linux-block@vger.kernel.org, nbd@other.debian.org,
+        linux-nvme@lists.infradead.org, open-iscsi@googlegroups.com,
+        linux-scsi@vger.kernel.org, linux-usb@vger.kernel.org,
+        linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
+        samba-technical@lists.samba.org, cluster-devel@redhat.com,
+        ocfs2-devel@oss.oracle.com, v9fs-developer@lists.sourceforge.net,
+        ceph-devel@vger.kernel.org, linux-nfs@vger.kernel.org
+Subject: Re: [PATCH v1 2/3] Treewide: Stop corrupting socket's task_frag
+Date:   Mon, 21 Nov 2022 09:34:43 -0500
+Message-ID: <51B5418D-34FB-4E87-B87A-6C3FCDF8B21C@redhat.com>
+In-Reply-To: <382872.1669039019@warthog.procyon.org.uk>
+References: <c2ec184226acd21a191ccc1aa46a1d7e43ca7104.1669036433.git.bcodding@redhat.com>
+ <cover.1669036433.git.bcodding@redhat.com>
+ <382872.1669039019@warthog.procyon.org.uk>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
- Thunderbird/102.4.1
-Subject: Re: [RESEND PATCH] drbd: destroy workqueue when drbd device was freed
-Content-Language: en-US
-To:     Wang ShaoBo <bobo.shaobowang@huawei.com>
-Cc:     liwei391@huawei.com, linux-block@vger.kernel.org,
-        drbd-dev@lists.linbit.com, christoph.boehmwalder@linbit.com
-References: <20221121115047.3828385-1-bobo.shaobowang@huawei.com>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20221121115047.3828385-1-bobo.shaobowang@huawei.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.10
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 11/21/22 4:50 AM, Wang ShaoBo wrote:
-> A submitter workqueue is dynamically allocated by init_submitter()
-> called by drbd_create_device(), we should destroy it when this
-> device is not needed or destroyed.
-> 
-> Fixes: 113fef9e20e0 ("drbd: prepare to queue write requests on a submit worker")
-> Signed-off-by: Wang ShaoBo <bobo.shaobowang@huawei.com>
-> ---
-> 
-> Changes in RESEND:
->   put destroy_workqueue() before memset(device, ...)
-> 
->  drivers/block/drbd/drbd_main.c | 7 +++++++
->  1 file changed, 7 insertions(+)
-> 
-> diff --git a/drivers/block/drbd/drbd_main.c b/drivers/block/drbd/drbd_main.c
-> index 8532b839a343..082bc34cd317 100644
-> --- a/drivers/block/drbd/drbd_main.c
-> +++ b/drivers/block/drbd/drbd_main.c
-> @@ -2217,7 +2217,12 @@ void drbd_destroy_device(struct kref *kref)
->  		kref_put(&peer_device->connection->kref, drbd_destroy_connection);
->  		kfree(peer_device);
->  	}
-> +
-> +	if (device->submit.wq)
-> +		destroy_workqueue(device->submit.wq);
-> +
->  	memset(device, 0xfd, sizeof(*device));
-> +
->  	kfree(device);
+On 21 Nov 2022, at 8:56, David Howells wrote:
 
-Maybe you can send a separate patch killing that very odd (and useless)
-memset as well?
+> Benjamin Coddington <bcodding@redhat.com> wrote:
+>
+>> Since moving to memalloc_nofs_save/restore, SUNRPC has stopped setting the
+>> GFP_NOIO flag on sk_allocation which the networking system uses to decide
+>> when it is safe to use current->task_frag.
+>
+> Um, what's task_frag?
 
--- 
-Jens Axboe
+Its a per-task page_frag used to coalesce small writes for networking -- see:
 
+5640f7685831 net: use a per task frag allocator
+
+Ben
 
