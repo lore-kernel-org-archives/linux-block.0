@@ -2,158 +2,88 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A326C43217
-	for <linux-block@archiver.kernel.org>; Mon, 21 Nov 2022 22:32:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F39CAC4332F
+	for <linux-block@archiver.kernel.org>; Mon, 21 Nov 2022 22:34:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231820AbiKUWcI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 21 Nov 2022 17:32:08 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41340 "EHLO
+        id S230152AbiKUWev (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 21 Nov 2022 17:34:51 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43876 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230475AbiKUWcH (ORCPT
+        with ESMTP id S229772AbiKUWeu (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 21 Nov 2022 17:32:07 -0500
-Received: from mail-io1-xd2b.google.com (mail-io1-xd2b.google.com [IPv6:2607:f8b0:4864:20::d2b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 22663E0683
-        for <linux-block@vger.kernel.org>; Mon, 21 Nov 2022 14:32:06 -0800 (PST)
-Received: by mail-io1-xd2b.google.com with SMTP id r81so9723023iod.2
-        for <linux-block@vger.kernel.org>; Mon, 21 Nov 2022 14:32:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linuxfoundation.org; s=google;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=C14m+5yBrv+u7QhAN78BFentZAFfnah8l0PUC4om7m8=;
-        b=Hffgzad5MotJq5EstTpwFVQ55zJ2m4sb3dYfhAhqq6QB33wEMcRLHmm2P2eeaxcyl7
-         AuWzz1/l9u/1PZyxMCWxsiA0Q6e5fRCsSvqJb8QkirXxS7f+WkWGHtcgrG5qSrXeSLS7
-         dJYa3L0ToHNG/CDOCknNOKSmu/izuTLa+EFwY=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=C14m+5yBrv+u7QhAN78BFentZAFfnah8l0PUC4om7m8=;
-        b=fSWQT26oaD458hwmSrZL5x5iybEqrhIBHMvqGBsX/FOsiyDM4JmADOzEdW7KvCu9aj
-         U7DgAlp0jX7jMbV9WCWddSJz8EmS8p9sGFoMVesh1zMq+oE7i1oOGc3Sl+SKnXfa3l7V
-         E313rHpXhkawP93bRocRLZG3EL0ycHI3NyGtS+iJbPQHGhaBJgtBlRvJstyIqLIrxdoq
-         NlIy0LrqOXYZ8i7fmSROx5Yb2o4n+iP1VngXb/2TFZvAF7qixjExEoQITfXX2hE/QZ6j
-         mLaRIccXFmZxTuhZy3eEW2dD5oaOJtVaCa2bc6a1pdKkqrwWcFd5FP2mW41G7uCKO+G+
-         8tcA==
-X-Gm-Message-State: ANoB5pkzxaU1CtgJinvxafilAFXN0kmVi2suOIKi1wAgYiScnT3VlIlU
-        OU4RNVA0uADspIcdIntvibBLqQ==
-X-Google-Smtp-Source: AA0mqf7LzJaZLZ7BN/ieedWyHJVfNYy1D/3fvJQ9uHDra09xLMDQnM+TgsskrmQ988UMBIXzYDc/Wg==
-X-Received: by 2002:a02:cba6:0:b0:375:a360:a130 with SMTP id v6-20020a02cba6000000b00375a360a130mr9477313jap.307.1669069925449;
-        Mon, 21 Nov 2022 14:32:05 -0800 (PST)
-Received: from [192.168.1.128] ([38.15.45.1])
-        by smtp.gmail.com with ESMTPSA id f15-20020a056638112f00b0037502ffac71sm4612316jar.18.2022.11.21.14.32.02
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 21 Nov 2022 14:32:04 -0800 (PST)
-Message-ID: <96114bec-1df7-0dcb-ec99-4f907587658d@linuxfoundation.org>
-Date:   Mon, 21 Nov 2022 15:32:02 -0700
+        Mon, 21 Nov 2022 17:34:50 -0500
+Received: from out0.migadu.com (out0.migadu.com [94.23.1.103])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2616017E17
+        for <linux-block@vger.kernel.org>; Mon, 21 Nov 2022 14:34:49 -0800 (PST)
+Message-ID: <e99fef7c-1b48-61e2-b503-a2363968d5fc@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1669070087;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Mi5AOnkNDd5+Yw+FClfum/TPQGJ1wsJfNK1UjN5PLpY=;
+        b=gEGNcd8+SurevPmIEcSmpmYBwWGnRLMXmOL8nUq3XOjVb0tJtb44Ajoy8xHkV5L8po5z64
+        lSXbiOCb9t9HgOj/6TRHl3xuLs7D34tZrXupBZz8p2DsnRMe/htuTjJpjwc6BonJ33LUUH
+        tXQsG5modsChaFE7JXeJRmbR1MGX1iE=
+Date:   Mon, 21 Nov 2022 15:34:44 -0700
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.4.2
-Subject: Re: [PATCH v1 2/3] Treewide: Stop corrupting socket's task_frag
+Subject: Re: [PATCH v2] tests/nvme: Add admin-passthru+reset race test
 Content-Language: en-US
-To:     Benjamin Coddington <bcodding@redhat.com>
-Cc:     David Howells <dhowells@redhat.com>, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Philipp Reisner <philipp.reisner@linbit.com>,
-        Lars Ellenberg <lars.ellenberg@linbit.com>,
-        =?UTF-8?Q?Christoph_B=c3=b6hmwalder?= 
-        <christoph.boehmwalder@linbit.com>, Jens Axboe <axboe@kernel.dk>,
-        Josef Bacik <josef@toxicpanda.com>,
-        Keith Busch <kbusch@kernel.org>,
+To:     Keith Busch <kbusch@kernel.org>
+Cc:     linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+        Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
         Christoph Hellwig <hch@lst.de>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Lee Duncan <lduncan@suse.com>, Chris Leech <cleech@redhat.com>,
-        Mike Christie <michael.christie@oracle.com>,
-        "James E.J. Bottomley" <jejb@linux.ibm.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Valentina Manea <valentina.manea.m@gmail.com>,
-        Shuah Khan <shuah@kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Marc Dionne <marc.dionne@auristor.com>,
-        Steve French <sfrench@samba.org>,
-        Christine Caulfield <ccaulfie@redhat.com>,
-        David Teigland <teigland@redhat.com>,
-        Mark Fasheh <mark@fasheh.com>,
-        Joel Becker <jlbec@evilplan.org>,
-        Joseph Qi <joseph.qi@linux.alibaba.com>,
-        Eric Van Hensbergen <ericvh@gmail.com>,
-        Latchesar Ionkov <lucho@ionkov.net>,
-        Dominique Martinet <asmadeus@codewreck.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Ilya Dryomov <idryomov@gmail.com>,
-        Xiubo Li <xiubli@redhat.com>,
-        Trond Myklebust <trond.myklebust@hammerspace.com>,
-        Anna Schumaker <anna@kernel.org>,
-        Chuck Lever <chuck.lever@oracle.com>,
-        Jeff Layton <jlayton@kernel.org>, drbd-dev@lists.linbit.com,
-        linux-block@vger.kernel.org, nbd@other.debian.org,
-        linux-nvme@lists.infradead.org, open-iscsi@googlegroups.com,
-        linux-scsi@vger.kernel.org, linux-usb@vger.kernel.org,
-        linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
-        samba-technical@lists.samba.org, cluster-devel@redhat.com,
-        ocfs2-devel@oss.oracle.com, v9fs-developer@lists.sourceforge.net,
-        ceph-devel@vger.kernel.org, linux-nfs@vger.kernel.org,
-        Shuah Khan <skhan@linuxfoundation.org>
-References: <c2ec184226acd21a191ccc1aa46a1d7e43ca7104.1669036433.git.bcodding@redhat.com>
- <cover.1669036433.git.bcodding@redhat.com>
- <382872.1669039019@warthog.procyon.org.uk>
- <51B5418D-34FB-4E87-B87A-6C3FCDF8B21C@redhat.com>
- <4585e331-03ad-959f-e715-29af15f63712@linuxfoundation.org>
- <26d98c8f-372b-b9c8-c29f-096cddaff149@linuxfoundation.org>
- <A860595D-5BAB-461B-B449-8975C0424311@redhat.com>
-From:   Shuah Khan <skhan@linuxfoundation.org>
-In-Reply-To: <A860595D-5BAB-461B-B449-8975C0424311@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+        Sagi Grimberg <sagi@grimberg.me>
+References: <20221117212210.934-1-jonathan.derrick@linux.dev>
+ <Y3vlsF7KcRrY7vCW@kbusch-mbp>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From:   Jonathan Derrick <jonathan.derrick@linux.dev>
+In-Reply-To: <Y3vlsF7KcRrY7vCW@kbusch-mbp>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 11/21/22 15:01, Benjamin Coddington wrote:
-> On 21 Nov 2022, at 16:43, Shuah Khan wrote:
+
+
+On 11/21/2022 1:55 PM, Keith Busch wrote:
+> On Thu, Nov 17, 2022 at 02:22:10PM -0700, Jonathan Derrick wrote:
+>> I seem to have isolated the error mechanism for older kernels, but 6.2.0-rc2
+>> reliably segfaults my QEMU instance (something else to look into) and I don't
+>> have any 'real' hardware to test this on at the moment. It looks like several
+>> passthru commands are able to enqueue prior/during/after resetting/connecting.
 > 
->> On 11/21/22 14:40, Shuah Khan wrote:
->>> On 11/21/22 07:34, Benjamin Coddington wrote:
->>>> On 21 Nov 2022, at 8:56, David Howells wrote:
->>>>
->>>>> Benjamin Coddington <bcodding@redhat.com> wrote:
->>>>>
->>>>>> Since moving to memalloc_nofs_save/restore, SUNRPC has stopped setting the
->>>>>> GFP_NOIO flag on sk_allocation which the networking system uses to decide
->>>>>> when it is safe to use current->task_frag.
->>>>>
->>>>> Um, what's task_frag?
->>>>
->>>> Its a per-task page_frag used to coalesce small writes for networking -- see:
->>>>
->>>> 5640f7685831 net: use a per task frag allocator
->>>>
->>>> Ben
->>>>
->>>>
->>>
->>> I am not seeing this in the mainline. Where can find this commit?
->>>
+> I'm not seeing any problem with the latest nvme-qemu after several dozen
+> iterations of this test case. In that environment, the formats and
+> resets complete practically synchronously with the call, so everything
+> proceeds quickly. Is there anything special I need to change?
+>  
+I can still repro this with nvme-fixes tag, so I'll have to dig into it myself
+Does the tighter loop in the test comment header produce results?
+
+
+>> The issue seems to be very heavily timing related, so the loop in the header is
+>> a lot more forceful in this approach.
 >>
->> Okay. I see this commit in the mainline. However, I don't see the
->> sk_use_task_frag in mainline.
+>> As far as the loop goes, I've noticed it will typically repro immediately or
+>> pass the whole test.
 > 
-> sk_use_task_frag is in patch 1/3 in this posting.
+> I can only get possible repro in scenarios that have multi-second long,
+> serialized format times. Even then, it still appears that everything
+> fixes itself after a waiting. Are you observing the same, or is it stuck
+> forever in your observations?
+In 5.19, it gets stuck forever with lots of formats outstanding and
+controller stuck in resetting. I'll keep digging. Thanks Keith
+
 > 
-> https://lore.kernel.org/netdev/26d98c8f-372b-b9c8-c29f-096cddaff149@linuxfoundation.org/T/#m3271959c4cf8dcff1c0c6ba023b2b3821d9e7e99
+>> +remove_and_rescan() {
+>> +	local pdev=$1
+>> +	echo 1 > /sys/bus/pci/devices/"$pdev"/remove
+>> +	echo 1 > /sys/bus/pci/rescan
+>> +}
 > 
-
-Aha. I don't have 1/3 in my Inbox - I think it would make
-sense to cc people on the first patch so we can understand
-the premise for the change.
-
-thanks,
--- Shuah
-  
-
+> This function isn't called anywhere.
