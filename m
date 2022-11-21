@@ -2,90 +2,113 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 686F4C433FE
-	for <linux-block@archiver.kernel.org>; Mon, 21 Nov 2022 08:14:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 82951C43219
+	for <linux-block@archiver.kernel.org>; Mon, 21 Nov 2022 08:25:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229575AbiKUIOW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 21 Nov 2022 03:14:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44648 "EHLO
+        id S229678AbiKUIZx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 21 Nov 2022 03:25:53 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53624 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229874AbiKUIOU (ORCPT
+        with ESMTP id S229491AbiKUIZw (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 21 Nov 2022 03:14:20 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9BF6127FCB
-        for <linux-block@vger.kernel.org>; Mon, 21 Nov 2022 00:13:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1669018401;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=LXlYy9pZM0dbFzL7qiPQerpcjHoHper9o+KpvlsD6jg=;
-        b=Vwa1kOERxQgiyfrevjFJtXVm3wjDU4vPXXtfokKnU1Omh2qDirZs+b5VVNCLKFhsMZmkKg
-        23anqydOcMTZa+S68D4FDSkRS4BXIFAH9TjrTqgvxEi1wg7LnePjaC8mnYclPQQncJdHUi
-        vxBWgVb6+lJ1bNtq1lHbIUeV5Q0dqPQ=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-12-1i1GLF9IOWKBtLsYoPD4aQ-1; Mon, 21 Nov 2022 03:13:20 -0500
-X-MC-Unique: 1i1GLF9IOWKBtLsYoPD4aQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id DD59E38012C8;
-        Mon, 21 Nov 2022 08:13:19 +0000 (UTC)
-Received: from T590 (ovpn-8-16.pek2.redhat.com [10.72.8.16])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id CEEAA2027061;
-        Mon, 21 Nov 2022 08:13:15 +0000 (UTC)
-Date:   Mon, 21 Nov 2022 16:13:10 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-        Andreas Hindborg <andreas.hindborg@wdc.com>,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        ming.lei@redhat.com
-Subject: Re: Reordering of ublk IO requests
-Message-ID: <Y3szFl5VcD/MNDu5@T590>
-References: <87fseh92aa.fsf@wdc.com>
- <Y3cGM0es14vj3n3N@T590>
- <2f86eb58-148b-03ac-d2bf-d67c5756a7a6@opensource.wdc.com>
- <Y3chDDdbuN99l7v7@T590>
- <8735ag8ueg.fsf@wdc.com>
- <Y3dscKle5oqLjSNT@T590>
- <87v8nc79cv.fsf@wdc.com>
- <Y3d+78qMOusdYUAG@T590>
- <be6940cf-7b23-4b11-1f6f-f3d4853d9a34@opensource.wdc.com>
- <Y3swtrdPaI5lGMpj@infradead.org>
+        Mon, 21 Nov 2022 03:25:52 -0500
+Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A496563FB;
+        Mon, 21 Nov 2022 00:25:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1669019151; x=1700555151;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=tRC91gf0tMNQxTUnM2kVX03iZwsnDeqc3G8jXCJ98P4=;
+  b=FTJoKZdYqC73wBb5/oFkoikhGuAFAu1DDJfA0ljAXI6KQeSoeiCUWW/C
+   IH3b6HJhZiXpkM0kZ750gAvu1J4g3919b8XqB9OVcdrTyPP7Bx4xJcbIx
+   oB1VLt/bUIAUP/XCoa4R93VMK0k9xNGjjJzt++RAYvZ/es1MFu/xGtSv9
+   HIMpt1TSnCAJkASjTCyC42GyHcC2ID42BqpK9WGQREPzgEv5ezESv2qL8
+   wzWtLobjjnTVTdkBismYbCLaJzsI6xd5S+H+I3h7EGXBVNKF0iJgW3CWp
+   0+v+1undo/S+5F0FGgRBr5zKKshBztdXhV0rCw2HXxVqfGsmccJYFSAOA
+   w==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10537"; a="301046507"
+X-IronPort-AV: E=Sophos;i="5.96,180,1665471600"; 
+   d="scan'208";a="301046507"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Nov 2022 00:25:51 -0800
+X-IronPort-AV: E=McAfee;i="6500,9779,10537"; a="635104678"
+X-IronPort-AV: E=Sophos;i="5.96,180,1665471600"; 
+   d="scan'208";a="635104678"
+Received: from ahunter6-mobl1.ger.corp.intel.com (HELO [10.0.2.15]) ([10.252.35.94])
+  by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Nov 2022 00:25:48 -0800
+Message-ID: <5df2c4d5-f426-e3ea-8e6d-f772ec7091b6@intel.com>
+Date:   Mon, 21 Nov 2022 10:25:44 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Y3swtrdPaI5lGMpj@infradead.org>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Firefox/102.0 Thunderbird/102.5.0
+Subject: Re: [PATCH 0/3] mmc: Improve block layer requeueing behavior
+Content-Language: en-US
+To:     Bart Van Assche <bvanassche@acm.org>,
+        =?UTF-8?Q?Christian_L=c3=b6hle?= <CLoehle@hyperstone.com>,
+        "axboe@kernel.dk" <axboe@kernel.dk>,
+        "ulf.hansson@linaro.org" <ulf.hansson@linaro.org>,
+        "linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Christoph Hellwig <hch@lst.de>
+Cc:     Avri Altman <Avri.Altman@wdc.com>,
+        "vincent.whitchurch@axis.com" <vincent.whitchurch@axis.com>
+References: <f30ec7fe7d834c1d8e116508500110cf@hyperstone.com>
+ <c1e1281e-0977-cbf7-041e-db911ee722a7@intel.com>
+ <d1a1340a-f5f8-6953-e066-b8c6095d63fd@acm.org>
+From:   Adrian Hunter <adrian.hunter@intel.com>
+Organization: Intel Finland Oy, Registered Address: PL 281, 00181 Helsinki,
+ Business Identity Code: 0357606 - 4, Domiciled in Helsinki
+In-Reply-To: <d1a1340a-f5f8-6953-e066-b8c6095d63fd@acm.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Nov 21, 2022 at 12:03:02AM -0800, Christoph Hellwig wrote:
-> I've been wading through this thread a bit, and while I can't follow
-> everything due some pretty bad reply trimming I'm really really
-> confused by this whole discussion.
+On 18/11/22 19:27, Bart Van Assche wrote:
+> On 11/18/22 02:47, Adrian Hunter wrote:
+>> On 26/10/22 10:30, Christian Löhle wrote:
+>>> Mmcblk relies on block layer requeueing to fulfill some requests under
+>>> certain conditions. Improve the handling to get nicely ordered requests.
+>>>
+>>> Using the terms a bit loosely to get a point across:
+>>> Current behavior for 512 blksz and max_blk_count = 1 the scenario would
+>>> be as follows:
+>>>
+>>> - request for page 0 lba 0 to 7
+>>> - request for page 1 lba 8 to 15
+>>> - request for page 2 lba 16 to 23
+>>> - request for page 3 lba 24 to 31
+>>>
+>>> mmcblk modifies data->blocks = 1 for each and requeues,
+>>> this leads to:
+>>>
+>>> Access lba 0
+>>> Access lba 8
+>>> Access lba 16
+>>> Access lba 24
+>>> Access lba 1 (1. Requeue for page 0)
+>>> Access lba 9 (1. Requeue for page 1)
+>>> Access lba 17 (1. Requeue for page 2)
+>>> Access lba 25 (1. Requeue for page 3)
+>>> Access lba 2 (2. Requeue for page 0)
+>>> ...
+>>>
+>>> Of course we would rather have lbas consecutive.
+>>
+>> Does anyone know why the block layer does not support
+>> (max_hw_sectors << 9) < PAGE_SIZE ?
 > 
-> Every single storage system, be that hard drives, SSDs, file systems
-> or what else much preferres sequential write.  Any code that turns
-> perfectly sequential writes into reverse sequential writes is a massive
-> performance bug, zoned or not.
+> Hi Adrian,
 > 
-> So totally independent of zone device support in ublk this needs to be
-> fixed ASAP.
+> Does this mean that the following patch series would not only be
+> useful for UFS but also for MMC? "[PATCH 00/10] Support DMA segments
+> smaller than the page size"
+> (https://lore.kernel.org/linux-block/20221019222324.362705-1-bvanassche@acm.org/).
 
-I will send one fix soon.
-
-BTW, blk-mq has such similar issue, which is reported for while, but
-not addressed yet.
-
-https://lore.kernel.org/linux-nvme/CAHex0coMNvFa1TPzK+5mZHsiie4d1Jd0Z8ejcZk1Vi1_4F7eRg@mail.gmail.com/T/#mbcb9b52ff61aed6fdd1b6630c6e62e55a4ed898f
-
-
-Thanks,
-Ming
+That patchset still does not allow max_hw_sectors = 1 which is
+what Christian's case needs.
 
