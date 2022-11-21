@@ -2,110 +2,140 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE3E6C4332F
-	for <linux-block@archiver.kernel.org>; Mon, 21 Nov 2022 13:58:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2AC13C433FE
+	for <linux-block@archiver.kernel.org>; Mon, 21 Nov 2022 13:59:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231609AbiKUN6m (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 21 Nov 2022 08:58:42 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34350 "EHLO
+        id S231602AbiKUN7b (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 21 Nov 2022 08:59:31 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36850 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231572AbiKUN6H (ORCPT
+        with ESMTP id S231462AbiKUN7F (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 21 Nov 2022 08:58:07 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 71B74BFF6B
-        for <linux-block@vger.kernel.org>; Mon, 21 Nov 2022 05:57:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1669039033;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=ZDwjBu4RghRAGfAihvi/wXSTBbp9s9Q2lKXWhxCyRLY=;
-        b=bkPOmsZZUEPy0ywvExnX2YY9fPvl83no39+1/4A3FgMGKqSUr4yVkaZNl7x4R338gjD1aq
-        J9IKjIFN+mmwG9zh0w1JUmoVA7sEcyFIY30zU8KRpJ+IV6u/t4UIkHzvK90/vTIIRAVrCJ
-        CrU3ISXEmgvMGLgk3WKiuSspO+webm8=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-357-r7ih-rJfOeutGzbihEzMtw-1; Mon, 21 Nov 2022 08:57:10 -0500
-X-MC-Unique: r7ih-rJfOeutGzbihEzMtw-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 2049F811E67;
-        Mon, 21 Nov 2022 13:57:08 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.33.36.14])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 14F9D2027062;
-        Mon, 21 Nov 2022 13:57:01 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <c2ec184226acd21a191ccc1aa46a1d7e43ca7104.1669036433.git.bcodding@redhat.com>
-References: <c2ec184226acd21a191ccc1aa46a1d7e43ca7104.1669036433.git.bcodding@redhat.com> <cover.1669036433.git.bcodding@redhat.com>
-To:     Benjamin Coddington <bcodding@redhat.com>
-cc:     netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Philipp Reisner <philipp.reisner@linbit.com>,
-        Lars Ellenberg <lars.ellenberg@linbit.com>,
-        Christoph =?utf-8?Q?B=C3=B6hmwalder?= 
-        <christoph.boehmwalder@linbit.com>, Jens Axboe <axboe@kernel.dk>,
-        Josef Bacik <josef@toxicpanda.com>,
-        Keith Busch <kbusch@kernel.org>,
-        Christoph Hellwig <hch@lst.de>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Lee Duncan <lduncan@suse.com>, Chris Leech <cleech@redhat.com>,
-        Mike Christie <michael.christie@oracle.com>,
-        "James E.J. Bottomley" <jejb@linux.ibm.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Valentina Manea <valentina.manea.m@gmail.com>,
-        Shuah Khan <shuah@kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Marc Dionne <marc.dionne@auristor.com>,
-        Steve French <sfrench@samba.org>,
-        Christine Caulfield <ccaulfie@redhat.com>,
-        David Teigland <teigland@redhat.com>,
-        Mark Fasheh <mark@fasheh.com>,
-        Joel Becker <jlbec@evilplan.org>,
-        Joseph Qi <joseph.qi@linux.alibaba.com>,
-        Eric Van Hensbergen <ericvh@gmail.com>,
-        Latchesar Ionkov <lucho@ionkov.net>,
-        Dominique Martinet <asmadeus@codewreck.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Ilya Dryomov <idryomov@gmail.com>,
-        Xiubo Li <xiubli@redhat.com>,
-        Trond Myklebust <trond.myklebust@hammerspace.com>,
-        Anna Schumaker <anna@kernel.org>,
-        Chuck Lever <chuck.lever@oracle.com>,
-        Jeff Layton <jlayton@kernel.org>, drbd-dev@lists.linbit.com,
-        linux-block@vger.kernel.org, nbd@other.debian.org,
-        linux-nvme@lists.infradead.org, open-iscsi@googlegroups.com,
-        linux-scsi@vger.kernel.org, linux-usb@vger.kernel.org,
-        linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
-        samba-technical@lists.samba.org, cluster-devel@redhat.com,
-        ocfs2-devel@oss.oracle.com, v9fs-developer@lists.sourceforge.net,
-        ceph-devel@vger.kernel.org, linux-nfs@vger.kernel.org
-Subject: Re: [PATCH v1 2/3] Treewide: Stop corrupting socket's task_frag
+        Mon, 21 Nov 2022 08:59:05 -0500
+Received: from mail-wr1-x42f.google.com (mail-wr1-x42f.google.com [IPv6:2a00:1450:4864:20::42f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CCB9517071
+        for <linux-block@vger.kernel.org>; Mon, 21 Nov 2022 05:57:43 -0800 (PST)
+Received: by mail-wr1-x42f.google.com with SMTP id s5so2771207wru.1
+        for <linux-block@vger.kernel.org>; Mon, 21 Nov 2022 05:57:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ionos.com; s=google;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=iF/t8apUyWuhDIryZyYBVw69J04guPwa/Q1m0PGtgj4=;
+        b=NTH1gFTQhD35MwNnKxHma+Dne19TTBr9hsuIMfgWyipYlc+hQpXP0YHxMy7h8Gc9/P
+         0f25YPA/9D37uxZ1XTs2rIwDzIlXHO27c7qFKIEdA4pT2otaDRECGXrh0ynhMkm/7lQI
+         NlLhp7csumAx4/4Dt0zetWAyTt+6qhR2oVrm9cmLg85/agpLojhCQA+M/Sybnh5wdfSE
+         5Bo0BIxNpf6aGi0bv2Q+oF14l67NmrgFMkRtwD81OXBwkpAC819yFFFUwy2dIZlilt47
+         VlmoWs5ZGzAxPsLy958luCizhuz0UKuMOh7xZynKuj11VHOVWbrDj+uwE4LRi8DQewCd
+         VmUQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=iF/t8apUyWuhDIryZyYBVw69J04guPwa/Q1m0PGtgj4=;
+        b=HOzp712R1Gj3tIsOhY1QBNlsaOJz8GY3LIkmdIrFUSHZK9ynGP05GMLeI9cGDMINWQ
+         LXSlhcojyYKjuD6lKoPPnocQ4vPjrPMY3olPezDPDCkGou2Mmbn/oOz3xUI7xLZqLDa9
+         sj546HNswD3uyZ2N9ZS6di+GkATXcYt6hIqx2rD1iS667ujmj1vSf0SKKmjab+Uu+061
+         Rb+grkuZBph7Tk4riefAbcz37E4l/2yvYDfFxGgZK+6cPLwMuJ6LppU7JeDh1OAIG3Om
+         wUvsKNvmZTo0s5ShYDqfz3fkc3JQ1HbiZMa6Sl67WpPUbbVEmPWZRMLNHvlEI8BiwEF9
+         2DGA==
+X-Gm-Message-State: ANoB5pmDfkCKkkh6tyH8p7tDTXj3bFAjOeZgp5gDEntPD5HhHTeKJmlx
+        iY7jLgkYRZyFqF+iFtHr48AWQv4s8HhTfmMMPVQJcw==
+X-Google-Smtp-Source: AA0mqf61vjT7gCdQcTsAcZAYE1/8Ro4EWqaK2HE4/5KcS+UqmBGZszawiFOhM+JSqSfT37FAFwbLoGXKdjqDAzCV9K0=
+X-Received: by 2002:a5d:4247:0:b0:241:a82b:5dee with SMTP id
+ s7-20020a5d4247000000b00241a82b5deemr533360wrr.425.1669039062122; Mon, 21 Nov
+ 2022 05:57:42 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain
-Date:   Mon, 21 Nov 2022 13:56:59 +0000
-Message-ID: <382872.1669039019@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
+References: <CAHg0Huzvhg7ZizbCGQyyVNdnAWmQCsypRWvdBzm0GWwPzXD0dw@mail.gmail.com>
+ <3b2f6267-e7a0-4266-867d-b0109d5a7cb4@acm.org> <CAHg0HuyGr8BfgBvXUG7N5WYyXKEzyh3i7eA=2XZxbW3zyXLTsA@mail.gmail.com>
+ <cc14aa58-254e-5c33-89ab-6f3900143164@acm.org> <CAHg0Huw35m_WiwFqcTEHpCz94=JhaKZdEuV-F=aetQ_SEQgauA@mail.gmail.com>
+In-Reply-To: <CAHg0Huw35m_WiwFqcTEHpCz94=JhaKZdEuV-F=aetQ_SEQgauA@mail.gmail.com>
+From:   Haris Iqbal <haris.iqbal@ionos.com>
+Date:   Mon, 21 Nov 2022 14:57:31 +0100
+Message-ID: <CAJpMwyh-cihwNyMyTFE-f2HQqOnLydNB+TiGcq5UTMkgwU0yNA@mail.gmail.com>
+Subject: Re: [RFC] Reliable Multicast on top of RTRS
+To:     Bart Van Assche <bvanassche@acm.org>, linux-rdma@vger.kernel.org,
+        linux-block@vger.kernel.org, Aleksei Marov <alexv.marov@gmail.com>
+Cc:     danil.kipnis@posteo.net, Jinpu Wang <jinpu.wang@ionos.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Hey there,
 
-Benjamin Coddington <bcodding@redhat.com> wrote:
+We've got a prototype version working in-house. We've also implemented
+a block device client and server. Another client and server could
+probably be rbd and dm-thin. Will update as soon as we have a github
+link.
 
-> Since moving to memalloc_nofs_save/restore, SUNRPC has stopped setting the
-> GFP_NOIO flag on sk_allocation which the networking system uses to decide
-> when it is safe to use current->task_frag.
+Some technical details
 
-Um, what's task_frag?
+- Ability to perform sync across storage nodes without the involvement
+of the client.
 
-David
+- This helps performing sync, extending/adding legs/members without
+the help of the client.
 
+Candidate users
+
+- We've implemented a stand-alone replicating block device. The client
+is similar to the rnbd-clt and our own corresponding "store"/server
+does linear mapping on the server side.
+
+- rbd could be a client of rmr-clt. The rmr-srv (store) would talk to
+lvm. rbd would provide the block device (over multiple objects) on the
+client side. Lvm would function as the store on the server side. One
+object would be stored on one dm-thin volume. rmr would provide for
+the replication in the network.
+
+Setups: RMR vs MD-RAID vs DRBD
+
+- Active-active
+
+- RMR as means of replication over network differs from the md-raid
+configuration because sync traffic goes directly between servers. The
+difference to the drbd setup is that the IO traffic goes to both legs
+in a single hop.
+
+How does RMR solve the activity log issue
+
+- Synchronous replication; much like Protocol C of DRBD.
+
+- RMR tracks all successful queue_depth (max number of IOs that can be
+inflight at any moment) worth of last IOs on each storage node.
+
+Best,
+Haris
+
+Signed-off: alexv.marov@gmail.com
+Reviewed-by: danil.kipnis@posteo.net
+
+On Sun, Nov 22, 2020 at 5:20 PM Danil Kipnis
+<danil.kipnis@cloud.ionos.com> wrote:
+>
+> On Fri, Sep 4, 2020 at 5:33 PM Bart Van Assche <bvanassche@acm.org> wrote:
+> >
+> > On 2020-09-04 04:35, Danil Kipnis wrote:
+> > > On Thu, Sep 3, 2020 at 1:07 AM Bart Van Assche <bvanassche@acm.org> wrote:
+> > >> How will it be guaranteed that the resulting software does
+> > >> not suffer from the problems that have been solved by the introduction
+> > >> of the DRBD activity log
+> > >> (https://www.linbit.com/drbd-user-guide/users-guide-drbd-8-4/#s-activity-log)?
+> > >
+> > > The above would require some kind of activity log also, I'm afraid.
+> >
+> > How about collaborating with the DRBD team? My concern is that otherwise
+> > we will end up with two drivers in the kernel that implement block device
+> > replication between servers connected over a network.
+>
+> Will take a closer look at drbd,
+>
+> Thank you,
+> Danil.
+>
+> >
+> > Thanks,
+> >
+> > Bart.
