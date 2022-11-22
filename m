@@ -2,81 +2,75 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B9FCC4332F
-	for <linux-block@archiver.kernel.org>; Tue, 22 Nov 2022 04:07:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78BACC4332F
+	for <linux-block@archiver.kernel.org>; Tue, 22 Nov 2022 06:05:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230342AbiKVEHS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 21 Nov 2022 23:07:18 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40926 "EHLO
+        id S229509AbiKVGF2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 22 Nov 2022 01:05:28 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59016 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230237AbiKVEHQ (ORCPT
+        with ESMTP id S229481AbiKVGF1 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 21 Nov 2022 23:07:16 -0500
-Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1A092E9DB;
-        Mon, 21 Nov 2022 20:07:15 -0800 (PST)
-Received: from dggemv703-chm.china.huawei.com (unknown [172.30.72.53])
-        by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4NGW0h5yybz15MpB;
-        Tue, 22 Nov 2022 12:06:44 +0800 (CST)
-Received: from kwepemm600003.china.huawei.com (7.193.23.202) by
- dggemv703-chm.china.huawei.com (10.3.19.46) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31; Tue, 22 Nov 2022 12:07:13 +0800
-Received: from ubuntu1804.huawei.com (10.67.174.61) by
- kwepemm600003.china.huawei.com (7.193.23.202) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31; Tue, 22 Nov 2022 12:07:13 +0800
-From:   Yang Jihong <yangjihong1@huawei.com>
-To:     <axboe@kernel.dk>, <rostedt@goodmis.org>, <mhiramat@kernel.org>,
-        <acme@redhat.com>, <mingo@elte.hu>, <linux-block@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>
-CC:     <yangjihong1@huawei.com>
-Subject: [PATCH] blktrace: Fix output non-blktrace event when blk_classic option enabled
-Date:   Tue, 22 Nov 2022 12:04:10 +0800
-Message-ID: <20221122040410.85113-1-yangjihong1@huawei.com>
-X-Mailer: git-send-email 2.30.GIT
+        Tue, 22 Nov 2022 01:05:27 -0500
+Received: from out30-57.freemail.mail.aliyun.com (out30-57.freemail.mail.aliyun.com [115.124.30.57])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 329432935D
+        for <linux-block@vger.kernel.org>; Mon, 21 Nov 2022 22:05:25 -0800 (PST)
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R801e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045176;MF=ziyangzhang@linux.alibaba.com;NM=1;PH=DS;RN=5;SR=0;TI=SMTPD_---0VVQn-Gy_1669097122;
+Received: from 30.97.56.154(mailfrom:ZiyangZhang@linux.alibaba.com fp:SMTPD_---0VVQn-Gy_1669097122)
+          by smtp.aliyun-inc.com;
+          Tue, 22 Nov 2022 14:05:22 +0800
+Message-ID: <7744e3c1-65ae-7dec-1e50-5ccf6035ceeb@linux.alibaba.com>
+Date:   Tue, 22 Nov 2022 14:05:21 +0800
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.67.174.61]
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- kwepemm600003.china.huawei.com (7.193.23.202)
-X-CFilter-Loop: Reflected
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.13.1
+Subject: Re: [PATCH] ublk_drv: don't forward io commands in reserve order
+Content-Language: en-US
+To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org,
+        Andreas Hindborg <andreas.hindborg@wdc.com>,
+        Damien Le Moal <damien.lemoal@opensource.wdc.com>
+References: <20221121155645.396272-1-ming.lei@redhat.com>
+From:   Ziyang Zhang <ZiyangZhang@linux.alibaba.com>
+In-Reply-To: <20221121155645.396272-1-ming.lei@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-When the blk_classic option is enabled, non-blktrace events must be
-filtered out. Otherwise, events of other types are output in the blktrace
-classic format, which is unexpected.
+On 2022/11/21 23:56, Ming Lei wrote:
+> Either ublk_can_use_task_work() is true or not, io commands are
+> forwarded to ublk server in reverse order, since llist_add() is
+> always to add one element to the head of the list.
+> 
+> Even though block layer doesn't guarantee request dispatch order,
+> requests should be sent to hardware in the sequence order generated
+> from io scheduler, which usually considers the request's LBA, and
+> order is often important for HDD.
+> 
+> So forward io commands in the sequence made from io scheduler by
+> aligning task work with current io_uring command's batch handling,
+> and it has been observed that both can get similar performance data
+> if IORING_SETUP_COOP_TASKRUN is set from ublk server.
+> 
+> Reported-by: Andreas Hindborg <andreas.hindborg@wdc.com>
+> Cc: Damien Le Moal <damien.lemoal@opensource.wdc.com>
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
 
-The problem can be triggered in the following ways:
+I have tested this with dd. Looks like we get the correct order:
 
-  # echo 1 > /sys/kernel/debug/tracing/options/blk_classic
-  # echo 1 > /sys/kernel/debug/tracing/events/enable
-  # echo blk > /sys/kernel/debug/tracing/current_tracer
-  # cat /sys/kernel/debug/tracing/trace_pipe
+ublk_queue_rq: qid 0 tag 2 sect 12288
+__ublk_rq_task_work: complete: op 33, qid 0 tag 2 io_flags 1 addr 7ff16699e000 sect 12288
+ublk_queue_rq: qid 0 tag 5 sect 13312
+__ublk_rq_task_work: complete: op 33, qid 0 tag 5 io_flags 1 addr 7ff166818000 sect 13312
+ublk_queue_rq: qid 0 tag 4 sect 14336
+__ublk_rq_task_work: complete: op 33, qid 0 tag 4 io_flags 1 addr 7ff16689a000 sect 14336
+ublk_queue_rq: qid 0 tag 6 sect 15360
+__ublk_rq_task_work: complete: op 33, qid 0 tag 6 io_flags 1 addr 7ff166796000 sect 15360
 
-Fixes: c71a89615411 ("blktrace: add ftrace plugin")
-Signed-off-by: Yang Jihong <yangjihong1@huawei.com>
----
- kernel/trace/blktrace.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
-index a995ea1ef849..a66cff5a1857 100644
---- a/kernel/trace/blktrace.c
-+++ b/kernel/trace/blktrace.c
-@@ -1548,7 +1548,8 @@ blk_trace_event_print_binary(struct trace_iterator *iter, int flags,
- 
- static enum print_line_t blk_tracer_print_line(struct trace_iterator *iter)
- {
--	if (!(blk_tracer_flags.val & TRACE_BLK_OPT_CLASSIC))
-+	if ((iter->ent->type != TRACE_BLK) ||
-+	    !(blk_tracer_flags.val & TRACE_BLK_OPT_CLASSIC))
- 		return TRACE_TYPE_UNHANDLED;
- 
- 	return print_one_line(iter, true);
--- 
-2.30.GIT
+Reviewed-by: ZiyangZhang <ZiyangZhang@linux.alibaba.com>
 
+Regards,
+Zhang
