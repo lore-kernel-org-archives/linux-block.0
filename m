@@ -2,121 +2,123 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 02336C4332F
-	for <linux-block@archiver.kernel.org>; Tue, 22 Nov 2022 20:31:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A533C4332F
+	for <linux-block@archiver.kernel.org>; Tue, 22 Nov 2022 21:10:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234837AbiKVUa7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 22 Nov 2022 15:30:59 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37790 "EHLO
+        id S233189AbiKVVKc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 22 Nov 2022 16:10:32 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39772 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234470AbiKVUav (ORCPT
+        with ESMTP id S232783AbiKVVKb (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 22 Nov 2022 15:30:51 -0500
-Received: from out2.migadu.com (out2.migadu.com [188.165.223.204])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C64C2CE2D
-        for <linux-block@vger.kernel.org>; Tue, 22 Nov 2022 12:30:49 -0800 (PST)
-Message-ID: <4f3c32a5-54cf-dcba-afe2-1f08b3f48b16@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1669149047;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=su4lExLppv6Rxu//8H+gMwaH+VUYLFFC4wdHiMQwUBQ=;
-        b=aC5vDIEsyoiFi9pCRocHFiWqyEh3pbkUkpAOEqKDkcF4fcAMu6mrQtBi52fBs0dmb4Cp++
-        hzt46IjzkwWnE6Q1IdlNRRhiSqeWhk2FZcss/C7foCl3PjjXAWpwbbDQSB2XMu98dpFf/D
-        DGf0V6BfPjLr6mBxLAm4UoscVXzQdlc=
-Date:   Tue, 22 Nov 2022 13:30:43 -0700
+        Tue, 22 Nov 2022 16:10:31 -0500
+Received: from mail-pg1-x52c.google.com (mail-pg1-x52c.google.com [IPv6:2607:f8b0:4864:20::52c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ECBAE7CB95;
+        Tue, 22 Nov 2022 13:10:30 -0800 (PST)
+Received: by mail-pg1-x52c.google.com with SMTP id f9so10896209pgf.7;
+        Tue, 22 Nov 2022 13:10:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:sender
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=C+KEqUPpt9nBZhy2l32eLRwk2q2Rg4+1eaxUkvjjhgg=;
+        b=hC1R8VpRUm1vtCVrxmHeI+RFvGrfUTgxzJDsTjqJnYDMfgLrcdlSQuqYhPvY/Ngiq8
+         YsJqRaFeRDIFWRDrW9MQKFf+YhGpvvEE5JQp6I7LE/fbFPycigIFZVC50Mn7T81Rc0ip
+         SpacCnKP0Cv8PWm/lx6EslA0e0XeGhuBFY1S80wuP3an5Ehy7+Du23j1TktTHFLf3g/X
+         xqpe587AjbUhmVWzf7e8zF8uXlCPo3vftSKmyF+LypLxS97o0nf1yo/ZCnmc70DYJF2C
+         xCNElSexSwgXjaNE3Ig8aTcZB/CYj0DlUtMBK+bALBMYuDlHh711uqPYnLmKjKocyIR5
+         DyOQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:sender
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=C+KEqUPpt9nBZhy2l32eLRwk2q2Rg4+1eaxUkvjjhgg=;
+        b=iMwfLciWIW2zFcp08JYbyorkU/18boVs50jlDqcjgrQ43oKz9KeDpZ+uW0+uoctAD9
+         p7OlD+f4lKqPurUiEfz9DYtMVDLAcTBWTiRL2L89bMKJY1GTxTK10JRZZwFUQx2tlmEB
+         HqSFGglmlRn6MelvE9Px2ZMG9dxmpNvF4GsEBS4qv50l+R5bFBIivf7f8CVgpANiVJMB
+         96Xi54+lFCFm/3lmXtekLM8M17yzRZ5M9e71fSZHnrB5XBd3G5KA5E0M9LmBpvoWuFdW
+         4Q/WwELjuG1XAtxiCEkpBSL4Bwo9gVRTNZvUU6r82KQaxOMifTlEfHjHaAoiwVJnzYvQ
+         He6g==
+X-Gm-Message-State: ANoB5pkORTFZkm4VSqpcreETztTfkPc8ne2KJKz+rXsYFgS6y111cKEC
+        9iOGyRqBHuJJv7qM1Dqz3Zg=
+X-Google-Smtp-Source: AA0mqf6TsDpRKKyxDHKrpggRE8TEmiZt0DJaKX3yDhZBcH1LKsFTJaLXufIb42rblcCx6ncdMDdGYQ==
+X-Received: by 2002:a62:16d3:0:b0:562:c1d4:e287 with SMTP id 202-20020a6216d3000000b00562c1d4e287mr5701810pfw.80.1669151430256;
+        Tue, 22 Nov 2022 13:10:30 -0800 (PST)
+Received: from localhost ([2620:10d:c090:400::5:bb3])
+        by smtp.gmail.com with ESMTPSA id h9-20020a170902f54900b00176a2d23d1asm12659611plf.56.2022.11.22.13.10.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 22 Nov 2022 13:10:29 -0800 (PST)
+Sender: Tejun Heo <htejun@gmail.com>
+Date:   Tue, 22 Nov 2022 11:10:28 -1000
+From:   Tejun Heo <tj@kernel.org>
+To:     Yu Kuai <yukuai1@huaweicloud.com>
+Cc:     hch@lst.de, josef@toxicpanda.com, axboe@kernel.dk,
+        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, yi.zhang@huawei.com,
+        "yukuai (C)" <yukuai3@huawei.com>
+Subject: Re: [PATCH v2 4/5] blk-iocost: fix sleeping in atomic context
+ warnning
+Message-ID: <Y306xJV6aNXd94kb@slm.duckdns.org>
+References: <20221104023938.2346986-1-yukuai1@huaweicloud.com>
+ <20221104023938.2346986-5-yukuai1@huaweicloud.com>
+ <Y3K8MSFWw8eTnxtm@slm.duckdns.org>
+ <3da991c6-21e4-8ed8-ba75-ccb92059f0ae@huaweicloud.com>
 MIME-Version: 1.0
-Subject: Re: [PATCH v2] tests/nvme: Add admin-passthru+reset race test
-Content-Language: en-US
-To:     Klaus Jensen <its@irrelevant.dk>, Keith Busch <kbusch@kernel.org>
-Cc:     linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-        Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
-        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Sagi Grimberg <sagi@grimberg.me>
-References: <20221117212210.934-1-jonathan.derrick@linux.dev>
- <Y3vlsF7KcRrY7vCW@kbusch-mbp>
- <e99fef7c-1b48-61e2-b503-a2363968d5fc@linux.dev>
- <7dcb9e3c-aa3e-b7b9-fc30-59281d581fd0@linux.dev>
- <Y3wED5m5JHOFMMg2@kbusch-mbp> <Y3yHvg27tKo11YCF@cormorant.local>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From:   Jonathan Derrick <jonathan.derrick@linux.dev>
-In-Reply-To: <Y3yHvg27tKo11YCF@cormorant.local>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <3da991c6-21e4-8ed8-ba75-ccb92059f0ae@huaweicloud.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Thu, Nov 17, 2022 at 07:28:50PM +0800, Yu Kuai wrote:
+> Hi, Tejun!
+> 
+> 在 2022/11/15 6:07, Tejun Heo 写道:
+> 
+> > 
+> > Any chance I can persuade you into updating match_NUMBER() helpers to not
+> > use match_strdup()? They can easily disable irq/preemption and use percpu
+> > buffers and we won't need most of this patchset.
+> 
+> Does the following patch match your proposal?
+> 
+> diff --git a/lib/parser.c b/lib/parser.c
+> index bcb23484100e..ded652471919 100644
+> --- a/lib/parser.c
+> +++ b/lib/parser.c
+> @@ -11,6 +11,24 @@
+>  #include <linux/slab.h>
+>  #include <linux/string.h>
+> 
+> +#define U64_MAX_SIZE 20
+> +
+> +static DEFINE_PER_CPU(char, buffer[U64_MAX_SIZE]);
+> +
+> +static char *get_buffer(void)
+> +{
+> +       preempt_disable();
+> +       local_irq_disable();
+> +
+> +       return this_cpu_ptr(buffer);
+> +}
+> +
+> +static void put_buffer(void)
+> +{
+> +       local_irq_enable();
+> +       preempt_enable();
+> +}
+> +
+> 
+> Then match_strdup() and kfree() in match_NUMBER() can be replaced with
+> get_buffer() and put_buffer().
 
+Sorry about the late reply. Yeah, something like this.
 
-On 11/22/2022 1:26 AM, Klaus Jensen wrote:
-> On Nov 21 16:04, Keith Busch wrote:
->> [cc'ing Klaus]
->>
->> On Mon, Nov 21, 2022 at 03:49:45PM -0700, Jonathan Derrick wrote:
->>> On 11/21/2022 3:34 PM, Jonathan Derrick wrote:
->>>> On 11/21/2022 1:55 PM, Keith Busch wrote:
->>>>> On Thu, Nov 17, 2022 at 02:22:10PM -0700, Jonathan Derrick wrote:
->>>>>> I seem to have isolated the error mechanism for older kernels, but 6.2.0-rc2
->>>>>> reliably segfaults my QEMU instance (something else to look into) and I don't
->>>>>> have any 'real' hardware to test this on at the moment. It looks like several
->>>>>> passthru commands are able to enqueue prior/during/after resetting/connecting.
->>>>>
->>>>> I'm not seeing any problem with the latest nvme-qemu after several dozen
->>>>> iterations of this test case. In that environment, the formats and
->>>>> resets complete practically synchronously with the call, so everything
->>>>> proceeds quickly. Is there anything special I need to change?
->>>>>  
->>>> I can still repro this with nvme-fixes tag, so I'll have to dig into it myself
->>> Here's a backtrace:
->>>
->>> Thread 1 "qemu-system-x86" received signal SIGSEGV, Segmentation fault.
->>> [Switching to Thread 0x7ffff7554400 (LWP 531154)]
->>> 0x000055555597a9d5 in nvme_ctrl (req=0x7fffec892780) at ../hw/nvme/nvme.h:539
->>> 540         return sq->ctrl;
->>> (gdb) backtrace
->>> #0  0x000055555597a9d5 in nvme_ctrl (req=0x7fffec892780) at ../hw/nvme/nvme.h:539
->>> #1  0x0000555555994360 in nvme_format_bh (opaque=0x5555579dd000) at ../hw/nvme/ctrl.c:5852
->>
->> Thanks, looks like a race between the admin queue format's bottom half,
->> and the controller reset tearing down that queue. I'll work with Klaus
->> on that qemu side (looks like a well placed qemu_bh_cancel() should do
->> it).
->>
-> 
-> Yuck. Bug located and quelched I think.
-> 
-> Jonathan, please try
-> 
->   https://lore.kernel.org/qemu-devel/20221122081348.49963-2-its@irrelevant.dk/
-> 
-> This fixes the qemu crash, but I still see a "nvme still not live after
-> 42 seconds!" resulting from the test. I'm seeing A LOT of invalid
-> submission queue doorbell writes:
-> 
->   pci_nvme_ub_db_wr_invalid_sq in nvme_process_db: submission queue doorbell write for nonexistent queue, sqid=0, ignoring
-> 
-> Tested on a 6.1-rc4.
+Thanks.
 
-Good change, just defers it a bit for me:
-
-Thread 1 "qemu-system-x86" received signal SIGSEGV, Segmentation fault.
-[Switching to Thread 0x7ffff7554400 (LWP 559269)]
-0x000055555598922e in nvme_enqueue_req_completion (cq=0x0, req=0x7fffec141310) at ../hw/nvme/ctrl.c:1390
-1390        assert(cq->cqid == req->sq->cqid);
-(gdb) backtrace
-#0  0x000055555598922e in nvme_enqueue_req_completion (cq=0x0, req=0x7fffec141310) at ../hw/nvme/ctrl.c:1390
-#1  0x000055555598a7a7 in nvme_misc_cb (opaque=0x7fffec141310, ret=0) at ../hw/nvme/ctrl.c:2002
-#2  0x000055555599448a in nvme_do_format (iocb=0x55555770ccd0) at ../hw/nvme/ctrl.c:5891
-#3  0x00005555559942a9 in nvme_format_ns_cb (opaque=0x55555770ccd0, ret=0) at ../hw/nvme/ctrl.c:5828
-#4  0x0000555555dda018 in blk_aio_complete (acb=0x7fffec1fccd0) at ../block/block-backend.c:1501
-#5  0x0000555555dda2fc in blk_aio_write_entry (opaque=0x7fffec1fccd0) at ../block/block-backend.c:1568
-#6  0x0000555555f506b9 in coroutine_trampoline (i0=-331119632, i1=32767) at ../util/coroutine-ucontext.c:177
-#7  0x00007ffff77c84e0 in __start_context () at ../sysdeps/unix/sysv/linux/x86_64/__start_context.S:91
-#8  0x00007ffff4ff2bd0 in  ()
-#9  0x0000000000000000 in  ()
-
+-- 
+tejun
