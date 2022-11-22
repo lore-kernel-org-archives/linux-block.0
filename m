@@ -2,53 +2,54 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8B3CC4332F
-	for <linux-block@archiver.kernel.org>; Tue, 22 Nov 2022 13:43:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A15C1C433FE
+	for <linux-block@archiver.kernel.org>; Tue, 22 Nov 2022 13:43:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229481AbiKVNnN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 22 Nov 2022 08:43:13 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41672 "EHLO
+        id S233254AbiKVNnQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 22 Nov 2022 08:43:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41686 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232384AbiKVNnM (ORCPT
+        with ESMTP id S232550AbiKVNnN (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 22 Nov 2022 08:43:12 -0500
-Received: from mail-wr1-x42c.google.com (mail-wr1-x42c.google.com [IPv6:2a00:1450:4864:20::42c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B08E127FE5
-        for <linux-block@vger.kernel.org>; Tue, 22 Nov 2022 05:43:10 -0800 (PST)
-Received: by mail-wr1-x42c.google.com with SMTP id d1so12656953wrs.12
-        for <linux-block@vger.kernel.org>; Tue, 22 Nov 2022 05:43:10 -0800 (PST)
+        Tue, 22 Nov 2022 08:43:13 -0500
+Received: from mail-wr1-x42e.google.com (mail-wr1-x42e.google.com [IPv6:2a00:1450:4864:20::42e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C3AD032B8E
+        for <linux-block@vger.kernel.org>; Tue, 22 Nov 2022 05:43:12 -0800 (PST)
+Received: by mail-wr1-x42e.google.com with SMTP id bs21so24786648wrb.4
+        for <linux-block@vger.kernel.org>; Tue, 22 Nov 2022 05:43:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linbit-com.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=aKWA+AP/j4No4bfih7dsLGLYEDSONTbhMU2EZnn42zY=;
-        b=yXqcBlksNnAzv0JPWlfp4srNfOhY8LdfdyUH6IMUrCMEgBmllXo1rkX45wgp8bEyPn
-         o8ZDOeQQWwfFcchSgMN2v/yoREFBb5mk5cZKlSvgr9G2bHzEJPK2C2Shly8AlYNQzPIZ
-         tGFZxm+Hr6bZzvic10oX82/fbGRTgUiLr8j2zz9tOxRkl+n/T2TVumlxlbXW9IcDT9+y
-         m/Q7WWyJlkk6fpEHUeJUH6ixlNsCx8eCN2LaSbFmUnW455OcLSLiBSLit2flL0IzhgUr
-         jZfeYc2AmokRQ6JFxZWYiu46OczuCtDIIQ9DWeS7ZZET2H8ZVybDb4vdLbQjiHa9jNKY
-         Pciw==
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=KF3CZXuQwHBE4nlGvTbysgbhQTbuB3zQD8B/JpHaOzg=;
+        b=Cbx7zn11EQehMM+81fn1VToCqdvNlnjLXq36xiSGojRY4l/t8KeOuqmgNPSFjh09S4
+         f/4yjE67gsK/CFRgOSP0pL/8N+IHCAR0NVN9MCiq1aNMEqps0/lzg9/FIfgMCzHY/azH
+         tqMu57sNswPfw1RKchHVhiLaxK1POke5vckhvWHje6LHsMcqhWn7Qd7NxidBNcNOpgOn
+         J8DLQ2mg60qgLy351jlgSEPilGpsEhJasu9kc4rJHZW8aaYIWJdM9npuoGPfWj6+SXM2
+         KcpGLp/W0SkFnOjbgqahbRrxXAQ+KUu0be+Iklv7EALyEIfLxDQOPJYz0wQCtZbPSqN6
+         0nbg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=aKWA+AP/j4No4bfih7dsLGLYEDSONTbhMU2EZnn42zY=;
-        b=pnUkikUHi2nAWJlIIQmdmv2zLkI4aIL+WKaKhQNUcmCqyv6TAg5r4sdrmRSN2hsfpa
-         nEVERcE2GPkZbwAwJa4nBwUcSaDQtl2PcP/DRdTYMHdLQiQEa8wPoLl1XJFNIhtyNFbu
-         +a5ATMwRakk06j3WBQ9RTak6lSnVVQVCNJWt28uWNAqaxbqgf3UZeAgzpnBN07jinMfo
-         75vq9FFIP1144x9w2cOempJPmK60+UeAzFmXCdUsftzNBILmlPRRlXP8KK61N/7a7KBg
-         BStRgTNioPXN8tWRPKbqjO/mN05I4oFiXlUYkZcedWf8IgP9rBFu17ONN7fbMIB93j37
-         Y+pQ==
-X-Gm-Message-State: ANoB5pl3hTy55M9YehASEJ2PHseAenh8wRAlZVudpYD8w6EACj+BQOZY
-        dM0YH61Tk+RJkQaw+o9nLjnWgg==
-X-Google-Smtp-Source: AA0mqf4wL76N4ZHZjvU2VZRB4kqJFOiavA4tPlcNIaqg/Z8JbxDOHK1GZZE8Q6cTqcXM4fihVgKIeQ==
-X-Received: by 2002:a05:6000:1148:b0:236:71cd:1a71 with SMTP id d8-20020a056000114800b0023671cd1a71mr14335072wrx.712.1669124589239;
-        Tue, 22 Nov 2022 05:43:09 -0800 (PST)
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=KF3CZXuQwHBE4nlGvTbysgbhQTbuB3zQD8B/JpHaOzg=;
+        b=O4buJEuQ2P193q80ho2u5+GuvfZVtiOPtuWWSgkEZEgAMMwo6NAATXeP6Ziccgq7Kf
+         790sCkJBPGoqQhexza3832kJiViSq7pEKCvQcwKFcUAtpM/yrNGoL9uwpYFZ2d2PcUKV
+         SawsCCScMrRo2etJms1LMEWyMMJ+yKNuMrqCIzEwmT4S6IR4ZDFQIGluumTbGco46kJA
+         PewZ6LV14J3J6+m3kL/yGwmkNeWf8pwFI0kFZdS9+wPpKGyl+RKz+15/ncT4Pl2yvp/O
+         sbclby8lKEKRBvRFxBro7khh61iyz3mXW+AbBmVK4guIoYKa3dKQERN4yxauF3BSxLwg
+         HQIQ==
+X-Gm-Message-State: ANoB5pnc90XEsL5gVWPeiY+7o+QcbhkzPVe5Q3/g19d3XnHVezyW/PNR
+        sSVKaFxuGslCsQZ5sVQdgv5CbA==
+X-Google-Smtp-Source: AA0mqf6N8cSjyb9zLCCmraBEhwm6rbiQsxbk/2HHlEM4qAz7dNe9e2uU4VCUO8pYvYUKWaMUzn/CSg==
+X-Received: by 2002:a05:6000:1192:b0:241:e7a6:9135 with SMTP id g18-20020a056000119200b00241e7a69135mr661925wrx.641.1669124591378;
+        Tue, 22 Nov 2022 05:43:11 -0800 (PST)
 Received: from localhost.localdomain (h082218028181.host.wavenet.at. [82.218.28.181])
-        by smtp.gmail.com with ESMTPSA id p6-20020a1c5446000000b003b47e75b401sm21437729wmi.37.2022.11.22.05.43.08
+        by smtp.gmail.com with ESMTPSA id p6-20020a1c5446000000b003b47e75b401sm21437729wmi.37.2022.11.22.05.43.10
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Nov 2022 05:43:08 -0800 (PST)
+        Tue, 22 Nov 2022 05:43:10 -0800 (PST)
 From:   =?UTF-8?q?Christoph=20B=C3=B6hmwalder?= 
         <christoph.boehmwalder@linbit.com>
 To:     Jens Axboe <axboe@kernel.dk>
@@ -58,10 +59,12 @@ Cc:     drbd-dev@lists.linbit.com, linux-kernel@vger.kernel.org,
         linux-block@vger.kernel.org,
         =?UTF-8?q?Christoph=20B=C3=B6hmwalder?= 
         <christoph.boehmwalder@linbit.com>
-Subject: [PATCH 0/4] lru_cache improvements, DRBD license identifiers
-Date:   Tue, 22 Nov 2022 14:42:57 +0100
-Message-Id: <20221122134301.69258-1-christoph.boehmwalder@linbit.com>
+Subject: [PATCH 1/4] lru_cache: use atomic operations when accessing lc->flags, always
+Date:   Tue, 22 Nov 2022 14:42:58 +0100
+Message-Id: <20221122134301.69258-2-christoph.boehmwalder@linbit.com>
 X-Mailer: git-send-email 2.38.1
+In-Reply-To: <20221122134301.69258-1-christoph.boehmwalder@linbit.com>
+References: <20221122134301.69258-1-christoph.boehmwalder@linbit.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
@@ -69,51 +72,39 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Here are some improvements to the lru_cache; mostly just cleanups that
-we missed to send upstream over the years.
+From: Lars Ellenberg <lars.ellenberg@linbit.com>
 
-The last patch makes the SPDX license headers in DRBD consistent so
-that they all represent GPL 2.0.
+Or, depending on the way locking is implemented at the call sites,
+some updates could be lost (has not been observed).
 
-Christoph Böhmwalder (2):
-  lru_cache: remove compiled out code
-  drbd: use consistent license
+Signed-off-by: Lars Ellenberg <lars.ellenberg@linbit.com>
+Signed-off-by: Christoph Böhmwalder <christoph.boehmwalder@linbit.com>
+---
+ lib/lru_cache.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Joel Colledge (1):
-  lru_cache: remove unused lc_private, lc_set, lc_index_of
-
-Lars Ellenberg (1):
-  lru_cache: use atomic operations when accessing lc->flags, always
-
- drivers/block/drbd/Kconfig             |  2 +-
- drivers/block/drbd/Makefile            |  2 +-
- drivers/block/drbd/drbd_actlog.c       |  2 +-
- drivers/block/drbd/drbd_bitmap.c       |  2 +-
- drivers/block/drbd/drbd_debugfs.c      |  2 +-
- drivers/block/drbd/drbd_debugfs.h      |  2 +-
- drivers/block/drbd/drbd_int.h          |  2 +-
- drivers/block/drbd/drbd_interval.c     |  2 +-
- drivers/block/drbd/drbd_interval.h     |  2 +-
- drivers/block/drbd/drbd_main.c         |  2 +-
- drivers/block/drbd/drbd_nl.c           |  2 +-
- drivers/block/drbd/drbd_nla.c          |  2 +-
- drivers/block/drbd/drbd_nla.h          |  2 +-
- drivers/block/drbd/drbd_proc.c         |  2 +-
- drivers/block/drbd/drbd_protocol.h     |  2 +-
- drivers/block/drbd/drbd_receiver.c     |  2 +-
- drivers/block/drbd/drbd_req.c          |  2 +-
- drivers/block/drbd/drbd_req.h          |  2 +-
- drivers/block/drbd/drbd_state.c        |  2 +-
- drivers/block/drbd/drbd_state.h        |  2 +-
- drivers/block/drbd/drbd_state_change.h |  2 +-
- drivers/block/drbd/drbd_strings.c      |  2 +-
- drivers/block/drbd/drbd_strings.h      |  2 +-
- drivers/block/drbd/drbd_vli.h          |  2 +-
- drivers/block/drbd/drbd_worker.c       |  2 +-
- include/linux/lru_cache.h              |  3 --
- lib/lru_cache.c                        | 59 +-------------------------
- 27 files changed, 27 insertions(+), 85 deletions(-)
-
+diff --git a/lib/lru_cache.c b/lib/lru_cache.c
+index dc35464216d3..fec899386238 100644
+--- a/lib/lru_cache.c
++++ b/lib/lru_cache.c
+@@ -364,7 +364,7 @@ static struct lc_element *__lc_get(struct lru_cache *lc, unsigned int enr, unsig
+ 	struct lc_element *e;
+ 
+ 	PARANOIA_ENTRY();
+-	if (lc->flags & LC_STARVING) {
++	if (test_bit(__LC_STARVING, &lc->flags)) {
+ 		++lc->starving;
+ 		RETURN(NULL);
+ 	}
+@@ -417,7 +417,7 @@ static struct lc_element *__lc_get(struct lru_cache *lc, unsigned int enr, unsig
+ 	 * the LRU element, we have to wait ...
+ 	 */
+ 	if (!lc_unused_element_available(lc)) {
+-		__set_bit(__LC_STARVING, &lc->flags);
++		set_bit(__LC_STARVING, &lc->flags);
+ 		RETURN(NULL);
+ 	}
+ 
 -- 
 2.38.1
 
