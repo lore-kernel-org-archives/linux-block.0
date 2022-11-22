@@ -2,109 +2,84 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F85BC43219
-	for <linux-block@archiver.kernel.org>; Tue, 22 Nov 2022 15:07:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44417C4332F
+	for <linux-block@archiver.kernel.org>; Tue, 22 Nov 2022 16:40:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233942AbiKVPHm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 22 Nov 2022 10:07:42 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55690 "EHLO
+        id S232312AbiKVQk2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 22 Nov 2022 11:40:28 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42202 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234027AbiKVPHc (ORCPT
+        with ESMTP id S229628AbiKVQk0 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 22 Nov 2022 10:07:32 -0500
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3097A13CF2;
-        Tue, 22 Nov 2022 07:07:30 -0800 (PST)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id C75EC21D3E;
-        Tue, 22 Nov 2022 15:07:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1669129648;
-        h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-         cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=p56F2nwME/RWURtSP2TSQAQXPWOVxd9VX0H+uS1eGS0=;
-        b=vuXrQNe9cPzsddLz3LepnRY7WjGBC2hwqmeAZKHW2mROYJ+vEC/3MyEuYK6J+FbxDozZEm
-        3segnSrLYCCTBO93SzOf8Ltn3wF/GcoR3rdoo9VdYNi5IePV3twf3X9QV69NrvRNMQYzbP
-        n1lrJXRS3YN9Glh8ZQGjpKAm6Mi0c6E=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1669129648;
-        h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-         cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=p56F2nwME/RWURtSP2TSQAQXPWOVxd9VX0H+uS1eGS0=;
-        b=GdC4hcnByfHfq5j9HOMxZvYvdEKAheoNPOxrH4K22oVhTseS4ITfKbDFlWzzX1TK2Cjf+X
-        LZVb/9aXKFcYVcAw==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id EAD6613B01;
-        Tue, 22 Nov 2022 15:07:26 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id +6QnMq7lfGM6CwAAMHmgww
-        (envelope-from <pvorel@suse.cz>); Tue, 22 Nov 2022 15:07:26 +0000
-Date:   Tue, 22 Nov 2022 16:07:24 +0100
-From:   Petr Vorel <pvorel@suse.cz>
-To:     Martin Doucha <mdoucha@suse.cz>
-Cc:     Sergey Senozhatsky <senozhatsky@chromium.org>,
-        Minchan Kim <minchan@kernel.org>, ltp@lists.linux.it,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, Nitin Gupta <ngupta@vflare.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>,
-        Yang Xu <xuyang2018.jy@fujitsu.com>
-Subject: Re: [PATCH 0/1] Possible bug in zram on ppc64le on vfat
-Message-ID: <Y3zlrBQ8fgJyNm7G@pevik>
-Reply-To: Petr Vorel <pvorel@suse.cz>
-References: <20221107191136.18048-1-pvorel@suse.cz>
- <Y2l3vJb1y2Jynf50@google.com>
- <3ac740c0-954b-5e68-b413-0adc7bc5a2b5@suse.cz>
- <Y22b3wWs2QfMjJHi@google.com>
- <9489dd1c-012c-8b5d-b670-a27213da287a@suse.cz>
+        Tue, 22 Nov 2022 11:40:26 -0500
+Received: from mail-yw1-x1135.google.com (mail-yw1-x1135.google.com [IPv6:2607:f8b0:4864:20::1135])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E7D51E3EE
+        for <linux-block@vger.kernel.org>; Tue, 22 Nov 2022 08:40:26 -0800 (PST)
+Received: by mail-yw1-x1135.google.com with SMTP id 00721157ae682-36cbcda2157so149452677b3.11
+        for <linux-block@vger.kernel.org>; Tue, 22 Nov 2022 08:40:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=D2zYvqvXjbGs5C4WInuhh3U2C66flVl4taaDYYUBAVA=;
+        b=UaPYWxjEdnLjXhU3WdNH0ejVKdY6kJXtscrlYGI69kfDiXTFnkEFSR46W2T3RsVTP5
+         txRxDRJTQ5DGe1K0fZYS21f3clsrdGw1OmUM57d/xnboggySp77gI/he4O487ft97Vme
+         WjL5PCnk+w6qZV6gSZ5h2mCoCKhm4FCXTP2xmNiSQtU3F3GIbxDFq7JKpYSU6wP2r8aj
+         XF3xQD/+sfPTM13ufbByfB62otc+u+lBsqKTJ7YGmdX62IlF6ErreeTKbQsO0GDLWdSb
+         uJoPEapG5MKQI1G39sCxzblmndinWn12RMatkEK5M/uOEUhP2wtZt9eh0uL14R7rZ3Tb
+         XQdw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=D2zYvqvXjbGs5C4WInuhh3U2C66flVl4taaDYYUBAVA=;
+        b=Nui+A349/eC65oMV5Iq7KljpE32Vusb2O5f9xHxpLFDPGJXuproQc1/hrdaNbYbC8X
+         sy3paaIQRcJKruxZTpf69txt9/5lLBXywlAbCgjyYmaCO4lW1KB/x1DmJbSyhMedyUtq
+         c5A4e8itu63CCVUp/KxOfjsZqFpVa0fgadS1q4jhDS6ve+wUQiCbyo4ZzPOMUlj1b5Nr
+         QZ25MgvdrBJc/DMlZgMFCsG8kgktp0kfvLQBRrr4SUk80Mr6ZcAbu4jW/r/AT8H5zY9g
+         RvuHEHcS9AoJhfB10b7xVh7IeGzmN0ZONPatweih0A9nuJFdApRWlLfK7Q+iO0HY54p/
+         vn5w==
+X-Gm-Message-State: ANoB5pmGFJGzZ+dF2/gzwNRHqBWamzGmsUUzpXRGjY7zkbhehzfTExFQ
+        yQl0Fqq6t+GlyKSFzWmjjkrcr+u05a4++wNEURxlng==
+X-Google-Smtp-Source: AA0mqf4mkW4nuiEh4N+hOrMH9u/+FRLT0Zho1JaAfLTjdPVXW3dNj6y1yEg0KGDKXO2qAlyN170k/W4HmBBv8EvuyBs=
+X-Received: by 2002:a81:acf:0:b0:391:48c6:3eb with SMTP id 198-20020a810acf000000b0039148c603ebmr22657111ywk.93.1669135225214;
+ Tue, 22 Nov 2022 08:40:25 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <9489dd1c-012c-8b5d-b670-a27213da287a@suse.cz>
+References: <20221101150050.3510-1-hch@lst.de> <20221101150050.3510-15-hch@lst.de>
+ <20221121204450.6vyg6gixsz4unpaz@google.com> <a8e3d7a4-c5f6-13d0-a517-72097daa2a7b@huawei.com>
+ <20221122060855.GA14111@lst.de>
+In-Reply-To: <20221122060855.GA14111@lst.de>
+From:   Shakeel Butt <shakeelb@google.com>
+Date:   Tue, 22 Nov 2022 08:40:13 -0800
+Message-ID: <CALvZod7AFOSyN7pz0+B2rbQrzepTD+QLwmSYSNUa5jyaXEfKfg@mail.gmail.com>
+Subject: Re: [PATCH 14/14] nvme: use blk_mq_[un]quiesce_tagset
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Chao Leng <lengchao@huawei.com>, Jens Axboe <axboe@kernel.dk>,
+        Keith Busch <kbusch@kernel.org>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Ming Lei <ming.lei@redhat.com>, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org, Hannes Reinecke <hare@suse.de>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-> On 11. 11. 22 1:48, Sergey Senozhatsky wrote:
-> > On (22/11/10 15:29), Martin Doucha wrote:
-> > > I've tried to debug the issue and collected some interesting data (all
-> > > values come from zram device with 25M size limit and zstd compression
-> > > algorithm):
-> > > - mm_stat values are correct after mkfs.vfat:
-> > > 65536      220    65536 26214400    65536        0        0        0
+On Mon, Nov 21, 2022 at 10:08 PM Christoph Hellwig <hch@lst.de> wrote:
+>
+> On Tue, Nov 22, 2022 at 10:53:17AM +0800, Chao Leng wrote:
+> >> This patch is causing the following crash at the boot and reverting it
+> >> fixes the issue. This is next-20221121 kernel.
+> > This patch can fix it.
+> > https://lore.kernel.org/linux-nvme/20221116072711.1903536-1-hch@lst.de/
+>
+> Yes,  But I'm a little curious how it happened.  Shakeel, do you
+> have a genuine admin controller that does not have any I/O queues
+> to start with, or did we have other setup time errors?  Can youpost the
+> full dmesg?
 
-> > > - mm_stat values stay correct after mount:
-> > > 65536      220    65536 26214400    65536        0        0        0
-
-> > > - the bug is triggered by filling the filesystem to capacity (using dd):
-> > > 4194304        0        0 26214400   327680       64        0        0
-
-> > Can you try using /dev/urandom for dd, not /dev/zero?
-> > Do you still see zeroes in sysfs output or some random values?
-
-> After 50 test runs on a kernel where the issue is confirmed, I could not
-> reproduce the failure while filling the device from /dev/urandom instead of
-> /dev/zero. The test reported compression ratio around 1.8-2.5 which means
-> the memory usage reported by mm_stat was 10-13MB.
-
-Martin, thanks a lot for reruning tests. I wonder problems on /dev/zero is a
-kernel bug or just problem which should be workarounded.
-
-> Note that I had to disable the other filesystems in the test because some of
-> them kept failing with compression ratio <1.
-
-Yes, I noted that as well at least on exfat and btrfs (if I remember correctly).
-It wouldn't be a problem to just use it for vfat if we agreed test should be
-modified.
-
-Kind regards,
-Petr
+Sorry, I don't know about the admin controller and its I/O queues. For
+dmesg, it was an early crash, so not in /var/log/message. I was able
+to get the crash dump through the remote serial console but there is
+no easy way to get it to give full dmesg. I will see if I can get more
+info.
