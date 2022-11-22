@@ -2,50 +2,102 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD0E9C433FE
-	for <linux-block@archiver.kernel.org>; Tue, 22 Nov 2022 11:56:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 243B8C433FE
+	for <linux-block@archiver.kernel.org>; Tue, 22 Nov 2022 11:56:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233510AbiKVLz6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 22 Nov 2022 06:55:58 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44020 "EHLO
+        id S232756AbiKVL4p (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 22 Nov 2022 06:56:45 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44564 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233382AbiKVLzz (ORCPT
+        with ESMTP id S232154AbiKVL4p (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 22 Nov 2022 06:55:55 -0500
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E27827B23
-        for <linux-block@vger.kernel.org>; Tue, 22 Nov 2022 03:55:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=M7NmYC/Iylm9myghHwqILim55SAUt9QrM+UZYk0eJlw=; b=tlV+4Mlft9M4nt3vVsL0IEuuy3
-        JIFqYYBnPhv7iX5z29dAtuTRGBIidXwvhYtLG7lU94rGwbad3GNrpV/HPIq7o4FxwwgCdu3O9uSub
-        pPA5AJ4eqt2SSvGN0BVM1NG04eQeEgVr+6Gkkf/zPjlQRvSQ4Z6Ba6N4px716IlOkr8zkPigXpe+y
-        sF50KdjhsobkuGz3ypMbIbvFH9K7ybMKJ1y6ojIHT9vlrevVEhFDE376Pf+a2fzD10bg4J/43ehxo
-        CEzE91ZJptDnpN2UkOgzX09MyF3u5kGp7aZmRIXGiqgMQPiR+r51W4ja60Og/LYavt+icCzAnRZdi
-        Yc1YLydw==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1oxRsX-008eLI-Oa; Tue, 22 Nov 2022 11:55:53 +0000
-Date:   Tue, 22 Nov 2022 03:55:53 -0800
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Cc:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Christoph Hellwig <hch@infradead.org>,
-        Chaitanya Kulkarni <chaitanyak@nvidia.com>
-Subject: Re: [PATCH for-next] block: fix missing nr_hw_queues update in
- blk_mq_realloc_tag_set_tags
-Message-ID: <Y3y4ybNDEeN47SUJ@infradead.org>
-References: <20221122084917.2034220-1-shinichiro.kawasaki@wdc.com>
+        Tue, 22 Nov 2022 06:56:45 -0500
+Received: from jabberwock.ucw.cz (jabberwock.ucw.cz [46.255.230.98])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D5B3126AD4;
+        Tue, 22 Nov 2022 03:56:43 -0800 (PST)
+Received: by jabberwock.ucw.cz (Postfix, from userid 1017)
+        id 24B071C09DB; Tue, 22 Nov 2022 12:56:42 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ucw.cz; s=gen1;
+        t=1669118202;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:mime-version:mime-version:content-type:content-type;
+        bh=bLu/KvzJPCTB/Xa7S7YY3MbbLXv7uV0njFU8uvir2CM=;
+        b=EDHX+WnCmFMJzNVMipcOujGTEfG4y2dPEqZGEmYyyTFEzrhRwKwVpL+cN/UP3CC5OUPF97
+        qKfjzGpjBNGhmY4NmP8tNeoM6DwV2ah3XjObU60xPt4g3p1wSct8jluvAB5O3M+rMzWnJe
+        w9jN9XGLem7jr/QogEzlCixGhfV0H+U=
+Date:   Tue, 22 Nov 2022 12:56:41 +0100
+From:   Pavel Machek <pavel@ucw.cz>
+To:     kernel list <linux-kernel@vger.kernel.org>, josef@toxicpanda.com,
+        linux-block@vger.kernel.org, nbd@other.debian.org
+Subject: nbd: please don't spawn 16 threads when nbd is not even in use
+Message-ID: <Y3y4+QqOlF00X9ET@duo.ucw.cz>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha1;
+        protocol="application/pgp-signature"; boundary="xPdvxnZFnwXOEoiz"
 Content-Disposition: inline
-In-Reply-To: <20221122084917.2034220-1-shinichiro.kawasaki@wdc.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Looks good:
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+--xPdvxnZFnwXOEoiz
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+Hi!
+
+I see this... and it looks like there are 16 workqueues before nbd is
+even used. Surely there are better ways to do that?
+
+Best regards,
+								Pavel
+
+    257 root       0 -20       0      0      0 I   0.0   0.0   0:00.00 nbd0=
+-recv                                             =20
+    260 root       0 -20       0      0      0 I   0.0   0.0   0:00.00 nbd1=
+-recv                                             =20
+    263 root       0 -20       0      0      0 I   0.0   0.0   0:00.00 nbd2=
+-recv                                             =20
+    266 root       0 -20       0      0      0 I   0.0   0.0   0:00.00 nbd3=
+-recv                                             =20
+    269 root       0 -20       0      0      0 I   0.0   0.0   0:00.00 nbd4=
+-recv                                             =20
+    272 root       0 -20       0      0      0 I   0.0   0.0   0:00.00 nbd5=
+-recv                                             =20
+    275 root       0 -20       0      0      0 I   0.0   0.0   0:00.00 nbd6=
+-recv                                             =20
+    278 root       0 -20       0      0      0 I   0.0   0.0   0:00.00 nbd7=
+-recv                                             =20
+    281 root       0 -20       0      0      0 I   0.0   0.0   0:00.00 nbd8=
+-recv                                             =20
+    284 root       0 -20       0      0      0 I   0.0   0.0   0:00.00 nbd9=
+-recv                                             =20
+    287 root       0 -20       0      0      0 I   0.0   0.0   0:00.00 nbd1=
+0-recv                                            =20
+    290 root       0 -20       0      0      0 I   0.0   0.0   0:00.00 nbd1=
+1-recv                                            =20
+    293 root       0 -20       0      0      0 I   0.0   0.0   0:00.00 nbd1=
+2-recv                                            =20
+    296 root       0 -20       0      0      0 I   0.0   0.0   0:00.00 nbd1=
+3-recv                                            =20
+    299 root       0 -20       0      0      0 I   0.0   0.0   0:00.00 nbd1=
+4-recv                                            =20
+    302 root       0 -20       0      0      0 I   0.0   0.0   0:00.00 nbd1=
+5-recv                                            =20
+
+
+--=20
+People of Russia, stop Putin before his war on Ukraine escalates.
+
+--xPdvxnZFnwXOEoiz
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iF0EABECAB0WIQRPfPO7r0eAhk010v0w5/Bqldv68gUCY3y4+QAKCRAw5/Bqldv6
+8hPjAKCzzoppkzpcMQzHpbLeYPjW5+/pfgCgn+QgASwdXiGIGIJSvP7peIs5mLo=
+=5DEI
+-----END PGP SIGNATURE-----
+
+--xPdvxnZFnwXOEoiz--
