@@ -2,64 +2,109 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 41DBFC433FE
-	for <linux-block@archiver.kernel.org>; Tue, 22 Nov 2022 14:58:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71E54C43217
+	for <linux-block@archiver.kernel.org>; Tue, 22 Nov 2022 14:59:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234091AbiKVO6u (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 22 Nov 2022 09:58:50 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46564 "EHLO
+        id S234163AbiKVO7J (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 22 Nov 2022 09:59:09 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46614 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234069AbiKVO6Z (ORCPT
+        with ESMTP id S234144AbiKVO6v (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 22 Nov 2022 09:58:25 -0500
-Received: from zju.edu.cn (mail.zju.edu.cn [61.164.42.155])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id B41707720C;
-        Tue, 22 Nov 2022 06:55:56 -0800 (PST)
-Received: by ajax-webmail-mail-app3 (Coremail) ; Tue, 22 Nov 2022 22:55:46
- +0800 (GMT+08:00)
-X-Originating-IP: [10.14.30.50]
-Date:   Tue, 22 Nov 2022 22:55:46 +0800 (GMT+08:00)
-X-CM-HeaderCharset: UTF-8
-From:   "Jinlong Chen" <nickyc975@zju.edu.cn>
-To:     axboe@kernel.dk
-Cc:     hch@lst.de, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 2/4] elevator: printk a warning if switching to a new io
- scheduler fails
-X-Priority: 3
-X-Mailer: Coremail Webmail Server Version XT5.0.13 build 20210104(ab8c30b6)
- Copyright (c) 2002-2022 www.mailtech.cn zju.edu.cn
-In-Reply-To: <d51ed0fb457db7a4f9cbb0dbce36d534e22be457.1669126766.git.nickyc975@zju.edu.cn>
-References: <cover.1669126766.git.nickyc975@zju.edu.cn>
- <d51ed0fb457db7a4f9cbb0dbce36d534e22be457.1669126766.git.nickyc975@zju.edu.cn>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset=UTF-8
+        Tue, 22 Nov 2022 09:58:51 -0500
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0BFF6EB6C;
+        Tue, 22 Nov 2022 06:56:26 -0800 (PST)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 8ACF91F85D;
+        Tue, 22 Nov 2022 14:56:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1669128985; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=+loFO6tN5YXsk0bWjK2r+zKhS9ssoaTjODd0fLpHxXw=;
+        b=sfmdqwbLKiTiB7Qi4AyDhjDIvCEMbXR1ZfivjEs/BqcOHbuhw+kprIf2xHCaCTwObQH8a5
+        CKtGZ10w9JYjpD8IToot/jXIPHYlpgW+5ZS0wbEgEuQpU+1AM+/uz+jrOhnvYaznSjFawR
+        lulkdeUJ9jy+oIMCVvY3OEkd0qOvieo=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1669128985;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=+loFO6tN5YXsk0bWjK2r+zKhS9ssoaTjODd0fLpHxXw=;
+        b=y42N2ZaNchVaRcELYmUf0n2LuOWXFda2EadO5JNkazxeFEBiX8E/BXEGx+KtlEgs/tzmrX
+        8ds0XUjamiBkMUDA==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 5594413B01;
+        Tue, 22 Nov 2022 14:56:25 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id e3sDFBnjfGMdBAAAMHmgww
+        (envelope-from <mdoucha@suse.cz>); Tue, 22 Nov 2022 14:56:25 +0000
+Message-ID: <9489dd1c-012c-8b5d-b670-a27213da287a@suse.cz>
+Date:   Tue, 22 Nov 2022 15:56:25 +0100
 MIME-Version: 1.0
-Message-ID: <17ab2daa.5b5b.1849fd681f2.Coremail.nickyc975@zju.edu.cn>
-X-Coremail-Locale: zh_CN
-X-CM-TRANSID: cC_KCgD3_6vy4nxjLJVgCQ--.57835W
-X-CM-SenderInfo: qssqjiaqqzq6lmxovvfxof0/1tbiAgECB1ZdtcivzQABsT
-X-Coremail-Antispam: 1Ur529EdanIXcx71UUUUU7IcSsGvfJ3iIAIbVAYjsxI4VW7Jw
-        CS07vEb4IE77IF4wCS07vE1I0E4x80FVAKz4kxMIAIbVAFxVCaYxvI4VCIwcAKzIAtYxBI
-        daVFxhVjvjDU=
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.2.2
+To:     Sergey Senozhatsky <senozhatsky@chromium.org>
+Cc:     Minchan Kim <minchan@kernel.org>, Petr Vorel <pvorel@suse.cz>,
+        ltp@lists.linux.it, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        Nitin Gupta <ngupta@vflare.org>, Jens Axboe <axboe@kernel.dk>,
+        OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>,
+        Yang Xu <xuyang2018.jy@fujitsu.com>
+References: <20221107191136.18048-1-pvorel@suse.cz>
+ <Y2l3vJb1y2Jynf50@google.com> <3ac740c0-954b-5e68-b413-0adc7bc5a2b5@suse.cz>
+ <Y22b3wWs2QfMjJHi@google.com>
+Content-Language: en-US
+From:   Martin Doucha <mdoucha@suse.cz>
+Subject: Re: [PATCH 0/1] Possible bug in zram on ppc64le on vfat
+In-Reply-To: <Y22b3wWs2QfMjJHi@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-PiAKPiBwcmludGsgYSB3YXJuaW5nIHRvIGluZGljYXRlIHRoYXQgdGhlIGlvIHNjaGVkdWxlciBo
-YXMgYmVlbiBzZXQgdG8gbm9uZQo+IGlmIHN3aXRjaGluZyB0byBhIG5ldyBpbyBzY2hlZHVsZXIg
-ZmFpbHMuCj4gCj4gU2lnbmVkLW9mZi1ieTogSmlubG9uZyBDaGVuIDxuaWNreWM5NzVAemp1LmVk
-dS5jbj4KPiAtLS0KPiAgYmxvY2svZWxldmF0b3IuYyB8IDYgKysrKysrCj4gIDEgZmlsZSBjaGFu
-Z2VkLCA2IGluc2VydGlvbnMoKykKPiAKPiBkaWZmIC0tZ2l0IGEvYmxvY2svZWxldmF0b3IuYyBi
-L2Jsb2NrL2VsZXZhdG9yLmMKPiBpbmRleCAwMWFhOWYzOGYyMmUuLjFmYTQ1NzE3YjFkNiAxMDA2
-NDQKPiAtLS0gYS9ibG9jay9lbGV2YXRvci5jCj4gKysrIGIvYmxvY2svZWxldmF0b3IuYwo+IEBA
-IC02ODMsNiArNjgzLDEyIEBAIGludCBlbGV2YXRvcl9zd2l0Y2goc3RydWN0IHJlcXVlc3RfcXVl
-dWUgKnEsIHN0cnVjdCBlbGV2YXRvcl90eXBlICpuZXdfZSkKPiAgb3V0X3VuZnJlZXplOgo+ICAJ
-YmxrX21xX3VucXVpZXNjZV9xdWV1ZShxKTsKPiAgCWJsa19tcV91bmZyZWV6ZV9xdWV1ZShxKTsK
-PiArCj4gKwlpZiAocmV0KSB7Cj4gKwkJcHJfd2FybigiZWx2OiBzd2l0Y2ggdG8gXCIlc1wiIGZh
-aWxlZCwgZmFsbGluZyBiYWNrIHRvIFwibm9uZVwiXG4iLAo+ICsJCQluZXdfZS0+ZWxldmF0b3Jf
-bmFtZSk7Cj4gKwl9Cj4gKwo+ICAJcmV0dXJuIHJldDsKPiAgfQo+ICAKCkhpLCBKZW5zIQoKVGhp
-cyBwYXRjaCBpcyBzdWdnZXN0ZWQgYnkgQ2hyaXN0b3BoLCBidXQgSSBmb3Jnb3QgdG8gYWRkIHRo
-ZSBTdWdnZXN0ZWQtYnkKdGFnLiBXb3VsZCB5b3UgcGxlYXNlIGFkZCAiU3VnZ2VzdGVkLWJ5OiBD
-aHJpc3RvcGggSGVsbHdpZyA8aGNoQGxzdC5kZT4iCmlmIHlvdSBhcHBseSB0aGUgcGF0Y2g/CgpU
-aGFua3MhCkppbmxvbmcgQ2hlbgo=
+On 11. 11. 22 1:48, Sergey Senozhatsky wrote:
+> On (22/11/10 15:29), Martin Doucha wrote:
+>> I've tried to debug the issue and collected some interesting data (all
+>> values come from zram device with 25M size limit and zstd compression
+>> algorithm):
+>> - mm_stat values are correct after mkfs.vfat:
+>> 65536      220    65536 26214400    65536        0        0        0
+>>
+>> - mm_stat values stay correct after mount:
+>> 65536      220    65536 26214400    65536        0        0        0
+>>
+>> - the bug is triggered by filling the filesystem to capacity (using dd):
+>> 4194304        0        0 26214400   327680       64        0        0
+> 
+> Can you try using /dev/urandom for dd, not /dev/zero?
+> Do you still see zeroes in sysfs output or some random values?
+
+After 50 test runs on a kernel where the issue is confirmed, I could not 
+reproduce the failure while filling the device from /dev/urandom instead 
+of /dev/zero. The test reported compression ratio around 1.8-2.5 which 
+means the memory usage reported by mm_stat was 10-13MB.
+
+Note that I had to disable the other filesystems in the test because 
+some of them kept failing with compression ratio <1.
+
+-- 
+Martin Doucha   mdoucha@suse.cz
+QA Engineer for Software Maintenance
+SUSE LINUX, s.r.o.
+CORSO IIa
+Krizikova 148/34
+186 00 Prague 8
+Czech Republic
+
