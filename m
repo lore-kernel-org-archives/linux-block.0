@@ -2,84 +2,66 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44417C4332F
-	for <linux-block@archiver.kernel.org>; Tue, 22 Nov 2022 16:40:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C6FDC43217
+	for <linux-block@archiver.kernel.org>; Tue, 22 Nov 2022 19:23:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232312AbiKVQk2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 22 Nov 2022 11:40:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42202 "EHLO
+        id S234712AbiKVTW6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 22 Nov 2022 14:22:58 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48698 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229628AbiKVQk0 (ORCPT
+        with ESMTP id S234716AbiKVTW6 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 22 Nov 2022 11:40:26 -0500
-Received: from mail-yw1-x1135.google.com (mail-yw1-x1135.google.com [IPv6:2607:f8b0:4864:20::1135])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E7D51E3EE
-        for <linux-block@vger.kernel.org>; Tue, 22 Nov 2022 08:40:26 -0800 (PST)
-Received: by mail-yw1-x1135.google.com with SMTP id 00721157ae682-36cbcda2157so149452677b3.11
-        for <linux-block@vger.kernel.org>; Tue, 22 Nov 2022 08:40:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=D2zYvqvXjbGs5C4WInuhh3U2C66flVl4taaDYYUBAVA=;
-        b=UaPYWxjEdnLjXhU3WdNH0ejVKdY6kJXtscrlYGI69kfDiXTFnkEFSR46W2T3RsVTP5
-         txRxDRJTQ5DGe1K0fZYS21f3clsrdGw1OmUM57d/xnboggySp77gI/he4O487ft97Vme
-         WjL5PCnk+w6qZV6gSZ5h2mCoCKhm4FCXTP2xmNiSQtU3F3GIbxDFq7JKpYSU6wP2r8aj
-         XF3xQD/+sfPTM13ufbByfB62otc+u+lBsqKTJ7YGmdX62IlF6ErreeTKbQsO0GDLWdSb
-         uJoPEapG5MKQI1G39sCxzblmndinWn12RMatkEK5M/uOEUhP2wtZt9eh0uL14R7rZ3Tb
-         XQdw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=D2zYvqvXjbGs5C4WInuhh3U2C66flVl4taaDYYUBAVA=;
-        b=Nui+A349/eC65oMV5Iq7KljpE32Vusb2O5f9xHxpLFDPGJXuproQc1/hrdaNbYbC8X
-         sy3paaIQRcJKruxZTpf69txt9/5lLBXywlAbCgjyYmaCO4lW1KB/x1DmJbSyhMedyUtq
-         c5A4e8itu63CCVUp/KxOfjsZqFpVa0fgadS1q4jhDS6ve+wUQiCbyo4ZzPOMUlj1b5Nr
-         QZ25MgvdrBJc/DMlZgMFCsG8kgktp0kfvLQBRrr4SUk80Mr6ZcAbu4jW/r/AT8H5zY9g
-         RvuHEHcS9AoJhfB10b7xVh7IeGzmN0ZONPatweih0A9nuJFdApRWlLfK7Q+iO0HY54p/
-         vn5w==
-X-Gm-Message-State: ANoB5pmGFJGzZ+dF2/gzwNRHqBWamzGmsUUzpXRGjY7zkbhehzfTExFQ
-        yQl0Fqq6t+GlyKSFzWmjjkrcr+u05a4++wNEURxlng==
-X-Google-Smtp-Source: AA0mqf4mkW4nuiEh4N+hOrMH9u/+FRLT0Zho1JaAfLTjdPVXW3dNj6y1yEg0KGDKXO2qAlyN170k/W4HmBBv8EvuyBs=
-X-Received: by 2002:a81:acf:0:b0:391:48c6:3eb with SMTP id 198-20020a810acf000000b0039148c603ebmr22657111ywk.93.1669135225214;
- Tue, 22 Nov 2022 08:40:25 -0800 (PST)
+        Tue, 22 Nov 2022 14:22:58 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5525CE12;
+        Tue, 22 Nov 2022 11:22:57 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 419B7B81D50;
+        Tue, 22 Nov 2022 19:22:56 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9177BC433C1;
+        Tue, 22 Nov 2022 19:22:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1669144974;
+        bh=Nd2SSpX2rnlORZIuluFSyUmIIouCQL/zDa4vN299e4E=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=GKVDKeWRBnacfdNcZLokrwElYe4jvGQbxsQh6kyyDkSFllijnHydQhaBmNaHeQJ7Y
+         bTMQU8GPNnMcWnjL9KwMShGAnxkAZs9zAyGKWEGnJqdTMB9PM2S/U03A+S9tIF95yc
+         EBcrcd0NzWG3KOwQNIH97dxyqqIb/F0wWvx2xblEWrKRvXKOD+/JO+HlfQCZhU9UnE
+         L/oHVpRp++M6DClMKF+/tPdg3IwjBB8KaPfju8bePj8YYc0hcQ3gqIv17g516fkmb7
+         hvLqLXpc6kvu3V09n+TIzbqIuala1T/vjmSnVR5fih7B7Rd20xe7St7pUSVdwwmPCZ
+         fi7K81DyYHCTg==
+Date:   Tue, 22 Nov 2022 11:22:52 -0800
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+Cc:     "Theodore Y. Ts o" <tytso@mit.edu>,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        Jonathan Corbet <corbet@lwn.net>, Jens Axboe <axboe@kernel.dk>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        linux-fscrypt@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
+Subject: Re: [PATCH v2 2/2] fscrypt: Add SM4 XTS/CTS symmetric algorithm
+ support
+Message-ID: <Y30hjJq1Vwl4k1dJ@sol.localdomain>
+References: <20221122070632.21910-1-tianjia.zhang@linux.alibaba.com>
+ <20221122070632.21910-3-tianjia.zhang@linux.alibaba.com>
 MIME-Version: 1.0
-References: <20221101150050.3510-1-hch@lst.de> <20221101150050.3510-15-hch@lst.de>
- <20221121204450.6vyg6gixsz4unpaz@google.com> <a8e3d7a4-c5f6-13d0-a517-72097daa2a7b@huawei.com>
- <20221122060855.GA14111@lst.de>
-In-Reply-To: <20221122060855.GA14111@lst.de>
-From:   Shakeel Butt <shakeelb@google.com>
-Date:   Tue, 22 Nov 2022 08:40:13 -0800
-Message-ID: <CALvZod7AFOSyN7pz0+B2rbQrzepTD+QLwmSYSNUa5jyaXEfKfg@mail.gmail.com>
-Subject: Re: [PATCH 14/14] nvme: use blk_mq_[un]quiesce_tagset
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Chao Leng <lengchao@huawei.com>, Jens Axboe <axboe@kernel.dk>,
-        Keith Busch <kbusch@kernel.org>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Ming Lei <ming.lei@redhat.com>, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, Hannes Reinecke <hare@suse.de>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221122070632.21910-3-tianjia.zhang@linux.alibaba.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Nov 21, 2022 at 10:08 PM Christoph Hellwig <hch@lst.de> wrote:
->
-> On Tue, Nov 22, 2022 at 10:53:17AM +0800, Chao Leng wrote:
-> >> This patch is causing the following crash at the boot and reverting it
-> >> fixes the issue. This is next-20221121 kernel.
-> > This patch can fix it.
-> > https://lore.kernel.org/linux-nvme/20221116072711.1903536-1-hch@lst.de/
->
-> Yes,  But I'm a little curious how it happened.  Shakeel, do you
-> have a genuine admin controller that does not have any I/O queues
-> to start with, or did we have other setup time errors?  Can youpost the
-> full dmesg?
+On Tue, Nov 22, 2022 at 03:06:32PM +0800, Tianjia Zhang wrote:
+> SM4 is a symmetric algorithm widely used in China, this patch enables
+> to use SM4-XTS mode to encrypt file content, and use SM4-CBC-CTS to
+> encrypt filename.
+> 
+> Signed-off-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
 
-Sorry, I don't know about the admin controller and its I/O queues. For
-dmesg, it was an early crash, so not in /var/log/message. I was able
-to get the crash dump through the remote serial console but there is
-no easy way to get it to give full dmesg. I will see if I can get more
-info.
+There is still no explanation here about why you believe this algorithm is
+useful to support in fscrypt.
+
+- Eric
