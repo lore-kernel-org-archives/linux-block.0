@@ -2,86 +2,82 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A2C40C4332F
-	for <linux-block@archiver.kernel.org>; Mon, 21 Nov 2022 23:04:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4AB0EC4332F
+	for <linux-block@archiver.kernel.org>; Tue, 22 Nov 2022 02:53:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229519AbiKUXEx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 21 Nov 2022 18:04:53 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56796 "EHLO
+        id S232080AbiKVCxZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 21 Nov 2022 21:53:25 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47844 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229489AbiKUXEw (ORCPT
+        with ESMTP id S232097AbiKVCxV (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 21 Nov 2022 18:04:52 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F78CCB94D
-        for <linux-block@vger.kernel.org>; Mon, 21 Nov 2022 15:04:52 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id B5765614C3
-        for <linux-block@vger.kernel.org>; Mon, 21 Nov 2022 23:04:51 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 664DDC433C1;
-        Mon, 21 Nov 2022 23:04:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1669071891;
-        bh=9G6Gabmxkd9zjTROmGV/ZqWq0G1Ria+xFxePpTMyFj4=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=My8xk8Coeyc/SidD1iB3d24XNr4MLmCOB57f4LKw58jPks9nhB/9YU0gXPRhYi6sT
-         vPzIa/6fsrGX4Gusu8hwbK3bjNXl7LthNpOaRkDvKfFEUjtmFbhr05vwsKU+bfMwJH
-         vDS82Zu0zpHTX/FxLzC5b58x/8RrkZIHGnn9Lu3Vla3xm6HrRKHoI7qCTiVGzdLLJI
-         /aqXr29ny8I8LT/U/xW1XcODDu921IwUS5taaWIvBz0C408/eWl1yozDCkaEpNkfjO
-         5s/3FiPVS3Ba4FjJcJNvxuEsDPvNeM1NsgfvEnfatOLCV2D1hbmQhUNNXghhERuV7x
-         pBflXwlMCU+lA==
-Date:   Mon, 21 Nov 2022 16:04:47 -0700
-From:   Keith Busch <kbusch@kernel.org>
-To:     Jonathan Derrick <jonathan.derrick@linux.dev>
-Cc:     linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-        Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
-        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Sagi Grimberg <sagi@grimberg.me>, its@irrelevant.dk
-Subject: Re: [PATCH v2] tests/nvme: Add admin-passthru+reset race test
-Message-ID: <Y3wED5m5JHOFMMg2@kbusch-mbp>
-References: <20221117212210.934-1-jonathan.derrick@linux.dev>
- <Y3vlsF7KcRrY7vCW@kbusch-mbp>
- <e99fef7c-1b48-61e2-b503-a2363968d5fc@linux.dev>
- <7dcb9e3c-aa3e-b7b9-fc30-59281d581fd0@linux.dev>
+        Mon, 21 Nov 2022 21:53:21 -0500
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B09AE097
+        for <linux-block@vger.kernel.org>; Mon, 21 Nov 2022 18:53:20 -0800 (PST)
+Received: from canpemm500002.china.huawei.com (unknown [172.30.72.54])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4NGTMG67HgzHwLG;
+        Tue, 22 Nov 2022 10:52:42 +0800 (CST)
+Received: from [10.169.59.127] (10.169.59.127) by
+ canpemm500002.china.huawei.com (7.192.104.244) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31; Tue, 22 Nov 2022 10:53:17 +0800
+Subject: Re: [PATCH 14/14] nvme: use blk_mq_[un]quiesce_tagset
+To:     Shakeel Butt <shakeelb@google.com>, Christoph Hellwig <hch@lst.de>
+CC:     Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Ming Lei <ming.lei@redhat.com>,
+        <linux-nvme@lists.infradead.org>, <linux-block@vger.kernel.org>,
+        Hannes Reinecke <hare@suse.de>
+References: <20221101150050.3510-1-hch@lst.de>
+ <20221101150050.3510-15-hch@lst.de>
+ <20221121204450.6vyg6gixsz4unpaz@google.com>
+From:   Chao Leng <lengchao@huawei.com>
+Message-ID: <a8e3d7a4-c5f6-13d0-a517-72097daa2a7b@huawei.com>
+Date:   Tue, 22 Nov 2022 10:53:17 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <7dcb9e3c-aa3e-b7b9-fc30-59281d581fd0@linux.dev>
+In-Reply-To: <20221121204450.6vyg6gixsz4unpaz@google.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.169.59.127]
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ canpemm500002.china.huawei.com (7.192.104.244)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-[cc'ing Klaus]
 
-On Mon, Nov 21, 2022 at 03:49:45PM -0700, Jonathan Derrick wrote:
-> On 11/21/2022 3:34 PM, Jonathan Derrick wrote:
-> > On 11/21/2022 1:55 PM, Keith Busch wrote:
-> >> On Thu, Nov 17, 2022 at 02:22:10PM -0700, Jonathan Derrick wrote:
-> >>> I seem to have isolated the error mechanism for older kernels, but 6.2.0-rc2
-> >>> reliably segfaults my QEMU instance (something else to look into) and I don't
-> >>> have any 'real' hardware to test this on at the moment. It looks like several
-> >>> passthru commands are able to enqueue prior/during/after resetting/connecting.
-> >>
-> >> I'm not seeing any problem with the latest nvme-qemu after several dozen
-> >> iterations of this test case. In that environment, the formats and
-> >> resets complete practically synchronously with the call, so everything
-> >> proceeds quickly. Is there anything special I need to change?
-> >>  
-> > I can still repro this with nvme-fixes tag, so I'll have to dig into it myself
-> Here's a backtrace:
+
+On 2022/11/22 4:44, Shakeel Butt wrote:
+> On Tue, Nov 01, 2022 at 04:00:50PM +0100, Christoph Hellwig wrote:
+>> From: Chao Leng <lengchao@huawei.com>
+>>
+>> All controller namespaces share the same tagset, so we can use this
+>> interface which does the optimal operation for parallel quiesce based on
+>> the tagset type(e.g. blocking tagsets and non-blocking tagsets).
+>>
+>> nvme connect_q should not be quiesced when quiesce tagset, so set the
+>> QUEUE_FLAG_SKIP_TAGSET_QUIESCE to skip it when init connect_q.
+>>
+>> Currently we use NVME_NS_STOPPED to ensure pairing quiescing and
+>> unquiescing. If use blk_mq_[un]quiesce_tagset, NVME_NS_STOPPED will be
+>> invalided, so introduce NVME_CTRL_STOPPED to replace NVME_NS_STOPPED.
+>> In addition, we never really quiesce a single namespace. It is a better
+>> choice to move the flag from ns to ctrl.
+>>
+>> Signed-off-by: Chao Leng <lengchao@huawei.com>
+>> [hch: rebased on top of prep patches]
+>> Signed-off-by: Christoph Hellwig <hch@lst.de>
+>> Reviewed-by: Keith Busch <kbusch@kernel.org>
+>> Reviewed-by: Chao Leng <lengchao@huawei.com>
+>> Reviewed-by: Hannes Reinecke <hare@suse.de>
+>> Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
 > 
-> Thread 1 "qemu-system-x86" received signal SIGSEGV, Segmentation fault.
-> [Switching to Thread 0x7ffff7554400 (LWP 531154)]
-> 0x000055555597a9d5 in nvme_ctrl (req=0x7fffec892780) at ../hw/nvme/nvme.h:539
-> 540         return sq->ctrl;
-> (gdb) backtrace
-> #0  0x000055555597a9d5 in nvme_ctrl (req=0x7fffec892780) at ../hw/nvme/nvme.h:539
-> #1  0x0000555555994360 in nvme_format_bh (opaque=0x5555579dd000) at ../hw/nvme/ctrl.c:5852
-
-Thanks, looks like a race between the admin queue format's bottom half,
-and the controller reset tearing down that queue. I'll work with Klaus
-on that qemu side (looks like a well placed qemu_bh_cancel() should do
-it).
+> This patch is causing the following crash at the boot and reverting it
+> fixes the issue. This is next-20221121 kernel.
+This patch can fix it.
+https://lore.kernel.org/linux-nvme/20221116072711.1903536-1-hch@lst.de/
