@@ -2,66 +2,81 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C6FDC43217
-	for <linux-block@archiver.kernel.org>; Tue, 22 Nov 2022 19:23:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3EBACC4332F
+	for <linux-block@archiver.kernel.org>; Tue, 22 Nov 2022 19:29:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234712AbiKVTW6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 22 Nov 2022 14:22:58 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48698 "EHLO
+        id S234788AbiKVT3P (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 22 Nov 2022 14:29:15 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52382 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234716AbiKVTW6 (ORCPT
+        with ESMTP id S234784AbiKVT3M (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 22 Nov 2022 14:22:58 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5525CE12;
-        Tue, 22 Nov 2022 11:22:57 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 419B7B81D50;
-        Tue, 22 Nov 2022 19:22:56 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9177BC433C1;
-        Tue, 22 Nov 2022 19:22:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1669144974;
-        bh=Nd2SSpX2rnlORZIuluFSyUmIIouCQL/zDa4vN299e4E=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=GKVDKeWRBnacfdNcZLokrwElYe4jvGQbxsQh6kyyDkSFllijnHydQhaBmNaHeQJ7Y
-         bTMQU8GPNnMcWnjL9KwMShGAnxkAZs9zAyGKWEGnJqdTMB9PM2S/U03A+S9tIF95yc
-         EBcrcd0NzWG3KOwQNIH97dxyqqIb/F0wWvx2xblEWrKRvXKOD+/JO+HlfQCZhU9UnE
-         L/oHVpRp++M6DClMKF+/tPdg3IwjBB8KaPfju8bePj8YYc0hcQ3gqIv17g516fkmb7
-         hvLqLXpc6kvu3V09n+TIzbqIuala1T/vjmSnVR5fih7B7Rd20xe7St7pUSVdwwmPCZ
-         fi7K81DyYHCTg==
-Date:   Tue, 22 Nov 2022 11:22:52 -0800
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-Cc:     "Theodore Y. Ts o" <tytso@mit.edu>,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        Jonathan Corbet <corbet@lwn.net>, Jens Axboe <axboe@kernel.dk>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        linux-fscrypt@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
-Subject: Re: [PATCH v2 2/2] fscrypt: Add SM4 XTS/CTS symmetric algorithm
- support
-Message-ID: <Y30hjJq1Vwl4k1dJ@sol.localdomain>
-References: <20221122070632.21910-1-tianjia.zhang@linux.alibaba.com>
- <20221122070632.21910-3-tianjia.zhang@linux.alibaba.com>
+        Tue, 22 Nov 2022 14:29:12 -0500
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98B8E920B4;
+        Tue, 22 Nov 2022 11:29:10 -0800 (PST)
+Received: by mail-pl1-f181.google.com with SMTP id 4so14655223pli.0;
+        Tue, 22 Nov 2022 11:29:10 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=N+SZqUZBgX2LO2pgTHb7GO+NG50V5PkmPLMToKbj5so=;
+        b=DG4ukGImo8LHmQsEO03H1pAAfj00GvI+GieFthEfBWBVK7wuTI2RYlLNtfLaAKGGIO
+         hbrQR39R1/+vbc5M18gGQzjLz37Zc3P/gmgYo4iHZd4uINhcNA3YDg17NZxKl/lxUQY1
+         6PRq8Iv7SMgz+t2VbKiLlEha4Thbfoji8WImyEDOq+nf16YUs+/9CRQ0CJqDqKVxjm71
+         NxtSM6vG5E3liFSegHSl2QQ4gPW2spUjsaw5JwFXayHHAogpCobpma4qpijPI8mwrtcD
+         2FI0+tdytVNT4hlK6xq1xDfDNqaedw5kzrJ0oeEXnJFWM+EZl9v3JzTfSJGGYh3qdaaQ
+         +mWQ==
+X-Gm-Message-State: ANoB5pma7w4gjszYU4KWWYa4gXOqViE4PNiY/rJM5ZTpsSh4esaZwVzK
+        FcrV2U9hcf9vhQ98mP7a514=
+X-Google-Smtp-Source: AA0mqf4SNRdsRpa8tN/44ALl0pdVPsCbKhnsc3zVPfln7ViBeFvMKPlgN/7R3U4cgv2axH203OuinA==
+X-Received: by 2002:a17:902:a38e:b0:189:1c93:c3a1 with SMTP id x14-20020a170902a38e00b001891c93c3a1mr8943069pla.26.1669145350031;
+        Tue, 22 Nov 2022 11:29:10 -0800 (PST)
+Received: from ?IPV6:2620:15c:211:201:3c88:9479:e09c:9acb? ([2620:15c:211:201:3c88:9479:e09c:9acb])
+        by smtp.gmail.com with ESMTPSA id lb9-20020a17090b4a4900b00218772ceaa3sm10282394pjb.41.2022.11.22.11.29.07
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 22 Nov 2022 11:29:08 -0800 (PST)
+Message-ID: <6c34dfee-0ed6-be99-4180-1239ed495437@acm.org>
+Date:   Tue, 22 Nov 2022 11:29:06 -0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221122070632.21910-3-tianjia.zhang@linux.alibaba.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.4.0
+Subject: Re: [PATCH 0/3] mmc: Improve block layer requeueing behavior
+Content-Language: en-US
+To:     Avri Altman <Avri.Altman@wdc.com>,
+        Adrian Hunter <adrian.hunter@intel.com>,
+        =?UTF-8?Q?Christian_L=c3=b6hle?= <CLoehle@hyperstone.com>,
+        "axboe@kernel.dk" <axboe@kernel.dk>,
+        "ulf.hansson@linaro.org" <ulf.hansson@linaro.org>,
+        "linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Christoph Hellwig <hch@lst.de>
+Cc:     "vincent.whitchurch@axis.com" <vincent.whitchurch@axis.com>
+References: <f30ec7fe7d834c1d8e116508500110cf@hyperstone.com>
+ <c1e1281e-0977-cbf7-041e-db911ee722a7@intel.com>
+ <d1a1340a-f5f8-6953-e066-b8c6095d63fd@acm.org>
+ <5df2c4d5-f426-e3ea-8e6d-f772ec7091b6@intel.com>
+ <bade026a-ec83-7516-d5ef-bb373df48a6e@acm.org>
+ <1c9b3db6-3443-5580-08f2-42520d6a3318@intel.com>
+ <4bba6b72-c361-f212-a8c3-9e33aab80c99@acm.org>
+ <DM6PR04MB6575EDCCDD993EEEA14A99A2FC0D9@DM6PR04MB6575.namprd04.prod.outlook.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <DM6PR04MB6575EDCCDD993EEEA14A99A2FC0D9@DM6PR04MB6575.namprd04.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Nov 22, 2022 at 03:06:32PM +0800, Tianjia Zhang wrote:
-> SM4 is a symmetric algorithm widely used in China, this patch enables
-> to use SM4-XTS mode to encrypt file content, and use SM4-CBC-CTS to
-> encrypt filename.
-> 
-> Signed-off-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+On 11/21/22 23:21, Avri Altman wrote:
+> Once you do, please publish it to the scsi mailing list as well.
 
-There is still no explanation here about why you believe this algorithm is
-useful to support in fscrypt.
+I will Cc the linux-scsi mailing list.
 
-- Eric
+Thanks,
+
+Bart.
+
