@@ -2,91 +2,65 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 99D4DC4332F
-	for <linux-block@archiver.kernel.org>; Tue, 22 Nov 2022 12:37:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91259C433FE
+	for <linux-block@archiver.kernel.org>; Tue, 22 Nov 2022 12:45:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229481AbiKVMhc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 22 Nov 2022 07:37:32 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45514 "EHLO
+        id S231465AbiKVMpE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 22 Nov 2022 07:45:04 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51618 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233405AbiKVMh3 (ORCPT
+        with ESMTP id S229507AbiKVMpC (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 22 Nov 2022 07:37:29 -0500
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2CC818B;
-        Tue, 22 Nov 2022 04:37:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=eEwn/jgijxzT0bTyhHon1GnPIusHbd+BLkxVvvIWLZE=; b=f5Vum9ZmrKnT1UDkwMjNUYBsm4
-        GIHnoIC9IcNcmKb51j0iGoXc9LjprOoe/m2MzzjYdHie3eZy9OZLefDRygrOShJTB7c9yoFhdFMbJ
-        L/XipT7GNdRPWsmr0SqCi+35+XBSUfP7yWGUakItGVjTngmXE+yfBu0wJOegJ31K7ugG8KCMFbBB3
-        aC4tXSCpCnanqdhGMOlpRPxFhpvUmwn1XmNaZy2D0r2H1Grwlvvy088D5h+OriypZ9bwnpjo/n2pL
-        XD+Hke7ddEE8xtToJFjAgFGSOLeC+6AsbQcY/RS2Lm2+A0Wm5qDWe/3h/I9INWtdU/6x8bpkD/eHT
-        noUdZM6w==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1oxSWS-009DG6-9l; Tue, 22 Nov 2022 12:37:08 +0000
-Date:   Tue, 22 Nov 2022 04:37:08 -0800
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Daniel Golle <daniel@makrotopia.org>
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        Richard Weinberger <richard@nod.at>,
-        Matthew Wilcox <willy@infradead.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        Wolfram Sang <wsa+renesas@sang-engineering.com>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH 1/4] init: move block device helpers from
- init/do_mounts.c
-Message-ID: <Y3zCdJr5dKsADsnM@infradead.org>
-References: <cover.1668644705.git.daniel@makrotopia.org>
- <e5e0ab0429b1fc8a4e3f9614d2d1cc43dea78093.1668644705.git.daniel@makrotopia.org>
- <Y3XM62P7CaeKXFsz@infradead.org>
- <Y3j+Pzy1JpqG8Yd8@makrotopia.org>
+        Tue, 22 Nov 2022 07:45:02 -0500
+Received: from zju.edu.cn (mail.zju.edu.cn [61.164.42.155])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id D011D1C402;
+        Tue, 22 Nov 2022 04:44:57 -0800 (PST)
+Received: by ajax-webmail-mail-app3 (Coremail) ; Tue, 22 Nov 2022 20:44:54
+ +0800 (GMT+08:00)
+X-Originating-IP: [10.14.30.50]
+Date:   Tue, 22 Nov 2022 20:44:54 +0800 (GMT+08:00)
+X-CM-HeaderCharset: UTF-8
+From:   "Jinlong Chen" <nickyc975@zju.edu.cn>
+To:     "Christoph Hellwig" <hch@lst.de>
+Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: Re: [RFC PATCH 0/2] elevator: restore old io scheduler on
+ failure in elevator_switch
+X-Priority: 3
+X-Mailer: Coremail Webmail Server Version XT5.0.13 build 20210104(ab8c30b6)
+ Copyright (c) 2002-2022 www.mailtech.cn zju.edu.cn
+In-Reply-To: <20221122122446.GA5068@lst.de>
+References: <cover.1668772991.git.nickyc975@zju.edu.cn>
+ <20221121071305.GB23882@lst.de>
+ <6d74b4a9.5489.1849f42de2d.Coremail.nickyc975@zju.edu.cn>
+ <20221122122446.GA5068@lst.de>
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=UTF-8
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Y3j+Pzy1JpqG8Yd8@makrotopia.org>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Message-ID: <7724857b.55d9.1849f5eb423.Coremail.nickyc975@zju.edu.cn>
+X-Coremail-Locale: zh_CN
+X-CM-TRANSID: cC_KCgD3_6tGxHxjlFJeCQ--.57695W
+X-CM-SenderInfo: qssqjiaqqzq6lmxovvfxof0/1tbiAgECB1ZdtcipPgABsm
+X-Coremail-Antispam: 1Ur529EdanIXcx71UUUUU7IcSsGvfJ3iIAIbVAYjsxI4VWxJw
+        CS07vEb4IE77IF4wCS07vE1I0E4x80FVAKz4kxMIAIbVAFxVCaYxvI4VCIwcAKzIAtYxBI
+        daVFxhVjvjDU=
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, Nov 19, 2022 at 04:03:11PM +0000, Daniel Golle wrote:
-> That works, but has slightly less utility value than the partition
-> parser approach as in this way I cannot easily populate the PARTNAME
-> uevent which can later help userspace to identify a device by the FIT
-> subimage name -- I'd have to either invent a new bus_type or
-> device_type, both seem inappropriate and have unwanted side effects.
-> Or am I missing something and there is a way to use add_uevent_var()
-> for a disk_type device?
-
-You're not exposing a partition here - this is an image format that
-sits in a partition and we should not pretend that is a partition.
-
-> However, I don't see a way to avoid using (or duplicating)
-> devt_from_devname() to select the lower device somehow without having
-> to probe and parse *all* block devices present (which is, from what I
-> understood, what you want to avoid, and I agree that it is more safe to
-> not do that...)
-> 
-> Can you or anyone give some advise on how this should be done?
-
-Just set the block driver up from an initramfs, like we do for all
-modern stackable drivers.
-
-> Yet another (imho not terrible) problem is removal of the lower device.
-> Many of the supported SBC use a micro SD card to boot, which can be
-> removed by the user while the system is running (which is generally not
-> a good idea, but anyway). For partitions this is handled automatically
-> by blk_drop_partitions() called directly from genhd.c.
-> I'm currently playing with doing something similar using the bus device
-> removal notification, but it doesn't seem to work for all cases, e.g.
-> mmcblk device do not seem to have the ->bus pointer populated at all
-> (ie. disk_to_dev(disk)->bus == NULL for mmcblk devices).
-
-I have WIP patches that allow the claimer of a block device get
-resize and removal notification.  It's not going to land for 6.2,
-but I hope I have it ready in time for the next merge window.
+PiBPbiBUdWUsIE5vdiAyMiwgMjAyMiBhdCAwODoxNDozMFBNICswODAwLCBKaW5sb25nIENoZW4g
+d3JvdGU6Cj4gPiBNb3N0bHkgZmFpbHVyZXMgc3BlY2lmaWMgdG8gdGhlIGludGVuZGVkIGlvIHNj
+aGVkdWxlciwgbGlrZSBjb25zdW1pbmcgbW9yZQo+ID4gcmVzb3VyY2VzIHRoYW4gdGhlIG9sZCBv
+bmUgdGhhdCB0aGUgc3lzdGVtIGNhbiBub3QgYWZmb3JkLiBCdXQgc3VyZSBpdCdzCj4gPiByYXJl
+LCBzbyBkbyB5b3UgdGhpbmsgSSBzaG91bGQganVzdCBjb3JyZWN0IHRoZSBvdXRkYXRlZCBkb2N1
+bWVudD8KPiAKPiBJJ2QgYmUgdGVtcHRlZCB0byBqdXN0IGRvY3VtZW50ZWQgdGhlIGJlaGF2aW9y
+LCBiZWNhdXNlIEkgdGhpbmsgdGhlCj4gY2hhbmNlcyBhcmUgaGlnaCB0aGF0IGlmIHN3aXRjaGlu
+ZyB0byBvbmUgc2NoZWR1bGUgd2lsbCBmYWlsIHRoYXQKPiBzd2l0Y2hpbmcgYmFjayB0byB0aGUg
+b2xkIG9uZSB3aWxsIGZhaWwgYXMgd2VsbC4gIEkndmUgZG9uZSBhIHF1aWNrCj4gYXVkaXQgb2Yg
+YWxsIHRocmVlIHNjaGVkdWxlcnMsIGFuZCB1bmxlc3MgSSBtaXNzZWQgc29tZXRoaW5nIHRoZXJl
+Cj4gYXJlIG5vIG90aGVyIGZhaWx1cmUgY2FzZXMgZXhjZXB0IGZvciBydW5uaW5nIG91dCBvZiBt
+ZW1vcnkuCj4gCj4gTWF5YmUgYSBwcmludGsgdG8gZG9jdW1lbnQgdGhhdCBzd2l0Y2hpbmcgdGhl
+IHNjaGVkdWxlciBmYWlsZWQgYXJlCj4gd2UgYXJlbid0IHVzaW5nIGFueSBzY2hlZHVsZXIgbm93
+IG1pZ2h0IGJlIHVzZWZ1bCwgdGhvdWdoLgoKT2ssIHRoZW4gSSdsbCBzZW5kIHR3byBwYXRjaGVz
+IHdpdGggdGhlIGRvY3VtZW50IHVwZGF0ZWQgYW5kIHRoZSBwcmludGsgYWRkZWQuCgpUaGFua3Mh
+CkppbmxvbmcgQ2hlbgo=
