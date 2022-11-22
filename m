@@ -2,89 +2,118 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD6C1C433FE
-	for <linux-block@archiver.kernel.org>; Tue, 22 Nov 2022 13:11:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E8B3CC4332F
+	for <linux-block@archiver.kernel.org>; Tue, 22 Nov 2022 13:43:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233121AbiKVNLT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 22 Nov 2022 08:11:19 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40606 "EHLO
+        id S229481AbiKVNnN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 22 Nov 2022 08:43:13 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41672 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233139AbiKVNLN (ORCPT
+        with ESMTP id S232384AbiKVNnM (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 22 Nov 2022 08:11:13 -0500
-Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A96D163142
-        for <linux-block@vger.kernel.org>; Tue, 22 Nov 2022 05:11:08 -0800 (PST)
-Received: by mail-pj1-x102b.google.com with SMTP id t17so12534255pjo.3
-        for <linux-block@vger.kernel.org>; Tue, 22 Nov 2022 05:11:08 -0800 (PST)
+        Tue, 22 Nov 2022 08:43:12 -0500
+Received: from mail-wr1-x42c.google.com (mail-wr1-x42c.google.com [IPv6:2a00:1450:4864:20::42c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B08E127FE5
+        for <linux-block@vger.kernel.org>; Tue, 22 Nov 2022 05:43:10 -0800 (PST)
+Received: by mail-wr1-x42c.google.com with SMTP id d1so12656953wrs.12
+        for <linux-block@vger.kernel.org>; Tue, 22 Nov 2022 05:43:10 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=N9N6VoykNRu/Vv9Z4jsJODEvG8uWFfnROjw18lJc5Zc=;
-        b=VLVSODZKuzGlMQO522s67z6LBvxD+71zOEdmTm8doHnPUY1325AFkWcEDQOY1mSqgM
-         ZpzY5PmOMrcBYkCzOJc2hj8QhGJrFLsXx9FiIPjnCJlqI0rGNapPriTjlkO71VvD5gJs
-         xvwlIuifQQaV9gpolF+Q1nXoVFpnKxCEFxfzd9J89ANEAE9HcFJ+p/3p5KGhoVgAG6s4
-         6D8TIxYn5TJWwUMxQCY66gcf4NbNA6x+kkvrz7JFDhAKPmWCV5h0K8c7UNoL6Dmq8l+R
-         fKpBk8nX15MQfWBJyslNxXuTiIaMX9VIzBJJn7htNMmsvDbKIVYvrk1NqHfUAc8LuaI7
-         r0gw==
+        d=linbit-com.20210112.gappssmtp.com; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=aKWA+AP/j4No4bfih7dsLGLYEDSONTbhMU2EZnn42zY=;
+        b=yXqcBlksNnAzv0JPWlfp4srNfOhY8LdfdyUH6IMUrCMEgBmllXo1rkX45wgp8bEyPn
+         o8ZDOeQQWwfFcchSgMN2v/yoREFBb5mk5cZKlSvgr9G2bHzEJPK2C2Shly8AlYNQzPIZ
+         tGFZxm+Hr6bZzvic10oX82/fbGRTgUiLr8j2zz9tOxRkl+n/T2TVumlxlbXW9IcDT9+y
+         m/Q7WWyJlkk6fpEHUeJUH6ixlNsCx8eCN2LaSbFmUnW455OcLSLiBSLit2flL0IzhgUr
+         jZfeYc2AmokRQ6JFxZWYiu46OczuCtDIIQ9DWeS7ZZET2H8ZVybDb4vdLbQjiHa9jNKY
+         Pciw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=N9N6VoykNRu/Vv9Z4jsJODEvG8uWFfnROjw18lJc5Zc=;
-        b=pImWvFvEmOkz+hKu11cQ2sYySVm9Z+qvNK23wHMeKIBp25KGjhMi1EGTKmvFDxV4HO
-         4qdocdrdFb3IlzpogWbIXxG/4nDe9eDssH5XElzxr+1bnqFwjaeCm0x+CNbJk6Vda6+Q
-         BGbb4PdPPmJnUjV6yg6nbo3ffejKhZBypH2YbloAvqriYb+ylH358827vrcVABnSS8/h
-         T4JdgImjVyENj7H+ntd3lJAvRidKTiD/mmn7mr49A86I3efvVDlrVQ7AiR/qCSUBp6OU
-         9wyBbupw8feSQS7i8/WcM4YJjYddvy4mPfQ++2D2R6xI+jXedrMkR+x6gim2PvcM9hpp
-         TtsQ==
-X-Gm-Message-State: ANoB5pnIoo5lZYVMtMrg99++hvwuf4KvHHt7s0PTJW9A43DrtZoHtnLK
-        ecPgsStSreeDFfGSsOyrVqpOqg==
-X-Google-Smtp-Source: AA0mqf571N+3HpDYFJN/VAaKGm0VgcXalUBxCO34awQVAUxrI0VU8E3efFQS/3+aAWpcr4//nL/7AQ==
-X-Received: by 2002:a17:902:9897:b0:186:a98c:4ab8 with SMTP id s23-20020a170902989700b00186a98c4ab8mr3915214plp.118.1669122667879;
-        Tue, 22 Nov 2022 05:11:07 -0800 (PST)
-Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id w13-20020aa79a0d000000b00562a237179esm10583992pfj.131.2022.11.22.05.11.06
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=aKWA+AP/j4No4bfih7dsLGLYEDSONTbhMU2EZnn42zY=;
+        b=pnUkikUHi2nAWJlIIQmdmv2zLkI4aIL+WKaKhQNUcmCqyv6TAg5r4sdrmRSN2hsfpa
+         nEVERcE2GPkZbwAwJa4nBwUcSaDQtl2PcP/DRdTYMHdLQiQEa8wPoLl1XJFNIhtyNFbu
+         +a5ATMwRakk06j3WBQ9RTak6lSnVVQVCNJWt28uWNAqaxbqgf3UZeAgzpnBN07jinMfo
+         75vq9FFIP1144x9w2cOempJPmK60+UeAzFmXCdUsftzNBILmlPRRlXP8KK61N/7a7KBg
+         BStRgTNioPXN8tWRPKbqjO/mN05I4oFiXlUYkZcedWf8IgP9rBFu17ONN7fbMIB93j37
+         Y+pQ==
+X-Gm-Message-State: ANoB5pl3hTy55M9YehASEJ2PHseAenh8wRAlZVudpYD8w6EACj+BQOZY
+        dM0YH61Tk+RJkQaw+o9nLjnWgg==
+X-Google-Smtp-Source: AA0mqf4wL76N4ZHZjvU2VZRB4kqJFOiavA4tPlcNIaqg/Z8JbxDOHK1GZZE8Q6cTqcXM4fihVgKIeQ==
+X-Received: by 2002:a05:6000:1148:b0:236:71cd:1a71 with SMTP id d8-20020a056000114800b0023671cd1a71mr14335072wrx.712.1669124589239;
+        Tue, 22 Nov 2022 05:43:09 -0800 (PST)
+Received: from localhost.localdomain (h082218028181.host.wavenet.at. [82.218.28.181])
+        by smtp.gmail.com with ESMTPSA id p6-20020a1c5446000000b003b47e75b401sm21437729wmi.37.2022.11.22.05.43.08
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Nov 2022 05:11:07 -0800 (PST)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
-        linux-block@vger.kernel.org
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        Chaitanya Kulkarni <chaitanyak@nvidia.com>
-In-Reply-To: <20221122084917.2034220-1-shinichiro.kawasaki@wdc.com>
-References: <20221122084917.2034220-1-shinichiro.kawasaki@wdc.com>
-Subject: Re: [PATCH for-next] block: fix missing nr_hw_queues update in blk_mq_realloc_tag_set_tags
-Message-Id: <166912266675.4175.5366360904287464294.b4-ty@kernel.dk>
-Date:   Tue, 22 Nov 2022 06:11:06 -0700
+        Tue, 22 Nov 2022 05:43:08 -0800 (PST)
+From:   =?UTF-8?q?Christoph=20B=C3=B6hmwalder?= 
+        <christoph.boehmwalder@linbit.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     drbd-dev@lists.linbit.com, linux-kernel@vger.kernel.org,
+        Lars Ellenberg <lars.ellenberg@linbit.com>,
+        Philipp Reisner <philipp.reisner@linbit.com>,
+        linux-block@vger.kernel.org,
+        =?UTF-8?q?Christoph=20B=C3=B6hmwalder?= 
+        <christoph.boehmwalder@linbit.com>
+Subject: [PATCH 0/4] lru_cache improvements, DRBD license identifiers
+Date:   Tue, 22 Nov 2022 14:42:57 +0100
+Message-Id: <20221122134301.69258-1-christoph.boehmwalder@linbit.com>
+X-Mailer: git-send-email 2.38.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Mailer: b4 0.11.0-dev-28747
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, 22 Nov 2022 17:49:17 +0900, Shin'ichiro Kawasaki wrote:
-> The commit ee9d55210c2f ("blk-mq: simplify blk_mq_realloc_tag_set_tags")
-> cleaned up the function blk_mq_realloc_tag_set_tags. After this change,
-> the function does not update nr_hw_queues of struct blk_mq_tag_set when
-> new nr_hw_queues value is smaller than original. This results in failure
-> of queue number change of block devices. To avoid the failure, add the
-> missing nr_hw_queues update.
-> 
-> [...]
+Here are some improvements to the lru_cache; mostly just cleanups that
+we missed to send upstream over the years.
 
-Applied, thanks!
+The last patch makes the SPDX license headers in DRBD consistent so
+that they all represent GPL 2.0.
 
-[1/1] block: fix missing nr_hw_queues update in blk_mq_realloc_tag_set_tags
-      commit: d4b2e0d433769cb7c87e4c93dc048733388d1c46
+Christoph Böhmwalder (2):
+  lru_cache: remove compiled out code
+  drbd: use consistent license
 
-Best regards,
+Joel Colledge (1):
+  lru_cache: remove unused lc_private, lc_set, lc_index_of
+
+Lars Ellenberg (1):
+  lru_cache: use atomic operations when accessing lc->flags, always
+
+ drivers/block/drbd/Kconfig             |  2 +-
+ drivers/block/drbd/Makefile            |  2 +-
+ drivers/block/drbd/drbd_actlog.c       |  2 +-
+ drivers/block/drbd/drbd_bitmap.c       |  2 +-
+ drivers/block/drbd/drbd_debugfs.c      |  2 +-
+ drivers/block/drbd/drbd_debugfs.h      |  2 +-
+ drivers/block/drbd/drbd_int.h          |  2 +-
+ drivers/block/drbd/drbd_interval.c     |  2 +-
+ drivers/block/drbd/drbd_interval.h     |  2 +-
+ drivers/block/drbd/drbd_main.c         |  2 +-
+ drivers/block/drbd/drbd_nl.c           |  2 +-
+ drivers/block/drbd/drbd_nla.c          |  2 +-
+ drivers/block/drbd/drbd_nla.h          |  2 +-
+ drivers/block/drbd/drbd_proc.c         |  2 +-
+ drivers/block/drbd/drbd_protocol.h     |  2 +-
+ drivers/block/drbd/drbd_receiver.c     |  2 +-
+ drivers/block/drbd/drbd_req.c          |  2 +-
+ drivers/block/drbd/drbd_req.h          |  2 +-
+ drivers/block/drbd/drbd_state.c        |  2 +-
+ drivers/block/drbd/drbd_state.h        |  2 +-
+ drivers/block/drbd/drbd_state_change.h |  2 +-
+ drivers/block/drbd/drbd_strings.c      |  2 +-
+ drivers/block/drbd/drbd_strings.h      |  2 +-
+ drivers/block/drbd/drbd_vli.h          |  2 +-
+ drivers/block/drbd/drbd_worker.c       |  2 +-
+ include/linux/lru_cache.h              |  3 --
+ lib/lru_cache.c                        | 59 +-------------------------
+ 27 files changed, 27 insertions(+), 85 deletions(-)
+
 -- 
-Jens Axboe
-
+2.38.1
 
