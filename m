@@ -2,123 +2,82 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A533C4332F
-	for <linux-block@archiver.kernel.org>; Tue, 22 Nov 2022 21:10:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21D32C4332F
+	for <linux-block@archiver.kernel.org>; Tue, 22 Nov 2022 22:58:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233189AbiKVVKc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 22 Nov 2022 16:10:32 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39772 "EHLO
+        id S234552AbiKVW6d (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 22 Nov 2022 17:58:33 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58114 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232783AbiKVVKb (ORCPT
+        with ESMTP id S230365AbiKVW6c (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 22 Nov 2022 16:10:31 -0500
-Received: from mail-pg1-x52c.google.com (mail-pg1-x52c.google.com [IPv6:2607:f8b0:4864:20::52c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ECBAE7CB95;
-        Tue, 22 Nov 2022 13:10:30 -0800 (PST)
-Received: by mail-pg1-x52c.google.com with SMTP id f9so10896209pgf.7;
-        Tue, 22 Nov 2022 13:10:30 -0800 (PST)
+        Tue, 22 Nov 2022 17:58:32 -0500
+Received: from mail-pg1-x533.google.com (mail-pg1-x533.google.com [IPv6:2607:f8b0:4864:20::533])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA134240BC
+        for <linux-block@vger.kernel.org>; Tue, 22 Nov 2022 14:58:31 -0800 (PST)
+Received: by mail-pg1-x533.google.com with SMTP id f9so11083950pgf.7
+        for <linux-block@vger.kernel.org>; Tue, 22 Nov 2022 14:58:31 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:sender
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=C+KEqUPpt9nBZhy2l32eLRwk2q2Rg4+1eaxUkvjjhgg=;
-        b=hC1R8VpRUm1vtCVrxmHeI+RFvGrfUTgxzJDsTjqJnYDMfgLrcdlSQuqYhPvY/Ngiq8
-         YsJqRaFeRDIFWRDrW9MQKFf+YhGpvvEE5JQp6I7LE/fbFPycigIFZVC50Mn7T81Rc0ip
-         SpacCnKP0Cv8PWm/lx6EslA0e0XeGhuBFY1S80wuP3an5Ehy7+Du23j1TktTHFLf3g/X
-         xqpe587AjbUhmVWzf7e8zF8uXlCPo3vftSKmyF+LypLxS97o0nf1yo/ZCnmc70DYJF2C
-         xCNElSexSwgXjaNE3Ig8aTcZB/CYj0DlUtMBK+bALBMYuDlHh711uqPYnLmKjKocyIR5
-         DyOQ==
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Cqm6rTul+MJv80b6M87o/8Ay245ctqmeFHSL1Z9I7sQ=;
+        b=BCJxV4DuNh6EFfNxnHaKlqFDu3UGKJ8DanfEU96mHAWWmhvzd123mMrICyzQd+fWXc
+         6Yxol3S1BV3r38vqC0WrlK3JrPXsiTMp1p8xu22lfuq4d+epoVXM/5hLEw0YEw/H76sg
+         XtWR3BvtE2KlzfNCmKlGFVA1+XeCO+fnoGBTs4tR+A7xpn/xdTFOzCEpDQFoj6x8o4gZ
+         z8+1pabJr5c7zg1/B0831tbIWOTV6YEDSpRWj+fcdFpCHU4LNbf54DWwHWJOQNoN2Tg2
+         JIZTzThf6NA4AJcBEao1GjX377DR2FuB68OhdwNDxpN+FipoiKcWKjzBUOs2X+oeCrej
+         c9dQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:sender
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=C+KEqUPpt9nBZhy2l32eLRwk2q2Rg4+1eaxUkvjjhgg=;
-        b=iMwfLciWIW2zFcp08JYbyorkU/18boVs50jlDqcjgrQ43oKz9KeDpZ+uW0+uoctAD9
-         p7OlD+f4lKqPurUiEfz9DYtMVDLAcTBWTiRL2L89bMKJY1GTxTK10JRZZwFUQx2tlmEB
-         HqSFGglmlRn6MelvE9Px2ZMG9dxmpNvF4GsEBS4qv50l+R5bFBIivf7f8CVgpANiVJMB
-         96Xi54+lFCFm/3lmXtekLM8M17yzRZ5M9e71fSZHnrB5XBd3G5KA5E0M9LmBpvoWuFdW
-         4Q/WwELjuG1XAtxiCEkpBSL4Bwo9gVRTNZvUU6r82KQaxOMifTlEfHjHaAoiwVJnzYvQ
-         He6g==
-X-Gm-Message-State: ANoB5pkORTFZkm4VSqpcreETztTfkPc8ne2KJKz+rXsYFgS6y111cKEC
-        9iOGyRqBHuJJv7qM1Dqz3Zg=
-X-Google-Smtp-Source: AA0mqf6TsDpRKKyxDHKrpggRE8TEmiZt0DJaKX3yDhZBcH1LKsFTJaLXufIb42rblcCx6ncdMDdGYQ==
-X-Received: by 2002:a62:16d3:0:b0:562:c1d4:e287 with SMTP id 202-20020a6216d3000000b00562c1d4e287mr5701810pfw.80.1669151430256;
-        Tue, 22 Nov 2022 13:10:30 -0800 (PST)
-Received: from localhost ([2620:10d:c090:400::5:bb3])
-        by smtp.gmail.com with ESMTPSA id h9-20020a170902f54900b00176a2d23d1asm12659611plf.56.2022.11.22.13.10.29
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Cqm6rTul+MJv80b6M87o/8Ay245ctqmeFHSL1Z9I7sQ=;
+        b=pJ4A+smN0pMlvqBliP3uFbL6ZFzq8rwUV5VhAGiIZGMGWtThq85+7DKgxPRhEsbLo4
+         tRH+4WYJ/S+Dzo62PIBKDgbLPMstqDoa2aE6khzLopzotKxp61kBC+fS34sJ5pf2hOzq
+         bi9+Hyy4CQBCZFncCeE5cwXsSxwIrYF7sU2z+1zbpRpdG7YJGfaTln0S80TOpwWEBrZe
+         qKCJICMrEdbqt9mEd70qkVBgRXAhUjjLeszzIaUdqHf0E5kGdedPrs+Yz3+/1u8vuhMs
+         mL1DDvy5TIj05/iJfc07gRFVJwA82KzUNBK+DSJ3g02jD08TvDvelIXmIIxLdUjC/h3S
+         DG+Q==
+X-Gm-Message-State: ANoB5pm8Oc+xsr/fcFyi1OyQhR+gMhDOZ2ODA1Thb534DahAqohJ2+BV
+        aKYC8dzq2PxYMCVPTa5A1LbXVWtXCYonb2bB
+X-Google-Smtp-Source: AA0mqf6L4gCqJFfL8TKckYqVL4UdbA4AvJsl85PbnuRckuOUybQn47sT013q6YHr5DJpuY1UeIOQjQ==
+X-Received: by 2002:a63:d117:0:b0:447:ed69:761 with SMTP id k23-20020a63d117000000b00447ed690761mr5042406pgg.181.1669157911225;
+        Tue, 22 Nov 2022 14:58:31 -0800 (PST)
+Received: from [127.0.0.1] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id x11-20020aa79acb000000b00561d79f1064sm11247066pfp.57.2022.11.22.14.58.30
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Nov 2022 13:10:29 -0800 (PST)
-Sender: Tejun Heo <htejun@gmail.com>
-Date:   Tue, 22 Nov 2022 11:10:28 -1000
-From:   Tejun Heo <tj@kernel.org>
-To:     Yu Kuai <yukuai1@huaweicloud.com>
-Cc:     hch@lst.de, josef@toxicpanda.com, axboe@kernel.dk,
-        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, yi.zhang@huawei.com,
-        "yukuai (C)" <yukuai3@huawei.com>
-Subject: Re: [PATCH v2 4/5] blk-iocost: fix sleeping in atomic context
- warnning
-Message-ID: <Y306xJV6aNXd94kb@slm.duckdns.org>
-References: <20221104023938.2346986-1-yukuai1@huaweicloud.com>
- <20221104023938.2346986-5-yukuai1@huaweicloud.com>
- <Y3K8MSFWw8eTnxtm@slm.duckdns.org>
- <3da991c6-21e4-8ed8-ba75-ccb92059f0ae@huaweicloud.com>
+        Tue, 22 Nov 2022 14:58:30 -0800 (PST)
+From:   Jens Axboe <axboe@kernel.dk>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     linux-block@vger.kernel.org, Al Viro <viro@zeniv.linux.org.uk>
+In-Reply-To: <20221122072753.426077-1-hch@lst.de>
+References: <20221122072753.426077-1-hch@lst.de>
+Subject: Re: [PATCH] blk-mq: fix queue reference leak on blk_mq_alloc_disk_for_queue failure
+Message-Id: <166915791036.141259.14121218872007132527.b4-ty@kernel.dk>
+Date:   Tue, 22 Nov 2022 15:58:30 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <3da991c6-21e4-8ed8-ba75-ccb92059f0ae@huaweicloud.com>
+X-Mailer: b4 0.11.0-dev-28747
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Nov 17, 2022 at 07:28:50PM +0800, Yu Kuai wrote:
-> Hi, Tejun!
+On Tue, 22 Nov 2022 08:27:53 +0100, Christoph Hellwig wrote:
+> Drop the disk reference just acquired when __alloc_disk_node failed.
 > 
-> 在 2022/11/15 6:07, Tejun Heo 写道:
 > 
-> > 
-> > Any chance I can persuade you into updating match_NUMBER() helpers to not
-> > use match_strdup()? They can easily disable irq/preemption and use percpu
-> > buffers and we won't need most of this patchset.
-> 
-> Does the following patch match your proposal?
-> 
-> diff --git a/lib/parser.c b/lib/parser.c
-> index bcb23484100e..ded652471919 100644
-> --- a/lib/parser.c
-> +++ b/lib/parser.c
-> @@ -11,6 +11,24 @@
->  #include <linux/slab.h>
->  #include <linux/string.h>
-> 
-> +#define U64_MAX_SIZE 20
-> +
-> +static DEFINE_PER_CPU(char, buffer[U64_MAX_SIZE]);
-> +
-> +static char *get_buffer(void)
-> +{
-> +       preempt_disable();
-> +       local_irq_disable();
-> +
-> +       return this_cpu_ptr(buffer);
-> +}
-> +
-> +static void put_buffer(void)
-> +{
-> +       local_irq_enable();
-> +       preempt_enable();
-> +}
-> +
-> 
-> Then match_strdup() and kfree() in match_NUMBER() can be replaced with
-> get_buffer() and put_buffer().
 
-Sorry about the late reply. Yeah, something like this.
+Applied, thanks!
 
-Thanks.
+[1/1] blk-mq: fix queue reference leak on blk_mq_alloc_disk_for_queue failure
+      commit: 22c17e279a1b03bad7987e4a4192b289b890f293
 
+Best regards,
 -- 
-tejun
+Jens Axboe
+
+
