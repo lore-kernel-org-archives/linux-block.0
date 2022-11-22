@@ -2,122 +2,174 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0724EC43219
-	for <linux-block@archiver.kernel.org>; Tue, 22 Nov 2022 07:06:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4761AC4332F
+	for <linux-block@archiver.kernel.org>; Tue, 22 Nov 2022 07:17:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232300AbiKVHGr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 22 Nov 2022 02:06:47 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59530 "EHLO
+        id S231956AbiKVHRz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 22 Nov 2022 02:17:55 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38700 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231583AbiKVHGp (ORCPT
+        with ESMTP id S229527AbiKVHRz (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 22 Nov 2022 02:06:45 -0500
-Received: from out199-6.us.a.mail.aliyun.com (out199-6.us.a.mail.aliyun.com [47.90.199.6])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4887F2A97E;
-        Mon, 21 Nov 2022 23:06:42 -0800 (PST)
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R191e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045170;MF=tianjia.zhang@linux.alibaba.com;NM=1;PH=DS;RN=11;SR=0;TI=SMTPD_---0VVR3yub_1669100796;
-Received: from localhost(mailfrom:tianjia.zhang@linux.alibaba.com fp:SMTPD_---0VVR3yub_1669100796)
-          by smtp.aliyun-inc.com;
-          Tue, 22 Nov 2022 15:06:37 +0800
-From:   Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-To:     "Theodore Y. Ts o" <tytso@mit.edu>,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        Eric Biggers <ebiggers@kernel.org>,
-        Jonathan Corbet <corbet@lwn.net>, Jens Axboe <axboe@kernel.dk>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        linux-fscrypt@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
-Cc:     Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-Subject: [PATCH v2 2/2] fscrypt: Add SM4 XTS/CTS symmetric algorithm support
-Date:   Tue, 22 Nov 2022 15:06:32 +0800
-Message-Id: <20221122070632.21910-3-tianjia.zhang@linux.alibaba.com>
-X-Mailer: git-send-email 2.24.3 (Apple Git-128)
-In-Reply-To: <20221122070632.21910-1-tianjia.zhang@linux.alibaba.com>
-References: <20221122070632.21910-1-tianjia.zhang@linux.alibaba.com>
+        Tue, 22 Nov 2022 02:17:55 -0500
+Received: from mail-ed1-x52d.google.com (mail-ed1-x52d.google.com [IPv6:2a00:1450:4864:20::52d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 025EC25E89
+        for <linux-block@vger.kernel.org>; Mon, 21 Nov 2022 23:17:53 -0800 (PST)
+Received: by mail-ed1-x52d.google.com with SMTP id z20so17884044edc.13
+        for <linux-block@vger.kernel.org>; Mon, 21 Nov 2022 23:17:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
+         :to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=/pK7+DIpf65Na+xkTauo/5yw1tjrhzCqldyom1FiwYk=;
+        b=Bnmqwa+QSdR8J134qyGz23rjmr9bhFZ4aaAwUBnX4ztDg9bzEvgmK1yRxybEhrMjR+
+         kCe8P4Y8BaV+dl6Uwe221D9Nva9Jn69AfW4COUU/YeUrVZ6Mh7UG9KB8wkoxr9XYIVLC
+         2r+vN1QFWZ7gTLkmCw4P45hS9Llhb4LfR8eCQ7nPB2W/OXCR5ZYVXk45hHU00EK8baeS
+         uFm0O+fkZ1iUx2QvOudbYNIWWv/xMPZGX8eHWuZ21n8nwQgcFvukq0YqF+p3YNt5sObu
+         PjaQpX60x9MRkyVSu72AUo0ShHzl5m+fNHao5+lGirzi5sx9H6E6oCDcKgsELUljI4nS
+         ntYg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
+         :to:from:date:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=/pK7+DIpf65Na+xkTauo/5yw1tjrhzCqldyom1FiwYk=;
+        b=Uws5r5DEWVK3PgOY0i+my/RM4nBt76KgC2UhIluZ1TPzclHzPUKheinTIFmdbgpvsw
+         mleeWz0eDW5q5IQl56tL4SWHc/+ExAAkSGyPlGpYPaOW7mV9XN3tpzBmSGvPDBX92QL0
+         WPBRdxMAeX3zIO8bPviVjHBoXrYgbyIE9ER4U9GCKUPuvCD7OBa9LJV3HmHAGIHwHV4D
+         BuQ6t+Q5u2b+Bj7Zp5CUHSYwsfuXRYYF0BJsWcWCrcbLcOgjoUQyy+Knb3Ck1ohQzqee
+         7xZJWnmV/p6+as2ERMwP7OYiHM3ICe/IW9NBS0XLKxs/+I2r/0IeBnwdS+PRsXFVRxZJ
+         luOQ==
+X-Gm-Message-State: ANoB5pl3laC104HoPRZqMaA/gJL2xD0FWwRShoH3A4izpTB+8ogDpxy2
+        zMMn5P9nZkNoh63nVhFjifVuFFWiZQJDfw==
+X-Google-Smtp-Source: AA0mqf5ZjigOakUK+3q0yPZMb4Hv3RA/VzsT1hX9pIbxpnC02WL0dVK7/nDulUMFQPj1zoKXas5Oxw==
+X-Received: by 2002:a05:6402:1f09:b0:462:6a0c:cfa with SMTP id b9-20020a0564021f0900b004626a0c0cfamr3028215edb.349.1669101471529;
+        Mon, 21 Nov 2022 23:17:51 -0800 (PST)
+Received: from localhost ([102.36.222.112])
+        by smtp.gmail.com with ESMTPSA id n13-20020a170906b30d00b007af0f0d2249sm5814786ejz.52.2022.11.21.23.17.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 21 Nov 2022 23:17:51 -0800 (PST)
+Date:   Tue, 22 Nov 2022 10:17:47 +0300
+From:   Dan Carpenter <error27@gmail.com>
+To:     oe-kbuild@lists.linux.dev, Ming Lei <ming.lei@redhat.com>,
+        Jens Axboe <axboe@kernel.dk>
+Cc:     lkp@intel.com, oe-kbuild-all@lists.linux.dev,
+        linux-block@vger.kernel.org,
+        ZiyangZhang <ZiyangZhang@linux.alibaba.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: Re: [PATCH 6/6] ublk_drv: add mechanism for supporting unprivileged
+ ublk device
+Message-ID: <202211220917.c5VXrB5O-lkp@intel.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221116060835.159945-7-ming.lei@redhat.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-SM4 is a symmetric algorithm widely used in China, this patch enables
-to use SM4-XTS mode to encrypt file content, and use SM4-CBC-CTS to
-encrypt filename.
+Hi Ming,
 
-Signed-off-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
----
- Documentation/filesystems/fscrypt.rst |  1 +
- fs/crypto/keysetup.c                  | 15 +++++++++++++++
- fs/crypto/policy.c                    |  4 ++++
- include/uapi/linux/fscrypt.h          |  2 ++
- 4 files changed, 22 insertions(+)
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-diff --git a/Documentation/filesystems/fscrypt.rst b/Documentation/filesystems/fscrypt.rst
-index 5ba5817c17c2..af27e7b2c74f 100644
---- a/Documentation/filesystems/fscrypt.rst
-+++ b/Documentation/filesystems/fscrypt.rst
-@@ -336,6 +336,7 @@ Currently, the following pairs of encryption modes are supported:
- 
- - AES-256-XTS for contents and AES-256-CTS-CBC for filenames
- - AES-128-CBC for contents and AES-128-CTS-CBC for filenames
-+- SM4-XTS for contents and SM4-CTS-CBC for filenames
- - Adiantum for both contents and filenames
- - AES-256-XTS for contents and AES-256-HCTR2 for filenames (v2 policies only)
- 
-diff --git a/fs/crypto/keysetup.c b/fs/crypto/keysetup.c
-index f7407071a952..24e55c95abc3 100644
---- a/fs/crypto/keysetup.c
-+++ b/fs/crypto/keysetup.c
-@@ -44,6 +44,21 @@ struct fscrypt_mode fscrypt_modes[] = {
- 		.security_strength = 16,
- 		.ivsize = 16,
- 	},
-+	[FSCRYPT_MODE_SM4_XTS] = {
-+		.friendly_name = "SM4-XTS",
-+		.cipher_str = "xts(sm4)",
-+		.keysize = 32,
-+		.security_strength = 16,
-+		.ivsize = 16,
-+		.blk_crypto_mode = BLK_ENCRYPTION_MODE_SM4_XTS,
-+	},
-+	[FSCRYPT_MODE_SM4_CTS] = {
-+		.friendly_name = "SM4-CTS",
-+		.cipher_str = "cts(cbc(sm4))",
-+		.keysize = 16,
-+		.security_strength = 16,
-+		.ivsize = 16,
-+	},
- 	[FSCRYPT_MODE_ADIANTUM] = {
- 		.friendly_name = "Adiantum",
- 		.cipher_str = "adiantum(xchacha12,aes)",
-diff --git a/fs/crypto/policy.c b/fs/crypto/policy.c
-index 46757c3052ef..8e69bc0c35cd 100644
---- a/fs/crypto/policy.c
-+++ b/fs/crypto/policy.c
-@@ -71,6 +71,10 @@ static bool fscrypt_valid_enc_modes_v1(u32 contents_mode, u32 filenames_mode)
- 	    filenames_mode == FSCRYPT_MODE_AES_128_CTS)
- 		return true;
- 
-+	if (contents_mode == FSCRYPT_MODE_SM4_XTS &&
-+	    filenames_mode == FSCRYPT_MODE_SM4_CTS)
-+		return true;
-+
- 	if (contents_mode == FSCRYPT_MODE_ADIANTUM &&
- 	    filenames_mode == FSCRYPT_MODE_ADIANTUM)
- 		return true;
-diff --git a/include/uapi/linux/fscrypt.h b/include/uapi/linux/fscrypt.h
-index a756b29afcc2..47dbd1994bfe 100644
---- a/include/uapi/linux/fscrypt.h
-+++ b/include/uapi/linux/fscrypt.h
-@@ -26,6 +26,8 @@
- #define FSCRYPT_MODE_AES_256_CTS		4
- #define FSCRYPT_MODE_AES_128_CBC		5
- #define FSCRYPT_MODE_AES_128_CTS		6
-+#define FSCRYPT_MODE_SM4_XTS			7
-+#define FSCRYPT_MODE_SM4_CTS			8
- #define FSCRYPT_MODE_ADIANTUM			9
- #define FSCRYPT_MODE_AES_256_HCTR2		10
- /* If adding a mode number > 10, update FSCRYPT_MODE_MAX in fscrypt_private.h */
+url:    https://github.com/intel-lab-lkp/linux/commits/Ming-Lei/ublk_drv-add-mechanism-for-supporting-unprivileged-ublk-device/20221116-141131
+patch link:    https://lore.kernel.org/r/20221116060835.159945-7-ming.lei%40redhat.com
+patch subject: [PATCH 6/6] ublk_drv: add mechanism for supporting unprivileged ublk device
+config: x86_64-randconfig-m001-20221121
+compiler: gcc-11 (Debian 11.3.0-8) 11.3.0
+
+If you fix the issue, kindly add following tag where applicable
+| Reported-by: kernel test robot <lkp@intel.com>
+| Reported-by: Dan Carpenter <error27@gmail.com>
+
+smatch warnings:
+drivers/block/ublk_drv.c:2107 ublk_ctrl_uring_cmd_permission() error: uninitialized symbol 'mask'.
+
+vim +/mask +2107 drivers/block/ublk_drv.c
+
+a922b5da71a7776 Ming Lei 2022-11-16  2043  static int ublk_ctrl_uring_cmd_permission(struct ublk_device *ub,
+a922b5da71a7776 Ming Lei 2022-11-16  2044  		struct io_uring_cmd *cmd)
+a922b5da71a7776 Ming Lei 2022-11-16  2045  {
+a922b5da71a7776 Ming Lei 2022-11-16  2046  	struct ublksrv_ctrl_cmd *header = (struct ublksrv_ctrl_cmd *)cmd->cmd;
+a922b5da71a7776 Ming Lei 2022-11-16  2047  	bool unprivileged = ub->dev_info.flags & UBLK_F_UNPRIVILEGED_DEV;
+a922b5da71a7776 Ming Lei 2022-11-16  2048  	void __user *argp = (void __user *)(unsigned long)header->addr;
+a922b5da71a7776 Ming Lei 2022-11-16  2049  	char *dev_path = NULL;
+a922b5da71a7776 Ming Lei 2022-11-16  2050  	int ret = 0;
+a922b5da71a7776 Ming Lei 2022-11-16  2051  	int mask;
+a922b5da71a7776 Ming Lei 2022-11-16  2052  
+a922b5da71a7776 Ming Lei 2022-11-16  2053  	if (!unprivileged) {
+a922b5da71a7776 Ming Lei 2022-11-16  2054  		if (!capable(CAP_SYS_ADMIN))
+a922b5da71a7776 Ming Lei 2022-11-16  2055  			return -EPERM;
+a922b5da71a7776 Ming Lei 2022-11-16  2056  		/*
+a922b5da71a7776 Ming Lei 2022-11-16  2057  		 * The new added command of UBLK_CMD_GET_DEV_INFO2 includes
+a922b5da71a7776 Ming Lei 2022-11-16  2058  		 * char_dev_path in payload too, since userspace may not
+a922b5da71a7776 Ming Lei 2022-11-16  2059  		 * know if the specified device is created as unprivileged
+a922b5da71a7776 Ming Lei 2022-11-16  2060  		 * mode.
+a922b5da71a7776 Ming Lei 2022-11-16  2061  		 */
+a922b5da71a7776 Ming Lei 2022-11-16  2062  		if (cmd->cmd_op != UBLK_CMD_GET_DEV_INFO2)
+a922b5da71a7776 Ming Lei 2022-11-16  2063  			return 0;
+a922b5da71a7776 Ming Lei 2022-11-16  2064  	}
+a922b5da71a7776 Ming Lei 2022-11-16  2065  
+a922b5da71a7776 Ming Lei 2022-11-16  2066  	/*
+a922b5da71a7776 Ming Lei 2022-11-16  2067  	 * User has to provide the char device path for unprivileged ublk
+a922b5da71a7776 Ming Lei 2022-11-16  2068  	 *
+a922b5da71a7776 Ming Lei 2022-11-16  2069  	 * header->addr always points to the dev path buffer, and
+a922b5da71a7776 Ming Lei 2022-11-16  2070  	 * header->dev_path_len records length of dev path buffer.
+a922b5da71a7776 Ming Lei 2022-11-16  2071  	 */
+a922b5da71a7776 Ming Lei 2022-11-16  2072  	if (!header->dev_path_len || header->dev_path_len > PATH_MAX)
+a922b5da71a7776 Ming Lei 2022-11-16  2073  		return -EINVAL;
+a922b5da71a7776 Ming Lei 2022-11-16  2074  
+a922b5da71a7776 Ming Lei 2022-11-16  2075  	if (header->len < header->dev_path_len)
+a922b5da71a7776 Ming Lei 2022-11-16  2076  		return -EINVAL;
+a922b5da71a7776 Ming Lei 2022-11-16  2077  
+a922b5da71a7776 Ming Lei 2022-11-16  2078  	dev_path = kmalloc(header->dev_path_len, GFP_KERNEL);
+a922b5da71a7776 Ming Lei 2022-11-16  2079  	if (!dev_path)
+a922b5da71a7776 Ming Lei 2022-11-16  2080  		return -ENOMEM;
+a922b5da71a7776 Ming Lei 2022-11-16  2081  
+a922b5da71a7776 Ming Lei 2022-11-16  2082  	ret = -EFAULT;
+a922b5da71a7776 Ming Lei 2022-11-16  2083  	if (copy_from_user(dev_path, argp, header->dev_path_len))
+a922b5da71a7776 Ming Lei 2022-11-16  2084  		goto exit;
+a922b5da71a7776 Ming Lei 2022-11-16  2085  	dev_path[header->dev_path_len] = 0;
+a922b5da71a7776 Ming Lei 2022-11-16  2086  
+a922b5da71a7776 Ming Lei 2022-11-16  2087  	switch (cmd->cmd_op) {
+a922b5da71a7776 Ming Lei 2022-11-16  2088  	case UBLK_CMD_GET_DEV_INFO:
+a922b5da71a7776 Ming Lei 2022-11-16  2089  	case UBLK_CMD_GET_DEV_INFO2:
+a922b5da71a7776 Ming Lei 2022-11-16  2090  	case UBLK_CMD_GET_QUEUE_AFFINITY:
+a922b5da71a7776 Ming Lei 2022-11-16  2091  	case UBLK_CMD_GET_PARAMS:
+a922b5da71a7776 Ming Lei 2022-11-16  2092  		mask = MAY_READ;
+a922b5da71a7776 Ming Lei 2022-11-16  2093  		break;
+a922b5da71a7776 Ming Lei 2022-11-16  2094  	case UBLK_CMD_START_DEV:
+a922b5da71a7776 Ming Lei 2022-11-16  2095  	case UBLK_CMD_STOP_DEV:
+a922b5da71a7776 Ming Lei 2022-11-16  2096  	case UBLK_CMD_ADD_DEV:
+a922b5da71a7776 Ming Lei 2022-11-16  2097  	case UBLK_CMD_DEL_DEV:
+a922b5da71a7776 Ming Lei 2022-11-16  2098  	case UBLK_CMD_SET_PARAMS:
+a922b5da71a7776 Ming Lei 2022-11-16  2099  	case UBLK_CMD_START_USER_RECOVERY:
+a922b5da71a7776 Ming Lei 2022-11-16  2100  	case UBLK_CMD_END_USER_RECOVERY:
+a922b5da71a7776 Ming Lei 2022-11-16  2101  		mask = MAY_READ | MAY_WRITE;
+a922b5da71a7776 Ming Lei 2022-11-16  2102  		break;
+a922b5da71a7776 Ming Lei 2022-11-16  2103  	default:
+
+mask not set on default path.
+
+a922b5da71a7776 Ming Lei 2022-11-16  2104  		break;
+a922b5da71a7776 Ming Lei 2022-11-16  2105  	}
+a922b5da71a7776 Ming Lei 2022-11-16  2106  
+a922b5da71a7776 Ming Lei 2022-11-16 @2107  	ret = ublk_char_dev_permission(ub, dev_path, mask);
+a922b5da71a7776 Ming Lei 2022-11-16  2108  	if (!ret) {
+a922b5da71a7776 Ming Lei 2022-11-16  2109  		header->len -= header->dev_path_len;
+a922b5da71a7776 Ming Lei 2022-11-16  2110  		header->addr += header->dev_path_len;
+a922b5da71a7776 Ming Lei 2022-11-16  2111  	}
+a922b5da71a7776 Ming Lei 2022-11-16  2112  	pr_devel("%s: dev id %d cmd_op %x uid %d gid %d path %s ret %d\n",
+a922b5da71a7776 Ming Lei 2022-11-16  2113  			__func__, ub->ub_number, cmd->cmd_op,
+a922b5da71a7776 Ming Lei 2022-11-16  2114  			ub->dev_info.owner_uid, ub->dev_info.owner_gid,
+a922b5da71a7776 Ming Lei 2022-11-16  2115  			dev_path, ret);
+a922b5da71a7776 Ming Lei 2022-11-16  2116  exit:
+a922b5da71a7776 Ming Lei 2022-11-16  2117  	kfree(dev_path);
+a922b5da71a7776 Ming Lei 2022-11-16  2118  	return ret;
+a922b5da71a7776 Ming Lei 2022-11-16  2119  }
+
 -- 
-2.24.3 (Apple Git-128)
+0-DAY CI Kernel Test Service
+https://01.org/lkp
 
