@@ -2,137 +2,87 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2CA2C46467
-	for <linux-block@archiver.kernel.org>; Wed, 23 Nov 2022 13:46:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 20CA5C4332F
+	for <linux-block@archiver.kernel.org>; Wed, 23 Nov 2022 13:52:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238245AbiKWNql (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 23 Nov 2022 08:46:41 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60342 "EHLO
+        id S237472AbiKWNwf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 23 Nov 2022 08:52:35 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33928 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238294AbiKWNqX (ORCPT
+        with ESMTP id S238482AbiKWNwK (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 23 Nov 2022 08:46:23 -0500
-Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF348E1BE2;
-        Wed, 23 Nov 2022 05:35:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1669210511; x=1700746511;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=0dPBcIou1yq73/ShQ5ge15FFqP86cP4E6nEb250ZlWo=;
-  b=K0VulbJse9A41zXVuIsWR7lzJIvxf452Y/g1P8EMxHuL+btsI7aM3y8g
-   4hu3WE7R0y8r6UT25oFPCjvB8Y3zJAqwRZUo6e+5sh+cqimY+9hcOIZjP
-   1uhFex2g8IM2Xd+GSSilm0JvUEZvUfrmb4ShSHiXxf/ezdABFKlSfDeWu
-   4feQg7/L4xhIc/4kQ/CvX0/Bxkvrbw7OpG3XDvx4wHthR67aWmoqhQQ1M
-   sbduSworxN5Hh0AqGJaM9uKQnyscUmjTAOXZbk2Eml70UjkuKpOieGHca
-   KhTnzFGJYby8bacvFtpsPfbbP53L9uL4Dwr/nA0axACal1PiyaEnwf2Wo
-   A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10539"; a="312766025"
-X-IronPort-AV: E=Sophos;i="5.96,187,1665471600"; 
-   d="scan'208";a="312766025"
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Nov 2022 05:35:10 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10539"; a="970863671"
-X-IronPort-AV: E=Sophos;i="5.96,187,1665471600"; 
-   d="scan'208";a="970863671"
-Received: from smile.fi.intel.com ([10.237.72.54])
-  by fmsmga005.fm.intel.com with ESMTP; 23 Nov 2022 05:35:00 -0800
-Received: from andy by smile.fi.intel.com with local (Exim 4.96)
-        (envelope-from <andriy.shevchenko@linux.intel.com>)
-        id 1oxptw-00GImp-12;
-        Wed, 23 Nov 2022 15:34:56 +0200
-Date:   Wed, 23 Nov 2022 15:34:56 +0200
-From:   Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To:     Maximilian Luz <luzmaximilian@gmail.com>
-Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        linux-kernel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        "Rafael J. Wysocki" <rafael@kernel.org>,
-        Len Brown <lenb@kernel.org>,
-        Stefan Richter <stefanr@s5r6.in-berlin.de>,
-        Wolfram Sang <wsa@kernel.org>,
-        Alexandre Belloni <alexandre.belloni@bootlin.com>,
-        Dmitry Torokhov <dmitry.torokhov@gmail.com>,
-        Sean Young <sean@mess.org>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Rob Herring <robh+dt@kernel.org>,
-        Frank Rowand <frowand.list@gmail.com>,
-        Hans de Goede <hdegoede@redhat.com>,
-        Mark Gross <markgross@kernel.org>,
-        Vinod Koul <vkoul@kernel.org>,
-        Bard Liao <yung-chuan.liao@linux.intel.com>,
-        Pierre-Louis Bossart <pierre-louis.bossart@linux.intel.com>,
-        Sanyog Kale <sanyog.r.kale@intel.com>,
-        Andreas Noever <andreas.noever@gmail.com>,
-        Michael Jamet <michael.jamet@intel.com>,
-        Mika Westerberg <mika.westerberg@linux.intel.com>,
-        Yehezkel Bernat <YehezkelShB@gmail.com>,
-        Jiri Slaby <jirislaby@kernel.org>,
-        Heikki Krogerus <heikki.krogerus@linux.intel.com>,
-        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        Ming Lei <ming.lei@redhat.com>,
-        Jilin Yuan <yuanjilin@cdjrlc.com>,
-        Alan Stern <stern@rowland.harvard.edu>,
-        Sakari Ailus <sakari.ailus@linux.intel.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ira Weiny <ira.weiny@intel.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Won Chung <wonchung@google.com>, alsa-devel@alsa-project.org,
-        devicetree@vger.kernel.org, linux-acpi@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-i2c@vger.kernel.org,
-        linux-i3c@lists.infradead.org, linux-input@vger.kernel.org,
-        linux-media@vger.kernel.org, linux-serial@vger.kernel.org,
-        linux-usb@vger.kernel.org, linux1394-devel@lists.sourceforge.net,
-        platform-driver-x86@vger.kernel.org
-Subject: Re: [PATCH 3/5] driver core: make struct device_type.uevent() take a
- const *
-Message-ID: <Y34hgIW8p1RlQTBB@smile.fi.intel.com>
-References: <20221123122523.1332370-1-gregkh@linuxfoundation.org>
- <20221123122523.1332370-3-gregkh@linuxfoundation.org>
- <711d5275-7e80-c00d-0cdc-0f3d52175361@gmail.com>
+        Wed, 23 Nov 2022 08:52:10 -0500
+Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C435F0E
+        for <linux-block@vger.kernel.org>; Wed, 23 Nov 2022 05:44:06 -0800 (PST)
+Received: by mail-pj1-x102b.google.com with SMTP id j10-20020a17090aeb0a00b00218dfce36e5so1764546pjz.1
+        for <linux-block@vger.kernel.org>; Wed, 23 Nov 2022 05:44:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=lbeQKfnL1JVfpAPQSNTjPMiQNcrNzohQvamTKcbh7Tw=;
+        b=V/XM2iU5sNodsDsjcWS8GKBX137HaeUdN4/FLT6cKIsxy+fM6YWCIZdWMeubqWZqqG
+         VtgAHJTgsmi+7SbmsEtEyAeEeicQeGDv/2RtcMYndF+hSOPSIvz7t5cfD/zSNMSKaBxD
+         JZ17HiHRvbYgGBfztFds8ULjxmP+fAxR3cB1yoy0tGgt13jfnWwpN9N0xLnWSCOiZyCl
+         qHZNvyRKS7N3wB5NkB5beQEzCYQLvo0L5qMvKhuHEj43bcpvME1ePgq3ffk/Zwsrm0oW
+         NcaJxr6ljCcjdvxei9/BmaZw3JCFP1xJEXiQuSD/RDnZaDKxR5Im0TELpDIVXk5twPbI
+         OtLQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=lbeQKfnL1JVfpAPQSNTjPMiQNcrNzohQvamTKcbh7Tw=;
+        b=xVm3VvfACJOP3Bq5t2maq/Ebwu5SgzUs0EAjTSGAq7h0x5o4NQrnxNiT9xnNRdDyMz
+         cJRY+WwVYZA9OWvUYg6v2/A5DbVc+IbwP5ozGuREuJesOM9WdssVg4gsoH8XMlBLecfu
+         yHB58HWUiZwjkkYMwWbTVbx/USz0QOPIAB2skx4qRl1hn+HVgAvDj208GspLvPYdlf1D
+         Mxrd+lFuTjqZd6rZnOcWxXCOscxgvdAbnMUf0DhIsngjmxESBTGkOqaNEHFFNhGn93lf
+         fRlmoNCaOAoNJIAe+D5si/0d+p4TohiYv3Q8t2gF3oQFRuwOJN2kGx75Q8v1e0xWxjnO
+         +C1g==
+X-Gm-Message-State: ANoB5pmwPXkub6n0e9X1+W2ihHmPzn8NBRQKddosNFo+k1hNxc7mRfxs
+        9Go0M4rk4mteskWV5tqclIew5zfazvhjIT4V
+X-Google-Smtp-Source: AA0mqf6049m2SP2gSyJsyhrIKBHIkOlqY6v7feMQBw0RrDiC6nGnPLgDnPwzGqIwTYXI8IW0B3QX8Q==
+X-Received: by 2002:a17:902:7c0e:b0:186:7395:e36a with SMTP id x14-20020a1709027c0e00b001867395e36amr21580729pll.83.1669211045783;
+        Wed, 23 Nov 2022 05:44:05 -0800 (PST)
+Received: from [192.168.1.136] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id b8-20020aa78ec8000000b0056b8b17f914sm12609513pfr.216.2022.11.23.05.44.03
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 23 Nov 2022 05:44:04 -0800 (PST)
+Message-ID: <27f3a493-4684-7eee-b3af-fa1c70b492e0@kernel.dk>
+Date:   Wed, 23 Nov 2022 06:44:02 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <711d5275-7e80-c00d-0cdc-0f3d52175361@gmail.com>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
+ Thunderbird/102.5.0
+Subject: Re: [PATCH AUTOSEL 5.15 23/31] block: make blk_set_default_limits()
+ private
+Content-Language: en-US
+To:     Sasha Levin <sashal@kernel.org>, linux-kernel@vger.kernel.org,
+        stable@vger.kernel.org
+Cc:     Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>,
+        linux-block@vger.kernel.org
+References: <20221123124234.265396-1-sashal@kernel.org>
+ <20221123124234.265396-23-sashal@kernel.org>
+From:   Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20221123124234.265396-23-sashal@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Nov 23, 2022 at 02:14:31PM +0100, Maximilian Luz wrote:
-> On 11/23/22 13:25, Greg Kroah-Hartman wrote:
-> > The uevent() callback in struct device_type should not be modifying the
-> > device that is passed into it, so mark it as a const * and propagate the
-> > function signature changes out into all relevant subsystems that use
-> > this callback.
-
-[...]
-
-> > -static inline struct ssam_device *to_ssam_device(struct device *d)
-> > +static inline struct ssam_device *to_ssam_device(const struct device *d)
-> >   {
-> >   	return container_of(d, struct ssam_device, dev);
-> >   }
+On 11/23/22 5:42 AM, Sasha Levin wrote:
+> From: Keith Busch <kbusch@kernel.org>
 > 
-> I am slightly conflicted about this change as that now more or less
-> implicitly drops the const. So I'm wondering if it wouldn't be better to
-> either create a function specifically for const pointers or to just
-> open-code it in the instance above.
+> [ Upstream commit b3228254bb6e91e57f920227f72a1a7d81925d81 ]
 > 
-> I guess we could also convert this to a macro. Then at least there
-> wouldn't be an explicit and potentially misleading const-conversion
-> indicated in the function signature.
+> There are no external users of this function.
 
-This is an intermediate step as far as I know since moving container_of to
-recognize const is a bit noisy right now. I guess you can find a discussion
-on the topic between Greg and Sakari.
+Please drop the 5.15 and earlier backports of this series, it's
+not needed.
 
 -- 
-With Best Regards,
-Andy Shevchenko
+Jens Axboe
 
 
