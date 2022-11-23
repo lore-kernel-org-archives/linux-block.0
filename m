@@ -2,122 +2,113 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 538B7C47088
-	for <linux-block@archiver.kernel.org>; Wed, 23 Nov 2022 18:14:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 12C13C433FE
+	for <linux-block@archiver.kernel.org>; Wed, 23 Nov 2022 18:16:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239677AbiKWSOv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 23 Nov 2022 13:14:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40782 "EHLO
+        id S239647AbiKWSQJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 23 Nov 2022 13:16:09 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44002 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239435AbiKWSN7 (ORCPT
+        with ESMTP id S239644AbiKWSPg (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 23 Nov 2022 13:13:59 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC4D913D41;
-        Wed, 23 Nov 2022 10:10:53 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 8B45661E38;
-        Wed, 23 Nov 2022 18:10:53 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1BB2DC433D6;
-        Wed, 23 Nov 2022 18:10:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1669227053;
-        bh=7X1Me0V7EXsm5r0OrPDHsQK8HbsG4Re2XTojZLZDjdc=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=YTyA9A1RK3VBVc4OuLsGmjha4gZZFX3fOAmM46DVvT12a9cMFNag8b+bk1nJBSkOS
-         iYBRuVdyoNseo7VxiYe+zfzA7cAKf7r+yPGFV7L1PjP6Bq7qE0QAPRFkIwzbad3cyJ
-         8YPFAWrJ2IcD41r/Fw+Je3USDQVOZs3K0ic3VM6I=
-Date:   Wed, 23 Nov 2022 19:10:49 +0100
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     Matthew Wilcox <willy@infradead.org>
-Cc:     Jason Gunthorpe <jgg@ziepe.ca>,
-        Maximilian Luz <luzmaximilian@gmail.com>,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        linux-kernel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        "Rafael J. Wysocki" <rafael@kernel.org>,
-        Len Brown <lenb@kernel.org>,
-        Stefan Richter <stefanr@s5r6.in-berlin.de>,
-        Wolfram Sang <wsa@kernel.org>,
-        Alexandre Belloni <alexandre.belloni@bootlin.com>,
-        Dmitry Torokhov <dmitry.torokhov@gmail.com>,
-        Sean Young <sean@mess.org>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Rob Herring <robh+dt@kernel.org>,
-        Frank Rowand <frowand.list@gmail.com>,
-        Hans de Goede <hdegoede@redhat.com>,
-        Mark Gross <markgross@kernel.org>,
-        Vinod Koul <vkoul@kernel.org>,
-        Bard Liao <yung-chuan.liao@linux.intel.com>,
-        Pierre-Louis Bossart <pierre-louis.bossart@linux.intel.com>,
-        Sanyog Kale <sanyog.r.kale@intel.com>,
-        Andreas Noever <andreas.noever@gmail.com>,
-        Michael Jamet <michael.jamet@intel.com>,
-        Mika Westerberg <mika.westerberg@linux.intel.com>,
-        Yehezkel Bernat <YehezkelShB@gmail.com>,
-        Jiri Slaby <jirislaby@kernel.org>,
-        Heikki Krogerus <heikki.krogerus@linux.intel.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        Ming Lei <ming.lei@redhat.com>,
-        Jilin Yuan <yuanjilin@cdjrlc.com>,
-        Alan Stern <stern@rowland.harvard.edu>,
-        Sakari Ailus <sakari.ailus@linux.intel.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ira Weiny <ira.weiny@intel.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Won Chung <wonchung@google.com>, alsa-devel@alsa-project.org,
-        devicetree@vger.kernel.org, linux-acpi@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-i2c@vger.kernel.org,
-        linux-i3c@lists.infradead.org, linux-input@vger.kernel.org,
-        linux-media@vger.kernel.org, linux-serial@vger.kernel.org,
-        linux-usb@vger.kernel.org, linux1394-devel@lists.sourceforge.net,
-        platform-driver-x86@vger.kernel.org
-Subject: Re: [PATCH 3/5] driver core: make struct device_type.uevent() take a
- const *
-Message-ID: <Y35iKfYf3ThdVvaR@kroah.com>
-References: <20221123122523.1332370-3-gregkh@linuxfoundation.org>
- <711d5275-7e80-c00d-0cdc-0f3d52175361@gmail.com>
- <Y34hgIW8p1RlQTBB@smile.fi.intel.com>
- <97be39ed-3cea-d55a-caa6-c2652baef399@gmail.com>
- <Y34zyzdbRUdyOSkA@casper.infradead.org>
- <Y34+V2bCDdqujBDk@kroah.com>
- <Y35JfNJDppRp5bLX@ziepe.ca>
- <Y35R+/eQJYI7VaDS@kroah.com>
- <Y35YlI93UBuTfgYy@ziepe.ca>
- <Y35dMIaNYSE0Cykd@casper.infradead.org>
+        Wed, 23 Nov 2022 13:15:36 -0500
+Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 538CAC47;
+        Wed, 23 Nov 2022 10:14:02 -0800 (PST)
+Received: by mail-pj1-x1030.google.com with SMTP id ci10so10339918pjb.1;
+        Wed, 23 Nov 2022 10:14:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=sMUk2UqA8txZdZbMsTiuPaMt9b7Ay82RXjXskAbuDPs=;
+        b=QAlAxOsEx24Cwf9tScvp0rAk8jnc3b8EhqyZVyTEUzMY+iffJxG+UTg2oo5xYUNszd
+         672R0ISbxm5hWjLG31Lvt+uIB/W6X45fhUb3yktwB1ioI6w3ZAUq+xsbihEMtpGCk/tk
+         rbTh1RYNawjVNsF66tpno4HWYq3IhBgEWzKwAesID2AUcPFOnKK/pOsZqXVE5e69/NVT
+         WU2woTi4IZ91+E0sVX5QTpJmDgsRoZs6ar4Tw1Dd8m26mXphAzH0X9gs5238Ljbs6AtY
+         ETcT2DHqHoHvEHW4pMIxk0CqJKz7GBBPXP5Ik/3uXCOLOADa0CxV9jX0HX9QNXg9XGAJ
+         Jq0g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=sMUk2UqA8txZdZbMsTiuPaMt9b7Ay82RXjXskAbuDPs=;
+        b=x3OYwQh7M9ZPV1kxW2xtEOEter6iGtlP7YBRNGVIPLrdBMlG18NfAxMXTA/hwRGZIA
+         RJs0Veb5sM7h/9g2X0PiqH8b6lBYV4U69K5YjivPLML+7VvVFVyVfxqBECf1AYUBSrnI
+         IUN8hw7gvjEq5gZilkRDlTJ14Ww+owIG9p8oEx1nN9/UDokiiGUn4BuKN7t/RWneXJfn
+         gqzGmOLjK9Muo8orNwfDFxUTrO2qmWnIuBJVD3F0raT9xTdTVMXe4BRnPqf2sYZomqNT
+         v7vqfXFjJIqbQuznOrFBfO4UqEZYPCsvnays0KxRQqOjWuxtFaG4LL21ESrzckKVD1KB
+         IRzA==
+X-Gm-Message-State: ANoB5pmGf8fZxfNT4OiK+CrrOa9qvrOHn5mwMBwc43kSUGWZ9jVVcD9w
+        /JRf7Ds/9a8rVSxjWGz7WMM=
+X-Google-Smtp-Source: AA0mqf6YZDuqBxTaT3yKbcyzATU8IJutlMvueeC+Mhr/ThkaBo1xhdJuHo5fUG353UMJ3B5H+fxWWg==
+X-Received: by 2002:a17:903:22c4:b0:171:5092:4d12 with SMTP id y4-20020a17090322c400b0017150924d12mr10383844plg.107.1669227241568;
+        Wed, 23 Nov 2022 10:14:01 -0800 (PST)
+Received: from localhost (2603-800c-1a02-1bae-a7fa-157f-969a-4cde.res6.spectrum.com. [2603:800c:1a02:1bae:a7fa:157f:969a:4cde])
+        by smtp.gmail.com with ESMTPSA id s12-20020a63f04c000000b0047681fa88d1sm11161364pgj.53.2022.11.23.10.14.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 23 Nov 2022 10:14:01 -0800 (PST)
+Sender: Tejun Heo <htejun@gmail.com>
+Date:   Wed, 23 Nov 2022 08:13:59 -1000
+From:   Tejun Heo <tj@kernel.org>
+To:     Kemeng Shi <shikemeng@huawei.com>
+Cc:     josef@toxicpanda.com, axboe@kernel.dk, cgroups@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 03/11] blk-throttle: ignore cgroup without io queued in
+ blk_throtl_cancel_bios
+Message-ID: <Y35i54BnLjKce3Kc@slm.duckdns.org>
+References: <20221123060401.20392-1-shikemeng@huawei.com>
+ <20221123060401.20392-4-shikemeng@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Y35dMIaNYSE0Cykd@casper.infradead.org>
+In-Reply-To: <20221123060401.20392-4-shikemeng@huawei.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Nov 23, 2022 at 05:49:36PM +0000, Matthew Wilcox wrote:
-> On Wed, Nov 23, 2022 at 01:29:56PM -0400, Jason Gunthorpe wrote:
-> > #define generic_container_of(in_type, in, out_type, out_member) \
-> > 	_Generic(in,                                        \
-> >                   const in_type *: ((const out_type *)container_of(in, out_type, out_member)),   \
-> >                   in_type *: ((out_type *)container_of(in, out_type, out_member)) \
-> > 		  )
+On Wed, Nov 23, 2022 at 02:03:53PM +0800, Kemeng Shi wrote:
+> Ignore cgroup without io queued in blk_throtl_cancel_bios for two
+> reasons:
+> 1. Save cpu cycle for trying to dispatch cgroup which is no io queued.
+> 2. Avoid non-consistent state that cgroup is inserted to service queue
+> without THROTL_TG_PENDING set as tg_update_disptime will unconditional
+> re-insert cgroup to service queue. If we are on the default hierarchy,
+> IO dispatched from child in tg_dispatch_one_bio will trigger inserting
+> cgroup to service queue without erase first and ruin the tree.
 > 
-> There's a neat trick I found in seqlock.h:
+> Signed-off-by: Kemeng Shi <shikemeng@huawei.com>
+> ---
+>  block/blk-throttle.c | 7 ++++++-
+>  1 file changed, 6 insertions(+), 1 deletion(-)
 > 
-> #define generic_container_of(in_t, in, out_t, m)			\
-> 	_Generic(*(in),							\
-> 		const in_t: ((const out_t *)container_of(in, out_t, m)), \
-> 		in_t: ((out_t *)container_of(in, out_type, m))	\
-> 	)
-> 
-> and now it fits in 80 columns ;-)
+> diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+> index b33bcf53b36e..acfac916ed99 100644
+> --- a/block/blk-throttle.c
+> +++ b/block/blk-throttle.c
+> @@ -1728,7 +1728,12 @@ void blk_throtl_cancel_bios(struct gendisk *disk)
+>  		 * Set the flag to make sure throtl_pending_timer_fn() won't
+>  		 * stop until all throttled bios are dispatched.
+>  		 */
+> -		blkg_to_tg(blkg)->flags |= THROTL_TG_CANCELING;
+> +		tg->flags |= THROTL_TG_CANCELING;
+> +
+> +		/* No need to dispatch cgroup without io queued */
 
-Nice trick!  Dropping the inline functions is a bit different, let me
-see if that still gives a sane error if we pass an incorrect type or
-mess with the const * the wrong way.  I'll run some tests tomorrow
-afternoon...
+It's probably more important to mention that putting this in without PENDING
+set can corrupt the tree in the future through double insertion.
 
-thanks,
+> +		if (!(tg->flags & THROTL_TG_PENDING))
+> +			continue;
+> +
 
-greg k-h
+Other than than the above comment,
+
+  Acked-by: Tejun Heo <tj@kernel.org>
+
+Thanks.
+
+-- 
+tejun
