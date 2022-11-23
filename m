@@ -2,92 +2,90 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42BFDC43217
-	for <linux-block@archiver.kernel.org>; Wed, 23 Nov 2022 00:42:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF323C4332F
+	for <linux-block@archiver.kernel.org>; Wed, 23 Nov 2022 02:05:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234872AbiKWAmN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 22 Nov 2022 19:42:13 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56256 "EHLO
+        id S235305AbiKWCFm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 22 Nov 2022 21:05:42 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56866 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233436AbiKWAmM (ORCPT
+        with ESMTP id S233239AbiKWCFl (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 22 Nov 2022 19:42:12 -0500
-Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B259C694C;
-        Tue, 22 Nov 2022 16:42:11 -0800 (PST)
-Received: by mail-pj1-x1033.google.com with SMTP id ci10so8419804pjb.1;
-        Tue, 22 Nov 2022 16:42:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=QBgNP0HxZqEmc/2hnmKVV8WQI9992gjmzgYgDwpjSpA=;
-        b=AMxaAaqozpiEIqVSD0dnERL7aTmBQ+mWEkbAkNKt57+j7WUWbOEYANuBlKIshObE7V
-         FtRNcmRfpQYu6RVscVuW2wJEBjLW/APviQcpCqWhkRfWEQbpHb4RHBx8DVhAfXLdkopA
-         aRY2Qoo9/iB/mo9wd3jZIQEmr8ohNIPISRDiSLNpj11QoG4igApiy8SZHr9v9WDcCGsC
-         68dZNoVEPocgQXaf2sxmHLlRqBCrimoKD5Ou1+/f60sQl1M42NS7+c/0iLX50G1I0TDl
-         XUqkCueyjZdyoaITTPMSK9NwX/FsmV8feYdp4Opfi5pulqkKp64DsutTrOBnlwqLrZh9
-         hXOg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=QBgNP0HxZqEmc/2hnmKVV8WQI9992gjmzgYgDwpjSpA=;
-        b=dUuqYn0IwWcjL36NDFRLhZjCFAoSyPFw/lDGeCjBhCcJZGG9rfbLfK5g7hXBux/uNq
-         JsNCFjUri99OCzoAuwliTvxd6F3kadaSKfXYYSmECeNEvvflTHl9eHfmzBxysY9muwRH
-         67eULtFnvAvam432fZZgmi+qibPKhCh5Ma6DpOYbvU7O5qlNPT64yncsH7Y56NOAy9Qz
-         3D9pXWyC9/eveT+t17nqtKntUGPJr6oiKI4VY3U7FrlsZK9mZGsYg5ehA5Ro4/GUF5zZ
-         32CmxiI+Qk74sjIlpgedRDroo3LDJwmI9cZDUhw7FlYnVY0cfHqpPZWe7nmo6LK/P/F4
-         7icQ==
-X-Gm-Message-State: ANoB5pni58bRZBo6RJ7ilNHmYtYkG+4xb/YXDwwkozt1/yHQBBOgPoJJ
-        RjndXHZoVwoovCKF/PL26LFi+oQgYGM/Yw==
-X-Google-Smtp-Source: AA0mqf5wgPBRdjuuP93HssD4zaNUMxkHa8K5eiih1KIyB+W2rPjrQuf/xN76KD3YRcU4P7gVzd/OVw==
-X-Received: by 2002:a17:902:b908:b0:189:1ef4:237b with SMTP id bf8-20020a170902b90800b001891ef4237bmr6869149plb.20.1669164130654;
-        Tue, 22 Nov 2022 16:42:10 -0800 (PST)
-Received: from localhost ([2620:10d:c090:400::5:bb3])
-        by smtp.gmail.com with ESMTPSA id l12-20020a170903120c00b0016be834d54asm12656101plh.306.2022.11.22.16.42.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Nov 2022 16:42:10 -0800 (PST)
-Sender: Tejun Heo <htejun@gmail.com>
-Date:   Tue, 22 Nov 2022 14:42:08 -1000
-From:   Tejun Heo <tj@kernel.org>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Yu Kuai <yukuai1@huaweicloud.com>, hch@lst.de,
-        josef@toxicpanda.com, cgroups@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        yi.zhang@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
-Subject: Re: [PATCH v2 4/5] blk-iocost: fix sleeping in atomic context
- warnning
-Message-ID: <Y31sYFdA2lHIvjt3@slm.duckdns.org>
-References: <20221104023938.2346986-1-yukuai1@huaweicloud.com>
- <20221104023938.2346986-5-yukuai1@huaweicloud.com>
- <Y3K8MSFWw8eTnxtm@slm.duckdns.org>
- <3da991c6-21e4-8ed8-ba75-ccb92059f0ae@huaweicloud.com>
- <Y306xJV6aNXd94kb@slm.duckdns.org>
- <1f52ccb1-c357-a2a0-ef9d-48d7e2eb51f8@kernel.dk>
+        Tue, 22 Nov 2022 21:05:41 -0500
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 760EF8DA60
+        for <linux-block@vger.kernel.org>; Tue, 22 Nov 2022 18:05:40 -0800 (PST)
+Received: from dggpemm500022.china.huawei.com (unknown [172.30.72.57])
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4NH4Fv6KmhzmW1Y;
+        Wed, 23 Nov 2022 10:05:07 +0800 (CST)
+Received: from dggpemm500015.china.huawei.com (7.185.36.181) by
+ dggpemm500022.china.huawei.com (7.185.36.162) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31; Wed, 23 Nov 2022 10:05:38 +0800
+Received: from huawei.com (10.175.103.91) by dggpemm500015.china.huawei.com
+ (7.185.36.181) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.31; Wed, 23 Nov
+ 2022 10:05:38 +0800
+From:   Wang ShaoBo <bobo.shaobowang@huawei.com>
+CC:     <liwei391@huawei.com>, <linux-block@vger.kernel.org>,
+        <drbd-dev@lists.linbit.com>, <axboe@kernel.dk>,
+        <lars.ellenberg@linbit.com>, <christoph.boehmwalder@linbit.com>,
+        <bobo.shaobowang@huawei.com>
+Subject: [PATCH v3 1/2] drbd: remove call to memset before free device/resource/connection
+Date:   Wed, 23 Nov 2022 10:03:54 +0800
+Message-ID: <20221123020355.2470160-2-bobo.shaobowang@huawei.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20221123020355.2470160-1-bobo.shaobowang@huawei.com>
+References: <20221123020355.2470160-1-bobo.shaobowang@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1f52ccb1-c357-a2a0-ef9d-48d7e2eb51f8@kernel.dk>
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.175.103.91]
+X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
+ dggpemm500015.china.huawei.com (7.185.36.181)
+X-CFilter-Loop: Reflected
+To:     unlisted-recipients:; (no To-header on input)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Nov 22, 2022 at 05:14:29PM -0700, Jens Axboe wrote:
-> >> Then match_strdup() and kfree() in match_NUMBER() can be replaced with
-> >> get_buffer() and put_buffer().
-> > 
-> > Sorry about the late reply. Yeah, something like this.
-> 
-> Doesn't local_irq_disable() imply preemption disable as well?
+This revert c2258ffc56f2 ("drbd: poison free'd device, resource and
+connection structs"), add memset is odd here for debugging, there are
+some methods to accurately show what happened, such as kdump.
 
-Right, I was thinking about spin_lock_irq() which doesn't imply disabling
-preemption in PREEMPT_RT. local_irq_disable() is actual irq disable even on
-RT. It should be fine on its own.
+Signed-off-by: Wang ShaoBo <bobo.shaobowang@huawei.com>
+---
+ drivers/block/drbd/drbd_main.c | 3 ---
+ 1 file changed, 3 deletions(-)
 
-Thanks.
-
+diff --git a/drivers/block/drbd/drbd_main.c b/drivers/block/drbd/drbd_main.c
+index 8532b839a343..78cae4e75af1 100644
+--- a/drivers/block/drbd/drbd_main.c
++++ b/drivers/block/drbd/drbd_main.c
+@@ -2217,7 +2217,6 @@ void drbd_destroy_device(struct kref *kref)
+ 		kref_put(&peer_device->connection->kref, drbd_destroy_connection);
+ 		kfree(peer_device);
+ 	}
+-	memset(device, 0xfd, sizeof(*device));
+ 	kfree(device);
+ 	kref_put(&resource->kref, drbd_destroy_resource);
+ }
+@@ -2309,7 +2308,6 @@ void drbd_destroy_resource(struct kref *kref)
+ 	idr_destroy(&resource->devices);
+ 	free_cpumask_var(resource->cpu_mask);
+ 	kfree(resource->name);
+-	memset(resource, 0xf2, sizeof(*resource));
+ 	kfree(resource);
+ }
+ 
+@@ -2650,7 +2648,6 @@ void drbd_destroy_connection(struct kref *kref)
+ 	drbd_free_socket(&connection->data);
+ 	kfree(connection->int_dig_in);
+ 	kfree(connection->int_dig_vv);
+-	memset(connection, 0xfc, sizeof(*connection));
+ 	kfree(connection);
+ 	kref_put(&resource->kref, drbd_destroy_resource);
+ }
 -- 
-tejun
+2.25.1
+
