@@ -2,199 +2,118 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 95BC2C46467
-	for <linux-block@archiver.kernel.org>; Wed, 23 Nov 2022 15:53:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AB704C433FE
+	for <linux-block@archiver.kernel.org>; Wed, 23 Nov 2022 16:07:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238722AbiKWPx0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 23 Nov 2022 10:53:26 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38264 "EHLO
+        id S237705AbiKWQHd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 23 Nov 2022 11:07:33 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33126 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238772AbiKWPwz (ORCPT
+        with ESMTP id S238729AbiKWQHc (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 23 Nov 2022 10:52:55 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB32457B76;
-        Wed, 23 Nov 2022 07:52:50 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 57703B82172;
-        Wed, 23 Nov 2022 15:52:49 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3DFB3C433D6;
-        Wed, 23 Nov 2022 15:52:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1669218768;
-        bh=/DumSgjbm3+bFjW/YII5HB+37hZffmS6RIQzxFus23A=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=Axk59HaPRU6B2o8/sQ2xV/J3QDnuJbllXINFmP+zTkfGNyl9/NsBA856568zy/Zy0
-         ziibqVHor7E2pImZW09H3fsO0rmk5lAkiY8/xImxvEPWF1JugZkU42k7XZp/1gGlxF
-         YjrYDdmJl0DMzZ+GHnRpj/dpCWN4eBZtN+hiAE0Q=
-Date:   Wed, 23 Nov 2022 16:52:45 +0100
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     Maximilian Luz <luzmaximilian@gmail.com>
-Cc:     Matthew Wilcox <willy@infradead.org>,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        linux-kernel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        "Rafael J. Wysocki" <rafael@kernel.org>,
-        Len Brown <lenb@kernel.org>,
-        Stefan Richter <stefanr@s5r6.in-berlin.de>,
-        Wolfram Sang <wsa@kernel.org>,
-        Alexandre Belloni <alexandre.belloni@bootlin.com>,
-        Dmitry Torokhov <dmitry.torokhov@gmail.com>,
-        Sean Young <sean@mess.org>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Rob Herring <robh+dt@kernel.org>,
-        Frank Rowand <frowand.list@gmail.com>,
-        Hans de Goede <hdegoede@redhat.com>,
-        Mark Gross <markgross@kernel.org>,
-        Vinod Koul <vkoul@kernel.org>,
-        Bard Liao <yung-chuan.liao@linux.intel.com>,
-        Pierre-Louis Bossart <pierre-louis.bossart@linux.intel.com>,
-        Sanyog Kale <sanyog.r.kale@intel.com>,
-        Andreas Noever <andreas.noever@gmail.com>,
-        Michael Jamet <michael.jamet@intel.com>,
-        Mika Westerberg <mika.westerberg@linux.intel.com>,
-        Yehezkel Bernat <YehezkelShB@gmail.com>,
-        Jiri Slaby <jirislaby@kernel.org>,
-        Heikki Krogerus <heikki.krogerus@linux.intel.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        Ming Lei <ming.lei@redhat.com>,
-        Jilin Yuan <yuanjilin@cdjrlc.com>,
-        Alan Stern <stern@rowland.harvard.edu>,
-        Sakari Ailus <sakari.ailus@linux.intel.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ira Weiny <ira.weiny@intel.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Won Chung <wonchung@google.com>, alsa-devel@alsa-project.org,
-        devicetree@vger.kernel.org, linux-acpi@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-i2c@vger.kernel.org,
-        linux-i3c@lists.infradead.org, linux-input@vger.kernel.org,
-        linux-media@vger.kernel.org, linux-serial@vger.kernel.org,
-        linux-usb@vger.kernel.org, linux1394-devel@lists.sourceforge.net,
-        platform-driver-x86@vger.kernel.org
-Subject: Re: [PATCH 3/5] driver core: make struct device_type.uevent() take a
- const *
-Message-ID: <Y35BzXYg8/WGqf6V@kroah.com>
-References: <20221123122523.1332370-1-gregkh@linuxfoundation.org>
- <20221123122523.1332370-3-gregkh@linuxfoundation.org>
- <711d5275-7e80-c00d-0cdc-0f3d52175361@gmail.com>
- <Y34hgIW8p1RlQTBB@smile.fi.intel.com>
- <97be39ed-3cea-d55a-caa6-c2652baef399@gmail.com>
- <Y34zyzdbRUdyOSkA@casper.infradead.org>
- <Y34+V2bCDdqujBDk@kroah.com>
- <b93a9fcd-0d7b-14fd-1018-bba35f961a27@gmail.com>
+        Wed, 23 Nov 2022 11:07:32 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C7B0BB9;
+        Wed, 23 Nov 2022 08:07:27 -0800 (PST)
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2ANEbDXa002372;
+        Wed, 23 Nov 2022 16:07:26 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : in-reply-to : references : content-transfer-encoding
+ : mime-version; s=pp1; bh=nRklbZ+rJiirAx94wRklHtjRr/Bmlm9o2s4m9AxA7xk=;
+ b=ErArvUOmA1u24QiP1v50szV9IU17qYfwctma0JHAbTcrsV4qjBJwgpeDTE7KcMRrCycU
+ 4/zSB1BUWaEsJLHHK7bj3UIIlMYei8tKG9UgjbMyvtxdUXUL0/XE0xkab7j/6TWBTR+g
+ ziNAlZLIAig+KZsITpwqok9HTEBr7KZtWCAXY0qhq5OU++cym4s6bsnHylRkbciDl+oW
+ DmNFsEFh/qy6sXqLH3Gj9hOtyNSlRZL3qRD/oNr8AUpl4B37ZUuBQAnM1Zcd5XjmO7iv
+ l/RcmdEvmFpB06W58l5ATlQrmDvAJcCuvC4ILIR7mnokdc13zMM5+CiIo2ZTQseQKLHp Ig== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3m100t38nw-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 23 Nov 2022 16:07:26 +0000
+Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2ANEbnND005350;
+        Wed, 23 Nov 2022 16:07:26 GMT
+Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3m100t38nd-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 23 Nov 2022 16:07:26 +0000
+Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
+        by ppma03fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2ANG7Mra021827;
+        Wed, 23 Nov 2022 16:07:24 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma03fra.de.ibm.com with ESMTP id 3kxps94rp3-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 23 Nov 2022 16:07:24 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2ANG7KKO57672116
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 23 Nov 2022 16:07:20 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 3E609AE064;
+        Wed, 23 Nov 2022 16:07:20 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 2D11CAE056;
+        Wed, 23 Nov 2022 16:07:20 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+        Wed, 23 Nov 2022 16:07:20 +0000 (GMT)
+Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 20191)
+        id E4C30E029C; Wed, 23 Nov 2022 17:07:19 +0100 (CET)
+From:   Stefan Haberland <sth@linux.ibm.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Jan Hoeppner <hoeppner@linux.ibm.com>,
+        linux-s390@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Colin Ian King <colin.i.king@gmail.com>
+Subject: [PATCH 1/4] s390/dasd: Fix spelling mistake "Ivalid" -> "Invalid"
+Date:   Wed, 23 Nov 2022 17:07:16 +0100
+Message-Id: <20221123160719.3002694-2-sth@linux.ibm.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20221123160719.3002694-1-sth@linux.ibm.com>
+References: <20221123160719.3002694-1-sth@linux.ibm.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: Z_VmGKriz-uTwPnhQL58WKSe2MhmsC9C
+X-Proofpoint-ORIG-GUID: dABXkQM0ybOQSAMwakI2KtYxx3ENikX3
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b93a9fcd-0d7b-14fd-1018-bba35f961a27@gmail.com>
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
+ definitions=2022-11-23_08,2022-11-23_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 suspectscore=0
+ mlxlogscore=999 adultscore=0 lowpriorityscore=0 priorityscore=1501
+ impostorscore=0 spamscore=0 clxscore=1011 bulkscore=0 malwarescore=0
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2210170000 definitions=main-2211230114
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Nov 23, 2022 at 04:48:41PM +0100, Maximilian Luz wrote:
-> On 11/23/22 16:37, Greg Kroah-Hartman wrote:
-> > On Wed, Nov 23, 2022 at 02:52:59PM +0000, Matthew Wilcox wrote:
-> > > On Wed, Nov 23, 2022 at 02:59:00PM +0100, Maximilian Luz wrote:
-> > > > On 11/23/22 14:34, Andy Shevchenko wrote:
-> > > > > On Wed, Nov 23, 2022 at 02:14:31PM +0100, Maximilian Luz wrote:
-> > > > > > On 11/23/22 13:25, Greg Kroah-Hartman wrote:
-> > > > > > > The uevent() callback in struct device_type should not be modifying the
-> > > > > > > device that is passed into it, so mark it as a const * and propagate the
-> > > > > > > function signature changes out into all relevant subsystems that use
-> > > > > > > this callback.
-> > > > > 
-> > > > > [...]
-> > > > > 
-> > > > > > > -static inline struct ssam_device *to_ssam_device(struct device *d)
-> > > > > > > +static inline struct ssam_device *to_ssam_device(const struct device *d)
-> > > > > > >     {
-> > > > > > >     	return container_of(d, struct ssam_device, dev);
-> > > > > > >     }
-> > > > > > 
-> > > > > > I am slightly conflicted about this change as that now more or less
-> > > > > > implicitly drops the const. So I'm wondering if it wouldn't be better to
-> > > > > > either create a function specifically for const pointers or to just
-> > > > > > open-code it in the instance above.
-> > > > > > 
-> > > > > > I guess we could also convert this to a macro. Then at least there
-> > > > > > wouldn't be an explicit and potentially misleading const-conversion
-> > > > > > indicated in the function signature.
-> > > > > 
-> > > > > This is an intermediate step as far as I know since moving container_of to
-> > > > > recognize const is a bit noisy right now. I guess you can find a discussion
-> > > > > on the topic between Greg and Sakari.
-> > > > 
-> > > > Thanks! I assume you are referring to the following?
-> > > > 
-> > > > 	https://lore.kernel.org/lkml/4218173bd72b4f1899d4c41a8e251f0d@AcuMS.aculab.com/T/
-> > > > 
-> > > > As far as I can tell this is only a warning in documentation, not
-> > > > compile time (which would probably be impossible?).
-> > > > 
-> > > > As I've said I'd be fine with converting the function to a macro (and
-> > > > preferably adding a similar warning like the one proposed in that
-> > > > thread). The point that irks me up is just that, as proposed, the
-> > > > function signature would now advertise a conversion that should never be
-> > > > happening.
-> > > > 
-> > > > Having two separate functions would create a compile-time guarantee, so
-> > > > I'd prefer that, but I can understand if that might be considered too
-> > > > noisy in code. Or if there is a push to make container_of() emit a
-> > > > compile-time warning I'd also be perfectly happy with converting it to a
-> > > > macro now as that'd alleviate the need for functions in the future.
-> > > 
-> > > Can't we do:
-> > > 
-> > > static inline const struct ssam_device *to_ssam_device(const struct device *d)
-> > > {
-> > > 	return container_of(d, const struct ssam_device, dev);
-> > > }
-> > > 
-> > 
-> > You could, if you can always handle a const pointer coming out of this
-> > function, but I don't think you can.
-> > 
-> > What you might want to do instead, and I'll be glad to do it for all of
-> > the functions like this I change, is to do what we have for struct
-> > device now:
-> > 
-> > static inline struct device *__kobj_to_dev(struct kobject *kobj)
-> > {
-> >          return container_of(kobj, struct device, kobj);
-> > }
-> > 
-> > static inline const struct device *__kobj_to_dev_const(const struct kobject *kobj)
-> > {
-> >          return container_of(kobj, const struct device, kobj);
-> > }
-> > 
-> > /*
-> >   * container_of() will happily take a const * and spit back a non-const * as it
-> >   * is just doing pointer math.  But we want to be a bit more careful in the
-> >   * driver code, so manually force any const * of a kobject to also be a const *
-> >   * to a device.
-> >   */
-> > #define kobj_to_dev(kobj)                                       \
-> >          _Generic((kobj),                                        \
-> >                   const struct kobject *: __kobj_to_dev_const,   \
-> >                   struct kobject *: __kobj_to_dev)(kobj)
-> > 
-> > 
-> > Want me to do the same thing here as well?
-> 
-> That looks great! Thanks!
-> 
-> I would very much prefer that.
+From: Colin Ian King <colin.i.king@gmail.com>
 
-Ok, will respin this patch as at least 2 individual patches, one that
-does the change to to_ssam_device() and the next that does the bus-wide
-changes.
+There is a spelling mistake in a pr_warn message. Fix it.
 
-I'll review the other container_of() users in this patch as well to see
-if they can be converted as well.
+Signed-off-by: Colin Ian King <colin.i.king@gmail.com>
+Link: https://lore.kernel.org/r/20220923132103.2486724-1-colin.i.king@gmail.com
+Signed-off-by: Stefan Haberland <sth@linux.ibm.com>
+---
+ drivers/s390/block/dasd_ioctl.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-thanks,
+diff --git a/drivers/s390/block/dasd_ioctl.c b/drivers/s390/block/dasd_ioctl.c
+index d0ddf2cc9786..9327dcdd6e5e 100644
+--- a/drivers/s390/block/dasd_ioctl.c
++++ b/drivers/s390/block/dasd_ioctl.c
+@@ -401,7 +401,7 @@ dasd_ioctl_copy_pair_swap(struct block_device *bdev, void __user *argp)
+ 		return -EFAULT;
+ 	}
+ 	if (memchr_inv(data.reserved, 0, sizeof(data.reserved))) {
+-		pr_warn("%s: Ivalid swap data specified.\n",
++		pr_warn("%s: Invalid swap data specified\n",
+ 			dev_name(&device->cdev->dev));
+ 		dasd_put_device(device);
+ 		return DASD_COPYPAIRSWAP_INVALID;
+-- 
+2.34.1
 
-greg k-h
