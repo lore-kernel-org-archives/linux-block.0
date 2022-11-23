@@ -2,88 +2,80 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF6C9C4332F
-	for <linux-block@archiver.kernel.org>; Wed, 23 Nov 2022 18:29:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 05FDDC46467
+	for <linux-block@archiver.kernel.org>; Wed, 23 Nov 2022 18:29:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238282AbiKWS3Y (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 23 Nov 2022 13:29:24 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58060 "EHLO
+        id S239271AbiKWS30 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 23 Nov 2022 13:29:26 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57248 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238355AbiKWS24 (ORCPT
+        with ESMTP id S239709AbiKWS26 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 23 Nov 2022 13:28:56 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D8B3D94A59
-        for <linux-block@vger.kernel.org>; Wed, 23 Nov 2022 10:28:43 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 57EB861E69
-        for <linux-block@vger.kernel.org>; Wed, 23 Nov 2022 18:28:43 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A4602C433C1;
-        Wed, 23 Nov 2022 18:28:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1669228122;
-        bh=c1QOASaIo+0UYVBWYG2Q8IJkg6i22hC4duAlGSseeVw=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=YOCAzxTtxM5I6QYfChcaigs414QhMchA9CLeOaYQKuv1cCULRAxv5ow2zxhbtgvCM
-         hUg3k1m8mbA6k4cNHQlX2+0zIS0MHrsx1c1jlvulfa4/2pfIjNjVog5A/rCyIN70ZC
-         MDmFk3Y0r5uK6Z8KvN9LTpYv2CG24U0b/ShYC+20RfeGBfbcEue878tT2/yXAmTl1Q
-         DWenvcYQ6MnGnrBfnd66CLzsj63OUyd8qUsZng+No5bmbxy8GnoiQM3WiPQpIYHXcr
-         RU8K9QRoBDABU9ePBt6F9EUxu3vJ5OA8mXjT+I4zv7AzzD4gO3Z6o4T6gy/26CrwyR
-         CDz2/DQRI2tqQ==
-Date:   Wed, 23 Nov 2022 18:28:41 +0000
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>
-Subject: Re: [PATCH] blk-crypto: Add a missing include directive
-Message-ID: <Y35mWSUML0vdwqvz@gmail.com>
-References: <20221123172923.434339-1-bvanassche@acm.org>
+        Wed, 23 Nov 2022 13:28:58 -0500
+Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 28C7A97358;
+        Wed, 23 Nov 2022 10:28:49 -0800 (PST)
+Received: by mail-pl1-x636.google.com with SMTP id y4so17405327plb.2;
+        Wed, 23 Nov 2022 10:28:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=HeXP11t/+0yLhKm0StolEpyltEEHuq6W+e1tTErqQaI=;
+        b=OO3acBF/AxFG9PvE3FfXDejXXULUCcDhFYGrWXM8f02v5B58SoZCg5HBB98r+jNnwD
+         Qz+NUoxIxl/Eg7QNIfdgGeIxRVNwSO7xs37P/+J6Vi4UyN2jfq5LHnbwJM4Sydqvam6+
+         heP0Lvyl2RfOftV00QuromUhSzPtd2zQ4rz3TNfcJv2gDAJolfN/yK53qd+/WJtf0LB4
+         94BQOHf5IMg90I6b27Rrs7dm5xiYAlfbCOhh/CfGrNBFmnOTCbxiXZCessgimQYKesXZ
+         EZ0yCCF3X2lypZ7NwzHg1vBIPBTriuuMqWkNfg4dfCh758tkmQhHw/QX58nbKy8HelQm
+         uIMw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=HeXP11t/+0yLhKm0StolEpyltEEHuq6W+e1tTErqQaI=;
+        b=uxAc+BvcC2BI62zKw3G52Aa+/6Rutcu7ou4IPYWbw/Xw1YIfkgZ2kFgvOv4nvBE5jb
+         QA5U88x3sbrIMzEJIpQ8U63vEm0MCppIi9LF/J6wH4kFYN4y5F7+M2AM6hqkEsNRlz5o
+         0UaMaDDcUratSjQMaJ0uT4Q2K4zkQIgF/RBCMIk5tFRoXB26GFz1cdmMUYmq4/2bEA62
+         6QSh84YLiNMLovSBhsSFZugcgUBdPNKlICYIludTU7biUpAbcfV99YGZJ9QPGPOjdNcQ
+         LJJNN8d4TgjK1ieZmMHvbrDoO+cg6Jg8ERARzlZNKb9tD7wwILVhTHrA+W6j8D/3FU/z
+         /krg==
+X-Gm-Message-State: ANoB5pnJJvrz6jDKodvGPdpVZJFQ1B8fYi+hy7NibvMNE436IDSEapFw
+        xx/c7RzMKcKLP0AJjQFGykA=
+X-Google-Smtp-Source: AA0mqf677qi+OR8ze787bk+49oIsafVTAux+aItt91jTR7n4sKuIHMs3PG/M1JQciezYcIgQxOLYiw==
+X-Received: by 2002:a17:90a:2b43:b0:200:40a2:eaaa with SMTP id y3-20020a17090a2b4300b0020040a2eaaamr37620844pjc.68.1669228128497;
+        Wed, 23 Nov 2022 10:28:48 -0800 (PST)
+Received: from localhost (2603-800c-1a02-1bae-a7fa-157f-969a-4cde.res6.spectrum.com. [2603:800c:1a02:1bae:a7fa:157f:969a:4cde])
+        by smtp.gmail.com with ESMTPSA id w3-20020aa79543000000b005633a06ad67sm299883pfq.64.2022.11.23.10.28.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 23 Nov 2022 10:28:48 -0800 (PST)
+Sender: Tejun Heo <htejun@gmail.com>
+Date:   Wed, 23 Nov 2022 08:28:47 -1000
+From:   Tejun Heo <tj@kernel.org>
+To:     Kemeng Shi <shikemeng@huawei.com>
+Cc:     josef@toxicpanda.com, axboe@kernel.dk, cgroups@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 08/11] blk-throttle: remove repeat check of elapsed time
+ from last upgrade in throtl_hierarchy_can_downgrade
+Message-ID: <Y35mXymUTC1lx50j@slm.duckdns.org>
+References: <20221123060401.20392-1-shikemeng@huawei.com>
+ <20221123060401.20392-9-shikemeng@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20221123172923.434339-1-bvanassche@acm.org>
+In-Reply-To: <20221123060401.20392-9-shikemeng@huawei.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Nov 23, 2022 at 09:29:23AM -0800, Bart Van Assche wrote:
-> Allow the compiler to verify consistency of function declarations and
-> function definitions. This patch fixes the following sparse errors:
-> 
-> block/blk-crypto-profile.c:241:14: error: no previous prototype for ‘blk_crypto_get_keyslot’ [-Werror=missing-prototypes]
->   241 | blk_status_t blk_crypto_get_keyslot(struct blk_crypto_profile *profile,
->       |              ^~~~~~~~~~~~~~~~~~~~~~
-> block/blk-crypto-profile.c:318:6: error: no previous prototype for ‘blk_crypto_put_keyslot’ [-Werror=missing-prototypes]
->   318 | void blk_crypto_put_keyslot(struct blk_crypto_keyslot *slot)
->       |      ^~~~~~~~~~~~~~~~~~~~~~
-> block/blk-crypto-profile.c:344:6: error: no previous prototype for ‘__blk_crypto_cfg_supported’ [-Werror=missing-prototypes]
->   344 | bool __blk_crypto_cfg_supported(struct blk_crypto_profile *profile,
->       |      ^~~~~~~~~~~~~~~~~~~~~~~~~~
-> block/blk-crypto-profile.c:373:5: error: no previous prototype for ‘__blk_crypto_evict_key’ [-Werror=missing-prototypes]
->   373 | int __blk_crypto_evict_key(struct blk_crypto_profile *profile,
->       |     ^~~~~~~~~~~~~~~~~~~~~~
-> 
-> Cc: Eric Biggers <ebiggers@google.com>
-> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
-> ---
->  block/blk-crypto-profile.c | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/block/blk-crypto-profile.c b/block/blk-crypto-profile.c
-> index 96c511967386..0307fb0d95d3 100644
-> --- a/block/blk-crypto-profile.c
-> +++ b/block/blk-crypto-profile.c
-> @@ -32,6 +32,7 @@
->  #include <linux/wait.h>
->  #include <linux/blkdev.h>
->  #include <linux/blk-integrity.h>
-> +#include "blk-crypto-internal.h"
->  
+On Wed, Nov 23, 2022 at 02:03:58PM +0800, Kemeng Shi wrote:
+>  static bool throtl_hierarchy_can_downgrade(struct throtl_grp *tg)
+>  {
+> +	if (time_before(now, tg->td->low_upgrade_time + td->throtl_slice))
+> +		return false;
 
-Thanks.  This was already caught during testing and review of the patch that
-introduced this problem, but I guess it is too late to fold this in.
+Does this even build? Where is td defined?
 
-- Eric
+-- 
+tejun
