@@ -2,94 +2,88 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B9053C4332F
-	for <linux-block@archiver.kernel.org>; Wed, 23 Nov 2022 18:27:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF6C9C4332F
+	for <linux-block@archiver.kernel.org>; Wed, 23 Nov 2022 18:29:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239752AbiKWS1u (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 23 Nov 2022 13:27:50 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55838 "EHLO
+        id S238282AbiKWS3Y (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 23 Nov 2022 13:29:24 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58060 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238864AbiKWS1X (ORCPT
+        with ESMTP id S238355AbiKWS24 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 23 Nov 2022 13:27:23 -0500
-Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A5C365875;
-        Wed, 23 Nov 2022 10:27:19 -0800 (PST)
-Received: by mail-pj1-x1032.google.com with SMTP id l22-20020a17090a3f1600b00212fbbcfb78so2862422pjc.3;
-        Wed, 23 Nov 2022 10:27:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=jkuJbkh43Co2UTSXb2C1Aswe4Vf/cx6MZjOFratu/Lw=;
-        b=hfWyPvgKFj2qty6cIV8tWczPoJ4XrP/IZZ1+V4y5pp8rSQGcIDdvFreSqpWEBv5CQ4
-         vWL2hd6JPKq9sP+uI8BDjxBqMtSWlW0weiK/inhIiTSc0tjRWRCRKtsOCyDpLpqNu+1W
-         vxmUZBu/1+E/CjQ3sJrA4efID7j/03XQmq9HFXGB+7Y8gQlnL+16spK6JaC8j/kg0FYk
-         kWElj4INXjenT6DPZTE+883OchrAYlz+xRgEqrf1f91aT01XjsgWZjr60bKHngT7eeWv
-         yMeJGF9Hy0Yyx/ylZjuUEQrWrJ0UJPf0sgGmz8071zpKHfRHDq6PtyTipIjwsrGi9J8X
-         Ddug==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=jkuJbkh43Co2UTSXb2C1Aswe4Vf/cx6MZjOFratu/Lw=;
-        b=b59xRy1NNB02u4ukNq3p+CaSJESfwA2SfovQeYsVF+ojRJlgAPUmcYsxOnEHBECvjl
-         wJ9MW8aS0VeSYqwPQgnuErr4WZYNTa5oNT7YPMo1Lt4QUrXTYrrJ0+0v2DTd/sMYn5xn
-         wj1SZmE417GF8PkRcvMzZbyMpH9X94OH/PjpU+Q7zSSA3IXu7ncRRD30IomKTxYw5bbd
-         8CLC+eKNuoyu4Q4n5prNaw0ICqzwXZOIxAWdPvXmSWgUJpzHyCvFdWvcgqXSBedZtQyg
-         jf2D/TUH+Iuoeb1MBdDcJXVTnHWfP8d6ve/uOa+Xl7E83mukw8ABFWyqeIE/cxg3N/kg
-         NqqA==
-X-Gm-Message-State: ANoB5pl83VMK3ctyqk+zlrges6f0qTiTEyxaJaxZtKzYe/WvV2kM2y0p
-        0FA4MGl8FVhnfTmvlxMsSZw=
-X-Google-Smtp-Source: AA0mqf4JvA39a5eyrkrpImOfz4Ug99pzEsgXnReWgKWgV0Hqb9t0vFzY9cOEePFnqyfeofmswt+VEw==
-X-Received: by 2002:a17:902:f391:b0:188:537d:78d9 with SMTP id f17-20020a170902f39100b00188537d78d9mr19000064ple.48.1669228038902;
-        Wed, 23 Nov 2022 10:27:18 -0800 (PST)
-Received: from localhost (2603-800c-1a02-1bae-a7fa-157f-969a-4cde.res6.spectrum.com. [2603:800c:1a02:1bae:a7fa:157f:969a:4cde])
-        by smtp.gmail.com with ESMTPSA id r12-20020a63e50c000000b00476dc914262sm11139869pgh.1.2022.11.23.10.27.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 23 Nov 2022 10:27:18 -0800 (PST)
-Sender: Tejun Heo <htejun@gmail.com>
-Date:   Wed, 23 Nov 2022 08:27:17 -1000
-From:   Tejun Heo <tj@kernel.org>
-To:     Kemeng Shi <shikemeng@huawei.com>
-Cc:     josef@toxicpanda.com, axboe@kernel.dk, cgroups@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 07/11] blk-throttle: remove incorrect comment for
- tg_last_low_overflow_time
-Message-ID: <Y35mBVQgYgCvmZhz@slm.duckdns.org>
-References: <20221123060401.20392-1-shikemeng@huawei.com>
- <20221123060401.20392-8-shikemeng@huawei.com>
+        Wed, 23 Nov 2022 13:28:56 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D8B3D94A59
+        for <linux-block@vger.kernel.org>; Wed, 23 Nov 2022 10:28:43 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 57EB861E69
+        for <linux-block@vger.kernel.org>; Wed, 23 Nov 2022 18:28:43 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A4602C433C1;
+        Wed, 23 Nov 2022 18:28:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1669228122;
+        bh=c1QOASaIo+0UYVBWYG2Q8IJkg6i22hC4duAlGSseeVw=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=YOCAzxTtxM5I6QYfChcaigs414QhMchA9CLeOaYQKuv1cCULRAxv5ow2zxhbtgvCM
+         hUg3k1m8mbA6k4cNHQlX2+0zIS0MHrsx1c1jlvulfa4/2pfIjNjVog5A/rCyIN70ZC
+         MDmFk3Y0r5uK6Z8KvN9LTpYv2CG24U0b/ShYC+20RfeGBfbcEue878tT2/yXAmTl1Q
+         DWenvcYQ6MnGnrBfnd66CLzsj63OUyd8qUsZng+No5bmbxy8GnoiQM3WiPQpIYHXcr
+         RU8K9QRoBDABU9ePBt6F9EUxu3vJ5OA8mXjT+I4zv7AzzD4gO3Z6o4T6gy/26CrwyR
+         CDz2/DQRI2tqQ==
+Date:   Wed, 23 Nov 2022 18:28:41 +0000
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH] blk-crypto: Add a missing include directive
+Message-ID: <Y35mWSUML0vdwqvz@gmail.com>
+References: <20221123172923.434339-1-bvanassche@acm.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20221123060401.20392-8-shikemeng@huawei.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20221123172923.434339-1-bvanassche@acm.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Nov 23, 2022 at 02:03:57PM +0800, Kemeng Shi wrote:
-> Function tg_last_low_overflow_time is called with intermediate node as
-> following:
-> throtl_hierarchy_can_downgrade
->   throtl_tg_can_downgrade
->     tg_last_low_overflow_time
+On Wed, Nov 23, 2022 at 09:29:23AM -0800, Bart Van Assche wrote:
+> Allow the compiler to verify consistency of function declarations and
+> function definitions. This patch fixes the following sparse errors:
 > 
-> throtl_hierarchy_can_upgrade
->   throtl_tg_can_upgrade
->     tg_last_low_overflow_time
+> block/blk-crypto-profile.c:241:14: error: no previous prototype for ‘blk_crypto_get_keyslot’ [-Werror=missing-prototypes]
+>   241 | blk_status_t blk_crypto_get_keyslot(struct blk_crypto_profile *profile,
+>       |              ^~~~~~~~~~~~~~~~~~~~~~
+> block/blk-crypto-profile.c:318:6: error: no previous prototype for ‘blk_crypto_put_keyslot’ [-Werror=missing-prototypes]
+>   318 | void blk_crypto_put_keyslot(struct blk_crypto_keyslot *slot)
+>       |      ^~~~~~~~~~~~~~~~~~~~~~
+> block/blk-crypto-profile.c:344:6: error: no previous prototype for ‘__blk_crypto_cfg_supported’ [-Werror=missing-prototypes]
+>   344 | bool __blk_crypto_cfg_supported(struct blk_crypto_profile *profile,
+>       |      ^~~~~~~~~~~~~~~~~~~~~~~~~~
+> block/blk-crypto-profile.c:373:5: error: no previous prototype for ‘__blk_crypto_evict_key’ [-Werror=missing-prototypes]
+>   373 | int __blk_crypto_evict_key(struct blk_crypto_profile *profile,
+>       |     ^~~~~~~~~~~~~~~~~~~~~~
 > 
-> throtl_hierarchy_can_downgrade/throtl_hierarchy_can_upgrade will traverse
-> from leaf node to sub-root node and pass traversed intermediate node
-> to tg_last_low_overflow_time.
+> Cc: Eric Biggers <ebiggers@google.com>
+> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+> ---
+>  block/blk-crypto-profile.c | 1 +
+>  1 file changed, 1 insertion(+)
 > 
-> No such limit could be found from context and implementation of
-> tg_last_low_overflow_time, so remove this limit in comment.
-> 
-> Signed-off-by: Kemeng Shi <shikemeng@huawei.com>
+> diff --git a/block/blk-crypto-profile.c b/block/blk-crypto-profile.c
+> index 96c511967386..0307fb0d95d3 100644
+> --- a/block/blk-crypto-profile.c
+> +++ b/block/blk-crypto-profile.c
+> @@ -32,6 +32,7 @@
+>  #include <linux/wait.h>
+>  #include <linux/blkdev.h>
+>  #include <linux/blk-integrity.h>
+> +#include "blk-crypto-internal.h"
+>  
 
-Acked-by: Tejun Heo <tj@kernel.org>
+Thanks.  This was already caught during testing and review of the patch that
+introduced this problem, but I guess it is too late to fold this in.
 
--- 
-tejun
+- Eric
