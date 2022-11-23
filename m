@@ -2,42 +2,42 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2864BC43219
-	for <linux-block@archiver.kernel.org>; Wed, 23 Nov 2022 20:58:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 87C95C3A59F
+	for <linux-block@archiver.kernel.org>; Wed, 23 Nov 2022 20:58:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234913AbiKWU6W (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 23 Nov 2022 15:58:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52500 "EHLO
+        id S233560AbiKWU6V (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 23 Nov 2022 15:58:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52498 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239240AbiKWU6K (ORCPT
+        with ESMTP id S239236AbiKWU6K (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Wed, 23 Nov 2022 15:58:10 -0500
-Received: from mail-pg1-f169.google.com (mail-pg1-f169.google.com [209.85.215.169])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A54DF580;
-        Wed, 23 Nov 2022 12:58:05 -0800 (PST)
-Received: by mail-pg1-f169.google.com with SMTP id b62so17811610pgc.0;
-        Wed, 23 Nov 2022 12:58:05 -0800 (PST)
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A4AAF03D;
+        Wed, 23 Nov 2022 12:58:07 -0800 (PST)
+Received: by mail-pl1-f175.google.com with SMTP id k7so17702722pll.6;
+        Wed, 23 Nov 2022 12:58:07 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=vi68gSKm8AaGgHkr2eCWaAuUOEyq7Y6kAABVSvzrER4=;
-        b=dlHHuPftvHvYf1A1TR5rqch7oJFiiYX9pm/L2A9L0aOW+Q99uM0lXP4JdUi6rWfIVy
-         8SE4tpvEYuisCFPf4jksaSvu7T646miXnKvXOurq7C0+g3sjL2u6p4gbYoLuRDuwCNlg
-         PUBLk1WhEDc+qjw2mFnqGdSXWpHLe0G+AK3Vyewd6LCK46mVWgGZnGl3/+Ydu0sjm4H3
-         LnITe6IxfZo2OVZqysODVqgM6lOIZevr+borFwidfZZ2YqARfWcqYYmkwfOIYRjfEqTD
-         +1Luueu2BHNsMZ6nhm+I2vTnDeNbAsdBQJujQ6VIPS4Mp17rqWpGHi7SBcF2V1R01Ara
-         sOVw==
-X-Gm-Message-State: ANoB5plQe0WFmJP1BWinFDrj773x2UhL3OwCuYTMLlv5Nvz9qb9LV9TB
-        KZmK+Eg4qiMnaSO1brgpjAA=
-X-Google-Smtp-Source: AA0mqf44ID5su45eYuFdJ9rAu/qDePvGNIr2FBHHKC3nwX8kURz1QBzbfoHhoV3VqB2VZYwWAFYsYg==
-X-Received: by 2002:a62:5f46:0:b0:56b:cc74:4bd5 with SMTP id t67-20020a625f46000000b0056bcc744bd5mr12240835pfb.79.1669237084446;
-        Wed, 23 Nov 2022 12:58:04 -0800 (PST)
+        bh=jowSlLiL6KGV55IcMYZWeqN5/FXu2HkeW31efA29JJQ=;
+        b=LXXQh3Gbn8XLGJNm7OWvlADu0zl9mkxUOQqkTd4u4nJ8oLnHiK7wNvdN2xBT0QOU5p
+         GvWmZsfzzoNjEw0B9Ex0fkY7Wb/H6GyGgMvN8nkODtbgIA+TeH4mESG1W8JM4MpOyuRh
+         Ya0jrfzPaqGc+ydx5r63NZ4kXTAvkbh9pJevZQuduFDqm5w5gLnDAIgg+F/4W+k0KXbf
+         vHh4G/y2CcK7K0cP9noycyPqfjVKBjTzs2jMVOEtp2Pd9oHaUy/VAyZ0Ha3bekoEARiq
+         YCwI7uaip9ggrC4hGtgpC2Fx5JPLp/WPRikM6w+BnfHe8O3wQzEMeProQTGDV0OtXDBd
+         qzRg==
+X-Gm-Message-State: ANoB5pkD3/CcMpEcDNsplpawe5cXc4XJHMQBxEsY7RbGPfR98qwSzwEa
+        tZJHKlyxbGo36FJ2GVXup7o=
+X-Google-Smtp-Source: AA0mqf4CgXq1JETjQQHzqHw5wv3EFngdoURmA4ZaHIijk5irbPmboc3q7nHo1/0eQkOKhGEv7lR78Q==
+X-Received: by 2002:a17:902:f391:b0:188:537d:78d9 with SMTP id f17-20020a170902f39100b00188537d78d9mr19512555ple.48.1669237086424;
+        Wed, 23 Nov 2022 12:58:06 -0800 (PST)
 Received: from bvanassche-glaptop2.roam.corp.google.com ([2601:642:4c02:686d:4311:4764:eee7:ac6d])
-        by smtp.gmail.com with ESMTPSA id i89-20020a17090a3de200b0020b2082e0acsm1858809pjc.0.2022.11.23.12.58.02
+        by smtp.gmail.com with ESMTPSA id i89-20020a17090a3de200b0020b2082e0acsm1858809pjc.0.2022.11.23.12.58.04
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 23 Nov 2022 12:58:03 -0800 (PST)
+        Wed, 23 Nov 2022 12:58:05 -0800 (PST)
 From:   Bart Van Assche <bvanassche@acm.org>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
@@ -46,9 +46,9 @@ Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
         Avri Altman <avri.altman@wdc.com>,
         Bart Van Assche <bvanassche@acm.org>,
         Ming Lei <ming.lei@redhat.com>, Keith Busch <kbusch@kernel.org>
-Subject: [PATCH v2 1/8] block: Introduce CONFIG_BLK_SUB_PAGE_SEGMENTS and QUEUE_FLAG_SUB_PAGE_SEGMENTS
-Date:   Wed, 23 Nov 2022 12:57:33 -0800
-Message-Id: <20221123205740.463185-2-bvanassche@acm.org>
+Subject: [PATCH v2 2/8] block: Support configuring limits below the page size
+Date:   Wed, 23 Nov 2022 12:57:34 -0800
+Message-Id: <20221123205740.463185-3-bvanassche@acm.org>
 X-Mailer: git-send-email 2.38.1.584.g0f3c55d4c2-goog
 In-Reply-To: <20221123205740.463185-1-bvanassche@acm.org>
 References: <20221123205740.463185-1-bvanassche@acm.org>
@@ -58,62 +58,62 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Prepare for introducing support for segments smaller than the page size
-by introducing the request queue flag QUEUE_FLAG_SUB_PAGE_SEGMENTS.
-Introduce CONFIG_BLK_SUB_PAGE_SEGMENTS to prevent that performance of
-block drivers that support segments >= PAGE_SIZE would be affected.
+Allow block drivers to configure the following if
+CONFIG_BLK_SUB_PAGE_SEGMENTS=y:
+* Maximum number of hardware sectors values smaller than
+  PAGE_SIZE >> SECTOR_SHIFT. With PAGE_SIZE = 4096 this means that values
+  below 8 become supported.
+* A maximum segment size smaller than the page size. This is most useful
+  for page sizes above 4096 bytes.
+
+The behavior of the block layer is not modified if
+CONFIG_BLK_SUB_PAGE_SEGMENTS=n.
 
 Cc: Christoph Hellwig <hch@lst.de>
 Cc: Ming Lei <ming.lei@redhat.com>
 Cc: Keith Busch <kbusch@kernel.org>
 Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 ---
- block/Kconfig          | 9 +++++++++
- include/linux/blkdev.h | 7 +++++++
- 2 files changed, 16 insertions(+)
+ block/blk-settings.c | 20 ++++++++++++--------
+ 1 file changed, 12 insertions(+), 8 deletions(-)
 
-diff --git a/block/Kconfig b/block/Kconfig
-index 444c5ab3b67e..c3857795fc0d 100644
---- a/block/Kconfig
-+++ b/block/Kconfig
-@@ -36,6 +36,15 @@ config BLOCK_LEGACY_AUTOLOAD
- 	  created on demand, but scripts that manually create device nodes and
- 	  then call losetup might rely on this behavior.
+diff --git a/block/blk-settings.c b/block/blk-settings.c
+index 0477c4d527fe..f9d78dea0291 100644
+--- a/block/blk-settings.c
++++ b/block/blk-settings.c
+@@ -122,12 +122,14 @@ EXPORT_SYMBOL(blk_queue_bounce_limit);
+ void blk_queue_max_hw_sectors(struct request_queue *q, unsigned int max_hw_sectors)
+ {
+ 	struct queue_limits *limits = &q->limits;
++	unsigned int min_max_hw_sectors = blk_queue_sub_page_segments(q) ? 1 :
++		PAGE_SIZE >> SECTOR_SHIFT;
+ 	unsigned int max_sectors;
  
-+config BLK_SUB_PAGE_SEGMENTS
-+       bool "Support segments smaller than the page size"
-+       default n
-+       help
-+	  Most storage controllers support DMA segments larger than the typical
-+	  size of a virtual memory page. Some embedded controllers only support
-+	  DMA segments smaller than the page size. Enable this option to support
-+	  such controllers.
+-	if ((max_hw_sectors << 9) < PAGE_SIZE) {
+-		max_hw_sectors = 1 << (PAGE_SHIFT - 9);
+-		printk(KERN_INFO "%s: set to minimum %d\n",
+-		       __func__, max_hw_sectors);
++	if (max_hw_sectors < min_max_hw_sectors) {
++		max_hw_sectors = min_max_hw_sectors;
++		printk(KERN_INFO "%s: set to minimum %u\n", __func__,
++		       max_hw_sectors);
+ 	}
+ 
+ 	max_hw_sectors = round_down(max_hw_sectors,
+@@ -277,10 +279,12 @@ EXPORT_SYMBOL_GPL(blk_queue_max_discard_segments);
+  **/
+ void blk_queue_max_segment_size(struct request_queue *q, unsigned int max_size)
+ {
+-	if (max_size < PAGE_SIZE) {
+-		max_size = PAGE_SIZE;
+-		printk(KERN_INFO "%s: set to minimum %d\n",
+-		       __func__, max_size);
++	unsigned int min_max_segment_size = blk_queue_sub_page_segments(q) ?
++		SECTOR_SIZE : PAGE_SIZE;
 +
- config BLK_RQ_ALLOC_TIME
- 	bool
++	if (max_size < min_max_segment_size) {
++		max_size = min_max_segment_size;
++		printk(KERN_INFO "%s: set to minimum %u\n", __func__, max_size);
+ 	}
  
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 3dbd45725b9f..a2362cf07366 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -548,6 +548,7 @@ struct request_queue {
- /* Keep blk_queue_flag_name[] in sync with the definitions below */
- #define QUEUE_FLAG_STOPPED	0	/* queue is stopped */
- #define QUEUE_FLAG_DYING	1	/* queue being torn down */
-+#define QUEUE_FLAG_SUB_PAGE_SEGMENTS 2	/* segments smaller than one page */
- #define QUEUE_FLAG_NOMERGES     3	/* disable merge attempts */
- #define QUEUE_FLAG_SAME_COMP	4	/* complete on same CPU-group */
- #define QUEUE_FLAG_FAIL_IO	5	/* fake timeout */
-@@ -614,6 +615,12 @@ bool blk_queue_flag_test_and_set(unsigned int flag, struct request_queue *q);
- #define blk_queue_sq_sched(q)	test_bit(QUEUE_FLAG_SQ_SCHED, &(q)->queue_flags)
- #define blk_queue_skip_tagset_quiesce(q) \
- 	test_bit(QUEUE_FLAG_SKIP_TAGSET_QUIESCE, &(q)->queue_flags)
-+#ifdef CONFIG_BLK_SUB_PAGE_SEGMENTS
-+#define blk_queue_sub_page_segments(q)				\
-+	test_bit(QUEUE_FLAG_SUB_PAGE_SEGMENTS, &(q)->queue_flags)
-+#else
-+#define blk_queue_sub_page_segments(q) false
-+#endif
- 
- extern void blk_set_pm_only(struct request_queue *q);
- extern void blk_clear_pm_only(struct request_queue *q);
+ 	/* see blk_queue_virt_boundary() for the explanation */
