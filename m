@@ -2,33 +2,33 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B404C433FE
-	for <linux-block@archiver.kernel.org>; Wed, 23 Nov 2022 06:04:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E661BC4332F
+	for <linux-block@archiver.kernel.org>; Wed, 23 Nov 2022 06:04:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235771AbiKWGEN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S235787AbiKWGEN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Wed, 23 Nov 2022 01:04:13 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42612 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42618 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235548AbiKWGEK (ORCPT
+        with ESMTP id S235606AbiKWGEK (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Wed, 23 Nov 2022 01:04:10 -0500
-Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2994CF2C07;
-        Tue, 22 Nov 2022 22:04:07 -0800 (PST)
-Received: from kwepemi500016.china.huawei.com (unknown [172.30.72.54])
-        by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4NH9Y31DHdz15MqG;
-        Wed, 23 Nov 2022 14:03:35 +0800 (CST)
+Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42123F2C09;
+        Tue, 22 Nov 2022 22:04:09 -0800 (PST)
+Received: from kwepemi500016.china.huawei.com (unknown [172.30.72.56])
+        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4NH9Tv4b8SzJnrS;
+        Wed, 23 Nov 2022 14:00:51 +0800 (CST)
 Received: from huawei.com (10.174.178.129) by kwepemi500016.china.huawei.com
  (7.221.188.220) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.31; Wed, 23 Nov
- 2022 14:04:05 +0800
+ 2022 14:04:06 +0800
 From:   Kemeng Shi <shikemeng@huawei.com>
 To:     <tj@kernel.org>, <josef@toxicpanda.com>, <axboe@kernel.dk>
 CC:     <cgroups@vger.kernel.org>, <linux-block@vger.kernel.org>,
         <linux-kernel@vger.kernel.org>, <shikemeng@huawei.com>
-Subject: [PATCH 02/11] blk-throttle: Fix that bps of child could exceed bps limited in parent
-Date:   Wed, 23 Nov 2022 14:03:52 +0800
-Message-ID: <20221123060401.20392-3-shikemeng@huawei.com>
+Subject: [PATCH 05/11] blk-throttle: simpfy low limit reached check in throtl_tg_can_upgrade
+Date:   Wed, 23 Nov 2022 14:03:55 +0800
+Message-ID: <20221123060401.20392-6-shikemeng@huawei.com>
 X-Mailer: git-send-email 2.14.1.windows.1
 In-Reply-To: <20221123060401.20392-1-shikemeng@huawei.com>
 References: <20221123060401.20392-1-shikemeng@huawei.com>
@@ -42,58 +42,54 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Consider situation as following (on the default hierarchy):
- HDD
-  |
-root (bps limit: 4k)
-  |
-child (bps limit :8k)
-  |
-fio bs=8k
-Rate of fio is supposed to be 4k, but result is 8k. Reason is as
-following:
-Size of single IO from fio is larger than bytes allowed in one
-throtl_slice in child, so IOs are always queued in child group first.
-When queued IOs in child are dispatched to parent group, BIO_BPS_THROTTLED
-is set and these IOs will not be limited by tg_within_bps_limit anymore.
-Fix this by:
-1. Limit IO with BIO_BPS_THROTTLED flag in tg_within_bps_limit.
-2. Ignore BIO_BPS_THROTTLED flag when accouting in throtl_charge_bio.
-There changes have no influence on situation which is not on the default
-hierarchy as each group is a single root group without parent.
+Cgroup reaches low limit if limit is zero or io is already queued. Cgroup
+will pass upgrade check if low limits of READ and WRITE are both reached.
+Simpfy the check code described above to removce repeat check and improve
+readability. There is no functional change.
 
 Signed-off-by: Kemeng Shi <shikemeng@huawei.com>
 ---
- block/blk-throttle.c | 9 +++------
- 1 file changed, 3 insertions(+), 6 deletions(-)
+ block/blk-throttle.c | 20 +++++++++-----------
+ 1 file changed, 9 insertions(+), 11 deletions(-)
 
 diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index 96aa53e30e28..b33bcf53b36e 100644
+index 01e30380c19b..322a6ee38fb6 100644
 --- a/block/blk-throttle.c
 +++ b/block/blk-throttle.c
-@@ -856,8 +856,7 @@ static bool tg_within_bps_limit(struct throtl_grp *tg, struct bio *bio,
- 	unsigned long jiffy_elapsed, jiffy_wait, jiffy_elapsed_rnd;
- 	unsigned int bio_size = throtl_bio_data_size(bio);
+@@ -1800,24 +1800,22 @@ static bool throtl_tg_is_idle(struct throtl_grp *tg)
+ 	return ret;
+ }
  
--	/* no need to throttle if this bio's bytes have been accounted */
--	if (bps_limit == U64_MAX || bio_flagged(bio, BIO_BPS_THROTTLED)) {
-+	if (bps_limit == U64_MAX) {
- 		if (wait)
- 			*wait = 0;
+-static bool throtl_tg_can_upgrade(struct throtl_grp *tg)
++static bool throtl_tg_reach_low_limit(struct throtl_grp *tg, int rw)
+ {
+ 	struct throtl_service_queue *sq = &tg->service_queue;
+-	bool read_limit, write_limit;
++	bool limit = tg->bps[rw][LIMIT_LOW] || tg->iops[rw][LIMIT_LOW];
+ 
+ 	/*
+ 	 * if cgroup reaches low limit (if low limit is 0, the cgroup always
+ 	 * reaches), it's ok to upgrade to next limit
+ 	 */
+-	read_limit = tg->bps[READ][LIMIT_LOW] || tg->iops[READ][LIMIT_LOW];
+-	write_limit = tg->bps[WRITE][LIMIT_LOW] || tg->iops[WRITE][LIMIT_LOW];
+-	if (!read_limit && !write_limit)
+-		return true;
+-	if (read_limit && sq->nr_queued[READ] &&
+-	    (!write_limit || sq->nr_queued[WRITE]))
+-		return true;
+-	if (write_limit && sq->nr_queued[WRITE] &&
+-	    (!read_limit || sq->nr_queued[READ]))
++	return !limit || sq->nr_queued[rw].
++}
++
++static bool throtl_tg_can_upgrade(struct throtl_grp *tg)
++{
++	if (throtl_tg_reach_low_limit(tg, READ) &&
++	    throtl_tg_reach_low_limit(tg, WRITE))
  		return true;
-@@ -964,10 +963,8 @@ static void throtl_charge_bio(struct throtl_grp *tg, struct bio *bio)
- 	unsigned int bio_size = throtl_bio_data_size(bio);
  
- 	/* Charge the bio to the group */
--	if (!bio_flagged(bio, BIO_BPS_THROTTLED)) {
--		tg->bytes_disp[rw] += bio_size;
--		tg->last_bytes_disp[rw] += bio_size;
--	}
-+	tg->bytes_disp[rw] += bio_size;
-+	tg->last_bytes_disp[rw] += bio_size;
- 
- 	tg->io_disp[rw]++;
- 	tg->last_io_disp[rw]++;
+ 	if (time_after_eq(jiffies,
 -- 
 2.30.0
 
