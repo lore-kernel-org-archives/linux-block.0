@@ -2,47 +2,47 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB6B5C3A59F
-	for <linux-block@archiver.kernel.org>; Wed, 23 Nov 2022 12:48:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 47083C433FE
+	for <linux-block@archiver.kernel.org>; Wed, 23 Nov 2022 12:51:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238064AbiKWMsh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 23 Nov 2022 07:48:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33752 "EHLO
+        id S238217AbiKWMvt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 23 Nov 2022 07:51:49 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33896 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238077AbiKWMr1 (ORCPT
+        with ESMTP id S238023AbiKWMv2 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 23 Nov 2022 07:47:27 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6EB2D7343C;
-        Wed, 23 Nov 2022 04:43:26 -0800 (PST)
+        Wed, 23 Nov 2022 07:51:28 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B8047FF0B;
+        Wed, 23 Nov 2022 04:44:21 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 083C461CAB;
-        Wed, 23 Nov 2022 12:43:26 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AE0A0C433C1;
-        Wed, 23 Nov 2022 12:43:24 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 6459A61CB0;
+        Wed, 23 Nov 2022 12:44:17 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 146C1C43154;
+        Wed, 23 Nov 2022 12:44:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1669207405;
-        bh=CvQ0L5K46OA2hF0GlMgqQ4n0+npdjV/E/Ozoo40TMWw=;
+        s=k20201202; t=1669207456;
+        bh=09ZYWzk9+I53RcxDP1NElPvoxKFt5KB7UxXSWWtfdKA=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=B+6HKK0C0bCASi+hI38e516nphp+GX2T/Kc1yAryT6hmh2YfX8WVdATA44f78FmpP
-         jsRdqWZgi+gTq9JeqjZ8XKtyq8VGKvYVrCEIuhTyJZOkvyH0IsSQOyGd3PviNSvIwe
-         qFh70EqCTr6ltiLiLY0lrd0jK4xRfSqC4GfrA3wYjCc1y/EIA5WpcO8HNVhJjJxhFV
-         S0DirK3DsatBi2oE3cpoZ1g3sCefEPPa8pfR58wfgujt5yE5svZH5XLCdJ3WrJlD5d
-         O+uel3XbX3nCx9ni/fG0LDutaszXed3cdq/3u7Mjp7pKLeh9QieNDRdsYjtnKCbPXm
-         cvb34grl6DVmg==
+        b=hqSW1RlGFt52xPPVJIIQfRdFvRjSu2PlXfQ3+Xz4KXj4RRwL82kd9J7oa+TvMzbn+
+         V+F+50uR+8CCsylP1P1lmhrDsuhhmCS81XwowZvnRJ0AtYUs8vwGaUQ6RwltXVHyZH
+         +6gksAy1tyHuv9ym9jRmOVXoMWkUpWnedsLlNVGq4t9JPwK3OR6TBulG7z6zPPDJct
+         R4e3nBH5eeqtZCmBKs5DThTk4Y0flzBVEm2P48VUKls5E44dEmuf4F7vmN3q7QsiT0
+         50VzuQCRMFoBdd7i7qPrzDLwoaQSt5CeAAhHb+vkeZ5SrGGT62jFrj9pyNfTAMBszG
+         OImOIUoaf1soQ==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>,
         Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
         linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.15 23/31] block: make blk_set_default_limits() private
-Date:   Wed, 23 Nov 2022 07:42:24 -0500
-Message-Id: <20221123124234.265396-23-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.10 16/22] block: make blk_set_default_limits() private
+Date:   Wed, 23 Nov 2022 07:43:31 -0500
+Message-Id: <20221123124339.265912-16-sashal@kernel.org>
 X-Mailer: git-send-email 2.35.1
-In-Reply-To: <20221123124234.265396-1-sashal@kernel.org>
-References: <20221123124234.265396-1-sashal@kernel.org>
+In-Reply-To: <20221123124339.265912-1-sashal@kernel.org>
+References: <20221123124339.265912-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -69,22 +69,22 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  3 files changed, 1 insertion(+), 2 deletions(-)
 
 diff --git a/block/blk-settings.c b/block/blk-settings.c
-index b880c70e22e4..aaedcbc20003 100644
+index c3aa7f8ee388..6ae1ca626304 100644
 --- a/block/blk-settings.c
 +++ b/block/blk-settings.c
-@@ -58,7 +58,6 @@ void blk_set_default_limits(struct queue_limits *lim)
+@@ -61,7 +61,6 @@ void blk_set_default_limits(struct queue_limits *lim)
+ 	lim->misaligned = 0;
  	lim->zoned = BLK_ZONED_NONE;
- 	lim->zone_write_granularity = 0;
  }
 -EXPORT_SYMBOL(blk_set_default_limits);
  
  /**
   * blk_set_stacking_limits - set default limits for stacking devices
 diff --git a/block/blk.h b/block/blk.h
-index aab72194d226..8af560ec6b39 100644
+index 997941cd999f..7d7a646bc6e1 100644
 --- a/block/blk.h
 +++ b/block/blk.h
-@@ -236,6 +236,7 @@ void blk_rq_set_mixed_merge(struct request *rq);
+@@ -243,6 +243,7 @@ void blk_rq_set_mixed_merge(struct request *rq);
  bool blk_rq_merge_ok(struct request *rq, struct bio *bio);
  enum elv_merge blk_try_merge(struct request *rq, struct bio *bio);
  
@@ -93,10 +93,10 @@ index aab72194d226..8af560ec6b39 100644
  
  /*
 diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 67344dfe07a7..fa923f4e0344 100644
+index 98fdf5a31fd6..82270bf8e620 100644
 --- a/include/linux/blkdev.h
 +++ b/include/linux/blkdev.h
-@@ -1126,7 +1126,6 @@ extern void blk_queue_io_min(struct request_queue *q, unsigned int min);
+@@ -1177,7 +1177,6 @@ extern void blk_queue_io_min(struct request_queue *q, unsigned int min);
  extern void blk_limits_io_opt(struct queue_limits *limits, unsigned int opt);
  extern void blk_queue_io_opt(struct request_queue *q, unsigned int opt);
  extern void blk_set_queue_depth(struct request_queue *q, unsigned int depth);
