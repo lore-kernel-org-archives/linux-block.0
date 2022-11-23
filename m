@@ -2,131 +2,85 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01DA5C43217
-	for <linux-block@archiver.kernel.org>; Wed, 23 Nov 2022 17:01:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DADD7C433FE
+	for <linux-block@archiver.kernel.org>; Wed, 23 Nov 2022 17:12:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236185AbiKWRBx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 23 Nov 2022 12:01:53 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51350 "EHLO
+        id S239288AbiKWRMQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 23 Nov 2022 12:12:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34018 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235738AbiKWRBx (ORCPT
+        with ESMTP id S238325AbiKWRLy (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 23 Nov 2022 12:01:53 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E20E32B9B;
-        Wed, 23 Nov 2022 09:01:52 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id E04F561DFD;
-        Wed, 23 Nov 2022 17:01:51 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 777BCC433D6;
-        Wed, 23 Nov 2022 17:01:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1669222911;
-        bh=o3haMfaeHZfYTyEePRwp9h5E4unKgpaM0OuqyhoXnp0=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=qo8vJIErhb/ipCwuy4gwV/i9YmIAaJMojUiZPS4IOOd8yQY7LyT3VrOZMJTKRDS9x
-         i8L49I9CCW+G4gWPmwXnGTUcpWsWu7OwHPDHLjbFVstIHlX3U3iCwopRHJdZmvOcLy
-         DUuQU3VjRGKHYyj8ctniAuEtEhb8ztF3vFHL+6eY=
-Date:   Wed, 23 Nov 2022 18:01:47 +0100
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     Jason Gunthorpe <jgg@ziepe.ca>
-Cc:     Matthew Wilcox <willy@infradead.org>,
-        Maximilian Luz <luzmaximilian@gmail.com>,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        linux-kernel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        "Rafael J. Wysocki" <rafael@kernel.org>,
-        Len Brown <lenb@kernel.org>,
-        Stefan Richter <stefanr@s5r6.in-berlin.de>,
-        Wolfram Sang <wsa@kernel.org>,
-        Alexandre Belloni <alexandre.belloni@bootlin.com>,
-        Dmitry Torokhov <dmitry.torokhov@gmail.com>,
-        Sean Young <sean@mess.org>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Rob Herring <robh+dt@kernel.org>,
-        Frank Rowand <frowand.list@gmail.com>,
-        Hans de Goede <hdegoede@redhat.com>,
-        Mark Gross <markgross@kernel.org>,
-        Vinod Koul <vkoul@kernel.org>,
-        Bard Liao <yung-chuan.liao@linux.intel.com>,
-        Pierre-Louis Bossart <pierre-louis.bossart@linux.intel.com>,
-        Sanyog Kale <sanyog.r.kale@intel.com>,
-        Andreas Noever <andreas.noever@gmail.com>,
-        Michael Jamet <michael.jamet@intel.com>,
-        Mika Westerberg <mika.westerberg@linux.intel.com>,
-        Yehezkel Bernat <YehezkelShB@gmail.com>,
-        Jiri Slaby <jirislaby@kernel.org>,
-        Heikki Krogerus <heikki.krogerus@linux.intel.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        Ming Lei <ming.lei@redhat.com>,
-        Jilin Yuan <yuanjilin@cdjrlc.com>,
-        Alan Stern <stern@rowland.harvard.edu>,
-        Sakari Ailus <sakari.ailus@linux.intel.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ira Weiny <ira.weiny@intel.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Won Chung <wonchung@google.com>, alsa-devel@alsa-project.org,
-        devicetree@vger.kernel.org, linux-acpi@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-i2c@vger.kernel.org,
-        linux-i3c@lists.infradead.org, linux-input@vger.kernel.org,
-        linux-media@vger.kernel.org, linux-serial@vger.kernel.org,
-        linux-usb@vger.kernel.org, linux1394-devel@lists.sourceforge.net,
-        platform-driver-x86@vger.kernel.org
-Subject: Re: [PATCH 3/5] driver core: make struct device_type.uevent() take a
- const *
-Message-ID: <Y35R+/eQJYI7VaDS@kroah.com>
-References: <20221123122523.1332370-1-gregkh@linuxfoundation.org>
- <20221123122523.1332370-3-gregkh@linuxfoundation.org>
- <711d5275-7e80-c00d-0cdc-0f3d52175361@gmail.com>
- <Y34hgIW8p1RlQTBB@smile.fi.intel.com>
- <97be39ed-3cea-d55a-caa6-c2652baef399@gmail.com>
- <Y34zyzdbRUdyOSkA@casper.infradead.org>
- <Y34+V2bCDdqujBDk@kroah.com>
- <Y35JfNJDppRp5bLX@ziepe.ca>
+        Wed, 23 Nov 2022 12:11:54 -0500
+Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 12919FD17;
+        Wed, 23 Nov 2022 09:11:52 -0800 (PST)
+Received: by mail-pl1-x62f.google.com with SMTP id p12so17218882plq.4;
+        Wed, 23 Nov 2022 09:11:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=NwhqRAJvGavoaGuqSrfgQhHpNiR8ljuOsT2sziprE50=;
+        b=kR4KehW+/5RtfQodotENKJN9+dUBrQYSP1Drnr1ELPapshjSBc05FeCs5WKFwRYhPF
+         5/evnW19Z3/WuKviaZQkBgYmYVsWl54dhOH3YawdfFrVbiz2wuB0KlNo28H3ATQVCRRj
+         gHOjfUzqr58hJitHQP3GkzeZasRkD9Cj71Pzok8i3r4muU/UqM93A+54CXeCmatNkCTc
+         VVwar/ZCrszc0IepuyjwUKg1EopF2V0JjDJSy82HO2WVCWX/zuXTY8vHKCzL/J50PqEu
+         o83KfGYbocXqlMkcuW3cugTYUWCoznHe9HubGFCHzhJRIq/KqnA/eNfF0C/L1x59QrhS
+         H27Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=NwhqRAJvGavoaGuqSrfgQhHpNiR8ljuOsT2sziprE50=;
+        b=Co4yWGCHqdRzNHXe6DPgG7TVGF5q1GAmgzoZ+kYgacAGAXHSyGen2dQVDDRLqOSc6j
+         YwdJuVpnzhFhYRX0q/mVEz9umXMDlKnrpO9ag9QfLxKf74e4RLvGlhqUH/HYE+IW+g4D
+         4sCoibcD9wIuWtahKCcJRuYORAF0TG5P5udwDytUHl3PWKY3bdin6Z564NBREmJOdDwE
+         3ENTlQaee4GpDgRCyF6ZSIGm2gvdudGDF8l0KZv+f6tinfIbYwI5AvUpo5Gj9ArTalGe
+         UYonRkYWxhPUc8ItAINYA1YMNNNvr8RUoR62EEZ4riw8SiuvPN2I40bXnALvAUEJez3R
+         CNAg==
+X-Gm-Message-State: ANoB5pnWLWeuThrLGZTVhH+ZnzQFpVY0dtIeTxMSz2j/Q8wX1SYZnW+8
+        FS3+DdGJpz4B0qoL5LaF+q8=
+X-Google-Smtp-Source: AA0mqf7KjgkN0jHcAVsy1r3Y3omUVQzpCEPHQxo9NJVMwkW9jfSM32OXw9Os8zoKtYe13fyfd4lXrA==
+X-Received: by 2002:a17:903:3311:b0:183:ee9e:4988 with SMTP id jk17-20020a170903331100b00183ee9e4988mr9331102plb.56.1669223511298;
+        Wed, 23 Nov 2022 09:11:51 -0800 (PST)
+Received: from localhost (2603-800c-1a02-1bae-a7fa-157f-969a-4cde.res6.spectrum.com. [2603:800c:1a02:1bae:a7fa:157f:969a:4cde])
+        by smtp.gmail.com with ESMTPSA id j3-20020a17090a318300b00218722ecac2sm1646531pjb.18.2022.11.23.09.11.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 23 Nov 2022 09:11:50 -0800 (PST)
+Sender: Tejun Heo <htejun@gmail.com>
+Date:   Wed, 23 Nov 2022 07:11:49 -1000
+From:   Tejun Heo <tj@kernel.org>
+To:     Kemeng Shi <shikemeng@huawei.com>
+Cc:     josef@toxicpanda.com, axboe@kernel.dk, cgroups@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 01/11] blk-throttle: Limit whole system if root group is
+ configured when on the default hierarchy
+Message-ID: <Y35UVRg0tTfsTdrB@slm.duckdns.org>
+References: <20221123060401.20392-1-shikemeng@huawei.com>
+ <20221123060401.20392-2-shikemeng@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Y35JfNJDppRp5bLX@ziepe.ca>
+In-Reply-To: <20221123060401.20392-2-shikemeng@huawei.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Nov 23, 2022 at 12:25:32PM -0400, Jason Gunthorpe wrote:
-> On Wed, Nov 23, 2022 at 04:37:59PM +0100, Greg Kroah-Hartman wrote:
-> > static inline struct device *__kobj_to_dev(struct kobject *kobj)
-> > {
-> >         return container_of(kobj, struct device, kobj);
-> > }
-> > 
-> > static inline const struct device *__kobj_to_dev_const(const struct kobject *kobj)
-> > {
-> >         return container_of(kobj, const struct device, kobj);
-> > }
-> > 
-> > /*
-> >  * container_of() will happily take a const * and spit back a non-const * as it
-> >  * is just doing pointer math.  But we want to be a bit more careful in the
-> >  * driver code, so manually force any const * of a kobject to also be a const *
-> >  * to a device.
-> >  */
-> > #define kobj_to_dev(kobj)                                       \
-> >         _Generic((kobj),                                        \
-> >                  const struct kobject *: __kobj_to_dev_const,   \
-> >                  struct kobject *: __kobj_to_dev)(kobj)
-> > 
-> > 
-> > Want me to do the same thing here as well?
-> 
-> It would be nice to have a shared macro code gen all of the above
-> instead of copy and pasting it. Then maybe other cases beyond struct
-> device could adopt const too..
+On Wed, Nov 23, 2022 at 02:03:51PM +0800, Kemeng Shi wrote:
+> Quoted from comment in throtl_pd_init: "If on the default hierarchy, we
+> switch to properly hierarchical behavior where limits on a given
+> throtl_grp are applied to the whole subtree rather than just the group
+> itself. e.g. If 16M read_bps limit is set on the root group, the whole
+> system can' exceed 16M for the device."
 
-I think I tried to create such a beast, but failed, so ended up
-open-coding it in a few places in the USB headers already.  I can try it
-again, but the redirection gets tricky (defines creating defines...)
+On the default hierarchy (cgroup2), the throttle interface files don't exist
+in the root cgroup. In general, cgroup doesn't wanna be in the business of
+restricting resources at the system level.
 
-thanks,
+Thanks.
 
-greg k-h
+-- 
+tejun
