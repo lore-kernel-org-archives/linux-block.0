@@ -2,97 +2,115 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 71302C43219
-	for <linux-block@archiver.kernel.org>; Wed, 23 Nov 2022 17:39:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 35409C43219
+	for <linux-block@archiver.kernel.org>; Wed, 23 Nov 2022 17:49:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238961AbiKWRjY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 23 Nov 2022 12:39:24 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58854 "EHLO
+        id S239183AbiKWRtw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 23 Nov 2022 12:49:52 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40988 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239111AbiKWRjU (ORCPT
+        with ESMTP id S239147AbiKWRtu (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 23 Nov 2022 12:39:20 -0500
-Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77156976F3
-        for <linux-block@vger.kernel.org>; Wed, 23 Nov 2022 09:39:13 -0800 (PST)
-Received: by mail-pj1-x1029.google.com with SMTP id v3-20020a17090ac90300b00218441ac0f6so4162233pjt.0
-        for <linux-block@vger.kernel.org>; Wed, 23 Nov 2022 09:39:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vVheXuX8LGH5JYP/sNnMLkgS4V4oAwG+GeizIcMSxe4=;
-        b=voPkRtcK5zM5t0+MCDyFqyjwkx5NSDyvO45EyLu6XanHIeHkZqsA51JaP4qIocDEPI
-         o3N6ixoUtaINWFLA/nJTFA+HS8vGAR+RIeTYNSNFtA3j5Xp0Mzg0L0B6U7sn1SuevGmq
-         S+BSCuFlrMwVWZULLZV6zfLw1VE8ZycN96ZNi2BCxww/5C6Nf5Q4GCxZM0mLVpTa6NgG
-         JTlxlvi14TXrl91IxpPPjYzmw+qoVq+6CwaNwIK3j/sv2NVjqMyNy+zf2pxX0CZ+oN96
-         l3artVER3K0129JMEOWBvIRQPY4Nt5DY/fyJZPuj2810aNvxoiJLpRue375TVdnrfkmo
-         BPfg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=vVheXuX8LGH5JYP/sNnMLkgS4V4oAwG+GeizIcMSxe4=;
-        b=ftG/BF+dgdkxZpZWx56hYqYwbDn9mr+tF7hT9e9P+GuFODZsvWOW4tx2CNaeA0ebWJ
-         PSfzKXLonXF5GuMfkWH9/yVfNO3bxc6+skSKW7Fp4uTsQtoYQSXbtqx4TGqnrI7X6LIz
-         JiKYPLyZHbeTZSeDYe2Jg/N7CMs/geKDTAvLIiHwFnG0lXy/8nGH6Mlyo++fWn6zCzLm
-         PF9KJfCAMWlsuPvFb++hrUx3B4X5UER6zUA1Dz5vv3rQ1KYTKTjXn5zYbDQyw2iQ8lXh
-         F0Jx98JtVz4yUPyZsExbHfr0ComiPtwdqMscBEgJWzh/OvqrwUDHhc9x/CaUhCZ4hRwi
-         m92g==
-X-Gm-Message-State: ANoB5plTDfObLzTejVje+LfUPfvAKCFTHhKhSoNeMbtMFVNX/vYDVMT1
-        GKFmakJCWSNMMPR9Uw/TSQm32tZ8floHBw==
-X-Google-Smtp-Source: AA0mqf4HT0ag6jsmUP/jIl+QneeuuS08tScB3h9atP6vSGnDzwQbTG0o2pYh1bUh3D/xQAW7fSsnwg==
-X-Received: by 2002:a17:902:ec01:b0:186:878e:3b0d with SMTP id l1-20020a170902ec0100b00186878e3b0dmr9707489pld.149.1669225152681;
-        Wed, 23 Nov 2022 09:39:12 -0800 (PST)
-Received: from [127.0.0.1] ([2600:380:4a4b:9d2c:aa9c:d2b:66c9:e23f])
-        by smtp.gmail.com with ESMTPSA id j4-20020a170903028400b001743ba85d39sm14468360plr.110.2022.11.23.09.39.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 23 Nov 2022 09:39:12 -0800 (PST)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     linux-block@vger.kernel.org, Eric Biggers <ebiggers@google.com>,
-        Christoph Hellwig <hch@lst.de>
-In-Reply-To: <20221123172923.434339-1-bvanassche@acm.org>
-References: <20221123172923.434339-1-bvanassche@acm.org>
-Subject: Re: [PATCH] blk-crypto: Add a missing include directive
-Message-Id: <166922515142.2606.472578798999047121.b4-ty@kernel.dk>
-Date:   Wed, 23 Nov 2022 10:39:11 -0700
+        Wed, 23 Nov 2022 12:49:50 -0500
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 362F1BE266;
+        Wed, 23 Nov 2022 09:49:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=3fTJtAhCYVf4T6+HaU0lUlvFevgLRUqxFHqxF0+M6mQ=; b=PsGxbrOAWhmOQwY2+t8gUj0lt8
+        YgJWe0wCbRmKhkaNMxQrEv6bl/KfCT3fTToiLGDu7OHzaxHKam06wEd44l0yMXWihhru3JN5dbOz+
+        z7yp7UE/E/I/YneKKLNgOcj5+nccs/cC3guuN8LzGUby6Doiinv0fCWvvxMlXivAGj6u6PF+riLi2
+        LeA79P9G/yt6pxvybg6aQ4YZkhos9sIpY/uuOe1/sV+1gr3feJnCNyFNIxwprdY1Hq9cLd3Ygp5jJ
+        f9FYMdZAoZHQ1ovdLLTBLm/NC7Jcs4zIddL8Sm83AguCkSkYweKgbyn70U1T/J5pD3EC9oSGcxcc2
+        L9pWqQRQ==;
+Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1oxtsO-007sVm-GW; Wed, 23 Nov 2022 17:49:36 +0000
+Date:   Wed, 23 Nov 2022 17:49:36 +0000
+From:   Matthew Wilcox <willy@infradead.org>
+To:     Jason Gunthorpe <jgg@ziepe.ca>
+Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Maximilian Luz <luzmaximilian@gmail.com>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        linux-kernel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        "Rafael J. Wysocki" <rafael@kernel.org>,
+        Len Brown <lenb@kernel.org>,
+        Stefan Richter <stefanr@s5r6.in-berlin.de>,
+        Wolfram Sang <wsa@kernel.org>,
+        Alexandre Belloni <alexandre.belloni@bootlin.com>,
+        Dmitry Torokhov <dmitry.torokhov@gmail.com>,
+        Sean Young <sean@mess.org>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Rob Herring <robh+dt@kernel.org>,
+        Frank Rowand <frowand.list@gmail.com>,
+        Hans de Goede <hdegoede@redhat.com>,
+        Mark Gross <markgross@kernel.org>,
+        Vinod Koul <vkoul@kernel.org>,
+        Bard Liao <yung-chuan.liao@linux.intel.com>,
+        Pierre-Louis Bossart <pierre-louis.bossart@linux.intel.com>,
+        Sanyog Kale <sanyog.r.kale@intel.com>,
+        Andreas Noever <andreas.noever@gmail.com>,
+        Michael Jamet <michael.jamet@intel.com>,
+        Mika Westerberg <mika.westerberg@linux.intel.com>,
+        Yehezkel Bernat <YehezkelShB@gmail.com>,
+        Jiri Slaby <jirislaby@kernel.org>,
+        Heikki Krogerus <heikki.krogerus@linux.intel.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        Ming Lei <ming.lei@redhat.com>,
+        Jilin Yuan <yuanjilin@cdjrlc.com>,
+        Alan Stern <stern@rowland.harvard.edu>,
+        Sakari Ailus <sakari.ailus@linux.intel.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ira Weiny <ira.weiny@intel.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Won Chung <wonchung@google.com>, alsa-devel@alsa-project.org,
+        devicetree@vger.kernel.org, linux-acpi@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-i2c@vger.kernel.org,
+        linux-i3c@lists.infradead.org, linux-input@vger.kernel.org,
+        linux-media@vger.kernel.org, linux-serial@vger.kernel.org,
+        linux-usb@vger.kernel.org, linux1394-devel@lists.sourceforge.net,
+        platform-driver-x86@vger.kernel.org
+Subject: Re: [PATCH 3/5] driver core: make struct device_type.uevent() take a
+ const *
+Message-ID: <Y35dMIaNYSE0Cykd@casper.infradead.org>
+References: <20221123122523.1332370-1-gregkh@linuxfoundation.org>
+ <20221123122523.1332370-3-gregkh@linuxfoundation.org>
+ <711d5275-7e80-c00d-0cdc-0f3d52175361@gmail.com>
+ <Y34hgIW8p1RlQTBB@smile.fi.intel.com>
+ <97be39ed-3cea-d55a-caa6-c2652baef399@gmail.com>
+ <Y34zyzdbRUdyOSkA@casper.infradead.org>
+ <Y34+V2bCDdqujBDk@kroah.com>
+ <Y35JfNJDppRp5bLX@ziepe.ca>
+ <Y35R+/eQJYI7VaDS@kroah.com>
+ <Y35YlI93UBuTfgYy@ziepe.ca>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-Mailer: b4 0.11.0-dev-28747
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Y35YlI93UBuTfgYy@ziepe.ca>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, 23 Nov 2022 09:29:23 -0800, Bart Van Assche wrote:
-> Allow the compiler to verify consistency of function declarations and
-> function definitions. This patch fixes the following sparse errors:
+On Wed, Nov 23, 2022 at 01:29:56PM -0400, Jason Gunthorpe wrote:
+> #define generic_container_of(in_type, in, out_type, out_member) \
+> 	_Generic(in,                                        \
+>                   const in_type *: ((const out_type *)container_of(in, out_type, out_member)),   \
+>                   in_type *: ((out_type *)container_of(in, out_type, out_member)) \
+> 		  )
+
+There's a neat trick I found in seqlock.h:
+
+#define generic_container_of(in_t, in, out_t, m)			\
+	_Generic(*(in),							\
+		const in_t: ((const out_t *)container_of(in, out_t, m)), \
+		in_t: ((out_t *)container_of(in, out_type, m))	\
+	)
+
+and now it fits in 80 columns ;-)
+
+> #define kobj_to_dev(__kobj) \
+> 	generic_container_of(struct kobject, __kobj, struct device, kobj)
 > 
-> block/blk-crypto-profile.c:241:14: error: no previous prototype for ‘blk_crypto_get_keyslot’ [-Werror=missing-prototypes]
->   241 | blk_status_t blk_crypto_get_keyslot(struct blk_crypto_profile *profile,
->       |              ^~~~~~~~~~~~~~~~~~~~~~
-> block/blk-crypto-profile.c:318:6: error: no previous prototype for ‘blk_crypto_put_keyslot’ [-Werror=missing-prototypes]
->   318 | void blk_crypto_put_keyslot(struct blk_crypto_keyslot *slot)
->       |      ^~~~~~~~~~~~~~~~~~~~~~
-> block/blk-crypto-profile.c:344:6: error: no previous prototype for ‘__blk_crypto_cfg_supported’ [-Werror=missing-prototypes]
->   344 | bool __blk_crypto_cfg_supported(struct blk_crypto_profile *profile,
->       |      ^~~~~~~~~~~~~~~~~~~~~~~~~~
-> block/blk-crypto-profile.c:373:5: error: no previous prototype for ‘__blk_crypto_evict_key’ [-Werror=missing-prototypes]
->   373 | int __blk_crypto_evict_key(struct blk_crypto_profile *profile,
->       |     ^~~~~~~~~~~~~~~~~~~~~~
-> 
-> [...]
-
-Applied, thanks!
-
-[1/1] blk-crypto: Add a missing include directive
-      commit: 85168d416e5d3184b77dbec8fee75c9439894afa
-
-Best regards,
--- 
-Jens Axboe
-
-
+> Jason
