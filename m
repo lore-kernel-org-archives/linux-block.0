@@ -2,118 +2,95 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DAC3BC433FE
-	for <linux-block@archiver.kernel.org>; Wed, 23 Nov 2022 18:00:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 120ADC433FE
+	for <linux-block@archiver.kernel.org>; Wed, 23 Nov 2022 18:14:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238741AbiKWSAZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 23 Nov 2022 13:00:25 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52886 "EHLO
+        id S239569AbiKWSOa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 23 Nov 2022 13:14:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40588 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238650AbiKWSAY (ORCPT
+        with ESMTP id S239572AbiKWSNi (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 23 Nov 2022 13:00:24 -0500
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A940D2D741;
-        Wed, 23 Nov 2022 10:00:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=EYzonTBkqTC9UWGLyjpc9x9J1BcQF0kByl1sDiQq+FM=; b=RZfJNgokp9yAuCF0f4VaqGLucW
-        jadEdnjqdDcWiMevKYrbHCLGV91kOSbZOy+jqSyoYv9E1+mOnaun2MEVyYCnR+Rn5MSiME3RW9iy0
-        Bg57st+nr6Bau6DxXwclhYnN499E3wW1etLZIS2mzdI43oDTyCxs5p4X0ehT80+8Iavk5Zca6yumq
-        YdXIfKJgwyxbKfoKRtq/OI/ZrZKLqeNrPwBXzRi2ZcZqmM9X7PyZvmySE8cTVDIAuteWIHciyXQMT
-        cljX/6emsm+HvGcH7ZS2ZKGaksXgjZrBVPjLjECTL0E/SnS5GQvEqAjSU1r78ItrP0pbE9w5a9fXZ
-        GTzAK9qg==;
-Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1oxu2p-007t5i-Iz; Wed, 23 Nov 2022 18:00:23 +0000
-Date:   Wed, 23 Nov 2022 18:00:23 +0000
-From:   Matthew Wilcox <willy@infradead.org>
-To:     Jason Gunthorpe <jgg@ziepe.ca>
-Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Maximilian Luz <luzmaximilian@gmail.com>,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        linux-kernel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        "Rafael J. Wysocki" <rafael@kernel.org>,
-        Len Brown <lenb@kernel.org>,
-        Stefan Richter <stefanr@s5r6.in-berlin.de>,
-        Wolfram Sang <wsa@kernel.org>,
-        Alexandre Belloni <alexandre.belloni@bootlin.com>,
-        Dmitry Torokhov <dmitry.torokhov@gmail.com>,
-        Sean Young <sean@mess.org>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Rob Herring <robh+dt@kernel.org>,
-        Frank Rowand <frowand.list@gmail.com>,
-        Hans de Goede <hdegoede@redhat.com>,
-        Mark Gross <markgross@kernel.org>,
-        Vinod Koul <vkoul@kernel.org>,
-        Bard Liao <yung-chuan.liao@linux.intel.com>,
-        Pierre-Louis Bossart <pierre-louis.bossart@linux.intel.com>,
-        Sanyog Kale <sanyog.r.kale@intel.com>,
-        Andreas Noever <andreas.noever@gmail.com>,
-        Michael Jamet <michael.jamet@intel.com>,
-        Mika Westerberg <mika.westerberg@linux.intel.com>,
-        Yehezkel Bernat <YehezkelShB@gmail.com>,
-        Jiri Slaby <jirislaby@kernel.org>,
-        Heikki Krogerus <heikki.krogerus@linux.intel.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        Ming Lei <ming.lei@redhat.com>,
-        Jilin Yuan <yuanjilin@cdjrlc.com>,
-        Alan Stern <stern@rowland.harvard.edu>,
-        Sakari Ailus <sakari.ailus@linux.intel.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ira Weiny <ira.weiny@intel.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Won Chung <wonchung@google.com>, alsa-devel@alsa-project.org,
-        devicetree@vger.kernel.org, linux-acpi@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-i2c@vger.kernel.org,
-        linux-i3c@lists.infradead.org, linux-input@vger.kernel.org,
-        linux-media@vger.kernel.org, linux-serial@vger.kernel.org,
-        linux-usb@vger.kernel.org, linux1394-devel@lists.sourceforge.net,
-        platform-driver-x86@vger.kernel.org
-Subject: Re: [PATCH 3/5] driver core: make struct device_type.uevent() take a
- const *
-Message-ID: <Y35ftyYlE8FX8xQO@casper.infradead.org>
-References: <711d5275-7e80-c00d-0cdc-0f3d52175361@gmail.com>
- <Y34hgIW8p1RlQTBB@smile.fi.intel.com>
- <97be39ed-3cea-d55a-caa6-c2652baef399@gmail.com>
- <Y34zyzdbRUdyOSkA@casper.infradead.org>
- <Y34+V2bCDdqujBDk@kroah.com>
- <Y35JfNJDppRp5bLX@ziepe.ca>
- <Y35R+/eQJYI7VaDS@kroah.com>
- <Y35YlI93UBuTfgYy@ziepe.ca>
- <Y35dMIaNYSE0Cykd@casper.infradead.org>
- <Y35enjI+dhhqiG3B@ziepe.ca>
+        Wed, 23 Nov 2022 13:13:38 -0500
+Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 226D9DFAF;
+        Wed, 23 Nov 2022 10:10:00 -0800 (PST)
+Received: by mail-pj1-x102d.google.com with SMTP id w4-20020a17090ac98400b002186f5d7a4cso2859182pjt.0;
+        Wed, 23 Nov 2022 10:10:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=42jiVvL+Ts2qh8Knn9mc2OntlNZr+ruehTRXIYJtsgE=;
+        b=kGEGxym2YsPDl+okJR+jAn9W99iCg2L5fctazVNfEVJQ6iw7n7XVcxJnKnNmYjd6g6
+         u6u6XnwbjVrt0w8j72DAle4dZGDdtfBW8X9zTc81l5maOtamqMfUIaUQwafb8lOvrWGO
+         qINUff3Ku+XIthIeKcEVc7busmkpJoMzZYZYaogshvbYljNoFzNiXCuVjwBalmvJcrBT
+         RIfqC8i+i1MU6as4+/8XsNCXD8L1AVZJFkyLTtmZ81dFQjtaSLreuez9uTMsF/jZZw3n
+         QQ7uwWxo01UW971auvwjUE1twN8Qs0LmIOAV+H8FsQetN7TJ3taVuownfeYPwHTjHQqC
+         G7kw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=42jiVvL+Ts2qh8Knn9mc2OntlNZr+ruehTRXIYJtsgE=;
+        b=rL0Et8rbi5utMRm1jglbVoT20scF8yu09lounWABPOHCFD82LnkpOifrjL0b5wffWk
+         zAH4OkcScRSWEogI0c4PLLzrbEijSx+eMilO0P7iQp3Q/5I8kbmge52N08RKx5iQwsy6
+         8DST1boSqPbBq/h8+jDhpUGBBb82lQqqs3XYUz6J5baB09JpwEDMLs5Soyc5ExbT2WXU
+         Pqrm87jdaV8ns/DQcRFArK5qtMUFpKCgwimnHSJtkgl6uurE2IUrhxsf2GnHCiTKW55F
+         qZo2VK4PriHKUaTOBPVjk74a4sgyhfuiripe7uGxsVsLar3s213lMWXQVmLVwm+TX1Ni
+         La6Q==
+X-Gm-Message-State: ANoB5plYYOwB1ZPKTRJVrP/N7GmUQcWeJjWmn6Md5f2+V4q1YRxU0ot0
+        8IxBYEDhq16bA+AtMhATqNc=
+X-Google-Smtp-Source: AA0mqf5kuG7tARTAIVt0J36rhq6lFOFV3bxt97HboHYXGMYzhr0PyTXjm63gzdQX3EzbzSmCwQy7sw==
+X-Received: by 2002:a17:902:ea06:b0:186:abaf:8fe with SMTP id s6-20020a170902ea0600b00186abaf08femr23078476plg.95.1669226999341;
+        Wed, 23 Nov 2022 10:09:59 -0800 (PST)
+Received: from localhost (2603-800c-1a02-1bae-a7fa-157f-969a-4cde.res6.spectrum.com. [2603:800c:1a02:1bae:a7fa:157f:969a:4cde])
+        by smtp.gmail.com with ESMTPSA id w11-20020aa79a0b000000b0056bad6ff1b8sm12932685pfj.101.2022.11.23.10.09.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 23 Nov 2022 10:09:58 -0800 (PST)
+Sender: Tejun Heo <htejun@gmail.com>
+Date:   Wed, 23 Nov 2022 08:09:57 -1000
+From:   Tejun Heo <tj@kernel.org>
+To:     Kemeng Shi <shikemeng@huawei.com>
+Cc:     josef@toxicpanda.com, axboe@kernel.dk, cgroups@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 02/11] blk-throttle: Fix that bps of child could exceed
+ bps limited in parent
+Message-ID: <Y35h9SmFeEJtBNgM@slm.duckdns.org>
+References: <20221123060401.20392-1-shikemeng@huawei.com>
+ <20221123060401.20392-3-shikemeng@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Y35enjI+dhhqiG3B@ziepe.ca>
+In-Reply-To: <20221123060401.20392-3-shikemeng@huawei.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Nov 23, 2022 at 01:55:42PM -0400, Jason Gunthorpe wrote:
-> On Wed, Nov 23, 2022 at 05:49:36PM +0000, Matthew Wilcox wrote:
-> > On Wed, Nov 23, 2022 at 01:29:56PM -0400, Jason Gunthorpe wrote:
-> > > #define generic_container_of(in_type, in, out_type, out_member) \
-> > > 	_Generic(in,                                        \
-> > >                   const in_type *: ((const out_type *)container_of(in, out_type, out_member)),   \
-> > >                   in_type *: ((out_type *)container_of(in, out_type, out_member)) \
-> > > 		  )
-> > 
-> > There's a neat trick I found in seqlock.h:
-> > 
-> > #define generic_container_of(in_t, in, out_t, m)			\
-> > 	_Generic(*(in),							\
-> > 		const in_t: ((const out_t *)container_of(in, out_t, m)), \
-> > 		in_t: ((out_t *)container_of(in, out_type, m))	\
-> > 	)
-> >
-> > and now it fits in 80 columns ;-)
-> 
-> Aside from less letters, is their another benifit to using *(in) ?
+On Wed, Nov 23, 2022 at 02:03:52PM +0800, Kemeng Shi wrote:
+> @@ -964,10 +963,8 @@ static void throtl_charge_bio(struct throtl_grp *tg, struct bio *bio)
+>  	unsigned int bio_size = throtl_bio_data_size(bio);
+>  
+>  	/* Charge the bio to the group */
+> -	if (!bio_flagged(bio, BIO_BPS_THROTTLED)) {
+> -		tg->bytes_disp[rw] += bio_size;
+> -		tg->last_bytes_disp[rw] += bio_size;
+> -	}
+> +	tg->bytes_disp[rw] += bio_size;
+> +	tg->last_bytes_disp[rw] += bio_size;
 
-I don't think so.  It just looks nicer to me than putting the star in
-each case.  If I'd thought of it, I would have done it to page_folio(),
-but I won't change it now.
+Are you sure this isn't gonna lead to double accounting? IIRC, the primary
+purpose of this flag is avoiding duplicate accounting of bios which end up
+going through the throttling path multiple times for whatever reason and
+we've had numerous breakages around it.
+
+To address the problem you're describing in this patch, wouldn't it make
+more sense to set the flag only when the bio traversed the entire tree
+rather than after each tg?
+
+Thanks.
+
+-- 
+tejun
