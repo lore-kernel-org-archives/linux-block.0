@@ -2,33 +2,33 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15B73C4332F
-	for <linux-block@archiver.kernel.org>; Wed, 23 Nov 2022 06:04:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 86FADC4332F
+	for <linux-block@archiver.kernel.org>; Wed, 23 Nov 2022 06:04:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235804AbiKWGEO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 23 Nov 2022 01:04:14 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42624 "EHLO
+        id S235818AbiKWGEQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 23 Nov 2022 01:04:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42616 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235611AbiKWGEK (ORCPT
+        with ESMTP id S235620AbiKWGEK (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Wed, 23 Nov 2022 01:04:10 -0500
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 29833DB86F;
-        Tue, 22 Nov 2022 22:04:07 -0800 (PST)
-Received: from kwepemi500016.china.huawei.com (unknown [172.30.72.54])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4NH9Y15C6xzmW6g;
-        Wed, 23 Nov 2022 14:03:33 +0800 (CST)
+Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F3BB729A9;
+        Tue, 22 Nov 2022 22:04:08 -0800 (PST)
+Received: from kwepemi500016.china.huawei.com (unknown [172.30.72.53])
+        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4NH9Tv0SYGzJnrQ;
+        Wed, 23 Nov 2022 14:00:51 +0800 (CST)
 Received: from huawei.com (10.174.178.129) by kwepemi500016.china.huawei.com
  (7.221.188.220) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.31; Wed, 23 Nov
- 2022 14:04:04 +0800
+ 2022 14:04:06 +0800
 From:   Kemeng Shi <shikemeng@huawei.com>
 To:     <tj@kernel.org>, <josef@toxicpanda.com>, <axboe@kernel.dk>
 CC:     <cgroups@vger.kernel.org>, <linux-block@vger.kernel.org>,
         <linux-kernel@vger.kernel.org>, <shikemeng@huawei.com>
-Subject: [PATCH 01/11] blk-throttle: Limit whole system if root group is configured when on the default hierarchy
-Date:   Wed, 23 Nov 2022 14:03:51 +0800
-Message-ID: <20221123060401.20392-2-shikemeng@huawei.com>
+Subject: [PATCH 04/11] blk-throttle: correct calculation of wait time in tg_may_dispatch
+Date:   Wed, 23 Nov 2022 14:03:54 +0800
+Message-ID: <20221123060401.20392-5-shikemeng@huawei.com>
 X-Mailer: git-send-email 2.14.1.windows.1
 In-Reply-To: <20221123060401.20392-1-shikemeng@huawei.com>
 References: <20221123060401.20392-1-shikemeng@huawei.com>
@@ -42,44 +42,123 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Quoted from comment in throtl_pd_init: "If on the default hierarchy, we
-switch to properly hierarchical behavior where limits on a given
-throtl_grp are applied to the whole subtree rather than just the group
-itself. e.g. If 16M read_bps limit is set on the root group, the whole
-system can' exceed 16M for the device."
-Commit b22c417c885ea9 ("blk-throttle: configure bps/iops limit for
-cgroup in low limit") broke this rule and did not explain why.
-Restore the ability to limit the whole system by root group.
+If bps and iops both reach limit, we always return bps wait time as
+tg_within_iops_limit is after "tg_within_bps_limit(tg, bio, bps_limit) &&"
+and will not be called if tg_within_bps_limit return true.
+
+Fix this by always calling tg_within_bps_limit and tg_within_iops_limit
+to get wait time for both bps and iops.
+
+Observed that:
+1. Wait time in tg_within_iops_limit/tg_within_bps_limit need always
+be stored as wait argument is always passed.
+2. Stored wait time is zero if iops/bps is limited otherwise non-zero
+is stored.
+Simpfy tg_within_iops_limit/tg_within_bps_limit by removing wait argument
+and return wait time directly. Caller tg_may_dispatch checks if wait time
+is zero to find if iops/bps is limited.
 
 Signed-off-by: Kemeng Shi <shikemeng@huawei.com>
 ---
- block/blk-throttle.c | 6 ------
- 1 file changed, 6 deletions(-)
+ block/blk-throttle.c | 38 +++++++++++++-------------------------
+ 1 file changed, 13 insertions(+), 25 deletions(-)
 
 diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index 847721dc2b2b..96aa53e30e28 100644
+index acfac916ed99..01e30380c19b 100644
 --- a/block/blk-throttle.c
 +++ b/block/blk-throttle.c
-@@ -150,9 +150,6 @@ static uint64_t tg_bps_limit(struct throtl_grp *tg, int rw)
- 	struct throtl_data *td;
- 	uint64_t ret;
+@@ -815,17 +815,15 @@ static void tg_update_carryover(struct throtl_grp *tg)
+ 		   tg->carryover_ios[READ], tg->carryover_ios[WRITE]);
+ }
  
--	if (cgroup_subsys_on_dfl(io_cgrp_subsys) && !blkg->parent)
--		return U64_MAX;
--
- 	td = tg->td;
- 	ret = tg->bps[rw][td->limit_index];
- 	if (ret == 0 && td->limit_index == LIMIT_LOW) {
-@@ -180,9 +177,6 @@ static unsigned int tg_iops_limit(struct throtl_grp *tg, int rw)
- 	struct throtl_data *td;
- 	unsigned int ret;
+-static bool tg_within_iops_limit(struct throtl_grp *tg, struct bio *bio,
+-				 u32 iops_limit, unsigned long *wait)
++static unsigned long tg_within_iops_limit(struct throtl_grp *tg, struct bio *bio,
++				 u32 iops_limit)
+ {
+ 	bool rw = bio_data_dir(bio);
+ 	unsigned int io_allowed;
+ 	unsigned long jiffy_elapsed, jiffy_wait, jiffy_elapsed_rnd;
  
--	if (cgroup_subsys_on_dfl(io_cgrp_subsys) && !blkg->parent)
--		return UINT_MAX;
+ 	if (iops_limit == UINT_MAX) {
+-		if (wait)
+-			*wait = 0;
+-		return true;
++		return 0;
+ 	}
+ 
+ 	jiffy_elapsed = jiffies - tg->slice_start[rw];
+@@ -835,21 +833,16 @@ static bool tg_within_iops_limit(struct throtl_grp *tg, struct bio *bio,
+ 	io_allowed = calculate_io_allowed(iops_limit, jiffy_elapsed_rnd) +
+ 		     tg->carryover_ios[rw];
+ 	if (tg->io_disp[rw] + 1 <= io_allowed) {
+-		if (wait)
+-			*wait = 0;
+-		return true;
++		return 0;
+ 	}
+ 
+ 	/* Calc approx time to dispatch */
+ 	jiffy_wait = jiffy_elapsed_rnd - jiffy_elapsed;
 -
- 	td = tg->td;
- 	ret = tg->iops[rw][td->limit_index];
- 	if (ret == 0 && tg->td->limit_index == LIMIT_LOW) {
+-	if (wait)
+-		*wait = jiffy_wait;
+-	return false;
++	return jiffy_wait;
+ }
+ 
+-static bool tg_within_bps_limit(struct throtl_grp *tg, struct bio *bio,
+-				u64 bps_limit, unsigned long *wait)
++static unsigned long tg_within_bps_limit(struct throtl_grp *tg, struct bio *bio,
++				u64 bps_limit)
+ {
+ 	bool rw = bio_data_dir(bio);
+ 	u64 bytes_allowed, extra_bytes;
+@@ -857,9 +850,7 @@ static bool tg_within_bps_limit(struct throtl_grp *tg, struct bio *bio,
+ 	unsigned int bio_size = throtl_bio_data_size(bio);
+ 
+ 	if (bps_limit == U64_MAX) {
+-		if (wait)
+-			*wait = 0;
+-		return true;
++		return 0;
+ 	}
+ 
+ 	jiffy_elapsed = jiffy_elapsed_rnd = jiffies - tg->slice_start[rw];
+@@ -872,9 +863,7 @@ static bool tg_within_bps_limit(struct throtl_grp *tg, struct bio *bio,
+ 	bytes_allowed = calculate_bytes_allowed(bps_limit, jiffy_elapsed_rnd) +
+ 			tg->carryover_bytes[rw];
+ 	if (tg->bytes_disp[rw] + bio_size <= bytes_allowed) {
+-		if (wait)
+-			*wait = 0;
+-		return true;
++		return 0;
+ 	}
+ 
+ 	/* Calc approx time to dispatch */
+@@ -889,9 +878,7 @@ static bool tg_within_bps_limit(struct throtl_grp *tg, struct bio *bio,
+ 	 * up we did. Add that time also.
+ 	 */
+ 	jiffy_wait = jiffy_wait + (jiffy_elapsed_rnd - jiffy_elapsed);
+-	if (wait)
+-		*wait = jiffy_wait;
+-	return false;
++	return jiffy_wait;
+ }
+ 
+ /*
+@@ -939,8 +926,9 @@ static bool tg_may_dispatch(struct throtl_grp *tg, struct bio *bio,
+ 				jiffies + tg->td->throtl_slice);
+ 	}
+ 
+-	if (tg_within_bps_limit(tg, bio, bps_limit, &bps_wait) &&
+-	    tg_within_iops_limit(tg, bio, iops_limit, &iops_wait)) {
++	bps_wait = tg_within_bps_limit(tg, bio, bps_limit);
++	iops_wait = tg_within_iops_limit(tg, bio, iops_limit);
++	if (bps_wait + iops_wait == 0) {
+ 		if (wait)
+ 			*wait = 0;
+ 		return true;
 -- 
 2.30.0
 
