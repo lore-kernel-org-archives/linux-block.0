@@ -2,128 +2,173 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 81AF5C433FE
-	for <linux-block@archiver.kernel.org>; Wed, 23 Nov 2022 23:17:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B7C9C47088
+	for <linux-block@archiver.kernel.org>; Wed, 23 Nov 2022 23:24:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229645AbiKWXRp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 23 Nov 2022 18:17:45 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47208 "EHLO
+        id S229922AbiKWXYo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 23 Nov 2022 18:24:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58780 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229672AbiKWXRo (ORCPT
+        with ESMTP id S229928AbiKWXYk (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 23 Nov 2022 18:17:44 -0500
-Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com [209.85.216.53])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F360DF17
-        for <linux-block@vger.kernel.org>; Wed, 23 Nov 2022 15:17:40 -0800 (PST)
-Received: by mail-pj1-f53.google.com with SMTP id q96-20020a17090a1b6900b00218b8f9035cso53058pjq.5
-        for <linux-block@vger.kernel.org>; Wed, 23 Nov 2022 15:17:40 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:content-language:cc:to:subject:from
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=6KjeuimzDZ/Cx4Hsf5YDM0APCp0nao9auzl1Uk+IHGM=;
-        b=RW2kpthqUzDUyN5jIYmLk0KjFLJLSy9t3V0XOQHNnWrvbltxlWdvdaBDk+nb22CXoI
-         AtfcFehgmrMX2fu+N6ENuipr5UROd85mQacqFh0rFO2vHcJ7mAZM+fY8IE0/YBU3sDd8
-         Cd2rzcNlBwecFN3e6C2BNWiWTBgE8FnWUl8NZWmYvM8xcTFml5d535xb3zqxsxQLTXqm
-         4VeIN6mq+PV7TGDfBYyHN+Mv7hWTRedHt0xIbUHal8RGgzQR5yhpe/t1PPAxzBL7YEgB
-         VGSh5BcDDu6KkfkJktQsR726qjAXKhhXiS/9E1L8EclTUG/8hoz4oUH6QTwI5wO7Oypl
-         50EQ==
-X-Gm-Message-State: ANoB5pnczNqwrDwcnKRLeIHf5zgtTCTuW3qNanIrHakWFfrtJRowYp/H
-        FYaXDlOmkt+Sd4+ZXWfwn+BPEfGN78o=
-X-Google-Smtp-Source: AA0mqf6MBEL3dbkFTouwqSHx+6OksWJCum4YjmQXYgxJyjXfxUzVvIfvMj4y0G+naYJbEoyFI+wqmg==
-X-Received: by 2002:a17:902:ef93:b0:189:3998:17d4 with SMTP id iz19-20020a170902ef9300b00189399817d4mr7963358plb.25.1669245459030;
-        Wed, 23 Nov 2022 15:17:39 -0800 (PST)
-Received: from ?IPV6:2601:642:4c02:686d:4311:4764:eee7:ac6d? ([2601:642:4c02:686d:4311:4764:eee7:ac6d])
-        by smtp.gmail.com with ESMTPSA id q11-20020aa7960b000000b0057460ac725bsm1832718pfg.136.2022.11.23.15.17.37
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 23 Nov 2022 15:17:38 -0800 (PST)
-Message-ID: <69af7ccb-6901-c84c-0e95-5682ccfb750c@acm.org>
-Date:   Wed, 23 Nov 2022 15:17:36 -0800
+        Wed, 23 Nov 2022 18:24:40 -0500
+Received: from mail-0201.mail-europe.com (mail-0201.mail-europe.com [51.77.79.158])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5FA3D1121C8;
+        Wed, 23 Nov 2022 15:24:39 -0800 (PST)
+Date:   Wed, 23 Nov 2022 23:24:23 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=protonmail.com;
+        s=protonmail3; t=1669245874; x=1669505074;
+        bh=4D7H7t9cQFG+vEXPzrmjxP0kBkCA637MqCW+lh8xlvo=;
+        h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+         Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
+         Message-ID:BIMI-Selector;
+        b=hPbJVkIuL1M0qEmL0bT4PuPpgSPCUAu33Y+Qb7tdeEgjcQqAn2P9/FpfK16HEA2EM
+         7vjsfHf0eS2PmoRXdPNGezpmX314hJ02XB0zpjgzVkJDzPqhEL7AMChGfIwFpiPwIA
+         NF7ZZEj1iGDIHy5p8DLkWQw2m5Qldpno4e6/JtLA16r0ZaA4hkUD/VeqWm5hbTdlnb
+         BxWDFCkr77h+K0/o8YNYsqjLGq0ZWGeFJce25BsYm5wcKn9VpmO0zKAO32OE9aTevx
+         yfP5UsPCKW2I3bqPQKJL7FqD0bhsWsXV2qxdqiRQ7WsVWh4oHNK9TFNBq0m4+w4lGn
+         bmQFT/VhhjM8A==
+To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+From:   =?utf-8?Q?Barnab=C3=A1s_P=C5=91cze?= <pobrn@protonmail.com>
+Cc:     Jason Gunthorpe <jgg@ziepe.ca>,
+        Matthew Wilcox <willy@infradead.org>,
+        Maximilian Luz <luzmaximilian@gmail.com>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        linux-kernel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        "Rafael J. Wysocki" <rafael@kernel.org>,
+        Len Brown <lenb@kernel.org>,
+        Stefan Richter <stefanr@s5r6.in-berlin.de>,
+        Wolfram Sang <wsa@kernel.org>,
+        Alexandre Belloni <alexandre.belloni@bootlin.com>,
+        Dmitry Torokhov <dmitry.torokhov@gmail.com>,
+        Sean Young <sean@mess.org>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Rob Herring <robh+dt@kernel.org>,
+        Frank Rowand <frowand.list@gmail.com>,
+        Hans de Goede <hdegoede@redhat.com>,
+        Mark Gross <markgross@kernel.org>,
+        Vinod Koul <vkoul@kernel.org>,
+        Bard Liao <yung-chuan.liao@linux.intel.com>,
+        Pierre-Louis Bossart <pierre-louis.bossart@linux.intel.com>,
+        Sanyog Kale <sanyog.r.kale@intel.com>,
+        Andreas Noever <andreas.noever@gmail.com>,
+        Michael Jamet <michael.jamet@intel.com>,
+        Mika Westerberg <mika.westerberg@linux.intel.com>,
+        Yehezkel Bernat <YehezkelShB@gmail.com>,
+        Jiri Slaby <jirislaby@kernel.org>,
+        Heikki Krogerus <heikki.krogerus@linux.intel.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        Ming Lei <ming.lei@redhat.com>,
+        Jilin Yuan <yuanjilin@cdjrlc.com>,
+        Alan Stern <stern@rowland.harvard.edu>,
+        Sakari Ailus <sakari.ailus@linux.intel.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ira Weiny <ira.weiny@intel.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Won Chung <wonchung@google.com>, alsa-devel@alsa-project.org,
+        devicetree@vger.kernel.org, linux-acpi@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-i2c@vger.kernel.org,
+        linux-i3c@lists.infradead.org, linux-input@vger.kernel.org,
+        linux-media@vger.kernel.org, linux-serial@vger.kernel.org,
+        linux-usb@vger.kernel.org, linux1394-devel@lists.sourceforge.net,
+        platform-driver-x86@vger.kernel.org
+Subject: Re: [PATCH 3/5] driver core: make struct device_type.uevent() take a const *
+Message-ID: <tx7-rd-SyCXl_K0mh2tDzOLPmogI631IJQJRNK8dMW_GVZiy5AHHVN7-b_Ib3P1L_dLTCRPEw8dAhDbMAPGg8QTKs4p1XFoNHlEZpAnWcCw=@protonmail.com>
+In-Reply-To: <Y35vLAWWfezPvGSm@kroah.com>
+References: <Y34hgIW8p1RlQTBB@smile.fi.intel.com> <Y34+V2bCDdqujBDk@kroah.com> <Y35JfNJDppRp5bLX@ziepe.ca> <Y35R+/eQJYI7VaDS@kroah.com> <Y35YlI93UBuTfgYy@ziepe.ca> <Y35dMIaNYSE0Cykd@casper.infradead.org> <Y35iKfYf3ThdVvaR@kroah.com> <Y35lt+0jXrOKynL5@ziepe.ca> <Y35vLAWWfezPvGSm@kroah.com>
+Feedback-ID: 20568564:user:proton
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.4.0
-From:   Bart Van Assche <bvanassche@acm.org>
-Subject: block/for-next: Reinitialization of active object
-To:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Cc:     Christoph Hellwig <hch@lst.de>, Tejun Heo <tj@kernel.org>
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
 
-If I run blktests test block/027 the warning and bug shown below appear.
-It is the first time that I see a complaint like this while running
-blktests. I have not yet tried to root-cause this issue.
+Hi
 
-root[7931]: run blktests block/027
-[ ... ]
-kernel: ------------[ cut here ]------------
-kernel: ODEBUG: init active (active state 0) object type: work_struct hint: css_release_work_fn+0x0/0x480
-kernel: WARNING: CPU: 38 PID: 498 at lib/debugobjects.c:502 debug_print_object+0xda/0x110
-kernel: Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.0-debian-1.16.0-4 04/01/2014
-kernel: Workqueue: cgwb_release cgwb_release_workfn
-kernel: RIP: 0010:debug_print_object+0xda/0x110
-kernel: Call Trace:
-kernel:  <TASK>
-kernel:  __debug_object_init+0x217/0x290
-kernel:  debug_object_init+0x16/0x20
-kernel:  __init_work+0x20/0x30
-kernel:  css_release+0x1f/0xb0
-kernel:  percpu_ref_put_many.constprop.0+0x150/0x160
-kernel:  blkcg_destroy_blkgs+0x20b/0x230
-kernel:  blkcg_unpin_online+0x4e/0x90
-kernel:  cgwb_release_workfn+0xba/0x210
-kernel:  process_one_work+0x57d/0xa80
-kernel:  worker_thread+0x90/0x650
-kernel:  kthread+0x185/0x1c0
-kernel:  ret_from_fork+0x1f/0x30
-kernel:  </TASK>
-kernel: irq event stamp: 121765
-kernel: hardirqs last  enabled at (121775): [<ffffffff811ae168>] __up_console_sem+0x58/0x60
-kernel: hardirqs last disabled at (121792): [<ffffffff811ae14d>] __up_console_sem+0x3d/0x60
-kernel: softirqs last  enabled at (121790): [<ffffffff824004d0>] __do_softirq+0x4d0/0x757
-kernel: softirqs last disabled at (121785): [<ffffffff810e4e61>] __irq_exit_rcu+0xd1/0x140
-kernel: ---[ end trace 0000000000000000 ]---
-kernel: BUG: sleeping function called from invalid context at kernel/workqueue.c:3010
-kernel: in_atomic(): 0, irqs_disabled(): 0, non_block: 0, pid: 498, name: kworker/38:1
-kernel: preempt_count: 0, expected: 0
-kernel: RCU nest depth: 1, expected: 0
-kernel: 3 locks held by kworker/38:1/498:
-kernel:  #0: ffff888102c6b538 ((wq_completion)cgwb_release){+.+.}-{0:0}, at: process_one_work+0x479/0xa80
-kernel:  #1: ffff88810357fdf0 ((work_completion)(&wb->release_work)){+.+.}-{0:0}, at: process_one_work+0x479/0xa80
-kernel:  #2: ffffffff830c52a0 (rcu_read_lock){....}-{1:2}, at: percpu_ref_put_many.constprop.0+0x0/0x160
-kernel: CPU: 38 PID: 498 Comm: kworker/38:1 Tainted: G        W   E      6.1.0-rc6-dbg #5
-kernel: Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.0-debian-1.16.0-4 04/01/2014
-kernel: Workqueue: cgwb_release cgwb_release_workfn
-kernel: Call Trace:
-kernel:  <TASK>
-kernel:  show_stack+0x4e/0x53
-kernel:  dump_stack_lvl+0x51/0x66
-kernel:  dump_stack+0x10/0x12
-kernel:  __might_resched.cold+0x173/0x198
-kernel:  __might_sleep+0x72/0xe0
-kernel:  start_flush_work+0x30/0x560
-kernel:  __flush_work+0xf7/0x170
-kernel:  __cancel_work_timer+0x22a/0x2c0
-kernel:  work_fixup_init+0x20/0x40
-kernel:  __debug_object_init+0x23b/0x290
-kernel:  debug_object_init+0x16/0x20
-kernel:  __init_work+0x20/0x30
-kernel:  css_release+0x1f/0xb0
-kernel:  percpu_ref_put_many.constprop.0+0x150/0x160
-kernel:  blkcg_destroy_blkgs+0x20b/0x230
-kernel:  blkcg_unpin_online+0x4e/0x90
-kernel:  cgwb_release_workfn+0xba/0x210
-kernel:  process_one_work+0x57d/0xa80
-kernel:  worker_thread+0x90/0x650
-kernel:  kthread+0x185/0x1c0
-kernel:  ret_from_fork+0x1f/0x30
-kernel:  </TASK>
-kernel: null_blk: disk nullb0 created
-kernel: null_blk: module loaded
 
+2022. november 23., szerda 20:06 keltez=C3=A9ssel, Greg Kroah-Hartman =
+=C3=ADrta:
+
+
+> On Wed, Nov 23, 2022 at 02:25:59PM -0400, Jason Gunthorpe wrote:
+>=20
+> > On Wed, Nov 23, 2022 at 07:10:49PM +0100, Greg Kroah-Hartman wrote:
+> >=20
+> > > On Wed, Nov 23, 2022 at 05:49:36PM +0000, Matthew Wilcox wrote:
+> > >=20
+> > > > On Wed, Nov 23, 2022 at 01:29:56PM -0400, Jason Gunthorpe wrote:
+> > > >=20
+> > > > > #define generic_container_of(in_type, in, out_type, out_member) \
+> > > > > _Generic(in, \
+> > > > > const in_type *: ((const out_type *)container_of(in, out_type, ou=
+t_member)), \
+> > > > > in_type *: ((out_type *)container_of(in, out_type, out_member)) \
+> > > > > )
+> > > >=20
+> > > > There's a neat trick I found in seqlock.h:
+> > > >=20
+> > > > #define generic_container_of(in_t, in, out_t, m) \
+> > > > _Generic(*(in), \
+> > > > const in_t: ((const out_t *)container_of(in, out_t, m)), \
+> > > > in_t: ((out_t *)container_of(in, out_type, m)) \
+> > > > )
+> > > >=20
+> > > > and now it fits in 80 columns ;-)
+> > >=20
+> > > Nice trick! Dropping the inline functions is a bit different, let me
+> > > see if that still gives a sane error if we pass an incorrect type or
+> > > mess with the const * the wrong way. I'll run some tests tomorrow
+> > > afternoon...
+> >=20
+> > The errors in some cases are very verbose, but it is somewhat
+> > understandable - the worst is when _Generic fails to match anything,
+> > but also at least clang partially expanded container_of and it throws
+> > other assertions too.
+> >=20
+> > I also wonder if this could just be rolled into the normal
+> > container_of.
+>=20
+>=20
+> I think we might be able to now, my previous attempts with inline
+> functions prevented that. I'll beat on that tomorrow...
+>=20
+> > in_type would have to be derived like:
+> >=20
+> > in_type =3D typeof((out_type *)NULL)->out_member)
+> >=20
+> > But I don't know if you can use typeof in a generic type matching expre=
+ssion..
+>=20
+>=20
+> Maybe that is what threw me before, I can't remember. I do know we
+> tried a number of different attempts, can't recall the failed ones...
+>=20
+
+I am sorry I haven't followed the previous discussion,
+but has something like the following been considered?
+
+  #define container_of2(ptr, type, member) \
+  =09_Generic((ptr), \
+  =09=09typeof_member(const type, member) *: container_of((ptr), const type=
+, member), \
+  =09=09const void *: container_of((ptr), const type, member), \
+  =09=09default: container_of((ptr), type, member) \
+  =09)
+
+This is not perfect by any means, but I believe it is a reasonable
+improvement. It only really works reliably if the member type and
+the specified `type` in the arguments are unqualified,
+but I believe that should cover the majority of cases.
+
+I have tried to build an x86-64 defconfig with this and there are
+numerous const violations, but I haven't seen any false positives.
+
+
+> [...]
+
+
+Regards,
+Barnab=C3=A1s P=C5=91cze
