@@ -2,34 +2,36 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6BBFDC4332F
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A20E2C43217
 	for <linux-block@archiver.kernel.org>; Wed, 23 Nov 2022 06:04:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235641AbiKWGEL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 23 Nov 2022 01:04:11 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42614 "EHLO
+        id S235733AbiKWGEM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 23 Nov 2022 01:04:12 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42610 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235555AbiKWGEK (ORCPT
+        with ESMTP id S229471AbiKWGEK (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Wed, 23 Nov 2022 01:04:10 -0500
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 29893F2C05;
-        Tue, 22 Nov 2022 22:04:07 -0800 (PST)
-Received: from kwepemi500016.china.huawei.com (unknown [172.30.72.56])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4NH9Xv5ywQzHw5S;
-        Wed, 23 Nov 2022 14:03:27 +0800 (CST)
+Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 34396F2C08;
+        Tue, 22 Nov 2022 22:04:08 -0800 (PST)
+Received: from kwepemi500016.china.huawei.com (unknown [172.30.72.54])
+        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4NH9Tt2rc6zJnrH;
+        Wed, 23 Nov 2022 14:00:50 +0800 (CST)
 Received: from huawei.com (10.174.178.129) by kwepemi500016.china.huawei.com
  (7.221.188.220) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.31; Wed, 23 Nov
- 2022 14:04:03 +0800
+ 2022 14:04:05 +0800
 From:   Kemeng Shi <shikemeng@huawei.com>
 To:     <tj@kernel.org>, <josef@toxicpanda.com>, <axboe@kernel.dk>
 CC:     <cgroups@vger.kernel.org>, <linux-block@vger.kernel.org>,
         <linux-kernel@vger.kernel.org>, <shikemeng@huawei.com>
-Subject: [PATCH 00/11] A few bugfix and cleanup patches for blk-throttle
-Date:   Wed, 23 Nov 2022 14:03:50 +0800
-Message-ID: <20221123060401.20392-1-shikemeng@huawei.com>
+Subject: [PATCH 03/11] blk-throttle: ignore cgroup without io queued in blk_throtl_cancel_bios
+Date:   Wed, 23 Nov 2022 14:03:53 +0800
+Message-ID: <20221123060401.20392-4-shikemeng@huawei.com>
 X-Mailer: git-send-email 2.14.1.windows.1
+In-Reply-To: <20221123060401.20392-1-shikemeng@huawei.com>
+References: <20221123060401.20392-1-shikemeng@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 X-Originating-IP: [10.174.178.129]
@@ -40,30 +42,38 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi, this series contain a few patches to fix problem when on the default
-hierarchy, corrent comment and so on. More detail can be found in
-respective changelogs. Thanks.
+Ignore cgroup without io queued in blk_throtl_cancel_bios for two
+reasons:
+1. Save cpu cycle for trying to dispatch cgroup which is no io queued.
+2. Avoid non-consistent state that cgroup is inserted to service queue
+without THROTL_TG_PENDING set as tg_update_disptime will unconditional
+re-insert cgroup to service queue. If we are on the default hierarchy,
+IO dispatched from child in tg_dispatch_one_bio will trigger inserting
+cgroup to service queue without erase first and ruin the tree.
 
-Kemeng Shi (11):
-  blk-throttle: Limit whole system if root group is configured when on
-    the default hierarchy
-  blk-throttle: Fix that bps of child could exceed bps limited in parent
-  blk-throttle: ignore cgroup without io queued in
-    blk_throtl_cancel_bios
-  blk-throttle: correct calculation of wait time in tg_may_dispatch
-  blk-throttle: simpfy low limit reached check in throtl_tg_can_upgrade
-  blk-throttle: fix typo in comment of throtl_adjusted_limit
-  blk-throttle: remove incorrect comment for tg_last_low_overflow_time
-  blk-throttle: remove repeat check of elapsed time from last upgrade in
-    throtl_hierarchy_can_downgrade
-  blk-throttle: remove unnecessary check for validation of limit index
-  blk-throttle: remove unused variable td in tg_update_has_rules
-  blk-throttle: Use more siutable time_after check for update
-    slice_start
+Signed-off-by: Kemeng Shi <shikemeng@huawei.com>
+---
+ block/blk-throttle.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
- block/blk-throttle.c | 98 ++++++++++++++++++--------------------------
- 1 file changed, 39 insertions(+), 59 deletions(-)
-
+diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+index b33bcf53b36e..acfac916ed99 100644
+--- a/block/blk-throttle.c
++++ b/block/blk-throttle.c
+@@ -1728,7 +1728,12 @@ void blk_throtl_cancel_bios(struct gendisk *disk)
+ 		 * Set the flag to make sure throtl_pending_timer_fn() won't
+ 		 * stop until all throttled bios are dispatched.
+ 		 */
+-		blkg_to_tg(blkg)->flags |= THROTL_TG_CANCELING;
++		tg->flags |= THROTL_TG_CANCELING;
++
++		/* No need to dispatch cgroup without io queued */
++		if (!(tg->flags & THROTL_TG_PENDING))
++			continue;
++
+ 		/*
+ 		 * Update disptime after setting the above flag to make sure
+ 		 * throtl_select_dispatch() won't exit without dispatching.
 -- 
 2.30.0
 
