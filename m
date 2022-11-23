@@ -2,97 +2,129 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A089C433FE
-	for <linux-block@archiver.kernel.org>; Wed, 23 Nov 2022 13:59:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D9ADC47088
+	for <linux-block@archiver.kernel.org>; Wed, 23 Nov 2022 14:01:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237558AbiKWN7W (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 23 Nov 2022 08:59:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45552 "EHLO
+        id S238322AbiKWOBh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 23 Nov 2022 09:01:37 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51366 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236767AbiKWN6x (ORCPT
+        with ESMTP id S238175AbiKWOAt (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 23 Nov 2022 08:58:53 -0500
-Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 815DD56566
-        for <linux-block@vger.kernel.org>; Wed, 23 Nov 2022 05:53:06 -0800 (PST)
-Received: by mail-pl1-x630.google.com with SMTP id 4so16725566pli.0
-        for <linux-block@vger.kernel.org>; Wed, 23 Nov 2022 05:53:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=t9CmsBIWPbQRo+TQhWjPbgMCBvMUGNV8/tiPp8eu33A=;
-        b=yxrVfZ0wWyZdqelxuvxh/YdZ1nBYHWUwk6oxwPvk304duX4I9vWxogIpb/cfsEI9zH
-         dCIdvO8YnEFqAOJLXg0N1SOM+SnEXBRVhIqLMx6Rmzku19LfNnyUCTa50K3hCFIWIEZE
-         QCIawit9/k4dg2LsuT7kqRWAf/POAws9KaYOSg7DCNAVEGu/Z3vM96SDxTj18uQqUftz
-         xDWV+lHziX73nHBXddpuF6QFG72Rtye6ddy8nUvhCS4ZgcFGtWTDqqwqdSgFX8dE5AWa
-         va+hedob9txWrBhyl10U3on6RwBARyMaZp4UVjeiyJrHl/BrYkb4SBTWFiKj3C9lmBUo
-         Xo2g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=t9CmsBIWPbQRo+TQhWjPbgMCBvMUGNV8/tiPp8eu33A=;
-        b=TqIU8r4q5CcKxkm5R4+V1etsmbgXjNPu2illOFHy9jDZ9rCmeNM7gfwWlspaT8v/cU
-         YW+5wHm1ulsUyqTlmYAcAEmMgHihQHBqfnSwhg3v4BsBIkx/BEgnRAtkPeabo6NognxQ
-         Q/jvv7BlNJt1YPz6vQzMT5/mNVX1OSi1+fSBdI87FK/mfMVdqznP2Wjy40l64FUd2Jf+
-         Q3Xz2rouP2wbC/gRE5SXic8Oocf+ZhyzS2rSo+AA/Ptv2lH3OA3JbHA0UHn1WRHn+PN1
-         ST4Ailx01/21pggxOeJA40n+/lYwMh5Apazx6aAB7N2bLHQWOajKb8KNv/84DzNRphoY
-         0KPQ==
-X-Gm-Message-State: ANoB5plz0SnbB9cdZnoaRAGOkOOuOnoppeV3BbmooW+kjcStgZ6bIxU0
-        +dL3wp1zz7IU+NvuSA2YkLMSA36TYKv4sETO
-X-Google-Smtp-Source: AA0mqf5sVEtPanjRBHYnlAf9OAv84TFp0ljtU0HTcjdOSxHLvWkAQFzNWw/gOjyRff/Sv+CxIY6HSw==
-X-Received: by 2002:a17:902:f68a:b0:189:b07:10fd with SMTP id l10-20020a170902f68a00b001890b0710fdmr8726256plg.151.1669211585735;
-        Wed, 23 Nov 2022 05:53:05 -0800 (PST)
-Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id c3-20020a170903234300b0018862bb3976sm2222618plh.308.2022.11.23.05.53.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 23 Nov 2022 05:53:05 -0800 (PST)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     Jinlong Chen <nickyc975@zju.edu.cn>
-Cc:     linux-block@vger.kernel.org, hch@lst.de,
-        linux-kernel@vger.kernel.org
-In-Reply-To: <cover.1669126766.git.nickyc975@zju.edu.cn>
-References: <cover.1669126766.git.nickyc975@zju.edu.cn>
-Subject: Re: [PATCH 0/4] random improvments and cleanups for elevator.c
-Message-Id: <166921158474.84780.6332237082581853166.b4-ty@kernel.dk>
-Date:   Wed, 23 Nov 2022 06:53:04 -0700
+        Wed, 23 Nov 2022 09:00:49 -0500
+Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BCD196DCE7;
+        Wed, 23 Nov 2022 05:56:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1669211800; x=1700747800;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=G44bnr+iuPtt+qZ8zu8tlw18X2XouCKtZQHGH+Pp3d4=;
+  b=XexFnTlsUxF1LDTm9dhP/FKYXd7Y9IZWVDCFyd4BKC6oWKXKmaYVDDg1
+   2oz6KbAjyHclfCQPnljs3m+cp+X6MZPwXexdSK70pR9Fd/SGJr52Ggwm9
+   dRPVOHR05Ql09ln6pJ+IyKGuNb2aFdd9Amnxf7A6rMx5N0kHR4t+RnhQA
+   Y+2Wcn6ifBDxVQM1a+a2GrLmXk+J1qb0nkCGXrmX+4xUIdo9HziFzwb/+
+   pXH6OsRyUoa4wam/+jOixVxzVwigAYTA/pC/BzKl/rsNnCH6dPGXUYpb0
+   Y+GaQR9aEGbSatjevBG7lXB/OFmidEK0ZiM0PQ1FbZixGUOE+DB9m5myz
+   Q==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10540"; a="293777075"
+X-IronPort-AV: E=Sophos;i="5.96,187,1665471600"; 
+   d="scan'208";a="293777075"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Nov 2022 05:56:40 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10540"; a="635924172"
+X-IronPort-AV: E=Sophos;i="5.96,187,1665471600"; 
+   d="scan'208";a="635924172"
+Received: from black.fi.intel.com ([10.237.72.28])
+  by orsmga007.jf.intel.com with ESMTP; 23 Nov 2022 05:56:28 -0800
+Received: by black.fi.intel.com (Postfix, from userid 1001)
+        id 994C4128; Wed, 23 Nov 2022 15:56:54 +0200 (EET)
+Date:   Wed, 23 Nov 2022 15:56:54 +0200
+From:   Mika Westerberg <mika.westerberg@linux.intel.com>
+To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc:     linux-kernel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        "Rafael J. Wysocki" <rafael@kernel.org>,
+        Len Brown <lenb@kernel.org>,
+        Stefan Richter <stefanr@s5r6.in-berlin.de>,
+        Wolfram Sang <wsa@kernel.org>,
+        Alexandre Belloni <alexandre.belloni@bootlin.com>,
+        Dmitry Torokhov <dmitry.torokhov@gmail.com>,
+        Sean Young <sean@mess.org>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Rob Herring <robh+dt@kernel.org>,
+        Frank Rowand <frowand.list@gmail.com>,
+        Maximilian Luz <luzmaximilian@gmail.com>,
+        Hans de Goede <hdegoede@redhat.com>,
+        Mark Gross <markgross@kernel.org>,
+        Vinod Koul <vkoul@kernel.org>,
+        Bard Liao <yung-chuan.liao@linux.intel.com>,
+        Pierre-Louis Bossart <pierre-louis.bossart@linux.intel.com>,
+        Sanyog Kale <sanyog.r.kale@intel.com>,
+        Andreas Noever <andreas.noever@gmail.com>,
+        Michael Jamet <michael.jamet@intel.com>,
+        Yehezkel Bernat <YehezkelShB@gmail.com>,
+        Jiri Slaby <jirislaby@kernel.org>,
+        Heikki Krogerus <heikki.krogerus@linux.intel.com>,
+        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        Ming Lei <ming.lei@redhat.com>,
+        Jilin Yuan <yuanjilin@cdjrlc.com>,
+        Alan Stern <stern@rowland.harvard.edu>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Sakari Ailus <sakari.ailus@linux.intel.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ira Weiny <ira.weiny@intel.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Won Chung <wonchung@google.com>, alsa-devel@alsa-project.org,
+        devicetree@vger.kernel.org, linux-acpi@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-i2c@vger.kernel.org,
+        linux-i3c@lists.infradead.org, linux-input@vger.kernel.org,
+        linux-media@vger.kernel.org, linux-serial@vger.kernel.org,
+        linux-usb@vger.kernel.org, linux1394-devel@lists.sourceforge.net,
+        platform-driver-x86@vger.kernel.org
+Subject: Re: [PATCH 3/5] driver core: make struct device_type.uevent() take a
+ const *
+Message-ID: <Y34mpkqds3NEZclU@black.fi.intel.com>
+References: <20221123122523.1332370-1-gregkh@linuxfoundation.org>
+ <20221123122523.1332370-3-gregkh@linuxfoundation.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-Mailer: b4 0.11.0-dev-28747
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20221123122523.1332370-3-gregkh@linuxfoundation.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, 22 Nov 2022 22:21:22 +0800, Jinlong Chen wrote:
-> This series updates some function documents (patch 1 and 3), removes an
-> outdated comment (patch 4), and adds a warning message (patch 2) in
-> elevator.c.
+On Wed, Nov 23, 2022 at 01:25:21PM +0100, Greg Kroah-Hartman wrote:
+> The uevent() callback in struct device_type should not be modifying the
+> device that is passed into it, so mark it as a const * and propagate the
+> function signature changes out into all relevant subsystems that use
+> this callback.
 > 
-> Jinlong Chen (4):
->   elevator: update the document of elevator_switch
->   elevator: printk a warning if switching to a new io scheduler fails
->   elevator: update the document of elevator_match
->   elevator: remove an outdated comment in elevator_change
-> 
-> [...]
+> Cc: Jens Axboe <axboe@kernel.dk>
+> Cc: "Rafael J. Wysocki" <rafael@kernel.org>
+> Cc: Len Brown <lenb@kernel.org>
+> Cc: Stefan Richter <stefanr@s5r6.in-berlin.de>
+> Cc: Wolfram Sang <wsa@kernel.org>
+> Cc: Alexandre Belloni <alexandre.belloni@bootlin.com>
+> Cc: Dmitry Torokhov <dmitry.torokhov@gmail.com>
+> Cc: Sean Young <sean@mess.org>
+> Cc: Mauro Carvalho Chehab <mchehab@kernel.org>
+> Cc: Rob Herring <robh+dt@kernel.org>
+> Cc: Frank Rowand <frowand.list@gmail.com>
+> Cc: Maximilian Luz <luzmaximilian@gmail.com>
+> Cc: Hans de Goede <hdegoede@redhat.com>
+> Cc: Mark Gross <markgross@kernel.org>
+> Cc: Vinod Koul <vkoul@kernel.org>
+> Cc: Bard Liao <yung-chuan.liao@linux.intel.com>
+> Cc: Pierre-Louis Bossart <pierre-louis.bossart@linux.intel.com>
+> Cc: Sanyog Kale <sanyog.r.kale@intel.com>
+> Cc: Andreas Noever <andreas.noever@gmail.com>
+> Cc: Michael Jamet <michael.jamet@intel.com>
+> Cc: Mika Westerberg <mika.westerberg@linux.intel.com>
 
-Applied, thanks!
-
-[1/4] elevator: update the document of elevator_switch
-      commit: ac1171bd2c7a3a32dfbdd3c347919fee32b745a1
-[2/4] elevator: printk a warning if switching to a new io scheduler fails
-      commit: e0cca8bc9cd8d6176921cb3f5f466d3ccfbc6b99
-[3/4] elevator: update the document of elevator_match
-      commit: f69b5e8f356e4e57e94b806ca1dcb9771933bb9c
-[4/4] elevator: remove an outdated comment in elevator_change
-      commit: 4284354758d67cf77ab2a4494e28d4c05fb83074
-
-Best regards,
--- 
-Jens Axboe
-
-
+Acked-by: Mika Westerberg <mika.westerberg@linux.intel.com> # for Thunderbolt
