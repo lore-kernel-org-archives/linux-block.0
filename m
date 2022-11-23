@@ -2,162 +2,128 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 40F62C433FE
-	for <linux-block@archiver.kernel.org>; Wed, 23 Nov 2022 22:56:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 81AF5C433FE
+	for <linux-block@archiver.kernel.org>; Wed, 23 Nov 2022 23:17:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229436AbiKWW4d (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 23 Nov 2022 17:56:33 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49176 "EHLO
+        id S229645AbiKWXRp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 23 Nov 2022 18:17:45 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47208 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229595AbiKWW40 (ORCPT
+        with ESMTP id S229672AbiKWXRo (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 23 Nov 2022 17:56:26 -0500
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2082.outbound.protection.outlook.com [40.107.244.82])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 24F2DC5B59;
-        Wed, 23 Nov 2022 14:56:26 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=m7NL8HoHULqjTiMMuhV1Jl1489oNXHsDB0ivaAXA8s0Z8waSnK3jEbV/x9YlR/FPQOAfUisXEWCxE/jnKT7HgugYkO3Se7B0uqzAJ5SILw9TNyhcMBwBwSVsidUOKw6lGzTdS3ndbYXu6yJH7deMV31O3d8ycWBNqNzAdBbjP6GfpTjGc0iQaSuXPlxX7alweurlKpCWVXvlV8OvXzX5pI7YMm+AKbvDHhsAoveKFtARkHqDZspdfU81pd2XksTa0wyyk0ZCvmgoBqBWZyomwoT+70qJQH/p6ZnsbgCrXcwrAgR3BP6qyojLyUXXNlmQrl1ZZ/4SpUs6FouE9vvaTQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=nsdbbK8MOvDKdQZllD/Rzr6ETl6lyot5ErW8HVcSaSA=;
- b=lBH7yRcA3+K6niWKNLk7lGO52ywaD+YFTRlxc3borcmXRvYPpSVI4eQxKaBIlOsVH3sPHqJSvurm5lfd500UYu/MBg9pHSCsxbY70PjzGzm9ZZWYglkBj3d50k6BqQ0qHqgv4bIpldXQxj+UBKocRuzpeIohLdaD2b7g3/TmPdUDxxhh5oNAzWyq+cgql9jgwqk115pldVHOkiXSJQfnHDeA0MBcOcDrfU9PI9sh3Rf9gFrtAM3bImvR2MTGj+yCMUrwGZooKZl9UZqYWW96P+K0hY7uLQe9MRRqCNSSZ8uno31/gNOrgvL4Rnz7gBHlylh2aRhlz4+s+GRQk9eWzw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=nsdbbK8MOvDKdQZllD/Rzr6ETl6lyot5ErW8HVcSaSA=;
- b=LfOqQJbj7JQsY+njtzSyYSaGc5/JN0pLPsHdGj/uapDi/P+KU6ur58zKdfYhSRwPgVvxX1WAtCvHcbSjBjGssez0U8m63s9fuZB1FyGn4OpfAfGfNNJaMTcW/qeIk5uzs4t+pC87yOrh4cb/lqXWhmSgo5RMp2kq588K2YBJt6wVQn7b5pEnXvoxCezs8OjI5Qx8M2O3DvOHqRUquLlYNCz+THEc+u0BDkCKcStTq2ZBKLWHboLv1JKC5Jb0q7wkF2BqzjMPr1Wpik8XXptwM77ZTxthjGv6QkigIHWvM+4wxSovXIkHAKDQAp8vgBM880628g4n3Uu8mCdsg6ZsYQ==
-Received: from MW2PR12MB4667.namprd12.prod.outlook.com (2603:10b6:302:12::28)
- by CY5PR12MB6033.namprd12.prod.outlook.com (2603:10b6:930:2f::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5834.15; Wed, 23 Nov
- 2022 22:56:23 +0000
-Received: from MW2PR12MB4667.namprd12.prod.outlook.com
- ([fe80::f02:bf13:2f64:43bc]) by MW2PR12MB4667.namprd12.prod.outlook.com
- ([fe80::f02:bf13:2f64:43bc%7]) with mapi id 15.20.5834.015; Wed, 23 Nov 2022
- 22:56:23 +0000
-From:   Chaitanya Kulkarni <chaitanyak@nvidia.com>
-To:     Nitesh Shetty <nj.shetty@samsung.com>
-CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "agk@redhat.com" <agk@redhat.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-        "axboe@kernel.dk" <axboe@kernel.dk>,
-        "viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>,
-        "sagi@grimberg.me" <sagi@grimberg.me>,
-        "anuj20.g@samsung.com" <anuj20.g@samsung.com>,
-        "joshi.k@samsung.com" <joshi.k@samsung.com>,
-        "p.raghav@samsung.com" <p.raghav@samsung.com>,
-        "naohiro.aota@wdc.com" <naohiro.aota@wdc.com>,
-        "damien.lemoal@opensource.wdc.com" <damien.lemoal@opensource.wdc.com>,
-        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
-        "snitzer@kernel.org" <snitzer@kernel.org>,
-        "kbusch@kernel.org" <kbusch@kernel.org>,
-        "jth@kernel.org" <jth@kernel.org>,
-        "nitheshshetty@gmail.com" <nitheshshetty@gmail.com>,
-        "james.smart@broadcom.com" <james.smart@broadcom.com>,
-        "gost.dev@samsung.com" <gost.dev@samsung.com>,
-        "dm-devel@redhat.com" <dm-devel@redhat.com>,
-        "hch@lst.de" <hch@lst.de>,
-        "shinichiro.kawasaki@wdc.com" <shinichiro.kawasaki@wdc.com>
-Subject: Re: [PATCH v5 00/10] Implement copy offload support
-Thread-Topic: [PATCH v5 00/10] Implement copy offload support
-Thread-Index: AQHY/wLEUhEocurOikWuV2dsph+j+a5NH5cA
-Date:   Wed, 23 Nov 2022 22:56:23 +0000
-Message-ID: <cd772b6c-90ae-f2d1-b71c-5d43f10891bf@nvidia.com>
-References: <CGME20221123061010epcas5p21cef9d23e4362b01f2b19d1117e1cdf5@epcas5p2.samsung.com>
- <20221123055827.26996-1-nj.shetty@samsung.com>
-In-Reply-To: <20221123055827.26996-1-nj.shetty@samsung.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-user-agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.9.0
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: MW2PR12MB4667:EE_|CY5PR12MB6033:EE_
-x-ms-office365-filtering-correlation-id: fd5d6bae-c707-423f-64d3-08dacda5f185
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: BcTNfeNaGyCRY7FCma5ImA3PnmKcmpWaPpG0wGZYW90QcQ8qcVzzF0pbBI55wqv3rBgRzXUOT4VNWPhqWw7Vy5hgAkrjilo1sAH70q3JYD6gp8CyphvG6c1tYxURXty/noygTZuCdlHp1wYo0TNbNHCTUg+LFLeAXdTJEpLsQi5cTzs7dN8qxNk2dKroRN1XP9Vekvbf3XHBDc2ReeUsN04+TYWYxnFo2blCFeU8lWjrEdMZm3I5FeHV/YNAHSxZEPJAdr3818xGozT2angYYny11yFlmit+tNTZepAMEdRrXJi1yZyu6KJYei4osU5kJ9LUQR64m8jn9oR5kGhkJexqle3xB44PB/kwHpW47CsdXyWkCFgKiT6F9pMllZPfyfjFVBLvZXPXOZLKPfzrYYhckF4lUsdZuJrbSrTQgmksY8HnEh3vyMmNpA9AQ/Nluxx6Q/BksyGQSB1r91DE5g/bcyaYOtu64IhIoPCYEEQReTjDwvaGX9VnVifteytwZaTS1ciXLu63SXmXpAKO90yXCLwV2H65tDlm4TqafaA+Fk9mK3QyeRPa5/6AF95XuBmEkoj0XW3wa4G4EO4XL8r74r06OkeRSrfIDPVA7dWVZlK6wBzpaj4QaPyOpusyuCSHvP6xUUrsET3ZaI069w3rJCwKRNmR7Ug7734KFe+ivoen52ioDbhBZcqIt5bhUUSLlAfaLWsL9R86IjsJp69Vbld0kFw/AZRgNvaqNolYWeqAnLg0N+xjL51u/Tx1o7Jis/c+VoqenOP+RCnzRg==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW2PR12MB4667.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(366004)(39860400002)(376002)(396003)(346002)(136003)(451199015)(91956017)(38100700002)(36756003)(6486002)(86362001)(4326008)(66946007)(76116006)(478600001)(64756008)(8676002)(66556008)(41300700001)(66446008)(54906003)(6916009)(2616005)(186003)(2906002)(83380400001)(6512007)(316002)(71200400001)(6506007)(122000001)(66476007)(38070700005)(31696002)(53546011)(4744005)(31686004)(5660300002)(8936002)(7416002)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?ZVc3eDRIM1pEeEhuN082VkFVU3hMM0U5RDk2QThWdGkzemUydEp5Q1NzUzFT?=
- =?utf-8?B?YWNjS1Q2bmJQbFA3ZjIrUEx4Vlh4ZS9vOUUxVG9xelViR3VENGtTM041ZDdZ?=
- =?utf-8?B?U0RxZnhjRHU0VHp1QzFZaVlDYTRsVnN4VmU4aWQ1aUl1cXRuMENqNGppMWVh?=
- =?utf-8?B?K0JGc3d2cmc4Vkw2QTVZSFpBLzhYTFdwdVpRU0ZkZ3V5SER3YlpSbXVLNCtC?=
- =?utf-8?B?aVBpaGp4QmRVNkxWVDdHeC9jN2FnU1JJdzBpOW9RTTJ0RGUvKy9oOXFWRU4r?=
- =?utf-8?B?MXVCemF3YTMvWVVVaEM1SUFtRkxEeUJFd0xtK3JoeU5lMmJ0VTNNV3ZSOEpF?=
- =?utf-8?B?UnMzblMrblh1YW5aVlN1SExkSVhMWmpJQisyZXVCZWx0WXNlaGlMcUx3MmxX?=
- =?utf-8?B?Qjk0bzBiZytpSWNiTVpsZ2FxOXM2dkV4UzZyYnNEUlpvY2VPMnVHVzYyUnhI?=
- =?utf-8?B?aVdqcml0QmhKb1lld2s1d1l6Vmc3TFNPVXlYcmZDOC8yRXpHbS8rS3hQTC9S?=
- =?utf-8?B?NllHdXJtWktpWUp4dGlWK2FCUXRrU0t4MmtVR0hYM1dYYUFnZHBNMWRCT0dK?=
- =?utf-8?B?eXpVUFVjODQxTEtNS205b0NuckpMRGJtZXZ5UGhXMWUxckdLS1hDWEM4SlY1?=
- =?utf-8?B?Nk83Um9SaWVHZU9sRTRLT0JVK2NYMlZSYW5oYyt1SDRQQlNEUVdZRitteW82?=
- =?utf-8?B?azNKZmcyUE5oWWcybFcwcXNmUUJUUFdKTjlyMnpEVFdJYXFyV2p0K2RlelJ3?=
- =?utf-8?B?VVdxK2V1VzhDWjRONGNVSzFra0JoUlRQZGZja2NUaDdGSWFFYjdNdmNFY1cr?=
- =?utf-8?B?NHJua0htV1VGZlZNODVIKzNLTDVtSjVOdzlJWFFBVi9zbE5zN01xK0dUaUhj?=
- =?utf-8?B?ZnhHellWeU03UFJ1d2h6SVRVUUEvQy93dXFXMEpmT0UrWHY4Znp4N0U2S3dV?=
- =?utf-8?B?YnVJbjRMa091L1ZtVHc0M1FhRUtMYUVRMndsaXJzS1V0UERGV1NQZjl5RFFl?=
- =?utf-8?B?dVZsYjlUV1JBWmgxMDlaYXA5SlB5a3lSMmVDMmRmMnBiS0Y0QWx2TWE2bVhh?=
- =?utf-8?B?cmVLL0RlUUtrUVJhQmd2TjZ3ZE5CNFZxRGxsOGFkSXY4VTVONnhvSm1TS3BQ?=
- =?utf-8?B?ZWxlNUloeGpJTWxzWVJPYmlYYko0VDJVRmE0UDdTUXRQSGlSemZMWHJya0lK?=
- =?utf-8?B?NWNuNS9JTFdTelRHallZUG9nY21JckUrOGxjRGJFTm5CTDVPSzJRdytHUmRq?=
- =?utf-8?B?S3J1aUJPNTJUSTNRUjRqS0R4a0Y3NE5oRUZObDNJTGk1VUJnSmZGVytBb1RM?=
- =?utf-8?B?MktoYlZtbTlsZjFxaXp0ODdhZ1kySWsyaTdObzh4aGlXYWYxVUwzVUd3Q1JS?=
- =?utf-8?B?bEh2Q093eVlZV3N1ajBNRllpbFZRZy9RcWZSQlIwUWhJUmVNN2EvTmZ0YWxS?=
- =?utf-8?B?L3VUQjNtcXBINWx2NTFhWG52OU1NL3N4MFgxSWpzN1dqKzNCNmM5VmkxVGZH?=
- =?utf-8?B?eXpseVB2VFBjd3FwbFlSclNiYUZXSTQzNForWTU5eGVyRkxTMG1MT0FuQkhN?=
- =?utf-8?B?RHJNeXFaMm5uYkVkZWZXT1FnR2xGajU3dldtV3lGUFB1QTZvM1l2eHFqL2o3?=
- =?utf-8?B?VjBmdms3Ui9xU1NBcWVsUmRQRWUwbzVwbjhhSzY3S2QwZnpMQXUwdTZubDcw?=
- =?utf-8?B?eXd3QTRTVFcxc2h5SGROWFFDRlFRZjNhOUdqbDB0NndyOEVSaEQxUTVnQVlp?=
- =?utf-8?B?SkZEVmhjMXAxT2J6Vy9mdG1oeFZ4MXZKdmF4bmpod29oMGx1VTN2Mlgrd1FF?=
- =?utf-8?B?KzFCSlgrSmJLWFc3RUFWUkpxMjlRQ3l4bFZhYld1UXRCeFBtQnN3U1dtdmZt?=
- =?utf-8?B?aUF0czdGeDdFRlZOeXF0eTMvRkYrbzlRTVZwQjlrYmpNcHdoU1ZaVUJvWkEy?=
- =?utf-8?B?N005MGlEK0Z6dWdjZkxUM3ljMVczSDFuSFAxMDYxMHdjcnN2WklKczhmVzJN?=
- =?utf-8?B?UzZFQlgxbDZ1QWpRRjY1Z3dzL25UblFrR0Z0aEhuWjBodG42aWJnVldoeW0v?=
- =?utf-8?B?Nzh6Z090c1dhVlN1WXhMUFU1UG5MRnE0Zm41QUR3WWYyN0YraExKVjZ3NDhu?=
- =?utf-8?B?YXRzU0E1NDFMZFErajJFQ3hrRHlVeVhmQVB5UmVBOHM5THBTQllyUEhCaVFw?=
- =?utf-8?B?amc9PQ==?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <11DE156DC86B9F40A76435524E1C3AFE@namprd12.prod.outlook.com>
-Content-Transfer-Encoding: base64
+        Wed, 23 Nov 2022 18:17:44 -0500
+Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com [209.85.216.53])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F360DF17
+        for <linux-block@vger.kernel.org>; Wed, 23 Nov 2022 15:17:40 -0800 (PST)
+Received: by mail-pj1-f53.google.com with SMTP id q96-20020a17090a1b6900b00218b8f9035cso53058pjq.5
+        for <linux-block@vger.kernel.org>; Wed, 23 Nov 2022 15:17:40 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:content-language:cc:to:subject:from
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=6KjeuimzDZ/Cx4Hsf5YDM0APCp0nao9auzl1Uk+IHGM=;
+        b=RW2kpthqUzDUyN5jIYmLk0KjFLJLSy9t3V0XOQHNnWrvbltxlWdvdaBDk+nb22CXoI
+         AtfcFehgmrMX2fu+N6ENuipr5UROd85mQacqFh0rFO2vHcJ7mAZM+fY8IE0/YBU3sDd8
+         Cd2rzcNlBwecFN3e6C2BNWiWTBgE8FnWUl8NZWmYvM8xcTFml5d535xb3zqxsxQLTXqm
+         4VeIN6mq+PV7TGDfBYyHN+Mv7hWTRedHt0xIbUHal8RGgzQR5yhpe/t1PPAxzBL7YEgB
+         VGSh5BcDDu6KkfkJktQsR726qjAXKhhXiS/9E1L8EclTUG/8hoz4oUH6QTwI5wO7Oypl
+         50EQ==
+X-Gm-Message-State: ANoB5pnczNqwrDwcnKRLeIHf5zgtTCTuW3qNanIrHakWFfrtJRowYp/H
+        FYaXDlOmkt+Sd4+ZXWfwn+BPEfGN78o=
+X-Google-Smtp-Source: AA0mqf6MBEL3dbkFTouwqSHx+6OksWJCum4YjmQXYgxJyjXfxUzVvIfvMj4y0G+naYJbEoyFI+wqmg==
+X-Received: by 2002:a17:902:ef93:b0:189:3998:17d4 with SMTP id iz19-20020a170902ef9300b00189399817d4mr7963358plb.25.1669245459030;
+        Wed, 23 Nov 2022 15:17:39 -0800 (PST)
+Received: from ?IPV6:2601:642:4c02:686d:4311:4764:eee7:ac6d? ([2601:642:4c02:686d:4311:4764:eee7:ac6d])
+        by smtp.gmail.com with ESMTPSA id q11-20020aa7960b000000b0057460ac725bsm1832718pfg.136.2022.11.23.15.17.37
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 23 Nov 2022 15:17:38 -0800 (PST)
+Message-ID: <69af7ccb-6901-c84c-0e95-5682ccfb750c@acm.org>
+Date:   Wed, 23 Nov 2022 15:17:36 -0800
 MIME-Version: 1.0
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: MW2PR12MB4667.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: fd5d6bae-c707-423f-64d3-08dacda5f185
-X-MS-Exchange-CrossTenant-originalarrivaltime: 23 Nov 2022 22:56:23.1539
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: tdLNY1HocNbd1GhZ2pHzlefYRYL6R6hljE7MiwoYwdgZkKY06hkE5xEGe4JxF42wj7NvU/4Kbv4Bi9xl3XH0Fw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY5PR12MB6033
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.4.0
+From:   Bart Van Assche <bvanassche@acm.org>
+Subject: block/for-next: Reinitialization of active object
+To:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Cc:     Christoph Hellwig <hch@lst.de>, Tejun Heo <tj@kernel.org>
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-KCsgU2hpbmljaGlybykNCg0KT24gMTEvMjIvMjIgMjE6NTgsIE5pdGVzaCBTaGV0dHkgd3JvdGU6
-DQo+IFRoZSBwYXRjaCBzZXJpZXMgY292ZXJzIHRoZSBwb2ludHMgZGlzY3Vzc2VkIGluIE5vdmVt
-YmVyIDIwMjEgdmlydHVhbA0KPiBjYWxsIFtMU0YvTU0vQkZQIFRPUElDXSBTdG9yYWdlOiBDb3B5
-IE9mZmxvYWQgWzBdLg0KPiBXZSBoYXZlIGNvdmVyZWQgdGhlIGluaXRpYWwgYWdyZWVkIHJlcXVp
-cmVtZW50cyBpbiB0aGlzIHBhdGNoc2V0IGFuZA0KPiBmdXJ0aGVyIGFkZGl0aW9uYWwgZmVhdHVy
-ZXMgc3VnZ2VzdGVkIGJ5IGNvbW11bml0eS4NCj4gUGF0Y2hzZXQgYm9ycm93cyBNaWt1bGFzJ3Mg
-dG9rZW4gYmFzZWQgYXBwcm9hY2ggZm9yIDIgYmRldg0KPiBpbXBsZW1lbnRhdGlvbi4NCj4gDQo+
-IFRoaXMgaXMgb24gdG9wIG9mIG91ciBwcmV2aW91cyBwYXRjaHNldCB2NFsxXS4NCg0KTm93IHRo
-YXQgc2VyaWVzIGlzIGNvbnZlcmdpbmcsIHNpbmNlIHBhdGNoLXNlcmllcyB0b3VjaGVzDQpkcml2
-ZXJzIGFuZCBrZXkgY29tcG9uZW50cyBpbiB0aGUgYmxvY2sgbGF5ZXIgeW91IG5lZWQgYWNjb21w
-YW55DQp0aGUgcGF0Y2gtc2VyaWVzIHdpdGggdGhlIGJsa3Rlc3RzIHRvIGNvdmVyIHRoZSBjb3Ju
-ZXIgY2FzZXMgaW4gdGhlDQpkcml2ZXJzIHdoaWNoIHN1cHBvcnRzIHRoaXMgb3BlcmF0aW9ucywg
-YXMgSSBtZW50aW9uZWQgdGhpcyBpbiB0aGUNCmNhbGwgbGFzdCB5ZWFyLi4uLg0KDQpJZiB5b3Ug
-bmVlZCBhbnkgaGVscCB3aXRoIHRoYXQgZmVlbCBmcmVlIHRvIHNlbmQgYW4gZW1haWwgdG8gbGlu
-dXgtYmxvY2sNCmFuZCBDQyBtZSBvciBTaGluaWNoaXJvIChhZGRlZCBpbiBDQyApLi4uDQoNCi1j
-aw0KDQo=
+Hi,
+
+If I run blktests test block/027 the warning and bug shown below appear.
+It is the first time that I see a complaint like this while running
+blktests. I have not yet tried to root-cause this issue.
+
+root[7931]: run blktests block/027
+[ ... ]
+kernel: ------------[ cut here ]------------
+kernel: ODEBUG: init active (active state 0) object type: work_struct hint: css_release_work_fn+0x0/0x480
+kernel: WARNING: CPU: 38 PID: 498 at lib/debugobjects.c:502 debug_print_object+0xda/0x110
+kernel: Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.0-debian-1.16.0-4 04/01/2014
+kernel: Workqueue: cgwb_release cgwb_release_workfn
+kernel: RIP: 0010:debug_print_object+0xda/0x110
+kernel: Call Trace:
+kernel:  <TASK>
+kernel:  __debug_object_init+0x217/0x290
+kernel:  debug_object_init+0x16/0x20
+kernel:  __init_work+0x20/0x30
+kernel:  css_release+0x1f/0xb0
+kernel:  percpu_ref_put_many.constprop.0+0x150/0x160
+kernel:  blkcg_destroy_blkgs+0x20b/0x230
+kernel:  blkcg_unpin_online+0x4e/0x90
+kernel:  cgwb_release_workfn+0xba/0x210
+kernel:  process_one_work+0x57d/0xa80
+kernel:  worker_thread+0x90/0x650
+kernel:  kthread+0x185/0x1c0
+kernel:  ret_from_fork+0x1f/0x30
+kernel:  </TASK>
+kernel: irq event stamp: 121765
+kernel: hardirqs last  enabled at (121775): [<ffffffff811ae168>] __up_console_sem+0x58/0x60
+kernel: hardirqs last disabled at (121792): [<ffffffff811ae14d>] __up_console_sem+0x3d/0x60
+kernel: softirqs last  enabled at (121790): [<ffffffff824004d0>] __do_softirq+0x4d0/0x757
+kernel: softirqs last disabled at (121785): [<ffffffff810e4e61>] __irq_exit_rcu+0xd1/0x140
+kernel: ---[ end trace 0000000000000000 ]---
+kernel: BUG: sleeping function called from invalid context at kernel/workqueue.c:3010
+kernel: in_atomic(): 0, irqs_disabled(): 0, non_block: 0, pid: 498, name: kworker/38:1
+kernel: preempt_count: 0, expected: 0
+kernel: RCU nest depth: 1, expected: 0
+kernel: 3 locks held by kworker/38:1/498:
+kernel:  #0: ffff888102c6b538 ((wq_completion)cgwb_release){+.+.}-{0:0}, at: process_one_work+0x479/0xa80
+kernel:  #1: ffff88810357fdf0 ((work_completion)(&wb->release_work)){+.+.}-{0:0}, at: process_one_work+0x479/0xa80
+kernel:  #2: ffffffff830c52a0 (rcu_read_lock){....}-{1:2}, at: percpu_ref_put_many.constprop.0+0x0/0x160
+kernel: CPU: 38 PID: 498 Comm: kworker/38:1 Tainted: G        W   E      6.1.0-rc6-dbg #5
+kernel: Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.0-debian-1.16.0-4 04/01/2014
+kernel: Workqueue: cgwb_release cgwb_release_workfn
+kernel: Call Trace:
+kernel:  <TASK>
+kernel:  show_stack+0x4e/0x53
+kernel:  dump_stack_lvl+0x51/0x66
+kernel:  dump_stack+0x10/0x12
+kernel:  __might_resched.cold+0x173/0x198
+kernel:  __might_sleep+0x72/0xe0
+kernel:  start_flush_work+0x30/0x560
+kernel:  __flush_work+0xf7/0x170
+kernel:  __cancel_work_timer+0x22a/0x2c0
+kernel:  work_fixup_init+0x20/0x40
+kernel:  __debug_object_init+0x23b/0x290
+kernel:  debug_object_init+0x16/0x20
+kernel:  __init_work+0x20/0x30
+kernel:  css_release+0x1f/0xb0
+kernel:  percpu_ref_put_many.constprop.0+0x150/0x160
+kernel:  blkcg_destroy_blkgs+0x20b/0x230
+kernel:  blkcg_unpin_online+0x4e/0x90
+kernel:  cgwb_release_workfn+0xba/0x210
+kernel:  process_one_work+0x57d/0xa80
+kernel:  worker_thread+0x90/0x650
+kernel:  kthread+0x185/0x1c0
+kernel:  ret_from_fork+0x1f/0x30
+kernel:  </TASK>
+kernel: null_blk: disk nullb0 created
+kernel: null_blk: module loaded
+
