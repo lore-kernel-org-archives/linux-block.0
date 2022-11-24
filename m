@@ -2,90 +2,410 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DD5B8C4332F
-	for <linux-block@archiver.kernel.org>; Thu, 24 Nov 2022 01:18:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AEB2BC433FE
+	for <linux-block@archiver.kernel.org>; Thu, 24 Nov 2022 01:32:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229625AbiKXBSB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 23 Nov 2022 20:18:01 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49584 "EHLO
+        id S229450AbiKXBcR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 23 Nov 2022 20:32:17 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60876 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229673AbiKXBR7 (ORCPT
+        with ESMTP id S229536AbiKXBcQ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 23 Nov 2022 20:17:59 -0500
-Received: from dggsgout12.his.huawei.com (unknown [45.249.212.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8368A27B07;
-        Wed, 23 Nov 2022 17:17:56 -0800 (PST)
-Received: from mail02.huawei.com (unknown [172.30.67.153])
-        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4NHg8v0M6Rz4f3v6w;
-        Thu, 24 Nov 2022 09:17:51 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-        by APP4 (Coremail) with SMTP id gCh0CgD3GthAxn5jsBE0BA--.21372S3;
-        Thu, 24 Nov 2022 09:17:53 +0800 (CST)
-Subject: Re: nbd: please don't spawn 16 threads when nbd is not even in use
-To:     Pavel Machek <pavel@ucw.cz>, Eric Blake <eblake@redhat.com>
-Cc:     kernel list <linux-kernel@vger.kernel.org>, josef@toxicpanda.com,
-        linux-block@vger.kernel.org, nbd@other.debian.org,
-        "yukuai (C)" <yukuai3@huawei.com>
-References: <Y3y4+QqOlF00X9ET@duo.ucw.cz>
- <20221123200845.cuct5euvikqksojm@redhat.com> <Y36YHNVmbozzSdxH@duo.ucw.cz>
-From:   Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <ccee0ff5-309c-b430-09c7-8d2081c9981d@huaweicloud.com>
-Date:   Thu, 24 Nov 2022 09:17:51 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        Wed, 23 Nov 2022 20:32:16 -0500
+Received: from esa1.hgst.iphmx.com (esa1.hgst.iphmx.com [68.232.141.245])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD4C38B84B
+        for <linux-block@vger.kernel.org>; Wed, 23 Nov 2022 17:32:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1669253535; x=1700789535;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=ica/S8uPZzawejTcseAyPlFWfKZju02n4YiJspQ8f2A=;
+  b=cPSoGqZrmaV/GAIKBONVA3zGyIth7RDvbE26TvYk7aAdoaJo1+t6TyLx
+   HSaV0aKmDmmMcdZegMcwWGoc5uNfNARvTLzyJiZXW5MISMaRtPkUqU0fs
+   yzMmptcfPFPuUiDcmwtnxJhnb6wB8z+yNPIVXrtUEfPUuZctnfC+cU4RM
+   FG7MHbOYreoVSI2zZpzVsHVHufT+NF79nnfdAPxttK4VPmMOFLvn3x1nB
+   2hRWkjjN+epoi/iBHmLes61pab7mlLQwXmRlIlUXD0IodM2fBsFpbp+BH
+   bltRcDtxZWV1tbjXwaM7o6qK7IXtKN8BAzQsWvT0MHMaCSmU2Kmt9vW/5
+   w==;
+X-IronPort-AV: E=Sophos;i="5.96,189,1665417600"; 
+   d="scan'208";a="329148111"
+Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
+  by ob1.hgst.iphmx.com with ESMTP; 24 Nov 2022 09:32:14 +0800
+IronPort-SDR: ft3izyvMRmIta5LaE60/FIzLCihZ18ut2tttAcTWXBl20Kc4HOcV8M8v0bxfB4w1ZDbtio4JTp
+ eMuZzf41N0d8ZP2Zffz+41cFh+pGgpkQexjKTHzCfcjhU0/IpeZYxPVWxbDgfDkvmPUzsqbnHM
+ /7A3rMoWhvhcCQO2lZ4w6DzgO1gB1HKrl6l0gnJ2Vy3pfELbn0wddMizhNMptWfwpsKs1Mi9nb
+ U34aNmcc69wF3b1HmS2siq78UbpZ533xVwDt1XL1vNnJUlCbEQc79OEDt8855P1cQI0ZIzxoIh
+ grE=
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 23 Nov 2022 16:51:00 -0800
+IronPort-SDR: hZRLY8w4RNB2vz7K0GGH/YDsRt6Ur9i4pMRzv6bbYOatAp6VOrxeudUgY18+V7Ry67bP1sBZxE
+ 1pnwTT0HhYPOADorXqK7rjYnBb8496+5IHHIQiWiYO+S3avX/eqo9lte0IRipiBwPY8nyiSw2/
+ Q5PU0/ME55aDBzg2G98zNwkEUZu4NIX93ILPQC+wPiV6sA504K9aPcmIAobTfLXD95C7Sbwokg
+ w/1o17mpTg0ZiU82bFI3Yyr8v2UxkE6b6XsbiRLoyyEyeQUJ7N5IfAJ3TLn9V8rXf3kjz4FYzX
+ WzM=
+WDCIronportException: Internal
+Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
+  by uls-op-cesaip02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 23 Nov 2022 17:32:14 -0800
+Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4NHgTT1FD4z1RWy3
+        for <linux-block@vger.kernel.org>; Wed, 23 Nov 2022 17:32:12 -0800 (PST)
+Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
+        reason="pass (just generated, assumed good)"
+        header.d=opensource.wdc.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
+        opensource.wdc.com; h=content-transfer-encoding:content-type
+        :in-reply-to:organization:from:references:to:content-language
+        :subject:user-agent:mime-version:date:message-id; s=dkim; t=
+        1669253530; x=1671845531; bh=ica/S8uPZzawejTcseAyPlFWfKZju02n4Yi
+        JspQ8f2A=; b=GzqMRl0UShXbYDCj4a6+8IeU1jodBd44ysKFkz88v7CcQN5Hs54
+        vZqvbCQ4+MlPOGbUhuzR0K9cRgMwnqEKXyohgtE6ehuUp+gPug8q1Cn6YqGSV8TZ
+        UmeDatGFC0xohs161PDLA4csy9V32HPM15T8AhqDB9c+qKkAl5VAWhKOXIVWUvyK
+        ePgXBwfLbxZGEJHqWbbWaFmcbDp2vcybdfSIzTs28x/K3iNkhdfeRDqBFlCnWK6Q
+        Xq9xfH/GoRy1oaE1nfaNeC/HHiJoPhAtHiZyBNrhBIwLjIq0bd5stZ2oeB4sqEwt
+        20SaisiRNML6Yfnwokfun5hqBeDn36+WKZg==
+X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
+Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
+        by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
+        with ESMTP id GuTorhJ8qv_2 for <linux-block@vger.kernel.org>;
+        Wed, 23 Nov 2022 17:32:10 -0800 (PST)
+Received: from [10.225.163.55] (unknown [10.225.163.55])
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4NHgTL2TNbz1RvLy;
+        Wed, 23 Nov 2022 17:32:06 -0800 (PST)
+Message-ID: <729254f8-2468-e694-715e-72bcbef80ff3@opensource.wdc.com>
+Date:   Thu, 24 Nov 2022 10:32:04 +0900
 MIME-Version: 1.0
-In-Reply-To: <Y36YHNVmbozzSdxH@duo.ucw.cz>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgD3GthAxn5jsBE0BA--.21372S3
-X-Coremail-Antispam: 1UD129KBjvdXoW7GFy8WrWfWFyftrWfZFyxXwb_yoW3AFX_WF
-        W7ZFyDGw4UXF18Ja1qkF1rWFW8Xrs7XF4jqasxtwsrJw43W3s3uF4DWry3Zw4UGw4YyFnx
-        ur1UZay7Ar47ujkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-        9fnUUIcSsGvfJTRUUUbzAYFVCjjxCrM7AC8VAFwI0_Gr0_Xr1l1xkIjI8I6I8E6xAIw20E
-        Y4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwV
-        A0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVWDJVCq3wA2z4x0Y4vE2Ix0cI8IcVCY1x02
-        67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I
-        0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40E
-        x7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x
-        0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lc7I2V7IY0VAS07AlzVAYIcxG8wCF04k20xvY0x0E
-        wIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E74
-        80Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_JF0_Jw1lIxkGc2Ij64vIr41lIxAIcVC0
-        I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04
-        k26cxKx2IYs7xG6rW3Jr0E3s1lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY
-        1x0267AKxVWUJVW8JbIYCTnIWIevJa73UjIFyTuYvjxUrR6zUUUUU
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
-X-CFilter-Loop: Reflected
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.5.0
+Subject: Re: [PATCH v5 10/10] fs: add support for copy file range in zonefs
+Content-Language: en-US
+To:     Nitesh Shetty <nj.shetty@samsung.com>, axboe@kernel.dk,
+        agk@redhat.com, snitzer@kernel.org, dm-devel@redhat.com,
+        kbusch@kernel.org, hch@lst.de, sagi@grimberg.me,
+        james.smart@broadcom.com, kch@nvidia.com, naohiro.aota@wdc.com,
+        jth@kernel.org, viro@zeniv.linux.org.uk
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org,
+        anuj20.g@samsung.com, joshi.k@samsung.com, p.raghav@samsung.com,
+        nitheshshetty@gmail.com, gost.dev@samsung.com
+References: <20221123055827.26996-1-nj.shetty@samsung.com>
+ <CGME20221123061044epcas5p2ac082a91fc8197821f29e84278b6203c@epcas5p2.samsung.com>
+ <20221123055827.26996-11-nj.shetty@samsung.com>
+From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
+Organization: Western Digital Research
+In-Reply-To: <20221123055827.26996-11-nj.shetty@samsung.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
+On 11/23/22 14:58, Nitesh Shetty wrote:
+> copy_file_range is implemented using copy offload,
+> copy offloading to device is always enabled.
+> To disable copy offloading mount with "no_copy_offload" mount option.
 
-在 2022/11/24 6:01, Pavel Machek 写道:
-> Hi!
-> 
->>> I see this... and it looks like there are 16 workqueues before nbd is
->>> even used. Surely there are better ways to do that?
->>
->> Yes, it would be nice to create a pool of workers that only spawns up
->> threads when actual parallel requests are made.  Are you willing to
->> help write the patch?
-> 
-> I was thinking more "only spawn a workqueue when nbd is opened" or so.
-> 
-> I have 16 of them, and I'm not using nbd. Workqueue per open device is
-> okay, current situation... not so much.
+And were is the code that handle this option ?
 
-You can take a look at this commit:
-
-e2daec488c57 ("nbd: Fix hungtask when nbd_config_put")
-
-Allocation of recv_workq is moved from start device to alloc device to
-fix hungtask. You might need to be careful if you want to move this.
-
-Thanks,
-Kuai
+> At present copy offload is only used, if the source and destination files
+> are on same block device, otherwise copy file range is completed by
+> generic copy file range.
 > 
->        	       	    	  	  	    	     		Pavel
+> copy file range implemented as following:
+> 	- write pending writes on the src and dest files
+> 	- drop page cache for dest file if its conv zone
+> 	- copy the range using offload
+> 	- update dest file info
 > 
+> For all failure cases we fallback to generic file copy range
+
+For all cases ? That would be weird. What would be the point of trying to
+copy again if e.g. the dest zone has gone offline or read only ?
+
+> At present this implementation does not support conv aggregation
+
+Please check this commit message overall: the grammar and punctuation
+could really be improved.
+
+> 
+> Signed-off-by: Nitesh Shetty <nj.shetty@samsung.com>
+> Signed-off-by: Anuj Gupta <anuj20.g@samsung.com>
+> ---
+>  fs/zonefs/super.c | 179 ++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 179 insertions(+)
+> 
+> diff --git a/fs/zonefs/super.c b/fs/zonefs/super.c
+> index abc9a85106f2..15613433d4ae 100644
+> --- a/fs/zonefs/super.c
+> +++ b/fs/zonefs/super.c
+> @@ -1223,6 +1223,183 @@ static int zonefs_file_release(struct inode *inode, struct file *file)
+>  	return 0;
+>  }
+>  
+> +static int zonefs_is_file_copy_offset_ok(struct inode *src_inode,
+> +		struct inode *dst_inode, loff_t src_off, loff_t dst_off,
+> +		size_t *len)
+> +{
+> +	loff_t size, endoff;
+> +	struct zonefs_inode_info *dst_zi = ZONEFS_I(dst_inode);
+> +
+> +	inode_lock(src_inode);
+> +	size = i_size_read(src_inode);
+> +	inode_unlock(src_inode);
+> +	/* Don't copy beyond source file EOF. */
+> +	if (src_off < size) {
+> +		if (src_off + *len > size)
+> +			*len = (size - (src_off + *len));
+> +	} else
+> +		*len = 0;
+
+Missing curly brackets for the else.
+
+> +
+> +	mutex_lock(&dst_zi->i_truncate_mutex);
+> +	if (dst_zi->i_ztype == ZONEFS_ZTYPE_SEQ) {
+> +		if (*len > dst_zi->i_max_size - dst_zi->i_wpoffset)
+> +			*len -= dst_zi->i_max_size - dst_zi->i_wpoffset;
+> +
+> +		if (dst_off != dst_zi->i_wpoffset)
+> +			goto err;
+> +	}
+> +	mutex_unlock(&dst_zi->i_truncate_mutex);
+> +
+> +	endoff = dst_off + *len;
+> +	inode_lock(dst_inode);
+> +	if (endoff > dst_zi->i_max_size ||
+> +			inode_newsize_ok(dst_inode, endoff)) {
+> +		inode_unlock(dst_inode);
+> +		goto err;
+
+And here truncate mutex is not locked, but goto err will unlock it. This
+is broken...
+
+> +	}
+> +	inode_unlock(dst_inode);
+
+...The locking is completely broken in this function anyway. You take the
+lock, look at something, then release the lock. Then what if a write or a
+trunctate comes in when the inode is not locked ? This is completely
+broken. The inode should be locked with no dio pending when this function
+is called. This is only to check if everything is ok. This has no business
+playing with the inode and truncate locks.
+
+> +
+> +	return 0;
+> +err:
+> +	mutex_unlock(&dst_zi->i_truncate_mutex);
+> +	return -EINVAL;
+> +}
+> +
+> +static ssize_t zonefs_issue_copy(struct zonefs_inode_info *src_zi,
+> +		loff_t src_off, struct zonefs_inode_info *dst_zi,
+> +		loff_t dst_off, size_t len)
+> +{
+> +	struct block_device *src_bdev = src_zi->i_vnode.i_sb->s_bdev;
+> +	struct block_device *dst_bdev = dst_zi->i_vnode.i_sb->s_bdev;
+> +	struct range_entry *rlist = NULL;
+> +	int ret = len;
+> +
+> +	rlist = kmalloc(sizeof(*rlist), GFP_KERNEL);
+
+GFP_NOIO ?
+
+> +	if (!rlist)
+> +		return -ENOMEM;
+> +
+> +	rlist[0].dst = (dst_zi->i_zsector << SECTOR_SHIFT) + dst_off;
+> +	rlist[0].src = (src_zi->i_zsector << SECTOR_SHIFT) + src_off;
+> +	rlist[0].len = len;
+> +	rlist[0].comp_len = 0;
+> +	ret = blkdev_issue_copy(src_bdev, dst_bdev, rlist, 1, NULL, NULL,
+> +			GFP_KERNEL);
+> +	if (rlist[0].comp_len > 0)
+> +		ret = rlist[0].comp_len;
+> +	kfree(rlist);
+> +
+> +	return ret;
+> +}
+> +
+> +/* Returns length of possible copy, else returns error */
+> +static ssize_t zonefs_copy_file_checks(struct file *src_file, loff_t src_off,
+> +					struct file *dst_file, loff_t dst_off,
+> +					size_t *len, unsigned int flags)
+> +{
+> +	struct inode *src_inode = file_inode(src_file);
+> +	struct inode *dst_inode = file_inode(dst_file);
+> +	struct zonefs_inode_info *src_zi = ZONEFS_I(src_inode);
+> +	struct zonefs_inode_info *dst_zi = ZONEFS_I(dst_inode);
+> +	ssize_t ret;
+> +
+> +	if (src_inode->i_sb != dst_inode->i_sb)
+> +		return -EXDEV;
+> +
+> +	/* Start by sync'ing the source and destination files for conv zones */
+> +	if (src_zi->i_ztype == ZONEFS_ZTYPE_CNV) {
+> +		ret = file_write_and_wait_range(src_file, src_off,
+> +				(src_off + *len));
+> +		if (ret < 0)
+> +			goto io_error;
+> +	}
+> +	inode_dio_wait(src_inode);
+
+That is not a "check". So having this in a function called
+zonefs_copy_file_checks() is a little strange.
+
+> +
+> +	/* Start by sync'ing the source and destination files ifor conv zones */
+
+Same comment repeated, with typos.
+
+> +	if (dst_zi->i_ztype == ZONEFS_ZTYPE_CNV) {
+> +		ret = file_write_and_wait_range(dst_file, dst_off,
+> +				(dst_off + *len));
+> +		if (ret < 0)
+> +			goto io_error;
+> +	}
+> +	inode_dio_wait(dst_inode);
+> +
+> +	/* Drop dst file cached pages for a conv zone*/
+> +	if (dst_zi->i_ztype == ZONEFS_ZTYPE_CNV) {
+> +		ret = invalidate_inode_pages2_range(dst_inode->i_mapping,
+> +				dst_off >> PAGE_SHIFT,
+> +				(dst_off + *len) >> PAGE_SHIFT);
+> +		if (ret < 0)
+> +			goto io_error;
+> +	}
+> +
+> +	ret = zonefs_is_file_copy_offset_ok(src_inode, dst_inode, src_off,
+> +			dst_off, len);
+> +	if (ret < 0)
+
+if (ret)
+
+> +		return ret;
+> +
+> +	return *len;
+> +
+> +io_error:
+> +	zonefs_io_error(dst_inode, true);
+> +	return ret;
+> +}
+> +
+> +static ssize_t zonefs_copy_file(struct file *src_file, loff_t src_off,
+> +		struct file *dst_file, loff_t dst_off,
+> +		size_t len, unsigned int flags)
+> +{
+> +	struct inode *src_inode = file_inode(src_file);
+> +	struct inode *dst_inode = file_inode(dst_file);
+> +	struct zonefs_inode_info *src_zi = ZONEFS_I(src_inode);
+> +	struct zonefs_inode_info *dst_zi = ZONEFS_I(dst_inode);
+> +	ssize_t ret = 0, bytes;
+> +
+> +	inode_lock(src_inode);
+> +	inode_lock(dst_inode);
+
+So you did zonefs_copy_file_checks() outside of these locks, which mean
+that everything about the source and destination files may have changed.
+This does not work.
+
+> +	bytes = zonefs_issue_copy(src_zi, src_off, dst_zi, dst_off, len);
+> +	if (bytes < 0)
+> +		goto unlock_exit;
+> +
+> +	ret += bytes;
+> +
+> +	file_update_time(dst_file);
+> +	mutex_lock(&dst_zi->i_truncate_mutex);
+> +	zonefs_update_stats(dst_inode, dst_off + bytes);
+> +	zonefs_i_size_write(dst_inode, dst_off + bytes);
+> +	dst_zi->i_wpoffset += bytes;
+
+This is wierd. iszie for dst will be dst_zi->i_wpoffset. So please do:
+
+	dst_zi->i_wpoffset += bytes;
+	zonefs_i_size_write(dst_inode, dst_zi->i_wpoffset);
+
+> +	mutex_unlock(&dst_zi->i_truncate_mutex);
+
+And you are not taking care of the accounting for active zones here. If
+the copy made the dst zone full, it is not active anymore. You need to
+call zonefs_account_active();
+
+> +	/* if we still have some bytes left, do splice copy */
+> +	if (bytes && (bytes < len)) {
+> +		bytes = do_splice_direct(src_file, &src_off, dst_file,
+> +					 &dst_off, len, flags);
+
+No way.
+
+> +		if (bytes > 0)
+> +			ret += bytes;
+> +	}
+> +unlock_exit:
+> +	if (ret < 0)
+> +		zonefs_io_error(dst_inode, true);
+
+How can you be sure that you even did an IO when you get an error ?
+zonefs_issue_copy() may have failed on its kmalloc() and no IO was done.
+
+> +	inode_unlock(src_inode);
+> +	inode_unlock(dst_inode);
+> +	return ret;
+> +}
+> +
+> +static ssize_t zonefs_copy_file_range(struct file *src_file, loff_t src_off,
+> +				      struct file *dst_file, loff_t dst_off,
+> +				      size_t len, unsigned int flags)
+> +{
+> +	ssize_t ret = -EIO;
+
+This does not need to be initialized.
+
+> +
+> +	ret = zonefs_copy_file_checks(src_file, src_off, dst_file, dst_off,
+> +				     &len, flags);
+
+These checks need to be done for the generic implementation too, no ? Why
+would checking this automatically trigger the offload ? What if the device
+does not support offloading ?
+
+> +	if (ret > 0)
+> +		ret = zonefs_copy_file(src_file, src_off, dst_file, dst_off,
+> +				     len, flags);
+
+return here, then no need for the else. But see above. This seems all
+broken to me.
+
+> +	else if (ret < 0 && ret == -EXDEV)
+> +		ret = generic_copy_file_range(src_file, src_off, dst_file,
+> +					      dst_off, len, flags);
+> +	return ret;
+> +}
+> +
+>  static const struct file_operations zonefs_file_operations = {
+>  	.open		= zonefs_file_open,
+>  	.release	= zonefs_file_release,
+> @@ -1234,6 +1411,7 @@ static const struct file_operations zonefs_file_operations = {
+>  	.splice_read	= generic_file_splice_read,
+>  	.splice_write	= iter_file_splice_write,
+>  	.iopoll		= iocb_bio_iopoll,
+> +	.copy_file_range = zonefs_copy_file_range,
+>  };
+>  
+>  static struct kmem_cache *zonefs_inode_cachep;
+> @@ -1804,6 +1982,7 @@ static int zonefs_fill_super(struct super_block *sb, void *data, int silent)
+>  	atomic_set(&sbi->s_active_seq_files, 0);
+>  	sbi->s_max_active_seq_files = bdev_max_active_zones(sb->s_bdev);
+>  
+> +	/* set copy support by default */
+
+What is this comment supposed to be for ?
+
+>  	ret = zonefs_read_super(sb);
+>  	if (ret)
+>  		return ret;
+
+-- 
+Damien Le Moal
+Western Digital Research
 
