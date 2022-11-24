@@ -2,102 +2,85 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C535C43219
-	for <linux-block@archiver.kernel.org>; Thu, 24 Nov 2022 10:06:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13EF1C433FE
+	for <linux-block@archiver.kernel.org>; Thu, 24 Nov 2022 11:18:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229547AbiKXKGS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 24 Nov 2022 05:06:18 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51444 "EHLO
+        id S230039AbiKXLSG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 24 Nov 2022 06:18:06 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45380 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229653AbiKXKGR (ORCPT
+        with ESMTP id S230084AbiKXLRo (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 24 Nov 2022 05:06:17 -0500
-Received: from jabberwock.ucw.cz (jabberwock.ucw.cz [46.255.230.98])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A12531B9F9;
-        Thu, 24 Nov 2022 02:06:16 -0800 (PST)
-Received: by jabberwock.ucw.cz (Postfix, from userid 1017)
-        id D5B641C09DB; Thu, 24 Nov 2022 11:06:14 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ucw.cz; s=gen1;
-        t=1669284374;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=capoMoyAoTRj+QhymNjy9DjDy54aOgbbJqtTNS98/nQ=;
-        b=apDGjOxrfVjgw3aF/04OkmIsnhtrCyjo6MrJ4rcit4SWicJfR1qXNVdIuE6asqhticv22R
-        M+VmZTXsmk7cSwRVDVSlbmb2xXp1Td3LXsEkJpqnka+yXADMcqikuw2OuYNZNWBDy/WNeW
-        VVjbKXbc45uomNEG2UQd2yoHFVcLJxw=
-Date:   Thu, 24 Nov 2022 11:06:14 +0100
-From:   Pavel Machek <pavel@ucw.cz>
-To:     Yu Kuai <yukuai1@huaweicloud.com>
+        Thu, 24 Nov 2022 06:17:44 -0500
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1BA26F834;
+        Thu, 24 Nov 2022 03:17:10 -0800 (PST)
+Received: from mail02.huawei.com (unknown [172.30.67.153])
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4NHwSJ1RQmz4f3jqc;
+        Thu, 24 Nov 2022 19:17:04 +0800 (CST)
+Received: from [10.174.176.73] (unknown [10.174.176.73])
+        by APP4 (Coremail) with SMTP id gCh0CgDH69ixUn9jsjZLBA--.43973S3;
+        Thu, 24 Nov 2022 19:17:07 +0800 (CST)
+Subject: Re: nbd: please don't spawn 16 threads when nbd is not even in use
+To:     Pavel Machek <pavel@ucw.cz>, Yu Kuai <yukuai1@huaweicloud.com>
 Cc:     Eric Blake <eblake@redhat.com>,
         kernel list <linux-kernel@vger.kernel.org>,
         josef@toxicpanda.com, linux-block@vger.kernel.org,
         nbd@other.debian.org, "yukuai (C)" <yukuai3@huawei.com>
-Subject: Re: nbd: please don't spawn 16 threads when nbd is not even in use
-Message-ID: <Y39CFnRwNGBGIsCH@duo.ucw.cz>
 References: <Y3y4+QqOlF00X9ET@duo.ucw.cz>
- <20221123200845.cuct5euvikqksojm@redhat.com>
- <Y36YHNVmbozzSdxH@duo.ucw.cz>
+ <20221123200845.cuct5euvikqksojm@redhat.com> <Y36YHNVmbozzSdxH@duo.ucw.cz>
  <ccee0ff5-309c-b430-09c7-8d2081c9981d@huaweicloud.com>
+ <Y39CFnRwNGBGIsCH@duo.ucw.cz>
+From:   Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <f07f496d-3bf7-eb84-eb90-df2d43c5c01b@huaweicloud.com>
+Date:   Thu, 24 Nov 2022 19:17:05 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-        protocol="application/pgp-signature"; boundary="HZjYMFTE2RCR7pyM"
-Content-Disposition: inline
-In-Reply-To: <ccee0ff5-309c-b430-09c7-8d2081c9981d@huaweicloud.com>
+In-Reply-To: <Y39CFnRwNGBGIsCH@duo.ucw.cz>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: gCh0CgDH69ixUn9jsjZLBA--.43973S3
+X-Coremail-Antispam: 1UD129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7v73
+        VFW2AGmfu7bjvjm3AaLaJ3UjIYCTnIWjp_UUUYF7AC8VAFwI0_Gr0_Xr1l1xkIjI8I6I8E
+        6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28Cjx
+        kF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVW7JVWDJwA2z4x0Y4vE2Ix0cI8I
+        cVCY1x0267AKxVWxJVW8Jr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2js
+        IEc7CjxVAFwI0_GcCE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE
+        5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeV
+        CFs4IE7xkEbVWUJVW8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lc7I2
+        V7IY0VAS07AlzVAYIcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8Jw
+        C20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAF
+        wI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjx
+        v20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6rW3Jr0E3s1lIxAIcVC2
+        z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnU
+        UI43ZEXa7VUbXdbUUUUUU==
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Hi,
 
---HZjYMFTE2RCR7pyM
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+在 2022/11/24 18:06, Pavel Machek 写道:
+> 
+> Can we get that reverted?
+> 
+> That is rather obscure bug (how many GFP_KERNEL failures do you
+> normally see?) and it costs, dunno, 100KB? of unswappable memory.
+> 
 
-On Thu 2022-11-24 09:17:51, Yu Kuai wrote:
-> Hi,
->=20
-> =E5=9C=A8 2022/11/24 6:01, Pavel Machek =E5=86=99=E9=81=93:
-> > Hi!
-> >=20
-> > > > I see this... and it looks like there are 16 workqueues before nbd =
-is
-> > > > even used. Surely there are better ways to do that?
-> > >=20
-> > > Yes, it would be nice to create a pool of workers that only spawns up
-> > > threads when actual parallel requests are made.  Are you willing to
-> > > help write the patch?
-> >=20
-> > I was thinking more "only spawn a workqueue when nbd is opened" or so.
-> >=20
-> > I have 16 of them, and I'm not using nbd. Workqueue per open device is
-> > okay, current situation... not so much.
->=20
-> You can take a look at this commit:
->=20
-> e2daec488c57 ("nbd: Fix hungtask when nbd_config_put")
->=20
-> Allocation of recv_workq is moved from start device to alloc device to
-> fix hungtask. You might need to be careful if you want to move this.
+No, I don't think that can be reverted. Introduce a BUG just to save
+some memory sounds insane.
 
-Can we get that reverted?
+If you really want to do this. I think the right thing to do is to move
+the allocation of recv_workq back to start device, and also fix the
+problem properly.
 
-That is rather obscure bug (how many GFP_KERNEL failures do you
-normally see?) and it costs, dunno, 100KB? of unswappable memory.
+Thanks,
+Kuai
+> Best regards,
+> 								Pavel
+> 
 
-Best regards,
-								Pavel
---=20
-People of Russia, stop Putin before his war on Ukraine escalates.
-
---HZjYMFTE2RCR7pyM
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iF0EABECAB0WIQRPfPO7r0eAhk010v0w5/Bqldv68gUCY39CFgAKCRAw5/Bqldv6
-8vWYAJ9yQ6drFnNpEutVeHvEesUcP4FckgCgvgMVBq1JANQNm02eRF+IlRzW0uc=
-=IyCl
------END PGP SIGNATURE-----
-
---HZjYMFTE2RCR7pyM--
