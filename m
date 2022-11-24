@@ -2,102 +2,111 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D638AC4332F
-	for <linux-block@archiver.kernel.org>; Thu, 24 Nov 2022 03:06:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D68BC433FE
+	for <linux-block@archiver.kernel.org>; Thu, 24 Nov 2022 03:06:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229889AbiKXDGD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 23 Nov 2022 22:06:03 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53606 "EHLO
+        id S229915AbiKXDGP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 23 Nov 2022 22:06:15 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53624 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229879AbiKXDGC (ORCPT
+        with ESMTP id S229897AbiKXDGK (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 23 Nov 2022 22:06:02 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 84844B7396
-        for <linux-block@vger.kernel.org>; Wed, 23 Nov 2022 19:05:08 -0800 (PST)
+        Wed, 23 Nov 2022 22:06:10 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F21BEC5623
+        for <linux-block@vger.kernel.org>; Wed, 23 Nov 2022 19:05:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1669259107;
+        s=mimecast20190719; t=1669259115;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=a7cUa6aB01P+z7A59NDxewUb//vfN7daC5caR/sN9+M=;
-        b=bySintVqvC6GEGjUs8esQ4uu4yW+6S8uM6Qye88xziiePQOQ+VODXUhYkgYDtb5De9sCQ2
-        jJqbdflfguFTR8RFQtFaEE19NcH0M+2hw7axmvKS+XfQf2fs4Wkgx1GP7g2cIzzbdKiD3Y
-        HPLaZhoofzo4W9qMzYClPXAUkA/RNtA=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=K1G7NamoQddPnuyXF2DsBdqfeJ4GuyoyTcP4JPgDPLQ=;
+        b=eXhaJRE7M2xHdZW1agNCMKvO5E8wir2p2uR17uOCoqWmLUelKVDicV46T+7arSvvulZqEN
+        MUD8nR4dxpfROtfXRAKwzAP3PAJmD/BTI4/y//RQ5A1BxbZIknb2wW3iMn/ebV75CVm1qv
+        x5NEDn7DwtoaxcOUGitnq4jsLHoNaM8=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-609-fjTExEkwOeOP8u3fA8fr6g-1; Wed, 23 Nov 2022 22:05:03 -0500
-X-MC-Unique: fjTExEkwOeOP8u3fA8fr6g-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+ us-mta-58-nBqCc8bDMMW4gti70qaCEA-1; Wed, 23 Nov 2022 22:05:12 -0500
+X-MC-Unique: nBqCc8bDMMW4gti70qaCEA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 6B1FA85A588;
-        Thu, 24 Nov 2022 03:05:03 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 564F8296A62B;
+        Thu, 24 Nov 2022 03:05:12 +0000 (UTC)
 Received: from localhost (ovpn-8-23.pek2.redhat.com [10.72.8.23])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 620B31121319;
-        Thu, 24 Nov 2022 03:05:02 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 032184EA4E;
+        Thu, 24 Nov 2022 03:05:10 +0000 (UTC)
 From:   Ming Lei <ming.lei@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org,
         ZiyangZhang <ZiyangZhang@linux.alibaba.com>,
         Dan Carpenter <error27@gmail.com>,
         Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V2 0/6] ublk_drv: add mechanism for supporting unprivileged ublk device
-Date:   Thu, 24 Nov 2022 11:04:48 +0800
-Message-Id: <20221124030454.476152-1-ming.lei@redhat.com>
+Subject: [PATCH V2 2/6] ublk_drv: don't probe partitions if the ubq daemon isn't trusted
+Date:   Thu, 24 Nov 2022 11:04:50 +0800
+Message-Id: <20221124030454.476152-3-ming.lei@redhat.com>
+In-Reply-To: <20221124030454.476152-1-ming.lei@redhat.com>
+References: <20221124030454.476152-1-ming.lei@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.5
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
+If any ubq daemon is unprivileged, the ublk char device is allowed
+for unprivileged user actually, and we can't trust the current user,
+so not probe partitions.
 
-Stefan Hajnoczi suggested un-privileged ublk device[1] for container
-use case.
+Fixes: 71f28f3136af ("ublk_drv: add io_uring based userspace block driver")
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ drivers/block/ublk_drv.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-So far only administrator can create/control ublk device which is too
-strict and increase system administrator burden, and this patchset
-implements un-privileged ublk device:
-
-- any user can create ublk device, which can only be controlled &
-  accessed by the owner of the device or administrator
-
-For using such mechanism, system administrator needs to deploy two
-simple udev rules[2] after running 'make install' in ublksrv.
-
-Userspace(ublksrv):
-
-	https://github.com/ming1/ubdsrv/tree/unprivileged-ublk
-    
-'ublk add -t $TYPE --un_privileged' is for creating one un-privileged
-ublk device if the user is un-privileged.
-
-
-[1] https://lore.kernel.org/linux-block/YoOr6jBfgVm8GvWg@stefanha-x1.localdomain/
-[2] https://github.com/ming1/ubdsrv/blob/unprivileged-ublk/README.rst#un-privileged-mode
-
-V2:
-	- fix "ublk_ctrl_uring_cmd_permission() error: uninitialized symbol 'mask'", reported
-	by  Dan Carpenter' test robot
-	- address Ziyang's comment on dealing with nr_privileged_daemon
-
-Ming Lei (6):
-  ublk_drv: remove nr_aborted_queues from ublk_device
-  ublk_drv: don't probe partitions if the ubq daemon isn't trusted
-  ublk_drv: move ublk_get_device_from_id into ublk_ctrl_uring_cmd
-  ublk_drv: add device parameter UBLK_PARAM_TYPE_DEVT
-  ublk_drv: add module parameter of ublks_max for limiting max allowed
-    ublk dev
-  ublk_drv: add mechanism for supporting unprivileged ublk device
-
- Documentation/block/ublk.rst  |  18 +-
- drivers/block/ublk_drv.c      | 336 ++++++++++++++++++++++++----------
- include/uapi/linux/ublk_cmd.h |  49 ++++-
- 3 files changed, 296 insertions(+), 107 deletions(-)
-
+diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+index 30db5e5edac4..a3d776a1c2f5 100644
+--- a/drivers/block/ublk_drv.c
++++ b/drivers/block/ublk_drv.c
+@@ -159,6 +159,7 @@ struct ublk_device {
+ 
+ 	struct completion	completion;
+ 	unsigned int		nr_queues_ready;
++	unsigned int		nr_privileged_daemon;
+ 
+ 	/*
+ 	 * Our ubq->daemon may be killed without any notification, so
+@@ -1178,6 +1179,9 @@ static void ublk_mark_io_ready(struct ublk_device *ub, struct ublk_queue *ubq)
+ 		ubq->ubq_daemon = current;
+ 		get_task_struct(ubq->ubq_daemon);
+ 		ub->nr_queues_ready++;
++
++		if (capable(CAP_SYS_ADMIN))
++			ub->nr_privileged_daemon++;
+ 	}
+ 	if (ub->nr_queues_ready == ub->dev_info.nr_hw_queues)
+ 		complete_all(&ub->completion);
+@@ -1534,6 +1538,10 @@ static int ublk_ctrl_start_dev(struct io_uring_cmd *cmd)
+ 	if (ret)
+ 		goto out_put_disk;
+ 
++	/* don't probe partitions if any one ubq daemon is un-trusted */
++	if (ub->nr_privileged_daemon != ub->nr_queues_ready)
++		set_bit(GD_SUPPRESS_PART_SCAN, &disk->state);
++
+ 	get_device(&ub->cdev_dev);
+ 	ret = add_disk(disk);
+ 	if (ret) {
+@@ -1935,6 +1943,7 @@ static int ublk_ctrl_start_recovery(struct io_uring_cmd *cmd)
+ 	/* set to NULL, otherwise new ubq_daemon cannot mmap the io_cmd_buf */
+ 	ub->mm = NULL;
+ 	ub->nr_queues_ready = 0;
++	ub->nr_privileged_daemon = 0;
+ 	init_completion(&ub->completion);
+ 	ret = 0;
+  out_unlock:
 -- 
 2.31.1
 
