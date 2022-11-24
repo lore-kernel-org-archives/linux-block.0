@@ -2,74 +2,120 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 960DFC43217
-	for <linux-block@archiver.kernel.org>; Thu, 24 Nov 2022 13:45:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F2E6C433FE
+	for <linux-block@archiver.kernel.org>; Thu, 24 Nov 2022 14:00:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229988AbiKXNpf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 24 Nov 2022 08:45:35 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36680 "EHLO
+        id S230155AbiKXOAo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 24 Nov 2022 09:00:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50380 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230094AbiKXNp3 (ORCPT
+        with ESMTP id S230317AbiKXOAa (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 24 Nov 2022 08:45:29 -0500
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE29A1095A0;
-        Thu, 24 Nov 2022 05:45:23 -0800 (PST)
-Received: from dggpeml500020.china.huawei.com (unknown [172.30.72.56])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4NHzkh4cHKzHw1P;
-        Thu, 24 Nov 2022 21:44:44 +0800 (CST)
-Received: from dggpeml500003.china.huawei.com (7.185.36.200) by
- dggpeml500020.china.huawei.com (7.185.36.88) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31; Thu, 24 Nov 2022 21:45:22 +0800
-Received: from huawei.com (10.175.127.227) by dggpeml500003.china.huawei.com
- (7.185.36.200) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.31; Thu, 24 Nov
- 2022 21:45:21 +0800
-From:   Li Nan <linan122@huawei.com>
-To:     <tj@kernel.org>, <josef@toxicpanda.com>, <axboe@kernel.dk>
-CC:     <cgroups@vger.kernel.org>, <linux-block@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <linan122@huawei.com>,
-        <yukuai3@huawei.com>, <yi.zhang@huawei.com>
-Subject: [PATCH -next 2/2] blk-iocost: change div64_u64 to DIV64_U64_ROUND_UP in ioc_refresh_params()
-Date:   Thu, 24 Nov 2022 22:06:35 +0800
-Message-ID: <20221124140635.695205-2-linan122@huawei.com>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20221124140635.695205-1-linan122@huawei.com>
-References: <20221124140635.695205-1-linan122@huawei.com>
+        Thu, 24 Nov 2022 09:00:30 -0500
+Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35FD513C705
+        for <linux-block@vger.kernel.org>; Thu, 24 Nov 2022 05:58:31 -0800 (PST)
+Received: by mail-pj1-x102f.google.com with SMTP id o5-20020a17090a678500b00218cd5a21c9so1685734pjj.4
+        for <linux-block@vger.kernel.org>; Thu, 24 Nov 2022 05:58:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=VkflUhit7OoN55ql8xALxypH6TKph++jYyEKyALoOoY=;
+        b=J20zac+mHU3mT4CWCx1AjwUMnLnD1d9/PwdlU+LMJFMTVyuzUuqI1bBakJWId7mdIs
+         AF6cMXHqA0n8mio9knEYOBEii6DRbZZ77dfA/LVwzQL8jGISVtsdI3WtpVL4ONiUaNJL
+         650k0DzrbPv9U1C/0xoSszESmPSQFPpxGKoVsMyL04SyWDhQ3eRQcxVy9xwgmn6IHxV8
+         S9wbFf2IQmmnX3Uqy3CDTd+tVZYhBe2BvL4cBVIFm35jQYovkmQBvW2VEO7Wn9bFCw2J
+         pm3fwpwWXX9yUirCLqiVe4EGkT25OaUTUStTPk62opbMwry97FdzeHK4fx12VaYj2pzi
+         AzIA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=VkflUhit7OoN55ql8xALxypH6TKph++jYyEKyALoOoY=;
+        b=msnO+xjX1uQdInNMZwCKX2jF1p/jbJi2gwkAcgGuQ3HEZMbmwPorDn0BoaPVOEa0Yz
+         gN4cYgQBiHNnIio0PWd8Atc10LlJLt4sviVIrXVH4TXtKFuSet0/1QyExXtkQjJhvI3Q
+         056wThSRHwzFjSnv8azcWBR9U278v2+T+C15spOBhGChrGdeNyrL49juo+ZxV6kzIDLq
+         SlmvpCS6dVohw9C0mfpqBL9csTJ7f4hKz31BG0Zp24Os/QjHipKJEiDMDcx09YXrO6FO
+         H9JY7DDhM459dZ55/6XU9oPyED5yL/32yMyE/9soXtk7g6q5f3Fnru1W5sKAVNRdAtqF
+         Bk5Q==
+X-Gm-Message-State: ANoB5pm864uKsigBvi3bfObKG66CNoRS5dAeL/9ZGOPdRAZ8/fOSBCp1
+        J+clJBTZp7UUYHtC+v8jro7Trw==
+X-Google-Smtp-Source: AA0mqf5JzXsxuKD0AuSR9GA9eY/RYGcKsZtkyW87zP3M2xjuoNqdQ27yzsUCAjBsBhIKKy/ccgg9aQ==
+X-Received: by 2002:a17:90a:ba97:b0:218:f5df:5cf1 with SMTP id t23-20020a17090aba9700b00218f5df5cf1mr5518212pjr.79.1669298310242;
+        Thu, 24 Nov 2022 05:58:30 -0800 (PST)
+Received: from [127.0.0.1] (cpe-72-132-29-68.dc.res.rr.com. [72.132.29.68])
+        by smtp.gmail.com with ESMTPSA id a28-20020aa795bc000000b00560cdb3784bsm1250769pfk.60.2022.11.24.05.58.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 24 Nov 2022 05:58:29 -0800 (PST)
+From:   Jens Axboe <axboe@kernel.dk>
+To:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        Ye Bin <yebin@huaweicloud.com>
+Cc:     ming.lei@redhat.com,
+        syzbot+746a4eece09f86bc39d7@syzkaller.appspotmail.com,
+        Ye Bin <yebin10@huawei.com>
+In-Reply-To: <20221107033956.3276891-1-yebin@huaweicloud.com>
+References: <20221107033956.3276891-1-yebin@huaweicloud.com>
+Subject: Re: [PATCH] block: fix crash in 'blk_mq_elv_switch_none'
+Message-Id: <166929830905.100836.12987821454081099289.b4-ty@kernel.dk>
+Date:   Thu, 24 Nov 2022 06:58:29 -0700
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.175.127.227]
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- dggpeml500003.china.huawei.com (7.185.36.200)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-Mailer: b4 0.11.0-dev-28747
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-vrate_min is calculated by DIV64_U64_ROUND_UP, but vrate_max is calculated
-by div64_u64. Vrate_min may be 1 greater than vrate_max if the input
-values min and max of cost.qos are equal.
+On Mon, 7 Nov 2022 11:39:56 +0800, Ye Bin wrote:
+> From: Ye Bin <yebin10@huawei.com>
+> 
+> Syzbot found the following issue:
+> general protection fault, probably for non-canonical address 0xdffffc000000001d: 0000 [#1] PREEMPT SMP KASAN
+> KASAN: null-ptr-deref in range [0x00000000000000e8-0x00000000000000ef]
+> CPU: 0 PID: 5234 Comm: syz-executor931 Not tainted 6.1.0-rc3-next-20221102-syzkaller #0
+> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/11/2022
+> RIP: 0010:__elevator_get block/elevator.h:94 [inline]
+> RIP: 0010:blk_mq_elv_switch_none block/blk-mq.c:4593 [inline]
+> RIP: 0010:__blk_mq_update_nr_hw_queues block/blk-mq.c:4658 [inline]
+> RIP: 0010:blk_mq_update_nr_hw_queues+0x304/0xe40 block/blk-mq.c:4709
+> RSP: 0018:ffffc90003cdfc08 EFLAGS: 00010206
+> RAX: 0000000000000000 RBX: dffffc0000000000 RCX: 0000000000000000
+> RDX: 000000000000001d RSI: 0000000000000002 RDI: 00000000000000e8
+> RBP: ffff88801dbd0000 R08: ffff888027c89398 R09: ffffffff8de2e517
+> R10: fffffbfff1bc5ca2 R11: 0000000000000000 R12: ffffc90003cdfc70
+> R13: ffff88801dbd0008 R14: ffff88801dbd03f8 R15: ffff888027c89380
+> FS:  0000555557259300(0000) GS:ffff8880b9a00000(0000) knlGS:0000000000000000
+> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> CR2: 00000000005d84c8 CR3: 000000007a7cb000 CR4: 00000000003506f0
+> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+> Call Trace:
+>  <TASK>
+>  nbd_start_device+0x153/0xc30 drivers/block/nbd.c:1355
+>  nbd_start_device_ioctl drivers/block/nbd.c:1405 [inline]
+>  __nbd_ioctl drivers/block/nbd.c:1481 [inline]
+>  nbd_ioctl+0x5a1/0xbd0 drivers/block/nbd.c:1521
+>  blkdev_ioctl+0x36e/0x800 block/ioctl.c:614
+>  vfs_ioctl fs/ioctl.c:51 [inline]
+>  __do_sys_ioctl fs/ioctl.c:870 [inline]
+>  __se_sys_ioctl fs/ioctl.c:856 [inline]
+>  __x64_sys_ioctl+0x193/0x200 fs/ioctl.c:856
+>  do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+>  do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
+>  entry_SYSCALL_64_after_hwframe+0x63/0xcd
+> 
+> [...]
 
-Signed-off-by: Li Nan <linan122@huawei.com>
----
- block/blk-iocost.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Applied, thanks!
 
-diff --git a/block/blk-iocost.c b/block/blk-iocost.c
-index a38a5324bf10..9030ad8672f3 100644
---- a/block/blk-iocost.c
-+++ b/block/blk-iocost.c
-@@ -926,7 +926,7 @@ static bool ioc_refresh_params(struct ioc *ioc, bool force)
- 
- 	ioc->vrate_min = DIV64_U64_ROUND_UP((u64)ioc->params.qos[QOS_MIN] *
- 					    VTIME_PER_USEC, MILLION);
--	ioc->vrate_max = div64_u64((u64)ioc->params.qos[QOS_MAX] *
-+	ioc->vrate_max = DIV64_U64_ROUND_UP((u64)ioc->params.qos[QOS_MAX] *
- 				   VTIME_PER_USEC, MILLION);
- 
- 	return true;
+[1/1] block: fix crash in 'blk_mq_elv_switch_none'
+      commit: 90b0296ece4bd8f70419f0addc1171be6feee195
+
+Best regards,
 -- 
-2.31.1
+Jens Axboe
+
 
