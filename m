@@ -2,142 +2,90 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C9F53C433FE
-	for <linux-block@archiver.kernel.org>; Thu, 24 Nov 2022 00:05:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DD5B8C4332F
+	for <linux-block@archiver.kernel.org>; Thu, 24 Nov 2022 01:18:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230081AbiKXAF3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 23 Nov 2022 19:05:29 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35012 "EHLO
+        id S229625AbiKXBSB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 23 Nov 2022 20:18:01 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49584 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230052AbiKXAFV (ORCPT
+        with ESMTP id S229673AbiKXBR7 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 23 Nov 2022 19:05:21 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B804108937
-        for <linux-block@vger.kernel.org>; Wed, 23 Nov 2022 16:04:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1669248266;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=Swuw4Srtq7ILJ+Sr28sVCP8NRm0onxfQ8iNTcMfZrZ0=;
-        b=UBdYMvbehhfSVImegvfMb0mP8yd+zOXotHCEBJdSGYiqFvf6GEZj3q9SqSfQlSI5A1Fsqo
-        1da88ruJ6IYW4lYXuwQcrXh4I8/qfLVLX1bNnIEAYBLUN38AY1/36HHdSaF3CcChKolrE+
-        Om+258S7gLbvebkUh+I2VGY2E/8kTnY=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-655-eMnJ2nuQPZ63mU3GdK9XLA-1; Wed, 23 Nov 2022 19:04:21 -0500
-X-MC-Unique: eMnJ2nuQPZ63mU3GdK9XLA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 3935F29AB3E1;
-        Thu, 24 Nov 2022 00:04:20 +0000 (UTC)
-Received: from T590 (ovpn-8-17.pek2.redhat.com [10.72.8.17])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 5DF81C15BB1;
-        Thu, 24 Nov 2022 00:04:03 +0000 (UTC)
-Date:   Thu, 24 Nov 2022 08:03:56 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Nitesh Shetty <nj.shetty@samsung.com>
-Cc:     axboe@kernel.dk, agk@redhat.com, snitzer@kernel.org,
-        dm-devel@redhat.com, kbusch@kernel.org, hch@lst.de,
-        sagi@grimberg.me, james.smart@broadcom.com, kch@nvidia.com,
-        damien.lemoal@opensource.wdc.com, naohiro.aota@wdc.com,
-        jth@kernel.org, viro@zeniv.linux.org.uk,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org,
-        anuj20.g@samsung.com, joshi.k@samsung.com, p.raghav@samsung.com,
-        nitheshshetty@gmail.com, gost.dev@samsung.com, ming.lei@redhat.com
-Subject: Re: [PATCH v5 02/10] block: Add copy offload support infrastructure
-Message-ID: <Y3607N6lDRK6WU7/@T590>
-References: <20221123055827.26996-1-nj.shetty@samsung.com>
- <CGME20221123061017epcas5p246a589e20eac655ac340cfda6028ff35@epcas5p2.samsung.com>
- <20221123055827.26996-3-nj.shetty@samsung.com>
- <Y33UAp6ncSPO84XI@T590>
- <20221123100712.GA26377@test-zns>
+        Wed, 23 Nov 2022 20:17:59 -0500
+Received: from dggsgout12.his.huawei.com (unknown [45.249.212.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8368A27B07;
+        Wed, 23 Nov 2022 17:17:56 -0800 (PST)
+Received: from mail02.huawei.com (unknown [172.30.67.153])
+        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4NHg8v0M6Rz4f3v6w;
+        Thu, 24 Nov 2022 09:17:51 +0800 (CST)
+Received: from [10.174.176.73] (unknown [10.174.176.73])
+        by APP4 (Coremail) with SMTP id gCh0CgD3GthAxn5jsBE0BA--.21372S3;
+        Thu, 24 Nov 2022 09:17:53 +0800 (CST)
+Subject: Re: nbd: please don't spawn 16 threads when nbd is not even in use
+To:     Pavel Machek <pavel@ucw.cz>, Eric Blake <eblake@redhat.com>
+Cc:     kernel list <linux-kernel@vger.kernel.org>, josef@toxicpanda.com,
+        linux-block@vger.kernel.org, nbd@other.debian.org,
+        "yukuai (C)" <yukuai3@huawei.com>
+References: <Y3y4+QqOlF00X9ET@duo.ucw.cz>
+ <20221123200845.cuct5euvikqksojm@redhat.com> <Y36YHNVmbozzSdxH@duo.ucw.cz>
+From:   Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <ccee0ff5-309c-b430-09c7-8d2081c9981d@huaweicloud.com>
+Date:   Thu, 24 Nov 2022 09:17:51 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221123100712.GA26377@test-zns>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
+In-Reply-To: <Y36YHNVmbozzSdxH@duo.ucw.cz>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: gCh0CgD3GthAxn5jsBE0BA--.21372S3
+X-Coremail-Antispam: 1UD129KBjvdXoW7GFy8WrWfWFyftrWfZFyxXwb_yoW3AFX_WF
+        W7ZFyDGw4UXF18Ja1qkF1rWFW8Xrs7XF4jqasxtwsrJw43W3s3uF4DWry3Zw4UGw4YyFnx
+        ur1UZay7Ar47ujkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+        9fnUUIcSsGvfJTRUUUbzAYFVCjjxCrM7AC8VAFwI0_Gr0_Xr1l1xkIjI8I6I8E6xAIw20E
+        Y4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwV
+        A0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVWDJVCq3wA2z4x0Y4vE2Ix0cI8IcVCY1x02
+        67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I
+        0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40E
+        x7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x
+        0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lc7I2V7IY0VAS07AlzVAYIcxG8wCF04k20xvY0x0E
+        wIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E74
+        80Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_JF0_Jw1lIxkGc2Ij64vIr41lIxAIcVC0
+        I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04
+        k26cxKx2IYs7xG6rW3Jr0E3s1lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY
+        1x0267AKxVWUJVW8JbIYCTnIWIevJa73UjIFyTuYvjxUrR6zUUUUU
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Nov 23, 2022 at 03:37:12PM +0530, Nitesh Shetty wrote:
-> On Wed, Nov 23, 2022 at 04:04:18PM +0800, Ming Lei wrote:
-> > On Wed, Nov 23, 2022 at 11:28:19AM +0530, Nitesh Shetty wrote:
-> > > Introduce blkdev_issue_copy which supports source and destination bdevs,
-> > > and an array of (source, destination and copy length) tuples.
-> > > Introduce REQ_COPY copy offload operation flag. Create a read-write
-> > > bio pair with a token as payload and submitted to the device in order.
-> > > Read request populates token with source specific information which
-> > > is then passed with write request.
-> > > This design is courtesy Mikulas Patocka's token based copy
-> > 
-> > I thought this patchset is just for enabling copy command which is
-> > supported by hardware. But turns out it isn't, because blk_copy_offload()
-> > still submits read/write bios for doing the copy.
-> > 
-> > I am just wondering why not let copy_file_range() cover this kind of copy,
-> > and the framework has been there.
-> > 
+Hi,
+
+在 2022/11/24 6:01, Pavel Machek 写道:
+> Hi!
 > 
-> Main goal was to enable copy command, but community suggested to add
-> copy emulation as well.
+>>> I see this... and it looks like there are 16 workqueues before nbd is
+>>> even used. Surely there are better ways to do that?
+>>
+>> Yes, it would be nice to create a pool of workers that only spawns up
+>> threads when actual parallel requests are made.  Are you willing to
+>> help write the patch?
 > 
-> blk_copy_offload - actually issues copy command in driver layer.
-> The way read/write BIOs are percieved is different for copy offload.
-> In copy offload we check REQ_COPY flag in NVMe driver layer to issue
-> copy command. But we did missed it to add in other driver's, where they
-> might be treated as normal READ/WRITE.
+> I was thinking more "only spawn a workqueue when nbd is opened" or so.
 > 
-> blk_copy_emulate - is used if we fail or if device doesn't support native
-> copy offload command. Here we do READ/WRITE. Using copy_file_range for
-> emulation might be possible, but we see 2 issues here.
-> 1. We explored possibility of pulling dm-kcopyd to block layer so that we 
-> can readily use it. But we found it had many dependecies from dm-layer.
-> So later dropped that idea.
+> I have 16 of them, and I'm not using nbd. Workqueue per open device is
+> okay, current situation... not so much.
 
-Is it just because dm-kcopyd supports async copy? If yes, I believe we
-can reply on io_uring for implementing async copy_file_range, which will
-be generic interface for async copy, and could get better perf.
+You can take a look at this commit:
 
-> 2. copy_file_range, for block device atleast we saw few check's which fail
-> it for raw block device. At this point I dont know much about the history of
-> why such check is present.
+e2daec488c57 ("nbd: Fix hungtask when nbd_config_put")
 
-Got it, but IMO the check in generic_copy_file_checks() can be
-relaxed to cover blkdev cause splice does support blkdev.
+Allocation of recv_workq is moved from start device to alloc device to
+fix hungtask. You might need to be careful if you want to move this.
 
-Then your bdev offload copy work can be simplified into:
-
-1) implement .copy_file_range for def_blk_fops, suppose it is
-blkdev_copy_file_range()
-
-2) inside blkdev_copy_file_range()
-
-- if the bdev supports offload copy, just submit one bio to the device,
-and this will be converted to one pt req to device
-
-- otherwise, fallback to generic_copy_file_range()
-
+Thanks,
+Kuai
 > 
-> > When I was researching pipe/splice code for supporting ublk zero copy[1], I
-> > have got idea for async copy_file_range(), such as: io uring based
-> > direct splice, user backed intermediate buffer, still zero copy, if these
-> > ideas are finally implemented, we could get super-fast generic offload copy,
-> > and bdev copy is really covered too.
-> > 
-> > [1] https://lore.kernel.org/linux-block/20221103085004.1029763-1-ming.lei@redhat.com/
-> > 
+>        	       	    	  	  	    	     		Pavel
 > 
-> Seems interesting, We will take a look into this.
-
-BTW, that is probably one direction of ublk's async zero copy IO too.
-
-
-Thanks, 
-Ming
 
