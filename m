@@ -2,173 +2,142 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B7C9C47088
-	for <linux-block@archiver.kernel.org>; Wed, 23 Nov 2022 23:24:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C9F53C433FE
+	for <linux-block@archiver.kernel.org>; Thu, 24 Nov 2022 00:05:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229922AbiKWXYo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 23 Nov 2022 18:24:44 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58780 "EHLO
+        id S230081AbiKXAF3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 23 Nov 2022 19:05:29 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35012 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229928AbiKWXYk (ORCPT
+        with ESMTP id S230052AbiKXAFV (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 23 Nov 2022 18:24:40 -0500
-Received: from mail-0201.mail-europe.com (mail-0201.mail-europe.com [51.77.79.158])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5FA3D1121C8;
-        Wed, 23 Nov 2022 15:24:39 -0800 (PST)
-Date:   Wed, 23 Nov 2022 23:24:23 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=protonmail.com;
-        s=protonmail3; t=1669245874; x=1669505074;
-        bh=4D7H7t9cQFG+vEXPzrmjxP0kBkCA637MqCW+lh8xlvo=;
-        h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-         Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-         Message-ID:BIMI-Selector;
-        b=hPbJVkIuL1M0qEmL0bT4PuPpgSPCUAu33Y+Qb7tdeEgjcQqAn2P9/FpfK16HEA2EM
-         7vjsfHf0eS2PmoRXdPNGezpmX314hJ02XB0zpjgzVkJDzPqhEL7AMChGfIwFpiPwIA
-         NF7ZZEj1iGDIHy5p8DLkWQw2m5Qldpno4e6/JtLA16r0ZaA4hkUD/VeqWm5hbTdlnb
-         BxWDFCkr77h+K0/o8YNYsqjLGq0ZWGeFJce25BsYm5wcKn9VpmO0zKAO32OE9aTevx
-         yfP5UsPCKW2I3bqPQKJL7FqD0bhsWsXV2qxdqiRQ7WsVWh4oHNK9TFNBq0m4+w4lGn
-         bmQFT/VhhjM8A==
-To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-From:   =?utf-8?Q?Barnab=C3=A1s_P=C5=91cze?= <pobrn@protonmail.com>
-Cc:     Jason Gunthorpe <jgg@ziepe.ca>,
-        Matthew Wilcox <willy@infradead.org>,
-        Maximilian Luz <luzmaximilian@gmail.com>,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        linux-kernel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        "Rafael J. Wysocki" <rafael@kernel.org>,
-        Len Brown <lenb@kernel.org>,
-        Stefan Richter <stefanr@s5r6.in-berlin.de>,
-        Wolfram Sang <wsa@kernel.org>,
-        Alexandre Belloni <alexandre.belloni@bootlin.com>,
-        Dmitry Torokhov <dmitry.torokhov@gmail.com>,
-        Sean Young <sean@mess.org>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Rob Herring <robh+dt@kernel.org>,
-        Frank Rowand <frowand.list@gmail.com>,
-        Hans de Goede <hdegoede@redhat.com>,
-        Mark Gross <markgross@kernel.org>,
-        Vinod Koul <vkoul@kernel.org>,
-        Bard Liao <yung-chuan.liao@linux.intel.com>,
-        Pierre-Louis Bossart <pierre-louis.bossart@linux.intel.com>,
-        Sanyog Kale <sanyog.r.kale@intel.com>,
-        Andreas Noever <andreas.noever@gmail.com>,
-        Michael Jamet <michael.jamet@intel.com>,
-        Mika Westerberg <mika.westerberg@linux.intel.com>,
-        Yehezkel Bernat <YehezkelShB@gmail.com>,
-        Jiri Slaby <jirislaby@kernel.org>,
-        Heikki Krogerus <heikki.krogerus@linux.intel.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        Ming Lei <ming.lei@redhat.com>,
-        Jilin Yuan <yuanjilin@cdjrlc.com>,
-        Alan Stern <stern@rowland.harvard.edu>,
-        Sakari Ailus <sakari.ailus@linux.intel.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ira Weiny <ira.weiny@intel.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Won Chung <wonchung@google.com>, alsa-devel@alsa-project.org,
-        devicetree@vger.kernel.org, linux-acpi@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-i2c@vger.kernel.org,
-        linux-i3c@lists.infradead.org, linux-input@vger.kernel.org,
-        linux-media@vger.kernel.org, linux-serial@vger.kernel.org,
-        linux-usb@vger.kernel.org, linux1394-devel@lists.sourceforge.net,
-        platform-driver-x86@vger.kernel.org
-Subject: Re: [PATCH 3/5] driver core: make struct device_type.uevent() take a const *
-Message-ID: <tx7-rd-SyCXl_K0mh2tDzOLPmogI631IJQJRNK8dMW_GVZiy5AHHVN7-b_Ib3P1L_dLTCRPEw8dAhDbMAPGg8QTKs4p1XFoNHlEZpAnWcCw=@protonmail.com>
-In-Reply-To: <Y35vLAWWfezPvGSm@kroah.com>
-References: <Y34hgIW8p1RlQTBB@smile.fi.intel.com> <Y34+V2bCDdqujBDk@kroah.com> <Y35JfNJDppRp5bLX@ziepe.ca> <Y35R+/eQJYI7VaDS@kroah.com> <Y35YlI93UBuTfgYy@ziepe.ca> <Y35dMIaNYSE0Cykd@casper.infradead.org> <Y35iKfYf3ThdVvaR@kroah.com> <Y35lt+0jXrOKynL5@ziepe.ca> <Y35vLAWWfezPvGSm@kroah.com>
-Feedback-ID: 20568564:user:proton
+        Wed, 23 Nov 2022 19:05:21 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B804108937
+        for <linux-block@vger.kernel.org>; Wed, 23 Nov 2022 16:04:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1669248266;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=Swuw4Srtq7ILJ+Sr28sVCP8NRm0onxfQ8iNTcMfZrZ0=;
+        b=UBdYMvbehhfSVImegvfMb0mP8yd+zOXotHCEBJdSGYiqFvf6GEZj3q9SqSfQlSI5A1Fsqo
+        1da88ruJ6IYW4lYXuwQcrXh4I8/qfLVLX1bNnIEAYBLUN38AY1/36HHdSaF3CcChKolrE+
+        Om+258S7gLbvebkUh+I2VGY2E/8kTnY=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-655-eMnJ2nuQPZ63mU3GdK9XLA-1; Wed, 23 Nov 2022 19:04:21 -0500
+X-MC-Unique: eMnJ2nuQPZ63mU3GdK9XLA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 3935F29AB3E1;
+        Thu, 24 Nov 2022 00:04:20 +0000 (UTC)
+Received: from T590 (ovpn-8-17.pek2.redhat.com [10.72.8.17])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 5DF81C15BB1;
+        Thu, 24 Nov 2022 00:04:03 +0000 (UTC)
+Date:   Thu, 24 Nov 2022 08:03:56 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Nitesh Shetty <nj.shetty@samsung.com>
+Cc:     axboe@kernel.dk, agk@redhat.com, snitzer@kernel.org,
+        dm-devel@redhat.com, kbusch@kernel.org, hch@lst.de,
+        sagi@grimberg.me, james.smart@broadcom.com, kch@nvidia.com,
+        damien.lemoal@opensource.wdc.com, naohiro.aota@wdc.com,
+        jth@kernel.org, viro@zeniv.linux.org.uk,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org,
+        anuj20.g@samsung.com, joshi.k@samsung.com, p.raghav@samsung.com,
+        nitheshshetty@gmail.com, gost.dev@samsung.com, ming.lei@redhat.com
+Subject: Re: [PATCH v5 02/10] block: Add copy offload support infrastructure
+Message-ID: <Y3607N6lDRK6WU7/@T590>
+References: <20221123055827.26996-1-nj.shetty@samsung.com>
+ <CGME20221123061017epcas5p246a589e20eac655ac340cfda6028ff35@epcas5p2.samsung.com>
+ <20221123055827.26996-3-nj.shetty@samsung.com>
+ <Y33UAp6ncSPO84XI@T590>
+ <20221123100712.GA26377@test-zns>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221123100712.GA26377@test-zns>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Wed, Nov 23, 2022 at 03:37:12PM +0530, Nitesh Shetty wrote:
+> On Wed, Nov 23, 2022 at 04:04:18PM +0800, Ming Lei wrote:
+> > On Wed, Nov 23, 2022 at 11:28:19AM +0530, Nitesh Shetty wrote:
+> > > Introduce blkdev_issue_copy which supports source and destination bdevs,
+> > > and an array of (source, destination and copy length) tuples.
+> > > Introduce REQ_COPY copy offload operation flag. Create a read-write
+> > > bio pair with a token as payload and submitted to the device in order.
+> > > Read request populates token with source specific information which
+> > > is then passed with write request.
+> > > This design is courtesy Mikulas Patocka's token based copy
+> > 
+> > I thought this patchset is just for enabling copy command which is
+> > supported by hardware. But turns out it isn't, because blk_copy_offload()
+> > still submits read/write bios for doing the copy.
+> > 
+> > I am just wondering why not let copy_file_range() cover this kind of copy,
+> > and the framework has been there.
+> > 
+> 
+> Main goal was to enable copy command, but community suggested to add
+> copy emulation as well.
+> 
+> blk_copy_offload - actually issues copy command in driver layer.
+> The way read/write BIOs are percieved is different for copy offload.
+> In copy offload we check REQ_COPY flag in NVMe driver layer to issue
+> copy command. But we did missed it to add in other driver's, where they
+> might be treated as normal READ/WRITE.
+> 
+> blk_copy_emulate - is used if we fail or if device doesn't support native
+> copy offload command. Here we do READ/WRITE. Using copy_file_range for
+> emulation might be possible, but we see 2 issues here.
+> 1. We explored possibility of pulling dm-kcopyd to block layer so that we 
+> can readily use it. But we found it had many dependecies from dm-layer.
+> So later dropped that idea.
 
-Hi
+Is it just because dm-kcopyd supports async copy? If yes, I believe we
+can reply on io_uring for implementing async copy_file_range, which will
+be generic interface for async copy, and could get better perf.
 
+> 2. copy_file_range, for block device atleast we saw few check's which fail
+> it for raw block device. At this point I dont know much about the history of
+> why such check is present.
 
-2022. november 23., szerda 20:06 keltez=C3=A9ssel, Greg Kroah-Hartman =
-=C3=ADrta:
+Got it, but IMO the check in generic_copy_file_checks() can be
+relaxed to cover blkdev cause splice does support blkdev.
 
+Then your bdev offload copy work can be simplified into:
 
-> On Wed, Nov 23, 2022 at 02:25:59PM -0400, Jason Gunthorpe wrote:
->=20
-> > On Wed, Nov 23, 2022 at 07:10:49PM +0100, Greg Kroah-Hartman wrote:
-> >=20
-> > > On Wed, Nov 23, 2022 at 05:49:36PM +0000, Matthew Wilcox wrote:
-> > >=20
-> > > > On Wed, Nov 23, 2022 at 01:29:56PM -0400, Jason Gunthorpe wrote:
-> > > >=20
-> > > > > #define generic_container_of(in_type, in, out_type, out_member) \
-> > > > > _Generic(in, \
-> > > > > const in_type *: ((const out_type *)container_of(in, out_type, ou=
-t_member)), \
-> > > > > in_type *: ((out_type *)container_of(in, out_type, out_member)) \
-> > > > > )
-> > > >=20
-> > > > There's a neat trick I found in seqlock.h:
-> > > >=20
-> > > > #define generic_container_of(in_t, in, out_t, m) \
-> > > > _Generic(*(in), \
-> > > > const in_t: ((const out_t *)container_of(in, out_t, m)), \
-> > > > in_t: ((out_t *)container_of(in, out_type, m)) \
-> > > > )
-> > > >=20
-> > > > and now it fits in 80 columns ;-)
-> > >=20
-> > > Nice trick! Dropping the inline functions is a bit different, let me
-> > > see if that still gives a sane error if we pass an incorrect type or
-> > > mess with the const * the wrong way. I'll run some tests tomorrow
-> > > afternoon...
-> >=20
-> > The errors in some cases are very verbose, but it is somewhat
-> > understandable - the worst is when _Generic fails to match anything,
-> > but also at least clang partially expanded container_of and it throws
-> > other assertions too.
-> >=20
-> > I also wonder if this could just be rolled into the normal
-> > container_of.
->=20
->=20
-> I think we might be able to now, my previous attempts with inline
-> functions prevented that. I'll beat on that tomorrow...
->=20
-> > in_type would have to be derived like:
-> >=20
-> > in_type =3D typeof((out_type *)NULL)->out_member)
-> >=20
-> > But I don't know if you can use typeof in a generic type matching expre=
-ssion..
->=20
->=20
-> Maybe that is what threw me before, I can't remember. I do know we
-> tried a number of different attempts, can't recall the failed ones...
->=20
+1) implement .copy_file_range for def_blk_fops, suppose it is
+blkdev_copy_file_range()
 
-I am sorry I haven't followed the previous discussion,
-but has something like the following been considered?
+2) inside blkdev_copy_file_range()
 
-  #define container_of2(ptr, type, member) \
-  =09_Generic((ptr), \
-  =09=09typeof_member(const type, member) *: container_of((ptr), const type=
-, member), \
-  =09=09const void *: container_of((ptr), const type, member), \
-  =09=09default: container_of((ptr), type, member) \
-  =09)
+- if the bdev supports offload copy, just submit one bio to the device,
+and this will be converted to one pt req to device
 
-This is not perfect by any means, but I believe it is a reasonable
-improvement. It only really works reliably if the member type and
-the specified `type` in the arguments are unqualified,
-but I believe that should cover the majority of cases.
+- otherwise, fallback to generic_copy_file_range()
 
-I have tried to build an x86-64 defconfig with this and there are
-numerous const violations, but I haven't seen any false positives.
+> 
+> > When I was researching pipe/splice code for supporting ublk zero copy[1], I
+> > have got idea for async copy_file_range(), such as: io uring based
+> > direct splice, user backed intermediate buffer, still zero copy, if these
+> > ideas are finally implemented, we could get super-fast generic offload copy,
+> > and bdev copy is really covered too.
+> > 
+> > [1] https://lore.kernel.org/linux-block/20221103085004.1029763-1-ming.lei@redhat.com/
+> > 
+> 
+> Seems interesting, We will take a look into this.
+
+BTW, that is probably one direction of ublk's async zero copy IO too.
 
 
-> [...]
+Thanks, 
+Ming
 
-
-Regards,
-Barnab=C3=A1s P=C5=91cze
