@@ -2,71 +2,83 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E039C433FE
-	for <linux-block@archiver.kernel.org>; Fri, 25 Nov 2022 04:18:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9263BC4332F
+	for <linux-block@archiver.kernel.org>; Fri, 25 Nov 2022 07:14:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229554AbiKYESm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 24 Nov 2022 23:18:42 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60126 "EHLO
+        id S229529AbiKYHOG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 25 Nov 2022 02:14:06 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39688 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229476AbiKYESl (ORCPT
+        with ESMTP id S229455AbiKYHOG (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 24 Nov 2022 23:18:41 -0500
-Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [IPv6:2a03:a000:7:0:5054:ff:fe1c:15ff])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E354C28E06;
-        Thu, 24 Nov 2022 20:18:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=linux.org.uk; s=zeniv-20220401; h=Sender:In-Reply-To:Content-Type:
-        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=pxM0Tai1NwFg2mqAJQ1nSkdVi+JTmOQz5Ac0dKx9+yk=; b=taGO1ATiA5q4QgCU8nnvoBtIcc
-        lO9tlrR7Y/phz7gCl0S4yEi9UyLuDogzERxdHX9JqxMx7QNxr0xB2EhdUMJOdDgEyHWEEp5DDWN9u
-        l6Gzx6ztvsZLRESGJpoB6+OUFikQQXY7cjlOv796YW8IR5gYUYdrkSTQ1rzAWyIzqZdM96Z0MOFAh
-        OiUvYtMAfx5zuGD88T9ju9s/hCqn2q7fdDoZUXY/GEnTjJzKS2dwZkaYWZxZpBR6zT3XXo0QMw1vZ
-        izeGgBxcMCN4zr8t1TxKibzgwAf91BD4KL+Z4b7yozfju0WMWwTJUD1dHKmLwOqtq1C74L5M9SCfu
-        eN4qXCrg==;
-Received: from viro by zeniv.linux.org.uk with local (Exim 4.96 #2 (Red Hat Linux))
-        id 1oyQAK-006aa1-1q;
-        Fri, 25 Nov 2022 04:18:16 +0000
-Date:   Fri, 25 Nov 2022 04:18:16 +0000
-From:   Al Viro <viro@zeniv.linux.org.uk>
-To:     Damien Le Moal <damien.lemoal@opensource.wdc.com>
-Cc:     Nitesh Shetty <nj.shetty@samsung.com>, axboe@kernel.dk,
-        agk@redhat.com, snitzer@kernel.org, dm-devel@redhat.com,
-        kbusch@kernel.org, hch@lst.de, sagi@grimberg.me,
-        james.smart@broadcom.com, kch@nvidia.com, naohiro.aota@wdc.com,
-        jth@kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-fsdevel@vger.kernel.org, anuj20.g@samsung.com,
-        joshi.k@samsung.com, p.raghav@samsung.com, nitheshshetty@gmail.com,
-        gost.dev@samsung.com
-Subject: Re: [PATCH v5 10/10] fs: add support for copy file range in zonefs
-Message-ID: <Y4BCCB9U10mkiehu@ZenIV>
-References: <20221123055827.26996-1-nj.shetty@samsung.com>
- <CGME20221123061044epcas5p2ac082a91fc8197821f29e84278b6203c@epcas5p2.samsung.com>
- <20221123055827.26996-11-nj.shetty@samsung.com>
- <729254f8-2468-e694-715e-72bcbef80ff3@opensource.wdc.com>
- <349a4d66-3a9f-a095-005c-1f180c5f3aac@opensource.wdc.com>
+        Fri, 25 Nov 2022 02:14:06 -0500
+Received: from out30-131.freemail.mail.aliyun.com (out30-131.freemail.mail.aliyun.com [115.124.30.131])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3EE7A22B33
+        for <linux-block@vger.kernel.org>; Thu, 24 Nov 2022 23:14:05 -0800 (PST)
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R151e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046050;MF=ziyangzhang@linux.alibaba.com;NM=1;PH=DS;RN=4;SR=0;TI=SMTPD_---0VVe6UNA_1669360441;
+Received: from 30.97.56.205(mailfrom:ZiyangZhang@linux.alibaba.com fp:SMTPD_---0VVe6UNA_1669360441)
+          by smtp.aliyun-inc.com;
+          Fri, 25 Nov 2022 15:14:02 +0800
+Message-ID: <2ec739a3-f7ba-0e97-0df6-0d198c6689b5@linux.alibaba.com>
+Date:   Fri, 25 Nov 2022 15:13:58 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <349a4d66-3a9f-a095-005c-1f180c5f3aac@opensource.wdc.com>
-Sender: Al Viro <viro@ftp.linux.org.uk>
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.5.0
+Subject: Re: [PATCH V2 4/6] ublk_drv: add device parameter
+ UBLK_PARAM_TYPE_DEVT
+Content-Language: en-US
+To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Dan Carpenter <error27@gmail.com>
+References: <20221124030454.476152-1-ming.lei@redhat.com>
+ <20221124030454.476152-5-ming.lei@redhat.com>
+From:   Ziyang Zhang <ZiyangZhang@linux.alibaba.com>
+In-Reply-To: <20221124030454.476152-5-ming.lei@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Nov 24, 2022 at 10:47:55AM +0900, Damien Le Moal wrote:
-> >> +	inode_lock(src_inode);
-> >> +	inode_lock(dst_inode);
-> > 
-> > So you did zonefs_copy_file_checks() outside of these locks, which mean
-> > that everything about the source and destination files may have changed.
-> > This does not work.
+On 2022/11/24 11:04, Ming Lei wrote:
+> Userspace side only knows device ID, but the associated path of ublkc* and
+> ublkb* could be changed by udev, and that depends on userspace's policy, so
+> add parameter of UBLK_PARAM_TYPE_DEVT for retrieving major/minor of the
+> ublkc* and ublkb*, then user may figure out major/minor of the ublk disks
+> he/she owns. With major/minor, it is easy to find the device node path.
 > 
-> I forgot to mention that locking 2 inodes blindly like this can leads to
-> deadlocks if another process tries a copy range from dst to src at the
-> same time (lock order is reversed and so can deadlock).
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> ---
+>  drivers/block/ublk_drv.c      | 24 +++++++++++++++++++++++-
+>  include/uapi/linux/ublk_cmd.h | 13 +++++++++++++
+>  2 files changed, 36 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+> index 9d1578384cba..04a28a2f2e1f 100644
+> --- a/drivers/block/ublk_drv.c
+> +++ b/drivers/block/ublk_drv.c
+> @@ -54,7 +54,8 @@
+>  		| UBLK_F_USER_RECOVERY_REISSUE)
+>  
+>  /* All UBLK_PARAM_TYPE_* should be included here */
+> -#define UBLK_PARAM_TYPE_ALL (UBLK_PARAM_TYPE_BASIC | UBLK_PARAM_TYPE_DISCARD)
+> +#define UBLK_PARAM_TYPE_ALL (UBLK_PARAM_TYPE_BASIC | \
+> +		UBLK_PARAM_TYPE_DISCARD | UBLK_PARAM_TYPE_DEVT)
+>  
+>  struct ublk_rq_data {
+>  	struct llist_node node;
+> @@ -255,6 +256,10 @@ static int ublk_validate_params(const struct ublk_device *ub)
+>  			return -EINVAL;
+>  	}
+>  
+> +	/* dev_t is read-only */
+> +	if (ub->params.types & UBLK_PARAM_TYPE_DEVT)
+> +		WARN_ON_ONCE(1);
+Hi, Ming
 
-Not to mention the deadlocks with existing places where fs/namei.c locks
-two inodes...
+ublk_validate_params() is only called by ublk_ctrl_set_params().
+Why not return -EINVAL here since UBLK_PARAM_TYPE_DEVT is not
+allowed in ublk_ctrl_set_params(). Then the user may know he has
+made a mistake.
+
+Regards,
+Zhang
