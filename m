@@ -2,132 +2,116 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AE8F5C4167B
-	for <linux-block@archiver.kernel.org>; Fri, 25 Nov 2022 18:37:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51A73C4167B
+	for <linux-block@archiver.kernel.org>; Fri, 25 Nov 2022 23:51:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229757AbiKYShL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 25 Nov 2022 13:37:11 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48986 "EHLO
+        id S229816AbiKYXvT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 25 Nov 2022 18:51:19 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42350 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229554AbiKYShL (ORCPT
+        with ESMTP id S229514AbiKYXvS (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 25 Nov 2022 13:37:11 -0500
-Received: from mail-pg1-x531.google.com (mail-pg1-x531.google.com [IPv6:2607:f8b0:4864:20::531])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC4C8178AF
-        for <linux-block@vger.kernel.org>; Fri, 25 Nov 2022 10:37:09 -0800 (PST)
-Received: by mail-pg1-x531.google.com with SMTP id q1so4567652pgl.11
-        for <linux-block@vger.kernel.org>; Fri, 25 Nov 2022 10:37:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=CwNmDYJLvH0fNlAuB17otvNLFcfDDeVwQfBxy2OZKy4=;
-        b=DFWOdgVffQEaPKJgFNPxYGixrCEmD68TAlRQCfTZRHihIZKPahl9mmNUwVV6MabUob
-         67IYLgEHD7HngVHsUObZQB9M23ycSG0fWkBGg5tLbVwADl5+xopvDWnvdzkmRzWjD7zb
-         F/6ck0k4eukDauNYWv/l7P3TZDaB/kKMeoLlpFmUbaDBveGybMhdjtVsqtIwNF7NZFJD
-         KWRCcbFSHjXns0w246dLkmeRZETWDJ89FsiVQN0dz29HvUj2ybvYJpmQ41zM6tHxX5nF
-         GfhxadRcwJgNtGoPgcUpFh8+BJkny2DQ+e97JOdEuQ9r/bwpLPGMVWR4gCL5Jp42oLgh
-         ky5A==
+        Fri, 25 Nov 2022 18:51:18 -0500
+Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com [209.85.216.43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8895E18E;
+        Fri, 25 Nov 2022 15:51:17 -0800 (PST)
+Received: by mail-pj1-f43.google.com with SMTP id k2-20020a17090a4c8200b002187cce2f92so8907494pjh.2;
+        Fri, 25 Nov 2022 15:51:17 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=CwNmDYJLvH0fNlAuB17otvNLFcfDDeVwQfBxy2OZKy4=;
-        b=TnDkUw9jjLTzu107uzD57lWm0GoFnF4rAd84vo5ZhdzPW2CSfH+WEg7XpDQla8bhXW
-         Sdf9JVLDg9fSfPZRDcavWWUQR7nW3Lkz/+b1Vu4k8KNoLbL4EovcV3IqFGFhKX6ZZt2o
-         y7Pbk0NJBl4ThsZyq3K8G8P7C//jTzcXD6c9E0jP/iwEgfFBBTi9mlDG8uSFt/Ejlpl3
-         LLGfEjpGo8q44d7QKawtYu9bQ+ucL6fDELSk9GjLiMB3UHXTiZVFhUQ8sgw++IftK1D1
-         U9WvFdvGP2Nln5biMebIvyOk9dddt5y3N4G+JOuyGu/i7asb3+bD3ErGypIWp9xVNZiS
-         QUhQ==
-X-Gm-Message-State: ANoB5pnw0NENphw5/OK+biBEeUeoYsVG7SdYXqrsA8htgXusWPUtC6oU
-        KuY3zjjTwcUXRI2bKaRzTK+VIw==
-X-Google-Smtp-Source: AA0mqf7DlfJmrpCywLPdyGNskOM1iXNX+AUH0PDt/4/XJNMU0kw/iZ1yC/EsSkaxwZfb9Dz10i2amw==
-X-Received: by 2002:a63:4d49:0:b0:46f:5bd0:492f with SMTP id n9-20020a634d49000000b0046f5bd0492fmr35299298pgl.186.1669401429087;
-        Fri, 25 Nov 2022 10:37:09 -0800 (PST)
-Received: from [192.168.4.201] (cpe-72-132-29-68.dc.res.rr.com. [72.132.29.68])
-        by smtp.gmail.com with ESMTPSA id e15-20020a170902ed8f00b00177efb56475sm3765743plj.85.2022.11.25.10.37.07
+        bh=UBCy9qp7TSwSwGwI/krp6oqH0EI9xTeC+ExI/AlQHzg=;
+        b=1OQZpXZ9Ed1f3U724rkw+MtCYUcdJtTOkQ3OJ37kYyDX/+ASIHd6vmK9sV2RyiKbDR
+         ffkPd2ZaEPqioDrIqq60oCchjlF1lDAjF6VQHiegOBVIjzBfg9O5LIsr17MGXVrhfHJ1
+         EpSV4AkvHA61ahLrikQ2SE8nCgoDrWzsdzSJlEvmLg0VS+Mfjt+DoY/n7vJxRMSDT0yY
+         M+5bSNwfcAKFZcSNTjEgcGXAitcGRLhVqwn8PT38U/J8WQuqXeGpHSbYU7jTEST9os7J
+         lhcWIDCR0gTByg9ebWcdcGzslqg1QCVb16SGCkSxfiJymBuUdmuTNnhxFpy5HCr5kqjH
+         8B4w==
+X-Gm-Message-State: ANoB5pmSedKMG6RkTCcAwZoIvPyhtzK5azH+FU+4AfjKzrZo/Eipmx+E
+        RQuM+oZM4QaEN5RqE01/84Q=
+X-Google-Smtp-Source: AA0mqf40CELg5Cd4cKADSnuQ7zDvszL+QjMGY2dYDbM8qR4FVWtlF2gM/wXRLECZg2wkT9gOazTizw==
+X-Received: by 2002:a17:90a:b88c:b0:218:e1c1:b4f3 with SMTP id o12-20020a17090ab88c00b00218e1c1b4f3mr15351878pjr.201.1669420276891;
+        Fri, 25 Nov 2022 15:51:16 -0800 (PST)
+Received: from [192.168.3.219] ([98.51.102.78])
+        by smtp.gmail.com with ESMTPSA id q6-20020a17090311c600b001865c298588sm3937409plh.258.2022.11.25.15.51.12
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 25 Nov 2022 10:37:08 -0800 (PST)
-Message-ID: <69b144a9-a8d6-08ba-24e8-76bbe7970294@kernel.dk>
-Date:   Fri, 25 Nov 2022 11:37:06 -0700
+        Fri, 25 Nov 2022 15:51:15 -0800 (PST)
+Message-ID: <d448b944-708a-32d4-37d7-0be16ee5f73c@acm.org>
+Date:   Fri, 25 Nov 2022 15:51:11 -0800
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.5.0
-Subject: Re: [PATCH v3 1/2] blk-crypto: Add support for SM4-XTS blk crypto
- mode
+Subject: Re: [PATCH 1/5] driver core: make struct class.dev_uevent() take a
+ const *
 Content-Language: en-US
-To:     Eric Biggers <ebiggers@kernel.org>,
-        Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-Cc:     "Theodore Y. Ts o" <tytso@mit.edu>,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        linux-fscrypt@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
-References: <20221125121630.87793-1-tianjia.zhang@linux.alibaba.com>
- <20221125121630.87793-2-tianjia.zhang@linux.alibaba.com>
- <Y4EK4iEmvPWRNRm9@sol.localdomain>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <Y4EK4iEmvPWRNRm9@sol.localdomain>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        linux-kernel@vger.kernel.org
+Cc:     Jens Axboe <axboe@kernel.dk>, Luis Chamberlain <mcgrof@kernel.org>,
+        Russ Weight <russell.h.weight@intel.com>,
+        "Rafael J. Wysocki" <rafael@kernel.org>,
+        Jean Delvare <jdelvare@suse.com>,
+        Johan Hovold <johan@kernel.org>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Leon Romanovsky <leon@kernel.org>,
+        Karsten Keil <isdn@linux-pingi.de>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Keith Busch <kbusch@kernel.org>,
+        Christoph Hellwig <hch@lst.de>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Dominik Brodowski <linux@dominikbrodowski.net>,
+        Sebastian Reichel <sre@kernel.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Johannes Berg <johannes@sipsolutions.net>,
+        Wolfram Sang <wsa+renesas@sang-engineering.com>,
+        Raed Salem <raeds@nvidia.com>,
+        Chen Zhongjin <chenzhongjin@huawei.com>,
+        Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>,
+        Avihai Horon <avihaih@nvidia.com>,
+        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
+        Alan Stern <stern@rowland.harvard.edu>,
+        Colin Ian King <colin.i.king@gmail.com>,
+        Geert Uytterhoeven <geert+renesas@glider.be>,
+        Jakob Koschel <jakobkoschel@gmail.com>,
+        Antoine Tenart <atenart@kernel.org>,
+        Frederic Weisbecker <frederic@kernel.org>,
+        Wang Yufen <wangyufen@huawei.com>, linux-block@vger.kernel.org,
+        linux-media@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-pm@vger.kernel.org, linux-rdma@vger.kernel.org,
+        linux-usb@vger.kernel.org, linux-wireless@vger.kernel.org,
+        netdev@vger.kernel.org
+References: <20221123122523.1332370-1-gregkh@linuxfoundation.org>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20221123122523.1332370-1-gregkh@linuxfoundation.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 11/25/22 11:35 AM, Eric Biggers wrote:
-> On Fri, Nov 25, 2022 at 08:16:29PM +0800, Tianjia Zhang wrote:
->> SM4 is a symmetric algorithm widely used in China, and SM4-XTS is also
->> used to encrypt length-preserving data, these algoritms are mandatory
->> in many scenarios. This patch enables the use of SM4-XTS algorithm in
->> block inline encryption, and provides support for fscrypt.
->>
->> Signed-off-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
->> ---
->>  block/blk-crypto.c         | 6 ++++++
->>  include/linux/blk-crypto.h | 1 +
->>  2 files changed, 7 insertions(+)
->>
->> diff --git a/block/blk-crypto.c b/block/blk-crypto.c
->> index a496aaef85ba..e44709fc6a08 100644
->> --- a/block/blk-crypto.c
->> +++ b/block/blk-crypto.c
->> @@ -36,6 +36,12 @@ const struct blk_crypto_mode blk_crypto_modes[] = {
->>  		.keysize = 32,
->>  		.ivsize = 32,
->>  	},
->> +	[BLK_ENCRYPTION_MODE_SM4_XTS] = {
->> +		.name = "SM4-XTS",
->> +		.cipher_str = "xts(sm4)",
->> +		.keysize = 32,
->> +		.ivsize = 16,
->> +	},
->>  };
->>  
->>  /*
->> diff --git a/include/linux/blk-crypto.h b/include/linux/blk-crypto.h
->> index 69b24fe92cbf..26b1b71c3091 100644
->> --- a/include/linux/blk-crypto.h
->> +++ b/include/linux/blk-crypto.h
->> @@ -13,6 +13,7 @@ enum blk_crypto_mode_num {
->>  	BLK_ENCRYPTION_MODE_AES_256_XTS,
->>  	BLK_ENCRYPTION_MODE_AES_128_CBC_ESSIV,
->>  	BLK_ENCRYPTION_MODE_ADIANTUM,
->> +	BLK_ENCRYPTION_MODE_SM4_XTS,
->>  	BLK_ENCRYPTION_MODE_MAX,
-> 
-> The commit message should mention that this is needed for the inlinecrypt mount
-> option to be supported via blk-crypto-fallback, as it is for the other fscrypt
-> modes.  (Since there's no inline encryption hardware that supports SM4-XTS.)
-> 
-> Anyway, if SM4-XTS support is really being added to fscrypt, then this patch
-> looks fine.  Jens, are you okay with me taking it through the fscrypt tree?
+On 11/23/22 04:25, Greg Kroah-Hartman wrote:
+> diff --git a/include/linux/mISDNif.h b/include/linux/mISDNif.h
+> index 7dd1f01ec4f9..7aab4a769736 100644
+> --- a/include/linux/mISDNif.h
+> +++ b/include/linux/mISDNif.h
+> @@ -586,7 +586,7 @@ extern struct mISDNclock *mISDN_register_clock(char *, int, clockctl_func_t *,
+>   						void *);
+>   extern void	mISDN_unregister_clock(struct mISDNclock *);
+>   
+> -static inline struct mISDNdevice *dev_to_mISDN(struct device *dev)
+> +static inline struct mISDNdevice *dev_to_mISDN(const struct device *dev)
+>   {
+>   	if (dev)
+>   		return dev_get_drvdata(dev);
 
-Yes, go ahead.
+Why does the dev_to_mISDN() function drop constness? I haven't found an 
+explanation for this in the cover letter.
 
--- 
-Jens Axboe
+Thanks,
 
+Bart.
 
