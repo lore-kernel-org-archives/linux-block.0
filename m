@@ -2,121 +2,97 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C867BC46467
-	for <linux-block@archiver.kernel.org>; Sat, 26 Nov 2022 02:55:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A171C4332F
+	for <linux-block@archiver.kernel.org>; Sat, 26 Nov 2022 06:08:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229748AbiKZCz5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 25 Nov 2022 21:55:57 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44512 "EHLO
+        id S229614AbiKZGIS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 26 Nov 2022 01:08:18 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32978 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230039AbiKZCzz (ORCPT
+        with ESMTP id S229464AbiKZGIR (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 25 Nov 2022 21:55:55 -0500
-Received: from esa3.hgst.iphmx.com (esa3.hgst.iphmx.com [216.71.153.141])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 28C5140448
-        for <linux-block@vger.kernel.org>; Fri, 25 Nov 2022 18:55:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1669431355; x=1700967355;
-  h=from:to:subject:date:message-id:in-reply-to:references:
-   mime-version:content-transfer-encoding;
-  bh=V13jW8+5PMPq0JeCmUcIq6AwfK+ulw58b3YjuwFCrIo=;
-  b=DRtymJH2JcounOzLDu2oQoISKhEl5qSOneb+YzMbM8o4gdvRqvaHcdp4
-   kVJY23aNGNUPXmeNoZXBmjV+jcFZoJC9KEYUrLrDL5NGzzWsfvTQYahi0
-   /TE/JN7TffOo9lXAXl698YgDLK44BkcRvISgmGip92qvU35w61c1ola1y
-   y9QaC7gHH6KdhUGoQk6LYogFvhJO8ETsN/klZpYt6gOaEmj1RcESv1Dva
-   jUghn7Bj/tWlI4hHZSeD8+xTzob5Nbe4feeGuZFsPdpR8QMF8POY0NrlV
-   eufKai3usQkf2N3rBxMLtKh78v16VsGDqP/No7LK7fWxuXsvqbI/eGmBe
-   g==;
-X-IronPort-AV: E=Sophos;i="5.96,194,1665417600"; 
-   d="scan'208";a="222364193"
-Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 26 Nov 2022 10:55:54 +0800
-IronPort-SDR: n2LNmLIzuQ9iFbvj2dv2rgveOJrj2fFAGDZ/i1d5F0YhHK3nBT10jTWPCtnVIc0b+QPJo8+twL
- vis78dEfnT4aURtcvZ3nSzjqwp+Yl8dvwXhNdz9hvcddivFKfReLShTiAPwte0o6hV332rZ7Gs
- KJAxlm+fV2HgTGFnib0bMOP96jMCWdWgeVgTrjU5H194NzWQDuD03B2U70vZbjmhZVRMe0vNpe
- 1ccB8DLRNvbLWhT7xZBFNMGcqVcJjL7KbfLi0KIOLuQCXH9zfmDIFOzH7rp4NHbaQ9B5fs3dXj
- Vrw=
-Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 25 Nov 2022 18:14:39 -0800
-IronPort-SDR: 7JxBpRTV5TgJvsGVT8aOXHJtc1i/9TQ8M5cv7fU8zKJkYRr4pJugaiK8VppeSmdI/j8EIY+Ay6
- +UfVq8LA0q/h5kVbev9AcKqghUGuWuAfnLPo+sFJkS2eWlUJmcpg4daP5qoNQonIcDx8+ZaNi3
- PhsGQp5sifBx8OOJO1qlEl8axsd2ON+XZALFHQFDkjQqVdgabfdpH+cUVSJXyi0G4xXUHGXFyD
- KZS3NmxsEL8Ug6JtVSkUxuyPYk2pX91CQ3VZIhiQokGRiRusWKxS0GrbCNKQ7y0ytCH9dXmhJ3
- 8zI=
-WDCIronportException: Internal
-Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
-  by uls-op-cesaip02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 25 Nov 2022 18:55:54 -0800
-Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4NJxF63lwcz1RvTp
-        for <linux-block@vger.kernel.org>; Fri, 25 Nov 2022 18:55:54 -0800 (PST)
-Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
-        reason="pass (just generated, assumed good)"
-        header.d=opensource.wdc.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
-        opensource.wdc.com; h=content-transfer-encoding:mime-version
-        :references:in-reply-to:x-mailer:message-id:date:subject:to
-        :from; s=dkim; t=1669431354; x=1672023355; bh=V13jW8+5PMPq0JeCmU
-        cIq6AwfK+ulw58b3YjuwFCrIo=; b=qfXM58F0kIhp3eLPu3f5oHck6sWqd7Wp8T
-        Xo/q54dmYKq8hHkGxAyRxCP4vB5IWuRHw2U0M569gT5aYF1zzGCPE7Tlf3AWyqqb
-        5d5jliPg9aepGTtgP2zY/XBYTj2VkzlmrTcTNdC+mM/eLjVPOHic7s8yGKCna6Dt
-        aGc8QUhPNhCu+5RWuPX79sbXpZXdGT0YFEnygDCG0bbAPQ3IobDD6XmQkiRxBwAK
-        SNc8Vxl+5KtYz2bVapXbke37pb3L9YA56NPjKwLoMzYAsTEDLLWKZJvphIHTZB7n
-        qfqc1cdGRlqpMvKTNqKfvSeSzWHtvES+k0HmvNdjz1GewECQh+QA==
-X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
-Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
-        by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id 4h6vjsNOls8X for <linux-block@vger.kernel.org>;
-        Fri, 25 Nov 2022 18:55:54 -0800 (PST)
-Received: from washi.fujisawa.hgst.com (washi.fujisawa.hgst.com [10.149.53.254])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4NJxF55lJxz1RvLy;
-        Fri, 25 Nov 2022 18:55:53 -0800 (PST)
-From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
-To:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-Subject: [PATCH 2/2] block: fops: Do not set REQ_SYNC for async IOs
-Date:   Sat, 26 Nov 2022 11:55:50 +0900
-Message-Id: <20221126025550.967914-3-damien.lemoal@opensource.wdc.com>
-X-Mailer: git-send-email 2.38.1
-In-Reply-To: <20221126025550.967914-1-damien.lemoal@opensource.wdc.com>
-References: <20221126025550.967914-1-damien.lemoal@opensource.wdc.com>
+        Sat, 26 Nov 2022 01:08:17 -0500
+Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 473F11B9EC;
+        Fri, 25 Nov 2022 22:08:15 -0800 (PST)
+Received: from mail02.huawei.com (unknown [172.30.67.153])
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4NK1Vn63zqz4f3tTF;
+        Sat, 26 Nov 2022 14:08:01 +0800 (CST)
+Received: from [10.174.176.73] (unknown [10.174.176.73])
+        by APP4 (Coremail) with SMTP id gCh0CgC329hDrYFj0lOxBA--.20596S3;
+        Sat, 26 Nov 2022 14:08:04 +0800 (CST)
+Subject: Re: Why is MEGASAS_SAS_QD set to 256?
+To:     Ming Lei <ming.lei@redhat.com>, Yu Kuai <yukuai1@huaweicloud.com>
+Cc:     John Garry <john.g.garry@oracle.com>, kashyap.desai@broadcom.com,
+        sumit.saxena@broadcom.com, shivasharan.srikanteshwara@broadcom.com,
+        jejb@linux.ibm.com, martin.petersen@oracle.com,
+        megaraidlinux.pdl@broadcom.com, linux-scsi@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        linux-block <linux-block@vger.kernel.org>,
+        "zhangyi (F)" <yi.zhang@huawei.com>,
+        "yukuai (C)" <yukuai3@huawei.com>
+References: <1c4d66ca-fe1a-3d1a-d7f9-4981d2fc9eb1@huaweicloud.com>
+ <e11cdb17-053c-390c-9c48-36790eb70cc5@oracle.com>
+ <2b89210a-222c-a919-ab5b-c76830308f92@huaweicloud.com>
+ <Y4F3XG3lMCCKlLAr@T590>
+From:   Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <aef69f3b-a8db-f34c-4a52-49ba9020f6cf@huaweicloud.com>
+Date:   Sat, 26 Nov 2022 14:08:02 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <Y4F3XG3lMCCKlLAr@T590>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: gCh0CgC329hDrYFj0lOxBA--.20596S3
+X-Coremail-Antispam: 1UD129KBjvdXoW7JFyDuF1rCFy3XFyUKrWxZwb_yoW3JFXEga
+        9Fk3Z7tw13Grsaqa13GFW5AFWfGFZ3KF9rZ3Wqq3Z8X3yjkFyfKrZY9r98Zan3Grs7Kwn7
+        Kr4Y9a4Yqrs09jkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+        9fnUUIcSsGvfJTRUUUb3AFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
+        6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
+        A2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j
+        6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
+        Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
+        I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
+        4UM4x0Y48IcVAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2kI
+        c2xKxwCYjI0SjxkI62AI1cAE67vIY487MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4
+        AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE
+        17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMI
+        IF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_WFyUJVCq
+        3wCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCT
+        nIWIevJa73UjIFyTuYvjfUoOJ5UUUUU
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Taking a blktrace of a simple fio run on a block device file using
-libaio and iodepth > 1 reveals that asynchronous writes are executed as
-sync writes, that is, REQ_SYNC is set for the write BIOs.
+Hi, Ming
 
-Fix this by modifying dio_bio_write_op() to set REQ_SYNC only for IOs
-that are indeed synchronous ones and set REQ_IDLE only for asynchronous
-IOs.
+在 2022/11/26 10:18, Ming Lei 写道:
+> 
+> If you want aggressive merge on sequential IO workload, the queue depth need
+> to be a bit less, then more requests can be staggered into scheduler queue,
+> and merge chance is increased.
 
-Signed-off-by: Damien Le Moal <damien.lemoal@opensource.wdc.com>
----
- block/fops.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+But if nr_requests >= queue_depth, it seems to me elevator will have no
+effect, no request can be merged or sorted by scheduler, right?
+> 
+> If you want good perf on random IO perf, the queue depth needs to
+> be deep enough to have enough parallelism for saturating SSD internal.
+> 
+> But we don't recognize sequential/random IO pattern, and usually fixed
+> queue depth is used.
 
-diff --git a/block/fops.c b/block/fops.c
-index 50d245e8c913..5a4f57726828 100644
---- a/block/fops.c
-+++ b/block/fops.c
-@@ -34,7 +34,12 @@ static int blkdev_get_block(struct inode *inode, secto=
-r_t iblock,
-=20
- static blk_opf_t dio_bio_write_op(struct kiocb *iocb)
- {
--	blk_opf_t opf =3D REQ_OP_WRITE | REQ_SYNC | REQ_IDLE;
-+	blk_opf_t opf =3D REQ_OP_WRITE;
-+
-+	if (is_sync_kiocb(iocb))
-+		opf |=3D REQ_SYNC;
-+	else
-+		opf |=3D REQ_IDLE;
-=20
- 	/* avoid the need for a I/O completion work item */
- 	if (iocb_is_dsync(iocb))
---=20
-2.38.1
+Is it possible to use none elevator and set large queue_depth if nvme is
+used in this case?
+
+Thansk,
+Kuai
+> 
+> Thanks,
+> Ming
+> 
+> .
+> 
 
