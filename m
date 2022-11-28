@@ -2,111 +2,144 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DEE4C433FE
-	for <linux-block@archiver.kernel.org>; Mon, 28 Nov 2022 01:22:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5554FC46467
+	for <linux-block@archiver.kernel.org>; Mon, 28 Nov 2022 02:38:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229504AbiK1BW1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 27 Nov 2022 20:22:27 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40320 "EHLO
+        id S229670AbiK1Ciq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 27 Nov 2022 21:38:46 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42338 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229615AbiK1BWN (ORCPT
+        with ESMTP id S229504AbiK1Cip (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 27 Nov 2022 20:22:13 -0500
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09CF31117B;
-        Sun, 27 Nov 2022 17:22:12 -0800 (PST)
-Received: from kwepemi500012.china.huawei.com (unknown [172.30.72.57])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4NL73F3BWpzHw33;
-        Mon, 28 Nov 2022 09:21:29 +0800 (CST)
-Received: from huawei.com (10.67.175.21) by kwepemi500012.china.huawei.com
- (7.221.188.12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.31; Mon, 28 Nov
- 2022 09:22:09 +0800
-From:   Li Zetao <lizetao1@huawei.com>
-To:     <mst@redhat.com>, <jasowang@redhat.com>, <pbonzini@redhat.com>,
-        <stefanha@redhat.com>, <axboe@kernel.dk>, <kraxel@redhat.com>,
-        <david@redhat.com>, <ericvh@gmail.com>, <lucho@ionkov.net>,
-        <asmadeus@codewreck.org>, <linux_oss@crudebyte.com>,
-        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-        <pabeni@redhat.com>, <rusty@rustcorp.com.au>
-CC:     <lizetao1@huawei.com>, <virtualization@lists.linux-foundation.org>,
-        <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <v9fs-developer@lists.sourceforge.net>, <netdev@vger.kernel.org>
-Subject: [PATCH 4/4] virtio-blk: Fix probe failed when modprobe virtio_blk
-Date:   Mon, 28 Nov 2022 10:10:05 +0800
-Message-ID: <20221128021005.232105-5-lizetao1@huawei.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20221128021005.232105-1-lizetao1@huawei.com>
-References: <20221128021005.232105-1-lizetao1@huawei.com>
+        Sun, 27 Nov 2022 21:38:45 -0500
+Received: from mail-pg1-f181.google.com (mail-pg1-f181.google.com [209.85.215.181])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D68C3A1B1;
+        Sun, 27 Nov 2022 18:38:44 -0800 (PST)
+Received: by mail-pg1-f181.google.com with SMTP id s196so8734766pgs.3;
+        Sun, 27 Nov 2022 18:38:44 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=1kG9z2qzxuFG+VRjNYAaaunJxmRkVIHKxHuUo9QjcyE=;
+        b=xpq/ddy9z30TTL8jOYYx+QH71jompOnAITlXG+/Q1SiCODz5cYlaf0vjWFE3f52vzr
+         GNw2vsAdcRB1jcqVSY4MynR3K4RQC/qab86MHxqkjpf3O+MEi5RwS2oeepxt2mh8z1ks
+         fdqFtgnoMBOu/QS+Ns8Ubtev3NmPGrlAklOmb/1Vr4lIT2UgGvYY3UFeIoIBuZ5gnug2
+         VWDAEZn/tPz+Anpr5vpw82wIqmBk7fYCidUVF1iMPh+Kmgmfr+Edx8IKulMIqborvP29
+         sFKWqMP3EYOcj5T+vQ4Vzx/KLwGzSL6O/qihDYlmy1obapyz6JY9h00JJHczDJ3ZLwWb
+         jxvg==
+X-Gm-Message-State: ANoB5pkdOvMNP2ETKz5fRr4ZM1ZIuWMlFE/Vh+llRsp5BAReHGwXftCV
+        iMqCyh/pUNi8vV9n5bbxd7o=
+X-Google-Smtp-Source: AA0mqf5vmCbco6ZHPjAXXxhwtD8PwFo1rRkGl5sk/L6YEIBylIo5gFL0rkxaBBXNXZfCI6rD4vcBjA==
+X-Received: by 2002:a63:388:0:b0:477:c828:dd2d with SMTP id 130-20020a630388000000b00477c828dd2dmr18012978pgd.105.1669603124285;
+        Sun, 27 Nov 2022 18:38:44 -0800 (PST)
+Received: from [192.168.3.219] ([98.51.102.78])
+        by smtp.gmail.com with ESMTPSA id j8-20020a170902da8800b00176ea6ce0efsm7507123plx.109.2022.11.27.18.38.40
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 27 Nov 2022 18:38:43 -0800 (PST)
+Message-ID: <5b14cdea-1bbe-1900-0004-a218ba97bbcb@acm.org>
+Date:   Sun, 27 Nov 2022 18:38:39 -0800
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.67.175.21]
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- kwepemi500012.china.huawei.com (7.221.188.12)
-X-CFilter-Loop: Reflected
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.5.0
+Subject: Re: [PATCH 1/5] driver core: make struct class.dev_uevent() take a
+ const *
+Content-Language: en-US
+To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc:     linux-kernel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        Luis Chamberlain <mcgrof@kernel.org>,
+        Russ Weight <russell.h.weight@intel.com>,
+        "Rafael J. Wysocki" <rafael@kernel.org>,
+        Jean Delvare <jdelvare@suse.com>,
+        Johan Hovold <johan@kernel.org>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Leon Romanovsky <leon@kernel.org>,
+        Karsten Keil <isdn@linux-pingi.de>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Keith Busch <kbusch@kernel.org>,
+        Christoph Hellwig <hch@lst.de>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Dominik Brodowski <linux@dominikbrodowski.net>,
+        Sebastian Reichel <sre@kernel.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Johannes Berg <johannes@sipsolutions.net>,
+        Wolfram Sang <wsa+renesas@sang-engineering.com>,
+        Raed Salem <raeds@nvidia.com>,
+        Chen Zhongjin <chenzhongjin@huawei.com>,
+        Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
+        Avihai Horon <avihaih@nvidia.com>,
+        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
+        Alan Stern <stern@rowland.harvard.edu>,
+        Colin Ian King <colin.i.king@gmail.com>,
+        Geert Uytterhoeven <geert+renesas@glider.be>,
+        Jakob Koschel <jakobkoschel@gmail.com>,
+        Antoine Tenart <atenart@kernel.org>,
+        Frederic Weisbecker <frederic@kernel.org>,
+        Wang Yufen <wangyufen@huawei.com>, linux-block@vger.kernel.org,
+        linux-media@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-pm@vger.kernel.org, linux-rdma@vger.kernel.org,
+        linux-usb@vger.kernel.org, linux-wireless@vger.kernel.org,
+        netdev@vger.kernel.org
+References: <20221123122523.1332370-1-gregkh@linuxfoundation.org>
+ <d448b944-708a-32d4-37d7-0be16ee5f73c@acm.org> <Y4NqAJW5V0tAP8ax@kroah.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <Y4NqAJW5V0tAP8ax@kroah.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-When doing the following test steps, an error was found:
-  step 1: modprobe virtio_blk succeeded
-    # modprobe virtio_blk      <-- OK
+On 11/27/22 05:45, Greg Kroah-Hartman wrote:
+> On Fri, Nov 25, 2022 at 03:51:11PM -0800, Bart Van Assche wrote:
+>> On 11/23/22 04:25, Greg Kroah-Hartman wrote:
+>>> diff --git a/include/linux/mISDNif.h b/include/linux/mISDNif.h
+>>> index 7dd1f01ec4f9..7aab4a769736 100644
+>>> --- a/include/linux/mISDNif.h
+>>> +++ b/include/linux/mISDNif.h
+>>> @@ -586,7 +586,7 @@ extern struct mISDNclock *mISDN_register_clock(char *, int, clockctl_func_t *,
+>>>    						void *);
+>>>    extern void	mISDN_unregister_clock(struct mISDNclock *);
+>>> -static inline struct mISDNdevice *dev_to_mISDN(struct device *dev)
+>>> +static inline struct mISDNdevice *dev_to_mISDN(const struct device *dev)
+>>>    {
+>>>    	if (dev)
+>>>    		return dev_get_drvdata(dev);
+>>
+>> Why does the dev_to_mISDN() function drop constness? I haven't found an
+>> explanation for this in the cover letter.
+> 
+> I agree, this is going to be fixed up, see the thread starting here:
+> 	https://lore.kernel.org/r/Y34+V2bCDdqujBDk@kroah.com
+> 
+> I'll work on making a const / non const version for these so that we
+> don't loose the marking.
+> 
+> Oh wait, no, this function is fine, it's not modifying the device
+> structure at all, and only returning the pointer in the private data
+> stored in the device.  There is no loss of const-ness here.
 
-  step 2: fault injection in __blk_mq_alloc_disk()
-    # modprobe -r virtio_blk   <-- OK
-    # ...
-      CPU: 0 PID: 4578 Comm: modprobe Tainted: G        W
-      6.1.0-rc6-00308-g644e9524388a-dirty
-      Hardware name: QEMU Standard PC (i440FX + PIIX, 1996),
-      Call Trace:
-       <TASK>
-       should_failslab+0xa/0x20
-       ...
-       blk_alloc_queue+0x3a4/0x780
-       __blk_mq_alloc_disk+0x91/0x1f0
-       virtblk_probe+0x6ff/0x1f20 [virtio_blk]
-       ...
-       </TASK>
-      virtio_blk: probe of virtio1 failed with error -12
+Hi Greg,
 
-  step 3: modprobe virtio_net failed
-    # modprobe virtio_blk       <-- failed
-      virtio_blk: probe of virtio1 failed with error -2
+This is what I found in include/linux/mISDNif.h:
 
-The root cause of the problem is that the virtqueues are not
-stopped on the error handling path when __blk_mq_alloc_disk()
-fails in virtblk_probe(), resulting in an error "-ENOENT"
-returned in the next modprobe call in setup_vq().
+struct mISDNdevice {
+	struct mISDNchannel	D;
+	u_int			id;
+	u_int			Dprotocols;
+	u_int			Bprotocols;
+	u_int			nrbchan;
+	u_char			channelmap[MISDN_CHMAP_SIZE];
+	struct list_head	bchannels;
+	struct mISDNchannel	*teimgr;
+	struct device		dev;
+};
 
-virtio_pci_modern_device uses virtqueues to send or
-receive message, and "queue_enable" records whether the
-queues are available. In vp_modern_find_vqs(), all queues
-will be selected and activated, but once queues are enabled
-there is no way to go back except reset.
+As one can see 'dev' is a member of struct mISDNdevice. I still think 
+that dev_to_mISDN() drops constness. Did I perhaps overlook something?
 
-Fix it by reset virtio device on error handling path. After
-init_vq() succeeded, all virtqueues should be stopped on error
-handling path.
-
-Fixes: 1fcf0512c9c8 ("virtio_pci: modern driver")
-Signed-off-by: Li Zetao <lizetao1@huawei.com>
----
- drivers/block/virtio_blk.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-index 19da5defd734..f401546d4e85 100644
---- a/drivers/block/virtio_blk.c
-+++ b/drivers/block/virtio_blk.c
-@@ -1157,6 +1157,7 @@ static int virtblk_probe(struct virtio_device *vdev)
- 	put_disk(vblk->disk);
- out_free_tags:
- 	blk_mq_free_tag_set(&vblk->tag_set);
-+	virtio_reset_device(vdev);
- out_free_vq:
- 	vdev->config->del_vqs(vdev);
- 	kfree(vblk->vqs);
--- 
-2.25.1
-
+Bart.
