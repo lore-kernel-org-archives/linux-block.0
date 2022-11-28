@@ -2,38 +2,38 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C11FC433FE
-	for <linux-block@archiver.kernel.org>; Mon, 28 Nov 2022 15:23:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 567B2C4708A
+	for <linux-block@archiver.kernel.org>; Mon, 28 Nov 2022 15:23:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231359AbiK1PXb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 28 Nov 2022 10:23:31 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60132 "EHLO
+        id S231637AbiK1PXd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 28 Nov 2022 10:23:33 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60156 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230077AbiK1PXa (ORCPT
+        with ESMTP id S231468AbiK1PXc (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 28 Nov 2022 10:23:30 -0500
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C590E59;
-        Mon, 28 Nov 2022 07:23:29 -0800 (PST)
-Received: from dggpeml500020.china.huawei.com (unknown [172.30.72.57])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4NLTk10FWLzmW6v;
-        Mon, 28 Nov 2022 23:22:49 +0800 (CST)
+        Mon, 28 Nov 2022 10:23:32 -0500
+Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 996A025EA;
+        Mon, 28 Nov 2022 07:23:31 -0800 (PST)
+Received: from dggpeml500021.china.huawei.com (unknown [172.30.72.56])
+        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4NLTft5ZFgzJnwS;
+        Mon, 28 Nov 2022 23:20:06 +0800 (CST)
 Received: from dggpeml500003.china.huawei.com (7.185.36.200) by
- dggpeml500020.china.huawei.com (7.185.36.88) with Microsoft SMTP Server
+ dggpeml500021.china.huawei.com (7.185.36.21) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31; Mon, 28 Nov 2022 23:23:27 +0800
+ 15.1.2375.31; Mon, 28 Nov 2022 23:23:28 +0800
 Received: from huawei.com (10.175.127.227) by dggpeml500003.china.huawei.com
  (7.185.36.200) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.31; Mon, 28 Nov
- 2022 23:23:26 +0800
+ 2022 23:23:27 +0800
 From:   Li Nan <linan122@huawei.com>
 To:     <tj@kernel.org>, <josef@toxicpanda.com>, <axboe@kernel.dk>
 CC:     <cgroups@vger.kernel.org>, <linux-block@vger.kernel.org>,
         <linux-kernel@vger.kernel.org>, <linan122@huawei.com>,
         <yukuai3@huawei.com>, <yi.zhang@huawei.com>
-Subject: [PATCH -next 1/8] blk-iocost: cleanup ioc_qos_write() and ioc_cost_model_write()
-Date:   Mon, 28 Nov 2022 23:44:27 +0800
-Message-ID: <20221128154434.4177442-2-linan122@huawei.com>
+Subject: [PATCH -next 3/8] blk-iocost: don't allow to configure bio based device
+Date:   Mon, 28 Nov 2022 23:44:29 +0800
+Message-ID: <20221128154434.4177442-4-linan122@huawei.com>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20221128154434.4177442-1-linan122@huawei.com>
 References: <20221128154434.4177442-1-linan122@huawei.com>
@@ -50,190 +50,44 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Yu Kuai <yukuai3@huawei.com>
 
-There are no functional changes, just to make the code a litter cleaner
-and follow up patches easier.
+iocost is based on rq_qos, which can only work for request based device,
+thus it doesn't make sense to configure iocost for bio based device.
 
 Signed-off-by: Yu Kuai <yukuai3@huawei.com>
 Reviewed-by: Christoph Hellwig <hch@lst.de>
 Signed-off-by: Li Nan <linan122@huawei.com>
 ---
- block/blk-iocost.c | 62 +++++++++++++++++++---------------------------
- 1 file changed, 25 insertions(+), 37 deletions(-)
+ block/blk-iocost.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
 diff --git a/block/blk-iocost.c b/block/blk-iocost.c
-index f01359906c83..fd495e823db2 100644
+index c532129a1456..2bfecc511dd9 100644
 --- a/block/blk-iocost.c
 +++ b/block/blk-iocost.c
-@@ -3185,7 +3185,7 @@ static ssize_t ioc_qos_write(struct kernfs_open_file *of, char *input,
+@@ -3181,6 +3181,11 @@ static ssize_t ioc_qos_write(struct kernfs_open_file *of, char *input,
+ 		return PTR_ERR(bdev);
+ 
+ 	disk = bdev->bd_disk;
++	if (!queue_is_mq(disk->queue)) {
++		ret = -EPERM;
++		goto out;
++	}
++
+ 	ioc = q_to_ioc(disk->queue);
  	if (!ioc) {
  		ret = blk_iocost_init(disk);
- 		if (ret)
--			goto err;
-+			goto out;
- 		ioc = q_to_ioc(disk->queue);
- 	}
+@@ -3364,6 +3369,11 @@ static ssize_t ioc_cost_model_write(struct kernfs_open_file *of, char *input,
+ 		return PTR_ERR(bdev);
  
-@@ -3197,6 +3197,7 @@ static ssize_t ioc_qos_write(struct kernfs_open_file *of, char *input,
- 	enable = ioc->enabled;
- 	user = ioc->user_qos_params;
- 
-+	ret = -EINVAL;
- 	while ((p = strsep(&input, " \t\n"))) {
- 		substring_t args[MAX_OPT_ARGS];
- 		char buf[32];
-@@ -3218,7 +3219,7 @@ static ssize_t ioc_qos_write(struct kernfs_open_file *of, char *input,
- 			else if (!strcmp(buf, "user"))
- 				user = true;
- 			else
--				goto einval;
-+				goto out_unlock;
- 			continue;
- 		}
- 
-@@ -3228,39 +3229,39 @@ static ssize_t ioc_qos_write(struct kernfs_open_file *of, char *input,
- 		case QOS_WPPM:
- 			if (match_strlcpy(buf, &args[0], sizeof(buf)) >=
- 			    sizeof(buf))
--				goto einval;
-+				goto out_unlock;
- 			if (cgroup_parse_float(buf, 2, &v))
--				goto einval;
-+				goto out_unlock;
- 			if (v < 0 || v > 10000)
--				goto einval;
-+				goto out_unlock;
- 			qos[tok] = v * 100;
- 			break;
- 		case QOS_RLAT:
- 		case QOS_WLAT:
- 			if (match_u64(&args[0], &v))
--				goto einval;
-+				goto out_unlock;
- 			qos[tok] = v;
- 			break;
- 		case QOS_MIN:
- 		case QOS_MAX:
- 			if (match_strlcpy(buf, &args[0], sizeof(buf)) >=
- 			    sizeof(buf))
--				goto einval;
-+				goto out_unlock;
- 			if (cgroup_parse_float(buf, 2, &v))
--				goto einval;
-+				goto out_unlock;
- 			if (v < 0)
--				goto einval;
-+				goto out_unlock;
- 			qos[tok] = clamp_t(s64, v * 100,
- 					   VRATE_MIN_PPM, VRATE_MAX_PPM);
- 			break;
- 		default:
--			goto einval;
-+			goto out_unlock;
- 		}
- 		user = true;
- 	}
- 
- 	if (qos[QOS_MIN] > qos[QOS_MAX])
--		goto einval;
-+		goto out_unlock;
- 
- 	if (enable) {
- 		blk_stat_enable_accounting(disk->queue);
-@@ -3281,21 +3282,14 @@ static ssize_t ioc_qos_write(struct kernfs_open_file *of, char *input,
- 	}
- 
- 	ioc_refresh_params(ioc, true);
--	spin_unlock_irq(&ioc->lock);
-+	ret = nbytes;
- 
--	blk_mq_unquiesce_queue(disk->queue);
--	blk_mq_unfreeze_queue(disk->queue);
--
--	blkdev_put_no_open(bdev);
--	return nbytes;
--einval:
-+out_unlock:
- 	spin_unlock_irq(&ioc->lock);
--
- 	blk_mq_unquiesce_queue(disk->queue);
- 	blk_mq_unfreeze_queue(disk->queue);
- 
--	ret = -EINVAL;
--err:
-+out:
- 	blkdev_put_no_open(bdev);
- 	return ret;
- }
-@@ -3364,7 +3358,7 @@ static ssize_t ioc_cost_model_write(struct kernfs_open_file *of, char *input,
+ 	q = bdev_get_queue(bdev);
++	if (!queue_is_mq(q)) {
++		ret = -EPERM;
++		goto out;
++	}
++
+ 	ioc = q_to_ioc(q);
  	if (!ioc) {
  		ret = blk_iocost_init(bdev->bd_disk);
- 		if (ret)
--			goto err;
-+			goto out;
- 		ioc = q_to_ioc(q);
- 	}
- 
-@@ -3375,6 +3369,7 @@ static ssize_t ioc_cost_model_write(struct kernfs_open_file *of, char *input,
- 	memcpy(u, ioc->params.i_lcoefs, sizeof(u));
- 	user = ioc->user_cost_model;
- 
-+	ret = -EINVAL;
- 	while ((p = strsep(&input, " \t\n"))) {
- 		substring_t args[MAX_OPT_ARGS];
- 		char buf[32];
-@@ -3392,20 +3387,20 @@ static ssize_t ioc_cost_model_write(struct kernfs_open_file *of, char *input,
- 			else if (!strcmp(buf, "user"))
- 				user = true;
- 			else
--				goto einval;
-+				goto out_unlock;
- 			continue;
- 		case COST_MODEL:
- 			match_strlcpy(buf, &args[0], sizeof(buf));
- 			if (strcmp(buf, "linear"))
--				goto einval;
-+				goto out_unlock;
- 			continue;
- 		}
- 
- 		tok = match_token(p, i_lcoef_tokens, args);
- 		if (tok == NR_I_LCOEFS)
--			goto einval;
-+			goto out_unlock;
- 		if (match_u64(&args[0], &v))
--			goto einval;
-+			goto out_unlock;
- 		u[tok] = v;
- 		user = true;
- 	}
-@@ -3416,23 +3411,16 @@ static ssize_t ioc_cost_model_write(struct kernfs_open_file *of, char *input,
- 	} else {
- 		ioc->user_cost_model = false;
- 	}
--	ioc_refresh_params(ioc, true);
--	spin_unlock_irq(&ioc->lock);
- 
--	blk_mq_unquiesce_queue(q);
--	blk_mq_unfreeze_queue(q);
--
--	blkdev_put_no_open(bdev);
--	return nbytes;
-+	ioc_refresh_params(ioc, true);
-+	ret = nbytes;
- 
--einval:
-+out_unlock:
- 	spin_unlock_irq(&ioc->lock);
--
- 	blk_mq_unquiesce_queue(q);
- 	blk_mq_unfreeze_queue(q);
- 
--	ret = -EINVAL;
--err:
-+out:
- 	blkdev_put_no_open(bdev);
- 	return ret;
- }
 -- 
 2.31.1
 
