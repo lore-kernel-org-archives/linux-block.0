@@ -2,117 +2,114 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 482C7C433FE
-	for <linux-block@archiver.kernel.org>; Mon, 28 Nov 2022 19:08:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 69253C433FE
+	for <linux-block@archiver.kernel.org>; Mon, 28 Nov 2022 19:11:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231970AbiK1TIx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 28 Nov 2022 14:08:53 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39726 "EHLO
+        id S233185AbiK1TLo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 28 Nov 2022 14:11:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40874 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232238AbiK1TIv (ORCPT
+        with ESMTP id S233130AbiK1TLm (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 28 Nov 2022 14:08:51 -0500
-Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5CB6E28735
-        for <linux-block@vger.kernel.org>; Mon, 28 Nov 2022 11:08:50 -0800 (PST)
-Received: by mail-pj1-x1030.google.com with SMTP id k2-20020a17090a4c8200b002187cce2f92so14985528pjh.2
-        for <linux-block@vger.kernel.org>; Mon, 28 Nov 2022 11:08:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=vdiFLWGJlZNZEhU3chxdhx2hGdjjeSZKpnJnffDHCx4=;
-        b=Q5XoN2CjIrbe+48L5bUfjZfu0U8JKd099j/FY7bwNTUH3aWmw9cAnqT8EgROl9fO4C
-         qOJNJTIm54HvYo6ESRa+AGqTKFtczOfLgtde/tjYAQUNfe4U748t/psuR81Mo6eR6XDK
-         sXlXiUBIXotQbcclPXQsaJq4Z9p3B5Dj4QF7c2XCk+w+z7/wrBnMz2rI26+IzJPJmuGO
-         JKaYF8JhouN3XgWuhpIqqQ6dEd1oqnjkTbX4EWZ5r+qE4YJcamhZhJhQO252DrRpLJS/
-         +shfuyh0O9KPr6c/aUrEpA6d1zQ2Pt/J0pfypcEynvs9EKZn9rve8Xm4ZoTR7+fcJ4XX
-         7FTw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=vdiFLWGJlZNZEhU3chxdhx2hGdjjeSZKpnJnffDHCx4=;
-        b=5MGJGOQC466Jbj+J0Njv9jXXwf+KjsYRUJCmI0f7ripMTQJHiwdR4/bqpX77/b20j+
-         XQ1UQe6OH9RKtUJo2ub17o8M8lKf6/dG0OZfmfQjSVVsbwl2/dFDMmEZFQ8zM7PGQzDs
-         NQe3juEtAHiB4qTZWEds6f30dNa0Rnsqdrc6/9UH5o6FE3EthdoCMNqs7V47TUnEajgp
-         53rGetEahhx6RUTfwHIL827vp8//INF0gFi+oLXERaoHI5jB9excv00+/X7CdWoN8ict
-         ANHFew14WnWO8FwyUZPAkRewZk38N2XbOoCvPdGX2s29xAHwWtqKoOs8nVkH9eBjCyAj
-         2ySw==
-X-Gm-Message-State: ANoB5pn2OsJX1quX/PkWvp3JGt+wj+TYj1Sun0mB+JcetkEcvXZHhd63
-        IS0KxJP5XzcnYYQSOC3cq2s7zQ==
-X-Google-Smtp-Source: AA0mqf58eO2rHe3Xr1xr78aQJvkKp/cyJMeBI5F2x7pd0MEGGkcfWTx6fI+wdxL/kuKyRwBa07WrdA==
-X-Received: by 2002:a17:902:f651:b0:187:190f:6aa7 with SMTP id m17-20020a170902f65100b00187190f6aa7mr35345914plg.131.1669662529792;
-        Mon, 28 Nov 2022 11:08:49 -0800 (PST)
-Received: from [192.168.1.136] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id 6-20020a170902c14600b00187197c499asm9208642plj.164.2022.11.28.11.08.47
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 28 Nov 2022 11:08:48 -0800 (PST)
-Message-ID: <0390c62d-11d9-5d89-ad88-db38526b74e6@kernel.dk>
-Date:   Mon, 28 Nov 2022 12:08:47 -0700
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.0
-Subject: Re: [PATCH-block] blk-cgroup: Use css_tryget() in
- blkcg_destroy_blkgs()
-Content-Language: en-US
-To:     Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+        Mon, 28 Nov 2022 14:11:42 -0500
+Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1118227937;
+        Mon, 28 Nov 2022 11:11:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1669662702; x=1701198702;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=nGzO+QrVInugh0e/lwUYUkj404LL7Ug3B9XyONtYbvY=;
+  b=BQ950FFp2EksAiS9v62y3UPX1QZYebbBRjvvkL0OVByvk5WtgRPNhIZy
+   en9IgztIzjaC80l5m1rfUUHhrwyj0Y5HuCM7zdDBfTPirkHFsl9BvbI1f
+   YyO/SnBz3g2eb70AB02qXpraHM0UFks20SH4ed52HXP/6J5Y7VCxtPvH2
+   h7swF8vzFXJ4HaTSqsee6907vVnwTD9MOX7qL6U5czxZ6ORx6edKXuuHG
+   TNKYWLZ78E0cMX1wfKLbahcsk3F3GjaKpERR6I++51LR07RnC9WGpfCvK
+   Zs1/QGRIbcmw4v2h3rS/dfJF+kkqGjuY0QFDanM2gF3918O4pLyrCuP7e
+   Q==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10545"; a="295306145"
+X-IronPort-AV: E=Sophos;i="5.96,200,1665471600"; 
+   d="scan'208";a="295306145"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Nov 2022 11:11:40 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10545"; a="706910256"
+X-IronPort-AV: E=Sophos;i="5.96,200,1665471600"; 
+   d="scan'208";a="706910256"
+Received: from smile.fi.intel.com ([10.237.72.54])
+  by fmsmga008.fm.intel.com with ESMTP; 28 Nov 2022 11:11:37 -0800
+Received: from andy by smile.fi.intel.com with local (Exim 4.96)
+        (envelope-from <andriy.shevchenko@linux.intel.com>)
+        id 1ozjXT-001MSe-12;
+        Mon, 28 Nov 2022 21:11:35 +0200
+Date:   Mon, 28 Nov 2022 21:11:35 +0200
+From:   Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To:     Jens Axboe <axboe@kernel.dk>
 Cc:     Bart Van Assche <bvanassche@acm.org>,
         Waiman Long <longman@redhat.com>, Tejun Heo <tj@kernel.org>,
         cgroups@vger.kernel.org, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
         Andrew Morton <akpm@linux-foundation.org>,
-        =?UTF-8?Q?Michal_Koutn=c3=bd?= <mkoutny@suse.com>,
+        Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>,
         Hillf Danton <hdanton@sina.com>, Yi Zhang <yi.zhang@redhat.com>
+Subject: Re: [PATCH-block] blk-cgroup: Use css_tryget() in
+ blkcg_destroy_blkgs()
+Message-ID: <Y4UH56EZfcDyXuti@smile.fi.intel.com>
 References: <20221128033057.1279383-1-longman@redhat.com>
  <d08a0059-7c0b-d65f-d184-5b0cb75c08ed@acm.org>
  <f89e922c-16d5-0bcf-7e7e-096f42793a36@kernel.dk>
  <Y4UG9H9QsMnCvN+D@smile.fi.intel.com>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <Y4UG9H9QsMnCvN+D@smile.fi.intel.com>
-Content-Type: text/plain; charset=UTF-8
+ <0390c62d-11d9-5d89-ad88-db38526b74e6@kernel.dk>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <0390c62d-11d9-5d89-ad88-db38526b74e6@kernel.dk>
+Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 11/28/22 12:07 PM, Andy Shevchenko wrote:
-> On Mon, Nov 28, 2022 at 12:00:55PM -0700, Jens Axboe wrote:
->> On 11/28/22 11:56 AM, Bart Van Assche wrote:
->>> On 11/27/22 19:30, Waiman Long wrote:
->>>> Fixes: 951d1e94801f ("blk-cgroup: Flush stats at blkgs destruction path")
->>>
->>> Has Jens' for-next branch perhaps been rebased? I see the following commit ID for that patch:
->>>
->>> dae590a6c96c ("blk-cgroup: Flush stats at blkgs destruction path")
->>
->> I don't know that sha is from, not from me. for-6.2/block has not been
->> rebased, for-next gets rebased whenever I need to do so as linux-next is
->> continually rebased anyway. But the sha for that commit would not change
->> as a result.
->>
->> I don't even have that sha in my tree, so...
+On Mon, Nov 28, 2022 at 12:08:47PM -0700, Jens Axboe wrote:
+> On 11/28/22 12:07 PM, Andy Shevchenko wrote:
+> > On Mon, Nov 28, 2022 at 12:00:55PM -0700, Jens Axboe wrote:
+> >> On 11/28/22 11:56 AM, Bart Van Assche wrote:
+> >>> On 11/27/22 19:30, Waiman Long wrote:
+> >>>> Fixes: 951d1e94801f ("blk-cgroup: Flush stats at blkgs destruction path")
+> >>>
+> >>> Has Jens' for-next branch perhaps been rebased? I see the following commit ID for that patch:
+> >>>
+> >>> dae590a6c96c ("blk-cgroup: Flush stats at blkgs destruction path")
+> >>
+> >> I don't know that sha is from, not from me. for-6.2/block has not been
+> >> rebased, for-next gets rebased whenever I need to do so as linux-next is
+> >> continually rebased anyway. But the sha for that commit would not change
+> >> as a result.
+> >>
+> >> I don't even have that sha in my tree, so...
+> > 
+> > $ git tag --contains dae590a6c96c
+> > next-20221117
+> > next-20221118
+> > next-20221121
+> > next-20221122
+> > next-20221123
+> > next-20221124
+> > next-20221125
+> > next-20221128
 > 
-> $ git tag --contains dae590a6c96c
-> next-20221117
-> next-20221118
-> next-20221121
-> next-20221122
-> next-20221123
-> next-20221124
-> next-20221125
-> next-20221128
+> That is the right sha, I'm talking about the fixes line in the
+> patch you're replying to:
+> 
+> Fixes: 951d1e94801f ("blk-cgroup: Flush stats at blkgs destruction path")
+> 
+> which is certainly not from my tree.
 
-That is the right sha, I'm talking about the fixes line in the
-patch you're replying to:
-
-Fixes: 951d1e94801f ("blk-cgroup: Flush stats at blkgs destruction path")
-
-which is certainly not from my tree.
+Ah, I see. That one is local / wrong. I don't see it either.
 
 -- 
-Jens Axboe
+With Best Regards,
+Andy Shevchenko
 
 
