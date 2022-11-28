@@ -2,86 +2,114 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A017FC433FE
-	for <linux-block@archiver.kernel.org>; Mon, 28 Nov 2022 15:36:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A613CC433FE
+	for <linux-block@archiver.kernel.org>; Mon, 28 Nov 2022 15:39:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230241AbiK1PgK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 28 Nov 2022 10:36:10 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45844 "EHLO
+        id S230509AbiK1Pj4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 28 Nov 2022 10:39:56 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48324 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230273AbiK1PgJ (ORCPT
+        with ESMTP id S231299AbiK1Pjx (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 28 Nov 2022 10:36:09 -0500
-Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F1F00101C1
-        for <linux-block@vger.kernel.org>; Mon, 28 Nov 2022 07:36:08 -0800 (PST)
-Received: by mail-pl1-x631.google.com with SMTP id j12so10499020plj.5
-        for <linux-block@vger.kernel.org>; Mon, 28 Nov 2022 07:36:08 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Rj827wEsH1NqoBDuLsjEbAn8bHdiGqsXAWQLi2uAuwY=;
-        b=MAW/x387LobbC2bDjGbN3EY1ZQhrv4+3vQyosY063PPWJZSZXE2g8O5QbYXyGQsESW
-         Wx47lu1uyNGDc3zVhz4j0TkxYHupC47ThIC9cuTujwIU1Qf6JsVko41YwNzXAfJtPwjB
-         KnUJ+b/fxmd0V+7FjlsKCc0XmUU2YjZJWiFdH8zxn4pNF1JlI24dsIMT9su/cjRQGtsS
-         hEF8CZk2fE9YL6I3udwZBm5y0KlR+wXC01m/lq/a74QA86Hz2Pu9Ggrw/2FhxVoftb5p
-         UFSaMm3ODaVa0ks23ZD17khkYMjlmcPQ7Kg4YHZZOaG57oUp10cmYh/L1j/tYpUZqAx8
-         VHXg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Rj827wEsH1NqoBDuLsjEbAn8bHdiGqsXAWQLi2uAuwY=;
-        b=RoXf2YkShH7HIbjEW/v6HZTxudK19iryDoLIAWKy8ys558mw+cDsyz5so17IZSWwRi
-         YeEGGIlQITO9wFA6jFA/IxxsBulai0Z28uyAejdIeDALjcIp3sfK0kvGfncP78gDQD1R
-         lmbMItRLpYsKHklGN1GAraRC8QEsK1KYTHlFlUHW4GKUNyLB1KvnvxHPGhQS3GhpTaGg
-         k4+Mijp0X+ziyBd/4efiJWF+NCROs8J2eFRSlL9vPGs7m98OCz9RtWOh/73RrL52aMmE
-         eAAKZfxid92zRNLOxfAkRIXiSxdWJPFedUYXuA/5NBuHab0S9DejozD9/dyohOph52p0
-         +ZUA==
-X-Gm-Message-State: ANoB5pnOWfMk8RuPVowVDoYvLvLZ6PV7rEf3DrLH/iW27Gbboq/x9IXF
-        IDSLMu1tfnT0oMmB5t1HHjhTUw==
-X-Google-Smtp-Source: AA0mqf7DFGiofzbG4Kxwh04DCFhU3v4OX9kxYCYXgE53StRXn/UH5vfd/9HG8/GOqxfcqQ+MDsFozA==
-X-Received: by 2002:a17:90b:804:b0:20a:7ec2:c96d with SMTP id bk4-20020a17090b080400b0020a7ec2c96dmr53704681pjb.178.1669649768381;
-        Mon, 28 Nov 2022 07:36:08 -0800 (PST)
-Received: from [192.168.1.136] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id x8-20020aa79568000000b005633a06ad67sm8208214pfq.64.2022.11.28.07.36.07
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 28 Nov 2022 07:36:07 -0800 (PST)
-Message-ID: <b1157a4f-fa4d-76d0-69de-428f3940efbd@kernel.dk>
-Date:   Mon, 28 Nov 2022 08:36:07 -0700
+        Mon, 28 Nov 2022 10:39:53 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ADABB1F627
+        for <linux-block@vger.kernel.org>; Mon, 28 Nov 2022 07:38:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1669649932;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=4r34gL/zLUGsXD6KoTRJJSoISJJekVdoxgz5n6tlG2k=;
+        b=G5/t9+EYBksbzkLhMS3wm2ua+N9vqJbzfZaggpHpYdnTGfnFrCoVppwUa2epNfxEYqd4e4
+        +4tazdLmk9SpK873rTPAnxKPfLeeYYl+ZAXgOEX3EA1MMjz4KrQG9j3jTRBc+amAxtFQdK
+        JMA7lWJqHumZO25WcVzc0LlPwK8VLT4=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-159-VCRQlnyDOiGbQ_EdikapSQ-1; Mon, 28 Nov 2022 10:38:48 -0500
+X-MC-Unique: VCRQlnyDOiGbQ_EdikapSQ-1
+Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 7368F802C17;
+        Mon, 28 Nov 2022 15:38:47 +0000 (UTC)
+Received: from [10.22.10.34] (unknown [10.22.10.34])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id B1EB6492B05;
+        Mon, 28 Nov 2022 15:38:46 +0000 (UTC)
+Message-ID: <b9018641-d39f-ff74-8cfb-ba597f5ee0c2@redhat.com>
+Date:   Mon, 28 Nov 2022 10:38:44 -0500
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.0
-Subject: Re: [PATCH 0/2] Minor fixes
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.4.0
+Subject: Re: [PATCH-block] blk-cgroup: Use css_tryget() in
+ blkcg_destroy_blkgs()
 Content-Language: en-US
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-        linux-block@vger.kernel.org
-References: <20221126025550.967914-1-damien.lemoal@opensource.wdc.com>
- <166964494783.5680.1897835623013824110.b4-ty@kernel.dk>
- <Y4TT1S4AOAm+wemn@infradead.org>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <Y4TT1S4AOAm+wemn@infradead.org>
-Content-Type: text/plain; charset=UTF-8
+To:     Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>
+Cc:     cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        =?UTF-8?Q?Michal_Koutn=c3=bd?= <mkoutny@suse.com>,
+        Hillf Danton <hdanton@sina.com>, Yi Zhang <yi.zhang@redhat.com>
+References: <20221128033057.1279383-1-longman@redhat.com>
+ <427068db-6695-a1e2-4aa2-033220680eb9@kernel.dk>
+From:   Waiman Long <longman@redhat.com>
+In-Reply-To: <427068db-6695-a1e2-4aa2-033220680eb9@kernel.dk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.10
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 11/28/22 8:29 AM, Christoph Hellwig wrote:
-> On Mon, Nov 28, 2022 at 07:15:47AM -0700, Jens Axboe wrote:
->> [2/2] block: fops: Do not set REQ_SYNC for async IOs
->>       commit: 26a7bc153a19f3349fd8c2e262728b2eae6bfd6f
-> 
-> Urgg.  I don't think this is right.  And even if it was, block device
-> I/O is not out of line with the other direct I/O implementations.
+On 11/28/22 09:14, Jens Axboe wrote:
+> On 11/27/22 8:30 PM, Waiman Long wrote:
+>> Commit 951d1e94801f ("blk-cgroup: Flush stats at blkgs destruction
+>> path") incorrectly assumes that css_get() will always succeed. That may
+>> not be true if there is no blkg associated with the blkcg. If css_get()
+>> fails, the subsequent css_put() call may lead to data corruption as
+>> was illustrated in a test system that it crashed on bootup when that
+>> commit was included. Also blkcg may be freed at any time leading to
+>> use-after-free. Fix it by using css_tryget() instead and bail out if
+>> the tryget fails.
+>>
+>> Fixes: 951d1e94801f ("blk-cgroup: Flush stats at blkgs destruction path")
+>> Reported-by: Yi Zhang <yi.zhang@redhat.com>
+>> Signed-off-by: Waiman Long <longman@redhat.com>
+>> ---
+>>   block/blk-cgroup.c | 7 ++++++-
+>>   1 file changed, 6 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+>> index 57941d2a8ba3..74fefc8cbcdf 100644
+>> --- a/block/blk-cgroup.c
+>> +++ b/block/blk-cgroup.c
+>> @@ -1088,7 +1088,12 @@ static void blkcg_destroy_blkgs(struct blkcg *blkcg)
+>>   
+>>   	might_sleep();
+>>   
+>> -	css_get(&blkcg->css);
+>> +	/*
+>> +	 * If css_tryget() fails, there is no blkg to destroy.
+>> +	 */
+>> +	if (!css_tryget(&blkcg->css))
+>> +		return;
+>> +
+>>   	spin_lock_irq(&blkcg->lock);
+>>   	while (!hlist_empty(&blkcg->blkg_list)) {
+>>   		struct blkcg_gq *blkg = hlist_entry(blkcg->blkg_list.first,
+> This doesn't seem safe to me, but maybe I'm missing something. A tryget
+> operation can be fine if we're under RCU lock and the entity is freed
+> appropriately, but what makes it safe here? Could blkcg already be gone
+> at this point?
 
-I'll drop it for now.
+The actual freeing of the blkcg structure is under RCU protection. So 
+the structure won't be freed immediately even if css_tryget() fails. I 
+suspect what Michal found may be the root cause of this problem. If so, 
+this is an existing bug which gets exposed by my patch.
 
--- 
-Jens Axboe
-
+Cheers,
+Longman
 
