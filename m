@@ -2,95 +2,79 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AE159C4321E
-	for <linux-block@archiver.kernel.org>; Mon, 28 Nov 2022 03:32:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C835C46467
+	for <linux-block@archiver.kernel.org>; Mon, 28 Nov 2022 07:35:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229929AbiK1Dcm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 27 Nov 2022 22:32:42 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39236 "EHLO
+        id S229888AbiK1Hfq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 28 Nov 2022 02:35:46 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40798 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229907AbiK1Dch (ORCPT
+        with ESMTP id S229713AbiK1Hfp (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 27 Nov 2022 22:32:37 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8DB913CC2
-        for <linux-block@vger.kernel.org>; Sun, 27 Nov 2022 19:31:33 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1669606292;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=Mh8+HZNMN2F6HzSwmWPr16ecpqC3Mw7WO0DSOHuRXuQ=;
-        b=JD1i+j+QXnc1HbipMzQVoy70Q7r2FqnP54sOXtsrQmDNrJYY8FhPMvAPYDDPkRkEkBnvGN
-        kdW0JcwqJFKbAynjcX2aZ8pdq0uyjfV+qt/sQ/TrZ7msaY2wB419SA3L+0Po3ODOqsTDVy
-        O0NlNcKEyNaQMH4wBTuSK854fI/wc2g=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-664-HrKrfLHKPnuPTFPzc0qKUA-1; Sun, 27 Nov 2022 22:31:28 -0500
-X-MC-Unique: HrKrfLHKPnuPTFPzc0qKUA-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E4C43811E67;
-        Mon, 28 Nov 2022 03:31:27 +0000 (UTC)
-Received: from llong.com (unknown [10.22.32.57])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id E5A17492B08;
-        Mon, 28 Nov 2022 03:31:26 +0000 (UTC)
-From:   Waiman Long <longman@redhat.com>
-To:     Tejun Heo <tj@kernel.org>, Jens Axboe <axboe@kernel.dk>
-Cc:     cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        =?UTF-8?q?Michal=20Koutn=C3=BD?= <mkoutny@suse.com>,
-        Hillf Danton <hdanton@sina.com>,
-        Waiman Long <longman@redhat.com>,
-        Yi Zhang <yi.zhang@redhat.com>
-Subject: [PATCH-block] blk-cgroup: Use css_tryget() in blkcg_destroy_blkgs()
-Date:   Sun, 27 Nov 2022 22:30:57 -0500
-Message-Id: <20221128033057.1279383-1-longman@redhat.com>
+        Mon, 28 Nov 2022 02:35:45 -0500
+Received: from out30-57.freemail.mail.aliyun.com (out30-57.freemail.mail.aliyun.com [115.124.30.57])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DEC4B12AAF;
+        Sun, 27 Nov 2022 23:35:43 -0800 (PST)
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R151e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045176;MF=tianjia.zhang@linux.alibaba.com;NM=1;PH=DS;RN=10;SR=0;TI=SMTPD_---0VVpnSmS_1669620938;
+Received: from 30.27.90.133(mailfrom:tianjia.zhang@linux.alibaba.com fp:SMTPD_---0VVpnSmS_1669620938)
+          by smtp.aliyun-inc.com;
+          Mon, 28 Nov 2022 15:35:39 +0800
+Message-ID: <e0461754-39c4-a9e1-6ca1-381659e4a2d7@linux.alibaba.com>
+Date:   Mon, 28 Nov 2022 15:35:37 +0800
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.10
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.13.1
+Subject: Re: [PATCH v3 2/2] fscrypt: Add SM4 XTS/CTS symmetric algorithm
+ support
+Content-Language: en-US
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     "Theodore Y. Ts o" <tytso@mit.edu>,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        Jonathan Corbet <corbet@lwn.net>, Jens Axboe <axboe@kernel.dk>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        linux-fscrypt@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
+References: <20221125121630.87793-1-tianjia.zhang@linux.alibaba.com>
+ <20221125121630.87793-3-tianjia.zhang@linux.alibaba.com>
+ <Y4EIR+n8aKutuLo0@sol.localdomain>
+From:   Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+In-Reply-To: <Y4EIR+n8aKutuLo0@sol.localdomain>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Commit 951d1e94801f ("blk-cgroup: Flush stats at blkgs destruction
-path") incorrectly assumes that css_get() will always succeed. That may
-not be true if there is no blkg associated with the blkcg. If css_get()
-fails, the subsequent css_put() call may lead to data corruption as
-was illustrated in a test system that it crashed on bootup when that
-commit was included. Also blkcg may be freed at any time leading to
-use-after-free. Fix it by using css_tryget() instead and bail out if
-the tryget fails.
+Hi Eric,
 
-Fixes: 951d1e94801f ("blk-cgroup: Flush stats at blkgs destruction path")
-Reported-by: Yi Zhang <yi.zhang@redhat.com>
-Signed-off-by: Waiman Long <longman@redhat.com>
----
- block/blk-cgroup.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+On 11/26/22 2:24 AM, Eric Biggers wrote:
+> On Fri, Nov 25, 2022 at 08:16:30PM +0800, Tianjia Zhang wrote:
+>> diff --git a/fs/crypto/policy.c b/fs/crypto/policy.c
+>> index 46757c3052ef..8e69bc0c35cd 100644
+>> --- a/fs/crypto/policy.c
+>> +++ b/fs/crypto/policy.c
+>> @@ -71,6 +71,10 @@ static bool fscrypt_valid_enc_modes_v1(u32 contents_mode, u32 filenames_mode)
+>>   	    filenames_mode == FSCRYPT_MODE_AES_128_CTS)
+>>   		return true;
+>>   
+>> +	if (contents_mode == FSCRYPT_MODE_SM4_XTS &&
+>> +	    filenames_mode == FSCRYPT_MODE_SM4_CTS)
+>> +		return true;
+>> +
+>>   	if (contents_mode == FSCRYPT_MODE_ADIANTUM &&
+>>   	    filenames_mode == FSCRYPT_MODE_ADIANTUM)
+>>   		return true;
+> 
+> Sorry, one more thing I didn't notice before.  Since this is a new feature,
+> please only allow it in fscrypt_valid_enc_modes_v2(), not in
+> fscrypt_valid_enc_modes_v1().  That's what we did for AES-256-XTS +
+> AES-256-HCTR2 recently.  There should be no need to add new features to
+> v1 encryption policies, which have been deprecated for several years.
+> 
+> - Eric
 
-diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-index 57941d2a8ba3..74fefc8cbcdf 100644
---- a/block/blk-cgroup.c
-+++ b/block/blk-cgroup.c
-@@ -1088,7 +1088,12 @@ static void blkcg_destroy_blkgs(struct blkcg *blkcg)
- 
- 	might_sleep();
- 
--	css_get(&blkcg->css);
-+	/*
-+	 * If css_tryget() fails, there is no blkg to destroy.
-+	 */
-+	if (!css_tryget(&blkcg->css))
-+		return;
-+
- 	spin_lock_irq(&blkcg->lock);
- 	while (!hlist_empty(&blkcg->blkg_list)) {
- 		struct blkcg_gq *blkg = hlist_entry(blkcg->blkg_list.first,
--- 
-2.31.1
+Thanks for reminder, it makes sense to only support the new algorithm in
+v2 policy, which I will do this.
 
+BR,
+Tianjia
