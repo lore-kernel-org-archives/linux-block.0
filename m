@@ -2,52 +2,110 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 51D9CC433FE
-	for <linux-block@archiver.kernel.org>; Mon, 28 Nov 2022 15:32:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1810EC4321E
+	for <linux-block@archiver.kernel.org>; Mon, 28 Nov 2022 15:32:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230077AbiK1Pcj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 28 Nov 2022 10:32:39 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41530 "EHLO
+        id S230386AbiK1Pck (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 28 Nov 2022 10:32:40 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42432 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231880AbiK1Pbo (ORCPT
+        with ESMTP id S232278AbiK1Pbs (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 28 Nov 2022 10:31:44 -0500
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B91425C7E
-        for <linux-block@vger.kernel.org>; Mon, 28 Nov 2022 07:29:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=FyuHIFv5euFr0Gjw4YqQ22tzxcFF0fJeltBDayrOrMk=; b=ecBoeJDgoYdmH5vd7tE51ceN3N
-        uJ9+p5z80V7x3fMf2mrAytzYs3pX1coXfSqVAxBwD2drg71Jfvqs8t/Xbi7I3lFk62FTOPNc2t1AF
-        uv4ndBLQwqCbBrd8A4tFmte8M9bUiIkkAS31tOvnCVpxhBfF6mRYLp5UYcnnDMFIdZSwtsX5Nye0Z
-        +xCCEhWGkOyJgV6QVweTQEfEgNWf6KwFmQiHgYLr5TMlmD5XOSqleqAOu74sObMADRWi/q3+aVfF4
-        frDcW4HNGcaSeoO1LNluUsw52DLzF7NwtZxpwV79ZEV5MItO0BrxYtYEqcZUVsiERYgazUkLzO9Ei
-        28zarr3w==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1ozg4T-002VZl-An; Mon, 28 Nov 2022 15:29:25 +0000
-Date:   Mon, 28 Nov 2022 07:29:25 -0800
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-        linux-block@vger.kernel.org
-Subject: Re: [PATCH 0/2] Minor fixes
-Message-ID: <Y4TT1S4AOAm+wemn@infradead.org>
-References: <20221126025550.967914-1-damien.lemoal@opensource.wdc.com>
- <166964494783.5680.1897835623013824110.b4-ty@kernel.dk>
+        Mon, 28 Nov 2022 10:31:48 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35DEE27CC1
+        for <linux-block@vger.kernel.org>; Mon, 28 Nov 2022 07:28:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1669649292;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=omHAWSGVOrqdistvF1mI4veeF3fLfIz9T/z0L/hp1Dw=;
+        b=IxOr4AytRl94kiG5gnH1ChBIhDpasQw8MFIoYWRCy67om+lp0UAmrsInvI/6Yi8CQNfKff
+        54y2qSgOI05pRdq8Zmb+VXyzTKcFamZv4ZFx3CFvizbuGAO22PAhXiSxmwr36BrtpdlmjO
+        LOUVyrV+SGNR1IuFCnABOG6K6iI5bec=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-649-EMi1OtOLOu-dlg5-KW-N1g-1; Mon, 28 Nov 2022 10:28:10 -0500
+X-MC-Unique: EMi1OtOLOu-dlg5-KW-N1g-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 818F0882826;
+        Mon, 28 Nov 2022 15:28:09 +0000 (UTC)
+Received: from [10.22.10.34] (unknown [10.22.10.34])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id A642F4B3FC8;
+        Mon, 28 Nov 2022 15:28:08 +0000 (UTC)
+Message-ID: <60c59bed-d9aa-5e49-7a1b-d3463ff267ad@redhat.com>
+Date:   Mon, 28 Nov 2022 10:28:06 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <166964494783.5680.1897835623013824110.b4-ty@kernel.dk>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.4.0
+Subject: Re: [PATCH-block] blk-cgroup: Use css_tryget() in
+ blkcg_destroy_blkgs()
+Content-Language: en-US
+To:     =?UTF-8?Q?Michal_Koutn=c3=bd?= <mkoutny@suse.com>
+Cc:     Tejun Heo <tj@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Hillf Danton <hdanton@sina.com>, Yi Zhang <yi.zhang@redhat.com>
+References: <20221128033057.1279383-1-longman@redhat.com>
+ <20221128140631.GI25160@blackbody.suse.cz>
+From:   Waiman Long <longman@redhat.com>
+In-Reply-To: <20221128140631.GI25160@blackbody.suse.cz>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Nov 28, 2022 at 07:15:47AM -0700, Jens Axboe wrote:
-> [2/2] block: fops: Do not set REQ_SYNC for async IOs
->       commit: 26a7bc153a19f3349fd8c2e262728b2eae6bfd6f
+On 11/28/22 09:06, Michal Koutný wrote:
+> Hello.
+>
+> On Sun, Nov 27, 2022 at 10:30:57PM -0500, Waiman Long <longman@redhat.com> wrote:
+>> That may not be true if there is no blkg associated with the blkcg. If
+>> css_get() fails, the subsequent css_put() call may lead to data
+>> corruption as was illustrated in a test system that it crashed on
+>> bootup when that commit was included.
+> Do you have a stacktrace of the underflowing css_put() in
+> blkcg_destroy_blkgs()?
+>
+> It looks to me slightly as a mistake of the caller site that it passes
+> struct blkcg * without any references.
+>
+> By a cursory look, could it be cgwb_release_workfn?
+>
+> --- a/mm/backing-dev.c
+> +++ b/mm/backing-dev.c
+> @@ -390,11 +390,11 @@ static void cgwb_release_workfn(struct work_struct *work)
+>          wb_shutdown(wb);
+>
+>          css_put(wb->memcg_css);
+> -       css_put(wb->blkcg_css);
+>          mutex_unlock(&wb->bdi->cgwb_release_mutex);
+>
+>          /* triggers blkg destruction if no online users left */
+>          blkcg_unpin_online(wb->blkcg_css);
+> +       css_put(wb->blkcg_css);
+>
+>          fprop_local_destroy_percpu(&wb->memcg_completions);
+>
+> Does your crash involve this stack?
 
-Urgg.  I don't think this is right.  And even if it was, block device
-I/O is not out of line with the other direct I/O implementations.
+That looks like a possible cause for the system crash that we are 
+seeing. In my testing, I do see one case out of more than a dozen calls 
+to blkcg_destroy_blkgs() where css_tryget() fail in the reproducing 
+system during bootup. However, I didn't force a stack dump at that point 
+and so I am not sure if that is the place, though it looks likely. One 
+of the crashes that was reported does involve blkcg_unpin_online(). So 
+maybe that is it.
+
+Cheers,
+Longman
+
+
