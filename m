@@ -2,156 +2,102 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 56359C4332F
-	for <linux-block@archiver.kernel.org>; Mon, 28 Nov 2022 17:25:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C594C433FE
+	for <linux-block@archiver.kernel.org>; Mon, 28 Nov 2022 18:55:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232503AbiK1RZc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 28 Nov 2022 12:25:32 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41422 "EHLO
+        id S231278AbiK1Szv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 28 Nov 2022 13:55:51 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57564 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232984AbiK1RZR (ORCPT
+        with ESMTP id S230218AbiK1Szt (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 28 Nov 2022 12:25:17 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0D61B20349;
-        Mon, 28 Nov 2022 09:25:14 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id B6D92B80E90;
-        Mon, 28 Nov 2022 17:25:12 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 002F2C433D6;
-        Mon, 28 Nov 2022 17:25:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1669656311;
-        bh=wZlmYJl8LMxMeefdCbrE5viQuX+AZVgF+lHUSAzV8mA=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=jklUVBk1mHdNx5UwNOVAyoL9FcfwZD4B7KDGLSBvRl5IAv16CCb++ynZ+TPs/2xnW
-         Y09yfkYWX7Zusj8ufWXnQv3O5+iO2GnPgg5dqoMaQRFD7eFKipOag5+WZBxv2B/3hS
-         npOJ5H5324elD5m0VsViiZtApWHVqoGlQ7+jDW9I=
-Date:   Mon, 28 Nov 2022 18:25:09 +0100
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     linux-kernel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Luis Chamberlain <mcgrof@kernel.org>,
-        Russ Weight <russell.h.weight@intel.com>,
-        "Rafael J. Wysocki" <rafael@kernel.org>,
-        Jean Delvare <jdelvare@suse.com>,
-        Johan Hovold <johan@kernel.org>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Leon Romanovsky <leon@kernel.org>,
-        Karsten Keil <isdn@linux-pingi.de>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Keith Busch <kbusch@kernel.org>,
-        Christoph Hellwig <hch@lst.de>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Dominik Brodowski <linux@dominikbrodowski.net>,
-        Sebastian Reichel <sre@kernel.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Johannes Berg <johannes@sipsolutions.net>,
-        Wolfram Sang <wsa+renesas@sang-engineering.com>,
-        Raed Salem <raeds@nvidia.com>,
-        Chen Zhongjin <chenzhongjin@huawei.com>,
-        Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
-        Avihai Horon <avihaih@nvidia.com>,
-        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
-        Alan Stern <stern@rowland.harvard.edu>,
-        Colin Ian King <colin.i.king@gmail.com>,
-        Geert Uytterhoeven <geert+renesas@glider.be>,
-        Jakob Koschel <jakobkoschel@gmail.com>,
-        Antoine Tenart <atenart@kernel.org>,
-        Frederic Weisbecker <frederic@kernel.org>,
-        Wang Yufen <wangyufen@huawei.com>, linux-block@vger.kernel.org,
-        linux-media@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-pm@vger.kernel.org, linux-rdma@vger.kernel.org,
-        linux-usb@vger.kernel.org, linux-wireless@vger.kernel.org,
-        netdev@vger.kernel.org
-Subject: Re: [PATCH 1/5] driver core: make struct class.dev_uevent() take a
- const *
-Message-ID: <Y4Tu9UUGGiEdFcVw@kroah.com>
-References: <20221123122523.1332370-1-gregkh@linuxfoundation.org>
- <d448b944-708a-32d4-37d7-0be16ee5f73c@acm.org>
- <Y4NqAJW5V0tAP8ax@kroah.com>
- <5b14cdea-1bbe-1900-0004-a218ba97bbcb@acm.org>
+        Mon, 28 Nov 2022 13:55:49 -0500
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE3D920189
+        for <linux-block@vger.kernel.org>; Mon, 28 Nov 2022 10:55:46 -0800 (PST)
+Received: by mail-pl1-f176.google.com with SMTP id p24so7336151plw.1
+        for <linux-block@vger.kernel.org>; Mon, 28 Nov 2022 10:55:46 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=wgmDqGHS1sUrH9TJPKKrtDA3xkUztR3VQIqu5bLr+yc=;
+        b=mXxLpIWXyJs75/IRt5Kir1+MW3gRldUamioBzCV3J/7HD5IzDK3HnNCMsq3VO/y8P0
+         bMgybxaVsnnTgFpDPQ5aVwQCWiWyMiMRTyc8XFjNN9OYmT16oZjHbCHUJYHzkpsE6rp9
+         47dYCRGk5W5EocLtjpfMgEBnBUvyWRuXFHp7rIcRbhgknTQ6wyljqg0xfVRyfAdT52+O
+         C8r5ik17Tsh8PhVIJRbsTV6G2cky+sjV9ZWIjQwJUaMTXX9nliS9LZEhgjdf9UfqsPTq
+         rEzvsLsVLh2EfUMDXb1qddLoVvH+897hfRnob2xPGzMoL1gu3IO3KBIPKajYP1faWJ5a
+         AnUg==
+X-Gm-Message-State: ANoB5pms0m+2AomocTTK4EnruLgkxcL00VWoFcviTlQYlCisqgSMob5m
+        pmxDxjlR1PP7ps2FwG+UASUw9zGpk0p08A==
+X-Google-Smtp-Source: AA0mqf6erjJso2S93OsTNsSnXNegEMoZ0l1bpNKqFiUksAORgvdTvh/SplacB+EKNEv0s8wixQuhxg==
+X-Received: by 2002:a17:903:3241:b0:186:dcc3:5d1d with SMTP id ji1-20020a170903324100b00186dcc35d1dmr46252233plb.20.1669661746089;
+        Mon, 28 Nov 2022 10:55:46 -0800 (PST)
+Received: from ?IPV6:2620:15c:211:201:95f2:baa2:773c:2cfe? ([2620:15c:211:201:95f2:baa2:773c:2cfe])
+        by smtp.gmail.com with ESMTPSA id l7-20020a170902f68700b0017f756563bcsm9290116plg.47.2022.11.28.10.55.44
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 28 Nov 2022 10:55:45 -0800 (PST)
+Message-ID: <8a3f3648-1bf9-68c1-36c0-c245f5bd7f8d@acm.org>
+Date:   Mon, 28 Nov 2022 10:55:42 -0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <5b14cdea-1bbe-1900-0004-a218ba97bbcb@acm.org>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.4.0
+Subject: Re: [bisected]kernel BUG at lib/list_debug.c:30! (list_add
+ corruption. prev->next should be nex)
+Content-Language: en-US
+To:     Yi Zhang <yi.zhang@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+        Waiman Long <longman@redhat.com>
+Cc:     linux-block <linux-block@vger.kernel.org>,
+        CKI Project <cki-project@redhat.com>,
+        Bruno Goncalves <bgoncalv@redhat.com>
+References: <CA+QYu4oxiRKC6hJ7F27whXy-PRBx=Tvb+-7TQTONN8qTtV3aDA@mail.gmail.com>
+ <2e5f0ed1-4771-1b24-e6da-b63393506e47@kernel.dk>
+ <CA+QYu4qDcYJf3WKAmuFcFGX273t4Yi0WG+eF6oQGiRyKeXejWw@mail.gmail.com>
+ <CAHj4cs9uLczHhbO+SRmbBGPu3WZ_HntiCi4sxettXCnjuV8ZXQ@mail.gmail.com>
+ <CAHj4cs-1mH-FKtU8_uq4H4o6K+JKVwgvN7Yk3e8LOc+-u=YhMw@mail.gmail.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <CAHj4cs-1mH-FKtU8_uq4H4o6K+JKVwgvN7Yk3e8LOc+-u=YhMw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sun, Nov 27, 2022 at 06:38:39PM -0800, Bart Van Assche wrote:
-> On 11/27/22 05:45, Greg Kroah-Hartman wrote:
-> > On Fri, Nov 25, 2022 at 03:51:11PM -0800, Bart Van Assche wrote:
-> > > On 11/23/22 04:25, Greg Kroah-Hartman wrote:
-> > > > diff --git a/include/linux/mISDNif.h b/include/linux/mISDNif.h
-> > > > index 7dd1f01ec4f9..7aab4a769736 100644
-> > > > --- a/include/linux/mISDNif.h
-> > > > +++ b/include/linux/mISDNif.h
-> > > > @@ -586,7 +586,7 @@ extern struct mISDNclock *mISDN_register_clock(char *, int, clockctl_func_t *,
-> > > >    						void *);
-> > > >    extern void	mISDN_unregister_clock(struct mISDNclock *);
-> > > > -static inline struct mISDNdevice *dev_to_mISDN(struct device *dev)
-> > > > +static inline struct mISDNdevice *dev_to_mISDN(const struct device *dev)
-> > > >    {
-> > > >    	if (dev)
-> > > >    		return dev_get_drvdata(dev);
-> > > 
-> > > Why does the dev_to_mISDN() function drop constness? I haven't found an
-> > > explanation for this in the cover letter.
-> > 
-> > I agree, this is going to be fixed up, see the thread starting here:
-> > 	https://lore.kernel.org/r/Y34+V2bCDdqujBDk@kroah.com
-> > 
-> > I'll work on making a const / non const version for these so that we
-> > don't loose the marking.
-> > 
-> > Oh wait, no, this function is fine, it's not modifying the device
-> > structure at all, and only returning the pointer in the private data
-> > stored in the device.  There is no loss of const-ness here.
+On 11/26/22 06:29, Yi Zhang wrote:
+> Finally, I rebased the for-6.2/block branch on 6.1-rc6 and was able to
+> bisect it：
 > 
-> Hi Greg,
 > 
-> This is what I found in include/linux/mISDNif.h:
+> 951d1e94801f95a3fc1c75ff342431c9f519dd14 is the first bad commit
+> commit 951d1e94801f95a3fc1c75ff342431c9f519dd14
+> Author: Waiman Long <longman@redhat.com>
+> Date:   Fri Nov 4 20:59:02 2022 -0400
 > 
-> struct mISDNdevice {
-> 	struct mISDNchannel	D;
-> 	u_int			id;
-> 	u_int			Dprotocols;
-> 	u_int			Bprotocols;
-> 	u_int			nrbchan;
-> 	u_char			channelmap[MISDN_CHMAP_SIZE];
-> 	struct list_head	bchannels;
-> 	struct mISDNchannel	*teimgr;
-> 	struct device		dev;
-> };
+>      blk-cgroup: Flush stats at blkgs destruction path
 > 
-> As one can see 'dev' is a member of struct mISDNdevice. I still think that
-> dev_to_mISDN() drops constness. Did I perhaps overlook something?
+>      As noted by Michal, the blkg_iostat_set's in the lockless list
+>      hold reference to blkg's to protect against their removal. Those
+>      blkg's hold reference to blkcg. When a cgroup is being destroyed,
+>      cgroup_rstat_flush() is only called at css_release_work_fn() which is
+>      called when the blkcg reference count reaches 0. This circular dependency
+>      will prevent blkcg from being freed until some other events cause
+>      cgroup_rstat_flush() to be called to flush out the pending blkcg stats.
+> 
+>      To prevent this delayed blkcg removal, add a new cgroup_rstat_css_flush()
+>      function to flush stats for a given css and cpu and call it at the blkgs
+>      destruction path, blkcg_destroy_blkgs(), whenever there are still some
+>      pending stats to be flushed. This will ensure that blkcg reference
+>      count can reach 0 ASAP.
+> 
+>      Signed-off-by: Waiman Long <longman@redhat.com>
+>      Acked-by: Tejun Heo <tj@kernel.org>
+>      Link: https://lore.kernel.org/r/20221105005902.407297-4-longman@redhat.com
+>      Signed-off-by: Jens Axboe <axboe@kernel.dk>
 
-I think you are missing that dev_to_mISDN() is doing something different
-than most dev_to_FOO() functions do (i.e. there is no container_of()
-call here at all):
+I can confirm this report. If I revert patch "blk-cgroup: Flush stats at 
+blkgs destruction path" on top of the block/for-next branch from last 
+Wednesday then test block/027 passes. Test block/027 fails 
+systematically with an unmodified block/for-next branch.
 
-static inline struct mISDNdevice *dev_to_mISDN(struct device *dev)
-{
-	if (dev)
-		return dev_get_drvdata(dev);
-	else
-		return NULL;
-}
-
-See, no pointer mess or anything else here, all that happens is the
-driver data pointer in struct device is returned.
-
-If this was a "normal" dev_to_FOO() function, then yes, the const-ness
-of the pointer would be called into question as the thread I linked to
-discusses.
-
-thanks,
-
-greg k-h
+Bart.
