@@ -2,124 +2,95 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 62A85C43217
-	for <linux-block@archiver.kernel.org>; Mon, 28 Nov 2022 03:09:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AE159C4321E
+	for <linux-block@archiver.kernel.org>; Mon, 28 Nov 2022 03:32:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229804AbiK1DJh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 27 Nov 2022 22:09:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60202 "EHLO
+        id S229929AbiK1Dcm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 27 Nov 2022 22:32:42 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39236 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229838AbiK1DJf (ORCPT
+        with ESMTP id S229907AbiK1Dch (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 27 Nov 2022 22:09:35 -0500
-Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 140A512621;
-        Sun, 27 Nov 2022 19:09:33 -0800 (PST)
-Received: from mail02.huawei.com (unknown [172.30.67.169])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4NL9Rq2Hgbz4f3jHd;
-        Mon, 28 Nov 2022 11:09:27 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-        by APP2 (Coremail) with SMTP id Syh0CgBnybRoJoRjC3cNBQ--.46112S3;
-        Mon, 28 Nov 2022 11:09:30 +0800 (CST)
-Subject: Re: Why is MEGASAS_SAS_QD set to 256?
-To:     Ming Lei <ming.lei@redhat.com>, Yu Kuai <yukuai1@huaweicloud.com>
-Cc:     John Garry <john.g.garry@oracle.com>, kashyap.desai@broadcom.com,
-        sumit.saxena@broadcom.com, shivasharan.srikanteshwara@broadcom.com,
-        jejb@linux.ibm.com, martin.petersen@oracle.com,
-        megaraidlinux.pdl@broadcom.com, linux-scsi@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        linux-block <linux-block@vger.kernel.org>,
-        "zhangyi (F)" <yi.zhang@huawei.com>,
-        "yukuai (C)" <yukuai3@huawei.com>
-References: <1c4d66ca-fe1a-3d1a-d7f9-4981d2fc9eb1@huaweicloud.com>
- <e11cdb17-053c-390c-9c48-36790eb70cc5@oracle.com>
- <2b89210a-222c-a919-ab5b-c76830308f92@huaweicloud.com>
- <Y4F3XG3lMCCKlLAr@T590>
- <aef69f3b-a8db-f34c-4a52-49ba9020f6cf@huaweicloud.com>
- <Y4MxEcF+DWCAgxGJ@T590>
-From:   Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <27aae921-d016-0416-17ff-a591cd2ae12d@huaweicloud.com>
-Date:   Mon, 28 Nov 2022 11:09:28 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        Sun, 27 Nov 2022 22:32:37 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8DB913CC2
+        for <linux-block@vger.kernel.org>; Sun, 27 Nov 2022 19:31:33 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1669606292;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=Mh8+HZNMN2F6HzSwmWPr16ecpqC3Mw7WO0DSOHuRXuQ=;
+        b=JD1i+j+QXnc1HbipMzQVoy70Q7r2FqnP54sOXtsrQmDNrJYY8FhPMvAPYDDPkRkEkBnvGN
+        kdW0JcwqJFKbAynjcX2aZ8pdq0uyjfV+qt/sQ/TrZ7msaY2wB419SA3L+0Po3ODOqsTDVy
+        O0NlNcKEyNaQMH4wBTuSK854fI/wc2g=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-664-HrKrfLHKPnuPTFPzc0qKUA-1; Sun, 27 Nov 2022 22:31:28 -0500
+X-MC-Unique: HrKrfLHKPnuPTFPzc0qKUA-1
+Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E4C43811E67;
+        Mon, 28 Nov 2022 03:31:27 +0000 (UTC)
+Received: from llong.com (unknown [10.22.32.57])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id E5A17492B08;
+        Mon, 28 Nov 2022 03:31:26 +0000 (UTC)
+From:   Waiman Long <longman@redhat.com>
+To:     Tejun Heo <tj@kernel.org>, Jens Axboe <axboe@kernel.dk>
+Cc:     cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        =?UTF-8?q?Michal=20Koutn=C3=BD?= <mkoutny@suse.com>,
+        Hillf Danton <hdanton@sina.com>,
+        Waiman Long <longman@redhat.com>,
+        Yi Zhang <yi.zhang@redhat.com>
+Subject: [PATCH-block] blk-cgroup: Use css_tryget() in blkcg_destroy_blkgs()
+Date:   Sun, 27 Nov 2022 22:30:57 -0500
+Message-Id: <20221128033057.1279383-1-longman@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <Y4MxEcF+DWCAgxGJ@T590>
-Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: Syh0CgBnybRoJoRjC3cNBQ--.46112S3
-X-Coremail-Antispam: 1UD129KBjvJXoW7Zw4kXr47Zw43tFW5Jw45GFg_yoW8XF4xp3
-        yrJa12kr1kZr40k340yr17XF1Sgw13ur1agF1Dt3sFkF9Ykan7Xw4Fg3y5XFZ29r40kw1j
-        kws5X3srXwnYqaDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUU9F14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-        1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4U
-        JVW0owA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
-        Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
-        I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
-        4UM4x0Y48IcVAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2kI
-        c2xKxwCYjI0SjxkI62AI1cAE67vIY487MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4
-        AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE
-        17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMI
-        IF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Wr1j6rW3
-        Jr1lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcS
-        sGvfC2KfnxnUUI43ZEXa7VUbXdbUUUUUU==
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
-X-CFilter-Loop: Reflected
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.10
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
+Commit 951d1e94801f ("blk-cgroup: Flush stats at blkgs destruction
+path") incorrectly assumes that css_get() will always succeed. That may
+not be true if there is no blkg associated with the blkcg. If css_get()
+fails, the subsequent css_put() call may lead to data corruption as
+was illustrated in a test system that it crashed on bootup when that
+commit was included. Also blkcg may be freed at any time leading to
+use-after-free. Fix it by using css_tryget() instead and bail out if
+the tryget fails.
 
-在 2022/11/27 17:42, Ming Lei 写道:
-> On Sat, Nov 26, 2022 at 02:08:02PM +0800, Yu Kuai wrote:
->> Hi, Ming
->>
->> 在 2022/11/26 10:18, Ming Lei 写道:
->>>
->>> If you want aggressive merge on sequential IO workload, the queue depth need
->>> to be a bit less, then more requests can be staggered into scheduler queue,
->>> and merge chance is increased.
->>
->> But if nr_requests >= queue_depth, it seems to me elevator will have no
->> effect, no request can be merged or sorted by scheduler, right?
-> 
-> Yeah.
-> 
-> If nr_requests <= queue_depth, every request can be queued to
-> driver/device, so requests won't be merged by scheduler.
-> 
-> But plug merge still works if IOs are submitted as batch.
+Fixes: 951d1e94801f ("blk-cgroup: Flush stats at blkgs destruction path")
+Reported-by: Yi Zhang <yi.zhang@redhat.com>
+Signed-off-by: Waiman Long <longman@redhat.com>
+---
+ block/blk-cgroup.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-Yes, io can still be merged by plug. I just find it a little werid to
-set default elevator as deadline, and default queue_depth to 256. Which
-means deadline here is useless.
-
-> 
->>>
->>> If you want good perf on random IO perf, the queue depth needs to
->>> be deep enough to have enough parallelism for saturating SSD internal.
->>>
->>> But we don't recognize sequential/random IO pattern, and usually fixed
->>> queue depth is used.
->>
->> Is it possible to use none elevator and set large queue_depth if nvme is
->> used in this case?
-> 
-> Yeah, if the storage is SSD, usually none with bigger queue_depth should
-> help, and usually 256 should be enough to saturate one single SSD for
-> one well implemented driver.
-
-Yes, I'm testing with multiple SSDs / NVMEs, and I can't get optimal
-performance by default.
-
-Thanks,
-Kuai
-> 
-> 
-> Thanks
-> Ming
-> 
-> .
-> 
+diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+index 57941d2a8ba3..74fefc8cbcdf 100644
+--- a/block/blk-cgroup.c
++++ b/block/blk-cgroup.c
+@@ -1088,7 +1088,12 @@ static void blkcg_destroy_blkgs(struct blkcg *blkcg)
+ 
+ 	might_sleep();
+ 
+-	css_get(&blkcg->css);
++	/*
++	 * If css_tryget() fails, there is no blkg to destroy.
++	 */
++	if (!css_tryget(&blkcg->css))
++		return;
++
+ 	spin_lock_irq(&blkcg->lock);
+ 	while (!hlist_empty(&blkcg->blkg_list)) {
+ 		struct blkcg_gq *blkg = hlist_entry(blkcg->blkg_list.first,
+-- 
+2.31.1
 
