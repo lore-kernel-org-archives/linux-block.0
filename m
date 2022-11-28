@@ -2,38 +2,38 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C7D9C43217
-	for <linux-block@archiver.kernel.org>; Mon, 28 Nov 2022 15:23:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 633EFC4321E
+	for <linux-block@archiver.kernel.org>; Mon, 28 Nov 2022 15:23:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230423AbiK1PXh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 28 Nov 2022 10:23:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60164 "EHLO
+        id S231268AbiK1PXi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 28 Nov 2022 10:23:38 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60176 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231551AbiK1PXc (ORCPT
+        with ESMTP id S231651AbiK1PXe (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 28 Nov 2022 10:23:32 -0500
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 617072DFC;
-        Mon, 28 Nov 2022 07:23:32 -0800 (PST)
-Received: from dggpeml500020.china.huawei.com (unknown [172.30.72.55])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4NLTk15F8fzHw8m;
-        Mon, 28 Nov 2022 23:22:49 +0800 (CST)
+        Mon, 28 Nov 2022 10:23:34 -0500
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C38B325EA;
+        Mon, 28 Nov 2022 07:23:33 -0800 (PST)
+Received: from dggpeml500026.china.huawei.com (unknown [172.30.72.56])
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4NLTf902d3zqSkM;
+        Mon, 28 Nov 2022 23:19:29 +0800 (CST)
 Received: from dggpeml500003.china.huawei.com (7.185.36.200) by
- dggpeml500020.china.huawei.com (7.185.36.88) with Microsoft SMTP Server
+ dggpeml500026.china.huawei.com (7.185.36.106) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31; Mon, 28 Nov 2022 23:23:30 +0800
+ 15.1.2375.31; Mon, 28 Nov 2022 23:23:29 +0800
 Received: from huawei.com (10.175.127.227) by dggpeml500003.china.huawei.com
  (7.185.36.200) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.31; Mon, 28 Nov
- 2022 23:23:30 +0800
+ 2022 23:23:29 +0800
 From:   Li Nan <linan122@huawei.com>
 To:     <tj@kernel.org>, <josef@toxicpanda.com>, <axboe@kernel.dk>
 CC:     <cgroups@vger.kernel.org>, <linux-block@vger.kernel.org>,
         <linux-kernel@vger.kernel.org>, <linan122@huawei.com>,
         <yukuai3@huawei.com>, <yi.zhang@huawei.com>
-Subject: [PATCH -next 8/8] block: fix null-pointer dereference in ioc_pd_init
-Date:   Mon, 28 Nov 2022 23:44:34 +0800
-Message-ID: <20221128154434.4177442-9-linan122@huawei.com>
+Subject: [PATCH -next 6/8] blk-iocost: change div64_u64 to DIV64_U64_ROUND_UP in ioc_refresh_params()
+Date:   Mon, 28 Nov 2022 23:44:32 +0800
+Message-ID: <20221128154434.4177442-7-linan122@huawei.com>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20221128154434.4177442-1-linan122@huawei.com>
 References: <20221128154434.4177442-1-linan122@huawei.com>
@@ -48,55 +48,28 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Remove block device when iocost is initializing may cause
-null-pointer dereference:
-
-	CPU1				   CPU2
-  ioc_qos_write
-   blkcg_conf_open_bdev
-    blkdev_get_no_open
-     kobject_get_unless_zero
-    blk_iocost_init
-     rq_qos_add
-  					del_gendisk
-  					 rq_qos_exit
-  					  q->rq_qos = rqos->next
-  					   //iocost is removed from q->roqs
-      blkcg_activate_policy
-       pd_init_fn
-        ioc_pd_init
-  	 ioc = q_to_ioc(blkg->q)
- 	  //cant find iocost and return null
-
-Fix problem by moving rq_qos_exit() to disk_release(). ioc_qos_write() get
-bd_device.kobj in blkcg_conf_open_bdev(), so disk_release will not be
-actived until iocost initialization is complited.
+vrate_min is calculated by DIV64_U64_ROUND_UP, but vrate_max is calculated
+by div64_u64. Vrate_min may be 1 greater than vrate_max if the input
+values min and max of cost.qos are equal.
 
 Signed-off-by: Li Nan <linan122@huawei.com>
 ---
- block/genhd.c | 2 +-
+ block/blk-iocost.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/block/genhd.c b/block/genhd.c
-index dcf200bcbd3e..c264da49eaaa 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -656,7 +656,6 @@ void del_gendisk(struct gendisk *disk)
- 		elevator_exit(q);
- 		mutex_unlock(&q->sysfs_lock);
- 	}
--	rq_qos_exit(q);
- 	blk_mq_unquiesce_queue(q);
+diff --git a/block/blk-iocost.c b/block/blk-iocost.c
+index a4fa17ebb2fa..03977385449f 100644
+--- a/block/blk-iocost.c
++++ b/block/blk-iocost.c
+@@ -926,7 +926,7 @@ static bool ioc_refresh_params(struct ioc *ioc, bool force)
  
- 	/*
-@@ -1168,6 +1167,7 @@ static void disk_release(struct device *dev)
- 	    !test_bit(GD_ADDED, &disk->state))
- 		blk_mq_exit_queue(disk->queue);
+ 	ioc->vrate_min = DIV64_U64_ROUND_UP((u64)ioc->params.qos[QOS_MIN] *
+ 					    VTIME_PER_USEC, MILLION);
+-	ioc->vrate_max = div64_u64((u64)ioc->params.qos[QOS_MAX] *
++	ioc->vrate_max = DIV64_U64_ROUND_UP((u64)ioc->params.qos[QOS_MAX] *
+ 				   VTIME_PER_USEC, MILLION);
  
-+	rq_qos_exit(q);
- 	blkcg_exit_disk(disk);
- 
- 	bioset_exit(&disk->bio_split);
+ 	return true;
 -- 
 2.31.1
 
