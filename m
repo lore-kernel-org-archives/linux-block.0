@@ -2,80 +2,156 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CBCFC4332F
-	for <linux-block@archiver.kernel.org>; Mon, 28 Nov 2022 17:10:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 56359C4332F
+	for <linux-block@archiver.kernel.org>; Mon, 28 Nov 2022 17:25:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230454AbiK1RJw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 28 Nov 2022 12:09:52 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55590 "EHLO
+        id S232503AbiK1RZc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 28 Nov 2022 12:25:32 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41422 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232936AbiK1RJR (ORCPT
+        with ESMTP id S232984AbiK1RZR (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 28 Nov 2022 12:09:17 -0500
-Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17E88B7F2;
-        Mon, 28 Nov 2022 09:09:04 -0800 (PST)
-Received: by mail-pj1-x1033.google.com with SMTP id k5so10119435pjo.5;
-        Mon, 28 Nov 2022 09:09:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=sznbp6Qjro/lU0fK9+7muhZjge7QWHgQWbjlTiDXzkc=;
-        b=a8tTbIcUy2a41TN780C+9J4rBtuAeFTi8gr72QkA0d2fcO8Uwmb6U5OzC3NKdEHsLY
-         l2esfexl6uRmQ4ljLpk/ffd0/3DnPY0ik2CPQ9EMfuJCyAmXMrFvJucmchwO+xb3rogv
-         ChfoJNtPJVUpaHKP6H3h1Fazd2xWQl+8i0ufLrwSla/QEQbBRXcagCCFTLZwLtwG/vNi
-         cS3cSVvO/muC82MOR1B3Ggp1gpjpqH59zMn3yiI+cH1TDFw8WqmR4vC150oMsGUIUunV
-         vvT5BSl1bNkGqr2SyZVnOcIaVC59T3osws9U30UgVXRHsDQWjghnfNgIzj3HmDMFyQhS
-         pKyg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=sznbp6Qjro/lU0fK9+7muhZjge7QWHgQWbjlTiDXzkc=;
-        b=a3W6SI84WnRXAzfqP7GNRHLVm2wRkp8DKWu9MAGgpjGi7V6/DuV/b+AvFa2p47vndr
-         Hh5ObyEgXgR663p8ixh4l6oW7N+gMcJzNq2a2rhQJHJbEpQlXd4uk+E5Tkaeltm/q/xn
-         W97pFbWf4NSe9GqB+AXZmL8i5g8lrrdWDaUXFpAi2RnMh4to0BX3bDNRKagsnf2fb4xI
-         CCFWy57lgn+S++zadinbcXkIuooRAiNiFORDXKuibaCuSuHgYqAO5uhr3d8CFPQ3CCck
-         ZLXMPhtaR2Mk+RZpOpiKOsCIIkjUGTfLgWcrzj+4KO4Ro48AuE0brmF+skuD3tI7hJy4
-         LwhQ==
-X-Gm-Message-State: ANoB5pkxIYMWB8qwp5Z7z4n2zbicT8ggkGRSMb2cVwg0OAxAYHhCT02C
-        hrxnXjt3A1LhP3NQlw0uzFU=
-X-Google-Smtp-Source: AA0mqf4tKE1nA4FYiGNaJkI6RtdPH+BPsqU9WiX4+2WxKvZ86kVUjsZeLWMxYFAR34Q5vyMPg2wJdw==
-X-Received: by 2002:a17:90a:5298:b0:217:e054:9ac8 with SMTP id w24-20020a17090a529800b00217e0549ac8mr61944865pjh.246.1669655343440;
-        Mon, 28 Nov 2022 09:09:03 -0800 (PST)
-Received: from localhost (2603-800c-1a02-1bae-a7fa-157f-969a-4cde.res6.spectrum.com. [2603:800c:1a02:1bae:a7fa:157f:969a:4cde])
-        by smtp.gmail.com with ESMTPSA id ga18-20020a17090b039200b0020a11217682sm7848802pjb.27.2022.11.28.09.09.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 28 Nov 2022 09:09:03 -0800 (PST)
-Sender: Tejun Heo <htejun@gmail.com>
-Date:   Mon, 28 Nov 2022 07:09:01 -1000
-From:   Tejun Heo <tj@kernel.org>
-To:     Li Jinlin <lijinlin3@huawei.com>
-Cc:     josef@toxicpanda.com, axboe@kernel.dk, cgroups@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        liuzhiqiang26@huawei.com
-Subject: Re: [PATCH] blk-iocost: fix shift-out-of-bounds in iocg_hick_delay()
-Message-ID: <Y4TrLfOj5sTpXyYR@slm.duckdns.org>
-References: <20221126121458.3564942-1-lijinlin3@huawei.com>
+        Mon, 28 Nov 2022 12:25:17 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0D61B20349;
+        Mon, 28 Nov 2022 09:25:14 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id B6D92B80E90;
+        Mon, 28 Nov 2022 17:25:12 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 002F2C433D6;
+        Mon, 28 Nov 2022 17:25:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1669656311;
+        bh=wZlmYJl8LMxMeefdCbrE5viQuX+AZVgF+lHUSAzV8mA=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=jklUVBk1mHdNx5UwNOVAyoL9FcfwZD4B7KDGLSBvRl5IAv16CCb++ynZ+TPs/2xnW
+         Y09yfkYWX7Zusj8ufWXnQv3O5+iO2GnPgg5dqoMaQRFD7eFKipOag5+WZBxv2B/3hS
+         npOJ5H5324elD5m0VsViiZtApWHVqoGlQ7+jDW9I=
+Date:   Mon, 28 Nov 2022 18:25:09 +0100
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     linux-kernel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        Luis Chamberlain <mcgrof@kernel.org>,
+        Russ Weight <russell.h.weight@intel.com>,
+        "Rafael J. Wysocki" <rafael@kernel.org>,
+        Jean Delvare <jdelvare@suse.com>,
+        Johan Hovold <johan@kernel.org>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Leon Romanovsky <leon@kernel.org>,
+        Karsten Keil <isdn@linux-pingi.de>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Keith Busch <kbusch@kernel.org>,
+        Christoph Hellwig <hch@lst.de>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Dominik Brodowski <linux@dominikbrodowski.net>,
+        Sebastian Reichel <sre@kernel.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Johannes Berg <johannes@sipsolutions.net>,
+        Wolfram Sang <wsa+renesas@sang-engineering.com>,
+        Raed Salem <raeds@nvidia.com>,
+        Chen Zhongjin <chenzhongjin@huawei.com>,
+        Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
+        Avihai Horon <avihaih@nvidia.com>,
+        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
+        Alan Stern <stern@rowland.harvard.edu>,
+        Colin Ian King <colin.i.king@gmail.com>,
+        Geert Uytterhoeven <geert+renesas@glider.be>,
+        Jakob Koschel <jakobkoschel@gmail.com>,
+        Antoine Tenart <atenart@kernel.org>,
+        Frederic Weisbecker <frederic@kernel.org>,
+        Wang Yufen <wangyufen@huawei.com>, linux-block@vger.kernel.org,
+        linux-media@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-pm@vger.kernel.org, linux-rdma@vger.kernel.org,
+        linux-usb@vger.kernel.org, linux-wireless@vger.kernel.org,
+        netdev@vger.kernel.org
+Subject: Re: [PATCH 1/5] driver core: make struct class.dev_uevent() take a
+ const *
+Message-ID: <Y4Tu9UUGGiEdFcVw@kroah.com>
+References: <20221123122523.1332370-1-gregkh@linuxfoundation.org>
+ <d448b944-708a-32d4-37d7-0be16ee5f73c@acm.org>
+ <Y4NqAJW5V0tAP8ax@kroah.com>
+ <5b14cdea-1bbe-1900-0004-a218ba97bbcb@acm.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20221126121458.3564942-1-lijinlin3@huawei.com>
+In-Reply-To: <5b14cdea-1bbe-1900-0004-a218ba97bbcb@acm.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, Nov 26, 2022 at 08:14:58PM +0800, Li Jinlin wrote:
->  	if (iocg->delay)
-> -		delay = iocg->delay >> div64_u64(tdelta, USEC_PER_SEC);
-> +		delay = iocg->delay >> min(div64_u64(tdelta, USEC_PER_SEC), 63);
+On Sun, Nov 27, 2022 at 06:38:39PM -0800, Bart Van Assche wrote:
+> On 11/27/22 05:45, Greg Kroah-Hartman wrote:
+> > On Fri, Nov 25, 2022 at 03:51:11PM -0800, Bart Van Assche wrote:
+> > > On 11/23/22 04:25, Greg Kroah-Hartman wrote:
+> > > > diff --git a/include/linux/mISDNif.h b/include/linux/mISDNif.h
+> > > > index 7dd1f01ec4f9..7aab4a769736 100644
+> > > > --- a/include/linux/mISDNif.h
+> > > > +++ b/include/linux/mISDNif.h
+> > > > @@ -586,7 +586,7 @@ extern struct mISDNclock *mISDN_register_clock(char *, int, clockctl_func_t *,
+> > > >    						void *);
+> > > >    extern void	mISDN_unregister_clock(struct mISDNclock *);
+> > > > -static inline struct mISDNdevice *dev_to_mISDN(struct device *dev)
+> > > > +static inline struct mISDNdevice *dev_to_mISDN(const struct device *dev)
+> > > >    {
+> > > >    	if (dev)
+> > > >    		return dev_get_drvdata(dev);
+> > > 
+> > > Why does the dev_to_mISDN() function drop constness? I haven't found an
+> > > explanation for this in the cover letter.
+> > 
+> > I agree, this is going to be fixed up, see the thread starting here:
+> > 	https://lore.kernel.org/r/Y34+V2bCDdqujBDk@kroah.com
+> > 
+> > I'll work on making a const / non const version for these so that we
+> > don't loose the marking.
+> > 
+> > Oh wait, no, this function is fine, it's not modifying the device
+> > structure at all, and only returning the pointer in the private data
+> > stored in the device.  There is no loss of const-ness here.
+> 
+> Hi Greg,
+> 
+> This is what I found in include/linux/mISDNif.h:
+> 
+> struct mISDNdevice {
+> 	struct mISDNchannel	D;
+> 	u_int			id;
+> 	u_int			Dprotocols;
+> 	u_int			Bprotocols;
+> 	u_int			nrbchan;
+> 	u_char			channelmap[MISDN_CHMAP_SIZE];
+> 	struct list_head	bchannels;
+> 	struct mISDNchannel	*teimgr;
+> 	struct device		dev;
+> };
+> 
+> As one can see 'dev' is a member of struct mISDNdevice. I still think that
+> dev_to_mISDN() drops constness. Did I perhaps overlook something?
 
-Let's just set delay to 0 if the shift is too big.
+I think you are missing that dev_to_mISDN() is doing something different
+than most dev_to_FOO() functions do (i.e. there is no container_of()
+call here at all):
 
-Thanks.
+static inline struct mISDNdevice *dev_to_mISDN(struct device *dev)
+{
+	if (dev)
+		return dev_get_drvdata(dev);
+	else
+		return NULL;
+}
 
--- 
-tejun
+See, no pointer mess or anything else here, all that happens is the
+driver data pointer in struct device is returned.
+
+If this was a "normal" dev_to_FOO() function, then yes, the const-ness
+of the pointer would be called into question as the thread I linked to
+discusses.
+
+thanks,
+
+greg k-h
