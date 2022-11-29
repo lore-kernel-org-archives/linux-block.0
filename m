@@ -2,89 +2,135 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 71BA3C4167B
-	for <linux-block@archiver.kernel.org>; Tue, 29 Nov 2022 14:32:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89BFAC4321E
+	for <linux-block@archiver.kernel.org>; Tue, 29 Nov 2022 14:33:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235383AbiK2Occ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 29 Nov 2022 09:32:32 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40340 "EHLO
+        id S235753AbiK2Odc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 29 Nov 2022 09:33:32 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42366 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235391AbiK2Oca (ORCPT
+        with ESMTP id S235703AbiK2OdS (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 29 Nov 2022 09:32:30 -0500
-Received: from mail-pf1-x42b.google.com (mail-pf1-x42b.google.com [IPv6:2607:f8b0:4864:20::42b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 603F658BF4
-        for <linux-block@vger.kernel.org>; Tue, 29 Nov 2022 06:32:28 -0800 (PST)
-Received: by mail-pf1-x42b.google.com with SMTP id z17so9057026pff.1
-        for <linux-block@vger.kernel.org>; Tue, 29 Nov 2022 06:32:28 -0800 (PST)
+        Tue, 29 Nov 2022 09:33:18 -0500
+Received: from mail-pg1-x529.google.com (mail-pg1-x529.google.com [IPv6:2607:f8b0:4864:20::529])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 446E21C43C
+        for <linux-block@vger.kernel.org>; Tue, 29 Nov 2022 06:33:17 -0800 (PST)
+Received: by mail-pg1-x529.google.com with SMTP id h33so8205501pgm.9
+        for <linux-block@vger.kernel.org>; Tue, 29 Nov 2022 06:33:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20210112.gappssmtp.com; s=20210112;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=15SxSNHfPSkRdUIJs7jjUNKUA+5AqJcIJ0LWkA4RN+g=;
-        b=zI4jM57lq4kblIKU5yxIn9FX6V+mwXkU/iIh8lZgHDF6o2hmGCnyHy3B3R5AW3zo03
-         hjQvrFsaRvQtI0g5Labl5sM/kuJCeYftFLaKHZ6I410sDOAUCbpDzcUGQvNq2686lF/J
-         Ki6eW4IHGBmRq46BEHvMtEc96woczA3ms6IoZI4gLcDgc8zOWq2tZ2H6Ub8ui80N6Z9U
-         HkGB2dX37zZKFsY8kuLyvPFtup1HPZXs5/gaS0SeNMS7Lzs/ueuphSju95F4bqF1kNwh
-         H09HRQFrmTKdaKWQtY0kPmMB6iHHdoG9GoMEowOdDBD5uXlEhcY/+qcD4OVPJsV2+7hB
-         AD8Q==
+        bh=n/jN8CDNxrDZag/wbLCJVmkiAlc7PInMojWyMS5FvR0=;
+        b=rG+mjOKGZIuhcRRFhzc7kHJmTKJjWNlvt7Nt28EVz0Kxsk9y61xwE/KEbNqx+V/42i
+         airBHJapeb49fJ0pSNFqO5BhkAv/aUPJaqsg9KOcKCbTJUX1CEucmPQ5nYIfifb4F5uA
+         WX2SJOx8neXgabEli9IZyy+73GBbBStkog9NsKYn+o42JjxY5wJSAqSKt4/eOLb1YQM4
+         PHpH+iKL5ejjDl2zl3WDMhewbfDY2m0HxyL/pk/LraH0vcvmN4DQt61aqx0RvRgTFG/2
+         dwuy2LUy+JGTsuvA8kHbUPpPhp3ikthbKKrOZfYRE05J48UDQZZxlk4Lf4FaVD43L/Zj
+         5kgg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=15SxSNHfPSkRdUIJs7jjUNKUA+5AqJcIJ0LWkA4RN+g=;
-        b=mxopMFaOoQd5sJ8qHDXPAbxGqhdzinMqDDF8iZkK/3RFmgJ7PFAF0NDzETPVIj2U2u
-         VsCKX3Wy3OJ80Kk28VVBsM2AlBfDy1LEFz6uGGwss3VPTIDwqALhQLn77Qeg1GgsLDcr
-         1IcqP1ScolNrmFWStF4MaqT2kJ4vZcNyGNC+YoMCfYDe46NX9TgDCL0+cE1gXwop2hBV
-         X7K+b1kRRb0lcQe7cS8BwuxNIkhpzJZF1Rc7FHpm4ORU3MwHXGcfUpy7a02v0zfZ+2gQ
-         8ruIQP+8x/bfcpIriG7F5J+cZUfgohpuDzNUSpUuMC/0Ohypg3TEzE/norjmfbajg3yT
-         CMpw==
-X-Gm-Message-State: ANoB5pkrkWow/rhlXyaSnk+nGmeZVWg4AbyaadbhRQzMuA1T5ypL1npF
-        Un0JDfW/bEMkjwyXBXIG9n6N6Q==
-X-Google-Smtp-Source: AA0mqf5g6DaXafJJOhWTZSsPpS8P+CKVmgSPtpkqBcyOyey/shhvMPSK01cTYg/DRIth7yaOl0+8XA==
-X-Received: by 2002:a62:198d:0:b0:572:5a7f:9f4a with SMTP id 135-20020a62198d000000b005725a7f9f4amr37451404pfz.33.1669732347829;
-        Tue, 29 Nov 2022 06:32:27 -0800 (PST)
+        bh=n/jN8CDNxrDZag/wbLCJVmkiAlc7PInMojWyMS5FvR0=;
+        b=2pO008doYr20EQYyuXeCv0+OWEp32pXrD11k5qXpgwwqcDOFfp39lcXn24DXKkRTc6
+         YPaXYNmJwIxqROuMUK6uUQJ6fFTE2n3/4nQx7ODDgEwAm8r8HrJGMCZ/5pd/+Qem5WKa
+         PI+6p1/4CpvuY/xo75F1EGTV6A7aaBLaGP3yGBVc9Hs7QVgJ55tjdfk+exhlEfiNZdCF
+         XWyAzpRLd9Vu68obWjFv4/gQEpEZ5xjO13i4fio4MwrSV/je80sIIomLMoNs5Yl2YJK1
+         PmpEwBExNg1QXKOR0j1qj/gYjgchFi6ekCeA9FESU+nj5B5QzOSqSSEzc+76hyJpAHCZ
+         IUIg==
+X-Gm-Message-State: ANoB5pkPQ5Q2+UvkOtrS7ZDIc62U3CGnAuUSvjTLkYpieYvH7Q2bHO/b
+        RyucXol3G4sgTCCKr4SobGiRZ/tSlfvomHet
+X-Google-Smtp-Source: AA0mqf4NCD+CMqaRNtBqT0OTyODhHhUsIusitSWW7R/Q/B4WQ7RqxGE2SqQGEO5BH4L0xJBLMVHbng==
+X-Received: by 2002:a63:2154:0:b0:477:b650:494b with SMTP id s20-20020a632154000000b00477b650494bmr29063622pgm.434.1669732396674;
+        Tue, 29 Nov 2022 06:33:16 -0800 (PST)
 Received: from [192.168.1.136] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id y1-20020a17090abd0100b0021885b05660sm1447319pjr.24.2022.11.29.06.32.26
+        by smtp.gmail.com with ESMTPSA id d10-20020a17090abf8a00b00212e5068e17sm1431643pjs.40.2022.11.29.06.33.15
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 29 Nov 2022 06:32:27 -0800 (PST)
-Message-ID: <d07eee61-eb3f-de75-4cc2-d9c554640a2b@kernel.dk>
-Date:   Tue, 29 Nov 2022 07:32:26 -0700
+        Tue, 29 Nov 2022 06:33:16 -0800 (PST)
+Message-ID: <ac488153-9a3c-1758-e596-e6c7928e984e@kernel.dk>
+Date:   Tue, 29 Nov 2022 07:33:15 -0700
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
  Thunderbird/102.5.0
-Subject: Re: [PATCH v2 1/2] nvme: introduce nvme_start_request
+Subject: Re: [PATCH v2 2/2] nvme: support io stats on the mpath device
 Content-Language: en-US
-To:     Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>
-Cc:     linux-nvme@lists.infradead.org, Christoph Hellwig <hch@lst.de>,
+To:     Sagi Grimberg <sagi@grimberg.me>, Hannes Reinecke <hare@suse.de>,
+        linux-nvme@lists.infradead.org
+Cc:     Christoph Hellwig <hch@lst.de>, Keith Busch <kbusch@kernel.org>,
         Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
-        Hannes Reinecke <hare@suse.de>, linux-block@vger.kernel.org
+        linux-block@vger.kernel.org
 References: <20221003094344.242593-1-sagi@grimberg.me>
- <20221003094344.242593-2-sagi@grimberg.me>
- <Y4YXDAZDZQbnLIbF@kbusch-mbp.dhcp.thefacebook.com>
+ <20221003094344.242593-3-sagi@grimberg.me>
+ <9db5d7eb-bd84-85e6-c30a-da057f1b2b69@suse.de>
+ <0733f642-8b97-b6ce-8a0e-14c3bb8e2a9a@grimberg.me>
 From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <Y4YXDAZDZQbnLIbF@kbusch-mbp.dhcp.thefacebook.com>
+In-Reply-To: <0733f642-8b97-b6ce-8a0e-14c3bb8e2a9a@grimberg.me>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 11/29/22 7:28 AM, Keith Busch wrote:
-> On Mon, Oct 03, 2022 at 12:43:43PM +0300, Sagi Grimberg wrote:
->>  
->> +void nvme_start_request(struct request *rq)
->> +{
->> +	blk_mq_start_request(rq);
->> +}
->> +EXPORT_SYMBOL_GPL(nvme_start_request);
+On 10/4/22 2:19 AM, Sagi Grimberg wrote:
 > 
-> Looks good, other than I feel this should be a static inline function in
-> nvme.h instead.
+> 
+> On 10/4/22 09:11, Hannes Reinecke wrote:
+>> On 10/3/22 11:43, Sagi Grimberg wrote:
+>>> Our mpath stack device is just a shim that selects a bottom namespace
+>>> and submits the bio to it without any fancy splitting. This also means
+>>> that we don't clone the bio or have any context to the bio beyond
+>>> submission. However it really sucks that we don't see the mpath device
+>>> io stats.
+>>>
+>>> Given that the mpath device can't do that without adding some context
+>>> to it, we let the bottom device do it on its behalf (somewhat similar
+>>> to the approach taken in nvme_trace_bio_complete).
+>>>
+>>> When the IO starts, we account the request for multipath IO stats using
+>>> REQ_NVME_MPATH_IO_STATS nvme_request flag to avoid queue io stats disable
+>>> in the middle of the request.
+>>>
+>>> Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
+>>> ---
+>>>   drivers/nvme/host/core.c      |  4 ++++
+>>>   drivers/nvme/host/multipath.c | 25 +++++++++++++++++++++++++
+>>>   drivers/nvme/host/nvme.h      | 12 ++++++++++++
+>>>   3 files changed, 41 insertions(+)
+>>>
+>>> diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+>>> index 64fd772de817..d5a54ddf73f2 100644
+>>> --- a/drivers/nvme/host/core.c
+>>> +++ b/drivers/nvme/host/core.c
+>>> @@ -384,6 +384,8 @@ static inline void nvme_end_req(struct request *req)
+>>>           nvme_log_error(req);
+>>>       nvme_end_req_zoned(req);
+>>>       nvme_trace_bio_complete(req);
+>>> +    if (req->cmd_flags & REQ_NVME_MPATH)
+>>> +        nvme_mpath_end_request(req);
+>>>       blk_mq_end_request(req, status);
+>>>   }
+>>> @@ -421,6 +423,8 @@ EXPORT_SYMBOL_GPL(nvme_complete_rq);
+>>>   void nvme_start_request(struct request *rq)
+>>>   {
+>>> +    if (rq->cmd_flags & REQ_NVME_MPATH)
+>>> +        nvme_mpath_start_request(rq);
+>>>       blk_mq_start_request(rq);
+>>>   }
+>>>   EXPORT_SYMBOL_GPL(nvme_start_request);
+>>
+>> Why don't you move the check for REQ_NVME_MPATH into nvme_mpath_{start,end}_request?
+> 
+> I'm less fond of calling a function that may or may not
+> do anything...
+> 
+> But it is a pattern that exists in the code, if people prefer
+> it I can change it.
 
-Hah, mid-air collision. But at least we agree :-)
+I prefer it the way that you have it, avoids a function call for
+the hot path of not being multipath.
 
 -- 
 Jens Axboe
