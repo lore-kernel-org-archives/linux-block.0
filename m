@@ -2,92 +2,119 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AFC55C4167B
-	for <linux-block@archiver.kernel.org>; Tue, 29 Nov 2022 04:38:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8673EC4332F
+	for <linux-block@archiver.kernel.org>; Tue, 29 Nov 2022 04:52:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235195AbiK2Eij (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 28 Nov 2022 23:38:39 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58948 "EHLO
+        id S235402AbiK2Eww (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 28 Nov 2022 23:52:52 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35190 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234729AbiK2Eii (ORCPT
+        with ESMTP id S234251AbiK2Ews (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 28 Nov 2022 23:38:38 -0500
-Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26FE829C87
-        for <linux-block@vger.kernel.org>; Mon, 28 Nov 2022 20:38:37 -0800 (PST)
-Received: by mail-pj1-x102c.google.com with SMTP id t11-20020a17090a024b00b0021932afece4so5239311pje.5
-        for <linux-block@vger.kernel.org>; Mon, 28 Nov 2022 20:38:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=48Xm3VfV4sx0+bUZmYTNZIpSa0XzNl3vvIQW42o7jJQ=;
-        b=T5LUfnFRWiWAdf7zeRpoyRCNSY164AYnoRT7heMBmwvQh/rkonGTMP2fDaxZ3cb3zq
-         WgnsezEnwq9KAb5FRfzcc5muJkJxXkVwjBgn2+VHTj+wotmFhoJq5rNh+hOLZk0LZ3g/
-         Ozt9Ev52HQoPAwOc9bKAd0REmzrYFGjcYLOh4=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=48Xm3VfV4sx0+bUZmYTNZIpSa0XzNl3vvIQW42o7jJQ=;
-        b=pt8hJEP6KyFufwPZ2N5Vr+V5tVcxaYu1v23b7muvjk/SjYPfDz4iRZ0qu8twePvQPz
-         nYLl1uR3NaGrNy6CXOhRput+UOugqdRDpgSCdwtJLgJ7uW9k9gDU3oV+fj0WpMvOfuJA
-         TNAFkZqlro/C535ijPANIgTPvOsP6aorEbp8XefMx9csCDdn8MBdR1zpWzcd3WnCoi4d
-         QVAAB/jIDGQnP1NI+1B53rv/X+pwvjEpasVY0P9iKuw4Jy4dtIklkhy5Ub3tX+D8Ptt8
-         /EuoeesFEG8canRMAMDyrVPRbzN8Q5xCbhMzmusa9cANZA3Ns2fpc3ayRN/Kuz09z4Fp
-         vFFQ==
-X-Gm-Message-State: ANoB5pmL2sdh3dhtR7C408SmOjyNRWk+fpRxxG9s7vb9tUAtOj91xJDh
-        quOEUJLIsQ4QGfPGrDys2EChVQ==
-X-Google-Smtp-Source: AA0mqf5c3WV2DuftkVuXZ0Ps8inmw7FchDxrXziCDRwmtaUhnUDq6si8XtaqqqnfHmFIrk0qg4O0fg==
-X-Received: by 2002:a17:90a:fb86:b0:219:26b5:d41e with SMTP id cp6-20020a17090afb8600b0021926b5d41emr12318785pjb.20.1669696716694;
-        Mon, 28 Nov 2022 20:38:36 -0800 (PST)
-Received: from google.com ([240f:75:7537:3187:2565:b2f5:cacd:a5d9])
-        by smtp.gmail.com with ESMTPSA id o42-20020a17090a0a2d00b00219133d0f4esm321809pjo.9.2022.11.28.20.38.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 28 Nov 2022 20:38:36 -0800 (PST)
-Date:   Tue, 29 Nov 2022 13:38:30 +0900
-From:   Sergey Senozhatsky <senozhatsky@chromium.org>
-To:     Petr Vorel <pvorel@suse.cz>
-Cc:     Martin Doucha <mdoucha@suse.cz>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>,
-        Minchan Kim <minchan@kernel.org>, ltp@lists.linux.it,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, Nitin Gupta <ngupta@vflare.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>,
-        Yang Xu <xuyang2018.jy@fujitsu.com>
-Subject: Re: [PATCH 0/1] Possible bug in zram on ppc64le on vfat
-Message-ID: <Y4WMxqyVlAt0Sp3g@google.com>
-References: <20221107191136.18048-1-pvorel@suse.cz>
- <Y2l3vJb1y2Jynf50@google.com>
- <3ac740c0-954b-5e68-b413-0adc7bc5a2b5@suse.cz>
- <Y22b3wWs2QfMjJHi@google.com>
- <9489dd1c-012c-8b5d-b670-a27213da287a@suse.cz>
- <Y3zlrBQ8fgJyNm7G@pevik>
+        Mon, 28 Nov 2022 23:52:48 -0500
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EFA756440;
+        Mon, 28 Nov 2022 20:52:43 -0800 (PST)
+Received: from canpemm500008.china.huawei.com (unknown [172.30.72.53])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4NLqgl0VP7zRpSZ;
+        Tue, 29 Nov 2022 12:52:03 +0800 (CST)
+Received: from [10.174.179.2] (10.174.179.2) by canpemm500008.china.huawei.com
+ (7.192.105.151) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.31; Tue, 29 Nov
+ 2022 12:52:41 +0800
+Message-ID: <7b447dcb-6009-31e1-8bf6-05b1cdb28b01@huawei.com>
+Date:   Tue, 29 Nov 2022 12:52:40 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Y3zlrBQ8fgJyNm7G@pevik>
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.1.1
+Subject: Re: [PATCH v2] blk-iocost: fix shift-out-of-bounds in
+ iocg_hick_delay()
+To:     Yu Kuai <yukuai1@huaweicloud.com>, Tejun Heo <tj@kernel.org>
+CC:     <josef@toxicpanda.com>, <axboe@kernel.dk>,
+        <cgroups@vger.kernel.org>, <linux-block@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <liuzhiqiang26@huawei.com>,
+        "yukuai (C)" <yukuai3@huawei.com>
+References: <20221128030413.882998-1-lijinlin3@huawei.com>
+ <Y4US2vFmR4pnw08Z@slm.duckdns.org>
+ <bbc5e21f-9e77-41bb-5763-36bd905b52a0@huaweicloud.com>
+ <2830bd58-0f53-fa54-58e5-e87225b1fdf1@huawei.com>
+ <5489e3c5-30ad-d7af-c329-40c93d9a1b62@huaweicloud.com>
+From:   Li Jinlin <lijinlin3@huawei.com>
+In-Reply-To: <5489e3c5-30ad-d7af-c329-40c93d9a1b62@huaweicloud.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.174.179.2]
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ canpemm500008.china.huawei.com (7.192.105.151)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On (22/11/22 16:07), Petr Vorel wrote:
-> > On 11. 11. 22 1:48, Sergey Senozhatsky wrote:
-> > > On (22/11/10 15:29), Martin Doucha wrote:
 
-[..]
 
-> > > Can you try using /dev/urandom for dd, not /dev/zero?
-> > > Do you still see zeroes in sysfs output or some random values?
+On 2022/11/29 10:59, Yu Kuai wrote:
+> Hi,
 > 
-> > After 50 test runs on a kernel where the issue is confirmed, I could not
-> > reproduce the failure while filling the device from /dev/urandom instead of
-> > /dev/zero. The test reported compression ratio around 1.8-2.5 which means
-> > the memory usage reported by mm_stat was 10-13MB.
+> 在 2022/11/29 10:49, Li Jinlin 写道:
+>>
+>>
+>> On 2022/11/29 9:14, Yu Kuai wrote:
+>>> Hi,
+>>>
+>>> 在 2022/11/29 3:58, Tejun Heo 写道:
+>>>> On Mon, Nov 28, 2022 at 11:04:13AM +0800, Li Jinlin wrote:
+>>>>>        /* calculate the current delay in effect - 1/2 every second */
+>>>>>        tdelta = now->now - iocg->delay_at;
+>>>>>        if (iocg->delay)
+>>>>> -        delay = iocg->delay >> div64_u64(tdelta, USEC_PER_SEC);
+>>>>> +        delay = iocg->delay >>
+>>>>> +            min_t(u64, div64_u64(tdelta, USEC_PER_SEC), 63);
+>>>>
+>>>> I replied earlier but the right thing to do here is setting delay to 0 if
+>>>> the shift is >= 64.
+>>>
+>>> Perhaps following change will make more sense?
+>>>
+>>> @@ -1322,18 +1323,19 @@ static bool iocg_kick_delay(struct ioc_gq *iocg, struct ioc_now *now)
+>>>   {
+>>>          struct ioc *ioc = iocg->ioc;
+>>>          struct blkcg_gq *blkg = iocg_to_blkg(iocg);
+>>> -       u64 tdelta, delay, new_delay;
+>>> +       u64 delay = 0;
+>>> +       u64 new_delay;
+>>>          s64 vover, vover_pct;
+>>>          u32 hwa;
+>>>
+>>>          lockdep_assert_held(&iocg->waitq.lock);
+>>>
+>>>          /* calculate the current delay in effect - 1/2 every second */
+>>> -       tdelta = now->now - iocg->delay_at;
+>>> -       if (iocg->delay)
+>>> +       if (iocg->delay && now->now > iocg->delay_at) {
+>>> +               u64 tdelta = now->now - iocg->delay_at;
+>>> +
+>>>                  delay = iocg->delay >> div64_u64(tdelta, USEC_PER_SEC);
+>>> -       else
+>>> -               delay = 0;
+>>> +       }
+>>>
+>> I think "now->now > iocg->delay_at" is unnecessary, it is almost inevitable.
 > 
-> Martin, thanks a lot for reruning tests. I wonder problems on /dev/zero is a
-> kernel bug or just problem which should be workarounded.
+> From what I see, following can only happen if now->now < iocg->delay_at:
+> 
+> "shift exponent 18446744073709"
+> 
+You are right. 
 
-Hmm. Does CONFIG_KASAN show anything interesting?
+But I didn't see any ubsan reported at now->now - iocg->delay_at. 
+Need to confirm this.
+
+Jinlin
+Thanks.
+
+> Or something else triggers it?
+> 
+> Thanks,
+> Kuai
+> 
