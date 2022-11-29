@@ -2,76 +2,56 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DD85DC4167B
-	for <linux-block@archiver.kernel.org>; Tue, 29 Nov 2022 14:34:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CE26C4321E
+	for <linux-block@archiver.kernel.org>; Tue, 29 Nov 2022 14:43:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235687AbiK2OeQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 29 Nov 2022 09:34:16 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42458 "EHLO
+        id S235027AbiK2OnF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 29 Nov 2022 09:43:05 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49606 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235726AbiK2Od4 (ORCPT
+        with ESMTP id S235740AbiK2OnB (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 29 Nov 2022 09:33:56 -0500
-Received: from mail-pg1-x52f.google.com (mail-pg1-x52f.google.com [IPv6:2607:f8b0:4864:20::52f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B18AE9B
-        for <linux-block@vger.kernel.org>; Tue, 29 Nov 2022 06:33:53 -0800 (PST)
-Received: by mail-pg1-x52f.google.com with SMTP id q71so13161708pgq.8
-        for <linux-block@vger.kernel.org>; Tue, 29 Nov 2022 06:33:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=cuxBsu4VDMAPgQORabQ3hLPzi0PvLOfECIVt9tqDIPc=;
-        b=5fbQ/o8HN1uU9Il6X/LoLok2YjQCD3iAUzjAwva8u2Bewi7xDO1eAgXOehjqnG89Vj
-         Pm4lJytLY4HLzDTxDQ57abFDn0FcRz7AX4j3J/t2xwcY5eehmHpqxvSK8qNSkYM2A1qL
-         ZaALy9wnNsf8drMUlQxrEuSZPwM+tpLba4E1LJOjUsxkQJn+d6wlhrHwcE2U4LHYyN5G
-         Ya///j9EpjNnfwrpUqqRMVhx7mygFI/2nWAz9f483CvEih2E5bIJLKij11WLssGjYYm3
-         76xopDdej5vs9Bvkir9tHFdhagiFnWYdcfTwTy+0UQMEbX7ozDMCRKXhFX+r5emBZADB
-         +K/A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=cuxBsu4VDMAPgQORabQ3hLPzi0PvLOfECIVt9tqDIPc=;
-        b=JZNhroHFe/2ByV0tb3F8O5jg707oeXDNjs59I7DZp4SrKZxNBw20SaXeI+0Z2dqe1m
-         sOWLl8NHZzp1aWuAzOYEwOezaGT5W9DNQGA0MnEdmOYG/FcA5HEoop3D2rgxjSj4z4qZ
-         O97S/i1EGNDp1vHCYzCEHho34Jdwp1uLfy6v2/4ac9B0kT+dsOq0SLS1B4xbwi/Gz1kf
-         w/4E27kG62rpH9wZeIIM4Upmce2Dm/NsRSBTcu63JIkwYp9xyab/G1Xj09WYgk9FB5PK
-         1ZJ9uRD+zVD3qjL4V8Og33HwnBrkUaPWkBR0OubUWYD24Ip+X3sCs68x2Cbc0kj/4bgo
-         IPnw==
-X-Gm-Message-State: ANoB5pn2O8JVRilHayRIKWhx+O9ErS01PjHkbbom5vyVK58dlAIaYA5s
-        D/04gdFncyg7xJrIwWW8z8TXKA==
-X-Google-Smtp-Source: AA0mqf4cAOnifTIeAsmfaAuLmOW0hFwCVqdZbuyJ5wPVOT+Ju8/bLnxagpvq1GBkii7dmlo0kMDu/A==
-X-Received: by 2002:a65:5543:0:b0:477:dc7f:bf24 with SMTP id t3-20020a655543000000b00477dc7fbf24mr20910314pgr.555.1669732432842;
-        Tue, 29 Nov 2022 06:33:52 -0800 (PST)
-Received: from [192.168.1.136] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id h11-20020a170902680b00b001745662d568sm2818626plk.278.2022.11.29.06.33.51
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 29 Nov 2022 06:33:52 -0800 (PST)
-Message-ID: <9f45de57-353a-08c9-5d7f-57d7acc67b18@kernel.dk>
-Date:   Tue, 29 Nov 2022 07:33:51 -0700
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.0
-Subject: Re: [PATCH v2 2/2] nvme: support io stats on the mpath device
-Content-Language: en-US
-To:     Sagi Grimberg <sagi@grimberg.me>, linux-nvme@lists.infradead.org
-Cc:     Christoph Hellwig <hch@lst.de>, Keith Busch <kbusch@kernel.org>,
+        Tue, 29 Nov 2022 09:43:01 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A088B2F39A
+        for <linux-block@vger.kernel.org>; Tue, 29 Nov 2022 06:42:59 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 565D7B816A9
+        for <linux-block@vger.kernel.org>; Tue, 29 Nov 2022 14:42:58 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8AE73C43470;
+        Tue, 29 Nov 2022 14:42:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1669732977;
+        bh=VXD0nauJaAQS0YyJR7h8BNQEX7ug9rVJXczcarKiYZQ=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=IqtociGSDWjHyQw+uvquNwbRQ1W8NVgFLAEG7PMCxu6CkpqatUVv8xzF8A/aYCEJ4
+         kZuJccUvrkSQ7T4C/zCxtMcCHRr+r64uFQZ4PIZ/J00hVWEoMGpMgDFdr2K/GPtiVX
+         G8Xqz5IUWd24KSsVTzNNoEZf9JRowGc8p93E4Czbzu1Qh2GMxC423UgKU4ZOeijNbn
+         Czc/6uu6Lpg3r4LZjHAYgybzlGmUjpIL2Dg7WZquyXOVN9iFcGFsW0/6SG6Hqz2FiA
+         iPGLzrIhyUsGat47RAGWeFOqXedYAblrWJz6lq4RHeY4v1YLpJfCvLTGTZ06zlbdFi
+         jlfxqgZZ9ExPA==
+Date:   Tue, 29 Nov 2022 07:42:53 -0700
+From:   Keith Busch <kbusch@kernel.org>
+To:     Sagi Grimberg <sagi@grimberg.me>
+Cc:     linux-nvme@lists.infradead.org, Christoph Hellwig <hch@lst.de>,
+        Jens Axboe <axboe@kernel.dk>,
         Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
         Hannes Reinecke <hare@suse.de>, linux-block@vger.kernel.org
+Subject: Re: [PATCH v2 2/2] nvme: support io stats on the mpath device
+Message-ID: <Y4YabR09emDGRRpP@kbusch-mbp.dhcp.thefacebook.com>
 References: <20221003094344.242593-1-sagi@grimberg.me>
  <20221003094344.242593-3-sagi@grimberg.me>
-From:   Jens Axboe <axboe@kernel.dk>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 In-Reply-To: <20221003094344.242593-3-sagi@grimberg.me>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/3/22 3:43 AM, Sagi Grimberg wrote:
+On Mon, Oct 03, 2022 at 12:43:44PM +0300, Sagi Grimberg wrote:
 > Our mpath stack device is just a shim that selects a bottom namespace
 > and submits the bio to it without any fancy splitting. This also means
 > that we don't clone the bio or have any context to the bio beyond
@@ -86,9 +66,34 @@ On 10/3/22 3:43 AM, Sagi Grimberg wrote:
 > REQ_NVME_MPATH_IO_STATS nvme_request flag to avoid queue io stats disable
 > in the middle of the request.
 
-Reviewed-by: Jens Axboe <axboe@kernel.dk>
+An unfortunate side effect is that a successful error failover will get
+accounted for twice in the mpath device, but cloning to create a
+separate context just to track iostats for that unusual condition is
+much worse.
 
--- 
-Jens Axboe
+Reviewed-by: Keith Busch <kbusch@kernel.org>
 
+> +void nvme_mpath_start_request(struct request *rq)
+> +{
+> +	struct nvme_ns *ns = rq->q->queuedata;
+> +	struct gendisk *disk = ns->head->disk;
+> +
+> +	if (!blk_queue_io_stat(disk->queue) || blk_rq_is_passthrough(rq))
+> +		return;
+> +
+> +	nvme_req(rq)->flags |= NVME_MPATH_IO_STATS;
+> +	nvme_req(rq)->start_time = bdev_start_io_acct(disk->part0,
+> +					blk_rq_bytes(rq) >> SECTOR_SHIFT,
+> +					req_op(rq), jiffies);
+> +}
+> +void nvme_mpath_end_request(struct request *rq)
+> +{
+> +	struct nvme_ns *ns = rq->q->queuedata;
+> +
+> +	if (!(nvme_req(rq)->flags & NVME_MPATH_IO_STATS))
+> +		return;
+> +	bdev_end_io_acct(ns->head->disk->part0, req_op(rq),
+> +		nvme_req(rq)->start_time);
+> +}
 
+I think these also can be static inline.
