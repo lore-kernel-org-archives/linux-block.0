@@ -2,80 +2,54 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EDF48C4167B
-	for <linux-block@archiver.kernel.org>; Tue, 29 Nov 2022 14:03:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8314FC4321E
+	for <linux-block@archiver.kernel.org>; Tue, 29 Nov 2022 14:25:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232372AbiK2ODI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 29 Nov 2022 09:03:08 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37522 "EHLO
+        id S235362AbiK2OZX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 29 Nov 2022 09:25:23 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34884 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233706AbiK2OCt (ORCPT
+        with ESMTP id S235019AbiK2OZK (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 29 Nov 2022 09:02:49 -0500
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0251813D20;
-        Tue, 29 Nov 2022 06:02:49 -0800 (PST)
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 7710168BEB; Tue, 29 Nov 2022 15:02:42 +0100 (CET)
-Date:   Tue, 29 Nov 2022 15:02:42 +0100
-From:   Christoph Hellwig <hch@lst.de>
-To:     Benjamin Coddington <bcodding@redhat.com>
-Cc:     netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Philipp Reisner <philipp.reisner@linbit.com>,
-        Lars Ellenberg <lars.ellenberg@linbit.com>,
-        Christoph =?iso-8859-1?Q?B=F6hmwalder?= 
-        <christoph.boehmwalder@linbit.com>, Jens Axboe <axboe@kernel.dk>,
-        Josef Bacik <josef@toxicpanda.com>,
-        Keith Busch <kbusch@kernel.org>,
-        Christoph Hellwig <hch@lst.de>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Lee Duncan <lduncan@suse.com>, Chris Leech <cleech@redhat.com>,
-        Mike Christie <michael.christie@oracle.com>,
-        "James E.J. Bottomley" <jejb@linux.ibm.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Valentina Manea <valentina.manea.m@gmail.com>,
-        Shuah Khan <shuah@kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        David Howells <dhowells@redhat.com>,
-        Marc Dionne <marc.dionne@auristor.com>,
-        Steve French <sfrench@samba.org>,
-        Christine Caulfield <ccaulfie@redhat.com>,
-        David Teigland <teigland@redhat.com>,
-        Mark Fasheh <mark@fasheh.com>,
-        Joel Becker <jlbec@evilplan.org>,
-        Joseph Qi <joseph.qi@linux.alibaba.com>,
-        Eric Van Hensbergen <ericvh@gmail.com>,
-        Latchesar Ionkov <lucho@ionkov.net>,
-        Dominique Martinet <asmadeus@codewreck.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Ilya Dryomov <idryomov@gmail.com>,
-        Xiubo Li <xiubli@redhat.com>,
-        Trond Myklebust <trond.myklebust@hammerspace.com>,
-        Anna Schumaker <anna@kernel.org>,
-        Chuck Lever <chuck.lever@oracle.com>,
-        Jeff Layton <jlayton@kernel.org>, drbd-dev@lists.linbit.com,
-        linux-block@vger.kernel.org, nbd@other.debian.org,
-        linux-nvme@lists.infradead.org, open-iscsi@googlegroups.com,
-        linux-scsi@vger.kernel.org, linux-usb@vger.kernel.org,
-        linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
-        samba-technical@lists.samba.org, cluster-devel@redhat.com,
-        ocfs2-devel@oss.oracle.com, v9fs-developer@lists.sourceforge.net,
-        ceph-devel@vger.kernel.org, linux-nfs@vger.kernel.org
-Subject: Re: [PATCH v1 2/3] Treewide: Stop corrupting socket's task_frag
-Message-ID: <20221129140242.GA15747@lst.de>
-References: <cover.1669036433.git.bcodding@redhat.com> <c2ec184226acd21a191ccc1aa46a1d7e43ca7104.1669036433.git.bcodding@redhat.com>
+        Tue, 29 Nov 2022 09:25:10 -0500
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 729BA2E2;
+        Tue, 29 Nov 2022 06:25:09 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=Ylwb4KCyca+jQJTbdW1raeSgIDIZEx3eWo3k4sH/7JI=; b=3jmd+PnWA2cHklZWXfXzE0YLxH
+        P3Qt4u6ALN3HizAKCzkKmK+ufSt2091ZZsysN0o2kJLAqo3XpNU2hwD7duqzqdxKIqAIzG9/RkBPD
+        0Nnpmd+8H+4zmuJwASUo2kjImy4VUZWKOM/rm2L8qseuxQquU+nZO2UOK50cVrck1PB46bjUHh2QP
+        N2HHuOoWwcjpyBlGF0e540qKOr2VCwI4ImwR7szrlu3r7zK/+Q2SeBiYZE6ElUKqlJW56amItAyTU
+        0F+vRxS/uoyh8RxMT3RDNXS/iKOZehuAXnPGMGJPTXgFJNhtQD7GoUwfe1jUXkgw7GyqJlANg09FF
+        yLvUY30Q==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1p01Xl-009Dk7-Af; Tue, 29 Nov 2022 14:25:05 +0000
+Date:   Tue, 29 Nov 2022 06:25:05 -0800
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Li Nan <linan122@huawei.com>
+Cc:     tj@kernel.org, josef@toxicpanda.com, axboe@kernel.dk,
+        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, yukuai3@huawei.com,
+        yi.zhang@huawei.com
+Subject: Re: [PATCH -next 8/8] block: fix null-pointer dereference in
+ ioc_pd_init
+Message-ID: <Y4YWQcb4PMmIdzIM@infradead.org>
+References: <20221128154434.4177442-1-linan122@huawei.com>
+ <20221128154434.4177442-9-linan122@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <c2ec184226acd21a191ccc1aa46a1d7e43ca7104.1669036433.git.bcodding@redhat.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <20221128154434.4177442-9-linan122@huawei.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hmm.  Having to set a flag to not accidentally corrupt per-task
-state seems a bit fragile.  Wouldn't it make sense to find a way to opt
-into the feature only for sockets created from the syscall layer?
+On Mon, Nov 28, 2022 at 11:44:34PM +0800, Li Nan wrote:
+> Fix problem by moving rq_qos_exit() to disk_release().
+
+No, that now means it is removed to later.  You need to add proper
+synchronization.
