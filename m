@@ -2,121 +2,73 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 29E19C4167B
-	for <linux-block@archiver.kernel.org>; Tue, 29 Nov 2022 15:19:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C1FC7C433FE
+	for <linux-block@archiver.kernel.org>; Tue, 29 Nov 2022 15:47:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235903AbiK2PTZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 29 Nov 2022 10:19:25 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45958 "EHLO
+        id S235975AbiK2PrG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 29 Nov 2022 10:47:06 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42402 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235587AbiK2PSb (ORCPT
+        with ESMTP id S235945AbiK2Pq4 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 29 Nov 2022 10:18:31 -0500
-Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 485CC10C2;
-        Tue, 29 Nov 2022 07:18:27 -0800 (PST)
-Received: from kwepemi500012.china.huawei.com (unknown [172.30.72.53])
-        by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4NM5Yh4Z1Wz15MyW;
-        Tue, 29 Nov 2022 23:17:44 +0800 (CST)
-Received: from huawei.com (10.67.175.21) by kwepemi500012.china.huawei.com
- (7.221.188.12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.31; Tue, 29 Nov
- 2022 23:18:22 +0800
-From:   Li Zetao <lizetao1@huawei.com>
-To:     <lizetao1@huawei.com>
-CC:     <st@redhat.com>, <jasowang@redhat.com>, <pbonzini@redhat.com>,
-        <stefanha@redhat.com>, <axboe@kernel.dk>, <airlied@redhat.com>,
-        <kraxel@redhat.com>, <gurchetansingh@chromium.org>,
-        <olvaffe@gmail.com>, <daniel@ffwll.ch>, <david@redhat.com>,
-        <ericvh@gmail.com>, <lucho@ionkov.net>, <asmadeus@codewreck.org>,
-        <linux_oss@crudebyte.com>, <davem@davemloft.net>,
-        <edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-        <pmorel@linux.vnet.ibm.com>, <cornelia.huck@de.ibm.com>,
-        <pankaj.gupta.linux@gmail.com>, <rusty@rustcorp.com.au>,
-        <airlied@gmail.com>, <virtualization@lists.linux-foundation.org>,
-        <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <dri-devel@lists.freedesktop.org>,
-        <v9fs-developer@lists.sourceforge.net>, <netdev@vger.kernel.org>
-Subject: [PATCH v2 5/5] drm/virtio: Fix probe failed when modprobe virtio_gpu
-Date:   Wed, 30 Nov 2022 00:06:15 +0800
-Message-ID: <20221129160615.3343036-6-lizetao1@huawei.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20221129160615.3343036-1-lizetao1@huawei.com>
-References: <20221128021005.232105-1-lizetao1@huawei.com>
- <20221129160615.3343036-1-lizetao1@huawei.com>
+        Tue, 29 Nov 2022 10:46:56 -0500
+Received: from zju.edu.cn (mail.zju.edu.cn [61.164.42.155])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id ADEC459FED;
+        Tue, 29 Nov 2022 07:46:54 -0800 (PST)
+Received: from localhost.localdomain (unknown [10.14.30.50])
+        by mail-app4 (Coremail) with SMTP id cS_KCgBnaMxfKYZjT2esCA--.15899S2;
+        Tue, 29 Nov 2022 23:46:48 +0800 (CST)
+From:   Jinlong Chen <nickyc975@zju.edu.cn>
+To:     axboe@kernel.dk
+Cc:     hch@lst.de, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, nickyc975@zju.edu.cn
+Subject: [PATCH v2 0/5] random improvements and cleanups for elevator.c
+Date:   Tue, 29 Nov 2022 23:46:33 +0800
+Message-Id: <cover.1669736350.git.nickyc975@zju.edu.cn>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.67.175.21]
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- kwepemi500012.china.huawei.com (7.221.188.12)
-X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: cS_KCgBnaMxfKYZjT2esCA--.15899S2
+X-Coremail-Antispam: 1UD129KBjvdXoW7Jr18JryrGr18tr15CF45Wrg_yoWxKFb_Za
+        97tas7Ja1DJ3Wjva47Ka43tr9xuF93X345A3W7JrWSyFW3GF4avrs7ZFZ8ur1rur42ywnI
+        kF4jvFyxZwnrKjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+        9fnUUIcSsGvfJTRUUUbIkFc2x0x2IEx4CE42xK8VAvwI8IcIk0rVWrJVCq3wAFIxvE14AK
+        wVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK021l84ACjcxK6xIIjxv20x
+        vE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4UJVW0owA2z4x0Y4vEx4A2
+        jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oVCq3wAac4AC62xK8xCEY4
+        vEwIxC4wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv
+        7VC0I7IYx2IY67AKxVWUGVWUXwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r
+        1j6r4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwCF04k20xvY0x0E
+        wIxGrwCF04k20xvE74AGY7Cv6cx26r4fKr1UJr1l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2
+        IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v2
+        6r126r1DMIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2
+        IY6xkF7I0E14v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv
+        67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r1j6r4UYxBIdaVFxhVjvjDU0xZFpf
+        9x0JUAkucUUUUU=
+X-CM-SenderInfo: qssqjiaqqzq6lmxovvfxof0/1tbiAgIJB1ZdtcpCQAABs5
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-When doing the following test steps, an error was found:
-  step 1: modprobe virtio_gpu succeeded
-    # modprobe virtio_gpu      <-- OK
+The series slightly improves the readability of elevator.c.
 
-  step 2: fault injection in virtio_gpu_alloc_vbufs()
-    # modprobe -r virtio_gpu   <-- OK
-    # ...
-      CPU: 0 PID: 1714 Comm: modprobe Not tainted 6.1.0-rc7-dirty
-      Hardware name: QEMU Standard PC (i440FX + PIIX, 1996)
-      Call Trace:
-       <TASK>
-       should_fail_ex.cold+0x1a/0x1f
-       ...
-       kmem_cache_create+0x12/0x20
-       virtio_gpu_alloc_vbufs+0x2f/0x90 [virtio_gpu]
-       virtio_gpu_init.cold+0x659/0xcad [virtio_gpu]
-       virtio_gpu_probe+0x14f/0x260 [virtio_gpu]
-       virtio_dev_probe+0x608/0xae0
-       ?...
-       </TASK>
-      kmem_cache_create_usercopy(virtio-gpu-vbufs) failed with error -12
+Changes in v2:
+  - add patch 3 to further improve the readability (suggested by Christoph)
+  - add Reviewed-by tags from Christoph
 
-  step 3: modprobe virtio_gpu failed
-    # modprobe virtio_gpu       <-- failed
-      failed to find virt queues
-      virtio_gpu: probe of virtio6 failed with error -2
+Jinlong Chen (5):
+  elevator: print none at first in elv_iosched_show even if the queue
+    has a scheduler
+  elevator: replace continue with else-if in elv_iosched_show
+  elevator: print e->elevator_name instead of cur->elevator_name in
+    elv_iosched_show
+  elevator: repalce "len+name" with "name+len" in elv_iosched_show
+  elevator: use bool instead of int as the return type of
+    elv_iosched_allow_bio_merge
 
-The root cause of the problem is that the virtqueues are not
-stopped on the error handling path when virtio_gpu_alloc_vbufs()
-fails in virtio_gpu_init(), resulting in an error "-ENOENT"
-returned in the next modprobe call in setup_vq().
+ block/elevator.c | 23 ++++++++++-------------
+ 1 file changed, 10 insertions(+), 13 deletions(-)
 
-virtio_pci_modern_device uses virtqueues to send or
-receive message, and "queue_enable" records whether the
-queues are available. In vp_modern_find_vqs(), all queues
-will be selected and activated, but once queues are enabled
-there is no way to go back except reset.
-
-Fix it by reset virtio device on error handling path. After
-virtio_find_vqs() succeeded, all virtqueues should be stopped
-on error handling path.
-
-Fixes: dc5698e80cf7 ("Add virtio gpu driver.")
-Signed-off-by: Li Zetao <lizetao1@huawei.com>
----
-v1 -> v2: patch is new.
-
- drivers/gpu/drm/virtio/virtgpu_kms.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/drivers/gpu/drm/virtio/virtgpu_kms.c b/drivers/gpu/drm/virtio/virtgpu_kms.c
-index 27b7f14dae89..1a03e8e13b5b 100644
---- a/drivers/gpu/drm/virtio/virtgpu_kms.c
-+++ b/drivers/gpu/drm/virtio/virtgpu_kms.c
-@@ -255,6 +255,7 @@ int virtio_gpu_init(struct virtio_device *vdev, struct drm_device *dev)
- err_scanouts:
- 	virtio_gpu_free_vbufs(vgdev);
- err_vbufs:
-+	virtio_reset_device(vgdev->vdev);
- 	vgdev->vdev->config->del_vqs(vgdev->vdev);
- err_vqs:
- 	dev->dev_private = NULL;
 -- 
-2.25.1
+2.34.1
 
