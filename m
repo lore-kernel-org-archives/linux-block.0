@@ -2,37 +2,39 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C1FC7C433FE
-	for <linux-block@archiver.kernel.org>; Tue, 29 Nov 2022 15:47:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D3E3C4708A
+	for <linux-block@archiver.kernel.org>; Tue, 29 Nov 2022 15:47:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235975AbiK2PrG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 29 Nov 2022 10:47:06 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42402 "EHLO
+        id S235990AbiK2PrH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 29 Nov 2022 10:47:07 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42414 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235945AbiK2Pq4 (ORCPT
+        with ESMTP id S235961AbiK2PrA (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 29 Nov 2022 10:46:56 -0500
+        Tue, 29 Nov 2022 10:47:00 -0500
 Received: from zju.edu.cn (mail.zju.edu.cn [61.164.42.155])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id ADEC459FED;
-        Tue, 29 Nov 2022 07:46:54 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 376816315A;
+        Tue, 29 Nov 2022 07:46:59 -0800 (PST)
 Received: from localhost.localdomain (unknown [10.14.30.50])
-        by mail-app4 (Coremail) with SMTP id cS_KCgBnaMxfKYZjT2esCA--.15899S2;
-        Tue, 29 Nov 2022 23:46:48 +0800 (CST)
+        by mail-app4 (Coremail) with SMTP id cS_KCgBnaMxfKYZjT2esCA--.15899S4;
+        Tue, 29 Nov 2022 23:46:56 +0800 (CST)
 From:   Jinlong Chen <nickyc975@zju.edu.cn>
 To:     axboe@kernel.dk
 Cc:     hch@lst.de, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org, nickyc975@zju.edu.cn
-Subject: [PATCH v2 0/5] random improvements and cleanups for elevator.c
-Date:   Tue, 29 Nov 2022 23:46:33 +0800
-Message-Id: <cover.1669736350.git.nickyc975@zju.edu.cn>
+Subject: [PATCH v2 2/5] elevator: replace continue with else-if in elv_iosched_show
+Date:   Tue, 29 Nov 2022 23:46:35 +0800
+Message-Id: <77ac19ba556efd2c8639a6396eb4203c59bc13d6.1669736350.git.nickyc975@zju.edu.cn>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <cover.1669736350.git.nickyc975@zju.edu.cn>
+References: <cover.1669736350.git.nickyc975@zju.edu.cn>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: cS_KCgBnaMxfKYZjT2esCA--.15899S2
-X-Coremail-Antispam: 1UD129KBjvdXoW7Jr18JryrGr18tr15CF45Wrg_yoWxKFb_Za
-        97tas7Ja1DJ3Wjva47Ka43tr9xuF93X345A3W7JrWSyFW3GF4avrs7ZFZ8ur1rur42ywnI
-        kF4jvFyxZwnrKjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-        9fnUUIcSsGvfJTRUUUbIkFc2x0x2IEx4CE42xK8VAvwI8IcIk0rVWrJVCq3wAFIxvE14AK
+X-CM-TRANSID: cS_KCgBnaMxfKYZjT2esCA--.15899S4
+X-Coremail-Antispam: 1UD129KBjvdXoWrtr48XryrAr18ArWrur4UJwb_yoW3AFb_Ka
+        s5Xwn7J345Jr9Ikr1jvFn5tFWjvwn3Jr15Kwnrtr97ta90gFyfA3Wxua45JryDWFWUu3s8
+        Cw1DZFn7CryxKjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+        9fnUUIcSsGvfJTRUUUbIAFc2x0x2IEx4CE42xK8VAvwI8IcIk0rVWrJVCq3wAFIxvE14AK
         wVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK021l84ACjcxK6xIIjxv20x
         vE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4UJVW0owA2z4x0Y4vEx4A2
         jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oVCq3wAac4AC62xK8xCEY4
@@ -42,33 +44,39 @@ X-Coremail-Antispam: 1UD129KBjvdXoW7Jr18JryrGr18tr15CF45Wrg_yoWxKFb_Za
         wIxGrwCF04k20xvE74AGY7Cv6cx26r4fKr1UJr1l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2
         IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v2
         6r126r1DMIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2
-        IY6xkF7I0E14v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv
-        67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r1j6r4UYxBIdaVFxhVjvjDU0xZFpf
-        9x0JUAkucUUUUU=
-X-CM-SenderInfo: qssqjiaqqzq6lmxovvfxof0/1tbiAgIJB1ZdtcpCQAABs5
+        IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv
+        67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyT
+        uYvjfUFYFADUUUU
+X-CM-SenderInfo: qssqjiaqqzq6lmxovvfxof0/1tbiAgIJB1ZdtcpCQAAFs9
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The series slightly improves the readability of elevator.c.
+else-if is more readable than continue here.
 
-Changes in v2:
-  - add patch 3 to further improve the readability (suggested by Christoph)
-  - add Reviewed-by tags from Christoph
+Signed-off-by: Jinlong Chen <nickyc975@zju.edu.cn>
+---
+ block/elevator.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
 
-Jinlong Chen (5):
-  elevator: print none at first in elv_iosched_show even if the queue
-    has a scheduler
-  elevator: replace continue with else-if in elv_iosched_show
-  elevator: print e->elevator_name instead of cur->elevator_name in
-    elv_iosched_show
-  elevator: repalce "len+name" with "name+len" in elv_iosched_show
-  elevator: use bool instead of int as the return type of
-    elv_iosched_allow_bio_merge
-
- block/elevator.c | 23 ++++++++++-------------
- 1 file changed, 10 insertions(+), 13 deletions(-)
-
+diff --git a/block/elevator.c b/block/elevator.c
+index 308bee253564..ffa750976d25 100644
+--- a/block/elevator.c
++++ b/block/elevator.c
+@@ -776,11 +776,9 @@ ssize_t elv_iosched_show(struct request_queue *q, char *name)
+ 
+ 	spin_lock(&elv_list_lock);
+ 	list_for_each_entry(e, &elv_list, list) {
+-		if (e == cur) {
++		if (e == cur)
+ 			len += sprintf(name+len, "[%s] ", cur->elevator_name);
+-			continue;
+-		}
+-		if (elv_support_features(q, e))
++		else if (elv_support_features(q, e))
+ 			len += sprintf(name+len, "%s ", e->elevator_name);
+ 	}
+ 	spin_unlock(&elv_list_lock);
 -- 
 2.34.1
 
