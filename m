@@ -2,119 +2,75 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8673EC4332F
-	for <linux-block@archiver.kernel.org>; Tue, 29 Nov 2022 04:52:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0FDEDC46467
+	for <linux-block@archiver.kernel.org>; Tue, 29 Nov 2022 07:04:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235402AbiK2Eww (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 28 Nov 2022 23:52:52 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35190 "EHLO
+        id S229909AbiK2HEg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 29 Nov 2022 02:04:36 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43668 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234251AbiK2Ews (ORCPT
+        with ESMTP id S229862AbiK2HE2 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 28 Nov 2022 23:52:48 -0500
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EFA756440;
-        Mon, 28 Nov 2022 20:52:43 -0800 (PST)
-Received: from canpemm500008.china.huawei.com (unknown [172.30.72.53])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4NLqgl0VP7zRpSZ;
-        Tue, 29 Nov 2022 12:52:03 +0800 (CST)
-Received: from [10.174.179.2] (10.174.179.2) by canpemm500008.china.huawei.com
- (7.192.105.151) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.31; Tue, 29 Nov
- 2022 12:52:41 +0800
-Message-ID: <7b447dcb-6009-31e1-8bf6-05b1cdb28b01@huawei.com>
-Date:   Tue, 29 Nov 2022 12:52:40 +0800
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.1.1
-Subject: Re: [PATCH v2] blk-iocost: fix shift-out-of-bounds in
- iocg_hick_delay()
-To:     Yu Kuai <yukuai1@huaweicloud.com>, Tejun Heo <tj@kernel.org>
-CC:     <josef@toxicpanda.com>, <axboe@kernel.dk>,
-        <cgroups@vger.kernel.org>, <linux-block@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <liuzhiqiang26@huawei.com>,
-        "yukuai (C)" <yukuai3@huawei.com>
-References: <20221128030413.882998-1-lijinlin3@huawei.com>
- <Y4US2vFmR4pnw08Z@slm.duckdns.org>
- <bbc5e21f-9e77-41bb-5763-36bd905b52a0@huaweicloud.com>
- <2830bd58-0f53-fa54-58e5-e87225b1fdf1@huawei.com>
- <5489e3c5-30ad-d7af-c329-40c93d9a1b62@huaweicloud.com>
-From:   Li Jinlin <lijinlin3@huawei.com>
-In-Reply-To: <5489e3c5-30ad-d7af-c329-40c93d9a1b62@huaweicloud.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.174.179.2]
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- canpemm500008.china.huawei.com (7.192.105.151)
-X-CFilter-Loop: Reflected
+        Tue, 29 Nov 2022 02:04:28 -0500
+Received: from mxhk.zte.com.cn (mxhk.zte.com.cn [63.216.63.40])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C8419554CB;
+        Mon, 28 Nov 2022 23:04:18 -0800 (PST)
+Received: from mse-fl1.zte.com.cn (unknown [10.5.228.132])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mxhk.zte.com.cn (FangMail) with ESMTPS id 4NLtcK1VgJz8R039;
+        Tue, 29 Nov 2022 15:04:17 +0800 (CST)
+Received: from szxlzmapp07.zte.com.cn ([10.5.230.251])
+        by mse-fl1.zte.com.cn with SMTP id 2AT7492l035439;
+        Tue, 29 Nov 2022 15:04:09 +0800 (+08)
+        (envelope-from yang.yang29@zte.com.cn)
+Received: from mapi (szxlzmapp02[null])
+        by mapi (Zmail) with MAPI id mid14;
+        Tue, 29 Nov 2022 15:04:12 +0800 (CST)
+Date:   Tue, 29 Nov 2022 15:04:12 +0800 (CST)
+X-Zmail-TransId: 2b046385aeecffffffff9fa25732
+X-Mailer: Zmail v1.0
+Message-ID: <202211291504123795374@zte.com.cn>
+Mime-Version: 1.0
+From:   <yang.yang29@zte.com.cn>
+To:     <axboe@kernel.dk>
+Cc:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <xu.panda@zte.com.cn>, <yang.yang29@zte.com.cn>
+Subject: =?UTF-8?B?W1BBVENIIGxpbnV4LW5leHRdIGVsZXZhdG9yOiB1c2Ugc3lzZnNfc3RyZXEoKSBpbnN0ZWFkIG9mIHN0cm5jbXAoKQ==?=
+Content-Type: text/plain;
+        charset="UTF-8"
+X-MAIL: mse-fl1.zte.com.cn 2AT7492l035439
+X-Fangmail-Gw-Spam-Type: 0
+X-FangMail-Miltered: at cgslv5.04-192.168.250.137.novalocal with ID 6385AEF1.000 by FangMail milter!
+X-FangMail-Envelope: 1669705457/4NLtcK1VgJz8R039/6385AEF1.000/10.5.228.132/[10.5.228.132]/mse-fl1.zte.com.cn/<yang.yang29@zte.com.cn>
+X-Fangmail-Anti-Spam-Filtered: true
+X-Fangmail-MID-QID: 6385AEF1.000/4NLtcK1VgJz8R039
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+From: Xu Panda <xu.panda@zte.com.cn>
 
+Replace the open-code with sysfs_streq().
 
-On 2022/11/29 10:59, Yu Kuai wrote:
-> Hi,
-> 
-> 在 2022/11/29 10:49, Li Jinlin 写道:
->>
->>
->> On 2022/11/29 9:14, Yu Kuai wrote:
->>> Hi,
->>>
->>> 在 2022/11/29 3:58, Tejun Heo 写道:
->>>> On Mon, Nov 28, 2022 at 11:04:13AM +0800, Li Jinlin wrote:
->>>>>        /* calculate the current delay in effect - 1/2 every second */
->>>>>        tdelta = now->now - iocg->delay_at;
->>>>>        if (iocg->delay)
->>>>> -        delay = iocg->delay >> div64_u64(tdelta, USEC_PER_SEC);
->>>>> +        delay = iocg->delay >>
->>>>> +            min_t(u64, div64_u64(tdelta, USEC_PER_SEC), 63);
->>>>
->>>> I replied earlier but the right thing to do here is setting delay to 0 if
->>>> the shift is >= 64.
->>>
->>> Perhaps following change will make more sense?
->>>
->>> @@ -1322,18 +1323,19 @@ static bool iocg_kick_delay(struct ioc_gq *iocg, struct ioc_now *now)
->>>   {
->>>          struct ioc *ioc = iocg->ioc;
->>>          struct blkcg_gq *blkg = iocg_to_blkg(iocg);
->>> -       u64 tdelta, delay, new_delay;
->>> +       u64 delay = 0;
->>> +       u64 new_delay;
->>>          s64 vover, vover_pct;
->>>          u32 hwa;
->>>
->>>          lockdep_assert_held(&iocg->waitq.lock);
->>>
->>>          /* calculate the current delay in effect - 1/2 every second */
->>> -       tdelta = now->now - iocg->delay_at;
->>> -       if (iocg->delay)
->>> +       if (iocg->delay && now->now > iocg->delay_at) {
->>> +               u64 tdelta = now->now - iocg->delay_at;
->>> +
->>>                  delay = iocg->delay >> div64_u64(tdelta, USEC_PER_SEC);
->>> -       else
->>> -               delay = 0;
->>> +       }
->>>
->> I think "now->now > iocg->delay_at" is unnecessary, it is almost inevitable.
-> 
-> From what I see, following can only happen if now->now < iocg->delay_at:
-> 
-> "shift exponent 18446744073709"
-> 
-You are right. 
+Signed-off-by: Xu Panda <xu.panda@zte.com.cn>
+Signed-off-by: Yang Yang <yang.yang29@zte.com>
+---
+ block/elevator.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-But I didn't see any ubsan reported at now->now - iocg->delay_at. 
-Need to confirm this.
+diff --git a/block/elevator.c b/block/elevator.c
+index 599413620558..6ed6049a01fd 100644
+--- a/block/elevator.c
++++ b/block/elevator.c
+@@ -721,7 +721,7 @@ static int elevator_change(struct request_queue *q, const char *elevator_name)
+ 	if (!blk_queue_registered(q))
+ 		return -ENOENT;
 
-Jinlin
-Thanks.
-
-> Or something else triggers it?
-> 
-> Thanks,
-> Kuai
-> 
+-	if (!strncmp(elevator_name, "none", 4)) {
++	if (sysfs_streq(elevator_name, "none")) {
+ 		if (q->elevator)
+ 			elevator_disable(q);
+ 		return 0;
+-- 
+2.15.2
