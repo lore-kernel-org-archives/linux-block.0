@@ -2,54 +2,64 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8314FC4321E
-	for <linux-block@archiver.kernel.org>; Tue, 29 Nov 2022 14:25:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CE6A3C4321E
+	for <linux-block@archiver.kernel.org>; Tue, 29 Nov 2022 14:28:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235362AbiK2OZX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 29 Nov 2022 09:25:23 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34884 "EHLO
+        id S230129AbiK2O2h (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 29 Nov 2022 09:28:37 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39344 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235019AbiK2OZK (ORCPT
+        with ESMTP id S232976AbiK2O2d (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 29 Nov 2022 09:25:10 -0500
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 729BA2E2;
-        Tue, 29 Nov 2022 06:25:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=Ylwb4KCyca+jQJTbdW1raeSgIDIZEx3eWo3k4sH/7JI=; b=3jmd+PnWA2cHklZWXfXzE0YLxH
-        P3Qt4u6ALN3HizAKCzkKmK+ufSt2091ZZsysN0o2kJLAqo3XpNU2hwD7duqzqdxKIqAIzG9/RkBPD
-        0Nnpmd+8H+4zmuJwASUo2kjImy4VUZWKOM/rm2L8qseuxQquU+nZO2UOK50cVrck1PB46bjUHh2QP
-        N2HHuOoWwcjpyBlGF0e540qKOr2VCwI4ImwR7szrlu3r7zK/+Q2SeBiYZE6ElUKqlJW56amItAyTU
-        0F+vRxS/uoyh8RxMT3RDNXS/iKOZehuAXnPGMGJPTXgFJNhtQD7GoUwfe1jUXkgw7GyqJlANg09FF
-        yLvUY30Q==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1p01Xl-009Dk7-Af; Tue, 29 Nov 2022 14:25:05 +0000
-Date:   Tue, 29 Nov 2022 06:25:05 -0800
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Li Nan <linan122@huawei.com>
-Cc:     tj@kernel.org, josef@toxicpanda.com, axboe@kernel.dk,
-        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, yukuai3@huawei.com,
-        yi.zhang@huawei.com
-Subject: Re: [PATCH -next 8/8] block: fix null-pointer dereference in
- ioc_pd_init
-Message-ID: <Y4YWQcb4PMmIdzIM@infradead.org>
-References: <20221128154434.4177442-1-linan122@huawei.com>
- <20221128154434.4177442-9-linan122@huawei.com>
+        Tue, 29 Nov 2022 09:28:33 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 945FD2AE0
+        for <linux-block@vger.kernel.org>; Tue, 29 Nov 2022 06:28:32 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 3472A61761
+        for <linux-block@vger.kernel.org>; Tue, 29 Nov 2022 14:28:32 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 191BDC433D6;
+        Tue, 29 Nov 2022 14:28:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1669732111;
+        bh=HkEU1+9tgYVEGam9m2b9sn+qf1Iht+T/ZI36+M1KNWA=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=MXBEppicUuEOxUYAyZbyMLqN6XTvu8wNTnv2nrCgOSGync0rca16SCEJ8yIXciE9d
+         JjB0QtEZ0NekSE8xKTflRtaTP/YqtAUHg3hMz9wSRu02kcpuCoj27A2qSUuu3zYi6/
+         C5d8OhAGU90gVeYaoEq2sdMzuCZYLROtkJWEzFx9Yd1vl2cBPHggZg1JesANIlVGyH
+         ZFJvrny/nTfuBmtapYaeljv2WzmpOJaNu4Bc3ToIOEqNi2/zPehT8fg9XNuZwLRtSo
+         0NFlUWul1wgWbVN4C90fbgyuoX3aXNId1oecztxPevrghA5XNHh2Zu8NMNKI6R1JLK
+         iCwMu8aUGZBog==
+Date:   Tue, 29 Nov 2022 07:28:28 -0700
+From:   Keith Busch <kbusch@kernel.org>
+To:     Sagi Grimberg <sagi@grimberg.me>
+Cc:     linux-nvme@lists.infradead.org, Christoph Hellwig <hch@lst.de>,
+        Jens Axboe <axboe@kernel.dk>,
+        Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
+        Hannes Reinecke <hare@suse.de>, linux-block@vger.kernel.org
+Subject: Re: [PATCH v2 1/2] nvme: introduce nvme_start_request
+Message-ID: <Y4YXDAZDZQbnLIbF@kbusch-mbp.dhcp.thefacebook.com>
+References: <20221003094344.242593-1-sagi@grimberg.me>
+ <20221003094344.242593-2-sagi@grimberg.me>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20221128154434.4177442-9-linan122@huawei.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20221003094344.242593-2-sagi@grimberg.me>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Nov 28, 2022 at 11:44:34PM +0800, Li Nan wrote:
-> Fix problem by moving rq_qos_exit() to disk_release().
+On Mon, Oct 03, 2022 at 12:43:43PM +0300, Sagi Grimberg wrote:
+>  
+> +void nvme_start_request(struct request *rq)
+> +{
+> +	blk_mq_start_request(rq);
+> +}
+> +EXPORT_SYMBOL_GPL(nvme_start_request);
 
-No, that now means it is removed to later.  You need to add proper
-synchronization.
+Looks good, other than I feel this should be a static inline function in
+nvme.h instead.
+
+Reviewed-by: Keith Busch <kbusch@kernel.org>
