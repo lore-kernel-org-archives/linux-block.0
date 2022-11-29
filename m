@@ -2,33 +2,33 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DB0AC46467
-	for <linux-block@archiver.kernel.org>; Tue, 29 Nov 2022 03:02:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09B26C43217
+	for <linux-block@archiver.kernel.org>; Tue, 29 Nov 2022 03:02:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235336AbiK2DCI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 28 Nov 2022 22:02:08 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55964 "EHLO
+        id S235350AbiK2DCJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 28 Nov 2022 22:02:09 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55962 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235313AbiK2DB6 (ORCPT
+        with ESMTP id S235314AbiK2DB6 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Mon, 28 Nov 2022 22:01:58 -0500
-Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6AB6C45097;
+Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B10E45084;
         Mon, 28 Nov 2022 19:01:57 -0800 (PST)
-Received: from kwepemi500016.china.huawei.com (unknown [172.30.72.57])
-        by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4NLnCx4dyFz15Mxq;
-        Tue, 29 Nov 2022 11:01:17 +0800 (CST)
+Received: from kwepemi500016.china.huawei.com (unknown [172.30.72.54])
+        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4NLn8n0j6jzJp0N;
+        Tue, 29 Nov 2022 10:58:33 +0800 (CST)
 Received: from huawei.com (10.174.178.129) by kwepemi500016.china.huawei.com
  (7.221.188.220) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.31; Tue, 29 Nov
- 2022 11:01:55 +0800
+ 2022 11:01:54 +0800
 From:   Kemeng Shi <shikemeng@huawei.com>
 To:     <tj@kernel.org>, <josef@toxicpanda.com>, <axboe@kernel.dk>
 CC:     <cgroups@vger.kernel.org>, <linux-block@vger.kernel.org>,
         <linux-kernel@vger.kernel.org>, <shikemeng@huawei.com>
-Subject: [PATCH v2 08/10] blk-throttle: remove repeat check of elapsed time from last upgrade in throtl_hierarchy_can_downgrade
-Date:   Tue, 29 Nov 2022 11:01:45 +0800
-Message-ID: <20221129030147.27400-9-shikemeng@huawei.com>
+Subject: [PATCH v2 07/10] blk-throttle: remove incorrect comment for tg_last_low_overflow_time
+Date:   Tue, 29 Nov 2022 11:01:44 +0800
+Message-ID: <20221129030147.27400-8-shikemeng@huawei.com>
 X-Mailer: git-send-email 2.14.1.windows.1
 In-Reply-To: <20221129030147.27400-1-shikemeng@huawei.com>
 References: <20221129030147.27400-1-shikemeng@huawei.com>
@@ -42,42 +42,41 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-There is no need to check elapsed time from last upgrade for each node in
-hierarchy. Move this check before traversing as throtl_can_upgrade do
-to remove repeat check.
+Function tg_last_low_overflow_time is called with intermediate node as
+following:
+throtl_hierarchy_can_downgrade
+  throtl_tg_can_downgrade
+    tg_last_low_overflow_time
+
+throtl_hierarchy_can_upgrade
+  throtl_tg_can_upgrade
+    tg_last_low_overflow_time
+
+throtl_hierarchy_can_downgrade/throtl_hierarchy_can_upgrade will traverse
+from leaf node to sub-root node and pass traversed intermediate node
+to tg_last_low_overflow_time.
+
+No such limit could be found from context and implementation of
+tg_last_low_overflow_time, so remove this limit in comment.
 
 Signed-off-by: Kemeng Shi <shikemeng@huawei.com>
-Reported-by: kernel test robot <lkp@intel.com>
+Acked-by: Tejun Heo <tj@kernel.org>
 ---
- block/blk-throttle.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+ block/blk-throttle.c | 1 -
+ 1 file changed, 1 deletion(-)
 
 diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index 3ddd8a15aa3f..94d850b57462 100644
+index 4b11099625da..3ddd8a15aa3f 100644
 --- a/block/blk-throttle.c
 +++ b/block/blk-throttle.c
-@@ -1955,8 +1955,7 @@ static bool throtl_tg_can_downgrade(struct throtl_grp *tg)
- 	 * If cgroup is below low limit, consider downgrade and throttle other
- 	 * cgroups
- 	 */
--	if (time_after_eq(now, td->low_upgrade_time + td->throtl_slice) &&
--	    time_after_eq(now, tg_last_low_overflow_time(tg) +
-+	if (time_after_eq(now, tg_last_low_overflow_time(tg) +
- 					td->throtl_slice) &&
- 	    (!throtl_tg_is_idle(tg) ||
- 	     !list_empty(&tg_to_blkg(tg)->blkcg->css.children)))
-@@ -1966,6 +1965,11 @@ static bool throtl_tg_can_downgrade(struct throtl_grp *tg)
+@@ -1762,7 +1762,6 @@ static unsigned long __tg_last_low_overflow_time(struct throtl_grp *tg)
+ 	return min(rtime, wtime);
+ }
  
- static bool throtl_hierarchy_can_downgrade(struct throtl_grp *tg)
+-/* tg should not be an intermediate node */
+ static unsigned long tg_last_low_overflow_time(struct throtl_grp *tg)
  {
-+	struct throtl_data *td = tg->td;
-+
-+	if (time_before(jiffies, td->low_upgrade_time + td->throtl_slice))
-+		return false;
-+
- 	while (true) {
- 		if (!throtl_tg_can_downgrade(tg))
- 			return false;
+ 	struct throtl_service_queue *parent_sq;
 -- 
 2.30.0
 
