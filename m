@@ -2,33 +2,33 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CCF38C4332F
-	for <linux-block@archiver.kernel.org>; Tue, 29 Nov 2022 03:02:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9ED51C4708A
+	for <linux-block@archiver.kernel.org>; Tue, 29 Nov 2022 03:02:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235307AbiK2DB4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 28 Nov 2022 22:01:56 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55934 "EHLO
+        id S235342AbiK2DCH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 28 Nov 2022 22:02:07 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55952 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235291AbiK2DBy (ORCPT
+        with ESMTP id S235306AbiK2DB4 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 28 Nov 2022 22:01:54 -0500
-Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1509845097;
-        Mon, 28 Nov 2022 19:01:54 -0800 (PST)
+        Mon, 28 Nov 2022 22:01:56 -0500
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 126D43D92C;
+        Mon, 28 Nov 2022 19:01:56 -0800 (PST)
 Received: from kwepemi500016.china.huawei.com (unknown [172.30.72.57])
-        by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4NLnCt1XVRz15MpD;
-        Tue, 29 Nov 2022 11:01:14 +0800 (CST)
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4NLnCr6DsJzCqjd;
+        Tue, 29 Nov 2022 11:01:12 +0800 (CST)
 Received: from huawei.com (10.174.178.129) by kwepemi500016.china.huawei.com
  (7.221.188.220) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.31; Tue, 29 Nov
- 2022 11:01:51 +0800
+ 2022 11:01:53 +0800
 From:   Kemeng Shi <shikemeng@huawei.com>
 To:     <tj@kernel.org>, <josef@toxicpanda.com>, <axboe@kernel.dk>
 CC:     <cgroups@vger.kernel.org>, <linux-block@vger.kernel.org>,
         <linux-kernel@vger.kernel.org>, <shikemeng@huawei.com>
-Subject: [PATCH v2 03/10] blk-throttle: ignore cgroup without io queued in blk_throtl_cancel_bios
-Date:   Tue, 29 Nov 2022 11:01:40 +0800
-Message-ID: <20221129030147.27400-4-shikemeng@huawei.com>
+Subject: [PATCH v2 06/10] blk-throttle: fix typo in comment of throtl_adjusted_limit
+Date:   Tue, 29 Nov 2022 11:01:43 +0800
+Message-ID: <20221129030147.27400-7-shikemeng@huawei.com>
 X-Mailer: git-send-email 2.14.1.windows.1
 In-Reply-To: <20221129030147.27400-1-shikemeng@huawei.com>
 References: <20221129030147.27400-1-shikemeng@huawei.com>
@@ -42,45 +42,27 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Ignore cgroup without io queued in blk_throtl_cancel_bios for two
-reasons:
-1. Save cpu cycle for trying to dispatch cgroup which is no io queued.
-2. Avoid non-consistent state that cgroup is inserted to service queue
-without THROTL_TG_PENDING set as tg_update_disptime will unconditional
-re-insert cgroup to service queue. If we are on the default hierarchy,
-IO dispatched from child in tg_dispatch_one_bio will trigger inserting
-cgroup to service queue without erase first and ruin the tree.
+lapsed time -> elapsed time
 
 Signed-off-by: Kemeng Shi <shikemeng@huawei.com>
 Acked-by: Tejun Heo <tj@kernel.org>
 ---
- block/blk-throttle.c | 13 ++++++++++++-
- 1 file changed, 12 insertions(+), 1 deletion(-)
+ block/blk-throttle.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index d516a37e82fb..ee7dc1a0adfd 100644
+index 4977fac56a00..4b11099625da 100644
 --- a/block/blk-throttle.c
 +++ b/block/blk-throttle.c
-@@ -1738,7 +1738,18 @@ void blk_throtl_cancel_bios(struct gendisk *disk)
- 		 * Set the flag to make sure throtl_pending_timer_fn() won't
- 		 * stop until all throttled bios are dispatched.
- 		 */
--		blkg_to_tg(blkg)->flags |= THROTL_TG_CANCELING;
-+		tg->flags |= THROTL_TG_CANCELING;
-+
-+		/*
-+		 * Do not dispatch cgroup without THROTL_TG_PENDING or cgroup
-+		 * will be inserted to service queue without THROTL_TG_PENDING
-+		 * set in tg_update_disptime below. Then IO dispatched from
-+		 * child in tg_dispatch_one_bio will trigger double insertion
-+		 * and corrupt the tree.
-+		 */
-+		if (!(tg->flags & THROTL_TG_PENDING))
-+			continue;
-+
- 		/*
- 		 * Update disptime after setting the above flag to make sure
- 		 * throtl_select_dispatch() won't exit without dispatching.
+@@ -129,7 +129,7 @@ static struct throtl_data *sq_to_td(struct throtl_service_queue *sq)
+ /*
+  * cgroup's limit in LIMIT_MAX is scaled if low limit is set. This scale is to
+  * make the IO dispatch more smooth.
+- * Scale up: linearly scale up according to lapsed time since upgrade. For
++ * Scale up: linearly scale up according to elapsed time since upgrade. For
+  *           every throtl_slice, the limit scales up 1/2 .low limit till the
+  *           limit hits .max limit
+  * Scale down: exponentially scale down if a cgroup doesn't hit its .low limit
 -- 
 2.30.0
 
