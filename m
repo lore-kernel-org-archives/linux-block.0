@@ -2,114 +2,97 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 724C2C46467
-	for <linux-block@archiver.kernel.org>; Tue, 29 Nov 2022 17:42:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57AF1C433FE
+	for <linux-block@archiver.kernel.org>; Tue, 29 Nov 2022 17:54:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236664AbiK2Rmp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 29 Nov 2022 12:42:45 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39070 "EHLO
+        id S235993AbiK2RyA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 29 Nov 2022 12:54:00 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50984 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236679AbiK2Rmn (ORCPT
+        with ESMTP id S235974AbiK2RyA (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 29 Nov 2022 12:42:43 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EBF521901F;
-        Tue, 29 Nov 2022 09:42:41 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 95822B8129E;
-        Tue, 29 Nov 2022 17:42:40 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 88D66C433C1;
-        Tue, 29 Nov 2022 17:42:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1669743759;
-        bh=3+jgbqIH2MJTIsVHlcxt6FoqC9JTTWJi5HGZCaZxgug=;
-        h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-        b=QUm6mA5J8FMakXMYs9TxR1saaYz2xtuB1WQ4vJJERTQPls5BaIPHVnOKz8jZIo9kT
-         XulObDx1A347icJCI3BmL1Pf+V0Y6vDE7c7GJVgCQGxPvlvdctmnzKGaymxCYNMyXQ
-         dKw/DfIH615h0CSbluMrGHtANR4WOUzVKajaI/Lk7UG43sRTDV3681zTOgmNB5PA42
-         4z8cYl3L4lhD0Mvd0OcboC2hB3hl3nwz3MNA3jwsaSJnlHZe8k2mACwlMT6PMRhQUD
-         9V/1JVeknQRJ/G2/votnmVuu78OlhM7g7yW8UlJERa2tg+7VQlKisF3sYHT8GaId68
-         G+E9LkyPR/ygQ==
-Message-ID: <d0a8f7a5e307e201926ae8e80d629da10c706a91.camel@kernel.org>
-Subject: Re: [PATCH v1 2/3] Treewide: Stop corrupting socket's task_frag
-From:   Jeff Layton <jlayton@kernel.org>
-To:     Christoph Hellwig <hch@lst.de>,
-        Benjamin Coddington <bcodding@redhat.com>
-Cc:     netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Philipp Reisner <philipp.reisner@linbit.com>,
-        Lars Ellenberg <lars.ellenberg@linbit.com>,
-        Christoph =?ISO-8859-1?Q?B=F6hmwalder?= 
-        <christoph.boehmwalder@linbit.com>, Jens Axboe <axboe@kernel.dk>,
-        Josef Bacik <josef@toxicpanda.com>,
-        Keith Busch <kbusch@kernel.org>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Lee Duncan <lduncan@suse.com>, Chris Leech <cleech@redhat.com>,
-        Mike Christie <michael.christie@oracle.com>,
-        "James E.J. Bottomley" <jejb@linux.ibm.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Valentina Manea <valentina.manea.m@gmail.com>,
-        Shuah Khan <shuah@kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        David Howells <dhowells@redhat.com>,
-        Marc Dionne <marc.dionne@auristor.com>,
-        Steve French <sfrench@samba.org>,
-        Christine Caulfield <ccaulfie@redhat.com>,
-        David Teigland <teigland@redhat.com>,
-        Mark Fasheh <mark@fasheh.com>,
-        Joel Becker <jlbec@evilplan.org>,
-        Joseph Qi <joseph.qi@linux.alibaba.com>,
-        Eric Van Hensbergen <ericvh@gmail.com>,
-        Latchesar Ionkov <lucho@ionkov.net>,
-        Dominique Martinet <asmadeus@codewreck.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Ilya Dryomov <idryomov@gmail.com>,
-        Xiubo Li <xiubli@redhat.com>,
-        Trond Myklebust <trond.myklebust@hammerspace.com>,
-        Anna Schumaker <anna@kernel.org>,
-        Chuck Lever <chuck.lever@oracle.com>,
-        drbd-dev@lists.linbit.com, linux-block@vger.kernel.org,
-        nbd@other.debian.org, linux-nvme@lists.infradead.org,
-        open-iscsi@googlegroups.com, linux-scsi@vger.kernel.org,
-        linux-usb@vger.kernel.org, linux-afs@lists.infradead.org,
-        linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
-        cluster-devel@redhat.com, ocfs2-devel@oss.oracle.com,
-        v9fs-developer@lists.sourceforge.net, ceph-devel@vger.kernel.org,
-        linux-nfs@vger.kernel.org
-Date:   Tue, 29 Nov 2022 12:42:33 -0500
-In-Reply-To: <20221129140242.GA15747@lst.de>
-References: <cover.1669036433.git.bcodding@redhat.com>
-         <c2ec184226acd21a191ccc1aa46a1d7e43ca7104.1669036433.git.bcodding@redhat.com>
-         <20221129140242.GA15747@lst.de>
-Content-Type: text/plain; charset="ISO-8859-15"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.1 (3.46.1-1.fc37) 
+        Tue, 29 Nov 2022 12:54:00 -0500
+Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE7852BB1A
+        for <linux-block@vger.kernel.org>; Tue, 29 Nov 2022 09:53:58 -0800 (PST)
+Received: by mail-pf1-x430.google.com with SMTP id x66so14415082pfx.3
+        for <linux-block@vger.kernel.org>; Tue, 29 Nov 2022 09:53:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Xli9vLCEDtXh1Vn33pOpeSIt22szJ79NH9QfJ1/hCFI=;
+        b=rnete2628Hvjc5JnCt8Q7ltyJnmZdSp9s1qJoUrljVKf2KKDbT5ljd9bWFPCmnTPoH
+         xi1/zyERiln1rGEVXHl/1xzQaQ1y7vrXTRP/NYMRHaadv2IatDHf3xBwITkNXkcO+SjO
+         +nDh7xGMCoVWGd+f77Z7byqi/iQ/D4MvqFdAyOieVo7HVq+AdkodTeR+BCwbbq/rmO4m
+         cj9gMpyU3kTMN6DSqs1EqnvIHm75Y3JRW2n7agG4s0BvNheokyFDGj9ZzZX0gs5EG9z5
+         187qFSyHShueZg2m0LaeI/IKReDVF5+snwpg/k4dWb9uyJEsj1z6l47yWEx/BLZpMAQW
+         lRxw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Xli9vLCEDtXh1Vn33pOpeSIt22szJ79NH9QfJ1/hCFI=;
+        b=F+cITHli7cXPIteX/Afvdvk3Z4PYfWI3VPWJFJZXhT3gtzfFjiMedc45GOe+KSbI62
+         MYaeGGXs/fuML9x8e+TX02Dil6wxZQqkLAACIQyNac1cgjq40Gv6AO0M4noM5F0rbqwJ
+         PAY7JGhaqx9ign0fWnaYwwOEfhcc1hpJXTQYQ8sp+peNEegqATWmgeFeZbDIzNHUqWkd
+         GpYiO4fJq9DKRcm4yUKhng6PUx10oTeatVdM3CbRr6Ij8auPKAjEnEDc0k3/6iSKQu1c
+         bqAp9FWAFty+/spicqRioB+rIx2s+GouX9s0UV28q9HPHb3+iJ+gB1O01EnItsqwZgAx
+         zfPQ==
+X-Gm-Message-State: ANoB5plZoYr9PpkoNsTZ/NkaphEyZXj4K/gNoM7P7mOEjFmCfOCFJxoM
+        dtyhBnVdXzlpEClIzg1q1LGzKw==
+X-Google-Smtp-Source: AA0mqf68+0UInZ79fmb6DL13+mxpSI9oXKNi01Izlzc+q4wolcGLb+Om+efE6TIVJSAwdMBcKg6rbw==
+X-Received: by 2002:a05:6a00:1d25:b0:562:5f71:d188 with SMTP id a37-20020a056a001d2500b005625f71d188mr40014334pfx.57.1669744438171;
+        Tue, 29 Nov 2022 09:53:58 -0800 (PST)
+Received: from [192.168.1.136] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id p5-20020a1709026b8500b00188c9c11559sm11201218plk.1.2022.11.29.09.53.56
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 29 Nov 2022 09:53:57 -0800 (PST)
+Message-ID: <bf638161-2193-7403-da2d-d4c5073cc2ed@kernel.dk>
+Date:   Tue, 29 Nov 2022 10:53:56 -0700
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
+ Thunderbird/102.5.0
+Subject: Re: [PATCH v2 0/5] random improvements and cleanups for elevator.c
+Content-Language: en-US
+To:     Jinlong Chen <nickyc975@zju.edu.cn>
+Cc:     hch@lst.de, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <cover.1669736350.git.nickyc975@zju.edu.cn>
+From:   Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <cover.1669736350.git.nickyc975@zju.edu.cn>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, 2022-11-29 at 15:02 +0100, Christoph Hellwig wrote:
-> Hmm.  Having to set a flag to not accidentally corrupt per-task
-> state seems a bit fragile.  Wouldn't it make sense to find a way to opt
-> into the feature only for sockets created from the syscall layer?
+On 11/29/22 8:46 AM, Jinlong Chen wrote:
+> The series slightly improves the readability of elevator.c.
+> 
+> Changes in v2:
+>   - add patch 3 to further improve the readability (suggested by Christoph)
+>   - add Reviewed-by tags from Christoph
+> 
+> Jinlong Chen (5):
+>   elevator: print none at first in elv_iosched_show even if the queue
+>     has a scheduler
+>   elevator: replace continue with else-if in elv_iosched_show
+>   elevator: print e->elevator_name instead of cur->elevator_name in
+>     elv_iosched_show
+>   elevator: repalce "len+name" with "name+len" in elv_iosched_show
+>   elevator: use bool instead of int as the return type of
+>     elv_iosched_allow_bio_merge
+> 
+>  block/elevator.c | 23 ++++++++++-------------
+>  1 file changed, 10 insertions(+), 13 deletions(-)
 
-I agree that that would be cleaner. task_frag should have been an opt-in
-thing all along. That change regressed all of the in-kernel users of
-sockets.
+Applied, with some commit message re-formatting. Please keep lines
+<= 74 chars.
 
-Where would be the right place to set that flag for only userland
-sockets? A lot of the in-kernel socket users hook into the socket API at
-a fairly high-level. 9P and CIFS, for instance, call __sock_create.
+-- 
+Jens Axboe
 
-We could set it in the syscall handlers (and maybe in iouring) I
-suppose, but that seems like the wrong thing to do too.
 
-In the absence of a clean place to do this, I think we're going to be
-stuck doing it the way Ben has proposed...
---=20
-Jeff Layton <jlayton@kernel.org>
