@@ -2,197 +2,122 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DB4CC433FE
-	for <linux-block@archiver.kernel.org>; Tue, 29 Nov 2022 23:30:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BAE1C433FE
+	for <linux-block@archiver.kernel.org>; Tue, 29 Nov 2022 23:46:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230193AbiK2Xaz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 29 Nov 2022 18:30:55 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58976 "EHLO
+        id S230211AbiK2XqH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 29 Nov 2022 18:46:07 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42230 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229877AbiK2Xa0 (ORCPT
+        with ESMTP id S230165AbiK2XqG (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 29 Nov 2022 18:30:26 -0500
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2071.outbound.protection.outlook.com [40.107.93.71])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6FA7F711A4;
-        Tue, 29 Nov 2022 15:30:07 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Ty+rTS/PcEyucpnhOxECoXjw9ZRuWBOMfaqO+kWgXyySD5EtBvr25lmwuAyyLNWVPET6vAQZ8WLLUaY7txA43sJdU9ey1xwUpVXnJugpq9nZ3PIt4ZukKov1wQLLPFjqwrL6G0VyCzxWiNzyk/VqoNnxGvipkJjCu0N7u3odQyDvECJk4aNgqBMkaqWCkHd4R5iuz7bf8F9DbNbzJbhI2ed/J19EVYxf0TYtIYValQXi5cu26OhH9g49soDBMolaQFQSsW5PZieUsIWy2q+ZhDHNKwBTBGXzmOVumEKzT9npLj1JdtTFGJkU1BSSkT/36/4L2OuCc0B6qqlvU9biBg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=93bHBBtS0wv2XFC3NpfyeM7QV18vLpAd7mLOdv0Ca3U=;
- b=ABw5W/RQPRJUNKF5b1xy68uUY4B4/aPs0jquUK82/TOu9yuSh3YA4ecZBQlHkMr+pjFAEJNMXRQ646v4JqHntJvZtsoHjTQQ4pQq4dX5thEfe2LwBs01XfaQduTi18hVWkXctfGpTuzWJO2BKClzIft0wdbX8F6t2ALAXDe16RIGToQP3HCWpNFNXuEY/IV41Ge0lpWZEC0LCP3wzfaVTsaAi1LQ4n/ree2seCLlYbpG89w5AkXkLupUJMtU4r1qBrSGYy8SdjmdF+ASAea7BWj6U0EClDpge1eJtkjcW0zIYq0mTKAZMzoy5XF1eW9maWbiqveVQ9h6Ec5ZO9MikQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=93bHBBtS0wv2XFC3NpfyeM7QV18vLpAd7mLOdv0Ca3U=;
- b=EkDtE7/4dOc9nADw7CTWcX8cnXRrMxW0tTWwqR5RicwH7OtYSme37kzOMZimjht29YxZ1J8bbLLWFoGnCgt1IzPF47aP8SmCm2h8NsG6pH2GFha271ENEbBPorwsJpBbosPaW7OiNp0MKb05VsGnCLYxDEosivkXgFg7guawRCWLenGOmBWxdMSPvZeOEhpQ+VMeeCWLzLvpW8K7ccKSlbojEbzaUsq2rJdHpi282yD7lXEq1YSZjZfIaADHh4NAIlf/rqYPgSnwwO5FP9n7rsyjis4BG39Jopcu7jXI5+XNiXwFobYw0TTpnKaVK9W+tebrlayclhlXYrHBX/lNDQ==
-Received: from DM6PR07CA0040.namprd07.prod.outlook.com (2603:10b6:5:74::17) by
- CH0PR12MB5371.namprd12.prod.outlook.com (2603:10b6:610:d6::13) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.5857.23; Tue, 29 Nov 2022 23:30:05 +0000
-Received: from DM6NAM11FT025.eop-nam11.prod.protection.outlook.com
- (2603:10b6:5:74:cafe::8c) by DM6PR07CA0040.outlook.office365.com
- (2603:10b6:5:74::17) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5857.23 via Frontend
- Transport; Tue, 29 Nov 2022 23:30:05 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- DM6NAM11FT025.mail.protection.outlook.com (10.13.172.197) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.5857.18 via Frontend Transport; Tue, 29 Nov 2022 23:30:05 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.36; Tue, 29 Nov
- 2022 15:29:53 -0800
-Received: from dev.nvidia.com (10.126.230.35) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.36; Tue, 29 Nov
- 2022 15:29:52 -0800
-From:   Chaitanya Kulkarni <kch@nvidia.com>
-To:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC:     <axboe@kernel.dk>, <damien.lemoal@opensource.wdc.com>,
-        <bvanassche@acm.org>, <shinichiro.kawasaki@wdc.com>,
-        <vincent.fu@samsung.com>, Chaitanya Kulkarni <kch@nvidia.com>
-Subject: [PATCH V4 8/8] null-blk: allow REQ_OP_ZONE_RESET_ALL to configure
-Date:   Tue, 29 Nov 2022 15:28:13 -0800
-Message-ID: <20221129232813.37968-9-kch@nvidia.com>
-X-Mailer: git-send-email 2.29.0
-In-Reply-To: <20221129232813.37968-1-kch@nvidia.com>
-References: <20221129232813.37968-1-kch@nvidia.com>
+        Tue, 29 Nov 2022 18:46:06 -0500
+Received: from esa5.hgst.iphmx.com (esa5.hgst.iphmx.com [216.71.153.144])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F04531ECE
+        for <linux-block@vger.kernel.org>; Tue, 29 Nov 2022 15:46:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1669765565; x=1701301565;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=ycxaYLjYb+ma8DDHfOmlnxZ6kUuyag3iWhXxhAoI4Bs=;
+  b=T05DJzx7qmqs2yFmlWJxavzZC45BRaIHjUAj3bv7adUNOPJkWjkDImWa
+   H/I97EeVYW8Wv8hg0q2k8DBICidCIzb300O0daPkYxaSaANniDn6u6MZn
+   F8qgJ5OzIGByU0SCxAktkGmWZJsJ6FkNbCMbwpn3Cj2MSjZq6tQHTamm9
+   JyWfmOxwxcLcXj9Jpn19OL2rV9XVk1cNYZiOIhYDEkxghGVKPCNDAI9dZ
+   CpwbiUjzjdeLj6iKPLoWrENI/GQZP5XqK/ILaQHbIcZORpcOvwUQVtrqF
+   dHXyrBictNkc4Q1BQBkbBZdawtWWMm6AftDBw73e8FmMnvZJiRqziUw96
+   Q==;
+X-IronPort-AV: E=Sophos;i="5.96,204,1665417600"; 
+   d="scan'208";a="217494471"
+Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
+  by ob1.hgst.iphmx.com with ESMTP; 30 Nov 2022 07:46:03 +0800
+IronPort-SDR: 2w/ujUbU20ZwMaZFiPoz6Bnp0flfJjFzLzd3IguDED+igGolnZBws2UQaN6+9Sh/8OW9fgkYL4
+ nqv8E/nlAJ4kqnISOks67aANDJNWUa5VqyKd+Qu7wQNjY8UqA0Jj7Mg94kjBZ4ZhJu5L6Tj+JW
+ +yVsE/JqQXNj0r/MWE/PIJIP7wXMZKs8wML69CCN51CAv5NqMYcrCAoSIyvIA7bv3T93w6CYwj
+ SXa8etx9ysrW2TAY753ajDeq09pg1Y5vncjuy0qgNu3N0b9UFZRxIv4SrFRdKfMwOpMoyrXkn2
+ YC4=
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 29 Nov 2022 14:58:58 -0800
+IronPort-SDR: JxQS6EBO2m6FYYoxnFpBLwNdSsLiTT1oh6edOh2ALwooM6yh/rTlw2fBXYZjpMHL3gAUQupYms
+ X6K1q6axNLrmdbgSiaceuRMIbBjbpI4lIMcfDZ8lSIcTtymue/rCtWXlxfj3bnNezf8oiO3sAU
+ xxwBwzva1JUgR6rtovSIPXwnZLBRQLqtiYQ59C0myZmAE0p/j5moHOZ7bT6gvcMrAJpfWdy5jv
+ Nw5QMUt54PP2OTBqU31c1+8yvV2h2HCJTGD1iPwt1lXN38pe/aR7Ujc/JHbDY626c24wB5abOO
+ TSQ=
+WDCIronportException: Internal
+Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
+  by uls-op-cesaip02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 29 Nov 2022 15:46:02 -0800
+Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4NMJrB0Tssz1Rx15
+        for <linux-block@vger.kernel.org>; Tue, 29 Nov 2022 15:46:01 -0800 (PST)
+Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
+        reason="pass (just generated, assumed good)"
+        header.d=opensource.wdc.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
+        opensource.wdc.com; h=content-transfer-encoding:content-type
+        :in-reply-to:organization:from:content-language:references:to
+        :subject:user-agent:mime-version:date:message-id; s=dkim; t=
+        1669765561; x=1672357562; bh=ycxaYLjYb+ma8DDHfOmlnxZ6kUuyag3iWhX
+        xhAoI4Bs=; b=qHUBIFsDit9tB+442wqkn8FnslJgjothH93jBEv+p37QzdcVqT7
+        JfyO2rDEUbUFU9ySIb6ZZMnZBkjX7o0IfKCBh9VF3scGsxJdsvMdYhmob3Tpcuab
+        QG6jHaofPY0hzIb5TbUHsCGPOi6edYL/y4fqu2zn4hilxMkcewsJd7eFcQmVvb7b
+        41/WHvDf10VLkoY2+XPdKEsfCgSclP6hWS1nxiADYM69SXCQQsVgN48gtFRUhqDm
+        CsGxlhrpkpqISWqICcXfGp/oz1v4MaTTkLG3r0YCNvoZm6NCTsx0miQge60XpbWC
+        vDK9OwTwLp1OVSbohBFP1cwtZh8aadUIFVQ==
+X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
+Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
+        by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
+        with ESMTP id 0IArCSX9xApk for <linux-block@vger.kernel.org>;
+        Tue, 29 Nov 2022 15:46:01 -0800 (PST)
+Received: from [10.225.163.66] (unknown [10.225.163.66])
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4NMJr51fc7z1RvLy;
+        Tue, 29 Nov 2022 15:45:56 -0800 (PST)
+Message-ID: <b22652ee-9cca-a5b1-e9f1-862ed8f0354d@opensource.wdc.com>
+Date:   Wed, 30 Nov 2022 08:45:55 +0900
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.126.230.35]
-X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6NAM11FT025:EE_|CH0PR12MB5371:EE_
-X-MS-Office365-Filtering-Correlation-Id: 0f769a18-bbae-478d-1157-08dad261a564
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: dsNU3nUqq26GInb0yTDhWKXOX3RBQEncqWf19M6FgZkgA14gWDQGdpnN2sazGpOf6oFW/Sw5YQ5FKqvolJs5jPsqzpDTPgRgYTOimVCZ/jiU9nebYkP/GCxYJColtgxpEbOJqfeqyxtmSahRI9Wtwz4QiqNGMIzo5rtRh1u6+ELSSxmlAz89mvcIhe9HI2lnBCl60da+SUhySYUcKdse2CW6QYVPqz0Y6/UyRzdnYZ8l4ZGI9uvsp67PdCx8yrZRC5zwNGTelVaEn0I1iBAjq6Z8N5eRQE1Jbjd6VDdPa8TH7hWuhPb4X6D2sE1IKnEcnCkRRunlnkgafp41eAibdOB0kDs5yIFkLk0x0WjzUC2aAtR0FviBCLDrBQjX47XmFIPInUfyC99G7i8uCL98Z0c/WBCG8dgQWulvBjxS71RHNspQ/kUKScMSGvYton2OYJ62TaPrtGhEjOSwJ3Z39op5XISE0tZUi/Nry6QJSxzt4CjbDyWMSrpRoMJOe9dfH2A2lcTu6ZYQkdw5D+ElTNhsdL6lUk0K+mcPnshEEWkUWarDzxNadU6TO8fgwLj4CZp4xuGc6pGldOna6RJFfivQJ1oyLtZn742Df/YPlDszyRY8IG+xXEe+Gz2/k4t259nj5oIdUwwC4gVf1sK6L0dby4AS60/WxdoXnMz4HkDu23H8TLDfCtbYzolBua4kyp9AqHEYn8x8oFCuBMk0xg==
-X-Forefront-Antispam-Report: CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230022)(4636009)(346002)(39860400002)(376002)(136003)(396003)(451199015)(36840700001)(46966006)(40470700004)(426003)(47076005)(2906002)(83380400001)(2616005)(41300700001)(5660300002)(8936002)(186003)(16526019)(1076003)(336012)(36756003)(40480700001)(36860700001)(40460700003)(82740400003)(82310400005)(107886003)(356005)(7636003)(7696005)(54906003)(110136005)(26005)(478600001)(316002)(6666004)(70206006)(4326008)(8676002)(70586007);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Nov 2022 23:30:05.3399
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0f769a18-bbae-478d-1157-08dad261a564
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT025.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR12MB5371
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.5.0
+Subject: Re: [PATCH v5 10/10] fs: add support for copy file range in zonefs
+To:     Nitesh Shetty <nj.shetty@samsung.com>
+Cc:     axboe@kernel.dk, agk@redhat.com, snitzer@kernel.org,
+        dm-devel@redhat.com, kbusch@kernel.org, hch@lst.de,
+        sagi@grimberg.me, james.smart@broadcom.com, kch@nvidia.com,
+        naohiro.aota@wdc.com, jth@kernel.org, viro@zeniv.linux.org.uk,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org,
+        anuj20.g@samsung.com, joshi.k@samsung.com, p.raghav@samsung.com,
+        nitheshshetty@gmail.com, gost.dev@samsung.com
+References: <20221123055827.26996-1-nj.shetty@samsung.com>
+ <CGME20221123061044epcas5p2ac082a91fc8197821f29e84278b6203c@epcas5p2.samsung.com>
+ <20221123055827.26996-11-nj.shetty@samsung.com>
+ <729254f8-2468-e694-715e-72bcbef80ff3@opensource.wdc.com>
+ <349a4d66-3a9f-a095-005c-1f180c5f3aac@opensource.wdc.com>
+ <20221129122232.GC16802@test-zns>
+Content-Language: en-US
+From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
+Organization: Western Digital Research
+In-Reply-To: <20221129122232.GC16802@test-zns>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-For a Zoned Block Device zone reset all is emulated if underlaying
-device doesn't support REQ_OP_ZONE_RESET_ALL operation. In null_blk
-Zoned mode there is no way to test zone reset all emulation present in
-the block layer since we enable it by default :-
+On 11/29/22 21:22, Nitesh Shetty wrote:
+> Acked. I do see a gap in current zonefs cfr implementation. I will drop this
 
-blkdev_zone_mgmt()
- blkdev_zone_reset_all_emulation() <---
- blkdev_zone_reset_all()
+cfr ?
 
-Add a module parameter zone_reset_all to enable or disable
-REQ_OP_ZONE_RESET_ALL, enable it by default to retain the existing
-behaviour.
+> implementation for next version. Once we finalize on block copy offload
+> implementation, will re-pick this and send with above reviews fixed.
+> 
+> Thank you,
+> Nitesh
 
-Signed-off-by: Chaitanya Kulkarni <kch@nvidia.com>
-Reviewed-by: Damien Le Moal <damien.lemoal@opensource.wdc.com>
----
- drivers/block/null_blk/main.c     | 9 ++++++++-
- drivers/block/null_blk/null_blk.h | 1 +
- drivers/block/null_blk/zoned.c    | 3 ++-
- 3 files changed, 11 insertions(+), 2 deletions(-)
+Please trim your replies.
 
-diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
-index 8b7f42024f14..5dc69f42b46c 100644
---- a/drivers/block/null_blk/main.c
-+++ b/drivers/block/null_blk/main.c
-@@ -260,6 +260,10 @@ static unsigned int g_zone_max_active;
- module_param_named(zone_max_active, g_zone_max_active, uint, 0444);
- MODULE_PARM_DESC(zone_max_active, "Maximum number of active zones when block device is zoned. Default: 0 (no limit)");
- 
-+static bool g_zone_reset_all = true;
-+module_param_named(zone_reset_all, g_zone_reset_all, bool, 0444);
-+MODULE_PARM_DESC(zone_reset_all, "Allow REQ_OP_ZONE_RESET_ALL. Default: true");
-+
- static struct nullb_device *null_alloc_dev(void);
- static void null_free_dev(struct nullb_device *dev);
- static void null_del_dev(struct nullb *nullb);
-@@ -446,6 +450,7 @@ NULLB_DEVICE_ATTR(zone_capacity, ulong, NULL);
- NULLB_DEVICE_ATTR(zone_nr_conv, uint, NULL);
- NULLB_DEVICE_ATTR(zone_max_open, uint, NULL);
- NULLB_DEVICE_ATTR(zone_max_active, uint, NULL);
-+NULLB_DEVICE_ATTR(zone_reset_all, bool, NULL);
- NULLB_DEVICE_ATTR(virt_boundary, bool, NULL);
- NULLB_DEVICE_ATTR(no_sched, bool, NULL);
- NULLB_DEVICE_ATTR(shared_tag_bitmap, bool, NULL);
-@@ -574,6 +579,7 @@ static struct configfs_attribute *nullb_device_attrs[] = {
- 	&nullb_device_attr_zone_nr_conv,
- 	&nullb_device_attr_zone_max_open,
- 	&nullb_device_attr_zone_max_active,
-+	&nullb_device_attr_zone_reset_all,
- 	&nullb_device_attr_virt_boundary,
- 	&nullb_device_attr_no_sched,
- 	&nullb_device_attr_shared_tag_bitmap,
-@@ -639,7 +645,7 @@ static ssize_t memb_group_features_show(struct config_item *item, char *page)
- 			"poll_queues,power,queue_mode,shared_tag_bitmap,size,"
- 			"submit_queues,use_per_node_hctx,virt_boundary,zoned,"
- 			"zone_capacity,zone_max_active,zone_max_open,"
--			"zone_nr_conv,zone_size,write_zeroes\n");
-+			"zone_nr_conv,zone_size,zone_reset_all,write_zeroes\n");
- }
- 
- CONFIGFS_ATTR_RO(memb_group_, features);
-@@ -715,6 +721,7 @@ static struct nullb_device *null_alloc_dev(void)
- 	dev->zone_nr_conv = g_zone_nr_conv;
- 	dev->zone_max_open = g_zone_max_open;
- 	dev->zone_max_active = g_zone_max_active;
-+	dev->zone_reset_all = g_zone_reset_all;
- 	dev->virt_boundary = g_virt_boundary;
- 	dev->no_sched = g_no_sched;
- 	dev->shared_tag_bitmap = g_shared_tag_bitmap;
-diff --git a/drivers/block/null_blk/null_blk.h b/drivers/block/null_blk/null_blk.h
-index e692c2a7369e..e7efe8de4ebf 100644
---- a/drivers/block/null_blk/null_blk.h
-+++ b/drivers/block/null_blk/null_blk.h
-@@ -115,6 +115,7 @@ struct nullb_device {
- 	bool discard; /* if support discard */
- 	bool write_zeroes; /* if support write_zeroes */
- 	bool zoned; /* if device is zoned */
-+	bool zone_reset_all; /* if support REQ_OP_ZONE_RESET_ALL */
- 	bool virt_boundary; /* virtual boundary on/off for the device */
- 	bool no_sched; /* no IO scheduler for the device */
- 	bool shared_tag_bitmap; /* use hostwide shared tags */
-diff --git a/drivers/block/null_blk/zoned.c b/drivers/block/null_blk/zoned.c
-index 55a69e48ef8b..7310d1c3f9ec 100644
---- a/drivers/block/null_blk/zoned.c
-+++ b/drivers/block/null_blk/zoned.c
-@@ -160,7 +160,8 @@ int null_register_zoned_dev(struct nullb *nullb)
- 	struct request_queue *q = nullb->q;
- 
- 	disk_set_zoned(nullb->disk, BLK_ZONED_HM);
--	blk_queue_flag_set(QUEUE_FLAG_ZONE_RESETALL, q);
-+	if (dev->zone_reset_all)
-+		blk_queue_flag_set(QUEUE_FLAG_ZONE_RESETALL, q);
- 	blk_queue_required_elevator_features(q, ELEVATOR_F_ZBD_SEQ_WRITE);
- 
- 	if (queue_is_mq(q)) {
+
 -- 
-2.29.0
+Damien Le Moal
+Western Digital Research
 
