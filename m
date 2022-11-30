@@ -2,102 +2,134 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AA02AC4321E
-	for <linux-block@archiver.kernel.org>; Wed, 30 Nov 2022 20:52:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EDEB6C352A1
+	for <linux-block@archiver.kernel.org>; Wed, 30 Nov 2022 20:59:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229499AbiK3Uw3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 30 Nov 2022 15:52:29 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60262 "EHLO
+        id S229674AbiK3U7Z (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 30 Nov 2022 15:59:25 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37078 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229497AbiK3Uw3 (ORCPT
+        with ESMTP id S229604AbiK3U7Y (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 30 Nov 2022 15:52:29 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B824054B34
-        for <linux-block@vger.kernel.org>; Wed, 30 Nov 2022 12:51:33 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1669841492;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=CQgAOvEZVM6ximlp/shF5gDfXHjOpS9Wecui6IHnldg=;
-        b=G3ejfLXN4J9vsFOCa4F3sB1FODGqosRXpzL4z5oAycR7dWsxFvpu6N0SHn/0X2YX3iAgP2
-        /QhOuRWiXbAdIDKgtGSz414BRGNjsUQjRrpgvIWIS574jkzs2PEAeI/lW/FA+TivNYitCv
-        PikeRR1wngcDAG4d4+POfVWAWmqb2Vc=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-193-DB69oWysORGQKIlKbJtf0A-1; Wed, 30 Nov 2022 15:51:29 -0500
-X-MC-Unique: DB69oWysORGQKIlKbJtf0A-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 983D485A5B6;
-        Wed, 30 Nov 2022 20:51:28 +0000 (UTC)
-Received: from localhost (unknown [10.39.192.71])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id F03BFC15BB4;
-        Wed, 30 Nov 2022 20:51:27 +0000 (UTC)
-Date:   Wed, 30 Nov 2022 15:51:23 -0500
-From:   Stefan Hajnoczi <stefanha@redhat.com>
-To:     Pankaj Raghav <p.raghav@samsung.com>
-Cc:     pbonzini@redhat.com, jasowang@redhat.com, mst@redhat.com,
-        gost.dev@samsung.com, Pankaj Raghav <pankydev8@gmail.com>,
-        axboe@kernel.dk, virtualization@lists.linux-foundation.org,
-        linux-block@vger.kernel.org, Chaitanya Kulkarni <kch@nvidia.com>
-Subject: Re: [PATCH] virtio-blk: replace ida_simple[get|remove] with
- ida_[alloc_range|free]
-Message-ID: <Y4fCS2d2r1YvSExI@fedora>
-References: <CGME20221130123126eucas1p2cd3287ee4e5c03642f1847c50af0e4f2@eucas1p2.samsung.com>
- <20221130123001.25473-1-p.raghav@samsung.com>
+        Wed, 30 Nov 2022 15:59:24 -0500
+Received: from mail-pf1-x431.google.com (mail-pf1-x431.google.com [IPv6:2607:f8b0:4864:20::431])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B451B8324A;
+        Wed, 30 Nov 2022 12:59:23 -0800 (PST)
+Received: by mail-pf1-x431.google.com with SMTP id o1so13419402pfp.12;
+        Wed, 30 Nov 2022 12:59:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=KIYpJVsaC2x+XnAlDSlXu4uym9M5TWj5fDbLd+7AM/E=;
+        b=L3xnIn1wpdKuckgw3HI3r9z5iKC3uwdevPZfrmuw/b1jbfj8jdJZOVswk68vmHn21o
+         GQIMOdSuBk3OSFNfE5YkGrKQYmOAJXxjZ/OOmypnCTW2dKtMhIwfS6REwkk1yvNj/S44
+         J4LLD7cKy1OuyHR0nUgcwYERHY3LZ2sylZS9yV13BTl52i043eQ5AlmWFMaOVx5tO2kv
+         BNcNqw1cIrppabgEjw6zABGeSWTQrfcTf82haH3t3cfS3MRe2qXlDHgp5Unhd3YgnDhR
+         NtaZm7+cfOR/kyaayPzmtzqAGGYUauQcJxb2ozki3p6nIkj0vzpTRSq4i2r6NgotGDR3
+         5oKg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=KIYpJVsaC2x+XnAlDSlXu4uym9M5TWj5fDbLd+7AM/E=;
+        b=7dAGkNExRstk9kxSWkyCjhwPpxTJpeUaNgCxfhWkbtQnD3DK1QhR9ZCxvfOHs18R4Q
+         wLQgISfoYRDt9QYJ/qrWotvyIL6AjwkOGJ6b1Qgw7mARvu7bWLevwX5gQHhQEN+IpJjn
+         czZ1TUzEjyPYLJI4Yb+MuvDHcFcw6h6gAI562R01MKjpncSDRaRIaJnMfQKfUmQLM1eQ
+         np9lL+rGyaL6UoiZnOB0TauqbmFi3eSHnrBY0u9+p8Lf2v5Gr5Tf4xw/9iijoOFIblqA
+         +r1BB257sMTQh/K8m+Rg6/+ZTK27xeT0Q5gOAiD4EJtoz8iuMSpbQls5UjJbX8F5V+LS
+         Nvnw==
+X-Gm-Message-State: ANoB5pmfCZ6uUoHzRRhV+WA9aJNQK/n3n10hhWFwD05cZnY8sB2oaxO6
+        8A7RvaI9ya+JAN4o9klih4s=
+X-Google-Smtp-Source: AA0mqf5+J4DKBqBObKdexlPW8CExyoc0kHyqKk012PaCUZhFrzwVOtdFTWaRHwPNBinKeaYoXXiLAA==
+X-Received: by 2002:a63:134e:0:b0:46e:f011:9563 with SMTP id 14-20020a63134e000000b0046ef0119563mr57561779pgt.451.1669841962972;
+        Wed, 30 Nov 2022 12:59:22 -0800 (PST)
+Received: from localhost (2603-800c-1a02-1bae-a7fa-157f-969a-4cde.res6.spectrum.com. [2603:800c:1a02:1bae:a7fa:157f:969a:4cde])
+        by smtp.gmail.com with ESMTPSA id t15-20020a170902e84f00b00188c9c11559sm1985774plg.1.2022.11.30.12.59.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 30 Nov 2022 12:59:22 -0800 (PST)
+Sender: Tejun Heo <htejun@gmail.com>
+Date:   Wed, 30 Nov 2022 10:59:21 -1000
+From:   Tejun Heo <tj@kernel.org>
+To:     Li Nan <linan122@huawei.com>
+Cc:     josef@toxicpanda.com, axboe@kernel.dk, cgroups@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yukuai3@huawei.com, yi.zhang@huawei.com
+Subject: Re: [PATCH -next v2 9/9] blk-iocost: fix walk_list corruption
+Message-ID: <Y4fEKZy4rTE5rG/5@slm.duckdns.org>
+References: <20221130132156.2836184-1-linan122@huawei.com>
+ <20221130132156.2836184-10-linan122@huawei.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="nHTxRgQR67n6DBCs"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20221130123001.25473-1-p.raghav@samsung.com>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
+In-Reply-To: <20221130132156.2836184-10-linan122@huawei.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Wed, Nov 30, 2022 at 09:21:56PM +0800, Li Nan wrote:
+> From: Yu Kuai <yukuai3@huawei.com>
+> 
+> Our test report a problem:
+> 
+> ------------[ cut here ]------------
+> list_del corruption. next->prev should be ffff888127e0c4b0, but was ffff888127e090b0
+> WARNING: CPU: 2 PID: 3117789 at lib/list_debug.c:62 __list_del_entry_valid+0x119/0x130
+> RIP: 0010:__list_del_entry_valid+0x119/0x130
+> RIP: 0010:__list_del_entry_valid+0x119/0x130
+> Call Trace:
+>  <IRQ>
+>  iocg_flush_stat.isra.0+0x11e/0x230
+>  ? ioc_rqos_done+0x230/0x230
+>  ? ioc_now+0x14f/0x180
+>  ioc_timer_fn+0x569/0x1640
+> 
+> We haven't reporduced it yet, but we think this is due to parent iocg is
+> freed before child iocg, and then in ioc_timer_fn, walk_list is
+> corrupted.
+> 
+> 1) Remove child cgroup can concurrent with remove parent cgroup, and
+> ioc_pd_free for parent iocg can be called before child iocg. This can be
+> fixed by moving the handle of walk_list to ioc_pd_offline, since that
+> offline from child is ensured to be called before parent.
 
---nHTxRgQR67n6DBCs
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Which you already did in a previous patch, right?
 
-On Wed, Nov 30, 2022 at 01:30:03PM +0100, Pankaj Raghav wrote:
-> ida_simple[get|remove] are deprecated, and are just wrappers to
-> ida_[alloc_range|free]. Replace ida_simple[get|remove] with their
-> corresponding counterparts.
->=20
-> No functional changes.
->=20
-> Signed-off-by: Pankaj Raghav <p.raghav@samsung.com>
+> 2) ioc_pd_free can be triggered from both removing device and removing
+> cgroup, this patch fix the problem by deleting timer before deactivating
+> policy, so that free parent iocg first in this case won't matter.
+
+Okay, so, yeah, css's pin parents but blkg's don't. I think the right thing
+to do here is making sure that a child blkg pins its parent (and eventually
+ioc).
+
+> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+> Signed-off-by: Li Nan <linan122@huawei.com>
 > ---
->  drivers/block/virtio_blk.c | 8 ++++----
->  1 file changed, 4 insertions(+), 4 deletions(-)
+>  block/blk-iocost.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/block/blk-iocost.c b/block/blk-iocost.c
+> index 710cf63a1643..d2b873908f88 100644
+> --- a/block/blk-iocost.c
+> +++ b/block/blk-iocost.c
+> @@ -2813,13 +2813,14 @@ static void ioc_rqos_exit(struct rq_qos *rqos)
+>  {
+>  	struct ioc *ioc = rqos_to_ioc(rqos);
+>  
+> +	del_timer_sync(&ioc->timer);
+> +
+>  	blkcg_deactivate_policy(rqos->q, &blkcg_policy_iocost);
+>  
+>  	spin_lock_irq(&ioc->lock);
+>  	ioc->running = IOC_STOP;
+>  	spin_unlock_irq(&ioc->lock);
+>  
+> -	del_timer_sync(&ioc->timer);
 
-Chaitanya proposed a similar patch in the past:
-https://lore.kernel.org/all/20220420041053.7927-5-kch@nvidia.com/
+I don't about this workaround. Let's fix properly?
 
-Your patch calculates the max argument correctly. Looks good.
-
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-
---nHTxRgQR67n6DBCs
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmOHwksACgkQnKSrs4Gr
-c8gQuAf9H2mnAIrELNShopJ32U5cjYPwqU2Bu2qZ5RfQxU83eCwJp7kyw922O4ng
-AOEQx/BV8cXytlv54kXWF2h4AKOAB/vGiIu1yZgF/Bfos9z8mKc9zjgV9G4vdKwf
-NTKrINoBHl1NnSiTDKrA/i1s4rgHU8asU7GcfO0UpX+QBKhM5gG3QYBw6zU4eD2x
-9lQ6S8DIvY16upOMwynUSiZ8ltUVAyBuRq6REZ5H0JtBz6nwvgLR+o344iVDxF6M
-Cl7oWdVVBslv2R+ExTo9zQW8naerHkFGIqrsTKcTcgIPEaVexyL95FcTB7g49wOV
-cfqQpZ04GJz3eDUDd59UWXlcDmcc3w==
-=SjCs
------END PGP SIGNATURE-----
-
---nHTxRgQR67n6DBCs--
-
+-- 
+tejun
