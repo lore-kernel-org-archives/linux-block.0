@@ -2,134 +2,89 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EDEB6C352A1
-	for <linux-block@archiver.kernel.org>; Wed, 30 Nov 2022 20:59:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DF19C4321E
+	for <linux-block@archiver.kernel.org>; Wed, 30 Nov 2022 21:08:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229674AbiK3U7Z (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 30 Nov 2022 15:59:25 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37078 "EHLO
+        id S229519AbiK3VIS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 30 Nov 2022 16:08:18 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42796 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229604AbiK3U7Y (ORCPT
+        with ESMTP id S229456AbiK3VIQ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 30 Nov 2022 15:59:24 -0500
-Received: from mail-pf1-x431.google.com (mail-pf1-x431.google.com [IPv6:2607:f8b0:4864:20::431])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B451B8324A;
-        Wed, 30 Nov 2022 12:59:23 -0800 (PST)
-Received: by mail-pf1-x431.google.com with SMTP id o1so13419402pfp.12;
-        Wed, 30 Nov 2022 12:59:23 -0800 (PST)
+        Wed, 30 Nov 2022 16:08:16 -0500
+Received: from mail-pf1-x429.google.com (mail-pf1-x429.google.com [IPv6:2607:f8b0:4864:20::429])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E420454374;
+        Wed, 30 Nov 2022 13:08:15 -0800 (PST)
+Received: by mail-pf1-x429.google.com with SMTP id r7so476976pfl.11;
+        Wed, 30 Nov 2022 13:08:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=KIYpJVsaC2x+XnAlDSlXu4uym9M5TWj5fDbLd+7AM/E=;
-        b=L3xnIn1wpdKuckgw3HI3r9z5iKC3uwdevPZfrmuw/b1jbfj8jdJZOVswk68vmHn21o
-         GQIMOdSuBk3OSFNfE5YkGrKQYmOAJXxjZ/OOmypnCTW2dKtMhIwfS6REwkk1yvNj/S44
-         J4LLD7cKy1OuyHR0nUgcwYERHY3LZ2sylZS9yV13BTl52i043eQ5AlmWFMaOVx5tO2kv
-         BNcNqw1cIrppabgEjw6zABGeSWTQrfcTf82haH3t3cfS3MRe2qXlDHgp5Unhd3YgnDhR
-         NtaZm7+cfOR/kyaayPzmtzqAGGYUauQcJxb2ozki3p6nIkj0vzpTRSq4i2r6NgotGDR3
-         5oKg==
+        bh=8GLeq4y1VkLChDK5qxV6t3jjI/iORg+c6M0TmX7kjP0=;
+        b=Apb1iWUbB5ph59NuwWq3GeIe1SG2Xnc2Ghfh+Z512kKQUVy0BHy8Xe+4CIpU3ulszy
+         ub8Y8NyUuKCdKtNJLSmNvH4De+/haJKxfuhQ7yUKzGvKD1mvcWbguLuzaHQmzJJTc1S6
+         /33FyHfpujuR0xIbLnLep+jOM+VjSELx9XKKIcX3B71jHSbtdZbUMu51k2Oq4nuBYwbO
+         ulz6t7yHPpy26DRout3+gghJB/gLn8kQ1gWJZrzKRVxd811jlCPKStDzfP24BW0sAJvL
+         wtUHeT/WqoRZm5jQ9rEiykrgkPYa8C8TCSNaPo3WKCnH5E4kabr+VplL0w8PkcLQW1Ah
+         kiBQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=KIYpJVsaC2x+XnAlDSlXu4uym9M5TWj5fDbLd+7AM/E=;
-        b=7dAGkNExRstk9kxSWkyCjhwPpxTJpeUaNgCxfhWkbtQnD3DK1QhR9ZCxvfOHs18R4Q
-         wLQgISfoYRDt9QYJ/qrWotvyIL6AjwkOGJ6b1Qgw7mARvu7bWLevwX5gQHhQEN+IpJjn
-         czZ1TUzEjyPYLJI4Yb+MuvDHcFcw6h6gAI562R01MKjpncSDRaRIaJnMfQKfUmQLM1eQ
-         np9lL+rGyaL6UoiZnOB0TauqbmFi3eSHnrBY0u9+p8Lf2v5Gr5Tf4xw/9iijoOFIblqA
-         +r1BB257sMTQh/K8m+Rg6/+ZTK27xeT0Q5gOAiD4EJtoz8iuMSpbQls5UjJbX8F5V+LS
-         Nvnw==
-X-Gm-Message-State: ANoB5pmfCZ6uUoHzRRhV+WA9aJNQK/n3n10hhWFwD05cZnY8sB2oaxO6
-        8A7RvaI9ya+JAN4o9klih4s=
-X-Google-Smtp-Source: AA0mqf5+J4DKBqBObKdexlPW8CExyoc0kHyqKk012PaCUZhFrzwVOtdFTWaRHwPNBinKeaYoXXiLAA==
-X-Received: by 2002:a63:134e:0:b0:46e:f011:9563 with SMTP id 14-20020a63134e000000b0046ef0119563mr57561779pgt.451.1669841962972;
-        Wed, 30 Nov 2022 12:59:22 -0800 (PST)
+        bh=8GLeq4y1VkLChDK5qxV6t3jjI/iORg+c6M0TmX7kjP0=;
+        b=eYYdI+dTNhQp6Xocdw70S6ou6VSF8LPMwuGiOkf1EbOHPHeRHoedWH0Hudxx1gW8Uq
+         1m7z3WIA9iKh2UTaYvsEurZMxuhz3dJprtQn1LJid4Syi3c6y48Qp1uINZyvbJFIoOX5
+         inc607EIiW66P6u4c7pf9Og0lgezQI5sg7JDPvZTQiEdoSXWO+I1FrddzJwaB2OBcDNC
+         d9JdJSKm1XjfWFmVlic0OyK43AtqvYxliV7anON8QRsmeTrw0V4yTM6zy8Yuy+LQlKAK
+         JZTR4gEBEFaXT1GyqOuKqCRI1MDo1IBHa5FKwRXkE/uWd3Nm28W9ahagJefXFzMgbjTe
+         w2rA==
+X-Gm-Message-State: ANoB5pkXFwLSp/XRsG5nGZWYk6hFP0NA0tfQD5W3cpZw2RryZqStrUzr
+        +RtfxUR03keWdCA/K7lgIBQ=
+X-Google-Smtp-Source: AA0mqf5vWRyTIyu007lBQW6ThPpGsX/6ucDzIPHV91olGo/xHAU3N4ehoDFdv44MIDwmSFZJ7/0DKA==
+X-Received: by 2002:aa7:9f0f:0:b0:575:f36c:967f with SMTP id g15-20020aa79f0f000000b00575f36c967fmr3178291pfr.54.1669842495022;
+        Wed, 30 Nov 2022 13:08:15 -0800 (PST)
 Received: from localhost (2603-800c-1a02-1bae-a7fa-157f-969a-4cde.res6.spectrum.com. [2603:800c:1a02:1bae:a7fa:157f:969a:4cde])
-        by smtp.gmail.com with ESMTPSA id t15-20020a170902e84f00b00188c9c11559sm1985774plg.1.2022.11.30.12.59.22
+        by smtp.gmail.com with ESMTPSA id u24-20020a631418000000b0047022e07035sm1348111pgl.47.2022.11.30.13.08.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 30 Nov 2022 12:59:22 -0800 (PST)
+        Wed, 30 Nov 2022 13:08:14 -0800 (PST)
 Sender: Tejun Heo <htejun@gmail.com>
-Date:   Wed, 30 Nov 2022 10:59:21 -1000
+Date:   Wed, 30 Nov 2022 11:08:13 -1000
 From:   Tejun Heo <tj@kernel.org>
-To:     Li Nan <linan122@huawei.com>
+To:     Kemeng Shi <shikemeng@huawei.com>
 Cc:     josef@toxicpanda.com, axboe@kernel.dk, cgroups@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        yukuai3@huawei.com, yi.zhang@huawei.com
-Subject: Re: [PATCH -next v2 9/9] blk-iocost: fix walk_list corruption
-Message-ID: <Y4fEKZy4rTE5rG/5@slm.duckdns.org>
-References: <20221130132156.2836184-1-linan122@huawei.com>
- <20221130132156.2836184-10-linan122@huawei.com>
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 01/10] blk-throttle: correct stale comment in
+ throtl_pd_init
+Message-ID: <Y4fGPUBBExrm51IH@slm.duckdns.org>
+References: <20221129030147.27400-1-shikemeng@huawei.com>
+ <20221129030147.27400-2-shikemeng@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20221130132156.2836184-10-linan122@huawei.com>
+In-Reply-To: <20221129030147.27400-2-shikemeng@huawei.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Nov 30, 2022 at 09:21:56PM +0800, Li Nan wrote:
-> From: Yu Kuai <yukuai3@huawei.com>
+On Tue, Nov 29, 2022 at 11:01:38AM +0800, Kemeng Shi wrote:
+> On the default hierarchy (cgroup2), the throttle interface files don't
+> exist in the root cgroup, so the ablity to limit the whole system
+> by configuring root group is not existing anymore. In general, cgroup
+> doesn't wanna be in the business of restricting resources at the
+> system level, so correct the stale comment that we can limit whole
+> system to we can only limit subtree.
 > 
-> Our test report a problem:
-> 
-> ------------[ cut here ]------------
-> list_del corruption. next->prev should be ffff888127e0c4b0, but was ffff888127e090b0
-> WARNING: CPU: 2 PID: 3117789 at lib/list_debug.c:62 __list_del_entry_valid+0x119/0x130
-> RIP: 0010:__list_del_entry_valid+0x119/0x130
-> RIP: 0010:__list_del_entry_valid+0x119/0x130
-> Call Trace:
->  <IRQ>
->  iocg_flush_stat.isra.0+0x11e/0x230
->  ? ioc_rqos_done+0x230/0x230
->  ? ioc_now+0x14f/0x180
->  ioc_timer_fn+0x569/0x1640
-> 
-> We haven't reporduced it yet, but we think this is due to parent iocg is
-> freed before child iocg, and then in ioc_timer_fn, walk_list is
-> corrupted.
-> 
-> 1) Remove child cgroup can concurrent with remove parent cgroup, and
-> ioc_pd_free for parent iocg can be called before child iocg. This can be
-> fixed by moving the handle of walk_list to ioc_pd_offline, since that
-> offline from child is ensured to be called before parent.
+> Signed-off-by: Kemeng Shi <shikemeng@huawei.com>
 
-Which you already did in a previous patch, right?
+Acked-by: Tejun Heo <tj@kernel.org>
 
-> 2) ioc_pd_free can be triggered from both removing device and removing
-> cgroup, this patch fix the problem by deleting timer before deactivating
-> policy, so that free parent iocg first in this case won't matter.
+> +	 * read_bps limit is set on a "parent" group, summary bps of
+> +	 * "parent" group and its subtree groups can't exceed 16M for the
 
-Okay, so, yeah, css's pin parents but blkg's don't. I think the right thing
-to do here is making sure that a child blkg pins its parent (and eventually
-ioc).
-
-> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
-> Signed-off-by: Li Nan <linan122@huawei.com>
-> ---
->  block/blk-iocost.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/block/blk-iocost.c b/block/blk-iocost.c
-> index 710cf63a1643..d2b873908f88 100644
-> --- a/block/blk-iocost.c
-> +++ b/block/blk-iocost.c
-> @@ -2813,13 +2813,14 @@ static void ioc_rqos_exit(struct rq_qos *rqos)
->  {
->  	struct ioc *ioc = rqos_to_ioc(rqos);
->  
-> +	del_timer_sync(&ioc->timer);
-> +
->  	blkcg_deactivate_policy(rqos->q, &blkcg_policy_iocost);
->  
->  	spin_lock_irq(&ioc->lock);
->  	ioc->running = IOC_STOP;
->  	spin_unlock_irq(&ioc->lock);
->  
-> -	del_timer_sync(&ioc->timer);
-
-I don't about this workaround. Let's fix properly?
+but why the quotes around parent?
 
 -- 
 tejun
