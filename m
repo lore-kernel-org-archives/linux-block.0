@@ -2,108 +2,102 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 377CEC4321E
-	for <linux-block@archiver.kernel.org>; Wed, 30 Nov 2022 20:50:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AA02AC4321E
+	for <linux-block@archiver.kernel.org>; Wed, 30 Nov 2022 20:52:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229625AbiK3Uuc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 30 Nov 2022 15:50:32 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59938 "EHLO
+        id S229499AbiK3Uw3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 30 Nov 2022 15:52:29 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60262 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229499AbiK3Uub (ORCPT
+        with ESMTP id S229497AbiK3Uw3 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 30 Nov 2022 15:50:31 -0500
-Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF1207E431;
-        Wed, 30 Nov 2022 12:50:29 -0800 (PST)
-Received: by mail-pj1-x102e.google.com with SMTP id o12so8937770pjo.4;
-        Wed, 30 Nov 2022 12:50:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=HY7HR+jxU6TKM04v8zsj6/Dqk0zLgSsOGTMBo35NxdY=;
-        b=BP6ht7VEuPlqXkYDyD/Uy4Vfo9GZIQRn2NXCSz31myYLsS/qsm4c23xVx7FpBTlxCA
-         Mr6yS7bSbO79UEnQYaajN846XpciQ/Dx3c82KEzkU1+FF7b9JAKqjn3U+iRH6ocXglja
-         6qxlpvDHVlMAiqeX6pn57vP31gsUzuBJgcZ27+YDDI56REblo/n8ZFXvq5jG9F17zWFx
-         9pSC5Kvn1zOUkaSY3dCXlpy2c2odJBfBI5PxT7DGYQX6IiasEmjB5wxXIgbn9HKndMFe
-         TvQaedBj+0RUPVdLc/2trbZiy3bTD6Q4ZVfd+Uic6WfxL86VANrSHyVXe2CkucO3OcHa
-         OCPg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=HY7HR+jxU6TKM04v8zsj6/Dqk0zLgSsOGTMBo35NxdY=;
-        b=lGKng8RaNHh4lTE7qgir/y4BNCCsscdfItYrCo+4MjY9JrRc+iYM3b/3jCR+NqqEQc
-         f/zVCra2HF1tJ3Wzv2uCBp05Uoqwtds00aOk0WFZLKDKx3U0lMOqZz6GaBlDm4Ii+LzQ
-         ralJbZLdqIGT+P/1GzhbINNrhWf5jbx2d4x0wJ0prdNHkxOG4vD9RRZerm4xzbXQwfdO
-         fK5GJcMfQJ2itJr4ehBSmtgt/17L9nvtC7MCNiY8qGaIJSqdO5v7EfSZc74cGQ02yQZ2
-         4TSr2gKKjs8Wa+NotM5OI5hDKU6mfax4ndZVRezmpBh6os6r1GxvYq79GyP5hPu276Y1
-         JrHg==
-X-Gm-Message-State: ANoB5pmRRwwvoscGs1D7j8VRkn5eZbuv4W48REiBGmNi3qbxXWIP27cr
-        P7IR9z43hDtOrbxRmeLLGdM=
-X-Google-Smtp-Source: AA0mqf4kQbVJGQ+mtfgB9XlMLOfJIYT6+xkzZGNGUROWUtVztwRb3YTHLfunSpX4m0hgMa/EeIOV5Q==
-X-Received: by 2002:a17:902:8e81:b0:188:4f86:e4d5 with SMTP id bg1-20020a1709028e8100b001884f86e4d5mr46097595plb.16.1669841429022;
-        Wed, 30 Nov 2022 12:50:29 -0800 (PST)
-Received: from localhost (2603-800c-1a02-1bae-a7fa-157f-969a-4cde.res6.spectrum.com. [2603:800c:1a02:1bae:a7fa:157f:969a:4cde])
-        by smtp.gmail.com with ESMTPSA id i20-20020a170902e49400b00168dadc7354sm1921642ple.78.2022.11.30.12.50.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 30 Nov 2022 12:50:28 -0800 (PST)
-Sender: Tejun Heo <htejun@gmail.com>
-Date:   Wed, 30 Nov 2022 10:50:27 -1000
-From:   Tejun Heo <tj@kernel.org>
-To:     Li Nan <linan122@huawei.com>
-Cc:     josef@toxicpanda.com, axboe@kernel.dk, cgroups@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        yukuai3@huawei.com, yi.zhang@huawei.com
-Subject: Re: [PATCH -next v2 8/9] block: fix null-pointer dereference in
- ioc_pd_init
-Message-ID: <Y4fCE7XxcpDfWyDJ@slm.duckdns.org>
-References: <20221130132156.2836184-1-linan122@huawei.com>
- <20221130132156.2836184-9-linan122@huawei.com>
+        Wed, 30 Nov 2022 15:52:29 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B824054B34
+        for <linux-block@vger.kernel.org>; Wed, 30 Nov 2022 12:51:33 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1669841492;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=CQgAOvEZVM6ximlp/shF5gDfXHjOpS9Wecui6IHnldg=;
+        b=G3ejfLXN4J9vsFOCa4F3sB1FODGqosRXpzL4z5oAycR7dWsxFvpu6N0SHn/0X2YX3iAgP2
+        /QhOuRWiXbAdIDKgtGSz414BRGNjsUQjRrpgvIWIS574jkzs2PEAeI/lW/FA+TivNYitCv
+        PikeRR1wngcDAG4d4+POfVWAWmqb2Vc=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-193-DB69oWysORGQKIlKbJtf0A-1; Wed, 30 Nov 2022 15:51:29 -0500
+X-MC-Unique: DB69oWysORGQKIlKbJtf0A-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 983D485A5B6;
+        Wed, 30 Nov 2022 20:51:28 +0000 (UTC)
+Received: from localhost (unknown [10.39.192.71])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id F03BFC15BB4;
+        Wed, 30 Nov 2022 20:51:27 +0000 (UTC)
+Date:   Wed, 30 Nov 2022 15:51:23 -0500
+From:   Stefan Hajnoczi <stefanha@redhat.com>
+To:     Pankaj Raghav <p.raghav@samsung.com>
+Cc:     pbonzini@redhat.com, jasowang@redhat.com, mst@redhat.com,
+        gost.dev@samsung.com, Pankaj Raghav <pankydev8@gmail.com>,
+        axboe@kernel.dk, virtualization@lists.linux-foundation.org,
+        linux-block@vger.kernel.org, Chaitanya Kulkarni <kch@nvidia.com>
+Subject: Re: [PATCH] virtio-blk: replace ida_simple[get|remove] with
+ ida_[alloc_range|free]
+Message-ID: <Y4fCS2d2r1YvSExI@fedora>
+References: <CGME20221130123126eucas1p2cd3287ee4e5c03642f1847c50af0e4f2@eucas1p2.samsung.com>
+ <20221130123001.25473-1-p.raghav@samsung.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="nHTxRgQR67n6DBCs"
 Content-Disposition: inline
-In-Reply-To: <20221130132156.2836184-9-linan122@huawei.com>
+In-Reply-To: <20221130123001.25473-1-p.raghav@samsung.com>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Nov 30, 2022 at 09:21:55PM +0800, Li Nan wrote:
-> Remove block device when iocost is initializing may cause
-> null-pointer dereference:
-> 
-> 	CPU1				   CPU2
->   ioc_qos_write
->    blkcg_conf_open_bdev
->     blkdev_get_no_open
->      kobject_get_unless_zero
->     blk_iocost_init
->      rq_qos_add
->   					del_gendisk
->   					 rq_qos_exit
->   					  q->rq_qos = rqos->next
->   					   //iocost is removed from q->roqs
->       blkcg_activate_policy
->        pd_init_fn
->         ioc_pd_init
->   	 ioc = q_to_ioc(blkg->q)
->  	  //cant find iocost and return null
-> 
-> Fix problem by moving rq_qos_exit() to disk_release(). ioc_qos_write() get
-> bd_device.kobj in blkcg_conf_open_bdev(), so disk_release will not be
-> actived until iocost initialization is complited.
 
-I think it'd be better to make del_gendisk wait for these in-flight
-operations because this might fix the above particular issue but now all the
-policies are exposed to request_queue in a state it never expected before.
+--nHTxRgQR67n6DBCs
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-del_gendisk() is quiescing the queue around rq_qos_exit(), so maybe we can
-piggyback on that and update blkcg_conf_open_bdev() to provide such
-exclusion?
+On Wed, Nov 30, 2022 at 01:30:03PM +0100, Pankaj Raghav wrote:
+> ida_simple[get|remove] are deprecated, and are just wrappers to
+> ida_[alloc_range|free]. Replace ida_simple[get|remove] with their
+> corresponding counterparts.
+>=20
+> No functional changes.
+>=20
+> Signed-off-by: Pankaj Raghav <p.raghav@samsung.com>
+> ---
+>  drivers/block/virtio_blk.c | 8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
 
-Thanks.
+Chaitanya proposed a similar patch in the past:
+https://lore.kernel.org/all/20220420041053.7927-5-kch@nvidia.com/
 
--- 
-tejun
+Your patch calculates the max argument correctly. Looks good.
+
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+
+--nHTxRgQR67n6DBCs
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmOHwksACgkQnKSrs4Gr
+c8gQuAf9H2mnAIrELNShopJ32U5cjYPwqU2Bu2qZ5RfQxU83eCwJp7kyw922O4ng
+AOEQx/BV8cXytlv54kXWF2h4AKOAB/vGiIu1yZgF/Bfos9z8mKc9zjgV9G4vdKwf
+NTKrINoBHl1NnSiTDKrA/i1s4rgHU8asU7GcfO0UpX+QBKhM5gG3QYBw6zU4eD2x
+9lQ6S8DIvY16upOMwynUSiZ8ltUVAyBuRq6REZ5H0JtBz6nwvgLR+o344iVDxF6M
+Cl7oWdVVBslv2R+ExTo9zQW8naerHkFGIqrsTKcTcgIPEaVexyL95FcTB7g49wOV
+cfqQpZ04GJz3eDUDd59UWXlcDmcc3w==
+=SjCs
+-----END PGP SIGNATURE-----
+
+--nHTxRgQR67n6DBCs--
+
