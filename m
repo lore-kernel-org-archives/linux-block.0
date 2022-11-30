@@ -2,245 +2,103 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E1C0C4708C
-	for <linux-block@archiver.kernel.org>; Wed, 30 Nov 2022 20:24:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CBA4C4321E
+	for <linux-block@archiver.kernel.org>; Wed, 30 Nov 2022 20:32:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229628AbiK3UYl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 30 Nov 2022 15:24:41 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33352 "EHLO
+        id S230287AbiK3Uco (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 30 Nov 2022 15:32:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42462 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229748AbiK3UYW (ORCPT
+        with ESMTP id S229941AbiK3UcC (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 30 Nov 2022 15:24:22 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 93B3CF75;
-        Wed, 30 Nov 2022 12:24:20 -0800 (PST)
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2AUJABSr011530;
-        Wed, 30 Nov 2022 20:24:07 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=w1peTonDZuxenXexGE4C0Bx6s+Dx3567tMu20D0uLq4=;
- b=RDHU4y3DrNm3x86yFl1N9rajTabd8T9oTa4bgpidtb6l1WGLmGTSesTfBpPEycn79arD
- YkkXPB6iUhPxj7WcT/G3TER/j0X/LUX1+DP4+TgSr0omzq6Qt98wZj0H3ua1rdbiwvMu
- l+VFFibfjry11q0KvqeUrPP0Cbh3fFjpOqSRA2xlXkv+QY9xEKV1DpiUoWaS+Vnp2QQu
- YQ1B5zhCvivHQ6EarToTkcvcSPSk8hH15a72rGKSQiRYSv+UWm8/eQHAVGOeZsziZIW2
- 4+tTJeJ1jJ/UoymGuKLFPPtQpzW+nPBCIJOtBs9cQCMOfSQxFkw/FjtU6/rDjq8xm14A Uw== 
-Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com [169.63.214.131])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3m6bednhy6-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 30 Nov 2022 20:24:06 +0000
-Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
-        by ppma01dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2AUKLWDt009268;
-        Wed, 30 Nov 2022 20:24:05 GMT
-Received: from smtprelay02.wdc07v.mail.ibm.com ([9.208.129.120])
-        by ppma01dal.us.ibm.com with ESMTP id 3m3aeae0y3-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 30 Nov 2022 20:24:05 +0000
-Received: from smtpav01.dal12v.mail.ibm.com (smtpav01.dal12v.mail.ibm.com [10.241.53.100])
-        by smtprelay02.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2AUKO4gu38142252
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 30 Nov 2022 20:24:04 GMT
-Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 2804058059;
-        Wed, 30 Nov 2022 20:24:04 +0000 (GMT)
-Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 12D0158058;
-        Wed, 30 Nov 2022 20:24:03 +0000 (GMT)
-Received: from rhel-laptop.ibm.com.com (unknown [9.160.99.100])
-        by smtpav01.dal12v.mail.ibm.com (Postfix) with ESMTP;
-        Wed, 30 Nov 2022 20:24:02 +0000 (GMT)
-From:   gjoyce@linux.vnet.ibm.com
-To:     linux-block@vger.kernel.org
-Cc:     linuxppc-dev@lists.ozlabs.org, jonathan.derrick@linux.dev,
-        brking@linux.vnet.ibm.com, msuchanek@suse.de, mpe@ellerman.id.au,
-        nayna@linux.ibm.com, axboe@kernel.dk, akpm@linux-foundation.org,
-        gjoyce@linux.vnet.ibm.com, keyrings@vger.kernel.org
-Subject: [PATCH v5 2/3] powerpc/pseries: PLPKS SED Opal keystore support
-Date:   Wed, 30 Nov 2022 14:23:57 -0600
-Message-Id: <20221130202358.18034-3-gjoyce@linux.vnet.ibm.com>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20221130202358.18034-1-gjoyce@linux.vnet.ibm.com>
-References: <20221130202358.18034-1-gjoyce@linux.vnet.ibm.com>
+        Wed, 30 Nov 2022 15:32:02 -0500
+Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 19E7F54475;
+        Wed, 30 Nov 2022 12:31:30 -0800 (PST)
+Received: by mail-pj1-x102e.google.com with SMTP id o5-20020a17090a678500b00218cd5a21c9so3470050pjj.4;
+        Wed, 30 Nov 2022 12:31:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=zERogrghEXBrjx46RlEGcBUab/oF8o5TSfDWdWk3204=;
+        b=CbBJH1iSFlP/+nWb9lr6aDG63sPp/lrVxYD5U9xyWoQntUFWySjlkoLu5qHG6HjIGf
+         XG+btjog3tUDwuH4Zx62q9zDDXiniyM0ILQ94Y8hyBEF5bAxpXwloJxWsNMeB2WTH2bW
+         M0SWvKno+eCyw3zJIrlZPSVggxp0wo44y6OFZl1Wbg64Ds+TWOepX6dVmaBCvLPGo2zg
+         VdWK8QSRqkSvOOwa4d3HX1VnjliG25vSJcSSHftki7wTOsmOjNYBaiQL6fC3nJNkKfkI
+         PJA/7D1kOpFCnZaYehRAFxs8Lh3fRmjLMRRTMRSFAqjJG6PyRS6DAC82ODpJbPIMKiKY
+         hH5w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=zERogrghEXBrjx46RlEGcBUab/oF8o5TSfDWdWk3204=;
+        b=KJOynGteEWKTvwQtX/AlZ60JeDhVeC7KOJDb4yEO0nkeqB8KB9uV+QKYkCTY4MTgn6
+         UIbBDA9/lqnNTbTq+BLYym+VVx8/Yk3fqBsaCP7cGE3CjvYg46JRlb6rpsAxPwOLk0sm
+         7h/bwi3CqgWhERStAEcmMnBUBCHJ8oZE4pNOu87ZHSfGjTGnq7sK+tJIVZZPLKqH98Kr
+         6+5FSSlorwK3eRfn+G2GzSJsrLePV/AqdtBFqy0vh3Iwmfepr2WV2cvMGJTKdrrJHZdd
+         Ef7m+70d4tOf+jMhNT9DlqhyAnu99i0EOTe9p9MrweU6pfw6B2h9WWgWpzgQ/tOufHV0
+         XMrg==
+X-Gm-Message-State: ANoB5pm3EzcRhU7Wyk3M5mKNoUvia/tD7wI+OlfJBS9WolQiM897rJC0
+        RFAx6TwfIM4wT6VX3qJiDUw=
+X-Google-Smtp-Source: AA0mqf4VM80Ds16sfnw7neteYzn/Ov1p8FE5iG3YyqDlZxPhDtrE9KPBjmNgn6cwqx3CRV7oc7Y4Ew==
+X-Received: by 2002:a17:902:bf06:b0:17b:d6ad:94c8 with SMTP id bi6-20020a170902bf0600b0017bd6ad94c8mr57718162plb.110.1669840289398;
+        Wed, 30 Nov 2022 12:31:29 -0800 (PST)
+Received: from localhost (2603-800c-1a02-1bae-a7fa-157f-969a-4cde.res6.spectrum.com. [2603:800c:1a02:1bae:a7fa:157f:969a:4cde])
+        by smtp.gmail.com with ESMTPSA id d13-20020aa797ad000000b00574a82bb877sm1760832pfq.203.2022.11.30.12.31.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 30 Nov 2022 12:31:28 -0800 (PST)
+Sender: Tejun Heo <htejun@gmail.com>
+Date:   Wed, 30 Nov 2022 10:31:27 -1000
+From:   Tejun Heo <tj@kernel.org>
+To:     Li Nan <linan122@huawei.com>
+Cc:     josef@toxicpanda.com, axboe@kernel.dk, cgroups@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yukuai3@huawei.com, yi.zhang@huawei.com
+Subject: Re: [PATCH -next v2 1/9] blk-iocost: cleanup ioc_qos_write() and
+ ioc_cost_model_write()
+Message-ID: <Y4e9n89vJ45+9WD2@slm.duckdns.org>
+References: <20221130132156.2836184-1-linan122@huawei.com>
+ <20221130132156.2836184-2-linan122@huawei.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: WQVGc5sBIZT3cez3D_f-UwHPMq8aeway
-X-Proofpoint-GUID: WQVGc5sBIZT3cez3D_f-UwHPMq8aeway
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
- definitions=2022-11-30_04,2022-11-30_02,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 clxscore=1015
- mlxlogscore=999 mlxscore=0 lowpriorityscore=0 bulkscore=0 spamscore=0
- impostorscore=0 malwarescore=0 adultscore=0 suspectscore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2210170000 definitions=main-2211300141
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221130132156.2836184-2-linan122@huawei.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Greg Joyce <gjoyce@linux.vnet.ibm.com>
+On Wed, Nov 30, 2022 at 09:21:48PM +0800, Li Nan wrote:
+> @@ -3197,6 +3197,7 @@ static ssize_t ioc_qos_write(struct kernfs_open_file *of, char *input,
+>  	enable = ioc->enabled;
+>  	user = ioc->user_qos_params;
+>  
+> +	ret = -EINVAL;
+>  	while ((p = strsep(&input, " \t\n"))) {
+>  		substring_t args[MAX_OPT_ARGS];
+>  		char buf[32];
+> @@ -3218,7 +3219,7 @@ static ssize_t ioc_qos_write(struct kernfs_open_file *of, char *input,
+>  			else if (!strcmp(buf, "user"))
+>  				user = true;
+>  			else
+> -				goto einval;
+> +				goto out_unlock;
 
-Define operations for SED Opal to read/write keys
-from POWER LPAR Platform KeyStore(PLPKS). This allows
-for non-volatile storage of SED Opal keys.
+So, I kinda dislike it. That's a lot of code to cover with one "ret =
+-EINVAL" assignment which makes it pretty easy to make a mistake. People use
+variables like i, ret, err without thinking much and it doesn't help that
+you now can't tell whether a given exit condition is error or not by just
+looking at it.
 
-Signed-off-by: Greg Joyce <gjoyce@linux.vnet.ibm.com>
-Reviewed-by: Jonathan Derrick <jonathan.derrick@linux.dev>
----
- arch/powerpc/platforms/pseries/Makefile       |   1 +
- .../powerpc/platforms/pseries/plpks_sed_ops.c | 129 ++++++++++++++++++
- 2 files changed, 130 insertions(+)
- create mode 100644 arch/powerpc/platforms/pseries/plpks_sed_ops.c
+I don't know what great extra insight the return value from match_u64()
+would carry (like, what else is it gonna say? and even if it does why does
+that matter when we say -EINVAL to pretty much everything else) so I'm not
+sure this matters but if you really want it just add a separate error return
+label?
 
-diff --git a/arch/powerpc/platforms/pseries/Makefile b/arch/powerpc/platforms/pseries/Makefile
-index 92310202bdd7..5bedc06ee2cc 100644
---- a/arch/powerpc/platforms/pseries/Makefile
-+++ b/arch/powerpc/platforms/pseries/Makefile
-@@ -28,6 +28,7 @@ obj-$(CONFIG_PPC_SPLPAR)	+= vphn.o
- obj-$(CONFIG_PPC_SVM)		+= svm.o
- obj-$(CONFIG_FA_DUMP)		+= rtas-fadump.o
- obj-$(CONFIG_PSERIES_PLPKS) += plpks.o
-+obj-$(CONFIG_PSERIES_PLPKS) += plpks_sed_ops.o
- 
- obj-$(CONFIG_SUSPEND)		+= suspend.o
- obj-$(CONFIG_PPC_VAS)		+= vas.o vas-sysfs.o
-diff --git a/arch/powerpc/platforms/pseries/plpks_sed_ops.c b/arch/powerpc/platforms/pseries/plpks_sed_ops.c
-new file mode 100644
-index 000000000000..cd1084d07716
---- /dev/null
-+++ b/arch/powerpc/platforms/pseries/plpks_sed_ops.c
-@@ -0,0 +1,129 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * POWER Platform specific code for non-volatile SED key access
-+ * Copyright (C) 2022 IBM Corporation
-+ *
-+ * Define operations for SED Opal to read/write keys
-+ * from POWER LPAR Platform KeyStore(PLPKS).
-+ *
-+ * Self Encrypting Drives(SED) key storage using PLPKS
-+ */
-+
-+#include <linux/kernel.h>
-+#include <linux/slab.h>
-+#include <linux/string.h>
-+#include <linux/ioctl.h>
-+#include <linux/sed-opal-key.h>
-+#include "plpks.h"
-+
-+/*
-+ * structure that contains all SED data
-+ */
-+struct plpks_sed_object_data {
-+	u_char version;
-+	u_char pad1[7];
-+	u_long authority;
-+	u_long range;
-+	u_int  key_len;
-+	u_char key[32];
-+};
-+
-+#define PLPKS_PLATVAR_POLICY            WORLDREADABLE
-+#define PLPKS_PLATVAR_OS_COMMON         4
-+
-+#define PLPKS_SED_OBJECT_DATA_V0        0
-+#define PLPKS_SED_MANGLED_LABEL         "/default/pri"
-+#define PLPKS_SED_COMPONENT             "sed-opal"
-+#define PLPKS_SED_KEY                   "opal-boot-pin"
-+
-+/*
-+ * authority is admin1 and range is global
-+ */
-+#define PLPKS_SED_AUTHORITY  0x0000000900010001
-+#define PLPKS_SED_RANGE      0x0000080200000001
-+
-+void plpks_init_var(struct plpks_var *var, char *keyname)
-+{
-+	var->name = keyname;
-+	var->namelen = strlen(keyname);
-+	if (strcmp(PLPKS_SED_KEY, keyname) == 0) {
-+		var->name = PLPKS_SED_MANGLED_LABEL;
-+		var->namelen = strlen(keyname);
-+	}
-+	var->policy = PLPKS_PLATVAR_POLICY;
-+	var->os = PLPKS_PLATVAR_OS_COMMON;
-+	var->data = NULL;
-+	var->datalen = 0;
-+	var->component = PLPKS_SED_COMPONENT;
-+}
-+
-+/*
-+ * Read the SED Opal key from PLPKS given the label
-+ */
-+int sed_read_key(char *keyname, char *key, u_int *keylen)
-+{
-+	struct plpks_var var;
-+	struct plpks_sed_object_data *data;
-+	u_int offset;
-+	int ret;
-+	u_int len;
-+
-+	plpks_init_var(&var, keyname);
-+
-+	ret = plpks_read_os_var(&var);
-+	if (ret != 0)
-+		return ret;
-+
-+	offset = offsetof(struct plpks_sed_object_data, key);
-+	if (offset > var.datalen) {
-+		kfree(var.data);
-+		return -EINVAL;
-+	}
-+
-+	data = (struct plpks_sed_object_data *)var.data;
-+	len = min(be32_to_cpu(data->key_len), *keylen);
-+
-+	if (var.data) {
-+		memcpy(key, data->key, len);
-+		kfree(var.data);
-+	} else
-+		len = 0;
-+
-+	key[len] = '\0';
-+	*keylen = len;
-+
-+	return 0;
-+}
-+
-+/*
-+ * Write the SED Opal key to PLPKS given the label
-+ */
-+int sed_write_key(char *keyname, char *key, u_int keylen)
-+{
-+	struct plpks_var var;
-+	struct plpks_sed_object_data data;
-+	struct plpks_var_name vname;
-+
-+	plpks_init_var(&var, keyname);
-+
-+	var.datalen = sizeof(struct plpks_sed_object_data);
-+	var.data = (u8 *)&data;
-+
-+	/* initialize SED object */
-+	data.version = PLPKS_SED_OBJECT_DATA_V0;
-+	data.authority = cpu_to_be64(PLPKS_SED_AUTHORITY);
-+	data.range = cpu_to_be64(PLPKS_SED_RANGE);
-+	memset(&data.pad1, '\0', sizeof(data.pad1));
-+	data.key_len = cpu_to_be32(keylen);
-+	memcpy(data.key, (char *)key, keylen);
-+
-+	/*
-+	 * Key update requires remove first. The return value
-+	 * is ignored since it's okay if the key doesn't exist.
-+	 */
-+	vname.namelen = var.namelen;
-+	vname.name = var.name;
-+	plpks_remove_var(var.component, var.os, vname);
-+
-+	return plpks_write_var(var);
-+}
+Thanks.
+
 -- 
-gjoyce@linux.vnet.ibm.com
-
+tejun
