@@ -2,95 +2,87 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 65480C433FE
-	for <linux-block@archiver.kernel.org>; Wed, 30 Nov 2022 18:09:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AD11CC352A1
+	for <linux-block@archiver.kernel.org>; Wed, 30 Nov 2022 20:20:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229624AbiK3SJZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 30 Nov 2022 13:09:25 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35714 "EHLO
+        id S229963AbiK3UUA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 30 Nov 2022 15:20:00 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55498 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229791AbiK3SJW (ORCPT
+        with ESMTP id S229999AbiK3UTl (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 30 Nov 2022 13:09:22 -0500
-Received: from mail-io1-xd34.google.com (mail-io1-xd34.google.com [IPv6:2607:f8b0:4864:20::d34])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9B31837FB
-        for <linux-block@vger.kernel.org>; Wed, 30 Nov 2022 10:09:20 -0800 (PST)
-Received: by mail-io1-xd34.google.com with SMTP id q21so12851170iod.4
-        for <linux-block@vger.kernel.org>; Wed, 30 Nov 2022 10:09:20 -0800 (PST)
+        Wed, 30 Nov 2022 15:19:41 -0500
+Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BFE889AE0A;
+        Wed, 30 Nov 2022 12:15:05 -0800 (PST)
+Received: by mail-pl1-x62c.google.com with SMTP id y17so9911127plp.3;
+        Wed, 30 Nov 2022 12:15:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=XS+6eK6sqFTnF9upSPizw27nH/W7NsnvcHiGtviZZKs=;
-        b=ufJFfvrGXhOUjKAFpGp+19sYd38G3J5p/0qAff6W5yQLgEGCVfJDwU8e3eR9bppSVX
-         cGtMDB7o/JEizhfmNpgqzZg4Eht73VhUhP4lPG0iUL9vTqQT7XeTR/owBAqekzJF5T/g
-         hOFeD/F2XQ5SkHz+FfFHHKmkTEP8urIEbx1WmplrGCTnwu2Pzr4sEZFx7WJXXSBgPi8O
-         PTgH+vDkohAPSt6TwOyxRrNz24GHjSkiB6KzCtCE3adp5dEJsV75TumSPn0018P4ZGGR
-         pXUselvX3Z14lHw9W+yZP7uJBDsbdEA/UgQNR/Lxnn21wwA0ldGRCzLpuioAAyApflYR
-         1YyA==
+        d=gmail.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=v3g9mSSTzBVgbdJrFv6g4zSJhT5rvOWrA1mwwXQAvko=;
+        b=NnQ1jmB4WIykg8PlJ1nvAeT8NodTppKpNNw5V8wAg7twFnjXER3jxgeXtinbAZOipL
+         Iqdoqym1NEW5yg+yI0NB++i7g+Ou5mxRqZTTx5p240lN0z8rX8wBQvxQDyqvpxPTDeuw
+         Ene8U600qy0MCvtjXul4oa6mbz9hf6l8preNi0VRD89TBvgVjTw++amZqBpCErV9IjyV
+         BDepgmdUBmzgZ5/aXjRpn0G6Dm91zxoZM905O13+vTAQRIeKoB1SotMtiijyP+0Pyf4J
+         XZLhtjtxiaMVzNzu9kONvMLvjaMfr1x1+S3DoJQGLBW6ObOPOo4wToh+mJ5tsGwsiEFN
+         KNnA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=XS+6eK6sqFTnF9upSPizw27nH/W7NsnvcHiGtviZZKs=;
-        b=mw35TWRg5acC5EaIstVOKF8ykzhgeaWoFRlG3/IYXYoCyWkaZcMh+sxb9W/uYRGvhr
-         VbTl19PzZyyg2tNOqZL0DbIwX51BeNEgcf3o8BBs0eIkoNImLBruIP198RphFw3pnQQC
-         tJ8PAUljMWu5CwWBuksYdaSADemWhLnyRH+59JNi+sYlwcUXit0e0Qaz4Llq3gc5jbMl
-         2hebhDAozyJtXTjXnSpMRedm8A3XSn9oxKUje8be1RlfccAaJJ7jCchF8zu+cWSJjWAf
-         fryXZXoEBtWuScAET72piKWN21cuw192RmrMLE0M7EZhjUXTfwblrKhG/0sW5QG8SIRi
-         UaOg==
-X-Gm-Message-State: ANoB5pnIF1wNRbh2WaV8UU+gUgB0On2AQgX0Zex6hu8v4bumySEEbmQs
-        TVTCKKQVLOJcESoHNa+Ui+iWv9QxXqAKZhOV
-X-Google-Smtp-Source: AA0mqf4Xf64zZgFEBWU0LRNZCGhn4k9fSO5+Qx9uinShhYDJAtDlQc4QoPJOZPW8EAOQ3HJE3MmF5w==
-X-Received: by 2002:a6b:4402:0:b0:6c3:996b:5960 with SMTP id r2-20020a6b4402000000b006c3996b5960mr19750668ioa.169.1669831760099;
-        Wed, 30 Nov 2022 10:09:20 -0800 (PST)
-Received: from [127.0.0.1] ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id a14-20020a029f8e000000b003755a721e98sm823231jam.107.2022.11.30.10.09.19
+        bh=v3g9mSSTzBVgbdJrFv6g4zSJhT5rvOWrA1mwwXQAvko=;
+        b=XL8ekpE+vZwMi0xRFb2QUngXVq9stYogTAk331Z84ANSY4/LNjlcznnxylsekwxfUN
+         xJNC2PoF+7mbBp4nCVAej6OiLZNsBEXNbxr5dBAPyG7P/2qYjnG0xkKV2RlPocFNzKEv
+         k85aaEX8edeFvtG9hyNGEmo0gSKzibtkvSBChZWjRaTlo2Dd7PqrMrzdEGq23lW9PrrY
+         p4KEzbXUrQWlU9VJczuxHBJtp5MjIQdo2kQQkmPccll06+RJU5iWVMjfwBFCeC2kjvnJ
+         I1J7Us8mwIhuAdx7jEUEqoApmCdys176UaQXSar3k33EaQRJP/u08+YqFOJfwDNFK0QF
+         AxNA==
+X-Gm-Message-State: ANoB5pkb4NNuTZ7ZdpnBO7VoFlhi6kGrRtzCStgNn9R8mDcdhdFVH9AL
+        taOiTNrY8veVVifh0pns4sM=
+X-Google-Smtp-Source: AA0mqf5ILLiP9R2J70Q4DdVVynBfjsnp+zqUAZTOymIlj/n2V4miUJjCeHPvOoVyi9n/fusmR6vcgg==
+X-Received: by 2002:a17:902:c946:b0:186:99e3:c079 with SMTP id i6-20020a170902c94600b0018699e3c079mr43689857pla.149.1669839305049;
+        Wed, 30 Nov 2022 12:15:05 -0800 (PST)
+Received: from localhost (2603-800c-1a02-1bae-a7fa-157f-969a-4cde.res6.spectrum.com. [2603:800c:1a02:1bae:a7fa:157f:969a:4cde])
+        by smtp.gmail.com with ESMTPSA id j5-20020a170903024500b00186ac812ab0sm1931331plh.83.2022.11.30.12.15.04
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 30 Nov 2022 10:09:19 -0800 (PST)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Eric Biggers <ebiggers@kernel.org>, linux-block@vger.kernel.org
-In-Reply-To: <20221114042637.1009333-1-hch@lst.de>
-References: <20221114042637.1009333-1-hch@lst.de>
-Subject: Re: untangle the request_queue refcounting from the queue kobject v2
-Message-Id: <166983175906.206850.16388085618879790592.b4-ty@kernel.dk>
-Date:   Wed, 30 Nov 2022 11:09:19 -0700
+        Wed, 30 Nov 2022 12:15:04 -0800 (PST)
+Sender: Tejun Heo <htejun@gmail.com>
+Date:   Wed, 30 Nov 2022 10:15:03 -1000
+From:   Tejun Heo <tj@kernel.org>
+To:     Li Nan <linan122@huawei.com>
+Cc:     josef@toxicpanda.com, axboe@kernel.dk, cgroups@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yukuai3@huawei.com, yi.zhang@huawei.com
+Subject: Re: [PATCH -next v2 3/9] blk-iocost: don't allow to configure bio
+ based device
+Message-ID: <Y4e5x37B2Mh+Bfko@slm.duckdns.org>
+References: <20221130132156.2836184-1-linan122@huawei.com>
+ <20221130132156.2836184-4-linan122@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-Mailer: b4 0.11.0-dev-d377f
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221130132156.2836184-4-linan122@huawei.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, 14 Nov 2022 05:26:32 +0100, Christoph Hellwig wrote:
-> this series cleans up the registration of the "queue/" kobject, and given
-> untangles it from the request_queue refcounting.
+On Wed, Nov 30, 2022 at 09:21:50PM +0800, Li Nan wrote:
+> From: Yu Kuai <yukuai3@huawei.com>
 > 
-> Changes since v1:
->  - also change the blk_crypto_sysfs_unregister prototype
->  - add two patches to fix the error handling in blk_register_queue
+> iocost is based on rq_qos, which can only work for request based device,
+> thus it doesn't make sense to configure iocost for bio based device.
 > 
-> [...]
+> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
+> Signed-off-by: Li Nan <linan122@huawei.com>
 
-Applied, thanks!
+Acked-by: Tejun Heo <tj@kernel.org>
 
-[1/5] blk-crypto: pass a gendisk to blk_crypto_sysfs_{,un}register
-      commit: 450deb93df7d457cdd93594a1987f9650c749b96
-[2/5] block: factor out a blk_debugfs_remove helper
-      commit: 6fc75f309d291d328b4ea2f91bef0ff56e4bc7c2
-[3/5] block: fix error unwinding in blk_register_queue
-      commit: 40602997be26887bdfa3d58659c3acb4579099e9
-[4/5] block: untangle request_queue refcounting from sysfs
-      commit: 2bd85221a625b316114bafaab527770b607095d3
-[5/5] block: mark blk_put_queue as potentially blocking
-      commit: 63f93fd6fa5717769a78d6d7bea6f7f9a1ccca8e
+Thanks.
 
-Best regards,
 -- 
-Jens Axboe
-
-
+tejun
