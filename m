@@ -2,96 +2,178 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E9AD6C433FE
-	for <linux-block@archiver.kernel.org>; Wed, 30 Nov 2022 17:26:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6162BC47089
+	for <linux-block@archiver.kernel.org>; Wed, 30 Nov 2022 17:57:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229941AbiK3R0h (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 30 Nov 2022 12:26:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54088 "EHLO
+        id S229879AbiK3R5I (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 30 Nov 2022 12:57:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51984 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229886AbiK3R0g (ORCPT
+        with ESMTP id S229955AbiK3R5D (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 30 Nov 2022 12:26:36 -0500
-Received: from mail-il1-x132.google.com (mail-il1-x132.google.com [IPv6:2607:f8b0:4864:20::132])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E0D02C12B
-        for <linux-block@vger.kernel.org>; Wed, 30 Nov 2022 09:26:35 -0800 (PST)
-Received: by mail-il1-x132.google.com with SMTP id h17so8409178ila.6
-        for <linux-block@vger.kernel.org>; Wed, 30 Nov 2022 09:26:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=04jXt74UY1VtpJun8zJvpOrg9ETd91QGiWVG7jWf27c=;
-        b=WvC3pO7A3ARpOpPdif1K6HiRZlgxJ/CstMca+FL0z0mtnmuUqcKoo7VHwcnziQbl//
-         jS+djIEAMLc6lTGvZY5l0345olBTCWEhjjBf2AwIsCgolZ6/oYAs4nRaDpNER5dVBDPX
-         sMq55sqJV6jv7gUnQ9T9wCK5Ot9OmPWvJe6nVfnuDVVJ+yNpvB/rXR2CIqms+BoXDt/b
-         cGMgh+Qnr74STBe8oISOcViGmkm95U61eut4IMPTZSmbN6vEEryfhATvELwBBA7mu2HZ
-         M7HY7WxOOE05iMNJM1kZSIrGpPhFMAAZ6Ge2hcwHMejCi8rVAVCBXTEKfKbjqBx7pnTT
-         MOGA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=04jXt74UY1VtpJun8zJvpOrg9ETd91QGiWVG7jWf27c=;
-        b=ABUXGup/jP8drUpSub55XwULirqbmJZplzz+nrzJPBQfyNKDqpI8gJaMqoOpsfRtrE
-         rrX5+8wmCoK5VAZZaP2QDL705mclJ1KIONQlaeXsuV37LnkFn9lBhsL+q0ccejXnWUG1
-         3yAkd9pspOqIN4/G1LuuPXzX+5+YlOgNLGhVJlQUZv3EV0UavY60lSqLs2UgRmRepkEh
-         +ktSTpC3hodpYMNZ0af9kubgTTaS80WYXcEqtxd+DlYjlNW/W9oAT5LuLA738Y5EiiHq
-         Lt7wLzm6HIaeaDOwqgOd8pcsCnD49rBYr7uACiaCHDPGG+kfaaiwRc/EGMWWj05Tcr13
-         7Avg==
-X-Gm-Message-State: ANoB5pmAuecFOw5o7ho0IuVVNupZNX36k5F4lNXojYNUBsvIDPMPfLDJ
-        tqlwppxOLnjbEiXyHvNaO8W8Kg==
-X-Google-Smtp-Source: AA0mqf4+xJx0hE4uVatQ7H6ZQopio6F/vICz5HPoG9dJxBEnflwG6PUOg4lYyFxT+ASdvPdJ5OKkrg==
-X-Received: by 2002:a05:6e02:80d:b0:303:afb:a98d with SMTP id u13-20020a056e02080d00b003030afba98dmr8960568ilm.74.1669829194557;
-        Wed, 30 Nov 2022 09:26:34 -0800 (PST)
-Received: from [192.168.1.94] ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id a92-20020a029465000000b003633748c95dsm750543jai.163.2022.11.30.09.26.33
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 30 Nov 2022 09:26:34 -0800 (PST)
-Message-ID: <c8a2fc0f-0bd3-b276-646f-cab97ba5bc34@kernel.dk>
-Date:   Wed, 30 Nov 2022 10:26:32 -0700
+        Wed, 30 Nov 2022 12:57:03 -0500
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E59F48418
+        for <linux-block@vger.kernel.org>; Wed, 30 Nov 2022 09:57:01 -0800 (PST)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 10DD01F37C;
+        Wed, 30 Nov 2022 17:57:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1669831020; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=ya1I8eYntPOk9IKKMe0Ay3HgTFq5reky7CgOCZKf+mU=;
+        b=FzMU9nTQf7870rTf7iwHLAcGsk9cNa3ou4dgY5HfHc3v89vfIoBFYfxmSFd/Aq3Ne8eOiV
+        9HDr+Cy2Y5efD6CaZFYICKlBkheQMpLfB50lGjVYMxN2zb7idkke1KxWJUoIXzMfrIlHDj
+        uEdcGtnT/GblKqAAZT92WcHDZXGJCLM=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1669831020;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=ya1I8eYntPOk9IKKMe0Ay3HgTFq5reky7CgOCZKf+mU=;
+        b=jRi2kNOJ1EYUtGJwhwXXdoBnU3I5i6KQjKh4dK5e/sLWzf+oypittDKsUr+opr4v1Wz9GH
+        kHl3qr2hmH07ogCg==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id E81181331F;
+        Wed, 30 Nov 2022 17:56:59 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id KpCeOGuZh2NbaQAAMHmgww
+        (envelope-from <jack@suse.cz>); Wed, 30 Nov 2022 17:56:59 +0000
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+        id 4D770A0710; Wed, 30 Nov 2022 18:56:59 +0100 (CET)
+From:   Jan Kara <jack@suse.cz>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        <linux-block@vger.kernel.org>, Jan Kara <jack@suse.cz>
+Subject: [PATCH] block: Do not reread partition table on exclusively open device
+Date:   Wed, 30 Nov 2022 18:56:53 +0100
+Message-Id: <20221130175653.24299-1-jack@suse.cz>
+X-Mailer: git-send-email 2.35.3
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.0
-Subject: Re: [PATCH -next v2 0/9] iocost bugfix
-Content-Language: en-US
-To:     Li Nan <linan122@huawei.com>, tj@kernel.org, josef@toxicpanda.com
-Cc:     cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, yukuai3@huawei.com,
-        yi.zhang@huawei.com
-References: <20221130132156.2836184-1-linan122@huawei.com>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20221130132156.2836184-1-linan122@huawei.com>
-Content-Type: text/plain; charset=UTF-8
+X-Developer-Signature: v=1; a=openpgp-sha256; l=4411; i=jack@suse.cz; h=from:subject; bh=YVvm+uKs5+ejuBxyI1CVvd8oZJC1LBuk0Tgq1jWwINA=; b=owEBbQGS/pANAwAIAZydqgc/ZEDZAcsmYgBjh5lVhCkkV7Z1AFFiharf7D/8mxo6Zm558qyRqfDH RF1N+dSJATMEAAEIAB0WIQSrWdEr1p4yirVVKBycnaoHP2RA2QUCY4eZVQAKCRCcnaoHP2RA2Q2wB/ 9iGpwT4+o0K1GUTvNx+sAfPW9dH6FMUC8ifXAC6pX0afKucwjWxUaiBQ1mu2oYCqwUXWbuuCVDLYid pANfhenJV6Xk73ax3l3qz0Tv93IDY8NyXuZLE76Dg7c8I+uSt+Jp42S33XomwCMLmh2OSp+xSiQbGR GbkhQNg9X+nEOQJtv2Jpygno+2YpCgRysbHHrW84GEfpMTOttmOz8mzZFji444S0zjyNijOv7oV0fg 8va2k741zF/zGMvZldgJJu+J6ZjM1ogLMWkf6MCHPX3gKV7SwxCrph4pWc5/t/0goQKrXaxte7Unab 0HhUms2zzDRtwrd7vNaZiLm7FDxKcf
+X-Developer-Key: i=jack@suse.cz; a=openpgp; fpr=93C6099A142276A28BBE35D815BC833443038D8C
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 11/30/22 6:21 AM, Li Nan wrote:
-> Li Nan (4):
->   blk-iocost: fix divide by 0 error in calc_lcoefs()
->   blk-iocost: change div64_u64 to DIV64_U64_ROUND_UP in
->     ioc_refresh_params()
->   blk-iocost: fix UAF in ioc_pd_free
->   block: fix null-pointer dereference in ioc_pd_init
-> 
-> Yu Kuai (5):
->   blk-iocost: cleanup ioc_qos_write() and ioc_cost_model_write()
->   blk-iocost: improve hanlder of match_u64()
->   blk-iocost: don't allow to configure bio based device
->   blk-iocost: read params inside lock in sysfs apis
->   blk-iocost: fix walk_list corruption
-> 
->  block/blk-iocost.c | 117 ++++++++++++++++++++++++++++-----------------
->  block/genhd.c      |   2 +-
->  2 files changed, 75 insertions(+), 44 deletions(-)
+Since commit 10c70d95c0f2 ("block: remove the bd_openers checks in
+blk_drop_partitions") we allow rereading of partition table although
+there are users of the block device. This has an undesirable consequence
+that e.g. if sda and sdb are assembled to a RAID1 device md0 with
+partitions, BLKRRPART ioctl on sda will rescan partition table and
+create sda1 device. This partition device under a raid device confuses
+some programs (such as libstorage-ng used for initial partitioning for
+distribution installation) leading to failures.
 
-Please include a changelog when posting later versions of a patchset.
+Fix the problem refusing to rescan partitions if there is another user
+that has the block device exclusively open.
 
+Link: https://lore.kernel.org/all/20221130135344.2ul4cyfstfs3znxg@quack3
+Fixes: 10c70d95c0f2 ("block: remove the bd_openers checks in blk_drop_partitions")
+Signed-off-by: Jan Kara <jack@suse.cz>
+---
+ block/blk.h   |  2 +-
+ block/genhd.c |  7 +++++--
+ block/ioctl.c | 12 +++++++-----
+ 3 files changed, 13 insertions(+), 8 deletions(-)
+
+diff --git a/block/blk.h b/block/blk.h
+index a186ea20f39d..8b75a95b28d6 100644
+--- a/block/blk.h
++++ b/block/blk.h
+@@ -436,7 +436,7 @@ static inline struct kmem_cache *blk_get_queue_kmem_cache(bool srcu)
+ }
+ struct request_queue *blk_alloc_queue(int node_id, bool alloc_srcu);
+ 
+-int disk_scan_partitions(struct gendisk *disk, fmode_t mode);
++int disk_scan_partitions(struct gendisk *disk, fmode_t mode, void *owner);
+ 
+ int disk_alloc_events(struct gendisk *disk);
+ void disk_add_events(struct gendisk *disk);
+diff --git a/block/genhd.c b/block/genhd.c
+index 0f9769db2de8..012529d36f5b 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -356,7 +356,7 @@ void disk_uevent(struct gendisk *disk, enum kobject_action action)
+ }
+ EXPORT_SYMBOL_GPL(disk_uevent);
+ 
+-int disk_scan_partitions(struct gendisk *disk, fmode_t mode)
++int disk_scan_partitions(struct gendisk *disk, fmode_t mode, void *owner)
+ {
+ 	struct block_device *bdev;
+ 
+@@ -366,6 +366,9 @@ int disk_scan_partitions(struct gendisk *disk, fmode_t mode)
+ 		return -EINVAL;
+ 	if (disk->open_partitions)
+ 		return -EBUSY;
++	/* Someone else has bdev exclusively open? */
++	if (disk->part0->bd_holder != owner)
++		return -EBUSY;
+ 
+ 	set_bit(GD_NEED_PART_SCAN, &disk->state);
+ 	bdev = blkdev_get_by_dev(disk_devt(disk), mode, NULL);
+@@ -500,7 +503,7 @@ int __must_check device_add_disk(struct device *parent, struct gendisk *disk,
+ 
+ 		bdev_add(disk->part0, ddev->devt);
+ 		if (get_capacity(disk))
+-			disk_scan_partitions(disk, FMODE_READ);
++			disk_scan_partitions(disk, FMODE_READ, NULL);
+ 
+ 		/*
+ 		 * Announce the disk and partitions after all partitions are
+diff --git a/block/ioctl.c b/block/ioctl.c
+index 60121e89052b..96617512982e 100644
+--- a/block/ioctl.c
++++ b/block/ioctl.c
+@@ -467,9 +467,10 @@ static int blkdev_bszset(struct block_device *bdev, fmode_t mode,
+  * user space. Note the separate arg/argp parameters that are needed
+  * to deal with the compat_ptr() conversion.
+  */
+-static int blkdev_common_ioctl(struct block_device *bdev, fmode_t mode,
+-				unsigned cmd, unsigned long arg, void __user *argp)
++static int blkdev_common_ioctl(struct file *file, fmode_t mode, unsigned cmd,
++			       unsigned long arg, void __user *argp)
+ {
++	struct block_device *bdev = I_BDEV(file->f_mapping->host);
+ 	unsigned int max_sectors;
+ 
+ 	switch (cmd) {
+@@ -527,7 +528,8 @@ static int blkdev_common_ioctl(struct block_device *bdev, fmode_t mode,
+ 			return -EACCES;
+ 		if (bdev_is_partition(bdev))
+ 			return -EINVAL;
+-		return disk_scan_partitions(bdev->bd_disk, mode & ~FMODE_EXCL);
++		return disk_scan_partitions(bdev->bd_disk, mode & ~FMODE_EXCL,
++					    file);
+ 	case BLKTRACESTART:
+ 	case BLKTRACESTOP:
+ 	case BLKTRACETEARDOWN:
+@@ -605,7 +607,7 @@ long blkdev_ioctl(struct file *file, unsigned cmd, unsigned long arg)
+ 		break;
+ 	}
+ 
+-	ret = blkdev_common_ioctl(bdev, mode, cmd, arg, argp);
++	ret = blkdev_common_ioctl(file, mode, cmd, arg, argp);
+ 	if (ret != -ENOIOCTLCMD)
+ 		return ret;
+ 
+@@ -674,7 +676,7 @@ long compat_blkdev_ioctl(struct file *file, unsigned cmd, unsigned long arg)
+ 		break;
+ 	}
+ 
+-	ret = blkdev_common_ioctl(bdev, mode, cmd, arg, argp);
++	ret = blkdev_common_ioctl(file, mode, cmd, arg, argp);
+ 	if (ret == -ENOIOCTLCMD && disk->fops->compat_ioctl)
+ 		ret = disk->fops->compat_ioctl(bdev, mode, cmd, arg);
+ 
 -- 
-Jens Axboe
-
+2.35.3
 
