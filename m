@@ -2,168 +2,329 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A474FC4321E
-	for <linux-block@archiver.kernel.org>; Wed, 30 Nov 2022 08:09:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 85A8EC433FE
+	for <linux-block@archiver.kernel.org>; Wed, 30 Nov 2022 09:41:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234392AbiK3IJ6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 30 Nov 2022 03:09:58 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42752 "EHLO
+        id S232066AbiK3Jlg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 30 Nov 2022 04:41:36 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44770 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234359AbiK3IJ4 (ORCPT
+        with ESMTP id S233860AbiK3JlY (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 30 Nov 2022 03:09:56 -0500
-Received: from esa6.hgst.iphmx.com (esa6.hgst.iphmx.com [216.71.154.45])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 363BB2F65C;
-        Wed, 30 Nov 2022 00:09:55 -0800 (PST)
+        Wed, 30 Nov 2022 04:41:24 -0500
+Received: from esa1.hgst.iphmx.com (esa1.hgst.iphmx.com [68.232.141.245])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91372D81
+        for <linux-block@vger.kernel.org>; Wed, 30 Nov 2022 01:41:23 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1669795795; x=1701331795;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=r5RS8dbw+LohJM2u9KUUCL9KH6qfA3vYKHYQGmNR3kw=;
-  b=VVLvPoaPDgMM2bdwTCios0xpIlUn4gQlPZ1eWoozHTHWPuHCutGKpmQc
-   loZ53YwSZHIt09VD0JpEIqebF/d/Q8B+3LbS4RZ4LPtt+fFjawzZ8mRE8
-   Y2ExXVixqrudfec+/B80GrToBRIQfnWC27a7Z5P8nstNePP9kYHJ2AnOj
-   WPrkjufvSY38nD1zM0BT1vL4aOzV8lv/yuf0IOdK9dngxOApVN/YfHIbO
-   sT4MpEa/yYJx914pdXChor4cvXigZWKTtgMwMj2/qsc1mhuF36bPgp2Sv
-   Oi7exAuyJQPn/BfL6098BsodWPBdIkayH9t65PTESDHVgOCQ3RC2icFI0
-   A==;
-X-IronPort-AV: E=Sophos;i="5.96,205,1665417600"; 
-   d="scan'208";a="217819466"
-Received: from mail-mw2nam12lp2047.outbound.protection.outlook.com (HELO NAM12-MW2-obe.outbound.protection.outlook.com) ([104.47.66.47])
-  by ob1.hgst.iphmx.com with ESMTP; 30 Nov 2022 16:09:52 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=bMTEw3gQ490yKRQJqWXcuSF43/1NbQczFYKAGq7HjrrQZBlOPB0d7nkbpBjdYS68sJlYMnrRkq6FrR4j9XEMnCT5BZpPiB/aGohfVtgSuOoZPQZPQW169eyPYlJUOAEz8Jya40nCPgA6FwbhkWIyt27n+1+KfaIHQjgcedLLfKRCXWcu8ok4u/BFgOS9/iVbO5otYhJTmt0MHzv4IVTDzGYWiMaNQHxzRgnM2BGbTT2758fCmosM2+2ypiK7yCdh1n8d0HruhZHFwd2Ar7DbrgvYbXiYdOulZq789/wj7ir3q79xdybbyFsK7c1cFvDDDG0PHd1OCqA6k9rTPUrfzQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=r5RS8dbw+LohJM2u9KUUCL9KH6qfA3vYKHYQGmNR3kw=;
- b=bxPi5+kk/eoBw/fWrTVzSHn2GygzhDcXFZGTEZJPYrGb6qG8WP0OjLuoWKscv0jH0wZ+VljFNYBOaLnaKLT30y5JeTUD+N2FnYw/zaG92FgXFDRf926rv0sNFhmVpXeI88X4L2LOUjIzyPSKdLK+zlEBS4uUx/AFNeMMaiEYNEz2xI1wUD4jrzCEmuDhEfz36I1JY4aO+IxqFbgUjmfrJtDphorxj8s4fEF4ps4xSOGC2gTEWZtdFBzKzQMNC4pzn118MJtVazlmTKWBjGm7sNKDN3tBEdRUrfmnsaOTydcOqSWnWmLZQ7kAAOnog3lhM5U/3LZ8SyYRelNC/pDZoQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=r5RS8dbw+LohJM2u9KUUCL9KH6qfA3vYKHYQGmNR3kw=;
- b=rKz/cgpc0jvW7nJNJP4nOl5+wir1a43oM3RTzzIREMcaPy4a8xIgYVt9WPK1bA+irGrfcNMXLW+VU+n/QSw/+/jEMlbqs8IZfwDCcbvIebDnqy4ac8OM8/eVJi/Ye+BbXD4htEGt6WetamqLYZoTAWFSI8TAVd4rDDxXYQyDUs8=
-Received: from DM8PR04MB8037.namprd04.prod.outlook.com (2603:10b6:8:f::6) by
- DM5PR04MB0411.namprd04.prod.outlook.com (2603:10b6:3:9d::20) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.5857.23; Wed, 30 Nov 2022 08:09:50 +0000
-Received: from DM8PR04MB8037.namprd04.prod.outlook.com
- ([fe80::d4b9:86e9:4fc8:d6e0]) by DM8PR04MB8037.namprd04.prod.outlook.com
- ([fe80::d4b9:86e9:4fc8:d6e0%5]) with mapi id 15.20.5857.023; Wed, 30 Nov 2022
- 08:09:50 +0000
-From:   Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-To:     Chaitanya Kulkarni <kch@nvidia.com>
-CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "axboe@kernel.dk" <axboe@kernel.dk>,
-        "damien.lemoal@opensource.wdc.com" <damien.lemoal@opensource.wdc.com>,
-        "bvanassche@acm.org" <bvanassche@acm.org>,
-        "vincent.fu@samsung.com" <vincent.fu@samsung.com>
-Subject: Re: [PATCH V4 7/8] null_blk: add param to set max write-zeroes sects
-Thread-Topic: [PATCH V4 7/8] null_blk: add param to set max write-zeroes sects
-Thread-Index: AQHZBEp+OsGAtgqQokWWJUgXPnCtJa5XHaaA
-Date:   Wed, 30 Nov 2022 08:09:50 +0000
-Message-ID: <20221130080949.3hzjio5x4hagvgga@shindev>
-References: <20221129232813.37968-1-kch@nvidia.com>
- <20221129232813.37968-8-kch@nvidia.com>
-In-Reply-To: <20221129232813.37968-8-kch@nvidia.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=wdc.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DM8PR04MB8037:EE_|DM5PR04MB0411:EE_
-x-ms-office365-filtering-correlation-id: 95f59663-94ff-4131-5ecc-08dad2aa40ed
-wdcipoutbound: EOP-TRUE
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 6ipxVO0ClKW0qrA2UgiV2SNDi47UWFQOw1l/HK22kbvRqarDKt9rOcVMiIrHnW8H2i8AzqlExT9wgTuXJ6ZuM0cOmcXczK9P5wiXxFGFBXtnACo17JNnzW2El7SHId3VNIBogwELzSVAQ9T4ENZvy9ZED+fR0WHPyLNYgkB79ul20FLIxpKM41jge3WRvTmblGALUDE8xBOmVy/kbZrrhvTox4F3UCD31NWrAA4I7auxAxDi4h2xZQ1BqyShvEZWdDnhdBhkGad7jUnTlYevAQB48xP+KpURovrWQliIxn2k+eaAsQKv/R4KmLgiSB6/ZR4QuMvu72BwNphH1emr4ZqzSqENSjF4gh06hsnrXbyl9HH/2XRWr8GDm2c9w59zwbz4BXlAZpNEiv9sHgC5kgiKACojnVQC/2Q4D2E1Fx75S9EkrxPQ9Nfn3V5HLH5IgVzJLHGh05qpkPSiN0P3OExOsoXL3MxMmj8vrjTzySXw276ZOZfY6Xo14km9tfr1w7KO61vb1qdpf7S6/gY4vEAKrDwvElwL6sQJW6y4z8QyJS3BJh+pmRTn0v01bfV5wFg8KP2ewY0bO/wf7cQZpBiT80cFhEpvKdzG99gmRF0fXs8UutzGtkSVOmM5sQBewkZ0LMDPXNQ6jPmnQWopChvvCQXhgYv2W1ZluAbIN180hqMos8EVQEN903MPaxCh8QTMEdyTnwoCQn4erTpeoA==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR04MB8037.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(7916004)(346002)(376002)(136003)(366004)(396003)(39860400002)(451199015)(83380400001)(2906002)(41300700001)(4744005)(5660300002)(1076003)(186003)(44832011)(8936002)(86362001)(122000001)(38100700002)(82960400001)(33716001)(38070700005)(6512007)(9686003)(71200400001)(316002)(6506007)(54906003)(6916009)(26005)(8676002)(66476007)(64756008)(76116006)(66446008)(66556008)(4326008)(478600001)(66946007)(91956017)(6486002);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?zRPBEImJ5zCckyKa+2RJqInmIow1cB+tXxRX7yTwiLw+OV42Gvju4WlC0LrI?=
- =?us-ascii?Q?6NhK5iKmFlikJ+MD3Jh4MWYg7oo5vrmo58z+/D9Oxrs04B5lkFLKPG8hlM52?=
- =?us-ascii?Q?GgZlqibrrxJsSCsCMsOeHKHlzvQLpBLCvGL41CJJ8GAc47GO9wIBbYAS1vzF?=
- =?us-ascii?Q?oSyVVUeVumUc2bZSKGfM/WYxu8sudrBoNV4NhHi2m3eldV+ffxU1Pqem2vA+?=
- =?us-ascii?Q?/YXzWHMz4B5X0qmaYNEmfG1ao9s/3EAtkResCoU3X5+TsFz8Ya8Ym6C3UgmR?=
- =?us-ascii?Q?LQGKI7IRZyuhOpclizc1P5TmNdhB++Y8UCKHrRLwZ8fiOWZxgqPn2f4A706y?=
- =?us-ascii?Q?IEBSoLghE0dPNsdYvM0xILtJedyPYkxeZz2hRobMmCR0aevhTTW2iywfV9/N?=
- =?us-ascii?Q?qDKd0LY8RapXPJfaT+BWe1fMa8ofXQPLDhwO4n/Za0/aUvaeq9yzMRBQJMOK?=
- =?us-ascii?Q?NrNLu6RkwoPXBLQdPsrxoFUo8ZG+SZqwL7HTBy+lObHPXSKFt8w1dBMmeUMZ?=
- =?us-ascii?Q?i16jKz3UU6kBtPN7Zhrgmf7apB1WBZCMoF0Q3bzp7HmpkELWbzVIrkET6s9U?=
- =?us-ascii?Q?BoptTXSu2B3KAzgo4lMRyd+pJd70ToPCdhxJLeIYhv4uGxoc/1BKhKq0tK4D?=
- =?us-ascii?Q?kVqa8EdHEB24cTjduUp10lzSq9AhHczr3Mds8LmKbc0u++pN1EZ3EprltJjy?=
- =?us-ascii?Q?W8ticz2qFn6ualhBD5LicmIWBbR6fedAD4Yn6rQ4S9qErVDgCy5Ven9XBM8w?=
- =?us-ascii?Q?xAiyw7C8oMXkCz/x8w7ioVOZ5nbEj6+2jUxqDoql3QQkvYzrIQOUtpH8j/N9?=
- =?us-ascii?Q?Q2OaQ5K+Naezr34pABYAoDWjTUFnlH1Ya9piN2KNDTWODiVNBCNZYDYMu02o?=
- =?us-ascii?Q?C8K9zU89OCO1rPvwL5Mf7ligCMriGxhyhE4VFO9l7CbNpf+UHFKObPtinRWN?=
- =?us-ascii?Q?KjWP1fK02rMQykddeSaVN3+mAU0i3rB057/TEs4v3UfbuVTRq9+vXF0NK8va?=
- =?us-ascii?Q?sVz6h8G7jXVcwmZZxVIBE8ujtGjkbMTOKIoKLsSKNtK/VuoUYRsbGQh4tGJ7?=
- =?us-ascii?Q?Jlbh8tUNfeCjCTzmS/gfvgMlNxdo5XH5ZV6k7GE2aVd2l09MabkNUA1a1syZ?=
- =?us-ascii?Q?AV2nj9tonUSkghTBtE/+kYVwDkRDvATT3SLV6/M+5RWRzdPniq2dhHwkNabM?=
- =?us-ascii?Q?ztOZo1lAHDSyK/uAs1eQOhNUgVw3ICAKvpnqlei79IsAF+h1cWpb8WERu6mF?=
- =?us-ascii?Q?tMKy5v8HbJvSFO0KU80JF5+JAgC8h19T4gWD3PPO1zBjgD/diuFiW8LBRQR2?=
- =?us-ascii?Q?zZHfp/2dGKJlKr8f52rDVBnUuA1yt3waJZKgPSXn5NglYmkghcKQahxQvc34?=
- =?us-ascii?Q?SDI1CDn33I37xChFPJLMJf201lxoGgWOroXqq+cJqNk23gVOoVGpBexDmtbb?=
- =?us-ascii?Q?9DoglYuW4RmHesmPXRzJT7VFxwLbhxNILYKf7CwtUoPVyH+TAC/4WMsR7m9P?=
- =?us-ascii?Q?LHitUmmxjRg/Xlsufh1QNXoBiMsf0wQMCHNNtA2s4OST75TXgvcuTdKaKVv3?=
- =?us-ascii?Q?FBZ/KcWxp96JrhbQYoeYF4BI6z7WjN4hlZUItHZg1AXtNKAs4M1KtFVxkUD2?=
- =?us-ascii?Q?RdoXMcHoKC70q+5j+WV+Vig=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <8BD75020AD37324A8FCBFC9671A811F4@namprd04.prod.outlook.com>
-Content-Transfer-Encoding: quoted-printable
+  t=1669801283; x=1701337283;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=XZldu3+2TyUmPJitRBwoeTOO/nARSg3GbazzLfZZtk4=;
+  b=JdebrZvg2svXXvfx36SQHn3bDttrB2rk3cIry4+NPvO+PfvleDsKho6i
+   zc22yr7hTwz/ucFhU5NCaLMvftSnPeOJe6/XariJmaryTeHl40WrqG9tv
+   uu7hiVrdgf7Ya3CoZrG7H69KburSZO0GTvylkZluIfmoOre2MIbBYbwp9
+   s/XFFYcQzpAikANe+Hf/7IGcS98QQ1NEgxswBsfy1mdMAq9qBSNw3z/y9
+   AnLBjCj5Hd9ggOP8OYw9VfXtTv5LXoxFcx6xXtBIGWgnXEoy+ZHA2iTQx
+   redj9T6kI+bp4ljPypVN7nJPEBaIJFzkw9I1yCXYU0JQAILymbUYV4dqM
+   w==;
+X-IronPort-AV: E=Sophos;i="5.96,206,1665417600"; 
+   d="scan'208";a="329639887"
+Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
+  by ob1.hgst.iphmx.com with ESMTP; 30 Nov 2022 17:41:22 +0800
+IronPort-SDR: J15grDKbfK0qSNh22RWBIQSf6e0ryDxu+RPFpcuxx/i8Piy1E043fZvQ7gzFvc5cZC3ARy2Bv7
+ g0navGb8jFELJpqkOsCReMJwnarZ4dY/si8nccgufNc/rw0gM4aoP7zttesCMP2/RZepwIU7Sp
+ vsj6XNezGXFSlSgzPtsz72JCxdhdJdHJ1GGrtT7l+bkP0KYWwFZD5NXYvFcTHtBWdwP+DZZI8L
+ +0fboHVPupBCl72EwffKRD2X0YsRUANQa6yQ83WcX+8oeB8vjI2jX91sw93t6r3ya6sBoShO7V
+ 1fE=
+Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
+  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 30 Nov 2022 00:54:17 -0800
+IronPort-SDR: tp8oxK8+XUwj6kXut60XLT1KhIINo0rW1nOK3AKxLge9/2A8d29TXXqFR1wJ1zY2j/R2BBV73A
+ toDYDEUTcf/fDYEkRC7JRKfLj/8v3KUlxw1/gcXPwFPycrZN11VHXrxsh/+5QGjc8HMI4x/kl6
+ RQqt0EENbCyS21Eawt9GvamYyBURo+uzI9W79QaANzgOnkJ3+pAsxCBDC2ll0G02Wz7UpO6vD8
+ Z62iFQq48r/Ua+zTohSLO0eCXKAVJLX2XVx/TKbuP4A31BnPe9QObJc/UUZTJZykE6sXBVm5+O
+ dZo=
+WDCIronportException: Internal
+Received: from shindev.dhcp.fujisawa.hgst.com (HELO shindev.fujisawa.hgst.com) ([10.149.52.207])
+  by uls-op-cesaip01.wdc.com with ESMTP; 30 Nov 2022 01:41:22 -0800
+From:   Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+To:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
+Cc:     Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+        Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Subject: [PATCH] null_blk: support readonly and offline zone conditions
+Date:   Wed, 30 Nov 2022 18:41:21 +0900
+Message-Id: <20221130094121.2321485-1-shinichiro.kawasaki@wdc.com>
+X-Mailer: git-send-email 2.37.1
 MIME-Version: 1.0
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: =?us-ascii?Q?xHGJcd+BT4Gy9IvCQENnWHI0GWyi7NP2TBfSqVuDUP3Koc1WW5e5GlWlorxg?=
- =?us-ascii?Q?dIKxrM5YvMZGQHz0AnrW07WECd5Vpmm9cwZF97WLe/3i8ZdZdVoAlIHjmB3n?=
- =?us-ascii?Q?LtL1XCYO2bZ+5yxsOWQryw8zXZmju6TWbsptF+HiV6g5N2l9ZGvjuxRnnxpQ?=
- =?us-ascii?Q?rWtBWuU3UsMrzJefOR7uVEHislICpXY5BIoWSPa9Q2vMcNqD9j7619cxXcMl?=
- =?us-ascii?Q?kN+hdl+xhxEv9DikzB9WGyLv1NGJOgh0lYJSELF0JlLVTshyigEmZq0VyhK/?=
- =?us-ascii?Q?pqu+ETTMf8xRaKlQ6i7lK6OWhR1uHccBXaTdbO9FTSgLvJ1sdgWuBXOGqMDW?=
- =?us-ascii?Q?2yjz1zRsaKOewD5gCLPBy6HaYaUcRayWuvuSJkZ4qqGnga+Rk4Vc6e9f68Y0?=
- =?us-ascii?Q?lwwYuhyP1UJ8tq6qxUMjlVW53N10A7YHELKoVIBdK2CUzvM99FTwo22QGQ+z?=
- =?us-ascii?Q?UclLJMmZ2MRhnhxtqlPwNoKYu+UYOrVsVjdNJpPZ9SN2MDu5AJuWBoqDiKpe?=
- =?us-ascii?Q?wHYrrURqTw3jVDlY8TSj1y0uIIuK5WsPOXGq1fKDvikGecgl1QLZdBGu0ydj?=
- =?us-ascii?Q?ba9+j2td5T4Lnj6yAKB/YuWmOvXQoeHpNyywJd0IzB3Hq0veI/LJRpzcHd4V?=
- =?us-ascii?Q?qopsbNLvz9kjjgCxs1y6t793BIxYWtn7Ib+ETxAVvxCZynjweDHQUQE91qZR?=
- =?us-ascii?Q?ZecNb3ArbXnxNdwPDGm1fhqbO2od/apVf+mghnNTH8ovuQToLjmqEUdca547?=
- =?us-ascii?Q?qIiJigfd9lNNNhXLsVHPJo3+FkyPV2HV4Ku0RbI6SK093buN+OOMrLQ8CyDy?=
- =?us-ascii?Q?ga0GC/NeL2DYIjbhvGIkkHLLFPLKtkWH0nz6v7JPrwSSdiVMnYqGALzGnrVp?=
- =?us-ascii?Q?S/8kx8aA1UTKjbOy8dp5KTFc8q59fw4dzWteB9TXbS/65nRYEB59cPqOWIIL?=
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DM8PR04MB8037.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 95f59663-94ff-4131-5ecc-08dad2aa40ed
-X-MS-Exchange-CrossTenant-originalarrivaltime: 30 Nov 2022 08:09:50.1761
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: D7kJEY0ePUVbIZx+tWStST0W6tP2FTrozuHiyq4IyDXTgYS+Qd2uHcDEqK3EpqWfimcX+Cl46l10sWhPya1Cr9bnGF8mRXZpikOxCt6y7Vg=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR04MB0411
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Nov 29, 2022 / 15:28, Chaitanya Kulkarni wrote:
-> Instead of hardcoding value for the maximum write-zeroes sector to
-> UINT_MAX >> 9, allow user to set the value with newly added module
-> parameter max_write_zeroes_sectors.
->=20
-> Signed-off-by: Chaitanya Kulkarni <kch@nvidia.com>
+In zoned mode, zones with write pointers can have conditions "readonly"
+or "offline". In readonly condition, zones can not be written. In
+offline condition, the zones can be neither written nor read. These
+conditions are intended for zones with media failures, then it is
+difficult to set those conditions to zones on real devices.
 
-Nit: it would be the better to note in the commit message why the default v=
-alue
-is UINT_MAX >> 9. Other than that, looks good.
+To test handling of zones in the conditions, add a feature to null_blk
+to set up zones in readonly or offline condition. Add new configuration
+attributes "zone_readonly" and "zone_offline". Write a sector to the
+attribute files to specify the target zone to set the zone conditions.
+For example, following command lines do it:
 
-Reviewed-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+   echo 0 > nullb1/zone_readonly
+   echo 524288 > nullb1/zone_offline
 
---=20
-Shin'ichiro Kawasaki=
+When the specified zones are already in readonly or offline condition,
+normal empty condition is restored to the zones. These condition changes
+can be done only after the null_blk device get powered, since status
+area of each zone is not yet allocated before power-on.
+
+Also improve zone condition checks to inhibit all commands for zones in
+offline conditions. In same manner, inhibit write and zone management
+commands for zones in readonly condition.
+
+Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+---
+This patch conflicts with another null_blk patch series posted recently [1].
+Will rework to avoid the conflict on v2 or later.
+
+[1] https://lore.kernel.org/linux-block/20221129232813.37968-1-kch@nvidia.com/
+
+ drivers/block/null_blk/main.c     |  22 +++++-
+ drivers/block/null_blk/null_blk.h |   8 +++
+ drivers/block/null_blk/zoned.c    | 112 ++++++++++++++++++++++++++++--
+ 3 files changed, 137 insertions(+), 5 deletions(-)
+
+diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
+index 1f154f92f4c2..7d28e3aa406c 100644
+--- a/drivers/block/null_blk/main.c
++++ b/drivers/block/null_blk/main.c
+@@ -523,6 +523,24 @@ static ssize_t nullb_device_badblocks_store(struct config_item *item,
+ }
+ CONFIGFS_ATTR(nullb_device_, badblocks);
+ 
++static ssize_t nullb_device_zone_readonly_store(struct config_item *item,
++						const char *page, size_t count)
++{
++	struct nullb_device *dev = to_nullb_device(item);
++
++	return zone_cond_store(dev, page, count, BLK_ZONE_COND_READONLY);
++}
++CONFIGFS_ATTR_WO(nullb_device_, zone_readonly);
++
++static ssize_t nullb_device_zone_offline_store(struct config_item *item,
++					       const char *page, size_t count)
++{
++	struct nullb_device *dev = to_nullb_device(item);
++
++	return zone_cond_store(dev, page, count, BLK_ZONE_COND_OFFLINE);
++}
++CONFIGFS_ATTR_WO(nullb_device_, zone_offline);
++
+ static struct configfs_attribute *nullb_device_attrs[] = {
+ 	&nullb_device_attr_size,
+ 	&nullb_device_attr_completion_nsec,
+@@ -549,6 +567,8 @@ static struct configfs_attribute *nullb_device_attrs[] = {
+ 	&nullb_device_attr_zone_nr_conv,
+ 	&nullb_device_attr_zone_max_open,
+ 	&nullb_device_attr_zone_max_active,
++	&nullb_device_attr_zone_readonly,
++	&nullb_device_attr_zone_offline,
+ 	&nullb_device_attr_virt_boundary,
+ 	&nullb_device_attr_no_sched,
+ 	&nullb_device_attr_shared_tag_bitmap,
+@@ -614,7 +634,7 @@ static ssize_t memb_group_features_show(struct config_item *item, char *page)
+ 			"poll_queues,power,queue_mode,shared_tag_bitmap,size,"
+ 			"submit_queues,use_per_node_hctx,virt_boundary,zoned,"
+ 			"zone_capacity,zone_max_active,zone_max_open,"
+-			"zone_nr_conv,zone_size\n");
++			"zone_nr_conv,zone_offline,zone_readonly,zone_size\n");
+ }
+ 
+ CONFIGFS_ATTR_RO(memb_group_, features);
+diff --git a/drivers/block/null_blk/null_blk.h b/drivers/block/null_blk/null_blk.h
+index 94ff68052b1e..eb5972c50be8 100644
+--- a/drivers/block/null_blk/null_blk.h
++++ b/drivers/block/null_blk/null_blk.h
+@@ -151,6 +151,8 @@ blk_status_t null_process_zoned_cmd(struct nullb_cmd *cmd, enum req_op op,
+ 				    sector_t sector, sector_t nr_sectors);
+ size_t null_zone_valid_read_len(struct nullb *nullb,
+ 				sector_t sector, unsigned int len);
++ssize_t zone_cond_store(struct nullb_device *dev, const char *page,
++			size_t count, enum blk_zone_cond cond);
+ #else
+ static inline int null_init_zoned_dev(struct nullb_device *dev,
+ 				      struct request_queue *q)
+@@ -174,6 +176,12 @@ static inline size_t null_zone_valid_read_len(struct nullb *nullb,
+ {
+ 	return len;
+ }
++static inline ssize_t zone_cond_store(struct nullb_device *dev,
++				      const char *page, size_t count,
++				      enum blk_zone_cond cond)
++{
++	return -EOPNOTSUPP;
++}
+ #define null_report_zones	NULL
+ #endif /* CONFIG_BLK_DEV_ZONED */
+ #endif /* __NULL_BLK_H */
+diff --git a/drivers/block/null_blk/zoned.c b/drivers/block/null_blk/zoned.c
+index 55a69e48ef8b..fac68e797803 100644
+--- a/drivers/block/null_blk/zoned.c
++++ b/drivers/block/null_blk/zoned.c
+@@ -384,8 +384,10 @@ static blk_status_t null_zone_write(struct nullb_cmd *cmd, sector_t sector,
+ 
+ 	null_lock_zone(dev, zone);
+ 
+-	if (zone->cond == BLK_ZONE_COND_FULL) {
+-		/* Cannot write to a full zone */
++	if (zone->cond == BLK_ZONE_COND_FULL ||
++	    zone->cond == BLK_ZONE_COND_READONLY ||
++	    zone->cond == BLK_ZONE_COND_OFFLINE) {
++		/* Cannot write to the zone */
+ 		ret = BLK_STS_IOERR;
+ 		goto unlock;
+ 	}
+@@ -613,7 +615,9 @@ static blk_status_t null_zone_mgmt(struct nullb_cmd *cmd, enum req_op op,
+ 		for (i = dev->zone_nr_conv; i < dev->nr_zones; i++) {
+ 			zone = &dev->zones[i];
+ 			null_lock_zone(dev, zone);
+-			if (zone->cond != BLK_ZONE_COND_EMPTY) {
++			if (zone->cond != BLK_ZONE_COND_EMPTY &&
++			    zone->cond != BLK_ZONE_COND_READONLY &&
++			    zone->cond != BLK_ZONE_COND_OFFLINE) {
+ 				null_reset_zone(dev, zone);
+ 				trace_nullb_zone_op(cmd, i, zone->cond);
+ 			}
+@@ -627,6 +631,12 @@ static blk_status_t null_zone_mgmt(struct nullb_cmd *cmd, enum req_op op,
+ 
+ 	null_lock_zone(dev, zone);
+ 
++	if (zone->cond == BLK_ZONE_COND_READONLY ||
++	    zone->cond == BLK_ZONE_COND_OFFLINE) {
++		ret = BLK_STS_IOERR;
++		goto unlock;
++	}
++
+ 	switch (op) {
+ 	case REQ_OP_ZONE_RESET:
+ 		ret = null_reset_zone(dev, zone);
+@@ -648,6 +658,7 @@ static blk_status_t null_zone_mgmt(struct nullb_cmd *cmd, enum req_op op,
+ 	if (ret == BLK_STS_OK)
+ 		trace_nullb_zone_op(cmd, zone_no, zone->cond);
+ 
++unlock:
+ 	null_unlock_zone(dev, zone);
+ 
+ 	return ret;
+@@ -674,10 +685,103 @@ blk_status_t null_process_zoned_cmd(struct nullb_cmd *cmd, enum req_op op,
+ 	default:
+ 		dev = cmd->nq->dev;
+ 		zone = &dev->zones[null_zone_no(dev, sector)];
+-
++		if (zone->cond == BLK_ZONE_COND_OFFLINE)
++			return BLK_STS_IOERR;
+ 		null_lock_zone(dev, zone);
+ 		sts = null_process_cmd(cmd, op, sector, nr_sectors);
+ 		null_unlock_zone(dev, zone);
+ 		return sts;
+ 	}
+ }
++
++/*
++ * Set specified condition COND_READONLY or COND_OFFLINE to a zone.
++ */
++static int null_set_zone_cond(struct nullb_device *dev, struct nullb_zone *zone,
++			      enum blk_zone_cond cond)
++{
++	enum blk_zone_cond old_cond;
++	int ret;
++
++	if (WARN_ON_ONCE(cond != BLK_ZONE_COND_READONLY &&
++			 cond != BLK_ZONE_COND_OFFLINE))
++		return -EINVAL;
++
++	null_lock_zone(dev, zone);
++
++	/*
++	 * When current zone condition is readonly or offline, handle the zone
++	 * as full condition to avoid failure of zone reset or zone finish.
++	 */
++	old_cond = zone->cond;
++	if (zone->cond == BLK_ZONE_COND_READONLY ||
++	    zone->cond == BLK_ZONE_COND_OFFLINE)
++		zone->cond = BLK_ZONE_COND_FULL;
++
++	/*
++	 * If readonly condition is requested again to zones already in readonly
++	 * condition, reset the zones to restore back normal empty condition.
++	 * Do same if offline condition is requested for offline zones.
++	 * Otherwise, set desired zone condition to the zones. Finish the zones
++	 * beforehand to free up zone resources.
++	 */
++	if (old_cond == cond) {
++		ret = null_reset_zone(dev, zone);
++	} else {
++		ret = null_finish_zone(dev, zone);
++		if (!ret) {
++			zone->cond = cond;
++			zone->wp = (sector_t)-1;
++		}
++	}
++
++	if (ret)
++		zone->cond = old_cond;
++
++	null_unlock_zone(dev, zone);
++	return ret;
++}
++
++/*
++ * Identify a zone from the sector written to configfs file. Then set zone
++ * condition to the zone.
++ */
++ssize_t zone_cond_store(struct nullb_device *dev, const char *page,
++			size_t count, enum blk_zone_cond cond)
++{
++	unsigned long long sector;
++	unsigned int zone_no;
++	int ret;
++
++	if (!dev->zoned) {
++		pr_err("null_blk device is not zoned\n");
++		return -EINVAL;
++	}
++
++	if (!dev->zones) {
++		pr_err("null_blk device is not yet powered\n");
++		return -EINVAL;
++	}
++
++	ret = kstrtoull(page, 0, &sector);
++	if (ret < 0)
++		return ret;
++
++	zone_no = null_zone_no(dev, sector);
++
++	if (zone_no >= dev->nr_zones) {
++		pr_err("Sector out of range\n");
++		return -EINVAL;
++	}
++
++	if (dev->zones[zone_no].type == BLK_ZONE_TYPE_CONVENTIONAL) {
++		pr_err("Can not change condition of conventional zones\n");
++		return -EINVAL;
++	}
++
++	ret = null_set_zone_cond(dev, &dev->zones[zone_no], cond);
++	if (ret)
++		return ret;
++
++	return count;
++}
+-- 
+2.37.1
+
