@@ -2,101 +2,162 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84A69C352A1
-	for <linux-block@archiver.kernel.org>; Wed, 30 Nov 2022 20:23:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D412C4708E
+	for <linux-block@archiver.kernel.org>; Wed, 30 Nov 2022 20:24:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230173AbiK3UXn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 30 Nov 2022 15:23:43 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33364 "EHLO
+        id S229693AbiK3UYj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 30 Nov 2022 15:24:39 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33338 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229476AbiK3UXQ (ORCPT
+        with ESMTP id S229699AbiK3UYW (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 30 Nov 2022 15:23:16 -0500
-Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6A3EF75;
-        Wed, 30 Nov 2022 12:22:35 -0800 (PST)
-Received: by mail-pj1-x102b.google.com with SMTP id x13-20020a17090a46cd00b00218f611b6e9so3456908pjg.1;
-        Wed, 30 Nov 2022 12:22:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=rXdxFhxTXJMZHC2K4jUkxh/OKutSS9K9Oo99ntvx5PA=;
-        b=fwyygy/fIcGISnxM7SLd6HwKX/itaYN7ne1sCrDpxfbyLvA/cYTRPkVgulkb4I5K1h
-         1ubPvLIZte+QIp4MCfHDL3whCyHeHroidEc7paAJ2LlFvK5lP17RnutOxvtk3AKlMYJR
-         tzfQ56dgLwAYEw8BEVndHTMEIlj3V4iFc6cTpaGKvgw3/pQS6tjnLOQ9ap6SPdS/xjwD
-         ho9jq2NS9Yfxyt20H3vwHJqav1tRRKrHuEvj8vuJPuyDB4o8htsopWsUszs2VaYuPqFb
-         O01oWFIDJjIUhYyH99AoZmGQDceqxvisTkY1V37hhitb88QrslKdeXpoO4wwgoPbnohC
-         LG4A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=rXdxFhxTXJMZHC2K4jUkxh/OKutSS9K9Oo99ntvx5PA=;
-        b=IThz3mSC2S5XKMic5xJ7W2CkBmeESHvf82IGxcMQumztCAG1T39/DZi2DsaJ5HvFCt
-         V79JVnjSORXJOgvaIzgek3ofXmYnEQb4UD6nexKt7vt6GXHkCXgV+XMFJW/LMCb/0TRJ
-         Ho8jZt862Ll5yJVjl983osF4oDxQhLPyem4kyHM7Xlppbh03sqIK+SRasELsnkxnlnJu
-         VyaNlnBV2pl5t9TEicpScOd+aTfJrnSzcNE2mFuSCF5QbLivPoi5pRsfvr5awA9qao7I
-         y2t2VN5wWMfZ4LqxD7cNxGxFhjmnjOvKIktLhFCcS7sHY8lgx1Q0XC1ojzZPBfJlzd1l
-         LgnQ==
-X-Gm-Message-State: ANoB5pmAqzjiaRHrn88cANBhcIpKt4C/te61q+UQ+pJ2Rp0Nq5tbXYil
-        erwiZfTHOcGWC61m14XF1E4=
-X-Google-Smtp-Source: AA0mqf5iFU9bZQDFBqqdrpIVGNTYf2Znccn2uj/KxfyIKuIsWGP8I9Pw6CPIYJj1XVOz6CDFBtq57w==
-X-Received: by 2002:a17:90a:a616:b0:219:6afd:24be with SMTP id c22-20020a17090aa61600b002196afd24bemr3258885pjq.0.1669839754973;
-        Wed, 30 Nov 2022 12:22:34 -0800 (PST)
-Received: from localhost (2603-800c-1a02-1bae-a7fa-157f-969a-4cde.res6.spectrum.com. [2603:800c:1a02:1bae:a7fa:157f:969a:4cde])
-        by smtp.gmail.com with ESMTPSA id x12-20020a1709029a4c00b00186a2dd3ffdsm1914862plv.15.2022.11.30.12.22.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 30 Nov 2022 12:22:34 -0800 (PST)
-Sender: Tejun Heo <htejun@gmail.com>
-Date:   Wed, 30 Nov 2022 10:22:33 -1000
-From:   Tejun Heo <tj@kernel.org>
-To:     Li Nan <linan122@huawei.com>
-Cc:     josef@toxicpanda.com, axboe@kernel.dk, cgroups@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        yukuai3@huawei.com, yi.zhang@huawei.com
-Subject: Re: [PATCH -next v2 6/9] blk-iocost: change div64_u64 to
- DIV64_U64_ROUND_UP in ioc_refresh_params()
-Message-ID: <Y4e7ibMMu4quJMO5@slm.duckdns.org>
-References: <20221130132156.2836184-1-linan122@huawei.com>
- <20221130132156.2836184-7-linan122@huawei.com>
+        Wed, 30 Nov 2022 15:24:22 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9315833F;
+        Wed, 30 Nov 2022 12:24:20 -0800 (PST)
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2AUJCeRN011520;
+        Wed, 30 Nov 2022 20:24:05 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : in-reply-to : references : mime-version :
+ content-transfer-encoding; s=pp1;
+ bh=O7nuDdT3BHM9Rrkwe/m8KPLCCsBsTZzLvZjXej86CYA=;
+ b=hEO1p93up5smIH+O/YBaeinkrl77hrNMV9r2wNQHgDa6JwhutgAhdO+n/rnOvUC707VW
+ h2fBkCF8l5MTy+wz/KKLHFCoNEs21TxN0PiYd20L51KymJ6bb7eUO65lCmcvMLqzgieL
+ iMbE7gw1O++uUPfljdmqywwWEa9zeruR9lcci/rDPNSgndnsxmfcfw2kUATjZRr7qIsz
+ imOMu0J8wNrYcsGiRVnwFCFF3nbH4MiebO+MrdnS9y8dnOOSQnBoJGdOe/DTTxzV6plL
+ rLYpniRBA24/v/ZAgDmlipqnrU4xd7kVLrUSQoDDhatgzCFMc2YwF7fgAHryeXO/God8 2Q== 
+Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com [169.63.214.131])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3m6bednhxk-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 30 Nov 2022 20:24:05 +0000
+Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
+        by ppma01dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2AUKLWDs009268;
+        Wed, 30 Nov 2022 20:24:04 GMT
+Received: from smtprelay07.dal12v.mail.ibm.com ([9.208.130.99])
+        by ppma01dal.us.ibm.com with ESMTP id 3m3aeae0xx-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 30 Nov 2022 20:24:04 +0000
+Received: from smtpav01.dal12v.mail.ibm.com (smtpav01.dal12v.mail.ibm.com [10.241.53.100])
+        by smtprelay07.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2AUKO2bA18809248
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 30 Nov 2022 20:24:03 GMT
+Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id E08FD58057;
+        Wed, 30 Nov 2022 20:24:02 +0000 (GMT)
+Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id D376A5805D;
+        Wed, 30 Nov 2022 20:24:01 +0000 (GMT)
+Received: from rhel-laptop.ibm.com.com (unknown [9.160.99.100])
+        by smtpav01.dal12v.mail.ibm.com (Postfix) with ESMTP;
+        Wed, 30 Nov 2022 20:24:01 +0000 (GMT)
+From:   gjoyce@linux.vnet.ibm.com
+To:     linux-block@vger.kernel.org
+Cc:     linuxppc-dev@lists.ozlabs.org, jonathan.derrick@linux.dev,
+        brking@linux.vnet.ibm.com, msuchanek@suse.de, mpe@ellerman.id.au,
+        nayna@linux.ibm.com, axboe@kernel.dk, akpm@linux-foundation.org,
+        gjoyce@linux.vnet.ibm.com, keyrings@vger.kernel.org
+Subject: [PATCH v5 1/3] block: sed-opal: SED Opal keystore
+Date:   Wed, 30 Nov 2022 14:23:56 -0600
+Message-Id: <20221130202358.18034-2-gjoyce@linux.vnet.ibm.com>
+X-Mailer: git-send-email 2.31.1
+In-Reply-To: <20221130202358.18034-1-gjoyce@linux.vnet.ibm.com>
+References: <20221130202358.18034-1-gjoyce@linux.vnet.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221130132156.2836184-7-linan122@huawei.com>
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: kp5VP5INL-gVFANvRbsVQmm5jfZc80CX
+X-Proofpoint-GUID: kp5VP5INL-gVFANvRbsVQmm5jfZc80CX
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
+ definitions=2022-11-30_04,2022-11-30_02,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 clxscore=1015
+ mlxlogscore=835 mlxscore=0 lowpriorityscore=0 bulkscore=0 spamscore=0
+ impostorscore=0 malwarescore=0 adultscore=0 suspectscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2210170000 definitions=main-2211300141
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Nov 30, 2022 at 09:21:53PM +0800, Li Nan wrote:
-> vrate_min is calculated by DIV64_U64_ROUND_UP, but vrate_max is calculated
-> by div64_u64. Vrate_min may be 1 greater than vrate_max if the input
-> values min and max of cost.qos are equal.
-> 
-> Signed-off-by: Li Nan <linan122@huawei.com>
-> ---
->  block/blk-iocost.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/block/blk-iocost.c b/block/blk-iocost.c
-> index f4a754b9d10f..2316ba93e7d6 100644
-> --- a/block/blk-iocost.c
-> +++ b/block/blk-iocost.c
-> @@ -926,7 +926,7 @@ static bool ioc_refresh_params(struct ioc *ioc, bool force)
->  
->  	ioc->vrate_min = DIV64_U64_ROUND_UP((u64)ioc->params.qos[QOS_MIN] *
->  					    VTIME_PER_USEC, MILLION);
-> -	ioc->vrate_max = div64_u64((u64)ioc->params.qos[QOS_MAX] *
-> +	ioc->vrate_max = DIV64_U64_ROUND_UP((u64)ioc->params.qos[QOS_MAX] *
->  				   VTIME_PER_USEC, MILLION);
+From: Greg Joyce <gjoyce@linux.vnet.ibm.com>
 
-Can you please align the parameters line? Other than that
+Add read and write functions that allow SED Opal keys to stored
+in a permanent keystore.
 
-Acked-by: Tejun Heo <tj@kernel.org>
+Signed-off-by: Greg Joyce <gjoyce@linux.vnet.ibm.com>
+Reviewed-by: Jonathan Derrick <jonathan.derrick@linux.dev>
+---
+ block/Makefile               |  2 +-
+ block/sed-opal-key.c         | 23 +++++++++++++++++++++++
+ include/linux/sed-opal-key.h | 15 +++++++++++++++
+ 3 files changed, 39 insertions(+), 1 deletion(-)
+ create mode 100644 block/sed-opal-key.c
+ create mode 100644 include/linux/sed-opal-key.h
 
-Thanks.
-
+diff --git a/block/Makefile b/block/Makefile
+index 4e01bb71ad6e..464a9f209552 100644
+--- a/block/Makefile
++++ b/block/Makefile
+@@ -35,7 +35,7 @@ obj-$(CONFIG_BLK_DEV_ZONED)	+= blk-zoned.o
+ obj-$(CONFIG_BLK_WBT)		+= blk-wbt.o
+ obj-$(CONFIG_BLK_DEBUG_FS)	+= blk-mq-debugfs.o
+ obj-$(CONFIG_BLK_DEBUG_FS_ZONED)+= blk-mq-debugfs-zoned.o
+-obj-$(CONFIG_BLK_SED_OPAL)	+= sed-opal.o
++obj-$(CONFIG_BLK_SED_OPAL)	+= sed-opal.o sed-opal-key.o
+ obj-$(CONFIG_BLK_PM)		+= blk-pm.o
+ obj-$(CONFIG_BLK_INLINE_ENCRYPTION)	+= blk-crypto.o blk-crypto-profile.o \
+ 					   blk-crypto-sysfs.o
+diff --git a/block/sed-opal-key.c b/block/sed-opal-key.c
+new file mode 100644
+index 000000000000..32ef988cd53b
+--- /dev/null
++++ b/block/sed-opal-key.c
+@@ -0,0 +1,23 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*
++ * SED key operations.
++ *
++ * Copyright (C) 2022 IBM Corporation
++ *
++ * These are the accessor functions (read/write) for SED Opal
++ * keys. Specific keystores can provide overrides.
++ *
++ */
++
++#include <linux/kernel.h>
++#include <linux/sed-opal-key.h>
++
++int __weak sed_read_key(char *keyname, char *key, u_int *keylen)
++{
++	return -EOPNOTSUPP;
++}
++
++int __weak sed_write_key(char *keyname, char *key, u_int keylen)
++{
++	return -EOPNOTSUPP;
++}
+diff --git a/include/linux/sed-opal-key.h b/include/linux/sed-opal-key.h
+new file mode 100644
+index 000000000000..c9b1447986d8
+--- /dev/null
++++ b/include/linux/sed-opal-key.h
+@@ -0,0 +1,15 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/*
++ * SED key operations.
++ *
++ * Copyright (C) 2022 IBM Corporation
++ *
++ * These are the accessor functions (read/write) for SED Opal
++ * keys. Specific keystores can provide overrides.
++ *
++ */
++
++#include <linux/kernel.h>
++
++int sed_read_key(char *keyname, char *key, u_int *keylen);
++int sed_write_key(char *keyname, char *key, u_int keylen);
 -- 
-tejun
+gjoyce@linux.vnet.ibm.com
+
