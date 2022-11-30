@@ -2,56 +2,127 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8ABFDC433FE
-	for <linux-block@archiver.kernel.org>; Wed, 30 Nov 2022 13:56:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D74E8C4332F
+	for <linux-block@archiver.kernel.org>; Wed, 30 Nov 2022 15:16:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229588AbiK3N4M (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 30 Nov 2022 08:56:12 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56544 "EHLO
+        id S229778AbiK3PQo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 30 Nov 2022 10:16:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40864 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229521AbiK3N4M (ORCPT
+        with ESMTP id S229611AbiK3PQo (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 30 Nov 2022 08:56:12 -0500
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7507E490A8
-        for <linux-block@vger.kernel.org>; Wed, 30 Nov 2022 05:56:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=CTkJx8JRlmMYM8d984nsdcAHse7udOqUT7yY2TVWS9c=; b=BJbDLb0KZTI0whIg/V3ue4rrYv
-        87U0ESLhkbLlNy34hatcc3nhtRQ07FOhZlu0WFHLF5RBO+XqKY0soyFItDR4P/vNmaTt/1UtK01VA
-        6iHP5vUdDjDQsmjo5jZYgCc9cescnV287dJsSV6ZWIKIfHI+AUuwBROolH2CXpc0pX1yxJ7uHG3ed
-        Kza0Wdc62Ou1A8uze0SQ5hlvhSE48kUil1umvK52TOYBhGUVVc4X48EIqxXC9mumQREwl/xjElI/c
-        ai9biKlgorqxDTr3GTfqYYCoKpmUeBguNBNOuLcP5csgk5kLSaHy2vm+4SmK/UyDTfp3K7qYHjKai
-        sbXki/7A==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1p0NZI-00Gdqj-8T; Wed, 30 Nov 2022 13:56:08 +0000
-Date:   Wed, 30 Nov 2022 05:56:08 -0800
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Jan Kara <jack@suse.cz>
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-Subject: Re: Partitions created under RAID devices
-Message-ID: <Y4dg+OTSdLOFFpvX@infradead.org>
-References: <20221130135344.2ul4cyfstfs3znxg@quack3>
+        Wed, 30 Nov 2022 10:16:44 -0500
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6AC4C2FA69;
+        Wed, 30 Nov 2022 07:16:42 -0800 (PST)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 1D5C0218DF;
+        Wed, 30 Nov 2022 15:16:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+        t=1669821401; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=ATM8wuEZO4F8LmfuabnM5oV4K3RnnbDMeyDmwCZSpdY=;
+        b=j6xq7JSq+Wr3SnG8eqNE+ECS5hPr743xQ5eo4n+UP7l3stds48QDvKwIiUHdHLnjAe5FLh
+        i3ipUvJUniXllps7G5UVsQKq8e4auYqUEEFMQ/03zLcVsv9A4c4d2v2B6rezUF+XYnSfwU
+        8/nlKl2px4rsGu4yjPnAuTS9c0Ex8fE=
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id C987F1331F;
+        Wed, 30 Nov 2022 15:16:40 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id tYxQMNhzh2MWGwAAMHmgww
+        (envelope-from <mkoutny@suse.com>); Wed, 30 Nov 2022 15:16:40 +0000
+Date:   Wed, 30 Nov 2022 16:16:39 +0100
+From:   Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>
+To:     Waiman Long <longman@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
+        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        Ming Lei <ming.lei@redhat.com>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Hillf Danton <hdanton@sina.com>,
+        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Josef Bacik <josef@toxicpanda.com>,
+        Yi Zhang <yi.zhang@redhat.com>
+Subject: Re: [PATCH-block v2] bdi, blk-cgroup: Fix potential UAF of blkcg
+Message-ID: <20221130151639.GE27838@blackbody.suse.cz>
+References: <20221129203400.1456100-1-longman@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="T6xhMxlHU34Bk0ad"
 Content-Disposition: inline
-In-Reply-To: <20221130135344.2ul4cyfstfs3znxg@quack3>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20221129203400.1456100-1-longman@redhat.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Nov 30, 2022 at 02:53:44PM +0100, Jan Kara wrote:
-> As I've studied history behind partition rescanning I understand it is
-> difficult to please everybody :). But creating partitions under assembled
-> RAID device looks wrong to me. So I was wondering - couldn't
-> disk_scan_partitions() just refuse to operate on the device if there's
-> another exclusive opener (it will be a bit painful to do the check but it
-> is doable)? That will fix this problem with RAID and should
-> not be prone to races with udev or similar problems causing troubles in the
-> past. What do people think?
 
-Yes, that seems like a very reasonable thing to do.
+--T6xhMxlHU34Bk0ad
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Tue, Nov 29, 2022 at 03:34:00PM -0500, Waiman Long <longman@redhat.com> =
+wrote:
+> The reproducing system can no longer produce a warning with this patch.
+> All the runnable block/0* tests including block/027 were run successfully
+> without failure.
+
+Thanks for the test!
+
+> @@ -1088,7 +1088,15 @@ static void blkcg_destroy_blkgs(struct blkcg *blkc=
+g)
+> =20
+>  	might_sleep();
+> =20
+> -	css_get(&blkcg->css);
+> +	/*
+> +	 * blkcg_destroy_blkgs() shouldn't be called with all the blkcg
+> +	 * references gone and rcu_read_lock not held.
+> +	 */
+> +	if (!css_tryget(&blkcg->css)) {
+> +		WARN_ON_ONCE(!rcu_read_lock_held());
+> +		return;
+> +	}
+
+As I followed the previous discussion, the principle is that obtaining a
+reference or being inside an RCU read section is sufficient.
+
+Consequently, I'd expect the two situations handled equally but here the
+no-ref but RCU bails out. (Which is OK because blkg_list must be empty?)
+
+However, the might_sleep() in (non-sleepable) RCU reader section combo
+makes me wary anyway (not with the early return but tools would likely
+complain).
+
+All in all, can't the contract of blkcg_destroy_blkgs() declare that
+a caller must pass blkcg with a valid reference? (The body of
+blkcg_destroy_blkgs then wouldn't need to get neither put the inner
+reference).
+
+HTH,
+Michal
+
+--T6xhMxlHU34Bk0ad
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: Digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEARYIAB0WIQTrXXag4J0QvXXBmkMkDQmsBEOquQUCY4dzxgAKCRAkDQmsBEOq
+ua6MAQCYfYVZAsH1NgOid00l0b52FcccC2/s0ITlu8jm7ZQs6wEAhKRvdwKu6lsC
+VQgfYht9U8f+lQdK562Fh/ONyn6DzQw=
+=M1ug
+-----END PGP SIGNATURE-----
+
+--T6xhMxlHU34Bk0ad--
