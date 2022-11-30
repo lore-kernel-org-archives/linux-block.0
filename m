@@ -2,63 +2,63 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B2B9C352A1
-	for <linux-block@archiver.kernel.org>; Wed, 30 Nov 2022 11:50:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 88A0BC46467
+	for <linux-block@archiver.kernel.org>; Wed, 30 Nov 2022 12:09:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232803AbiK3LuF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 30 Nov 2022 06:50:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41372 "EHLO
+        id S233824AbiK3MJh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 30 Nov 2022 07:09:37 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57646 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233192AbiK3LuD (ORCPT
+        with ESMTP id S232507AbiK3MJf (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 30 Nov 2022 06:50:03 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D25042983
-        for <linux-block@vger.kernel.org>; Wed, 30 Nov 2022 03:48:48 -0800 (PST)
+        Wed, 30 Nov 2022 07:09:35 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3C359FF4
+        for <linux-block@vger.kernel.org>; Wed, 30 Nov 2022 04:07:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1669808927;
+        s=mimecast20190719; t=1669810059;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=ew+rmcqxH2n7lRVyzxgZ+S2EuF0zHGkt1auf+7rBZUw=;
-        b=FhxxZUjkhnWjZF3FSy62t7kY9geKhR+hqgaLTF0qQxr0ru0QJqI56UyKA/ofHTYg7PgAoL
-        7yQJCHGN7gZgowW83NbdMe8andDE3H0rKdCBXhavtTeGog/ysqOyV+uxKfQ8DqFbCu/+qD
-        s5erauCEP2lGRU0bD1tw4PHVjUYoPJ0=
+        bh=jnVdlteFV26Z76cEF4gxE55CdPW4P3QACX8nQF2ZXTo=;
+        b=Ix/AyPurRsGGPzKxeB5ldQjovMWEn9hvZFj4Mqpiia5mJ44eJZAfkwdjYkvreSQcNFoVQ3
+        SBCLDU6jB7Ymsuk1RANpguyHrG525QhpEdH02R0RRhrcRSApBJ6guTz5QSTt2oZ04MHwN4
+        qgAPAq1rqteSxdpSKhJMXtXu8YiI+ag=
 Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
  [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-474-NuQzGQvhNzaYxV6jEkUOwA-1; Wed, 30 Nov 2022 06:48:43 -0500
-X-MC-Unique: NuQzGQvhNzaYxV6jEkUOwA-1
-Received: by mail-wm1-f71.google.com with SMTP id j2-20020a05600c1c0200b003cf7397fc9bso9293229wms.5
-        for <linux-block@vger.kernel.org>; Wed, 30 Nov 2022 03:48:43 -0800 (PST)
+ us-mta-417-Ngi4da8qMEuyu_kRCTIN9w-1; Wed, 30 Nov 2022 07:07:38 -0500
+X-MC-Unique: Ngi4da8qMEuyu_kRCTIN9w-1
+Received: by mail-wm1-f71.google.com with SMTP id b47-20020a05600c4aaf00b003d031aeb1b6so898077wmp.9
+        for <linux-block@vger.kernel.org>; Wed, 30 Nov 2022 04:07:37 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ew+rmcqxH2n7lRVyzxgZ+S2EuF0zHGkt1auf+7rBZUw=;
-        b=yAR+C2H0DYLKT4ZN7SXVEIKBg7oJ5W4hi6sK1noZG7NuUuAAonSAHp9CvHY8qTAXYy
-         51ZtkiZf+yyy3Jbzm0P5l84CqCOdTWjlOQlpdPXPKCKVBC+gWN/cOY9/AFgm+dOKW7Lz
-         pgdQd2xRRQdg0BSGwhjqTSNOb+1xRhEycCntT7GxW7hs2QuBLwk4nFc/Nquuu36hnV2Q
-         LMQeJ94YWzHBsB1OaeUGBC4YhTDM5n9WqgS0WmxKABpuOIH0Wp8dKrInXbEpVDj0+rAm
-         WUS9fjLQ+qU6CLNjjKbqiaSZ3pxxSmy5zjdTOZ9eqJdVSyuJEe3opoRVfbd4d69uybiS
-         mYAQ==
-X-Gm-Message-State: ANoB5plBHO3jAvdPWNCwxqP8KVpHtIV76U8T8m6ilZhabWVUntR5lF3X
-        u+L4cQ67VJVCzxWrvtqSGwsm5AbL4YOs/KWRzYPwEKtV1dPgq8KsAleKrIbtcyoaRJoFt3fzQAM
-        UFdHR6fMGH5Tod/HBm0PczhA=
-X-Received: by 2002:a5d:5f04:0:b0:241:e9a6:fb3 with SMTP id cl4-20020a5d5f04000000b00241e9a60fb3mr22408125wrb.462.1669808919575;
-        Wed, 30 Nov 2022 03:48:39 -0800 (PST)
-X-Google-Smtp-Source: AA0mqf71i1QvnhhrXaTwa+I+8EpX/qnDqrYR4GbrQTWzEGi7bUvVncNy/xc2a74B4erNgTJKDcQn3Q==
-X-Received: by 2002:a5d:5f04:0:b0:241:e9a6:fb3 with SMTP id cl4-20020a5d5f04000000b00241e9a60fb3mr22408062wrb.462.1669808919318;
-        Wed, 30 Nov 2022 03:48:39 -0800 (PST)
+        bh=jnVdlteFV26Z76cEF4gxE55CdPW4P3QACX8nQF2ZXTo=;
+        b=tDqJo+WXO1bOCGtXZJ1BHgeEZOZDcw7rDguLlbXcf5FOt4sRrkM6kLJqoaN+PJlkhS
+         9mkNnaXCGUN9XvdP7kmbGzVJcaS9lojrkEHWmvx4/M29U9KOGVvooxtwh+Bescs3v6Qp
+         sc7auhfPNX5HItI+q2Z195bVrH6QlGiC1mL+wLiqef07k92P9ZJZI0gePrMWZNh5ZUkd
+         P2xTg/eF1VbwWxahUuScwEn/pJ477PMS9VJ21JUH9wlEv5qvxAgLzOjvjsR6pTnjveWt
+         fePLbUfKQ8E7sud+E77lUGQ/6rY/Pi3MWfmj7Fxz82NALgoOb4AMhoPQDV1UcT5a8DJK
+         HkzA==
+X-Gm-Message-State: ANoB5pkaRXRrkBoSgDkVgj9AXsddgPfSmiN9xWjNR1Sd78l2GNCoEnku
+        5Q8mDAk0AG2geMvBFX43nQFMhBkwJsBWZm61P0UjpxUOQitC8INICCU/YLBeAC2/10yQXSRgLzz
+        sRVAb+WiArsPhwv1ulpfZElE=
+X-Received: by 2002:a05:600c:3c8e:b0:3d0:69f4:d3d0 with SMTP id bg14-20020a05600c3c8e00b003d069f4d3d0mr4598119wmb.93.1669810056171;
+        Wed, 30 Nov 2022 04:07:36 -0800 (PST)
+X-Google-Smtp-Source: AA0mqf4PpVsPubG71ps8rgagttNzK50w8zECDxzJfF2enqQnAPQgsvcgKe3HBaErdsIeSxrgevrHjQ==
+X-Received: by 2002:a05:600c:3c8e:b0:3d0:69f4:d3d0 with SMTP id bg14-20020a05600c3c8e00b003d069f4d3d0mr4598054wmb.93.1669810055886;
+        Wed, 30 Nov 2022 04:07:35 -0800 (PST)
 Received: from pc-4.home (2a01cb058918ce00dd1a5a4f9908f2d5.ipv6.abo.wanadoo.fr. [2a01:cb05:8918:ce00:dd1a:5a4f:9908:f2d5])
-        by smtp.gmail.com with ESMTPSA id 16-20020a05600c22d000b003b497138093sm1620841wmg.47.2022.11.30.03.48.37
+        by smtp.gmail.com with ESMTPSA id j3-20020adfd203000000b002366c3eefccsm1368822wrh.109.2022.11.30.04.07.33
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 30 Nov 2022 03:48:38 -0800 (PST)
-Date:   Wed, 30 Nov 2022 12:48:35 +0100
+        Wed, 30 Nov 2022 04:07:35 -0800 (PST)
+Date:   Wed, 30 Nov 2022 13:07:32 +0100
 From:   Guillaume Nault <gnault@redhat.com>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Benjamin Coddington <bcodding@redhat.com>, netdev@vger.kernel.org,
+To:     Benjamin Coddington <bcodding@redhat.com>
+Cc:     Christoph Hellwig <hch@lst.de>, netdev@vger.kernel.org,
         linux-kernel@vger.kernel.org,
         Philipp Reisner <philipp.reisner@linbit.com>,
         Lars Ellenberg <lars.ellenberg@linbit.com>,
@@ -103,24 +103,40 @@ Cc:     Benjamin Coddington <bcodding@redhat.com>, netdev@vger.kernel.org,
         ocfs2-devel@oss.oracle.com, v9fs-developer@lists.sourceforge.net,
         ceph-devel@vger.kernel.org, linux-nfs@vger.kernel.org
 Subject: Re: [PATCH v1 2/3] Treewide: Stop corrupting socket's task_frag
-Message-ID: <20221130114835.GA29316@pc-4.home>
+Message-ID: <20221130120732.GB29316@pc-4.home>
 References: <cover.1669036433.git.bcodding@redhat.com>
  <c2ec184226acd21a191ccc1aa46a1d7e43ca7104.1669036433.git.bcodding@redhat.com>
  <20221129140242.GA15747@lst.de>
+ <794DBAB0-EDAF-4DA2-A837-C1F99916BC8E@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20221129140242.GA15747@lst.de>
+In-Reply-To: <794DBAB0-EDAF-4DA2-A837-C1F99916BC8E@redhat.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Nov 29, 2022 at 03:02:42PM +0100, Christoph Hellwig wrote:
-> Hmm.  Having to set a flag to not accidentally corrupt per-task
-> state seems a bit fragile.  Wouldn't it make sense to find a way to opt
-> into the feature only for sockets created from the syscall layer?
+On Tue, Nov 29, 2022 at 11:47:47AM -0500, Benjamin Coddington wrote:
+> On 29 Nov 2022, at 9:02, Christoph Hellwig wrote:
+> 
+> > Hmm.  Having to set a flag to not accidentally corrupt per-task
+> > state seems a bit fragile.  Wouldn't it make sense to find a way to opt
+> > into the feature only for sockets created from the syscall layer?
+> 
+> It's totally fragile, and that's why it's currently broken in production.
+> The fragile ship sailed when networking decided to depend on users setting
+> the socket's GFP_ flags correctly to avoid corruption.
+> 
+> Meantime, this problem needs fixing in a way that makes everyone happy.
+> This fix doesn't make it less fragile, but it may (hopefully) address the
+> previous criticisms enough that something gets done to fix it.
 
-That's something I originally considered. But, as far as I can see, nbd
-needs this flag _and_ uses sockets created in user space. So it'd still
-need to opt out manually.
+Also, let's remember that while we're discussing how the kernel sould
+work in an ideal world, the reality is that production NFS systems
+crash randomly upon memory reclaim since commit a1231fda7e94 ("SUNRPC:
+Set memalloc_nofs_save() on all rpciod/xprtiod jobs"). Fixing that is
+just a matter of re-introducing GFP_NOFS on SUNRPC sockets (which has
+been proposed several times already). Then we'll have plenty of time
+to argue about how networking should use the per-task page_frag and
+how to remove GFP_NOFS in the long term.
 
