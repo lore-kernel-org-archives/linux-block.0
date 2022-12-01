@@ -2,125 +2,101 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AACF6C43217
-	for <linux-block@archiver.kernel.org>; Thu,  1 Dec 2022 10:31:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BA61FC47088
+	for <linux-block@archiver.kernel.org>; Thu,  1 Dec 2022 11:05:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230498AbiLAKbs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 1 Dec 2022 05:31:48 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38644 "EHLO
+        id S231276AbiLALFk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 1 Dec 2022 06:05:40 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44264 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230285AbiLAKbg (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 1 Dec 2022 05:31:36 -0500
-Received: from mail-pg1-x534.google.com (mail-pg1-x534.google.com [IPv6:2607:f8b0:4864:20::534])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D6ADA06D4;
-        Thu,  1 Dec 2022 02:31:13 -0800 (PST)
-Received: by mail-pg1-x534.google.com with SMTP id 82so1335031pgc.0;
-        Thu, 01 Dec 2022 02:31:13 -0800 (PST)
+        with ESMTP id S230503AbiLALEa (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 1 Dec 2022 06:04:30 -0500
+Received: from mail-ej1-x629.google.com (mail-ej1-x629.google.com [IPv6:2a00:1450:4864:20::629])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F7967616B
+        for <linux-block@vger.kernel.org>; Thu,  1 Dec 2022 03:04:28 -0800 (PST)
+Received: by mail-ej1-x629.google.com with SMTP id vv4so3345727ejc.2
+        for <linux-block@vger.kernel.org>; Thu, 01 Dec 2022 03:04:28 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:sender
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=lC4h75dh+3IE6iSBYmQlNa7ll+YBh2sVpnAtr9WVaso=;
-        b=ByAibcDVmt0W60dpTosow7EH8me0TGKi/eAI5Q9Gl9tW3HldQqJ+STDuyGLZKEHYt5
-         EkpSGrBvOhXN1tpEbZOtx3srwDQqvvwAOaZ9ecOEaTYOoARoNQjZdrhH5V6WrPI0SZag
-         6Y3BBsvFy7GVPIeyXZfOqAFKJa8sSbBYZRV7VfdzEVw1i0Iv02CJbW22NFsrmFt7mPUD
-         Em/4mvLH+4Jdn/eoxHuhu9hncj5SQ2QLM9wmt0noqqCbyKEtDMnlM/ff3Dq2lzCplqGb
-         gq/uzYiNUAEJn//sorb8I+sbppA4HfKd5LA2lb2UdttoLs0w1Kcje7BU5LYvhxPIr9Vs
-         OE6Q==
+        d=linbit-com.20210112.gappssmtp.com; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=bCSFONotMGlT5jcNSWA3wEw//+37lRPpQvu379eQdb4=;
+        b=mky/H4kqev/SBa6soq1k+oMgOaV2tJ6fff0Qn4zByh6t4++4mdmoeRtyyf3dT0AGXh
+         8qcdBXx/eU+yX2ubXovz++PON5OelriwP9No7rBn8afMyyq4glmQiIX/S4k8FEotVKNa
+         tm5Ta4VNNWwL2Di8riPg+0yKi3AJntfpfgWvpOprnbKahJ/NZpIqhIm20ggN6r0EuxmC
+         c0uM8xGx2bd7ZsNkzMYTihZTjhxs6FHLbzuzIFza+54tb64iXc/1ks7O2IfHtQ6zedtz
+         bjZcNpxzIuMAiGBZ/+cNhUThlzgMlYueD6SJic/P2fmG9VN7zurkQCVwTEoN4AZ87+gY
+         SvGA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:sender
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=lC4h75dh+3IE6iSBYmQlNa7ll+YBh2sVpnAtr9WVaso=;
-        b=VzCWNh7DdSf8M9N7bRWso46XAkpZCdmRQd6qQCra2qYOASITqE+QMwxIOSw89J1McV
-         P5WRFtgHpXBtPeY8M9znHRPIGVlRTonY4/gui7hV2xgGfinGgFIsBjHuf/ucdXUDpLDz
-         nGS2jyOrKmM0cCLxDrc7+IzYK3tsMc2CkV3w8YqKy6wRc7dQUh5Q4ySL/zvx5uCt7L1M
-         U7DXpQXTrs8VE4zO/1XZzEP3oPnlPo6PFi/EPrLoTk0HuVGBnOGNI2ctP3e9qcmAAmhe
-         ED4zHUXaFM3PrRs5e71Z0G2dn+/2BRIxXvSje0HjWSAbE+wMnmoaZiYuFVRQWZ81STny
-         U2ew==
-X-Gm-Message-State: ANoB5pmYLC1gvof9J48+v6oG1BPemmpeWYYKcRudqhh0t+c8n7mKNpHd
-        rrckTbdlRkqbxdYA0eOo+5U=
-X-Google-Smtp-Source: AA0mqf68leKiPAJyvCCFaB+9KbGEykpF/Fd7aASl3jgDQ9lo+HfhKCMXFbJ7H827s0G71AafpwvxSw==
-X-Received: by 2002:a63:1915:0:b0:477:3803:674f with SMTP id z21-20020a631915000000b004773803674fmr39052188pgl.469.1669890672382;
-        Thu, 01 Dec 2022 02:31:12 -0800 (PST)
-Received: from localhost (2603-800c-1a02-1bae-a7fa-157f-969a-4cde.res6.spectrum.com. [2603:800c:1a02:1bae:a7fa:157f:969a:4cde])
-        by smtp.gmail.com with ESMTPSA id z186-20020a6265c3000000b0056bc5ad4862sm2908916pfb.28.2022.12.01.02.31.11
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=bCSFONotMGlT5jcNSWA3wEw//+37lRPpQvu379eQdb4=;
+        b=Ehs5FEL6/plmFzlWRJ3BHtM17/vXV7JXf2I3txyQddih2oVw7gpbHOyLm4OLDybxXx
+         4gpe0z9KWubq8V8WT2BzgwMpXO3cb5zIfgSh5Ls2GZMynDIl5nCB6DRFTF9wCGXT0mdZ
+         hAgIT+AaM/4jGtP4aTCnFQiBiteF7swDQRVHYT7Ms8PSuybe1dQLOdwUc8uXW613y6QI
+         asJjx2XvtTUpz5g3g4q1jBToCAiQkdhA6JQBcTRiWc6523tQkhfkvsM3Evmsy672Sx5z
+         z1ziPZLEhZGTqIrpSYNLTgdkxNUGzL/Dj22y+urEYrUIDUUhFIDdsTPl624ryby6NshT
+         KOEA==
+X-Gm-Message-State: ANoB5pl/4HZM+sKYb6DfGuT8c6Rr0ubfcuWY0FnEe/auV9SKGOtg7low
+        8BrBI3IX12bbQtEenLHud19y9yfi2QsR4Q==
+X-Google-Smtp-Source: AA0mqf5D3lvSWXlbNVxaPnrYe5tMWRFbul2ScpxDzKf3ljJWGch6rkuPwy1XuKM1ffPLdoJA/bIXmA==
+X-Received: by 2002:a17:906:a198:b0:7b4:bc42:3b44 with SMTP id s24-20020a170906a19800b007b4bc423b44mr48503029ejy.101.1669892666946;
+        Thu, 01 Dec 2022 03:04:26 -0800 (PST)
+Received: from localhost.localdomain (h082218028181.host.wavenet.at. [82.218.28.181])
+        by smtp.gmail.com with ESMTPSA id f26-20020a056402161a00b00463a83ce063sm1576424edv.96.2022.12.01.03.04.25
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 01 Dec 2022 02:31:12 -0800 (PST)
-Sender: Tejun Heo <htejun@gmail.com>
-Date:   Thu, 1 Dec 2022 00:31:10 -1000
-From:   Tejun Heo <tj@kernel.org>
-To:     Yu Kuai <yukuai1@huaweicloud.com>
-Cc:     Li Nan <linan122@huawei.com>, josef@toxicpanda.com,
-        axboe@kernel.dk, cgroups@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        yi.zhang@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
-Subject: Re: [PATCH -next v2 8/9] block: fix null-pointer dereference in
- ioc_pd_init
-Message-ID: <Y4iCbuALBBGLODWI@slm.duckdns.org>
-References: <20221130132156.2836184-1-linan122@huawei.com>
- <20221130132156.2836184-9-linan122@huawei.com>
- <Y4fCE7XxcpDfWyDJ@slm.duckdns.org>
- <9ca2b7ab-7fd3-a9a3-12a6-021a78886b54@huaweicloud.com>
- <Y4h94m8QMPtS4xJV@slm.duckdns.org>
- <431dcb3f-4572-7fd0-9e5d-90b6c34d577c@huaweicloud.com>
+        Thu, 01 Dec 2022 03:04:26 -0800 (PST)
+From:   =?UTF-8?q?Christoph=20B=C3=B6hmwalder?= 
+        <christoph.boehmwalder@linbit.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     drbd-dev@lists.linbit.com, linux-kernel@vger.kernel.org,
+        Lars Ellenberg <lars.ellenberg@linbit.com>,
+        Philipp Reisner <philipp.reisner@linbit.com>,
+        linux-block@vger.kernel.org,
+        =?UTF-8?q?Christoph=20B=C3=B6hmwalder?= 
+        <christoph.boehmwalder@linbit.com>
+Subject: [PATCH 0/5] Backported DRBD printk/debug improvements
+Date:   Thu,  1 Dec 2022 12:03:45 +0100
+Message-Id: <20221201110349.1282687-1-christoph.boehmwalder@linbit.com>
+X-Mailer: git-send-email 2.38.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <431dcb3f-4572-7fd0-9e5d-90b6c34d577c@huaweicloud.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Dec 01, 2022 at 06:23:16PM +0800, Yu Kuai wrote:
-> Hi,
-> 
-> 在 2022/12/01 18:11, Tejun Heo 写道:
-> > On Thu, Dec 01, 2022 at 10:12:13AM +0800, Yu Kuai wrote:
-> > > 1) By mentioning that "del_gendisk() is quiescing the queue", do you
-> > > suggest to add rcu_read_lock()? This seems wrong because blk_iocost_init
-> > > requires memory allocation.
-> > 
-> > Quiescing uses SRCU so that should be fine but I'm not sure whether this is
-> > the right one to piggyback on. Jens should have a better idea.
-> > 
-> > Thanks.
-> > 
-> 
-> Currently SRCU is used if BLK_MQ_F_BLOCKING set, otherwise RCU is used.
-> 
-> dispatch:
-> #define __blk_mq_run_dispatch_ops(q, check_sleep, dispatch_ops) \
-> do {                                                            \
->         if ((q)->tag_set->flags & BLK_MQ_F_BLOCKING) {          \
->                 int srcu_idx;                                   \
->                                                                 \
->                 might_sleep_if(check_sleep);                    \
->                 srcu_idx = srcu_read_lock((q)->tag_set->srcu);  \
->                 (dispatch_ops);                                 \
->                 srcu_read_unlock((q)->tag_set->srcu, srcu_idx); \
->         } else {                                                \
->                 rcu_read_lock();                                \
->                 (dispatch_ops);                                 \
->                 rcu_read_unlock();                              \
->         }                                                       \
-> } while (0)
-> 
-> quiesce:
-> void blk_mq_wait_quiesce_done(struct blk_mq_tag_set *set)
-> {
->         if (set->flags & BLK_MQ_F_BLOCKING)
->                 synchronize_srcu(set->srcu);
->         else
->                 synchronize_rcu();
-> }
+Some changes to DRBD's logging infrastructure, backported from the
+out-of-tree module.
 
-Oh I see. Unfortunately, I don't know what to do off the top of my head.
+Since the two code bases have diverged so much, it is tough to preserve
+authorship information without "putting words into someone's mouth". So
+I ended up using Originally-from tags to try and encode the original
+authors of these patches.
 
-Thanks.
+Christoph Böhmwalder (5):
+  drbd: unify how failed assertions are logged
+  drbd: split polymorph printk to its own file
+  drbd: introduce dynamic debug
+  drbd: introduce drbd_ratelimit()
+  drbd: add context parameter to expect() macro
 
+ drivers/block/drbd/drbd_actlog.c           |   6 +-
+ drivers/block/drbd/drbd_bitmap.c           |  60 ++++-----
+ drivers/block/drbd/drbd_int.h              |  68 +---------
+ drivers/block/drbd/drbd_main.c             |  10 +-
+ drivers/block/drbd/drbd_nl.c               |   2 +-
+ drivers/block/drbd/drbd_polymorph_printk.h | 141 +++++++++++++++++++++
+ drivers/block/drbd/drbd_receiver.c         |  16 +--
+ drivers/block/drbd/drbd_req.c              |   6 +-
+ drivers/block/drbd/drbd_worker.c           |  12 +-
+ 9 files changed, 199 insertions(+), 122 deletions(-)
+ create mode 100644 drivers/block/drbd/drbd_polymorph_printk.h
+
+
+base-commit: b4c0482bfe89cd6c4f030314c86aae35642c44a5
 -- 
-tejun
+2.38.1
+
