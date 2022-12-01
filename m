@@ -2,127 +2,93 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 05115C4708D
-	for <linux-block@archiver.kernel.org>; Thu,  1 Dec 2022 12:58:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A806CC4321E
+	for <linux-block@archiver.kernel.org>; Thu,  1 Dec 2022 13:32:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231289AbiLAM6b (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 1 Dec 2022 07:58:31 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39374 "EHLO
+        id S230132AbiLANco (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 1 Dec 2022 08:32:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44298 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231272AbiLAM6a (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 1 Dec 2022 07:58:30 -0500
-Received: from out30-1.freemail.mail.aliyun.com (out30-1.freemail.mail.aliyun.com [115.124.30.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1505856EF6;
-        Thu,  1 Dec 2022 04:58:28 -0800 (PST)
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R131e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046050;MF=tianjia.zhang@linux.alibaba.com;NM=1;PH=DS;RN=12;SR=0;TI=SMTPD_---0VW8qK3K_1669899504;
-Received: from localhost(mailfrom:tianjia.zhang@linux.alibaba.com fp:SMTPD_---0VW8qK3K_1669899504)
-          by smtp.aliyun-inc.com;
-          Thu, 01 Dec 2022 20:58:25 +0800
-From:   Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-To:     Eric Biggers <ebiggers@kernel.org>,
-        "Theodore Y. Ts o" <tytso@mit.edu>,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        Jonathan Corbet <corbet@lwn.net>, Jens Axboe <axboe@kernel.dk>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        Bagas Sanjaya <bagasdotme@gmail.com>,
-        linux-fscrypt@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
-Cc:     Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-Subject: [PATCH v4 2/2] fscrypt: Add SM4 XTS/CTS symmetric algorithm support
-Date:   Thu,  1 Dec 2022 20:58:19 +0800
-Message-Id: <20221201125819.36932-3-tianjia.zhang@linux.alibaba.com>
-X-Mailer: git-send-email 2.24.3 (Apple Git-128)
-In-Reply-To: <20221201125819.36932-1-tianjia.zhang@linux.alibaba.com>
-References: <20221201125819.36932-1-tianjia.zhang@linux.alibaba.com>
+        with ESMTP id S231241AbiLANcm (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 1 Dec 2022 08:32:42 -0500
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3DB04B53;
+        Thu,  1 Dec 2022 05:32:41 -0800 (PST)
+Received: from imap1.suse-dmz.suse.de (imap1.suse-dmz.suse.de [192.168.254.73])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id F2BEC1FD8F;
+        Thu,  1 Dec 2022 13:32:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1669901559; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=REO845ueyHwukIo955ToEcih+b2p0jbrSygtR1fpLsc=;
+        b=BKuigp6t6zYSJq6epjH3Fyq2dG43DX6R6hARA4Ls0+P49Q8qSbImY66ni9vcfpSTzce3so
+        hdVLtWv3qPfSDI8bUo3X1hHSNDS7ANumug2WMP1uE48vspkzdVyVPH6p25nmuDijDaGMiO
+        p+TXaBcSKG63CAO5VTe2J1+4jK7T5aA=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1669901560;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=REO845ueyHwukIo955ToEcih+b2p0jbrSygtR1fpLsc=;
+        b=iJqJUqp8TV21SEaoFP9VR/Gi4boXcz2DHT6/USjQxObFzt9Ls8i3vjMIjNh2Zk8PLTCKXZ
+        FO+4j+uakXy2tZCQ==
+Received: from imap1.suse-dmz.suse.de (imap1.suse-dmz.suse.de [192.168.254.73])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap1.suse-dmz.suse.de (Postfix) with ESMTPS id 76CA013503;
+        Thu,  1 Dec 2022 13:32:39 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap1.suse-dmz.suse.de with ESMTPSA
+        id 2pMhD/esiGO5FAAAGKfGzw
+        (envelope-from <krisman@suse.de>); Thu, 01 Dec 2022 13:32:39 +0000
+From:   Gabriel Krisman Bertazi <krisman@suse.de>
+To:     Kemeng Shi <shikemeng@huawei.com>
+Cc:     <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <shikemeng@huaweicloud.com>,
+        <linfeilong@huawei.com>, <liuzhiqiang@huawei.com>
+Subject: Re: [PATCH 1/5] sbitmap: don't consume nr for inactive waitqueue to
+ avoid lost wakeups
+References: <20221201045408.21908-1-shikemeng@huawei.com>
+        <20221201045408.21908-2-shikemeng@huawei.com>
+Date:   Thu, 01 Dec 2022 10:32:36 -0300
+In-Reply-To: <20221201045408.21908-2-shikemeng@huawei.com> (Kemeng Shi's
+        message of "Thu, 1 Dec 2022 12:54:04 +0800")
+Message-ID: <87y1rrmeq3.fsf@suse.de>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.2 (gnu/linux)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Add support for XTS and CTS mode variant of SM4 algorithm, in similar
-fashion to SM2 and SM3. The former is used to encrypt file contents,
-while the latter (SM4-CBC-CTS) is used to encrypt filenames.
+Kemeng Shi <shikemeng@huawei.com> writes:
 
-SM4 is a symmetric algorithm widely used in China, and is even mandatory
-algorithm in some special scenarios. We need to provide these users with
-the ability to encrypt files or disks using SM4-XTS.
+> If we decremented queue without waiters, we should not decremente freed
+> bits number "nr", or all "nr" could be consumed in a empty queue and no
+> wakeup will be called.
+> Currently, for case "wait_cnt > 0", "nr" will not be decremented if we
+> decremented queue without watiers and retry is returned to avoid lost
+> wakeups. However for case "wait_cnt == 0", "nr" will be decremented
+> unconditionally and maybe decremented to zero. Although retry is
+> returned by active state of queue, it's not actually executed for "nr"
+> is zero.
+>
 
-Signed-off-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
----
- Documentation/filesystems/fscrypt.rst |  1 +
- fs/crypto/keysetup.c                  | 15 +++++++++++++++
- fs/crypto/policy.c                    |  5 +++++
- include/uapi/linux/fscrypt.h          |  2 ++
- 4 files changed, 23 insertions(+)
+Hi Kemeng,
 
-diff --git a/Documentation/filesystems/fscrypt.rst b/Documentation/filesystems/fscrypt.rst
-index 5ba5817c17c2..c0784ec05553 100644
---- a/Documentation/filesystems/fscrypt.rst
-+++ b/Documentation/filesystems/fscrypt.rst
-@@ -338,6 +338,7 @@ Currently, the following pairs of encryption modes are supported:
- - AES-128-CBC for contents and AES-128-CTS-CBC for filenames
- - Adiantum for both contents and filenames
- - AES-256-XTS for contents and AES-256-HCTR2 for filenames (v2 policies only)
-+- SM4-XTS for contents and SM4-CTS-CBC for filenames (v2 policies only)
- 
- If unsure, you should use the (AES-256-XTS, AES-256-CTS-CBC) pair.
- 
-diff --git a/fs/crypto/keysetup.c b/fs/crypto/keysetup.c
-index f7407071a952..24e55c95abc3 100644
---- a/fs/crypto/keysetup.c
-+++ b/fs/crypto/keysetup.c
-@@ -44,6 +44,21 @@ struct fscrypt_mode fscrypt_modes[] = {
- 		.security_strength = 16,
- 		.ivsize = 16,
- 	},
-+	[FSCRYPT_MODE_SM4_XTS] = {
-+		.friendly_name = "SM4-XTS",
-+		.cipher_str = "xts(sm4)",
-+		.keysize = 32,
-+		.security_strength = 16,
-+		.ivsize = 16,
-+		.blk_crypto_mode = BLK_ENCRYPTION_MODE_SM4_XTS,
-+	},
-+	[FSCRYPT_MODE_SM4_CTS] = {
-+		.friendly_name = "SM4-CTS",
-+		.cipher_str = "cts(cbc(sm4))",
-+		.keysize = 16,
-+		.security_strength = 16,
-+		.ivsize = 16,
-+	},
- 	[FSCRYPT_MODE_ADIANTUM] = {
- 		.friendly_name = "Adiantum",
- 		.cipher_str = "adiantum(xchacha12,aes)",
-diff --git a/fs/crypto/policy.c b/fs/crypto/policy.c
-index 46757c3052ef..ec19066128e5 100644
---- a/fs/crypto/policy.c
-+++ b/fs/crypto/policy.c
-@@ -83,6 +83,11 @@ static bool fscrypt_valid_enc_modes_v2(u32 contents_mode, u32 filenames_mode)
- 	if (contents_mode == FSCRYPT_MODE_AES_256_XTS &&
- 	    filenames_mode == FSCRYPT_MODE_AES_256_HCTR2)
- 		return true;
-+
-+	if (contents_mode == FSCRYPT_MODE_SM4_XTS &&
-+	    filenames_mode == FSCRYPT_MODE_SM4_CTS)
-+		return true;
-+
- 	return fscrypt_valid_enc_modes_v1(contents_mode, filenames_mode);
- }
- 
-diff --git a/include/uapi/linux/fscrypt.h b/include/uapi/linux/fscrypt.h
-index a756b29afcc2..47dbd1994bfe 100644
---- a/include/uapi/linux/fscrypt.h
-+++ b/include/uapi/linux/fscrypt.h
-@@ -26,6 +26,8 @@
- #define FSCRYPT_MODE_AES_256_CTS		4
- #define FSCRYPT_MODE_AES_128_CBC		5
- #define FSCRYPT_MODE_AES_128_CTS		6
-+#define FSCRYPT_MODE_SM4_XTS			7
-+#define FSCRYPT_MODE_SM4_CTS			8
- #define FSCRYPT_MODE_ADIANTUM			9
- #define FSCRYPT_MODE_AES_256_HCTR2		10
- /* If adding a mode number > 10, update FSCRYPT_MODE_MAX in fscrypt_private.h */
+Fwiw, I sent a patch rewriting this algorithm which is now merged in
+axboe/for-next.  It drops the per-waitqueue wait_cnt entirely.  You can
+find it here:
+
+https://lore.kernel.org/lkml/20221110153533.go5qs3psm75h27mx@quack3/T/
+
+Thanks!
+
+
 -- 
-2.24.3 (Apple Git-128)
-
+Gabriel Krisman Bertazi
