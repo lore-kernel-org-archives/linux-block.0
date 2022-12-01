@@ -2,136 +2,103 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A8C3C43217
-	for <linux-block@archiver.kernel.org>; Thu,  1 Dec 2022 07:21:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D11E5C43217
+	for <linux-block@archiver.kernel.org>; Thu,  1 Dec 2022 10:00:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229580AbiLAHVN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 1 Dec 2022 02:21:13 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38794 "EHLO
+        id S229617AbiLAKAp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 1 Dec 2022 05:00:45 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36260 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229476AbiLAHVN (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 1 Dec 2022 02:21:13 -0500
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A688E54378;
-        Wed, 30 Nov 2022 23:21:09 -0800 (PST)
-Received: from mail02.huawei.com (unknown [172.30.67.153])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4NN6tl3g4Cz4f3jpy;
-        Thu,  1 Dec 2022 15:21:03 +0800 (CST)
-Received: from [10.174.178.129] (unknown [10.174.178.129])
-        by APP4 (Coremail) with SMTP id gCh0CgC32tfhVYhjlXjVBQ--.52763S2;
-        Thu, 01 Dec 2022 15:21:06 +0800 (CST)
-Subject: Re: [PATCH 1/5] sbitmap: don't consume nr for inactive waitqueue to
- avoid lost wakeups
-To:     Kemeng Shi <shikemeng@huawei.com>, axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linfeilong@huawei.com, liuzhiqiang@huawei.com
-References: <20221201045408.21908-1-shikemeng@huawei.com>
- <20221201045408.21908-2-shikemeng@huawei.com>
-From:   Kemeng Shi <shikemeng@huaweicloud.com>
-Message-ID: <81e3f861-f163-c17c-49d4-2408f16c3350@huaweicloud.com>
-Date:   Thu, 1 Dec 2022 15:21:05 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.5.0
+        with ESMTP id S229520AbiLAKAo (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 1 Dec 2022 05:00:44 -0500
+Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C50B1D1;
+        Thu,  1 Dec 2022 02:00:42 -0800 (PST)
+Received: by mail-pj1-x1031.google.com with SMTP id o5-20020a17090a678500b00218cd5a21c9so1485970pjj.4;
+        Thu, 01 Dec 2022 02:00:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=RvAcF4yt3U38ulka5v5lZO8tAA6N2kN/9W8fhnuQ3DA=;
+        b=PthsZ+Q8Y6NJRwPCIBP8MuFSXijY5REyP5RtsSO9OPxZiWTEKKwFMOos6DjWLQvBKM
+         9+68aLFA2KJibeLzcXKW+TRr0f8kBeVJPCy/2qKzfHy90Fie4M+cp5nPkc4pk11SeAia
+         jH57uge2Q/jZXwDKyyUdiowPc6qMj7ayVGHpMarZsh6DN2oGN8wu5NKo3Iqfpk4ydUIY
+         gmi0PquZQL7ahFmfCvPlElkpeJ25wvgTILpt2DQBpdv8azUNSn4Cu5/LBB5hDW8mQ6bU
+         yoe5DDNTuabeiXazVGv43j+CRYcNSOCynorXMDyO4wEWc21G3Ob/mnt/+/tlpaqSP8bC
+         8inw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=RvAcF4yt3U38ulka5v5lZO8tAA6N2kN/9W8fhnuQ3DA=;
+        b=KGQeTFmVefap1I1F7sL06aLc30TWe4O2+9GFZ9OinTb9IwPYT8SAkPFZubmSnEPpGK
+         CeLVcsJTp3yhFsVJNdRk5un3j+iz2LK0ehiOpmPnjcX0kZ9fh8JHMDO2nR+MiIL4DI0N
+         GCCCKH94/wsD5w7gs6hVIP+WK70ox5kqyuioagD6Y4zjf0bLgFy9yTNj0W6JrXVlYAtO
+         GIoLO94QtXwsc3W97n61SAmBgyL/r3d/HlRM/Kj5VQAit5IjM+5YTqQSaJv6760K1OTR
+         r5HxasWm9ZgfPtnRq3TBoH+entgf7FMoeVNgvVTG78QRDsal2ET3BYA8M9OVU2vR930n
+         f/Gw==
+X-Gm-Message-State: ANoB5pmjI+OwdBzoqBeuyxqsKdA4sVfPZ8/duxEhcAdtMqPV98kgT5Ju
+        qe1eMc1ZnDnTNrxeNaWj85M=
+X-Google-Smtp-Source: AA0mqf4q2CFgsKrPNGmoGiXBxaXgDpo6jm9FaGZY3ctXH6/vkBqjnYSGyNASdEdM2/KZINfk539FIw==
+X-Received: by 2002:a17:902:ab89:b0:185:3659:1ce9 with SMTP id f9-20020a170902ab8900b0018536591ce9mr44744790plr.26.1669888841580;
+        Thu, 01 Dec 2022 02:00:41 -0800 (PST)
+Received: from localhost (2603-800c-1a02-1bae-a7fa-157f-969a-4cde.res6.spectrum.com. [2603:800c:1a02:1bae:a7fa:157f:969a:4cde])
+        by smtp.gmail.com with ESMTPSA id m13-20020a170902f64d00b001891ea4d133sm3185378plg.12.2022.12.01.02.00.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 01 Dec 2022 02:00:41 -0800 (PST)
+Sender: Tejun Heo <htejun@gmail.com>
+Date:   Thu, 1 Dec 2022 00:00:39 -1000
+From:   Tejun Heo <tj@kernel.org>
+To:     Yu Kuai <yukuai1@huaweicloud.com>
+Cc:     Li Nan <linan122@huawei.com>, josef@toxicpanda.com,
+        axboe@kernel.dk, cgroups@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yi.zhang@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
+Subject: Re: [PATCH -next v2 9/9] blk-iocost: fix walk_list corruption
+Message-ID: <Y4h7RxdT83g+zFN0@slm.duckdns.org>
+References: <20221130132156.2836184-1-linan122@huawei.com>
+ <20221130132156.2836184-10-linan122@huawei.com>
+ <Y4fEKZy4rTE5rG/5@slm.duckdns.org>
+ <c028dd77-cabf-edd6-c893-8ee24762ac8c@huaweicloud.com>
 MIME-Version: 1.0
-In-Reply-To: <20221201045408.21908-2-shikemeng@huawei.com>
-Content-Type: text/plain; charset=gbk
-Content-Transfer-Encoding: 7bit
-X-CM-TRANSID: gCh0CgC32tfhVYhjlXjVBQ--.52763S2
-X-Coremail-Antispam: 1UD129KBjvJXoWxXr48Kw15GryUZw48ZFyxKrg_yoW5Gw17pr
-        4UGF1fAa1ktrW29rW7Jr1jvaya9w4DtrsrKF4fK34DCa17tr93Zr40kFsY9FW8CFs5tFW5
-        tr47Xan8Ga4UXaDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUkjb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k2
-        6cxKx2IYs7xG6r1S6rWUM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-        vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7Cj
-        xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
-        0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
-        6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
-        Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JMxk0xIA0c2IEe2xFo4CEbIxvr21l42xK82IYc2Ij
-        64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x
-        8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r126r1DMIIYrxkI7VAKI48JMIIF0xvE
-        2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42
-        xK8VAvwI8IcIk0rVWrZr1j6s0DMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIE
-        c7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x07UE-erUUUUU=
-X-CM-SenderInfo: 5vklyvpphqwq5kxd4v5lfo033gof0z/
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <c028dd77-cabf-edd6-c893-8ee24762ac8c@huaweicloud.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Thu, Dec 01, 2022 at 09:19:54AM +0800, Yu Kuai wrote:
+> > > diff --git a/block/blk-iocost.c b/block/blk-iocost.c
+> > > index 710cf63a1643..d2b873908f88 100644
+> > > --- a/block/blk-iocost.c
+> > > +++ b/block/blk-iocost.c
+> > > @@ -2813,13 +2813,14 @@ static void ioc_rqos_exit(struct rq_qos *rqos)
+> > >   {
+> > >   	struct ioc *ioc = rqos_to_ioc(rqos);
+> > > +	del_timer_sync(&ioc->timer);
+> > > +
+> > >   	blkcg_deactivate_policy(rqos->q, &blkcg_policy_iocost);
+> > >   	spin_lock_irq(&ioc->lock);
+> > >   	ioc->running = IOC_STOP;
+> > >   	spin_unlock_irq(&ioc->lock);
+> > > -	del_timer_sync(&ioc->timer);
+> > 
+> > I don't about this workaround. Let's fix properly?
+> 
+> Ok, and by the way, is there any reason to delete timer after
+> deactivate policy? This seems a litter wreid to me.
 
-
-on 12/1/2022 12:54 PM, Kemeng Shi wrote:
-> If we decremented queue without waiters, we should not decremente freed
-> bits number "nr", or all "nr" could be consumed in a empty queue and no
-> wakeup will be called.
-> Currently, for case "wait_cnt > 0", "nr" will not be decremented if we
-> decremented queue without watiers and retry is returned to avoid lost
-> wakeups. However for case "wait_cnt == 0", "nr" will be decremented
-> unconditionally and maybe decremented to zero. Although retry is
-> returned by active state of queue, it's not actually executed for "nr"
-> is zero.
-> 
-> Fix this by only decrementing "nr" for active queue when "wait_cnt ==
-> 0". After this fix, "nr" will always be non-zero when we decremented
-> inactive queue for case "wait_cnt == 0", so the need to retry could
-> be returned by "nr" and active state of waitqueue returned for the same
-> purpose is not needed.
-> 
-> Signed-off-by: Kemeng Shi <shikemeng@huawei.com>
-> ---
->  lib/sbitmap.c | 13 ++++++-------
->  1 file changed, 6 insertions(+), 7 deletions(-)
-> 
-> diff --git a/lib/sbitmap.c b/lib/sbitmap.c
-> index 7280ae8ca88c..e40759bcf821 100644
-> --- a/lib/sbitmap.c
-> +++ b/lib/sbitmap.c
-> @@ -604,7 +604,6 @@ static bool __sbq_wake_up(struct sbitmap_queue *sbq, int *nr)
->  	struct sbq_wait_state *ws;
->  	unsigned int wake_batch;
->  	int wait_cnt, cur, sub;
-> -	bool ret;
->  
->  	if (*nr <= 0)
->  		return false;
-> @@ -632,15 +631,15 @@ static bool __sbq_wake_up(struct sbitmap_queue *sbq, int *nr)
->  	if (wait_cnt > 0)
->  		return !waitqueue_active(&ws->wait);
->  
-> -	*nr -= sub;
-> -
->  	/*
->  	 * When wait_cnt == 0, we have to be particularly careful as we are
->  	 * responsible to reset wait_cnt regardless whether we've actually
-> -	 * woken up anybody. But in case we didn't wakeup anybody, we still
-> -	 * need to retry.
-> +	 * woken up anybody. But in case we didn't wakeup anybody, we should
-> +	 * not consume nr and need to retry to avoid lost wakeups.
->  	 */
-> -	ret = !waitqueue_active(&ws->wait);
-There is a warnning reported by checkpatch.pl which is "WARNING:waitqueue_active
-without comment" but I don't know why.
-> +	if (waitqueue_active(&ws->wait))
-> +		*nr -= sub;
-> +
->  	wake_batch = READ_ONCE(sbq->wake_batch);
->  
->  	/*
-> @@ -669,7 +668,7 @@ static bool __sbq_wake_up(struct sbitmap_queue *sbq, int *nr)
->  	sbq_index_atomic_inc(&sbq->wake_index);
->  	atomic_set(&ws->wait_cnt, wake_batch);
->  
-> -	return ret || *nr;
-> +	return *nr;
->  }
->  
->  void sbitmap_queue_wake_up(struct sbitmap_queue *sbq, int nr)
-> 
-Besides, there are some git config problems for my huaweicloud email, I will send
-patchset with huaweicloud email when I fix them.
+ioc->running is what controls whether the timer gets rescheduled or not. If
+we don't shut that down, the timer may as well get rescheduled after being
+deleted. Here, the only extra activation point is IO issue which shouldn't
+trigger during rq_qos_exit, so the ordering shouldn't matter but this is the
+right order for anything which can get restarted.
 
 Thanks.
--- 
-Best wishes
-Kemeng Shi
 
+-- 
+tejun
