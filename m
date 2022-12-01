@@ -2,108 +2,86 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 28CDBC43217
-	for <linux-block@archiver.kernel.org>; Thu,  1 Dec 2022 13:47:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6D71C47088
+	for <linux-block@archiver.kernel.org>; Thu,  1 Dec 2022 14:45:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231622AbiLANro (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 1 Dec 2022 08:47:44 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59240 "EHLO
+        id S230159AbiLAOpN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 1 Dec 2022 09:45:13 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57330 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229521AbiLANrn (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 1 Dec 2022 08:47:43 -0500
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8ED85DFDD;
-        Thu,  1 Dec 2022 05:47:39 -0800 (PST)
-Received: from mail02.huawei.com (unknown [172.30.67.169])
-        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4NNHSk1jxsz4f3jHR;
-        Thu,  1 Dec 2022 21:47:34 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-        by APP2 (Coremail) with SMTP id Syh0CgB3jrl4sIhjHtzRBQ--.20446S3;
-        Thu, 01 Dec 2022 21:47:36 +0800 (CST)
-Subject: Re: [PATCH -next v2 2/9] blk-iocost: improve hanlder of match_u64()
-To:     Tejun Heo <tj@kernel.org>, Yu Kuai <yukuai1@huaweicloud.com>
-Cc:     Li Nan <linan122@huawei.com>, josef@toxicpanda.com,
-        axboe@kernel.dk, cgroups@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        yi.zhang@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
-References: <20221130132156.2836184-1-linan122@huawei.com>
- <20221130132156.2836184-3-linan122@huawei.com>
- <Y4e90zFnhhq764lP@slm.duckdns.org>
- <7e4f1cea-2691-9b81-35f6-0dd236149f56@huaweicloud.com>
- <Y4h9MEd3q4LXDGQq@slm.duckdns.org>
-From:   Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <46bd7f33-6f24-a7a0-6359-3dc9aad98e6f@huaweicloud.com>
-Date:   Thu, 1 Dec 2022 21:47:35 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        with ESMTP id S229940AbiLAOpM (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 1 Dec 2022 09:45:12 -0500
+Received: from mail-io1-xd2c.google.com (mail-io1-xd2c.google.com [IPv6:2607:f8b0:4864:20::d2c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E18FA9CDF
+        for <linux-block@vger.kernel.org>; Thu,  1 Dec 2022 06:45:11 -0800 (PST)
+Received: by mail-io1-xd2c.google.com with SMTP id 135so1145453iou.7
+        for <linux-block@vger.kernel.org>; Thu, 01 Dec 2022 06:45:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Myk/frs+/PELrl6SJ0tjbXBv1A0UiyxiM57+8qkIPRQ=;
+        b=1ECiSr8xkZdZ3I3qIBsqirwG1tY438zDjWMz+rcqOhOrQuIsHCG5dqU7kqNh6TeQSB
+         oL2kLPhOk4vJCGLYgdT6XTKtlRlcKnStUKqXpkdx4VxlW00GVDbp/PnM16fCHGUB2Drc
+         FEgseG7EChDvXXcNU/DiPKEpyYUu8TuWl0/nCygoIzPyrQ+cXup8ieVQrGl6k8Gqngrg
+         xm8CoZNYAv3uqncmLDhZNg1rLGqGLeAajZiZHOHvQtZ7YxM/KWLr+XfR7TXLoBGz98SQ
+         mgtVWuRQKFZDIcy72KpI+Z+mVkLzhgxl70EmcBKi7FIX2aGVvEgvFUkUOYIHz4ms0l9F
+         s4Yg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Myk/frs+/PELrl6SJ0tjbXBv1A0UiyxiM57+8qkIPRQ=;
+        b=ezx7WBoQwlgbthF0HkQoNmGFkoSeTZC+uy8arHoTgaQchfn6UBk5u880BIIaRjJgE/
+         wEm8/mwOriCX1x75kdPx0/an7TgshprzdVo5TZ35pFykTlUzR7zb5+5DOP9ALvV5GIkn
+         ED0QVFhvR78ryQF12PoPyvOGmixOF+j/lRyGG/237xB/0UH55YofCnLWmI5RQODSfh5G
+         4Rk01VNY1C7Lhr/9nTHqINHXl4rJd0ajLEqOEzBBlJd3DFKoCJ0mS9N0hO1dxjwr2vMA
+         rWa2jkJUIwtHs7oVabPKkCM03oB5hE752ZyR4U4hjF1srAizRBpaxm1VJtFB7YEH7kBC
+         M2dw==
+X-Gm-Message-State: ANoB5pklVDWU2CW31ss84JUOY8WYLP3GO7eTi7CIDPPpOj5s1UgOBC4X
+        lMjKzASb7J9qEeY0M3EMVbMvHw==
+X-Google-Smtp-Source: AA0mqf6PS1vyKImmIJ+s988DaGJbXthqY5i4AUmTUIw7FcXoWmIpIz2g4Iwm7mhSnDK9kB6uKcNmHg==
+X-Received: by 2002:a02:c881:0:b0:38a:f6b:76f9 with SMTP id m1-20020a02c881000000b0038a0f6b76f9mr1836013jao.180.1669905910873;
+        Thu, 01 Dec 2022 06:45:10 -0800 (PST)
+Received: from [192.168.1.94] ([207.135.234.126])
+        by smtp.gmail.com with ESMTPSA id y17-20020a056e02119100b00300d3c0e33dsm1589519ili.4.2022.12.01.06.45.09
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 01 Dec 2022 06:45:10 -0800 (PST)
+Message-ID: <a3c9044e-d7ab-8130-76ea-a09152eacaea@kernel.dk>
+Date:   Thu, 1 Dec 2022 07:45:09 -0700
 MIME-Version: 1.0
-In-Reply-To: <Y4h9MEd3q4LXDGQq@slm.duckdns.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
+ Thunderbird/102.5.0
+Subject: Re: [PATCH] block: Fixup condition detecting exclusive opener during
+ partition rescan
+Content-Language: en-US
+To:     Jan Kara <jack@suse.cz>
+Cc:     Christoph Hellwig <hch@infradead.org>, linux-block@vger.kernel.org,
+        stable@vger.kernel.org
+References: <20221201114442.6829-1-jack@suse.cz>
+From:   Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20221201114442.6829-1-jack@suse.cz>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: Syh0CgB3jrl4sIhjHtzRBQ--.20446S3
-X-Coremail-Antispam: 1UD129KBjvJXoW7WFW5GF1UCFW7ZrW7Ary7Wrg_yoW8Wr4DpF
-        W3tas7Ar18Cr1Sk3W2y3y7XayYyr4xJr1YvFy5K348Zr1a9rW2yr17tw1Y93WUA397Kr1j
-        qF4YvasxXw1DZa7anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUU9014x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-        1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4j
-        6r4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
-        Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
-        I7IYx2IY67AKxVWUGVWUXwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
-        4UM4x0Y48IcVAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2kI
-        c2xKxwCYjI0SjxkI62AI1cAE67vIY487MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4
-        AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE
-        17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMI
-        IF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Zr0_Wr1U
-        MIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIda
-        VFxhVjvjDU0xZFpf9x0JUZa9-UUUUU=
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
-X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
+On 12/1/22 4:44 AM, Jan Kara wrote:
+> The condition detecting whether somebody else has the device exclusively
+> open in disk_scan_partitions() has a brownpaper bag bug. It triggers also
+> when nobody has the device exclusively open and we are coming from
+> BLKRRPART path. Interestingly this didn't have any adverse effects
+> during testing because tools update kernel's notion of the partition
+> table using ioctls and don't rely on BLKRRPART. Fix the bug before
+> somebody trips over it.
 
-在 2022/12/01 18:08, Tejun Heo 写道:
-> On Thu, Dec 01, 2022 at 10:15:53AM +0800, Yu Kuai wrote:
->> Hi,
->>
->> 在 2022/12/01 4:32, Tejun Heo 写道:
->>> On Wed, Nov 30, 2022 at 09:21:49PM +0800, Li Nan wrote:
->>>> From: Yu Kuai <yukuai3@huawei.com>
->>>>
->>>> 1) There are one place that return value of match_u64() is not checked.
->>>> 2) If match_u64() failed, return value is set to -EINVAL despite that
->>>>      there are other possible errnos.
->>>
->>> Ditto. Does this matter?
->>>
->>
->> It's not a big deal, but I think at least return value of match_u64()
->> should be checked, we don't want to continue with invalid input, right?
-> 
-> Yeah, sure.
-> 
->> By the way, match_u64() can return -ERANGE, which can provide more
->> specific error messge to user.
-> 
-> I'm really not convinced going over 64bit range would be all that difficult
-> to spot whether the error code is -EINVAL or -ERANGE. There isn't anything
-> wrong with returning -ERANGE but the fact that that particular function
-> returns an error code doesn't necessarily mean that it *must* be forwarded.
-> 
-> Imagine that we used sscanf(buf, "%llu", &value) to parse the number
-> instead. We'd only know whether the parsing would have succeeded or not and
-> would probably return -EINVAL on failure and the behavior would be just
-> fine. This does not matter *at all*.
-> 
-> So, idk, I'm not necessarily against it but changing -EINVAL to -ERANGE is
-> pure churn. Nothing material is being improved by that change.
+I folded this in. It's funny because I did consider this when reviewing
+it, but then convinced myself it was fine...
 
-Thanks for the review and explanation, I'll just keep the addition of
-return value  checking of the former 2 patches.
+-- 
+Jens Axboe
 
-Thanks,
-Kuai
 
