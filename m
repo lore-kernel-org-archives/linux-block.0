@@ -2,159 +2,147 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC6E2C4321E
-	for <linux-block@archiver.kernel.org>; Wed, 30 Nov 2022 23:32:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF4DCC4321E
+	for <linux-block@archiver.kernel.org>; Thu,  1 Dec 2022 00:39:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230139AbiK3Xcz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 30 Nov 2022 18:32:55 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50844 "EHLO
+        id S229751AbiLAAjQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 30 Nov 2022 19:39:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57758 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229782AbiK3Xcg (ORCPT
+        with ESMTP id S229461AbiLAAjQ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 30 Nov 2022 18:32:36 -0500
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2078.outbound.protection.outlook.com [40.107.244.78])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30C9C862F7;
-        Wed, 30 Nov 2022 15:29:02 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=HQ84dWe/f5TxidKGNp+oFPl7UwOfecrIl+dV+9W1PcVlewriyBYh/boTHk6BTr5WoSI5utxKiUNU0mr9gN1tXl9pG5a9oI2VJn2d6FrVU5tO6ZjolP5YRnKn5vwdq6Dg6PFU/0I4HCraTJl7wm07J7SA4RvAxHNXtb92cmY246rgAFLDp45DD5be1CIK+CNJjs5aWQTK/8PdYjye8dlwMydacBqBkbweOYWez/AMqmt4zVg8Z2uKoPZxlz0kvF/0yXR8Ktz+HaGfzPc55p0+px+CPdffdQ59jq/jlDtOjKH96edeXEojZeygokyF2LBDfwX2jSzaiCQIsxQyGhITow==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Z47RPPGnxzd+D5ETlytqTtR2XTJaI17SBE9wex6SFug=;
- b=RBt1YCxzWW/AS0VkQO5caipihVeiFG3wc/4ew3SLb5zTVaa4rQNtiIjp9lr+0ZonKbgzkfVqhnUJZBKaD8JmRiaxMv0e6vMVMw+dQXHVozr7Mn+nzkEvqhEfjZb0ymol8dCdR0b6opRDC8LngsiaLqqRBIfTc8SeAkzmUB1V9i1efGt1MmpDAEyiv/dofY5QOq22tkaw6O9cLJWxzSPjIwIU6k7qkaMqb8pA+SoRAgRGgtpNp8ujzzo4sGTh2Ngtv+g1ao4aeAmAtWKIJSC6ijcbJWRRZA7zHlQwRvmJzY5ce95M1wJkBUZ/umZyIT54EqBjeBD19UhvoJTBhJqoww==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Z47RPPGnxzd+D5ETlytqTtR2XTJaI17SBE9wex6SFug=;
- b=d8H5El+d+T6iCCCinlpnNb3gZMeIxTSOJhKxXkcyxG9bFE/P/IL6BPv/M25hLF2YIYEaxOp5bRvUlcmxgCWjCDcWGYyoJ9PwczHwf9JoP4qGVBdiCgL90OJ0GAOf5XEiE+LGGu/p1jt9eTUhE1pV+IATBZZRkxz+KVFlX6O1AL3n2VSVbBQzbba9Qwumal5WrJO2F3EKGovyZRaSIpUXeS8BWOCtMnwmvapxFcf8m1sLTEUuCYKvV2n1jJPnyW63Fd9Im31agrBIc/e9f3QvycGR95ietZvAy6W7UBwfqH4vU1SyOwkIVoRjP6HyixDyXS0utrbdXb6J8Jz3tO7luQ==
-Received: from MW2PR12MB4667.namprd12.prod.outlook.com (2603:10b6:302:12::28)
- by DS7PR12MB6288.namprd12.prod.outlook.com (2603:10b6:8:93::7) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.5857.23; Wed, 30 Nov 2022 23:29:00 +0000
-Received: from MW2PR12MB4667.namprd12.prod.outlook.com
- ([fe80::f02:bf13:2f64:43bc]) by MW2PR12MB4667.namprd12.prod.outlook.com
- ([fe80::f02:bf13:2f64:43bc%7]) with mapi id 15.20.5857.023; Wed, 30 Nov 2022
- 23:29:00 +0000
-From:   Chaitanya Kulkarni <chaitanyak@nvidia.com>
-To:     Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
-        Chaitanya Kulkarni <chaitanyak@nvidia.com>
-CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "axboe@kernel.dk" <axboe@kernel.dk>,
-        "damien.lemoal@opensource.wdc.com" <damien.lemoal@opensource.wdc.com>,
-        "bvanassche@acm.org" <bvanassche@acm.org>,
-        "vincent.fu@samsung.com" <vincent.fu@samsung.com>
-Subject: Re: [PATCH V4 1/8] null_blk: allow REQ_OP_WRITE_ZEROES
-Thread-Topic: [PATCH V4 1/8] null_blk: allow REQ_OP_WRITE_ZEROES
-Thread-Index: AQHZBEpTLGKBSAeKCE6T0fXerJPm765XGscAgAEDsAA=
-Date:   Wed, 30 Nov 2022 23:29:00 +0000
-Message-ID: <bebfa1a2-1bf6-b515-00fb-4a7be7eeeae5@nvidia.com>
-References: <20221129232813.37968-1-kch@nvidia.com>
- <20221129232813.37968-2-kch@nvidia.com>
- <20221130075932.nfbxiixykfpxrweh@shindev>
-In-Reply-To: <20221130075932.nfbxiixykfpxrweh@shindev>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-user-agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.9.0
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: MW2PR12MB4667:EE_|DS7PR12MB6288:EE_
-x-ms-office365-filtering-correlation-id: 39652f14-0751-4d57-71af-08dad32aa914
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 0Tr+EXRMHHxFG5VqKhR4Lh4EmfwaDWtRqNA5B/DKaujkEqWIK+oWrObNItiyfBRatxn5m4v9iP6yEcF5BjYB6hBZMo4530eeXeDV1mqj4uAAZi6gJr7Frr6jp7XYuuWURI+v0SVzH8AboB9/9NEnhD1e4SCTnaSssyMKWSa5PyKuOkxwP5wrnVo97o5XPProM/Dc3U5dH1DiiQOlv2r+YDrT41uEVtKG9yC7zEBwKO9DL626leUfUQqkGMZVNngscRdJRVgptkhWD/muEU2n4j+ggxr3Ep2IojZYVqRSPxv219v2c7rrD5QTPENUKG6A0+BQcc1Eaem9B8nIVhPYnEyMhb5ZanRQKCuct/FxF/tO2Z0lMJEWp0CSvXyS1piH/+DLuZUhoprFCq7ecRRsT7kVFDwQFtlMfghxW6AR1ZD3XIKYBYg2RoWxyLj+9cWxEJ9uInwE+QL1+lDMfUa8WC/hZNVQpC08CtlCwW6Kahhp36wJ/L0yOj6Qpx8T7PCHiHKTSavffNQL4cdymip3TpACTiyEGqUjH3/afsqlsL81KnbI3I8CkzGzdvP9fl4VzRFYxEXX/UIV/9BKW8M4y0t46WmlumTCRUl2ih78RUYEx+XSz0Apsc5r9VRvPdxEh2OuGV4J6AYXzi+Fz/3aUeQ8NnDAFFYfUQvW9FDCJPWVVSqxwXvkNflrDJK/9Chv2X6Dkfmjwww7NYnGiMa0wXwr2xhIxJ3n6la/i+eSQ3+IBSS1DHq+ruVEGK0XZAXAl3EQVq7OZ5U39T4ap4z3XA==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW2PR12MB4667.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(396003)(346002)(376002)(39860400002)(136003)(366004)(451199015)(38070700005)(36756003)(86362001)(31696002)(54906003)(316002)(6486002)(110136005)(71200400001)(122000001)(91956017)(66476007)(41300700001)(64756008)(8676002)(66946007)(5660300002)(4326008)(76116006)(478600001)(66556008)(2906002)(8936002)(66446008)(38100700002)(6512007)(6506007)(186003)(2616005)(31686004)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?UFdDamdEaXE4dGlNZTVjTTNoYXRVeGhtYUpHb2hRNkJOY1FwNlJYK3V4RG1Z?=
- =?utf-8?B?bEE1aDdjNlhZQWdyYy9hdERKL2twVEZhSlVIUGMzZEFwbDQ2dzFyR09qZnl6?=
- =?utf-8?B?TkQ2eG9yVEN1amc4OGhwS3JFUVF4aitxdStkQityR3hkV1ZtdVl2KzVyem9S?=
- =?utf-8?B?bmgrWHd2cmltekVsQVFlM3IzVnRLOVdpSDA2RjQ2Yk5RQTJvNE0vZitQMi9M?=
- =?utf-8?B?eXU5bnJIRHFmaGRSY0kwSzhUbGlDU2FCWERHd3NyRjFtNW94TE1Lb240WU9R?=
- =?utf-8?B?MkxnZTZDUU0rSXBqNFRjOVhmaU5JTVpYL0REdmVEYVJMSi95WkxvQTAvcHRJ?=
- =?utf-8?B?YlplYUNrMENqWFRnbiszMS8vbEthZUZkZ0FBMmhJMkg1K2hFNG1RQnQvdWNM?=
- =?utf-8?B?c25SZDd1NjBiZVJzRmRkL3NzRnFBNXErT21tay9hOXpWMWRWQ1hlUDhUZGo0?=
- =?utf-8?B?TWxiNVFBWUszM1UvYjBSUmFtV001NUVhWUR3bWZXSmd0MHFWbVV3NHdqR2NG?=
- =?utf-8?B?K0VqVE0zSi94SnJXczVQK2pmL1lWL2pqR0FpWlpNbFpTU2ZZcVlRZVpSQlRU?=
- =?utf-8?B?NUtOYk55K1JZemY5aGsxZ0xHZUZTS1dNRmE4Yk5sUGV6aG0rZFVESG9DT2Q5?=
- =?utf-8?B?Q1EreGFvRTM2MTA0eTJKMHp3SWlHaW1qL1p6djcwSDczNHEvOFdKbWp4Sko5?=
- =?utf-8?B?ZVdnWUpvWGptd1ZXRC9oL1c0aWRQZ2ZZdHdnalZsWkNpZlZVK1JTWXZWSXR6?=
- =?utf-8?B?QStTOFlvVy9qRktOSCt0dFYrOEZjdVY2QVJ1a1oweGRjZDk3ZFA2MGZKTUlM?=
- =?utf-8?B?YSs2KzNuKzljeXEvbVVDQ0o3c0c0S1h5U0ZzcWhZbzhhYS8wcXpYZ0pNVHZ5?=
- =?utf-8?B?QWhTQ2hUOXR6SlRPS0srdTNuWWxFVkhPQURramZINWlHQXNlVE1VbVhFSVZJ?=
- =?utf-8?B?cXpWWXBCSmlHWnZ6SUMrUlN5R1l3d1N6aEkyYk5zcHNKcElhUWwyZlhvM1lr?=
- =?utf-8?B?RERYeU50M1BkVG4zZmU0QVdHWFljM1FxSEVkQTFVdGRjUFM1SjRScUxrOGVO?=
- =?utf-8?B?MkN0WmJXVUNQMFd1SFNnOEVlK1gzK2hTTFdYYXFsTC9qUlVGczVwMVdqWW1h?=
- =?utf-8?B?d2hCczJidnpsTVoxMkNjWFMySHhWWnhZWXRwMzBaRDJWWFFaWW54L3h3dzhm?=
- =?utf-8?B?V2VYYUwybllKdFpkai8rT0QyTHp5MWc1RnNWbXZqT3l6SC9UWTEzcE4rYkFy?=
- =?utf-8?B?dEgwZkJWdVhPaFdpOUwyWEZIN2pBRTFaYTVzRGdwcndvLzBrMjNYRkVFZGFI?=
- =?utf-8?B?SklaaDRRbHU4a0lPMm11TnRUaVZFcEdFRkpVNldtTllGQ0l4QStySHgrMmlm?=
- =?utf-8?B?d1kvMkFDbC8yTC9OTzNWejRMVHl2WFFIdWpqMnNQa01mSGRRTG5aeTRTRXp3?=
- =?utf-8?B?bWxCRTlEL1ZkRzdqN0xNWk40NWdQbkJDQlZiaS94aTVTYjlOaTFodDlvMTF6?=
- =?utf-8?B?STBZcjZQZDdSYnZIcjBzelVyUXFqK0p3WDg4Mjh6c1cxaGwxV3BwdlJDVDAx?=
- =?utf-8?B?aTZSMjVTNHFNNW5vNm94NEtUTkxUWE9kU0pCQ1lBdHkzanBSSzdmanNYWmRu?=
- =?utf-8?B?Zi8zclp5QXFXSndmcllzNkh1d3lRWFJjRkFENkgzeGFmZDRMMUs2ci9MSmR0?=
- =?utf-8?B?a3gzM0llZkNLRVRvcTZQaWJGNDV3aDZyRnpsS1ozelA3QUY2Q0p2dytnRkpY?=
- =?utf-8?B?cTFJMFE0ZU1oZzhaY3RYVXE5YjlldlVDM2NMdDU0V2tTbmZPNlZWZ1FZWS9y?=
- =?utf-8?B?cmJBcC8rTjl2ZzRIRTY1ZlI1SU0zWXBGNUJhM0hVcy82cDh1dGVYdVg2dE5n?=
- =?utf-8?B?WHV4dXkxMm5xRERYTVlFV2hRMVlxOTh5N0tiQkdwd0wrWGpyd0x4d0hWT1FD?=
- =?utf-8?B?YU9RVkNMWkE4Y0didTBiem5PZnJ6NlF0SXJXeUxBNmFJbTRVcXRGVUpZbkZo?=
- =?utf-8?B?Q2ZXSlNQVWJjM3FkYWdGNkltb0NNcmM4VUhJMklXeVFXeHVPZnliV0MxdEhL?=
- =?utf-8?B?dVNtbEl0YTV6c2d0Vm8vVzFEd2VMQmtESThHUkovb1VpWG93Q0c5cGRuWkty?=
- =?utf-8?B?OEpFM29iejBlNTNkd2o5UXhJcVdiU1FybWEydmF6Z0VjbkN1ZUpwaVhxeDQ4?=
- =?utf-8?B?OHc9PQ==?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <A091E02DAD4BF74DBDFD5185BAEE0886@namprd12.prod.outlook.com>
-Content-Transfer-Encoding: base64
+        Wed, 30 Nov 2022 19:39:16 -0500
+Received: from esa4.hgst.iphmx.com (esa4.hgst.iphmx.com [216.71.154.42])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49AC159FF7
+        for <linux-block@vger.kernel.org>; Wed, 30 Nov 2022 16:39:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1669855155; x=1701391155;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=pgc+p5PDA6K847LjDI8dN8wGPApGRqqSYi2al8gE+q0=;
+  b=I+rV0cL9qHoIhoP03Ls1rp92MCdqgnovyLxbY5cQ/jYVWNKM7K47WvhC
+   EaA1vXXeV6jT9sfRvji3pu9KNZ80tmfAvhcKSRMppla53MTPuzHNg0MmG
+   7pG5HYHCk/K3VenNUeWuoj4EoBZbiNrSZTiBgNO3ngnnB5RDLE/lVZmpR
+   DD5OfOcYOGgXGA0F/aKYUOuuTj6J23wCbNyCiGzG4tmDiIj3jbtKhTgXZ
+   iZ+JK4RKp9KlIxKojcDC2BfLhS+Y4z00OJrqmjeHvpk5I/3ob/3GobYFu
+   5WLhQrQBqilM4fiq0EbkxEYY5taHH6JuwOZZOrkg0P1N/BluWogB4v3+U
+   g==;
+X-IronPort-AV: E=Sophos;i="5.96,207,1665417600"; 
+   d="scan'208";a="215832918"
+Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
+  by ob1.hgst.iphmx.com with ESMTP; 01 Dec 2022 08:39:14 +0800
+IronPort-SDR: wbMHOYdjB5SfxWofrmPbvmlWvpO8Zhc7UQow3Is4IhHXYOM12Op092xVgxjoafhzsP573Mqp2v
+ WZ8xBNkcOHoVMNPt2kAXn+9SDDSA8ngSvE2071IwwdtE487lz1bbOlM2VhME85LorJMnQU+Qt0
+ t79TXGCNNmxB5xYn6tNdfJywgcIKpFf6IgrPzUtsV30Axew3OprKiInc23tgFSGT8foV6+eYoP
+ G7sSrGPC/5oY1tG5Gj7a1bTX67+JONYsHSZODFLqPpeHdRb10oYS3+1M36B1INOw3RQYUS0vP8
+ mQw=
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 30 Nov 2022 15:57:53 -0800
+IronPort-SDR: nneZChkC1ijduzvGaEPZHIkaRMNJvvwP1KCdkD15DIU5Zy0M8M5uhrfuS53gD0vYQYQGlW3EVv
+ tawgQPzjHpq6a4Bo/sCztVtPVNuGAo4WJExIB/4+WGPCo9FEe753NeOX9ZD+xGiXmGEViQa9aF
+ hlYvrXgJZeXHGnAD6zSjK6+g/7b8W0KXsLz4VXg9RSRtC4uKGuBrnmh1Xc3X5h/hcn0WDvgbpL
+ RkgVFHBxsnT8jLfoQPP5a3/2HxHesAyEVsJcT1w8FsjI8YhRGSVQqNjEW6NVhR96PlrYAQpGrY
+ vIE=
+WDCIronportException: Internal
+Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
+  by uls-op-cesaip02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 30 Nov 2022 16:39:14 -0800
+Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4NMxz62568z1RvTr
+        for <linux-block@vger.kernel.org>; Wed, 30 Nov 2022 16:39:14 -0800 (PST)
+Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
+        reason="pass (just generated, assumed good)"
+        header.d=opensource.wdc.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
+        opensource.wdc.com; h=content-transfer-encoding:content-type
+        :in-reply-to:organization:from:references:to:content-language
+        :subject:user-agent:mime-version:date:message-id; s=dkim; t=
+        1669855153; x=1672447154; bh=pgc+p5PDA6K847LjDI8dN8wGPApGRqqSYi2
+        al8gE+q0=; b=tD6vpG7Z82qbE3CipPvSIVmkpkXKxKQB4BnoveZ9oe6iF4H/G10
+        UIZ+gEeDpa0fIxUOB1FNa39KmJAZezf4rGNjBkmQLSSUzlrfb430U7rds+Jddjnj
+        0cipDt7l+vIUMoRpR7jWrm+jIj7Y3liIQ0/DmzvkJnjcMfMf15MUUqbUL/ucXg9u
+        YJ11ojvONMTbyZqWn+wIfXXRZSO5pcjwr0MpAe/JQz2dzwjFIcZpn6UAZhxxAC4a
+        vxkLO239c1Og4IXYrxroOiZumh/Ik0Ewpd3m2Bm/IXRkva1vIxIgLA892oUjyjwB
+        sDXayqD7kqFE5BBQe4jglUQa9PjzGyO7Wsg==
+X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
+Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
+        by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
+        with ESMTP id vXoVIVedu27Q for <linux-block@vger.kernel.org>;
+        Wed, 30 Nov 2022 16:39:13 -0800 (PST)
+Received: from [10.225.163.66] (unknown [10.225.163.66])
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4NMxz36Dp3z1RvLy;
+        Wed, 30 Nov 2022 16:39:11 -0800 (PST)
+Message-ID: <687161b4-3e92-9fbf-c0a6-e8dceee3d250@opensource.wdc.com>
+Date:   Thu, 1 Dec 2022 09:39:10 +0900
 MIME-Version: 1.0
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: MW2PR12MB4667.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 39652f14-0751-4d57-71af-08dad32aa914
-X-MS-Exchange-CrossTenant-originalarrivaltime: 30 Nov 2022 23:29:00.4654
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: ZuAOrpWEtm80vWekpoHpE1DydUrz+OUvbmrTE9ZuqWAzCVAswm7RVJUKneq2WrUcmGrhhRbhVE85IN57wJcQXA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB6288
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.5.0
+Subject: Re: [PATCH v2 8/8] null_blk: Support configuring the maximum segment
+ size
+Content-Language: en-US
+To:     Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        Christoph Hellwig <hch@lst.de>,
+        Adrian Hunter <adrian.hunter@intel.com>,
+        Avri Altman <avri.altman@wdc.com>,
+        Ming Lei <ming.lei@redhat.com>,
+        Chaitanya Kulkarni <kch@nvidia.com>
+References: <20221123205740.463185-1-bvanassche@acm.org>
+ <20221123205740.463185-9-bvanassche@acm.org>
+ <32feb681-e858-1a0c-b91d-3f0d85615a6d@opensource.wdc.com>
+ <6c41f85b-7add-60d7-e131-71c3cfae80d0@acm.org>
+From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
+Organization: Western Digital Research
+In-Reply-To: <6c41f85b-7add-60d7-e131-71c3cfae80d0@acm.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Pj4gU2lnbmVkLW9mZi1ieTogQ2hhaXRhbnlhIEt1bGthcm5pIDxrY2hAbnZpZGlhLmNvbT4NCj4g
-DQo+IFRoaXMgbW90aXZhdGlvbiBzb3VuZHMgZ29vZC4gSSB0cmllZCB0aGlzIHBhdGNoLiBXaXRo
-IGEgcXVpY2sgdGVzdCBpdCBsb29rcw0KPiB3b3JraW5nIGdvb2QgZm9yIG1lLiBQbGVhc2UgZmlu
-ZCBtaW5vciBjb21tZW50cyBpbiBsaW5lLg0KPiANCj4gWy4uLl0NCj4gDQo+PiArc3RhdGljIHZv
-aWQgbnVsbF96ZXJvX3NlY3RvcihzdHJ1Y3QgbnVsbGJfZGV2aWNlICpkLCBzZWN0b3JfdCBzZWN0
-LA0KPj4gKwkJCSAgICAgc2VjdG9yX3QgbnJfc2VjdHMsIGJvb2wgY2FjaGUpDQo+PiArew0KPj4g
-KwlzdHJ1Y3QgcmFkaXhfdHJlZV9yb290ICpyb290ID0gY2FjaGUgPyAmZC0+Y2FjaGUgOiAmZC0+
-ZGF0YTsNCj4+ICsJc3RydWN0IG51bGxiX3BhZ2UgKnRfcGFnZTsNCj4+ICsJdW5zaWduZWQgaW50
-IG9mZnNldDsNCj4+ICsJdm9pZCAqZGVzdDsNCj4+ICsNCj4+ICsJdF9wYWdlID0gcmFkaXhfdHJl
-ZV9sb29rdXAocm9vdCwgc2VjdCA+PiBQQUdFX1NFQ1RPUlNfU0hJRlQpOw0KPj4gKwlpZiAoIXRf
-cGFnZSkNCj4+ICsJCXJldHVybjsNCj4+ICsNCj4+ICsJb2Zmc2V0ID0gKHNlY3QgJiBTRUNUT1Jf
-TUFTSykgPDwgU0VDVE9SX1NISUZUOw0KPj4gKwlkZXN0ID0ga21hcF9hdG9taWModF9wYWdlLT5w
-YWdlKTsNCj4+ICsJbWVtc2V0KGRlc3QgKyBvZmZzZXQsIDAsIFNFQ1RPUl9TSVpFICogbnJfc2Vj
-dHMpOw0KPj4gKwlrdW5tYXBfYXRvbWljKGRlc3QpOw0KPj4gK30NCj4gDQo+IERpZCB5b3UgY29u
-c2lkZXIgdG8gY2FsbCBudWxsX2xvb2t1cF9wYWdlKCkgZm9yIF9fbnVsbF9sb29rdXBfcGFnZSgp
-IGZyb20NCj4gbnVsbF96ZXJvX3NlY3RvcigpPyBJdCBtYXkgc2ltcGxpZnkgdGhpcyBmdW5jdGlv
-biBhIGJpdC4NCj4gDQoNCkkgZm91bmQgdGhpcyBjbGVhciBhbmQgZWFzeSB0aGFuIGdvaW5nIG92
-ZXIgY2FsbCBjaGFpbiB3aGVuDQpkZWJ1Z2dpbmcuDQoNCj4+ICsNCj4+ICAgc3RhdGljIHN0cnVj
-dCBudWxsYl9wYWdlICpudWxsX3JhZGl4X3RyZWVfaW5zZXJ0KHN0cnVjdCBudWxsYiAqbnVsbGIs
-IHU2NCBpZHgsDQoNClsuLi5dDQoNCj4+ICAgDQo+PiArc3RhdGljIHZvaWQgbnVsbF9jb25maWdf
-d3JpdGVfemVyb2VzKHN0cnVjdCBudWxsYiAqbnVsbGIpDQo+PiArew0KPj4gKwlpZiAoIW51bGxi
-LT5kZXYtPndyaXRlX3plcm9lcykNCj4+ICsJCXJldHVybjsNCj4+ICsJYmxrX3F1ZXVlX21heF93
-cml0ZV96ZXJvZXNfc2VjdG9ycyhudWxsYi0+cSwgVUlOVF9NQVggPj4gOSk7DQo+IA0KPiBKdXN0
-IGNvbW1lbnQ6IHRoaXMgdmFsdWUgVUlOVF9NQVggPj4gOSBzb3VuZHMgYSBiaXQgd2VpcmQsIGJ1
-dCBwcm9iYWJseSBvay4gVGhpcw0KPiB2YWx1ZSB3YXMgaW50cm9kdWNlZCBieSBjb21taXQgMzA2
-ZWI2YjRhZDRmICgibnVsbGI6IHN1cHBvcnQgZGlzY2FyZCIpIHRvIGNhbGwNCj4gYmxrX3F1ZXVl
-X21heF9kaXNjYXJkX3NlY3RvcnMoKS4gSSBndWVzcyB5b3UgY2hvc2UgdGhlIHNhbWUgdmFsdWUg
-Zm9yIHdyaXRlDQo+IHplcm9lcy4NCj4gDQoNClllcyBpbmRlZWQsIHBseiBoYXZlIGEgbG9vayBl
-bmQgcGF0Y2hlcyB0byBhbGxvdyB1c2VyIHRvIHNldCB0aGlzIHZhbHVlLg0KDQotY2sNCg0K
+On 12/1/22 07:29, Bart Van Assche wrote:
+> On 11/23/22 17:40, Damien Le Moal wrote:
+>> On 11/24/22 05:57, Bart Van Assche wrote:
+>>> +static unsigned int g_max_segment_size = 1UL << 31;
+>>
+>> 1UL is unsigned long be this var is unsigned int. Why not simply use
+>> UINT_MAX here ? You prefer the 2GB value ? If yes, then may be at least
+>> change that to "1U << 31", no ?
+>>
+>> [ ... ]
+>>> @@ -2106,6 +2119,7 @@ static int null_add_dev(struct nullb_device *dev)
+>>>   	dev->max_sectors = min_t(unsigned int, dev->max_sectors,
+>>>   				 BLK_DEF_MAX_SECTORS);
+>>>   	blk_queue_max_hw_sectors(nullb->q, dev->max_sectors);
+>>> +	blk_queue_max_segment_size(nullb->q, dev->max_segment_size);
+>>
+>> Should we keep the ability to use the kernel default value as the default
+>> here ?
+>> E.g.
+>>
+>> 	if (dev->max_segment_size)
+>> 		blk_queue_max_segment_size(nullb->q,
+>> 				dev->max_segment_size);
+>>
+>> If yes, then g_max_segment_size initial value should be 0, meaning "kernel
+>> default".
+> 
+> Hi Damien,
+> 
+> How about changing the default value for g_max_segment_size from
+> 1UL << 31 into BLK_MAX_SEGMENT_SIZE? That will simplify the code and 
+> also prevents that this patch changes the behavior of the null_blk 
+> driver if g_max_segment_size is not modified by the user.
+
+Sounds good to me.
+
+> 
+> Thanks,
+> 
+> Bart.
+> 
+
+-- 
+Damien Le Moal
+Western Digital Research
+
