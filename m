@@ -2,127 +2,87 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FC05C4708E
-	for <linux-block@archiver.kernel.org>; Thu,  1 Dec 2022 18:43:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BF9E4C47089
+	for <linux-block@archiver.kernel.org>; Thu,  1 Dec 2022 19:29:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230248AbiLASn0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 1 Dec 2022 13:43:26 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41164 "EHLO
+        id S229714AbiLAT3T (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 1 Dec 2022 14:29:19 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52158 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230103AbiLASnZ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 1 Dec 2022 13:43:25 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 293C9934C2;
-        Thu,  1 Dec 2022 10:43:25 -0800 (PST)
+        with ESMTP id S229810AbiLAT3S (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 1 Dec 2022 14:29:18 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 57D41C7D27;
+        Thu,  1 Dec 2022 11:29:17 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id BC797620B3;
-        Thu,  1 Dec 2022 18:43:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 208F8C433D6;
-        Thu,  1 Dec 2022 18:43:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1669920204;
-        bh=p4GYPrcLemfL1H4zQdK4YSafqKxYl8uzcCcsuNR5Mug=;
+        by ams.source.kernel.org (Postfix) with ESMTPS id 09BCBB8201E;
+        Thu,  1 Dec 2022 19:29:16 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3B662C433C1;
+        Thu,  1 Dec 2022 19:29:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1669922954;
+        bh=J43MOZ0js3CHpA7AwpgZh/EydKVlRQh87fdR90KbnRY=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=a2BoPen065qBe8Og5canw6L1zfhJNTp7AhJG9KCJ6kiqz0PbaFOGVhFTqYEHLQC/3
-         txrNOo/kDMMWMmzGqvPwfOzgrz6vwm2Q1DicWoYbq+xwADN5A7BOVkCSHc8BU+fkbm
-         ahiTJmpUWGq4d9z7eAd6F7xiHvrsPEH9AaFENflI=
-Date:   Thu, 1 Dec 2022 19:43:20 +0100
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     Matthew Wilcox <willy@infradead.org>
-Cc:     Jason Gunthorpe <jgg@ziepe.ca>,
-        Maximilian Luz <luzmaximilian@gmail.com>,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        linux-kernel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        "Rafael J. Wysocki" <rafael@kernel.org>,
-        Len Brown <lenb@kernel.org>,
-        Stefan Richter <stefanr@s5r6.in-berlin.de>,
-        Wolfram Sang <wsa@kernel.org>,
-        Alexandre Belloni <alexandre.belloni@bootlin.com>,
-        Dmitry Torokhov <dmitry.torokhov@gmail.com>,
-        Sean Young <sean@mess.org>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Rob Herring <robh+dt@kernel.org>,
-        Frank Rowand <frowand.list@gmail.com>,
-        Hans de Goede <hdegoede@redhat.com>,
-        Mark Gross <markgross@kernel.org>,
-        Vinod Koul <vkoul@kernel.org>,
-        Bard Liao <yung-chuan.liao@linux.intel.com>,
-        Pierre-Louis Bossart <pierre-louis.bossart@linux.intel.com>,
-        Sanyog Kale <sanyog.r.kale@intel.com>,
-        Andreas Noever <andreas.noever@gmail.com>,
-        Michael Jamet <michael.jamet@intel.com>,
-        Mika Westerberg <mika.westerberg@linux.intel.com>,
-        Yehezkel Bernat <YehezkelShB@gmail.com>,
-        Jiri Slaby <jirislaby@kernel.org>,
-        Heikki Krogerus <heikki.krogerus@linux.intel.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        Ming Lei <ming.lei@redhat.com>,
-        Jilin Yuan <yuanjilin@cdjrlc.com>,
-        Alan Stern <stern@rowland.harvard.edu>,
-        Sakari Ailus <sakari.ailus@linux.intel.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ira Weiny <ira.weiny@intel.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Won Chung <wonchung@google.com>, alsa-devel@alsa-project.org,
-        devicetree@vger.kernel.org, linux-acpi@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-i2c@vger.kernel.org,
-        linux-i3c@lists.infradead.org, linux-input@vger.kernel.org,
-        linux-media@vger.kernel.org, linux-serial@vger.kernel.org,
-        linux-usb@vger.kernel.org, linux1394-devel@lists.sourceforge.net,
-        platform-driver-x86@vger.kernel.org
-Subject: Re: [PATCH 3/5] driver core: make struct device_type.uevent() take a
- const *
-Message-ID: <Y4j1yPD4Ypze7jx5@kroah.com>
-References: <Y34hgIW8p1RlQTBB@smile.fi.intel.com>
- <97be39ed-3cea-d55a-caa6-c2652baef399@gmail.com>
- <Y34zyzdbRUdyOSkA@casper.infradead.org>
- <Y34+V2bCDdqujBDk@kroah.com>
- <Y35JfNJDppRp5bLX@ziepe.ca>
- <Y35R+/eQJYI7VaDS@kroah.com>
- <Y35YlI93UBuTfgYy@ziepe.ca>
- <Y35dMIaNYSE0Cykd@casper.infradead.org>
- <Y35enjI+dhhqiG3B@ziepe.ca>
- <Y35ftyYlE8FX8xQO@casper.infradead.org>
+        b=rD8FMgQukf48d4Y/QPh3LFy1sKkP4JdDiYxMhNO1HuDyXbeuu2h1PdaNULgR0hGQe
+         wFaZCPUQEb8RU91EGwviDwhqZdxY3AfXn8b2kbTP04i0meZBQANgEIK1A0ERAoDAei
+         5TUlrcpjwRQTyIh2gzYQFKPbq4mvlYEmtW7+vbZRkVljcGHrWVckv6QevxieIcM5N4
+         OFfoeVkAHCG6dWQW7KVJeRWJesoh6r0LHfe9JUbGVABT96mHwUORX8oD3f3olmsJtk
+         7DwwqZXiVIe+eRWKqD39Lqf35JDJHlfySWNA7riEZS6sCn+3OyuRSYJQ8RB5vAs/am
+         XhhuxhCEN9G2Q==
+Date:   Thu, 1 Dec 2022 11:29:12 -0800
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+Cc:     "Theodore Y. Ts o" <tytso@mit.edu>,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        Jonathan Corbet <corbet@lwn.net>, Jens Axboe <axboe@kernel.dk>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Bagas Sanjaya <bagasdotme@gmail.com>,
+        linux-fscrypt@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
+Subject: Re: [PATCH v4 0/2] Add SM4 XTS symmetric algorithm for blk-crypto
+ and fscrypt
+Message-ID: <Y4kAiKhZL4Ucv3MI@sol.localdomain>
+References: <20221201125819.36932-1-tianjia.zhang@linux.alibaba.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Y35ftyYlE8FX8xQO@casper.infradead.org>
+In-Reply-To: <20221201125819.36932-1-tianjia.zhang@linux.alibaba.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Nov 23, 2022 at 06:00:23PM +0000, Matthew Wilcox wrote:
-> On Wed, Nov 23, 2022 at 01:55:42PM -0400, Jason Gunthorpe wrote:
-> > On Wed, Nov 23, 2022 at 05:49:36PM +0000, Matthew Wilcox wrote:
-> > > On Wed, Nov 23, 2022 at 01:29:56PM -0400, Jason Gunthorpe wrote:
-> > > > #define generic_container_of(in_type, in, out_type, out_member) \
-> > > > 	_Generic(in,                                        \
-> > > >                   const in_type *: ((const out_type *)container_of(in, out_type, out_member)),   \
-> > > >                   in_type *: ((out_type *)container_of(in, out_type, out_member)) \
-> > > > 		  )
-> > > 
-> > > There's a neat trick I found in seqlock.h:
-> > > 
-> > > #define generic_container_of(in_t, in, out_t, m)			\
-> > > 	_Generic(*(in),							\
-> > > 		const in_t: ((const out_t *)container_of(in, out_t, m)), \
-> > > 		in_t: ((out_t *)container_of(in, out_type, m))	\
-> > > 	)
-> > >
-> > > and now it fits in 80 columns ;-)
-> > 
-> > Aside from less letters, is their another benifit to using *(in) ?
+On Thu, Dec 01, 2022 at 08:58:17PM +0800, Tianjia Zhang wrote:
+> SM4 is widely used in China's data encryption software and hardware.
+> these algoritms are mandatory in many scenarios. This serial of
+> patches enables the SM4-XTS algorithm in blk-crypto and enables the
+> SM4-XTS/CTS algorithm in fscrypt to encrypt file content and filename.
 > 
-> I don't think so.  It just looks nicer to me than putting the star in
-> each case.  If I'd thought of it, I would have done it to page_folio(),
-> but I won't change it now.
+> v4 changes:
+>   - only allow the SM4 XTS/CTS algorithm in policy v2 for fscrypt
+>   - update git commit message
+> 
+> v3 change:
+>   - update git commit message
+> 
+> v2 change:
+>   - As Eric said, the new FSCRYPT_MODE is defined for the unused numbers 7 and 8
+> 
+> Tianjia Zhang (2):
+>   blk-crypto: Add support for SM4-XTS blk crypto mode
+>   fscrypt: Add SM4 XTS/CTS symmetric algorithm support
+> 
+>  Documentation/filesystems/fscrypt.rst |  1 +
+>  block/blk-crypto.c                    |  6 ++++++
+>  fs/crypto/keysetup.c                  | 15 +++++++++++++++
+>  fs/crypto/policy.c                    |  5 +++++
+>  include/linux/blk-crypto.h            |  1 +
+>  include/uapi/linux/fscrypt.h          |  2 ++
+>  6 files changed, 30 insertions(+)
 
-Ah, but your trick will not work, that blows up and will not build.  The
-original one from Jason here does work.  _Generic is tricky...
+Applied.  I don't think anyone should actually use this, but with the SM*
+algorithms turning up everywhere these days, and people seemingly being totally
+okay with that for some reason, I don't think it's fair for me to reject this.
 
-thanks,
-
-greg k-h
+- Eric
