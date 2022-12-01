@@ -2,93 +2,119 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9431BC4321E
-	for <linux-block@archiver.kernel.org>; Thu,  1 Dec 2022 01:47:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0897FC352A1
+	for <linux-block@archiver.kernel.org>; Thu,  1 Dec 2022 02:12:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229579AbiLABrL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 30 Nov 2022 20:47:11 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49466 "EHLO
+        id S229548AbiLACMW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 30 Nov 2022 21:12:22 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46446 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229865AbiLABrJ (ORCPT
+        with ESMTP id S229515AbiLACMV (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 30 Nov 2022 20:47:09 -0500
-Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6DA445A6D7
-        for <linux-block@vger.kernel.org>; Wed, 30 Nov 2022 17:47:06 -0800 (PST)
-Received: by mail-pj1-x102b.google.com with SMTP id hd14-20020a17090b458e00b0021909875bccso3144445pjb.1
-        for <linux-block@vger.kernel.org>; Wed, 30 Nov 2022 17:47:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=wG1FRF6NvvTrQgh7hkGSM1RofK5aGr38w3ooW7oI78w=;
-        b=nue/1SmJ1LCPfvm3ohnTASWGXwKcSs3WqqLHKlqlyaFhuQ1+BPaoBv38LB/i/Mm6x+
-         kgdpsRx520nsbxizSIgZdsSF94bQdGEG7rKZ+nzgfedNWWYuY8btrChtXNxbgwj6G1EU
-         EP9dR0OW85GOBoxGKYXThtht9b/kVgQJA760EHWDfN+2xoRaQ9lzmgVZ9AAdDbqqenqj
-         WcMNXZXx21mAm5js47qVwwZr2OU2QaWTojn12g85PxwmurYyyezYF3ItaVhTTRtMK2hT
-         kFtHStmx1pC/xPqSYSQN6fQW2tlywRzXKaeONI45fZvV4Ia9oQr/5swgQU45jLaKZcxU
-         2Viw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=wG1FRF6NvvTrQgh7hkGSM1RofK5aGr38w3ooW7oI78w=;
-        b=YXyXZxCSlDu+ldK3gWk/aE16PWb/q/TBFP4cXUz+tXSgHKMRYqdFKddsD8ZyxpQEHy
-         HQVOuVF6BqowoHNE9XuR79PkGWtqacuXplnWTr2nb4XaC2aKhzJrI41Ia7ERcNRDjNWz
-         bF8Vr7UYL4ecFVGlvZ+/P76hZ4MwZQKDWrX3G8hY4zars5bNNA8yCGH/JUmtns54rKJL
-         x5okvcTnrAGZQadVOvjZL53/Wnf7jN3DiUvQ2v9JM62QD7MUruXzYvy2XW/cj7O6qDZn
-         4i+xOQXo43BTimTy67sqwUgI4FeizSuj8k5xdtRdsH8CJbIvZj5pzcKAuhXaF2Ky7vFY
-         vRGw==
-X-Gm-Message-State: ANoB5pn4gkjM21TlowDUWmJFsU8ipxso1VYbAV6ILNi+MIrZAuefv95+
-        rAf+qbGWVxMLosSrg/6mvTq6Sw==
-X-Google-Smtp-Source: AA0mqf6Xq5rFthMl9MozMuFDWfE41NWQOupHJghdq9afHJdJf4VxHFmZjkVlNCm5/e0cUCYkjYpHww==
-X-Received: by 2002:a17:903:452:b0:189:6574:7ac2 with SMTP id iw18-20020a170903045200b0018965747ac2mr31099929plb.65.1669859225822;
-        Wed, 30 Nov 2022 17:47:05 -0800 (PST)
-Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id v8-20020a17090a088800b00213a9e1ec44sm3671307pjc.52.2022.11.30.17.47.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 30 Nov 2022 17:47:05 -0800 (PST)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     josef@toxicpanda.com, Kemeng Shi <shikemeng@huawei.com>,
-        tj@kernel.org
-Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        cgroups@vger.kernel.org
-In-Reply-To: <20221018121932.10792-1-shikemeng@huawei.com>
-References: <20221018121932.10792-1-shikemeng@huawei.com>
-Subject: Re: [PATCH v2 0/5] A few cleanup and bugfix patches for blk-iocost
-Message-Id: <166985922489.517656.7936907108096958272.b4-ty@kernel.dk>
-Date:   Wed, 30 Nov 2022 18:47:04 -0700
+        Wed, 30 Nov 2022 21:12:21 -0500
+Received: from dggsgout12.his.huawei.com (unknown [45.249.212.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BAF6254465;
+        Wed, 30 Nov 2022 18:12:19 -0800 (PST)
+Received: from mail02.huawei.com (unknown [172.30.67.153])
+        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4NN02N574Rz4f3s8m;
+        Thu,  1 Dec 2022 10:12:12 +0800 (CST)
+Received: from [10.174.176.73] (unknown [10.174.176.73])
+        by APP1 (Coremail) with SMTP id cCh0CgC3YK99DYhjepV1BQ--.2209S3;
+        Thu, 01 Dec 2022 10:12:15 +0800 (CST)
+Subject: Re: [PATCH -next v2 8/9] block: fix null-pointer dereference in
+ ioc_pd_init
+To:     Tejun Heo <tj@kernel.org>, Li Nan <linan122@huawei.com>
+Cc:     josef@toxicpanda.com, axboe@kernel.dk, cgroups@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yi.zhang@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
+References: <20221130132156.2836184-1-linan122@huawei.com>
+ <20221130132156.2836184-9-linan122@huawei.com>
+ <Y4fCE7XxcpDfWyDJ@slm.duckdns.org>
+From:   Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <9ca2b7ab-7fd3-a9a3-12a6-021a78886b54@huaweicloud.com>
+Date:   Thu, 1 Dec 2022 10:12:13 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <Y4fCE7XxcpDfWyDJ@slm.duckdns.org>
+Content-Type: text/plain; charset=gbk; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Mailer: b4 0.11.0-dev-d377f
+X-CM-TRANSID: cCh0CgC3YK99DYhjepV1BQ--.2209S3
+X-Coremail-Antispam: 1UD129KBjvJXoW7WF4DCFWrZw4rZr1kWF17Jrb_yoW8Ww4UpF
+        WfWF1Yy34jqrs3t3WDAw4xAryYqrs5WF1fZ3s8A3sI9FZruw1Yq3W2kFWqgayxZrs8Zr1F
+        qayjqw17Xry0yrJanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUk0b4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
+        6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+        vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7Cj
+        xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
+        0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
+        6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
+        Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JMxk0xIA0c2IEe2xFo4CEbIxvr21l42xK82IYc2Ij
+        64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x
+        8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE
+        2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42
+        xK8VAvwI8IcIk0rVWrJr0_WFyUJwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv
+        6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUrR6zUUUUU
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, 18 Oct 2022 20:19:27 +0800, Kemeng Shi wrote:
-> This series contain a few patch to correct comment, correct trace of
-> vtime_rate and so on. More detail can be found in the respective
-> changelogs.
+Hi,
+
+ÔÚ 2022/12/01 4:50, Tejun Heo Ð´µÀ:
+> On Wed, Nov 30, 2022 at 09:21:55PM +0800, Li Nan wrote:
+>> Remove block device when iocost is initializing may cause
+>> null-pointer dereference:
+>>
+>> 	CPU1				   CPU2
+>>    ioc_qos_write
+>>     blkcg_conf_open_bdev
+>>      blkdev_get_no_open
+>>       kobject_get_unless_zero
+>>      blk_iocost_init
+>>       rq_qos_add
+>>    					del_gendisk
+>>    					 rq_qos_exit
+>>    					  q->rq_qos = rqos->next
+>>    					   //iocost is removed from q->roqs
+>>        blkcg_activate_policy
+>>         pd_init_fn
+>>          ioc_pd_init
+>>    	 ioc = q_to_ioc(blkg->q)
+>>   	  //cant find iocost and return null
+>>
+>> Fix problem by moving rq_qos_exit() to disk_release(). ioc_qos_write() get
+>> bd_device.kobj in blkcg_conf_open_bdev(), so disk_release will not be
+>> actived until iocost initialization is complited.
 > 
+> I think it'd be better to make del_gendisk wait for these in-flight
+> operations because this might fix the above particular issue but now all the
+> policies are exposed to request_queue in a state it never expected before.
+> 
+> del_gendisk() is quiescing the queue around rq_qos_exit(), so maybe we can
+> piggyback on that and update blkcg_conf_open_bdev() to provide such
+> exclusion?
 
-Applied, thanks!
+Let del_gendisk waiting for that sounds good, but I'm litter confused
+how to do that. Following are what I think about:
 
-[1/5] blk-iocost: Fix typo in comment
-      commit: e12d34fce7652a870fac62e9749a6623883d6fd8
-[2/5] blk-iocost: Reset vtime_base_rate in ioc_refresh_params
-      commit: c81d97a61c8c3c25a576c3db4c4dd34316256f05
-[3/5] blk-iocost: Trace vtime_base_rate instead of vtime_rate
-      commit: 0c0d362dc97d19d898219c13a357e167a9ee77ee
-[4/5] blk-iocost: Remove vrate member in struct ioc_now
-      commit: f44ed8722034ef7d214fa121ae2402100a3590e1
-[5/5] blk-iocost: Correct comment in blk_iocost_init
-      commit: b4c0482bfe89cd6c4f030314c86aae35642c44a5
+1) By mentioning that "del_gendisk() is quiescing the queue", do you
+suggest to add rcu_read_lock()? This seems wrong because blk_iocost_init
+requires memory allocation.
 
-Best regards,
--- 
-Jens Axboe
+2) Hold gendisk open mutex
 
+3) Use q_usage_counter, and in the meantime, rq_qos_add() and
+blkcg_activate_policy() will need refactoring to factor out freeze
+queue.
+
+4) Define a new metux
+
+Thanks,
+Kuai
+> 
+> Thanks.
+> 
 
