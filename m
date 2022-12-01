@@ -2,95 +2,76 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B7BBCC4321E
-	for <linux-block@archiver.kernel.org>; Thu,  1 Dec 2022 11:45:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6EEDFC47088
+	for <linux-block@archiver.kernel.org>; Thu,  1 Dec 2022 12:46:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231226AbiLALpE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 1 Dec 2022 06:45:04 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33452 "EHLO
+        id S230107AbiLAMqK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 1 Dec 2022 07:46:10 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58048 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231183AbiLALo7 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 1 Dec 2022 06:44:59 -0500
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F272D9FAAA;
-        Thu,  1 Dec 2022 03:44:49 -0800 (PST)
-Received: from imap1.suse-dmz.suse.de (imap1.suse-dmz.suse.de [192.168.254.73])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 8DA5121B27;
-        Thu,  1 Dec 2022 11:44:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1669895088; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-        bh=4i2hmTJG3JZsAjlKbUAjxq/hqJ7aLy9kBI8fYx+RIJg=;
-        b=vwZNtzztj30ZpXCjM0tQYerWIdtxacuAPZ41HsakLScp80AKil5u4csGaS3EfIVru11eYF
-        uFwpfpq4k4kTgv1JjBxfsJ3JIlM0Grsr7TxDMwFVK+EjwohpxocXvUVPu4QFJxpQSrJdSP
-        V6q6Hk5mmkhVyRpHZmF+ZIDnohN40+k=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1669895088;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-        bh=4i2hmTJG3JZsAjlKbUAjxq/hqJ7aLy9kBI8fYx+RIJg=;
-        b=9Ru6jInkyfuPLUrMALp40MO5qAj6FtOu9oX7T0AXbgoH2uev2sWnGSD3CP4ZwuGk1KooGw
-        4I3Py+nKKXm2tfDQ==
-Received: from imap1.suse-dmz.suse.de (imap1.suse-dmz.suse.de [192.168.254.73])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap1.suse-dmz.suse.de (Postfix) with ESMTPS id 7F1001320E;
-        Thu,  1 Dec 2022 11:44:48 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap1.suse-dmz.suse.de with ESMTPSA
-        id OUQCH7CTiGOIVwAAGKfGzw
-        (envelope-from <jack@suse.cz>); Thu, 01 Dec 2022 11:44:48 +0000
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-        id 28023A06E4; Thu,  1 Dec 2022 12:44:48 +0100 (CET)
-From:   Jan Kara <jack@suse.cz>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        <linux-block@vger.kernel.org>, Jan Kara <jack@suse.cz>,
-        stable@vger.kernel.org
-Subject: [PATCH] block: Fixup condition detecting exclusive opener during partition rescan
-Date:   Thu,  1 Dec 2022 12:44:42 +0100
-Message-Id: <20221201114442.6829-1-jack@suse.cz>
-X-Mailer: git-send-email 2.35.3
+        with ESMTP id S230040AbiLAMqJ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 1 Dec 2022 07:46:09 -0500
+Received: from out30-7.freemail.mail.aliyun.com (out30-7.freemail.mail.aliyun.com [115.124.30.7])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA30684DFA;
+        Thu,  1 Dec 2022 04:46:03 -0800 (PST)
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R111e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045170;MF=tianjia.zhang@linux.alibaba.com;NM=1;PH=DS;RN=11;SR=0;TI=SMTPD_---0VW8qGyf_1669898759;
+Received: from 30.32.116.214(mailfrom:tianjia.zhang@linux.alibaba.com fp:SMTPD_---0VW8qGyf_1669898759)
+          by smtp.aliyun-inc.com;
+          Thu, 01 Dec 2022 20:46:01 +0800
+Message-ID: <fc2c7a50-6330-b9d5-6f50-0c6e2ccfb680@linux.alibaba.com>
+Date:   Thu, 1 Dec 2022 20:45:58 +0800
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1191; i=jack@suse.cz; h=from:subject; bh=ooTJMstDsEeDfhzqsy9acY1xNmp8/ie8MZFBcMY6qqs=; b=owEBbQGS/pANAwAIAZydqgc/ZEDZAcsmYgBjiJOj2L9J6qHjP43xvAGiCcJYfTx28vIn8EVRSzN7 oG3vxbSJATMEAAEIAB0WIQSrWdEr1p4yirVVKBycnaoHP2RA2QUCY4iTowAKCRCcnaoHP2RA2ZROCA CtoxD65QZ/kyl/S13etoR+OBqqgF+awC7lzzeL3P0HjKjZgDPwPF0/E3R5KDseafDxxOFLuAGKebYr 0a1EC3vrRzoZQhoAy3spxqYwmGT8lTZxw1m9Ml61PR3akjim4aFGjiNLHQISiAGqjP7QzGDsr6lH24 QituANcYJ9z4kULGjbXu65CKhUM/k2lEwUisPQE6Y/Mg23xQWIIo6v1H0uxewjOEjjVAggUj/tK8PT aGiiidoEH0CN/OKCo5KJYswwtno2gpILP0Po/K7QD+kwqpaLEV2hAVv5ZUkaIae4p7Pisz47LpJrdQ bqBBSENkqavRiVd69n7vDQYEcuNNUP
-X-Developer-Key: i=jack@suse.cz; a=openpgp; fpr=93C6099A142276A28BBE35D815BC833443038D8C
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.13.1
+Subject: Re: [PATCH v3 2/2] fscrypt: Add SM4 XTS/CTS symmetric algorithm
+ support
+Content-Language: en-US
+To:     Bagas Sanjaya <bagasdotme@gmail.com>,
+        Eric Biggers <ebiggers@kernel.org>,
+        "Theodore Y. Ts o" <tytso@mit.edu>,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        Jonathan Corbet <corbet@lwn.net>, Jens Axboe <axboe@kernel.dk>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        linux-fscrypt@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
+References: <20221125121630.87793-1-tianjia.zhang@linux.alibaba.com>
+ <20221125121630.87793-3-tianjia.zhang@linux.alibaba.com>
+ <1a5e57be-ccff-f281-6e06-be5e59db1d05@gmail.com>
+From:   Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+In-Reply-To: <1a5e57be-ccff-f281-6e06-be5e59db1d05@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The condition detecting whether somebody else has the device exclusively
-open in disk_scan_partitions() has a brownpaper bag bug. It triggers also
-when nobody has the device exclusively open and we are coming from
-BLKRRPART path. Interestingly this didn't have any adverse effects
-during testing because tools update kernel's notion of the partition
-table using ioctls and don't rely on BLKRRPART. Fix the bug before
-somebody trips over it.
+Hi Bagas,
 
-Fixes: 8d67fc20caf8 ("block: Do not reread partition table on exclusively open device")
-CC: stable@vger.kernel.org
-Signed-off-by: Jan Kara <jack@suse.cz>
----
- block/genhd.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+On 11/28/22 9:33 PM, Bagas Sanjaya wrote:
+> On 11/25/22 19:16, Tianjia Zhang wrote:
+>> SM4 is a symmetric algorithm widely used in China, and is even mandatory
+>> in many scenarios. We need to provide these users with the ability to
+>> encrypt files or disks using SM4-XTS, and many other algorithms that use
+>> SM2/3/4 algorithms or their combined algorithm scenarios, these features
+>> are demanded by many users, this patch enables to use SM4-XTS mode to
+>> encrypt file content, and use SM4-CBC-CTS to encrypt filename.
+>>
+> 
+> Similar reply as [1]. That is, better say:
+> 
+> ```
+> Add support for XTS and CTS mode variant of SM4 algorithm, in similar
+> fashion to SM2 and SM3. The former is used to encrypt file contents, while
+> the latter (SM4-CBC-CTS) is used to encrypt filenames.
+> ```
+> 
+> Thanks.
+> 
+> [1]: https://lore.kernel.org/linux-doc/42624542-6ccb-26a5-db98-d7944972246e@gmail.com/
+> 
 
-diff --git a/block/genhd.c b/block/genhd.c
-index 012529d36f5b..29fb2c98b401 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -367,7 +367,7 @@ int disk_scan_partitions(struct gendisk *disk, fmode_t mode, void *owner)
- 	if (disk->open_partitions)
- 		return -EBUSY;
- 	/* Someone else has bdev exclusively open? */
--	if (disk->part0->bd_holder != owner)
-+	if (disk->part0->bd_holder && disk->part0->bd_holder != owner)
- 		return -EBUSY;
- 
- 	set_bit(GD_NEED_PART_SCAN, &disk->state);
--- 
-2.35.3
+Thanks for your reply, it is very valuable for me, I will update it in
+the next patch.
 
+Cheers,
+Tianjia
