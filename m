@@ -2,147 +2,139 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF4DCC4321E
-	for <linux-block@archiver.kernel.org>; Thu,  1 Dec 2022 00:39:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E0E4EC4321E
+	for <linux-block@archiver.kernel.org>; Thu,  1 Dec 2022 01:20:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229751AbiLAAjQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 30 Nov 2022 19:39:16 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57758 "EHLO
+        id S229521AbiLABUB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 30 Nov 2022 20:20:01 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60164 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229461AbiLAAjQ (ORCPT
+        with ESMTP id S229601AbiLABUA (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 30 Nov 2022 19:39:16 -0500
-Received: from esa4.hgst.iphmx.com (esa4.hgst.iphmx.com [216.71.154.42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49AC159FF7
-        for <linux-block@vger.kernel.org>; Wed, 30 Nov 2022 16:39:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1669855155; x=1701391155;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=pgc+p5PDA6K847LjDI8dN8wGPApGRqqSYi2al8gE+q0=;
-  b=I+rV0cL9qHoIhoP03Ls1rp92MCdqgnovyLxbY5cQ/jYVWNKM7K47WvhC
-   EaA1vXXeV6jT9sfRvji3pu9KNZ80tmfAvhcKSRMppla53MTPuzHNg0MmG
-   7pG5HYHCk/K3VenNUeWuoj4EoBZbiNrSZTiBgNO3ngnnB5RDLE/lVZmpR
-   DD5OfOcYOGgXGA0F/aKYUOuuTj6J23wCbNyCiGzG4tmDiIj3jbtKhTgXZ
-   iZ+JK4RKp9KlIxKojcDC2BfLhS+Y4z00OJrqmjeHvpk5I/3ob/3GobYFu
-   5WLhQrQBqilM4fiq0EbkxEYY5taHH6JuwOZZOrkg0P1N/BluWogB4v3+U
-   g==;
-X-IronPort-AV: E=Sophos;i="5.96,207,1665417600"; 
-   d="scan'208";a="215832918"
-Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 01 Dec 2022 08:39:14 +0800
-IronPort-SDR: wbMHOYdjB5SfxWofrmPbvmlWvpO8Zhc7UQow3Is4IhHXYOM12Op092xVgxjoafhzsP573Mqp2v
- WZ8xBNkcOHoVMNPt2kAXn+9SDDSA8ngSvE2071IwwdtE487lz1bbOlM2VhME85LorJMnQU+Qt0
- t79TXGCNNmxB5xYn6tNdfJywgcIKpFf6IgrPzUtsV30Axew3OprKiInc23tgFSGT8foV6+eYoP
- G7sSrGPC/5oY1tG5Gj7a1bTX67+JONYsHSZODFLqPpeHdRb10oYS3+1M36B1INOw3RQYUS0vP8
- mQw=
-Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 30 Nov 2022 15:57:53 -0800
-IronPort-SDR: nneZChkC1ijduzvGaEPZHIkaRMNJvvwP1KCdkD15DIU5Zy0M8M5uhrfuS53gD0vYQYQGlW3EVv
- tawgQPzjHpq6a4Bo/sCztVtPVNuGAo4WJExIB/4+WGPCo9FEe753NeOX9ZD+xGiXmGEViQa9aF
- hlYvrXgJZeXHGnAD6zSjK6+g/7b8W0KXsLz4VXg9RSRtC4uKGuBrnmh1Xc3X5h/hcn0WDvgbpL
- RkgVFHBxsnT8jLfoQPP5a3/2HxHesAyEVsJcT1w8FsjI8YhRGSVQqNjEW6NVhR96PlrYAQpGrY
- vIE=
-WDCIronportException: Internal
-Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
-  by uls-op-cesaip02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 30 Nov 2022 16:39:14 -0800
-Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4NMxz62568z1RvTr
-        for <linux-block@vger.kernel.org>; Wed, 30 Nov 2022 16:39:14 -0800 (PST)
-Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
-        reason="pass (just generated, assumed good)"
-        header.d=opensource.wdc.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
-        opensource.wdc.com; h=content-transfer-encoding:content-type
-        :in-reply-to:organization:from:references:to:content-language
-        :subject:user-agent:mime-version:date:message-id; s=dkim; t=
-        1669855153; x=1672447154; bh=pgc+p5PDA6K847LjDI8dN8wGPApGRqqSYi2
-        al8gE+q0=; b=tD6vpG7Z82qbE3CipPvSIVmkpkXKxKQB4BnoveZ9oe6iF4H/G10
-        UIZ+gEeDpa0fIxUOB1FNa39KmJAZezf4rGNjBkmQLSSUzlrfb430U7rds+Jddjnj
-        0cipDt7l+vIUMoRpR7jWrm+jIj7Y3liIQ0/DmzvkJnjcMfMf15MUUqbUL/ucXg9u
-        YJ11ojvONMTbyZqWn+wIfXXRZSO5pcjwr0MpAe/JQz2dzwjFIcZpn6UAZhxxAC4a
-        vxkLO239c1Og4IXYrxroOiZumh/Ik0Ewpd3m2Bm/IXRkva1vIxIgLA892oUjyjwB
-        sDXayqD7kqFE5BBQe4jglUQa9PjzGyO7Wsg==
-X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
-Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
-        by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id vXoVIVedu27Q for <linux-block@vger.kernel.org>;
-        Wed, 30 Nov 2022 16:39:13 -0800 (PST)
-Received: from [10.225.163.66] (unknown [10.225.163.66])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4NMxz36Dp3z1RvLy;
-        Wed, 30 Nov 2022 16:39:11 -0800 (PST)
-Message-ID: <687161b4-3e92-9fbf-c0a6-e8dceee3d250@opensource.wdc.com>
-Date:   Thu, 1 Dec 2022 09:39:10 +0900
+        Wed, 30 Nov 2022 20:20:00 -0500
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A092890750;
+        Wed, 30 Nov 2022 17:19:59 -0800 (PST)
+Received: from mail02.huawei.com (unknown [172.30.67.153])
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4NMyt13bVGz4f3v5L;
+        Thu,  1 Dec 2022 09:19:53 +0800 (CST)
+Received: from [10.174.176.73] (unknown [10.174.176.73])
+        by APP4 (Coremail) with SMTP id gCh0CgAnmdY6AYhj1APHBQ--.30576S3;
+        Thu, 01 Dec 2022 09:19:56 +0800 (CST)
+Subject: Re: [PATCH -next v2 9/9] blk-iocost: fix walk_list corruption
+To:     Tejun Heo <tj@kernel.org>, Li Nan <linan122@huawei.com>
+Cc:     josef@toxicpanda.com, axboe@kernel.dk, cgroups@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yi.zhang@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
+References: <20221130132156.2836184-1-linan122@huawei.com>
+ <20221130132156.2836184-10-linan122@huawei.com>
+ <Y4fEKZy4rTE5rG/5@slm.duckdns.org>
+From:   Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <c028dd77-cabf-edd6-c893-8ee24762ac8c@huaweicloud.com>
+Date:   Thu, 1 Dec 2022 09:19:54 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.0
-Subject: Re: [PATCH v2 8/8] null_blk: Support configuring the maximum segment
- size
-Content-Language: en-US
-To:     Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>,
-        Adrian Hunter <adrian.hunter@intel.com>,
-        Avri Altman <avri.altman@wdc.com>,
-        Ming Lei <ming.lei@redhat.com>,
-        Chaitanya Kulkarni <kch@nvidia.com>
-References: <20221123205740.463185-1-bvanassche@acm.org>
- <20221123205740.463185-9-bvanassche@acm.org>
- <32feb681-e858-1a0c-b91d-3f0d85615a6d@opensource.wdc.com>
- <6c41f85b-7add-60d7-e131-71c3cfae80d0@acm.org>
-From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
-Organization: Western Digital Research
-In-Reply-To: <6c41f85b-7add-60d7-e131-71c3cfae80d0@acm.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <Y4fEKZy4rTE5rG/5@slm.duckdns.org>
+Content-Type: text/plain; charset=gbk; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: gCh0CgAnmdY6AYhj1APHBQ--.30576S3
+X-Coremail-Antispam: 1UD129KBjvJXoWxWryruF43Cr4DuFyktw13urg_yoW5Jw1DpF
+        WfKFZ0krWjqr12k3W0q3ZIqF1Sya10qr18JrWfWr1Fya4akw13J3WvkF48GFyDZrWxJrWa
+        qF10g3s8JrWjyaDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUyEb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
+        6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+        vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7Cj
+        xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
+        0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
+        6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
+        Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JMxk0xIA0c2IEe2xFo4CEbIxvr21l42xK82IYc2Ij
+        64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x
+        8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE
+        2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42
+        xK8VAvwI8IcIk0rVWrZr1j6s0DMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIE
+        c7CjxVAFwI0_Jr0_GrUvcSsGvfC2KfnxnUUI43ZEXa7IU1zuWJUUUUU==
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 12/1/22 07:29, Bart Van Assche wrote:
-> On 11/23/22 17:40, Damien Le Moal wrote:
->> On 11/24/22 05:57, Bart Van Assche wrote:
->>> +static unsigned int g_max_segment_size = 1UL << 31;
->>
->> 1UL is unsigned long be this var is unsigned int. Why not simply use
->> UINT_MAX here ? You prefer the 2GB value ? If yes, then may be at least
->> change that to "1U << 31", no ?
->>
->> [ ... ]
->>> @@ -2106,6 +2119,7 @@ static int null_add_dev(struct nullb_device *dev)
->>>   	dev->max_sectors = min_t(unsigned int, dev->max_sectors,
->>>   				 BLK_DEF_MAX_SECTORS);
->>>   	blk_queue_max_hw_sectors(nullb->q, dev->max_sectors);
->>> +	blk_queue_max_segment_size(nullb->q, dev->max_segment_size);
->>
->> Should we keep the ability to use the kernel default value as the default
->> here ?
->> E.g.
->>
->> 	if (dev->max_segment_size)
->> 		blk_queue_max_segment_size(nullb->q,
->> 				dev->max_segment_size);
->>
->> If yes, then g_max_segment_size initial value should be 0, meaning "kernel
->> default".
-> 
-> Hi Damien,
-> 
-> How about changing the default value for g_max_segment_size from
-> 1UL << 31 into BLK_MAX_SEGMENT_SIZE? That will simplify the code and 
-> also prevents that this patch changes the behavior of the null_blk 
-> driver if g_max_segment_size is not modified by the user.
+Hi,
 
-Sounds good to me.
+ÔÚ 2022/12/01 4:59, Tejun Heo Ð´µÀ:
+> On Wed, Nov 30, 2022 at 09:21:56PM +0800, Li Nan wrote:
+>> From: Yu Kuai <yukuai3@huawei.com>
+>>
+>> Our test report a problem:
+>>
+>> ------------[ cut here ]------------
+>> list_del corruption. next->prev should be ffff888127e0c4b0, but was ffff888127e090b0
+>> WARNING: CPU: 2 PID: 3117789 at lib/list_debug.c:62 __list_del_entry_valid+0x119/0x130
+>> RIP: 0010:__list_del_entry_valid+0x119/0x130
+>> RIP: 0010:__list_del_entry_valid+0x119/0x130
+>> Call Trace:
+>>   <IRQ>
+>>   iocg_flush_stat.isra.0+0x11e/0x230
+>>   ? ioc_rqos_done+0x230/0x230
+>>   ? ioc_now+0x14f/0x180
+>>   ioc_timer_fn+0x569/0x1640
+>>
+>> We haven't reporduced it yet, but we think this is due to parent iocg is
+>> freed before child iocg, and then in ioc_timer_fn, walk_list is
+>> corrupted.
+>>
+>> 1) Remove child cgroup can concurrent with remove parent cgroup, and
+>> ioc_pd_free for parent iocg can be called before child iocg. This can be
+>> fixed by moving the handle of walk_list to ioc_pd_offline, since that
+>> offline from child is ensured to be called before parent.
+> 
+> Which you already did in a previous patch, right?
+
+yes, this is already did in patch 7.
 
 > 
-> Thanks,
+>> 2) ioc_pd_free can be triggered from both removing device and removing
+>> cgroup, this patch fix the problem by deleting timer before deactivating
+>> policy, so that free parent iocg first in this case won't matter.
 > 
-> Bart.
-> 
+> Okay, so, yeah, css's pin parents but blkg's don't. I think the right thing
+> to do here is making sure that a child blkg pins its parent (and eventually
+> ioc).
 
--- 
-Damien Le Moal
-Western Digital Research
+Ok, I can try to do that.
+
+> 
+>> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+>> Signed-off-by: Li Nan <linan122@huawei.com>
+>> ---
+>>   block/blk-iocost.c | 3 ++-
+>>   1 file changed, 2 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/block/blk-iocost.c b/block/blk-iocost.c
+>> index 710cf63a1643..d2b873908f88 100644
+>> --- a/block/blk-iocost.c
+>> +++ b/block/blk-iocost.c
+>> @@ -2813,13 +2813,14 @@ static void ioc_rqos_exit(struct rq_qos *rqos)
+>>   {
+>>   	struct ioc *ioc = rqos_to_ioc(rqos);
+>>   
+>> +	del_timer_sync(&ioc->timer);
+>> +
+>>   	blkcg_deactivate_policy(rqos->q, &blkcg_policy_iocost);
+>>   
+>>   	spin_lock_irq(&ioc->lock);
+>>   	ioc->running = IOC_STOP;
+>>   	spin_unlock_irq(&ioc->lock);
+>>   
+>> -	del_timer_sync(&ioc->timer);
+> 
+> I don't about this workaround. Let's fix properly?
+
+Ok, and by the way, is there any reason to delete timer after
+deactivate policy? This seems a litter wreid to me.
+
+Thanks,
+Kuai
+> 
 
