@@ -2,34 +2,34 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12716C4708C
-	for <linux-block@archiver.kernel.org>; Thu,  1 Dec 2022 04:55:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5BF6C4708D
+	for <linux-block@archiver.kernel.org>; Thu,  1 Dec 2022 04:55:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229756AbiLAEzB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 30 Nov 2022 23:55:01 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54854 "EHLO
+        id S229760AbiLAEzC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 30 Nov 2022 23:55:02 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54924 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229747AbiLAEy5 (ORCPT
+        with ESMTP id S229754AbiLAEy7 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 30 Nov 2022 23:54:57 -0500
+        Wed, 30 Nov 2022 23:54:59 -0500
 Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B065F9FEC7;
-        Wed, 30 Nov 2022 20:54:56 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 647BFA055A;
+        Wed, 30 Nov 2022 20:54:57 -0800 (PST)
 Received: from kwepemi500016.china.huawei.com (unknown [172.30.72.54])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4NN3ch0VwhzHwN9;
-        Thu,  1 Dec 2022 12:53:40 +0800 (CST)
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4NN3cj6nwbzHwNG;
+        Thu,  1 Dec 2022 12:53:41 +0800 (CST)
 Received: from huawei.com (10.174.178.129) by kwepemi500016.china.huawei.com
  (7.221.188.220) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.31; Thu, 1 Dec
- 2022 12:54:11 +0800
+ 2022 12:54:13 +0800
 From:   Kemeng Shi <shikemeng@huawei.com>
 To:     <axboe@kernel.dk>
 CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
         <shikemeng@huaweicloud.com>, <linfeilong@huawei.com>,
         <liuzhiqiang@huawei.com>
-Subject: [PATCH 3/5] sbitmap: remove redundant check in __sbitmap_queue_get_batch
-Date:   Thu, 1 Dec 2022 12:54:06 +0800
-Message-ID: <20221201045408.21908-4-shikemeng@huawei.com>
+Subject: [PATCH 5/5] sbitmap: add sbitmap_find_bit to remove repeat code in __sbitmap_get/__sbitmap_get_shallow
+Date:   Thu, 1 Dec 2022 12:54:08 +0800
+Message-ID: <20221201045408.21908-6-shikemeng@huawei.com>
 X-Mailer: git-send-email 2.14.1.windows.1
 In-Reply-To: <20221201045408.21908-1-shikemeng@huawei.com>
 References: <20221201045408.21908-1-shikemeng@huawei.com>
@@ -43,43 +43,136 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Commit fbb564a557809 ("lib/sbitmap: Fix invalid loop in
-__sbitmap_queue_get_batch()") mentioned that "Checking free bits when
-setting the target bits. Otherwise, it may reuse the busying bits."
-This commit add check to make sure all masked bits in word before
-cmpxchg is zero. Then the existing check after cmpxchg to check any
-zero bit is existing in masked bits in word is redundant.
+There are three differences between __sbitmap_get and
+__sbitmap_get_shallow when searching free bit:
+1. __sbitmap_get_shallow limit number of bit to search per word.
+__sbitmap_get has no such limit.
+2. __sbitmap_get_shallow always searches with wrap set. __sbitmap_get set
+wrap according to round_robin.
+3. __sbitmap_get_shallow always searches from first bit in first word.
+__sbitmap_get searches from first bit when round_robin is not set
+otherwise searches from SB_NR_TO_BIT(sb, alloc_hint).
 
-Actually, old value of word before cmpxchg is stored in val and we
-will filter out busy bits in val by "(get_mask & ~val)" after cmpxchg.
-So we will not reuse busy bits methioned in commit fbb564a557809
-("lib/sbitmap: Fix invalid loop in __sbitmap_queue_get_batch()"). Revert
-new-added check to remove redundant check.
+Add helper function sbitmap_find_bit function to do common search while
+accept "limit depth per word", "wrap flag" and "first bit to
+search" from caller to support the need of both __sbitmap_get and
+__sbitmap_get_shallow.
 
 Signed-off-by: Kemeng Shi <shikemeng@huawei.com>
 ---
- lib/sbitmap.c | 8 +++-----
- 1 file changed, 3 insertions(+), 5 deletions(-)
+ lib/sbitmap.c | 72 +++++++++++++++++++++++++--------------------------
+ 1 file changed, 35 insertions(+), 37 deletions(-)
 
 diff --git a/lib/sbitmap.c b/lib/sbitmap.c
-index 791edf5ea4ca..70b62b1e40a1 100644
+index b6a2cdb9bdaf..93e7db484b96 100644
 --- a/lib/sbitmap.c
 +++ b/lib/sbitmap.c
-@@ -534,11 +534,9 @@ unsigned long __sbitmap_queue_get_batch(struct sbitmap_queue *sbq, int nr_tags,
+@@ -186,26 +186,22 @@ static int sbitmap_find_bit_in_word(struct sbitmap_word *map,
+ 	return nr;
+ }
  
- 			get_mask = ((1UL << nr_tags) - 1) << nr;
- 			val = READ_ONCE(map->word);
--			do {
--				if ((val & ~get_mask) != val)
--					goto next;
--			} while (!atomic_long_try_cmpxchg(ptr, &val,
--							  get_mask | val));
-+			while (!atomic_long_try_cmpxchg(ptr, &val,
-+							  get_mask | val))
-+				;
- 			get_mask = (get_mask & ~val) >> nr;
- 			if (get_mask) {
- 				*offset = nr + (index << sb->shift);
+-static int __sbitmap_get(struct sbitmap *sb, unsigned int alloc_hint)
++static int sbitmap_find_bit(struct sbitmap *sb,
++			    unsigned int depth,
++			    unsigned int index,
++			    unsigned int alloc_hint,
++			    bool wrap)
+ {
+-	unsigned int i, index;
++	unsigned int i;
+ 	int nr = -1;
+ 
+-	index = SB_NR_TO_INDEX(sb, alloc_hint);
+-
+-	/*
+-	 * Unless we're doing round robin tag allocation, just use the
+-	 * alloc_hint to find the right word index. No point in looping
+-	 * twice in find_next_zero_bit() for that case.
+-	 */
+-	if (sb->round_robin)
+-		alloc_hint = SB_NR_TO_BIT(sb, alloc_hint);
+-	else
+-		alloc_hint = 0;
+-
+ 	for (i = 0; i < sb->map_nr; i++) {
+-		nr = sbitmap_find_bit_in_word(&sb->map[index], __map_depth(sb, index),
+-					      alloc_hint, !sb->round_robin);
++		nr = sbitmap_find_bit_in_word(&sb->map[index],
++					      min_t(unsigned int,
++						    __map_depth(sb, index),
++						    depth),
++					      alloc_hint, wrap);
++
+ 		if (nr != -1) {
+ 			nr += index << sb->shift;
+ 			break;
+@@ -215,11 +211,32 @@ static int __sbitmap_get(struct sbitmap *sb, unsigned int alloc_hint)
+ 		alloc_hint = 0;
+ 		if (++index >= sb->map_nr)
+ 			index = 0;
++
+ 	}
+ 
+ 	return nr;
+ }
+ 
++static int __sbitmap_get(struct sbitmap *sb, unsigned int alloc_hint)
++{
++	unsigned int index;
++
++	index = SB_NR_TO_INDEX(sb, alloc_hint);
++
++	/*
++	 * Unless we're doing round robin tag allocation, just use the
++	 * alloc_hint to find the right word index. No point in looping
++	 * twice in find_next_zero_bit() for that case.
++	 */
++	if (sb->round_robin)
++		alloc_hint = SB_NR_TO_BIT(sb, alloc_hint);
++	else
++		alloc_hint = 0;
++
++	return sbitmap_find_bit(sb, UINT_MAX, index, alloc_hint,
++				!sb->round_robin);
++}
++
+ int sbitmap_get(struct sbitmap *sb)
+ {
+ 	int nr;
+@@ -241,31 +258,12 @@ static int __sbitmap_get_shallow(struct sbitmap *sb,
+ 				 unsigned int alloc_hint,
+ 				 unsigned long shallow_depth)
+ {
+-	unsigned int i, index;
+-	int nr = -1;
++	unsigned int index;
+ 
+ 	index = SB_NR_TO_INDEX(sb, alloc_hint);
+ 	alloc_hint = SB_NR_TO_BIT(sb, alloc_hint);
+ 
+-	for (i = 0; i < sb->map_nr; i++) {
+-		nr = sbitmap_find_bit_in_word(&sb->map[index],
+-					      min_t(unsigned int,
+-						    __map_depth(sb, index),
+-						    shallow_depth),
+-					      alloc_hint, true);
+-
+-		if (nr != -1) {
+-			nr += index << sb->shift;
+-			break;
+-		}
+-
+-		/* Jump to next index. */
+-		alloc_hint = 0;
+-		if (++index >= sb->map_nr)
+-			index = 0;
+-	}
+-
+-	return nr;
++	return sbitmap_find_bit(sb, shallow_depth, index, alloc_hint, true);
+ }
+ 
+ int sbitmap_get_shallow(struct sbitmap *sb, unsigned long shallow_depth)
 -- 
 2.30.0
 
