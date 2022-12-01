@@ -2,86 +2,123 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A6D71C47088
-	for <linux-block@archiver.kernel.org>; Thu,  1 Dec 2022 14:45:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 06700C47088
+	for <linux-block@archiver.kernel.org>; Thu,  1 Dec 2022 15:36:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230159AbiLAOpN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 1 Dec 2022 09:45:13 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57330 "EHLO
+        id S231802AbiLAPgX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 1 Dec 2022 10:36:23 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48096 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229940AbiLAOpM (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 1 Dec 2022 09:45:12 -0500
-Received: from mail-io1-xd2c.google.com (mail-io1-xd2c.google.com [IPv6:2607:f8b0:4864:20::d2c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E18FA9CDF
-        for <linux-block@vger.kernel.org>; Thu,  1 Dec 2022 06:45:11 -0800 (PST)
-Received: by mail-io1-xd2c.google.com with SMTP id 135so1145453iou.7
-        for <linux-block@vger.kernel.org>; Thu, 01 Dec 2022 06:45:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Myk/frs+/PELrl6SJ0tjbXBv1A0UiyxiM57+8qkIPRQ=;
-        b=1ECiSr8xkZdZ3I3qIBsqirwG1tY438zDjWMz+rcqOhOrQuIsHCG5dqU7kqNh6TeQSB
-         oL2kLPhOk4vJCGLYgdT6XTKtlRlcKnStUKqXpkdx4VxlW00GVDbp/PnM16fCHGUB2Drc
-         FEgseG7EChDvXXcNU/DiPKEpyYUu8TuWl0/nCygoIzPyrQ+cXup8ieVQrGl6k8Gqngrg
-         xm8CoZNYAv3uqncmLDhZNg1rLGqGLeAajZiZHOHvQtZ7YxM/KWLr+XfR7TXLoBGz98SQ
-         mgtVWuRQKFZDIcy72KpI+Z+mVkLzhgxl70EmcBKi7FIX2aGVvEgvFUkUOYIHz4ms0l9F
-         s4Yg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Myk/frs+/PELrl6SJ0tjbXBv1A0UiyxiM57+8qkIPRQ=;
-        b=ezx7WBoQwlgbthF0HkQoNmGFkoSeTZC+uy8arHoTgaQchfn6UBk5u880BIIaRjJgE/
-         wEm8/mwOriCX1x75kdPx0/an7TgshprzdVo5TZ35pFykTlUzR7zb5+5DOP9ALvV5GIkn
-         ED0QVFhvR78ryQF12PoPyvOGmixOF+j/lRyGG/237xB/0UH55YofCnLWmI5RQODSfh5G
-         4Rk01VNY1C7Lhr/9nTHqINHXl4rJd0ajLEqOEzBBlJd3DFKoCJ0mS9N0hO1dxjwr2vMA
-         rWa2jkJUIwtHs7oVabPKkCM03oB5hE752ZyR4U4hjF1srAizRBpaxm1VJtFB7YEH7kBC
-         M2dw==
-X-Gm-Message-State: ANoB5pklVDWU2CW31ss84JUOY8WYLP3GO7eTi7CIDPPpOj5s1UgOBC4X
-        lMjKzASb7J9qEeY0M3EMVbMvHw==
-X-Google-Smtp-Source: AA0mqf6PS1vyKImmIJ+s988DaGJbXthqY5i4AUmTUIw7FcXoWmIpIz2g4Iwm7mhSnDK9kB6uKcNmHg==
-X-Received: by 2002:a02:c881:0:b0:38a:f6b:76f9 with SMTP id m1-20020a02c881000000b0038a0f6b76f9mr1836013jao.180.1669905910873;
-        Thu, 01 Dec 2022 06:45:10 -0800 (PST)
-Received: from [192.168.1.94] ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id y17-20020a056e02119100b00300d3c0e33dsm1589519ili.4.2022.12.01.06.45.09
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 01 Dec 2022 06:45:10 -0800 (PST)
-Message-ID: <a3c9044e-d7ab-8130-76ea-a09152eacaea@kernel.dk>
-Date:   Thu, 1 Dec 2022 07:45:09 -0700
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.0
-Subject: Re: [PATCH] block: Fixup condition detecting exclusive opener during
- partition rescan
-Content-Language: en-US
-To:     Jan Kara <jack@suse.cz>
-Cc:     Christoph Hellwig <hch@infradead.org>, linux-block@vger.kernel.org,
-        stable@vger.kernel.org
-References: <20221201114442.6829-1-jack@suse.cz>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20221201114442.6829-1-jack@suse.cz>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+        with ESMTP id S231933AbiLAPgQ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 1 Dec 2022 10:36:16 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D7B81839D;
+        Thu,  1 Dec 2022 07:36:14 -0800 (PST)
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2B1FOf0M013550;
+        Thu, 1 Dec 2022 15:35:56 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : reply-to : to : cc : date : in-reply-to : references : content-type
+ : mime-version : content-transfer-encoding; s=pp1;
+ bh=Xk/l0U+Cz7PYE5CVeOcthMKdyGJyTMeO5xaBAtu53ps=;
+ b=G9bLF70KykG6TWmEzNzjyCBteyzp0RxfqDaqnZ6XSjHmqgQxXRg2DOwQjNcKtmxy2VMl
+ iMjwSRJ1NVgnWCt4vLTrPOVLoITg2qWeqe3EjxD/R6vCXtYH0nrwEitQRu/gPq6kthfD
+ LT3MymtQqzy+xnXtZB1fvAw1GcmImVtrRKbJ8mmfCycuuB06FkGvAsBhOQFiJQauOPZ8
+ TX6OaflzchNzwQLdjlUvTavVI+wS7PgS2icIG70ws/i/Ke3Y9u2qTVKNEdnn6d81kVRj
+ xHGjlSqFTIhLyyS/xtwUnCQYIBeVup+MbpRL+nuHHCwO1l9xU6/5NIZxCYICZdf+c5YL og== 
+Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com [169.63.214.131])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3m6xvs0bgs-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 01 Dec 2022 15:35:55 +0000
+Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
+        by ppma01dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2B1FLlJ4018218;
+        Thu, 1 Dec 2022 15:30:54 GMT
+Received: from smtprelay04.wdc07v.mail.ibm.com ([9.208.129.114])
+        by ppma01dal.us.ibm.com with ESMTP id 3m3aeanw4x-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 01 Dec 2022 15:30:54 +0000
+Received: from smtpav03.wdc07v.mail.ibm.com (smtpav03.wdc07v.mail.ibm.com [10.39.53.230])
+        by smtprelay04.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2B1FTcEa18940552
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 1 Dec 2022 15:29:38 GMT
+Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 4BDDB5805A;
+        Thu,  1 Dec 2022 15:29:38 +0000 (GMT)
+Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id BFF7C5805D;
+        Thu,  1 Dec 2022 15:29:36 +0000 (GMT)
+Received: from rhel-laptop.ibm.com (unknown [9.160.99.100])
+        by smtpav03.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+        Thu,  1 Dec 2022 15:29:36 +0000 (GMT)
+Message-ID: <044c90dc7feb3959b5740154addc230ba9a57216.camel@linux.vnet.ibm.com>
+Subject: Re: [PATCH v3 3/3] block: sed-opal: keyring support for SED keys
+From:   Greg Joyce <gjoyce@linux.vnet.ibm.com>
+Reply-To: gjoyce@linux.vnet.ibm.com
+To:     Ben Boeckel <me@benboeckel.net>
+Cc:     Hannes Reinecke <hare@suse.de>, linux-block@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, jonathan.derrick@linux.dev,
+        brking@linux.vnet.ibm.com, msuchanek@suse.de, mpe@ellerman.id.au,
+        nayna@linux.ibm.com, axboe@kernel.dk, akpm@linux-foundation.org,
+        keyrings@vger.kernel.org
+Date:   Thu, 01 Dec 2022 09:29:36 -0600
+In-Reply-To: <Y4gjgf2xHOYTVnSc@farprobe>
+References: <20221129232506.3735672-1-gjoyce@linux.vnet.ibm.com>
+         <20221129232506.3735672-4-gjoyce@linux.vnet.ibm.com>
+         <c78edd60-b6ae-6ec0-9ce4-73b9a92b9b32@suse.de>
+         <2133c00e5e7c53c458dbb709204c955bac8bee88.camel@linux.vnet.ibm.com>
+         <Y4gjgf2xHOYTVnSc@farprobe>
+Content-Type: text/plain; charset="UTF-8"
+X-Mailer: Evolution 3.28.5 (3.28.5-18.el8) 
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: RN6-zXpnA45xPOTAP4vXVTMBnrGVxftM
+X-Proofpoint-GUID: RN6-zXpnA45xPOTAP4vXVTMBnrGVxftM
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.923,Hydra:6.0.545,FMLib:17.11.122.1
+ definitions=2022-12-01_11,2022-12-01_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 impostorscore=0
+ lowpriorityscore=0 phishscore=0 mlxlogscore=999 spamscore=0 mlxscore=0
+ clxscore=1011 suspectscore=0 bulkscore=0 malwarescore=0 priorityscore=1501
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2210170000
+ definitions=main-2212010113
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 12/1/22 4:44 AM, Jan Kara wrote:
-> The condition detecting whether somebody else has the device exclusively
-> open in disk_scan_partitions() has a brownpaper bag bug. It triggers also
-> when nobody has the device exclusively open and we are coming from
-> BLKRRPART path. Interestingly this didn't have any adverse effects
-> during testing because tools update kernel's notion of the partition
-> table using ioctls and don't rely on BLKRRPART. Fix the bug before
-> somebody trips over it.
+On Wed, 2022-11-30 at 22:46 -0500, Ben Boeckel wrote:
+> On Wed, Nov 30, 2022 at 09:19:25 -0600, Greg Joyce wrote:
+> > On Wed, 2022-11-30 at 08:00 +0100, Hannes Reinecke wrote:
+> > > On 11/30/22 00:25, gjoyce@linux.vnet.ibm.com wrote:
+> > > > +	case OPAL_KEYRING:
+> > > > +		/* the key is in the keyring */
+> > > > +		ret = read_sed_opal_key(OPAL_AUTH_KEY, key-
+> > > > >key,
+> > > > OPAL_KEY_MAX);
+> > > > +		if (ret > 0) {
+> > > > +			if (ret > 255) {
+> > > 
+> > > Why is a key longer than 255 an error?
+> > > If this is a requirement, why not move the check into
+> > > read_sed_opal_key() such that one only has to check for
+> > > ret < 0 on errors?
+> > 
+> > The check is done here because the SED Opal spec stipulates 255 as
+> > the
+> > maximum key length. The key length (key->key_len) in the existing
+> > data
+> > structures is __u8, so a length greater than 255 can not be
+> > conveyed.
+> > For defensive purposes, I though it best to check here.
+> 
+> Perhaps naming it `OPAL_MAX_KEY_LEN` would help clarify this?
+> 
+> --Ben
 
-I folded this in. It's funny because I did consider this when reviewing
-it, but then convinced myself it was fine...
+I'm not averse to changing it because it would be clearer. My concern
+is that it's been OPAL_KEY_MAX for 5+ years (the original SED Opal
+commit). Unless there is strong consensus to change it, I'm going to
+leave it as the original name.
 
--- 
-Jens Axboe
-
+-Greg
 
