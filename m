@@ -2,159 +2,104 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BD086C47088
-	for <linux-block@archiver.kernel.org>; Fri,  2 Dec 2022 15:19:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CB8BC47088
+	for <linux-block@archiver.kernel.org>; Fri,  2 Dec 2022 17:50:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232723AbiLBPTU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 2 Dec 2022 10:19:20 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53852 "EHLO
+        id S234012AbiLBRui convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 2 Dec 2022 12:50:38 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44810 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232114AbiLBPTT (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 2 Dec 2022 10:19:19 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 772B4A958E;
-        Fri,  2 Dec 2022 07:19:18 -0800 (PST)
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2B2FHN4g008585;
-        Fri, 2 Dec 2022 15:19:04 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : reply-to : to : cc : date : in-reply-to : references : content-type
- : mime-version : content-transfer-encoding; s=pp1;
- bh=kk2DKWr3NuGpJ+Svcp+qRnmUBH5ye61AWs17cEkLK3k=;
- b=eIZKp8jIvlNGrbtxhT7sBjf8ytCaNuRSPxG1OXnEURIA/3izVTUEdmA34hMqfmrDPOuS
- XEG7huc2qcmbFaV50MRyWiZ6qXLgwCTT869vu14pf3uy+hGWKzcqq68Bfjk29/mRYzfq
- CdthJW71V1Bi5G7B3ndeIxsuU+2KGKVy/JQGknCCNe71yEbF6CWElVHo8Sy14at/5l8d
- pvgQtPbfQMbuyZFtGnTDIW+O+aXVdszLu09dChIWOAhijzoHU1qMO6EcovQ7FEewIy9i
- s6JDbu1/VDnJevH/ezPMo+tbIfiP5r0SZll29mSuKZuWK3lZN6jn75agzhCyy1UYeGAw 2A== 
-Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com [169.63.214.131])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3m7kvd80wy-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 02 Dec 2022 15:19:03 +0000
-Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
-        by ppma01dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2B2F5dmj013584;
-        Fri, 2 Dec 2022 15:19:02 GMT
-Received: from smtprelay03.wdc07v.mail.ibm.com ([9.208.129.113])
-        by ppma01dal.us.ibm.com with ESMTP id 3m3aeb12x0-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 02 Dec 2022 15:19:02 +0000
-Received: from smtpav04.dal12v.mail.ibm.com (smtpav04.dal12v.mail.ibm.com [10.241.53.103])
-        by smtprelay03.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2B2FJ05s3408442
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 2 Dec 2022 15:19:01 GMT
-Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D2E5B5804E;
-        Fri,  2 Dec 2022 15:19:00 +0000 (GMT)
-Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C480258052;
-        Fri,  2 Dec 2022 15:18:59 +0000 (GMT)
-Received: from rhel-laptop.ibm.com (unknown [9.160.99.100])
-        by smtpav04.dal12v.mail.ibm.com (Postfix) with ESMTP;
-        Fri,  2 Dec 2022 15:18:59 +0000 (GMT)
-Message-ID: <e53f14006d4a26f9b8e14d30683e4006ed2fa35f.camel@linux.vnet.ibm.com>
-Subject: Re: [PATCH v3 3/3] block: sed-opal: keyring support for SED keys
-From:   Greg Joyce <gjoyce@linux.vnet.ibm.com>
-Reply-To: gjoyce@linux.vnet.ibm.com
-To:     Hannes Reinecke <hare@suse.de>, linux-block@vger.kernel.org
-Cc:     linuxppc-dev@lists.ozlabs.org, jonathan.derrick@linux.dev,
-        brking@linux.vnet.ibm.com, msuchanek@suse.de, mpe@ellerman.id.au,
-        nayna@linux.ibm.com, axboe@kernel.dk, akpm@linux-foundation.org,
-        keyrings@vger.kernel.org
-Date:   Fri, 02 Dec 2022 09:18:59 -0600
-In-Reply-To: <4a3b6a0f-be1b-e0b1-941b-6701a42e9a2c@suse.de>
-References: <20221129232506.3735672-1-gjoyce@linux.vnet.ibm.com>
-         <20221129232506.3735672-4-gjoyce@linux.vnet.ibm.com>
-         <c78edd60-b6ae-6ec0-9ce4-73b9a92b9b32@suse.de>
-         <ed32cbc546383085bc8c00d913a53059831b2cfc.camel@linux.vnet.ibm.com>
-         <4a3b6a0f-be1b-e0b1-941b-6701a42e9a2c@suse.de>
-Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.28.5 (3.28.5-18.el8) 
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: xZ5pZaCSkGial_cn81MpDjJboOX58ITK
-X-Proofpoint-GUID: xZ5pZaCSkGial_cn81MpDjJboOX58ITK
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.923,Hydra:6.0.545,FMLib:17.11.122.1
- definitions=2022-12-02_08,2022-12-01_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 bulkscore=0
- spamscore=0 priorityscore=1501 mlxscore=0 suspectscore=0 adultscore=0
- mlxlogscore=999 impostorscore=0 malwarescore=0 lowpriorityscore=0
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2210170000 definitions=main-2212020114
+        with ESMTP id S233389AbiLBRuh (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 2 Dec 2022 12:50:37 -0500
+X-Greylist: delayed 901 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Fri, 02 Dec 2022 09:50:36 PST
+Received: from SJSMAIL01.us.kioxia.com (usmailhost21.kioxia.com [12.0.68.226])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 12167DEA79;
+        Fri,  2 Dec 2022 09:50:36 -0800 (PST)
+Received: from SJSMAIL01.us.kioxia.com (10.90.133.90) by
+ SJSMAIL01.us.kioxia.com (10.90.133.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.34; Fri, 2 Dec 2022 09:33:33 -0800
+Received: from SJSMAIL01.us.kioxia.com ([::1]) by SJSMAIL01.us.kioxia.com
+ ([fe80::f5ad:7ba5:d6cc:6f21%3]) with mapi id 15.01.2375.034; Fri, 2 Dec 2022
+ 09:33:33 -0800
+From:   Clay Mayers <Clay.Mayers@kioxia.com>
+To:     Keith Busch <kbusch@kernel.org>, Hannes Reinecke <hare@suse.de>
+CC:     Matthew Wilcox <willy@infradead.org>,
+        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-raid@vger.kernel.org" <linux-raid@vger.kernel.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        "axboe@kernel.dk" <axboe@kernel.dk>,
+        "djwong@kernel.org" <djwong@kernel.org>, "hch@lst.de" <hch@lst.de>,
+        "sagi@grimberg.me" <sagi@grimberg.me>,
+        "jejb@linux.ibm.com" <jejb@linux.ibm.com>,
+        "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
+        "javier@javigon.com" <javier@javigon.com>,
+        "johannes.thumshirn@wdc.com" <johannes.thumshirn@wdc.com>,
+        "bvanassche@acm.org" <bvanassche@acm.org>,
+        "dongli.zhang@oracle.com" <dongli.zhang@oracle.com>,
+        "jefflexu@linux.alibaba.com" <jefflexu@linux.alibaba.com>,
+        "josef@toxicpanda.com" <josef@toxicpanda.com>,
+        "clm@fb.com" <clm@fb.com>, "dsterba@suse.com" <dsterba@suse.com>,
+        "jack@suse.com" <jack@suse.com>, "tytso@mit.edu" <tytso@mit.edu>,
+        "adilger.kernel@dilger.ca" <adilger.kernel@dilger.ca>,
+        "jlayton@kernel.org" <jlayton@kernel.org>,
+        "idryomov@gmail.com" <idryomov@gmail.com>,
+        "danil.kipnis@cloud.ionos.com" <danil.kipnis@cloud.ionos.com>,
+        "ebiggers@google.com" <ebiggers@google.com>,
+        "jinpu.wang@cloud.ionos.com" <jinpu.wang@cloud.ionos.com>
+Subject: RE: [PATCH 0/6] block: add support for REQ_OP_VERIFY
+Thread-Topic: [PATCH 0/6] block: add support for REQ_OP_VERIFY
+Thread-Index: AQHYjGHN/dRfjWV95kG4kItzDx62xa1xpq+AgOihlACAAJ5aAIAAwrsAgACBBAD//5Rf8A==
+Date:   Fri, 2 Dec 2022 17:33:33 +0000
+Message-ID: <f68009b7cc744c02ad69d68fd7e61751@kioxia.com>
+References: <20220630091406.19624-1-kch@nvidia.com>
+ <YsXJdXnXsMtaC8DJ@casper.infradead.org>
+ <d14fe396-b39b-6b3e-ae74-eb6a8b64e379@nvidia.com>
+ <Y4kC9NIXevPlji+j@casper.infradead.org>
+ <72a51a83-c25a-ef52-55fb-2b73aec70305@suse.de>
+ <Y4oSiPH0ENFktioQ@kbusch-mbp.dhcp.thefacebook.com>
+In-Reply-To: <Y4oSiPH0ENFktioQ@kbusch-mbp.dhcp.thefacebook.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.93.77.43]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
+MIME-Version: 1.0
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, 2022-12-02 at 07:56 +0100, Hannes Reinecke wrote:
-> On 12/1/22 19:03, Greg Joyce wrote:
-> > On Wed, 2022-11-30 at 08:00 +0100, Hannes Reinecke wrote:
-> > > On 11/30/22 00:25, gjoyce@linux.vnet.ibm.com wrote:
-> > > > From: Greg Joyce <gjoyce@linux.vnet.ibm.com>
-> > > > 
-> > > > Extend the SED block driver so it can alternatively
-> > > > obtain a key from a sed-opal kernel keyring. The SED
-> > > > ioctls will indicate the source of the key, either
-> > > > directly in the ioctl data or from the keyring.
-> > > > 
-> > > > This allows the use of SED commands in scripts such as
-> > > > udev scripts so that drives may be automatically unlocked
-> > > > as they become available.
-> > > > 
-> > > > Signed-off-by: Greg Joyce <gjoyce@linux.vnet.ibm.com>
-> > > > Reviewed-by: Jonathan Derrick <jonathan.derrick@linux.dev>
-> > > > ---
-> > > >    block/Kconfig                 |   1 +
-> > > >    block/sed-opal.c              | 174
-> > > > +++++++++++++++++++++++++++++++++-
-> > > >    include/linux/sed-opal.h      |   3 +
-> > > >    include/uapi/linux/sed-opal.h |   8 +-
-> > > >    4 files changed, 183 insertions(+), 3 deletions(-)
-> > > >   
-> > > > +	ret = opal_get_key(dev, &opal_lrs->session.opal_key);
-> > > > +	if (ret)
-> > > > +		return ret;
-> > > >    	mutex_lock(&dev->dev_lock);
-> > > >    	setup_opal_dev(dev);
-> > > >    	ret = execute_steps(dev, lr_steps,
-> > > > ARRAY_SIZE(lr_steps));
-> > > > @@ -2622,6 +2759,14 @@ static int opal_set_new_pw(struct
-> > > > opal_dev
-> > > > *dev, struct opal_new_pw *opal_pw)
-> > > >    	ret = execute_steps(dev, pw_steps,
-> > > > ARRAY_SIZE(pw_steps));
-> > > >    	mutex_unlock(&dev->dev_lock);
-> > > >    
-> > > > +	if (ret)
-> > > > +		return ret;
-> > > > +
-> > > > +	/* update keyring with new password */
-> > > > +	ret = update_sed_opal_key(OPAL_AUTH_KEY,
-> > > > +				  opal_pw-
-> > > > >new_user_pw.opal_key.key,
-> > > > +				  opal_pw-
-> > > > > new_user_pw.opal_key.key_len);
-> > > > +
-> > > >    	return ret;
-> > > >    }
-> > > >    
-> > > What about key revocation?
-> > > You only allow to set a new key, but what happens with the old
-> > > ones?
-> > 
-> > My understanding was that key_create_or_update() would not allow
-> > duplicates so there shouldn't be old ones. Is that incorrect?
-> > 
-> Ah, right, you only have one key.
-> But still, you might want to revoke that one, too, no?
-> (Think of decommissioning old drives ...)
+> From: Keith Busch
+> On Fri, Dec 02, 2022 at 08:16:30AM +0100, Hannes Reinecke wrote:
+> > On 12/1/22 20:39, Matthew Wilcox wrote:
+> > > On Thu, Dec 01, 2022 at 06:12:46PM +0000, Chaitanya Kulkarni wrote:
+> > > > So nobody can get away with a lie.
+> > >
+> > > And yet devices do exist which lie.  I'm not surprised that vendors
+> > > vehemently claim that they don't, or "nobody would get away with it".
+> > > But, of course, they do.  And there's no way for us to find out if
+> > > they're lying!
+
+My guess, if true, is it's rationalized with the device is already
+doing patrols in the background - why verify when it's already
+been recently patrolled?
+ 
+> > >
+> > But we'll never be able to figure that out unless we try.
+> >
+> > Once we've tried we will have proof either way.
 > 
-> Cheers,
->  
-> Hannes
+> As long as the protocols don't provide proof-of-work, trying this
+> doesn't really prove anything with respect to this concern.
 
-SED Opal allows for disabling locking on a SED drive. Both sedcli and
-sedutil have commands to support this. This is the method for drive
-decommisioning (un-provisioning). There is also a mechanism to
-cryptographically erase the data on the drive if that is desired.
-
+I'm out of my depth here, but isn't VERIFY tightly related to PI and
+at the heart of detecting SAN bit-rot? The proof of work can be via
+end-to-end data protection. VERIFY has to actually read to detect bad
+host generated PI guard/tags.  I'm assuming the PI checks can be
+disabled for WRITE and enabled for VERIFY as the test.
 
