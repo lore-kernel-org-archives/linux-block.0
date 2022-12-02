@@ -2,73 +2,100 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7EB7BC4332F
-	for <linux-block@archiver.kernel.org>; Fri,  2 Dec 2022 09:35:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AB00BC4332F
+	for <linux-block@archiver.kernel.org>; Fri,  2 Dec 2022 10:28:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232307AbiLBJfu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 2 Dec 2022 04:35:50 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38146 "EHLO
+        id S232681AbiLBK20 convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 2 Dec 2022 05:28:26 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38990 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231831AbiLBJft (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 2 Dec 2022 04:35:49 -0500
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 92F80C65
-        for <linux-block@vger.kernel.org>; Fri,  2 Dec 2022 01:35:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Content-Type:MIME-Version:Message-ID:
-        Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-        Content-Description:In-Reply-To:References;
-        bh=rH8MM7ztjz32yvM18t1XgQUk0Ikrcd9m0/ls9NFDjpk=; b=ovvUSIoX2OSGPjQK0ieMY9h+xs
-        g/FX3Be3y+FFp31tzqEQXLfC1y5RuH/DJlImpPf5CIK4Vj6nuf4DvDkeX55W4Y9QjByx4QlNAKYTo
-        EQwlump5q2b69fAF0+kPOAesVER4IYJi0/jJwQrFx0Fn3D7gNkXXZqAEHK1DWMu97peXA0I8c/jCv
-        cZP5Nlj3pqAJP44tBWdTVg8Qb4xh7xkFtcEQd8HrsRu9H0LeVhXN/NIfKb5VCa/hVHxTKjre1lSkE
-        L1qOiEFOs7zRDa2Fbaqs3cQYSF3aRecsYAIfsR2atHl48FXlPefctihxPkVagXSrv5yCq/Hr9UJP0
-        9A6XiwSA==;
-Received: from [2001:4bb8:192:26e7:bcd3:7e81:e7de:56fd] (helo=localhost)
-        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1p12SJ-00F1P3-KY; Fri, 02 Dec 2022 09:35:40 +0000
-Date:   Fri, 2 Dec 2022 10:35:37 +0100
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
-Subject: [GIT PULL] nvme fixes for Linux 6.1
-Message-ID: <Y4nG6f7QDhcmbldD@infradead.org>
+        with ESMTP id S232477AbiLBK2Z (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 2 Dec 2022 05:28:25 -0500
+Received: from mail-qt1-f176.google.com (mail-qt1-f176.google.com [209.85.160.176])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 086D32FA6F
+        for <linux-block@vger.kernel.org>; Fri,  2 Dec 2022 02:28:23 -0800 (PST)
+Received: by mail-qt1-f176.google.com with SMTP id h24so4460124qta.9
+        for <linux-block@vger.kernel.org>; Fri, 02 Dec 2022 02:28:22 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ylGtQ4aHoKpRgzGyzoZLymGQWp7U4G0g9FjRAEYlfNw=;
+        b=V3PVfmtNHNYRNE2pJSDaG/8RaS7aQz7S/Fdlh0R6Fy+rKW217cEzNbYDRMM4qc6uf7
+         pz5vOGAHyUpYFlL657H6UZGANWI9XFRUSvSyDQyJ2XHio6qyIB50q1BMRhzjLB5mu9iJ
+         H1pUmlqRMKwmxfQYfXyWkU3AemuitdZxDDMvpinD6P7tVGhuZ+6y3yzr3iKC5YvhYgBQ
+         XHpedY7krCDfE/rG6bWk0Ka8ZHHMRP1ZIOwGG1aaV3oCYyi5iWFHHJpnjzDhD0ZYiAtt
+         QwcSKscQqU9R+njBFDX8L9nEEpV6TgBZ7wqewVsMg+05xgUAC0jpGSbqZVdt7I13MaMz
+         Bqdw==
+X-Gm-Message-State: ANoB5pkOAXbz4ZdZ7vZ4TbIzZTrgwkIMMKuQJaGXdSCdzL++hjGSu2WJ
+        IouSJ6HGhfLd2D8FZxX6s2Yn1a5fYneaww==
+X-Google-Smtp-Source: AA0mqf7SDDhauxJGVvcHzJqWjY5UqPEN939y/1ld8MvUf8LtOvQJJfd4iXp8PstfcjQYVMY44aCEaQ==
+X-Received: by 2002:a05:622a:258d:b0:3a6:5758:e24 with SMTP id cj13-20020a05622a258d00b003a657580e24mr45291212qtb.261.1669976901997;
+        Fri, 02 Dec 2022 02:28:21 -0800 (PST)
+Received: from mail-yb1-f169.google.com (mail-yb1-f169.google.com. [209.85.219.169])
+        by smtp.gmail.com with ESMTPSA id q23-20020a37f717000000b006cbc00db595sm5018618qkj.23.2022.12.02.02.28.21
+        for <linux-block@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 02 Dec 2022 02:28:21 -0800 (PST)
+Received: by mail-yb1-f169.google.com with SMTP id z192so5545657yba.0
+        for <linux-block@vger.kernel.org>; Fri, 02 Dec 2022 02:28:21 -0800 (PST)
+X-Received: by 2002:a25:a028:0:b0:6d5:a323:51b8 with SMTP id
+ x37-20020a25a028000000b006d5a32351b8mr54222802ybh.33.1669976901384; Fri, 02
+ Dec 2022 02:28:21 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+References: <20221202003610.100024-1-luca.boccassi@gmail.com> <20221202084845.66mn2m3srfabehnu@wittgenstein>
+In-Reply-To: <20221202084845.66mn2m3srfabehnu@wittgenstein>
+From:   Luca Boccassi <bluca@debian.org>
+Date:   Fri, 2 Dec 2022 10:28:10 +0000
+X-Gmail-Original-Message-ID: <CAMw=ZnQ+iPa9gv95_8Z4mVdBr-ma5ohd-Ys49WYOB+KmMQY_9g@mail.gmail.com>
+Message-ID: <CAMw=ZnQ+iPa9gv95_8Z4mVdBr-ma5ohd-Ys49WYOB+KmMQY_9g@mail.gmail.com>
+Subject: Re: [PATCH] sed-opal: if key is available from IOC_OPAL_SAVE use it
+ when locking
+To:     Christian Brauner <brauner@kernel.org>
+Cc:     linux-block@vger.kernel.org, jonathan.derrick@linux.dev,
+        gmazyland@gmail.com, axboe@kernel.dk, stepan.horacek@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The following changes since commit 7d4a93176e0142ce16d23c849a47d5b00b856296:
+On Fri, 2 Dec 2022 at 08:48, Christian Brauner <brauner@kernel.org> wrote:
+>
+> On Fri, Dec 02, 2022 at 12:36:10AM +0000, luca.boccassi@gmail.com wrote:
+> > From: Luca Boccassi <bluca@debian.org>
+> >
+> > Usually when closing a crypto device (eg: dm-crypt with LUKS) the
+> > volume key is not required, as it requires root privileges anyway, and
+> > root can deny access to a disk in many ways regardless. Requiring the
+> > volume key to lock the device is a peculiarity of the OPAL
+> > specification.
+> >
+> > Given we might already have saved the key if the user requested it via
+> > the 'IOC_OPAL_SAVE' ioctl, we can use that key to lock the device if no
+> > key was provided here and the locking range matches. This allows
+> > integrating OPAL with tools and libraries that are used to the common
+> > behaviour and do not ask for the volume key when closing a device.
+> >
+> > If the caller provides a key on the other hand it will still be used as
+> > before, no changes in that case.
+> >
+> > Suggested-by: Štěpán Horáček <stepan.horacek@gmail.com>
+> > Signed-off-by: Luca Boccassi <bluca@debian.org>
+> > ---
+>
+> But it would be quite the change in behavior for existing users, no?
+>
+> It might be better to add an ioctl that would allow to set an option on
+> the opal device after it was opened which marks it as closable without
+> providing the key?
 
-  ublk_drv: don't forward io commands in reserve order (2022-11-23 20:36:57 -0700)
+Closing with a zero-length key could not work before and would fail
+with eperm, so I can't imagine anyone using it as such, so I didn't
+bother.
+But I don't mind either way, so I will add a new ioctl for v2.
 
-are available in the Git repository at:
-
-  git://git.infradead.org/nvme.git tags/nvme-6.1-2022-01-02
-
-for you to fetch changes up to 899d2a05dc14733cfba6224083c6b0dd5a738590:
-
-  nvme: fix SRCU protection of nvme_ns_head list (2022-11-30 14:37:46 +0100)
-
-----------------------------------------------------------------
-nvme fixes for Linux 6.1
-
- - fix SRCU protection of nvme_ns_head list (Caleb Sander)
- - clear the prp2 field when not used (Lei Rao)
-
-----------------------------------------------------------------
-Caleb Sander (1):
-      nvme: fix SRCU protection of nvme_ns_head list
-
-Lei Rao (1):
-      nvme-pci: clear the prp2 field when not used
-
- drivers/nvme/host/core.c      | 2 +-
- drivers/nvme/host/multipath.c | 3 +++
- drivers/nvme/host/pci.c       | 2 ++
- 3 files changed, 6 insertions(+), 1 deletion(-)
+Kind regards,
+Luca Boccassi
