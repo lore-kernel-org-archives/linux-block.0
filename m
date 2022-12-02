@@ -2,132 +2,146 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92DF2C47088
-	for <linux-block@archiver.kernel.org>; Fri,  2 Dec 2022 06:56:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 483E7C4167B
+	for <linux-block@archiver.kernel.org>; Fri,  2 Dec 2022 07:13:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232447AbiLBG4x (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 2 Dec 2022 01:56:53 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44990 "EHLO
+        id S231367AbiLBHN1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 2 Dec 2022 02:13:27 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59866 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232245AbiLBG4w (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 2 Dec 2022 01:56:52 -0500
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 29418BC5AD;
-        Thu,  1 Dec 2022 22:56:50 -0800 (PST)
+        with ESMTP id S230447AbiLBHNZ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 2 Dec 2022 02:13:25 -0500
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63FDF60B50;
+        Thu,  1 Dec 2022 23:13:23 -0800 (PST)
 Received: from imap1.suse-dmz.suse.de (imap1.suse-dmz.suse.de [192.168.254.73])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 9F17F21B5C;
-        Fri,  2 Dec 2022 06:56:48 +0000 (UTC)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 806591FDB2;
+        Fri,  2 Dec 2022 07:13:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1669964208; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+        t=1669965201; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=NKRlnmSi9cULYBX+c6mBT5MzyG+E0j7vwb/2t12kBrw=;
-        b=c2Xb0pewOZr4hWEphekzh/H9MizOIOT4EFBfJ4UojhvnX/ethC1ngZup0oFLVYV89dGND9
-        H/GOWzLrqXOa4gUpwZNpqavAyYT2Zj1vHy4RCk5iFd2jCtcbDMOxU60W1WohBj/MhYi/G1
-        XJyEbKd37QaChm4BtqOuxFhrEKVkXeU=
+        bh=p8xc9/NvQfEQJ4e4z6/baVfh/lD5CFR3fcc+Q0PHSQI=;
+        b=ybjOTPvRHpXwAhn3vINNm69twJGz58PGyPK1sd3JJZbdDiPz2XdYP0ZhZwebDY3UWbwKVN
+        wDbUB5l15WW/8w+/RXjEQ/x1eSgM/aHnw1oZfWYT+5bACHpQI3sPlbXhA4JfNpeIOUAKNi
+        wP2uRuN6cIXW9o6qJboZbFKuFHljxrc=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1669964208;
+        s=susede2_ed25519; t=1669965201;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=NKRlnmSi9cULYBX+c6mBT5MzyG+E0j7vwb/2t12kBrw=;
-        b=jxG49tsMXLSVVWmmTavuLSz586smJ3JQ/2DDpzYt7da2V+CxS9FrMs6kUumBXuKl40YHpj
-        x/FX5AAocE1QlfAQ==
+        bh=p8xc9/NvQfEQJ4e4z6/baVfh/lD5CFR3fcc+Q0PHSQI=;
+        b=pNHg4CJKoV+kTyzOXNJhCE1t7cDzJtp0kSAmdAcNEpT9EoHNSazpnSisumGDH/FUhyIQ0d
+        rahTJqu09ovnd6Ag==
 Received: from imap1.suse-dmz.suse.de (imap1.suse-dmz.suse.de [192.168.254.73])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap1.suse-dmz.suse.de (Postfix) with ESMTPS id 689C3133DE;
-        Fri,  2 Dec 2022 06:56:48 +0000 (UTC)
+        by imap1.suse-dmz.suse.de (Postfix) with ESMTPS id F18E013644;
+        Fri,  2 Dec 2022 07:13:20 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap1.suse-dmz.suse.de with ESMTPSA
-        id vMRwGLChiWOTeAAAGKfGzw
-        (envelope-from <hare@suse.de>); Fri, 02 Dec 2022 06:56:48 +0000
-Message-ID: <4a3b6a0f-be1b-e0b1-941b-6701a42e9a2c@suse.de>
-Date:   Fri, 2 Dec 2022 07:56:48 +0100
+        id D8OZOZCliWPifwAAGKfGzw
+        (envelope-from <hare@suse.de>); Fri, 02 Dec 2022 07:13:20 +0000
+Message-ID: <ab4f15be-2e4a-0a5c-8d36-051b3808be2f@suse.de>
+Date:   Fri, 2 Dec 2022 08:13:21 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.5.0
-Subject: Re: [PATCH v3 3/3] block: sed-opal: keyring support for SED keys
+Subject: Re: [PATCH 0/6] block: add support for REQ_OP_VERIFY
 Content-Language: en-US
-To:     gjoyce@linux.vnet.ibm.com, linux-block@vger.kernel.org
-Cc:     linuxppc-dev@lists.ozlabs.org, jonathan.derrick@linux.dev,
-        brking@linux.vnet.ibm.com, msuchanek@suse.de, mpe@ellerman.id.au,
-        nayna@linux.ibm.com, axboe@kernel.dk, akpm@linux-foundation.org,
-        keyrings@vger.kernel.org
-References: <20221129232506.3735672-1-gjoyce@linux.vnet.ibm.com>
- <20221129232506.3735672-4-gjoyce@linux.vnet.ibm.com>
- <c78edd60-b6ae-6ec0-9ce4-73b9a92b9b32@suse.de>
- <ed32cbc546383085bc8c00d913a53059831b2cfc.camel@linux.vnet.ibm.com>
+To:     Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+        Matthew Wilcox <willy@infradead.org>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-raid@vger.kernel.org" <linux-raid@vger.kernel.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        "axboe@kernel.dk" <axboe@kernel.dk>,
+        "djwong@kernel.org" <djwong@kernel.org>,
+        "kbusch@kernel.org" <kbusch@kernel.org>, "hch@lst.de" <hch@lst.de>,
+        "sagi@grimberg.me" <sagi@grimberg.me>,
+        "jejb@linux.ibm.com" <jejb@linux.ibm.com>,
+        "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
+        "javier@javigon.com" <javier@javigon.com>,
+        "johannes.thumshirn@wdc.com" <johannes.thumshirn@wdc.com>,
+        "bvanassche@acm.org" <bvanassche@acm.org>,
+        "dongli.zhang@oracle.com" <dongli.zhang@oracle.com>,
+        "jefflexu@linux.alibaba.com" <jefflexu@linux.alibaba.com>,
+        "josef@toxicpanda.com" <josef@toxicpanda.com>,
+        "clm@fb.com" <clm@fb.com>, "dsterba@suse.com" <dsterba@suse.com>,
+        "jack@suse.com" <jack@suse.com>, "tytso@mit.edu" <tytso@mit.edu>,
+        "adilger.kernel@dilger.ca" <adilger.kernel@dilger.ca>,
+        "jlayton@kernel.org" <jlayton@kernel.org>,
+        "idryomov@gmail.com" <idryomov@gmail.com>,
+        "danil.kipnis@cloud.ionos.com" <danil.kipnis@cloud.ionos.com>,
+        "ebiggers@google.com" <ebiggers@google.com>,
+        "jinpu.wang@cloud.ionos.com" <jinpu.wang@cloud.ionos.com>
+References: <20220630091406.19624-1-kch@nvidia.com>
+ <YsXJdXnXsMtaC8DJ@casper.infradead.org>
+ <d14fe396-b39b-6b3e-ae74-eb6a8b64e379@nvidia.com>
 From:   Hannes Reinecke <hare@suse.de>
-In-Reply-To: <ed32cbc546383085bc8c00d913a53059831b2cfc.camel@linux.vnet.ibm.com>
+In-Reply-To: <d14fe396-b39b-6b3e-ae74-eb6a8b64e379@nvidia.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 12/1/22 19:03, Greg Joyce wrote:
-> On Wed, 2022-11-30 at 08:00 +0100, Hannes Reinecke wrote:
->> On 11/30/22 00:25, gjoyce@linux.vnet.ibm.com wrote:
->>> From: Greg Joyce <gjoyce@linux.vnet.ibm.com>
->>>
->>> Extend the SED block driver so it can alternatively
->>> obtain a key from a sed-opal kernel keyring. The SED
->>> ioctls will indicate the source of the key, either
->>> directly in the ioctl data or from the keyring.
->>>
->>> This allows the use of SED commands in scripts such as
->>> udev scripts so that drives may be automatically unlocked
->>> as they become available.
->>>
->>> Signed-off-by: Greg Joyce <gjoyce@linux.vnet.ibm.com>
->>> Reviewed-by: Jonathan Derrick <jonathan.derrick@linux.dev>
->>> ---
->>>    block/Kconfig                 |   1 +
->>>    block/sed-opal.c              | 174
->>> +++++++++++++++++++++++++++++++++-
->>>    include/linux/sed-opal.h      |   3 +
->>>    include/uapi/linux/sed-opal.h |   8 +-
->>>    4 files changed, 183 insertions(+), 3 deletions(-)
->>>   
->>> +	ret = opal_get_key(dev, &opal_lrs->session.opal_key);
->>> +	if (ret)
->>> +		return ret;
->>>    	mutex_lock(&dev->dev_lock);
->>>    	setup_opal_dev(dev);
->>>    	ret = execute_steps(dev, lr_steps, ARRAY_SIZE(lr_steps));
->>> @@ -2622,6 +2759,14 @@ static int opal_set_new_pw(struct opal_dev
->>> *dev, struct opal_new_pw *opal_pw)
->>>    	ret = execute_steps(dev, pw_steps, ARRAY_SIZE(pw_steps));
->>>    	mutex_unlock(&dev->dev_lock);
->>>    
->>> +	if (ret)
->>> +		return ret;
->>> +
->>> +	/* update keyring with new password */
->>> +	ret = update_sed_opal_key(OPAL_AUTH_KEY,
->>> +				  opal_pw->new_user_pw.opal_key.key,
->>> +				  opal_pw-
->>>> new_user_pw.opal_key.key_len);
->>> +
->>>    	return ret;
->>>    }
->>>    
->> What about key revocation?
->> You only allow to set a new key, but what happens with the old ones?
+On 12/1/22 19:12, Chaitanya Kulkarni wrote:
+> On 7/6/22 10:42, Matthew Wilcox wrote:
+>> On Thu, Jun 30, 2022 at 02:14:00AM -0700, Chaitanya Kulkarni wrote:
+>>> This adds support for the REQ_OP_VERIFY. In this version we add
+>>
+>> IMO, VERIFY is a useless command.  The history of storage is full of
+>> devices which simply lie.  Since there's no way for the host to check if
+>> the device did any work, cheap devices may simply implement it as a NOOP.
 > 
-> My understanding was that key_create_or_update() would not allow
-> duplicates so there shouldn't be old ones. Is that incorrect?
+> In past few months at various storage conferences I've talked to
+> different people to address your comment where device being
+> a liar verify implementation or even implementing NOOP.
 > 
-Ah, right, you only have one key.
-But still, you might want to revoke that one, too, no?
-(Think of decommissioning old drives ...)
+> With all do respect this is not true.
+> 
+[ .. ]
+
+Be careful to not fall into the copy-offload trap.
+The arguments given do pretty much mirror the discussion we had during 
+designing and implementing copy offload.
+
+Turns out that the major benefit for any of these 'advanced' commands is 
+not so much functionality but rather performance.
+If the functionality provided by the command is _slower_ as when the 
+host would be doing is manually there hardly is a point even calling 
+that functionality; we've learned that the hard way with copy offload, 
+and I guess the same it true for 'verify'.
+Thing is, none of the command will _tell_ you how long that command will 
+take; you just have to issue it and wait for it to complete.
+(Remember TRIM? And device which took minutes to complete it?)
+
+For copy offload we only recently added a bit telling the application 
+whether it's worth calling it, or if we should rather do it the old 
+fashioned way.
+
+But all of the above discussion has nothing to do with the 
+implementation. Why should we disallow an implementation for a 
+functionality which is present in hardware?
+How could we figure out the actual usability if we don't test?
+Where is the innovation?
+
+We need room for experimenting; if it turns out to be useless we can 
+always disable or remove it later. But we shouldn't bar implementations 
+because hardware _might_ be faulty.
+
+I do see at least two topics for the next LSF:
+
+- Implementation of REQ_OP_VERIFY
+- Innovation rules for the kernel
+...
 
 Cheers,
 
