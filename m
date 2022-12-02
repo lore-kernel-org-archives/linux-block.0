@@ -2,130 +2,94 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 39811C4332F
-	for <linux-block@archiver.kernel.org>; Fri,  2 Dec 2022 00:36:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E6A09C4332F
+	for <linux-block@archiver.kernel.org>; Fri,  2 Dec 2022 00:57:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231562AbiLBAgW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 1 Dec 2022 19:36:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53588 "EHLO
+        id S232094AbiLBA53 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 1 Dec 2022 19:57:29 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48070 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229893AbiLBAgV (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 1 Dec 2022 19:36:21 -0500
-Received: from mail-wm1-x336.google.com (mail-wm1-x336.google.com [IPv6:2a00:1450:4864:20::336])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B0E3293
-        for <linux-block@vger.kernel.org>; Thu,  1 Dec 2022 16:36:20 -0800 (PST)
-Received: by mail-wm1-x336.google.com with SMTP id c65-20020a1c3544000000b003cfffd00fc0so5365403wma.1
-        for <linux-block@vger.kernel.org>; Thu, 01 Dec 2022 16:36:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=v9ekcnDHDEQ3l22MuceDJz0T2U7LgcQrhIH0jnfs5LQ=;
-        b=k2DH+qNkPV5FZgyE+lmOrXGV6IdKSZFdud1/CrIcdl2WbxyededXjKUw/zI21zKTIN
-         1SkQWNZJBqM+SAWtR1w0YhdozviE9D8xJw5jPGusaKUABpv7lKmBsRFh/ze5VohRP0o9
-         jNCba7VUZBxzamWcrNgxMpJ89WWJ/dsbkY2Ye8tO1fjuVLPcPJJkj2KKOlfNpbEB2Nel
-         VjM79LxvR5JJUne5+FNjmiIwpaXrKqjOn17qWkXSQQL8GwNTKt/XitnPuAom3Wbgv/0/
-         c3hgANvPvgiTcpr2l5UNYg2qsOIhDg1hju8nY6hr/iWgwOree4Lluhmzbjwq6Tz/MeKl
-         F4Lg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=v9ekcnDHDEQ3l22MuceDJz0T2U7LgcQrhIH0jnfs5LQ=;
-        b=d4R1VIX8TEsln9eFvAWM6p4NmFplznLVTr+Eviv4EQ7ZBBwplNjTEhZ3wmXiqGuipK
-         fSPFMG6lL9Vn58Y1iUniyZlJB1ZDVQOX/GTB6I4z0Z4uPZhC3wlv0l8KGx42DCPQbfCd
-         Tw8WO0hMsyCYGm5Cz1Q/wE2FG7QR04ZcfgexVHj2pzyPDBCeU+nFMvQqj9ux36LPxJCb
-         sDL/oFZVQ3TXsubbbKBqCz0xD6f6CibDUovkEAkPoS5D1Kr/R2xE35Zqq5bt2zmK0xNu
-         uLB/ZzjPtIGyl4RX4mXWsmsTORpDfCNBudOPZ8/hSVuqTC36Pf8PGDjeGyU+zg+wl8es
-         ggrw==
-X-Gm-Message-State: ANoB5pmSpddGqSrWZNVSbfo6dIwLZvceFQ+NhDjrec+yXilnH7HLBOJE
-        e50PPyikeumMVliqmpRNd9PU4UDRuBLlqg==
-X-Google-Smtp-Source: AA0mqf6bMRQ5LfZdDO4ix7mtaZSlnDngXoDvZbC5omQLvXlgUTs/fWogK2h8VwGXeNBT5XxgBJN4WQ==
-X-Received: by 2002:a1c:7909:0:b0:3c6:f83e:d1b3 with SMTP id l9-20020a1c7909000000b003c6f83ed1b3mr37790209wme.190.1669941378532;
-        Thu, 01 Dec 2022 16:36:18 -0800 (PST)
-Received: from localhost ([2a01:4b00:d307:1000:6f15:7230:d519:3286])
-        by smtp.gmail.com with ESMTPSA id dn13-20020a05600c654d00b003c6bd12ac27sm6642176wmb.37.2022.12.01.16.36.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 01 Dec 2022 16:36:17 -0800 (PST)
-From:   luca.boccassi@gmail.com
-To:     linux-block@vger.kernel.org
-Cc:     jonathan.derrick@linux.dev, gmazyland@gmail.com, axboe@kernel.dk,
-        brauner@kernel.org, stepan.horacek@gmail.com
-Subject: [PATCH] sed-opal: if key is available from IOC_OPAL_SAVE use it when locking
-Date:   Fri,  2 Dec 2022 00:36:10 +0000
-Message-Id: <20221202003610.100024-1-luca.boccassi@gmail.com>
-X-Mailer: git-send-email 2.35.1
+        with ESMTP id S231961AbiLBA52 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 1 Dec 2022 19:57:28 -0500
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30919CB23E;
+        Thu,  1 Dec 2022 16:57:27 -0800 (PST)
+Received: from mail02.huawei.com (unknown [172.30.67.169])
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4NNZKX70b5z4f3kKc;
+        Fri,  2 Dec 2022 08:57:20 +0800 (CST)
+Received: from [10.174.178.129] (unknown [10.174.178.129])
+        by APP2 (Coremail) with SMTP id Syh0CgCXrLdwTYljf+TsBQ--.3634S2;
+        Fri, 02 Dec 2022 08:57:22 +0800 (CST)
+Subject: Re: [PATCH 1/5] sbitmap: don't consume nr for inactive waitqueue to
+ avoid lost wakeups
+To:     Gabriel Krisman Bertazi <krisman@suse.de>,
+        Kemeng Shi <shikemeng@huawei.com>
+Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linfeilong@huawei.com,
+        liuzhiqiang@huawei.com
+References: <20221201045408.21908-1-shikemeng@huawei.com>
+ <20221201045408.21908-2-shikemeng@huawei.com> <87y1rrmeq3.fsf@suse.de>
+From:   Kemeng Shi <shikemeng@huaweicloud.com>
+Message-ID: <20551512-a703-9637-29d8-931f5a76e392@huaweicloud.com>
+Date:   Fri, 2 Dec 2022 08:57:20 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.5.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <87y1rrmeq3.fsf@suse.de>
+Content-Type: text/plain; charset=gbk
+Content-Transfer-Encoding: 7bit
+X-CM-TRANSID: Syh0CgCXrLdwTYljf+TsBQ--.3634S2
+X-Coremail-Antispam: 1UD129KBjvdXoW7XFy5Jw4UtF43JrWDAFW3trb_yoWDZFb_Kw
+        4vgFWay39agFnrWw1Yka17uFnxGFW8Gw1kCr40qF9ayF1ftrs3AFsxCrZ5uF4xG34kAFnY
+        gFn0v34vvr429jkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+        9fnUUIcSsGvfJTRUUUbzkYFVCjjxCrM7AC8VAFwI0_Gr0_Xr1l1xkIjI8I6I8E6xAIw20E
+        Y4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwV
+        A0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVW7JVWDJwA2z4x0Y4vE2Ix0cI8IcVCY1x02
+        67AKxVWxJVW8Jr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxV
+        AFwI0_GcCE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2
+        j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7x
+        kEbVWUJVW8JwACjcxG0xvEwIxGrwCYjI0SjxkI62AI1cAE67vIY487MxAIw28IcxkI7VAK
+        I48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7
+        xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUAVWUtwCIc40Y0x0EwIxGrwCI42IY6xII
+        jxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw2
+        0EY4v20xvaj40_WFyUJVCq3wCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF
+        7I0E14v26r1j6r4UYxBIdaVFxhVjvjDU0xZFpf9x07UWE__UUUUU=
+X-CM-SenderInfo: 5vklyvpphqwq5kxd4v5lfo033gof0z/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Luca Boccassi <bluca@debian.org>
 
-Usually when closing a crypto device (eg: dm-crypt with LUKS) the
-volume key is not required, as it requires root privileges anyway, and
-root can deny access to a disk in many ways regardless. Requiring the
-volume key to lock the device is a peculiarity of the OPAL
-specification.
 
-Given we might already have saved the key if the user requested it via
-the 'IOC_OPAL_SAVE' ioctl, we can use that key to lock the device if no
-key was provided here and the locking range matches. This allows
-integrating OPAL with tools and libraries that are used to the common
-behaviour and do not ask for the volume key when closing a device.
+on 12/1/2022 9:32 PM, Gabriel Krisman Bertazi wrote:
+> Kemeng Shi <shikemeng@huawei.com> writes:
+> 
+>> If we decremented queue without waiters, we should not decremente freed
+>> bits number "nr", or all "nr" could be consumed in a empty queue and no
+>> wakeup will be called.
+>> Currently, for case "wait_cnt > 0", "nr" will not be decremented if we
+>> decremented queue without watiers and retry is returned to avoid lost
+>> wakeups. However for case "wait_cnt == 0", "nr" will be decremented
+>> unconditionally and maybe decremented to zero. Although retry is
+>> returned by active state of queue, it's not actually executed for "nr"
+>> is zero.
+>>
+> 
+> Hi Kemeng,
+> 
+> Fwiw, I sent a patch rewriting this algorithm which is now merged in
+> axboe/for-next.  It drops the per-waitqueue wait_cnt entirely.  You can
+> find it here:
+> 
+> https://lore.kernel.org/lkml/20221110153533.go5qs3psm75h27mx@quack3/T/
+> 
+> Thanks!
+Hi Gabriel,
+Thanks for remind me of this, I will recheck my patches in the
+axboe/for-next branch.
 
-If the caller provides a key on the other hand it will still be used as
-before, no changes in that case.
-
-Suggested-by: Štěpán Horáček <stepan.horacek@gmail.com>
-Signed-off-by: Luca Boccassi <bluca@debian.org>
----
- block/sed-opal.c | 29 +++++++++++++++++++++++++++++
- 1 file changed, 29 insertions(+)
-
-diff --git a/block/sed-opal.c b/block/sed-opal.c
-index 9bdb833e5817..b54bb76e4484 100644
---- a/block/sed-opal.c
-+++ b/block/sed-opal.c
-@@ -2470,6 +2470,35 @@ static int opal_lock_unlock(struct opal_dev *dev,
- 		return -EINVAL;
- 
- 	mutex_lock(&dev->dev_lock);
-+
-+	/*
-+	 * Usually when closing a crypto device (eg: dm-crypt with LUKS) the volume key
-+	 * is not required, as it requires root privileges anyway, and root can deny
-+	 * access to a disk in many ways regardless. Requiring the volume key to lock
-+	 * the device is a peculiarity of the OPAL specification.
-+	 * Given we might already have saved the key if the user requested it via the
-+	 * 'IOC_OPAL_SAVE' ioctl, we can use that key to lock the device if no key was
-+	 * provided here and the locking range matches. This allows integrating OPAL
-+	 * with tools and libraries that are used to the common behaviour and do not
-+	 * ask for the volume key when closing a device.
-+	 */
-+	if (lk_unlk->l_state == OPAL_LK && lk_unlk->session.opal_key.key_len == 0) {
-+		struct opal_suspend_data *iter;
-+
-+		setup_opal_dev(dev);
-+		list_for_each_entry(iter, &dev->unlk_lst, node) {
-+			if (iter->lr == lk_unlk->session.opal_key.lr &&
-+					iter->unlk.session.opal_key.key_len > 0) {
-+				lk_unlk->session.opal_key.key_len =
-+					iter->unlk.session.opal_key.key_len;
-+				memcpy(lk_unlk->session.opal_key.key,
-+					iter->unlk.session.opal_key.key,
-+					iter->unlk.session.opal_key.key_len);
-+				break;
-+			}
-+		}
-+	}
-+
- 	ret = __opal_lock_unlock(dev, lk_unlk);
- 	mutex_unlock(&dev->dev_lock);
- 
 -- 
-2.35.1
+Best wishes
+Kemeng Shi
 
