@@ -2,69 +2,140 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E866CC4332F
-	for <linux-block@archiver.kernel.org>; Fri,  2 Dec 2022 02:42:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92DF2C47088
+	for <linux-block@archiver.kernel.org>; Fri,  2 Dec 2022 06:56:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232079AbiLBCmz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 1 Dec 2022 21:42:55 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58404 "EHLO
+        id S232447AbiLBG4x (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 2 Dec 2022 01:56:53 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44990 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230193AbiLBCmz (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 1 Dec 2022 21:42:55 -0500
-Received: from out30-7.freemail.mail.aliyun.com (out30-7.freemail.mail.aliyun.com [115.124.30.7])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5189D15BA;
-        Thu,  1 Dec 2022 18:42:53 -0800 (PST)
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R981e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045170;MF=yang.lee@linux.alibaba.com;NM=1;PH=DS;RN=8;SR=0;TI=SMTPD_---0VWAkoq4_1669948970;
-Received: from localhost(mailfrom:yang.lee@linux.alibaba.com fp:SMTPD_---0VWAkoq4_1669948970)
-          by smtp.aliyun-inc.com;
-          Fri, 02 Dec 2022 10:42:51 +0800
-From:   Yang Li <yang.lee@linux.alibaba.com>
-To:     axboe@kernel.dk
-Cc:     tj@kernel.org, josef@toxicpanda.com, cgroups@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Yang Li <yang.lee@linux.alibaba.com>,
-        Abaci Robot <abaci@linux.alibaba.com>
-Subject: [PATCH -next v2] blk-cgroup: Fix some kernel-doc comments
-Date:   Fri,  2 Dec 2022 10:42:49 +0800
-Message-Id: <20221202024249.12884-1-yang.lee@linux.alibaba.com>
-X-Mailer: git-send-email 2.20.1.7.g153144c
+        with ESMTP id S232245AbiLBG4w (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 2 Dec 2022 01:56:52 -0500
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 29418BC5AD;
+        Thu,  1 Dec 2022 22:56:50 -0800 (PST)
+Received: from imap1.suse-dmz.suse.de (imap1.suse-dmz.suse.de [192.168.254.73])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 9F17F21B5C;
+        Fri,  2 Dec 2022 06:56:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1669964208; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=NKRlnmSi9cULYBX+c6mBT5MzyG+E0j7vwb/2t12kBrw=;
+        b=c2Xb0pewOZr4hWEphekzh/H9MizOIOT4EFBfJ4UojhvnX/ethC1ngZup0oFLVYV89dGND9
+        H/GOWzLrqXOa4gUpwZNpqavAyYT2Zj1vHy4RCk5iFd2jCtcbDMOxU60W1WohBj/MhYi/G1
+        XJyEbKd37QaChm4BtqOuxFhrEKVkXeU=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1669964208;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=NKRlnmSi9cULYBX+c6mBT5MzyG+E0j7vwb/2t12kBrw=;
+        b=jxG49tsMXLSVVWmmTavuLSz586smJ3JQ/2DDpzYt7da2V+CxS9FrMs6kUumBXuKl40YHpj
+        x/FX5AAocE1QlfAQ==
+Received: from imap1.suse-dmz.suse.de (imap1.suse-dmz.suse.de [192.168.254.73])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap1.suse-dmz.suse.de (Postfix) with ESMTPS id 689C3133DE;
+        Fri,  2 Dec 2022 06:56:48 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap1.suse-dmz.suse.de with ESMTPSA
+        id vMRwGLChiWOTeAAAGKfGzw
+        (envelope-from <hare@suse.de>); Fri, 02 Dec 2022 06:56:48 +0000
+Message-ID: <4a3b6a0f-be1b-e0b1-941b-6701a42e9a2c@suse.de>
+Date:   Fri, 2 Dec 2022 07:56:48 +0100
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.5.0
+Subject: Re: [PATCH v3 3/3] block: sed-opal: keyring support for SED keys
+Content-Language: en-US
+To:     gjoyce@linux.vnet.ibm.com, linux-block@vger.kernel.org
+Cc:     linuxppc-dev@lists.ozlabs.org, jonathan.derrick@linux.dev,
+        brking@linux.vnet.ibm.com, msuchanek@suse.de, mpe@ellerman.id.au,
+        nayna@linux.ibm.com, axboe@kernel.dk, akpm@linux-foundation.org,
+        keyrings@vger.kernel.org
+References: <20221129232506.3735672-1-gjoyce@linux.vnet.ibm.com>
+ <20221129232506.3735672-4-gjoyce@linux.vnet.ibm.com>
+ <c78edd60-b6ae-6ec0-9ce4-73b9a92b9b32@suse.de>
+ <ed32cbc546383085bc8c00d913a53059831b2cfc.camel@linux.vnet.ibm.com>
+From:   Hannes Reinecke <hare@suse.de>
+In-Reply-To: <ed32cbc546383085bc8c00d913a53059831b2cfc.camel@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Make the description of @gendisk to @disk in blkcg_schedule_throttle()
-to clear the below warnings:
+On 12/1/22 19:03, Greg Joyce wrote:
+> On Wed, 2022-11-30 at 08:00 +0100, Hannes Reinecke wrote:
+>> On 11/30/22 00:25, gjoyce@linux.vnet.ibm.com wrote:
+>>> From: Greg Joyce <gjoyce@linux.vnet.ibm.com>
+>>>
+>>> Extend the SED block driver so it can alternatively
+>>> obtain a key from a sed-opal kernel keyring. The SED
+>>> ioctls will indicate the source of the key, either
+>>> directly in the ioctl data or from the keyring.
+>>>
+>>> This allows the use of SED commands in scripts such as
+>>> udev scripts so that drives may be automatically unlocked
+>>> as they become available.
+>>>
+>>> Signed-off-by: Greg Joyce <gjoyce@linux.vnet.ibm.com>
+>>> Reviewed-by: Jonathan Derrick <jonathan.derrick@linux.dev>
+>>> ---
+>>>    block/Kconfig                 |   1 +
+>>>    block/sed-opal.c              | 174
+>>> +++++++++++++++++++++++++++++++++-
+>>>    include/linux/sed-opal.h      |   3 +
+>>>    include/uapi/linux/sed-opal.h |   8 +-
+>>>    4 files changed, 183 insertions(+), 3 deletions(-)
+>>>   
+>>> +	ret = opal_get_key(dev, &opal_lrs->session.opal_key);
+>>> +	if (ret)
+>>> +		return ret;
+>>>    	mutex_lock(&dev->dev_lock);
+>>>    	setup_opal_dev(dev);
+>>>    	ret = execute_steps(dev, lr_steps, ARRAY_SIZE(lr_steps));
+>>> @@ -2622,6 +2759,14 @@ static int opal_set_new_pw(struct opal_dev
+>>> *dev, struct opal_new_pw *opal_pw)
+>>>    	ret = execute_steps(dev, pw_steps, ARRAY_SIZE(pw_steps));
+>>>    	mutex_unlock(&dev->dev_lock);
+>>>    
+>>> +	if (ret)
+>>> +		return ret;
+>>> +
+>>> +	/* update keyring with new password */
+>>> +	ret = update_sed_opal_key(OPAL_AUTH_KEY,
+>>> +				  opal_pw->new_user_pw.opal_key.key,
+>>> +				  opal_pw-
+>>>> new_user_pw.opal_key.key_len);
+>>> +
+>>>    	return ret;
+>>>    }
+>>>    
+>> What about key revocation?
+>> You only allow to set a new key, but what happens with the old ones?
+> 
+> My understanding was that key_create_or_update() would not allow
+> duplicates so there shouldn't be old ones. Is that incorrect?
+> 
+Ah, right, you only have one key.
+But still, you might want to revoke that one, too, no?
+(Think of decommissioning old drives ...)
 
-block/blk-cgroup.c:1850: warning: Function parameter or member 'disk' not described in 'blkcg_schedule_throttle'
-block/blk-cgroup.c:1850: warning: Excess function parameter 'gendisk' description in 'blkcg_schedule_throttle'
+Cheers,
 
-Link: https://bugzilla.openanolis.cn/show_bug.cgi?id=3338
-Fixes: de185b56e8a6 ("blk-cgroup: pass a gendisk to blkcg_schedule_throttle")
-Reported-by: Abaci Robot <abaci@linux.alibaba.com>
-Signed-off-by: Yang Li <yang.lee@linux.alibaba.com>
----
-
-change in v2:
---According to Jens's suggestion, add a fixes line.
-
- block/blk-cgroup.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-index 1bb939d3b793..77f44472b41e 100644
---- a/block/blk-cgroup.c
-+++ b/block/blk-cgroup.c
-@@ -1831,7 +1831,7 @@ void blkcg_maybe_throttle_current(void)
- 
- /**
-  * blkcg_schedule_throttle - this task needs to check for throttling
-- * @gendisk: disk to throttle
-+ * @disk: disk to throttle
-  * @use_memdelay: do we charge this to memory delay for PSI
-  *
-  * This is called by the IO controller when we know there's delay accumulated
+Hannes
 -- 
-2.20.1.7.g153144c
+Dr. Hannes Reinecke                Kernel Storage Architect
+hare@suse.de                              +49 911 74053 688
+SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
+HRB 36809 (AG Nürnberg), Geschäftsführer: Ivo Totev, Andrew
+Myers, Andrew McDonald, Martje Boudien Moerman
 
