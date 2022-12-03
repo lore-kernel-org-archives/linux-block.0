@@ -2,68 +2,99 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 852C1C352A1
-	for <linux-block@archiver.kernel.org>; Sat,  3 Dec 2022 12:26:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D2938C352A1
+	for <linux-block@archiver.kernel.org>; Sat,  3 Dec 2022 14:07:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229611AbiLCM0b (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 3 Dec 2022 07:26:31 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39154 "EHLO
+        id S229521AbiLCOH5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 3 Dec 2022 09:07:57 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56886 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229462AbiLCM0b (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sat, 3 Dec 2022 07:26:31 -0500
-X-Greylist: delayed 450 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Sat, 03 Dec 2022 04:26:30 PST
-Received: from smtp.smtpout.orange.fr (smtp-28.smtpout.orange.fr [80.12.242.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 9204F2D1C0
-        for <linux-block@vger.kernel.org>; Sat,  3 Dec 2022 04:26:30 -0800 (PST)
-Received: from pop-os.home ([86.243.100.34])
-        by smtp.orange.fr with ESMTPA
-        id 1RTspiirkpJKl1RTtpLW6C; Sat, 03 Dec 2022 13:18:58 +0100
-X-ME-Helo: pop-os.home
-X-ME-Auth: Y2hyaXN0b3BoZS5qYWlsbGV0QHdhbmFkb28uZnI=
-X-ME-Date: Sat, 03 Dec 2022 13:18:58 +0100
-X-ME-IP: 86.243.100.34
-From:   Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-To:     Jonathan Derrick <jonathan.derrick@linux.dev>
-Cc:     linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org,
-        Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
-        linux-block@vger.kernel.org
-Subject: [PATCH] block: sed-opal: Don't include <linux/kernel.h>
-Date:   Sat,  3 Dec 2022 13:18:49 +0100
-Message-Id: <a2de79b3de30fe70c457953af935dadd49441f00.1670069909.git.christophe.jaillet@wanadoo.fr>
-X-Mailer: git-send-email 2.34.1
+        with ESMTP id S229477AbiLCOHz (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sat, 3 Dec 2022 09:07:55 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40D042A1;
+        Sat,  3 Dec 2022 06:07:53 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id CCE48B80171;
+        Sat,  3 Dec 2022 14:07:51 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 39FF0C433D6;
+        Sat,  3 Dec 2022 14:07:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1670076470;
+        bh=vU2RIMt0NQ9fPaVqCgnRSsvOgTRXxBc1YGXBbcmUD68=;
+        h=From:To:Cc:Subject:Date:From;
+        b=DvawMEc+zVNJcxmPjDr8FsVB2ARFHxB00EEsRUFa38/bpP7VcQgzD3iW4mmPdxthp
+         HT2zMLqznz8dqcN9bZeIy3DFqtSH2+Yww2L4mRKYCDERKb5aaMxn5XReCIOSrHJoIL
+         lDnOpb9QJAgQZwSTOPg4XZM3VfadZU8kBenvm06g=
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Subject: [PATCH] block: remove devnode callback from struct block_device_operations
+Date:   Sat,  3 Dec 2022 15:07:47 +0100
+Message-Id: <20221203140747.1942969-1-gregkh@linuxfoundation.org>
+X-Mailer: git-send-email 2.38.1
 MIME-Version: 1.0
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1774; i=gregkh@linuxfoundation.org; h=from:subject; bh=vU2RIMt0NQ9fPaVqCgnRSsvOgTRXxBc1YGXBbcmUD68=; b=owGbwMvMwCRo6H6F97bub03G02pJDMndEYYWDB8OMfzzs56xZLv7/fqFzOL/ZRztir4wVE1lPfh6 tadlRywLgyATg6yYIsuXbTxH91ccUvQytD0NM4eVCWQIAxenAExE6CLDgqYpPcry8ulrrp5//Sw1Qm GJ0dm99xkWnH2cnfK+tCCeV2LVztOSrxPOBqtfBQA=
+X-Developer-Key: i=gregkh@linuxfoundation.org; a=openpgp; fpr=F4B60CC5BF78C2214A313DCB3147D40DDB2DFB29
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-There is no need to include <linux/kernel.h> here.
+With the removal of the pktcdvd driver, there are no in-kernel users of
+the devnode callback in struct block_device_operations, so it can be
+safely removed.  If it is needed for new block drivers in the future, it
+can be brought back.
 
-Prefer the less invasive <linux/types.h> and <linux/compiler_types.h>
-which are needed in this .h file itself.
-
-Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+Cc: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 ---
-Let see if build-bots agree with me!
----
- include/linux/sed-opal.h | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ block/genhd.c          | 11 -----------
+ include/linux/blkdev.h |  1 -
+ 2 files changed, 12 deletions(-)
 
-diff --git a/include/linux/sed-opal.h b/include/linux/sed-opal.h
-index 6f837bb6c715..87f981c70894 100644
---- a/include/linux/sed-opal.h
-+++ b/include/linux/sed-opal.h
-@@ -11,7 +11,9 @@
- #define LINUX_OPAL_H
+diff --git a/block/genhd.c b/block/genhd.c
+index 0f9769db2de8..1a2f3fa5678f 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -1193,21 +1193,10 @@ struct class block_class = {
+ 	.dev_uevent	= block_uevent,
+ };
  
- #include <uapi/linux/sed-opal.h>
--#include <linux/kernel.h>
-+
-+#include <linux/compiler_types.h>		/* for __user */
-+#include <linux/types.h>
+-static char *block_devnode(struct device *dev, umode_t *mode,
+-			   kuid_t *uid, kgid_t *gid)
+-{
+-	struct gendisk *disk = dev_to_disk(dev);
+-
+-	if (disk->fops->devnode)
+-		return disk->fops->devnode(disk, mode);
+-	return NULL;
+-}
+-
+ const struct device_type disk_type = {
+ 	.name		= "disk",
+ 	.groups		= disk_attr_groups,
+ 	.release	= disk_release,
+-	.devnode	= block_devnode,
+ };
  
- struct opal_dev;
- 
+ #ifdef CONFIG_PROC_FS
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 891f8cbcd043..b767c6b86856 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -1413,7 +1413,6 @@ struct block_device_operations {
+ 	void (*swap_slot_free_notify) (struct block_device *, unsigned long);
+ 	int (*report_zones)(struct gendisk *, sector_t sector,
+ 			unsigned int nr_zones, report_zones_cb cb, void *data);
+-	char *(*devnode)(struct gendisk *disk, umode_t *mode);
+ 	/* returns the length of the identifier or a negative errno: */
+ 	int (*get_unique_id)(struct gendisk *disk, u8 id[16],
+ 			enum blk_unique_id id_type);
 -- 
-2.34.1
+2.38.1
 
