@@ -2,67 +2,103 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DC04C4321E
-	for <linux-block@archiver.kernel.org>; Sat,  3 Dec 2022 00:30:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84FA1C47088
+	for <linux-block@archiver.kernel.org>; Sat,  3 Dec 2022 04:19:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234701AbiLCAag (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 2 Dec 2022 19:30:36 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35484 "EHLO
+        id S230401AbiLCETe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 2 Dec 2022 23:19:34 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60742 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234918AbiLCAad (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 2 Dec 2022 19:30:33 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EFDB1F2C7A
-        for <linux-block@vger.kernel.org>; Fri,  2 Dec 2022 16:30:31 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 872076245D
-        for <linux-block@vger.kernel.org>; Sat,  3 Dec 2022 00:30:31 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id EBD8AC433D6;
-        Sat,  3 Dec 2022 00:30:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1670027431;
-        bh=gqcPv1asTCQVD1J6R/fRDUniBpHcCRsXKwg1LDDFmHQ=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=WKNez15ZgnYF4x5IlfuZSdZXzi/Y1I1WP/Iwi/TnxV2BQa1icSGV3HWxlgbhpFs4U
-         MzzqYewNy4E7piLrLlX5Qw6XHqwz3Ez1Ch5QP1MA0+GohoUlynMUPqe+Ybp/LQUWwo
-         C0b4AHvQ3Dsoh14dmwS3k/LYj0X1hmt0BUDirkZSLdEGCbBjU40DJIH5RES7RY0wj0
-         iRe29VAhqhG/6O0hU0VxSSPrKZp/jjxjnQqa1I5mxecB1/hexhS/CPgYcbxQV0DZCe
-         K6iW0Uzit1VQZ6Ge0Vcperasm9+bgGWb+dVESE0bjeL5f0oik+tZWjaxS2SAp7wMdj
-         hHzcsVDrddo7w==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id D78DDC395F5;
-        Sat,  3 Dec 2022 00:30:30 +0000 (UTC)
-Subject: Re: [GIT PULL] Block fixes for 6.1-rc8/final
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <0429607c-d5b1-6d6f-2cff-7b35f02a562d@kernel.dk>
-References: <0429607c-d5b1-6d6f-2cff-7b35f02a562d@kernel.dk>
-X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
-X-PR-Tracked-Message-Id: <0429607c-d5b1-6d6f-2cff-7b35f02a562d@kernel.dk>
-X-PR-Tracked-Remote: git://git.kernel.dk/linux.git tags/block-6.1-2022-12-02
-X-PR-Tracked-Commit-Id: d0f411c0b9bdef85f647e15a2fcc790b29891f2c
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 97ee9d1c16963375eefdf964c429897d27e28956
-Message-Id: <167002743087.3308.8740847421687527763.pr-tracker-bot@kernel.org>
-Date:   Sat, 03 Dec 2022 00:30:30 +0000
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+        with ESMTP id S230359AbiLCETd (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 2 Dec 2022 23:19:33 -0500
+Received: from mail-lj1-x22f.google.com (mail-lj1-x22f.google.com [IPv6:2a00:1450:4864:20::22f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88D76E988C
+        for <linux-block@vger.kernel.org>; Fri,  2 Dec 2022 20:19:32 -0800 (PST)
+Received: by mail-lj1-x22f.google.com with SMTP id h10so7473805ljk.11
+        for <linux-block@vger.kernel.org>; Fri, 02 Dec 2022 20:19:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=javigon-com.20210112.gappssmtp.com; s=20210112;
+        h=to:in-reply-to:cc:references:message-id:date:subject:mime-version
+         :from:content-transfer-encoding:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ccD2JrUqoo8dGTQE9lIA6Ic8NF4n65yiBkZdSFL8aqk=;
+        b=CABa0c6Z8GB68LpfcT6ifNmMsRl7DojSt4Fz1SE0rQ5YTWctV66UCulvr3VgqKgoPM
+         C8XUke796Bj/HUETpCMj69/cGSEj0lU8xCpBLAHjeANAQ07/qld/hw+W732EEmu5Ghtw
+         ob24fAgs3ragUTh6oQvWZHvxqpi01iWPHK9X+81oVWSvCBtue4daxQkaz9pdB1B0Qc3z
+         PYnL5RsoKUmqc9z+sum4t4NTPJwft9tylToWPiTLf3kPle1ukpBEeQwlZOYto9xy4ATd
+         8jTZ5KbajYSifVbIbmsKlcBeDvSgPI/dFKN38mEqDjt4LyeVg6xPThyCiWzBnvK8UQ/q
+         SQKg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=to:in-reply-to:cc:references:message-id:date:subject:mime-version
+         :from:content-transfer-encoding:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ccD2JrUqoo8dGTQE9lIA6Ic8NF4n65yiBkZdSFL8aqk=;
+        b=0I7bYDmsEFconE9D4LRn+sLcopCEHe8wfHLs69ZbFoGp7SXRqBEKxDS/C+aG+Pcv1j
+         j60YDegJnXWiAaurLD+6yalLVdSfVU6FSnbffXEBBTXL61o+yrgQmHCa9SjxLGumw0OI
+         s0u1Pt8KSG9v3ZTGBIu4nLko9Q+qzJ/ZLlQramzSCls+V6SS8D2NbuW1c8CxnKV+jfO8
+         BXr6+Ays/SRzXfoHmQoYglgEYN1/aAcaBpoJ+S3q0Uyk/hIaIgcCSiQhUSOsdYf0D6wF
+         adBCDxeuTMiDWicbdU43YAcyobzRu5W35mSPSAXLpP6NAbmBD3T7uVTd3ag1tDU72n9T
+         oAMw==
+X-Gm-Message-State: ANoB5pl6ovdGMIe/hC4k+anOGPw09H1Jun2pV3YTf1ANTDDL0qbuJlgr
+        hK345R7ZrMP0Ho+ZynTcypI2FA==
+X-Google-Smtp-Source: AA0mqf7wH0C0pDIAs+KLfjhRNQCtQ/GYw24Q7zFEM++AAYMYahqX8fgtbDrgd5iOVZMlUmFCMtte/A==
+X-Received: by 2002:a2e:be08:0:b0:277:857:87ab with SMTP id z8-20020a2ebe08000000b00277085787abmr16751284ljq.442.1670041170764;
+        Fri, 02 Dec 2022 20:19:30 -0800 (PST)
+Received: from smtpclient.apple (77.241.136.54.bredband.3.dk. [77.241.136.54])
+        by smtp.gmail.com with ESMTPSA id z8-20020a056512370800b004a91d1b3070sm1243597lfr.308.2022.12.02.20.19.30
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 02 Dec 2022 20:19:30 -0800 (PST)
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+From:   =?utf-8?Q?Javier_Gonz=C3=A1lez?= <javier@javigon.com>
+Mime-Version: 1.0 (1.0)
+Subject: Re: [PATCH 0/6] block: add support for REQ_OP_VERIFY
+Date:   Sat, 3 Dec 2022 07:19:17 +0300
+Message-Id: <4F15C752-AE73-4F10-B5DD-C37353782111@javigon.com>
+References: <Y4oSiPH0ENFktioQ@kbusch-mbp.dhcp.thefacebook.com>
+Cc:     Hannes Reinecke <hare@suse.de>,
+        Matthew Wilcox <willy@infradead.org>,
+        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+        linux-block@vger.kernel.org, linux-raid@vger.kernel.org,
+        linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org,
+        axboe@kernel.dk, djwong@kernel.org, hch@lst.de, sagi@grimberg.me,
+        jejb@linux.ibm.com, martin.petersen@oracle.com,
+        Johannes.Thumshirn@wdc.com, bvanassche@acm.org,
+        dongli.zhang@oracle.com, jefflexu@linux.alibaba.com,
+        josef@toxicpanda.com, clm@fb.com, dsterba@suse.com, jack@suse.com,
+        tytso@mit.edu, adilger.kernel@dilger.ca, jlayton@kernel.org,
+        idryomov@gmail.com, danil.kipnis@cloud.ionos.com,
+        ebiggers@google.com, jinpu.wang@cloud.ionos.com
+In-Reply-To: <Y4oSiPH0ENFktioQ@kbusch-mbp.dhcp.thefacebook.com>
+To:     Keith Busch <kbusch@kernel.org>
+X-Mailer: iPhone Mail (20B82)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The pull request you sent on Fri, 2 Dec 2022 14:38:06 -0700:
 
-> git://git.kernel.dk/linux.git tags/block-6.1-2022-12-02
+> On 2 Dec 2022, at 17.58, Keith Busch <kbusch@kernel.org> wrote:
+>=20
+> =EF=BB=BFOn Fri, Dec 02, 2022 at 08:16:30AM +0100, Hannes Reinecke wrote:
+>>> On 12/1/22 20:39, Matthew Wilcox wrote:
+>>> On Thu, Dec 01, 2022 at 06:12:46PM +0000, Chaitanya Kulkarni wrote:
+>>>> So nobody can get away with a lie.
+>>>=20
+>>> And yet devices do exist which lie.  I'm not surprised that vendors
+>>> vehemently claim that they don't, or "nobody would get away with it".
+>>> But, of course, they do.  And there's no way for us to find out if
+>>> they're lying!
+>>>=20
+>> But we'll never be able to figure that out unless we try.
+>>=20
+>> Once we've tried we will have proof either way.
+>=20
+> As long as the protocols don't provide proof-of-work, trying this
+> doesn't really prove anything with respect to this concern.
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/97ee9d1c16963375eefdf964c429897d27e28956
+Is this something we should bring to NVMe? Seems like the main disagreement c=
+an be addressed there.=20
 
-Thank you!
-
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+I will check internally if there is any existing proof-of-work that we are m=
+issing.=20=
