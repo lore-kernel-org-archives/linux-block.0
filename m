@@ -2,103 +2,106 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84FA1C47088
-	for <linux-block@archiver.kernel.org>; Sat,  3 Dec 2022 04:19:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C13F7C352A1
+	for <linux-block@archiver.kernel.org>; Sat,  3 Dec 2022 06:23:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230401AbiLCETe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 2 Dec 2022 23:19:34 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60742 "EHLO
+        id S229522AbiLCGXH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 3 Dec 2022 01:23:07 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44986 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230359AbiLCETd (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 2 Dec 2022 23:19:33 -0500
-Received: from mail-lj1-x22f.google.com (mail-lj1-x22f.google.com [IPv6:2a00:1450:4864:20::22f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88D76E988C
-        for <linux-block@vger.kernel.org>; Fri,  2 Dec 2022 20:19:32 -0800 (PST)
-Received: by mail-lj1-x22f.google.com with SMTP id h10so7473805ljk.11
-        for <linux-block@vger.kernel.org>; Fri, 02 Dec 2022 20:19:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=javigon-com.20210112.gappssmtp.com; s=20210112;
-        h=to:in-reply-to:cc:references:message-id:date:subject:mime-version
-         :from:content-transfer-encoding:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ccD2JrUqoo8dGTQE9lIA6Ic8NF4n65yiBkZdSFL8aqk=;
-        b=CABa0c6Z8GB68LpfcT6ifNmMsRl7DojSt4Fz1SE0rQ5YTWctV66UCulvr3VgqKgoPM
-         C8XUke796Bj/HUETpCMj69/cGSEj0lU8xCpBLAHjeANAQ07/qld/hw+W732EEmu5Ghtw
-         ob24fAgs3ragUTh6oQvWZHvxqpi01iWPHK9X+81oVWSvCBtue4daxQkaz9pdB1B0Qc3z
-         PYnL5RsoKUmqc9z+sum4t4NTPJwft9tylToWPiTLf3kPle1ukpBEeQwlZOYto9xy4ATd
-         8jTZ5KbajYSifVbIbmsKlcBeDvSgPI/dFKN38mEqDjt4LyeVg6xPThyCiWzBnvK8UQ/q
-         SQKg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=to:in-reply-to:cc:references:message-id:date:subject:mime-version
-         :from:content-transfer-encoding:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ccD2JrUqoo8dGTQE9lIA6Ic8NF4n65yiBkZdSFL8aqk=;
-        b=0I7bYDmsEFconE9D4LRn+sLcopCEHe8wfHLs69ZbFoGp7SXRqBEKxDS/C+aG+Pcv1j
-         j60YDegJnXWiAaurLD+6yalLVdSfVU6FSnbffXEBBTXL61o+yrgQmHCa9SjxLGumw0OI
-         s0u1Pt8KSG9v3ZTGBIu4nLko9Q+qzJ/ZLlQramzSCls+V6SS8D2NbuW1c8CxnKV+jfO8
-         BXr6+Ays/SRzXfoHmQoYglgEYN1/aAcaBpoJ+S3q0Uyk/hIaIgcCSiQhUSOsdYf0D6wF
-         adBCDxeuTMiDWicbdU43YAcyobzRu5W35mSPSAXLpP6NAbmBD3T7uVTd3ag1tDU72n9T
-         oAMw==
-X-Gm-Message-State: ANoB5pl6ovdGMIe/hC4k+anOGPw09H1Jun2pV3YTf1ANTDDL0qbuJlgr
-        hK345R7ZrMP0Ho+ZynTcypI2FA==
-X-Google-Smtp-Source: AA0mqf7wH0C0pDIAs+KLfjhRNQCtQ/GYw24Q7zFEM++AAYMYahqX8fgtbDrgd5iOVZMlUmFCMtte/A==
-X-Received: by 2002:a2e:be08:0:b0:277:857:87ab with SMTP id z8-20020a2ebe08000000b00277085787abmr16751284ljq.442.1670041170764;
-        Fri, 02 Dec 2022 20:19:30 -0800 (PST)
-Received: from smtpclient.apple (77.241.136.54.bredband.3.dk. [77.241.136.54])
-        by smtp.gmail.com with ESMTPSA id z8-20020a056512370800b004a91d1b3070sm1243597lfr.308.2022.12.02.20.19.30
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 02 Dec 2022 20:19:30 -0800 (PST)
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-From:   =?utf-8?Q?Javier_Gonz=C3=A1lez?= <javier@javigon.com>
-Mime-Version: 1.0 (1.0)
-Subject: Re: [PATCH 0/6] block: add support for REQ_OP_VERIFY
-Date:   Sat, 3 Dec 2022 07:19:17 +0300
-Message-Id: <4F15C752-AE73-4F10-B5DD-C37353782111@javigon.com>
-References: <Y4oSiPH0ENFktioQ@kbusch-mbp.dhcp.thefacebook.com>
-Cc:     Hannes Reinecke <hare@suse.de>,
-        Matthew Wilcox <willy@infradead.org>,
-        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
-        linux-block@vger.kernel.org, linux-raid@vger.kernel.org,
-        linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org,
-        axboe@kernel.dk, djwong@kernel.org, hch@lst.de, sagi@grimberg.me,
-        jejb@linux.ibm.com, martin.petersen@oracle.com,
-        Johannes.Thumshirn@wdc.com, bvanassche@acm.org,
-        dongli.zhang@oracle.com, jefflexu@linux.alibaba.com,
-        josef@toxicpanda.com, clm@fb.com, dsterba@suse.com, jack@suse.com,
-        tytso@mit.edu, adilger.kernel@dilger.ca, jlayton@kernel.org,
-        idryomov@gmail.com, danil.kipnis@cloud.ionos.com,
-        ebiggers@google.com, jinpu.wang@cloud.ionos.com
-In-Reply-To: <Y4oSiPH0ENFktioQ@kbusch-mbp.dhcp.thefacebook.com>
-To:     Keith Busch <kbusch@kernel.org>
-X-Mailer: iPhone Mail (20B82)
+        with ESMTP id S231264AbiLCGXF (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sat, 3 Dec 2022 01:23:05 -0500
+Received: from mxct.zte.com.cn (mxct.zte.com.cn [183.62.165.209])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0918D77408;
+        Fri,  2 Dec 2022 22:23:04 -0800 (PST)
+Received: from mse-fl1.zte.com.cn (unknown [10.5.228.132])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mxct.zte.com.cn (FangMail) with ESMTPS id 4NPKVt4mFRz4y0vK;
+        Sat,  3 Dec 2022 14:23:02 +0800 (CST)
+Received: from szxlzmapp01.zte.com.cn ([10.5.231.85])
+        by mse-fl1.zte.com.cn with SMTP id 2B36MuUB089118;
+        Sat, 3 Dec 2022 14:22:56 +0800 (+08)
+        (envelope-from yang.yang29@zte.com.cn)
+Received: from mapi (szxlzmapp02[null])
+        by mapi (Zmail) with MAPI id mid14;
+        Sat, 3 Dec 2022 14:22:58 +0800 (CST)
+Date:   Sat, 3 Dec 2022 14:22:58 +0800 (CST)
+X-Zmail-TransId: 2b04638aeb42ffffffff9bb0203b
+X-Mailer: Zmail v1.0
+Message-ID: <202212031422587503771@zte.com.cn>
+Mime-Version: 1.0
+From:   <yang.yang29@zte.com.cn>
+To:     <axboe@kernel.dk>
+Cc:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <xu.panda@zte.com.cn>, <yang.yang29@zte.com.cn>
+Subject: =?UTF-8?B?W1BBVENIIGxpbnV4LW5leHRdIGJsb2NrOiB1c2Ugc3Ryc2NweSgpIHRvIGluc3RlYWQgb2Ygc3RybmNweSgp?=
+Content-Type: text/plain;
+        charset="UTF-8"
+X-MAIL: mse-fl1.zte.com.cn 2B36MuUB089118
+X-Fangmail-Gw-Spam-Type: 0
+X-FangMail-Miltered: at cgslv5.04-192.168.251.13.novalocal with ID 638AEB46.001 by FangMail milter!
+X-FangMail-Envelope: 1670048582/4NPKVt4mFRz4y0vK/638AEB46.001/10.5.228.132/[10.5.228.132]/mse-fl1.zte.com.cn/<yang.yang29@zte.com.cn>
+X-Fangmail-Anti-Spam-Filtered: true
+X-Fangmail-MID-QID: 638AEB46.001/4NPKVt4mFRz4y0vK
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+From: Xu Panda <xu.panda@zte.com.cn>
 
-> On 2 Dec 2022, at 17.58, Keith Busch <kbusch@kernel.org> wrote:
->=20
-> =EF=BB=BFOn Fri, Dec 02, 2022 at 08:16:30AM +0100, Hannes Reinecke wrote:
->>> On 12/1/22 20:39, Matthew Wilcox wrote:
->>> On Thu, Dec 01, 2022 at 06:12:46PM +0000, Chaitanya Kulkarni wrote:
->>>> So nobody can get away with a lie.
->>>=20
->>> And yet devices do exist which lie.  I'm not surprised that vendors
->>> vehemently claim that they don't, or "nobody would get away with it".
->>> But, of course, they do.  And there's no way for us to find out if
->>> they're lying!
->>>=20
->> But we'll never be able to figure that out unless we try.
->>=20
->> Once we've tried we will have proof either way.
->=20
-> As long as the protocols don't provide proof-of-work, trying this
-> doesn't really prove anything with respect to this concern.
+The implementation of strscpy() is more robust and safer.
+That's now the recommended way to copy NUL terminated strings.
 
-Is this something we should bring to NVMe? Seems like the main disagreement c=
-an be addressed there.=20
+Signed-off-by: Xu Panda <xu.panda@zte.com.cn>
+Signed-off-by: Yang Yang <yang.yang29@zte.com>
+---
+ block/partitions/cmdline.c | 12 ++++--------
+ 1 file changed, 4 insertions(+), 8 deletions(-)
 
-I will check internally if there is any existing proof-of-work that we are m=
-issing.=20=
+diff --git a/block/partitions/cmdline.c b/block/partitions/cmdline.c
+index 1af610f0ba8c..c03bc105e575 100644
+--- a/block/partitions/cmdline.c
++++ b/block/partitions/cmdline.c
+@@ -81,8 +81,7 @@ static int parse_subpart(struct cmdline_subpart **subpart, char *partdef)
+
+ 		length = min_t(int, next - partdef,
+ 			       sizeof(new_subpart->name) - 1);
+-		strncpy(new_subpart->name, partdef, length);
+-		new_subpart->name[length] = '\0';
++		strscpy(new_subpart->name, partdef, length);
+
+ 		partdef = ++next;
+ 	} else
+@@ -140,8 +139,7 @@ static int parse_parts(struct cmdline_parts **parts, const char *bdevdef)
+ 	}
+
+ 	length = min_t(int, next - bdevdef, sizeof(newparts->name) - 1);
+-	strncpy(newparts->name, bdevdef, length);
+-	newparts->name[length] = '\0';
++	strscpy(newparts->name, bdevdef, length);
+ 	newparts->nr_subparts = 0;
+
+ 	next_subpart = &newparts->subpart;
+@@ -153,8 +151,7 @@ static int parse_parts(struct cmdline_parts **parts, const char *bdevdef)
+ 		length = (!next) ? (sizeof(buf) - 1) :
+ 			min_t(int, next - bdevdef, sizeof(buf) - 1);
+
+-		strncpy(buf, bdevdef, length);
+-		buf[length] = '\0';
++		strscpy(buf, bdevdef, length);
+
+ 		ret = parse_subpart(next_subpart, buf);
+ 		if (ret)
+@@ -267,8 +264,7 @@ static int add_part(int slot, struct cmdline_subpart *subpart,
+
+ 	label_min = min_t(int, sizeof(info->volname) - 1,
+ 			  sizeof(subpart->name));
+-	strncpy(info->volname, subpart->name, label_min);
+-	info->volname[label_min] = '\0';
++	strscpy(info->volname, subpart->name, label_min);
+
+ 	snprintf(tmp, sizeof(tmp), "(%s)", info->volname);
+ 	strlcat(state->pp_buf, tmp, PAGE_SIZE);
+-- 
+2.15.2
