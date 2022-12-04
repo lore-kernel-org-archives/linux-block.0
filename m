@@ -2,102 +2,88 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A2551C4321E
-	for <linux-block@archiver.kernel.org>; Sun,  4 Dec 2022 15:55:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A97F4C4332F
+	for <linux-block@archiver.kernel.org>; Sun,  4 Dec 2022 20:30:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230006AbiLDPzQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 4 Dec 2022 10:55:16 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57980 "EHLO
+        id S230377AbiLDUaF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 4 Dec 2022 15:30:05 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49876 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230000AbiLDPzP (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 4 Dec 2022 10:55:15 -0500
-Received: from mail-pg1-x531.google.com (mail-pg1-x531.google.com [IPv6:2607:f8b0:4864:20::531])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 19EFC13D72
-        for <linux-block@vger.kernel.org>; Sun,  4 Dec 2022 07:55:14 -0800 (PST)
-Received: by mail-pg1-x531.google.com with SMTP id w37so8434928pga.5
-        for <linux-block@vger.kernel.org>; Sun, 04 Dec 2022 07:55:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=SZaaXSaZ3rhZbc/fbjMaKgGU3Pwlz35jgq+Lxq3L3fM=;
-        b=0eGXUP6djpDlhjQrvirA+ZlWvtL/GKUavYyNWW34OQAAmGI4kqlYSTMAS2dTZ+3UQZ
-         8LmPA2eVlgFXC3PD3sqWNwFtRmHvJVaZ8Kn+rVxwowxcqu3Lt/EysrkBJdNQSpR5LgGB
-         4d3CsuuxxG+0/Qv/a3917E7zti4revTM+juUqwmAf84jzOIVuci4tV7VY0Xe/GsN4kTQ
-         wxtocJzPbTgQN0Sgg0AyFh0rN5sojqwYHioRmc5e0EHdaXJMBvdPDmJ9luPwiyKI2OHt
-         hJwwuniOSLmsA0zDtXVEbdZIz2zXzUyuR4YbgS+8JkAJHyLZIDLCW8CGYu5aUW2Z0Hes
-         krNA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=SZaaXSaZ3rhZbc/fbjMaKgGU3Pwlz35jgq+Lxq3L3fM=;
-        b=aEvj/Tg7OrYRWc1N48yWAjoBteCBrztKVX+FQ3qT3zW3YUUq0nxFcBdAVVHA1mmcB/
-         +9FNuD5sqV8DnoHDP/H4n9+CDLPyzIEKTDU/2Oflr+KbPHNSmxJ8oOLFnafkhQvoWKPn
-         wmnIrkP8qf86Z/93KbknKYu3w4KPA4yMqA0JLmrkOEwmZCfNDsrskOzEUnuCXBlvVg2C
-         p9mcSapJrUKsJRymYegHjZHjAqzuD8B/0mnKY2/bAql3iGCs/wBl2Vnm3MGrNSngD5dP
-         nNBfjGzcn5L//D5jRISmNSZ/qBAOEuAz3qOK7p/2sXAntt/u0BMDqmJX1fIBaEsONV81
-         AFWQ==
-X-Gm-Message-State: ANoB5pmwIUUF4eQgk1kbt1fLN9W8WTTl1SyWFQWQVNuVXwhJz2PmMHcM
-        sC7XJdBSu/4OxHQ4QILjNjyvvQ==
-X-Google-Smtp-Source: AA0mqf64xFl/RjpCi/9yQ2rE6gxObGVVg/1hUkpUHNYS/Ef9MH32NIgEoDFZRO3AGOr21tcZ4FfTqA==
-X-Received: by 2002:a63:195a:0:b0:477:c9d9:f8a0 with SMTP id 26-20020a63195a000000b00477c9d9f8a0mr45278528pgz.228.1670169313462;
-        Sun, 04 Dec 2022 07:55:13 -0800 (PST)
-Received: from [192.168.1.136] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id px13-20020a17090b270d00b00218fb3bec27sm7744840pjb.56.2022.12.04.07.55.12
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 04 Dec 2022 07:55:12 -0800 (PST)
-Message-ID: <4362a118-48fe-8d45-5b52-77b23f093ae2@kernel.dk>
-Date:   Sun, 4 Dec 2022 08:55:11 -0700
+        with ESMTP id S230209AbiLDUaA (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 4 Dec 2022 15:30:00 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4FB061403A;
+        Sun,  4 Dec 2022 12:29:59 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id EA72EB80B94;
+        Sun,  4 Dec 2022 20:29:57 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CDF49C433D6;
+        Sun,  4 Dec 2022 20:29:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1670185796;
+        bh=7pr8hVZJ6Hx+FhaG0oa2FI+IrcOdsDHZDzij5USkQBU=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=MFvp8AzxAXsyTBEEXEMbXnCLpf+zYijfGRBH4KHkeeX2G2mBh37L/+578ilVGPD2l
+         PoVAvjiI26kfkHkt8OMgVk4Gcs/8dC5RSBWLzBHfqNYgo5G0NBWpG0J+R7pMesASJ7
+         cvXULRwUdPgnjgPO+WBWoIUGv+y34BnD1BPDy2U3s9U22/QodgTeLHge8CCx2NzKcF
+         LUxs/vaZBRj3PAH644643/uG7BM0fmwvDKbjvZsv307Hx5MsEsRI3Ru/J+oAqoXXcv
+         ngbINzNer5vFsz2CdyEfCVtl2K0roS/mneQVhFN8E1djrf9eboEcFlTQVLvmyoWPs+
+         8inCg7btm82Uw==
+Date:   Sun, 4 Dec 2022 20:29:44 +0000
+From:   Keith Busch <kbusch@kernel.org>
+To:     Javier =?iso-8859-1?Q?Gonz=E1lez?= <javier@javigon.com>
+Cc:     Hannes Reinecke <hare@suse.de>,
+        Matthew Wilcox <willy@infradead.org>,
+        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+        linux-block@vger.kernel.org, linux-raid@vger.kernel.org,
+        linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org,
+        axboe@kernel.dk, djwong@kernel.org, hch@lst.de, sagi@grimberg.me,
+        jejb@linux.ibm.com, martin.petersen@oracle.com,
+        Johannes.Thumshirn@wdc.com, bvanassche@acm.org,
+        dongli.zhang@oracle.com, jefflexu@linux.alibaba.com,
+        josef@toxicpanda.com, clm@fb.com, dsterba@suse.com, jack@suse.com,
+        tytso@mit.edu, adilger.kernel@dilger.ca, jlayton@kernel.org,
+        idryomov@gmail.com, danil.kipnis@cloud.ionos.com,
+        ebiggers@google.com, jinpu.wang@cloud.ionos.com
+Subject: Re: [PATCH 0/6] block: add support for REQ_OP_VERIFY
+Message-ID: <Y40DOJ+7WlqIwkbD@kbusch-mbp>
+References: <Y4oSiPH0ENFktioQ@kbusch-mbp.dhcp.thefacebook.com>
+ <4F15C752-AE73-4F10-B5DD-C37353782111@javigon.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.0
-Subject: Re: [GIT PULL] Floppy changes for 6.2
-Content-Language: en-US
-To:     efremov@linux.com
-Cc:     linux-block@vger.kernel.org,
-        Linux-kernel <linux-kernel@vger.kernel.org>
-References: <805d7405-2e2f-ddda-8e17-97ac1934738c@linux.com>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <805d7405-2e2f-ddda-8e17-97ac1934738c@linux.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <4F15C752-AE73-4F10-B5DD-C37353782111@javigon.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 12/4/22 8:42 AM, Denis Efremov wrote:
-> The following changes since commit 85d6ce58e493ac8b7122e2fbe3f41b94d6ebdc11:
+On Sat, Dec 03, 2022 at 07:19:17AM +0300, Javier González wrote:
 > 
->   block: remove devnode callback from struct block_device_operations (2022-12-03 09:19:48 -0700)
+> > On 2 Dec 2022, at 17.58, Keith Busch <kbusch@kernel.org> wrote:
+> > 
+> > ﻿On Fri, Dec 02, 2022 at 08:16:30AM +0100, Hannes Reinecke wrote:
+> >>> On 12/1/22 20:39, Matthew Wilcox wrote:
+> >>> On Thu, Dec 01, 2022 at 06:12:46PM +0000, Chaitanya Kulkarni wrote:
+> >>>> So nobody can get away with a lie.
+> >>> 
+> >>> And yet devices do exist which lie.  I'm not surprised that vendors
+> >>> vehemently claim that they don't, or "nobody would get away with it".
+> >>> But, of course, they do.  And there's no way for us to find out if
+> >>> they're lying!
+> >>> 
+> >> But we'll never be able to figure that out unless we try.
+> >> 
+> >> Once we've tried we will have proof either way.
+> > 
+> > As long as the protocols don't provide proof-of-work, trying this
+> > doesn't really prove anything with respect to this concern.
 > 
-> are available in the Git repository at:
-> 
->   https://github.com/evdenis/linux-floppy tags/floppy-for-6.2
-> 
-> for you to fetch changes up to f8ace2e304c5dd8a7328db9cd2b8a4b1b98d83ec:
-> 
->   floppy: Fix memory leak in do_floppy_init() (2022-12-04 18:03:41 +0400)
-> 
-> ----------------------------------------------------------------
-> Floppy patch for 6.2
-> 
-> The patch from Yuan Can fixes a memory leak in floppy init code.
-> 
-> Signed-off-by: Denis Efremov <efremov@linux.com>
-> 
-> ----------------------------------------------------------------
-> Yuan Can (1):
->       floppy: Fix memory leak in do_floppy_init()
-> 
->  drivers/block/floppy.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
+> Is this something we should bring to NVMe? Seems like the main disagreement can be addressed there. 
 
-Pulled, thanks.
-
--- 
-Jens Axboe
-
-
+Yeah, proof for the host appears to require a new feature, so we'd need
+to bring this to the TWG. I can draft a TPAR if there's interest and
+have ideas on how the feature could be implemented, but I currently
+don't have enough skin in this game to sponser it.
