@@ -2,86 +2,81 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 203BCC352A1
-	for <linux-block@archiver.kernel.org>; Sat,  3 Dec 2022 16:27:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BEFCC4321E
+	for <linux-block@archiver.kernel.org>; Sun,  4 Dec 2022 15:42:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229726AbiLCQ14 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 3 Dec 2022 11:27:56 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36262 "EHLO
+        id S230137AbiLDPmO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 4 Dec 2022 10:42:14 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50488 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229680AbiLCQ14 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sat, 3 Dec 2022 11:27:56 -0500
-Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5AD5E26DC
-        for <linux-block@vger.kernel.org>; Sat,  3 Dec 2022 08:27:54 -0800 (PST)
-Received: by mail-pl1-x62d.google.com with SMTP id g10so7254408plo.11
-        for <linux-block@vger.kernel.org>; Sat, 03 Dec 2022 08:27:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=zFhsulPsPHvOyONkpTyQ+xbocqKNoUqhz2MWHZ1fQoM=;
-        b=HCV4bo6pyoFwPnLnxUrE4+NQmiEIvSzc38MWSU1F/O+3k3vreVhIfDjfXwbMfOg0Qj
-         +IPcbiQfIU7NWl+vN0iiSASnjXtNhDGBZNpx7jZV9d20OqP+Lmk5bL+Bu5xrRbW91Yzr
-         SMI045jHxPND23hM6R8N5j1DX9YOTAUxz/WcMCewEcsafxten0ifedj6ZTD/CCz09TK+
-         DefvvjJCUnmaCM5igfODJrKqXssU0SO7FfrSxPWIQV2t7uyEm8iY8z3Jd4X42Tx3Hod6
-         kMTGsi1bSTJOcKmFmxkyRkNdkAUIfwMCb0Dhh/fw0UjqnP+x0IeJzheSb9Y0lY+Znyj9
-         9MlA==
+        with ESMTP id S229917AbiLDPmN (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 4 Dec 2022 10:42:13 -0500
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F20E11175;
+        Sun,  4 Dec 2022 07:42:12 -0800 (PST)
+Received: by mail-wm1-f49.google.com with SMTP id n7so7036788wms.3;
+        Sun, 04 Dec 2022 07:42:12 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=zFhsulPsPHvOyONkpTyQ+xbocqKNoUqhz2MWHZ1fQoM=;
-        b=Pcbqi7QUxNV9b8tJay03Dsu4ujsB0ndPNLCdfabyN5Xo6HRADOaF39Oq6UYrfq9CrJ
-         Ueq8kQwKy/LNAchMGXn1fuaapZHmAUq6E1VmKJ0Z+AT3EjROV5EFBn78fNr5IqrDITph
-         bVxUS990MFP2XKUQyYSYymjlq5MWqYyC2HyFXutTg+owN+c5yqjb5NZdV1yFG0NObCv1
-         Lmbtfps20YmWnNUHJFrGtLt+ZHs/YHXnqPU+77S9O0fb5Br3BrsCTdPXqjy0VAQ1sIWR
-         e8YpghrQtkTzUJgXvoctwGdT1Qr1hjmWa2w1/XGVVgO1R4VSw7A3eers0g9pcT3Bs1Rf
-         dEXA==
-X-Gm-Message-State: ANoB5pkPbgRmFnU4gM34RntxMSBmnznHButs+4fwcSm4Us+Jge+DguRn
-        42lpXhVxKReUCiTn+06Vsc9u1A==
-X-Google-Smtp-Source: AA0mqf4l9Gq/NyriF9XNkJYHsltSulsw3feL9iCauzAUehTiMaovPc+hql9CG/b5bLj8iK9/iKEEAg==
-X-Received: by 2002:a17:90a:440b:b0:219:886b:9155 with SMTP id s11-20020a17090a440b00b00219886b9155mr9592082pjg.167.1670084873536;
-        Sat, 03 Dec 2022 08:27:53 -0800 (PST)
-Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id j7-20020a170902da8700b0018980f14ecfsm7658119plx.115.2022.12.03.08.27.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 03 Dec 2022 08:27:52 -0800 (PST)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-In-Reply-To: <20221203140747.1942969-1-gregkh@linuxfoundation.org>
-References: <20221203140747.1942969-1-gregkh@linuxfoundation.org>
-Subject: Re: [PATCH] block: remove devnode callback from struct
- block_device_operations
-Message-Id: <167008487227.998221.5510218779438847268.b4-ty@kernel.dk>
-Date:   Sat, 03 Dec 2022 09:27:52 -0700
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :reply-to:user-agent:mime-version:date:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ARJr/vQ/Knp4FhLBG/R5CG9hyKkb4Kf7wc8CtCdE9MA=;
+        b=OdTvFkBOe2smg8eLEgGUrKf8uAot3y1J750clEheB+bhRL4XlV+6OtN9IOZicNVswS
+         EmZvhfxfJ/Pfm7QJmQ6ul4t2w1uEKtYlY9+Zyg7ZLpSpKMAEQ+v+X1FUZzkoKJuzurlW
+         cmi+ggbScdntpurIEwkJ1Tuvngyo/0Wan09IucYZGqeT6yiehOH3lV4g34sOMtti1UuE
+         05EON0Kh/zfLd5I5wtyafkS3zT2siaZg0A18PHVoB7MqOy1kl9H+/kCzsgCKfeN6hMWn
+         QtoL15Jhqe7jMkqeT46rj68a0azH+wutCLmzqKmbD8MHuHx95LfuuzFieFioOxiHPacA
+         nBYQ==
+X-Gm-Message-State: ANoB5plnOuoFXyvF6eiT5yzZQ829btm7aAGfobRb6QQ3oelBnZ84BP4o
+        AGJlyMP4mJu50wAqmt63jqahJj0Ppz8=
+X-Google-Smtp-Source: AA0mqf6E4NIoyZEUI5UzMZ/4uFr9cNIRBVcplhRTvgLrFrjXryAvJ17+72A0HoBTfD74xwp1mwkW2Q==
+X-Received: by 2002:a1c:6a13:0:b0:3cf:7801:c780 with SMTP id f19-20020a1c6a13000000b003cf7801c780mr58335691wmc.29.1670168530698;
+        Sun, 04 Dec 2022 07:42:10 -0800 (PST)
+Received: from [192.168.1.243] ([5.30.201.27])
+        by smtp.gmail.com with ESMTPSA id v128-20020a1cac86000000b003cfa80443a0sm14927961wme.35.2022.12.04.07.42.08
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 04 Dec 2022 07:42:10 -0800 (PST)
+Message-ID: <805d7405-2e2f-ddda-8e17-97ac1934738c@linux.com>
+Date:   Sun, 4 Dec 2022 19:42:07 +0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.5.1
+Reply-To: efremov@linux.com
+Content-Language: en-US
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org,
+        Linux-kernel <linux-kernel@vger.kernel.org>
+From:   Denis Efremov <efremov@linux.com>
+Subject: [GIT PULL] Floppy changes for 6.2
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.11.0-dev-50ba3
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+The following changes since commit 85d6ce58e493ac8b7122e2fbe3f41b94d6ebdc11:
 
-On Sat, 03 Dec 2022 15:07:47 +0100, Greg Kroah-Hartman wrote:
-> With the removal of the pktcdvd driver, there are no in-kernel users of
-> the devnode callback in struct block_device_operations, so it can be
-> safely removed.  If it is needed for new block drivers in the future, it
-> can be brought back.
-> 
-> 
+  block: remove devnode callback from struct block_device_operations (2022-12-03 09:19:48 -0700)
 
-Applied, thanks!
+are available in the Git repository at:
 
-[1/1] block: remove devnode callback from struct block_device_operations
-      commit: 85d6ce58e493ac8b7122e2fbe3f41b94d6ebdc11
+  https://github.com/evdenis/linux-floppy tags/floppy-for-6.2
 
-Best regards,
--- 
-Jens Axboe
+for you to fetch changes up to f8ace2e304c5dd8a7328db9cd2b8a4b1b98d83ec:
 
+  floppy: Fix memory leak in do_floppy_init() (2022-12-04 18:03:41 +0400)
 
+----------------------------------------------------------------
+Floppy patch for 6.2
+
+The patch from Yuan Can fixes a memory leak in floppy init code.
+
+Signed-off-by: Denis Efremov <efremov@linux.com>
+
+----------------------------------------------------------------
+Yuan Can (1):
+      floppy: Fix memory leak in do_floppy_init()
+
+ drivers/block/floppy.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
