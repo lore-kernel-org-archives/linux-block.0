@@ -2,116 +2,88 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EBEBCC47089
-	for <linux-block@archiver.kernel.org>; Mon,  5 Dec 2022 13:29:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C3932C4321E
+	for <linux-block@archiver.kernel.org>; Mon,  5 Dec 2022 15:08:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232294AbiLEN3I (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 5 Dec 2022 08:29:08 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52150 "EHLO
+        id S232471AbiLEPIn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 5 Dec 2022 10:08:43 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40144 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232315AbiLEN26 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 5 Dec 2022 08:28:58 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 398CB95A1
-        for <linux-block@vger.kernel.org>; Mon,  5 Dec 2022 05:28:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1670246879;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=EBG17hZ5lJ7XuehrQoveGv2unIPyrFlGuohss0wJMc0=;
-        b=hTYlKQ8YHXXZq2CxGjzaFuf3nYj4VtzLlnCnMCtaSuAF1SRdaoJaeHly6zZDRVeMl9s65g
-        db8atQEPmxsGmkve4GIKHJ7bORpzNTp8epB7s2vB49dpGoGEPUewPd7c19qgk9B0BMFaAC
-        x7au7AGORxcq6+y9FN5vQwcJlitotPk=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-594-_QCVAUZANfKmhIt26KaiLA-1; Mon, 05 Dec 2022 08:27:54 -0500
-X-MC-Unique: _QCVAUZANfKmhIt26KaiLA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        with ESMTP id S232479AbiLEPIS (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 5 Dec 2022 10:08:18 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C8BAD2DD;
+        Mon,  5 Dec 2022 07:08:12 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E21EC29AB41E;
-        Mon,  5 Dec 2022 13:27:53 +0000 (UTC)
-Received: from localhost (ovpn-8-24.pek2.redhat.com [10.72.8.24])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id E49A9112131E;
-        Mon,  5 Dec 2022 13:27:52 +0000 (UTC)
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        stable@vger.kernel.org
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Ming Lei <ming.lei@redhat.com>, Shiwei Cui <cuishw@inspur.com>,
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 0EEF16119A;
+        Mon,  5 Dec 2022 15:08:12 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1CC75C433C1;
+        Mon,  5 Dec 2022 15:08:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1670252891;
+        bh=aD976dpLSZrvdiKPkzTWfbT9kaCjs86wvXYu3RuxCCk=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=xlcLTyRQ6xy0wl3AemTDT+u71655K6rCFAj0bvuVQWUcQOmF+vGRizu6l22wgiJRz
+         h/31CdhQKy1S1RjvzV7jufjua9luJpCdvVWRiJle24Rom0o97GcQxxqeCA/Rz+4XWx
+         L0EoH8wNwwP1hxWJSn8Si4T/KTycBKZ8kOh84CHA=
+Date:   Mon, 5 Dec 2022 16:08:08 +0100
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     stable@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org, Shiwei Cui <cuishw@inspur.com>,
         Christoph Hellwig <hch@lst.de>, Jan Kara <jack@suse.cz>
-Subject: [PATCH 5.10.y stable v2] block: unhash blkdev part inode when the part is deleted
-Date:   Mon,  5 Dec 2022 21:27:39 +0800
-Message-Id: <20221205132739.844399-1-ming.lei@redhat.com>
+Subject: Re: [PATCH 5.10.y stable v2] block: unhash blkdev part inode when
+ the part is deleted
+Message-ID: <Y44JWBw9opr2HVyN@kroah.com>
+References: <20221205132739.844399-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221205132739.844399-1-ming.lei@redhat.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-v5.11 changes the blkdev lookup mechanism completely since commit
-22ae8ce8b892 ("block: simplify bdev/disk lookup in blkdev_get"),
-and small part of the change is to unhash part bdev inode when
-deleting partition. Turns out this kind of change does fix one
-nasty issue in case of BLOCK_EXT_MAJOR:
+On Mon, Dec 05, 2022 at 09:27:39PM +0800, Ming Lei wrote:
+> v5.11 changes the blkdev lookup mechanism completely since commit
+> 22ae8ce8b892 ("block: simplify bdev/disk lookup in blkdev_get"),
+> and small part of the change is to unhash part bdev inode when
+> deleting partition. Turns out this kind of change does fix one
+> nasty issue in case of BLOCK_EXT_MAJOR:
+> 
+> 1) when one partition is deleted & closed, disk_put_part() is always
+> called before bdput(bdev), see blkdev_put(); so the part's devt can
+> be freed & re-used before the inode is dropped
+> 
+> 2) then new partition with same devt can be created just before the
+> inode in 1) is dropped, then the old inode/bdev structurein 1) is
+> re-used for this new partition, this way causes use-after-free and
+> kernel panic.
+> 
+> It isn't possible to backport the whole big patchset of "merge struct
+> block_device and struct hd_struct v4" for addressing this issue.
+> 
+> https://lore.kernel.org/linux-block/20201128161510.347752-1-hch@lst.de/
+> 
+> So fixes it by unhashing part bdev in delete_partition(), and this way
+> is actually aligned with v5.11+'s behavior.
+> 
+> Reported-by: Shiwei Cui <cuishw@inspur.com>
+> Tested-by: Shiwei Cui <cuishw@inspur.com>
+> Cc: Christoph Hellwig <hch@lst.de>
+> Cc: Jan Kara <jack@suse.cz>
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> ---
+> V2:
+> 	- fix one typo and Shiwei's email format
+> 
+>  block/partitions/core.c | 7 +++++++
 
-1) when one partition is deleted & closed, disk_put_part() is always
-called before bdput(bdev), see blkdev_put(); so the part's devt can
-be freed & re-used before the inode is dropped
+I need an ack from the block maintainers/developers to be able to take
+this.
 
-2) then new partition with same devt can be created just before the
-inode in 1) is dropped, then the old inode/bdev structurein 1) is
-re-used for this new partition, this way causes use-after-free and
-kernel panic.
+thanks,
 
-It isn't possible to backport the whole big patchset of "merge struct
-block_device and struct hd_struct v4" for addressing this issue.
-
-https://lore.kernel.org/linux-block/20201128161510.347752-1-hch@lst.de/
-
-So fixes it by unhashing part bdev in delete_partition(), and this way
-is actually aligned with v5.11+'s behavior.
-
-Reported-by: Shiwei Cui <cuishw@inspur.com>
-Tested-by: Shiwei Cui <cuishw@inspur.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Jan Kara <jack@suse.cz>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
-V2:
-	- fix one typo and Shiwei's email format
-
- block/partitions/core.c | 7 +++++++
- 1 file changed, 7 insertions(+)
-
-diff --git a/block/partitions/core.c b/block/partitions/core.c
-index a02e22411594..e3d61ec4a5a6 100644
---- a/block/partitions/core.c
-+++ b/block/partitions/core.c
-@@ -329,6 +329,7 @@ void delete_partition(struct hd_struct *part)
- 	struct gendisk *disk = part_to_disk(part);
- 	struct disk_part_tbl *ptbl =
- 		rcu_dereference_protected(disk->part_tbl, 1);
-+	struct block_device *bdev;
- 
- 	/*
- 	 * ->part_tbl is referenced in this part's release handler, so
-@@ -346,6 +347,12 @@ void delete_partition(struct hd_struct *part)
- 	 * "in-use" until we really free the gendisk.
- 	 */
- 	blk_invalidate_devt(part_devt(part));
-+
-+	bdev = bdget_part(part);
-+	if (bdev) {
-+		remove_inode_hash(bdev->bd_inode);
-+		bdput(bdev);
-+	}
- 	percpu_ref_kill(&part->ref);
- }
- 
--- 
-2.37.3
-
+greg k-h
