@@ -2,77 +2,113 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 899E2C4321E
-	for <linux-block@archiver.kernel.org>; Mon,  5 Dec 2022 11:30:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A968AC4321E
+	for <linux-block@archiver.kernel.org>; Mon,  5 Dec 2022 12:26:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229753AbiLELab (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 5 Dec 2022 06:30:31 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46944 "EHLO
+        id S231601AbiLEM0S (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 5 Dec 2022 07:26:18 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59862 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230246AbiLELaa (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 5 Dec 2022 06:30:30 -0500
-Received: from mxhk.zte.com.cn (mxhk.zte.com.cn [63.216.63.40])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C0FB10569;
-        Mon,  5 Dec 2022 03:30:28 -0800 (PST)
-Received: from mse-fl2.zte.com.cn (unknown [10.5.228.133])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        with ESMTP id S230313AbiLEM0S (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 5 Dec 2022 07:26:18 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D76725CA
+        for <linux-block@vger.kernel.org>; Mon,  5 Dec 2022 04:25:18 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1670243117;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=0/lPTp7lVynVMq0c+szAs3DzdDpFpUGy1TPnJKo1ThQ=;
+        b=elYa3VdEv4p4g1Nslul4VGGpDfSSb7ZIxkwsdZGwVnoxV+zFncVur/AxAsI99bHIP8KpsX
+        Mrs8INFo+jcORe1QqMq4eh5otZv0mhSh3McolvEBFckKmGZw4qMMzmJ6i5BEd+ZATGZl45
+        NxW5xxRRFVpYdrIrpDaizehFPhQOcT8=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-491-7cvNzi1OPOGPRWe7RCbykQ-1; Mon, 05 Dec 2022 07:25:14 -0500
+X-MC-Unique: 7cvNzi1OPOGPRWe7RCbykQ-1
+Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mxhk.zte.com.cn (FangMail) with ESMTPS id 4NQhDf72jfz8R040;
-        Mon,  5 Dec 2022 19:30:26 +0800 (CST)
-Received: from szxlzmapp02.zte.com.cn ([10.5.231.79])
-        by mse-fl2.zte.com.cn with SMTP id 2B5BUMBd072078;
-        Mon, 5 Dec 2022 19:30:22 +0800 (+08)
-        (envelope-from yang.yang29@zte.com.cn)
-Received: from mapi (szxlzmapp02[null])
-        by mapi (Zmail) with MAPI id mid14;
-        Mon, 5 Dec 2022 19:30:25 +0800 (CST)
-Date:   Mon, 5 Dec 2022 19:30:25 +0800 (CST)
-X-Zmail-TransId: 2b04638dd651ffffffffb0f9510b
-X-Mailer: Zmail v1.0
-Message-ID: <202212051930256039214@zte.com.cn>
-Mime-Version: 1.0
-From:   <yang.yang29@zte.com.cn>
-To:     <justin@coraid.com>
-Cc:     <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <xu.panda@zte.com.cn>,
-        <yang.yang29@zte.com.cn>
-Subject: =?UTF-8?B?W1BBVENIIGxpbnV4LW5leHRdIGFvZTogdXNlIHN0cnNjcHkoKSB0byBpbnN0ZWFkIG9mIHN0cm5jcHkoKQ==?=
-Content-Type: text/plain;
-        charset="UTF-8"
-X-MAIL: mse-fl2.zte.com.cn 2B5BUMBd072078
-X-Fangmail-Gw-Spam-Type: 0
-X-FangMail-Miltered: at cgslv5.04-192.168.250.137.novalocal with ID 638DD652.000 by FangMail milter!
-X-FangMail-Envelope: 1670239827/4NQhDf72jfz8R040/638DD652.000/10.5.228.133/[10.5.228.133]/mse-fl2.zte.com.cn/<yang.yang29@zte.com.cn>
-X-Fangmail-Anti-Spam-Filtered: true
-X-Fangmail-MID-QID: 638DD652.000/4NQhDf72jfz8R040
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B7F77833AEE;
+        Mon,  5 Dec 2022 12:25:13 +0000 (UTC)
+Received: from localhost (ovpn-8-24.pek2.redhat.com [10.72.8.24])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id AA369492B07;
+        Mon,  5 Dec 2022 12:25:12 +0000 (UTC)
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        stable@vger.kernel.org
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Ming Lei <ming.lei@redhat.com>, cuishw@inspur.com,
+        Christoph Hellwig <hch@lst.de>, Jan Kara <jack@suse.cz>
+Subject: [PATCH 5.10.y stable] block: unhash blkdev part inode when the part is deleted
+Date:   Mon,  5 Dec 2022 20:25:02 +0800
+Message-Id: <20221205122502.841896-1-ming.lei@redhat.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.10
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Xu Panda <xu.panda@zte.com.cn>
+v5.11 changes the blkdev lookup mechanism completely since commit
+22ae8ce8b892 ("block: simplify bdev/disk lookup in blkdev_get"),
+and small part of the change is to unhash part bdev inode when
+deleting partition. Turns out this kind of change does fix one
+nasty issue in case of BLOCK_EXT_MAJOR:
 
-The implementation of strscpy() is more robust and safer.
-That's now the recommended way to copy NUL terminated strings.
+1) when one partition is deleted & closed, disk_put_part() is always
+called before bdput(bdev), see blkdev_put(); so the part's devt can
+be freed & re-used before the inode is dropped
 
-Signed-off-by: Xu Panda <xu.panda@zte.com.cn>
-Signed-off-by: Yang Yang <yang.yang29@zte.com>
+2) then new partition with same devt can be created just before the
+inode in 1) is dropped, then the old inode/bdev structurein 1) is
+re-used for this new partition, this way causes use-after-free and
+kernel panic.
+
+It isn't possible to backport the whole fbig patchset of "merge struct
+block_device and struct hd_struct v4" for addressing this issue.
+
+https://lore.kernel.org/linux-block/20201128161510.347752-1-hch@lst.de/
+
+So fixes it by unhashing part bdev in delete_partition(), and this way
+is actually aligned with v5.11+'s behavior.
+
+Reported-by: cuishw@inspur.com
+Tested-by: cuishw@inspur.com
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Jan Kara <jack@suse.cz>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/block/aoe/aoenet.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ block/partitions/core.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-diff --git a/drivers/block/aoe/aoenet.c b/drivers/block/aoe/aoenet.c
-index 63773a90581d..c51ea95bc2ce 100644
---- a/drivers/block/aoe/aoenet.c
-+++ b/drivers/block/aoe/aoenet.c
-@@ -39,8 +39,7 @@ static struct ktstate kts;
- #ifndef MODULE
- static int __init aoe_iflist_setup(char *str)
- {
--	strncpy(aoe_iflist, str, IFLISTSZ);
--	aoe_iflist[IFLISTSZ - 1] = '\0';
-+	strscpy(aoe_iflist, str, IFLISTSZ);
- 	return 1;
+diff --git a/block/partitions/core.c b/block/partitions/core.c
+index a02e22411594..e3d61ec4a5a6 100644
+--- a/block/partitions/core.c
++++ b/block/partitions/core.c
+@@ -329,6 +329,7 @@ void delete_partition(struct hd_struct *part)
+ 	struct gendisk *disk = part_to_disk(part);
+ 	struct disk_part_tbl *ptbl =
+ 		rcu_dereference_protected(disk->part_tbl, 1);
++	struct block_device *bdev;
+ 
+ 	/*
+ 	 * ->part_tbl is referenced in this part's release handler, so
+@@ -346,6 +347,12 @@ void delete_partition(struct hd_struct *part)
+ 	 * "in-use" until we really free the gendisk.
+ 	 */
+ 	blk_invalidate_devt(part_devt(part));
++
++	bdev = bdget_part(part);
++	if (bdev) {
++		remove_inode_hash(bdev->bd_inode);
++		bdput(bdev);
++	}
+ 	percpu_ref_kill(&part->ref);
  }
-
+ 
 -- 
-2.15.2
+2.37.3
+
