@@ -2,90 +2,76 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D25EBC4321E
-	for <linux-block@archiver.kernel.org>; Mon,  5 Dec 2022 18:25:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00E74C4708D
+	for <linux-block@archiver.kernel.org>; Mon,  5 Dec 2022 18:40:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232406AbiLESZR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 5 Dec 2022 13:25:17 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39118 "EHLO
+        id S233546AbiLESkg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 5 Dec 2022 13:40:36 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57698 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232120AbiLESZH (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 5 Dec 2022 13:25:07 -0500
-Received: from mail-pg1-x532.google.com (mail-pg1-x532.google.com [IPv6:2607:f8b0:4864:20::532])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20B2B20BC1
-        for <linux-block@vger.kernel.org>; Mon,  5 Dec 2022 10:25:06 -0800 (PST)
-Received: by mail-pg1-x532.google.com with SMTP id h33so11195785pgm.9
-        for <linux-block@vger.kernel.org>; Mon, 05 Dec 2022 10:25:06 -0800 (PST)
+        with ESMTP id S232410AbiLESkG (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 5 Dec 2022 13:40:06 -0500
+Received: from mail-io1-xd32.google.com (mail-io1-xd32.google.com [IPv6:2607:f8b0:4864:20::d32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3497B2316B
+        for <linux-block@vger.kernel.org>; Mon,  5 Dec 2022 10:37:10 -0800 (PST)
+Received: by mail-io1-xd32.google.com with SMTP id q190so3033115iod.10
+        for <linux-block@vger.kernel.org>; Mon, 05 Dec 2022 10:37:10 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ImidpIQm24xC230ns//vzB+kQ7xYkel7WPj+tXR6tek=;
-        b=8GuqePATHeBdjIjB00TbgRxhjgSPMawtU2wrtMW9YV2SFZq8p01ldTEAEDJdXmVdMQ
-         aKPQa9ow3SZfxPLVddZSdd1Vmiivd8Xsns2MQXSSv+HZEwMB1AkPzU6/prRYqgG7kBx1
-         pFwb6vkT/NsseKhCFBT2+xNiqVxZUMuF074XfMTL9Gx4DluIfSQ7QPpppgw373tGuZ5f
-         xVs1yKe34IQP9m0MTefim8eR8AQhvmWGrY892kFb9Pe9xk1DbtOZd1fthb/96tnSraR5
-         hLHHIQR60waW9xkALD7Ke5rkzmfw0e/dorvR7w9+noJkFwmrrhy7A1sDDF8SwAYzoYsH
-         S2TQ==
+        d=solid-run-com.20210112.gappssmtp.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=bKqfMwQzWVOYOX0yr/2heukDSWlHU0sCLL6O1tBRc7A=;
+        b=r2nugea+/S+x1+A/NKJxhGhSo46KlCg0/YSPkE4xZ65fZB3u3y4swnhKZToZJV53y9
+         W9ZuR4fGX6HPrGTQoaamF83HV2266vhVLmtnTqs0f08R19v4/QjYZHxHkxNpukL6bq0T
+         2RNtr7QF3zxGwPNAWXt2lxtnP8HKNHLrQNZWZRjIkLp+m6CJBuuAzxLg7wn6L7NeH5Br
+         Ykj6XHfBLizr5eRdyrLbdpPVKMOx9NAw8tufqLVjkmkB+eGjAdId2ThIt3wJmqhKSbJT
+         h7O2hmgsO0npQxMPs01kiVL2/tcv7qdJOM/Wj3xa/a2hq4E1YFE6m6+itmy/n/6DMF31
+         q9xA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ImidpIQm24xC230ns//vzB+kQ7xYkel7WPj+tXR6tek=;
-        b=JMbtB2yTFOe6WywgVNOIhrl1jWPLK2nxMJR6ceSUgiIKpl8hyi+BSV2Xv9jJVUVidN
-         o/BikkGYMMfeILkG1plC6PvzpdnBNJ15ri24PIL1/u9UkIc14OUj9FjjkzASrIIHQnDW
-         FisKeHH93opP/W+5kZe9VPv4oJsCteTaavT0snNUADS1tKInvLSiLrXH21a3DFX+ENSS
-         SEfVj45ZYoPRhvEdg0IWm7WEfgIkpnXlweFUJz02rHJumWeyMiN2uoi4tIHjECyxyuap
-         um3EM8bVvArAWb/2FBl3Tql6+J4Am35LAHM8RDm0CMecjwN4poYKbqumCtaBbE5ElO32
-         x8FA==
-X-Gm-Message-State: ANoB5pkJtvxiBPTxzsFgQgZZOPZvKAf8/w9VE4b54mzrUCj43tlQcIca
-        SIygI0PVGMTxS06L6iT0aiaD7g==
-X-Google-Smtp-Source: AA0mqf6LXB3TBL6QfztXAdNGDz+SFYGDjGPt38SvDGSzimZxm0Mc+GjiJQds8/JFTJ/UbjqS/ZkzWQ==
-X-Received: by 2002:a63:ce43:0:b0:476:fdde:9ac8 with SMTP id r3-20020a63ce43000000b00476fdde9ac8mr57775329pgi.164.1670264704207;
-        Mon, 05 Dec 2022 10:25:04 -0800 (PST)
-Received: from ?IPV6:2600:380:4a37:5fe7:dac6:a7fe:6a6b:c11a? ([2600:380:4a37:5fe7:dac6:a7fe:6a6b:c11a])
-        by smtp.gmail.com with ESMTPSA id ik7-20020a170902ab0700b00189529ed580sm10917190plb.60.2022.12.05.10.25.02
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 05 Dec 2022 10:25:03 -0800 (PST)
-Message-ID: <759f50d0-75c4-7970-b145-469e87f6acc5@kernel.dk>
-Date:   Mon, 5 Dec 2022 11:25:01 -0700
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=bKqfMwQzWVOYOX0yr/2heukDSWlHU0sCLL6O1tBRc7A=;
+        b=JaunakVb83pW+86xfgZvS44njyi5Lbn7YSYkK5pW9QoXE17qLpdTo/ne5FCZLDAUFR
+         nVg3dPo5jCVkfjKMWjGY6q09AGQ9T9HfuTyo7/K0lebsjCF9bkZMJBWY0nhCEDkDPESk
+         x7Dc7ybwTHSYVDHYMUNlQfA3dMsKY92TUIJQDp2RSPlGTjjWlTlMvL6PWC2+v4lhMVK7
+         Kac+67mNjYdB86kMx1OaRP1+6ADHwcEB+6R8VRb62ayla+UDLRXX2DPgKjEs29XN8fQz
+         gPtC6qnzem+PWdLCNHNcawJoBOFQUOlADXq+o/MFhrVK2jo3QF82SkUl1/EDkhCLfUCr
+         Pg5w==
+X-Gm-Message-State: ANoB5pmVzm1NYRFryYCTL8GBXNslalhVobl6NkDlOXotrin16kMtQQeC
+        X+I36TmnxpTq4uhAZkGd4HQMVUpxXNk7WmISfcVyIQ==
+X-Google-Smtp-Source: AA0mqf7iS69oYWO13rn/6u9i2SOCARyk4OODHe8uFql4/VPC3ttbr8u6HDq0kZnXhGPO5q+l052KxdhC7ngmMQnNADM=
+X-Received: by 2002:a02:6603:0:b0:375:9e02:b459 with SMTP id
+ k3-20020a026603000000b003759e02b459mr38421363jac.30.1670265429512; Mon, 05
+ Dec 2022 10:37:09 -0800 (PST)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.0
+References: <20221205162035.2261037-1-alvaro.karsz@solid-run.com> <fe2800f1-aaae-33e8-aaf0-83fd034162d5@kernel.dk>
+In-Reply-To: <fe2800f1-aaae-33e8-aaf0-83fd034162d5@kernel.dk>
+From:   Alvaro Karsz <alvaro.karsz@solid-run.com>
+Date:   Mon, 5 Dec 2022 20:36:33 +0200
+Message-ID: <CAJs=3_AKOMWBpvKqvX6_c=zN1cwEM7x9dzGr7na=i-5_16rdEg@mail.gmail.com>
 Subject: Re: [PATCH v3] virtio_blk: add VIRTIO_BLK_F_LIFETIME feature support
-Content-Language: en-US
-To:     Alvaro Karsz <alvaro.karsz@solid-run.com>,
-        virtualization@lists.linux-foundation.org
-Cc:     linux-block@vger.kernel.org, dm-devel@redhat.com,
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     virtualization@lists.linux-foundation.org,
+        linux-block@vger.kernel.org, dm-devel@redhat.com,
         linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org,
         "Michael S. Tsirkin" <mst@redhat.com>,
         Jason Wang <jasowang@redhat.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
         Stefan Hajnoczi <stefanha@redhat.com>
-References: <20221205162035.2261037-1-alvaro.karsz@solid-run.com>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20221205162035.2261037-1-alvaro.karsz@solid-run.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 12/5/22 9:20 AM, Alvaro Karsz wrote:
-> Implement the VIRTIO_BLK_F_LIFETIME feature for VirtIO block devices.
-> 
-> This commit introduces a new ioctl command, VBLK_LIFETIME.
-> 
-> VBLK_LIFETIME ioctl asks for the block device to provide lifetime
-> information by sending a VIRTIO_BLK_T_GET_LIFETIME command to the device.
+Hi,
 
-s/VBLK_LIFETIME/VBLK_GET_LIFETIME
+> Is this based on some spec? Because it looks pretty odd to me. There
+> can be a pretty wide range of two/three/etc level cells with wildly
+> different ranges of durability. And there's really not a lot of slc
+> for generic devices these days, if any.
 
-for the above.
-
--- 
-Jens Axboe
-
-
+Yes, this is based on the virtio spec
+https://docs.oasis-open.org/virtio/virtio/v1.2/csd01/virtio-v1.2-csd01.html
+section  5.2.6
