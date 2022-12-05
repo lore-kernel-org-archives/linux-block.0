@@ -2,54 +2,54 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 883DEC4708D
-	for <linux-block@archiver.kernel.org>; Mon,  5 Dec 2022 03:58:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC8CDC4708E
+	for <linux-block@archiver.kernel.org>; Mon,  5 Dec 2022 03:58:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231425AbiLED6E (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 4 Dec 2022 22:58:04 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55106 "EHLO
+        id S231441AbiLED6G (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 4 Dec 2022 22:58:06 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55134 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230522AbiLED6B (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 4 Dec 2022 22:58:01 -0500
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A72F4FCEC;
-        Sun,  4 Dec 2022 19:57:58 -0800 (PST)
+        with ESMTP id S231246AbiLED6C (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 4 Dec 2022 22:58:02 -0500
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EFAFBFD24;
+        Sun,  4 Dec 2022 19:57:59 -0800 (PST)
 Received: from mail02.huawei.com (unknown [172.30.67.153])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4NQVBS64FQz4f3pG5;
-        Mon,  5 Dec 2022 11:57:52 +0800 (CST)
+        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4NQVBV6pLSz4f3rq5;
+        Mon,  5 Dec 2022 11:57:54 +0800 (CST)
 Received: from huaweicloud.com (unknown [10.175.124.27])
-        by APP1 (Coremail) with SMTP id cCh0CgDXfq1CbI1jRaRVBg--.57323S4;
-        Mon, 05 Dec 2022 11:57:55 +0800 (CST)
+        by APP1 (Coremail) with SMTP id cCh0CgDXfq1CbI1jRaRVBg--.57323S8;
+        Mon, 05 Dec 2022 11:57:57 +0800 (CST)
 From:   Kemeng Shi <shikemeng@huaweicloud.com>
 To:     tj@kernel.org, josef@toxicpanda.com, axboe@kernel.dk
 Cc:     cgroups@vger.kernel.org, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org, shikemeng@huawei.com,
         linfeilong@huawei.com, liuzhiqiang26@huawei.com
-Subject: [PATCH v3 2/9] blk-throttle: Fix that bps of child could exceed bps limited in parent
-Date:   Mon,  5 Dec 2022 19:57:02 +0800
-Message-Id: <20221205115709.251489-3-shikemeng@huaweicloud.com>
+Subject: [PATCH v3 6/9] blk-throttle: fix typo in comment of throtl_adjusted_limit
+Date:   Mon,  5 Dec 2022 19:57:06 +0800
+Message-Id: <20221205115709.251489-7-shikemeng@huaweicloud.com>
 X-Mailer: git-send-email 2.30.0
 In-Reply-To: <20221205115709.251489-1-shikemeng@huaweicloud.com>
 References: <20221205115709.251489-1-shikemeng@huaweicloud.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: cCh0CgDXfq1CbI1jRaRVBg--.57323S4
-X-Coremail-Antispam: 1UD129KBjvJXoW7AF47uF18ur17Grykuw1kAFb_yoW8Aw1fpr
-        WrCF4kCr4qgr4qkr1FqanxXay8tw4rCrWayFZ5GF4fAr9rWwn3GF1q9F18Z3ZxZF93C390
-        vrsIg347Ja4UJ3DanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUB0b4IE77IF4wAFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k2
-        6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M280x2IEY4vEnII2IxkI6r1a6r45M2
-        8IrcIa0xkI8VA2jI8067AKxVWUXwA2048vs2IY020Ec7CjxVAFwI0_Gr0_Xr1l8cAvFVAK
-        0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVW7JVWDJwA2z4
-        x0Y4vE2Ix0cI8IcVCY1x0267AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l
-        84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I
-        8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r106r15McIj6I8E87Iv67AK
-        xVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41l42xK82IYc2Ij64
-        vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8G
-        jcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2I
-        x0cI8IcVAFwI0_Gr0_Xr1lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK
-        8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVW8JVWxJwCI42IY6I8E87Iv6xkF7I
-        0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUVDUUDUUUU
+X-CM-TRANSID: cCh0CgDXfq1CbI1jRaRVBg--.57323S8
+X-Coremail-Antispam: 1UD129KBjvdXoW7XF47Kw15AF1rWr4xCr1kuFg_yoWDWFb_XF
+        W8tr18Xw15u3s7Aa4FkFWfur9Yg34UuryUC3s8GFy7WF10qa1kA3ZxtrZ0kFsIvay7KrWa
+        yF93XF4j9r1SvjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+        9fnUUIcSsGvfJTRUUUbSxYFVCjjxCrM7AC8VAFwI0_Wr0E3s1l1xkIjI8I6I8E6xAIw20E
+        Y4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l87I20VAvwVAaII0Ic2I_JFv_Gryl82
+        xGYIkIc2x26280x7IE14v26r126s0DM28IrcIa0xkI8VCY1x0267AKxVW5JVCq3wA2ocxC
+        64kIII0Yj41l84x0c7CEw4AK67xGY2AK021l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM2
+        8EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4UJVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq
+        3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_GcCE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8w
+        Aqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_JrI_JrylYx0Ex4A2jsIE
+        14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwIxGrwCF04k20xvY0x
+        0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E
+        7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcV
+        C0I7IYx2IY67AKxVW8JVW5JwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Cr0_Gr1UMIIF0xvE
+        42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVW8JVWxJwCI42IY6I8E87Iv6x
+        kF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUxD7aUUUUU
 X-CM-SenderInfo: 5vklyvpphqwq5kxd4v5lfo033gof0z/
 X-CFilter-Loop: Reflected
 Precedence: bulk
@@ -58,25 +58,7 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Kemeng Shi <shikemeng@huawei.com>
 
-Consider situation as following (on the default hierarchy):
- HDD
-  |
-root (bps limit: 4k)
-  |
-child (bps limit :8k)
-  |
-fio bs=8k
-Rate of fio is supposed to be 4k, but result is 8k. Reason is as
-following:
-Size of single IO from fio is larger than bytes allowed in one
-throtl_slice in child, so IOs are always queued in child group first.
-When queued IOs in child are dispatched to parent group, BIO_BPS_THROTTLED
-is set and these IOs will not be limited by tg_within_bps_limit anymore.
-Fix this by only set BIO_BPS_THROTTLED when the bio traversed the entire
-tree.
-
-There patch has no influence on situation which is not on the default
-hierarchy as each group is a single root group without parent.
+lapsed time -> elapsed time
 
 Signed-off-by: Kemeng Shi <shikemeng@huawei.com>
 Acked-by: Tejun Heo <tj@kernel.org>
@@ -86,25 +68,18 @@ Signed-off-by: Kemeng Shi <shikemeng@huaweicloud.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index 8e2349b17936..2444ebf5f11d 100644
+index 1623507ed56e..7db8592dae38 100644
 --- a/block/blk-throttle.c
 +++ b/block/blk-throttle.c
-@@ -1067,7 +1067,6 @@ static void tg_dispatch_one_bio(struct throtl_grp *tg, bool rw)
- 	sq->nr_queued[rw]--;
- 
- 	throtl_charge_bio(tg, bio);
--	bio_set_flag(bio, BIO_BPS_THROTTLED);
- 
- 	/*
- 	 * If our parent is another tg, we just need to transfer @bio to
-@@ -1080,6 +1079,7 @@ static void tg_dispatch_one_bio(struct throtl_grp *tg, bool rw)
- 		throtl_add_bio_tg(bio, &tg->qnode_on_parent[rw], parent_tg);
- 		start_parent_slice_with_credit(tg, parent_tg, rw);
- 	} else {
-+		bio_set_flag(bio, BIO_BPS_THROTTLED);
- 		throtl_qnode_add_bio(bio, &tg->qnode_on_parent[rw],
- 				     &parent_sq->queued[rw]);
- 		BUG_ON(tg->td->nr_queued[rw] <= 0);
+@@ -129,7 +129,7 @@ static struct throtl_data *sq_to_td(struct throtl_service_queue *sq)
+ /*
+  * cgroup's limit in LIMIT_MAX is scaled if low limit is set. This scale is to
+  * make the IO dispatch more smooth.
+- * Scale up: linearly scale up according to lapsed time since upgrade. For
++ * Scale up: linearly scale up according to elapsed time since upgrade. For
+  *           every throtl_slice, the limit scales up 1/2 .low limit till the
+  *           limit hits .max limit
+  * Scale down: exponentially scale down if a cgroup doesn't hit its .low limit
 -- 
 2.30.0
 
