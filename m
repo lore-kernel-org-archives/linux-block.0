@@ -2,55 +2,55 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DA2FC4321E
-	for <linux-block@archiver.kernel.org>; Mon,  5 Dec 2022 18:24:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D25EBC4321E
+	for <linux-block@archiver.kernel.org>; Mon,  5 Dec 2022 18:25:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232170AbiLESYG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 5 Dec 2022 13:24:06 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38756 "EHLO
+        id S232406AbiLESZR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 5 Dec 2022 13:25:17 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39118 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232169AbiLESYF (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 5 Dec 2022 13:24:05 -0500
-Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 553F51F2D0
-        for <linux-block@vger.kernel.org>; Mon,  5 Dec 2022 10:24:04 -0800 (PST)
-Received: by mail-pf1-x432.google.com with SMTP id 124so12253691pfy.0
-        for <linux-block@vger.kernel.org>; Mon, 05 Dec 2022 10:24:04 -0800 (PST)
+        with ESMTP id S232120AbiLESZH (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 5 Dec 2022 13:25:07 -0500
+Received: from mail-pg1-x532.google.com (mail-pg1-x532.google.com [IPv6:2607:f8b0:4864:20::532])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20B2B20BC1
+        for <linux-block@vger.kernel.org>; Mon,  5 Dec 2022 10:25:06 -0800 (PST)
+Received: by mail-pg1-x532.google.com with SMTP id h33so11195785pgm.9
+        for <linux-block@vger.kernel.org>; Mon, 05 Dec 2022 10:25:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20210112.gappssmtp.com; s=20210112;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=MiaU0h+bdhLcyz46u9rPXY7SBRUUk1LjjV2sWNv5RLY=;
-        b=UBAKgIuuOhTG3tpp18QArd1BLiZIqIsmrc+4/lD5AsoySzR1qItFUrsUCuFBWW+V7W
-         NN2KIHP7x2TpFYLEpDAVnAYN+9qZ+/AX/nXjLFuLwIwASDZ5TCrrY6Icl9kLCXsJnFp2
-         2nI8qClHrISNzrvTysGS6mWOe77CE/lEituW6eRdhOSEvyhqLcQtgnSDhdmtwzRZq3H3
-         t9gh6367wtD+fMwzVdZQHcjkEtEIZUGmsUbF+1sZ059635xeS4MW7dzCg2dwPJ9UAzdV
-         UHJpkdFPOBH9kWrxNGtG9EH15d6tA7E5U5gRClOLHJ2QLOn49p6zl6y4+YgaYg17wO/n
-         Dyhg==
+        bh=ImidpIQm24xC230ns//vzB+kQ7xYkel7WPj+tXR6tek=;
+        b=8GuqePATHeBdjIjB00TbgRxhjgSPMawtU2wrtMW9YV2SFZq8p01ldTEAEDJdXmVdMQ
+         aKPQa9ow3SZfxPLVddZSdd1Vmiivd8Xsns2MQXSSv+HZEwMB1AkPzU6/prRYqgG7kBx1
+         pFwb6vkT/NsseKhCFBT2+xNiqVxZUMuF074XfMTL9Gx4DluIfSQ7QPpppgw373tGuZ5f
+         xVs1yKe34IQP9m0MTefim8eR8AQhvmWGrY892kFb9Pe9xk1DbtOZd1fthb/96tnSraR5
+         hLHHIQR60waW9xkALD7Ke5rkzmfw0e/dorvR7w9+noJkFwmrrhy7A1sDDF8SwAYzoYsH
+         S2TQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=MiaU0h+bdhLcyz46u9rPXY7SBRUUk1LjjV2sWNv5RLY=;
-        b=a1lbV+OJJv09E8eM+uXPsF4O64yb/tJ/Yww2ku/YlLeeZe/OwuO3ZvhZvdhLos6REH
-         5TWU6FfrD793CRg8yePvsI+i16+4Af1dZYn9A3ApT+/5JWqBEHfjKO3xMMvyjZKhGGN/
-         33t0pyXUCh9ZY0QlYyFNPTg+/K8elkvX3MhxRRw8juqnoR2++6SgCD47l53dNApNyjFQ
-         IL0pflLQvhJLJ3QSt4W9AJnUIdOPZvs6Z+8sopUpdfaeoSCb8OerVyLlPsLE5X+bJX92
-         KB4DA26CzzTpw3gOS7cQZ1rAYbGQlCLvzJqiKORY9zDV/C1Lf6n5Zsh49sn+H/rj6Lcv
-         70JQ==
-X-Gm-Message-State: ANoB5pmQXFfprw+IoQcNkHTt19FRrA1GAZDHxdyMtpoG1+6pCh/75XfW
-        dwsGNM55NJUmMsu8ePRuhk4txA==
-X-Google-Smtp-Source: AA0mqf6jZL7CMm0mQFuDdI6JgmGYYwGjfVoJPowXsYQWIx6DQ5YO6ZYAjPvSltOjb7zYJtxe7LeLEA==
-X-Received: by 2002:a05:6a00:2396:b0:56c:318a:f808 with SMTP id f22-20020a056a00239600b0056c318af808mr68347160pfc.11.1670264643685;
-        Mon, 05 Dec 2022 10:24:03 -0800 (PST)
+        bh=ImidpIQm24xC230ns//vzB+kQ7xYkel7WPj+tXR6tek=;
+        b=JMbtB2yTFOe6WywgVNOIhrl1jWPLK2nxMJR6ceSUgiIKpl8hyi+BSV2Xv9jJVUVidN
+         o/BikkGYMMfeILkG1plC6PvzpdnBNJ15ri24PIL1/u9UkIc14OUj9FjjkzASrIIHQnDW
+         FisKeHH93opP/W+5kZe9VPv4oJsCteTaavT0snNUADS1tKInvLSiLrXH21a3DFX+ENSS
+         SEfVj45ZYoPRhvEdg0IWm7WEfgIkpnXlweFUJz02rHJumWeyMiN2uoi4tIHjECyxyuap
+         um3EM8bVvArAWb/2FBl3Tql6+J4Am35LAHM8RDm0CMecjwN4poYKbqumCtaBbE5ElO32
+         x8FA==
+X-Gm-Message-State: ANoB5pkJtvxiBPTxzsFgQgZZOPZvKAf8/w9VE4b54mzrUCj43tlQcIca
+        SIygI0PVGMTxS06L6iT0aiaD7g==
+X-Google-Smtp-Source: AA0mqf6LXB3TBL6QfztXAdNGDz+SFYGDjGPt38SvDGSzimZxm0Mc+GjiJQds8/JFTJ/UbjqS/ZkzWQ==
+X-Received: by 2002:a63:ce43:0:b0:476:fdde:9ac8 with SMTP id r3-20020a63ce43000000b00476fdde9ac8mr57775329pgi.164.1670264704207;
+        Mon, 05 Dec 2022 10:25:04 -0800 (PST)
 Received: from ?IPV6:2600:380:4a37:5fe7:dac6:a7fe:6a6b:c11a? ([2600:380:4a37:5fe7:dac6:a7fe:6a6b:c11a])
-        by smtp.gmail.com with ESMTPSA id 72-20020a62154b000000b0056283e2bdbdsm4726356pfv.138.2022.12.05.10.24.01
+        by smtp.gmail.com with ESMTPSA id ik7-20020a170902ab0700b00189529ed580sm10917190plb.60.2022.12.05.10.25.02
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 05 Dec 2022 10:24:03 -0800 (PST)
-Message-ID: <fe2800f1-aaae-33e8-aaf0-83fd034162d5@kernel.dk>
-Date:   Mon, 5 Dec 2022 11:24:00 -0700
+        Mon, 05 Dec 2022 10:25:03 -0800 (PST)
+Message-ID: <759f50d0-75c4-7970-b145-469e87f6acc5@kernel.dk>
+Date:   Mon, 5 Dec 2022 11:25:01 -0700
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
  Thunderbird/102.5.0
@@ -80,33 +80,10 @@ On 12/5/22 9:20 AM, Alvaro Karsz wrote:
 > 
 > VBLK_LIFETIME ioctl asks for the block device to provide lifetime
 > information by sending a VIRTIO_BLK_T_GET_LIFETIME command to the device.
-> 
-> lifetime information fields:
-> 
-> - pre_eol_info: specifies the percentage of reserved blocks that are
-> 		consumed.
-> 		optional values following virtio spec:
-> 		*) 0 - undefined.
-> 		*) 1 - normal, < 80% of reserved blocks are consumed.
-> 		*) 2 - warning, 80% of reserved blocks are consumed.
-> 		*) 3 - urgent, 90% of reserved blocks are consumed.
-> 
-> - device_lifetime_est_typ_a: this field refers to wear of SLC cells and
-> 			     is provided in increments of 10used, and so
-> 			     on, thru to 11 meaning estimated lifetime
-> 			     exceeded. All values above 11 are reserved.
-> 
-> - device_lifetime_est_typ_b: this field refers to wear of MLC cells and is
-> 			     provided with the same semantics as
-> 			     device_lifetime_est_typ_a.
-> 
-> The data received from the device will be sent as is to the user.
-> No data check/decode is done by virtblk.
 
-Is this based on some spec? Because it looks pretty odd to me. There
-can be a pretty wide range of two/three/etc level cells with wildly
-different ranges of durability. And there's really not a lot of slc
-for generic devices these days, if any.
+s/VBLK_LIFETIME/VBLK_GET_LIFETIME
+
+for the above.
 
 -- 
 Jens Axboe
