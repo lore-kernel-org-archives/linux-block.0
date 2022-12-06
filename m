@@ -2,263 +2,120 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB905C3A5A7
-	for <linux-block@archiver.kernel.org>; Tue,  6 Dec 2022 16:27:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2633FC352A1
+	for <linux-block@archiver.kernel.org>; Tue,  6 Dec 2022 16:32:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232571AbiLFQ1H (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 6 Dec 2022 11:27:07 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42724 "EHLO
+        id S234556AbiLFQcO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 6 Dec 2022 11:32:14 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45732 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235271AbiLFQ1E (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 6 Dec 2022 11:27:04 -0500
-Received: from mail-ed1-x52d.google.com (mail-ed1-x52d.google.com [IPv6:2a00:1450:4864:20::52d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2CD12A259
-        for <linux-block@vger.kernel.org>; Tue,  6 Dec 2022 08:27:02 -0800 (PST)
-Received: by mail-ed1-x52d.google.com with SMTP id m19so21003982edj.8
-        for <linux-block@vger.kernel.org>; Tue, 06 Dec 2022 08:27:02 -0800 (PST)
+        with ESMTP id S233613AbiLFQcN (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 6 Dec 2022 11:32:13 -0500
+Received: from mail-ej1-x62f.google.com (mail-ej1-x62f.google.com [IPv6:2a00:1450:4864:20::62f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06AD02E9D7
+        for <linux-block@vger.kernel.org>; Tue,  6 Dec 2022 08:32:12 -0800 (PST)
+Received: by mail-ej1-x62f.google.com with SMTP id vv4so7571771ejc.2
+        for <linux-block@vger.kernel.org>; Tue, 06 Dec 2022 08:32:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
-        h=to:references:message-id:content-transfer-encoding:cc:date
-         :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1wNGJip1HKswY03rIn0qBN8lLPIUP/zhuY/3XSL3+9g=;
-        b=fD9i3S/OyqKgyk6wKHC5lzP9djQhREEu8RWPUcbxw52GfNQLvBWJQ2exlnhkwuoVnX
-         ODkWJs+9ZWGaBloc8GriItGzcaI9kv3Z/q+2DI/CJMYugkcY1zWshHDkRo0S4P/RZYbW
-         wf5B8rZVQ/HWB8udR2tLK/r+3aLCWsd7vxNQkvMgtI7i9LORQdAYFj9cIBg3e1NGVMk1
-         iaOU3W7MHb4WyYmeLs33v5BVQAtHv3yXz+7Qza0Jv3nJIIuSTckNPxetmLdAxjpqMStb
-         odVj/IxjrwRsJ4/7ouN/+kIuqnSl2MD5eoPuVC15uX55/xRRlu+SGTdO40R7hXK46DKV
-         adyQ==
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=wTesi+XMwOO6DggGYE/adAhyblAlWesbBFNRIu2wHW4=;
+        b=JyfCpxCvNOf2ETLBMLxdSngurnZ49ZRWCLZSotJ8MSpZCulX5uFaN4ZbYgFZkkHvFH
+         0RUXM9JVJ9ufi6nLZcffxzh4Zsv41NoAfE8zeJkFQ4mXbOJHiUvZithDvq8SmYjzetJ6
+         LdTblZ1N+G868f8KVeiOhy8upitg5DbubebhWP6umM3/NKsiQ4c4xrIX6x+0mf/Rqa/B
+         77gYaovItJYiH3N6ldvMr4RuWO5X8HNV0ooTCITOpje9mzoifXuEnCi2mZPvC7U/ajs6
+         +AM5QF89cWfu+vAWjrLwEgRuHXjiHSkSXUAaY837dPugDppQEnNXlnGtpp4AUMTEr7LC
+         JayA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=to:references:message-id:content-transfer-encoding:cc:date
-         :in-reply-to:from:subject:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=1wNGJip1HKswY03rIn0qBN8lLPIUP/zhuY/3XSL3+9g=;
-        b=Xypv3VQB7dERh8rd8JUZqC/P03GJJ0UyxtT0zUF5J0aip/MA746m/wPnIlwBnfdNyF
-         YPsM/oIAzYv7whawRw4naqCTVKyPbU01XP5WS6kyKIUcsRBIRb2lrJXVyf9IwicyNslW
-         qHlbCEaa0Q5kjIBbYqR0dsr6TbxnnYzQ9RaIMDDUAP7jlKg/GCKO5Rdy97afpJs8Ijtw
-         rfC/aAGPRBA8F4b6k5o+LQJ6wnz4U+M/VqrBU8DBULw2Twq6/woxoyPQ0vbH43nuIssl
-         WYD4Rb6id2OTet2LF10tgkq8J/BnCVMuaZmFyDSgTFvTTyGU3oj6FgS89iSbtj+xncic
-         MgHw==
-X-Gm-Message-State: ANoB5pn+9JoilXIDJemMlR+kwUs09+JmUuoQQzf2tzftHhyu4NBYQThx
-        9do2sMSUFXHcc1eVEqVMBWtrTA==
-X-Google-Smtp-Source: AA0mqf5O5cZ8jGnB/77uzy3JBRtagKZAZO2TV80r76TGZfG4XbsIH3Cz4RphZQYm70T/1MMOHro6Lw==
-X-Received: by 2002:a50:c314:0:b0:46c:4850:a192 with SMTP id a20-20020a50c314000000b0046c4850a192mr15141650edb.65.1670344021185;
-        Tue, 06 Dec 2022 08:27:01 -0800 (PST)
-Received: from mbp-di-paolo.station (net-2-35-55-161.cust.vodafonedsl.it. [2.35.55.161])
-        by smtp.gmail.com with ESMTPSA id d18-20020a50fb12000000b004588ef795easm1164055edq.34.2022.12.06.08.27.00
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=wTesi+XMwOO6DggGYE/adAhyblAlWesbBFNRIu2wHW4=;
+        b=Pt2CUFD7TCLDYZykdCVwhuDpZ+oNdEzapqdtIkT3xw1kNZF3eHGM5/S92JXw7Ym+sC
+         63iaoGhiiI7LjmJIw4fhTQOVBXQWSvB1P++xjRpxJ/wQA7SRjJIMPAHoKThGGU6dzNHC
+         FabT/dkZUHu6DXWT2JBBk+FmNX0fcOkXCinEoVFpYMcRbq/eVEKAd2vY/EC9ot4mILxu
+         bnJhUAv3QHSHhy29zLd7Ilsqf9BSbdQLmQlhNhZF4HH16+FQzWXNqBGf3CbnfuS0Byc3
+         n9/snZcMWDrxfznivOC7T3lNRhpFAJUC9VduL6TPUXLVb2AHKAI72mv98q0LasyshOrE
+         n5MQ==
+X-Gm-Message-State: ANoB5plOTjpdwBIUwYWj0YW8/f4Rdx4zq85a7F0zIFEclw4FaJazuRXI
+        pZ2Y7qwkRGZS3j/dn33Wz0XsUw==
+X-Google-Smtp-Source: AA0mqf5STJjS2tk6WUgUVbwiv1TZzFQaT9jbG3AzstPY4qgHzCqghdImo0J8atoG+jo4TH8/ldSX+w==
+X-Received: by 2002:a17:907:a4c3:b0:7c0:7c22:d70d with SMTP id vq3-20020a170907a4c300b007c07c22d70dmr33002119ejc.707.1670344330594;
+        Tue, 06 Dec 2022 08:32:10 -0800 (PST)
+Received: from MBP-di-Paolo.station (net-2-35-55-161.cust.vodafonedsl.it. [2.35.55.161])
+        by smtp.gmail.com with ESMTPSA id t5-20020a056402020500b0046ac460da13sm1170104edv.53.2022.12.06.08.32.09
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 06 Dec 2022 08:27:00 -0800 (PST)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
-Subject: Re: [PATCH V7 1/8] block, bfq: split sync bfq_queues on a
- per-actuator basis
+        Tue, 06 Dec 2022 08:32:10 -0800 (PST)
 From:   Paolo Valente <paolo.valente@linaro.org>
-In-Reply-To: <5f8aa1f6-c0d1-d6b9-f01d-f9a65cdeadb6@opensource.wdc.com>
-Date:   Tue, 6 Dec 2022 17:26:59 +0100
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        linux-block <linux-block@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        Arie van der Hoeven <arie.vanderhoeven@seagate.com>,
-        Rory Chen <rory.c.chen@seagate.com>,
-        Glen Valante <glen.valante@linaro.org>,
-        Gabriele Felici <felicigb@gmail.com>,
-        Carmine Zaccagnino <carmine@carminezacc.com>
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <50017876-ED45-44E7-A2F9-90BB8178D129@linaro.org>
-References: <20221206081551.28257-1-paolo.valente@linaro.org>
- <20221206081551.28257-2-paolo.valente@linaro.org>
- <5f8aa1f6-c0d1-d6b9-f01d-f9a65cdeadb6@opensource.wdc.com>
-To:     Damien Le Moal <damien.lemoal@opensource.wdc.com>
-X-Mailer: Apple Mail (2.3445.104.11)
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        arie.vanderhoeven@seagate.com, rory.c.chen@seagate.com,
+        glen.valante@linaro.org, Paolo Valente <paolo.valente@linaro.org>
+Subject: [PATCH V8 0/8] block, bfq: extend bfq to support multi-actuator drives
+Date:   Tue,  6 Dec 2022 17:31:55 +0100
+Message-Id: <20221206163203.30071-1-paolo.valente@linaro.org>
+X-Mailer: git-send-email 2.20.1
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Hi,
+here is the V8, it differs from V7 in that it addresses the issues
+reported in [2].
 
+Here is the whole description of this patch series again.  This
+extension addresses the following issue. Single-LUN multi-actuator
+SCSI drives, as well as all multi-actuator SATA drives appear as a
+single device to the I/O subsystem [1].  Yet they address commands to
+different actuators internally, as a function of Logical Block
+Addressing (LBAs). A given sector is reachable by only one of the
+actuators. For example, Seagate’s Serial Advanced Technology
+Attachment (SATA) version contains two actuators and maps the lower
+half of the SATA LBA space to the lower actuator and the upper half to
+the upper actuator.
 
-> Il giorno 6 dic 2022, alle ore 09:53, Damien Le Moal =
-<damien.lemoal@opensource.wdc.com> ha scritto:
->=20
-> [...]
->> 	return bfqg;
->> diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
->> index 7ea427817f7f..127aeecaf903 100644
->> --- a/block/bfq-iosched.c
->> +++ b/block/bfq-iosched.c
->> @@ -377,14 +377,21 @@ static const unsigned long =
-bfq_late_stable_merging =3D 600;
->> #define RQ_BIC(rq)		((struct bfq_io_cq =
-*)((rq)->elv.priv[0]))
->> #define RQ_BFQQ(rq)		((rq)->elv.priv[1])
->>=20
->> -struct bfq_queue *bic_to_bfqq(struct bfq_io_cq *bic, bool is_sync)
->> +struct bfq_queue *bic_to_bfqq(struct bfq_io_cq *bic, bool is_sync,
->> +			      unsigned int actuator_idx)
->> {
->> -	return bic->bfqq[is_sync];
->=20
-> See below. But here, you could add:
->=20
-> 	if (!bic)
-> 		return NULL;
->=20
->> +	if (is_sync)
->> +		return bic->bfqq[1][actuator_idx];
->> +
->> +	return bic->bfqq[0][actuator_idx];
->> }
->>=20
->> static void bfq_put_stable_ref(struct bfq_queue *bfqq);
->>=20
->> -void bic_set_bfqq(struct bfq_io_cq *bic, struct bfq_queue *bfqq, =
-bool is_sync)
->> +void bic_set_bfqq(struct bfq_io_cq *bic,
->> +		  struct bfq_queue *bfqq,
->> +		  bool is_sync,
->> +		  unsigned int actuator_idx)
->> {
->> 	/*
->> 	 * If bfqq !=3D NULL, then a non-stable queue merge between
->> @@ -399,7 +406,10 @@ void bic_set_bfqq(struct bfq_io_cq *bic, struct =
-bfq_queue *bfqq, bool is_sync)
->> 	 * we cancel the stable merge if
->> 	 * bic->stable_merge_bfqq =3D=3D bfqq.
->> 	 */
->> -	bic->bfqq[is_sync] =3D bfqq;
->> +	if (is_sync)
->> +		bic->bfqq[1][actuator_idx] =3D bfqq;
->> +	else
->> +		bic->bfqq[0][actuator_idx] =3D bfqq;
->>=20
->> 	if (bfqq && bic->stable_merge_bfqq =3D=3D bfqq) {
->> 		/*
->> @@ -672,9 +682,9 @@ static void bfq_limit_depth(blk_opf_t opf, struct =
-blk_mq_alloc_data *data)
->> {
->> 	struct bfq_data *bfqd =3D data->q->elevator->elevator_data;
->> 	struct bfq_io_cq *bic =3D bfq_bic_lookup(data->q);
->> -	struct bfq_queue *bfqq =3D bic ? bic_to_bfqq(bic, =
-op_is_sync(opf)) : NULL;
->> 	int depth;
->> 	unsigned limit =3D data->q->nr_requests;
->> +	unsigned int act_idx;
->>=20
->> 	/* Sync reads have full depth available */
->> 	if (op_is_sync(opf) && !op_is_write(opf)) {
->> @@ -684,14 +694,21 @@ static void bfq_limit_depth(blk_opf_t opf, =
-struct blk_mq_alloc_data *data)
->> 		limit =3D (limit * depth) >> bfqd->full_depth_shift;
->> 	}
->>=20
->> -	/*
->> -	 * Does queue (or any parent entity) exceed number of requests =
-that
->> -	 * should be available to it? Heavily limit depth so that it =
-cannot
->> -	 * consume more available requests and thus starve other =
-entities.
->> -	 */
->> -	if (bfqq && bfqq_request_over_limit(bfqq, limit))
->> -		depth =3D 1;
->> +	for (act_idx =3D 0; act_idx < bfqd->num_actuators; act_idx++) {
->> +		struct bfq_queue *bfqq =3D
->> +			bic ? bic_to_bfqq(bic, op_is_sync(opf), act_idx) =
-: NULL;
->=20
-> You could return NULL in bic_to_bfqq() if bic is NULL. That would =
-avoid
-> this cludge.
+Evidently, to fully utilize actuators, no actuator must be left idle
+or underutilized while there is pending I/O for it. To reach this
+goal, the block layer must somehow control the load of each actuator
+individually. This series enriches BFQ with such a per-actuator
+control, as a first step. Then it also adds a simple mechanism for
+guaranteeing that actuators with pending I/O are never left idle.
 
-Actually, this would improve code here, but it would entail the above
-(useless) control for all the other invocations :(
-
->=20
->>=20
->> +		/*
->> +		 * Does queue (or any parent entity) exceed number of
->> +		 * requests that should be available to it? Heavily
->> +		 * limit depth so that it cannot consume more
->> +		 * available requests and thus starve other entities.
->> +		 */
->> +		if (bfqq && bfqq_request_over_limit(bfqq, limit)) {
->> +			depth =3D 1;
->> +			break;
->> +		}
->> +	}
->> 	bfq_log(bfqd, "[%s] wr_busy %d sync %d depth %u",
->> 		__func__, bfqd->wr_busy_queues, op_is_sync(opf), depth);
->> 	if (depth)
->> @@ -1812,6 +1829,18 @@ static bool =
-bfq_bfqq_higher_class_or_weight(struct bfq_queue *bfqq,
->> 	return bfqq_weight > in_serv_weight;
->> }
->>=20
->> +/*
->> + * Get the index of the actuator that will serve bio.
->> + */
->> +static unsigned int bfq_actuator_index(struct bfq_data *bfqd, struct =
-bio *bio)
->> +{
->> +	/*
->> +	 * Multi-actuator support not complete yet, so always return 0
->> +	 * for the moment (to keep incomplete mechanisms off).
->> +	 */
->> +	return 0;
->> +}
->> +
->> static bool bfq_better_to_idle(struct bfq_queue *bfqq);
->>=20
->> static void bfq_bfqq_handle_idle_busy_switch(struct bfq_data *bfqd,
->> @@ -2142,7 +2171,7 @@ static void bfq_check_waker(struct bfq_data =
-*bfqd, struct bfq_queue *bfqq,
->> 	 * We reset waker detection logic also if too much time has =
-passed
->>  	 * since the first detection. If wakeups are rare, pointless =
-idling
->> 	 * doesn't hurt throughput that much. The condition below makes =
-sure
->> -	 * we do not uselessly idle blocking waker in more than 1/64 =
-cases.=20
->> +	 * we do not uselessly idle blocking waker in more than 1/64 =
-cases.
->> 	 */
->> 	if (bfqd->last_completed_rq_bfqq !=3D
->> 	    bfqq->tentative_waker_bfqq ||
->> @@ -2478,7 +2507,8 @@ static bool bfq_bio_merge(struct request_queue =
-*q, struct bio *bio,
->> 		 */
->> 		bfq_bic_update_cgroup(bic, bio);
->>=20
->> -		bfqd->bio_bfqq =3D bic_to_bfqq(bic, =
-op_is_sync(bio->bi_opf));
->> +		bfqd->bio_bfqq =3D bic_to_bfqq(bic, =
-op_is_sync(bio->bi_opf),
->> +					     bfq_actuator_index(bfqd, =
-bio));
->=20
-> Given that you repeat this pattern a lot, might be worth having a =
-wrapper
-> like:
->=20
-> static inline struct bfq_queue *bio_to_bfqq(struct bfq_io_cq *bic,
-> 					    struct bio *bio)
-> {
-> 	return bic_to_bfqq(bic, op_is_sync(bio->bi_opf),
-> 			   bfq_actuator_index(bfqd, bio));
-> }
->=20
-> The code would be less verbose while still being clear.
-
-Actually this (exact) pattern is used only twice.  I'm thinking of
-some more general wrapper, but each different combination seems to
-have its own extra cost.  Any suggestion is more than welcome.
-Meanwhile, I'll send a V8 to keep this going.
-
-As usual, in my V8 I'll apply all of your other suggestions.
+See [1] for a more detailed overview of the problem and of the
+solutions implemented in this patch series. There you will also find
+some preliminary performance results.
 
 Thanks,
 Paolo
 
-[...]=
+[1] https://www.linaro.org/blog/budget-fair-queueing-bfq-linux-io-scheduler-optimizations-for-multi-actuator-sata-hard-drives/
+[2] https://lore.kernel.org/lkml/20221206081551.28257-1-paolo.valente@linaro.org/T/#t
+
+Davide Zini (3):
+  block, bfq: split also async bfq_queues on a per-actuator basis
+  block, bfq: inject I/O to underutilized actuators
+  block, bfq: balance I/O injection among underutilized actuators
+
+Federico Gavioli (1):
+  block, bfq: retrieve independent access ranges from request queue
+
+Paolo Valente (4):
+  block, bfq: split sync bfq_queues on a per-actuator basis
+  block, bfq: forbid stable merging of queues associated with different
+    actuators
+  block, bfq: move io_cq-persistent bfqq data into a dedicated struct
+  block, bfq: turn bfqq_data into an array in bfq_io_cq
+
+ block/bfq-cgroup.c  |  94 ++++----
+ block/bfq-iosched.c | 573 ++++++++++++++++++++++++++++++--------------
+ block/bfq-iosched.h | 142 ++++++++---
+ block/bfq-wf2q.c    |   2 +-
+ 4 files changed, 558 insertions(+), 253 deletions(-)
+
+--
+2.20.1
