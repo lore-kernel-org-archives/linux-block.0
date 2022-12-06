@@ -2,261 +2,109 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3AB83C352A1
-	for <linux-block@archiver.kernel.org>; Tue,  6 Dec 2022 16:40:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 375A6C3A5A7
+	for <linux-block@archiver.kernel.org>; Tue,  6 Dec 2022 16:42:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235592AbiLFQk2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 6 Dec 2022 11:40:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53208 "EHLO
+        id S233884AbiLFQmX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 6 Dec 2022 11:42:23 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54194 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235622AbiLFQkG (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 6 Dec 2022 11:40:06 -0500
-Received: from mail-pg1-x52b.google.com (mail-pg1-x52b.google.com [IPv6:2607:f8b0:4864:20::52b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F043E010
-        for <linux-block@vger.kernel.org>; Tue,  6 Dec 2022 08:38:45 -0800 (PST)
-Received: by mail-pg1-x52b.google.com with SMTP id 62so13839834pgb.13
-        for <linux-block@vger.kernel.org>; Tue, 06 Dec 2022 08:38:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance-com.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=RvhqGNfZHYPrNa3BihNBSaEDPogspIa8w2pPkMm+z9Y=;
-        b=5kEW4tl4dXzh85X9h0gAg4N74pmIpxh0Oyj+nknU8RDMjTS2hC00RFqyTfR3bctz8d
-         Ix0Ic8jdeHaS11ZknOTJ4sglufgXHfwR/ozN58VujUWxlWp8e+wrAdqIHseAqUXZp+M2
-         5vczzJ4clCL+K21DLGvv77piA371kOmuLkGm4Z6CnuvGEZg3TUDqIa1kAPP/Q11fsBvh
-         OkpAFrWSLxdHT3yhwF3Q4vIh8OuxDF6NnehUMRWj6Rz1kD8rhKapjuAx+7f9c/tEPMby
-         09XpzDFfBvBOt6BtCcznunT0+G452Dobqs90OYPyBuDilHQ5+gLfVjf3iCL0BiCwN1w0
-         KQcA==
+        with ESMTP id S235741AbiLFQl7 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 6 Dec 2022 11:41:59 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61438CE8
+        for <linux-block@vger.kernel.org>; Tue,  6 Dec 2022 08:40:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1670344816;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=6ge3pwq/JlMlTkSjEGqqkwIK42+btCPQr7/pr8xaxyc=;
+        b=DeK9UUHZA+NXpCyFrPUwn6263SV/bUmTLRlrUJ8KotrAoWMmNl+8u1ulmJYs6jnpZft6hB
+        XHBdm8APdFuzvY2ltJ4AUVtLXA7HncFGNU3pTL8xUDEEdBpbeO7bXVf6lnAtNpFTWCEcEq
+        dmKTTqStNT2VVesIDxjFj4Qm7WWYQ68=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-591-2nWASnlaOYe0PE9zI87BYQ-1; Tue, 06 Dec 2022 11:40:14 -0500
+X-MC-Unique: 2nWASnlaOYe0PE9zI87BYQ-1
+Received: by mail-wr1-f70.google.com with SMTP id k1-20020adfb341000000b0024215e0f486so3405582wrd.21
+        for <linux-block@vger.kernel.org>; Tue, 06 Dec 2022 08:40:13 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=RvhqGNfZHYPrNa3BihNBSaEDPogspIa8w2pPkMm+z9Y=;
-        b=Nj+GWRmDH9k8iWd0oPH9RMIBkVoJ83v650ypyZ2elda42kcfRYjcNT0r3pjSpmJfOM
-         3KIGF7ltYd9SbVgIdDwqkvyPUNqxYBpX27FkqZ095HwcUKXYbDQund0PM9qZImO9VFqX
-         I8GLtZeUSI2D/H6Csn9AjuUhSzHuCPtH/xbQ102/VnSCuRGKe6j6idoPdpL1uLWl+i5j
-         4FkoeN9tcKTP7fviCtSx5In8oNW7lk4tPrh1BFtsT7/1UKY5CInRbivTHlUuZj5DXJ71
-         +5t4X+tkH7GCubJQISXYA/6Mz7ehMCkCqzq14qTCGMh5qQnkca4xno+R3Sph6FmvWWj2
-         ETrA==
-X-Gm-Message-State: ANoB5pkblVaf9svALhMHwxTFgDmnBODqr0H3Pq9v+2ubu5ZBAoK65aW6
-        EkCE+Uy6K6VoysK0klJ+DD9www==
-X-Google-Smtp-Source: AA0mqf7xyEC0ye0/AJmWdBBERYgOG0Vikwb2T83f0kna8CNsKHH8XVNAGmMbR/bmVW6zqSOcz9DM+Q==
-X-Received: by 2002:a05:6a00:d66:b0:56a:fd45:d054 with SMTP id n38-20020a056a000d6600b0056afd45d054mr76941698pfv.3.1670344724899;
-        Tue, 06 Dec 2022 08:38:44 -0800 (PST)
-Received: from localhost.localdomain ([139.177.225.227])
-        by smtp.gmail.com with ESMTPSA id 3-20020a631543000000b0044ed37dbca8sm10102407pgv.2.2022.12.06.08.38.41
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6ge3pwq/JlMlTkSjEGqqkwIK42+btCPQr7/pr8xaxyc=;
+        b=zpQpVV3nJt4Zf4HG8/dxPBpQ+sQZX2tr8Rlz6Yd7KJcOTqEIvNHY3/5iq1eAnq7Kt8
+         cf6ZKbG8k7a7PiLoKR4tuYB8eZdyMJL9Lj8Wcyr0ooxiN29qiunMXwOhBq3GKRzM1PO8
+         twg1IuxetyAOdBD3jObujir0whyi2yA3Un1m8cqXzsNJ8XLya8sx011rK3F8aGQZZm8q
+         Cu6BDbHqdDRhGgIuor7moLZXX/w4Q1v1yk2/o03UfEBHx1j63TrEcmq6K4vpgzbR5D39
+         8KymYBA7IyPjv9hiSRzKufdI8OnLH/yxF1IG7koIzNvZkwmLDab5ZOL7DXiiYXlm/WnQ
+         /93Q==
+X-Gm-Message-State: ANoB5pnFKutC9XL5la0XyyEK6bH5hziqWfR0COlm2rB8EXo5NLcu/obU
+        tGU1cAx8yV+0X4znKp2pCJiHNvFuVf1tWLBtZt+7vyufG2nz8hOXIpgxJl/skVqsVd3aDrBZJoB
+        Vl8JPWKvZvznEZiVJHBaBCCk=
+X-Received: by 2002:a05:600c:43d6:b0:3cf:a856:ba2f with SMTP id f22-20020a05600c43d600b003cfa856ba2fmr54374398wmn.37.1670344813013;
+        Tue, 06 Dec 2022 08:40:13 -0800 (PST)
+X-Google-Smtp-Source: AA0mqf4NVS4Nr5mwzewnBswh2mp5LN3uIb1H6IjnbaF2zAiGYSd8n0GAdY9XUcgUa+xExhq9zeGgKw==
+X-Received: by 2002:a05:600c:43d6:b0:3cf:a856:ba2f with SMTP id f22-20020a05600c43d600b003cfa856ba2fmr54374381wmn.37.1670344812837;
+        Tue, 06 Dec 2022 08:40:12 -0800 (PST)
+Received: from redhat.com ([109.253.207.7])
+        by smtp.gmail.com with ESMTPSA id h20-20020a05600c351400b003c6cd82596esm29427965wmq.43.2022.12.06.08.40.08
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 06 Dec 2022 08:38:44 -0800 (PST)
-From:   Jinke Han <hanjinke.666@bytedance.com>
-X-Google-Original-From: Jinke Han <hnajinke.666@bytedance>
-To:     tj@kernel.org, josef@toxicpanda.com, axboe@kernel.dk
-Cc:     cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Jinke Han <hanjinke.666@bytedance.com>
-Subject: [RFC PATCH] blk-throtl: Introduce sync queue for write ios
-Date:   Wed,  7 Dec 2022 00:38:26 +0800
-Message-Id: <20221206163826.10700-1-hanjinke.666@bytedance.com>
-X-Mailer: git-send-email 2.32.0 (Apple Git-132)
+        Tue, 06 Dec 2022 08:40:12 -0800 (PST)
+Date:   Tue, 6 Dec 2022 11:40:06 -0500
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Stefan Hajnoczi <stefanha@redhat.com>
+Cc:     Alvaro Karsz <alvaro.karsz@solid-run.com>,
+        virtualization@lists.linux-foundation.org,
+        linux-block@vger.kernel.org, dm-devel@redhat.com,
+        linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org,
+        Jason Wang <jasowang@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jens Axboe <axboe@kernel.dk>
+Subject: Re: [PATCH v3] virtio_blk: add VIRTIO_BLK_F_LIFETIME feature support
+Message-ID: <20221206113744-mutt-send-email-mst@kernel.org>
+References: <20221205162035.2261037-1-alvaro.karsz@solid-run.com>
+ <Y49ucLGtCOtnbM0K@fedora>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Y49ucLGtCOtnbM0K@fedora>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Jinke Han <hanjinke.666@bytedance.com>
+On Tue, Dec 06, 2022 at 11:31:44AM -0500, Stefan Hajnoczi wrote:
+> On Mon, Dec 05, 2022 at 06:20:34PM +0200, Alvaro Karsz wrote:
+> 
+> I don't like that the ioctl lifetime struct is passed through
+> little-endian from the device to userspace. The point of this new ioctl
+> is not to be a passthrough interface. The kernel should define a proper
+> UABI struct for the ioctl and handle endianness conversion. But I think
+> Michael is happy with this approach, so nevermind.
+> 
+> > @@ -219,4 +247,8 @@ struct virtio_scsi_inhdr {
+> >  #define VIRTIO_BLK_S_OK		0
+> >  #define VIRTIO_BLK_S_IOERR	1
+> >  #define VIRTIO_BLK_S_UNSUPP	2
+> > +
+> > +/* Virtblk ioctl commands */
+> > +#define VBLK_GET_LIFETIME	_IOR('r', 0, struct virtio_blk_lifetime)
+> 
+> Does something include <linux/ioctl.h> for _IOR()? Failure to include
+> the necessary header file could break userspace applications that
+> include <linux/virtio_blk.h>.
+> 
+> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
-Now we don't distinguish sync write ios from normal buffer write ios
-in blk-throtl. A bio with REQ_SYNC tagged always mean it will be wait
-until write completion soon after it submit. So it's reasonable for sync
-io to complete as soon as possible.
+Good point. I think it's preferable to add a new header
+for this stuff. virtio_blk_ioctl.h ? Have that pull in linux/ioctl.h
+Also VIRTIO_BLK_IOCTL_GET_LIFETIME
+might be a better name to avoid confusion and collisions.
+And s/Virtblk/virtio-blk/
 
-In our test, fio writes a 100g file in sequential 4k blocksize in
-a container with low bps limit configured (wbps=10M). More than 1200
-ios were throttled in blk-throtl queue and the avarage throtle time
-of each io is 140s. At the same time, the operation of saving a small
-file by vim will be blocked amolst 140s. As a fsync will be send by vim,
-the sync ios of fsync will be blocked by a huge amount of buffer write
-ios ahead. This is also a priority inversion problem within one cgroup.
-In the database scene, things got really bad with blk-throtle enabled
-as fsync is called very often.
-
-This patch introduces a independent sync queue for write ios and gives
-a huge priority to sync write ios. I think it's a nice respond to the
-semantics of REQ_SYNC. Bios with REQ_META and REQ_PRIO gains the same
-priority as they are important to fs. This may avoid some potential
-priority inversion problems.
-
-Signed-off-by: Jinke Han <hanjinke.666@bytedance.com>
----
- block/blk-throttle.c | 83 ++++++++++++++++++++++++++++++++++++++++----
- block/blk-throttle.h |  9 ++++-
- 2 files changed, 85 insertions(+), 7 deletions(-)
-
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index 847721dc2b2b..5d290fb95f5a 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -21,6 +21,9 @@
- /* Total max dispatch from all groups in one round */
- #define THROTL_QUANTUM 32
- 
-+/* For write ios, dispatch 4 sync ios and 1 normal io in one loop */
-+#define THROTL_SYNC_FACTOR 4
-+
- /* Throttling is performed over a slice and after that slice is renewed */
- #define DFL_THROTL_SLICE_HD (HZ / 10)
- #define DFL_THROTL_SLICE_SSD (HZ / 50)
-@@ -241,11 +244,27 @@ static inline unsigned int throtl_bio_data_size(struct bio *bio)
- 	return bio->bi_iter.bi_size;
- }
- 
--static void throtl_qnode_init(struct throtl_qnode *qn, struct throtl_grp *tg)
-+static void throtl_qnode_init(struct throtl_qnode *qn, struct throtl_grp *tg,
-+			      bool rw)
- {
- 	INIT_LIST_HEAD(&qn->node);
- 	bio_list_init(&qn->bios);
-+	bio_list_init(&qn->sync_bios);
- 	qn->tg = tg;
-+	qn->dispatch_sync_cnt = (rw == READ) ? UINT_MAX : 0;
-+}
-+
-+#define BLK_THROTL_SYNC(bio) (bio->bi_opf & (REQ_SYNC | REQ_META | REQ_PRIO))
-+
-+static inline void throtl_qnode_add_bio_list(struct throtl_qnode *qn,
-+					     struct bio *bio)
-+{
-+	bool rw = bio_data_dir(bio);
-+
-+	if ((rw == WRITE) && (BLK_THROTL_SYNC(bio)))
-+		bio_list_add(&qn->sync_bios, bio);
-+	else
-+		bio_list_add(&qn->bios, bio);
- }
- 
- /**
-@@ -261,13 +280,34 @@ static void throtl_qnode_init(struct throtl_qnode *qn, struct throtl_grp *tg)
- static void throtl_qnode_add_bio(struct bio *bio, struct throtl_qnode *qn,
- 				 struct list_head *queued)
- {
--	bio_list_add(&qn->bios, bio);
-+	throtl_qnode_add_bio_list(qn, bio);
- 	if (list_empty(&qn->node)) {
- 		list_add_tail(&qn->node, queued);
- 		blkg_get(tg_to_blkg(qn->tg));
- 	}
- }
- 
-+static inline struct bio *throtl_qnode_bio_peek(struct throtl_qnode *qn)
-+{
-+	struct bio *bio1, *bio2;
-+
-+	/* qn for read ios */
-+	if (qn->dispatch_sync_cnt == UINT_MAX)
-+		return bio_list_peek(&qn->bios);
-+
-+	/* qn for write ios */
-+	bio1 = bio_list_peek(&qn->bios);
-+	bio2 = bio_list_peek(&qn->sync_bios);
-+
-+	if (bio1 && bio2) {
-+		if (qn->dispatch_sync_cnt == THROTL_SYNC_FACTOR)
-+			return bio1;
-+		return bio2;
-+	}
-+
-+	return bio1 ?: bio2;
-+}
-+
- /**
-  * throtl_peek_queued - peek the first bio on a qnode list
-  * @queued: the qnode list to peek
-@@ -281,11 +321,42 @@ static struct bio *throtl_peek_queued(struct list_head *queued)
- 		return NULL;
- 
- 	qn = list_first_entry(queued, struct throtl_qnode, node);
--	bio = bio_list_peek(&qn->bios);
-+	bio = throtl_qnode_bio_peek(qn);
- 	WARN_ON_ONCE(!bio);
- 	return bio;
- }
- 
-+static inline struct bio *throtl_qnode_bio_pop(struct throtl_qnode *qn)
-+{
-+	struct bio *bio;
-+
-+	/* qn for read ios */
-+	if (qn->dispatch_sync_cnt == UINT_MAX)
-+		return bio_list_pop(&qn->bios);
-+
-+	/* try to dispatch sync io */
-+	if (qn->dispatch_sync_cnt < THROTL_SYNC_FACTOR) {
-+		bio = bio_list_pop(&qn->sync_bios);
-+		if (bio) {
-+			qn->dispatch_sync_cnt++;
-+			return bio;
-+		}
-+		bio = bio_list_pop(&qn->bios);
-+		qn->dispatch_sync_cnt = 0;
-+		return bio;
-+	}
-+
-+	/* try to dispatch normal io */
-+	bio = bio_list_pop(&qn->bios);
-+	if (bio) {
-+		qn->dispatch_sync_cnt = 0;
-+		return bio;
-+	}
-+	bio = bio_list_pop(&qn->sync_bios);
-+
-+	return bio;
-+}
-+
- /**
-  * throtl_pop_queued - pop the first bio form a qnode list
-  * @queued: the qnode list to pop a bio from
-@@ -310,7 +381,7 @@ static struct bio *throtl_pop_queued(struct list_head *queued,
- 		return NULL;
- 
- 	qn = list_first_entry(queued, struct throtl_qnode, node);
--	bio = bio_list_pop(&qn->bios);
-+	bio = throtl_qnode_bio_pop(qn);
- 	WARN_ON_ONCE(!bio);
- 
- 	if (bio_list_empty(&qn->bios)) {
-@@ -355,8 +426,8 @@ static struct blkg_policy_data *throtl_pd_alloc(gfp_t gfp,
- 	throtl_service_queue_init(&tg->service_queue);
- 
- 	for (rw = READ; rw <= WRITE; rw++) {
--		throtl_qnode_init(&tg->qnode_on_self[rw], tg);
--		throtl_qnode_init(&tg->qnode_on_parent[rw], tg);
-+		throtl_qnode_init(&tg->qnode_on_self[rw], tg, rw);
-+		throtl_qnode_init(&tg->qnode_on_parent[rw], tg, rw);
- 	}
- 
- 	RB_CLEAR_NODE(&tg->rb_node);
-diff --git a/block/blk-throttle.h b/block/blk-throttle.h
-index ef4b7a4de987..6a857c9420f9 100644
---- a/block/blk-throttle.h
-+++ b/block/blk-throttle.h
-@@ -28,8 +28,15 @@
-  */
- struct throtl_qnode {
- 	struct list_head	node;		/* service_queue->queued[] */
--	struct bio_list		bios;		/* queued bios */
-+	struct bio_list		bios;		/* queued normal bios */
-+	struct bio_list		sync_bios;	/* queued sync write bios */
- 	struct throtl_grp	*tg;		/* tg this qnode belongs to */
-+
-+	/*
-+	 * [0, THROTL_SYNC_FACTOR-1] dispatch sync io, THROTL_SYNC_FACTOR
-+	 * dispatch normal io
-+	 */
-+	unsigned int dispatch_sync_cnt;         /* sync io dispatch counter */
- };
- 
- struct throtl_service_queue {
 -- 
-2.20.1
+MST
 
