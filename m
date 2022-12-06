@@ -2,109 +2,83 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 375A6C3A5A7
-	for <linux-block@archiver.kernel.org>; Tue,  6 Dec 2022 16:42:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D44E8C352A1
+	for <linux-block@archiver.kernel.org>; Tue,  6 Dec 2022 17:19:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233884AbiLFQmX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 6 Dec 2022 11:42:23 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54194 "EHLO
+        id S234435AbiLFRTc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 6 Dec 2022 12:19:32 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53998 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235741AbiLFQl7 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 6 Dec 2022 11:41:59 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61438CE8
-        for <linux-block@vger.kernel.org>; Tue,  6 Dec 2022 08:40:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1670344816;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=6ge3pwq/JlMlTkSjEGqqkwIK42+btCPQr7/pr8xaxyc=;
-        b=DeK9UUHZA+NXpCyFrPUwn6263SV/bUmTLRlrUJ8KotrAoWMmNl+8u1ulmJYs6jnpZft6hB
-        XHBdm8APdFuzvY2ltJ4AUVtLXA7HncFGNU3pTL8xUDEEdBpbeO7bXVf6lnAtNpFTWCEcEq
-        dmKTTqStNT2VVesIDxjFj4Qm7WWYQ68=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-591-2nWASnlaOYe0PE9zI87BYQ-1; Tue, 06 Dec 2022 11:40:14 -0500
-X-MC-Unique: 2nWASnlaOYe0PE9zI87BYQ-1
-Received: by mail-wr1-f70.google.com with SMTP id k1-20020adfb341000000b0024215e0f486so3405582wrd.21
-        for <linux-block@vger.kernel.org>; Tue, 06 Dec 2022 08:40:13 -0800 (PST)
+        with ESMTP id S234414AbiLFRTb (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 6 Dec 2022 12:19:31 -0500
+Received: from mail-il1-x12b.google.com (mail-il1-x12b.google.com [IPv6:2607:f8b0:4864:20::12b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F30F9326EB
+        for <linux-block@vger.kernel.org>; Tue,  6 Dec 2022 09:19:30 -0800 (PST)
+Received: by mail-il1-x12b.google.com with SMTP id a18so4251646ilk.9
+        for <linux-block@vger.kernel.org>; Tue, 06 Dec 2022 09:19:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=4oCNEDNpGcaI2Aj5VMbDsaBAOnGUQv0gPAyadqC7Wu4=;
+        b=Wz9CseKxzzVvT9R4Qxvx6tSE3Sr5Qizdya0/jSyc0v2aaoNGKrFPtw+IFZVY3CoKmR
+         6wOSW4GpL+0IZ48Nfq0PE7Jd5qJu5UC+itK2LuV0h7U8q9bHNtIg+CaiMwR5UETfhy+/
+         zxny0Z1nFI72vrjLVLT6YFAXqyVc+C4ckLGgcG0bp3EfdOsniL/XR8sNau1ukqPkpIvY
+         UnLtGh1hqyZZWvCM8brC5Kzvnjppm0WRFkCHCDwvcxNvM7mbLSXHGjmPtq85vQyF3Hm9
+         RPKc7mZuT1zRmYPRA9l9m6xztmxMpyrEyps6j/p9sOu6wmyAoLX5t0Oy5/rUPvH9pyJF
+         eoNQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6ge3pwq/JlMlTkSjEGqqkwIK42+btCPQr7/pr8xaxyc=;
-        b=zpQpVV3nJt4Zf4HG8/dxPBpQ+sQZX2tr8Rlz6Yd7KJcOTqEIvNHY3/5iq1eAnq7Kt8
-         cf6ZKbG8k7a7PiLoKR4tuYB8eZdyMJL9Lj8Wcyr0ooxiN29qiunMXwOhBq3GKRzM1PO8
-         twg1IuxetyAOdBD3jObujir0whyi2yA3Un1m8cqXzsNJ8XLya8sx011rK3F8aGQZZm8q
-         Cu6BDbHqdDRhGgIuor7moLZXX/w4Q1v1yk2/o03UfEBHx1j63TrEcmq6K4vpgzbR5D39
-         8KymYBA7IyPjv9hiSRzKufdI8OnLH/yxF1IG7koIzNvZkwmLDab5ZOL7DXiiYXlm/WnQ
-         /93Q==
-X-Gm-Message-State: ANoB5pnFKutC9XL5la0XyyEK6bH5hziqWfR0COlm2rB8EXo5NLcu/obU
-        tGU1cAx8yV+0X4znKp2pCJiHNvFuVf1tWLBtZt+7vyufG2nz8hOXIpgxJl/skVqsVd3aDrBZJoB
-        Vl8JPWKvZvznEZiVJHBaBCCk=
-X-Received: by 2002:a05:600c:43d6:b0:3cf:a856:ba2f with SMTP id f22-20020a05600c43d600b003cfa856ba2fmr54374398wmn.37.1670344813013;
-        Tue, 06 Dec 2022 08:40:13 -0800 (PST)
-X-Google-Smtp-Source: AA0mqf4NVS4Nr5mwzewnBswh2mp5LN3uIb1H6IjnbaF2zAiGYSd8n0GAdY9XUcgUa+xExhq9zeGgKw==
-X-Received: by 2002:a05:600c:43d6:b0:3cf:a856:ba2f with SMTP id f22-20020a05600c43d600b003cfa856ba2fmr54374381wmn.37.1670344812837;
-        Tue, 06 Dec 2022 08:40:12 -0800 (PST)
-Received: from redhat.com ([109.253.207.7])
-        by smtp.gmail.com with ESMTPSA id h20-20020a05600c351400b003c6cd82596esm29427965wmq.43.2022.12.06.08.40.08
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=4oCNEDNpGcaI2Aj5VMbDsaBAOnGUQv0gPAyadqC7Wu4=;
+        b=k9x5IvwQQrKNr0tlmNNzltx2tVipxw+T4RgCCZO3YvQ13yTeOhmrxHravH8sS/NvJB
+         js2C5/t5KqG9siHEcyQaQgXvxSd3MtKvbLh2qDsvtg4OMx1CU3NGOn3JvmP1LyvYYqhy
+         EAqns6z57hqY/9Cqm8GyePDpHi18JnORz8qBqURJ4CHxAVEl2d176u6SBVF7/O1M2qhJ
+         Juc1CSXPf/3BTC9Bt+7tY20D7BlD+zy2MRLak36I73vuWEXCZzcxkwiCGugHikFL/76c
+         rvtxqRDzJnViQVQgYBXcAlKVz2kmo5uWH1cWJtXm87y6DedVeuUBN/xZbJ07MuUIp/wL
+         YhUg==
+X-Gm-Message-State: ANoB5plfKcSIKxc30/hoKCDbGMZJ9JItKkhVjOGa1sNh7Dyh+8ifwlwh
+        E+JCx8PzuIjY6t3vg6q1JHr5gREFxDzprUlEOik=
+X-Google-Smtp-Source: AA0mqf5Cidrser6tiSvWBkr4gK7QPwxmKSMGCKUsyvTmQ2yPXYL9dF7uvErDCBy8BDPyEJp/vVCC8g==
+X-Received: by 2002:a05:6e02:78b:b0:303:ab9:9c93 with SMTP id q11-20020a056e02078b00b003030ab99c93mr21100756ils.111.1670347170090;
+        Tue, 06 Dec 2022 09:19:30 -0800 (PST)
+Received: from [127.0.0.1] ([207.135.234.126])
+        by smtp.gmail.com with ESMTPSA id f3-20020a05660215c300b006dfd3599b60sm6592323iow.26.2022.12.06.09.19.29
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 06 Dec 2022 08:40:12 -0800 (PST)
-Date:   Tue, 6 Dec 2022 11:40:06 -0500
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Stefan Hajnoczi <stefanha@redhat.com>
-Cc:     Alvaro Karsz <alvaro.karsz@solid-run.com>,
-        virtualization@lists.linux-foundation.org,
-        linux-block@vger.kernel.org, dm-devel@redhat.com,
-        linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org,
-        Jason Wang <jasowang@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jens Axboe <axboe@kernel.dk>
-Subject: Re: [PATCH v3] virtio_blk: add VIRTIO_BLK_F_LIFETIME feature support
-Message-ID: <20221206113744-mutt-send-email-mst@kernel.org>
-References: <20221205162035.2261037-1-alvaro.karsz@solid-run.com>
- <Y49ucLGtCOtnbM0K@fedora>
+        Tue, 06 Dec 2022 09:19:29 -0800 (PST)
+From:   Jens Axboe <axboe@kernel.dk>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     linux-block@vger.kernel.org
+In-Reply-To: <20221206144407.722049-1-hch@lst.de>
+References: <20221206144407.722049-1-hch@lst.de>
+Subject: Re: [PATCH] block: bio_copy_data_iter
+Message-Id: <167034716943.332019.15368410495932137707.b4-ty@kernel.dk>
+Date:   Tue, 06 Dec 2022 10:19:29 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Y49ucLGtCOtnbM0K@fedora>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.11.0-dev-50ba3
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Dec 06, 2022 at 11:31:44AM -0500, Stefan Hajnoczi wrote:
-> On Mon, Dec 05, 2022 at 06:20:34PM +0200, Alvaro Karsz wrote:
-> 
-> I don't like that the ioctl lifetime struct is passed through
-> little-endian from the device to userspace. The point of this new ioctl
-> is not to be a passthrough interface. The kernel should define a proper
-> UABI struct for the ioctl and handle endianness conversion. But I think
-> Michael is happy with this approach, so nevermind.
-> 
-> > @@ -219,4 +247,8 @@ struct virtio_scsi_inhdr {
-> >  #define VIRTIO_BLK_S_OK		0
-> >  #define VIRTIO_BLK_S_IOERR	1
-> >  #define VIRTIO_BLK_S_UNSUPP	2
-> > +
-> > +/* Virtblk ioctl commands */
-> > +#define VBLK_GET_LIFETIME	_IOR('r', 0, struct virtio_blk_lifetime)
-> 
-> Does something include <linux/ioctl.h> for _IOR()? Failure to include
-> the necessary header file could break userspace applications that
-> include <linux/virtio_blk.h>.
-> 
-> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
-Good point. I think it's preferable to add a new header
-for this stuff. virtio_blk_ioctl.h ? Have that pull in linux/ioctl.h
-Also VIRTIO_BLK_IOCTL_GET_LIFETIME
-might be a better name to avoid confusion and collisions.
-And s/Virtblk/virtio-blk/
+On Tue, 06 Dec 2022 15:44:07 +0100, Christoph Hellwig wrote:
+> With the pktcdvdv removal, bio_copy_data_iter is unused now.  Fold the
+> logic into bio_copy_data and remove the separate lower level function.
+> 
+> 
 
+Applied, thanks!
+
+[1/1] block: bio_copy_data_iter
+      commit: db1c7d77976775483a8ef240b4c705f113e13ea1
+
+Best regards,
 -- 
-MST
+Jens Axboe
+
 
