@@ -2,132 +2,157 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7383FC352A1
-	for <linux-block@archiver.kernel.org>; Tue,  6 Dec 2022 07:53:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 002ACC3A5A7
+	for <linux-block@archiver.kernel.org>; Tue,  6 Dec 2022 08:00:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229690AbiLFHxj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 6 Dec 2022 02:53:39 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34854 "EHLO
+        id S231869AbiLFIAc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 6 Dec 2022 03:00:32 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38434 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229461AbiLFHxi (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 6 Dec 2022 02:53:38 -0500
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD42D14019;
-        Mon,  5 Dec 2022 23:53:36 -0800 (PST)
-Received: from mail02.huawei.com (unknown [172.30.67.153])
-        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4NRCMv2CJhz4f3mTF;
-        Tue,  6 Dec 2022 15:53:31 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-        by APP1 (Coremail) with SMTP id cCh0CgAXwa_79I5jZb6VBg--.47464S3;
-        Tue, 06 Dec 2022 15:53:33 +0800 (CST)
-Subject: Re: [PATCH -next v2 7/9] blk-iocost: fix UAF in ioc_pd_free
-To:     Tejun Heo <tj@kernel.org>, Li Nan <linan122@huawei.com>
-Cc:     josef@toxicpanda.com, axboe@kernel.dk, cgroups@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        yi.zhang@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
-References: <20221130132156.2836184-1-linan122@huawei.com>
- <20221130132156.2836184-8-linan122@huawei.com>
- <Y4fAJpKcVL7Q9hgY@slm.duckdns.org>
-From:   Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <aa924294-2f54-1b53-fc6e-e4f8fa019b14@huaweicloud.com>
-Date:   Tue, 6 Dec 2022 15:53:31 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
-MIME-Version: 1.0
-In-Reply-To: <Y4fAJpKcVL7Q9hgY@slm.duckdns.org>
-Content-Type: text/plain; charset=gbk; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: cCh0CgAXwa_79I5jZb6VBg--.47464S3
-X-Coremail-Antispam: 1UD129KBjvJXoW7uFW7uF4fXry7ZFWUJr4Utwb_yoW8WryDpF
-        WfGa1rKFZ5JFs7Can0qw12vFySgF4Dtr1UGr4fKrZxKF43Jr9Yqr4fZFWYkFZ8KFn8WrWY
-        vrn7WF1kG3WUAw7anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUyEb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
-        6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-        vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7Cj
-        xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
-        0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
-        6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
-        Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JMxk0xIA0c2IEe2xFo4CEbIxvr21l42xK82IYc2Ij
-        64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x
-        8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE
-        2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42
-        xK8VAvwI8IcIk0rVWrZr1j6s0DMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIE
-        c7CjxVAFwI0_Jr0_GrUvcSsGvfC2KfnxnUUI43ZEXa7IU1zuWJUUUUU==
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
-X-CFilter-Loop: Reflected
+        with ESMTP id S231866AbiLFIAa (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 6 Dec 2022 03:00:30 -0500
+Received: from mail-ed1-x530.google.com (mail-ed1-x530.google.com [IPv6:2a00:1450:4864:20::530])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 11CBF11831
+        for <linux-block@vger.kernel.org>; Tue,  6 Dec 2022 00:00:28 -0800 (PST)
+Received: by mail-ed1-x530.google.com with SMTP id a16so19115803edb.9
+        for <linux-block@vger.kernel.org>; Tue, 06 Dec 2022 00:00:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ep5DwQubDegymOyENqeDtmNucgK1obqpX2IeGsm5/9E=;
+        b=G/PhRItAnRXVFsLh+fcpOARTY6iJ2HnFhVRKBx0D0zeonK5sRBJa1RyGWLkd1By2XC
+         +NkUwwyqBHUgpOmIM3VbsoOI+xuCh0R9wENHUlfxz12A+49E/zI+KxxoGjcAd7U4+1IK
+         lpGaMfL8JCaN0LhCSTelxLQdKiJTzj9z2nEKMruIbZCEEwCwiN5lkaX2LmbjXhdQ8P0y
+         BlxpulTpQiOFOD2iOxsEk+Rpe+xskhHlR2m+86fKHE/otTkEcMxee0yjeRaAHyDWhfs2
+         k0HxEPZa+Qr0Fb5qek2/+Ool5sj4UNnz+7yvV5VzW95mHsazB4mleWWQMgR/NjOJGJlQ
+         fSiA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ep5DwQubDegymOyENqeDtmNucgK1obqpX2IeGsm5/9E=;
+        b=rUvC7c+rsSg/86GVhbQfAmMz/zI8zl/6BoNERbeDgQAaX5I1X37YUYQRZCTYaMPQJ3
+         /ZrL+UCa041pg+LpWOP9RFMQxFC8nHEhl3+eYjavuewLTxNRC/m27WsSLu0MAlY2riLS
+         GnN54yzZ+MhkZvFZet/XgRCrSTY81kbKsRn7I/GgKXTznT4LZTr7tqEzjoMeaaY5iaIX
+         ZIhLvTQRAyqd8uA5snUsIsyvbn75noTIsc7RoWGux7XeDg1PWj+8LORcerjPjY36YYlf
+         Za8e55Ahx3CiI37p5ukDXkLdULZHcWVkrYlDe9neuxA51k7A28TcOP61NQmXDFpw515w
+         ZZzg==
+X-Gm-Message-State: ANoB5pmmvyf2aMtBmG1HZ4FjX/fU6Gx7s3pUdn2vhuiJQq0xXA57/AYW
+        qymWezhuzQWT3bOhy3PMj3a1tw==
+X-Google-Smtp-Source: AA0mqf5c6Hc1ac1Itcq09k7TTOKGYU1QiwkRuw3Vn378c8ftuGgeVyGWWdqI6tta0kV3ZnRJwBYsag==
+X-Received: by 2002:a05:6402:4c2:b0:46c:d5a8:b0ac with SMTP id n2-20020a05640204c200b0046cd5a8b0acmr5294383edw.226.1670313626564;
+        Tue, 06 Dec 2022 00:00:26 -0800 (PST)
+Received: from mbp-di-paolo.station (net-2-35-55-161.cust.vodafonedsl.it. [2.35.55.161])
+        by smtp.gmail.com with ESMTPSA id my48-20020a1709065a7000b007c0d64c1886sm3784586ejc.33.2022.12.06.00.00.25
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 06 Dec 2022 00:00:26 -0800 (PST)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
+Subject: Re: [PATCH V6 4/8] block, bfq: turn bfqq_data into an array in
+ bfq_io_cq
+From:   Paolo Valente <paolo.valente@linaro.org>
+In-Reply-To: <3ec70cff-f1bc-1a45-a4db-10bb1d0e6266@opensource.wdc.com>
+Date:   Tue, 6 Dec 2022 09:00:22 +0100
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        linux-block <linux-block@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        Arie van der Hoeven <arie.vanderhoeven@seagate.com>,
+        Rory Chen <rory.c.chen@seagate.com>,
+        Gabriele Felici <felicigb@gmail.com>,
+        Gianmarco Lusvardi <glusvardi@posteo.net>,
+        Giulio Barabino <giuliobarabino99@gmail.com>,
+        Emiliano Maccaferri <inbox@emilianomaccaferri.com>
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <9548A61A-7DEA-4FB2-85AE-0B75417B4B9E@linaro.org>
+References: <20221103162623.10286-1-paolo.valente@linaro.org>
+ <20221103162623.10286-5-paolo.valente@linaro.org>
+ <3ec70cff-f1bc-1a45-a4db-10bb1d0e6266@opensource.wdc.com>
+To:     Damien Le Moal <damien.lemoal@opensource.wdc.com>
+X-Mailer: Apple Mail (2.3445.104.11)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi, Tejun!
 
-ÔÚ 2022/12/01 4:42, Tejun Heo Ð´µÀ:
-> On Wed, Nov 30, 2022 at 09:21:54PM +0800, Li Nan wrote:
->> 	T1		     T2			T3
->>    //delete device
->>    del_gendisk
->>     bdi_unregister
->>      bdi_remove_from_list
->>       synchronize_rcu_expedited
->>
->> 		         //rmdir cgroup
->> 		         blkcg_destroy_blkgs
->> 		          blkg_destroy
->> 		           percpu_ref_kill
->> 		            blkg_release
->> 		             call_rcu
->>     rq_qos_exit
->>      ioc_rqos_exit
->>       kfree(ioc)
->> 					   __blkg_release
->> 					    blkg_free
->> 					     blkg_free_workfn
->> 					      pd_free_fn
->> 					       ioc_pd_free
->> 						spin_lock_irqsave
->> 						 ->ioc is freed
->>
->> Fix the problem by moving the operation on ioc in ioc_pd_free() to
->> ioc_pd_offline(), and just free resource in ioc_pd_free() like iolatency
->> and throttle.
->>
->> Signed-off-by: Li Nan <linan122@huawei.com>
-> 
-> I wonder what we really wanna do is pinning ioc while blkgs are still around
-> but I think this should work too.
-> 
 
-I just found that this is not enough, other problems still exist:
+> Il giorno 21 nov 2022, alle ore 01:39, Damien Le Moal =
+<damien.lemoal@opensource.wdc.com> ha scritto:
+...
+>>=20
+>> 			bfqq =3D bfq_split_bfqq(bic, bfqq);
+>> 			split =3D true;
+>> diff --git a/block/bfq-iosched.h b/block/bfq-iosched.h
+>> index f2e8ab91951c..e27897d66a0f 100644
+>> --- a/block/bfq-iosched.h
+>> +++ b/block/bfq-iosched.h
+>> @@ -416,7 +416,7 @@ struct bfq_queue {
+>> struct bfq_iocq_bfqq_data {
+>> 	/*
+>> 	 * Snapshot of the has_short_time flag before merging; taken
+>> -	 * to remember its value while the queue is merged, so as to
+>> +	 * to remember its values while the queue is merged, so as to
+>> 	 * be able to restore it in case of split.
+>> 	 */
+>> 	bool saved_has_short_ttime;
+>> @@ -430,7 +430,7 @@ struct bfq_iocq_bfqq_data {
+>> 	u64 saved_tot_idle_time;
+>>=20
+>> 	/*
+>> -	 * Same purpose as the previous fields for the value of the
+>> +	 * Same purpose as the previous fields for the values of the
+>> 	 * field keeping the queue's belonging to a large burst
+>> 	 */
+>> 	bool saved_in_large_burst;
+>> @@ -493,8 +493,12 @@ struct bfq_io_cq {
+>> 	uint64_t blkcg_serial_nr; /* the current blkcg serial */
+>> #endif
+>>=20
+>> -	/* persistent data for associated synchronous process queue */
+>> -	struct bfq_iocq_bfqq_data bfqq_data;
+>> +	/*
+>> +	 * Persistent data for associated synchronous process queues
+>> +	 * (one queue per actuator, see field bfqq above). In
+>> +	 * particular, each of these queues may undergo a merge.
+>> +	 */
+>> +	struct bfq_iocq_bfqq_data bfqq_data[BFQ_MAX_ACTUATORS];
+>=20
+> I wonder if packing this together with struct bfq_queue would be =
+cleaner.
+> That would avoid the 2 arrays you have in this struct. Something like =
+this:
+>=20
+> struct bfq_queue_data {
+> 	struct bfq_queue 	*bfqq[2];
+> 	struct bfq_iocq_bfqq_data iocq_data;
+> }
+>=20
+> struct bfq_io_cq {
+> 	...
+> 	struct bfq_queue_data bfqqd[BFQ_MAX_ACTUATORS];
+> 	...
+> }
+>=20
+> Thinking aloud here. That may actually make the code more complicated.
 
-t1:		
-bio_init
-  bio_associate_blkg
-   //get blkg->refcnt
-......
-submit_bio
-  blk_throtl_bio
-  // bio is throttlled, user thread can exit
-  			t2:
-			// blkcg online_pin is zero
-			blkcg_destroy_blkgs
-			 blkg_destroy
-			  ioc_pd_offline
-			   list_del_init(&iocg->active_list)
-t3:
-ioc_rqos_throttle
-  blkg_to_iocg
-  // got the iocg that is offlined
-   iocg_activate
-   // acitvate the iocg again
+I see your point, but, yes, this change would entail one more
+indirection when accessing queues from io contexts.
 
-For consequence, kernel can crash due to access unexpected
-address. Fortunately, bfq already handle similar problem by checking
-blkg->online in bfq_bio_bfqg(), this problem can be fixed by checking
-it in iocg_activate().
-
-BTW, I'm still working on checking if other policies have the same
-problem.
+Apart from this, I have applied all of your other suggestions here.
 
 Thanks,
-Kuai
+Paolo
+
+>=20
+>>=20
+>> 	unsigned int requests;	/* Number of requests this process has =
+in flight */
+>> };
+>=20
+> --=20
+> Damien Le Moal
+> Western Digital Research
 
