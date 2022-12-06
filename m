@@ -2,177 +2,283 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 991E5C352A1
-	for <linux-block@archiver.kernel.org>; Tue,  6 Dec 2022 14:12:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B3719C352A1
+	for <linux-block@archiver.kernel.org>; Tue,  6 Dec 2022 14:41:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234765AbiLFOMV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 6 Dec 2022 09:12:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57158 "EHLO
+        id S233849AbiLFOlJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 6 Dec 2022 09:41:09 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42644 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234758AbiLFOMU (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 6 Dec 2022 09:12:20 -0500
-Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E2C502CE18
-        for <linux-block@vger.kernel.org>; Tue,  6 Dec 2022 06:12:17 -0800 (PST)
-Received: by mail-pj1-x1029.google.com with SMTP id q17-20020a17090aa01100b002194cba32e9so18155675pjp.1
-        for <linux-block@vger.kernel.org>; Tue, 06 Dec 2022 06:12:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=EEhiuW2gArhGYCSskmAetNey/HHBVPNeAnM+tUNOGWM=;
-        b=YAzn0NHmdbqwon7yA6Fo1RYOBgm2BTRRm6EJWFdOL1W5dB2EdmrH5UkeX7ZhsbyR1E
-         DAtAuU1OCDOimtKrdpRSZrvTv9xSNl0AIa00uMhiPXihv4wDh9LYA2N1yd3R3izb3QVr
-         n7hpJr+N0xihNpDIyGTmBzKptBmNl07IKJl9XmPM574D07Akdswkhge590FfPY71sisH
-         goBFCm+wdGik6Qule0/XAznpf47x3okrTO3fT3LACABsgolJTPoGtosD5mgU9Odw+c+E
-         W1sB4Lq8sxzFTnbxNMWx32GPu2x9xfmDtapwYsBdlOqCdx7tI9y1Dlmx9tD32t3Zj3Ml
-         jQcg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=EEhiuW2gArhGYCSskmAetNey/HHBVPNeAnM+tUNOGWM=;
-        b=6P5hm0tf+hP8CIM7qleU/EIev7agKdsIRw106J+vEe5zfe7RlTTOjVKGeL3q8/EbS3
-         3NZcfYNxTzGndwYnFuV2hUWT8QF6Zec94rfVgx/eobEcMXg901ZY+5aWBdec666oyqtR
-         RZMxKCR3O9+V3Hq/NSFVBcFlO5Tt0Flj68jLWKIxlB5sK16Pyv0QEs2us106DwdXN6cS
-         L0AkiEgyWFFtbh33H9H0/bIIMizRTYy9In9upyDjOiH6Yj3FBfYKm4yROUeXJmHcNJz3
-         rH2ECFhqZHZjta2hrkjYAjDhjwXqRpYT8BmlaKJa7+eBi7nI66MCYurBEhJOya1t+x9J
-         sA2Q==
-X-Gm-Message-State: ANoB5pmzubrgMkzEyaPaMqjKZ18wLmbG9k5vcroMt7gGLg5uRKuWw3gN
-        hXKmxBXqiiNwjkA0Mc+nCho=
-X-Google-Smtp-Source: AA0mqf5ifQnIEWDTnItBjrVO3oTIfJn3X/DJofogVO7Y5EaU0HvuxDZsPjGYiGxYc5wCBxyE415Sbg==
-X-Received: by 2002:a17:90b:4d0b:b0:214:1329:dec7 with SMTP id mw11-20020a17090b4d0b00b002141329dec7mr101284953pjb.91.1670335937419;
-        Tue, 06 Dec 2022 06:12:17 -0800 (PST)
-Received: from localhost.localdomain ([114.200.4.15])
-        by smtp.googlemail.com with ESMTPSA id nn6-20020a17090b38c600b001df264610c4sm2282978pjb.0.2022.12.06.06.12.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 06 Dec 2022 06:12:16 -0800 (PST)
-From:   Suwan Kim <suwan.kim027@gmail.com>
-To:     mst@redhat.com, jasowang@redhat.com, stefanha@redhat.com,
-        pbonzini@redhat.com, hch@infradead.org, axboe@kernel.dk
-Cc:     virtualization@lists.linux-foundation.org,
-        linux-block@vger.kernel.org, Suwan Kim <suwan.kim027@gmail.com>
-Subject: [PATCH 2/2] virtio-blk: support completion batching for the IRQ path
-Date:   Tue,  6 Dec 2022 23:11:25 +0900
-Message-Id: <20221206141125.93055-2-suwan.kim027@gmail.com>
-X-Mailer: git-send-email 2.26.3
-In-Reply-To: <20221206141125.93055-1-suwan.kim027@gmail.com>
-References: <20221206141125.93055-1-suwan.kim027@gmail.com>
+        with ESMTP id S231272AbiLFOlI (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 6 Dec 2022 09:41:08 -0500
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 514AB1275E;
+        Tue,  6 Dec 2022 06:41:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+        Content-ID:Content-Description:In-Reply-To:References;
+        bh=3bLqs13PpyfTzvuG10t33NPo/Pm8V+s3TDruy9c4hbQ=; b=Ei+Uu6m5C0p3u7YW58rqYm0UHN
+        rMI5Ab2YO+y6sokCnWoS3FTZQrruPq3ai4SzcX9/Atp/xauNuT1Vddf1CEllEH7Zw+CUP85/zoloo
+        8V7RfS38GPvVsihNpCHM6KmLcXjIOjM5iwPk2Bt7jzmYST8oqlQ7Gk5QABMAKaoEyBz478h1RaggM
+        uEK/5WMppqCTllhZ1yA/sl9+AvANhD0caH2tNo9HLAnbhh8BHETfPo/eh+empfRUJUF65xcj80l1o
+        Cifrgq1Wrm3Si1iaV2U+gg4AqWFSU2/D/BJZrYfC+0E+prGeumWK/lFQ9kirIK4vGp7YIBbnIiYaA
+        zIXndYyg==;
+Received: from [2001:4bb8:19a:6deb:96e2:518:dd92:8fb1] (helo=localhost)
+        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1p2Z7z-00BJhE-SS; Tue, 06 Dec 2022 14:41:00 +0000
+From:   Christoph Hellwig <hch@lst.de>
+To:     axboe@kernel.dk, snitzer@kernel.org
+Cc:     colyli@suse.de, song@kernel.org, linux-block@vger.kernel.org,
+        linux-raid@vger.kernel.org, linux-bcache@vger.kernel.org,
+        dm-devel@redhat.com
+Subject: [PATCH] block: remove bio_set_op_attrs
+Date:   Tue,  6 Dec 2022 15:40:57 +0100
+Message-Id: <20221206144057.720846-1-hch@lst.de>
+X-Mailer: git-send-email 2.35.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This patch adds completion batching to the IRQ path. It reuses batch
-completion code of virtblk_poll(). It collects requests to io_comp_batch
-and processes them all at once. It can boost up the performance by 2%.
+This macro is obsolete, so replace the last few uses with open coded
+bi_opf assignments.
 
-To validate the performance improvement and stabilty, I did fio test with
-4 vCPU VM and 12 vCPU VM respectively. Both VMs have 8GB ram and the same
-number of HW queues as vCPU.
-The fio cammad is as follows and I ran the fio 5 times and got IOPS average.
-(io_uring, randread, direct=1, bs=512, iodepth=64 numjobs=2,4)
-
-Test result shows about 2% improvement.
-
-           4 vcpu VM       |   numjobs=2   |   numjobs=4
-      -----------------------------------------------------------
-        fio without patch  |  367.2K IOPS  |   397.6K IOPS
-      -----------------------------------------------------------
-        fio with patch     |  372.8K IOPS  |   407.7K IOPS
-
-           12 vcpu VM      |   numjobs=2   |   numjobs=4
-      -----------------------------------------------------------
-        fio without patch  |  363.6K IOPS  |   374.8K IOPS
-      -----------------------------------------------------------
-        fio with patch     |  373.8K IOPS  |   385.3K IOPS
-
-Signed-off-by: Suwan Kim <suwan.kim027@gmail.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- drivers/block/virtio_blk.c | 38 +++++++++++++++++++++++---------------
- 1 file changed, 23 insertions(+), 15 deletions(-)
+ drivers/md/bcache/movinggc.c  |  2 +-
+ drivers/md/bcache/request.c   |  2 +-
+ drivers/md/bcache/writeback.c |  4 ++--
+ drivers/md/dm-thin.c          |  2 +-
+ drivers/md/raid1.c            | 12 ++++++------
+ drivers/md/raid10.c           | 18 +++++++++---------
+ include/linux/blk_types.h     |  7 -------
+ 7 files changed, 20 insertions(+), 27 deletions(-)
 
-diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-index cf64d256787e..48fcf745f007 100644
---- a/drivers/block/virtio_blk.c
-+++ b/drivers/block/virtio_blk.c
-@@ -272,6 +272,18 @@ static inline void virtblk_request_done(struct request *req)
- 	blk_mq_end_request(req, virtblk_result(vbr));
- }
+diff --git a/drivers/md/bcache/movinggc.c b/drivers/md/bcache/movinggc.c
+index 99499d1f6e6666..9f32901fdad102 100644
+--- a/drivers/md/bcache/movinggc.c
++++ b/drivers/md/bcache/movinggc.c
+@@ -160,7 +160,7 @@ static void read_moving(struct cache_set *c)
+ 		moving_init(io);
+ 		bio = &io->bio.bio;
  
-+static void virtblk_complete_batch(struct io_comp_batch *iob)
-+{
-+	struct request *req;
-+
-+	rq_list_for_each(&iob->req_list, req) {
-+		virtblk_unmap_data(req, blk_mq_rq_to_pdu(req));
-+		virtblk_cleanup_cmd(req);
-+		blk_mq_set_request_complete(req);
-+	}
-+	blk_mq_end_request_batch(iob);
-+}
-+
- static void virtblk_done(struct virtqueue *vq)
- {
- 	struct virtio_blk *vblk = vq->vdev->priv;
-@@ -280,6 +292,7 @@ static void virtblk_done(struct virtqueue *vq)
- 	struct virtblk_req *vbr;
- 	unsigned long flags;
- 	unsigned int len;
-+	DEFINE_IO_COMP_BATCH(iob);
+-		bio_set_op_attrs(bio, REQ_OP_READ, 0);
++		bio->bi_opf = REQ_OP_READ;
+ 		bio->bi_end_io	= read_moving_endio;
  
- 	spin_lock_irqsave(&vblk->vqs[qid].lock, flags);
- 	do {
-@@ -287,7 +300,9 @@ static void virtblk_done(struct virtqueue *vq)
- 		while ((vbr = virtqueue_get_buf(vblk->vqs[qid].vq, &len)) != NULL) {
- 			struct request *req = blk_mq_rq_from_pdu(vbr);
+ 		if (bch_bio_alloc_pages(bio, GFP_KERNEL))
+diff --git a/drivers/md/bcache/request.c b/drivers/md/bcache/request.c
+index 3427555b0ccae4..39c7b607f8aad8 100644
+--- a/drivers/md/bcache/request.c
++++ b/drivers/md/bcache/request.c
+@@ -244,7 +244,7 @@ static void bch_data_insert_start(struct closure *cl)
+ 		trace_bcache_cache_insert(k);
+ 		bch_keylist_push(&op->insert_keys);
  
--			if (likely(!blk_should_fake_timeout(req->q)))
-+			if (likely(!blk_should_fake_timeout(req->q)) &&
-+				!blk_mq_add_to_batch(req, &iob, vbr->status,
-+							virtblk_complete_batch))
- 				blk_mq_complete_request(req);
- 			req_done = true;
- 		}
-@@ -295,9 +310,14 @@ static void virtblk_done(struct virtqueue *vq)
- 			break;
- 	} while (!virtqueue_enable_cb(vq));
+-		bio_set_op_attrs(n, REQ_OP_WRITE, 0);
++		n->bi_opf = REQ_OP_WRITE;
+ 		bch_submit_bbio(n, op->c, k, 0);
+ 	} while (n != bio);
  
--	/* In case queue is stopped waiting for more buffers. */
--	if (req_done)
-+	if (req_done) {
-+		if (!rq_list_empty(iob.req_list))
-+			virtblk_complete_batch(&iob);
-+
-+		/* In case queue is stopped waiting for more buffers. */
- 		blk_mq_start_stopped_hw_queues(vblk->disk->queue, true);
-+	}
-+
- 	spin_unlock_irqrestore(&vblk->vqs[qid].lock, flags);
- }
+diff --git a/drivers/md/bcache/writeback.c b/drivers/md/bcache/writeback.c
+index 0285b676e9834a..d4a5fc0650bb29 100644
+--- a/drivers/md/bcache/writeback.c
++++ b/drivers/md/bcache/writeback.c
+@@ -434,7 +434,7 @@ static void write_dirty(struct closure *cl)
+ 	 */
+ 	if (KEY_DIRTY(&w->key)) {
+ 		dirty_init(w);
+-		bio_set_op_attrs(&io->bio, REQ_OP_WRITE, 0);
++		io->bio.bi_opf = REQ_OP_WRITE;
+ 		io->bio.bi_iter.bi_sector = KEY_START(&w->key);
+ 		bio_set_dev(&io->bio, io->dc->bdev);
+ 		io->bio.bi_end_io	= dirty_endio;
+@@ -547,7 +547,7 @@ static void read_dirty(struct cached_dev *dc)
+ 			io->sequence    = sequence++;
  
-@@ -832,18 +852,6 @@ static void virtblk_map_queues(struct blk_mq_tag_set *set)
+ 			dirty_init(w);
+-			bio_set_op_attrs(&io->bio, REQ_OP_READ, 0);
++			io->bio.bi_opf = REQ_OP_READ;
+ 			io->bio.bi_iter.bi_sector = PTR_OFFSET(&w->key, 0);
+ 			bio_set_dev(&io->bio, dc->disk.c->cache->bdev);
+ 			io->bio.bi_end_io	= read_dirty_endio;
+diff --git a/drivers/md/dm-thin.c b/drivers/md/dm-thin.c
+index e76c96c760a9b5..c2b5a537f5b8ad 100644
+--- a/drivers/md/dm-thin.c
++++ b/drivers/md/dm-thin.c
+@@ -410,7 +410,7 @@ static void end_discard(struct discard_op *op, int r)
+ 		 * need to wait for the chain to complete.
+ 		 */
+ 		bio_chain(op->bio, op->parent_bio);
+-		bio_set_op_attrs(op->bio, REQ_OP_DISCARD, 0);
++		op->bio->bi_opf = REQ_OP_DISCARD;
+ 		submit_bio(op->bio);
  	}
+ 
+diff --git a/drivers/md/raid1.c b/drivers/md/raid1.c
+index 58f705f4294801..68a9e2d9985b2f 100644
+--- a/drivers/md/raid1.c
++++ b/drivers/md/raid1.c
+@@ -1321,7 +1321,7 @@ static void raid1_read_request(struct mddev *mddev, struct bio *bio,
+ 	read_bio->bi_iter.bi_sector = r1_bio->sector +
+ 		mirror->rdev->data_offset;
+ 	read_bio->bi_end_io = raid1_end_read_request;
+-	bio_set_op_attrs(read_bio, op, do_sync);
++	read_bio->bi_opf = op | do_sync;
+ 	if (test_bit(FailFast, &mirror->rdev->flags) &&
+ 	    test_bit(R1BIO_FailFast, &r1_bio->state))
+ 	        read_bio->bi_opf |= MD_FAILFAST;
+@@ -2254,7 +2254,7 @@ static void sync_request_write(struct mddev *mddev, struct r1bio *r1_bio)
+ 			continue;
+ 		}
+ 
+-		bio_set_op_attrs(wbio, REQ_OP_WRITE, 0);
++		wbio->bi_opf = REQ_OP_WRITE;
+ 		if (test_bit(FailFast, &conf->mirrors[i].rdev->flags))
+ 			wbio->bi_opf |= MD_FAILFAST;
+ 
+@@ -2419,7 +2419,7 @@ static int narrow_write_error(struct r1bio *r1_bio, int i)
+ 					       GFP_NOIO, &mddev->bio_set);
+ 		}
+ 
+-		bio_set_op_attrs(wbio, REQ_OP_WRITE, 0);
++		wbio->bi_opf = REQ_OP_WRITE;
+ 		wbio->bi_iter.bi_sector = r1_bio->sector;
+ 		wbio->bi_iter.bi_size = r1_bio->sectors << 9;
+ 
+@@ -2770,7 +2770,7 @@ static sector_t raid1_sync_request(struct mddev *mddev, sector_t sector_nr,
+ 			if (i < conf->raid_disks)
+ 				still_degraded = 1;
+ 		} else if (!test_bit(In_sync, &rdev->flags)) {
+-			bio_set_op_attrs(bio, REQ_OP_WRITE, 0);
++			bio->bi_opf = REQ_OP_WRITE;
+ 			bio->bi_end_io = end_sync_write;
+ 			write_targets ++;
+ 		} else {
+@@ -2797,7 +2797,7 @@ static sector_t raid1_sync_request(struct mddev *mddev, sector_t sector_nr,
+ 					if (disk < 0)
+ 						disk = i;
+ 				}
+-				bio_set_op_attrs(bio, REQ_OP_READ, 0);
++				bio->bi_opf = REQ_OP_READ;
+ 				bio->bi_end_io = end_sync_read;
+ 				read_targets++;
+ 			} else if (!test_bit(WriteErrorSeen, &rdev->flags) &&
+@@ -2809,7 +2809,7 @@ static sector_t raid1_sync_request(struct mddev *mddev, sector_t sector_nr,
+ 				 * if we are doing resync or repair. Otherwise, leave
+ 				 * this device alone for this sync request.
+ 				 */
+-				bio_set_op_attrs(bio, REQ_OP_WRITE, 0);
++				bio->bi_opf = REQ_OP_WRITE;
+ 				bio->bi_end_io = end_sync_write;
+ 				write_targets++;
+ 			}
+diff --git a/drivers/md/raid10.c b/drivers/md/raid10.c
+index 9a6503f5cb982e..6c66357f92f559 100644
+--- a/drivers/md/raid10.c
++++ b/drivers/md/raid10.c
+@@ -1254,7 +1254,7 @@ static void raid10_read_request(struct mddev *mddev, struct bio *bio,
+ 	read_bio->bi_iter.bi_sector = r10_bio->devs[slot].addr +
+ 		choose_data_offset(r10_bio, rdev);
+ 	read_bio->bi_end_io = raid10_end_read_request;
+-	bio_set_op_attrs(read_bio, op, do_sync);
++	read_bio->bi_opf = op | do_sync;
+ 	if (test_bit(FailFast, &rdev->flags) &&
+ 	    test_bit(R10BIO_FailFast, &r10_bio->state))
+ 	        read_bio->bi_opf |= MD_FAILFAST;
+@@ -1301,7 +1301,7 @@ static void raid10_write_one_disk(struct mddev *mddev, struct r10bio *r10_bio,
+ 	mbio->bi_iter.bi_sector	= (r10_bio->devs[n_copy].addr +
+ 				   choose_data_offset(r10_bio, rdev));
+ 	mbio->bi_end_io	= raid10_end_write_request;
+-	bio_set_op_attrs(mbio, op, do_sync | do_fua);
++	mbio->bi_opf = op | do_sync | do_fua;
+ 	if (!replacement && test_bit(FailFast,
+ 				     &conf->mirrors[devnum].rdev->flags)
+ 			 && enough(conf, devnum))
+@@ -2933,7 +2933,7 @@ static int narrow_write_error(struct r10bio *r10_bio, int i)
+ 		wsector = r10_bio->devs[i].addr + (sector - r10_bio->sector);
+ 		wbio->bi_iter.bi_sector = wsector +
+ 				   choose_data_offset(r10_bio, rdev);
+-		bio_set_op_attrs(wbio, REQ_OP_WRITE, 0);
++		wbio->bi_opf = REQ_OP_WRITE;
+ 
+ 		if (submit_bio_wait(wbio) < 0)
+ 			/* Failure! */
+@@ -3542,7 +3542,7 @@ static sector_t raid10_sync_request(struct mddev *mddev, sector_t sector_nr,
+ 				bio->bi_next = biolist;
+ 				biolist = bio;
+ 				bio->bi_end_io = end_sync_read;
+-				bio_set_op_attrs(bio, REQ_OP_READ, 0);
++				bio->bi_opf = REQ_OP_READ;
+ 				if (test_bit(FailFast, &rdev->flags))
+ 					bio->bi_opf |= MD_FAILFAST;
+ 				from_addr = r10_bio->devs[j].addr;
+@@ -3567,7 +3567,7 @@ static sector_t raid10_sync_request(struct mddev *mddev, sector_t sector_nr,
+ 					bio->bi_next = biolist;
+ 					biolist = bio;
+ 					bio->bi_end_io = end_sync_write;
+-					bio_set_op_attrs(bio, REQ_OP_WRITE, 0);
++					bio->bi_opf = REQ_OP_WRITE;
+ 					bio->bi_iter.bi_sector = to_addr
+ 						+ mrdev->data_offset;
+ 					bio_set_dev(bio, mrdev->bdev);
+@@ -3588,7 +3588,7 @@ static sector_t raid10_sync_request(struct mddev *mddev, sector_t sector_nr,
+ 				bio->bi_next = biolist;
+ 				biolist = bio;
+ 				bio->bi_end_io = end_sync_write;
+-				bio_set_op_attrs(bio, REQ_OP_WRITE, 0);
++				bio->bi_opf = REQ_OP_WRITE;
+ 				bio->bi_iter.bi_sector = to_addr +
+ 					mreplace->data_offset;
+ 				bio_set_dev(bio, mreplace->bdev);
+@@ -3742,7 +3742,7 @@ static sector_t raid10_sync_request(struct mddev *mddev, sector_t sector_nr,
+ 			bio->bi_next = biolist;
+ 			biolist = bio;
+ 			bio->bi_end_io = end_sync_read;
+-			bio_set_op_attrs(bio, REQ_OP_READ, 0);
++			bio->bi_opf = REQ_OP_READ;
+ 			if (test_bit(FailFast, &rdev->flags))
+ 				bio->bi_opf |= MD_FAILFAST;
+ 			bio->bi_iter.bi_sector = sector + rdev->data_offset;
+@@ -3764,7 +3764,7 @@ static sector_t raid10_sync_request(struct mddev *mddev, sector_t sector_nr,
+ 			bio->bi_next = biolist;
+ 			biolist = bio;
+ 			bio->bi_end_io = end_sync_write;
+-			bio_set_op_attrs(bio, REQ_OP_WRITE, 0);
++			bio->bi_opf = REQ_OP_WRITE;
+ 			if (test_bit(FailFast, &rdev->flags))
+ 				bio->bi_opf |= MD_FAILFAST;
+ 			bio->bi_iter.bi_sector = sector + rdev->data_offset;
+@@ -4970,7 +4970,7 @@ static sector_t reshape_request(struct mddev *mddev, sector_t sector_nr,
+ 		b->bi_iter.bi_sector = r10_bio->devs[s/2].addr +
+ 			rdev2->new_data_offset;
+ 		b->bi_end_io = end_reshape_write;
+-		bio_set_op_attrs(b, REQ_OP_WRITE, 0);
++		b->bi_opf = REQ_OP_WRITE;
+ 		b->bi_next = blist;
+ 		blist = b;
+ 	}
+diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+index e0b098089ef2b7..99be590f952f6e 100644
+--- a/include/linux/blk_types.h
++++ b/include/linux/blk_types.h
+@@ -472,13 +472,6 @@ static inline enum req_op bio_op(const struct bio *bio)
+ 	return bio->bi_opf & REQ_OP_MASK;
  }
  
--static void virtblk_complete_batch(struct io_comp_batch *iob)
+-/* obsolete, don't use in new code */
+-static inline void bio_set_op_attrs(struct bio *bio, enum req_op op,
+-				    blk_opf_t op_flags)
 -{
--	struct request *req;
--
--	rq_list_for_each(&iob->req_list, req) {
--		virtblk_unmap_data(req, blk_mq_rq_to_pdu(req));
--		virtblk_cleanup_cmd(req);
--		blk_mq_set_request_complete(req);
--	}
--	blk_mq_end_request_batch(iob);
+-	bio->bi_opf = op | op_flags;
 -}
 -
- static int virtblk_poll(struct blk_mq_hw_ctx *hctx, struct io_comp_batch *iob)
+ static inline bool op_is_write(blk_opf_t op)
  {
- 	struct virtio_blk *vblk = hctx->queue->queuedata;
+ 	return !!(op & (__force blk_opf_t)1);
 -- 
-2.26.3
+2.35.1
 
