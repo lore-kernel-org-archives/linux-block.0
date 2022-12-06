@@ -2,65 +2,62 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CB2CC352A1
-	for <linux-block@archiver.kernel.org>; Tue,  6 Dec 2022 16:32:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E93DFC3A5A7
+	for <linux-block@archiver.kernel.org>; Tue,  6 Dec 2022 16:32:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235343AbiLFQcW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 6 Dec 2022 11:32:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45812 "EHLO
+        id S235426AbiLFQc1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 6 Dec 2022 11:32:27 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45858 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235210AbiLFQcR (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 6 Dec 2022 11:32:17 -0500
-Received: from mail-ej1-x634.google.com (mail-ej1-x634.google.com [IPv6:2a00:1450:4864:20::634])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2957E2EF75
-        for <linux-block@vger.kernel.org>; Tue,  6 Dec 2022 08:32:16 -0800 (PST)
-Received: by mail-ej1-x634.google.com with SMTP id b2so7503477eja.7
-        for <linux-block@vger.kernel.org>; Tue, 06 Dec 2022 08:32:16 -0800 (PST)
+        with ESMTP id S235271AbiLFQcT (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 6 Dec 2022 11:32:19 -0500
+Received: from mail-ej1-x62d.google.com (mail-ej1-x62d.google.com [IPv6:2a00:1450:4864:20::62d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9BBC2F003
+        for <linux-block@vger.kernel.org>; Tue,  6 Dec 2022 08:32:17 -0800 (PST)
+Received: by mail-ej1-x62d.google.com with SMTP id fc4so7466731ejc.12
+        for <linux-block@vger.kernel.org>; Tue, 06 Dec 2022 08:32:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=8LXubQ3FrSF6IYeikSKGn7KB26hbqba/FTsLwOsytAM=;
-        b=EiCkoVuJov3+S2MpLdDLw0ANZHuS3DQme4Aq5Jfjq5LT5AkJAhKSfxC1QrrvV+HNQX
-         VXCjFMIAw+mM70khaB/R7QQi6YC0+0N4iTwJ0JKXOhwFqH2VAV4tWDNO5sJYOHmSn+ra
-         MHAw8SgwxWUfPfnbcnqnZMiUdyNJDli/HSpAdcfkhYEOCubQqv8oFfdFB6Kind7XwXUC
-         HQB8q/w0NeYSXa9BirGyKgtgundfaCOpPxmLVU72vNhM/BxK2mkKIisjn0j6Cge1cyIJ
-         mrjtAcBnVmL+mkV4ZeP+KN20glxJDWYBeF5fbI+E1ve2vxeb7BJiIV/YxZqdWUd87wkb
-         CYiQ==
+        bh=ZY/PyYvl5yef9dzUBwOoFODLyiHOEVf2zJot7jAU88w=;
+        b=DSKhn7CIMJB3E1zujAn8BZChULAiSzolcGsUHfl4zoMFGsNHAn3KYkSFAa/o+1gRBI
+         OXovq2jiPdKVZbdIYL4vDCcSQT69md8e2Y2TOcXdNqct45reVYw8oXOGEhhOdJWUkxQF
+         3XenC6+47ubOOakXAI1nw50YvkdUB5u8FU+k7MszNAeUYeze+ZP4EXnx1MQlI/aKzU/u
+         NDoMPENA4hCCnzKI7eevMAtuCffWBoyMcqoWHcj8HiDTAgP7JDiDkQ5G1U3z9QlazkFw
+         RmK3VCEXq5yzYcP5hn376MNUHVckSKrgygSFGNM5oCqOPfh3ngh+TSCeLwm6S7Vh0cMg
+         Mwyg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=8LXubQ3FrSF6IYeikSKGn7KB26hbqba/FTsLwOsytAM=;
-        b=6T3NvkHjsGp0k4iiLll6QqHzuhSDPWxSu2xJ4wfSviREBC6NFUclm2rvFcQ+fqszjt
-         SkudIA+Goj8xXYjRrtFgnkO4vZXNuNgxvc5JlVL6JcgJsEwvJ0tgErkgaZZtagUH00dx
-         HoWxpySPP7jRNAAUNMmgVb7dhM1+/6e/HvUIXu89xNwf6IzR5Nm57/cW+hpj8doTN3w0
-         IduvAatpKBrBFRWkiieUyZmghrzSs7vLP2YbTCscHR31SC5os1/6Z0Mtj3SOkMG2tx2Q
-         2GhjGu5koaJmbgfwtFsUF9UfKHY3x5uAacQiLCPFrc9LvWU1XBOWt7YjVck8cc4J+ESU
-         GPKw==
-X-Gm-Message-State: ANoB5pkeEM/YsZjYD8f4oloJrP5Ph2mKt2vqtHMLwJBfM8Hqi+kJnQ1K
-        MYnFU0gCqiasXtaa5aUJ6flBtdvk1NyhNu3X
-X-Google-Smtp-Source: AA0mqf4sIYM0dFBA+dctM5w8ZAN480dJ/OokYNJQh9honpIV6wJIB6CxigZlO4Il57bCwDE3QjkxKQ==
-X-Received: by 2002:a17:907:2c68:b0:7c0:999d:1767 with SMTP id ib8-20020a1709072c6800b007c0999d1767mr24927013ejc.301.1670344334674;
-        Tue, 06 Dec 2022 08:32:14 -0800 (PST)
+        bh=ZY/PyYvl5yef9dzUBwOoFODLyiHOEVf2zJot7jAU88w=;
+        b=mNb2GI6BfFeXtRaDGecbv+tsBIDLy8Ee1lzz5zRQkfwUfxqk7Kisbx2yNNz3JVNA7t
+         oX1sJLMrtIR477QvogLPDna0t7FslvYzXdRW9azMbupc2ZpzDSraqMVLKYtxfWWlPMyS
+         TbCXm9B3SXe1nEd07APeNTI853/UFZH2dzmL0FROMZGVYMT3/yqXlOf846/Bp7YLlR8m
+         IfNfXVa0ClfBxrSP8DsR2HEciFL/pVlS1JlSHYecRsBH5KD67QP6A1JL91TN1nlPwy09
+         YakFygJZeiF4sOFhAZ7DAR+uak0Ez6AscBLxOHvlW9ANiqUNL+fUwYn0iuMEKZoDakKB
+         tQ9g==
+X-Gm-Message-State: ANoB5pl6qmN6likyOnQxoFs4Ale7CWdJYQaCRN0ulhLhUGyDCJRvYBDD
+        f6xV6MGQFebcES/U3zbStrGQ2g==
+X-Google-Smtp-Source: AA0mqf4N0d2tqvn2g5Ntd5MMupUUGeFRAVQulLEkIF3tZFrEpa0y67AjA8pSFM06fQwgdHo0Wt7viQ==
+X-Received: by 2002:a17:906:1713:b0:7a3:fc74:7fb4 with SMTP id c19-20020a170906171300b007a3fc747fb4mr77082586eje.17.1670344336430;
+        Tue, 06 Dec 2022 08:32:16 -0800 (PST)
 Received: from MBP-di-Paolo.station (net-2-35-55-161.cust.vodafonedsl.it. [2.35.55.161])
-        by smtp.gmail.com with ESMTPSA id t5-20020a056402020500b0046ac460da13sm1170104edv.53.2022.12.06.08.32.13
+        by smtp.gmail.com with ESMTPSA id t5-20020a056402020500b0046ac460da13sm1170104edv.53.2022.12.06.08.32.15
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 06 Dec 2022 08:32:14 -0800 (PST)
+        Tue, 06 Dec 2022 08:32:16 -0800 (PST)
 From:   Paolo Valente <paolo.valente@linaro.org>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         arie.vanderhoeven@seagate.com, rory.c.chen@seagate.com,
-        glen.valante@linaro.org, Paolo Valente <paolo.valente@linaro.org>,
-        Gabriele Felici <felicigb@gmail.com>,
-        Gianmarco Lusvardi <glusvardi@posteo.net>,
-        Giulio Barabino <giuliobarabino99@gmail.com>,
-        Emiliano Maccaferri <inbox@emilianomaccaferri.com>
-Subject: [PATCH V8 4/8] block, bfq: turn bfqq_data into an array in bfq_io_cq
-Date:   Tue,  6 Dec 2022 17:31:59 +0100
-Message-Id: <20221206163203.30071-5-paolo.valente@linaro.org>
+        glen.valante@linaro.org, Federico Gavioli <f.gavioli97@gmail.com>,
+        Paolo Valente <paolo.valente@linaro.org>
+Subject: [PATCH V8 6/8] block, bfq: retrieve independent access ranges from request queue
+Date:   Tue,  6 Dec 2022 17:32:01 +0100
+Message-Id: <20221206163203.30071-7-paolo.valente@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20221206163203.30071-1-paolo.valente@linaro.org>
 References: <20221206163203.30071-1-paolo.valente@linaro.org>
@@ -70,310 +67,128 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-When a bfq_queue Q is merged with another queue, several pieces of
-information are saved about Q. These pieces are stored in the
-bfqq_data field in the bfq_io_cq data structure of the process
-associated with Q.
+From: Federico Gavioli <f.gavioli97@gmail.com>
 
-Yet, with a multi-actuator drive, a process may get associated with
-multiple bfq_queues: one queue for each of the N actuators. Each of
-these queues may undergo a merge. So, the bfq_io_cq data structure
-must be able to accommodate the above information for N queues.
+This patch implements the code to gather the content of the
+independent_access_ranges structure from the request_queue and copy
+it into the queue's bfq_data. This copy is done at queue initialization.
 
-This commit solves this problem by turning the bfqq_data scalar field
-into an array of N elements (and by changing code so as to handle
-this array).
+We copy the access ranges into the bfq_data to avoid taking the queue
+lock each time we access the ranges.
 
-This solution is written under the assumption that bfq_queues
-associated with different actuators cannot be cross-merged. This
-assumption holds naturally with basic queue merging: the latter is
-triggered by spatial locality, and sectors for different actuators are
-not close to each other (apart from the corner case of the last
-sectors served by a given actuator and the first sectors served by the
-next actuator). As for stable cross-merging, the assumption here is
-that it is disabled.
+This implementation, however, puts a limit to the maximum independent
+ranges supported by the scheduler. Such a limit is equal to the constant
+BFQ_MAX_ACTUATORS. This limit was placed to avoid the allocation of
+dynamic memory.
 
-Signed-off-by: Gabriele Felici <felicigb@gmail.com>
-Signed-off-by: Gianmarco Lusvardi <glusvardi@posteo.net>
-Signed-off-by: Giulio Barabino <giuliobarabino99@gmail.com>
-Signed-off-by: Emiliano Maccaferri <inbox@emilianomaccaferri.com>
+Co-developed-by: Rory Chen <rory.c.chen@seagate.com>
+Signed-off-by: Rory Chen <rory.c.chen@seagate.com>
+Signed-off-by: Federico Gavioli <f.gavioli97@gmail.com>
 Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
 ---
- block/bfq-iosched.c | 95 +++++++++++++++++++++++++++------------------
- block/bfq-iosched.h | 12 ++++--
- 2 files changed, 65 insertions(+), 42 deletions(-)
+ block/bfq-iosched.c | 53 ++++++++++++++++++++++++++++++++++++++-------
+ block/bfq-iosched.h |  8 ++++++-
+ 2 files changed, 52 insertions(+), 9 deletions(-)
 
 diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index 0d6b35ef3d3f..18e2b8f75435 100644
+index dcecba3c6e23..a5361c287657 100644
 --- a/block/bfq-iosched.c
 +++ b/block/bfq-iosched.c
-@@ -406,7 +406,7 @@ void bic_set_bfqq(struct bfq_io_cq *bic,
- 	 * we cancel the stable merge if
- 	 * bic->stable_merge_bfqq == bfqq.
- 	 */
--	struct bfq_iocq_bfqq_data *bfqq_data = &bic->bfqq_data;
-+	struct bfq_iocq_bfqq_data *bfqq_data = &bic->bfqq_data[actuator_idx];
- 
- 	if (is_sync)
- 		bic->bfqq[1][actuator_idx] = bfqq;
-@@ -1181,9 +1181,10 @@ static void
- bfq_bfqq_resume_state(struct bfq_queue *bfqq, struct bfq_data *bfqd,
- 		      struct bfq_io_cq *bic, bool bfq_already_existing)
+@@ -1839,10 +1839,25 @@ static bool bfq_bfqq_higher_class_or_weight(struct bfq_queue *bfqq,
+  */
+ static unsigned int bfq_actuator_index(struct bfq_data *bfqd, struct bio *bio)
  {
--	struct bfq_iocq_bfqq_data *bfqq_data = &bic->bfqq_data;
- 	unsigned int old_wr_coeff = 1;
- 	bool busy = bfq_already_existing && bfq_bfqq_busy(bfqq);
-+	unsigned int a_idx = bfqq->actuator_idx;
-+	struct bfq_iocq_bfqq_data *bfqq_data = &bic->bfqq_data[a_idx];
+-	/*
+-	 * Multi-actuator support not complete yet, so always return 0
+-	 * for the moment (to keep incomplete mechanisms off).
+-	 */
++	unsigned int i;
++	sector_t end;
++
++	/* no search needed if one or zero ranges present */
++	if (bfqd->num_actuators == 1)
++		return 0;
++
++	/* bio_end_sector(bio) gives the sector after the last one */
++	end = bio_end_sector(bio) - 1;
++
++	for (i = 0; i < bfqd->num_actuators; i++) {
++		if (end >= bfqd->sector[i] &&
++		    end < bfqd->sector[i] + bfqd->nr_sectors[i])
++			return i;
++	}
++
++	WARN_ONCE(true,
++		  "bfq_actuator_index: bio sector out of ranges: end=%llu\n",
++		  end);
+ 	return 0;
+ }
  
- 	if (bfqq_data->saved_has_short_ttime)
- 		bfq_mark_bfqq_has_short_ttime(bfqq);
-@@ -1899,7 +1900,9 @@ static void bfq_bfqq_handle_idle_busy_switch(struct bfq_data *bfqd,
- 	wr_or_deserves_wr = bfqd->low_latency &&
- 		(bfqq->wr_coeff > 1 ||
- 		 (bfq_bfqq_sync(bfqq) &&
--		  (bfqq->bic || RQ_BIC(rq)->bfqq_data.stably_merged) &&
-+		  (bfqq->bic ||
-+		   RQ_BIC(rq)->bfqq_data[bfq_actuator_index(bfqd, rq->bio)]
-+		   .stably_merged) &&
- 		   (*interactive || soft_rt)));
+@@ -7160,6 +7175,8 @@ static int bfq_init_queue(struct request_queue *q, struct elevator_type *e)
+ {
+ 	struct bfq_data *bfqd;
+ 	struct elevator_queue *eq;
++	unsigned int i;
++	struct blk_independent_access_ranges *ia_ranges = q->disk->ia_ranges;
  
+ 	eq = elevator_alloc(q, e);
+ 	if (!eq)
+@@ -7202,12 +7219,32 @@ static int bfq_init_queue(struct request_queue *q, struct elevator_type *e)
+ 
+ 	bfqd->queue = q;
+ 
++	bfqd->num_actuators = 1;
  	/*
-@@ -2888,6 +2891,35 @@ static bool bfq_may_be_close_cooperator(struct bfq_queue *bfqq,
- static bool idling_boosts_thr_without_issues(struct bfq_data *bfqd,
- 					     struct bfq_queue *bfqq);
- 
-+static struct bfq_queue *
-+bfq_setup_stable_merge(struct bfq_data *bfqd, struct bfq_queue *bfqq,
-+		       struct bfq_queue *stable_merge_bfqq,
-+		       struct bfq_iocq_bfqq_data *bfqq_data)
-+{
-+	int proc_ref = min(bfqq_process_refs(bfqq),
-+			   bfqq_process_refs(stable_merge_bfqq));
+-	 * Multi-actuator support not complete yet, unconditionally
+-	 * set to only one actuator for the moment (to keep incomplete
+-	 * mechanisms off).
++	 * If the disk supports multiple actuators, copy independent
++	 * access ranges from the request queue structure.
+ 	 */
+-	bfqd->num_actuators = 1;
++	spin_lock_irq(&q->queue_lock);
++	if (ia_ranges) {
++		/*
++		 * Check if the disk ia_ranges size exceeds the current bfq
++		 * actuator limit.
++		 */
++		if (ia_ranges->nr_ia_ranges > BFQ_MAX_ACTUATORS) {
++			pr_crit("nr_ia_ranges higher than act limit: iars=%d, max=%d.\n",
++				ia_ranges->nr_ia_ranges, BFQ_MAX_ACTUATORS);
++			pr_crit("Falling back to single actuator mode.\n");
++		} else {
++			bfqd->num_actuators = ia_ranges->nr_ia_ranges;
 +
-+	if (!idling_boosts_thr_without_issues(bfqd, bfqq) &&
-+	    proc_ref > 0) {
-+		/* next function will take at least one ref */
-+		struct bfq_queue *new_bfqq =
-+			bfq_setup_merge(bfqq, stable_merge_bfqq);
-+
-+		if (new_bfqq) {
-+			bfqq_data->stably_merged = true;
-+			if (new_bfqq->bic) {
-+				unsigned int new_a_idx = new_bfqq->actuator_idx;
-+				struct bfq_iocq_bfqq_data *new_bfqq_data =
-+					&new_bfqq->bic->bfqq_data[new_a_idx];
-+
-+				new_bfqq_data->stably_merged = true;
++			for (i = 0; i < bfqd->num_actuators; i++) {
++				bfqd->sector[i] = ia_ranges->ia_range[i].sector;
++				bfqd->nr_sectors[i] =
++					ia_ranges->ia_range[i].nr_sectors;
 +			}
 +		}
-+		return new_bfqq;
-+	} else
-+		return NULL;
-+}
-+
- /*
-  * Attempt to schedule a merge of bfqq with the currently in-service
-  * queue or with a close queue among the scheduled queues.  Return
-@@ -2913,7 +2945,8 @@ bfq_setup_cooperator(struct bfq_data *bfqd, struct bfq_queue *bfqq,
- 		     void *io_struct, bool request, struct bfq_io_cq *bic)
- {
- 	struct bfq_queue *in_service_bfqq, *new_bfqq;
--	struct bfq_iocq_bfqq_data *bfqq_data = &bic->bfqq_data;
-+	unsigned int a_idx = bfqq->actuator_idx;
-+	struct bfq_iocq_bfqq_data *bfqq_data = &bic->bfqq_data[a_idx];
++	}
++	spin_unlock_irq(&q->queue_lock);
  
- 	/* if a merge has already been setup, then proceed with that first */
- 	if (bfqq->new_bfqq)
-@@ -2943,29 +2976,15 @@ bfq_setup_cooperator(struct bfq_data *bfqd, struct bfq_queue *bfqq,
- 					   msecs_to_jiffies(bfq_late_stable_merging))) {
- 			struct bfq_queue *stable_merge_bfqq =
- 				bfqq_data->stable_merge_bfqq;
--			int proc_ref = min(bfqq_process_refs(bfqq),
--					   bfqq_process_refs(stable_merge_bfqq));
+ 	INIT_LIST_HEAD(&bfqd->dispatch);
  
- 			/* deschedule stable merge, because done or aborted here */
- 			bfq_put_stable_ref(stable_merge_bfqq);
- 
- 			bfqq_data->stable_merge_bfqq = NULL;
- 
--			if (!idling_boosts_thr_without_issues(bfqd, bfqq) &&
--			    proc_ref > 0) {
--				/* next function will take at least one ref */
--				struct bfq_queue *new_bfqq =
--					bfq_setup_merge(bfqq, stable_merge_bfqq);
--
--				if (new_bfqq) {
--					bfqq_data->stably_merged = true;
--					if (new_bfqq->bic)
--						new_bfqq->bic->bfqq_data.stably_merged =
--							true;
--				}
--				return new_bfqq;
--			} else
--				return NULL;
-+			return bfq_setup_stable_merge(bfqd, bfqq,
-+						      stable_merge_bfqq,
-+						      bfqq_data);
- 		}
- 	}
- 
-@@ -3060,7 +3079,8 @@ bfq_setup_cooperator(struct bfq_data *bfqd, struct bfq_queue *bfqq,
- static void bfq_bfqq_save_state(struct bfq_queue *bfqq)
- {
- 	struct bfq_io_cq *bic = bfqq->bic;
--	struct bfq_iocq_bfqq_data *bfqq_data = &bic->bfqq_data;
-+	unsigned int a_idx = bfqq->actuator_idx;
-+	struct bfq_iocq_bfqq_data *bfqq_data = &bic->bfqq_data[a_idx];
- 
- 	/*
- 	 * If !bfqq->bic, the queue is already shared or its requests
-@@ -3071,7 +3091,7 @@ static void bfq_bfqq_save_state(struct bfq_queue *bfqq)
- 		return;
- 
- 	bfqq_data->saved_last_serv_time_ns = bfqq->last_serv_time_ns;
--	bfqq_data->saved_inject_limit = bfqq->inject_limit;
-+	bfqq_data->saved_inject_limit =	bfqq->inject_limit;
- 	bfqq_data->saved_decrease_time_jif = bfqq->decrease_time_jif;
- 
- 	bfqq_data->saved_weight = bfqq->entity.orig_weight;
-@@ -5438,7 +5458,7 @@ static void bfq_exit_icq(struct io_cq *icq)
- 	 * therefore on its unused per-actuator fields being NULL.
- 	 */
- 	unsigned int num_actuators = BFQ_MAX_ACTUATORS;
--	struct bfq_iocq_bfqq_data *bfqq_data = &bic->bfqq_data;
-+	struct bfq_iocq_bfqq_data *bfqq_data = bic->bfqq_data;
- 
- 	/*
- 	 * bfqd is NULL if scheduler already exited, and in that case
-@@ -5449,10 +5469,10 @@ static void bfq_exit_icq(struct io_cq *icq)
- 		num_actuators = bfqd->num_actuators;
- 	}
- 
--	if (bfqq_data->stable_merge_bfqq)
--		bfq_put_stable_ref(bfqq_data->stable_merge_bfqq);
--
- 	for (act_idx = 0; act_idx < num_actuators; act_idx++) {
-+		if (bfqq_data[act_idx].stable_merge_bfqq)
-+			bfq_put_stable_ref(bfqq_data[act_idx].stable_merge_bfqq);
-+
- 		bfq_exit_icq_bfqq(bic, true, act_idx);
- 		bfq_exit_icq_bfqq(bic, false, act_idx);
- 	}
-@@ -5639,16 +5659,16 @@ bfq_do_early_stable_merge(struct bfq_data *bfqd, struct bfq_queue *bfqq,
- 			  struct bfq_io_cq *bic,
- 			  struct bfq_queue *last_bfqq_created)
- {
-+	unsigned int a_idx = last_bfqq_created->actuator_idx;
- 	struct bfq_queue *new_bfqq =
- 		bfq_setup_merge(bfqq, last_bfqq_created);
--	struct bfq_iocq_bfqq_data *bfqq_data = &bic->bfqq_data;
- 
- 	if (!new_bfqq)
- 		return bfqq;
- 
- 	if (new_bfqq->bic)
--		new_bfqq->bic->bfqq_data.stably_merged = true;
--	bfqq_data->stably_merged = true;
-+		new_bfqq->bic->bfqq_data[a_idx].stably_merged = true;
-+	bic->bfqq_data[a_idx].stably_merged = true;
- 
- 	/*
- 	 * Reusing merge functions. This implies that
-@@ -5717,7 +5737,6 @@ static struct bfq_queue *bfq_do_or_sched_stable_merge(struct bfq_data *bfqd,
- 		&bfqd->last_bfqq_created;
- 
- 	struct bfq_queue *last_bfqq_created = *source_bfqq;
--	struct bfq_iocq_bfqq_data *bfqq_data = &bic->bfqq_data;
- 
- 	/*
- 	 * If last_bfqq_created has not been set yet, then init it. If
-@@ -5779,7 +5798,8 @@ static struct bfq_queue *bfq_do_or_sched_stable_merge(struct bfq_data *bfqd,
- 			/*
- 			 * Record the bfqq to merge to.
- 			 */
--			bfqq_data->stable_merge_bfqq = last_bfqq_created;
-+			bic->bfqq_data[last_bfqq_created->actuator_idx].stable_merge_bfqq =
-+				last_bfqq_created;
- 		}
- 	}
- 
-@@ -6699,7 +6719,7 @@ static struct bfq_queue *bfq_get_bfqq_handle_split(struct bfq_data *bfqd,
- {
- 	unsigned int act_idx = bfq_actuator_index(bfqd, bio);
- 	struct bfq_queue *bfqq = bic_to_bfqq(bic, is_sync, act_idx);
--	struct bfq_iocq_bfqq_data *bfqq_data = &bic->bfqq_data;
-+	struct bfq_iocq_bfqq_data *bfqq_data = &bic->bfqq_data[act_idx];
- 
- 	if (likely(bfqq && bfqq != &bfqd->oom_bfqq))
- 		return bfqq;
-@@ -6807,7 +6827,7 @@ static struct bfq_queue *bfq_init_rq(struct request *rq)
- 	struct bfq_queue *bfqq;
- 	bool new_queue = false;
- 	bool bfqq_already_existing = false, split = false;
--	struct bfq_iocq_bfqq_data *bfqq_data;
-+	unsigned int a_idx = bfq_actuator_index(bfqd, bio);
- 
- 	if (unlikely(!rq->elv.icq))
- 		return NULL;
-@@ -6831,17 +6851,16 @@ static struct bfq_queue *bfq_init_rq(struct request *rq)
- 	bfqq = bfq_get_bfqq_handle_split(bfqd, bic, bio, false, is_sync,
- 					 &new_queue);
- 
--	bfqq_data = &bic->bfqq_data;
--
- 	if (likely(!new_queue)) {
- 		/* If the queue was seeky for too long, break it apart. */
- 		if (bfq_bfqq_coop(bfqq) && bfq_bfqq_split_coop(bfqq) &&
--			!bfqq_data->stably_merged) {
-+			!bic->bfqq_data[a_idx].stably_merged) {
- 			struct bfq_queue *old_bfqq = bfqq;
- 
- 			/* Update bic before losing reference to bfqq */
- 			if (bfq_bfqq_in_large_burst(bfqq))
--				bfqq_data->saved_in_large_burst = true;
-+				bic->bfqq_data[a_idx].saved_in_large_burst =
-+					true;
- 
- 			bfqq = bfq_split_bfqq(bic, bfqq);
- 			split = true;
 diff --git a/block/bfq-iosched.h b/block/bfq-iosched.h
-index 9d77d964620f..a685aa32b037 100644
+index 1450990dba32..953980de6b4b 100644
 --- a/block/bfq-iosched.h
 +++ b/block/bfq-iosched.h
-@@ -416,7 +416,7 @@ struct bfq_queue {
- struct bfq_iocq_bfqq_data {
- 	/*
- 	 * Snapshot of the has_short_time flag before merging; taken
--	 * to remember its value while the queue is merged, so as to
-+	 * to remember its values while the queue is merged, so as to
- 	 * be able to restore it in case of split.
+@@ -810,7 +810,13 @@ struct bfq_data {
+ 	 * case of single-actuator drives.
  	 */
- 	bool saved_has_short_ttime;
-@@ -430,7 +430,7 @@ struct bfq_iocq_bfqq_data {
- 	u64 saved_tot_idle_time;
- 
- 	/*
--	 * Same purpose as the previous fields for the value of the
-+	 * Same purpose as the previous fields for the values of the
- 	 * field keeping the queue's belonging to a large burst
- 	 */
- 	bool saved_in_large_burst;
-@@ -493,8 +493,12 @@ struct bfq_io_cq {
- 	uint64_t blkcg_serial_nr; /* the current blkcg serial */
- #endif
- 
--	/* persistent data for associated synchronous process queue */
--	struct bfq_iocq_bfqq_data bfqq_data;
+ 	unsigned int num_actuators;
+-
 +	/*
-+	 * Persistent data for associated synchronous process queues
-+	 * (one queue per actuator, see field bfqq above). In
-+	 * particular, each of these queues may undergo a merge.
++	 * Disk independent access ranges for each actuator
++	 * in this device.
 +	 */
-+	struct bfq_iocq_bfqq_data bfqq_data[BFQ_MAX_ACTUATORS];
- 
- 	unsigned int requests;	/* Number of requests this process has in flight */
++	sector_t sector[BFQ_MAX_ACTUATORS];
++	sector_t nr_sectors[BFQ_MAX_ACTUATORS];
++	struct blk_independent_access_range ia_ranges[BFQ_MAX_ACTUATORS];
  };
+ 
+ enum bfqq_state_flags {
 -- 
 2.20.1
 
