@@ -2,89 +2,243 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 837F5C4708E
-	for <linux-block@archiver.kernel.org>; Tue,  6 Dec 2022 14:58:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A52AC4708E
+	for <linux-block@archiver.kernel.org>; Tue,  6 Dec 2022 15:43:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235045AbiLFO6A (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 6 Dec 2022 09:58:00 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52524 "EHLO
+        id S235191AbiLFPnl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 6 Dec 2022 10:43:41 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34998 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235204AbiLFO5U (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 6 Dec 2022 09:57:20 -0500
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 655492FC3F;
-        Tue,  6 Dec 2022 06:51:34 -0800 (PST)
-Received: from imap1.suse-dmz.suse.de (imap1.suse-dmz.suse.de [192.168.254.73])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 9267F1FE36;
-        Tue,  6 Dec 2022 14:51:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1670338293; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=y1QA/VfgBDC1wZs2knAWjY99Zbr5hdIc3ImjrFUrhjk=;
-        b=YGoqIO/FxZVZm7YPlo6VnN19GY1N+BTLUIRAH1kaAgoze+eqIboMAYoLATkdE8hqI9ZEpb
-        YfZ+iVjBMS5M6SNmozP2rUNbmSj4V/jHzaV+5gaMYaYzQ9i9pYFHwv1HtvaZoFwhXriJFD
-        Z0za+eD33v81Bt/jTZJVSr/d85ODO10=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1670338293;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=y1QA/VfgBDC1wZs2knAWjY99Zbr5hdIc3ImjrFUrhjk=;
-        b=mo1mdbErcw9tnjWYGCsPhZiWu6oQBpXvujnaeETWM6W81iLbJBMSCuF51SVENHEBEl+CvC
-        avsi/ulsJpuisCDA==
-Received: from imap1.suse-dmz.suse.de (imap1.suse-dmz.suse.de [192.168.254.73])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap1.suse-dmz.suse.de (Postfix) with ESMTPS id 6B12F132F3;
-        Tue,  6 Dec 2022 14:51:31 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap1.suse-dmz.suse.de with ESMTPSA
-        id 4f0yDfNWj2PiMQAAGKfGzw
-        (envelope-from <colyli@suse.de>); Tue, 06 Dec 2022 14:51:31 +0000
+        with ESMTP id S235175AbiLFPnk (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 6 Dec 2022 10:43:40 -0500
+Received: from mail-ed1-x533.google.com (mail-ed1-x533.google.com [IPv6:2a00:1450:4864:20::533])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0228221810
+        for <linux-block@vger.kernel.org>; Tue,  6 Dec 2022 07:43:39 -0800 (PST)
+Received: by mail-ed1-x533.google.com with SMTP id d20so20900565edn.0
+        for <linux-block@vger.kernel.org>; Tue, 06 Dec 2022 07:43:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=0YMbGD5xVj+KBWViu06h2Q07es5r/uT6nSyXk1K+LJE=;
+        b=sRVLkOqcwqUtfhkv3zICnRdOeIl9Em7fAy/YMqXKtKrYOUW07/2D6lrRiJyqPLYdLp
+         Nlr1E0K2E0v0xhhEgdolk97VAkoMRAI+lCWba7LxP6UOdSkRBrL51jsLmRTCeIjs4CH0
+         yWn7/HNIVVmmLttcZLWS3+g+8jxMms0CaemCuArwHN6jtpppx5AdKSZ3nvkXCwMejvuX
+         BtMUdUYwxQLpUJ35sj52d/WHgm2uq9lgEK0PKfAqqlgsLzeW7fB1P/+v6tRHdsdNRUxu
+         aMt2nHMMs5TTi9G3W+fo/ohREoeff/JdAs4FQYHA8POAGRuU82eNNZIVSeLRhPsASgsW
+         aSyg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=0YMbGD5xVj+KBWViu06h2Q07es5r/uT6nSyXk1K+LJE=;
+        b=8CT11SdysIBxAo05InqN1JTzV7RWS9zZxzYv9XI9s6cnWpDKzGxmOwCcOzNtc4d7qO
+         ySN+49g3lZG6hTeT33GttB3egSJBe/BQQ5Fowl7y3jSjGdJlNRdf3YT+fvRA1UvSr8UH
+         261NsDgv+A6mbMp+156Kg77Ta6i5mjmIqUt9/6TjqXELf2Y06R6wyeElydZ2aFOjeODI
+         LdpmWrZLz+xyWiE/gi3oWo8yLrh+bp0554hGK1MDytQ4XDLKqrdMcGzvKlbNItsvBkoX
+         rnf48HFpXAVoTHO609VDAX/MPBGnB64G5Xq8Noxk4lFTSX3w6XckI3zbof+knug2UDek
+         p1Wg==
+X-Gm-Message-State: ANoB5pkk/FQXhDp5uKa/lkobg3cnHTWFwwe2eHJgscLHEhwt9V+O5VmE
+        r1KCH4hN5ZvX90l3+Jea0tjp2g==
+X-Google-Smtp-Source: AA0mqf5Mi9GxgQuFPp2bkrf7MIEgUOiBJ/GAe0xzfX45eRtgh8UJkoOREYJAGduj6cwO56jIvucoew==
+X-Received: by 2002:aa7:d556:0:b0:45c:6467:94e2 with SMTP id u22-20020aa7d556000000b0045c646794e2mr77286461edr.295.1670341417439;
+        Tue, 06 Dec 2022 07:43:37 -0800 (PST)
+Received: from mbp-di-paolo.station (net-2-35-55-161.cust.vodafonedsl.it. [2.35.55.161])
+        by smtp.gmail.com with ESMTPSA id x10-20020a1709060a4a00b00741a251d9e8sm7547195ejf.171.2022.12.06.07.43.36
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 06 Dec 2022 07:43:36 -0800 (PST)
 Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3731.200.110.1.12\))
-Subject: Re: [dm-devel] [PATCH] block: remove bio_set_op_attrs
-From:   Coly Li <colyli@suse.de>
-In-Reply-To: <20221206144902.GA31845@lst.de>
-Date:   Tue, 6 Dec 2022 22:51:17 +0800
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        snitzer@kernel.org, dm-devel@redhat.com,
-        linux-raid <linux-raid@vger.kernel.org>,
-        Song Liu <song@kernel.org>, linux-bcache@vger.kernel.org
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
+Subject: Re: [PATCH V6 6/8] block, bfq: retrieve independent access ranges
+ from request queue
+From:   Paolo Valente <paolo.valente@linaro.org>
+In-Reply-To: <6983f8b3-a320-ce32-ef0d-273d11dd8648@opensource.wdc.com>
+Date:   Tue, 6 Dec 2022 16:43:35 +0100
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        linux-block <linux-block@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        Arie van der Hoeven <arie.vanderhoeven@seagate.com>,
+        Rory Chen <rory.c.chen@seagate.com>,
+        Federico Gavioli <f.gavioli97@gmail.com>
 Content-Transfer-Encoding: quoted-printable
-Message-Id: <51D61E7A-055D-4F6F-AC4C-748D7E0C5E12@suse.de>
-References: <20221206144057.720846-1-hch@lst.de>
- <434E4CE3-EA46-4CD9-9EAF-5C1B99B8A603@suse.de>
- <20221206144902.GA31845@lst.de>
-To:     Christoph Hellwig <hch@lst.de>
-X-Mailer: Apple Mail (2.3731.200.110.1.12)
+Message-Id: <518C279B-8896-470A-9D8C-974F3BB886DB@linaro.org>
+References: <20221103162623.10286-1-paolo.valente@linaro.org>
+ <20221103162623.10286-7-paolo.valente@linaro.org>
+ <5d062001-2fff-35e5-d951-a61b510727d9@opensource.wdc.com>
+ <4C45BCC6-D9AB-4C70-92E2-1B54AB4A2090@linaro.org>
+ <d27ca14b-e228-49b7-28a8-00ea67e8ea06@opensource.wdc.com>
+ <76ADE275-1862-44F7-B9C4-4A08179A72E3@linaro.org>
+ <6983f8b3-a320-ce32-ef0d-273d11dd8648@opensource.wdc.com>
+To:     Damien Le Moal <damien.lemoal@opensource.wdc.com>
+X-Mailer: Apple Mail (2.3445.104.11)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 
 
-> 2022=E5=B9=B412=E6=9C=886=E6=97=A5 22:49=EF=BC=8CChristoph Hellwig =
-<hch@lst.de> =E5=86=99=E9=81=93=EF=BC=9A
+> Il giorno 6 dic 2022, alle ore 10:02, Damien Le Moal =
+<damien.lemoal@opensource.wdc.com> ha scritto:
 >=20
-> On Tue, Dec 06, 2022 at 10:46:31PM +0800, Coly Li wrote:
->> BTW, may I ask why bio_set_op_attrs() is removed. Quite long time ago =
-it was added to avoid open code, and now we remove it to use open coded =
-assignments. What is the motivation for now?
+> On 12/6/22 17:41, Paolo Valente wrote:
+>>=20
+>>=20
+>>> Il giorno 6 dic 2022, alle ore 09:29, Damien Le Moal =
+<damien.lemoal@opensource.wdc.com> ha scritto:
+>>>=20
+>>> On 12/6/22 17:06, Paolo Valente wrote:
+>>>>=20
+>>>>=20
+>>>>> Il giorno 21 nov 2022, alle ore 02:01, Damien Le Moal =
+<damien.lemoal@opensource.wdc.com> ha scritto:
+>>>>>=20
+>>>>=20
+>>>> ...
+>>>>=20
+>>>>>=20
+>>>>>> }
+>>>>>>=20
+>>>>>> static bool bfq_bio_merge(struct request_queue *q, struct bio =
+*bio,
+>>>>>> @@ -7144,6 +7159,8 @@ static int bfq_init_queue(struct =
+request_queue *q, struct elevator_type *e)
+>>>>>> {
+>>>>>> 	struct bfq_data *bfqd;
+>>>>>> 	struct elevator_queue *eq;
+>>>>>> +	unsigned int i;
+>>>>>> +	struct blk_independent_access_ranges *ia_ranges =3D =
+q->disk->ia_ranges;
+>>>>>>=20
+>>>>>> 	eq =3D elevator_alloc(q, e);
+>>>>>> 	if (!eq)
+>>>>>> @@ -7187,10 +7204,31 @@ static int bfq_init_queue(struct =
+request_queue *q, struct elevator_type *e)
+>>>>>> 	bfqd->queue =3D q;
+>>>>>>=20
+>>>>>> 	/*
+>>>>>> -	 * Multi-actuator support not complete yet, default to =
+single
+>>>>>> -	 * actuator for the moment.
+>>>>>> +	 * If the disk supports multiple actuators, we copy the =
+independent
+>>>>>> +	 * access ranges from the request queue structure.
+>>>>>> 	 */
+>>>>>> -	bfqd->num_actuators =3D 1;
+>>>>>> +	spin_lock_irq(&q->queue_lock);
+>>>>>> +	if (ia_ranges) {
+>>>>>> +		/*
+>>>>>> +		 * Check if the disk ia_ranges size exceeds the =
+current bfq
+>>>>>> +		 * actuator limit.
+>>>>>> +		 */
+>>>>>> +		if (ia_ranges->nr_ia_ranges > BFQ_MAX_ACTUATORS) =
+{
+>>>>>> +			pr_crit("nr_ia_ranges higher than act =
+limit: iars=3D%d, max=3D%d.\n",
+>>>>>> +				ia_ranges->nr_ia_ranges, =
+BFQ_MAX_ACTUATORS);
+>>>>>> +			pr_crit("Falling back to single actuator =
+mode.\n");
+>>>>>> +			bfqd->num_actuators =3D 0;
+>>>>>> +		} else {
+>>>>>> +			bfqd->num_actuators =3D =
+ia_ranges->nr_ia_ranges;
+>>>>>> +
+>>>>>> +			for (i =3D 0; i < bfqd->num_actuators; =
+i++)
+>>>>>> +				bfqd->ia_ranges[i] =3D =
+ia_ranges->ia_range[i];
+>>>>>> +		}
+>>>>>> +	} else {
+>>>>>> +		bfqd->num_actuators =3D 0;
+>>>>>=20
+>>>>> That is very weird. The default should be 1 actuator.
+>>>>> ia_ranges->nr_ia_ranges is 0 when the disk does not provide any =
+range
+>>>>> information, meaning it is a regular disk with a single actuator.
+>>>>=20
+>>>> Actually, IIUC this assignment to 0 seems to be done exactly when =
+you
+>>>> say that it should be done, i.e., when the disk does not provide =
+any
+>>>> range information (ia_ranges is NULL). Am I missing something else?
+>>>=20
+>>> No ranges reported means no extra actuators, so a single actuator an
+>>> single LBA range for the entire device.
+>>=20
+>> I'm still confused, sorry.  Where will I read sector ranges from, if
+>> no sector range information is available (ia_ranges is NULL)?
 >=20
-> It was added when the flags encoding was a mess.  Now that the RQF_
-> flags are split out things have become much simpler and we don't need
-> to hide a simple assignment of a value to a field.
+> start =3D 0 and nr_sectors =3D bdev_nr_sectors(bdev).
+> No ia_ranges to read.
+>=20
 
-I see. Thanks for doing this.
+ok, thanks
 
-Coly Li
+>>=20
+>>> In that case, bfq should process
+>>> all IOs using bfqd->ia_ranges[0]. The get range function will always
+>>> return that range. That makes the code clean and avoids different =
+path for
+>>> nr_ranges =3D=3D 1 and nr_ranges > 1. No ?
+>>=20
+>> Apart from the above point, for which maybe there is some other
+>> source of information for getting ranges, I see the following issue.
+>>=20
+>> What you propose is to save sector information and trigger the
+>> range-checking for loop also for the above single-actuator case.  Yet
+>> txecuting (one iteration of) that loop will will always result in
+>> getting a 0 as index.  So, what's the point is saving data and
+>> executing code on each IO, for getting a static result that we =
+already
+>> know we will get?
+>=20
+> Surely, you can add an "if (bfqd->num_actuators =3D=3D1)" optimization =
+in
+> strategic places to optimize for regular devices with a single =
+actuator,
+> which bfqd->num_actuators =3D=3D 1 *exactly* describes. Having
+> "bfqd->num_actuators =3D 0" makes no sense to me.
+>=20
+
+Ok, I see your point at last, sorry.  I'll check the code, but I think
+that there is no problem in moving from 0 to 1 actuators for the case
+ia_ranges =3D=3D NULL.  I meant to separate the case "single actuator =
+with
+ia_ranges available" (num_actuators =3D 1), from the case "no ia_ranges
+available" (num_actuators =3D 0).  But evidently things don't work as I
+thought, and using the same value (1) is ok.
+
+Just, let me avoid setting the fields bfqd->sector and
+bfqd->nr_sectors for a case where we don't use them.
+
+Thanks,
+Paolo
+
+> But if you feel strongly about this, feel free to ignore this.
+>=20
+>>=20
+>> Thanks,
+>> Paolo
+>>=20
+>>>=20
+>>>>=20
+>>>> Once again, all other suggestions applied. I'm about to submit a =
+V7.
+>>>>=20
+>>>> Thanks,
+>>>> Paolo
+>>>>=20
+>>>=20
+>>> --=20
+>>> Damien Le Moal
+>>> Western Digital Research
+>>=20
+>=20
+> --=20
+> Damien Le Moal
+> Western Digital Research
 
