@@ -2,76 +2,74 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A52AC4708E
-	for <linux-block@archiver.kernel.org>; Tue,  6 Dec 2022 15:43:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB905C3A5A7
+	for <linux-block@archiver.kernel.org>; Tue,  6 Dec 2022 16:27:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235191AbiLFPnl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 6 Dec 2022 10:43:41 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34998 "EHLO
+        id S232571AbiLFQ1H (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 6 Dec 2022 11:27:07 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42724 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235175AbiLFPnk (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 6 Dec 2022 10:43:40 -0500
-Received: from mail-ed1-x533.google.com (mail-ed1-x533.google.com [IPv6:2a00:1450:4864:20::533])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0228221810
-        for <linux-block@vger.kernel.org>; Tue,  6 Dec 2022 07:43:39 -0800 (PST)
-Received: by mail-ed1-x533.google.com with SMTP id d20so20900565edn.0
-        for <linux-block@vger.kernel.org>; Tue, 06 Dec 2022 07:43:38 -0800 (PST)
+        with ESMTP id S235271AbiLFQ1E (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 6 Dec 2022 11:27:04 -0500
+Received: from mail-ed1-x52d.google.com (mail-ed1-x52d.google.com [IPv6:2a00:1450:4864:20::52d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2CD12A259
+        for <linux-block@vger.kernel.org>; Tue,  6 Dec 2022 08:27:02 -0800 (PST)
+Received: by mail-ed1-x52d.google.com with SMTP id m19so21003982edj.8
+        for <linux-block@vger.kernel.org>; Tue, 06 Dec 2022 08:27:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=to:references:message-id:content-transfer-encoding:cc:date
          :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=0YMbGD5xVj+KBWViu06h2Q07es5r/uT6nSyXk1K+LJE=;
-        b=sRVLkOqcwqUtfhkv3zICnRdOeIl9Em7fAy/YMqXKtKrYOUW07/2D6lrRiJyqPLYdLp
-         Nlr1E0K2E0v0xhhEgdolk97VAkoMRAI+lCWba7LxP6UOdSkRBrL51jsLmRTCeIjs4CH0
-         yWn7/HNIVVmmLttcZLWS3+g+8jxMms0CaemCuArwHN6jtpppx5AdKSZ3nvkXCwMejvuX
-         BtMUdUYwxQLpUJ35sj52d/WHgm2uq9lgEK0PKfAqqlgsLzeW7fB1P/+v6tRHdsdNRUxu
-         aMt2nHMMs5TTi9G3W+fo/ohREoeff/JdAs4FQYHA8POAGRuU82eNNZIVSeLRhPsASgsW
-         aSyg==
+        bh=1wNGJip1HKswY03rIn0qBN8lLPIUP/zhuY/3XSL3+9g=;
+        b=fD9i3S/OyqKgyk6wKHC5lzP9djQhREEu8RWPUcbxw52GfNQLvBWJQ2exlnhkwuoVnX
+         ODkWJs+9ZWGaBloc8GriItGzcaI9kv3Z/q+2DI/CJMYugkcY1zWshHDkRo0S4P/RZYbW
+         wf5B8rZVQ/HWB8udR2tLK/r+3aLCWsd7vxNQkvMgtI7i9LORQdAYFj9cIBg3e1NGVMk1
+         iaOU3W7MHb4WyYmeLs33v5BVQAtHv3yXz+7Qza0Jv3nJIIuSTckNPxetmLdAxjpqMStb
+         odVj/IxjrwRsJ4/7ouN/+kIuqnSl2MD5eoPuVC15uX55/xRRlu+SGTdO40R7hXK46DKV
+         adyQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=to:references:message-id:content-transfer-encoding:cc:date
          :in-reply-to:from:subject:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=0YMbGD5xVj+KBWViu06h2Q07es5r/uT6nSyXk1K+LJE=;
-        b=8CT11SdysIBxAo05InqN1JTzV7RWS9zZxzYv9XI9s6cnWpDKzGxmOwCcOzNtc4d7qO
-         ySN+49g3lZG6hTeT33GttB3egSJBe/BQQ5Fowl7y3jSjGdJlNRdf3YT+fvRA1UvSr8UH
-         261NsDgv+A6mbMp+156Kg77Ta6i5mjmIqUt9/6TjqXELf2Y06R6wyeElydZ2aFOjeODI
-         LdpmWrZLz+xyWiE/gi3oWo8yLrh+bp0554hGK1MDytQ4XDLKqrdMcGzvKlbNItsvBkoX
-         rnf48HFpXAVoTHO609VDAX/MPBGnB64G5Xq8Noxk4lFTSX3w6XckI3zbof+knug2UDek
-         p1Wg==
-X-Gm-Message-State: ANoB5pkk/FQXhDp5uKa/lkobg3cnHTWFwwe2eHJgscLHEhwt9V+O5VmE
-        r1KCH4hN5ZvX90l3+Jea0tjp2g==
-X-Google-Smtp-Source: AA0mqf5Mi9GxgQuFPp2bkrf7MIEgUOiBJ/GAe0xzfX45eRtgh8UJkoOREYJAGduj6cwO56jIvucoew==
-X-Received: by 2002:aa7:d556:0:b0:45c:6467:94e2 with SMTP id u22-20020aa7d556000000b0045c646794e2mr77286461edr.295.1670341417439;
-        Tue, 06 Dec 2022 07:43:37 -0800 (PST)
+        bh=1wNGJip1HKswY03rIn0qBN8lLPIUP/zhuY/3XSL3+9g=;
+        b=Xypv3VQB7dERh8rd8JUZqC/P03GJJ0UyxtT0zUF5J0aip/MA746m/wPnIlwBnfdNyF
+         YPsM/oIAzYv7whawRw4naqCTVKyPbU01XP5WS6kyKIUcsRBIRb2lrJXVyf9IwicyNslW
+         qHlbCEaa0Q5kjIBbYqR0dsr6TbxnnYzQ9RaIMDDUAP7jlKg/GCKO5Rdy97afpJs8Ijtw
+         rfC/aAGPRBA8F4b6k5o+LQJ6wnz4U+M/VqrBU8DBULw2Twq6/woxoyPQ0vbH43nuIssl
+         WYD4Rb6id2OTet2LF10tgkq8J/BnCVMuaZmFyDSgTFvTTyGU3oj6FgS89iSbtj+xncic
+         MgHw==
+X-Gm-Message-State: ANoB5pn+9JoilXIDJemMlR+kwUs09+JmUuoQQzf2tzftHhyu4NBYQThx
+        9do2sMSUFXHcc1eVEqVMBWtrTA==
+X-Google-Smtp-Source: AA0mqf5O5cZ8jGnB/77uzy3JBRtagKZAZO2TV80r76TGZfG4XbsIH3Cz4RphZQYm70T/1MMOHro6Lw==
+X-Received: by 2002:a50:c314:0:b0:46c:4850:a192 with SMTP id a20-20020a50c314000000b0046c4850a192mr15141650edb.65.1670344021185;
+        Tue, 06 Dec 2022 08:27:01 -0800 (PST)
 Received: from mbp-di-paolo.station (net-2-35-55-161.cust.vodafonedsl.it. [2.35.55.161])
-        by smtp.gmail.com with ESMTPSA id x10-20020a1709060a4a00b00741a251d9e8sm7547195ejf.171.2022.12.06.07.43.36
+        by smtp.gmail.com with ESMTPSA id d18-20020a50fb12000000b004588ef795easm1164055edq.34.2022.12.06.08.27.00
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 06 Dec 2022 07:43:36 -0800 (PST)
+        Tue, 06 Dec 2022 08:27:00 -0800 (PST)
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
-Subject: Re: [PATCH V6 6/8] block, bfq: retrieve independent access ranges
- from request queue
+Subject: Re: [PATCH V7 1/8] block, bfq: split sync bfq_queues on a
+ per-actuator basis
 From:   Paolo Valente <paolo.valente@linaro.org>
-In-Reply-To: <6983f8b3-a320-ce32-ef0d-273d11dd8648@opensource.wdc.com>
-Date:   Tue, 6 Dec 2022 16:43:35 +0100
+In-Reply-To: <5f8aa1f6-c0d1-d6b9-f01d-f9a65cdeadb6@opensource.wdc.com>
+Date:   Tue, 6 Dec 2022 17:26:59 +0100
 Cc:     Jens Axboe <axboe@kernel.dk>,
         linux-block <linux-block@vger.kernel.org>,
         linux-kernel <linux-kernel@vger.kernel.org>,
         Arie van der Hoeven <arie.vanderhoeven@seagate.com>,
         Rory Chen <rory.c.chen@seagate.com>,
-        Federico Gavioli <f.gavioli97@gmail.com>
+        Glen Valante <glen.valante@linaro.org>,
+        Gabriele Felici <felicigb@gmail.com>,
+        Carmine Zaccagnino <carmine@carminezacc.com>
 Content-Transfer-Encoding: quoted-printable
-Message-Id: <518C279B-8896-470A-9D8C-974F3BB886DB@linaro.org>
-References: <20221103162623.10286-1-paolo.valente@linaro.org>
- <20221103162623.10286-7-paolo.valente@linaro.org>
- <5d062001-2fff-35e5-d951-a61b510727d9@opensource.wdc.com>
- <4C45BCC6-D9AB-4C70-92E2-1B54AB4A2090@linaro.org>
- <d27ca14b-e228-49b7-28a8-00ea67e8ea06@opensource.wdc.com>
- <76ADE275-1862-44F7-B9C4-4A08179A72E3@linaro.org>
- <6983f8b3-a320-ce32-ef0d-273d11dd8648@opensource.wdc.com>
+Message-Id: <50017876-ED45-44E7-A2F9-90BB8178D129@linaro.org>
+References: <20221206081551.28257-1-paolo.valente@linaro.org>
+ <20221206081551.28257-2-paolo.valente@linaro.org>
+ <5f8aa1f6-c0d1-d6b9-f01d-f9a65cdeadb6@opensource.wdc.com>
 To:     Damien Le Moal <damien.lemoal@opensource.wdc.com>
 X-Mailer: Apple Mail (2.3445.104.11)
 Precedence: bulk
@@ -80,165 +78,187 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 
 
-> Il giorno 6 dic 2022, alle ore 10:02, Damien Le Moal =
+> Il giorno 6 dic 2022, alle ore 09:53, Damien Le Moal =
 <damien.lemoal@opensource.wdc.com> ha scritto:
 >=20
-> On 12/6/22 17:41, Paolo Valente wrote:
+> [...]
+>> 	return bfqg;
+>> diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+>> index 7ea427817f7f..127aeecaf903 100644
+>> --- a/block/bfq-iosched.c
+>> +++ b/block/bfq-iosched.c
+>> @@ -377,14 +377,21 @@ static const unsigned long =
+bfq_late_stable_merging =3D 600;
+>> #define RQ_BIC(rq)		((struct bfq_io_cq =
+*)((rq)->elv.priv[0]))
+>> #define RQ_BFQQ(rq)		((rq)->elv.priv[1])
 >>=20
->>=20
->>> Il giorno 6 dic 2022, alle ore 09:29, Damien Le Moal =
-<damien.lemoal@opensource.wdc.com> ha scritto:
->>>=20
->>> On 12/6/22 17:06, Paolo Valente wrote:
->>>>=20
->>>>=20
->>>>> Il giorno 21 nov 2022, alle ore 02:01, Damien Le Moal =
-<damien.lemoal@opensource.wdc.com> ha scritto:
->>>>>=20
->>>>=20
->>>> ...
->>>>=20
->>>>>=20
->>>>>> }
->>>>>>=20
->>>>>> static bool bfq_bio_merge(struct request_queue *q, struct bio =
-*bio,
->>>>>> @@ -7144,6 +7159,8 @@ static int bfq_init_queue(struct =
-request_queue *q, struct elevator_type *e)
->>>>>> {
->>>>>> 	struct bfq_data *bfqd;
->>>>>> 	struct elevator_queue *eq;
->>>>>> +	unsigned int i;
->>>>>> +	struct blk_independent_access_ranges *ia_ranges =3D =
-q->disk->ia_ranges;
->>>>>>=20
->>>>>> 	eq =3D elevator_alloc(q, e);
->>>>>> 	if (!eq)
->>>>>> @@ -7187,10 +7204,31 @@ static int bfq_init_queue(struct =
-request_queue *q, struct elevator_type *e)
->>>>>> 	bfqd->queue =3D q;
->>>>>>=20
->>>>>> 	/*
->>>>>> -	 * Multi-actuator support not complete yet, default to =
-single
->>>>>> -	 * actuator for the moment.
->>>>>> +	 * If the disk supports multiple actuators, we copy the =
-independent
->>>>>> +	 * access ranges from the request queue structure.
->>>>>> 	 */
->>>>>> -	bfqd->num_actuators =3D 1;
->>>>>> +	spin_lock_irq(&q->queue_lock);
->>>>>> +	if (ia_ranges) {
->>>>>> +		/*
->>>>>> +		 * Check if the disk ia_ranges size exceeds the =
-current bfq
->>>>>> +		 * actuator limit.
->>>>>> +		 */
->>>>>> +		if (ia_ranges->nr_ia_ranges > BFQ_MAX_ACTUATORS) =
-{
->>>>>> +			pr_crit("nr_ia_ranges higher than act =
-limit: iars=3D%d, max=3D%d.\n",
->>>>>> +				ia_ranges->nr_ia_ranges, =
-BFQ_MAX_ACTUATORS);
->>>>>> +			pr_crit("Falling back to single actuator =
-mode.\n");
->>>>>> +			bfqd->num_actuators =3D 0;
->>>>>> +		} else {
->>>>>> +			bfqd->num_actuators =3D =
-ia_ranges->nr_ia_ranges;
->>>>>> +
->>>>>> +			for (i =3D 0; i < bfqd->num_actuators; =
-i++)
->>>>>> +				bfqd->ia_ranges[i] =3D =
-ia_ranges->ia_range[i];
->>>>>> +		}
->>>>>> +	} else {
->>>>>> +		bfqd->num_actuators =3D 0;
->>>>>=20
->>>>> That is very weird. The default should be 1 actuator.
->>>>> ia_ranges->nr_ia_ranges is 0 when the disk does not provide any =
-range
->>>>> information, meaning it is a regular disk with a single actuator.
->>>>=20
->>>> Actually, IIUC this assignment to 0 seems to be done exactly when =
-you
->>>> say that it should be done, i.e., when the disk does not provide =
-any
->>>> range information (ia_ranges is NULL). Am I missing something else?
->>>=20
->>> No ranges reported means no extra actuators, so a single actuator an
->>> single LBA range for the entire device.
->>=20
->> I'm still confused, sorry.  Where will I read sector ranges from, if
->> no sector range information is available (ia_ranges is NULL)?
+>> -struct bfq_queue *bic_to_bfqq(struct bfq_io_cq *bic, bool is_sync)
+>> +struct bfq_queue *bic_to_bfqq(struct bfq_io_cq *bic, bool is_sync,
+>> +			      unsigned int actuator_idx)
+>> {
+>> -	return bic->bfqq[is_sync];
 >=20
-> start =3D 0 and nr_sectors =3D bdev_nr_sectors(bdev).
-> No ia_ranges to read.
+> See below. But here, you could add:
 >=20
-
-ok, thanks
-
->>=20
->>> In that case, bfq should process
->>> all IOs using bfqd->ia_ranges[0]. The get range function will always
->>> return that range. That makes the code clean and avoids different =
-path for
->>> nr_ranges =3D=3D 1 and nr_ranges > 1. No ?
->>=20
->> Apart from the above point, for which maybe there is some other
->> source of information for getting ranges, I see the following issue.
->>=20
->> What you propose is to save sector information and trigger the
->> range-checking for loop also for the above single-actuator case.  Yet
->> txecuting (one iteration of) that loop will will always result in
->> getting a 0 as index.  So, what's the point is saving data and
->> executing code on each IO, for getting a static result that we =
-already
->> know we will get?
+> 	if (!bic)
+> 		return NULL;
 >=20
-> Surely, you can add an "if (bfqd->num_actuators =3D=3D1)" optimization =
-in
-> strategic places to optimize for regular devices with a single =
-actuator,
-> which bfqd->num_actuators =3D=3D 1 *exactly* describes. Having
-> "bfqd->num_actuators =3D 0" makes no sense to me.
+>> +	if (is_sync)
+>> +		return bic->bfqq[1][actuator_idx];
+>> +
+>> +	return bic->bfqq[0][actuator_idx];
+>> }
+>>=20
+>> static void bfq_put_stable_ref(struct bfq_queue *bfqq);
+>>=20
+>> -void bic_set_bfqq(struct bfq_io_cq *bic, struct bfq_queue *bfqq, =
+bool is_sync)
+>> +void bic_set_bfqq(struct bfq_io_cq *bic,
+>> +		  struct bfq_queue *bfqq,
+>> +		  bool is_sync,
+>> +		  unsigned int actuator_idx)
+>> {
+>> 	/*
+>> 	 * If bfqq !=3D NULL, then a non-stable queue merge between
+>> @@ -399,7 +406,10 @@ void bic_set_bfqq(struct bfq_io_cq *bic, struct =
+bfq_queue *bfqq, bool is_sync)
+>> 	 * we cancel the stable merge if
+>> 	 * bic->stable_merge_bfqq =3D=3D bfqq.
+>> 	 */
+>> -	bic->bfqq[is_sync] =3D bfqq;
+>> +	if (is_sync)
+>> +		bic->bfqq[1][actuator_idx] =3D bfqq;
+>> +	else
+>> +		bic->bfqq[0][actuator_idx] =3D bfqq;
+>>=20
+>> 	if (bfqq && bic->stable_merge_bfqq =3D=3D bfqq) {
+>> 		/*
+>> @@ -672,9 +682,9 @@ static void bfq_limit_depth(blk_opf_t opf, struct =
+blk_mq_alloc_data *data)
+>> {
+>> 	struct bfq_data *bfqd =3D data->q->elevator->elevator_data;
+>> 	struct bfq_io_cq *bic =3D bfq_bic_lookup(data->q);
+>> -	struct bfq_queue *bfqq =3D bic ? bic_to_bfqq(bic, =
+op_is_sync(opf)) : NULL;
+>> 	int depth;
+>> 	unsigned limit =3D data->q->nr_requests;
+>> +	unsigned int act_idx;
+>>=20
+>> 	/* Sync reads have full depth available */
+>> 	if (op_is_sync(opf) && !op_is_write(opf)) {
+>> @@ -684,14 +694,21 @@ static void bfq_limit_depth(blk_opf_t opf, =
+struct blk_mq_alloc_data *data)
+>> 		limit =3D (limit * depth) >> bfqd->full_depth_shift;
+>> 	}
+>>=20
+>> -	/*
+>> -	 * Does queue (or any parent entity) exceed number of requests =
+that
+>> -	 * should be available to it? Heavily limit depth so that it =
+cannot
+>> -	 * consume more available requests and thus starve other =
+entities.
+>> -	 */
+>> -	if (bfqq && bfqq_request_over_limit(bfqq, limit))
+>> -		depth =3D 1;
+>> +	for (act_idx =3D 0; act_idx < bfqd->num_actuators; act_idx++) {
+>> +		struct bfq_queue *bfqq =3D
+>> +			bic ? bic_to_bfqq(bic, op_is_sync(opf), act_idx) =
+: NULL;
 >=20
+> You could return NULL in bic_to_bfqq() if bic is NULL. That would =
+avoid
+> this cludge.
 
-Ok, I see your point at last, sorry.  I'll check the code, but I think
-that there is no problem in moving from 0 to 1 actuators for the case
-ia_ranges =3D=3D NULL.  I meant to separate the case "single actuator =
-with
-ia_ranges available" (num_actuators =3D 1), from the case "no ia_ranges
-available" (num_actuators =3D 0).  But evidently things don't work as I
-thought, and using the same value (1) is ok.
+Actually, this would improve code here, but it would entail the above
+(useless) control for all the other invocations :(
 
-Just, let me avoid setting the fields bfqd->sector and
-bfqd->nr_sectors for a case where we don't use them.
+>=20
+>>=20
+>> +		/*
+>> +		 * Does queue (or any parent entity) exceed number of
+>> +		 * requests that should be available to it? Heavily
+>> +		 * limit depth so that it cannot consume more
+>> +		 * available requests and thus starve other entities.
+>> +		 */
+>> +		if (bfqq && bfqq_request_over_limit(bfqq, limit)) {
+>> +			depth =3D 1;
+>> +			break;
+>> +		}
+>> +	}
+>> 	bfq_log(bfqd, "[%s] wr_busy %d sync %d depth %u",
+>> 		__func__, bfqd->wr_busy_queues, op_is_sync(opf), depth);
+>> 	if (depth)
+>> @@ -1812,6 +1829,18 @@ static bool =
+bfq_bfqq_higher_class_or_weight(struct bfq_queue *bfqq,
+>> 	return bfqq_weight > in_serv_weight;
+>> }
+>>=20
+>> +/*
+>> + * Get the index of the actuator that will serve bio.
+>> + */
+>> +static unsigned int bfq_actuator_index(struct bfq_data *bfqd, struct =
+bio *bio)
+>> +{
+>> +	/*
+>> +	 * Multi-actuator support not complete yet, so always return 0
+>> +	 * for the moment (to keep incomplete mechanisms off).
+>> +	 */
+>> +	return 0;
+>> +}
+>> +
+>> static bool bfq_better_to_idle(struct bfq_queue *bfqq);
+>>=20
+>> static void bfq_bfqq_handle_idle_busy_switch(struct bfq_data *bfqd,
+>> @@ -2142,7 +2171,7 @@ static void bfq_check_waker(struct bfq_data =
+*bfqd, struct bfq_queue *bfqq,
+>> 	 * We reset waker detection logic also if too much time has =
+passed
+>>  	 * since the first detection. If wakeups are rare, pointless =
+idling
+>> 	 * doesn't hurt throughput that much. The condition below makes =
+sure
+>> -	 * we do not uselessly idle blocking waker in more than 1/64 =
+cases.=20
+>> +	 * we do not uselessly idle blocking waker in more than 1/64 =
+cases.
+>> 	 */
+>> 	if (bfqd->last_completed_rq_bfqq !=3D
+>> 	    bfqq->tentative_waker_bfqq ||
+>> @@ -2478,7 +2507,8 @@ static bool bfq_bio_merge(struct request_queue =
+*q, struct bio *bio,
+>> 		 */
+>> 		bfq_bic_update_cgroup(bic, bio);
+>>=20
+>> -		bfqd->bio_bfqq =3D bic_to_bfqq(bic, =
+op_is_sync(bio->bi_opf));
+>> +		bfqd->bio_bfqq =3D bic_to_bfqq(bic, =
+op_is_sync(bio->bi_opf),
+>> +					     bfq_actuator_index(bfqd, =
+bio));
+>=20
+> Given that you repeat this pattern a lot, might be worth having a =
+wrapper
+> like:
+>=20
+> static inline struct bfq_queue *bio_to_bfqq(struct bfq_io_cq *bic,
+> 					    struct bio *bio)
+> {
+> 	return bic_to_bfqq(bic, op_is_sync(bio->bi_opf),
+> 			   bfq_actuator_index(bfqd, bio));
+> }
+>=20
+> The code would be less verbose while still being clear.
+
+Actually this (exact) pattern is used only twice.  I'm thinking of
+some more general wrapper, but each different combination seems to
+have its own extra cost.  Any suggestion is more than welcome.
+Meanwhile, I'll send a V8 to keep this going.
+
+As usual, in my V8 I'll apply all of your other suggestions.
 
 Thanks,
 Paolo
 
-> But if you feel strongly about this, feel free to ignore this.
->=20
->>=20
->> Thanks,
->> Paolo
->>=20
->>>=20
->>>>=20
->>>> Once again, all other suggestions applied. I'm about to submit a =
-V7.
->>>>=20
->>>> Thanks,
->>>> Paolo
->>>>=20
->>>=20
->>> --=20
->>> Damien Le Moal
->>> Western Digital Research
->>=20
->=20
-> --=20
-> Damien Le Moal
-> Western Digital Research
-
+[...]=
