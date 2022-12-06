@@ -2,195 +2,81 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E34D8C3A5A7
-	for <linux-block@archiver.kernel.org>; Tue,  6 Dec 2022 19:31:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 812C5C3A5A7
+	for <linux-block@archiver.kernel.org>; Tue,  6 Dec 2022 19:56:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229702AbiLFTbf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 6 Dec 2022 14:31:35 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59788 "EHLO
+        id S229544AbiLFT4n (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 6 Dec 2022 14:56:43 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40438 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229602AbiLFTbe (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 6 Dec 2022 14:31:34 -0500
-Received: from mx1.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DDE1B2FFE7;
-        Tue,  6 Dec 2022 11:31:31 -0800 (PST)
-Received: from [192.168.0.2] (ip5f5aeffe.dynamic.kabel-deutschland.de [95.90.239.254])
-        (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (No client certificate requested)
-        (Authenticated sender: pmenzel)
-        by mx.molgen.mpg.de (Postfix) with ESMTPSA id EAFA660027FC0;
-        Tue,  6 Dec 2022 20:31:27 +0100 (CET)
-Message-ID: <b28ab260-7a5a-4801-4d33-80c66ae25f89@molgen.mpg.de>
-Date:   Tue, 6 Dec 2022 20:31:27 +0100
+        with ESMTP id S229507AbiLFT4m (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 6 Dec 2022 14:56:42 -0500
+Received: from mail-il1-x12c.google.com (mail-il1-x12c.google.com [IPv6:2607:f8b0:4864:20::12c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 39C0732BAC
+        for <linux-block@vger.kernel.org>; Tue,  6 Dec 2022 11:56:41 -0800 (PST)
+Received: by mail-il1-x12c.google.com with SMTP id x11so6122526ilo.13
+        for <linux-block@vger.kernel.org>; Tue, 06 Dec 2022 11:56:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=solid-run-com.20210112.gappssmtp.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=Pr5A82QMDS3439cV/l0TiwyD6oe8HTmjdxBAYHIenkw=;
+        b=5gZ4Gpu/Xoh5ChxX8vn4yDQ839Y02gORAbRJKicZwrHFBH0NIchUZDW6Y615MW8Cuo
+         ZdO4L3CqvKD9JNcgHJjpe9/mjrs85Al83QInqMzjcK62pr1wgEqU8ZhTAJi4Ib3ahj7k
+         BZlEtq3KfssqlsY9tZQIx0vaLlC9u3vbxT8LvjuAL1GnsClNkR2tm4WIKQeodHoXdkZE
+         KiPCEIcEoxIg4QSjQNTqtlAXIew+2ghnCH4ev8+TU75YzUKjhKWJSMnNxTy27fwj8JCb
+         XWwul5V7p/Z+1rXby5ETA9G2t4IWGRXtyRcQ3Cmi0XJKOmS3YkN3oRqED74z2Db+6nws
+         ZSgw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Pr5A82QMDS3439cV/l0TiwyD6oe8HTmjdxBAYHIenkw=;
+        b=SU9sAf+g2BpVeEpA6/cpyqodBZXERNpv0zYN8o5FZZfeL0h2tD9W77hLEj1/0b1yzm
+         xKz0XwgOqIGg37FFiYSz53mvWzXF3xlb5qBp8YG0Hlh7p/U7v4DchkoCBtvVOBaNKxAg
+         L1j6vlp1N5x7DIWSQII7wQZbJUuXMZsw15kjqN9AVe9cl1RrDA7HAK/PkqEljCNdSwCZ
+         dSGUQ7qVaS3JPgumelzj75TV5jjRyFogZ64FGLUDOjWX7mh0km+HuVl+WR+swAahCkWA
+         DIXGTTjFZ9J1SOCO6EdiB4PGq8wYQBV/z4mTEu9PveZM0VA3Bvo1/5TPt/e85cCT37Wh
+         9YbQ==
+X-Gm-Message-State: ANoB5pnisHczQKGveHx2tubPh9Rtgk0/w/MG/7Ah0BufRqwBf06V+uHY
+        TFPtBxELs330yRtCcPsS0lHSzIAOAx/tp8MwoOyuA3Jt/SXP0auRgNA=
+X-Google-Smtp-Source: AA0mqf5weYpfxnfmeNEaWEQd5GuamfhCWZUc6GKCqEjTgjj47RKtDegoyGS/7Ff3WUue6RAch00gS/qlXcQ0t/Pzp84=
+X-Received: by 2002:a05:6e02:1c8d:b0:303:71ee:7b6b with SMTP id
+ w13-20020a056e021c8d00b0030371ee7b6bmr2852396ill.147.1670356600505; Tue, 06
+ Dec 2022 11:56:40 -0800 (PST)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.1
-Subject: Re: [RFC] block: Change the granularity of io ticks from ms to ns
-To:     Gulam Mohamed <gulam.mohamed@oracle.com>
-Cc:     linux-block@vger.kernel.org, axboe@kernel.dk,
-        philipp.reisner@linbit.com, lars.ellenberg@linbit.com,
-        christoph.boehmwalder@linbit.com, minchan@kernel.org,
-        ngupta@vflare.org, senozhatsky@chromium.org, colyli@suse.de,
-        kent.overstreet@gmail.com, agk@redhat.com, snitzer@kernel.org,
-        dm-devel@redhat.com, song@kernel.org, dan.j.williams@intel.com,
-        vishal.l.verma@intel.com, dave.jiang@intel.com,
-        ira.weiny@intel.com, junxiao.bi@oracle.com,
-        martin.petersen@oracle.com, kch@nvidia.com,
-        drbd-dev@lists.linbit.com, linux-kernel@vger.kernel.org,
-        linux-bcache@vger.kernel.org, linux-raid@vger.kernel.org,
-        nvdimm@lists.linux.dev, konrad.wilk@oracle.com
-References: <20221206181536.13333-1-gulam.mohamed@oracle.com>
-Content-Language: en-US
-From:   Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20221206181536.13333-1-gulam.mohamed@oracle.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+References: <20221205162035.2261037-1-alvaro.karsz@solid-run.com> <1d1c946d-2739-6347-f453-8ccf92c6a0cc@acm.org>
+In-Reply-To: <1d1c946d-2739-6347-f453-8ccf92c6a0cc@acm.org>
+From:   Alvaro Karsz <alvaro.karsz@solid-run.com>
+Date:   Tue, 6 Dec 2022 21:56:05 +0200
+Message-ID: <CAJs=3_CWrO34KBxN_eNVyibRNYUP9tzmywnmq2W+9uMYwbQdBA@mail.gmail.com>
+Subject: Re: [PATCH v3] virtio_blk: add VIRTIO_BLK_F_LIFETIME feature support
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     virtualization@lists.linux-foundation.org,
+        linux-block@vger.kernel.org, dm-devel@redhat.com,
+        linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Jens Axboe <axboe@kernel.dk>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Dear Gulam,
+Hi Bart,
 
+> Why does the above data structure only refer to SLC and MLC but not to
+> TLC or QLC?
 
-Thank you for the patch.
+This has been discussed before.
+The data structure follows the virtio spec
+(https://docs.oasis-open.org/virtio/virtio/v1.2/csd01/virtio-v1.2-csd01.html)
 
-Am 06.12.22 um 19:15 schrieb Gulam Mohamed:
-> Use ktime to change the granularity of IO accounting in block layer from
-> milli-seconds to nano-seconds to get the proper latency values for the
-> devices whose latency is in micro-seconds. After changing the granularity
-> to nano-seconds the iostat command, which was showing incorrect values for
-> %util, is now showing correct values.
-> 
-> We did not work on the patch to drop the logic for
-> STAT_PRECISE_TIMESTAMPS yet. Will do it if this patch is ok.
-> 
-> The iostat command was run after starting the fio with following command
-> on an NVME disk. For the same fio command, the iostat %util was showing
-> ~100% for the disks whose latencies are in the range of microseconds.
-> With the kernel changes (granularity to nano-seconds), the %util was
-> showing correct values. Following are the details of the test and their
-> output:
-> 
-> fio command
-> -----------
-> [global]
-> bs=128K
-> iodepth=1
-> direct=1
-> ioengine=libaio
-> group_reporting
-> time_based
-> runtime=90
-> thinktime=1ms
-> numjobs=1
-> name=raw-write
-> rw=randrw
-> ignore_error=EIO:EIO
-> [job1]
-> filename=/dev/nvme0n1
-> 
-> Correct values after kernel changes:
-> ====================================
-> iostat output
-> -------------
-> iostat -d /dev/nvme0n1 -x 1
-> 
-> Device            r_await w_await aqu-sz rareq-sz wareq-sz  svctm  %util
-> nvme0n1              0.08    0.05   0.06   128.00   128.00   0.07   6.50
-> 
-> Device            r_await w_await aqu-sz rareq-sz wareq-sz  svctm  %util
-> nvme0n1              0.08    0.06   0.06   128.00   128.00   0.07   6.30
-> 
-> Device            r_await w_await aqu-sz rareq-sz wareq-sz  svctm  %util
-> nvme0n1              0.06    0.05   0.06   128.00   128.00   0.06   5.70
-> 
->  From fio
-> --------
-> Read Latency: clat (usec): min=32, max=2335, avg=79.54, stdev=29.95
-> Write Latency: clat (usec): min=38, max=130, avg=57.76, stdev= 3.25
-> 
-> Values before kernel changes
-> ============================
-> iostat output
-> -------------
-> 
-> iostat -d /dev/nvme0n1 -x 1
-> 
-> Device            r_await w_await aqu-sz rareq-sz wareq-sz  svctm  %util
-> nvme0n1              0.08    0.06   0.06   128.00   128.00   1.07  97.70
-> 
-> Device            r_await w_await aqu-sz rareq-sz wareq-sz  svctm  %util
-> nvme0n1              0.08    0.06   0.06   128.00   128.00   1.08  98.80
-> 
-> Device            r_await w_await aqu-sz rareq-sz wareq-sz  svctm  %util
-> nvme0n1              0.08    0.05   0.06   128.00   128.00   1.06  97.20
-> 
->  From fio
-> --------
-> Read Latency: clat (usec): min=33, max=468, avg=79.56, stdev=28.04
-> Write Latency: clat (usec): min=9, max=139, avg=57.10, stdev= 3.79
+> How will this data structure be extended without having to introduce a
+> new ioctl?
 
-I’d order the numbers before the change first, but it’s not important.
-
-> Signed-off-by: Junxiao Bi <junxiao.bi@oracle.com>
-> Signed-off-by: Gulam Mohamed <gulam.mohamed@oracle.com>
-
-(If Junxiao is the patch author, that name should be documented as the 
-patch author.)
-
-> ---
->   block/blk-core.c                  | 26 +++++++++++++-------------
->   block/blk-mq.c                    |  4 ++--
->   block/blk.h                       |  2 +-
->   block/genhd.c                     |  8 ++++----
->   drivers/block/drbd/drbd_debugfs.c |  4 ++--
->   drivers/block/drbd/drbd_int.h     |  2 +-
->   drivers/block/zram/zram_drv.c     |  4 ++--
->   drivers/md/bcache/request.c       | 10 +++++-----
->   drivers/md/dm-core.h              |  2 +-
->   drivers/md/dm.c                   |  8 ++++----
->   drivers/md/md.h                   |  2 +-
->   drivers/md/raid1.h                |  2 +-
->   drivers/md/raid10.h               |  2 +-
->   drivers/md/raid5.c                |  2 +-
->   drivers/nvdimm/btt.c              |  2 +-
->   drivers/nvdimm/pmem.c             |  2 +-
->   include/linux/blk_types.h         |  2 +-
->   include/linux/blkdev.h            | 14 +++++++-------
->   include/linux/part_stat.h         |  2 +-
->   19 files changed, 50 insertions(+), 50 deletions(-)
-> 
-> diff --git a/block/blk-core.c b/block/blk-core.c
-> index 5487912befe8..069c29dad3e7 100644
-> --- a/block/blk-core.c
-> +++ b/block/blk-core.c
-> @@ -912,12 +912,12 @@ int iocb_bio_iopoll(struct kiocb *kiocb, struct io_comp_batch *iob,
->   }
->   EXPORT_SYMBOL_GPL(iocb_bio_iopoll);
->   
-> -void update_io_ticks(struct block_device *part, unsigned long now, bool end)
-> +void update_io_ticks(struct block_device *part, u64 now, bool end)
->   {
-> -	unsigned long stamp;
-> +	u64 stamp;
-
-Did you check the code size difference with `scripts/bloat-o-meter`?
-
-Instead of the fixed-size type, I’d use `unsigned long long` to ensure 
-the minimum size is 64-bit.
-
->   again:
->   	stamp = READ_ONCE(part->bd_stamp);
-> -	if (unlikely(time_after(now, stamp))) {
-> +	if (unlikely(time_after64(now, stamp))) {
-
-No idea, if it’s possible with `time_after64()` though, as that uses 
-`__u64`.
-
-[…]
-
-
-Kind regards,
-
-Paul
+There are no more lifetime parameters defined in the virtio spec.
+Please note that this is a virtio block specific ioctl, not a block generic one.
