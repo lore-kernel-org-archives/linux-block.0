@@ -2,181 +2,180 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96553C47090
-	for <linux-block@archiver.kernel.org>; Tue,  6 Dec 2022 09:29:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63704C352A1
+	for <linux-block@archiver.kernel.org>; Tue,  6 Dec 2022 11:04:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234936AbiLFJ3Y (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 6 Dec 2022 04:29:24 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44600 "EHLO
+        id S229449AbiLFLEY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 6 Dec 2022 06:04:24 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50920 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233912AbiLFJ3X (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 6 Dec 2022 04:29:23 -0500
-Received: from mail-wr1-x430.google.com (mail-wr1-x430.google.com [IPv6:2a00:1450:4864:20::430])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A367C1CFDA
-        for <linux-block@vger.kernel.org>; Tue,  6 Dec 2022 01:29:21 -0800 (PST)
-Received: by mail-wr1-x430.google.com with SMTP id y16so22600565wrm.2
-        for <linux-block@vger.kernel.org>; Tue, 06 Dec 2022 01:29:21 -0800 (PST)
+        with ESMTP id S230036AbiLFLEW (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 6 Dec 2022 06:04:22 -0500
+Received: from esa4.hgst.iphmx.com (esa4.hgst.iphmx.com [216.71.154.42])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09113C56;
+        Tue,  6 Dec 2022 03:04:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1670324660; x=1701860660;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=joufdrNO2/FLdgGzlnaieoHfZ28FYCwNXGhrZ08f24E=;
+  b=XfuWEE2p2bw6qserwG9aL3vBFnsTa6+QF6+4NNGzYNYM0FgEEgZmaQ/b
+   2aJ/spp/RNrsDzP8DVHQQOPFxmn71yVdxuwPcn0UeNFWZMyql41wkHXe6
+   7WizdEM2YZLnwHMgy0rtH8bJu8V4sazXWN3cJvTE0O5FSuU4yvL4L6uBu
+   beEdSTHB0lfSxgdTW6qgvvZGefj6wvfujEfyXUJ+aLyznQ95ctcT6gsk1
+   BDmGUvRoxbS/D9AicpAGCGC4NeZyqb1YxEmuiMIzx65XxolDSyi4nKYpO
+   o6t4jBrB6OxlAwIc9AHjch3lZ/If4bw7hFHdyG5tMKAkGqntG7xGlhvsU
+   A==;
+X-IronPort-AV: E=Sophos;i="5.96,222,1665417600"; 
+   d="scan'208";a="216221757"
+Received: from mail-mw2nam04lp2172.outbound.protection.outlook.com (HELO NAM04-MW2-obe.outbound.protection.outlook.com) ([104.47.73.172])
+  by ob1.hgst.iphmx.com with ESMTP; 06 Dec 2022 19:04:18 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=arK5Bp0mhqPa2di9CdjnPW/PFw3bpFvzCOphfzNoR/BJhei+HBAcDHFUk0OyR4BIxAEf/5Lvwgw0MB8hnnmB93nVyQ/T89YtGluky6O6X/lSEIyY2y8DTNvTbVQP/AnpcBLXU05LsVJvjppUyZu4WAlu3dGbryre+QJ3qXT2vnwZ1wdiJrMMnGoPTc9aQipKs3DL++mbhfBhtmWhxd+x7oStE2CigbgHOBfoA1/ElmD9JlCapKNFozbjHd6n6K6i0bl4t4/jGOXdL2eU8FA2a8hA0x0US2uhKCO8SLz58uz/wYqLzzzmUzmpdLOjHhmezPSRORL/AKNXPZG6A45a+g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=joufdrNO2/FLdgGzlnaieoHfZ28FYCwNXGhrZ08f24E=;
+ b=h0HHCbyOk3amBo84Odw8yO2jYKqRhh3s/GzQJMmmK/SsWMTpgbWEkRBSNfseyZemPhFerF1XMkFN65R1YUvoNKG6jkV4EuRJemAglAR5DLmZnNHisbThmudpJALUUENw9Tav45BGp8+IkU6vsZ5r4+boC1bCuWtJ4O6SeiZo1XvTPQsoSd5imgOARyGLXQkEXzn0B1jPee/SERFdgheScDRse+HZu7X3vKrxpzlrpiYjPW7Ep+aaBcDMMNLHoLytJr6uU6APcHEhM7GMtDnX8PavrDbBKfx3JauC2uWqnpSIbApYRChZ3JJGjpYaHZN6nu9S9c5HJEs+7AEJT22J/g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=PmTRt7YDs57sWJDVE7fhRVC9OoYTIqsOQpeQA08LOIs=;
-        b=N4D2y9Hj/QPNn4zdlIwdjtcYwKpBuhy45yBtjEwOYjmh+xziCUXZYflvGEWH2BzN8e
-         qDt9jEAGqtReBFN1lBKEZqqu4r/CFFzltUsE1iY9xMmhbn41yd5rOKygnY1z6jueZvux
-         a+mDY/RcB0PAtHmmx3e5WUtrvAjCbtlc5PPQrlq/81/L7HpP4dAS9rhhmvj5BM5kcOtz
-         3DRPXX7epJ+dYogKnJCBHZJIPIo5k5xDMlNBaIidbRHPWELN6SfiH5Zo7ECMcwET3E5q
-         nVS8PW7rtQI5FDgR6ymvuyShqe1vUTkV43lJAICVSzTeeHedY9MDA8lghaJx4w6Xgp1h
-         5kBg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=PmTRt7YDs57sWJDVE7fhRVC9OoYTIqsOQpeQA08LOIs=;
-        b=z4zK/PZIde+gK8kV6JanM6I6bepX0uU8OrgphQHIPogdiUvD1XGelLZ7ZUi1Awe957
-         GxFwOwp5pVPeaaFWAgJmrLKWUisLYJiXB4XmzOYeoQUIY3mKqm2VllV0AmCMbpefifNb
-         3xr5zWoMfsvJXRW+0QbTAIRBDQjjPg0dDOU8fKMz/qatBX49ojKZ+NRbva8a18hwBuhQ
-         bjEqI7vUzRUrDjb1X5ub4JRq/tmqzAJefgxWQqsARzAmEs/cN9uJhWl2wy190gv/A+3f
-         Ah36H+hMudY998Bhj14W065dY2r8DbU/Z0iM0l1dz/gMJS2XAx3VXWAOfmPC8boFaKfe
-         rmNA==
-X-Gm-Message-State: ANoB5pnXRp1stzDMPzoUCnASgUP3NKa+SZ33arAE6O65hjMCxd2DAYFt
-        u5w8LXG7/oI6npCjLWsagtnt8aCez/c=
-X-Google-Smtp-Source: AA0mqf4a0SKKJ7R5h/t+LW2njhnlRKOKvqADcAqQzOUseGA9rd3JiGeVDUsQwLIrHVE4jbCtvFy2DA==
-X-Received: by 2002:a5d:4283:0:b0:242:55fd:2511 with SMTP id k3-20020a5d4283000000b0024255fd2511mr7513101wrq.7.1670318959669;
-        Tue, 06 Dec 2022 01:29:19 -0800 (PST)
-Received: from localhost ([2a01:4b00:d307:1000:6f15:7230:d519:3286])
-        by smtp.gmail.com with ESMTPSA id t17-20020a05600c199100b003c7087f6c9asm25483601wmq.32.2022.12.06.01.29.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 06 Dec 2022 01:29:19 -0800 (PST)
-From:   luca.boccassi@gmail.com
-To:     linux-block@vger.kernel.org
-Cc:     jonathan.derrick@linux.dev, axboe@kernel.dk
-Subject: [PATCH v4] sed-opal: allow using IOC_OPAL_SAVE for locking too
-Date:   Tue,  6 Dec 2022 09:29:13 +0000
-Message-Id: <20221206092913.4625-1-luca.boccassi@gmail.com>
-X-Mailer: git-send-email 2.35.1
-In-Reply-To: <20221202003610.100024-1-luca.boccassi@gmail.com>
-References: <20221202003610.100024-1-luca.boccassi@gmail.com>
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=joufdrNO2/FLdgGzlnaieoHfZ28FYCwNXGhrZ08f24E=;
+ b=R5DivWBD3HFEkeGIxVAAi91Kf+YEpnyBEFDw8NisWdcT2jAq1PqKWOKvNr58JX4LXCweK+LG4KdeLmUZpbT1n5rXKrt+4gN6WyrnAu1PQ8uFJZHisPCsmhcQzfTgnRnyaQUKnGb2UPEr24EY7H2Q8CnKwr8PBeDbTqWfrJsdzug=
+Received: from PH0PR04MB7416.namprd04.prod.outlook.com (2603:10b6:510:12::17)
+ by CY4PR04MB0247.namprd04.prod.outlook.com (2603:10b6:903:3c::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5880.14; Tue, 6 Dec
+ 2022 11:04:16 +0000
+Received: from PH0PR04MB7416.namprd04.prod.outlook.com
+ ([fe80::81b2:90e4:d6ec:d0c6]) by PH0PR04MB7416.namprd04.prod.outlook.com
+ ([fe80::81b2:90e4:d6ec:d0c6%5]) with mapi id 15.20.5880.014; Tue, 6 Dec 2022
+ 11:04:16 +0000
+From:   Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
+To:     Christoph Hellwig <hch@lst.de>, Chris Mason <clm@fb.com>,
+        Josef Bacik <josef@toxicpanda.com>,
+        David Sterba <dsterba@suse.com>
+CC:     Damien Le Moal <Damien.LeMoal@wdc.com>,
+        Naohiro Aota <Naohiro.Aota@wdc.com>, Qu Wenruo <wqu@suse.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        "Darrick J. Wong" <djwong@kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-btrfs@vger.kernel.org" <linux-btrfs@vger.kernel.org>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>
+Subject: Re: [PATCH 02/19] btrfs: handle checksum validation and repair at the
+ storage layer
+Thread-Topic: [PATCH 02/19] btrfs: handle checksum validation and repair at
+ the storage layer
+Thread-Index: AQHY/N5Rc4T4pkxXLEWR7XmAj+eE9a5gyziA
+Date:   Tue, 6 Dec 2022 11:04:16 +0000
+Message-ID: <90064ca8-3629-e686-212c-981cc43a9e1d@wdc.com>
+References: <20221120124734.18634-1-hch@lst.de>
+ <20221120124734.18634-3-hch@lst.de>
+In-Reply-To: <20221120124734.18634-3-hch@lst.de>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+user-agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.5.1
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=wdc.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: PH0PR04MB7416:EE_|CY4PR04MB0247:EE_
+x-ms-office365-filtering-correlation-id: acb54514-c6a5-46ca-a960-08dad7799dde
+wdcipoutbound: EOP-TRUE
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: wFMVd4XkLT2C5kEBVrqk+Kc8YJEkZeEjVdImUkvb5OjfKraN/XVnFHuBusD4YKWuIPHNQJb1wy+x/mu5r2ijH0Ea6f3uJUroAJCwurq7g0ODYoI9Z6MIEOsBHWsV6epIi/23MN7XSH1AHPZ2vo8rFK6qhCSRLc71xFWxRfAFZGTLLJzWPYvpg+55Z0VlIumgflIESin3oCT6Kdw1CxBLIQ0QGY7xRZKadNOleg3G61lNGAGyOxIxDsr1IFsq24xQpX8a/Ys3qYaW29Qid62GoHbfbHrndmeghxagox5fli7V9tH5VXfSKPwaf6aNSvS3xCFsfPlQlYTtuOyBWbtENzMeZ7ZYdKlHbH/vbV5ecoKg5uS36WHhU3v/VInvcOyPoT+K+1hHSjdnIR0OcNYW5OwUgW9CNHcpEXd+VH5WcBi2vJavkuOtej+Mjm+jHYDswAvaDHjJg4wPeJqOqo0Ni7KzbJF5DmigTv0eZJOCerer7KvPZgTyhiOacokzFjUhUrS8yyLkcP80tEZgGNY/PAQRZ3Ti1oD86Srx9u2IyyZpNVq8deTOSx+pSLaKOwlfdEdm1o52QX3tsMsxwIt0zMUuySrjKpEBXGAIuN3UUbp9Cn6a5PF3XCtjk95xxSD8gPJbBIzp3++oqGfrZ2GO/+A3x/EmYs6Ru8jis0q6ToQRdr8O8kV5RAdQshn4LMyh49AALkkfXiHlTvkM2HERDDqKHnwquwLfI9+xC8quypk/Lq8GMxfpofP7Pf3E7zEJo0yhulPNzC+r8IhvTMsMQA==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR04MB7416.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(136003)(396003)(346002)(366004)(376002)(39860400002)(451199015)(122000001)(31686004)(558084003)(86362001)(82960400001)(31696002)(7416002)(38070700005)(5660300002)(19618925003)(41300700001)(2906002)(4326008)(8936002)(8676002)(6506007)(6512007)(186003)(64756008)(316002)(110136005)(4270600006)(54906003)(2616005)(91956017)(66476007)(76116006)(66946007)(6486002)(66446008)(71200400001)(478600001)(66556008)(38100700002)(36756003)(43740500002)(45980500001);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?VzZ4Mm9OY0c4TGJwL1dTbE9ZMWF6ay8walBKM2YxcUI5LzVhaHNFTW9HVnN3?=
+ =?utf-8?B?Z1NTUjZISWNjNjExRzJ4ZUtiUEs1dFNvMUZZNDNsMjcrWHFUUDBUbHY3bENq?=
+ =?utf-8?B?a1FadnVGV1pENkNVOVIvQlEwN1lPRVZMc3dkOTJUbVJPL1IvN000eUR6UitR?=
+ =?utf-8?B?ZCtRWDlnbnhGWFNjVHljZUlSKzJ6Y0dKTTJJeVlobmtINEZVQTJ4aktoVkd2?=
+ =?utf-8?B?akVaZzVuVVdybXJsUW90YXVkTVN5TDBLVm1mbzIwUnBnbDQwNTV6am1EWHhy?=
+ =?utf-8?B?bWIreXBud1NlZHVPU0laS0ZiWWhwWElsbVNvS0c1MHExSDFjY2FQZXhHcmhR?=
+ =?utf-8?B?ZEtVSGc5T0EyaHY0TmF3WGl6dUtpN29KaW1Jb3Eya3lJV0JFRmQ4VzNQWEFr?=
+ =?utf-8?B?eWZlbndWZ0xGbnVZVVNkY1N0UWFZc1JFaEY1ZEFjMUZSc2NRQlF0UnpoNlI2?=
+ =?utf-8?B?ZHlwRXRwY2dDb05EOUdvUnFsRm5yUDQyNWF6NVhGZExNLzE5d29xSlhLQWV5?=
+ =?utf-8?B?bjFDZXo1ZTd1MXFPZWVqQUttZTBJTnh3RXJaTjR1UnJMU3V6L2tuUmlRb21o?=
+ =?utf-8?B?dVNGS0VVcy9DV0RYVXB2V2wrbWIvVGlWckwxcS9rRThtbVZqK0pHSGszVDJJ?=
+ =?utf-8?B?ZTl5allnVjg0OGJIMUx2cjR4QTNNeEloVlBBaE5GWEtPOVdGdTRKTDNNK0dJ?=
+ =?utf-8?B?TGtmUUpMSTJ0TmQyeHRPZU9EU2lyRnYwK0pUaFJuK3VZMkw5SXBRUXJSVlpq?=
+ =?utf-8?B?TUtVTHA2bGZ1UU9YSnQ4U3poTVhKTnBzNDlqc1pLaDlKVVQ3OHZJWms4K1U1?=
+ =?utf-8?B?VVdjdUx5UEtmWHBkQWNCNGZhc2x2ZSs2aDRsbXEvejdVQXdXRDFJdzkvRk90?=
+ =?utf-8?B?RjNmZzBXdHYzMi9uVnpIc2JhQjROTkJyTHdZdjZEUTFLMUNpM1VOdzVaQzBP?=
+ =?utf-8?B?cmRNamJzZTdnNVluakJzWFR4RC84dlFJMVMrVU9zZ3ZLc2Z5eTJUN1BvRVNz?=
+ =?utf-8?B?SlpIQzAxK09xK0VFMkZDWWVLN0FwQS9pNW14T2VRN1N4KzM3OCtHK2c2ODQv?=
+ =?utf-8?B?Y05QbFJDYjN6d29CVlJJaC9nZDVBNXN0d0lZb0NYWFU1R3I2T2JsZ0NlKzda?=
+ =?utf-8?B?Zkw1alpsMjh1dUZSVHc3czFmWTBPR1psQ2pWNDdiaSs0MitacHhMTFk2ZmlL?=
+ =?utf-8?B?a2RsSW5KbDJwNHQzbnRQamtpa1RxQlRsVTRGVmd1WHBTUURFWUNMV0xqUTl2?=
+ =?utf-8?B?d0IydXAzUUF3WUp0N1JCdVFKblgwYitOTStpcWptMkpqZXBsZDRGbXg3MkNQ?=
+ =?utf-8?B?V0R5M1V6MjAvbk5Jc0Jta2Zpcys4dWtuNU1uaWI1d2ZGSWFBNURLQ0pyWG1G?=
+ =?utf-8?B?ZDFpelZ4ZmVvWVJYbGVDeCtYWGdQRTdaUy9Gbzl3U2VSMFZNSFdPejFUS2ww?=
+ =?utf-8?B?ZGRXbHJRclZsVzZQMW8ycm9ta1o3UXFQVDVHeEJIYUhNOU9JVXFqbzRPdUEx?=
+ =?utf-8?B?elBpd2ZsZXphalZ3d3hybkttbTBJZzJpd2pqVlcvTHhJMjNQcWxVTFMwN2do?=
+ =?utf-8?B?MlZuYm1BK25yVTNxaS9Hc01MNC8xSnVJcjk2SGlwcllzc1VVOGQrdzBHYnRK?=
+ =?utf-8?B?d0pUdkdXengxUGJVR1NsMy81Z2JuQlRtOHlEd0VvYTZqUlNjbmg1a0RvM09C?=
+ =?utf-8?B?RWFnd1pRbzFrNjVkc0pYNGtLWFREeGRlSTRXVWI0VnF2bzZCRXg2RUJaQ0ho?=
+ =?utf-8?B?QUFIb08zSlZaS2FScCsyNVZPUGV4SW1RUytJVVhIY1A2MFlPQThpc3pobCtC?=
+ =?utf-8?B?OXVFSndCRE0xaENkdk8xVlRBQmRWREk1Z3hQdUhsSE1RMllZSjhldS9NVWlr?=
+ =?utf-8?B?N3dVV0pMeXlZKzNUb1MwQmpjbyt1dTFPWUVNaDcyWU9wMEpyU1hkbEpSMTJi?=
+ =?utf-8?B?UHNRVWNoYUJuOWtPSDJVakpJSmFPMlIwRW1VVFdLMVgxM2pjbE9Hd1JUS2Vs?=
+ =?utf-8?B?ZlNUSU85MmtHanNvMEo0VkhaVjBsWFYzM3BwdUpRSHZXVDJ6dGRCd3RVTGVB?=
+ =?utf-8?B?Z01waVdzSkhqRmNabWFRcmJyVElVSWNvMkh0MFNSSFV3a1RPYWRyV0I1VWJ1?=
+ =?utf-8?B?enIvQkV5dUVmNEZvalBNRnJQNVZUWlgySHVUY2NYVmVCNjZjZndlaWpIeURH?=
+ =?utf-8?B?TjFIU2NrVFh2SEl5R3hRbG9MNVlNSHo3dVVCYkNIQllsWTBuU3BLaXdZVWdJ?=
+ =?utf-8?Q?6Ru7g/9kMOklsOlL8oqeuOfukDgyQxQagc9UCN/1Rc=3D?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <4CA5FA69D67CAE4C80632B15CEB34278@namprd04.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: =?utf-8?B?SGNvaURHbVJuZ0MwMU13OFZmVklvTGhWMEFwZlRKejVoZmgrd0xWQlF2YXJH?=
+ =?utf-8?B?Z29WN3hQbkhjdGpablMxWmF5Z0VqY0dEOEErOFNWbVdOcE1UTGs2LytMTHA0?=
+ =?utf-8?B?WFpyM3o1NUc1aDd4eWRRU3lBN0RxZmxMZGozQU9rUjREWU84aVNGOFk4UFdh?=
+ =?utf-8?B?L1grYTM0RU1PYXZPKzFNbDgvNHRqK0t5R2ZWeWU2ZkFheFZualdCNENncGVD?=
+ =?utf-8?B?d0NWS3FpcTlUMkptZHNBZkhkTkM5QjRJMXk4Qjg1UjlpNkZJbEJkNmxXS3ha?=
+ =?utf-8?B?dTNlOG9OVEcvZGJIQUNsQlFtcW5taXlQbmhVR0gvVjVYd0FJMjBwY2N3S05E?=
+ =?utf-8?B?TXdzYy9ySVEvTjdzOW5TczdCclphVm0xb1ZVNVZNVHJobVQ0MmkxTVo5VEVP?=
+ =?utf-8?B?LzU2aW5TMXp5eEI0dnRMZ3VlN0xhVW5iNG1BOC9ZUUpYcmJic1VqY2VvN29S?=
+ =?utf-8?B?SFF6N09Ka2NSK0twRlJldGtDU2tOeExWZFErWGZzRUE3N1dmeFdZY1FmYldx?=
+ =?utf-8?B?bS9tbThGWHhHRC9CY2lObmdIa2Mycml5WmpDMTN3cTIybUFCV3dTTUUya1lQ?=
+ =?utf-8?B?YnJKVXcrbVdjSUdDOFJvWHNGbWhtODBndnF4ZmJLaTZhZDNpY1p3N2kxWEhj?=
+ =?utf-8?B?ZVdBZCs1SnBGQm11U3o1bldCRFRZY1dHYkNoQ1Q1VXFSbm9ZNURJMVFLMVND?=
+ =?utf-8?B?TktCaitBUTNibDJCb1NhTkllOHcreVVyYTBVWm5ueTYxa0pJbU9JZWt3MEpm?=
+ =?utf-8?B?RXVRSnR3dDlTalkrMnE2bWg2V0t4RTBFc1UrRHQ4WW4wMUU0RU9CdDFjNVZY?=
+ =?utf-8?B?U21kVmJWNFh6YTgzY1NUdG1tTXBHZGloYXhKK1YzTUQxbGZnM1JCemlieEEv?=
+ =?utf-8?B?cDdXTUR6dDJ2bDhlYmZWNTQyWHZ2eU96R0wvQ0ZicGI1Q21tQkkrRzVla0Yx?=
+ =?utf-8?B?U3hLT1hGN0MzcEJtSFBKZTZudjVITkZGYUpFMjd3Mkp3R3EwQVExOVZsTDgx?=
+ =?utf-8?B?Tlh2aXh3L2c1R2M0cGdZK3l6ZjZ2bWs0b0x6UC9sb05KMFBjMTRuYVdSQzd2?=
+ =?utf-8?B?blR4NFpPUGxrSW5kM3lFN2tsVlBqL2FlSGtPcVJXZHFZcWVmdFhQWSt6NXR6?=
+ =?utf-8?B?R1RuUUh5ZXZYN2tGeWRaa1l2MzNIK1NITlZPT0tyTVpUTDh4bUhYbktHeDFX?=
+ =?utf-8?B?eUxRRGxQemxhajNQRjBxbFZkUnNlcFhDWHFHQ1pBZ2tiRXJ1RlJKakw0ZzBl?=
+ =?utf-8?B?dFZGWmdRR2Mrc1JScjVvNWk4c3U4U0tuRjV2OTZvWVd4QTllZEVkWVJNa1ls?=
+ =?utf-8?B?N3lqNmxtZXVjNnhXOXh6NC9TQkg0bFk1YjZVeTl4R3FFTm1Rd3lMUER3TDd6?=
+ =?utf-8?Q?kQNlfrj+ABot4IZ83ryqAqnTC9+WdTmY=3D?=
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR04MB7416.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: acb54514-c6a5-46ca-a960-08dad7799dde
+X-MS-Exchange-CrossTenant-originalarrivaltime: 06 Dec 2022 11:04:16.5352
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: FjhG/ToVtTHdgyAKh5VaQD066e+t8Z7gnRUhv2QVOhz/xUvcbmpN012QDdgqpaNEg0Xd1+A08ujJpesjeDUBHqionCSu5nrQA+/P5Y1ZPnY=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR04MB0247
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Luca Boccassi <bluca@debian.org>
-
-Usually when closing a crypto device (eg: dm-crypt with LUKS) the
-volume key is not required, as it requires root privileges anyway, and
-root can deny access to a disk in many ways regardless. Requiring the
-volume key to lock the device is a peculiarity of the OPAL
-specification.
-
-Given we might already have saved the key if the user requested it via
-the 'IOC_OPAL_SAVE' ioctl, we can use that key to lock the device if no
-key was provided here and the locking range matches, and the user sets
-the appropriate flag with 'IOC_OPAL_SAVE'. This allows integrating OPAL
-with tools and libraries that are used to the common behaviour and do
-not ask for the volume key when closing a device.
-
-Callers can always pass a non-zero key and it will be used regardless,
-as before.
-
-Suggested-by: Štěpán Horáček <stepan.horacek@gmail.com>
-Signed-off-by: Luca Boccassi <bluca@debian.org>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Christian Brauner <brauner@kernel.org>
----
-v4: add reviewed-by tags, no other changes
-
- block/sed-opal.c              | 39 +++++++++++++++++++++++++++++++++++
- include/uapi/linux/sed-opal.h |  8 ++++++-
- 2 files changed, 46 insertions(+), 1 deletion(-)
-
-diff --git a/block/sed-opal.c b/block/sed-opal.c
-index 9bdb833e5817..463873f61e01 100644
---- a/block/sed-opal.c
-+++ b/block/sed-opal.c
-@@ -2461,6 +2461,44 @@ static int __opal_set_mbr_done(struct opal_dev *dev, struct opal_key *key)
- 	return execute_steps(dev, mbrdone_step, ARRAY_SIZE(mbrdone_step));
- }
- 
-+static void opal_lock_check_for_saved_key(struct opal_dev *dev,
-+			    struct opal_lock_unlock *lk_unlk)
-+{
-+	struct opal_suspend_data *iter;
-+
-+	if (lk_unlk->l_state != OPAL_LK ||
-+			lk_unlk->session.opal_key.key_len > 0)
-+		return;
-+
-+	/*
-+	 * Usually when closing a crypto device (eg: dm-crypt with LUKS) the
-+	 * volume key is not required, as it requires root privileges anyway,
-+	 * and root can deny access to a disk in many ways regardless.
-+	 * Requiring the volume key to lock the device is a peculiarity of the
-+	 * OPAL specification. Given we might already have saved the key if
-+	 * the user requested it via the 'IOC_OPAL_SAVE' ioctl, we can use
-+	 * that key to lock the device if no key was provided here, the
-+	 * locking range matches and the appropriate flag was passed with
-+	 * 'IOC_OPAL_SAVE'.
-+	 * This allows integrating OPAL with tools and libraries that are used
-+	 * to the common behaviour and do not ask for the volume key when
-+	 * closing a device.
-+	 */
-+	setup_opal_dev(dev);
-+	list_for_each_entry(iter, &dev->unlk_lst, node) {
-+		if ((iter->unlk.flags & OPAL_SAVE_FOR_LOCK) &&
-+				iter->lr == lk_unlk->session.opal_key.lr &&
-+				iter->unlk.session.opal_key.key_len > 0) {
-+			lk_unlk->session.opal_key.key_len =
-+				iter->unlk.session.opal_key.key_len;
-+			memcpy(lk_unlk->session.opal_key.key,
-+				iter->unlk.session.opal_key.key,
-+				iter->unlk.session.opal_key.key_len);
-+			break;
-+		}
-+	}
-+}
-+
- static int opal_lock_unlock(struct opal_dev *dev,
- 			    struct opal_lock_unlock *lk_unlk)
- {
-@@ -2470,6 +2508,7 @@ static int opal_lock_unlock(struct opal_dev *dev,
- 		return -EINVAL;
- 
- 	mutex_lock(&dev->dev_lock);
-+	opal_lock_check_for_saved_key(dev, lk_unlk);
- 	ret = __opal_lock_unlock(dev, lk_unlk);
- 	mutex_unlock(&dev->dev_lock);
- 
-diff --git a/include/uapi/linux/sed-opal.h b/include/uapi/linux/sed-opal.h
-index 2573772e2fb3..1fed3c9294fc 100644
---- a/include/uapi/linux/sed-opal.h
-+++ b/include/uapi/linux/sed-opal.h
-@@ -44,6 +44,11 @@ enum opal_lock_state {
- 	OPAL_LK = 0x04, /* 0100 */
- };
- 
-+enum opal_lock_flags {
-+	/* IOC_OPAL_SAVE will also store the provided key for locking */
-+	OPAL_SAVE_FOR_LOCK = 0x01,
-+};
-+
- struct opal_key {
- 	__u8 lr;
- 	__u8 key_len;
-@@ -76,7 +81,8 @@ struct opal_user_lr_setup {
- struct opal_lock_unlock {
- 	struct opal_session_info session;
- 	__u32 l_state;
--	__u8 __align[4];
-+	__u16 flags;
-+	__u8 __align[2];
- };
- 
- struct opal_new_pw {
--- 
-2.35.1
-
+TG9va3MgZ29vZCwNClJldmlld2VkLWJ5OiBKb2hhbm5lcyBUaHVtc2hpcm4gPGpvaGFubmVzLnRo
+dW1zaGlybkB3ZGMuY29tPg0K
