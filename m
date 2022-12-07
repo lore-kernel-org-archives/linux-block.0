@@ -2,113 +2,175 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1DADC6370C
-	for <linux-block@archiver.kernel.org>; Thu,  8 Dec 2022 14:03:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EAF94C63708
+	for <linux-block@archiver.kernel.org>; Thu,  8 Dec 2022 14:43:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230074AbiLHOC7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 8 Dec 2022 09:02:59 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38732 "EHLO
+        id S229479AbiLHOnp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 8 Dec 2022 09:43:45 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36246 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229939AbiLHOCs (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 8 Dec 2022 09:02:48 -0500
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2250165D2;
-        Thu,  8 Dec 2022 06:02:40 -0800 (PST)
-Received: from mail02.huawei.com (unknown [172.30.67.153])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4NSbSp23Jnz4f3nTH;
-        Thu,  8 Dec 2022 22:02:34 +0800 (CST)
-Received: from huaweicloud.com (unknown [10.175.124.27])
-        by APP1 (Coremail) with SMTP id cCh0CgBXAbB77pFjF4YRBw--.33249S3;
-        Thu, 08 Dec 2022 22:02:37 +0800 (CST)
-From:   Kemeng Shi <shikemeng@huaweicloud.com>
-To:     axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linfeilong@huawei.com, liuzhiqiang26@huawei.com
-Subject: [PATCH 1/4] sbitmap: remove unnecessary calculation of alloc_hint in __sbitmap_get_shallow
-Date:   Fri,  9 Dec 2022 06:01:44 +0800
-Message-Id: <20221208220147.3315388-2-shikemeng@huaweicloud.com>
-X-Mailer: git-send-email 2.30.0
-In-Reply-To: <20221208220147.3315388-1-shikemeng@huaweicloud.com>
-References: <20221208220147.3315388-1-shikemeng@huaweicloud.com>
+        with ESMTP id S229886AbiLHOnn (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 8 Dec 2022 09:43:43 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B791DFEA
+        for <linux-block@vger.kernel.org>; Thu,  8 Dec 2022 06:42:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1670510562;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=dC06rHD9795Mcwyf2BZrlXOuy21bGOSa5sAkC9Cuad8=;
+        b=GZgk68YEluHKHfDlp+ThCw2YVCncIymLg7+Mtaizbygg2rv8BEqa9bSXekPhRYml4BCqfX
+        5zGAcuK212yCF/QqAuMXawoG9GGeN8HJTbS9zixQpauUKsEjGG0srb9VbVpVdfUeVsBTi2
+        kMUD0E/tdEEGfIpg1aRX40a82T+s7Hs=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-299-fUuTU7TkNaqp4ocsryWSkQ-1; Thu, 08 Dec 2022 09:42:38 -0500
+X-MC-Unique: fUuTU7TkNaqp4ocsryWSkQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id D132D3832781;
+        Thu,  8 Dec 2022 14:42:37 +0000 (UTC)
+Received: from localhost (unknown [10.39.194.17])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 504842166B26;
+        Thu,  8 Dec 2022 14:42:37 +0000 (UTC)
+Date:   Wed, 7 Dec 2022 17:05:06 -0500
+From:   Stefan Hajnoczi <stefanha@redhat.com>
+To:     Suwan Kim <suwan.kim027@gmail.com>
+Cc:     mst@redhat.com, jasowang@redhat.com, pbonzini@redhat.com,
+        hch@infradead.org, axboe@kernel.dk,
+        virtualization@lists.linux-foundation.org,
+        linux-block@vger.kernel.org
+Subject: Re: [PATCH 2/2] virtio-blk: support completion batching for the IRQ
+ path
+Message-ID: <Y5EOEh2HYHqo+Sbh@fedora>
+References: <20221206141125.93055-1-suwan.kim027@gmail.com>
+ <20221206141125.93055-2-suwan.kim027@gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: cCh0CgBXAbB77pFjF4YRBw--.33249S3
-X-Coremail-Antispam: 1UD129KBjvJXoW7AFy8JF18AF4xKFy5Kw4fuFg_yoW8Gw18pr
-        4jgF9rK3sYvFy8ur4UKFykAFy3G398G3sxJa4Sgw4fur18K3Z3Gr4kKFWaqr13uFW7AFZ2
-        ya1xXr1UuF1jqa7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUB0b4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
-        6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M280x2IEY4vEnII2IxkI6r1a6r45M2
-        8IrcIa0xkI8VA2jI8067AKxVWUGwA2048vs2IY020Ec7CjxVAFwI0_Jrv_JF4l8cAvFVAK
-        0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVWDJVCq3wA2z4
-        x0Y4vE2Ix0cI8IcVCY1x0267AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l
-        84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I
-        8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AK
-        xVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41l42xK82IYc2Ij64
-        vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8G
-        jcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r126r1DMIIYrxkI7VAKI48JMIIF0xvE2I
-        x0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42xK
-        8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I
-        0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUIksgUUUUU
-X-CM-SenderInfo: 5vklyvpphqwq5kxd4v5lfo033gof0z/
-X-CFilter-Loop: Reflected
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="hn7qBZnoP/ukmpt3"
+Content-Disposition: inline
+In-Reply-To: <20221206141125.93055-2-suwan.kim027@gmail.com>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-We calculate allow_hint in next word as following:
 
-/* low sb->shift bit of alloc_hint will be 0 after this shift */
-alloc_hint = index << sb->shift;
+--hn7qBZnoP/ukmpt3
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-/* get low sb->shift bit of alloc_hit */
-SB_NR_TO_BIT(sb, alloc_hint)
+On Tue, Dec 06, 2022 at 11:11:25PM +0900, Suwan Kim wrote:
+> This patch adds completion batching to the IRQ path. It reuses batch
+> completion code of virtblk_poll(). It collects requests to io_comp_batch
+> and processes them all at once. It can boost up the performance by 2%.
+>=20
+> To validate the performance improvement and stabilty, I did fio test with
+> 4 vCPU VM and 12 vCPU VM respectively. Both VMs have 8GB ram and the same
+> number of HW queues as vCPU.
+> The fio cammad is as follows and I ran the fio 5 times and got IOPS avera=
+ge.
+> (io_uring, randread, direct=3D1, bs=3D512, iodepth=3D64 numjobs=3D2,4)
+>=20
+> Test result shows about 2% improvement.
+>=20
+>            4 vcpu VM       |   numjobs=3D2   |   numjobs=3D4
+>       -----------------------------------------------------------
+>         fio without patch  |  367.2K IOPS  |   397.6K IOPS
+>       -----------------------------------------------------------
+>         fio with patch     |  372.8K IOPS  |   407.7K IOPS
+>=20
+>            12 vcpu VM      |   numjobs=3D2   |   numjobs=3D4
+>       -----------------------------------------------------------
+>         fio without patch  |  363.6K IOPS  |   374.8K IOPS
+>       -----------------------------------------------------------
+>         fio with patch     |  373.8K IOPS  |   385.3K IOPS
+>=20
+> Signed-off-by: Suwan Kim <suwan.kim027@gmail.com>
+> ---
+>  drivers/block/virtio_blk.c | 38 +++++++++++++++++++++++---------------
+>  1 file changed, 23 insertions(+), 15 deletions(-)
 
-So alloc_hit in next word will always be zero. Simpfy alloc_hit calculation
-in __sbitmap_get_shallow according to the alloc_hit calculation in
-__sbitmap_get.
+Cool, thanks for doing this!
 
-Signed-off-by: Kemeng Shi <shikemeng@huaweicloud.com>
----
- lib/sbitmap.c | 11 ++++-------
- 1 file changed, 4 insertions(+), 7 deletions(-)
+> diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+> index cf64d256787e..48fcf745f007 100644
+> --- a/drivers/block/virtio_blk.c
+> +++ b/drivers/block/virtio_blk.c
+> @@ -272,6 +272,18 @@ static inline void virtblk_request_done(struct reque=
+st *req)
+>  	blk_mq_end_request(req, virtblk_result(vbr));
+>  }
+> =20
+> +static void virtblk_complete_batch(struct io_comp_batch *iob)
+> +{
+> +	struct request *req;
+> +
+> +	rq_list_for_each(&iob->req_list, req) {
+> +		virtblk_unmap_data(req, blk_mq_rq_to_pdu(req));
+> +		virtblk_cleanup_cmd(req);
+> +		blk_mq_set_request_complete(req);
+> +	}
+> +	blk_mq_end_request_batch(iob);
+> +}
+> +
+>  static void virtblk_done(struct virtqueue *vq)
+>  {
+>  	struct virtio_blk *vblk =3D vq->vdev->priv;
+> @@ -280,6 +292,7 @@ static void virtblk_done(struct virtqueue *vq)
+>  	struct virtblk_req *vbr;
+>  	unsigned long flags;
+>  	unsigned int len;
+> +	DEFINE_IO_COMP_BATCH(iob);
+> =20
+>  	spin_lock_irqsave(&vblk->vqs[qid].lock, flags);
+>  	do {
+> @@ -287,7 +300,9 @@ static void virtblk_done(struct virtqueue *vq)
+>  		while ((vbr =3D virtqueue_get_buf(vblk->vqs[qid].vq, &len)) !=3D NULL)=
+ {
+>  			struct request *req =3D blk_mq_rq_from_pdu(vbr);
+> =20
+> -			if (likely(!blk_should_fake_timeout(req->q)))
+> +			if (likely(!blk_should_fake_timeout(req->q)) &&
+> +				!blk_mq_add_to_batch(req, &iob, vbr->status,
+> +							virtblk_complete_batch))
+>  				blk_mq_complete_request(req);
+>  			req_done =3D true;
+>  		}
+> @@ -295,9 +310,14 @@ static void virtblk_done(struct virtqueue *vq)
+>  			break;
+>  	} while (!virtqueue_enable_cb(vq));
+> =20
+> -	/* In case queue is stopped waiting for more buffers. */
+> -	if (req_done)
+> +	if (req_done) {
+> +		if (!rq_list_empty(iob.req_list))
+> +			virtblk_complete_batch(&iob);
 
-diff --git a/lib/sbitmap.c b/lib/sbitmap.c
-index 586deb333237..cb5e03a2d65b 100644
---- a/lib/sbitmap.c
-+++ b/lib/sbitmap.c
-@@ -243,6 +243,7 @@ static int __sbitmap_get_shallow(struct sbitmap *sb,
- 	int nr = -1;
- 
- 	index = SB_NR_TO_INDEX(sb, alloc_hint);
-+	alloc_hint = SB_NR_TO_BIT(sb, alloc_hint);
- 
- 	for (i = 0; i < sb->map_nr; i++) {
- again:
-@@ -250,7 +251,7 @@ static int __sbitmap_get_shallow(struct sbitmap *sb,
- 					min_t(unsigned int,
- 					      __map_depth(sb, index),
- 					      shallow_depth),
--					SB_NR_TO_BIT(sb, alloc_hint), true);
-+					alloc_hint, true);
- 		if (nr != -1) {
- 			nr += index << sb->shift;
- 			break;
-@@ -260,13 +261,9 @@ static int __sbitmap_get_shallow(struct sbitmap *sb,
- 			goto again;
- 
- 		/* Jump to next index. */
--		index++;
--		alloc_hint = index << sb->shift;
--
--		if (index >= sb->map_nr) {
-+		alloc_hint = 0;
-+		if (++index >= sb->map_nr)
- 			index = 0;
--			alloc_hint = 0;
--		}
- 	}
- 
- 	return nr;
--- 
-2.30.0
+A little optimization to avoid the indirect call: iob.complete(&iob) :).
+Not sure if it's good style to do that but it works in this case because
+we know it can only be virtblk_complete_batch().
+
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+
+--hn7qBZnoP/ukmpt3
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmORDhIACgkQnKSrs4Gr
+c8iy+ggAhIXNBcnfGowRN+/CxGfb7+omNJp6krM78eBlHR0VuOX++5xjK5gKV+Mn
+p64DisOw1+U2GXz0YZee34jkFg6TH53Rj7cDvrDnbX92+DbrsSAmShmJLYr5vjNV
+MDL0UyQjRq88MHA+zy5os5UJwWbuLR9roKNYgGHan5IdQ95mJQe5Uzp3899JtfKW
+U7ZutEPl5sQFZCTE6XsfFOunqrsJ5Tq0RzRxU9rQCAjkqeDe409pwThYtyfkzCzy
+C9BEMaFrnqYLlem4+e1qfpnHNmajy7PT3jAPZispvTcWUxm4fwGDrOl6Cbi31Wwh
+kxtfd2gvYMcD+sbl/whExj2nSrb7qA==
+=8GGk
+-----END PGP SIGNATURE-----
+
+--hn7qBZnoP/ukmpt3--
 
