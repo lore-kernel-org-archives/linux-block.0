@@ -2,113 +2,87 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13350C4708D
-	for <linux-block@archiver.kernel.org>; Wed,  7 Dec 2022 18:28:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B998EC352A1
+	for <linux-block@archiver.kernel.org>; Wed,  7 Dec 2022 19:40:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229573AbiLGS2V (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 7 Dec 2022 13:28:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42278 "EHLO
+        id S229530AbiLGTkf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 7 Dec 2022 14:40:35 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52978 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229640AbiLGS2T (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 7 Dec 2022 13:28:19 -0500
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD6A254768
-        for <linux-block@vger.kernel.org>; Wed,  7 Dec 2022 10:28:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Content-Type:MIME-Version:Message-ID:
-        Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-        Content-Description:In-Reply-To:References;
-        bh=kiK0JwG5mTuuEr7z0kUmCZLlpQoHhD/Ddo0Cxmejecc=; b=FnAI2RWf+vzTQYS+WGmzlHNN8F
-        Qp5hcAprc35SMQmbzsJmTfK9OiAjukGkDuTKIAdi5SZXIaXgzOsu8OAzgbiLsTdxweeRXSYiLMYhk
-        8C8cYERz3OKJFNvQP/r6zUf8bbywbm79VQetdDcKrCbayup67DOhzRLV9PR6x4GRRpzgHmyEpjvVR
-        bL27sQTPMqbkbtJ4icwOw+GuIxPwTU/IZIul86us1XVQI8GQdasb9lFnFJsaDAPNUJCYr2c+5r0O6
-        vPQ9uGKGPPoQA3jW8KUQcO+8+pOxlVCt6i/8phQWPn6NTJ9i5LNrqQesCeMekkKlijSFBi/wjk29C
-        HZ9ghiIQ==;
-Received: from [2001:4bb8:19a:6deb:1e50:ef0a:649d:fd9d] (helo=localhost)
-        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1p2z9M-008cps-SL; Wed, 07 Dec 2022 18:28:09 +0000
-Date:   Wed, 7 Dec 2022 19:28:03 +0100
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Jens Axboe <axboe@kernel.dk>
+        with ESMTP id S229456AbiLGTkd (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 7 Dec 2022 14:40:33 -0500
+Received: from mail-il1-x12e.google.com (mail-il1-x12e.google.com [IPv6:2607:f8b0:4864:20::12e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1BD5D2A240
+        for <linux-block@vger.kernel.org>; Wed,  7 Dec 2022 11:40:32 -0800 (PST)
+Received: by mail-il1-x12e.google.com with SMTP id z18so2262931ils.3
+        for <linux-block@vger.kernel.org>; Wed, 07 Dec 2022 11:40:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=2zFLoHLb1Dak8B2hEAlRd1msRP6Th/qVOfnIe/tfsAo=;
+        b=0h5EajkaNDlkepqaplu4kd0DtQzDvNutIS/6I16Gs3Zqe2qFPpJg5r8fE5qef74UvW
+         5r1DUd+RkRH/lRKg5IZ8bKETHSCStUT+OPQ15WNbQIhVGhjqEXe2awUqT/oAQfPAtYot
+         ENTaSeq8aS9iwgoxyK7bNtIIc0rCLrxiLmXhgcQgzPG92rsSASg4ijiMDfLRZLNmRA6O
+         ATQ3BhoIbANJ1T1Ac1xbh15uUVIQduvneERofvvUCvg4BBPUpqC9EmwBf1ZYQ0Thv06W
+         3P773wJ5V5gFlkcqqepB5pJuC3qrYWiJh9VFITMecmwXPA64lPruxuQDBo7e/4HBHcSF
+         1OLA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=2zFLoHLb1Dak8B2hEAlRd1msRP6Th/qVOfnIe/tfsAo=;
+        b=BBBROrg99NHNDgdwmr4VH3hNZIVa+P2NbepKZmKEkOWJD8fcv1aPtVWbCi8oPXGMcs
+         ODLDJt5uOwl8FWc5C503xR3u0Sg+qUfWnfKoSEDl0aSigWyRXT6QUk/doY+Z7iaGnCzP
+         utcd20KOCOOQg2h5aC3mEb8IOMeQ0L7kEYTkyvEf7xkfM7+AxZRsuGVs12zIs6is2Y5V
+         7LlcGN/PiVyaU1xO8L1um4eHRjnLg5c4nItfL6ZlIqRoWzz5j+JJfpQIs+EM5HHHJHW1
+         C2aPXQQaNEf3OMYMVJllzsMKZeG4nFfhUIkBxkfjuYkGPKQiRM3ei8FiPJ9lFk00Tudm
+         /6tA==
+X-Gm-Message-State: ANoB5pm/IhIACO4ikZrm7NwA7NuTptMHF2VOxgTjBQ1FCp5/Gw5Nnx/V
+        rqYjj20pm0egKvJZ551yLRJBXg==
+X-Google-Smtp-Source: AA0mqf6Jz5PYh1LkEVLw9teBsWBYb8QL6Bw523dDiFXvPgFWqFFhFCmOenpWa4gWj+hTE0+OnXDX9A==
+X-Received: by 2002:a92:870e:0:b0:2fa:f47:d960 with SMTP id m14-20020a92870e000000b002fa0f47d960mr33450223ild.19.1670442031401;
+        Wed, 07 Dec 2022 11:40:31 -0800 (PST)
+Received: from [192.168.1.94] ([207.135.234.126])
+        by smtp.gmail.com with ESMTPSA id d9-20020a026049000000b00375e136bf95sm7952621jaf.127.2022.12.07.11.40.30
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 07 Dec 2022 11:40:30 -0800 (PST)
+Message-ID: <3747bc85-967c-fd5a-66e5-7cad42d00bcd@kernel.dk>
+Date:   Wed, 7 Dec 2022 12:40:29 -0700
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
+ Thunderbird/102.5.1
+Subject: Re: [GIT PULL] nvme updates for Linux 6.2
+Content-Language: en-US
+To:     Christoph Hellwig <hch@infradead.org>
 Cc:     Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
         Chaitanya Kulkarni <kch@nvidia.com>,
         linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
-Subject: [GIT PULL] nvme updates for Linux 6.2
-Message-ID: <Y5DbMySCBMWI7CbE@infradead.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+References: <Y5DbMySCBMWI7CbE@infradead.org>
+From:   Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <Y5DbMySCBMWI7CbE@infradead.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The following changes since commit eea3e8b74aa1648fc96b739458d067a6e498c302:
+On 12/7/22 11:28 AM, Christoph Hellwig wrote:
+> The following changes since commit eea3e8b74aa1648fc96b739458d067a6e498c302:
+> 
+>   blk-throttle: Use more suitable time_after check for update of slice_start (2022-12-05 13:45:31 -0700)
+> 
+> are available in the Git repository at:
+> 
+>   ssh://git.infradead.org/var/lib/git/nvme.git tags/nvme-6.2-2022-12-07
 
-  blk-throttle: Use more suitable time_after check for update of slice_start (2022-12-05 13:45:31 -0700)
+I pulled:
 
-are available in the Git repository at:
+git://git.infradead.org/nvme tags/nvme-6.2-2022-12-07
 
-  ssh://git.infradead.org/var/lib/git/nvme.git tags/nvme-6.2-2022-12-07
+-- 
+Jens Axboe
 
-for you to fetch changes up to 19b00e0069a3819eac0e0ea685899aba29e545d6:
 
-  nvmet: don't open-code NVME_NS_ATTR_RO enumeration (2022-12-07 15:03:09 +0100)
-
-----------------------------------------------------------------
-nvme updates for Linux 6.2
-
- - fix and cleanup nvme-fc req allocation (Chaitanya Kulkarni)
- - use the common tagset helpers in nvme-pci driver (Christoph Hellwig)
- - cleanup the nvme-pci removal path (Christoph Hellwig)
- - use kstrtobool() instead of strtobool (Christophe JAILLET)
- - allow unprivileged passthrough of Identify Controller (Joel Granados)
- - support io stats on the mpath device (Sagi Grimberg)
- - minor nvmet cleanup (Sagi Grimberg)
-
-----------------------------------------------------------------
-Chaitanya Kulkarni (2):
-      nvme-fc: avoid null pointer dereference
-      nvme-fc: move common code into helper
-
-Christoph Hellwig (15):
-      nvme: don't call blk_mq_{,un}quiesce_tagset when ctrl->tagset is NULL
-      nvme-apple: fix controller shutdown in apple_nvme_disable
-      nvme: use nvme_wait_ready in nvme_shutdown_ctrl
-      nvme: merge nvme_shutdown_ctrl into nvme_disable_ctrl
-      nvme-pci: remove nvme_disable_admin_queue
-      nvme-pci: remove nvme_pci_disable
-      nvme-pci: cleanup nvme_suspend_queue
-      nvme-pci: rename nvme_disable_io_queues
-      nvme-pci: return early on ctrl state mismatch in nvme_reset_work
-      nvme-pci: split out a nvme_pci_ctrl_is_dead helper
-      nvme: pass nr_maps explicitly to nvme_alloc_io_tag_set
-      nvme: consolidate setting the tagset flags
-      nvme: only set reserved_tags in nvme_alloc_io_tag_set for fabrics controllers
-      nvme: add the Apple shared tag workaround to nvme_alloc_io_tag_set
-      nvme-pci: use the tagset alloc/free helpers
-
-Christophe JAILLET (1):
-      nvme: use kstrtobool() instead of strtobool()
-
-Joel Granados (1):
-      nvme: allow unprivileged passthrough of Identify Controller
-
-Sagi Grimberg (3):
-      nvme: introduce nvme_start_request
-      nvme-multipath: support io stats on the mpath device
-      nvmet: don't open-code NVME_NS_ATTR_RO enumeration
-
- drivers/nvme/host/apple.c       |   6 +-
- drivers/nvme/host/core.c        |  98 +++++++++----------
- drivers/nvme/host/fc.c          |  30 ++++--
- drivers/nvme/host/ioctl.c       |   2 +
- drivers/nvme/host/multipath.c   |  26 +++++
- drivers/nvme/host/nvme.h        |  29 +++++-
- drivers/nvme/host/pci.c         | 209 ++++++++++++++--------------------------
- drivers/nvme/host/rdma.c        |  12 +--
- drivers/nvme/host/tcp.c         |  13 +--
- drivers/nvme/target/admin-cmd.c |   2 +-
- drivers/nvme/target/configfs.c  |  17 ++--
- drivers/nvme/target/loop.c      |   8 +-
- 12 files changed, 214 insertions(+), 238 deletions(-)
