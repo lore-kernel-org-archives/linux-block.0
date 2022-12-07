@@ -2,85 +2,104 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 39049C352A1
-	for <linux-block@archiver.kernel.org>; Wed,  7 Dec 2022 16:43:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF762C4708E
+	for <linux-block@archiver.kernel.org>; Wed,  7 Dec 2022 17:08:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229911AbiLGQnu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 7 Dec 2022 11:43:50 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35384 "EHLO
+        id S229656AbiLGRI4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 7 Dec 2022 12:08:56 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50632 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229515AbiLGQnt (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 7 Dec 2022 11:43:49 -0500
-Received: from mail-il1-x135.google.com (mail-il1-x135.google.com [IPv6:2607:f8b0:4864:20::135])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4B135D6B6
-        for <linux-block@vger.kernel.org>; Wed,  7 Dec 2022 08:43:47 -0800 (PST)
-Received: by mail-il1-x135.google.com with SMTP id z9so8070991ilu.10
-        for <linux-block@vger.kernel.org>; Wed, 07 Dec 2022 08:43:47 -0800 (PST)
+        with ESMTP id S229604AbiLGRIz (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 7 Dec 2022 12:08:55 -0500
+Received: from mail-io1-xd32.google.com (mail-io1-xd32.google.com [IPv6:2607:f8b0:4864:20::d32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8AD4C66CAA
+        for <linux-block@vger.kernel.org>; Wed,  7 Dec 2022 09:08:53 -0800 (PST)
+Received: by mail-io1-xd32.google.com with SMTP id q190so7050962iod.10
+        for <linux-block@vger.kernel.org>; Wed, 07 Dec 2022 09:08:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=kJ8Ay+PB284aY3NVmhw3n5NaBjbrOxQtEAJy+RGXMRM=;
-        b=Ny7BzO6Z3MS2ZJ0cRncx8Fzd5LXVeD1NHgtDeyn6MJ6xVu5o3y5OWYJZCvUtEgjKRk
-         UNUPyxK+q6Ys/IktM1+7HYWPvLZRwL1iJmxg5fEtG7dBfn8iQ0DETRblKzR4UnQC+HtJ
-         k1VqyES/CL5JZBKrXcVioYud0xilCvP+oC8W5LQkl0ZmVqdFxLYxqIzDNxweoqMHg6FN
-         ljqwW+AfkWgOjuNLzw4HiWU6wW5KlGdJjq4azTIVo0fK02r4j5WyJaFN/7wYQhkwyBjs
-         lLuD782mA4hJl4Gw17g9BhZiCbWyGJKUIkg0swDfu8lfl7B88IJiGrKlSmUDGnmKJ+sH
-         5kug==
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=+r3z2TzChBc0Vs/D1sJ6f4Z6Cq8sqK5Sifftb2ph/uA=;
+        b=sqgK4uVgdukFxIDxOvSAAyQFpMopVm99bZ5YD2B/lQFb1XglqtMEdjzv4zSPvnedAj
+         PlIMswBqc8UYikh4BdgySLaWBAmwPQLCA+DlUrsRTHy+/Y4trGeyfTrXAjWjIXqmWBgX
+         hTw2LZQ0rDXoDM9eo98BrRubaVVwABlt9qLRJHkrq14N5qdMHboXlGZVVHnZrW3foxss
+         cYd/kgCu+72av+pycZz+zetKRaKEH7IpVSwk9xgVJsZMOfSPMFagEGeyCzFLMIh9/Jhd
+         GCY129UD4jcHF5FgAomHtHxC6KVv+ObkjnkDwWHBHgewjgg/JqQUNZeIdPzgrsE+ubKz
+         hDYQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=kJ8Ay+PB284aY3NVmhw3n5NaBjbrOxQtEAJy+RGXMRM=;
-        b=Hq3GGvmoOxZ8H3uO8L6o1WsHyDIRLBqx5ICEzeuDei8/NrA6mNvSgewNYfvMd4wTyH
-         ouR4hfTA+9namaykcYf9UGJoHUbN6a529+XMdz0vDxfC1dsFMxXFdyr4C8oGNsGaeclJ
-         BKFbI4ZWLsrvfNoRZL/gpKCAI1ewwxhpiX9/G0ULR8Qn0b6ydPOCu3NDkPO199Pu3MOM
-         hMgNKF7VhVOtD+YGG9vuBJFUGDnC8zqACvMumw7IxWNyHOKE4brEu7/SEh8vEYiPTpNd
-         hMYdOu7Hqti4csy9r+foNwoXKDUfs+GV7yTbBobhJI8E51+Rk1aKDwf8shFOwIhp+sxo
-         fvAA==
-X-Gm-Message-State: ANoB5plsWNAhDvGZiu5KyRl9Aa9XSET+FRkRB6OeC2jIhPzQKyzvPu8g
-        BvfGU2wFjV9bfxjs8Fh75gyRjA==
-X-Google-Smtp-Source: AA0mqf7tWpWZtUh0xPnGJO9AZcQHA021bUAhGGmdDCkM2tthnOVB7XOHehMq1xO+VcDumIv8Vf9cvw==
-X-Received: by 2002:a92:cc84:0:b0:302:489c:669 with SMTP id x4-20020a92cc84000000b00302489c0669mr34208447ilo.135.1670431427024;
-        Wed, 07 Dec 2022 08:43:47 -0800 (PST)
-Received: from [127.0.0.1] ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id e12-20020a0566380ccc00b003728cd8bc7csm7802731jak.38.2022.12.07.08.43.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 07 Dec 2022 08:43:46 -0800 (PST)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     snitzer@kernel.org, Christoph Hellwig <hch@lst.de>
-Cc:     colyli@suse.de, song@kernel.org, linux-block@vger.kernel.org,
-        linux-raid@vger.kernel.org, linux-bcache@vger.kernel.org,
-        dm-devel@redhat.com
-In-Reply-To: <20221206144057.720846-1-hch@lst.de>
-References: <20221206144057.720846-1-hch@lst.de>
-Subject: Re: [PATCH] block: remove bio_set_op_attrs
-Message-Id: <167043142630.172966.3660102879335248846.b4-ty@kernel.dk>
-Date:   Wed, 07 Dec 2022 09:43:46 -0700
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=+r3z2TzChBc0Vs/D1sJ6f4Z6Cq8sqK5Sifftb2ph/uA=;
+        b=lbU8/unDTnOHLXRmMxwrqCGBA2+k6AzDrYmQG/I4ypTAHsv7u82Eo0FJeL0jNeoQNq
+         qZnr+RcWEKIptgsTNEUINJ0DYRnpWd2YFhwDsUSJZPZkp0mZonosUS+JXmdA9nEqUCia
+         xaWIG/2VzhnrKwvIVI8VLD3+Sx2pVig4LTs/Gq1lkcJy8uZA0MQxXWn7xzXj0GnnwWP7
+         G4g56VpXpkgyvk5MmzPDx41tn85DNWajX9ti6xYlEsCpB1EfkLGG56F6WlZ0W1t0pTYH
+         63ahdKyQs9UZxEcoOs6/YQtpr5Cg+5mXShWnmusBUw7MNNT0mQ6QnSVbPgwh9YCPnW8I
+         HPSg==
+X-Gm-Message-State: ANoB5plhsFYp2RcoE+iKi1HxCERj1uQI6XcI2J8ox0/LUO2VnJpyIqrn
+        BHPzi4uOhLZS4x4lnFv+r1lhzg==
+X-Google-Smtp-Source: AA0mqf7yLejbRNfqMUu3ilEvsYdDj7YhVkPipELjA6VqWKNVXZJlTdAqiTcfQmriCKmlYB7qULxDWg==
+X-Received: by 2002:a05:6638:1124:b0:38a:171a:dee with SMTP id f4-20020a056638112400b0038a171a0deemr12454949jar.292.1670432932906;
+        Wed, 07 Dec 2022 09:08:52 -0800 (PST)
+Received: from [192.168.1.94] ([207.135.234.126])
+        by smtp.gmail.com with ESMTPSA id o27-20020a02a1db000000b0038a0c2ae99bsm7327723jah.18.2022.12.07.09.08.51
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 07 Dec 2022 09:08:52 -0800 (PST)
+Message-ID: <eaf4f9a8-dfc6-402e-4a1a-732034d1512d@kernel.dk>
+Date:   Wed, 7 Dec 2022 10:08:50 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
+ Thunderbird/102.5.1
+Subject: Re: [RFC] block: Change the granularity of io ticks from ms to ns
+To:     Gulam Mohamed <gulam.mohamed@oracle.com>,
+        linux-block@vger.kernel.org
+Cc:     philipp.reisner@linbit.com, lars.ellenberg@linbit.com,
+        christoph.boehmwalder@linbit.com, minchan@kernel.org,
+        ngupta@vflare.org, senozhatsky@chromium.org, colyli@suse.de,
+        kent.overstreet@gmail.com, agk@redhat.com, snitzer@kernel.org,
+        dm-devel@redhat.com, song@kernel.org, dan.j.williams@intel.com,
+        vishal.l.verma@intel.com, dave.jiang@intel.com,
+        ira.weiny@intel.com, junxiao.bi@oracle.com,
+        martin.petersen@oracle.com, kch@nvidia.com,
+        drbd-dev@lists.linbit.com, linux-kernel@vger.kernel.org,
+        linux-bcache@vger.kernel.org, linux-raid@vger.kernel.org,
+        nvdimm@lists.linux.dev, konrad.wilk@oracle.com
+References: <20221206181536.13333-1-gulam.mohamed@oracle.com>
+Content-Language: en-US
+From:   Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20221206181536.13333-1-gulam.mohamed@oracle.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.11.0-dev-50ba3
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
-On Tue, 06 Dec 2022 15:40:57 +0100, Christoph Hellwig wrote:
-> This macro is obsolete, so replace the last few uses with open coded
-> bi_opf assignments.
+On 12/6/22 11:15?AM, Gulam Mohamed wrote:
+> Use ktime to change the granularity of IO accounting in block layer from
+> milli-seconds to nano-seconds to get the proper latency values for the
+> devices whose latency is in micro-seconds. After changing the granularity
+> to nano-seconds the iostat command, which was showing incorrect values for
+> %util, is now showing correct values.
 > 
+> We did not work on the patch to drop the logic for
+> STAT_PRECISE_TIMESTAMPS yet. Will do it if this patch is ok.
 > 
+> The iostat command was run after starting the fio with following command
+> on an NVME disk. For the same fio command, the iostat %util was showing
+> ~100% for the disks whose latencies are in the range of microseconds.
+> With the kernel changes (granularity to nano-seconds), the %util was
+> showing correct values. Following are the details of the test and their
+> output:
 
-Applied, thanks!
+As mentioned, this will most likely have a substantial performance
+impact. I'd test it, but your patch is nowhere near applying to the
+current block tree. Please resend it against for-6.2/block so it can
+get tested.
 
-[1/1] block: remove bio_set_op_attrs
-      commit: c34b7ac65087554627f4840f4ecd6f2107a68fd1
-
-Best regards,
 -- 
 Jens Axboe
-
 
