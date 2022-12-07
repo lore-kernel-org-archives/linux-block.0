@@ -2,133 +2,113 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B831C4708E
-	for <linux-block@archiver.kernel.org>; Wed,  7 Dec 2022 17:22:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13350C4708D
+	for <linux-block@archiver.kernel.org>; Wed,  7 Dec 2022 18:28:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229564AbiLGRWU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 7 Dec 2022 12:22:20 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59038 "EHLO
+        id S229573AbiLGS2V (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 7 Dec 2022 13:28:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42278 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229739AbiLGRWO (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 7 Dec 2022 12:22:14 -0500
-Received: from mail-io1-xd36.google.com (mail-io1-xd36.google.com [IPv6:2607:f8b0:4864:20::d36])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3CB4C537C3
-        for <linux-block@vger.kernel.org>; Wed,  7 Dec 2022 09:22:13 -0800 (PST)
-Received: by mail-io1-xd36.google.com with SMTP id g20so5041619iob.2
-        for <linux-block@vger.kernel.org>; Wed, 07 Dec 2022 09:22:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=EpTDLOhW0V3+1aR8vlaV9Hai3rR7JGPJvFehDEM1z0k=;
-        b=WuLBfeGFwu+0r21caxzCY0+TP72iv0Vmz6j4f2nARaTkZ6MmLakC7hya4ycSRvqMDI
-         SuzvbugdfQlsXrJGaT4MBJtrovZDXTkclAPuy4ARX/NXLtySpWY43xZIWrBasgcQugq8
-         vQhfZ35UxQngr2AbHjR8VvqDdM2S7bawB1nbVd8IAIAtAJ6QIM0groms0cVRZmf/5hJ5
-         gYRuWN4pmn37QJI13DuMnWpuKPm3dQxH/KlZ9pWGQ70mwlSqfH7NoBL0xtcoQk0ex4xM
-         qbmg7ziYNHJJjBjTSvOZVicehGzE9TQ8n7q/GwtauEdZJAs9Wa7FXxqQQfBLwFZUidsz
-         /Q3A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=EpTDLOhW0V3+1aR8vlaV9Hai3rR7JGPJvFehDEM1z0k=;
-        b=UQFQwQbtz1GT5Sol+S+iblQtgAgazBH7eKpfuSrtmpQgrZ/tFnt0pk3RJ/hZTsslcO
-         3rb+OhpYvEck1+RTg+hh403gynzCPPKeWTtoz602qzkvPyXhwIGjh3cUl8mUEWRpTc/Y
-         yQ+LEYIALFPn191BdPwa5WGqPvNE1CQRP0TiY5HaUkEU0f9jvNbjD/eKHIBB74zlxi1n
-         b6iNvPQsRIfsN9E6IS0GvQ3Sb6hd3kPy4wCVUDGFHqRqsiS12r/nyzbUlTLTGat9rJOJ
-         32BDLecvwUtpHpWnX5Y3YnsHtsAm6GOlEfq9iajzn+G3w+zbwibAtSaHcPc12+VDEVKF
-         8DOQ==
-X-Gm-Message-State: ANoB5pns7qaU5XFUL0vNXKeHTnDuaEMwr91frJvoACFSgYnCmbZis+KW
-        wmqSAijm8UfVxW7J9yTC/CjM+w==
-X-Google-Smtp-Source: AA0mqf7/gBf7/XEEClF7Gq7hMc0QmhQHunFYc2f4SCWfcKxA9tFoQkk2RXV+JEDjVFWOG2u7WxQZig==
-X-Received: by 2002:a05:6602:4296:b0:6e0:1464:a7d7 with SMTP id cd22-20020a056602429600b006e01464a7d7mr5843517iob.60.1670433732410;
-        Wed, 07 Dec 2022 09:22:12 -0800 (PST)
-Received: from [192.168.1.94] ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id q34-20020a056638346200b0038a44dbbd8fsm3597816jav.123.2022.12.07.09.22.10
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 07 Dec 2022 09:22:11 -0800 (PST)
-Message-ID: <b8deb6fa-8a09-c1af-278f-24e66afe367d@kernel.dk>
-Date:   Wed, 7 Dec 2022 10:22:09 -0700
+        with ESMTP id S229640AbiLGS2T (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 7 Dec 2022 13:28:19 -0500
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD6A254768
+        for <linux-block@vger.kernel.org>; Wed,  7 Dec 2022 10:28:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Content-Type:MIME-Version:Message-ID:
+        Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+        Content-Description:In-Reply-To:References;
+        bh=kiK0JwG5mTuuEr7z0kUmCZLlpQoHhD/Ddo0Cxmejecc=; b=FnAI2RWf+vzTQYS+WGmzlHNN8F
+        Qp5hcAprc35SMQmbzsJmTfK9OiAjukGkDuTKIAdi5SZXIaXgzOsu8OAzgbiLsTdxweeRXSYiLMYhk
+        8C8cYERz3OKJFNvQP/r6zUf8bbywbm79VQetdDcKrCbayup67DOhzRLV9PR6x4GRRpzgHmyEpjvVR
+        bL27sQTPMqbkbtJ4icwOw+GuIxPwTU/IZIul86us1XVQI8GQdasb9lFnFJsaDAPNUJCYr2c+5r0O6
+        vPQ9uGKGPPoQA3jW8KUQcO+8+pOxlVCt6i/8phQWPn6NTJ9i5LNrqQesCeMekkKlijSFBi/wjk29C
+        HZ9ghiIQ==;
+Received: from [2001:4bb8:19a:6deb:1e50:ef0a:649d:fd9d] (helo=localhost)
+        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1p2z9M-008cps-SL; Wed, 07 Dec 2022 18:28:09 +0000
+Date:   Wed, 7 Dec 2022 19:28:03 +0100
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
+Subject: [GIT PULL] nvme updates for Linux 6.2
+Message-ID: <Y5DbMySCBMWI7CbE@infradead.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.1
-Subject: Re: [RFC] block: Change the granularity of io ticks from ms to ns
-Content-Language: en-US
-To:     Yu Kuai <yukuai1@huaweicloud.com>, Ming Lei <ming.lei@redhat.com>
-Cc:     Gulam Mohamed <gulam.mohamed@oracle.com>,
-        linux-block@vger.kernel.org, philipp.reisner@linbit.com,
-        lars.ellenberg@linbit.com, christoph.boehmwalder@linbit.com,
-        minchan@kernel.org, ngupta@vflare.org, senozhatsky@chromium.org,
-        colyli@suse.de, kent.overstreet@gmail.com, agk@redhat.com,
-        snitzer@kernel.org, dm-devel@redhat.com, song@kernel.org,
-        dan.j.williams@intel.com, vishal.l.verma@intel.com,
-        dave.jiang@intel.com, ira.weiny@intel.com, junxiao.bi@oracle.com,
-        martin.petersen@oracle.com, kch@nvidia.com,
-        drbd-dev@lists.linbit.com, linux-kernel@vger.kernel.org,
-        linux-bcache@vger.kernel.org, linux-raid@vger.kernel.org,
-        nvdimm@lists.linux.dev, konrad.wilk@oracle.com,
-        "yukuai (C)" <yukuai3@huawei.com>
-References: <20221206181536.13333-1-gulam.mohamed@oracle.com>
- <936a498b-19fe-36d5-ff32-817f153e57e3@huaweicloud.com>
- <Y5AFX4sxLRLV4uSt@T590>
- <aadfc6d2-ad04-279c-a1d6-7f634d0b2c99@huaweicloud.com>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <aadfc6d2-ad04-279c-a1d6-7f634d0b2c99@huaweicloud.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 12/7/22 6:09 AM, Yu Kuai wrote:
-> Hi,
-> 
-> 在 2022/12/07 11:15, Ming Lei 写道:
->> On Wed, Dec 07, 2022 at 10:19:08AM +0800, Yu Kuai wrote:
->>> Hi,
->>>
->>> 在 2022/12/07 2:15, Gulam Mohamed 写道:
->>>> Use ktime to change the granularity of IO accounting in block layer from
->>>> milli-seconds to nano-seconds to get the proper latency values for the
->>>> devices whose latency is in micro-seconds. After changing the granularity
->>>> to nano-seconds the iostat command, which was showing incorrect values for
->>>> %util, is now showing correct values.
->>>
->>> This patch didn't correct the counting of io_ticks, just make the
->>> error accounting from jiffies(ms) to ns. The problem that util can be
->>> smaller or larger still exist.
->>
->> Agree.
->>
->>>
->>> However, I think this change make sense consider that error margin is
->>> much smaller, and performance overhead should be minimum.
->>>
->>> Hi, Ming, how do you think?
->>
->> I remembered that ktime_get() has non-negligible overhead, is there any
->> test data(iops/cpu utilization) when running fio or t/io_uring on
->> null_blk with this patch?
-> 
-> Yes, testing with null_blk is necessary, we don't want any performance
-> regression.
+The following changes since commit eea3e8b74aa1648fc96b739458d067a6e498c302:
 
-null_blk is fine as a substitute, but I'd much rather run this on my
-test bench with actual IO and devices.
+  blk-throttle: Use more suitable time_after check for update of slice_start (2022-12-05 13:45:31 -0700)
 
-> BTW, I thought it's fine because it's already used for tracking io
-> latency.
+are available in the Git repository at:
 
-Reading a nsec timestamp is a LOT more expensive than reading jiffies,
-which is essentially free. If you look at the amount of work that's
-gone into minimizing ktime_get() for the fast path in the IO stack,
-then that's a testament to that.
+  ssh://git.infradead.org/var/lib/git/nvme.git tags/nvme-6.2-2022-12-07
 
-So that's a very bad assumption, and definitely wrong.
+for you to fetch changes up to 19b00e0069a3819eac0e0ea685899aba29e545d6:
 
--- 
-Jens Axboe
+  nvmet: don't open-code NVME_NS_ATTR_RO enumeration (2022-12-07 15:03:09 +0100)
 
+----------------------------------------------------------------
+nvme updates for Linux 6.2
 
+ - fix and cleanup nvme-fc req allocation (Chaitanya Kulkarni)
+ - use the common tagset helpers in nvme-pci driver (Christoph Hellwig)
+ - cleanup the nvme-pci removal path (Christoph Hellwig)
+ - use kstrtobool() instead of strtobool (Christophe JAILLET)
+ - allow unprivileged passthrough of Identify Controller (Joel Granados)
+ - support io stats on the mpath device (Sagi Grimberg)
+ - minor nvmet cleanup (Sagi Grimberg)
+
+----------------------------------------------------------------
+Chaitanya Kulkarni (2):
+      nvme-fc: avoid null pointer dereference
+      nvme-fc: move common code into helper
+
+Christoph Hellwig (15):
+      nvme: don't call blk_mq_{,un}quiesce_tagset when ctrl->tagset is NULL
+      nvme-apple: fix controller shutdown in apple_nvme_disable
+      nvme: use nvme_wait_ready in nvme_shutdown_ctrl
+      nvme: merge nvme_shutdown_ctrl into nvme_disable_ctrl
+      nvme-pci: remove nvme_disable_admin_queue
+      nvme-pci: remove nvme_pci_disable
+      nvme-pci: cleanup nvme_suspend_queue
+      nvme-pci: rename nvme_disable_io_queues
+      nvme-pci: return early on ctrl state mismatch in nvme_reset_work
+      nvme-pci: split out a nvme_pci_ctrl_is_dead helper
+      nvme: pass nr_maps explicitly to nvme_alloc_io_tag_set
+      nvme: consolidate setting the tagset flags
+      nvme: only set reserved_tags in nvme_alloc_io_tag_set for fabrics controllers
+      nvme: add the Apple shared tag workaround to nvme_alloc_io_tag_set
+      nvme-pci: use the tagset alloc/free helpers
+
+Christophe JAILLET (1):
+      nvme: use kstrtobool() instead of strtobool()
+
+Joel Granados (1):
+      nvme: allow unprivileged passthrough of Identify Controller
+
+Sagi Grimberg (3):
+      nvme: introduce nvme_start_request
+      nvme-multipath: support io stats on the mpath device
+      nvmet: don't open-code NVME_NS_ATTR_RO enumeration
+
+ drivers/nvme/host/apple.c       |   6 +-
+ drivers/nvme/host/core.c        |  98 +++++++++----------
+ drivers/nvme/host/fc.c          |  30 ++++--
+ drivers/nvme/host/ioctl.c       |   2 +
+ drivers/nvme/host/multipath.c   |  26 +++++
+ drivers/nvme/host/nvme.h        |  29 +++++-
+ drivers/nvme/host/pci.c         | 209 ++++++++++++++--------------------------
+ drivers/nvme/host/rdma.c        |  12 +--
+ drivers/nvme/host/tcp.c         |  13 +--
+ drivers/nvme/target/admin-cmd.c |   2 +-
+ drivers/nvme/target/configfs.c  |  17 ++--
+ drivers/nvme/target/loop.c      |   8 +-
+ 12 files changed, 214 insertions(+), 238 deletions(-)
