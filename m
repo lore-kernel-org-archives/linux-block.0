@@ -2,104 +2,99 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D8A29C352A1
-	for <linux-block@archiver.kernel.org>; Wed,  7 Dec 2022 02:33:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A4CBEC47089
+	for <linux-block@archiver.kernel.org>; Wed,  7 Dec 2022 03:17:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229536AbiLGCdD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 6 Dec 2022 21:33:03 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60864 "EHLO
+        id S229733AbiLGDRK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 6 Dec 2022 22:17:10 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53446 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229486AbiLGCdC (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 6 Dec 2022 21:33:02 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E95BB54375
-        for <linux-block@vger.kernel.org>; Tue,  6 Dec 2022 18:32:11 -0800 (PST)
+        with ESMTP id S229448AbiLGDRI (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 6 Dec 2022 22:17:08 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4146A5475F
+        for <linux-block@vger.kernel.org>; Tue,  6 Dec 2022 19:16:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1670380331;
+        s=mimecast20190719; t=1670382970;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=4X+7im9lAvgRY16a9M1eDI0bu6hBlAZ0o9PutKyZYok=;
-        b=WiJkGw4YnU5DDj8jSkoohftbRaMNRW66HUa2IjpOCTADrz6iOp1ry7JcQnXhjAe4yhk/e+
-        JDF8Klbu2dBowO4wXg7ypy6q+weduN92nnvB68pAEDP3oHjFaja+iciZCe8ER71SLnXTzn
-        aoOdqoCeeuL9AKUr7NZ6UEbzA75HSFI=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=faTdYvtAe2NMddrehpXs2XQgPcQu3OATzJcZ1A/nsDA=;
+        b=Kem0Nx3VcKYrz2QF4re6j/kWYICkrzdu15Sh8ACzC0dm/vupMmMNqpZuUaVqpk+D+HdXRy
+        oA8LJuZZs1QHP142FMvQ166vxjcV7yVNueTZLC/JtWGL5nX6CVzU6ze/k8r7qm0dPVjIOZ
+        uB9pLBjIY+GJD6r+j0uMXeNMx33W6go=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-97-vkUceayeMGWEM2SMSSQ3dQ-1; Tue, 06 Dec 2022 21:32:07 -0500
-X-MC-Unique: vkUceayeMGWEM2SMSSQ3dQ-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+ us-mta-52-qPbK1vmPPgSMR5tC6UfxoA-1; Tue, 06 Dec 2022 22:16:07 -0500
+X-MC-Unique: qPbK1vmPPgSMR5tC6UfxoA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 37BA51C05AB9;
-        Wed,  7 Dec 2022 02:32:07 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C3F5C811E67;
+        Wed,  7 Dec 2022 03:16:05 +0000 (UTC)
 Received: from T590 (ovpn-8-16.pek2.redhat.com [10.72.8.16])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id B6F7740C2064;
-        Wed,  7 Dec 2022 02:32:03 +0000 (UTC)
-Date:   Wed, 7 Dec 2022 10:31:57 +0800
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id A29517AE5;
+        Wed,  7 Dec 2022 03:15:49 +0000 (UTC)
+Date:   Wed, 7 Dec 2022 11:15:43 +0800
 From:   Ming Lei <ming.lei@redhat.com>
-To:     Ziyang Zhang <ZiyangZhang@linux.alibaba.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Dan Carpenter <error27@gmail.com>
-Subject: Re: [PATCH V2 4/6] ublk_drv: add device parameter
- UBLK_PARAM_TYPE_DEVT
-Message-ID: <Y4/7HRzoDW0VeNid@T590>
-References: <20221124030454.476152-1-ming.lei@redhat.com>
- <20221124030454.476152-5-ming.lei@redhat.com>
- <2ec739a3-f7ba-0e97-0df6-0d198c6689b5@linux.alibaba.com>
+To:     Yu Kuai <yukuai1@huaweicloud.com>
+Cc:     Gulam Mohamed <gulam.mohamed@oracle.com>,
+        linux-block@vger.kernel.org, axboe@kernel.dk,
+        philipp.reisner@linbit.com, lars.ellenberg@linbit.com,
+        christoph.boehmwalder@linbit.com, minchan@kernel.org,
+        ngupta@vflare.org, senozhatsky@chromium.org, colyli@suse.de,
+        kent.overstreet@gmail.com, agk@redhat.com, snitzer@kernel.org,
+        dm-devel@redhat.com, song@kernel.org, dan.j.williams@intel.com,
+        vishal.l.verma@intel.com, dave.jiang@intel.com,
+        ira.weiny@intel.com, junxiao.bi@oracle.com,
+        martin.petersen@oracle.com, kch@nvidia.com,
+        drbd-dev@lists.linbit.com, linux-kernel@vger.kernel.org,
+        linux-bcache@vger.kernel.org, linux-raid@vger.kernel.org,
+        nvdimm@lists.linux.dev, konrad.wilk@oracle.com,
+        "yukuai (C)" <yukuai3@huawei.com>
+Subject: Re: [RFC] block: Change the granularity of io ticks from ms to ns
+Message-ID: <Y5AFX4sxLRLV4uSt@T590>
+References: <20221206181536.13333-1-gulam.mohamed@oracle.com>
+ <936a498b-19fe-36d5-ff32-817f153e57e3@huaweicloud.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <2ec739a3-f7ba-0e97-0df6-0d198c6689b5@linux.alibaba.com>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.1
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <936a498b-19fe-36d5-ff32-817f153e57e3@huaweicloud.com>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.5
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Nov 25, 2022 at 03:13:58PM +0800, Ziyang Zhang wrote:
-> On 2022/11/24 11:04, Ming Lei wrote:
-> > Userspace side only knows device ID, but the associated path of ublkc* and
-> > ublkb* could be changed by udev, and that depends on userspace's policy, so
-> > add parameter of UBLK_PARAM_TYPE_DEVT for retrieving major/minor of the
-> > ublkc* and ublkb*, then user may figure out major/minor of the ublk disks
-> > he/she owns. With major/minor, it is easy to find the device node path.
-> > 
-> > Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> > ---
-> >  drivers/block/ublk_drv.c      | 24 +++++++++++++++++++++++-
-> >  include/uapi/linux/ublk_cmd.h | 13 +++++++++++++
-> >  2 files changed, 36 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-> > index 9d1578384cba..04a28a2f2e1f 100644
-> > --- a/drivers/block/ublk_drv.c
-> > +++ b/drivers/block/ublk_drv.c
-> > @@ -54,7 +54,8 @@
-> >  		| UBLK_F_USER_RECOVERY_REISSUE)
-> >  
-> >  /* All UBLK_PARAM_TYPE_* should be included here */
-> > -#define UBLK_PARAM_TYPE_ALL (UBLK_PARAM_TYPE_BASIC | UBLK_PARAM_TYPE_DISCARD)
-> > +#define UBLK_PARAM_TYPE_ALL (UBLK_PARAM_TYPE_BASIC | \
-> > +		UBLK_PARAM_TYPE_DISCARD | UBLK_PARAM_TYPE_DEVT)
-> >  
-> >  struct ublk_rq_data {
-> >  	struct llist_node node;
-> > @@ -255,6 +256,10 @@ static int ublk_validate_params(const struct ublk_device *ub)
-> >  			return -EINVAL;
-> >  	}
-> >  
-> > +	/* dev_t is read-only */
-> > +	if (ub->params.types & UBLK_PARAM_TYPE_DEVT)
-> > +		WARN_ON_ONCE(1);
-> Hi, Ming
+On Wed, Dec 07, 2022 at 10:19:08AM +0800, Yu Kuai wrote:
+> Hi,
 > 
-> ublk_validate_params() is only called by ublk_ctrl_set_params().
-> Why not return -EINVAL here since UBLK_PARAM_TYPE_DEVT is not
-> allowed in ublk_ctrl_set_params(). Then the user may know he has
-> made a mistake.
+> 在 2022/12/07 2:15, Gulam Mohamed 写道:
+> > Use ktime to change the granularity of IO accounting in block layer from
+> > milli-seconds to nano-seconds to get the proper latency values for the
+> > devices whose latency is in micro-seconds. After changing the granularity
+> > to nano-seconds the iostat command, which was showing incorrect values for
+> > %util, is now showing correct values.
+> 
+> This patch didn't correct the counting of io_ticks, just make the
+> error accounting from jiffies(ms) to ns. The problem that util can be
+> smaller or larger still exist.
 
-Yeah, it is better to return -EINVAL here.
+Agree.
 
-Thanks,
+> 
+> However, I think this change make sense consider that error margin is
+> much smaller, and performance overhead should be minimum.
+> 
+> Hi, Ming, how do you think?
+
+I remembered that ktime_get() has non-negligible overhead, is there any
+test data(iops/cpu utilization) when running fio or t/io_uring on
+null_blk with this patch?
+
+
+Thanks, 
 Ming
 
