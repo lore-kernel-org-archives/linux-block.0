@@ -2,431 +2,115 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A11E6C4708E
-	for <linux-block@archiver.kernel.org>; Wed,  7 Dec 2022 12:36:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA93AC63705
+	for <linux-block@archiver.kernel.org>; Wed,  7 Dec 2022 13:09:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229638AbiLGMgH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 7 Dec 2022 07:36:07 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50812 "EHLO
+        id S229736AbiLGNJS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 7 Dec 2022 08:09:18 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44964 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229628AbiLGMgH (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 7 Dec 2022 07:36:07 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79F474FFA5
-        for <linux-block@vger.kernel.org>; Wed,  7 Dec 2022 04:35:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1670416504;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=igbELO7YLlaENiUl2h14gjofaMd81HzChl1GjF8P0d0=;
-        b=JiO9u4XuzVBjxbnIDitqf7ycY4nB7qLTDvFjwj4u2gq87jL9MbX8wzLu31+xqsLjfm/xFv
-        eXdv9zBymYzJA00uQWHA7C6+Ffw34S4xjEmEPO4NcXIiouBYNNFe8iPhwuA3TAlul9QxbK
-        vjgp3IaCyCZbKJ0007LQLOrLH+x4u1s=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-442-WuQwDnBxN26c3P-X0B8MXw-1; Wed, 07 Dec 2022 07:33:46 -0500
-X-MC-Unique: WuQwDnBxN26c3P-X0B8MXw-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id DC440806003;
-        Wed,  7 Dec 2022 12:33:45 +0000 (UTC)
-Received: from localhost (ovpn-8-28.pek2.redhat.com [10.72.8.28])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 60EA91415100;
-        Wed,  7 Dec 2022 12:33:43 +0000 (UTC)
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org,
-        ZiyangZhang <ZiyangZhang@linux.alibaba.com>,
-        Ming Lei <ming.lei@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>
-Subject: [PATCH V3 6/6] ublk_drv: add mechanism for supporting unprivileged ublk device
-Date:   Wed,  7 Dec 2022 20:33:05 +0800
-Message-Id: <20221207123305.937678-7-ming.lei@redhat.com>
-In-Reply-To: <20221207123305.937678-1-ming.lei@redhat.com>
-References: <20221207123305.937678-1-ming.lei@redhat.com>
+        with ESMTP id S229515AbiLGNJR (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 7 Dec 2022 08:09:17 -0500
+Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EADED554E8;
+        Wed,  7 Dec 2022 05:09:15 -0800 (PST)
+Received: from mail02.huawei.com (unknown [172.30.67.153])
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4NRyKc2Vfmz4f3w0Q;
+        Wed,  7 Dec 2022 21:09:08 +0800 (CST)
+Received: from [10.174.176.73] (unknown [10.174.176.73])
+        by APP4 (Coremail) with SMTP id gCh0CgBni9h0kJBjx41CBw--.7669S3;
+        Wed, 07 Dec 2022 21:09:11 +0800 (CST)
+Subject: Re: [RFC] block: Change the granularity of io ticks from ms to ns
+To:     Ming Lei <ming.lei@redhat.com>, Yu Kuai <yukuai1@huaweicloud.com>
+Cc:     Gulam Mohamed <gulam.mohamed@oracle.com>,
+        linux-block@vger.kernel.org, axboe@kernel.dk,
+        philipp.reisner@linbit.com, lars.ellenberg@linbit.com,
+        christoph.boehmwalder@linbit.com, minchan@kernel.org,
+        ngupta@vflare.org, senozhatsky@chromium.org, colyli@suse.de,
+        kent.overstreet@gmail.com, agk@redhat.com, snitzer@kernel.org,
+        dm-devel@redhat.com, song@kernel.org, dan.j.williams@intel.com,
+        vishal.l.verma@intel.com, dave.jiang@intel.com,
+        ira.weiny@intel.com, junxiao.bi@oracle.com,
+        martin.petersen@oracle.com, kch@nvidia.com,
+        drbd-dev@lists.linbit.com, linux-kernel@vger.kernel.org,
+        linux-bcache@vger.kernel.org, linux-raid@vger.kernel.org,
+        nvdimm@lists.linux.dev, konrad.wilk@oracle.com,
+        "yukuai (C)" <yukuai3@huawei.com>
+References: <20221206181536.13333-1-gulam.mohamed@oracle.com>
+ <936a498b-19fe-36d5-ff32-817f153e57e3@huaweicloud.com>
+ <Y5AFX4sxLRLV4uSt@T590>
+From:   Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <aadfc6d2-ad04-279c-a1d6-7f634d0b2c99@huaweicloud.com>
+Date:   Wed, 7 Dec 2022 21:09:08 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
+In-Reply-To: <Y5AFX4sxLRLV4uSt@T590>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.7
+X-CM-TRANSID: gCh0CgBni9h0kJBjx41CBw--.7669S3
+X-Coremail-Antispam: 1UD129KBjvJXoWrKF13ZrWDCw43Cw15CF1DAwb_yoW8Jr4kpr
+        y3A3ZIkw48WFyFkwnFya1UJrWYvrn3ArZ8uFW5K3s7trn0kas3Jr4UG3WDCF92gFsIkF12
+        gay2gas8ur48C3DanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUU9F14x267AKxVWrJVCq3wAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+        1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+        JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+        CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+        2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+        W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka
+        0xkIwI1lc7I2V7IY0VAS07AlzVAYIcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7x
+        kEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E
+        67AF67kF1VAFwI0_GFv_WrylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCw
+        CI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6rW3Jr0E
+        3s1lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcS
+        sGvfC2KfnxnUUI43ZEXa7VUbJ73DUUUUU==
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-unprivileged ublk device is helpful for container use case, such
-as: ublk device created in one unprivileged container can be controlled
-and accessed by this container only.
+Hi,
 
-Implement this feature by adding flag of UBLK_F_UNPRIVILEGED_DEV, and if
-this flag isn't set, any control command has been run from privileged
-user. Otherwise, any control command can be sent from any unprivileged
-user, but the user has to be permitted to access the ublk char device
-to be controlled.
+在 2022/12/07 11:15, Ming Lei 写道:
+> On Wed, Dec 07, 2022 at 10:19:08AM +0800, Yu Kuai wrote:
+>> Hi,
+>>
+>> 在 2022/12/07 2:15, Gulam Mohamed 写道:
+>>> Use ktime to change the granularity of IO accounting in block layer from
+>>> milli-seconds to nano-seconds to get the proper latency values for the
+>>> devices whose latency is in micro-seconds. After changing the granularity
+>>> to nano-seconds the iostat command, which was showing incorrect values for
+>>> %util, is now showing correct values.
+>>
+>> This patch didn't correct the counting of io_ticks, just make the
+>> error accounting from jiffies(ms) to ns. The problem that util can be
+>> smaller or larger still exist.
+> 
+> Agree.
+> 
+>>
+>> However, I think this change make sense consider that error margin is
+>> much smaller, and performance overhead should be minimum.
+>>
+>> Hi, Ming, how do you think?
+> 
+> I remembered that ktime_get() has non-negligible overhead, is there any
+> test data(iops/cpu utilization) when running fio or t/io_uring on
+> null_blk with this patch?
 
-In case of UBLK_F_UNPRIVILEGED_DEV:
+Yes, testing with null_blk is necessary, we don't want any performance
+regression.
 
-1) for command UBLK_CMD_ADD_DEV, it is always allowed, and user needs
-to provide owner's uid/gid in this command, so that udev can set correct
-ownership for the created ublk device, since the device owner uid/gid
-can be queried via command of UBLK_CMD_GET_DEV_INFO.
-
-2) for other control commands, they can only be run successfully if the
-current user is allowed to access the specified ublk char device, for
-running the permission check, path of the ublk char device has to be
-provided by these commands.
-
-Also add one control of command UBLK_CMD_GET_DEV_INFO2 which always
-include the char dev path in payload since userspace may not have
-knowledge if this device is created in unprivileged mode.
-
-For applying this mechanism, system administrator needs to take
-the following policies:
-
-1) chmod 0666 /dev/ublk-control
-
-2) change ownership of ublkcN & ublkbN
-- chown owner_uid:owner_gid /dev/ublkcN
-- chown owner_uid:owner_gid /dev/ublkbN
-
-Both can be done via one simple udev rule.
-
-Userspace:
-
-	https://github.com/ming1/ubdsrv/tree/unprivileged-ublk
-
-'ublk add -t $TYPE --un_privileged=1' is for creating one un-privileged
-ublk device if the user is un-privileged.
-
-Link: https://lore.kernel.org/linux-block/YoOr6jBfgVm8GvWg@stefanha-x1.localdomain/
-Suggested-by: Stefan Hajnoczi <stefanha@redhat.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- Documentation/block/ublk.rst  |  18 ++---
- drivers/block/ublk_drv.c      | 147 ++++++++++++++++++++++++++++++++--
- include/uapi/linux/ublk_cmd.h |  36 ++++++++-
- 3 files changed, 184 insertions(+), 17 deletions(-)
-
-diff --git a/Documentation/block/ublk.rst b/Documentation/block/ublk.rst
-index ba45c46cc0da..403ffd0f4511 100644
---- a/Documentation/block/ublk.rst
-+++ b/Documentation/block/ublk.rst
-@@ -180,6 +180,15 @@ managing and controlling ublk devices with help of several control commands:
-   double-write since the driver may issue the same I/O request twice. It
-   might be useful to a read-only FS or a VM backend.
- 
-+Unprivileged ublk device is supported by passing UBLK_F_UNPRIVILEGED_DEV.
-+Once the flag is set, all control commands can be sent by unprivileged
-+user. Except for command of ``UBLK_CMD_ADD_DEV``, permission check on
-+the specified char device(``/dev/ublkc*``) is done for all other control
-+commands by ublk driver, for doing that, path of the char device has to
-+be provided in these commands' payload from ublk server. With this way,
-+ublk device becomes container-ware, and device created in one container
-+can be controlled/accessed just inside this container.
-+
- Data plane
- ----------
- 
-@@ -254,15 +263,6 @@ with specified IO tag in the command data:
- Future development
- ==================
- 
--Container-aware ublk deivice
------------------------------
--
--ublk driver doesn't handle any IO logic. Its function is well defined
--for now and very limited userspace interfaces are needed, which is also
--well defined too. It is possible to make ublk devices container-aware block
--devices in future as Stefan Hajnoczi suggested [#stefan]_, by removing
--ADMIN privilege.
--
- Zero copy
- ---------
- 
-diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-index f91b3e124cc2..e7a7affd9af7 100644
---- a/drivers/block/ublk_drv.c
-+++ b/drivers/block/ublk_drv.c
-@@ -42,6 +42,7 @@
- #include <linux/mm.h>
- #include <asm/page.h>
- #include <linux/task_work.h>
-+#include <linux/namei.h>
- #include <uapi/linux/ublk_cmd.h>
- 
- #define UBLK_MINORS		(1U << MINORBITS)
-@@ -51,7 +52,8 @@
- 		| UBLK_F_URING_CMD_COMP_IN_TASK \
- 		| UBLK_F_NEED_GET_DATA \
- 		| UBLK_F_USER_RECOVERY \
--		| UBLK_F_USER_RECOVERY_REISSUE)
-+		| UBLK_F_USER_RECOVERY_REISSUE \
-+		| UBLK_F_UNPRIVILEGED_DEV)
- 
- /* All UBLK_PARAM_TYPE_* should be included here */
- #define UBLK_PARAM_TYPE_ALL (UBLK_PARAM_TYPE_BASIC | \
-@@ -1641,15 +1643,33 @@ static int ublk_ctrl_add_dev(struct io_uring_cmd *cmd)
- 			__func__, header->queue_id);
- 		return -EINVAL;
- 	}
-+
- 	if (copy_from_user(&info, argp, sizeof(info)))
- 		return -EFAULT;
--	ublk_dump_dev_info(&info);
-+
-+	if (info.flags & UBLK_F_UNPRIVILEGED_DEV) {
-+		/*
-+		 * user needs to provide proper owner_uid/owner_gid,
-+		 * which will be provided to udev rule for setting
-+		 * ownership on the ublk device to be created.
-+		 */
-+		;
-+	} else {
-+		if (!capable(CAP_SYS_ADMIN))
-+			return -EPERM;
-+
-+		if (info.owner_uid != 0 || info.owner_gid != 0)
-+			return -EINVAL;
-+	}
-+
- 	if (header->dev_id != info.dev_id) {
- 		pr_warn("%s: dev id not match %u %u\n",
- 			__func__, header->dev_id, info.dev_id);
- 		return -EINVAL;
- 	}
- 
-+	ublk_dump_dev_info(&info);
-+
- 	ret = mutex_lock_killable(&ublk_ctl_mutex);
- 	if (ret)
- 		return ret;
-@@ -1982,6 +2002,114 @@ static int ublk_ctrl_end_recovery(struct ublk_device *ub,
- 	return ret;
- }
- 
-+/*
-+ * All control commands are sent via /dev/ublk-control, so we have to check
-+ * the destination device's permission
-+ */
-+static int ublk_char_dev_permission(struct ublk_device *ub,
-+		const char *dev_path, int mask)
-+{
-+	int err;
-+	struct path path;
-+	struct kstat stat;
-+
-+	err = kern_path(dev_path, LOOKUP_FOLLOW, &path);
-+	if (err)
-+		return err;
-+
-+	err = vfs_getattr(&path, &stat, STATX_TYPE, AT_STATX_SYNC_AS_STAT);
-+	if (err)
-+		goto exit;
-+
-+	if (stat.rdev != ub->cdev_dev.devt || !S_ISCHR(stat.mode))
-+		goto exit;
-+
-+	err = inode_permission(&init_user_ns,
-+			d_backing_inode(path.dentry), mask);
-+exit:
-+	path_put(&path);
-+	return err;
-+}
-+
-+static int ublk_ctrl_uring_cmd_permission(struct ublk_device *ub,
-+		struct io_uring_cmd *cmd)
-+{
-+	struct ublksrv_ctrl_cmd *header = (struct ublksrv_ctrl_cmd *)cmd->cmd;
-+	bool unprivileged = ub->dev_info.flags & UBLK_F_UNPRIVILEGED_DEV;
-+	void __user *argp = (void __user *)(unsigned long)header->addr;
-+	char *dev_path = NULL;
-+	int ret = 0;
-+	int mask;
-+
-+	if (!unprivileged) {
-+		if (!capable(CAP_SYS_ADMIN))
-+			return -EPERM;
-+		/*
-+		 * The new added command of UBLK_CMD_GET_DEV_INFO2 includes
-+		 * char_dev_path in payload too, since userspace may not
-+		 * know if the specified device is created as unprivileged
-+		 * mode.
-+		 */
-+		if (cmd->cmd_op != UBLK_CMD_GET_DEV_INFO2)
-+			return 0;
-+	}
-+
-+	/*
-+	 * User has to provide the char device path for unprivileged ublk
-+	 *
-+	 * header->addr always points to the dev path buffer, and
-+	 * header->dev_path_len records length of dev path buffer.
-+	 */
-+	if (!header->dev_path_len || header->dev_path_len > PATH_MAX)
-+		return -EINVAL;
-+
-+	if (header->len < header->dev_path_len)
-+		return -EINVAL;
-+
-+	dev_path = kmalloc(header->dev_path_len + 1, GFP_KERNEL);
-+	if (!dev_path)
-+		return -ENOMEM;
-+
-+	ret = -EFAULT;
-+	if (copy_from_user(dev_path, argp, header->dev_path_len))
-+		goto exit;
-+	dev_path[header->dev_path_len] = 0;
-+
-+	ret = -EINVAL;
-+	switch (cmd->cmd_op) {
-+	case UBLK_CMD_GET_DEV_INFO:
-+	case UBLK_CMD_GET_DEV_INFO2:
-+	case UBLK_CMD_GET_QUEUE_AFFINITY:
-+	case UBLK_CMD_GET_PARAMS:
-+		mask = MAY_READ;
-+		break;
-+	case UBLK_CMD_START_DEV:
-+	case UBLK_CMD_STOP_DEV:
-+	case UBLK_CMD_ADD_DEV:
-+	case UBLK_CMD_DEL_DEV:
-+	case UBLK_CMD_SET_PARAMS:
-+	case UBLK_CMD_START_USER_RECOVERY:
-+	case UBLK_CMD_END_USER_RECOVERY:
-+		mask = MAY_READ | MAY_WRITE;
-+		break;
-+	default:
-+		goto exit;
-+	}
-+
-+	ret = ublk_char_dev_permission(ub, dev_path, mask);
-+	if (!ret) {
-+		header->len -= header->dev_path_len;
-+		header->addr += header->dev_path_len;
-+	}
-+	pr_devel("%s: dev id %d cmd_op %x uid %d gid %d path %s ret %d\n",
-+			__func__, ub->ub_number, cmd->cmd_op,
-+			ub->dev_info.owner_uid, ub->dev_info.owner_gid,
-+			dev_path, ret);
-+exit:
-+	kfree(dev_path);
-+	return ret;
-+}
-+
- static int ublk_ctrl_uring_cmd(struct io_uring_cmd *cmd,
- 		unsigned int issue_flags)
- {
-@@ -1994,17 +2122,21 @@ static int ublk_ctrl_uring_cmd(struct io_uring_cmd *cmd,
- 	if (!(issue_flags & IO_URING_F_SQE128))
- 		goto out;
- 
--	ret = -EPERM;
--	if (!capable(CAP_SYS_ADMIN))
--		goto out;
--
- 	if (cmd->cmd_op != UBLK_CMD_ADD_DEV) {
- 		ret = -ENODEV;
- 		ub = ublk_get_device_from_id(header->dev_id);
- 		if (!ub)
- 			goto out;
-+
-+		ret = ublk_ctrl_uring_cmd_permission(ub, cmd);
-+	} else {
-+		/* ADD_DEV permission check is done in command handler */
-+		ret = 0;
- 	}
- 
-+	if (ret)
-+		goto put_dev;
-+
- 	switch (cmd->cmd_op) {
- 	case UBLK_CMD_START_DEV:
- 		ret = ublk_ctrl_start_dev(ub, cmd);
-@@ -2013,6 +2145,7 @@ static int ublk_ctrl_uring_cmd(struct io_uring_cmd *cmd,
- 		ret = ublk_ctrl_stop_dev(ub);
- 		break;
- 	case UBLK_CMD_GET_DEV_INFO:
-+	case UBLK_CMD_GET_DEV_INFO2:
- 		ret = ublk_ctrl_get_dev_info(ub, cmd);
- 		break;
- 	case UBLK_CMD_ADD_DEV:
-@@ -2040,6 +2173,8 @@ static int ublk_ctrl_uring_cmd(struct io_uring_cmd *cmd,
- 		ret = -ENOTSUPP;
- 		break;
- 	}
-+
-+ put_dev:
- 	if (ub)
- 		ublk_put_device(ub);
-  out:
-diff --git a/include/uapi/linux/ublk_cmd.h b/include/uapi/linux/ublk_cmd.h
-index 4e38b9aa0293..ae80bfef3b9f 100644
---- a/include/uapi/linux/ublk_cmd.h
-+++ b/include/uapi/linux/ublk_cmd.h
-@@ -19,6 +19,8 @@
- #define	UBLK_CMD_GET_PARAMS	0x09
- #define	UBLK_CMD_START_USER_RECOVERY	0x10
- #define	UBLK_CMD_END_USER_RECOVERY	0x11
-+#define	UBLK_CMD_GET_DEV_INFO2		0x12
-+
- /*
-  * IO commands, issued by ublk server, and handled by ublk driver.
-  *
-@@ -79,6 +81,27 @@
- 
- #define UBLK_F_USER_RECOVERY_REISSUE	(1UL << 4)
- 
-+/*
-+ * Unprivileged user can create /dev/ublkcN and /dev/ublkbN.
-+ *
-+ * /dev/ublk-control needs to be available for unprivileged user, and it
-+ * can be done via udev rule to make all control commands available to
-+ * unprivileged user. Except for the command of UBLK_CMD_ADD_DEV, all
-+ * other commands are only allowed for the owner of the specified device.
-+ *
-+ * When userspace sends UBLK_CMD_ADD_DEV, the device pair's owner_uid and
-+ * owner_gid need to be provided via ublksrv_ctrl_dev_info, and the two
-+ * ids need to match with ublk server's uid/gid, otherwise the created
-+ * ublk device can't be started successfully.
-+ *
-+ * We still need udev rule to set correct OWNER/GROUP with the stored
-+ * owner_uid and owner_gid.
-+ *
-+ * Then ublk server can be run as unprivileged user, and /dev/ublkbN can
-+ * be accessed by user of owner_uid/owner_gid.
-+ */
-+#define UBLK_F_UNPRIVILEGED_DEV	(1UL << 5)
-+
- /* device state */
- #define UBLK_S_DEV_DEAD	0
- #define UBLK_S_DEV_LIVE	1
-@@ -98,7 +121,15 @@ struct ublksrv_ctrl_cmd {
- 	__u64	addr;
- 
- 	/* inline data */
--	__u64	data[2];
-+	__u64	data[1];
-+
-+	/*
-+	 * Used for UBLK_F_UNPRIVILEGED_DEV and UBLK_CMD_GET_DEV_INFO2
-+	 * only, include null char
-+	 */
-+	__u16	dev_path_len;
-+	__u16	pad;
-+	__u32	reserved;
- };
- 
- struct ublksrv_ctrl_dev_info {
-@@ -118,7 +149,8 @@ struct ublksrv_ctrl_dev_info {
- 	/* For ublksrv internal use, invisible to ublk driver */
- 	__u64	ublksrv_flags;
- 
--	__u64	reserved0;
-+	__u32	owner_uid;
-+	__u32	owner_gid;
- 	__u64	reserved1;
- 	__u64   reserved2;
- };
--- 
-2.31.1
+BTW, I thought it's fine because it's already used for tracking io
+latency.
+> 
+> 
+> Thanks,
+> Ming
+> 
+> 
+> .
+> 
 
