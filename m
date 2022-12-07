@@ -2,87 +2,106 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B998EC352A1
-	for <linux-block@archiver.kernel.org>; Wed,  7 Dec 2022 19:40:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 700DFC63705
+	for <linux-block@archiver.kernel.org>; Wed,  7 Dec 2022 20:29:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229530AbiLGTkf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 7 Dec 2022 14:40:35 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52978 "EHLO
+        id S229783AbiLGU3Y (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 7 Dec 2022 15:29:24 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47916 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229456AbiLGTkd (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 7 Dec 2022 14:40:33 -0500
-Received: from mail-il1-x12e.google.com (mail-il1-x12e.google.com [IPv6:2607:f8b0:4864:20::12e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1BD5D2A240
-        for <linux-block@vger.kernel.org>; Wed,  7 Dec 2022 11:40:32 -0800 (PST)
-Received: by mail-il1-x12e.google.com with SMTP id z18so2262931ils.3
-        for <linux-block@vger.kernel.org>; Wed, 07 Dec 2022 11:40:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=2zFLoHLb1Dak8B2hEAlRd1msRP6Th/qVOfnIe/tfsAo=;
-        b=0h5EajkaNDlkepqaplu4kd0DtQzDvNutIS/6I16Gs3Zqe2qFPpJg5r8fE5qef74UvW
-         5r1DUd+RkRH/lRKg5IZ8bKETHSCStUT+OPQ15WNbQIhVGhjqEXe2awUqT/oAQfPAtYot
-         ENTaSeq8aS9iwgoxyK7bNtIIc0rCLrxiLmXhgcQgzPG92rsSASg4ijiMDfLRZLNmRA6O
-         ATQ3BhoIbANJ1T1Ac1xbh15uUVIQduvneERofvvUCvg4BBPUpqC9EmwBf1ZYQ0Thv06W
-         3P773wJ5V5gFlkcqqepB5pJuC3qrYWiJh9VFITMecmwXPA64lPruxuQDBo7e/4HBHcSF
-         1OLA==
+        with ESMTP id S229566AbiLGU3W (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 7 Dec 2022 15:29:22 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7247530573
+        for <linux-block@vger.kernel.org>; Wed,  7 Dec 2022 12:28:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1670444899;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=ERzjyp7zk5Z5+YVLaxlhiooylxoMa/YnIAQSVI50Phc=;
+        b=HNfgA+EBdik8a7ImgHBkU261GvxFLalqqOlJh1EE5gbfAPKF36NxpZa8qVD9wrzcp/adNT
+        kS9kJ7FL/HlkELxVa5h3KDrkNaKqo5SjLZ9Qkd+LtmCb/zvAz8QwCddWEZMF/UmpTfVlaF
+        ipCfryf8vSSMuMMY8CH4hRwRYnLZ5rY=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-507-VFMp9BVeNfym3-D6XNncLA-1; Wed, 07 Dec 2022 15:28:18 -0500
+X-MC-Unique: VFMp9BVeNfym3-D6XNncLA-1
+Received: by mail-wm1-f72.google.com with SMTP id v188-20020a1cacc5000000b003cf76c4ae66so1267480wme.7
+        for <linux-block@vger.kernel.org>; Wed, 07 Dec 2022 12:28:17 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=2zFLoHLb1Dak8B2hEAlRd1msRP6Th/qVOfnIe/tfsAo=;
-        b=BBBROrg99NHNDgdwmr4VH3hNZIVa+P2NbepKZmKEkOWJD8fcv1aPtVWbCi8oPXGMcs
-         ODLDJt5uOwl8FWc5C503xR3u0Sg+qUfWnfKoSEDl0aSigWyRXT6QUk/doY+Z7iaGnCzP
-         utcd20KOCOOQg2h5aC3mEb8IOMeQ0L7kEYTkyvEf7xkfM7+AxZRsuGVs12zIs6is2Y5V
-         7LlcGN/PiVyaU1xO8L1um4eHRjnLg5c4nItfL6ZlIqRoWzz5j+JJfpQIs+EM5HHHJHW1
-         C2aPXQQaNEf3OMYMVJllzsMKZeG4nFfhUIkBxkfjuYkGPKQiRM3ei8FiPJ9lFk00Tudm
-         /6tA==
-X-Gm-Message-State: ANoB5pm/IhIACO4ikZrm7NwA7NuTptMHF2VOxgTjBQ1FCp5/Gw5Nnx/V
-        rqYjj20pm0egKvJZ551yLRJBXg==
-X-Google-Smtp-Source: AA0mqf6Jz5PYh1LkEVLw9teBsWBYb8QL6Bw523dDiFXvPgFWqFFhFCmOenpWa4gWj+hTE0+OnXDX9A==
-X-Received: by 2002:a92:870e:0:b0:2fa:f47:d960 with SMTP id m14-20020a92870e000000b002fa0f47d960mr33450223ild.19.1670442031401;
-        Wed, 07 Dec 2022 11:40:31 -0800 (PST)
-Received: from [192.168.1.94] ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id d9-20020a026049000000b00375e136bf95sm7952621jaf.127.2022.12.07.11.40.30
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 07 Dec 2022 11:40:30 -0800 (PST)
-Message-ID: <3747bc85-967c-fd5a-66e5-7cad42d00bcd@kernel.dk>
-Date:   Wed, 7 Dec 2022 12:40:29 -0700
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.1
-Subject: Re: [GIT PULL] nvme updates for Linux 6.2
-Content-Language: en-US
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ERzjyp7zk5Z5+YVLaxlhiooylxoMa/YnIAQSVI50Phc=;
+        b=wM2k7/bdNcpxvdO82UEDQQeJbswoOT3JdrnbFX0Gi0BFvPmZJWuCmYtXhlDFy3x0XJ
+         UIkp0TRUissXFMkz0K7PSu1qGHsJq5UNoIp2o0SWH6djwKwkcNa+qJRwPkQkiRSPiSTg
+         qFRPoFX/tdamhYdXv0EqrewquREOrk2z/3kG3zBiHLBI2pOOIgEmHG1vJ7qvAw6lmRrD
+         XC9BQUHJCfReClGcM6aqO4ERRrnhqCM4ZFIQhkWHt+4gcp/UL2aOwQ3N5vmYpmNbv5N8
+         gFKmxfS5WVOK1jF0tX2OF5W78ieFS/3h7P0fQZoxn4zkg2nNHonmQs2EHaJ1/BsChGgu
+         EHWg==
+X-Gm-Message-State: ANoB5pmYvZyzEEi36FG9JRSFeZHsFrHybZ2al0uQMSHIrjQs5iQrOUiR
+        G6lwqF0CUiV9Uj/5yX1Gvj/mIwvF9ezQj6cy0gcd6i44/zmBb92pgGt994NArz3uGUb04noSbis
+        RmWLzjWFWuTLITdekCU2NkFk=
+X-Received: by 2002:adf:f98e:0:b0:242:324:ff88 with SMTP id f14-20020adff98e000000b002420324ff88mr35473840wrr.81.1670444897079;
+        Wed, 07 Dec 2022 12:28:17 -0800 (PST)
+X-Google-Smtp-Source: AA0mqf4QOq0RAPymVdkyXnh7/V2ZIzFLtZtJ+dwe3UW02/93b8NTVphp6L78PZAaWRCEXF7iho9Mtw==
+X-Received: by 2002:adf:f98e:0:b0:242:324:ff88 with SMTP id f14-20020adff98e000000b002420324ff88mr35473829wrr.81.1670444896831;
+        Wed, 07 Dec 2022 12:28:16 -0800 (PST)
+Received: from redhat.com ([2a02:14f:17a:1a4f:ce60:357c:370b:cc7e])
+        by smtp.gmail.com with ESMTPSA id b12-20020a5d634c000000b00241e8d00b79sm25007953wrw.54.2022.12.07.12.28.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 07 Dec 2022 12:28:16 -0800 (PST)
+Date:   Wed, 7 Dec 2022 15:28:10 -0500
+From:   "Michael S. Tsirkin" <mst@redhat.com>
 To:     Christoph Hellwig <hch@infradead.org>
-Cc:     Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
-References: <Y5DbMySCBMWI7CbE@infradead.org>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <Y5DbMySCBMWI7CbE@infradead.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Cc:     Alvaro Karsz <alvaro.karsz@solid-run.com>,
+        virtualization@lists.linux-foundation.org,
+        linux-block@vger.kernel.org, dm-devel@redhat.com,
+        linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org,
+        Jason Wang <jasowang@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Jens Axboe <axboe@kernel.dk>
+Subject: Re: [PATCH v3] virtio_blk: add VIRTIO_BLK_F_LIFETIME feature support
+Message-ID: <20221207152116-mutt-send-email-mst@kernel.org>
+References: <20221205162035.2261037-1-alvaro.karsz@solid-run.com>
+ <Y5BCQ/9/uhXdu35W@infradead.org>
+ <20221207052001-mutt-send-email-mst@kernel.org>
+ <Y5C/4H7Ettg/DcRz@infradead.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Y5C/4H7Ettg/DcRz@infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 12/7/22 11:28 AM, Christoph Hellwig wrote:
-> The following changes since commit eea3e8b74aa1648fc96b739458d067a6e498c302:
+On Wed, Dec 07, 2022 at 08:31:28AM -0800, Christoph Hellwig wrote:
+> On Wed, Dec 07, 2022 at 05:21:48AM -0500, Michael S. Tsirkin wrote:
+> > Christoph you acked the spec patch adding this to virtio blk:
+> > 
+> > 	Still not a fan of the encoding, but at least it is properly documented
+> > 	now:
+> > 
+> > 	Acked-by: Christoph Hellwig <hch@lst.de>
+> > 
+> > Did you change your mind then? Or do you prefer a different encoding for
+> > the ioctl then? could you help sugesting what kind?
 > 
->   blk-throttle: Use more suitable time_after check for update of slice_start (2022-12-05 13:45:31 -0700)
-> 
-> are available in the Git repository at:
-> 
->   ssh://git.infradead.org/var/lib/git/nvme.git tags/nvme-6.2-2022-12-07
+> Well, it is good enough documented for a spec.  I don't think it is
+> a useful feature for Linux where virtio-blk is our minimum viable
+> paravirtualized block driver.
 
-I pulled:
+No idea what this means, sorry.  Now that's in the spec I expect (some)
+devices to implement it and if they do I see no reason not to expose the
+data to userspace.
 
-git://git.infradead.org/nvme tags/nvme-6.2-2022-12-07
+Alvaro could you pls explain the use-case? Christoph has doubts that
+it's useful. Do you have a device implementing this?
 
 -- 
-Jens Axboe
-
+MST
 
