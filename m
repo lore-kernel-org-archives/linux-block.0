@@ -2,59 +2,59 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 639DAC3A5A7
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D76BC6370B
 	for <linux-block@archiver.kernel.org>; Thu,  8 Dec 2022 11:04:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229828AbiLHLDs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S229981AbiLHLDs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Thu, 8 Dec 2022 06:03:48 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35502 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38484 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230284AbiLHLCx (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 8 Dec 2022 06:02:53 -0500
+        with ESMTP id S230310AbiLHLC4 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 8 Dec 2022 06:02:56 -0500
 Received: from esa3.hgst.iphmx.com (esa3.hgst.iphmx.com [216.71.153.141])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA3865BD66;
-        Thu,  8 Dec 2022 03:01:16 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F10455CD2A;
+        Thu,  8 Dec 2022 03:01:18 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1670497276; x=1702033276;
+  t=1670497278; x=1702033278;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=fkMDbHJKptb+eHoWQREDqIKMzmlWlbmdh50ygb3ZD+w=;
-  b=dRQVTaZ1EesjFjoqAvjNVXAcoEJcGbbNd4DeburTqEBi7mkbfgiRgcku
-   nEvumr1j+0lUiZbWAyJ3fix8kzw3wcx04I6lXDywroE4y13Q3jta2EZjy
-   sczA2yCilm+VwaqvGJ9oM2vIJaW5X3p4aReOSentsqIzQLoLS5qLgMwux
-   lvx08tV+Egsn261frgZFXMPdokuzZJhUJLOTWRLiFxzk0BU/j4BlCxvyv
-   UibxkFbOnd7ulFs1yfZGidiE7duMv25c7s+2W0Vjv6qIEbM58fohJvwym
-   udu6ISPCYJXOxPHOzcHWVv5m4jEo949FrY+DN/tkXk79koZI99ljIgDml
-   A==;
+  bh=DL3+bdlAlVJyOHJFHmnZNgLXM8VisYLIjqtEpyzmztw=;
+  b=iRb2dIfvFzFFEZP+QquWFc/cf3USk/BeagOQhVPdugKAd3TV3HFYzJNy
+   D3wwb2z4L9qFODfUkkdXp/KXqZEdfBA1VUrTDz+9JQBv6sK4hyWKNGCs0
+   zYDbmbFUnfRaPq3Iy6M3eIi4PV89Oe9zqthiKN39T81NuZcB62Jn382Hk
+   qiAFqs9jeU38wr+1L5+6SOzNiRGlF1Aqs61v61S7LTPZoKfSDLs6FBtIh
+   uynxFd28B1ze4M3lwmWxvvPnKpD7ECpjqBU9ejmD/1ar2jTrSuSVLu1Yt
+   QxJwpuPYm0da2rfyTgqCc8ULEqTBVWDXV5GqnimlsxriRMVuFCM1ig/M4
+   Q==;
 X-IronPort-AV: E=Sophos;i="5.96,227,1665417600"; 
-   d="scan'208";a="223333401"
+   d="scan'208";a="223333404"
 Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 08 Dec 2022 19:01:16 +0800
-IronPort-SDR: ZBokXB94yfwe0hU26qR8hBoBhrFxVNfibaMDPzL4Vh98DYJNcfFdK4ZEH6RgvwpXc3HvnUQJCZ
- PkaTXoBLpVSwmGZtrCTcgEZXcG1JwSLkSPPjHufmQQKjNRmae4r2iuVs4qzwUgRIsIMSSbvgsS
- tSgSwNPdwfqxw504l8eu5AxAr2A3St+pEt6YHrfvLXxtuE1ziK1fd+C5kY3CJuZc6cNw4Wj//0
- ZemBaD/rwxy2D6UXNDfozBbUKq0A97FneXm21yu/fMRQ6YTz/HLba2mqYdEzoMnHK2a1Nax+V1
- nDk=
+  by ob1.hgst.iphmx.com with ESMTP; 08 Dec 2022 19:01:18 +0800
+IronPort-SDR: GGAF7BE+hXSUkIi57qZIzEk49biCE6b2dC7rUoko3DgyPsoaaeIBLtLvgLeRAK+kLl/mpPNGX8
+ fHXKSAaB4P/qAVHO6OxopBHjP2K9xXgFth6vlvDvED35g/1W2D3yeDUKbD7LqBGyutGX2tVBut
+ iMHF6tqRxFR39pN3egwJ7E+31fOd6OirLwEqpLCaAisTNgx/0pnQquXVkm/9Z4g8wdfDoJNVT4
+ eKDN1Ug4eBjHANMDWJJ2WKSl9HSzVTOvWBr3Bse2fiymmSNS/sKtCswnPABfmD84r/UkRmcIKl
+ xNg=
 Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
-  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 08 Dec 2022 02:14:01 -0800
-IronPort-SDR: 5f6iq0uF0+5KUFxVzbvJEOSn9BUHltZIQiA9/o3Hata+JGC6s24sTmVidgNLX59xP3rIMtb9U7
- SdudTsfEIyb+AFKwgJOPHN0cRgzalM2I/lKviYg/TlPZTIwQf58FLmc6Af8pTWEzrsIavN+qjT
- BOxDuNpg7zmkPzcoQCXGravX/odHCINJ6PwTYu+qCs9vHlf4HP1k22r507Y6MImlTI/SGyPVpp
- Ua+RY465dfudAyz2VgzkYQE3VtZgU+ejyZYB5oacRwMaX8CuPbkCFFYDkbwLwbDYXDxSuxujc2
- BV8=
+  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 08 Dec 2022 02:14:03 -0800
+IronPort-SDR: 1giZiys6opqWDb8rUovSg/VnLPD94zAlMtInV7HbHOLoWaD87iyxxlfppqjpzE0ZoMNCDyeCaT
+ 7kdhnzqrdiorwEF7XLOpHWh+thTk6ZgzwsGF4paPiJ/3K5O8Fnq9Jg5yypdV1sIaZpZgFY6sEG
+ 1AoWpEJr+zvAy/O9S+GUEcLOrTHNkUcEuSQsA80FG040YqDhFg3m1blTyt/v6HVyjSEwoIYrPc
+ bU34Dgcn28l3wbUs3OcBd1bEFWh0y6H4Knz/wfO3QLeMiZ1G2Om9F5oJ9B5bDYpKDDKHyvzfmj
+ Lsc=
 WDCIronportException: Internal
 Received: from dellx5.wdc.com (HELO x1-carbon.cphwdc) ([10.200.210.81])
-  by uls-op-cesaip01.wdc.com with ESMTP; 08 Dec 2022 03:01:15 -0800
+  by uls-op-cesaip01.wdc.com with ESMTP; 08 Dec 2022 03:01:18 -0800
 From:   Niklas Cassel <niklas.cassel@wdc.com>
-To:     Paolo Valente <paolo.valente@linaro.org>,
-        Jens Axboe <axboe@kernel.dk>
+To:     Jens Axboe <axboe@kernel.dk>
 Cc:     Hannes Reinecke <hare@suse.de>, linux-scsi@vger.kernel.org,
         Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+        Niklas Cassel <niklas.cassel@wdc.com>,
         linux-block@vger.kernel.org
-Subject: [PATCH 14/25] block: introduce duration-limits priority class
-Date:   Thu,  8 Dec 2022 11:59:30 +0100
-Message-Id: <20221208105947.2399894-15-niklas.cassel@wdc.com>
+Subject: [PATCH 15/25] block: introduce BLK_STS_DURATION_LIMIT
+Date:   Thu,  8 Dec 2022 11:59:31 +0100
+Message-Id: <20221208105947.2399894-16-niklas.cassel@wdc.com>
 X-Mailer: git-send-email 2.38.1
 In-Reply-To: <20221208105947.2399894-1-niklas.cassel@wdc.com>
 References: <20221208105947.2399894-1-niklas.cassel@wdc.com>
@@ -66,153 +66,51 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Damien Le Moal <damien.lemoal@opensource.wdc.com>
 
-Introduce the IOPRIO_CLASS_DL priority class to indicate that IOs should
-be executed using duration-limits targets. The duration target to apply
-to a command is indicated using the priority level. Up to 8 levels are
-supported, with level 0 indiating "no limit".
+Introduce the new block IO status BLK_STS_DURATION_LIMIT for LLDDs to
+report command that failed due to a command duration limit being
+exceeded. This new status is mapped to the ETIME error code to allow
+users to differentiate "soft" duration limit failures from other more
+serious hardware related errors.
 
-This priority class has effect only if the target device supports the
-command duration limits feature and this feature is enabled by the user.
-In BFQ and mq-deadline, all requests with this new priority class are
-handled using the highest priority class RT and priority level 0.
-
+Co-developed-by: Niklas Cassel <niklas.cassel@wdc.com>
+Signed-off-by: Niklas Cassel <niklas.cassel@wdc.com>
 Signed-off-by: Damien Le Moal <damien.lemoal@opensource.wdc.com>
 ---
- block/bfq-iosched.c         | 10 ++++++++++
- block/blk-ioprio.c          |  3 +++
- block/ioprio.c              |  3 ++-
- block/mq-deadline.c         |  1 +
- include/linux/ioprio.h      |  2 +-
- include/uapi/linux/ioprio.h |  7 +++++++
- 6 files changed, 24 insertions(+), 2 deletions(-)
+ block/blk-core.c          | 3 +++
+ include/linux/blk_types.h | 6 ++++++
+ 2 files changed, 9 insertions(+)
 
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index a72304c728fc..62cf7fa7e0cf 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -5384,6 +5384,14 @@ bfq_set_next_ioprio_data(struct bfq_queue *bfqq, struct bfq_io_cq *bic)
- 		bfqq->new_ioprio_class = IOPRIO_CLASS_IDLE;
- 		bfqq->new_ioprio = 7;
- 		break;
-+	case IOPRIO_CLASS_DL:
-+		/*
-+		 * For the duration-limits class, we want the disk to do the
-+		 * scheduling. So map all levels to the highest RT level.
-+		 */
-+		bfqq->new_ioprio = 0;
-+		bfqq->new_ioprio_class = IOPRIO_CLASS_RT;
-+		break;
- 	}
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 3866b6c4cd88..5cbb0e5f189c 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -170,6 +170,9 @@ static const struct {
+ 	[BLK_STS_ZONE_OPEN_RESOURCE]	= { -ETOOMANYREFS, "open zones exceeded" },
+ 	[BLK_STS_ZONE_ACTIVE_RESOURCE]	= { -EOVERFLOW, "active zones exceeded" },
  
- 	if (bfqq->new_ioprio >= IOPRIO_NR_LEVELS) {
-@@ -5510,6 +5518,8 @@ static struct bfq_queue **bfq_async_queue_prio(struct bfq_data *bfqd,
- 		return &bfqg->async_bfqq[1][ioprio];
- 	case IOPRIO_CLASS_IDLE:
- 		return &bfqg->async_idle_bfqq;
-+	case IOPRIO_CLASS_DL:
-+		return &bfqg->async_bfqq[0][0];
- 	default:
- 		return NULL;
- 	}
-diff --git a/block/blk-ioprio.c b/block/blk-ioprio.c
-index 8bb6b8eba4ce..dfb5c3f447f4 100644
---- a/block/blk-ioprio.c
-+++ b/block/blk-ioprio.c
-@@ -27,6 +27,7 @@
-  * @POLICY_RESTRICT_TO_BE: modify IOPRIO_CLASS_NONE and IOPRIO_CLASS_RT into
-  *		IOPRIO_CLASS_BE.
-  * @POLICY_ALL_TO_IDLE: change the I/O priority class into IOPRIO_CLASS_IDLE.
-+ * @POLICY_ALL_TO_DL: change the I/O priority class into IOPRIO_CLASS_DL.
-  *
-  * See also <linux/ioprio.h>.
++	/* Command duration limit device-side timeout */
++	[BLK_STS_DURATION_LIMIT]	= { -ETIME, "duration limit exceeded" },
++
+ 	/* everything else not covered above: */
+ 	[BLK_STS_IOERR]		= { -EIO,	"I/O" },
+ };
+diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+index e0b098089ef2..a357bbd51546 100644
+--- a/include/linux/blk_types.h
++++ b/include/linux/blk_types.h
+@@ -166,6 +166,12 @@ typedef u16 blk_short_t;
   */
-@@ -35,6 +36,7 @@ enum prio_policy {
- 	POLICY_NONE_TO_RT	= 1,
- 	POLICY_RESTRICT_TO_BE	= 2,
- 	POLICY_ALL_TO_IDLE	= 3,
-+	POLICY_ALL_TO_DL	= 4,
- };
- 
- static const char *policy_name[] = {
-@@ -42,6 +44,7 @@ static const char *policy_name[] = {
- 	[POLICY_NONE_TO_RT]	= "none-to-rt",
- 	[POLICY_RESTRICT_TO_BE]	= "restrict-to-be",
- 	[POLICY_ALL_TO_IDLE]	= "idle",
-+	[POLICY_ALL_TO_DL]	= "duration-limits",
- };
- 
- static struct blkcg_policy ioprio_policy;
-diff --git a/block/ioprio.c b/block/ioprio.c
-index 32a456b45804..1b3a9da82597 100644
---- a/block/ioprio.c
-+++ b/block/ioprio.c
-@@ -37,6 +37,7 @@ int ioprio_check_cap(int ioprio)
- 
- 	switch (class) {
- 		case IOPRIO_CLASS_RT:
-+		case IOPRIO_CLASS_DL:
- 			/*
- 			 * Originally this only checked for CAP_SYS_ADMIN,
- 			 * which was implicitly allowed for pid 0 by security
-@@ -47,7 +48,7 @@ int ioprio_check_cap(int ioprio)
- 			if (!capable(CAP_SYS_ADMIN) && !capable(CAP_SYS_NICE))
- 				return -EPERM;
- 			fallthrough;
--			/* rt has prio field too */
-+			/* RT and DL have prio field too */
- 		case IOPRIO_CLASS_BE:
- 			if (data >= IOPRIO_NR_LEVELS || data < 0)
- 				return -EINVAL;
-diff --git a/block/mq-deadline.c b/block/mq-deadline.c
-index f10c2a0d18d4..526d0ea4dbf9 100644
---- a/block/mq-deadline.c
-+++ b/block/mq-deadline.c
-@@ -113,6 +113,7 @@ static const enum dd_prio ioprio_class_to_prio[] = {
- 	[IOPRIO_CLASS_RT]	= DD_RT_PRIO,
- 	[IOPRIO_CLASS_BE]	= DD_BE_PRIO,
- 	[IOPRIO_CLASS_IDLE]	= DD_IDLE_PRIO,
-+	[IOPRIO_CLASS_DL]	= DD_RT_PRIO,
- };
- 
- static inline struct rb_root *
-diff --git a/include/linux/ioprio.h b/include/linux/ioprio.h
-index 7578d4f6a969..2f3fc2fbd668 100644
---- a/include/linux/ioprio.h
-+++ b/include/linux/ioprio.h
-@@ -20,7 +20,7 @@ static inline bool ioprio_valid(unsigned short ioprio)
- {
- 	unsigned short class = IOPRIO_PRIO_CLASS(ioprio);
- 
--	return class > IOPRIO_CLASS_NONE && class <= IOPRIO_CLASS_IDLE;
-+	return class > IOPRIO_CLASS_NONE && class <= IOPRIO_CLASS_DL;
- }
- 
- /*
-diff --git a/include/uapi/linux/ioprio.h b/include/uapi/linux/ioprio.h
-index f70f2596a6bf..15908b9e9d8c 100644
---- a/include/uapi/linux/ioprio.h
-+++ b/include/uapi/linux/ioprio.h
-@@ -29,6 +29,7 @@ enum {
- 	IOPRIO_CLASS_RT,
- 	IOPRIO_CLASS_BE,
- 	IOPRIO_CLASS_IDLE,
-+	IOPRIO_CLASS_DL,
- };
- 
- /*
-@@ -37,6 +38,12 @@ enum {
- #define IOPRIO_NR_LEVELS	8
- #define IOPRIO_BE_NR		IOPRIO_NR_LEVELS
+ #define BLK_STS_OFFLINE		((__force blk_status_t)17)
  
 +/*
-+ * The Duration limits class allows 8 levels: level 0 for "no limit" and levels
-+ * 1 to 7, each corresponding to a read or write limit descriptor.
++ * BLK_STS_DURATION_LIMIT is returned from the driver when the target device
++ * aborted the command because it exceeded one of its Command Duration Limits.
 + */
-+#define IOPRIO_DL_NR_LEVELS	8
++#define BLK_STS_DURATION_LIMIT	((__force blk_status_t)18)
 +
- enum {
- 	IOPRIO_WHO_PROCESS = 1,
- 	IOPRIO_WHO_PGRP,
+ /**
+  * blk_path_error - returns true if error may be path related
+  * @error: status the request was completed with
 -- 
 2.38.1
 
