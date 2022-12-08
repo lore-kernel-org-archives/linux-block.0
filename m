@@ -2,100 +2,161 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C8188C4332F
-	for <linux-block@archiver.kernel.org>; Thu,  8 Dec 2022 21:03:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 75F33C001B2
+	for <linux-block@archiver.kernel.org>; Thu,  8 Dec 2022 21:29:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229792AbiLHVDH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 8 Dec 2022 16:03:07 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54662 "EHLO
+        id S229589AbiLHV3H (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 8 Dec 2022 16:29:07 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40652 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229795AbiLHVDF (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 8 Dec 2022 16:03:05 -0500
-Received: from mail-il1-x131.google.com (mail-il1-x131.google.com [IPv6:2607:f8b0:4864:20::131])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D62954767
-        for <linux-block@vger.kernel.org>; Thu,  8 Dec 2022 13:03:03 -0800 (PST)
-Received: by mail-il1-x131.google.com with SMTP id o13so1727103ilc.7
-        for <linux-block@vger.kernel.org>; Thu, 08 Dec 2022 13:03:03 -0800 (PST)
+        with ESMTP id S229592AbiLHV3H (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 8 Dec 2022 16:29:07 -0500
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F5F784265
+        for <linux-block@vger.kernel.org>; Thu,  8 Dec 2022 13:29:06 -0800 (PST)
+Received: by mail-yb1-xb49.google.com with SMTP id a5-20020a25af05000000b006e450a5e507so2855520ybh.22
+        for <linux-block@vger.kernel.org>; Thu, 08 Dec 2022 13:29:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=EVLGV9HSVjQT6MWFOCI6sr/k5HJU0kVG05tStWNC7nY=;
-        b=ipaP+BSrE8uS9w5Vr79fKneH80rRl7vVwJ9JvMJwUJIl7SfXJUXy+e6z20PDFhEXEl
-         jBgd84P695DTiiRUt+hFmRHfSdJ07shFrrgajKV7J7SNtI/fpclNEJtzTVmUEWfvGpCm
-         UFCUzOwbT3ChHrwc3Iq7bAPIj1id0ihoDM0G4AVPZ/sJH8FD30w9IbLjr+VahvoPoc/O
-         q7QgEqVPpiASlo/m/VSRAJ67WlAchzZEcddeAL/UsVh/e90rSnHKOSOEEugPn4Z309A3
-         fG04NrlY23B2wu40FlrWz8X+yOBrkye2SVgmQRbt3+fEPurDqwdmvKlQlwamLUdTWos6
-         iSGg==
+        d=google.com; s=20210112;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=1/7SmmzO1fjUhk6gqNU1IGSXCaBrn6wr7PS0uHHL0Y4=;
+        b=LqiYpvieBDCbLQwkb+CSQO3e5kvlO9YkgEAx+uj4dvnOMSYSbFp+eB6H7weFJnTz89
+         8MDyvy5lu8E6NOlVICNsMMIWd2RXsQrhEHP/T+ym9fr0388elXolqAQVV5XMtGyPc7hB
+         mh47hi5HEFtu4bMGkuw7sLC+CgMhhQDK3rFxEm+R8vsaFvB3a8j6j2zQv0P+wJGMQLDy
+         6qYqDgN4YpiZmvCgZNbe6NfpIeJGuTrFf6M+9a2bJ+nkDnbJl61wH4k79YmSG333Qxbj
+         9U7xGHcetB4fBU33IHmW5ZSKzsib8LREKjD5mpb4io1ayunr/o9VMJFRteWlgb2E3MvY
+         WTSg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=EVLGV9HSVjQT6MWFOCI6sr/k5HJU0kVG05tStWNC7nY=;
-        b=6vGXJ+JKjh/Wg+V/LV5GMpJCOu2UMVxPt3+nBQxkRlxKLhdWnAJ9Qh2MKqhmni7FHe
-         ODGaDZIqo3EPJ9YHwTCyHKvy8sWQ8UOZiW+JtVvmiwxZfCaHQpHKlrBdsy0cZmV29GZB
-         bj/l5Z5NYqv3XdOHLw5SFcl9KYBHZCEHZSBUVtF7BXbFUnsajIUB8qx0uqstNI1jq+OL
-         iUrib6AtB1huZ8X8JyM+Q05mRYIdX7EU8vjgobx4TQX5j4sn51hrmZMeF8QV0qxQPhAf
-         Q1Ji7F3Q8nZTr36NYY9wBA1obaSc2PVUTewLmQlaYtANgjyvWAJJIs9CP182U73Uy6gw
-         +3fg==
-X-Gm-Message-State: ANoB5pkcCMT7AE8JNdsgsOJJkPJJGG2IAb3oF4QKSF+RyGMWueezfu/8
-        TDtBSzQyZIrqgGlEZeSu9DRHMkrDKHKunzRm/NE=
-X-Google-Smtp-Source: AA0mqf46JjC7y7QrfVPbdbVkJNTeCPnYXVkxqqYos2AHsIh0cyryHAPg0zFLh6ky5mi6EB/LCDJcww==
-X-Received: by 2002:a05:6e02:1244:b0:303:7a9c:1b11 with SMTP id j4-20020a056e02124400b003037a9c1b11mr4635170ilq.71.1670533382390;
-        Thu, 08 Dec 2022 13:03:02 -0800 (PST)
-Received: from [192.168.1.94] ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id e33-20020a026d61000000b00363ad31c149sm8989119jaf.110.2022.12.08.13.03.01
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 08 Dec 2022 13:03:02 -0800 (PST)
-Message-ID: <40dbd6f1-be33-6536-4e2a-e7f0120a2fa1@kernel.dk>
-Date:   Thu, 8 Dec 2022 14:03:01 -0700
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.1
-Content-Language: en-US
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From:   Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Block fix for 6.1-final
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=1/7SmmzO1fjUhk6gqNU1IGSXCaBrn6wr7PS0uHHL0Y4=;
+        b=OZCx8j+u9hcWM92BeDiXclWnUG7zwEFxtfKIlEmeGWMYjz/xL07A4jOBJPQOvqqn3t
+         Px/T46ZvLMN/oy63PCBlvjNBgZ3vFhcsiPtEGaSI8gDsWJbpeSRmG4A4mfLOCvxGyU5H
+         EeSuRyScDH6//+D9Hk3LlAHHvHlnjhg0ijB7ulOXrD6ZTs6NqYBTYrcpRKaEHG7Os6mZ
+         FhXiNN6aGI2ZmTx6VEqCCVfujOuqTP3lEqDbeQ4yARvmGLriO4gHvlyratCxPLpEjV8B
+         ozZETcujae995psljq4OJxQBTbIvt3HsG7yjRQOzDFZ+YPHaLrdoZ72/Y01ZlKGoSuDr
+         Mlhw==
+X-Gm-Message-State: ANoB5pnh/5ruQ6prjIhzaO/dol1IWPkDSVm9uozEGKavKGrIfEIsTAXD
+        grfgV6JnVTAb7KVJkzXL+jFuP4dmFc+bEDp5z+kiIA==
+X-Google-Smtp-Source: AA0mqf5uSOfyS4zTT3VGBQCIxUQ4g9tCxEa+73pikowJ78eitpwdyfLrX+kPJHU3xsZsUmGtzI1+a4VpVYAb7VSEbSE1OQ==
+X-Received: from isaacmanjarres.irv.corp.google.com ([2620:15c:2d:3:c924:bf6:54d9:20e9])
+ (user=isaacmanjarres job=sendgmr) by 2002:a05:690c:902:b0:3f6:489a:a06f with
+ SMTP id cb2-20020a05690c090200b003f6489aa06fmr10039866ywb.470.1670534945529;
+ Thu, 08 Dec 2022 13:29:05 -0800 (PST)
+Date:   Thu,  8 Dec 2022 13:29:01 -0800
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.39.0.rc1.256.g54fd8350bd-goog
+Message-ID: <20221208212902.765781-1-isaacmanjarres@google.com>
+Subject: [PATCH RESEND v1] loop: Fix the max_loop commandline argument
+ treatment when it is set to 0
+From:   "Isaac J. Manjarres" <isaacmanjarres@google.com>
+To:     Jens Axboe <axboe@kernel.dk>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Ken Chen <kenchen@google.com>
+Cc:     Saravana Kannan <saravanak@google.com>,
+        "Isaac J. Manjarres" <isaacmanjarres@google.com>,
+        stable@vger.kernel.org, kernel-team@android.com,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Linus,
+Currently, the max_loop commandline argument can be used to specify how
+many loop block devices are created at init time. If it is not
+specified on the commandline, CONFIG_BLK_DEV_LOOP_MIN_COUNT loop block
+devices will be created.
 
-Just a small fix for initializing the NVMe quirks before initializing
-the subsystem. Please pull!
+The max_loop commandline argument can be used to override the value of
+CONFIG_BLK_DEV_LOOP_MIN_COUNT. However, when max_loop is set to 0
+through the commandline, the current logic treats it as if it had not
+been set, and creates CONFIG_BLK_DEV_LOOP_MIN_COUNT devices anyway.
 
+Fix this by starting max_loop off as set to CONFIG_BLK_DEV_LOOP_MIN_COUNT.
+This preserves the intended behavior of creating
+CONFIG_BLK_DEV_LOOP_MIN_COUNT loop block devices if the max_loop
+commandline parameter is not specified, and allowing max_loop to
+be respected for all values, including 0.
 
-The following changes since commit d0f411c0b9bdef85f647e15a2fcc790b29891f2c:
+This allows environments that can create all of their required loop
+block devices on demand to not have to unnecessarily preallocate loop
+block devices.
 
-  Merge tag 'nvme-6.1-2022-01-02' of git://git.infradead.org/nvme into block-6.1 (2022-12-02 08:01:06 -0700)
+Fixes: 732850827450 ("remove artificial software max_loop limit")
+Cc: stable@vger.kernel.org
+Cc: Ken Chen <kenchen@google.com>
+Signed-off-by: Isaac J. Manjarres <isaacmanjarres@google.com>
+---
+ drivers/block/loop.c | 28 ++++++++++++----------------
+ 1 file changed, 12 insertions(+), 16 deletions(-)
 
-are available in the Git repository at:
+This is a resend because I misspelled the address for
+stable@vger.kernel.org the first time.
 
-  git://git.kernel.dk/linux.git tags/block-6.1-2022-12-08
+--Isaac
 
-for you to fetch changes up to e18a9c18c38f523ae45416e2b75ed4ddf8ad107b:
-
-  Merge tag 'nvme-6.1-2022-12-07' of git://git.infradead.org/nvme into block-6.1 (2022-12-07 08:55:27 -0700)
-
-----------------------------------------------------------------
-block-6.1-2022-12-08
-
-----------------------------------------------------------------
-Jens Axboe (1):
-      Merge tag 'nvme-6.1-2022-12-07' of git://git.infradead.org/nvme into block-6.1
-
-Pankaj Raghav (1):
-      nvme initialize core quirks before calling nvme_init_subsystem
-
- drivers/nvme/host/core.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
-
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index ad92192c7d61..d12d3d171ec4 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -1773,7 +1773,16 @@ static const struct block_device_operations lo_fops = {
+ /*
+  * And now the modules code and kernel interface.
+  */
+-static int max_loop;
++
++/*
++ * If max_loop is specified, create that many devices upfront.
++ * This also becomes a hard limit. If max_loop is not specified,
++ * create CONFIG_BLK_DEV_LOOP_MIN_COUNT loop devices at module
++ * init time. Loop devices can be requested on-demand with the
++ * /dev/loop-control interface, or be instantiated by accessing
++ * a 'dead' device node.
++ */
++static int max_loop = CONFIG_BLK_DEV_LOOP_MIN_COUNT;
+ module_param(max_loop, int, 0444);
+ MODULE_PARM_DESC(max_loop, "Maximum number of loop devices");
+ module_param(max_part, int, 0444);
+@@ -2181,7 +2190,7 @@ MODULE_ALIAS("devname:loop-control");
+ 
+ static int __init loop_init(void)
+ {
+-	int i, nr;
++	int i;
+ 	int err;
+ 
+ 	part_shift = 0;
+@@ -2209,19 +2218,6 @@ static int __init loop_init(void)
+ 		goto err_out;
+ 	}
+ 
+-	/*
+-	 * If max_loop is specified, create that many devices upfront.
+-	 * This also becomes a hard limit. If max_loop is not specified,
+-	 * create CONFIG_BLK_DEV_LOOP_MIN_COUNT loop devices at module
+-	 * init time. Loop devices can be requested on-demand with the
+-	 * /dev/loop-control interface, or be instantiated by accessing
+-	 * a 'dead' device node.
+-	 */
+-	if (max_loop)
+-		nr = max_loop;
+-	else
+-		nr = CONFIG_BLK_DEV_LOOP_MIN_COUNT;
+-
+ 	err = misc_register(&loop_misc);
+ 	if (err < 0)
+ 		goto err_out;
+@@ -2233,7 +2229,7 @@ static int __init loop_init(void)
+ 	}
+ 
+ 	/* pre-create number of devices given by config or max_loop */
+-	for (i = 0; i < nr; i++)
++	for (i = 0; i < max_loop; i++)
+ 		loop_add(i);
+ 
+ 	printk(KERN_INFO "loop: module loaded\n");
 -- 
-Jens Axboe
+2.39.0.rc1.256.g54fd8350bd-goog
 
