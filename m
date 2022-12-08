@@ -2,117 +2,120 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BF51C3A5A7
-	for <linux-block@archiver.kernel.org>; Thu,  8 Dec 2022 10:49:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DE61CC63709
+	for <linux-block@archiver.kernel.org>; Thu,  8 Dec 2022 10:49:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229545AbiLHKtl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 8 Dec 2022 05:49:41 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57068 "EHLO
+        id S230001AbiLHKtm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 8 Dec 2022 05:49:42 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56916 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230165AbiLHKsq (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 8 Dec 2022 05:48:46 -0500
-Received: from mail-ej1-x633.google.com (mail-ej1-x633.google.com [IPv6:2a00:1450:4864:20::633])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 95DA07B56E
-        for <linux-block@vger.kernel.org>; Thu,  8 Dec 2022 02:44:01 -0800 (PST)
-Received: by mail-ej1-x633.google.com with SMTP id x22so2835070ejs.11
-        for <linux-block@vger.kernel.org>; Thu, 08 Dec 2022 02:44:01 -0800 (PST)
+        with ESMTP id S230261AbiLHKss (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 8 Dec 2022 05:48:48 -0500
+Received: from mail-ej1-x62c.google.com (mail-ej1-x62c.google.com [IPv6:2a00:1450:4864:20::62c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 95706578C9
+        for <linux-block@vger.kernel.org>; Thu,  8 Dec 2022 02:43:59 -0800 (PST)
+Received: by mail-ej1-x62c.google.com with SMTP id qk9so2900255ejc.3
+        for <linux-block@vger.kernel.org>; Thu, 08 Dec 2022 02:43:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=H138aqobhHjmcHH6RFqFD59W1hrmC7/KCJez2I0jafo=;
-        b=CzlENSXIlHjwUOyd67Oro8J9zGfNfaRzYFG93Ulb9hv/6zS6G+b9XaV+dCu+ZWNhED
-         +HU0nltoTBvmExw2O29qJ+TsptddL3PAmYZQ62XqZCQ7QUhqcDChUUEvOTiA9h34wooq
-         sUqN1lZtAMUiBz0QW9pgWcObvCpJNtHdQf9A1Wb0QOaEvZFn1AsAn3NoFOUGvuh5hfJq
-         uEZNaaLFLSoeOZMIvXYLgLrACvltaevVvTBp814KWYSsJj9RXoyQQcXqPCZKN3RXRHwT
-         pnjBA9M8a7Zt0PLWb49IGqdZ/TJO+pq8S5tdzZ7AO9cS9Hw2JB4ERmAcrNW33XNk1oHD
-         cGfg==
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Ayq2uzYmxur5KO3TBD7Tr7qziqy3xJrvwA2myfA8G2M=;
+        b=zeWPkoCZb1FlV7oMvzbYNU2TqdCH2PecBvv9BOPMv1x/pbetJ/0zzxlW9aLYpXI+Uj
+         rLpDGjKActCDbELjrkfq5YHMz/duulYHGsoVZe1eGCogKHRZDN0WicmHTwb52JJsDGv7
+         mx+FomyfQPKw7Wi6EvBj6WfFjGpqVGOeQeWnR7x46B3oCKm+skdTsNqIVPbTfGcbhmur
+         zRxWNz8W5DCd/WtodpRe2sna/Mxulse9tkACWGy4TzT8oSoD8SYSzB7K8DOuaZn5rdq5
+         /3msWgsvHEatA0Np63ffbStzLoLqEw9hj4DJVvbJ86HmdRsK0dhaaRIO/bYSn9Nj7MvP
+         EXVg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=H138aqobhHjmcHH6RFqFD59W1hrmC7/KCJez2I0jafo=;
-        b=qeXumq0riCtaEapbjq4sB1va5gRWQNq9CeVm01C0ecWhZMoE/ckFyWq+eTc0P6DHO7
-         eymAFuK6k7cv9mKza1dzAvxEMIGSqFyE7BsdmoO8YPbnlr0BMekyMEZCCG/7C+WkxeR6
-         QlXagWaqkwLo13m14XSwmmp0dMuDh3qB3v+Kwb5YHzAKriANd5TtBpye6f+NfwZ83ilT
-         lJE5rHy3Aj3xqEQfFCH5JYKeD3Lpt/fSlwurhR2wvvMJA2N/1V6lYe5cKqh7lG7Civy6
-         WiBQXXbf0YSmxy7HunlzAX4sCaiq0bt+ehLBw8XdiOKxsdRZjgABAb4kLYS5o1VPqL6a
-         mKmg==
-X-Gm-Message-State: ANoB5pmME1jgtw9j66miyrDHsUlBRdZZZJ6g0mj4pTlB70Fc0jtNV1hD
-        OlfinYoJPdaciSeMyn2Vo8sWWg==
-X-Google-Smtp-Source: AA0mqf7ohP1f4N+OjCCGBeI0b2uGvG148r9PxPu8WybtywdVkvCp5WeiCvAaDBuTLsSdKzDszpVVKA==
-X-Received: by 2002:a17:906:3a85:b0:7ab:afd4:d7ed with SMTP id y5-20020a1709063a8500b007abafd4d7edmr11333715ejd.228.1670496240066;
-        Thu, 08 Dec 2022 02:44:00 -0800 (PST)
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Ayq2uzYmxur5KO3TBD7Tr7qziqy3xJrvwA2myfA8G2M=;
+        b=HiVQldMZPqIvNrNdnR1ObqmudBs16thqJC20Y0GryS5hDUKYMcGbFxAsyIHqJmFTAZ
+         EHgNMO9VXyM9UyEVFFWc/9AkbR2s+20P6p3bg7F3BaeHtL/98TJDhn9boFNgqNz6CeE+
+         JdGd44oUCN6Q27OfgwZTyC2lErOQmhue/LJvdnzWHuQcOKwzoIMWv9kzbGLWkQtpBfQ4
+         7kiYBrvTw4+tw4zVdxPhHuZ9aHEEUMEUjZENyvnJbToQfvfKscz+bLbOHOXq8iMCnpa8
+         1E6U4/AuIGgpiRLR/ih8LlpLpp0Pkk6TZYP9yhyELWq1YjmIvsU5CwbxtC8fSu7WomJR
+         i+QA==
+X-Gm-Message-State: ANoB5pnaWO3c1HDYEHI5g7pKsgeufNeUS6MzaE9PIgrAwqkqjtiT/DHs
+        iWLfFAaRRIH9XqEUqeebS9+pUg==
+X-Google-Smtp-Source: AA0mqf4jzaLcHPMM3pVvfOP2Kujd1gMjC+2C370Fvv+vTgvoCQkzYjH+uTtcZZfjEx0gOgDzyKVPZQ==
+X-Received: by 2002:a17:906:4351:b0:78d:513d:f447 with SMTP id z17-20020a170906435100b0078d513df447mr68192785ejm.708.1670496238174;
+        Thu, 08 Dec 2022 02:43:58 -0800 (PST)
 Received: from MBP-di-Paolo.station (net-2-35-55-161.cust.vodafonedsl.it. [2.35.55.161])
-        by smtp.gmail.com with ESMTPSA id fe17-20020a1709072a5100b0077a8fa8ba55sm9544193ejc.210.2022.12.08.02.43.59
+        by smtp.gmail.com with ESMTPSA id fe17-20020a1709072a5100b0077a8fa8ba55sm9544193ejc.210.2022.12.08.02.43.57
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 08 Dec 2022 02:43:59 -0800 (PST)
+        Thu, 08 Dec 2022 02:43:57 -0800 (PST)
 From:   Paolo Valente <paolo.valente@linaro.org>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         arie.vanderhoeven@seagate.com, rory.c.chen@seagate.com,
-        glen.valante@linaro.org, Paolo Valente <paolo.valente@linaro.org>,
-        Damien Le Moal <damien.lemoal@opensource.wdc.com>
-Subject: [PATCH V9 2/8] block, bfq: forbid stable merging of queues associated with different actuators
-Date:   Thu,  8 Dec 2022 11:43:45 +0100
-Message-Id: <20221208104351.35038-3-paolo.valente@linaro.org>
+        glen.valante@linaro.org, Paolo Valente <paolo.valente@linaro.org>
+Subject: [PATCH V9 0/8] block, bfq: extend bfq to support multi-actuator drives
+Date:   Thu,  8 Dec 2022 11:43:43 +0100
+Message-Id: <20221208104351.35038-1-paolo.valente@linaro.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20221208104351.35038-1-paolo.valente@linaro.org>
-References: <20221208104351.35038-1-paolo.valente@linaro.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-If queues associated with different actuators are merged, then control
-is lost on each actuator. Therefore some actuator may be
-underutilized, and throughput may decrease. This problem cannot occur
-with basic queue merging, because the latter is triggered by spatial
-locality, and sectors for different actuators are not close to each
-other. Yet it may happen with stable merging. To address this issue,
-this commit prevents stable merging from occurring among queues
-associated with different actuators.
+Hi,
+here is the V9, it differs from V8 in that it applies the
+recommendation by Damien in [2].
 
-Reviewed-by: Damien Le Moal <damien.lemoal@opensource.wdc.com>
-Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
----
- block/bfq-iosched.c | 13 +++++++++----
- 1 file changed, 9 insertions(+), 4 deletions(-)
+Here is the whole description of this patch series again.  This
+extension addresses the following issue. Single-LUN multi-actuator
+SCSI drives, as well as all multi-actuator SATA drives appear as a
+single device to the I/O subsystem [1].  Yet they address commands to
+different actuators internally, as a function of Logical Block
+Addressing (LBAs). A given sector is reachable by only one of the
+actuators. For example, Seagate’s Serial Advanced Technology
+Attachment (SATA) version contains two actuators and maps the lower
+half of the SATA LBA space to the lower actuator and the upper half to
+the upper actuator.
 
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index 16dbf52ce74b..456b5f5c24fd 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -5708,9 +5708,13 @@ static struct bfq_queue *bfq_do_or_sched_stable_merge(struct bfq_data *bfqd,
- 	 * it has been set already, but too long ago, then move it
- 	 * forward to bfqq. Finally, move also if bfqq belongs to a
- 	 * different group than last_bfqq_created, or if bfqq has a
--	 * different ioprio or ioprio_class. If none of these
--	 * conditions holds true, then try an early stable merge or
--	 * schedule a delayed stable merge.
-+	 * different ioprio, ioprio_class or actuator_idx. If none of
-+	 * these conditions holds true, then try an early stable merge
-+	 * or schedule a delayed stable merge. As for the condition on
-+	 * actuator_idx, the reason is that, if queues associated with
-+	 * different actuators are merged, then control is lost on
-+	 * each actuator. Therefore some actuator may be
-+	 * underutilized, and throughput may decrease.
- 	 *
- 	 * A delayed merge is scheduled (instead of performing an
- 	 * early merge), in case bfqq might soon prove to be more
-@@ -5728,7 +5732,8 @@ static struct bfq_queue *bfq_do_or_sched_stable_merge(struct bfq_data *bfqd,
- 			bfqq->creation_time) ||
- 		bfqq->entity.parent != last_bfqq_created->entity.parent ||
- 		bfqq->ioprio != last_bfqq_created->ioprio ||
--		bfqq->ioprio_class != last_bfqq_created->ioprio_class)
-+		bfqq->ioprio_class != last_bfqq_created->ioprio_class ||
-+		bfqq->actuator_idx != last_bfqq_created->actuator_idx)
- 		*source_bfqq = bfqq;
- 	else if (time_after_eq(last_bfqq_created->creation_time +
- 				 bfqd->bfq_burst_interval,
--- 
+Evidently, to fully utilize actuators, no actuator must be left idle
+or underutilized while there is pending I/O for it. To reach this
+goal, the block layer must somehow control the load of each actuator
+individually. This series enriches BFQ with such a per-actuator
+control, as a first step. Then it also adds a simple mechanism for
+guaranteeing that actuators with pending I/O are never left idle.
+
+See [1] for a more detailed overview of the problem and of the
+solutions implemented in this patch series. There you will also find
+some preliminary performance results.
+
+Thanks,
+Paolo
+
+[1] https://www.linaro.org/blog/budget-fair-queueing-bfq-linux-io-scheduler-optimizations-for-multi-actuator-sata-hard-drives/
+[2] https://lore.kernel.org/lkml/20221103162623.10286-5-paolo.valente@linaro.org/T/#mdb87dc01b2ac165056ee3c7a1386754dea42a006
+
+Davide Zini (3):
+  block, bfq: split also async bfq_queues on a per-actuator basis
+  block, bfq: inject I/O to underutilized actuators
+  block, bfq: balance I/O injection among underutilized actuators
+
+Federico Gavioli (1):
+  block, bfq: retrieve independent access ranges from request queue
+
+Paolo Valente (4):
+  block, bfq: split sync bfq_queues on a per-actuator basis
+  block, bfq: forbid stable merging of queues associated with different
+    actuators
+  block, bfq: move io_cq-persistent bfqq data into a dedicated struct
+  block, bfq: turn bfqq_data into an array in bfq_io_cq
+
+ block/bfq-cgroup.c  |  94 +++----
+ block/bfq-iosched.c | 580 ++++++++++++++++++++++++++++++--------------
+ block/bfq-iosched.h | 142 ++++++++---
+ block/bfq-wf2q.c    |   2 +-
+ 4 files changed, 565 insertions(+), 253 deletions(-)
+
+--
 2.20.1
-
