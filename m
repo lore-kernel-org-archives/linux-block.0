@@ -2,135 +2,137 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 81C9CC4332F
-	for <linux-block@archiver.kernel.org>; Thu,  8 Dec 2022 12:59:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BC57C3A5A7
+	for <linux-block@archiver.kernel.org>; Thu,  8 Dec 2022 14:02:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229849AbiLHM7i (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 8 Dec 2022 07:59:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55978 "EHLO
+        id S229714AbiLHOCt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 8 Dec 2022 09:02:49 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38738 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230111AbiLHM7c (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 8 Dec 2022 07:59:32 -0500
+        with ESMTP id S229948AbiLHOCs (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 8 Dec 2022 09:02:48 -0500
 Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7BDC08C44A;
-        Thu,  8 Dec 2022 04:59:30 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 22CB865E5;
+        Thu,  8 Dec 2022 06:02:43 -0800 (PST)
 Received: from mail02.huawei.com (unknown [172.30.67.153])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4NSZ3v4tGlz4f3pFV;
-        Thu,  8 Dec 2022 20:59:23 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-        by APP4 (Coremail) with SMTP id gCh0CgC329is35Fj97d8Bw--.45128S3;
-        Thu, 08 Dec 2022 20:59:26 +0800 (CST)
-Subject: Re: [PATCH 3/9] bfq: Split shared queues on move between cgroups
-To:     Jan Kara <jack@suse.cz>, Yu Kuai <yukuai1@huaweicloud.com>
-Cc:     linux-block@vger.kernel.org,
-        Paolo Valente <paolo.valente@linaro.org>,
-        Jens Axboe <axboe@kernel.dk>, stable@vger.kernel.org,
-        "yukuai (C)" <yukuai3@huawei.com>
-References: <20220330123438.32719-1-jack@suse.cz>
- <20220330124255.24581-3-jack@suse.cz>
- <89941655-baeb-9696-dc89-0a1f4bc9e8d6@huaweicloud.com>
- <20221208093733.izj7irhzspmvpxxc@quack3>
-From:   Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <5a712ac6-e6c7-0008-bee7-2383cc684c73@huaweicloud.com>
-Date:   Thu, 8 Dec 2022 20:59:24 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4NSbSp6B0pz4f3k67;
+        Thu,  8 Dec 2022 22:02:34 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.175.124.27])
+        by APP1 (Coremail) with SMTP id cCh0CgBXAbB77pFjF4YRBw--.33249S5;
+        Thu, 08 Dec 2022 22:02:37 +0800 (CST)
+From:   Kemeng Shi <shikemeng@huaweicloud.com>
+To:     axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linfeilong@huawei.com, liuzhiqiang26@huawei.com
+Subject: [PATCH 3/4] sbitmap: rewrite sbitmap_find_bit_in_index to reduce repeat code
+Date:   Fri,  9 Dec 2022 06:01:46 +0800
+Message-Id: <20221208220147.3315388-4-shikemeng@huaweicloud.com>
+X-Mailer: git-send-email 2.30.0
+In-Reply-To: <20221208220147.3315388-1-shikemeng@huaweicloud.com>
+References: <20221208220147.3315388-1-shikemeng@huaweicloud.com>
 MIME-Version: 1.0
-In-Reply-To: <20221208093733.izj7irhzspmvpxxc@quack3>
-Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgC329is35Fj97d8Bw--.45128S3
-X-Coremail-Antispam: 1UD129KBjvJXoW7AFy3JF4xXFyUWF1DWw4DJwb_yoW8XFW5pF
-        W3ta4Skr18G3yakw17ur4rJF10qa1fJF43JryFqr1kZrn5Ary8tFnxtFn5XrWFq34v93s2
-        qw18trsrJFs7Za7anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUkC14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-        1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4j
-        6r4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
-        Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
-        I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
-        4UM4x0Y48IcVAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwCYjI0SjxkI62AI1cAE67vI
-        Y487MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI
-        0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUAVWUtwCIc40Y
-        0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxV
-        WUJVW8JwCI42IY6xAIw20EY4v20xvaj40_WFyUJVCq3wCI42IY6I8E87Iv67AKxVWUJVW8
-        JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfUoOJ5UU
-        UUU
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+X-CM-TRANSID: cCh0CgBXAbB77pFjF4YRBw--.33249S5
+X-Coremail-Antispam: 1UD129KBjvJXoWxur4kur17WFWUZryDtw1fJFb_yoW5JFWkpF
+        4fJFy7K398try7uw4qqFy5AFy3Kws5GwnxJF4fW3WF9FyUJFn3GrWFgFW3ta4UCFWkZFWD
+        ZF4rXw18K3Wjqa7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUB0b4IE77IF4wAFF20E14v26ryj6rWUM7CY07I20VC2zVCF04k2
+        6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M280x2IEY4vEnII2IxkI6r1a6r45M2
+        8IrcIa0xkI8VA2jI8067AKxVWUWwA2048vs2IY020Ec7CjxVAFwI0_Gr0_Xr1l8cAvFVAK
+        0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVWDJVCq3wA2z4
+        x0Y4vE2Ix0cI8IcVCY1x0267AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l
+        84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I
+        8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AK
+        xVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41l42xK82IYc2Ij64
+        vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8G
+        jcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r126r1DMIIYrxkI7VAKI48JMIIF0xvE2I
+        x0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK
+        8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I
+        0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxU3G-eDUUUU
+X-CM-SenderInfo: 5vklyvpphqwq5kxd4v5lfo033gof0z/
 X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi
+Rewrite sbitmap_find_bit_in_index as following:
+1. Rename sbitmap_find_bit_in_index to sbitmap_find_bit_in_word
+2. Accept "struct sbitmap_word *" directly instead of accepting
+"struct sbitmap *" and "int index" to get "struct sbitmap_word *".
+3. Accept depth/shallow_depth and wrap for __sbitmap_get_word from caller
+to support need of both __sbitmap_get_shallow and __sbitmap_get.
 
-在 2022/12/08 17:37, Jan Kara 写道:
-> 
-> So if this state happens, it would be indeed a problem. But I don't see how
-> it could happen. bics are associated with the process. So t1 will always
-> use bic1, t2 will always use bic2. In bfq_init_rq() we get bfqq either from
-> bic (so it would return bfqq3 for bic1) or we allocate a new queue (that
-> would be some bfqq4). So I see no way how bfqq2 could start pointing to
-> bic1...
+With helper function sbitmap_find_bit_in_word, we can remove repeat
+code in __sbitmap_get_shallow to find bit considring deferred clear.
 
+Signed-off-by: Kemeng Shi <shikemeng@huaweicloud.com>
+---
+ lib/sbitmap.c | 29 ++++++++++++++---------------
+ 1 file changed, 14 insertions(+), 15 deletions(-)
 
-> 
-> 								Honza
->
-
-Following is possible scenarios that we derived:
-
-1) Initial state, two process with io.
-
-Process 1       Process 2
-  (BIC1)          (BIC2)
-   |  Λ           |  Λ
-   |  |            |  |
-   V  |            V  |
-   bfqq1           bfqq2
-
-2) bfqq1 is merged to bfqq2, now bfqq2 has two process ref, bfqq2->bic
-    will not be set.
-
-Process 1       Process 2
-  (BIC1)          (BIC2)
-   |               |
-    \-------------\|
-                   V
-   bfqq1           bfqq2(coop)
-
-3) Process 1 exit, then issue io(denoted IOA) from Process 2.
-
-Process 2
-  (BIC1)
-   |  Λ
-   |  |
-   V  |
-bfqq2(coop)
-
-4) Before IOA completed, move Process 2 to another cgroup and issue
-    io.
-
-Process 2
-  (BIC2)
-    Λ
-    |\--------------\
-    |                V
-bfqq2(coop)      bfqq3
-
-Now that BIC2 point to bfqq3, while bfqq2 and bfqq3 both point to BIC2.
-
-5) If all the io are completed and Process 2 exit, BIC2 will be freed,
-    while bfqq2 still ponits to BIC2.
-
-It's easy to construct such scenario, however, I'm not able to trigger
-such UAF yet. It seems hard to let bfqq2 become in_service_queue again
-and access bfqq2->bic in bfq_select_queue.
-
-While I'm organizing the above procedures, I realized that my former
-solution is wrong. Now I think that the right thing to do is to also
-clear bfqq->bic while process ref is decreased to 0.
-
-Thanks,
-Kuai
+diff --git a/lib/sbitmap.c b/lib/sbitmap.c
+index 11e75f4040fb..3f7e276a427d 100644
+--- a/lib/sbitmap.c
++++ b/lib/sbitmap.c
+@@ -167,15 +167,16 @@ static int __sbitmap_get_word(unsigned long *word, unsigned long depth,
+ 	return nr;
+ }
+ 
+-static int sbitmap_find_bit_in_index(struct sbitmap *sb, int index,
+-				     unsigned int alloc_hint)
++static int sbitmap_find_bit_in_word(struct sbitmap_word *map,
++				    unsigned int depth,
++				    unsigned int alloc_hint,
++				    bool wrap)
+ {
+-	struct sbitmap_word *map = &sb->map[index];
+ 	int nr;
+ 
+ 	do {
+-		nr = __sbitmap_get_word(&map->word, __map_depth(sb, index),
+-					alloc_hint, !sb->round_robin);
++		nr = __sbitmap_get_word(&map->word, depth,
++					alloc_hint, wrap);
+ 		if (nr != -1)
+ 			break;
+ 		if (!sbitmap_deferred_clear(map))
+@@ -203,7 +204,8 @@ static int __sbitmap_get(struct sbitmap *sb, unsigned int alloc_hint)
+ 		alloc_hint = 0;
+ 
+ 	for (i = 0; i < sb->map_nr; i++) {
+-		nr = sbitmap_find_bit_in_index(sb, index, alloc_hint);
++		nr = sbitmap_find_bit_in_word(&sb->map[index], __map_depth(sb, index),
++					      alloc_hint, !sb->round_robin);
+ 		if (nr != -1) {
+ 			nr += index << sb->shift;
+ 			break;
+@@ -246,20 +248,17 @@ static int __sbitmap_get_shallow(struct sbitmap *sb,
+ 	alloc_hint = SB_NR_TO_BIT(sb, alloc_hint);
+ 
+ 	for (i = 0; i < sb->map_nr; i++) {
+-again:
+-		nr = __sbitmap_get_word(&sb->map[index].word,
+-					min_t(unsigned int,
+-					      __map_depth(sb, index),
+-					      shallow_depth),
+-					alloc_hint, true);
++		nr = sbitmap_find_bit_in_word(&sb->map[index],
++					      min_t(unsigned int,
++						    __map_depth(sb, index),
++						    shallow_depth),
++					      alloc_hint, true);
++
+ 		if (nr != -1) {
+ 			nr += index << sb->shift;
+ 			break;
+ 		}
+ 
+-		if (sbitmap_deferred_clear(&sb->map[index]))
+-			goto again;
+-
+ 		/* Jump to next index. */
+ 		alloc_hint = 0;
+ 		if (++index >= sb->map_nr)
+-- 
+2.30.0
 
