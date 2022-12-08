@@ -2,125 +2,138 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26644C3A5A7
-	for <linux-block@archiver.kernel.org>; Thu,  8 Dec 2022 14:43:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AB4EDC3A5A7
+	for <linux-block@archiver.kernel.org>; Thu,  8 Dec 2022 15:59:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229932AbiLHOno (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 8 Dec 2022 09:43:44 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36084 "EHLO
+        id S229749AbiLHP7m (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 8 Dec 2022 10:59:42 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45838 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229479AbiLHOnl (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 8 Dec 2022 09:43:41 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB1DC9FDB
-        for <linux-block@vger.kernel.org>; Thu,  8 Dec 2022 06:42:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1670510557;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=su2lUkDQHUFhv4VEOGFPuQBsnBPEcF90Y1ekpqoV0HM=;
-        b=Q+qI4RDKxmalTL2JTLjZewurOlQGW15N+mFq1fM5pI/rTlXUn2mgmACYPmF0mQyIxcNmbN
-        oEwvtMvdjLJuou35BkHcvBfxaoJDqXhczCWkATT8Q7BU0FE5FJyab62/wag1XDSNrMfQi1
-        2gdvZfidfXEx77lEQTJDbJCvRQcwjYg=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-66-wesRoOmrMEuqHAmp1RPsVw-1; Thu, 08 Dec 2022 09:42:33 -0500
-X-MC-Unique: wesRoOmrMEuqHAmp1RPsVw-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 3B1388039AC;
-        Thu,  8 Dec 2022 14:42:33 +0000 (UTC)
-Received: from localhost (unknown [10.39.194.17])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id D76B2492B05;
-        Thu,  8 Dec 2022 14:42:31 +0000 (UTC)
-Date:   Wed, 7 Dec 2022 16:47:39 -0500
-From:   Stefan Hajnoczi <stefanha@redhat.com>
-To:     axboe@kernel.dk
-Cc:     mst@redhat.com, jasowang@redhat.com, pbonzini@redhat.com,
-        hch@infradead.org, virtualization@lists.linux-foundation.org,
-        linux-block@vger.kernel.org, Suwan Kim <suwan.kim027@gmail.com>
-Subject: Re: [PATCH 1/2] virtio-blk: set req->state to MQ_RQ_COMPLETE after
- polling I/O is finished
-Message-ID: <Y5EJ+6qtsy8Twe/q@fedora>
-References: <20221206141125.93055-1-suwan.kim027@gmail.com>
+        with ESMTP id S229514AbiLHP7k (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 8 Dec 2022 10:59:40 -0500
+Received: from mail-pg1-x533.google.com (mail-pg1-x533.google.com [IPv6:2607:f8b0:4864:20::533])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F06E889AEA;
+        Thu,  8 Dec 2022 07:59:38 -0800 (PST)
+Received: by mail-pg1-x533.google.com with SMTP id 6so1506729pgm.6;
+        Thu, 08 Dec 2022 07:59:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:sender
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=q0YLsvBKzhSCVgibbSxOvtb/WdQ/EJIsYcqmRJMPdrA=;
+        b=LKqMi50ut5W+4QYLYDzZRJz8rOYDM1FZOI+bsaRUBjbfPxkaXOkGHv/B58zlQJCVp9
+         MOjRUaRqxNz0nLVuO6/F76JbXbGZitk+2iyDmotSKGPXPoVVHHddmOrwt9KP6Mv6y5Xd
+         SxD/qLNSLtneYFA9954fdAcCxDvWe7t+RaCdqX50dbiBJuc0xdbdRlVvJKMOZr6k2AeA
+         UN4OLtD63b3uEgMi5eMop+qH9rGyXYzEIxZ1PinFgbvoWMIZ8pq6K8gfKFZ/b8EHRO6N
+         rXk0i0ECbUePeDcBgMkYPccKs/o9Q4EQc3aSt5FYGtktl4E40BnuiUuFe8kE39ATlds/
+         GDuA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:sender
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=q0YLsvBKzhSCVgibbSxOvtb/WdQ/EJIsYcqmRJMPdrA=;
+        b=p01k9VIyA0yWCShjml6FkmnPt8vCsCvHHJeUMDkO4GTJGDsx9OVzUvqyJ6MH6KKten
+         +1Gnvsz2qTHoMc0HGi69hCleoP+ZkA92oKLTkGD9lNCxMiwjZIo4SaJXAbEjhAoEEtps
+         JLjRWHcpsaKxdDE2Tx4TDGU7XsyC5/RncrhogMMszqFGi09WoTA3IuOjUSQyaPAXQqMz
+         9DNP9zU9HfqPldmDN7cSImo6zBxXZk/oaao/qeTdlGqYgUP7tZdj982F3+8Nq4FG8AlQ
+         itHwA5+hVjan7yOjxAUmFjJWdt9GeCX6e8GjgThzHJyTEVXV/EPUPvQuHiHX7Ernd+Gz
+         mUuQ==
+X-Gm-Message-State: ANoB5pnBVZWk2rSxif8tPhrfCDn/o/SjxjhtXZAtRy3dRCJ98z8ruKSW
+        30OB2ZL3jkM+EOUE1C8NYtQ=
+X-Google-Smtp-Source: AA0mqf5fUWNBxoR7bQr+SHUqc2hyMkzGP2cITTq2LBCg5GHCZkrG2V5QTuBQmVq/ebNqbnw1rkjP8A==
+X-Received: by 2002:a62:648a:0:b0:572:76dd:3756 with SMTP id y132-20020a62648a000000b0057276dd3756mr78402506pfb.9.1670515178140;
+        Thu, 08 Dec 2022 07:59:38 -0800 (PST)
+Received: from localhost (2603-800c-1a02-1bae-a7fa-157f-969a-4cde.res6.spectrum.com. [2603:800c:1a02:1bae:a7fa:157f:969a:4cde])
+        by smtp.gmail.com with ESMTPSA id ij22-20020a170902ab5600b001893a002107sm16781662plb.0.2022.12.08.07.59.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 08 Dec 2022 07:59:37 -0800 (PST)
+Sender: Tejun Heo <htejun@gmail.com>
+Date:   Thu, 8 Dec 2022 05:59:36 -1000
+From:   Tejun Heo <tj@kernel.org>
+To:     Yu Kuai <yukuai1@huaweicloud.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, hch@lst.de, josef@toxicpanda.com,
+        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, yi.zhang@huawei.com,
+        "yukuai (C)" <yukuai3@huawei.com>
+Subject: Re: [PATCH v2 4/5] blk-iocost: fix sleeping in atomic context
+ warnning
+Message-ID: <Y5IJ6Nk56KPBhpfr@slm.duckdns.org>
+References: <20221104023938.2346986-1-yukuai1@huaweicloud.com>
+ <20221104023938.2346986-5-yukuai1@huaweicloud.com>
+ <Y3K8MSFWw8eTnxtm@slm.duckdns.org>
+ <3da991c6-21e4-8ed8-ba75-ccb92059f0ae@huaweicloud.com>
+ <Y306xJV6aNXd94kb@slm.duckdns.org>
+ <1f52ccb1-c357-a2a0-ef9d-48d7e2eb51f8@kernel.dk>
+ <Y31sYFdA2lHIvjt3@slm.duckdns.org>
+ <ec3754a6-3249-51ab-b659-fd795884e346@huaweicloud.com>
+ <f227e4bd-c74b-a02e-2a02-11a1376ee4f9@huaweicloud.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="TLPWbvavsl8s4xu9"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20221206141125.93055-1-suwan.kim027@gmail.com>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.10
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <f227e4bd-c74b-a02e-2a02-11a1376ee4f9@huaweicloud.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
---TLPWbvavsl8s4xu9
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Tue, Dec 06, 2022 at 11:11:24PM +0900, Suwan Kim wrote:
-> Driver should set req->state to MQ_RQ_COMPLETE after it finishes to proce=
-ss
-> req. But virtio-blk doesn't set MQ_RQ_COMPLETE after virtblk_poll() handl=
-es
-> req and req->state still remains MQ_RQ_IN_FLIGHT. Fortunately so far there
-> is no issue about it because blk_mq_end_request_batch() sets req->state to
-> MQ_RQ_IDLE. This patch properly sets req->state after polling I/O is fini=
-shed.
->=20
-> Fixes: 4e0400525691 ("virtio-blk: support polling I/O")
-> Signed-off-by: Suwan Kim <suwan.kim027@gmail.com>
-> ---
->  drivers/block/virtio_blk.c | 1 +
->  1 file changed, 1 insertion(+)
->=20
-> diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-> index 19da5defd734..cf64d256787e 100644
-> --- a/drivers/block/virtio_blk.c
-> +++ b/drivers/block/virtio_blk.c
-> @@ -839,6 +839,7 @@ static void virtblk_complete_batch(struct io_comp_bat=
-ch *iob)
->  	rq_list_for_each(&iob->req_list, req) {
->  		virtblk_unmap_data(req, blk_mq_rq_to_pdu(req));
->  		virtblk_cleanup_cmd(req);
-> +		blk_mq_set_request_complete(req);
->  	}
->  	blk_mq_end_request_batch(iob);
+On Mon, Dec 05, 2022 at 05:39:33PM +0800, Yu Kuai wrote:
+> Hi, Tejun
+> 
+> 在 2022/11/23 18:22, Yu Kuai 写道:
+> > Hi, Tejun
+> > 
+> > 在 2022/11/23 8:42, Tejun Heo 写道:
+> > > On Tue, Nov 22, 2022 at 05:14:29PM -0700, Jens Axboe wrote:
+> > > > > > Then match_strdup() and kfree() in match_NUMBER() can be replaced with
+> > > > > > get_buffer() and put_buffer().
+> > > > > 
+> > > > > Sorry about the late reply. Yeah, something like this.
+> > 
+> 
+> I wonder can we just use arary directly in stack? The max size is just
+> 24 bytes, which should be fine:
+> 
+> HEX: "0xFFFFFFFFFFFFFFFF" --> 18
+> DEC: "18446744073709551615" --> 20
+> OCT: "01777777777777777777777" --> 23
+> 
+> Something like:
+> #define U64_MAX_SIZE 23
+> static int match_strdup_local(const substring_t *s, char *buf)
+> {
+> 	size_t len = s->to - s->from;
+> 
+> 	if (len > U64_MAX_SIZE)
+> 		return -ERANGE;
+> 
+> 	if (!s->from)
+> 		return -EINVAL;
+> 
+> 	memcpy(buf, s->from, len);
+> 	buf[len] = '\0';
+> 	return 0;
+> }
+> 
+>  static int match_u64int(substring_t *s, u64 *result, int base)
+>  {
+> 	char buf[U64_MAX_SIZE + 1];
+>  	int ret;
+>  	u64 val;
+> 
+> 	ret = match_strdup_local(s, buf);
+> 	if (ret)
+> 		return ret;
+>  	ret = kstrtoull(buf, base, &val);
+>  	if (!ret)
+>  		*result = val;;
+>  	return ret;
 >  }
 
-The doc comment for blk_mq_set_request_complete() mentions this being
-used in ->queue_rq(), but that's not the case here. Does the doc comment
-need to be updated if we're using the function in a different way?
+Oh yeah, absolutely. That's much better.
 
-I'm not familiar enough with the Linux block APIs, but this feels weird
-to me. Shouldn't blk_mq_end_request_batch(iob) take care of this for us?
-Why does it set the state to IDLE instead of COMPLETE?
+Thanks.
 
-I think Jens can confirm whether we really want all drivers that use
-polling and io_comp_batch to manually call
-blk_mq_set_request_complete().
-
-Thanks,
-Stefan
-
---TLPWbvavsl8s4xu9
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmORCfsACgkQnKSrs4Gr
-c8jzcwgAkqjCxjdTMpgQ9FJr1zb/9w4oIKfPrLRFiS8+aZrjF4PSgH6iISADo6LN
-y5jC+JbJI9HImldIbxcJ3VBzA4Vbp6gJZv/NolxztP0Vnc/1EPCQDy1j8hoJzm7u
-G7jLL2iIkQEyr4IChxEtJMrLRmNz9Lqj2dcKdLTPNGInlgUspVDKjbdjN+rfHOHg
-bGG0GDreFzM+8ZuGghcJMeeUb+fUjbJd4oLyxwROhZlBD+LU8nG0KRZ1L/phGIN3
-sPihNVo5okhFsDBqCqIPgGiouSpN/fsfQJV+spkFPbm2kbuURlFVQZZJSV1wZ1rn
-19xu2Y5NAnew/RxTYo7OflRvnC0ISQ==
-=U0Ee
------END PGP SIGNATURE-----
-
---TLPWbvavsl8s4xu9--
-
+-- 
+tejun
