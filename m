@@ -2,52 +2,53 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A8DEC4332F
-	for <linux-block@archiver.kernel.org>; Fri,  9 Dec 2022 14:56:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 560CBC04FDE
+	for <linux-block@archiver.kernel.org>; Fri,  9 Dec 2022 14:56:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229961AbiLIO4H (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 9 Dec 2022 09:56:07 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44120 "EHLO
+        id S229995AbiLIO4I (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 9 Dec 2022 09:56:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42854 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230071AbiLIOzq (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 9 Dec 2022 09:55:46 -0500
-Received: from mail-ej1-x62b.google.com (mail-ej1-x62b.google.com [IPv6:2a00:1450:4864:20::62b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D96F80A29
+        with ESMTP id S230072AbiLIOzr (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 9 Dec 2022 09:55:47 -0500
+Received: from mail-ed1-x52e.google.com (mail-ed1-x52e.google.com [IPv6:2a00:1450:4864:20::52e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DFCBC80A32
         for <linux-block@vger.kernel.org>; Fri,  9 Dec 2022 06:55:08 -0800 (PST)
-Received: by mail-ej1-x62b.google.com with SMTP id m18so12058198eji.5
+Received: by mail-ed1-x52e.google.com with SMTP id f7so3396727edc.6
         for <linux-block@vger.kernel.org>; Fri, 09 Dec 2022 06:55:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linbit-com.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=NGS8p58llTH0j/JtmBIf8IcqQNNb3dOfgpZWMO+4qxc=;
-        b=ZKM+8vmyIyGnqJGMg1PLrEyjzHURIQ49nrR+4Cjb2tDfhRzSNwsUBEQ3CDMpzbTWlK
-         wKbONKbccHcx7tdtrRxI5jqvo+xhjD+v6FvDo2UjxteCxErRQ8jOMzBOaQkbcMIJvv39
-         wPgwsSPiQ+Ng/npOz16yJBEtmbjEy8VV+fP6aW9bqBRCwzBpOHK4zWUmd1AeFlqG26W4
-         5ZYMibLNHHIudvWomfOP0bxVYcHEieLRIlFflAwXX/V/d5gmZ+Kvk3dyz0dTQo1rpCsd
-         KCaqDixfrYloL6JFEoI9btVVm7ggxh3H4TGOiPkp+r4FjxgD+eGf5J6O9HXV1XMPDAj1
-         pUag==
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=w8mQ1DNdko28cUxvjVBwoXrO008ZDGIG0DMI/J1nWT4=;
+        b=IUG8ldHfU+Z2W8ssHSjmCqhbct2jByJci7FEf/55pMFshhMS7k+iLD4zTUZM/vN8Vq
+         TRnxOna/m/DOf9FkM5W0nfGKVh437qsWJLBuTc1L9bEkkydiEQacgT3gsZcjlU0QvrUW
+         ghoZGKHys0XNatcxeqS4WGCrc+i44BYjUktBdRGNt5HDu0QUK2jzN5dxUu9Pae4kYw7h
+         BowqGf+a/9DnKfnfzwmGO2yrWIzTzyjRegbyqqcoPtXBIoLHqO/5TnYN+Tq+dbTaDC69
+         nCbN+jY+30BuRxWcHwRaAY0XSsCekS76GhnIPJBGTsy2XQy3ak0QU/x27zXWOJnP7sHb
+         jgNw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=NGS8p58llTH0j/JtmBIf8IcqQNNb3dOfgpZWMO+4qxc=;
-        b=b+BBoSbkl6kHcMtc50Up7ISHlYx8F3bpA3jIIGnUfeDC0GEtu6a7+l9UJ4ItS5Phb0
-         TmJBPe1gOX/oddRTle+6FGNcduzFqK8X23tU1TyqoCSGe2qjklCrSvO5YWbi9rP75NB4
-         rVq5XQDnr4TVIES/i1eR2S0H/bC/17hoHJHEHtbT6rY0S6c9kn1UgjjVkHrDwr2CVNW/
-         i+Tx5Z7pfCcjO7F/RnnC2zozR8BNXorjYPYhld8FxEfX2jt7JqVEkk7Q4kTREx5tNr5/
-         GP1gMoPjvzEJE/q96AR3GwK3ORGMbyjipdCeP4H7AJV2kQjoA1QbEOsVppL8plPKXMCY
-         dFjg==
-X-Gm-Message-State: ANoB5pn8SQuyIKMDkKJMI+RqRZU2w2EAp8y2IVym+WixMDgdc+omlxDc
-        fW6pL3Pxv9mQA/PnRcXeJv8niw==
-X-Google-Smtp-Source: AA0mqf7K+mE1v7tZQxx275XaT1evbeQtA2Yf7MlJpotalKJ4eJCBxIJUmePOtFfIcVRJx6XFbXGQGA==
-X-Received: by 2002:a17:906:30d3:b0:78d:f454:ba10 with SMTP id b19-20020a17090630d300b0078df454ba10mr5517836ejb.15.1670597706776;
-        Fri, 09 Dec 2022 06:55:06 -0800 (PST)
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=w8mQ1DNdko28cUxvjVBwoXrO008ZDGIG0DMI/J1nWT4=;
+        b=NILFUmCRcFP/p3eFkbPkJlR0eyY9kRWB0L05p2ijruj/x5Q5PsFTGP0rJLpUH6SXJo
+         yYHcsm9PDPlgfkNbgkwplXBwA1EWGe4E2+793FkixlI7CANREA/6XjRx7FjV7mKVlGBe
+         VRd35/Y1UMXTD/frdAJ3PB+ClKeVSUTWdIgMzW2yHK1Mt49K5w7yFcxfitMqdaEH/Th0
+         MhN/WWnvyuFcXOP+S1R+yMLv3+O9a2vqgTEh8W6+14KjykPOn5Ou+0jQiEcVKqo9bUKa
+         0AiPukoIyBU2uYuD2+C5xyPOgYv5fwvzywFWXKnFK07EXdKfBcF82WSMzKRIMYKmGEcz
+         AnpA==
+X-Gm-Message-State: ANoB5pk4mCQiorRwcPZgiq8WVhGEQM6B4HGcY7Bc3rykvCcB5lEOEqwo
+        2Eq9PdUedeZKGWaTievMEzSfcQ==
+X-Google-Smtp-Source: AA0mqf61kq4qDITMmU/ANSy6fHJpUxypHKu0yrnlzXRMvNtX2P9Ui4uunU9KRDO1fLXg3COosGHBRQ==
+X-Received: by 2002:a05:6402:500f:b0:461:bce0:c783 with SMTP id p15-20020a056402500f00b00461bce0c783mr7206023eda.36.1670597707421;
+        Fri, 09 Dec 2022 06:55:07 -0800 (PST)
 Received: from localhost.localdomain (h082218028181.host.wavenet.at. [82.218.28.181])
         by smtp.gmail.com with ESMTPSA id l4-20020aa7c304000000b0046b1d63cfc1sm716856edq.88.2022.12.09.06.55.06
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 09 Dec 2022 06:55:06 -0800 (PST)
+        Fri, 09 Dec 2022 06:55:07 -0800 (PST)
 From:   =?UTF-8?q?Christoph=20B=C3=B6hmwalder?= 
         <christoph.boehmwalder@linbit.com>
 To:     Jens Axboe <axboe@kernel.dk>
@@ -56,11 +57,14 @@ Cc:     drbd-dev@lists.linbit.com, linux-kernel@vger.kernel.org,
         Philipp Reisner <philipp.reisner@linbit.com>,
         linux-block@vger.kernel.org,
         =?UTF-8?q?Christoph=20B=C3=B6hmwalder?= 
-        <christoph.boehmwalder@linbit.com>
-Subject: [PATCH 0/3] DRBD file structure reorganization
-Date:   Fri,  9 Dec 2022 15:55:01 +0100
-Message-Id: <20221209145504.2273072-1-christoph.boehmwalder@linbit.com>
+        <christoph.boehmwalder@linbit.com>,
+        Joel Colledge <joel.colledge@linbit.com>
+Subject: [PATCH 1/3] drbd: split off drbd_buildtag into separate file
+Date:   Fri,  9 Dec 2022 15:55:02 +0100
+Message-Id: <20221209145504.2273072-2-christoph.boehmwalder@linbit.com>
 X-Mailer: git-send-email 2.38.1
+In-Reply-To: <20221209145504.2273072-1-christoph.boehmwalder@linbit.com>
+References: <20221209145504.2273072-1-christoph.boehmwalder@linbit.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
@@ -68,30 +72,86 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-To make our lives easier when sending future, more complex patches,
-we want to align the file structure as best as possible with what we
-have in the out-of-tree module.
+To be more similar to what we do in the out-of-tree module and ease the
+upstreaming process.
 
-Christoph Böhmwalder (3):
-  drbd: split off drbd_buildtag into separate file
-  drbd: drop API_VERSION define
-  drbd: split off drbd_config into separate file
-
+Signed-off-by: Christoph Böhmwalder <christoph.boehmwalder@linbit.com>
+Reviewed-by: Joel Colledge <joel.colledge@linbit.com>
+---
  drivers/block/drbd/Makefile        |  2 +-
  drivers/block/drbd/drbd_buildtag.c | 22 ++++++++++++++++++++++
- drivers/block/drbd/drbd_debugfs.c  |  2 +-
- drivers/block/drbd/drbd_int.h      |  1 +
- drivers/block/drbd/drbd_main.c     | 20 +-------------------
- drivers/block/drbd/drbd_proc.c     |  2 +-
- include/linux/drbd.h               |  7 -------
- include/linux/drbd_config.h        | 16 ++++++++++++++++
- include/linux/drbd_genl_api.h      |  2 +-
- 9 files changed, 44 insertions(+), 30 deletions(-)
+ drivers/block/drbd/drbd_main.c     | 18 ------------------
+ 3 files changed, 23 insertions(+), 19 deletions(-)
  create mode 100644 drivers/block/drbd/drbd_buildtag.c
- create mode 100644 include/linux/drbd_config.h
 
-
-base-commit: f596da3efaf4130ff61cd029558845808df9bf99
+diff --git a/drivers/block/drbd/Makefile b/drivers/block/drbd/Makefile
+index c93e462130ff..67a8b352a1d5 100644
+--- a/drivers/block/drbd/Makefile
++++ b/drivers/block/drbd/Makefile
+@@ -1,5 +1,5 @@
+ # SPDX-License-Identifier: GPL-2.0-only
+-drbd-y := drbd_bitmap.o drbd_proc.o
++drbd-y := drbd_buildtag.o drbd_bitmap.o drbd_proc.o
+ drbd-y += drbd_worker.o drbd_receiver.o drbd_req.o drbd_actlog.o
+ drbd-y += drbd_main.o drbd_strings.o drbd_nl.o
+ drbd-y += drbd_interval.o drbd_state.o
+diff --git a/drivers/block/drbd/drbd_buildtag.c b/drivers/block/drbd/drbd_buildtag.c
+new file mode 100644
+index 000000000000..956a4d5c339b
+--- /dev/null
++++ b/drivers/block/drbd/drbd_buildtag.c
+@@ -0,0 +1,22 @@
++// SPDX-License-Identifier: GPL-2.0-only
++#include <linux/drbd.h>
++#include <linux/module.h>
++
++const char *drbd_buildtag(void)
++{
++	/* DRBD built from external sources has here a reference to the
++	 * git hash of the source code.
++	 */
++
++	static char buildtag[38] = "\0uilt-in";
++
++	if (buildtag[0] == 0) {
++#ifdef MODULE
++		sprintf(buildtag, "srcversion: %-24s", THIS_MODULE->srcversion);
++#else
++		buildtag[0] = 'b';
++#endif
++	}
++
++	return buildtag;
++}
+diff --git a/drivers/block/drbd/drbd_main.c b/drivers/block/drbd/drbd_main.c
+index 7213ffd69a16..345bfac441da 100644
+--- a/drivers/block/drbd/drbd_main.c
++++ b/drivers/block/drbd/drbd_main.c
+@@ -3776,24 +3776,6 @@ _drbd_insert_fault(struct drbd_device *device, unsigned int type)
+ }
+ #endif
+ 
+-const char *drbd_buildtag(void)
+-{
+-	/* DRBD built from external sources has here a reference to the
+-	   git hash of the source code. */
+-
+-	static char buildtag[38] = "\0uilt-in";
+-
+-	if (buildtag[0] == 0) {
+-#ifdef MODULE
+-		sprintf(buildtag, "srcversion: %-24s", THIS_MODULE->srcversion);
+-#else
+-		buildtag[0] = 'b';
+-#endif
+-	}
+-
+-	return buildtag;
+-}
+-
+ module_init(drbd_init)
+ module_exit(drbd_cleanup)
+ 
 -- 
 2.38.1
 
