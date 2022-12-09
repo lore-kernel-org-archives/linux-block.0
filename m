@@ -2,53 +2,53 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 983A6C4332F
-	for <linux-block@archiver.kernel.org>; Fri,  9 Dec 2022 00:29:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B3CB1C4332F
+	for <linux-block@archiver.kernel.org>; Fri,  9 Dec 2022 01:30:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229675AbiLIA3j (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 8 Dec 2022 19:29:39 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58392 "EHLO
+        id S229897AbiLIBah (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 8 Dec 2022 20:30:37 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37870 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229555AbiLIA3h (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 8 Dec 2022 19:29:37 -0500
-Received: from esa6.hgst.iphmx.com (esa6.hgst.iphmx.com [216.71.154.45])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C0C6100E
-        for <linux-block@vger.kernel.org>; Thu,  8 Dec 2022 16:29:35 -0800 (PST)
+        with ESMTP id S229843AbiLIBae (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 8 Dec 2022 20:30:34 -0500
+Received: from esa1.hgst.iphmx.com (esa1.hgst.iphmx.com [68.232.141.245])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C8DE86F47
+        for <linux-block@vger.kernel.org>; Thu,  8 Dec 2022 17:30:29 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1670545776; x=1702081776;
+  t=1670549429; x=1702085429;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=qk9j8LVxjXBJSIxe9aNCa/SGxFRCLd8rLG0tmlR1LxU=;
-  b=ecFytVuzQVFOKyisnvbIhQIh609rf/ydDTUmygUR1B6F20eFcJMfP1tZ
-   e+F+V0MmDehtBDvenLS6/DtDGL5QJLcnwp2wO0Lz3CTfLrCyg4PStN5l/
-   Al+gfLDUN2WsSAl5WxSxlRLEf3Nx/MBgBiqzhoMTPy9iSsgjteXq3t7cw
-   ghDgN52+fBXM7HY+Ev2g7zUGUkNov4l/9CtHF9HByCVcMCZezxxU+igSy
-   JWxWT4sdftCvOBY8sxh+pnijeHdPX6uclW5NWE3Z3L9b+sQGVLiSBVFPx
-   btdmo0/TeM4Eof7fxpQ2EZXCrR2w8JDxAds803eFvO15Fywq8brg8oxQA
+  bh=Z+MB6BKbERAk/aU/VdmESjhXVsEOrKd+g9suaVcIVzs=;
+  b=TFRF0re1KwkDFD4BmJ37XiFbrpJ2mFLjB7tKWQrsgQyaaFWKbK8w/gz/
+   KFNVU23LzhDSGOYhlRsWdGhEN2MMeRfjq00YNOmWcKskz2APUC0HySkTs
+   ulm8VXnsE5/PtBYljyYcUnmqyOim2dyNBWH1Qsn8dtudrNroeEZ4cilmn
+   lywXYZoNqMV/6Au6yA8xfUdLszkzunnxQvUU/6xvyFpSMD71MqB97xD89
+   34iLlpnpC2cQiaoNw+fSk5fAxSgSCXTPJpPm+mnJ5/55wXXQXkFatp7In
+   sVFDVRWnduOCZ5TRHjQF9neG9HWmEfyXRUEWydMeDJQ6UiP34ZuXDjnA7
    g==;
 X-IronPort-AV: E=Sophos;i="5.96,228,1665417600"; 
-   d="scan'208";a="218499346"
-Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 09 Dec 2022 08:29:35 +0800
-IronPort-SDR: YswRHqFqDW31cx5q0sME1evUw4BocJls0DsZPoMipxJiDh10FQSXEBMIYDGu3ykTLC2q9o4n3b
- kYxKfw36rt+DqKP+uT/7JuBoOxF3rh4RpFMR9dxqwM6wnPj6qwNtp06s7EvuQ3s1C57z/n46tL
- VyirIHDGW68D7KQQLszZfml0B6oWa95A+HE1YmfM20IeKBpe40+u9ZV+R8V/q6VajkRdVokvXf
- QPIiN7Kap9/wgl+GA4t4+ubTt7NhLJqa8HEwi9DANVCEW/sidr7nyRw3yIbO+iaoqQlcwS9rJQ
- C9g=
-Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 08 Dec 2022 15:42:19 -0800
-IronPort-SDR: 17srmIDdT4nJsolXJgMSCyFWmk9jokkH+f3n5ydVE/o3vB/pGALfnGvEcGX9e5oSWg6tlTt5NO
- I4Y5P9Dgdl3PKWo+M2RnkuQfYgbQOc7xKUsxI00TTnNH9qBZ9ExeaB461g6xYJXZeS83CVqw6X
- zDDHkMLRwxjRmqcFYOdDzwJbVDyVov2primdWKtaI652GNfx2NO149KqGvf8FNlOvqALYZS4FH
- jSpLVbzZvv557GpJ0BzEi5S/B7cjxn0hpxACGhyG2ASS+RgpgWH4eJAsIEeVfXsSpqAfCv2S9U
- NTo=
+   d="scan'208";a="330328949"
+Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
+  by ob1.hgst.iphmx.com with ESMTP; 09 Dec 2022 09:30:27 +0800
+IronPort-SDR: yZgElUO005QpZNNTDxkseEgClsLCIymnrGa5nfyPex73OqiFhmbwJLWVEs7m6pzGo/ZUy0Jv2U
+ 3I6b8I8/CSMQ3dK0IjOvWLx8J/QACfIhdlRBeCsGLdLuXV8u9Jz7A0gd4UWcLPtQNd0KAIRSkc
+ w/k7gBbare5CZBo+s8xu5IXXoXQcTofxcFaM74pRBoi3xrftDwv9j7lxCmlzXR7X65RUBD5i24
+ yxuT1mVhefYiT0Em89SeWeeak7JymdxKM7x7AhqOZvIm4MS2BCtKLp1BInm985CWi4wTFUapa2
+ 3Lg=
+Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 08 Dec 2022 16:48:55 -0800
+IronPort-SDR: Jivlyu3PgpiN6lVeACqVvl2tXWwlCaJDvz3UIMJ14SNXYfpFM9BnG2xDAMyLRZ/Yxj8ygrwa+/
+ Hn+g/wyVWWcDCkRKaNn2mnIfOyqBtHCLlYTbNhAqGGJwA72RYpgKVV2Htn4To072LpIgCQ1B1h
+ rOyK49EVU1jTZJ3TjeHeJBBcOAOdBrI+zyPeEXU4be+fXTHsBCnITM30fIR+Rrgd8b63CDiRhd
+ ob0Y+6PRPYqQlXvYyxCNe2CJuXyXQIjfy8YDdr3Tt+FiBkpmDeaNeCzNDiHdBFEkLp5pAK1nKn
+ Exc=
 WDCIronportException: Internal
 Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
-  by uls-op-cesaip02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 08 Dec 2022 16:29:37 -0800
+  by uls-op-cesaip01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 08 Dec 2022 17:30:27 -0800
 Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4NSsNH0N0Nz1RvTp
-        for <linux-block@vger.kernel.org>; Thu,  8 Dec 2022 16:29:35 -0800 (PST)
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4NStkV6bfkz1Rwtl
+        for <linux-block@vger.kernel.org>; Thu,  8 Dec 2022 17:30:26 -0800 (PST)
 Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
         reason="pass (just generated, assumed good)"
         header.d=opensource.wdc.com
@@ -56,90 +56,161 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
         opensource.wdc.com; h=content-transfer-encoding:content-type
         :in-reply-to:organization:from:references:to:content-language
         :subject:user-agent:mime-version:date:message-id; s=dkim; t=
-        1670545774; x=1673137775; bh=qk9j8LVxjXBJSIxe9aNCa/SGxFRCLd8rLG0
-        tmlR1LxU=; b=huebuoh6+rUFkVDfHWkwIdyIRMRkWTzAylli86kSWUThPdepn69
-        dn8RJOqP8ddhUIT3MX36NTVEJdrxenavwp13bJnEvWIGoGBVmwzI03NGAR7TETY9
-        a2zGxW1uSHZznctJSJkaQ/rwiVuuy6FloZgtZo148Q08VVK18r4XbYMZ50ub25yE
-        tcRwCMDmuqSg1dpb7CSgwNK/VQUs0eSYireH1H6erTxZqDkmgkv8AT4Jasf9M3tM
-        PA54Xq2VhYzj5BR+gPwUS8HO4qgVVjGaeS2HhzxjTuE5u+pYcXrkJ6AXASDkZdpO
-        M7QdQJFRMm5vpqkfPVBLwL57p0UVDm4uXEA==
+        1670549425; x=1673141426; bh=Z+MB6BKbERAk/aU/VdmESjhXVsEOrKd+g9s
+        uaVcIVzs=; b=o2qNqd7qAEIYwB0IRQG3i2PEuyxzBJAsHxHRUkyL+6aE6sxRQB2
+        3SEpm5dWS6gyBSya+aFhg5dCp+EHlv8GVmjNHYkUhASIDoH9pBdBmo7sB57qbS6k
+        El9f4DNYPYcfSCLLutju/A3rwU0md2NdVB7GKYVuHmjeEUwpU0KYZvydwh4JjI5O
+        AuqX277Ql/3t6kPJy6u0l0Lh3RqB0Xr+X9EUTpWVA5157lUN7C/NgdKRNYkAOHek
+        CFfsmBBzSLlnrvBH8SDZtE2sYsLlQv6k9OA1ueoR6YJlV/JOSr0A5KdwxoKlgr9A
+        HFkeJAWf42CpNsVKp571KSnllnerdzPlMkw==
 X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
 Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
         by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id zljn6xl5qR7u for <linux-block@vger.kernel.org>;
-        Thu,  8 Dec 2022 16:29:34 -0800 (PST)
+        with ESMTP id hqm4_LFL7eJc for <linux-block@vger.kernel.org>;
+        Thu,  8 Dec 2022 17:30:25 -0800 (PST)
 Received: from [10.225.163.85] (unknown [10.225.163.85])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4NSsNF3v33z1RvLy;
-        Thu,  8 Dec 2022 16:29:33 -0800 (PST)
-Message-ID: <510732e0-7962-cf54-c22c-f1d7066895f5@opensource.wdc.com>
-Date:   Fri, 9 Dec 2022 09:29:32 +0900
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4NStkR4tBBz1RvLy;
+        Thu,  8 Dec 2022 17:30:23 -0800 (PST)
+Message-ID: <49aa8a40-938f-50c2-990e-04cf743e3b19@opensource.wdc.com>
+Date:   Fri, 9 Dec 2022 10:30:22 +0900
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.5.0
-Subject: Re: [PATCH 00/25] Add Command Duration Limits support
+Subject: Re: [PATCH V9 4/8] block, bfq: turn bfqq_data into an array in
+ bfq_io_cq
 Content-Language: en-US
-To:     Chaitanya Kulkarni <chaitanyak@nvidia.com>,
-        Niklas Cassel <niklas.cassel@wdc.com>
-Cc:     Hannes Reinecke <hare@suse.de>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-ide@vger.kernel.org" <linux-ide@vger.kernel.org>
-References: <20221208105947.2399894-1-niklas.cassel@wdc.com>
- <daff011b-6aeb-e6ba-c71b-8b0ff9a21ef7@nvidia.com>
+To:     Paolo Valente <paolo.valente@linaro.org>,
+        Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        arie.vanderhoeven@seagate.com, rory.c.chen@seagate.com,
+        glen.valante@linaro.org, Gabriele Felici <felicigb@gmail.com>,
+        Gianmarco Lusvardi <glusvardi@posteo.net>,
+        Giulio Barabino <giuliobarabino99@gmail.com>,
+        Emiliano Maccaferri <inbox@emilianomaccaferri.com>
+References: <20221208104351.35038-1-paolo.valente@linaro.org>
+ <20221208104351.35038-5-paolo.valente@linaro.org>
 From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
 Organization: Western Digital Research
-In-Reply-To: <daff011b-6aeb-e6ba-c71b-8b0ff9a21ef7@nvidia.com>
+In-Reply-To: <20221208104351.35038-5-paolo.valente@linaro.org>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 12/9/22 03:18, Chaitanya Kulkarni wrote:
+On 12/8/22 19:43, Paolo Valente wrote:
+> When a bfq_queue Q is merged with another queue, several pieces of
+> information are saved about Q. These pieces are stored in the
+> bfqq_data field in the bfq_io_cq data structure of the process
+> associated with Q.
 > 
->> Kind regards,
->> Niklas & Damien
->>
->> Damien Le Moal (14):
->>    ata: libata: simplify qc_fill_rtf port operation interface
->>    ata: libata-scsi: improve ata_scsiop_maint_in()
->>    scsi: support retrieving sub-pages of mode pages
->>    scsi: support service action in scsi_report_opcode()
->>    block: introduce duration-limits priority class
->>    block: introduce BLK_STS_DURATION_LIMIT
->>    ata: libata: detect support for command duration limits
->>    ata: libata-scsi: handle CDL bits in ata_scsiop_maint_in()
->>    ata: libata-scsi: add support for CDL pages mode sense
->>    ata: libata: add ATA feature control sub-page translation
->>    ata: libata: set read/write commands CDL index
->>    scsi: sd: detect support for command duration limits
->>    scsi: sd: set read/write commands CDL index
->>    Documentation: sysfs-block-device: document command duration limits
->>
->> Niklas Cassel (11):
->>    ata: scsi: rename flag ATA_QCFLAG_FAILED to ATA_QCFLAG_EH
->>    ata: libata: move NCQ related ATA_DFLAGs
->>    ata: libata: fix broken NCQ command status handling
->>    ata: libata: respect successfully completed commands during errors
->>    ata: libata: allow ata_scsi_set_sense() to not set CHECK_CONDITION
->>    ata: libata: allow ata_eh_request_sense() to not set CHECK_CONDITION
->>    ata: libata-scsi: do not overwrite SCSI ML and status bytes
->>    scsi: core: allow libata to complete successful commands via EH
->>    scsi: move get_scsi_ml_byte() to scsi_priv.h
->>    scsi: sd: handle read/write CDL timeout failures
->>    ata: libata: handle completion of CDL commands using policy 0xD
->>
+> Yet, with a multi-actuator drive, a process may get associated with
+> multiple bfq_queues: one queue for each of the N actuators. Each of
+> these queues may undergo a merge. So, the bfq_io_cq data structure
+> must be able to accommodate the above information for N queues.
 > 
-> Out of 25 patches linux-block mailing list only got 3,
-> was this on purpose ? see this and [1] :-
+> This commit solves this problem by turning the bfqq_data scalar field
+> into an array of N elements (and by changing code so as to handle
+> this array).
+> 
+> This solution is written under the assumption that bfq_queues
+> associated with different actuators cannot be cross-merged. This
+> assumption holds naturally with basic queue merging: the latter is
+> triggered by spatial locality, and sectors for different actuators are
+> not close to each other (apart from the corner case of the last
+> sectors served by a given actuator and the first sectors served by the
+> next actuator). As for stable cross-merging, the assumption here is
+> that it is disabled.
+> 
+> Signed-off-by: Gabriele Felici <felicigb@gmail.com>
+> Signed-off-by: Gianmarco Lusvardi <glusvardi@posteo.net>
+> Signed-off-by: Giulio Barabino <giuliobarabino99@gmail.com>
+> Signed-off-by: Emiliano Maccaferri <inbox@emilianomaccaferri.com>
+> Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
+> ---
+>  block/bfq-iosched.c | 95 +++++++++++++++++++++++++++------------------
+>  block/bfq-iosched.h | 12 ++++--
+>  2 files changed, 65 insertions(+), 42 deletions(-)
+> 
+> diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+> index 0d6b35ef3d3f..18e2b8f75435 100644
+> --- a/block/bfq-iosched.c
+> +++ b/block/bfq-iosched.c
+> @@ -406,7 +406,7 @@ void bic_set_bfqq(struct bfq_io_cq *bic,
+>  	 * we cancel the stable merge if
+>  	 * bic->stable_merge_bfqq == bfqq.
+>  	 */
+> -	struct bfq_iocq_bfqq_data *bfqq_data = &bic->bfqq_data;
+> +	struct bfq_iocq_bfqq_data *bfqq_data = &bic->bfqq_data[actuator_idx];
+>  
+>  	if (is_sync)
+>  		bic->bfqq[1][actuator_idx] = bfqq;
+> @@ -1181,9 +1181,10 @@ static void
+>  bfq_bfqq_resume_state(struct bfq_queue *bfqq, struct bfq_data *bfqd,
+>  		      struct bfq_io_cq *bic, bool bfq_already_existing)
+>  {
+> -	struct bfq_iocq_bfqq_data *bfqq_data = &bic->bfqq_data;
+>  	unsigned int old_wr_coeff = 1;
+>  	bool busy = bfq_already_existing && bfq_bfqq_busy(bfqq);
+> +	unsigned int a_idx = bfqq->actuator_idx;
+> +	struct bfq_iocq_bfqq_data *bfqq_data = &bic->bfqq_data[a_idx];
+>  
+>  	if (bfqq_data->saved_has_short_ttime)
+>  		bfq_mark_bfqq_has_short_ttime(bfqq);
+> @@ -1899,7 +1900,9 @@ static void bfq_bfqq_handle_idle_busy_switch(struct bfq_data *bfqd,
+>  	wr_or_deserves_wr = bfqd->low_latency &&
+>  		(bfqq->wr_coeff > 1 ||
+>  		 (bfq_bfqq_sync(bfqq) &&
+> -		  (bfqq->bic || RQ_BIC(rq)->bfqq_data.stably_merged) &&
+> +		  (bfqq->bic ||
+> +		   RQ_BIC(rq)->bfqq_data[bfq_actuator_index(bfqd, rq->bio)]
+> +		   .stably_merged) &&
 
-Not sure how Niklas sent the series.
+very weird line split here...
 
-Niklas,
+>  		   (*interactive || soft_rt)));
+>  
+>  	/*
+> @@ -2888,6 +2891,35 @@ static bool bfq_may_be_close_cooperator(struct bfq_queue *bfqq,
+>  static bool idling_boosts_thr_without_issues(struct bfq_data *bfqd,
+>  					     struct bfq_queue *bfqq);
+>  
+> +static struct bfq_queue *
+> +bfq_setup_stable_merge(struct bfq_data *bfqd, struct bfq_queue *bfqq,
+> +		       struct bfq_queue *stable_merge_bfqq,
+> +		       struct bfq_iocq_bfqq_data *bfqq_data)
+> +{
+> +	int proc_ref = min(bfqq_process_refs(bfqq),
+> +			   bfqq_process_refs(stable_merge_bfqq));
+> +
+> +	if (!idling_boosts_thr_without_issues(bfqd, bfqq) &&
+> +	    proc_ref > 0) {
 
-For the next rev (we will need one to at least rebase on 6.2-rc1 I think),
-please make sure to send all patches to all lists/maintainers.
+If you reverse the if condition and return NULL here you can save one tab
+indent level for the hunk below (no need for an else after a return).
 
+> +		/* next function will take at least one ref */
+> +		struct bfq_queue *new_bfqq =
+> +			bfq_setup_merge(bfqq, stable_merge_bfqq);
+> +
+> +		if (new_bfqq) {
+> +			bfqq_data->stably_merged = true;
+> +			if (new_bfqq->bic) {
+> +				unsigned int new_a_idx = new_bfqq->actuator_idx;
+> +				struct bfq_iocq_bfqq_data *new_bfqq_data =
+> +					&new_bfqq->bic->bfqq_data[new_a_idx];
+> +
+> +				new_bfqq_data->stably_merged = true;
+> +			}
+> +		}
+> +		return new_bfqq;
+> +	} else
+> +		return NULL;
+> +}
+
+Otherwise, looks OK.
+
+Reviewed-by: Damien Le Moal <damien.lemoal@opensource.wdc.com>
 
 -- 
 Damien Le Moal
