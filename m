@@ -2,201 +2,294 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 888C4C04FDE
-	for <linux-block@archiver.kernel.org>; Fri,  9 Dec 2022 12:38:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 629C5C4167B
+	for <linux-block@archiver.kernel.org>; Fri,  9 Dec 2022 14:44:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229912AbiLIMiM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 9 Dec 2022 07:38:12 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52548 "EHLO
+        id S229538AbiLIOoS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 9 Dec 2022 09:44:18 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35252 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229626AbiLIMiL (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 9 Dec 2022 07:38:11 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D39BE66CB1
-        for <linux-block@vger.kernel.org>; Fri,  9 Dec 2022 04:37:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1670589435;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=kKcc7XQPg0UZn1AHNfQ4N2d5zF9JzBW3g3hPGFAB4Kc=;
-        b=ZG3qqAatQhAgpOboJAhhAnXOsAls6GT3djKhXpAx8qhAmpWP+j5Ewoo4/diUxYxZxAhmAx
-        IsB4N7gRUZDNj5yOs+yBwaGHPcGpIAQwcjkCOeZuP6frx+KIOVT+ppWBotynfu9bGbnIWY
-        PFnFWXmmPhUxIB2B9Yq/ZGaPsueGibY=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-336-7qKiZZuNMDeoj8uAn03GxQ-1; Fri, 09 Dec 2022 07:37:14 -0500
-X-MC-Unique: 7qKiZZuNMDeoj8uAn03GxQ-1
-Received: by mail-wm1-f71.google.com with SMTP id x10-20020a05600c420a00b003cfa33f2e7cso2352942wmh.2
-        for <linux-block@vger.kernel.org>; Fri, 09 Dec 2022 04:37:13 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:user-agent:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=kKcc7XQPg0UZn1AHNfQ4N2d5zF9JzBW3g3hPGFAB4Kc=;
-        b=5EoJu2diO82bIV0xnLywtnEvx+F0v9szA2O131S4pU6LKnp6sGmsZMOY9xWlAyJJx3
-         IVzHGgNKwJOmF0JH1GWD0VwvfEZ3YeqLWKSQBCNBmGs2b0inKBBS/r8Rl34Mx+497PRw
-         Ix4plWu7toilxsMYhUsydnLtIFMUzwDNmRpq2SNBof7DpWjjjxp2S0XHyDMzh5IE7RyX
-         r1fzx72lsTRNVtV9NZY9z6R2pBLoAiZN2BBai+9utzJkT05aLqeu1AO7qyzAnGwIrq0A
-         w/5soBKwxKrPlfwRhgy0q7M7amh0iAKjCEeBdYVkCyROul692mD9ISKvfLjXZVD7gPrl
-         +Mlg==
-X-Gm-Message-State: ANoB5pl+x0X/FxQU/2ENfPOOM8AUfxGFmwYHyvSQRwekXB27Bd0DSmdX
-        pxscmzssbVid6DcyMQIziG4u8QJk9OAScobylmdP8aKbQzOPwQbK2aVREl+K7fyy7bpgUD/y485
-        nERhdVYCXD0JFBNDZIoaikO8=
-X-Received: by 2002:a05:600c:4fd0:b0:3d1:c0a1:4804 with SMTP id o16-20020a05600c4fd000b003d1c0a14804mr4752771wmq.17.1670589432858;
-        Fri, 09 Dec 2022 04:37:12 -0800 (PST)
-X-Google-Smtp-Source: AA0mqf5DyMiYpWNcqaQueb0cVh7tJ5lH4JY75MZjLcmrbwYgfM+x/au0sr5C4m2hvq8cZrZMVyWo5g==
-X-Received: by 2002:a05:600c:4fd0:b0:3d1:c0a1:4804 with SMTP id o16-20020a05600c4fd000b003d1c0a14804mr4752714wmq.17.1670589432518;
-        Fri, 09 Dec 2022 04:37:12 -0800 (PST)
-Received: from gerbillo.redhat.com (146-241-106-22.dyn.eolo.it. [146.241.106.22])
-        by smtp.gmail.com with ESMTPSA id j10-20020a05600c1c0a00b003b49bd61b19sm9284355wms.15.2022.12.09.04.37.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 09 Dec 2022 04:37:11 -0800 (PST)
-Message-ID: <d220402a232e204676d9100d6fe4c2ae08f753ee.camel@redhat.com>
-Subject: Re: [PATCH v1 2/3] Treewide: Stop corrupting socket's task_frag
-From:   Paolo Abeni <pabeni@redhat.com>
-To:     Benjamin Coddington <bcodding@redhat.com>, netdev@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org,
-        Philipp Reisner <philipp.reisner@linbit.com>,
-        Lars Ellenberg <lars.ellenberg@linbit.com>,
-        Christoph =?ISO-8859-1?Q?B=F6hmwalder?= 
-        <christoph.boehmwalder@linbit.com>, Jens Axboe <axboe@kernel.dk>,
-        Josef Bacik <josef@toxicpanda.com>,
-        Keith Busch <kbusch@kernel.org>,
-        Christoph Hellwig <hch@lst.de>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Lee Duncan <lduncan@suse.com>, Chris Leech <cleech@redhat.com>,
-        Mike Christie <michael.christie@oracle.com>,
-        "James E.J. Bottomley" <jejb@linux.ibm.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Valentina Manea <valentina.manea.m@gmail.com>,
-        Shuah Khan <shuah@kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        David Howells <dhowells@redhat.com>,
-        Marc Dionne <marc.dionne@auristor.com>,
-        Steve French <sfrench@samba.org>,
-        Christine Caulfield <ccaulfie@redhat.com>,
-        David Teigland <teigland@redhat.com>,
-        Mark Fasheh <mark@fasheh.com>,
-        Joel Becker <jlbec@evilplan.org>,
-        Joseph Qi <joseph.qi@linux.alibaba.com>,
-        Eric Van Hensbergen <ericvh@gmail.com>,
-        Latchesar Ionkov <lucho@ionkov.net>,
-        Dominique Martinet <asmadeus@codewreck.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Ilya Dryomov <idryomov@gmail.com>,
-        Xiubo Li <xiubli@redhat.com>,
-        Trond Myklebust <trond.myklebust@hammerspace.com>,
-        Anna Schumaker <anna@kernel.org>,
-        Chuck Lever <chuck.lever@oracle.com>,
-        Jeff Layton <jlayton@kernel.org>, drbd-dev@lists.linbit.com,
-        linux-block@vger.kernel.org, nbd@other.debian.org,
-        linux-nvme@lists.infradead.org, open-iscsi@googlegroups.com,
-        linux-scsi@vger.kernel.org, linux-usb@vger.kernel.org,
-        linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
-        samba-technical@lists.samba.org, cluster-devel@redhat.com,
-        ocfs2-devel@oss.oracle.com, v9fs-developer@lists.sourceforge.net,
-        ceph-devel@vger.kernel.org, linux-nfs@vger.kernel.org
-Date:   Fri, 09 Dec 2022 13:37:08 +0100
-In-Reply-To: <c2ec184226acd21a191ccc1aa46a1d7e43ca7104.1669036433.git.bcodding@redhat.com>
-References: <cover.1669036433.git.bcodding@redhat.com>
-         <c2ec184226acd21a191ccc1aa46a1d7e43ca7104.1669036433.git.bcodding@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.42.4 (3.42.4-2.fc35) 
+        with ESMTP id S229626AbiLIOoN (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 9 Dec 2022 09:44:13 -0500
+Received: from mx4.veeam.com (mx4.veeam.com [104.41.138.86])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B64142F74;
+        Fri,  9 Dec 2022 06:44:11 -0800 (PST)
+Received: from mail.veeam.com (prgmbx01.amust.local [172.24.128.102])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mx4.veeam.com (Postfix) with ESMTPS id BC48C7D483;
+        Fri,  9 Dec 2022 17:24:13 +0300 (MSK)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=veeam.com;
+        s=mx4-2022; t=1670595853;
+        bh=GuKRXAKi0Mk+SnLsrZ2Plo8BttBp04suMOxW3nuz4z8=;
+        h=From:To:CC:Subject:Date:In-Reply-To:References:From;
+        b=f+10IUSrIVR/wUmirL8WYw47JFVGdS1KzZL3Je4pdTbUsfRK6eVA5vZdJmTQIRNAA
+         GjHPyXylz+KsTHc6unr/9l3T32GMXjWoiI4ZXy81sPfcX9GuE81M0sioU+2Ws5oXW3
+         dit6QOc97RJ9rkhL+eOziCEnMG0Yb+WmM6uZrhkW4tjV0CyXdrMS1WnUdamsWtCuIh
+         ObsKMOTy9ld+yQve0fUtiEt8b40QKno4J62StJXhJtsaLwx2tHuLVNOwQjxim38YS5
+         cJf994JsF0jz3thVawHXfrOuN0tSPSTsVcjaCEfNj0c+CSBsmOEAphUm+sGEMuESqa
+         xYFzJKZIjRiQA==
+Received: from ssh-deb10-ssd-vb.amust.local (172.24.10.107) by
+ prgmbx01.amust.local (172.24.128.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.20; Fri, 9 Dec 2022 15:24:11 +0100
+From:   Sergei Shtepa <sergei.shtepa@veeam.com>
+To:     <axboe@kernel.dk>, <corbet@lwn.net>
+CC:     <linux-block@vger.kernel.org>, <linux-doc@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>,
+        Sergei Shtepa <sergei.shtepa@veeam.com>
+Subject: [PATCH v2 12/21] block, blksnap: buffer in memory for the minimum data storage unit
+Date:   Fri, 9 Dec 2022 15:23:22 +0100
+Message-ID: <20221209142331.26395-13-sergei.shtepa@veeam.com>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20221209142331.26395-1-sergei.shtepa@veeam.com>
+References: <20221209142331.26395-1-sergei.shtepa@veeam.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [172.24.10.107]
+X-ClientProxiedBy: prgmbx02.amust.local (172.24.128.103) To
+ prgmbx01.amust.local (172.24.128.102)
+X-EsetResult: clean, is OK
+X-EsetId: 37303A2924031556627C62
+X-Veeam-MMEX: True
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, 2022-11-21 at 08:35 -0500, Benjamin Coddington wrote:
-> Since moving to memalloc_nofs_save/restore, SUNRPC has stopped setting the
-> GFP_NOIO flag on sk_allocation which the networking system uses to decide
-> when it is safe to use current->task_frag.  The results of this are
-> unexpected corruption in task_frag when SUNRPC is involved in memory
-> reclaim.
-> 
-> The corruption can be seen in crashes, but the root cause is often
-> difficult to ascertain as a crashing machine's stack trace will have no
-> evidence of being near NFS or SUNRPC code.  I believe this problem to
-> be much more pervasive than reports to the community may indicate.
-> 
-> Fix this by having kernel users of sockets that may corrupt task_frag due
-> to reclaim set sk_use_task_frag = false.  Preemptively correcting this
-> situation for users that still set sk_allocation allows them to convert to
-> memalloc_nofs_save/restore without the same unexpected corruptions that are
-> sure to follow, unlikely to show up in testing, and difficult to bisect.
-> 
-> CC: Philipp Reisner <philipp.reisner@linbit.com>
-> CC: Lars Ellenberg <lars.ellenberg@linbit.com>
-> CC: "Christoph Böhmwalder" <christoph.boehmwalder@linbit.com>
-> CC: Jens Axboe <axboe@kernel.dk>
-> CC: Josef Bacik <josef@toxicpanda.com>
-> CC: Keith Busch <kbusch@kernel.org>
-> CC: Christoph Hellwig <hch@lst.de>
-> CC: Sagi Grimberg <sagi@grimberg.me>
-> CC: Lee Duncan <lduncan@suse.com>
-> CC: Chris Leech <cleech@redhat.com>
-> CC: Mike Christie <michael.christie@oracle.com>
-> CC: "James E.J. Bottomley" <jejb@linux.ibm.com>
-> CC: "Martin K. Petersen" <martin.petersen@oracle.com>
-> CC: Valentina Manea <valentina.manea.m@gmail.com>
-> CC: Shuah Khan <shuah@kernel.org>
-> CC: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> CC: David Howells <dhowells@redhat.com>
-> CC: Marc Dionne <marc.dionne@auristor.com>
-> CC: Steve French <sfrench@samba.org>
-> CC: Christine Caulfield <ccaulfie@redhat.com>
-> CC: David Teigland <teigland@redhat.com>
-> CC: Mark Fasheh <mark@fasheh.com>
-> CC: Joel Becker <jlbec@evilplan.org>
-> CC: Joseph Qi <joseph.qi@linux.alibaba.com>
-> CC: Eric Van Hensbergen <ericvh@gmail.com>
-> CC: Latchesar Ionkov <lucho@ionkov.net>
-> CC: Dominique Martinet <asmadeus@codewreck.org>
-> CC: "David S. Miller" <davem@davemloft.net>
-> CC: Eric Dumazet <edumazet@google.com>
-> CC: Jakub Kicinski <kuba@kernel.org>
-> CC: Paolo Abeni <pabeni@redhat.com>
-> CC: Ilya Dryomov <idryomov@gmail.com>
-> CC: Xiubo Li <xiubli@redhat.com>
-> CC: Chuck Lever <chuck.lever@oracle.com>
-> CC: Jeff Layton <jlayton@kernel.org>
-> CC: Trond Myklebust <trond.myklebust@hammerspace.com>
-> CC: Anna Schumaker <anna@kernel.org>
-> CC: drbd-dev@lists.linbit.com
-> CC: linux-block@vger.kernel.org
-> CC: linux-kernel@vger.kernel.org
-> CC: nbd@other.debian.org
-> CC: linux-nvme@lists.infradead.org
-> CC: open-iscsi@googlegroups.com
-> CC: linux-scsi@vger.kernel.org
-> CC: linux-usb@vger.kernel.org
-> CC: linux-afs@lists.infradead.org
-> CC: linux-cifs@vger.kernel.org
-> CC: samba-technical@lists.samba.org
-> CC: cluster-devel@redhat.com
-> CC: ocfs2-devel@oss.oracle.com
-> CC: v9fs-developer@lists.sourceforge.net
-> CC: netdev@vger.kernel.org
-> CC: ceph-devel@vger.kernel.org
-> CC: linux-nfs@vger.kernel.org
-> 
-> Suggested-by: Guillaume Nault <gnault@redhat.com>
-> Signed-off-by: Benjamin Coddington <bcodding@redhat.com>
+The struct diff_buffer describes a buffer in memory for the minimum data
+storage block of the original block device (struct chunk).
+Buffer allocation and release functions allow to reduce the number of
+allocations and releases of a large number of memory pages.
 
-I think this is the most feasible way out of the existing issue, and I
-think this patchset should go via the networking tree, targeting the
-Linux 6.2.
+Signed-off-by: Sergei Shtepa <sergei.shtepa@veeam.com>
+---
+ drivers/block/blksnap/diff_buffer.c | 133 ++++++++++++++++++++++++++++
+ drivers/block/blksnap/diff_buffer.h |  75 ++++++++++++++++
+ 2 files changed, 208 insertions(+)
+ create mode 100644 drivers/block/blksnap/diff_buffer.c
+ create mode 100644 drivers/block/blksnap/diff_buffer.h
 
-If someone has disagreement with the above, please speak! 
-
-Thanks,
-
-Paolo
+diff --git a/drivers/block/blksnap/diff_buffer.c b/drivers/block/blksnap/diff_buffer.c
+new file mode 100644
+index 000000000000..40ae949b99d1
+--- /dev/null
++++ b/drivers/block/blksnap/diff_buffer.c
+@@ -0,0 +1,133 @@
++// SPDX-License-Identifier: GPL-2.0
++#define pr_fmt(fmt) KBUILD_MODNAME "-diff-buffer: " fmt
++
++#include "params.h"
++#include "diff_buffer.h"
++#include "diff_area.h"
++
++static void diff_buffer_free(struct diff_buffer *diff_buffer)
++{
++	size_t inx = 0;
++
++	if (unlikely(!diff_buffer))
++		return;
++
++	for (inx = 0; inx < diff_buffer->page_count; inx++) {
++		struct page *page = diff_buffer->pages[inx];
++
++		if (page)
++			__free_page(page);
++	}
++
++	kfree(diff_buffer);
++}
++
++static struct diff_buffer *
++diff_buffer_new(size_t page_count, size_t buffer_size, gfp_t gfp_mask)
++{
++	struct diff_buffer *diff_buffer;
++	size_t inx = 0;
++	struct page *page;
++
++	if (unlikely(page_count <= 0))
++		return NULL;
++
++	/*
++	 * In case of overflow, it is better to get a null pointer
++	 * than a pointer to some memory area. Therefore + 1.
++	 */
++	diff_buffer = kzalloc(sizeof(struct diff_buffer) +
++				      (page_count + 1) * sizeof(struct page *),
++			      gfp_mask);
++	if (!diff_buffer)
++		return NULL;
++
++	INIT_LIST_HEAD(&diff_buffer->link);
++	diff_buffer->size = buffer_size;
++	diff_buffer->page_count = page_count;
++
++	for (inx = 0; inx < page_count; inx++) {
++		page = alloc_page(gfp_mask);
++		if (!page)
++			goto fail;
++
++		diff_buffer->pages[inx] = page;
++	}
++	return diff_buffer;
++fail:
++	diff_buffer_free(diff_buffer);
++	return NULL;
++}
++
++struct diff_buffer *diff_buffer_take(struct diff_area *diff_area,
++				     const bool is_nowait)
++{
++	struct diff_buffer *diff_buffer = NULL;
++	sector_t chunk_sectors;
++	size_t page_count;
++	size_t buffer_size;
++
++	spin_lock(&diff_area->free_diff_buffers_lock);
++	diff_buffer = list_first_entry_or_null(&diff_area->free_diff_buffers,
++					       struct diff_buffer, link);
++	if (diff_buffer) {
++		list_del(&diff_buffer->link);
++		atomic_dec(&diff_area->free_diff_buffers_count);
++	}
++	spin_unlock(&diff_area->free_diff_buffers_lock);
++
++	/* Return free buffer if it was found in a pool */
++	if (diff_buffer)
++		return diff_buffer;
++
++	/* Allocate new buffer */
++	chunk_sectors = diff_area_chunk_sectors(diff_area);
++	page_count = round_up(chunk_sectors, PAGE_SECTORS) / PAGE_SECTORS;
++	buffer_size = chunk_sectors << SECTOR_SHIFT;
++
++	diff_buffer =
++		diff_buffer_new(page_count, buffer_size,
++				is_nowait ? (GFP_NOIO | GFP_NOWAIT) : GFP_NOIO);
++	if (unlikely(!diff_buffer)) {
++		if (is_nowait)
++			return ERR_PTR(-EAGAIN);
++		else
++			return ERR_PTR(-ENOMEM);
++	}
++
++	return diff_buffer;
++}
++
++void diff_buffer_release(struct diff_area *diff_area,
++			 struct diff_buffer *diff_buffer)
++{
++	if (atomic_read(&diff_area->free_diff_buffers_count) >
++	    free_diff_buffer_pool_size) {
++		diff_buffer_free(diff_buffer);
++		return;
++	}
++	spin_lock(&diff_area->free_diff_buffers_lock);
++	list_add_tail(&diff_buffer->link, &diff_area->free_diff_buffers);
++	atomic_inc(&diff_area->free_diff_buffers_count);
++	spin_unlock(&diff_area->free_diff_buffers_lock);
++}
++
++void diff_buffer_cleanup(struct diff_area *diff_area)
++{
++	struct diff_buffer *diff_buffer = NULL;
++
++	do {
++		spin_lock(&diff_area->free_diff_buffers_lock);
++		diff_buffer =
++			list_first_entry_or_null(&diff_area->free_diff_buffers,
++						 struct diff_buffer, link);
++		if (diff_buffer) {
++			list_del(&diff_buffer->link);
++			atomic_dec(&diff_area->free_diff_buffers_count);
++		}
++		spin_unlock(&diff_area->free_diff_buffers_lock);
++
++		if (diff_buffer)
++			diff_buffer_free(diff_buffer);
++	} while (diff_buffer);
++}
+diff --git a/drivers/block/blksnap/diff_buffer.h b/drivers/block/blksnap/diff_buffer.h
+new file mode 100644
+index 000000000000..d1ff80452552
+--- /dev/null
++++ b/drivers/block/blksnap/diff_buffer.h
+@@ -0,0 +1,75 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++#ifndef __BLK_SNAP_DIFF_BUFFER_H
++#define __BLK_SNAP_DIFF_BUFFER_H
++
++#include <linux/types.h>
++#include <linux/slab.h>
++#include <linux/list.h>
++#include <linux/blkdev.h>
++
++struct diff_area;
++
++/**
++ * struct diff_buffer - Difference buffer.
++ * @link:
++ *	The list header allows to create a pool of the diff_buffer structures.
++ * @size:
++ *	Count of bytes in the buffer.
++ * @page_count:
++ *	The number of pages reserved for the buffer.
++ * @pages:
++ *	An array of pointers to pages.
++ *
++ * Describes the memory buffer for a chunk in the memory.
++ */
++struct diff_buffer {
++	struct list_head link;
++	size_t size;
++	size_t page_count;
++	struct page *pages[0];
++};
++
++/**
++ * struct diff_buffer_iter - Iterator for &struct diff_buffer.
++ * @page:
++ *      A pointer to the current page.
++ * @offset:
++ *      The offset in bytes in the current page.
++ * @bytes:
++ *      The number of bytes that can be read or written from the current page.
++ *
++ * It is convenient to use when copying data from or to &struct bio_vec.
++ */
++struct diff_buffer_iter {
++	struct page *page;
++	size_t offset;
++	size_t bytes;
++};
++
++static inline bool diff_buffer_iter_get(struct diff_buffer *diff_buffer,
++					size_t buff_offset,
++					struct diff_buffer_iter *iter)
++{
++	if (diff_buffer->size <= buff_offset)
++		return false;
++
++	iter->page = diff_buffer->pages[buff_offset >> PAGE_SHIFT];
++	iter->offset = (size_t)(buff_offset & (PAGE_SIZE - 1));
++	/*
++	 * The size cannot exceed the size of the page, taking into account
++	 * the offset in this page.
++	 * But at the same time it is unacceptable to go beyond the allocated
++	 * buffer.
++	 */
++	iter->bytes = min_t(size_t, (PAGE_SIZE - iter->offset),
++			    (diff_buffer->size - buff_offset));
++
++	return true;
++};
++
++struct diff_buffer *diff_buffer_take(struct diff_area *diff_area,
++				     const bool is_nowait);
++void diff_buffer_release(struct diff_area *diff_area,
++			 struct diff_buffer *diff_buffer);
++void diff_buffer_cleanup(struct diff_area *diff_area);
++#endif /* __BLK_SNAP_DIFF_BUFFER_H */
+-- 
+2.20.1
 
