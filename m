@@ -2,112 +2,99 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7A73C4332F
-	for <linux-block@archiver.kernel.org>; Fri,  9 Dec 2022 15:59:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D672C10F1E
+	for <linux-block@archiver.kernel.org>; Fri,  9 Dec 2022 16:11:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229939AbiLIP7m (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 9 Dec 2022 10:59:42 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46742 "EHLO
+        id S229555AbiLIQLI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 9 Dec 2022 11:11:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54340 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230136AbiLIP7k (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 9 Dec 2022 10:59:40 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6050B3C6E0
-        for <linux-block@vger.kernel.org>; Fri,  9 Dec 2022 07:58:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1670601522;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=XJPm4fwaRggOYMPWB+4OQhr2AoXrB0vtei9ZF45OHV8=;
-        b=D6Pb9lp6n9ZI+GT3tIGr7g9WUO1Ls8ef+5UPLfoJtzMmPSKwSAUk4FBuU4YpcCAZ/EGFN3
-        aEfwLWIYEnWImvXl938BV4IyUvCkUv+98oQlBIq4mCKtj05nF3FfOGrcd2CHpdf+f3aNaG
-        kDV+Zeu+Xs4Py0WHCCW6rpTHCSPucfI=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-486-B696t4EsMfiGoAAspXHKFA-1; Fri, 09 Dec 2022 10:58:36 -0500
-X-MC-Unique: B696t4EsMfiGoAAspXHKFA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        with ESMTP id S229460AbiLIQLH (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 9 Dec 2022 11:11:07 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 10AE660F7;
+        Fri,  9 Dec 2022 08:11:05 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id A33E429AA2EF;
-        Fri,  9 Dec 2022 15:58:35 +0000 (UTC)
-Received: from [10.22.9.164] (unknown [10.22.9.164])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 0E1AE1401C30;
-        Fri,  9 Dec 2022 15:58:34 +0000 (UTC)
-Message-ID: <8641d4a4-4d60-0f31-120c-56628f477ba2@redhat.com>
-Date:   Fri, 9 Dec 2022 10:58:32 -0500
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.4.0
-Subject: Re: [PATCH-block 3/3] blk-cgroup: Flush stats at blkgs destruction
- path
-Content-Language: en-US
-To:     Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 7CAE860EB0;
+        Fri,  9 Dec 2022 16:11:05 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B20FEC433EF;
+        Fri,  9 Dec 2022 16:11:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1670602264;
+        bh=OclmnU1jYcdMFqciE3c6RyUB6hgvanpdH2l220bFhz4=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=lP5pQ24T3IT2YBfVVAYFE/vlA14kPUGpHI19DQSbfMFFqcLV6yfVQX2yzf3FWU9BJ
+         DEPOy15CleSzGVLHHvdVrCdctgS6AMOlWyxNMtd1UP4Jl6EFRe7WSmHsdwacu3KmIi
+         3gphHYn83fw+acEzH9vRCOj48wMtBY8ejFf/mJMd7kxsJCGH1dwZt2JHDO6M2WNy+F
+         RxYdcuexGpRtzv/r3df/M1OzYPk521V8CVwEXUXt0ZTCVSTYNw6OFG3RfFVHJS6f4s
+         Cy+bJUuWARFf6RP5DMfx0m0W7Y2ou/9vrV6yP2gJYTEe5AantjuQErI6+6QNzX5szc
+         v2qI3ygfSsAtw==
+Date:   Fri, 9 Dec 2022 08:11:01 -0800
+From:   Jakub Kicinski <kuba@kernel.org>
+To:     Paolo Abeni <pabeni@redhat.com>
+Cc:     Benjamin Coddington <bcodding@redhat.com>, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Philipp Reisner <philipp.reisner@linbit.com>,
+        Lars Ellenberg <lars.ellenberg@linbit.com>,
+        Christoph =?UTF-8?B?QsO2aG13?= =?UTF-8?B?YWxkZXI=?= 
+        <christoph.boehmwalder@linbit.com>, Jens Axboe <axboe@kernel.dk>,
         Josef Bacik <josef@toxicpanda.com>,
-        Zefan Li <lizefan.x@bytedance.com>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        Andrew Morton <akpm@linux-foundation.org>
-Cc:     cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        =?UTF-8?Q?Michal_Koutn=c3=bd?= <mkoutny@suse.com>,
-        "Dennis Zhou (Facebook)" <dennisszhou@gmail.com>
-References: <20221208220141.2625775-1-longman@redhat.com>
- <20221208220141.2625775-4-longman@redhat.com>
- <e8a09f5d-afce-608f-220b-6b32b3ae37b9@kernel.dk>
-From:   Waiman Long <longman@redhat.com>
-In-Reply-To: <e8a09f5d-afce-608f-220b-6b32b3ae37b9@kernel.dk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.7
+        Keith Busch <kbusch@kernel.org>,
+        Christoph Hellwig <hch@lst.de>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Lee Duncan <lduncan@suse.com>, Chris Leech <cleech@redhat.com>,
+        Mike Christie <michael.christie@oracle.com>,
+        "James E.J. Bottomley" <jejb@linux.ibm.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Valentina Manea <valentina.manea.m@gmail.com>,
+        Shuah Khan <shuah@kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        David Howells <dhowells@redhat.com>,
+        Marc Dionne <marc.dionne@auristor.com>,
+        Steve French <sfrench@samba.org>,
+        Christine Caulfield <ccaulfie@redhat.com>,
+        David Teigland <teigland@redhat.com>,
+        Mark Fasheh <mark@fasheh.com>,
+        Joel Becker <jlbec@evilplan.org>,
+        Joseph Qi <joseph.qi@linux.alibaba.com>,
+        Eric Van Hensbergen <ericvh@gmail.com>,
+        Latchesar Ionkov <lucho@ionkov.net>,
+        Dominique Martinet <asmadeus@codewreck.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Ilya Dryomov <idryomov@gmail.com>,
+        Xiubo Li <xiubli@redhat.com>,
+        Trond Myklebust <trond.myklebust@hammerspace.com>,
+        Anna Schumaker <anna@kernel.org>,
+        Chuck Lever <chuck.lever@oracle.com>,
+        Jeff Layton <jlayton@kernel.org>, drbd-dev@lists.linbit.com,
+        linux-block@vger.kernel.org, nbd@other.debian.org,
+        linux-nvme@lists.infradead.org, open-iscsi@googlegroups.com,
+        linux-scsi@vger.kernel.org, linux-usb@vger.kernel.org,
+        linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
+        samba-technical@lists.samba.org, cluster-devel@redhat.com,
+        ocfs2-devel@oss.oracle.com, v9fs-developer@lists.sourceforge.net,
+        ceph-devel@vger.kernel.org, linux-nfs@vger.kernel.org
+Subject: Re: [PATCH v1 2/3] Treewide: Stop corrupting socket's task_frag
+Message-ID: <20221209081101.7500478c@kernel.org>
+In-Reply-To: <d220402a232e204676d9100d6fe4c2ae08f753ee.camel@redhat.com>
+References: <cover.1669036433.git.bcodding@redhat.com>
+        <c2ec184226acd21a191ccc1aa46a1d7e43ca7104.1669036433.git.bcodding@redhat.com>
+        <d220402a232e204676d9100d6fe4c2ae08f753ee.camel@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 12/8/22 18:00, Jens Axboe wrote:
-> On 12/8/22 3:01?PM, Waiman Long wrote:
->> diff --git a/kernel/cgroup/rstat.c b/kernel/cgroup/rstat.c
->> index 793ecff29038..910e633869b0 100644
->> --- a/kernel/cgroup/rstat.c
->> +++ b/kernel/cgroup/rstat.c
->> @@ -281,6 +281,26 @@ void cgroup_rstat_flush_release(void)
->>   	spin_unlock_irq(&cgroup_rstat_lock);
->>   }
->>   
->> +/**
->> + * cgroup_rstat_css_cpu_flush - flush stats for the given css and cpu
->> + * @css: target css to be flush
->> + * @cpu: the cpu that holds the stats to be flush
->> + *
->> + * A lightweight rstat flush operation for a given css and cpu.
->> + * Only the cpu_lock is being held for mutual exclusion, the cgroup_rstat_lock
->> + * isn't used.
->> + */
->> +void cgroup_rstat_css_cpu_flush(struct cgroup_subsys_state *css, int cpu)
->> +{
->> +	raw_spinlock_t *cpu_lock = per_cpu_ptr(&cgroup_rstat_cpu_lock, cpu);
->> +
->> +	raw_spin_lock_irq(cpu_lock);
->> +	rcu_read_lock();
->> +	css->ss->css_rstat_flush(css, cpu);
->> +	rcu_read_unlock();
->> +	raw_spin_unlock_irq(cpu_lock);
->> +}
->> +
->>   int cgroup_rstat_init(struct cgroup *cgrp)
->>   {
->>   	int cpu;
-> As I mentioned last time, raw_spin_lock_irq() will be equivalent to an
-> RCU protected section anyway, so you don't need to do both. Just add a
-> comment on why rcu_read_lock()/rcu_read_unlock() isn't needed inside the
-> raw irq safe lock.
+On Fri, 09 Dec 2022 13:37:08 +0100 Paolo Abeni wrote:
+> I think this is the most feasible way out of the existing issue, and I
+> think this patchset should go via the networking tree, targeting the
+> Linux 6.2.
 
-Yes, you are right.  We don't need rcu_read_lock() here. I put it there 
-to follow the locking pattern in cgroup_rstat_flush_locked(). I will 
-remove it in the next version.
-
-Cheers,
-Longman
-
+FWIW some fields had been moved so this will not longer apply cleanly,
+see b534dc46c8ae016. But I think we can apply it to net since the merge
+window is upon us? Just a heads up.
