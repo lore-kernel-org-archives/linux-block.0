@@ -2,192 +2,120 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 27808C4332F
-	for <linux-block@archiver.kernel.org>; Fri,  9 Dec 2022 09:40:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C8654C4332F
+	for <linux-block@archiver.kernel.org>; Fri,  9 Dec 2022 09:44:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229719AbiLIJkn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 9 Dec 2022 04:40:43 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52830 "EHLO
+        id S229479AbiLIJow (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 9 Dec 2022 04:44:52 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54330 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229555AbiLIJkm (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 9 Dec 2022 04:40:42 -0500
-Received: from mail-ej1-x62c.google.com (mail-ej1-x62c.google.com [IPv6:2a00:1450:4864:20::62c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA3CE54762
-        for <linux-block@vger.kernel.org>; Fri,  9 Dec 2022 01:40:39 -0800 (PST)
-Received: by mail-ej1-x62c.google.com with SMTP id t17so10241103eju.1
-        for <linux-block@vger.kernel.org>; Fri, 09 Dec 2022 01:40:39 -0800 (PST)
+        with ESMTP id S229696AbiLIJou (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 9 Dec 2022 04:44:50 -0500
+Received: from mail-ed1-x52b.google.com (mail-ed1-x52b.google.com [IPv6:2a00:1450:4864:20::52b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 930045F6CE
+        for <linux-block@vger.kernel.org>; Fri,  9 Dec 2022 01:44:49 -0800 (PST)
+Received: by mail-ed1-x52b.google.com with SMTP id c17so2329871edj.13
+        for <linux-block@vger.kernel.org>; Fri, 09 Dec 2022 01:44:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
-        h=to:references:message-id:content-transfer-encoding:cc:date
-         :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jKKLCBzLV8/46B+QgkzgYyULA0ZCO/PFX9LWayGP/FA=;
-        b=c+lvXxGrRJc2H+S2Lis4tyDqevkpQZr6osuTT7i245BKBT0JQjdgy+Byy2obnWWZpM
-         ricTRLwZV71ZTgwA0ZXZ1pZnHRrtgA+uruncx4YyMYOKHEX8Fg3HGsXczNUKvanbP37G
-         Grb3acFtI/+A8M6SzlNqASbrIXQ/QuyxS9rc9KeWPODETABVJP+VFG1NdBkbhnV650v2
-         MVI5Q81oHaUDi8hqcyuh+2gNjys9A1u219rzbGEkmHgDg9gzbaSp4v4U5Z5yaspTWM4E
-         UeFZ8Z3r7V9ytr6vhnxqdJRfaXEyLKqnGbH2kBCWZBx+oMbxUUY5ZpiOnpX711Xq7BBf
-         Cxpw==
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=pfI4vsEkYZcvS0kTttCan8tA6wqo2c0ZacXpsvLTWzM=;
+        b=XcarWuHZMTRs5AOZBw/0jYp1FkwxKFBjVogjXX1mlauUBECcasU88p8X5sQGIwxqnB
+         NJ2tT7sWa7WhDscBCcic1qSZsWBonbjM22q93xqiQuRaBA+bLGzZSSVmjouaTE0f6Bjm
+         mu+TLpuhfiy5LTc1VK3X281sLZKHBL/inEkfdu4WXAxeqHnprdhpNCll+dV8d8JE1vT2
+         IpFtcMrSprl1wbrYqB8akJ4nOvdJLuHiOu6W2VTlJABn+Kw+mlp54+Uu2mKM9lcugVd+
+         kBcyf78LWC0etYtY+BrVx4d1hYlpaaNtpsiOIBCy3BTvehcQu1kMB9rb2j56wHXaGBdM
+         kT9g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=to:references:message-id:content-transfer-encoding:cc:date
-         :in-reply-to:from:subject:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=jKKLCBzLV8/46B+QgkzgYyULA0ZCO/PFX9LWayGP/FA=;
-        b=ZByx0pB6lLbYGbvIusMgd3wZ5Dn2uVERioGs7R0GksepqzJQL5GJiHoJX7l3Yp2ioB
-         DIDZ6yQEjGvDYz83jds+UErCHp07sfTXttqiK5GzSuuxa8GjES+DQ4g+kEiIzKvXZ1eD
-         RIzMpuefh1lAvQaaeCTO5fpUHAbz6z1f5HxCjM4VwW8RvHzYsbQe+N9BIl/EAsmUIJtj
-         lwXr17id9V5Xs/cRoU5lV/QP+f2dAdtUKbtmRdHnzsrov3+G6tyh+iBjb6cpeL6VwStd
-         JTfKhBkn2UDVkqp48mjvWwVFa0nEARSZnh/1baqkV9ft4cRsQqWY7yFvizjcxGf7QAmc
-         0eEQ==
-X-Gm-Message-State: ANoB5pnuflvpzTlaQx06VJmoSCaUinejIdEZ1hNWgictH9pd52HXa9jE
-        qQB/P//X301LZ4SS7IGxRvxpww==
-X-Google-Smtp-Source: AA0mqf6EI9XikAHq5TezGX9KT5vIUxGEjx/Gk21eI7m7wrsKkUCQnOpiXSVZaDM27TMo0cJLNd9GaA==
-X-Received: by 2002:a17:906:79d8:b0:7bd:6372:fdb4 with SMTP id m24-20020a17090679d800b007bd6372fdb4mr6764320ejo.41.1670578838442;
-        Fri, 09 Dec 2022 01:40:38 -0800 (PST)
-Received: from mbp-di-paolo.station (net-2-35-55-161.cust.vodafonedsl.it. [2.35.55.161])
-        by smtp.gmail.com with ESMTPSA id a15-20020a056402168f00b004642b35f89esm192957edv.9.2022.12.09.01.40.37
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=pfI4vsEkYZcvS0kTttCan8tA6wqo2c0ZacXpsvLTWzM=;
+        b=EDkFUtHl5zwujrvtVXaUynBVAGRfYOcgavPIJr2BOrXIrK2CE7kaHUdEV0eumVHucS
+         TkQxdWX5eeQ9OEjaYOfwtd8KBI546jv5ykorC7YmzDhXn6b3/uP7WvspKcezppkyBehF
+         QSpllxYVO5WUBoH3ywpa7LSNbxpQ+BeXUvpFVBdNx80tGk3M5Yy0IGypQHgSRNxbQ8RC
+         xnJAMVJCjlZtYrMg/f7bVa9vh0aMXqXvFK/1q82tuFkIINm7jMoQNVM74olvEC/34fas
+         EuV+3r910voDZ7RPJxlWmkIrIKEkGDIcyC8wah6r6ZMgD3y7Nu8FKRrjQJReZsXwKbu+
+         7eew==
+X-Gm-Message-State: ANoB5plOdxVw/la2P6mM5yOZFrqRu1hI2ivD4Uy3UI6Ep1nM6+BfxC+L
+        BQBFbVe2skZmGevKOdm3drwnBDzOA6YZ5Spw
+X-Google-Smtp-Source: AA0mqf5DeqTiaS39hxMFl9rgsXY8FGFEZcgB5nhdAI56X3M3J0nb7ppN74OCnWJ9D0IIxXMeriYBzw==
+X-Received: by 2002:aa7:c94e:0:b0:467:5491:1e21 with SMTP id h14-20020aa7c94e000000b0046754911e21mr4237385edt.12.1670579088125;
+        Fri, 09 Dec 2022 01:44:48 -0800 (PST)
+Received: from MBP-di-Paolo.station (net-2-35-55-161.cust.vodafonedsl.it. [2.35.55.161])
+        by smtp.gmail.com with ESMTPSA id oz18-20020a170906cd1200b007c11f2a3b3dsm353421ejb.107.2022.12.09.01.44.47
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 09 Dec 2022 01:40:37 -0800 (PST)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
-Subject: Re: [PATCH V9 7/8] block, bfq: inject I/O to underutilized actuators
+        Fri, 09 Dec 2022 01:44:47 -0800 (PST)
 From:   Paolo Valente <paolo.valente@linaro.org>
-In-Reply-To: <2678a347-188a-1f2a-27ec-67e7caa38175@opensource.wdc.com>
-Date:   Fri, 9 Dec 2022 10:40:36 +0100
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        linux-block <linux-block@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        Arie van der Hoeven <arie.vanderhoeven@seagate.com>,
-        Rory Chen <rory.c.chen@seagate.com>,
-        Glen Valante <glen.valante@linaro.org>,
-        Davide Zini <davidezini2@gmail.com>
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <DC3919CC-437C-46E9-A399-C4C2B5C16792@linaro.org>
-References: <20221208104351.35038-1-paolo.valente@linaro.org>
- <20221208104351.35038-8-paolo.valente@linaro.org>
- <2678a347-188a-1f2a-27ec-67e7caa38175@opensource.wdc.com>
-To:     Damien Le Moal <damien.lemoal@opensource.wdc.com>
-X-Mailer: Apple Mail (2.3445.104.11)
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        arie.vanderhoeven@seagate.com, rory.c.chen@seagate.com,
+        glen.valante@linaro.org, Paolo Valente <paolo.valente@linaro.org>
+Subject: [PATCH V10 0/8] block, bfq: extend bfq to support multi-actuator drives
+Date:   Fri,  9 Dec 2022 10:44:34 +0100
+Message-Id: <20221209094442.36896-1-paolo.valente@linaro.org>
+X-Mailer: git-send-email 2.20.1
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Hi,
+here is the V10, it differs from V9 in that it applies the
+recommendation by Damien in [2].
 
+Here is the whole description of this patch series again.  This
+extension addresses the following issue. Single-LUN multi-actuator
+SCSI drives, as well as all multi-actuator SATA drives appear as a
+single device to the I/O subsystem [1].  Yet they address commands to
+different actuators internally, as a function of Logical Block
+Addressing (LBAs). A given sector is reachable by only one of the
+actuators. For example, Seagate’s Serial Advanced Technology
+Attachment (SATA) version contains two actuators and maps the lower
+half of the SATA LBA space to the lower actuator and the upper half to
+the upper actuator.
 
-> Il giorno 9 dic 2022, alle ore 02:46, Damien Le Moal =
-<damien.lemoal@opensource.wdc.com> ha scritto:
->=20
-> On 12/8/22 19:43, Paolo Valente wrote:
->> From: Davide Zini <davidezini2@gmail.com>
->>=20
->> The main service scheme of BFQ for sync I/O is serving one sync
->> bfq_queue at a time, for a while. In particular, BFQ enforces this
->> scheme when it deems the latter necessary to boost throughput or
->> to preserve service guarantees. Unfortunately, when BFQ enforces
->> this policy, only one actuator at a time gets served for a while,
->> because each bfq_queue contains I/O only for one actuator. The
->> other actuators may remain underutilized.
->>=20
->> Actually, BFQ may serve (inject) extra I/O, taken from other
->> bfq_queues, in parallel with that of the in-service queue. This
->> injection mechanism may provide the ground for dealing also with
->> the above actuator-underutilization problem. Yet BFQ does not take
->> the actuator load into account when choosing which queue to pick
->> extra I/O from. In addition, BFQ may happen to inject extra I/O
->> only when the in-service queue is temporarily empty.
->>=20
->> In view of these facts, this commit extends the
->> injection mechanism in such a way that the latter:
->> (1) takes into account also the actuator load;
->> (2) checks such a load on each dispatch, and injects I/O for an
->>    underutilized actuator, if there is one and there is I/O for it.
->>=20
->> To perform the check in (2), this commit introduces a load
->> threshold, currently set to 4.  A linear scan of each actuator is
->> performed, until an actuator is found for which the following two
->> conditions hold: the load of the actuator is below the threshold,
->> and there is at least one non-in-service queue that contains I/O
->> for that actuator. If such a pair (actuator, queue) is found, then
->> the head request of that queue is returned for dispatch, instead
->> of the head request of the in-service queue.
->>=20
->> We have set the threshold, empirically, to the minimum possible
->> value for which an actuator is fully utilized, or close to be
->> fully utilized. By doing so, injected I/O 'steals' as few
->> drive-queue slots as possibile to the in-service queue. This
->> reduces as much as possible the probability that the service of
->> I/O from the in-service bfq_queue gets delayed because of slot
->> exhaustion, i.e., because all the slots of the drive queue are
->> filled with I/O injected from other queues (NCQ provides for 32
->> slots).
->>=20
->> This new mechanism also counters actuator underutilization in the
->> case of asymmetric configurations of bfq_queues. Namely if there
->> are few bfq_queues containing I/O for some actuators and many
->> bfq_queues containing I/O for other actuators. Or if the
->> bfq_queues containing I/O for some actuators have lower weights
->> than the other bfq_queues.
->>=20
->> Reviewed-by: Damien Le Moal <damien.lemoal@opensource.wdc.com>
->> Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
->> Signed-off-by: Davide Zini <davidezini2@gmail.com>
->=20
-> [...]
->=20
->> @@ -4792,22 +4799,69 @@ bfq_choose_bfqq_for_injection(struct bfq_data =
-*bfqd)
->> 			else
->> 				limit =3D in_serv_bfqq->inject_limit;
->>=20
->> -			if (bfqd->rq_in_driver < limit) {
->> +			if (bfqd->tot_rq_in_driver < limit) {
->> 				bfqd->rqs_injected =3D true;
->> 				return bfqq;
->> 			}
->> 		}
->> +	}
->> +
->> +	return NULL;
->> +}
->> +
->> +static struct bfq_queue *
->> +bfq_find_active_bfqq_for_actuator(struct bfq_data *bfqd, int idx)
->> +{
->> +	struct bfq_queue *bfqq =3D NULL;
->=20
-> I do not think that you need the NULL initialization here.
->=20
->> +
->> +	if (bfqd->in_service_queue &&
->> +	    bfqd->in_service_queue->actuator_idx =3D=3D idx)
->> +		return bfqd->in_service_queue;
->> +
->> +	list_for_each_entry(bfqq, &bfqd->active_list[idx], bfqq_list) {
->> +		if (!RB_EMPTY_ROOT(&bfqq->sort_list) &&
->> +			bfq_serv_to_charge(bfqq->next_rq, bfqq) <=3D
->> +				bfq_bfqq_budget_left(bfqq)) {
->> +			return bfqq;
->> +		}
->> +	}
->>=20
->> 	return NULL;
->> }
->=20
-> Otherwise looks OK.
->=20
-> Reviewed-by: Damien Le Moal <damien.lemoal@opensource.wdc.com>
+Evidently, to fully utilize actuators, no actuator must be left idle
+or underutilized while there is pending I/O for it. To reach this
+goal, the block layer must somehow control the load of each actuator
+individually. This series enriches BFQ with such a per-actuator
+control, as a first step. Then it also adds a simple mechanism for
+guaranteeing that actuators with pending I/O are never left idle.
 
-Hi Damien,
-I've applied your recommendations in this and the other replies of
-yours.  I'm about to send a V10.
+See [1] for a more detailed overview of the problem and of the
+solutions implemented in this patch series. There you will also find
+some preliminary performance results.
 
-Thank you very much for checking this code and helping me improve it,
+Thanks,
 Paolo
 
->=20
-> --=20
-> Damien Le Moal
-> Western Digital Research
+[1] https://www.linaro.org/blog/budget-fair-queueing-bfq-linux-io-scheduler-optimizations-for-multi-actuator-sata-hard-drives/
+[2] https://lore.kernel.org/lkml/20221208104351.35038-1-paolo.valente@linaro.org/T/#t
 
+Davide Zini (3):
+  block, bfq: split also async bfq_queues on a per-actuator basis
+  block, bfq: inject I/O to underutilized actuators
+  block, bfq: balance I/O injection among underutilized actuators
+
+Federico Gavioli (1):
+  block, bfq: retrieve independent access ranges from request queue
+
+Paolo Valente (4):
+  block, bfq: split sync bfq_queues on a per-actuator basis
+  block, bfq: forbid stable merging of queues associated with different
+    actuators
+  block, bfq: move io_cq-persistent bfqq data into a dedicated struct
+  block, bfq: turn bfqq_data into an array in bfq_io_cq
+
+ block/bfq-cgroup.c  |  94 +++----
+ block/bfq-iosched.c | 584 ++++++++++++++++++++++++++++++--------------
+ block/bfq-iosched.h | 142 ++++++++---
+ block/bfq-wf2q.c    |   2 +-
+ 4 files changed, 566 insertions(+), 256 deletions(-)
+
+--
+2.20.1
