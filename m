@@ -2,845 +2,102 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A88B2C4332F
-	for <linux-block@archiver.kernel.org>; Fri,  9 Dec 2022 14:49:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5972DC4332F
+	for <linux-block@archiver.kernel.org>; Fri,  9 Dec 2022 14:53:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229938AbiLIOtP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 9 Dec 2022 09:49:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38172 "EHLO
+        id S229814AbiLIOxf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 9 Dec 2022 09:53:35 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42478 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229907AbiLIOtM (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 9 Dec 2022 09:49:12 -0500
-Received: from mx4.veeam.com (mx4.veeam.com [104.41.138.86])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8ED2932071;
-        Fri,  9 Dec 2022 06:49:08 -0800 (PST)
-Received: from mail.veeam.com (prgmbx01.amust.local [172.24.128.102])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mx4.veeam.com (Postfix) with ESMTPS id 9AD0A5EC25;
-        Fri,  9 Dec 2022 17:24:09 +0300 (MSK)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=veeam.com;
-        s=mx4-2022; t=1670595849;
-        bh=4QqyIKHb6ezcfj3pNBet/NTZXOEI7oE0uVL+ArjuT4I=;
-        h=From:To:CC:Subject:Date:In-Reply-To:References:From;
-        b=AoV8C5hsM9UhBl/GS0Q3IGNl5769cGe5NbiQKI2eCVN5JTRirdP9manBFDnr400Vp
-         FuzN7Z+7GcrWEhXOkNEJ2OJUnTm26wwTvJT+J7lDlJqDDcHHduyB/JaxnkT/0q/BwF
-         UjYX0XjdQn+8fN78Apno6lidoQFxw6FMBdXpdOQ0QOkO7n/qSyJ05bE5m+YSrAMmjd
-         BKCNCVPUy1ubLrrnPC39X77YzOwJ3eBadj/j+i4ENFN4yB4yeqLwQ96SxPv9atVtjU
-         h3hJXqREOPuSzLCPM7XmEcZ8Bbo6v6S/4Vtmuqdcg6T8+f60BhL1+wcS+o6f6emN9c
-         oWk9UgdEIZTjA==
-Received: from ssh-deb10-ssd-vb.amust.local (172.24.10.107) by
- prgmbx01.amust.local (172.24.128.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.20; Fri, 9 Dec 2022 15:24:06 +0100
-From:   Sergei Shtepa <sergei.shtepa@veeam.com>
-To:     <axboe@kernel.dk>, <corbet@lwn.net>
-CC:     <linux-block@vger.kernel.org>, <linux-doc@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>,
-        Sergei Shtepa <sergei.shtepa@veeam.com>
-Subject: [PATCH v2 09/21] block, blksnap: attaching and detaching the filter and handling I/O units
-Date:   Fri, 9 Dec 2022 15:23:19 +0100
-Message-ID: <20221209142331.26395-10-sergei.shtepa@veeam.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20221209142331.26395-1-sergei.shtepa@veeam.com>
-References: <20221209142331.26395-1-sergei.shtepa@veeam.com>
+        with ESMTP id S229680AbiLIOxe (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 9 Dec 2022 09:53:34 -0500
+Received: from mail-ed1-x52c.google.com (mail-ed1-x52c.google.com [IPv6:2a00:1450:4864:20::52c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8AF8E5C0FB
+        for <linux-block@vger.kernel.org>; Fri,  9 Dec 2022 06:53:33 -0800 (PST)
+Received: by mail-ed1-x52c.google.com with SMTP id l11so3404571edb.4
+        for <linux-block@vger.kernel.org>; Fri, 09 Dec 2022 06:53:33 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linbit-com.20210112.gappssmtp.com; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=CtCs8GxpjiNUlKe9jLRTDXiumifJAjD1jl0L4CeLiMA=;
+        b=MHoLj/reYCEaCu2BZl791sUFMu9EsJFTpuGoSGhqpzPg1G2i0+rLOnXbsB74P9BAN9
+         nIpY0Gnji9Fvtm+3k4SGTzoM0pjpKrp58glH6ITl3OGiRQ4wKlxsE9B9MO3Ta6kSCCT2
+         FRjDRDKxtEPLDb/k49mnKJLE4k/GiOCWaPQdx5p1AmTeufBD40E2oASTNMZES01XTvDU
+         ob7QGOqAnUyVU485JtXEMbvjpSShmh7tyXcQ/pABd4lut+BrUnbtpdiECjQQjcELOV9s
+         ZKCVJhpPA+iSjzC1lop/aOkPvTKR9c3ijh4XvJeNOj9EW0nnSFcsgUUAmmnPFcmuOJa5
+         hZUg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=CtCs8GxpjiNUlKe9jLRTDXiumifJAjD1jl0L4CeLiMA=;
+        b=YoGONoEIpkF+vJmBFKHefXtAgS3MK7jc9VGx7WhHDA9LCkmbe76UtYCDBXl4asSb+p
+         5J3ync1HynEOIXn44ZVX304BYXGpGF3P99VjQyFiwRZaugk0VseJONgaM7PGS+/ab49x
+         9bB9J/JUQ08bIVIQH+bUrvRi0Ov3FvWXEN488lT/A8QEYUXOteLSvwpH3ZdvxGrEbeky
+         v+93l0ZP0SB+qOKhWlCJRrOd+AxPNnzB5wcCjZlmo5S5B6kofqibn0HGl5T+5OvQ79DC
+         0R3BFFb1m9MqSN3aAd8qIib3OHsvqhHZDjmiVWiFXLdRQR3J/hTHJI1GVT1cgZ2SyTzE
+         ElDg==
+X-Gm-Message-State: ANoB5pmamF0VKPScZJiQpNSr2XJcciFC4sHIT+/LVtZKCRQSdbsBkYEA
+        BH98W2wBPAEw64hOOJHorxV1XQ==
+X-Google-Smtp-Source: AA0mqf48psVfOczEhg6GzyTLj3NBiKg2BMDsqH01qlhK1pulUi4SHigJ39yDwhJazBez6TTHcD8srg==
+X-Received: by 2002:aa7:cac2:0:b0:461:608f:f3e0 with SMTP id l2-20020aa7cac2000000b00461608ff3e0mr5102001edt.28.1670597612099;
+        Fri, 09 Dec 2022 06:53:32 -0800 (PST)
+Received: from localhost.localdomain (h082218028181.host.wavenet.at. [82.218.28.181])
+        by smtp.gmail.com with ESMTPSA id bd21-20020a056402207500b0046bb7503d9asm728424edb.24.2022.12.09.06.53.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 09 Dec 2022 06:53:31 -0800 (PST)
+From:   =?UTF-8?q?Christoph=20B=C3=B6hmwalder?= 
+        <christoph.boehmwalder@linbit.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     drbd-dev@lists.linbit.com, linux-kernel@vger.kernel.org,
+        Lars Ellenberg <lars.ellenberg@linbit.com>,
+        Philipp Reisner <philipp.reisner@linbit.com>,
+        linux-block@vger.kernel.org,
+        =?UTF-8?q?Christoph=20B=C3=B6hmwalder?= 
+        <christoph.boehmwalder@linbit.com>
+Subject: [PATCH 0/8] Miscellaneous DRBD reorganization
+Date:   Fri,  9 Dec 2022 15:53:19 +0100
+Message-Id: <20221209145327.2272271-1-christoph.boehmwalder@linbit.com>
+X-Mailer: git-send-email 2.38.1
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [172.24.10.107]
-X-ClientProxiedBy: prgmbx02.amust.local (172.24.128.103) To
- prgmbx01.amust.local (172.24.128.102)
-X-EsetResult: clean, is OK
-X-EsetId: 37303A2924031556627C62
-X-Veeam-MMEX: True
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The struct tracker contains callback functions for handling a I/O units
-of a block device. When a write request is handled, the change block
-tracking (CBT) map functions are called and initiates the process of
-copying data from the original block device to the change store.
-Attaching and detaching the tracker is provided by the functions
-bdev_filter_*() of the kernel.
+Some more mostly trivial "alignment patches" to (slowly but surely)
+move further in the direction of re-upstreaming DRBD.
 
-Signed-off-by: Sergei Shtepa <sergei.shtepa@veeam.com>
----
- drivers/block/blksnap/tracker.c | 683 ++++++++++++++++++++++++++++++++
- drivers/block/blksnap/tracker.h |  74 ++++
- 2 files changed, 757 insertions(+)
- create mode 100644 drivers/block/blksnap/tracker.c
- create mode 100644 drivers/block/blksnap/tracker.h
+These should be fairly uncontroversial.
 
-diff --git a/drivers/block/blksnap/tracker.c b/drivers/block/blksnap/tracker.c
-new file mode 100644
-index 000000000000..03e828d4a22f
---- /dev/null
-+++ b/drivers/block/blksnap/tracker.c
-@@ -0,0 +1,683 @@
-+// SPDX-License-Identifier: GPL-2.0
-+#define pr_fmt(fmt) KBUILD_MODNAME "-tracker: " fmt
-+
-+#include <linux/slab.h>
-+#include <linux/blk-mq.h>
-+#include <linux/sched/mm.h>
-+#include <uapi/linux/blksnap.h>
-+#include "params.h"
-+#include "tracker.h"
-+#include "cbt_map.h"
-+#include "diff_area.h"
-+
-+struct tracked_device {
-+	struct list_head link;
-+	dev_t dev_id;
-+};
-+
-+DEFINE_PERCPU_RWSEM(tracker_submit_lock);
-+LIST_HEAD(tracked_device_list);
-+DEFINE_SPINLOCK(tracked_device_lock);
-+static refcount_t trackers_counter = REFCOUNT_INIT(1);
-+
-+struct tracker_release_worker {
-+	struct work_struct work;
-+	struct list_head list;
-+	spinlock_t lock;
-+};
-+static struct tracker_release_worker tracker_release_worker;
-+
-+void tracker_lock(void)
-+{
-+	pr_debug("Lock trackers\n");
-+	percpu_down_write(&tracker_submit_lock);
-+};
-+void tracker_unlock(void)
-+{
-+	percpu_up_write(&tracker_submit_lock);
-+	pr_debug("Trackers have been unlocked\n");
-+};
-+
-+static void tracker_free(struct tracker *tracker)
-+{
-+	might_sleep();
-+
-+	pr_debug("Free tracker for device [%u:%u].\n", MAJOR(tracker->dev_id),
-+		 MINOR(tracker->dev_id));
-+
-+	diff_area_put(tracker->diff_area);
-+	cbt_map_put(tracker->cbt_map);
-+
-+	kfree(tracker);
-+
-+	refcount_dec(&trackers_counter);
-+}
-+
-+static inline struct tracker *tracker_get_by_dev(struct block_device *bdev)
-+{
-+	struct bdev_filter *flt = bdev->bd_filter;
-+
-+	if (!flt)
-+		return NULL;
-+
-+	bdev_filter_get(flt);
-+
-+	return container_of(flt, struct tracker, flt);
-+}
-+
-+static bool tracker_submit_bio_cb(struct bio *bio)
-+{
-+	struct bdev_filter *flt = bio->bi_bdev->bd_filter;
-+	struct bio_list bio_list_on_stack[2] = { };
-+	struct bio *new_bio;
-+	bool ret = true;
-+	struct tracker *tracker = container_of(flt, struct tracker, flt);
-+	int err;
-+	sector_t sector;
-+	sector_t count;
-+	unsigned int current_flag;
-+
-+	WARN_ON_ONCE(!flt);
-+	if (unlikely(!flt))
-+		return true;
-+
-+	if (bio->bi_opf & REQ_NOWAIT) {
-+		if (!percpu_down_read_trylock(&tracker_submit_lock)) {
-+			bio_wouldblock_error(bio);
-+			return false;
-+		}
-+	} else
-+		percpu_down_read(&tracker_submit_lock);
-+
-+	if (!op_is_write(bio_op(bio)))
-+		goto out;
-+
-+	count = bio_sectors(bio);
-+	if (!count)
-+		goto out;
-+
-+	sector = bio->bi_iter.bi_sector;
-+	if (bio_flagged(bio, BIO_REMAPPED))
-+		sector -= bio->bi_bdev->bd_start_sect;
-+
-+	current_flag = memalloc_noio_save();
-+	err = cbt_map_set(tracker->cbt_map, sector, count);
-+	memalloc_noio_restore(current_flag);
-+	if (unlikely(err))
-+		goto out;
-+
-+	if (!atomic_read(&tracker->snapshot_is_taken))
-+		goto out;
-+
-+	if (diff_area_is_corrupted(tracker->diff_area))
-+		goto out;
-+
-+	current_flag = memalloc_noio_save();
-+	bio_list_init(&bio_list_on_stack[0]);
-+	current->bio_list = bio_list_on_stack;
-+	barrier();
-+
-+	err = diff_area_copy(tracker->diff_area, sector, count,
-+			     !!(bio->bi_opf & REQ_NOWAIT));
-+
-+	current->bio_list = NULL;
-+	barrier();
-+	memalloc_noio_restore(current_flag);
-+
-+	if (unlikely(err))
-+		goto fail;
-+
-+	while ((new_bio = bio_list_pop(&bio_list_on_stack[0]))) {
-+		/*
-+		 * The result from submitting a bio from the
-+		 * filter itself does not need to be processed,
-+		 * even if this function has a return code.
-+		 */
-+
-+		bio_set_flag(new_bio, BIO_FILTERED);
-+		submit_bio_noacct(new_bio);
-+	}
-+	/*
-+	 * If a new bio was created during the handling, then new bios must
-+	 * be sent and returned to complete the processing of the original bio.
-+	 * Unfortunately, this has to be done for any bio, regardless of their
-+	 * flags and options.
-+	 * Otherwise, write I/O units may overtake read I/O units.
-+	 */
-+	err = diff_area_wait(tracker->diff_area, sector, count,
-+			     !!(bio->bi_opf & REQ_NOWAIT));
-+	if (likely(err == 0))
-+		goto out;
-+fail:
-+	if (err == -EAGAIN) {
-+		bio_wouldblock_error(bio);
-+		ret = false;
-+	} else
-+		pr_err("Failed to copy data to diff storage with error %d\n", abs(err));
-+out:
-+	percpu_up_read(&tracker_submit_lock);
-+	return ret;
-+}
-+
-+
-+static void tracker_release_work(struct work_struct *work)
-+{
-+	struct tracker *tracker = NULL;
-+	struct tracker_release_worker *tracker_release =
-+		container_of(work, struct tracker_release_worker, work);
-+
-+	do {
-+		spin_lock(&tracker_release->lock);
-+		tracker = list_first_entry_or_null(&tracker_release->list,
-+						   struct tracker, link);
-+		if (tracker)
-+			list_del(&tracker->link);
-+		spin_unlock(&tracker_release->lock);
-+
-+		if (tracker)
-+			tracker_free(tracker);
-+	} while (tracker);
-+}
-+
-+static void tracker_release_cb(struct kref *kref)
-+{
-+	struct bdev_filter *flt = container_of(kref, struct bdev_filter, kref);
-+	struct tracker *tracker = container_of(flt, struct tracker, flt);
-+
-+	spin_lock(&tracker_release_worker.lock);
-+	list_add_tail(&tracker->link, &tracker_release_worker.list);
-+	spin_unlock(&tracker_release_worker.lock);
-+
-+	queue_work(system_wq, &tracker_release_worker.work);
-+}
-+
-+static const struct bdev_filter_operations tracker_fops = {
-+	.submit_bio_cb = tracker_submit_bio_cb,
-+	.release_cb = tracker_release_cb
-+};
-+
-+static int tracker_filter_attach(struct block_device *bdev,
-+				 struct tracker *tracker)
-+{
-+	int ret;
-+	bool is_frozen = false;
-+
-+	pr_debug("Tracker attach filter\n");
-+
-+	if (freeze_bdev(bdev))
-+		pr_err("Failed to freeze device [%u:%u]\n", MAJOR(bdev->bd_dev),
-+		       MINOR(bdev->bd_dev));
-+	else {
-+		is_frozen = true;
-+		pr_debug("Device [%u:%u] was frozen\n", MAJOR(bdev->bd_dev),
-+			 MINOR(bdev->bd_dev));
-+	}
-+
-+	ret = bdev_filter_attach(bdev, &tracker->flt);
-+
-+	if (is_frozen) {
-+		if (thaw_bdev(bdev))
-+			pr_err("Failed to thaw device [%u:%u]\n",
-+			       MAJOR(tracker->dev_id), MINOR(tracker->dev_id));
-+		else
-+			pr_debug("Device [%u:%u] was unfrozen\n",
-+				 MAJOR(bdev->bd_dev), MINOR(bdev->bd_dev));
-+	}
-+
-+	if (ret)
-+		pr_err("Failed to attach tracker to device [%u:%u]\n",
-+		       MAJOR(tracker->dev_id), MINOR(tracker->dev_id));
-+
-+	return ret;
-+}
-+
-+static int tracker_filter_detach(struct block_device *bdev)
-+{
-+	int ret;
-+	bool is_frozen = false;
-+
-+	pr_debug("Tracker delete filter\n");
-+	if (freeze_bdev(bdev))
-+		pr_err("Failed to freeze device [%u:%u]\n", MAJOR(bdev->bd_dev),
-+		       MINOR(bdev->bd_dev));
-+	else {
-+		is_frozen = true;
-+		pr_debug("Device [%u:%u] was frozen\n", MAJOR(bdev->bd_dev),
-+			 MINOR(bdev->bd_dev));
-+	}
-+
-+
-+	ret = bdev_filter_detach(bdev);
-+
-+	if (is_frozen) {
-+		if (thaw_bdev(bdev))
-+			pr_err("Failed to thaw device [%u:%u]\n",
-+			       MAJOR(bdev->bd_dev), MINOR(bdev->bd_dev));
-+		else
-+			pr_debug("Device [%u:%u] was unfrozen\n",
-+				 MAJOR(bdev->bd_dev), MINOR(bdev->bd_dev));
-+	}
-+
-+	if (ret)
-+		pr_err("Failed to detach filter from device [%u:%u]\n",
-+		       MAJOR(bdev->bd_dev), MINOR(bdev->bd_dev));
-+	return ret;
-+}
-+
-+static struct tracker *tracker_new(struct block_device *bdev)
-+{
-+	int ret;
-+	struct tracker *tracker = NULL;
-+	struct cbt_map *cbt_map;
-+
-+	pr_debug("Creating tracker for device [%u:%u].\n", MAJOR(bdev->bd_dev),
-+		 MINOR(bdev->bd_dev));
-+
-+	tracker = kzalloc(sizeof(struct tracker), GFP_KERNEL);
-+	if (tracker == NULL)
-+		return ERR_PTR(-ENOMEM);
-+
-+	refcount_inc(&trackers_counter);
-+	bdev_filter_init(&tracker->flt, &tracker_fops);
-+	INIT_LIST_HEAD(&tracker->link);
-+	atomic_set(&tracker->snapshot_is_taken, false);
-+	tracker->dev_id = bdev->bd_dev;
-+
-+	pr_info("Create tracker for device [%u:%u]. Capacity 0x%llx sectors\n",
-+		MAJOR(tracker->dev_id), MINOR(tracker->dev_id),
-+		(unsigned long long)bdev_nr_sectors(bdev));
-+
-+	cbt_map = cbt_map_create(bdev);
-+	if (!cbt_map) {
-+		pr_err("Failed to create tracker for device [%u:%u]\n",
-+		       MAJOR(tracker->dev_id), MINOR(tracker->dev_id));
-+		ret = -ENOMEM;
-+		goto fail;
-+	}
-+	tracker->cbt_map = cbt_map;
-+
-+	ret = tracker_filter_attach(bdev, tracker);
-+	if (ret) {
-+		pr_err("Failed to attach tracker. errno=%d\n", abs(ret));
-+		goto fail;
-+	}
-+
-+	pr_debug("New tracker for device [%u:%u] was created.\n",
-+		 MAJOR(tracker->dev_id), MINOR(tracker->dev_id));
-+
-+	return tracker;
-+fail:
-+	tracker_put(tracker);
-+	return ERR_PTR(ret);
-+}
-+
-+int tracker_take_snapshot(struct tracker *tracker)
-+{
-+	int ret = 0;
-+	bool cbt_reset_needed = false;
-+	sector_t capacity;
-+
-+	if (tracker->cbt_map->is_corrupted) {
-+		cbt_reset_needed = true;
-+		pr_warn("Corrupted CBT table detected. CBT fault\n");
-+	}
-+
-+	capacity = bdev_nr_sectors(tracker->diff_area->orig_bdev);
-+	if (tracker->cbt_map->device_capacity != capacity) {
-+		cbt_reset_needed = true;
-+		pr_warn("Device resize detected. CBT fault\n");
-+	}
-+
-+	if (cbt_reset_needed) {
-+		ret = cbt_map_reset(tracker->cbt_map, capacity);
-+		if (ret) {
-+			pr_err("Failed to create tracker. errno=%d\n",
-+			       abs(ret));
-+			return ret;
-+		}
-+	}
-+
-+	cbt_map_switch(tracker->cbt_map);
-+	atomic_set(&tracker->snapshot_is_taken, true);
-+
-+	return 0;
-+}
-+
-+void tracker_release_snapshot(struct tracker *tracker)
-+{
-+	if (!tracker)
-+		return;
-+
-+	pr_debug("Tracker for device [%u:%u] release snapshot\n",
-+		 MAJOR(tracker->dev_id), MINOR(tracker->dev_id));
-+
-+	atomic_set(&tracker->snapshot_is_taken, false);
-+}
-+
-+int tracker_init(void)
-+{
-+	INIT_WORK(&tracker_release_worker.work, tracker_release_work);
-+	INIT_LIST_HEAD(&tracker_release_worker.list);
-+	spin_lock_init(&tracker_release_worker.lock);
-+
-+	return 0;
-+}
-+
-+/**
-+ * tracker_wait_for_release - Waiting for all trackers are released.
-+ *
-+ * Trackers are released in the worker thread. So, this function allows to wait
-+ * for the end of the process of releasing trackers.
-+ */
-+static void tracker_wait_for_release(void)
-+{
-+	long inx = 0;
-+	u64 start_waiting = jiffies_64;
-+
-+	while (refcount_read(&trackers_counter) > 1) {
-+		schedule_timeout_interruptible(HZ);
-+		if (jiffies_64 > (start_waiting + 10*HZ)) {
-+			start_waiting = jiffies_64;
-+			inx++;
-+
-+			if (inx <= 12)
-+				pr_warn("Waiting for trackers release\n");
-+
-+			WARN_ONCE(inx > 12, "Failed to release trackers\n");
-+		}
-+	}
-+}
-+
-+void tracker_done(void)
-+{
-+	struct tracked_device *tr_dev;
-+
-+	pr_debug("Cleanup trackers\n");
-+	while (true) {
-+		spin_lock(&tracked_device_lock);
-+		tr_dev = list_first_entry_or_null(&tracked_device_list,
-+						  struct tracked_device, link);
-+		if (tr_dev)
-+			list_del(&tr_dev->link);
-+		spin_unlock(&tracked_device_lock);
-+
-+		if (!tr_dev)
-+			break;
-+
-+		tracker_remove(tr_dev->dev_id);
-+		kfree(tr_dev);
-+	}
-+
-+	tracker_wait_for_release();
-+}
-+
-+struct tracker *tracker_create_or_get(dev_t dev_id)
-+{
-+	struct tracker *tracker;
-+	struct block_device *bdev;
-+	struct tracked_device *tr_dev;
-+
-+	bdev = blkdev_get_by_dev(dev_id, 0, NULL);
-+	if (IS_ERR(bdev)) {
-+		int err = PTR_ERR(bdev);
-+
-+		pr_info("Cannot open device [%u:%u]\n", MAJOR(dev_id),
-+		       MINOR(dev_id));
-+		return ERR_PTR(err);
-+	}
-+
-+	tracker = tracker_get_by_dev(bdev);
-+	if (IS_ERR(tracker)) {
-+		int err = PTR_ERR(tracker);
-+
-+		pr_err("Cannot get tracker for device [%u:%u]. errno=%d\n",
-+			 MAJOR(dev_id), MINOR(dev_id), abs(err));
-+		goto put_bdev;
-+	}
-+	if (tracker) {
-+		pr_debug("Device [%u:%u] is already under tracking\n",
-+			 MAJOR(dev_id), MINOR(dev_id));
-+		goto put_bdev;
-+	}
-+
-+	tr_dev = kzalloc(sizeof(struct tracked_device), GFP_KERNEL);
-+	if (!tr_dev) {
-+		tracker = ERR_PTR(-ENOMEM);
-+		goto put_bdev;
-+	}
-+
-+	INIT_LIST_HEAD(&tr_dev->link);
-+	tr_dev->dev_id = dev_id;
-+
-+	tracker = tracker_new(bdev);
-+	if (IS_ERR(tracker)) {
-+		int err = PTR_ERR(tracker);
-+
-+		pr_err("Failed to create tracker. errno=%d\n", abs(err));
-+		kfree(tr_dev);
-+	} else {
-+		/*
-+		 * It is normal that the new trackers filter will have
-+		 * a ref counter value of 2. This allows not to detach
-+		 * the filter when the snapshot is released.
-+		 */
-+		bdev_filter_get(&tracker->flt);
-+
-+		spin_lock(&tracked_device_lock);
-+		list_add_tail(&tr_dev->link, &tracked_device_list);
-+		spin_unlock(&tracked_device_lock);
-+	}
-+put_bdev:
-+	blkdev_put(bdev, 0);
-+	return tracker;
-+}
-+
-+int tracker_remove(dev_t dev_id)
-+{
-+	int ret;
-+	struct tracker *tracker;
-+	struct block_device *bdev;
-+
-+	pr_info("Removing device [%u:%u] from tracking\n", MAJOR(dev_id),
-+		MINOR(dev_id));
-+
-+	bdev = blkdev_get_by_dev(dev_id, 0, NULL);
-+	if (IS_ERR(bdev)) {
-+		pr_info("Cannot open device [%u:%u]\n", MAJOR(dev_id),
-+		       MINOR(dev_id));
-+		return PTR_ERR(bdev);
-+	}
-+
-+	tracker = tracker_get_by_dev(bdev);
-+	if (!tracker) {
-+		pr_info("Unable to remove device [%u:%u] from tracking: ",
-+		       MAJOR(dev_id), MINOR(dev_id));
-+		pr_info("tracker not found\n");
-+		ret = -ENODATA;
-+		goto put_bdev;
-+	}
-+
-+	if (atomic_read(&tracker->snapshot_is_taken)) {
-+		pr_err("Tracker for device [%u:%u] is busy with a snapshot\n",
-+		       MAJOR(dev_id), MINOR(dev_id));
-+		ret = -EBUSY;
-+		goto put_tracker;
-+	}
-+
-+	ret = tracker_filter_detach(bdev);
-+	if (ret)
-+		pr_err("Failed to remove tracker from device [%u:%u]\n",
-+		       MAJOR(dev_id), MINOR(dev_id));
-+	else {
-+		struct tracked_device *tr_dev = NULL;
-+		struct tracked_device *iter_tr_dev;
-+
-+		spin_lock(&tracked_device_lock);
-+		list_for_each_entry(iter_tr_dev, &tracked_device_list, link) {
-+			if (iter_tr_dev->dev_id == dev_id) {
-+				list_del(&iter_tr_dev->link);
-+				tr_dev = iter_tr_dev;
-+				break;
-+			}
-+		}
-+		spin_unlock(&tracked_device_lock);
-+
-+		kfree(tr_dev);
-+	}
-+put_tracker:
-+	tracker_put(tracker);
-+put_bdev:
-+	blkdev_put(bdev, 0);
-+	return ret;
-+}
-+
-+int tracker_read_cbt_bitmap(dev_t dev_id, unsigned int offset, size_t length,
-+			    char __user *user_buff)
-+{
-+	int ret;
-+	struct tracker *tracker;
-+	struct block_device *bdev;
-+
-+	bdev = blkdev_get_by_dev(dev_id, 0, NULL);
-+	if (IS_ERR(bdev)) {
-+		pr_info("Cannot open device [%u:%u]\n", MAJOR(dev_id),
-+		       MINOR(dev_id));
-+		return PTR_ERR(bdev);
-+	}
-+
-+	tracker = tracker_get_by_dev(bdev);
-+	if (!tracker) {
-+		pr_err("Cannot get tracker for device [%u:%u]\n",
-+			 MAJOR(dev_id), MINOR(dev_id));
-+		ret = PTR_ERR(tracker);
-+		goto put_bdev;
-+	}
-+
-+	if (atomic_read(&tracker->snapshot_is_taken)) {
-+		ret = cbt_map_read_to_user(tracker->cbt_map, user_buff,
-+					   offset, length);
-+	} else {
-+		pr_err("Unable to read CBT bitmap for device [%u:%u]: ",
-+		       MAJOR(dev_id), MINOR(dev_id));
-+		pr_err("device is not captured by snapshot\n");
-+		ret = -EPERM;
-+	}
-+	tracker_put(tracker);
-+put_bdev:
-+	blkdev_put(bdev, 0);
-+	return ret;
-+}
-+
-+static inline void collect_cbt_info(dev_t dev_id,
-+				    struct blk_snap_cbt_info *cbt_info)
-+{
-+	struct block_device *bdev;
-+	struct tracker *tracker;
-+
-+	bdev = blkdev_get_by_dev(dev_id, 0, NULL);
-+	if (IS_ERR(bdev)) {
-+		pr_err("Cannot open device [%u:%u]\n", MAJOR(dev_id),
-+		       MINOR(dev_id));
-+		return;
-+	}
-+
-+	tracker = tracker_get_by_dev(bdev);
-+	if (!tracker)
-+		goto put_bdev;
-+	if (!tracker->cbt_map)
-+		goto put_tracker;
-+
-+	cbt_info->device_capacity =
-+		(__u64)(tracker->cbt_map->device_capacity << SECTOR_SHIFT);
-+	cbt_info->blk_size = (__u32)cbt_map_blk_size(tracker->cbt_map);
-+	cbt_info->blk_count = (__u32)tracker->cbt_map->blk_count;
-+	cbt_info->snap_number = (__u8)tracker->cbt_map->snap_number_previous;
-+
-+	export_uuid(cbt_info->generation_id.b, &tracker->cbt_map->generation_id);
-+put_tracker:
-+	tracker_put(tracker);
-+put_bdev:
-+	blkdev_put(bdev, 0);
-+}
-+
-+int tracker_collect(int max_count, struct blk_snap_cbt_info *cbt_info,
-+		    int *pcount)
-+{
-+	int ret = 0;
-+	int count = 0;
-+	int iter = 0;
-+	struct tracked_device *tr_dev;
-+
-+	if (!cbt_info) {
-+		/**
-+		 * Just calculate trackers list length.
-+		 */
-+		spin_lock(&tracked_device_lock);
-+		list_for_each_entry(tr_dev, &tracked_device_list, link)
-+			++count;
-+		spin_unlock(&tracked_device_lock);
-+		goto out;
-+	}
-+
-+	spin_lock(&tracked_device_lock);
-+	list_for_each_entry(tr_dev, &tracked_device_list, link) {
-+		if (count >= max_count) {
-+			ret = -ENOBUFS;
-+			break;
-+		}
-+
-+		cbt_info[count].dev_id.mj = MAJOR(tr_dev->dev_id);
-+		cbt_info[count].dev_id.mn = MINOR(tr_dev->dev_id);
-+		++count;
-+	}
-+	spin_unlock(&tracked_device_lock);
-+
-+	if (ret)
-+		return ret;
-+
-+	for (iter = 0; iter < count; iter++) {
-+		dev_t dev_id = MKDEV(cbt_info[iter].dev_id.mj,
-+				     cbt_info[iter].dev_id.mn);
-+
-+		collect_cbt_info(dev_id, &cbt_info[iter]);
-+	}
-+out:
-+	*pcount = count;
-+	return 0;
-+}
-+
-+int tracker_mark_dirty_blocks(dev_t dev_id,
-+			      struct blk_snap_block_range *block_ranges,
-+			      unsigned int count)
-+{
-+	int ret = 0;
-+	struct tracker *tracker;
-+	struct block_device *bdev;
-+
-+	bdev = blkdev_get_by_dev(dev_id, 0, NULL);
-+	if (IS_ERR(bdev)) {
-+		pr_err("Cannot open device [%u:%u]\n", MAJOR(dev_id),
-+		       MINOR(dev_id));
-+		return PTR_ERR(bdev);
-+	}
-+
-+	pr_debug("Marking [%d] dirty blocks for device [%u:%u]\n", count,
-+		 MAJOR(dev_id), MINOR(dev_id));
-+
-+	tracker = tracker_get_by_dev(bdev);
-+	if (!tracker) {
-+		pr_err("Cannot find tracker for device [%u:%u]\n",
-+		       MAJOR(dev_id), MINOR(dev_id));
-+		ret = -ENODEV;
-+		goto put_bdev;
-+	}
-+
-+	ret = cbt_map_mark_dirty_blocks(tracker->cbt_map, block_ranges, count);
-+	if (ret)
-+		pr_err("Failed to set CBT table. errno=%d\n", abs(ret));
-+
-+	tracker_put(tracker);
-+put_bdev:
-+	blkdev_put(bdev, 0);
-+	return ret;
-+}
-diff --git a/drivers/block/blksnap/tracker.h b/drivers/block/blksnap/tracker.h
-new file mode 100644
-index 000000000000..a7ae5312d488
---- /dev/null
-+++ b/drivers/block/blksnap/tracker.h
-@@ -0,0 +1,74 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+#ifndef __BLK_SNAP_TRACKER_H
-+#define __BLK_SNAP_TRACKER_H
-+
-+#include <linux/kref.h>
-+#include <linux/spinlock.h>
-+#include <linux/list.h>
-+#include <linux/rwsem.h>
-+#include <linux/blkdev.h>
-+#include <linux/fs.h>
-+
-+struct cbt_map;
-+struct diff_area;
-+
-+/**
-+ * struct tracker - Tracker for a block device.
-+ *
-+ * @flt:
-+ *	The block device filter structure.
-+ * @link:
-+ *	List header. Tracker release cannot be performed in the release_cb()
-+ *	filters callback function. Therefore, the trackers are queued for
-+ *	release in the worker thread.
-+ * @dev_id:
-+ *	Original block device ID.
-+ * @snapshot_is_taken:
-+ *	Indicates that a snapshot was taken for the device whose I/O unit are
-+ *	handled by this tracker.
-+ * @cbt_map:
-+ *	Pointer to a change block tracker map.
-+ * @diff_area:
-+ *	Pointer to a difference area.
-+ *
-+ * The goal of the tracker is to handle I/O unit. The tracker detectes
-+ * the range of sectors that will change and transmits them to the CBT map
-+ * and to the difference area.
-+ */
-+struct tracker {
-+	struct bdev_filter flt;
-+	struct list_head link;
-+	dev_t dev_id;
-+
-+	atomic_t snapshot_is_taken;
-+
-+	struct cbt_map *cbt_map;
-+	struct diff_area *diff_area;
-+};
-+
-+void tracker_lock(void);
-+void tracker_unlock(void);
-+
-+static inline void tracker_put(struct tracker *tracker)
-+{
-+	if (likely(tracker))
-+		bdev_filter_put(&tracker->flt);
-+};
-+
-+int tracker_init(void);
-+void tracker_done(void);
-+
-+struct tracker *tracker_create_or_get(dev_t dev_id);
-+int tracker_remove(dev_t dev_id);
-+int tracker_collect(int max_count, struct blk_snap_cbt_info *cbt_info,
-+		    int *pcount);
-+int tracker_read_cbt_bitmap(dev_t dev_id, unsigned int offset, size_t length,
-+			    char __user *user_buff);
-+int tracker_mark_dirty_blocks(dev_t dev_id,
-+			      struct blk_snap_block_range *block_ranges,
-+			      unsigned int count);
-+
-+int tracker_take_snapshot(struct tracker *tracker);
-+void tracker_release_snapshot(struct tracker *tracker);
-+
-+#endif /* __BLK_SNAP_TRACKER_H */
+Andreas Gruenbacher (1):
+  drbd: drbd_insert_interval(): Clarify comment
+
+Christoph Böhmwalder (5):
+  drbd: adjust drbd_limits license header
+  drbd: make limits unsigned
+  drbd: remove unnecessary assignment in vli_encode_bits
+  drbd: remove macros using require_context
+  MAINTAINERS: add drbd headers
+
+Lars Ellenberg (1):
+  drbd: interval tree: make removing an "empty" interval a no-op
+
+Robert Altnoeder (1):
+  drbd: fix DRBD_VOLUME_MAX 65535 -> 65534
+
+ MAINTAINERS                        |   1 +
+ drivers/block/drbd/drbd_int.h      |  12 +-
+ drivers/block/drbd/drbd_interval.c |   6 +-
+ drivers/block/drbd/drbd_vli.h      |   2 +-
+ include/linux/drbd_limits.h        | 204 ++++++++++++++---------------
+ 5 files changed, 110 insertions(+), 115 deletions(-)
+
+
+base-commit: f596da3efaf4130ff61cd029558845808df9bf99
 -- 
-2.20.1
+2.38.1
 
