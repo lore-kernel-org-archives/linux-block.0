@@ -2,67 +2,146 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 18BEFC4332F
-	for <linux-block@archiver.kernel.org>; Thu,  8 Dec 2022 23:57:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 983A6C4332F
+	for <linux-block@archiver.kernel.org>; Fri,  9 Dec 2022 00:29:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230392AbiLHX55 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 8 Dec 2022 18:57:57 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38626 "EHLO
+        id S229675AbiLIA3j (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 8 Dec 2022 19:29:39 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58392 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230208AbiLHX5x (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 8 Dec 2022 18:57:53 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BDB4879CAA
-        for <linux-block@vger.kernel.org>; Thu,  8 Dec 2022 15:57:51 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 728AAB826A7
-        for <linux-block@vger.kernel.org>; Thu,  8 Dec 2022 23:57:50 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 32DEDC433EF;
-        Thu,  8 Dec 2022 23:57:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1670543869;
-        bh=zPpdzUvXzJOEDJzPmmPTy8q4FfQjOpTNsDovy11Yup0=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=LYR3KAcbyAagZg9oScCf5TZ/3sXn4GOKKi1CLl1NPwy4whRkJbp9ctsHJJMiZ/DWp
-         ClAcCO4xRv+KlfJe/7yq8PnOY31K1tQ8zQXxmIx5xDKQvXbzc7CW0tk+HxPiCSZp8z
-         +C+e4yeDtQfgXpOhsd+zL9tKxY1Qy3n3hvPMFIgCo9SkKc5uh29rFg04DmPlrKUNqN
-         OnwcCoNko4n4l7VtqAOt+RBMVe1od3/fwr6k4mJavcauk5pE4Al4W8OUo/NYpL5G6I
-         5ZnRy0i4ptKJVwR31fTm3/vNQYag618gBujjsnBu4idHUlJNHQUal+IAANyBRG1LAS
-         ZbN6/P2e5YdgA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 23AE2E1B4D8;
-        Thu,  8 Dec 2022 23:57:49 +0000 (UTC)
-Subject: Re: [GIT PULL] Block fix for 6.1-final
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <40dbd6f1-be33-6536-4e2a-e7f0120a2fa1@kernel.dk>
-References: <40dbd6f1-be33-6536-4e2a-e7f0120a2fa1@kernel.dk>
-X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
-X-PR-Tracked-Message-Id: <40dbd6f1-be33-6536-4e2a-e7f0120a2fa1@kernel.dk>
-X-PR-Tracked-Remote: git://git.kernel.dk/linux.git tags/block-6.1-2022-12-08
-X-PR-Tracked-Commit-Id: e18a9c18c38f523ae45416e2b75ed4ddf8ad107b
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 859c73d439cd9113333a75e683e9433c0092990d
-Message-Id: <167054386914.21053.8832680620140116865.pr-tracker-bot@kernel.org>
-Date:   Thu, 08 Dec 2022 23:57:49 +0000
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+        with ESMTP id S229555AbiLIA3h (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 8 Dec 2022 19:29:37 -0500
+Received: from esa6.hgst.iphmx.com (esa6.hgst.iphmx.com [216.71.154.45])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C0C6100E
+        for <linux-block@vger.kernel.org>; Thu,  8 Dec 2022 16:29:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1670545776; x=1702081776;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=qk9j8LVxjXBJSIxe9aNCa/SGxFRCLd8rLG0tmlR1LxU=;
+  b=ecFytVuzQVFOKyisnvbIhQIh609rf/ydDTUmygUR1B6F20eFcJMfP1tZ
+   e+F+V0MmDehtBDvenLS6/DtDGL5QJLcnwp2wO0Lz3CTfLrCyg4PStN5l/
+   Al+gfLDUN2WsSAl5WxSxlRLEf3Nx/MBgBiqzhoMTPy9iSsgjteXq3t7cw
+   ghDgN52+fBXM7HY+Ev2g7zUGUkNov4l/9CtHF9HByCVcMCZezxxU+igSy
+   JWxWT4sdftCvOBY8sxh+pnijeHdPX6uclW5NWE3Z3L9b+sQGVLiSBVFPx
+   btdmo0/TeM4Eof7fxpQ2EZXCrR2w8JDxAds803eFvO15Fywq8brg8oxQA
+   g==;
+X-IronPort-AV: E=Sophos;i="5.96,228,1665417600"; 
+   d="scan'208";a="218499346"
+Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
+  by ob1.hgst.iphmx.com with ESMTP; 09 Dec 2022 08:29:35 +0800
+IronPort-SDR: YswRHqFqDW31cx5q0sME1evUw4BocJls0DsZPoMipxJiDh10FQSXEBMIYDGu3ykTLC2q9o4n3b
+ kYxKfw36rt+DqKP+uT/7JuBoOxF3rh4RpFMR9dxqwM6wnPj6qwNtp06s7EvuQ3s1C57z/n46tL
+ VyirIHDGW68D7KQQLszZfml0B6oWa95A+HE1YmfM20IeKBpe40+u9ZV+R8V/q6VajkRdVokvXf
+ QPIiN7Kap9/wgl+GA4t4+ubTt7NhLJqa8HEwi9DANVCEW/sidr7nyRw3yIbO+iaoqQlcwS9rJQ
+ C9g=
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 08 Dec 2022 15:42:19 -0800
+IronPort-SDR: 17srmIDdT4nJsolXJgMSCyFWmk9jokkH+f3n5ydVE/o3vB/pGALfnGvEcGX9e5oSWg6tlTt5NO
+ I4Y5P9Dgdl3PKWo+M2RnkuQfYgbQOc7xKUsxI00TTnNH9qBZ9ExeaB461g6xYJXZeS83CVqw6X
+ zDDHkMLRwxjRmqcFYOdDzwJbVDyVov2primdWKtaI652GNfx2NO149KqGvf8FNlOvqALYZS4FH
+ jSpLVbzZvv557GpJ0BzEi5S/B7cjxn0hpxACGhyG2ASS+RgpgWH4eJAsIEeVfXsSpqAfCv2S9U
+ NTo=
+WDCIronportException: Internal
+Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
+  by uls-op-cesaip02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 08 Dec 2022 16:29:37 -0800
+Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4NSsNH0N0Nz1RvTp
+        for <linux-block@vger.kernel.org>; Thu,  8 Dec 2022 16:29:35 -0800 (PST)
+Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
+        reason="pass (just generated, assumed good)"
+        header.d=opensource.wdc.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
+        opensource.wdc.com; h=content-transfer-encoding:content-type
+        :in-reply-to:organization:from:references:to:content-language
+        :subject:user-agent:mime-version:date:message-id; s=dkim; t=
+        1670545774; x=1673137775; bh=qk9j8LVxjXBJSIxe9aNCa/SGxFRCLd8rLG0
+        tmlR1LxU=; b=huebuoh6+rUFkVDfHWkwIdyIRMRkWTzAylli86kSWUThPdepn69
+        dn8RJOqP8ddhUIT3MX36NTVEJdrxenavwp13bJnEvWIGoGBVmwzI03NGAR7TETY9
+        a2zGxW1uSHZznctJSJkaQ/rwiVuuy6FloZgtZo148Q08VVK18r4XbYMZ50ub25yE
+        tcRwCMDmuqSg1dpb7CSgwNK/VQUs0eSYireH1H6erTxZqDkmgkv8AT4Jasf9M3tM
+        PA54Xq2VhYzj5BR+gPwUS8HO4qgVVjGaeS2HhzxjTuE5u+pYcXrkJ6AXASDkZdpO
+        M7QdQJFRMm5vpqkfPVBLwL57p0UVDm4uXEA==
+X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
+Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
+        by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
+        with ESMTP id zljn6xl5qR7u for <linux-block@vger.kernel.org>;
+        Thu,  8 Dec 2022 16:29:34 -0800 (PST)
+Received: from [10.225.163.85] (unknown [10.225.163.85])
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4NSsNF3v33z1RvLy;
+        Thu,  8 Dec 2022 16:29:33 -0800 (PST)
+Message-ID: <510732e0-7962-cf54-c22c-f1d7066895f5@opensource.wdc.com>
+Date:   Fri, 9 Dec 2022 09:29:32 +0900
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.5.0
+Subject: Re: [PATCH 00/25] Add Command Duration Limits support
+Content-Language: en-US
+To:     Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+        Niklas Cassel <niklas.cassel@wdc.com>
+Cc:     Hannes Reinecke <hare@suse.de>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-ide@vger.kernel.org" <linux-ide@vger.kernel.org>
+References: <20221208105947.2399894-1-niklas.cassel@wdc.com>
+ <daff011b-6aeb-e6ba-c71b-8b0ff9a21ef7@nvidia.com>
+From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
+Organization: Western Digital Research
+In-Reply-To: <daff011b-6aeb-e6ba-c71b-8b0ff9a21ef7@nvidia.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The pull request you sent on Thu, 8 Dec 2022 14:03:01 -0700:
+On 12/9/22 03:18, Chaitanya Kulkarni wrote:
+> 
+>> Kind regards,
+>> Niklas & Damien
+>>
+>> Damien Le Moal (14):
+>>    ata: libata: simplify qc_fill_rtf port operation interface
+>>    ata: libata-scsi: improve ata_scsiop_maint_in()
+>>    scsi: support retrieving sub-pages of mode pages
+>>    scsi: support service action in scsi_report_opcode()
+>>    block: introduce duration-limits priority class
+>>    block: introduce BLK_STS_DURATION_LIMIT
+>>    ata: libata: detect support for command duration limits
+>>    ata: libata-scsi: handle CDL bits in ata_scsiop_maint_in()
+>>    ata: libata-scsi: add support for CDL pages mode sense
+>>    ata: libata: add ATA feature control sub-page translation
+>>    ata: libata: set read/write commands CDL index
+>>    scsi: sd: detect support for command duration limits
+>>    scsi: sd: set read/write commands CDL index
+>>    Documentation: sysfs-block-device: document command duration limits
+>>
+>> Niklas Cassel (11):
+>>    ata: scsi: rename flag ATA_QCFLAG_FAILED to ATA_QCFLAG_EH
+>>    ata: libata: move NCQ related ATA_DFLAGs
+>>    ata: libata: fix broken NCQ command status handling
+>>    ata: libata: respect successfully completed commands during errors
+>>    ata: libata: allow ata_scsi_set_sense() to not set CHECK_CONDITION
+>>    ata: libata: allow ata_eh_request_sense() to not set CHECK_CONDITION
+>>    ata: libata-scsi: do not overwrite SCSI ML and status bytes
+>>    scsi: core: allow libata to complete successful commands via EH
+>>    scsi: move get_scsi_ml_byte() to scsi_priv.h
+>>    scsi: sd: handle read/write CDL timeout failures
+>>    ata: libata: handle completion of CDL commands using policy 0xD
+>>
+> 
+> Out of 25 patches linux-block mailing list only got 3,
+> was this on purpose ? see this and [1] :-
 
-> git://git.kernel.dk/linux.git tags/block-6.1-2022-12-08
+Not sure how Niklas sent the series.
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/859c73d439cd9113333a75e683e9433c0092990d
+Niklas,
 
-Thank you!
+For the next rev (we will need one to at least rebase on 6.2-rc1 I think),
+please make sure to send all patches to all lists/maintainers.
+
 
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+Damien Le Moal
+Western Digital Research
+
