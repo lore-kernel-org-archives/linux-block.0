@@ -2,151 +2,82 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 55C18C4167B
-	for <linux-block@archiver.kernel.org>; Fri,  9 Dec 2022 14:56:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 255B2C4167B
+	for <linux-block@archiver.kernel.org>; Fri,  9 Dec 2022 14:59:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230051AbiLIO4J (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 9 Dec 2022 09:56:09 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44140 "EHLO
+        id S229656AbiLIO7K (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 9 Dec 2022 09:59:10 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48814 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230075AbiLIOzs (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 9 Dec 2022 09:55:48 -0500
-Received: from mail-ed1-x529.google.com (mail-ed1-x529.google.com [IPv6:2a00:1450:4864:20::529])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 51BF981381
-        for <linux-block@vger.kernel.org>; Fri,  9 Dec 2022 06:55:10 -0800 (PST)
-Received: by mail-ed1-x529.google.com with SMTP id v8so3423375edi.3
-        for <linux-block@vger.kernel.org>; Fri, 09 Dec 2022 06:55:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linbit-com.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Nr0DjBH1YEnasxrYesj7cvRVZfRH4rPEDs0TxXAHiSg=;
-        b=6BR4ftmEi4cwaY0Zq2EMADfCq7D3R7dRhGj565BcwcOdftO7DpLqU7m1Uq+/yJ+AGZ
-         jh/kM4TgyggxJ+OTIBjhyKG6SAj9vKbh98eNvUeU43HoQPObiR6Pz9b5QNHJ3vavH2k1
-         ZtqdFgFQq6/oMk76hY+leei80rWiI5ExUI3F5vd83sJCp4F/ZTicV1hH7KE6ocr2Kxbc
-         vIl+6NtxjPHuGXJE2mutZpRE0s5Mz54VT5WHCKvnLwDfs5udM6eQpLVXxJ2N+nbLSW9f
-         wqeE2ymttBeIpxn5/ahdOSnUceCLnfxZJcAzEMCvBIYv079KyzKGFg/I7JNLpD/SZZ9L
-         d6Cg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Nr0DjBH1YEnasxrYesj7cvRVZfRH4rPEDs0TxXAHiSg=;
-        b=Dx8icUFu2fbExxlRCETf8Y0gj1xyGaVDiIUX/w1f6qRXoRQoNEQ6OXqRhjdpSM6/uI
-         tbKiy/LZ8bZU03lYz5a0k8n8QDcUfG0G3UZpVA/odFi768yWH8qA68SSKPxljINhPT4y
-         j9FyMae0WFIKDu07hGu+XIYXBuSuRQcIufZpd9MgySV5VWUpDwLTOQpHzCc4lTWl2Fxt
-         ULqHv04ol8cCkS99IW/ZrHTDqhXrmU7hOTN2SlJmV/5jyREpbBBpqP06zkueYytwAjQ9
-         g+8VSAhUVDf5mVAqlcpD/8XY8r3xqvumq18CaFJ/LF6N7oxN0PImNxwsP7BpPFbzxJ6z
-         BXZA==
-X-Gm-Message-State: ANoB5plZqxXk149TgGl7IAnhqgNGpw6xeJKsJUiBkCdF+62rkmjt+oOR
-        LmNh6AxjnrKJvZV2l5VxsA3JfA==
-X-Google-Smtp-Source: AA0mqf4Yb/BOvMLtH6r67H46I1phEPMg/pmN85YtjlgWU29uNdJPkmrZ6mICq1Tm5TiV5cKxNxgBlA==
-X-Received: by 2002:a05:6402:1004:b0:46b:c156:9965 with SMTP id c4-20020a056402100400b0046bc1569965mr5266982edu.38.1670597708861;
-        Fri, 09 Dec 2022 06:55:08 -0800 (PST)
-Received: from localhost.localdomain (h082218028181.host.wavenet.at. [82.218.28.181])
-        by smtp.gmail.com with ESMTPSA id l4-20020aa7c304000000b0046b1d63cfc1sm716856edq.88.2022.12.09.06.55.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 09 Dec 2022 06:55:08 -0800 (PST)
-From:   =?UTF-8?q?Christoph=20B=C3=B6hmwalder?= 
-        <christoph.boehmwalder@linbit.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     drbd-dev@lists.linbit.com, linux-kernel@vger.kernel.org,
-        Lars Ellenberg <lars.ellenberg@linbit.com>,
-        Philipp Reisner <philipp.reisner@linbit.com>,
-        linux-block@vger.kernel.org,
-        =?UTF-8?q?Christoph=20B=C3=B6hmwalder?= 
-        <christoph.boehmwalder@linbit.com>,
-        Joel Colledge <joel.colledge@linbit.com>
-Subject: [PATCH 3/3] drbd: split off drbd_config into separate file
-Date:   Fri,  9 Dec 2022 15:55:04 +0100
-Message-Id: <20221209145504.2273072-4-christoph.boehmwalder@linbit.com>
-X-Mailer: git-send-email 2.38.1
-In-Reply-To: <20221209145504.2273072-1-christoph.boehmwalder@linbit.com>
-References: <20221209145504.2273072-1-christoph.boehmwalder@linbit.com>
+        with ESMTP id S229488AbiLIO7K (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 9 Dec 2022 09:59:10 -0500
+Received: from mx4.veeam.com (mx4.veeam.com [104.41.138.86])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE655302;
+        Fri,  9 Dec 2022 06:59:08 -0800 (PST)
+Received: from mail.veeam.com (prgmbx01.amust.local [172.24.128.102])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mx4.veeam.com (Postfix) with ESMTPS id 711E57D47B;
+        Fri,  9 Dec 2022 17:23:59 +0300 (MSK)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=veeam.com;
+        s=mx4-2022; t=1670595839;
+        bh=ru7ZhzL3gCpkBa2tYBC7LlIYfyyUWNzdAZhrSEsjuA4=;
+        h=From:To:CC:Subject:Date:In-Reply-To:References:From;
+        b=m58LS9zTxGauhaa8NL92tCBxhjMpRP4/qCHxefFPr3Usv1n8Kw26spAk9Dt+z5k0/
+         xV7Gjt3r53EQcv3t+hAqzt8wjRWOkb0G1E3oumqA2hsGmTQshdTOleo2pt4ohSW3fe
+         P50xz33AxSFx0/0xLd4goAO8ywGfTdoJFGB/ZuvuSVKYJnHmtpaMdiQyGOnx/MycQF
+         xWNMHUmcv8A/O3Iv/HMHZjN/wMqkPOVOwooJW6eN1IuHt2jHKDutm97YYbmJoz5Y/G
+         PUn4eXsTPzOatGJmpvvmcjrAS/Zp+Eoh3LA6G1YXyGw3R0olD1NxxKBaobq8E6eDIQ
+         uBKlVZfY/Odpw==
+Received: from ssh-deb10-ssd-vb.amust.local (172.24.10.107) by
+ prgmbx01.amust.local (172.24.128.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.20; Fri, 9 Dec 2022 15:23:56 +0100
+From:   Sergei Shtepa <sergei.shtepa@veeam.com>
+To:     <axboe@kernel.dk>, <corbet@lwn.net>
+CC:     <linux-block@vger.kernel.org>, <linux-doc@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>,
+        Sergei Shtepa <sergei.shtepa@veeam.com>
+Subject: [PATCH v2 03/21] documentation, capability: fix Generic Block Device Capability
+Date:   Fri, 9 Dec 2022 15:23:13 +0100
+Message-ID: <20221209142331.26395-4-sergei.shtepa@veeam.com>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20221209142331.26395-1-sergei.shtepa@veeam.com>
+References: <20221209142331.26395-1-sergei.shtepa@veeam.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [172.24.10.107]
+X-ClientProxiedBy: prgmbx02.amust.local (172.24.128.103) To
+ prgmbx01.amust.local (172.24.128.102)
+X-EsetResult: clean, is OK
+X-EsetId: 37303A2924031556627C62
+X-Veeam-MMEX: True
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-To be more similar to what we do in the out-of-tree module and ease the
-upstreaming process.
+When adding documentation for blkfilter, new lines of documentation
+appeared in the file include/linux/blkdev.h. To preserve the appearance
+of this document, the required sections and function descriptions were
+explicitly specified.
 
-Signed-off-by: Christoph Böhmwalder <christoph.boehmwalder@linbit.com>
-Reviewed-by: Joel Colledge <joel.colledge@linbit.com>
+Signed-off-by: Sergei Shtepa <sergei.shtepa@veeam.com>
 ---
- drivers/block/drbd/drbd_buildtag.c |  2 +-
- drivers/block/drbd/drbd_int.h      |  1 +
- include/linux/drbd.h               |  6 ------
- include/linux/drbd_config.h        | 16 ++++++++++++++++
- 4 files changed, 18 insertions(+), 7 deletions(-)
- create mode 100644 include/linux/drbd_config.h
+ Documentation/block/capability.rst | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/drivers/block/drbd/drbd_buildtag.c b/drivers/block/drbd/drbd_buildtag.c
-index 956a4d5c339b..cb1aa66d7d5d 100644
---- a/drivers/block/drbd/drbd_buildtag.c
-+++ b/drivers/block/drbd/drbd_buildtag.c
-@@ -1,5 +1,5 @@
- // SPDX-License-Identifier: GPL-2.0-only
--#include <linux/drbd.h>
-+#include <linux/drbd_config.h>
- #include <linux/module.h>
+diff --git a/Documentation/block/capability.rst b/Documentation/block/capability.rst
+index 2ae7f064736a..8fad791980bb 100644
+--- a/Documentation/block/capability.rst
++++ b/Documentation/block/capability.rst
+@@ -8,3 +8,6 @@ This file documents the sysfs file ``block/<disk>/capability``.
+ capabilities a specific block device supports:
  
- const char *drbd_buildtag(void)
-diff --git a/drivers/block/drbd/drbd_int.h b/drivers/block/drbd/drbd_int.h
-index edce1f7ac2da..d89b7d03d4c8 100644
---- a/drivers/block/drbd/drbd_int.h
-+++ b/drivers/block/drbd/drbd_int.h
-@@ -34,6 +34,7 @@
- #include <linux/prefetch.h>
- #include <linux/drbd_genl_api.h>
- #include <linux/drbd.h>
-+#include <linux/drbd_config.h>
- #include "drbd_strings.h"
- #include "drbd_state.h"
- #include "drbd_protocol.h"
-diff --git a/include/linux/drbd.h b/include/linux/drbd.h
-index df65a8f5228a..5468a2399d48 100644
---- a/include/linux/drbd.h
-+++ b/include/linux/drbd.h
-@@ -38,12 +38,6 @@
- 
- #endif
- 
--extern const char *drbd_buildtag(void);
--#define REL_VERSION "8.4.11"
--#define PRO_VERSION_MIN 86
--#define PRO_VERSION_MAX 101
--
--
- enum drbd_io_error_p {
- 	EP_PASS_ON, /* FIXME should the better be named "Ignore"? */
- 	EP_CALL_HELPER,
-diff --git a/include/linux/drbd_config.h b/include/linux/drbd_config.h
-new file mode 100644
-index 000000000000..d215365c6bb1
---- /dev/null
-+++ b/include/linux/drbd_config.h
-@@ -0,0 +1,16 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+/*
-+ * drbd_config.h
-+ * DRBD's compile time configuration.
-+ */
-+
-+#ifndef DRBD_CONFIG_H
-+#define DRBD_CONFIG_H
-+
-+extern const char *drbd_buildtag(void);
-+
-+#define REL_VERSION "8.4.11"
-+#define PRO_VERSION_MIN 86
-+#define PRO_VERSION_MAX 101
-+
-+#endif
+ .. kernel-doc:: include/linux/blkdev.h
++	:DOC: genhd capability flags
++.. kernel-doc:: include/linux/blkdev.h
++	:functions: disk_openers blk_alloc_disk bio_end_io_acct
 -- 
-2.38.1
+2.20.1
 
