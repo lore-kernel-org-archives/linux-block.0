@@ -2,45 +2,45 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AE63DC4708D
-	for <linux-block@archiver.kernel.org>; Fri,  9 Dec 2022 15:03:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BB4FEC04FDE
+	for <linux-block@archiver.kernel.org>; Fri,  9 Dec 2022 15:04:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229989AbiLIPDE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 9 Dec 2022 10:03:04 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52838 "EHLO
+        id S230129AbiLIPES (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 9 Dec 2022 10:04:18 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54508 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229796AbiLIPCz (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 9 Dec 2022 10:02:55 -0500
-Received: from mx1.veeam.com (mx1.veeam.com [216.253.77.21])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5DABB10B7A;
-        Fri,  9 Dec 2022 07:02:49 -0800 (PST)
+        with ESMTP id S230143AbiLIPEJ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 9 Dec 2022 10:04:09 -0500
+Received: from mx4.veeam.com (mx4.veeam.com [104.41.138.86])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF7CD450B2;
+        Fri,  9 Dec 2022 07:04:08 -0800 (PST)
 Received: from mail.veeam.com (prgmbx01.amust.local [172.24.128.102])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mx1.veeam.com (Postfix) with ESMTPS id 111374241C;
-        Fri,  9 Dec 2022 09:24:47 -0500 (EST)
+        by mx4.veeam.com (Postfix) with ESMTPS id 78B877D487;
+        Fri,  9 Dec 2022 17:24:19 +0300 (MSK)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=veeam.com;
-        s=mx1-2022; t=1670595887;
-        bh=zeXfmgb9Pnkj8I5+f4SyAhdIG1+QaLfkaugwopvU0zc=;
+        s=mx4-2022; t=1670595859;
+        bh=TyNzmYDcfAr7FLJZ9aVsP79ngrCxgm8xxrHZVRSY9WY=;
         h=From:To:CC:Subject:Date:In-Reply-To:References:From;
-        b=qGvVUkwbU0wJWiSXSFyA6w+vPT5Mwpf/1fv+jPgxvis/rnfyDBLKDPYoerfnwQT3t
-         cdY1Z/6/lNmNGB4RP6Q3OkW8Mb4q4tZotYZA5bUfRNMIy13MA/ufXJ/jl35jMzHk/t
-         8Khx/dG6/2PVQ/Q8Z/qUHwv8G6lGkYJJmmp2b0lYuQa5ET5I3rmBNVmEFDmS8eMoH7
-         7hlxGsfD5xr8XEAjK4krGXWFacPmb5fK2RDU+afk2FmSWeV+76yzOy8n2Rbyc/Kfls
-         wOzZDhFezH++Re/gBOCuMIKteHuNoUoeyuwVjuTW7YOwx8XcDuSdWfYo//lfhiR3u9
-         NrMu1vu4GnyyQ==
+        b=J9WFg399V2Em83U4EeFpibp3pkqwXE5vL0iC+ug2GjrT5hjQwjBOIzJrTI+1ixxfl
+         3oVR5hzvzK4oMKD9dFH4w08k8T13GjfechVbPrn5fbqAAu1KZ/Bi20aT+q5hSnTH05
+         QD8zKigU0VxhROOgE87ssCLD2cbH5GoEPeVd+Z/z4sp9ZDXURXHw414nZTU0E7M5OR
+         bsDllcsJSY1T12klMUlDeFL+TFq/+YuJFP0T99R1168NUu10T9GCur8T48d5i0zWAM
+         3wGRddgGfETnLOOPIFC6P6GUV/MyUAljZ1sQgKXHcCBDmHofeAb+ux5dpcEEj1AtoE
+         JLnvS/8bsV+fQ==
 Received: from ssh-deb10-ssd-vb.amust.local (172.24.10.107) by
  prgmbx01.amust.local (172.24.128.102) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.20; Fri, 9 Dec 2022 15:23:53 +0100
+ 15.2.1118.20; Fri, 9 Dec 2022 15:24:16 +0100
 From:   Sergei Shtepa <sergei.shtepa@veeam.com>
 To:     <axboe@kernel.dk>, <corbet@lwn.net>
 CC:     <linux-block@vger.kernel.org>, <linux-doc@vger.kernel.org>,
         <linux-kernel@vger.kernel.org>,
         Sergei Shtepa <sergei.shtepa@veeam.com>
-Subject: [PATCH v2 01/21] documentation, blkfilter: Block Device Filtering Mechanism
-Date:   Fri, 9 Dec 2022 15:23:11 +0100
-Message-ID: <20221209142331.26395-2-sergei.shtepa@veeam.com>
+Subject: [PATCH v2 15/21] block, blksnap: event queue from the difference storage
+Date:   Fri, 9 Dec 2022 15:23:25 +0100
+Message-ID: <20221209142331.26395-16-sergei.shtepa@veeam.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20221209142331.26395-1-sergei.shtepa@veeam.com>
 References: <20221209142331.26395-1-sergei.shtepa@veeam.com>
@@ -57,88 +57,182 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The document contains:
-* Describes the purpose of the mechanism
-* A little historical background on the capabilities of handling I/O
-  units of the Linux kernel
-* Brief description of the design
-* Reference to interface description
+Provides transmission of events from the difference storage to the user
+process. Only two events are currently defined. The first is that there
+are few free regions in the difference storage. The second is that the
+request for a free region for storing differences failed with an error,
+since there are no more free regions left in the difference storage
+(the snapshot overflow state).
 
 Signed-off-by: Sergei Shtepa <sergei.shtepa@veeam.com>
 ---
- Documentation/block/blkfilter.rst | 50 +++++++++++++++++++++++++++++++
- Documentation/block/index.rst     |  1 +
- 2 files changed, 51 insertions(+)
- create mode 100644 Documentation/block/blkfilter.rst
+ drivers/block/blksnap/event_queue.c | 86 +++++++++++++++++++++++++++++
+ drivers/block/blksnap/event_queue.h | 63 +++++++++++++++++++++
+ 2 files changed, 149 insertions(+)
+ create mode 100644 drivers/block/blksnap/event_queue.c
+ create mode 100644 drivers/block/blksnap/event_queue.h
 
-diff --git a/Documentation/block/blkfilter.rst b/Documentation/block/blkfilter.rst
+diff --git a/drivers/block/blksnap/event_queue.c b/drivers/block/blksnap/event_queue.c
 new file mode 100644
-index 000000000000..3482e16c1964
+index 000000000000..c91a81b3e3a8
 --- /dev/null
-+++ b/Documentation/block/blkfilter.rst
-@@ -0,0 +1,50 @@
-+.. SPDX-License-Identifier: GPL-2.0
++++ b/drivers/block/blksnap/event_queue.c
+@@ -0,0 +1,86 @@
++// SPDX-License-Identifier: GPL-2.0
++#define pr_fmt(fmt) KBUILD_MODNAME "-event_queue: " fmt
 +
-+================================
-+Block Device Filtering Mechanism
-+================================
++#include <linux/slab.h>
++#include <linux/sched.h>
++#include "event_queue.h"
 +
-+The block device filtering mechanism is an API that allows to attach block
-+device filters. Block device filters allow perform additional processing
-+for I/O units.
++void event_queue_init(struct event_queue *event_queue)
++{
++	INIT_LIST_HEAD(&event_queue->list);
++	spin_lock_init(&event_queue->lock);
++	init_waitqueue_head(&event_queue->wq_head);
++}
 +
-+Introduction
-+============
++void event_queue_done(struct event_queue *event_queue)
++{
++	struct event *event;
 +
-+The idea of handling I/O units on block devices is not new. Back in the
-+2.6 kernel, there was an undocumented possibility of handling I/O units
-+by substituting the make_request_fn() function, which belonged to the
-+request_queue structure. But no kernel module used this feature, and it
-+was eliminated in the 5.10 kernel.
++	spin_lock(&event_queue->lock);
++	while (!list_empty(&event_queue->list)) {
++		event = list_first_entry(&event_queue->list, struct event,
++					 link);
++		list_del(&event->link);
++		event_free(event);
++	}
++	spin_unlock(&event_queue->lock);
++}
 +
-+The block device filtering mechanism returns the ability to handle I/O units.
-+It is possible to safely attach filter to a block device "on the fly" without
-+changing the structure of block devices.
++int event_gen(struct event_queue *event_queue, gfp_t flags, int code,
++	      const void *data, int data_size)
++{
++	struct event *event;
 +
-+It supports attaching one filter to one block device, because there is only
-+one filter implementation in the kernel.
-+See Documentation/block/blksnap.rst.
++	event = kzalloc(sizeof(struct event) + data_size, flags);
++	if (!event)
++		return -ENOMEM;
 +
-+Design
-+======
++	event->time = ktime_get();
++	event->code = code;
++	event->data_size = data_size;
++	memcpy(event->data, data, data_size);
 +
-+The block device filtering mechanism provides functions for attaching and
-+detaching the filter. The filter is a structure with a reference counter
-+and callback functions.
++	pr_debug("Generate event: time=%lld code=%d data_size=%d\n",
++		 event->time, event->code, event->data_size);
 +
-+The submit_bio_cb() callback function is called for each I/O unit for a block
-+device, providing I/O unit filtering. Depending on the result of filtering
-+the I/O unit, it can either be passed for subsequent processing by the block
-+layer, or skipped.
++	spin_lock(&event_queue->lock);
++	list_add_tail(&event->link, &event_queue->list);
++	spin_unlock(&event_queue->lock);
 +
-+The reference counter allows to control the filter lifetime. When the reference
-+count is reduced to zero, the release_cb() callback function is called to
-+release the filter. This allows the filter to be released when the block
-+device is disconnected.
++	wake_up(&event_queue->wq_head);
++	return 0;
++}
 +
-+Interface description
-+=====================
-+.. kernel-doc:: include/linux/blkdev.h
-+	:functions: bdev_filter_operations bdev_filter bdev_filter_init bdev_filter_get bdev_filter_put
-+.. kernel-doc:: block/bdev.c
-+	:functions: bdev_filter_attach bdev_filter_detach
-diff --git a/Documentation/block/index.rst b/Documentation/block/index.rst
-index c4c73db748a8..bef6de22d651 100644
---- a/Documentation/block/index.rst
-+++ b/Documentation/block/index.rst
-@@ -10,6 +10,7 @@ Block
-    bfq-iosched
-    biovecs
-    blk-mq
-+   blkfilter
-    capability
-    cmdline-partition
-    data-integrity
++struct event *event_wait(struct event_queue *event_queue,
++			 unsigned long timeout_ms)
++{
++	int ret;
++
++	ret = wait_event_interruptible_timeout(event_queue->wq_head,
++					       !list_empty(&event_queue->list),
++					       timeout_ms);
++
++	if (ret > 0) {
++		struct event *event;
++
++		spin_lock(&event_queue->lock);
++		event = list_first_entry(&event_queue->list, struct event,
++					 link);
++		list_del(&event->link);
++		spin_unlock(&event_queue->lock);
++
++		pr_debug("Event received: time=%lld code=%d\n", event->time,
++			 event->code);
++		return event;
++	}
++	if (ret == 0)
++		return ERR_PTR(-ENOENT);
++
++	if (ret == -ERESTARTSYS) {
++		pr_debug("event waiting interrupted\n");
++		return ERR_PTR(-EINTR);
++	}
++
++	pr_err("Failed to wait event. errno=%d\n", abs(ret));
++	return ERR_PTR(ret);
++}
+diff --git a/drivers/block/blksnap/event_queue.h b/drivers/block/blksnap/event_queue.h
+new file mode 100644
+index 000000000000..d9aee081ab51
+--- /dev/null
++++ b/drivers/block/blksnap/event_queue.h
+@@ -0,0 +1,63 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++#ifndef __BLK_SNAP_EVENT_QUEUE_H
++#define __BLK_SNAP_EVENT_QUEUE_H
++
++#include <linux/types.h>
++#include <linux/ktime.h>
++#include <linux/list.h>
++#include <linux/spinlock.h>
++#include <linux/wait.h>
++
++/**
++ * struct event - An event to be passed to the user space.
++ * @link:
++ *	The list header allows to combine events from the queue.
++ * @time:
++ *	A timestamp indicates when an event occurred.
++ * @code:
++ *	Event code.
++ * @data_size:
++ *	The number of bytes in the event data array.
++ * @data:
++ *	An array of event data.
++ *
++ * Events can be different, so they contain different data. The size of the
++ * data array is not defined exactly, but it has limitations. The size of
++ * the event structure may exceed the PAGE_SIZE.
++ */
++struct event {
++	struct list_head link;
++	ktime_t time;
++	int code;
++	int data_size;
++	char data[1]; /* up to PAGE_SIZE - sizeof(struct blk_snap_snapshot_event) */
++};
++
++/**
++ * struct event_queue - A queue of &struct event.
++ * @list:
++ *	Linked list for storing events.
++ * @lock:
++ *	Spinlock allows to guarantee safety of the linked list.
++ * @wq_head:
++ *	A wait queue allows to put a user thread in a waiting state until
++ *	an event appears in the linked list.
++ */
++struct event_queue {
++	struct list_head list;
++	spinlock_t lock;
++	struct wait_queue_head wq_head;
++};
++
++void event_queue_init(struct event_queue *event_queue);
++void event_queue_done(struct event_queue *event_queue);
++
++int event_gen(struct event_queue *event_queue, gfp_t flags, int code,
++	      const void *data, int data_size);
++struct event *event_wait(struct event_queue *event_queue,
++			 unsigned long timeout_ms);
++static inline void event_free(struct event *event)
++{
++	kfree(event);
++};
++#endif /* __BLK_SNAP_EVENT_QUEUE_H */
 -- 
 2.20.1
 
