@@ -2,123 +2,189 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87AE4C04FDE
-	for <linux-block@archiver.kernel.org>; Sat, 10 Dec 2022 03:23:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 882DAC10F1B
+	for <linux-block@archiver.kernel.org>; Sat, 10 Dec 2022 03:51:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229555AbiLJDX3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 9 Dec 2022 22:23:29 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32972 "EHLO
+        id S229749AbiLJDvW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 9 Dec 2022 22:51:22 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46348 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229470AbiLJDX1 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 9 Dec 2022 22:23:27 -0500
-Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 29D1525C49;
-        Fri,  9 Dec 2022 19:23:26 -0800 (PST)
-Received: by mail-pl1-x635.google.com with SMTP id jl24so6812287plb.8;
-        Fri, 09 Dec 2022 19:23:26 -0800 (PST)
+        with ESMTP id S229605AbiLJDvJ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 9 Dec 2022 22:51:09 -0500
+Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC8CE60EB7;
+        Fri,  9 Dec 2022 19:51:05 -0800 (PST)
+Received: by mail-pl1-x636.google.com with SMTP id jl24so6850253plb.8;
+        Fri, 09 Dec 2022 19:51:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=4Y74Cn5CiCVsP4DjJ8yZF5+hknYEUL/oM8T1MPatY28=;
-        b=ikI8a2YQsDJ9qEuEgGCSg5/PgITzfs0cRaicS+l2YWND8wRBD3DOsWB/ZiKJ24Q2jg
-         6Fj2yM8+t/wJVWLkuzfBpQ4oRyyxRWa/jH1MtcR6LofzIGuVkqBUGp6Lj1KHtoXUcPQP
-         NjDT/4wuA8DEexN+BcSfvR8sc6ar6XcHdRBR78YeU20PNssFGTN0g97mhOl0fB5ub/Tg
-         8+8SBdtv3sd5qPIz+LE99e/k5eyMOzLNwkYSHCEaU618yXIuDaQ9UdXyjPa3ZsJfHGFo
-         StfKcEx9o7WGLu60qgxcY7S7BEp9IDdYn6aAysOM8ZtjIpceTCoJ5vCvlwDyGsEwr31t
-         M33A==
+        bh=2Z1BxGqgHITzxO8Bw1N1uCOjsI728aaE4AlHdATKeMY=;
+        b=f+DxILPCiJEbc3+xycVStaiFr60dHklhd9G068nwGG1d6SfL1d7MTVFBW2kC027c/X
+         kD+IQ/CMX1QBrt2LoumioD57wI/07k2HHIstp1PZC5Ci/MsZlgtDnT948fkpgqEOuRPE
+         hN+kSiqO0Lc/uKx6qc94XL40oyB5c5EWEZr9yVpZbfF4ZGguSe8hXqtJRL5jOOAmRt7t
+         ZkXCy6oL8Nf4xkkGkcWAFGzw2dzaDF832rFg1t6KjkkEEuGl2gyz5lFFFJ5kAxUhoGmq
+         0GZ6tuqlSXH3zK12qTVApHROmJaTU+t1lMIgtlReHTcARzZRLQcNyl+dKyQzXFxBTYmK
+         XhZw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=4Y74Cn5CiCVsP4DjJ8yZF5+hknYEUL/oM8T1MPatY28=;
-        b=ovDtqt5NZMQkQ5OLoDsnQtHlWtcAzGaZXLuwpc1MQ5yQhAGSQlgd2rG7NA8LZBtF5T
-         yyomnri55z0YcEWSer1JAZ+EoPR3Wzw6Swm2RRL6pKrNcQ2vNVSeKcSxsdvr7/WcAMiP
-         XKAP3wmnDTaEOqOWxElmlHjuG4naFIf2fxNes//qSoxbrWC6L0EfyV64d560+v3Kx7T6
-         IqTkbCxKQffcUcR5PCJ3hi1ieiAj9wJAK/DEXWQFsJkyImRLWuR9rPSTWaUSu5NKMX5R
-         Mb4asuq/6X0jYC5qTY89xO6ubmfC90xX5cdSzJpereuopeKBN4kuCgO3h7G+x5yFhMRj
-         nYDw==
-X-Gm-Message-State: ANoB5plzm3BD5O2cp1BtsbHcrb4q4w4mf0PIWSlcdFH+KeyBuY/hUp6h
-        uoLobGTcm8QGyEMtxYLinAk=
-X-Google-Smtp-Source: AA0mqf7yFJ8CLN+3ulanB43+/24cpg/e7nMZKGpEzciyz1QtE/kE33uCcfTn5/y/kd/H9pM8QhETcA==
-X-Received: by 2002:a17:902:d18c:b0:189:df3c:1ba1 with SMTP id m12-20020a170902d18c00b00189df3c1ba1mr7681329plb.38.1670642605609;
-        Fri, 09 Dec 2022 19:23:25 -0800 (PST)
+        bh=2Z1BxGqgHITzxO8Bw1N1uCOjsI728aaE4AlHdATKeMY=;
+        b=kj3eVe4xufZGvjh6CZaYw4QBiL8SP4IWjqx68kdy0nkR2wv+ty3suVsqROjAoBJZ6L
+         SFxEXhNhYHkxb3TlIXIPepWiRBwQckS5jvGu4ij14J8NQBdVV2XMKZA+9MwaUS7Ku0Kh
+         SOweX4PQXbpRAKvHIn6VvMaS3sEaPboQ8oAgmYXqKPHlEsCXNdHnotHwODGfV3qBZNLo
+         TszziLaPDsVhwhxCk1+QVB0awauEEJXkFo5amryjJFoXDtntHo6ueKefKjv0TohrLz3j
+         eNaODaNNy7WzBe60KUIEydSJCfmwxVT0Vw48PFwBmicdV1rjO9Iz9FDx/+yn6AmQMfCh
+         Ktwg==
+X-Gm-Message-State: ANoB5pk1JRxspA7DwU54VrJzteNReUglWqmg8Jdo7euxrXarsECEPJ/x
+        eUVNScD5TgW3bgXrujoLQQc=
+X-Google-Smtp-Source: AA0mqf4rCVdO8UL0ztSnV+pTxDUcUzFbCj5XZieEIPqwQnHFA5oe7BYNe4+ZjB0ris45py/m6zJN1g==
+X-Received: by 2002:a17:902:7890:b0:188:fc0c:cdb1 with SMTP id q16-20020a170902789000b00188fc0ccdb1mr8238689pll.16.1670644265334;
+        Fri, 09 Dec 2022 19:51:05 -0800 (PST)
 Received: from debian.me (subs02-180-214-232-76.three.co.id. [180.214.232.76])
-        by smtp.gmail.com with ESMTPSA id d13-20020a63d70d000000b0047829d1b8eesm1605511pgg.31.2022.12.09.19.23.23
+        by smtp.gmail.com with ESMTPSA id q15-20020a170902a3cf00b0016d9b101413sm1993404plb.200.2022.12.09.19.51.03
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 09 Dec 2022 19:23:23 -0800 (PST)
+        Fri, 09 Dec 2022 19:51:03 -0800 (PST)
 Received: by debian.me (Postfix, from userid 1000)
-        id 146CC101D56; Sat, 10 Dec 2022 10:23:20 +0700 (WIB)
-Date:   Sat, 10 Dec 2022 10:23:20 +0700
+        id 18D54103E00; Sat, 10 Dec 2022 10:50:59 +0700 (WIB)
+Date:   Sat, 10 Dec 2022 10:50:59 +0700
 From:   Bagas Sanjaya <bagasdotme@gmail.com>
 To:     Sergei Shtepa <sergei.shtepa@veeam.com>
 Cc:     axboe@kernel.dk, corbet@lwn.net, linux-block@vger.kernel.org,
         linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 00/21] blksnap - block devices snapshots module
-Message-ID: <Y5P7qDolYickFyBJ@debian.me>
+Subject: Re: [PATCH v2 04/21] documentation, blksnap:  Block Devices
+ Snapshots Module
+Message-ID: <Y5QCI9rXE+HW03ci@debian.me>
 References: <20221209142331.26395-1-sergei.shtepa@veeam.com>
+ <20221209142331.26395-5-sergei.shtepa@veeam.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="a3vgSDtb/WZb5Bie"
+        protocol="application/pgp-signature"; boundary="740pxZ5UMCIx1ZPc"
 Content-Disposition: inline
-In-Reply-To: <20221209142331.26395-1-sergei.shtepa@veeam.com>
+In-Reply-To: <20221209142331.26395-5-sergei.shtepa@veeam.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 
---a3vgSDtb/WZb5Bie
+--740pxZ5UMCIx1ZPc
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Dec 09, 2022 at 03:23:10PM +0100, Sergei Shtepa wrote:
-> Sergei Shtepa (21):
->   documentation, blkfilter: Block Device Filtering Mechanism
->   block, blkfilter: Block Device Filtering Mechanism
->   documentation, capability: fix Generic Block Device Capability
->   documentation, blksnap:  Block Devices Snapshots Module
->   block, blksnap: header file of the module interface
->   block, blksnap: module management interface functions
->   block, blksnap: init() and exit() functions
->   block, blksnap: interaction with sysfs
->   block, blksnap: attaching and detaching the filter and handling I/O
->     units
->   block, blksnap: map of change block tracking
->   block, blksnap: minimum data storage unit of the original block device
->   block, blksnap: buffer in memory for the minimum data storage unit
->   block, blksnap: functions and structures for performing block I/O
->     operations
->   block, blksnap: storage for storing difference blocks
->   block, blksnap: event queue from the difference storage
->   block, blksnap: owner of information about overwritten blocks of the
->     original block device
->   block, blksnap: snapshot image block device
->   block, blksnap: snapshot
->   block, blksnap: Kconfig and Makefile
->   block, blksnap: adds a blksnap to the kernel tree
->   block, blksnap: adds a maintainer for new files
->=20
+On Fri, Dec 09, 2022 at 03:23:14PM +0100, Sergei Shtepa wrote:
+> The document contains:
+> * Describes the purpose of the mechanism
+> * Description of features
+> * Description of algorithms
+> * Recommendations about using the module from the user-space side
+> * Reference to module interface description
 
-Per convention in block subsystem (see for example `git log --no-merges
--- drivers/block/`), the patch subject prefix should looks like "block
-component: some patch" (e.g. "blksnap: do something").
+The patch subject should be "Documentation: document Block Devices
+Snapshots Module".
 
-Thanks.
+Don't forget to write the description in imperative mood instead.
+
+> +Introduction
+> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> +
+> +At first glance, there is no novelty in the idea of creating snapshots f=
+or
+> +block devices. The Linux kernel already has mechanisms for creating snap=
+shots.
+> +Device Mapper includes dm-snap, which allows to create snapshots of block
+> +devices. BTRFS supports snapshots at the file system level. However, both
+> +of these options have flaws that do not allow to use them as a universal
+> +tool for creating backups.
+> +
+> +Device Mapper flaws:
+> +
+> +- Block devices must have LVM markup.
+> +  If no logical volumes were created during system installation, then dm=
+-snap
+> +  cannot be applied.
+> +- To store snapshot differences of one logical volume, it is necessary to
+> +  reserve a fixed range of sectors on a reserved empty logical volume.
+> +  Firstly, it is required that the system has enough space unoccupied by=
+ the
+> +  file system, which rarely occurs on real servers. Secondly, as a rule,
+> +  it is necessary to create snapshots for all logical volumes at once, w=
+hich
+> +  requires dividing this reserved space between several logical volumes.
+> +  This space can be divided equally or proportionally to the size. But
+> +  the load on different disks is usually uneven. As a result, a snapshot
+> +  overflow may occur for one of the block devices, while for others all
+> +  the reserved space may remain free. This complicates management of the
+> +  difference storage and makes it almost impossible to create a coherent
+> +  snapshot of multiple logical volumes.
+> +
+> +BTRFS flaws:
+> +
+> +- Snapshots create a persistent image of the file system, not a block de=
+vice.
+> +  Such a snapshot is only applicable for a file backup.
+> +- When synchronizing the snapshot subvolume with the backup subvolume, r=
+eading
+> +  the differences leads to random access to the block device, which leads
+> +  to decrease in efficiency compared to direct copying of the block devi=
+ce.
+> +- BTRFS allows to get an incremental backup [#btrfs_increment]_, but it =
+is
+> +  necessary to keep a snapshot of the previous backup cycle on the syste=
+m,
+> +  which leads to excessive consumption of disk space.
+> +- If there is not enough free space on the file system while holding the
+> +  snapshot, new data cannot be saved, which leads to a server malfunctio=
+n.
+> +
+> +Features of the blksnap module:
+> +
+> +- Change tracker
+> +- Snapshots at the block device level
+> +- Dynamic allocation of space for storing differences
+> +- Snapshot overflow resistance
+> +- Coherent snapshot of multiple block devices
+
+There is a jump from drawbacks of existing method to blksnap features.
+Before introducing the latter, there should have been blksnap
+description and how it solves the drawbacks. Also, the features list
+above is redundant due to features section which describes each of them.
+
+> +Static C++ library
+> +------------------
+> +
+> +The [#userspace_libs]_ library was created primarily to simplify creatio=
+n of
+
+"The libblksnap [#userspace_libs]_ library was ..."
+
+
+> +Module interface description
+> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D
+> +
+> +.. kernel-doc:: include/uapi/linux/blksnap.h
+
+IMO this section should be placed after "How to use" section, because
+it's quite odd to add another info after references section.
+
+Thanks.=20
 
 --=20
 An old man doll... just what I always wanted! - Clara
 
---a3vgSDtb/WZb5Bie
+--740pxZ5UMCIx1ZPc
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iHUEABYIAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCY5P7qAAKCRD2uYlJVVFO
-oxBMAQDiZVI/ZOQMMTngtyrZorqy9ONsxNMJQtfAoqcgAOYyAgD/fJfx7YohYs8z
-LsYz1f786k+fCfipOou0ee1xjjRDeQE=
-=KJUt
+iHUEABYIAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCY5QCHwAKCRD2uYlJVVFO
+o28kAP9cdVAiAeRGozPZ57xf/LM6z/ASMVfrquTf9kSnycL3NAEAoW6WPu+U1KsR
+azbIOnLYwKahdIXUoQ0AkDbSqBO5Vgw=
+=L60b
 -----END PGP SIGNATURE-----
 
---a3vgSDtb/WZb5Bie--
+--740pxZ5UMCIx1ZPc--
