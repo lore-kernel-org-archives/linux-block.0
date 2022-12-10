@@ -2,189 +2,241 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 882DAC10F1B
-	for <linux-block@archiver.kernel.org>; Sat, 10 Dec 2022 03:51:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0616BC4332F
+	for <linux-block@archiver.kernel.org>; Sat, 10 Dec 2022 04:16:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229749AbiLJDvW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 9 Dec 2022 22:51:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46348 "EHLO
+        id S229728AbiLJEQZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 9 Dec 2022 23:16:25 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56898 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229605AbiLJDvJ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 9 Dec 2022 22:51:09 -0500
-Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC8CE60EB7;
-        Fri,  9 Dec 2022 19:51:05 -0800 (PST)
-Received: by mail-pl1-x636.google.com with SMTP id jl24so6850253plb.8;
-        Fri, 09 Dec 2022 19:51:05 -0800 (PST)
+        with ESMTP id S229760AbiLJEPy (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 9 Dec 2022 23:15:54 -0500
+Received: from mail-pf1-x435.google.com (mail-pf1-x435.google.com [IPv6:2607:f8b0:4864:20::435])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 507FA750B8;
+        Fri,  9 Dec 2022 20:15:53 -0800 (PST)
+Received: by mail-pf1-x435.google.com with SMTP id 65so5046249pfx.9;
+        Fri, 09 Dec 2022 20:15:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=2Z1BxGqgHITzxO8Bw1N1uCOjsI728aaE4AlHdATKeMY=;
-        b=f+DxILPCiJEbc3+xycVStaiFr60dHklhd9G068nwGG1d6SfL1d7MTVFBW2kC027c/X
-         kD+IQ/CMX1QBrt2LoumioD57wI/07k2HHIstp1PZC5Ci/MsZlgtDnT948fkpgqEOuRPE
-         hN+kSiqO0Lc/uKx6qc94XL40oyB5c5EWEZr9yVpZbfF4ZGguSe8hXqtJRL5jOOAmRt7t
-         ZkXCy6oL8Nf4xkkGkcWAFGzw2dzaDF832rFg1t6KjkkEEuGl2gyz5lFFFJ5kAxUhoGmq
-         0GZ6tuqlSXH3zK12qTVApHROmJaTU+t1lMIgtlReHTcARzZRLQcNyl+dKyQzXFxBTYmK
-         XhZw==
+        bh=5ozEVuMBsrz2fGpZPaf5TBc56Rb5hAzeIeLY45YAmjg=;
+        b=qBuyZR9xJuqckUAwIQgashHsDw96Aw3Jld/uVlEvbCsfcLt46kL96bojo8qKgzJZtK
+         FygLn59+S6HBFyAz6rV5sxdMykV3+DwsLnQb03+ohkhmmhJthTwX/6v2orYRqHQCtGgD
+         9ANAMJ/CC+ocvoN5WiGy2CWKEjV/EEZn4dKGLD5bzOsfN0CZpQhbrvwd5iND2vqfFaq6
+         7DxKT/IpCfoPsI4ey/RRAb0T72Dpdwq4xL50pZq0sLv0K4ndk9K1KYaKzalDPvNV2wq6
+         dWB0wi+d54AycCMonGVteTXR7X3BymFAWaUwk7YpRWJzqBAMdVWYdLOfSsPFOHbXpB3C
+         CIOg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=2Z1BxGqgHITzxO8Bw1N1uCOjsI728aaE4AlHdATKeMY=;
-        b=kj3eVe4xufZGvjh6CZaYw4QBiL8SP4IWjqx68kdy0nkR2wv+ty3suVsqROjAoBJZ6L
-         SFxEXhNhYHkxb3TlIXIPepWiRBwQckS5jvGu4ij14J8NQBdVV2XMKZA+9MwaUS7Ku0Kh
-         SOweX4PQXbpRAKvHIn6VvMaS3sEaPboQ8oAgmYXqKPHlEsCXNdHnotHwODGfV3qBZNLo
-         TszziLaPDsVhwhxCk1+QVB0awauEEJXkFo5amryjJFoXDtntHo6ueKefKjv0TohrLz3j
-         eNaODaNNy7WzBe60KUIEydSJCfmwxVT0Vw48PFwBmicdV1rjO9Iz9FDx/+yn6AmQMfCh
-         Ktwg==
-X-Gm-Message-State: ANoB5pk1JRxspA7DwU54VrJzteNReUglWqmg8Jdo7euxrXarsECEPJ/x
-        eUVNScD5TgW3bgXrujoLQQc=
-X-Google-Smtp-Source: AA0mqf4rCVdO8UL0ztSnV+pTxDUcUzFbCj5XZieEIPqwQnHFA5oe7BYNe4+ZjB0ris45py/m6zJN1g==
-X-Received: by 2002:a17:902:7890:b0:188:fc0c:cdb1 with SMTP id q16-20020a170902789000b00188fc0ccdb1mr8238689pll.16.1670644265334;
-        Fri, 09 Dec 2022 19:51:05 -0800 (PST)
+        bh=5ozEVuMBsrz2fGpZPaf5TBc56Rb5hAzeIeLY45YAmjg=;
+        b=xVBBji3+crHkl5gRxj/aUzKHNTYEqtasurYdEqH5myOg2CDE58mnYkae5JnOfCXCI7
+         JwfShkar+3oolzQZ5tE+saHK+Nrv0izasJ9Pv3EzqhJ5cwBzC/l4S9T0y2LAk+t9Oj5f
+         vpOQ/H4V/BAUxwpw4zUxW7miE58qerF/ttZOp31BUo+8cGn9CvxO+wwIhBfb1NcGSmM7
+         cvBT/ccOaLTrnfxysqV9axp/mbEiUIcyyDEIMqh+h0Lurs/urTcCdrfANhRIJQqanIog
+         EICl8XHdnZaO3rN645bfLaMda5BQP9P9hKxtOcO5Tnj/pSEaIdBBcgZVq3J8EVy0Gj9N
+         Fx9w==
+X-Gm-Message-State: ANoB5plYjRUPGXDsNgcnxO+hLiR1LOTYq16LUyqCr3ZFjQQ5TazghnBF
+        CloWaGc5T21fFwLEpJtf9p4=
+X-Google-Smtp-Source: AA0mqf6INOrKloviSF3T6uZisghveh/vGMlmOCeTTviA5Pj5gFIHDKQkWAafIbmnMBVlQbMX9yDAAQ==
+X-Received: by 2002:a62:de04:0:b0:577:3885:9d43 with SMTP id h4-20020a62de04000000b0057738859d43mr8063841pfg.18.1670645752742;
+        Fri, 09 Dec 2022 20:15:52 -0800 (PST)
 Received: from debian.me (subs02-180-214-232-76.three.co.id. [180.214.232.76])
-        by smtp.gmail.com with ESMTPSA id q15-20020a170902a3cf00b0016d9b101413sm1993404plb.200.2022.12.09.19.51.03
+        by smtp.gmail.com with ESMTPSA id x28-20020aa78f1c000000b0056bc5ad4862sm1926655pfr.28.2022.12.09.20.15.51
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 09 Dec 2022 19:51:03 -0800 (PST)
+        Fri, 09 Dec 2022 20:15:52 -0800 (PST)
 Received: by debian.me (Postfix, from userid 1000)
-        id 18D54103E00; Sat, 10 Dec 2022 10:50:59 +0700 (WIB)
-Date:   Sat, 10 Dec 2022 10:50:59 +0700
+        id 0FB8510463F; Sat, 10 Dec 2022 11:15:48 +0700 (WIB)
+Date:   Sat, 10 Dec 2022 11:15:48 +0700
 From:   Bagas Sanjaya <bagasdotme@gmail.com>
 To:     Sergei Shtepa <sergei.shtepa@veeam.com>
 Cc:     axboe@kernel.dk, corbet@lwn.net, linux-block@vger.kernel.org,
         linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 04/21] documentation, blksnap:  Block Devices
- Snapshots Module
-Message-ID: <Y5QCI9rXE+HW03ci@debian.me>
+Subject: Re: [PATCH v2 01/21] documentation, blkfilter: Block Device
+ Filtering Mechanism
+Message-ID: <Y5QH9FdUvgZ7A8cu@debian.me>
 References: <20221209142331.26395-1-sergei.shtepa@veeam.com>
- <20221209142331.26395-5-sergei.shtepa@veeam.com>
+ <20221209142331.26395-2-sergei.shtepa@veeam.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="740pxZ5UMCIx1ZPc"
+        protocol="application/pgp-signature"; boundary="djxDLq4t0gK1VZM2"
 Content-Disposition: inline
-In-Reply-To: <20221209142331.26395-5-sergei.shtepa@veeam.com>
+In-Reply-To: <20221209142331.26395-2-sergei.shtepa@veeam.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 
---740pxZ5UMCIx1ZPc
+--djxDLq4t0gK1VZM2
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Dec 09, 2022 at 03:23:14PM +0100, Sergei Shtepa wrote:
+On Fri, Dec 09, 2022 at 03:23:11PM +0100, Sergei Shtepa wrote:
 > The document contains:
 > * Describes the purpose of the mechanism
-> * Description of features
-> * Description of algorithms
-> * Recommendations about using the module from the user-space side
-> * Reference to module interface description
+> * A little historical background on the capabilities of handling I/O
+>   units of the Linux kernel
+> * Brief description of the design
+> * Reference to interface description
+>=20
 
-The patch subject should be "Documentation: document Block Devices
-Snapshots Module".
+The patch subject should be "Documentation: document block device
+filtering"
 
-Don't forget to write the description in imperative mood instead.
+Also, write the patch description in imperative mood.
 
+> diff --git a/Documentation/block/blkfilter.rst b/Documentation/block/blkf=
+ilter.rst
+> new file mode 100644
+> index 000000000000..3482e16c1964
+> --- /dev/null
+> +++ b/Documentation/block/blkfilter.rst
+> @@ -0,0 +1,50 @@
+> +.. SPDX-License-Identifier: GPL-2.0
+> +
+> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D
+> +Block Device Filtering Mechanism
+> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D
+> +
+> +The block device filtering mechanism is an API that allows to attach blo=
+ck
+> +device filters. Block device filters allow perform additional processing
+> +for I/O units.
+> +
 > +Introduction
 > +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
 > +
-> +At first glance, there is no novelty in the idea of creating snapshots f=
-or
-> +block devices. The Linux kernel already has mechanisms for creating snap=
-shots.
-> +Device Mapper includes dm-snap, which allows to create snapshots of block
-> +devices. BTRFS supports snapshots at the file system level. However, both
-> +of these options have flaws that do not allow to use them as a universal
-> +tool for creating backups.
+> +The idea of handling I/O units on block devices is not new. Back in the
+> +2.6 kernel, there was an undocumented possibility of handling I/O units
+> +by substituting the make_request_fn() function, which belonged to the
+> +request_queue structure. But no kernel module used this feature, and it
+> +was eliminated in the 5.10 kernel.
 > +
-> +Device Mapper flaws:
+> +The block device filtering mechanism returns the ability to handle I/O u=
+nits.
+> +It is possible to safely attach filter to a block device "on the fly" wi=
+thout
+> +changing the structure of block devices.
 > +
-> +- Block devices must have LVM markup.
-> +  If no logical volumes were created during system installation, then dm=
--snap
-> +  cannot be applied.
-> +- To store snapshot differences of one logical volume, it is necessary to
-> +  reserve a fixed range of sectors on a reserved empty logical volume.
-> +  Firstly, it is required that the system has enough space unoccupied by=
- the
-> +  file system, which rarely occurs on real servers. Secondly, as a rule,
-> +  it is necessary to create snapshots for all logical volumes at once, w=
-hich
-> +  requires dividing this reserved space between several logical volumes.
-> +  This space can be divided equally or proportionally to the size. But
-> +  the load on different disks is usually uneven. As a result, a snapshot
-> +  overflow may occur for one of the block devices, while for others all
-> +  the reserved space may remain free. This complicates management of the
-> +  difference storage and makes it almost impossible to create a coherent
-> +  snapshot of multiple logical volumes.
+> +It supports attaching one filter to one block device, because there is o=
+nly
+> +one filter implementation in the kernel.
+> +See Documentation/block/blksnap.rst.
 > +
-> +BTRFS flaws:
+> +Design
+> +=3D=3D=3D=3D=3D=3D
 > +
-> +- Snapshots create a persistent image of the file system, not a block de=
-vice.
-> +  Such a snapshot is only applicable for a file backup.
-> +- When synchronizing the snapshot subvolume with the backup subvolume, r=
-eading
-> +  the differences leads to random access to the block device, which leads
-> +  to decrease in efficiency compared to direct copying of the block devi=
-ce.
-> +- BTRFS allows to get an incremental backup [#btrfs_increment]_, but it =
-is
-> +  necessary to keep a snapshot of the previous backup cycle on the syste=
-m,
-> +  which leads to excessive consumption of disk space.
-> +- If there is not enough free space on the file system while holding the
-> +  snapshot, new data cannot be saved, which leads to a server malfunctio=
-n.
+> +The block device filtering mechanism provides functions for attaching and
+> +detaching the filter. The filter is a structure with a reference counter
+> +and callback functions.
 > +
-> +Features of the blksnap module:
+> +The submit_bio_cb() callback function is called for each I/O unit for a =
+block
+> +device, providing I/O unit filtering. Depending on the result of filteri=
+ng
+> +the I/O unit, it can either be passed for subsequent processing by the b=
+lock
+> +layer, or skipped.
 > +
-> +- Change tracker
-> +- Snapshots at the block device level
-> +- Dynamic allocation of space for storing differences
-> +- Snapshot overflow resistance
-> +- Coherent snapshot of multiple block devices
+> +The reference counter allows to control the filter lifetime. When the re=
+ference
+> +count is reduced to zero, the release_cb() callback function is called to
+> +release the filter. This allows the filter to be released when the block
+> +device is disconnected.
+> +
+> +Interface description
+> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> +.. kernel-doc:: include/linux/blkdev.h
+> +	:functions: bdev_filter_operations bdev_filter bdev_filter_init bdev_fi=
+lter_get bdev_filter_put
+> +.. kernel-doc:: block/bdev.c
+> +	:functions: bdev_filter_attach bdev_filter_detach
 
-There is a jump from drawbacks of existing method to blksnap features.
-Before introducing the latter, there should have been blksnap
-description and how it solves the drawbacks. Also, the features list
-above is redundant due to features section which describes each of them.
+What about the wording below instead?
 
-> +Static C++ library
-> +------------------
-> +
-> +The [#userspace_libs]_ library was created primarily to simplify creatio=
-n of
+---- >8 ----
+diff --git a/Documentation/block/blkfilter.rst b/Documentation/block/blkfil=
+ter.rst
+index 3482e16c1964e6..fe2a4151c38fde 100644
+--- a/Documentation/block/blkfilter.rst
++++ b/Documentation/block/blkfilter.rst
+@@ -5,7 +5,7 @@ Block Device Filtering Mechanism
+ =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D
+=20
+ The block device filtering mechanism is an API that allows to attach block
+-device filters. Block device filters allow perform additional processing
++device filters. Block device filters allow performing additional processing
+ for I/O units.
+=20
+ Introduction
+@@ -14,16 +14,16 @@ Introduction
+ The idea of handling I/O units on block devices is not new. Back in the
+ 2.6 kernel, there was an undocumented possibility of handling I/O units
+ by substituting the make_request_fn() function, which belonged to the
+-request_queue structure. But no kernel module used this feature, and it
+-was eliminated in the 5.10 kernel.
++request_queue structure. But no kernel module used this feature, which was
++the reason why it was removed in the 5.10 kernel.
+=20
+-The block device filtering mechanism returns the ability to handle I/O uni=
+ts.
+-It is possible to safely attach filter to a block device "on the fly" with=
+out
++With block device filtering, the ability to handling I/O units is back. It=
+ is
++now possible to safely attaching filter to a block device "on the fly" wit=
+hout
+ changing the structure of block devices.
+=20
+-It supports attaching one filter to one block device, because there is only
+-one filter implementation in the kernel.
+-See Documentation/block/blksnap.rst.
++It supports attaching a filter to a block device, due to there is only
++one filter implementation in the kernel. See Documentation/block/blksnap.r=
+st
++for details.
+=20
+ Design
+ =3D=3D=3D=3D=3D=3D
+@@ -33,9 +33,9 @@ detaching the filter. The filter is a structure with a re=
+ference counter
+ and callback functions.
+=20
+ The submit_bio_cb() callback function is called for each I/O unit for a bl=
+ock
+-device, providing I/O unit filtering. Depending on the result of filtering
+-the I/O unit, it can either be passed for subsequent processing by the blo=
+ck
+-layer, or skipped.
++device, providing I/O unit filtering. Depending on filtering result, it can
++either be passed for subsequent processing by the block
++layer, or be skipped.
+=20
+ The reference counter allows to control the filter lifetime. When the refe=
+rence
+ count is reduced to zero, the release_cb() callback function is called to
 
-"The libblksnap [#userspace_libs]_ library was ..."
-
-
-> +Module interface description
-> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D
-> +
-> +.. kernel-doc:: include/uapi/linux/blksnap.h
-
-IMO this section should be placed after "How to use" section, because
-it's quite odd to add another info after references section.
-
-Thanks.=20
+Thanks.
 
 --=20
 An old man doll... just what I always wanted! - Clara
 
---740pxZ5UMCIx1ZPc
+--djxDLq4t0gK1VZM2
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iHUEABYIAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCY5QCHwAKCRD2uYlJVVFO
-o28kAP9cdVAiAeRGozPZ57xf/LM6z/ASMVfrquTf9kSnycL3NAEAoW6WPu+U1KsR
-azbIOnLYwKahdIXUoQ0AkDbSqBO5Vgw=
-=L60b
+iHUEABYIAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCY5QH7gAKCRD2uYlJVVFO
+ozyBAP4y2s2pM1cq93OuuJUSPvRd1Qz1ElJR2eNrN63nSWIPtgD/U3JNGKJ3bzNp
+6SMFiHhd6OvERXUaW7U/TJ2hkKacrgc=
+=yUM4
 -----END PGP SIGNATURE-----
 
---740pxZ5UMCIx1ZPc--
+--djxDLq4t0gK1VZM2--
