@@ -2,241 +2,280 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0616BC4332F
-	for <linux-block@archiver.kernel.org>; Sat, 10 Dec 2022 04:16:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E33DCC4332F
+	for <linux-block@archiver.kernel.org>; Sat, 10 Dec 2022 10:04:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229728AbiLJEQZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 9 Dec 2022 23:16:25 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56898 "EHLO
+        id S229684AbiLJKEx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 10 Dec 2022 05:04:53 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38532 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229760AbiLJEPy (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 9 Dec 2022 23:15:54 -0500
-Received: from mail-pf1-x435.google.com (mail-pf1-x435.google.com [IPv6:2607:f8b0:4864:20::435])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 507FA750B8;
-        Fri,  9 Dec 2022 20:15:53 -0800 (PST)
-Received: by mail-pf1-x435.google.com with SMTP id 65so5046249pfx.9;
-        Fri, 09 Dec 2022 20:15:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=5ozEVuMBsrz2fGpZPaf5TBc56Rb5hAzeIeLY45YAmjg=;
-        b=qBuyZR9xJuqckUAwIQgashHsDw96Aw3Jld/uVlEvbCsfcLt46kL96bojo8qKgzJZtK
-         FygLn59+S6HBFyAz6rV5sxdMykV3+DwsLnQb03+ohkhmmhJthTwX/6v2orYRqHQCtGgD
-         9ANAMJ/CC+ocvoN5WiGy2CWKEjV/EEZn4dKGLD5bzOsfN0CZpQhbrvwd5iND2vqfFaq6
-         7DxKT/IpCfoPsI4ey/RRAb0T72Dpdwq4xL50pZq0sLv0K4ndk9K1KYaKzalDPvNV2wq6
-         dWB0wi+d54AycCMonGVteTXR7X3BymFAWaUwk7YpRWJzqBAMdVWYdLOfSsPFOHbXpB3C
-         CIOg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5ozEVuMBsrz2fGpZPaf5TBc56Rb5hAzeIeLY45YAmjg=;
-        b=xVBBji3+crHkl5gRxj/aUzKHNTYEqtasurYdEqH5myOg2CDE58mnYkae5JnOfCXCI7
-         JwfShkar+3oolzQZ5tE+saHK+Nrv0izasJ9Pv3EzqhJ5cwBzC/l4S9T0y2LAk+t9Oj5f
-         vpOQ/H4V/BAUxwpw4zUxW7miE58qerF/ttZOp31BUo+8cGn9CvxO+wwIhBfb1NcGSmM7
-         cvBT/ccOaLTrnfxysqV9axp/mbEiUIcyyDEIMqh+h0Lurs/urTcCdrfANhRIJQqanIog
-         EICl8XHdnZaO3rN645bfLaMda5BQP9P9hKxtOcO5Tnj/pSEaIdBBcgZVq3J8EVy0Gj9N
-         Fx9w==
-X-Gm-Message-State: ANoB5plYjRUPGXDsNgcnxO+hLiR1LOTYq16LUyqCr3ZFjQQ5TazghnBF
-        CloWaGc5T21fFwLEpJtf9p4=
-X-Google-Smtp-Source: AA0mqf6INOrKloviSF3T6uZisghveh/vGMlmOCeTTviA5Pj5gFIHDKQkWAafIbmnMBVlQbMX9yDAAQ==
-X-Received: by 2002:a62:de04:0:b0:577:3885:9d43 with SMTP id h4-20020a62de04000000b0057738859d43mr8063841pfg.18.1670645752742;
-        Fri, 09 Dec 2022 20:15:52 -0800 (PST)
-Received: from debian.me (subs02-180-214-232-76.three.co.id. [180.214.232.76])
-        by smtp.gmail.com with ESMTPSA id x28-20020aa78f1c000000b0056bc5ad4862sm1926655pfr.28.2022.12.09.20.15.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 09 Dec 2022 20:15:52 -0800 (PST)
-Received: by debian.me (Postfix, from userid 1000)
-        id 0FB8510463F; Sat, 10 Dec 2022 11:15:48 +0700 (WIB)
-Date:   Sat, 10 Dec 2022 11:15:48 +0700
-From:   Bagas Sanjaya <bagasdotme@gmail.com>
-To:     Sergei Shtepa <sergei.shtepa@veeam.com>
-Cc:     axboe@kernel.dk, corbet@lwn.net, linux-block@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 01/21] documentation, blkfilter: Block Device
- Filtering Mechanism
-Message-ID: <Y5QH9FdUvgZ7A8cu@debian.me>
-References: <20221209142331.26395-1-sergei.shtepa@veeam.com>
- <20221209142331.26395-2-sergei.shtepa@veeam.com>
+        with ESMTP id S229545AbiLJKEw (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Sat, 10 Dec 2022 05:04:52 -0500
+Received: from dggsgout12.his.huawei.com (unknown [45.249.212.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E7FD1929F;
+        Sat, 10 Dec 2022 02:04:50 -0800 (PST)
+Received: from mail02.huawei.com (unknown [172.30.67.169])
+        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4NTk5R66wZz4f3mSf;
+        Sat, 10 Dec 2022 18:04:43 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.175.127.227])
+        by APP2 (Coremail) with SMTP id Syh0CgB3jrm9WZRjUP3SBw--.988S4;
+        Sat, 10 Dec 2022 18:04:47 +0800 (CST)
+From:   Yu Kuai <yukuai1@huaweicloud.com>
+To:     jack@suse.cz, paolo.valente@linaro.org, axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yukuai3@huawei.com, yukuai1@huaweicloud.com, yi.zhang@huawei.com
+Subject: [PATCH] block, bfq: fix possible uaf for 'bfqq->bic'
+Date:   Sat, 10 Dec 2022 18:25:37 +0800
+Message-Id: <20221210102537.655670-1-yukuai1@huaweicloud.com>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="djxDLq4t0gK1VZM2"
-Content-Disposition: inline
-In-Reply-To: <20221209142331.26395-2-sergei.shtepa@veeam.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: Syh0CgB3jrm9WZRjUP3SBw--.988S4
+X-Coremail-Antispam: 1UD129KBjvJXoW3Xw18XF18XFWfGryDWw13CFg_yoW3Aw4rpr
+        sI9ayxCr48JryUZr47Ar48KF18JFZxA3W7JrWIkr1xXa45Zw4YyFyUtF1UWry8Gr4rAa47
+        WFn8GrWUtr1Dt3DanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUyG14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+        1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+        JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+        CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+        2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+        W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1l42xK82IYc2Ij64vI
+        r41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8Gjc
+        xK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0
+        cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42xK8V
+        AvwI8IcIk0rVWrZr1j6s0DMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7Cj
+        xVAFwI0_Jr0_GrUvcSsGvfC2KfnxnUUI43ZEXa7VUbXdbUUUUUU==
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+From: Yu Kuai <yukuai3@huawei.com>
 
---djxDLq4t0gK1VZM2
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Our test report a uaf for 'bfqq->bic' in 5.10:
 
-On Fri, Dec 09, 2022 at 03:23:11PM +0100, Sergei Shtepa wrote:
-> The document contains:
-> * Describes the purpose of the mechanism
-> * A little historical background on the capabilities of handling I/O
->   units of the Linux kernel
-> * Brief description of the design
-> * Reference to interface description
->=20
+==================================================================
+BUG: KASAN: use-after-free in bfq_select_queue+0x378/0xa30
+Read of size 8 at addr ffff88810efb42d8 by task fsstress/2318352
 
-The patch subject should be "Documentation: document block device
-filtering"
+CPU: 6 PID: 2318352 Comm: fsstress Kdump: loaded Not tainted 5.10.0-60.18.0.50.h602.kasan.eulerosv2r11.x86_64 #1
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.12.1-0-ga5cab58-20220320_160524-szxrtosci10000 04/01/2014
+Call Trace:
+ dump_stack+0x9c/0xd3
+ print_address_description.constprop.0+0x19/0x170
+ ? bfq_select_queue+0x378/0xa30
+ __kasan_report.cold+0x6c/0x84
+ ? bfq_select_queue+0x378/0xa30
+ kasan_report+0x3a/0x50
+ bfq_select_queue+0x378/0xa30
+ ? bfq_bfqq_expire+0x6c0/0x6c0
+ ? bfq_mark_bfqq_busy+0x1f/0x30
+ ? _raw_spin_lock_irq+0x7b/0xd0
+ __bfq_dispatch_request+0x1c4/0x220
+ bfq_dispatch_request+0xe8/0x130
+ __blk_mq_do_dispatch_sched+0x3f4/0x560
+ ? blk_mq_sched_mark_restart_hctx+0x50/0x50
+ ? bfq_init_rq+0x128/0x940
+ ? pvclock_clocksource_read+0xf6/0x1d0
+ blk_mq_do_dispatch_sched+0x62/0xb0
+ __blk_mq_sched_dispatch_requests+0x215/0x2a0
+ ? blk_mq_do_dispatch_ctx+0x3a0/0x3a0
+ ? bfq_insert_request+0x193/0x3f0
+ blk_mq_sched_dispatch_requests+0x8f/0xd0
+ __blk_mq_run_hw_queue+0x98/0x180
+ __blk_mq_delay_run_hw_queue+0x22b/0x240
+ ? bfq_asymmetric_scenario+0x160/0x160
+ blk_mq_run_hw_queue+0xe3/0x190
+ ? bfq_insert_request+0x3f0/0x3f0
+ blk_mq_sched_insert_requests+0x107/0x200
+ blk_mq_flush_plug_list+0x26e/0x3c0
+ ? blk_mq_insert_requests+0x250/0x250
+ ? blk_check_plugged+0x190/0x190
+ blk_finish_plug+0x63/0x90
+ __iomap_dio_rw+0x7b5/0x910
+ ? iomap_dio_actor+0x150/0x150
+ ? userns_put+0x70/0x70
+ ? userns_put+0x70/0x70
+ ? avc_has_perm_noaudit+0x1d0/0x1d0
+ ? down_read+0xd5/0x1a0
+ ? down_read_killable+0x1b0/0x1b0
+ ? from_kgid+0xa0/0xa0
+ iomap_dio_rw+0x36/0x80
+ ext4_dio_read_iter+0x146/0x190 [ext4]
+ ext4_file_read_iter+0x1e2/0x230 [ext4]
+ new_sync_read+0x29f/0x400
+ ? default_llseek+0x160/0x160
+ ? find_isec_ns+0x8d/0x2e0
+ ? avc_policy_seqno+0x27/0x40
+ ? selinux_file_permission+0x34/0x180
+ ? security_file_permission+0x135/0x2b0
+ vfs_read+0x24e/0x2d0
+ ksys_read+0xd5/0x1b0
+ ? __ia32_sys_pread64+0x160/0x160
+ ? __audit_syscall_entry+0x1cc/0x220
+ do_syscall_64+0x33/0x40
+ entry_SYSCALL_64_after_hwframe+0x61/0xc6
+RIP: 0033:0x7ff05f96fe62
+Code: c0 e9 b2 fe ff ff 50 48 8d 3d 12 04 0c 00 e8 b5 fe 01 00 0f 1f 44 00 00 f3 0f 1e fa 64 8b 04 25 18 00 00 00 85 c0 75 10 0f 05 <48> 3d 00 f0 ff ff 77 56 c3 0f 1f 44 00 00 48 83 ec 28 48 89 54 24
+RSP: 002b:00007fffd30c0ff8 EFLAGS: 00000246 ORIG_RAX: 0000000000000000
+RAX: ffffffffffffffda RBX: 00000000000000a5 RCX: 00007ff05f96fe62
+RDX: 000000000001d000 RSI: 0000000001ffc000 RDI: 0000000000000003
+RBP: 0000000000000003 R08: 0000000002019000 R09: 0000000000000000
+R10: 00007ff05fa65290 R11: 0000000000000246 R12: 0000000000131800
+R13: 000000000001d000 R14: 0000000000000000 R15: 0000000001ffc000
 
-Also, write the patch description in imperative mood.
+Allocated by task 2318348:
+ kasan_save_stack+0x1b/0x40
+ __kasan_kmalloc.constprop.0+0xb5/0xe0
+ kmem_cache_alloc_node+0x15d/0x480
+ ioc_create_icq+0x68/0x2e0
+ blk_mq_sched_assign_ioc+0xbc/0xd0
+ blk_mq_rq_ctx_init+0x4b0/0x600
+ __blk_mq_alloc_request+0x21f/0x2e0
+ blk_mq_submit_bio+0x27a/0xd60
+ __submit_bio_noacct_mq+0x10b/0x270
+ submit_bio_noacct+0x13d/0x150
+ submit_bio+0xbf/0x280
+ iomap_dio_submit_bio+0x155/0x180
+ iomap_dio_bio_actor+0x2f0/0x770
+ iomap_dio_actor+0xd9/0x150
+ iomap_apply+0x1d2/0x4f0
+ __iomap_dio_rw+0x43a/0x910
+ iomap_dio_rw+0x36/0x80
+ ext4_dio_write_iter+0x46f/0x730 [ext4]
+ ext4_file_write_iter+0xd8/0x100 [ext4]
+ new_sync_write+0x2ac/0x3a0
+ vfs_write+0x365/0x430
+ ksys_write+0xd5/0x1b0
+ do_syscall_64+0x33/0x40
+ entry_SYSCALL_64_after_hwframe+0x61/0xc6
 
-> diff --git a/Documentation/block/blkfilter.rst b/Documentation/block/blkf=
-ilter.rst
-> new file mode 100644
-> index 000000000000..3482e16c1964
-> --- /dev/null
-> +++ b/Documentation/block/blkfilter.rst
-> @@ -0,0 +1,50 @@
-> +.. SPDX-License-Identifier: GPL-2.0
-> +
-> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D
-> +Block Device Filtering Mechanism
-> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D
-> +
-> +The block device filtering mechanism is an API that allows to attach blo=
-ck
-> +device filters. Block device filters allow perform additional processing
-> +for I/O units.
-> +
-> +Introduction
-> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> +
-> +The idea of handling I/O units on block devices is not new. Back in the
-> +2.6 kernel, there was an undocumented possibility of handling I/O units
-> +by substituting the make_request_fn() function, which belonged to the
-> +request_queue structure. But no kernel module used this feature, and it
-> +was eliminated in the 5.10 kernel.
-> +
-> +The block device filtering mechanism returns the ability to handle I/O u=
-nits.
-> +It is possible to safely attach filter to a block device "on the fly" wi=
-thout
-> +changing the structure of block devices.
-> +
-> +It supports attaching one filter to one block device, because there is o=
-nly
-> +one filter implementation in the kernel.
-> +See Documentation/block/blksnap.rst.
-> +
-> +Design
-> +=3D=3D=3D=3D=3D=3D
-> +
-> +The block device filtering mechanism provides functions for attaching and
-> +detaching the filter. The filter is a structure with a reference counter
-> +and callback functions.
-> +
-> +The submit_bio_cb() callback function is called for each I/O unit for a =
-block
-> +device, providing I/O unit filtering. Depending on the result of filteri=
-ng
-> +the I/O unit, it can either be passed for subsequent processing by the b=
-lock
-> +layer, or skipped.
-> +
-> +The reference counter allows to control the filter lifetime. When the re=
-ference
-> +count is reduced to zero, the release_cb() callback function is called to
-> +release the filter. This allows the filter to be released when the block
-> +device is disconnected.
-> +
-> +Interface description
-> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> +.. kernel-doc:: include/linux/blkdev.h
-> +	:functions: bdev_filter_operations bdev_filter bdev_filter_init bdev_fi=
-lter_get bdev_filter_put
-> +.. kernel-doc:: block/bdev.c
-> +	:functions: bdev_filter_attach bdev_filter_detach
+Freed by task 2320929:
+ kasan_save_stack+0x1b/0x40
+ kasan_set_track+0x1c/0x30
+ kasan_set_free_info+0x20/0x40
+ __kasan_slab_free+0x151/0x180
+ kmem_cache_free+0x9e/0x540
+ rcu_do_batch+0x292/0x700
+ rcu_core+0x270/0x2d0
+ __do_softirq+0xfd/0x402
 
-What about the wording below instead?
+Last call_rcu():
+ kasan_save_stack+0x1b/0x40
+ kasan_record_aux_stack+0xa8/0xf0
+ __call_rcu+0xa4/0x3a0
+ ioc_release_fn+0x45/0x120
+ process_one_work+0x3c5/0x730
+ worker_thread+0x93/0x650
+ kthread+0x1ba/0x210
+ ret_from_fork+0x22/0x30
 
----- >8 ----
-diff --git a/Documentation/block/blkfilter.rst b/Documentation/block/blkfil=
-ter.rst
-index 3482e16c1964e6..fe2a4151c38fde 100644
---- a/Documentation/block/blkfilter.rst
-+++ b/Documentation/block/blkfilter.rst
-@@ -5,7 +5,7 @@ Block Device Filtering Mechanism
- =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D
-=20
- The block device filtering mechanism is an API that allows to attach block
--device filters. Block device filters allow perform additional processing
-+device filters. Block device filters allow performing additional processing
- for I/O units.
-=20
- Introduction
-@@ -14,16 +14,16 @@ Introduction
- The idea of handling I/O units on block devices is not new. Back in the
- 2.6 kernel, there was an undocumented possibility of handling I/O units
- by substituting the make_request_fn() function, which belonged to the
--request_queue structure. But no kernel module used this feature, and it
--was eliminated in the 5.10 kernel.
-+request_queue structure. But no kernel module used this feature, which was
-+the reason why it was removed in the 5.10 kernel.
-=20
--The block device filtering mechanism returns the ability to handle I/O uni=
-ts.
--It is possible to safely attach filter to a block device "on the fly" with=
-out
-+With block device filtering, the ability to handling I/O units is back. It=
- is
-+now possible to safely attaching filter to a block device "on the fly" wit=
-hout
- changing the structure of block devices.
-=20
--It supports attaching one filter to one block device, because there is only
--one filter implementation in the kernel.
--See Documentation/block/blksnap.rst.
-+It supports attaching a filter to a block device, due to there is only
-+one filter implementation in the kernel. See Documentation/block/blksnap.r=
-st
-+for details.
-=20
- Design
- =3D=3D=3D=3D=3D=3D
-@@ -33,9 +33,9 @@ detaching the filter. The filter is a structure with a re=
-ference counter
- and callback functions.
-=20
- The submit_bio_cb() callback function is called for each I/O unit for a bl=
-ock
--device, providing I/O unit filtering. Depending on the result of filtering
--the I/O unit, it can either be passed for subsequent processing by the blo=
-ck
--layer, or skipped.
-+device, providing I/O unit filtering. Depending on filtering result, it can
-+either be passed for subsequent processing by the block
-+layer, or be skipped.
-=20
- The reference counter allows to control the filter lifetime. When the refe=
-rence
- count is reduced to zero, the release_cb() callback function is called to
+Second to last call_rcu():
+ kasan_save_stack+0x1b/0x40
+ kasan_record_aux_stack+0xa8/0xf0
+ __call_rcu+0xa4/0x3a0
+ ioc_release_fn+0x45/0x120
+ process_one_work+0x3c5/0x730
+ worker_thread+0x93/0x650
+ kthread+0x1ba/0x210
+ ret_from_fork+0x22/0x30
 
-Thanks.
+The buggy address belongs to the object at ffff88810efb42a0
+ which belongs to the cache bfq_io_cq of size 160
+The buggy address is located 56 bytes inside of
+ 160-byte region [ffff88810efb42a0, ffff88810efb4340)
+The buggy address belongs to the page:
+page:00000000a519c14c refcount:1 mapcount:0 mapping:0000000000000000 index:0xffff88810efb4000 pfn:0x10efb4
+head:00000000a519c14c order:1 compound_mapcount:0
+flags: 0x17ffffc0010200(slab|head|node=0|zone=2|lastcpupid=0x1fffff)
+raw: 0017ffffc0010200 0000000000000000 dead000000000122 ffff8881407c8600
+raw: ffff88810efb4000 000000008024001a 00000001ffffffff 0000000000000000
+page dumped because: kasan: bad access detected
 
---=20
-An old man doll... just what I always wanted! - Clara
+Memory state around the buggy address:
+ ffff88810efb4180: fc fc fc fc fc fc fc fc fb fb fb fb fb fb fb fb
+ ffff88810efb4200: fb fb fb fb fb fb fb fb fb fb fb fb fc fc fc fc
+>ffff88810efb4280: fc fc fc fc fa fb fb fb fb fb fb fb fb fb fb fb
+                                                    ^
+ ffff88810efb4300: fb fb fb fb fb fb fb fb fc fc fc fc fc fc fc fc
+ ffff88810efb4380: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+================================================================== 
 
---djxDLq4t0gK1VZM2
-Content-Type: application/pgp-signature; name="signature.asc"
+Commit 3bc5e683c67d ("bfq: Split shared queues on move between cgroups")
+changes that move process to a new cgroup will allocate a new bfqq to
+use, however, the old bfqq and new bfqq can point to the same bic:
 
------BEGIN PGP SIGNATURE-----
+1) Initial state, two process with io in the same cgroup.
 
-iHUEABYIAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCY5QH7gAKCRD2uYlJVVFO
-ozyBAP4y2s2pM1cq93OuuJUSPvRd1Qz1ElJR2eNrN63nSWIPtgD/U3JNGKJ3bzNp
-6SMFiHhd6OvERXUaW7U/TJ2hkKacrgc=
-=yUM4
------END PGP SIGNATURE-----
+Process 1       Process 2
+ (BIC1)          (BIC2)
+  |  Λ            |  Λ
+  |  |            |  |
+  V  |            V  |
+  bfqq1           bfqq2
 
---djxDLq4t0gK1VZM2--
+2) bfqq1 is merged to bfqq2.
+
+Process 1       Process 2（cg1)
+ (BIC1)          (BIC2)
+  |               |
+   \-------------\|
+                  V
+  bfqq1           bfqq2(coop)
+
+3) Process 1 exit, then issue new io(denoce IOA) from Process 2.
+
+ (BIC2)
+  |  Λ
+  |  |
+  V  |
+  bfqq2(coop)
+
+4) Before IOA is completed, move Process 2 to another cgroup and issue io.
+
+Process 2
+ (BIC2)
+   Λ
+   |\--------------\
+   |                V
+  bfqq2           bfqq3
+
+Now that BIC2 points to bfqq3, while bfqq2 and bfqq3 both point to BIC2.
+If all the requests are completed, and Process 2 exit, BIC2 will be
+freed while there is no guarantee that bfqq2 will be freed before BIC2.
+
+Fix the problem by clearing bfqq->bic if process references is decreased
+to zero, since that they are not related anymore.
+
+Fixes: 3bc5e683c67d ("bfq: Split shared queues on move between cgroups")
+Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+---
+ block/bfq-iosched.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+index a72304c728fc..6eada99d1b34 100644
+--- a/block/bfq-iosched.c
++++ b/block/bfq-iosched.c
+@@ -3036,6 +3036,14 @@ void bfq_release_process_ref(struct bfq_data *bfqd, struct bfq_queue *bfqq)
+ 
+ 	bfq_reassign_last_bfqq(bfqq, NULL);
+ 
++	/*
++	 * __bfq_bic_change_cgroup() just reset bic->bfqq so that a new bfqq
++	 * will be created to handle new io, while old bfqq will stay around
++	 * until all the requests are completed. It's unsafe to keep bfqq->bic
++	 * since they are not related anymore.
++	 */
++	if (bfqq_process_refs(bfqq) == 1)
++		bfqq->bic = NULL;
+ 	bfq_put_queue(bfqq);
+ }
+ 
+-- 
+2.31.1
+
