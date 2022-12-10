@@ -2,151 +2,123 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5A3FC4332F
-	for <linux-block@archiver.kernel.org>; Fri,  9 Dec 2022 17:00:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 87AE4C04FDE
+	for <linux-block@archiver.kernel.org>; Sat, 10 Dec 2022 03:23:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229723AbiLIRA5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 9 Dec 2022 12:00:57 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51336 "EHLO
+        id S229555AbiLJDX3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 9 Dec 2022 22:23:29 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32972 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229612AbiLIRA4 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 9 Dec 2022 12:00:56 -0500
-Received: from fudo.makrotopia.org (fudo.makrotopia.org [IPv6:2a07:2ec0:3002::71])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D4716311;
-        Fri,  9 Dec 2022 09:00:55 -0800 (PST)
-Received: from local
-        by fudo.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-         (Exim 4.94.2)
-        (envelope-from <daniel@makrotopia.org>)
-        id 1p3gjm-0003BX-4w; Fri, 09 Dec 2022 18:00:38 +0100
-Date:   Fri, 9 Dec 2022 17:00:34 +0000
-From:   Daniel Golle <daniel@makrotopia.org>
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     Richard Weinberger <richard@nod.at>,
-        Matthew Wilcox <willy@infradead.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        Wolfram Sang <wsa+renesas@sang-engineering.com>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH 1/4] init: move block device helpers from
- init/do_mounts.c
-Message-ID: <Y5NpsmN/npnG8lxY@makrotopia.org>
-References: <cover.1668644705.git.daniel@makrotopia.org>
- <e5e0ab0429b1fc8a4e3f9614d2d1cc43dea78093.1668644705.git.daniel@makrotopia.org>
- <Y3XM62P7CaeKXFsz@infradead.org>
- <Y3j+Pzy1JpqG8Yd8@makrotopia.org>
- <Y3zCdJr5dKsADsnM@infradead.org>
+        with ESMTP id S229470AbiLJDX1 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 9 Dec 2022 22:23:27 -0500
+Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 29D1525C49;
+        Fri,  9 Dec 2022 19:23:26 -0800 (PST)
+Received: by mail-pl1-x635.google.com with SMTP id jl24so6812287plb.8;
+        Fri, 09 Dec 2022 19:23:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=4Y74Cn5CiCVsP4DjJ8yZF5+hknYEUL/oM8T1MPatY28=;
+        b=ikI8a2YQsDJ9qEuEgGCSg5/PgITzfs0cRaicS+l2YWND8wRBD3DOsWB/ZiKJ24Q2jg
+         6Fj2yM8+t/wJVWLkuzfBpQ4oRyyxRWa/jH1MtcR6LofzIGuVkqBUGp6Lj1KHtoXUcPQP
+         NjDT/4wuA8DEexN+BcSfvR8sc6ar6XcHdRBR78YeU20PNssFGTN0g97mhOl0fB5ub/Tg
+         8+8SBdtv3sd5qPIz+LE99e/k5eyMOzLNwkYSHCEaU618yXIuDaQ9UdXyjPa3ZsJfHGFo
+         StfKcEx9o7WGLu60qgxcY7S7BEp9IDdYn6aAysOM8ZtjIpceTCoJ5vCvlwDyGsEwr31t
+         M33A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=4Y74Cn5CiCVsP4DjJ8yZF5+hknYEUL/oM8T1MPatY28=;
+        b=ovDtqt5NZMQkQ5OLoDsnQtHlWtcAzGaZXLuwpc1MQ5yQhAGSQlgd2rG7NA8LZBtF5T
+         yyomnri55z0YcEWSer1JAZ+EoPR3Wzw6Swm2RRL6pKrNcQ2vNVSeKcSxsdvr7/WcAMiP
+         XKAP3wmnDTaEOqOWxElmlHjuG4naFIf2fxNes//qSoxbrWC6L0EfyV64d560+v3Kx7T6
+         IqTkbCxKQffcUcR5PCJ3hi1ieiAj9wJAK/DEXWQFsJkyImRLWuR9rPSTWaUSu5NKMX5R
+         Mb4asuq/6X0jYC5qTY89xO6ubmfC90xX5cdSzJpereuopeKBN4kuCgO3h7G+x5yFhMRj
+         nYDw==
+X-Gm-Message-State: ANoB5plzm3BD5O2cp1BtsbHcrb4q4w4mf0PIWSlcdFH+KeyBuY/hUp6h
+        uoLobGTcm8QGyEMtxYLinAk=
+X-Google-Smtp-Source: AA0mqf7yFJ8CLN+3ulanB43+/24cpg/e7nMZKGpEzciyz1QtE/kE33uCcfTn5/y/kd/H9pM8QhETcA==
+X-Received: by 2002:a17:902:d18c:b0:189:df3c:1ba1 with SMTP id m12-20020a170902d18c00b00189df3c1ba1mr7681329plb.38.1670642605609;
+        Fri, 09 Dec 2022 19:23:25 -0800 (PST)
+Received: from debian.me (subs02-180-214-232-76.three.co.id. [180.214.232.76])
+        by smtp.gmail.com with ESMTPSA id d13-20020a63d70d000000b0047829d1b8eesm1605511pgg.31.2022.12.09.19.23.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 09 Dec 2022 19:23:23 -0800 (PST)
+Received: by debian.me (Postfix, from userid 1000)
+        id 146CC101D56; Sat, 10 Dec 2022 10:23:20 +0700 (WIB)
+Date:   Sat, 10 Dec 2022 10:23:20 +0700
+From:   Bagas Sanjaya <bagasdotme@gmail.com>
+To:     Sergei Shtepa <sergei.shtepa@veeam.com>
+Cc:     axboe@kernel.dk, corbet@lwn.net, linux-block@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 00/21] blksnap - block devices snapshots module
+Message-ID: <Y5P7qDolYickFyBJ@debian.me>
+References: <20221209142331.26395-1-sergei.shtepa@veeam.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="a3vgSDtb/WZb5Bie"
 Content-Disposition: inline
-In-Reply-To: <Y3zCdJr5dKsADsnM@infradead.org>
+In-Reply-To: <20221209142331.26395-1-sergei.shtepa@veeam.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Christoph,
 
-On Tue, Nov 22, 2022 at 04:37:08AM -0800, Christoph Hellwig wrote:
-> On Sat, Nov 19, 2022 at 04:03:11PM +0000, Daniel Golle wrote:
-> > That works, but has slightly less utility value than the partition
-> > parser approach as in this way I cannot easily populate the PARTNAME
-> > uevent which can later help userspace to identify a device by the FIT
-> > subimage name -- I'd have to either invent a new bus_type or
-> > device_type, both seem inappropriate and have unwanted side effects.
-> > Or am I missing something and there is a way to use add_uevent_var()
-> > for a disk_type device?
-> 
-> You're not exposing a partition here - this is an image format that
-> sits in a partition and we should not pretend that is a partition.
+--a3vgSDtb/WZb5Bie
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-It doesn't need to be literally the PARTNAME uevent, just any way to
-communicate the names of mapped subimages to userspace.
+On Fri, Dec 09, 2022 at 03:23:10PM +0100, Sergei Shtepa wrote:
+> Sergei Shtepa (21):
+>   documentation, blkfilter: Block Device Filtering Mechanism
+>   block, blkfilter: Block Device Filtering Mechanism
+>   documentation, capability: fix Generic Block Device Capability
+>   documentation, blksnap:  Block Devices Snapshots Module
+>   block, blksnap: header file of the module interface
+>   block, blksnap: module management interface functions
+>   block, blksnap: init() and exit() functions
+>   block, blksnap: interaction with sysfs
+>   block, blksnap: attaching and detaching the filter and handling I/O
+>     units
+>   block, blksnap: map of change block tracking
+>   block, blksnap: minimum data storage unit of the original block device
+>   block, blksnap: buffer in memory for the minimum data storage unit
+>   block, blksnap: functions and structures for performing block I/O
+>     operations
+>   block, blksnap: storage for storing difference blocks
+>   block, blksnap: event queue from the difference storage
+>   block, blksnap: owner of information about overwritten blocks of the
+>     original block device
+>   block, blksnap: snapshot image block device
+>   block, blksnap: snapshot
+>   block, blksnap: Kconfig and Makefile
+>   block, blksnap: adds a blksnap to the kernel tree
+>   block, blksnap: adds a maintainer for new files
+>=20
 
-My understanding by now is that there is no way around introducing a
-new device_type and then mitigate the unwanted side effects by
-follow-up changes, ie. make it possible to use that new device_type
-when specifying the rootfs= cmdline variable (currently only disks and
-partitions are considered there).
+Per convention in block subsystem (see for example `git log --no-merges
+-- drivers/block/`), the patch subject prefix should looks like "block
+component: some patch" (e.g. "blksnap: do something").
 
-Or give up on the idea that uImage.FIT subimages mapped by the new
-driver can be identified by userspace by poking uevent from sysfs and
-just rely on convention and ordering.
+Thanks.
 
-> 
-> > However, I don't see a way to avoid using (or duplicating)
-> > devt_from_devname() to select the lower device somehow without having
-> > to probe and parse *all* block devices present (which is, from what I
-> > understood, what you want to avoid, and I agree that it is more safe to
-> > not do that...)
-> > 
-> > Can you or anyone give some advise on how this should be done?
-> 
-> Just set the block driver up from an initramfs, like we do for all
-> modern stackable drivers.
+--=20
+An old man doll... just what I always wanted! - Clara
 
-Instead of using a kernel cmdline parameter we could also have the
-bootloader embed that information as string in the 'chosen' section in
-the device tree blob, right next to the cmdline. However, as there is
-no representation of block partitions in device tree, also in that case
-the lower device will have to be referenced by a string somehow, ie.
-devt_from_devname() or the like will be needed.
+--a3vgSDtb/WZb5Bie
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Needing an initramfs, even if it boils down to just one statically
-compile executable, is a massive bloat and complication when building
-embedded device firmware and none of the over 1580 devices currently
-supported by OpenWrt need an intermediate initramfs to mount their
-on-flash squashfs rootfs (some, however, already use this uImage.FIT
-partition parser, and not needing a downstream patch for that would be
-nice).
+-----BEGIN PGP SIGNATURE-----
 
-uImage.FIT typically contains the complete firmware used on an embedded
-device, ie. at least a Linux kernel, device tree blob and a filesystem.
-The main use of this whole uImage.FIT-parsing-in-Linux approach I'm
-trying to get across here is to expose one or more 'filesystem'-type
-subimages of such an image as block devices, also so that one of them
-can directly be mounted as rootfs by the kernel.
+iHUEABYIAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCY5P7qAAKCRD2uYlJVVFO
+oxBMAQDiZVI/ZOQMMTngtyrZorqy9ONsxNMJQtfAoqcgAOYyAgD/fJfx7YohYs8z
+LsYz1f786k+fCfipOou0ee1xjjRDeQE=
+=KJUt
+-----END PGP SIGNATURE-----
 
-This *replaces* the use of 'ramdisk' type sub-images which need to
-remain allocated at runtime, while using a squashfs 'filesystem' type
-sub-image allows freeing the filesystem cache if ram is becomes scarce.
-
-As both, storage and memory, are often very limited on small embedded
-devices, OpenWrt has always been using a squashfs as rootfs with a
-storage-type specific filesytem used as r/w overlay on top. Up to now,
-the rootfs is often stored in platform-specific ways, ie. an additional
-partition on block devices, MTD partition on NOR flash or UBI volume on
-NAND flash.
-
-Carrying the read-only squashfs filesystem inside the uImage.FIT
-structure has the advantage of being agnostic regarding the
-storage-type (NOR/mtdblockX, NAND/ubiblockX, MMC/mmcblkXpY) and allows
-the bootloader to validate the filesystem hash before starting the
-kernel, ie. ensuring integrity of the firmware as-a-whole which
-includes the root filesystem.
-
-
-> 
-> > Yet another (imho not terrible) problem is removal of the lower device.
-> > Many of the supported SBC use a micro SD card to boot, which can be
-> > removed by the user while the system is running (which is generally not
-> > a good idea, but anyway). For partitions this is handled automatically
-> > by blk_drop_partitions() called directly from genhd.c.
-> > I'm currently playing with doing something similar using the bus device
-> > removal notification, but it doesn't seem to work for all cases, e.g.
-> > mmcblk device do not seem to have the ->bus pointer populated at all
-> > (ie. disk_to_dev(disk)->bus == NULL for mmcblk devices).
-> 
-> I have WIP patches that allow the claimer of a block device get
-> resize and removal notification.  It's not going to land for 6.2,
-> but I hope I have it ready in time for the next merge window.
-
-I'm looking forward to integrate that in the uImage.FIT block driver
-I've been working on. In the meantime, should I already post my current
-draft so we can start discussing if that solution could be acceptable?
-
-
-Best regards
-
-
-Daniel
+--a3vgSDtb/WZb5Bie--
