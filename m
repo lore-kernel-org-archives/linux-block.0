@@ -2,42 +2,42 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2D31C001B2
-	for <linux-block@archiver.kernel.org>; Sun, 11 Dec 2022 22:22:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A5FCC4167B
+	for <linux-block@archiver.kernel.org>; Sun, 11 Dec 2022 22:22:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230367AbiLKWWI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 11 Dec 2022 17:22:08 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52852 "EHLO
+        id S230340AbiLKWWJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 11 Dec 2022 17:22:09 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52840 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229625AbiLKWWH (ORCPT
+        with ESMTP id S230339AbiLKWWI (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 11 Dec 2022 17:22:07 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B3BFCE0
+        Sun, 11 Dec 2022 17:22:08 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 266AE198
         for <linux-block@vger.kernel.org>; Sun, 11 Dec 2022 14:21:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
         s=mimecast20190719; t=1670797272;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=k/HK6fMXdxgz4kcaH4vQrOdm/WfD552GcWScyCwHZ9A=;
-        b=gv8yrf9u1UUylYtNCcp520HPRybEBEBjcyvXVSwx8qstgQeXB2DDF24QAWRAWjxHv6dyEu
-        YAk3OZW1zIeHoyAjT3AZ0wq74NfD1xRCnUHSAbKPlxMt1Su2efj/NP9fX0wKzsbuAxKdlc
-        UwAbrMKdMnxt9O7PrMDnk4CQuHQuZEo=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=+MsWk87quHbEwHCR1sVYteGgGZjHdGBkMWIDf/Jp0nk=;
+        b=aQ7LBNBzoVLKHFtDQw0BAB6Dl0M2jW/PJiGqhglJsO33N+UgJtjCBeCOQwz68J5MqdhPow
+        iD+BKSOymMHAjPhkwkdfvnTvPIl9FKowjy8Ib+AA4Ycv5hfAjnBkSBT5erPQJHhkuAo8/i
+        ed0F0QFCtwLUUuIY1V6p7+S7q/dmahI=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-567-gXbDyWjHO-mp8qogjpDY2A-1; Sun, 11 Dec 2022 17:21:09 -0500
-X-MC-Unique: gXbDyWjHO-mp8qogjpDY2A-1
+ us-mta-478-dS9F4qTYMZGQE_Cocb_m5Q-1; Sun, 11 Dec 2022 17:21:08 -0500
+X-MC-Unique: dS9F4qTYMZGQE_Cocb_m5Q-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B196D3C01D8F;
-        Sun, 11 Dec 2022 22:21:08 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 9496C101A56C;
+        Sun, 11 Dec 2022 22:21:07 +0000 (UTC)
 Received: from llong.com (unknown [10.22.16.68])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 37C721121331;
-        Sun, 11 Dec 2022 22:21:08 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 073EF1121331;
+        Sun, 11 Dec 2022 22:21:06 +0000 (UTC)
 From:   Waiman Long <longman@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
         Josef Bacik <josef@toxicpanda.com>,
@@ -48,111 +48,114 @@ Cc:     cgroups@vger.kernel.org, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org, linux-mm@kvack.org,
         =?UTF-8?q?Michal=20Koutn=C3=BD?= <mkoutny@suse.com>,
         "Dennis Zhou (Facebook)" <dennisszhou@gmail.com>,
-        Waiman Long <longman@redhat.com>
-Subject: [PATCH-block v2 3/3] blk-cgroup: Flush stats at blkgs destruction path
-Date:   Sun, 11 Dec 2022 17:20:58 -0500
-Message-Id: <20221211222058.2946830-4-longman@redhat.com>
+        Waiman Long <longman@redhat.com>,
+        Yi Zhang <yi.zhang@redhat.com>
+Subject: [PATCH-block v2 1/3] bdi, blk-cgroup: Fix potential UAF of blkcg
+Date:   Sun, 11 Dec 2022 17:20:56 -0500
+Message-Id: <20221211222058.2946830-2-longman@redhat.com>
 In-Reply-To: <20221211222058.2946830-1-longman@redhat.com>
 References: <20221211222058.2946830-1-longman@redhat.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-As noted by Michal, the blkg_iostat_set's in the lockless list
-hold reference to blkg's to protect against their removal. Those
-blkg's hold reference to blkcg. When a cgroup is being destroyed,
-cgroup_rstat_flush() is only called at css_release_work_fn() which is
-called when the blkcg reference count reaches 0. This circular dependency
-will prevent blkcg from being freed until some other events cause
-cgroup_rstat_flush() to be called to flush out the pending blkcg stats.
+Commit 59b57717fff8 ("blkcg: delay blkg destruction until after
+writeback has finished") delayed call to blkcg_destroy_blkgs() to
+cgwb_release_workfn(). However, it is done after a css_put() of blkcg
+which may be the final put that causes the blkcg to be freed as RCU
+read lock isn't held.
 
-To prevent this delayed blkcg removal, add a new cgroup_rstat_css_flush()
-function to flush stats for a given css and cpu and call it at the blkgs
-destruction path, blkcg_destroy_blkgs(), whenever there are still some
-pending stats to be flushed. This will ensure that blkcg reference
-count can reach 0 ASAP.
+Another place where blkcg_destroy_blkgs() can be called indirectly via
+blkcg_unpin_online() is from the offline_css() function called from
+css_killed_work_fn(). Over there, the potentially final css_put() call
+is issued after offline_css().
 
+By adding a css_tryget() into blkcg_destroy_blkgs() and warning its
+failure, the following stack trace was produced in a test system on
+bootup.
+
+[   34.254240] RIP: 0010:blkcg_destroy_blkgs+0x16a/0x1a0
+      :
+[   34.339943] Call Trace:
+[   34.344510]  blkcg_unpin_online+0x38/0x60
+[   34.348523]  cgwb_release_workfn+0x6a/0x200
+[   34.352708]  process_one_work+0x1e5/0x3b0
+[   34.360758]  worker_thread+0x50/0x3a0
+[   34.368447]  kthread+0xd9/0x100
+[   34.376386]  ret_from_fork+0x22/0x30
+
+This confirms that a potential UAF situation can really happen in
+cgwb_release_workfn().
+
+Fix that by delaying the css_put() until after the blkcg_unpin_online()
+call. Also use css_tryget() in blkcg_destroy_blkgs() and issue a warning
+if css_tryget() fails.
+
+The reproducing system can no longer produce a warning with this patch.
+All the runnable block/0* tests including block/027 were run successfully
+without failure.
+
+Fixes: 59b57717fff8 ("blkcg: delay blkg destruction until after writeback has finished")
+Suggested-by: Michal Koutný <mkoutny@suse.com>
+Reported-by: Yi Zhang <yi.zhang@redhat.com>
 Signed-off-by: Waiman Long <longman@redhat.com>
 ---
- block/blk-cgroup.c     | 12 ++++++++++++
- include/linux/cgroup.h |  1 +
- kernel/cgroup/rstat.c  | 18 ++++++++++++++++++
- 3 files changed, 31 insertions(+)
+ block/blk-cgroup.c | 8 ++++++++
+ mm/backing-dev.c   | 8 ++++++--
+ 2 files changed, 14 insertions(+), 2 deletions(-)
 
 diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-index c466aef0d467..534f3baeb84a 100644
+index 1bb939d3b793..21cc88349f21 100644
 --- a/block/blk-cgroup.c
 +++ b/block/blk-cgroup.c
-@@ -1090,6 +1090,8 @@ struct list_head *blkcg_get_cgwb_list(struct cgroup_subsys_state *css)
+@@ -1084,6 +1084,13 @@ struct list_head *blkcg_get_cgwb_list(struct cgroup_subsys_state *css)
   */
  static void blkcg_destroy_blkgs(struct blkcg *blkcg)
  {
-+	int cpu;
++	/*
++	 * blkcg_destroy_blkgs() shouldn't be called with all the blkcg
++	 * references gone.
++	 */
++	if (WARN_ON_ONCE(!css_tryget(&blkcg->css)))
++		return;
 +
- 	/*
- 	 * blkcg_destroy_blkgs() shouldn't be called with all the blkcg
- 	 * references gone.
-@@ -1099,6 +1101,16 @@ static void blkcg_destroy_blkgs(struct blkcg *blkcg)
- 
  	might_sleep();
  
-+	/*
-+	 * Flush all the non-empty percpu lockless lists.
-+	 */
-+	for_each_possible_cpu(cpu) {
-+		struct llist_head *lhead = per_cpu_ptr(blkcg->lhead, cpu);
-+
-+		if (!llist_empty(lhead))
-+			cgroup_rstat_css_cpu_flush(&blkcg->css, cpu);
-+	}
-+
  	spin_lock_irq(&blkcg->lock);
+@@ -1110,6 +1117,7 @@ static void blkcg_destroy_blkgs(struct blkcg *blkcg)
+ 	}
  
- 	while (!hlist_empty(&blkcg->blkg_list)) {
-diff --git a/include/linux/cgroup.h b/include/linux/cgroup.h
-index 528bd44b59e2..6c4e66b3fa84 100644
---- a/include/linux/cgroup.h
-+++ b/include/linux/cgroup.h
-@@ -766,6 +766,7 @@ void cgroup_rstat_flush(struct cgroup *cgrp);
- void cgroup_rstat_flush_irqsafe(struct cgroup *cgrp);
- void cgroup_rstat_flush_hold(struct cgroup *cgrp);
- void cgroup_rstat_flush_release(void);
-+void cgroup_rstat_css_cpu_flush(struct cgroup_subsys_state *css, int cpu);
- 
- /*
-  * Basic resource stats.
-diff --git a/kernel/cgroup/rstat.c b/kernel/cgroup/rstat.c
-index 793ecff29038..2e44be44351f 100644
---- a/kernel/cgroup/rstat.c
-+++ b/kernel/cgroup/rstat.c
-@@ -281,6 +281,24 @@ void cgroup_rstat_flush_release(void)
- 	spin_unlock_irq(&cgroup_rstat_lock);
+ 	spin_unlock_irq(&blkcg->lock);
++	css_put(&blkcg->css);
  }
  
-+/**
-+ * cgroup_rstat_css_cpu_flush - flush stats for the given css and cpu
-+ * @css: target css to be flush
-+ * @cpu: the cpu that holds the stats to be flush
-+ *
-+ * A lightweight rstat flush operation for a given css and cpu.
-+ * Only the cpu_lock is being held for mutual exclusion, the cgroup_rstat_lock
-+ * isn't used.
-+ */
-+void cgroup_rstat_css_cpu_flush(struct cgroup_subsys_state *css, int cpu)
-+{
-+	raw_spinlock_t *cpu_lock = per_cpu_ptr(&cgroup_rstat_cpu_lock, cpu);
-+
-+	raw_spin_lock_irq(cpu_lock);
-+	css->ss->css_rstat_flush(css, cpu);
-+	raw_spin_unlock_irq(cpu_lock);
-+}
-+
- int cgroup_rstat_init(struct cgroup *cgrp)
- {
- 	int cpu;
+ /**
+diff --git a/mm/backing-dev.c b/mm/backing-dev.c
+index c30419a5e119..36f75b072325 100644
+--- a/mm/backing-dev.c
++++ b/mm/backing-dev.c
+@@ -390,11 +390,15 @@ static void cgwb_release_workfn(struct work_struct *work)
+ 	wb_shutdown(wb);
+ 
+ 	css_put(wb->memcg_css);
+-	css_put(wb->blkcg_css);
+ 	mutex_unlock(&wb->bdi->cgwb_release_mutex);
+ 
+-	/* triggers blkg destruction if no online users left */
++	/*
++	 * Triggers blkg destruction if no online users left
++	 * The final blkcg css_put() has to be done after blkcg_unpin_online()
++	 * to avoid use-after-free.
++	 */
+ 	blkcg_unpin_online(wb->blkcg_css);
++	css_put(wb->blkcg_css);
+ 
+ 	fprop_local_destroy_percpu(&wb->memcg_completions);
+ 
 -- 
 2.31.1
 
