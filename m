@@ -2,79 +2,74 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 298FDC4708D
-	for <linux-block@archiver.kernel.org>; Mon, 12 Dec 2022 06:30:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F3B4C4332F
+	for <linux-block@archiver.kernel.org>; Mon, 12 Dec 2022 06:50:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231213AbiLLGab (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 12 Dec 2022 01:30:31 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39618 "EHLO
+        id S231302AbiLLGuR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 12 Dec 2022 01:50:17 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43566 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229697AbiLLGaa (ORCPT
+        with ESMTP id S230105AbiLLGuP (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 12 Dec 2022 01:30:30 -0500
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E0E07B1EA;
-        Sun, 11 Dec 2022 22:30:28 -0800 (PST)
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 70C1268AA6; Mon, 12 Dec 2022 07:30:18 +0100 (CET)
-Date:   Mon, 12 Dec 2022 07:30:17 +0100
-From:   "hch@lst.de" <hch@lst.de>
-To:     Carlos Carvalho <carlos@fisica.ufpr.br>
-Cc:     "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Clay Mayers <Clay.Mayers@kioxia.com>,
-        Keith Busch <kbusch@kernel.org>,
-        Hannes Reinecke <hare@suse.de>,
-        Matthew Wilcox <willy@infradead.org>,
-        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-raid@vger.kernel.org" <linux-raid@vger.kernel.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-        "axboe@kernel.dk" <axboe@kernel.dk>,
-        "djwong@kernel.org" <djwong@kernel.org>, "hch@lst.de" <hch@lst.de>,
-        "sagi@grimberg.me" <sagi@grimberg.me>,
-        "jejb@linux.ibm.com" <jejb@linux.ibm.com>,
-        "javier@javigon.com" <javier@javigon.com>,
-        "johannes.thumshirn@wdc.com" <johannes.thumshirn@wdc.com>,
-        "bvanassche@acm.org" <bvanassche@acm.org>,
-        "dongli.zhang@oracle.com" <dongli.zhang@oracle.com>,
-        "jefflexu@linux.alibaba.com" <jefflexu@linux.alibaba.com>,
-        "josef@toxicpanda.com" <josef@toxicpanda.com>,
-        "clm@fb.com" <clm@fb.com>, "dsterba@suse.com" <dsterba@suse.com>,
-        "jack@suse.com" <jack@suse.com>, "tytso@mit.edu" <tytso@mit.edu>,
-        "adilger.kernel@dilger.ca" <adilger.kernel@dilger.ca>,
-        "jlayton@kernel.org" <jlayton@kernel.org>,
-        "idryomov@gmail.com" <idryomov@gmail.com>,
-        "danil.kipnis@cloud.ionos.com" <danil.kipnis@cloud.ionos.com>,
-        "ebiggers@google.com" <ebiggers@google.com>,
-        "jinpu.wang@cloud.ionos.com" <jinpu.wang@cloud.ionos.com>
-Subject: Re: [PATCH 0/6] block: add support for REQ_OP_VERIFY
-Message-ID: <20221212063017.GA9290@lst.de>
-References: <20220630091406.19624-1-kch@nvidia.com> <YsXJdXnXsMtaC8DJ@casper.infradead.org> <d14fe396-b39b-6b3e-ae74-eb6a8b64e379@nvidia.com> <Y4kC9NIXevPlji+j@casper.infradead.org> <72a51a83-c25a-ef52-55fb-2b73aec70305@suse.de> <Y4oSiPH0ENFktioQ@kbusch-mbp.dhcp.thefacebook.com> <f68009b7cc744c02ad69d68fd7e61751@kioxia.com> <yq14ju5gvfh.fsf@ca-mkp.ca.oracle.com> <Y5SEWnNUpgKxOB/W@fisica.ufpr.br>
+        Mon, 12 Dec 2022 01:50:15 -0500
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4141E101
+        for <linux-block@vger.kernel.org>; Sun, 11 Dec 2022 22:50:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=jp5hbDSEuCBBxqq4FtmbnUPgBzjkN+ii+Vc35aDpJGY=; b=WFvwE5prADrPvSFSuGK2hKbfO8
+        J+iv5hu2r3a/D/ON0ps4jGYvgUCy03PwQVE7tOHvIkCOoHVRH0voE38GdQS6VRzV/MbX/0M1Rsb4M
+        9f6IjVrGNrhxYY1piQFv8kYaqiO63+WfAfIVRfiKtc8nJVYMNBjfWndFc3iCt5cZCL+XaerSKXCob
+        KbNC+8ZgQ0FNai+DbKU5gMp1iA5LTw/pyBbyQAfGqrrMPiLDkPMNanpjQzgFr6b9CfON/PzZhuTBL
+        yL/B51icQLs2SGlSe1tAdsnCdvgj+OQGcEwg/Vi8GpPrI6CjryYcmwPk1njPJCuUAyB9+mem/2YhI
+        jZZ+5+IA==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1p4cdX-0092UC-QX; Mon, 12 Dec 2022 06:50:04 +0000
+Date:   Sun, 11 Dec 2022 22:50:03 -0800
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Stefan Hajnoczi <stefanha@redhat.com>, mst@redhat.com,
+        jasowang@redhat.com, pbonzini@redhat.com, hch@infradead.org,
+        virtualization@lists.linux-foundation.org,
+        linux-block@vger.kernel.org, Suwan Kim <suwan.kim027@gmail.com>
+Subject: Re: [PATCH 1/2] virtio-blk: set req->state to MQ_RQ_COMPLETE after
+ polling I/O is finished
+Message-ID: <Y5bPG9QGMd/cDTQG@infradead.org>
+References: <20221206141125.93055-1-suwan.kim027@gmail.com>
+ <Y5EJ+6qtsy8Twe/q@fedora>
+ <4701aded-0464-791e-8b8c-a34c422e8e62@kernel.dk>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Y5SEWnNUpgKxOB/W@fisica.ufpr.br>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <4701aded-0464-791e-8b8c-a34c422e8e62@kernel.dk>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, Dec 10, 2022 at 10:06:34AM -0300, Carlos Carvalho wrote:
-> Certainly we have. Currently admins have to periodically run full block range
-> checks in redundant arrays to detect bad blocks and correct them while
-> redundancy is available. Otherwise when a disk fails and you try to reconstruct
-> the replacement you hit another block in the remaining disks that's bad and you
-> cannot complete the reconstruction and have data loss. These checks are a
-> burden because they have HIGH overhead, significantly reducing bandwidth for
-> the normal use of the array.
+On Thu, Dec 08, 2022 at 09:48:23AM -0700, Jens Axboe wrote:
+> > The doc comment for blk_mq_set_request_complete() mentions this being
+> > used in ->queue_rq(), but that's not the case here. Does the doc comment
+> > need to be updated if we're using the function in a different way?
 > 
-> If there was a standard interface for getting the list of bad blocks that the
-> firmware secretly knows the kernel could implement the repair continuosly, with
-> logs etc. That'd really be a relief for admins and, specially, users.
+> Looks like it's a bit outdated...
 
-Both SCSI and NVMe can do this through the GET LBA STATUS command -
-in SCSI this was a later addition abusing the command, and in NVMe
-only the abuse survived.  NVMe also has a log page an AEN associated
-for it, I'd have to spend more time reading SBC to remember if SCSI
-also has a notification mechanism of some sort.
+I think the comment is still entirely correct.
+
+> 
+> > I'm not familiar enough with the Linux block APIs, but this feels weird
+> > to me. Shouldn't blk_mq_end_request_batch(iob) take care of this for us?
+> > Why does it set the state to IDLE instead of COMPLETE?
+> > 
+> > I think Jens can confirm whether we really want all drivers that use
+> > polling and io_comp_batch to manually call
+> > blk_mq_set_request_complete().
+> 
+> Should not be a need to call blk_mq_set_request_complete() directly in
+> the driver for this.
+
+Exactly.  Polling or not, drivers should go through the normal completion
+interface, that is blk_mq_complete_request or the lower-level options
+blk_mq_complete_request_remote and blk_mq_complete_request_direct.
