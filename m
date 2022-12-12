@@ -2,93 +2,115 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2151EC4708D
-	for <linux-block@archiver.kernel.org>; Mon, 12 Dec 2022 22:13:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E4F04C4332F
+	for <linux-block@archiver.kernel.org>; Mon, 12 Dec 2022 22:14:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233522AbiLLWNw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 12 Dec 2022 17:13:52 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56078 "EHLO
+        id S233697AbiLLWOh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 12 Dec 2022 17:14:37 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56452 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233476AbiLLWNv (ORCPT
+        with ESMTP id S233658AbiLLWOd (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 12 Dec 2022 17:13:51 -0500
-Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F3321A232;
-        Mon, 12 Dec 2022 14:13:50 -0800 (PST)
-Received: by mail-pj1-x1036.google.com with SMTP id gt4so1332634pjb.1;
-        Mon, 12 Dec 2022 14:13:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=n2XZBEP0JR3u42vjkud6u2pf7wcC2jLfekfdtsMKR2o=;
-        b=CFHCFDtE98y5A8aGdBtghjU5l9CphTqaYy8+bNqMg2oj+xvRkpTz+CiNOXnOGa+xmH
-         aFRyuXYMB56A8Qaj2sKuwGcPdNQ8AoKGDqpSvvk1nupxWCQ6HeVJMNeCoCndqgy4KHMa
-         gtTajfL2mnJdmGIF83EGfF+l6DuCgA8QoD2TcFhwAK1WOdR4yW8jtgwKhOVlWo2htGf2
-         5VbW7laZOO8WJeDhfUU061bT5bwJcSuhhe/E7n8AUutbCBMyf/ER4mfE68WrEqJxoo3a
-         6h3bRzsp+lesOssSJTDJcFigURcJGHNh6iZ62bkwx4gVc0a+Cg6S4v/6y1LTDsSJtivC
-         4Slg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=n2XZBEP0JR3u42vjkud6u2pf7wcC2jLfekfdtsMKR2o=;
-        b=yr9pfWf4kDhLvyvVeZvMHFhe9i++qnF7ZY1ko2LAtz0mzB7opjeuu9/lb9XhM/29rK
-         HyJ1k3TZdoW7QRFQvCDtFeBi8lYvwoFUvX09WmAjLx0M2s07RiWHo/Qc9bTD4Y7fkOKh
-         8PJzdRFkLi1ehXNhS06W3TcC+uc/P/rWj+brvrN9QQMu187L7KgBIEJb6ehIbVaScwLv
-         cQ2zKqydLzn0XhLE8SKmOBBaHspHUagEmav789Q0Scj5N43FfYSv296Pd/ozkp1oU6D7
-         wt9rYep5VD87ssv1U0sOpHk2VJkk/fn+4kHBjPDUR1wlKeARTO5CGs6lDGN5O23iQc/f
-         YCrA==
-X-Gm-Message-State: ANoB5pmsKokylVe94ZRK3+INeVfHnz9ncE4Vpt4lVWs2aY/y7X8ENm1Y
-        fiAABasnnhk1XKr45O6YRbb2EBoWVJoLWA==
-X-Google-Smtp-Source: AA0mqf67w1m5VItBX9PGVatqIjNwsKAAmChP+SvVKw5BDzUrHAocCOyWg7+eIfj//6EU5zpEYbFhbQ==
-X-Received: by 2002:a05:6a20:8e02:b0:a0:462f:8e3f with SMTP id y2-20020a056a208e0200b000a0462f8e3fmr31554587pzj.53.1670883229447;
-        Mon, 12 Dec 2022 14:13:49 -0800 (PST)
-Received: from localhost (2603-800c-1a02-1bae-a7fa-157f-969a-4cde.res6.spectrum.com. [2603:800c:1a02:1bae:a7fa:157f:969a:4cde])
-        by smtp.gmail.com with ESMTPSA id z29-20020aa7991d000000b00575afe3c188sm6255061pff.150.2022.12.12.14.13.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 12 Dec 2022 14:13:48 -0800 (PST)
-Sender: Tejun Heo <htejun@gmail.com>
-Date:   Mon, 12 Dec 2022 12:13:47 -1000
-From:   Tejun Heo <tj@kernel.org>
-To:     Waiman Long <longman@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, Josef Bacik <josef@toxicpanda.com>,
-        Zefan Li <lizefan.x@bytedance.com>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>,
-        "Dennis Zhou (Facebook)" <dennisszhou@gmail.com>,
-        Yi Zhang <yi.zhang@redhat.com>
-Subject: Re: [PATCH-block v2 1/3] bdi, blk-cgroup: Fix potential UAF of blkcg
-Message-ID: <Y5enmzQM7BIiEv9n@slm.duckdns.org>
-References: <20221211222058.2946830-1-longman@redhat.com>
- <20221211222058.2946830-2-longman@redhat.com>
+        Mon, 12 Dec 2022 17:14:33 -0500
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0DC5C183B1;
+        Mon, 12 Dec 2022 14:14:31 -0800 (PST)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id A21E31F8C3;
+        Mon, 12 Dec 2022 22:14:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1670883269;
+        h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
+         cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=Iu1km/g1sPbdm1PysSK8oZqkVLK+FsDA35rUtF19Te4=;
+        b=YQisxeGOiVeV1btWZg2vu9Oq/MIJ/DYQ7x4NiwtZN0r0F+WfeZEm351kJPg74lUhVfIbwO
+        +Bati0xiymrARzFgqPPEQGB0I9TTrRD5Rt7In/1pos1bHGc4/H/s1V51xR+row9cagJgAs
+        p2EKhOxvGKZ1wcpiT9tRE4Fw+2icJ1c=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1670883269;
+        h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
+         cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=Iu1km/g1sPbdm1PysSK8oZqkVLK+FsDA35rUtF19Te4=;
+        b=vAAtT6/yI5XUmZaJwfp7omtuY5X2OVQJRIDLgBLJHp2s109ksM/bnK8klJCpf6q31rNDBZ
+        6Nof02Z5CRU/IkBA==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 54443138F3;
+        Mon, 12 Dec 2022 22:14:29 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id 2c+nE8Wnl2PdHwAAMHmgww
+        (envelope-from <dsterba@suse.cz>); Mon, 12 Dec 2022 22:14:29 +0000
+Date:   Mon, 12 Dec 2022 23:13:47 +0100
+From:   David Sterba <dsterba@suse.cz>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Chris Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>,
+        David Sterba <dsterba@suse.com>,
+        Damien Le Moal <damien.lemoal@wdc.com>,
+        Naohiro Aota <naohiro.aota@wdc.com>,
+        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+        Qu Wenruo <wqu@suse.com>, Jens Axboe <axboe@kernel.dk>,
+        "Darrick J. Wong" <djwong@kernel.org>, linux-block@vger.kernel.org,
+        linux-btrfs@vger.kernel.org, linux-fsdevel@vger.kernel.org
+Subject: Re: [PATCH 02/19] btrfs: handle checksum validation and repair at
+ the storage layer
+Message-ID: <20221212221347.GC5824@twin.jikos.cz>
+Reply-To: dsterba@suse.cz
+References: <20221120124734.18634-1-hch@lst.de>
+ <20221120124734.18634-3-hch@lst.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20221211222058.2946830-2-longman@redhat.com>
+In-Reply-To: <20221120124734.18634-3-hch@lst.de>
+User-Agent: Mutt/1.5.23.1-rc1 (2014-03-12)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sun, Dec 11, 2022 at 05:20:56PM -0500, Waiman Long wrote:
->  static void blkcg_destroy_blkgs(struct blkcg *blkcg)
->  {
-> +	/*
-> +	 * blkcg_destroy_blkgs() shouldn't be called with all the blkcg
-> +	 * references gone.
-> +	 */
-> +	if (WARN_ON_ONCE(!css_tryget(&blkcg->css)))
-> +		return;
+On Sun, Nov 20, 2022 at 01:47:17PM +0100, Christoph Hellwig wrote:
+> Currently btrfs handles checksum validation and repair in the end I/O
+> handler for the btrfs_bio.  This leads to a lot of duplicate code
+> plus issues with variying semantics or bugs, e.g.
+> 
+>  - the until recently broken repair for compressed extents
+>  - the fact that encoded reads validate the checksums but do not kick
+>    of read repair
+>  - the inconsistent checking of the BTRFS_FS_STATE_NO_CSUMS flag
+> 
+> This commit revamps the checksum validation and repair code to instead
+> work below the btrfs_submit_bio interfaces.  For this to work we need
+> to make sure an inode is available, so that is added as a parameter
+> to btrfs_bio_alloc.  With that btrfs_submit_bio can preload
+> btrfs_bio.csum from the csum tree without help from the upper layers,
+> and the low-level I/O completion can iterate over the bio and verify
+> the checksums.
+> 
+> In case of a checksum failure (or a plain old I/O error), the repair
+> is now kicked off before the upper level ->end_io handler is invoked.
+> Tracking of the repair status is massively simplified by just keeping
+> a small failed_bio structure per bio with failed sectors and otherwise
+> using the information in the repair bio.  The per-inode I/O failure
+> tree can be entirely removed.
+> 
+> The saved bvec_iter in the btrfs_bio is now competely managed by
+> btrfs_submit_bio and must not be accessed by the callers.
+> 
+> There is one significant behavior change here:  If repair fails or
+> is impossible to start with, the whole bio will be failed to the
+> upper layer.  This is the behavior that all I/O submitters execept
+> for buffered I/O already emulated in their end_io handler.  For
+> buffered I/O this now means that a large readahead request can
+> fail due to a single bad sector, but as readahead errors are igored
+> the following readpage if the sector is actually accessed will
+> still be able to read.  This also matches the I/O failure handling
+> in other file systems.
 
-Wouldn't it make more sense to use percpu_ref_is_zero()? It's not like the
-obtained extra reference does anything, right?
-
+This patch is apparently doing several things at once, please split it.
 Thanks.
-
--- 
-tejun
