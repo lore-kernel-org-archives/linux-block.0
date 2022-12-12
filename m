@@ -2,115 +2,113 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E4F04C4332F
-	for <linux-block@archiver.kernel.org>; Mon, 12 Dec 2022 22:14:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D05CC4332F
+	for <linux-block@archiver.kernel.org>; Mon, 12 Dec 2022 22:16:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233697AbiLLWOh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 12 Dec 2022 17:14:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56452 "EHLO
+        id S233410AbiLLWQk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 12 Dec 2022 17:16:40 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56972 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233658AbiLLWOd (ORCPT
+        with ESMTP id S231770AbiLLWQi (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 12 Dec 2022 17:14:33 -0500
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0DC5C183B1;
-        Mon, 12 Dec 2022 14:14:31 -0800 (PST)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id A21E31F8C3;
-        Mon, 12 Dec 2022 22:14:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1670883269;
-        h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-         cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=Iu1km/g1sPbdm1PysSK8oZqkVLK+FsDA35rUtF19Te4=;
-        b=YQisxeGOiVeV1btWZg2vu9Oq/MIJ/DYQ7x4NiwtZN0r0F+WfeZEm351kJPg74lUhVfIbwO
-        +Bati0xiymrARzFgqPPEQGB0I9TTrRD5Rt7In/1pos1bHGc4/H/s1V51xR+row9cagJgAs
-        p2EKhOxvGKZ1wcpiT9tRE4Fw+2icJ1c=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1670883269;
-        h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-         cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=Iu1km/g1sPbdm1PysSK8oZqkVLK+FsDA35rUtF19Te4=;
-        b=vAAtT6/yI5XUmZaJwfp7omtuY5X2OVQJRIDLgBLJHp2s109ksM/bnK8klJCpf6q31rNDBZ
-        6Nof02Z5CRU/IkBA==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 54443138F3;
-        Mon, 12 Dec 2022 22:14:29 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id 2c+nE8Wnl2PdHwAAMHmgww
-        (envelope-from <dsterba@suse.cz>); Mon, 12 Dec 2022 22:14:29 +0000
-Date:   Mon, 12 Dec 2022 23:13:47 +0100
-From:   David Sterba <dsterba@suse.cz>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Chris Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>,
-        David Sterba <dsterba@suse.com>,
-        Damien Le Moal <damien.lemoal@wdc.com>,
-        Naohiro Aota <naohiro.aota@wdc.com>,
-        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
-        Qu Wenruo <wqu@suse.com>, Jens Axboe <axboe@kernel.dk>,
-        "Darrick J. Wong" <djwong@kernel.org>, linux-block@vger.kernel.org,
-        linux-btrfs@vger.kernel.org, linux-fsdevel@vger.kernel.org
-Subject: Re: [PATCH 02/19] btrfs: handle checksum validation and repair at
- the storage layer
-Message-ID: <20221212221347.GC5824@twin.jikos.cz>
-Reply-To: dsterba@suse.cz
-References: <20221120124734.18634-1-hch@lst.de>
- <20221120124734.18634-3-hch@lst.de>
+        Mon, 12 Dec 2022 17:16:38 -0500
+Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 82AF1183B1;
+        Mon, 12 Dec 2022 14:16:37 -0800 (PST)
+Received: by mail-pj1-x1030.google.com with SMTP id t17so1311880pjo.3;
+        Mon, 12 Dec 2022 14:16:37 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:sender
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=9jGpkSVyc4v+RFtLDSN/m3mYqOtryehMxfGYmcyBkvk=;
+        b=EIqkfOYY6p1JIUWt70bGUX7mnzPNoEpOqH6QlCucGYlpM2VZNJQVGYtbLlK7ioSRCQ
+         mfJNxsx8/Z0uIJ+1MGPDc+n85sDUAYrPQg+9CQbY1uZ1wqPQ28tQjPZt/lXPdc7R1+yn
+         H2LDbOxp7Y5P7npUtry9kDHISuYFckwOEtgNqm3yDu6gx4QyMunYTEEc4U5aoIwB6sGk
+         rhU2eswgT90dBBFW6CMnPwo5NvPpWy5WO7yzL8eY7yQ0WzmuPDZCNvHQKrsbLpjVzGFV
+         J0vallyMWqqlSsk74jsQQsygRc88eAJrhSKw2CsRPMma/liL0dqbUZj3SFG0VQ2kQR1r
+         otWw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:sender
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=9jGpkSVyc4v+RFtLDSN/m3mYqOtryehMxfGYmcyBkvk=;
+        b=wgr0Nay+Zojizwri+mK5KauYm257mBHl6Fvpg0nV+fncLWzYIjBuKGP7w4FeetUmzE
+         8X9dU3BKASg6DtnI4DW5RblTLak8LNsi7yiGX6RXkOspS8M7qt1Xis5D7Jc/v8tkVUuN
+         5tSq3o5KXPgsONjwmQZnjDyITMDR2ENL9Yqfp8G+dTkZFEUq9piW1PpTj+YnAoNhNK8u
+         UZGvHQWrKiED22iF+VkjA3XM3xJqJ7VufInRloK5ZqNxbSLPRhi0isniKdKgrgfvy3x+
+         2kJRG9pnNkMZlzeKWnVd9dwW7CJWRhPx7IJ+FNjqunnOQPttoYcC7TiSMIbPKbjmWyRd
+         14+w==
+X-Gm-Message-State: ANoB5pnrjwhKpcVzam6Xgijcyc1saZYIWWc9Ny59EogABk99MG/mWo0O
+        a3GUCKDJ7DBxEFurblHmGAg=
+X-Google-Smtp-Source: AA0mqf6DvxA2rDj+gNoMoyJqTqbaeklwbwXmAMMhpE1PS1l1hyZwB1/e2aNBNogaYREc3/ljGac5uw==
+X-Received: by 2002:a05:6a20:1b15:b0:a9:d66f:b7e9 with SMTP id ch21-20020a056a201b1500b000a9d66fb7e9mr19697831pzb.30.1670883396887;
+        Mon, 12 Dec 2022 14:16:36 -0800 (PST)
+Received: from localhost (2603-800c-1a02-1bae-a7fa-157f-969a-4cde.res6.spectrum.com. [2603:800c:1a02:1bae:a7fa:157f:969a:4cde])
+        by smtp.gmail.com with ESMTPSA id e4-20020a63aa04000000b004785d99321asm5640370pgf.86.2022.12.12.14.16.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 12 Dec 2022 14:16:36 -0800 (PST)
+Sender: Tejun Heo <htejun@gmail.com>
+Date:   Mon, 12 Dec 2022 12:16:35 -1000
+From:   Tejun Heo <tj@kernel.org>
+To:     Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>
+Cc:     Waiman Long <longman@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+        Josef Bacik <josef@toxicpanda.com>,
+        Zefan Li <lizefan.x@bytedance.com>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        "Dennis Zhou (Facebook)" <dennisszhou@gmail.com>
+Subject: Re: [PATCH-block v2 2/3] blk-cgroup: Don't flush a blkg if destroyed
+Message-ID: <Y5eoQ8UBN8Xpc+Wp@slm.duckdns.org>
+References: <20221211222058.2946830-1-longman@redhat.com>
+ <20221211222058.2946830-3-longman@redhat.com>
+ <20221212125953.GE16456@blackbody.suse.cz>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20221120124734.18634-3-hch@lst.de>
-User-Agent: Mutt/1.5.23.1-rc1 (2014-03-12)
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20221212125953.GE16456@blackbody.suse.cz>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sun, Nov 20, 2022 at 01:47:17PM +0100, Christoph Hellwig wrote:
-> Currently btrfs handles checksum validation and repair in the end I/O
-> handler for the btrfs_bio.  This leads to a lot of duplicate code
-> plus issues with variying semantics or bugs, e.g.
+On Mon, Dec 12, 2022 at 01:59:53PM +0100, Michal Koutný wrote:
+> Hello.
 > 
->  - the until recently broken repair for compressed extents
->  - the fact that encoded reads validate the checksums but do not kick
->    of read repair
->  - the inconsistent checking of the BTRFS_FS_STATE_NO_CSUMS flag
+> On Sun, Dec 11, 2022 at 05:20:57PM -0500, Waiman Long <longman@redhat.com> wrote:
+> > Before commit 3b8cc6298724 ("blk-cgroup: Optimize blkcg_rstat_flush()"),
+> > blkg's stats is only flushed if they are online.
 > 
-> This commit revamps the checksum validation and repair code to instead
-> work below the btrfs_submit_bio interfaces.  For this to work we need
-> to make sure an inode is available, so that is added as a parameter
-> to btrfs_bio_alloc.  With that btrfs_submit_bio can preload
-> btrfs_bio.csum from the csum tree without help from the upper layers,
-> and the low-level I/O completion can iterate over the bio and verify
-> the checksums.
+> I'm not sure I follow -- css_release_work_fn/cgroup_rstat_flush may be
+> called on an offlined blkcg (offlined!=released). There's no invariant
+> ensuring offlined blkcg won't be flushed. (There is only current
+> situation when there is no reader of io data that'd need them flushed
+> [1].)
 > 
-> In case of a checksum failure (or a plain old I/O error), the repair
-> is now kicked off before the upper level ->end_io handler is invoked.
-> Tracking of the repair status is massively simplified by just keeping
-> a small failed_bio structure per bio with failed sectors and otherwise
-> using the information in the repair bio.  The per-inode I/O failure
-> tree can be entirely removed.
+> > In addition, the stat flushing of blkgs in blkcg_rstat_flush()
+> > includes propagating the rstat data to its parent. However, if a blkg
+> > has been destroyed (offline), the validity of its parent may be
+> > questionable.
 > 
-> The saved bvec_iter in the btrfs_bio is now competely managed by
-> btrfs_submit_bio and must not be accessed by the callers.
+> Parents won't be freed (neither offlined) before children (see
+> css_killed_work_fn). It should be regularly OK to pass data into a
+> parent of an offlined blkcg.
 > 
-> There is one significant behavior change here:  If repair fails or
-> is impossible to start with, the whole bio will be failed to the
-> upper layer.  This is the behavior that all I/O submitters execept
-> for buffered I/O already emulated in their end_io handler.  For
-> buffered I/O this now means that a large readahead request can
-> fail due to a single bad sector, but as readahead errors are igored
-> the following readpage if the sector is actually accessed will
-> still be able to read.  This also matches the I/O failure handling
-> in other file systems.
+> > For safety, revert back to the old behavior by ignoring offline
+> > blkg's.
+> 
+> I don't know if this is a good reasoning. If you argue that offlined
+> children needn't be taken into parent's account, then I think it's more
+> efficient to exclude the offlined blkcgs from update. (With the caveat I
+> have in [1].)
 
-This patch is apparently doing several things at once, please split it.
+Yeah, I'm not sure about this patch either. Doesn't seem necessary.
+
 Thanks.
+
+-- 
+tejun
