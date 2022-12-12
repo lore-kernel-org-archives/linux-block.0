@@ -2,117 +2,192 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E5001C4167B
-	for <linux-block@archiver.kernel.org>; Mon, 12 Dec 2022 13:01:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A28DFC4332F
+	for <linux-block@archiver.kernel.org>; Mon, 12 Dec 2022 13:36:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232504AbiLLNBj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 12 Dec 2022 08:01:39 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58688 "EHLO
+        id S232770AbiLLNgI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 12 Dec 2022 08:36:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36454 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232476AbiLLNBC (ORCPT
+        with ESMTP id S232808AbiLLNfn (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 12 Dec 2022 08:01:02 -0500
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7131F13D06;
-        Mon, 12 Dec 2022 04:59:58 -0800 (PST)
+        Mon, 12 Dec 2022 08:35:43 -0500
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 271D613F1E;
+        Mon, 12 Dec 2022 05:35:39 -0800 (PST)
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 7BBA433801;
-        Mon, 12 Dec 2022 12:59:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-        t=1670849995; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 18EF51FEA0;
+        Mon, 12 Dec 2022 13:35:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1670852138; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=95JjiZBzv65n1mXRBvbktBTBpXMKtPfhRGInuWjwgaw=;
-        b=uuKDsqZWYBzL3/5EH0W9pudOuIMhaAq4/3TnbUS+als3ZaEvEGNa0OKuG9U915dTuE5nv1
-        J5XsBEBbXnDawcj5Nq3kHSUgUEF8D/90UfElpXVAK76hhfcDZgzhMEyL+gJTA1bFhbruQ4
-        4AB2Z5GtWCRgu6mh/wZqowW3cR1wTH4=
+        bh=3kvbV1iUur+xypLxktToJdMaRK2U74GIxla1Zf8hI0c=;
+        b=WFdS5FsPd2V69pXoxeYLFw5qg5BMAvCJhEHE89JyLcX8K4TelIRGKt/tZMsNPaiLnbAA+x
+        8GrxrEYgaeUcxlejLJVeP0JoxZnlM6bqi1h2obdFqxi0UXpocg1DXDuXTsXNBLPonbB0Lk
+        k8pP28OFtXPM+LWgPUGMdk3UNoDtdOg=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1670852138;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=3kvbV1iUur+xypLxktToJdMaRK2U74GIxla1Zf8hI0c=;
+        b=3UhE1553YNQujJOuI/Yo3Yi5vKTJ51zgtK57MdDL3pVoL8ypKctz2haqtoiLPKfNzENI5s
+        wKEj9++BzzAEMsBA==
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 3A92B13456;
-        Mon, 12 Dec 2022 12:59:55 +0000 (UTC)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 0A39113456;
+        Mon, 12 Dec 2022 13:35:38 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id EbVZDcsll2P+EgAAMHmgww
-        (envelope-from <mkoutny@suse.com>); Mon, 12 Dec 2022 12:59:55 +0000
-Date:   Mon, 12 Dec 2022 13:59:53 +0100
-From:   Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>
-To:     Waiman Long <longman@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
-        Josef Bacik <josef@toxicpanda.com>,
-        Zefan Li <lizefan.x@bytedance.com>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        "Dennis Zhou (Facebook)" <dennisszhou@gmail.com>
-Subject: Re: [PATCH-block v2 2/3] blk-cgroup: Don't flush a blkg if destroyed
-Message-ID: <20221212125953.GE16456@blackbody.suse.cz>
-References: <20221211222058.2946830-1-longman@redhat.com>
- <20221211222058.2946830-3-longman@redhat.com>
+        id SZV2Aioul2M1JQAAMHmgww
+        (envelope-from <jack@suse.cz>); Mon, 12 Dec 2022 13:35:38 +0000
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+        id 79268A0728; Mon, 12 Dec 2022 14:35:37 +0100 (CET)
+Date:   Mon, 12 Dec 2022 14:35:37 +0100
+From:   Jan Kara <jack@suse.cz>
+To:     Yu Kuai <yukuai1@huaweicloud.com>
+Cc:     jack@suse.cz, paolo.valente@linaro.org, axboe@kernel.dk,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yukuai3@huawei.com, yi.zhang@huawei.com
+Subject: Re: [PATCH] block, bfq: fix possible uaf for 'bfqq->bic'
+Message-ID: <20221212133537.hrs5t32ijj6lxoaf@quack3>
+References: <20221210102537.655670-1-yukuai1@huaweicloud.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="11Y7aswkeuHtSBEs"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20221211222058.2946830-3-longman@redhat.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20221210102537.655670-1-yukuai1@huaweicloud.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Sat 10-12-22 18:25:37, Yu Kuai wrote:
+> From: Yu Kuai <yukuai3@huawei.com>
+> 
+> Our test report a uaf for 'bfqq->bic' in 5.10:
+> 
+> ==================================================================
+> BUG: KASAN: use-after-free in bfq_select_queue+0x378/0xa30
+> Read of size 8 at addr ffff88810efb42d8 by task fsstress/2318352
+> 
+> CPU: 6 PID: 2318352 Comm: fsstress Kdump: loaded Not tainted 5.10.0-60.18.0.50.h602.kasan.eulerosv2r11.x86_64 #1
+> Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.12.1-0-ga5cab58-20220320_160524-szxrtosci10000 04/01/2014
+> Call Trace:
+...
+>  bfq_select_queue+0x378/0xa30
+>  __bfq_dispatch_request+0x1c4/0x220
+>  bfq_dispatch_request+0xe8/0x130
+>  __blk_mq_do_dispatch_sched+0x3f4/0x560
+>  blk_mq_do_dispatch_sched+0x62/0xb0
+>  __blk_mq_sched_dispatch_requests+0x215/0x2a0
+>  blk_mq_sched_dispatch_requests+0x8f/0xd0
+>  __blk_mq_run_hw_queue+0x98/0x180
+>  __blk_mq_delay_run_hw_queue+0x22b/0x240
+>  blk_mq_run_hw_queue+0xe3/0x190
+>  blk_mq_sched_insert_requests+0x107/0x200
+>  blk_mq_flush_plug_list+0x26e/0x3c0
+>  blk_finish_plug+0x63/0x90
+>  __iomap_dio_rw+0x7b5/0x910
+>  iomap_dio_rw+0x36/0x80
+>  ext4_dio_read_iter+0x146/0x190 [ext4]
+>  ext4_file_read_iter+0x1e2/0x230 [ext4]
+>  new_sync_read+0x29f/0x400
+>  vfs_read+0x24e/0x2d0
+>  ksys_read+0xd5/0x1b0
 
---11Y7aswkeuHtSBEs
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Perhaps we can trim this UAF report a bit to what I've left above? That
+should be enough to give idea about the problem.
 
-Hello.
+> Commit 3bc5e683c67d ("bfq: Split shared queues on move between cgroups")
+> changes that move process to a new cgroup will allocate a new bfqq to
+> use, however, the old bfqq and new bfqq can point to the same bic:
+> 
+> 1) Initial state, two process with io in the same cgroup.
+> 
+> Process 1       Process 2
+>  (BIC1)          (BIC2)
+>   |  Λ            |  Λ
+>   |  |            |  |
+>   V  |            V  |
+>   bfqq1           bfqq2
+> 
+> 2) bfqq1 is merged to bfqq2.
+> 
+> Process 1       Process 2（cg1)
+>  (BIC1)          (BIC2)
+>   |               |
+>    \-------------\|
+>                   V
+>   bfqq1           bfqq2(coop)
+> 
+> 3) Process 1 exit, then issue new io(denoce IOA) from Process 2.
+> 
+>  (BIC2)
+>   |  Λ
+>   |  |
+>   V  |
+>   bfqq2(coop)
+> 
+> 4) Before IOA is completed, move Process 2 to another cgroup and issue io.
+> 
+> Process 2
+>  (BIC2)
+>    Λ
+>    |\--------------\
+>    |                V
+>   bfqq2           bfqq3
+> 
+> Now that BIC2 points to bfqq3, while bfqq2 and bfqq3 both point to BIC2.
+> If all the requests are completed, and Process 2 exit, BIC2 will be
+> freed while there is no guarantee that bfqq2 will be freed before BIC2.
+> 
+> Fix the problem by clearing bfqq->bic if process references is decreased
+> to zero, since that they are not related anymore.
+> 
+> Fixes: 3bc5e683c67d ("bfq: Split shared queues on move between cgroups")
+> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
 
-On Sun, Dec 11, 2022 at 05:20:57PM -0500, Waiman Long <longman@redhat.com> wrote:
-> Before commit 3b8cc6298724 ("blk-cgroup: Optimize blkcg_rstat_flush()"),
-> blkg's stats is only flushed if they are online.
+Thanks for the analysis and the patch! I agree this is a problem.
 
-I'm not sure I follow -- css_release_work_fn/cgroup_rstat_flush may be
-called on an offlined blkcg (offlined!=released). There's no invariant
-ensuring offlined blkcg won't be flushed. (There is only current
-situation when there is no reader of io data that'd need them flushed
-[1].)
+> diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+> index a72304c728fc..6eada99d1b34 100644
+> --- a/block/bfq-iosched.c
+> +++ b/block/bfq-iosched.c
+> @@ -3036,6 +3036,14 @@ void bfq_release_process_ref(struct bfq_data *bfqd, struct bfq_queue *bfqq)
+>  
+>  	bfq_reassign_last_bfqq(bfqq, NULL);
+>  
+> +	/*
+> +	 * __bfq_bic_change_cgroup() just reset bic->bfqq so that a new bfqq
+> +	 * will be created to handle new io, while old bfqq will stay around
+> +	 * until all the requests are completed. It's unsafe to keep bfqq->bic
+> +	 * since they are not related anymore.
+> +	 */
+> +	if (bfqq_process_refs(bfqq) == 1)
+> +		bfqq->bic = NULL;
+>  	bfq_put_queue(bfqq);
 
-> In addition, the stat flushing of blkgs in blkcg_rstat_flush()
-> includes propagating the rstat data to its parent. However, if a blkg
-> has been destroyed (offline), the validity of its parent may be
-> questionable.
+Rather than changing bfq_release_process_ref() I think it would be more
+logical to change bic_set_bfqq() like:
 
-Parents won't be freed (neither offlined) before children (see
-css_killed_work_fn). It should be regularly OK to pass data into a
-parent of an offlined blkcg.
+	struct bfq_queue *old_bfqq = bic->bfqq[is_sync];
 
-> For safety, revert back to the old behavior by ignoring offline
-> blkg's.
+	/* Clear bic pointer if we are detaching bfqq from its bic */
+	if (old_bfqq && old_bfqq->bic == bic)
+		old_bfqq->bic = NULL;
 
-I don't know if this is a good reasoning. If you argue that offlined
-children needn't be taken into parent's account, then I think it's more
-efficient to exclude the offlined blkcgs from update. (With the caveat I
-have in [1].)
+And then we can also remove several explicit bfqq->bic = NULL statements
+from bfq code.
 
-Regards,
-Michal
-
-[1] https://lore.kernel.org/r/YqEfNgUc8jxlAq8D@blackbook/
-
---11Y7aswkeuHtSBEs
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: Digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iHUEARYIAB0WIQTrXXag4J0QvXXBmkMkDQmsBEOquQUCY5clxQAKCRAkDQmsBEOq
-uSetAQCmnfBYSQWk5l/gfz/eBj+JLLtB5FF0vKwMUp7t6s2hdQEA/iF6GKtaE8D3
-6UdBR14daTYUWeIsw+Jji88gMzQy9gY=
-=kEQi
------END PGP SIGNATURE-----
-
---11Y7aswkeuHtSBEs--
+								Honza
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
