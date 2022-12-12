@@ -2,107 +2,99 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87FF1C4332F
-	for <linux-block@archiver.kernel.org>; Mon, 12 Dec 2022 18:48:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BE5B8C4332F
+	for <linux-block@archiver.kernel.org>; Mon, 12 Dec 2022 21:47:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233364AbiLLSsG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 12 Dec 2022 13:48:06 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37172 "EHLO
+        id S233549AbiLLVrI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 12 Dec 2022 16:47:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40390 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233423AbiLLSqc (ORCPT
+        with ESMTP id S233558AbiLLVrD (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 12 Dec 2022 13:46:32 -0500
-Received: from mail-qt1-x836.google.com (mail-qt1-x836.google.com [IPv6:2607:f8b0:4864:20::836])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D239634D
-        for <linux-block@vger.kernel.org>; Mon, 12 Dec 2022 10:46:23 -0800 (PST)
-Received: by mail-qt1-x836.google.com with SMTP id s9so9491440qtx.6
-        for <linux-block@vger.kernel.org>; Mon, 12 Dec 2022 10:46:23 -0800 (PST)
+        Mon, 12 Dec 2022 16:47:03 -0500
+Received: from mail-pf1-x431.google.com (mail-pf1-x431.google.com [IPv6:2607:f8b0:4864:20::431])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8711C192A4;
+        Mon, 12 Dec 2022 13:47:02 -0800 (PST)
+Received: by mail-pf1-x431.google.com with SMTP id c13so872065pfp.5;
+        Mon, 12 Dec 2022 13:47:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=toxicpanda-com.20210112.gappssmtp.com; s=20210112;
+        d=gmail.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=bbkdJaLOP/vMBqN0DWbeXqbCoBKj/NLdfM5o1UZoPtg=;
-        b=BiflXrMvkQL86DwDsuvp6zeu20P/QSTZLdhXa0elHIV0T/SgbjFyJwd6jvnjoc+f88
-         41OV0DeplENg78lX4yl9EdygKEKISQ3t6ZyaGuN+6sNg+M9nXKZsRrRw/7x9eMgHOEqr
-         fscuXjvYupahus/kO2WGkZtW5EAaFAD2+yxyOYZ624vIgFYw6UZZFcxVqX22QIi34AU1
-         /fpStE00hMo0mxyXrXq1Bru6OBSweQ+rKUt66IltQb85gCfaod0CbdDFSZLMueN+uL2v
-         Wcol1WibOeTSE+o+ofOg67Gjf99MJGhFJbqpoO1Uoad11Tht0XVZZApO5oRxve2JL4+w
-         X7zQ==
+         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=6qiAQ7WTwZr4dVTtMKJayehUb8HIRKe6ZlI8Mkp+Y78=;
+        b=bQdgiHkGAhLziF8YrE6lY1CbCjAd+Q93tt3s7B8OuQurw+fBLJSpXapeoQaWoGZaCu
+         pW23g/hLxu3YE+Ri3icoxByE0NpQbPuYRKm0O44+zvDAKNWI4dZPRINx9W16HsUoSdCB
+         mDygSc6MDZPTYGJWHfRTLiZugJJLsljMh9rjcxrw5rIm3xd4N2+rOrwUJVhkj4WFAt9O
+         ps7VSjNuawEnABvIeNBm++nfKVPatwvO+Yt/cH+xxUCqdqlwTio2ARN+cmMZ3TnCRgL8
+         HMNsEYRtDBw2k4+p9EeEBSbg9SZxYykoFL4ShGXYiCZ683mFThj8DLxwmff6vHfGqwzS
+         q1uA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=bbkdJaLOP/vMBqN0DWbeXqbCoBKj/NLdfM5o1UZoPtg=;
-        b=edMlPBOUrQhSZuCDHfhZKH43oPW/6Jz8h7g3LpBHCnQUid4anzbRALWbgcAAwwMHfU
-         ZUJ6HHa7UaIe3IzjsJkpGisJ6/8lWX9pg4ndsusC2huZdqnfXfVKhBMW4Q+veP+ZmOG7
-         OKJIK6okEtv6/9/MEdXqPFIO7+C/reTVwMXaUFnFgxbEoZbhq6CoTeKDxJQ64O3QqWaA
-         ghghsLQV5aV6txdlH24qrsXqgvcuvxreUZz8MMlUguBQM6LS7qHJ0DyLrMPr5XJYGiD6
-         AkOAl5jADfZJVImgXBYGNnAM+uuvHIRo/OtX3WqwHelPBENR/orvVxlbQp3jv8dEYR9D
-         URnw==
-X-Gm-Message-State: ANoB5pnEVXQc1EFpBcWF6SXa48UHamx97/QvkmjuABezs6jWrTnxvzWq
-        g5TF8ddO+cqciRcn7lWB/kFe+A==
-X-Google-Smtp-Source: AA0mqf5lCcZ3o+7m0AnrGOzD69vhiTmFeYO42EEJpCHJDRdGBUIxLCGMJx4ZMqEDyrKPzYFZZSMrqA==
-X-Received: by 2002:ac8:5c83:0:b0:3a6:c4eb:2e52 with SMTP id r3-20020ac85c83000000b003a6c4eb2e52mr29409230qta.43.1670870782424;
-        Mon, 12 Dec 2022 10:46:22 -0800 (PST)
-Received: from localhost (cpe-174-109-170-245.nc.res.rr.com. [174.109.170.245])
-        by smtp.gmail.com with ESMTPSA id i12-20020ac813cc000000b003a50248b89esm6155964qtj.26.2022.12.12.10.46.21
+         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=6qiAQ7WTwZr4dVTtMKJayehUb8HIRKe6ZlI8Mkp+Y78=;
+        b=LJpHuVbzmpDI31qWHHKvkR7wWWLgpHMBkZu7chjcMt4xULpJVSIGXwfevS6ptZkUyi
+         44HXF4JW53DeHRdK4Y+XFscTWzN0PYVetDtwD3+jynGuTdQH5ksw1vOMm8KFx4AQnQWd
+         O4rfTYtoKe5eajmYzpMwwNqscnNRdqCAUlWWHIl+J6u9IKNZgdD4S1FO0BeOAvg+KP74
+         ivs2CZNPL9R5gKzLF61ZUty/cZGOgp2xKrVtLH3cf4LwWBFPB+xVBPrOAbycdtTy4ORv
+         VsRAieBWHq98GhO5QduIZmR7/8DNK7wRHwqNOsmAOEnhJPtlqpgQeZSSmHsyoQC80dfX
+         HunQ==
+X-Gm-Message-State: ANoB5plY+PXTXqR9WyqOjYPsa3ipjKVSn9NQWmgL4C7S2BFvWhA4wUgs
+        uNFVZ5MLmAYWT1Oj7R4wDIc=
+X-Google-Smtp-Source: AA0mqf6FYZFa62ntzOFykUefdpR0zUL84rPMRalzLreyTNxWJpv2jD0oJuR8N24+bpAwNeG7dA7ydg==
+X-Received: by 2002:a05:6a00:1411:b0:574:a541:574a with SMTP id l17-20020a056a00141100b00574a541574amr20784128pfu.0.1670881621860;
+        Mon, 12 Dec 2022 13:47:01 -0800 (PST)
+Received: from localhost (2603-800c-1a02-1bae-a7fa-157f-969a-4cde.res6.spectrum.com. [2603:800c:1a02:1bae:a7fa:157f:969a:4cde])
+        by smtp.gmail.com with ESMTPSA id o24-20020aa79798000000b005745eb7eccasm6236062pfp.112.2022.12.12.13.47.00
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 12 Dec 2022 10:46:21 -0800 (PST)
-Date:   Mon, 12 Dec 2022 13:46:19 -0500
-From:   Josef Bacik <josef@toxicpanda.com>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Chris Mason <clm@fb.com>, David Sterba <dsterba@suse.com>,
-        Damien Le Moal <damien.lemoal@wdc.com>,
-        Naohiro Aota <naohiro.aota@wdc.com>,
-        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
-        Qu Wenruo <wqu@suse.com>, Jens Axboe <axboe@kernel.dk>,
-        "Darrick J. Wong" <djwong@kernel.org>, linux-block@vger.kernel.org,
-        linux-btrfs@vger.kernel.org, linux-fsdevel@vger.kernel.org
-Subject: Re: consolidate btrfs checksumming, repair and bio splitting v2
-Message-ID: <Y5d2+3hCpEwT7QG2@localhost.localdomain>
-References: <20221120124734.18634-1-hch@lst.de>
+        Mon, 12 Dec 2022 13:47:01 -0800 (PST)
+Sender: Tejun Heo <htejun@gmail.com>
+Date:   Mon, 12 Dec 2022 11:46:59 -1000
+From:   'Tejun Heo' <tj@kernel.org>
+To:     Jiri Slaby <jirislaby@kernel.org>
+Cc:     David Laight <David.Laight@aculab.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Martin Liska <mliska@suse.cz>,
+        Josef Bacik <josef@toxicpanda.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        "cgroups@vger.kernel.org" <cgroups@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: Re: [PATCH] block/blk-iocost (gcc13): cast enum members to int in
+ prints
+Message-ID: <Y5ehU524daymEKgf@slm.duckdns.org>
+References: <20221031114520.10518-1-jirislaby@kernel.org>
+ <Y1++fLJXkeZgtXR2@infradead.org>
+ <Y2AMcSPAJpj6obSA@slm.duckdns.org>
+ <d833ad15-f458-d43d-cab7-de62ff54a939@kernel.org>
+ <Y2FNa4bGhJoevRKT@slm.duckdns.org>
+ <2b975ee3117e45aaa7882203cf9a4db8@AcuMS.aculab.com>
+ <Y2Kaghnu/sPvl0+g@slm.duckdns.org>
+ <Y2KePvYRRMOrqzOe@slm.duckdns.org>
+ <320c939e-a3f0-1b1e-77e4-f3ecca00465d@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20221120124734.18634-1-hch@lst.de>
+In-Reply-To: <320c939e-a3f0-1b1e-77e4-f3ecca00465d@kernel.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sun, Nov 20, 2022 at 01:47:15PM +0100, Christoph Hellwig wrote:
-> Hi all,
+On Mon, Dec 12, 2022 at 01:14:31PM +0100, Jiri Slaby wrote:
+> > If so, my suggestion is just sticking with the old behavior until we switch
+> > to --std=g2x and then make one time adjustment at that point.
 > 
-> this series moves a large amount of duplicate code below btrfs_submit_bio
-> into what I call the 'storage' layer.  Instead of duplicating code to
-> checksum, check checksums and repair and split bios in all the caller
-> of btrfs_submit_bio (buffered I/O, direct I/O, compressed I/O, encoded
-> I/O), the work is done one in a central place, often more optiomal and
-> without slight changes in behavior.  Once that is done the upper layers
-> also don't need to split the bios for extent boundaries, as the storage
-> layer can do that itself, including splitting the bios for the zone
-> append limits for zoned I/O.
-> 
-> The split work is inspired by an earlier series from Qu, from which it
-> also reuses a few patches.
-> 
-> The rebasing against the latest misc-next was a bit painful due to the
-> various large cleanups, but very little logic changed, so I've kept the
-> review tags for now, but I'd appreciated another careful round of eyes.
-> 
-> A git tree is also available:
-> 
->     git://git.infradead.org/users/hch/misc.git btrfs-bio-split
-> 
-> Gitweb:
-> 
->     http://git.infradead.org/users/hch/misc.git/shortlog/refs/heads/btrfs-bio-split
-> 
+> So is the enum split OK under these circumstances?
 
-You can add
+Oh man, it's kinda crazy that the compiler is changing in a way that the
+same piece of code can't be compiled the same way across two adjoining
+versions of the same compiler. But, yeah, if that's what gcc is gonna do and
+splitting enums is the only way to be okay across the compiler versions,
+there isn't any other choice we can make.
 
-Reviewed-by: Josef Bacik <josef@toxicpanda.com>
+Thanks.
 
-to the patches that don't already have my reviewed-by tag.  Thanks,
-
-Josef
+-- 
+tejun
