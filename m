@@ -2,107 +2,172 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CBCA3C4332F
-	for <linux-block@archiver.kernel.org>; Mon, 12 Dec 2022 14:21:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44694C4332F
+	for <linux-block@archiver.kernel.org>; Mon, 12 Dec 2022 14:44:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231612AbiLLOVq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 12 Dec 2022 09:21:46 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44506 "EHLO
+        id S232253AbiLLOn7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 12 Dec 2022 09:43:59 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53956 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230315AbiLLOVp (ORCPT
+        with ESMTP id S232301AbiLLOn4 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 12 Dec 2022 09:21:45 -0500
-Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2E943886
-        for <linux-block@vger.kernel.org>; Mon, 12 Dec 2022 06:21:44 -0800 (PST)
-Received: by mail-pl1-x636.google.com with SMTP id g10so12213209plo.11
-        for <linux-block@vger.kernel.org>; Mon, 12 Dec 2022 06:21:44 -0800 (PST)
+        Mon, 12 Dec 2022 09:43:56 -0500
+Received: from mail-pg1-x531.google.com (mail-pg1-x531.google.com [IPv6:2607:f8b0:4864:20::531])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8AD6095A3
+        for <linux-block@vger.kernel.org>; Mon, 12 Dec 2022 06:43:55 -0800 (PST)
+Received: by mail-pg1-x531.google.com with SMTP id 142so8340245pga.1
+        for <linux-block@vger.kernel.org>; Mon, 12 Dec 2022 06:43:55 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=9XdE4u8wb4SGysfqm2k4eAsH/hYE/rL6WOXQqKBcfCQ=;
-        b=nr/TmBJudujF3LzjEPT/iI1bG5mry7lvgQr4qFXTqsymwqvIaQD1ustZ3P/gJQfnoZ
-         lkGbOu5RabaD+hj6Divl536kKQx0fsd6RKjJYQ8LDHXRuW53h26lQRpgSHWP0pJBR4TV
-         PmX04YQo/R5tjtzI4Fv+EUn5Q8Te4rNxpZAO6K/YnYQE5V64a41e4R+OYO1ZrNhxZWhg
-         7s51ilRa+1LiSkJPEskgMg9Y5ODpDlzv+YRX67klUeNoXEzBhhLYgBgFcBY+333ayTa+
-         W+GIezBwCDuWDozMMyuPwrea9wWwgn36WuufydHYYv3EtQcZelvuEpHZET0ANNePPZHb
-         UkLA==
+        bh=HuF1eqwBxskCeYrPt9wrS/ASCD/8dAon4WxokTRgu+o=;
+        b=H9wLocN9flhRiHVEh8vDRQ508Hjpe9vurfzl5DHNrWDKLS7tNOAhYrAPILmLab/rhX
+         OR4VaJTWPZjrjYKvsUcTmwW/46/vpS2MAfJVRZfiFXZHZdWzTUxgGkGTIWVnBdLDHHFg
+         HFwa50eylXRnouktFn2Rm1hSvK9m7EswxPy1d7jU1wO5Z/ocw8uxLp6r3hh3lN4qk2gq
+         uKkL2czZKgHLpfriHS5YDRJoAzN+y29MXRdc+159kLaj0jzMcTuW5uFG/TUvE+mlyV8+
+         /5WScEuISR/WM3roxWR6wM3eyGLmIgJ42oovh4yD351jrgcgxik6l4zmvi8IHXluTpGK
+         lQ9g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=9XdE4u8wb4SGysfqm2k4eAsH/hYE/rL6WOXQqKBcfCQ=;
-        b=Y7PofW1NNgmk5wYAlrJpxfGpEdO9N+wm5ioisQcDAXEA3WKROmu+vA/H9cdKBFU/C1
-         +cTx9Hh1MRGiSq8XRZJ1CrkdoMJv8W0G+oSTEDVmDMNLMQwc2RA13bAE2mIK3N7K6lfo
-         r3/xDWCECoq+XeNjeT4y6bWBGkPLTE3Fuz9pebc1zQGCKpVm0B2YTuVjFa22VbWGhV7H
-         Y0k3hAfEuvieebQay+1g91XJHeZYmKpKb8IcjJYiw93wZDM9P+VX47mQyIGcqjVxvF/u
-         q4XqLaeF+NBdKbOvM1cTjb04S48/nlaoTfwqUXtmhjq/M2UvWblxO03uKmTjJ/oANNJc
-         BkZQ==
-X-Gm-Message-State: ANoB5pl5vNKHdHUk9aD5k7WzfnK8lL6HSzTqDfuQtHlFk3hqlageIcLM
-        h1R6fKssehz0JpMHP9gWGHc=
-X-Google-Smtp-Source: AA0mqf4EDWLTKEbOQpGXbaof/cBi/H+iEeCBhyeImreuuLDU0FVDM5DVhH6MXI79mBPAGwjki99ZKw==
-X-Received: by 2002:a17:902:e811:b0:189:d8fb:152d with SMTP id u17-20020a170902e81100b00189d8fb152dmr23146353plg.25.1670854904218;
-        Mon, 12 Dec 2022 06:21:44 -0800 (PST)
+        bh=HuF1eqwBxskCeYrPt9wrS/ASCD/8dAon4WxokTRgu+o=;
+        b=gx4dSGbGnCPjd3jRuArVwD9JQlvCtpVa46YkXixLXAhw8otYpaLVXF9HaOBdGuX7xa
+         8OK6hjtq5a4N+h63qrG8ptcHU45Fc9KeCFGdhRv7EM4rIBQ/PIfvWD5i3HF24hBoqVFR
+         G27/JwD1fgkgBTTUA13GsAPTASHuv5BuZ7T5IKHS1UuBUwm4JLtASArlXtflqbitPvDW
+         veKzgFMOuJZc8+V6xEL1DPs2eXWi+P7VsbJKF8SO7FfYVETFPJemZ3U25oKSkvJSl1uR
+         FtJuFdFURIaPeBtr9zkYWpWcZubj1rT5RbnUtSObYgWXriz2czNTrl5x3M3FBwx5J/kc
+         M9Ng==
+X-Gm-Message-State: ANoB5pmWPknoWeFQSv4fOjeHhioFaBMIHkKQ038sjPI78MaY3C7efv9n
+        E6z4n+2wDXraiO58VqjZgrGl46A4/E4=
+X-Google-Smtp-Source: AA0mqf7TsfY2Ds45Sv36JzK/wqx2vX1PhqojOKuXed+b8FBBxWyG5zFOH0y+Oiq/+Lu/yagwzTOrqg==
+X-Received: by 2002:aa7:8492:0:b0:576:ebfe:e9c1 with SMTP id u18-20020aa78492000000b00576ebfee9c1mr16019318pfn.20.1670856234979;
+        Mon, 12 Dec 2022 06:43:54 -0800 (PST)
 Received: from localhost.localdomain ([114.200.4.15])
-        by smtp.gmail.com with ESMTPSA id je19-20020a170903265300b00186b3c3e2dasm6419558plb.155.2022.12.12.06.21.41
+        by smtp.gmail.com with ESMTPSA id s3-20020aa78bc3000000b005618189b0ffsm5886630pfd.104.2022.12.12.06.43.52
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 12 Dec 2022 06:21:43 -0800 (PST)
-Date:   Mon, 12 Dec 2022 23:21:32 +0900
+        Mon, 12 Dec 2022 06:43:54 -0800 (PST)
+Date:   Mon, 12 Dec 2022 23:43:50 +0900
 From:   Suwan Kim <suwan.kim027@gmail.com>
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        Stefan Hajnoczi <stefanha@redhat.com>, mst@redhat.com,
-        jasowang@redhat.com, pbonzini@redhat.com,
+To:     Stefan Hajnoczi <stefanha@redhat.com>
+Cc:     mst@redhat.com, jasowang@redhat.com, pbonzini@redhat.com,
+        hch@infradead.org, axboe@kernel.dk,
         virtualization@lists.linux-foundation.org,
         linux-block@vger.kernel.org
-Subject: Re: [PATCH 1/2] virtio-blk: set req->state to MQ_RQ_COMPLETE after
- polling I/O is finished
-Message-ID: <Y5c47EqWknNKefRl@localhost.localdomain>
+Subject: Re: [PATCH 2/2] virtio-blk: support completion batching for the IRQ
+ path
+Message-ID: <Y5c+Jok0DbtsRJ4X@localhost.localdomain>
 References: <20221206141125.93055-1-suwan.kim027@gmail.com>
- <Y5EJ+6qtsy8Twe/q@fedora>
- <4701aded-0464-791e-8b8c-a34c422e8e62@kernel.dk>
- <Y5bPG9QGMd/cDTQG@infradead.org>
+ <20221206141125.93055-2-suwan.kim027@gmail.com>
+ <Y5EOEh2HYHqo+Sbh@fedora>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Y5bPG9QGMd/cDTQG@infradead.org>
+In-Reply-To: <Y5EOEh2HYHqo+Sbh@fedora>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sun, Dec 11, 2022 at 10:50:03PM -0800, Christoph Hellwig wrote:
-> On Thu, Dec 08, 2022 at 09:48:23AM -0700, Jens Axboe wrote:
-> > > The doc comment for blk_mq_set_request_complete() mentions this being
-> > > used in ->queue_rq(), but that's not the case here. Does the doc comment
-> > > need to be updated if we're using the function in a different way?
+On Wed, Dec 07, 2022 at 05:05:06PM -0500, Stefan Hajnoczi wrote:
+> On Tue, Dec 06, 2022 at 11:11:25PM +0900, Suwan Kim wrote:
+> > This patch adds completion batching to the IRQ path. It reuses batch
+> > completion code of virtblk_poll(). It collects requests to io_comp_batch
+> > and processes them all at once. It can boost up the performance by 2%.
 > > 
-> > Looks like it's a bit outdated...
-> 
-> I think the comment is still entirely correct.
-> 
+> > To validate the performance improvement and stabilty, I did fio test with
+> > 4 vCPU VM and 12 vCPU VM respectively. Both VMs have 8GB ram and the same
+> > number of HW queues as vCPU.
+> > The fio cammad is as follows and I ran the fio 5 times and got IOPS average.
+> > (io_uring, randread, direct=1, bs=512, iodepth=64 numjobs=2,4)
 > > 
-> > > I'm not familiar enough with the Linux block APIs, but this feels weird
-> > > to me. Shouldn't blk_mq_end_request_batch(iob) take care of this for us?
-> > > Why does it set the state to IDLE instead of COMPLETE?
-> > > 
-> > > I think Jens can confirm whether we really want all drivers that use
-> > > polling and io_comp_batch to manually call
-> > > blk_mq_set_request_complete().
+> > Test result shows about 2% improvement.
 > > 
-> > Should not be a need to call blk_mq_set_request_complete() directly in
-> > the driver for this.
+> >            4 vcpu VM       |   numjobs=2   |   numjobs=4
+> >       -----------------------------------------------------------
+> >         fio without patch  |  367.2K IOPS  |   397.6K IOPS
+> >       -----------------------------------------------------------
+> >         fio with patch     |  372.8K IOPS  |   407.7K IOPS
+> > 
+> >            12 vcpu VM      |   numjobs=2   |   numjobs=4
+> >       -----------------------------------------------------------
+> >         fio without patch  |  363.6K IOPS  |   374.8K IOPS
+> >       -----------------------------------------------------------
+> >         fio with patch     |  373.8K IOPS  |   385.3K IOPS
+> > 
+> > Signed-off-by: Suwan Kim <suwan.kim027@gmail.com>
+> > ---
+> >  drivers/block/virtio_blk.c | 38 +++++++++++++++++++++++---------------
+> >  1 file changed, 23 insertions(+), 15 deletions(-)
 > 
-> Exactly.  Polling or not, drivers should go through the normal completion
-> interface, that is blk_mq_complete_request or the lower-level options
-> blk_mq_complete_request_remote and blk_mq_complete_request_direct.
+> Cool, thanks for doing this!
+> 
+> > diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+> > index cf64d256787e..48fcf745f007 100644
+> > --- a/drivers/block/virtio_blk.c
+> > +++ b/drivers/block/virtio_blk.c
+> > @@ -272,6 +272,18 @@ static inline void virtblk_request_done(struct request *req)
+> >  	blk_mq_end_request(req, virtblk_result(vbr));
+> >  }
+> >  
+> > +static void virtblk_complete_batch(struct io_comp_batch *iob)
+> > +{
+> > +	struct request *req;
+> > +
+> > +	rq_list_for_each(&iob->req_list, req) {
+> > +		virtblk_unmap_data(req, blk_mq_rq_to_pdu(req));
+> > +		virtblk_cleanup_cmd(req);
+> > +		blk_mq_set_request_complete(req);
+> > +	}
+> > +	blk_mq_end_request_batch(iob);
+> > +}
+> > +
+> >  static void virtblk_done(struct virtqueue *vq)
+> >  {
+> >  	struct virtio_blk *vblk = vq->vdev->priv;
+> > @@ -280,6 +292,7 @@ static void virtblk_done(struct virtqueue *vq)
+> >  	struct virtblk_req *vbr;
+> >  	unsigned long flags;
+> >  	unsigned int len;
+> > +	DEFINE_IO_COMP_BATCH(iob);
+> >  
+> >  	spin_lock_irqsave(&vblk->vqs[qid].lock, flags);
+> >  	do {
+> > @@ -287,7 +300,9 @@ static void virtblk_done(struct virtqueue *vq)
+> >  		while ((vbr = virtqueue_get_buf(vblk->vqs[qid].vq, &len)) != NULL) {
+> >  			struct request *req = blk_mq_rq_from_pdu(vbr);
+> >  
+> > -			if (likely(!blk_should_fake_timeout(req->q)))
+> > +			if (likely(!blk_should_fake_timeout(req->q)) &&
+> > +				!blk_mq_add_to_batch(req, &iob, vbr->status,
+> > +							virtblk_complete_batch))
+> >  				blk_mq_complete_request(req);
+> >  			req_done = true;
+> >  		}
+> > @@ -295,9 +310,14 @@ static void virtblk_done(struct virtqueue *vq)
+> >  			break;
+> >  	} while (!virtqueue_enable_cb(vq));
+> >  
+> > -	/* In case queue is stopped waiting for more buffers. */
+> > -	if (req_done)
+> > +	if (req_done) {
+> > +		if (!rq_list_empty(iob.req_list))
+> > +			virtblk_complete_batch(&iob);
+> 
+> A little optimization to avoid the indirect call: iob.complete(&iob) :).
+> Not sure if it's good style to do that but it works in this case because
+> we know it can only be virtblk_complete_batch().
+> 
+> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
-Hi all,
+Hi Stefan,
 
-Thanks for the comment. It was the wrong use of the function...
-I will use blk_mq_complete_request_remote() instead of
-blk_mq_set_request_complete() and send next version soon.
+Thanks for the comment!
+It also needs to use blk_mq_complete_request_remote() instead of
+blk_mq_set_request_complete()
+I will resend it with the modification of patch #1 and then please
+review it again.
 
 Regards,
 Suwan Kim
