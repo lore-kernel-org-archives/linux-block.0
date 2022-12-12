@@ -2,106 +2,121 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 99D14C4332F
-	for <linux-block@archiver.kernel.org>; Mon, 12 Dec 2022 22:44:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 42BA8C00145
+	for <linux-block@archiver.kernel.org>; Mon, 12 Dec 2022 22:55:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233205AbiLLWot (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 12 Dec 2022 17:44:49 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46820 "EHLO
+        id S233782AbiLLWzm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 12 Dec 2022 17:55:42 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54414 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229748AbiLLWor (ORCPT
+        with ESMTP id S233737AbiLLWzh (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 12 Dec 2022 17:44:47 -0500
-Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2AC04BF9;
-        Mon, 12 Dec 2022 14:44:47 -0800 (PST)
-Received: by mail-pl1-x62a.google.com with SMTP id d15so4025769pls.6;
-        Mon, 12 Dec 2022 14:44:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=7VOrhnDaJPP4RQqpd0yn3MDNObHRe5gWELFMKh7qM4U=;
-        b=K7K+mAD97aLDIIC1hy4vdLBoNY+c97ZElXwCxgTOIojifLfLg41cVFoKvqLr/yVhk1
-         Xjldnx46lS/tylmHuKBWVwZ4D2U9l+GT8F8s5UI32yHMzoFMkM7mUs9Da4pv87Zjqse+
-         2XJ024MHSpu/PdMqoKQdEYibBrmPF9lU87wV/19tl80ThgAB4NAKl7C78NjLLiURkI2R
-         q6nYnOOfA1EHzCb+N7RDZMNuR64hObK8l7uk/2pBvB20VhAEr1bw+sta4cxC9pmnD0Pm
-         QaFK4ty88+u2jOBWDw5jxivjEMqNbOwhW9on44uPbvbxURNAWHDnSOnjjF4rz4m+f2d/
-         RcUg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=7VOrhnDaJPP4RQqpd0yn3MDNObHRe5gWELFMKh7qM4U=;
-        b=FSc1/fdV1pF0tbANdMiZFNWpG1uSVHNlBCTA3DaYdfuki2eoomnZH5/lsUgLBS9lJC
-         6KCkGCipE+JS7wGUntS+fw37N5CRexqC+CWWRiwdyStIQ4sfkxo0t0FtABhRA68Q9qyy
-         fSOR+908Scsy9S53tWs5tLWq5UzVa5PWSvgRGQyfyBlNKgB862yt8VHPbo2HMQ94yXeu
-         aMxvY5ENBDbk61KAyPr+ikACuKUXvc+ih+mK2n3lXEGmXglRWflttsiuvBoSRrtbiv40
-         8WNWrQPBa7X+iHabt0AHWZukH8/mGwTmzAAVkU1DsH4Utz05OIrc/zWyPLpr60qdQe3j
-         NDUA==
-X-Gm-Message-State: ANoB5pk9b16FGF5Ugd8Foh/fxuAAq5tamt82MnNRuW+GelUO2wDhwuhi
-        MpadQou08C+2tXOl+FuZT2w=
-X-Google-Smtp-Source: AA0mqf7HeEv0d0+GUfis9eEUGo1YJql6GcPjPVYiMZyz1n16fxMybBfGOkj9SzniPi4PflAEuI3YBw==
-X-Received: by 2002:a17:902:bb8b:b0:188:760f:d831 with SMTP id m11-20020a170902bb8b00b00188760fd831mr16961830pls.7.1670885086528;
-        Mon, 12 Dec 2022 14:44:46 -0800 (PST)
-Received: from localhost (2603-800c-1a02-1bae-a7fa-157f-969a-4cde.res6.spectrum.com. [2603:800c:1a02:1bae:a7fa:157f:969a:4cde])
-        by smtp.gmail.com with ESMTPSA id l11-20020a170902f68b00b00188fdae6e0esm6928483plg.44.2022.12.12.14.44.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 12 Dec 2022 14:44:46 -0800 (PST)
-Sender: Tejun Heo <htejun@gmail.com>
-Date:   Mon, 12 Dec 2022 12:44:44 -1000
-From:   Tejun Heo <tj@kernel.org>
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, darklight2357@icloud.com,
-        Josef Bacik <josef@toxicpanda.com>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        cgroups@vger.kernel.org
-Subject: Re: [PATCH 2/2 block/for-6.2] blk-iolatency: Make initialization lazy
-Message-ID: <Y5eu3A3TMWRUYd+N@slm.duckdns.org>
-References: <Y5TQ5gm3O4HXrXR3@slm.duckdns.org>
- <Y5TRU2+s379DhUbj@slm.duckdns.org>
- <Y5bsBuwjcbHEjhIw@infradead.org>
+        Mon, 12 Dec 2022 17:55:37 -0500
+Received: from hosting.gsystem.sk (hosting.gsystem.sk [212.5.213.30])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 46D5D1208B;
+        Mon, 12 Dec 2022 14:55:36 -0800 (PST)
+Received: from [192.168.0.2] (chello089173232159.chello.sk [89.173.232.159])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by hosting.gsystem.sk (Postfix) with ESMTPSA id EF74A7A028B;
+        Mon, 12 Dec 2022 23:55:33 +0100 (CET)
+From:   Ondrej Zary <linux@zary.sk>
+To:     Damien Le Moal <damien.lemoal@opensource.wdc.com>
+Subject: Re: [PATCH] pata_parport: add driver (PARIDE replacement)
+Date:   Mon, 12 Dec 2022 23:55:30 +0100
+User-Agent: KMail/1.9.10
+Cc:     Christoph Hellwig <hch@lst.de>,
+        Sergey Shtylyov <s.shtylyov@omp.ru>,
+        Jens Axboe <axboe@kernel.dk>, Tim Waugh <tim@cyberelk.net>,
+        linux-block@vger.kernel.org, linux-parport@lists.infradead.org,
+        linux-ide@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20220312144415.20010-1-linux@zary.sk> <202211151556.52895.linux@zary.sk> <bfc49618-dbc3-8ffb-f536-3b4486e1980e@opensource.wdc.com>
+In-Reply-To: <bfc49618-dbc3-8ffb-f536-3b4486e1980e@opensource.wdc.com>
+X-KMail-QuotePrefix: > 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: Text/Plain;
+  charset="utf-8"
+Content-Transfer-Encoding: 7bit
 Content-Disposition: inline
-In-Reply-To: <Y5bsBuwjcbHEjhIw@infradead.org>
+Message-Id: <202212122355.30988.linux@zary.sk>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello, Christoph.
-
-On Mon, Dec 12, 2022 at 12:53:26AM -0800, Christoph Hellwig wrote:
-> > +static int blk_iolatency_try_init(char *input)
-> > +{
-> > +	static DEFINE_MUTEX(init_mutex);
-> > +	struct block_device *bdev;
-> > +	int ret = 0;
-> > +
-> > +	bdev = blkcg_conf_open_bdev(&input);
-> > +	if (IS_ERR(bdev))
-> > +		return PTR_ERR(bdev);
+On Wednesday 16 November 2022 02:30:46 Damien Le Moal wrote:
+> On 2022/11/15 23:56, Ondrej Zary wrote:
+> > On Tuesday 15 November 2022, Damien Le Moal wrote:
+> >> On 11/15/22 04:25, Ondrej Zary wrote:
+> >>> On Monday 14 November 2022 09:03:28 Damien Le Moal wrote:
+> >>>> On 11/14/22 16:53, Ondrej Zary wrote:
+> >>>>> On Monday 14 November 2022, Damien Le Moal wrote:
+> >>>>>> On 11/12/22 20:17, Ondrej Zary wrote:
+> >>>>>>> On Wednesday 19 October 2022 09:34:31 Christoph Hellwig wrote:
+> >>>>>>>> It's been a while - did you get a chance to make some progress on
+> >>>>>>>> this?  Do you need any help to unblock you?
+> >>>>>>>>
+> >>>>>>>
+> >>>>>>> Sorry again, I'm back now. Trying to fix locking problems.
+> >>>>>>> Added this to each function for analysis how the functions are called wrt.
+> >>>>>>> locking:
+> >>>>>>>
+> >>>>>>> 	printk("%s, locked=%d\n", __FUNCTION__, spin_is_locked(ap->lock));
+> >>>>>>
+> >>>>>> Do you have your code somewhere that we can look at ?
+> >>>>>
+> >>>>> This is the current version with debug printks. I've also added dump_stack()
+> >>>>> to find out the code path but haven't analyzed the output yet.
+> >>>>
+> >>>> Can you send a proper patch ? Or a link to a git tree ? That is easier to
+> >>>> handle than pasted code in an email...
+> >>>
+> >>> Patch against what? I don't have a git server.
+> >>
+> >> patch against current 6.1-rc, or against an older kernel should be OK too.
+> >> But please "git send-email" a patch, or push your dev tree to github ?
+> >>
+> >>> I've done some call trace analysis. These code paths are calling
+> >>> pata_parport functions with ap->lock locked during init.
+> >>>
+> >>> Comm: kworker, Workqueue: ata_sff ata_sff_pio_task
+> >>> ata_sff_hsm_move -> ata_pio_sectors-> ata_sff_altstatus -> pata_parport_tf_read -> pata_parport_check_altstatus
+> >>> ata_sff_hsm_move -> ata_sff_altstatus -> pata_parport_tf_read -> pata_parport_check_altstatus
+> >>> ata_sff_pio_task -> ata_sff_busy_wait -> pata_parport_check_status
+> >>> ata_sff_hsm_move -> ata_wait_idle -> ata_sff_busy_wait -> pata_parport_check_status
+> >>> ata_sff_hsm_move -> ata_hsm_qc_complete -> ata_sff_irq_on -> ata_wait_idle -> ata_sff_busy_wait -> pata_parport_check_status
+> >>> ata_sff_pio_task -> ata_sff_hsm_move -> ata_pio_sectors -> ata_pio_sector -> ata_pio_xfer -> pata_parport_data_xfer
+> >>> ata_sff_pio_task -> ata_sff_hsm_move -> pata_parport_data_xfer
+> >>> ata_sff_pio_task -> ata_sff_hsm_move -> pata_parport_tf_read
+> >>> ata_sff_hsm_move -> ata_hsm_qc_complete -> ata_qc_complete -> fill_result_tf -> ata_sff_qc_fill_rtf -> pata_parport_tf_read
+> >>> ata_sff_hsm_move -> ata_pio_sectors -> ata_sff_altstatus -> pata_parport_check_altstatus
+> >>> ata_sff_hsm_move -> ata_sff_altstatus -> pata_parport_check_altstatus
+> >>>
+> >>> Comm: modprobe
+> >>> ata_host_start -> ata_eh_freeze_port -> ata_sff_freeze -> pata_parport_check_status
+> >>>
+> >>> Comm: scsi_eh_4
+> >>> ata_eh_recover -> ata_eh_reset -> ata_eh_thaw_port -> ata_sff_thaw -> ata_sff_irq_on -> ata_wait_idle -> ata_sff_busy_wait -> pata_parport_check_status
+> >>> ata_eh_reset -> ata_eh_freeze_port -> ata_sff_freeze -> pata_parport_check_status
+> >>> ata_scsi_error -> ata_scsi_port_error_handler -> ata_port_freeze -> ata_sff_freeze -> pata_parport_check_status
+> >>> ata_sff_error_handler -> pata_parport_drain_fifo -> pata_parport_check_status
+> >>
+> >> What exactly are the issues you are having with ap->lock ? It looks like
+> >> you have done a lot of analysis of the code, but without any context about
+> >> the problem, I do not understand what I am looking at.
+> >>
+> > 
+> > The problem is that pi_connect() can sleep because it calls
+> > parport_claim_or_block(). And any access (even reading ATA status register)
+> > requires pi_connect.
 > 
-> > +retry:
-> >  	ret = blkg_conf_prep(blkcg, &blkcg_policy_iolatency, buf, &ctx);
-> > +	if (ret == -EOPNOTSUPP) {
-> > +		ret = blk_iolatency_try_init(buf);
+> OK. Let me have a look.
 > 
-> It's a little sad to do two block device lookups here (even if it
-> obviously doesn't matter for performance).  I wonder if it would
-> make sense to explicitly support the lazy init pattern
-> in blkg_conf_prep somehow.
-> 
-> Otherwise I'm all for the lazy init.
 
-Yeah, I thought about separating out open_bdev from blkg_conf_prep() but the
-added complexity didn't feel very attractive given the usage pattern. Lemme
-take a stab at it. Maybe it won't look too bad.
+The locking problems seem not to be easily solvable. Maybe a hack that grabs
+the parport before registering ata interface (and keeps it until the
+interface is disabled) will help? That will prevent multiple chained devices
+on one parport from working but can get pata_parport moving.
 
-Thanks.
 
 -- 
-tejun
+Ondrej Zary
