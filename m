@@ -2,115 +2,134 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 502F0C4167B
-	for <linux-block@archiver.kernel.org>; Mon, 12 Dec 2022 22:24:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7659BC4332F
+	for <linux-block@archiver.kernel.org>; Mon, 12 Dec 2022 22:37:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233735AbiLLWYG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 12 Dec 2022 17:24:06 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32860 "EHLO
+        id S233792AbiLLWhP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 12 Dec 2022 17:37:15 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40814 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233733AbiLLWYF (ORCPT
+        with ESMTP id S233804AbiLLWhN (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 12 Dec 2022 17:24:05 -0500
-Received: from mail-pg1-x52a.google.com (mail-pg1-x52a.google.com [IPv6:2607:f8b0:4864:20::52a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 89988B7C1;
-        Mon, 12 Dec 2022 14:24:04 -0800 (PST)
-Received: by mail-pg1-x52a.google.com with SMTP id 142so9202799pga.1;
-        Mon, 12 Dec 2022 14:24:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=DduZ36/gNNuK+m5qHFBGb7Zr62cBswC5K6+2kXn9vQE=;
-        b=KUybaHVVN3vB51GqoRWpHL2dDTx2qMFPypuONf/AmhxlZr55HRmLSgY5wpkSn1navb
-         dyTi2H+7ZAZtAStM5HvFjAtD4ljlq5qcHJKd+rnNIe5MPoHkVUIrXEk2wYr8Qawciwe+
-         F3wYqQXQWHtzDjn2y/qMSnQuc+Cr3KqWgWxsE+EdXuTMEG6aOD9xbM9akomuQE/5nRWp
-         AnAhL9RTKC4y0TrpDLXYj32qftrZhQQcovsuqi1GPshjIQuvDA8BDqaQ8hm82Pasqk7i
-         dyTvyXn8iL4x7CjRudvASM1DyVneJ5/3auOxORwtTNf6DmwJ9N3OBtW+09+w3T0We0bI
-         ixVA==
+        Mon, 12 Dec 2022 17:37:13 -0500
+Received: from mail-vs1-f47.google.com (mail-vs1-f47.google.com [209.85.217.47])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5CEC03886
+        for <linux-block@vger.kernel.org>; Mon, 12 Dec 2022 14:36:16 -0800 (PST)
+Received: by mail-vs1-f47.google.com with SMTP id a66so4324401vsa.6
+        for <linux-block@vger.kernel.org>; Mon, 12 Dec 2022 14:36:16 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=DduZ36/gNNuK+m5qHFBGb7Zr62cBswC5K6+2kXn9vQE=;
-        b=3IT0nUpMQdLuH+k6dyMwNhfWqgQM1Ju4+vcI0m/rpXH7ZgZo/JPlvGm6gY9gZY0fCG
-         f9ini547kKPmZzamnuJ39cltLkjj6jlZwZ1OVw9jYFj7q1JLbPY7TV/nBD4GT18A7IRh
-         oVpxjIwQh4AZ8dbBO4+bkRL6tTSUb3ibxyoChgbBMPSL6SLaapEGnjXJBZKKpbF8be08
-         g55VMFllGo3bmDQkTWtqQWWn+5OIwYrhkxcSPTiEAqzPCbIbW8Jggof2b9Du1QGf0VH8
-         N1WGDwI3JfShyor5+lBoyPLrEeHy+jKtVGWS3LepjJpHVNDb7MT4chSLRGj22y7o0LcS
-         sb1Q==
-X-Gm-Message-State: ANoB5pnXlLhwIdiNtq54hvT6867lVkV/k0kROGDzaDLr5WPgTH2B7Ye9
-        OgNusj8Pi+CoBnQyCAommX5UAgKU4q4i5Q==
-X-Google-Smtp-Source: AA0mqf7w2sY2+JO/aSuCD35Y2z4vdxNFK4vcVZCzRRxri3yF2qj1Wi8BtYvS1At5X0J6AEo3xIYmLg==
-X-Received: by 2002:a05:6a00:84d:b0:566:900d:5ada with SMTP id q13-20020a056a00084d00b00566900d5adamr25516059pfk.10.1670883843884;
-        Mon, 12 Dec 2022 14:24:03 -0800 (PST)
-Received: from localhost (2603-800c-1a02-1bae-a7fa-157f-969a-4cde.res6.spectrum.com. [2603:800c:1a02:1bae:a7fa:157f:969a:4cde])
-        by smtp.gmail.com with ESMTPSA id h3-20020a056a00000300b005758d26fbf7sm6301027pfk.58.2022.12.12.14.24.03
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=nWhMF1CTesM4BHybNTgKV7lM/70y3OMyFAmvejIEjS4=;
+        b=cvWrxBqMwzx3JG82ehBUWltUZP58J8mY7TstMI8LtMcdzO1A63s3EWjJcAWLJWyvZ5
+         hO8Er1DeN2Bt3QkzsJ+U7Ev8w5XWbHXJXX5u0WhHXjboynAnXGCIzS4P9o+fIiVyV0Bh
+         TgPGwVcZojVzjq+s/x44wGUXDNbT1jdbpISHW5gJ+p14v6t1nrDcv+fq2REV9AuzGcEH
+         PzO1TmpyBmGfuZBQ5e9EOZ+6YWexeqeQjlwV1ZZCFXocDvTZiKKSyKuHtohmDcakaxwp
+         vp88oxvgU0k91vO+QRJk+5q7SmZCLwvouPniiLrOD8oCI4cwBDF7sKAjwsol478vSM7H
+         sNKA==
+X-Gm-Message-State: ANoB5pnQGLtdN2LddIn7pUMjtNuWvH9jj3p7o/qHH/HkdceB+jXP4sq/
+        fZgmEdQeYELQt4bWwYIQPFSe5eilXOcR1qA=
+X-Google-Smtp-Source: AA0mqf7m4mzBWV2azX1Bll5cjClij3B+qoQDpbNtARWC+17pZx8HuSAsuUyrhipDelLAGzJyv19RVw==
+X-Received: by 2002:a05:6102:22cf:b0:3b0:f33b:38a5 with SMTP id a15-20020a05610222cf00b003b0f33b38a5mr6450670vsh.13.1670884575404;
+        Mon, 12 Dec 2022 14:36:15 -0800 (PST)
+Received: from localhost (pool-68-160-173-162.bstnma.fios.verizon.net. [68.160.173.162])
+        by smtp.gmail.com with ESMTPSA id bn39-20020a05620a2ae700b006ce76811a07sm6504540qkb.75.2022.12.12.14.36.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 12 Dec 2022 14:24:03 -0800 (PST)
-Sender: Tejun Heo <htejun@gmail.com>
-Date:   Mon, 12 Dec 2022 12:24:02 -1000
-From:   Tejun Heo <tj@kernel.org>
-To:     Waiman Long <longman@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, Josef Bacik <josef@toxicpanda.com>,
-        Zefan Li <lizefan.x@bytedance.com>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>,
-        "Dennis Zhou (Facebook)" <dennisszhou@gmail.com>
-Subject: Re: [PATCH-block v2 3/3] blk-cgroup: Flush stats at blkgs
- destruction path
-Message-ID: <Y5eqAtwnpfEUG0EL@slm.duckdns.org>
-References: <20221211222058.2946830-1-longman@redhat.com>
- <20221211222058.2946830-4-longman@redhat.com>
+        Mon, 12 Dec 2022 14:36:14 -0800 (PST)
+Date:   Mon, 12 Dec 2022 17:36:13 -0500
+From:   Mike Snitzer <snitzer@kernel.org>
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     dm-devel@redhat.com, linux-block@vger.kernel.org,
+        Alasdair G Kergon <agk@redhat.com>,
+        Luo Meng <luomeng12@huawei.com>,
+        Mikulas Patocka <mpatocka@redhat.com>,
+        Peter Korsgaard <peter@korsgaard.com>,
+        Zhihao Cheng <chengzhihao1@huawei.com>
+Subject: [git pull] device mapper changes for 6.2
+Message-ID: <Y5es3Sf0DU0QEHPP@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20221211222058.2946830-4-longman@redhat.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sun, Dec 11, 2022 at 05:20:58PM -0500, Waiman Long wrote:
-> As noted by Michal, the blkg_iostat_set's in the lockless list
-> hold reference to blkg's to protect against their removal. Those
-> blkg's hold reference to blkcg. When a cgroup is being destroyed,
-> cgroup_rstat_flush() is only called at css_release_work_fn() which is
-> called when the blkcg reference count reaches 0. This circular dependency
-> will prevent blkcg from being freed until some other events cause
-> cgroup_rstat_flush() to be called to flush out the pending blkcg stats.
-> 
-> To prevent this delayed blkcg removal, add a new cgroup_rstat_css_flush()
-> function to flush stats for a given css and cpu and call it at the blkgs
-> destruction path, blkcg_destroy_blkgs(), whenever there are still some
-> pending stats to be flushed. This will ensure that blkcg reference
-> count can reach 0 ASAP.
-> 
-> Signed-off-by: Waiman Long <longman@redhat.com>
+Hi Linus,
 
-Acked-by: Tejun Heo <tj@kernel.org>
+The following changes since commit b7b275e60bcd5f89771e865a8239325f86d9927d:
 
-But a nit below
+  Linux 6.1-rc7 (2022-11-27 13:31:48 -0800)
 
-> +	/*
-> +	 * Flush all the non-empty percpu lockless lists.
-> +	 */
+are available in the Git repository at:
 
-Can you please explain the deadlock that's being avoided in the above
-comment? ie. it should say why this flush is necessary.
+  git://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git tags/for-6.2/dm-changes
 
-> +	for_each_possible_cpu(cpu) {
-> +		struct llist_head *lhead = per_cpu_ptr(blkcg->lhead, cpu);
-> +
-> +		if (!llist_empty(lhead))
-> +			cgroup_rstat_css_cpu_flush(&blkcg->css, cpu);
-> +	}
+for you to fetch changes up to 7991dbff6849f67e823b7cc0c15e5a90b0549b9f:
 
-Thanks.
+  dm thin: Use last transaction's pmd->root when commit failed (2022-12-08 12:17:09 -0500)
 
--- 
-tejun
+Please pull, thanks.
+Mike
+
+----------------------------------------------------------------
+- Fix use-after-free races due to missing resource cleanup during DM
+  target destruction in DM targets: thin-pool, cache, integrity and
+  clone.
+
+- Fix ABBA deadlocks in DM thin-pool and cache targets due to their
+  use of a bufio client (that has a shrinker whose locking can cause
+  the incorrect locking order).
+
+- Fix DM cache target to set its needs_check flag after first aborting
+  the metadata (whereby using reset persistent-data objects to update
+  the superblock with, otherwise the superblock update could be
+  dropped due to aborting metadata).  This was found with
+  code-inspection when comparing with the equivalent in DM thinp
+  code.
+
+- Fix DM thin-pool's presume to continue resuming the device even if
+  the pool in is fail mode -- otherwise bios may never be failed up
+  the IO stack (which will prevent resetting the thin-pool target via
+  table reload)
+
+- Fix DM thin-pool's metadata to use proper btree root (from previous
+  transaction) if metadata commit failed.
+
+- Add 'waitfor' module param to DM module (dm_mod) to allow dm-init to
+  wait for the specified device before continuing with its DM target
+  initialization.
+
+----------------------------------------------------------------
+Luo Meng (5):
+      dm thin: Fix UAF in run_timer_softirq()
+      dm clone: Fix UAF in clone_dtr()
+      dm cache: Fix UAF in destroy()
+      dm integrity: Fix UAF in dm_integrity_dtr()
+      dm thin: resume even if in FAIL mode
+
+Mike Snitzer (2):
+      dm cache: Fix ABBA deadlock between shrink_slab and dm_cache_metadata_abort
+      dm cache: set needs_check flag after aborting metadata
+
+Mikulas Patocka (2):
+      dm ioctl: a small code cleanup in list_version_get_info
+      dm ioctl: fix a couple ioctl codes
+
+Peter Korsgaard (1):
+      dm init: add dm-mod.waitfor to wait for asynchronously probed block devices
+
+Zhihao Cheng (2):
+      dm thin: Fix ABBA deadlock between shrink_slab and dm_pool_abort_metadata
+      dm thin: Use last transaction's pmd->root when commit failed
+
+ .../admin-guide/device-mapper/dm-init.rst          |  8 +++
+ drivers/md/dm-cache-metadata.c                     | 54 ++++++++++++++++---
+ drivers/md/dm-cache-target.c                       | 11 ++--
+ drivers/md/dm-clone-target.c                       |  1 +
+ drivers/md/dm-init.c                               | 22 +++++++-
+ drivers/md/dm-integrity.c                          |  2 +
+ drivers/md/dm-ioctl.c                              |  6 +--
+ drivers/md/dm-thin-metadata.c                      | 60 +++++++++++++++++++---
+ drivers/md/dm-thin.c                               | 18 +++++--
+ 9 files changed, 154 insertions(+), 28 deletions(-)
