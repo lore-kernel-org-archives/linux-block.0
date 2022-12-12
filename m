@@ -2,181 +2,173 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BDCAC4332F
-	for <linux-block@archiver.kernel.org>; Mon, 12 Dec 2022 23:07:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45B0BC4167B
+	for <linux-block@archiver.kernel.org>; Mon, 12 Dec 2022 23:10:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233954AbiLLXHt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 12 Dec 2022 18:07:49 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33012 "EHLO
+        id S233995AbiLLXKv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 12 Dec 2022 18:10:51 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34960 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233659AbiLLXHl (ORCPT
+        with ESMTP id S233994AbiLLXKp (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 12 Dec 2022 18:07:41 -0500
-Received: from esa4.hgst.iphmx.com (esa4.hgst.iphmx.com [216.71.154.42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0080AC78
-        for <linux-block@vger.kernel.org>; Mon, 12 Dec 2022 15:07:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1670886459; x=1702422459;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=xomx44ErsYrGwGV/oMLYjJEQHpULQ8ikWOnAe1neyG8=;
-  b=MSQVqKgn+RSqZt+PSpL7YaA+lGE7OPxyneLmhYGm7ep5YhGWXOhErf6J
-   ak1UZADBHgoAPJWgHsQRObkNVLtzdXs+a7iNsvABff1yKngUDUREvEeAM
-   gZKCydOyJQAXRHPCYWc1pvNz80tjATQNS59j2GSeVDxWeuGoXrFgB452s
-   DYL7Bar7MhBUoBdRVJp4xHol0sE4x2ZW6rjJAFTSDSisDYGQVmuCWsx5P
-   8h0ngDzmyIag0tRNz/HRnbiyVb/7seldv6I7h1rm7hUrdG2w3+2NedbFI
-   9oKsT6Rh5btcLD+/ih/A593DbjXu8YDbgYdVsA9O9+WrGVvfNTGjx1i/w
-   g==;
-X-IronPort-AV: E=Sophos;i="5.96,239,1665417600"; 
-   d="scan'208";a="216690803"
-Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 13 Dec 2022 07:07:36 +0800
-IronPort-SDR: vhn6UolVKpF5b9VgLFCUV6ND+nbO559oCxpGFhNdFK5nKnz3DMCwOMJ3zCJLiZ7bD2KLi6tUMA
- 34+7MGKMzFHsm+XNm+BDgJGSMo/rt1FbeiIi+G60EGDkTmUE/FzdNw+QuRpd5C+5A3a0+99rFA
- OZLxU2NEGv/47+jXxa1lgHkuOdNsySHLjEFxKvQIKMu+Ly9zJsD8JaBzVh1pO1hyp0Jny22QwH
- j/PhTV71iisBVXzgfjcmRtZUIrfieTLeEED2ysULRR04n0PDqjNXwzrgWZ+igcz7gMu3nmDSib
- aRY=
-Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 12 Dec 2022 14:26:01 -0800
-IronPort-SDR: A79XGbPHMuekmbctp8kRmmVt3n534l7YR0nLSgEuPAcxfhA58NrlAln2t8E7cabl11oP/LbPLH
- SgnOr0G6lBPmx83RG8Ql6cO7qAzCzVFbP/zwXZl/YuhBJmaXNIKNxKceYv9PwYnjyXy6He7O8h
- vNhXfGvEA6C9i1pV11FEkH2EfBGpomsTUIRs9FzjsX7NCHFEmA3zZS81Zs8sVKxjC01qepvn8N
- irV9NUcsRu4MuF5JRP+RMo4KrlcKDk2ugB9vrCpRODo381FbbwZfGCE2qSndYvAJ2Aim76B2Pp
- f6k=
-WDCIronportException: Internal
-Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
-  by uls-op-cesaip02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 12 Dec 2022 15:07:37 -0800
-Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4NWHMr1Bt0z1RvTp
-        for <linux-block@vger.kernel.org>; Mon, 12 Dec 2022 15:07:36 -0800 (PST)
-Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
-        reason="pass (just generated, assumed good)"
-        header.d=opensource.wdc.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
-        opensource.wdc.com; h=content-transfer-encoding:content-type
-        :in-reply-to:organization:from:references:to:content-language
-        :subject:user-agent:mime-version:date:message-id; s=dkim; t=
-        1670886454; x=1673478455; bh=xomx44ErsYrGwGV/oMLYjJEQHpULQ8ikWOn
-        Ae1neyG8=; b=Cuj3VN+gMWPSANYbtxtxjzlkGB5c5LQWe/58o3sWfjpDGNECFLh
-        xGq/TkSoXQENYxbZvh8XoIROOWsiPvCQYFI2ubO7VmElWdK+Q9jTcyQtA2XtDZvT
-        9DxLY2xx14YDZ9p9cWKwSkP7AGEocv7LGfDZDnBRcPNYOWUCzV4aEHZpCgldPYxH
-        8kl2SY5tPwdD+V8bP4NAtBz1GwdkTQ5A2tqvfAIeR1Dp2MtGfuWnKBsgGp7eicJC
-        iqfSS4dsOCC3NTeau10VerYDEepXv46k4noo07MXgidfsN5soHUBIgaQDSRLX1h9
-        Z+1KYAuet5CFn0SAEgBIfnXGP4bJooK7SjA==
-X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
-Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
-        by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id Nl3cQrkKMqlB for <linux-block@vger.kernel.org>;
-        Mon, 12 Dec 2022 15:07:34 -0800 (PST)
-Received: from [10.225.163.90] (unknown [10.225.163.90])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4NWHMn3tL8z1RvLy;
-        Mon, 12 Dec 2022 15:07:33 -0800 (PST)
-Message-ID: <dcd31bf2-5a7a-30a4-4c3c-205d5f39fcd8@opensource.wdc.com>
-Date:   Tue, 13 Dec 2022 08:07:31 +0900
+        Mon, 12 Dec 2022 18:10:45 -0500
+Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F363615A08;
+        Mon, 12 Dec 2022 15:10:28 -0800 (PST)
+Received: by mail-pj1-x1036.google.com with SMTP id fa4-20020a17090af0c400b002198d1328a0so209474pjb.0;
+        Mon, 12 Dec 2022 15:10:28 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=pZDS6utjeiGgDa4ROrpBjFTGSUb0kKrpSXUgc52VtJQ=;
+        b=UHxmfk1YIHXsZ85vl3BmRcLrv+A1Wp3ORhoNKMvbeYIUXxQ4ia3UjLJZKbeNpzf3ft
+         PQrFrZEd5zgvcWqD2VNQxlOCIQtzLLs6fHCfeKAon4O6OKOA23xekPOnaoNTHHZ1wupA
+         AOZ+YkdKvIoKQ5xbffbb4q6KJfp1BQT3cGhb5ywjnEgH+9PXk/AVhBOs0XATIRRLwkt3
+         Wi/8WSCzOjyBTAOfyjs2giiLdVrQRhsv8mNdsWVl1WXZqe2BQr5U31iu1I5VPO/PsfIn
+         L7QQipFlfPjM4sXnc/uLQCbhOnwaf8oZunAZU2sD4G8JV88hECgQVfv3v2adMDXzqJkH
+         X6oA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=pZDS6utjeiGgDa4ROrpBjFTGSUb0kKrpSXUgc52VtJQ=;
+        b=q56PFwAJFpn67fiIJwsk2nkXMhUM+XvUDmMrRJ5ktiAdVJ21HcMTEGEqxxprFALrbi
+         f1Oz1KuaovBi19JFBYzoH819zxM0uG25MowOQcshVWdCtDJaZvfTtQ6avQGbLZjEq6UR
+         MSyEg0zplnc9AvXuZrQJmFOoDBm+H/tCW2Hc0ZNNzDDK1x74KDh1jmoPVeMLCOfgPcvl
+         7EXZp+olfIxtJ+P+reQ3Hfy3qR67gM6xiFK2YODe4GyhGTe86zspHptLQ5xdLR8IWsYm
+         KHO+eUbkSDSpbSqy3ObqwuKElSGm/q2tYvPgT2Azt3WEU0XjGuGJ22KDhdGcrKj2KGZj
+         IbfQ==
+X-Gm-Message-State: ANoB5plfTQXaN7QlhogR29M2TkzFKjo8rRb5hB+iquy5/nEktpskpHa1
+        fjjm5fg0H1jEEewi08bnubg=
+X-Google-Smtp-Source: AA0mqf4dX47XWg36tSlsw3uOrSOdDmX4a8d2eb2XWQOYvVEOWQndD62o05X2yFvK3vHbJiCU2LFhsA==
+X-Received: by 2002:a17:902:e743:b0:187:34f6:3323 with SMTP id p3-20020a170902e74300b0018734f63323mr27073672plf.59.1670886628320;
+        Mon, 12 Dec 2022 15:10:28 -0800 (PST)
+Received: from localhost (2603-800c-1a02-1bae-a7fa-157f-969a-4cde.res6.spectrum.com. [2603:800c:1a02:1bae:a7fa:157f:969a:4cde])
+        by smtp.gmail.com with ESMTPSA id ik13-20020a170902ab0d00b00189caf296e6sm6881132plb.279.2022.12.12.15.10.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 12 Dec 2022 15:10:27 -0800 (PST)
+Sender: Tejun Heo <htejun@gmail.com>
+Date:   Mon, 12 Dec 2022 13:10:26 -1000
+From:   Tejun Heo <tj@kernel.org>
+To:     Yu Kuai <yukuai1@huaweicloud.com>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        Li Nan <linan122@huawei.com>, josef@toxicpanda.com,
+        axboe@kernel.dk, cgroups@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yi.zhang@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
+Subject: Re: [PATCH -next v2 8/9] block: fix null-pointer dereference in
+ ioc_pd_init
+Message-ID: <Y5e04oKUEEBXqaar@slm.duckdns.org>
+References: <20221130132156.2836184-1-linan122@huawei.com>
+ <20221130132156.2836184-9-linan122@huawei.com>
+ <Y4fCE7XxcpDfWyDJ@slm.duckdns.org>
+ <9ca2b7ab-7fd3-a9a3-12a6-021a78886b54@huaweicloud.com>
+ <Y4h94m8QMPtS4xJV@slm.duckdns.org>
+ <431dcb3f-4572-7fd0-9e5d-90b6c34d577c@huaweicloud.com>
+ <Y4iCbuALBBGLODWI@slm.duckdns.org>
+ <96487803-12cc-a694-0099-784106596fd1@huaweicloud.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.1
-Subject: Re: [PATCH] pata_parport: add driver (PARIDE replacement)
-Content-Language: en-US
-To:     Ondrej Zary <linux@zary.sk>
-Cc:     Christoph Hellwig <hch@lst.de>,
-        Sergey Shtylyov <s.shtylyov@omp.ru>,
-        Jens Axboe <axboe@kernel.dk>, Tim Waugh <tim@cyberelk.net>,
-        linux-block@vger.kernel.org, linux-parport@lists.infradead.org,
-        linux-ide@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20220312144415.20010-1-linux@zary.sk>
- <202211151556.52895.linux@zary.sk>
- <bfc49618-dbc3-8ffb-f536-3b4486e1980e@opensource.wdc.com>
- <202212122355.30988.linux@zary.sk>
-From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
-Organization: Western Digital Research
-In-Reply-To: <202212122355.30988.linux@zary.sk>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <96487803-12cc-a694-0099-784106596fd1@huaweicloud.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 12/13/22 07:55, Ondrej Zary wrote:
-> On Wednesday 16 November 2022 02:30:46 Damien Le Moal wrote:
->> On 2022/11/15 23:56, Ondrej Zary wrote:
->>> On Tuesday 15 November 2022, Damien Le Moal wrote:
->>>> On 11/15/22 04:25, Ondrej Zary wrote:
->>>>> On Monday 14 November 2022 09:03:28 Damien Le Moal wrote:
->>>>>> On 11/14/22 16:53, Ondrej Zary wrote:
->>>>>>> On Monday 14 November 2022, Damien Le Moal wrote:
->>>>>>>> On 11/12/22 20:17, Ondrej Zary wrote:
->>>>>>>>> On Wednesday 19 October 2022 09:34:31 Christoph Hellwig wrote:
->>>>>>>>>> It's been a while - did you get a chance to make some progress on
->>>>>>>>>> this?  Do you need any help to unblock you?
->>>>>>>>>>
->>>>>>>>>
->>>>>>>>> Sorry again, I'm back now. Trying to fix locking problems.
->>>>>>>>> Added this to each function for analysis how the functions are called wrt.
->>>>>>>>> locking:
->>>>>>>>>
->>>>>>>>> 	printk("%s, locked=%d\n", __FUNCTION__, spin_is_locked(ap->lock));
->>>>>>>>
->>>>>>>> Do you have your code somewhere that we can look at ?
->>>>>>>
->>>>>>> This is the current version with debug printks. I've also added dump_stack()
->>>>>>> to find out the code path but haven't analyzed the output yet.
->>>>>>
->>>>>> Can you send a proper patch ? Or a link to a git tree ? That is easier to
->>>>>> handle than pasted code in an email...
->>>>>
->>>>> Patch against what? I don't have a git server.
->>>>
->>>> patch against current 6.1-rc, or against an older kernel should be OK too.
->>>> But please "git send-email" a patch, or push your dev tree to github ?
->>>>
->>>>> I've done some call trace analysis. These code paths are calling
->>>>> pata_parport functions with ap->lock locked during init.
->>>>>
->>>>> Comm: kworker, Workqueue: ata_sff ata_sff_pio_task
->>>>> ata_sff_hsm_move -> ata_pio_sectors-> ata_sff_altstatus -> pata_parport_tf_read -> pata_parport_check_altstatus
->>>>> ata_sff_hsm_move -> ata_sff_altstatus -> pata_parport_tf_read -> pata_parport_check_altstatus
->>>>> ata_sff_pio_task -> ata_sff_busy_wait -> pata_parport_check_status
->>>>> ata_sff_hsm_move -> ata_wait_idle -> ata_sff_busy_wait -> pata_parport_check_status
->>>>> ata_sff_hsm_move -> ata_hsm_qc_complete -> ata_sff_irq_on -> ata_wait_idle -> ata_sff_busy_wait -> pata_parport_check_status
->>>>> ata_sff_pio_task -> ata_sff_hsm_move -> ata_pio_sectors -> ata_pio_sector -> ata_pio_xfer -> pata_parport_data_xfer
->>>>> ata_sff_pio_task -> ata_sff_hsm_move -> pata_parport_data_xfer
->>>>> ata_sff_pio_task -> ata_sff_hsm_move -> pata_parport_tf_read
->>>>> ata_sff_hsm_move -> ata_hsm_qc_complete -> ata_qc_complete -> fill_result_tf -> ata_sff_qc_fill_rtf -> pata_parport_tf_read
->>>>> ata_sff_hsm_move -> ata_pio_sectors -> ata_sff_altstatus -> pata_parport_check_altstatus
->>>>> ata_sff_hsm_move -> ata_sff_altstatus -> pata_parport_check_altstatus
->>>>>
->>>>> Comm: modprobe
->>>>> ata_host_start -> ata_eh_freeze_port -> ata_sff_freeze -> pata_parport_check_status
->>>>>
->>>>> Comm: scsi_eh_4
->>>>> ata_eh_recover -> ata_eh_reset -> ata_eh_thaw_port -> ata_sff_thaw -> ata_sff_irq_on -> ata_wait_idle -> ata_sff_busy_wait -> pata_parport_check_status
->>>>> ata_eh_reset -> ata_eh_freeze_port -> ata_sff_freeze -> pata_parport_check_status
->>>>> ata_scsi_error -> ata_scsi_port_error_handler -> ata_port_freeze -> ata_sff_freeze -> pata_parport_check_status
->>>>> ata_sff_error_handler -> pata_parport_drain_fifo -> pata_parport_check_status
->>>>
->>>> What exactly are the issues you are having with ap->lock ? It looks like
->>>> you have done a lot of analysis of the code, but without any context about
->>>> the problem, I do not understand what I am looking at.
->>>>
->>>
->>> The problem is that pi_connect() can sleep because it calls
->>> parport_claim_or_block(). And any access (even reading ATA status register)
->>> requires pi_connect.
->>
->> OK. Let me have a look.
->>
-> 
-> The locking problems seem not to be easily solvable. Maybe a hack that grabs
-> the parport before registering ata interface (and keeps it until the
-> interface is disabled) will help? That will prevent multiple chained devices
-> on one parport from working but can get pata_parport moving.
+Hello,
 
-I have been very busy and had no time to look at this. Sorry about that. I
-will have a look before year-end break.
+On Mon, Dec 05, 2022 at 05:32:17PM +0800, Yu Kuai wrote:
+> 1) queue_lock is held to protect rq_qos_add() and rq_qos_del(), whlie
+> it's not held to protect rq_qos_exit(), which is absolutely not safe
+> because they can be called concurrently by configuring iocost and
+> removing device.
+> I'm thinking about holding the lock to fetch the list and reset
+> q->rq_qos first:
+> 
+> diff --git a/block/blk-rq-qos.c b/block/blk-rq-qos.c
+> index 88f0fe7dcf54..271ad65eebd9 100644
+> --- a/block/blk-rq-qos.c
+> +++ b/block/blk-rq-qos.c
+> @@ -288,9 +288,15 @@ void rq_qos_wait(struct rq_wait *rqw, void
+> *private_data,
+> 
+>  void rq_qos_exit(struct request_queue *q)
+>  {
+> -       while (q->rq_qos) {
+> -               struct rq_qos *rqos = q->rq_qos;
+> -               q->rq_qos = rqos->next;
+> +       struct rq_qos *rqos;
+> +
+> +       spin_lock_irq(&q->queue_lock);
+> +       rqos = q->rq_qos;
+> +       q->rq_qos = NULL;
+> +       spin_unlock_irq(&q->queue_lock);
+> +
+> +       while (rqos) {
+>                 rqos->ops->exit(rqos);
+> +               rqos = rqos->next;
+>         }
+>  }
+> 
+> 2) rq_qos_add() can still succeed after rq_qos_exit() is done, which
+> will cause memory leak. Hence a checking is required beforing adding
+> to q->rq_qos. I'm thinking about flag QUEUE_FLAG_DYING first, but the
+> flag will not set if disk state is not marked GD_OWNS_QUEUE. Since
+> blk_unregister_queue() is called before rq_qos_exit(), use the queue
+> flag QUEUE_FLAG_REGISTERED should be OK.
+> 
+> For the current problem that device can be removed while initializing
+> , I'm thinking about some possible solutions:
+> 
+> Since bfq is initialized in elevator initialization, and others are
+> in queue initialization, such problem is only possible in iocost, hence
+> it make sense to fix it in iocost:
+
+So, iolatency is likely to switch to similar lazy init scheme, so we better
+fix it in the rq_qos / core block layer.
+
+...
+> 3) Or is it better to fix it in the higher level? For example:
+> add a new restriction that blkcg_deactivate_policy() should be called
+> with blkcg_activate_policy() in pairs, and blkcg_deactivate_policy()
+> will wait for blkcg_activate_policy() to finish. Something like:
+> 
+> diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+> index ef4fef1af909..6266f702157f 100644
+> --- a/block/blk-cgroup.c
+> +++ b/block/blk-cgroup.c
+> @@ -1410,7 +1410,7 @@ int blkcg_activate_policy(struct request_queue *q,
+>         struct blkcg_gq *blkg, *pinned_blkg = NULL;
+>         int ret;
+> 
+> -       if (blkcg_policy_enabled(q, pol))
+> +       if (WARN_ON_ONCE(blkcg_policy_enabled(q, pol)))
+>                 return 0;
+> 
+>         if (queue_is_mq(q))
+> @@ -1477,6 +1477,8 @@ int blkcg_activate_policy(struct request_queue *q,
+>                 blkg_put(pinned_blkg);
+>         if (pd_prealloc)
+>                 pol->pd_free_fn(pd_prealloc);
+> +       if (!ret)
+> +               wake_up(q->policy_waitq);
+>         return ret;
+> 
+>  enomem:
+> @@ -1512,7 +1514,7 @@ void blkcg_deactivate_policy(struct request_queue *q,
+>         struct blkcg_gq *blkg;
+> 
+>         if (!blkcg_policy_enabled(q, pol))
+> -               return;
+> +               wait_event(q->policy_waitq, blkcg_policy_enabled(q, pol));
+>    wait_event(q->xxx, blkcg_policy_enabled(q, pol));
+
+Yeah, along this line but hopefully something simpler like a mutex.
+
+Thanks.
 
 -- 
-Damien Le Moal
-Western Digital Research
-
+tejun
