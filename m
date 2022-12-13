@@ -2,105 +2,191 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5563BC4332F
-	for <linux-block@archiver.kernel.org>; Tue, 13 Dec 2022 08:31:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 86293C4332F
+	for <linux-block@archiver.kernel.org>; Tue, 13 Dec 2022 10:32:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231939AbiLMIbj convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 13 Dec 2022 03:31:39 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46026 "EHLO
+        id S234936AbiLMKc2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 13 Dec 2022 05:32:28 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59186 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234771AbiLMIbJ (ORCPT
+        with ESMTP id S229884AbiLMKc1 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 13 Dec 2022 03:31:09 -0500
-Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.85.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D9FB116E
-        for <linux-block@vger.kernel.org>; Tue, 13 Dec 2022 00:30:12 -0800 (PST)
-Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- uk-mta-310-7JytmWPuMGiigtX7_hd_5g-1; Tue, 13 Dec 2022 08:30:09 +0000
-X-MC-Unique: 7JytmWPuMGiigtX7_hd_5g-1
-Received: from AcuMS.Aculab.com (10.202.163.6) by AcuMS.aculab.com
- (10.202.163.6) with Microsoft SMTP Server (TLS) id 15.0.1497.42; Tue, 13 Dec
- 2022 08:30:08 +0000
-Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
- id 15.00.1497.044; Tue, 13 Dec 2022 08:30:08 +0000
-From:   David Laight <David.Laight@ACULAB.COM>
-To:     'Tejun Heo' <tj@kernel.org>, Jiri Slaby <jirislaby@kernel.org>
-CC:     Christoph Hellwig <hch@infradead.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Martin Liska <mliska@suse.cz>,
-        Josef Bacik <josef@toxicpanda.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        "cgroups@vger.kernel.org" <cgroups@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: RE: [PATCH] block/blk-iocost (gcc13): cast enum members to int in
- prints
-Thread-Topic: [PATCH] block/blk-iocost (gcc13): cast enum members to int in
- prints
-Thread-Index: AQHY7hGH734dfSyX20WOi86L/FtKtq4rTpIAgD+71dKAALHkcA==
-Date:   Tue, 13 Dec 2022 08:30:08 +0000
-Message-ID: <f5220f08bd7f45248d718f1919503261@AcuMS.aculab.com>
-References: <20221031114520.10518-1-jirislaby@kernel.org>
- <Y1++fLJXkeZgtXR2@infradead.org> <Y2AMcSPAJpj6obSA@slm.duckdns.org>
- <d833ad15-f458-d43d-cab7-de62ff54a939@kernel.org>
- <Y2FNa4bGhJoevRKT@slm.duckdns.org>
- <2b975ee3117e45aaa7882203cf9a4db8@AcuMS.aculab.com>
- <Y2Kaghnu/sPvl0+g@slm.duckdns.org> <Y2KePvYRRMOrqzOe@slm.duckdns.org>
- <320c939e-a3f0-1b1e-77e4-f3ecca00465d@kernel.org>
- <Y5ehU524daymEKgf@slm.duckdns.org>
-In-Reply-To: <Y5ehU524daymEKgf@slm.duckdns.org>
-Accept-Language: en-GB, en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.202.205.107]
+        Tue, 13 Dec 2022 05:32:27 -0500
+Received: from dggsgout12.his.huawei.com (unknown [45.249.212.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F383CB8;
+        Tue, 13 Dec 2022 02:32:25 -0800 (PST)
+Received: from mail02.huawei.com (unknown [172.30.67.169])
+        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4NWZYv2YXNz4f3kpT;
+        Tue, 13 Dec 2022 18:32:19 +0800 (CST)
+Received: from [10.174.176.73] (unknown [10.174.176.73])
+        by APP2 (Coremail) with SMTP id Syh0CgCH6bS0VJhjUsCFCA--.4892S3;
+        Tue, 13 Dec 2022 18:32:22 +0800 (CST)
+Subject: Re: [PATCH] block, bfq: fix possible uaf for 'bfqq->bic'
+To:     Jan Kara <jack@suse.cz>, Yu Kuai <yukuai1@huaweicloud.com>
+Cc:     paolo.valente@linaro.org, axboe@kernel.dk,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yi.zhang@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
+References: <20221210102537.655670-1-yukuai1@huaweicloud.com>
+ <20221212133537.hrs5t32ijj6lxoaf@quack3>
+From:   Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <ba364ff7-c6eb-9005-2c4d-04857a7298c5@huaweicloud.com>
+Date:   Tue, 13 Dec 2022 18:32:20 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: aculab.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
+In-Reply-To: <20221212133537.hrs5t32ijj6lxoaf@quack3>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: Syh0CgCH6bS0VJhjUsCFCA--.4892S3
+X-Coremail-Antispam: 1UD129KBjvJXoWxZw1kGF43WFWfZF45Zr4rGrg_yoWrWw15pr
+        ZxJayxAw48JrWagw47Zw18t3WfXws3Wr47Jr1Sgr1xKrW5Ar13XFZ2yF1UZrWfWrykuay3
+        WF1DJrZ7XryIva7anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUkG14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+        1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4j
+        6r4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
+        Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
+        I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
+        4UM4x0Y48IcVAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwCYjI0SjxkI62AI1cAE67vI
+        Y487MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI
+        0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y
+        0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxV
+        WUJVW8JwCI42IY6xAIw20EY4v20xvaj40_WFyUJVCq3wCI42IY6I8E87Iv67AKxVWUJVW8
+        JwCI42IY6I8E87Iv6xkF7I0E14v26r1j6r4UYxBIdaVFxhVjvjDU0xZFpf9x0JUdHUDUUU
+        UU=
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Tejun Heo <htejun@gmail.com> On Behalf Of 'Tejun Heo'
-> Sent: 12 December 2022 21:47
-> To: Jiri Slaby <jirislaby@kernel.org>
-> Cc: David Laight <David.Laight@ACULAB.COM>; Christoph Hellwig <hch@infradead.org>; linux-
-> kernel@vger.kernel.org; Martin Liska <mliska@suse.cz>; Josef Bacik <josef@toxicpanda.com>; Jens Axboe
-> <axboe@kernel.dk>; cgroups@vger.kernel.org; linux-block@vger.kernel.org
-> Subject: Re: [PATCH] block/blk-iocost (gcc13): cast enum members to int in prints
+Hi, Jan!
+
+在 2022/12/12 21:35, Jan Kara 写道:
+> On Sat 10-12-22 18:25:37, Yu Kuai wrote:
+>> From: Yu Kuai <yukuai3@huawei.com>
+>>
+>> Our test report a uaf for 'bfqq->bic' in 5.10:
+>>
+>> ==================================================================
+>> BUG: KASAN: use-after-free in bfq_select_queue+0x378/0xa30
+>> Read of size 8 at addr ffff88810efb42d8 by task fsstress/2318352
+>>
+>> CPU: 6 PID: 2318352 Comm: fsstress Kdump: loaded Not tainted 5.10.0-60.18.0.50.h602.kasan.eulerosv2r11.x86_64 #1
+>> Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.12.1-0-ga5cab58-20220320_160524-szxrtosci10000 04/01/2014
+>> Call Trace:
+> ...
+>>   bfq_select_queue+0x378/0xa30
+>>   __bfq_dispatch_request+0x1c4/0x220
+>>   bfq_dispatch_request+0xe8/0x130
+>>   __blk_mq_do_dispatch_sched+0x3f4/0x560
+>>   blk_mq_do_dispatch_sched+0x62/0xb0
+>>   __blk_mq_sched_dispatch_requests+0x215/0x2a0
+>>   blk_mq_sched_dispatch_requests+0x8f/0xd0
+>>   __blk_mq_run_hw_queue+0x98/0x180
+>>   __blk_mq_delay_run_hw_queue+0x22b/0x240
+>>   blk_mq_run_hw_queue+0xe3/0x190
+>>   blk_mq_sched_insert_requests+0x107/0x200
+>>   blk_mq_flush_plug_list+0x26e/0x3c0
+>>   blk_finish_plug+0x63/0x90
+>>   __iomap_dio_rw+0x7b5/0x910
+>>   iomap_dio_rw+0x36/0x80
+>>   ext4_dio_read_iter+0x146/0x190 [ext4]
+>>   ext4_file_read_iter+0x1e2/0x230 [ext4]
+>>   new_sync_read+0x29f/0x400
+>>   vfs_read+0x24e/0x2d0
+>>   ksys_read+0xd5/0x1b0
 > 
-> On Mon, Dec 12, 2022 at 01:14:31PM +0100, Jiri Slaby wrote:
-> > > If so, my suggestion is just sticking with the old behavior until we switch
-> > > to --std=g2x and then make one time adjustment at that point.
-> >
-> > So is the enum split OK under these circumstances?
+> Perhaps we can trim this UAF report a bit to what I've left above? That
+> should be enough to give idea about the problem.
+Yes, of course.
 > 
-> Oh man, it's kinda crazy that the compiler is changing in a way that the
-> same piece of code can't be compiled the same way across two adjoining
-> versions of the same compiler. But, yeah, if that's what gcc is gonna do and
-> splitting enums is the only way to be okay across the compiler versions,
-> there isn't any other choice we can make.
+>> Commit 3bc5e683c67d ("bfq: Split shared queues on move between cgroups")
+>> changes that move process to a new cgroup will allocate a new bfqq to
+>> use, however, the old bfqq and new bfqq can point to the same bic:
+>>
+>> 1) Initial state, two process with io in the same cgroup.
+>>
+>> Process 1       Process 2
+>>   (BIC1)          (BIC2)
+>>    |  Λ            |  Λ
+>>    |  |            |  |
+>>    V  |            V  |
+>>    bfqq1           bfqq2
+>>
+>> 2) bfqq1 is merged to bfqq2.
+>>
+>> Process 1       Process 2（cg1)
+>>   (BIC1)          (BIC2)
+>>    |               |
+>>     \-------------\|
+>>                    V
+>>    bfqq1           bfqq2(coop)
+>>
+>> 3) Process 1 exit, then issue new io(denoce IOA) from Process 2.
+>>
+>>   (BIC2)
+>>    |  Λ
+>>    |  |
+>>    V  |
+>>    bfqq2(coop)
+>>
+>> 4) Before IOA is completed, move Process 2 to another cgroup and issue io.
+>>
+>> Process 2
+>>   (BIC2)
+>>     Λ
+>>     |\--------------\
+>>     |                V
+>>    bfqq2           bfqq3
+>>
+>> Now that BIC2 points to bfqq3, while bfqq2 and bfqq3 both point to BIC2.
+>> If all the requests are completed, and Process 2 exit, BIC2 will be
+>> freed while there is no guarantee that bfqq2 will be freed before BIC2.
+>>
+>> Fix the problem by clearing bfqq->bic if process references is decreased
+>> to zero, since that they are not related anymore.
+>>
+>> Fixes: 3bc5e683c67d ("bfq: Split shared queues on move between cgroups")
+>> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+> 
+> Thanks for the analysis and the patch! I agree this is a problem.
+> 
+>> diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+>> index a72304c728fc..6eada99d1b34 100644
+>> --- a/block/bfq-iosched.c
+>> +++ b/block/bfq-iosched.c
+>> @@ -3036,6 +3036,14 @@ void bfq_release_process_ref(struct bfq_data *bfqd, struct bfq_queue *bfqq)
+>>   
+>>   	bfq_reassign_last_bfqq(bfqq, NULL);
+>>   
+>> +	/*
+>> +	 * __bfq_bic_change_cgroup() just reset bic->bfqq so that a new bfqq
+>> +	 * will be created to handle new io, while old bfqq will stay around
+>> +	 * until all the requests are completed. It's unsafe to keep bfqq->bic
+>> +	 * since they are not related anymore.
+>> +	 */
+>> +	if (bfqq_process_refs(bfqq) == 1)
+>> +		bfqq->bic = NULL;
+>>   	bfq_put_queue(bfqq);
+> 
+> Rather than changing bfq_release_process_ref() I think it would be more
+> logical to change bic_set_bfqq() like:
+> 
+> 	struct bfq_queue *old_bfqq = bic->bfqq[is_sync];
+> 
+> 	/* Clear bic pointer if we are detaching bfqq from its bic */
+> 	if (old_bfqq && old_bfqq->bic == bic)
+> 		old_bfqq->bic = NULL;
+> 
+> And then we can also remove several explicit bfqq->bic = NULL statements
+> from bfq code.
 
-It is also a silent code-breaker.
-Compile this for 32bit x86:
+Yes, I agree. I'll send a new patch soon.
 
-enum { a = 1, b = ~0ull};
-extern int foo(int, ...);
-int f(void)
-{
-    return foo(0, a, 2);
-}
-
-gcc13 pushes an extra zero onto the stack between the 1 and 2.
-
-	David
-
--
-Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1PT, UK
-Registration No: 1397386 (Wales)
+Thanks,
+Kuai
+> 
+> 								Honza
+> 
 
