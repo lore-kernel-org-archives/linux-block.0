@@ -2,92 +2,187 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2722FC4332F
-	for <linux-block@archiver.kernel.org>; Tue, 13 Dec 2022 12:58:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A037C4332F
+	for <linux-block@archiver.kernel.org>; Tue, 13 Dec 2022 15:35:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235280AbiLMM6S (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 13 Dec 2022 07:58:18 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56638 "EHLO
+        id S235817AbiLMPfq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 13 Dec 2022 10:35:46 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35064 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235216AbiLMM6R (ORCPT
+        with ESMTP id S236198AbiLMPfm (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 13 Dec 2022 07:58:17 -0500
-Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.86.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7BE12FACF
-        for <linux-block@vger.kernel.org>; Tue, 13 Dec 2022 04:58:14 -0800 (PST)
-Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- uk-mta-89-xORWxX3AP_CUetMfbOsIHA-1; Tue, 13 Dec 2022 12:58:11 +0000
-X-MC-Unique: xORWxX3AP_CUetMfbOsIHA-1
-Received: from AcuMS.Aculab.com (10.202.163.4) by AcuMS.aculab.com
- (10.202.163.4) with Microsoft SMTP Server (TLS) id 15.0.1497.42; Tue, 13 Dec
- 2022 12:58:10 +0000
-Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
- id 15.00.1497.044; Tue, 13 Dec 2022 12:58:10 +0000
-From:   David Laight <David.Laight@ACULAB.COM>
-To:     'Jiri Slaby' <jirislaby@kernel.org>, 'Tejun Heo' <tj@kernel.org>
-CC:     Christoph Hellwig <hch@infradead.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Martin Liska <mliska@suse.cz>,
-        Josef Bacik <josef@toxicpanda.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        "cgroups@vger.kernel.org" <cgroups@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: RE: [PATCH] block/blk-iocost (gcc13): cast enum members to int in
- prints
-Thread-Topic: [PATCH] block/blk-iocost (gcc13): cast enum members to int in
- prints
-Thread-Index: AQHY7hGH734dfSyX20WOi86L/FtKtq4rTpIAgD+71dKAALHkcIAAL92AgAACt3CAAAtKgIAADYvw
-Date:   Tue, 13 Dec 2022 12:58:10 +0000
-Message-ID: <d26f03e828c94df5b4653ac6980def59@AcuMS.aculab.com>
-References: <20221031114520.10518-1-jirislaby@kernel.org>
- <Y1++fLJXkeZgtXR2@infradead.org> <Y2AMcSPAJpj6obSA@slm.duckdns.org>
- <d833ad15-f458-d43d-cab7-de62ff54a939@kernel.org>
- <Y2FNa4bGhJoevRKT@slm.duckdns.org>
- <2b975ee3117e45aaa7882203cf9a4db8@AcuMS.aculab.com>
- <Y2Kaghnu/sPvl0+g@slm.duckdns.org> <Y2KePvYRRMOrqzOe@slm.duckdns.org>
- <320c939e-a3f0-1b1e-77e4-f3ecca00465d@kernel.org>
- <Y5ehU524daymEKgf@slm.duckdns.org>
- <f5220f08bd7f45248d718f1919503261@AcuMS.aculab.com>
- <9d2ead31-efab-cf49-08d4-1e613382d89f@kernel.org>
- <542d413b9d044474a34b6e7a40d70541@AcuMS.aculab.com>
- <c7539121-c8fc-b4b7-b722-ead833420b2b@kernel.org>
-In-Reply-To: <c7539121-c8fc-b4b7-b722-ead833420b2b@kernel.org>
-Accept-Language: en-GB, en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.202.205.107]
+        Tue, 13 Dec 2022 10:35:42 -0500
+Received: from mail-il1-f200.google.com (mail-il1-f200.google.com [209.85.166.200])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A0B21FFB0
+        for <linux-block@vger.kernel.org>; Tue, 13 Dec 2022 07:35:40 -0800 (PST)
+Received: by mail-il1-f200.google.com with SMTP id i7-20020a056e021b0700b003033a763270so7728010ilv.19
+        for <linux-block@vger.kernel.org>; Tue, 13 Dec 2022 07:35:40 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=6RxT+yoEXvae8IZOVzRkgDoj7dOx8+ozRPGUkIsbuyE=;
+        b=AIaPXfSSwekoldcTZl7AWes6pOynd2XyxCnuDWHPvbWuhdl0Y8NoO81aZGJWVMAwIM
+         RVPI14qUPlsmViHH5J0/xe4iXYhv4R31LNgWCk16Vs8qC0bv7BWOFviWbL7M8Dh4hAGn
+         sdep4xz/Bl+n7o6qqvZ/NR1yKTUFpNbQr0d89cILVWxGVxRAh0SGK7wnF+Mc7+AFWcmq
+         tX58Uavd+D1iWxatNvY0iXqKFd2EdqoYWfoaA2GBQSZYisFAJ7M1Fgt4GaUaynKI4UO/
+         JjLC9aTlmmVPzXbNaNAAuBJchPKGjUG5xKlHTDRytbctdbeBoo5C3a1YjK3+yBtTmpEX
+         HUFA==
+X-Gm-Message-State: ANoB5pkwbSJBiGzt3VYvBsm/08z8dBRNggKq46LZahfx9VOwuFp3Cm2B
+        yMFRkhWXXzfppbTv6ajFY0F/SBnmr92rI5jKbTIPi3ZACis+
+X-Google-Smtp-Source: AA0mqf6AIADVjhBFdqvCaPHcsy9o9+e0DIRyToosTovBS/F4dkhCuNCRxExzFX/gPA8yewZTXWA5pHELZ3agBShiHxls0WtKuV1j
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: aculab.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: base64
+X-Received: by 2002:a92:d590:0:b0:303:4c6:dd96 with SMTP id
+ a16-20020a92d590000000b0030304c6dd96mr26682271iln.246.1670945739940; Tue, 13
+ Dec 2022 07:35:39 -0800 (PST)
+Date:   Tue, 13 Dec 2022 07:35:39 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <00000000000044cc2e05efb75fc3@google.com>
+Subject: [syzbot] KASAN: stack-out-of-bounds Read in __blk_flush_plug
+From:   syzbot <syzbot+27ad9fcb89d23f44ca81@syzkaller.appspotmail.com>
+To:     axboe@kernel.dk, bpf@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-RnJvbTogSmlyaSBTbGFieSA8amlyaXNsYWJ5QGtlcm5lbC5vcmc+DQo+IFNlbnQ6IDEzIERlY2Vt
-YmVyIDIwMjIgMTI6MDUNCj4gDQo+IE9uIDEzLiAxMi4gMjIsIDEyOjUwLCBEYXZpZCBMYWlnaHQg
-d3JvdGU6DQo+ID4gRnJvbTogSmlyaSBTbGFieQ0KPiA+PiBTZW50OiAxMyBEZWNlbWJlciAyMDIy
-IDExOjE1DQo+ID4+DQouLi4NCj4gPj4+PiBPaCBtYW4sIGl0J3Mga2luZGEgY3JhenkgdGhhdCB0
-aGUgY29tcGlsZXIgaXMgY2hhbmdpbmcgaW4gYSB3YXkgdGhhdCB0aGUNCj4gPj4+PiBzYW1lIHBp
-ZWNlIG9mIGNvZGUgY2FuJ3QgYmUgY29tcGlsZWQgdGhlIHNhbWUgd2F5IGFjcm9zcyB0d28gYWRq
-b2luaW5nDQo+ID4+Pj4gdmVyc2lvbnMgb2YgdGhlIHNhbWUgY29tcGlsZXIuIEJ1dCwgeWVhaCwg
-aWYgdGhhdCdzIHdoYXQgZ2NjIGlzIGdvbm5hIGRvIGFuZA0KPiA+Pj4+IHNwbGl0dGluZyBlbnVt
-cyBpcyB0aGUgb25seSB3YXkgdG8gYmUgb2theSBhY3Jvc3MgdGhlIGNvbXBpbGVyIHZlcnNpb25z
-LA0KPiA+Pj4+IHRoZXJlIGlzbid0IGFueSBvdGhlciBjaG9pY2Ugd2UgY2FuIG1ha2UuDQo+ID4+
-Pg0KPiA+Pj4gSXQgaXMgYWxzbyBhIHNpbGVudCBjb2RlLWJyZWFrZXIuDQo+ID4+PiBDb21waWxl
-IHRoaXMgZm9yIDMyYml0IHg4NjoNCj4gPj4+DQo+ID4+PiBlbnVtIHsgYSA9IDEsIGIgPSB+MHVs
-bH07DQo+ID4+DQo+ID4+IEJ1dCBoYXZpbmcgdWxsIGluIGFuIGVudW0gaXMgdW5kZWZpbmVkIGFu
-eXdheS4gQzk5IGFsbG93cyBvbmx5IGludA0KPiA+PiBjb25zdGFudHMuIGdudUMgc3VwcG9ydHMg
-dWxvbmcgZXhwcmVzc2lvbnMgKElJUkMpLg0KPiA+DQo+ID4gZ2NjIHN1cHBvcnRzICdsb25nIGxv
-bmcnIGFzIHdlbGwgLSA2NGJpdCBvbiAzMmJpdCBzeXN0ZW1zLg0KPiANCj4gQ2FuIHlvdSBlbGFi
-b3JhdGUgd2hhdCdzIHNvdXJjZSBvZiB0aGlzPyAuLi4NCg0KRXhwZXJpbWVudGF0aW9uLCBmb3Ig
-ZXhhbXBsZToNCg0KaHR0cHM6Ly9nb2Rib2x0Lm9yZy96L240cm5jN2NLRw0KDQoNCglEYXZpZA0K
-DQotDQpSZWdpc3RlcmVkIEFkZHJlc3MgTGFrZXNpZGUsIEJyYW1sZXkgUm9hZCwgTW91bnQgRmFy
-bSwgTWlsdG9uIEtleW5lcywgTUsxIDFQVCwgVUsNClJlZ2lzdHJhdGlvbiBObzogMTM5NzM4NiAo
-V2FsZXMpDQo=
+Hello,
 
+syzbot found the following issue on:
+
+HEAD commit:    0d1409e4ff08 Merge tag 'drm-fixes-2022-12-09' of git://ano..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=170a308f880000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=d58e7fe7f9cf5e24
+dashboard link: https://syzkaller.appspot.com/bug?extid=27ad9fcb89d23f44ca81
+compiler:       Debian clang version 13.0.1-++20220126092033+75e33f71c2da-1~exp1~20220126212112.63, GNU ld (GNU Binutils for Debian) 2.35.2
+
+Unfortunately, I don't have any reproducer for this issue yet.
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/9ab0143f95cb/disk-0d1409e4.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/e574d5eaa32f/vmlinux-0d1409e4.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/31109436b00b/bzImage-0d1409e4.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+27ad9fcb89d23f44ca81@syzkaller.appspotmail.com
+
+==================================================================
+BUG: KASAN: stack-out-of-bounds in __blk_flush_plug+0x4ca/0x570 block/blk-core.c:1136
+Read of size 8 at addr ffffc900031bf37f by task syz-executor.3/10381
+
+CPU: 0 PID: 10381 Comm: syz-executor.3 Not tainted 6.1.0-rc8-syzkaller-00148-g0d1409e4ff08 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/26/2022
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0x1b1/0x28e lib/dump_stack.c:106
+ print_address_description+0x74/0x340 mm/kasan/report.c:284
+ print_report+0x107/0x1f0 mm/kasan/report.c:395
+ kasan_report+0xcd/0x100 mm/kasan/report.c:495
+ __blk_flush_plug+0x4ca/0x570 block/blk-core.c:1136
+ blk_finish_plug+0x5a/0x80 block/blk-core.c:1161
+ read_pages+0x7a8/0x9c0 mm/readahead.c:184
+ page_cache_ra_unbounded+0x703/0x820 mm/readahead.c:270
+ page_cache_sync_readahead include/linux/pagemap.h:1213 [inline]
+ filemap_get_pages+0x465/0x10d0 mm/filemap.c:2581
+ filemap_read+0x3cf/0xea0 mm/filemap.c:2675
+ call_read_iter include/linux/fs.h:2193 [inline]
+ generic_file_splice_read+0x1ff/0x5d0 fs/splice.c:309
+ do_splice_to fs/splice.c:793 [inline]
+ splice_direct_to_actor+0x41b/0xc00 fs/splice.c:865
+ do_splice_direct+0x279/0x3d0 fs/splice.c:974
+ do_sendfile+0x5fb/0xf80 fs/read_write.c:1255
+ __do_sys_sendfile64 fs/read_write.c:1323 [inline]
+ __se_sys_sendfile64+0x14f/0x1b0 fs/read_write.c:1309
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x3d/0xb0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x63/0xcd
+RIP: 0033:0x7f0ef8e8c0d9
+Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 f1 19 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f0ef9c36168 EFLAGS: 00000246 ORIG_RAX: 0000000000000028
+RAX: ffffffffffffffda RBX: 00007f0ef8fabf80 RCX: 00007f0ef8e8c0d9
+RDX: 0000000000000000 RSI: 0000000000000007 RDI: 0000000000000006
+RBP: 00007f0ef8ee7ae9 R08: 0000000000000000 R09: 0000000000000000
+R10: 00000000f03b0000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007fff02d3b9cf R14: 00007f0ef9c36300 R15: 0000000000022000
+ </TASK>
+
+The buggy address belongs to stack of task syz-executor.3/10381
+ and is located at offset 31 in frame:
+ read_pages+0x0/0x9c0 include/linux/page-flags.h:319
+
+This frame has 1 object:
+ [32, 72) 'plug'
+
+The buggy address belongs to the virtual mapping at
+ [ffffc900031b8000, ffffc900031c1000) created by:
+ dup_task_struct+0x8b/0x490 kernel/fork.c:974
+
+The buggy address belongs to the physical page:
+page:ffffea00008b5a40 refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x22d69
+memcg:ffff888027c8ad02
+flags: 0xfff00000000000(node=0|zone=1|lastcpupid=0x7ff)
+raw: 00fff00000000000 0000000000000000 dead000000000122 0000000000000000
+raw: 0000000000000000 0000000000000000 00000001ffffffff ffff888027c8ad02
+page dumped because: kasan: bad access detected
+page_owner tracks the page as allocated
+page last allocated via order 0, migratetype Unmovable, gfp_mask 0x102dc2(GFP_HIGHUSER|__GFP_NOWARN|__GFP_ZERO), pid 10379, tgid 10379 (syz-executor.3), ts 335022583921, free_ts 334826793550
+ prep_new_page mm/page_alloc.c:2539 [inline]
+ get_page_from_freelist+0x742/0x7c0 mm/page_alloc.c:4291
+ __alloc_pages+0x259/0x560 mm/page_alloc.c:5558
+ vm_area_alloc_pages mm/vmalloc.c:2975 [inline]
+ __vmalloc_area_node mm/vmalloc.c:3043 [inline]
+ __vmalloc_node_range+0x9b2/0x1400 mm/vmalloc.c:3213
+ alloc_thread_stack_node+0x307/0x500 kernel/fork.c:311
+ dup_task_struct+0x8b/0x490 kernel/fork.c:974
+ copy_process+0x637/0x4000 kernel/fork.c:2084
+ kernel_clone+0x21b/0x620 kernel/fork.c:2671
+ __do_sys_clone kernel/fork.c:2812 [inline]
+ __se_sys_clone kernel/fork.c:2796 [inline]
+ __x64_sys_clone+0x228/0x290 kernel/fork.c:2796
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x3d/0xb0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x63/0xcd
+page last free stack trace:
+ reset_page_owner include/linux/page_owner.h:24 [inline]
+ free_pages_prepare mm/page_alloc.c:1459 [inline]
+ free_pcp_prepare+0x80c/0x8f0 mm/page_alloc.c:1509
+ free_unref_page_prepare mm/page_alloc.c:3387 [inline]
+ free_unref_page_list+0xb4/0x7b0 mm/page_alloc.c:3529
+ release_pages+0x232a/0x25c0 mm/swap.c:1055
+ tlb_batch_pages_flush mm/mmu_gather.c:59 [inline]
+ tlb_flush_mmu_free mm/mmu_gather.c:254 [inline]
+ tlb_flush_mmu+0x850/0xa70 mm/mmu_gather.c:261
+ tlb_finish_mmu+0xcb/0x200 mm/mmu_gather.c:361
+ exit_mmap+0x275/0x630 mm/mmap.c:3102
+ __mmput+0x114/0x3b0 kernel/fork.c:1185
+ exit_mm+0x1f5/0x2d0 kernel/exit.c:516
+ do_exit+0x5e7/0x2070 kernel/exit.c:807
+ do_group_exit+0x1fd/0x2b0 kernel/exit.c:950
+ __do_sys_exit_group kernel/exit.c:961 [inline]
+ __se_sys_exit_group kernel/exit.c:959 [inline]
+ __x64_sys_exit_group+0x3b/0x40 kernel/exit.c:959
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x3d/0xb0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x63/0xcd
+
+Memory state around the buggy address:
+ ffffc900031bf200: 00 00 00 00 00 00 00 00 f1 f1 f1 f1 00 00 f3 f3
+ ffffc900031bf280: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+>ffffc900031bf300: 00 00 00 00 00 00 00 00 00 00 00 00 f1 f1 f1 f1
+                                                                ^
+ ffffc900031bf380: 00 00 00 00 00 f3 f3 f3 f3 f3 f3 f3 00 00 00 00
+ ffffc900031bf400: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+==================================================================
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
