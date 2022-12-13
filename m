@@ -2,68 +2,100 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 278ACC10F1D
-	for <linux-block@archiver.kernel.org>; Tue, 13 Dec 2022 19:03:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6025FC4332F
+	for <linux-block@archiver.kernel.org>; Tue, 13 Dec 2022 19:29:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236796AbiLMTD2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 13 Dec 2022 14:03:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49290 "EHLO
+        id S235382AbiLMT3s (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 13 Dec 2022 14:29:48 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40426 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237028AbiLMTDG (ORCPT
+        with ESMTP id S236842AbiLMT3g (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 13 Dec 2022 14:03:06 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF6C72AC0
-        for <linux-block@vger.kernel.org>; Tue, 13 Dec 2022 11:02:45 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 4740C616F0
-        for <linux-block@vger.kernel.org>; Tue, 13 Dec 2022 19:02:45 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id B05B4C433D2;
-        Tue, 13 Dec 2022 19:02:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1670958164;
-        bh=8b5RW06fRUQk08UNKmjNSStPnn3Cx9qH7mMrrR+Kc68=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=AopRfOyAHzUUT71zNlejPlE0rqpPBdF2X1byH5cVQei1GjO1Ely7vka5kmdXij5Ua
-         8XNTv0e3A+jBpMrVXizWu2fppSon6Us+sf72hgsLBvXBTKpDjgq4EXsP7o3ixGYG0r
-         yJkwFtwVOVFoK1rJh3pM3XKDYDm4lE4A1uLV1PojenjLJsgdP0b6B7gZZUdF6MPyhT
-         B7ib85nNhk3ZC6rvIIwsoVXLpTXW7EGAz1duCBRXJ3TARzoEM9jyDrIdPjMzOTX7Y8
-         U0xfD4QYNvuLOrRAdnE8GCCVZyymkM5X65VYKIWbqMetMjogWuptOYVmQSJJwmRgSd
-         Rj8m3JEgo0OsA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id A03F4C41612;
-        Tue, 13 Dec 2022 19:02:44 +0000 (UTC)
-Subject: Re: [GIT PULL] Block updates for 6.2-rc1
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <99cd4a7d-32c2-497b-d35b-950eebcd5319@kernel.dk>
-References: <99cd4a7d-32c2-497b-d35b-950eebcd5319@kernel.dk>
-X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
-X-PR-Tracked-Message-Id: <99cd4a7d-32c2-497b-d35b-950eebcd5319@kernel.dk>
-X-PR-Tracked-Remote: git://git.kernel.dk/linux.git tags/for-6.2/block-2022-12-08
-X-PR-Tracked-Commit-Id: f596da3efaf4130ff61cd029558845808df9bf99
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: ce8a79d5601aab94c02ed4539c48e8605422ac94
-Message-Id: <167095816465.20557.12608856643148424319.pr-tracker-bot@kernel.org>
-Date:   Tue, 13 Dec 2022 19:02:44 +0000
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+        Tue, 13 Dec 2022 14:29:36 -0500
+Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D11F0248F5;
+        Tue, 13 Dec 2022 11:29:28 -0800 (PST)
+Received: by mail-pl1-x630.google.com with SMTP id 4so902563plj.3;
+        Tue, 13 Dec 2022 11:29:28 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=l7iej3uCNn9r6CuK7MDwP9bcqGiFhUgLAt5WQq2ePLA=;
+        b=k8gA9BVoaw8yYqfb3WcJbE9PU/wx0MjT4ZBH29rHEE3YZ3p83vX1GakjNnqCAcr3Oa
+         w6DCBxMko8Pkra2ttxA70QRGC/qJ8u41XaQk/aQRUMqKMu+9EdRMvNNYiUYtXquHXbXW
+         EQBcIUH+jFUoC1easz32DDyL/LrE0eqZAquVXbEF0JdQmPFImn+DaIcmGyYqrao9JnnG
+         OqVnsgPQT6iPNsOraxbEg1fuzcRSct08BKWiI60WV2gSktSzVsDtIzV38eWQE8AeXzko
+         Cbhu8ACMVwRUIkiXKZM9+47YNbVzzb9o1LPbCLTf34DBbTVzKUMCElxP8GsBdL+gZDZL
+         cnfQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=l7iej3uCNn9r6CuK7MDwP9bcqGiFhUgLAt5WQq2ePLA=;
+        b=uFpWPXzF3/lVyOHoS0sXiRkp8oXhpU0n1k0pxbR/I+FRCC/S0cVWqSdHq0aeSleve/
+         fW0xJ9B6oSwGnV0MxMugqxUsFdlVB2sSIfIMVfndWUEtavTNxvErzMuSTTPx/eVAbTqg
+         Fb9UWFv1E/RkQWScObh1APLkQ9vvUKSCnT9iXrecKuTdqcQM0qfHS2tkpy0mERjkaise
+         rX3PtkP1ThSyHZsnUUT7M4BAgF7SCaVBgCwQI2L72+djxGT13kWLqchs+eb5McWcD/1h
+         TNv2AYU5zXRBz84HWt0XBuikg3aIwB+YZQBMJvOBCRO60B0nUqE/+4XniekjIz4ymzRg
+         X9mA==
+X-Gm-Message-State: ANoB5pmlOQs7gkOcV0LYv26HBleiTdR1JN9zGxx+V7gkNx5kFHrCGFa9
+        D0Uii5Hujy7XfMDFla1qkUk=
+X-Google-Smtp-Source: AA0mqf6MdMEtUXS7LxRhF8TBNyTlFws6dl5XBJuxnFV3lLin82JfRprzqq7+XQGJPVPWfRJCnOOBeQ==
+X-Received: by 2002:a05:6a20:9c8f:b0:a2:17a6:3e86 with SMTP id mj15-20020a056a209c8f00b000a217a63e86mr5501167pzb.55.1670959768196;
+        Tue, 13 Dec 2022 11:29:28 -0800 (PST)
+Received: from localhost ([2620:10d:c090:400::5:c415])
+        by smtp.gmail.com with ESMTPSA id c197-20020a624ece000000b005745788f44csm8017095pfb.124.2022.12.13.11.29.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 13 Dec 2022 11:29:27 -0800 (PST)
+Sender: Tejun Heo <htejun@gmail.com>
+Date:   Tue, 13 Dec 2022 09:29:26 -1000
+From:   Tejun Heo <tj@kernel.org>
+To:     Waiman Long <longman@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, Josef Bacik <josef@toxicpanda.com>,
+        Zefan Li <lizefan.x@bytedance.com>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>,
+        "Dennis Zhou (Facebook)" <dennisszhou@gmail.com>,
+        Yi Zhang <yi.zhang@redhat.com>
+Subject: Re: [PATCH-block v3 1/2] bdi, blk-cgroup: Fix potential UAF of blkcg
+Message-ID: <Y5jSllwwBdmQ1jQz@slm.duckdns.org>
+References: <20221213184446.50181-1-longman@redhat.com>
+ <20221213184446.50181-2-longman@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221213184446.50181-2-longman@redhat.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The pull request you sent on Mon, 12 Dec 2022 20:24:46 -0700:
+On Tue, Dec 13, 2022 at 01:44:45PM -0500, Waiman Long wrote:
+> Commit 59b57717fff8 ("blkcg: delay blkg destruction until after
+> writeback has finished") delayed call to blkcg_destroy_blkgs() to
+> cgwb_release_workfn(). However, it is done after a css_put() of blkcg
+> which may be the final put that causes the blkcg to be freed as RCU
+> read lock isn't held.
+> 
+> Another place where blkcg_destroy_blkgs() can be called indirectly via
+> blkcg_unpin_online() is from the offline_css() function called from
+> css_killed_work_fn(). Over there, the potentially final css_put() call
+> is issued after offline_css().
+> 
+> By adding a css_tryget() into blkcg_destroy_blkgs() and warning its
+> failure, the following stack trace was produced in a test system on
+> bootup.
 
-> git://git.kernel.dk/linux.git tags/for-6.2/block-2022-12-08
+This doesn't agree with the code anymore. Otherwise
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/ce8a79d5601aab94c02ed4539c48e8605422ac94
+Acked-by: Tejun Heo <tj@kernel.org>
 
-Thank you!
+Thanks.
 
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+tejun
