@@ -2,87 +2,195 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EA7B8C04FDE
-	for <linux-block@archiver.kernel.org>; Tue, 13 Dec 2022 12:29:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C1E7AC4332F
+	for <linux-block@archiver.kernel.org>; Tue, 13 Dec 2022 12:45:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234568AbiLMM3E (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 13 Dec 2022 07:29:04 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42026 "EHLO
+        id S229774AbiLMMp5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 13 Dec 2022 07:45:57 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49110 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235674AbiLMM3D (ORCPT
+        with ESMTP id S229645AbiLMMp4 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 13 Dec 2022 07:29:03 -0500
-X-Greylist: delayed 905 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 13 Dec 2022 04:29:00 PST
-Received: from smtp.tiscali.it (santino-notr.mail.tiscali.it [213.205.33.215])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 828C514004
-        for <linux-block@vger.kernel.org>; Tue, 13 Dec 2022 04:28:59 -0800 (PST)
-Received: from [192.168.178.50] ([87.15.83.83])
-        by santino.mail.tiscali.it with 
-        id voDn2802s1ns05j01oDoMD; Tue, 13 Dec 2022 12:13:52 +0000
-x-auth-user: fantonifabio@tiscali.it
-Message-ID: <e42dd6c7-6365-75be-0fcd-3329b8f8ba35@tiscali.it>
-Date:   Tue, 13 Dec 2022 13:13:45 +0100
+        Tue, 13 Dec 2022 07:45:56 -0500
+Received: from fudo.makrotopia.org (fudo.makrotopia.org [IPv6:2a07:2ec0:3002::71])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C020288;
+        Tue, 13 Dec 2022 04:45:54 -0800 (PST)
+Received: from local
+        by fudo.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+         (Exim 4.94.2)
+        (envelope-from <daniel@makrotopia.org>)
+        id 1p54f8-0002G7-NG; Tue, 13 Dec 2022 13:45:34 +0100
+Date:   Tue, 13 Dec 2022 12:45:27 +0000
+From:   Daniel Golle <daniel@makrotopia.org>
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Richard Weinberger <richard@nod.at>,
+        Matthew Wilcox <willy@infradead.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        Wolfram Sang <wsa+renesas@sang-engineering.com>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH 1/4] init: move block device helpers from
+ init/do_mounts.c
+Message-ID: <Y5hz5+yXWDadDhRB@makrotopia.org>
+References: <cover.1668644705.git.daniel@makrotopia.org>
+ <e5e0ab0429b1fc8a4e3f9614d2d1cc43dea78093.1668644705.git.daniel@makrotopia.org>
+ <Y3XM62P7CaeKXFsz@infradead.org>
+ <Y3j+Pzy1JpqG8Yd8@makrotopia.org>
+ <Y3zCdJr5dKsADsnM@infradead.org>
+ <Y5NpsmN/npnG8lxY@makrotopia.org>
+ <Y5buTVuu0pfqBQh+@infradead.org>
+ <Y5cKSRmZ45OJq6Qq@makrotopia.org>
+ <Y5ggLBy+XBjl/vYj@infradead.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.1
-Reply-To: fantonifabio@tiscali.it
-Subject: Re: [PATCH v2 03/21] documentation, capability: fix Generic Block
- Device Capability
-To:     Sergei Shtepa <sergei.shtepa@veeam.com>, axboe@kernel.dk,
-        corbet@lwn.net
-Cc:     linux-block@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20221209142331.26395-1-sergei.shtepa@veeam.com>
- <20221209142331.26395-4-sergei.shtepa@veeam.com>
-From:   Fabio Fantoni <fantonifabio@tiscali.it>
-In-Reply-To: <20221209142331.26395-4-sergei.shtepa@veeam.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Antivirus: Avast (VPS 221213-0, 13/12/2022), Outbound message
-X-Antivirus-Status: Clean
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tiscali.it; s=smtp;
-        t=1670933632; bh=zUNL1AzJb7Uzdlx47B9/0o8wRh3Bhbs6NWEEPysoQb8=;
-        h=Date:Reply-To:Subject:To:Cc:References:From:In-Reply-To;
-        b=eQh/KfFfLAjfYWZWcanbu/k/4syXDE+y1hNr1/pJi0yo36II7H7RgDvQezdqNDhE0
-         GqDtTrjW5QHyB8nEXv7G/33M+fBM3o90+kqHKU6pA763b1hnCOS7kj4bkY/BIv4AvZ
-         uFTevywFPyDhLQ9vzpRyVYCus6H9XNfbR7Es0d+s=
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Y5ggLBy+XBjl/vYj@infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Il 09/12/2022 15:23, Sergei Shtepa ha scritto:
-> When adding documentation for blkfilter, new lines of documentation
-> appeared in the file include/linux/blkdev.h. To preserve the appearance
-> of this document, the required sections and function descriptions were
-> explicitly specified.
->
-> Signed-off-by: Sergei Shtepa <sergei.shtepa@veeam.com>
-> ---
->   Documentation/block/capability.rst | 3 +++
->   1 file changed, 3 insertions(+)
->
-> diff --git a/Documentation/block/capability.rst b/Documentation/block/capability.rst
-> index 2ae7f064736a..8fad791980bb 100644
-> --- a/Documentation/block/capability.rst
-> +++ b/Documentation/block/capability.rst
-> @@ -8,3 +8,6 @@ This file documents the sysfs file ``block/<disk>/capability``.
->   capabilities a specific block device supports:
->   
->   .. kernel-doc:: include/linux/blkdev.h
-> +	:DOC: genhd capability flags
-> +.. kernel-doc:: include/linux/blkdev.h
-> +	:functions: disk_openers blk_alloc_disk bio_end_io_acct
-Thanks for spotting this, I think this is not related to blkfilter patch 
-but was already wrong/broken before and should be posted in a single 
-patch out of the blksnap serie (also fixing title, as reported by Bagas 
-Sanjaya, like "documentation: fix Generic Block Device Capability")
+On Mon, Dec 12, 2022 at 10:48:12PM -0800, Christoph Hellwig wrote:
+> On Mon, Dec 12, 2022 at 11:02:33AM +0000, Daniel Golle wrote:
+> > The thing is that there isn't anything extraordinarily complex here,
+> > just dynamically partitioning a block device based on a well-known
+> > format.
+> 
+> Yes, but a completely non-standard format that nests inside an
+> partition.
 
-from a fast look seems to me should have only:
+The reason for this current discussion (see subject line) is exactly
+that you didn't like the newly introduced partition type GUID which
+then calls the newly introduced partition parser taking care of the
+uImage.FIT content of a partition.
+Instead you suggested to implement it as a small stackable block
+driver, which I did (and will post as RFC in a moment from now).
 
-+    :DOC: genhd capability flags
+This block driver (if built-into the kernel and relied upon to expose
+the block device used as root filesystem) will need to identify the
+lower device it should work on. And for that the helper functions such
+as devt_from_devname() need to be available for that driver.
 
-and out of that looking older version of doc 
-(https://www.kernel.org/doc/html/v5.10/block/capability.html) seems to 
-me that this DOC in blkdev.h need improvement as it seems to me it was 
-better in the past, for example also reporting the corresponding 
-hexadecimal value in parentheses
+> 
+> > Using initramfs implies that we would need a 2nd copy of the standard C
+> > library and libfdt, both alone will already occupy more than just a
+> > single 64kB block of flash.
+> 
+> Why do you need libfdt?
+
+uImage.FIT is based on FDT, so the easiest way to parse this format
+without reinventing the wheel is using libfdt.
+
+> And with a simple statically linked kpartx you won't pull in much of
+> libc either.
+
+Well, enough to have kpartx and libfdt covered. I still assume that's
+more than 64KiB of compressed bytecode in total.
+
+> 
+> > I understand that from the point of view of
+> > classic x86 servers or even embedded devices with eMMC this seems
+> > negligible. However, keep in mind that a huge number of existing
+> > devices and also new designs of embedded devices often boot from just a
+> > few megabytes of NOR flash, and there every byte counts.
+> 
+> So I've worked quite a bit on really small deeply embedded systems,
+> and for those I wouldn't even think of using strange image formats
+> or the rather wasteful GPT partition format.
+> There we wouldn't dare to use paritions or weird image formats, but
+
+Well, the reality as of today is that even the smallest of all embedded
+devices will need updated firmware at some point.
+
+Using an image format which allows to dynamically partition a firmware
+image into kernel and rootfs parts is needed **especially** on devices
+with very little storage space -- it's there that we cannot afford to
+use hard-coded MTD partition sizes either limiting or overestimating
+the future kernel size.
+
+And having a unified format which serves a whole range of devices does
+make that easier -- surely, on NOR flash, there would not be a GPT
+partition; mtdblock on top of an MTD partition is used in that case.
+
+> 
+> > > What is the point of the uImage.FIT?
+> > 
+> > It is the format used by Das U-Boot, which is by far the most common
+> > bootloader found on small embedded devices running Linux.
+> > Is is already used by Das U-Boot to validate and load kernel,
+> > devicetree, initramfs, ... to RAM before launching Linux.
+> > I've included a link to the documentation[1] which gives insights
+> > regarding the motivation to create such a format.
+> 
+> That doesn't explain why you'd want to use it.  Nor how people
+> came up with it.
+
+I didn't want to quote all the history here, but it is explained rather
+well in their documentation I had linked there.
+
+> 
+> > In fact, that's only one out of three possible uses in which parsing
+> > the contained sub-image boundaries can be useful:
+> >  * On devices with NOR flash uImage.FIT is stored in an MTD partition,
+> >    hence the uImage.FIT partition parser (or small stackable block
+> >    driver) would then operate on top of /dev/mtdblockX.
+> > 
+> >  * On devices with NAND flash uImage.FIT is stored in a UBI volume,
+> >    hence in this case /dev/ubiblockX needs to be processed.
+> 
+> And all the mtdblock / ubiblock is due to the lack of a native
+> mtd/ubi backend for squashfs?  Why can't we take the block layer
+> out of the loop entirely?
+
+A block representation is the common denominator of all the
+above. Sure, I could implement splitting MTD devices according to
+uImage.FIT and then add MTD support to squashfs. Then implement
+splitting of UBI volumes and add UBI support to squashfs.
+
+However, simply using mtdblock on NOR and ubiblock on NAND seem
+well-suited and hence there wasn't ever a need to implement
+MTD or UBI support for any **read-only** filesystem.
+Afaik that is what mtdblock and ubiblock are intended to be used
+for.
+
+> > I hope this explains my motivation. Please ask should there by any
+> > doubts or if any of my explainations above are not clear.
+> 
+> None of this explains the silly nesting inside the GPT partition.
+> It is not needed for the any use cases and the root probem here.
+
+So where would you store the uImage (which will have to exist
+even to just load kernel and DTB in U-Boot, even without containing
+the root filesystem) on devices with eMMC then?
+
+I did consider block2mtd on eMMC and gluebi (which is deprecated) on
+UBI, but in order to mount the filesystem I'd then use mtdblock further
+down the road, and that'd actually be silly.
+
+> Without that you could simply implement a parition format, with that
+> you get into crazy nesting behavior.  Note that it would have
+> any benefit over just not doing this silly image.
+
+Are you suggesting to come up with an entirely new type of partition
+table only for that purpose? Which will require its own tools and
+implementation in both, U-Boot and Linux? What would be the benefit
+over just using GPT partitioning?
+
+I'm not saying that this cannot be done (and I will do it if you
+convince me that it'd be needed).
+
+> 
+> Maybe someone just needs to go back and come up wit ha scheme that
+> actually works and implement that in uboot as well.
+
+In terms of "works" both are working very well, the uImage.FIT
+partition parser as well as the tiny stackable block driver you had
+asked me to write instead. I've tested both on multiple devices by now,
+the former is even used in production on one of the currently most
+popular devices running OpenWrt (according to update backend stats).
+
+
+Thank you for your patience!
+
+
+Daniel
