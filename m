@@ -2,187 +2,143 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A037C4332F
-	for <linux-block@archiver.kernel.org>; Tue, 13 Dec 2022 15:35:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B0ADCC4332F
+	for <linux-block@archiver.kernel.org>; Tue, 13 Dec 2022 15:40:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235817AbiLMPfq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 13 Dec 2022 10:35:46 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35064 "EHLO
+        id S229562AbiLMPkK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 13 Dec 2022 10:40:10 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38754 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236198AbiLMPfm (ORCPT
+        with ESMTP id S235771AbiLMPkJ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 13 Dec 2022 10:35:42 -0500
-Received: from mail-il1-f200.google.com (mail-il1-f200.google.com [209.85.166.200])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A0B21FFB0
-        for <linux-block@vger.kernel.org>; Tue, 13 Dec 2022 07:35:40 -0800 (PST)
-Received: by mail-il1-f200.google.com with SMTP id i7-20020a056e021b0700b003033a763270so7728010ilv.19
-        for <linux-block@vger.kernel.org>; Tue, 13 Dec 2022 07:35:40 -0800 (PST)
+        Tue, 13 Dec 2022 10:40:09 -0500
+Received: from mail-ej1-x62d.google.com (mail-ej1-x62d.google.com [IPv6:2a00:1450:4864:20::62d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0405E6350
+        for <linux-block@vger.kernel.org>; Tue, 13 Dec 2022 07:40:07 -0800 (PST)
+Received: by mail-ej1-x62d.google.com with SMTP id bj12so37398298ejb.13
+        for <linux-block@vger.kernel.org>; Tue, 13 Dec 2022 07:40:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ILpM5LpfCtgvaR8spaJOQHAQvN8pz0k7KsYQo/byGFY=;
+        b=sZzomQln12xbOyxq7mY5YoVaS67L5yz42RZHr9MiVzgi6cQndzXus//tHvmSSRAYCm
+         PuIATHpqLjfe2LUIKwU1i/HnUf8vOei/VUbVmESxl54PrKT1L5Chcxl8557KRWJD7sk+
+         jS63vZN50ZqRuIbWZL5ZioEgd1osZDl6FSLeYY+uxSslgDdc2sxBqQoAnwXjuGFJiMnT
+         Zond65wcql5KQ8PtvcDg9dDneqOV3Fy2p4BU6tML5Q87kISChQqhxUMM2eGTrQYdkjEA
+         QbiYUpbudn6iW9tAi3LvVbHlHa2dh7YZpJT2Vh5GIkgfujJAZeQjfhDsWka+zUKjlIFm
+         T6LQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=6RxT+yoEXvae8IZOVzRkgDoj7dOx8+ozRPGUkIsbuyE=;
-        b=AIaPXfSSwekoldcTZl7AWes6pOynd2XyxCnuDWHPvbWuhdl0Y8NoO81aZGJWVMAwIM
-         RVPI14qUPlsmViHH5J0/xe4iXYhv4R31LNgWCk16Vs8qC0bv7BWOFviWbL7M8Dh4hAGn
-         sdep4xz/Bl+n7o6qqvZ/NR1yKTUFpNbQr0d89cILVWxGVxRAh0SGK7wnF+Mc7+AFWcmq
-         tX58Uavd+D1iWxatNvY0iXqKFd2EdqoYWfoaA2GBQSZYisFAJ7M1Fgt4GaUaynKI4UO/
-         JjLC9aTlmmVPzXbNaNAAuBJchPKGjUG5xKlHTDRytbctdbeBoo5C3a1YjK3+yBtTmpEX
-         HUFA==
-X-Gm-Message-State: ANoB5pkwbSJBiGzt3VYvBsm/08z8dBRNggKq46LZahfx9VOwuFp3Cm2B
-        yMFRkhWXXzfppbTv6ajFY0F/SBnmr92rI5jKbTIPi3ZACis+
-X-Google-Smtp-Source: AA0mqf6AIADVjhBFdqvCaPHcsy9o9+e0DIRyToosTovBS/F4dkhCuNCRxExzFX/gPA8yewZTXWA5pHELZ3agBShiHxls0WtKuV1j
-MIME-Version: 1.0
-X-Received: by 2002:a92:d590:0:b0:303:4c6:dd96 with SMTP id
- a16-20020a92d590000000b0030304c6dd96mr26682271iln.246.1670945739940; Tue, 13
- Dec 2022 07:35:39 -0800 (PST)
-Date:   Tue, 13 Dec 2022 07:35:39 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000044cc2e05efb75fc3@google.com>
-Subject: [syzbot] KASAN: stack-out-of-bounds Read in __blk_flush_plug
-From:   syzbot <syzbot+27ad9fcb89d23f44ca81@syzkaller.appspotmail.com>
-To:     axboe@kernel.dk, bpf@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ILpM5LpfCtgvaR8spaJOQHAQvN8pz0k7KsYQo/byGFY=;
+        b=jfZbps7u29DrPcTfrXJCXlFNnlPc4xXjXZOGevjdXCNEV6O/0ifi7rlhje5QZEUT4q
+         duyWXUoq5Ds7+ry1EJGBQ4HwILpY7zm+dIjdrpErabBjvtvwcBlv37lEEVohacUTBf5D
+         eh3t/oOz5IstjfpBxsYBZtEqqcfCnMt/swRGlMTeGl6lkV5PNVyvM/rhIxBvXA6y6NTM
+         2bQyu8r43xhhcZffP/bJ24GXJs1KglW23HrppWlasysWAWsWqJthOfHeBCBwpM0g457H
+         zPvn9cS4cewKeIoSnCH4CUuibPMD8BZlsjHfJnggsBXksGJq40goevNqS5NktbTCzaOR
+         LqmA==
+X-Gm-Message-State: ANoB5pnLfw5K2vJBHlN4JI4ZydVR5fBdSe6+FFNKDb9uVMcrgo1f7adN
+        VgP7/17wxg4oytLxmwJVcMINmRi6x1YgwpQv
+X-Google-Smtp-Source: AA0mqf7SkuuK2blorw3tUDWeJ2H1w26BHN1Tqo0IqrMNBnWdp/57ukQKq+lPGeiaExqBPXyHVjZ2+Q==
+X-Received: by 2002:a17:906:86ca:b0:7c0:f2cf:23fb with SMTP id j10-20020a17090686ca00b007c0f2cf23fbmr18484888ejy.52.1670946005511;
+        Tue, 13 Dec 2022 07:40:05 -0800 (PST)
+Received: from mbp-di-paolo.station (net-2-37-165-98.cust.vodafonedsl.it. [2.37.165.98])
+        by smtp.gmail.com with ESMTPSA id b18-20020a1709063cb200b007ba46867e6asm4760257ejh.16.2022.12.13.07.40.04
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 13 Dec 2022 07:40:05 -0800 (PST)
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
+Subject: Re: [PATCH V10 0/8] block, bfq: extend bfq to support multi-actuator
+ drives
+From:   Paolo Valente <paolo.valente@linaro.org>
+In-Reply-To: <20221209094442.36896-1-paolo.valente@linaro.org>
+Date:   Tue, 13 Dec 2022 16:40:03 +0100
+Cc:     linux-block <linux-block@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        Arie van der Hoeven <arie.vanderhoeven@seagate.com>,
+        Rory Chen <rory.c.chen@seagate.com>,
+        Glen Valante <glen.valante@linaro.org>,
+        Damien Le Moal <damien.lemoal@opensource.wdc.com>
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <A0328388-7C6B-46A4-A05E-DCD6D91334AE@linaro.org>
+References: <20221209094442.36896-1-paolo.valente@linaro.org>
+To:     Jens Axboe <axboe@kernel.dk>
+X-Mailer: Apple Mail (2.3445.104.11)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
+Hi Jens, Damien,
+can we consider this for 6.2?
 
-syzbot found the following issue on:
+Thanks,
+Paolo
 
-HEAD commit:    0d1409e4ff08 Merge tag 'drm-fixes-2022-12-09' of git://ano..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=170a308f880000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=d58e7fe7f9cf5e24
-dashboard link: https://syzkaller.appspot.com/bug?extid=27ad9fcb89d23f44ca81
-compiler:       Debian clang version 13.0.1-++20220126092033+75e33f71c2da-1~exp1~20220126212112.63, GNU ld (GNU Binutils for Debian) 2.35.2
+> Il giorno 9 dic 2022, alle ore 10:44, Paolo Valente =
+<paolo.valente@linaro.org> ha scritto:
+>=20
+> Hi,
+> here is the V10, it differs from V9 in that it applies the
+> recommendation by Damien in [2].
+>=20
+> Here is the whole description of this patch series again.  This
+> extension addresses the following issue. Single-LUN multi-actuator
+> SCSI drives, as well as all multi-actuator SATA drives appear as a
+> single device to the I/O subsystem [1].  Yet they address commands to
+> different actuators internally, as a function of Logical Block
+> Addressing (LBAs). A given sector is reachable by only one of the
+> actuators. For example, Seagate=E2=80=99s Serial Advanced Technology
+> Attachment (SATA) version contains two actuators and maps the lower
+> half of the SATA LBA space to the lower actuator and the upper half to
+> the upper actuator.
+>=20
+> Evidently, to fully utilize actuators, no actuator must be left idle
+> or underutilized while there is pending I/O for it. To reach this
+> goal, the block layer must somehow control the load of each actuator
+> individually. This series enriches BFQ with such a per-actuator
+> control, as a first step. Then it also adds a simple mechanism for
+> guaranteeing that actuators with pending I/O are never left idle.
+>=20
+> See [1] for a more detailed overview of the problem and of the
+> solutions implemented in this patch series. There you will also find
+> some preliminary performance results.
+>=20
+> Thanks,
+> Paolo
+>=20
+> [1] =
+https://www.linaro.org/blog/budget-fair-queueing-bfq-linux-io-scheduler-op=
+timizations-for-multi-actuator-sata-hard-drives/
+> [2] =
+https://lore.kernel.org/lkml/20221208104351.35038-1-paolo.valente@linaro.o=
+rg/T/#t
+>=20
+> Davide Zini (3):
+>  block, bfq: split also async bfq_queues on a per-actuator basis
+>  block, bfq: inject I/O to underutilized actuators
+>  block, bfq: balance I/O injection among underutilized actuators
+>=20
+> Federico Gavioli (1):
+>  block, bfq: retrieve independent access ranges from request queue
+>=20
+> Paolo Valente (4):
+>  block, bfq: split sync bfq_queues on a per-actuator basis
+>  block, bfq: forbid stable merging of queues associated with different
+>    actuators
+>  block, bfq: move io_cq-persistent bfqq data into a dedicated struct
+>  block, bfq: turn bfqq_data into an array in bfq_io_cq
+>=20
+> block/bfq-cgroup.c  |  94 +++----
+> block/bfq-iosched.c | 584 ++++++++++++++++++++++++++++++--------------
+> block/bfq-iosched.h | 142 ++++++++---
+> block/bfq-wf2q.c    |   2 +-
+> 4 files changed, 566 insertions(+), 256 deletions(-)
+>=20
+> --
+> 2.20.1
 
-Unfortunately, I don't have any reproducer for this issue yet.
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/9ab0143f95cb/disk-0d1409e4.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/e574d5eaa32f/vmlinux-0d1409e4.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/31109436b00b/bzImage-0d1409e4.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+27ad9fcb89d23f44ca81@syzkaller.appspotmail.com
-
-==================================================================
-BUG: KASAN: stack-out-of-bounds in __blk_flush_plug+0x4ca/0x570 block/blk-core.c:1136
-Read of size 8 at addr ffffc900031bf37f by task syz-executor.3/10381
-
-CPU: 0 PID: 10381 Comm: syz-executor.3 Not tainted 6.1.0-rc8-syzkaller-00148-g0d1409e4ff08 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/26/2022
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:88 [inline]
- dump_stack_lvl+0x1b1/0x28e lib/dump_stack.c:106
- print_address_description+0x74/0x340 mm/kasan/report.c:284
- print_report+0x107/0x1f0 mm/kasan/report.c:395
- kasan_report+0xcd/0x100 mm/kasan/report.c:495
- __blk_flush_plug+0x4ca/0x570 block/blk-core.c:1136
- blk_finish_plug+0x5a/0x80 block/blk-core.c:1161
- read_pages+0x7a8/0x9c0 mm/readahead.c:184
- page_cache_ra_unbounded+0x703/0x820 mm/readahead.c:270
- page_cache_sync_readahead include/linux/pagemap.h:1213 [inline]
- filemap_get_pages+0x465/0x10d0 mm/filemap.c:2581
- filemap_read+0x3cf/0xea0 mm/filemap.c:2675
- call_read_iter include/linux/fs.h:2193 [inline]
- generic_file_splice_read+0x1ff/0x5d0 fs/splice.c:309
- do_splice_to fs/splice.c:793 [inline]
- splice_direct_to_actor+0x41b/0xc00 fs/splice.c:865
- do_splice_direct+0x279/0x3d0 fs/splice.c:974
- do_sendfile+0x5fb/0xf80 fs/read_write.c:1255
- __do_sys_sendfile64 fs/read_write.c:1323 [inline]
- __se_sys_sendfile64+0x14f/0x1b0 fs/read_write.c:1309
- do_syscall_x64 arch/x86/entry/common.c:50 [inline]
- do_syscall_64+0x3d/0xb0 arch/x86/entry/common.c:80
- entry_SYSCALL_64_after_hwframe+0x63/0xcd
-RIP: 0033:0x7f0ef8e8c0d9
-Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 f1 19 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f0ef9c36168 EFLAGS: 00000246 ORIG_RAX: 0000000000000028
-RAX: ffffffffffffffda RBX: 00007f0ef8fabf80 RCX: 00007f0ef8e8c0d9
-RDX: 0000000000000000 RSI: 0000000000000007 RDI: 0000000000000006
-RBP: 00007f0ef8ee7ae9 R08: 0000000000000000 R09: 0000000000000000
-R10: 00000000f03b0000 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007fff02d3b9cf R14: 00007f0ef9c36300 R15: 0000000000022000
- </TASK>
-
-The buggy address belongs to stack of task syz-executor.3/10381
- and is located at offset 31 in frame:
- read_pages+0x0/0x9c0 include/linux/page-flags.h:319
-
-This frame has 1 object:
- [32, 72) 'plug'
-
-The buggy address belongs to the virtual mapping at
- [ffffc900031b8000, ffffc900031c1000) created by:
- dup_task_struct+0x8b/0x490 kernel/fork.c:974
-
-The buggy address belongs to the physical page:
-page:ffffea00008b5a40 refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x22d69
-memcg:ffff888027c8ad02
-flags: 0xfff00000000000(node=0|zone=1|lastcpupid=0x7ff)
-raw: 00fff00000000000 0000000000000000 dead000000000122 0000000000000000
-raw: 0000000000000000 0000000000000000 00000001ffffffff ffff888027c8ad02
-page dumped because: kasan: bad access detected
-page_owner tracks the page as allocated
-page last allocated via order 0, migratetype Unmovable, gfp_mask 0x102dc2(GFP_HIGHUSER|__GFP_NOWARN|__GFP_ZERO), pid 10379, tgid 10379 (syz-executor.3), ts 335022583921, free_ts 334826793550
- prep_new_page mm/page_alloc.c:2539 [inline]
- get_page_from_freelist+0x742/0x7c0 mm/page_alloc.c:4291
- __alloc_pages+0x259/0x560 mm/page_alloc.c:5558
- vm_area_alloc_pages mm/vmalloc.c:2975 [inline]
- __vmalloc_area_node mm/vmalloc.c:3043 [inline]
- __vmalloc_node_range+0x9b2/0x1400 mm/vmalloc.c:3213
- alloc_thread_stack_node+0x307/0x500 kernel/fork.c:311
- dup_task_struct+0x8b/0x490 kernel/fork.c:974
- copy_process+0x637/0x4000 kernel/fork.c:2084
- kernel_clone+0x21b/0x620 kernel/fork.c:2671
- __do_sys_clone kernel/fork.c:2812 [inline]
- __se_sys_clone kernel/fork.c:2796 [inline]
- __x64_sys_clone+0x228/0x290 kernel/fork.c:2796
- do_syscall_x64 arch/x86/entry/common.c:50 [inline]
- do_syscall_64+0x3d/0xb0 arch/x86/entry/common.c:80
- entry_SYSCALL_64_after_hwframe+0x63/0xcd
-page last free stack trace:
- reset_page_owner include/linux/page_owner.h:24 [inline]
- free_pages_prepare mm/page_alloc.c:1459 [inline]
- free_pcp_prepare+0x80c/0x8f0 mm/page_alloc.c:1509
- free_unref_page_prepare mm/page_alloc.c:3387 [inline]
- free_unref_page_list+0xb4/0x7b0 mm/page_alloc.c:3529
- release_pages+0x232a/0x25c0 mm/swap.c:1055
- tlb_batch_pages_flush mm/mmu_gather.c:59 [inline]
- tlb_flush_mmu_free mm/mmu_gather.c:254 [inline]
- tlb_flush_mmu+0x850/0xa70 mm/mmu_gather.c:261
- tlb_finish_mmu+0xcb/0x200 mm/mmu_gather.c:361
- exit_mmap+0x275/0x630 mm/mmap.c:3102
- __mmput+0x114/0x3b0 kernel/fork.c:1185
- exit_mm+0x1f5/0x2d0 kernel/exit.c:516
- do_exit+0x5e7/0x2070 kernel/exit.c:807
- do_group_exit+0x1fd/0x2b0 kernel/exit.c:950
- __do_sys_exit_group kernel/exit.c:961 [inline]
- __se_sys_exit_group kernel/exit.c:959 [inline]
- __x64_sys_exit_group+0x3b/0x40 kernel/exit.c:959
- do_syscall_x64 arch/x86/entry/common.c:50 [inline]
- do_syscall_64+0x3d/0xb0 arch/x86/entry/common.c:80
- entry_SYSCALL_64_after_hwframe+0x63/0xcd
-
-Memory state around the buggy address:
- ffffc900031bf200: 00 00 00 00 00 00 00 00 f1 f1 f1 f1 00 00 f3 f3
- ffffc900031bf280: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
->ffffc900031bf300: 00 00 00 00 00 00 00 00 00 00 00 00 f1 f1 f1 f1
-                                                                ^
- ffffc900031bf380: 00 00 00 00 00 f3 f3 f3 f3 f3 f3 f3 00 00 00 00
- ffffc900031bf400: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-==================================================================
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
