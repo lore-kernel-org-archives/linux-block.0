@@ -2,161 +2,73 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 628A4C10F1B
-	for <linux-block@archiver.kernel.org>; Tue, 13 Dec 2022 18:45:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CC531C10F1B
+	for <linux-block@archiver.kernel.org>; Tue, 13 Dec 2022 19:03:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236619AbiLMSpv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 13 Dec 2022 13:45:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40336 "EHLO
+        id S236763AbiLMTD1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 13 Dec 2022 14:03:27 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49888 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236640AbiLMSpt (ORCPT
+        with ESMTP id S237022AbiLMTDF (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 13 Dec 2022 13:45:49 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 555D923E91
-        for <linux-block@vger.kernel.org>; Tue, 13 Dec 2022 10:45:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1670957103;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=h+iH+gyUSP9RmZybF0rRU4rA5/id1U9+eBsl2PUnAPQ=;
-        b=Li7zuSVUekrYZlysizQSX2K/ojAmuTLtWF8FBzUEQPm0tOmJcTGKF1Dt15m1icV5uOrak0
-        ZSYcilF01D/lKa5Ul19ZqPCyuRymM84xB9Sexcey/bn20g42FAUGHX3e5uIYuAtqpPZ3Iu
-        5wOHNMl21zU0h/fCSTdB7ZuFjHdtnC0=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-617-cFUaBO_WOZqWlEoTA3QSDA-1; Tue, 13 Dec 2022 13:45:00 -0500
-X-MC-Unique: cFUaBO_WOZqWlEoTA3QSDA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        Tue, 13 Dec 2022 14:03:05 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6CA0FBEC
+        for <linux-block@vger.kernel.org>; Tue, 13 Dec 2022 11:02:39 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 66E001C008A7;
-        Tue, 13 Dec 2022 18:44:59 +0000 (UTC)
-Received: from llong.com (unknown [10.22.32.205])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id A8242C15BA0;
-        Tue, 13 Dec 2022 18:44:58 +0000 (UTC)
-From:   Waiman Long <longman@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
-        Josef Bacik <josef@toxicpanda.com>,
-        Zefan Li <lizefan.x@bytedance.com>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        Andrew Morton <akpm@linux-foundation.org>
-Cc:     cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        =?UTF-8?q?Michal=20Koutn=C3=BD?= <mkoutny@suse.com>,
-        "Dennis Zhou (Facebook)" <dennisszhou@gmail.com>,
-        Waiman Long <longman@redhat.com>
-Subject: [PATCH-block v3 2/2] blk-cgroup: Flush stats at blkgs destruction path
-Date:   Tue, 13 Dec 2022 13:44:46 -0500
-Message-Id: <20221213184446.50181-3-longman@redhat.com>
-In-Reply-To: <20221213184446.50181-1-longman@redhat.com>
-References: <20221213184446.50181-1-longman@redhat.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
+        by ams.source.kernel.org (Postfix) with ESMTPS id 2A30EB815B1
+        for <linux-block@vger.kernel.org>; Tue, 13 Dec 2022 19:02:38 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id CCFC8C433EF;
+        Tue, 13 Dec 2022 19:02:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1670958156;
+        bh=bqBetgiIfsNO84i1qW2/dVkckEDh8U9rezo0MFNdsY0=;
+        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+        b=gAjfQAyGmv4X9jz3YXVgU8UDu72BwrfnDBHg2yDsDF4QZ1wOW6izJ4eVo8S9GNJJ+
+         mBZLesPLNIXl4BTHtKcsU/CiYSyrbJtEIv0QZapKWh88IgKUUQODBCcxcAOEL+5n1B
+         TnDg8bYutau+QvyPqekMapNLy1XoXBg3HZbsv0hO+wghXnURd+evap4e235ZhXN1Gx
+         Z+W1vh9GrIIc1nvuH18/o/eHg5lB7qOe8aEuhUc7UvDz2SApeaXYM8F57OoayhNevY
+         4HMoKzgCiJNVnd4SCkWOOaJcLsNpKNe3D7gu4vdEKygAKTF4muHZvCzq4FIi1Je5AY
+         5FI/Q0vihl8kg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id B9828C00445;
+        Tue, 13 Dec 2022 19:02:36 +0000 (UTC)
+Subject: Re: [dm-devel] [git pull] device mapper changes for 6.2
+From:   pr-tracker-bot@kernel.org
+In-Reply-To: <Y5es3Sf0DU0QEHPP@redhat.com>
+References: <Y5es3Sf0DU0QEHPP@redhat.com>
+X-PR-Tracked-List-Id: device-mapper development <dm-devel.redhat.com>
+X-PR-Tracked-Message-Id: <Y5es3Sf0DU0QEHPP@redhat.com>
+X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git tags/for-6.2/dm-changes
+X-PR-Tracked-Commit-Id: 7991dbff6849f67e823b7cc0c15e5a90b0549b9f
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 8715c6d3100fc7c6edddf29af4a399a1c12d028c
+Message-Id: <167095815675.20557.4629416317881565086.pr-tracker-bot@kernel.org>
+Date:   Tue, 13 Dec 2022 19:02:36 +0000
+To:     Mike Snitzer <snitzer@kernel.org>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        Peter Korsgaard <peter@korsgaard.com>,
+        linux-block@vger.kernel.org, dm-devel@redhat.com,
+        Mikulas Patocka <mpatocka@redhat.com>,
+        Luo Meng <luomeng12@huawei.com>,
+        Zhihao Cheng <chengzhihao1@huawei.com>,
+        Alasdair G Kergon <agk@redhat.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-As noted by Michal, the blkg_iostat_set's in the lockless list
-hold reference to blkg's to protect against their removal. Those
-blkg's hold reference to blkcg. When a cgroup is being destroyed,
-cgroup_rstat_flush() is only called at css_release_work_fn() which is
-called when the blkcg reference count reaches 0. This circular dependency
-will prevent blkcg from being freed until some other events cause
-cgroup_rstat_flush() to be called to flush out the pending blkcg stats.
+The pull request you sent on Mon, 12 Dec 2022 17:36:13 -0500:
 
-To prevent this delayed blkcg removal, add a new cgroup_rstat_css_flush()
-function to flush stats for a given css and cpu and call it at the blkgs
-destruction path, blkcg_destroy_blkgs(), whenever there are still some
-pending stats to be flushed. This will ensure that blkcg reference
-count can reach 0 ASAP.
+> git://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git tags/for-6.2/dm-changes
 
-Signed-off-by: Waiman Long <longman@redhat.com>
-Acked-by: Tejun Heo <tj@kernel.org>
----
- block/blk-cgroup.c     | 15 +++++++++++++++
- include/linux/cgroup.h |  1 +
- kernel/cgroup/rstat.c  | 18 ++++++++++++++++++
- 3 files changed, 34 insertions(+)
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/8715c6d3100fc7c6edddf29af4a399a1c12d028c
 
-diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-index ca28306aa1b1..ddd27a714d3e 100644
---- a/block/blk-cgroup.c
-+++ b/block/blk-cgroup.c
-@@ -1084,6 +1084,8 @@ struct list_head *blkcg_get_cgwb_list(struct cgroup_subsys_state *css)
-  */
- static void blkcg_destroy_blkgs(struct blkcg *blkcg)
- {
-+	int cpu;
-+
- 	/*
- 	 * blkcg_destroy_blkgs() shouldn't be called with all the blkcg
- 	 * references gone.
-@@ -1093,6 +1095,19 @@ static void blkcg_destroy_blkgs(struct blkcg *blkcg)
- 
- 	might_sleep();
- 
-+	/*
-+	 * Flush all the non-empty percpu lockless lists so as to release
-+	 * the blkg references held by those lists which, in turn, may
-+	 * allow the blkgs to be freed and release their references to
-+	 * blkcg speeding up its freeing.
-+	 */
-+	for_each_possible_cpu(cpu) {
-+		struct llist_head *lhead = per_cpu_ptr(blkcg->lhead, cpu);
-+
-+		if (!llist_empty(lhead))
-+			cgroup_rstat_css_cpu_flush(&blkcg->css, cpu);
-+	}
-+
- 	spin_lock_irq(&blkcg->lock);
- 
- 	while (!hlist_empty(&blkcg->blkg_list)) {
-diff --git a/include/linux/cgroup.h b/include/linux/cgroup.h
-index 528bd44b59e2..6c4e66b3fa84 100644
---- a/include/linux/cgroup.h
-+++ b/include/linux/cgroup.h
-@@ -766,6 +766,7 @@ void cgroup_rstat_flush(struct cgroup *cgrp);
- void cgroup_rstat_flush_irqsafe(struct cgroup *cgrp);
- void cgroup_rstat_flush_hold(struct cgroup *cgrp);
- void cgroup_rstat_flush_release(void);
-+void cgroup_rstat_css_cpu_flush(struct cgroup_subsys_state *css, int cpu);
- 
- /*
-  * Basic resource stats.
-diff --git a/kernel/cgroup/rstat.c b/kernel/cgroup/rstat.c
-index 793ecff29038..2e44be44351f 100644
---- a/kernel/cgroup/rstat.c
-+++ b/kernel/cgroup/rstat.c
-@@ -281,6 +281,24 @@ void cgroup_rstat_flush_release(void)
- 	spin_unlock_irq(&cgroup_rstat_lock);
- }
- 
-+/**
-+ * cgroup_rstat_css_cpu_flush - flush stats for the given css and cpu
-+ * @css: target css to be flush
-+ * @cpu: the cpu that holds the stats to be flush
-+ *
-+ * A lightweight rstat flush operation for a given css and cpu.
-+ * Only the cpu_lock is being held for mutual exclusion, the cgroup_rstat_lock
-+ * isn't used.
-+ */
-+void cgroup_rstat_css_cpu_flush(struct cgroup_subsys_state *css, int cpu)
-+{
-+	raw_spinlock_t *cpu_lock = per_cpu_ptr(&cgroup_rstat_cpu_lock, cpu);
-+
-+	raw_spin_lock_irq(cpu_lock);
-+	css->ss->css_rstat_flush(css, cpu);
-+	raw_spin_unlock_irq(cpu_lock);
-+}
-+
- int cgroup_rstat_init(struct cgroup *cgrp)
- {
- 	int cpu;
+Thank you!
+
 -- 
-2.31.1
-
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
