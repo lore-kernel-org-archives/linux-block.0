@@ -2,92 +2,87 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 482DFC4332F
-	for <linux-block@archiver.kernel.org>; Tue, 13 Dec 2022 17:18:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA114C4167B
+	for <linux-block@archiver.kernel.org>; Tue, 13 Dec 2022 18:45:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236132AbiLMRSD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 13 Dec 2022 12:18:03 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43914 "EHLO
+        id S236595AbiLMSpp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 13 Dec 2022 13:45:45 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40308 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235622AbiLMRSC (ORCPT
+        with ESMTP id S235461AbiLMSpn (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 13 Dec 2022 12:18:02 -0500
-Received: from mail-io1-xd2c.google.com (mail-io1-xd2c.google.com [IPv6:2607:f8b0:4864:20::d2c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F019C20F49
-        for <linux-block@vger.kernel.org>; Tue, 13 Dec 2022 09:18:00 -0800 (PST)
-Received: by mail-io1-xd2c.google.com with SMTP id n63so2047243iod.7
-        for <linux-block@vger.kernel.org>; Tue, 13 Dec 2022 09:18:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=3qTFjyiSnCqLYqAWj+0eGtZebhl1ojJPI8tNnCqLlTE=;
-        b=HB5/saVepTV9HjHxz7WHFJyxL9CfXUD3huZ49GaFiQcsING5TyFfTQoLKoRlXNKe4l
-         dUwCO06hJh4pznQKBQ+TjXYHH4OOJDRsPLsQL5T/98ksbk0iK4SKEJ27IiDT23rNKACM
-         b0CDh6Eq14nAbpY33R1+HSpjdKbqPJpsleYT4GM8cPcegtuEN5gJtsjMLhTn+ZDcXsE5
-         +EMf/JuZUUbR6aJ3fqOSx82arSBf1NkRdVzA63tLRs4g2SXZkBb0sesn5RI6GSUYg/pr
-         g9Ucrb/nLtoVlKSr4O/XGERFEaxvJTwuH+iMw+hO7wfW8NQoSBbonsB/X4hUScm9xfvj
-         TkFA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=3qTFjyiSnCqLYqAWj+0eGtZebhl1ojJPI8tNnCqLlTE=;
-        b=kSA2rMUgS0r1LgDFyp4rncx+AsDWsFeWcIxbQo7jkEJ5KmW831dSGYYm5FOqLfgrfv
-         VP3GZv3mlTH3HCy6U+TqM6c94c4Z9lcNaqdmWv2LtCxSPqncYppfoHfv3ksmICmWF/yN
-         HHObKjpk6gAfj2AdTsuB0qZl9xrDO3t3+EWy3/FGy2ob9x4P1x5shTWMj3fB3iIJV1Yl
-         0MLuYK48kH35jAc/oLFJm+QdClcgc40RNEVJRp5a7bX2R1XXvJN04TBGz0azEO9RR0Wu
-         VzB51icRaswmitJCQwhtnLawmvoryG/xVCWjA7hAeW8ctZQoFW8qnms2Ew2ijaTVZfem
-         T4Vw==
-X-Gm-Message-State: ANoB5pnyWYTSlXfiznnD91iORtzTp7wrBCWwkoLR0jcd+IqApgDICl2O
-        SzJvzcqV/4EJxjfrSomn1i0sDQ==
-X-Google-Smtp-Source: AA0mqf4SVR20qmTHEorZ05ywtYmpbvZg4FRoaQP1RNvXJbBX+ojDS1Hbn+T5mHLEJIVtKm1mRRyX5Q==
-X-Received: by 2002:a05:6602:3283:b0:6dd:f251:caf7 with SMTP id d3-20020a056602328300b006ddf251caf7mr2220206ioz.0.1670951880188;
-        Tue, 13 Dec 2022 09:18:00 -0800 (PST)
-Received: from [192.168.1.94] ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id w14-20020a02968e000000b00389b36027a6sm993360jai.92.2022.12.13.09.17.59
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 13 Dec 2022 09:17:59 -0800 (PST)
-Message-ID: <7125ff61-bf11-6f8c-8496-f2603371c214@kernel.dk>
-Date:   Tue, 13 Dec 2022 10:17:57 -0700
+        Tue, 13 Dec 2022 13:45:43 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6539024BE3
+        for <linux-block@vger.kernel.org>; Tue, 13 Dec 2022 10:45:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1670957101;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=gC79KdPgX8meWkHV6kEH9PpY7k/sykKi+3gQfcC9IOQ=;
+        b=EO1YF/o7PQ+hB9WKFyom9FG2siln3GP/cxPd+WgwJt9JtWH6bQNmVu1AqhwY2qiUr6FzbI
+        Y9wpgwi1psOxjrCPJ3fakQtD+tGN6j3mkluuvrn6y8Ag7/wun8OKPHGinR/Ow/3gnvCHDd
+        APZPjIAFYZbkvpHdnccFDNZAfy2BHVw=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-20-BvYR3lxsNKWZAZOxPDL65Q-1; Tue, 13 Dec 2022 13:44:58 -0500
+X-MC-Unique: BvYR3lxsNKWZAZOxPDL65Q-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E6381185A78F;
+        Tue, 13 Dec 2022 18:44:57 +0000 (UTC)
+Received: from llong.com (unknown [10.22.32.205])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 2E9CCC15BA0;
+        Tue, 13 Dec 2022 18:44:57 +0000 (UTC)
+From:   Waiman Long <longman@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
+        Josef Bacik <josef@toxicpanda.com>,
+        Zefan Li <lizefan.x@bytedance.com>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        Andrew Morton <akpm@linux-foundation.org>
+Cc:     cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        =?UTF-8?q?Michal=20Koutn=C3=BD?= <mkoutny@suse.com>,
+        "Dennis Zhou (Facebook)" <dennisszhou@gmail.com>,
+        Waiman Long <longman@redhat.com>
+Subject: [PATCH-block v3 0/2] blk-cgroup: Fix potential UAF & flush rstat at blkgs destruction path
+Date:   Tue, 13 Dec 2022 13:44:44 -0500
+Message-Id: <20221213184446.50181-1-longman@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.1
-Subject: Re: [PATCH V10 0/8] block, bfq: extend bfq to support multi-actuator
- drives
-Content-Language: en-US
-To:     Arie van der Hoeven <arie.vanderhoeven@seagate.com>,
-        Paolo Valente <paolo.valente@linaro.org>
-Cc:     linux-block <linux-block@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        Rory Chen <rory.c.chen@seagate.com>,
-        Glen Valante <glen.valante@linaro.org>,
-        Damien Le Moal <damien.lemoal@opensource.wdc.com>
-References: <20221209094442.36896-1-paolo.valente@linaro.org>
- <A0328388-7C6B-46A4-A05E-DCD6D91334AE@linaro.org>
- <0bcf7776-59d7-53ef-bfd0-449940a05161@kernel.dk>
- <PH7PR20MB50589A941F3F5A50C872E264F1E39@PH7PR20MB5058.namprd20.prod.outlook.com>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <PH7PR20MB50589A941F3F5A50C872E264F1E39@PH7PR20MB5058.namprd20.prod.outlook.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Please don't top post...
+ v3:
+  - Drop v2 patch 2 as it may not be needed.
+  - Replace css_tryget() with percpu_ref_is_zero() in patch 1 as
+    suggested by Tejun.
+  - Expand comment on patch 2 to elaborate the reason for this patch.
 
-On 12/13/22 10:10?AM, Arie van der Hoeven wrote:
-> We understand being conservative but the code paths only impact on a
-> product that is not yet in market.  This is version 10 spanning months
-> with many gaps waiting on review.  It's an interesting case study.
+ v2:
+  - Remove unnecessary rcu_read_{lock|unlock} from
+    cgroup_rstat_css_cpu_flush() in patch 3.
 
-That's a nice theory, but that's not how code works. As mentioned, the
-last version was posted 1-2 weeks later than would've been appropriate
-for inclusion.
+It was found that blkcg_destroy_blkgs() may be called with all blkcg
+references gone. This may potentially cause user-after-free and so should
+be fixed. The second patch flushes rstat when blkcg_destroy_blkgs().
+
+Waiman Long (2):
+  bdi, blk-cgroup: Fix potential UAF of blkcg
+  blk-cgroup: Flush stats at blkgs destruction path
+
+ block/blk-cgroup.c     | 22 ++++++++++++++++++++++
+ include/linux/cgroup.h |  1 +
+ kernel/cgroup/rstat.c  | 18 ++++++++++++++++++
+ mm/backing-dev.c       |  8 ++++++--
+ 4 files changed, 47 insertions(+), 2 deletions(-)
 
 -- 
-Jens Axboe
+2.31.1
 
