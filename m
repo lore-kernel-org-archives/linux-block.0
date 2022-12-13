@@ -2,56 +2,56 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6025FC4332F
-	for <linux-block@archiver.kernel.org>; Tue, 13 Dec 2022 19:29:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18489C4708D
+	for <linux-block@archiver.kernel.org>; Tue, 13 Dec 2022 19:31:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235382AbiLMT3s (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 13 Dec 2022 14:29:48 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40426 "EHLO
+        id S236691AbiLMTbD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 13 Dec 2022 14:31:03 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41356 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236842AbiLMT3g (ORCPT
+        with ESMTP id S236267AbiLMTbC (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 13 Dec 2022 14:29:36 -0500
-Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D11F0248F5;
-        Tue, 13 Dec 2022 11:29:28 -0800 (PST)
-Received: by mail-pl1-x630.google.com with SMTP id 4so902563plj.3;
-        Tue, 13 Dec 2022 11:29:28 -0800 (PST)
+        Tue, 13 Dec 2022 14:31:02 -0500
+Received: from mail-pf1-x431.google.com (mail-pf1-x431.google.com [IPv6:2607:f8b0:4864:20::431])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CCC9E24085;
+        Tue, 13 Dec 2022 11:31:01 -0800 (PST)
+Received: by mail-pf1-x431.google.com with SMTP id n3so2904545pfq.10;
+        Tue, 13 Dec 2022 11:31:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=l7iej3uCNn9r6CuK7MDwP9bcqGiFhUgLAt5WQq2ePLA=;
-        b=k8gA9BVoaw8yYqfb3WcJbE9PU/wx0MjT4ZBH29rHEE3YZ3p83vX1GakjNnqCAcr3Oa
-         w6DCBxMko8Pkra2ttxA70QRGC/qJ8u41XaQk/aQRUMqKMu+9EdRMvNNYiUYtXquHXbXW
-         EQBcIUH+jFUoC1easz32DDyL/LrE0eqZAquVXbEF0JdQmPFImn+DaIcmGyYqrao9JnnG
-         OqVnsgPQT6iPNsOraxbEg1fuzcRSct08BKWiI60WV2gSktSzVsDtIzV38eWQE8AeXzko
-         Cbhu8ACMVwRUIkiXKZM9+47YNbVzzb9o1LPbCLTf34DBbTVzKUMCElxP8GsBdL+gZDZL
-         cnfQ==
+        bh=sXb/rEJk2v1xayTt6fq4DLeZdX5JWv1TpuzsNKAsI7M=;
+        b=G7J7io0xWPaTvvK6zYRTl01FHKEjCE7q/Jaq0JD7R1g3OdahdIZtirguReRInIrPRH
+         lZsfSIG+8+OSKwrxDm0SlrqyJmOeSXBDZrO8SkfI4g6JjRukQH28HHKsxVX/gSYqaybD
+         hxxQOSwBU4s3Sc7AvEyaQxh8DY45WGklrYMAn2GHRlP8xHqIqTs1JTT5nO6YSg9E9p2w
+         fic1D5sGqkASXcthzYQanLnBIebq2BxRY4h0k/r/Sbgjb+opKe973QztrDdQbHiBgwbJ
+         Yg/P5MaegIvmBAoR2/1zusmab90D83KH1vTve3IBK1wCcxqZ9z0CYdq5ekniAUS5kP7n
+         q8wA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=l7iej3uCNn9r6CuK7MDwP9bcqGiFhUgLAt5WQq2ePLA=;
-        b=uFpWPXzF3/lVyOHoS0sXiRkp8oXhpU0n1k0pxbR/I+FRCC/S0cVWqSdHq0aeSleve/
-         fW0xJ9B6oSwGnV0MxMugqxUsFdlVB2sSIfIMVfndWUEtavTNxvErzMuSTTPx/eVAbTqg
-         Fb9UWFv1E/RkQWScObh1APLkQ9vvUKSCnT9iXrecKuTdqcQM0qfHS2tkpy0mERjkaise
-         rX3PtkP1ThSyHZsnUUT7M4BAgF7SCaVBgCwQI2L72+djxGT13kWLqchs+eb5McWcD/1h
-         TNv2AYU5zXRBz84HWt0XBuikg3aIwB+YZQBMJvOBCRO60B0nUqE/+4XniekjIz4ymzRg
-         X9mA==
-X-Gm-Message-State: ANoB5pmlOQs7gkOcV0LYv26HBleiTdR1JN9zGxx+V7gkNx5kFHrCGFa9
-        D0Uii5Hujy7XfMDFla1qkUk=
-X-Google-Smtp-Source: AA0mqf6MdMEtUXS7LxRhF8TBNyTlFws6dl5XBJuxnFV3lLin82JfRprzqq7+XQGJPVPWfRJCnOOBeQ==
-X-Received: by 2002:a05:6a20:9c8f:b0:a2:17a6:3e86 with SMTP id mj15-20020a056a209c8f00b000a217a63e86mr5501167pzb.55.1670959768196;
-        Tue, 13 Dec 2022 11:29:28 -0800 (PST)
+        bh=sXb/rEJk2v1xayTt6fq4DLeZdX5JWv1TpuzsNKAsI7M=;
+        b=19d8AlXAXm9gpJtZa3xBPfL6SQsQUhLHclLDmW9Jdnckq/muVFYE6d7YYQmjXytd4Q
+         ysMwPrcMDf5TSCavn8omVsCFGbn9ckGBnC89Or0DJjgmOiNLtxif4ivO8eSqg3yOQsQR
+         eIsoDQOdJmmXTG94KD2Frk9a3cj9Xaw8YQIHm9VHRaK+R+S0D1s9u0hjuLRKBBKlFSCU
+         x/PmvLhB9tTFamB2dIjpaOFbn5MDiEizqWIG6hsbCP6ABF+/PjSke2JmtLBCG5E8e06O
+         V9HXdp/aZH6LqaBuiTHv+g230KKGyHp1HNjNCmdA3dZOFK57HmsCIWzqahJ4JwS2I97H
+         Bobg==
+X-Gm-Message-State: ANoB5pl2uenaJlEcTY8JK8g3u6SK6h/DN7R/jdQCZLG8xCL8oZkkGFh9
+        yifdUGneRhxUZKd6Sq8ZTmk=
+X-Google-Smtp-Source: AA0mqf4LR0w9Q2cfjZcReFSGVhRaqHyqmcRJT4oMpOm+Bbkp1P5i0Ew5juN6Qehq6v8vhXbEJ9/Biw==
+X-Received: by 2002:a05:6a00:4482:b0:576:95ec:bc93 with SMTP id cu2-20020a056a00448200b0057695ecbc93mr20756659pfb.23.1670959861145;
+        Tue, 13 Dec 2022 11:31:01 -0800 (PST)
 Received: from localhost ([2620:10d:c090:400::5:c415])
-        by smtp.gmail.com with ESMTPSA id c197-20020a624ece000000b005745788f44csm8017095pfb.124.2022.12.13.11.29.27
+        by smtp.gmail.com with ESMTPSA id i63-20020a62c142000000b00572198393c2sm7986815pfg.194.2022.12.13.11.31.00
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 13 Dec 2022 11:29:27 -0800 (PST)
+        Tue, 13 Dec 2022 11:31:00 -0800 (PST)
 Sender: Tejun Heo <htejun@gmail.com>
-Date:   Tue, 13 Dec 2022 09:29:26 -1000
+Date:   Tue, 13 Dec 2022 09:30:59 -1000
 From:   Tejun Heo <tj@kernel.org>
 To:     Waiman Long <longman@redhat.com>
 Cc:     Jens Axboe <axboe@kernel.dk>, Josef Bacik <josef@toxicpanda.com>,
@@ -61,39 +61,30 @@ Cc:     Jens Axboe <axboe@kernel.dk>, Josef Bacik <josef@toxicpanda.com>,
         cgroups@vger.kernel.org, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org, linux-mm@kvack.org,
         Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>,
-        "Dennis Zhou (Facebook)" <dennisszhou@gmail.com>,
-        Yi Zhang <yi.zhang@redhat.com>
-Subject: Re: [PATCH-block v3 1/2] bdi, blk-cgroup: Fix potential UAF of blkcg
-Message-ID: <Y5jSllwwBdmQ1jQz@slm.duckdns.org>
+        "Dennis Zhou (Facebook)" <dennisszhou@gmail.com>
+Subject: Re: [PATCH-block v3 2/2] blk-cgroup: Flush stats at blkgs
+ destruction path
+Message-ID: <Y5jS825K7ej0jEV+@slm.duckdns.org>
 References: <20221213184446.50181-1-longman@redhat.com>
- <20221213184446.50181-2-longman@redhat.com>
+ <20221213184446.50181-3-longman@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20221213184446.50181-2-longman@redhat.com>
+In-Reply-To: <20221213184446.50181-3-longman@redhat.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Dec 13, 2022 at 01:44:45PM -0500, Waiman Long wrote:
-> Commit 59b57717fff8 ("blkcg: delay blkg destruction until after
-> writeback has finished") delayed call to blkcg_destroy_blkgs() to
-> cgwb_release_workfn(). However, it is done after a css_put() of blkcg
-> which may be the final put that causes the blkcg to be freed as RCU
-> read lock isn't held.
-> 
-> Another place where blkcg_destroy_blkgs() can be called indirectly via
-> blkcg_unpin_online() is from the offline_css() function called from
-> css_killed_work_fn(). Over there, the potentially final css_put() call
-> is issued after offline_css().
-> 
-> By adding a css_tryget() into blkcg_destroy_blkgs() and warning its
-> failure, the following stack trace was produced in a test system on
-> bootup.
+On Tue, Dec 13, 2022 at 01:44:46PM -0500, Waiman Long wrote:
+> +	/*
+> +	 * Flush all the non-empty percpu lockless lists so as to release
+> +	 * the blkg references held by those lists which, in turn, may
+> +	 * allow the blkgs to be freed and release their references to
+> +	 * blkcg speeding up its freeing.
+> +	 */
 
-This doesn't agree with the code anymore. Otherwise
-
-Acked-by: Tejun Heo <tj@kernel.org>
+Can you mention the possible deadlock explicitly? This sounds more like an
+optimization.
 
 Thanks.
 
