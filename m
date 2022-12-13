@@ -2,122 +2,118 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 81B12C4332F
-	for <linux-block@archiver.kernel.org>; Tue, 13 Dec 2022 06:48:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A1254C4332F
+	for <linux-block@archiver.kernel.org>; Tue, 13 Dec 2022 07:17:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234404AbiLMGs2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 13 Dec 2022 01:48:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37772 "EHLO
+        id S234559AbiLMHRT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 13 Dec 2022 02:17:19 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46256 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233753AbiLMGs1 (ORCPT
+        with ESMTP id S233935AbiLMHRN (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 13 Dec 2022 01:48:27 -0500
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1607817E25;
-        Mon, 12 Dec 2022 22:48:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=s0r3sKZ22FIW4RvgWC+odYHiBjrvzyEHiairyKLURUw=; b=Fm6ZNDDEmC3fVLokI8VI0Gp2MS
-        Yh8D7Z85GByribjANlhRTC6B/h6YIlKrFAQHvCcVzw+9DOKKK7UkrjjRAhjdEKIZRgS7CQYm3Tcfq
-        3JCkXGKhXxCwv76phRO+ch2i56rSxizrcJN4qDcOdxwmdm3xPyT69TcMYIEzKwj+fogN1QKOXMGh9
-        qsHMLVS7x9/gMv6Lxvaq91BRXMAwjJAsw852mPRphL/7O7d+H5TiUOu7Wdx4whLSQ8Th7XMmbqGJG
-        GmsFz+lDdQxVtbjr0sBEBhEZOyKElejvc9NRU9qr5x/xNSvOgr/VlZtDqGUKm0NxBFPjO0nUhj3+y
-        KuL5dk/A==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1p4z5I-00Btcm-Bb; Tue, 13 Dec 2022 06:48:12 +0000
-Date:   Mon, 12 Dec 2022 22:48:12 -0800
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Daniel Golle <daniel@makrotopia.org>
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        Richard Weinberger <richard@nod.at>,
-        Matthew Wilcox <willy@infradead.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        Wolfram Sang <wsa+renesas@sang-engineering.com>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH 1/4] init: move block device helpers from
- init/do_mounts.c
-Message-ID: <Y5ggLBy+XBjl/vYj@infradead.org>
-References: <cover.1668644705.git.daniel@makrotopia.org>
- <e5e0ab0429b1fc8a4e3f9614d2d1cc43dea78093.1668644705.git.daniel@makrotopia.org>
- <Y3XM62P7CaeKXFsz@infradead.org>
- <Y3j+Pzy1JpqG8Yd8@makrotopia.org>
- <Y3zCdJr5dKsADsnM@infradead.org>
- <Y5NpsmN/npnG8lxY@makrotopia.org>
- <Y5buTVuu0pfqBQh+@infradead.org>
- <Y5cKSRmZ45OJq6Qq@makrotopia.org>
+        Tue, 13 Dec 2022 02:17:13 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED8C41583C
+        for <linux-block@vger.kernel.org>; Mon, 12 Dec 2022 23:16:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1670915779;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=vL1aI2CeOT2r881YEwZLig2j6p/IN/XBuBuLam0vSKY=;
+        b=ZSu8tyPcnSJwtZ2eukfpfnGvweWMAEj53M4uDNmCyyiLObaBe3qBYkZI4+WG3VZi8lQijx
+        YZJi6OPYqNuwxB7UbjMZIangFLYQ9DpVb42r7wYiB1fhARBVKtTXax73SZQAtQeXuqnPVp
+        rZMtfafFRlWtqgGUoUloSC75Ad4FMzw=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-618-DlzHVZQ8OAKMsvuoGye0rA-1; Tue, 13 Dec 2022 02:16:15 -0500
+X-MC-Unique: DlzHVZQ8OAKMsvuoGye0rA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 377BE85A588;
+        Tue, 13 Dec 2022 07:16:15 +0000 (UTC)
+Received: from localhost (ovpn-8-24.pek2.redhat.com [10.72.8.24])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 0F73953AA;
+        Tue, 13 Dec 2022 07:16:13 +0000 (UTC)
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        stable@vger.kernel.org
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Ming Lei <ming.lei@redhat.com>, Shiwei Cui <cuishw@inspur.com>,
+        Christoph Hellwig <hch@lst.de>, Jan Kara <jack@suse.cz>
+Subject: [PATCH stable 5.4.y/4.19.y] block: unhash blkdev part inode when the part is deleted
+Date:   Tue, 13 Dec 2022 15:16:03 +0800
+Message-Id: <20221213071603.1197703-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Y5cKSRmZ45OJq6Qq@makrotopia.org>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.5
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Dec 12, 2022 at 11:02:33AM +0000, Daniel Golle wrote:
-> The thing is that there isn't anything extraordinarily complex here,
-> just dynamically partitioning a block device based on a well-known
-> format.
+v5.11 changes the blkdev lookup mechanism completely since commit
+22ae8ce8b892 ("block: simplify bdev/disk lookup in blkdev_get"),
+and small part of the change is to unhash part bdev inode when
+deleting partition. Turns out this kind of change does fix one
+nasty issue in case of BLOCK_EXT_MAJOR:
 
-Yes, but a completely non-standard format that nests inside an
-partition.
+1) when one partition is deleted & closed, disk_put_part() is always
+called before bdput(bdev), see blkdev_put(); so the part's devt can
+be freed & re-used before the inode is dropped
 
-> Using initramfs implies that we would need a 2nd copy of the standard C
-> library and libfdt, both alone will already occupy more than just a
-> single 64kB block of flash.
+2) then new partition with same devt can be created just before the
+inode in 1) is dropped, then the old inode/bdev structurein 1) is
+re-used for this new partition, this way causes use-after-free and
+kernel panic.
 
-Why do you need libfdt?  And with a simple statically linked kpartx
-you won't pull in much of libc either.
+It isn't possible to backport the whole big patchset of "merge struct
+block_device and struct hd_struct v4" for addressing this issue.
 
-> I understand that from the point of view of
-> classic x86 servers or even embedded devices with eMMC this seems
-> negligible. However, keep in mind that a huge number of existing
-> devices and also new designs of embedded devices often boot from just a
-> few megabytes of NOR flash, and there every byte counts.
+https://lore.kernel.org/linux-block/20201128161510.347752-1-hch@lst.de/
 
-So I've worked quite a bit on really small deeply embedded systems,
-and for those I wouldn't even think of using strange image formats
-or the rather wasteful GPT partition format.
-There we wouldn't dare to use paritions or weird image formats, but
+So fixes it by unhashing part bdev in delete_partition(), and this way
+is actually aligned with v5.11+'s behavior.
 
-> > What is the point of the uImage.FIT?
-> 
-> It is the format used by Das U-Boot, which is by far the most common
-> bootloader found on small embedded devices running Linux.
-> Is is already used by Das U-Boot to validate and load kernel,
-> devicetree, initramfs, ... to RAM before launching Linux.
-> I've included a link to the documentation[1] which gives insights
-> regarding the motivation to create such a format.
+Backported from the following 5.10.y commit:
 
-That doesn't explain why you'd want to use it.  Nor how people
-came up with it.
+5f2f77560591 ("block: unhash blkdev part inode when the part is deleted")
 
-> In fact, that's only one out of three possible uses in which parsing
-> the contained sub-image boundaries can be useful:
->  * On devices with NOR flash uImage.FIT is stored in an MTD partition,
->    hence the uImage.FIT partition parser (or small stackable block
->    driver) would then operate on top of /dev/mtdblockX.
-> 
->  * On devices with NAND flash uImage.FIT is stored in a UBI volume,
->    hence in this case /dev/ubiblockX needs to be processed.
+Reported-by: Shiwei Cui <cuishw@inspur.com>
+Tested-by: Shiwei Cui <cuishw@inspur.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Jan Kara <jack@suse.cz>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ block/partition-generic.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-And all the mtdblock / ubiblock is due to the lack of a native
-mtd/ubi backend for squashfs?  Why can't we take the block layer
-out of the loop entirely?
-
-> I hope this explains my motivation. Please ask should there by any
-> doubts or if any of my explainations above are not clear.
-
-None of this explains the silly nesting inside the GPT partition.
-It is not needed for the any use cases and the root probem here.
-Without that you could simply implement a parition format, with that
-you get into crazy nesting behavior.  Note that it would have
-any benefit over just not doing this silly image.
-
-Maybe someone just needs to go back and come up wit ha scheme that
-actually works and implement that in uboot as well.
+diff --git a/block/partition-generic.c b/block/partition-generic.c
+index aee643ce13d1..e69452c1f5ad 100644
+--- a/block/partition-generic.c
++++ b/block/partition-generic.c
+@@ -272,6 +272,7 @@ void delete_partition(struct gendisk *disk, int partno)
+ 	struct disk_part_tbl *ptbl =
+ 		rcu_dereference_protected(disk->part_tbl, 1);
+ 	struct hd_struct *part;
++	struct block_device *bdev;
+ 
+ 	if (partno >= ptbl->len)
+ 		return;
+@@ -292,6 +293,12 @@ void delete_partition(struct gendisk *disk, int partno)
+ 	 * "in-use" until we really free the gendisk.
+ 	 */
+ 	blk_invalidate_devt(part_devt(part));
++
++	bdev = bdget(part_devt(part));
++	if (bdev) {
++		remove_inode_hash(bdev->bd_inode);
++		bdput(bdev);
++	}
+ 	hd_struct_kill(part);
+ }
+ 
+-- 
+2.38.1
 
