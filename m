@@ -2,104 +2,87 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF5CFC4332F
-	for <linux-block@archiver.kernel.org>; Tue, 13 Dec 2022 12:08:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA7B8C04FDE
+	for <linux-block@archiver.kernel.org>; Tue, 13 Dec 2022 12:29:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235172AbiLMMIe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 13 Dec 2022 07:08:34 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58612 "EHLO
+        id S234568AbiLMM3E (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 13 Dec 2022 07:29:04 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42026 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234987AbiLMMIe (ORCPT
+        with ESMTP id S235674AbiLMM3D (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 13 Dec 2022 07:08:34 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2714314D19;
-        Tue, 13 Dec 2022 04:08:33 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id CAF41B81184;
-        Tue, 13 Dec 2022 12:08:31 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A6CCAC433D2;
-        Tue, 13 Dec 2022 12:08:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1670933310;
-        bh=1tNxadmfkO3wj3an2rLdn3PtureG9sBU9F7brxxdtrU=;
-        h=From:To:Cc:Subject:Date:From;
-        b=rFY4pyCHiVD7KgWofs2wsmFjqM4rL08Dplh3GbhT9v7DJqVBDyvjDzATa8bB6cib3
-         S3+6iIZgeD1l684fNA0IHiBdi1TiF2dNj+prfU+U9kdA9nwWyZksd38HhAfwi7pJd/
-         VP+paDps1N+Ojb/Q00qQPFRgGYNuNvbl5ilUwZtRZmc9T58WWMU3JEKoZYXADkMKKM
-         9QW7KHZe4k34GlxbCG/Do/pExBrOJGlck9Cpmk5EkAYO3U3FPWNtcRJZoMQk2ciJ55
-         iBKv69j6Ra/XaMe2t5KQiKS/Nx5p9iVksp2zkaPBlqaBJlRGHupKNUe8wqAjYb6Kmv
-         dIiOkw7waa/Dw==
-From:   "Jiri Slaby (SUSE)" <jirislaby@kernel.org>
-To:     Tejun Heo <tj@kernel.org>
-Cc:     linux-kernel@vger.kernel.org,
-        "Jiri Slaby (SUSE)" <jirislaby@kernel.org>,
-        Martin Liska <mliska@suse.cz>,
-        Josef Bacik <josef@toxicpanda.com>,
-        Jens Axboe <axboe@kernel.dk>, cgroups@vger.kernel.org,
-        linux-block@vger.kernel.org
-Subject: [PATCH v3] block/blk-iocost (gcc13): keep large values in a new enum
-Date:   Tue, 13 Dec 2022 13:08:26 +0100
-Message-Id: <20221213120826.17446-1-jirislaby@kernel.org>
-X-Mailer: git-send-email 2.39.0
+        Tue, 13 Dec 2022 07:29:03 -0500
+X-Greylist: delayed 905 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 13 Dec 2022 04:29:00 PST
+Received: from smtp.tiscali.it (santino-notr.mail.tiscali.it [213.205.33.215])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 828C514004
+        for <linux-block@vger.kernel.org>; Tue, 13 Dec 2022 04:28:59 -0800 (PST)
+Received: from [192.168.178.50] ([87.15.83.83])
+        by santino.mail.tiscali.it with 
+        id voDn2802s1ns05j01oDoMD; Tue, 13 Dec 2022 12:13:52 +0000
+x-auth-user: fantonifabio@tiscali.it
+Message-ID: <e42dd6c7-6365-75be-0fcd-3329b8f8ba35@tiscali.it>
+Date:   Tue, 13 Dec 2022 13:13:45 +0100
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.5.1
+Reply-To: fantonifabio@tiscali.it
+Subject: Re: [PATCH v2 03/21] documentation, capability: fix Generic Block
+ Device Capability
+To:     Sergei Shtepa <sergei.shtepa@veeam.com>, axboe@kernel.dk,
+        corbet@lwn.net
+Cc:     linux-block@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20221209142331.26395-1-sergei.shtepa@veeam.com>
+ <20221209142331.26395-4-sergei.shtepa@veeam.com>
+From:   Fabio Fantoni <fantonifabio@tiscali.it>
+In-Reply-To: <20221209142331.26395-4-sergei.shtepa@veeam.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-Antivirus: Avast (VPS 221213-0, 13/12/2022), Outbound message
+X-Antivirus-Status: Clean
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tiscali.it; s=smtp;
+        t=1670933632; bh=zUNL1AzJb7Uzdlx47B9/0o8wRh3Bhbs6NWEEPysoQb8=;
+        h=Date:Reply-To:Subject:To:Cc:References:From:In-Reply-To;
+        b=eQh/KfFfLAjfYWZWcanbu/k/4syXDE+y1hNr1/pJi0yo36II7H7RgDvQezdqNDhE0
+         GqDtTrjW5QHyB8nEXv7G/33M+fBM3o90+kqHKU6pA763b1hnCOS7kj4bkY/BIv4AvZ
+         uFTevywFPyDhLQ9vzpRyVYCus6H9XNfbR7Es0d+s=
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Since gcc13, each member of an enum has the same type as the enum [1]. And
-that is inherited from its members. Provided:
-  VTIME_PER_SEC_SHIFT     = 37,
-  VTIME_PER_SEC           = 1LLU << VTIME_PER_SEC_SHIFT,
-  ...
-  AUTOP_CYCLE_NSEC        = 10LLU * NSEC_PER_SEC,
-the named type is unsigned long.
+Il 09/12/2022 15:23, Sergei Shtepa ha scritto:
+> When adding documentation for blkfilter, new lines of documentation
+> appeared in the file include/linux/blkdev.h. To preserve the appearance
+> of this document, the required sections and function descriptions were
+> explicitly specified.
+>
+> Signed-off-by: Sergei Shtepa <sergei.shtepa@veeam.com>
+> ---
+>   Documentation/block/capability.rst | 3 +++
+>   1 file changed, 3 insertions(+)
+>
+> diff --git a/Documentation/block/capability.rst b/Documentation/block/capability.rst
+> index 2ae7f064736a..8fad791980bb 100644
+> --- a/Documentation/block/capability.rst
+> +++ b/Documentation/block/capability.rst
+> @@ -8,3 +8,6 @@ This file documents the sysfs file ``block/<disk>/capability``.
+>   capabilities a specific block device supports:
+>   
+>   .. kernel-doc:: include/linux/blkdev.h
+> +	:DOC: genhd capability flags
+> +.. kernel-doc:: include/linux/blkdev.h
+> +	:functions: disk_openers blk_alloc_disk bio_end_io_acct
+Thanks for spotting this, I think this is not related to blkfilter patch 
+but was already wrong/broken before and should be posted in a single 
+patch out of the blksnap serie (also fixing title, as reported by Bagas 
+Sanjaya, like "documentation: fix Generic Block Device Capability")
 
-This generates warnings with gcc-13:
-  block/blk-iocost.c: In function 'ioc_weight_prfill':
-  block/blk-iocost.c:3037:37: error: format '%u' expects argument of type 'unsigned int', but argument 4 has type 'long unsigned int'
+from a fast look seems to me should have only:
 
-  block/blk-iocost.c: In function 'ioc_weight_show':
-  block/blk-iocost.c:3047:34: error: format '%u' expects argument of type 'unsigned int', but argument 3 has type 'long unsigned int'
++    :DOC: genhd capability flags
 
-So split the anonumois enum with large values to a separate enum, so
-that they don't affect other members.
-
-[1] https://gcc.gnu.org/bugzilla/show_bug.cgi?id=36113
-
-Cc: Martin Liska <mliska@suse.cz>
-Cc: Tejun Heo <tj@kernel.org>
-Cc: Josef Bacik <josef@toxicpanda.com>
-Cc: Jens Axboe <axboe@kernel.dk>
-Cc: cgroups@vger.kernel.org
-Cc: linux-block@vger.kernel.org
-Signed-off-by: Jiri Slaby (SUSE) <jirislaby@kernel.org>
----
-
-Notes:
-    [v3] move more to a new enum (effectively split the enums)
-    [v2] move to a new enum
-
- block/blk-iocost.c | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/block/blk-iocost.c b/block/blk-iocost.c
-index d1bdc12deaa7..549ddc9e0c6f 100644
---- a/block/blk-iocost.c
-+++ b/block/blk-iocost.c
-@@ -232,7 +232,9 @@ enum {
- 
- 	/* 1/64k is granular enough and can easily be handled w/ u32 */
- 	WEIGHT_ONE		= 1 << 16,
-+};
- 
-+enum {
- 	/*
- 	 * As vtime is used to calculate the cost of each IO, it needs to
- 	 * be fairly high precision.  For example, it should be able to
--- 
-2.39.0
-
+and out of that looking older version of doc 
+(https://www.kernel.org/doc/html/v5.10/block/capability.html) seems to 
+me that this DOC in blkdev.h need improvement as it seems to me it was 
+better in the past, for example also reporting the corresponding 
+hexadecimal value in parentheses
