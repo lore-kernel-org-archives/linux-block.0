@@ -2,50 +2,50 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A1254C4332F
-	for <linux-block@archiver.kernel.org>; Tue, 13 Dec 2022 07:17:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E86AC4332F
+	for <linux-block@archiver.kernel.org>; Tue, 13 Dec 2022 07:17:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234559AbiLMHRT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 13 Dec 2022 02:17:19 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46256 "EHLO
+        id S229832AbiLMHRf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 13 Dec 2022 02:17:35 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46322 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233935AbiLMHRN (ORCPT
+        with ESMTP id S233753AbiLMHRe (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 13 Dec 2022 02:17:13 -0500
+        Tue, 13 Dec 2022 02:17:34 -0500
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED8C41583C
-        for <linux-block@vger.kernel.org>; Mon, 12 Dec 2022 23:16:19 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6E3841648E
+        for <linux-block@vger.kernel.org>; Mon, 12 Dec 2022 23:16:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1670915779;
+        s=mimecast20190719; t=1670915798;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding;
-        bh=vL1aI2CeOT2r881YEwZLig2j6p/IN/XBuBuLam0vSKY=;
-        b=ZSu8tyPcnSJwtZ2eukfpfnGvweWMAEj53M4uDNmCyyiLObaBe3qBYkZI4+WG3VZi8lQijx
-        YZJi6OPYqNuwxB7UbjMZIangFLYQ9DpVb42r7wYiB1fhARBVKtTXax73SZQAtQeXuqnPVp
-        rZMtfafFRlWtqgGUoUloSC75Ad4FMzw=
+        bh=HV6bZfiLV8FEntMPcSpg1BWvo05nmE6Um9ZxfDdt4QQ=;
+        b=HI0+wfvVhaC0uSAwCRJemTlW+Xjv6qxaB4Giu2aVX4ptLZZpJUu49lJmDFyFY0irpRUR8Q
+        M0PJ7NOe8ck6vilY4CGajtHlL/FKZ3qXrl87si7Yr92dehJ/fvUljrB3r+/WvtdP4Bw9RO
+        IlMsXc5G2agscGNEAsPDlYftcWQvCdY=
 Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
  [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-618-DlzHVZQ8OAKMsvuoGye0rA-1; Tue, 13 Dec 2022 02:16:15 -0500
-X-MC-Unique: DlzHVZQ8OAKMsvuoGye0rA-1
+ us-mta-670-xG4PYZB1PAmkbh9PXCloMQ-1; Tue, 13 Dec 2022 02:16:33 -0500
+X-MC-Unique: xG4PYZB1PAmkbh9PXCloMQ-1
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 377BE85A588;
-        Tue, 13 Dec 2022 07:16:15 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E1CB386C14D;
+        Tue, 13 Dec 2022 07:16:32 +0000 (UTC)
 Received: from localhost (ovpn-8-24.pek2.redhat.com [10.72.8.24])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 0F73953AA;
-        Tue, 13 Dec 2022 07:16:13 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 172FC51E5;
+        Tue, 13 Dec 2022 07:16:31 +0000 (UTC)
 From:   Ming Lei <ming.lei@redhat.com>
 To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         stable@vger.kernel.org
 Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
         Ming Lei <ming.lei@redhat.com>, Shiwei Cui <cuishw@inspur.com>,
         Christoph Hellwig <hch@lst.de>, Jan Kara <jack@suse.cz>
-Subject: [PATCH stable 5.4.y/4.19.y] block: unhash blkdev part inode when the part is deleted
-Date:   Tue, 13 Dec 2022 15:16:03 +0800
-Message-Id: <20221213071603.1197703-1-ming.lei@redhat.com>
+Subject: [PATCH stable 4.14.y] block: unhash blkdev part inode when the part is deleted
+Date:   Tue, 13 Dec 2022 15:16:27 +0800
+Message-Id: <20221213071627.1197786-1-ming.lei@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.1 on 10.11.54.5
@@ -86,14 +86,14 @@ Cc: Christoph Hellwig <hch@lst.de>
 Cc: Jan Kara <jack@suse.cz>
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- block/partition-generic.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+ block/partition-generic.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
 diff --git a/block/partition-generic.c b/block/partition-generic.c
-index aee643ce13d1..e69452c1f5ad 100644
+index db57cced9b98..68bd04d044b9 100644
 --- a/block/partition-generic.c
 +++ b/block/partition-generic.c
-@@ -272,6 +272,7 @@ void delete_partition(struct gendisk *disk, int partno)
+@@ -270,6 +270,7 @@ void delete_partition(struct gendisk *disk, int partno)
  	struct disk_part_tbl *ptbl =
  		rcu_dereference_protected(disk->part_tbl, 1);
  	struct hd_struct *part;
@@ -101,11 +101,10 @@ index aee643ce13d1..e69452c1f5ad 100644
  
  	if (partno >= ptbl->len)
  		return;
-@@ -292,6 +293,12 @@ void delete_partition(struct gendisk *disk, int partno)
- 	 * "in-use" until we really free the gendisk.
- 	 */
- 	blk_invalidate_devt(part_devt(part));
-+
+@@ -283,6 +284,11 @@ void delete_partition(struct gendisk *disk, int partno)
+ 	kobject_put(part->holder_dir);
+ 	device_del(part_to_dev(part));
+ 
 +	bdev = bdget(part_devt(part));
 +	if (bdev) {
 +		remove_inode_hash(bdev->bd_inode);
