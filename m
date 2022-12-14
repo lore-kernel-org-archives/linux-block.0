@@ -2,78 +2,109 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46A16C4332F
-	for <linux-block@archiver.kernel.org>; Wed, 14 Dec 2022 03:15:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 75B11C4332F
+	for <linux-block@archiver.kernel.org>; Wed, 14 Dec 2022 04:03:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237299AbiLNDPS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 13 Dec 2022 22:15:18 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58388 "EHLO
+        id S237384AbiLNEDI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 13 Dec 2022 23:03:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48802 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237306AbiLNDO4 (ORCPT
+        with ESMTP id S237676AbiLNEDB (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 13 Dec 2022 22:14:56 -0500
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4EEFF27CE7;
-        Tue, 13 Dec 2022 19:14:54 -0800 (PST)
-Received: from mail02.huawei.com (unknown [172.30.67.153])
-        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4NX0pc4PxHz4f3mLK;
-        Wed, 14 Dec 2022 11:14:48 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-        by APP4 (Coremail) with SMTP id gCh0CgCXu9iqP5ljK07JCA--.27794S3;
-        Wed, 14 Dec 2022 11:14:51 +0800 (CST)
-Subject: Re: [PATCH 0/2] block, bfq: minor cleanups
-To:     Jan Kara <jack@suse.cz>, paolo.valente@linaro.org, axboe@kernel.dk,
-        tj@kernel.org, josef@toxicpanda.com
-Cc:     linux-block@vger.kernel.org, cgroups@vger.kernel.org,
-        linux-kernel@vger.kernel.org, yi.zhang@huawei.com,
-        "yukuai (C)" <yukuai3@huawei.com>
-References: <20221214033155.3455754-1-yukuai1@huaweicloud.com>
-From:   Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <79d587ef-66c3-e84d-0904-41da2c8e7146@huaweicloud.com>
-Date:   Wed, 14 Dec 2022 11:14:49 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        Tue, 13 Dec 2022 23:03:01 -0500
+Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D722027165
+        for <linux-block@vger.kernel.org>; Tue, 13 Dec 2022 20:02:58 -0800 (PST)
+Received: by mail-pl1-x62d.google.com with SMTP id l10so2066853plb.8
+        for <linux-block@vger.kernel.org>; Tue, 13 Dec 2022 20:02:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance-com.20210112.gappssmtp.com; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/fCrMB9cQt2MX8YzEWi0sGLkBMAE2dTTyW94AFZn9pA=;
+        b=fgjO1qQIwaV1ipZKA8klXdP4Ve8zlCH05WM04DBeAuVhT2gV0/NDQjwzHWxvy6vjoo
+         Z8Wpdy4M8ga+fRK0sYnPreKKUxfL63DTSNOd+GnpDA5wFIEeY2UZ6ZizffNy5TSem3fD
+         OASi7zyrHG3s4Cefq1ZVxzjAlDEwOJdGHqEyh+ePjyV/tbXz8S0ksLLjPOSMBw+VUGLc
+         h6l+EOVvIc7rBKKXCwQ0L0ko7MdR1a95ECuIGMulh2iJaSWH0s7Fjmc9D+aOWAorlGYa
+         11LUxOEneebX67UHldEWM+Vgc3beULPdhg7ncK0q2+MFuQACLqTCu2dc15pdEWPK5h2K
+         FgzQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=/fCrMB9cQt2MX8YzEWi0sGLkBMAE2dTTyW94AFZn9pA=;
+        b=qURgR5ROH9X6Dl6uSDTEf7cowYxHqNl66WUGQqyI0MvO+Y5NykbvlDOOJnZf4cSVsP
+         qwjn9qoibixeLav6XJyToUPx0tAjf/mFMC+HHJEfLxetuEZYP45v/ULhbcoiNox2hhJo
+         UYAdTKdoIk0S8mJWDg5XGipPv+MLtPkqjd2AIqnHW1MJj9BoS+UeLWWd0JlF50Ep1iz4
+         ExYvUZvsOVPHV/u4yiUIUT5ZKR7hzH9t7XlnniO/ZcdvTusJvi925tDNnWaN/vYXwvGE
+         ITyjafh60rH+hNXIbz3PZgR4qs6Cbum17j0nCHJqCFSA+SVIVx06qTSQcERHgib9+2Lj
+         tVsA==
+X-Gm-Message-State: ANoB5plh4HLkqvMdHb3ocBvjz106zs9xMzG+Xk+SdT1Rq+X0OGeNFqVA
+        lHwdIzOPwFGHDue/ktNM0Gy5ySWI6lOTBePv
+X-Google-Smtp-Source: AA0mqf4eQdsVDxhyLdxJPM3HETuo0Ym+0gSGYwMuYtLjp51oYGKdeufiEWmH06tCm5OiFbgvmqG6Sg==
+X-Received: by 2002:a17:902:a502:b0:186:7a6b:24d9 with SMTP id s2-20020a170902a50200b001867a6b24d9mr21682666plq.23.1670990578230;
+        Tue, 13 Dec 2022 20:02:58 -0800 (PST)
+Received: from [10.5.231.247] ([139.177.225.227])
+        by smtp.gmail.com with ESMTPSA id s15-20020a170902b18f00b00189393ab02csm675922plr.99.2022.12.13.20.02.55
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 13 Dec 2022 20:02:57 -0800 (PST)
+Message-ID: <1e53592f-b1f1-df85-3edb-eba4c5a5f989@bytedance.com>
+Date:   Wed, 14 Dec 2022 12:02:53 +0800
 MIME-Version: 1.0
-In-Reply-To: <20221214033155.3455754-1-yukuai1@huaweicloud.com>
-Content-Type: text/plain; charset=gbk; format=flowed
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.13.0
+Subject: Re: [External] Re: [RFC PATCH] blk-throtl: Introduce sync queue for
+ write ios
+To:     Tejun Heo <tj@kernel.org>
+Cc:     josef@toxicpanda.com, axboe@kernel.dk, cgroups@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20221206163826.10700-1-hanjinke.666@bytedance.com>
+ <Y5et48VryiKgL/eD@slm.duckdns.org>
+From:   hanjinke <hanjinke.666@bytedance.com>
+In-Reply-To: <Y5et48VryiKgL/eD@slm.duckdns.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgCXu9iqP5ljK07JCA--.27794S3
-X-Coremail-Antispam: 1UD129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7v73
-        VFW2AGmfu7bjvjm3AaLaJ3UjIYCTnIWjp_UUUY47kC6x804xWl14x267AKxVW8JVW5JwAF
-        c2x0x2IEx4CE42xK8VAvwI8IcIk0rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII
-        0Yj41l84x0c7CEw4AK67xGY2AK021l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xv
-        wVC0I7IYx2IY6xkF7I0E14v26F4UJVW0owA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7
-        xvwVC2z280aVCY1x0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40E
-        FcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr
-        0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI48JM4IIrI8v6xkF7I0E8cxan2IY
-        04v7Mxk0xIA0c2IEe2xFo4CEbIxvr21l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7
-        v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF
-        1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIx
-        AIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVW3JVWrJr1l
-        IxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvf
-        C2KfnxnUUI43ZEXa7IU1zuWJUUUUU==
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
-X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi, Jan
 
-Sorry that I forgot to cc you.
 
-Thanks,
-Kuai
-
-ÔÚ 2022/12/14 11:31, Yu Kuai Ð´µÀ:
-> From: Yu Kuai <yukuai3@huawei.com>
+åœ¨ 2022/12/13 ä¸Šåˆ6:40, Tejun Heo å†™é“:
+> On Wed, Dec 07, 2022 at 12:38:26AM +0800, Jinke Han wrote:
+>> From: Jinke Han <hanjinke.666@bytedance.com>
+>>
+>> Now we don't distinguish sync write ios from normal buffer write ios
+>> in blk-throtl. A bio with REQ_SYNC tagged always mean it will be wait
+>> until write completion soon after it submit. So it's reasonable for sync
+>> io to complete as soon as possible.
+>>
+>> In our test, fio writes a 100g file in sequential 4k blocksize in
+>> a container with low bps limit configured (wbps=10M). More than 1200
+>> ios were throttled in blk-throtl queue and the avarage throtle time
+>> of each io is 140s. At the same time, the operation of saving a small
+>> file by vim will be blocked amolst 140s. As a fsync will be send by vim,
+>> the sync ios of fsync will be blocked by a huge amount of buffer write
+>> ios ahead. This is also a priority inversion problem within one cgroup.
+>> In the database scene, things got really bad with blk-throtle enabled
+>> as fsync is called very often.
+>>
+>> This patch introduces a independent sync queue for write ios and gives
+>> a huge priority to sync write ios. I think it's a nice respond to the
+>> semantics of REQ_SYNC. Bios with REQ_META and REQ_PRIO gains the same
+>> priority as they are important to fs. This may avoid some potential
+>> priority inversion problems.
 > 
-> Yu Kuai (2):
->    block, bfq: don't return bfqg from __bfq_bic_change_cgroup()
->    block, bfq: replace 0/1 with false/true in bic apis
+> I think the idea makes sense but wonder whether the implementation would be
+> cleaner / simpler if the sq->queued[] are indexed by SYNC, ASYNC and the
+> sync writes are queued in the sync queue together with reads.
 > 
->   block/bfq-cgroup.c  | 16 +++++++---------
->   block/bfq-iosched.c |  4 ++--
->   2 files changed, 9 insertions(+), 11 deletions(-)
+> Thanks.
 > 
+Should we keep the main category of io based READ and WRITE, and within 
+READ / WRITE the subcategory were SYNC and ASYNC ? This may give less 
+intrusion into existing frameworks.
 
+Thanks.
