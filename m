@@ -2,67 +2,66 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DEC8C4167B
-	for <linux-block@archiver.kernel.org>; Wed, 14 Dec 2022 17:55:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 74129C4167B
+	for <linux-block@archiver.kernel.org>; Wed, 14 Dec 2022 19:43:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237958AbiLNRzk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 14 Dec 2022 12:55:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59448 "EHLO
+        id S238917AbiLNTnc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 14 Dec 2022 14:43:32 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51616 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237720AbiLNRzi (ORCPT
+        with ESMTP id S238888AbiLNTnb (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 14 Dec 2022 12:55:38 -0500
-Received: from mail-il1-x135.google.com (mail-il1-x135.google.com [IPv6:2607:f8b0:4864:20::135])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC0A9F23
-        for <linux-block@vger.kernel.org>; Wed, 14 Dec 2022 09:55:36 -0800 (PST)
-Received: by mail-il1-x135.google.com with SMTP id m15so6926656ilq.2
-        for <linux-block@vger.kernel.org>; Wed, 14 Dec 2022 09:55:36 -0800 (PST)
+        Wed, 14 Dec 2022 14:43:31 -0500
+Received: from mail-il1-x12b.google.com (mail-il1-x12b.google.com [IPv6:2607:f8b0:4864:20::12b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB3C42A700
+        for <linux-block@vger.kernel.org>; Wed, 14 Dec 2022 11:43:29 -0800 (PST)
+Received: by mail-il1-x12b.google.com with SMTP id o13so7071106ilc.7
+        for <linux-block@vger.kernel.org>; Wed, 14 Dec 2022 11:43:29 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20210112.gappssmtp.com; s=20210112;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=/5mupyHph60zW1pBiVb4mDSMN7RkjMG8EJ9nxvuoQ3I=;
-        b=DxoQG/CUV6j/eIQ4DQf2r1048BkXOzql3x5HEv6/SDQxco/uInwIFwDzawZcJUoOzy
-         TOCCZICRMLVJhEbwcoApINifHZj1o2D0vyNykiZnyCOu28d3h5PPggPaTE8DXd2SlHVY
-         2ew+bj54yDuwubo8nIw47UKWkPc6BGTDH6LpFjdl0P6nPg2ALs2YUaSbrpHKwRLETY1i
-         b6hO9fAnJku0IUECOSVyXmNX8pUp6cV+UeJMTRODX7/toSNJUVl6b3nyqFVC8eRkGa3b
-         q7aiwYKifPun/jZLJhZYSZYvWte9uhGf2jRtVjAOH54qw84YqN3lo0oDf2z08JdFElTo
-         8mxA==
+        bh=2Mo0zxBwzxFipCiGCCwccoKGO7YvtvSURarcs0pMhQI=;
+        b=lvENkja2zLcChQJAHLDCQQqh3zlQH8Dsoq55tTl87sB+2c0MjiwdB7LOF6vWIz22Fu
+         eCICg9Fj6TfwXA8yG7XYMiaf2z12/uwOtxGbirrVMlhelM9zsuZSiJc0fsCQcVkxIqWi
+         RQd2jNWuTv9nWpvqSBjTE6mk9xX/4Ih+TD6DNwKiit6DgH/l7Dbq4AiiFcND0y8/5zYZ
+         HcmI74WEhjBHTUZjZl0MFiaX3CzA+Q2HPYKOJGeQA+jYIBNJZTtivM8BtmFfUwTiLPqK
+         ov7lyv5b6U8d6dtzpDcDCl9w8rm+uTR3Js1B0DGhRtqpJZkWRzUSkxytnCYJqyMhzm2G
+         G9Cg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=/5mupyHph60zW1pBiVb4mDSMN7RkjMG8EJ9nxvuoQ3I=;
-        b=L8KCl7Qsor1pbJcc8MQ1A9zFSGwgVTgVwUCoiZcQ74JMGv7ecPalHZYObfg1aydXAO
-         C8YyySwaQyY5OhuEkIH6SAYQYGjkRKqw6d2tRjUWTWF5sEH1Jr/NYSpt/4bSMIK0lqXw
-         L9R/NUkCguMJCeRqHiRwXOPuIEo15n/bOZorw/U4dflnfWWShhq7glIg+o+F7sYvXs6q
-         BB9QhiBcJ9afbKYra/kkOU9yArUGHvob4ZyL9+fgys6tja7W1u4u8TgXM1TDGh5fCfNC
-         XRUA8ecZ6msWuqmqbafdYlrcI0Kgl5A1TXxCFOPbr2mmOr0awPUnI0Pj8SW5WEIpsGE8
-         TyZw==
-X-Gm-Message-State: ANoB5pnMY6mkNKhOupIifFdHBvFoIpuWdhYrYcrT2w37wsw6ZkyLF0mY
-        Xg0q5dQJxymYpXmzwnN+yoReOg==
-X-Google-Smtp-Source: AA0mqf65/Kf9O9EnNDER/ZDoDPXWd03V7lAqgfPJL2N4119ThlOL/HDlJIORW0PhNwXDQJGWscBDHw==
-X-Received: by 2002:a92:dc83:0:b0:302:42c9:8f2f with SMTP id c3-20020a92dc83000000b0030242c98f2fmr2516110iln.1.1671040536091;
-        Wed, 14 Dec 2022 09:55:36 -0800 (PST)
+        bh=2Mo0zxBwzxFipCiGCCwccoKGO7YvtvSURarcs0pMhQI=;
+        b=tuE8Y5ACoSJ699jbXNWmbSXINeQAWXXl8qKERg37U7ikNrGOA8f89XAdGZnA33kLBF
+         q5aAJlBFRt5IzSIz/d18IrxHWEJcV/O8X/0aC31vD6bF5Buld53lQVPgkDdTXXjbxj6r
+         Xa5ufhKsjOuF9UNMsD43+5yGJKke1HTJCkrsCr884/XHiZJYUqG+juosnfdYGMjUahb6
+         CEPr4LVWX/8E4ZfDU7NMrzKLBzP0V1+VDzkHkQ476QhV5VaPtTGWdEh4eO4HC+vQ/med
+         yxxlM8jAlXwIFkYn3F/i6vjjpFTe8OA023O3V0IDWAQ5QQ5EDo3epLPktQW9K+b5IIu7
+         j7cQ==
+X-Gm-Message-State: ANoB5pluAgwl1ynj7te4tzvpu+SbnJzInYMKvufX14Qnw1Iy2fPQc2Ok
+        +k4rWcF5HFBZpB8WmCdoblRxsg==
+X-Google-Smtp-Source: AA0mqf6WKbG+uIycnikl1gYVo8MJ2Ro9/CeBqRYhcftKzrxuMs24gD/X3ikbzVraxdgzchJF9GRhRA==
+X-Received: by 2002:a05:6e02:1a27:b0:304:b2dc:4274 with SMTP id g7-20020a056e021a2700b00304b2dc4274mr2666051ile.3.1671047009066;
+        Wed, 14 Dec 2022 11:43:29 -0800 (PST)
 Received: from [127.0.0.1] ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id x5-20020a92dc45000000b002eb1137a774sm2364958ilq.59.2022.12.14.09.55.35
+        by smtp.gmail.com with ESMTPSA id u11-20020a02b1cb000000b0038a5b48f3d4sm1980125jah.3.2022.12.14.11.43.28
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 14 Dec 2022 09:55:35 -0800 (PST)
+        Wed, 14 Dec 2022 11:43:28 -0800 (PST)
 From:   Jens Axboe <axboe@kernel.dk>
-To:     Andrew Morton <akpm@linux-foundation.org>,
-        Ken Chen <kenchen@google.com>,
-        "Isaac J. Manjarres" <isaacmanjarres@google.com>
-Cc:     Saravana Kannan <saravanak@google.com>, stable@vger.kernel.org,
-        kernel-team@android.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-In-Reply-To: <20221208212902.765781-1-isaacmanjarres@google.com>
-References: <20221208212902.765781-1-isaacmanjarres@google.com>
-Subject: Re: [PATCH RESEND v1] loop: Fix the max_loop commandline argument
- treatment when it is set to 0
-Message-Id: <167104053516.12018.3829902997304947122.b4-ty@kernel.dk>
-Date:   Wed, 14 Dec 2022 10:55:35 -0700
+To:     Tejun Heo <tj@kernel.org>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        darklight2357@icloud.com, Josef Bacik <josef@toxicpanda.com>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        cgroups@vger.kernel.org
+In-Reply-To: <Y5TQ5gm3O4HXrXR3@slm.duckdns.org>
+References: <Y5TQ5gm3O4HXrXR3@slm.duckdns.org>
+Subject: Re: (subset) [PATCH 1/2 block/for-6.2] blk-iolatency: Fix memory leak
+ on add_disk() failures
+Message-Id: <167104700802.18171.11122547200509229739.b4-ty@kernel.dk>
+Date:   Wed, 14 Dec 2022 12:43:28 -0700
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
@@ -72,23 +71,25 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 
-On Thu, 08 Dec 2022 13:29:01 -0800, Isaac J. Manjarres wrote:
-> Currently, the max_loop commandline argument can be used to specify how
-> many loop block devices are created at init time. If it is not
-> specified on the commandline, CONFIG_BLK_DEV_LOOP_MIN_COUNT loop block
-> devices will be created.
+On Sat, 10 Dec 2022 08:33:10 -1000, Tejun Heo wrote:
+> When a gendisk is successfully initialized but add_disk() fails such as when
+> a loop device has invalid number of minor device numbers specified,
+> blkcg_init_disk() is called during init and then blkcg_exit_disk() during
+> error handling. Unfortunately, iolatency gets initialized in the former but
+> doesn't get cleaned up in the latter.
 > 
-> The max_loop commandline argument can be used to override the value of
-> CONFIG_BLK_DEV_LOOP_MIN_COUNT. However, when max_loop is set to 0
-> through the commandline, the current logic treats it as if it had not
-> been set, and creates CONFIG_BLK_DEV_LOOP_MIN_COUNT devices anyway.
+> This is because, in non-error cases, the cleanup is performed by
+> del_gendisk() calling rq_qos_exit(), the assumption being that rq_qos
+> policies, iolatency being one of them, can only be activated once the disk
+> is fully registered and visible. That assumption is true for wbt and iocost,
+> but not so for iolatency as it gets initialized before add_disk() is called.
 > 
 > [...]
 
 Applied, thanks!
 
-[1/1] loop: Fix the max_loop commandline argument treatment when it is set to 0
-      commit: 85c50197716c60fe57f411339c579462e563ac57
+[1/2] blk-iolatency: Fix memory leak on add_disk() failures
+      commit: 813e693023ba10da9e75067780f8378465bf27cc
 
 Best regards,
 -- 
