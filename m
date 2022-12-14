@@ -2,128 +2,196 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A5BEC4332F
-	for <linux-block@archiver.kernel.org>; Wed, 14 Dec 2022 13:31:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D793C4167B
+	for <linux-block@archiver.kernel.org>; Wed, 14 Dec 2022 15:56:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238226AbiLNNbI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 14 Dec 2022 08:31:08 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48278 "EHLO
+        id S238822AbiLNP4a (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 14 Dec 2022 10:56:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55896 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238218AbiLNNbI (ORCPT
+        with ESMTP id S238562AbiLNP4B (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 14 Dec 2022 08:31:08 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DAB112494B
-        for <linux-block@vger.kernel.org>; Wed, 14 Dec 2022 05:30:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1671024622;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=p5nDSovtGcMOmECeVBK2QeZhfWdznopYC9ScdOLMtVw=;
-        b=XVc0NawcLSLi6znddHJNnMueIEzsH2kJ4sS7CTC8Odba2RTaQZe6X50Cedw5YyFiy4QU/m
-        bz2SaToAO+eSatYx7WsoiQWFTHsFeK07Z9BHYzjJ9nUCucgTPzgWT+w18qvPAwGXlYfgdn
-        x3Y5hSjHF88FC5zZMOTWWcuwq3dCD2s=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-381-SkU2T6obNHq0jzOTvgDD4g-1; Wed, 14 Dec 2022 08:30:17 -0500
-X-MC-Unique: SkU2T6obNHq0jzOTvgDD4g-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        Wed, 14 Dec 2022 10:56:01 -0500
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5632525EA3;
+        Wed, 14 Dec 2022 07:54:41 -0800 (PST)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 74DA9101A52E;
-        Wed, 14 Dec 2022 13:30:17 +0000 (UTC)
-Received: from T590 (ovpn-8-24.pek2.redhat.com [10.72.8.24])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id C956514171C0;
-        Wed, 14 Dec 2022 13:30:13 +0000 (UTC)
-Date:   Wed, 14 Dec 2022 21:30:08 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Hillf Danton <hdanton@sina.com>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Zhong Jinghua <zhongjinghua@huawei.com>,
-        Dennis Zhou <dennis@kernel.org>
-Subject: Re: [PATCH 3/3] lib/percpu-refcount: drain ->release() in
- perpcu_ref_exit()
-Message-ID: <Y5nP4JC00zTepHue@T590>
-References: <20221214025101.1268437-1-ming.lei@redhat.com>
- <20221214081651.954-1-hdanton@sina.com>
+        by smtp-out1.suse.de (Postfix) with ESMTPS id EBDB621E3C;
+        Wed, 14 Dec 2022 15:54:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1671033278; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=y3f+FcqGXbBknqOS6KZiTyP9VJP1zOTzW5PHqNUH4Bg=;
+        b=vLm8RKVBKBJMhRboOIhV92neDIINBqpSEdwkVLIEJKDZjKmKBE56ijdXwu84eVvD5fDyj+
+        BcWLip4jZ/p/1PXN8uD9J+MvjVPBQ3qvBqF0uXZ0Ab7xNv/JdbWwyucwpDxWGKU3HZo+ed
+        34d8PFvUrdmynD9QM5pHydYePlxAzgk=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1671033278;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=y3f+FcqGXbBknqOS6KZiTyP9VJP1zOTzW5PHqNUH4Bg=;
+        b=LgsH/OWL4z4zvaU7S8lsBaO5fL75x8DVWpar7FStdALnMcpQSeZfDwgyV5P9Mdpg1v4zza
+        ysCxxSN6G9JvHmDA==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id DCA9A138F6;
+        Wed, 14 Dec 2022 15:54:38 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id 2YjbNb7xmWMXWQAAMHmgww
+        (envelope-from <jack@suse.cz>); Wed, 14 Dec 2022 15:54:38 +0000
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+        id 5D883A0727; Wed, 14 Dec 2022 16:54:38 +0100 (CET)
+Date:   Wed, 14 Dec 2022 16:54:38 +0100
+From:   Jan Kara <jack@suse.cz>
+To:     Yu Kuai <yukuai1@huaweicloud.com>
+Cc:     paolo.valente@linaro.org, axboe@kernel.dk, jack@suse.cz,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yukuai3@huawei.com, yi.zhang@huawei.com
+Subject: Re: [PATCH v2] block, bfq: fix possible uaf for 'bfqq->bic'
+Message-ID: <20221214155438.crsdb2otmsfdhamc@quack3>
+References: <20221214030430.3304151-1-yukuai1@huaweicloud.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20221214081651.954-1-hdanton@sina.com>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.7
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20221214030430.3304151-1-yukuai1@huaweicloud.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Dec 14, 2022 at 04:16:51PM +0800, Hillf Danton wrote:
-> On 14 Dec 2022 10:51:01 +0800 Ming Lei <ming.lei@redhat.com>
-> > The pattern of wait_event(percpu_ref_is_zero()) has been used in several
+On Wed 14-12-22 11:04:30, Yu Kuai wrote:
+> From: Yu Kuai <yukuai3@huawei.com>
 > 
-> For example?
-
-blk_mq_freeze_queue_wait() and target_wait_for_sess_cmds().
-
+> Our test report a uaf for 'bfqq->bic' in 5.10:
 > 
-> > kernel components, and this way actually has the following risk:
-> > 
-> > - percpu_ref_is_zero() can be returned just between
-> >   atomic_long_sub_and_test() and ref->data->release(ref)
-> > 
-> > - given the refcount is found as zero, percpu_ref_exit() could
-> >   be called, and the host data structure is freed
-> > 
-> > - then use-after-free is triggered in ->release() when the user host
-> >   data structure is freed after percpu_ref_exit() returns
+> ==================================================================
+> BUG: KASAN: use-after-free in bfq_select_queue+0x378/0xa30
 > 
-> The race between exit and the release callback should be considered at the
-> corresponding callsite, given the comment below, and closed for instance
-> by synchronizing rcu.
+> CPU: 6 PID: 2318352 Comm: fsstress Kdump: loaded Not tainted 5.10.0-60.18.0.50.h602.kasan.eulerosv2r11.x86_64 #1
+> Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.12.1-0-ga5cab58-20220320_160524-szxrtosci10000 04/01/2014
+> Call Trace:
+>  bfq_select_queue+0x378/0xa30
+>  bfq_dispatch_request+0xe8/0x130
+>  blk_mq_do_dispatch_sched+0x62/0xb0
+>  __blk_mq_sched_dispatch_requests+0x215/0x2a0
+>  blk_mq_sched_dispatch_requests+0x8f/0xd0
+>  __blk_mq_run_hw_queue+0x98/0x180
+>  __blk_mq_delay_run_hw_queue+0x22b/0x240
+>  blk_mq_run_hw_queue+0xe3/0x190
+>  blk_mq_sched_insert_requests+0x107/0x200
+>  blk_mq_flush_plug_list+0x26e/0x3c0
+>  blk_finish_plug+0x63/0x90
+>  __iomap_dio_rw+0x7b5/0x910
+>  iomap_dio_rw+0x36/0x80
+>  ext4_dio_read_iter+0x146/0x190 [ext4]
+>  ext4_file_read_iter+0x1e2/0x230 [ext4]
+>  new_sync_read+0x29f/0x400
+>  vfs_read+0x24e/0x2d0
+>  ksys_read+0xd5/0x1b0
+>  do_syscall_64+0x33/0x40
+>  entry_SYSCALL_64_after_hwframe+0x61/0xc6
 > 
-> /**
->  * percpu_ref_put_many - decrement a percpu refcount
->  * @ref: percpu_ref to put
->  * @nr: number of references to put
->  *
->  * Decrement the refcount, and if 0, call the release function (which was passed
->  * to percpu_ref_init())
->  *
->  * This function is safe to call as long as @ref is between init and exit.
->  */
+> Commit 3bc5e683c67d ("bfq: Split shared queues on move between cgroups")
+> changes that move process to a new cgroup will allocate a new bfqq to
+> use, however, the old bfqq and new bfqq can point to the same bic:
+> 
+> 1) Initial state, two process with io in the same cgroup.
+> 
+> Process 1       Process 2
+>  (BIC1)          (BIC2)
+>   |  Λ            |  Λ
+>   |  |            |  |
+>   V  |            V  |
+>   bfqq1           bfqq2
+> 
+> 2) bfqq1 is merged to bfqq2.
+> 
+> Process 1       Process 2
+>  (BIC1)          (BIC2)
+>   |               |
+>    \-------------\|
+>                   V
+>   bfqq1           bfqq2(coop)
+> 
+> 3) Process 1 exit, then issue new io(denoce IOA) from Process 2.
+> 
+>  (BIC2)
+>   |  Λ
+>   |  |
+>   V  |
+>   bfqq2(coop)
+> 
+> 4) Before IOA is completed, move Process 2 to another cgroup and issue io.
+> 
+> Process 2
+>  (BIC2)
+>    Λ
+>    |\--------------\
+>    |                V
+>   bfqq2           bfqq3
+> 
+> Now that BIC2 points to bfqq3, while bfqq2 and bfqq3 both point to BIC2.
+> If all the requests are completed, and Process 2 exit, BIC2 will be
+> freed while there is no guarantee that bfqq2 will be freed before BIC2.
+> 
+> Fix the problem by clearing bfqq->bic while bfqq is detached from bic.
+> 
+> Fixes: 3bc5e683c67d ("bfq: Split shared queues on move between cgroups")
+> Suggested-by: Jan Kara <jack@suse.cz>
+> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
 
-Not sure if the above comment implies that the callsite should cover the
-race.
+Looks good. Feel free to add:
 
-But blk-mq can really avoid the trouble by using the existed call_rcu():
+Reviewed-by: Jan Kara <jack@suse.cz>
 
-
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 3866b6c4cd88..9321767470dc 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -254,14 +254,15 @@ EXPORT_SYMBOL_GPL(blk_clear_pm_only);
- 
- static void blk_free_queue_rcu(struct rcu_head *rcu_head)
- {
--	kmem_cache_free(blk_requestq_cachep,
--			container_of(rcu_head, struct request_queue, rcu_head));
-+	struct request_queue *q = container_of(rcu_head,
-+			struct request_queue, rcu_head);
-+
-+	percpu_ref_exit(&q->q_usage_counter);
-+	kmem_cache_free(blk_requestq_cachep, q);
- }
- 
- static void blk_free_queue(struct request_queue *q)
- {
--	percpu_ref_exit(&q->q_usage_counter);
--
- 	if (q->poll_stat)
- 		blk_stat_remove_callback(q, q->poll_cb);
- 	blk_stat_free_callback(q->poll_cb);
+								Honza
 
 
-Thanks, 
-Ming
-
+> ---
+> Changes in v2:
+>  - Use a new solution as suggested by Jan.
+> 
+>  block/bfq-iosched.c | 7 ++++++-
+>  1 file changed, 6 insertions(+), 1 deletion(-)
+> 
+> diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+> index a72304c728fc..b111a7b8dca6 100644
+> --- a/block/bfq-iosched.c
+> +++ b/block/bfq-iosched.c
+> @@ -386,6 +386,12 @@ static void bfq_put_stable_ref(struct bfq_queue *bfqq);
+>  
+>  void bic_set_bfqq(struct bfq_io_cq *bic, struct bfq_queue *bfqq, bool is_sync)
+>  {
+> +	struct bfq_queue *old_bfqq = bic->bfqq[is_sync];
+> +
+> +	/* Clear bic pointer if bfqq is detached from this bic */
+> +	if (old_bfqq && old_bfqq->bic == bic)
+> +		old_bfqq->bic = NULL;
+> +
+>  	/*
+>  	 * If bfqq != NULL, then a non-stable queue merge between
+>  	 * bic->bfqq and bfqq is happening here. This causes troubles
+> @@ -5311,7 +5317,6 @@ static void bfq_exit_icq_bfqq(struct bfq_io_cq *bic, bool is_sync)
+>  		unsigned long flags;
+>  
+>  		spin_lock_irqsave(&bfqd->lock, flags);
+> -		bfqq->bic = NULL;
+>  		bfq_exit_bfqq(bfqd, bfqq);
+>  		bic_set_bfqq(bic, NULL, is_sync);
+>  		spin_unlock_irqrestore(&bfqd->lock, flags);
+> -- 
+> 2.31.1
+> 
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
