@@ -2,94 +2,79 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C3ADC4332F
-	for <linux-block@archiver.kernel.org>; Thu, 15 Dec 2022 12:25:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B46B2C4332F
+	for <linux-block@archiver.kernel.org>; Thu, 15 Dec 2022 12:37:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229462AbiLOMZz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 15 Dec 2022 07:25:55 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47892 "EHLO
+        id S229619AbiLOMhX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 15 Dec 2022 07:37:23 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52486 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229718AbiLOMZ3 (ORCPT
+        with ESMTP id S229543AbiLOMhW (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 15 Dec 2022 07:25:29 -0500
-Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 315B713F3F
-        for <linux-block@vger.kernel.org>; Thu, 15 Dec 2022 04:25:13 -0800 (PST)
-Received: by mail-pj1-x1033.google.com with SMTP id q17-20020a17090aa01100b002194cba32e9so2572576pjp.1
-        for <linux-block@vger.kernel.org>; Thu, 15 Dec 2022 04:25:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=T/73M0DNtQgyuRndF4NIlkV/I2VZcMXTamkSjavQvl4=;
-        b=tTkPLj6burO+K8np9jfNiBbUJV8kRIFJc04mJVOm5hZwtD6XZpqTb7bvEv2ifBVAcq
-         BzYtHyVFVbH1dcgI26YhLLqSP3BLIhsdoXs8TcZc3laRMxSKL2dXvWu5BVDBAwZ7Ddhk
-         e6FQnIO8dmMQmius5D6e8u5NDk5E15cV3fVnGqeqlHNyKNznQ+TpvS3cv+HFitIbo96+
-         LB+EnzpeASuwbGL+eQ30fgHXXX7w8PNj6YFtjYA77H3zfSOJPeOhyuqAouHocPJ88sDJ
-         5OOKbmJACAYbazZ4W6N9L7R/s4KqUvBOPspuQtmalCGGIuiEdKINeZBt2C/bCDaFHwv6
-         FhZA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=T/73M0DNtQgyuRndF4NIlkV/I2VZcMXTamkSjavQvl4=;
-        b=CeUl7GDccf3Jl+tcY6i/XFrW6D6PXBe0cnwPHkBxD9wDJ5fmhJVjQEQerxS9MlYqpD
-         9V/T/TWKtzL7Rinuur0GJwRYhCMaiT262qZ2H6hgooPSNTNFVY1OpXUfwSAbegUOyN6V
-         rSOMI4MCtEboJeXJYKYrpdBRkYb2V9PRclLZKc642sL09UFRWLp3oBXUgBPiVxGZjl6l
-         oA1eGwtP/8sONs4bxeps85uha8O6T6ZdvZOP1XIk/+rgNWJVtI0rDIJqr+j9A+RIBUfZ
-         zzQdaQ65tJSs4UTm41YOK/iK+dO4jsetB97+PUaQXdAMPfEilvhqAhX73KGDVl9Ext0X
-         HcFw==
-X-Gm-Message-State: ANoB5pkUy5Oz1nn3nB410XyKWptjuDqiF7QiRsHlk06fxrSQFxAce+IL
-        4pJT6VIkuFi6jKuKlNS8CiVgSQ==
-X-Google-Smtp-Source: AA0mqf6QmQNVNKm4BgWY33J2vQjUiyC8U3MjZDRFbnbaB+N2WOi+0p6uv6jLFAXJGCU9hBdFo3bBWg==
-X-Received: by 2002:a17:902:ea10:b0:189:b74f:46ad with SMTP id s16-20020a170902ea1000b00189b74f46admr8377919plg.3.1671107112581;
-        Thu, 15 Dec 2022 04:25:12 -0800 (PST)
-Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id q18-20020a170902bd9200b001868bf6a7b8sm3700999pls.146.2022.12.15.04.25.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 15 Dec 2022 04:25:11 -0800 (PST)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     linux-block@vger.kernel.org,
-        Zhang Wensheng <zhangwensheng@huaweicloud.com>,
-        Zhong Jinghua <zhongjinghua@huawei.com>,
-        Hillf Danton <hdanton@sina.com>, Yu Kuai <yukuai3@huawei.com>,
-        Dennis Zhou <dennis@kernel.org>
-In-Reply-To: <20221215021629.74870-1-ming.lei@redhat.com>
-References: <20221215021629.74870-1-ming.lei@redhat.com>
-Subject: Re: [PATCH] block: fix use-after-free of q->q_usage_counter
-Message-Id: <167110711134.47123.15435164400352739613.b4-ty@kernel.dk>
-Date:   Thu, 15 Dec 2022 05:25:11 -0700
+        Thu, 15 Dec 2022 07:37:22 -0500
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8FE5B5F4E;
+        Thu, 15 Dec 2022 04:37:20 -0800 (PST)
+Received: from mail02.huawei.com (unknown [172.30.67.153])
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4NXsF65pCbz4f3kKx;
+        Thu, 15 Dec 2022 20:37:14 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.175.124.27])
+        by APP4 (Coremail) with SMTP id gCh0CgDHONb9FJtjOv0bCQ--.50238S4;
+        Thu, 15 Dec 2022 20:37:17 +0800 (CST)
+From:   Kemeng Shi <shikemeng@huaweicloud.com>
+To:     axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linfeilong@huawei.com, liuzhiqiang26@huawei.com
+Subject: [PATCH v2 0/5] A few bugfix and cleanup patches for sbitmap
+Date:   Fri, 16 Dec 2022 04:36:16 +0800
+Message-Id: <20221215203621.3572458-1-shikemeng@huaweicloud.com>
+X-Mailer: git-send-email 2.30.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.11.0-dev-50ba3
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: gCh0CgDHONb9FJtjOv0bCQ--.50238S4
+X-Coremail-Antispam: 1UD129KBjvdXoWrtFW8JF4DZFy5Jry8uw1xZrb_yoW3Kwb_tF
+        WkAFW8tFykJF15JFy7XFy7AFyDKw4kJa4UtanayrWxJr1xZas7Xw4kuFW2qr15ZFyDuF15
+        Jry5Jrs5AwnI9jkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+        9fnUUIcSsGvfJTRUUUb7kYFVCjjxCrM7AC8VAFwI0_Gr0_Xr1l1xkIjI8I6I8E6xAIw20E
+        Y4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l87I20VAvwVAaII0Ic2I_JFv_Gryl8c
+        AvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVWDJVCq
+        3wA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_Gc
+        CE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxI
+        r21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1Y6r17McIj6I8E87
+        Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41l42xK82IY
+        c2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s
+        026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r126r1DMIIYrxkI7VAKI48JMIIF
+        0xvE2Ix0cI8IcVAFwI0_JFI_Gr1lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0x
+        vE42xK8VAvwI8IcIk0rVW8JVW3JwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv
+        6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUI0tCUUUUU
+X-CM-SenderInfo: 5vklyvpphqwq5kxd4v5lfo033gof0z/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Hi, this series contain a bugfix patch to correct wake_batch
+recalculation to avoid potential IO hung and a few cleanup patches to
+remove unnecessary check and repeat code in sbitmap. Thanks.
 
-On Thu, 15 Dec 2022 10:16:29 +0800, Ming Lei wrote:
-> For blk-mq, queue release handler is usually called into after
-> blk_mq_freeze_queue_wait() returns. However, q_usage_counter->release()
-> handler may not be started yet at that time, so cause user-after-free.
-> 
-> Fix the issue by moving percpu_ref_exit() into blk_free_queue_rcu()
-> since ->release() is called with rcu read lock held, since it is
-> concluded that the race should be covered in caller per discussion
-> from the two links.
-> 
-> [...]
+---
+v2:
+ -add patch "sbitmap: correct wake_batch recalculation to avoid potential
+IO hung"
+---
 
-Applied, thanks!
+Kemeng Shi (5):
+  sbitmap: remove unnecessary calculation of alloc_hint in
+    __sbitmap_get_shallow
+  sbitmap: remove redundant check in __sbitmap_queue_get_batch
+  sbitmap: rewrite sbitmap_find_bit_in_index to reduce repeat code
+  sbitmap: add sbitmap_find_bit to remove repeat code in
+    __sbitmap_get/__sbitmap_get_shallow
+  sbitmap: correct wake_batch recalculation to avoid potential IO hung
 
-[1/1] block: fix use-after-free of q->q_usage_counter
-      commit: d36a9ea5e7766961e753ee38d4c331bbe6ef659b
+ lib/sbitmap.c | 103 ++++++++++++++++++++++----------------------------
+ 1 file changed, 46 insertions(+), 57 deletions(-)
 
-Best regards,
 -- 
-Jens Axboe
-
+2.30.0
 
