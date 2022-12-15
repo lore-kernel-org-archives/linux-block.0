@@ -2,88 +2,151 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 688A3C00145
-	for <linux-block@archiver.kernel.org>; Thu, 15 Dec 2022 06:50:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38C90C4332F
+	for <linux-block@archiver.kernel.org>; Thu, 15 Dec 2022 08:10:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229614AbiLOGux (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 15 Dec 2022 01:50:53 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47152 "EHLO
+        id S229600AbiLOIKI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 15 Dec 2022 03:10:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55212 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229655AbiLOGup (ORCPT
+        with ESMTP id S229517AbiLOIKG (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 15 Dec 2022 01:50:45 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3FFDB21E33;
-        Wed, 14 Dec 2022 22:50:43 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id D84F4B81AD3;
-        Thu, 15 Dec 2022 06:50:41 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3612CC433F2;
-        Thu, 15 Dec 2022 06:50:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1671087040;
-        bh=dsffucc6I2sU3ocPccR5Wt4nUWd9vSTjx8+hyd+0RWQ=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=DLm5tHEZp1xiGgjKyWDc+mWbcd5f6p2OlvsnREv2115mQ8NI9eca8UpCJ/F9S+bfN
-         wuARYqKkjrLkNOlRqTUcvvfj+U9SeIkxGqHC72Qm2a1GtTZYLWXq2D/LpQ10Gw9DDD
-         61WkHnvIoJ1xqk4TdMFQu1xKHfOwpnegDxaDCSvM=
-Date:   Thu, 15 Dec 2022 07:50:30 +0100
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     stable@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org, Shiwei Cui <cuishw@inspur.com>,
-        Christoph Hellwig <hch@lst.de>, Jan Kara <jack@suse.cz>
-Subject: Re: [PATCH stable 4.9.y] block: unhash blkdev part inode when the
- part is deleted
-Message-ID: <Y5rDttO3ah+zzhDX@kroah.com>
-References: <20221213071655.1197875-1-ming.lei@redhat.com>
+        Thu, 15 Dec 2022 03:10:06 -0500
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A52231EC0;
+        Thu, 15 Dec 2022 00:10:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=Cef1UzqWfVAbvA6+u55m3YXipeQMyViKSaX0VjPe9YU=; b=nfljYgtR+5cOVEIFxn9RUMpY+8
+        2Nt2YUwahox8qkXB6AzNrTiFWPZvG2jJM4S2pjw/miAqlqEQk2FgUm27fpAllJHEM6LCVlNSp9ZJA
+        yqH0ras/O7RJBF4Cx5eJAdK6cbUKeqO/CnmTFH1ht/374F4fBwT8ziO0CP6KdJbkgB3lSSRr5A8nJ
+        G+Btr5jrC4+SsJHHi75yj/FzR7OH+fZuShccJpOS4SsgkZq2x3tGB6eS7t8QYgQ1g1TQxadSryZhj
+        RCmOHe9puOi6BBpveW6RO7NixC8AZM1OnOBYby/8fN4aI6wi5x+0NL3xSK/2hgBZdspev088LUCr2
+        cYT6T7hA==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1p5jJQ-007WnA-8V; Thu, 15 Dec 2022 08:09:52 +0000
+Date:   Thu, 15 Dec 2022 00:09:52 -0800
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Daniel Golle <daniel@makrotopia.org>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        Richard Weinberger <richard@nod.at>,
+        Matthew Wilcox <willy@infradead.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        Wolfram Sang <wsa+renesas@sang-engineering.com>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH 1/4] init: move block device helpers from
+ init/do_mounts.c
+Message-ID: <Y5rWUJ6fv6DLkJ5a@infradead.org>
+References: <Y3XM62P7CaeKXFsz@infradead.org>
+ <Y3j+Pzy1JpqG8Yd8@makrotopia.org>
+ <Y3zCdJr5dKsADsnM@infradead.org>
+ <Y5NpsmN/npnG8lxY@makrotopia.org>
+ <Y5buTVuu0pfqBQh+@infradead.org>
+ <Y5cKSRmZ45OJq6Qq@makrotopia.org>
+ <Y5ggLBy+XBjl/vYj@infradead.org>
+ <Y5hz5+yXWDadDhRB@makrotopia.org>
+ <Y5n9MYEkrnAF4Ztv@infradead.org>
+ <Y5orrN6THpkTuiA8@makrotopia.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20221213071655.1197875-1-ming.lei@redhat.com>
+In-Reply-To: <Y5orrN6THpkTuiA8@makrotopia.org>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Dec 13, 2022 at 03:16:55PM +0800, Ming Lei wrote:
-> v5.11 changes the blkdev lookup mechanism completely since commit
-> 22ae8ce8b892 ("block: simplify bdev/disk lookup in blkdev_get"),
-> and small part of the change is to unhash part bdev inode when
-> deleting partition. Turns out this kind of change does fix one
-> nasty issue in case of BLOCK_EXT_MAJOR:
-> 
-> 1) when one partition is deleted & closed, disk_put_part() is always
-> called before bdput(bdev), see blkdev_put(); so the part's devt can
-> be freed & re-used before the inode is dropped
-> 
-> 2) then new partition with same devt can be created just before the
-> inode in 1) is dropped, then the old inode/bdev structurein 1) is
-> re-used for this new partition, this way causes use-after-free and
-> kernel panic.
-> 
-> It isn't possible to backport the whole big patchset of "merge struct
-> block_device and struct hd_struct v4" for addressing this issue.
-> 
-> https://lore.kernel.org/linux-block/20201128161510.347752-1-hch@lst.de/
-> 
-> So fixes it by unhashing part bdev in delete_partition(), and this way
-> is actually aligned with v5.11+'s behavior.
-> 
-> Backported from the following 5.10.y commit:
-> 
-> 5f2f77560591 ("block: unhash blkdev part inode when the part is deleted")
-> 
-> Reported-by: Shiwei Cui <cuishw@inspur.com>
-> Tested-by: Shiwei Cui <cuishw@inspur.com>
-> Cc: Christoph Hellwig <hch@lst.de>
-> Cc: Jan Kara <jack@suse.cz>
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> ---
->  block/partition-generic.c | 6 ++++++
->  1 file changed, 6 insertions(+)
+On Wed, Dec 14, 2022 at 08:01:48PM +0000, Daniel Golle wrote:
+> I assume that implementing anything similar using blk_lookup_devt in
+> the driver itself is then also not acceptable, right?
 
-All now queued up, thanks!
+No.  blk_lookup_devt is a workaround for the early init code where
+the file system is not available yet.  The only reasonable use case
+is the early init code, but even that is better handled by an initramfs.
 
-greg k-h
+> Yet another option would be to implement a way to acquire this
+> information from device tree. Ie. have a reference to the disk device
+> as well as an unsigned integer in the 'chosen' node which the
+> bootloader can use to communicate this to the kernel. Example:
+> chosen {
+> 	bootdev = <&mmc0 3>;
+> };
+> 
+> It's a bit more tricky for ubiblock or mtdblock devices because they
+> don't have *any* representation in device tree at all at this point.
+> 
+> In case of an MTD partition (for mtdblockX) we would just reference
+> the mtd partition in the same way.
+> 
+> To do this cleanly with NAND/UBI, I'd start with adding
+> device-tree-based attaching of an MTD partition to UBI using a
+> device-tree attribute 'compatible = "linux,ubi"' on the MTD partition.
+> We could then have sub-nodes referencing specific UBI volumes, to
+> select them for use with ubiblock but also for those nodes then
+> being a valid reference for use with the to-be-introduced 'bootdev'
+> attribute in 'chosen'.
+> 
+> Does that sound acceptable from your perspective?
+
+Device tree questions are really out of my knowledge and domain, the
+right people to talk to would be the device-tree and relevant driver
+maintainers. 
+
+> Even devices with NOR flash may still want support for removable
+> block devices like USB pendrives or SD cards... Many home-routers
+> got only 8MiB of NOR flash and yet come with USB 2.0 ports intended
+> for a pendrive which is then shared via Samba.
+
+Ok, so we're not _that_ resource contrained at all, because for the
+really small devices with just a few MB of ram, not having the block
+layer makes a huge difference.
+
+> As the first few blocks are typically used for bootloader code and
+> bootloader environment, we would then need to hard-code the offset(s)
+> of the uImage.FIT on the block device. Imho this becomes messy and just
+> using partitions seemed like a straight forward solution.
+
+Ok, so the whole DOS-World boot load nightmare has spread to these
+devices as well.
+
+> And what about dual-boot systems where you have more than one firmware
+> image? Hard-code more offsets? For each device?
+
+Is this for a fail save use case where on image is update while the
+other on is in use?  I've usually seen people use two different NOR
+chips for that to have full error isolation.
+
+> The reason is the different life-cycle of the device main partition
+> table, bootloader, bootloader environment, ... on one hand and each
+> firmware image on a dual boot system on the other hand.
+
+Oh, so the firmware image doesn't even include the bootloader, but the
+bootload is on the same device?  That just seems like a very odd
+setup, but I'll take your word for it being used.
+
+> Therefore re-writing the whole disk during firmware upgrades is not an
+> option because it is risky, eg. in case of a sudden power failure we
+> could end up with a hard-bricked system. So to me it makes sense that
+> for a firmware upgrade, we write only to one partition and don't touch
+> GPT or anything else on the device. So in case something goes wrong,
+> the device will still boot, the bootloader will realize that the
+> uImage.FIT in one partition is broken (uImage.FIT also comes with
+> hashes to ensure image integrity) and it will load something else (from
+> another partition) instead.
+
+I'm just really confused about this whole setup.  Maybe it's just
+because what I've worked with, which is either really deeply embededd
+devices where the everything is one image, that you might in some case
+have twice, or a full blown UEFI-like setup where the boot loader is
+separate, but can simply load a kernel from the actual root file system.
+
+I have to say even after all these round trip I'm still not sure
+what problem where really solving. In basically all other environments
+that have a powerful enough bootloader to read file systems your rootfs
+would simply store the kernel image and dtb if they are interdependent.
+Is the root cause that uboot doesn't support reading files from squashfs
+despite supporting half a dozen other file systems?
