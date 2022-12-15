@@ -2,85 +2,82 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A2370C4167B
-	for <linux-block@archiver.kernel.org>; Thu, 15 Dec 2022 16:47:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BF684C4332F
+	for <linux-block@archiver.kernel.org>; Thu, 15 Dec 2022 16:54:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230286AbiLOQrM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 15 Dec 2022 11:47:12 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41518 "EHLO
+        id S229877AbiLOQyc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 15 Dec 2022 11:54:32 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46132 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230346AbiLOQq6 (ORCPT
+        with ESMTP id S230349AbiLOQyS (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 15 Dec 2022 11:46:58 -0500
-Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08CF72A953;
-        Thu, 15 Dec 2022 08:46:58 -0800 (PST)
-Received: by mail-pj1-x1036.google.com with SMTP id gt4so11098189pjb.1;
-        Thu, 15 Dec 2022 08:46:58 -0800 (PST)
+        Thu, 15 Dec 2022 11:54:18 -0500
+Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E9E6C396D2;
+        Thu, 15 Dec 2022 08:54:16 -0800 (PST)
+Received: by mail-pl1-x635.google.com with SMTP id 17so7544264pll.0;
+        Thu, 15 Dec 2022 08:54:16 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=NtuasfiQwAVb7T7lHLup3YJ84O51YLi79K4mOD3jS5A=;
-        b=hZ4Cot94gaF1e87/TucVOwB8o680736L461Il3xZ+KPnmu5CDTodnJjoxNhGI8jm/P
-         ezzK6dmlX/iVzaI7KzXIoaOBAJ5qVX+ZsNI1FmMinXUp7f25Ja3zydw9ku6cOyd3u3+N
-         j4nsXWLh/j2KY6m/XKiuAkRuwaLR7sGHukq0kX3UPrF00AMnQQTj5WRPw7fqziSIWjtD
-         FS821KiSlWhilmJ2BKonUoauhCstgpIzJcskq9dEH0djxjxX7IwfuBbzIj/EFqkYwvRa
-         9g5rakZUJwAy+N1If+4CzOizhNWKm/7dRP1W/6Cu7Zmriycj7YQjkSssTxulOU7U6ZrK
-         HZGw==
+        bh=iZn+QJIG+pG2FMov/YvviioMJllEnj55mv0rTOwAEiE=;
+        b=OgTU8ACnECzBXNTgrFTQtc97eoPsgGmtug2GqlsFNG4KyynZ9Cli72P8mSBQTLM9v3
+         NE/VPRuXPU6mIMOm55/f2MBv9wc+fPQO3qNGoDvKdKAcvBFZAhv7tqlGKNHRjSCBBTKn
+         Iefa/DsMDX8M5Jk2C+Del/o2N7aUjC3JWPHkEhjwhgMPogeZCWsG149Hd027dH3P7vWa
+         FZrmWzLeI/wJO4E9nyL2LebGYy5Z3PPMESE93tC1hY/bAaWrP8P2iFijLfWQcRSb0FtQ
+         Sz/Cex8iHrLmLA2WtV99BUV2Bue1+ZUvI667HeSWVpOAithkUB2YPgRqplIrambaeZ0L
+         EcnQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=NtuasfiQwAVb7T7lHLup3YJ84O51YLi79K4mOD3jS5A=;
-        b=Gu+MwE9Pcz6M4a4vfV2AdC7FrykQ4Vr2hXtOtvT/1v78o2/F26+f02cgggGA3CgnEf
-         4Wi3R81x8XUb5/o1h9v5yKQEYma71POXGqEAPF+jOsmEdKl6mH9eXws4pZoXJaZ0CH23
-         3x08Ur863J/tOrmAwil/IhfKS6GZ5/9kHql8+7ac4dOODDjLdwzad9x/EZRInhUJmq67
-         oSizJJz06NFY4alIfghDwF+YKgTjtHEoodgSESqKj/ztNLtjjezKGiB8Oe2Q6Gd30xu4
-         lChs7aAjYwO3WKLzSe55D8NJpEF61TJo3iB3FPgwzAWvjhN4ytXj7nsSQDF8xyjBvyPZ
-         IGTg==
-X-Gm-Message-State: ANoB5pl3t1SRY3WVFCmeGShpf/dBUjcWMgN++kus+RHWiBfR92m1Wx+0
-        SDfz/xpuGvyKQcEqTr8noNwepXPM9M0CsA==
-X-Google-Smtp-Source: AA0mqf62eTzXyDSBZkE/AtV0fC7U8HTdv0sT57bbTCTkhk2WzwAApDGDQRoS8K8YGJBnVcAhA+Xtwg==
-X-Received: by 2002:a05:6a20:d492:b0:a5:df86:f2c3 with SMTP id im18-20020a056a20d49200b000a5df86f2c3mr34110935pzb.32.1671122817363;
-        Thu, 15 Dec 2022 08:46:57 -0800 (PST)
+        bh=iZn+QJIG+pG2FMov/YvviioMJllEnj55mv0rTOwAEiE=;
+        b=hafUjmB7YEWVT1aOc6vjgbmjXdj3e5YSrw5a/RqDwH4teSxAkNsNSAoNrkYi4xz0lD
+         NoDMRvj3gSuYPYBbmOxvdX11vd9iLuEI11WbVl9FgZi2fdSq9QLN4q4rUtJDeW096Qy1
+         AAQwlOvsO0PWhi2y3eVo4SL6/5AzHBoxYG47iCoqKDpadZYJy23Xk1u2sOsmNf6bwzXF
+         uKk3ssNHCZx7swE6omMn5P24ea2yruGnlGFrh8PYbFRYkPS6tTeSyNuRHjioFucNaMt/
+         b9Hf3I4Y4Zdk/awnUD6WL5FfakFZZzdWh2AO4pk7D0PhM2KVjKKJUJDREKN8a86N66Tg
+         ISRA==
+X-Gm-Message-State: ANoB5pkv89+OyjKVTxkZUqX6h6JfLPDBYEuYOyoOSu/SnB8vmQAciKac
+        c4N68ZpY2xwGi9hyaOdvDg93EYse87So7g==
+X-Google-Smtp-Source: AA0mqf6Lira6AyIybIY5JV+PGyuPz2Fvz9rbaC93AU4F9Y516G7igpd4UAuTGy88rKoYXsP43xPbrQ==
+X-Received: by 2002:a05:6a20:d68b:b0:9d:efbf:6604 with SMTP id it11-20020a056a20d68b00b0009defbf6604mr35689526pzb.18.1671123256345;
+        Thu, 15 Dec 2022 08:54:16 -0800 (PST)
 Received: from localhost (2603-800c-1a02-1bae-a7fa-157f-969a-4cde.res6.spectrum.com. [2603:800c:1a02:1bae:a7fa:157f:969a:4cde])
-        by smtp.gmail.com with ESMTPSA id r7-20020a17090a1bc700b00217090ece49sm3376132pjr.31.2022.12.15.08.46.55
+        by smtp.gmail.com with ESMTPSA id b7-20020a62cf07000000b00562677968aesm1972328pfg.72.2022.12.15.08.54.15
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 15 Dec 2022 08:46:55 -0800 (PST)
+        Thu, 15 Dec 2022 08:54:15 -0800 (PST)
 Sender: Tejun Heo <htejun@gmail.com>
-Date:   Thu, 15 Dec 2022 06:46:54 -1000
+Date:   Thu, 15 Dec 2022 06:54:14 -1000
 From:   Tejun Heo <tj@kernel.org>
-To:     hanjinke <hanjinke.666@bytedance.com>
-Cc:     josef@toxicpanda.com, axboe@kernel.dk, cgroups@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [External] Re: [RFC PATCH] blk-throtl: Introduce sync queue for
- write ios
-Message-ID: <Y5tPftzjXN6RcswM@slm.duckdns.org>
-References: <20221206163826.10700-1-hanjinke.666@bytedance.com>
- <Y5et48VryiKgL/eD@slm.duckdns.org>
- <1e53592f-b1f1-df85-3edb-eba4c5a5f989@bytedance.com>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Zhong Jinghua <zhongjinghua@huawei.com>,
+        Yu Kuai <yukuai3@huawei.com>, Dennis Zhou <dennis@kernel.org>
+Subject: Re: [PATCH 3/3] lib/percpu-refcount: drain ->release() in
+ perpcu_ref_exit()
+Message-ID: <Y5tRNoL5lbwy91Xs@slm.duckdns.org>
+References: <20221214025101.1268437-1-ming.lei@redhat.com>
+ <20221214025101.1268437-4-ming.lei@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1e53592f-b1f1-df85-3edb-eba4c5a5f989@bytedance.com>
+In-Reply-To: <20221214025101.1268437-4-ming.lei@redhat.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
+On Wed, Dec 14, 2022 at 10:51:01AM +0800, Ming Lei wrote:
+> The pattern of wait_event(percpu_ref_is_zero()) has been used in several
+> kernel components, and this way actually has the following risk:
 
-On Wed, Dec 14, 2022 at 12:02:53PM +0800, hanjinke wrote:
-> Should we keep the main category of io based READ and WRITE, and within READ
-> / WRITE the subcategory were SYNC and ASYNC ? This may give less intrusion
-> into existing frameworks.
-
-Ah, you haven't posted yet. So, yeah, let's do this. The code was a bit odd
-looking after adding the sync queue on the side. For reads, we can just
-consider everything synchrnous (or maybe treat SYNC the same way, I don't
-know whether reads actually use SYNC flags tho).
+I'd much rather see those components updated to wait for notification from
+->release rather than doing this or update percpu_ref_is_zero() to wait for
+->release() to finish.
 
 Thanks.
 
