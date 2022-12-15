@@ -2,188 +2,104 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D0F2C4332F
-	for <linux-block@archiver.kernel.org>; Thu, 15 Dec 2022 01:49:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CC2F0C4332F
+	for <linux-block@archiver.kernel.org>; Thu, 15 Dec 2022 02:17:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229660AbiLOBtk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 14 Dec 2022 20:49:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43800 "EHLO
+        id S229480AbiLOCRg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 14 Dec 2022 21:17:36 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54114 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229596AbiLOBti (ORCPT
+        with ESMTP id S229451AbiLOCRf (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 14 Dec 2022 20:49:38 -0500
-Received: from mail-lf1-x132.google.com (mail-lf1-x132.google.com [IPv6:2a00:1450:4864:20::132])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30B782A26D;
-        Wed, 14 Dec 2022 17:49:37 -0800 (PST)
-Received: by mail-lf1-x132.google.com with SMTP id j4so13490773lfk.0;
-        Wed, 14 Dec 2022 17:49:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=2uR0itTVt/FczCT3tTCUIz7rhFERW4XLAvwXhZxOOck=;
-        b=H7ZRzaMERNL5e0UNCT3+KQPjY2LcFL9F9zkoihWkPRVjZfGwMFjsC9e2Qxu9AxAA1h
-         uc/If3AusNjZs8BEvwR/Ww6d5AXy6Z9R8eGKgwIQqi6C1Gk/FyPv+eFhAmaho38J1I8b
-         UIdoM9/1/v7zZNhAMWSs+nr1nFutrX+oDqDVRf7Miult/CzGhBvwBfDGxCv8leeohcCG
-         wGBU3sgjPbmrPYtHQlOM+NUxghtIf3/II7mkyaaqBb7JsQ/v/maiyqKk1vW/mHYk4kCs
-         NiUg1YCeagKUZ8Amy8C/KLm02VFvHCVyJQo4otMBTJnoanacgZcU1DwZE8BTp9crcIla
-         bUqQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=2uR0itTVt/FczCT3tTCUIz7rhFERW4XLAvwXhZxOOck=;
-        b=VAneozlRqbja/OMb/fEkyeEFLvWSC5k+tlOgKnyP/F1krgRzxvtbIXQUzsx2y3kszx
-         xylcnOedDIotPAN7cYMQVSfVZ3DS/MKzcXKWhMFwO3zp3fWfQJqD+fNB0kimW+b2g/tr
-         VHm6z2OEycTeFs3ultSbm/6duftXFGhpSc1IdTWjWOZkbfDmEkbDVQ888JQ/q+kKZK0V
-         1xlDwVL9oQ2iUb+mGwU/9IQhI1yKJ8D6VkrjfZawup9s6u89TuSACYFiE0lgj8hAGAeX
-         QTxN2tlbDT/tm2aMho1dsoEzJCLxqwsgyrSWW2Cxe5Wx+JTlDReJinJXhxcxoWvIU5Vv
-         /xHQ==
-X-Gm-Message-State: ANoB5plED8kWCB+4FfbgxhHCiYY9LJ2aVJfnW3d5cibMGQEVPj1g2UP1
-        pt/fHAGYIbQ796xQOseqpFDSTp5YH25LpPIlVNo=
-X-Google-Smtp-Source: AA0mqf5liwcVYnuCPTCNcyM6ilakhOG9gI5m3PiYoLX0ZL/wlDP38UbjqB7o4AkT/dwZPWZ5Y0fiC2BnhhPAAxuh7lY=
-X-Received: by 2002:ac2:59c6:0:b0:4b5:721f:f32f with SMTP id
- x6-20020ac259c6000000b004b5721ff32fmr6830047lfn.383.1671068975395; Wed, 14
- Dec 2022 17:49:35 -0800 (PST)
+        Wed, 14 Dec 2022 21:17:35 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD44E537DA
+        for <linux-block@vger.kernel.org>; Wed, 14 Dec 2022 18:16:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1671070608;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=B41vHQu3wkjdeVx/bVMUmGUCdCJAuukDi0ZM85456ts=;
+        b=SrkaYsN+YFs09SoWE4Zh3CsVm9ABwLuPG8zvzWoo6FX7x/4xlk+d3ZMQMPCphlmwopY9Tb
+        AfmlovGepTQF1WDcKhTKjB7cgaLb7PqSPG9dqsr+aOd4H9muA7RSaz9Tl48hkgxJwCxRSj
+        e1KW5vX5Ksy2CNdZp4YC47QJ2wPUc2w=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-563-4RuOVaKiOFm1d5iPZyukxQ-1; Wed, 14 Dec 2022 21:16:42 -0500
+X-MC-Unique: 4RuOVaKiOFm1d5iPZyukxQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C7F2B86C166;
+        Thu, 15 Dec 2022 02:16:41 +0000 (UTC)
+Received: from localhost (ovpn-8-16.pek2.redhat.com [10.72.8.16])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id E18412026D68;
+        Thu, 15 Dec 2022 02:16:39 +0000 (UTC)
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
+        Zhang Wensheng <zhangwensheng@huaweicloud.com>,
+        Zhong Jinghua <zhongjinghua@huawei.com>,
+        Hillf Danton <hdanton@sina.com>, Yu Kuai <yukuai3@huawei.com>,
+        Dennis Zhou <dennis@kernel.org>
+Subject: [PATCH] block: fix use-after-free of q->q_usage_counter
+Date:   Thu, 15 Dec 2022 10:16:29 +0800
+Message-Id: <20221215021629.74870-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-References: <20221110112622.389332-1-Yuwei.Guan@zeekrlife.com> <3153dcb3-dd9b-7a2b-a15a-8244d805f246@huaweicloud.com>
-In-Reply-To: <3153dcb3-dd9b-7a2b-a15a-8244d805f246@huaweicloud.com>
-From:   Yuwei Guan <ssawgyw@gmail.com>
-Date:   Thu, 15 Dec 2022 09:48:59 +0800
-Message-ID: <CALJQGLmOaEnHawYvNz5fk_MtGhz6DPpW+8E-hgvmWxF--8V4zA@mail.gmail.com>
-Subject: Re: [PATCH v1] block, bfq: do the all counting of pending-request if
- CONFIG_BFQ_GROUP_IOSCHED is enabled
-To:     Yu Kuai <yukuai1@huaweicloud.com>, Jan Kara <jack@suse.cz>
-Cc:     paolo.valente@linaro.org, axboe@kernel.dk,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Yuwei.Guan@zeekrlife.com, "yukuai (C)" <yukuai3@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Yu Kuai <yukuai1@huaweicloud.com> =E4=BA=8E2022=E5=B9=B411=E6=9C=8814=E6=97=
-=A5=E5=91=A8=E4=B8=80 11:33=E5=86=99=E9=81=93=EF=BC=9A
->
-> Hi,
->
-> =E5=9C=A8 2022/11/10 19:26, Yuwei Guan =E5=86=99=E9=81=93:
-> > The 'bfqd->num_groups_with_pending_reqs' is used when
-> > CONFIG_BFQ_GROUP_IOSCHED is enabled, so let the variables and processes
-> > take effect when ONFIG_BFQ_GROUP_IOSCHED is enabled.
-> >
->
-> This patch looks good to me, fell free to add:
-> Reviewed-by: Yu Kuai <yukuai3@huawei.com>
->
-> BTW, this patch need to be reviewed by Jan or Paolo before it can be
-> applied.
->
-Hi Jan,
+For blk-mq, queue release handler is usually called into after
+blk_mq_freeze_queue_wait() returns. However, q_usage_counter->release()
+handler may not be started yet at that time, so cause user-after-free.
 
-Could you help to review this patch.
+Fix the issue by moving percpu_ref_exit() into blk_free_queue_rcu()
+since ->release() is called with rcu read lock held, since it is
+concluded that the race should be covered in caller per discussion
+from the two links.
 
-Thanks.
+Reported-by: Zhang Wensheng <zhangwensheng@huaweicloud.com>
+Reported-by: Zhong Jinghua <zhongjinghua@huawei.com>
+Link: https://lore.kernel.org/linux-block/Y5prfOjyyjQKUrtH@T590/T/#u
+Link: https://lore.kernel.org/lkml/Y4%2FmzMd4evRg9yDi@fedora/
+Cc: Hillf Danton <hdanton@sina.com>
+Cc: Yu Kuai <yukuai3@huawei.com>
+Cc: Dennis Zhou <dennis@kernel.org>
+Fixes: 2b0d3d3e4fcf ("percpu_ref: reduce memory footprint of percpu_ref in fast path")
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ block/blk-core.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
 
-> Thanks,
-> Kuai
->
-> > Cc: Yu Kuai <yukuai3@huawei.com>
-> > Signed-off-by: Yuwei Guan <Yuwei.Guan@zeekrlife.com>
-> > ---
-> >   block/bfq-iosched.c | 2 ++
-> >   block/bfq-iosched.h | 4 ++++
-> >   block/bfq-wf2q.c    | 8 ++++----
-> >   3 files changed, 10 insertions(+), 4 deletions(-)
-> >
-> > diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-> > index 2381cf220ba2..5f54091e7fe9 100644
-> > --- a/block/bfq-iosched.c
-> > +++ b/block/bfq-iosched.c
-> > @@ -7051,7 +7051,9 @@ static int bfq_init_queue(struct request_queue *q=
-, struct elevator_type *e)
-> >       bfqd->idle_slice_timer.function =3D bfq_idle_slice_timer;
-> >
-> >       bfqd->queue_weights_tree =3D RB_ROOT_CACHED;
-> > +#ifdef CONFIG_BFQ_GROUP_IOSCHED
-> >       bfqd->num_groups_with_pending_reqs =3D 0;
-> > +#endif
-> >
-> >       INIT_LIST_HEAD(&bfqd->active_list);
-> >       INIT_LIST_HEAD(&bfqd->idle_list);
-> > diff --git a/block/bfq-iosched.h b/block/bfq-iosched.h
-> > index 9fa89577322d..41aa151ccc22 100644
-> > --- a/block/bfq-iosched.h
-> > +++ b/block/bfq-iosched.h
-> > @@ -197,8 +197,10 @@ struct bfq_entity {
-> >       /* flag, set to request a weight, ioprio or ioprio_class change  =
-*/
-> >       int prio_changed;
-> >
-> > +#ifdef CONFIG_BFQ_GROUP_IOSCHED
-> >       /* flag, set if the entity is counted in groups_with_pending_reqs=
- */
-> >       bool in_groups_with_pending_reqs;
-> > +#endif
-> >
-> >       /* last child queue of entity created (for non-leaf entities) */
-> >       struct bfq_queue *last_bfqq_created;
-> > @@ -491,6 +493,7 @@ struct bfq_data {
-> >        */
-> >       struct rb_root_cached queue_weights_tree;
-> >
-> > +#ifdef CONFIG_BFQ_GROUP_IOSCHED
-> >       /*
-> >        * Number of groups with at least one process that
-> >        * has at least one request waiting for completion. Note that
-> > @@ -538,6 +541,7 @@ struct bfq_data {
-> >        * with no request waiting for completion.
-> >        */
-> >       unsigned int num_groups_with_pending_reqs;
-> > +#endif
-> >
-> >       /*
-> >        * Per-class (RT, BE, IDLE) number of bfq_queues containing
-> > diff --git a/block/bfq-wf2q.c b/block/bfq-wf2q.c
-> > index b02b53658ed4..ea4c3d757fdd 100644
-> > --- a/block/bfq-wf2q.c
-> > +++ b/block/bfq-wf2q.c
-> > @@ -1612,28 +1612,28 @@ void bfq_requeue_bfqq(struct bfq_data *bfqd, st=
-ruct bfq_queue *bfqq,
-> >
-> >   void bfq_add_bfqq_in_groups_with_pending_reqs(struct bfq_queue *bfqq)
-> >   {
-> > +#ifdef CONFIG_BFQ_GROUP_IOSCHED
-> >       struct bfq_entity *entity =3D &bfqq->entity;
-> >
-> >       if (!entity->in_groups_with_pending_reqs) {
-> >               entity->in_groups_with_pending_reqs =3D true;
-> > -#ifdef CONFIG_BFQ_GROUP_IOSCHED
-> >               if (!(bfqq_group(bfqq)->num_queues_with_pending_reqs++))
-> >                       bfqq->bfqd->num_groups_with_pending_reqs++;
-> > -#endif
-> >       }
-> > +#endif
-> >   }
-> >
-> >   void bfq_del_bfqq_in_groups_with_pending_reqs(struct bfq_queue *bfqq)
-> >   {
-> > +#ifdef CONFIG_BFQ_GROUP_IOSCHED
-> >       struct bfq_entity *entity =3D &bfqq->entity;
-> >
-> >       if (entity->in_groups_with_pending_reqs) {
-> >               entity->in_groups_with_pending_reqs =3D false;
-> > -#ifdef CONFIG_BFQ_GROUP_IOSCHED
-> >               if (!(--bfqq_group(bfqq)->num_queues_with_pending_reqs))
-> >                       bfqq->bfqd->num_groups_with_pending_reqs--;
-> > -#endif
-> >       }
-> > +#endif
-> >   }
-> >
-> >   /*
-> >
->
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 3866b6c4cd88..9321767470dc 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -254,14 +254,15 @@ EXPORT_SYMBOL_GPL(blk_clear_pm_only);
+ 
+ static void blk_free_queue_rcu(struct rcu_head *rcu_head)
+ {
+-	kmem_cache_free(blk_requestq_cachep,
+-			container_of(rcu_head, struct request_queue, rcu_head));
++	struct request_queue *q = container_of(rcu_head,
++			struct request_queue, rcu_head);
++
++	percpu_ref_exit(&q->q_usage_counter);
++	kmem_cache_free(blk_requestq_cachep, q);
+ }
+ 
+ static void blk_free_queue(struct request_queue *q)
+ {
+-	percpu_ref_exit(&q->q_usage_counter);
+-
+ 	if (q->poll_stat)
+ 		blk_stat_remove_callback(q, q->poll_cb);
+ 	blk_stat_free_callback(q->poll_cb);
+-- 
+2.31.1
+
