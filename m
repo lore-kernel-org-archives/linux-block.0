@@ -2,199 +2,151 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 52E45C001B2
-	for <linux-block@archiver.kernel.org>; Wed, 14 Dec 2022 20:10:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E30AEC4332F
+	for <linux-block@archiver.kernel.org>; Thu, 15 Dec 2022 00:35:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229477AbiLNUK1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 14 Dec 2022 15:10:27 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46266 "EHLO
+        id S229620AbiLOAfH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 14 Dec 2022 19:35:07 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48142 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229975AbiLNUJx (ORCPT
+        with ESMTP id S229705AbiLOAfF (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 14 Dec 2022 15:09:53 -0500
-Received: from fudo.makrotopia.org (fudo.makrotopia.org [IPv6:2a07:2ec0:3002::71])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE1BC2C13D;
-        Wed, 14 Dec 2022 12:02:12 -0800 (PST)
-Received: from local
-        by fudo.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-         (Exim 4.94.2)
-        (envelope-from <daniel@makrotopia.org>)
-        id 1p5Xwt-0001md-V8; Wed, 14 Dec 2022 21:01:52 +0100
-Date:   Wed, 14 Dec 2022 20:01:48 +0000
-From:   Daniel Golle <daniel@makrotopia.org>
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     Richard Weinberger <richard@nod.at>,
-        Matthew Wilcox <willy@infradead.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        Wolfram Sang <wsa+renesas@sang-engineering.com>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH 1/4] init: move block device helpers from
- init/do_mounts.c
-Message-ID: <Y5orrN6THpkTuiA8@makrotopia.org>
-References: <e5e0ab0429b1fc8a4e3f9614d2d1cc43dea78093.1668644705.git.daniel@makrotopia.org>
- <Y3XM62P7CaeKXFsz@infradead.org>
- <Y3j+Pzy1JpqG8Yd8@makrotopia.org>
- <Y3zCdJr5dKsADsnM@infradead.org>
- <Y5NpsmN/npnG8lxY@makrotopia.org>
- <Y5buTVuu0pfqBQh+@infradead.org>
- <Y5cKSRmZ45OJq6Qq@makrotopia.org>
- <Y5ggLBy+XBjl/vYj@infradead.org>
- <Y5hz5+yXWDadDhRB@makrotopia.org>
- <Y5n9MYEkrnAF4Ztv@infradead.org>
+        Wed, 14 Dec 2022 19:35:05 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF2A031ED4
+        for <linux-block@vger.kernel.org>; Wed, 14 Dec 2022 16:34:18 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1671064458;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=aqeMywu3iT4ftxLMJbD0nCtsC2LYnymRthrhqGzevww=;
+        b=JDGxtEBM5JwE8bvC851JSy6yg9u5skcTYX6KY9/VghUWGIh2CRskeTVRYifbdDklB9VcJ3
+        OlHRRW1ctcOrzRRsCubt5f9X2uAdF+4ZXrnw9VytUrHzbt5/baoQwjVcs1mnueSuqgu1te
+        zETj8zxvi4uI2fZ4DWTWrbFStAPXRYI=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-9-HCZZRf8fOYm2A6yCDzp3UQ-1; Wed, 14 Dec 2022 19:34:14 -0500
+X-MC-Unique: HCZZRf8fOYm2A6yCDzp3UQ-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 1D294858F0E;
+        Thu, 15 Dec 2022 00:34:14 +0000 (UTC)
+Received: from T590 (ovpn-8-16.pek2.redhat.com [10.72.8.16])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 199E4492C14;
+        Thu, 15 Dec 2022 00:34:09 +0000 (UTC)
+Date:   Thu, 15 Dec 2022 08:34:04 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Dennis Zhou <dennis@kernel.org>
+Cc:     Hillf Danton <hdanton@sina.com>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Zhong Jinghua <zhongjinghua@huawei.com>, ming.lei@redhat.com
+Subject: Re: [PATCH 3/3] lib/percpu-refcount: drain ->release() in
+ perpcu_ref_exit()
+Message-ID: <Y5prfOjyyjQKUrtH@T590>
+References: <20221214025101.1268437-1-ming.lei@redhat.com>
+ <20221214081651.954-1-hdanton@sina.com>
+ <Y5nP4JC00zTepHue@T590>
+ <Y5n0wBarpw7IEQX4@fedora>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Y5n9MYEkrnAF4Ztv@infradead.org>
+In-Reply-To: <Y5n0wBarpw7IEQX4@fedora>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Dec 14, 2022 at 08:43:29AM -0800, Christoph Hellwig wrote:
-> On Tue, Dec 13, 2022 at 12:45:27PM +0000, Daniel Golle wrote:
-> > > Yes, but a completely non-standard format that nests inside an
-> > > partition.
+On Wed, Dec 14, 2022 at 08:07:28AM -0800, Dennis Zhou wrote:
+> Hello,
+> 
+> On Wed, Dec 14, 2022 at 09:30:08PM +0800, Ming Lei wrote:
+> > On Wed, Dec 14, 2022 at 04:16:51PM +0800, Hillf Danton wrote:
+> > > On 14 Dec 2022 10:51:01 +0800 Ming Lei <ming.lei@redhat.com>
+> > > > The pattern of wait_event(percpu_ref_is_zero()) has been used in several
+> > > 
+> > > For example?
 > > 
-> > The reason for this current discussion (see subject line) is exactly
-> > that you didn't like the newly introduced partition type GUID which
-> > then calls the newly introduced partition parser taking care of the
-> > uImage.FIT content of a partition.
-> 
-> Which is the exact nesting I'm complaining about.  Why do you need
-> to use your format inside a GPT partition table?
-
-The GPT partition table is typically written only once to an eMMC-
-based device in factory. Firmware images (typically uImage.FIT) are
-stored in partitions because there are sometimes two of them (for
-A/B dual-boot, or recovery/production dual-boot).
-
-As a working device firmware consists of kernel, dtb and rootfs, all
-these three things have to be written and used together, typically
-they also come together in one file for firmware upgrade (ie.
-rootfs appended to kernel, tarballs, or uImage.FIT containing all three
-of them).
-
-As the size of kernel and rootfs cannot be determined accurately at
-the time the device is made, having individual GPT partitions for
-kernel and rootfs ends up to either being a limit to future groth of
-the kernel image or wastes space by overestimating the kernel size.
-
-Changing the GPT partitioning when updating the device to match the
-exact sizes is also not an option as a damage to the GPT would then
-present a single point of failure (backup GPT also wouldn't help
-much here), so for dual-boot to actually be meaningful, we shouldn't
-ever write to any parts of the disk/flash which affect more than one
-of the dual-boot options.
-
-> What you're doing is bascially nesting a partition table format
-> inside another one, which doesn't make any sense at all.
-
-See the last paragraph of this message for good reasons why one would
-want to do exactly that.
-
-> 
-> > This block driver (if built-into the kernel and relied upon to expose
-> > the block device used as root filesystem) will need to identify the
-> > lower device it should work on. And for that the helper functions such
-> > as devt_from_devname() need to be available for that driver.
-> 
-> And devt_from_devname must not be used by more non-init code.  It is
-> bad it got exposed at all, but new users are not acceptable.
-
-I assume that implementing anything similar using blk_lookup_devt in
-the driver itself is then also not acceptable, right?
-
-Yet another option would be to implement a way to acquire this
-information from device tree. Ie. have a reference to the disk device
-as well as an unsigned integer in the 'chosen' node which the
-bootloader can use to communicate this to the kernel. Example:
-chosen {
-	bootdev = <&mmc0 3>;
-};
-
-It's a bit more tricky for ubiblock or mtdblock devices because they
-don't have *any* representation in device tree at all at this point.
-
-In case of an MTD partition (for mtdblockX) we would just reference
-the mtd partition in the same way.
-
-To do this cleanly with NAND/UBI, I'd start with adding
-device-tree-based attaching of an MTD partition to UBI using a
-device-tree attribute 'compatible = "linux,ubi"' on the MTD partition.
-We could then have sub-nodes referencing specific UBI volumes, to
-select them for use with ubiblock but also for those nodes then
-being a valid reference for use with the to-be-introduced 'bootdev'
-attribute in 'chosen'.
-
-Does that sound acceptable from your perspective?
-
-> 
-> > A block representation is the common denominator of all the
-> > above. Sure, I could implement splitting MTD devices according to
-> > uImage.FIT and then add MTD support to squashfs. Then implement
-> > splitting of UBI volumes and add UBI support to squashfs.
-> 
-> Implementing MTD and/or UBI support would allow you to build a
-> kernel without CONFIG_BLOCK, which will save you a lot more than
-> the 64k you were whining about above.
-
-Even devices with NOR flash may still want support for removable
-block devices like USB pendrives or SD cards... Many home-routers
-got only 8MiB of NOR flash and yet come with USB 2.0 ports intended
-for a pendrive which is then shared via Samba.
-
-Also, heavily customzied per-device kernel builds would never
-scale up to support thousands of devices -- hence OpenWrt uses the
-exact same kernel build for many devices, which makes both, the
-build process and also debugging kernel bugs, much much easier (or
-even doable at all).
-
-> 
-> > > None of this explains the silly nesting inside the GPT partition.
-> > > It is not needed for the any use cases and the root probem here.
+> > blk_mq_freeze_queue_wait() and target_wait_for_sess_cmds().
 > > 
-> > So where would you store the uImage (which will have to exist
-> > even to just load kernel and DTB in U-Boot, even without containing
-> > the root filesystem) on devices with eMMC then?
+> > > 
+> > > > kernel components, and this way actually has the following risk:
+> > > > 
+> > > > - percpu_ref_is_zero() can be returned just between
+> > > >   atomic_long_sub_and_test() and ref->data->release(ref)
+> > > > 
+> > > > - given the refcount is found as zero, percpu_ref_exit() could
+> > > >   be called, and the host data structure is freed
+> > > > 
+> > > > - then use-after-free is triggered in ->release() when the user host
+> > > >   data structure is freed after percpu_ref_exit() returns
+> > > 
+> > > The race between exit and the release callback should be considered at the
+> > > corresponding callsite, given the comment below, and closed for instance
+> > > by synchronizing rcu.
+> > > 
+> > > /**
+> > >  * percpu_ref_put_many - decrement a percpu refcount
+> > >  * @ref: percpu_ref to put
+> > >  * @nr: number of references to put
+> > >  *
+> > >  * Decrement the refcount, and if 0, call the release function (which was passed
+> > >  * to percpu_ref_init())
+> > >  *
+> > >  * This function is safe to call as long as @ref is between init and exit.
+> > >  */
+> > 
+> > Not sure if the above comment implies that the callsite should cover the
+> > race.
+> > 
+> > But blk-mq can really avoid the trouble by using the existed call_rcu():
+> > 
 > 
-> Straight on the block device, where else?
+> I struggle with the dependency on release(). release() itself should not
+> block, but a common pattern would be to through a call_rcu() in and
 
-As the first few blocks are typically used for bootloader code and
-bootloader environment, we would then need to hard-code the offset(s)
-of the uImage.FIT on the block device. Imho this becomes messy and just
-using partitions seemed like a straight forward solution.
+Yes, release() is called with rcu read lock, and I guess the trouble may
+be originated from the fact release() may do nothing related with
+actual data releasing.
 
-And what about dual-boot systems where you have more than one firmware
-image? Hard-code more offsets? For each device?
+> schedule additional work - see block/blk-cgroup.c, blkg_release().
 
-In a way, I was considering this by using blkdevparts= cmdline option
-instead of GPT, but 
+I believe the pattern is user specific, and the motivation of using call_rcu
+can't be just for avoiding such potential race between release() and
+percpu_ref_exit().
 
 > 
-> > Are you suggesting to come up with an entirely new type of partition
-> > table only for that purpose? Which will require its own tools and
-> > implementation in both, U-Boot and Linux? What would be the benefit
-> > over just using GPT partitioning?
+> I think the dependency really is the completion of release() and the
+> work scheduled on it's behalf rather than strictly starting the
+> release() callback. This series doesn't preclude that from happening.
+
+Yeah.
+
+For any additional work or sort of thing scheduled in release(), only
+the caller can guarantee they are drained before percpu_exit_ref(), so
+I agree now it is better for caller to avoid the race.
+
 > 
-> Why do you need another layer of partitioning instead of storing
-> all your information either in the uImage, or in some other
-> partition format of your choice?
+> /**
+>  * percpu_ref_exit - undo percpu_ref_init()
+>  * @ref: percpu_ref to exit
+>  *
+>  * This function exits @ref.  The caller is responsible for ensuring that
+>  * @ref is no longer in active use.  The usual places to invoke this
+>  * function from are the @ref->release() callback or in init failure path
+>  * where percpu_ref_init() succeeded but other parts of the initialization
+>  * of the embedding object failed.
+>  */
+> 
+> I think the percpu_ref_exit() comment explains the more common use case
+> approach to percpu refcounts. release() triggering percpu_ref_exit() is
+> the ideal case.
 
-The reason is the different life-cycle of the device main partition
-table, bootloader, bootloader environment, ... on one hand and each
-firmware image on a dual boot system on the other hand.
-Hence there is more than just one uImage: typically bootloader,
-bootloader environment, firmware A (uImage.FIT) and firmware B.
-Relace "A" and "B" with "recovery" and "production", depending on the
-dual-boot style implemented.
+But most of callers don't use in this way actually.
 
-Therefore re-writing the whole disk during firmware upgrades is not an
-option because it is risky, eg. in case of a sudden power failure we
-could end up with a hard-bricked system. So to me it makes sense that
-for a firmware upgrade, we write only to one partition and don't touch
-GPT or anything else on the device. So in case something goes wrong,
-the device will still boot, the bootloader will realize that the
-uImage.FIT in one partition is broken (uImage.FIT also comes with
-hashes to ensure image integrity) and it will load something else (from
-another partition) instead.
+
+Thanks, 
+Ming
+
