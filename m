@@ -2,90 +2,88 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 548BBC4332F
-	for <linux-block@archiver.kernel.org>; Thu, 15 Dec 2022 03:32:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 688A3C00145
+	for <linux-block@archiver.kernel.org>; Thu, 15 Dec 2022 06:50:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229656AbiLODc6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 14 Dec 2022 22:32:58 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44472 "EHLO
+        id S229614AbiLOGux (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 15 Dec 2022 01:50:53 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47152 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229704AbiLODcz (ORCPT
+        with ESMTP id S229655AbiLOGup (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 14 Dec 2022 22:32:55 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BCB36BCA1
-        for <linux-block@vger.kernel.org>; Wed, 14 Dec 2022 19:32:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1671075125;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=veCyvm43EvJLg9G9hhu4AmM7THRxqVqHEQtr8ufuCSo=;
-        b=ctbeBavTtkZXT21HzlShUfLfO+/VFoA0SVuJkgIUSSRMqfgYXuH7zOEB5c1DInoEClAQ6e
-        PP8pqgM8rVJyIVyAApd7GCy9lA1hwdiPw/EvxCs0plgydG7PSbElGpnbFgTYrxbSKbNDQB
-        n1viFzhYKY3q5dD60SAwTZ1tHArnr5Y=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-496-tg69kkZDM-O1mkTEYK98qg-1; Wed, 14 Dec 2022 22:31:45 -0500
-X-MC-Unique: tg69kkZDM-O1mkTEYK98qg-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        Thu, 15 Dec 2022 01:50:45 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3FFDB21E33;
+        Wed, 14 Dec 2022 22:50:43 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 99C9F185A78B;
-        Thu, 15 Dec 2022 03:31:44 +0000 (UTC)
-Received: from llong.com (unknown [10.22.16.55])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id AA9B240ED76E;
-        Thu, 15 Dec 2022 03:31:43 +0000 (UTC)
-From:   Waiman Long <longman@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
-        Josef Bacik <josef@toxicpanda.com>,
-        Zefan Li <lizefan.x@bytedance.com>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        Andrew Morton <akpm@linux-foundation.org>
-Cc:     cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        =?UTF-8?q?Michal=20Koutn=C3=BD?= <mkoutny@suse.com>,
-        "Dennis Zhou (Facebook)" <dennisszhou@gmail.com>,
-        Waiman Long <longman@redhat.com>
-Subject: [PATCH v4 0/2] blk-cgroup: Fix potential UAF & flush rstat at blkgs destruction path
-Date:   Wed, 14 Dec 2022 22:31:30 -0500
-Message-Id: <20221215033132.230023-1-longman@redhat.com>
+        by ams.source.kernel.org (Postfix) with ESMTPS id D84F4B81AD3;
+        Thu, 15 Dec 2022 06:50:41 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3612CC433F2;
+        Thu, 15 Dec 2022 06:50:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1671087040;
+        bh=dsffucc6I2sU3ocPccR5Wt4nUWd9vSTjx8+hyd+0RWQ=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=DLm5tHEZp1xiGgjKyWDc+mWbcd5f6p2OlvsnREv2115mQ8NI9eca8UpCJ/F9S+bfN
+         wuARYqKkjrLkNOlRqTUcvvfj+U9SeIkxGqHC72Qm2a1GtTZYLWXq2D/LpQ10Gw9DDD
+         61WkHnvIoJ1xqk4TdMFQu1xKHfOwpnegDxaDCSvM=
+Date:   Thu, 15 Dec 2022 07:50:30 +0100
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     stable@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org, Shiwei Cui <cuishw@inspur.com>,
+        Christoph Hellwig <hch@lst.de>, Jan Kara <jack@suse.cz>
+Subject: Re: [PATCH stable 4.9.y] block: unhash blkdev part inode when the
+ part is deleted
+Message-ID: <Y5rDttO3ah+zzhDX@kroah.com>
+References: <20221213071655.1197875-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221213071655.1197875-1-ming.lei@redhat.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
- v4:
-  - Update comment and commit logs for both patches.
+On Tue, Dec 13, 2022 at 03:16:55PM +0800, Ming Lei wrote:
+> v5.11 changes the blkdev lookup mechanism completely since commit
+> 22ae8ce8b892 ("block: simplify bdev/disk lookup in blkdev_get"),
+> and small part of the change is to unhash part bdev inode when
+> deleting partition. Turns out this kind of change does fix one
+> nasty issue in case of BLOCK_EXT_MAJOR:
+> 
+> 1) when one partition is deleted & closed, disk_put_part() is always
+> called before bdput(bdev), see blkdev_put(); so the part's devt can
+> be freed & re-used before the inode is dropped
+> 
+> 2) then new partition with same devt can be created just before the
+> inode in 1) is dropped, then the old inode/bdev structurein 1) is
+> re-used for this new partition, this way causes use-after-free and
+> kernel panic.
+> 
+> It isn't possible to backport the whole big patchset of "merge struct
+> block_device and struct hd_struct v4" for addressing this issue.
+> 
+> https://lore.kernel.org/linux-block/20201128161510.347752-1-hch@lst.de/
+> 
+> So fixes it by unhashing part bdev in delete_partition(), and this way
+> is actually aligned with v5.11+'s behavior.
+> 
+> Backported from the following 5.10.y commit:
+> 
+> 5f2f77560591 ("block: unhash blkdev part inode when the part is deleted")
+> 
+> Reported-by: Shiwei Cui <cuishw@inspur.com>
+> Tested-by: Shiwei Cui <cuishw@inspur.com>
+> Cc: Christoph Hellwig <hch@lst.de>
+> Cc: Jan Kara <jack@suse.cz>
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> ---
+>  block/partition-generic.c | 6 ++++++
+>  1 file changed, 6 insertions(+)
 
- v3:
-  - Drop v2 patch 2 as it may not be needed.
-  - Replace css_tryget() with percpu_ref_is_zero() in patch 1 as
-    suggested by Tejun.
-  - Expand comment on patch 2 to elaborate the reason for this patch.
+All now queued up, thanks!
 
- v2:
-  - Remove unnecessary rcu_read_{lock|unlock} from
-    cgroup_rstat_css_cpu_flush() in patch 3.
-
-It was found that blkcg_destroy_blkgs() may be called with all blkcg
-references gone. This may potentially cause user-after-free and so should
-be fixed. The second patch flushes rstat when calling blkcg_destroy_blkgs().
-
-Waiman Long (2):
-  bdi, blk-cgroup: Fix potential UAF of blkcg
-  blk-cgroup: Flush stats at blkgs destruction path
-
- block/blk-cgroup.c     | 23 +++++++++++++++++++++++
- include/linux/cgroup.h |  1 +
- kernel/cgroup/rstat.c  | 18 ++++++++++++++++++
- mm/backing-dev.c       |  8 ++++++--
- 4 files changed, 48 insertions(+), 2 deletions(-)
-
--- 
-2.31.1
-
+greg k-h
