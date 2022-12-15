@@ -2,103 +2,69 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 047EAC4167B
-	for <linux-block@archiver.kernel.org>; Thu, 15 Dec 2022 10:27:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D99E8C3DA6E
+	for <linux-block@archiver.kernel.org>; Thu, 15 Dec 2022 10:46:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229506AbiLOK1O (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 15 Dec 2022 05:27:14 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41036 "EHLO
+        id S229684AbiLOKqy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 15 Dec 2022 05:46:54 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50778 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229744AbiLOK1L (ORCPT
+        with ESMTP id S230036AbiLOKqw (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 15 Dec 2022 05:27:11 -0500
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 529952E4;
-        Thu, 15 Dec 2022 02:27:10 -0800 (PST)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        Thu, 15 Dec 2022 05:46:52 -0500
+Received: from mx1.veeam.com (mx1.veeam.com [216.253.77.21])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42C5A1C410;
+        Thu, 15 Dec 2022 02:46:49 -0800 (PST)
+Received: from mail.veeam.com (prgmbx01.amust.local [172.24.128.102])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id BBE9520F72;
-        Thu, 15 Dec 2022 10:27:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1671100028; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=yi1j32638121uUkrd5VI1ko6llH+YBRN+da4F96TPoY=;
-        b=AhbyzMrL5rrJBm0s+wy3Kan0wdkB9iIFNKUdWwX5DOeDZrFjSiA5LncheEpslE2Eud/rS3
-        vTXIcmioFqcyBar23lVjjor87q4fA5WjuPEoNZKnUr6LDjCb9vNNStQmtbCTLP7iA0vcxO
-        ZJPUuv9/D8pEESbvSjbard/1Cuovni4=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1671100028;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=yi1j32638121uUkrd5VI1ko6llH+YBRN+da4F96TPoY=;
-        b=0jz0jEeGSk/napn+mrIoVfrNaoa4XcTGVBeY2lUEQOiO5AAxhnF4fQHNHQ0xhLwjP8Gtk9
-        5NFVwUEEH+1DG3Cw==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id A5F1F138E5;
-        Thu, 15 Dec 2022 10:27:08 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id rCx0KHz2mmNGUAAAMHmgww
-        (envelope-from <jack@suse.cz>); Thu, 15 Dec 2022 10:27:08 +0000
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-        id 7ABF2A0727; Thu, 15 Dec 2022 11:27:07 +0100 (CET)
-Date:   Thu, 15 Dec 2022 11:27:07 +0100
-From:   Jan Kara <jack@suse.cz>
-To:     Yuwei Guan <ssawgyw@gmail.com>
-Cc:     Yu Kuai <yukuai1@huaweicloud.com>, Jan Kara <jack@suse.cz>,
-        paolo.valente@linaro.org, axboe@kernel.dk,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Yuwei.Guan@zeekrlife.com, "yukuai (C)" <yukuai3@huawei.com>
-Subject: Re: [PATCH v1] block, bfq: do the all counting of pending-request if
- CONFIG_BFQ_GROUP_IOSCHED is enabled
-Message-ID: <20221215102707.hvnhzwd425f3dccy@quack3>
-References: <20221110112622.389332-1-Yuwei.Guan@zeekrlife.com>
- <3153dcb3-dd9b-7a2b-a15a-8244d805f246@huaweicloud.com>
- <CALJQGLmOaEnHawYvNz5fk_MtGhz6DPpW+8E-hgvmWxF--8V4zA@mail.gmail.com>
+        by mx1.veeam.com (Postfix) with ESMTPS id D099241D42;
+        Thu, 15 Dec 2022 05:47:41 -0500 (EST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=veeam.com;
+        s=mx1-2022; t=1671101262;
+        bh=xhll34qBllbleKx66EAPbdWrQOO5TZUZ0637lrp11Nc=;
+        h=Date:Subject:To:CC:References:From:In-Reply-To:From;
+        b=TKrwTfOBXBuHz/g0VqQ2IiMSFrcARyCoIRxkmMNuLSh3CfzQE5657obtdA8fxCebV
+         VR09826PnxKczE2lZv0AUwj2g7e1g0UJoxqpvMdHcOdk+paSt3nJORTW+kYmD3ZMC/
+         FFpjN6uHi2LuGH4aOVDc9mb05UUXP8W1CoGb9YrzmI9/9uJIoXnq9iRbUHYAOFjz/4
+         3zcWPe4GuMFHoZfSqu7artJAHbCTbLAzsLG+l+bbJY2u21J8STR9+OXhgLvak5Glxs
+         dqhFxDCLLCC1m/TQCOe0YSjPStdyUPu9S4NZAZyldw7Nj3OwWEbrHEnquUdBVbd7dz
+         pQBWfxyL+K7sg==
+Received: from [172.24.10.107] (172.24.10.107) by prgmbx01.amust.local
+ (172.24.128.102) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.20; Thu, 15 Dec
+ 2022 11:46:43 +0100
+Message-ID: <28b715eb-f9bc-c0d3-8dfd-22d0f84080c0@veeam.com>
+Date:   Thu, 15 Dec 2022 11:46:35 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CALJQGLmOaEnHawYvNz5fk_MtGhz6DPpW+8E-hgvmWxF--8V4zA@mail.gmail.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.5.1
+Subject: Re: [PATCH v2 02/21] block, blkfilter: Block Device Filtering
+ Mechanism
+Content-Language: en-US
+To:     Christoph Hellwig <hch@infradead.org>
+CC:     <axboe@kernel.dk>, <corbet@lwn.net>, <linux-block@vger.kernel.org>,
+        <linux-doc@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+References: <20221209142331.26395-1-sergei.shtepa@veeam.com>
+ <20221209142331.26395-3-sergei.shtepa@veeam.com>
+ <Y5roR3jjhQwgFWVM@infradead.org>
+From:   Sergei Shtepa <sergei.shtepa@veeam.com>
+In-Reply-To: <Y5roR3jjhQwgFWVM@infradead.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [172.24.10.107]
+X-ClientProxiedBy: colmbx01.amust.local (172.18.0.171) To prgmbx01.amust.local
+ (172.24.128.102)
+X-EsetResult: clean, is OK
+X-EsetId: 37303A29240315566D7061
+X-Veeam-MMEX: True
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello Yuwei!
+I am very glad to see your comments, Christoph.
+Thank you so much for the review.
 
-On Thu 15-12-22 09:48:59, Yuwei Guan wrote:
-> Yu Kuai <yukuai1@huaweicloud.com> 于2022年11月14日周一 11:33写道：
-> >
-> > Hi,
-> >
-> > 在 2022/11/10 19:26, Yuwei Guan 写道:
-> > > The 'bfqd->num_groups_with_pending_reqs' is used when
-> > > CONFIG_BFQ_GROUP_IOSCHED is enabled, so let the variables and processes
-> > > take effect when ONFIG_BFQ_GROUP_IOSCHED is enabled.
-> > >
-> >
-> > This patch looks good to me, fell free to add:
-> > Reviewed-by: Yu Kuai <yukuai3@huawei.com>
-> >
-> > BTW, this patch need to be reviewed by Jan or Paolo before it can be
-> > applied.
-> 
-> Could you help to review this patch.
-
-Yeah, the patch looks good to me. Feel free to add:
-
-Reviewed-by: Jan Kara <jack@suse.cz>
-
-								Honza
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+I have read all the comments and agree with them.
+Now I see new ways to make the code of the filter and the blksnap module better.
+There seems to be a lot of work to be done. :)
