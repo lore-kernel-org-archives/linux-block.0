@@ -2,104 +2,170 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC2F0C4332F
-	for <linux-block@archiver.kernel.org>; Thu, 15 Dec 2022 02:17:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 15991C001B2
+	for <linux-block@archiver.kernel.org>; Thu, 15 Dec 2022 03:32:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229480AbiLOCRg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 14 Dec 2022 21:17:36 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54114 "EHLO
+        id S229613AbiLODcg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 14 Dec 2022 22:32:36 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44292 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229451AbiLOCRf (ORCPT
+        with ESMTP id S229544AbiLODcf (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 14 Dec 2022 21:17:35 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD44E537DA
-        for <linux-block@vger.kernel.org>; Wed, 14 Dec 2022 18:16:48 -0800 (PST)
+        Wed, 14 Dec 2022 22:32:35 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 56D8A2EF4F
+        for <linux-block@vger.kernel.org>; Wed, 14 Dec 2022 19:31:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1671070608;
+        s=mimecast20190719; t=1671075109;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=B41vHQu3wkjdeVx/bVMUmGUCdCJAuukDi0ZM85456ts=;
-        b=SrkaYsN+YFs09SoWE4Zh3CsVm9ABwLuPG8zvzWoo6FX7x/4xlk+d3ZMQMPCphlmwopY9Tb
-        AfmlovGepTQF1WDcKhTKjB7cgaLb7PqSPG9dqsr+aOd4H9muA7RSaz9Tl48hkgxJwCxRSj
-        e1KW5vX5Ksy2CNdZp4YC47QJ2wPUc2w=
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=P/pLznPGQVdkseYoFw2OMUXPOTJl7XFp+0+LqLupem4=;
+        b=A5l3Yp0IYh7jB5T04zh0ldDq0/a9tDNuk5RCgLG+Nkgo0FTKPjwtskhUYRv9MiyLq+ifHW
+        AEGBWadcGcpr4BlZr1qYuFLcUzYmeySKgxgJYZnzuPXcQJurIXUHSVQGGjiQDlCEMgU1K3
+        Femu0LawMLrtoUIqmN6+tkFHkQl+xRM=
 Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
  [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-563-4RuOVaKiOFm1d5iPZyukxQ-1; Wed, 14 Dec 2022 21:16:42 -0500
-X-MC-Unique: 4RuOVaKiOFm1d5iPZyukxQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
+ us-mta-80-Ufz3riySO5yZc8WkBp7EUA-1; Wed, 14 Dec 2022 22:31:46 -0500
+X-MC-Unique: Ufz3riySO5yZc8WkBp7EUA-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C7F2B86C166;
-        Thu, 15 Dec 2022 02:16:41 +0000 (UTC)
-Received: from localhost (ovpn-8-16.pek2.redhat.com [10.72.8.16])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id E18412026D68;
-        Thu, 15 Dec 2022 02:16:39 +0000 (UTC)
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
-        Zhang Wensheng <zhangwensheng@huaweicloud.com>,
-        Zhong Jinghua <zhongjinghua@huawei.com>,
-        Hillf Danton <hdanton@sina.com>, Yu Kuai <yukuai3@huawei.com>,
-        Dennis Zhou <dennis@kernel.org>
-Subject: [PATCH] block: fix use-after-free of q->q_usage_counter
-Date:   Thu, 15 Dec 2022 10:16:29 +0800
-Message-Id: <20221215021629.74870-1-ming.lei@redhat.com>
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B953D85D060;
+        Thu, 15 Dec 2022 03:31:45 +0000 (UTC)
+Received: from llong.com (unknown [10.22.16.55])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 42B11400D796;
+        Thu, 15 Dec 2022 03:31:45 +0000 (UTC)
+From:   Waiman Long <longman@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
+        Josef Bacik <josef@toxicpanda.com>,
+        Zefan Li <lizefan.x@bytedance.com>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        Andrew Morton <akpm@linux-foundation.org>
+Cc:     cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        =?UTF-8?q?Michal=20Koutn=C3=BD?= <mkoutny@suse.com>,
+        "Dennis Zhou (Facebook)" <dennisszhou@gmail.com>,
+        Waiman Long <longman@redhat.com>
+Subject: [PATCH v4 2/2] blk-cgroup: Flush stats at blkgs destruction path
+Date:   Wed, 14 Dec 2022 22:31:32 -0500
+Message-Id: <20221215033132.230023-3-longman@redhat.com>
+In-Reply-To: <20221215033132.230023-1-longman@redhat.com>
+References: <20221215033132.230023-1-longman@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-For blk-mq, queue release handler is usually called into after
-blk_mq_freeze_queue_wait() returns. However, q_usage_counter->release()
-handler may not be started yet at that time, so cause user-after-free.
+As noted by Michal, the blkg_iostat_set's in the lockless list
+hold reference to blkg's to protect against their removal. Those
+blkg's hold reference to blkcg. When a cgroup is being destroyed,
+cgroup_rstat_flush() is only called at css_release_work_fn() which
+is called when the blkcg reference count reaches 0. This circular
+dependency will prevent blkcg and some blkgs from being freed after
+they are made offline.
 
-Fix the issue by moving percpu_ref_exit() into blk_free_queue_rcu()
-since ->release() is called with rcu read lock held, since it is
-concluded that the race should be covered in caller per discussion
-from the two links.
+It is less a problem if the cgroup to be destroyed also has other
+controllers like memory that will call cgroup_rstat_flush() which will
+clean up the reference count. If block is the only controller that uses
+rstat, these offline blkcg and blkgs may never be freed leaking more
+and more memory over time.
 
-Reported-by: Zhang Wensheng <zhangwensheng@huaweicloud.com>
-Reported-by: Zhong Jinghua <zhongjinghua@huawei.com>
-Link: https://lore.kernel.org/linux-block/Y5prfOjyyjQKUrtH@T590/T/#u
-Link: https://lore.kernel.org/lkml/Y4%2FmzMd4evRg9yDi@fedora/
-Cc: Hillf Danton <hdanton@sina.com>
-Cc: Yu Kuai <yukuai3@huawei.com>
-Cc: Dennis Zhou <dennis@kernel.org>
-Fixes: 2b0d3d3e4fcf ("percpu_ref: reduce memory footprint of percpu_ref in fast path")
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+To prevent this potential memory leak, a new cgroup_rstat_css_cpu_flush()
+function is added to flush stats for a given css and cpu. This new
+function will be called at blkgs destruction path, blkcg_destroy_blkgs(),
+whenever there are still pending stats to be flushed. This will release
+the references to blkgs allowing them to be freed and indirectly allow
+the freeing of blkcg.
+
+Fixes: 3b8cc6298724 ("blk-cgroup: Optimize blkcg_rstat_flush()")
+Signed-off-by: Waiman Long <longman@redhat.com>
+Acked-by: Tejun Heo <tj@kernel.org>
 ---
- block/blk-core.c | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
+ block/blk-cgroup.c     | 16 ++++++++++++++++
+ include/linux/cgroup.h |  1 +
+ kernel/cgroup/rstat.c  | 18 ++++++++++++++++++
+ 3 files changed, 35 insertions(+)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 3866b6c4cd88..9321767470dc 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -254,14 +254,15 @@ EXPORT_SYMBOL_GPL(blk_clear_pm_only);
- 
- static void blk_free_queue_rcu(struct rcu_head *rcu_head)
+diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+index ca28306aa1b1..a2a1081d9d1d 100644
+--- a/block/blk-cgroup.c
++++ b/block/blk-cgroup.c
+@@ -1084,6 +1084,8 @@ struct list_head *blkcg_get_cgwb_list(struct cgroup_subsys_state *css)
+  */
+ static void blkcg_destroy_blkgs(struct blkcg *blkcg)
  {
--	kmem_cache_free(blk_requestq_cachep,
--			container_of(rcu_head, struct request_queue, rcu_head));
-+	struct request_queue *q = container_of(rcu_head,
-+			struct request_queue, rcu_head);
++	int cpu;
 +
-+	percpu_ref_exit(&q->q_usage_counter);
-+	kmem_cache_free(blk_requestq_cachep, q);
+ 	/*
+ 	 * blkcg_destroy_blkgs() shouldn't be called with all the blkcg
+ 	 * references gone.
+@@ -1093,6 +1095,20 @@ static void blkcg_destroy_blkgs(struct blkcg *blkcg)
+ 
+ 	might_sleep();
+ 
++	/*
++	 * Flush all the non-empty percpu lockless lists to release the
++	 * blkg references held by those lists which, in turn, will
++	 * allow those blkgs to be freed and release their references to
++	 * blkcg. Otherwise, they may not be freed at all becase of this
++	 * circular dependency resulting in memory leak.
++	 */
++	for_each_possible_cpu(cpu) {
++		struct llist_head *lhead = per_cpu_ptr(blkcg->lhead, cpu);
++
++		if (!llist_empty(lhead))
++			cgroup_rstat_css_cpu_flush(&blkcg->css, cpu);
++	}
++
+ 	spin_lock_irq(&blkcg->lock);
+ 
+ 	while (!hlist_empty(&blkcg->blkg_list)) {
+diff --git a/include/linux/cgroup.h b/include/linux/cgroup.h
+index 528bd44b59e2..6c4e66b3fa84 100644
+--- a/include/linux/cgroup.h
++++ b/include/linux/cgroup.h
+@@ -766,6 +766,7 @@ void cgroup_rstat_flush(struct cgroup *cgrp);
+ void cgroup_rstat_flush_irqsafe(struct cgroup *cgrp);
+ void cgroup_rstat_flush_hold(struct cgroup *cgrp);
+ void cgroup_rstat_flush_release(void);
++void cgroup_rstat_css_cpu_flush(struct cgroup_subsys_state *css, int cpu);
+ 
+ /*
+  * Basic resource stats.
+diff --git a/kernel/cgroup/rstat.c b/kernel/cgroup/rstat.c
+index 793ecff29038..2e44be44351f 100644
+--- a/kernel/cgroup/rstat.c
++++ b/kernel/cgroup/rstat.c
+@@ -281,6 +281,24 @@ void cgroup_rstat_flush_release(void)
+ 	spin_unlock_irq(&cgroup_rstat_lock);
  }
  
- static void blk_free_queue(struct request_queue *q)
++/**
++ * cgroup_rstat_css_cpu_flush - flush stats for the given css and cpu
++ * @css: target css to be flush
++ * @cpu: the cpu that holds the stats to be flush
++ *
++ * A lightweight rstat flush operation for a given css and cpu.
++ * Only the cpu_lock is being held for mutual exclusion, the cgroup_rstat_lock
++ * isn't used.
++ */
++void cgroup_rstat_css_cpu_flush(struct cgroup_subsys_state *css, int cpu)
++{
++	raw_spinlock_t *cpu_lock = per_cpu_ptr(&cgroup_rstat_cpu_lock, cpu);
++
++	raw_spin_lock_irq(cpu_lock);
++	css->ss->css_rstat_flush(css, cpu);
++	raw_spin_unlock_irq(cpu_lock);
++}
++
+ int cgroup_rstat_init(struct cgroup *cgrp)
  {
--	percpu_ref_exit(&q->q_usage_counter);
--
- 	if (q->poll_stat)
- 		blk_stat_remove_callback(q, q->poll_cb);
- 	blk_stat_free_callback(q->poll_cb);
+ 	int cpu;
 -- 
 2.31.1
 
