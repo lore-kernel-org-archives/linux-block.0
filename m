@@ -2,205 +2,168 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4299FC10F31
-	for <linux-block@archiver.kernel.org>; Thu, 15 Dec 2022 09:45:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C240C4167B
+	for <linux-block@archiver.kernel.org>; Thu, 15 Dec 2022 10:01:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230103AbiLOJpi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 15 Dec 2022 04:45:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45336 "EHLO
+        id S229562AbiLOKB1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 15 Dec 2022 05:01:27 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56146 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230097AbiLOJph (ORCPT
+        with ESMTP id S230013AbiLOKBY (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 15 Dec 2022 04:45:37 -0500
+        Thu, 15 Dec 2022 05:01:24 -0500
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D564414D20;
-        Thu, 15 Dec 2022 01:45:35 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CCFEA2036F;
+        Thu, 15 Dec 2022 02:01:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
         :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=ngEPy5SgkQAXzrDrGQ4y5fn8QjLL1hAd1sk2qSi+fc0=; b=M8Gs6M1azvQ5whxKV4gsBan5e0
-        7/QEDmiPUm+2alXDzA+/jyfouaoah8t8D/USCRDwhBME+qGuilhleIGTge/patyPnoE+W72c4rMGk
-        ySKsFFKP1xuoAQWNAL9hURCoU2YpsrIwxqsLNlzkVuupwYOlhuDhcwM5QIXpMXPgcDqS10/t636OG
-        IcxJycWqpfL1b59n+zGbw1W6s0qgxVDtloLLRi+Q5FoNGqUvqLwYZ0zJ611MiGAtXUlC1zQgM84Ws
-        QDuOzH5o+ShmUMCy51OAjjnoYE02cx4rovniH0hZ0zfd4JKSJOSgdEzB/AGgZXc7qgPs40r6YTSPz
-        9wOsX1xw==;
+        bh=wkAghe3ZNHLtMkd0SpeOhPk85q8HVfUfHIWkbKQ6Tjs=; b=Hvp+NvWQs5Luk958wA57VbeRNK
+        OMTEG4yA7yQFAXaOHiEClUFOcpr8R2ndbIlSlETpKMTWVrJdB+1xovmDAeVAKvI48kpqhBwcWAJwj
+        JZANyR1PLRmtLYM3JiEZEQF/GtMXeeVt60oO59kNv6lGYmuqk41ljxzBRQJahnQX7Y4UDLbY3zF21
+        hBjLWXEkvipV1HSKqCK9pmkQ9XMOqIlHl/vP7cygXrhE7TQQzmNUKR+fxyCmzGoMvsmnJYtwSLsnH
+        zFnt1DnoBMJt6OGpXPXUrOr/icR8B/Jmviw8bwjL5QyermsF5Fx+f9C58xG7QmfTH2noGbyiU4XUh
+        rnyFmlLg==;
 Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1p5ko2-008T1Y-9W; Thu, 15 Dec 2022 09:45:34 +0000
-Date:   Thu, 15 Dec 2022 01:45:34 -0800
+        id 1p5l3D-008daE-QI; Thu, 15 Dec 2022 10:01:15 +0000
+Date:   Thu, 15 Dec 2022 02:01:15 -0800
 From:   Christoph Hellwig <hch@infradead.org>
 To:     Sergei Shtepa <sergei.shtepa@veeam.com>
 Cc:     axboe@kernel.dk, corbet@lwn.net, linux-block@vger.kernel.org,
         linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 17/21] block, blksnap: snapshot image block device
-Message-ID: <Y5rsvibCBNGMwnn+@infradead.org>
+Subject: Re: [PATCH v2 09/21] block, blksnap: attaching and detaching the
+ filter and handling I/O units
+Message-ID: <Y5rwa6m3yqo40vz1@infradead.org>
 References: <20221209142331.26395-1-sergei.shtepa@veeam.com>
- <20221209142331.26395-18-sergei.shtepa@veeam.com>
+ <20221209142331.26395-10-sergei.shtepa@veeam.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20221209142331.26395-18-sergei.shtepa@veeam.com>
+In-Reply-To: <20221209142331.26395-10-sergei.shtepa@veeam.com>
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Dec 09, 2022 at 03:23:27PM +0100, Sergei Shtepa wrote:
-> +static int snapimage_kthread_worker_fn(void *param);
-
-Any chance to order th code so that you can avoid forward declarations
-wherever possible.
-
-> +static inline int snapimage_start_worker(struct snapimage *snapimage)
+> +static bool tracker_submit_bio_cb(struct bio *bio)
 > +{
-> +	struct task_struct *task;
+> +	struct bdev_filter *flt = bio->bi_bdev->bd_filter;
+> +	struct bio_list bio_list_on_stack[2] = { };
+> +	struct bio *new_bio;
+> +	bool ret = true;
+> +	struct tracker *tracker = container_of(flt, struct tracker, flt);
+> +	int err;
+> +	sector_t sector;
+> +	sector_t count;
+> +	unsigned int current_flag;
 > +
-> +	spin_lock_init(&snapimage->queue_lock);
-> +	bio_list_init(&snapimage->queue);
-> +
-> +	task = kthread_create(snapimage_kthread_worker_fn,
-> +			      snapimage,
-> +			      BLK_SNAP_IMAGE_NAME "%d",
-> +			      MINOR(snapimage->image_dev_id));
-> +	if (IS_ERR(task))
-> +		return -ENOMEM;
-> +
-> +	snapimage->worker = get_task_struct(task);
+> +	WARN_ON_ONCE(!flt);
+> +	if (unlikely(!flt))
+> +		return true;
 
-There's not need to grab and put an extra reference to the task_struct,
-the kthread code already holds one.
+We're called through the filter, so checking this again here (twice)
+is a bit silly.
 
-> +	while (!kthread_should_stop()) {
-> +		bio = get_bio_from_queue(snapimage);
-> +		if (!bio) {
-> +			schedule_timeout_interruptible(HZ / 100);
-
-Do you need a timeout sleep here?  All new arrivals should properly
-wake the thread.
-
-> +			continue;
+> +	if (bio->bi_opf & REQ_NOWAIT) {
+> +		if (!percpu_down_read_trylock(&tracker_submit_lock)) {
+> +			bio_wouldblock_error(bio);
+> +			return false;
 > +		}
-> +
-> +		snapimage_process_bio(snapimage, bio);
-> +	}
-> +
-> +	while ((bio = get_bio_from_queue(snapimage)))
-> +		snapimage_process_bio(snapimage, bio);
-
-It seems like the loop could be simplified to:
-
-	for (;; {
-		while ((bio = get_bio_from_queue(snapimage)))
-			snapimage_process_bio(snapimage, bio);
-		if (kthread_should_stop())
-			break;
-		schedule();
-	}
-
-	return 0;
-
-
-> +static void snapimage_submit_bio(struct bio *bio)
-> +{
-> +	struct snapimage *snapimage = bio->bi_bdev->bd_disk->private_data;
-> +	gfp_t gfp = GFP_NOIO;
-> +
-> +	if (bio->bi_opf & REQ_NOWAIT)
-> +		gfp |= GFP_NOWAIT;
-
-gfp isn't actually used anywhere.
-
-> +	if (snapimage->is_ready) {
-> +		spin_lock(&snapimage->queue_lock);
-> +		bio_list_add(&snapimage->queue, bio);
-> +		spin_unlock(&snapimage->queue_lock);
-> +
-> +		wake_up_process(snapimage->worker);
 > +	} else
-> +		bio_io_error(bio);
-> +}
+> +		percpu_down_read(&tracker_submit_lock);
 
-I think you can do away with the is_ready flag entirely by just
-calling del_gendisk early enough.  See below.
+Does it make sense to make this a global lock vs per-struct tracker?
 
-> +void snapimage_free(struct snapimage *snapimage)
+> +	if (!op_is_write(bio_op(bio)))
+> +		goto out;
+> +
+> +	count = bio_sectors(bio);
+> +	if (!count)
+> +		goto out;
+
+Just nitpicking, but what about moving all the code below here
+into a separate helper that is only called for op_is_write &&
+bio_sectors?  It's not going to change anything functionally, but
+would make the code easier to follow.
+
+> +	current_flag = memalloc_noio_save();
+> +	bio_list_init(&bio_list_on_stack[0]);
+> +	current->bio_list = bio_list_on_stack;
+> +	barrier();
+
+barrier is just a compiler barrier, so it is unlikely to do what
+you want. But without a comment I can't even figure out what it is
+trying to do.
+
+> +static int tracker_filter_attach(struct block_device *bdev,
+> +				 struct tracker *tracker)
 > +{
-> +	pr_info("Snapshot image disk [%u:%u] delete\n",
-> +		MAJOR(snapimage->image_dev_id), MINOR(snapimage->image_dev_id));
+> +	int ret;
+> +	bool is_frozen = false;
 > +
-> +	blk_mq_freeze_queue(snapimage->disk->queue);
-> +	snapimage->is_ready = false;
-> +	blk_mq_unfreeze_queue(snapimage->disk->queue);
+> +	pr_debug("Tracker attach filter\n");
 > +
-> +	snapimage_stop_worker(snapimage);
-> +
-> +	del_gendisk(snapimage->disk);
+> +	if (freeze_bdev(bdev))
+> +		pr_err("Failed to freeze device [%u:%u]\n", MAJOR(bdev->bd_dev),
+> +		       MINOR(bdev->bd_dev));
 
-Just move the snapimage_stop_worker after del_gendisk here, and
-you should be fine.
+I think you need to fail the attachment if we can't freeze the device.
 
-> +	put_disk(snapimage->disk);
-> +
-> +	diff_area_put(snapimage->diff_area);
-> +	cbt_map_put(snapimage->cbt_map);
-> +
-> +	ida_free(&snapimage_devt_ida, MINOR(snapimage->image_dev_id));
-> +	kfree(snapimage);
-
-.. and then implement the free_disk block_device operation, and
-move all code after the put_disk into it, which means all your
-data structures are alive until the very last gendisk reference goes
-away.
-
-> +#ifdef GENHD_FL_NO_PART_SCAN
-> +	disk->flags |= GENHD_FL_NO_PART_SCAN;
-> +#else
-> +	disk->flags |= GENHD_FL_NO_PART;
-> +#endif
-
-GENHD_FL_NO_PART_SCAN is gone, so this ifdef goes away.
-
-> +	disk->major = _major;
-> +	disk->first_minor = minor;
-> +	disk->minors = 1; /* One disk has only one partition */
-
-No new driver should manage the major/minor numbers manually, as
-the block layer just assigns a dev_t by default if you don't se these.
-
-> +	wake_up_process(snapimage->worker);
-
-I don't think this wake_up is needed - the first queue bio should
-wake the helper thread up.
-
-> +int snapimage_init(void)
+> +static int tracker_filter_detach(struct block_device *bdev)
 > +{
-> +	int ret = 0;
+> +	int ret;
+> +	bool is_frozen = false;
 > +
-> +	ret = register_blkdev(0, BLK_SNAP_IMAGE_NAME);
-> +	if (ret < 0) {
-> +		pr_err("Failed to register snapshot image block device\n");
-> +		return ret;
-> +	}
-> +
-> +	_major = ret;
-> +	pr_info("Snapshot image block device major %d was registered\n",
-> +		_major);
-> +
-> +	return 0;
-> +}
-> +
-> +void snapimage_done(void)
+> +	pr_debug("Tracker delete filter\n");
+> +	if (freeze_bdev(bdev))
+> +		pr_err("Failed to freeze device [%u:%u]\n", MAJOR(bdev->bd_dev),
+> +		       MINOR(bdev->bd_dev));
+
+Same here.
+
+> +/**
+> + * tracker_wait_for_release - Waiting for all trackers are released.
+> + *
+> + * Trackers are released in the worker thread. So, this function allows to wait
+> + * for the end of the process of releasing trackers.
+> + */
+> +static void tracker_wait_for_release(void)
+
+This defeats the reason to move it to the workqueue first, as you
+can still deadlock on whatever problem that tried to solve, just
+out of reach of lockdep.
+
+> +struct tracker *tracker_create_or_get(dev_t dev_id)
 > +{
-> +	unregister_blkdev(_major, BLK_SNAP_IMAGE_NAME);
-> +	pr_info("Snapshot image block device [%d] was unregistered\n", _major);
-> +}
+> +	struct tracker *tracker;
+> +	struct block_device *bdev;
+> +	struct tracked_device *tr_dev;
+> +
+> +	bdev = blkdev_get_by_dev(dev_id, 0, NULL);
 
-And with block layer managed dev_t all this boilerplate can go away
-as well.
+These blkdev_get_by_dev calls are a little problematic, as they
+bypass any access restriction (LSMs, containers, etc).  That's
+why the kernel generally does a blkdev_get_by_name based on the
+actual file name, which does all the proper checks.  I think the
+tracker creation also needs to happen based on names to fit into this
+security model.  Passing in names should also be much easier for
+userspace to start with.
 
-> +#include <linux/blk_types.h>
-> +#include <linux/blkdev.h>
-> +#include <linux/blk-mq.h>
 
-If you already include blk-mq.h, there is no need for the other two
-headers as they are already implictly included.
+Now for remove, and the other operations on the tracked device:
+Is there any reason to not simply add an ioctl method to
+bdev_filter_operations, so that you can issue these ioctls against the
+tracked device?  That removes the need to find the tracked device
+entirely and should simplify a lot of things.
+
+In fact thinking wonder if attachment of a filter driver should
+go through the block layer using an ioctl on the tracked device
+as well, i.e.
+
+ - add a name field to bdev_filter_operations
+ - keep a list of all bdev_filter_operations in the block core
+ - new core block layer ioctl to associate a block device with a
+   bdev_filter_operations
+ - everything after that is done through bdev_filter_operations->ioctl.
+
