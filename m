@@ -2,69 +2,87 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D99E8C3DA6E
-	for <linux-block@archiver.kernel.org>; Thu, 15 Dec 2022 10:46:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CEDE6C4332F
+	for <linux-block@archiver.kernel.org>; Thu, 15 Dec 2022 12:13:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229684AbiLOKqy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 15 Dec 2022 05:46:54 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50778 "EHLO
+        id S229795AbiLOMNA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 15 Dec 2022 07:13:00 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38600 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230036AbiLOKqw (ORCPT
+        with ESMTP id S229639AbiLOMM6 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 15 Dec 2022 05:46:52 -0500
-Received: from mx1.veeam.com (mx1.veeam.com [216.253.77.21])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42C5A1C410;
-        Thu, 15 Dec 2022 02:46:49 -0800 (PST)
-Received: from mail.veeam.com (prgmbx01.amust.local [172.24.128.102])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mx1.veeam.com (Postfix) with ESMTPS id D099241D42;
-        Thu, 15 Dec 2022 05:47:41 -0500 (EST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=veeam.com;
-        s=mx1-2022; t=1671101262;
-        bh=xhll34qBllbleKx66EAPbdWrQOO5TZUZ0637lrp11Nc=;
-        h=Date:Subject:To:CC:References:From:In-Reply-To:From;
-        b=TKrwTfOBXBuHz/g0VqQ2IiMSFrcARyCoIRxkmMNuLSh3CfzQE5657obtdA8fxCebV
-         VR09826PnxKczE2lZv0AUwj2g7e1g0UJoxqpvMdHcOdk+paSt3nJORTW+kYmD3ZMC/
-         FFpjN6uHi2LuGH4aOVDc9mb05UUXP8W1CoGb9YrzmI9/9uJIoXnq9iRbUHYAOFjz/4
-         3zcWPe4GuMFHoZfSqu7artJAHbCTbLAzsLG+l+bbJY2u21J8STR9+OXhgLvak5Glxs
-         dqhFxDCLLCC1m/TQCOe0YSjPStdyUPu9S4NZAZyldw7Nj3OwWEbrHEnquUdBVbd7dz
-         pQBWfxyL+K7sg==
-Received: from [172.24.10.107] (172.24.10.107) by prgmbx01.amust.local
- (172.24.128.102) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.20; Thu, 15 Dec
- 2022 11:46:43 +0100
-Message-ID: <28b715eb-f9bc-c0d3-8dfd-22d0f84080c0@veeam.com>
-Date:   Thu, 15 Dec 2022 11:46:35 +0100
+        Thu, 15 Dec 2022 07:12:58 -0500
+Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 892DE2DABC
+        for <linux-block@vger.kernel.org>; Thu, 15 Dec 2022 04:12:57 -0800 (PST)
+Received: by mail-pj1-x1032.google.com with SMTP id k88-20020a17090a4ce100b00219d0b857bcso2486139pjh.1
+        for <linux-block@vger.kernel.org>; Thu, 15 Dec 2022 04:12:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=tbROf/TWMFjx+MhQppMSRO2ij4qLCaZ+Ou86oYjClhs=;
+        b=xRlaGwhWLdkfj/Xfjxe0Bu53C3ZyhnOP60du9GLIDh5lpeg9AixIvblroSXtY/xpKb
+         z8QYSyvoDAqkGdEczolF7dChtHNWOtFs/uFuLE67vgSVIClw0MWuVhb35TQYt0Eypj7L
+         QT0iEswSfSGshl7iVZ+LIeq1CmMwm707euW0l8uTQIN9FmVtlGv93CXv6TFaEucub3Ch
+         +qwYPEdXrnTWbevK5LyOejX01Vy7wq2u3WhJ++nzYWATwkZVWFD19/oT2xy+mcJaCdlt
+         BirmGqphW1e/qTxcvj7OGXizc7cVjlsb/BUKU60XjFFykZaPUvCGLA8GvUxgc7xhP9bj
+         H8JA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=tbROf/TWMFjx+MhQppMSRO2ij4qLCaZ+Ou86oYjClhs=;
+        b=cwofsU7rEpxjnrftpc1MkBUNA48Zf7+3NkANcA+m3OhbLglA5y5dUxHZybbm0fM5F6
+         Lxj5NYh3/SgLeAd/jYvg6wsZoML1UTXrpScPNleF0uQ9u9PRy3R7VBBblQgg6ji5a4/i
+         +Is9MRPIvRaH3tyWj7MF6qOTYviH/IotzmcaSRaZTRfaXnfW81i+6mQbDQGvpuOL7DkH
+         W7VDAMpFb1NfT/MayI8jyDHa0aV3mF4Nn/uZmVUQv4FlBqZtQGWHHeFi61cLPbGWaNF9
+         0Gz35C/fxL/E1nrx1N5tlrofPVWt6LM71pQf0s/P7c1vLH+OCkZEnX6noggYiaSTKYYF
+         e/2g==
+X-Gm-Message-State: ANoB5pnOrcw4z9vkxtmpyyoNN8uOntHo/pyHm6oOgqx5oF7oLWFXoxjQ
+        wXMTiDM2e69r7QKXvXeAInweNuTK0ibLmpOi/8I=
+X-Google-Smtp-Source: AA0mqf4sD2H8/j5rrD7/yP/LldETGl5hooq/lVB9I1kQwnnTUp5/EAtE4m4QFhcWVGkJN1mVn8aARg==
+X-Received: by 2002:a17:90b:1914:b0:219:3e05:64b7 with SMTP id mp20-20020a17090b191400b002193e0564b7mr6458040pjb.0.1671106376453;
+        Thu, 15 Dec 2022 04:12:56 -0800 (PST)
+Received: from [127.0.0.1] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id oa9-20020a17090b1bc900b0020a81cf4a9asm3037614pjb.14.2022.12.15.04.12.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 15 Dec 2022 04:12:55 -0800 (PST)
+From:   Jens Axboe <axboe@kernel.dk>
+To:     paolo.valente@linaro.org, Yuwei Guan <ssawgyw@gmail.com>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Yuwei.Guan@zeekrlife.com, Yu Kuai <yukuai3@huawei.com>
+In-Reply-To: <20221110112622.389332-1-Yuwei.Guan@zeekrlife.com>
+References: <20221110112622.389332-1-Yuwei.Guan@zeekrlife.com>
+Subject: Re: [PATCH v1] block, bfq: do the all counting of pending-request if
+ CONFIG_BFQ_GROUP_IOSCHED is enabled
+Message-Id: <167110637519.45663.2497428136113155086.b4-ty@kernel.dk>
+Date:   Thu, 15 Dec 2022 05:12:55 -0700
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.1
-Subject: Re: [PATCH v2 02/21] block, blkfilter: Block Device Filtering
- Mechanism
-Content-Language: en-US
-To:     Christoph Hellwig <hch@infradead.org>
-CC:     <axboe@kernel.dk>, <corbet@lwn.net>, <linux-block@vger.kernel.org>,
-        <linux-doc@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-References: <20221209142331.26395-1-sergei.shtepa@veeam.com>
- <20221209142331.26395-3-sergei.shtepa@veeam.com>
- <Y5roR3jjhQwgFWVM@infradead.org>
-From:   Sergei Shtepa <sergei.shtepa@veeam.com>
-In-Reply-To: <Y5roR3jjhQwgFWVM@infradead.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [172.24.10.107]
-X-ClientProxiedBy: colmbx01.amust.local (172.18.0.171) To prgmbx01.amust.local
- (172.24.128.102)
-X-EsetResult: clean, is OK
-X-EsetId: 37303A29240315566D7061
-X-Veeam-MMEX: True
+X-Mailer: b4 0.11.0-dev-50ba3
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-I am very glad to see your comments, Christoph.
-Thank you so much for the review.
 
-I have read all the comments and agree with them.
-Now I see new ways to make the code of the filter and the blksnap module better.
-There seems to be a lot of work to be done. :)
+On Thu, 10 Nov 2022 19:26:22 +0800, Yuwei Guan wrote:
+> The 'bfqd->num_groups_with_pending_reqs' is used when
+> CONFIG_BFQ_GROUP_IOSCHED is enabled, so let the variables and processes
+> take effect when ONFIG_BFQ_GROUP_IOSCHED is enabled.
+> 
+> 
+
+Applied, thanks!
+
+[1/1] block, bfq: do the all counting of pending-request if CONFIG_BFQ_GROUP_IOSCHED is enabled
+      commit: 1eb206208b0f3f707c67134ef6ba394410effb67
+
+Best regards,
+-- 
+Jens Axboe
+
+
