@@ -2,69 +2,205 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77DF0C00145
-	for <linux-block@archiver.kernel.org>; Thu, 15 Dec 2022 09:30:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4299FC10F31
+	for <linux-block@archiver.kernel.org>; Thu, 15 Dec 2022 09:45:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229905AbiLOJaW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 15 Dec 2022 04:30:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35616 "EHLO
+        id S230103AbiLOJpi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 15 Dec 2022 04:45:38 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45336 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229868AbiLOJaT (ORCPT
+        with ESMTP id S230097AbiLOJph (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 15 Dec 2022 04:30:19 -0500
+        Thu, 15 Dec 2022 04:45:37 -0500
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9BAB1379E5;
-        Thu, 15 Dec 2022 01:30:18 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D564414D20;
+        Thu, 15 Dec 2022 01:45:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
         :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=IlJozU8OcvQayugAj056DEYAilBtzE6ivKVmxPXiPjk=; b=KwL0SIsMaRie20LTB50JeyVkKV
-        POMk7lwcQE7zJUjIsRTtQq8GEMo7/nLrkOmO6nZIpJnGAv/SzZQAQ1a4aQyzrgwzCw435vslZO6H2
-        cA93wdjgSACqBxvjHiLQYJhuGX65OwIAYQgmwBWgKEUIOv3SPuIL6ccFpRdbMFAJTBda0JmSptqaq
-        ea4y2Nu96SWWKLgPdgO8tds7ISBV1IlSdQ1jOcjIW3gRq229Qqi5Qlhn8USxSwfC8pJn+AyI4jMkc
-        UneNesuw7+JfPgOQY8LKbFNx2r7/+AB/pH3mOVOGX1zuYukb1nEpgQGkdzemkKJXmV+xAhUmI6+xv
-        NRn5VSQg==;
+        bh=ngEPy5SgkQAXzrDrGQ4y5fn8QjLL1hAd1sk2qSi+fc0=; b=M8Gs6M1azvQ5whxKV4gsBan5e0
+        7/QEDmiPUm+2alXDzA+/jyfouaoah8t8D/USCRDwhBME+qGuilhleIGTge/patyPnoE+W72c4rMGk
+        ySKsFFKP1xuoAQWNAL9hURCoU2YpsrIwxqsLNlzkVuupwYOlhuDhcwM5QIXpMXPgcDqS10/t636OG
+        IcxJycWqpfL1b59n+zGbw1W6s0qgxVDtloLLRi+Q5FoNGqUvqLwYZ0zJ611MiGAtXUlC1zQgM84Ws
+        QDuOzH5o+ShmUMCy51OAjjnoYE02cx4rovniH0hZ0zfd4JKSJOSgdEzB/AGgZXc7qgPs40r6YTSPz
+        9wOsX1xw==;
 Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1p5kZF-008HLa-4H; Thu, 15 Dec 2022 09:30:17 +0000
-Date:   Thu, 15 Dec 2022 01:30:17 -0800
+        id 1p5ko2-008T1Y-9W; Thu, 15 Dec 2022 09:45:34 +0000
+Date:   Thu, 15 Dec 2022 01:45:34 -0800
 From:   Christoph Hellwig <hch@infradead.org>
 To:     Sergei Shtepa <sergei.shtepa@veeam.com>
 Cc:     axboe@kernel.dk, corbet@lwn.net, linux-block@vger.kernel.org,
         linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 07/21] block, blksnap: init() and exit() functions
-Message-ID: <Y5rpKXuJxqeUYfJP@infradead.org>
+Subject: Re: [PATCH v2 17/21] block, blksnap: snapshot image block device
+Message-ID: <Y5rsvibCBNGMwnn+@infradead.org>
 References: <20221209142331.26395-1-sergei.shtepa@veeam.com>
- <20221209142331.26395-8-sergei.shtepa@veeam.com>
+ <20221209142331.26395-18-sergei.shtepa@veeam.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20221209142331.26395-8-sergei.shtepa@veeam.com>
+In-Reply-To: <20221209142331.26395-18-sergei.shtepa@veeam.com>
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Dec 09, 2022 at 03:23:17PM +0100, Sergei Shtepa wrote:
-> +	result = diff_io_init();
-> +	if (result)
-> +		return result;
-> +
-> +	result = snapimage_init();
-> +	if (result)
-> +		return result;
-> +
-> +	result = tracker_init();
-> +	if (result)
-> +		return result;
+On Fri, Dec 09, 2022 at 03:23:27PM +0100, Sergei Shtepa wrote:
+> +static int snapimage_kthread_worker_fn(void *param);
 
-You need to clean up all these initialization if a later one fails.
+Any chance to order th code so that you can avoid forward declarations
+wherever possible.
 
-Also, does this really need a separate file?  Any good reason to
-not just keep the tiny amount of init code in ctrl.c?
-
-> +static void __exit blk_snap_exit(void)
+> +static inline int snapimage_start_worker(struct snapimage *snapimage)
 > +{
-> +	pr_info("Unloading module\n");
+> +	struct task_struct *task;
+> +
+> +	spin_lock_init(&snapimage->queue_lock);
+> +	bio_list_init(&snapimage->queue);
+> +
+> +	task = kthread_create(snapimage_kthread_worker_fn,
+> +			      snapimage,
+> +			      BLK_SNAP_IMAGE_NAME "%d",
+> +			      MINOR(snapimage->image_dev_id));
+> +	if (IS_ERR(task))
+> +		return -ENOMEM;
+> +
+> +	snapimage->worker = get_task_struct(task);
 
-Also we try to avoid these verbose messages for new code normally.
+There's not need to grab and put an extra reference to the task_struct,
+the kthread code already holds one.
+
+> +	while (!kthread_should_stop()) {
+> +		bio = get_bio_from_queue(snapimage);
+> +		if (!bio) {
+> +			schedule_timeout_interruptible(HZ / 100);
+
+Do you need a timeout sleep here?  All new arrivals should properly
+wake the thread.
+
+> +			continue;
+> +		}
+> +
+> +		snapimage_process_bio(snapimage, bio);
+> +	}
+> +
+> +	while ((bio = get_bio_from_queue(snapimage)))
+> +		snapimage_process_bio(snapimage, bio);
+
+It seems like the loop could be simplified to:
+
+	for (;; {
+		while ((bio = get_bio_from_queue(snapimage)))
+			snapimage_process_bio(snapimage, bio);
+		if (kthread_should_stop())
+			break;
+		schedule();
+	}
+
+	return 0;
+
+
+> +static void snapimage_submit_bio(struct bio *bio)
+> +{
+> +	struct snapimage *snapimage = bio->bi_bdev->bd_disk->private_data;
+> +	gfp_t gfp = GFP_NOIO;
+> +
+> +	if (bio->bi_opf & REQ_NOWAIT)
+> +		gfp |= GFP_NOWAIT;
+
+gfp isn't actually used anywhere.
+
+> +	if (snapimage->is_ready) {
+> +		spin_lock(&snapimage->queue_lock);
+> +		bio_list_add(&snapimage->queue, bio);
+> +		spin_unlock(&snapimage->queue_lock);
+> +
+> +		wake_up_process(snapimage->worker);
+> +	} else
+> +		bio_io_error(bio);
+> +}
+
+I think you can do away with the is_ready flag entirely by just
+calling del_gendisk early enough.  See below.
+
+> +void snapimage_free(struct snapimage *snapimage)
+> +{
+> +	pr_info("Snapshot image disk [%u:%u] delete\n",
+> +		MAJOR(snapimage->image_dev_id), MINOR(snapimage->image_dev_id));
+> +
+> +	blk_mq_freeze_queue(snapimage->disk->queue);
+> +	snapimage->is_ready = false;
+> +	blk_mq_unfreeze_queue(snapimage->disk->queue);
+> +
+> +	snapimage_stop_worker(snapimage);
+> +
+> +	del_gendisk(snapimage->disk);
+
+Just move the snapimage_stop_worker after del_gendisk here, and
+you should be fine.
+
+> +	put_disk(snapimage->disk);
+> +
+> +	diff_area_put(snapimage->diff_area);
+> +	cbt_map_put(snapimage->cbt_map);
+> +
+> +	ida_free(&snapimage_devt_ida, MINOR(snapimage->image_dev_id));
+> +	kfree(snapimage);
+
+.. and then implement the free_disk block_device operation, and
+move all code after the put_disk into it, which means all your
+data structures are alive until the very last gendisk reference goes
+away.
+
+> +#ifdef GENHD_FL_NO_PART_SCAN
+> +	disk->flags |= GENHD_FL_NO_PART_SCAN;
+> +#else
+> +	disk->flags |= GENHD_FL_NO_PART;
+> +#endif
+
+GENHD_FL_NO_PART_SCAN is gone, so this ifdef goes away.
+
+> +	disk->major = _major;
+> +	disk->first_minor = minor;
+> +	disk->minors = 1; /* One disk has only one partition */
+
+No new driver should manage the major/minor numbers manually, as
+the block layer just assigns a dev_t by default if you don't se these.
+
+> +	wake_up_process(snapimage->worker);
+
+I don't think this wake_up is needed - the first queue bio should
+wake the helper thread up.
+
+> +int snapimage_init(void)
+> +{
+> +	int ret = 0;
+> +
+> +	ret = register_blkdev(0, BLK_SNAP_IMAGE_NAME);
+> +	if (ret < 0) {
+> +		pr_err("Failed to register snapshot image block device\n");
+> +		return ret;
+> +	}
+> +
+> +	_major = ret;
+> +	pr_info("Snapshot image block device major %d was registered\n",
+> +		_major);
+> +
+> +	return 0;
+> +}
+> +
+> +void snapimage_done(void)
+> +{
+> +	unregister_blkdev(_major, BLK_SNAP_IMAGE_NAME);
+> +	pr_info("Snapshot image block device [%d] was unregistered\n", _major);
+> +}
+
+And with block layer managed dev_t all this boilerplate can go away
+as well.
+
+> +#include <linux/blk_types.h>
+> +#include <linux/blkdev.h>
+> +#include <linux/blk-mq.h>
+
+If you already include blk-mq.h, there is no need for the other two
+headers as they are already implictly included.
