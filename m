@@ -2,57 +2,103 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D64A8C00145
-	for <linux-block@archiver.kernel.org>; Thu, 15 Dec 2022 10:06:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 047EAC4167B
+	for <linux-block@archiver.kernel.org>; Thu, 15 Dec 2022 10:27:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230096AbiLOKG2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 15 Dec 2022 05:06:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59464 "EHLO
+        id S229506AbiLOK1O (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 15 Dec 2022 05:27:14 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41036 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229945AbiLOKG1 (ORCPT
+        with ESMTP id S229744AbiLOK1L (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 15 Dec 2022 05:06:27 -0500
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 92C76FDD;
-        Thu, 15 Dec 2022 02:06:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=iRzkPWuCkQml6FYGQ4TeSDfpbXjzHlPcMLaQkvZAaQE=; b=2V1qG2uHmplQmT3bRDjmbko+Ot
-        HY9m8IrWLuV49vQ/8DgONSsiWewojZXnbLNKHm/FdweSHW90r6i7onM+uXP9jPMahqSBNW+RiE6Ix
-        jnE9iIFRM+4hRDUhauomEVtIo2ZRZ2qE5w0hxa/Cw1xOoLPLzwNhTUFx41OACjAgdO3o5wjvaRK1J
-        DVtqQC7NAiVFfF4ik3p/Y61CtKdO7jVliVCIEEJ8VYSy1G/lLfi1MqIkVFRkB0Dk0/w8E2+WxKmQ0
-        /GnElXVHFDtAU0TSJgq1gVova4ZCO/X8a0OFn6ehKzhFSUjwHQj+dceCySI9ibpAqAUD0cnapqLUV
-        0SRsX12A==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1p5l8A-008ffS-Mn; Thu, 15 Dec 2022 10:06:22 +0000
-Date:   Thu, 15 Dec 2022 02:06:22 -0800
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Sergei Shtepa <sergei.shtepa@veeam.com>
-Cc:     axboe@kernel.dk, corbet@lwn.net, linux-block@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 13/21] block, blksnap: functions and structures for
- performing block I/O operations
-Message-ID: <Y5rxnsKpQga5GRzY@infradead.org>
-References: <20221209142331.26395-1-sergei.shtepa@veeam.com>
- <20221209142331.26395-14-sergei.shtepa@veeam.com>
+        Thu, 15 Dec 2022 05:27:11 -0500
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 529952E4;
+        Thu, 15 Dec 2022 02:27:10 -0800 (PST)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id BBE9520F72;
+        Thu, 15 Dec 2022 10:27:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1671100028; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=yi1j32638121uUkrd5VI1ko6llH+YBRN+da4F96TPoY=;
+        b=AhbyzMrL5rrJBm0s+wy3Kan0wdkB9iIFNKUdWwX5DOeDZrFjSiA5LncheEpslE2Eud/rS3
+        vTXIcmioFqcyBar23lVjjor87q4fA5WjuPEoNZKnUr6LDjCb9vNNStQmtbCTLP7iA0vcxO
+        ZJPUuv9/D8pEESbvSjbard/1Cuovni4=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1671100028;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=yi1j32638121uUkrd5VI1ko6llH+YBRN+da4F96TPoY=;
+        b=0jz0jEeGSk/napn+mrIoVfrNaoa4XcTGVBeY2lUEQOiO5AAxhnF4fQHNHQ0xhLwjP8Gtk9
+        5NFVwUEEH+1DG3Cw==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id A5F1F138E5;
+        Thu, 15 Dec 2022 10:27:08 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id rCx0KHz2mmNGUAAAMHmgww
+        (envelope-from <jack@suse.cz>); Thu, 15 Dec 2022 10:27:08 +0000
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+        id 7ABF2A0727; Thu, 15 Dec 2022 11:27:07 +0100 (CET)
+Date:   Thu, 15 Dec 2022 11:27:07 +0100
+From:   Jan Kara <jack@suse.cz>
+To:     Yuwei Guan <ssawgyw@gmail.com>
+Cc:     Yu Kuai <yukuai1@huaweicloud.com>, Jan Kara <jack@suse.cz>,
+        paolo.valente@linaro.org, axboe@kernel.dk,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Yuwei.Guan@zeekrlife.com, "yukuai (C)" <yukuai3@huawei.com>
+Subject: Re: [PATCH v1] block, bfq: do the all counting of pending-request if
+ CONFIG_BFQ_GROUP_IOSCHED is enabled
+Message-ID: <20221215102707.hvnhzwd425f3dccy@quack3>
+References: <20221110112622.389332-1-Yuwei.Guan@zeekrlife.com>
+ <3153dcb3-dd9b-7a2b-a15a-8244d805f246@huaweicloud.com>
+ <CALJQGLmOaEnHawYvNz5fk_MtGhz6DPpW+8E-hgvmWxF--8V4zA@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20221209142331.26395-14-sergei.shtepa@veeam.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CALJQGLmOaEnHawYvNz5fk_MtGhz6DPpW+8E-hgvmWxF--8V4zA@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-> +	bio = bio_alloc_bioset(diff_region->bdev, nr_iovecs, opf, gfp_mask,
-> +			       &diff_io_bioset);
-> +	if (unlikely(!bio)) {
-> +		if (is_nowait)
-> +			ret = -EAGAIN;
-> +		else
-> +			ret = -ENOMEM;
-> +		goto fail;
+Hello Yuwei!
 
-bio_alloc_bioset can't fail for the !is_nowait case.
+On Thu 15-12-22 09:48:59, Yuwei Guan wrote:
+> Yu Kuai <yukuai1@huaweicloud.com> 于2022年11月14日周一 11:33写道：
+> >
+> > Hi,
+> >
+> > 在 2022/11/10 19:26, Yuwei Guan 写道:
+> > > The 'bfqd->num_groups_with_pending_reqs' is used when
+> > > CONFIG_BFQ_GROUP_IOSCHED is enabled, so let the variables and processes
+> > > take effect when ONFIG_BFQ_GROUP_IOSCHED is enabled.
+> > >
+> >
+> > This patch looks good to me, fell free to add:
+> > Reviewed-by: Yu Kuai <yukuai3@huawei.com>
+> >
+> > BTW, this patch need to be reviewed by Jan or Paolo before it can be
+> > applied.
+> 
+> Could you help to review this patch.
+
+Yeah, the patch looks good to me. Feel free to add:
+
+Reviewed-by: Jan Kara <jack@suse.cz>
+
+								Honza
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
