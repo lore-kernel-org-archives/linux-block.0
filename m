@@ -2,96 +2,62 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C6B5C10F1E
-	for <linux-block@archiver.kernel.org>; Fri, 16 Dec 2022 03:13:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D3D7C001B2
+	for <linux-block@archiver.kernel.org>; Fri, 16 Dec 2022 07:04:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229968AbiLPDNo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 15 Dec 2022 22:13:44 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45870 "EHLO
+        id S229882AbiLPHEm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 16 Dec 2022 02:04:42 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34602 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229863AbiLPDNg (ORCPT
+        with ESMTP id S229814AbiLPHEl (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 15 Dec 2022 22:13:36 -0500
-Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E16562A951;
-        Thu, 15 Dec 2022 19:13:35 -0800 (PST)
-Received: from mail02.huawei.com (unknown [172.30.67.153])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4NYDhB3Pnhz4f41hk;
-        Fri, 16 Dec 2022 11:13:30 +0800 (CST)
-Received: from huaweicloud.com (unknown [10.175.124.27])
-        by APP4 (Coremail) with SMTP id gCh0CgAXiNVW4ptjHYxACQ--.50238S12;
-        Fri, 16 Dec 2022 11:13:33 +0800 (CST)
-From:   Kemeng Shi <shikemeng@huaweicloud.com>
-To:     jack@suse.cz, paolo.valente@linaro.org, tj@kernel.org,
-        josef@toxicpanda.com, axboe@kernel.dk
-Cc:     cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linfeilong@huawei.com,
-        liuzhiqiang@26.com, shikemeng@huaweicloud.com
-Subject: [PATCH v2 10/10] block, bfq: remove check of bfq_wr_max_softrt_rate which is always greater than 0
-Date:   Fri, 16 Dec 2022 19:12:30 +0800
-Message-Id: <20221216111230.3638832-11-shikemeng@huaweicloud.com>
-X-Mailer: git-send-email 2.30.0
-In-Reply-To: <20221216111230.3638832-1-shikemeng@huaweicloud.com>
-References: <20221216111230.3638832-1-shikemeng@huaweicloud.com>
+        Fri, 16 Dec 2022 02:04:41 -0500
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59BF736C42;
+        Thu, 15 Dec 2022 23:04:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=Bdn3uI2+vY5pQpRy4ybJdHr0gzTwg0wCHFdFjlS66os=; b=bLfJhBuvLnKfTacOfntkdpS2po
+        uAg/4/QhYMKzf4mZgSJhDGyiG4KkB7RTxyWxK+FqZuwCXC8tpmImbDTEiVw8UVc+KvhOJZwd+TbOc
+        7kpyqxiSfd89La05577BSU/N1Pm2w8f8wLgenw8HtpqxFH6ll6ph504SagudlnHyZx6qJMo1qy6jn
+        AfwOY34DFkgeTgN3TI/aAh9YaQOP8l5RlBs5skn91XVAHisw2DYcVEtJH7x1Y9BkNfvRDnZIPnSpG
+        kZI+PpexyIt88X90R0K4QYbleTEnC5uzu9vnCte4RRH8VN4oR6+1PeqqWzbpC1HI80DUDcbOla61k
+        qNV6+6Ag==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1p64ln-00DJ0d-Mf; Fri, 16 Dec 2022 07:04:35 +0000
+Date:   Thu, 15 Dec 2022 23:04:35 -0800
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Sergei Shtepa <sergei.shtepa@veeam.com>
+Cc:     Christoph Hellwig <hch@infradead.org>, axboe@kernel.dk,
+        corbet@lwn.net, linux-block@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 02/21] block, blkfilter: Block Device Filtering
+ Mechanism
+Message-ID: <Y5wYgwtFYPj2xq/m@infradead.org>
+References: <20221209142331.26395-1-sergei.shtepa@veeam.com>
+ <20221209142331.26395-3-sergei.shtepa@veeam.com>
+ <Y5roR3jjhQwgFWVM@infradead.org>
+ <28b715eb-f9bc-c0d3-8dfd-22d0f84080c0@veeam.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgAXiNVW4ptjHYxACQ--.50238S12
-X-Coremail-Antispam: 1UD129KBjvJXoW7Cry7Zr47CFyUZFyfJF13Arb_yoW8Gr1kpa
-        yaqr4UWF45Ka1F9F4UtF18Ww1jyan3W3srKw1DZw1DtrW7ZFn3ua9akwnYva92qFn7Crsx
-        ZF1DKa4kXF1DA37anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUmq14x267AKxVWrJVCq3wAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2jI8I6cxK62vIxIIY0VWUZVW8XwA2048vs2IY02
-        0E87I2jVAFwI0_JF0E3s1l82xGYIkIc2x26xkF7I0E14v26ryj6s0DM28lY4IEw2IIxxk0
-        rwA2F7IY1VAKz4vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6x
-        IIjxv20xvEc7CjxVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vE
-        x4A2jsIEc7CjxVAFwI0_GcCE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2
-        IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4U
-        McvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I64
-        8v4I1lFIxGxcIEc7CjxVA2Y2ka0xkIwI1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Y
-        z7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zV
-        AF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Gr0_Xr1l
-        IxAIcVC0I7IYx2IY6xkF7I0E14v26r4UJVWxJr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r
-        1xMIIF0xvEx4A2jsIE14v26r4j6F4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr1j6F4UJbIY
-        CTnIWIevJa73UjIFyTuYvjTRKfOwUUUUU
-X-CM-SenderInfo: 5vklyvpphqwq5kxd4v5lfo033gof0z/
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <28b715eb-f9bc-c0d3-8dfd-22d0f84080c0@veeam.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-bfqd->bfq_wr_max_softrt_rate is assigned with 7000 in bfq_init_queue and
-never changed. So we can remove bfqd->bfq_wr_max_softrt_rate > 0 check
-which is always true.
+On Thu, Dec 15, 2022 at 11:46:35AM +0100, Sergei Shtepa wrote:
+> I am very glad to see your comments, Christoph.
+> Thank you so much for the review.
+> 
+> I have read all the comments and agree with them.
+> Now I see new ways to make the code of the filter and the blksnap module better.
 
-Signed-off-by: Kemeng Shi <shikemeng@huaweicloud.com>
----
- block/bfq-iosched.c | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
-
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index 91bc68fba72d..00cdd42ac02a 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -1788,8 +1788,7 @@ static void bfq_bfqq_handle_idle_busy_switch(struct bfq_data *bfqd,
- 	 *   to control its weight explicitly)
- 	 */
- 	in_burst = bfq_bfqq_in_large_burst(bfqq);
--	soft_rt = bfqd->bfq_wr_max_softrt_rate > 0 &&
--		!BFQQ_TOTALLY_SEEKY(bfqq) &&
-+	soft_rt = !BFQQ_TOTALLY_SEEKY(bfqq) &&
- 		!in_burst &&
- 		time_is_before_jiffies(bfqq->soft_rt_next_start) &&
- 		bfqq->dispatched == 0 &&
-@@ -4284,8 +4283,7 @@ void bfq_bfqq_expire(struct bfq_data *bfqd,
- 	if (bfqd->low_latency && bfqq->wr_coeff == 1)
- 		bfqq->last_wr_start_finish = jiffies;
- 
--	if (bfqd->low_latency && bfqd->bfq_wr_max_softrt_rate > 0 &&
--	    RB_EMPTY_ROOT(&bfqq->sort_list)) {
-+	if (bfqd->low_latency && RB_EMPTY_ROOT(&bfqq->sort_list)) {
- 		/*
- 		 * If we get here, and there are no outstanding
- 		 * requests, then the request pattern is isochronous
--- 
-2.30.0
-
+Sorry for being so late, but I was stuck onder a pile of work last
+time you posted it.  But compared to the versions before I think we've
+made a lot of progress and we'll get there.  Also feel free to ask me
+for input on changes before the sending the whole series if you have any
+questions.
