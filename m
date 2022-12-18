@@ -2,47 +2,47 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EDD00C4167B
-	for <linux-block@archiver.kernel.org>; Sun, 18 Dec 2022 16:53:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AD462C4332F
+	for <linux-block@archiver.kernel.org>; Sun, 18 Dec 2022 16:58:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232729AbiLRQxK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 18 Dec 2022 11:53:10 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34574 "EHLO
+        id S233037AbiLRQ6Y (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 18 Dec 2022 11:58:24 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37862 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233050AbiLRQwb (ORCPT
+        with ESMTP id S233183AbiLRQ5a (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 18 Dec 2022 11:52:31 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1C6611478;
-        Sun, 18 Dec 2022 08:18:31 -0800 (PST)
+        Sun, 18 Dec 2022 11:57:30 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6CA4C1C918;
+        Sun, 18 Dec 2022 08:20:05 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 3F1A4B80BA4;
-        Sun, 18 Dec 2022 16:18:22 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4D8A4C433F1;
-        Sun, 18 Dec 2022 16:18:20 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 0A6A160C99;
+        Sun, 18 Dec 2022 16:20:05 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ACAB1C433F0;
+        Sun, 18 Dec 2022 16:20:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1671380301;
-        bh=N0q58NOKlB182lXyIjtsJmQ29ooopntDX1/ZIkcm5VA=;
+        s=k20201202; t=1671380404;
+        bh=rByWPUYhZaAZwdDPTUtCgCF4SZBKN0twJvNUntKA2Rk=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=O6UFGvRqWwjb5xc6EQFO5ZGvJtDKwiafAGi13iSQ59ikPBsbp5/yO2s4ydVF1EPDL
-         SmiJidYG9gnwNEls0sUBWLeMi9u90h1Ey1hr7UmBujBL27rPEOce4fS+0ZjQfP4I/L
-         8ny8/OTb+CCTydYNAL6T3e9/+bvGySxG3/X6M1WrHMCVG0mW2P4ms7QY9U3Pk7G5sL
-         EHX8MH0jtGRQ0aAL661aDNcSgn9YbW568SDIIFp2ojliUcuEbREw/puJ1QWKXH1aiL
-         bPdT/8GKmcqWU2T+EYj4K4PyeHCUl0+1seC/yCbxQ708Mb45zSuFGJbq3V+jzhUEsC
-         A+ex+GZHepVQg==
+        b=PaCE66CSK1AFefIr0SJmbGUJFOA3Ia/7XbFgWaACIslsXLh7yp14sR3G51kAQB1jX
+         /TF3CPv8KhhvnCHNTrO84j6atL7B/Rn/hLwdKBis5+NdgFoTecJdomz3Sr/+VEW8jQ
+         fh7LRzlzBgAsm5Wp1njUK8tvbx0E5nXCHTKV5H5obpx5wdlfMK1W7CkbTfIeSWMUIx
+         9D7xaD6w2YKzgd4JItjolrL7bfphyP3hwvHLM1m7A7Fropg0KzhnDjD6JvWpIbpye9
+         9U8N0GG49r5wn9/4DSa37X/6V3sryJR1Q8p0Ceb2Ml3QR3dEJZVAMdNCjt/xkRpDyn
+         riv/RWuXmJ2bw==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Ye Bin <yebin10@huawei.com>, Ming Lei <ming.lei@redhat.com>,
         Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
         linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.10 33/39] blk-mq: fix possible memleak when register 'hctx' failed
-Date:   Sun, 18 Dec 2022 11:15:53 -0500
-Message-Id: <20221218161559.932604-33-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.4 26/30] blk-mq: fix possible memleak when register 'hctx' failed
+Date:   Sun, 18 Dec 2022 11:18:31 -0500
+Message-Id: <20221218161836.933697-26-sashal@kernel.org>
 X-Mailer: git-send-email 2.35.1
-In-Reply-To: <20221218161559.932604-1-sashal@kernel.org>
-References: <20221218161559.932604-1-sashal@kernel.org>
+In-Reply-To: <20221218161836.933697-1-sashal@kernel.org>
+References: <20221218161836.933697-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -99,10 +99,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 9 insertions(+), 2 deletions(-)
 
 diff --git a/block/blk-mq-sysfs.c b/block/blk-mq-sysfs.c
-index 7b52e7657b2d..f0bc3398f3ed 100644
+index 5dafd7a8ec91..7abd66d1228a 100644
 --- a/block/blk-mq-sysfs.c
 +++ b/block/blk-mq-sysfs.c
-@@ -242,7 +242,7 @@ static int blk_mq_register_hctx(struct blk_mq_hw_ctx *hctx)
+@@ -250,7 +250,7 @@ static int blk_mq_register_hctx(struct blk_mq_hw_ctx *hctx)
  {
  	struct request_queue *q = hctx->queue;
  	struct blk_mq_ctx *ctx;
@@ -111,7 +111,7 @@ index 7b52e7657b2d..f0bc3398f3ed 100644
  
  	if (!hctx->nr_ctx)
  		return 0;
-@@ -254,9 +254,16 @@ static int blk_mq_register_hctx(struct blk_mq_hw_ctx *hctx)
+@@ -262,9 +262,16 @@ static int blk_mq_register_hctx(struct blk_mq_hw_ctx *hctx)
  	hctx_for_each_ctx(hctx, ctx, i) {
  		ret = kobject_add(&ctx->kobj, &hctx->kobj, "cpu%u", ctx->cpu);
  		if (ret)
