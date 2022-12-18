@@ -2,293 +2,199 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 458B2C3DA78
-	for <linux-block@archiver.kernel.org>; Sun, 18 Dec 2022 11:13:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C813C4167B
+	for <linux-block@archiver.kernel.org>; Sun, 18 Dec 2022 16:05:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230415AbiLRLNf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 18 Dec 2022 06:13:35 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46478 "EHLO
+        id S231193AbiLRQFL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 18 Dec 2022 11:05:11 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33928 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230328AbiLRLNb (ORCPT
+        with ESMTP id S231192AbiLRQEj (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 18 Dec 2022 06:13:31 -0500
-Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4275F60D4
-        for <linux-block@vger.kernel.org>; Sun, 18 Dec 2022 03:13:29 -0800 (PST)
-Received: by mail-pj1-x1034.google.com with SMTP id o12so6499384pjo.4
-        for <linux-block@vger.kernel.org>; Sun, 18 Dec 2022 03:13:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance-com.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Bj58fIt+qJydCfyNzVeCHORGcPLQ9XK7V8aCuX3pXug=;
-        b=5a1eXguRdAGVjYb/NPWQ9Ytpxe5kmDCVYyojCgvvb83+9XeovdU6lB6nvW8a+0tMAd
-         NcUL9eaH5VQERezbLbZW4zBj70WRQSWu9d56z4MsVXEIlhGL2nrIEUK3LeiGrWuo+DpK
-         tpQ2QZ2H8OXv+i4kPX7oJ5Gc+LAkJuUY9w4nOyMZa2NlO5KuHoBVFz2mVRutkjiT+JMQ
-         DDkayo4nsPlJErSwX+YNpfao+UqQyyA24b9o1ed2dIiBmFIoyz6Kb1nIghxfc92RZj4j
-         L6kIHMxbDTPV4vY3YUCtN+pRi0g4wYToUpUQ0c47WJAiKNcyQNdnkXoCo7/yFP76DIdk
-         COcw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Bj58fIt+qJydCfyNzVeCHORGcPLQ9XK7V8aCuX3pXug=;
-        b=OQ/kv3ohzzYLgK06qZ+CP2WVEspOhJoEBaP9CX9QBJAv2cFga0eHVHv60ECa5l6PCr
-         tL88/nt/TBInzFDAuwRNmUr9eWJizi0gNNCb92P6+BmxWcqbQMr2zGEBf5C3vRl5jA11
-         QiHyYEJ5oKmGQH9RXoH9Y+SZXESaYiK4abmPqWKNCmHkKbBMwMaW6sAaYC83sHAyBcDv
-         lyy+FcdcWPdML1DcTYsUyiwIlAhs1/h0omi7xJTrU6lrDNuz1uBs5cBU3DJ52xTkq7Fe
-         IsaNsYE7AXbVc8WdJoIFPxxyETwO1AphEgFB1a+aruX1t8jBCvmi1doY7a8ELg+miPxZ
-         Z/bA==
-X-Gm-Message-State: AFqh2kqV6sLJEOisecYh+Wgz9822QnIRdd8VQ7B2Gkqs58REy61xxQFB
-        GJHKRChhbAEFzLtNwUw37vCbUVBcBCh3QJ4XUtk=
-X-Google-Smtp-Source: AMrXdXtBJ3f5/hcS5KH8J4TUZSeF7LgpX1tc9Z/zVcLXR1oDs/v2wQ1IrHxLolGz5FsJOAfNFTEb5A==
-X-Received: by 2002:a05:6a20:2d8f:b0:b0:2070:2ef5 with SMTP id bf15-20020a056a202d8f00b000b020702ef5mr2606422pzb.22.1671362008699;
-        Sun, 18 Dec 2022 03:13:28 -0800 (PST)
-Received: from localhost.localdomain ([139.177.225.231])
-        by smtp.gmail.com with ESMTPSA id x21-20020a63fe55000000b0043c22e926f8sm4227235pgj.84.2022.12.18.03.13.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 18 Dec 2022 03:13:28 -0800 (PST)
-From:   Jinke Han <hanjinke.666@bytedance.com>
-X-Google-Original-From: Jinke Han <hnajinke.666@bytedance>
-To:     tj@kernel.org, josef@toxicpanda.com, axboe@kernel.dk
-Cc:     cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, yinxin.x@bytedance.com,
-        Jinke Han <hanjinke.666@bytedance.com>
-Subject: [PATCH] blk-throtl: Introduce sync and async queues for blk-throtl
-Date:   Sun, 18 Dec 2022 19:13:14 +0800
-Message-Id: <20221218111314.55525-1-hanjinke.666@bytedance.com>
-X-Mailer: git-send-email 2.32.0 (Apple Git-132)
+        Sun, 18 Dec 2022 11:04:39 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 82330B7F7;
+        Sun, 18 Dec 2022 08:03:01 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 8F66860DCA;
+        Sun, 18 Dec 2022 16:03:00 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E2C5EC433F2;
+        Sun, 18 Dec 2022 16:02:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1671379380;
+        bh=3gsHSt0wuiY6019cjs5JAUJmceQVZDeXBuBdLOIk2KA=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=GdhAhFW0DSZ5cRwAf7SAtKN5ym00m9QDvGQ0taH/cFRQac8AdyeScIsYuLl8NhOTs
+         NdTJCHEyknCAkaoigvcCkras8zQpr3zsXa4G4rrfkcAzdxoXOZ6E28XtCXgFudKVEt
+         0yvG+nkeqlJ8NegOpE36NX6kYPmDVxW46VRTMPVyLOkF1rw+OJ7iRrJCddeJWZ9J/I
+         Uq//4hwm2E88qELqJg+PH8eXoaXT+6ZAyjH/mv0jkw/sSoc4cckJbi78ypcxAtyIJ9
+         6dUSrOBECPV28dhqDVsQskfNJqSvADzb8Y9ivjiLG1ZssKLsX2ca0n6RkZL7K92k0b
+         DDSAqHeEyhQKA==
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     David Jeffery <djeffery@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Keith Busch <kbusch@kernel.org>,
+        virtualization@lists.linux-foundation.org,
+        Bart Van Assche <bvanassche@acm.org>,
+        Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+        Sasha Levin <sashal@kernel.org>, linux-block@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.1 17/85] blk-mq: avoid double ->queue_rq() because of early timeout
+Date:   Sun, 18 Dec 2022 11:00:34 -0500
+Message-Id: <20221218160142.925394-17-sashal@kernel.org>
+X-Mailer: git-send-email 2.35.1
+In-Reply-To: <20221218160142.925394-1-sashal@kernel.org>
+References: <20221218160142.925394-1-sashal@kernel.org>
 MIME-Version: 1.0
+X-stable: review
+X-Patchwork-Hint: Ignore
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Jinke Han <hanjinke.666@bytedance.com>
+From: David Jeffery <djeffery@redhat.com>
 
-Now we don't distinguish sync write ios from normal buffer write ios
-in blk-throtl. A bio with REQ_SYNC tagged always mean it will be wait
-until write completion soon after it submit. So it's reasonable for sync
-io to complete as soon as possible.
+[ Upstream commit 82c229476b8f6afd7e09bc4dc77d89dc19ff7688 ]
 
-In our test, fio writes a 100g file in sequential 4k blocksize in
-a container with low bps limit configured (wbps=10M). More than 1200
-ios were throttled in blk-throtl queue and the avarage throtle time
-of each io is 140s. At the same time, the operation of saving a small
-file by vim will be blocked amolst 140s. As a fsync will be send by vim,
-the sync ios of fsync will be blocked by a huge amount of buffer write
-ios ahead. This is also a priority inversion problem within one cgroup.
-In the database scene, things got really bad with blk-throtle enabled
-as fsync is called very often.
+David Jeffery found one double ->queue_rq() issue, so far it can
+be triggered in VM use case because of long vmexit latency or preempt
+latency of vCPU pthread or long page fault in vCPU pthread, then block
+IO req could be timed out before queuing the request to hardware but after
+calling blk_mq_start_request() during ->queue_rq(), then timeout handler
+may handle it by requeue, then double ->queue_rq() is caused, and kernel
+panic.
 
-This patch splits bio queue into sync and async queues for blk-throtl
-and gives a huge priority to sync write ios. Sync queue only make sense
-for write ios as we treat all read io as sync io. I think it's a nice
-respond to the semantics of REQ_SYNC. Bios with REQ_META and REQ_PRIO
-gains the same priority as they are important to fs. This may avoid
-some potential priority inversion problems.
+So far, it is driver's responsibility to cover the race between timeout
+and completion, so it seems supposed to be solved in driver in theory,
+given driver has enough knowledge.
 
-Signed-off-by: Jinke Han <hanjinke.666@bytedance.com>
-Signed-off-by: Xin Yin <yinxin.x@bytedance.com>
+But it is really one common problem, lots of driver could have similar
+issue, and could be hard to fix all affected drivers, even it isn't easy
+for driver to handle the race. So David suggests this patch by draining
+in-progress ->queue_rq() for solving this issue.
+
+Cc: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Keith Busch <kbusch@kernel.org>
+Cc: virtualization@lists.linux-foundation.org
+Cc: Bart Van Assche <bvanassche@acm.org>
+Signed-off-by: David Jeffery <djeffery@redhat.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Reviewed-by: Bart Van Assche <bvanassche@acm.org>
+Link: https://lore.kernel.org/r/20221026051957.358818-1-ming.lei@redhat.com
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- block/blk-throttle.c | 108 +++++++++++++++++++++++++++++++++++++++----
- block/blk-throttle.h |  12 ++++-
- 2 files changed, 111 insertions(+), 9 deletions(-)
+ block/blk-mq.c | 56 +++++++++++++++++++++++++++++++++++++++-----------
+ 1 file changed, 44 insertions(+), 12 deletions(-)
 
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index 847721dc2b2b..57acfae9f820 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -21,6 +21,13 @@
- /* Total max dispatch from all groups in one round */
- #define THROTL_QUANTUM 32
- 
-+/* For write ios, dispatch 4 sync ios and 1 normal io in one loop */
-+#define THROTL_SYNC_FACTOR 4
-+
-+/* Only make sense for write ios, all read ios are treated as SYNC */
-+#define SYNC	0
-+#define ASYNC	1
-+
- /* Throttling is performed over a slice and after that slice is renewed */
- #define DFL_THROTL_SLICE_HD (HZ / 10)
- #define DFL_THROTL_SLICE_SSD (HZ / 50)
-@@ -241,11 +248,27 @@ static inline unsigned int throtl_bio_data_size(struct bio *bio)
- 	return bio->bi_iter.bi_size;
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 228a6696d835..0b855e033a83 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -1529,7 +1529,13 @@ static void blk_mq_rq_timed_out(struct request *req)
+ 	blk_add_timer(req);
  }
  
--static void throtl_qnode_init(struct throtl_qnode *qn, struct throtl_grp *tg)
-+static void throtl_qnode_init(struct throtl_qnode *qn, struct throtl_grp *tg,
-+			      bool rw)
+-static bool blk_mq_req_expired(struct request *rq, unsigned long *next)
++struct blk_expired_data {
++	bool has_timedout_rq;
++	unsigned long next;
++	unsigned long timeout_start;
++};
++
++static bool blk_mq_req_expired(struct request *rq, struct blk_expired_data *expired)
  {
- 	INIT_LIST_HEAD(&qn->node);
--	bio_list_init(&qn->bios);
-+	bio_list_init(&qn->bios[SYNC]);
-+	bio_list_init(&qn->bios[ASYNC]);
- 	qn->tg = tg;
-+	qn->dispatch_sync_cnt = (rw == READ) ? UINT_MAX : 0;
-+}
-+
-+#define BLK_THROTL_SYNC(bio) (bio->bi_opf & (REQ_SYNC | REQ_META | REQ_PRIO))
-+
-+static inline void throtl_qnode_add_bio_list(struct throtl_qnode *qn,
-+					     struct bio *bio)
-+{
-+	bool rw = bio_data_dir(bio);
-+
-+	if ((rw == READ) || BLK_THROTL_SYNC(bio))
-+		bio_list_add(&qn->bios[SYNC], bio);
-+	else
-+		bio_list_add(&qn->bios[ASYNC], bio);
+ 	unsigned long deadline;
+ 
+@@ -1539,13 +1545,13 @@ static bool blk_mq_req_expired(struct request *rq, unsigned long *next)
+ 		return false;
+ 
+ 	deadline = READ_ONCE(rq->deadline);
+-	if (time_after_eq(jiffies, deadline))
++	if (time_after_eq(expired->timeout_start, deadline))
+ 		return true;
+ 
+-	if (*next == 0)
+-		*next = deadline;
+-	else if (time_after(*next, deadline))
+-		*next = deadline;
++	if (expired->next == 0)
++		expired->next = deadline;
++	else if (time_after(expired->next, deadline))
++		expired->next = deadline;
+ 	return false;
  }
  
- /**
-@@ -261,13 +284,34 @@ static void throtl_qnode_init(struct throtl_qnode *qn, struct throtl_grp *tg)
- static void throtl_qnode_add_bio(struct bio *bio, struct throtl_qnode *qn,
- 				 struct list_head *queued)
+@@ -1561,7 +1567,7 @@ void blk_mq_put_rq_ref(struct request *rq)
+ 
+ static bool blk_mq_check_expired(struct request *rq, void *priv)
  {
--	bio_list_add(&qn->bios, bio);
-+	throtl_qnode_add_bio_list(qn, bio);
- 	if (list_empty(&qn->node)) {
- 		list_add_tail(&qn->node, queued);
- 		blkg_get(tg_to_blkg(qn->tg));
- 	}
+-	unsigned long *next = priv;
++	struct blk_expired_data *expired = priv;
+ 
+ 	/*
+ 	 * blk_mq_queue_tag_busy_iter() has locked the request, so it cannot
+@@ -1570,7 +1576,18 @@ static bool blk_mq_check_expired(struct request *rq, void *priv)
+ 	 * it was completed and reallocated as a new request after returning
+ 	 * from blk_mq_check_expired().
+ 	 */
+-	if (blk_mq_req_expired(rq, next))
++	if (blk_mq_req_expired(rq, expired)) {
++		expired->has_timedout_rq = true;
++		return false;
++	}
++	return true;
++}
++
++static bool blk_mq_handle_expired(struct request *rq, void *priv)
++{
++	struct blk_expired_data *expired = priv;
++
++	if (blk_mq_req_expired(rq, expired))
+ 		blk_mq_rq_timed_out(rq);
+ 	return true;
  }
+@@ -1579,7 +1596,9 @@ static void blk_mq_timeout_work(struct work_struct *work)
+ {
+ 	struct request_queue *q =
+ 		container_of(work, struct request_queue, timeout_work);
+-	unsigned long next = 0;
++	struct blk_expired_data expired = {
++		.timeout_start = jiffies,
++	};
+ 	struct blk_mq_hw_ctx *hctx;
+ 	unsigned long i;
  
-+static inline struct bio *throtl_qnode_bio_peek(struct throtl_qnode *qn)
-+{
-+	struct bio *bio1, *bio2;
+@@ -1599,10 +1618,23 @@ static void blk_mq_timeout_work(struct work_struct *work)
+ 	if (!percpu_ref_tryget(&q->q_usage_counter))
+ 		return;
+ 
+-	blk_mq_queue_tag_busy_iter(q, blk_mq_check_expired, &next);
++	/* check if there is any timed-out request */
++	blk_mq_queue_tag_busy_iter(q, blk_mq_check_expired, &expired);
++	if (expired.has_timedout_rq) {
++		/*
++		 * Before walking tags, we must ensure any submit started
++		 * before the current time has finished. Since the submit
++		 * uses srcu or rcu, wait for a synchronization point to
++		 * ensure all running submits have finished
++		 */
++		blk_mq_wait_quiesce_done(q);
 +
-+	/* qn for read ios */
-+	if (qn->dispatch_sync_cnt == UINT_MAX)
-+		return bio_list_peek(&qn->bios[SYNC]);
-+
-+	/* qn for write ios */
-+	bio1 = bio_list_peek(&qn->bios[SYNC]);
-+	bio2 = bio_list_peek(&qn->bios[ASYNC]);
-+
-+	if (bio1 && bio2) {
-+		if (qn->dispatch_sync_cnt == THROTL_SYNC_FACTOR)
-+			return bio2;
-+		return bio1;
++		expired.next = 0;
++		blk_mq_queue_tag_busy_iter(q, blk_mq_handle_expired, &expired);
 +	}
-+
-+	return bio1 ?: bio2;
-+}
-+
- /**
-  * throtl_peek_queued - peek the first bio on a qnode list
-  * @queued: the qnode list to peek
-@@ -281,11 +325,59 @@ static struct bio *throtl_peek_queued(struct list_head *queued)
- 		return NULL;
  
- 	qn = list_first_entry(queued, struct throtl_qnode, node);
--	bio = bio_list_peek(&qn->bios);
-+	bio = throtl_qnode_bio_peek(qn);
- 	WARN_ON_ONCE(!bio);
- 	return bio;
- }
- 
-+/**
-+ * throtl_qnode_bio_pop: pop a bio from a qnode
-+ * @qn: the qnode to pop a bio from
-+ *
-+ * For read io qn, just pop bio from sync queu and return.
-+ * For write io qn, the target queue to pop was determined by the dispatch_sync_cnt.
-+ * Try to pop bio from target queue, fetch the bio and return when it is not empty.
-+ * If the target queue empty, pop bio from other queue instead.
-+ */
-+static inline struct bio *throtl_qnode_bio_pop(struct throtl_qnode *qn)
-+{
-+	struct bio *bio;
-+
-+	/* qn for read ios */
-+	if (qn->dispatch_sync_cnt == UINT_MAX)
-+		return bio_list_pop(&qn->bios[SYNC]);
-+
-+	/* try to dispatch sync io */
-+	if (qn->dispatch_sync_cnt < THROTL_SYNC_FACTOR) {
-+		bio = bio_list_pop(&qn->bios[SYNC]);
-+		if (bio) {
-+			qn->dispatch_sync_cnt++;
-+			return bio;
-+		}
-+		bio = bio_list_pop(&qn->bios[ASYNC]);
-+		qn->dispatch_sync_cnt = 0;
-+		return bio;
-+	}
-+
-+	/* try to dispatch async io */
-+	bio = bio_list_pop(&qn->bios[ASYNC]);
-+	if (bio) {
-+		qn->dispatch_sync_cnt = 0;
-+		return bio;
-+	}
-+	bio = bio_list_pop(&qn->bios[SYNC]);
-+
-+	return bio;
-+}
-+
-+static inline bool throtl_qnode_empty(struct throtl_qnode *qn)
-+{
-+	if (bio_list_empty(&qn->bios[SYNC]) &&
-+		bio_list_empty(&qn->bios[ASYNC]))
-+		return true;
-+	return false;
-+}
-+
- /**
-  * throtl_pop_queued - pop the first bio form a qnode list
-  * @queued: the qnode list to pop a bio from
-@@ -310,10 +402,10 @@ static struct bio *throtl_pop_queued(struct list_head *queued,
- 		return NULL;
- 
- 	qn = list_first_entry(queued, struct throtl_qnode, node);
--	bio = bio_list_pop(&qn->bios);
-+	bio = throtl_qnode_bio_pop(qn);
- 	WARN_ON_ONCE(!bio);
- 
--	if (bio_list_empty(&qn->bios)) {
-+	if (throtl_qnode_empty(qn)) {
- 		list_del_init(&qn->node);
- 		if (tg_to_put)
- 			*tg_to_put = qn->tg;
-@@ -355,8 +447,8 @@ static struct blkg_policy_data *throtl_pd_alloc(gfp_t gfp,
- 	throtl_service_queue_init(&tg->service_queue);
- 
- 	for (rw = READ; rw <= WRITE; rw++) {
--		throtl_qnode_init(&tg->qnode_on_self[rw], tg);
--		throtl_qnode_init(&tg->qnode_on_parent[rw], tg);
-+		throtl_qnode_init(&tg->qnode_on_self[rw], tg, rw);
-+		throtl_qnode_init(&tg->qnode_on_parent[rw], tg, rw);
- 	}
- 
- 	RB_CLEAR_NODE(&tg->rb_node);
-diff --git a/block/blk-throttle.h b/block/blk-throttle.h
-index ef4b7a4de987..55f3a9594e0d 100644
---- a/block/blk-throttle.h
-+++ b/block/blk-throttle.h
-@@ -28,8 +28,18 @@
-  */
- struct throtl_qnode {
- 	struct list_head	node;		/* service_queue->queued[] */
--	struct bio_list		bios;		/* queued bios */
-+	struct bio_list		bios[2];	/* queued bios */
- 	struct throtl_grp	*tg;		/* tg this qnode belongs to */
-+
-+	/*
-+	 * 1) for write throtl_qnode:
-+	 * [0, THROTL_SYNC_FACTOR-1]: dispatch sync io
-+	 * [THROTL_SYNC_FACTOR]: dispatch async io
-+	 *
-+	 * 2) for read throtl_qnode:
-+	 * UINT_MAX
-+	 */
-+	unsigned int dispatch_sync_cnt;         /* sync io dispatch counter */
- };
- 
- struct throtl_service_queue {
+-	if (next != 0) {
+-		mod_timer(&q->timeout, next);
++	if (expired.next != 0) {
++		mod_timer(&q->timeout, expired.next);
+ 	} else {
+ 		/*
+ 		 * Request timeouts are handled as a forward rolling timer. If
 -- 
-2.20.1
+2.35.1
 
