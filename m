@@ -2,48 +2,44 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C813C4167B
-	for <linux-block@archiver.kernel.org>; Sun, 18 Dec 2022 16:05:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D0AEC4167B
+	for <linux-block@archiver.kernel.org>; Sun, 18 Dec 2022 16:15:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231193AbiLRQFL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 18 Dec 2022 11:05:11 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33928 "EHLO
+        id S231682AbiLRQPI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 18 Dec 2022 11:15:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52190 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231192AbiLRQEj (ORCPT
+        with ESMTP id S231686AbiLRQOl (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 18 Dec 2022 11:04:39 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 82330B7F7;
-        Sun, 18 Dec 2022 08:03:01 -0800 (PST)
+        Sun, 18 Dec 2022 11:14:41 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA927FCC4;
+        Sun, 18 Dec 2022 08:06:26 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 8F66860DCA;
-        Sun, 18 Dec 2022 16:03:00 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E2C5EC433F2;
-        Sun, 18 Dec 2022 16:02:58 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 642F5B80BA7;
+        Sun, 18 Dec 2022 16:05:51 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5BA13C433F1;
+        Sun, 18 Dec 2022 16:05:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1671379380;
-        bh=3gsHSt0wuiY6019cjs5JAUJmceQVZDeXBuBdLOIk2KA=;
+        s=k20201202; t=1671379550;
+        bh=2z+F95vK9xmILr9GtTPCrdh3zuzMsw/9bsWbAfXOKuc=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=GdhAhFW0DSZ5cRwAf7SAtKN5ym00m9QDvGQ0taH/cFRQac8AdyeScIsYuLl8NhOTs
-         NdTJCHEyknCAkaoigvcCkras8zQpr3zsXa4G4rrfkcAzdxoXOZ6E28XtCXgFudKVEt
-         0yvG+nkeqlJ8NegOpE36NX6kYPmDVxW46VRTMPVyLOkF1rw+OJ7iRrJCddeJWZ9J/I
-         Uq//4hwm2E88qELqJg+PH8eXoaXT+6ZAyjH/mv0jkw/sSoc4cckJbi78ypcxAtyIJ9
-         6dUSrOBECPV28dhqDVsQskfNJqSvADzb8Y9ivjiLG1ZssKLsX2ca0n6RkZL7K92k0b
-         DDSAqHeEyhQKA==
+        b=uFhzZdT31v/EKg0K8r4qBPB1NUc/LsnNueaRMU9wujJOMBIua0Rv28jkaw54/284r
+         9sRp6Xb/EsYpN2JbfhTAAbkOXZaukmNeHQUWHqLuB9Qhimr4Ulos0VtSommvpijGDZ
+         4y7BIm6CT6G68Wtb5XMO4yy5CL4D8V4C7VpyC5NQS1i7pM2rHowgCeU6Zeg2R5faLr
+         IBMmju5GtLcU6AJJBviKk8iJ7FiqgJs72Fc1GE+nSR52VyDIu9al3oRLtpMRFjnSOx
+         5CARwhhvZ8HKUK92pa2KPgwfQ2Zw/bXJ6Ya26z5VgYwxt5vMcUp7vWV8igbxcXBQsE
+         aU7rpEY1NcRlg==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     David Jeffery <djeffery@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Keith Busch <kbusch@kernel.org>,
-        virtualization@lists.linux-foundation.org,
-        Bart Van Assche <bvanassche@acm.org>,
-        Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-        Sasha Levin <sashal@kernel.org>, linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.1 17/85] blk-mq: avoid double ->queue_rq() because of early timeout
-Date:   Sun, 18 Dec 2022 11:00:34 -0500
-Message-Id: <20221218160142.925394-17-sashal@kernel.org>
+Cc:     Ye Bin <yebin10@huawei.com>, Ming Lei <ming.lei@redhat.com>,
+        Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
+        linux-block@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.1 62/85] blk-mq: fix possible memleak when register 'hctx' failed
+Date:   Sun, 18 Dec 2022 11:01:19 -0500
+Message-Id: <20221218160142.925394-62-sashal@kernel.org>
 X-Mailer: git-send-email 2.35.1
 In-Reply-To: <20221218160142.925394-1-sashal@kernel.org>
 References: <20221218160142.925394-1-sashal@kernel.org>
@@ -55,146 +51,84 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: David Jeffery <djeffery@redhat.com>
+From: Ye Bin <yebin10@huawei.com>
 
-[ Upstream commit 82c229476b8f6afd7e09bc4dc77d89dc19ff7688 ]
+[ Upstream commit 4b7a21c57b14fbcd0e1729150189e5933f5088e9 ]
 
-David Jeffery found one double ->queue_rq() issue, so far it can
-be triggered in VM use case because of long vmexit latency or preempt
-latency of vCPU pthread or long page fault in vCPU pthread, then block
-IO req could be timed out before queuing the request to hardware but after
-calling blk_mq_start_request() during ->queue_rq(), then timeout handler
-may handle it by requeue, then double ->queue_rq() is caused, and kernel
-panic.
+There's issue as follows when do fault injection test:
+unreferenced object 0xffff888132a9f400 (size 512):
+  comm "insmod", pid 308021, jiffies 4324277909 (age 509.733s)
+  hex dump (first 32 bytes):
+    00 00 00 00 00 00 00 00 08 f4 a9 32 81 88 ff ff  ...........2....
+    08 f4 a9 32 81 88 ff ff 00 00 00 00 00 00 00 00  ...2............
+  backtrace:
+    [<00000000e8952bb4>] kmalloc_node_trace+0x22/0xa0
+    [<00000000f9980e0f>] blk_mq_alloc_and_init_hctx+0x3f1/0x7e0
+    [<000000002e719efa>] blk_mq_realloc_hw_ctxs+0x1e6/0x230
+    [<000000004f1fda40>] blk_mq_init_allocated_queue+0x27e/0x910
+    [<00000000287123ec>] __blk_mq_alloc_disk+0x67/0xf0
+    [<00000000a2a34657>] 0xffffffffa2ad310f
+    [<00000000b173f718>] 0xffffffffa2af824a
+    [<0000000095a1dabb>] do_one_initcall+0x87/0x2a0
+    [<00000000f32fdf93>] do_init_module+0xdf/0x320
+    [<00000000cbe8541e>] load_module+0x3006/0x3390
+    [<0000000069ed1bdb>] __do_sys_finit_module+0x113/0x1b0
+    [<00000000a1a29ae8>] do_syscall_64+0x35/0x80
+    [<000000009cd878b0>] entry_SYSCALL_64_after_hwframe+0x46/0xb0
 
-So far, it is driver's responsibility to cover the race between timeout
-and completion, so it seems supposed to be solved in driver in theory,
-given driver has enough knowledge.
+Fault injection context as follows:
+ kobject_add
+ blk_mq_register_hctx
+ blk_mq_sysfs_register
+ blk_register_queue
+ device_add_disk
+ null_add_dev.part.0 [null_blk]
 
-But it is really one common problem, lots of driver could have similar
-issue, and could be hard to fix all affected drivers, even it isn't easy
-for driver to handle the race. So David suggests this patch by draining
-in-progress ->queue_rq() for solving this issue.
+As 'blk_mq_register_hctx' may already add some objects when failed halfway,
+but there isn't do fallback, caller don't know which objects add failed.
+To solve above issue just do fallback when add objects failed halfway in
+'blk_mq_register_hctx'.
 
-Cc: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: Keith Busch <kbusch@kernel.org>
-Cc: virtualization@lists.linux-foundation.org
-Cc: Bart Van Assche <bvanassche@acm.org>
-Signed-off-by: David Jeffery <djeffery@redhat.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
-Reviewed-by: Bart Van Assche <bvanassche@acm.org>
-Link: https://lore.kernel.org/r/20221026051957.358818-1-ming.lei@redhat.com
+Signed-off-by: Ye Bin <yebin10@huawei.com>
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
+Link: https://lore.kernel.org/r/20221117022940.873959-1-yebin@huaweicloud.com
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- block/blk-mq.c | 56 +++++++++++++++++++++++++++++++++++++++-----------
- 1 file changed, 44 insertions(+), 12 deletions(-)
+ block/blk-mq-sysfs.c | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 228a6696d835..0b855e033a83 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1529,7 +1529,13 @@ static void blk_mq_rq_timed_out(struct request *req)
- 	blk_add_timer(req);
- }
- 
--static bool blk_mq_req_expired(struct request *rq, unsigned long *next)
-+struct blk_expired_data {
-+	bool has_timedout_rq;
-+	unsigned long next;
-+	unsigned long timeout_start;
-+};
-+
-+static bool blk_mq_req_expired(struct request *rq, struct blk_expired_data *expired)
+diff --git a/block/blk-mq-sysfs.c b/block/blk-mq-sysfs.c
+index 93997d297d42..4515288fbe35 100644
+--- a/block/blk-mq-sysfs.c
++++ b/block/blk-mq-sysfs.c
+@@ -185,7 +185,7 @@ static int blk_mq_register_hctx(struct blk_mq_hw_ctx *hctx)
  {
- 	unsigned long deadline;
+ 	struct request_queue *q = hctx->queue;
+ 	struct blk_mq_ctx *ctx;
+-	int i, ret;
++	int i, j, ret;
  
-@@ -1539,13 +1545,13 @@ static bool blk_mq_req_expired(struct request *rq, unsigned long *next)
- 		return false;
+ 	if (!hctx->nr_ctx)
+ 		return 0;
+@@ -197,9 +197,16 @@ static int blk_mq_register_hctx(struct blk_mq_hw_ctx *hctx)
+ 	hctx_for_each_ctx(hctx, ctx, i) {
+ 		ret = kobject_add(&ctx->kobj, &hctx->kobj, "cpu%u", ctx->cpu);
+ 		if (ret)
+-			break;
++			goto out;
+ 	}
  
- 	deadline = READ_ONCE(rq->deadline);
--	if (time_after_eq(jiffies, deadline))
-+	if (time_after_eq(expired->timeout_start, deadline))
- 		return true;
- 
--	if (*next == 0)
--		*next = deadline;
--	else if (time_after(*next, deadline))
--		*next = deadline;
-+	if (expired->next == 0)
-+		expired->next = deadline;
-+	else if (time_after(expired->next, deadline))
-+		expired->next = deadline;
- 	return false;
- }
- 
-@@ -1561,7 +1567,7 @@ void blk_mq_put_rq_ref(struct request *rq)
- 
- static bool blk_mq_check_expired(struct request *rq, void *priv)
- {
--	unsigned long *next = priv;
-+	struct blk_expired_data *expired = priv;
- 
- 	/*
- 	 * blk_mq_queue_tag_busy_iter() has locked the request, so it cannot
-@@ -1570,7 +1576,18 @@ static bool blk_mq_check_expired(struct request *rq, void *priv)
- 	 * it was completed and reallocated as a new request after returning
- 	 * from blk_mq_check_expired().
- 	 */
--	if (blk_mq_req_expired(rq, next))
-+	if (blk_mq_req_expired(rq, expired)) {
-+		expired->has_timedout_rq = true;
-+		return false;
++	return 0;
++out:
++	hctx_for_each_ctx(hctx, ctx, j) {
++		if (j < i)
++			kobject_del(&ctx->kobj);
 +	}
-+	return true;
-+}
-+
-+static bool blk_mq_handle_expired(struct request *rq, void *priv)
-+{
-+	struct blk_expired_data *expired = priv;
-+
-+	if (blk_mq_req_expired(rq, expired))
- 		blk_mq_rq_timed_out(rq);
- 	return true;
++	kobject_del(&hctx->kobj);
+ 	return ret;
  }
-@@ -1579,7 +1596,9 @@ static void blk_mq_timeout_work(struct work_struct *work)
- {
- 	struct request_queue *q =
- 		container_of(work, struct request_queue, timeout_work);
--	unsigned long next = 0;
-+	struct blk_expired_data expired = {
-+		.timeout_start = jiffies,
-+	};
- 	struct blk_mq_hw_ctx *hctx;
- 	unsigned long i;
  
-@@ -1599,10 +1618,23 @@ static void blk_mq_timeout_work(struct work_struct *work)
- 	if (!percpu_ref_tryget(&q->q_usage_counter))
- 		return;
- 
--	blk_mq_queue_tag_busy_iter(q, blk_mq_check_expired, &next);
-+	/* check if there is any timed-out request */
-+	blk_mq_queue_tag_busy_iter(q, blk_mq_check_expired, &expired);
-+	if (expired.has_timedout_rq) {
-+		/*
-+		 * Before walking tags, we must ensure any submit started
-+		 * before the current time has finished. Since the submit
-+		 * uses srcu or rcu, wait for a synchronization point to
-+		 * ensure all running submits have finished
-+		 */
-+		blk_mq_wait_quiesce_done(q);
-+
-+		expired.next = 0;
-+		blk_mq_queue_tag_busy_iter(q, blk_mq_handle_expired, &expired);
-+	}
- 
--	if (next != 0) {
--		mod_timer(&q->timeout, next);
-+	if (expired.next != 0) {
-+		mod_timer(&q->timeout, expired.next);
- 	} else {
- 		/*
- 		 * Request timeouts are handled as a forward rolling timer. If
 -- 
 2.35.1
 
