@@ -2,133 +2,128 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BE95C10F1E
-	for <linux-block@archiver.kernel.org>; Sun, 18 Dec 2022 17:13:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 80A5AC4332F
+	for <linux-block@archiver.kernel.org>; Mon, 19 Dec 2022 07:17:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233466AbiLRRNL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 18 Dec 2022 12:13:11 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37638 "EHLO
+        id S231418AbiLSHRT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 19 Dec 2022 02:17:19 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34920 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233525AbiLRRLC (ORCPT
+        with ESMTP id S231491AbiLSHRP (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 18 Dec 2022 12:11:02 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 188B213E9C;
-        Sun, 18 Dec 2022 08:23:54 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id AAF4860C40;
-        Sun, 18 Dec 2022 16:23:53 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 55837C433D2;
-        Sun, 18 Dec 2022 16:23:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1671380633;
-        bh=PFXo/H9XbYNJh+1q5k+Qi4mEA3PvRNfZqjQ98IO1cY8=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=bXBpW2TU+wKy/m8aw2FulzCnxqEiAl1OLBuhIl0DHXbzsSzDjL8KFEN4M3P04TA3j
-         gy3ARpmw5eqVzk+gGWSuYGuxAhaGSXstteRr1KzeSUx9w4Rei1m35Qjl9ynFuP3dmL
-         vCIEseswtyMVUP4pjXbvbTEg298GqrqXV3iCMLBopI3JABvsx8DtQSaBYodnqFCIBV
-         RICgKcZMzGCxHrwO2YRsPjajpSnlZdDLzeirzxEZ448Whavm+GjKT954WXJh9oVQtK
-         qH7AH2jfn8+rjM83F87vzt0dDm3oQkgV7gVQMfTHIbly3tJLeOLwM8BXZuM7CGTSUN
-         L7r/AhPVexfBQ==
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Ye Bin <yebin10@huawei.com>, Ming Lei <ming.lei@redhat.com>,
-        Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
-        linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.9 17/20] blk-mq: fix possible memleak when register 'hctx' failed
-Date:   Sun, 18 Dec 2022 11:23:02 -0500
-Message-Id: <20221218162305.935724-17-sashal@kernel.org>
-X-Mailer: git-send-email 2.35.1
-In-Reply-To: <20221218162305.935724-1-sashal@kernel.org>
-References: <20221218162305.935724-1-sashal@kernel.org>
+        Mon, 19 Dec 2022 02:17:15 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 065AA95A6
+        for <linux-block@vger.kernel.org>; Sun, 18 Dec 2022 23:16:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1671434185;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:mime-version:mime-version:content-type:content-type;
+        bh=xSMvHf+auy2UcRRNDEcD1HPUFs/NEV4PX4QkZ5TGRiM=;
+        b=VOOfhTXauhVf9XZMJGAjmzdRlVR4yfvyK4jXNo1hn48K14YiiOdJFoboeI1D3O5k9HqbfL
+        hn8zOci729VHApyP1LU3sCJUJCs3CR9sG+OGNiN4ntAW4YnFotGdVOcsqWSy9VI2U0knm2
+        PPmaRUWwakhICRoKvpYPQMp+zomzFl4=
+Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com
+ [209.85.216.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-259-wWtEKw_EOZaxKUv-0zQivg-1; Mon, 19 Dec 2022 02:16:23 -0500
+X-MC-Unique: wWtEKw_EOZaxKUv-0zQivg-1
+Received: by mail-pj1-f71.google.com with SMTP id x8-20020a17090a1f8800b0022153149290so3106644pja.5
+        for <linux-block@vger.kernel.org>; Sun, 18 Dec 2022 23:16:23 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=xSMvHf+auy2UcRRNDEcD1HPUFs/NEV4PX4QkZ5TGRiM=;
+        b=Vh9NTLZ5Y1PIT0y/AgRl4hhk+sHxRvfFVjmikCn1zWGASFRGQ1Doa5q8CtTaNco0aR
+         fOVCdQ+AGrdUgB149FiVfO2LuLjXg2sAoDi1orz+EddTQOIGnI6fvPdgiahoRd2/I1Tn
+         vjceIL05gPUKFZHW0DWgbPsbcE9NjTdtYxwUwL+NEgJLtaFcRX9wxS0ZERvo4FSOcu7k
+         Ep+iaPfk5krxejiZAysJQEd7JE77bnWnJ3sEcXJXVkqBZWMBX/+Gm27dWBGE9pG1xbDi
+         C+rLdzuGNBP6WaClVm9pkAJmKTgAKp+81InandnXgGcqq3CAJJwIdDfeeNGQoi9KMI9p
+         fErQ==
+X-Gm-Message-State: AFqh2kpfC0L8vu1h1gQAEJlV23RZTxtwNBn3gBQlMuC7X2io4J9FojK6
+        yQhSuWyxzmoBMEF3PoQ419/h0OVtcUzIcrZZat8TZfFTTvQUhWQMVtGE8rYo5biFXbscztecM9+
+        VCyS7ut1FPMQFFch90ffOx/kno59ILXn0cdGUAsY=
+X-Received: by 2002:a17:90a:9744:b0:219:8464:84e3 with SMTP id i4-20020a17090a974400b00219846484e3mr1616792pjw.232.1671434182053;
+        Sun, 18 Dec 2022 23:16:22 -0800 (PST)
+X-Google-Smtp-Source: AMrXdXvY8NPOpjTb7PI7aCDZ8bIWyUdEdYChfIZ1WVIZwXL+kuzCUzCrr0Y2xBrxun7s7uESyX0qfl9M9Z64uJm38V4=
+X-Received: by 2002:a17:90a:9744:b0:219:8464:84e3 with SMTP id
+ i4-20020a17090a974400b00219846484e3mr1616790pjw.232.1671434181590; Sun, 18
+ Dec 2022 23:16:21 -0800 (PST)
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-Content-Transfer-Encoding: 8bit
+From:   Yi Zhang <yi.zhang@redhat.com>
+Date:   Mon, 19 Dec 2022 15:16:10 +0800
+Message-ID: <CAHj4cs-MzFV6WTfveRXTARsik9wTGgado2U4vnT8oH6vmfFjzQ@mail.gmail.com>
+Subject: [bug report]BUG: KFENCE: use-after-free read in bfq_exit_icq_bfqq+0x132/0x270
+To:     linux-block <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Ye Bin <yebin10@huawei.com>
+Hello
+Below issue was triggered during blktests nvme-tcp with for-next
+(6.1.0, block, 2280cbf6), pls help check it
 
-[ Upstream commit 4b7a21c57b14fbcd0e1729150189e5933f5088e9 ]
+[  782.395936] run blktests nvme/013 at 2022-12-18 07:32:09
+[  782.425739] nvmet: adding nsid 1 to subsystem blktests-subsystem-1
+[  782.435780] nvmet_tcp: enabling port 0 (127.0.0.1:4420)
+[  782.446357] nvmet: creating nvm controller 1 for subsystem
+blktests-subsystem-1 for NQN
+nqn.2014-08.org.nvmexpress:uuid:4c4c4544-0042-3910-8039-c6c04f544833.
+[  782.460744] nvme nvme0: creating 32 I/O queues.
+[  782.466760] nvme nvme0: mapped 32/0/0 default/read/poll queues.
+[  782.479615] nvme nvme0: new ctrl: NQN "blktests-subsystem-1", addr
+127.0.0.1:4420
+[  783.612793] XFS (nvme0n1): Mounting V5 Filesystem
+[  783.650705] XFS (nvme0n1): Ending clean mount
+[  799.653271] ==================================================================
+[  799.660496] BUG: KFENCE: use-after-free read in bfq_exit_icq_bfqq+0x132/0x270
+[  799.669117] Use-after-free read at 0x000000008c692c21 (in kfence-#11):
+[  799.675647]  bfq_exit_icq_bfqq+0x132/0x270
+[  799.679753]  bfq_exit_icq+0x5b/0x80
+[  799.683255]  exit_io_context+0x81/0xb0
+[  799.687015]  do_exit+0x74b/0xaf0
+[  799.690256]  kthread_exit+0x25/0x30
+[  799.693758]  kthread+0xc8/0x110
+[  799.696904]  ret_from_fork+0x1f/0x30
+[  799.701991] kfence-#11: 0x00000000f1839eaa-0x0000000011c747a1,
+size=568, cache=bfq_queue
+[  799.711549] allocated by task 19533 on cpu 9 at 499.180335s:
+[  799.717218]  bfq_get_queue+0xe0/0x530
+[  799.720884]  bfq_get_bfqq_handle_split+0x75/0x120
+[  799.725592]  bfq_insert_requests+0x1d15/0x2710
+[  799.730045]  blk_mq_sched_insert_requests+0x5c/0x170
+[  799.735021]  blk_mq_flush_plug_list+0x115/0x2e0
+[  799.739551]  __blk_flush_plug+0xf2/0x130
+[  799.743479]  blk_finish_plug+0x25/0x40
+[  799.747231]  __iomap_dio_rw+0x520/0x7b0
+[  799.751070]  btrfs_dio_write+0x42/0x50
+[  799.754832]  btrfs_do_write_iter+0x2f4/0x5d0
+[  799.759112]  nvmet_file_submit_bvec+0xa6/0xe0 [nvmet]
+[  799.764193]  nvmet_file_execute_io+0x1a4/0x250 [nvmet]
+[  799.769349]  process_one_work+0x1c4/0x380
+[  799.773361]  worker_thread+0x4d/0x380
+[  799.777028]  kthread+0xe6/0x110
+[  799.780174]  ret_from_fork+0x1f/0x30
+[  799.785252] freed by task 19533 on cpu 9 at 799.653250s:
+[  799.790584]  bfq_put_queue+0x183/0x2c0
+[  799.794344]  bfq_exit_icq_bfqq+0x129/0x270
+[  799.798442]  bfq_exit_icq+0x5b/0x80
+[  799.801934]  exit_io_context+0x81/0xb0
+[  799.805687]  do_exit+0x74b/0xaf0
+[  799.808920]  kthread_exit+0x25/0x30
+[  799.812413]  kthread+0xc8/0x110
+[  799.815561]  ret_from_fork+0x1f/0x30
+[  799.820648] CPU: 9 PID: 19533 Comm: kworker/dying Not tainted 6.1.0 #1
+[  799.827181] Hardware name: Dell Inc. PowerEdge R640/0X45NX, BIOS
+2.15.1 06/15/2022
+[  799.834746] ==================================================================
+[  823.081364] XFS (nvme0n1): Unmounting Filesystem
+[  823.159994] nvme nvme0: Removing ctrl: NQN "blktests-subsystem-1"
 
-There's issue as follows when do fault injection test:
-unreferenced object 0xffff888132a9f400 (size 512):
-  comm "insmod", pid 308021, jiffies 4324277909 (age 509.733s)
-  hex dump (first 32 bytes):
-    00 00 00 00 00 00 00 00 08 f4 a9 32 81 88 ff ff  ...........2....
-    08 f4 a9 32 81 88 ff ff 00 00 00 00 00 00 00 00  ...2............
-  backtrace:
-    [<00000000e8952bb4>] kmalloc_node_trace+0x22/0xa0
-    [<00000000f9980e0f>] blk_mq_alloc_and_init_hctx+0x3f1/0x7e0
-    [<000000002e719efa>] blk_mq_realloc_hw_ctxs+0x1e6/0x230
-    [<000000004f1fda40>] blk_mq_init_allocated_queue+0x27e/0x910
-    [<00000000287123ec>] __blk_mq_alloc_disk+0x67/0xf0
-    [<00000000a2a34657>] 0xffffffffa2ad310f
-    [<00000000b173f718>] 0xffffffffa2af824a
-    [<0000000095a1dabb>] do_one_initcall+0x87/0x2a0
-    [<00000000f32fdf93>] do_init_module+0xdf/0x320
-    [<00000000cbe8541e>] load_module+0x3006/0x3390
-    [<0000000069ed1bdb>] __do_sys_finit_module+0x113/0x1b0
-    [<00000000a1a29ae8>] do_syscall_64+0x35/0x80
-    [<000000009cd878b0>] entry_SYSCALL_64_after_hwframe+0x46/0xb0
 
-Fault injection context as follows:
- kobject_add
- blk_mq_register_hctx
- blk_mq_sysfs_register
- blk_register_queue
- device_add_disk
- null_add_dev.part.0 [null_blk]
-
-As 'blk_mq_register_hctx' may already add some objects when failed halfway,
-but there isn't do fallback, caller don't know which objects add failed.
-To solve above issue just do fallback when add objects failed halfway in
-'blk_mq_register_hctx'.
-
-Signed-off-by: Ye Bin <yebin10@huawei.com>
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
-Link: https://lore.kernel.org/r/20221117022940.873959-1-yebin@huaweicloud.com
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- block/blk-mq-sysfs.c | 11 +++++++++--
- 1 file changed, 9 insertions(+), 2 deletions(-)
-
-diff --git a/block/blk-mq-sysfs.c b/block/blk-mq-sysfs.c
-index 5b64d9d7d147..fc9362e0a118 100644
---- a/block/blk-mq-sysfs.c
-+++ b/block/blk-mq-sysfs.c
-@@ -380,7 +380,7 @@ static int blk_mq_register_hctx(struct blk_mq_hw_ctx *hctx)
- {
- 	struct request_queue *q = hctx->queue;
- 	struct blk_mq_ctx *ctx;
--	int i, ret;
-+	int i, j, ret;
- 
- 	if (!hctx->nr_ctx)
- 		return 0;
-@@ -392,9 +392,16 @@ static int blk_mq_register_hctx(struct blk_mq_hw_ctx *hctx)
- 	hctx_for_each_ctx(hctx, ctx, i) {
- 		ret = kobject_add(&ctx->kobj, &hctx->kobj, "cpu%u", ctx->cpu);
- 		if (ret)
--			break;
-+			goto out;
- 	}
- 
-+	return 0;
-+out:
-+	hctx_for_each_ctx(hctx, ctx, j) {
-+		if (j < i)
-+			kobject_del(&ctx->kobj);
-+	}
-+	kobject_del(&hctx->kobj);
- 	return ret;
- }
- 
--- 
-2.35.1
+--
+Best Regards,
+  Yi Zhang
 
