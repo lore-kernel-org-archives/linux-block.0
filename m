@@ -2,62 +2,58 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BD47C10F1B
-	for <linux-block@archiver.kernel.org>; Mon, 19 Dec 2022 08:00:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60E98C4167B
+	for <linux-block@archiver.kernel.org>; Mon, 19 Dec 2022 08:40:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231344AbiLSIAb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 19 Dec 2022 03:00:31 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45088 "EHLO
+        id S231570AbiLSIkU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 19 Dec 2022 03:40:20 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55708 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229615AbiLSIAa (ORCPT
+        with ESMTP id S231569AbiLSIkS (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 19 Dec 2022 03:00:30 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D32A7BC3A
-        for <linux-block@vger.kernel.org>; Sun, 18 Dec 2022 23:59:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1671436783;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=YS3+j8ysmQFXuAF/WWlDo+Y2S/ZCz/u0RFV1hier8ug=;
-        b=MFGldvTq8NLpKjoNDnfQhAGpImtFmNJmWGoYPQGTUoA06LRdWxU7HvxxN8ptJlI0snfGP8
-        1oaAegWydghf/bUl2XfFAB+fDN+0r4bXQZ2hDSkjz1gk7GGCA08mSImFd2hMIlTNNj0fmL
-        YPHySizGDVJCiSinqW/8F9tFH8OjQNI=
-Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
- [209.85.222.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-288-ltmdYWtAPJ--pLJzGk2D2g-1; Mon, 19 Dec 2022 02:59:41 -0500
-X-MC-Unique: ltmdYWtAPJ--pLJzGk2D2g-1
-Received: by mail-qk1-f200.google.com with SMTP id br6-20020a05620a460600b007021e1a5c48so6793073qkb.6
-        for <linux-block@vger.kernel.org>; Sun, 18 Dec 2022 23:59:41 -0800 (PST)
+        Mon, 19 Dec 2022 03:40:18 -0500
+Received: from mail-pg1-x534.google.com (mail-pg1-x534.google.com [IPv6:2607:f8b0:4864:20::534])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 162A6A19A
+        for <linux-block@vger.kernel.org>; Mon, 19 Dec 2022 00:40:17 -0800 (PST)
+Received: by mail-pg1-x534.google.com with SMTP id e190so1247211pgc.9
+        for <linux-block@vger.kernel.org>; Mon, 19 Dec 2022 00:40:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=solid-run-com.20210112.gappssmtp.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=f8+bSmaA0cmp16x26bRQ/cm+4zQqtY1wbwdEpQv5OiY=;
+        b=x3TU33kLDcq/fKKT5qEHxp4k2dRmZICETK7MtPkScTvO3f4q0zn/lKiLXv5/E4poHh
+         ohcn17PYGrtMr7icJoKrtIh1wNpyHZrW8qXbxXAJuCD7Cu60bPhfFEtBZJrqAqyzdZ4k
+         BfpPqfxo/eY7Rbs8thLo2rI+w4ExHV84kb8cnzQzgyXEO9j+fLgl9NqWIjcv/UOfM6MJ
+         h2r8rSKyhv6IS16fz9VXUNe70HAEbgY2CbzOb7K0nchnNIyNmEnZhm3HNK1umwI2830K
+         AkAG9tBUOawIoOK8pjc76Mc9/yazdENIRmrWYKP3MSbdTk6aBVOaXrXuTXaUl8TYmmWh
+         sZsQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=YS3+j8ysmQFXuAF/WWlDo+Y2S/ZCz/u0RFV1hier8ug=;
-        b=1IC4u9BaGly45L+qjqfwE2GNYWHSCMHxUSlNYjz0uXTwxad8OUzi3iy4fDac0jWFbA
-         2dFvkLjbVid3C4i6SZ91qfD9uBu/OslQhJv9iNiFyaF3C0l/fKD2qnoni0u/2y5wGSPx
-         nEhxX9jmqoQESn56cIMwsU1QeVbpGSJzpDjgkWu4rn9WUvKZEyk1FGckPAmw2jlrxg8g
-         jfzPA85zQDnL29iRDH7HQKnBRi4MJAqTo6Q3rg54CTSoP0W5WwpIyDFctdUY/yoQ+8mW
-         F+EUFV9solu9pc6XkWSa7YPeow7ksS9tl1gTjwiiilqDL+tDcTAe8m6RUUMwThx7uDOh
-         Qqpg==
-X-Gm-Message-State: ANoB5plUeWCchfjOKRtugrWyBrwM9C5yZbrsRiS/c0V+ZAw0Tdn/ARow
-        6G9jyhhhBJdKywiFjuK5pf1mbcFZyvELCM+A/fO6p6Q33ZtY8B0gtgLeJG88zStfVHJYfTCpyDP
-        CdDFIwVa4+a3dlFIW1LIcvOs=
-X-Received: by 2002:ac8:73d0:0:b0:3a6:a750:7295 with SMTP id v16-20020ac873d0000000b003a6a7507295mr52184078qtp.4.1671436781369;
-        Sun, 18 Dec 2022 23:59:41 -0800 (PST)
-X-Google-Smtp-Source: AA0mqf5Wq6cMYNlB+7Xwf8W/aB4sv+SmT+LvfYGgWrr7DqxucS6GjT8jJVdHwqlCwXwk+RfFMFIuhg==
-X-Received: by 2002:ac8:73d0:0:b0:3a6:a750:7295 with SMTP id v16-20020ac873d0000000b003a6a7507295mr52184064qtp.4.1671436781018;
-        Sun, 18 Dec 2022 23:59:41 -0800 (PST)
-Received: from redhat.com ([45.144.113.29])
-        by smtp.gmail.com with ESMTPSA id r17-20020ae9d611000000b006fcc437c2e8sm6591250qkk.44.2022.12.18.23.59.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 18 Dec 2022 23:59:40 -0800 (PST)
-Date:   Mon, 19 Dec 2022 02:59:34 -0500
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Alvaro Karsz <alvaro.karsz@solid-run.com>
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=f8+bSmaA0cmp16x26bRQ/cm+4zQqtY1wbwdEpQv5OiY=;
+        b=gxeAO5CoaOHT64SiZk07w1qdvGC1HOuOufJUWrfWJunLi9b15hvJ+efQBVTFkLITOs
+         QPCxHBaI+mF4jTqo1cXS09WPNFlfEMo2otmRvU03Sa6f/FzTZx5GYn5P9WVdIyji+U5K
+         Ai3zdAAQ4KkyuJnl5Fk8QhrP6T5TH9pSP40H9wDageyKmrwlIDGW85GLDx9MjVBvIKCW
+         M56/RphOWUhOFXWyuVoQ/3dB4tZOcuBDRXctEAqjLfGdj1zfHU8CL5nufRJIkwc9FCiQ
+         PQ+3xqHRJJzt44pdll30fMvpdXATCg7A2gs5K4OvZtVqn7K/A0thRzXUo4IRmL2B2o4L
+         sLXg==
+X-Gm-Message-State: ANoB5pkmuR2H/Rfk3ZplB9fCKDbOvvs+5G7Dnz8MN+RaV8UM4mCbzyNo
+        Fa3jIHqoVm9gQhLWtzNxA16bZrdtehCaW1ZGXyQS/A==
+X-Google-Smtp-Source: AA0mqf6fHrB24kpKRZtxJ/jl4cyycBpONCwoE9u9Hwo5PX1mANCykQgJBY1PwHfLY1yPaXCstzW+unZ0wtSJyelyLd8=
+X-Received: by 2002:aa7:9acc:0:b0:577:81cb:4761 with SMTP id
+ x12-20020aa79acc000000b0057781cb4761mr9183983pfp.46.1671439216472; Mon, 19
+ Dec 2022 00:40:16 -0800 (PST)
+MIME-Version: 1.0
+References: <20221205162035.2261037-1-alvaro.karsz@solid-run.com> <20221219025404-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20221219025404-mutt-send-email-mst@kernel.org>
+From:   Alvaro Karsz <alvaro.karsz@solid-run.com>
+Date:   Mon, 19 Dec 2022 10:39:39 +0200
+Message-ID: <CAJs=3_CWQ3T1O5RofstwkczpgoJym5X4xBQmdQCtt573sHUOKg@mail.gmail.com>
+Subject: Re: [PATCH v3] virtio_blk: add VIRTIO_BLK_F_LIFETIME feature support
+To:     "Michael S. Tsirkin" <mst@redhat.com>
 Cc:     virtualization@lists.linux-foundation.org,
         linux-block@vger.kernel.org, dm-devel@redhat.com,
         linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org,
@@ -65,324 +61,13 @@ Cc:     virtualization@lists.linux-foundation.org,
         Paolo Bonzini <pbonzini@redhat.com>,
         Stefan Hajnoczi <stefanha@redhat.com>,
         Jens Axboe <axboe@kernel.dk>
-Subject: Re: [PATCH v3] virtio_blk: add VIRTIO_BLK_F_LIFETIME feature support
-Message-ID: <20221219025404-mutt-send-email-mst@kernel.org>
-References: <20221205162035.2261037-1-alvaro.karsz@solid-run.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221205162035.2261037-1-alvaro.karsz@solid-run.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Dec 05, 2022 at 06:20:34PM +0200, Alvaro Karsz wrote:
-> Implement the VIRTIO_BLK_F_LIFETIME feature for VirtIO block devices.
-> 
-> This commit introduces a new ioctl command, VBLK_LIFETIME.
-> 
-> VBLK_LIFETIME ioctl asks for the block device to provide lifetime
-> information by sending a VIRTIO_BLK_T_GET_LIFETIME command to the device.
-> 
-> lifetime information fields:
-> 
-> - pre_eol_info: specifies the percentage of reserved blocks that are
-> 		consumed.
-> 		optional values following virtio spec:
-> 		*) 0 - undefined.
-> 		*) 1 - normal, < 80% of reserved blocks are consumed.
-> 		*) 2 - warning, 80% of reserved blocks are consumed.
-> 		*) 3 - urgent, 90% of reserved blocks are consumed.
-> 
-> - device_lifetime_est_typ_a: this field refers to wear of SLC cells and
-> 			     is provided in increments of 10used, and so
-> 			     on, thru to 11 meaning estimated lifetime
-> 			     exceeded. All values above 11 are reserved.
-> 
-> - device_lifetime_est_typ_b: this field refers to wear of MLC cells and is
-> 			     provided with the same semantics as
-> 			     device_lifetime_est_typ_a.
-> 
-> The data received from the device will be sent as is to the user.
-> No data check/decode is done by virtblk.
-> 
-> Signed-off-by: Alvaro Karsz <alvaro.karsz@solid-run.com>
-> --
-> v2:
-> 	- Remove (void *) casting.
-> 	- Fix comments format in virtio_blk.h.
-> 	- Set ioprio value for legacy devices for REQ_OP_DRV_IN
-> 	  operations.
-> 
-> v3:
-> 	- Initialize struct virtio_blk_lifetime to 0 instead of memset.
-> 	- Rename ioctl from VBLK_LIFETIME to VBLK_GET_LIFETIME.
-> 	- Return EOPNOTSUPP insted of ENOTTY if ioctl is not supported.
-> 	- Check if process is CAP_SYS_ADMIN capable in lifetime ioctl.
-> 	- Check if vdev is not NULL before accessing it in lifetime ioctl.
-> --
-> ---
->  drivers/block/virtio_blk.c      | 106 ++++++++++++++++++++++++++++++--
->  include/uapi/linux/virtio_blk.h |  32 ++++++++++
->  2 files changed, 133 insertions(+), 5 deletions(-)
-> 
-> diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-> index 19da5defd73..392d57fd6b7 100644
-> --- a/drivers/block/virtio_blk.c
-> +++ b/drivers/block/virtio_blk.c
-> @@ -101,6 +101,18 @@ static inline blk_status_t virtblk_result(struct virtblk_req *vbr)
->  	}
->  }
->  
-> +static inline int virtblk_ioctl_result(struct virtblk_req *vbr)
-> +{
-> +	switch (vbr->status) {
-> +	case VIRTIO_BLK_S_OK:
-> +		return 0;
-> +	case VIRTIO_BLK_S_UNSUPP:
-> +		return -EOPNOTSUPP;
-> +	default:
-> +		return -EIO;
-> +	}
-> +}
-> +
->  static inline struct virtio_blk_vq *get_virtio_blk_vq(struct blk_mq_hw_ctx *hctx)
->  {
->  	struct virtio_blk *vblk = hctx->queue->queuedata;
-> @@ -218,6 +230,7 @@ static blk_status_t virtblk_setup_cmd(struct virtio_device *vdev,
->  	u32 type;
->  
->  	vbr->out_hdr.sector = 0;
-> +	vbr->out_hdr.ioprio = cpu_to_virtio32(vdev, req_get_ioprio(req));
->  
->  	switch (req_op(req)) {
->  	case REQ_OP_READ:
-> @@ -244,15 +257,14 @@ static blk_status_t virtblk_setup_cmd(struct virtio_device *vdev,
->  		type = VIRTIO_BLK_T_SECURE_ERASE;
->  		break;
->  	case REQ_OP_DRV_IN:
-> -		type = VIRTIO_BLK_T_GET_ID;
-> -		break;
-> +		/* type is set in virtblk_get_id/virtblk_ioctl_lifetime */
-> +		return 0;
->  	default:
->  		WARN_ON_ONCE(1);
->  		return BLK_STS_IOERR;
->  	}
->  
->  	vbr->out_hdr.type = cpu_to_virtio32(vdev, type);
-> -	vbr->out_hdr.ioprio = cpu_to_virtio32(vdev, req_get_ioprio(req));
->  
->  	if (type == VIRTIO_BLK_T_DISCARD || type == VIRTIO_BLK_T_WRITE_ZEROES ||
->  	    type == VIRTIO_BLK_T_SECURE_ERASE) {
-> @@ -459,12 +471,16 @@ static int virtblk_get_id(struct gendisk *disk, char *id_str)
->  	struct virtio_blk *vblk = disk->private_data;
->  	struct request_queue *q = vblk->disk->queue;
->  	struct request *req;
-> +	struct virtblk_req *vbr;
->  	int err;
->  
->  	req = blk_mq_alloc_request(q, REQ_OP_DRV_IN, 0);
->  	if (IS_ERR(req))
->  		return PTR_ERR(req);
->  
-> +	vbr = blk_mq_rq_to_pdu(req);
-> +	vbr->out_hdr.type = cpu_to_virtio32(vblk->vdev, VIRTIO_BLK_T_GET_ID);
-> +
->  	err = blk_rq_map_kern(q, req, id_str, VIRTIO_BLK_ID_BYTES, GFP_KERNEL);
->  	if (err)
->  		goto out;
-> @@ -508,6 +524,85 @@ static int virtblk_getgeo(struct block_device *bd, struct hd_geometry *geo)
->  	return ret;
->  }
->  
-> +/* Get lifetime information from device */
-> +static int virtblk_ioctl_lifetime(struct virtio_blk *vblk, unsigned long arg)
-> +{
-> +	struct request_queue *q = vblk->disk->queue;
-> +	struct request *req = NULL;
-> +	struct virtblk_req *vbr;
-> +	struct virtio_blk_lifetime lifetime = {};
-> +	int ret;
-> +
-> +	if (!capable(CAP_SYS_ADMIN))
-> +		return -EPERM;
-> +
-> +	/* The virtio_blk_lifetime struct fields follow virtio spec.
-> +	 * There is no check/decode on values received from the device.
-> +	 * The data is sent as is to the user.
-> +	 */
-> +
-> +	/* This ioctl is allowed only if VIRTIO_BLK_F_LIFETIME
-> +	 * feature is negotiated.
-> +	 */
-> +	if (!virtio_has_feature(vblk->vdev, VIRTIO_BLK_F_LIFETIME))
-> +		return -EOPNOTSUPP;
-> +
-> +	req = blk_mq_alloc_request(q, REQ_OP_DRV_IN, 0);
-> +	if (IS_ERR(req))
-> +		return PTR_ERR(req);
-> +
-> +	/* Write the correct type */
-> +	vbr = blk_mq_rq_to_pdu(req);
-> +	vbr->out_hdr.type = cpu_to_virtio32(vblk->vdev, VIRTIO_BLK_T_GET_LIFETIME);
-> +
-> +	ret = blk_rq_map_kern(q, req, &lifetime, sizeof(lifetime), GFP_KERNEL);
-> +	if (ret)
-> +		goto out;
-> +
-> +	blk_execute_rq(req, false);
-> +
-> +	ret = virtblk_ioctl_result(blk_mq_rq_to_pdu(req));
-> +	if (ret)
-> +		goto out;
-> +
-> +	/* Pass the data to the user */
-> +	if (copy_to_user((void __user *)arg, &lifetime, sizeof(lifetime))) {
-> +		ret = -EFAULT;
-> +		goto out;
-> +	}
-> +
-> +out:
-> +	blk_mq_free_request(req);
-> +	return ret;
-> +}
-> +
-> +static int virtblk_ioctl(struct block_device *bd, fmode_t mode,
-> +			 unsigned int cmd, unsigned long arg)
-> +{
-> +	struct virtio_blk *vblk = bd->bd_disk->private_data;
-> +	int ret;
-> +
-> +	mutex_lock(&vblk->vdev_mutex);
-> +
-> +	if (!vblk->vdev) {
-> +		ret = -ENXIO;
-> +		goto exit;
-> +	}
-> +
-> +	switch (cmd) {
-> +	case VBLK_GET_LIFETIME:
-> +		ret = virtblk_ioctl_lifetime(vblk, arg);
-> +		break;
-> +	default:
-> +		ret = -EOPNOTSUPP;
-> +		break;
-> +	}
-> +
-> +exit:
-> +	mutex_unlock(&vblk->vdev_mutex);
-> +	return ret;
-> +}
-> +
->  static void virtblk_free_disk(struct gendisk *disk)
->  {
->  	struct virtio_blk *vblk = disk->private_data;
-> @@ -520,6 +615,7 @@ static void virtblk_free_disk(struct gendisk *disk)
->  static const struct block_device_operations virtblk_fops = {
->  	.owner  	= THIS_MODULE,
->  	.getgeo		= virtblk_getgeo,
-> +	.ioctl		= virtblk_ioctl,
->  	.free_disk	= virtblk_free_disk,
->  };
->  
-> @@ -1239,7 +1335,7 @@ static unsigned int features_legacy[] = {
->  	VIRTIO_BLK_F_RO, VIRTIO_BLK_F_BLK_SIZE,
->  	VIRTIO_BLK_F_FLUSH, VIRTIO_BLK_F_TOPOLOGY, VIRTIO_BLK_F_CONFIG_WCE,
->  	VIRTIO_BLK_F_MQ, VIRTIO_BLK_F_DISCARD, VIRTIO_BLK_F_WRITE_ZEROES,
-> -	VIRTIO_BLK_F_SECURE_ERASE,
-> +	VIRTIO_BLK_F_SECURE_ERASE, VIRTIO_BLK_F_LIFETIME,
->  }
->  ;
->  static unsigned int features[] = {
-> @@ -1247,7 +1343,7 @@ static unsigned int features[] = {
->  	VIRTIO_BLK_F_RO, VIRTIO_BLK_F_BLK_SIZE,
->  	VIRTIO_BLK_F_FLUSH, VIRTIO_BLK_F_TOPOLOGY, VIRTIO_BLK_F_CONFIG_WCE,
->  	VIRTIO_BLK_F_MQ, VIRTIO_BLK_F_DISCARD, VIRTIO_BLK_F_WRITE_ZEROES,
-> -	VIRTIO_BLK_F_SECURE_ERASE,
-> +	VIRTIO_BLK_F_SECURE_ERASE, VIRTIO_BLK_F_LIFETIME,
->  };
->  
->  static struct virtio_driver virtio_blk = {
-> diff --git a/include/uapi/linux/virtio_blk.h b/include/uapi/linux/virtio_blk.h
-> index 58e70b24b50..e755d62d2ea 100644
-> --- a/include/uapi/linux/virtio_blk.h
-> +++ b/include/uapi/linux/virtio_blk.h
-> @@ -40,6 +40,7 @@
->  #define VIRTIO_BLK_F_MQ		12	/* support more than one vq */
->  #define VIRTIO_BLK_F_DISCARD	13	/* DISCARD is supported */
->  #define VIRTIO_BLK_F_WRITE_ZEROES	14	/* WRITE ZEROES is supported */
-> +#define VIRTIO_BLK_F_LIFETIME	15 /* Storage lifetime information is supported */
->  #define VIRTIO_BLK_F_SECURE_ERASE	16 /* Secure Erase is supported */
->  
->  /* Legacy feature bits */
-> @@ -165,6 +166,9 @@ struct virtio_blk_config {
->  /* Get device ID command */
->  #define VIRTIO_BLK_T_GET_ID    8
->  
-> +/* Get lifetime information command */
-> +#define VIRTIO_BLK_T_GET_LIFETIME 10
-> +
->  /* Discard command */
->  #define VIRTIO_BLK_T_DISCARD	11
->  
-> @@ -206,6 +210,30 @@ struct virtio_blk_discard_write_zeroes {
->  	__le32 flags;
->  };
->  
-> +/* Get lifetime information struct for each request */
-> +struct virtio_blk_lifetime {
-> +	/*
-> +	 * specifies the percentage of reserved blocks that are consumed.
-> +	 * optional values following virtio spec:
-> +	 * 0 - undefined
-> +	 * 1 - normal, < 80% of reserved blocks are consumed
-> +	 * 2 - warning, 80% of reserved blocks are consumed
-> +	 * 3 - urgent, 90% of reserved blocks are consumed
-> +	 */
-> +	__le16 pre_eol_info;
-> +	/*
-> +	 * this field refers to wear of SLC cells and is provided in increments of 10used,
-> +	 * and so on, thru to 11 meaning estimated lifetime exceeded. All values above 11
-> +	 * are reserved
-> +	 */
-> +	__le16 device_lifetime_est_typ_a;
-> +	/*
-> +	 * this field refers to wear of MLC cells and is provided with the same semantics as
-> +	 * device_lifetime_est_typ_a
-> +	 */
-> +	__le16 device_lifetime_est_typ_b;
-> +};
-> +
->  #ifndef VIRTIO_BLK_NO_LEGACY
->  struct virtio_scsi_inhdr {
->  	__virtio32 errors;
-> @@ -219,4 +247,8 @@ struct virtio_scsi_inhdr {
->  #define VIRTIO_BLK_S_OK		0
->  #define VIRTIO_BLK_S_IOERR	1
->  #define VIRTIO_BLK_S_UNSUPP	2
-> +
-> +/* Virtblk ioctl commands */
-> +#define VBLK_GET_LIFETIME	_IOR('r', 0, struct virtio_blk_lifetime)
-> +
->  #endif /* _LINUX_VIRTIO_BLK_H */
+Hi Michael,
+Sorry, I had no time to create a new version.
+I'll do it today.
 
-
-So this makes the header not self-contained: you need to
-pull in ioctl.h. And that's a bit annoying to people
-who are used to just have spec defines in this header.
-Maybe add a new one virtio_blk_ioctl.h ?
-
-And I'd still like to change VBLK_ prefix here to something like
-VIRTIO_BLK_IOCTL_ 
-
-And maybe document that this is just for specific type of backend
-device, and mention the types which benefit, in code comment
-if not in the ioctl name.
-
-Thanks!
-
-
-> -- 
-> 2.32.0
-
+Alvaro
