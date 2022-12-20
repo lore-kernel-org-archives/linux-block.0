@@ -2,107 +2,75 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F1F5C4332F
-	for <linux-block@archiver.kernel.org>; Tue, 20 Dec 2022 20:20:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BB135C3DA7A
+	for <linux-block@archiver.kernel.org>; Tue, 20 Dec 2022 21:28:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234343AbiLTUU2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 20 Dec 2022 15:20:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54782 "EHLO
+        id S234091AbiLTV2r (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 20 Dec 2022 16:28:47 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50786 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234291AbiLTUUA (ORCPT
+        with ESMTP id S233971AbiLTV2q (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 20 Dec 2022 15:20:00 -0500
-Received: from smtp6-g21.free.fr (smtp6-g21.free.fr [212.27.42.6])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B5FB1FCE2;
-        Tue, 20 Dec 2022 12:18:34 -0800 (PST)
-Received: from localhost (unknown [IPv6:2a01:e35:39f2:1220:dc8b:b602:9bcd:3004])
-        by smtp6-g21.free.fr (Postfix) with ESMTPS id 7B28D780350;
-        Tue, 20 Dec 2022 21:18:23 +0100 (CET)
-From:   Yann Droneaud <ydroneaud@opteya.com>
-To:     Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>,
-        Jens Axboe <axboe@kernel.dk>
-Cc:     cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Yann Droneaud <ydroneaud@opteya.com>
-Subject: [PATCH] blk-iocost: don't make all constants unsigned long long
-Date:   Tue, 20 Dec 2022 21:18:19 +0100
-Message-Id: <20221220201819.1497577-1-ydroneaud@opteya.com>
-X-Mailer: git-send-email 2.37.2
+        Tue, 20 Dec 2022 16:28:46 -0500
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6C071EAE0
+        for <linux-block@vger.kernel.org>; Tue, 20 Dec 2022 13:28:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
+        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=Uk//xnFF9s+wkGimPH4UmEyWe6edFnqnttAQCxTAmrY=; b=WlQYN464FuPztf/O685AkO1e7z
+        MhMsMYLRl9iJR2hOyX7jUDLiENSQDePxD5Syow3icZ4W97vlqqTc33Hmf+BXsukBlJXGULFrBvmd3
+        sLg4JVDrlWEFXpbbdiGOzguSNxvU0i39nB2xf5VZ+bpB1NRRVzxOm5iRPgp/O2gCHYPsUP+sEMb3u
+        XX+HLisgIQa75oMOl7CW4pYuPLM+2HslUbo5ck9MCROzfx/CzKN5fE4ynSlCu1BJWxDma/GleczO3
+        QqDM/kYQp2zHI7q9dapvDhkySipq/2UhNkY4gn3GJZYu2aeQm8XQskJV8AmEO0LS0TGCGde215iKp
+        trhlx9Xg==;
+Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1p7kAF-004LtL-RQ; Tue, 20 Dec 2022 21:28:43 +0000
+Date:   Tue, 20 Dec 2022 13:28:43 -0800
+From:   Luis Chamberlain <mcgrof@kernel.org>
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     osandov@fb.com, linux-block@vger.kernel.org
+Subject: Re: [PATCH v2] blktests: replace module removal with patient module
+ removal
+Message-ID: <Y6IpC3Rv5QRSRCs0@bombadil.infradead.org>
+References: <YlogluONIoc1VTCI@bombadil.infradead.org>
+ <c584cf40-2181-2617-92aa-bcdbc56a5ab8@acm.org>
+ <Yl2KU6vLxawrIXi/@bombadil.infradead.org>
+ <1293a7e7-71d0-117e-1a4f-8ccfc609bc43@acm.org>
+ <Ynv2BaRJcL0I3vAR@bombadil.infradead.org>
+ <71af1a93-1950-b480-afbb-d61b6590f6fe@acm.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <71af1a93-1950-b480-afbb-d61b6590f6fe@acm.org>
+Sender: Luis Chamberlain <mcgrof@infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-My shiny new compiler (GCC 13) is reporting the following
-warnings:
+On Wed, May 11, 2022 at 11:22:52AM -0700, Bart Van Assche wrote:
+> On 5/11/22 10:44, Luis Chamberlain wrote:
+> > I suspect you ran into the issue of the refcnt being bumped by anything
+> > multipathd tried, and not being able to remove the module, but  if it is
+> > adding *new* mpath devices that would seem like a bug which we'd need to
+> > address. The point to the patient module removal is to keep on trying
+> > until the recnt  is 0 and if that fails wait and keep trying, until the
+> > the timeout. Anytihng userspace does, say multipathd does, like
+> > bdev_open(), would be yielded to.
+> > 
+> > So I'd like to keep this change as it is exactly the sort of hack I am
+> > chasing after with this crusade.
+> > 
+> > Let me know how you'd like to proceed so I can punt a v3.
+> 
+> Please implement the patient module removal and the stop_srp_ini() behavior
+> changes as separate patches such that the stop_srp_ini() behavioral changes
+> can be reverted easily in case these would trigger a regression.
 
-  ../block/blk-iocost.c: In function 'ioc_weight_prfill':
-  ../block/blk-iocost.c:3035:37: warning: format '%u' expects argument of type 'unsigned int', but argument 4 has type 'long unsigned int' [-Wformat=]
-   3035 |                 seq_printf(sf, "%s %u\n", dname, iocg->cfg_weight / WEIGHT_ONE);
-        |                                    ~^            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        |                                     |                             |
-        |                                     unsigned int                  long unsigned int
-        |                                    %lu
-  ../block/blk-iocost.c: In function 'ioc_weight_show':
-  ../block/blk-iocost.c:3045:34: warning: format '%u' expects argument of type 'unsigned int', but argument 3 has type 'long unsigned int' [-Wformat=]
-   3045 |         seq_printf(sf, "default %u\n", iocc->dfl_weight / WEIGHT_ONE);
-        |                                 ~^     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        |                                  |                      |
-        |                                  unsigned int           long unsigned int
-        |                                 %lu
+I had dropped the ball here, because well, it takes a bit of time to
+re-test everything. And also just around this time I was also ironing
+out how to properly automate testing for srp. That's all done now
+and I finally had time to re-test so will send a v3 out shortly.
 
-It appears WEIGHT_ONE enum is unnecessarly unsigned long
-(or unsigned long long on 32bit) because of VTIME_PER_SEC
-and/or AUTOP_CYCLE_NSEC need the enum to be that large.
-
-Addressed by lazy splitting the "catch all" anonymous
-enum and placing the unsigned long long constants in
-their own anonymous enums.
-
-Signed-off-by: Yann Droneaud <ydroneaud@opteya.com>
----
- block/blk-iocost.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
-
-diff --git a/block/blk-iocost.c b/block/blk-iocost.c
-index 495396425bad..bb1f8522c0f1 100644
---- a/block/blk-iocost.c
-+++ b/block/blk-iocost.c
-@@ -232,7 +232,9 @@ enum {
- 
- 	/* 1/64k is granular enough and can easily be handled w/ u32 */
- 	WEIGHT_ONE		= 1 << 16,
-+};
- 
-+enum {
- 	/*
- 	 * As vtime is used to calculate the cost of each IO, it needs to
- 	 * be fairly high precision.  For example, it should be able to
-@@ -255,7 +257,9 @@ enum {
- 
- 	VRATE_MIN		= VTIME_PER_USEC * VRATE_MIN_PPM / MILLION,
- 	VRATE_CLAMP_ADJ_PCT	= 4,
-+};
- 
-+enum {
- 	/* if IOs end up waiting for requests, issue less */
- 	RQ_WAIT_BUSY_PCT	= 5,
- 
-@@ -293,10 +297,14 @@ enum {
- 
- 	/* don't let cmds which take a very long time pin lagging for too long */
- 	MAX_LAGGING_PERIODS	= 10,
-+};
- 
-+enum {
- 	/* switch iff the conditions are met for longer than this */
- 	AUTOP_CYCLE_NSEC	= 10LLU * NSEC_PER_SEC,
-+};
- 
-+enum {
- 	/*
- 	 * Count IO size in 4k pages.  The 12bit shift helps keeping
- 	 * size-proportional components of cost calculation in closer
--- 
-2.37.2
-
+  Luis
