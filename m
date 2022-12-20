@@ -2,143 +2,138 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A3BF4C4332F
-	for <linux-block@archiver.kernel.org>; Tue, 20 Dec 2022 06:40:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 08FEFC4332F
+	for <linux-block@archiver.kernel.org>; Tue, 20 Dec 2022 06:45:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232887AbiLTGkJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 20 Dec 2022 01:40:09 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43262 "EHLO
+        id S233179AbiLTGpT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 20 Dec 2022 01:45:19 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44934 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230090AbiLTGkI (ORCPT
+        with ESMTP id S233189AbiLTGpR (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 20 Dec 2022 01:40:08 -0500
-X-Greylist: delayed 430 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 19 Dec 2022 22:40:06 PST
-Received: from smtp.cecloud.com (unknown [106.39.185.58])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 6BB9155B7
-        for <linux-block@vger.kernel.org>; Mon, 19 Dec 2022 22:40:06 -0800 (PST)
-Received: from localhost (localhost [127.0.0.1])
-        by smtp.cecloud.com (Postfix) with ESMTP id 8ED8417E0207;
-        Tue, 20 Dec 2022 14:32:51 +0800 (CST)
-X-MAIL-GRAY: 0
-X-MAIL-DELIVERY: 1
-X-ANTISPAM-LEVEL: 2
-X-ABS-CHECKED: 0
-Received: from localhost.localdomain (unknown [111.48.58.13])
-        by smtp.cecloud.com (postfix) whith ESMTP id P2473742T281457142133104S1671517970621458_;
-        Tue, 20 Dec 2022 14:32:51 +0800 (CST)
-X-IP-DOMAINF: 1
-X-UNIQUE-TAG: <3cad95c469ae8f2eea65a6d463006468>
-X-RL-SENDER: zhangyanjun@cestc.cn
-X-SENDER: zhangyanjun@cestc.cn
-X-LOGIN-NAME: zhangyanjun@cestc.cn
-X-FST-TO: sagi@grimberg.me
-X-RCPT-COUNT: 9
-X-SENDER-IP: 111.48.58.13
-X-ATTACHMENT-NUM: 0
-X-System-Flag: 0
-From:   zhangyanjun@cestc.cn
-To:     sagi@grimberg.me, axboe@kernel.dk, kbusch@kernel.org, axboe@fb.com,
-        hch@lst.de
-Cc:     linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, Yanjun Zhang <zhangyanjun@cestc.cn>
-Subject: [PATCH v2] nvme: fix multipath crash caused by flush request when blktrace is enabled
-Date:   Tue, 20 Dec 2022 14:32:33 +0800
-Message-Id: <20221220063233.43932-1-zhangyanjun@cestc.cn>
-X-Mailer: git-send-email 2.31.1
+        Tue, 20 Dec 2022 01:45:17 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 58CAD13DD6
+        for <linux-block@vger.kernel.org>; Mon, 19 Dec 2022 22:44:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1671518669;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=IwzbCVxJgzqh/hZntLgZPVw/8F+zWvpGjiJvEA/MIXQ=;
+        b=fOT8LjDr7XUfp+a4RAtm99I9HZKBSmGtUs5DevYXnP1VicAX0sU7YKconJeIBCf2CGBndk
+        rQs3jHOX8Y5FbW823MVFZcLo40XNGc7PVkyN8ef81sDUiH4oqTTSodFiv5wI3IJSGCz4Y1
+        ustFzTjHLSCfVijSgtmCwflVEg+T2yY=
+Received: from mail-oa1-f70.google.com (mail-oa1-f70.google.com
+ [209.85.160.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-433-zC43077sNhK2qiJwKHDC3Q-1; Tue, 20 Dec 2022 01:44:28 -0500
+X-MC-Unique: zC43077sNhK2qiJwKHDC3Q-1
+Received: by mail-oa1-f70.google.com with SMTP id 586e51a60fabf-144ea535efbso5222232fac.16
+        for <linux-block@vger.kernel.org>; Mon, 19 Dec 2022 22:44:27 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=IwzbCVxJgzqh/hZntLgZPVw/8F+zWvpGjiJvEA/MIXQ=;
+        b=TGpAF542bVHEhLDa7j5cI0Oj/Cgujs4FNWqyJ/0YQ3FFE8QwgtauZieNlcUfjIBpyN
+         oc6gnFeTiexds+bGFaUTHENROQEq5/C7lplj0tToAKcClcUH0DRGj2+ctMmeV1MzD6Aq
+         j36bSDvcyhJITK+5Kw0QKQLjrFZR0eciOovuOCjRLzbGPq0Q1caBzdyCbtBTSDBP1/ax
+         mwF8fC7fgyacBDVnzdedbc+QOR8J/CNIMIe/0QQYZEVn7CUUYVLMBw0vgj9tgKBMr1GX
+         mMXTQiNg5wU6zpDNDjZQZJoO5v4HPL12kRdl6F/psZ4kH7KAX3odWXN/PbwUZVkpB5Tx
+         rbrA==
+X-Gm-Message-State: ANoB5pmeflFum8b/GK3ZED15ViPwu9nj4A5e6dmJzTZKUFER0xfR4lY1
+        sTITlN3ArWPQa1nPk186ijBGIjY7Qh1dofgfQ4I8q9SI/D0KnnmvYXjKPmbQP1go6dCzF+ORLop
+        tgP4jIi50BPXI8IRQRdzoPxScWmAWDogL4OY3BuY=
+X-Received: by 2002:a05:6808:114c:b0:35e:7a42:7ab5 with SMTP id u12-20020a056808114c00b0035e7a427ab5mr1228659oiu.280.1671518667327;
+        Mon, 19 Dec 2022 22:44:27 -0800 (PST)
+X-Google-Smtp-Source: AA0mqf7jGysDqwGrWJu197Nisc2Stp5MBJuSZWK+fp7URpsNdbjTOdPL95/ws7E6NNNRPis0ciTrq34bL9g/AETi3fk=
+X-Received: by 2002:a05:6808:114c:b0:35e:7a42:7ab5 with SMTP id
+ u12-20020a056808114c00b0035e7a427ab5mr1228649oiu.280.1671518667107; Mon, 19
+ Dec 2022 22:44:27 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20221128021005.232105-1-lizetao1@huawei.com> <20221128042945-mutt-send-email-mst@kernel.org>
+ <CACGkMEtuOk+wyCsvY0uayGAvy926G381PC-csoXVAwCfiKCZQw@mail.gmail.com> <20221219050716-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20221219050716-mutt-send-email-mst@kernel.org>
+From:   Jason Wang <jasowang@redhat.com>
+Date:   Tue, 20 Dec 2022 14:44:16 +0800
+Message-ID: <CACGkMEsHojBVQWUDH4L1xiVTjNm3JgkYBppyOHKr8QLUg3=FsQ@mail.gmail.com>
+Subject: Re: [PATCH 0/4] Fix probe failed when modprobe modules
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     Li Zetao <lizetao1@huawei.com>, pbonzini@redhat.com,
+        stefanha@redhat.com, axboe@kernel.dk, kraxel@redhat.com,
+        david@redhat.com, ericvh@gmail.com, lucho@ionkov.net,
+        asmadeus@codewreck.org, linux_oss@crudebyte.com,
+        davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+        pabeni@redhat.com, rusty@rustcorp.com.au,
+        virtualization@lists.linux-foundation.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        v9fs-developer@lists.sourceforge.net, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Yanjun Zhang <zhangyanjun@cestc.cn>
+On Mon, Dec 19, 2022 at 6:15 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+>
+> On Tue, Nov 29, 2022 at 11:37:09AM +0800, Jason Wang wrote:
+> > >
+> > >
+> > > Quite a lot of core work here. Jason are you still looking into
+> > > hardening?
+> >
+> > Yes, last time we've discussed a solution that depends on the first
+> > kick to enable the interrupt handler. But after some thought, it seems
+> > risky since there's no guarantee that the device work in this way.
+> >
+> > One example is the current vhost_net, it doesn't wait for the kick to
+> > process the rx packets. Any more thought on this?
+> >
+> > Thanks
+>
+> Specifically virtio net is careful to call virtio_device_ready
+> under rtnl lock so buffers are only added after DRIVER_OK.
 
-The flush request initialized by blk_kick_flush has NULL bio,
-and it may be dealt with nvme_end_req during io completion.
-When blktrace is enabled, nvme_trace_bio_complete with multipath
-activated trying to access NULL pointer bio from flush request
-results in the following crash:
+Right but it only got fixed this year after some code audit.
 
-[ 2517.831677] BUG: kernel NULL pointer dereference, address: 000000000000001a
-[ 2517.835213] #PF: supervisor read access in kernel mode
-[ 2517.838724] #PF: error_code(0x0000) - not-present page
-[ 2517.842222] PGD 7b2d51067 P4D 0
-[ 2517.845684] Oops: 0000 [#1] SMP NOPTI
-[ 2517.849125] CPU: 2 PID: 732 Comm: kworker/2:1H Kdump: loaded Tainted: G S                5.15.67-0.el9.x86_64 #1
-[ 2517.852723] Hardware name: XFUSION 2288H V6/BC13MBSBC, BIOS 1.13 07/27/2022
-[ 2517.856358] Workqueue: nvme_tcp_wq nvme_tcp_io_work [nvme_tcp]
-[ 2517.859993] RIP: 0010:blk_add_trace_bio_complete+0x6/0x30
-[ 2517.863628] Code: 1f 44 00 00 48 8b 46 08 31 c9 ba 04 00 10 00 48 8b 80 50 03 00 00 48 8b 78 50 e9 e5 fe ff ff 0f 1f 44 00 00 41 54 49 89 f4 55 <0f> b6 7a 1a 48 89 d5 e8 3e 1c 2b 00 48 89 ee 4c 89 e7 5d 89 c1 ba
-[ 2517.871269] RSP: 0018:ff7f6a008d9dbcd0 EFLAGS: 00010286
-[ 2517.875081] RAX: ff3d5b4be00b1d50 RBX: 0000000002040002 RCX: ff3d5b0a270f2000
-[ 2517.878966] RDX: 0000000000000000 RSI: ff3d5b0b021fb9f8 RDI: 0000000000000000
-[ 2517.882849] RBP: ff3d5b0b96a6fa00 R08: 0000000000000001 R09: 0000000000000000
-[ 2517.886718] R10: 000000000000000c R11: 000000000000000c R12: ff3d5b0b021fb9f8
-[ 2517.890575] R13: 0000000002000000 R14: ff3d5b0b021fb1b0 R15: 0000000000000018
-[ 2517.894434] FS:  0000000000000000(0000) GS:ff3d5b42bfc80000(0000) knlGS:0000000000000000
-[ 2517.898299] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[ 2517.902157] CR2: 000000000000001a CR3: 00000004f023e005 CR4: 0000000000771ee0
-[ 2517.906053] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-[ 2517.909930] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-[ 2517.913761] PKRU: 55555554
-[ 2517.917558] Call Trace:
-[ 2517.921294]  <TASK>
-[ 2517.924982]  nvme_complete_rq+0x1c3/0x1e0 [nvme_core]
-[ 2517.928715]  nvme_tcp_recv_pdu+0x4d7/0x540 [nvme_tcp]
-[ 2517.932442]  nvme_tcp_recv_skb+0x4f/0x240 [nvme_tcp]
-[ 2517.936137]  ? nvme_tcp_recv_pdu+0x540/0x540 [nvme_tcp]
-[ 2517.939830]  tcp_read_sock+0x9c/0x260
-[ 2517.943486]  nvme_tcp_try_recv+0x65/0xa0 [nvme_tcp]
-[ 2517.947173]  nvme_tcp_io_work+0x64/0x90 [nvme_tcp]
-[ 2517.950834]  process_one_work+0x1e8/0x390
-[ 2517.954473]  worker_thread+0x53/0x3c0
-[ 2517.958069]  ? process_one_work+0x390/0x390
-[ 2517.961655]  kthread+0x10c/0x130
-[ 2517.965211]  ? set_kthread_struct+0x40/0x40
-[ 2517.968760]  ret_from_fork+0x1f/0x30
-[ 2517.972285]  </TASK>
+>
+> However we do not need to tie this to kick, this is what I wrote:
+>
+> > BTW Jason, I had the idea to disable callbacks until driver uses the
+> > virtio core for the first time (e.g. by calling virtqueue_add* family of
+> > APIs). Less aggressive than your ideas but I feel it will add security
+> > to the init path at least.
+>
+> So not necessarily kick, we can make adding buffers allow the
+> interrupt.
 
-To avoid this situation, add one more check with is_flush_rq before
-calling trace_block_bio_complete.
+Some questions:
 
-Signed-off-by: Yanjun Zhang <zhangyanjun@cestc.cn>
----
- block/blk-flush.c        | 1 +
- drivers/nvme/host/nvme.h | 3 ++-
- 2 files changed, 3 insertions(+), 1 deletion(-)
+1) It introduces a code defined behaviour other than depending on the
+spec defined behavior like DRIVER_OK, this will lead extra complexity
+in auditing
+2) there's no guarantee that the interrupt handler is ready before
+virtqueue_add(), or it requires barriers before virtqueue_add() to
+make sure the handler is commit
 
-diff --git a/block/blk-flush.c b/block/blk-flush.c
-index 53202eff5..4504321ed 100644
---- a/block/blk-flush.c
-+++ b/block/blk-flush.c
-@@ -276,6 +276,7 @@ bool is_flush_rq(struct request *rq)
- {
- 	return rq->end_io == flush_end_io;
- }
-+EXPORT_SYMBOL(is_flush_rq);
- 
- /**
-  * blk_kick_flush - consider issuing flush request
-diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
-index a29877217..1f1bd375f 100644
---- a/drivers/nvme/host/nvme.h
-+++ b/drivers/nvme/host/nvme.h
-@@ -884,11 +884,12 @@ void nvme_mpath_revalidate_paths(struct nvme_ns *ns);
- void nvme_mpath_clear_ctrl_paths(struct nvme_ctrl *ctrl);
- void nvme_mpath_shutdown_disk(struct nvme_ns_head *head);
- 
-+extern bool is_flush_rq(struct request *rq);
- static inline void nvme_trace_bio_complete(struct request *req)
- {
- 	struct nvme_ns *ns = req->q->queuedata;
- 
--	if (req->cmd_flags & REQ_NVME_MPATH)
-+	if (req->cmd_flags & REQ_NVME_MPATH && !is_flush_rq(req))
- 		trace_block_bio_complete(ns->head->disk->queue, req->bio);
- }
- 
--- 
-2.31.1
+So it looks to me the virtio_device_ready() should be still the
+correct way to go:
 
+1) it depends on spec defined behaviour like DRIVER_OK, and it then
+can comply with possible future security requirement of drivers
+defined in the spec
+2) choose to use a new boolean instead of reusing vq->broken
+3) enable the harden in driver one by one
 
+Does it make sense?
+
+Thanks
+
+>
+>
+>
+> --
+> MST
+>
 
