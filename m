@@ -2,155 +2,143 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E4881C4332F
-	for <linux-block@archiver.kernel.org>; Tue, 20 Dec 2022 02:38:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A3BF4C4332F
+	for <linux-block@archiver.kernel.org>; Tue, 20 Dec 2022 06:40:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232432AbiLTCiT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 19 Dec 2022 21:38:19 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34990 "EHLO
+        id S232887AbiLTGkJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 20 Dec 2022 01:40:09 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43262 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232578AbiLTCiP (ORCPT
+        with ESMTP id S230090AbiLTGkI (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 19 Dec 2022 21:38:15 -0500
-Received: from mail-pf1-x436.google.com (mail-pf1-x436.google.com [IPv6:2607:f8b0:4864:20::436])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED9E811A27
-        for <linux-block@vger.kernel.org>; Mon, 19 Dec 2022 18:38:13 -0800 (PST)
-Received: by mail-pf1-x436.google.com with SMTP id d82so7574046pfd.11
-        for <linux-block@vger.kernel.org>; Mon, 19 Dec 2022 18:38:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance-com.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=XdsW29O/6Xn6rXQsu5aPcLciaxL4xlcszGahdv8fEa4=;
-        b=JX+Yf4WHK86OHRDqIF+sLMufhIcZDg+3+srs173HnZoa49DGsPAWF5Dr5GAckDMRWz
-         FKHkNX+zSoaW4T6mj7PFoBB+R7aIPFkoDT6C/zaKh7Fr6YFcJKKB+3TP03RHpygnFjIk
-         zT4pk334VL7ur7W5QNW3BqlUa/W794r2umr3pX1aAVp3AXfUJGFwSzJu8dGpw7ZCgTEG
-         4NVifBZ8i6VMj0URqFcOG+fZKYrG0HAfPsGfyCS0BgcNENC/nKgRAk4PMZc5vosOwenc
-         Y434W1ZNjXPpGBrbmjcVPOpgMpveICUYsPsb8oI5lQrxmvtyQ5C3+4gEoXEATonYs6ZV
-         7YBw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=XdsW29O/6Xn6rXQsu5aPcLciaxL4xlcszGahdv8fEa4=;
-        b=mWm+HdsfPqkb9SSiiVEpJjBHO0tJOEDscsKAtMdlXsMDDJzD/izxviLzi8akpV6jQV
-         hHJr9/S40MtlgGqvfoXikBcggUJc2R/pXjdC8Vl58PLOzy/PzIBXtRNNrsL2mlsvXSix
-         ZEvkODW/hPpUv9hwPAgOpZ4Q9VyJee2RRw2lT8CL/gjQ33MW6cysBUVKl6HTs9gurbTg
-         LyHqYfPwsc1Kfeht0MXAVRsSnfra1WavPLnvZBDb90nbQPDf9UwJ7NJEvnSZaaaayFhd
-         ahJnaUn6p1AAzgW1Cr6+18babUDW1EiZ9crS4rTWJ9I7EkeDQMaU6zMr7awUovnSkYGo
-         TYCA==
-X-Gm-Message-State: ANoB5pk2134c7P3JGmAuKjqZkIFhbWdk5BB5KXYMqBC2cK+cckDBjfeX
-        +dVp7CaxTf40xZR2lUTGf4rDbg==
-X-Google-Smtp-Source: AA0mqf56VtST1wkF2n8PGxLj9I+dEzc6pW0gRfjpWT3uBZx2CydeTcTnKx4AzFZWXiGsSCMKonwciw==
-X-Received: by 2002:aa7:956f:0:b0:576:e1f0:c812 with SMTP id x15-20020aa7956f000000b00576e1f0c812mr42718289pfq.30.1671503893422;
-        Mon, 19 Dec 2022 18:38:13 -0800 (PST)
-Received: from [10.254.36.84] ([139.177.225.236])
-        by smtp.gmail.com with ESMTPSA id 81-20020a621654000000b00574740c99e9sm7306038pfw.129.2022.12.19.18.38.10
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 19 Dec 2022 18:38:12 -0800 (PST)
-Message-ID: <78028f86-4fb4-e24e-a01b-d1f8a51cff87@bytedance.com>
-Date:   Tue, 20 Dec 2022 10:38:08 +0800
+        Tue, 20 Dec 2022 01:40:08 -0500
+X-Greylist: delayed 430 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 19 Dec 2022 22:40:06 PST
+Received: from smtp.cecloud.com (unknown [106.39.185.58])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 6BB9155B7
+        for <linux-block@vger.kernel.org>; Mon, 19 Dec 2022 22:40:06 -0800 (PST)
+Received: from localhost (localhost [127.0.0.1])
+        by smtp.cecloud.com (Postfix) with ESMTP id 8ED8417E0207;
+        Tue, 20 Dec 2022 14:32:51 +0800 (CST)
+X-MAIL-GRAY: 0
+X-MAIL-DELIVERY: 1
+X-ANTISPAM-LEVEL: 2
+X-ABS-CHECKED: 0
+Received: from localhost.localdomain (unknown [111.48.58.13])
+        by smtp.cecloud.com (postfix) whith ESMTP id P2473742T281457142133104S1671517970621458_;
+        Tue, 20 Dec 2022 14:32:51 +0800 (CST)
+X-IP-DOMAINF: 1
+X-UNIQUE-TAG: <3cad95c469ae8f2eea65a6d463006468>
+X-RL-SENDER: zhangyanjun@cestc.cn
+X-SENDER: zhangyanjun@cestc.cn
+X-LOGIN-NAME: zhangyanjun@cestc.cn
+X-FST-TO: sagi@grimberg.me
+X-RCPT-COUNT: 9
+X-SENDER-IP: 111.48.58.13
+X-ATTACHMENT-NUM: 0
+X-System-Flag: 0
+From:   zhangyanjun@cestc.cn
+To:     sagi@grimberg.me, axboe@kernel.dk, kbusch@kernel.org, axboe@fb.com,
+        hch@lst.de
+Cc:     linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org, Yanjun Zhang <zhangyanjun@cestc.cn>
+Subject: [PATCH v2] nvme: fix multipath crash caused by flush request when blktrace is enabled
+Date:   Tue, 20 Dec 2022 14:32:33 +0800
+Message-Id: <20221220063233.43932-1-zhangyanjun@cestc.cn>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.2.2
-Subject: Re: [External] Re: [PATCH] blk-throtl: Introduce sync and async
- queues for blk-throtl
-To:     Tejun Heo <tj@kernel.org>
-Cc:     josef@toxicpanda.com, axboe@kernel.dk, cgroups@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        yinxin.x@bytedance.com
-References: <20221218111314.55525-1-hanjinke.666@bytedance.com>
- <Y6DWGBQSP/DA7apC@slm.duckdns.org>
-From:   hanjinke <hanjinke.666@bytedance.com>
-In-Reply-To: <Y6DWGBQSP/DA7apC@slm.duckdns.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+From: Yanjun Zhang <zhangyanjun@cestc.cn>
+
+The flush request initialized by blk_kick_flush has NULL bio,
+and it may be dealt with nvme_end_req during io completion.
+When blktrace is enabled, nvme_trace_bio_complete with multipath
+activated trying to access NULL pointer bio from flush request
+results in the following crash:
+
+[ 2517.831677] BUG: kernel NULL pointer dereference, address: 000000000000001a
+[ 2517.835213] #PF: supervisor read access in kernel mode
+[ 2517.838724] #PF: error_code(0x0000) - not-present page
+[ 2517.842222] PGD 7b2d51067 P4D 0
+[ 2517.845684] Oops: 0000 [#1] SMP NOPTI
+[ 2517.849125] CPU: 2 PID: 732 Comm: kworker/2:1H Kdump: loaded Tainted: G S                5.15.67-0.el9.x86_64 #1
+[ 2517.852723] Hardware name: XFUSION 2288H V6/BC13MBSBC, BIOS 1.13 07/27/2022
+[ 2517.856358] Workqueue: nvme_tcp_wq nvme_tcp_io_work [nvme_tcp]
+[ 2517.859993] RIP: 0010:blk_add_trace_bio_complete+0x6/0x30
+[ 2517.863628] Code: 1f 44 00 00 48 8b 46 08 31 c9 ba 04 00 10 00 48 8b 80 50 03 00 00 48 8b 78 50 e9 e5 fe ff ff 0f 1f 44 00 00 41 54 49 89 f4 55 <0f> b6 7a 1a 48 89 d5 e8 3e 1c 2b 00 48 89 ee 4c 89 e7 5d 89 c1 ba
+[ 2517.871269] RSP: 0018:ff7f6a008d9dbcd0 EFLAGS: 00010286
+[ 2517.875081] RAX: ff3d5b4be00b1d50 RBX: 0000000002040002 RCX: ff3d5b0a270f2000
+[ 2517.878966] RDX: 0000000000000000 RSI: ff3d5b0b021fb9f8 RDI: 0000000000000000
+[ 2517.882849] RBP: ff3d5b0b96a6fa00 R08: 0000000000000001 R09: 0000000000000000
+[ 2517.886718] R10: 000000000000000c R11: 000000000000000c R12: ff3d5b0b021fb9f8
+[ 2517.890575] R13: 0000000002000000 R14: ff3d5b0b021fb1b0 R15: 0000000000000018
+[ 2517.894434] FS:  0000000000000000(0000) GS:ff3d5b42bfc80000(0000) knlGS:0000000000000000
+[ 2517.898299] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[ 2517.902157] CR2: 000000000000001a CR3: 00000004f023e005 CR4: 0000000000771ee0
+[ 2517.906053] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+[ 2517.909930] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+[ 2517.913761] PKRU: 55555554
+[ 2517.917558] Call Trace:
+[ 2517.921294]  <TASK>
+[ 2517.924982]  nvme_complete_rq+0x1c3/0x1e0 [nvme_core]
+[ 2517.928715]  nvme_tcp_recv_pdu+0x4d7/0x540 [nvme_tcp]
+[ 2517.932442]  nvme_tcp_recv_skb+0x4f/0x240 [nvme_tcp]
+[ 2517.936137]  ? nvme_tcp_recv_pdu+0x540/0x540 [nvme_tcp]
+[ 2517.939830]  tcp_read_sock+0x9c/0x260
+[ 2517.943486]  nvme_tcp_try_recv+0x65/0xa0 [nvme_tcp]
+[ 2517.947173]  nvme_tcp_io_work+0x64/0x90 [nvme_tcp]
+[ 2517.950834]  process_one_work+0x1e8/0x390
+[ 2517.954473]  worker_thread+0x53/0x3c0
+[ 2517.958069]  ? process_one_work+0x390/0x390
+[ 2517.961655]  kthread+0x10c/0x130
+[ 2517.965211]  ? set_kthread_struct+0x40/0x40
+[ 2517.968760]  ret_from_fork+0x1f/0x30
+[ 2517.972285]  </TASK>
+
+To avoid this situation, add one more check with is_flush_rq before
+calling trace_block_bio_complete.
+
+Signed-off-by: Yanjun Zhang <zhangyanjun@cestc.cn>
+---
+ block/blk-flush.c        | 1 +
+ drivers/nvme/host/nvme.h | 3 ++-
+ 2 files changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/block/blk-flush.c b/block/blk-flush.c
+index 53202eff5..4504321ed 100644
+--- a/block/blk-flush.c
++++ b/block/blk-flush.c
+@@ -276,6 +276,7 @@ bool is_flush_rq(struct request *rq)
+ {
+ 	return rq->end_io == flush_end_io;
+ }
++EXPORT_SYMBOL(is_flush_rq);
+ 
+ /**
+  * blk_kick_flush - consider issuing flush request
+diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
+index a29877217..1f1bd375f 100644
+--- a/drivers/nvme/host/nvme.h
++++ b/drivers/nvme/host/nvme.h
+@@ -884,11 +884,12 @@ void nvme_mpath_revalidate_paths(struct nvme_ns *ns);
+ void nvme_mpath_clear_ctrl_paths(struct nvme_ctrl *ctrl);
+ void nvme_mpath_shutdown_disk(struct nvme_ns_head *head);
+ 
++extern bool is_flush_rq(struct request *rq);
+ static inline void nvme_trace_bio_complete(struct request *req)
+ {
+ 	struct nvme_ns *ns = req->q->queuedata;
+ 
+-	if (req->cmd_flags & REQ_NVME_MPATH)
++	if (req->cmd_flags & REQ_NVME_MPATH && !is_flush_rq(req))
+ 		trace_block_bio_complete(ns->head->disk->queue, req->bio);
+ }
+ 
+-- 
+2.31.1
 
 
-在 2022/12/20 上午5:22, Tejun Heo 写道:
-> Hello,
-> 
-> This looks generally fine to me. Some nits below.
-> 
->> +static inline struct bio *throtl_qnode_bio_peek(struct throtl_qnode *qn)
->> +{
->> +	struct bio *bio1, *bio2;
->> +
->> +	/* qn for read ios */
->> +	if (qn->dispatch_sync_cnt == UINT_MAX)
->> +		return bio_list_peek(&qn->bios[SYNC]);
->> +
->> +	/* qn for write ios */
->> +	bio1 = bio_list_peek(&qn->bios[SYNC]);
->> +	bio2 = bio_list_peek(&qn->bios[ASYNC]);
->> +
->> +	if (bio1 && bio2) {
->> +		if (qn->dispatch_sync_cnt == THROTL_SYNC_FACTOR)
->> +			return bio2;
->> +		return bio1;
->> +	}
->> +
->> +	return bio1 ?: bio2;
->> +}
-> 
-> Wouldn't it be simpler to write:
-> 
->          if (qn->dispatch_sync_count < THROTL_SYNC_FACTOR)
->                  return bio1 ?: bio2;
->          else
->                  return bio2 ?: bio1;
-> 
->> +/**
->> + * throtl_qnode_bio_pop: pop a bio from a qnode
->> + * @qn: the qnode to pop a bio from
->> + *
->> + * For read io qn, just pop bio from sync queu and return.
->> + * For write io qn, the target queue to pop was determined by the dispatch_sync_cnt.
->> + * Try to pop bio from target queue, fetch the bio and return when it is not empty.
->> + * If the target queue empty, pop bio from other queue instead.
->> + */
->> +static inline struct bio *throtl_qnode_bio_pop(struct throtl_qnode *qn)
->> +{
->> +	struct bio *bio;
->> +
->> +	/* qn for read ios */
->> +	if (qn->dispatch_sync_cnt == UINT_MAX)
->> +		return bio_list_pop(&qn->bios[SYNC]);
->> +
->> +	/* try to dispatch sync io */
->> +	if (qn->dispatch_sync_cnt < THROTL_SYNC_FACTOR) {
->> +		bio = bio_list_pop(&qn->bios[SYNC]);
->> +		if (bio) {
->> +			qn->dispatch_sync_cnt++;
->> +			return bio;
->> +		}
->> +		bio = bio_list_pop(&qn->bios[ASYNC]);
->> +		qn->dispatch_sync_cnt = 0;
->> +		return bio;
->> +	}
->> +
->> +	/* try to dispatch async io */
->> +	bio = bio_list_pop(&qn->bios[ASYNC]);
->> +	if (bio) {
->> +		qn->dispatch_sync_cnt = 0;
->> +		return bio;
->> +	}
->> +	bio = bio_list_pop(&qn->bios[SYNC]);
->> +
->> +	return bio;
->> +}
-> 
-> This also seems like it can be simplified a bit.
-> 
-> Thanks.
-> 
 
-Indeed, I will make it more clear and send the v2.
-
-Thanks.
