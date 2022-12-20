@@ -2,93 +2,155 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DA37CC4332F
-	for <linux-block@archiver.kernel.org>; Mon, 19 Dec 2022 21:32:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E4881C4332F
+	for <linux-block@archiver.kernel.org>; Tue, 20 Dec 2022 02:38:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232469AbiLSVcB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 19 Dec 2022 16:32:01 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52196 "EHLO
+        id S232432AbiLTCiT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 19 Dec 2022 21:38:19 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34990 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232190AbiLSVbp (ORCPT
+        with ESMTP id S232578AbiLTCiP (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 19 Dec 2022 16:31:45 -0500
-Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1211CDFB5;
-        Mon, 19 Dec 2022 13:31:44 -0800 (PST)
-Received: by mail-pj1-x102c.google.com with SMTP id gt4so10438705pjb.1;
-        Mon, 19 Dec 2022 13:31:44 -0800 (PST)
+        Mon, 19 Dec 2022 21:38:15 -0500
+Received: from mail-pf1-x436.google.com (mail-pf1-x436.google.com [IPv6:2607:f8b0:4864:20::436])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED9E811A27
+        for <linux-block@vger.kernel.org>; Mon, 19 Dec 2022 18:38:13 -0800 (PST)
+Received: by mail-pf1-x436.google.com with SMTP id d82so7574046pfd.11
+        for <linux-block@vger.kernel.org>; Mon, 19 Dec 2022 18:38:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=BomEC32AM6ovoRGRoa2VDMC3YGhwNtq2L7oOB+Yvsps=;
-        b=hCitRNCAgCMGc3lcKkdvYuqgyJSbzuhh31Zq8cJgEQT9EaoWFJ4aaOrosn+xToc3qi
-         i1v64YtOXP8bUBG2wBWvL3mACkuvAEqwNgDKAG6u4/MgUwZ5ofzcTqTlTzO/cafayrhX
-         uuoevjjPURg+Ytr/7jBe4iZ071G7h9or/VaEgqEhoC9cxHoQALhUfGrA6q/OK33NDmwW
-         Nhvldk7qZX1BtpNwDwRXjvJsUUwiVSDEmZYFfa4e4fD9V7uRTWxS0fX7QN63JVA/ov7x
-         wSFKzrHlRIyTMaFo/oCDtArYOtAWDuYathCiaB4iq0hsIW9+zQ8SamE8trjHALAgXHL6
-         aTNw==
+        d=bytedance-com.20210112.gappssmtp.com; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=XdsW29O/6Xn6rXQsu5aPcLciaxL4xlcszGahdv8fEa4=;
+        b=JX+Yf4WHK86OHRDqIF+sLMufhIcZDg+3+srs173HnZoa49DGsPAWF5Dr5GAckDMRWz
+         FKHkNX+zSoaW4T6mj7PFoBB+R7aIPFkoDT6C/zaKh7Fr6YFcJKKB+3TP03RHpygnFjIk
+         zT4pk334VL7ur7W5QNW3BqlUa/W794r2umr3pX1aAVp3AXfUJGFwSzJu8dGpw7ZCgTEG
+         4NVifBZ8i6VMj0URqFcOG+fZKYrG0HAfPsGfyCS0BgcNENC/nKgRAk4PMZc5vosOwenc
+         Y434W1ZNjXPpGBrbmjcVPOpgMpveICUYsPsb8oI5lQrxmvtyQ5C3+4gEoXEATonYs6ZV
+         7YBw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=BomEC32AM6ovoRGRoa2VDMC3YGhwNtq2L7oOB+Yvsps=;
-        b=mfGwH3Pw9WvwKJ8c2ZuN2G4YCwOoPf1927N4UVmzm8PRy29659QJHQ/n6Np2cbIv7G
-         gcMZ74T1M5HcyqpmtkXbyhbDf1IgeU0kkfyz/bado+t3q0YTcgcUk/l4VKy2rPjHDbxq
-         +u8kRwE22et/ZpuhCbhirigWE92kBQAaTduf9OoPYFGkyyLeH3/jwD1M63+vC5CyLbfJ
-         /aI65NNmc0PX8hj0Az7AifYshPdAeytBhoVO8APuJYh/tJhM/xrVjqu8vHR/wN+sgIVx
-         mrl1wP9U0t2wA3gxyOHFF/rvTgbhybouPF/Rhpa/vFlvhgnGshcGFU5LvQlanRRzSwa1
-         XMzQ==
-X-Gm-Message-State: ANoB5pmN9wJWHsAmYPtrKO5utW/EjmrpGw7lnVjpOHgVQbC8/2ZwFnvg
-        qI3a4J/AL7LgS1FBqB3cGFQ=
-X-Google-Smtp-Source: AA0mqf5C3DCy52F4RhlKBSSQx08e7sswRSHWI5ALknED64q7XQN1PpKUj9UthgLFpr86oXElbB+1hA==
-X-Received: by 2002:a17:902:bb8a:b0:189:abdd:400a with SMTP id m10-20020a170902bb8a00b00189abdd400amr48029480pls.15.1671485503409;
-        Mon, 19 Dec 2022 13:31:43 -0800 (PST)
-Received: from localhost (2603-800c-1a02-1bae-a7fa-157f-969a-4cde.res6.spectrum.com. [2603:800c:1a02:1bae:a7fa:157f:969a:4cde])
-        by smtp.gmail.com with ESMTPSA id y3-20020a655a03000000b00478b2d5d148sm6806566pgs.5.2022.12.19.13.31.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 19 Dec 2022 13:31:43 -0800 (PST)
-Sender: Tejun Heo <htejun@gmail.com>
-Date:   Mon, 19 Dec 2022 11:31:41 -1000
-From:   Tejun Heo <tj@kernel.org>
-To:     Yu Kuai <yukuai1@huaweicloud.com>
-Cc:     hch@infradead.org, josef@toxicpanda.com, axboe@kernel.dk,
-        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, yukuai3@huawei.com,
-        yi.zhang@huawei.com
-Subject: Re: [PATCH -next 3/4] blk-iocost: dispatch all throttled bio in
- ioc_pd_offline
-Message-ID: <Y6DYPRWtEAfUrH4Q@slm.duckdns.org>
-References: <20221217030527.1250083-1-yukuai1@huaweicloud.com>
- <20221217030527.1250083-4-yukuai1@huaweicloud.com>
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=XdsW29O/6Xn6rXQsu5aPcLciaxL4xlcszGahdv8fEa4=;
+        b=mWm+HdsfPqkb9SSiiVEpJjBHO0tJOEDscsKAtMdlXsMDDJzD/izxviLzi8akpV6jQV
+         hHJr9/S40MtlgGqvfoXikBcggUJc2R/pXjdC8Vl58PLOzy/PzIBXtRNNrsL2mlsvXSix
+         ZEvkODW/hPpUv9hwPAgOpZ4Q9VyJee2RRw2lT8CL/gjQ33MW6cysBUVKl6HTs9gurbTg
+         LyHqYfPwsc1Kfeht0MXAVRsSnfra1WavPLnvZBDb90nbQPDf9UwJ7NJEvnSZaaaayFhd
+         ahJnaUn6p1AAzgW1Cr6+18babUDW1EiZ9crS4rTWJ9I7EkeDQMaU6zMr7awUovnSkYGo
+         TYCA==
+X-Gm-Message-State: ANoB5pk2134c7P3JGmAuKjqZkIFhbWdk5BB5KXYMqBC2cK+cckDBjfeX
+        +dVp7CaxTf40xZR2lUTGf4rDbg==
+X-Google-Smtp-Source: AA0mqf56VtST1wkF2n8PGxLj9I+dEzc6pW0gRfjpWT3uBZx2CydeTcTnKx4AzFZWXiGsSCMKonwciw==
+X-Received: by 2002:aa7:956f:0:b0:576:e1f0:c812 with SMTP id x15-20020aa7956f000000b00576e1f0c812mr42718289pfq.30.1671503893422;
+        Mon, 19 Dec 2022 18:38:13 -0800 (PST)
+Received: from [10.254.36.84] ([139.177.225.236])
+        by smtp.gmail.com with ESMTPSA id 81-20020a621654000000b00574740c99e9sm7306038pfw.129.2022.12.19.18.38.10
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 19 Dec 2022 18:38:12 -0800 (PST)
+Message-ID: <78028f86-4fb4-e24e-a01b-d1f8a51cff87@bytedance.com>
+Date:   Tue, 20 Dec 2022 10:38:08 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221217030527.1250083-4-yukuai1@huaweicloud.com>
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.2.2
+Subject: Re: [External] Re: [PATCH] blk-throtl: Introduce sync and async
+ queues for blk-throtl
+To:     Tejun Heo <tj@kernel.org>
+Cc:     josef@toxicpanda.com, axboe@kernel.dk, cgroups@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yinxin.x@bytedance.com
+References: <20221218111314.55525-1-hanjinke.666@bytedance.com>
+ <Y6DWGBQSP/DA7apC@slm.duckdns.org>
+From:   hanjinke <hanjinke.666@bytedance.com>
+In-Reply-To: <Y6DWGBQSP/DA7apC@slm.duckdns.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, Dec 17, 2022 at 11:05:26AM +0800, Yu Kuai wrote:
-> From: Yu Kuai <yukuai3@huawei.com>
+
+
+在 2022/12/20 上午5:22, Tejun Heo 写道:
+> Hello,
 > 
-> Currently, if cgroup is removed while some bio is still throttled, such
-> bio will still wait for timer to dispatch. On the one hand, it
-> doesn't make sense to throttle bio while cgroup is removed, on the other
-> hand, this behaviour makes it hard to guarantee the exit order for
-> iocg(in ioc_pd_free() currently).
+> This looks generally fine to me. Some nits below.
+> 
+>> +static inline struct bio *throtl_qnode_bio_peek(struct throtl_qnode *qn)
+>> +{
+>> +	struct bio *bio1, *bio2;
+>> +
+>> +	/* qn for read ios */
+>> +	if (qn->dispatch_sync_cnt == UINT_MAX)
+>> +		return bio_list_peek(&qn->bios[SYNC]);
+>> +
+>> +	/* qn for write ios */
+>> +	bio1 = bio_list_peek(&qn->bios[SYNC]);
+>> +	bio2 = bio_list_peek(&qn->bios[ASYNC]);
+>> +
+>> +	if (bio1 && bio2) {
+>> +		if (qn->dispatch_sync_cnt == THROTL_SYNC_FACTOR)
+>> +			return bio2;
+>> +		return bio1;
+>> +	}
+>> +
+>> +	return bio1 ?: bio2;
+>> +}
+> 
+> Wouldn't it be simpler to write:
+> 
+>          if (qn->dispatch_sync_count < THROTL_SYNC_FACTOR)
+>                  return bio1 ?: bio2;
+>          else
+>                  return bio2 ?: bio1;
+> 
+>> +/**
+>> + * throtl_qnode_bio_pop: pop a bio from a qnode
+>> + * @qn: the qnode to pop a bio from
+>> + *
+>> + * For read io qn, just pop bio from sync queu and return.
+>> + * For write io qn, the target queue to pop was determined by the dispatch_sync_cnt.
+>> + * Try to pop bio from target queue, fetch the bio and return when it is not empty.
+>> + * If the target queue empty, pop bio from other queue instead.
+>> + */
+>> +static inline struct bio *throtl_qnode_bio_pop(struct throtl_qnode *qn)
+>> +{
+>> +	struct bio *bio;
+>> +
+>> +	/* qn for read ios */
+>> +	if (qn->dispatch_sync_cnt == UINT_MAX)
+>> +		return bio_list_pop(&qn->bios[SYNC]);
+>> +
+>> +	/* try to dispatch sync io */
+>> +	if (qn->dispatch_sync_cnt < THROTL_SYNC_FACTOR) {
+>> +		bio = bio_list_pop(&qn->bios[SYNC]);
+>> +		if (bio) {
+>> +			qn->dispatch_sync_cnt++;
+>> +			return bio;
+>> +		}
+>> +		bio = bio_list_pop(&qn->bios[ASYNC]);
+>> +		qn->dispatch_sync_cnt = 0;
+>> +		return bio;
+>> +	}
+>> +
+>> +	/* try to dispatch async io */
+>> +	bio = bio_list_pop(&qn->bios[ASYNC]);
+>> +	if (bio) {
+>> +		qn->dispatch_sync_cnt = 0;
+>> +		return bio;
+>> +	}
+>> +	bio = bio_list_pop(&qn->bios[SYNC]);
+>> +
+>> +	return bio;
+>> +}
+> 
+> This also seems like it can be simplified a bit.
+> 
+> Thanks.
+> 
 
-Yeah, idk about this. So, now if you're in a cgroup with IO restriction, you
-can create a sub-cgroup shove all the IOs in there and then kill the cgroup
-and escape control and do so repeatedly.
-
-The refcnting is rather complicated in blkcg world because it gets pulled
-from several different directions but the problem you're trying to address
-likely should be addressed through refcnting.
+Indeed, I will make it more clear and send the v2.
 
 Thanks.
-
--- 
-tejun
