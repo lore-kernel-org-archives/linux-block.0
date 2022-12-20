@@ -2,221 +2,106 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C7282C10F1E
-	for <linux-block@archiver.kernel.org>; Tue, 20 Dec 2022 15:36:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 50351C4167B
+	for <linux-block@archiver.kernel.org>; Tue, 20 Dec 2022 16:01:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229958AbiLTPgw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 20 Dec 2022 10:36:52 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36778 "EHLO
+        id S233462AbiLTQBg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 20 Dec 2022 11:01:36 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48234 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229638AbiLTPgv (ORCPT
+        with ESMTP id S233220AbiLTQBd (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 20 Dec 2022 10:36:51 -0500
-Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CB3A3E0
-        for <linux-block@vger.kernel.org>; Tue, 20 Dec 2022 07:36:50 -0800 (PST)
-Received: by mail-pl1-x634.google.com with SMTP id t2so12648971ply.2
-        for <linux-block@vger.kernel.org>; Tue, 20 Dec 2022 07:36:50 -0800 (PST)
+        Tue, 20 Dec 2022 11:01:33 -0500
+Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 95BCC38A5;
+        Tue, 20 Dec 2022 08:01:32 -0800 (PST)
+Received: by mail-pj1-x1033.google.com with SMTP id fy4so12887523pjb.0;
+        Tue, 20 Dec 2022 08:01:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1MLXjes3JIAsgel+SrJ2/UmVYh62VOMAS31r3eQD11A=;
-        b=iZom9Gv4ORvlSBwhoRZrd911HG9u0AbGSjbV+VqTAVv9Gi8N1c87+aUOrKfv28kxQe
-         XzB0k2i4sp2YehVmTlY25s+FybtU7nCUU9gCEB8XYWusd+dljiFDQL9HzdA2ae9/+6XP
-         H17VU+l/wjdZH7Q2W7YvaStltfstbv6HOy4wK4NNGx4pJLeufauq3siSIP5uDHJk0HkY
-         zOlpSUwktSE9pHld+mKBn6fENOqpXXzPwii+b/W+n/+jVmgWrUwxrOOYnOlUINwcQjFi
-         /hnvMP1Lhn78YIT1rZK5yey6cQPJVFJvprSTSb5KkTJi0CuebOdEfCPW+lLAHJ+OfV1/
-         tbrQ==
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:sender
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=CZMmU+pGQ8I5cymzBUpFRodcntV5ODz7Rjd+p+IjcxM=;
+        b=FgJB7RQvMGsU5maNwk7Ibn2Kug3rClLlbV+23BVAoBFTwzYdicUZXx3BxJFCWZACEC
+         POblY96MELR7T8nVNu6GLXbVj3mdBhx9OWg+ZlzMjrulDNLSzZubdpBOCyAOuYAk1GLg
+         6rEUYa4jn5ws84VoWzD+jGpalbsPbcEv6MtfvQfmUe3Bwh0ZymytgdtxzCe4SAxSrrZW
+         JRsTSU42YJ8g0PZRLD5Dt3rOnvuYZyElq0JPi8DYrCTyyg7ARVSRAGy7Z5/+NF+zqMkJ
+         O+XjDFoi/9ao4U8frNn+BxeKGEMMB+OkJytTxfidyNroPX4BqWLhwMp6/SNiMJGUxwc6
+         GPyQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=1MLXjes3JIAsgel+SrJ2/UmVYh62VOMAS31r3eQD11A=;
-        b=KqSRhfVqbYJRs/msEHScZjGgHHl38GPu4vHxSazI3nB3WZkMVsZTpntO6KxXaJow5b
-         HuCvk0NOBFwh4rZhfCTnjMO7mCH50YkD7HJXYzMCD1UKzeHJt+Gbov64iKS3BmiHc2TO
-         su3lu37CejDnXsVssNiFJaKcRzRNFTrxxjkyd4O5hEEd16IgQJU6HPCvkVVPPYVm0Ikf
-         Hgq9AnREUv8ot68uBFdBe1tJNQsWi4qdE+e0j7dLbwZKkeWT9a4yR6mGQD4ZXgqd+4Lq
-         IR7YTYJQdsrJXGzj7Q3ETtHhXvhvBtV+aBW72py/UQqIVEoWG6cDaTK5ZwIC/2gzUMS8
-         WPeg==
-X-Gm-Message-State: AFqh2kriUH72lYONkY4lsniLQKPt+E1kw0dkjDAPWJw4azOc8lKVkHX1
-        H88US9/wdzCLZwhxj17oj5E=
-X-Google-Smtp-Source: AMrXdXv4u4fH7pb3YL7OCQ2NYIkJ/2HZJXgFFkNKYNp6hzR8eVJuwrhpuMr4PaneH1vXl+iVbjhppQ==
-X-Received: by 2002:a17:902:f301:b0:191:1a7c:ef9d with SMTP id c1-20020a170902f30100b001911a7cef9dmr8995899ple.56.1671550610273;
-        Tue, 20 Dec 2022 07:36:50 -0800 (PST)
-Received: from localhost.localdomain ([114.200.4.15])
-        by smtp.googlemail.com with ESMTPSA id jf3-20020a170903268300b001811a197797sm9558084plb.194.2022.12.20.07.36.47
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:sender
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=CZMmU+pGQ8I5cymzBUpFRodcntV5ODz7Rjd+p+IjcxM=;
+        b=HIbvMRIRuWcK9mtq2UIMCz89ZoSubGN75W0cfLi5N4PQqXumfYyaBLaD7hVr9YmTUq
+         vKob0wknlACA4esasc7l2krq9OU9opAyKlDhKoAgStdokhv4T5G9B0s9qplBPVVwyJ13
+         fzd/jqE3iVDQP/66WCXo0Iw8ou/gLkO7WCjzusZ8JuzKv0ioxA9xAZS4q/UgmavG/tHl
+         h52H7b5PbUIUD5MmT8mhkLSpB3UaoGMgj4W5AAne4/dTeJ2+sjcFdHf7MFgdSG4b0nQB
+         VW/M34cIloYn9PIMXVDPimxNlHKU6yAMcs5cJXRfbiE/ZYQqG2YYC6CDGJq76QND8kH0
+         LMdA==
+X-Gm-Message-State: AFqh2kq8lqQ3gSoZTzZKgC3pKwIsvRDpMMhA7bdePJnZr9FjsPzhOKn8
+        mDTQArYpjDx2avZZt/lLW0s=
+X-Google-Smtp-Source: AMrXdXu/PTWG3RF5FJl77akOeoAMUXeZltzVrigzm8q6ibeY4U1MWMGr6FwSCANfZHn/XMjGC92vWg==
+X-Received: by 2002:a05:6a20:d385:b0:b0:3318:ab59 with SMTP id iq5-20020a056a20d38500b000b03318ab59mr12279097pzb.14.1671552091976;
+        Tue, 20 Dec 2022 08:01:31 -0800 (PST)
+Received: from localhost (2603-800c-1a02-1bae-a7fa-157f-969a-4cde.res6.spectrum.com. [2603:800c:1a02:1bae:a7fa:157f:969a:4cde])
+        by smtp.gmail.com with ESMTPSA id 64-20020a620543000000b00574b86040a4sm8846432pff.3.2022.12.20.08.01.31
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 20 Dec 2022 07:36:49 -0800 (PST)
-From:   Suwan Kim <suwan.kim027@gmail.com>
-To:     mst@redhat.com, jasowang@redhat.com, stefanha@redhat.com,
-        pbonzini@redhat.com, hch@infradead.org, axboe@kernel.dk
-Cc:     virtualization@lists.linux-foundation.org,
-        linux-block@vger.kernel.org, Suwan Kim <suwan.kim027@gmail.com>
-Subject: [PATCH v2 2/2] virtio-blk: support completion batching for the IRQ path
-Date:   Wed, 21 Dec 2022 00:36:13 +0900
-Message-Id: <20221220153613.21675-3-suwan.kim027@gmail.com>
-X-Mailer: git-send-email 2.26.3
-In-Reply-To: <20221220153613.21675-1-suwan.kim027@gmail.com>
-References: <20221220153613.21675-1-suwan.kim027@gmail.com>
+        Tue, 20 Dec 2022 08:01:31 -0800 (PST)
+Sender: Tejun Heo <htejun@gmail.com>
+Date:   Tue, 20 Dec 2022 06:01:30 -1000
+From:   Tejun Heo <tj@kernel.org>
+To:     Yu Kuai <yukuai1@huaweicloud.com>
+Cc:     hch@infradead.org, josef@toxicpanda.com, axboe@kernel.dk,
+        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, yi.zhang@huawei.com,
+        "yukuai (C)" <yukuai3@huawei.com>
+Subject: Re: [PATCH -next 0/4] blk-cgroup: synchronize del_gendisk() with
+ configuring cgroup policy
+Message-ID: <Y6HcWiJbaWjN3jlt@slm.duckdns.org>
+References: <20221217030908.1261787-1-yukuai1@huaweicloud.com>
+ <Y6DP3aOSad8+D1yY@slm.duckdns.org>
+ <e01daffe-a3e3-8bf2-40ee-192a9e70d911@huaweicloud.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <e01daffe-a3e3-8bf2-40ee-192a9e70d911@huaweicloud.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This patch adds completion batching to the IRQ path. It reuses batch
-completion code of virtblk_poll(). It collects requests to io_comp_batch
-and processes them all at once. It can boost up the performance by 2%.
+Hello,
 
-To validate the performance improvement and stabilty, I did fio test with
-4 vCPU VM and 12 vCPU VM respectively. Both VMs have 8GB ram and the same
-number of HW queues as vCPU.
-The fio cammad is as follows and I ran the fio 5 times and got IOPS average.
-(io_uring, randread, direct=1, bs=512, iodepth=64 numjobs=2,4)
+On Tue, Dec 20, 2022 at 05:19:12PM +0800, Yu Kuai wrote:
+> Yes, that sounds good. BTW, queue_lock is also used to protect
+> pd_alloc_fn/pd_init_fn，and we found that blkcg_activate_policy() is
+> problematic:
+> 
+> blkcg_activate_policy
+>  spin_lock_irq(&q->queue_lock);
+>  list_for_each_entry_reverse(blkg, &q->blkg_list
+>   pd_alloc_fn(GFP_NOWAIT | __GFP_NOWARN,...) -> failed
+> 
+>   spin_unlock_irq(&q->queue_lock);
+>   // release queue_lock here is problematic, this will cause
+> pd_offline_fn called without pd_init_fn.
+>   pd_alloc_fn(__GFP_NOWARN,...)
 
-Test result shows about 2% improvement.
+So, if a blkg is destroyed while a policy is being activated, right?
 
-           4 vcpu VM       |   numjobs=2   |   numjobs=4
-      -----------------------------------------------------------
-        fio without patch  |  367.2K IOPS  |   397.6K IOPS
-      -----------------------------------------------------------
-        fio with patch     |  372.8K IOPS  |   407.7K IOPS
+> If we are using a mutex to protect rq_qos ops, it seems the right thing
+> to do do also using the mutex to protect blkcg_policy ops, and this
+> problem can be fixed because mutex can be held to alloc memroy with
+> GFP_KERNEL. What do you think?
 
-           12 vcpu VM      |   numjobs=2   |   numjobs=4
-      -----------------------------------------------------------
-        fio without patch  |  363.6K IOPS  |   374.8K IOPS
-      -----------------------------------------------------------
-        fio with patch     |  373.8K IOPS  |   385.3K IOPS
+One worry is that switching to mutex can be more headache due to destroy
+path synchronization. Another approach would be using a per-blkg flag to
+track whether a blkg has been initialized.
 
-Signed-off-by: Suwan Kim <suwan.kim027@gmail.com>
----
- drivers/block/virtio_blk.c | 82 +++++++++++++++++++++-----------------
- 1 file changed, 45 insertions(+), 37 deletions(-)
+Thanks.
 
-diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-index 75ee51aba964..0ac7b570300c 100644
---- a/drivers/block/virtio_blk.c
-+++ b/drivers/block/virtio_blk.c
-@@ -272,33 +272,63 @@ static inline void virtblk_request_done(struct request *req)
- 	blk_mq_end_request(req, virtblk_result(vbr));
- }
- 
-+static void virtblk_complete_batch(struct io_comp_batch *iob)
-+{
-+	struct request *req;
-+
-+	rq_list_for_each(&iob->req_list, req) {
-+		virtblk_unmap_data(req, blk_mq_rq_to_pdu(req));
-+		virtblk_cleanup_cmd(req);
-+	}
-+	blk_mq_end_request_batch(iob);
-+}
-+
-+static int virtblk_handle_req(struct virtio_blk_vq *vq,
-+				struct io_comp_batch *iob)
-+{
-+	struct virtblk_req *vbr;
-+	int req_done = 0;
-+	unsigned int len;
-+
-+	while ((vbr = virtqueue_get_buf(vq->vq, &len)) != NULL) {
-+		struct request *req = blk_mq_rq_from_pdu(vbr);
-+
-+		if (likely(!blk_should_fake_timeout(req->q)) &&
-+			!blk_mq_complete_request_remote(req) &&
-+			!blk_mq_add_to_batch(req, iob, vbr->status,
-+						virtblk_complete_batch))
-+			virtblk_request_done(req);
-+		req_done++;
-+	}
-+
-+	return req_done;
-+}
-+
- static void virtblk_done(struct virtqueue *vq)
- {
- 	struct virtio_blk *vblk = vq->vdev->priv;
--	bool req_done = false;
--	int qid = vq->index;
--	struct virtblk_req *vbr;
-+	struct virtio_blk_vq *vblk_vq = &vblk->vqs[vq->index];
-+	int req_done = 0;
- 	unsigned long flags;
--	unsigned int len;
-+	DEFINE_IO_COMP_BATCH(iob);
- 
--	spin_lock_irqsave(&vblk->vqs[qid].lock, flags);
-+	spin_lock_irqsave(&vblk_vq->lock, flags);
- 	do {
- 		virtqueue_disable_cb(vq);
--		while ((vbr = virtqueue_get_buf(vblk->vqs[qid].vq, &len)) != NULL) {
--			struct request *req = blk_mq_rq_from_pdu(vbr);
-+		req_done += virtblk_handle_req(vblk_vq, &iob);
- 
--			if (likely(!blk_should_fake_timeout(req->q)))
--				blk_mq_complete_request(req);
--			req_done = true;
--		}
- 		if (unlikely(virtqueue_is_broken(vq)))
- 			break;
- 	} while (!virtqueue_enable_cb(vq));
- 
--	/* In case queue is stopped waiting for more buffers. */
--	if (req_done)
-+	if (req_done) {
-+		if (!rq_list_empty(iob.req_list))
-+			iob.complete(&iob);
-+
-+		/* In case queue is stopped waiting for more buffers. */
- 		blk_mq_start_stopped_hw_queues(vblk->disk->queue, true);
--	spin_unlock_irqrestore(&vblk->vqs[qid].lock, flags);
-+	}
-+	spin_unlock_irqrestore(&vblk_vq->lock, flags);
- }
- 
- static void virtio_commit_rqs(struct blk_mq_hw_ctx *hctx)
-@@ -832,37 +862,15 @@ static void virtblk_map_queues(struct blk_mq_tag_set *set)
- 	}
- }
- 
--static void virtblk_complete_batch(struct io_comp_batch *iob)
--{
--	struct request *req;
--
--	rq_list_for_each(&iob->req_list, req) {
--		virtblk_unmap_data(req, blk_mq_rq_to_pdu(req));
--		virtblk_cleanup_cmd(req);
--	}
--	blk_mq_end_request_batch(iob);
--}
--
- static int virtblk_poll(struct blk_mq_hw_ctx *hctx, struct io_comp_batch *iob)
- {
- 	struct virtio_blk *vblk = hctx->queue->queuedata;
- 	struct virtio_blk_vq *vq = get_virtio_blk_vq(hctx);
--	struct virtblk_req *vbr;
- 	unsigned long flags;
--	unsigned int len;
- 	int found = 0;
- 
- 	spin_lock_irqsave(&vq->lock, flags);
--
--	while ((vbr = virtqueue_get_buf(vq->vq, &len)) != NULL) {
--		struct request *req = blk_mq_rq_from_pdu(vbr);
--
--		found++;
--		if (!blk_mq_complete_request_remote(req) &&
--		    !blk_mq_add_to_batch(req, iob, vbr->status,
--						virtblk_complete_batch))
--			virtblk_request_done(req);
--	}
-+	found = virtblk_handle_req(vq, iob);
- 
- 	if (found)
- 		blk_mq_start_stopped_hw_queues(vblk->disk->queue, true);
 -- 
-2.26.3
-
+tejun
