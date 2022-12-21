@@ -2,148 +2,126 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E689C41535
-	for <linux-block@archiver.kernel.org>; Wed, 21 Dec 2022 18:48:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CA04C4332F
+	for <linux-block@archiver.kernel.org>; Wed, 21 Dec 2022 19:16:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234719AbiLUSsD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 21 Dec 2022 13:48:03 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49808 "EHLO
+        id S234611AbiLUTQy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 21 Dec 2022 14:16:54 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33050 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234296AbiLUSsC (ORCPT
+        with ESMTP id S233283AbiLUTQw (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 21 Dec 2022 13:48:02 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA2E01E70C;
-        Wed, 21 Dec 2022 10:48:01 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 8D247B81BA6;
-        Wed, 21 Dec 2022 18:48:00 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0F6C4C433EF;
-        Wed, 21 Dec 2022 18:47:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1671648479;
-        bh=hTuIjHBHd+Tec1DAOqqIPFW5jFXlpQ7ZWnftXs2hg6Q=;
-        h=From:To:Cc:Subject:References:Date:In-Reply-To:From;
-        b=XiS53svtnGlZKUpJLWpjIb00pvlTavkGyE/yhXeS7hKFYS8V/5Xav/+mlpRGezW6h
-         BljUFnHKQWw/igsJKn42+z68Zwy3Z5sPZrjhFME/Kwqkbwjx7njFSsJY/zjJWCYIs2
-         hg7VB/Upxxl01DViL7TGCOLjNQW9ZDg1YFt1aai4iFOc2yVu8ujua8wy7VEyZXvui4
-         /1bJ/zTi5VZkqa0c9me5b9nyIRR+8AGM7a6aXGScjL7jgysNOOGh6mrX4vs3UGAGXF
-         1s0aX5L7Ze9A8zWY2oezGwBJF7QaIiwiLIJLyqjhe4qpPeepExO7oc4XqzOCONcDBc
-         /pYLvZHxEpyuQ==
-From:   Kalle Valo <kvalo@kernel.org>
-To:     Steven Rostedt <rostedt@goodmis.org>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Stephen Boyd <sboyd@kernel.org>,
-        Guenter Roeck <linux@roeck-us.net>,
-        Anna-Maria Gleixner <anna-maria@linutronix.de>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Julia Lawall <Julia.Lawall@inria.fr>, linux-sh@vger.kernel.org,
-        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-acpi@vger.kernel.org,
-        linux-atm-general@lists.sourceforge.net, netdev@vger.kernel.org,
-        drbd-dev@lists.linbit.com, linux-bluetooth@vger.kernel.org,
-        intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-        linux-input@vger.kernel.org, linux-leds@vger.kernel.org,
-        linux-media@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
-        linux-usb@vger.kernel.org, linux-wireless@vger.kernel.org,
-        brcm80211-dev-list.pdl@broadcom.com,
-        SHA-cyfmac-dev-list@infineon.com, linux-scsi@vger.kernel.org,
-        linux-staging@lists.linux.dev, linux-ext4@vger.kernel.org,
-        linux-nilfs@vger.kernel.org, bridge@lists.linux-foundation.org,
-        netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
-        lvs-devel@vger.kernel.org, linux-nfs@vger.kernel.org,
-        tipc-discussion@lists.sourceforge.net, alsa-devel@alsa-project.org
-Subject: Re: [PATCH] treewide: Convert del_timer*() to timer_shutdown*()
-References: <20221220134519.3dd1318b@gandalf.local.home>
-Date:   Wed, 21 Dec 2022 20:47:50 +0200
-In-Reply-To: <20221220134519.3dd1318b@gandalf.local.home> (Steven Rostedt's
-        message of "Tue, 20 Dec 2022 13:45:19 -0500")
-Message-ID: <87mt7gk2zt.fsf@kernel.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
+        Wed, 21 Dec 2022 14:16:52 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4BC282651
+        for <linux-block@vger.kernel.org>; Wed, 21 Dec 2022 11:16:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1671650165;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=oziG1chFC2ZM07+R9uNqeu7rPi/qIDF9DD7uMEf+XEc=;
+        b=Gk2i+C+UEpmi7IYJ3q5OkY5LuaeqqzYELOGrqRgB1nb4MU5IouTV0huyZmgIfpuLwXOdg9
+        JyIs+x3FPKfX0nP85YxNluckHcUnDSgS8J06RNbA4HBnm/1sqXMdhbhoUDVaXjlkTW4LDV
+        lq8ayAOWsDLAi8MuoZuMVgJBCWDUMBc=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-160-dl5A2mF5OQioxyYWp0KFQg-1; Wed, 21 Dec 2022 14:16:03 -0500
+X-MC-Unique: dl5A2mF5OQioxyYWp0KFQg-1
+Received: by mail-ed1-f72.google.com with SMTP id w20-20020a056402269400b004700a51c202so12030644edd.13
+        for <linux-block@vger.kernel.org>; Wed, 21 Dec 2022 11:16:03 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=oziG1chFC2ZM07+R9uNqeu7rPi/qIDF9DD7uMEf+XEc=;
+        b=sFarb46AwpCladXpU4ZikIQhrqXTEBY/hZKd5Gzryozka9FS2Z0GSX0hsfDaxW9Z+L
+         chcz+6fmK5OEXpfA/2fxmHwn/iBlr8t1W9+dbihsHiGD87e7+sGWZVorbVS8y6j/RUAd
+         Oso9k37vq5AHSndWDuO9ll/B8RUdtOo9QWGgdGR9d2v2ghLHZBDsJtXZKQ0jeh02j8QM
+         fSVoTcA4073vyZCTYjeRV31oHVZOcl+2PoiTIv6UEO+KtPKGk40SBjVPHrKzO6bW8kot
+         jYVdVMk9oIdDB2t4Aftw20dBuWtz4KHiqGCsTkkCNl9QeZ12AaUk/mlpNlIfCODt/55V
+         I6cA==
+X-Gm-Message-State: AFqh2kolpITpXcwT0OPaPjo4yhY39o3Nb87+pTNJNSZBP8/jdL7qza6a
+        Eae6Tl5nXPwywInGssUqPJrP2O5Hxztn063u/vuPrnfJDFlgt6LiGGO4vGqenAWzOXVhI1evQ8i
+        X9gkC1couiUtxhrfoDCrGw2A=
+X-Received: by 2002:a17:906:2b16:b0:81b:f931:cb08 with SMTP id a22-20020a1709062b1600b0081bf931cb08mr6654972ejg.47.1671650162802;
+        Wed, 21 Dec 2022 11:16:02 -0800 (PST)
+X-Google-Smtp-Source: AMrXdXtYgpQRoajpgpg88+32ygzHFWgzyaQ5djHehL3dJahxgz4ZK1NR86JbdFjj+nGQkHTx6xrXhg==
+X-Received: by 2002:a17:906:2b16:b0:81b:f931:cb08 with SMTP id a22-20020a1709062b1600b0081bf931cb08mr6654959ejg.47.1671650162588;
+        Wed, 21 Dec 2022 11:16:02 -0800 (PST)
+Received: from redhat.com ([2.55.175.215])
+        by smtp.gmail.com with ESMTPSA id mh11-20020a170906eb8b00b007ad69e9d34dsm7460122ejb.54.2022.12.21.11.16.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 21 Dec 2022 11:16:01 -0800 (PST)
+Date:   Wed, 21 Dec 2022 14:15:58 -0500
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Lorenzo Stoakes <lstoakes@gmail.com>
+Cc:     linux-block@vger.kernel.org,
+        Dmitry Fomichev <dmitry.fomichev@wdc.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+        virtualization@lists.linux-foundation.org,
+        virtio-dev@lists.oasis-open.org, linux-kernel@vger.kernel.org,
+        Hannes Reinecke <hare@suse.de>,
+        Sam Li <faithilikerun@gmail.com>,
+        Steven Rostedt <rostedt@goodmis.org>
+Subject: Re: [PATCH v2] virtio-blk: avoid kernel panic on VIRTIO_BLK_F_ZONED
+ check
+Message-ID: <20221221141451-mutt-send-email-mst@kernel.org>
+References: <20221221145433.254805-1-lstoakes@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221221145433.254805-1-lstoakes@gmail.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Steven Rostedt <rostedt@goodmis.org> writes:
+On Wed, Dec 21, 2022 at 02:54:33PM +0000, Lorenzo Stoakes wrote:
+> virtio zoned block device support is added by commit 0562d7bf1604
+> ("virtio-blk: add support for zoned block devices") which adds
+> VIRTIO_BLK_F_ZONED to the features array in virtio_blk.c but makes it
+> conditional on CONFIG_BLK_DEV_ZONED.
+> 
+> In it virtblk_probe() calls virtio_has_feature(vdev, VIRTIO_BLK_F_ZONED)
+> unconditionally, which invokes virtio_check_driver_offered_feature().
+> This function checks whether virtio_blk.feature_table (assigned to
+> the static features array) contains the specified feature enum, and if not
+> _causes a kernel panic_ via BUG().
+> 
+> This therefore means that failing to enable CONFIG_BLK_DEV_ZONED while
+> using virtio is a guaranteed kernel panic. Fix the issue by making the
+> feature test also conditional on CONFIG_BLK_DEV_ZONED.
+> 
+> Signed-off-by: Lorenzo Stoakes <lstoakes@gmail.com>
 
-> [
->   Linus,
->
->     I ran the script against your latest master branch:
->     commit b6bb9676f2165d518b35ba3bea5f1fcfc0d969bf
->
->     As the timer_shutdown*() code is now in your tree, I figured
->     we can start doing the conversions. At least add the trivial ones
->     now as Thomas suggested that this gets applied at the end of the
->     merge window, to avoid conflicts with linux-next during the
->     development cycle. I can wait to Friday to run it again, and
->     resubmit.
->
->     What is the best way to handle this?
-> ]
->
-> From: "Steven Rostedt (Google)" <rostedt@goodmis.org>
->
-> Due to several bugs caused by timers being re-armed after they are
-> shutdown and just before they are freed, a new state of timers was added
-> called "shutdown". After a timer is set to this state, then it can no
-> longer be re-armed.
->
-> The following script was run to find all the trivial locations where
-> del_timer() or del_timer_sync() is called in the same function that the
-> object holding the timer is freed. It also ignores any locations where the
-> timer->function is modified between the del_timer*() and the free(), as
-> that is not considered a "trivial" case.
->
-> This was created by using a coccinelle script and the following commands:
->
->  $ cat timer.cocci
-> @@
-> expression ptr, slab;
-> identifier timer, rfield;
-> @@
-> (
-> -       del_timer(&ptr->timer);
-> +       timer_shutdown(&ptr->timer);
-> |
-> -       del_timer_sync(&ptr->timer);
-> +       timer_shutdown_sync(&ptr->timer);
-> )
->   ... when strict
->       when != ptr->timer
-> (
->         kfree_rcu(ptr, rfield);
-> |
->         kmem_cache_free(slab, ptr);
-> |
->         kfree(ptr);
-> )
->
->  $ spatch timer.cocci . > /tmp/t.patch
->  $ patch -p1 < /tmp/t.patch
->
-> Link: https://lore.kernel.org/lkml/20221123201306.823305113@linutronix.de/
->
-> Signed-off-by: Steven Rostedt (Google) <rostedt@goodmis.org>
+I think this was fixed by
+Message-ID: <20221220112340.518841-1-mst@redhat.com>
 
-For wireless:
 
->  .../broadcom/brcm80211/brcmfmac/btcoex.c         |  2 +-
->  drivers/net/wireless/intel/iwlwifi/iwl-dbg-tlv.c |  2 +-
->  drivers/net/wireless/intel/iwlwifi/mvm/sta.c     |  2 +-
->  drivers/net/wireless/intersil/hostap/hostap_ap.c |  2 +-
->  drivers/net/wireless/marvell/mwifiex/main.c      |  2 +-
->  drivers/net/wireless/microchip/wilc1000/hif.c    |  6 +++---
+> ---
+>  drivers/block/virtio_blk.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+> index ff49052e26f7..94d210b10ebb 100644
+> --- a/drivers/block/virtio_blk.c
+> +++ b/drivers/block/virtio_blk.c
+> @@ -1580,7 +1580,8 @@ static int virtblk_probe(struct virtio_device *vdev)
+>  	virtblk_update_capacity(vblk, false);
+>  	virtio_device_ready(vdev);
+>  
+> -	if (virtio_has_feature(vdev, VIRTIO_BLK_F_ZONED)) {
+> +	if (IS_ENABLED(CONFIG_BLK_DEV_ZONED) &&
+> +	    virtio_has_feature(vdev, VIRTIO_BLK_F_ZONED)) {
+>  		err = virtblk_probe_zoned_device(vdev, vblk, q);
+>  		if (err)
+>  			goto out_cleanup_disk;
+> -- 
+> 2.39.0
 
-Acked-by: Kalle Valo <kvalo@kernel.org>
-
--- 
-https://patchwork.kernel.org/project/linux-wireless/list/
-
-https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatches
