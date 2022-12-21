@@ -2,54 +2,53 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24B26C4332F
-	for <linux-block@archiver.kernel.org>; Wed, 21 Dec 2022 14:53:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 373A7C4332F
+	for <linux-block@archiver.kernel.org>; Wed, 21 Dec 2022 14:54:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230103AbiLUOxR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 21 Dec 2022 09:53:17 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40968 "EHLO
+        id S231855AbiLUOyl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 21 Dec 2022 09:54:41 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41916 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229472AbiLUOxQ (ORCPT
+        with ESMTP id S232603AbiLUOyj (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 21 Dec 2022 09:53:16 -0500
-Received: from mail-wm1-x332.google.com (mail-wm1-x332.google.com [IPv6:2a00:1450:4864:20::332])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B5B3AF593;
-        Wed, 21 Dec 2022 06:53:15 -0800 (PST)
-Received: by mail-wm1-x332.google.com with SMTP id ja17so11341782wmb.3;
-        Wed, 21 Dec 2022 06:53:15 -0800 (PST)
+        Wed, 21 Dec 2022 09:54:39 -0500
+Received: from mail-wr1-x42f.google.com (mail-wr1-x42f.google.com [IPv6:2a00:1450:4864:20::42f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 373F823BC7;
+        Wed, 21 Dec 2022 06:54:39 -0800 (PST)
+Received: by mail-wr1-x42f.google.com with SMTP id a17so14037000wrt.11;
+        Wed, 21 Dec 2022 06:54:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=HI1luplpZbZtMfrW5nz8VoSxbUmlQikDikFMZRlTu2s=;
-        b=HjU2Xsm/p3k2oMOotYW1bG90VqwYKk0udzUiZrpCOrqK8D5YVaG0okQqr/krbzdPvT
-         d6cmI1K4yKczRY2684TMMPfXopx+tdXVedtCi3o1vvtylN4mOYxWHnpmrEC4sUlZyJ4I
-         YFGUhrHYelHkxkxMMqGNmnDhA7LMFg9f0w/wKQ3xnqDjsteeXVfaqctUDzkVhw5Vb9g8
-         akso7CEDwRiCupt68D1l4silfCFiwhuW/+qkGialcjdh+dW5215IposnmA/f9D3bnyHD
-         OplvWJVYw5WI/qMyM/6hKThcv6B4Q/pBnRDagFKR537egiOqoTGhfMo3AUdkaj85Di/z
-         qZ8Q==
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=VMbqxbuRDI+bCHOQmmEigjmorE48SzrkTJ2QBJ9psbw=;
+        b=OwIu9F/cBLhbKMRhGmr28+guDrzEqJEdYIsn3wOqorLhX0ELMhTZ/4XoY9rioKoMlS
+         Gldhfzx1XURJNyJo9hXBciy1ugOko36X7jDbcy+TDSysr2yaA6TKAoK6Bhr4LWmSTHYh
+         tcEKWIzKRAmF4EuAcVtaTGemJb7XcrGunLfR9XNwetRAeinATsWzhOibchnerN+qYpSo
+         SEsUumoEFh8zdX9bLG6JWpYKwCAli6Kv+U/x9dM5FxmeOdx3Ajx9juB3icZEmrOyh51b
+         J3g/7TboZj94UJRkGSZfzpt7IxI2JL3FyLf/s4D+zi6oeTH7u5FlLh7SPF3WsSU0WlPI
+         H32Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=HI1luplpZbZtMfrW5nz8VoSxbUmlQikDikFMZRlTu2s=;
-        b=fMHcc1lnJ3cVRqszwmd++B/0SALQzLIebd7LHLaj0yBxVXsXtZaHTy40bM+SS57KW8
-         AHQFp8wdedogzwZOcMW3CP1xX52vhutZysmtQRBYStoiAH3N0lMnnV2+WHnmcWSPT0Er
-         Vy0gkJotz3blaLZ62htnM3XNORCGAsZmHqzjdUZs6TDyeTRT4D+vvYFW0WN2E/rpqPYZ
-         XiSVsyFI4igWYSsRsktJrLX+361kObWyPBO1C/jGLpawW2uxRG2kvuL4luYxph+x8hSc
-         uMQCFy5j1FrYIOOBmqEC702NllsKgXdE4CDiHSS30wzafScuUBT7Crfeb3bRriNUeHbo
-         HalQ==
-X-Gm-Message-State: AFqh2koUU5j/mesx9ICq1aC1WJ4S8tCXq6bFtu/Tr53fYde4aKA6ZkTe
-        Pa1zcEId1Vdu52iwzvl5EcuxsjAM3UM=
-X-Google-Smtp-Source: AMrXdXst1yNYFX8VIK8eFbGC1P22Qo5FLPmcWms3+sHZ3O7HzicFabe0T7S/tM9pJhQ378DR7ze0VA==
-X-Received: by 2002:a05:600c:3d98:b0:3cf:d70d:d5a8 with SMTP id bi24-20020a05600c3d9800b003cfd70dd5a8mr1971568wmb.6.1671634394046;
-        Wed, 21 Dec 2022 06:53:14 -0800 (PST)
-Received: from localhost ([2a00:23c5:dc8c:8701:1663:9a35:5a7b:1d76])
-        by smtp.gmail.com with ESMTPSA id iz13-20020a05600c554d00b003d33ab317dasm3076064wmb.14.2022.12.21.06.53.13
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=VMbqxbuRDI+bCHOQmmEigjmorE48SzrkTJ2QBJ9psbw=;
+        b=Y3Fw6SwKnpYB1lsfv+WVZyvy7sDx+wH7hAd6yltjNkjNK1e1ftNJKstCDgr99x9T9P
+         Ov21F+N72b4kOOnSksFY9UrliyCWaMeLagUfIUzzgYjN/7K36xLkOq77I5Mu30iUWa2d
+         ju2QGu5QtMK4hRERJFdfmn6XvnafVBDHGYiUA6P8NuSHiJrsJC2rzjJ4I9HBznuoTXjj
+         n8SRK2epIwnWxuc+TwnX8rKzmc/TAMWVMRK/34ghbOldoMJht2dyrp5UW/+VTae76oG1
+         v0wx9+vxImZ26IM88wteliB0E2i0UVLDIYhr9zZd3925CLnpjfHHkyojvlA4OTN0U0vH
+         djlQ==
+X-Gm-Message-State: AFqh2kq2DeY3oopUTahP2iknhke1oEgOchmhOZFu4BD8nsFW+YyDAoby
+        xxj460WUD8wJatmTsh4MMbxPd1gEa1c=
+X-Google-Smtp-Source: AMrXdXuZGI0m2k8KvdyfCEyIzio8FppBZ8Hp7bZKAoxqKYhfSY3s4jMM2e377/0wTYkIN1bzuwDhcg==
+X-Received: by 2002:a5d:4578:0:b0:24e:f72a:4285 with SMTP id a24-20020a5d4578000000b0024ef72a4285mr1462971wrc.24.1671634477353;
+        Wed, 21 Dec 2022 06:54:37 -0800 (PST)
+Received: from lucifer.home ([2a00:23c5:dc8c:8701:1663:9a35:5a7b:1d76])
+        by smtp.googlemail.com with ESMTPSA id u1-20020a5d6ac1000000b00241cfe6e286sm15466752wrw.98.2022.12.21.06.54.36
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 21 Dec 2022 06:53:13 -0800 (PST)
-Date:   Wed, 21 Dec 2022 14:53:12 +0000
+        Wed, 21 Dec 2022 06:54:36 -0800 (PST)
 From:   Lorenzo Stoakes <lstoakes@gmail.com>
 To:     linux-block@vger.kernel.org,
         Dmitry Fomichev <dmitry.fomichev@wdc.com>,
@@ -63,60 +62,52 @@ Cc:     Damien Le Moal <damien.lemoal@opensource.wdc.com>,
         virtio-dev@lists.oasis-open.org, linux-kernel@vger.kernel.org,
         Hannes Reinecke <hare@suse.de>,
         Sam Li <faithilikerun@gmail.com>,
-        Steven Rostedt <rostedt@goodmis.org>
-Subject: Re: [PATCH] virtio-blk: avoid kernel panic on VIRTIO_BLK_F_ZONED
- check
-Message-ID: <Y6Md2DuDigrnrvxU@lucifer>
-References: <20221221140012.238494-1-lstoakes@gmail.com>
+        Steven Rostedt <rostedt@goodmis.org>,
+        Lorenzo Stoakes <lstoakes@gmail.com>
+Subject: [PATCH v2] virtio-blk: avoid kernel panic on VIRTIO_BLK_F_ZONED check
+Date:   Wed, 21 Dec 2022 14:54:33 +0000
+Message-Id: <20221221145433.254805-1-lstoakes@gmail.com>
+X-Mailer: git-send-email 2.39.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221221140012.238494-1-lstoakes@gmail.com>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Dec 21, 2022 at 02:00:12PM +0000, Lorenzo Stoakes wrote:
-> virtio zoned block device support is added by commit 0562d7bf1604
-> ("virtio-blk: add support for zoned block devices") which adds
-> VIRTIO_BLK_F_ZONED to the features array in virtio_blk.c but makes it
-> conditional on CONFIG_BLK_DEV_ZONED.
->
-> In it virtblk_probe() calls virtio_has_feature(vdev, VIRTIO_BLK_F_ZONED)
-> unconditionally, which invokes virtio_check_driver_offered_feature().
-> This function checks whether virtio_blk.feature_table (assigned to
-> the static features array) contains the specified feature enum, and if not
-> _causes a kernel panic_ via BUG().
->
-> This therefore means that failing to enable CONFIG_BLK_DEV_ZONED while
-> using virtio is a guaranteed kernel panic. Fix the issue by making the
-> feature test also conditional on CONFIG_BLK_DEV_ZONED.
->
-> Signed-off-by: Lorenzo Stoakes <lstoakes@gmail.com>
-> ---
->  drivers/block/virtio_blk.c | 2 ++
->  1 file changed, 2 insertions(+)
->
-> diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-> index ff49052e26f7..34fdc141fb21 100644
-> --- a/drivers/block/virtio_blk.c
-> +++ b/drivers/block/virtio_blk.c
-> @@ -1580,11 +1580,13 @@ static int virtblk_probe(struct virtio_device *vdev)
->  	virtblk_update_capacity(vblk, false);
->  	virtio_device_ready(vdev);
->
-> +#ifdef CONFIG_BLK_DEV_ZONED
->  	if (virtio_has_feature(vdev, VIRTIO_BLK_F_ZONED)) {
->  		err = virtblk_probe_zoned_device(vdev, vblk, q);
->  		if (err)
->  			goto out_cleanup_disk;
->  	}
-> +#endif /* CONFIG_BLK_DEV_ZONED */
->
->  	dev_info(&vdev->dev, "blk config size: %zu\n",
->  		sizeof(struct virtio_blk_config));
-> --
-> 2.39.0
+virtio zoned block device support is added by commit 0562d7bf1604
+("virtio-blk: add support for zoned block devices") which adds
+VIRTIO_BLK_F_ZONED to the features array in virtio_blk.c but makes it
+conditional on CONFIG_BLK_DEV_ZONED.
 
-Steven suggested use of IS_ENABLED() here which makes it rather less ugly, will
-send as a v2.
+In it virtblk_probe() calls virtio_has_feature(vdev, VIRTIO_BLK_F_ZONED)
+unconditionally, which invokes virtio_check_driver_offered_feature().
+This function checks whether virtio_blk.feature_table (assigned to
+the static features array) contains the specified feature enum, and if not
+_causes a kernel panic_ via BUG().
+
+This therefore means that failing to enable CONFIG_BLK_DEV_ZONED while
+using virtio is a guaranteed kernel panic. Fix the issue by making the
+feature test also conditional on CONFIG_BLK_DEV_ZONED.
+
+Signed-off-by: Lorenzo Stoakes <lstoakes@gmail.com>
+---
+ drivers/block/virtio_blk.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+index ff49052e26f7..94d210b10ebb 100644
+--- a/drivers/block/virtio_blk.c
++++ b/drivers/block/virtio_blk.c
+@@ -1580,7 +1580,8 @@ static int virtblk_probe(struct virtio_device *vdev)
+ 	virtblk_update_capacity(vblk, false);
+ 	virtio_device_ready(vdev);
+ 
+-	if (virtio_has_feature(vdev, VIRTIO_BLK_F_ZONED)) {
++	if (IS_ENABLED(CONFIG_BLK_DEV_ZONED) &&
++	    virtio_has_feature(vdev, VIRTIO_BLK_F_ZONED)) {
+ 		err = virtblk_probe_zoned_device(vdev, vblk, q);
+ 		if (err)
+ 			goto out_cleanup_disk;
+-- 
+2.39.0
+
