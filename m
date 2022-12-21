@@ -2,114 +2,99 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2CDD2C4167B
-	for <linux-block@archiver.kernel.org>; Wed, 21 Dec 2022 14:00:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B0FA8C4332F
+	for <linux-block@archiver.kernel.org>; Wed, 21 Dec 2022 14:15:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229729AbiLUOAV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 21 Dec 2022 09:00:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50340 "EHLO
+        id S232710AbiLUOPg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 21 Dec 2022 09:15:36 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56012 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229694AbiLUOAU (ORCPT
+        with ESMTP id S233812AbiLUOP1 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 21 Dec 2022 09:00:20 -0500
-Received: from mail-wm1-x32e.google.com (mail-wm1-x32e.google.com [IPv6:2a00:1450:4864:20::32e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 025E2F58B;
-        Wed, 21 Dec 2022 06:00:20 -0800 (PST)
-Received: by mail-wm1-x32e.google.com with SMTP id i187-20020a1c3bc4000000b003d1e906ca23so1601108wma.3;
-        Wed, 21 Dec 2022 06:00:19 -0800 (PST)
+        Wed, 21 Dec 2022 09:15:27 -0500
+Received: from mail-ej1-x631.google.com (mail-ej1-x631.google.com [IPv6:2a00:1450:4864:20::631])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A739248EE
+        for <linux-block@vger.kernel.org>; Wed, 21 Dec 2022 06:15:23 -0800 (PST)
+Received: by mail-ej1-x631.google.com with SMTP id x22so37068319ejs.11
+        for <linux-block@vger.kernel.org>; Wed, 21 Dec 2022 06:15:23 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Nkgr/PILpuVC3sCWYta0XXo8hnwU8RgWZjFpRgXAELg=;
-        b=nsIQjMlh47JuKX0YRjs58BTfW1aBQ7t5ZpnD/DFRfzGo5NBhsoW9TqyXb1I4m7pgJz
-         7gwgdDC8ybyqdZYc3oI1t4qIXXm11MsB9Wnw0++hgtJIgfn0O5Omzdl/VLpn+LJlNaCR
-         MLwsTeF9OqoFAPRpZU8yGNBJMdO5YuAIWj3zCzROLJESoeAdWwvEZilLucSAWglY+bv9
-         Gy0xn4Iv13/jCUtx2Bus2T4E90w3JWoXJ4aepFVAJkGthrGrdmigii0k207784ouqokB
-         qCZRkdfhzTVykbbjlBDk5mD/IJ0mNi8zxZr2DyKF8EnIHuaeDD2RuJ/xhyckg6m39ke3
-         efhQ==
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=SMVy3OUddSJwF96CPiXZ2tBpIM5xXUul9JOqAQTf3xU=;
+        b=RuQKjaSc5/F3YXI2MV113Lta4dCmnWkEhNsdgaAj4X6AuKi3k4DIZU6nE11pN+ju/b
+         vIf+omg1Wa/4nwL4aKWE8XWlpkiJLzIhJFDNgH94+EdbvXIw6oJCzsxl3FOOGrJ52sGq
+         iv/SPj0cLMkzHOJx2qqcHORbf+cvTQZLnpE+U4FkQgmWfF8R2aApsXr/LPTvAJsfhWui
+         W6v/1WyayAC8r94G8XvWpDW4UcJIn9ZPofbuF6jnEmMig7whlfHEQkkJ2cJqX7R7aTtc
+         UmYodUn1YljpuI/Ug0M8zpCAHNIKqCxtLeCjYm2NixbaVe82hbTThAs33G6q3P+yef1C
+         Xoiw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=Nkgr/PILpuVC3sCWYta0XXo8hnwU8RgWZjFpRgXAELg=;
-        b=Yxzz7vrfVzDIEXQY2puBa02OHvkklGl88SksYi5FsCeMAdEgBnxqN7W/sjlixlVpdF
-         x1tp9brDuN1l7yJaC5ihDZyPFKC8Yerr7z3wIozIhF1e0EsJTsQ9kERwT5ViQBZzvDOa
-         8TpwP68xIrChQTf4zI5GfzSl8pJBMwaOczmoALcvEQ1GYOd73PRt0IvLDkR1U9Jul5LU
-         yDxkdqzb3yNPONvamhQ3P1kiKj6SkVA59Hr3SybU+Vy423kG9DM7IsN1GUI2wRCLV7DX
-         f4qXhYlI810f760ZM5lXKIy5XTvziZHdO6EmZa9huVMokD77YJiJEtsCcIxxXQ1IZwSn
-         8frg==
-X-Gm-Message-State: AFqh2koUhPkD+HX2r2WFEIpkMANhi3jquY5EHKyhLm8yi6PtOgbfc9SM
-        j3ndlfAUMCVLiez26mCC4dsSlB5eCsk=
-X-Google-Smtp-Source: AMrXdXtVfkIkIQra855/evVr+dkD00oysXSW/o0GiRK6c0X7b8rmOCfRryGzxGQdYcEv7gtbzjJKvw==
-X-Received: by 2002:a05:600c:2252:b0:3d3:5d8b:7af with SMTP id a18-20020a05600c225200b003d35d8b07afmr1882310wmm.41.1671631218074;
-        Wed, 21 Dec 2022 06:00:18 -0800 (PST)
-Received: from lucifer.home ([2a00:23c5:dc8c:8701:1663:9a35:5a7b:1d76])
-        by smtp.googlemail.com with ESMTPSA id c12-20020a05600c0a4c00b003cfa3a12660sm7243731wmq.1.2022.12.21.06.00.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 21 Dec 2022 06:00:17 -0800 (PST)
-From:   Lorenzo Stoakes <lstoakes@gmail.com>
-To:     linux-block@vger.kernel.org,
-        Dmitry Fomichev <dmitry.fomichev@wdc.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jens Axboe <axboe@kernel.dk>
-Cc:     Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-        virtualization@lists.linux-foundation.org,
-        virtio-dev@lists.oasis-open.org, linux-kernel@vger.kernel.org,
-        Hannes Reinecke <hare@suse.de>,
-        Sam Li <faithilikerun@gmail.com>,
-        Lorenzo Stoakes <lstoakes@gmail.com>
-Subject: [PATCH] virtio-blk: avoid kernel panic on VIRTIO_BLK_F_ZONED check
-Date:   Wed, 21 Dec 2022 14:00:12 +0000
-Message-Id: <20221221140012.238494-1-lstoakes@gmail.com>
-X-Mailer: git-send-email 2.39.0
+        bh=SMVy3OUddSJwF96CPiXZ2tBpIM5xXUul9JOqAQTf3xU=;
+        b=z0o5hMh157eGciTcOboOiY7SajSIVMYunE2I5R29DjS9RMrCmaGW3bgy1A46EZlBAn
+         QuXdzlnatpAsYmeLxKiTvzLmXUvMTeuzIw8RafTkRNxU8H3hU2gDNUgKJuqQh5whILi4
+         LVnOUWGnUgDGSxyPxxqtMEbqhot2qhHfEvifqoK3uOyFjvD+HEyEDGuSk5uKoKSEwyCU
+         v8qhfSQuUECo+fHDa8BVAuMhk29y00Q6r4R7OfnGDqsz1J/FisV3Gu1V6R6TdNLjGtjo
+         ZsmwKwyeNP5QVoKJyHhxKC1Ai51/E3PdkIFM/mhb+xKdDjycvu8Z2+EcbiMYzwvMhDJR
+         HQ7g==
+X-Gm-Message-State: AFqh2koklZOyDFObcoWX8gnkgttrtYMRR6wUILjWMkbC+15PnLiYyx2B
+        xfVtOedGw9qEdfwkMCVsLckPJiZ4xVwMAS3N2p+K+Jppczs=
+X-Google-Smtp-Source: AMrXdXu29NPg5n1rurrLcU9CvB3z09vpGPusGVHlCGCnG/bTftrfJORneuxk2H6g0xPcIdCJxI+Of+g0b2KSRvTPsEw=
+X-Received: by 2002:a17:906:285a:b0:7b2:af38:ef00 with SMTP id
+ s26-20020a170906285a00b007b2af38ef00mr201709ejc.546.1671632122026; Wed, 21
+ Dec 2022 06:15:22 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20221220153613.21675-1-suwan.kim027@gmail.com>
+ <20221220153613.21675-3-suwan.kim027@gmail.com> <Y6LkfrTVV/M2eye/@infradead.org>
+ <Y6MOF7CMJ1AZEzoC@localhost.localdomain>
+In-Reply-To: <Y6MOF7CMJ1AZEzoC@localhost.localdomain>
+From:   Suwan Kim <suwan.kim027@gmail.com>
+Date:   Wed, 21 Dec 2022 23:15:10 +0900
+Message-ID: <CAFNWusY=z=rhPxuLnFpPKRfuJWMEtPomysm9LLvb8WvK2y2+jg@mail.gmail.com>
+Subject: Re: [PATCH v2 2/2] virtio-blk: support completion batching for the
+ IRQ path
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     mst@redhat.com, jasowang@redhat.com, stefanha@redhat.com,
+        pbonzini@redhat.com, axboe@kernel.dk,
+        virtualization@lists.linux-foundation.org,
+        linux-block@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-virtio zoned block device support is added by commit 0562d7bf1604
-("virtio-blk: add support for zoned block devices") which adds
-VIRTIO_BLK_F_ZONED to the features array in virtio_blk.c but makes it
-conditional on CONFIG_BLK_DEV_ZONED.
+On Wed, Dec 21, 2022 at 10:46 PM Suwan Kim <suwan.kim027@gmail.com> wrote:
+>
+> On Wed, Dec 21, 2022 at 02:48:30AM -0800, Christoph Hellwig wrote:
+> > > +           if (likely(!blk_should_fake_timeout(req->q)) &&
+> > > +                   !blk_mq_complete_request_remote(req) &&
+> > > +                   !blk_mq_add_to_batch(req, iob, vbr->status,
+> > > +                                           virtblk_complete_batch))
+> >
+> > One tab indents for line continuations are really confusing.  Please
+> > make this:
+> >
+> >               if (likely(!blk_should_fake_timeout(req->q)) &&
+> >                   !blk_mq_complete_request_remote(req) &&
+> >                   !blk_mq_add_to_batch(req, iob, vbr->status,
+> >                                        virtblk_complete_batch))
+> >
+> > > +   found = virtblk_handle_req(vq, iob);
+> > >
+> > >     if (found)
+> >
+> > You can drop the found variable here now:
+> >
+> >       if (virtblk_handle_req(vq, iob))
+> >               blk_mq_start_stopped_hw_queues(vblk->disk->queue, true);
+> >
+>
 
-In it virtblk_probe() calls virtio_has_feature(vdev, VIRTIO_BLK_F_ZONED)
-unconditionally, which invokes virtio_check_driver_offered_feature().
-This function checks whether virtio_blk.feature_table (assigned to
-the static features array) contains the specified feature enum, and if not
-_causes a kernel panic_ via BUG().
+Ah, virtblk_poll() should return found to indicate whether a request
+was processed. I'll leave this as is.
 
-This therefore means that failing to enable CONFIG_BLK_DEV_ZONED while
-using virtio is a guaranteed kernel panic. Fix the issue by making the
-feature test also conditional on CONFIG_BLK_DEV_ZONED.
-
-Signed-off-by: Lorenzo Stoakes <lstoakes@gmail.com>
----
- drivers/block/virtio_blk.c | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-index ff49052e26f7..34fdc141fb21 100644
---- a/drivers/block/virtio_blk.c
-+++ b/drivers/block/virtio_blk.c
-@@ -1580,11 +1580,13 @@ static int virtblk_probe(struct virtio_device *vdev)
- 	virtblk_update_capacity(vblk, false);
- 	virtio_device_ready(vdev);
-
-+#ifdef CONFIG_BLK_DEV_ZONED
- 	if (virtio_has_feature(vdev, VIRTIO_BLK_F_ZONED)) {
- 		err = virtblk_probe_zoned_device(vdev, vblk, q);
- 		if (err)
- 			goto out_cleanup_disk;
- 	}
-+#endif /* CONFIG_BLK_DEV_ZONED */
-
- 	dev_info(&vdev->dev, "blk config size: %zu\n",
- 		sizeof(struct virtio_blk_config));
---
-2.39.0
+Regards,
+Suwan Kim
