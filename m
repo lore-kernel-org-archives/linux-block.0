@@ -2,126 +2,148 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A2ECC10F1B
-	for <linux-block@archiver.kernel.org>; Wed, 21 Dec 2022 17:09:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E689C41535
+	for <linux-block@archiver.kernel.org>; Wed, 21 Dec 2022 18:48:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229614AbiLURJK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 21 Dec 2022 12:09:10 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51560 "EHLO
+        id S234719AbiLUSsD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 21 Dec 2022 13:48:03 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49808 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229620AbiLURJJ (ORCPT
+        with ESMTP id S234296AbiLUSsC (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 21 Dec 2022 12:09:09 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F29AB1903D;
-        Wed, 21 Dec 2022 09:09:07 -0800 (PST)
+        Wed, 21 Dec 2022 13:48:02 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA2E01E70C;
+        Wed, 21 Dec 2022 10:48:01 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id AAD79B81BDA;
-        Wed, 21 Dec 2022 17:09:06 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 27BB4C433EF;
-        Wed, 21 Dec 2022 17:09:03 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 8D247B81BA6;
+        Wed, 21 Dec 2022 18:48:00 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0F6C4C433EF;
+        Wed, 21 Dec 2022 18:47:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1671642545;
-        bh=HexWrl21jQsZiZHSJmWAZU7Ngb+sLT1anzFCUeX4EtU=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=eb1rcmPIHP+2ixTURffKrMR/B0JPZHtcCp3fI8SsDi38mfPsBeBn0wkQMfGl+WqEc
-         EReXnaFgZ6dxXAFvqCA5sYZNrexaFNulst4/5VC+IhK9+dfLk0UscsoR2tDUYSthbK
-         M4awtawpM9cIjyVwb0fPcZxSuIVWiCKFWpscUxYYw2MSmsOB4vNbHTgLNgsVg+ooik
-         IcZ0YCbfl7H/IYiAM1B0U1uRfO4Z6VB3TpHQliDUvIPcxYjy+60I9d91p27S1yfLIO
-         tRRPvOOuFj9CY1ZxFso107+OjTh+UkYETvwPmtbFTmvdvXK3YHpMmeqkNjJnsQImXu
-         4WTH7RLaXi4MA==
-Date:   Wed, 21 Dec 2022 10:09:00 -0700
-From:   Keith Busch <kbusch@kernel.org>
-To:     Gulam Mohamed <gulam.mohamed@oracle.com>
-Cc:     linux-block@vger.kernel.org, axboe@kernel.dk,
-        philipp.reisner@linbit.com, lars.ellenberg@linbit.com,
-        christoph.boehmwalder@linbit.com, minchan@kernel.org,
-        ngupta@vflare.org, senozhatsky@chromium.org, colyli@suse.de,
-        kent.overstreet@gmail.com, agk@redhat.com, snitzer@kernel.org,
-        dm-devel@redhat.com, song@kernel.org, dan.j.williams@intel.com,
-        vishal.l.verma@intel.com, dave.jiang@intel.com,
-        ira.weiny@intel.com, junxiao.bi@oracle.com,
-        martin.petersen@oracle.com, kch@nvidia.com,
-        drbd-dev@lists.linbit.com, linux-kernel@vger.kernel.org,
-        linux-bcache@vger.kernel.org, linux-raid@vger.kernel.org,
-        nvdimm@lists.linux.dev, konrad.wilk@oracle.com, joe.jin@oracle.com,
-        rajesh.sivaramasubramaniom@oracle.com, shminderjit.singh@oracle.com
-Subject: Re: [PATCH for-6.2/block V3 2/2] block: Change the granularity of io
- ticks from ms to ns
-Message-ID: <Y6M9rJbw3ZMvOeDr@kbusch-mbp.dhcp.thefacebook.com>
-References: <20221221040506.1174644-1-gulam.mohamed@oracle.com>
- <20221221040506.1174644-2-gulam.mohamed@oracle.com>
+        s=k20201202; t=1671648479;
+        bh=hTuIjHBHd+Tec1DAOqqIPFW5jFXlpQ7ZWnftXs2hg6Q=;
+        h=From:To:Cc:Subject:References:Date:In-Reply-To:From;
+        b=XiS53svtnGlZKUpJLWpjIb00pvlTavkGyE/yhXeS7hKFYS8V/5Xav/+mlpRGezW6h
+         BljUFnHKQWw/igsJKn42+z68Zwy3Z5sPZrjhFME/Kwqkbwjx7njFSsJY/zjJWCYIs2
+         hg7VB/Upxxl01DViL7TGCOLjNQW9ZDg1YFt1aai4iFOc2yVu8ujua8wy7VEyZXvui4
+         /1bJ/zTi5VZkqa0c9me5b9nyIRR+8AGM7a6aXGScjL7jgysNOOGh6mrX4vs3UGAGXF
+         1s0aX5L7Ze9A8zWY2oezGwBJF7QaIiwiLIJLyqjhe4qpPeepExO7oc4XqzOCONcDBc
+         /pYLvZHxEpyuQ==
+From:   Kalle Valo <kvalo@kernel.org>
+To:     Steven Rostedt <rostedt@goodmis.org>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Stephen Boyd <sboyd@kernel.org>,
+        Guenter Roeck <linux@roeck-us.net>,
+        Anna-Maria Gleixner <anna-maria@linutronix.de>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Julia Lawall <Julia.Lawall@inria.fr>, linux-sh@vger.kernel.org,
+        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-acpi@vger.kernel.org,
+        linux-atm-general@lists.sourceforge.net, netdev@vger.kernel.org,
+        drbd-dev@lists.linbit.com, linux-bluetooth@vger.kernel.org,
+        intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+        linux-input@vger.kernel.org, linux-leds@vger.kernel.org,
+        linux-media@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
+        linux-usb@vger.kernel.org, linux-wireless@vger.kernel.org,
+        brcm80211-dev-list.pdl@broadcom.com,
+        SHA-cyfmac-dev-list@infineon.com, linux-scsi@vger.kernel.org,
+        linux-staging@lists.linux.dev, linux-ext4@vger.kernel.org,
+        linux-nilfs@vger.kernel.org, bridge@lists.linux-foundation.org,
+        netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+        lvs-devel@vger.kernel.org, linux-nfs@vger.kernel.org,
+        tipc-discussion@lists.sourceforge.net, alsa-devel@alsa-project.org
+Subject: Re: [PATCH] treewide: Convert del_timer*() to timer_shutdown*()
+References: <20221220134519.3dd1318b@gandalf.local.home>
+Date:   Wed, 21 Dec 2022 20:47:50 +0200
+In-Reply-To: <20221220134519.3dd1318b@gandalf.local.home> (Steven Rostedt's
+        message of "Tue, 20 Dec 2022 13:45:19 -0500")
+Message-ID: <87mt7gk2zt.fsf@kernel.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221221040506.1174644-2-gulam.mohamed@oracle.com>
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Dec 21, 2022 at 04:05:06AM +0000, Gulam Mohamed wrote:
-> +u64  blk_get_iostat_ticks(struct request_queue *q)
-> +{
-> +       return (blk_queue_precise_io_stat(q) ? ktime_get_ns() : jiffies);
-> +}
-> +EXPORT_SYMBOL_GPL(blk_get_iostat_ticks);
-> +
->  void update_io_ticks(struct block_device *part, u64 now, bool end)
->  {
->  	u64 stamp;
-> @@ -968,20 +980,26 @@ EXPORT_SYMBOL(bdev_start_io_acct);
->  u64 bio_start_io_acct(struct bio *bio)
->  {
->  	return bdev_start_io_acct(bio->bi_bdev, bio_sectors(bio),
-> -				  bio_op(bio), jiffies);
-> +				  bio_op(bio),
-> +				  blk_get_iostat_ticks(bio->bi_bdev->bd_queue));
->  }
->  EXPORT_SYMBOL_GPL(bio_start_io_acct);
->  
->  void bdev_end_io_acct(struct block_device *bdev, enum req_op op,
->  		      u64 start_time)
->  {
-> +	u64 now;
-> +	u64 duration;
-> +	struct request_queue *q = bdev_get_queue(bdev);
->  	const int sgrp = op_stat_group(op);
-> -	u64 now = READ_ONCE(jiffies);
-> -	u64 duration = (unsigned long)now -(unsigned long) start_time;
-> +	now = blk_get_iostat_ticks(q);;
+Steven Rostedt <rostedt@goodmis.org> writes:
 
-I don't think you can rely on the blk_queue_precise_io_stat() flag in
-the completion side. The user can toggle this with data in flight, which
-means the completion may use different tick units than the start. I
-think you'll need to add a flag to the request in the start accounting
-side to know which method to use for the completion.
+> [
+>   Linus,
+>
+>     I ran the script against your latest master branch:
+>     commit b6bb9676f2165d518b35ba3bea5f1fcfc0d969bf
+>
+>     As the timer_shutdown*() code is now in your tree, I figured
+>     we can start doing the conversions. At least add the trivial ones
+>     now as Thomas suggested that this gets applied at the end of the
+>     merge window, to avoid conflicts with linux-next during the
+>     development cycle. I can wait to Friday to run it again, and
+>     resubmit.
+>
+>     What is the best way to handle this?
+> ]
+>
+> From: "Steven Rostedt (Google)" <rostedt@goodmis.org>
+>
+> Due to several bugs caused by timers being re-armed after they are
+> shutdown and just before they are freed, a new state of timers was added
+> called "shutdown". After a timer is set to this state, then it can no
+> longer be re-armed.
+>
+> The following script was run to find all the trivial locations where
+> del_timer() or del_timer_sync() is called in the same function that the
+> object holding the timer is freed. It also ignores any locations where the
+> timer->function is modified between the del_timer*() and the free(), as
+> that is not considered a "trivial" case.
+>
+> This was created by using a coccinelle script and the following commands:
+>
+>  $ cat timer.cocci
+> @@
+> expression ptr, slab;
+> identifier timer, rfield;
+> @@
+> (
+> -       del_timer(&ptr->timer);
+> +       timer_shutdown(&ptr->timer);
+> |
+> -       del_timer_sync(&ptr->timer);
+> +       timer_shutdown_sync(&ptr->timer);
+> )
+>   ... when strict
+>       when != ptr->timer
+> (
+>         kfree_rcu(ptr, rfield);
+> |
+>         kmem_cache_free(slab, ptr);
+> |
+>         kfree(ptr);
+> )
+>
+>  $ spatch timer.cocci . > /tmp/t.patch
+>  $ patch -p1 < /tmp/t.patch
+>
+> Link: https://lore.kernel.org/lkml/20221123201306.823305113@linutronix.de/
+>
+> Signed-off-by: Steven Rostedt (Google) <rostedt@goodmis.org>
 
-> @@ -951,6 +951,7 @@ ssize_t part_stat_show(struct device *dev,
->  	struct request_queue *q = bdev_get_queue(bdev);
->  	struct disk_stats stat;
->  	unsigned int inflight;
-> +	u64 stat_ioticks;
->  
->  	if (queue_is_mq(q))
->  		inflight = blk_mq_in_flight(q, bdev);
-> @@ -959,10 +960,13 @@ ssize_t part_stat_show(struct device *dev,
->  
->  	if (inflight) {
->  		part_stat_lock();
-> -		update_io_ticks(bdev, jiffies, true);
-> +		update_io_ticks(bdev, blk_get_iostat_ticks(q), true);
->  		part_stat_unlock();
->  	}
->  	part_stat_read_all(bdev, &stat);
-> +	stat_ioticks = (blk_queue_precise_io_stat(q) ?
-> +				div_u64(stat.io_ticks, NSEC_PER_MSEC) :
-> +				jiffies_to_msecs(stat.io_ticks));
+For wireless:
 
+>  .../broadcom/brcm80211/brcmfmac/btcoex.c         |  2 +-
+>  drivers/net/wireless/intel/iwlwifi/iwl-dbg-tlv.c |  2 +-
+>  drivers/net/wireless/intel/iwlwifi/mvm/sta.c     |  2 +-
+>  drivers/net/wireless/intersil/hostap/hostap_ap.c |  2 +-
+>  drivers/net/wireless/marvell/mwifiex/main.c      |  2 +-
+>  drivers/net/wireless/microchip/wilc1000/hif.c    |  6 +++---
 
-With the user able to change the precision at will, I think these
-io_ticks need to have a consistent unit size. Mixing jiffies and nsecs
-is going to create garbage stats output. Could existing io_ticks using
-jiffies be converted to jiffies_to_nsecs() so that you only have one
-unit to consider?
+Acked-by: Kalle Valo <kvalo@kernel.org>
+
+-- 
+https://patchwork.kernel.org/project/linux-wireless/list/
+
+https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatches
