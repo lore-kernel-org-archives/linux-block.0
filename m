@@ -2,99 +2,121 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0FA8C4332F
-	for <linux-block@archiver.kernel.org>; Wed, 21 Dec 2022 14:15:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24B26C4332F
+	for <linux-block@archiver.kernel.org>; Wed, 21 Dec 2022 14:53:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232710AbiLUOPg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 21 Dec 2022 09:15:36 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56012 "EHLO
+        id S230103AbiLUOxR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 21 Dec 2022 09:53:17 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40968 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233812AbiLUOP1 (ORCPT
+        with ESMTP id S229472AbiLUOxQ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 21 Dec 2022 09:15:27 -0500
-Received: from mail-ej1-x631.google.com (mail-ej1-x631.google.com [IPv6:2a00:1450:4864:20::631])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A739248EE
-        for <linux-block@vger.kernel.org>; Wed, 21 Dec 2022 06:15:23 -0800 (PST)
-Received: by mail-ej1-x631.google.com with SMTP id x22so37068319ejs.11
-        for <linux-block@vger.kernel.org>; Wed, 21 Dec 2022 06:15:23 -0800 (PST)
+        Wed, 21 Dec 2022 09:53:16 -0500
+Received: from mail-wm1-x332.google.com (mail-wm1-x332.google.com [IPv6:2a00:1450:4864:20::332])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B5B3AF593;
+        Wed, 21 Dec 2022 06:53:15 -0800 (PST)
+Received: by mail-wm1-x332.google.com with SMTP id ja17so11341782wmb.3;
+        Wed, 21 Dec 2022 06:53:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=SMVy3OUddSJwF96CPiXZ2tBpIM5xXUul9JOqAQTf3xU=;
-        b=RuQKjaSc5/F3YXI2MV113Lta4dCmnWkEhNsdgaAj4X6AuKi3k4DIZU6nE11pN+ju/b
-         vIf+omg1Wa/4nwL4aKWE8XWlpkiJLzIhJFDNgH94+EdbvXIw6oJCzsxl3FOOGrJ52sGq
-         iv/SPj0cLMkzHOJx2qqcHORbf+cvTQZLnpE+U4FkQgmWfF8R2aApsXr/LPTvAJsfhWui
-         W6v/1WyayAC8r94G8XvWpDW4UcJIn9ZPofbuF6jnEmMig7whlfHEQkkJ2cJqX7R7aTtc
-         UmYodUn1YljpuI/Ug0M8zpCAHNIKqCxtLeCjYm2NixbaVe82hbTThAs33G6q3P+yef1C
-         Xoiw==
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=HI1luplpZbZtMfrW5nz8VoSxbUmlQikDikFMZRlTu2s=;
+        b=HjU2Xsm/p3k2oMOotYW1bG90VqwYKk0udzUiZrpCOrqK8D5YVaG0okQqr/krbzdPvT
+         d6cmI1K4yKczRY2684TMMPfXopx+tdXVedtCi3o1vvtylN4mOYxWHnpmrEC4sUlZyJ4I
+         YFGUhrHYelHkxkxMMqGNmnDhA7LMFg9f0w/wKQ3xnqDjsteeXVfaqctUDzkVhw5Vb9g8
+         akso7CEDwRiCupt68D1l4silfCFiwhuW/+qkGialcjdh+dW5215IposnmA/f9D3bnyHD
+         OplvWJVYw5WI/qMyM/6hKThcv6B4Q/pBnRDagFKR537egiOqoTGhfMo3AUdkaj85Di/z
+         qZ8Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=SMVy3OUddSJwF96CPiXZ2tBpIM5xXUul9JOqAQTf3xU=;
-        b=z0o5hMh157eGciTcOboOiY7SajSIVMYunE2I5R29DjS9RMrCmaGW3bgy1A46EZlBAn
-         QuXdzlnatpAsYmeLxKiTvzLmXUvMTeuzIw8RafTkRNxU8H3hU2gDNUgKJuqQh5whILi4
-         LVnOUWGnUgDGSxyPxxqtMEbqhot2qhHfEvifqoK3uOyFjvD+HEyEDGuSk5uKoKSEwyCU
-         v8qhfSQuUECo+fHDa8BVAuMhk29y00Q6r4R7OfnGDqsz1J/FisV3Gu1V6R6TdNLjGtjo
-         ZsmwKwyeNP5QVoKJyHhxKC1Ai51/E3PdkIFM/mhb+xKdDjycvu8Z2+EcbiMYzwvMhDJR
-         HQ7g==
-X-Gm-Message-State: AFqh2koklZOyDFObcoWX8gnkgttrtYMRR6wUILjWMkbC+15PnLiYyx2B
-        xfVtOedGw9qEdfwkMCVsLckPJiZ4xVwMAS3N2p+K+Jppczs=
-X-Google-Smtp-Source: AMrXdXu29NPg5n1rurrLcU9CvB3z09vpGPusGVHlCGCnG/bTftrfJORneuxk2H6g0xPcIdCJxI+Of+g0b2KSRvTPsEw=
-X-Received: by 2002:a17:906:285a:b0:7b2:af38:ef00 with SMTP id
- s26-20020a170906285a00b007b2af38ef00mr201709ejc.546.1671632122026; Wed, 21
- Dec 2022 06:15:22 -0800 (PST)
-MIME-Version: 1.0
-References: <20221220153613.21675-1-suwan.kim027@gmail.com>
- <20221220153613.21675-3-suwan.kim027@gmail.com> <Y6LkfrTVV/M2eye/@infradead.org>
- <Y6MOF7CMJ1AZEzoC@localhost.localdomain>
-In-Reply-To: <Y6MOF7CMJ1AZEzoC@localhost.localdomain>
-From:   Suwan Kim <suwan.kim027@gmail.com>
-Date:   Wed, 21 Dec 2022 23:15:10 +0900
-Message-ID: <CAFNWusY=z=rhPxuLnFpPKRfuJWMEtPomysm9LLvb8WvK2y2+jg@mail.gmail.com>
-Subject: Re: [PATCH v2 2/2] virtio-blk: support completion batching for the
- IRQ path
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     mst@redhat.com, jasowang@redhat.com, stefanha@redhat.com,
-        pbonzini@redhat.com, axboe@kernel.dk,
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=HI1luplpZbZtMfrW5nz8VoSxbUmlQikDikFMZRlTu2s=;
+        b=fMHcc1lnJ3cVRqszwmd++B/0SALQzLIebd7LHLaj0yBxVXsXtZaHTy40bM+SS57KW8
+         AHQFp8wdedogzwZOcMW3CP1xX52vhutZysmtQRBYStoiAH3N0lMnnV2+WHnmcWSPT0Er
+         Vy0gkJotz3blaLZ62htnM3XNORCGAsZmHqzjdUZs6TDyeTRT4D+vvYFW0WN2E/rpqPYZ
+         XiSVsyFI4igWYSsRsktJrLX+361kObWyPBO1C/jGLpawW2uxRG2kvuL4luYxph+x8hSc
+         uMQCFy5j1FrYIOOBmqEC702NllsKgXdE4CDiHSS30wzafScuUBT7Crfeb3bRriNUeHbo
+         HalQ==
+X-Gm-Message-State: AFqh2koUU5j/mesx9ICq1aC1WJ4S8tCXq6bFtu/Tr53fYde4aKA6ZkTe
+        Pa1zcEId1Vdu52iwzvl5EcuxsjAM3UM=
+X-Google-Smtp-Source: AMrXdXst1yNYFX8VIK8eFbGC1P22Qo5FLPmcWms3+sHZ3O7HzicFabe0T7S/tM9pJhQ378DR7ze0VA==
+X-Received: by 2002:a05:600c:3d98:b0:3cf:d70d:d5a8 with SMTP id bi24-20020a05600c3d9800b003cfd70dd5a8mr1971568wmb.6.1671634394046;
+        Wed, 21 Dec 2022 06:53:14 -0800 (PST)
+Received: from localhost ([2a00:23c5:dc8c:8701:1663:9a35:5a7b:1d76])
+        by smtp.gmail.com with ESMTPSA id iz13-20020a05600c554d00b003d33ab317dasm3076064wmb.14.2022.12.21.06.53.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 21 Dec 2022 06:53:13 -0800 (PST)
+Date:   Wed, 21 Dec 2022 14:53:12 +0000
+From:   Lorenzo Stoakes <lstoakes@gmail.com>
+To:     linux-block@vger.kernel.org,
+        Dmitry Fomichev <dmitry.fomichev@wdc.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jens Axboe <axboe@kernel.dk>
+Cc:     Damien Le Moal <damien.lemoal@opensource.wdc.com>,
         virtualization@lists.linux-foundation.org,
-        linux-block@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+        virtio-dev@lists.oasis-open.org, linux-kernel@vger.kernel.org,
+        Hannes Reinecke <hare@suse.de>,
+        Sam Li <faithilikerun@gmail.com>,
+        Steven Rostedt <rostedt@goodmis.org>
+Subject: Re: [PATCH] virtio-blk: avoid kernel panic on VIRTIO_BLK_F_ZONED
+ check
+Message-ID: <Y6Md2DuDigrnrvxU@lucifer>
+References: <20221221140012.238494-1-lstoakes@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221221140012.238494-1-lstoakes@gmail.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Dec 21, 2022 at 10:46 PM Suwan Kim <suwan.kim027@gmail.com> wrote:
+On Wed, Dec 21, 2022 at 02:00:12PM +0000, Lorenzo Stoakes wrote:
+> virtio zoned block device support is added by commit 0562d7bf1604
+> ("virtio-blk: add support for zoned block devices") which adds
+> VIRTIO_BLK_F_ZONED to the features array in virtio_blk.c but makes it
+> conditional on CONFIG_BLK_DEV_ZONED.
 >
-> On Wed, Dec 21, 2022 at 02:48:30AM -0800, Christoph Hellwig wrote:
-> > > +           if (likely(!blk_should_fake_timeout(req->q)) &&
-> > > +                   !blk_mq_complete_request_remote(req) &&
-> > > +                   !blk_mq_add_to_batch(req, iob, vbr->status,
-> > > +                                           virtblk_complete_batch))
-> >
-> > One tab indents for line continuations are really confusing.  Please
-> > make this:
-> >
-> >               if (likely(!blk_should_fake_timeout(req->q)) &&
-> >                   !blk_mq_complete_request_remote(req) &&
-> >                   !blk_mq_add_to_batch(req, iob, vbr->status,
-> >                                        virtblk_complete_batch))
-> >
-> > > +   found = virtblk_handle_req(vq, iob);
-> > >
-> > >     if (found)
-> >
-> > You can drop the found variable here now:
-> >
-> >       if (virtblk_handle_req(vq, iob))
-> >               blk_mq_start_stopped_hw_queues(vblk->disk->queue, true);
-> >
+> In it virtblk_probe() calls virtio_has_feature(vdev, VIRTIO_BLK_F_ZONED)
+> unconditionally, which invokes virtio_check_driver_offered_feature().
+> This function checks whether virtio_blk.feature_table (assigned to
+> the static features array) contains the specified feature enum, and if not
+> _causes a kernel panic_ via BUG().
 >
+> This therefore means that failing to enable CONFIG_BLK_DEV_ZONED while
+> using virtio is a guaranteed kernel panic. Fix the issue by making the
+> feature test also conditional on CONFIG_BLK_DEV_ZONED.
+>
+> Signed-off-by: Lorenzo Stoakes <lstoakes@gmail.com>
+> ---
+>  drivers/block/virtio_blk.c | 2 ++
+>  1 file changed, 2 insertions(+)
+>
+> diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+> index ff49052e26f7..34fdc141fb21 100644
+> --- a/drivers/block/virtio_blk.c
+> +++ b/drivers/block/virtio_blk.c
+> @@ -1580,11 +1580,13 @@ static int virtblk_probe(struct virtio_device *vdev)
+>  	virtblk_update_capacity(vblk, false);
+>  	virtio_device_ready(vdev);
+>
+> +#ifdef CONFIG_BLK_DEV_ZONED
+>  	if (virtio_has_feature(vdev, VIRTIO_BLK_F_ZONED)) {
+>  		err = virtblk_probe_zoned_device(vdev, vblk, q);
+>  		if (err)
+>  			goto out_cleanup_disk;
+>  	}
+> +#endif /* CONFIG_BLK_DEV_ZONED */
+>
+>  	dev_info(&vdev->dev, "blk config size: %zu\n",
+>  		sizeof(struct virtio_blk_config));
+> --
+> 2.39.0
 
-Ah, virtblk_poll() should return found to indicate whether a request
-was processed. I'll leave this as is.
-
-Regards,
-Suwan Kim
+Steven suggested use of IS_ENABLED() here which makes it rather less ugly, will
+send as a v2.
