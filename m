@@ -2,149 +2,145 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD703C10F1B
-	for <linux-block@archiver.kernel.org>; Wed, 21 Dec 2022 10:00:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 20D22C4332F
+	for <linux-block@archiver.kernel.org>; Wed, 21 Dec 2022 10:13:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234654AbiLUKAn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 21 Dec 2022 05:00:43 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35040 "EHLO
+        id S234544AbiLUKNO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 21 Dec 2022 05:13:14 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40470 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234760AbiLUKAC (ORCPT
+        with ESMTP id S232975AbiLUKNM (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 21 Dec 2022 05:00:02 -0500
-Received: from mout01.posteo.de (mout01.posteo.de [185.67.36.65])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6DFE222B0
-        for <linux-block@vger.kernel.org>; Wed, 21 Dec 2022 01:57:45 -0800 (PST)
-Received: from submission (posteo.de [185.67.36.169]) 
-        by mout01.posteo.de (Postfix) with ESMTPS id 4AD3F240029
-        for <linux-block@vger.kernel.org>; Wed, 21 Dec 2022 10:57:44 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=posteo.net; s=2017;
-        t=1671616664; bh=0SE2pIFPu1kPwESlbR+h5d7mIARIWSvOnvEjifJ0GbY=;
-        h=Date:From:To:Cc:Subject:From;
-        b=TIqDDGS3lIVOQVkAExmx37TcTDP328eW21gW5XC72f7pCHT4cNyDIFoKVvU6FfN8s
-         Uq0supD1kOMT/vR5KVol51TgSe+62zW5qYoXsakOB5Sh5qHx4G2DURxfeHYwdJfLWa
-         eZKobbNCfGvox5b75QGxx7IgPHu3C/6jlwcrf79tze39ZchELYHN2/F06dmwhUSFgP
-         EJtjyGlqsNpIja0WjDvTfh4dLilFfISefEffAVnMIKZTeCtbHgtO3Z6i+/ozkGU7CV
-         fDy/nRvDCNX5hndC5ZzWby+CWJvr6hQmWgU0yo/zBuGGomwJGcGBu7izJ+wJadhXYE
-         T0Pu5/nPCbJEg==
-Received: from customer (localhost [127.0.0.1])
-        by submission (posteo.de) with ESMTPSA id 4NcTQH2rPtz6tnY;
-        Wed, 21 Dec 2022 10:57:43 +0100 (CET)
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date:   Wed, 21 Dec 2022 09:57:43 +0000
-From:   danil.kipnis@posteo.net
-To:     Haris Iqbal <haris.iqbal@ionos.com>
-Cc:     Bart Van Assche <bvanassche@acm.org>, linux-rdma@vger.kernel.org,
-        linux-block@vger.kernel.org, Aleksei Marov <alexv.marov@gmail.com>,
-        Jinpu Wang <jinpu.wang@ionos.com>, leonro@nvidia.com,
-        jgg@nvidia.com
-Subject: Re: [RFC] Reliable Multicast on top of RTRS
-In-Reply-To: <CAJpMwyh-cihwNyMyTFE-f2HQqOnLydNB+TiGcq5UTMkgwU0yNA@mail.gmail.com>
-References: <CAHg0Huzvhg7ZizbCGQyyVNdnAWmQCsypRWvdBzm0GWwPzXD0dw@mail.gmail.com>
- <3b2f6267-e7a0-4266-867d-b0109d5a7cb4@acm.org>
- <CAHg0HuyGr8BfgBvXUG7N5WYyXKEzyh3i7eA=2XZxbW3zyXLTsA@mail.gmail.com>
- <cc14aa58-254e-5c33-89ab-6f3900143164@acm.org>
- <CAHg0Huw35m_WiwFqcTEHpCz94=JhaKZdEuV-F=aetQ_SEQgauA@mail.gmail.com>
- <CAJpMwyh-cihwNyMyTFE-f2HQqOnLydNB+TiGcq5UTMkgwU0yNA@mail.gmail.com>
-Message-ID: <fff44726895096cc64079dae69a66f9e@posteo.net>
+        Wed, 21 Dec 2022 05:13:12 -0500
+Received: from mail-ej1-x635.google.com (mail-ej1-x635.google.com [IPv6:2a00:1450:4864:20::635])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB59210B73
+        for <linux-block@vger.kernel.org>; Wed, 21 Dec 2022 02:13:10 -0800 (PST)
+Received: by mail-ej1-x635.google.com with SMTP id jo4so26730012ejb.7
+        for <linux-block@vger.kernel.org>; Wed, 21 Dec 2022 02:13:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=UFtUFEZ0yASxUMxyQqgxfJVN6QZngKYn2+EeS1iFjCo=;
+        b=UNuNXzFe/jgHclh7OC+ib0WQHgrctcsjkyvePS0r49LZu3k2B/Dh+/RN6Uqy1PBQ0x
+         jPZC8aqpG/bWd67UES1Na1SH6B4McMvKTRfmbQeylSzdaDGEO2sAnQJbK8LcpRZOCF1R
+         x+qHZ6wZSo7cvHQwjZZ/Y8Q/Pf0/V07R3SFjp/FSBkn7MzApBi0i1utMPvDOh4BU6IWQ
+         WmGLqzqh2gkkyAc7Q7MCKJtZJ+xSIsfXgR/8ebs6V4zlX3oUNdLt/QZ0Abou9Ep6yLH7
+         G27XY/S2lWLGW3xyU+GGbwzaMjhlMY5YkLbGe99pYkLS6NUNlbotYorEm22o7InHbNvw
+         oH1Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=UFtUFEZ0yASxUMxyQqgxfJVN6QZngKYn2+EeS1iFjCo=;
+        b=TIWz9dHC7hZv3vDrAYJ18i9P1r6RLqDyUcV+c/mBTYnic74GPmn0qbVByV2GmwRplZ
+         2YDXtqqb0FtUn33wQBZHCxY3aae1uHboMZ0Dooa/ZUWpOjo2vm+lFCAUbNdBIHJ1Y2GT
+         FBBqeEuKw54R3514C1nFEcllSP35sqeuwMh0qs4p3VfghaLZs8g9iD1loeWp7ceQNe54
+         Uta9sV4QHgmCVL/57rDz9d0hLiv+mzhUBnkgrFBBBRslyc6/2K5wdmc9m8k2rxOuVfML
+         XFcheQ/0SusxW1qc3+45Go91XdKc1U7MeBIy5wc+UcRC8RDO8bxHYyRnEvdiEDcmspOS
+         9Krg==
+X-Gm-Message-State: AFqh2kqJWXCTgzlk7ZVvawVBXan+HCmd8+IzKZ9OCo0KBoVCehVbgDJR
+        KqlJB7HTeOJZyd87VUsg+zDDcc1F4dlmsk0w
+X-Google-Smtp-Source: AMrXdXu/B1l/48o1Lzo9FG7MydmQAkljJlw+an+qgZ2PalLVn46ULX35mPd1yX16FhCu/QvEXUz1JA==
+X-Received: by 2002:a17:906:30d3:b0:7c0:a1f9:c778 with SMTP id b19-20020a17090630d300b007c0a1f9c778mr920539ejb.13.1671617589472;
+        Wed, 21 Dec 2022 02:13:09 -0800 (PST)
+Received: from mbp-di-paolo.station (net-93-70-85-0.cust.vodafonedsl.it. [93.70.85.0])
+        by smtp.gmail.com with ESMTPSA id z8-20020aa7cf88000000b0043bbb3535d6sm6741560edx.66.2022.12.21.02.13.08
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 21 Dec 2022 02:13:09 -0800 (PST)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
+Subject: Re: [PATCH V10 1/8] block, bfq: split sync bfq_queues on a
+ per-actuator basis
+From:   Paolo Valente <paolo.valente@linaro.org>
+In-Reply-To: <eb58939f-567e-c0c1-bafb-383f18f3d58e@opensource.wdc.com>
+Date:   Wed, 21 Dec 2022 11:13:07 +0100
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        linux-block <linux-block@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        Arie van der Hoeven <arie.vanderhoeven@seagate.com>,
+        Rory Chen <rory.c.chen@seagate.com>,
+        Glen Valante <glen.valante@linaro.org>,
+        Gabriele Felici <felicigb@gmail.com>,
+        Carmine Zaccagnino <carmine@carminezacc.com>
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <3E955C95-3912-46D0-A48C-9709F094FD0D@linaro.org>
+References: <20221209094442.36896-1-paolo.valente@linaro.org>
+ <20221209094442.36896-2-paolo.valente@linaro.org>
+ <cd41583b-ef11-a3b7-1e39-c4a224050c7d@opensource.wdc.com>
+ <60582F89-8020-4468-80FE-BC52202D1129@linaro.org>
+ <eb58939f-567e-c0c1-bafb-383f18f3d58e@opensource.wdc.com>
+To:     Damien Le Moal <damien.lemoal@opensource.wdc.com>
+X-Mailer: Apple Mail (2.3445.104.11)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Haris,
-
-Thanks for pushing RMR forward! Lutz Pogrell and Alexei and you did a 
-huge amount of work. I'm honestly convinced RMR will be a very useful 
-extension for the kernel. It is currently used with a block client and a 
-block server. Haris already mentioned rbd and dm-thin as a different 
-potential pair of users. I'm still of the opinion that sched and mm 
-could be the most interesting users of rmr.
-
-Looking forward to the github link,
-Cheers,
-Danil.
-
-P.S. BTW, where is my beloved libtbl?!
 
 
-On 21.11.2022 14:57, Haris Iqbal wrote:
-> Hey there,
-> 
-> We've got a prototype version working in-house. We've also implemented
-> a block device client and server. Another client and server could
-> probably be rbd and dm-thin. Will update as soon as we have a github
-> link.
-> 
-> Some technical details
-> 
-> - Ability to perform sync across storage nodes without the involvement
-> of the client.
-> 
-> - This helps performing sync, extending/adding legs/members without
-> the help of the client.
-> 
-> Candidate users
-> 
-> - We've implemented a stand-alone replicating block device. The client
-> is similar to the rnbd-clt and our own corresponding "store"/server
-> does linear mapping on the server side.
-> 
-> - rbd could be a client of rmr-clt. The rmr-srv (store) would talk to
-> lvm. rbd would provide the block device (over multiple objects) on the
-> client side. Lvm would function as the store on the server side. One
-> object would be stored on one dm-thin volume. rmr would provide for
-> the replication in the network.
-> 
-> Setups: RMR vs MD-RAID vs DRBD
-> 
-> - Active-active
-> 
-> - RMR as means of replication over network differs from the md-raid
-> configuration because sync traffic goes directly between servers. The
-> difference to the drbd setup is that the IO traffic goes to both legs
-> in a single hop.
-> 
-> How does RMR solve the activity log issue
-> 
-> - Synchronous replication; much like Protocol C of DRBD.
-> 
-> - RMR tracks all successful queue_depth (max number of IOs that can be
-> inflight at any moment) worth of last IOs on each storage node.
-> 
-> Best,
-> Haris
-> 
-> Signed-off: alexv.marov@gmail.com
-> Reviewed-by: danil.kipnis@posteo.net
-> 
-> On Sun, Nov 22, 2020 at 5:20 PM Danil Kipnis
-> <danil.kipnis@cloud.ionos.com> wrote:
->> 
->> On Fri, Sep 4, 2020 at 5:33 PM Bart Van Assche <bvanassche@acm.org> 
->> wrote:
->> >
->> > On 2020-09-04 04:35, Danil Kipnis wrote:
->> > > On Thu, Sep 3, 2020 at 1:07 AM Bart Van Assche <bvanassche@acm.org> wrote:
->> > >> How will it be guaranteed that the resulting software does
->> > >> not suffer from the problems that have been solved by the introduction
->> > >> of the DRBD activity log
->> > >> (https://www.linbit.com/drbd-user-guide/users-guide-drbd-8-4/#s-activity-log)?
->> > >
->> > > The above would require some kind of activity log also, I'm afraid.
->> >
->> > How about collaborating with the DRBD team? My concern is that otherwise
->> > we will end up with two drivers in the kernel that implement block device
->> > replication between servers connected over a network.
->> 
->> Will take a closer look at drbd,
->> 
->> Thank you,
->> Danil.
->> 
->> >
->> > Thanks,
->> >
->> > Bart.
+> Il giorno 21 dic 2022, alle ore 01:50, Damien Le Moal =
+<damien.lemoal@opensource.wdc.com> ha scritto:
+>=20
+> On 2022/12/20 22:10, Paolo Valente wrote:
+>>>> -	/*
+>>>> -	 * Does queue (or any parent entity) exceed number of requests =
+that
+>>>> -	 * should be available to it? Heavily limit depth so that it =
+cannot
+>>>> -	 * consume more available requests and thus starve other =
+entities.
+>>>> -	 */
+>>>> -	if (bfqq && bfqq_request_over_limit(bfqq, limit))
+>>>> -		depth =3D 1;
+>>>> +	for (act_idx =3D 0; act_idx < bfqd->num_actuators; act_idx++) {
+>>>> +		struct bfq_queue *bfqq =3D
+>>>> +			bic ? bic_to_bfqq(bic, op_is_sync(opf), act_idx) =
+: NULL;
+>>>=20
+>>> Commented already: why not add a "if (!bfqq) return NULL;" in
+>>> bic_to_bfqq() ?
+>>=20
+>> You have probably missed my reply on this.  The problem is that your
+>> proposal would improve code (only) here, but it would entail the =
+above
+>> control for all the other invocations, for which it is useless :(
+>=20
+> But then you have *a lot* of "if (bfqd)" tests that are useless =
+elsewhere since
+> bic_to_bfqq() never returns NULL.
+>=20
+
+I'm probably misunderstanding your point, sorry.  Could you point me
+to one of the places where there is the useless control that would go
+away if we add your proposed control inside bic_to_bfqq?  (of course
+apart form the above one, which seems to be the only one to me)
+
+> And for this line, I personally would prefer seeing something like:
+>=20
+> 		struct bfq_queue *bfqq;
+>=20
+>=20
+> 		if (bic)
+> 			bfqd =3D bic_to_bfqq(bic, op_is_sync(opf), =
+act_idx)
+> 		else
+> 			bfqd =3D NULL;
+>=20
+> Which is a lot simpler to read.
+>=20
+>=20
+
+Ok, as I have your blessing on this point, I'll send a V12 with also
+this change.
+
+Thanks,
+Paolo
+
+> --=20
+> Damien Le Moal
+> Western Digital Research
+>=20
+
