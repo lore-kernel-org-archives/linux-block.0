@@ -2,58 +2,149 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A2CF2C4167B
-	for <linux-block@archiver.kernel.org>; Wed, 21 Dec 2022 08:21:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AD703C10F1B
+	for <linux-block@archiver.kernel.org>; Wed, 21 Dec 2022 10:00:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229814AbiLUIVj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 21 Dec 2022 03:21:39 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52100 "EHLO
+        id S234654AbiLUKAn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 21 Dec 2022 05:00:43 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35040 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229612AbiLUIVh (ORCPT
+        with ESMTP id S234760AbiLUKAC (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 21 Dec 2022 03:21:37 -0500
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1006E8D;
-        Wed, 21 Dec 2022 00:21:35 -0800 (PST)
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id BFFC267373; Wed, 21 Dec 2022 09:21:31 +0100 (CET)
-Date:   Wed, 21 Dec 2022 09:21:31 +0100
-From:   Christoph Hellwig <hch@lst.de>
-To:     zhangyanjun@cestc.cn
-Cc:     sagi@grimberg.me, axboe@kernel.dk, kbusch@kernel.org, axboe@fb.com,
-        hch@lst.de, linux-kernel@vger.kernel.org,
-        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org
-Subject: Re: [PATCH v2] nvme: fix multipath crash caused by flush request
- when blktrace is enabled
-Message-ID: <20221221082131.GA23644@lst.de>
-References: <20221220063233.43932-1-zhangyanjun@cestc.cn>
+        Wed, 21 Dec 2022 05:00:02 -0500
+Received: from mout01.posteo.de (mout01.posteo.de [185.67.36.65])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6DFE222B0
+        for <linux-block@vger.kernel.org>; Wed, 21 Dec 2022 01:57:45 -0800 (PST)
+Received: from submission (posteo.de [185.67.36.169]) 
+        by mout01.posteo.de (Postfix) with ESMTPS id 4AD3F240029
+        for <linux-block@vger.kernel.org>; Wed, 21 Dec 2022 10:57:44 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=posteo.net; s=2017;
+        t=1671616664; bh=0SE2pIFPu1kPwESlbR+h5d7mIARIWSvOnvEjifJ0GbY=;
+        h=Date:From:To:Cc:Subject:From;
+        b=TIqDDGS3lIVOQVkAExmx37TcTDP328eW21gW5XC72f7pCHT4cNyDIFoKVvU6FfN8s
+         Uq0supD1kOMT/vR5KVol51TgSe+62zW5qYoXsakOB5Sh5qHx4G2DURxfeHYwdJfLWa
+         eZKobbNCfGvox5b75QGxx7IgPHu3C/6jlwcrf79tze39ZchELYHN2/F06dmwhUSFgP
+         EJtjyGlqsNpIja0WjDvTfh4dLilFfISefEffAVnMIKZTeCtbHgtO3Z6i+/ozkGU7CV
+         fDy/nRvDCNX5hndC5ZzWby+CWJvr6hQmWgU0yo/zBuGGomwJGcGBu7izJ+wJadhXYE
+         T0Pu5/nPCbJEg==
+Received: from customer (localhost [127.0.0.1])
+        by submission (posteo.de) with ESMTPSA id 4NcTQH2rPtz6tnY;
+        Wed, 21 Dec 2022 10:57:43 +0100 (CET)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221220063233.43932-1-zhangyanjun@cestc.cn>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Date:   Wed, 21 Dec 2022 09:57:43 +0000
+From:   danil.kipnis@posteo.net
+To:     Haris Iqbal <haris.iqbal@ionos.com>
+Cc:     Bart Van Assche <bvanassche@acm.org>, linux-rdma@vger.kernel.org,
+        linux-block@vger.kernel.org, Aleksei Marov <alexv.marov@gmail.com>,
+        Jinpu Wang <jinpu.wang@ionos.com>, leonro@nvidia.com,
+        jgg@nvidia.com
+Subject: Re: [RFC] Reliable Multicast on top of RTRS
+In-Reply-To: <CAJpMwyh-cihwNyMyTFE-f2HQqOnLydNB+TiGcq5UTMkgwU0yNA@mail.gmail.com>
+References: <CAHg0Huzvhg7ZizbCGQyyVNdnAWmQCsypRWvdBzm0GWwPzXD0dw@mail.gmail.com>
+ <3b2f6267-e7a0-4266-867d-b0109d5a7cb4@acm.org>
+ <CAHg0HuyGr8BfgBvXUG7N5WYyXKEzyh3i7eA=2XZxbW3zyXLTsA@mail.gmail.com>
+ <cc14aa58-254e-5c33-89ab-6f3900143164@acm.org>
+ <CAHg0Huw35m_WiwFqcTEHpCz94=JhaKZdEuV-F=aetQ_SEQgauA@mail.gmail.com>
+ <CAJpMwyh-cihwNyMyTFE-f2HQqOnLydNB+TiGcq5UTMkgwU0yNA@mail.gmail.com>
+Message-ID: <fff44726895096cc64079dae69a66f9e@posteo.net>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Just checking for ->bio seems to be:
+Hi Haris,
 
- - simpler
- - faster
+Thanks for pushing RMR forward! Lutz Pogrell and Alexei and you did a 
+huge amount of work. I'm honestly convinced RMR will be a very useful 
+extension for the kernel. It is currently used with a block client and a 
+block server. Haris already mentioned rbd and dm-thin as a different 
+potential pair of users. I'm still of the opinion that sched and mm 
+could be the most interesting users of rmr.
 
-and does not require block layer internals.  So why not just this:
+Looking forward to the github link,
+Cheers,
+Danil.
+
+P.S. BTW, where is my beloved libtbl?!
 
 
-diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
-index 6bbb73ef8b2548..424c8a467a0c2a 100644
---- a/drivers/nvme/host/nvme.h
-+++ b/drivers/nvme/host/nvme.h
-@@ -893,7 +893,7 @@ static inline void nvme_trace_bio_complete(struct request *req)
- {
- 	struct nvme_ns *ns = req->q->queuedata;
- 
--	if (req->cmd_flags & REQ_NVME_MPATH)
-+	if ((req->cmd_flags & REQ_NVME_MPATH) && req->bio)
- 		trace_block_bio_complete(ns->head->disk->queue, req->bio);
- }
- 
+On 21.11.2022 14:57, Haris Iqbal wrote:
+> Hey there,
+> 
+> We've got a prototype version working in-house. We've also implemented
+> a block device client and server. Another client and server could
+> probably be rbd and dm-thin. Will update as soon as we have a github
+> link.
+> 
+> Some technical details
+> 
+> - Ability to perform sync across storage nodes without the involvement
+> of the client.
+> 
+> - This helps performing sync, extending/adding legs/members without
+> the help of the client.
+> 
+> Candidate users
+> 
+> - We've implemented a stand-alone replicating block device. The client
+> is similar to the rnbd-clt and our own corresponding "store"/server
+> does linear mapping on the server side.
+> 
+> - rbd could be a client of rmr-clt. The rmr-srv (store) would talk to
+> lvm. rbd would provide the block device (over multiple objects) on the
+> client side. Lvm would function as the store on the server side. One
+> object would be stored on one dm-thin volume. rmr would provide for
+> the replication in the network.
+> 
+> Setups: RMR vs MD-RAID vs DRBD
+> 
+> - Active-active
+> 
+> - RMR as means of replication over network differs from the md-raid
+> configuration because sync traffic goes directly between servers. The
+> difference to the drbd setup is that the IO traffic goes to both legs
+> in a single hop.
+> 
+> How does RMR solve the activity log issue
+> 
+> - Synchronous replication; much like Protocol C of DRBD.
+> 
+> - RMR tracks all successful queue_depth (max number of IOs that can be
+> inflight at any moment) worth of last IOs on each storage node.
+> 
+> Best,
+> Haris
+> 
+> Signed-off: alexv.marov@gmail.com
+> Reviewed-by: danil.kipnis@posteo.net
+> 
+> On Sun, Nov 22, 2020 at 5:20 PM Danil Kipnis
+> <danil.kipnis@cloud.ionos.com> wrote:
+>> 
+>> On Fri, Sep 4, 2020 at 5:33 PM Bart Van Assche <bvanassche@acm.org> 
+>> wrote:
+>> >
+>> > On 2020-09-04 04:35, Danil Kipnis wrote:
+>> > > On Thu, Sep 3, 2020 at 1:07 AM Bart Van Assche <bvanassche@acm.org> wrote:
+>> > >> How will it be guaranteed that the resulting software does
+>> > >> not suffer from the problems that have been solved by the introduction
+>> > >> of the DRBD activity log
+>> > >> (https://www.linbit.com/drbd-user-guide/users-guide-drbd-8-4/#s-activity-log)?
+>> > >
+>> > > The above would require some kind of activity log also, I'm afraid.
+>> >
+>> > How about collaborating with the DRBD team? My concern is that otherwise
+>> > we will end up with two drivers in the kernel that implement block device
+>> > replication between servers connected over a network.
+>> 
+>> Will take a closer look at drbd,
+>> 
+>> Thank you,
+>> Danil.
+>> 
+>> >
+>> > Thanks,
+>> >
+>> > Bart.
