@@ -2,134 +2,441 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 616ACC4332F
-	for <linux-block@archiver.kernel.org>; Wed, 21 Dec 2022 03:24:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0099FC4332F
+	for <linux-block@archiver.kernel.org>; Wed, 21 Dec 2022 04:05:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234029AbiLUDYw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 20 Dec 2022 22:24:52 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44656 "EHLO
+        id S234370AbiLUEFr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 20 Dec 2022 23:05:47 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57712 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233726AbiLUDYv (ORCPT
+        with ESMTP id S234331AbiLUEFj (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 20 Dec 2022 22:24:51 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D4ED13E02
-        for <linux-block@vger.kernel.org>; Tue, 20 Dec 2022 19:24:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1671593044;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=qGspaHzQPxqTwdTzEM+6CxFY6yjXuHAKATnBqhR/cIw=;
-        b=ItIf7A/kSmEM080v167pyAImRjonYafxaH8lttBz4NKhzR53v2T1HrS1KaNUWm/YMlFBfS
-        oSNi0N55HR6pjh+It/i6xOWLmocd6R6mqCBF4To71/3G7UswBhlmm+somh9y470a1VPmdm
-        aq2II+lWqmIBszNOy6mtiVP9dWDhdnQ=
-Received: from mail-oa1-f72.google.com (mail-oa1-f72.google.com
- [209.85.160.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-17-T91siB0PMyStkIMrhEHiWA-1; Tue, 20 Dec 2022 22:24:03 -0500
-X-MC-Unique: T91siB0PMyStkIMrhEHiWA-1
-Received: by mail-oa1-f72.google.com with SMTP id 586e51a60fabf-1447ffe6046so6264143fac.3
-        for <linux-block@vger.kernel.org>; Tue, 20 Dec 2022 19:24:03 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=qGspaHzQPxqTwdTzEM+6CxFY6yjXuHAKATnBqhR/cIw=;
-        b=z728+Tiktas+icFoY4Wzzu9+M/nQaQNjFMwV3uZgqprbk+CQ6C3uAifIlwIAl654Ri
-         XnPinVLodoOV6p/Usd+2L9Qh7OMrtWn4u433ZD9h6Mn0LeQdika2s2NW+WSXYAIt6P2e
-         u+Vlyl55VUmu6tPHQsGVnQHoPlw+EGmI4gzzy/22zFXlZQl5LhFLnYiB/Hm+tHl8gSGz
-         YbQ9593egDA8KaKnDdjiMa0BYwT5Lhw4AVseobKkzVmPg0Ru0ScfzbgcF9D4VmJM/3a2
-         k6LnDkivxtrJ2khz4gYeRNBZzkw5LaLugZFdGOFCfu2sEwnUkshRf6IOvEPRwXYnp7hV
-         nyuQ==
-X-Gm-Message-State: AFqh2kplBUSuK6OUeXSYleJT3FPxRyTwwums6nk5et9RhxT+bS9XPYNc
-        Dlnq+0M7p/vLmWk61TMqzIpA1N+1PhcXM3hHElW6gPDEU46G9jBj//IKD9kxCF0NPQoqfbYGXEU
-        J1vER31W3RHp4/gjbb0VJ+aRS5R/ZaiQ9bWzoQec=
-X-Received: by 2002:a9d:7843:0:b0:678:1eb4:3406 with SMTP id c3-20020a9d7843000000b006781eb43406mr25000otm.237.1671593042446;
-        Tue, 20 Dec 2022 19:24:02 -0800 (PST)
-X-Google-Smtp-Source: AMrXdXu6qY57e2GgcRHWrfthleF4uh/gauFFEArM3SE5nEJmGcPQ8lmsJLiuqe4JznhtR/YQJA67yWVZFf3UWvSworo=
-X-Received: by 2002:a9d:7843:0:b0:678:1eb4:3406 with SMTP id
- c3-20020a9d7843000000b006781eb43406mr24997otm.237.1671593042237; Tue, 20 Dec
- 2022 19:24:02 -0800 (PST)
+        Tue, 20 Dec 2022 23:05:39 -0500
+Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18C5615FEB;
+        Tue, 20 Dec 2022 20:05:30 -0800 (PST)
+Received: from pps.filterd (m0246629.ppops.net [127.0.0.1])
+        by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2BL0ic2a026008;
+        Wed, 21 Dec 2022 04:05:11 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-transfer-encoding;
+ s=corp-2022-7-12; bh=qCow3b3gBADi4XqwH0quFWwnLvaIoVCqn4xVVehDvWU=;
+ b=1AizXW7rOjlHvTJa6C+WATR+YF6tw+ISvZJMWa4JWXCHohUTDDrHCnK6lv2MODXz7p07
+ IgjCTyHjZE9BRHiJ+q2c6msV3tnOXdboi86jpQvXIkSKWPTedKt4Urf8hYIAvW7glRbS
+ JiwdMt0XDabUHVQTHqWP/3hcN2erqokh0F4eeYu8KbG5pnPdYAyuzDIt10EAWjmNhLGF
+ 1sUKh+yOaQcm36pIjRbq/hE2DcCe8lRxYBbkSzdWGZGBjlAxLAP6fs4vCZO6MeL7frW1
+ ww/HsxLt7JsCL9d0f2Qoh+QlZ10AFAnAqywdQ3WZcLExSWvLBEUSngsO0j2LzSV8QYUi OQ== 
+Received: from phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta02.appoci.oracle.com [147.154.114.232])
+        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3mh6tp7tr6-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 21 Dec 2022 04:05:11 +0000
+Received: from pps.filterd (phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+        by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (8.17.1.5/8.17.1.5) with ESMTP id 2BL1BDLx003525;
+        Wed, 21 Dec 2022 04:05:10 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+        by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 3mh476294c-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 21 Dec 2022 04:05:10 +0000
+Received: from phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2BL459MA023735;
+        Wed, 21 Dec 2022 04:05:09 GMT
+Received: from bm-iostat-test-2.osdevelopmeniad.oraclevcn.com (bm-iostat-test-2.allregionaliads.osdevelopmeniad.oraclevcn.com [100.100.255.177])
+        by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTP id 3mh4762924-1;
+        Wed, 21 Dec 2022 04:05:09 +0000
+From:   Gulam Mohamed <gulam.mohamed@oracle.com>
+To:     linux-block@vger.kernel.org
+Cc:     axboe@kernel.dk, philipp.reisner@linbit.com,
+        lars.ellenberg@linbit.com, christoph.boehmwalder@linbit.com,
+        minchan@kernel.org, ngupta@vflare.org, senozhatsky@chromium.org,
+        colyli@suse.de, kent.overstreet@gmail.com, agk@redhat.com,
+        snitzer@kernel.org, dm-devel@redhat.com, song@kernel.org,
+        dan.j.williams@intel.com, vishal.l.verma@intel.com,
+        dave.jiang@intel.com, ira.weiny@intel.com, junxiao.bi@oracle.com,
+        gulam.mohamed@oracle.com, martin.petersen@oracle.com,
+        kch@nvidia.com, drbd-dev@lists.linbit.com,
+        linux-kernel@vger.kernel.org, linux-bcache@vger.kernel.org,
+        linux-raid@vger.kernel.org, nvdimm@lists.linux.dev,
+        konrad.wilk@oracle.com, joe.jin@oracle.com,
+        rajesh.sivaramasubramaniom@oracle.com, shminderjit.singh@oracle.com
+Subject: [PATCH for-6.2/block V3 1/2] block: Data type conversion for IO accounting
+Date:   Wed, 21 Dec 2022 04:05:05 +0000
+Message-Id: <20221221040506.1174644-1-gulam.mohamed@oracle.com>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-References: <20221220112340.518841-1-mst@redhat.com>
-In-Reply-To: <20221220112340.518841-1-mst@redhat.com>
-From:   Jason Wang <jasowang@redhat.com>
-Date:   Wed, 21 Dec 2022 11:23:51 +0800
-Message-ID: <CACGkMEvwwBSkeUaOJKYB2VTc0HT60sWfLFSNwcrEzyDWu9Aj2g@mail.gmail.com>
-Subject: Re: [PATCH] virtio-blk: fix probe without CONFIG_BLK_DEV_ZONED
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     linux-kernel@vger.kernel.org,
-        Anders Roxell <anders.roxell@linaro.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        virtualization@lists.linux-foundation.org,
-        linux-block@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.923,Hydra:6.0.545,FMLib:17.11.122.1
+ definitions=2022-12-21_01,2022-12-20_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 phishscore=0 suspectscore=0
+ adultscore=0 malwarescore=0 spamscore=0 mlxlogscore=999 mlxscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2212070000
+ definitions=main-2212210027
+X-Proofpoint-GUID: wDgeMj7pcM-YvdFbu7xUMiWUgEUFWRds
+X-Proofpoint-ORIG-GUID: wDgeMj7pcM-YvdFbu7xUMiWUgEUFWRds
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Dec 20, 2022 at 7:23 PM Michael S. Tsirkin <mst@redhat.com> wrote:
->
-> When building without CONFIG_BLK_DEV_ZONED, VIRTIO_BLK_F_ZONED
-> is excluded from array of driver features.
-> As a result virtio_has_feature panics in virtio_check_driver_offered_feature
-> since that by design verifies that a feature we are checking for
-> is listed in the feature array.
->
-> To fix, replace the call to virtio_has_feature with a stub.
->
-> Tested-by: Anders Roxell <anders.roxell@linaro.org>
-> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+Change the data type of start and end time IO accounting variables in,
+block layer, from "unsigned long" to "u64". This is to enable nano-seconds
+granularity, in next commit, for the devices whose latency is less than
+milliseconds.
 
-Acked-by: Jason Wang <jasowang@redhat.com>
+Changes from V2 to V3
+=====================
+1. Changed all the required variables data-type to u64 as part of this
+   first patch
+2. Create a new setting '2' for iostats in sysfs in next patch
+3. Change the code to get the ktime values when iostat=2 in next patch
 
-Thanks
+Signed-off-by: Gulam Mohamed <gulam.mohamed@oracle.com>
+---
+ block/blk-core.c              | 24 ++++++++++++------------
+ block/blk.h                   |  2 +-
+ drivers/block/drbd/drbd_int.h |  2 +-
+ drivers/block/zram/zram_drv.c |  4 ++--
+ drivers/md/bcache/request.c   | 10 +++++-----
+ drivers/md/dm-core.h          |  2 +-
+ drivers/md/dm.c               |  2 +-
+ drivers/md/md.h               |  2 +-
+ drivers/md/raid1.h            |  2 +-
+ drivers/md/raid10.h           |  2 +-
+ drivers/md/raid5.c            |  2 +-
+ drivers/nvdimm/btt.c          |  2 +-
+ drivers/nvdimm/pmem.c         |  2 +-
+ include/linux/blk_types.h     |  2 +-
+ include/linux/blkdev.h        | 12 ++++++------
+ include/linux/part_stat.h     |  2 +-
+ 16 files changed, 37 insertions(+), 37 deletions(-)
 
-> ---
->  drivers/block/virtio_blk.c | 11 ++++++++++-
->  1 file changed, 10 insertions(+), 1 deletion(-)
->
-> diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-> index 88b3639f8536..5ea1dc882a80 100644
-> --- a/drivers/block/virtio_blk.c
-> +++ b/drivers/block/virtio_blk.c
-> @@ -760,6 +760,10 @@ static int virtblk_probe_zoned_device(struct virtio_device *vdev,
->         return ret;
->  }
->
-> +static inline bool virtblk_has_zoned_feature(struct virtio_device *vdev)
-> +{
-> +       return virtio_has_feature(vdev, VIRTIO_BLK_F_ZONED);
-> +}
->  #else
->
->  /*
-> @@ -775,6 +779,11 @@ static inline int virtblk_probe_zoned_device(struct virtio_device *vdev,
->  {
->         return -EOPNOTSUPP;
->  }
-> +
-> +static inline bool virtblk_has_zoned_feature(struct virtio_device *vdev)
-> +{
-> +       return false;
-> +}
->  #endif /* CONFIG_BLK_DEV_ZONED */
->
->  /* return id (s/n) string for *disk to *id_str
-> @@ -1480,7 +1489,7 @@ static int virtblk_probe(struct virtio_device *vdev)
->         virtblk_update_capacity(vblk, false);
->         virtio_device_ready(vdev);
->
-> -       if (virtio_has_feature(vdev, VIRTIO_BLK_F_ZONED)) {
-> +       if (virtblk_has_zoned_feature(vdev)) {
->                 err = virtblk_probe_zoned_device(vdev, vblk, q);
->                 if (err)
->                         goto out_cleanup_disk;
-> --
-> MST
->
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 8ab21dd01cd1..5670032fe932 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -927,13 +927,13 @@ int iocb_bio_iopoll(struct kiocb *kiocb, struct io_comp_batch *iob,
+ }
+ EXPORT_SYMBOL_GPL(iocb_bio_iopoll);
+ 
+-void update_io_ticks(struct block_device *part, unsigned long now, bool end)
++void update_io_ticks(struct block_device *part, u64 now, bool end)
+ {
+-	unsigned long stamp;
++	u64 stamp;
+ again:
+ 	stamp = READ_ONCE(part->bd_stamp);
+-	if (unlikely(time_after(now, stamp))) {
+-		if (likely(try_cmpxchg(&part->bd_stamp, &stamp, now)))
++	if (unlikely(time_after64(now, stamp))) {
++		if (likely(try_cmpxchg64(&part->bd_stamp, &stamp, now)))
+ 			__part_stat_add(part, io_ticks, end ? now - stamp : 1);
+ 	}
+ 	if (part->bd_partno) {
+@@ -942,9 +942,9 @@ void update_io_ticks(struct block_device *part, unsigned long now, bool end)
+ 	}
+ }
+ 
+-unsigned long bdev_start_io_acct(struct block_device *bdev,
+-				 unsigned int sectors, enum req_op op,
+-				 unsigned long start_time)
++u64 bdev_start_io_acct(struct block_device *bdev,
++			unsigned int sectors, enum req_op op,
++			u64 start_time)
+ {
+ 	const int sgrp = op_stat_group(op);
+ 
+@@ -965,7 +965,7 @@ EXPORT_SYMBOL(bdev_start_io_acct);
+  *
+  * Returns the start time that should be passed back to bio_end_io_acct().
+  */
+-unsigned long bio_start_io_acct(struct bio *bio)
++u64 bio_start_io_acct(struct bio *bio)
+ {
+ 	return bdev_start_io_acct(bio->bi_bdev, bio_sectors(bio),
+ 				  bio_op(bio), jiffies);
+@@ -973,11 +973,11 @@ unsigned long bio_start_io_acct(struct bio *bio)
+ EXPORT_SYMBOL_GPL(bio_start_io_acct);
+ 
+ void bdev_end_io_acct(struct block_device *bdev, enum req_op op,
+-		      unsigned long start_time)
++		      u64 start_time)
+ {
+ 	const int sgrp = op_stat_group(op);
+-	unsigned long now = READ_ONCE(jiffies);
+-	unsigned long duration = now - start_time;
++	u64 now = READ_ONCE(jiffies);
++	u64 duration = (unsigned long)now -(unsigned long) start_time;
+ 
+ 	part_stat_lock();
+ 	update_io_ticks(bdev, now, true);
+@@ -987,7 +987,7 @@ void bdev_end_io_acct(struct block_device *bdev, enum req_op op,
+ }
+ EXPORT_SYMBOL(bdev_end_io_acct);
+ 
+-void bio_end_io_acct_remapped(struct bio *bio, unsigned long start_time,
++void bio_end_io_acct_remapped(struct bio *bio, u64 start_time,
+ 			      struct block_device *orig_bdev)
+ {
+ 	bdev_end_io_acct(orig_bdev, bio_op(bio), start_time);
+diff --git a/block/blk.h b/block/blk.h
+index 8900001946c7..8997435ad4a0 100644
+--- a/block/blk.h
++++ b/block/blk.h
+@@ -341,7 +341,7 @@ static inline bool blk_do_io_stat(struct request *rq)
+ 	return (rq->rq_flags & RQF_IO_STAT) && !blk_rq_is_passthrough(rq);
+ }
+ 
+-void update_io_ticks(struct block_device *part, unsigned long now, bool end);
++void update_io_ticks(struct block_device *part, u64 now, bool end);
+ 
+ static inline void req_set_nomerge(struct request_queue *q, struct request *req)
+ {
+diff --git a/drivers/block/drbd/drbd_int.h b/drivers/block/drbd/drbd_int.h
+index ae713338aa46..8e4d3b2eb99d 100644
+--- a/drivers/block/drbd/drbd_int.h
++++ b/drivers/block/drbd/drbd_int.h
+@@ -236,7 +236,7 @@ struct drbd_request {
+ 	struct list_head req_pending_local;
+ 
+ 	/* for generic IO accounting */
+-	unsigned long start_jif;
++	u64 start_jif;
+ 
+ 	/* for DRBD internal statistics */
+ 
+diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
+index 966aab902d19..da28eb83e6ed 100644
+--- a/drivers/block/zram/zram_drv.c
++++ b/drivers/block/zram/zram_drv.c
+@@ -1581,7 +1581,7 @@ static void __zram_make_request(struct zram *zram, struct bio *bio)
+ 	u32 index;
+ 	struct bio_vec bvec;
+ 	struct bvec_iter iter;
+-	unsigned long start_time;
++	u64 start_time;
+ 
+ 	index = bio->bi_iter.bi_sector >> SECTORS_PER_PAGE_SHIFT;
+ 	offset = (bio->bi_iter.bi_sector &
+@@ -1662,7 +1662,7 @@ static int zram_rw_page(struct block_device *bdev, sector_t sector,
+ 	u32 index;
+ 	struct zram *zram;
+ 	struct bio_vec bv;
+-	unsigned long start_time;
++	u64 start_time;
+ 
+ 	if (PageTransHuge(page))
+ 		return -ENOTSUPP;
+diff --git a/drivers/md/bcache/request.c b/drivers/md/bcache/request.c
+index 39c7b607f8aa..1f9bd20dcdcf 100644
+--- a/drivers/md/bcache/request.c
++++ b/drivers/md/bcache/request.c
+@@ -476,7 +476,7 @@ struct search {
+ 	unsigned int		cache_missed:1;
+ 
+ 	struct block_device	*orig_bdev;
+-	unsigned long		start_time;
++	u64			start_time;
+ 
+ 	struct btree_op		op;
+ 	struct data_insert_op	iop;
+@@ -714,7 +714,7 @@ static void search_free(struct closure *cl)
+ 
+ static inline struct search *search_alloc(struct bio *bio,
+ 		struct bcache_device *d, struct block_device *orig_bdev,
+-		unsigned long start_time)
++		u64 start_time)
+ {
+ 	struct search *s;
+ 
+@@ -1065,7 +1065,7 @@ static void cached_dev_nodata(struct closure *cl)
+ 
+ struct detached_dev_io_private {
+ 	struct bcache_device	*d;
+-	unsigned long		start_time;
++	u64			start_time;
+ 	bio_end_io_t		*bi_end_io;
+ 	void			*bi_private;
+ 	struct block_device	*orig_bdev;
+@@ -1094,7 +1094,7 @@ static void detached_dev_end_io(struct bio *bio)
+ }
+ 
+ static void detached_dev_do_request(struct bcache_device *d, struct bio *bio,
+-		struct block_device *orig_bdev, unsigned long start_time)
++		struct block_device *orig_bdev, u64 start_time)
+ {
+ 	struct detached_dev_io_private *ddip;
+ 	struct cached_dev *dc = container_of(d, struct cached_dev, disk);
+@@ -1173,7 +1173,7 @@ void cached_dev_submit_bio(struct bio *bio)
+ 	struct block_device *orig_bdev = bio->bi_bdev;
+ 	struct bcache_device *d = orig_bdev->bd_disk->private_data;
+ 	struct cached_dev *dc = container_of(d, struct cached_dev, disk);
+-	unsigned long start_time;
++	u64    start_time;
+ 	int rw = bio_data_dir(bio);
+ 
+ 	if (unlikely((d->c && test_bit(CACHE_SET_IO_DISABLE, &d->c->flags)) ||
+diff --git a/drivers/md/dm-core.h b/drivers/md/dm-core.h
+index 6c6bd24774f2..e620fd878b08 100644
+--- a/drivers/md/dm-core.h
++++ b/drivers/md/dm-core.h
+@@ -284,7 +284,7 @@ struct dm_io {
+ 	unsigned short magic;
+ 	blk_short_t flags;
+ 	spinlock_t lock;
+-	unsigned long start_time;
++	u64 start_time;
+ 	void *data;
+ 	struct dm_io *next;
+ 	struct dm_stats_aux stats_aux;
+diff --git a/drivers/md/dm.c b/drivers/md/dm.c
+index e1ea3a7bd9d9..011a85ea40da 100644
+--- a/drivers/md/dm.c
++++ b/drivers/md/dm.c
+@@ -494,7 +494,7 @@ static bool bio_is_flush_with_data(struct bio *bio)
+ static void dm_io_acct(struct dm_io *io, bool end)
+ {
+ 	struct dm_stats_aux *stats_aux = &io->stats_aux;
+-	unsigned long start_time = io->start_time;
++	u64 start_time = io->start_time;
+ 	struct mapped_device *md = io->md;
+ 	struct bio *bio = io->orig_bio;
+ 	unsigned int sectors;
+diff --git a/drivers/md/md.h b/drivers/md/md.h
+index 554a9026669a..df73c1d1d960 100644
+--- a/drivers/md/md.h
++++ b/drivers/md/md.h
+@@ -711,7 +711,7 @@ struct md_thread {
+ 
+ struct md_io_acct {
+ 	struct bio *orig_bio;
+-	unsigned long start_time;
++	u64 start_time;
+ 	struct bio bio_clone;
+ };
+ 
+diff --git a/drivers/md/raid1.h b/drivers/md/raid1.h
+index ebb6788820e7..0fb5a1148745 100644
+--- a/drivers/md/raid1.h
++++ b/drivers/md/raid1.h
+@@ -157,7 +157,7 @@ struct r1bio {
+ 	sector_t		sector;
+ 	int			sectors;
+ 	unsigned long		state;
+-	unsigned long		start_time;
++	u64			start_time;
+ 	struct mddev		*mddev;
+ 	/*
+ 	 * original bio going to /dev/mdx
+diff --git a/drivers/md/raid10.h b/drivers/md/raid10.h
+index 8c072ce0bc54..4cf3eec89bf3 100644
+--- a/drivers/md/raid10.h
++++ b/drivers/md/raid10.h
+@@ -123,7 +123,7 @@ struct r10bio {
+ 	sector_t		sector;	/* virtual sector number */
+ 	int			sectors;
+ 	unsigned long		state;
+-	unsigned long		start_time;
++	u64			start_time;
+ 	struct mddev		*mddev;
+ 	/*
+ 	 * original bio going to /dev/mdx
+diff --git a/drivers/md/raid5.c b/drivers/md/raid5.c
+index 7b820b81d8c2..8f4364f4bda0 100644
+--- a/drivers/md/raid5.c
++++ b/drivers/md/raid5.c
+@@ -5474,7 +5474,7 @@ static void raid5_align_endio(struct bio *bi)
+ 	struct r5conf *conf;
+ 	struct md_rdev *rdev;
+ 	blk_status_t error = bi->bi_status;
+-	unsigned long start_time = md_io_acct->start_time;
++	u64 start_time = md_io_acct->start_time;
+ 
+ 	bio_put(bi);
+ 
+diff --git a/drivers/nvdimm/btt.c b/drivers/nvdimm/btt.c
+index 0297b7882e33..8fc1d5da747c 100644
+--- a/drivers/nvdimm/btt.c
++++ b/drivers/nvdimm/btt.c
+@@ -1442,7 +1442,7 @@ static void btt_submit_bio(struct bio *bio)
+ 	struct bio_integrity_payload *bip = bio_integrity(bio);
+ 	struct btt *btt = bio->bi_bdev->bd_disk->private_data;
+ 	struct bvec_iter iter;
+-	unsigned long start;
++	u64 start;
+ 	struct bio_vec bvec;
+ 	int err = 0;
+ 	bool do_acct;
+diff --git a/drivers/nvdimm/pmem.c b/drivers/nvdimm/pmem.c
+index 96e6e9a5f235..b5b7a709e1ab 100644
+--- a/drivers/nvdimm/pmem.c
++++ b/drivers/nvdimm/pmem.c
+@@ -202,7 +202,7 @@ static void pmem_submit_bio(struct bio *bio)
+ 	int ret = 0;
+ 	blk_status_t rc = 0;
+ 	bool do_acct;
+-	unsigned long start;
++	u64 start;
+ 	struct bio_vec bvec;
+ 	struct bvec_iter iter;
+ 	struct pmem_device *pmem = bio->bi_bdev->bd_disk->private_data;
+diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+index 99be590f952f..d3386ac3b470 100644
+--- a/include/linux/blk_types.h
++++ b/include/linux/blk_types.h
+@@ -41,7 +41,7 @@ struct block_device {
+ 	sector_t		bd_start_sect;
+ 	sector_t		bd_nr_sectors;
+ 	struct disk_stats __percpu *bd_stats;
+-	unsigned long		bd_stamp;
++	u64			bd_stamp;
+ 	bool			bd_read_only;	/* read-only policy */
+ 	dev_t			bd_dev;
+ 	atomic_t		bd_openers;
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 2db2ad72af0f..ca94d690d292 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -1433,14 +1433,14 @@ static inline void blk_wake_io_task(struct task_struct *waiter)
+ 		wake_up_process(waiter);
+ }
+ 
+-unsigned long bdev_start_io_acct(struct block_device *bdev,
++u64 bdev_start_io_acct(struct block_device *bdev,
+ 				 unsigned int sectors, enum req_op op,
+-				 unsigned long start_time);
++				 u64 start_time);
+ void bdev_end_io_acct(struct block_device *bdev, enum req_op op,
+-		unsigned long start_time);
++		u64 start_time);
+ 
+-unsigned long bio_start_io_acct(struct bio *bio);
+-void bio_end_io_acct_remapped(struct bio *bio, unsigned long start_time,
++u64 bio_start_io_acct(struct bio *bio);
++void bio_end_io_acct_remapped(struct bio *bio, u64 start_time,
+ 		struct block_device *orig_bdev);
+ 
+ /**
+@@ -1448,7 +1448,7 @@ void bio_end_io_acct_remapped(struct bio *bio, unsigned long start_time,
+  * @bio:	bio to end account for
+  * @start_time:	start time returned by bio_start_io_acct()
+  */
+-static inline void bio_end_io_acct(struct bio *bio, unsigned long start_time)
++static inline void bio_end_io_acct(struct bio *bio, u64 start_time)
+ {
+ 	return bio_end_io_acct_remapped(bio, start_time, bio->bi_bdev);
+ }
+diff --git a/include/linux/part_stat.h b/include/linux/part_stat.h
+index abeba356bc3f..85c50235693c 100644
+--- a/include/linux/part_stat.h
++++ b/include/linux/part_stat.h
+@@ -10,7 +10,7 @@ struct disk_stats {
+ 	unsigned long sectors[NR_STAT_GROUPS];
+ 	unsigned long ios[NR_STAT_GROUPS];
+ 	unsigned long merges[NR_STAT_GROUPS];
+-	unsigned long io_ticks;
++	u64 io_ticks;
+ 	local_t in_flight[2];
+ };
+ 
+-- 
+2.31.1
 
