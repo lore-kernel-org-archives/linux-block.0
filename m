@@ -2,300 +2,66 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BEBCC4332F
-	for <linux-block@archiver.kernel.org>; Wed, 21 Dec 2022 10:43:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77568C4332F
+	for <linux-block@archiver.kernel.org>; Wed, 21 Dec 2022 10:46:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229881AbiLUKnE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 21 Dec 2022 05:43:04 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56538 "EHLO
+        id S234535AbiLUKqP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 21 Dec 2022 05:46:15 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57746 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229558AbiLUKnA (ORCPT
+        with ESMTP id S234516AbiLUKqI (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 21 Dec 2022 05:43:00 -0500
-Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 01BB6DEA3
-        for <linux-block@vger.kernel.org>; Wed, 21 Dec 2022 02:42:58 -0800 (PST)
-Received: by mail-pf1-x42a.google.com with SMTP id a14so10413856pfa.1
-        for <linux-block@vger.kernel.org>; Wed, 21 Dec 2022 02:42:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance-com.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=EXjeVHBjgltp+/cJKno9ptSj0CNQ0nCLFPpP59WHeTg=;
-        b=v2cmregMrOgOmaHu3rRG6LJSTP80ziH9u8gUdncnLU79cFiheMn2QQheiuo3ocdciu
-         MoE7g+CJ6bnGGTrRdEfJ1DOWfANVEQ0wOVgz6esUHbzhcBt57qEtkghDqYw5C5K0ax4q
-         Ex+Q+PBasUjQmEPgCtc7LwDSNazovn2cFMY8LLJ3WdjzhvtECGxD2Cnio5A7278uXSty
-         X6VUExuPNhGkYVotqXKqymLbxbDCqavFKx5vMWL+PjyeSEobhwVm4uEt0iDGeJHnvsjE
-         J9SWzOUy6OPC7wqZLlEBLHpLo0vOdh5C0oGqDpEKfCH2HFK3t+HuMJflxn7f7IkqwEPX
-         bAbA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=EXjeVHBjgltp+/cJKno9ptSj0CNQ0nCLFPpP59WHeTg=;
-        b=gTykNqkR0fHyKSt3YlVU6EGKI/2/cCkyrP52Hq09IrYQF7xaJndTBxKDVvzc82w+QT
-         Rc5PueCu+n+hLusAVmcx+xKQY3cdLd+FC7UJN71dGjDrcgAt5kCycj6MT4+kQ6SCOa1R
-         JHuwnx7GrVyUOPrgIRiwkjXkkkSjCDdFgzhVXvuOvpXxVj2p3W1N0UkEWmJHeRNEUtuT
-         PJVSszyGveh5wpsgyrg8ugHUwv+0PQFh4l2ZTi49mFGKHeu3p6gfpU6qs8966LQqRQ12
-         ogZbUtY8timF8jE8Z2hckdOsE2IREV/Fh2rsrzFrabapuGP2DLjsoFqPx0Ne1SwPI7c/
-         FLAw==
-X-Gm-Message-State: AFqh2kqcJYaj2ZqYjlU6lEG74pL6hkV6S5/obmDpX4wDn25quzUoSCaU
-        PAuUeDb3rYVcsTJmyGqJAzpDew==
-X-Google-Smtp-Source: AMrXdXvVQfDhNobuiWiV0jGOoH6nE3BdmpChsGX9GzVDDQ5O8riwb3fnkQyQ5VOCtjokG5LprMgrmQ==
-X-Received: by 2002:a62:2903:0:b0:57f:f2cd:6180 with SMTP id p3-20020a622903000000b0057ff2cd6180mr2006841pfp.0.1671619377258;
-        Wed, 21 Dec 2022 02:42:57 -0800 (PST)
-Received: from localhost.localdomain ([139.177.225.249])
-        by smtp.gmail.com with ESMTPSA id q15-20020aa7982f000000b00576f9773c80sm10243469pfl.206.2022.12.21.02.42.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 21 Dec 2022 02:42:56 -0800 (PST)
-From:   Jinke Han <hanjinke.666@bytedance.com>
-X-Google-Original-From: Jinke Han <hnajinke.666@bytedance>
-To:     tj@kernel.org, josef@toxicpanda.com, axboe@kernel.dk
-Cc:     cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, yinxin.x@bytedance.com,
-        Jinke Han <hanjinke.666@bytedance.com>
-Subject: [PATCH v2] blk-throtl: Introduce sync and async queues for blk-throtl
-Date:   Wed, 21 Dec 2022 18:42:46 +0800
-Message-Id: <20221221104246.37714-1-hanjinke.666@bytedance.com>
-X-Mailer: git-send-email 2.32.0 (Apple Git-132)
-In-Reply-To: <20221218111314.55525-1-hanjinke.666@bytedance.com>
-References: <20221218111314.55525-1-hanjinke.666@bytedance.com>
+        Wed, 21 Dec 2022 05:46:08 -0500
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1369A6540
+        for <linux-block@vger.kernel.org>; Wed, 21 Dec 2022 02:46:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=NVvTHYKeGOdR2VjTX4ZINnL+ls5shgZj5qyaSyTHOso=; b=UjLea5MbYfKKu+BxOeWIyiUJOw
+        y9PWEd7zrR35TmWg3MjBXnWhTlx6jvUlS6zpKKCqY+dxBMM4h0iqEuprKh5xoNJtxxAVkTiYySt6e
+        LJcBlicIObQF8sZz/HLOy6xRfeQn5bsUXKA0s4ObcldaOp+Nxcwp+NbTntiarKkJArC5Wiy9kjl10
+        kDWBqpLwhVbXAOtbeC92N03/syW8vIXNPsaJpZCYMPqUs2W5L97Xam62wLSHmeYa/Y9Rs3QIUglQd
+        vACdyfk5f61E5w/8jNndzyqvnRmib1IqfWss/R5YGH9ehX7EEGcrVllLcQZ0bznb2wNYwsg+3quuC
+        WerSqOzQ==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1p7wbl-00DefD-Vm; Wed, 21 Dec 2022 10:45:58 +0000
+Date:   Wed, 21 Dec 2022 02:45:57 -0800
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Suwan Kim <suwan.kim027@gmail.com>
+Cc:     mst@redhat.com, jasowang@redhat.com, stefanha@redhat.com,
+        pbonzini@redhat.com, hch@infradead.org, axboe@kernel.dk,
+        virtualization@lists.linux-foundation.org,
+        linux-block@vger.kernel.org
+Subject: Re: [PATCH v2 1/2] virtio-blk: set req->state to MQ_RQ_COMPLETE
+ after polling I/O is finished
+Message-ID: <Y6Lj5QcLFP87a4d9@infradead.org>
+References: <20221220153613.21675-1-suwan.kim027@gmail.com>
+ <20221220153613.21675-2-suwan.kim027@gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221220153613.21675-2-suwan.kim027@gmail.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Jinke Han <hanjinke.666@bytedance.com>
+On Wed, Dec 21, 2022 at 12:36:12AM +0900, Suwan Kim wrote:
+> Driver should set req->state to MQ_RQ_COMPLETE after it finishes to process
+> req. But virtio-blk doesn't set MQ_RQ_COMPLETE after virtblk_poll() handles
+> req and req->state still remains MQ_RQ_IN_FLIGHT. Fortunately so far there
+> is no issue about it because blk_mq_end_request_batch() sets req->state to
+> MQ_RQ_IDLE.
+> 
+> In this patch, virblk_poll() calls blk_mq_complete_request_remote() to set
+> req->state to MQ_RQ_COMPLETE before it adds req to a batch completion list.
+> So it properly sets req->state after polling I/O is finished.
+> 
+> Fixes: 4e0400525691 ("virtio-blk: support polling I/O")
+> Signed-off-by: Suwan Kim <suwan.kim027@gmail.com>
 
-Now we don't distinguish sync write ios from normal buffer write ios
-in blk-throtl. A bio with REQ_SYNC tagged always mean it will be wait
-until write completion soon after it submit. So it's reasonable for sync
-io to complete as soon as possible.
+Looks good:
 
-In our test, fio writes a 100g file in sequential 4k blocksize in
-a container with low bps limit configured (wbps=10M). More than 1200
-ios were throttled in blk-throtl queue and the avarage throtle time
-of each io is 140s. At the same time, the operation of saving a small
-file by vim will be blocked amolst 140s. As a fsync will be send by vim,
-the sync ios of fsync will be blocked by a huge amount of buffer write
-ios ahead. This is also a priority inversion problem within one cgroup.
-In the database scene, things got really bad with blk-throtle enabled
-as fsync is called very often.
-
-This patch splits bio queue into sync and async queues for blk-throtl
-and gives a huge priority to sync write ios. Sync queue only make sense
-for write ios as we treat all read io as sync io. I think it's a nice
-respond to the semantics of REQ_SYNC. Bios with REQ_META and REQ_PRIO
-gains the same priority as they are important to fs. This may avoid
-some potential priority inversion problems.
-
-With this patch, do the same test above, the duration of the fsync sent
-by vim drops to servral hundreds of milliseconds.
-
-Signed-off-by: Jinke Han <hanjinke.666@bytedance.com>
-Signed-off-by: Xin Yin <yinxin.x@bytedance.com>
----
-
-Changes in v2:
-- Make the code more simple
-
- block/blk-throttle.c | 105 +++++++++++++++++++++++++++++++++++++++----
- block/blk-throttle.h |  12 ++++-
- 2 files changed, 108 insertions(+), 9 deletions(-)
-
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index 847721dc2b2b..f3285c7da9f7 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -21,6 +21,13 @@
- /* Total max dispatch from all groups in one round */
- #define THROTL_QUANTUM 32
- 
-+/* For write ios, dispatch 4 sync ios and 1 normal io in one loop */
-+#define THROTL_SYNC_FACTOR 4
-+
-+/* Only make sense for write ios, all read ios are treated as SYNC */
-+#define SYNC	0
-+#define ASYNC	1
-+
- /* Throttling is performed over a slice and after that slice is renewed */
- #define DFL_THROTL_SLICE_HD (HZ / 10)
- #define DFL_THROTL_SLICE_SSD (HZ / 50)
-@@ -241,11 +248,27 @@ static inline unsigned int throtl_bio_data_size(struct bio *bio)
- 	return bio->bi_iter.bi_size;
- }
- 
--static void throtl_qnode_init(struct throtl_qnode *qn, struct throtl_grp *tg)
-+static void throtl_qnode_init(struct throtl_qnode *qn, struct throtl_grp *tg,
-+			      bool rw)
- {
- 	INIT_LIST_HEAD(&qn->node);
--	bio_list_init(&qn->bios);
-+	bio_list_init(&qn->bios[SYNC]);
-+	bio_list_init(&qn->bios[ASYNC]);
- 	qn->tg = tg;
-+	qn->dispatch_sync_cnt = (rw == READ) ? UINT_MAX : 0;
-+}
-+
-+#define BLK_THROTL_SYNC(bio) (bio->bi_opf & (REQ_SYNC | REQ_META | REQ_PRIO))
-+
-+static inline void throtl_qnode_add_bio_list(struct throtl_qnode *qn,
-+					     struct bio *bio)
-+{
-+	bool rw = bio_data_dir(bio);
-+
-+	if ((rw == READ) || BLK_THROTL_SYNC(bio))
-+		bio_list_add(&qn->bios[SYNC], bio);
-+	else
-+		bio_list_add(&qn->bios[ASYNC], bio);
- }
- 
- /**
-@@ -261,13 +284,34 @@ static void throtl_qnode_init(struct throtl_qnode *qn, struct throtl_grp *tg)
- static void throtl_qnode_add_bio(struct bio *bio, struct throtl_qnode *qn,
- 				 struct list_head *queued)
- {
--	bio_list_add(&qn->bios, bio);
-+	throtl_qnode_add_bio_list(qn, bio);
- 	if (list_empty(&qn->node)) {
- 		list_add_tail(&qn->node, queued);
- 		blkg_get(tg_to_blkg(qn->tg));
- 	}
- }
- 
-+static inline struct bio *throtl_qnode_bio_peek(struct throtl_qnode *qn)
-+{
-+	struct bio *bio;
-+	int from = SYNC;
-+
-+	/* qn for read ios */
-+	if (qn->dispatch_sync_cnt == UINT_MAX)
-+		return bio_list_peek(&qn->bios[from]);
-+
-+	/* qn for write ios */
-+	if (qn->dispatch_sync_cnt == THROTL_SYNC_FACTOR)
-+		from = ASYNC;
-+	bio = bio_list_peek(&qn->bios[from]);
-+	if (!bio) {
-+		from = 1 - from;
-+		bio = bio_list_peek(&qn->bios[from]);
-+	}
-+
-+	return bio;
-+}
-+
- /**
-  * throtl_peek_queued - peek the first bio on a qnode list
-  * @queued: the qnode list to peek
-@@ -281,11 +325,56 @@ static struct bio *throtl_peek_queued(struct list_head *queued)
- 		return NULL;
- 
- 	qn = list_first_entry(queued, struct throtl_qnode, node);
--	bio = bio_list_peek(&qn->bios);
-+	bio = throtl_qnode_bio_peek(qn);
- 	WARN_ON_ONCE(!bio);
- 	return bio;
- }
- 
-+/**
-+ * throtl_qnode_bio_pop: pop a bio from a qnode
-+ * @qn: the qnode to pop a bio from
-+ *
-+ * For read io qn, just pop bio from sync queue and return.
-+ * For write io qn, the target queue to pop was determined by the dispatch_sync_cnt.
-+ * Try to pop bio from target queue, fetch the bio and return when it is not empty.
-+ * If the target queue empty, pop bio from other queue instead.
-+ */
-+static inline struct bio *throtl_qnode_bio_pop(struct throtl_qnode *qn)
-+{
-+	struct bio *bio;
-+	int from = SYNC;
-+
-+	/* qn for read ios */
-+	if (qn->dispatch_sync_cnt == UINT_MAX)
-+		return bio_list_pop(&qn->bios[from]);
-+
-+	/* qn for write ios */
-+	if (qn->dispatch_sync_cnt == THROTL_SYNC_FACTOR)
-+		from = ASYNC;
-+
-+	bio = bio_list_pop(&qn->bios[from]);
-+	if (!bio) {
-+		from = 1 - from;
-+		bio = bio_list_pop(&qn->bios[from]);
-+	}
-+
-+	if ((qn->dispatch_sync_cnt < THROTL_SYNC_FACTOR) &&
-+		(from == SYNC))
-+		qn->dispatch_sync_cnt++;
-+	else if (from == ASYNC)
-+		qn->dispatch_sync_cnt = 0;
-+
-+	return bio;
-+}
-+
-+static inline bool throtl_qnode_empty(struct throtl_qnode *qn)
-+{
-+	if (bio_list_empty(&qn->bios[SYNC]) &&
-+		bio_list_empty(&qn->bios[ASYNC]))
-+		return true;
-+	return false;
-+}
-+
- /**
-  * throtl_pop_queued - pop the first bio form a qnode list
-  * @queued: the qnode list to pop a bio from
-@@ -310,10 +399,10 @@ static struct bio *throtl_pop_queued(struct list_head *queued,
- 		return NULL;
- 
- 	qn = list_first_entry(queued, struct throtl_qnode, node);
--	bio = bio_list_pop(&qn->bios);
-+	bio = throtl_qnode_bio_pop(qn);
- 	WARN_ON_ONCE(!bio);
- 
--	if (bio_list_empty(&qn->bios)) {
-+	if (throtl_qnode_empty(qn)) {
- 		list_del_init(&qn->node);
- 		if (tg_to_put)
- 			*tg_to_put = qn->tg;
-@@ -355,8 +444,8 @@ static struct blkg_policy_data *throtl_pd_alloc(gfp_t gfp,
- 	throtl_service_queue_init(&tg->service_queue);
- 
- 	for (rw = READ; rw <= WRITE; rw++) {
--		throtl_qnode_init(&tg->qnode_on_self[rw], tg);
--		throtl_qnode_init(&tg->qnode_on_parent[rw], tg);
-+		throtl_qnode_init(&tg->qnode_on_self[rw], tg, rw);
-+		throtl_qnode_init(&tg->qnode_on_parent[rw], tg, rw);
- 	}
- 
- 	RB_CLEAR_NODE(&tg->rb_node);
-diff --git a/block/blk-throttle.h b/block/blk-throttle.h
-index ef4b7a4de987..55f3a9594e0d 100644
---- a/block/blk-throttle.h
-+++ b/block/blk-throttle.h
-@@ -28,8 +28,18 @@
-  */
- struct throtl_qnode {
- 	struct list_head	node;		/* service_queue->queued[] */
--	struct bio_list		bios;		/* queued bios */
-+	struct bio_list		bios[2];	/* queued bios */
- 	struct throtl_grp	*tg;		/* tg this qnode belongs to */
-+
-+	/*
-+	 * 1) for write throtl_qnode:
-+	 * [0, THROTL_SYNC_FACTOR-1]: dispatch sync io
-+	 * [THROTL_SYNC_FACTOR]: dispatch async io
-+	 *
-+	 * 2) for read throtl_qnode:
-+	 * UINT_MAX
-+	 */
-+	unsigned int dispatch_sync_cnt;         /* sync io dispatch counter */
- };
- 
- struct throtl_service_queue {
--- 
-2.20.1
-
+Reviewed-by: Christoph Hellwig <hch@lst.de>
