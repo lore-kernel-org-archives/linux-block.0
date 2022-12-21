@@ -2,39 +2,39 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B584C3DA79
-	for <linux-block@archiver.kernel.org>; Wed, 21 Dec 2022 10:35:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7642BC4332F
+	for <linux-block@archiver.kernel.org>; Wed, 21 Dec 2022 10:35:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232901AbiLUKf1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 21 Dec 2022 05:35:27 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49314 "EHLO
+        id S229612AbiLUKf3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 21 Dec 2022 05:35:29 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50324 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231614AbiLUKe7 (ORCPT
+        with ESMTP id S234495AbiLUKe7 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Wed, 21 Dec 2022 05:34:59 -0500
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20E6DB879
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 07A65C758
         for <linux-block@vger.kernel.org>; Wed, 21 Dec 2022 02:34:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=Sender:Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:
         Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=EU5hx8EPY2ObYMvaGr18kG+q5W0YmfXi6zYNqgfxw38=; b=njzCA+s+lVBGhOzX3ixaON2sPC
-        ljcxfWL9tPDvsdzQ67Dw3eEeZZXglY8neQtB1ZsGyJ8gdDIx1bqGhkd/0ldSVn75cR+oxakZQ/rtA
-        YIrbTWe43lV/RY+PqtevtuIEwS8FMJZ+VifCRa7LMHSaPyPEeCFQwCmKTVCL01iC6EjtzOI3J+uvW
-        mlmSWGuemFSghvQJF26p0eS1yd0dce+j9i3ds434Of/OyJCrkcBGQSI+d6q7AcEdV4IIGP1nZU03K
-        hEhSEniCe5aDRyMrSKKJOlzLhQFabKcGYdCuW5ABLpwpOp/+7MlcRlAOqyQP+pZfq6C6cvV67pMWl
-        DJLZaSBA==;
+        bh=4WoCl1SIQbDhatQ3/vSDaEL62NDZ5t6fuJwpEfQSHQE=; b=X1RK5iEb0GoqcyTQ+oHnHwgocx
+        JOhAf7J4xUitzhwBb6VyXA+xeev6J00hODSDK4ROdu+ZsWIzo0Eafd0h1s8lBmEO5pLx8BVkw8jwf
+        xKBYKVWB+qycrjVE6i9zFjlVLXlSx4YevE9oYuRTTyrCaCssRMR8TgF9q6CM8Evw+C9JZ3WswwCSL
+        uRxyiaQMcF/ijRnCMRzw/jD5vXqutOPX54xVvSIZxFQxJKC6v5//fVECCIjQBJWTtRpydeFmRJBfY
+        gMvlpxs4Y5Fzx48xp2VaeetUJo5J6sU2x0gXektRPu9WhFb4aXpIeCUXcyHTKBD8PWwr+oI5HXKRK
+        2akMzTPw==;
 Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1p7wQx-00DUqV-2r; Wed, 21 Dec 2022 10:34:47 +0000
+        id 1p7wQw-00DUqR-UZ; Wed, 21 Dec 2022 10:34:46 +0000
 From:   Luis Chamberlain <mcgrof@kernel.org>
 To:     osandov@fb.com, mcgrof@kernel.org
 Cc:     joshi.k@samsung.com, j.granados@samsung.com, anuj20.g@samsung.com,
         ankit.kumar@samsung.com, vincent.fu@samsung.com,
         ming.lei@redhat.com, linux-block@vger.kernel.org
-Subject: [PATCH 3/6] tests/nvme: add new test for rand-write on the nvme character device
-Date:   Wed, 21 Dec 2022 02:34:38 -0800
-Message-Id: <20221221103441.3216600-4-mcgrof@kernel.org>
+Subject: [PATCH 1/6] common/fio: add helpers using io-uring cmd engine
+Date:   Wed, 21 Dec 2022 02:34:36 -0800
+Message-Id: <20221221103441.3216600-2-mcgrof@kernel.org>
 X-Mailer: git-send-email 2.37.1
 In-Reply-To: <20221221103441.3216600-1-mcgrof@kernel.org>
 References: <20221221103441.3216600-1-mcgrof@kernel.org>
@@ -45,72 +45,79 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This does basic rand-write testing of the character device of a
-conventional NVMe drive.
+This will allow us to add tests which use the io-uring cmd engine,
+part of fio. They are inspired by the work by Anuj Gupta and
+Ankit Kumar which added sample fio files onto fio for this exact
+purpose.
+
+We can build on those to expand test coverage with elaborate tests.
+
+We don't specify the cmd to allow other types of io-uring cmd
+users to use this other than nvme.
 
 Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
 ---
- tests/nvme/047     | 41 +++++++++++++++++++++++++++++++++++++++++
- tests/nvme/047.out |  2 ++
- 2 files changed, 43 insertions(+)
- create mode 100755 tests/nvme/047
- create mode 100644 tests/nvme/047.out
+ common/fio | 47 +++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 47 insertions(+)
 
-diff --git a/tests/nvme/047 b/tests/nvme/047
-new file mode 100755
-index 000000000000..8ba55b250bc5
---- /dev/null
-+++ b/tests/nvme/047
-@@ -0,0 +1,41 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-3.0+
-+# Copyright (C) 2022 Luis Chamberlain <mcgrof@kernel.org>
-+#
-+# This does basic random write test for the the convential nvme character
-+# device.
-+
-+. tests/nvme/rc
-+
-+DESCRIPTION="basic rand-write io_uring_cmd engine for nvme-ns character device"
-+QUICK=1
-+
-+requires() {
-+	_nvme_requires
-+	_have_fio
+diff --git a/common/fio b/common/fio
+index bed76d555b2a..4da90804ed21 100644
+--- a/common/fio
++++ b/common/fio
+@@ -184,6 +184,53 @@ _run_fio_verify_io() {
+ 	rm -f local*verify*state
+ }
+ 
++_run_fio_rand_iouring_cmd() {
++	_run_fio --bs=4k --rw=randread --numjobs="$(nproc)" \
++		--ioengine=io_uring_cmd --iodepth=32 \
++		--thread=1 --stonewall=1 \
++		--name=reads "$@"
 +}
 +
-+device_requires() {
-+	_require_test_dev_is_nvme
++_run_fio_verify_iouring_cmd_randwrite() {
++	_run_fio --bs=4k --rw=randwrite --numjobs="$(nproc)" \
++		--ioengine=io_uring_cmd --iodepth=32 \
++		--thread=1 --stonewall=1 \
++		--sqthread_poll=1 --sqthread_poll_cpu=0 \
++		--nonvectored=1 --registerfiles=1 \
++		--verify=crc32c \
++		--name=verify "$@"
++	rm -f local*verify*state
 +}
 +
-+test_device() {
-+	echo "Running ${TEST_NAME}"
-+	local ngdev=${TEST_DEV/nvme/ng}
-+	local fio_args=(
-+		--size=1M
-+		--cmd_type=nvme
-+		--filename="$ngdev"
-+		--time_based
-+		--runtime=10
-+	) &&
-+	_run_fio_verify_iouring_cmd_randwrite "${fio_args[@]}" >>"${FULL}" 2>&1 ||
-+	fail=true
-+
-+	if [ -z "$fail" ]; then
-+		echo "Test complete"
-+	else
-+		echo "Test failed"
-+		return 1
-+	fi
++_run_fio_verify_iouring_cmd_write_opts() {
++	_run_fio --bs=4k --rw=write --numjobs="$(nproc)" \
++		--ioengine=io_uring_cmd --iodepth=32 \
++		--thread=1 --stonewall=1 \
++		--sqthread_poll=1 --sqthread_poll_cpu=0 \
++		--nonvectored=1 --registerfiles=1 \
++		--verify=crc32c \
++		--name=verify "$@"
++	rm -f local*verify*state
 +}
-diff --git a/tests/nvme/047.out b/tests/nvme/047.out
-new file mode 100644
-index 000000000000..915d0a2389ca
---- /dev/null
-+++ b/tests/nvme/047.out
-@@ -0,0 +1,2 @@
-+Running nvme/047
-+Test complete
++
++_run_fio_iouring_cmd_zone() {
++	_run_fio --rw=randread --numjobs="$(nproc)" \
++		--ioengine=io_uring_cmd --iodepth=1 \
++		--stonewall=1 \
++		--zonemode=zbd \
++		--name=reads "$@"
++}
++
++_run_fio_verify_iouring_cmd_write_opts_zone() {
++	_run_fio --rw=randread --numjobs="$(nproc)" \
++		--ioengine=io_uring_cmd --iodepth=1 \
++		--stonewall=1 \
++		--zonemode=zbd \
++		--sqthread_poll=1 --registerfiles=1 --sqthread_poll_cpu=0 \
++		--verify=crc32c \
++		--name=verify "$@"
++}
++
+ _fio_perf_report() {
+ 	# If there is more than one group, we don't know what to report.
+ 	if [[ $(wc -l < "$TMPDIR/fio_perf") -gt 1 ]]; then
 -- 
 2.35.1
 
