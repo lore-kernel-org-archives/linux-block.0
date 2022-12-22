@@ -2,68 +2,115 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64555C10F1B
-	for <linux-block@archiver.kernel.org>; Thu, 22 Dec 2022 03:07:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B3C71C4332F
+	for <linux-block@archiver.kernel.org>; Thu, 22 Dec 2022 06:35:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235078AbiLVDHe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 21 Dec 2022 22:07:34 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58658 "EHLO
+        id S235092AbiLVGfC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 22 Dec 2022 01:35:02 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55948 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235026AbiLVDHd (ORCPT
+        with ESMTP id S232013AbiLVGfB (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 21 Dec 2022 22:07:33 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0EEEA1181E
-        for <linux-block@vger.kernel.org>; Wed, 21 Dec 2022 19:07:33 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 9F139619C6
-        for <linux-block@vger.kernel.org>; Thu, 22 Dec 2022 03:07:32 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 13FE6C433D2;
-        Thu, 22 Dec 2022 03:07:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1671678452;
-        bh=dthrsJy1CDx6XemMvwwzAW1QzJjaEHsOjKN6xNcRaUc=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=Kn3gfbixW9mLinABHTdWp4FDZZtXihws06gFme1wtXouXSrq/brzYdW9c8+Igi55L
-         XmWEE0by5Xqyr1lYFCPsbrzV2KNSVxnR5JAo4MWxHFwyQWbIZXRrm0AySwGonta0q4
-         FsayRkUmxv/FID14ISFQpT39sDJHORSbU6EGfQkcrjYiulqup1sK5eHyso+st47HGx
-         5yH0sYUIMyAAevPHonMEjrM17Gat1/OYqyRZ6HCzeZ10BNI4AglgQvTGJdeMPzCEfi
-         pI5qw3ytvHRTQ9Ms9FT6aaiuVHnHLer6i2ot/8xiV32im03IlGFUxBTKTH2HGZ8GkV
-         4tupoKHQtZuwg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 02BEDC43141;
-        Thu, 22 Dec 2022 03:07:32 +0000 (UTC)
-Subject: Re: [GIT PULL] Followup block fixes for 6.2-rc1
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <b4f6146f-6bbf-c58a-21fd-a03acb28c4a0@kernel.dk>
-References: <b4f6146f-6bbf-c58a-21fd-a03acb28c4a0@kernel.dk>
-X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
-X-PR-Tracked-Message-Id: <b4f6146f-6bbf-c58a-21fd-a03acb28c4a0@kernel.dk>
-X-PR-Tracked-Remote: git://git.kernel.dk/linux.git tags/block-6.2-2022-12-19
-X-PR-Tracked-Commit-Id: 53eab8e76667b124615a943a033cdf97c80c242a
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 569c3a283c96a9efbf7ee32dda10905b8684de07
-Message-Id: <167167845200.12654.6861677566544805638.pr-tracker-bot@kernel.org>
-Date:   Thu, 22 Dec 2022 03:07:32 +0000
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+        Thu, 22 Dec 2022 01:35:01 -0500
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F27301E701;
+        Wed, 21 Dec 2022 22:34:59 -0800 (PST)
+Received: from mail02.huawei.com (unknown [172.30.67.153])
+        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4Nd0sp0gKQz4f3mKp;
+        Thu, 22 Dec 2022 14:34:54 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.175.124.27])
+        by APP1 (Coremail) with SMTP id cCh0CgDH5jCP+qNjzwckAQ--.30442S3;
+        Thu, 22 Dec 2022 14:34:57 +0800 (CST)
+From:   Kemeng Shi <shikemeng@huaweicloud.com>
+To:     axboe@kernel.dk, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Cc:     jack@suse.cz, kbusch@kernel.org, shikemeng@huaweicloud.com
+Subject: [PATCH RESEND v2 1/5] sbitmap: remove unnecessary calculation of alloc_hint in __sbitmap_get_shallow
+Date:   Thu, 22 Dec 2022 22:33:49 +0800
+Message-Id: <20221222143353.598042-2-shikemeng@huaweicloud.com>
+X-Mailer: git-send-email 2.30.0
+In-Reply-To: <20221222143353.598042-1-shikemeng@huaweicloud.com>
+References: <20221222143353.598042-1-shikemeng@huaweicloud.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: cCh0CgDH5jCP+qNjzwckAQ--.30442S3
+X-Coremail-Antispam: 1UD129KBjvJXoW7AFy8JF18AF4xKFy5Kw4fuFg_yoW8Gw18pr
+        4jgF9rK3sYvFy8ur4UKFykAFy3G398G3sxJa4Sgw4fur18K3Z3Gr4kKFWaqr13uFW7AFZ2
+        ya1xXr1UuF1jqa7anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUBE14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2jI8I6cxK62vIxIIY0VWUZVW8XwA2048vs2IY02
+        0E87I2jVAFwI0_Jr4l82xGYIkIc2x26xkF7I0E14v26r1I6r4UM28lY4IEw2IIxxk0rwA2
+        F7IY1VAKz4vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjx
+        v20xvEc7CjxVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2
+        z280aVCY1x0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0V
+        AKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1l
+        Ox8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErc
+        IFxwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v2
+        6r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_JF0_Jw1lIxkGc2
+        Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_
+        Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMI
+        IF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0pR3PE3UUUUU
+        =
+X-CM-SenderInfo: 5vklyvpphqwq5kxd4v5lfo033gof0z/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The pull request you sent on Tue, 20 Dec 2022 08:17:32 -0700:
+We calculate allow_hint in next word as following:
 
-> git://git.kernel.dk/linux.git tags/block-6.2-2022-12-19
+/* low sb->shift bit of alloc_hint will be 0 after this shift */
+alloc_hint = index << sb->shift;
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/569c3a283c96a9efbf7ee32dda10905b8684de07
+/* get low sb->shift bit of alloc_hit */
+SB_NR_TO_BIT(sb, alloc_hint)
 
-Thank you!
+So alloc_hit in next word will always be zero. Simpfy alloc_hit calculation
+in __sbitmap_get_shallow according to the alloc_hit calculation in
+__sbitmap_get.
 
+Signed-off-by: Kemeng Shi <shikemeng@huaweicloud.com>
+---
+ lib/sbitmap.c | 11 ++++-------
+ 1 file changed, 4 insertions(+), 7 deletions(-)
+
+diff --git a/lib/sbitmap.c b/lib/sbitmap.c
+index 586deb333237..cb5e03a2d65b 100644
+--- a/lib/sbitmap.c
++++ b/lib/sbitmap.c
+@@ -243,6 +243,7 @@ static int __sbitmap_get_shallow(struct sbitmap *sb,
+ 	int nr = -1;
+ 
+ 	index = SB_NR_TO_INDEX(sb, alloc_hint);
++	alloc_hint = SB_NR_TO_BIT(sb, alloc_hint);
+ 
+ 	for (i = 0; i < sb->map_nr; i++) {
+ again:
+@@ -250,7 +251,7 @@ static int __sbitmap_get_shallow(struct sbitmap *sb,
+ 					min_t(unsigned int,
+ 					      __map_depth(sb, index),
+ 					      shallow_depth),
+-					SB_NR_TO_BIT(sb, alloc_hint), true);
++					alloc_hint, true);
+ 		if (nr != -1) {
+ 			nr += index << sb->shift;
+ 			break;
+@@ -260,13 +261,9 @@ static int __sbitmap_get_shallow(struct sbitmap *sb,
+ 			goto again;
+ 
+ 		/* Jump to next index. */
+-		index++;
+-		alloc_hint = index << sb->shift;
+-
+-		if (index >= sb->map_nr) {
++		alloc_hint = 0;
++		if (++index >= sb->map_nr)
+ 			index = 0;
+-			alloc_hint = 0;
+-		}
+ 	}
+ 
+ 	return nr;
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+2.30.0
+
