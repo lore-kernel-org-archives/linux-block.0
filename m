@@ -2,86 +2,143 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89CAAC001B2
-	for <linux-block@archiver.kernel.org>; Thu, 22 Dec 2022 16:23:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B5C2BC4332F
+	for <linux-block@archiver.kernel.org>; Thu, 22 Dec 2022 17:52:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229630AbiLVQXQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 22 Dec 2022 11:23:16 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43888 "EHLO
+        id S229797AbiLVRwN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 22 Dec 2022 12:52:13 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42822 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229545AbiLVQXQ (ORCPT
+        with ESMTP id S229734AbiLVRwM (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 22 Dec 2022 11:23:16 -0500
-Received: from mail-pg1-x530.google.com (mail-pg1-x530.google.com [IPv6:2607:f8b0:4864:20::530])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08254220C9
-        for <linux-block@vger.kernel.org>; Thu, 22 Dec 2022 08:23:15 -0800 (PST)
-Received: by mail-pg1-x530.google.com with SMTP id 36so1629854pgp.10
-        for <linux-block@vger.kernel.org>; Thu, 22 Dec 2022 08:23:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=UXlbX1VyAp1OUkMGBpH9EiNGKAxy9fO5IsYvI0ywITo=;
-        b=3GhP48iDsw7f3PN/e0bFTcv0wTw99koJKRq7qbRwENHRRKiyLXG4lVTjrlwLgrDMfK
-         m45LccLNE8dr7UUTsyzS3klT75UkUXzdYCBIHBBO51foNhFQTaS6Ph2diBUX8v8T30Wz
-         y/z3CU++6aFCJ7nU1mgRzOsD5NlKHG1+ArdJd77AdbWCCG2TNdYW6xwtBMXQAKKYxMwl
-         niR8b1PcoiGawFC2t7R6ADFbPAK++sOTnxPe5r2NveIM+HWRTdKVMioCEXDCU02ViOBW
-         vFrWlAH0QHZMHivIhLCx9VJEvZK26CktVAi0guj63kaKwWAT4cZoulHpczOf5JD3nt5j
-         nwfQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=UXlbX1VyAp1OUkMGBpH9EiNGKAxy9fO5IsYvI0ywITo=;
-        b=gtFYtcNJAYHx4uX/gwGlOJrxBAp9fg9ADvVmAyML9ANOolNJbBL68PbTjogLroGMeC
-         pUX4eXyDlMHC39aCV1VmNz3VLbTVFNSyIf2VLA49ER0jLXJeB0VkXnaXezxFsB4H9cfb
-         lJ2QF72hTNaLAKrR03Q+Gdu/drc5G4yAP2HQeBFfzTn2zobP7cGitvvJJ8TSDKNfZFkU
-         nBA7w5JdOtcALIVelycWA8Y8/atpUkHQpq9wAnMAswGr+hMKTNn434fqLWO3vRMz6arO
-         fX/cXcXNiJek0T930tI2/DEzjXMKB7mI3sjOzQ54BDb7rqxj7eLItE4/czPHjQ/AB3r/
-         swmg==
-X-Gm-Message-State: AFqh2kpOqkBngZ3w6i6BscO/Y74FzX1h1P/z8X8fHIxqnj3fkiE0xzKY
-        DvS/ktZvaRwgj/ZrwGTjNLR1Kw==
-X-Google-Smtp-Source: AMrXdXtgaBwVjVuK9ElEkuRLLaMFoufiteDPKp8RMN9JoNyAuUkFKncyt6MbxWyHiFtw/GNAQhz5dg==
-X-Received: by 2002:a62:3894:0:b0:56b:a661:5a5a with SMTP id f142-20020a623894000000b0056ba6615a5amr1672622pfa.2.1671726194457;
-        Thu, 22 Dec 2022 08:23:14 -0800 (PST)
-Received: from [192.168.1.136] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id z7-20020a623307000000b00576d4d69909sm952358pfz.8.2022.12.22.08.23.13
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 22 Dec 2022 08:23:13 -0800 (PST)
-Message-ID: <7c253b8a-7535-51f0-5325-fb3866f7634e@kernel.dk>
-Date:   Thu, 22 Dec 2022 09:23:12 -0700
+        Thu, 22 Dec 2022 12:52:12 -0500
+Received: from mx0b-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 55484B7CC
+        for <linux-block@vger.kernel.org>; Thu, 22 Dec 2022 09:52:11 -0800 (PST)
+Received: from pps.filterd (m0109331.ppops.net [127.0.0.1])
+        by mx0a-00082601.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2BMHiaUR011753
+        for <linux-block@vger.kernel.org>; Thu, 22 Dec 2022 09:52:10 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-transfer-encoding :
+ content-type; s=s2048-2021-q4;
+ bh=F65TMfIBR/GCVPxYnrLZEA/djWWUoUGXVl6copPTWZQ=;
+ b=NurrL9d6r12JPMsnysxw3iOWWTi5aYIAYRzsuLLgMHJT0QlfUhTjO+PzD+9KDxnP8/l0
+ czXxHYJZvC7q0Ypm9fsWGu26mdT51l/c+Av/UJcbmp0mO+LUEPDY3jAxi2Oatpm+GP4y
+ pRjlltXOOYyzBkVDQVzm6Gbdzew8dycujZ/qde+ZURh393BoumTBkMfswQXQEQyBUDKD
+ TgNgTahhK3V10IA48TJUha9uh5p+NOfqdbfzxtL2cwnW5mNB5HbzXScjsFBbxAqpuL4i
+ P9UvKgocFXlYOUrL5vSQf6JLYmRl0JrHLHWAc/M/kcML4vxuG3Etb4CyqTRRTxfg7zHW jg== 
+Received: from maileast.thefacebook.com ([163.114.130.16])
+        by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 3mkx85jpb1-2
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
+        for <linux-block@vger.kernel.org>; Thu, 22 Dec 2022 09:52:10 -0800
+Received: from twshared41876.03.ash8.facebook.com (2620:10d:c0a8:1b::d) by
+ mail.thefacebook.com (2620:10d:c0a8:83::5) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.34; Thu, 22 Dec 2022 09:52:09 -0800
+Received: by devbig007.nao1.facebook.com (Postfix, from userid 544533)
+        id 5E14DD60CAC5; Thu, 22 Dec 2022 09:52:04 -0800 (PST)
+From:   Keith Busch <kbusch@meta.com>
+To:     <linux-block@vger.kernel.org>, <axboe@kernel.dk>
+CC:     <hch@lst.de>, <martin.petersen@oracle.com>,
+        Keith Busch <kbusch@kernel.org>
+Subject: [PATCH] block: save user max_sectors limit
+Date:   Thu, 22 Dec 2022 09:52:04 -0800
+Message-ID: <20221222175204.1782061-1-kbusch@meta.com>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.1
-Subject: Re: [GIT PULL] nvme fixes for Linux 6.2
-Content-Language: en-US
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
-References: <Y6R7MBrn2xzmwT1J@infradead.org>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <Y6R7MBrn2xzmwT1J@infradead.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: quoted-printable
+X-FB-Internal: Safe
+Content-Type: text/plain
+X-Proofpoint-ORIG-GUID: ZbJQED3_k8JO5nAwzg_djK8XacN75tlt
+X-Proofpoint-GUID: ZbJQED3_k8JO5nAwzg_djK8XacN75tlt
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.923,Hydra:6.0.545,FMLib:17.11.122.1
+ definitions=2022-12-22_09,2022-12-22_03,2022-06-22_01
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 12/22/22 8:43 AM, Christoph Hellwig wrote:
-> The following changes since commit 53eab8e76667b124615a943a033cdf97c80c242a:
-> 
->   block: don't clear REQ_ALLOC_CACHE for non-polled requests (2022-12-16 09:18:09 -0700)
-> 
-> are available in the Git repository at:
-> 
->   git://git.infradead.org/nvme.git tags/nvme-6.2-2022-12-22
+From: Keith Busch <kbusch@kernel.org>
 
-Pulled, thanks.
+The user can set the max_sectors limit to any valid value via sysfs
+/sys/block/<dev>/queue/max_sectors_kb attribute. If the device limits
+are ever rescanned, though, the limit reverts back to the kernel defined
+BLK_DEF_MAX_SECTORS limit.
 
--- 
-Jens Axboe
+Preserve the user's setting for the max_sectors limit as long as it's
+valid. The user can reset back to defaults by writing 0 to the sysfs
+file.
 
+Signed-off-by: Keith Busch <kbusch@kernel.org>
+---
+ block/blk-settings.c   |  9 +++++++--
+ block/blk-sysfs.c      | 10 +++++++++-
+ include/linux/blkdev.h |  1 +
+ 3 files changed, 17 insertions(+), 3 deletions(-)
+
+diff --git a/block/blk-settings.c b/block/blk-settings.c
+index 0477c4d527fee..e75304f853bd5 100644
+--- a/block/blk-settings.c
++++ b/block/blk-settings.c
+@@ -40,7 +40,7 @@ void blk_set_default_limits(struct queue_limits *lim)
+ 	lim->virt_boundary_mask =3D 0;
+ 	lim->max_segment_size =3D BLK_MAX_SEGMENT_SIZE;
+ 	lim->max_sectors =3D lim->max_hw_sectors =3D BLK_SAFE_MAX_SECTORS;
+-	lim->max_dev_sectors =3D 0;
++	lim->max_user_sectors =3D lim->max_dev_sectors =3D 0;
+ 	lim->chunk_sectors =3D 0;
+ 	lim->max_write_zeroes_sectors =3D 0;
+ 	lim->max_zone_append_sectors =3D 0;
+@@ -135,7 +135,12 @@ void blk_queue_max_hw_sectors(struct request_queue *=
+q, unsigned int max_hw_secto
+ 	limits->max_hw_sectors =3D max_hw_sectors;
+=20
+ 	max_sectors =3D min_not_zero(max_hw_sectors, limits->max_dev_sectors);
+-	max_sectors =3D min_t(unsigned int, max_sectors, BLK_DEF_MAX_SECTORS);
++
++	if (limits->max_user_sectors)
++		max_sectors =3D min_not_zero(max_sectors, limits->max_user_sectors);
++	else
++		max_sectors =3D min_t(unsigned int, max_sectors, BLK_DEF_MAX_SECTORS);
++
+ 	max_sectors =3D round_down(max_sectors,
+ 				 limits->logical_block_size >> SECTOR_SHIFT);
+ 	limits->max_sectors =3D max_sectors;
+diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
+index 93d9e9c9a6ea8..db5d1d908f5d9 100644
+--- a/block/blk-sysfs.c
++++ b/block/blk-sysfs.c
+@@ -250,8 +250,16 @@ queue_max_sectors_store(struct request_queue *q, con=
+st char *page, size_t count)
+ 	max_hw_sectors_kb =3D min_not_zero(max_hw_sectors_kb, (unsigned long)
+ 					 q->limits.max_dev_sectors >> 1);
+=20
+-	if (max_sectors_kb > max_hw_sectors_kb || max_sectors_kb < page_kb)
++	if (max_sectors_kb =3D=3D 0) {
++		q->limits.max_user_sectors =3D 0;
++		max_sectors_kb =3D min_t(unsigned int, max_hw_sectors_kb,
++				       BLK_DEF_MAX_SECTORS >> 1);
++	} else if (max_sectors_kb > max_hw_sectors_kb ||
++		   max_sectors_kb < page_kb)  {
+ 		return -EINVAL;
++	} else {
++		q->limits.max_user_sectors =3D max_sectors_kb << 1;
++	}
+=20
+ 	spin_lock_irq(&q->queue_lock);
+ 	q->limits.max_sectors =3D max_sectors_kb << 1;
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 301cf1cf4f2fa..71e97f0a87264 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -288,6 +288,7 @@ struct queue_limits {
+ 	unsigned int		max_dev_sectors;
+ 	unsigned int		chunk_sectors;
+ 	unsigned int		max_sectors;
++	unsigned int		max_user_sectors;
+ 	unsigned int		max_segment_size;
+ 	unsigned int		physical_block_size;
+ 	unsigned int		logical_block_size;
+--=20
+2.30.2
 
