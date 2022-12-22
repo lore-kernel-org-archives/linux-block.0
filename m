@@ -2,93 +2,121 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B128C001B2
-	for <linux-block@archiver.kernel.org>; Thu, 22 Dec 2022 11:18:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63C0CC4332F
+	for <linux-block@archiver.kernel.org>; Thu, 22 Dec 2022 11:23:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235432AbiLVLSA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 22 Dec 2022 06:18:00 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32784 "EHLO
+        id S235424AbiLVLXX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 22 Dec 2022 06:23:23 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38190 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235405AbiLVLRv (ORCPT
+        with ESMTP id S235133AbiLVLXW (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 22 Dec 2022 06:17:51 -0500
-Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5CF3D1F611;
-        Thu, 22 Dec 2022 03:17:51 -0800 (PST)
-Received: from mail02.huawei.com (unknown [172.30.67.169])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4Nd78B0HDyz4f3lWy;
-        Thu, 22 Dec 2022 19:17:46 +0800 (CST)
-Received: from huaweicloud.com (unknown [10.175.124.27])
-        by APP2 (Coremail) with SMTP id Syh0CgB3a+nXPKRjMew+AQ--.3596S12;
-        Thu, 22 Dec 2022 19:17:48 +0800 (CST)
-From:   Kemeng Shi <shikemeng@huaweicloud.com>
-To:     paolo.valente@linaro.org, axboe@kernel.dk,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     jack@suse.cz, hch@lst.de, damien.lemoal@wdc.com
-Subject: [PATCH RESEND v2 10/10] block, bfq: remove check of bfq_wr_max_softrt_rate which is always greater than 0
-Date:   Fri, 23 Dec 2022 03:16:41 +0800
-Message-Id: <20221222191641.1643117-11-shikemeng@huaweicloud.com>
-X-Mailer: git-send-email 2.30.0
-In-Reply-To: <20221222191641.1643117-1-shikemeng@huaweicloud.com>
-References: <20221222191641.1643117-1-shikemeng@huaweicloud.com>
+        Thu, 22 Dec 2022 06:23:22 -0500
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EDF181EE;
+        Thu, 22 Dec 2022 03:23:21 -0800 (PST)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 19E9223940;
+        Thu, 22 Dec 2022 11:23:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1671708200; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=Q7//GWIteFgH1E0ImEj9IrbM2aYh4kFVO4zFsnlVSG0=;
+        b=TsbymAibCwFsC0kzQbs0g54rk6xYAfYEj5MIFHZeX5X5+OOYIakazt1cJXV7uEi3qmcHux
+        8IDBoOVHPykhxPuClSrfKWnrAUw8jOY4uYtyp/oB0/RZCLQ1WlDGqXMun5fQCQNfkAs3kM
+        dDqQBB5w+X+MFpasnHVksH6JJrmjD5c=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1671708200;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=Q7//GWIteFgH1E0ImEj9IrbM2aYh4kFVO4zFsnlVSG0=;
+        b=ARBTYnbj+oCFe2R0D9NbmqK4FVwODoDm/qByVjoYBv4ovWcb7TqR3KgBOjBu3xhL4Lqhh2
+        En4zaFhH1uNAulAw==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 0BD01138FD;
+        Thu, 22 Dec 2022 11:23:20 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id o43WAig+pGOoeAAAMHmgww
+        (envelope-from <jack@suse.cz>); Thu, 22 Dec 2022 11:23:20 +0000
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+        id 73E47A0732; Thu, 22 Dec 2022 12:23:19 +0100 (CET)
+Date:   Thu, 22 Dec 2022 12:23:19 +0100
+From:   Jan Kara <jack@suse.cz>
+To:     Kemeng Shi <shikemeng@huaweicloud.com>
+Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, jack@suse.cz, kbusch@kernel.org
+Subject: Re: [PATCH RESEND v2 2/5] sbitmap: remove redundant check in
+ __sbitmap_queue_get_batch
+Message-ID: <20221222112319.26wtwxeyry6ybvse@quack3>
+References: <20221222143353.598042-1-shikemeng@huaweicloud.com>
+ <20221222143353.598042-3-shikemeng@huaweicloud.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: Syh0CgB3a+nXPKRjMew+AQ--.3596S12
-X-Coremail-Antispam: 1UD129KBjvJXoW7Cry7Zr47CFyUZFyfJF13Arb_yoW8Gr1kpa
-        yaqr4UWF45Ka1F9F4UtF18Ww1jyan3W3srKw1DZw1DtrW7ZFn3ua9akwnYva92qFn7Crsx
-        ZF1DKa4kXF1DA37anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUBab4IE77IF4wAFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k2
-        6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M280x2IEY4vEnII2IxkI6r1a6r45M2
-        8IrcIa0xkI8VA2jI8067AKxVWUAVCq3wA2048vs2IY020Ec7CjxVAFwI0_Xr0E3s1l8cAv
-        FVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVW7JVWDJw
-        A2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE
-        3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr2
-        1l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv
-        67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41l42xK82IYc2
-        Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s02
-        6x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r126r1DMIIYrxkI7VAKI48JMIIF0x
-        vE2Ix0cI8IcVAFwI0_Gr0_Xr1lIxAIcVC0I7IYx2IY6xkF7I0E14v26F4j6r4UJwCI42IY
-        6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Gr0_Cr1lIxAIcVC2z280aV
-        CY1x0267AKxVW8Jr0_Cr1UYxBIdaVFxhVjvjDU0xZFpf9x07jstxDUUUUU=
-X-CM-SenderInfo: 5vklyvpphqwq5kxd4v5lfo033gof0z/
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221222143353.598042-3-shikemeng@huaweicloud.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-bfqd->bfq_wr_max_softrt_rate is assigned with 7000 in bfq_init_queue and
-never changed. So we can remove bfqd->bfq_wr_max_softrt_rate > 0 check
-which is always true.
+On Thu 22-12-22 22:33:50, Kemeng Shi wrote:
+> Commit fbb564a557809 ("lib/sbitmap: Fix invalid loop in
+> __sbitmap_queue_get_batch()") mentioned that "Checking free bits when
+> setting the target bits. Otherwise, it may reuse the busying bits."
+> This commit add check to make sure all masked bits in word before
+> cmpxchg is zero. Then the existing check after cmpxchg to check any
+> zero bit is existing in masked bits in word is redundant.
+> 
+> Actually, old value of word before cmpxchg is stored in val and we
+> will filter out busy bits in val by "(get_mask & ~val)" after cmpxchg.
+> So we will not reuse busy bits methioned in commit fbb564a557809
+> ("lib/sbitmap: Fix invalid loop in __sbitmap_queue_get_batch()"). Revert
+> new-added check to remove redundant check.
+> 
+> Signed-off-by: Kemeng Shi <shikemeng@huaweicloud.com>
 
-Signed-off-by: Kemeng Shi <shikemeng@huaweicloud.com>
----
- block/bfq-iosched.c | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+...
 
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index 91bc68fba72d..00cdd42ac02a 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -1788,8 +1788,7 @@ static void bfq_bfqq_handle_idle_busy_switch(struct bfq_data *bfqd,
- 	 *   to control its weight explicitly)
- 	 */
- 	in_burst = bfq_bfqq_in_large_burst(bfqq);
--	soft_rt = bfqd->bfq_wr_max_softrt_rate > 0 &&
--		!BFQQ_TOTALLY_SEEKY(bfqq) &&
-+	soft_rt = !BFQQ_TOTALLY_SEEKY(bfqq) &&
- 		!in_burst &&
- 		time_is_before_jiffies(bfqq->soft_rt_next_start) &&
- 		bfqq->dispatched == 0 &&
-@@ -4284,8 +4283,7 @@ void bfq_bfqq_expire(struct bfq_data *bfqd,
- 	if (bfqd->low_latency && bfqq->wr_coeff == 1)
- 		bfqq->last_wr_start_finish = jiffies;
- 
--	if (bfqd->low_latency && bfqd->bfq_wr_max_softrt_rate > 0 &&
--	    RB_EMPTY_ROOT(&bfqq->sort_list)) {
-+	if (bfqd->low_latency && RB_EMPTY_ROOT(&bfqq->sort_list)) {
- 		/*
- 		 * If we get here, and there are no outstanding
- 		 * requests, then the request pattern is isochronous
+> diff --git a/lib/sbitmap.c b/lib/sbitmap.c
+> index cb5e03a2d65b..11e75f4040fb 100644
+> --- a/lib/sbitmap.c
+> +++ b/lib/sbitmap.c
+> @@ -518,11 +518,9 @@ unsigned long __sbitmap_queue_get_batch(struct sbitmap_queue *sbq, int nr_tags,
+>  
+>  			get_mask = ((1UL << nr_tags) - 1) << nr;
+>  			val = READ_ONCE(map->word);
+> -			do {
+> -				if ((val & ~get_mask) != val)
+> -					goto next;
+> -			} while (!atomic_long_try_cmpxchg(ptr, &val,
+> -							  get_mask | val));
+> +			while (!atomic_long_try_cmpxchg(ptr, &val,
+> +							  get_mask | val))
+> +				;
+>  			get_mask = (get_mask & ~val) >> nr;
+>  			if (get_mask) {
+>  				*offset = nr + (index << sb->shift);
+
+So I agree this will result in correct behavior but it can change
+performance. In the original code, we end up doing
+atomic_long_try_cmpxchg() only for words where we have a chance of getting
+all tags allocated. Now we just accept any word where we could allocate at
+least one bit. Frankly the original code looks rather restrictive and also
+the fact that we look only from the first zero bit in the word looks
+unnecessarily restrictive so maybe I miss some details about what's
+expected from __sbitmap_queue_get_batch(). So all in all I wanted to point
+out this needs more scrutiny from someone understanding better expectations
+from __sbitmap_queue_get_batch().
+
+								Honza
 -- 
-2.30.0
-
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
