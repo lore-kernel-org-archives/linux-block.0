@@ -1,129 +1,69 @@
-Return-Path: <linux-block-owner@kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF0C1C4332F
-	for <linux-block@archiver.kernel.org>; Wed, 21 Dec 2022 19:32:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64555C10F1B
+	for <linux-block@archiver.kernel.org>; Thu, 22 Dec 2022 03:07:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234616AbiLUTcL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 21 Dec 2022 14:32:11 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38630 "EHLO
+        id S235078AbiLVDHe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 21 Dec 2022 22:07:34 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58658 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234209AbiLUTcK (ORCPT
+        with ESMTP id S235026AbiLVDHd (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 21 Dec 2022 14:32:10 -0500
-Received: from mail-wm1-x330.google.com (mail-wm1-x330.google.com [IPv6:2a00:1450:4864:20::330])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0D0DF15F0B;
-        Wed, 21 Dec 2022 11:32:09 -0800 (PST)
-Received: by mail-wm1-x330.google.com with SMTP id c65-20020a1c3544000000b003cfffd00fc0so2325464wma.1;
-        Wed, 21 Dec 2022 11:32:08 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=+UwB8YFQzgwG8BjOAeX2tDFHU+o0BOKKcjrYgGzP1vA=;
-        b=D9575x7xtb4F1WNG/+7M/9uYWsL8cB69hBx7F+3/VQ0sFOXBvLMV/z1doUMzPv8jop
-         Q0J/Dz4C6i5r3vJ50Cg84XOLLYV924SF3I1sm3cSmkc3yZ6vMpILk8qRbFWvfHj7SqQ/
-         bAqESABVsarqaCuak4Rp4WSsQTdIHpRl3qkEO+JOKwg4jcOp/yWntaGXDrnva3wSqwbY
-         UiW0rFnpLE9N/8UJQ8iqXVqp4eyxsheVr4C5WUqKfshE+kHNOYdc4TSIHzl/T9ftk59B
-         4c8jxdD5s5kqSUV8/jqWIOfiDL1n+rTBo9Tzv4V1cCYsxWWD1zb37seS/319YWpwlgPc
-         1XIw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+UwB8YFQzgwG8BjOAeX2tDFHU+o0BOKKcjrYgGzP1vA=;
-        b=CeS2GM/MoP3giy2ztSQY3+tBmgdwFCSLo3qg9Jo2wljPqMd0IkQ0xZGDzEjKwWDjZb
-         FDc+eT+epZHfPaHdgMf0KMVgN8kVxZiDsj3s9gQbelsP1M47cw3KAocD3XtFBOLEv4RP
-         SokkOa301+Umil32yricGAqJNs/APWmtSC6oHL3QGMXiVhNAmHh67SQPQYAakn6o4hnf
-         ihhU9WFbiBp46z/ZRJmCi1DLfggngRBmmhbnpkZw3e173fhVjMhje/PqeszQOguJ1S53
-         XC9MXZhb2dD47LHFMULXduOjqAa3zgycGazGfb5r93MCD+XysC6vaRP15kPy71dDJTCZ
-         hdIg==
-X-Gm-Message-State: AFqh2kqE4M8pAn188EsgCzCvbFqzF+rYUOHDoDiLbNAIKVIgk2LOzXV4
-        fR5Kcq/0rppO+qtV8PZz9Sw=
-X-Google-Smtp-Source: AMrXdXv+IcZLB2hPBAZX9IZ5iqZXqlv8xDYzvzXS5CkY3kiwYo1W8iV+d5MKf0U9oDNxnPWeuEm1gQ==
-X-Received: by 2002:a05:600c:a51:b0:3cf:6f4d:c259 with SMTP id c17-20020a05600c0a5100b003cf6f4dc259mr2312518wmq.39.1671651127512;
-        Wed, 21 Dec 2022 11:32:07 -0800 (PST)
-Received: from localhost ([2a00:23c5:dc8c:8701:1663:9a35:5a7b:1d76])
-        by smtp.gmail.com with ESMTPSA id u7-20020a05600c4d0700b003d220ef3232sm3191634wmp.34.2022.12.21.11.32.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 21 Dec 2022 11:32:06 -0800 (PST)
-Date:   Wed, 21 Dec 2022 19:32:06 +0000
-From:   Lorenzo Stoakes <lstoakes@gmail.com>
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Anders Roxell <anders.roxell@linaro.org>,
-        virtualization@lists.linux-foundation.org,
-        linux-block@vger.kernel.org, Stefan Hajnoczi <stefanha@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH] virtio-blk: fix probe without CONFIG_BLK_DEV_ZONED
-Message-ID: <Y6NfNoFdrxJXu82U@lucifer>
-References: <20221220112340.518841-1-mst@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221220112340.518841-1-mst@redhat.com>
+        Wed, 21 Dec 2022 22:07:33 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0EEEA1181E
+        for <linux-block@vger.kernel.org>; Wed, 21 Dec 2022 19:07:33 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 9F139619C6
+        for <linux-block@vger.kernel.org>; Thu, 22 Dec 2022 03:07:32 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 13FE6C433D2;
+        Thu, 22 Dec 2022 03:07:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1671678452;
+        bh=dthrsJy1CDx6XemMvwwzAW1QzJjaEHsOjKN6xNcRaUc=;
+        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+        b=Kn3gfbixW9mLinABHTdWp4FDZZtXihws06gFme1wtXouXSrq/brzYdW9c8+Igi55L
+         XmWEE0by5Xqyr1lYFCPsbrzV2KNSVxnR5JAo4MWxHFwyQWbIZXRrm0AySwGonta0q4
+         FsayRkUmxv/FID14ISFQpT39sDJHORSbU6EGfQkcrjYiulqup1sK5eHyso+st47HGx
+         5yH0sYUIMyAAevPHonMEjrM17Gat1/OYqyRZ6HCzeZ10BNI4AglgQvTGJdeMPzCEfi
+         pI5qw3ytvHRTQ9Ms9FT6aaiuVHnHLer6i2ot/8xiV32im03IlGFUxBTKTH2HGZ8GkV
+         4tupoKHQtZuwg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 02BEDC43141;
+        Thu, 22 Dec 2022 03:07:32 +0000 (UTC)
+Subject: Re: [GIT PULL] Followup block fixes for 6.2-rc1
+From:   pr-tracker-bot@kernel.org
+In-Reply-To: <b4f6146f-6bbf-c58a-21fd-a03acb28c4a0@kernel.dk>
+References: <b4f6146f-6bbf-c58a-21fd-a03acb28c4a0@kernel.dk>
+X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
+X-PR-Tracked-Message-Id: <b4f6146f-6bbf-c58a-21fd-a03acb28c4a0@kernel.dk>
+X-PR-Tracked-Remote: git://git.kernel.dk/linux.git tags/block-6.2-2022-12-19
+X-PR-Tracked-Commit-Id: 53eab8e76667b124615a943a033cdf97c80c242a
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 569c3a283c96a9efbf7ee32dda10905b8684de07
+Message-Id: <167167845200.12654.6861677566544805638.pr-tracker-bot@kernel.org>
+Date:   Thu, 22 Dec 2022 03:07:32 +0000
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Dec 20, 2022 at 06:23:44AM -0500, Michael S. Tsirkin wrote:
-> When building without CONFIG_BLK_DEV_ZONED, VIRTIO_BLK_F_ZONED
-> is excluded from array of driver features.
-> As a result virtio_has_feature panics in virtio_check_driver_offered_feature
-> since that by design verifies that a feature we are checking for
-> is listed in the feature array.
->
-> To fix, replace the call to virtio_has_feature with a stub.
->
-> Tested-by: Anders Roxell <anders.roxell@linaro.org>
-> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> ---
->  drivers/block/virtio_blk.c | 11 ++++++++++-
->  1 file changed, 10 insertions(+), 1 deletion(-)
->
-> diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-> index 88b3639f8536..5ea1dc882a80 100644
-> --- a/drivers/block/virtio_blk.c
-> +++ b/drivers/block/virtio_blk.c
-> @@ -760,6 +760,10 @@ static int virtblk_probe_zoned_device(struct virtio_device *vdev,
->  	return ret;
->  }
->
-> +static inline bool virtblk_has_zoned_feature(struct virtio_device *vdev)
-> +{
-> +	return virtio_has_feature(vdev, VIRTIO_BLK_F_ZONED);
-> +}
->  #else
->
->  /*
-> @@ -775,6 +779,11 @@ static inline int virtblk_probe_zoned_device(struct virtio_device *vdev,
->  {
->  	return -EOPNOTSUPP;
->  }
-> +
-> +static inline bool virtblk_has_zoned_feature(struct virtio_device *vdev)
-> +{
-> +	return false;
-> +}
->  #endif /* CONFIG_BLK_DEV_ZONED */
->
->  /* return id (s/n) string for *disk to *id_str
-> @@ -1480,7 +1489,7 @@ static int virtblk_probe(struct virtio_device *vdev)
->  	virtblk_update_capacity(vblk, false);
->  	virtio_device_ready(vdev);
->
-> -	if (virtio_has_feature(vdev, VIRTIO_BLK_F_ZONED)) {
-> +	if (virtblk_has_zoned_feature(vdev)) {
->  		err = virtblk_probe_zoned_device(vdev, vblk, q);
->  		if (err)
->  			goto out_cleanup_disk;
-> --
-> MST
->
-> _______________________________________________
-> Virtualization mailing list
-> Virtualization@lists.linux-foundation.org
-> https://lists.linuxfoundation.org/mailman/listinfo/virtualization
-Tested-by: Lorenzo Stoakes <lstoakes@gmail.com>
+The pull request you sent on Tue, 20 Dec 2022 08:17:32 -0700:
+
+> git://git.kernel.dk/linux.git tags/block-6.2-2022-12-19
+
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/569c3a283c96a9efbf7ee32dda10905b8684de07
+
+Thank you!
+
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
