@@ -2,104 +2,112 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 85367C4332F
-	for <linux-block@archiver.kernel.org>; Thu, 22 Dec 2022 12:42:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BB15EC001B2
+	for <linux-block@archiver.kernel.org>; Thu, 22 Dec 2022 13:39:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235181AbiLVMmc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 22 Dec 2022 07:42:32 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33642 "EHLO
+        id S229608AbiLVNjT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 22 Dec 2022 08:39:19 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60736 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229620AbiLVMmb (ORCPT
+        with ESMTP id S229452AbiLVNjR (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 22 Dec 2022 07:42:31 -0500
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4ACA5FCC;
-        Thu, 22 Dec 2022 04:42:30 -0800 (PST)
+        Thu, 22 Dec 2022 08:39:17 -0500
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7ED01262C;
+        Thu, 22 Dec 2022 05:39:15 -0800 (PST)
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id DA3DA17BDE;
-        Thu, 22 Dec 2022 12:42:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1671712948; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 18B04761F4;
+        Thu, 22 Dec 2022 13:39:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+        t=1671716354; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=XmkqMDqoOV2vZvcbKcSsCfN2Q0eQg7RCp79KQBrfRkU=;
-        b=dSEDo37e26q8wi6ingQFJVEw8ZwHEMXjmoJnlKx5yU0EpR8/7YJpcefHYY7HrMFSWB6lDt
-        ycqha5Hk438wJBN8l31iaa6ZjoXMTfcfMzt8d4xt1jJqjk4w7T9mGQDqrByjlXPqi9U0Km
-        o9hwyEGzg18Ii5EMC0HnilSgQgQFD14=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1671712948;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=XmkqMDqoOV2vZvcbKcSsCfN2Q0eQg7RCp79KQBrfRkU=;
-        b=mSsqGeCLP8TAnnwN4OgzqnF0AAYUERoi+NMcROyY2OO72miZv8uYpXvAr4Kv8QeeyabLxI
-        LvOBfeTtXTWOKNBA==
+        bh=vtrUvg4YowUHHaB/oWDczwXqJMHTjVYGpm9kUzl8kTI=;
+        b=BX65IxCWiuGYFzvTkZ+nr3VtDH+usLyg+BU9HM+jdMWyoRpJ+3k3OCpwuGNDqcMNpirHtA
+        DLSXITsn3LTiR/TPLke2cOGEITISuFRggz4oAfhTnUt14xTl305toFm7z1ogtSDIOxn92w
+        CihiLx8o6X0kl8zur6D6H4APW/OxlSs=
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id CC4B413918;
-        Thu, 22 Dec 2022 12:42:28 +0000 (UTC)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id E0DFD138FD;
+        Thu, 22 Dec 2022 13:39:13 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id mBLbMbRQpGOCHQAAMHmgww
-        (envelope-from <jack@suse.cz>); Thu, 22 Dec 2022 12:42:28 +0000
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-        id 478E4A0732; Thu, 22 Dec 2022 13:42:28 +0100 (CET)
-Date:   Thu, 22 Dec 2022 13:42:28 +0100
-From:   Jan Kara <jack@suse.cz>
-To:     Kemeng Shi <shikemeng@huaweicloud.com>
-Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, jack@suse.cz, kbusch@kernel.org
-Subject: Re: [PATCH RESEND v2 4/5] sbitmap: add sbitmap_find_bit to remove
- repeat code in __sbitmap_get/__sbitmap_get_shallow
-Message-ID: <20221222124228.pt3x3yenrqi44dhr@quack3>
-References: <20221222143353.598042-1-shikemeng@huaweicloud.com>
- <20221222143353.598042-5-shikemeng@huaweicloud.com>
+        id 5/7nNQFepGNtNQAAMHmgww
+        (envelope-from <mkoutny@suse.com>); Thu, 22 Dec 2022 13:39:13 +0000
+Date:   Thu, 22 Dec 2022 14:39:12 +0100
+From:   Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>
+To:     Jinke Han <hanjinke.666@bytedance.com>
+Cc:     tj@kernel.org, josef@toxicpanda.com, axboe@kernel.dk,
+        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, yinxin.x@bytedance.com
+Subject: Re: [PATCH v2] blk-throtl: Introduce sync and async queues for
+ blk-throtl
+Message-ID: <20221222133912.GA20830@blackbody.suse.cz>
+References: <20221218111314.55525-1-hanjinke.666@bytedance.com>
+ <20221221104246.37714-1-hanjinke.666@bytedance.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="X1bOJ3K7DJ5YkBrT"
 Content-Disposition: inline
-In-Reply-To: <20221222143353.598042-5-shikemeng@huaweicloud.com>
+In-Reply-To: <20221221104246.37714-1-hanjinke.666@bytedance.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu 22-12-22 22:33:52, Kemeng Shi wrote:
-> There are three differences between __sbitmap_get and
-> __sbitmap_get_shallow when searching free bit:
-> 1. __sbitmap_get_shallow limit number of bit to search per word.
-> __sbitmap_get has no such limit.
-> 2. __sbitmap_get_shallow always searches with wrap set. __sbitmap_get set
-> wrap according to round_robin.
-> 3. __sbitmap_get_shallow always searches from first bit in first word.
-> __sbitmap_get searches from first bit when round_robin is not set
-> otherwise searches from SB_NR_TO_BIT(sb, alloc_hint).
-> 
-> Add helper function sbitmap_find_bit function to do common search while
-> accept "limit depth per word", "wrap flag" and "first bit to
-> search" from caller to support the need of both __sbitmap_get and
-> __sbitmap_get_shallow.
-> 
-> Signed-off-by: Kemeng Shi <shikemeng@huaweicloud.com>
 
-One style nit below, otherwise feel free to add:
+--X1bOJ3K7DJ5YkBrT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Reviewed-by: Jan Kara <jack@suse.cz>
+Hello Jinke.
 
+On Wed, Dec 21, 2022 at 06:42:46PM +0800, Jinke Han <hanjinke.666@bytedance=
+=2Ecom> wrote:
+> In our test, fio writes a 100g file in sequential 4k blocksize in
+> a container with low bps limit configured (wbps=3D10M). More than 1200
+> ios were throttled in blk-throtl queue and the avarage throtle time
+> of each io is 140s. At the same time, the operation of saving a small
+> file by vim will be blocked amolst 140s. As a fsync will be send by vim,
+> the sync ios of fsync will be blocked by a huge amount of buffer write
+> ios ahead. This is also a priority inversion problem within one cgroup.
+> In the database scene, things got really bad with blk-throtle enabled
+> as fsync is called very often.
 
-> @@ -215,11 +211,32 @@ static int __sbitmap_get(struct sbitmap *sb, unsigned int alloc_hint)
->  		alloc_hint = 0;
->  		if (++index >= sb->map_nr)
->  			index = 0;
-> +
->  	}
+I'm trying to make sense of the numbers:
+- at 10 MB/s, it's 0.4 ms per 4k block
+- there are 1.2k throttled bios that gives waiting time of roughly 0.5s
+  ~ 0.4ms * 1200
+- you say that you observe 280 times longer throttling time,
+- that'd mean there should be 340k queued bios=20
+  - or cummulative dispatch of ~1400 MB of data
 
-Pointless empty line here...
+So what are the queued quantities? Are there more than 1200 bios or are
+they bigger than the 4k you mention?
 
-								Honza
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+Thanks for clarification.
+
+(I acknowledge the possible problem with a large population of async
+writes delaying scarce sync writes.)
+
+Michal
+
+--X1bOJ3K7DJ5YkBrT
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: Digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEARYIAB0WIQTrXXag4J0QvXXBmkMkDQmsBEOquQUCY6Rd9AAKCRAkDQmsBEOq
+ua1JAQDsiMRSLjxEJBtDI7L1TSV+aXGoBObxymsZ8wdIom3evQD/RFAuRv6/4e6V
+GjV/UcnvMk5iZ5R2P+SQNC3uHiNJTQU=
+=95C9
+-----END PGP SIGNATURE-----
+
+--X1bOJ3K7DJ5YkBrT--
