@@ -2,42 +2,42 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 04062C41535
-	for <linux-block@archiver.kernel.org>; Thu, 22 Dec 2022 11:17:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 10123C4332F
+	for <linux-block@archiver.kernel.org>; Thu, 22 Dec 2022 11:17:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235421AbiLVLRy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 22 Dec 2022 06:17:54 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60994 "EHLO
+        id S231892AbiLVLRz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 22 Dec 2022 06:17:55 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32770 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235383AbiLVLRu (ORCPT
+        with ESMTP id S235389AbiLVLRv (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 22 Dec 2022 06:17:50 -0500
+        Thu, 22 Dec 2022 06:17:51 -0500
 Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EAE2822B30;
-        Thu, 22 Dec 2022 03:17:49 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A318022BD8;
+        Thu, 22 Dec 2022 03:17:50 -0800 (PST)
 Received: from mail02.huawei.com (unknown [172.30.67.169])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4Nd7884MVcz4f3kpW;
-        Thu, 22 Dec 2022 19:17:44 +0800 (CST)
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4Nd7892rr7z4f3pFL;
+        Thu, 22 Dec 2022 19:17:45 +0800 (CST)
 Received: from huaweicloud.com (unknown [10.175.124.27])
-        by APP2 (Coremail) with SMTP id Syh0CgB3a+nXPKRjMew+AQ--.3596S8;
-        Thu, 22 Dec 2022 19:17:47 +0800 (CST)
+        by APP2 (Coremail) with SMTP id Syh0CgB3a+nXPKRjMew+AQ--.3596S10;
+        Thu, 22 Dec 2022 19:17:48 +0800 (CST)
 From:   Kemeng Shi <shikemeng@huaweicloud.com>
 To:     paolo.valente@linaro.org, axboe@kernel.dk,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
 Cc:     jack@suse.cz, hch@lst.de, damien.lemoal@wdc.com
-Subject: [PATCH RESEND v2 06/10] block, bfq: remove redundant bfqd->rq_in_driver > 0 check in bfq_add_request
-Date:   Fri, 23 Dec 2022 03:16:37 +0800
-Message-Id: <20221222191641.1643117-7-shikemeng@huaweicloud.com>
+Subject: [PATCH RESEND v2 08/10] block, bfq: remove unnecessary goto tag in bfq_dispatch_rq_from_bfqq
+Date:   Fri, 23 Dec 2022 03:16:39 +0800
+Message-Id: <20221222191641.1643117-9-shikemeng@huaweicloud.com>
 X-Mailer: git-send-email 2.30.0
 In-Reply-To: <20221222191641.1643117-1-shikemeng@huaweicloud.com>
 References: <20221222191641.1643117-1-shikemeng@huaweicloud.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: Syh0CgB3a+nXPKRjMew+AQ--.3596S8
-X-Coremail-Antispam: 1UD129KBjvdXoWrZw48Cw4xJw1xGw4UWryrXrb_yoWfArb_Ca
-        18Grn7Gr1kGr45Arn0y3W5Zw10yF4fXFn5AryY9r1aqF17Ga1vy39Fqry5KF4DCa9rJ3Wa
-        yr4FvFyrJrWvvjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-        9fnUUIcSsGvfJTRUUUbS8YFVCjjxCrM7AC8VAFwI0_Wr0E3s1l1xkIjI8I6I8E6xAIw20E
+X-CM-TRANSID: Syh0CgB3a+nXPKRjMew+AQ--.3596S10
+X-Coremail-Antispam: 1UD129KBjvdXoWruF4UWF4DWFyxKr47GF15urg_yoWkZFXEyF
+        409r9ayFWkCF98Wr4YkFsrJF1jyFW2qa1DtF1Fg3y2g3W7J3ZYyF9IqrsIka95WrWIkFyY
+        qFs0q343Jr1UXjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+        9fnUUIcSsGvfJTRUUUbSxYFVCjjxCrM7AC8VAFwI0_Wr0E3s1l1xkIjI8I6I8E6xAIw20E
         Y4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l87I20VAvwVAaII0Ic2I_JFv_Gryl82
         xGYIkIc2x26280x7IE14v26r126s0DM28IrcIa0xkI8VCY1x0267AKxVW5JVCq3wA2ocxC
         64kIII0Yj41l84x0c7CEw4AK67xGY2AK021l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM2
@@ -47,38 +47,51 @@ X-Coremail-Antispam: 1UD129KBjvdXoWrZw48Cw4xJw1xGw4UWryrXrb_yoWfArb_Ca
         14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwIxGrwCF04k20xvY0x
         0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E
         7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_JF0_Jw1lIxkGc2Ij64vIr41lIxAIcV
-        C0I7IYx2IY67AKxVWUCVW8JwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF
-        04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r4j6F4UMIIF0xvEx4A2jsIEc7
-        CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x07jstxDUUUUU=
+        C0I7IYx2IY67AKxVWUCVW8JwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Cr0_Gr1UMIIF0xvE
+        42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVW8JVWxJwCI42IY6I8E87Iv6x
+        kF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUIL05UUUUU
 X-CM-SenderInfo: 5vklyvpphqwq5kxd4v5lfo033gof0z/
 X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The bfqd->rq_in_driver > 0 check is along with previous
-"bfqd->rq_in_driver == 0 ||" check, so no need to re-check
-bfqd->rq_in_driver > 0.
+We jump to tag only for returning current rq. Return directly to
+remove this tag.
 
 Signed-off-by: Kemeng Shi <shikemeng@huaweicloud.com>
 ---
- block/bfq-iosched.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ block/bfq-iosched.c | 9 +++------
+ 1 file changed, 3 insertions(+), 6 deletions(-)
 
 diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index ebcafe3c4c3b..7c91d16dbf6f 100644
+index 89995815dbae..195cdc6be087 100644
 --- a/block/bfq-iosched.c
 +++ b/block/bfq-iosched.c
-@@ -2204,8 +2204,7 @@ static void bfq_add_request(struct request *rq)
- 		 */
- 		if (bfqq == bfqd->in_service_queue &&
- 		    (bfqd->rq_in_driver == 0 ||
--		     (bfqq->last_serv_time_ns > 0 &&
--		      bfqd->rqs_injected && bfqd->rq_in_driver > 0)) &&
-+		     (bfqq->last_serv_time_ns > 0 && bfqd->rqs_injected)) &&
- 		    time_is_before_eq_jiffies(bfqq->decrease_time_jif +
- 					      msecs_to_jiffies(10))) {
- 			bfqd->last_empty_occupied_ns = ktime_get_ns();
+@@ -4965,7 +4965,7 @@ static struct request *bfq_dispatch_rq_from_bfqq(struct bfq_data *bfqd,
+ 	bfq_dispatch_remove(bfqd->queue, rq);
+ 
+ 	if (bfqq != bfqd->in_service_queue)
+-		goto return_rq;
++		return rq;
+ 
+ 	/*
+ 	 * If weight raising has to terminate for bfqq, then next
+@@ -4985,12 +4985,9 @@ static struct request *bfq_dispatch_rq_from_bfqq(struct bfq_data *bfqd,
+ 	 * belongs to CLASS_IDLE and other queues are waiting for
+ 	 * service.
+ 	 */
+-	if (!(bfq_tot_busy_queues(bfqd) > 1 && bfq_class_idle(bfqq)))
+-		goto return_rq;
++	if ((bfq_tot_busy_queues(bfqd) > 1 && bfq_class_idle(bfqq)))
++		bfq_bfqq_expire(bfqd, bfqq, false, BFQQE_BUDGET_EXHAUSTED);
+ 
+-	bfq_bfqq_expire(bfqd, bfqq, false, BFQQE_BUDGET_EXHAUSTED);
+-
+-return_rq:
+ 	return rq;
+ }
+ 
 -- 
 2.30.0
 
