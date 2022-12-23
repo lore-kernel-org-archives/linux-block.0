@@ -2,116 +2,75 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83FF1C3DA6E
-	for <linux-block@archiver.kernel.org>; Fri, 23 Dec 2022 06:00:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93A08C4332F
+	for <linux-block@archiver.kernel.org>; Fri, 23 Dec 2022 06:39:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229625AbiLWGAP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 23 Dec 2022 01:00:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38898 "EHLO
+        id S230340AbiLWGi6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 23 Dec 2022 01:38:58 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46520 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229524AbiLWGAO (ORCPT
+        with ESMTP id S230258AbiLWGi6 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 23 Dec 2022 01:00:14 -0500
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3626E640D
-        for <linux-block@vger.kernel.org>; Thu, 22 Dec 2022 22:00:14 -0800 (PST)
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 35F626732D; Fri, 23 Dec 2022 07:00:10 +0100 (CET)
-Date:   Fri, 23 Dec 2022 07:00:09 +0100
-From:   Christoph Hellwig <hch@lst.de>
-To:     Keith Busch <kbusch@meta.com>
-Cc:     linux-block@vger.kernel.org, axboe@kernel.dk, hch@lst.de,
-        martin.petersen@oracle.com, Keith Busch <kbusch@kernel.org>
-Subject: Re: [PATCH] block: save user max_sectors limit
-Message-ID: <20221223060009.GA3088@lst.de>
-References: <20221222175204.1782061-1-kbusch@meta.com>
+        Fri, 23 Dec 2022 01:38:58 -0500
+Received: from dggsgout12.his.huawei.com (unknown [45.249.212.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 725971BEB4;
+        Thu, 22 Dec 2022 22:38:56 -0800 (PST)
+Received: from mail02.huawei.com (unknown [172.30.67.169])
+        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4Ndcvr5qkYz4f3nqX;
+        Fri, 23 Dec 2022 14:38:48 +0800 (CST)
+Received: from [10.174.178.129] (unknown [10.174.178.129])
+        by APP3 (Coremail) with SMTP id _Ch0CgBH8yD6TKVjMP5SAQ--.29845S2;
+        Fri, 23 Dec 2022 14:38:51 +0800 (CST)
+Subject: Re: [PATCH 01/13] blk-mq: avoid sleep in blk_mq_alloc_request_hctx
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     axboe@kernel.dk, dwagner@suse.de, hare@suse.de,
+        ming.lei@redhat.com, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, john.garry@huawei.com
+References: <20221223125223.1687670-1-shikemeng@huaweicloud.com>
+ <20221223125223.1687670-2-shikemeng@huaweicloud.com>
+ <20221223053718.GA2676@lst.de>
+From:   Kemeng Shi <shikemeng@huaweicloud.com>
+Message-ID: <fd69227c-1350-c8fa-8231-5ca230cd2c43@huaweicloud.com>
+Date:   Fri, 23 Dec 2022 14:38:50 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.5.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221222175204.1782061-1-kbusch@meta.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <20221223053718.GA2676@lst.de>
+Content-Type: text/plain; charset=gbk
+Content-Transfer-Encoding: 7bit
+X-CM-TRANSID: _Ch0CgBH8yD6TKVjMP5SAQ--.29845S2
+X-Coremail-Antispam: 1UD129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7v73
+        VFW2AGmfu7bjvjm3AaLaJ3UjIYCTnIWjp_UUUYj7kC6x804xWl14x267AKxVW8JVW5JwAF
+        c2x0x2IEx4CE42xK8VAvwI8IcIk0rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII
+        0Yj41l84x0c7CEw4AK67xGY2AK021l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xv
+        wVC0I7IYx2IY6xkF7I0E14v26r4UJVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4
+        x0Y4vEx4A2jsIEc7CjxVAFwI0_GcCE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG
+        64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r
+        1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvEwIxGrwCYjI0SjxkI62AI1cAE67vI
+        Y487MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI
+        0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y
+        0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxV
+        WUJVW8JwCI42IY6xAIw20EY4v20xvaj40_WFyUJVCq3wCI42IY6I8E87Iv67AKxVW8JVWx
+        JwCI42IY6I8E87Iv6xkF7I0E14v26r4UJVWxJrUvcSsGvfC2KfnxnUUI43ZEXa7IU1zuWJ
+        UUUUU==
+X-CM-SenderInfo: 5vklyvpphqwq5kxd4v5lfo033gof0z/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Dec 22, 2022 at 09:52:04AM -0800, Keith Busch wrote:
-> From: Keith Busch <kbusch@kernel.org>
+Hi, Christoph.
+on 12/23/2022 1:37 PM, Christoph Hellwig wrote:
+> On Fri, Dec 23, 2022 at 08:52:11PM +0800, Kemeng Shi wrote:
+>> +	if (WARN_ON_ONCE(((!flags) & (BLK_MQ_REQ_NOWAIT | BLK_MQ_REQ_RESERVED))))
 > 
-> The user can set the max_sectors limit to any valid value via sysfs
-> /sys/block/<dev>/queue/max_sectors_kb attribute. If the device limits
-> are ever rescanned, though, the limit reverts back to the kernel defined
-> BLK_DEF_MAX_SECTORS limit.
+> This check does not make any sense.  I think what you want is
 > 
-> Preserve the user's setting for the max_sectors limit as long as it's
-> valid. The user can reset back to defaults by writing 0 to the sysfs
-> file.
-> 
-> Signed-off-by: Keith Busch <kbusch@kernel.org>
-> ---
->  block/blk-settings.c   |  9 +++++++--
->  block/blk-sysfs.c      | 10 +++++++++-
->  include/linux/blkdev.h |  1 +
->  3 files changed, 17 insertions(+), 3 deletions(-)
-> 
-> diff --git a/block/blk-settings.c b/block/blk-settings.c
-> index 0477c4d527fee..e75304f853bd5 100644
-> --- a/block/blk-settings.c
-> +++ b/block/blk-settings.c
-> @@ -40,7 +40,7 @@ void blk_set_default_limits(struct queue_limits *lim)
->  	lim->virt_boundary_mask = 0;
->  	lim->max_segment_size = BLK_MAX_SEGMENT_SIZE;
->  	lim->max_sectors = lim->max_hw_sectors = BLK_SAFE_MAX_SECTORS;
-> -	lim->max_dev_sectors = 0;
-> +	lim->max_user_sectors = lim->max_dev_sectors = 0;
->  	lim->chunk_sectors = 0;
->  	lim->max_write_zeroes_sectors = 0;
->  	lim->max_zone_append_sectors = 0;
-> @@ -135,7 +135,12 @@ void blk_queue_max_hw_sectors(struct request_queue *q, unsigned int max_hw_secto
->  	limits->max_hw_sectors = max_hw_sectors;
->  
->  	max_sectors = min_not_zero(max_hw_sectors, limits->max_dev_sectors);
-> -	max_sectors = min_t(unsigned int, max_sectors, BLK_DEF_MAX_SECTORS);
-> +
-> +	if (limits->max_user_sectors)
-> +		max_sectors = min_not_zero(max_sectors, limits->max_user_sectors);
+> 	if (WARN_ON_ONCE(!(flags & BLK_MQ_REQ_NOWAIT) ||
+> 	    WARN_ON_ONCE(!(flags & BLK_MQ_REQ_RESERVED))))
+This is exactly what I want and I will fix this in next version. Thanks.
 
-I don't think the min_not_zero here makes sense, as you just checked
-max_user_sectors for zero above, and max_sectors better not be zero.
+-- 
+Best wishes
+Kemeng Shi
 
-> +	else
-> +		max_sectors = min_t(unsigned int, max_sectors, BLK_DEF_MAX_SECTORS);
-
-And please make BLK_DEF_MAX_SECTORS an unsigned constant as it should be
-and drop the min_t here.  Instead of working around type mismatches
-just avoid them from the beginning..
-
-> +	if (max_sectors_kb == 0) {
-> +		q->limits.max_user_sectors = 0;
-> +		max_sectors_kb = min_t(unsigned int, max_hw_sectors_kb,
-> +				       BLK_DEF_MAX_SECTORS >> 1);
-
-.. which will also pay off here.
-
-> +	} else if (max_sectors_kb > max_hw_sectors_kb ||
-> +		   max_sectors_kb < page_kb)  {
->  		return -EINVAL;
-
-And this check should probably move above the old one to keep the
-sanity checks first.
-
-> +	} else {
-> +		q->limits.max_user_sectors = max_sectors_kb << 1;
-> +	}
-
-i.e.
-
-	if (max_sectors_kb > max_hw_sectors_kb || max_sectors_kb < page_kb)
-		return -EINVAL;
-
-	q->limits.max_user_sectors = max_sectors_kb << 1;
-
-	/* reset to default when the user clears max_sectors_kb: */
-	if (max_sectors_kb == 0) {
-		max_sectors_kb =
-			min(max_hw_sectors_kb, BLK_DEF_MAX_SECTORS >> 1);
-	}
