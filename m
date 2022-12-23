@@ -2,74 +2,186 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 73DD6C4332F
-	for <linux-block@archiver.kernel.org>; Fri, 23 Dec 2022 11:51:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A9861C4332F
+	for <linux-block@archiver.kernel.org>; Fri, 23 Dec 2022 13:11:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235818AbiLWLvM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 23 Dec 2022 06:51:12 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52976 "EHLO
+        id S236142AbiLWNLy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 23 Dec 2022 08:11:54 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34860 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230413AbiLWLvL (ORCPT
+        with ESMTP id S229625AbiLWNLt (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 23 Dec 2022 06:51:11 -0500
-Received: from mail-pg1-x52e.google.com (mail-pg1-x52e.google.com [IPv6:2607:f8b0:4864:20::52e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CEC3E5FCD
-        for <linux-block@vger.kernel.org>; Fri, 23 Dec 2022 03:51:10 -0800 (PST)
-Received: by mail-pg1-x52e.google.com with SMTP id f3so3192949pgc.2
-        for <linux-block@vger.kernel.org>; Fri, 23 Dec 2022 03:51:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Sjv/rRvXeISjMwkyg4jOWEP5q4M57HHzk7yPJaOOhtY=;
-        b=ZpIa3DS09D5ozTUeEZeNzSvBicRKYBlwZZu7/O2+K5u9TUnLAPK+jYdhX//qFzYKQ1
-         lp1K1u18zcUB2k5Wdo5kqOopWseXOCBpZBlMFA+DUQnqx2rwC1rEAiHQGcDYjn0+sFaa
-         Lhck/cvE9uuTmcBqo4rW2NyEKmTGYCAM39JOE=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Sjv/rRvXeISjMwkyg4jOWEP5q4M57HHzk7yPJaOOhtY=;
-        b=FJ8OeZkaGBJZYi+DZrJd6B8KPPtdx7jff1mmSZmzqJBSx7Sj1eLzZexy1BJbHlb6fE
-         l9RrrkoaF1f8z8dk/tUojiqFX1eiUQ8N5B4wNGap6s2ueEjmp2DDSkv7wKjFxN8Q9o+r
-         EVeaZpQzxEPW5PSxlo8Dm2sghw5K317GuUx4hXHOictaWXlNrbmyWHOy6yBALGKgmziB
-         cnAON8gzxr6bMZpDZkwSerBDjHk8Jki31ElcMrdjEmIQxaim4dwSR10HCKLB3cUZgQ0r
-         icGZs0PbhGI9CMHDTEJpSjf+iqamcyyaISDeDnkKKZjhHkn8VQ7D85dVh9UhoxQerITO
-         EKuQ==
-X-Gm-Message-State: AFqh2krC/Gt504+WGPIfyGIxPPnMuHnaVx+mSGWIqMPz07HmGhf+USZS
-        yipEwnKnd90lCROlpDxXc9fX7ZfMZ4M9fuBE
-X-Google-Smtp-Source: AMrXdXsPk67PjFUI8adM5H88BkzcWWRaJBvouYJe9gvxHtQcPi5cLcb9STmHwmKGx7YUo2uB609Uog==
-X-Received: by 2002:a05:6a00:1ca7:b0:56d:1bb6:af75 with SMTP id y39-20020a056a001ca700b0056d1bb6af75mr23752646pfw.4.1671796270329;
-        Fri, 23 Dec 2022 03:51:10 -0800 (PST)
-Received: from google.com (KD124209188001.ppp-bb.dion.ne.jp. [124.209.188.1])
-        by smtp.gmail.com with ESMTPSA id a3-20020a624d03000000b0056ee49d6e95sm2369161pfb.86.2022.12.23.03.51.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 23 Dec 2022 03:51:09 -0800 (PST)
-Date:   Fri, 23 Dec 2022 20:51:05 +0900
-From:   Sergey Senozhatsky <senozhatsky@chromium.org>
-To:     JeongHyeon Lee <jhs2.lee@samsung.com>
-Cc:     Andrew Morton <akpm@linux-foundation.org>,
-        senozhatsky@chromium.org, minchan@kernel.org, axboe@kernel.dk,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
-Subject: Re: [PATCH] zram: fix typos in comments
-Message-ID: <Y6WWKXUEDcq26XEF@google.com>
-References: <CGME20221223040335epcas1p45bda0013a3a42f176fa137e0597fd7c9@epcas1p4.samsung.com>
- <20221223040331.4194-1-jhs2.lee@samsung.com>
+        Fri, 23 Dec 2022 08:11:49 -0500
+Received: from mailout2.samsung.com (mailout2.samsung.com [203.254.224.25])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6FF18DFE3
+        for <linux-block@vger.kernel.org>; Fri, 23 Dec 2022 05:11:47 -0800 (PST)
+Received: from epcas5p2.samsung.com (unknown [182.195.41.40])
+        by mailout2.samsung.com (KnoxPortal) with ESMTP id 20221223131144epoutp021db1de5946760c1317501c13654eec11~zbj9Qjgbu2692726927epoutp02a
+        for <linux-block@vger.kernel.org>; Fri, 23 Dec 2022 13:11:44 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20221223131144epoutp021db1de5946760c1317501c13654eec11~zbj9Qjgbu2692726927epoutp02a
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1671801104;
+        bh=ys4cNgNp+Lt8cfq7z2qs4gP/1oOPjeqW0KDkwBWr2pA=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=SEDGK9jmge3Am5iaJUDQF1wQ48rcSM6kSFQtb+Iu/8uenYdDfRVD8IxxVu8n0KgFR
+         thtIglVNIzpY1od77eMsNuzbT/+cjcK3YyqM1z0iRwFyP4KJ67oDGCz98fSbqjOe47
+         71e8o97r8ePOxQMD2Eql6G0fwEKJANDtedhJlX90=
+Received: from epsnrtp4.localdomain (unknown [182.195.42.165]) by
+        epcas5p1.samsung.com (KnoxPortal) with ESMTP id
+        20221223131143epcas5p17ba48ad59d2514f2201525f307deafe9~zbj8M19Dw0259602596epcas5p1d;
+        Fri, 23 Dec 2022 13:11:43 +0000 (GMT)
+Received: from epsmges5p3new.samsung.com (unknown [182.195.38.178]) by
+        epsnrtp4.localdomain (Postfix) with ESMTP id 4NdndB4RYYz4x9Pq; Fri, 23 Dec
+        2022 13:11:42 +0000 (GMT)
+Received: from epcas5p2.samsung.com ( [182.195.41.40]) by
+        epsmges5p3new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        AD.25.03362.E09A5A36; Fri, 23 Dec 2022 22:11:42 +0900 (KST)
+Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
+        epcas5p2.samsung.com (KnoxPortal) with ESMTPA id
+        20221223131142epcas5p2f30d722bd9c9465b8807de9746492dfa~zbj6rpxnz1431614316epcas5p23;
+        Fri, 23 Dec 2022 13:11:42 +0000 (GMT)
+Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
+        epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
+        20221223131142epsmtrp2ad4ddd606899055ec19d09a6a32bc442~zbj6q_M312168421684epsmtrp2h;
+        Fri, 23 Dec 2022 13:11:42 +0000 (GMT)
+X-AuditID: b6c32a4b-287ff70000010d22-e7-63a5a90e824e
+Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
+        epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        E9.33.02211.D09A5A36; Fri, 23 Dec 2022 22:11:41 +0900 (KST)
+Received: from green (unknown [107.110.206.5]) by epsmtip1.samsung.com
+        (KnoxPortal) with ESMTPA id
+        20221223131140epsmtip1f2f6acb40018f29c521633963b0232de~zbj5bDVaT2911429114epsmtip16;
+        Fri, 23 Dec 2022 13:11:40 +0000 (GMT)
+Date:   Fri, 23 Dec 2022 18:41:37 +0530
+From:   Kanchan Joshi <joshi.k@samsung.com>
+To:     Luis Chamberlain <mcgrof@kernel.org>
+Cc:     osandov@fb.com, j.granados@samsung.com, anuj20.g@samsung.com,
+        ankit.kumar@samsung.com, vincent.fu@samsung.com,
+        ming.lei@redhat.com, linux-block@vger.kernel.org
+Subject: Re: [PATCH 2/6] tests/nvme: add new test for rand-read on the nvme
+ character device
+Message-ID: <20221223131137.GA27984@green>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221223040331.4194-1-jhs2.lee@samsung.com>
+In-Reply-To: <20221221103441.3216600-3-mcgrof@kernel.org>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFupnk+LIzCtJLcpLzFFi42LZdlhTQ5dv5dJkg1XH5C3WXPnNbtE04S+z
+        xdL9Dxkt9t7Strgx4SmjxaHJzUwWh+9dZbF43N3B6MDhMbH5HbvHplWdbB7v911l8+jbsorR
+        4/MmuQDWqGybjNTElNQihdS85PyUzLx0WyXv4HjneFMzA0NdQ0sLcyWFvMTcVFslF58AXbfM
+        HKBTlBTKEnNKgUIBicXFSvp2NkX5pSWpChn5xSW2SqkFKTkFJgV6xYm5xaV56Xp5qSVWhgYG
+        RqZAhQnZGcvv5xesE6j4/b2ZrYHxIW8XIyeHhICJROfR9exdjFwcQgK7GSW6tt5mg3A+MUp8
+        37yIEaRKSOAbo8Tm/VFdjBxgHXtOQ9XsZZTY9OsFK4TzmFHi5bfLYA0sAqoSU7Z2M4M0sAlo
+        SlyYXAoSFhHQkNg3oZcJpJ5ZYDmjxOm9O9lBEsICcRKn97SC9fIKaEk8/bSHCcIWlDg58wkL
+        iM0pYCnRs3cqmC0qoCxxYNtxsEESAn/ZJU6u72SFuM5F4uNZF4jXhCVeHd/CDmFLSXx+t5cN
+        wk6WuDTzHBOEXSLxeM9BKNteovVUPzOIzSyQIXHwzSNGCJtPovf3EyaI8bwSHW1CEOWKEvcm
+        PWWFsMUlHs5YAmV7SLy9sY4VEm7AEL22rHYCo9wsJN/MQrIBwraS6PzQxDoLaAOzgLTE8n8c
+        EKamxPpd+gsYWVcxSqYWFOempxabFhjnpZbDIzg5P3cTIzhlannvYHz04IPeIUYmDsZDjBIc
+        zEoivFseL04W4k1JrKxKLcqPLyrNSS0+xGgKjJ2JzFKiyfnApJ1XEm9oYmlgYmZmZmJpbGao
+        JM6bunV+spBAemJJanZqakFqEUwfEwenVAPTZfbJB7+r7uvpNZA4t/yxlJzI+mulS97O//2a
+        KYYpg2/iwXsK+0xdfzY+2On857TcmX37DilkblOqybzGPO3g3k/+zFu0e6LZLGVPdk2cMHPq
+        ujU/LTP3NJ94q21UYvhj2q93eSc/NFtLW89vv3P4Yum8XzOCPmRYigZsKbtgd/H9ZsmLH32t
+        05y83ZyKVmY+5T/axFu9sNnPuaK4n/HIpL7L+jluZrkbGlZ5//4QkhC/+lqAuD6bScW7h9Fx
+        jTzXY88fCZ8999zTF209wlMPv17HN1E1Vd1EbtfToM0xLd7z11eoVvxI4PurLX/4fIInU9D9
+        TUt2ipZNt3OUfceS7ywVf+Vo2hMnhsDH08/pKLEUZyQaajEXFScCAISG09QiBAAA
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrALMWRmVeSWpSXmKPExsWy7bCSnC7vyqXJBjtPWlmsufKb3aJpwl9m
+        i6X7HzJa7L2lbXFjwlNGi0OTm5ksDt+7ymLxuLuD0YHDY2LzO3aPTas62Tze77vK5tG3ZRWj
+        x+dNcgGsUVw2Kak5mWWpRfp2CVwZ3yYuZSt4wFvx6OF/xgbGtdxdjBwcEgImEntOs3UxcnEI
+        CexmlLi25jpLFyMnUFxcovnaD3YIW1hi5b/n7BBFDxklts9dCVbEIqAqMWVrNzPIIDYBTYkL
+        k0tBwiICGhL7JvQygdjMAssZJR5/SQKxhQXiJE7vaWUEsXkFtCSeftrDBLf4wvavTBAJQYmT
+        M5+wQDSbSczb/BBsPrOAtMTyfxwgYU4BS4mevVPBSkQFlCUObDvONIFRcBaS7llIumchdC9g
+        ZF7FKJlaUJybnltsWGCYl1quV5yYW1yal66XnJ+7iREcCVqaOxi3r/qgd4iRiYPxEKMEB7OS
+        CO+Wx4uThXhTEiurUovy44tKc1KLDzFKc7AoifNe6DoZLySQnliSmp2aWpBaBJNl4uCUamAS
+        3d/GvUorWMgtI9c0ObFI9oA9827nxhzTJtci/RIx9WLukik/TeRurz78fWJkS3w507nGtR+O
+        uU/NNnbKrZ5cstgvVIUnwrfcfkaw2/4fisVex8q8pyfu955vp5am7jPz1b+2k8GLpDx0bBdu
+        DeH/Xv3isLmuX0Peu6VL1fYc2CyldGZGmodo6v7c01t0lfJ2T9P3sjNdc66EPVk23ODFm662
+        VXZidn/rTp068bPIxzU9P+/OjN3Kc7fm3n26JPpc1PftLY75Svu0phRVaqnFLJ4VsG/i/9L2
+        yQmzq5Qdn62RucDjXZJ/uTc8KC74hVVK3eQ7PSLvlq7V+mzirb7fgO9SpvPlIk0Gran3lViK
+        MxINtZiLihMBtGllTfMCAAA=
+X-CMS-MailID: 20221223131142epcas5p2f30d722bd9c9465b8807de9746492dfa
+X-Msg-Generator: CA
+Content-Type: multipart/mixed;
+        boundary="----d7wgNpQcY-y3Wxr.o4x8P.ZM-s8jhIouQULCgAQexljrVMsg=_55b46_"
+CMS-TYPE: 105P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20221221103532epcas5p2c806adb12a32e259438511a584216c11
+References: <20221221103441.3216600-1-mcgrof@kernel.org>
+        <CGME20221221103532epcas5p2c806adb12a32e259438511a584216c11@epcas5p2.samsung.com>
+        <20221221103441.3216600-3-mcgrof@kernel.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Cc-ing Andrew
+------d7wgNpQcY-y3Wxr.o4x8P.ZM-s8jhIouQULCgAQexljrVMsg=_55b46_
+Content-Type: text/plain; charset="utf-8"; format="flowed"
+Content-Disposition: inline
 
-On (22/12/23 13:03), JeongHyeon Lee wrote:
-> - The double `range` is duplicated in comment, remove one.
->  - change `syfs` to `sysfs`
-> 
-> Signed-off-by: JeongHyeon Lee <jhs2.lee@samsung.com>
+On Wed, Dec 21, 2022 at 02:34:37AM -0800, Luis Chamberlain wrote:
+>This does basic rand-read testing of the character device of a
+>conventional NVMe drive.
+>
+>Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
+>---
+> tests/nvme/046     | 42 ++++++++++++++++++++++++++++++++++++++++++
+> tests/nvme/046.out |  2 ++
+> 2 files changed, 44 insertions(+)
+> create mode 100755 tests/nvme/046
+> create mode 100644 tests/nvme/046.out
+>
+>diff --git a/tests/nvme/046 b/tests/nvme/046
+>new file mode 100755
+>index 000000000000..3526ab9eedab
+>--- /dev/null
+>+++ b/tests/nvme/046
+>@@ -0,0 +1,42 @@
+>+#!/bin/bash
+>+# SPDX-License-Identifier: GPL-3.0+
+>+# Copyright (C) 2022 Luis Chamberlain <mcgrof@kernel.org>
+>+#
+>+# This does basic sanity test for the nvme character device. This is a basic
+>+# test and if it fails it is probably very likely other nvme character device
+>+# tests would fail.
+>+#
+>+. tests/nvme/rc
+>+
+>+DESCRIPTION="basic rand-read io_uring_cmd engine for nvme-ns character device"
+>+QUICK=1
+>+
+>+requires() {
+>+	_nvme_requires
+>+	_have_fio
+>+}
+>+
+>+device_requires() {
+>+	_require_test_dev_is_nvme
+>+}
+>+
+>+test_device() {
+>+	echo "Running ${TEST_NAME}"
+>+	local ngdev=${TEST_DEV/nvme/ng}
+>+	local fio_args=(
+>+		--size=1M
+>+		--cmd_type=nvme
+>+		--filename="$ngdev"
+>+		--time_based
+>+		--runtime=10
+>+	) &&
 
-Reviewed-by: Sergey Senozhatsky <senozhatsky@chromium.org>
+Is this && needed?
+
+>+	_run_fio_rand_iouring_cmd "${fio_args[@]}" >>"${FULL}" 2>&1 ||
+
+Something to change here (and therefore in other patches too).
+If we change "cmd_type = something_random", test continues to show the
+success while it should show failure.
+
+How about changing above line to:
+_run_fio_rand_iouring_cmd "${fio_args[@]}" || fail=true
+
+And thanks for the series.
+
+
+------d7wgNpQcY-y3Wxr.o4x8P.ZM-s8jhIouQULCgAQexljrVMsg=_55b46_
+Content-Type: text/plain; charset="utf-8"
+
+
+------d7wgNpQcY-y3Wxr.o4x8P.ZM-s8jhIouQULCgAQexljrVMsg=_55b46_--
