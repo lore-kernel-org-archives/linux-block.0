@@ -2,83 +2,128 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E5007C4332F
-	for <linux-block@archiver.kernel.org>; Fri, 23 Dec 2022 15:41:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21AA8C4332F
+	for <linux-block@archiver.kernel.org>; Fri, 23 Dec 2022 15:56:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236441AbiLWPlc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 23 Dec 2022 10:41:32 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53234 "EHLO
+        id S230219AbiLWP4n (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 23 Dec 2022 10:56:43 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33394 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236522AbiLWPlV (ORCPT
+        with ESMTP id S230157AbiLWP4m (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 23 Dec 2022 10:41:21 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3314A1148;
-        Fri, 23 Dec 2022 07:41:20 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id A9E326158B;
-        Fri, 23 Dec 2022 15:41:19 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 55F15C433D2;
-        Fri, 23 Dec 2022 15:41:15 +0000 (UTC)
-Date:   Fri, 23 Dec 2022 10:41:13 -0500
-From:   Steven Rostedt <rostedt@goodmis.org>
-To:     Linus Torvalds <torvalds@linux-foundation.org>,
-        Thomas Gleixner <tglx@linutronix.de>
-Cc:     LKML <linux-kernel@vger.kernel.org>,
-        Stephen Boyd <sboyd@kernel.org>,
-        Guenter Roeck <linux@roeck-us.net>,
-        Anna-Maria Gleixner <anna-maria@linutronix.de>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Julia Lawall <Julia.Lawall@inria.fr>, linux-sh@vger.kernel.org,
-        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-acpi@vger.kernel.org,
-        linux-atm-general@lists.sourceforge.net, netdev@vger.kernel.org,
-        drbd-dev@lists.linbit.com, linux-bluetooth@vger.kernel.org,
-        intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-        linux-input@vger.kernel.org, linux-leds@vger.kernel.org,
-        linux-media@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
-        linux-usb@vger.kernel.org, linux-wireless@vger.kernel.org,
-        brcm80211-dev-list.pdl@broadcom.com,
-        SHA-cyfmac-dev-list@infineon.com, linux-scsi@vger.kernel.org,
-        linux-staging@lists.linux.dev, linux-ext4@vger.kernel.org,
-        linux-nilfs@vger.kernel.org, bridge@lists.linux-foundation.org,
-        netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
-        lvs-devel@vger.kernel.org, linux-nfs@vger.kernel.org,
-        tipc-discussion@lists.sourceforge.net, alsa-devel@alsa-project.org
-Subject: Re: [PATCH] treewide: Convert del_timer*() to timer_shutdown*()
-Message-ID: <20221223104113.0bc8d37f@gandalf.local.home>
-In-Reply-To: <20221220134519.3dd1318b@gandalf.local.home>
-References: <20221220134519.3dd1318b@gandalf.local.home>
-X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+        Fri, 23 Dec 2022 10:56:42 -0500
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F0D6A379E1
+        for <linux-block@vger.kernel.org>; Fri, 23 Dec 2022 07:56:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
+        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=BNX8VLljCWB7Hky5keRLcIjg+3UcTIifKDcoXrG5Ok8=; b=q7E7VpPzOKI/IYW6NZOGgqKoYR
+        0mk1h8/n2FlHPdDr3dTjxB2zT3RCbo1T4rK9AyGL+mE5XShABvRb5LCMMyVskuFYGkXAo7Qw1fRQD
+        9IDn0AjDsriHMd7lAWU6ZVoJlAd7iSRSJf8BI9kzLZD9oUoEeLmDiZBNtjZvoqkaO9c22822c80w3
+        Uh0S0MTKMmwQslDtLB/Z0Za9rEvGVz42MQyfnAhAZMlMO8cG2gRWvU+hNfZM6EFziGy3DOjDX/4R+
+        /LIuNoprqK0XX7yfDZ2rEHpLR/4xQtfBpMmFlXG8B2aFdznBXtBCMmrF6RVNWTFf5sVLb5sODjNEk
+        kXAKKoxg==;
+Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1p8kPT-009hVz-AM; Fri, 23 Dec 2022 15:56:35 +0000
+Date:   Fri, 23 Dec 2022 07:56:35 -0800
+From:   Luis Chamberlain <mcgrof@kernel.org>
+To:     Kanchan Joshi <joshi.k@samsung.com>, bvanassche@acm.org
+Cc:     osandov@fb.com, j.granados@samsung.com, anuj20.g@samsung.com,
+        ankit.kumar@samsung.com, vincent.fu@samsung.com,
+        ming.lei@redhat.com, linux-block@vger.kernel.org
+Subject: Re: [PATCH 2/6] tests/nvme: add new test for rand-read on the nvme
+ character device
+Message-ID: <Y6XPs3MoyltFvEYT@bombadil.infradead.org>
+References: <20221221103441.3216600-1-mcgrof@kernel.org>
+ <CGME20221221103532epcas5p2c806adb12a32e259438511a584216c11@epcas5p2.samsung.com>
+ <20221221103441.3216600-3-mcgrof@kernel.org>
+ <20221223131137.GA27984@green>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221223131137.GA27984@green>
+Sender: Luis Chamberlain <mcgrof@infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, 20 Dec 2022 13:45:19 -0500
-Steven Rostedt <rostedt@goodmis.org> wrote:
-
-> [
->   Linus,
+On Fri, Dec 23, 2022 at 06:41:37PM +0530, Kanchan Joshi wrote:
+> On Wed, Dec 21, 2022 at 02:34:37AM -0800, Luis Chamberlain wrote:
+> > This does basic rand-read testing of the character device of a
+> > conventional NVMe drive.
+> > 
+> > Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
+> > ---
+> > tests/nvme/046     | 42 ++++++++++++++++++++++++++++++++++++++++++
+> > tests/nvme/046.out |  2 ++
+> > 2 files changed, 44 insertions(+)
+> > create mode 100755 tests/nvme/046
+> > create mode 100644 tests/nvme/046.out
+> > 
+> > diff --git a/tests/nvme/046 b/tests/nvme/046
+> > new file mode 100755
+> > index 000000000000..3526ab9eedab
+> > --- /dev/null
+> > +++ b/tests/nvme/046
+> > @@ -0,0 +1,42 @@
+> > +#!/bin/bash
+> > +# SPDX-License-Identifier: GPL-3.0+
+> > +# Copyright (C) 2022 Luis Chamberlain <mcgrof@kernel.org>
+> > +#
+> > +# This does basic sanity test for the nvme character device. This is a basic
+> > +# test and if it fails it is probably very likely other nvme character device
+> > +# tests would fail.
+> > +#
+> > +. tests/nvme/rc
+> > +
+> > +DESCRIPTION="basic rand-read io_uring_cmd engine for nvme-ns character device"
+> > +QUICK=1
+> > +
+> > +requires() {
+> > +	_nvme_requires
+> > +	_have_fio
+> > +}
+> > +
+> > +device_requires() {
+> > +	_require_test_dev_is_nvme
+> > +}
+> > +
+> > +test_device() {
+> > +	echo "Running ${TEST_NAME}"
+> > +	local ngdev=${TEST_DEV/nvme/ng}
+> > +	local fio_args=(
+> > +		--size=1M
+> > +		--cmd_type=nvme
+> > +		--filename="$ngdev"
+> > +		--time_based
+> > +		--runtime=10
+> > +	) &&
 > 
->     I ran the script against your latest master branch:
->     commit b6bb9676f2165d518b35ba3bea5f1fcfc0d969bf
-> 
->     As the timer_shutdown*() code is now in your tree, I figured
->     we can start doing the conversions. At least add the trivial ones
->     now as Thomas suggested that this gets applied at the end of the
->     merge window, to avoid conflicts with linux-next during the
->     development cycle. I can wait to Friday to run it again, and
->     resubmit.
-> 
->     What is the best way to handle this?
-> ]
+> Is this && needed?
 
-Note, I just did a git remote update, checked out the latest, re-ran the
-script, and this patch hasn't changed.
+This form was inspired by commit 238c7e0b by Bart, but yeah you're
+right, I can't see any reason for it, so we can clean zbd/010 from it too.
+> 
+> > +	_run_fio_rand_iouring_cmd "${fio_args[@]}" >>"${FULL}" 2>&1 ||
+> 
+> Something to change here (and therefore in other patches too).
+> If we change "cmd_type = something_random", test continues to show the
+> success while it should show failure.
 
--- Steve
+Definitely no bueno.
+
+> How about changing above line to:
+> _run_fio_rand_iouring_cmd "${fio_args[@]}" || fail=true
+
+We'd loose the 046.full log then.
+
+If we just return $? at the end of _run_fio_rand_iouring_cmd() that
+seems to fix the undetected error. Whatyda think?
+
+I noticed an odd thing in the last two patches which work for zone
+storage, if I change the runtime it doesn't take longer, so I think
+something is still off there too... can you take a look?
+
+  Luis
