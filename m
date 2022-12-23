@@ -2,42 +2,42 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 45A9CC3DA6E
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 32F74C4332F
 	for <linux-block@archiver.kernel.org>; Fri, 23 Dec 2022 04:53:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235667AbiLWExo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 22 Dec 2022 23:53:44 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51906 "EHLO
+        id S229656AbiLWExn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 22 Dec 2022 23:53:43 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51914 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230060AbiLWExf (ORCPT
+        with ESMTP id S230024AbiLWExe (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 22 Dec 2022 23:53:35 -0500
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BFBAA12771;
-        Thu, 22 Dec 2022 20:53:34 -0800 (PST)
+        Thu, 22 Dec 2022 23:53:34 -0500
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EADEB2EF96;
+        Thu, 22 Dec 2022 20:53:33 -0800 (PST)
 Received: from mail02.huawei.com (unknown [172.30.67.153])
-        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4NdZZK23gYz4f3xJn;
-        Fri, 23 Dec 2022 12:53:29 +0800 (CST)
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4NdZZJ529zz4f3p5V;
+        Fri, 23 Dec 2022 12:53:28 +0800 (CST)
 Received: from huaweicloud.com (unknown [10.175.124.27])
-        by APP4 (Coremail) with SMTP id gCh0CgDXjbFHNKVjpOduAQ--.93S11;
-        Fri, 23 Dec 2022 12:53:32 +0800 (CST)
+        by APP4 (Coremail) with SMTP id gCh0CgDXjbFHNKVjpOduAQ--.93S9;
+        Fri, 23 Dec 2022 12:53:31 +0800 (CST)
 From:   Kemeng Shi <shikemeng@huaweicloud.com>
 To:     axboe@kernel.dk, dwagner@suse.de, hare@suse.de,
         ming.lei@redhat.com, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org
 Cc:     hch@lst.de, john.garry@huawei.com, shikemeng@huaweicloud.com
-Subject: [PATCH 09/13] blk-mq: remove unnecessary error count and check in blk_mq_dispatch_rq_list
-Date:   Fri, 23 Dec 2022 20:52:19 +0800
-Message-Id: <20221223125223.1687670-10-shikemeng@huaweicloud.com>
+Subject: [PATCH 07/13] blk-mq: remove error count and unncessary flush in blk_mq_try_issue_list_directly
+Date:   Fri, 23 Dec 2022 20:52:17 +0800
+Message-Id: <20221223125223.1687670-8-shikemeng@huaweicloud.com>
 X-Mailer: git-send-email 2.30.0
 In-Reply-To: <20221223125223.1687670-1-shikemeng@huaweicloud.com>
 References: <20221223125223.1687670-1-shikemeng@huaweicloud.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgDXjbFHNKVjpOduAQ--.93S11
-X-Coremail-Antispam: 1UD129KBjvJXoW7Ar47WrW7uF4kWFyrGw15Jwb_yoW8uw1xpF
-        45Gan0y3yrXF40qFy8Aa9xGwn5trs5Cw1DGFy3C3yavFnrKrs7JF4rJrWUu3WfKrs09F47
-        XF18WrWYvan7WrDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+X-CM-TRANSID: gCh0CgDXjbFHNKVjpOduAQ--.93S9
+X-Coremail-Antispam: 1UD129KBjvJXoW7tryrKF4UZw1xZF1UZF4fKrg_yoW8Zw4kpF
+        W5Ga1qkr4avr4xurW8Ca9rC3W2vrs8GrW7KF43Cw1aqrW5WrWI9r4aqrW7Was2krs3Aw4a
+        9FWUWr90yay5XrDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
         9KBjDU0xBIdaVrnRJUUUPF14x267AKxVWrJVCq3wAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
         rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2jI8I6cxK62vIxIIY0VWUZVW8XwA2048vs2IY02
         0E87I2jVAFwI0_JF0E3s1l82xGYIkIc2x26xkF7I0E14v26ryj6s0DM28lY4IEw2IIxxk0
@@ -58,68 +58,60 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-blk_mq_dispatch_rq_list will notify if hctx is busy in return bool. It will
-return true if we are not busy and can handle more and return false on the
-opposite. Inside blk_mq_dispatch_rq_list, we will return true if list is
-empty and (errors + queued) != 0.
+blk_mq_try_issue_list_directly try to send a list requests belong to the
+same hctx to driver. Normally, we will send flush along with last request
+in the list by set last parameter in blk_mq_request_issue_directly.
+Extra flush is needed for two cases:
+1. We stop sending at middle of list and normal flush along with last
+request will not be sent.
+2. Error happens at sending last request and normal flush may be lost.
 
-For busy error BLK_STS*_RESOURCE, the failed request will be added back
-to list and list will not be empty. We count queued for BLK_STS_OK and
-errors for rest error except busy error.
-So if list is empty, (errors + queued) will be total requests in the list
-which is checked not empty at beginning of blk_mq_dispatch_rq_list. So
-(errors + queued) != 0 is always met if all requests are handled. Then the
-(errors + queued) != 0 check and errors number count is not needed.
+We will only break list walk if we get BLK_STS_RESOURCE or
+BLK_STS_DEV_RESOURCE which will be stored in ret. So for case 1, we can
+simply check ret and send a extra flush if ret is not BLK_STS_OK.
+For case 2, the error of last request in the list is also stored in ret, we
+can simply check ret and send a extra flush if ret is not BLK_STS_OK too.
+
+Then error count is not needed and error in middle of list will not trigger
+unnecessary extra flush anymore.
 
 Signed-off-by: Kemeng Shi <shikemeng@huaweicloud.com>
 ---
- block/blk-mq.c | 11 +++++------
- 1 file changed, 5 insertions(+), 6 deletions(-)
+ block/blk-mq.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
 
 diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 9c5971b04adc..97e2a07062de 100644
+index 01f48a73eacd..f67acd78a9c2 100644
 --- a/block/blk-mq.c
 +++ b/block/blk-mq.c
-@@ -2009,7 +2009,7 @@ bool blk_mq_dispatch_rq_list(struct blk_mq_hw_ctx *hctx, struct list_head *list,
- 	enum prep_dispatch prep;
- 	struct request_queue *q = hctx->queue;
- 	struct request *rq, *nxt;
--	int errors, queued;
-+	int queued;
- 	blk_status_t ret = BLK_STS_OK;
- 	LIST_HEAD(zone_list);
- 	bool needs_resource = false;
-@@ -2020,7 +2020,7 @@ bool blk_mq_dispatch_rq_list(struct blk_mq_hw_ctx *hctx, struct list_head *list,
- 	/*
- 	 * Now process all the entries, sending them to the driver.
- 	 */
--	errors = queued = 0;
-+	queued = 0;
- 	do {
- 		struct blk_mq_queue_data bd;
+@@ -2803,17 +2803,15 @@ void blk_mq_try_issue_list_directly(struct blk_mq_hw_ctx *hctx,
+ 		struct list_head *list)
+ {
+ 	int queued = 0;
+-	int errors = 0;
++	blk_status_t ret;
  
-@@ -2073,7 +2073,6 @@ bool blk_mq_dispatch_rq_list(struct blk_mq_hw_ctx *hctx, struct list_head *list,
- 			needs_resource = true;
- 			break;
- 		default:
+ 	while (!list_empty(list)) {
+-		blk_status_t ret;
+ 		struct request *rq = list_first_entry(list, struct request,
+ 				queuelist);
+ 
+ 		list_del_init(&rq->queuelist);
+ 		ret = blk_mq_request_issue_directly(rq, list_empty(list));
+ 		if (ret != BLK_STS_OK) {
 -			errors++;
- 			blk_mq_end_request(rq, ret);
- 		}
- 	} while (!list_empty(list));
-@@ -2151,10 +2150,10 @@ bool blk_mq_dispatch_rq_list(struct blk_mq_hw_ctx *hctx, struct list_head *list,
- 
- 		blk_mq_update_dispatch_busy(hctx, true);
- 		return false;
--	} else
--		blk_mq_update_dispatch_busy(hctx, false);
-+	}
- 
--	return (queued + errors) != 0;
-+	blk_mq_update_dispatch_busy(hctx, false);
-+	return true;
+ 			if (ret == BLK_STS_RESOURCE ||
+ 					ret == BLK_STS_DEV_RESOURCE) {
+ 				blk_mq_request_bypass_insert(rq, false,
+@@ -2830,7 +2828,7 @@ void blk_mq_try_issue_list_directly(struct blk_mq_hw_ctx *hctx,
+ 	 * the driver there was more coming, but that turned out to
+ 	 * be a lie.
+ 	 */
+-	if (errors && hctx->queue->mq_ops->commit_rqs && queued)
++	if (ret != BLK_STS_OK && hctx->queue->mq_ops->commit_rqs && queued)
+ 		hctx->queue->mq_ops->commit_rqs(hctx);
  }
  
- /**
 -- 
 2.30.0
 
