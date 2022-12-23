@@ -2,126 +2,88 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E6917C3DA6E
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D0E7FC4332F
 	for <linux-block@archiver.kernel.org>; Fri, 23 Dec 2022 04:53:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235443AbiLWExj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 22 Dec 2022 23:53:39 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51912 "EHLO
+        id S229627AbiLWExi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 22 Dec 2022 23:53:38 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51890 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229996AbiLWExe (ORCPT
+        with ESMTP id S229667AbiLWExd (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 22 Dec 2022 23:53:34 -0500
+        Thu, 22 Dec 2022 23:53:33 -0500
 Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 904072654D;
-        Thu, 22 Dec 2022 20:53:33 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 32B98BC19;
+        Thu, 22 Dec 2022 20:53:31 -0800 (PST)
 Received: from mail02.huawei.com (unknown [172.30.67.153])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4NdZZJ2DZ0z4f3p5T;
-        Fri, 23 Dec 2022 12:53:28 +0800 (CST)
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4NdZZF6Hlbz4f3p1W;
+        Fri, 23 Dec 2022 12:53:25 +0800 (CST)
 Received: from huaweicloud.com (unknown [10.175.124.27])
-        by APP4 (Coremail) with SMTP id gCh0CgDXjbFHNKVjpOduAQ--.93S8;
-        Fri, 23 Dec 2022 12:53:31 +0800 (CST)
+        by APP4 (Coremail) with SMTP id gCh0CgDXjbFHNKVjpOduAQ--.93S2;
+        Fri, 23 Dec 2022 12:53:28 +0800 (CST)
 From:   Kemeng Shi <shikemeng@huaweicloud.com>
 To:     axboe@kernel.dk, dwagner@suse.de, hare@suse.de,
         ming.lei@redhat.com, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org
 Cc:     hch@lst.de, john.garry@huawei.com, shikemeng@huaweicloud.com
-Subject: [PATCH 06/13] blk-mq: remove unncessary error count and flush in blk_mq_plug_issue_direct
-Date:   Fri, 23 Dec 2022 20:52:16 +0800
-Message-Id: <20221223125223.1687670-7-shikemeng@huaweicloud.com>
+Subject: [PATCH 00/13] A few bugfix and cleanup patches for blk-mq
+Date:   Fri, 23 Dec 2022 20:52:10 +0800
+Message-Id: <20221223125223.1687670-1-shikemeng@huaweicloud.com>
 X-Mailer: git-send-email 2.30.0
-In-Reply-To: <20221223125223.1687670-1-shikemeng@huaweicloud.com>
-References: <20221223125223.1687670-1-shikemeng@huaweicloud.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgDXjbFHNKVjpOduAQ--.93S8
-X-Coremail-Antispam: 1UD129KBjvJXoW7AF13uFW7Xr43tF1DCr4kZwb_yoW8Kw4xpF
-        W5GanFkrn5XrW8Zry8Aa9rA34jvrWrJFW3Wrn0yw13XrZ8GrWa9ry5trWSgryIyrs3Aw43
-        ur4Yg34DXr15XrJanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUPF14x267AKxVWrJVCq3wAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2jI8I6cxK62vIxIIY0VWUZVW8XwA2048vs2IY02
-        0E87I2jVAFwI0_JF0E3s1l82xGYIkIc2x26xkF7I0E14v26ryj6s0DM28lY4IEw2IIxxk0
-        rwA2F7IY1VAKz4vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6x
-        IIjxv20xvEc7CjxVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xv
-        wVC2z280aVCY1x0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFc
-        xC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_
-        Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2
-        IErcIFxwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E
-        14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIx
-        kGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUCVW8JwCI42IY6xIIjxv20xvEc7CjxVAF
-        wI0_Cr0_Gr1UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJV
-        W8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjTRKfOw
-        UUUUU
+X-CM-TRANSID: gCh0CgDXjbFHNKVjpOduAQ--.93S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7uF1xXF4fKry7XFWDAF1DZFb_yoW8Jw4kpF
+        43GFnxGa1fJry2qr1fAw47AF9avF4kGrW7JwnxC34rJr4DCryUJrWkWa1fZry0yFZxCanr
+        WF18Xw1YkF1Iqa7anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUvj14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2jI8I6cxK62vIxIIY0VWUZVW8XwA2ocxC64kIII
+        0Yj41l84x0c7CEw4AK67xGY2AK021l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xv
+        wVC0I7IYx2IY6xkF7I0E14v26F4j6r4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7
+        xvwVC2z280aVCY1x0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40E
+        FcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr
+        0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8v
+        x2IErcIFxwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F4
+        0E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFyl
+        IxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxV
+        AFwI0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6rW3Jr0E3s1lIxAIcVC2z280aVAFwI0_
+        Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVWUJVW8JbIYCTnIWIevJa73UjIFyTuYvjTRNg
+        AwUUUUU
 X-CM-SenderInfo: 5vklyvpphqwq5kxd4v5lfo033gof0z/
 X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-blk_mq_plug_issue_direct try to send a list of requests which belong to
-different hctxs. Normally, we will send flush when hctx changes as there
-maybe no more request for the same hctx. Besides we will send flush along
-with last request in the list by set last parameter of
-blk_mq_request_issue_directly.
+Hi, this series contain several bugfix patches to fix potential io
+hung and a few cleanup patches to remove stale codes and unnecessary
+check. Most changes are in request issue and dispatch path. Thanks.
 
-Extra flush is needed for two cases:
-1. We stop sending at middle of list, then normal flush sent after last
-request of current hctx is miss.
-2. Error happens at sending last request and normal flush may be lost.
+Kemeng Shi (13):
+  blk-mq: avoid sleep in blk_mq_alloc_request_hctx
+  blk-mq: remove stale comment for blk_mq_sched_mark_restart_hctx
+  blk-mq: wait on correct sbitmap_queue in blk_mq_mark_tag_wait
+  blk-mq: Fix potential io hung for shared sbitmap per tagset
+  blk-mq: remove unnecessary list_empty check in
+    blk_mq_try_issue_list_directly
+  blk-mq: remove unncessary error count and flush in
+    blk_mq_plug_issue_direct
+  blk-mq: remove error count and unncessary flush in
+    blk_mq_try_issue_list_directly
+  blk-mq: simplify flush check in blk_mq_dispatch_rq_list
+  blk-mq: remove unnecessary error count and check in
+    blk_mq_dispatch_rq_list
+  blk-mq: remove set bd->last when get driver tag for next request fails
+  blk-mq: remove unncessary from_schedule parameter in
+    blk_mq_plug_issue_direct
+  blk-mq: use switch/case to improve readability in
+    blk_mq_try_issue_list_directly
+  blk-mq: correct stale comment of .get_budget
 
-In blk_mq_plug_issue_direct, we only break the list walk if we get
-BLK_STS_RESOURCE or BLK_STS_DEV_RESOURCE error. We will send extra flush
-for this case already.
-We count error number and send extra flush if error number is non-zero
-after sending all requests in list. This could cover case 2 described
-above, but there are two things to improve:
-1. If last request is sent successfully, error of request at middle of list
-will trigger an unnecessary flush.
-2. We only need error of last request instead of error number and error of
-last request can be simply retrieved from ret.
+ block/blk-mq-sched.c |   7 ++-
+ block/blk-mq.c       | 103 ++++++++++++++++++-------------------------
+ 2 files changed, 46 insertions(+), 64 deletions(-)
 
-Cover case 2 above by simply check ret of last request and remove
-unnecessary error count and flush to improve blk_mq_plug_issue_direct.
-
-Signed-off-by: Kemeng Shi <shikemeng@huaweicloud.com>
----
- block/blk-mq.c | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
-
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index a447a7586032..01f48a73eacd 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -2686,11 +2686,10 @@ static void blk_mq_plug_issue_direct(struct blk_plug *plug, bool from_schedule)
- 	struct blk_mq_hw_ctx *hctx = NULL;
- 	struct request *rq;
- 	int queued = 0;
--	int errors = 0;
-+	blk_status_t ret;
- 
- 	while ((rq = rq_list_pop(&plug->mq_list))) {
- 		bool last = rq_list_empty(plug->mq_list);
--		blk_status_t ret;
- 
- 		if (hctx != rq->mq_hctx) {
- 			if (hctx)
-@@ -2710,7 +2709,6 @@ static void blk_mq_plug_issue_direct(struct blk_plug *plug, bool from_schedule)
- 			return;
- 		default:
- 			blk_mq_end_request(rq, ret);
--			errors++;
- 			break;
- 		}
- 	}
-@@ -2719,7 +2717,7 @@ static void blk_mq_plug_issue_direct(struct blk_plug *plug, bool from_schedule)
- 	 * If we didn't flush the entire list, we could have told the driver
- 	 * there was more coming, but that turned out to be a lie.
- 	 */
--	if (errors)
-+	if (ret != BLK_STS_OK)
- 		blk_mq_commit_rqs(hctx, &queued, from_schedule);
- }
- 
 -- 
 2.30.0
 
