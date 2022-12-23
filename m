@@ -2,143 +2,140 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B5C2BC4332F
-	for <linux-block@archiver.kernel.org>; Thu, 22 Dec 2022 17:52:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D448C4332F
+	for <linux-block@archiver.kernel.org>; Fri, 23 Dec 2022 04:03:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229797AbiLVRwN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 22 Dec 2022 12:52:13 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42822 "EHLO
+        id S230040AbiLWEDp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 22 Dec 2022 23:03:45 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43186 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229734AbiLVRwM (ORCPT
+        with ESMTP id S229524AbiLWEDn (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 22 Dec 2022 12:52:12 -0500
-Received: from mx0b-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 55484B7CC
-        for <linux-block@vger.kernel.org>; Thu, 22 Dec 2022 09:52:11 -0800 (PST)
-Received: from pps.filterd (m0109331.ppops.net [127.0.0.1])
-        by mx0a-00082601.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2BMHiaUR011753
-        for <linux-block@vger.kernel.org>; Thu, 22 Dec 2022 09:52:10 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=from : to : cc :
- subject : date : message-id : mime-version : content-transfer-encoding :
- content-type; s=s2048-2021-q4;
- bh=F65TMfIBR/GCVPxYnrLZEA/djWWUoUGXVl6copPTWZQ=;
- b=NurrL9d6r12JPMsnysxw3iOWWTi5aYIAYRzsuLLgMHJT0QlfUhTjO+PzD+9KDxnP8/l0
- czXxHYJZvC7q0Ypm9fsWGu26mdT51l/c+Av/UJcbmp0mO+LUEPDY3jAxi2Oatpm+GP4y
- pRjlltXOOYyzBkVDQVzm6Gbdzew8dycujZ/qde+ZURh393BoumTBkMfswQXQEQyBUDKD
- TgNgTahhK3V10IA48TJUha9uh5p+NOfqdbfzxtL2cwnW5mNB5HbzXScjsFBbxAqpuL4i
- P9UvKgocFXlYOUrL5vSQf6JLYmRl0JrHLHWAc/M/kcML4vxuG3Etb4CyqTRRTxfg7zHW jg== 
-Received: from maileast.thefacebook.com ([163.114.130.16])
-        by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 3mkx85jpb1-2
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-        for <linux-block@vger.kernel.org>; Thu, 22 Dec 2022 09:52:10 -0800
-Received: from twshared41876.03.ash8.facebook.com (2620:10d:c0a8:1b::d) by
- mail.thefacebook.com (2620:10d:c0a8:83::5) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.34; Thu, 22 Dec 2022 09:52:09 -0800
-Received: by devbig007.nao1.facebook.com (Postfix, from userid 544533)
-        id 5E14DD60CAC5; Thu, 22 Dec 2022 09:52:04 -0800 (PST)
-From:   Keith Busch <kbusch@meta.com>
-To:     <linux-block@vger.kernel.org>, <axboe@kernel.dk>
-CC:     <hch@lst.de>, <martin.petersen@oracle.com>,
-        Keith Busch <kbusch@kernel.org>
-Subject: [PATCH] block: save user max_sectors limit
-Date:   Thu, 22 Dec 2022 09:52:04 -0800
-Message-ID: <20221222175204.1782061-1-kbusch@meta.com>
-X-Mailer: git-send-email 2.30.2
+        Thu, 22 Dec 2022 23:03:43 -0500
+Received: from mailout3.samsung.com (mailout3.samsung.com [203.254.224.33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 76A5F1C42D
+        for <linux-block@vger.kernel.org>; Thu, 22 Dec 2022 20:03:41 -0800 (PST)
+Received: from epcas1p1.samsung.com (unknown [182.195.41.45])
+        by mailout3.samsung.com (KnoxPortal) with ESMTP id 20221223040336epoutp03d4c46fd539f5173e9d7d7be7704c2ce7~zUFXph_xZ1455514555epoutp03J
+        for <linux-block@vger.kernel.org>; Fri, 23 Dec 2022 04:03:36 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20221223040336epoutp03d4c46fd539f5173e9d7d7be7704c2ce7~zUFXph_xZ1455514555epoutp03J
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1671768216;
+        bh=OUo7XqUBNxxTZmDVqphH51Eqptd1EgIhPFysmBbWXf4=;
+        h=From:To:Cc:Subject:Date:References:From;
+        b=QrWpLhIw1DLFgF4G/LsNcck6NLafdb9pewj/6uBxvAV3tugpGg3txpPfJnp7eQ8K5
+         bgLTOLubfb6LBpik5WvwJ9/z4unXYf2IqaHyKbG16uzrVR4zX0V5grpYdNN7ls/ASU
+         Xek7QoAMtlWBz7BEXLzlW+hie4WJWPmd+yIDFPo4=
+Received: from epsnrtp4.localdomain (unknown [182.195.42.165]) by
+        epcas1p3.samsung.com (KnoxPortal) with ESMTP id
+        20221223040336epcas1p38c0cd0afa5590dabddb2345ecbb3788e~zUFXWvCGx2690226902epcas1p3k;
+        Fri, 23 Dec 2022 04:03:36 +0000 (GMT)
+Received: from epsmges1p5.samsung.com (unknown [182.195.36.226]) by
+        epsnrtp4.localdomain (Postfix) with ESMTP id 4NdYSl6VbCz4x9Q2; Fri, 23 Dec
+        2022 04:03:35 +0000 (GMT)
+Received: from epcas1p2.samsung.com ( [182.195.41.46]) by
+        epsmges1p5.samsung.com (Symantec Messaging Gateway) with SMTP id
+        55.AF.41504.79825A36; Fri, 23 Dec 2022 13:03:35 +0900 (KST)
+Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
+        epcas1p4.samsung.com (KnoxPortal) with ESMTPA id
+        20221223040335epcas1p45bda0013a3a42f176fa137e0597fd7c9~zUFWrQ9dQ2778927789epcas1p4f;
+        Fri, 23 Dec 2022 04:03:35 +0000 (GMT)
+Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
+        epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
+        20221223040335epsmtrp2aaa763281fc627a9b468a2d1bef247ff~zUFWqnSV62533725337epsmtrp2k;
+        Fri, 23 Dec 2022 04:03:35 +0000 (GMT)
+X-AuditID: b6c32a39-24bfd7000001a220-7f-63a5289760ff
+Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
+        epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        C2.CB.02211.79825A36; Fri, 23 Dec 2022 13:03:35 +0900 (KST)
+Received: from localhost.localdomain (unknown [10.253.101.104]) by
+        epsmtip2.samsung.com (KnoxPortal) with ESMTPA id
+        20221223040335epsmtip2e31261bfcad3528a7af9efd65a648a1f~zUFWcuLPX0434204342epsmtip2Q;
+        Fri, 23 Dec 2022 04:03:35 +0000 (GMT)
+From:   JeongHyeon Lee <jhs2.lee@samsung.com>
+To:     senozhatsky@chromium.org
+Cc:     minchan@kernel.org, axboe@kernel.dk, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org, JeongHyeon Lee <jhs2.lee@samsung.com>
+Subject: [PATCH] zram: fix typos in comments
+Date:   Fri, 23 Dec 2022 13:03:31 +0900
+Message-Id: <20221223040331.4194-1-jhs2.lee@samsung.com>
+X-Mailer: git-send-email 2.38.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-FB-Internal: Safe
-Content-Type: text/plain
-X-Proofpoint-ORIG-GUID: ZbJQED3_k8JO5nAwzg_djK8XacN75tlt
-X-Proofpoint-GUID: ZbJQED3_k8JO5nAwzg_djK8XacN75tlt
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.923,Hydra:6.0.545,FMLib:17.11.122.1
- definitions=2022-12-22_09,2022-12-22_03,2022-06-22_01
+Content-Transfer-Encoding: 8bit
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrOKsWRmVeSWpSXmKPExsWy7bCmnu50jaXJBv0f9S1W3+1ns7h0/w6r
+        xd5b2haXd81hs1j29T27xe6Ni9gc2DxmN1xk8bh8ttRj06pONo++LasYPT5vkgtgjcq2yUhN
+        TEktUkjNS85PycxLt1XyDo53jjc1MzDUNbS0MFdSyEvMTbVVcvEJ0HXLzAHar6RQlphTChQK
+        SCwuVtK3synKLy1JVcjILy6xVUotSMkpMCvQK07MLS7NS9fLSy2xMjQwMDIFKkzIzmhfv5qt
+        YBlnxevGFawNjLfZuxg5OSQETCTONx1j7WLk4hAS2MEoceHDTCYI5xOjxO8H56Gcb4wSt9+0
+        sMC0rFm+mREisZdRYv3Jy1DOF0aJ9qlv2UCq2AS0JW63bAJbIiIgI9H77w0jiM0s0M0o8X+Z
+        EIgtLKAjcWrpBbAaFgFVif99+4BqODh4BSwkjh90gVgmL/H78T6wxbwCghInZz5hgRgjL9G8
+        dTYzyF4JgWPsEsfX7oG6zkWice0yVghbWOLV8S1Qj0pJfH63lw3Czpa4vuEQVH2JxPd1jcwg
+        eyUE7CXeX7IAMZkFNCXW79KHqFCU2Pl7LtT1fBLvvvawQlTzSnS0CUGUKEms+HcNaqCExIbD
+        3VCLPCQmLngIFhcSiJXYcW4K+wRG+VlInpmF5JlZCIsXMDKvYhRLLSjOTU8tNiwwhcdpcn7u
+        JkZwCtSy3ME4/e0HvUOMTByMhxglOJiVRHi3PF6cLMSbklhZlVqUH19UmpNafIjRFBi6E5ml
+        RJPzgUk4ryTe0MTSwMTMyMTC2NLYTEmcN3//omQhgfTEktTs1NSC1CKYPiYOTqkGJuuLa5eu
+        P3w5cEKpwbsTJo8F3m+YMLfvb0GsSfXKNpvlZ6a93svnIFNx0Cm+nZttk67PgxmFAqpVZQHH
+        zrZds1jKnP9srn3Rq96wG6zzz7k8u3drex/jh13XS85WlTO9Ox0br73TeYLUrsqY+cUiPQvm
+        v3s989Vi6b8c237rLn/b4NooeamZ5bxPUPrLh12XHtQ66P3b7vPySHD2gl7PYz1LHC8/6Dnw
+        ekvpWqFCrqZT7LWuaTM1w89pfMyKjz8QP+94Spo97/Wb8cvslTZMVQiOUeA9dmsX573srzKv
+        4nhCri9iZLmSq1XAnTfzwhz+gxJhJzQXe8atKz0b+H7h+vNpJS8WX7KIZbrktZP5TL4SS3FG
+        oqEWc1FxIgAROq3PCgQAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFlrKLMWRmVeSWpSXmKPExsWy7bCSvO50jaXJBi27pS1W3+1ns7h0/w6r
+        xd5b2haXd81hs1j29T27xe6Ni9gc2DxmN1xk8bh8ttRj06pONo++LasYPT5vkgtgjeKySUnN
+        ySxLLdK3S+DKaF+/mq1gGWfF68YVrA2Mt9m7GDk5JARMJNYs38zYxcjFISSwm1Fi1p8TrBAJ
+        CYkNm9YCFXEA2cIShw8Xg4SFBD4xShx4WA5iswloS9xu2QQ2R0RARqL33xtGEJtZYCKjxL2d
+        IiC2sICOxKmlF8BqWARUJf737WMEGckrYCFx/KALxCZ5id+P97GA2LwCghInZz5hgRgjL9G8
+        dTbzBEa+WUhSs5CkFjAyrWKUTC0ozk3PLTYsMMxLLdcrTswtLs1L10vOz93ECA5JLc0djNtX
+        fdA7xMjEwXiIUYKDWUmEd8vjxclCvCmJlVWpRfnxRaU5qcWHGKU5WJTEeS90nYwXEkhPLEnN
+        Tk0tSC2CyTJxcEo1MAU2izHHaTSrbCvSdW1V3Zzxlr01c/2X7KXW3cYKUTJyzfHOpd/WpNnk
+        tvwrXdZ35FNaT/mTvUEWNoaGC7iPWB17aJ4VcU7lRqLG5NiSDU4Zq61/3mvbsmC9aqVSfXv0
+        pvua0kmFsirdE76btvq7xLCcZX0eUOTx8+Mj8XLfgoAytagb+6Y0y6wPtzkuvvCvszxHzgMG
+        Ic2H9jdbL3TtyPu80awpYmlStfXGJc+r53xLFd5+24/tjOCbO6KF6is0X115v0U9znSlEUPG
+        3q9bs37tOudZvaZqFVOEyrxpbD3C1zZVx2VFWd9esrt88+7k1zK72qW3pVqzZJ/Z9ejpRj07
+        vsmHz5z6rf6mZXeNEktxRqKhFnNRcSIAA3enyLgCAAA=
+X-CMS-MailID: 20221223040335epcas1p45bda0013a3a42f176fa137e0597fd7c9
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+X-Sendblock-Type: SVC_REQ_APPROVE
+CMS-TYPE: 101P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20221223040335epcas1p45bda0013a3a42f176fa137e0597fd7c9
+References: <CGME20221223040335epcas1p45bda0013a3a42f176fa137e0597fd7c9@epcas1p4.samsung.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Keith Busch <kbusch@kernel.org>
+- The double `range` is duplicated in comment, remove one.
+ - change `syfs` to `sysfs`
 
-The user can set the max_sectors limit to any valid value via sysfs
-/sys/block/<dev>/queue/max_sectors_kb attribute. If the device limits
-are ever rescanned, though, the limit reverts back to the kernel defined
-BLK_DEF_MAX_SECTORS limit.
-
-Preserve the user's setting for the max_sectors limit as long as it's
-valid. The user can reset back to defaults by writing 0 to the sysfs
-file.
-
-Signed-off-by: Keith Busch <kbusch@kernel.org>
+Signed-off-by: JeongHyeon Lee <jhs2.lee@samsung.com>
 ---
- block/blk-settings.c   |  9 +++++++--
- block/blk-sysfs.c      | 10 +++++++++-
- include/linux/blkdev.h |  1 +
- 3 files changed, 17 insertions(+), 3 deletions(-)
+ drivers/block/zram/zram_drv.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/block/blk-settings.c b/block/blk-settings.c
-index 0477c4d527fee..e75304f853bd5 100644
---- a/block/blk-settings.c
-+++ b/block/blk-settings.c
-@@ -40,7 +40,7 @@ void blk_set_default_limits(struct queue_limits *lim)
- 	lim->virt_boundary_mask =3D 0;
- 	lim->max_segment_size =3D BLK_MAX_SEGMENT_SIZE;
- 	lim->max_sectors =3D lim->max_hw_sectors =3D BLK_SAFE_MAX_SECTORS;
--	lim->max_dev_sectors =3D 0;
-+	lim->max_user_sectors =3D lim->max_dev_sectors =3D 0;
- 	lim->chunk_sectors =3D 0;
- 	lim->max_write_zeroes_sectors =3D 0;
- 	lim->max_zone_append_sectors =3D 0;
-@@ -135,7 +135,12 @@ void blk_queue_max_hw_sectors(struct request_queue *=
-q, unsigned int max_hw_secto
- 	limits->max_hw_sectors =3D max_hw_sectors;
-=20
- 	max_sectors =3D min_not_zero(max_hw_sectors, limits->max_dev_sectors);
--	max_sectors =3D min_t(unsigned int, max_sectors, BLK_DEF_MAX_SECTORS);
-+
-+	if (limits->max_user_sectors)
-+		max_sectors =3D min_not_zero(max_sectors, limits->max_user_sectors);
-+	else
-+		max_sectors =3D min_t(unsigned int, max_sectors, BLK_DEF_MAX_SECTORS);
-+
- 	max_sectors =3D round_down(max_sectors,
- 				 limits->logical_block_size >> SECTOR_SHIFT);
- 	limits->max_sectors =3D max_sectors;
-diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index 93d9e9c9a6ea8..db5d1d908f5d9 100644
---- a/block/blk-sysfs.c
-+++ b/block/blk-sysfs.c
-@@ -250,8 +250,16 @@ queue_max_sectors_store(struct request_queue *q, con=
-st char *page, size_t count)
- 	max_hw_sectors_kb =3D min_not_zero(max_hw_sectors_kb, (unsigned long)
- 					 q->limits.max_dev_sectors >> 1);
-=20
--	if (max_sectors_kb > max_hw_sectors_kb || max_sectors_kb < page_kb)
-+	if (max_sectors_kb =3D=3D 0) {
-+		q->limits.max_user_sectors =3D 0;
-+		max_sectors_kb =3D min_t(unsigned int, max_hw_sectors_kb,
-+				       BLK_DEF_MAX_SECTORS >> 1);
-+	} else if (max_sectors_kb > max_hw_sectors_kb ||
-+		   max_sectors_kb < page_kb)  {
- 		return -EINVAL;
-+	} else {
-+		q->limits.max_user_sectors =3D max_sectors_kb << 1;
-+	}
-=20
- 	spin_lock_irq(&q->queue_lock);
- 	q->limits.max_sectors =3D max_sectors_kb << 1;
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 301cf1cf4f2fa..71e97f0a87264 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -288,6 +288,7 @@ struct queue_limits {
- 	unsigned int		max_dev_sectors;
- 	unsigned int		chunk_sectors;
- 	unsigned int		max_sectors;
-+	unsigned int		max_user_sectors;
- 	unsigned int		max_segment_size;
- 	unsigned int		physical_block_size;
- 	unsigned int		logical_block_size;
---=20
-2.30.2
+diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
+index e290d6d97047..7becd5448791 100644
+--- a/drivers/block/zram/zram_drv.c
++++ b/drivers/block/zram/zram_drv.c
+@@ -190,7 +190,7 @@ static inline bool valid_io_request(struct zram *zram,
+ 
+ 	end = start + (size >> SECTOR_SHIFT);
+ 	bound = zram->disksize >> SECTOR_SHIFT;
+-	/* out of range range */
++	/* out of range */
+ 	if (unlikely(start >= bound || end > bound || start > end))
+ 		return false;
+ 
+@@ -2385,7 +2385,7 @@ static int zram_add(void)
+ 	zram->disk->private_data = zram;
+ 	snprintf(zram->disk->disk_name, 16, "zram%d", device_id);
+ 
+-	/* Actual capacity set using syfs (/sys/block/zram<id>/disksize */
++	/* Actual capacity set using sysfs (/sys/block/zram<id>/disksize */
+ 	set_capacity(zram->disk, 0);
+ 	/* zram devices sort of resembles non-rotational disks */
+ 	blk_queue_flag_set(QUEUE_FLAG_NONROT, zram->disk->queue);
+-- 
+2.38.1
 
