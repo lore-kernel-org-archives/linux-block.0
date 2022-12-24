@@ -2,68 +2,79 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64A8CC4332F
-	for <linux-block@archiver.kernel.org>; Sat, 24 Dec 2022 15:14:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F118FC4332F
+	for <linux-block@archiver.kernel.org>; Sat, 24 Dec 2022 15:48:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229699AbiLXPO1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 24 Dec 2022 10:14:27 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36078 "EHLO
+        id S229622AbiLXPsu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 24 Dec 2022 10:48:50 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43286 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229688AbiLXPO0 (ORCPT
+        with ESMTP id S229485AbiLXPst (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 24 Dec 2022 10:14:26 -0500
-Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40832B4A9;
-        Sat, 24 Dec 2022 07:14:22 -0800 (PST)
-Received: from zn.tnic (p5de8e9fe.dip0.t-ipconnect.de [93.232.233.254])
+        Sat, 24 Dec 2022 10:48:49 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E78B75FAE;
+        Sat, 24 Dec 2022 07:48:46 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 2BACB1EC063F;
-        Sat, 24 Dec 2022 16:14:19 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1671894859;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=n1KqmbfyN6TgP9ZY8lAPsZ8T2bMHbEWfbwhhLgQg3YM=;
-        b=QrEAcwYVD3atnCKQsJTOnzBUxwlW1Cz9mEUPlDJFz3cRq7+oZZICZaQSkKySoak87p9JKX
-        fXPIqgf32EIgPgYGMPVPtnGhKdda9QfUBb22QWuB3kNcL/Ltg1WKegJ7lgIsJ8vUOifpsW
-        TxY/oGQ+A2a3KgQmZCS4X3hhCxCZkWs=
-Date:   Sat, 24 Dec 2022 16:14:13 +0100
-From:   Borislav Petkov <bp@alien8.de>
-To:     Pali =?utf-8?B?Um9ow6Fy?= <pali@kernel.org>
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 6B183601D9;
+        Sat, 24 Dec 2022 15:48:46 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9E757C433D2;
+        Sat, 24 Dec 2022 15:48:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1671896925;
+        bh=TbL10yENx03QutUshBo9CR+1cIeW10xWw1Krmir7kFw=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=eHgOv6thr4+npEcodYXPAo7AUQ99xqL9LXWS5kbRn4CdfRgJ/Cj8u06lJuS1Ky2qB
+         fw7Omg7o9drmoIRNw0vb+1bJNSzNvAfdCA7AbrgFMOkJqyurJKyPTAxivXqx60hOOz
+         q3bb6JZssrmhwHonou+ouE86XIWBKebAC6OqYBaJgdemmi3zwCQTT3a7tWcXun/AbX
+         mNeyTgbjwMvDohr+QxLnYEpl5ezuLTSd8TJMjL0dgiGIIre9sTiXcAKf8EaksbGTaL
+         ViArgSSNXs8JrkaID17JKnAKZtru7AMhPaoaf5txCIUQs5BkI1s4SMIvWCSGEXf/pP
+         Ld77n3kjnYfSQ==
+Received: by pali.im (Postfix)
+        id D8398720; Sat, 24 Dec 2022 16:48:42 +0100 (CET)
+Date:   Sat, 24 Dec 2022 16:48:42 +0100
+From:   Pali =?utf-8?B?Um9ow6Fy?= <pali@kernel.org>
+To:     Borislav Petkov <bp@alien8.de>
 Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Jens Axboe <axboe@kernel.dk>, linux-kernel@vger.kernel.org,
         Christoph Hellwig <hch@infradead.org>,
         Thomas Maier <balagi@justmail.de>, linux-block@vger.kernel.org
 Subject: Re: [PATCH] pktcdvd: remove driver.
-Message-ID: <Y6cXRbGUsarzoJEw@zn.tnic>
+Message-ID: <20221224154842.o4ngrwmskduowttm@pali>
 References: <20221202182758.1339039-1-gregkh@linuxfoundation.org>
  <20221224095353.w32xhmyzlft6qi4v@pali>
  <Y6bObzIoHrJMotI3@kroah.com>
  <20221224101139.sgvhr2n3pbrs4agm@pali>
  <Y6bvh48kTTzbMX6M@kroah.com>
  <20221224133425.vlcxbaaynihiom4a@pali>
+ <Y6cXRbGUsarzoJEw@zn.tnic>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20221224133425.vlcxbaaynihiom4a@pali>
+In-Reply-To: <Y6cXRbGUsarzoJEw@zn.tnic>
+User-Agent: NeoMutt/20180716
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, Dec 24, 2022 at 02:34:25PM +0100, Pali Rohár wrote:
-> And asking question back is not the best way too.
+On Saturday 24 December 2022 16:14:13 Borislav Petkov wrote:
+> On Sat, Dec 24, 2022 at 02:34:25PM +0100, Pali Rohár wrote:
+> > And asking question back is not the best way too.
+> 
+> Maybe I'm missing something here but is there a logic/rule somewhere
+> which says to inform *you* when this driver gets removed?!
 
-Maybe I'm missing something here but is there a logic/rule somewhere
-which says to inform *you* when this driver gets removed?!
+Do you think that it is fully illogical to never inform and ignore
+userspace projects which are under active maintenance and are using
+kernel APIs and kernel drivers which somebody decided to remove?
 
-I can't find one, ./scripts/get_maintainer.pl doesn't say so either.
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+> I can't find one, ./scripts/get_maintainer.pl doesn't say so either.
+> 
+> -- 
+> Regards/Gruss,
+>     Boris.
+> 
+> https://people.kernel.org/tglx/notes-about-netiquette
