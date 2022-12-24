@@ -2,48 +2,49 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 90D0CC4332F
-	for <linux-block@archiver.kernel.org>; Sat, 24 Dec 2022 21:17:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E238AC10F1B
+	for <linux-block@archiver.kernel.org>; Sat, 24 Dec 2022 21:44:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230242AbiLXVRk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 24 Dec 2022 16:17:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50602 "EHLO
+        id S229655AbiLXVgy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 24 Dec 2022 16:36:54 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55854 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230463AbiLXVR1 (ORCPT
+        with ESMTP id S229648AbiLXVgw (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 24 Dec 2022 16:17:27 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C6C4BF55;
-        Sat, 24 Dec 2022 13:17:17 -0800 (PST)
+        Sat, 24 Dec 2022 16:36:52 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B0E4B84E;
+        Sat, 24 Dec 2022 13:36:51 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 83DF360B27;
-        Sat, 24 Dec 2022 21:17:17 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5051DC433D2;
-        Sat, 24 Dec 2022 21:17:16 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 3BD8FB80185;
+        Sat, 24 Dec 2022 21:36:50 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B2334C433EF;
+        Sat, 24 Dec 2022 21:36:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1671916636;
-        bh=mY/VWAfQF1bhkSpjc9GIhMWPcWvvJp+NigHVr9j8XE4=;
+        s=k20201202; t=1671917808;
+        bh=VQb7MWoNP9XDTkn0OWRtjf3EugByIlCRVMC/M3almsA=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=CnO+gzU0DAzoUMNcBH4MKPCYlBGwVII/n/znreE4I55N2DdLTm1tT9fGg411ZgRhp
-         A/LrOtjFzfWFtb42vaRo4U9hjTwf6wGPgKaRpyXHzkERVUxtMYdsr7TtfdCS6NXFgQ
-         ITaHv1GzgdWRa3Ch7kh7/hmQcXtcWjcaB1lXAWaDfqfHfZg/GBUv/YLMrH7CVMLVvJ
-         Om1DhwJhY4W5D4uEZbWQlRN59Im7eeeJc5eMMwgaZCjGun645VJSZ5aVEJj+k+8NBE
-         O9IWvZkq81mFiEqp8BNQ1qMnHG6aLpDmX4/QVCQL9lvUZ7Qw7+QHiPomgQD1Y5A+N5
-         bJDL/3S4r8wfQ==
-Date:   Sat, 24 Dec 2022 14:17:13 -0700
-From:   Keith Busch <kbusch@kernel.org>
-To:     Pali =?iso-8859-1?Q?Roh=E1r?= <pali@kernel.org>
+        b=rZsPP1nFOp7YzD+5De0+81DKldhptG7WatoTqh1zff33rJ1f1TAULH8TXbotcIzR7
+         lOnDF9nnL39sd5CpKhAZ58pgPnyw/QZ8DJBFdsg2GyB3wO+Fa8lwydOT/lTtDE0fHV
+         q5mpZmYgy+WFUjCo4NvR6EPIoRddwNAVHH2PeukCASz5CC5Vg2eU00XfteMy6FjgzY
+         koJO5bE2oHZkJuUZqWokeKwAihguUCAl57xX7Ij5b4tKrGFFogSa4eO5qynJBFK2RB
+         xK7O8SG9/QyWbBuHcmob+/z9yox7BGLKE9jg15kqBZeOte9/0Y183xuYnqn2Wn0zcY
+         V+aBsbdsfqY3w==
+Received: by pali.im (Postfix)
+        id 2F4C1720; Sat, 24 Dec 2022 22:36:46 +0100 (CET)
+Date:   Sat, 24 Dec 2022 22:36:46 +0100
+From:   Pali =?utf-8?B?Um9ow6Fy?= <pali@kernel.org>
+To:     Keith Busch <kbusch@kernel.org>
 Cc:     Borislav Petkov <bp@alien8.de>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Jens Axboe <axboe@kernel.dk>, linux-kernel@vger.kernel.org,
         Christoph Hellwig <hch@infradead.org>,
         Thomas Maier <balagi@justmail.de>, linux-block@vger.kernel.org
 Subject: Re: [PATCH] pktcdvd: remove driver.
-Message-ID: <Y6dsWVspi9tGNid5@kbusch-mbp.dhcp.thefacebook.com>
-References: <Y6bObzIoHrJMotI3@kroah.com>
- <20221224101139.sgvhr2n3pbrs4agm@pali>
+Message-ID: <20221224213646.zyosaq7hnlsaje4b@pali>
+References: <20221224101139.sgvhr2n3pbrs4agm@pali>
  <Y6bvh48kTTzbMX6M@kroah.com>
  <20221224133425.vlcxbaaynihiom4a@pali>
  <Y6cXRbGUsarzoJEw@zn.tnic>
@@ -52,28 +53,35 @@ References: <Y6bObzIoHrJMotI3@kroah.com>
  <20221224160055.ln3dbhx7dnut7dwi@pali>
  <Y6cma26FKzBQD8AN@zn.tnic>
  <20221224163602.6bqr32tkf2ulx6po@pali>
+ <Y6dsWVspi9tGNid5@kbusch-mbp.dhcp.thefacebook.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20221224163602.6bqr32tkf2ulx6po@pali>
+In-Reply-To: <Y6dsWVspi9tGNid5@kbusch-mbp.dhcp.thefacebook.com>
+User-Agent: NeoMutt/20180716
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, Dec 24, 2022 at 05:36:02PM +0100, Pali Rohár wrote:
-> On Saturday 24 December 2022 17:18:51 Borislav Petkov wrote:
-> > 
-> > So you don't have to get all worked up about it - if it is really used,
-> > I'm sure the maintainers involved will do the right decision. The point
-> > is, finding out whether something still has users and with the latest
-> > kernel is not always trivial.
-> 
-> I agree that finding out such information is hard. But do not take me
-> wrong, but if people are lazy and do not look into in-tree kernel
-> documentation and check it, then I'm loosing motivation to keep in-tree
-> kernel documentation up-to-date...
+On Saturday 24 December 2022 14:17:13 Keith Busch wrote:
+> As a matter of procedure, could patches deprecating modules perhaps add
+> a loud kernel warning message somewhere in the module's execution path
+> as a means to mitigate any surprises for people using it?
 
-As a matter of procedure, could patches deprecating modules perhaps add
-a loud kernel warning message somewhere in the module's execution path
-as a means to mitigate any surprises for people using it?
+Sounds like a good idea. But it is needed to find a place for "somewhere".
+And message should contain what does that deprecation means. Because for
+more software products it means that software is being replaced by
+another one. So it could be confusing that it is just needed to switch
+from module A to module B and that is all. But for this case there is no
+replacement.
+
+And based on my experience, users (including me) are using distributions
+LTS kernels in production. So do not forget that it takes lot of time
+until some distributions switch from one LTS version to another LTS
+version and so it would take lot of time until deprecation warning is
+visible to user. (Maybe deprecation information could be "backported" to
+LTS kernels?)
+
+In any case I would prefer some documented webpage with all deprecation
+information. Like there is releases webpage which says exact day when
+particular LTS version is EOL: https://kernel.org/category/releases.html
