@@ -2,90 +2,117 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD46DC4332F
-	for <linux-block@archiver.kernel.org>; Sat, 24 Dec 2022 16:24:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BB2D4C4332F
+	for <linux-block@archiver.kernel.org>; Sat, 24 Dec 2022 16:36:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230355AbiLXQYh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 24 Dec 2022 11:24:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49044 "EHLO
+        id S231237AbiLXQgL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 24 Dec 2022 11:36:11 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51454 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229688AbiLXQYg (ORCPT
+        with ESMTP id S229688AbiLXQgK (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 24 Dec 2022 11:24:36 -0500
-Received: from jabberwock.ucw.cz (jabberwock.ucw.cz [46.255.230.98])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 53A5D2DF2;
-        Sat, 24 Dec 2022 08:24:34 -0800 (PST)
-Received: by jabberwock.ucw.cz (Postfix, from userid 1017)
-        id B17E21C09F4; Sat, 24 Dec 2022 17:24:32 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ucw.cz; s=gen1;
-        t=1671899072;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=HLSwP1mqtD+5aHUsmlzOAFN5IZw+LcyyPNXjFF5e900=;
-        b=mzWh/mRCvlNvshHprDT3Bxkgop1//gpHSN0N/WiSGmDYhWKK5jZus8/a2WR3aR3Ftu9yMk
-        g61AyNqtDd0L8lGQAyutXo/dz7lC5+LnfRe3SCq8UlgMbFqXIN080H/ag+mK2Wl1ttRujw
-        uulOZ7bFoDvm4VJ8E9ITwDM6b6Vom1A=
-Date:   Sat, 24 Dec 2022 17:24:32 +0100
-From:   Pavel Machek <pavel@ucw.cz>
+        Sat, 24 Dec 2022 11:36:10 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1461E108C;
+        Sat, 24 Dec 2022 08:36:06 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id A4DD160A72;
+        Sat, 24 Dec 2022 16:36:05 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DA5F4C433D2;
+        Sat, 24 Dec 2022 16:36:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1671899765;
+        bh=0EIF4T19puak+3zPaJRrkSbrt6wgIvpIz8iwaG3dJ0Y=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=s+BFRJUSedEvY9T5lGayUDSkctnWHtfApja+MyvYVuDUmYA7wm8OiEbPxWCYSn5ul
+         LO5XJ7Jw3m/XGi1mnR5tcus1XwySWF+hf0TM561w5rKVu9tHulwZqTwNa7Mb+cObG8
+         9uvkb3WJtJfpT1XvgdNmN1J/988k+YnXJ/ZOyAn0c4fSaUbf4SQV2xt0caPfuRNGoZ
+         8AS2N3PWPjFoxlroy9Z14MvUk+DlAV3BrvRO3FvMEMxEW0N9atIUgqLUcJF1ZNW4BQ
+         z4ydc0GEXtR0U0FIaeW+U8B/+prc9CETEy+kpjDZ8jF/bY1QBFrvEMG+pl/aKqkRMQ
+         iYwIJbTNUQ8tw==
+Received: by pali.im (Postfix)
+        id 2C2B8720; Sat, 24 Dec 2022 17:36:02 +0100 (CET)
+Date:   Sat, 24 Dec 2022 17:36:02 +0100
+From:   Pali =?utf-8?B?Um9ow6Fy?= <pali@kernel.org>
 To:     Borislav Petkov <bp@alien8.de>
-Cc:     Pali =?iso-8859-1?Q?Roh=E1r?= <pali@kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Jens Axboe <axboe@kernel.dk>, linux-kernel@vger.kernel.org,
         Christoph Hellwig <hch@infradead.org>,
         Thomas Maier <balagi@justmail.de>, linux-block@vger.kernel.org
 Subject: Re: [PATCH] pktcdvd: remove driver.
-Message-ID: <Y6cnwA9ULyMXlL2j@duo.ucw.cz>
-References: <20221202182758.1339039-1-gregkh@linuxfoundation.org>
- <20221224095353.w32xhmyzlft6qi4v@pali>
+Message-ID: <20221224163602.6bqr32tkf2ulx6po@pali>
+References: <20221224095353.w32xhmyzlft6qi4v@pali>
  <Y6bObzIoHrJMotI3@kroah.com>
  <20221224101139.sgvhr2n3pbrs4agm@pali>
  <Y6bvh48kTTzbMX6M@kroah.com>
  <20221224133425.vlcxbaaynihiom4a@pali>
  <Y6cXRbGUsarzoJEw@zn.tnic>
+ <20221224154842.o4ngrwmskduowttm@pali>
+ <Y6chm9khdG4pmNhN@zn.tnic>
+ <20221224160055.ln3dbhx7dnut7dwi@pali>
+ <Y6cma26FKzBQD8AN@zn.tnic>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-        protocol="application/pgp-signature"; boundary="4TKnUpmhT+oKcbQi"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <Y6cXRbGUsarzoJEw@zn.tnic>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <Y6cma26FKzBQD8AN@zn.tnic>
+User-Agent: NeoMutt/20180716
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Saturday 24 December 2022 17:18:51 Borislav Petkov wrote:
+> On Sat, Dec 24, 2022 at 05:00:55PM +0100, Pali Rohár wrote:
+> > Maybe it would be a wise to read a documentation which is in the kernel
+> > source tree?
+> 
+> I guess you mean udftools...
 
---4TKnUpmhT+oKcbQi
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Yes, pktcdvd tools (pktsetup, pktcdvd-check, cdrwtool) are (for
+historical reasons) in udftools project. Ok, maybe it is unintuitive to
+find them here but it is documented in kernel tree.
 
+> > Or at least read the deletion patch itself as it is linked from there?
+> 
+> You mean the documentation file is pointed at there?
 
-> On Sat, Dec 24, 2022 at 02:34:25PM +0100, Pali Roh=E1r wrote:
-> > And asking question back is not the best way too.
->=20
-> Maybe I'm missing something here but is there a logic/rule somewhere
-> which says to inform *you* when this driver gets removed?!
+Yes. In Kconfig option which is being removed, is a documentation link
 
-You are not exactly polite here.
+-	  See the file <file:Documentation/cdrom/packet-writing.rst>
+-	  for further information on the use of this driver.
 
-Anyway, we have rule saying "no regressions" and that includes "we
-don't remove drivers people use".
+> > Or what else could be easier than this?
+> 
+> Well, apparently it ain't as easy because people do not necessarily see
+> it how you see it. That's why I'm asking.
 
-(And yes, at some point we do ask people using the code to also
-maintain it...)
+Yes, in more cases it is not easy. But in this case, when kernel in-tree
+documentation about this driver was updated in the last year, it is lot
+of easier than in other cases to get more information about it.
 
-Best regards,
-							Pavel
---=20
-People of Russia, stop Putin before his war on Ukraine escalates.
+I sent this patch to keep links up-to-date for packet-writing.rst file:
+https://lore.kernel.org/linux-doc/20220210192200.30828-1-pali@kernel.org/
+(and it was merged)
 
---4TKnUpmhT+oKcbQi
-Content-Type: application/pgp-signature; name="signature.asc"
+In documentation are mentioned 3 projects which are related to packet
+writing and all have valid homepages with contact information.
 
------BEGIN PGP SIGNATURE-----
+> I have removed ancient stuff in the past myself and it is not always
+> easy to go dig out who uses it and whether it is used at all in the
+> first place.
+> 
+> And people do not always reply and projects are dead and they maybe use
+> it but the machine which has this hw hasn't been booted for a decade and
+> it ain't worth the enegry to power it back on and so so on and so on...
+> 
+> So you don't have to get all worked up about it - if it is really used,
+> I'm sure the maintainers involved will do the right decision. The point
+> is, finding out whether something still has users and with the latest
+> kernel is not always trivial.
 
-iF0EABECAB0WIQRPfPO7r0eAhk010v0w5/Bqldv68gUCY6cnwAAKCRAw5/Bqldv6
-8ksdAJ9aN8MdVErtcgkxx40yUgWSeREK5QCgwUBBGfnXB9UWlmNIP7fVzm82WyQ=
-=eBRl
------END PGP SIGNATURE-----
-
---4TKnUpmhT+oKcbQi--
+I agree that finding out such information is hard. But do not take me
+wrong, but if people are lazy and do not look into in-tree kernel
+documentation and check it, then I'm loosing motivation to keep in-tree
+kernel documentation up-to-date...
