@@ -2,97 +2,109 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CBD10C4332F
-	for <linux-block@archiver.kernel.org>; Sat, 24 Dec 2022 21:46:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0364FC4332F
+	for <linux-block@archiver.kernel.org>; Sat, 24 Dec 2022 22:06:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229534AbiLXVqs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 24 Dec 2022 16:46:48 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57842 "EHLO
+        id S229473AbiLXWGr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 24 Dec 2022 17:06:47 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60524 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230364AbiLXVqr (ORCPT
+        with ESMTP id S229499AbiLXWGq (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 24 Dec 2022 16:46:47 -0500
-Received: from mail-pg1-x52c.google.com (mail-pg1-x52c.google.com [IPv6:2607:f8b0:4864:20::52c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94183BE1B
-        for <linux-block@vger.kernel.org>; Sat, 24 Dec 2022 13:46:46 -0800 (PST)
-Received: by mail-pg1-x52c.google.com with SMTP id 82so5313433pgc.0
-        for <linux-block@vger.kernel.org>; Sat, 24 Dec 2022 13:46:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=sladewatkins.net; s=googled;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=O3UxsimBVOhEDuKfSuQBk+/BzoqRkKBz/Nr1j/ZryG8=;
-        b=pvsrtHUzIjjg31V+IH/mGznvfjfwaNZDh0KiqTKR+D9Qp0tWJs97bpm4mhN5kW3pQt
-         OkRylP6veOvbgsdOaq3/x/m4d4dTH9ZDPaMWkmmnK02OoF7Xzpp+wtyerfdn9ClqqG/9
-         U9rpKaLAWkrv5ZFoUPjFw+3Gy91H5HOaJuwMmV7DvjkSyJ1SLqub9OaDLBSWcr18YZH5
-         46p0CwJ/hDRTUUvu3BY03NQwjNEAL5uNZsg1P75CIC/cQlgdAezkZyduQXl6f75R1m8B
-         WA/2IHud3doEE+gz3Okydd2VATvQEiJJ/O/Wf8Q8LGepTE0YHxR/LGVG1FqGkHEhNd7A
-         42YQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=O3UxsimBVOhEDuKfSuQBk+/BzoqRkKBz/Nr1j/ZryG8=;
-        b=s7HoGr/dlSPAQY61e+3f+QcBzLAOfbmP4wiwDtDJvcXHeenNfXJ69VxlgYCVhx4diU
-         pqh6vWJZDlS2W/pQgthjhDXMzXMnnci5R7yC0RfnV6puBTODZlo4iuxcQh1/10t6vFFK
-         7XiKViKDrqinesiemSjuJvnsmL9vAaWaOtzuAR8hiuruplYDkn4v0/7+tWE48YuLx2lZ
-         TwixgHv/tjn7a9yL+f3CWoAY0lphAGyld/aUKU9+NOXVslHB85GSTKkoDH709auySZ29
-         iiA1QeAGYtRhsB0ABFFMHFy/G68T2BUn727Bek6QDcqbw/MwQ7O8gcIu90+75bJRw+Md
-         UOtg==
-X-Gm-Message-State: AFqh2koB2nfaB2OjMhjF4iCQN1Sr393oj7IsrfsJqIpnmLteim/ZDRle
-        EBMPEQXzMImht+NjKztRFTUR6AsOfftl0psQHz4CdA==
-X-Google-Smtp-Source: AMrXdXt0YkaBTrpFdunDUREJLDj9yvlHL4xI+4nHdNaNW/k6tF7R0vqMBDOeqky0agrYPB5X5UyL0/+Wjr719wDOP8c=
-X-Received: by 2002:a63:5b15:0:b0:479:3bf5:df35 with SMTP id
- p21-20020a635b15000000b004793bf5df35mr586451pgb.572.1671918406048; Sat, 24
- Dec 2022 13:46:46 -0800 (PST)
+        Sat, 24 Dec 2022 17:06:46 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 224A765C3;
+        Sat, 24 Dec 2022 14:06:45 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 96D3BB80184;
+        Sat, 24 Dec 2022 22:06:43 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7FE9CC433D2;
+        Sat, 24 Dec 2022 22:06:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1671919602;
+        bh=FDRW/65+iOIG+xRl7DZC4z2D8oXawEPLvY0Logj1h7I=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=azEswh39v0IPU+yFWhK/l7jZnBdIuQyRXDASQsXm26TOOIzxu45HD40/Jn/oOhOxB
+         l8kSRtNTPKTH4KrhYFqQD8IwI59cyqoCffkqxPjuPgu6GZu2fP7ihtHA/8EfiUCPdm
+         igs7kG3lysEgaOhZICnOxgh12LqqdfXwzz1RE/+HUO4/xEW7UY9PjwGB+BR8JCvbrQ
+         wpne5B4xhd0oFoRhz/ea7mYjO8NAKeh8CBQMgP0PRr9cscfG1cfmom0YJ+S8eXIZcx
+         KQ4RoXlKeKdjA6ifcFhSS5mJIcfUZAczlIElcgldw4z4ZTmIjjs0tI+5HTtvgddYpV
+         jj/HBtGAatVFQ==
+Date:   Sat, 24 Dec 2022 15:06:38 -0700
+From:   Keith Busch <kbusch@kernel.org>
+To:     Hugh Dickins <hughd@google.com>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        Jens Axboe <axboe@kernel.dk>, Sagi Grimberg <sagi@grimberg.me>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Thorsten Leemhuis <regressions@leemhuis.info>,
+        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: 6.2 nvme-pci: something wrong
+Message-ID: <Y6d37vGSCKvfJhzD@kbusch-mbp.dhcp.thefacebook.com>
+References: <572cfcc0-197a-9ead-9cb-3c5bf5e735@google.com>
 MIME-Version: 1.0
-References: <20221224101139.sgvhr2n3pbrs4agm@pali> <Y6bvh48kTTzbMX6M@kroah.com>
- <20221224133425.vlcxbaaynihiom4a@pali> <Y6cXRbGUsarzoJEw@zn.tnic>
- <20221224154842.o4ngrwmskduowttm@pali> <Y6chm9khdG4pmNhN@zn.tnic>
- <20221224160055.ln3dbhx7dnut7dwi@pali> <Y6cma26FKzBQD8AN@zn.tnic>
- <20221224163602.6bqr32tkf2ulx6po@pali> <Y6dsWVspi9tGNid5@kbusch-mbp.dhcp.thefacebook.com>
- <20221224213646.zyosaq7hnlsaje4b@pali>
-In-Reply-To: <20221224213646.zyosaq7hnlsaje4b@pali>
-From:   Slade Watkins <srw@sladewatkins.net>
-Date:   Sat, 24 Dec 2022 16:46:35 -0500
-Message-ID: <CA+pv=HPUgxxJjOJBki1jDjR+Abk3W9=SZ3RxSsB-YYucKBFdaQ@mail.gmail.com>
-Subject: Re: [PATCH] pktcdvd: remove driver.
-To:     =?UTF-8?Q?Pali_Roh=C3=A1r?= <pali@kernel.org>
-Cc:     Keith Busch <kbusch@kernel.org>, Borislav Petkov <bp@alien8.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Jens Axboe <axboe@kernel.dk>, linux-kernel@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>,
-        Thomas Maier <balagi@justmail.de>, linux-block@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <572cfcc0-197a-9ead-9cb-3c5bf5e735@google.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, Dec 24, 2022 at 4:39 PM Pali Roh=C3=A1r <pali@kernel.org> wrote:
-> And based on my experience, users (including me) are using distributions
-> LTS kernels in production. So do not forget that it takes lot of time
-> until some distributions switch from one LTS version to another LTS
-> version and so it would take lot of time until deprecation warning is
-> visible to user. (Maybe deprecation information could be "backported" to
-> LTS kernels?)
+On Fri, Dec 23, 2022 at 09:24:56PM -0800, Hugh Dickins wrote:
+> Hi Christoph,
+> 
+> There's something wrong with the nvme-pci heading for 6.2-rc1:
+> no problem booting here on this Lenovo ThinkPad X1 Carbon 5th,
+> but under load...
+> 
+> nvme nvme0: I/O 0 (I/O Cmd) QID 2 timeout, aborting
+> nvme nvme0: I/O 1 (I/O Cmd) QID 2 timeout, aborting
+> nvme nvme0: I/O 2 (I/O Cmd) QID 2 timeout, aborting
+> nvme nvme0: I/O 3 (I/O Cmd) QID 2 timeout, aborting
+> nvme nvme0: Abort status: 0x0
+> nvme nvme0: Abort status: 0x0
+> nvme nvme0: Abort status: 0x0
+> nvme nvme0: Abort status: 0x0
+> nvme nvme0: I/O 0 QID 2 timeout, reset controller
+> 
+> ...and more, until I just have to poweroff and reboot.
+> 
+> Bisection points to your
+> 0da7feaa5913 ("nvme-pci: use the tagset alloc/free helpers")
+> And that does revert cleanly, giving a kernel which shows no problem.
+> 
+> I've spent a while comparing old nvme_pci_alloc_tag_set() and new
+> nvme_alloc_io_tag_set(), I do not know my way around there at all
+> and may be talking nonsense, but it did look as if there might now
+> be a difference in the queue_depth, sqsize, q_depth conversions.
+> 
+> I'm running load successfully with the patch below, but I strongly
+> suspect that the right patch will be somewhere else: over to you!
+> 
+> Hugh
+> 
+> --- a/drivers/nvme/host/core.c
+> +++ b/drivers/nvme/host/core.c
+> @@ -4926,7 +4926,7 @@ int nvme_alloc_io_tag_set(struct nvme_ct
+>  
+>  	memset(set, 0, sizeof(*set));
+>  	set->ops = ops;
+> -	set->queue_depth = ctrl->sqsize + 1;
+> +	set->queue_depth = ctrl->sqsize;
 
-Yeah, my main server (which I don't use for dev work) is on an LTS
-kernel, same with my primary workstation, so I'm also using LTS
-kernels in prod.
+Your observation is a queue-wrap condition that makes it impossible for
+the controller know there are new commands.
 
-Would definitely appreciate it if those deprecation warnings are
-visible (and maybe even backported?) if added... would certainly help
-make transitioning from one LTS to the next easier.
+Your patch does look like the correct thing to do. The "zero means one"
+thing is a confusing distraction, I think. It makes more sense if you
+consider sqsize as the maximum number of tags we can have outstanding at
+one time and it looks like all the drivers set it that way. We're
+supposed to leave one slot empty for a full NVMe queue, so adding one
+here to report the total number slots isn't right since that would allow
+us to fill all slots.
 
->
-> In any case I would prefer some documented webpage with all deprecation
-> information. Like there is releases webpage which says exact day when
-> particular LTS version is EOL: https://kernel.org/category/releases.html
-
-I would as well, maybe it could go somewhere in Documentation? Not
-sure, that's way beyond me.
-
--- Slade
+Fabrics drivers have been using this method for a while, though, so
+interesting they haven't had a simiar problem.
