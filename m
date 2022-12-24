@@ -2,68 +2,73 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B942C4332F
-	for <linux-block@archiver.kernel.org>; Sat, 24 Dec 2022 07:52:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 95127C4332F
+	for <linux-block@archiver.kernel.org>; Sat, 24 Dec 2022 10:03:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229537AbiLXHwI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 24 Dec 2022 02:52:08 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52464 "EHLO
+        id S229507AbiLXKDe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 24 Dec 2022 05:03:34 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47358 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229445AbiLXHwH (ORCPT
+        with ESMTP id S229487AbiLXKDd (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 24 Dec 2022 02:52:07 -0500
-Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [80.237.130.52])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49A33186AA;
-        Fri, 23 Dec 2022 23:52:06 -0800 (PST)
-Received: from [2a02:8108:963f:de38:eca4:7d19:f9a2:22c5]; authenticated
-        by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        id 1p8zK7-0002jH-51; Sat, 24 Dec 2022 08:52:03 +0100
-Message-ID: <dedcb972-e934-53c2-f933-c25afa5c65a4@leemhuis.info>
-Date:   Sat, 24 Dec 2022 08:52:02 +0100
+        Sat, 24 Dec 2022 05:03:33 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 15A9A959C;
+        Sat, 24 Dec 2022 02:03:33 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 2336C60A51;
+        Sat, 24 Dec 2022 10:03:32 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 88AC9C433EF;
+        Sat, 24 Dec 2022 10:03:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1671876211;
+        bh=z6vauG+yojR9tbLySl4qCSuCZDdhNY6BicAY/0AR/F4=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=PAOFPg1uBW5rirxza7Yxw7WAAFk0EndQBF5GVm40h622S95uOXZhYWNJ03VEoLycy
+         OQhow8DDZgfr/TcrzervVwVMOAaJ/DCrNVPyaZLH/QkCohh+zWk4Xpf78lNXdoJ5CL
+         I7QUQq/alo2REEkH+9L0XjvwmcWo5fDOxwGrvQSc=
+Date:   Sat, 24 Dec 2022 11:03:27 +0100
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     Pali =?iso-8859-1?Q?Roh=E1r?= <pali@kernel.org>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-kernel@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>,
+        Thomas Maier <balagi@justmail.de>,
+        Peter Osterlund <petero2@telia.com>,
+        linux-block@vger.kernel.org
+Subject: Re: [PATCH] pktcdvd: remove driver.
+Message-ID: <Y6bObzIoHrJMotI3@kroah.com>
+References: <20221202182758.1339039-1-gregkh@linuxfoundation.org>
+ <20221224095353.w32xhmyzlft6qi4v@pali>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.1
-Subject: Re: 6.2 nvme-pci: something wrong #forregzbot
-Content-Language: en-US, de-DE
-To:     "regressions@lists.linux.dev" <regressions@lists.linux.dev>
-Cc:     linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-kernel@vger.kernel.org
-References: <572cfcc0-197a-9ead-9cb-3c5bf5e735@google.com>
-From:   Thorsten Leemhuis <regressions@leemhuis.info>
-In-Reply-To: <572cfcc0-197a-9ead-9cb-3c5bf5e735@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1671868326;d43034ff;
-X-HE-SMSGID: 1p8zK7-0002jH-51
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20221224095353.w32xhmyzlft6qi4v@pali>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-[Note: this mail contains only information for Linux kernel regression
-tracking. Mails like these contain '#forregzbot' in the subject to make
-then easy to spot and filter out. The author also tried to remove most
-or all individuals from the list of recipients to spare them the hassle.]
-
-On 24.12.22 06:24, Hugh Dickins wrote:
+On Sat, Dec 24, 2022 at 10:53:53AM +0100, Pali Rohár wrote:
+> On Friday 02 December 2022 19:27:58 Greg Kroah-Hartman wrote:
+> > Way back in 2016 in commit 5a8b187c61e9 ("pktcdvd: mark as unmaintained
+> > and deprecated") this driver was marked as "will be removed soon".  5
+> > years seems long enough to have it stick around after that, so finally
+> > remove the thing now.
 > 
-> There's something wrong with the nvme-pci heading for 6.2-rc1:
-> no problem booting here on this Lenovo ThinkPad X1 Carbon 5th,
-> but under load...> [...]
-> Bisection points to your
-> 0da7feaa5913 ("nvme-pci: use the tagset alloc/free helpers")
-> And that does revert cleanly, giving a kernel which shows no problem.
-> [...]
+> Why to remove? This driver is still widely used, userspace in active
+> maintenance and in last two years userspace software received more fixes
+> for CD-RW support and pktcdvd.
 
-Thanks for the report. To be sure below issue doesn't fall through the
-cracks unnoticed, I'm adding it to regzbot, my Linux kernel regression
-tracking bot:
+It was marked as "please remove" back in 2016, why wasn't that changed
+if people were actually using this?
 
-#regzbot ^introduced 0da7feaa5913
-#regzbot title nvme-pci: problems under load
-#regzbot ignore-activity
-Ciao, Thorsten (wearing his 'the Linux kernel's regression tracker' hat)
+> Just now community person informed me that somebody is going to remove
+> kernel support.
 
-P.S.: As the Linux kernel's regression tracker I deal with a lot of
-reports and sometimes miss something important when writing mails like
-this. If that's the case here, don't hesitate to tell me in a public
-reply, it's in everyone's interest to set the public record straight.ns.
+Isn't there better ways to support the hardware needed than this driver?
+
+thanks,
+
+greg k-h
