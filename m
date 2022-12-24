@@ -2,128 +2,111 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21AA8C4332F
-	for <linux-block@archiver.kernel.org>; Fri, 23 Dec 2022 15:56:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B18B0C4332F
+	for <linux-block@archiver.kernel.org>; Sat, 24 Dec 2022 05:25:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230219AbiLWP4n (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 23 Dec 2022 10:56:43 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33394 "EHLO
+        id S229831AbiLXFZK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 24 Dec 2022 00:25:10 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58772 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230157AbiLWP4m (ORCPT
+        with ESMTP id S229535AbiLXFZJ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 23 Dec 2022 10:56:42 -0500
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F0D6A379E1
-        for <linux-block@vger.kernel.org>; Fri, 23 Dec 2022 07:56:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
-        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=BNX8VLljCWB7Hky5keRLcIjg+3UcTIifKDcoXrG5Ok8=; b=q7E7VpPzOKI/IYW6NZOGgqKoYR
-        0mk1h8/n2FlHPdDr3dTjxB2zT3RCbo1T4rK9AyGL+mE5XShABvRb5LCMMyVskuFYGkXAo7Qw1fRQD
-        9IDn0AjDsriHMd7lAWU6ZVoJlAd7iSRSJf8BI9kzLZD9oUoEeLmDiZBNtjZvoqkaO9c22822c80w3
-        Uh0S0MTKMmwQslDtLB/Z0Za9rEvGVz42MQyfnAhAZMlMO8cG2gRWvU+hNfZM6EFziGy3DOjDX/4R+
-        /LIuNoprqK0XX7yfDZ2rEHpLR/4xQtfBpMmFlXG8B2aFdznBXtBCMmrF6RVNWTFf5sVLb5sODjNEk
-        kXAKKoxg==;
-Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1p8kPT-009hVz-AM; Fri, 23 Dec 2022 15:56:35 +0000
-Date:   Fri, 23 Dec 2022 07:56:35 -0800
-From:   Luis Chamberlain <mcgrof@kernel.org>
-To:     Kanchan Joshi <joshi.k@samsung.com>, bvanassche@acm.org
-Cc:     osandov@fb.com, j.granados@samsung.com, anuj20.g@samsung.com,
-        ankit.kumar@samsung.com, vincent.fu@samsung.com,
-        ming.lei@redhat.com, linux-block@vger.kernel.org
-Subject: Re: [PATCH 2/6] tests/nvme: add new test for rand-read on the nvme
- character device
-Message-ID: <Y6XPs3MoyltFvEYT@bombadil.infradead.org>
-References: <20221221103441.3216600-1-mcgrof@kernel.org>
- <CGME20221221103532epcas5p2c806adb12a32e259438511a584216c11@epcas5p2.samsung.com>
- <20221221103441.3216600-3-mcgrof@kernel.org>
- <20221223131137.GA27984@green>
+        Sat, 24 Dec 2022 00:25:09 -0500
+Received: from mail-qt1-x82f.google.com (mail-qt1-x82f.google.com [IPv6:2607:f8b0:4864:20::82f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0CB4FE0BE
+        for <linux-block@vger.kernel.org>; Fri, 23 Dec 2022 21:25:08 -0800 (PST)
+Received: by mail-qt1-x82f.google.com with SMTP id a16so5139735qtw.10
+        for <linux-block@vger.kernel.org>; Fri, 23 Dec 2022 21:25:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:message-id:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=BvE2awRwFzFbxJ18OKrhIqmcucLQ6AvTFfNUPm7G5WM=;
+        b=k6yGb/e8VmV5KYVZsTahb9RS1DKkPk395PBpTV6Q0c0DCTyRc82+Q8HoH8NgoHMKlu
+         k0OJAqWW+dtvDsPiUy+FHoe2+HNwiRoRulbbb/udOX5BbqyGakPkGPqYwtw//+x8CJNH
+         LgqkLvXGhZp7vBGd/aGwXhmFxSo/qDjCyUXHaVuYpgTeIrv1fjIQiX83kC67SV+3rW/n
+         Prew+NQNkcr42MsV06oBUb6os+U5uPv4Ocej1jDMD9c3BVENdFVTXiv3gsleYn8W+Tlm
+         fkaLLbvNvYxPcDoryiGUIf4ka6vhmNl57zxitj1ZSgqZX6C55cy+MeUN99MLsdp/X6Ew
+         iPyg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=mime-version:message-id:subject:cc:to:from:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=BvE2awRwFzFbxJ18OKrhIqmcucLQ6AvTFfNUPm7G5WM=;
+        b=01VbGHs02F4C+nYnuBaNbfa+84RQL6m4HDKLmC0j0LifjTJTznMZAtT8Lez9UvF5IO
+         z1OhLXa9iQgEtMZf/jziwZ5zYYbXMzKsuU2aWYt3Wp0aazAEpJ84ud7N9bynNlpG6yLJ
+         AWzpANXrzEgKs+/WpvH0c2bM2KHgA1VlqezzAsZP7f9t8jsCzs8UNZvBSbSWUtUKCykO
+         c+BrHGNr9SWgZvjeVW7lx5J2LryUO0A1KIVcFENiulxb2MbExGooimTtBCWlCHsEeK1N
+         1577pZgcWehGrVmoe6GcgWemSYxkf6evNkhZQ6GFvWcs+gzEJygxfysj+bs7wWwM2GG2
+         1/Xw==
+X-Gm-Message-State: AFqh2kqwaoTlUQL8I8zdVNWTK0pTU4erKEIFMsH3ldTPK12eWEYT5K7d
+        9jssfbgzKlToJrUbSntyz3bIYQ==
+X-Google-Smtp-Source: AMrXdXvarlLSAFP/bDWauq4ZnQA3IIy1ziyTyivTcJn+nGyKDos6haGrFxuYk8OoGGeRKpx00w3VuA==
+X-Received: by 2002:ac8:649:0:b0:3a6:93d7:873f with SMTP id e9-20020ac80649000000b003a693d7873fmr14076523qth.49.1671859507050;
+        Fri, 23 Dec 2022 21:25:07 -0800 (PST)
+Received: from ripple.attlocal.net (172-10-233-147.lightspeed.sntcca.sbcglobal.net. [172.10.233.147])
+        by smtp.gmail.com with ESMTPSA id v2-20020a05620a440200b006fed2788751sm3654004qkp.76.2022.12.23.21.25.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 23 Dec 2022 21:25:06 -0800 (PST)
+Date:   Fri, 23 Dec 2022 21:24:56 -0800 (PST)
+From:   Hugh Dickins <hughd@google.com>
+X-X-Sender: hugh@ripple.attlocal.net
+To:     Christoph Hellwig <hch@infradead.org>
+cc:     Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Thorsten Leemhuis <regressions@leemhuis.info>,
+        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-kernel@vger.kernel.org
+Subject: 6.2 nvme-pci: something wrong
+Message-ID: <572cfcc0-197a-9ead-9cb-3c5bf5e735@google.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221223131137.GA27984@green>
-Sender: Luis Chamberlain <mcgrof@infradead.org>
+Content-Type: text/plain; charset=US-ASCII
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Dec 23, 2022 at 06:41:37PM +0530, Kanchan Joshi wrote:
-> On Wed, Dec 21, 2022 at 02:34:37AM -0800, Luis Chamberlain wrote:
-> > This does basic rand-read testing of the character device of a
-> > conventional NVMe drive.
-> > 
-> > Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
-> > ---
-> > tests/nvme/046     | 42 ++++++++++++++++++++++++++++++++++++++++++
-> > tests/nvme/046.out |  2 ++
-> > 2 files changed, 44 insertions(+)
-> > create mode 100755 tests/nvme/046
-> > create mode 100644 tests/nvme/046.out
-> > 
-> > diff --git a/tests/nvme/046 b/tests/nvme/046
-> > new file mode 100755
-> > index 000000000000..3526ab9eedab
-> > --- /dev/null
-> > +++ b/tests/nvme/046
-> > @@ -0,0 +1,42 @@
-> > +#!/bin/bash
-> > +# SPDX-License-Identifier: GPL-3.0+
-> > +# Copyright (C) 2022 Luis Chamberlain <mcgrof@kernel.org>
-> > +#
-> > +# This does basic sanity test for the nvme character device. This is a basic
-> > +# test and if it fails it is probably very likely other nvme character device
-> > +# tests would fail.
-> > +#
-> > +. tests/nvme/rc
-> > +
-> > +DESCRIPTION="basic rand-read io_uring_cmd engine for nvme-ns character device"
-> > +QUICK=1
-> > +
-> > +requires() {
-> > +	_nvme_requires
-> > +	_have_fio
-> > +}
-> > +
-> > +device_requires() {
-> > +	_require_test_dev_is_nvme
-> > +}
-> > +
-> > +test_device() {
-> > +	echo "Running ${TEST_NAME}"
-> > +	local ngdev=${TEST_DEV/nvme/ng}
-> > +	local fio_args=(
-> > +		--size=1M
-> > +		--cmd_type=nvme
-> > +		--filename="$ngdev"
-> > +		--time_based
-> > +		--runtime=10
-> > +	) &&
-> 
-> Is this && needed?
+Hi Christoph,
 
-This form was inspired by commit 238c7e0b by Bart, but yeah you're
-right, I can't see any reason for it, so we can clean zbd/010 from it too.
-> 
-> > +	_run_fio_rand_iouring_cmd "${fio_args[@]}" >>"${FULL}" 2>&1 ||
-> 
-> Something to change here (and therefore in other patches too).
-> If we change "cmd_type = something_random", test continues to show the
-> success while it should show failure.
+There's something wrong with the nvme-pci heading for 6.2-rc1:
+no problem booting here on this Lenovo ThinkPad X1 Carbon 5th,
+but under load...
 
-Definitely no bueno.
+nvme nvme0: I/O 0 (I/O Cmd) QID 2 timeout, aborting
+nvme nvme0: I/O 1 (I/O Cmd) QID 2 timeout, aborting
+nvme nvme0: I/O 2 (I/O Cmd) QID 2 timeout, aborting
+nvme nvme0: I/O 3 (I/O Cmd) QID 2 timeout, aborting
+nvme nvme0: Abort status: 0x0
+nvme nvme0: Abort status: 0x0
+nvme nvme0: Abort status: 0x0
+nvme nvme0: Abort status: 0x0
+nvme nvme0: I/O 0 QID 2 timeout, reset controller
 
-> How about changing above line to:
-> _run_fio_rand_iouring_cmd "${fio_args[@]}" || fail=true
+...and more, until I just have to poweroff and reboot.
 
-We'd loose the 046.full log then.
+Bisection points to your
+0da7feaa5913 ("nvme-pci: use the tagset alloc/free helpers")
+And that does revert cleanly, giving a kernel which shows no problem.
 
-If we just return $? at the end of _run_fio_rand_iouring_cmd() that
-seems to fix the undetected error. Whatyda think?
+I've spent a while comparing old nvme_pci_alloc_tag_set() and new
+nvme_alloc_io_tag_set(), I do not know my way around there at all
+and may be talking nonsense, but it did look as if there might now
+be a difference in the queue_depth, sqsize, q_depth conversions.
 
-I noticed an odd thing in the last two patches which work for zone
-storage, if I change the runtime it doesn't take longer, so I think
-something is still off there too... can you take a look?
+I'm running load successfully with the patch below, but I strongly
+suspect that the right patch will be somewhere else: over to you!
 
-  Luis
+Hugh
+
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@ -4926,7 +4926,7 @@ int nvme_alloc_io_tag_set(struct nvme_ct
+ 
+ 	memset(set, 0, sizeof(*set));
+ 	set->ops = ops;
+-	set->queue_depth = ctrl->sqsize + 1;
++	set->queue_depth = ctrl->sqsize;
+ 	/*
+ 	 * Some Apple controllers requires tags to be unique across admin and
+ 	 * the (only) I/O queue, so reserve the first 32 tags of the I/O queue.
