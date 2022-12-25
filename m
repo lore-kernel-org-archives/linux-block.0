@@ -2,40 +2,36 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0364FC4332F
-	for <linux-block@archiver.kernel.org>; Sat, 24 Dec 2022 22:06:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5517C4332F
+	for <linux-block@archiver.kernel.org>; Sun, 25 Dec 2022 05:30:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229473AbiLXWGr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 24 Dec 2022 17:06:47 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60524 "EHLO
+        id S229711AbiLYFad (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 25 Dec 2022 00:30:33 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43598 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229499AbiLXWGq (ORCPT
+        with ESMTP id S229441AbiLYFac (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 24 Dec 2022 17:06:46 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 224A765C3;
-        Sat, 24 Dec 2022 14:06:45 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 96D3BB80184;
-        Sat, 24 Dec 2022 22:06:43 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7FE9CC433D2;
-        Sat, 24 Dec 2022 22:06:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1671919602;
-        bh=FDRW/65+iOIG+xRl7DZC4z2D8oXawEPLvY0Logj1h7I=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=azEswh39v0IPU+yFWhK/l7jZnBdIuQyRXDASQsXm26TOOIzxu45HD40/Jn/oOhOxB
-         l8kSRtNTPKTH4KrhYFqQD8IwI59cyqoCffkqxPjuPgu6GZu2fP7ihtHA/8EfiUCPdm
-         igs7kG3lysEgaOhZICnOxgh12LqqdfXwzz1RE/+HUO4/xEW7UY9PjwGB+BR8JCvbrQ
-         wpne5B4xhd0oFoRhz/ea7mYjO8NAKeh8CBQMgP0PRr9cscfG1cfmom0YJ+S8eXIZcx
-         KQ4RoXlKeKdjA6ifcFhSS5mJIcfUZAczlIElcgldw4z4ZTmIjjs0tI+5HTtvgddYpV
-         jj/HBtGAatVFQ==
-Date:   Sat, 24 Dec 2022 15:06:38 -0700
-From:   Keith Busch <kbusch@kernel.org>
-To:     Hugh Dickins <hughd@google.com>
-Cc:     Christoph Hellwig <hch@infradead.org>,
+        Sun, 25 Dec 2022 00:30:32 -0500
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D99CE6461;
+        Sat, 24 Dec 2022 21:30:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Transfer-Encoding
+        :Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:
+        Sender:Reply-To:Content-ID:Content-Description;
+        bh=twAXp15EP92U8CY+1GARtaxT1yyqVN5KY/uqb5CNqGE=; b=kluFoXYudn9xWzv+p4uKVzFhOc
+        HEM8m7cTYVM4Q1QRm86N93B6M9BIDfErvttMxjC0hrwP3mMtdNEbyQVTHXRmQ76XOAQ1J/5FXyfNu
+        xTCK/y4ZTE6aqiYCwgzD+CyTNxxc5eOjI3Sw7l2FnfgyI2SjtDJEJk6jQUem4o7N30CB4viam96Y4
+        Xu5yWwTy1YePtADW0vUQGSZz+5xy546nNb9ykU2K9EHa6ir13MXt2ZXnAvsXKNLEBGZYXNftNeAqo
+        AW5+OcEQ5VXz0zsp3EUZyG6+Hn2xvxkM9y0p/BvBDPqawrqRJhpHyO3w/GnCQ2izUIv3DHPl6yJJb
+        +tgBoBig==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1p9JaM-007OWV-C7; Sun, 25 Dec 2022 05:30:10 +0000
+Date:   Sat, 24 Dec 2022 21:30:10 -0800
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Keith Busch <kbusch@kernel.org>
+Cc:     Hugh Dickins <hughd@google.com>,
+        Christoph Hellwig <hch@infradead.org>,
         Jens Axboe <axboe@kernel.dk>, Sagi Grimberg <sagi@grimberg.me>,
         Chaitanya Kulkarni <kch@nvidia.com>,
         Linus Torvalds <torvalds@linux-foundation.org>,
@@ -43,68 +39,90 @@ Cc:     Christoph Hellwig <hch@infradead.org>,
         linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
         linux-kernel@vger.kernel.org
 Subject: Re: 6.2 nvme-pci: something wrong
-Message-ID: <Y6d37vGSCKvfJhzD@kbusch-mbp.dhcp.thefacebook.com>
+Message-ID: <Y6ff4tpk1Su/Q9bP@infradead.org>
 References: <572cfcc0-197a-9ead-9cb-3c5bf5e735@google.com>
+ <Y6d37vGSCKvfJhzD@kbusch-mbp.dhcp.thefacebook.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <572cfcc0-197a-9ead-9cb-3c5bf5e735@google.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <Y6d37vGSCKvfJhzD@kbusch-mbp.dhcp.thefacebook.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Dec 23, 2022 at 09:24:56PM -0800, Hugh Dickins wrote:
-> Hi Christoph,
+On Sat, Dec 24, 2022 at 03:06:38PM -0700, Keith Busch wrote:
+> Your observation is a queue-wrap condition that makes it impossible for
+> the controller know there are new commands.
 > 
-> There's something wrong with the nvme-pci heading for 6.2-rc1:
-> no problem booting here on this Lenovo ThinkPad X1 Carbon 5th,
-> but under load...
-> 
-> nvme nvme0: I/O 0 (I/O Cmd) QID 2 timeout, aborting
-> nvme nvme0: I/O 1 (I/O Cmd) QID 2 timeout, aborting
-> nvme nvme0: I/O 2 (I/O Cmd) QID 2 timeout, aborting
-> nvme nvme0: I/O 3 (I/O Cmd) QID 2 timeout, aborting
-> nvme nvme0: Abort status: 0x0
-> nvme nvme0: Abort status: 0x0
-> nvme nvme0: Abort status: 0x0
-> nvme nvme0: Abort status: 0x0
-> nvme nvme0: I/O 0 QID 2 timeout, reset controller
-> 
-> ...and more, until I just have to poweroff and reboot.
-> 
-> Bisection points to your
-> 0da7feaa5913 ("nvme-pci: use the tagset alloc/free helpers")
-> And that does revert cleanly, giving a kernel which shows no problem.
-> 
-> I've spent a while comparing old nvme_pci_alloc_tag_set() and new
-> nvme_alloc_io_tag_set(), I do not know my way around there at all
-> and may be talking nonsense, but it did look as if there might now
-> be a difference in the queue_depth, sqsize, q_depth conversions.
-> 
-> I'm running load successfully with the patch below, but I strongly
-> suspect that the right patch will be somewhere else: over to you!
-> 
-> Hugh
-> 
-> --- a/drivers/nvme/host/core.c
-> +++ b/drivers/nvme/host/core.c
-> @@ -4926,7 +4926,7 @@ int nvme_alloc_io_tag_set(struct nvme_ct
->  
->  	memset(set, 0, sizeof(*set));
->  	set->ops = ops;
-> -	set->queue_depth = ctrl->sqsize + 1;
-> +	set->queue_depth = ctrl->sqsize;
+> Your patch does look like the correct thing to do. The "zero means one"
+> thing is a confusing distraction, I think. It makes more sense if you
+> consider sqsize as the maximum number of tags we can have outstanding at
+> one time and it looks like all the drivers set it that way. We're
+> supposed to leave one slot empty for a full NVMe queue, so adding one
+> here to report the total number slots isn't right since that would allow
+> us to fill all slots.
 
-Your observation is a queue-wrap condition that makes it impossible for
-the controller know there are new commands.
+Yes, and pcie did actually do the ‐ 1 from q_depth, so we should
+drop the +1 for sqsize.  And add back the missing BLK_MQ_MAX_DEPTH.
+But we still need to keep sqsize updated as well.
 
-Your patch does look like the correct thing to do. The "zero means one"
-thing is a confusing distraction, I think. It makes more sense if you
-consider sqsize as the maximum number of tags we can have outstanding at
-one time and it looks like all the drivers set it that way. We're
-supposed to leave one slot empty for a full NVMe queue, so adding one
-here to report the total number slots isn't right since that would allow
-us to fill all slots.
+> Fabrics drivers have been using this method for a while, though, so
+> interesting they haven't had a simiar problem.
 
-Fabrics drivers have been using this method for a while, though, so
-interesting they haven't had a simiar problem.
+Fabrics doesn't have a real queue and thus no actual wrap, so
+I don't think they will be hit as bad by this.
+
+So we'll probably need something like this, split into two patches.
+And then for 6.2 clean up the sqsize vs q_depth mess for real.
+
+diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+index 95c488ea91c303..5b723c65fbeab5 100644
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@ -4926,7 +4926,7 @@ int nvme_alloc_io_tag_set(struct nvme_ctrl *ctrl, struct blk_mq_tag_set *set,
+ 
+ 	memset(set, 0, sizeof(*set));
+ 	set->ops = ops;
+-	set->queue_depth = ctrl->sqsize + 1;
++	set->queue_depth = min_t(unsigned, ctrl->sqsize, BLK_MQ_MAX_DEPTH - 1);
+ 	/*
+ 	 * Some Apple controllers requires tags to be unique across admin and
+ 	 * the (only) I/O queue, so reserve the first 32 tags of the I/O queue.
+diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
+index f0f8027644bbf8..ec5e1c578a710b 100644
+--- a/drivers/nvme/host/pci.c
++++ b/drivers/nvme/host/pci.c
+@@ -2332,10 +2332,12 @@ static int nvme_setup_io_queues(struct nvme_dev *dev)
+ 	if (dev->cmb_use_sqes) {
+ 		result = nvme_cmb_qdepth(dev, nr_io_queues,
+ 				sizeof(struct nvme_command));
+-		if (result > 0)
++		if (result > 0) {
+ 			dev->q_depth = result;
+-		else
++			dev->ctrl.sqsize = dev->q_depth - 1;
++		} else {
+ 			dev->cmb_use_sqes = false;
++		}
+ 	}
+ 
+ 	do {
+@@ -2536,7 +2538,6 @@ static int nvme_pci_enable(struct nvme_dev *dev)
+ 
+ 	dev->q_depth = min_t(u32, NVME_CAP_MQES(dev->ctrl.cap) + 1,
+ 				io_queue_depth);
+-	dev->ctrl.sqsize = dev->q_depth - 1; /* 0's based queue depth */
+ 	dev->db_stride = 1 << NVME_CAP_STRIDE(dev->ctrl.cap);
+ 	dev->dbs = dev->bar + 4096;
+ 
+@@ -2577,7 +2578,7 @@ static int nvme_pci_enable(struct nvme_dev *dev)
+ 		dev_warn(dev->ctrl.device, "IO queue depth clamped to %d\n",
+ 			 dev->q_depth);
+ 	}
+-
++	dev->ctrl.sqsize = dev->q_depth - 1; /* 0's based queue depth */
+ 
+ 	nvme_map_cmb(dev);
+ 
