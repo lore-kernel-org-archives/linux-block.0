@@ -2,167 +2,106 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F0425C10F1D
-	for <linux-block@archiver.kernel.org>; Sun, 25 Dec 2022 08:33:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BDDBFC10F1D
+	for <linux-block@archiver.kernel.org>; Sun, 25 Dec 2022 11:40:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230208AbiLYId0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 25 Dec 2022 03:33:26 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56696 "EHLO
+        id S229631AbiLYLkb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 25 Dec 2022 06:40:31 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45932 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229631AbiLYIdY (ORCPT
+        with ESMTP id S229441AbiLYLka (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 25 Dec 2022 03:33:24 -0500
-Received: from mail-oo1-xc32.google.com (mail-oo1-xc32.google.com [IPv6:2607:f8b0:4864:20::c32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A41BF5FD3
-        for <linux-block@vger.kernel.org>; Sun, 25 Dec 2022 00:33:23 -0800 (PST)
-Received: by mail-oo1-xc32.google.com with SMTP id v62-20020a4a7c41000000b004a0a214dfbaso1411842ooc.9
-        for <linux-block@vger.kernel.org>; Sun, 25 Dec 2022 00:33:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:message-id:in-reply-to:subject:cc:to:from
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=W+48L8Ebv4aPP9Sakn0pKuKNsmP77TbDjxN1IU0ghN8=;
-        b=C/KrYpL0yQVWEjfNR/+zh7hkyjCD67VfVkBqy1K8+RQKSfbhpUBLc1qOTnF0fCDGyX
-         abvvTi4Ix3YCZHlLWgq3LiOzF+h0Jtp54tbGUKxFzIMPy/Mpzyd09v75l/qsGq59dvEP
-         vZcgG8Ifqg0FTq8C+68pJIcdKu6utedNm/1HHAE+7dAImU3/8jOyGUz2zzzOU3yxHeGw
-         IK0IUzxxXjHgH/x/hO0Dr1CepqxRhwo1OODAk+gO3kUB4ZRcnKyOhX2CD1WcT86Y+PTw
-         Epqv/zocptsxO/54HcQBq6fKOw8yBahgM+C3M/0Kxcc0eVkTLtMKyM/ZJawcDJtSjg/6
-         SihA==
+        Sun, 25 Dec 2022 06:40:30 -0500
+Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 346F66328;
+        Sun, 25 Dec 2022 03:40:28 -0800 (PST)
+Received: by mail-wr1-f42.google.com with SMTP id d4so213191wrw.6;
+        Sun, 25 Dec 2022 03:40:28 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=mime-version:references:message-id:in-reply-to:subject:cc:to:from
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=W+48L8Ebv4aPP9Sakn0pKuKNsmP77TbDjxN1IU0ghN8=;
-        b=N53hM7gxjv9xlA3xLhVSck2vkHyJPnKBbRHgvyH6VPvGyuo9oRLJvoPWaBQyyA8k0N
-         bYbAsOWY65VqUEjKMqOlXIzCQoTJXUNns2WJb7sD31oDKtdkqUrshIwI6UshiUF436kZ
-         BpmG4lTm26cl5XXPRkVS78MfhRkxLlAucpzoeeIf1++ixZQShV/7gaV+EfsoBuuSQ+0O
-         WoyBl4AiJN7gmimqRvenYhbaMf2Q1BsHY6qciKDk7Lq5VhC591YS9ee3oAsWC6PQYnVr
-         cFkkbL0K9Hd3rqd9ZiEv8lGWd1r96VGjlxGIVC6gi/XPuL81SNyJ1viHKzNFaKzzyCeq
-         xQFQ==
-X-Gm-Message-State: AFqh2kr6keeCINF9/btNE637duI7tlD3sU6g6q66Jl4UwEKksDSizntV
-        nEy7jcYEICB9Soy4j3CubuAGd27k5oem5Hbt
-X-Google-Smtp-Source: AMrXdXvLMgnRzgpvkvKHbG2Qq8+wQ0bi6W7/3nrnjeyJTI28yHtg1Aezw0WEm0FwzzMz0ZLIptgr6Q==
-X-Received: by 2002:a4a:df0e:0:b0:49f:dec4:10db with SMTP id i14-20020a4adf0e000000b0049fdec410dbmr7115498oou.0.1671957202776;
-        Sun, 25 Dec 2022 00:33:22 -0800 (PST)
-Received: from ripple.attlocal.net (172-10-233-147.lightspeed.sntcca.sbcglobal.net. [172.10.233.147])
-        by smtp.gmail.com with ESMTPSA id m2-20020a4add02000000b004a3d98b2ccdsm3213620oou.42.2022.12.25.00.33.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 25 Dec 2022 00:33:22 -0800 (PST)
-Date:   Sun, 25 Dec 2022 00:33:13 -0800 (PST)
-From:   Hugh Dickins <hughd@google.com>
-X-X-Sender: hugh@ripple.attlocal.net
-To:     Christoph Hellwig <hch@infradead.org>
-cc:     Keith Busch <kbusch@kernel.org>, Hugh Dickins <hughd@google.com>,
-        Jens Axboe <axboe@kernel.dk>, Sagi Grimberg <sagi@grimberg.me>,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Thorsten Leemhuis <regressions@leemhuis.info>,
-        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: 6.2 nvme-pci: something wrong
-In-Reply-To: <Y6ff4tpk1Su/Q9bP@infradead.org>
-Message-ID: <6715d48b-7670-527-38ab-42f865fe3c10@google.com>
-References: <572cfcc0-197a-9ead-9cb-3c5bf5e735@google.com> <Y6d37vGSCKvfJhzD@kbusch-mbp.dhcp.thefacebook.com> <Y6ff4tpk1Su/Q9bP@infradead.org>
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZHIIoLI6GIci6V+pJYW1QHErBVX3zcPxWh+ZJQxLA0o=;
+        b=RBf9RMQ5Qst8eEVr26mVoIbmDnzWdRsX02HiJABs74Yc3wC4OwQF/wgbisfTRrOHcp
+         7jjaDnY9GYdPxmek+eDuaJFxoGEoGRRJnqskqxUz/3CwwQZSuBiByg85SA712Q6GHU0M
+         wQE06D7NGvDYhbZ9aec2yALM2+nh7U6rEvJtSfclLIXFy2qvil/yPaGnogJ4B1ksRZCq
+         k+ARgoj/CrTiL1QO3wkeRMhF/78dKe9+PfLhCaOvlo0lip75h4aRke+pyOAyLD8RLxBp
+         iCZO2gCz3e5az31ulBkcxLijVRiJUr7Y5I1hiTfjSPCoW0wtAMEyyA5iqKDTHzFRIbyJ
+         tQKA==
+X-Gm-Message-State: AFqh2ko9jcLU3lI/dA3nyaTr68FzYH4bNp3ZGM6ZygwCo88bp4CmfYVT
+        gzzbY4zrZvXrvJVbQ3GkrqY=
+X-Google-Smtp-Source: AMrXdXtOU+j5gb521X9u9SLkgvSyxLbk+fAjhclAlSe9w631NeEuF0qIeOMvF5fteB8K21s8/zxQPQ==
+X-Received: by 2002:adf:f30f:0:b0:242:864e:c71c with SMTP id i15-20020adff30f000000b00242864ec71cmr8954222wro.24.1671968426666;
+        Sun, 25 Dec 2022 03:40:26 -0800 (PST)
+Received: from [192.168.64.177] (bzq-219-42-90.isdn.bezeqint.net. [62.219.42.90])
+        by smtp.gmail.com with ESMTPSA id e16-20020adfdbd0000000b002362f6fcaf5sm7652128wrj.48.2022.12.25.03.40.23
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 25 Dec 2022 03:40:26 -0800 (PST)
+Message-ID: <1d0eb8e4-a91f-4635-bac7-9bc6cefbeff0@grimberg.me>
+Date:   Sun, 25 Dec 2022 13:40:23 +0200
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="-1463760895-442772056-1671957202=:1683"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.4.2
+Subject: Re: [PATCH for-6.2/block V3 1/2] block: Data type conversion for IO
+ accounting
+Content-Language: en-US
+To:     Gulam Mohamed <gulam.mohamed@oracle.com>,
+        linux-block@vger.kernel.org
+Cc:     axboe@kernel.dk, philipp.reisner@linbit.com,
+        lars.ellenberg@linbit.com, christoph.boehmwalder@linbit.com,
+        minchan@kernel.org, ngupta@vflare.org, senozhatsky@chromium.org,
+        colyli@suse.de, kent.overstreet@gmail.com, agk@redhat.com,
+        snitzer@kernel.org, dm-devel@redhat.com, song@kernel.org,
+        dan.j.williams@intel.com, vishal.l.verma@intel.com,
+        dave.jiang@intel.com, ira.weiny@intel.com, junxiao.bi@oracle.com,
+        martin.petersen@oracle.com, kch@nvidia.com,
+        drbd-dev@lists.linbit.com, linux-kernel@vger.kernel.org,
+        linux-bcache@vger.kernel.org, linux-raid@vger.kernel.org,
+        nvdimm@lists.linux.dev, konrad.wilk@oracle.com, joe.jin@oracle.com,
+        rajesh.sivaramasubramaniom@oracle.com, shminderjit.singh@oracle.com
+References: <20221221040506.1174644-1-gulam.mohamed@oracle.com>
+From:   Sagi Grimberg <sagi@grimberg.me>
+In-Reply-To: <20221221040506.1174644-1-gulam.mohamed@oracle.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-  This message is in MIME format.  The first part should be readable text,
-  while the remaining parts are likely unreadable without MIME-aware tools.
 
----1463760895-442772056-1671957202=:1683
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
 
-On Sat, 24 Dec 2022, Christoph Hellwig wrote:
-> On Sat, Dec 24, 2022 at 03:06:38PM -0700, Keith Busch wrote:
-> > Your observation is a queue-wrap condition that makes it impossible for
-> > the controller know there are new commands.
-> >=20
-> > Your patch does look like the correct thing to do. The "zero means one"
-> > thing is a confusing distraction, I think. It makes more sense if you
-> > consider sqsize as the maximum number of tags we can have outstanding a=
-t
-> > one time and it looks like all the drivers set it that way. We're
-> > supposed to leave one slot empty for a full NVMe queue, so adding one
-> > here to report the total number slots isn't right since that would allo=
-w
-> > us to fill all slots.
->=20
-> Yes, and pcie did actually do the =E2=80=90 1 from q_depth, so we should
-> drop the +1 for sqsize.  And add back the missing BLK_MQ_MAX_DEPTH.
-> But we still need to keep sqsize updated as well.
->=20
-> > Fabrics drivers have been using this method for a while, though, so
-> > interesting they haven't had a simiar problem.
->=20
-> Fabrics doesn't have a real queue and thus no actual wrap, so
-> I don't think they will be hit as bad by this.
->=20
-> So we'll probably need something like this, split into two patches.
-> And then for 6.2 clean up the sqsize vs q_depth mess for real.
+On 12/21/22 06:05, Gulam Mohamed wrote:
+> Change the data type of start and end time IO accounting variables in,
+> block layer, from "unsigned long" to "u64". This is to enable nano-seconds
+> granularity, in next commit, for the devices whose latency is less than
+> milliseconds.
+> 
+> Changes from V2 to V3
+> =====================
+> 1. Changed all the required variables data-type to u64 as part of this
+>     first patch
+> 2. Create a new setting '2' for iostats in sysfs in next patch
+> 3. Change the code to get the ktime values when iostat=2 in next patch
+> 
+> Signed-off-by: Gulam Mohamed <gulam.mohamed@oracle.com>
+> ---
+>   block/blk-core.c              | 24 ++++++++++++------------
+>   block/blk.h                   |  2 +-
+>   drivers/block/drbd/drbd_int.h |  2 +-
+>   drivers/block/zram/zram_drv.c |  4 ++--
+>   drivers/md/bcache/request.c   | 10 +++++-----
+>   drivers/md/dm-core.h          |  2 +-
+>   drivers/md/dm.c               |  2 +-
+>   drivers/md/md.h               |  2 +-
+>   drivers/md/raid1.h            |  2 +-
+>   drivers/md/raid10.h           |  2 +-
+>   drivers/md/raid5.c            |  2 +-
+>   drivers/nvdimm/btt.c          |  2 +-
+>   drivers/nvdimm/pmem.c         |  2 +-
+>   include/linux/blk_types.h     |  2 +-
+>   include/linux/blkdev.h        | 12 ++++++------
+>   include/linux/part_stat.h     |  2 +-
 
-This patch is working fine for me; and, in the light of Keith's
-explanation, so far as I can tell, seems the right thing to do.
-
-Thanks!
-Hugh
-
->=20
-> diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-> index 95c488ea91c303..5b723c65fbeab5 100644
-> --- a/drivers/nvme/host/core.c
-> +++ b/drivers/nvme/host/core.c
-> @@ -4926,7 +4926,7 @@ int nvme_alloc_io_tag_set(struct nvme_ctrl *ctrl, s=
-truct blk_mq_tag_set *set,
-> =20
->  =09memset(set, 0, sizeof(*set));
->  =09set->ops =3D ops;
-> -=09set->queue_depth =3D ctrl->sqsize + 1;
-> +=09set->queue_depth =3D min_t(unsigned, ctrl->sqsize, BLK_MQ_MAX_DEPTH -=
- 1);
->  =09/*
->  =09 * Some Apple controllers requires tags to be unique across admin and
->  =09 * the (only) I/O queue, so reserve the first 32 tags of the I/O queu=
-e.
-> diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-> index f0f8027644bbf8..ec5e1c578a710b 100644
-> --- a/drivers/nvme/host/pci.c
-> +++ b/drivers/nvme/host/pci.c
-> @@ -2332,10 +2332,12 @@ static int nvme_setup_io_queues(struct nvme_dev *=
-dev)
->  =09if (dev->cmb_use_sqes) {
->  =09=09result =3D nvme_cmb_qdepth(dev, nr_io_queues,
->  =09=09=09=09sizeof(struct nvme_command));
-> -=09=09if (result > 0)
-> +=09=09if (result > 0) {
->  =09=09=09dev->q_depth =3D result;
-> -=09=09else
-> +=09=09=09dev->ctrl.sqsize =3D dev->q_depth - 1;
-> +=09=09} else {
->  =09=09=09dev->cmb_use_sqes =3D false;
-> +=09=09}
->  =09}
-> =20
->  =09do {
-> @@ -2536,7 +2538,6 @@ static int nvme_pci_enable(struct nvme_dev *dev)
-> =20
->  =09dev->q_depth =3D min_t(u32, NVME_CAP_MQES(dev->ctrl.cap) + 1,
->  =09=09=09=09io_queue_depth);
-> -=09dev->ctrl.sqsize =3D dev->q_depth - 1; /* 0's based queue depth */
->  =09dev->db_stride =3D 1 << NVME_CAP_STRIDE(dev->ctrl.cap);
->  =09dev->dbs =3D dev->bar + 4096;
-> =20
-> @@ -2577,7 +2578,7 @@ static int nvme_pci_enable(struct nvme_dev *dev)
->  =09=09dev_warn(dev->ctrl.device, "IO queue depth clamped to %d\n",
->  =09=09=09 dev->q_depth);
->  =09}
-> -
-> +=09dev->ctrl.sqsize =3D dev->q_depth - 1; /* 0's based queue depth */
-> =20
->  =09nvme_map_cmb(dev);
-> =20
->=20
----1463760895-442772056-1671957202=:1683--
+nvme-mpath now also has stats, so struct nvme_request should also be
+updated.
