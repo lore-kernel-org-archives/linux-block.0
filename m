@@ -2,106 +2,105 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BDDBFC10F1D
-	for <linux-block@archiver.kernel.org>; Sun, 25 Dec 2022 11:40:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A0A0AC4167B
+	for <linux-block@archiver.kernel.org>; Mon, 26 Dec 2022 01:10:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229631AbiLYLkb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 25 Dec 2022 06:40:31 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45932 "EHLO
+        id S231435AbiLZBKv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 25 Dec 2022 20:10:51 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55994 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229441AbiLYLka (ORCPT
+        with ESMTP id S230189AbiLZBKu (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 25 Dec 2022 06:40:30 -0500
-Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 346F66328;
-        Sun, 25 Dec 2022 03:40:28 -0800 (PST)
-Received: by mail-wr1-f42.google.com with SMTP id d4so213191wrw.6;
-        Sun, 25 Dec 2022 03:40:28 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZHIIoLI6GIci6V+pJYW1QHErBVX3zcPxWh+ZJQxLA0o=;
-        b=RBf9RMQ5Qst8eEVr26mVoIbmDnzWdRsX02HiJABs74Yc3wC4OwQF/wgbisfTRrOHcp
-         7jjaDnY9GYdPxmek+eDuaJFxoGEoGRRJnqskqxUz/3CwwQZSuBiByg85SA712Q6GHU0M
-         wQE06D7NGvDYhbZ9aec2yALM2+nh7U6rEvJtSfclLIXFy2qvil/yPaGnogJ4B1ksRZCq
-         k+ARgoj/CrTiL1QO3wkeRMhF/78dKe9+PfLhCaOvlo0lip75h4aRke+pyOAyLD8RLxBp
-         iCZO2gCz3e5az31ulBkcxLijVRiJUr7Y5I1hiTfjSPCoW0wtAMEyyA5iqKDTHzFRIbyJ
-         tQKA==
-X-Gm-Message-State: AFqh2ko9jcLU3lI/dA3nyaTr68FzYH4bNp3ZGM6ZygwCo88bp4CmfYVT
-        gzzbY4zrZvXrvJVbQ3GkrqY=
-X-Google-Smtp-Source: AMrXdXtOU+j5gb521X9u9SLkgvSyxLbk+fAjhclAlSe9w631NeEuF0qIeOMvF5fteB8K21s8/zxQPQ==
-X-Received: by 2002:adf:f30f:0:b0:242:864e:c71c with SMTP id i15-20020adff30f000000b00242864ec71cmr8954222wro.24.1671968426666;
-        Sun, 25 Dec 2022 03:40:26 -0800 (PST)
-Received: from [192.168.64.177] (bzq-219-42-90.isdn.bezeqint.net. [62.219.42.90])
-        by smtp.gmail.com with ESMTPSA id e16-20020adfdbd0000000b002362f6fcaf5sm7652128wrj.48.2022.12.25.03.40.23
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 25 Dec 2022 03:40:26 -0800 (PST)
-Message-ID: <1d0eb8e4-a91f-4635-bac7-9bc6cefbeff0@grimberg.me>
-Date:   Sun, 25 Dec 2022 13:40:23 +0200
+        Sun, 25 Dec 2022 20:10:50 -0500
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 48AC3C34;
+        Sun, 25 Dec 2022 17:10:47 -0800 (PST)
+Received: from mail02.huawei.com (unknown [172.30.67.153])
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4NgKTr6cc0z4f3nTL;
+        Mon, 26 Dec 2022 09:10:40 +0800 (CST)
+Received: from [10.174.176.73] (unknown [10.174.176.73])
+        by APP4 (Coremail) with SMTP id gCh0CgBXwLOR9KhjFu0ZAg--.46799S3;
+        Mon, 26 Dec 2022 09:10:43 +0800 (CST)
+Subject: Re: [PATCH -next 1/4] blk-iocost: track whether iocg is still online
+To:     Christoph Hellwig <hch@infradead.org>,
+        Yu Kuai <yukuai1@huaweicloud.com>
+Cc:     tj@kernel.org, josef@toxicpanda.com, axboe@kernel.dk,
+        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, yi.zhang@huawei.com,
+        "yukuai (C)" <yukuai3@huawei.com>
+References: <20221217030527.1250083-1-yukuai1@huaweicloud.com>
+ <20221217030527.1250083-2-yukuai1@huaweicloud.com>
+ <Y6LhD8CEkcgLUJoQ@infradead.org>
+From:   Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <edb84ee2-3dd5-8bb4-4417-ed42744d793f@huaweicloud.com>
+Date:   Mon, 26 Dec 2022 09:10:41 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.4.2
-Subject: Re: [PATCH for-6.2/block V3 1/2] block: Data type conversion for IO
- accounting
-Content-Language: en-US
-To:     Gulam Mohamed <gulam.mohamed@oracle.com>,
-        linux-block@vger.kernel.org
-Cc:     axboe@kernel.dk, philipp.reisner@linbit.com,
-        lars.ellenberg@linbit.com, christoph.boehmwalder@linbit.com,
-        minchan@kernel.org, ngupta@vflare.org, senozhatsky@chromium.org,
-        colyli@suse.de, kent.overstreet@gmail.com, agk@redhat.com,
-        snitzer@kernel.org, dm-devel@redhat.com, song@kernel.org,
-        dan.j.williams@intel.com, vishal.l.verma@intel.com,
-        dave.jiang@intel.com, ira.weiny@intel.com, junxiao.bi@oracle.com,
-        martin.petersen@oracle.com, kch@nvidia.com,
-        drbd-dev@lists.linbit.com, linux-kernel@vger.kernel.org,
-        linux-bcache@vger.kernel.org, linux-raid@vger.kernel.org,
-        nvdimm@lists.linux.dev, konrad.wilk@oracle.com, joe.jin@oracle.com,
-        rajesh.sivaramasubramaniom@oracle.com, shminderjit.singh@oracle.com
-References: <20221221040506.1174644-1-gulam.mohamed@oracle.com>
-From:   Sagi Grimberg <sagi@grimberg.me>
-In-Reply-To: <20221221040506.1174644-1-gulam.mohamed@oracle.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <Y6LhD8CEkcgLUJoQ@infradead.org>
+Content-Type: text/plain; charset=gbk; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: gCh0CgBXwLOR9KhjFu0ZAg--.46799S3
+X-Coremail-Antispam: 1UD129KBjvdXoWruw1xCw48CF1kGrW7ZF4rAFb_yoWDWrg_Zw
+        1Fva4akwsxKFZ3X34jyw1fXFZIkwn5Gr1kWFWrtasrCryUX3yfCa17ZrWfCa97Gw4xCrW3
+        Cr98W3yxG34IqjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+        9fnUUIcSsGvfJTRUUUb3kFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
+        6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
+        A2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j
+        6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
+        Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
+        I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
+        4UM4x0Y48IcVAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2kI
+        c2xKxwCYjI0SjxkI62AI1cAE67vIY487MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4
+        AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE
+        17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMI
+        IF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw20EY4v20xvaj40_WFyUJVCq
+        3wCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r1j6r4UYxBIda
+        VFxhVjvjDU0xZFpf9x0JUdHUDUUUUU=
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Hi, Christoph
 
-
-On 12/21/22 06:05, Gulam Mohamed wrote:
-> Change the data type of start and end time IO accounting variables in,
-> block layer, from "unsigned long" to "u64". This is to enable nano-seconds
-> granularity, in next commit, for the devices whose latency is less than
-> milliseconds.
+ÔÚ 2022/12/21 18:33, Christoph Hellwig Ð´µÀ:
+> On Sat, Dec 17, 2022 at 11:05:24AM +0800, Yu Kuai wrote:
+>> @@ -459,6 +459,8 @@ struct ioc_gq {
+>>   	struct blkg_policy_data		pd;
+>>   	struct ioc			*ioc;
+>>   
+>> +	bool online;
 > 
-> Changes from V2 to V3
-> =====================
-> 1. Changed all the required variables data-type to u64 as part of this
->     first patch
-> 2. Create a new setting '2' for iostats in sysfs in next patch
-> 3. Change the code to get the ktime values when iostat=2 in next patch
+> Nit: maybe tab align this field like the fields above it.
 > 
-> Signed-off-by: Gulam Mohamed <gulam.mohamed@oracle.com>
-> ---
->   block/blk-core.c              | 24 ++++++++++++------------
->   block/blk.h                   |  2 +-
->   drivers/block/drbd/drbd_int.h |  2 +-
->   drivers/block/zram/zram_drv.c |  4 ++--
->   drivers/md/bcache/request.c   | 10 +++++-----
->   drivers/md/dm-core.h          |  2 +-
->   drivers/md/dm.c               |  2 +-
->   drivers/md/md.h               |  2 +-
->   drivers/md/raid1.h            |  2 +-
->   drivers/md/raid10.h           |  2 +-
->   drivers/md/raid5.c            |  2 +-
->   drivers/nvdimm/btt.c          |  2 +-
->   drivers/nvdimm/pmem.c         |  2 +-
->   include/linux/blk_types.h     |  2 +-
->   include/linux/blkdev.h        | 12 ++++++------
->   include/linux/part_stat.h     |  2 +-
+>> +static void ioc_pd_offline(struct blkg_policy_data *pd)
+>> +{
+>> +	struct ioc_gq *iocg = pd_to_iocg(pd);
+>> +	struct ioc *ioc = iocg->ioc;
+>> +	unsigned long flags;
+>> +
+>> +	if (ioc) {
+> 
+> How could ioc be NULL here?
+> 
 
-nvme-mpath now also has stats, so struct nvme_request should also be
-updated.
+As I explained in another thread.. pd_offline_fn() can be called without
+pd_init_fn(), which is a bug from upper layer...
+
+blkcg_activate_policy
+  spin_lock_irq(&q->queue_lock);
+  list_for_each_entry_reverse(blkg, &q->blkg_list
+   pd_alloc_fn(GFP_NOWAIT | __GFP_NOWARN,...) -> failed
+
+   spin_unlock_irq(&q->queue_lock);
+   // release queue_lock here is problematic, this will cause
+pd_offline_fn called without pd_init_fn.
+   pd_alloc_fn(__GFP_NOWARN,...)
+
+Thanks,
+Kuai
+> .
+> 
+
