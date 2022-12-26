@@ -2,339 +2,291 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DED81C3DA79
-	for <linux-block@archiver.kernel.org>; Mon, 26 Dec 2022 13:05:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13FA9C3DA79
+	for <linux-block@archiver.kernel.org>; Mon, 26 Dec 2022 16:56:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230520AbiLZNFV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 26 Dec 2022 08:05:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55004 "EHLO
+        id S232174AbiLZQ4B (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 26 Dec 2022 11:56:01 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50326 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229568AbiLZNFU (ORCPT
+        with ESMTP id S232165AbiLZQzb (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 26 Dec 2022 08:05:20 -0500
-Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98218E22
-        for <linux-block@vger.kernel.org>; Mon, 26 Dec 2022 05:05:18 -0800 (PST)
-Received: by mail-pl1-x62c.google.com with SMTP id m4so10691561pls.4
-        for <linux-block@vger.kernel.org>; Mon, 26 Dec 2022 05:05:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance-com.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=nE7yJwFAP/zkGtRmnIRtac0TUO9NfSKJNGcyhbdNgL8=;
-        b=EIWRvUG6w6BpGVljPLu29Cqw6SgK7myTN/ND1p0+c2x0VTOiDgEe1nnuW8IEHGfs5o
-         W0BQM/QzfWsNhJhfVoh5AJQOEsvEfgLfn17K+ffzcKKYP7gzpffhtP6upvfKzm0pOsVG
-         +vYFIjSHnl0LNwf/vKmuzPOMjpU5X0KwYedp7hbO/aAXUCuufM46gia2OGwTZ4ozuPRQ
-         AjSsGg9+/TNkFCPdVRNrsqygIblFi2UNP5fLXcqYQZshNfHXhJWDlyBUzez1GTZY64HQ
-         YT3gIYPTZTqtIG91CMcLLMVzm0erxIVx+QaDWaPnlN5snLcLmxivoiArUd97keTo8NtD
-         1x1A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=nE7yJwFAP/zkGtRmnIRtac0TUO9NfSKJNGcyhbdNgL8=;
-        b=pkBQ6FW9nfDskF/OtEF/mTyiYo8JsIQiLLXoEAA7koHo9n2hsR+vbfSGwC0AqCJP/y
-         CnO0WWQiTmfAko9LKH1ajdGeBBnVtgauYp1/9SA5LzmSR6q5R7TFbsdTWvoqLgz03RfB
-         Yk5UN+ubEo9v6GslrswjYrgvMrTGr4I/8YY8qRlg5/YV9YtPCJix+1K6/C45w7YRXkhR
-         gVNEivnoL9JllZ4/ohMTw9p/dqtYFacLtM4+tmTTJc+YaTf3yG0l7GaWU6jFkOwRJ8CD
-         XAf5gDKlOdOyBC7pheL6WwHEcV4NNOHD9lV/Id6oOaHjqdjddKCey2cP55enu22Dte25
-         3YLQ==
-X-Gm-Message-State: AFqh2kr08k8LQXNL5aB++ym6Tp6FMo59dFF7qxu0Ntpi+Oer/QtPWkfW
-        faSbcecuGkN/9hP6QDcsiFLFLA==
-X-Google-Smtp-Source: AMrXdXtUvINrZ/n8z0Jp/5N0BXqODp6VXuLXA41j83K8qQeg7cVGSbF3p/54kbFdxLImuG9eQHrFxQ==
-X-Received: by 2002:a17:902:ba8e:b0:189:db2b:ac1a with SMTP id k14-20020a170902ba8e00b00189db2bac1amr31991745pls.36.1672059917944;
-        Mon, 26 Dec 2022 05:05:17 -0800 (PST)
-Received: from localhost.localdomain ([139.177.225.243])
-        by smtp.gmail.com with ESMTPSA id y12-20020a17090322cc00b00182d25a1e4bsm7037697plg.259.2022.12.26.05.05.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 26 Dec 2022 05:05:17 -0800 (PST)
-From:   Jinke Han <hanjinke.666@bytedance.com>
-X-Google-Original-From: Jinke Han <hnajinke.666@bytedance>
-To:     tj@kernel.org, josef@toxicpanda.com, axboe@kernel.dk
-Cc:     cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, yinxin.x@bytedance.com,
-        Jinke Han <hanjinke.666@bytedance.com>
-Subject: [PATCH v3] blk-throtl: Introduce sync and async queues for blk-throtl
-Date:   Mon, 26 Dec 2022 21:05:05 +0800
-Message-Id: <20221226130505.7186-1-hanjinke.666@bytedance.com>
-X-Mailer: git-send-email 2.32.0 (Apple Git-132)
+        Mon, 26 Dec 2022 11:55:31 -0500
+Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A609F6413;
+        Mon, 26 Dec 2022 08:55:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1672073701; x=1703609701;
+  h=date:from:to:cc:subject:message-id:mime-version:
+   content-transfer-encoding;
+  bh=SfZzdNV19bg9UmQpe6KYIZYymHxtUypJH/O7nO8s6g4=;
+  b=h31mID8Nj5IvQhElF9vkmX2MwemEqgYnIN6yGlU2CZyWEac6EvWXINt7
+   l5mr/uWh8P0XXMqpyY+DImnkCpzuQoiOLMHQNkjnGqMbt6mMQVAkvWg4z
+   hj+qhEZ5WAY5AFarg1LsBGlqdJ9qL67uPj6rUFbhHN0Y70lSuVLXgTXW8
+   rqQTxFviXwYYhJIIuAHkrPJNJDSzNLB+ShXcNPWJYa9GYJ/s3OqPVu6yD
+   idmnf7K4mV/AcO6GoTntodEJf3aM2/aWvOftu6AcpJLXRQRv1nfRoEGvR
+   9MlniTegoPbXWLjkxruZ33hcPBnYfy+hr1LAdqJpFRbQ79mQ4RMo4rCfc
+   w==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10572"; a="308338533"
+X-IronPort-AV: E=Sophos;i="5.96,276,1665471600"; 
+   d="scan'208";a="308338533"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Dec 2022 08:55:00 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10572"; a="646205184"
+X-IronPort-AV: E=Sophos;i="5.96,276,1665471600"; 
+   d="scan'208";a="646205184"
+Received: from lkp-server01.sh.intel.com (HELO b5d47979f3ad) ([10.239.97.150])
+  by orsmga007.jf.intel.com with ESMTP; 26 Dec 2022 08:54:55 -0800
+Received: from kbuild by b5d47979f3ad with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1p9qkZ-000EZN-0D;
+        Mon, 26 Dec 2022 16:54:55 +0000
+Date:   Tue, 27 Dec 2022 00:54:10 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Andrew Morton <akpm@linux-foundation.org>
+Cc:     virtualization@lists.linux-foundation.org,
+        speakup@linux-speakup.org, netdev@vger.kernel.org,
+        loongarch@lists.linux.dev, linux-xfs@vger.kernel.org,
+        linux-omap@vger.kernel.org, linux-mtd@lists.infradead.org,
+        linux-media@vger.kernel.org, linux-iio@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-cxl@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-arch@vger.kernel.org,
+        Linux Memory Management List <linux-mm@kvack.org>
+Subject: [linux-next:master] BUILD REGRESSION
+ c76083fac3bae1a87ae3d005b5cb1cbc761e31d5
+Message-ID: <63a9d1b2.869GAwHafmAB6R7M%lkp@intel.com>
+User-Agent: Heirloom mailx 12.5 6/20/10
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Jinke Han <hanjinke.666@bytedance.com>
+tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git master
+branch HEAD: c76083fac3bae1a87ae3d005b5cb1cbc761e31d5  Add linux-next specific files for 20221226
 
-Now we don't distinguish sync write ios from normal buffer write ios
-in blk-throtl. A bio with REQ_SYNC tagged always mean it will be wait
-until write completion soon after it submit. So it's reasonable for sync
-io to complete as soon as possible.
+Error/Warning reports:
 
-In our test, fio writes a 100g file in sequential 4k blocksize in
-a container with low bps limit configured (wbps=10M). More than 1200
-ios were throttled in blk-throtl queue and the avarage throtle time
-of each io is 140s. At the same time, the operation of saving a small
-file by vim will be blocked amolst 140s. As a fsync will be send by vim,
-the sync ios of fsync will be blocked by a huge amount of buffer write
-ios ahead. This is also a priority inversion problem within one cgroup.
-In the database scene, things got really bad with blk-throtle enabled
-as fsync is called very often.
+https://lore.kernel.org/oe-kbuild-all/202212020520.0OkMIno3-lkp@intel.com
+https://lore.kernel.org/oe-kbuild-all/202212041528.4TbQL9ys-lkp@intel.com
+https://lore.kernel.org/oe-kbuild-all/202212051759.cEv6fyHy-lkp@intel.com
+https://lore.kernel.org/oe-kbuild-all/202212061455.6GE7y0jg-lkp@intel.com
+https://lore.kernel.org/oe-kbuild-all/202212080938.RHVtvwt0-lkp@intel.com
+https://lore.kernel.org/oe-kbuild-all/202212090509.NjAl9tbo-lkp@intel.com
+https://lore.kernel.org/oe-kbuild-all/202212242239.hWUlGmm0-lkp@intel.com
+https://lore.kernel.org/oe-kbuild-all/202212250859.uLjFpJy3-lkp@intel.com
 
-This patch splits bio queue into sync and async queues for blk-throtl
-and gives a huge priority to sync write ios. Sync queue only make sense
-for write ios as we treat all read io as sync io. I think it's a nice
-respond to the semantics of REQ_SYNC. Bios with REQ_META and REQ_PRIO
-gains the same priority as they are important to fs. This may avoid
-some potential priority inversion problems.
+Error/Warning: (recently discovered and may have been fixed)
 
-With this patch, do the same test above, the duration of the fsync sent
-by vim drops to several hundreds of milliseconds.
+ERROR: modpost: "input_ff_create_memless" [drivers/hid/hid-betopff.ko] undefined!
+ERROR: modpost: "input_ff_create_memless" [drivers/hid/hid-logitech.ko] undefined!
+ERROR: modpost: "input_ff_create_memless" [drivers/hid/hid-megaworld.ko] undefined!
+ERROR: modpost: "input_ff_create_memless" [drivers/hid/hid-mf.ko] undefined!
+ERROR: modpost: "input_ff_create_memless" [drivers/input/misc/drv260x.ko] undefined!
+ERROR: modpost: "input_ff_create_memless" [drivers/input/misc/drv2665.ko] undefined!
+ERROR: modpost: "input_ff_create_memless" [drivers/input/misc/gpio-vibra.ko] undefined!
+ERROR: modpost: "input_ff_create_memless" [drivers/input/misc/regulator-haptic.ko] undefined!
+ERROR: modpost: "input_ff_create_memless" [drivers/input/misc/sc27xx-vibra.ko] undefined!
+aarch64-linux-ld: ID map text too big or misaligned
+arch/arm/kernel/entry-armv.S:485:5: warning: "CONFIG_ARM_THUMB" is not defined, evaluates to 0 [-Wundef]
+arch/arm64/include/asm/pgtable-hwdef.h:82:64: warning: "PMD_SHIFT" is not defined, evaluates to 0 [-Wundef]
+arch/loongarch/kernel/asm-offsets.c:265:6: warning: no previous prototype for 'output_pbe_defines' [-Wmissing-prototypes]
+drivers/regulator/tps65219-regulator.c:310:32: warning: parameter 'dev' set but not used [-Wunused-but-set-parameter]
+drivers/regulator/tps65219-regulator.c:310:60: warning: parameter 'dev' set but not used [-Wunused-but-set-parameter]
+drivers/regulator/tps65219-regulator.c:370:26: sparse:    int
+drivers/regulator/tps65219-regulator.c:370:26: sparse:    struct regulator_dev *[assigned] rdev
+drivers/regulator/tps65219-regulator.c:370:26: warning: ordered comparison of pointer with integer zero [-Wextra]
+loongarch64-linux-ld: sleep.c:(.text+0x22c): undefined reference to `loongarch_wakeup_start'
+sleep.c:(.text+0x228): undefined reference to `loongarch_wakeup_start'
 
-Signed-off-by: Jinke Han <hanjinke.666@bytedance.com>
-Signed-off-by: Xin Yin <yinxin.x@bytedance.com>
----
+Unverified Error/Warning (likely false positive, please contact us if interested):
 
-Changes in v2
-- Make code more simple.
-Changes in v3
-- Fix mismatch of waiting bio and the next dispatched bio.
-- Rename dispatch_sync_cnt to disp_sync_cnt.
-- Add more notes.
+drivers/accessibility/speakup/main.c:1290:26: sparse: sparse: obsolete array initializer, use C99 syntax
+drivers/block/null_blk/zoned.c:769 zone_cond_store() warn: potential spectre issue 'dev->zones' [w] (local cap)
+drivers/block/virtio_blk.c:721:9: sparse:    bad type *
+drivers/block/virtio_blk.c:721:9: sparse:    unsigned int *
+drivers/block/virtio_blk.c:721:9: sparse: sparse: incompatible types in comparison expression (different base types):
+drivers/block/virtio_blk.c:721:9: sparse: sparse: no generic selection for 'restricted __le32 [addressable] virtio_cread_v'
+drivers/block/virtio_blk.c:721:9: sparse: sparse: no generic selection for 'restricted __le32 virtio_cread_v'
+drivers/cxl/core/mbox.c:832:18: sparse: sparse: cast from non-scalar
+drivers/cxl/core/mbox.c:832:18: sparse: sparse: cast to non-scalar
+drivers/i2c/busses/i2c-qcom-geni.c:1028:28: sparse: sparse: symbol 'i2c_master_hub' was not declared. Should it be static?
+drivers/iio/adc/twl6030-gpadc.c:955:16-23: duplicated argument to & or |
+drivers/iio/light/tsl2563.c:751:8-33: WARNING: Threaded IRQ with no primary handler requested without IRQF_ONESHOT (unless it is nested IRQ)
+drivers/media/platform/ti/davinci/vpif.c:483:20: sparse: sparse: cast from non-scalar
+drivers/media/platform/ti/davinci/vpif.c:483:20: sparse: sparse: cast to non-scalar
+drivers/media/test-drivers/visl/visl-video.c:690:22: sparse: sparse: symbol 'visl_qops' was not declared. Should it be static?
+fs/exfat/dir.c:862 exfat_get_dentry_set() warn: missing unwind goto?
+fs/xfs/xfs_iomap.c:86:29: sparse: sparse: symbol 'xfs_iomap_page_ops' was not declared. Should it be static?
 
- block/blk-throttle.c | 135 ++++++++++++++++++++++++++++++++++++++++---
- block/blk-throttle.h |  13 ++++-
- 2 files changed, 139 insertions(+), 9 deletions(-)
+Error/Warning ids grouped by kconfigs:
 
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index 847721dc2b2b..c4db7873dfa8 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -21,6 +21,13 @@
- /* Total max dispatch from all groups in one round */
- #define THROTL_QUANTUM 32
- 
-+/* For write ios, dispatch 4 sync ios and 1 normal io in one loop */
-+#define THROTL_SYNC_FACTOR 4
-+
-+/* Only make sense for write ios, all read ios are treated as SYNC */
-+#define SYNC	0
-+#define ASYNC	1
-+
- /* Throttling is performed over a slice and after that slice is renewed */
- #define DFL_THROTL_SLICE_HD (HZ / 10)
- #define DFL_THROTL_SLICE_SSD (HZ / 50)
-@@ -88,6 +95,7 @@ struct throtl_data
- };
- 
- static void throtl_pending_timer_fn(struct timer_list *t);
-+static inline struct bio *throtl_qnode_bio_list_pop(struct throtl_qnode *qn);
- 
- static inline struct blkcg_gq *tg_to_blkg(struct throtl_grp *tg)
- {
-@@ -241,11 +249,28 @@ static inline unsigned int throtl_bio_data_size(struct bio *bio)
- 	return bio->bi_iter.bi_size;
- }
- 
--static void throtl_qnode_init(struct throtl_qnode *qn, struct throtl_grp *tg)
-+static void throtl_qnode_init(struct throtl_qnode *qn, struct throtl_grp *tg,
-+			      bool rw)
- {
- 	INIT_LIST_HEAD(&qn->node);
--	bio_list_init(&qn->bios);
-+	bio_list_init(&qn->bios[SYNC]);
-+	bio_list_init(&qn->bios[ASYNC]);
- 	qn->tg = tg;
-+	qn->disp_sync_cnt = (rw == READ) ? UINT_MAX : 0;
-+	qn->next_to_disp = NULL;
-+}
-+
-+#define BLK_THROTL_SYNC(bio) (bio->bi_opf & (REQ_SYNC | REQ_META | REQ_PRIO))
-+
-+static inline void throtl_qnode_add_bio_list(struct throtl_qnode *qn,
-+					     struct bio *bio)
-+{
-+	bool rw = bio_data_dir(bio);
-+
-+	if ((rw == READ) || BLK_THROTL_SYNC(bio))
-+		bio_list_add(&qn->bios[SYNC], bio);
-+	else
-+		bio_list_add(&qn->bios[ASYNC], bio);
- }
- 
- /**
-@@ -261,13 +286,45 @@ static void throtl_qnode_init(struct throtl_qnode *qn, struct throtl_grp *tg)
- static void throtl_qnode_add_bio(struct bio *bio, struct throtl_qnode *qn,
- 				 struct list_head *queued)
- {
--	bio_list_add(&qn->bios, bio);
-+	throtl_qnode_add_bio_list(qn, bio);
- 	if (list_empty(&qn->node)) {
- 		list_add_tail(&qn->node, queued);
- 		blkg_get(tg_to_blkg(qn->tg));
- 	}
- }
- 
-+/**
-+ * throtl_qnode_bio_peek - peek a bio for a qn
-+ * @qn: the qnode to peek from
-+ *
-+ * For read qn, just peek bio from the SYNC queue and return.
-+ * For write qn, we first ask the next_to_disp for bio and will pop a bio
-+ * to fill it if it's NULL. The next_to_disp is used to pin the bio for
-+ * next to dispatch. It is necessary. In the dispatching  process, a peeked
-+ * bio may can't be dispatched due to lack of budget and has to wait, the
-+ * dispatching process may give up and the spin lock of the request queue
-+ * will be released. New bio may be queued in as the spin lock were released.
-+ * When it's time to dispatch the waiting bio, another bio may be selected to
-+ * check the limit and may be dispatched. If the dispatched bio is smaller
-+ * than the waiting bio, the bandwidth may be hard to satisfied as we may
-+ * trim the slice after each dispatch.
-+ * So pinning the next_to_disp to make sure that the waiting bio and the
-+ * dispatched one later always the same one in case that the spin lock of
-+ * queue was released and re-holded.
-+ */
-+static inline struct bio *throtl_qnode_bio_peek(struct throtl_qnode *qn)
-+{
-+	/* qn for read ios */
-+	if (qn->disp_sync_cnt == UINT_MAX)
-+		return bio_list_peek(&qn->bios[SYNC]);
-+
-+	/* qn for write ios */
-+	if (!qn->next_to_disp)
-+		qn->next_to_disp  = throtl_qnode_bio_list_pop(qn);
-+
-+	return qn->next_to_disp;
-+}
-+
- /**
-  * throtl_peek_queued - peek the first bio on a qnode list
-  * @queued: the qnode list to peek
-@@ -281,11 +338,73 @@ static struct bio *throtl_peek_queued(struct list_head *queued)
- 		return NULL;
- 
- 	qn = list_first_entry(queued, struct throtl_qnode, node);
--	bio = bio_list_peek(&qn->bios);
-+	bio = throtl_qnode_bio_peek(qn);
- 	WARN_ON_ONCE(!bio);
- 	return bio;
- }
- 
-+/**
-+ * throtl_qnode_bio_pop: pop a bio from sync/async queue
-+ * @qn: the qnode to pop a bio from
-+ *
-+ * For write io qn, the target queue to pop was determined by the disp_sync_cnt.
-+ * Try to pop bio from target queue, fetch the bio and return it when it is not
-+ * empty. If the target queue empty, pop bio from another queue instead.
-+ */
-+static inline struct bio *throtl_qnode_bio_list_pop(struct throtl_qnode *qn)
-+{
-+	struct bio *bio;
-+	int from = SYNC;
-+
-+	if (qn->disp_sync_cnt == THROTL_SYNC_FACTOR)
-+		from = ASYNC;
-+
-+	bio = bio_list_pop(&qn->bios[from]);
-+	if (!bio) {
-+		from = 1 - from;
-+		bio = bio_list_pop(&qn->bios[from]);
-+	}
-+
-+	if ((qn->disp_sync_cnt < THROTL_SYNC_FACTOR) &&
-+		(from == SYNC))
-+		qn->disp_sync_cnt++;
-+	else
-+		qn->disp_sync_cnt = 0;
-+
-+	return bio;
-+}
-+
-+/**
-+ * throtl_qnode_bio_pop: pop a bio from a qnode
-+ * @qn: the qnode to pop a bio from
-+ */
-+static inline struct bio *throtl_qnode_bio_pop(struct throtl_qnode *qn)
-+{
-+	struct bio *bio;
-+
-+	/* qn for read ios */
-+	if (qn->disp_sync_cnt == UINT_MAX)
-+		return bio_list_pop(&qn->bios[SYNC]);
-+
-+	/* qn for write ios */
-+	if (qn->next_to_disp) {
-+		bio = qn->next_to_disp;
-+		qn->next_to_disp = NULL;
-+		return bio;
-+	}
-+
-+	return throtl_qnode_bio_list_pop(qn);
-+}
-+
-+static inline bool throtl_qnode_empty(struct throtl_qnode *qn)
-+{
-+	if (!qn->next_to_disp &&
-+		bio_list_empty(&qn->bios[SYNC]) &&
-+		bio_list_empty(&qn->bios[ASYNC]))
-+		return true;
-+	return false;
-+}
-+
- /**
-  * throtl_pop_queued - pop the first bio form a qnode list
-  * @queued: the qnode list to pop a bio from
-@@ -310,10 +429,10 @@ static struct bio *throtl_pop_queued(struct list_head *queued,
- 		return NULL;
- 
- 	qn = list_first_entry(queued, struct throtl_qnode, node);
--	bio = bio_list_pop(&qn->bios);
-+	bio = throtl_qnode_bio_pop(qn);
- 	WARN_ON_ONCE(!bio);
- 
--	if (bio_list_empty(&qn->bios)) {
-+	if (throtl_qnode_empty(qn)) {
- 		list_del_init(&qn->node);
- 		if (tg_to_put)
- 			*tg_to_put = qn->tg;
-@@ -355,8 +474,8 @@ static struct blkg_policy_data *throtl_pd_alloc(gfp_t gfp,
- 	throtl_service_queue_init(&tg->service_queue);
- 
- 	for (rw = READ; rw <= WRITE; rw++) {
--		throtl_qnode_init(&tg->qnode_on_self[rw], tg);
--		throtl_qnode_init(&tg->qnode_on_parent[rw], tg);
-+		throtl_qnode_init(&tg->qnode_on_self[rw], tg, rw);
-+		throtl_qnode_init(&tg->qnode_on_parent[rw], tg, rw);
- 	}
- 
- 	RB_CLEAR_NODE(&tg->rb_node);
-diff --git a/block/blk-throttle.h b/block/blk-throttle.h
-index ef4b7a4de987..bd4fff65b6d9 100644
---- a/block/blk-throttle.h
-+++ b/block/blk-throttle.h
-@@ -28,8 +28,19 @@
-  */
- struct throtl_qnode {
- 	struct list_head	node;		/* service_queue->queued[] */
--	struct bio_list		bios;		/* queued bios */
-+	struct bio_list		bios[2];	/* queued bios */
- 	struct throtl_grp	*tg;		/* tg this qnode belongs to */
-+
-+	struct bio		*next_to_disp;	/* pinned for next to dispatch */
-+	/*
-+	 * 1) for write throtl_qnode:
-+	 * [0, THROTL_SYNC_FACTOR-1]: dispatch sync io
-+	 * [THROTL_SYNC_FACTOR]: dispatch async io
-+	 *
-+	 * 2) for read throtl_qnode:
-+	 * UINT_MAX
-+	 */
-+	unsigned int disp_sync_cnt;         /* sync io dispatch counter */
- };
- 
- struct throtl_service_queue {
+gcc_recent_errors
+|-- alpha-allyesconfig
+|   |-- drivers-regulator-tps65219-regulator.c:warning:ordered-comparison-of-pointer-with-integer-zero
+|   `-- drivers-regulator-tps65219-regulator.c:warning:parameter-dev-set-but-not-used
+|-- arc-allyesconfig
+|   |-- drivers-regulator-tps65219-regulator.c:warning:ordered-comparison-of-pointer-with-integer-zero
+|   `-- drivers-regulator-tps65219-regulator.c:warning:parameter-dev-set-but-not-used
+|-- arc-randconfig-r024-20221225
+|   |-- drivers-regulator-tps65219-regulator.c:warning:ordered-comparison-of-pointer-with-integer-zero
+|   `-- drivers-regulator-tps65219-regulator.c:warning:parameter-dev-set-but-not-used
+|-- arc-randconfig-s041-20221225
+|   `-- fs-xfs-xfs_iomap.c:sparse:sparse:symbol-xfs_iomap_page_ops-was-not-declared.-Should-it-be-static
+|-- arm-allyesconfig
+|   |-- drivers-regulator-tps65219-regulator.c:warning:ordered-comparison-of-pointer-with-integer-zero
+|   `-- drivers-regulator-tps65219-regulator.c:warning:parameter-dev-set-but-not-used
+|-- arm-badge4_defconfig
+|   `-- arch-arm-kernel-entry-armv.S:warning:CONFIG_ARM_THUMB-is-not-defined-evaluates-to
+|-- arm64-allyesconfig
+|   |-- aarch64-linux-ld:ID-map-text-too-big-or-misaligned
+|   |-- drivers-regulator-tps65219-regulator.c:warning:ordered-comparison-of-pointer-with-integer-zero
+|   `-- drivers-regulator-tps65219-regulator.c:warning:parameter-dev-set-but-not-used
+|-- arm64-randconfig-c034-20221225
+|   `-- arch-arm64-include-asm-pgtable-hwdef.h:warning:PMD_SHIFT-is-not-defined-evaluates-to
+|-- csky-randconfig-c033-20221225
+|   |-- drivers-iio-light-tsl2563.c:WARNING:Threaded-IRQ-with-no-primary-handler-requested-without-IRQF_ONESHOT-(unless-it-is-nested-IRQ)
+|   `-- drivers-mtd-ubi-build.c:WARNING:conversion-to-bool-not-needed-here
+|-- i386-allyesconfig
+|   |-- drivers-regulator-tps65219-regulator.c:warning:ordered-comparison-of-pointer-with-integer-zero
+|   `-- drivers-regulator-tps65219-regulator.c:warning:parameter-dev-set-but-not-used
+|-- i386-randconfig-c021-20221226
+|   `-- drivers-iio-light-tsl2563.c:WARNING:Threaded-IRQ-with-no-primary-handler-requested-without-IRQF_ONESHOT-(unless-it-is-nested-IRQ)
+|-- i386-randconfig-m021-20221226
+|   `-- fs-exfat-dir.c-exfat_get_dentry_set()-warn:missing-unwind-goto
+|-- i386-randconfig-s002
+|   `-- fs-xfs-xfs_iomap.c:sparse:sparse:symbol-xfs_iomap_page_ops-was-not-declared.-Should-it-be-static
+|-- ia64-allmodconfig
+|   |-- drivers-regulator-tps65219-regulator.c:warning:ordered-comparison-of-pointer-with-integer-zero
+|   `-- drivers-regulator-tps65219-regulator.c:warning:parameter-dev-set-but-not-used
+|-- loongarch-allyesconfig
+|   `-- arch-loongarch-kernel-asm-offsets.c:warning:no-previous-prototype-for-output_pbe_defines
+|-- loongarch-randconfig-s043-20221225
+|   |-- arch-loongarch-kernel-asm-offsets.c:warning:no-previous-prototype-for-output_pbe_defines
+|   |-- drivers-cxl-core-mbox.c:sparse:sparse:cast-from-non-scalar
+|   |-- drivers-cxl-core-mbox.c:sparse:sparse:cast-to-non-scalar
+|   |-- drivers-i2c-busses-i2c-qcom-geni.c:sparse:sparse:symbol-i2c_master_hub-was-not-declared.-Should-it-be-static
+|   |-- fs-xfs-xfs_iomap.c:sparse:sparse:symbol-xfs_iomap_page_ops-was-not-declared.-Should-it-be-static
+|   |-- loongarch64-linux-ld:sleep.c:(.text):undefined-reference-to-loongarch_wakeup_start
+|   `-- sleep.c:(.text):undefined-reference-to-loongarch_wakeup_start
+|-- m68k-allmodconfig
+|   |-- drivers-regulator-tps65219-regulator.c:warning:ordered-comparison-of-pointer-with-integer-zero
+|   `-- drivers-regulator-tps65219-regulator.c:warning:parameter-dev-set-but-not-used
+clang_recent_errors
+|-- hexagon-buildonly-randconfig-r003-20221225
+|   `-- drivers-regulator-tps65219-regulator.c:warning:parameter-dev-set-but-not-used
+|-- hexagon-randconfig-r002-20221225
+|   `-- drivers-regulator-tps65219-regulator.c:warning:parameter-dev-set-but-not-used
+|-- riscv-randconfig-r021-20221225
+|   `-- drivers-regulator-tps65219-regulator.c:warning:parameter-dev-set-but-not-used
+|-- x86_64-allyesconfig
+|   `-- drivers-regulator-tps65219-regulator.c:warning:parameter-dev-set-but-not-used
+`-- x86_64-randconfig-a003-20221226
+    `-- vmlinux.o:warning:objtool:___ksymtab_gpl-_RNvNtCsfATHBUcknU9_6kernel5print16call_printk_cont:data-relocation-to-ENDBR:_RNvNtCsfATHBUcknU9_6kernel5print16call_printk_cont
+
+elapsed time: 720m
+
+configs tested: 89
+configs skipped: 2
+
+gcc tested configs:
+um                             i386_defconfig
+um                           x86_64_defconfig
+arc                                 defconfig
+alpha                               defconfig
+i386                 randconfig-a012-20221226
+x86_64                    rhel-8.3-kselftests
+arm                                 defconfig
+i386                 randconfig-a011-20221226
+x86_64                          rhel-8.3-func
+i386                                defconfig
+i386                 randconfig-a013-20221226
+x86_64                           rhel-8.3-bpf
+s390                             allmodconfig
+s390                                defconfig
+ia64                             allmodconfig
+i386                 randconfig-a014-20221226
+x86_64                           rhel-8.3-syz
+x86_64                              defconfig
+i386                 randconfig-a016-20221226
+s390                             allyesconfig
+i386                 randconfig-a015-20221226
+x86_64                         rhel-8.3-kunit
+x86_64                           rhel-8.3-kvm
+x86_64                            allnoconfig
+x86_64               randconfig-a014-20221226
+powerpc                           allnoconfig
+x86_64               randconfig-a013-20221226
+x86_64                               rhel-8.3
+arm64                            allyesconfig
+x86_64               randconfig-a011-20221226
+arm                              allyesconfig
+x86_64               randconfig-a012-20221226
+i386                             allyesconfig
+x86_64               randconfig-a015-20221226
+x86_64               randconfig-a016-20221226
+sh                               allmodconfig
+m68k                             allyesconfig
+mips                             allyesconfig
+powerpc                          allmodconfig
+x86_64                           allyesconfig
+m68k                             allmodconfig
+arc                              allyesconfig
+alpha                            allyesconfig
+arm                  randconfig-r046-20221225
+arc                  randconfig-r043-20221225
+arc                  randconfig-r043-20221226
+riscv                randconfig-r042-20221226
+s390                 randconfig-r044-20221226
+x86_64                           alldefconfig
+sh                          lboxre2_defconfig
+arc                               allnoconfig
+sh                             shx3_defconfig
+arm                           tegra_defconfig
+microblaze                          defconfig
+m68k                       m5475evb_defconfig
+m68k                        m5407c3_defconfig
+xtensa                              defconfig
+mips                      maltasmvp_defconfig
+parisc                           alldefconfig
+arm                          badge4_defconfig
+powerpc                     mpc83xx_defconfig
+sh                          rsk7201_defconfig
+sh                 kfr2r09-romimage_defconfig
+powerpc                    klondike_defconfig
+sh                  sh7785lcr_32bit_defconfig
+
+clang tested configs:
+x86_64                          rhel-8.3-rust
+i386                 randconfig-a004-20221226
+i386                 randconfig-a001-20221226
+x86_64               randconfig-a002-20221226
+i386                 randconfig-a003-20221226
+i386                 randconfig-a002-20221226
+x86_64               randconfig-a003-20221226
+x86_64               randconfig-a006-20221226
+i386                 randconfig-a005-20221226
+i386                 randconfig-a006-20221226
+x86_64               randconfig-a001-20221226
+x86_64               randconfig-a004-20221226
+x86_64               randconfig-a005-20221226
+hexagon              randconfig-r045-20221225
+hexagon              randconfig-r041-20221225
+hexagon              randconfig-r041-20221226
+arm                  randconfig-r046-20221226
+s390                 randconfig-r044-20221225
+hexagon              randconfig-r045-20221226
+riscv                randconfig-r042-20221225
+powerpc                     tqm5200_defconfig
+arm                         shannon_defconfig
+arm                         orion5x_defconfig
+arm                           sama7_defconfig
+x86_64                           allyesconfig
+
 -- 
-2.20.1
-
+0-DAY CI Kernel Test Service
+https://01.org/lkp
