@@ -2,55 +2,52 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8296AC4332F
-	for <linux-block@archiver.kernel.org>; Mon, 26 Dec 2022 08:38:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28257C3DA79
+	for <linux-block@archiver.kernel.org>; Mon, 26 Dec 2022 08:38:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231661AbiLZIir (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 26 Dec 2022 03:38:47 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44644 "EHLO
+        id S231800AbiLZIit (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 26 Dec 2022 03:38:49 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44642 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229999AbiLZIip (ORCPT
+        with ESMTP id S229634AbiLZIip (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Mon, 26 Dec 2022 03:38:45 -0500
 Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AA0591109;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C86D10FC;
         Mon, 26 Dec 2022 00:38:43 -0800 (PST)
 Received: from mail02.huawei.com (unknown [172.30.67.169])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4NgWQk27hLz4f3jZ5;
-        Mon, 26 Dec 2022 16:38:38 +0800 (CST)
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4NgWQj3KDYz4f3jZg;
+        Mon, 26 Dec 2022 16:38:37 +0800 (CST)
 Received: from huaweicloud.com (unknown [10.175.127.227])
-        by APP2 (Coremail) with SMTP id Syh0CgBH7eqEXaljOrUjAg--.30907S6;
-        Mon, 26 Dec 2022 16:38:41 +0800 (CST)
+        by APP2 (Coremail) with SMTP id Syh0CgBH7eqEXaljOrUjAg--.30907S4;
+        Mon, 26 Dec 2022 16:38:40 +0800 (CST)
 From:   Yu Kuai <yukuai1@huaweicloud.com>
 To:     tj@kernel.org, josef@toxicpanda.com, axboe@kernel.dk
 Cc:     cgroups@vger.kernel.org, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org, yukuai3@huawei.com,
         yukuai1@huaweicloud.com, yi.zhang@huawei.com
-Subject: [PATCH v3 2/5] blk-iocost: don't allow to configure bio based device
-Date:   Mon, 26 Dec 2022 16:58:56 +0800
-Message-Id: <20221226085859.2701195-3-yukuai1@huaweicloud.com>
+Subject: [PATCH v3 0/5] blk-iocost: random bugfix
+Date:   Mon, 26 Dec 2022 16:58:54 +0800
+Message-Id: <20221226085859.2701195-1-yukuai1@huaweicloud.com>
 X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20221226085859.2701195-1-yukuai1@huaweicloud.com>
-References: <20221226085859.2701195-1-yukuai1@huaweicloud.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: Syh0CgBH7eqEXaljOrUjAg--.30907S6
-X-Coremail-Antispam: 1UD129KBjvdXoWrKryxur13Zr1rCr4xJw1fWFg_yoWkAwb_Ca
-        yI9r90gFs5Gay8XF1SyF90vrWfKw4FqFW0vFy7Ja43JFn8Xas0yan3Xryktr45uayq9a45
-        Ca9ruw1DJFs7WjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-        9fnUUIcSsGvfJTRUUUb-kFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k26cxKx2IYs7xG
-        6rWj6s0DM7CIcVAFz4kK6r1j6r18M28IrcIa0xkI8VA2jI8067AKxVWUXwA2048vs2IY02
-        0Ec7CjxVAFwI0_Gr0_Xr1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xv
-        wVC0I7IYx2IY67AKxVWDJVCq3wA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVW8Jr0_Cr1UM2
-        8EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s0DM2AI
-        xVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20x
-        vE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xv
-        r2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7MxAIw28IcxkI7VAKI48JMxC20s
-        026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_
-        JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14
-        v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xva
-        j40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JV
-        W8JrUvcSsGvfC2KfnxnUUI43ZEXa7VUjYiiDUUUUU==
+X-CM-TRANSID: Syh0CgBH7eqEXaljOrUjAg--.30907S4
+X-Coremail-Antispam: 1UD129KBjvdXoWrZF1Utr1DAFy8uw48Ar4ruFg_yoWxuFg_uF
+        97t3s5Xr1xJa93WFW7GF4DJrW7Kw45CrWjva4DtFy0qr1UXr1DXw4fXrZ3WrZ8WFy2qrW5
+        CFy5uFWftF12gjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+        9fnUUIcSsGvfJTRUUUbzkFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
+        6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
+        A2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j
+        6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
+        Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
+        I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
+        4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwCF04k20xvY0x0EwIxG
+        rwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4
+        vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IY
+        x2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04k26c
+        xKx2IYs7xG6rWUJVWrZr1UMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7Cj
+        xVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUdHUDUUUUU=
 X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 X-CFilter-Loop: Reflected
 Precedence: bulk
@@ -59,44 +56,25 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Yu Kuai <yukuai3@huawei.com>
 
-iocost is based on rq_qos, which can only work for request based device,
-thus it doesn't make sense to configure iocost for bio based device.
+changes in v3:
+ - move some patches into separate patchset
+ - don't return other error number for match_u64() in patch 1
+ - instead of checking user input separately, set page directly if
+ 'bps + IOC_PAGE_SIZE' will overflow.
 
-Signed-off-by: Yu Kuai <yukuai3@huawei.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Acked-by: Tejun Heo <tj@kernel.org>
----
- block/blk-iocost.c | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+Li Nan (2):
+  blk-iocost: fix divide by 0 error in calc_lcoefs()
+  blk-iocost: change div64_u64 to DIV64_U64_ROUND_UP in
+    ioc_refresh_params()
 
-diff --git a/block/blk-iocost.c b/block/blk-iocost.c
-index 93b938517be3..ce4eafbada56 100644
---- a/block/blk-iocost.c
-+++ b/block/blk-iocost.c
-@@ -3185,6 +3185,11 @@ static ssize_t ioc_qos_write(struct kernfs_open_file *of, char *input,
- 		return PTR_ERR(bdev);
- 
- 	disk = bdev->bd_disk;
-+	if (!queue_is_mq(disk->queue)) {
-+		ret = -EOPNOTSUPP;
-+		goto err;
-+	}
-+
- 	ioc = q_to_ioc(disk->queue);
- 	if (!ioc) {
- 		ret = blk_iocost_init(disk);
-@@ -3365,6 +3370,11 @@ static ssize_t ioc_cost_model_write(struct kernfs_open_file *of, char *input,
- 		return PTR_ERR(bdev);
- 
- 	q = bdev_get_queue(bdev);
-+	if (!queue_is_mq(q)) {
-+		ret = -EOPNOTSUPP;
-+		goto err;
-+	}
-+
- 	ioc = q_to_ioc(q);
- 	if (!ioc) {
- 		ret = blk_iocost_init(bdev->bd_disk);
+Yu Kuai (3):
+  blk-iocost: check return value of match_u64()
+  blk-iocost: don't allow to configure bio based device
+  blk-iocost: read params inside lock in sysfs apis
+
+ block/blk-iocost.c | 31 +++++++++++++++++++++++++------
+ 1 file changed, 25 insertions(+), 6 deletions(-)
+
 -- 
 2.31.1
 
