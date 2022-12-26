@@ -2,55 +2,55 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87940C4332F
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CA90C3DA79
 	for <linux-block@archiver.kernel.org>; Mon, 26 Dec 2022 08:38:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231851AbiLZIit (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 26 Dec 2022 03:38:49 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44652 "EHLO
+        id S231690AbiLZIiv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 26 Dec 2022 03:38:51 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44650 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230003AbiLZIip (ORCPT
+        with ESMTP id S231534AbiLZIiq (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 26 Dec 2022 03:38:45 -0500
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE91325FB;
+        Mon, 26 Dec 2022 03:38:46 -0500
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9EE825F8;
         Mon, 26 Dec 2022 00:38:43 -0800 (PST)
 Received: from mail02.huawei.com (unknown [172.30.67.169])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4NgWQk4wY9z4f3jqX;
-        Mon, 26 Dec 2022 16:38:38 +0800 (CST)
+        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4NgWQj5WpGz4f3mSQ;
+        Mon, 26 Dec 2022 16:38:37 +0800 (CST)
 Received: from huaweicloud.com (unknown [10.175.127.227])
-        by APP2 (Coremail) with SMTP id Syh0CgBH7eqEXaljOrUjAg--.30907S7;
-        Mon, 26 Dec 2022 16:38:41 +0800 (CST)
+        by APP2 (Coremail) with SMTP id Syh0CgBH7eqEXaljOrUjAg--.30907S5;
+        Mon, 26 Dec 2022 16:38:40 +0800 (CST)
 From:   Yu Kuai <yukuai1@huaweicloud.com>
 To:     tj@kernel.org, josef@toxicpanda.com, axboe@kernel.dk
 Cc:     cgroups@vger.kernel.org, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org, yukuai3@huawei.com,
         yukuai1@huaweicloud.com, yi.zhang@huawei.com
-Subject: [PATCH v3 3/5] blk-iocost: read params inside lock in sysfs apis
-Date:   Mon, 26 Dec 2022 16:58:57 +0800
-Message-Id: <20221226085859.2701195-4-yukuai1@huaweicloud.com>
+Subject: [PATCH v3 1/5] blk-iocost: check return value of match_u64()
+Date:   Mon, 26 Dec 2022 16:58:55 +0800
+Message-Id: <20221226085859.2701195-2-yukuai1@huaweicloud.com>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20221226085859.2701195-1-yukuai1@huaweicloud.com>
 References: <20221226085859.2701195-1-yukuai1@huaweicloud.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: Syh0CgBH7eqEXaljOrUjAg--.30907S7
-X-Coremail-Antispam: 1UD129KBjvJXoW7Zr4UGr18JrWDXrWrtF1UZFb_yoW8WryfpF
-        Z0g397K3yFvr1xWFnxtF40q3Z5Wa1qqr4fXr47Cr93Aryaqr12qFsrCr40vw48ZFWxu390
-        gFWagrW0yr15C37anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUU9m14x267AKxVWrJVCq3wAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2048vs2IY020E87I2jVAFwI0_JrWl82xGYIkIc2
-        x26xkF7I0E14v26ryj6s0DM28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8wA2z4x0
-        Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j6F4UJw
-        A2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oVCq3wAS
-        0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2
-        IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0
-        Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwCF04k20xvY0x0EwIxGrwCFx2
-        IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v2
-        6r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67
-        AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IY
-        s7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr
-        0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUd8n5UUUUU=
+X-CM-TRANSID: Syh0CgBH7eqEXaljOrUjAg--.30907S5
+X-Coremail-Antispam: 1UD129KBjvdXoW7GF4kXr15AryDtF4xur1rJFb_yoWxtwb_ZF
+        Z3Ga4fZrn7Ga95Z3WkCF1YqrWIkwn5JF4j9340yryUX3W3X3Z5Aw47Xr18Xa15WFW8G34r
+        CFWDZr4qyr1IgjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+        9fnUUIcSsGvfJTRUUUb-kFF20E14v26ryj6rWUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
+        6rWj6s0DM7CIcVAFz4kK6r1j6r18M28IrcIa0xkI8VA2jI8067AKxVWUGwA2048vs2IY02
+        0Ec7CjxVAFwI0_JFI_Gr1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xv
+        wVC0I7IYx2IY67AKxVWDJVCq3wA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVW8Jr0_Cr1UM2
+        8EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s0DM2AI
+        xVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20x
+        vE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xv
+        r2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7MxAIw28IcxkI7VAKI48JMxC20s
+        026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_
+        JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14
+        v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xva
+        j40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JV
+        W8JrUvcSsGvfC2KfnxnUUI43ZEXa7VUbec_DUUUUU==
 X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 X-CFilter-Loop: Reflected
 Precedence: bulk
@@ -59,50 +59,28 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Yu Kuai <yukuai3@huawei.com>
 
-Otherwise, user might get abnormal values if params is updated
-concurrently.
+This patch fixs that the return value of match_u64() from ioc_qos_write()
+is not checked,
 
 Signed-off-by: Yu Kuai <yukuai3@huawei.com>
-Acked-by: Tejun Heo <tj@kernel.org>
 ---
- block/blk-iocost.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ block/blk-iocost.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/block/blk-iocost.c b/block/blk-iocost.c
-index ce4eafbada56..f8726e20da20 100644
+index 549ddc9e0c6f..93b938517be3 100644
 --- a/block/blk-iocost.c
 +++ b/block/blk-iocost.c
-@@ -3129,6 +3129,7 @@ static u64 ioc_qos_prfill(struct seq_file *sf, struct blkg_policy_data *pd,
- 	if (!dname)
- 		return 0;
+@@ -3212,7 +3212,8 @@ static ssize_t ioc_qos_write(struct kernfs_open_file *of, char *input,
  
-+	spin_lock_irq(&ioc->lock);
- 	seq_printf(sf, "%s enable=%d ctrl=%s rpct=%u.%02u rlat=%u wpct=%u.%02u wlat=%u min=%u.%02u max=%u.%02u\n",
- 		   dname, ioc->enabled, ioc->user_qos_params ? "user" : "auto",
- 		   ioc->params.qos[QOS_RPPM] / 10000,
-@@ -3141,6 +3142,7 @@ static u64 ioc_qos_prfill(struct seq_file *sf, struct blkg_policy_data *pd,
- 		   ioc->params.qos[QOS_MIN] % 10000 / 100,
- 		   ioc->params.qos[QOS_MAX] / 10000,
- 		   ioc->params.qos[QOS_MAX] % 10000 / 100);
-+	spin_unlock_irq(&ioc->lock);
- 	return 0;
- }
- 
-@@ -3320,12 +3322,14 @@ static u64 ioc_cost_model_prfill(struct seq_file *sf,
- 	if (!dname)
- 		return 0;
- 
-+	spin_lock_irq(&ioc->lock);
- 	seq_printf(sf, "%s ctrl=%s model=linear "
- 		   "rbps=%llu rseqiops=%llu rrandiops=%llu "
- 		   "wbps=%llu wseqiops=%llu wrandiops=%llu\n",
- 		   dname, ioc->user_cost_model ? "user" : "auto",
- 		   u[I_LCOEF_RBPS], u[I_LCOEF_RSEQIOPS], u[I_LCOEF_RRANDIOPS],
- 		   u[I_LCOEF_WBPS], u[I_LCOEF_WSEQIOPS], u[I_LCOEF_WRANDIOPS]);
-+	spin_unlock_irq(&ioc->lock);
- 	return 0;
- }
- 
+ 		switch (match_token(p, qos_ctrl_tokens, args)) {
+ 		case QOS_ENABLE:
+-			match_u64(&args[0], &v);
++			if (match_u64(&args[0], &v))
++				goto einval;
+ 			enable = v;
+ 			continue;
+ 		case QOS_CTRL:
 -- 
 2.31.1
 
