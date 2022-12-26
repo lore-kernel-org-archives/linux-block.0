@@ -2,90 +2,110 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 410A9C4167B
-	for <linux-block@archiver.kernel.org>; Mon, 26 Dec 2022 19:11:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A1913C4167B
+	for <linux-block@archiver.kernel.org>; Mon, 26 Dec 2022 21:58:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230057AbiLZTLl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 26 Dec 2022 14:11:41 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47156 "EHLO
+        id S232315AbiLZV6v (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 26 Dec 2022 16:58:51 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35438 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229591AbiLZTLk (ORCPT
+        with ESMTP id S229614AbiLZV6v (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 26 Dec 2022 14:11:40 -0500
-Received: from mail-qv1-xf35.google.com (mail-qv1-xf35.google.com [IPv6:2607:f8b0:4864:20::f35])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E7B57E37
-        for <linux-block@vger.kernel.org>; Mon, 26 Dec 2022 11:11:30 -0800 (PST)
-Received: by mail-qv1-xf35.google.com with SMTP id o17so3902000qvn.4
-        for <linux-block@vger.kernel.org>; Mon, 26 Dec 2022 11:11:30 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ki8erFK6+zdeqp6mmQ4ZeNXpW07xxtnIN5dQM+gH9tw=;
-        b=I1Hb9MtthY1UsgJEjiEuH/h+pQZyfWJ8Lk4kX5EOkterJ0kgKclSV/OQBqRcS6yQwU
-         NbQ3epR46cWs/444OUfZIfKQIWn/8ovKUKFCITCvtr0FTxYYRIaNMIpUkdks74UOj05t
-         DrPlKj9HbOBDYgL8wzoFtWIZBStSjVvu3aOX+e3NKG2lraOnRLuVIyLlMcMa9rzE928B
-         XG4WOqxB0LRxqyDEMwgZsww5ZQgFcpfvTiFYFp7fYtFjP1+2Oz/35ZyartbG5iuzpPya
-         dZZCV9NjrhSjIitJ+vJLH1Znk+4p6Y3Pm+uammvg38Y7qcS1YhlibUaEOg2+6b/4+zDA
-         VGHA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ki8erFK6+zdeqp6mmQ4ZeNXpW07xxtnIN5dQM+gH9tw=;
-        b=3qcb+gVjyjxZLkYVV/XBRWPA5KZksO4SO7+r66X1tHoedxH7eMkju3ceb9QH1sp18f
-         4ud/gPDCzDtVcKFh4DJhv2Az1tLM3wrJfbzJEeumbHpKKuC1YT0QEBnMGc3y0qqYRDvt
-         wU5P8AzcZbHVOiVa26XmGWd2Lttz44p+u9Mfxh9qJggx74gqXheQ5vHTRGZaGxZY0akN
-         F3e/Ssgv73KnKTed2lkxW/Rdksf4edr0wm7F914DXMl4x1qx+EevUWi5Z61xhweJ0PJK
-         bQj/75xWs+V4RvIRuWvL1N75nplgU9gNzAWFmh8xmuGx/Dbe247F2GRQZehAcJOl81tQ
-         VcyA==
-X-Gm-Message-State: AFqh2kocXuqRyxW3VviUwAiltoZE8THW/hGYd+y8wfULPWD2kPaqsD5p
-        ufHPnaDPDfvpC1fz9s+EMADinQWYdosGiw42
-X-Google-Smtp-Source: AMrXdXtG2kCsUCujjb7Nl8fxazyAzG36Qd03gN+F64PW5mgkrbEPsJjA9XvdNXeIYxOZWIF1tNasWw==
-X-Received: by 2002:a0c:ec41:0:b0:530:c834:b3e with SMTP id n1-20020a0cec41000000b00530c8340b3emr2875483qvq.0.1672081889805;
-        Mon, 26 Dec 2022 11:11:29 -0800 (PST)
-Received: from [127.0.0.1] ([216.250.210.0])
-        by smtp.gmail.com with ESMTPSA id u7-20020a05620a430700b006cbc6e1478csm8145190qko.57.2022.12.26.11.11.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 26 Dec 2022 11:11:29 -0800 (PST)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     paolo.valente@linaro.org, jack@suse.cz,
-        Yu Kuai <yukuai1@huaweicloud.com>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Mon, 26 Dec 2022 16:58:51 -0500
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED87D21BF;
+        Mon, 26 Dec 2022 13:58:49 -0800 (PST)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 5089E2086A;
+        Mon, 26 Dec 2022 21:58:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1672091928; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=YhWabLpDTnB6UAKrZK6Tl8sha0fVHHbdbYiBlIIK1Gw=;
+        b=a2EH1N3/k5SUHfA5iOFWkrfswcbGtIUi74pCD8ZD5vyLDQMM5oRWnCtEeCR9yls0ieXCrf
+        sycybsVxiodF6JV8RILj3Zi0OxzABSOv6Ws1od+VeFzNRb9DgDB5pdcAmnaQD/prPs0e7d
+        ZbO8PRXiYjNsfK10mrM8zx8U485LbGM=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1672091928;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=YhWabLpDTnB6UAKrZK6Tl8sha0fVHHbdbYiBlIIK1Gw=;
+        b=GIk2YrUc5+FF2R+STO1MGJBTsXHiE546B7216vGBxvDQjXxqM9KA1fQRHj+GeL8fKBtL6X
+        4bMuUKS0oJYP9WDA==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 3811313456;
+        Mon, 26 Dec 2022 21:58:48 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id 4QM2DRgZqmMxOAAAMHmgww
+        (envelope-from <jack@suse.cz>); Mon, 26 Dec 2022 21:58:48 +0000
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+        id E3B74A0733; Mon, 26 Dec 2022 12:18:48 +0100 (CET)
+Date:   Mon, 26 Dec 2022 12:18:48 +0100
+From:   Jan Kara <jack@suse.cz>
+To:     Yu Kuai <yukuai1@huaweicloud.com>
+Cc:     paolo.valente@linaro.org, axboe@kernel.dk, jack@suse.cz,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         yukuai3@huawei.com, yi.zhang@huawei.com
-In-Reply-To: <20221226030605.1437081-1-yukuai1@huaweicloud.com>
-References: <20221226030605.1437081-1-yukuai1@huaweicloud.com>
 Subject: Re: [PATCH] block, bfq: fix uaf for bfqq in bfq_exit_icq_bfqq
-Message-Id: <167208188642.23141.13167280199462782271.b4-ty@kernel.dk>
-Date:   Mon, 26 Dec 2022 12:11:26 -0700
+Message-ID: <20221226111848.oorzy2mecnrignzc@quack3>
+References: <20221226030605.1437081-1-yukuai1@huaweicloud.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.12-dev-05166
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221226030605.1437081-1-yukuai1@huaweicloud.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
-On Mon, 26 Dec 2022 11:06:05 +0800, Yu Kuai wrote:
+On Mon 26-12-22 11:06:05, Yu Kuai wrote:
+> From: Yu Kuai <yukuai3@huawei.com>
+> 
 > Commit 64dc8c732f5c ("block, bfq: fix possible uaf for 'bfqq->bic'")
 > will access 'bic->bfqq' in bic_set_bfqq(), however, bfq_exit_icq_bfqq()
 > can free bfqq first, and then call bic_set_bfqq(), which will cause uaf.
 > 
 > Fix the problem by moving bfq_exit_bfqq() behind bic_set_bfqq().
 > 
+> Fixes: 64dc8c732f5c ("block, bfq: fix possible uaf for 'bfqq->bic'")
+> Reported-by: Yi Zhang <yi.zhang@redhat.com>
+> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+
+Thanks for the patch! Feel free to add:
+
+Reviewed-by: Jan Kara <jack@suse.cz>
+
+								Honza
+
+> ---
+>  block/bfq-iosched.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> [...]
-
-Applied, thanks!
-
-[1/1] block, bfq: fix uaf for bfqq in bfq_exit_icq_bfqq
-      commit: 246cf66e300b76099b5dbd3fdd39e9a5dbc53f02
-
-Best regards,
+> diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+> index 16f43bbc575a..ccf2204477a5 100644
+> --- a/block/bfq-iosched.c
+> +++ b/block/bfq-iosched.c
+> @@ -5317,8 +5317,8 @@ static void bfq_exit_icq_bfqq(struct bfq_io_cq *bic, bool is_sync)
+>  		unsigned long flags;
+>  
+>  		spin_lock_irqsave(&bfqd->lock, flags);
+> -		bfq_exit_bfqq(bfqd, bfqq);
+>  		bic_set_bfqq(bic, NULL, is_sync);
+> +		bfq_exit_bfqq(bfqd, bfqq);
+>  		spin_unlock_irqrestore(&bfqd->lock, flags);
+>  	}
+>  }
+> -- 
+> 2.31.1
+> 
 -- 
-Jens Axboe
-
-
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
