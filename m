@@ -2,191 +2,89 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C9552C4167B
-	for <linux-block@archiver.kernel.org>; Tue, 27 Dec 2022 12:34:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1881BC4167B
+	for <linux-block@archiver.kernel.org>; Tue, 27 Dec 2022 16:49:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229873AbiL0Men (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 27 Dec 2022 07:34:43 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42026 "EHLO
+        id S230033AbiL0QtX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 27 Dec 2022 11:49:23 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33562 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229635AbiL0Mek (ORCPT
+        with ESMTP id S230104AbiL0QtW (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 27 Dec 2022 07:34:40 -0500
-Received: from dggsgout12.his.huawei.com (unknown [45.249.212.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F9132A3;
-        Tue, 27 Dec 2022 04:34:39 -0800 (PST)
-Received: from mail02.huawei.com (unknown [172.30.67.153])
-        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4NhDcR4cLHz4f3jMg;
-        Tue, 27 Dec 2022 20:34:31 +0800 (CST)
-Received: from huaweicloud.com (unknown [10.175.127.227])
-        by APP4 (Coremail) with SMTP id gCh0CgAHvbBZ5qpjAnByAg--.34791S5;
-        Tue, 27 Dec 2022 20:34:34 +0800 (CST)
-From:   Yu Kuai <yukuai1@huaweicloud.com>
-To:     tj@kernel.org, hch@infradead.org, josef@toxicpanda.com,
-        axboe@kernel.dk
-Cc:     cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, yukuai3@huawei.com,
-        yukuai1@huaweicloud.com, yi.zhang@huawei.com
-Subject: [PATCH v2 1/2] blk-iocost: add refcounting for iocg
-Date:   Tue, 27 Dec 2022 20:55:01 +0800
-Message-Id: <20221227125502.541931-2-yukuai1@huaweicloud.com>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20221227125502.541931-1-yukuai1@huaweicloud.com>
-References: <20221227125502.541931-1-yukuai1@huaweicloud.com>
+        Tue, 27 Dec 2022 11:49:22 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5ED42393
+        for <linux-block@vger.kernel.org>; Tue, 27 Dec 2022 08:49:21 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 18813B80EC3
+        for <linux-block@vger.kernel.org>; Tue, 27 Dec 2022 16:49:20 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4781EC433EF;
+        Tue, 27 Dec 2022 16:49:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1672159758;
+        bh=9fVjb1wYQrxL91F9uk42SKxCwYZVJ20/WG5Bu5wrHG0=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=Nn3y2MFGYqK0BbWOPfMjdpLU1ZEPj6DSbTDPih5s34+qfnRYu72mSeEpAcfsui2hV
+         GuZj9RftdMzwQmvx7u/OzS1UTUgiS3p7xXpJk6pKssqj+soOT8wxtVrxO6lm5U7JXU
+         Zi6l2o/NWEDLLrZ9SMHly+Fpg99yLiNt+LOZbnlGldxWZDmZqL7L6WSTtqs5Fq4XOs
+         l5WHevelLq1U3G2vMhIjUvo5lzicgyE/pRmfZsS5Ab3qXBjZwvRaRCy/JWZoev+VIW
+         4jQy+Rv1dDEWqUaP5JaFA6uv3FizsvRBk6Kubbny7nQJqz++zKgsA/P7cmIfCHqwAL
+         myaEJzpxCEMcQ==
+Date:   Tue, 27 Dec 2022 09:49:15 -0700
+From:   Keith Busch <kbusch@kernel.org>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Keith Busch <kbusch@meta.com>, linux-block@vger.kernel.org,
+        axboe@kernel.dk, martin.petersen@oracle.com
+Subject: Re: [PATCH] block: save user max_sectors limit
+Message-ID: <Y6siCw6JFqTpsObx@kbusch-mbp>
+References: <20221222175204.1782061-1-kbusch@meta.com>
+ <20221223060009.GA3088@lst.de>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgAHvbBZ5qpjAnByAg--.34791S5
-X-Coremail-Antispam: 1UD129KBjvJXoWxAw1kKFW8ZFW7CryxXr45GFg_yoW5Kr43pF
-        13W345Cay5JF4xuws8t3ZrXw1rAw4fWr4kKrWfWwnYyr17Ar10q3WkA348Ga4rCFZxZr43
-        XF18KFWUGr4jvF7anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUBE14x267AKxVW5JVWrJwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2048vs2IY020E87I2jVAFwI0_Jr4l82xGYIkIc2
-        x26xkF7I0E14v26r1I6r4UM28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8wA2z4x0
-        Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j6F4UJw
-        A2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oVCq3wAS
-        0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2
-        IY67AKxVWUGVWUXwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0
-        Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2kIc2
-        xKxwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v2
-        6r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2
-        Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_
-        Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMI
-        IF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUHyIUUUUUU
-        =
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221223060009.GA3088@lst.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Yu Kuai <yukuai3@huawei.com>
+On Fri, Dec 23, 2022 at 07:00:09AM +0100, Christoph Hellwig wrote:
+> On Thu, Dec 22, 2022 at 09:52:04AM -0800, Keith Busch wrote:
+> > +		max_sectors = min_t(unsigned int, max_sectors, BLK_DEF_MAX_SECTORS);
+> 
+> And please make BLK_DEF_MAX_SECTORS an unsigned constant as it should be
+> and drop the min_t here.  Instead of working around type mismatches
+> just avoid them from the beginning..
 
-iocost requires that child iocg must exit before parent iocg, otherwise
-kernel might crash in ioc_timer_fn(). However, currently iocg is exited
-in pd_free_fn(), which can't guarantee such order:
+Let me just make sure I understand: you don't want BLK_DEF_MAX_SECTORS
+defined in an enum, and instead want it a 'const unsigned int'? Or
+#define?
+ 
+> > +	} else if (max_sectors_kb > max_hw_sectors_kb ||
+> > +		   max_sectors_kb < page_kb)  {
+> >  		return -EINVAL;
+> 
+> And this check should probably move above the old one to keep the
+> sanity checks first.
+> 
+> > +	} else {
+> > +		q->limits.max_user_sectors = max_sectors_kb << 1;
+> > +	}
+> 
+> i.e.
+> 
+> 	if (max_sectors_kb > max_hw_sectors_kb || max_sectors_kb < page_kb)
+> 		return -EINVAL;
+> 
+> 	q->limits.max_user_sectors = max_sectors_kb << 1;
+> 
+> 	/* reset to default when the user clears max_sectors_kb: */
+> 	if (max_sectors_kb == 0) {
 
-1) remove cgroup can concurrent with deactivate policy;
-2) blkg_free() triggered by remove cgroup is asynchronously, remove
-child cgroup can concurrent with remove parent cgroup;
+We'll never reach here since 0 is < page_kb. But I think I can clean
+this up a little bit for the next version.
 
-Fix the problem by add refcounting for iocg, and child iocg will grab
-reference of parent iocg, so that parent iocg will wait for all child
-iocg to be exited.
-
-Signed-off-by: Yu Kuai <yukuai3@huawei.com>
----
- block/blk-iocost.c | 74 +++++++++++++++++++++++++++++++---------------
- 1 file changed, 50 insertions(+), 24 deletions(-)
-
-diff --git a/block/blk-iocost.c b/block/blk-iocost.c
-index 7a0d754b9eb2..525e93e1175a 100644
---- a/block/blk-iocost.c
-+++ b/block/blk-iocost.c
-@@ -461,6 +461,8 @@ struct ioc_gq {
- 	struct blkg_policy_data		pd;
- 	struct ioc			*ioc;
- 
-+	refcount_t			ref;
-+
- 	/*
- 	 * A iocg can get its weight from two sources - an explicit
- 	 * per-device-cgroup configuration or the default weight of the
-@@ -2943,9 +2945,53 @@ static struct blkg_policy_data *ioc_pd_alloc(gfp_t gfp, struct request_queue *q,
- 		return NULL;
- 	}
- 
-+	refcount_set(&iocg->ref, 1);
- 	return &iocg->pd;
- }
- 
-+static void iocg_get(struct ioc_gq *iocg)
-+{
-+	refcount_inc(&iocg->ref);
-+}
-+
-+static void iocg_put(struct ioc_gq *iocg)
-+{
-+	struct ioc *ioc = iocg->ioc;
-+	unsigned long flags;
-+	struct ioc_gq *parent = NULL;
-+
-+	if (!refcount_dec_and_test(&iocg->ref))
-+		return;
-+
-+	if (iocg->level > 0)
-+		parent = iocg->ancestors[iocg->level - 1];
-+
-+	if (ioc) {
-+		spin_lock_irqsave(&ioc->lock, flags);
-+
-+		if (!list_empty(&iocg->active_list)) {
-+			struct ioc_now now;
-+
-+			ioc_now(ioc, &now);
-+			propagate_weights(iocg, 0, 0, false, &now);
-+			list_del_init(&iocg->active_list);
-+		}
-+
-+		WARN_ON_ONCE(!list_empty(&iocg->walk_list));
-+		WARN_ON_ONCE(!list_empty(&iocg->surplus_list));
-+
-+		spin_unlock_irqrestore(&ioc->lock, flags);
-+
-+		hrtimer_cancel(&iocg->waitq_timer);
-+	}
-+
-+	free_percpu(iocg->pcpu_stat);
-+	kfree(iocg);
-+
-+	if (parent)
-+		iocg_put(parent);
-+}
-+
- static void ioc_pd_init(struct blkg_policy_data *pd)
- {
- 	struct ioc_gq *iocg = pd_to_iocg(pd);
-@@ -2973,6 +3019,9 @@ static void ioc_pd_init(struct blkg_policy_data *pd)
- 
- 	iocg->level = blkg->blkcg->css.cgroup->level;
- 
-+	if (blkg->parent)
-+		iocg_get(blkg_to_iocg(blkg->parent));
-+
- 	for (tblkg = blkg; tblkg; tblkg = tblkg->parent) {
- 		struct ioc_gq *tiocg = blkg_to_iocg(tblkg);
- 		iocg->ancestors[tiocg->level] = tiocg;
-@@ -2985,30 +3034,7 @@ static void ioc_pd_init(struct blkg_policy_data *pd)
- 
- static void ioc_pd_free(struct blkg_policy_data *pd)
- {
--	struct ioc_gq *iocg = pd_to_iocg(pd);
--	struct ioc *ioc = iocg->ioc;
--	unsigned long flags;
--
--	if (ioc) {
--		spin_lock_irqsave(&ioc->lock, flags);
--
--		if (!list_empty(&iocg->active_list)) {
--			struct ioc_now now;
--
--			ioc_now(ioc, &now);
--			propagate_weights(iocg, 0, 0, false, &now);
--			list_del_init(&iocg->active_list);
--		}
--
--		WARN_ON_ONCE(!list_empty(&iocg->walk_list));
--		WARN_ON_ONCE(!list_empty(&iocg->surplus_list));
--
--		spin_unlock_irqrestore(&ioc->lock, flags);
--
--		hrtimer_cancel(&iocg->waitq_timer);
--	}
--	free_percpu(iocg->pcpu_stat);
--	kfree(iocg);
-+	iocg_put(pd_to_iocg(pd));
- }
- 
- static void ioc_pd_stat(struct blkg_policy_data *pd, struct seq_file *s)
--- 
-2.31.1
-
+> 		max_sectors_kb =
+> 			min(max_hw_sectors_kb, BLK_DEF_MAX_SECTORS >> 1);
+> 	}
