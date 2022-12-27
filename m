@@ -2,176 +2,121 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 17904C4332F
-	for <linux-block@archiver.kernel.org>; Tue, 27 Dec 2022 02:31:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DDE4C4332F
+	for <linux-block@archiver.kernel.org>; Tue, 27 Dec 2022 02:55:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232721AbiL0Ca7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 26 Dec 2022 21:30:59 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52534 "EHLO
+        id S229540AbiL0CzT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 26 Dec 2022 21:55:19 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36668 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232724AbiL0Ca3 (ORCPT
+        with ESMTP id S229445AbiL0CzS (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 26 Dec 2022 21:30:29 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 14EB9B75
-        for <linux-block@vger.kernel.org>; Mon, 26 Dec 2022 18:29:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1672108185;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=zS2731Tqsl5rZOtBPgZHUDyyYtPAz2zgn9cswpCwiq8=;
-        b=CRt0oDlfGt3qhweQWfygXLIxUq1MjcTyrTufRtuw4XduIYo6TTNE7Q1HGMLAm6M++dCo60
-        xnnMZSIkYq1lIS7QP8fsd1jgxJ6chRZ+CUpmrA5mcJCBHihFl6zvOKfi+qo085dbD+V9TU
-        +jaELzbARItnyrIB1x+qMMSBiTa+YM4=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-58-980IQXpiPf-Q_89jrFImbA-1; Mon, 26 Dec 2022 21:29:39 -0500
-X-MC-Unique: 980IQXpiPf-Q_89jrFImbA-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 19FD43C0F7E1;
-        Tue, 27 Dec 2022 02:29:39 +0000 (UTC)
-Received: from localhost (ovpn-8-22.pek2.redhat.com [10.72.8.22])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 0957D492C14;
-        Tue, 27 Dec 2022 02:29:37 +0000 (UTC)
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Thomas Gleixner <tglx@linutronix.de>, Jens Axboe <axboe@kernel.dk>
-Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>,
-        John Garry <john.garry@huawei.com>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V4 6/6] blk-mq: Build default queue map via group_cpus_evenly()
-Date:   Tue, 27 Dec 2022 10:29:05 +0800
-Message-Id: <20221227022905.352674-7-ming.lei@redhat.com>
-In-Reply-To: <20221227022905.352674-1-ming.lei@redhat.com>
-References: <20221227022905.352674-1-ming.lei@redhat.com>
+        Mon, 26 Dec 2022 21:55:18 -0500
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D39E2F05;
+        Mon, 26 Dec 2022 18:55:16 -0800 (PST)
+Received: from mail02.huawei.com (unknown [172.30.67.153])
+        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4Ngzlz0B4Sz4f3nqj;
+        Tue, 27 Dec 2022 10:55:11 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.175.127.227])
+        by APP4 (Coremail) with SMTP id gCh0CgBH_rGPXqpjDHZaAg--.54074S4;
+        Tue, 27 Dec 2022 10:55:13 +0800 (CST)
+From:   Yu Kuai <yukuai1@huaweicloud.com>
+To:     jack@suse.cz, tj@kernel.org, josef@toxicpanda.com, axboe@kernel.dk,
+        paolo.valente@linaro.org
+Cc:     cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, yukuai3@huawei.com,
+        yukuai1@huaweicloud.com, yi.zhang@huawei.com
+Subject: [PATCH RFC] block, bfq: switch 'bfqg->ref' to use atomic refcount apis
+Date:   Tue, 27 Dec 2022 11:15:41 +0800
+Message-Id: <20221227031541.2595647-1-yukuai1@huaweicloud.com>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
+X-CM-TRANSID: gCh0CgBH_rGPXqpjDHZaAg--.54074S4
+X-Coremail-Antispam: 1UD129KBjvJXoW7uFyfuw15Jr4xAryUXFWUJwb_yoW8Cry3pF
+        nIq3W5J34rJr1fXF4UAa4UXry8Jw1fCryrK3yqg39Yyry7Xw1Sg3Z0yrWrJ34SvF93ArZr
+        Zr1Ygayvvr12q3JanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUvY14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+        1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+        JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+        CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+        2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+        W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2
+        Y2ka0xkIwI1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4
+        xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43
+        MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I
+        0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWrZr1j6s0DMIIF0xvEx4A2jsIE14v2
+        6r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0J
+        UdHUDUUUUU=
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The default queue mapping builder of blk_mq_map_queues doesn't take NUMA
-topo into account, so the built mapping is pretty bad, since CPUs
-belonging to different NUMA node are assigned to same queue. It is
-observed that IOPS drops by ~30% when running two jobs on same hctx
-of null_blk from two CPUs belonging to two NUMA nodes compared with
-from same NUMA node.
+From: Yu Kuai <yukuai3@huawei.com>
 
-Address the issue by reusing group_cpus_evenly() for building queue
-mapping since group_cpus_evenly() does group cpus according to CPU/NUMA
-locality.
+The updating of 'bfqg->ref' should be protected by 'bfqd->lock', however,
+during code review, we found that bfq_pd_free() update 'bfqg->ref'
+without holding the lock, which is problematic:
 
-Also performance data becomes more stable with this patchset given
-correct queue mapping is applied wrt. numa locality viewpoint, for
-example, on one two nodes arm64 machine with 160 cpus, node 0(cpu 0~79),
-node 1(cpu 80~159):
+1) bfq_pd_free() triggered by removing cgroup is called asynchronously;
+2) bfqq will grab bfqg reference, and exit bfqq will drop the reference,
+which can concurrenty with 1).
 
-1) modprobe null_blk nr_devices=1 submit_queues=2
+Unfortunately, 'bfqd->lock' can't be held here because 'bfqd' might already
+be freed in bfq_pd_free(). Fix the problem by using atomic refcount apis.
 
-2) run 'fio(t/io_uring -p 0 -n 4 -r 20 /dev/nullb0)', and observe that
-IOPS becomes much stable on multiple tests:
-
-- without patched: IOPS is 2.5M ~ 4.5M
-- patched: IOPS is 4.3 ~ 5M
-
-Lots of drivers may benefit from the change, such as nvme pci poll,
-nvme tcp, ...
-
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Yu Kuai <yukuai3@huawei.com>
 ---
- block/blk-mq-cpumap.c | 63 +++++++++----------------------------------
- 1 file changed, 13 insertions(+), 50 deletions(-)
+ block/bfq-cgroup.c  | 8 +++-----
+ block/bfq-iosched.h | 2 +-
+ 2 files changed, 4 insertions(+), 6 deletions(-)
 
-diff --git a/block/blk-mq-cpumap.c b/block/blk-mq-cpumap.c
-index 9c2fce1a7b50..0c612c19feb8 100644
---- a/block/blk-mq-cpumap.c
-+++ b/block/blk-mq-cpumap.c
-@@ -10,66 +10,29 @@
- #include <linux/mm.h>
- #include <linux/smp.h>
- #include <linux/cpu.h>
-+#include <linux/group_cpus.h>
+diff --git a/block/bfq-cgroup.c b/block/bfq-cgroup.c
+index 1b2829e99dad..aa9c4f02e3a3 100644
+--- a/block/bfq-cgroup.c
++++ b/block/bfq-cgroup.c
+@@ -316,14 +316,12 @@ struct bfq_group *bfqq_group(struct bfq_queue *bfqq)
  
- #include <linux/blk-mq.h>
- #include "blk.h"
- #include "blk-mq.h"
- 
--static int queue_index(struct blk_mq_queue_map *qmap,
--		       unsigned int nr_queues, const int q)
--{
--	return qmap->queue_offset + (q % nr_queues);
--}
--
--static int get_first_sibling(unsigned int cpu)
--{
--	unsigned int ret;
--
--	ret = cpumask_first(topology_sibling_cpumask(cpu));
--	if (ret < nr_cpu_ids)
--		return ret;
--
--	return cpu;
--}
--
- void blk_mq_map_queues(struct blk_mq_queue_map *qmap)
+ static void bfqg_get(struct bfq_group *bfqg)
  {
--	unsigned int *map = qmap->mq_map;
--	unsigned int nr_queues = qmap->nr_queues;
--	unsigned int cpu, first_sibling, q = 0;
+-	bfqg->ref++;
++	refcount_inc(&bfqg->ref);
+ }
+ 
+ static void bfqg_put(struct bfq_group *bfqg)
+ {
+-	bfqg->ref--;
 -
--	for_each_possible_cpu(cpu)
--		map[cpu] = -1;
--
--	/*
--	 * Spread queues among present CPUs first for minimizing
--	 * count of dead queues which are mapped by all un-present CPUs
--	 */
--	for_each_present_cpu(cpu) {
--		if (q >= nr_queues)
--			break;
--		map[cpu] = queue_index(qmap, nr_queues, q++);
-+	const struct cpumask *masks;
-+	unsigned int queue, cpu;
-+
-+	masks = group_cpus_evenly(qmap->nr_queues);
-+	if (!masks) {
-+		for_each_possible_cpu(cpu)
-+			qmap->mq_map[cpu] = qmap->queue_offset;
-+		return;
+-	if (bfqg->ref == 0)
++	if (refcount_dec_and_test(bfqg->ref))
+ 		kfree(bfqg);
+ }
+ 
+@@ -530,7 +528,7 @@ static struct blkg_policy_data *bfq_pd_alloc(gfp_t gfp, struct request_queue *q,
  	}
  
--	for_each_possible_cpu(cpu) {
--		if (map[cpu] != -1)
--			continue;
--		/*
--		 * First do sequential mapping between CPUs and queues.
--		 * In case we still have CPUs to map, and we have some number of
--		 * threads per cores then map sibling threads to the same queue
--		 * for performance optimizations.
--		 */
--		if (q < nr_queues) {
--			map[cpu] = queue_index(qmap, nr_queues, q++);
--		} else {
--			first_sibling = get_first_sibling(cpu);
--			if (first_sibling == cpu)
--				map[cpu] = queue_index(qmap, nr_queues, q++);
--			else
--				map[cpu] = map[first_sibling];
--		}
-+	for (queue = 0; queue < qmap->nr_queues; queue++) {
-+		for_each_cpu(cpu, &masks[queue])
-+			qmap->mq_map[cpu] = qmap->queue_offset + queue;
- 	}
-+	kfree(masks);
+ 	/* see comments in bfq_bic_update_cgroup for why refcounting */
+-	bfqg_get(bfqg);
++	refcount_set(&bfqg->ref, 1);
+ 	return &bfqg->pd;
  }
- EXPORT_SYMBOL_GPL(blk_mq_map_queues);
+ 
+diff --git a/block/bfq-iosched.h b/block/bfq-iosched.h
+index 41aa151ccc22..466e4865ace6 100644
+--- a/block/bfq-iosched.h
++++ b/block/bfq-iosched.h
+@@ -928,7 +928,7 @@ struct bfq_group {
+ 	char blkg_path[128];
+ 
+ 	/* reference counter (see comments in bfq_bic_update_cgroup) */
+-	int ref;
++	refcount_t ref;
+ 	/* Is bfq_group still online? */
+ 	bool online;
  
 -- 
 2.31.1
