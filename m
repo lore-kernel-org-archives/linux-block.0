@@ -2,104 +2,137 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CEBFCC4332F
-	for <linux-block@archiver.kernel.org>; Tue, 27 Dec 2022 03:33:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 65BCDC10F1B
+	for <linux-block@archiver.kernel.org>; Tue, 27 Dec 2022 06:09:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229511AbiL0Ddo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 26 Dec 2022 22:33:44 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45830 "EHLO
+        id S229561AbiL0GJt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 27 Dec 2022 01:09:49 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59398 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229497AbiL0Ddn (ORCPT
+        with ESMTP id S229447AbiL0GJs (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 26 Dec 2022 22:33:43 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A78F25E7
-        for <linux-block@vger.kernel.org>; Mon, 26 Dec 2022 19:32:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1672111974;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=VwOE+F86uWsg5Wnwq09aKncqgVlvCr+KQWK+eRMPdfA=;
-        b=Asat/RYIiATEgqnSUZupiSRc8N257lC2kxuXaHnsR8jQw/dm3f23TONN054X1ZmwbJfHv0
-        CoOhPdK7tcgHlZauDWshOoEtoacflnxd9nfe++gmxnwCuy2915pCwSb1eQxWVmrkVoirJ1
-        12CEe1MiA0QOaBLqTcBQQGVSIMJpPvE=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-204-cRqnW_nrPAqfqiFX-XlIyQ-1; Mon, 26 Dec 2022 22:32:53 -0500
-X-MC-Unique: cRqnW_nrPAqfqiFX-XlIyQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id AF4923806647
-        for <linux-block@vger.kernel.org>; Tue, 27 Dec 2022 03:32:52 +0000 (UTC)
-Received: from T590 (ovpn-8-22.pek2.redhat.com [10.72.8.22])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 9ADF22166B3F;
-        Tue, 27 Dec 2022 03:32:50 +0000 (UTC)
-Date:   Tue, 27 Dec 2022 11:32:44 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Changhui Zhong <czhong@redhat.com>
-Cc:     linux-block@vger.kernel.org
-Subject: Re: [bug report] Unable to handle kernel NULL pointer dereference at
- virtual address 0000000000000058
-Message-ID: <Y6pnXGJn6tx+nCH3@T590>
-References: <CAGVVp+WS5aHiF2Odc-C+fO56qKyV7vPsPRz35v9eWsPJDNj=ng@mail.gmail.com>
+        Tue, 27 Dec 2022 01:09:48 -0500
+Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 355C61029;
+        Mon, 26 Dec 2022 22:09:46 -0800 (PST)
+Received: from mail02.huawei.com (unknown [172.30.67.153])
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4Nh44M3nnSz4f3mWF;
+        Tue, 27 Dec 2022 14:09:39 +0800 (CST)
+Received: from [10.174.176.73] (unknown [10.174.176.73])
+        by APP1 (Coremail) with SMTP id cCh0CgCHpzEkjKpjE0o7Ag--.25751S3;
+        Tue, 27 Dec 2022 14:09:42 +0800 (CST)
+Subject: Re: [PATCH RFC] block, bfq: switch 'bfqg->ref' to use atomic refcount
+ apis
+To:     Yu Kuai <yukuai1@huaweicloud.com>, jack@suse.cz, tj@kernel.org,
+        josef@toxicpanda.com, axboe@kernel.dk, paolo.valente@linaro.org
+Cc:     cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, yi.zhang@huawei.com,
+        "yukuai (C)" <yukuai3@huawei.com>
+References: <20221227031541.2595647-1-yukuai1@huaweicloud.com>
+From:   Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <ba5e74a6-b3de-844d-16b8-84eb429c7058@huaweicloud.com>
+Date:   Tue, 27 Dec 2022 14:09:40 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAGVVp+WS5aHiF2Odc-C+fO56qKyV7vPsPRz35v9eWsPJDNj=ng@mail.gmail.com>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
+In-Reply-To: <20221227031541.2595647-1-yukuai1@huaweicloud.com>
+Content-Type: text/plain; charset=gbk; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: cCh0CgCHpzEkjKpjE0o7Ag--.25751S3
+X-Coremail-Antispam: 1UD129KBjvJXoW7KF4rKryxGFWUKF47Cry7GFg_yoW8urW7pF
+        n0gFy5Jw1rJr18WF17J3WUXry8Jw4rCry8K3y8Xwnayry3Xwnag3Z0yrWrJ34IvF93Arsr
+        ZF1YgayDCr1IvFUanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUU9F14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+        1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+        JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+        CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+        2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+        W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka
+        0xkIwI1lc7I2V7IY0VAS07AlzVAYIcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7x
+        kEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E
+        67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCw
+        CI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6rW3Jr0E
+        3s1lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcS
+        sGvfC2KfnxnUUI43ZEXa7VUbXdbUUUUUU==
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Dec 26, 2022 at 11:11:44AM +0800, Changhui Zhong wrote:
-> Hello,
-> Below issue was triggered with ( v6.0.15-996-g988abd970566), pls help check it
+Hi, Jan!
+
+ÔÚ 2022/12/27 11:15, Yu Kuai Ð´µÀ:
+> From: Yu Kuai <yukuai3@huawei.com>
 > 
-> [ 7845.648246] Unable to handle kernel NULL pointer dereference at
-> virtual address 0000000000000058
-> [ 7845.648776] Mem abort info:
-> [ 7845.648938]   ESR = 0x0000000096000004
-> [ 7845.649155]   EC = 0x25: DABT (current EL), IL = 32 bits
-> [ 7845.649462]   SET = 0, FnV = 0
-> [ 7845.649639]   EA = 0, S1PTW = 0
-> [ 7845.649821]   FSC = 0x04: level 0 translation fault
-> [ 7845.650105] Data abort info:
-> [ 7845.650274]   ISV = 0, ISS = 0x00000004
-> [ 7845.650496]   CM = 0, WnR = 0
-> [ 7845.650670] user pgtable: 4k pages, 48-bit VAs, pgdp=0000000103cba000
-> [ 7845.651043] [0000000000000058] pgd=0000000000000000, p4d=0000000000000000
-> [ 7845.651446] Internal error: Oops: 96000004 [#1] SMP
-> [ 7845.651764] Modules linked in: snd_aloop snd_dummy snd_seq
-> snd_seq_device snd_pcm snd_timer snd soundcore ansi_cprng crypto_user
-> veth vrf ipvlan echainiv esp4 des_generic libdes tun geneve ip6_tables
-> ip_vs ip_set xt_sctp nf_conntrack_netlink nft_chain_nat xt_nat nf_nat
-> nf_conntrack nf_defrag_ipv6 nf_defrag_ipv4 nft_compat nf_tables
-> nfnetlink tcp_dctcp ah6 ah4 binfmt_misc can_j1939 l2tp_core bnep hidp
-> can_bcm pptp gre can_raw rfcomm bluetooth ieee802154_socket ieee802154
-> af_key qrtr pppoe pppox ppp_generic slhc mpls_router ip_tunnel
-> vsock_loopback vmw_vsock_virtio_transport_common
-> vmw_vsock_vmci_transport vmw_vmci vsock fcrypt pcbc rxrpc smc ib_core
-> kcm can macsec llc sctp ip6_udp_tunnel udp_tunnel mlx4_en mlx4_core
-> nfp tls loop nls_utf8 cifs cifs_arc4 cifs_md4 dns_resolver fscache
-> netfs rfkill sunrpc vfat fat virtio_net net_failover failover fuse
-> zram xfs crct10dif_ce polyval_ce virtio_console polyval_generic
-> ghash_ce virtio_blk virtio_mmio qemu_fw_cfg [last unloaded: vxlan]
-> [ 7845.656785] CPU: 5 PID: 789199 Comm: bash Not tainted 6.0.15 #1
-> [ 7845.657126] Hardware name: QEMU KVM Virtual Machine, BIOS 0.0.0 02/06/2015
-> [ 7845.657523] pstate: 00400005 (nzcv daif +PAN -UAO -TCO -DIT -SSBS BTYPE=--)
-> [ 7845.657932] pc : blk_mq_quiesce_queue+0x50/0xa0
+> The updating of 'bfqg->ref' should be protected by 'bfqd->lock', however,
+> during code review, we found that bfq_pd_free() update 'bfqg->ref'
+> without holding the lock, which is problematic:
+> 
+> 1) bfq_pd_free() triggered by removing cgroup is called asynchronously;
+> 2) bfqq will grab bfqg reference, and exit bfqq will drop the reference,
+> which can concurrenty with 1).
+> 
+> Unfortunately, 'bfqd->lock' can't be held here because 'bfqd' might already
+> be freed in bfq_pd_free(). Fix the problem by using atomic refcount apis.
+> 
+> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+> ---
+>   block/bfq-cgroup.c  | 8 +++-----
+>   block/bfq-iosched.h | 2 +-
+>   2 files changed, 4 insertions(+), 6 deletions(-)
+> 
+> diff --git a/block/bfq-cgroup.c b/block/bfq-cgroup.c
+> index 1b2829e99dad..aa9c4f02e3a3 100644
+> --- a/block/bfq-cgroup.c
+> +++ b/block/bfq-cgroup.c
+> @@ -316,14 +316,12 @@ struct bfq_group *bfqq_group(struct bfq_queue *bfqq)
+>   
+>   static void bfqg_get(struct bfq_group *bfqg)
+>   {
+> -	bfqg->ref++;
+> +	refcount_inc(&bfqg->ref);
+>   }
+>   
+>   static void bfqg_put(struct bfq_group *bfqg)
+>   {
+> -	bfqg->ref--;
+> -
+> -	if (bfqg->ref == 0)
+> +	if (refcount_dec_and_test(bfqg->ref))
+Sorry that here should be '&bfqg->ref'.
 
-Hi Changhui,
+Anyway, I'll wait for you, and send a new version if you think this
+patch make sense.
 
-Can you figure out the fault source code by gdb?
+Thanks,
+Kuai
 
-gdb vmlinux
-gdb> l *(blk_mq_quiesce_queue+0x50)
-
-
-thanks, 
-Ming
+>   		kfree(bfqg);
+>   }
+>   
+> @@ -530,7 +528,7 @@ static struct blkg_policy_data *bfq_pd_alloc(gfp_t gfp, struct request_queue *q,
+>   	}
+>   
+>   	/* see comments in bfq_bic_update_cgroup for why refcounting */
+> -	bfqg_get(bfqg);
+> +	refcount_set(&bfqg->ref, 1);
+>   	return &bfqg->pd;
+>   }
+>   
+> diff --git a/block/bfq-iosched.h b/block/bfq-iosched.h
+> index 41aa151ccc22..466e4865ace6 100644
+> --- a/block/bfq-iosched.h
+> +++ b/block/bfq-iosched.h
+> @@ -928,7 +928,7 @@ struct bfq_group {
+>   	char blkg_path[128];
+>   
+>   	/* reference counter (see comments in bfq_bic_update_cgroup) */
+> -	int ref;
+> +	refcount_t ref;
+>   	/* Is bfq_group still online? */
+>   	bool online;
+>   
+> 
 
