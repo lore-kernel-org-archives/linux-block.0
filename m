@@ -2,72 +2,109 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C926DC46467
-	for <linux-block@archiver.kernel.org>; Wed, 28 Dec 2022 16:07:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60BB5C3DA7A
+	for <linux-block@archiver.kernel.org>; Wed, 28 Dec 2022 17:01:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234427AbiL1QHY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 28 Dec 2022 11:07:24 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53468 "EHLO
+        id S233722AbiL1RBX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 28 Dec 2022 12:01:23 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53416 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234488AbiL1QHB (ORCPT
+        with ESMTP id S235333AbiL1RAo (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 28 Dec 2022 11:07:01 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F57A18E06
-        for <linux-block@vger.kernel.org>; Wed, 28 Dec 2022 08:06:45 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id ED6E461577
-        for <linux-block@vger.kernel.org>; Wed, 28 Dec 2022 16:06:44 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AD04CC433F0;
-        Wed, 28 Dec 2022 16:06:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1672243604;
-        bh=9G0+6z+ndU6BIQFkkvajID1aZBDKwELvY/UH+TeWjjw=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=WNvz80ENk4eBWU6NihmHDVHgtnWKkm8ymkKhFoMtSeq+8fabmgQaIS9mD1lJrOyLo
-         8McmZX/LD15YN017su13KDLwka5F40OZI4seLE7xU1dmIXvrULH9bHTSU2Q7CrCxWB
-         JUOmgAibHLv9na57UqSCUG/wn3p0o6sdkCnYlRBFkBswm1fNcpNwzqXLjp/od8fcpz
-         M6gAVjEog01H3shfET2nTPhtw2dSb7BzEiktEHX2IvhCL/iwAnogP0BCGxFZzQnqru
-         tqwe+6dvGFtfLcU2DjnmGLxy491PaBi0YkhuV+CIcj+cku4TEc8Y6UbiS5o5J1MufH
-         kTr34QpT4lKjg==
-Date:   Wed, 28 Dec 2022 09:06:41 -0700
-From:   Keith Busch <kbusch@kernel.org>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     kernel test robot <lkp@intel.com>, Keith Busch <kbusch@meta.com>,
-        linux-block@vger.kernel.org, axboe@kernel.dk, llvm@lists.linux.dev,
-        oe-kbuild-all@lists.linux.dev, martin.petersen@oracle.com,
-        Damien Le Moal <damien.lemoal@opensource.wdc.com>
-Subject: Re: [PATCHv3 2/2] block: save user max_sectors limit
-Message-ID: <Y6xpkcEn0BZw4cYE@kbusch-mbp>
-References: <20221227191009.2277326-2-kbusch@meta.com>
- <202212280931.RDVmPBnX-lkp@intel.com>
- <20221228155111.GA388@lst.de>
+        Wed, 28 Dec 2022 12:00:44 -0500
+Received: from wout3-smtp.messagingengine.com (wout3-smtp.messagingengine.com [64.147.123.19])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E743AA450
+        for <linux-block@vger.kernel.org>; Wed, 28 Dec 2022 08:55:51 -0800 (PST)
+Received: from compute2.internal (compute2.nyi.internal [10.202.2.46])
+        by mailout.west.internal (Postfix) with ESMTP id C860332002FB;
+        Wed, 28 Dec 2022 11:55:50 -0500 (EST)
+Received: from mailfrontend2 ([10.202.2.163])
+  by compute2.internal (MEProxy); Wed, 28 Dec 2022 11:55:51 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=astier.eu; h=cc
+        :cc:content-transfer-encoding:date:date:from:from:in-reply-to
+        :in-reply-to:message-id:mime-version:references:reply-to:sender
+        :subject:subject:to:to; s=fm2; t=1672246550; x=1672332950; bh=Zb
+        r/mnJU0JN2wDPd5xpvoUy8PqNs3xUN5jz6PCtn5w4=; b=UEz3oM56NKJ54P18gT
+        c+Uua048+Evb2RNQtyrvB850/hlq3LoguW/PfYxbAw1Tna9ES/C15aKZ0vkMhroD
+        3yk1+f43FdsH0ZB0CO5XNYIlS/Z+fDbSaVaJ3KR4JfsTsbPkkg0Tg+sItyLxSerN
+        wGmAS/YxbIPBE4cs49eBW3cyKCS9r5IVk8E07zXn8qflv4QjmH/JVC2KOEKLkDOq
+        CWkZdpUYOzkcgoucNlTEQcXnb1ojgTUN+9f00OaMOGTjWJ4HyxoTFNKqFNDyDD+a
+        jma/wBCI7l5bkG4RURU5FhNDPs5GLgS1lVyfWIViQCYce+03PExurV7GsbDqkkCS
+        ag3A==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:cc:content-transfer-encoding:date:date
+        :feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+        :message-id:mime-version:references:reply-to:sender:subject
+        :subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
+        :x-sasl-enc; s=fm2; t=1672246550; x=1672332950; bh=Zbr/mnJU0JN2w
+        DPd5xpvoUy8PqNs3xUN5jz6PCtn5w4=; b=v/+LpTveU46M5CMFsESN1BT3yxwdI
+        DcSxNUozDKVQGG1ZPur7oLijVB7qAu1prbwB+BOLeJpfBMAlnJs9RRKVsr75bfYT
+        57Bkgok07W0IGPVVs6XqZYpv3SXS03rMAbkA6l7/4luSr3iB/uVHkQSSgNMei1qw
+        wql8NyRaGS97aOQxmesj1nlldgx3jADtfYqSJWk0NJ1e+F+v/6TBvv/Bv4Qpw/qH
+        rVUZWCVfSzX7gClKbOtSY2GKjhEaZGnS123i/BUK3KIWw8qdQpy3BIhAOEG5ZR2q
+        F6RuKwiGjywdKMENZ2I6HEbTuXPFZarrKTfb3jByv2nww5Dg/yi7fWX+w==
+X-ME-Sender: <xms:FXWsYydeE2Pjbod-8kRP475xhNYsqUmmcEI6Hd3iQX2QQGd738sKJg>
+    <xme:FXWsY8M8wHv_sNEZNy_P6Hc87Rey3Dg9ph2zDPMivyT6gAwCoMvMSVpXLCwAP3zFt
+    lexdD8SH0geFG1WGdM>
+X-ME-Received: <xmr:FXWsYzhplXwb143kVH61pUot0Ee_1PY6QPYNiVx7QvnJ4U0n4eW-_IbnOv6UFSqurEwJn9WhNGtpRzJZysF0__iTShizy6h_uOch1eouYTBfzVkpW1D_xw>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvhedriedvgdeliecutefuodetggdotefrodftvf
+    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
+    uegrihhlohhuthemuceftddtnecunecujfgurhephffvvefufffkofgjfhgggfestdekre
+    dtredttdenucfhrhhomheptehnihhsshgvucetshhtihgvrhcuoegrnhhishhsvgesrghs
+    thhivghrrdgvuheqnecuggftrfgrthhtvghrnhepudduudehffeigfefkefghefhudejff
+    fgfeffgfdtvdejheevfeevuefhhefhteefnecuvehluhhsthgvrhfuihiivgeptdenucfr
+    rghrrghmpehmrghilhhfrhhomheprghnihhsshgvsegrshhtihgvrhdrvghu
+X-ME-Proxy: <xmx:FXWsY_-IqRyLYOsoi--5y9sqFZoQBbJE_u6Bt4DiVVzEJPZNkJROkw>
+    <xmx:FXWsY-synC4Gu4aXD47I8qbU89uYpowFJNH_VmMCMI7b1K349RIQ-Q>
+    <xmx:FXWsY2Fsy2kx0MPVAJ1XyvVy90hYk2GvTHFAIVZbLUafZwH52gK5HQ>
+    <xmx:FnWsY799DofwM3ETPemTzfTF9R4LcfHGSigI-nJ9f9NY44AQAxG1uA>
+Feedback-ID: iccec46d4:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
+ 28 Dec 2022 11:55:48 -0500 (EST)
+From:   Anisse Astier <anisse@astier.eu>
+To:     mcgrof@kernel.org
+Cc:     axboe@kernel.dk, hare@suse.de, hch@lst.de, jeffm@suse.com,
+        kzak@redhat.com, linux-block@vger.kernel.org, ming.lei@redhat.com,
+        snitzer@redhat.com
+Subject: Re: [PATCH] block: default BLOCK_LEGACY_AUTOLOAD to y
+Date:   Wed, 28 Dec 2022 17:55:47 +0100
+Message-Id: <20221228165547.27502-1-anisse@astier.eu>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <YhlI4bKqYpknNgBa@bombadil.infradead.org>
+References: <YhlI4bKqYpknNgBa@bombadil.infradead.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221228155111.GA388@lst.de>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Dec 28, 2022 at 04:51:11PM +0100, Christoph Hellwig wrote:
-> On Wed, Dec 28, 2022 at 10:04:16AM +0800, kernel test robot wrote:
-> > >> block/blk-sysfs.c:254:20: warning: comparison of distinct pointer types ('typeof (max_hw_sectors_kb) *' (aka 'unsigned long *') and 'typeof (2560U >> 1) *' (aka 'unsigned int *')) [-Wcompare-distinct-pointer-types]
+Hi,
+
+On Fri, 25 Feb 2022 13:23:45 -0800, Luis Chamberlain wrote:
+> On Fri, Feb 25, 2022 at 07:14:40PM +0100, Christoph Hellwig wrote:
+> > As Luis reported, losetup currently doesn't properly create the loop
+> > device without this if the device node already exists because old
+> > scripts created it manually.  So default to y for now and remove the
+> > aggressive removal schedule.
+> > 
+> > Reported-by: Luis Chamberlain <mcgrof@kernel.org>
+> > Signed-off-by: Christoph Hellwig <hch@lst.de>
 > 
-> Seems like the local max_sectors_kb variable also needs to be turned
-> into an unsigned int from the current unsigned long.
+> I'm saddened by the fact that we're not going to get an idea of how far
+> and wide the stupid mknod prior to modprobe use is by making this
+> as y default even though I know this is the right thing to do.
+> 
+> I think our ownly measure of success here is to really push
+> Linux distributions to start disabling BLOCK_LEGACY_AUTOLOAD
+> and getting their help to see what burts into flames.
 
-Yeah, and gcc didn't complain about it, so looks like I need to add
-clang to my dev setup.
- 
-> And btw, while I'm getting philosophical during my early morning
-> coffee here, I wonder if we need to actually get rid of or at least
-> bump BLK_DEF_MAX_SECTORS.  It's pretty ridiculous for modern devices,
-> and with CDL support that defintion would also include hard drives
-> eventually.
+I just spent some time bisecting another thing that regresses without
+BLOCK_LEGACY_AUTOLOAD (which was disabled here): mdadm software raid
+auto-assemble on boot (with udev).
 
-It looks like there's a bit of history around that value. I was hoping
-we could just get rid of it entirely and let drivers choose their own
-defaults.
+I think it's because it tries to open /dev/md127 and then fails since it's not
+created automatically.
+
+Regards,
+
+Anisse
