@@ -2,176 +2,71 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 330A0C4332F
-	for <linux-block@archiver.kernel.org>; Thu, 29 Dec 2022 08:22:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BB099C4332F
+	for <linux-block@archiver.kernel.org>; Thu, 29 Dec 2022 11:35:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229734AbiL2IWr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 29 Dec 2022 03:22:47 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43694 "EHLO
+        id S230212AbiL2LfQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 29 Dec 2022 06:35:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45732 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230126AbiL2IWp (ORCPT
+        with ESMTP id S229611AbiL2LfN (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 29 Dec 2022 03:22:45 -0500
-Received: from mail-ed1-x532.google.com (mail-ed1-x532.google.com [IPv6:2a00:1450:4864:20::532])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6671410A9
-        for <linux-block@vger.kernel.org>; Thu, 29 Dec 2022 00:22:44 -0800 (PST)
-Received: by mail-ed1-x532.google.com with SMTP id l29so18749002edj.7
-        for <linux-block@vger.kernel.org>; Thu, 29 Dec 2022 00:22:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=cdbk6YKET6QEGq9IebYDQMQPZF6j/6rc109njHhKlvI=;
-        b=e0zqBtvvlQD2HeN7X7P1SHKwtY1WmNXBewHhrqgYf+Cjes2XV0RT3hygT/cZ9mLgAg
-         mK9seVibJbFJISY9ylAm9410ISVQog0mR5lB7brL/TzMXjDdvh0jGSUofBvfksQXdS0N
-         Bc48MzAHtkmpJ07DAwIqs27Z+Q8lD/rkRbbfs=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=cdbk6YKET6QEGq9IebYDQMQPZF6j/6rc109njHhKlvI=;
-        b=SZAzCDy6f61GtzZoKx13qn+6SGNRT5lO9AoWLmJTexxQ2eXd65EwFAkn/57ERuLcdn
-         JsPDtpA9fbD/e4Zwlg/72ALb7sokQXSPMU79mFYmCK0wMA10Gxcp6pNbJa/QFVDoF37j
-         OIp52MjjEltZ/8EBxxZ90zAsaF7fvHDjlrioiUwPjt5vK/OXKLR+EvJA5Sj6iTxpXf3v
-         ffbDhvxLn7IppDR85Acu9myBnDRja8twrpmT6Ews39fgpwI6JRNckq2rv/JcKk+j5hyc
-         jNCPiWgcf2vx12f9C+tZyJQNsSA5fpYuHzgYmixMfl8fVMqihWI11QTaAbPDFVFawjQh
-         Dj6A==
-X-Gm-Message-State: AFqh2kpv34rK4epQIi2NMs7GARotFFB/PNmFJT33AC6Doy5n3dWWKqIE
-        clwFcUzneVoA6X7RPQBecmTTdTJqMasf4DIu1h1uPQ==
-X-Google-Smtp-Source: AMrXdXsQ7w+8O+47UlcrH/eyB1AcY+iw3zi67xHAp19yIp7KZoxSU3hceHOEF+dEFVjlYfKxx8GN7IxiiG1wtM0JlDA=
-X-Received: by 2002:a05:6402:1654:b0:47f:e663:1d78 with SMTP id
- s20-20020a056402165400b0047fe6631d78mr1566473edx.237.1672302162986; Thu, 29
- Dec 2022 00:22:42 -0800 (PST)
+        Thu, 29 Dec 2022 06:35:13 -0500
+Received: from out2.migadu.com (out2.migadu.com [IPv6:2001:41d0:2:aacc::])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E430413DFF
+        for <linux-block@vger.kernel.org>; Thu, 29 Dec 2022 03:35:11 -0800 (PST)
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1672313710;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=qu4mZ4grBhIrSABkjYWYI2yb4o4KiWbAcR8epDr5sA8=;
+        b=v5bEPS8F4AFJxdpMtaCxAOAnfpjfF4Cx0kz3U3iRJHK6tkg3FqISB2Vz1CulHKssdCIaEs
+        RNjIAhcIXlqb2jkWuYfKABxDV24o8cz6M9svf0mFiEUP9mQCzTMxpzS3+dY5iXJAR3KDYz
+        LgZN7L0P/2AtOpVkM1Mh8OgtmYHR8FA=
+From:   Guoqing Jiang <guoqing.jiang@linux.dev>
+To:     haris.iqbal@ionos.com, jinpu.wang@ionos.com, axboe@kernel.dk,
+        christophe.jaillet@wanadoo.fr
+Cc:     error27@gmail.com, linux-block@vger.kernel.org
+Subject: [PATCH] block/rnbd-clt: fix wrong max ID in ida_alloc_max
+Date:   Thu, 29 Dec 2022 19:35:01 +0800
+Message-Id: <20221229113501.16612-1-guoqing.jiang@linux.dev>
 MIME-Version: 1.0
-References: <20220915164826.1396245-1-sarthakkukreti@google.com>
- <20220915164826.1396245-3-sarthakkukreti@google.com> <Yy3BXc9wf4PH6Rby@redhat.com>
-In-Reply-To: <Yy3BXc9wf4PH6Rby@redhat.com>
-From:   Sarthak Kukreti <sarthakkukreti@chromium.org>
-Date:   Thu, 29 Dec 2022 00:22:32 -0800
-Message-ID: <CAG9=OMMgtscWZyZYHsY0pp-9we+yxs=88sr_yMb6pfz7e75nyA@mail.gmail.com>
-Subject: Re: [PATCH RFC 2/8] dm: Add support for block provisioning
-To:     Mike Snitzer <snitzer@redhat.com>
-Cc:     dm-devel@redhat.com, linux-block@vger.kernel.org,
-        linux-ext4@vger.kernel.org, linux-kernel@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        Jens Axboe <axboe@kernel.dk>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Alasdair Kergon <agk@redhat.com>,
-        Mike Snitzer <snitzer@kernel.org>,
-        "Theodore Ts'o" <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Bart Van Assche <bvanassche@google.com>,
-        Daniil Lunev <dlunev@google.com>,
-        Evan Green <evgreen@google.com>,
-        Gwendal Grignou <gwendal@google.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Sep 23, 2022 at 7:23 AM Mike Snitzer <snitzer@redhat.com> wrote:
->
-> On Thu, Sep 15 2022 at 12:48P -0400,
-> Sarthak Kukreti <sarthakkukreti@chromium.org> wrote:
->
-> > From: Sarthak Kukreti <sarthakkukreti@chromium.org>
-> >
-> > Add support to dm devices for REQ_OP_PROVISION. The default mode
-> > is to pass through the request and dm-thin will utilize it to provision
-> > blocks.
-> >
-> > Signed-off-by: Sarthak Kukreti <sarthakkukreti@chromium.org>
-> > ---
-> >  drivers/md/dm-crypt.c         |  4 +-
-> >  drivers/md/dm-linear.c        |  1 +
-> >  drivers/md/dm-table.c         | 17 +++++++
-> >  drivers/md/dm-thin.c          | 86 +++++++++++++++++++++++++++++++++--
-> >  drivers/md/dm.c               |  4 ++
-> >  include/linux/device-mapper.h |  6 +++
-> >  6 files changed, 113 insertions(+), 5 deletions(-)
-> >
-> > diff --git a/drivers/md/dm-crypt.c b/drivers/md/dm-crypt.c
-> > index 159c6806c19b..357f0899cfb6 100644
-> > --- a/drivers/md/dm-crypt.c
-> > +++ b/drivers/md/dm-crypt.c
-> > @@ -3081,6 +3081,8 @@ static int crypt_ctr_optional(struct dm_target *ti, unsigned int argc, char **ar
-> >       if (ret)
-> >               return ret;
-> >
-> > +     ti->num_provision_bios = 1;
-> > +
-> >       while (opt_params--) {
-> >               opt_string = dm_shift_arg(&as);
-> >               if (!opt_string) {
-> > @@ -3384,7 +3386,7 @@ static int crypt_map(struct dm_target *ti, struct bio *bio)
-> >        * - for REQ_OP_DISCARD caller must use flush if IO ordering matters
-> >        */
-> >       if (unlikely(bio->bi_opf & REQ_PREFLUSH ||
-> > -         bio_op(bio) == REQ_OP_DISCARD)) {
-> > +         bio_op(bio) == REQ_OP_DISCARD || bio_op(bio) == REQ_OP_PROVISION)) {
-> >               bio_set_dev(bio, cc->dev->bdev);
-> >               if (bio_sectors(bio))
-> >                       bio->bi_iter.bi_sector = cc->start +
-> > diff --git a/drivers/md/dm-linear.c b/drivers/md/dm-linear.c
-> > index 3212ef6aa81b..1aa782149428 100644
-> > --- a/drivers/md/dm-linear.c
-> > +++ b/drivers/md/dm-linear.c
-> > @@ -61,6 +61,7 @@ static int linear_ctr(struct dm_target *ti, unsigned int argc, char **argv)
-> >       ti->num_discard_bios = 1;
-> >       ti->num_secure_erase_bios = 1;
-> >       ti->num_write_zeroes_bios = 1;
-> > +     ti->num_provision_bios = 1;
-> >       ti->private = lc;
-> >       return 0;
-> >
-> > diff --git a/drivers/md/dm-table.c b/drivers/md/dm-table.c
-> > index 332f96b58252..b7f9cb66b7ba 100644
-> > --- a/drivers/md/dm-table.c
-> > +++ b/drivers/md/dm-table.c
-> > @@ -1853,6 +1853,18 @@ static bool dm_table_supports_write_zeroes(struct dm_table *t)
-> >       return true;
-> >  }
-> >
-> > +static bool dm_table_supports_provision(struct dm_table *t)
-> > +{
-> > +     for (unsigned int i = 0; i < t->num_targets; i++) {
-> > +             struct dm_target *ti = dm_table_get_target(t, i);
-> > +
-> > +             if (ti->num_provision_bios)
-> > +                     return true;
-> > +     }
-> > +
-> > +     return false;
-> > +}
-> > +
->
-> This needs to go a step further and verify a device in the stack
-> actually services REQ_OP_PROVISION.
->
-> Please see dm_table_supports_discards(): it iterates all devices in
-> the table and checks that support is advertised.
->
-> For discard, DM requires that _all_ devices in a table advertise
-> support (that is pretty strict and likely could be relaxed to _any_).
->
-> You'll need ti->provision_supported (like ->discards_supported) to
-> advertise actual support is provided by dm-thinp (even if underlying
-> devices don't support it).
->
-> And yeah, dm-thinp passdown support for REQ_OP_PROVISION can follow
-> later as needed (if there actual HW that would benefit from
-> REQ_OP_PROVISION).
->
-Done, thanks (the provision support, not the passdown)! I think the
-one case where passdown might help is to build images with dm-thinp
-already set up on one of the partitions (I have something in the works
-for ChromiumOS images to do VM tests with preset state :)). That would
-allow us to preallocate space for thin logical volumes inside the
-image file.
+We need to pass 'end - 1' to ida_alloc_max after switch from
+ida_simple_get to ida_alloc_max.
 
-> Mike
->
+And smatch warns.
+
+drivers/block/rnbd/rnbd-clt.c:1460 init_dev() error: Calling ida_alloc_max() with a 'max' argument which is a power of 2. -1 missing?
+
+Fixes: 24afc15dbe21 ("block/rnbd: Remove a useless mutex")
+Reported-by: kernel test robot <lkp@intel.com>
+Reported-by: Dan Carpenter <error27@gmail.com>
+Signed-off-by: Guoqing Jiang <guoqing.jiang@linux.dev>
+---
+ drivers/block/rnbd/rnbd-clt.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/block/rnbd/rnbd-clt.c b/drivers/block/rnbd/rnbd-clt.c
+index 78334da74d8b..8cdecec89d74 100644
+--- a/drivers/block/rnbd/rnbd-clt.c
++++ b/drivers/block/rnbd/rnbd-clt.c
+@@ -1440,7 +1440,7 @@ static struct rnbd_clt_dev *init_dev(struct rnbd_clt_session *sess,
+ 		goto out_alloc;
+ 	}
+ 
+-	ret = ida_alloc_max(&index_ida, 1 << (MINORBITS - RNBD_PART_BITS),
++	ret = ida_alloc_max(&index_ida, 1 << (MINORBITS - RNBD_PART_BITS) - 1,
+ 			    GFP_KERNEL);
+ 	if (ret < 0) {
+ 		pr_err("Failed to initialize device '%s' from session %s, allocating idr failed, err: %d\n",
+-- 
+2.35.3
+
