@@ -2,51 +2,51 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DF83C4332F
-	for <linux-block@archiver.kernel.org>; Thu, 29 Dec 2022 08:14:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1735C4332F
+	for <linux-block@archiver.kernel.org>; Thu, 29 Dec 2022 08:14:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231264AbiL2IOD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 29 Dec 2022 03:14:03 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37922 "EHLO
+        id S233084AbiL2IO2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 29 Dec 2022 03:14:28 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37910 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233084AbiL2INU (ORCPT
+        with ESMTP id S233129AbiL2IOB (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 29 Dec 2022 03:13:20 -0500
-Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 19BD810040
-        for <linux-block@vger.kernel.org>; Thu, 29 Dec 2022 00:13:11 -0800 (PST)
-Received: by mail-pl1-x631.google.com with SMTP id s7so18288952plk.5
-        for <linux-block@vger.kernel.org>; Thu, 29 Dec 2022 00:13:11 -0800 (PST)
+        Thu, 29 Dec 2022 03:14:01 -0500
+Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE4B313D5B
+        for <linux-block@vger.kernel.org>; Thu, 29 Dec 2022 00:13:15 -0800 (PST)
+Received: by mail-pj1-x1033.google.com with SMTP id m7-20020a17090a730700b00225ebb9cd01so10355143pjk.3
+        for <linux-block@vger.kernel.org>; Thu, 29 Dec 2022 00:13:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=tknTAYGKiWbOelfCTGAIM4O7q8g3LJuucBsJtaWsm7Y=;
-        b=od6vH7qllnsXef6M4SnGIOrNBwpv4p//RiTi9UhMGK3lxP1a2K3Nm1uXz7ssRR+Smi
-         wUthhRevFt0NOvSr6D9fSLI7kuMeJffcI62x3q63JgaiPRtoRmo7cT9cQcEV1/CPgE3M
-         gaDQE3uH/ZWruLOhIAciPanxs5Ham7RNijdIg=
+        bh=/8DbNiGbTyMPWSOnHF8Kc/zLYgsGw2pv5SS5s5v0R+s=;
+        b=g9XepsvU/uDTIkRU/0RfRztiaH4ysj5lPHnKvHquo4r2R81/t9Ab0n0lHqtHLvd81L
+         Q99LTPfepq7s8nl2fawi9Q1Hj0cYT+r116Jc2iu54KTeJljXqfbrFWykA1a3MtFEjxbc
+         IILAMKAGR6lSnvUPpxgAk36YR2QLLOe+csueQ=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=tknTAYGKiWbOelfCTGAIM4O7q8g3LJuucBsJtaWsm7Y=;
-        b=ynnccAZhWA/ARSF2DHqaVXRoQUmJnwwB/tKP895nGJUGixjcIMLGNMNWzU+3AsiZZh
-         KbZb0QJV/9UuXSCINi2/rJ61muj2rsg/afcWDaNqgk/MCiHthxE3TCvwho2+A+OJj8g4
-         rtzky7Uq1z0W6hahgw8IA07316OXdqoymTp2nnrvaLS6okYfoOTrjXMAag83Fi3qsQ4N
-         nTALCQR4QT4sNInsfKbsQKMkvAec07tA4S8m1USnThFOTyNMm+SnWdEJvZtwSzROmhNU
-         yF48rGLI68V/rzdyoL/1YtqG3X75DWTuIsDcx6v/TLfKZtpRwU+31NHmG99bpK6MgzSq
-         epxw==
-X-Gm-Message-State: AFqh2kru/2s1IVN7i4L+76SpeN7C1oaYQOS5KSo4Cu5vwj3e5VZMmdN0
-        OZXis3iQZmjRiZoVkY9zzNdLIw==
-X-Google-Smtp-Source: AMrXdXtym0rxjHIaY1zQhiKiElSe51N0oXHJB0JFxm27wv3KTRxbF3edYhG2fNv1/xvRbhTy3gkDbA==
-X-Received: by 2002:a17:902:c94f:b0:189:9e91:762e with SMTP id i15-20020a170902c94f00b001899e91762emr45014676pla.57.1672301590739;
-        Thu, 29 Dec 2022 00:13:10 -0800 (PST)
+        bh=/8DbNiGbTyMPWSOnHF8Kc/zLYgsGw2pv5SS5s5v0R+s=;
+        b=zFJ5RbeOaHN7P8UC6Vor/sC8QcPNig+PtzgZY9Pu/141UnZTDG+X1dfS86wxks3LG4
+         PmQGo9r4upebnehIFVeHcmcmVA+v8Gr1VZq97STWmqtwNKCYDQ+6SAoJTxh3RnONubWX
+         UI143/ArOQHmOnxXboja2fQLOhXgroZkfLlcrE0rEh8aTEtmyGuWzy89+KxOGzwmMt4A
+         GQa8lhFCqTI03FwZz+I74bPzCbyxWx3HY7TJutyfURfmntX40rf0B/1TgzIPn9kvGENs
+         7Oe1BLyt6ZHgGSgkpg3lqAXfOqutYOebwpw37yYKMkz23uHYqLQ7dj/64WoYiVJqo6oW
+         eu1g==
+X-Gm-Message-State: AFqh2krw3F10Avg5T4HDFJe4iS5i1P4MxV6hfR+1/uuIbcSBJwEndf6n
+        624bBfbOYxK1Wbm02c3WQ9lfTg==
+X-Google-Smtp-Source: AMrXdXtgQYYpwQ6pz9x9/465K8tsLdsmt3F7AV27atGdHHls0t4amkRI67RTybj/weosU20glWNaiw==
+X-Received: by 2002:a17:903:228a:b0:191:217f:b2ea with SMTP id b10-20020a170903228a00b00191217fb2eamr42495271plh.40.1672301595208;
+        Thu, 29 Dec 2022 00:13:15 -0800 (PST)
 Received: from sarthakkukreti-glaptop.hsd1.ca.comcast.net ([2601:647:4200:b5b0:75ff:1277:3d7b:d67a])
-        by smtp.gmail.com with ESMTPSA id 12-20020a170902e9cc00b00192820d00d0sm6496325plk.120.2022.12.29.00.13.08
+        by smtp.gmail.com with ESMTPSA id 12-20020a170902e9cc00b00192820d00d0sm6496325plk.120.2022.12.29.00.13.13
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 Dec 2022 00:13:10 -0800 (PST)
+        Thu, 29 Dec 2022 00:13:14 -0800 (PST)
 From:   Sarthak Kukreti <sarthakkukreti@chromium.org>
 To:     sarthakkukreti@google.com, dm-devel@redhat.com,
         linux-block@vger.kernel.org, linux-ext4@vger.kernel.org,
@@ -64,9 +64,9 @@ Cc:     Jens Axboe <axboe@kernel.dk>,
         Bart Van Assche <bvanassche@google.com>,
         Daniil Lunev <dlunev@google.com>,
         "Darrick J. Wong" <djwong@kernel.org>
-Subject: [PATCH v2 5/7] ext4: Add support for FALLOC_FL_PROVISION
-Date:   Thu, 29 Dec 2022 00:12:50 -0800
-Message-Id: <20221229081252.452240-6-sarthakkukreti@chromium.org>
+Subject: [PATCH v2 7/7] ext4: Add a per-file provision override xattr
+Date:   Thu, 29 Dec 2022 00:12:52 -0800
+Message-Id: <20221229081252.452240-8-sarthakkukreti@chromium.org>
 X-Mailer: git-send-email 2.39.0.314.g84b9a713c41-goog
 In-Reply-To: <20221229081252.452240-1-sarthakkukreti@chromium.org>
 References: <20221229081252.452240-1-sarthakkukreti@chromium.org>
@@ -76,118 +76,87 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Once ext4 is done mapping blocks for an fallocate() request, send
-out an FALLOC_FL_PROVISION request to the underlying layer to
-ensure that the space is provisioned for the newly allocated extent
-or indirect blocks.
+Adds a per-file provision override that allows select files to
+override the per-mount setting for provisioning blocks on allocation.
 
-There is an expected performance degradation with fallocate() calls made
-with this flag due to the extra REQ_OP_PROVISIONs sent to the underlying
-storage.
+This acts as a mechanism to allow mounts using provision to
+replicate the current behavior for fallocate() and only preserve
+space at the filesystem level.
 
 Signed-off-by: Sarthak Kukreti <sarthakkukreti@chromium.org>
 ---
- fs/ext4/ext4.h         |  2 ++
- fs/ext4/extents.c      | 15 ++++++++++++++-
- fs/ext4/indirect.c     |  9 +++++++++
- include/linux/blkdev.h | 11 +++++++++++
- 4 files changed, 36 insertions(+), 1 deletion(-)
+ fs/ext4/extents.c | 32 ++++++++++++++++++++++++++++++++
+ fs/ext4/xattr.h   |  1 +
+ 2 files changed, 33 insertions(+)
 
-diff --git a/fs/ext4/ext4.h b/fs/ext4/ext4.h
-index 140e1eb300d1..49832e90b62f 100644
---- a/fs/ext4/ext4.h
-+++ b/fs/ext4/ext4.h
-@@ -673,6 +673,8 @@ enum {
- #define EXT4_GET_BLOCKS_IO_SUBMIT		0x0400
- 	/* Caller is in the atomic contex, find extent if it has been cached */
- #define EXT4_GET_BLOCKS_CACHED_NOWAIT		0x0800
-+	/* Provision blocks on underlying storage */
-+#define EXT4_GET_BLOCKS_PROVISION		0x1000
- 
- /*
-  * The bit position of these flags must not overlap with any of the
 diff --git a/fs/ext4/extents.c b/fs/ext4/extents.c
-index 9de1c9d1a13d..2e64a9211792 100644
+index a73f44264fe2..9861115681b3 100644
 --- a/fs/ext4/extents.c
 +++ b/fs/ext4/extents.c
-@@ -4361,6 +4361,13 @@ int ext4_ext_map_blocks(handle_t *handle, struct inode *inode,
- 		}
- 	}
- 
-+	/* Attempt to provision blocks on underlying storage */
-+	if (flags & EXT4_GET_BLOCKS_PROVISION) {
-+		err = sb_issue_provision(inode->i_sb, pblk, ar.len, GFP_NOFS);
-+		if (err)
-+			goto out;
-+	}
-+
- 	/*
- 	 * Cache the extent and update transaction to commit on fdatasync only
- 	 * when it is _not_ an unwritten extent.
-@@ -4694,7 +4701,7 @@ long ext4_fallocate(struct file *file, int mode, loff_t offset, loff_t len)
- 	/* Return error if mode is not supported */
- 	if (mode & ~(FALLOC_FL_KEEP_SIZE | FALLOC_FL_PUNCH_HOLE |
- 		     FALLOC_FL_COLLAPSE_RANGE | FALLOC_FL_ZERO_RANGE |
--		     FALLOC_FL_INSERT_RANGE))
-+		     FALLOC_FL_INSERT_RANGE | FALLOC_FL_PROVISION))
- 		return -EOPNOTSUPP;
- 
- 	inode_lock(inode);
-@@ -4754,6 +4761,12 @@ long ext4_fallocate(struct file *file, int mode, loff_t offset, loff_t len)
- 	if (ret)
- 		goto out;
- 
-+	/* Ensure that preallocation provisions the blocks on the underlying
-+	 * storage device.
-+	 */
-+	if (mode & FALLOC_FL_PROVISION)
-+		flags |= EXT4_GET_BLOCKS_PROVISION;
-+
- 	ret = ext4_alloc_file_blocks(file, lblk, max_blocks, new_size, flags);
- 	if (ret)
- 		goto out;
-diff --git a/fs/ext4/indirect.c b/fs/ext4/indirect.c
-index c68bebe7ff4b..a8065aae7563 100644
---- a/fs/ext4/indirect.c
-+++ b/fs/ext4/indirect.c
-@@ -647,6 +647,15 @@ int ext4_ind_map_blocks(handle_t *handle, struct inode *inode,
- 	if (err)
- 		goto cleanup;
- 
-+	/* Attempt to provision blocks on underlying storage */
-+	if (flags & EXT4_GET_BLOCKS_PROVISION) {
-+		err = sb_issue_provision(inode->i_sb,
-+					 le32_to_cpu(chain[depth-1].key),
-+					 ar.len, GFP_NOFS);
-+		if (err)
-+			goto out;
-+	}
-+
- 	map->m_flags |= EXT4_MAP_NEW;
- 
- 	ext4_update_inode_fsync_trans(handle, inode, 1);
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index f1abc7b43e25..b2e3244e9f3d 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -1093,6 +1093,17 @@ static inline int sb_issue_zeroout(struct super_block *sb, sector_t block,
- 				    gfp_mask, 0);
+@@ -4428,6 +4428,26 @@ int ext4_ext_truncate(handle_t *handle, struct inode *inode)
+ 	return err;
  }
  
-+static inline int sb_issue_provision(struct super_block *sb, sector_t block,
-+		sector_t nr_blocks, gfp_t gfp_mask)
++static int ext4_file_provision_support(struct inode *inode)
 +{
-+	return blkdev_issue_provision(sb->s_bdev,
-+				      block << (sb->s_blocksize_bits -
-+					      SECTOR_SHIFT),
-+				      nr_blocks << (sb->s_blocksize_bits -
-+						    SECTOR_SHIFT),
-+				      gfp_mask);
++	char provision;
++	int ret =
++		ext4_xattr_get(inode, EXT4_XATTR_INDEX_TRUSTED,
++			       EXT4_XATTR_NAME_PROVISION_POLICY, &provision, 1);
++
++	if (ret < 0)
++		return ret;
++
++	switch (provision) {
++	case 'y':
++		return 1;
++	case 'n':
++		return 0;
++	default:
++		return -EINVAL;
++	}
 +}
 +
- static inline bool bdev_is_partition(struct block_device *bdev)
- {
- 	return bdev->bd_partno;
+ static int ext4_alloc_file_blocks(struct file *file, ext4_lblk_t offset,
+ 				  ext4_lblk_t len, loff_t new_size,
+ 				  int flags)
+@@ -4440,12 +4460,24 @@ static int ext4_alloc_file_blocks(struct file *file, ext4_lblk_t offset,
+ 	struct ext4_map_blocks map;
+ 	unsigned int credits;
+ 	loff_t epos;
++	bool provision = false;
++	int file_provision_override = -1;
+ 
+ 	/*
+ 	 * Attempt to provision file blocks if the mount is mounted with
+ 	 * provision.
+ 	 */
+ 	if (test_opt2(inode->i_sb, PROVISION))
++		provision = true;
++
++	/*
++	 * Use file-specific override, if available.
++	 */
++	file_provision_override = ext4_file_provision_support(inode);
++	if (file_provision_override >= 0)
++		provision &= file_provision_override;
++
++	if (provision)
+ 		flags |= EXT4_GET_BLOCKS_PROVISION;
+ 
+ 	BUG_ON(!ext4_test_inode_flag(inode, EXT4_INODE_EXTENTS));
+diff --git a/fs/ext4/xattr.h b/fs/ext4/xattr.h
+index 824faf0b15a8..69e97f853b0c 100644
+--- a/fs/ext4/xattr.h
++++ b/fs/ext4/xattr.h
+@@ -140,6 +140,7 @@ extern const struct xattr_handler ext4_xattr_security_handler;
+ extern const struct xattr_handler ext4_xattr_hurd_handler;
+ 
+ #define EXT4_XATTR_NAME_ENCRYPTION_CONTEXT "c"
++#define EXT4_XATTR_NAME_PROVISION_POLICY "provision"
+ 
+ /*
+  * The EXT4_STATE_NO_EXPAND is overloaded and used for two purposes.
 -- 
 2.37.3
 
