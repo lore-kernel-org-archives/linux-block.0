@@ -2,92 +2,66 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BA2C6C4332F
-	for <linux-block@archiver.kernel.org>; Thu, 29 Dec 2022 16:41:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 123A5C3DA79
+	for <linux-block@archiver.kernel.org>; Thu, 29 Dec 2022 18:13:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233125AbiL2Qlq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 29 Dec 2022 11:41:46 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34490 "EHLO
+        id S231378AbiL2SNl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 29 Dec 2022 13:13:41 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40642 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230284AbiL2Qlp (ORCPT
+        with ESMTP id S229831AbiL2SNk (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 29 Dec 2022 11:41:45 -0500
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F923A199
-        for <linux-block@vger.kernel.org>; Thu, 29 Dec 2022 08:41:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Content-Type:MIME-Version:Message-ID:
-        Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-        Content-Description:In-Reply-To:References;
-        bh=avvqaRN2SjmRVsthHLPqt7SLtudB6a3Mbu7hhPbcWa4=; b=Pxp1fPI/AhHcj4TxfDq7pndvvI
-        INS7Rf7Zp1jfwunXHxVj3BTp8rUHEezAvKBYrgwlDmTRUh0T/l/uzfX/z2xepuhy9cf3mEFpIKmt4
-        Ite1giYXeGxt+FnaIJFYj8t87sppi7M+NR9cH2m2CQex/6ns3cR3EhmvBfID+XXYfWYpBpivTP6DZ
-        CpgXdjMM931/hxbS3g1eO4bZlhSGtBW8s3i4eYpmjyQxtWxqu3cCzf+A5RW6NYXyMAso3aO2ORT54
-        X4+IH7MgKlm56aYicLj36DfcRUsRB0wg+xwaL6gb1LCdej/NOeDW7fgWDBDs661dRe79inkgX9rLo
-        2gtr+J3A==;
-Received: from rrcs-67-53-201-206.west.biz.rr.com ([67.53.201.206] helo=localhost)
-        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1pAvyM-00HaGJ-6u; Thu, 29 Dec 2022 16:41:38 +0000
-Date:   Thu, 29 Dec 2022 06:41:37 -1000
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
-Subject: [GIT PULL] nvme fixes for Linux 6.2
-Message-ID: <Y63DQSUSW4aQlVJ+@infradead.org>
+        Thu, 29 Dec 2022 13:13:40 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB05813CD3;
+        Thu, 29 Dec 2022 10:13:38 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 99AA4B81A26;
+        Thu, 29 Dec 2022 18:13:37 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 304B2C433D2;
+        Thu, 29 Dec 2022 18:13:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1672337616;
+        bh=usORqHciyFUalESiER55B7VFdgT4QAkx64KL27S0Gjs=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:From;
+        b=oOle2ajE2r1i8AIwwtR4Xcv8pq8zt1WzFElaAb9R+2zB2NMsYC3M2vMAT6LU19EvA
+         8GOb1NnBQEyGmafBrxNaPr5hQx8U0xGqwX5F3EwZEZnNkJpdetmeZ3ZVhf6LGJIY4r
+         PlrrngObTMT2ad4b2jxY5Jmh6WQKdiCWECga8eP6JukGyuG/ap+YTaOJtua0iMMdBk
+         z1oi6asC60n5CC4U+CfwSZF40Abl2Jpbl6uGYv3hNekZrZSb9FNIxQNqLuR1VGNOla
+         IYTuW/xMIXCmrF21qEijQODtXr9gGCGQrAavV9cbF3TD8Wt1IYtp7P32CNFEiG4uQ8
+         yyAb74VeWQudA==
+Date:   Thu, 29 Dec 2022 12:13:34 -0600
+From:   Bjorn Helgaas <helgaas@kernel.org>
+To:     Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Cc:     Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+        Yi Zhang <yi.zhang@redhat.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "mstowe@redhat.com" <mstowe@redhat.com>,
+        "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
+        Xiao Yang <yangx.jy@fujitsu.com>,
+        Keith Busch <kbusch@kernel.org>
+Subject: Re: blktests failures with v5.19-rc1
+Message-ID: <20221229181334.GA616694@bhelgaas>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20221219112703.rlqdo33ncgmuowfm@shindev>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The following changes since commit 88d356ca41ba1c3effc2d4208dfbd4392f58cd6d:
+On Mon, Dec 19, 2022 at 11:27:03AM +0000, Shinichiro Kawasaki wrote:
+> Bjorn, FYI. This lockdep warning disappeared with kernel version
+> v6.1. I bisected and found the commit 2d7f9f8c1815 ("kernfs: Improve
+> kernfs_drain() and always call on removal.") avoided the issue. This
+> commit touches kernfs_drain() and __kernfs_remove(), and modifies
+> the condition to lock kernfs_rwsem. I think it explains why the
+> lockdep disappeared. No longer need to work on this issue :)
 
-  nvme-pci: update sqsize when adjusting the queue depth (2022-12-26 12:10:51 -0700)
+Thanks for following up on this!
 
-are available in the Git repository at:
-
-  git://git.infradead.org/nvme.git tags/nvme-6.2-2022-12-29
-
-for you to fetch changes up to 76807fcd73b818eb9f245ef1035aed34ecdd9813:
-
-  nvme-auth: fix smatch warning complaints (2022-12-28 06:26:35 -1000)
-
-----------------------------------------------------------------
-nvme fixes for Linux 6.2
-
- - fix various problems in handling the Command Supported and Effects log
-   (Christoph Hellwig)
- - don't allow unprivileged passthrough of commands that don't transfer
-   data but modify logical block content (Christoph Hellwig)
- - add a features and quirks policy document (Christoph Hellwig)
- - fix some really nasty code that was correct but made smatch complain
-   (Sagi Grimberg)
-
-----------------------------------------------------------------
-Christoph Hellwig (7):
-      docs, nvme: add a feature and quirk policy document
-      nvme: fix the NVME_CMD_EFFECTS_CSE_MASK definition
-      nvmet: use NVME_CMD_EFFECTS_CSUPP instead of open coding it
-      nvmet: set the LBCC bit for commands that modify data
-      nvmet: don't defer passthrough commands with trivial effects to the workqueue
-      nvme: also return I/O command effects from nvme_command_effects
-      nvme: consult the CSE log page for unprivileged passthrough
-
-Sagi Grimberg (1):
-      nvme-auth: fix smatch warning complaints
-
- .../maintainer/maintainer-entry-profile.rst        |  1 +
- Documentation/nvme/feature-and-quirk-policy.rst    | 77 ++++++++++++++++++++++
- MAINTAINERS                                        |  1 +
- drivers/nvme/host/auth.c                           |  2 +-
- drivers/nvme/host/core.c                           | 32 +++++++--
- drivers/nvme/host/ioctl.c                          | 28 ++++++--
- drivers/nvme/target/admin-cmd.c                    | 37 ++++++-----
- drivers/nvme/target/passthru.c                     | 11 ++--
- include/linux/nvme.h                               |  4 +-
- 9 files changed, 159 insertions(+), 34 deletions(-)
- create mode 100644 Documentation/nvme/feature-and-quirk-policy.rst
+Bjorn
