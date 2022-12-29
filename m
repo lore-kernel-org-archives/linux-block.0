@@ -2,106 +2,92 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C87EC4332F
-	for <linux-block@archiver.kernel.org>; Thu, 29 Dec 2022 13:32:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BA2C6C4332F
+	for <linux-block@archiver.kernel.org>; Thu, 29 Dec 2022 16:41:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233409AbiL2Ncr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 29 Dec 2022 08:32:47 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51662 "EHLO
+        id S233125AbiL2Qlq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 29 Dec 2022 11:41:46 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34490 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233302AbiL2NcU (ORCPT
+        with ESMTP id S230284AbiL2Qlp (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 29 Dec 2022 08:32:20 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3DA56240
-        for <linux-block@vger.kernel.org>; Thu, 29 Dec 2022 05:31:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1672320694;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=1D/AekxKLpAcu+bYl7a0bmZjxWv5ZDkXjJgeYIo+ziA=;
-        b=A8FCwENg4lfwHjerPdCCN7PAHQml/Go7Oii6d5xcYY+9DzUP+IAtnQ94WVdFV0xMD6a5uL
-        rBOnEj/yz3oYNOUuaW7f2SBk5510Hhl0L0NdClSNGpHkWimNZ/4HeYXxQ/3zy6CExrBEK4
-        uH9JMIZdUPkFe00CWiTtmlgOq99pVrg=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-643-LCUTScvNOsCTsEZWZDZswA-1; Thu, 29 Dec 2022 08:31:32 -0500
-X-MC-Unique: LCUTScvNOsCTsEZWZDZswA-1
-Received: by mail-wm1-f70.google.com with SMTP id m38-20020a05600c3b2600b003d1fc5f1f80so12668819wms.1
-        for <linux-block@vger.kernel.org>; Thu, 29 Dec 2022 05:31:32 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1D/AekxKLpAcu+bYl7a0bmZjxWv5ZDkXjJgeYIo+ziA=;
-        b=z5niHOfcpVJRinC/m0xzHQEthIwDwVQsf1FHo5oJJD1Qcl9Gk9xksfiUkYzFiKhV1h
-         2e2Pzy2CHPdc3NvuB3aykrNjDfS45HH6Bcjb4T3I3QnqwngOia9rov3hgtIU7knFmQ3o
-         IEYerYZGOjp6uyyOhcndxlq4DqMjpfdVyR+/LGqcvD5EFQbAb9RHgC4kNGeGMRAtliGT
-         Drf2cEG3HGdg+cvN9xlq2DVzEOECDXZOI6oYhlCKitJF+IWrsSo+HUVrUx4/Tv5l6WhZ
-         zsLP8BZ3+p8zmh8742iIKqVAEaTyr8wNR+mgHOsMzGP/HqAS9ak80MR7S3R5LQgeqKZF
-         qtYg==
-X-Gm-Message-State: AFqh2kqHFtitX1zZlznRpxbSBZbqlGJdOVlKXTofkauMkYJ5UtFwEsfD
-        oD7Jabho1cezEEeFQOUIHX2o90KHmZEcHrn5zB3kB2P0765Zn1e+23tgBH7eCoFjjVHChWuA7cA
-        tQ3oF18r7fL72nLlWf6pfOlc=
-X-Received: by 2002:adf:e409:0:b0:242:45e7:db17 with SMTP id g9-20020adfe409000000b0024245e7db17mr16250526wrm.66.1672320691716;
-        Thu, 29 Dec 2022 05:31:31 -0800 (PST)
-X-Google-Smtp-Source: AMrXdXsWnvN6QyVN1zTOnSfNKEdIudugUP7fkbiKn5gbdcdRZxKN6fb0RQ8JfBa58bamIqgqaTnuhg==
-X-Received: by 2002:adf:e409:0:b0:242:45e7:db17 with SMTP id g9-20020adfe409000000b0024245e7db17mr16250519wrm.66.1672320691497;
-        Thu, 29 Dec 2022 05:31:31 -0800 (PST)
-Received: from redhat.com ([2.52.151.85])
-        by smtp.gmail.com with ESMTPSA id c17-20020adffb51000000b0027cb20605e3sm10757933wrs.105.2022.12.29.05.31.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 Dec 2022 05:31:30 -0800 (PST)
-Date:   Thu, 29 Dec 2022 08:31:26 -0500
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Alvaro Karsz <alvaro.karsz@solid-run.com>
-Cc:     virtualization@lists.linux-foundation.org,
-        linux-block@vger.kernel.org, Stefan Hajnoczi <stefanha@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jens Axboe <axboe@kernel.dk>
-Subject: Re: [PATCH v5] virtio_blk: add VIRTIO_BLK_F_LIFETIME feature support
-Message-ID: <20221229082943-mutt-send-email-mst@kernel.org>
-References: <20221219122155.333099-1-alvaro.karsz@solid-run.com>
- <20221229030850-mutt-send-email-mst@kernel.org>
- <CAJs=3_ApAnMTC0O81vO=hvRLssLYRnJsVUE5gd_aomCB+5eWLQ@mail.gmail.com>
+        Thu, 29 Dec 2022 11:41:45 -0500
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F923A199
+        for <linux-block@vger.kernel.org>; Thu, 29 Dec 2022 08:41:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Content-Type:MIME-Version:Message-ID:
+        Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+        Content-Description:In-Reply-To:References;
+        bh=avvqaRN2SjmRVsthHLPqt7SLtudB6a3Mbu7hhPbcWa4=; b=Pxp1fPI/AhHcj4TxfDq7pndvvI
+        INS7Rf7Zp1jfwunXHxVj3BTp8rUHEezAvKBYrgwlDmTRUh0T/l/uzfX/z2xepuhy9cf3mEFpIKmt4
+        Ite1giYXeGxt+FnaIJFYj8t87sppi7M+NR9cH2m2CQex/6ns3cR3EhmvBfID+XXYfWYpBpivTP6DZ
+        CpgXdjMM931/hxbS3g1eO4bZlhSGtBW8s3i4eYpmjyQxtWxqu3cCzf+A5RW6NYXyMAso3aO2ORT54
+        X4+IH7MgKlm56aYicLj36DfcRUsRB0wg+xwaL6gb1LCdej/NOeDW7fgWDBDs661dRe79inkgX9rLo
+        2gtr+J3A==;
+Received: from rrcs-67-53-201-206.west.biz.rr.com ([67.53.201.206] helo=localhost)
+        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1pAvyM-00HaGJ-6u; Thu, 29 Dec 2022 16:41:38 +0000
+Date:   Thu, 29 Dec 2022 06:41:37 -1000
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
+Subject: [GIT PULL] nvme fixes for Linux 6.2
+Message-ID: <Y63DQSUSW4aQlVJ+@infradead.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAJs=3_ApAnMTC0O81vO=hvRLssLYRnJsVUE5gd_aomCB+5eWLQ@mail.gmail.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Dec 29, 2022 at 02:08:34PM +0200, Alvaro Karsz wrote:
-> > So due to my mistake this got pushed out to next linux release.
-> > Sorry :(
-> 
-> No problem at all :)
-> 
-> > I'd like to use this opportunity to write a new better
-> > interface that actually works with modern backends,
-> > and add it to the virtio spec.
-> >
-> > Do you think you can take up this task?
-> 
-> Sure, I can do it.
-> So, the idea is to:
-> 
-> * Drop this patch
-> * Implement a new, more general virtio block feature for virtio spec
-> * Add linux support for the new feature
-> 
-> right?
+The following changes since commit 88d356ca41ba1c3effc2d4208dfbd4392f58cd6d:
 
-That's certainly an option.
-Let's start with point 2, and get ack from people who objected to this
-feature.
+  nvme-pci: update sqsize when adjusting the queue depth (2022-12-26 12:10:51 -0700)
 
+are available in the Git repository at:
 
--- 
-MST
+  git://git.infradead.org/nvme.git tags/nvme-6.2-2022-12-29
 
+for you to fetch changes up to 76807fcd73b818eb9f245ef1035aed34ecdd9813:
+
+  nvme-auth: fix smatch warning complaints (2022-12-28 06:26:35 -1000)
+
+----------------------------------------------------------------
+nvme fixes for Linux 6.2
+
+ - fix various problems in handling the Command Supported and Effects log
+   (Christoph Hellwig)
+ - don't allow unprivileged passthrough of commands that don't transfer
+   data but modify logical block content (Christoph Hellwig)
+ - add a features and quirks policy document (Christoph Hellwig)
+ - fix some really nasty code that was correct but made smatch complain
+   (Sagi Grimberg)
+
+----------------------------------------------------------------
+Christoph Hellwig (7):
+      docs, nvme: add a feature and quirk policy document
+      nvme: fix the NVME_CMD_EFFECTS_CSE_MASK definition
+      nvmet: use NVME_CMD_EFFECTS_CSUPP instead of open coding it
+      nvmet: set the LBCC bit for commands that modify data
+      nvmet: don't defer passthrough commands with trivial effects to the workqueue
+      nvme: also return I/O command effects from nvme_command_effects
+      nvme: consult the CSE log page for unprivileged passthrough
+
+Sagi Grimberg (1):
+      nvme-auth: fix smatch warning complaints
+
+ .../maintainer/maintainer-entry-profile.rst        |  1 +
+ Documentation/nvme/feature-and-quirk-policy.rst    | 77 ++++++++++++++++++++++
+ MAINTAINERS                                        |  1 +
+ drivers/nvme/host/auth.c                           |  2 +-
+ drivers/nvme/host/core.c                           | 32 +++++++--
+ drivers/nvme/host/ioctl.c                          | 28 ++++++--
+ drivers/nvme/target/admin-cmd.c                    | 37 ++++++-----
+ drivers/nvme/target/passthru.c                     | 11 ++--
+ include/linux/nvme.h                               |  4 +-
+ 9 files changed, 159 insertions(+), 34 deletions(-)
+ create mode 100644 Documentation/nvme/feature-and-quirk-policy.rst
