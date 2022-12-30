@@ -2,191 +2,110 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A930C46467
-	for <linux-block@archiver.kernel.org>; Fri, 30 Dec 2022 14:47:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4BDDC46467
+	for <linux-block@archiver.kernel.org>; Fri, 30 Dec 2022 15:36:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234743AbiL3OrO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 30 Dec 2022 09:47:14 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36550 "EHLO
+        id S235157AbiL3Pf7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 30 Dec 2022 10:35:59 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48704 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235034AbiL3OrL (ORCPT
+        with ESMTP id S234879AbiL3Pf5 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 30 Dec 2022 09:47:11 -0500
-Received: from esa3.hgst.iphmx.com (esa3.hgst.iphmx.com [216.71.153.141])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94ED6B84D;
-        Fri, 30 Dec 2022 06:47:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1672411629; x=1703947629;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=RiKLiylsxlH/sIeE51TOULk85mXdeguPXPl44rkRiDg=;
-  b=Wo6+CPO311EfPxL0l1R4TJb50ynfZqx/h41oGCQvOZsQX+hXYQ0NpkVm
-   COGbfMcp2YhCwDNgkkAA7wCwvp7rnywrKuFYRAZCxUxnq08btYSZo48zJ
-   1HKYPLiQ0PUrfpyH2xPyF4iRbVq0PU2p/kz2SViMOOKX15AFT7qJ/odf/
-   rq68hbYSmDFaXW1W5oTydYpfAZ0jdlVN2Ak6OAT8LtNjW0HhjwJbhOXVz
-   mFFQbjW15cHfnhULZ5fCR85FcqH63mkC+6N7MUWkGFsvVZlCp2ZuA5Zkq
-   DxfGIJIfsh3Lra74nf+MH6THXVufZv6vaa/Ku3+ow9gl1QIXuLfLk2ltr
-   g==;
-X-IronPort-AV: E=Sophos;i="5.96,287,1665417600"; 
-   d="scan'208";a="224818448"
-Received: from mail-mw2nam12lp2046.outbound.protection.outlook.com (HELO NAM12-MW2-obe.outbound.protection.outlook.com) ([104.47.66.46])
-  by ob1.hgst.iphmx.com with ESMTP; 30 Dec 2022 22:47:08 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=iJqgvXMg/zXifUHjC6Krkxygvuagc2m6trMq/j+8fGDjCl6mtmFJ7A/fQ95i4KJK2n8tlO52HSM7vKky7t6ycud84QSRnWT3Ejc1eb1IuhhJnz0bow2b5nVoVeesuurHHqC5evIGGBju5OE5591RM2nHDdwytZtCz9TgmDOKnyYUCbww9eXeRn8lHkkL188qp9bRL2pu5pkhl44HAQnoLPbiOYfpw462d7VdyEBVUciGNZ/UjGsobIKOcWQ7SvttaqQq0IphppoHWSjJSowk+wXVajnly13/2q83LE5IQPldb0imPxGtnVJMjVs3tpP2NIQQa9UHT4Xkr73u0n773w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=4RKDUEZ4v2nfTobd5oGgWqkUCiQ/sTRkvNxTNtXSMGo=;
- b=iyV21/p4xR8NrgEzErDnWi1Ntoy0IqH4+gWHgj1Sixszc/iI8l0Wh0eLlZghBJyEnmZEAbRgQS4gYrEYj2N20I/ws2ZXXuz7RGEgMj+60B3RBJ4coam18ELDpwg5g40TwTG8XDc5TQS5GonrxrvDIHp7x5q0iwB5kFp+EdhJJIqO07+cQSAmzDLhzasMqacZ7ZgrN/pqTUK0F8d8GjnJcMZHKTScOGfjrwajNufU5JfRQGTUoWOyqMd34YvWon2AR6Gl8XZHtSZMkUEH5beNOMeAqZoWD0lKx12+bdw1T2Syou2x5FQIgYmqVxOJ6o7c4Havxv9mJnbL9txggnAEbQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=4RKDUEZ4v2nfTobd5oGgWqkUCiQ/sTRkvNxTNtXSMGo=;
- b=DiEyqc/jjCEnZ3uW0a+ukwXf0BPOTAvH/GjxeOZwNqIC0VR00IyK9y4wHw7rK7HiDZ2Ow2lFzMHLX2FgK1rtIZTYpyN0TfpWP1umBrvMi1N2LePwD5bfGNrt+jh6VyyyIp632nYUJhZ5a4zz49Q4cep9hkG+3RsBpsrVj3DDbSY=
-Received: from MN2PR04MB6272.namprd04.prod.outlook.com (2603:10b6:208:e0::27)
- by BL0PR04MB4516.namprd04.prod.outlook.com (2603:10b6:208:41::23) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5944.16; Fri, 30 Dec
- 2022 14:47:05 +0000
-Received: from MN2PR04MB6272.namprd04.prod.outlook.com
- ([fe80::a65a:f2ad:4c7b:3164]) by MN2PR04MB6272.namprd04.prod.outlook.com
- ([fe80::a65a:f2ad:4c7b:3164%4]) with mapi id 15.20.5944.016; Fri, 30 Dec 2022
- 14:47:05 +0000
-From:   Niklas Cassel <Niklas.Cassel@wdc.com>
-To:     Damien Le Moal <damien.lemoal@opensource.wdc.com>
-CC:     "linux-ide@vger.kernel.org" <linux-ide@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Hannes Reinecke <hare@suse.de>, Christoph Hellwig <hch@lst.de>
-Subject: Re: [PATCH v6 7/7] ata: libata: Enable fua support by default
-Thread-Topic: [PATCH v6 7/7] ata: libata: Enable fua support by default
-Thread-Index: AQHZHF2Uq7+4wKWoQkiyzEvhMhy44g==
-Date:   Fri, 30 Dec 2022 14:47:05 +0000
-Message-ID: <Y675506TD2FsrFmu@x1-carbon>
-References: <20221108055544.1481583-1-damien.lemoal@opensource.wdc.com>
- <20221108055544.1481583-8-damien.lemoal@opensource.wdc.com>
-In-Reply-To: <20221108055544.1481583-8-damien.lemoal@opensource.wdc.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=wdc.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: MN2PR04MB6272:EE_|BL0PR04MB4516:EE_
-x-ms-office365-filtering-correlation-id: 9a31fc44-e580-4714-e4cd-08daea74b813
-wdcipoutbound: EOP-TRUE
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: qX0NSGL6FLMeQ+i5p4lYABxqyLgkOgWoPqAAGI08L0DiBRGoV5PQDuAhuicOe+NEVB+YajB3zSqkcCLSCyrp9B8kiAYUMsVJiEdrt7LV3I+v3X8eIqZhfTwQj5UQf8BqM0YVZhzePDSViQOdgiWO+oOO0Hzyf0qpTP85RtrllMOBXh87nV6EbN7kD/8ektzvBSnARll/mq37YPhFHHPeukRtK5vCAd0euKF7PokeKhWJGtC4hXdhPAf5fGyH1sfzCrICMJEwtQbqoK9+fD5mg8ODT4OXi5sUfW+12jubFo2IcYhyvt7Kh3pIx3OSLfl/bwpUJ+wHzMw/sKOwMZ5Z0K3xoLPzlD0yO2EIeE74q2TW3iDxPyILiqGHqpjkRKOvaKP1J9BnlhXqFa4ISZSYWfOvIJ2BKPAzQvu9i5BIMcXfM04ff17d9gf8QZxt3+tMFJzc96Xw/1IaQ73tX0jtClJ6qt9awdFfmFwUqYojCaZqn5B7qTO+YHAH4norpCIPzG8LwcZOqPf6BcarnUQ+VVNRg7SsYcW3Te95lUZETkA9Eybrztd3teBtXZ+FPr0ZP1BPAHCIhT91SKX9S8u+lPl9DyehT5TttNNoTcJoKBVzbzqmvsquxVPBjBidpUYDRy6rrOA8NsI80oPwA8O74TM818EluVo9TfrThPDsdc+nWmOJtqwyCxc+xLX2cwLBH/tQpYjx53tDPCkFnlZ6ag==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR04MB6272.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(7916004)(4636009)(366004)(396003)(376002)(136003)(39860400002)(346002)(451199015)(64756008)(66946007)(5660300002)(66446008)(76116006)(6512007)(4326008)(91956017)(66556008)(66476007)(8676002)(41300700001)(8936002)(9686003)(6862004)(26005)(186003)(2906002)(54906003)(478600001)(6486002)(71200400001)(316002)(86362001)(38070700005)(33716001)(6506007)(122000001)(38100700002)(83380400001)(82960400001);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?05vkyh3qT3zJekBQBAFa+TdNeayLI30uCu0JEVVljD0IQvwsWPXVJXG8oxKK?=
- =?us-ascii?Q?We5raCgILxuh+vGPlFA6p6N85We/uKvpROHGkUYxF5DhmDL+LB44x0rfsNZw?=
- =?us-ascii?Q?soM8qvfuCJMVioTkmSjw5ZxA2EiDxedyS9xz6Gc43vO6p/VKZ4HlPi/FQ6Re?=
- =?us-ascii?Q?sJERcrMxtOjOmLy+akRxFXrwCs9ortcTBl1/bJEsf3ZaDd6UakRWGozYTr06?=
- =?us-ascii?Q?jPPkks/Dby4rdu+j/S8iXNjXxRcqx3LqMBdyuSy/qMfP7ZNuIntU7sNcS60z?=
- =?us-ascii?Q?w8b8jxIYvbQ3PJ3kbpVH4jQfLr4XHSGOlS/MXNbrpJWtF+pwV+w5bi/4SKNE?=
- =?us-ascii?Q?PUcyn3xmyevMnjHnmtUChSZ3YnaHJlZwDB3Lm2xVlwhvTtvsdnt7W5o1ntEp?=
- =?us-ascii?Q?AFCUw/5jXaAG5b8f4E/niM5+rEGlv6Fc+S26Ldv1Z8toD8S9ciy40t+1bJ8D?=
- =?us-ascii?Q?veYI+sVcFOYFhbZSJ+sdrp2hY6dOVBsGN21E4wfSrQyuqwq58+ahBd7YaN6S?=
- =?us-ascii?Q?i4Iz4IOSX/prL83+EUgNV/O41LKdV32YEaFath8AVbu7N0UIOSrtj8xQ5BQc?=
- =?us-ascii?Q?nrJy50m7kssC6Av4hdKb3xzmj5lDwvJi3TOdal1mkwheRLsU0s6KzIpkYbjm?=
- =?us-ascii?Q?I7ko99XZYHm1yyRz1bA0aqjTRBg141/CGEhjC3rx4+LzIrUW5GiUhPZ8b77V?=
- =?us-ascii?Q?d9EY2Ju3mzsLbOJLhhcPdy/lu4hHRVDudpWwPTQ2kidtHBJi6rvKJK90Subo?=
- =?us-ascii?Q?6CrA/uazaNiFEsDJOBLgL/3Zpaqdz3yKaHoYHhLFMzX4UUfTVSKH/gfRfAQX?=
- =?us-ascii?Q?Mj812/AbAC2ZAmSeoj2oT4Sf5uTIwjtotbFB+yxSAxs1Lzbk1NqDZnSLTWEU?=
- =?us-ascii?Q?5vW3es1NdI1e6Lfu+6lu4e7+0LU1Sbe9me3f8QxFNy+NV6g2f9rI4NRendq6?=
- =?us-ascii?Q?AqHhsyubvrRiQADsyA/WUnJNX3Uz+If65mhfZBT9xwFbiYZRg/6gxzn2kvN+?=
- =?us-ascii?Q?x1ctAHBzkotCjcewhlIUspn/+8FOedYSxe2ZKw1pp8M44rNgdZ/Pvg7zjHhT?=
- =?us-ascii?Q?EQAKjYmmL95k87X5DBnn9fY7r/O68N04TCwTCIRVt3mCOCpF3ILCF7mwaCeD?=
- =?us-ascii?Q?cTs+cvkp/zV8UVFMc2tnloyQxxCBMoiJT2dEZtL+tNRe3gAQ4QD7+c9F7PYz?=
- =?us-ascii?Q?LF1/4FK4lVXBMGUBbgJ17l7qfyT5+ysiRZlJWmKRIHRysiBZDbHbqtnQvbKB?=
- =?us-ascii?Q?6C4Y4w0eMKlZ6yjsQ6hrj6I9Q6I23OdqPMQTAI/0qVrzaLxaApXLQtPHJIEV?=
- =?us-ascii?Q?eg1Y4TaqCTQh3Je6w2To6n735fyIyiem83zmE8H/LAzhKMMuIRodAbsVn37Q?=
- =?us-ascii?Q?FTtUhUP7wDfYKRYwKbcV7it1NBM3Lmz7E/cfcYbscqzjB0tlQ2hp2QRQAGH5?=
- =?us-ascii?Q?L83J3LMy9kv4I8Ax/L2Hqtn7dP0ERnJceXE/T4rcjmVlyP6bxTHNPnsXDjkc?=
- =?us-ascii?Q?4rxlO3qcOsYLXsGzvzO8SNKg7liC9brMRdyi0Sa0cWUnKd3CaOSHj7AZJ2Oz?=
- =?us-ascii?Q?PJ4yxS86gSP9zKIOiQeGtX4eS1nr614Tn3asXdefwYn6dT8Es24k76SyskKE?=
- =?us-ascii?Q?Mw=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <D9DE57962CCAF84C912DE5D9C2C5CB0A@namprd04.prod.outlook.com>
-Content-Transfer-Encoding: quoted-printable
+        Fri, 30 Dec 2022 10:35:57 -0500
+Received: from smtp.tiscali.it (santino-notr.mail.tiscali.it [213.205.33.215])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 22D90B03
+        for <linux-block@vger.kernel.org>; Fri, 30 Dec 2022 07:35:55 -0800 (PST)
+Received: from [192.168.178.50] ([87.2.89.108])
+        by santino.mail.tiscali.it with 
+        id 2fbs2900G2LFcqX01fbs16; Fri, 30 Dec 2022 15:35:53 +0000
+x-auth-user: fantonifabio@tiscali.it
+Message-ID: <19375d92-e9a0-ae11-4e3c-f24f032922b4@tiscali.it>
+Date:   Fri, 30 Dec 2022 16:35:49 +0100
 MIME-Version: 1.0
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: MN2PR04MB6272.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9a31fc44-e580-4714-e4cd-08daea74b813
-X-MS-Exchange-CrossTenant-originalarrivaltime: 30 Dec 2022 14:47:05.1451
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: Zc5QdGqBovABtpQ3PSwThCE0TWKOAH/0fwVxX3mWroLvecGUSbu/KVGnzWwDrh7nwTI7rBpr+W7WyOQC8eum3w==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL0PR04MB4516
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.6.1
+Reply-To: fantonifabio@tiscali.it
+Subject: Re: [PATCH v2 03/21] documentation, capability: fix Generic Block
+ Device Capability
+From:   Fabio Fantoni <fantonifabio@tiscali.it>
+To:     Sergei Shtepa <sergei.shtepa@veeam.com>, axboe@kernel.dk,
+        corbet@lwn.net, hch@lst.de
+Cc:     linux-block@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20221209142331.26395-1-sergei.shtepa@veeam.com>
+ <20221209142331.26395-4-sergei.shtepa@veeam.com>
+ <e42dd6c7-6365-75be-0fcd-3329b8f8ba35@tiscali.it>
+In-Reply-To: <e42dd6c7-6365-75be-0fcd-3329b8f8ba35@tiscali.it>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Antivirus: Avast (VPS 221230-0, 30/12/2022), Outbound message
+X-Antivirus-Status: Clean
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tiscali.it; s=smtp;
+        t=1672414553; bh=UFIXQlWkz3kvqXadUrHh4OwE5XvC6aIIfAyzCHk6uMk=;
+        h=Date:Reply-To:Subject:From:To:Cc:References:In-Reply-To;
+        b=sJSyXdfb7WjQ4Nhf2fTM9cZJ+goFvLhyia36jbt6x5XM1jP9/LUQ9sFWT051qFotu
+         MrzJvlcuZ/RM1mQwjTXJ0Mh2TcZ+pQJObUNXkFgpm5aW8DHNw/MQj2Og2w/v0yYV5r
+         qoYAyHlHAU+8B7F8unHRXzuMwAdmyg5Tkeb8OsXc=
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Nov 08, 2022 at 02:55:44PM +0900, Damien Le Moal wrote:
-> Change the default value of the fua module parameter to 1 to enable fua
-> support by default for all devices supporting it.
+Il 13/12/2022 13:13, Fabio Fantoni ha scritto:
+> Il 09/12/2022 15:23, Sergei Shtepa ha scritto:
+>> When adding documentation for blkfilter, new lines of documentation
+>> appeared in the file include/linux/blkdev.h. To preserve the appearance
+>> of this document, the required sections and function descriptions were
+>> explicitly specified.
+>>
+>> Signed-off-by: Sergei Shtepa <sergei.shtepa@veeam.com>
+>> ---
+>>   Documentation/block/capability.rst | 3 +++
+>>   1 file changed, 3 insertions(+)
+>>
+>> diff --git a/Documentation/block/capability.rst 
+>> b/Documentation/block/capability.rst
+>> index 2ae7f064736a..8fad791980bb 100644
+>> --- a/Documentation/block/capability.rst
+>> +++ b/Documentation/block/capability.rst
+>> @@ -8,3 +8,6 @@ This file documents the sysfs file 
+>> ``block/<disk>/capability``.
+>>   capabilities a specific block device supports:
+>>     .. kernel-doc:: include/linux/blkdev.h
+>> +    :DOC: genhd capability flags
+>> +.. kernel-doc:: include/linux/blkdev.h
+>> +    :functions: disk_openers blk_alloc_disk bio_end_io_acct
+> Thanks for spotting this, I think this is not related to blkfilter 
+> patch but was already wrong/broken before and should be posted in a 
+> single patch out of the blksnap serie (also fixing title, as reported 
+> by Bagas Sanjaya, like "documentation: fix Generic Block Device 
+> Capability")
+>
+> from a fast look seems to me should have only:
+>
+> +    :DOC: genhd capability flags
+>
+> and out of that looking older version of doc 
+> (https://www.kernel.org/doc/html/v5.10/block/capability.html) seems to 
+> me that this DOC in blkdev.h need improvement as it seems to me it was 
+> better in the past, for example also reporting the corresponding 
+> hexadecimal value in parentheses
 
-Perhaps add the following to the commit message:
+Hi, after a fast look to the git history the "genhd capability flags" 
+DOC was changed in commit 430cc5d3ab4d0ba0bd011cfbb0035e46ba92920c 
+(block: cleanup the GENHD_FL_* definitions) as part of 
+https://lore.kernel.org/all/20211122130625.1136848-1-hch@lst.de/ and 
+after that in Documentation/block/capability.rst is not possible 
+"decode" /sys/block/<disk>/capability reading it 
+(https://www.kernel.org/doc/html/v6.1/block/capability.html) without 
+having to read also include/linux/blkdev.h code, or I'm wrong?
 
-With this change, ata_dev_config_fua() will now set the flag
-ATA_DFLAG_FUA by default for devices that support FUA.
+is correct readd the hexadecimal value from bitfield?
 
-This will cause ata_scsiop_mode_sense() to set the DPOFUA bit in
-the DEVICE-SPECIFIC PARAMETER field in the mode parameter header.
+GENHD_FL_REMOVABLE (0x01): ...
 
-The SCSI disk driver performs a MODE SENSE and looks at the
-DPOFUA bit, it then calls blk_queue_write_cache() with the
-value of the DPOFUA bit, to inform the the block layer if FUA
-is supported or not.
+GENHD_FL_HIDDEN (0x02): ...
 
-The block layer will not issue REQ_FUA requests if it hasn't
-been informed that the lower levels actually support FUA.
+GENHD_FL_NO_PART (0x04): ...
 
->=20
-> FUA support can be disabled for individual drives using the
-> force=3D[ID]nofua libata module argument.
->=20
-> Signed-off-by: Damien Le Moal <damien.lemoal@opensource.wdc.com>
-> Reviewed-by: Hannes Reinecke <hare@suse.de>
-> Reviewed-by: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
-> Reviewed-by: Chaitanya Kulkarni <kch@nvidia.com>
-> ---
->  drivers/ata/libata-core.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->=20
-> diff --git a/drivers/ata/libata-core.c b/drivers/ata/libata-core.c
-> index 97ade977b830..2967671131d2 100644
-> --- a/drivers/ata/libata-core.c
-> +++ b/drivers/ata/libata-core.c
-> @@ -127,9 +127,9 @@ int atapi_passthru16 =3D 1;
->  module_param(atapi_passthru16, int, 0444);
->  MODULE_PARM_DESC(atapi_passthru16, "Enable ATA_16 passthru for ATAPI dev=
-ices (0=3Doff, 1=3Don [default])");
-> =20
-> -int libata_fua =3D 0;
-> +int libata_fua =3D 1;
->  module_param_named(fua, libata_fua, int, 0444);
-> -MODULE_PARM_DESC(fua, "FUA support (0=3Doff [default], 1=3Don)");
-> +MODULE_PARM_DESC(fua, "FUA support (0=3Doff, 1=3Don [default])");
-> =20
->  static int ata_ignore_hpa;
->  module_param_named(ignore_hpa, ata_ignore_hpa, int, 0644);
-> --=20
-> 2.38.1
->=20
+Thanks for any reply and sorry for my bad english
 
-With a less spartan commit message:
-Reviewed-by: Niklas Cassel <niklas.cassel@wdc.com>=
