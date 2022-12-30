@@ -2,229 +2,210 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B115C4167B
-	for <linux-block@archiver.kernel.org>; Fri, 30 Dec 2022 10:37:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33110C4708E
+	for <linux-block@archiver.kernel.org>; Fri, 30 Dec 2022 10:54:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234844AbiL3KhU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 30 Dec 2022 05:37:20 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54868 "EHLO
+        id S231130AbiL3Kyn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 30 Dec 2022 05:54:43 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57072 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234572AbiL3KhT (ORCPT
+        with ESMTP id S229924AbiL3Kym (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 30 Dec 2022 05:37:19 -0500
-Received: from mailout1.w1.samsung.com (mailout1.w1.samsung.com [210.118.77.11])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3A581A05B
-        for <linux-block@vger.kernel.org>; Fri, 30 Dec 2022 02:37:17 -0800 (PST)
-Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
-        by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20221230103715euoutp01fe24be84fcb161909f3b5f2c88d51a13~1i_Exn4vC3186931869euoutp01H;
-        Fri, 30 Dec 2022 10:37:15 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20221230103715euoutp01fe24be84fcb161909f3b5f2c88d51a13~1i_Exn4vC3186931869euoutp01H
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1672396635;
-        bh=1H+EV5lkQbYxu7KyBZt4GEgMuiuP6Q4aipWj4ZQVioM=;
-        h=Date:From:To:CC:Subject:In-Reply-To:References:From;
-        b=S3Rzx+N65JRKhEqXmq0YFmWtEL0fRUWkDCQiWsG6zVNGMUdw4YTG4vWVS46q6oDF9
-         ALXM+t1qDCW1r0/o0guKBuyrk+AgaQGHMrSHTFN5c45X+ogxr8cBhZeQb/Mk5DSvG2
-         k+9SVaORiNt7fDFDnSTSofwwtT3maN2EdbgkVCQA=
-Received: from eusmges2new.samsung.com (unknown [203.254.199.244]) by
-        eucas1p2.samsung.com (KnoxPortal) with ESMTP id
-        20221230103715eucas1p2a0c1433197182ea848dc3265a721cd02~1i_EnMuYP2967629676eucas1p2m;
-        Fri, 30 Dec 2022 10:37:15 +0000 (GMT)
-Received: from eucas1p2.samsung.com ( [182.198.249.207]) by
-        eusmges2new.samsung.com (EUCPMTA) with SMTP id AB.32.61936.B5FBEA36; Fri, 30
-        Dec 2022 10:37:15 +0000 (GMT)
-Received: from eusmtrp2.samsung.com (unknown [182.198.249.139]) by
-        eucas1p2.samsung.com (KnoxPortal) with ESMTPA id
-        20221230103715eucas1p21212a9024a28e81961ae5c0caf769df2~1i_EO1GGP2746927469eucas1p27;
-        Fri, 30 Dec 2022 10:37:15 +0000 (GMT)
-Received: from eusmgms2.samsung.com (unknown [182.198.249.180]) by
-        eusmtrp2.samsung.com (KnoxPortal) with ESMTP id
-        20221230103715eusmtrp2a80f004258d9f0292734ff377c999f7a~1i_EOSRks1362313623eusmtrp2g;
-        Fri, 30 Dec 2022 10:37:15 +0000 (GMT)
-X-AuditID: cbfec7f4-a2dff7000002f1f0-84-63aebf5b4cd5
-Received: from eusmtip1.samsung.com ( [203.254.199.221]) by
-        eusmgms2.samsung.com (EUCPMTA) with SMTP id 93.E7.52424.B5FBEA36; Fri, 30
-        Dec 2022 10:37:15 +0000 (GMT)
-Received: from CAMSVWEXC01.scsc.local (unknown [106.1.227.71]) by
-        eusmtip1.samsung.com (KnoxPortal) with ESMTPA id
-        20221230103715eusmtip10e215f0227f5b004a1b9f2a10bfdd224~1i_EDl00L0095400954eusmtip15;
-        Fri, 30 Dec 2022 10:37:15 +0000 (GMT)
-Received: from localhost (106.210.248.83) by CAMSVWEXC01.scsc.local
-        (2002:6a01:e347::6a01:e347) with Microsoft SMTP Server (TLS) id 15.0.1497.2;
-        Fri, 30 Dec 2022 10:37:14 +0000
-Date:   Fri, 30 Dec 2022 11:37:13 +0100
-From:   Joel Granados <j.granados@samsung.com>
-To:     Luis Chamberlain <mcgrof@kernel.org>
-CC:     <osandov@fb.com>, <joshi.k@samsung.com>, <anuj20.g@samsung.com>,
-        <ankit.kumar@samsung.com>, <vincent.fu@samsung.com>,
-        <ming.lei@redhat.com>, <linux-block@vger.kernel.org>
-Subject: Re: [PATCH 2/6] tests/nvme: add new test for rand-read on the nvme
- character device
-Message-ID: <20221230103713.sf7y77ds77473rl3@localhost>
+        Fri, 30 Dec 2022 05:54:42 -0500
+Received: from esa5.hgst.iphmx.com (esa5.hgst.iphmx.com [216.71.153.144])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1A401A390;
+        Fri, 30 Dec 2022 02:54:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1672397680; x=1703933680;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=LqjZTqEarypCyTq4LzqJwnKhCTuSnoqr/5pTFaeJ4ak=;
+  b=K3/lpHmPxJP1PM9E9nBmni0X6qnA6ZO0kWMttYoQYA+XBv29sandu+dX
+   xShJAYlKypERN1h9YQ1qHGuttPnTcptndRmqwZM0uYpaDdV5LDXgmOPoG
+   EiVTc8VaWQO0aUMobnDy8b7Hw16gxTwdvGZT2mVHN1rEoqvjsGVCWFUi9
+   AWv8dG2eEK4u61Q3Z+JNBGP8d2zbjZ/mNIxNvj7gV7GPR52y4Xqz/R4k9
+   nu1KzBroRH30soAOdqL0hjuI5/J80I+7eEBA+28JYo3ZcIAGEHUDHqXkO
+   ZGXt+c31UAHZLgvG3m3EfdK0fyjpjZwTdC2jt+RZVNGikxtZ0XppfdAVo
+   Q==;
+X-IronPort-AV: E=Sophos;i="5.96,287,1665417600"; 
+   d="scan'208";a="219639741"
+Received: from mail-bn7nam10lp2105.outbound.protection.outlook.com (HELO NAM10-BN7-obe.outbound.protection.outlook.com) ([104.47.70.105])
+  by ob1.hgst.iphmx.com with ESMTP; 30 Dec 2022 18:54:39 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=DUgPlhQ5yGF2f4yytc9KT7JnVBFRZjBuZ0VrSO3HT0HxwZEVKx6y/DVJl7QW9P0imj5djGUtu8vuG/B+zuS0F26YXYXAc5Q6+hhG0QFoSUJlxFOLtb2JaWn7w+c+eZkOoV/gtIPBofDo+s89gpaiMJNvxswlrRGsN9oBMywjP6hq4H9ylnhKUtAL/2EQNlFukNNWOQSyujTD/2ja4snsC6+a1zOO9fRWWJe68O7FPkA0nnOF/tBCRgpDk4aarOcB6BLzcwBqcvzgSb+Ye89f3oPJCEKQTLdlqYFxyzGKBGCreaownzuh2MlzELZo8idqEulV8BMyai5D2TPeDPfDKg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=wPhjbF87HYuhSx+udQ6dwYdRMAdzI2izxAoy1a8hQxE=;
+ b=kBuvKZdzDKWb6RQgWfrdt7v0nw4DlHv7D0yqbzeeJJ9N7iLv6pLYBdJHicLP+XzqY8kGXqzea/m66FRFkW15eJXGqvQEG3IJmPLLcMpfnMT2KP3pvzRbkHOlthS2Gh7WUwFsv4AXmKzI72EKbKbM3QkaObvnd9V0VJoIzlFwFTHN0qlEK72uisGi5XD1FgEmR4qNBR1a/foLLTUH4gYcrupIlWhJK2OTrjWMj5c6ezIia9RpI2MAKoFssZ1tWORWEAhKy2j9nHaZu3PH1uVakz56ktp7B5wfj+JkV6FgCKICkO5IIg5al4rZ79uMWlXR0wrMnko67/dTVDbwoke/sQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=wPhjbF87HYuhSx+udQ6dwYdRMAdzI2izxAoy1a8hQxE=;
+ b=y7dBG3JN08GpdwZzGFJOSj09bfgIAU7KiKwB6MfaBKHToLKZD3eXjB/rDvdt+tvFEaD/FU38NBSSzYHIYjiXOb/KgDu8psH0CKItIC2OG1nODgLtm8eLehrT712nZNqq9XzJpVTn8wfrFMKL+ck2QfiEZ249/zP0RECX466MqAM=
+Received: from MN2PR04MB6272.namprd04.prod.outlook.com (2603:10b6:208:e0::27)
+ by MWHPR0401MB3657.namprd04.prod.outlook.com (2603:10b6:301:80::31) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5944.16; Fri, 30 Dec
+ 2022 10:54:35 +0000
+Received: from MN2PR04MB6272.namprd04.prod.outlook.com
+ ([fe80::a65a:f2ad:4c7b:3164]) by MN2PR04MB6272.namprd04.prod.outlook.com
+ ([fe80::a65a:f2ad:4c7b:3164%4]) with mapi id 15.20.5944.016; Fri, 30 Dec 2022
+ 10:54:34 +0000
+From:   Niklas Cassel <Niklas.Cassel@wdc.com>
+To:     Damien Le Moal <damien.lemoal@opensource.wdc.com>
+CC:     "linux-ide@vger.kernel.org" <linux-ide@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Hannes Reinecke <hare@suse.de>, Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH v6 7/7] ata: libata: Enable fua support by default
+Thread-Topic: [PATCH v6 7/7] ata: libata: Enable fua support by default
+Thread-Index: AQHZHD0aq7+4wKWoQkiyzEvhMhy44g==
+Date:   Fri, 30 Dec 2022 10:54:34 +0000
+Message-ID: <Y67DaUBSFBU9xoIU@x1-carbon>
+References: <20221108055544.1481583-1-damien.lemoal@opensource.wdc.com>
+ <20221108055544.1481583-8-damien.lemoal@opensource.wdc.com>
+In-Reply-To: <20221108055544.1481583-8-damien.lemoal@opensource.wdc.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=wdc.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: MN2PR04MB6272:EE_|MWHPR0401MB3657:EE_
+x-ms-office365-filtering-correlation-id: 00e89711-512b-44a7-dc45-08daea543cbe
+wdcipoutbound: EOP-TRUE
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: KYXvl7WSS19gFbejcnGe0F9VORaa13rEZr0SNYJYsjjwUxT9/MsEYtQzMtXXmd9gKNsFikpvpaYVCC+78hDL81VWPKGHAoD9UMJap5Wh8ehBW21W2MYFDfiu7zCu0s3pQZcZ+JOHTsI7zyTBHPg5ouqO63CJ31Hzvu7mL6Gc98Goy4luBFkGDvDhYgZfPrrA/4E9m1xoQXvphSSXPDLOsJUHGUnkUTtnaKfhfA/OZ7IBY3QCRd1VbbVkpUMigJTsaK/TgIGy4rZ6ZrDjn1Ob0GbVh/GNzOecH4IE8t2skCR2AozLYuuk0qijeVYH8Q0+2g+WYeHbRsSGx0MdpdoOO974RhXwOEaVJCztjnIdUVJN0qQPjDxRSAvWlJPQ2f5SUG3evkLWdgTQeYa/gCSnrdgXO0fFy+mDgPbR5Corlw61wSGGQ6m9U69fitt0w2UheEdFLF2h3E5s25x9sIN4qAChg9EdVOH/YDkQfho2RoRVcQ8WLAO/n8UOfASxkrAWbZCblzo2DuQRPgsybyOJqUIG+bdqzh+7nimoOUXXbmC58TohaStCRETGTJqUth/yabHmD8uYH8sRyOLJtLPXqUfLg1Ex07ICkXVyqrFj4iDoSFUnI144RBioz0GgmZwO2+9JF7bc3hD6d7Hf5iv465SjjXzqp2dkSG5selBtF4Uj9lDgK4vn26jmXP9TghCqA7ZIg2YSEk+howefWzb+lw==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR04MB6272.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(7916004)(4636009)(39860400002)(376002)(136003)(396003)(346002)(366004)(451199015)(33716001)(122000001)(41300700001)(8676002)(8936002)(66946007)(6862004)(5660300002)(4326008)(66556008)(64756008)(66446008)(76116006)(86362001)(66476007)(2906002)(91956017)(54906003)(6506007)(82960400001)(71200400001)(316002)(38100700002)(38070700005)(478600001)(6486002)(83380400001)(186003)(6512007)(9686003)(26005);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?XF3CP7yMPEMFKBfLiIBFeX2q1coKj8DuXrT4NODG2OGFvu5wuB+eYx614XZ+?=
+ =?us-ascii?Q?WqeX2csD4bibQMAnCyAh/UpobCEcKiqyzONbNVYu3UB9e10vGX7DywSGuoGR?=
+ =?us-ascii?Q?3TXnldqmg3gRP2Tv8D4Pi3oXn2ML1az0LBAVE9MhNMmUjJnJwEEBe6lM3Gu5?=
+ =?us-ascii?Q?wN6XUYvUn+Jjy8/t+6ts4cpFCO2gI/GJHkjJEVM3hAmezR4eLJPLVem3/WXl?=
+ =?us-ascii?Q?kQ+Mp2EoKsSDtimtZZtppsP4b1HlB552DIMPRzZLKUxoZ+u80vREyzF3u0fh?=
+ =?us-ascii?Q?O91/CRnxkj0qUfbll3bKlKaai9iju/cpLR8FsoIPO4L+g8EN2eKqpDsrJUtz?=
+ =?us-ascii?Q?Ypxq2FselbukDBWkAtEQW1wkVvubuQzj3G7bPXVmGlEVUHhpTkgoU0/Oo8tJ?=
+ =?us-ascii?Q?KYEaB0AgBYxKVXRxCU7PtrJ8ZPByqI8ibPdni/qNUgkDBlVE0VotlLX5uVZc?=
+ =?us-ascii?Q?hu17xsVoC7kVntrHjuC4Fu9SM8oPf3cyRSYRkGIhS3WyaYweoj82wiuZiXuH?=
+ =?us-ascii?Q?O3FxARl5iBfztqcGBUaklna1FFMi3daw0caH+pDUZLGeNCfVi+F/vASjdJHN?=
+ =?us-ascii?Q?GwHfS9saAOfIl3aRlHOSdSfc7WuyLP0wK/ZwC1EDPJ5zd2zsBSPxgwj4g9KL?=
+ =?us-ascii?Q?DuNA1mHT0U7bV1oKWLhGjXj/2vPr5Lbixy1rxRA4Si4DtjQNc7iGqhPmFtYH?=
+ =?us-ascii?Q?Hyb4NKDE9Mtxt0UPm0Zx3sU3cDA4j3YMoL+fRM5KB7Ae2brEbZvGyp/hkbs2?=
+ =?us-ascii?Q?tyQS4WJHxTYrJ8O7CL7TKxEF3MlaGtP1d9AkbSu0OJk1toFTz/1BWon2uQ0r?=
+ =?us-ascii?Q?HSQYB6cYp/YKoV+aLpXWL1FEC4fgIoF13p+CR2WySa2ZyeQGerExdw8ANJ9O?=
+ =?us-ascii?Q?z11OgIArrHLSfTgNu0K6MnbCb6I7//mY818+b9bPy34b1RT2TEu7/AjFG1B9?=
+ =?us-ascii?Q?Stucb2tvq40qA7Rb0wQ4kkIteldxRjJqoJmYaEZHt3Hpex13hSCCgDzB1aoV?=
+ =?us-ascii?Q?dodS2gI8MarHSEhC7X0lVJsZPFs8OrAmPA7uNcypAyuD9hcS0xTEtwOpAbW6?=
+ =?us-ascii?Q?J1TPn3q6wDl2UDJZ4TPvj2uxtQ4zyS4EeeoOiPptYnKAQNp48a6f6+GrH6P/?=
+ =?us-ascii?Q?sN2Mxu3I/cQrTKw3yuh58HKj3lpXMRBK29u2OA52CGcQ0lSy2QYUsKClc2Pg?=
+ =?us-ascii?Q?dDg6cx8eW53D8l0YdGswxUSoYqaTp2jukNpp4q2uKtzuRZvoo2cVKgxoBzgm?=
+ =?us-ascii?Q?NZAT0EdwU9UbdODKtYX+jghD/Ph8scOBLIA+FsNl1L/kEznfGCOGe0OxMC6D?=
+ =?us-ascii?Q?SLkBN4Db2dIiLUgVhwtMcmxI0SpTben0qN4XEIphF8W61h1kPkNCSoCClNY4?=
+ =?us-ascii?Q?gIqCkL7tGdo6V/aw33V8ERPGv9qk7NbFK02jEjOCNhddWaTUjSAq+F8K9zXU?=
+ =?us-ascii?Q?XPQ1qoIgwFa1g0J9TdGn3YoWFChHqU5HIr8tXoHouJ+EtICbOxwtIN17Y0ne?=
+ =?us-ascii?Q?OOIayrc9kLt5VygeZO5UXKYzSiy7enNq5R0V+1W4mB8ANk4aDuh5xlBrE+Eq?=
+ =?us-ascii?Q?NKSF67D09gwel5fByfe7Mt3wO7kkJOiKxZcQhJlSSy9GRmBPokxCtzRr2axK?=
+ =?us-ascii?Q?KA=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <90699B94ED40DA418F5E47A216F9772F@namprd04.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg="pgp-sha512";
-        protocol="application/pgp-signature"; boundary="yuxdgeszv5r5csq3"
-Content-Disposition: inline
-In-Reply-To: <20221221103441.3216600-3-mcgrof@kernel.org>
-X-Originating-IP: [106.210.248.83]
-X-ClientProxiedBy: CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347) To
-        CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347)
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFtrBKsWRmVeSWpSXmKPExsWy7djP87rR+9clGyz9qWWx95a2xY0JTxkt
-        Dk1uZrI4fO8qiwOLx8Tmd+wem1Z1snm833eVzePzJrkAligum5TUnMyy1CJ9uwSujMdr21kK
-        DkpUnLr6j72BcYNIFyMnh4SAicTtWzsYuxi5OIQEVjBKNFzuZIdwvjBKnJ3TwwrhfGaUuPXp
-        ADNMy7/ln9kgEssZJSau/8YIVzX74E9mCGcLo8Sa77fAWlgEVCW2T/7PBmKzCehInH9zBywu
-        IqAhsW9CLxNIA7PAJkaJFQevgyWEBeIkTu9pZQSxeQXMJT5c+ccOYQtKnJz5hAXEZhaokGi+
-        9gloKAeQLS2x/B8HSJhTwFKiZ+9UFohTlSQ23rjFBmHXSqw9dgbsOQmB/xwSPQ8eskMkXCT6
-        nk2CKhKWeHV8C1RcRuL/zvlMEHa2xM4pu6D+L5CYdXIq2F4JAWuJvjM5EGFHidP/p0OF+SRu
-        vBWEuJJPYtK26cwQYV6JjjYhiGo1iR1NWxknMCrPQvLXLCR/zUL4CyKsI7FgNxZhbYllC18z
-        Q9i2EuvWvWdZwMi+ilE8tbQ4Nz212CgvtVyvODG3uDQvXS85P3cTIzBBnf53/MsOxuWvPuod
-        YmTiYDzEqALU/GjD6guMUix5+XmpSiK8GmdXJwvxpiRWVqUW5ccXleakFh9ilOZgURLnnbF1
-        frKQQHpiSWp2ampBahFMlomDU6qBiWvqLcfwOb8FXmi8F5c1vfDyQ+utR12xtqulriQsK9k9
-        ewq3ndWktccnVAl2L08KuJTzNEhNS7b3xvf/Dntqfx4KceCT0Uib7Xpd8fD5xSv+c7y1eZQb
-        O3Uye/VDX1EDTutzc4ofV2aIPjP1vpi5rNQ+6P1dPubpl5k+bbVTy7r90PvssUO8GZYNX2tu
-        5i4PKAu+Jbw8OnZxpsOjbS8sI2dn712d+i31XJHZi4O8XXM/WS37M+PdCQ4lW91pG+beb4rV
-        38PBek9mV8OGC+5Jj4wmX7/96cT/6BVCYfX67wz3MMgnF/5l/vPFcb3ww/1ppm7rHE8v8WgO
-        2NyxpGB91eeClVHpiZ8f/TeZKpVrkKPEUpyRaKjFXFScCAAmbu39ywMAAA==
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFrrGIsWRmVeSWpSXmKPExsVy+t/xu7rR+9clG0w6J2ix95a2xY0JTxkt
-        Dk1uZrI4fO8qiwOLx8Tmd+wem1Z1snm833eVzePzJrkAlig9m6L80pJUhYz84hJbpWhDCyM9
-        Q0sLPSMTSz1DY/NYKyNTJX07m5TUnMyy1CJ9uwS9jB9fX7EU7Jeo2P91FVsD4zqRLkZODgkB
-        E4l/yz+zgdhCAksZJW4skIKIy0h8uvKRHcIWlvhzrQuohguo5iOjxOPTs5khnC2MEtvvXWcF
-        qWIRUJXYPvk/2CQ2AR2J82/uMIPYIgIaEvsm9DKBNDALbGKUWHHwOlhCWCBO4vSeVkYQm1fA
-        XOLDlX/sEFN3M0qs27uXGSIhKHFy5hMWEJtZoEzizcHPQEUcQLa0xPJ/HCBhTgFLiZ69U1kg
-        TlWS2HjjFhuEXSvx6v5uxgmMwrOQTJqFZNIshEkQYS2JG/9eMmEIa0ssW/iaGcK2lVi37j3L
-        Akb2VYwiqaXFuem5xUZ6xYm5xaV56XrJ+bmbGIGRuu3Yzy07GFe++qh3iJGJg/EQowpQ56MN
-        qy8wSrHk5eelKonwapxdnSzEm5JYWZValB9fVJqTWnyI0RQYjBOZpUST84EpJK8k3tDMwNTQ
-        xMzSwNTSzFhJnNezoCNRSCA9sSQ1OzW1ILUIpo+Jg1OqgSnndMDqRSz7rUVbFjx7a+Uu0n9S
-        snnng2P77k/PkvB6MPnMwVuv684ZTDtcmC2qovHlrOihkN1q4ilxSzt1Y+0k6pYZCN96qtuQ
-        7NAr5lK278nd1Xe2Tj1y8qlt0wcXu48NnYv3Xzq6dbbI0y3rr8/Km3PlpoJVTFiP8n/WaJOd
-        OWpXzkxtOvNi1kQZA4Wy95WXmY8FHnNU/C0h8zVkoaXmsv6bt8XYF3xM3Kfb+7X8H8Odtle5
-        Dt9dzmU+COXnEGW+f/LwqagF0/T3rJZeYbStsHKzHmNF7K8fFSvVtuZqvVtosMPAaTGP5a7e
-        O9LGYjHCBToBD42UMlefP+G/fb5Njqz8CXPbOUY9r/jd+COUWIozEg21mIuKEwGXrXltaQMA
-        AA==
-X-CMS-MailID: 20221230103715eucas1p21212a9024a28e81961ae5c0caf769df2
-X-Msg-Generator: CA
-X-RootMTR: 20221221103454eucas1p2facaa4072e0c8f395162f37fd74fcd18
-X-EPHeader: CA
-CMS-TYPE: 201P
-X-CMS-RootMailID: 20221221103454eucas1p2facaa4072e0c8f395162f37fd74fcd18
-References: <20221221103441.3216600-1-mcgrof@kernel.org>
-        <CGME20221221103454eucas1p2facaa4072e0c8f395162f37fd74fcd18@eucas1p2.samsung.com>
-        <20221221103441.3216600-3-mcgrof@kernel.org>
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: MN2PR04MB6272.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 00e89711-512b-44a7-dc45-08daea543cbe
+X-MS-Exchange-CrossTenant-originalarrivaltime: 30 Dec 2022 10:54:34.3483
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: T86sCVzjFoj+B6WyHcT8Y/w35uG5n9TCa3q7STeEXlM0nGM5lWA4P731AAj7FWJJTSrKa/yv5bRKeTjF3uhDdQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR0401MB3657
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
---yuxdgeszv5r5csq3
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Wed, Dec 21, 2022 at 02:34:37AM -0800, Luis Chamberlain wrote:
-> This does basic rand-read testing of the character device of a
-> conventional NVMe drive.
+On Tue, Nov 08, 2022 at 02:55:44PM +0900, Damien Le Moal wrote:
+> Change the default value of the fua module parameter to 1 to enable fua
+> support by default for all devices supporting it.
 >=20
-> Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
+> FUA support can be disabled for individual drives using the
+> force=3D[ID]nofua libata module argument.
+>=20
+> Signed-off-by: Damien Le Moal <damien.lemoal@opensource.wdc.com>
+> Reviewed-by: Hannes Reinecke <hare@suse.de>
+> Reviewed-by: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
+> Reviewed-by: Chaitanya Kulkarni <kch@nvidia.com>
 > ---
->  tests/nvme/046     | 42 ++++++++++++++++++++++++++++++++++++++++++
->  tests/nvme/046.out |  2 ++
->  2 files changed, 44 insertions(+)
->  create mode 100755 tests/nvme/046
->  create mode 100644 tests/nvme/046.out
+>  drivers/ata/libata-core.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 >=20
-> diff --git a/tests/nvme/046 b/tests/nvme/046
-> new file mode 100755
-> index 000000000000..3526ab9eedab
-> --- /dev/null
-> +++ b/tests/nvme/046
-> @@ -0,0 +1,42 @@
-> +#!/bin/bash
-> +# SPDX-License-Identifier: GPL-3.0+
-> +# Copyright (C) 2022 Luis Chamberlain <mcgrof@kernel.org>
-> +#
-> +# This does basic sanity test for the nvme character device. This is a b=
-asic
-> +# test and if it fails it is probably very likely other nvme character d=
-evice
-> +# tests would fail.
-> +#
-> +. tests/nvme/rc
-> +
-> +DESCRIPTION=3D"basic rand-read io_uring_cmd engine for nvme-ns character=
- device"
-> +QUICK=3D1
-> +
-> +requires() {
-> +	_nvme_requires
-> +	_have_fio
-> +}
-> +
-> +device_requires() {
-> +	_require_test_dev_is_nvme
-> +}
-> +
-> +test_device() {
-> +	echo "Running ${TEST_NAME}"
-> +	local ngdev=3D${TEST_DEV/nvme/ng}
-> +	local fio_args=3D(
-> +		--size=3D1M
-> +		--cmd_type=3Dnvme
-> +		--filename=3D"$ngdev"
-> +		--time_based
-> +		--runtime=3D10
-> +	) &&
-> +	_run_fio_rand_iouring_cmd "${fio_args[@]}" >>"${FULL}" 2>&1 ||
-> +	fail=3Dtrue
-> +
-> +	if [ -z "$fail" ]; then
-> +		echo "Test complete"
-> +	else
-> +		echo "Test failed"
-> +		return 1
-> +	fi
-I see that several test have this structure, but would it not be better
-to do:
-
-"""
-if [ -n "$fail" ]; then
-  echo "Test failed"
-  return 1
-fi
-
-return "Test complete"
-"""
-
-I point this out because I noticed that most nvme tests just set the
-"test complete" string at the end of the test function.
-
-> +}
-> diff --git a/tests/nvme/046.out b/tests/nvme/046.out
-> new file mode 100644
-> index 000000000000..2b5fa6af63b1
-> --- /dev/null
-> +++ b/tests/nvme/046.out
-> @@ -0,0 +1,2 @@
-> +Running nvme/046
-> +Test complete
+> diff --git a/drivers/ata/libata-core.c b/drivers/ata/libata-core.c
+> index 97ade977b830..2967671131d2 100644
+> --- a/drivers/ata/libata-core.c
+> +++ b/drivers/ata/libata-core.c
+> @@ -127,9 +127,9 @@ int atapi_passthru16 =3D 1;
+>  module_param(atapi_passthru16, int, 0444);
+>  MODULE_PARM_DESC(atapi_passthru16, "Enable ATA_16 passthru for ATAPI dev=
+ices (0=3Doff, 1=3Don [default])");
+> =20
+> -int libata_fua =3D 0;
+> +int libata_fua =3D 1;
+>  module_param_named(fua, libata_fua, int, 0444);
+> -MODULE_PARM_DESC(fua, "FUA support (0=3Doff [default], 1=3Don)");
+> +MODULE_PARM_DESC(fua, "FUA support (0=3Doff, 1=3Don [default])");
+> =20
+>  static int ata_ignore_hpa;
+>  module_param_named(ignore_hpa, ata_ignore_hpa, int, 0644);
 > --=20
-> 2.35.1
+> 2.38.1
 >=20
 
---yuxdgeszv5r5csq3
-Content-Type: application/pgp-signature; name="signature.asc"
+Before this commit:
+-For a SCSI mode sense:
+ FUA bit will not get set in the simulated SCSI cmd output buffer,
+ since ATA_DFLAG_FUA is not be set, since libata_fua =3D=3D 0.
+-For a SCSI WRITE_16 / WRITE_16 command:
+ ata_scsi_rw_xlat() sets ATA_TFLAG_FUA, regardless if ATA_DFLAG_FUA
+ is set or not. ata_set_rwcmd_protocol() will return a FUA command
+ as long as ATA_TFLAG_FUA is set.
 
------BEGIN PGP SIGNATURE-----
+After this commit:
+-For a SCSI mode sense:
+ FUA bit will get set in the simulated SCSI cmd output buffer,
+ since ATA_DFLAG_FUA is set, since libata_fua =3D=3D 1.
+-For a SCSI WRITE_16 / WRITE_16 command:
+ ata_scsi_rw_xlat() sets ATA_TFLAG_FUA, regardless if ATA_DFLAG_FUA
+ is set or not. ata_set_rwcmd_protocol() will return a FUA command
+ as long as ATA_TFLAG_FUA is set.
 
-iQGzBAABCgAdFiEErkcJVyXmMSXOyyeQupfNUreWQU8FAmOuv1IACgkQupfNUreW
-QU92hAv/VPpAjccbHRuBUaQPnZRSBAfFkJRiEO86tMJs2o9C1/P25uV98eDOawRe
-8w88ROwVrxkYmwg/xXnF/nDf3dlj6S0NV9rNxa+jtd4Sg1BZFiFFFchNvZTqn0tj
-nvZK4o/RhnJKIdkw1vmksauQpilrkx2e83hoCyDH16BudaQjW7sEAi4Whn2XAYaK
-kKQEzk/GxWJECFoe3M3my/d5HOVEyrzvu6aAfV4cBxOYeO3C+ImCW8Vboa+oMHA4
-CtuTIipACIhMRSU2bXEBSnuckeVcf0xC2XDSGyGefDM5cysngvNa69pZFeDz6mSN
-6pM/NgHsCwME2RgIiE2ku/yeL6MXaGgM4D8lhZZXc2Ini5YstNzu9oXc0OZHvWzG
-HAsoVOtsoR2AssgcwA2v+x390DlDAr1dRGfBbOCDyuvD62qMRb4TrA3jIujL8jIi
-WF5W30rLDsyN938oCTVnifRwQRBlEetllhHyaebiP/hBGDiFMW6kUmaXLdn21Uel
-cvR3h1PM
-=0mX3
------END PGP SIGNATURE-----
 
---yuxdgeszv5r5csq3--
+Perhaps this commit should more clearly say that this commit only affects
+the simulated output for a SCSI mode sense command?
+
+Currently, the commit message is a bit misleading, since it makes the
+reader think that a SCSI write command with the FUA bit was not propagated
+to the device before this commit, which AFAICT, is not true.
+
+If the intention of this series was to only send a ATA write command to
+the device, if the device has the ATA_DFLAG_FUA flag set, then perhaps the
+series should include a new commit which either:
+-Adds a check to ata_scsi_rw_xlat() so that it only sets ATA_TFLAG_FUA if
+ATA_DFLAG_FUA is set;
+or
+-Adds a check to ata_scsi_rw_xlat() which returns an error if the SCSI
+command has the FUA bit set, but ATA_DFLAG_FUA is not set.
+
+
+Kind regards,
+Niklas=
