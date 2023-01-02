@@ -2,87 +2,122 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A5090C4332F
-	for <linux-block@archiver.kernel.org>; Fri, 30 Dec 2022 22:25:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 96750C5479D
+	for <linux-block@archiver.kernel.org>; Mon,  2 Jan 2023 11:23:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235579AbiL3WZE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 30 Dec 2022 17:25:04 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50766 "EHLO
+        id S232676AbjABLXi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 2 Jan 2023 06:23:38 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44406 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229519AbiL3WZD (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 30 Dec 2022 17:25:03 -0500
-Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 22CEB1D0D9
-        for <linux-block@vger.kernel.org>; Fri, 30 Dec 2022 14:25:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1672439102; x=1703975102;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=yybVRQ8iPIsbqZIGLaIL7MB2xjCclLzuH42lS2c7G5E=;
-  b=YNuaL5poYLT8Opd1HBVwcmMHJy7Z9OpBqSc3ySf4lc35+UCfK2EPn8zd
-   Dd8fS+ONAaOW6ztoZ4W2iZcWGpVSm7yBDyANMmf38QCdoBd/Oeeup5bSD
-   +MSSo8Gu2T+cL4JX58CuiaGlvpO4SrDkbdGf7uuyA1pDp7zCpDzCVYyjb
-   ym6oU3AjRKVGkisJBRsItDrc7IdJmeITMHEr76gEx+3KFO+AkTEIzfSM9
-   L5oA/N2VVww/UfiFv2vq6B3RYydK9jUAz8BC67spZCZb26/cPskWqjiWM
-   4FyTwcxyFdycxOcSSbbQ4kb8xeiTvFWqUrlJu3dIXagj++USEBi5YGP3N
-   w==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10576"; a="385694190"
-X-IronPort-AV: E=Sophos;i="5.96,288,1665471600"; 
-   d="scan'208";a="385694190"
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Dec 2022 14:25:01 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10576"; a="631620938"
-X-IronPort-AV: E=Sophos;i="5.96,288,1665471600"; 
-   d="scan'208";a="631620938"
-Received: from lkp-server01.sh.intel.com (HELO b5d47979f3ad) ([10.239.97.150])
-  by orsmga006.jf.intel.com with ESMTP; 30 Dec 2022 14:24:59 -0800
-Received: from kbuild by b5d47979f3ad with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1pBNoA-000ITT-19;
-        Fri, 30 Dec 2022 22:24:58 +0000
-Date:   Sat, 31 Dec 2022 06:24:11 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Yu Kuai <yukuai1@huaweicloud.com>, linux-block@vger.kernel.org,
-        shinichiro.kawasaki@wdc.com, hch@infradead.org
-Cc:     oe-kbuild-all@lists.linux.dev, yukuai3@huawei.com,
-        yangerkun@huawei.com, yi.zhang@huawei.com
-Subject: Re: [PATCH blktests] dm: add a regression test
-Message-ID: <202212310607.TCNdNAlM-lkp@intel.com>
-References: <20221230065424.19998-1-yukuai1@huaweicloud.com>
+        with ESMTP id S232752AbjABLXE (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 2 Jan 2023 06:23:04 -0500
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E4C35FAB;
+        Mon,  2 Jan 2023 03:23:00 -0800 (PST)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id ECDDF3407E;
+        Mon,  2 Jan 2023 11:22:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1672658578; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=VqwR+u//1iVHsLjS8ecEfHM3m/I8nXvJ9KjV1eh5WXs=;
+        b=QhMvVVMsVf6x5AViodhwkQFpoKLW/PYRa0Ijf7o3mskGYh6S4+61ZECF9G3TYScuIp7trv
+        mK8+RjALUdvmq5ZNuTg5/Tz5jodjLfufzWzjON0Kq+iFv13oOJ9np0a2VmyjWDhzfGRKVI
+        EWhorYbh0tj61v8YqB35xiUgkTRvk6A=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1672658578;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=VqwR+u//1iVHsLjS8ecEfHM3m/I8nXvJ9KjV1eh5WXs=;
+        b=K0tV4Q/xIo8tj99PVm3YZoJHBPvz4Lgq/VAnMDEUg/pj96U16eNquZmpyyQjnPO+/riu1/
+        l4ZdCXpQqX/S11Cw==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id D9C1913427;
+        Mon,  2 Jan 2023 11:22:58 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id jt8kNZK+smOqbgAAMHmgww
+        (envelope-from <jack@suse.cz>); Mon, 02 Jan 2023 11:22:58 +0000
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+        id 4ACF3A073E; Mon,  2 Jan 2023 12:22:58 +0100 (CET)
+Date:   Mon, 2 Jan 2023 12:22:58 +0100
+From:   Jan Kara <jack@suse.cz>
+To:     Yu Kuai <yukuai1@huaweicloud.com>
+Cc:     jack@suse.cz, tj@kernel.org, josef@toxicpanda.com, axboe@kernel.dk,
+        paolo.valente@linaro.org, cgroups@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yi.zhang@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
+Subject: Re: [PATCH RFC] block, bfq: switch 'bfqg->ref' to use atomic
+ refcount apis
+Message-ID: <20230102112258.3fixhuialamu6pkd@quack3>
+References: <20221227031541.2595647-1-yukuai1@huaweicloud.com>
+ <ba5e74a6-b3de-844d-16b8-84eb429c7058@huaweicloud.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20221230065424.19998-1-yukuai1@huaweicloud.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <ba5e74a6-b3de-844d-16b8-84eb429c7058@huaweicloud.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Yu,
+On Tue 27-12-22 14:09:40, Yu Kuai wrote:
+> Hi, Jan!
+> 
+> 在 2022/12/27 11:15, Yu Kuai 写道:
+> > From: Yu Kuai <yukuai3@huawei.com>
+> > 
+> > The updating of 'bfqg->ref' should be protected by 'bfqd->lock', however,
+> > during code review, we found that bfq_pd_free() update 'bfqg->ref'
+> > without holding the lock, which is problematic:
+> > 
+> > 1) bfq_pd_free() triggered by removing cgroup is called asynchronously;
+> > 2) bfqq will grab bfqg reference, and exit bfqq will drop the reference,
+> > which can concurrenty with 1).
+> > 
+> > Unfortunately, 'bfqd->lock' can't be held here because 'bfqd' might already
+> > be freed in bfq_pd_free(). Fix the problem by using atomic refcount apis.
+> > 
+> > Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+> > ---
+> >   block/bfq-cgroup.c  | 8 +++-----
+> >   block/bfq-iosched.h | 2 +-
+> >   2 files changed, 4 insertions(+), 6 deletions(-)
+> > 
+> > diff --git a/block/bfq-cgroup.c b/block/bfq-cgroup.c
+> > index 1b2829e99dad..aa9c4f02e3a3 100644
+> > --- a/block/bfq-cgroup.c
+> > +++ b/block/bfq-cgroup.c
+> > @@ -316,14 +316,12 @@ struct bfq_group *bfqq_group(struct bfq_queue *bfqq)
+> >   static void bfqg_get(struct bfq_group *bfqg)
+> >   {
+> > -	bfqg->ref++;
+> > +	refcount_inc(&bfqg->ref);
+> >   }
+> >   static void bfqg_put(struct bfq_group *bfqg)
+> >   {
+> > -	bfqg->ref--;
+> > -
+> > -	if (bfqg->ref == 0)
+> > +	if (refcount_dec_and_test(bfqg->ref))
+> Sorry that here should be '&bfqg->ref'.
+> 
+> Anyway, I'll wait for you, and send a new version if you think this
+> patch make sense.
 
-Thank you for the patch! Perhaps something to improve:
+Yes, the patch makes sense to me so feel free to send fixed version.
 
-[auto build test WARNING on linus/master]
-[also build test WARNING on v6.2-rc1 next-20221226]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Yu-Kuai/dm-add-a-regression-test/20221230-143530
-patch link:    https://lore.kernel.org/r/20221230065424.19998-1-yukuai1%40huaweicloud.com
-patch subject: [PATCH blktests] dm: add a regression test
-reproduce:
-        scripts/spdxcheck.py
-
-If you fix the issue, kindly add following tag where applicable
-| Reported-by: kernel test robot <lkp@intel.com>
-
-spdxcheck warnings: (new ones prefixed by >>)
->> tests/dm/001: 2:27 Invalid License ID: GPL-3.0+
->> tests/dm/rc: 2:27 Invalid License ID: GPL-3.0+
-
+								Honza
 -- 
-0-DAY CI Kernel Test Service
-https://01.org/lkp
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
