@@ -2,121 +2,108 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F4F6C3DA7A
-	for <linux-block@archiver.kernel.org>; Mon,  2 Jan 2023 15:31:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E78DCC3DA7A
+	for <linux-block@archiver.kernel.org>; Mon,  2 Jan 2023 15:31:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235970AbjABPbC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 2 Jan 2023 10:31:02 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37356 "EHLO
+        id S232572AbjABPbh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 2 Jan 2023 10:31:37 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37782 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236157AbjABPa7 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 2 Jan 2023 10:30:59 -0500
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 41085D5B;
-        Mon,  2 Jan 2023 07:30:58 -0800 (PST)
+        with ESMTP id S232796AbjABPbh (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 2 Jan 2023 10:31:37 -0500
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 526D42AE7;
+        Mon,  2 Jan 2023 07:31:35 -0800 (PST)
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 0131D3420D;
-        Mon,  2 Jan 2023 15:30:57 +0000 (UTC)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 9DA6E20178;
+        Mon,  2 Jan 2023 15:31:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1672673457; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+        t=1672673494; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=yDqqFLETDv1ymt0DZxMHzXB+9Y/0AhFHnAfV6WurXFk=;
-        b=MWDnQYXY8j5PrDK6N6D20bjkFYb3FqQ7ACY4PzqPraRe5C1Ox7nUVF9QXfzdctt2WhSHmU
-        DfS6J87G9/CAYId9pXb+Rn+fSXw2nbswublbUykxpP5UTF2ToJSJzafqj+8YnDcnIf8AeV
-        J0jPFP6gKJA3V4MzDfQXNxg5roRuywU=
+        bh=2F11xUiDzXli+fkwzboFgES4G1zpWWoKOQc4R+WpSds=;
+        b=cPY8bJHmi/8/Vygj6+IGupdiwuStqHqA3V8pmUkgf/EGfLl67/ILyfULN57nN/Ac4J3kjR
+        YP24cCNW2ySHsnjJk66bqsRw4t5Oqy9/kyAn78bsR8F2bSBzIr8Ja0sLXRMA1iQ4rbFKyQ
+        pOaiJnHKZwzNgREllsmP/O3wyJMInRI=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1672673457;
+        s=susede2_ed25519; t=1672673494;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=yDqqFLETDv1ymt0DZxMHzXB+9Y/0AhFHnAfV6WurXFk=;
-        b=MUWJkZsZuo4i8t7uImvlVUUU//U+20SwkKZqP4tx3XBMmRRc4wPR+bC5PPdE6v0nwhCGYh
-        c5zWOJ+pxEEy9UBg==
+        bh=2F11xUiDzXli+fkwzboFgES4G1zpWWoKOQc4R+WpSds=;
+        b=XcDFX/EQgVgrsvTzpgeZ7NFXtCHv0ze5r6iRd/hsIcqefp47bW7oRIxC6C3Xd23EFW2YJC
+        i4ovpK6OF8TzJoAw==
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id E419813427;
-        Mon,  2 Jan 2023 15:30:56 +0000 (UTC)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 9087213427;
+        Mon,  2 Jan 2023 15:31:34 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id HzCxN7D4smNaagAAMHmgww
-        (envelope-from <jack@suse.cz>); Mon, 02 Jan 2023 15:30:56 +0000
+        id EW1JI9b4smOsagAAMHmgww
+        (envelope-from <jack@suse.cz>); Mon, 02 Jan 2023 15:31:34 +0000
 Received: by quack3.suse.cz (Postfix, from userid 1000)
-        id 24943A0742; Mon,  2 Jan 2023 16:30:56 +0100 (CET)
-Date:   Mon, 2 Jan 2023 16:30:56 +0100
+        id 27269A0742; Mon,  2 Jan 2023 16:31:34 +0100 (CET)
+Date:   Mon, 2 Jan 2023 16:31:34 +0100
 From:   Jan Kara <jack@suse.cz>
 To:     Kemeng Shi <shikemeng@huaweicloud.com>
 Cc:     paolo.valente@linaro.org, axboe@kernel.dk,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         jack@suse.cz, hch@lst.de, damien.lemoal@wdc.com
-Subject: Re: [PATCH RESEND v2 03/10] block, bfq: initialize
- bfqq->decrease_time_jif correctly
-Message-ID: <20230102153056.gdofu7rp5s4arz2n@quack3>
+Subject: Re: [PATCH RESEND v2 04/10] block, bfq: use helper macro RQ_BFQQ to
+ get bfqq of request
+Message-ID: <20230102153134.hifz5alouhkkxx4o@quack3>
 References: <20221222191641.1643117-1-shikemeng@huaweicloud.com>
- <20221222191641.1643117-4-shikemeng@huaweicloud.com>
+ <20221222191641.1643117-5-shikemeng@huaweicloud.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20221222191641.1643117-4-shikemeng@huaweicloud.com>
+In-Reply-To: <20221222191641.1643117-5-shikemeng@huaweicloud.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri 23-12-22 03:16:34, Kemeng Shi wrote:
-> Inject limit is updated or reset when time_is_before_eq_jiffies(
-> decrease_time_jif + several msecs) or think-time state changes.
-> decrease_time_jif is initialized to 0 and will be set to current jiffies
-> when inject limit is updated or reset. If the jiffies is slightly greater
-> than LONG_MAX, time_is_after_eq_jiffies(0) will keep for a long time, so as
-> time_is_after_eq_jiffies(decrease_time_jif + several msecs). If the
-> think-time state never chages, then the injection will not work as expected
-> for long time.
-> 
-> To be more specific:
-> Function bfq_update_inject_limit maybe triggered when jiffies pasts
-> decrease_time_jif + msecs_to_jiffies(10) in bfq_add_request by setting
-> bfqd->wait_dispatch to true.
-> Function bfq_reset_inject_limit are called in two conditions:
-> 1. jiffies pasts bfqq->decrease_time_jif + msecs_to_jiffies(1000) in
-> function bfq_add_request.
-> 2. jiffies pasts bfqq->decrease_time_jif + msecs_to_jiffies(100) or
-> bfq think-time state change from short to long.
-> 
-> Fix this by initializing bfqq->decrease_time_jif to current jiffies
-> to trigger service injection soon when service injection conditions
-> are met.
+On Fri 23-12-22 03:16:35, Kemeng Shi wrote:
+> Use helper macro RQ_BFQQ to get bfqq of request.
 > 
 > Signed-off-by: Kemeng Shi <shikemeng@huaweicloud.com>
 
-I agree that initializing jiffies timer to 0 is just a bad practice and
-current time is much saner choice. Feel free to add:
+Yeah, why not. Feel free to add:
 
 Reviewed-by: Jan Kara <jack@suse.cz>
 
 								Honza
 
 > ---
->  block/bfq-iosched.c | 2 ++
->  1 file changed, 2 insertions(+)
+>  block/bfq-iosched.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
 > 
 > diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-> index 5a6d9e8c329d..9441fc98961a 100644
+> index 9441fc98961a..c3c4c83ee95f 100644
 > --- a/block/bfq-iosched.c
 > +++ b/block/bfq-iosched.c
-> @@ -5491,6 +5491,8 @@ static void bfq_init_bfqq(struct bfq_data *bfqd, struct bfq_queue *bfqq,
+> @@ -6683,14 +6683,14 @@ static struct bfq_queue *bfq_init_rq(struct request *rq)
+>  		return NULL;
 >  
->  	/* first request is almost certainly seeky */
->  	bfqq->seek_history = 1;
-> +
-> +	bfqq->decrease_time_jif = jiffies;
->  }
+>  	/*
+> -	 * Assuming that elv.priv[1] is set only if everything is set
+> +	 * Assuming that RQ_BFQQ(rq) is set only if everything is set
+>  	 * for this rq. This holds true, because this function is
+>  	 * invoked only for insertion or merging, and, after such
+>  	 * events, a request cannot be manipulated any longer before
+>  	 * being removed from bfq.
+>  	 */
+> -	if (rq->elv.priv[1])
+> -		return rq->elv.priv[1];
+> +	if (RQ_BFQQ(rq))
+> +		return RQ_BFQQ(rq);
 >  
->  static struct bfq_queue **bfq_async_queue_prio(struct bfq_data *bfqd,
+>  	bic = icq_to_bic(rq->elv.icq);
+>  
 > -- 
 > 2.30.0
 > 
