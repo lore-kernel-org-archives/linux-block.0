@@ -2,99 +2,101 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BA92C53210
-	for <linux-block@archiver.kernel.org>; Mon,  2 Jan 2023 15:35:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B585C3DA7A
+	for <linux-block@archiver.kernel.org>; Mon,  2 Jan 2023 15:54:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230340AbjABPfD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 2 Jan 2023 10:35:03 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40002 "EHLO
+        id S236402AbjABPyV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 2 Jan 2023 10:54:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46766 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236348AbjABPfB (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 2 Jan 2023 10:35:01 -0500
+        with ESMTP id S233865AbjABPyS (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 2 Jan 2023 10:54:18 -0500
 Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD54CCEE;
-        Mon,  2 Jan 2023 07:35:00 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3924FF6E;
+        Mon,  2 Jan 2023 07:54:18 -0800 (PST)
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 918FB34215;
-        Mon,  2 Jan 2023 15:34:59 +0000 (UTC)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id BD38133E13;
+        Mon,  2 Jan 2023 15:54:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1672673699; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+        t=1672674856; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=rxSU7BQCVQRZyJH13xdhDi57U6Cq3OOvoYb4SRQKQ+8=;
-        b=TqnW1VOrriFFzJX7NpbogXSbiBbUOlHR7r4zoZJvtV/a4qILbsZ06XJZxIKcvxet0hWXBM
-        13c78kbw9DgqZktNCxOEzTLLvAMu189OxtodrBtArhYEFxmcQ2JV+wjgRzgQEEXYtJ/Vua
-        /B6gIbJ3ePVkDwJmw2IxLPUH4lHypXA=
+        bh=Zuod7z+5UPCG454P5NyNY251FiSdc6kVNmMzVnEJn7U=;
+        b=Sf8atC5GTLPoKO/IsmR7Sdu4UIOzsLK1m316FJ92+qJNBOAUU/GbHR/ii7MmC0wachcTBB
+        9Y68PNxHvJ/9PkBLc+drC8mq0FHxElYyBwty0anFs8ySYEXgNWjQ9zQBYgLWbG6rLKXV0j
+        OCzg1VUs+G4wvvxpqH9wRc3lRFbkdEw=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1672673699;
+        s=susede2_ed25519; t=1672674856;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=rxSU7BQCVQRZyJH13xdhDi57U6Cq3OOvoYb4SRQKQ+8=;
-        b=GDZDwgo32tSKGR0LnrYI5tHwImqQCMXJg8nveBFEEXcjPHqjqSHfrvuo72z/o4w8wf3c5X
-        YeVCQeVur6MWQuAQ==
+        bh=Zuod7z+5UPCG454P5NyNY251FiSdc6kVNmMzVnEJn7U=;
+        b=qodcG15AMrzWKSWHeNJCLjZ+i3Vt83QcINgNUOKWNHMW9CDo+hqo8eZmLw/7ov+pDi2vaQ
+        csGnpujTUC6PUJBA==
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 823CE13427;
-        Mon,  2 Jan 2023 15:34:59 +0000 (UTC)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 98C94139C8;
+        Mon,  2 Jan 2023 15:54:16 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id PbLmH6P5smOCbAAAMHmgww
-        (envelope-from <jack@suse.cz>); Mon, 02 Jan 2023 15:34:59 +0000
+        id tl1DJSj+smOKdQAAMHmgww
+        (envelope-from <jack@suse.cz>); Mon, 02 Jan 2023 15:54:16 +0000
 Received: by quack3.suse.cz (Postfix, from userid 1000)
-        id C8CC1A0742; Mon,  2 Jan 2023 16:34:58 +0100 (CET)
-Date:   Mon, 2 Jan 2023 16:34:58 +0100
+        id 661B2A0742; Mon,  2 Jan 2023 16:54:15 +0100 (CET)
+Date:   Mon, 2 Jan 2023 16:54:15 +0100
 From:   Jan Kara <jack@suse.cz>
 To:     Kemeng Shi <shikemeng@huaweicloud.com>
 Cc:     paolo.valente@linaro.org, axboe@kernel.dk,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         jack@suse.cz, hch@lst.de, damien.lemoal@wdc.com
-Subject: Re: [PATCH RESEND v2 05/10] block, bfq: remove unnecessary
- dereference to get async_bfqq
-Message-ID: <20230102153458.zg3ku5styjcz2gf3@quack3>
+Subject: Re: [PATCH RESEND v2 06/10] block, bfq: remove redundant
+ bfqd->rq_in_driver > 0 check in bfq_add_request
+Message-ID: <20230102155415.pvl57qtzjk2acwf6@quack3>
 References: <20221222191641.1643117-1-shikemeng@huaweicloud.com>
- <20221222191641.1643117-6-shikemeng@huaweicloud.com>
+ <20221222191641.1643117-7-shikemeng@huaweicloud.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20221222191641.1643117-6-shikemeng@huaweicloud.com>
+In-Reply-To: <20221222191641.1643117-7-shikemeng@huaweicloud.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri 23-12-22 03:16:36, Kemeng Shi wrote:
-> The async_bfqq is assigned with bfqq->bic->bfqq[0], use it directly.
+On Fri 23-12-22 03:16:37, Kemeng Shi wrote:
+> The bfqd->rq_in_driver > 0 check is along with previous
+> "bfqd->rq_in_driver == 0 ||" check, so no need to re-check
+> bfqd->rq_in_driver > 0.
 > 
 > Signed-off-by: Kemeng Shi <shikemeng@huaweicloud.com>
 
-Yeah, that is a more logical choice. Feel free to add:
-
-Reviewed-by: Jan Kara <jack@suse.cz>
+I have nothing against this but OTOH in this complex condition the original
+version looks more readable than the new one to me.
 
 								Honza
 
 > ---
->  block/bfq-iosched.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  block/bfq-iosched.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
 > 
 > diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-> index c3c4c83ee95f..ebcafe3c4c3b 100644
+> index ebcafe3c4c3b..7c91d16dbf6f 100644
 > --- a/block/bfq-iosched.c
 > +++ b/block/bfq-iosched.c
-> @@ -4835,7 +4835,7 @@ static struct bfq_queue *bfq_select_queue(struct bfq_data *bfqd)
->  		    icq_to_bic(async_bfqq->next_rq->elv.icq) == bfqq->bic &&
->  		    bfq_serv_to_charge(async_bfqq->next_rq, async_bfqq) <=
->  		    bfq_bfqq_budget_left(async_bfqq))
-> -			bfqq = bfqq->bic->bfqq[0];
-> +			bfqq = async_bfqq;
->  		else if (bfqq->waker_bfqq &&
->  			   bfq_bfqq_busy(bfqq->waker_bfqq) &&
->  			   bfqq->waker_bfqq->next_rq &&
+> @@ -2204,8 +2204,7 @@ static void bfq_add_request(struct request *rq)
+>  		 */
+>  		if (bfqq == bfqd->in_service_queue &&
+>  		    (bfqd->rq_in_driver == 0 ||
+> -		     (bfqq->last_serv_time_ns > 0 &&
+> -		      bfqd->rqs_injected && bfqd->rq_in_driver > 0)) &&
+> +		     (bfqq->last_serv_time_ns > 0 && bfqd->rqs_injected)) &&
+>  		    time_is_before_eq_jiffies(bfqq->decrease_time_jif +
+>  					      msecs_to_jiffies(10))) {
+>  			bfqd->last_empty_occupied_ns = ktime_get_ns();
 > -- 
 > 2.30.0
 > 
