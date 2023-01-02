@@ -2,116 +2,83 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EA468C3DA7A
-	for <linux-block@archiver.kernel.org>; Mon,  2 Jan 2023 16:05:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A2C2C3DA7A
+	for <linux-block@archiver.kernel.org>; Mon,  2 Jan 2023 16:53:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236478AbjABQFM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 2 Jan 2023 11:05:12 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51712 "EHLO
+        id S236417AbjABQxj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 2 Jan 2023 11:53:39 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48014 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232697AbjABQFK (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 2 Jan 2023 11:05:10 -0500
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CAC1DE5E;
-        Mon,  2 Jan 2023 08:05:08 -0800 (PST)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id C009A5C487;
-        Mon,  2 Jan 2023 16:05:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1672675505; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=FmGsCrBzS6Uv+XJl7JWGbpklMz8TH25ZcuNsmqXhnDk=;
-        b=lRzjC/5Navli0KbqjStN9XwLarrVPGlRmE4OmA0M4JZhXhqZLzyhbPACvdawKzSYhUHn6H
-        bDXYZgny8+ilahI8SWhJ4QDr8BwapD8uPU1PbePazOTfBSVkbCRKWthxmLnf19f2UbGlyY
-        Z6o05FQvuK3Ma0wh9OOsQybNqQL0ZQ0=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1672675505;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=FmGsCrBzS6Uv+XJl7JWGbpklMz8TH25ZcuNsmqXhnDk=;
-        b=R2F8pNepQY5RcOO0KZ/GWfOENC+kRQg8fuPfjv2M+KweFQ52RYAmbe8jLeru/V0CV+pRww
-        GcCmXqdapAa4hgAQ==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id A8DB1139C8;
-        Mon,  2 Jan 2023 16:05:05 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id QXExKbEAs2PdegAAMHmgww
-        (envelope-from <jack@suse.cz>); Mon, 02 Jan 2023 16:05:05 +0000
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-        id 3531AA0742; Mon,  2 Jan 2023 17:05:05 +0100 (CET)
-Date:   Mon, 2 Jan 2023 17:05:05 +0100
-From:   Jan Kara <jack@suse.cz>
-To:     Kemeng Shi <shikemeng@huaweicloud.com>
-Cc:     paolo.valente@linaro.org, axboe@kernel.dk,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        jack@suse.cz, hch@lst.de, damien.lemoal@wdc.com
-Subject: Re: [PATCH RESEND v2 10/10] block, bfq: remove check of
- bfq_wr_max_softrt_rate which is always greater than 0
-Message-ID: <20230102160505.2r26ct5wadfhyr23@quack3>
-References: <20221222191641.1643117-1-shikemeng@huaweicloud.com>
- <20221222191641.1643117-11-shikemeng@huaweicloud.com>
+        with ESMTP id S232103AbjABQxi (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 2 Jan 2023 11:53:38 -0500
+Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1BC61E02
+        for <linux-block@vger.kernel.org>; Mon,  2 Jan 2023 08:53:37 -0800 (PST)
+Received: by mail-pl1-x633.google.com with SMTP id b2so30026940pld.7
+        for <linux-block@vger.kernel.org>; Mon, 02 Jan 2023 08:53:37 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=T/cxfl/LR9GgO9ZvS/ZvJXYf6jxwd1F3cUMP6lmAYpI=;
+        b=mmntdGgr7TfOTVqLvYs4G7k/SpKn+gpvtuPloVB2LEPAIA+WeUZgVv1UjLHQFhAj6O
+         aQG7pGbwezQRE2dvn/5uJuKj3TNPdQz9AvtTKU1+w/2xP2EX+l+22ByQGP8K8rF7Bohc
+         KXSzXT3cCYHoRTiyB89cG7QRHYY94dWjERbfKCB1t9VnhudXvC7ZAwcSI/9T0M44wjwi
+         Ky1fjOjgleVLQxUHdP7DUpxdtqnzCvEXDa7Lk7YRrH5id+eeKzA+C3CCna96yQX8hEVQ
+         m+9m4uReFdr62USHq4yMpdQRaQadH8nWpCDquQ+OGt7CZdDW/z/zoF17/hK/lblsTiQa
+         9f+g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=T/cxfl/LR9GgO9ZvS/ZvJXYf6jxwd1F3cUMP6lmAYpI=;
+        b=5552uCKgIFeig85aIh4bKgQ19wcKIrZMLgg0os8tPDiv+m+iG/z4ckvFNV+PpgczkC
+         FzIBBUXv76PnvWrHPk30hwWbteZQrIdAkQvvakNcSHw3mwnXuVPVw2nXTWKUn576UHNf
+         bZ9vmBxZdF3dmaF3icZ0lDXwoHRuWbQ/VaQV8v+RIwVN3tKp+nZNo92sqtNRwkaNNs4a
+         Qp/qpZJrGuRZ7WF0gdSZlX3KhffDaE5fAhA9aW4tX+GOqj88nq785rXDQFNeDmoakyKr
+         AUD2f2ThsT3lG3zJSI1dFqo9FkwricIRDAQG6PF6FnD7nwdZZSjFd0CPIoIdH6Q2k7aW
+         A/RA==
+X-Gm-Message-State: AFqh2koXwhhlV44Fhbt6Dl5lnvgLCqIMJ+UdlcmX9KUCUaz5un9ZfOCU
+        PcL50AKDnH+GXaQh6mOb75po+dO/SLIcjVbW
+X-Google-Smtp-Source: AMrXdXuDyzl3mRGjAOUDPdqwWXpAqM8HKZ629fDDGtE4QLCE/aeGvJpusjDyAqhHyPpCbS6gvzZQkw==
+X-Received: by 2002:a05:6a21:398b:b0:ab:9997:8ee2 with SMTP id ad11-20020a056a21398b00b000ab99978ee2mr12332900pzc.6.1672678416492;
+        Mon, 02 Jan 2023 08:53:36 -0800 (PST)
+Received: from [192.168.1.136] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id v63-20020a626142000000b005828071bf7asm1924910pfb.22.2023.01.02.08.53.35
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 02 Jan 2023 08:53:35 -0800 (PST)
+Message-ID: <9a01e386-0fb5-b074-a7b1-7e4bcf1ca204@kernel.dk>
+Date:   Mon, 2 Jan 2023 09:53:34 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221222191641.1643117-11-shikemeng@huaweicloud.com>
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
+ Thunderbird/102.6.0
+Subject: Re: [PATCH V13 0/8] block, bfq: extend bfq to support multi-actuator
+ drives
+Content-Language: en-US
+To:     Paolo Valente <paolo.valente@linaro.org>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        arie.vanderhoeven@seagate.com, rory.c.chen@seagate.com,
+        glen.valante@linaro.org, damien.lemoal@opensource.wdc.com
+References: <20221229203707.68458-1-paolo.valente@linaro.org>
+From:   Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20221229203707.68458-1-paolo.valente@linaro.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri 23-12-22 03:16:41, Kemeng Shi wrote:
-> bfqd->bfq_wr_max_softrt_rate is assigned with 7000 in bfq_init_queue and
-> never changed. So we can remove bfqd->bfq_wr_max_softrt_rate > 0 check
-> which is always true.
-> 
-> Signed-off-by: Kemeng Shi <shikemeng@huaweicloud.com>
+On 12/29/22 1:36 PM, Paolo Valente wrote:
+> Hi,
+> here is the V13, it differs from V12 in that it applies the
+> recommendation by Damien in [2].
 
-I would just leave these checks for documentation purposes and for possible
-experiments (e.g. disabling this logic by setting bfq_wr_max_softrt_rate to
-0). Alternatively, we could just define a constant for this and
-then we can remove all the checks, that would be a clean solution as well.
+This doesn't apply to current master. Can you send one that
+does?
 
-								Honza
-
-> ---
->  block/bfq-iosched.c | 6 ++----
->  1 file changed, 2 insertions(+), 4 deletions(-)
-> 
-> diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-> index 91bc68fba72d..00cdd42ac02a 100644
-> --- a/block/bfq-iosched.c
-> +++ b/block/bfq-iosched.c
-> @@ -1788,8 +1788,7 @@ static void bfq_bfqq_handle_idle_busy_switch(struct bfq_data *bfqd,
->  	 *   to control its weight explicitly)
->  	 */
->  	in_burst = bfq_bfqq_in_large_burst(bfqq);
-> -	soft_rt = bfqd->bfq_wr_max_softrt_rate > 0 &&
-> -		!BFQQ_TOTALLY_SEEKY(bfqq) &&
-> +	soft_rt = !BFQQ_TOTALLY_SEEKY(bfqq) &&
->  		!in_burst &&
->  		time_is_before_jiffies(bfqq->soft_rt_next_start) &&
->  		bfqq->dispatched == 0 &&
-> @@ -4284,8 +4283,7 @@ void bfq_bfqq_expire(struct bfq_data *bfqd,
->  	if (bfqd->low_latency && bfqq->wr_coeff == 1)
->  		bfqq->last_wr_start_finish = jiffies;
->  
-> -	if (bfqd->low_latency && bfqd->bfq_wr_max_softrt_rate > 0 &&
-> -	    RB_EMPTY_ROOT(&bfqq->sort_list)) {
-> +	if (bfqd->low_latency && RB_EMPTY_ROOT(&bfqq->sort_list)) {
->  		/*
->  		 * If we get here, and there are no outstanding
->  		 * requests, then the request pattern is isochronous
-> -- 
-> 2.30.0
-> 
 -- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+Jens Axboe
+
+
