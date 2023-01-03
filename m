@@ -2,141 +2,156 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 54298C3DA7A
-	for <linux-block@archiver.kernel.org>; Tue,  3 Jan 2023 02:33:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B51AC53210
+	for <linux-block@archiver.kernel.org>; Tue,  3 Jan 2023 05:22:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236549AbjACCdz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 2 Jan 2023 21:33:55 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37836 "EHLO
+        id S230157AbjACFWV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 3 Jan 2023 00:22:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48590 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236516AbjACCdy (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 2 Jan 2023 21:33:54 -0500
-Received: from esa3.hgst.iphmx.com (esa3.hgst.iphmx.com [216.71.153.141])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE32D103E
-        for <linux-block@vger.kernel.org>; Mon,  2 Jan 2023 18:33:53 -0800 (PST)
+        with ESMTP id S236765AbjACFVn (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 3 Jan 2023 00:21:43 -0500
+Received: from esa5.hgst.iphmx.com (esa5.hgst.iphmx.com [216.71.153.144])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D5E51F5A
+        for <linux-block@vger.kernel.org>; Mon,  2 Jan 2023 21:19:29 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1672713233; x=1704249233;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=m7CZUEu0rfN0SOVohyMC53s9FO7RSU1uMypinK6ksRk=;
-  b=PyBRk951L7fwKdIKGfGoaopsnWpCGhIu890NywkIzLWaQlWcTAbFMr1y
-   SFozyudiHC0ZtQmNPwKXAR/p+GwnwHw8uLfthWppkwOq6/1Z3CfQT8W8N
-   ZPZqj3wuS35Rc5wnl5JbosVJfEbTshoOJOfsP5ZYbVWSehJ+MgQQEEDJJ
-   nsCWvkNTrfRmV7z+48ZvX3Gx91k51ziAoXdckLwVLOdBZ8DeF+OmLE8cJ
-   lOlw59FrjJPXEA5ZVhTsJvNFDcMTaVXmZBYf7n/EOs9uGMS9DDAJ3sijy
-   bCP6qK4I71Kb0PtZPQqTxP7BX/mijzlnBQsZb0qsXPqDazj5BWDg7lTzw
+  t=1672723169; x=1704259169;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=7l1MMIENk2oH2FqNWL1GVw2Zn0YgTZg5M7dujBNkB8M=;
+  b=pXZtoH1nj4orzqFTJWklBsBG4IAnQKn55SthzypGfsmR1xmuLR6VbXCo
+   RwObKVhW5Umx9DF7/BeBV6T20H/JbgKAyjhWeguk4HAPpAFDwW+zz8eGI
+   6jKJBy3IbYbGfbWbh+B70cZpBxyN64r93qhtWRyZshTL6vxwTGMR2Pm5B
+   DKFZS9C5PXKN1hF0ULaAzkXNxbjEodfMez2Pp394CRrB3iJLMp7Y6GLhr
+   gBfHSLLQ+mqvTsIp9N0dFMZNIlXCL7ggPf/ABz1o5McTQjEYCQabZvhOR
+   CvYka8kysABqM+QNYEl/+jqmrCWsNgpCA8+GtILIpT0n/R+EZSYl8uvAw
    g==;
 X-IronPort-AV: E=Sophos;i="5.96,295,1665417600"; 
-   d="scan'208";a="224959416"
+   d="scan'208";a="219794866"
 Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 03 Jan 2023 10:33:52 +0800
-IronPort-SDR: XgK3YJcIWQIgIX3nqajkZhOgXM873zUvcsHU9OZxDEhIr6htj68+5bA9WdQuBsWLNaLyObvjU8
- 4m+PMuIw1aJOf5In3pryc0BDr3/BgoCj9dS+6gd+NpLvlvv35PPos12vxHRLtk6PqzoRCjtuSN
- D8rNpBiSQgAvn+O6THkCoqrcOKGUjyS2o5cQGrofKI/R9py9Ine5GXz/VirSUJraH30D4wmJ6r
- JTRsPo89az/qXNIJf/pf59uOpTJ6VNNoE/HMWYLdx60CaEU5qKyLAd7LvQDSbDhayYY7Xpr0Kx
- GcE=
+  by ob1.hgst.iphmx.com with ESMTP; 03 Jan 2023 13:19:28 +0800
+IronPort-SDR: LcAIq+53zJv5q1+2xaBKvbdEd6DN0dt23XYG8ZoHXyH0AfGUto/expZjX1RX8P5A+p70Hpa1rp
+ GLgqweURuurSPOE944d81yP/ggNx0AWlU+JsVfOg1twu1MBPlRtv/9ogpy/tob0m5rY+ulsxS/
+ o7aVtaKTaTj66HIN2DHOR/dtELf3JsbIoNEa1rcaaBowY2DflRTmeMszSqTuzep0X4XAuYNzcY
+ TGVbsGB4AWzJ5A/bC+2tE1ivpjLIEhs3bzk5Jnagam7/Wq0uP2INEUhZAGiVpZ/Vo1EvZi6xxN
+ ssc=
 Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
-  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 02 Jan 2023 17:46:06 -0800
-IronPort-SDR: tCFOwIZ6LTXO5hie1y7SniSrMCSdNviETXGbkF2fMdK6NkDpuSKeRNhaGvF8slPlJsZQyUs1DT
- RIr39qhPhVuhcdmHua+O6JhHB5n/XjYMuOauj7no4fKZYYIpNPKlFHF9LHu5OsqP5B7FZqe8wv
- tpPnxKPYbGoZEMkNGqXdqogzVU1BwegrIBs/tLZ8f4Cu1APQhD2SsSb+U6SfAhAAfEMHs06eTl
- iAM+kZ4ZvxCMASQa5NcO+WD/vTdUZPf+H7vxmE96WXgT04sZXrAo+XuQNpsZD79eqawzChsonm
- jBA=
+  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 02 Jan 2023 20:31:42 -0800
+IronPort-SDR: 2ss+ve8NIA/kQYo6FiJDqqiQCejVXdoV4oC9JCxhAUKu6sVOol6KPQU9QtYE9qASPts2umReQy
+ pUWXVS7aqvmIK0fOVO87CSxD2ki7h/dWWgP9P36nXH4VlZp2ZE95F2E8HWz44YtkEDyGNXQcy5
+ clKu5AHO7BtKGbSIceHfwcwqUhHOTe2Z8vzms2PjzI5fdf4XVLVWZJvYaBoOSboEkopuSrq8HQ
+ 34YkhafTuTwSrshqefvihcXeuoWhE33x8u/fL2+BFJEHoUIFdXfHHegzDyqY6cPpZH07b9Vmc1
+ nuY=
 WDCIronportException: Internal
 Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
-  by uls-op-cesaip01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 02 Jan 2023 18:33:52 -0800
+  by uls-op-cesaip01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 02 Jan 2023 21:19:29 -0800
 Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4NmGy80w8Vz1Rwtl
-        for <linux-block@vger.kernel.org>; Mon,  2 Jan 2023 18:33:52 -0800 (PST)
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4NmLdC6Z0lz1Rwrq
+        for <linux-block@vger.kernel.org>; Mon,  2 Jan 2023 21:19:27 -0800 (PST)
 Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
         reason="pass (just generated, assumed good)"
         header.d=opensource.wdc.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
-        opensource.wdc.com; h=content-transfer-encoding:content-type
-        :in-reply-to:organization:from:references:to:content-language
-        :subject:user-agent:mime-version:date:message-id; s=dkim; t=
-        1672713231; x=1675305232; bh=m7CZUEu0rfN0SOVohyMC53s9FO7RSU1uMyp
-        inK6ksRk=; b=G9qql6fVwHBAZmPI0LXOsmy3znq7MttXL2EiNnxJznnZ8/kwDwe
-        n8EK9lPE1E7TkhzwL7jOPLxJcTiYR2ohTP5I/IPtyllCTwL5Rc6jgHysimGcaNJ6
-        wtFYx3UmWTyukd8McTe0nwXKj3oarUaYIIENk5TOID0bsk6BnxcoAmTv2ZD+eEsr
-        CgND+8KnNLHOZp+1OmvI3pYVm+puTu3iimRmloL/awchHfahFpEXoIBhUqVgCbyE
-        tLRVDGbgSGC2XHcA0Z+dQIbHnXzExUcIDpbuN4O2+NXqU6S+ULEc3imB0Sq7Wdi6
-        k4fdythtP+euHvI8yv0hFnn0kv8NVdHV7GA==
+        opensource.wdc.com; h=content-transfer-encoding:mime-version
+        :x-mailer:message-id:date:subject:to:from; s=dkim; t=1672723167;
+         x=1675315168; bh=7l1MMIENk2oH2FqNWL1GVw2Zn0YgTZg5M7dujBNkB8M=; b=
+        nOafh1+vc2DsudU4VTflh1Tnzd6RVWn46r79oILpdWAjOP9mC7Q2J6nJ019vVp1o
+        KH3SNPa4QWIDZw8+CkwtDnKzAq1FSje/U0Lw0zfp/t6tnNMRbmBPTh1xFBqiZF24
+        CfGtY3S5m1XcJC05AS7Jn+o+ghwqYtI51IjzL+c1k3tBHYW27LqoUsSh4t2abKJE
+        Sau6aXoVkw0A1T/WWqeRlxdNc7EDGv4dZkinh6BrTbhxA8t71jH5l6i8G7zIyWET
+        5do/s8GCV6eZWmtbI+T5H+jXrQqWNaQ0e6lR+B55NgRxFDPh5bCgm24Lizo7kMlN
+        2908CQBhnsrY/eXJery+2Q==
 X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
 Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
         by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id e8K0xqzv1O2v for <linux-block@vger.kernel.org>;
-        Mon,  2 Jan 2023 18:33:51 -0800 (PST)
-Received: from [10.225.163.3] (unknown [10.225.163.3])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4NmGy62mDSz1RvLy;
-        Mon,  2 Jan 2023 18:33:50 -0800 (PST)
-Message-ID: <d4613092-e29d-574e-9d1e-4f5a3eca8b56@opensource.wdc.com>
-Date:   Tue, 3 Jan 2023 11:33:48 +0900
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.0
-Subject: Re: [PATCH v3 7/8] block, bfq: remove unnecessary goto tag in
- bfq_dispatch_rq_from_bfqq
-Content-Language: en-US
-To:     Kemeng Shi <shikemeng@huaweicloud.com>, jack@suse.com,
-        paolo.valente@linaro.org, axboe@kernel.dk
-Cc:     hch@lst.de, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20230103095303.2223546-1-shikemeng@huaweicloud.com>
- <20230103095303.2223546-8-shikemeng@huaweicloud.com>
+        with ESMTP id cREnswzJzTAW for <linux-block@vger.kernel.org>;
+        Mon,  2 Jan 2023 21:19:27 -0800 (PST)
+Received: from washi.fujisawa.hgst.com (washi.fujisawa.hgst.com [10.149.53.254])
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4NmLdB0YXMz1RvLy;
+        Mon,  2 Jan 2023 21:19:25 -0800 (PST)
 From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
-Organization: Western Digital Research
-In-Reply-To: <20230103095303.2223546-8-shikemeng@huaweicloud.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+To:     linux-ide@vger.kernel.org, linux-block@vger.kernel.org,
+        Jens Axboe <axboe@kernel.dk>
+Cc:     "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Hannes Reinecke <hare@suse.de>, Christoph Hellwig <hch@lst.de>,
+        Niklas Cassel <niklas.cassel@wdc.com>
+Subject: [PATCH v7 0/7] Improve libata support for FUA
+Date:   Tue,  3 Jan 2023 14:19:17 +0900
+Message-Id: <20230103051924.233796-1-damien.lemoal@opensource.wdc.com>
+X-Mailer: git-send-email 2.39.0
+MIME-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/3/23 18:53, Kemeng Shi wrote:
-> We jump to tag only for returning current rq. Return directly to
-> remove this tag.
-> 
-> Signed-off-by: Kemeng Shi <shikemeng@huaweicloud.com>
-> ---
->  block/bfq-iosched.c | 9 +++------
->  1 file changed, 3 insertions(+), 6 deletions(-)
-> 
-> diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-> index 9ff424c78e9b..a11be312ac77 100644
-> --- a/block/bfq-iosched.c
-> +++ b/block/bfq-iosched.c
-> @@ -4966,7 +4966,7 @@ static struct request *bfq_dispatch_rq_from_bfqq(struct bfq_data *bfqd,
->  	bfq_dispatch_remove(bfqd->queue, rq);
->  
->  	if (bfqq != bfqd->in_service_queue)
-> -		goto return_rq;
-> +		return rq;
->  
->  	/*
->  	 * If weight raising has to terminate for bfqq, then next
-> @@ -4986,12 +4986,9 @@ static struct request *bfq_dispatch_rq_from_bfqq(struct bfq_data *bfqd,
->  	 * belongs to CLASS_IDLE and other queues are waiting for
->  	 * service.
->  	 */
-> -	if (!(bfq_tot_busy_queues(bfqd) > 1 && bfq_class_idle(bfqq)))
-> -		goto return_rq;
-> +	if (bfq_tot_busy_queues(bfqd) > 1 && bfq_class_idle(bfqq))
-> +		bfq_bfqq_expire(bfqd, bfqq, false, BFQQE_BUDGET_EXHAUSTED);
->  
-> -	bfq_bfqq_expire(bfqd, bfqq, false, BFQQE_BUDGET_EXHAUSTED);
-> -
-> -return_rq:
->  	return rq;
->  }
->  
+These patches cleanup and improve libata support for ATA devices
+supporting the FUA feature.
 
-Looks OK to me.
+The first patch modifies the block layer to prevent the use of REQ_FUA
+with read requests. This is necessary as the block layer code expect
+REQ_FUA to be used with write requests (the flush machinery cannot
+enforce access to the media for FUA read commands) and FUA is not
+supported with ATA devices when NCQ is not enabled (device queue depth
+set to 1).
 
-Reviewed-by: Damien Le Moal <damien.lemoal@opensource.wdc.com>
+Patch 2 and 3 are libata cleanup preparatory patches. Patch 4 cleans up
+the detection for FUA support. Patch 5 fixes building a taskfile for FUA
+write requests. Patch 6 prevents the use of FUA with known bad drives.
 
--- 
-Damien Le Moal
-Western Digital Research
+Finally, patch 7 enables FUA support by default in libata for devices
+supporting this features.
+
+Changes from v6:
+ - Modified patch 1 to include checks for REQ_OP_ZONE_APPEND
+ - Addressed comments from Niklas (patch 2 -> return false, patch 3 ->
+   commit message typo, patch 7 -> more verbose commit message)
+
+Changes from v5:
+ - Removed WARN for FUA reads in patch 5.
+ - Added reviewed-by tags.
+
+Changes from v4:
+ - Changed patch 1 to the one suggested by Christoph.
+ - Added Hannes review tag.
+
+Changes from v3:
+ - Added patch 1 to prevent any block device user from issuing a
+   REQ_FUA read.
+ - Changed patch 5 to remove the check for REQ_FUA read and also remove=20
+   support for ATA_CMD_WRITE_MULTI_FUA_EXT as this command is obsolete
+   in recent ACS specifications.
+
+Changes from v2:
+ - Added patch 1 and 2 as preparatory patches
+ - Added patch 4 to fix FUA writes handling for the non-ncq case. Note
+   that it is possible that the drives blacklisted in patch 5 are
+   actually OK since the code back in 2012 had the issue with the wrong
+   use of LBA 28 commands for FUA writes.
+
+Changes from v1:
+ - Removed Maciej's patch 2. Instead, blacklist drives which are known
+   to have a buggy FUA support.
+
+Christoph Hellwig (1):
+  block: add a sanity check for non-write flush/fua bios
+
+Damien Le Moal (6):
+  ata: libata: Introduce ata_ncq_supported()
+  ata: libata: Rename and cleanup ata_rwcmd_protocol()
+  ata: libata: cleanup fua support detection
+  ata: libata: Fix FUA handling in ata_build_rw_tf()
+  ata: libata: blacklist FUA support for known buggy drives
+  ata: libata: Enable fua support by default
+
+ .../admin-guide/kernel-parameters.txt         |  3 +
+ block/blk-core.c                              | 14 ++--
+ drivers/ata/libata-core.c                     | 73 ++++++++++++++-----
+ drivers/ata/libata-scsi.c                     | 30 +-------
+ include/linux/libata.h                        | 36 ++++++---
+ 5 files changed, 94 insertions(+), 62 deletions(-)
+
+--=20
+2.39.0
 
