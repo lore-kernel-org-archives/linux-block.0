@@ -2,43 +2,43 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD5C6C5479D
-	for <linux-block@archiver.kernel.org>; Tue,  3 Jan 2023 01:54:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 66356C54EBD
+	for <linux-block@archiver.kernel.org>; Tue,  3 Jan 2023 01:54:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236528AbjACBy0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S232823AbjACBy0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Mon, 2 Jan 2023 20:54:26 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53890 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53888 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230389AbjACByY (ORCPT
+        with ESMTP id S232362AbjACByY (ORCPT
         <rfc822;linux-block@vger.kernel.org>); Mon, 2 Jan 2023 20:54:24 -0500
 Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 01C0C766F;
-        Mon,  2 Jan 2023 17:54:23 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A356766C;
+        Mon,  2 Jan 2023 17:54:22 -0800 (PST)
 Received: from mail02.huawei.com (unknown [172.30.67.153])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4NmG4T6xhLz4f3v4j;
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4NmG4T1575z4f3kph;
         Tue,  3 Jan 2023 09:54:17 +0800 (CST)
 Received: from huaweicloud.com (unknown [10.175.124.27])
-        by APP4 (Coremail) with SMTP id gCh0CgBHr7LJirNj9wMDBA--.19481S5;
-        Tue, 03 Jan 2023 09:54:20 +0800 (CST)
+        by APP4 (Coremail) with SMTP id gCh0CgBHr7LJirNj9wMDBA--.19481S3;
+        Tue, 03 Jan 2023 09:54:19 +0800 (CST)
 From:   Kemeng Shi <shikemeng@huaweicloud.com>
 To:     jack@suse.com, paolo.valente@linaro.org, axboe@kernel.dk
 Cc:     hch@lst.de, damien.lemoal@opensource.wdc.com,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v3 3/8] block, bfq: initialize bfqq->decrease_time_jif correctly
-Date:   Tue,  3 Jan 2023 17:52:58 +0800
-Message-Id: <20230103095303.2223546-4-shikemeng@huaweicloud.com>
+Subject: [PATCH v3 1/8] block, bfq: correctly raise inject limit in bfq_choose_bfqq_for_injection
+Date:   Tue,  3 Jan 2023 17:52:56 +0800
+Message-Id: <20230103095303.2223546-2-shikemeng@huaweicloud.com>
 X-Mailer: git-send-email 2.30.0
 In-Reply-To: <20230103095303.2223546-1-shikemeng@huaweicloud.com>
 References: <20230103095303.2223546-1-shikemeng@huaweicloud.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgBHr7LJirNj9wMDBA--.19481S5
-X-Coremail-Antispam: 1UD129KBjvJXoW7Cr4Utw1kuw4fJr45tF4ruFg_yoW8Aw4xpa
-        9Fgr47KF1jqFy3WF1UA3WDGFy5Krs09ry7J3W2g392y3yUArnF9FsYkrWYvFWfGrs7Aw10
-        qw4vqr9ruw1F9FJanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUB0b4IE77IF4wAFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k2
+X-CM-TRANSID: gCh0CgBHr7LJirNj9wMDBA--.19481S3
+X-Coremail-Antispam: 1UD129KBjvJXoW7uF4xCr1xXrWruF18AF45trb_yoW8ZrW3pa
+        47K347C348JF1ruF1jq3WfZFyYqan3CrnrtF13W34Fqryxur92gasFg3y5Za1ftFZ3Aw4j
+        v3WUWa4q9F15CaDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUB0b4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
         6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M280x2IEY4vEnII2IxkI6r1a6r45M2
-        8IrcIa0xkI8VA2jI8067AKxVWUWwA2048vs2IY020Ec7CjxVAFwI0_Xr0E3s1l8cAvFVAK
+        8IrcIa0xkI8VA2jI8067AKxVWUGwA2048vs2IY020Ec7CjxVAFwI0_JFI_Gr1l8cAvFVAK
         0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVWDJVCq3wA2z4
         x0Y4vE2Ix0cI8IcVCY1x0267AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l
         84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I
@@ -48,55 +48,59 @@ X-Coremail-Antispam: 1UD129KBjvJXoW7Cr4Utw1kuw4fJr45tF4ruFg_yoW8Aw4xpa
         jcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r126r1DMIIYrxkI7VAKI48JMIIF0xvE2I
         x0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK
         8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I
-        0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUIq2MUUUUU
+        0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUsgyZUUUUU
 X-CM-SenderInfo: 5vklyvpphqwq5kxd4v5lfo033gof0z/
 X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Inject limit is updated or reset when time_is_before_eq_jiffies(
-decrease_time_jif + several msecs) or think-time state changes.
-decrease_time_jif is initialized to 0 and will be set to current jiffies
-when inject limit is updated or reset. If the jiffies is slightly greater
-than LONG_MAX, time_is_after_eq_jiffies(0) will keep for a long time, so as
-time_is_after_eq_jiffies(decrease_time_jif + several msecs). If the
-think-time state never chages, then the injection will not work as expected
-for long time.
+Function bfq_choose_bfqq_for_injection may temporarily raise inject limit
+to one request if current inject_limit is 0 before search of the source
+queue for injection. However the search below will reset inject limit to
+bfqd->in_service_queue which is zero for raised inject limit. Then the
+temporarily raised inject limit never works as expected.
+Assigment limit to bfqd->in_service_queue in search is needed as limit
+maybe overwriten to min_t(unsigned int, 1, limit) for condition that
+a large in-flight request is on non-rotational devices in found queue.
+So we need to reset limit to bfqd->in_service_queue for normal case.
 
-To be more specific:
-Function bfq_update_inject_limit maybe triggered when jiffies pasts
-decrease_time_jif + msecs_to_jiffies(10) in bfq_add_request by setting
-bfqd->wait_dispatch to true.
-Function bfq_reset_inject_limit are called in two conditions:
-1. jiffies pasts bfqq->decrease_time_jif + msecs_to_jiffies(1000) in
-function bfq_add_request.
-2. jiffies pasts bfqq->decrease_time_jif + msecs_to_jiffies(100) or
-bfq think-time state change from short to long.
-
-Fix this by initializing bfqq->decrease_time_jif to current jiffies
-to trigger service injection soon when service injection conditions
-are met.
+Actually, we have already make sure bfqd->rq_in_driver is < limit before
+search, then
+ -Limit is >= 1 as bfqd->rq_in_driver is >= 0. Then min_t(unsigned int,
+1, limit) is always 1. So we can simply check bfqd->rq_in_driver with
+1 instead of result of min_t(unsigned int, 1, limit) for larget request in
+non-rotational device case to avoid overwritting limit and the bug is gone.
+ -For normal case, we have already check bfqd->rq_in_driver is < limit,
+so we can return found bfqq unconditionally to remove unncessary check.
 
 Signed-off-by: Kemeng Shi <shikemeng@huaweicloud.com>
 Reviewed-by: Jan Kara <jack@suse.cz>
 ---
- block/bfq-iosched.c | 2 ++
- 1 file changed, 2 insertions(+)
+ block/bfq-iosched.c | 10 ++++------
+ 1 file changed, 4 insertions(+), 6 deletions(-)
 
 diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index 5a6d9e8c329d..9441fc98961a 100644
+index a72304c728fc..1220c41fc767 100644
 --- a/block/bfq-iosched.c
 +++ b/block/bfq-iosched.c
-@@ -5491,6 +5491,8 @@ static void bfq_init_bfqq(struct bfq_data *bfqd, struct bfq_queue *bfqq,
- 
- 	/* first request is almost certainly seeky */
- 	bfqq->seek_history = 1;
-+
-+	bfqq->decrease_time_jif = jiffies;
- }
- 
- static struct bfq_queue **bfq_async_queue_prio(struct bfq_data *bfqd,
+@@ -4641,12 +4641,10 @@ bfq_choose_bfqq_for_injection(struct bfq_data *bfqd)
+ 			 */
+ 			if (blk_queue_nonrot(bfqd->queue) &&
+ 			    blk_rq_sectors(bfqq->next_rq) >=
+-			    BFQQ_SECT_THR_NONROT)
+-				limit = min_t(unsigned int, 1, limit);
+-			else
+-				limit = in_serv_bfqq->inject_limit;
+-
+-			if (bfqd->rq_in_driver < limit) {
++			    BFQQ_SECT_THR_NONROT &&
++			    bfqd->rq_in_driver >= 1)
++				continue;
++			else {
+ 				bfqd->rqs_injected = true;
+ 				return bfqq;
+ 			}
 -- 
 2.30.0
 
