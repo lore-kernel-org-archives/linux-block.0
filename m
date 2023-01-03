@@ -2,195 +2,89 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D67A2C3DA7A
-	for <linux-block@archiver.kernel.org>; Mon,  2 Jan 2023 17:39:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA128C53210
+	for <linux-block@archiver.kernel.org>; Tue,  3 Jan 2023 01:54:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231852AbjABRjq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 2 Jan 2023 12:39:46 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41340 "EHLO
+        id S232770AbjACByY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 2 Jan 2023 20:54:24 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53894 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234628AbjABRjp (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 2 Jan 2023 12:39:45 -0500
-Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com [209.85.216.45])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC289626E
-        for <linux-block@vger.kernel.org>; Mon,  2 Jan 2023 09:39:44 -0800 (PST)
-Received: by mail-pj1-f45.google.com with SMTP id j8-20020a17090a3e0800b00225fdd5007fso19112693pjc.2
-        for <linux-block@vger.kernel.org>; Mon, 02 Jan 2023 09:39:44 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=3xTLqIpTV5mPi8bTrEds70LhKQ+M/Ia6yMuSdpNsFzo=;
-        b=N8bRUjUfFzHbXCmcM1xJGKe4tgZrGfgDxoCs9qU4QLwwTZndz42AaqF940RqhfF9K+
-         oLntVqwD0AxUNTCXX/5nDJlGzkCopAYkjItBrEY1FvkvHjpa9fO7XNdX3X9jaC15Ki+q
-         3cDq7AqwS64OoMCnLOuA5HiaaZ8JhwAvbeEDMb9NKW7q7N1KedGDBN9LWtJdUvI4bbJC
-         59aASE4QT95++SbWCrLRlBDDF/kHxmu16HNKcZwkC4ZxIrSsmhRGPIyukXzDKK+TvgSC
-         bgJrNTl1Yp4wh0GW5vtu/i991euMWQf0YrFRCCVZbRyZtDzYl16UyvCJRl91DdwFjOIF
-         wzuA==
-X-Gm-Message-State: AFqh2krNPTW+/Zpo28zvI16oBZiI5LrV8QRyotZo+9YByomWLfkrpkOM
-        qTb1ydHE5MKh+UqutAK0w+8=
-X-Google-Smtp-Source: AMrXdXtbCMmgQ0ou05jJLVFPsCgQRbyx8uEjyU8jRrhC2b5AXkmC+8mYqzMzcRSSks/B0VlAFnxqgA==
-X-Received: by 2002:a05:6a21:3393:b0:ab:fb31:be13 with SMTP id yy19-20020a056a21339300b000abfb31be13mr89038167pzb.37.1672681183863;
-        Mon, 02 Jan 2023 09:39:43 -0800 (PST)
-Received: from asus.hsd1.ca.comcast.net ([98.51.102.78])
-        by smtp.gmail.com with ESMTPSA id a13-20020a1709027e4d00b00183c6784704sm20304510pln.291.2023.01.02.09.39.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Jan 2023 09:39:42 -0800 (PST)
-From:   Bart Van Assche <bvanassche@acm.org>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Bart Van Assche <bvanassche@acm.org>,
-        Christoph Hellwig <hch@lst.de>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Ming Lei <ming.lei@redhat.com>,
-        Keith Busch <kbusch@kernel.org>,
-        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-        Ed Tsai <ed.tsai@mediatek.com>
-Subject: [PATCH] block: Improve shared tag set performance
-Date:   Mon,  2 Jan 2023 09:39:26 -0800
-Message-Id: <20230102173926.29132-1-bvanassche@acm.org>
-X-Mailer: git-send-email 2.39.0
+        with ESMTP id S232144AbjACByY (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 2 Jan 2023 20:54:24 -0500
+Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66944767F;
+        Mon,  2 Jan 2023 17:54:23 -0800 (PST)
+Received: from mail02.huawei.com (unknown [172.30.67.153])
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4NmG4V2V3jz4f3v4q;
+        Tue,  3 Jan 2023 09:54:18 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.175.124.27])
+        by APP4 (Coremail) with SMTP id gCh0CgBHr7LJirNj9wMDBA--.19481S6;
+        Tue, 03 Jan 2023 09:54:20 +0800 (CST)
+From:   Kemeng Shi <shikemeng@huaweicloud.com>
+To:     jack@suse.com, paolo.valente@linaro.org, axboe@kernel.dk
+Cc:     hch@lst.de, damien.lemoal@opensource.wdc.com,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH v3 4/8] block, bfq: use helper macro RQ_BFQQ to get bfqq of request
+Date:   Tue,  3 Jan 2023 17:52:59 +0800
+Message-Id: <20230103095303.2223546-5-shikemeng@huaweicloud.com>
+X-Mailer: git-send-email 2.30.0
+In-Reply-To: <20230103095303.2223546-1-shikemeng@huaweicloud.com>
+References: <20230103095303.2223546-1-shikemeng@huaweicloud.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: gCh0CgBHr7LJirNj9wMDBA--.19481S6
+X-Coremail-Antispam: 1UD129KBjvdXoWrZF47Xry3Xry7Cr4UtFyrWFg_yoWfKFg_Ca
+        yxKr93Jr1kC3y5Zr4SkFWYqFn7CFWfXFn8ur98trs8Wa43CanIy3sFqr43ZFZ8ua1DCa9x
+        KFn0vw13ArnrujkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+        9fnUUIcSsGvfJTRUUUbS8YFVCjjxCrM7AC8VAFwI0_Wr0E3s1l1xkIjI8I6I8E6xAIw20E
+        Y4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l87I20VAvwVAaII0Ic2I_JFv_Gryl82
+        xGYIkIc2x26280x7IE14v26r126s0DM28IrcIa0xkI8VCY1x0267AKxVW5JVCq3wA2ocxC
+        64kIII0Yj41l84x0c7CEw4AK67xGY2AK021l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM2
+        8EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4UJVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq
+        3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_GcCE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8w
+        Aqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE
+        14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwIxGrwCF04k20xvY0x
+        0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E
+        7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_JF0_Jw1lIxkGc2Ij64vIr41lIxAIcV
+        C0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF
+        04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7
+        CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x07jstxDUUUUU=
+X-CM-SenderInfo: 5vklyvpphqwq5kxd4v5lfo033gof0z/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Remove the code for fair tag sharing because it significantly hurts
-performance for UFS devices. Removing this code is safe because the
-legacy block layer worked fine without any equivalent fairness
-algorithm.
+Use helper macro RQ_BFQQ to get bfqq of request.
 
-This algorithm hurts performance for UFS devices because UFS devices
-have multiple logical units. One of these logical units (WLUN) is used
-to submit control commands, e.g. START STOP UNIT. If any request is
-submitted to the WLUN, the queue depth is reduced from 31 to 15 or
-lower for data LUNs.
-
-See also https://lore.kernel.org/linux-scsi/20221229030645.11558-1-ed.tsai@mediatek.com/
-
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Martin K. Petersen <martin.petersen@oracle.com>
-Cc: Ming Lei <ming.lei@redhat.com>
-Cc: Keith Busch <kbusch@kernel.org>
-Cc: Damien Le Moal <damien.lemoal@opensource.wdc.com>
-Cc: Ed Tsai <ed.tsai@mediatek.com>
-Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+Signed-off-by: Kemeng Shi <shikemeng@huaweicloud.com>
+Reviewed-by: Jan Kara <jack@suse.cz>
 ---
- block/blk-mq-debugfs.c |  2 --
- block/blk-mq-tag.c     |  8 --------
- block/blk-mq.c         |  3 ---
- block/blk-mq.h         | 40 ----------------------------------------
- 4 files changed, 53 deletions(-)
+ block/bfq-iosched.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-index bd942341b638..00af8d2c8816 100644
---- a/block/blk-mq-debugfs.c
-+++ b/block/blk-mq-debugfs.c
-@@ -426,8 +426,6 @@ static void blk_mq_debugfs_tags_show(struct seq_file *m,
- {
- 	seq_printf(m, "nr_tags=%u\n", tags->nr_tags);
- 	seq_printf(m, "nr_reserved_tags=%u\n", tags->nr_reserved_tags);
--	seq_printf(m, "active_queues=%d\n",
--		   atomic_read(&tags->active_queues));
+diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+index 9441fc98961a..c3c4c83ee95f 100644
+--- a/block/bfq-iosched.c
++++ b/block/bfq-iosched.c
+@@ -6683,14 +6683,14 @@ static struct bfq_queue *bfq_init_rq(struct request *rq)
+ 		return NULL;
  
- 	seq_puts(m, "\nbitmap_tags:\n");
- 	sbitmap_queue_show(&tags->bitmap_tags, m);
-diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
-index 9eb968e14d31..e9243cae41c7 100644
---- a/block/blk-mq-tag.c
-+++ b/block/blk-mq-tag.c
-@@ -53,8 +53,6 @@ void __blk_mq_tag_busy(struct blk_mq_hw_ctx *hctx)
- 		set_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state);
- 	}
+ 	/*
+-	 * Assuming that elv.priv[1] is set only if everything is set
++	 * Assuming that RQ_BFQQ(rq) is set only if everything is set
+ 	 * for this rq. This holds true, because this function is
+ 	 * invoked only for insertion or merging, and, after such
+ 	 * events, a request cannot be manipulated any longer before
+ 	 * being removed from bfq.
+ 	 */
+-	if (rq->elv.priv[1])
+-		return rq->elv.priv[1];
++	if (RQ_BFQQ(rq))
++		return RQ_BFQQ(rq);
  
--	users = atomic_inc_return(&hctx->tags->active_queues);
--
- 	blk_mq_update_wake_batch(hctx->tags, users);
- }
+ 	bic = icq_to_bic(rq->elv.icq);
  
-@@ -88,8 +86,6 @@ void __blk_mq_tag_idle(struct blk_mq_hw_ctx *hctx)
- 			return;
- 	}
- 
--	users = atomic_dec_return(&tags->active_queues);
--
- 	blk_mq_update_wake_batch(tags, users);
- 
- 	blk_mq_tag_wakeup_all(tags, false);
-@@ -98,10 +94,6 @@ void __blk_mq_tag_idle(struct blk_mq_hw_ctx *hctx)
- static int __blk_mq_get_tag(struct blk_mq_alloc_data *data,
- 			    struct sbitmap_queue *bt)
- {
--	if (!data->q->elevator && !(data->flags & BLK_MQ_REQ_RESERVED) &&
--			!hctx_may_queue(data->hctx, bt))
--		return BLK_MQ_NO_TAG;
--
- 	if (data->shallow_depth)
- 		return sbitmap_queue_get_shallow(bt, data->shallow_depth);
- 	else
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 4a7805390cf8..c570f134850a 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1698,9 +1698,6 @@ static bool __blk_mq_alloc_driver_tag(struct request *rq)
- 	if (blk_mq_tag_is_reserved(rq->mq_hctx->sched_tags, rq->internal_tag)) {
- 		bt = &rq->mq_hctx->tags->breserved_tags;
- 		tag_offset = 0;
--	} else {
--		if (!hctx_may_queue(rq->mq_hctx, bt))
--			return false;
- 	}
- 
- 	tag = __sbitmap_queue_get(bt);
-diff --git a/block/blk-mq.h b/block/blk-mq.h
-index 0b2870839cdd..908f830931f0 100644
---- a/block/blk-mq.h
-+++ b/block/blk-mq.h
-@@ -334,46 +334,6 @@ static inline void blk_mq_free_requests(struct list_head *list)
- 	}
- }
- 
--/*
-- * For shared tag users, we track the number of currently active users
-- * and attempt to provide a fair share of the tag depth for each of them.
-- */
--static inline bool hctx_may_queue(struct blk_mq_hw_ctx *hctx,
--				  struct sbitmap_queue *bt)
--{
--	unsigned int depth, users;
--
--	if (!hctx || !(hctx->flags & BLK_MQ_F_TAG_QUEUE_SHARED))
--		return true;
--
--	/*
--	 * Don't try dividing an ant
--	 */
--	if (bt->sb.depth == 1)
--		return true;
--
--	if (blk_mq_is_shared_tags(hctx->flags)) {
--		struct request_queue *q = hctx->queue;
--
--		if (!test_bit(QUEUE_FLAG_HCTX_ACTIVE, &q->queue_flags))
--			return true;
--	} else {
--		if (!test_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state))
--			return true;
--	}
--
--	users = atomic_read(&hctx->tags->active_queues);
--
--	if (!users)
--		return true;
--
--	/*
--	 * Allow at least some tags
--	 */
--	depth = max((bt->sb.depth + users - 1) / users, 4U);
--	return __blk_mq_active_requests(hctx) < depth;
--}
--
- /* run the code block in @dispatch_ops with rcu/srcu read lock held */
- #define __blk_mq_run_dispatch_ops(q, check_sleep, dispatch_ops)	\
- do {								\
+-- 
+2.30.0
+
