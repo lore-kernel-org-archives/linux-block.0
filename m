@@ -2,124 +2,118 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9401BC3DA7D
-	for <linux-block@archiver.kernel.org>; Tue,  3 Jan 2023 08:23:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CAA82C3DA7D
+	for <linux-block@archiver.kernel.org>; Tue,  3 Jan 2023 09:44:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232992AbjACIX1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 3 Jan 2023 03:23:27 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46858 "EHLO
+        id S237244AbjACJow (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 3 Jan 2023 04:44:52 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59896 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232838AbjACIX0 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 3 Jan 2023 03:23:26 -0500
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 763291036;
-        Tue,  3 Jan 2023 00:23:21 -0800 (PST)
-Received: from mail02.huawei.com (unknown [172.30.67.153])
-        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4NmQjH3z7yz4f3kpC;
-        Tue,  3 Jan 2023 16:23:15 +0800 (CST)
-Received: from huaweicloud.com (unknown [10.175.127.227])
-        by APP4 (Coremail) with SMTP id gCh0CgBH_rH05bNjFOASBA--.23491S4;
-        Tue, 03 Jan 2023 16:23:18 +0800 (CST)
-From:   Yu Kuai <yukuai1@huaweicloud.com>
-To:     jack@suse.cz, paolo.valente@linaro.org, axboe@kernel.dk,
-        tj@kernel.org, josef@toxicpanda.com
-Cc:     linux-block@vger.kernel.org, cgroups@vger.kernel.org,
-        linux-kernel@vger.kernel.org, yukuai3@huawei.com,
-        yukuai1@huaweicloud.com, yi.zhang@huawei.com, yangerkun@huawei.com
-Subject: [PATCH] block, bfq: switch 'bfqg->ref' to use atomic refcount apis
-Date:   Tue,  3 Jan 2023 16:47:55 +0800
-Message-Id: <20230103084755.1256479-1-yukuai1@huaweicloud.com>
-X-Mailer: git-send-email 2.31.1
+        with ESMTP id S230467AbjACJow (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 3 Jan 2023 04:44:52 -0500
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C79DE0D5;
+        Tue,  3 Jan 2023 01:44:51 -0800 (PST)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 120D83825B;
+        Tue,  3 Jan 2023 09:44:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1672739090; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=h9d33HEzxSlB3aWdhyISRr5Fj3AshfOOVeWRm3q0aSQ=;
+        b=dKiKaiVuzqWQLU16r4Itx7y8XqtIAzQ6BeSjKjYn2lVdjgyp003gWZFV++vJ99AxyELn8E
+        KoTn+Gdur7lM/i/CedKASpXAIwyJTi/ioEE9Sf0yug2xHzFeZ5BKXzEtVOX4DeXByfQwlU
+        g/fNrf8iYSgouEtHzKHNdeGZ9crfRSA=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1672739090;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=h9d33HEzxSlB3aWdhyISRr5Fj3AshfOOVeWRm3q0aSQ=;
+        b=ZnZqVLV55JADBFuAx1wD64/UKUmFDMQdkEfKp3jFPu3mDA7FX/yF63/jnLW5Oh1m0StGDo
+        jLG3z1zpLJwo7/Bw==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 033CE1392B;
+        Tue,  3 Jan 2023 09:44:50 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id bFfHABL5s2N1LQAAMHmgww
+        (envelope-from <jack@suse.cz>); Tue, 03 Jan 2023 09:44:50 +0000
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+        id 83845A0742; Tue,  3 Jan 2023 10:44:49 +0100 (CET)
+Date:   Tue, 3 Jan 2023 10:44:49 +0100
+From:   Jan Kara <jack@suse.cz>
+To:     Kemeng Shi <shikemeng@huaweicloud.com>
+Cc:     jack@suse.com, paolo.valente@linaro.org, axboe@kernel.dk,
+        hch@lst.de, damien.lemoal@opensource.wdc.com,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 7/8] block, bfq: remove unnecessary goto tag in
+ bfq_dispatch_rq_from_bfqq
+Message-ID: <20230103094449.caq2hoftxdhmnv6e@quack3>
+References: <20230103095303.2223546-1-shikemeng@huaweicloud.com>
+ <20230103095303.2223546-8-shikemeng@huaweicloud.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgBH_rH05bNjFOASBA--.23491S4
-X-Coremail-Antispam: 1UD129KBjvJXoW7uFyfuw15JryDWrWDury3Arb_yoW8Zr1kpF
-        n0qa45G34rGr1fXF4UAa4UXry8Jw1fCryrK3yqg3sYyry7Xw1Sg3Z0yrWrJ34SvF93ArWU
-        Zr1Ygay0vr12qFUanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUvY14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-        1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-        JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-        CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-        2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-        W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2
-        Y2ka0xkIwI1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4
-        xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43
-        MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I
-        0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWrZr1j6s0DMIIF0xvEx4A2jsIE14v2
-        6r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0J
-        UdHUDUUUUU=
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230103095303.2223546-8-shikemeng@huaweicloud.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Yu Kuai <yukuai3@huawei.com>
+On Tue 03-01-23 17:53:02, Kemeng Shi wrote:
+> We jump to tag only for returning current rq. Return directly to
+> remove this tag.
+> 
+> Signed-off-by: Kemeng Shi <shikemeng@huaweicloud.com>
 
-The updating of 'bfqg->ref' should be protected by 'bfqd->lock', however,
-during code review, we found that bfq_pd_free() update 'bfqg->ref'
-without holding the lock, which is problematic:
+Looks good to me. Feel free to add:
 
-1) bfq_pd_free() triggered by removing cgroup is called asynchronously;
-2) bfqq will grab bfqg reference, and exit bfqq will drop the reference,
-which can concurrent with 1).
+Reviewed-by: Jan Kara <jack@suse.cz>
 
-Unfortunately, 'bfqd->lock' can't be held here because 'bfqd' might already
-be freed in bfq_pd_free(). Fix the problem by using atomic refcount apis.
+								Honza
 
-Signed-off-by: Yu Kuai <yukuai3@huawei.com>
----
-Changes from RFC:
- - refcount_dec_and_test(bfqg->ref) -> refcount_dec_and_test(&bfqg->ref)
-
- block/bfq-cgroup.c  | 8 +++-----
- block/bfq-iosched.h | 2 +-
- 2 files changed, 4 insertions(+), 6 deletions(-)
-
-diff --git a/block/bfq-cgroup.c b/block/bfq-cgroup.c
-index 1b2829e99dad..7d9b15f0dbd5 100644
---- a/block/bfq-cgroup.c
-+++ b/block/bfq-cgroup.c
-@@ -316,14 +316,12 @@ struct bfq_group *bfqq_group(struct bfq_queue *bfqq)
- 
- static void bfqg_get(struct bfq_group *bfqg)
- {
--	bfqg->ref++;
-+	refcount_inc(&bfqg->ref);
- }
- 
- static void bfqg_put(struct bfq_group *bfqg)
- {
--	bfqg->ref--;
--
--	if (bfqg->ref == 0)
-+	if (refcount_dec_and_test(&bfqg->ref))
- 		kfree(bfqg);
- }
- 
-@@ -530,7 +528,7 @@ static struct blkg_policy_data *bfq_pd_alloc(gfp_t gfp, struct request_queue *q,
- 	}
- 
- 	/* see comments in bfq_bic_update_cgroup for why refcounting */
--	bfqg_get(bfqg);
-+	refcount_set(&bfqg->ref, 1);
- 	return &bfqg->pd;
- }
- 
-diff --git a/block/bfq-iosched.h b/block/bfq-iosched.h
-index 41aa151ccc22..466e4865ace6 100644
---- a/block/bfq-iosched.h
-+++ b/block/bfq-iosched.h
-@@ -928,7 +928,7 @@ struct bfq_group {
- 	char blkg_path[128];
- 
- 	/* reference counter (see comments in bfq_bic_update_cgroup) */
--	int ref;
-+	refcount_t ref;
- 	/* Is bfq_group still online? */
- 	bool online;
- 
+> ---
+>  block/bfq-iosched.c | 9 +++------
+>  1 file changed, 3 insertions(+), 6 deletions(-)
+> 
+> diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+> index 9ff424c78e9b..a11be312ac77 100644
+> --- a/block/bfq-iosched.c
+> +++ b/block/bfq-iosched.c
+> @@ -4966,7 +4966,7 @@ static struct request *bfq_dispatch_rq_from_bfqq(struct bfq_data *bfqd,
+>  	bfq_dispatch_remove(bfqd->queue, rq);
+>  
+>  	if (bfqq != bfqd->in_service_queue)
+> -		goto return_rq;
+> +		return rq;
+>  
+>  	/*
+>  	 * If weight raising has to terminate for bfqq, then next
+> @@ -4986,12 +4986,9 @@ static struct request *bfq_dispatch_rq_from_bfqq(struct bfq_data *bfqd,
+>  	 * belongs to CLASS_IDLE and other queues are waiting for
+>  	 * service.
+>  	 */
+> -	if (!(bfq_tot_busy_queues(bfqd) > 1 && bfq_class_idle(bfqq)))
+> -		goto return_rq;
+> +	if (bfq_tot_busy_queues(bfqd) > 1 && bfq_class_idle(bfqq))
+> +		bfq_bfqq_expire(bfqd, bfqq, false, BFQQE_BUDGET_EXHAUSTED);
+>  
+> -	bfq_bfqq_expire(bfqd, bfqq, false, BFQQE_BUDGET_EXHAUSTED);
+> -
+> -return_rq:
+>  	return rq;
+>  }
+>  
+> -- 
+> 2.30.0
+> 
 -- 
-2.31.1
-
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
