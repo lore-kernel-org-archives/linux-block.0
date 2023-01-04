@@ -2,42 +2,42 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D9B9C53210
-	for <linux-block@archiver.kernel.org>; Wed,  4 Jan 2023 06:24:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C049C46467
+	for <linux-block@archiver.kernel.org>; Wed,  4 Jan 2023 06:24:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233111AbjADGYY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 4 Jan 2023 01:24:24 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41906 "EHLO
+        id S233072AbjADGY0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 4 Jan 2023 01:24:26 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41918 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230060AbjADGYX (ORCPT
+        with ESMTP id S230483AbjADGYX (ORCPT
         <rfc822;linux-block@vger.kernel.org>); Wed, 4 Jan 2023 01:24:23 -0500
 Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D02513D67;
-        Tue,  3 Jan 2023 22:24:21 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 56335183A0;
+        Tue,  3 Jan 2023 22:24:22 -0800 (PST)
 Received: from mail02.huawei.com (unknown [172.30.67.153])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4Nn01W4Yx6z4f43ZG;
-        Wed,  4 Jan 2023 14:24:15 +0800 (CST)
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4Nn01Y1SSWz4f3pPl;
+        Wed,  4 Jan 2023 14:24:17 +0800 (CST)
 Received: from huaweicloud.com (unknown [10.175.124.27])
-        by APP4 (Coremail) with SMTP id gCh0CgDnnbGOG7Vju3lKBA--.23788S6;
-        Wed, 04 Jan 2023 14:24:18 +0800 (CST)
+        by APP4 (Coremail) with SMTP id gCh0CgDnnbGOG7Vju3lKBA--.23788S10;
+        Wed, 04 Jan 2023 14:24:19 +0800 (CST)
 From:   Kemeng Shi <shikemeng@huaweicloud.com>
 To:     axboe@kernel.dk, dwagner@suse.de, hare@suse.de,
         ming.lei@redhat.com, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org
 Cc:     hch@lst.de, john.garry@huawei.com, jack@suse.cz
-Subject: [PATCH v2 04/13] blk-mq: Fix potential io hung for shared sbitmap per tagset
-Date:   Wed,  4 Jan 2023 22:22:50 +0800
-Message-Id: <20230104142259.2673013-5-shikemeng@huaweicloud.com>
+Subject: [PATCH v2 08/13] blk-mq: simplify flush check in blk_mq_dispatch_rq_list
+Date:   Wed,  4 Jan 2023 22:22:54 +0800
+Message-Id: <20230104142259.2673013-9-shikemeng@huaweicloud.com>
 X-Mailer: git-send-email 2.30.0
 In-Reply-To: <20230104142259.2673013-1-shikemeng@huaweicloud.com>
 References: <20230104142259.2673013-1-shikemeng@huaweicloud.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgDnnbGOG7Vju3lKBA--.23788S6
-X-Coremail-Antispam: 1UD129KBjvJXoW7CFW7tFy5CFyfXr4Duw1ftFb_yoW8AF48pr
-        WrtF1UKanaqr1qvFWxXa17GF10krs5Kwn3J3yfursIvw15Kr1xJFW0gay3J3W0vFZayrW7
-        ZayUKFyUXws5X37anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUB2b4IE77IF4wAFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k2
+X-CM-TRANSID: gCh0CgDnnbGOG7Vju3lKBA--.23788S10
+X-Coremail-Antispam: 1UD129KBjvJXoW7CFyxAr1fCF4kuw48XrWkZwb_yoW8JFWkpF
+        W3Gayqkryaqr12yr18Ca9xGasrAws5AF1UuFZxCw1aqF45Cr4xKrZaga15Wa4kCrsayF4Y
+        vayUWrWY9FW5Xa7anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUBIb4IE77IF4wAFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k2
         6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M280x2IEY4vEnII2IxkI6r1a6r45M2
         8IrcIa0xkI8VA2jI8067AKxVWUAVCq3wA2048vs2IY020Ec7CjxVAFwI0_Xr0E3s1l8cAv
         FVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVWDJVCq3w
@@ -47,56 +47,45 @@ X-Coremail-Antispam: 1UD129KBjvJXoW7CFW7tFy5CFyfXr4Duw1ftFb_yoW8AF48pr
         67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41l42xK82IYc2
         Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s02
         6x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0x
-        vE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE
-        42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6x
-        kF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUIL05UUUUU
+        vE2Ix0cI8IcVAFwI0_JFI_Gr1lIxAIcVC0I7IYx2IY6xkF7I0E14v26F4j6r4UJwCI42IY
+        6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aV
+        CY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU0TqcUUUUUU==
 X-CM-SenderInfo: 5vklyvpphqwq5kxd4v5lfo033gof0z/
 X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Commit f906a6a0f4268 ("blk-mq: improve tag waiting setup for non-shared
-tags") mark restart for unshared tags for improvement. At that time,
-tags is only shared betweens queues and we can check if tags is shared
-by test BLK_MQ_F_TAG_SHARED.
-Afterwards, commit 32bc15afed04b ("blk-mq: Facilitate a shared sbitmap per
-tagset") enabled tags share betweens hctxs inside a queue. We only
-mark restart for shared hctxs inside a queue and may cause io hung if
-there is no tag currently allocated by hctxs going to be marked restart.
-Wait on sbitmap_queue instead of mark restart for shared hctxs case to
-fix this.
+For busy error BLK_STS*_RESOURCE, request will always be added
+back to list, so need_resource will not be true and ret will
+not be == BLK_STS_DEV_RESOURCE if list is empty. We could remove
+these dead check.
+If list is empty, we only need to send extra flush
+if error happens at last request in the list which is stored in
+ret. So send a extra flush if ret is not BLK_STS_OK instead of
+errors is non-zero to avoid unnecessary flush for error at middle
+request in list.
 
-Fixes: 32bc15afed04 ("blk-mq: Facilitate a shared sbitmap per tagset")
 Signed-off-by: Kemeng Shi <shikemeng@huaweicloud.com>
 ---
- block/blk-mq.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ block/blk-mq.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/block/blk-mq.c b/block/blk-mq.c
-index ec958aa044ba..9c3a9b5e5b0c 100644
+index a9e88037550b..c543c14fdb47 100644
 --- a/block/blk-mq.c
 +++ b/block/blk-mq.c
-@@ -1825,7 +1825,8 @@ static bool blk_mq_mark_tag_wait(struct blk_mq_hw_ctx *hctx,
- 	wait_queue_entry_t *wait;
- 	bool ret;
- 
--	if (!(hctx->flags & BLK_MQ_F_TAG_QUEUE_SHARED)) {
-+	if (!(hctx->flags & BLK_MQ_F_TAG_QUEUE_SHARED) &&
-+	    !(blk_mq_is_shared_tags(hctx->flags))) {
- 		blk_mq_sched_mark_restart_hctx(hctx);
- 
- 		/*
-@@ -2095,7 +2096,8 @@ bool blk_mq_dispatch_rq_list(struct blk_mq_hw_ctx *hctx, struct list_head *list,
- 		bool needs_restart;
- 		/* For non-shared tags, the RESTART check will suffice */
- 		bool no_tag = prep == PREP_DISPATCH_NO_TAG &&
--			(hctx->flags & BLK_MQ_F_TAG_QUEUE_SHARED);
-+			((hctx->flags & BLK_MQ_F_TAG_QUEUE_SHARED) ||
-+			blk_mq_is_shared_tags(hctx->flags));
- 
- 		if (nr_budgets)
- 			blk_mq_release_budgets(q, list);
+@@ -2085,8 +2085,8 @@ bool blk_mq_dispatch_rq_list(struct blk_mq_hw_ctx *hctx, struct list_head *list,
+ 	/* If we didn't flush the entire list, we could have told the driver
+ 	 * there was more coming, but that turned out to be a lie.
+ 	 */
+-	if ((!list_empty(list) || errors || needs_resource ||
+-	     ret == BLK_STS_DEV_RESOURCE) && q->mq_ops->commit_rqs && queued)
++	if ((!list_empty(list) || ret != BLK_STS_OK) &&
++	     q->mq_ops->commit_rqs && queued)
+ 		q->mq_ops->commit_rqs(hctx);
+ 	/*
+ 	 * Any items that need requeuing? Stuff them into hctx->dispatch,
 -- 
 2.30.0
 
