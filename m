@@ -2,41 +2,41 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D60B4C4708D
-	for <linux-block@archiver.kernel.org>; Wed,  4 Jan 2023 06:24:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BDE30C53210
+	for <linux-block@archiver.kernel.org>; Wed,  4 Jan 2023 06:24:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230321AbjADGY1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 4 Jan 2023 01:24:27 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41916 "EHLO
+        id S233150AbjADGY2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 4 Jan 2023 01:24:28 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41922 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230416AbjADGYX (ORCPT
+        with ESMTP id S231128AbjADGYX (ORCPT
         <rfc822;linux-block@vger.kernel.org>); Wed, 4 Jan 2023 01:24:23 -0500
-Received: from dggsgout12.his.huawei.com (unknown [45.249.212.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E544518396;
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC81C17E3E;
         Tue,  3 Jan 2023 22:24:21 -0800 (PST)
 Received: from mail02.huawei.com (unknown [172.30.67.153])
-        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4Nn01X4pWNz4f3mKw;
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4Nn01X2dNwz4f3pPX;
         Wed,  4 Jan 2023 14:24:16 +0800 (CST)
 Received: from huaweicloud.com (unknown [10.175.124.27])
-        by APP4 (Coremail) with SMTP id gCh0CgDnnbGOG7Vju3lKBA--.23788S9;
-        Wed, 04 Jan 2023 14:24:19 +0800 (CST)
+        by APP4 (Coremail) with SMTP id gCh0CgDnnbGOG7Vju3lKBA--.23788S8;
+        Wed, 04 Jan 2023 14:24:18 +0800 (CST)
 From:   Kemeng Shi <shikemeng@huaweicloud.com>
 To:     axboe@kernel.dk, dwagner@suse.de, hare@suse.de,
         ming.lei@redhat.com, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org
 Cc:     hch@lst.de, john.garry@huawei.com, jack@suse.cz
-Subject: [PATCH v2 07/13] blk-mq: remove error count and unncessary flush in blk_mq_try_issue_list_directly
-Date:   Wed,  4 Jan 2023 22:22:53 +0800
-Message-Id: <20230104142259.2673013-8-shikemeng@huaweicloud.com>
+Subject: [PATCH v2 06/13] blk-mq: remove unncessary error count and flush in blk_mq_plug_issue_direct
+Date:   Wed,  4 Jan 2023 22:22:52 +0800
+Message-Id: <20230104142259.2673013-7-shikemeng@huaweicloud.com>
 X-Mailer: git-send-email 2.30.0
 In-Reply-To: <20230104142259.2673013-1-shikemeng@huaweicloud.com>
 References: <20230104142259.2673013-1-shikemeng@huaweicloud.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgDnnbGOG7Vju3lKBA--.23788S9
-X-Coremail-Antispam: 1UD129KBjvJXoW7tryrKF4UZw1xZF1UZF4fKrg_yoW8Zw4kpF
-        W3Ga1qkr4avr4xurW8Ca9rG3W2vrZxGrW7KFW3Cw1aqr45KrWI9rsxXrW7Xas2krs3Ar43
-        WFWUWryYyayUXrDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+X-CM-TRANSID: gCh0CgDnnbGOG7Vju3lKBA--.23788S8
+X-Coremail-Antispam: 1UD129KBjvJXoW7AF13uFW7Xr43tF1DCr4kZwb_yoW8Kw4xpF
+        W5GanFkrn5XrW8ZrW8Aa9rA34j9rWrtFW3Wrs0yw13XrZ8GrWY9ry5trWSgryIkrs3Aw43
+        Wrs0g3s8Xr15XrJanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
         9KBjDU0xBIdaVrnRJUUUBIb4IE77IF4wAFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k2
         6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M280x2IEY4vEnII2IxkI6r1a6r45M2
         8IrcIa0xkI8VA2jI8067AKxVWUAVCq3wA2048vs2IY020Ec7CjxVAFwI0_Xr0E3s1l8cAv
@@ -56,22 +56,30 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-blk_mq_try_issue_list_directly try to send a list requests belong to the
-same hctx to driver. Normally, we will send flush along with last request
-in the list by set last parameter in blk_mq_request_issue_directly.
+blk_mq_plug_issue_direct try to send a list of requests which belong to
+different hctxs. Normally, we will send flush when hctx changes as there
+maybe no more request for the same hctx. Besides we will send flush along
+with last request in the list by set last parameter of
+blk_mq_request_issue_directly.
+
 Extra flush is needed for two cases:
-1. We stop sending at middle of list and normal flush along with last
-request will not be sent.
+1. We stop sending at middle of list, then normal flush sent after last
+request of current hctx is miss.
 2. Error happens at sending last request and normal flush may be lost.
 
-We will only break list walk if we get BLK_STS_RESOURCE or
-BLK_STS_DEV_RESOURCE which will be stored in ret. So for case 1, we can
-simply check ret and send a extra flush if ret is not BLK_STS_OK.
-For case 2, the error of last request in the list is also stored in ret, we
-can simply check ret and send a extra flush if ret is not BLK_STS_OK too.
+In blk_mq_plug_issue_direct, we only break the list walk if we get
+BLK_STS_RESOURCE or BLK_STS_DEV_RESOURCE error. We will send extra flush
+for this case already.
+We count error number and send extra flush if error number is non-zero
+after sending all requests in list. This could cover case 2 described
+above, but there are two things to improve:
+1. If last request is sent successfully, error of request at middle of list
+will trigger an unnecessary flush.
+2. We only need error of last request instead of error number and error of
+last request can be simply retrieved from ret.
 
-Then error count is not needed and error in middle of list will not trigger
-unnecessary extra flush anymore.
+Cover case 2 above by simply check ret of last request and remove
+unnecessary error count and flush to improve blk_mq_plug_issue_direct.
 
 Signed-off-by: Kemeng Shi <shikemeng@huaweicloud.com>
 ---
@@ -79,35 +87,37 @@ Signed-off-by: Kemeng Shi <shikemeng@huaweicloud.com>
  1 file changed, 2 insertions(+), 4 deletions(-)
 
 diff --git a/block/blk-mq.c b/block/blk-mq.c
-index ba917b6b5cc1..a9e88037550b 100644
+index d84ce1f758ce..ba917b6b5cc1 100644
 --- a/block/blk-mq.c
 +++ b/block/blk-mq.c
-@@ -2804,17 +2804,15 @@ void blk_mq_try_issue_list_directly(struct blk_mq_hw_ctx *hctx,
- 		struct list_head *list)
- {
+@@ -2687,11 +2687,10 @@ static void blk_mq_plug_issue_direct(struct blk_plug *plug, bool from_schedule)
+ 	struct blk_mq_hw_ctx *hctx = NULL;
+ 	struct request *rq;
  	int queued = 0;
 -	int errors = 0;
 +	blk_status_t ret;
  
- 	while (!list_empty(list)) {
+ 	while ((rq = rq_list_pop(&plug->mq_list))) {
+ 		bool last = rq_list_empty(plug->mq_list);
 -		blk_status_t ret;
- 		struct request *rq = list_first_entry(list, struct request,
- 				queuelist);
  
- 		list_del_init(&rq->queuelist);
- 		ret = blk_mq_request_issue_directly(rq, list_empty(list));
- 		if (ret != BLK_STS_OK) {
+ 		if (hctx != rq->mq_hctx) {
+ 			if (hctx)
+@@ -2711,7 +2710,6 @@ static void blk_mq_plug_issue_direct(struct blk_plug *plug, bool from_schedule)
+ 			return;
+ 		default:
+ 			blk_mq_end_request(rq, ret);
 -			errors++;
- 			if (ret == BLK_STS_RESOURCE ||
- 					ret == BLK_STS_DEV_RESOURCE) {
- 				blk_mq_request_bypass_insert(rq, false,
-@@ -2831,7 +2829,7 @@ void blk_mq_try_issue_list_directly(struct blk_mq_hw_ctx *hctx,
- 	 * the driver there was more coming, but that turned out to
- 	 * be a lie.
+ 			break;
+ 		}
+ 	}
+@@ -2720,7 +2718,7 @@ static void blk_mq_plug_issue_direct(struct blk_plug *plug, bool from_schedule)
+ 	 * If we didn't flush the entire list, we could have told the driver
+ 	 * there was more coming, but that turned out to be a lie.
  	 */
--	if (errors && hctx->queue->mq_ops->commit_rqs && queued)
-+	if (ret != BLK_STS_OK && hctx->queue->mq_ops->commit_rqs && queued)
- 		hctx->queue->mq_ops->commit_rqs(hctx);
+-	if (errors)
++	if (ret != BLK_STS_OK)
+ 		blk_mq_commit_rqs(hctx, &queued, from_schedule);
  }
  
 -- 
