@@ -2,79 +2,74 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E9040C4332F
-	for <linux-block@archiver.kernel.org>; Wed,  4 Jan 2023 13:35:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C84EEC4332F
+	for <linux-block@archiver.kernel.org>; Wed,  4 Jan 2023 14:02:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231787AbjADNfF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 4 Jan 2023 08:35:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35126 "EHLO
+        id S237408AbjADOCL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 4 Jan 2023 09:02:11 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56432 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239551AbjADNeu (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 4 Jan 2023 08:34:50 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 82F6F3AA9A
-        for <linux-block@vger.kernel.org>; Wed,  4 Jan 2023 05:32:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1672839163;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=UXhtq2BfoMv4ks6wMn18wccB8SuyC2oyyx5uojYC2t8=;
-        b=d/3vudDAeOQYTSV0/lfqdwN5ttP2kIm1cfGZPyOUJayNdIwJnA4DhIfe5jrdlMEg71K2gF
-        WTNY384aDD07JVYh+AtHatMA8kEe5MQHig7IcFoU1sk6FwnG8wAa6UUbBGINR+s8swrw++
-        QvQwh7S76BUP6RVwjjLGOfktm8xaZ4c=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-26-aVP_sM_BPju_OEyEAUjYmw-1; Wed, 04 Jan 2023 08:32:42 -0500
-X-MC-Unique: aVP_sM_BPju_OEyEAUjYmw-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id DDB0F18E0922;
-        Wed,  4 Jan 2023 13:32:41 +0000 (UTC)
-Received: from localhost (ovpn-8-26.pek2.redhat.com [10.72.8.26])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id EBDB82166B30;
-        Wed,  4 Jan 2023 13:32:40 +0000 (UTC)
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org,
-        ZiyangZhang <ZiyangZhang@linux.alibaba.com>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH] ublk: honor IO_URING_F_NONBLOCK for handling control command
-Date:   Wed,  4 Jan 2023 21:32:35 +0800
-Message-Id: <20230104133235.836536-1-ming.lei@redhat.com>
+        with ESMTP id S234327AbjADOCK (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 4 Jan 2023 09:02:10 -0500
+Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [80.237.130.52])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF0CA1E1;
+        Wed,  4 Jan 2023 06:02:09 -0800 (PST)
+Received: from [2a02:8108:963f:de38:eca4:7d19:f9a2:22c5]; authenticated
+        by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        id 1pD4LI-0002Kl-EC; Wed, 04 Jan 2023 15:02:08 +0100
+Message-ID: <818ec46b-d058-d294-8b22-cea427c2911a@leemhuis.info>
+Date:   Wed, 4 Jan 2023 15:02:07 +0100
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.6.0
+Subject: Re: 6.2 nvme-pci: something wrong #forregzbot
+Content-Language: en-US, de-DE
+From:   Thorsten Leemhuis <regressions@leemhuis.info>
+To:     "regressions@lists.linux.dev" <regressions@lists.linux.dev>
+Cc:     linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-kernel@vger.kernel.org
+References: <572cfcc0-197a-9ead-9cb-3c5bf5e735@google.com>
+ <dedcb972-e934-53c2-f933-c25afa5c65a4@leemhuis.info>
+In-Reply-To: <dedcb972-e934-53c2-f933-c25afa5c65a4@leemhuis.info>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1672840929;63b491ab;
+X-HE-SMSGID: 1pD4LI-0002Kl-EC
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Most of control command handlers may sleep, so return -EAGAIN in case
-of IO_URING_F_NONBLOCK to defer the handling into io wq context.
+[TLDR: This mail in primarily relevant for Linux kernel regression
+tracking. See link in footer if these mails annoy you.]
 
-Fixes: 71f28f3136af ("ublk_drv: add io_uring based userspace block driver")
-Reported-by: Jens Axboe <axboe@kernel.dk>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- drivers/block/ublk_drv.c | 3 +++
- 1 file changed, 3 insertions(+)
+On 24.12.22 08:52, Thorsten Leemhuis wrote:
+> [Note: this mail contains only information for Linux kernel regression
+> tracking. Mails like these contain '#forregzbot' in the subject to make
+> then easy to spot and filter out. The author also tried to remove most
+> or all individuals from the list of recipients to spare them the hassle.]
+> 
+> On 24.12.22 06:24, Hugh Dickins wrote:
+>>
+>> There's something wrong with the nvme-pci heading for 6.2-rc1:
+>> no problem booting here on this Lenovo ThinkPad X1 Carbon 5th,
+>> but under load...> [...]
+>> Bisection points to your
+>> 0da7feaa5913 ("nvme-pci: use the tagset alloc/free helpers")
+>> And that does revert cleanly, giving a kernel which shows no problem.
+>> [...]
+> 
+> Thanks for the report. To be sure below issue doesn't fall through the
+> cracks unnoticed, I'm adding it to regzbot, my Linux kernel regression
+> tracking bot:
+> 
+> #regzbot ^introduced 0da7feaa5913
+> #regzbot title nvme-pci: problems under load
+> #regzbot ignore-activity
 
-diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-index e9de9d846b73..17b677b5d3b2 100644
---- a/drivers/block/ublk_drv.c
-+++ b/drivers/block/ublk_drv.c
-@@ -1992,6 +1992,9 @@ static int ublk_ctrl_uring_cmd(struct io_uring_cmd *cmd,
- 	struct ublksrv_ctrl_cmd *header = (struct ublksrv_ctrl_cmd *)cmd->cmd;
- 	int ret = -EINVAL;
- 
-+	if (issue_flags & IO_URING_F_NONBLOCK)
-+		return -EAGAIN;
-+
- 	ublk_ctrl_cmd_dump(cmd);
- 
- 	if (!(issue_flags & IO_URING_F_SQE128))
--- 
-2.38.1
+#regzbot fix: 88d356ca41ba1c3effc2d4208dfbd43
 
+Ciao, Thorsten (wearing his 'the Linux kernel's regression tracker' hat)
+--
+Everything you wanna know about Linux kernel regression tracking:
+https://linux-regtracking.leemhuis.info/about/#tldr
+That page also explains what to do if mails like this annoy you.
