@@ -2,90 +2,96 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C049C46467
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A197DC54EBC
 	for <linux-block@archiver.kernel.org>; Wed,  4 Jan 2023 06:24:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233072AbjADGY0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 4 Jan 2023 01:24:26 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41918 "EHLO
+        id S230521AbjADGYZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 4 Jan 2023 01:24:25 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41914 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230483AbjADGYX (ORCPT
+        with ESMTP id S230387AbjADGYX (ORCPT
         <rfc822;linux-block@vger.kernel.org>); Wed, 4 Jan 2023 01:24:23 -0500
 Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 56335183A0;
-        Tue,  3 Jan 2023 22:24:22 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F2D817E21;
+        Tue,  3 Jan 2023 22:24:21 -0800 (PST)
 Received: from mail02.huawei.com (unknown [172.30.67.153])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4Nn01Y1SSWz4f3pPl;
-        Wed,  4 Jan 2023 14:24:17 +0800 (CST)
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4Nn01T6Rc7z4f3pPB;
+        Wed,  4 Jan 2023 14:24:13 +0800 (CST)
 Received: from huaweicloud.com (unknown [10.175.124.27])
-        by APP4 (Coremail) with SMTP id gCh0CgDnnbGOG7Vju3lKBA--.23788S10;
-        Wed, 04 Jan 2023 14:24:19 +0800 (CST)
+        by APP4 (Coremail) with SMTP id gCh0CgDnnbGOG7Vju3lKBA--.23788S2;
+        Wed, 04 Jan 2023 14:24:16 +0800 (CST)
 From:   Kemeng Shi <shikemeng@huaweicloud.com>
 To:     axboe@kernel.dk, dwagner@suse.de, hare@suse.de,
         ming.lei@redhat.com, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org
 Cc:     hch@lst.de, john.garry@huawei.com, jack@suse.cz
-Subject: [PATCH v2 08/13] blk-mq: simplify flush check in blk_mq_dispatch_rq_list
-Date:   Wed,  4 Jan 2023 22:22:54 +0800
-Message-Id: <20230104142259.2673013-9-shikemeng@huaweicloud.com>
+Subject: [PATCH v2 00/13] A few bugfix and cleanup patches for blk-mq
+Date:   Wed,  4 Jan 2023 22:22:46 +0800
+Message-Id: <20230104142259.2673013-1-shikemeng@huaweicloud.com>
 X-Mailer: git-send-email 2.30.0
-In-Reply-To: <20230104142259.2673013-1-shikemeng@huaweicloud.com>
-References: <20230104142259.2673013-1-shikemeng@huaweicloud.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgDnnbGOG7Vju3lKBA--.23788S10
-X-Coremail-Antispam: 1UD129KBjvJXoW7CFyxAr1fCF4kuw48XrWkZwb_yoW8JFWkpF
-        W3Gayqkryaqr12yr18Ca9xGasrAws5AF1UuFZxCw1aqF45Cr4xKrZaga15Wa4kCrsayF4Y
-        vayUWrWY9FW5Xa7anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUBIb4IE77IF4wAFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k2
+X-CM-TRANSID: gCh0CgDnnbGOG7Vju3lKBA--.23788S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7uF1xXF43Gw4fGw15Ww1fXrb_yoW8WrWUpF
+        43Ga13Ga1rJry7Xr1Syw47AF9YvFs3GrW7JwnxC34fXrs8Cr1UJr1kWa1rXFyjyFZxCa17
+        WF40qw1YkF1Iva7anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUkFb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
         6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M280x2IEY4vEnII2IxkI6r1a6r45M2
-        8IrcIa0xkI8VA2jI8067AKxVWUAVCq3wA2048vs2IY020Ec7CjxVAFwI0_Xr0E3s1l8cAv
-        FVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVWDJVCq3w
-        A2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE
-        3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr2
-        1l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv
-        67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41l42xK82IYc2
-        Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s02
-        6x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0x
-        vE2Ix0cI8IcVAFwI0_JFI_Gr1lIxAIcVC0I7IYx2IY6xkF7I0E14v26F4j6r4UJwCI42IY
-        6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aV
-        CY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU0TqcUUUUUU==
+        8lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E
+        3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26r
+        xl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv
+        0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z2
+        80aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JMxAIw28I
+        cxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2
+        IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI
+        42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42
+        IY6xAIw20EY4v20xvaj40_WFyUJVCq3wCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E
+        87Iv6xkF7I0E14v26r1j6r4UYxBIdaVFxhVjvjDU0xZFpf9x07jIGQDUUUUU=
 X-CM-SenderInfo: 5vklyvpphqwq5kxd4v5lfo033gof0z/
 X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-For busy error BLK_STS*_RESOURCE, request will always be added
-back to list, so need_resource will not be true and ret will
-not be == BLK_STS_DEV_RESOURCE if list is empty. We could remove
-these dead check.
-If list is empty, we only need to send extra flush
-if error happens at last request in the list which is stored in
-ret. So send a extra flush if ret is not BLK_STS_OK instead of
-errors is non-zero to avoid unnecessary flush for error at middle
-request in list.
+Hi, this series contain several bugfix patches to fix potential io
+hung and a few cleanup patches to remove stale codes and unnecessary
+check. Most changes are in request issue and dispatch path. Thanks.
 
-Signed-off-by: Kemeng Shi <shikemeng@huaweicloud.com>
 ---
- block/blk-mq.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+V2:
+ -Thanks Christoph for review and there are two fixes in v2 according
+to recommends from Christoph.
+  1)Avoid overly long line in patch "blk-mq: avoid sleep in
+blk_mq_alloc_request_hctx"
+  2)Check BLK_MQ_REQ_NOWAIT and BLK_MQ_REQ_RESERVED in two WARN_ON_ONCE
+---
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index a9e88037550b..c543c14fdb47 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -2085,8 +2085,8 @@ bool blk_mq_dispatch_rq_list(struct blk_mq_hw_ctx *hctx, struct list_head *list,
- 	/* If we didn't flush the entire list, we could have told the driver
- 	 * there was more coming, but that turned out to be a lie.
- 	 */
--	if ((!list_empty(list) || errors || needs_resource ||
--	     ret == BLK_STS_DEV_RESOURCE) && q->mq_ops->commit_rqs && queued)
-+	if ((!list_empty(list) || ret != BLK_STS_OK) &&
-+	     q->mq_ops->commit_rqs && queued)
- 		q->mq_ops->commit_rqs(hctx);
- 	/*
- 	 * Any items that need requeuing? Stuff them into hctx->dispatch,
+Kemeng Shi (13):
+  blk-mq: avoid sleep in blk_mq_alloc_request_hctx
+  blk-mq: remove stale comment for blk_mq_sched_mark_restart_hctx
+  blk-mq: wait on correct sbitmap_queue in blk_mq_mark_tag_wait
+  blk-mq: Fix potential io hung for shared sbitmap per tagset
+  blk-mq: remove unnecessary list_empty check in
+    blk_mq_try_issue_list_directly
+  blk-mq: remove unncessary error count and flush in
+    blk_mq_plug_issue_direct
+  blk-mq: remove error count and unncessary flush in
+    blk_mq_try_issue_list_directly
+  blk-mq: simplify flush check in blk_mq_dispatch_rq_list
+  blk-mq: remove unnecessary error count and check in
+    blk_mq_dispatch_rq_list
+  blk-mq: remove set of bd->last when get driver tag for next request
+    fails
+  blk-mq: remove unncessary from_schedule parameter in
+    blk_mq_plug_issue_direct
+  blk-mq: use switch/case to improve readability in
+    blk_mq_try_issue_list_directly
+  blk-mq: correct stale comment of .get_budget
+
+ block/blk-mq-sched.c |   7 ++-
+ block/blk-mq.c       | 105 +++++++++++++++++++------------------------
+ 2 files changed, 48 insertions(+), 64 deletions(-)
+
 -- 
 2.30.0
 
