@@ -2,110 +2,152 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 05F2AC4332F
-	for <linux-block@archiver.kernel.org>; Wed,  4 Jan 2023 18:05:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 26B6EC4332F
+	for <linux-block@archiver.kernel.org>; Wed,  4 Jan 2023 18:13:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235346AbjADSFR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 4 Jan 2023 13:05:17 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57798 "EHLO
+        id S235292AbjADSNT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 4 Jan 2023 13:13:19 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33894 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235148AbjADSFQ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 4 Jan 2023 13:05:16 -0500
-Received: from mail-io1-xd34.google.com (mail-io1-xd34.google.com [IPv6:2607:f8b0:4864:20::d34])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D36193476A
-        for <linux-block@vger.kernel.org>; Wed,  4 Jan 2023 10:05:13 -0800 (PST)
-Received: by mail-io1-xd34.google.com with SMTP id e129so9870398iof.3
-        for <linux-block@vger.kernel.org>; Wed, 04 Jan 2023 10:05:13 -0800 (PST)
+        with ESMTP id S234591AbjADSNT (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 4 Jan 2023 13:13:19 -0500
+Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66BCF1868E
+        for <linux-block@vger.kernel.org>; Wed,  4 Jan 2023 10:13:18 -0800 (PST)
+Received: by mail-pj1-x102b.google.com with SMTP id v23so36926022pju.3
+        for <linux-block@vger.kernel.org>; Wed, 04 Jan 2023 10:13:18 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+        d=gmail.com; s=20210112;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=fwbSRErGI+M+kxIjiNvET71nV5klg9jfFeBjal8e880=;
-        b=RsyncF9aIG927BmS+icDdcL5LIowTNpFEhbPJ5WkHLbZJWCFl/U/gFKQqUPKFXGajz
-         U2ThHcuqcr/NWVgmuh62RSKba0GAC4p00gClmHL0CaV6Cxk/vtEDcbh88KjJefpuPE8A
-         aG998LvTAb/8zGvypWeoJYLdMBtx95w5WxIwvT6gFJoSKG1lQqB1K5C3gY0fPM6o5mGK
-         hrDYWci9vx3GoAVdl9Z6FD6iyI55V0kmhcqzixSgBXqJb2+f0WZBLbkE+Nrb0LLveNIh
-         d3qnbKEB4eyshd2dawwsVhIy1Jc+IBJ8zqW5wOh8/1duAIkBQP5WS3WFTvGaodY8hiCq
-         PAJA==
+        bh=3238GOgdzYvLUkwGduiCin/jQ5W4csnMOltJpcP5lgc=;
+        b=SEks4YIcDioYNcOyvBe67wOz2RjzPmk0snfIRAGUp0ITdgC1beNvm1nyTpPAFYKFg/
+         Pk0FNrmJgHH4Kz2lf/PflSIRwEOcp4MORRn0V7bmIPLiM3cbxP8Xfm6pbtJGYqP4bxyc
+         gRh3LKkROZ3cCs2hhcOujcH/abZrCvT+Z3Ph0p91MNgKCt8leDDjf6YEvDnf+3mXmirF
+         9s4HNyp9BADosq4hGJ6qs+mdnoKpg2Q37NvCM6aaDh2ymm0MtLDdjRPuejlml50j6Z3u
+         C50tkFw2nDVgKssiwf3cqRlGhM1RlZfP8AUgjm7gVOIFujSEMBeEaJUnobJBafo/ul13
+         ZBMQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=fwbSRErGI+M+kxIjiNvET71nV5klg9jfFeBjal8e880=;
-        b=pxJnH2kpizLfzbmUrkyiI1sYRldv772n2NLjFnwH/7IG2heoD4GPJ4RDtbSiHna72e
-         3GqE6v1lshSk/LomWgXiTu0tokseR21ZzaRhXwqRWVGR7aSb2mYgTsNirNKnY1SMZEnC
-         WGeqvHVKydlcLk8G10wEAf0uPdG9fyJassltARm39IOqYt9GQM/Q9m7N5C0dtdZ+UJFk
-         r4T7aHo7P1l0vF1+UYHUCFG2PHXvbSvjs3YUPab8NZ+b48VL5Pj4AAcSu2T3SutjUzHK
-         4Sw1J/NWxNSIAQRcDuHrVJUozBdR/mlLB2uG+vuP09lMWzoQD2cU6ze/TkenVYEK5N+b
-         iJqA==
-X-Gm-Message-State: AFqh2kqf4BWTaDhISwuNzovzb33b8ultVCUQcozGuycBUR8hKOSUnn5P
-        poTxx1NP5XjKFjfMuXxfjBKRvw==
-X-Google-Smtp-Source: AMrXdXtZgRTw0Rd+lWWQFY6awnxtC+Ar0uDv/+rCvqrsUk26zYgQBzwslu+rRnkVVwLOdLilv7Awhw==
-X-Received: by 2002:a6b:e812:0:b0:6f3:fed4:aa36 with SMTP id f18-20020a6be812000000b006f3fed4aa36mr5132225ioh.1.1672855513121;
-        Wed, 04 Jan 2023 10:05:13 -0800 (PST)
-Received: from [127.0.0.1] ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id h13-20020a056602130d00b006cab79c4214sm6904465iov.46.2023.01.04.10.05.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 04 Jan 2023 10:05:12 -0800 (PST)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     Paolo Valente <paolo.valente@linaro.org>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        arie.vanderhoeven@seagate.com, rory.c.chen@seagate.com,
-        glen.valante@linaro.org, damien.lemoal@opensource.wdc.com
-In-Reply-To: <20230103145503.71712-1-paolo.valente@linaro.org>
-References: <20230103145503.71712-1-paolo.valente@linaro.org>
-Subject: Re: [PATCH V13 REBASED 0/8] block, bfq: extend bfq to support
- multi-actuator drives
-Message-Id: <167285551197.71557.16292371729864205895.b4-ty@kernel.dk>
-Date:   Wed, 04 Jan 2023 11:05:11 -0700
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-Mailer: b4 0.12-dev-7ab1d
+        bh=3238GOgdzYvLUkwGduiCin/jQ5W4csnMOltJpcP5lgc=;
+        b=AoKYfs1EygT3bUja2en8NgLIBGjZWg27nznvEJCFN4Af8mKdu8fPYcSdeIVAHPMjjE
+         aYcfLh2ln4YVXjhigZYOINA+vSMbstinArZAYkjoYNju2w3p62kdjknQrL/tDlDxuuAr
+         ZIyndmWaYrpv3iRyJU0OWfx2AY2Z/WZeURlC8eggVO2yYONzoxBCLuGS6o0GGEwX/6T+
+         PNpw91sF8kSDbMXaZrKn+g+4rT9SExi7lRzJ3weFpz0xQNqBon0cec32T+R0W+wYWxzf
+         ZM6SmwUtdNWfN43IGnX5ksk0BgFe9WFai11IbfuUZVJYfkyK66F5KDojCAlGZWW/dWYN
+         MY8A==
+X-Gm-Message-State: AFqh2krXW2LlVfCp+YChVEQ0qivyLpLrlYdXcJ4T/BlLkQZLSZKrWzvl
+        DWDa/gEDV7jUq73imTCLfS0=
+X-Google-Smtp-Source: AMrXdXtJcQlb/Oi65SBw7xR42PsMiDLWOGqSdNLZRC1/LO2EKPl8bMfRFGs0nk/1eTnJmvbQ1U3g1A==
+X-Received: by 2002:a05:6a20:2d22:b0:b0:30d8:d48 with SMTP id g34-20020a056a202d2200b000b030d80d48mr63153453pzl.42.1672855997674;
+        Wed, 04 Jan 2023 10:13:17 -0800 (PST)
+Received: from smtpclient.apple ([66.170.99.95])
+        by smtp.gmail.com with ESMTPSA id x184-20020a6363c1000000b004784cdc196dsm20855064pgb.24.2023.01.04.10.13.16
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 04 Jan 2023 10:13:17 -0800 (PST)
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3731.300.101.1.3\))
+Subject: Re: Potential hang on ublk_ctrl_del_dev()
+From:   Nadav Amit <nadav.amit@gmail.com>
+In-Reply-To: <Y7URsuwxaAHFmn8S@T590>
+Date:   Wed, 4 Jan 2023 10:13:05 -0800
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <20EBDD77-21AD-4C39-B1F2-E9A9954FA360@gmail.com>
+References: <862272BC-C6A3-4A60-A620-4C5596972D01@gmail.com>
+ <Y7URsuwxaAHFmn8S@T590>
+To:     Ming Lei <ming.lei@redhat.com>
+X-Mailer: Apple Mail (2.3731.300.101.1.3)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 
-On Tue, 03 Jan 2023 15:54:55 +0100, Paolo Valente wrote:
-> rebased V13 [2].
-> 
-> Here is the whole description of this patch series again.  This
-> extension addresses the following issue. Single-LUN multi-actuator
-> SCSI drives, as well as all multi-actuator SATA drives appear as a
-> single device to the I/O subsystem [1].  Yet they address commands to
-> different actuators internally, as a function of Logical Block
-> Addressing (LBAs). A given sector is reachable by only one of the
-> actuators. For example, Seagate’s Serial Advanced Technology
-> Attachment (SATA) version contains two actuators and maps the lower
-> half of the SATA LBA space to the lower actuator and the upper half to
-> the upper actuator.
-> 
-> [...]
 
-Applied, thanks!
+> On Jan 3, 2023, at 9:42 PM, Ming Lei <ming.lei@redhat.com> wrote:
+>=20
+> On Tue, Jan 03, 2023 at 01:47:37PM -0800, Nadav Amit wrote:
+>> Hello Ming,
+>>=20
+>> I am trying the ublk and it seems very exciting.
+>>=20
+>> However, I encounter an issue when I remove a ublk device that is =
+mounted or
+>> in use.
+>>=20
+>> In ublk_ctrl_del_dev(), shouldn=E2=80=99t we *not* wait if =
+ublk_idr_freed() is false?
+>> It seems to me that it is saner to return -EBUSY in such a case and =
+let
+>> userspace deal with the results.
+>>=20
+>> For instance, if I run the following (using ubdsrv):
+>>=20
+>> $ mkfs.ext4 /dev/ram0
+>> $ ./ublk add -t loop -f /dev/ram0
+>> $ sudo mount /dev/ublkb0 tmp
+>> $ sudo ./ublk del -a
+>>=20
+>> ublk_ctrl_del_dev() would not be done until the partition is =
+unmounted, and you
+>> can get a splat that is similar to the one below.
+>=20
+> The splat itself can be avoided easily by replace wait_event with
+> wait_event_timeout() plus loop, but I guess you think the sync delete
+> isn't good too?
 
-[1/8] block, bfq: split sync bfq_queues on a per-actuator basis
-      commit: abc653033297fb39c097f9e18cc4ab42a5c00a23
-[2/8] block, bfq: forbid stable merging of queues associated with different actuators
-      commit: d591f14a59ed700caff6db734ecf558387d38f35
-[3/8] block, bfq: move io_cq-persistent bfqq data into a dedicated struct
-      commit: d85fed150b4efadf01ea3d12ba78285f6720f583
-[4/8] block, bfq: turn bfqq_data into an array in bfq_io_cq
-      commit: 7cf744815a3cd94591b0227f3c63f533f3402a47
-[5/8] block, bfq: split also async bfq_queues on a per-actuator basis
-      commit: 8249909fe789d7dc50f6749bbdf440d69ac46ac1
-[6/8] block, bfq: retrieve independent access ranges from request queue
-      commit: b3d9aece342834ef3840b55a99a11dc82b1f96cc
-[7/8] block, bfq: inject I/O to underutilized actuators
-      commit: 3f40467eb5ec1e4f383daff7f93c7494e7881fee
-[8/8] block, bfq: balance I/O injection among underutilized actuators
-      commit: dd9b66eb9ed5c0e58098c336cb8e6329590564be
+I don=E2=80=99t think the splat is the issue. The issue is the blocking =
+behavior,
+which is both unconditional and unbounded in time, and (worse) takes =
+place
+without relinquishing the locks. wait_event_timeout() is therefore not a
+valid solution IMHO.
 
-Best regards,
--- 
-Jens Axboe
+>=20
+>>=20
+>> What do you say? Would you agree to change the behavior to return =
+-EBUSY?
+>=20
+> It is designed in this way from beginning, and I believe it is just =
+for
+> the sake of simplicity, and one point is that the device number needs
+> to be freed after 'ublk del' returns.
+>=20
+> But if it isn't friendly from user's viewpoint, we can change to =
+return
+> -EBUSY. One simple solution is to check if the ublk block device
+> is opened before running any deletion action, if yes, stop to delete =
+it
+> and return -EBUSY; otherwise go ahead and stop & delete the pair of =
+devices.
+> And the userspace part(ublk utility) needs update too.
+>=20
+> However, -EBUSY isn't perfect too, cause user has to retry the delete
+> command manually.
 
+I understand your considerations. My intuition is that just as umount
+cannot be done while a file is opened and would return -EBUSY, so should
+deleting the ublock while the ublk is in use.
+
+So as I see it, there are 2 possible options for proper deletion of =
+ublk,
+and actually both can be implemented and distinguished with a new flag
+(UBLK_F_*):
+
+1. Blocking - similar to the way it is done today, but (hopefully) =
+without
+   holding locks, and with using wait_event_interruptible() instead of
+   wait_event() to allow interruption (and return EINTR if interrupted).
+
+2. Best-effort - returning EBUSY if it cannot be removed.
+
+I can imagine use-cases for both, and it would also allow you not to
+change ubdsrv if you choose so.
+
+Does it make sense?
 
