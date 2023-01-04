@@ -2,96 +2,230 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E8F9C4332F
-	for <linux-block@archiver.kernel.org>; Wed,  4 Jan 2023 08:20:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 65305C4332F
+	for <linux-block@archiver.kernel.org>; Wed,  4 Jan 2023 08:29:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233126AbjADIUi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 4 Jan 2023 03:20:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55748 "EHLO
+        id S233926AbjADI32 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 4 Jan 2023 03:29:28 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59494 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229590AbjADIUh (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 4 Jan 2023 03:20:37 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E12D319C07
-        for <linux-block@vger.kernel.org>; Wed,  4 Jan 2023 00:19:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1672820392;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=TaIt1E713BausU+dyJgM5xXKuUZPPOufGW2XT61ZWTU=;
-        b=CgX3E16gjIKm5dZNrhW+OsDYlLK26kLWGmGO7OvLm1Jd1JcjH7/HCWzL/XnVfslA2bdYGD
-        nGaaLUSfKwXiHrYSTs4DDU5XBG06bFx60CDdvpGumt16v29tmof1pXjt95I75UxIWMMjV+
-        J1X0ddVCcsVaw3df58reEin2BRGY2/c=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-286-yIMW1LRAP-i-eJdx8a-ttQ-1; Wed, 04 Jan 2023 03:19:49 -0500
-X-MC-Unique: yIMW1LRAP-i-eJdx8a-ttQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 4A58B3811F37;
-        Wed,  4 Jan 2023 08:19:49 +0000 (UTC)
-Received: from T590 (ovpn-8-26.pek2.redhat.com [10.72.8.26])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 9CB592166B30;
-        Wed,  4 Jan 2023 08:19:43 +0000 (UTC)
-Date:   Wed, 4 Jan 2023 16:19:38 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jonathan Corbet <corbet@lwn.net>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        ZiyangZhang <ZiyangZhang@linux.alibaba.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>, ming.lei@redhat.com
-Subject: Re: [PATCH V3 6/6] ublk_drv: add mechanism for supporting
- unprivileged ublk device
-Message-ID: <Y7U2mshx9s9rx++C@T590>
-References: <20221207123305.937678-1-ming.lei@redhat.com>
- <20221207123305.937678-7-ming.lei@redhat.com>
- <87a62ze4ql.fsf@meer.lwn.net>
+        with ESMTP id S234036AbjADI3Y (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 4 Jan 2023 03:29:24 -0500
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B0CEB1869B;
+        Wed,  4 Jan 2023 00:29:23 -0800 (PST)
+Received: from mail02.huawei.com (unknown [172.30.67.169])
+        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4Nn2np03H3z4f3mT1;
+        Wed,  4 Jan 2023 16:29:18 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.175.127.227])
+        by APP2 (Coremail) with SMTP id Syh0CgBnW+ndOLVjwys+BA--.58806S5;
+        Wed, 04 Jan 2023 16:29:20 +0800 (CST)
+From:   Yu Kuai <yukuai1@huaweicloud.com>
+To:     tj@kernel.org, hch@infradead.org, josef@toxicpanda.com,
+        axboe@kernel.dk
+Cc:     cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, yukuai3@huawei.com,
+        yukuai1@huaweicloud.com, yi.zhang@huawei.com, yangerkun@huawei.com
+Subject: [PATCH -next 1/4] block/rq_qos: move implementions of init/exit rq-qos apis to blk-rq-qos.c
+Date:   Wed,  4 Jan 2023 16:53:51 +0800
+Message-Id: <20230104085354.2343590-2-yukuai1@huaweicloud.com>
+X-Mailer: git-send-email 2.31.1
+In-Reply-To: <20230104085354.2343590-1-yukuai1@huaweicloud.com>
+References: <20230104085354.2343590-1-yukuai1@huaweicloud.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87a62ze4ql.fsf@meer.lwn.net>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: Syh0CgBnW+ndOLVjwys+BA--.58806S5
+X-Coremail-Antispam: 1UD129KBjvJXoWxZryDKF48ArW3CrWxZw1fZwb_yoWrtFy5pa
+        yfK3W3A3yvgrsrW3s8Gw4xX39IkwnYgr47JrWfJFWfAr1v9r1YvF1vyFyUWrWFqrZ7Ar45
+        Ar45KrZ5Cr1UAwUanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUBE14x267AKxVW5JVWrJwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2048vs2IY020E87I2jVAFwI0_Jr4l82xGYIkIc2
+        x26xkF7I0E14v26r4j6ryUM28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8wA2z4x0
+        Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j6F4UJw
+        A2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oVCq3wAS
+        0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2
+        IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0
+        Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2kIc2
+        xKxwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v2
+        6r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2
+        Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_
+        Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMI
+        IF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JU2_M3UUUUU
+        =
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Jonathan,
+From: Yu Kuai <yukuai3@huawei.com>
 
-On Tue, Jan 03, 2023 at 01:35:14PM -0700, Jonathan Corbet wrote:
-> I have one quick question...
-> 
-> Ming Lei <ming.lei@redhat.com> writes:
-> 
-> > In case of UBLK_F_UNPRIVILEGED_DEV:
-> >
-> > 1) for command UBLK_CMD_ADD_DEV, it is always allowed, and user needs
-> > to provide owner's uid/gid in this command, so that udev can set correct
-> > ownership for the created ublk device, since the device owner uid/gid
-> > can be queried via command of UBLK_CMD_GET_DEV_INFO.
-> 
-> Why do you have the user provide the uid/gid rather than just using the
-> user's credentials directly?  It seems a bit strange to me to let
-> unprivileged users create devices with arbitrary ownership.  What am I
-> missing here?
+These init/exit rq-qos apis are super cold path, there is no need to
+inline them to improve performance. This patch also prepare to use a
+global mutex to protect these apis, move these implementions to
+blk-rq-qos.c so that the global mutex won't be exposed. There are no
+functional changes.
 
-It is one good question.
+Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+---
+ block/blk-rq-qos.c | 59 +++++++++++++++++++++++++++++++++++++++++
+ block/blk-rq-qos.h | 65 +++-------------------------------------------
+ 2 files changed, 62 insertions(+), 62 deletions(-)
 
-The original idea is to allow user A to create device for another user
-B, and it still depends on user A's capability, such as, if the created
-daemon can open the created device which is owned by user B actually.
-
-The above behavior may be extended in future if there is such
-requirement. I will switch to just allow to create device for the
-current user in V4, then we can start with this easy/simple model.
-
-BTW, that is exactly the current userspace implementation, only the
-current uid/gid is passed.
-
-	https://github.com/ming1/ubdsrv/tree/unprivileged-ublk
-
-
-Thanks,
-Ming
+diff --git a/block/blk-rq-qos.c b/block/blk-rq-qos.c
+index 88f0fe7dcf54..b6ea40775b2a 100644
+--- a/block/blk-rq-qos.c
++++ b/block/blk-rq-qos.c
+@@ -286,6 +286,65 @@ void rq_qos_wait(struct rq_wait *rqw, void *private_data,
+ 	finish_wait(&rqw->wait, &data.wq);
+ }
+ 
++int rq_qos_add(struct request_queue *q, struct rq_qos *rqos)
++{
++	/*
++	 * No IO can be in-flight when adding rqos, so freeze queue, which
++	 * is fine since we only support rq_qos for blk-mq queue.
++	 *
++	 * Reuse ->queue_lock for protecting against other concurrent
++	 * rq_qos adding/deleting
++	 */
++	blk_mq_freeze_queue(q);
++
++	spin_lock_irq(&q->queue_lock);
++	if (rq_qos_id(q, rqos->id))
++		goto ebusy;
++	rqos->next = q->rq_qos;
++	q->rq_qos = rqos;
++	spin_unlock_irq(&q->queue_lock);
++
++	blk_mq_unfreeze_queue(q);
++
++	if (rqos->ops->debugfs_attrs) {
++		mutex_lock(&q->debugfs_mutex);
++		blk_mq_debugfs_register_rqos(rqos);
++		mutex_unlock(&q->debugfs_mutex);
++	}
++
++	return 0;
++ebusy:
++	spin_unlock_irq(&q->queue_lock);
++	blk_mq_unfreeze_queue(q);
++	return -EBUSY;
++}
++
++void rq_qos_del(struct request_queue *q, struct rq_qos *rqos)
++{
++	struct rq_qos **cur;
++
++	/*
++	 * See comment in rq_qos_add() about freezing queue & using
++	 * ->queue_lock.
++	 */
++	blk_mq_freeze_queue(q);
++
++	spin_lock_irq(&q->queue_lock);
++	for (cur = &q->rq_qos; *cur; cur = &(*cur)->next) {
++		if (*cur == rqos) {
++			*cur = rqos->next;
++			break;
++		}
++	}
++	spin_unlock_irq(&q->queue_lock);
++
++	blk_mq_unfreeze_queue(q);
++
++	mutex_lock(&q->debugfs_mutex);
++	blk_mq_debugfs_unregister_rqos(rqos);
++	mutex_unlock(&q->debugfs_mutex);
++}
++
+ void rq_qos_exit(struct request_queue *q)
+ {
+ 	while (q->rq_qos) {
+diff --git a/block/blk-rq-qos.h b/block/blk-rq-qos.h
+index 1ef1f7d4bc3c..f2d95e19d7a8 100644
+--- a/block/blk-rq-qos.h
++++ b/block/blk-rq-qos.h
+@@ -85,69 +85,12 @@ static inline void rq_wait_init(struct rq_wait *rq_wait)
+ 	init_waitqueue_head(&rq_wait->wait);
+ }
+ 
+-static inline int rq_qos_add(struct request_queue *q, struct rq_qos *rqos)
+-{
+-	/*
+-	 * No IO can be in-flight when adding rqos, so freeze queue, which
+-	 * is fine since we only support rq_qos for blk-mq queue.
+-	 *
+-	 * Reuse ->queue_lock for protecting against other concurrent
+-	 * rq_qos adding/deleting
+-	 */
+-	blk_mq_freeze_queue(q);
+-
+-	spin_lock_irq(&q->queue_lock);
+-	if (rq_qos_id(q, rqos->id))
+-		goto ebusy;
+-	rqos->next = q->rq_qos;
+-	q->rq_qos = rqos;
+-	spin_unlock_irq(&q->queue_lock);
+-
+-	blk_mq_unfreeze_queue(q);
+-
+-	if (rqos->ops->debugfs_attrs) {
+-		mutex_lock(&q->debugfs_mutex);
+-		blk_mq_debugfs_register_rqos(rqos);
+-		mutex_unlock(&q->debugfs_mutex);
+-	}
+-
+-	return 0;
+-ebusy:
+-	spin_unlock_irq(&q->queue_lock);
+-	blk_mq_unfreeze_queue(q);
+-	return -EBUSY;
+-
+-}
+-
+-static inline void rq_qos_del(struct request_queue *q, struct rq_qos *rqos)
+-{
+-	struct rq_qos **cur;
+-
+-	/*
+-	 * See comment in rq_qos_add() about freezing queue & using
+-	 * ->queue_lock.
+-	 */
+-	blk_mq_freeze_queue(q);
+-
+-	spin_lock_irq(&q->queue_lock);
+-	for (cur = &q->rq_qos; *cur; cur = &(*cur)->next) {
+-		if (*cur == rqos) {
+-			*cur = rqos->next;
+-			break;
+-		}
+-	}
+-	spin_unlock_irq(&q->queue_lock);
+-
+-	blk_mq_unfreeze_queue(q);
+-
+-	mutex_lock(&q->debugfs_mutex);
+-	blk_mq_debugfs_unregister_rqos(rqos);
+-	mutex_unlock(&q->debugfs_mutex);
+-}
+-
+ typedef bool (acquire_inflight_cb_t)(struct rq_wait *rqw, void *private_data);
+ typedef void (cleanup_cb_t)(struct rq_wait *rqw, void *private_data);
+ 
++int rq_qos_add(struct request_queue *q, struct rq_qos *rqos);
++void rq_qos_del(struct request_queue *q, struct rq_qos *rqos);
++void rq_qos_exit(struct request_queue *q);
+ void rq_qos_wait(struct rq_wait *rqw, void *private_data,
+ 		 acquire_inflight_cb_t *acquire_inflight_cb,
+ 		 cleanup_cb_t *cleanup_cb);
+@@ -230,6 +173,4 @@ static inline void rq_qos_queue_depth_changed(struct request_queue *q)
+ 		__rq_qos_queue_depth_changed(q->rq_qos);
+ }
+ 
+-void rq_qos_exit(struct request_queue *);
+-
+ #endif
+-- 
+2.31.1
 
