@@ -2,233 +2,71 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20CBBC4708D
-	for <linux-block@archiver.kernel.org>; Wed,  4 Jan 2023 18:58:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 69F1BC4708D
+	for <linux-block@archiver.kernel.org>; Wed,  4 Jan 2023 19:13:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239695AbjADS6u (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 4 Jan 2023 13:58:50 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53248 "EHLO
+        id S235307AbjADTNt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 4 Jan 2023 14:13:49 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59078 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239897AbjADS6s (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 4 Jan 2023 13:58:48 -0500
-Received: from mail-ej1-x629.google.com (mail-ej1-x629.google.com [IPv6:2a00:1450:4864:20::629])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 123C31E3C4
-        for <linux-block@vger.kernel.org>; Wed,  4 Jan 2023 10:58:45 -0800 (PST)
-Received: by mail-ej1-x629.google.com with SMTP id x22so84829040ejs.11
-        for <linux-block@vger.kernel.org>; Wed, 04 Jan 2023 10:58:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=4FVYvcF1KmvMk+MCRWQgSZcVi7MsFmqDZl7EgX8Ml8k=;
-        b=JYK1xnGCYe/rSOMKQddlS4LSeX+tZ4KO2yn0biMx7gmgJIzGSR2tb+ztvP25FpvhgU
-         FdfHanSvsz34e6pnffihFOyALWFuLh7vIw+Aq51yCsNc1+TCsqzxim1RidcX2ts+6j25
-         k4VxSVS93aOFBB6+LatJkCMYSLuVfBntM1SLo=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=4FVYvcF1KmvMk+MCRWQgSZcVi7MsFmqDZl7EgX8Ml8k=;
-        b=bllqOQAmlGCum7mWFdfUg+i0ERQUE/8sjomWe+gnmxssvQRVUyPkAfApQGqQ30TqSD
-         UzIt3RMmDbaqh++h5jyAaVBxBCLO1p9sHiJ+qQCkkNakQS+AEepFOr2ICxPVOEbTjjzT
-         Db+IO+jJuwWSANCo2O0iJNwX5HgEsS2Ixd9qtB5eiuTtHwv7zZCBbY8aOCSWvgkL1mVn
-         595c0yTvwajvFdxL2le3118QBJg/3R7OJ8tUs8xfOoxHWvEjnyvIWnToipVDGxdYZN8m
-         k1u3ReHSHeyh4fUSBzdqLb2fwU5FcgK23BjzodRlxbDeTRol2pEEKVYV1ROoMS29edPF
-         OYUA==
-X-Gm-Message-State: AFqh2krdWhaN0dljzs8towuHEeWI4H4l31G/zNRYKqrmIiiiLLloR6Qf
-        cR4GP2hCQTDMwkjLhVAqNu/e1NpXND1KNpH15PDqNQ==
-X-Google-Smtp-Source: AMrXdXtmk8YuQbBW9ULRV7yQ0fWwtL5S9J0nHaYQ3h0G5KBFd1VFG36kq4HzYRZz3ZQJDbl5R7afTpTZuk/Y9Ppo41U=
-X-Received: by 2002:a17:906:2816:b0:7c0:a997:2298 with SMTP id
- r22-20020a170906281600b007c0a9972298mr3739703ejc.430.1672858723579; Wed, 04
- Jan 2023 10:58:43 -0800 (PST)
+        with ESMTP id S235176AbjADTNs (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 4 Jan 2023 14:13:48 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7024434741;
+        Wed,  4 Jan 2023 11:13:47 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 10875617EB;
+        Wed,  4 Jan 2023 19:13:47 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 17B87C433D2;
+        Wed,  4 Jan 2023 19:13:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1672859626;
+        bh=Ij0mrFcW6uT75Z62D42qxMtie8o67ZCbOW7kGd0W7Js=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=FLOW9DFX++NsbeT3eV+svUUzgn6Elqlyvhvp3UaDB49bAzvA8I8DMli2cXEgxtejL
+         N0noFRxiQM3dtkU+9kPbRJq2tqMyZvLxzJcgCgW2bqfbr+xrKSJOz37nz0SvqTpWfY
+         U5JHY99a5y+rFGSNBnW/1pJ2HBQCuPMeP5cviSntFLb/j808J0WFXr7NSpUwonPnOB
+         irXxf3BxRXV1kN+/B8HXlZOokTmmrCIRWiHDtmkCMTLl6XWETVsw9sFpv+3WYtrlNB
+         2ea8a1pyXokmd4YGVYaCGMbxeUT7wV9y03f1qEOxaXXKr2/Diu1Uy5CwJPqNcjNF+6
+         6XHJithFHqJQw==
+Date:   Wed, 4 Jan 2023 12:13:43 -0700
+From:   Keith Busch <kbusch@kernel.org>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, mikelley@microsoft.com,
+        stable@vger.kernel.org
+Subject: Re: [PATCH 2/2] block: don't allow splitting of a REQ_NOWAIT bio
+Message-ID: <Y7XP5w9cTyHJHwta@kbusch-mbp.dhcp.thefacebook.com>
+References: <20230104160938.62636-1-axboe@kernel.dk>
+ <20230104160938.62636-3-axboe@kernel.dk>
 MIME-Version: 1.0
-References: <20221229081252.452240-1-sarthakkukreti@chromium.org>
- <20221229081252.452240-4-sarthakkukreti@chromium.org> <Y7Wr2uadI+82BB6a@magnolia>
-In-Reply-To: <Y7Wr2uadI+82BB6a@magnolia>
-From:   Sarthak Kukreti <sarthakkukreti@chromium.org>
-Date:   Wed, 4 Jan 2023 10:58:32 -0800
-Message-ID: <CAG9=OMO3FKZUnsXym8fo2D-wYT9Sg7yB7tiYw=xqX3KEQ89bsQ@mail.gmail.com>
-Subject: Re: [PATCH v2 3/7] fs: Introduce FALLOC_FL_PROVISION
-To:     "Darrick J. Wong" <djwong@kernel.org>
-Cc:     sarthakkukreti@google.com, dm-devel@redhat.com,
-        linux-block@vger.kernel.org, linux-ext4@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        Jens Axboe <axboe@kernel.dk>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Alasdair Kergon <agk@redhat.com>,
-        Mike Snitzer <snitzer@kernel.org>,
-        Christoph Hellwig <hch@infradead.org>,
-        Brian Foster <bfoster@redhat.com>,
-        "Theodore Ts'o" <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Bart Van Assche <bvanassche@google.com>,
-        Daniil Lunev <dlunev@google.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230104160938.62636-3-axboe@kernel.dk>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jan 4, 2023 at 8:39 AM Darrick J. Wong <djwong@kernel.org> wrote:
->
-> On Thu, Dec 29, 2022 at 12:12:48AM -0800, Sarthak Kukreti wrote:
-> > FALLOC_FL_PROVISION is a new fallocate() allocation mode that
-> > sends a hint to (supported) thinly provisioned block devices to
-> > allocate space for the given range of sectors via REQ_OP_PROVISION.
-> >
-> > The man pages for both fallocate(2) and posix_fallocate(3) describe
-> > the default allocation mode as:
-> >
-> > ```
-> > The default operation (i.e., mode is zero) of fallocate()
-> > allocates the disk space within the range specified by offset and len.
-> > ...
-> > subsequent writes to bytes in the specified range are guaranteed
-> > not to fail because of lack of disk space.
-> > ```
-> >
-> > For thinly provisioned storage constructs (dm-thin, filesystems on sparse
-> > files), the term 'disk space' is overloaded and can either mean the apparent
-> > disk space in the filesystem/thin logical volume or the true disk
-> > space that will be utilized on the underlying non-sparse allocation layer.
-> >
-> > The use of a separate mode allows us to cleanly disambiguate whether fallocate()
-> > causes allocation only at the current layer (default mode) or whether it propagates
-> > allocations to underlying layers (provision mode)
->
-> Why is it important to make this distinction?  The outcome of fallocate
-> is supposed to be that subsequent writes do not fail with ENOSPC.  In my
-> (fs developer) mind, REQ_OP_PROVISION simply an extra step to be taken
-> after allocating file blocks.
->
-Some use cases still benefit from keeping the default mode - eg.
-virtual machines
-running on massive storage pools that don't expect to hit the storage
-limit anytime
-soon (like most cloud storage providers). Essentially, if the 'no
-ENOSPC' guarantee is
-maintained via other means, then REQ_OP_PROVISION adds latency that isn't
-needed (and cloud storage providers don't need to set aside that extra
-space that
-may or may not be used).
+On Wed, Jan 04, 2023 at 09:09:38AM -0700, Jens Axboe wrote:
+> If we split a bio marked with REQ_NOWAIT, then we can trigger spurious
+> EAGAIN if constituent parts of that split bio end up failing request
+> allocations. Parts will complete just fine, but just a single failure
+> in one of the chained bios will yield an EAGAIN final result for the
+> parent bio.
+> 
+> Return EAGAIN early if we end up needing to split such a bio, which
+> allows for saner recovery handling.
 
-> If you *don't* add this API flag and simply bake the REQ_OP_PROVISION
-> call into mode 0 fallocate, then the new functionality can be added (or
-> even backported) to existing kernels and customers can use it
-> immediately.  If you *do*, then you get to wait a few years for
-> developers to add it to their codebases only after enough enterprise
-> distros pick up a new kernel to make it worth their while.
->
-> > for thinly provisioned filesystems/
-> > block devices. For devices that do not support REQ_OP_PROVISION, both these
-> > allocation modes will be equivalent. Given the performance cost of sending provision
-> > requests to the underlying layers, keeping the default mode as-is allows users to
-> > preserve existing behavior.
->
-> How expensive is this expected to be?  Is this why you wanted a separate
-> mode flag?
->
-Yes, the exact latency will depend on the stacked block devices and the
-fragmentation at the allocation layers.
+We're losing some performance here for large-ish single depth IO with
+nvme. We can get a little back by forcing to use the async worker
+earlier in the dispatch instead of getting all the way to the bio
+splitting, but the overhead to check for the condition (which is
+arbitrary decision anyway since we don't know the queue limits at
+io_uring prep time) mostly negates the gain.
 
-I did a quick test for benchmarking fallocate() with an:
-A) ext4 filesystem mounted with 'noprovision'
-B) ext4 filesystem mounted with 'provision' on a dm-thin device.
-C) ext4 filesystem mounted with 'provision' on a loop device with a sparse
-   backing file on the filesystem in (B).
+It's probably fine, though, since you can still hit peak b/w with just a
+little higher qdepth. This patch is a simple way to handle the problem,
+so looks good to me.
 
-I tested file sizes from 512M to 8G, time taken for fallocate() in (A)
-remains expectedly
-flat at ~0.01-0.02s, but for (B), it scales from 0.03-0.4s and for (C) it scales
-from 0.04s-0.52s (I captured the exact time distribution in the cover letter
-https://marc.info/?l=linux-ext4&m=167230113520636&w=2)
-
-+0.5s for a 8G fallocate doesn't sound a lot but I think fragmentation
-and how the
-block device is layered can make this worse...
-
-> --D
->
-> > Signed-off-by: Sarthak Kukreti <sarthakkukreti@chromium.org>
-> > ---
-> >  block/fops.c                | 15 +++++++++++----
-> >  include/linux/falloc.h      |  3 ++-
-> >  include/uapi/linux/falloc.h |  8 ++++++++
-> >  3 files changed, 21 insertions(+), 5 deletions(-)
-> >
-> > diff --git a/block/fops.c b/block/fops.c
-> > index 50d245e8c913..01bde561e1e2 100644
-> > --- a/block/fops.c
-> > +++ b/block/fops.c
-> > @@ -598,7 +598,8 @@ static ssize_t blkdev_read_iter(struct kiocb *iocb, struct iov_iter *to)
-> >
-> >  #define      BLKDEV_FALLOC_FL_SUPPORTED                                      \
-> >               (FALLOC_FL_KEEP_SIZE | FALLOC_FL_PUNCH_HOLE |           \
-> > -              FALLOC_FL_ZERO_RANGE | FALLOC_FL_NO_HIDE_STALE)
-> > +              FALLOC_FL_ZERO_RANGE | FALLOC_FL_NO_HIDE_STALE |       \
-> > +              FALLOC_FL_PROVISION)
-> >
-> >  static long blkdev_fallocate(struct file *file, int mode, loff_t start,
-> >                            loff_t len)
-> > @@ -634,9 +635,11 @@ static long blkdev_fallocate(struct file *file, int mode, loff_t start,
-> >       filemap_invalidate_lock(inode->i_mapping);
-> >
-> >       /* Invalidate the page cache, including dirty pages. */
-> > -     error = truncate_bdev_range(bdev, file->f_mode, start, end);
-> > -     if (error)
-> > -             goto fail;
-> > +     if (mode != FALLOC_FL_PROVISION) {
-> > +             error = truncate_bdev_range(bdev, file->f_mode, start, end);
-> > +             if (error)
-> > +                     goto fail;
-> > +     }
-> >
-> >       switch (mode) {
-> >       case FALLOC_FL_ZERO_RANGE:
-> > @@ -654,6 +657,10 @@ static long blkdev_fallocate(struct file *file, int mode, loff_t start,
-> >               error = blkdev_issue_discard(bdev, start >> SECTOR_SHIFT,
-> >                                            len >> SECTOR_SHIFT, GFP_KERNEL);
-> >               break;
-> > +     case FALLOC_FL_PROVISION:
-> > +             error = blkdev_issue_provision(bdev, start >> SECTOR_SHIFT,
-> > +                                            len >> SECTOR_SHIFT, GFP_KERNEL);
-> > +             break;
-> >       default:
-> >               error = -EOPNOTSUPP;
-> >       }
-> > diff --git a/include/linux/falloc.h b/include/linux/falloc.h
-> > index f3f0b97b1675..b9a40a61a59b 100644
-> > --- a/include/linux/falloc.h
-> > +++ b/include/linux/falloc.h
-> > @@ -30,7 +30,8 @@ struct space_resv {
-> >                                        FALLOC_FL_COLLAPSE_RANGE |     \
-> >                                        FALLOC_FL_ZERO_RANGE |         \
-> >                                        FALLOC_FL_INSERT_RANGE |       \
-> > -                                      FALLOC_FL_UNSHARE_RANGE)
-> > +                                      FALLOC_FL_UNSHARE_RANGE |      \
-> > +                                      FALLOC_FL_PROVISION)
-> >
-> >  /* on ia32 l_start is on a 32-bit boundary */
-> >  #if defined(CONFIG_X86_64)
-> > diff --git a/include/uapi/linux/falloc.h b/include/uapi/linux/falloc.h
-> > index 51398fa57f6c..2d323d113eed 100644
-> > --- a/include/uapi/linux/falloc.h
-> > +++ b/include/uapi/linux/falloc.h
-> > @@ -77,4 +77,12 @@
-> >   */
-> >  #define FALLOC_FL_UNSHARE_RANGE              0x40
-> >
-> > +/*
-> > + * FALLOC_FL_PROVISION acts as a hint for thinly provisioned devices to allocate
-> > + * blocks for the range/EOF.
-> > + *
-> > + * FALLOC_FL_PROVISION can only be used with allocate-mode fallocate.
-> > + */
-> > +#define FALLOC_FL_PROVISION          0x80
-> > +
-> >  #endif /* _UAPI_FALLOC_H_ */
-> > --
-> > 2.37.3
-> >
+Reviewed-by: Keith Busch <kbusch@kernel.org>
