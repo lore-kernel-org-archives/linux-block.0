@@ -2,198 +2,198 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3D2EC3DA7D
-	for <linux-block@archiver.kernel.org>; Thu,  5 Jan 2023 17:52:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C9539C3DA7A
+	for <linux-block@archiver.kernel.org>; Thu,  5 Jan 2023 18:16:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235346AbjAERwP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 5 Jan 2023 12:52:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59988 "EHLO
+        id S232942AbjAESQD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 5 Jan 2023 13:16:03 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46614 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235337AbjAERwN (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 5 Jan 2023 12:52:13 -0500
-Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DDD6E3DBC6
-        for <linux-block@vger.kernel.org>; Thu,  5 Jan 2023 09:52:12 -0800 (PST)
-Received: by mail-pj1-x1032.google.com with SMTP id n65-20020a17090a2cc700b0021bc5ef7a14so2778440pjd.0
-        for <linux-block@vger.kernel.org>; Thu, 05 Jan 2023 09:52:12 -0800 (PST)
+        with ESMTP id S231365AbjAESQC (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 5 Jan 2023 13:16:02 -0500
+Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0EE0B4FCCD;
+        Thu,  5 Jan 2023 10:16:01 -0800 (PST)
+Received: by mail-pf1-x42e.google.com with SMTP id z7so20245141pfq.13;
+        Thu, 05 Jan 2023 10:16:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=to:references:message-id:content-transfer-encoding:cc:date
-         :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rn0mF4Rzt2xJGz/OjuUC/0FM9L+vJsdwZ8UojIiYWoI=;
-        b=SxFG/ohYh8wv3Ao6a+M8yftbqKwAdlRUQC87v1SSWnm9U7SQkbTtLAMxlErTEckqYA
-         W4AZL4kJZMOt+am1SvzT2PRd/TUHbEIUH7PI3b7YWPcK/hkMI3uzlOx5JEiHbHbU1imr
-         HIxnWOk0eqxStXYOiIStxrt3j+7oaVfB1CKG4IiyxInOtZ+Th7YYnsi09fb4XvZQIpJw
-         X8lW2L4O3oOWcDwPiqEaWRKyVmd31aj+QubYOQ5b3ebecSdvsGv7nRXcX5z2x8HoZkci
-         Fu1+kRtrC6mmLc+cHuQyFMRFW+zga4u65veS/8HhQ5WBG+sWeq2c1KbY1c4GBrd3SU5s
-         89xg==
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=10MvpkF8hXViHIKUuerudV+3cNcQupsLf0iIclwjeuI=;
+        b=mDKbKL18L6Yd5hBjaPEGurxQHiGZ2QprTXgY6J+gn1R/D59qzgwp4N7Qf5/UZAKIsp
+         C2u400b2V9e9lP22Om/tb4J7ZCbPOJICOjCz13gDvws+CEOY3IbD+u4rjmIM+0y6UjG8
+         8MaydimNcLplCMzjqwEgjACpsHqxM2FZbMkYDVUaZk3LuDZkYDRgH91gBDnkzGVD2T8G
+         1AGLR/v+JBHE0wZu+XHdokFy9Iip0QkaoyUYRcsIqqgn1qYULy5UTI0eRdzlbGCUtaPk
+         KIk4e49p8PKWdSjOwb1VV52Uok/5HQfeMJcbOKErdEdvO0z7MTStlD1DAWQBmXJWz3fa
+         onZw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=to:references:message-id:content-transfer-encoding:cc:date
-         :in-reply-to:from:subject:mime-version:x-gm-message-state:from:to:cc
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=rn0mF4Rzt2xJGz/OjuUC/0FM9L+vJsdwZ8UojIiYWoI=;
-        b=XSsmCSV0ES6OXU+AZQ+FlFWt7iSS92N+vRJDB3YLVceqHbLG28rvx0152eCsI4ryjR
-         thq9YEBcvwCG0nIlZv3CoF6Mh7fWKCeHsuAw3Ha61NweeHcuBi3Jwa32vtl12jSO0A+W
-         sMq2Nmnaic3GcNl/GDwPJv6oZR1aaxIOPjAg/1Dxy8o5uE1PL0hmgm70hxdYEE5K+mre
-         jqrZHjUXjO+7/HKQXdr4cZKwDRGKB3ZokwaKrz2OV38vDGbFOPR8ZOmaSSzE7gXyG39T
-         xl41swlcN1iFrdKpuOIjsMgkDmrjaZu/qAtxOKkn/bZaivHxaD1mzBbHopSyJXhfoL4K
-         jNWA==
-X-Gm-Message-State: AFqh2kqtLw33ouOPLGjUasXo+ylB+zkkssiqSO7M/NBCqEQZ8RO7P9v4
-        O4OkjpSDlF8JOoWf2+ofGIk=
-X-Google-Smtp-Source: AMrXdXvtL7T6TKp0VscS/YynVzMr8k7Bd12d4lE6bTB8wdTngvpNInt754vMu1mKrclqB2A14UKQsQ==
-X-Received: by 2002:a17:903:1315:b0:192:ccfc:c178 with SMTP id iy21-20020a170903131500b00192ccfcc178mr15429207plb.52.1672941132058;
-        Thu, 05 Jan 2023 09:52:12 -0800 (PST)
-Received: from smtpclient.apple (c-24-6-216-183.hsd1.ca.comcast.net. [24.6.216.183])
-        by smtp.gmail.com with ESMTPSA id b8-20020a1709027e0800b00189a7fbfd44sm26262351plm.211.2023.01.05.09.52.10
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 05 Jan 2023 09:52:11 -0800 (PST)
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3731.300.101.1.3\))
-Subject: Re: Potential hang on ublk_ctrl_del_dev()
-From:   Nadav Amit <nadav.amit@gmail.com>
-In-Reply-To: <Y7ZA/ULE4hg3lkbY@T590>
-Date:   Thu, 5 Jan 2023 09:52:00 -0800
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <B7B3A381-60CD-402D-8F81-D65E7D186215@gmail.com>
-References: <862272BC-C6A3-4A60-A620-4C5596972D01@gmail.com>
- <Y7URsuwxaAHFmn8S@T590> <20EBDD77-21AD-4C39-B1F2-E9A9954FA360@gmail.com>
- <Y7ZA/ULE4hg3lkbY@T590>
-To:     Ming Lei <ming.lei@redhat.com>
-X-Mailer: Apple Mail (2.3731.300.101.1.3)
+        bh=10MvpkF8hXViHIKUuerudV+3cNcQupsLf0iIclwjeuI=;
+        b=1/TQhTpKy2U1YhWEnEsIDTADcglbTmlRpqG7EAFAcdY9W9Ei7h2q0BAuxulCEZ/lPn
+         ALgjuebCczfinsAv2HlOR2mX/7Y7vH7SjwbpWgMIZxZWCQWd+MSy94LzOJDLHfDT/w8V
+         caoDvejLNC2ARKJZMhkkhIQzHBZK5Qw1R4RJU0nS5g1bAIa+USQemin24PzG0iDHCvKR
+         c9Pj/MowUAIghe1DtN8yUIYkg9RsuixmzBmDb/fYwjaj7S4d+gotQsWXKkRCks6Qvh5E
+         H99cWVjayp9eWQ1I1MhJrRPaGhbFqa/ewTaSfZqpA6Np5kXUDV4CVK5PPNwwzh6c6do7
+         svag==
+X-Gm-Message-State: AFqh2kpcrwrBOrCuUZh31nIWBUtwS7UKpmbVQnleYuAuCcyxXdAK7jNo
+        eF/58GbA3dSoe5Jy1lLazbg=
+X-Google-Smtp-Source: AMrXdXs6Vr1TqAuaUz8B4kLHvB5Nfz5G7o5pmtNMyRy77ZCCDEM7Hal0z7Q/kNdXFVKQcnFxxAErKQ==
+X-Received: by 2002:aa7:99cb:0:b0:580:d188:f516 with SMTP id v11-20020aa799cb000000b00580d188f516mr50716268pfi.19.1672942560272;
+        Thu, 05 Jan 2023 10:16:00 -0800 (PST)
+Received: from localhost (2603-800c-1a02-1bae-a7fa-157f-969a-4cde.res6.spectrum.com. [2603:800c:1a02:1bae:a7fa:157f:969a:4cde])
+        by smtp.gmail.com with ESMTPSA id p5-20020a622905000000b005749f5d9d07sm25419078pfp.99.2023.01.05.10.15.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 05 Jan 2023 10:15:58 -0800 (PST)
+Sender: Tejun Heo <htejun@gmail.com>
+Date:   Thu, 5 Jan 2023 08:15:57 -1000
+From:   Tejun Heo <tj@kernel.org>
+To:     Damien Le Moal <damien.lemoal@opensource.wdc.com>
+Cc:     linux-ide@vger.kernel.org, linux-block@vger.kernel.org,
+        Jens Axboe <axboe@kernel.dk>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Hannes Reinecke <hare@suse.de>, Christoph Hellwig <hch@lst.de>,
+        Niklas Cassel <niklas.cassel@wdc.com>
+Subject: Re: [PATCH v7 0/7] Improve libata support for FUA
+Message-ID: <Y7cT3SSssHzBYqU4@slm.duckdns.org>
+References: <20230103051924.233796-1-damien.lemoal@opensource.wdc.com>
+ <Y7WuEqMgySOCCTqy@slm.duckdns.org>
+ <79260c74-92dd-2cdf-ad71-e70d9fa0f8a9@opensource.wdc.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <79260c74-92dd-2cdf-ad71-e70d9fa0f8a9@opensource.wdc.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Hello,
 
+On Thu, Jan 05, 2023 at 12:43:06PM +0900, Damien Le Moal wrote:
+> > These optional features tend to be broken in various and subtle ways,
+> 
+> FUA is not optional for any drive that supports NCQ. The FUA bit is a
+> mandatory part of the FPDMA READ/WRITE commands. The optional part is
+> support for the non-ncq WRITE FUA EXT command.
 
-> On Jan 4, 2023, at 7:16 PM, Ming Lei <ming.lei@redhat.com> wrote:
->=20
-> On Wed, Jan 04, 2023 at 10:13:05AM -0800, Nadav Amit wrote:
->>=20
->>=20
->>> On Jan 3, 2023, at 9:42 PM, Ming Lei <ming.lei@redhat.com> wrote:
->>>=20
->>> On Tue, Jan 03, 2023 at 01:47:37PM -0800, Nadav Amit wrote:
->>>> Hello Ming,
->>>>=20
->>>> I am trying the ublk and it seems very exciting.
->>>>=20
->>>> However, I encounter an issue when I remove a ublk device that is =
-mounted or
->>>> in use.
->>>>=20
->>>> In ublk_ctrl_del_dev(), shouldn=E2=80=99t we *not* wait if =
-ublk_idr_freed() is false?
->>>> It seems to me that it is saner to return -EBUSY in such a case and =
-let
->>>> userspace deal with the results.
->>>>=20
->>>> For instance, if I run the following (using ubdsrv):
->>>>=20
->>>> $ mkfs.ext4 /dev/ram0
->>>> $ ./ublk add -t loop -f /dev/ram0
->>>> $ sudo mount /dev/ublkb0 tmp
->>>> $ sudo ./ublk del -a
->>>>=20
->>>> ublk_ctrl_del_dev() would not be done until the partition is =
-unmounted, and you
->>>> can get a splat that is similar to the one below.
->>>=20
->>> The splat itself can be avoided easily by replace wait_event with
->>> wait_event_timeout() plus loop, but I guess you think the sync =
-delete
->>> isn't good too?
->>=20
->> I don=E2=80=99t think the splat is the issue. The issue is the =
-blocking behavior,
->> which is both unconditional and unbounded in time, and (worse) takes =
-place
->> without relinquishing the locks. wait_event_timeout() is therefore =
-not a
->> valid solution IMHO.
->>=20
->>>=20
->>>>=20
->>>> What do you say? Would you agree to change the behavior to return =
--EBUSY?
->>>=20
->>> It is designed in this way from beginning, and I believe it is just =
-for
->>> the sake of simplicity, and one point is that the device number =
-needs
->>> to be freed after 'ublk del' returns.
->>>=20
->>> But if it isn't friendly from user's viewpoint, we can change to =
-return
->>> -EBUSY. One simple solution is to check if the ublk block device
->>> is opened before running any deletion action, if yes, stop to delete =
-it
->>> and return -EBUSY; otherwise go ahead and stop & delete the pair of =
-devices.
->>> And the userspace part(ublk utility) needs update too.
->>>=20
->>> However, -EBUSY isn't perfect too, cause user has to retry the =
-delete
->>> command manually.
->>=20
->> I understand your considerations. My intuition is that just as umount
->> cannot be done while a file is opened and would return -EBUSY, so =
-should
->> deleting the ublock while the ublk is in use.
->>=20
->> So as I see it, there are 2 possible options for proper deletion of =
-ublk,
->> and actually both can be implemented and distinguished with a new =
-flag
->> (UBLK_F_*):
->>=20
->> 1. Blocking - similar to the way it is done today, but (hopefully) =
-without
->>   holding locks, and with using wait_event_interruptible() instead of
->>   wait_event() to allow interruption (and return EINTR if =
-interrupted).
->>=20
->> 2. Best-effort - returning EBUSY if it cannot be removed.
->>=20
->> I can imagine use-cases for both, and it would also allow you not to
->> change ubdsrv if you choose so.
->>=20
->> Does it make sense?
->=20
-> I prefer to the 1st approach:
->=20
-> 1) the wait event is still one positive signal for user to cleanup the
-> device use, since the correct step is to umount ublk disk before =
-deleting
-> the device.
->=20
-> 2) the wait still can avoid the current context to reuse the device
-> number
->=20
-> 3) after switching to wait_event_interruptible(), we need to avoid
-> double delete, and one flag of UB_STATE_DELETED can be used for =
-failing
-> new delete command.
->=20
-> 4) IMO new flag(UBLK_F_*) isn't needed to distinguish this change
-> with current behavior.
->=20
-> Please let us know if you'd like to cook one patch for improving
-> the delete handling.
+Optional in the sense that it isn't essential in achieving the main function
+of the device, which means that most don't end up using it.
 
-I can take a stab on it, but only in about 2 weeks time.
+> > especially the ones which don't show clear and notable advantages and thus
+> > don't get used by everybody. I'm not necessarily against enabling it by
+> > default but we should have better justifications as we might unnecessarily
+> > cause a bunch of painful and subtle failures which can take a while to sort
+> > out.
+> 
+> Avoiding regressions is always my highest priority. I know that there
+> are a lot of cheap ATA devices out there that have questionable ACS spec
+> compliance.
 
->=20
-> BTW, there could be another option, such as, 'ublk delete --no-wait' =
-just
-> run the remove and without waiting at all, but not sure if it is =
-useful.
->=20
+A lot of historical devices too which don't get much scrutiny or testing but
+can still cause significant griefs for the users.
 
-I considered the userspace ublk as one possible implementation. I am not
-sure this affects the kernel interfaces that are needed.
+> > * Can the advantages of using FUA be demonstrated in a realistic way? IOW,
+> >   are there workloads which clearly benefit from FUA? My memory is hazy but
+> >   we only really use FUA from flush sequence to turn flush, write, flush
+> >   sequence into flush, FUA-write. As all the heavy lifting is done in the
+> >   first flush anyway, I couldn't find a case where that optimization made a
+> >   meaningful difference but I didn't look very hard.
+> 
+> The main users in kernel are file systems, when committing
+> transactions/metadata journaling. Given that this is generally not
+> generating a lot of traffic, I do not think we can measure any
+> difference for HDDs. The devices are too slow to start with, so saving
+> one command will not matter much, unless the application is fsync()
+> crazy (and even then, not sure we'll see any difference). Even for SATA
+> SSDs it likely will be hard to see a difference I think.
 
+On a quick glance, there are some uses of REQ_FUA w/o REQ_PREFLUSH which
+indicates that there can be actual gains to be had. However, ext4 AFAICS
+always pairs PREFLUSH w/ FUA, so a lot of use cases won't see any gain while
+taking on the possible risk of being exposed to FUA commands.
+
+> Then we have applications using the drive block device file directly.
+> For these, it is hard to tell how much it matters. Enabling it by
+> default with a drive correctly supporting it will very much likely not
+> hurt though.
+> 
+> Maciej,
+> 
+> May be you did some experiments before asking for enabling FUA by
+> default ? Any interesting performance data you can share ?
+> 
+> > * Do we know how widely FUA is used now? IOW, is windows using FUA by
+> >   default now? If so, do we know whether they have a blocklist?
+> 
+> You mean "blacklist" ? I do not have any information about Windows, but
+
+The PC thing to say now seems to be allowlist / blocklist instead of
+whiltelist / blacklist, not that I mind either way.
+
+> I can try to find out, at least for my employer's devices. But that will
+> not be very useful as I know these drives behave correctly.
+
+So, AFAIK, windows doesn't issue FUA for SATA devices, only SAS, but I could
+be wrong. It'd be really useful to find out.
+
+> More than Windows or the kernel, I think that looking at SAS HBAs is
+> more important here. SATA HDDs are the most widely used type of devices
+> with these, by far. These may have a SAT translating FUA scsi writes to
+> FUA NCQ FPDMA writes, resulting in FUA being extensively used. Modulo a
+> blacklist that results in the same as the kernel with a
+> flush/write/flush sequence. Hard to know as HBA's FW are not open. A bus
+> analyzer could tell us that though, but again I can look at that only
+> with the drives I have, which I know are working well with FUA.
+> 
+> I am OK with attempting enabling FUA by default for the following reasons:
+> 1) The vast majority of drives in libata blacklist (all features) are
+> old models that are not sold anymore.
+
+The context here is that we promptly found all of these devices struggle
+with FUA (like locking up and dropping off the bus) shortly after we enabled
+FUA by default, so the list is by no means exhaustive and is more an
+indication that there at least were a whole lot of devices which choke on
+FUA. On top, devices not sold anymore are even harder to debug and pay
+attention to while being able to cause a lot of pain to configurations which
+have been stable and happy for a long time.
+
+> 2) We are restricting FUA support to drives that also support NCQ, that
+> is, modern-ish ones that are supposed to process the FUA NCQ read/write
+> commands correctly, per specs.
+
+NCQ is really old now and our previous attempt at FUA was after NCQ was
+widely available, so I'm not sure this holds.
+
+> 3) For HDDs, which is the vast majority of ATA devices out there these
+> days, all recent drives I have tested are OK. Even older ones with NCQ
+> support that I have access to are fine.
+> 4) We are at rc2, which gives us time to revert patch 7 if we see too
+> many bug reports.
+
+This sort of problems especially if affecting mostly old devices can be very
+difficult to suss out and will definitely take way longer than a single
+release cycle.
+
+> One thing we could add to the patch series is an additional restriction
+> to enabling FUA by default to drives that support a recent standard. Say
+> ACS-4 and above. That will restrict this to recent devices, thus
+> reducing the risk of hitting bad apples. Thoughts ?
+
+Yeah, that'd help and also if SAS HBA SAT's have been issuing FUA's which
+would be a meaningful verification of the feature, at least for rotating
+hard disks.
+
+I feel rather uneasy about enabling FUA by default given history. We can
+improve its chances by restricting it to newer devices and maybe even just
+hard disks, but it kinda comes back to the root question of why. Why would
+we want to do this? What are the benefits? Right now, there are a bunch of
+really tricky cons and not whole lot on the pro column.
+
+Thanks.
+
+-- 
+tejun
