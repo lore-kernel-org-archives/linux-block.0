@@ -2,106 +2,91 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 859A0C54EBC
-	for <linux-block@archiver.kernel.org>; Thu,  5 Jan 2023 21:24:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B00C5C3DA7A
+	for <linux-block@archiver.kernel.org>; Thu,  5 Jan 2023 21:28:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235752AbjAEVYs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 5 Jan 2023 16:24:48 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48588 "EHLO
+        id S235817AbjAEV2p (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 5 Jan 2023 16:28:45 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52422 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235738AbjAEVYq (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 5 Jan 2023 16:24:46 -0500
-Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B91B631AD;
-        Thu,  5 Jan 2023 13:24:45 -0800 (PST)
-Received: by mail-pj1-x1029.google.com with SMTP id z4-20020a17090a170400b00226d331390cso2283028pjd.5;
-        Thu, 05 Jan 2023 13:24:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:sender:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3WPbvsPoBO1wdRnnR1ui7BApmCnbJf4jlfv1HBKIBy8=;
-        b=h7Rkd2eoAqOSb3NPQcC429lnxpLGOUQWpdpDfVRumSo56ccDcW26pC/hLGdMgC/Iic
-         QgeeKnII9Fkf8pa3RVL9oEpVLXr8eNHSU4BhUMszxqbHlRyDNUTknRTO8JN+aD0Z7Hh4
-         ILf01WtrtaEjA9OjrHxoW1rKO1wJzGbv1L8QqO3wAlSfVALhhjT6oW45MkTD1qixXnuC
-         pjc6+ch1UdJD8mjiS0+EJsG9dSeZyJlTmvMRzqFgVHC0xiF0aviW8kOnr9tC/zkdOszn
-         C2AiozuHZoAYbEumaaFxY5clPdUZXF8TeGh+gPTJi8kDsfLVPAQIVnoFN7GyykDGZ6M1
-         cYRw==
+        with ESMTP id S235874AbjAEV2j (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 5 Jan 2023 16:28:39 -0500
+Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com [209.85.215.170])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 078446319C
+        for <linux-block@vger.kernel.org>; Thu,  5 Jan 2023 13:28:39 -0800 (PST)
+Received: by mail-pg1-f170.google.com with SMTP id 141so7055344pgc.0
+        for <linux-block@vger.kernel.org>; Thu, 05 Jan 2023 13:28:39 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:sender:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=3WPbvsPoBO1wdRnnR1ui7BApmCnbJf4jlfv1HBKIBy8=;
-        b=DCEo0iGvo6tzKgjM7O1XXvjdLNyB1p25NHjSJUes58Nr8vLmK/aQZEHw26vm+oobtb
-         ML89g+h1dD/iGMmo68p5su39IAHAbiR72mG7OEt4KbF/FVrBLwS9/y/n/67fPz6Ol2HJ
-         794p3NRoY5Ctpxs2ltYC6tKoxutwb75xN54ZTOiwF1iBKdHNYOzQ4h8/I/XUtXW7y+Ol
-         9FYMTU7J8Pkc0HJ8dpy8niVlnf1YPmkfbn3kxHy/8CGNnNsHhgV0Z8QnvmtbWLF2BPD8
-         4eL2wfXOgLpeqDXTZfkByQujRWAtWbt5w+ANOsTL7yp8+o4H0z6N/fgWi/9laC0U19Rp
-         NIgQ==
-X-Gm-Message-State: AFqh2kqlnMNUKzXUTzyPx99DGuYUPlkVIi2cLf7OJRctbpKAlINhOD8G
-        J5Xue6xMJGxg8dumf21GGmg=
-X-Google-Smtp-Source: AMrXdXv8TvNCpT/+B43gLCoaPxf6EUgyZ6sV9YGzP9vxvPxJPkB0OQ1g0jouAN2nf8P4uTl8EBor4A==
-X-Received: by 2002:a17:902:f24c:b0:189:7d30:7623 with SMTP id j12-20020a170902f24c00b001897d307623mr47885881plc.30.1672953884912;
-        Thu, 05 Jan 2023 13:24:44 -0800 (PST)
-Received: from localhost (2603-800c-1a02-1bae-a7fa-157f-969a-4cde.res6.spectrum.com. [2603:800c:1a02:1bae:a7fa:157f:969a:4cde])
-        by smtp.gmail.com with ESMTPSA id z4-20020a1709027e8400b0018685257c0dsm3689527pla.58.2023.01.05.13.24.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 05 Jan 2023 13:24:44 -0800 (PST)
-Sender: Tejun Heo <htejun@gmail.com>
-From:   Tejun Heo <tj@kernel.org>
-To:     axboe@kernel.dk, josef@toxicpanda.com, hch@lst.de
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Tejun Heo <tj@kernel.org>
-Subject: [PATCH 3/4] blk-iolatency: s/blkcg_rq_qos/iolat_rq_qos/
-Date:   Thu,  5 Jan 2023 11:24:31 -1000
-Message-Id: <20230105212432.289569-4-tj@kernel.org>
-X-Mailer: git-send-email 2.39.0
-In-Reply-To: <20230105212432.289569-1-tj@kernel.org>
-References: <20230105212432.289569-1-tj@kernel.org>
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=4NfHQbVjBXzSTS5DZsdkkWWss5p6l1QMhBCl8oIS3Sk=;
+        b=FoNi7/sz+D78WNlMX6HEyhSskqwuYlxOYCiPIl5yXbq/Ixb3La0UlRYwbt6hliM+2q
+         /uqLkJvl2Zz/5yvXZW0YnXLIB/6CGv6zSYqR2U4GcuKACgv+VJLv721BGGB6gk0DxlCr
+         DEF8IHQkGBcFE9BTFSS6Vhoda19F4rqcjFcfkOVfpQkVZQjbvz4b2UirL/l9LdUeoKj+
+         5SOfFR2fDadBUQ3ZY9wfYe61m8LDSEALYmGdS2Gc2vOHk5WSRSGSniV/n8xhYiHNbMnm
+         HuDI3z1u50kTinAo1XczAnyC5j7tw4xixWGFqtLuiOJxv2Ago0t7RM6aDPQ7qb/iQrA1
+         g2DQ==
+X-Gm-Message-State: AFqh2kr81e/0KiqB5Thr4+ib4X5ok+3au6bPAhiAcjqsBINPyIXHKwDy
+        Z0u2cJgkYMZXcbpYGst+pFk=
+X-Google-Smtp-Source: AMrXdXsaXd8EEdkVUSDtZAcZai0ijdOMvBKRzMxOLgcy6ngM2JH4zdsNyirF2sY90hp1AqbiVML+FQ==
+X-Received: by 2002:aa7:96ba:0:b0:583:1dc6:2aef with SMTP id g26-20020aa796ba000000b005831dc62aefmr4611592pfk.34.1672954118255;
+        Thu, 05 Jan 2023 13:28:38 -0800 (PST)
+Received: from ?IPV6:2620:15c:211:201:f9eb:49b6:75b:111e? ([2620:15c:211:201:f9eb:49b6:75b:111e])
+        by smtp.gmail.com with ESMTPSA id y17-20020a626411000000b00575b6d7c458sm24799602pfb.21.2023.01.05.13.28.36
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 05 Jan 2023 13:28:37 -0800 (PST)
+Message-ID: <fff1ca57-b0ee-9598-9ea8-e6c8b7571f0d@acm.org>
+Date:   Thu, 5 Jan 2023 13:28:35 -0800
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.5.1
+Subject: Re: [PATCHv4 2/2] block: save user max_sectors limit
+Content-Language: en-US
+To:     Keith Busch <kbusch@meta.com>, linux-block@vger.kernel.org,
+        axboe@kernel.dk
+Cc:     hch@lst.de, martin.petersen@oracle.com,
+        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+        Keith Busch <kbusch@kernel.org>
+References: <20230105205146.3610282-1-kbusch@meta.com>
+ <20230105205146.3610282-3-kbusch@meta.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20230105205146.3610282-3-kbusch@meta.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The name was too generic given that there are multiple blkcg rq-qos
-policies.
+On 1/5/23 12:51, Keith Busch wrote:
+> diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
+> index 93d9e9c9a6ea8..5486b6c57f6b8 100644
+> --- a/block/blk-sysfs.c
+> +++ b/block/blk-sysfs.c
+> @@ -239,19 +239,28 @@ static ssize_t queue_zone_append_max_show(struct request_queue *q, char *page)
+>   static ssize_t
+>   queue_max_sectors_store(struct request_queue *q, const char *page, size_t count)
+>   {
+> -	unsigned long max_sectors_kb,
+> +	unsigned long var;
+> +	unsigned int max_sectors_kb,
+>   		max_hw_sectors_kb = queue_max_hw_sectors(q) >> 1,
+>   			page_kb = 1 << (PAGE_SHIFT - 10);
+> -	ssize_t ret = queue_var_store(&max_sectors_kb, page, count);
+> +	ssize_t ret = queue_var_store(&var, page, count);
+>   
+>   	if (ret < 0)
+>   		return ret;
+>   
+> -	max_hw_sectors_kb = min_not_zero(max_hw_sectors_kb, (unsigned long)
+> +	max_sectors_kb = (unsigned int)var;
 
-Signed-off-by: Tejun Heo <tj@kernel.org>
-Cc: Josef Bacik <josef@toxicpanda.com>
----
- block/blk-iolatency.c | 2 +-
- block/blk-rq-qos.h    | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+Shouldn't this function report an error if 'var' is too large to fit 
+into an unsigned int?
 
-diff --git a/block/blk-iolatency.c b/block/blk-iolatency.c
-index 3b3667f397a9..3601345808d2 100644
---- a/block/blk-iolatency.c
-+++ b/block/blk-iolatency.c
-@@ -976,7 +976,7 @@ static void iolatency_pd_init(struct blkg_policy_data *pd)
- {
- 	struct iolatency_grp *iolat = pd_to_lat(pd);
- 	struct blkcg_gq *blkg = lat_to_blkg(iolat);
--	struct rq_qos *rqos = blkcg_rq_qos(blkg->q);
-+	struct rq_qos *rqos = iolat_rq_qos(blkg->q);
- 	struct blk_iolatency *blkiolat = BLKIOLATENCY(rqos);
- 	u64 now = ktime_to_ns(ktime_get());
- 	int cpu;
-diff --git a/block/blk-rq-qos.h b/block/blk-rq-qos.h
-index 1ef1f7d4bc3c..27f004fae66b 100644
---- a/block/blk-rq-qos.h
-+++ b/block/blk-rq-qos.h
-@@ -74,7 +74,7 @@ static inline struct rq_qos *wbt_rq_qos(struct request_queue *q)
- 	return rq_qos_id(q, RQ_QOS_WBT);
- }
- 
--static inline struct rq_qos *blkcg_rq_qos(struct request_queue *q)
-+static inline struct rq_qos *iolat_rq_qos(struct request_queue *q)
- {
- 	return rq_qos_id(q, RQ_QOS_LATENCY);
- }
--- 
-2.39.0
+Otherwise this patch looks good to me.
 
+Thanks,
+
+Bart.
