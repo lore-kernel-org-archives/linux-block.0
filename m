@@ -2,182 +2,123 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59249C54E76
-	for <linux-block@archiver.kernel.org>; Thu,  5 Jan 2023 15:51:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3224CC3DA7D
+	for <linux-block@archiver.kernel.org>; Thu,  5 Jan 2023 16:19:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233605AbjAEPvL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 5 Jan 2023 10:51:11 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39310 "EHLO
+        id S234891AbjAEQTH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 5 Jan 2023 11:19:07 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55450 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234960AbjAEPuY (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 5 Jan 2023 10:50:24 -0500
-Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 302AB5E09D;
-        Thu,  5 Jan 2023 07:50:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1672933822; x=1704469822;
-  h=date:from:to:cc:subject:message-id:mime-version:
-   content-transfer-encoding;
-  bh=RJatMYrbPfEvNurBxtLaBiUJD4LCEtP8VKvLxxz/leM=;
-  b=kd+ndZ8K31PGe55ZJiqMQis4fsu+hv8Rm63LgYwx5JxFW9JsIhuqBdsU
-   mUV2x5Jscn5rE5BjY3vePPgkoaYaz56cKPdGNYKuP4sRZal5LafympAro
-   8Gry/cIEmHQZK8kFSjgyEQ42SvcWVmih9WIPeRz6HicpQ4F1I/efKWDRx
-   U45aDrwzVvms7bgxa2YiAQr+44rJrMnUZkrcIw/U/OHnSaeDDlumeK9xR
-   xF9qVk4Ey39D7v53nkXypFoSQTGoSghKWaH2M4l5pQOsbTY2PPWg3RgHE
-   XmHRJBeyW+Me1s/I7vsi4I/4qv26uDvkN2g3YnTaRbi8io+T7QP+eHsKt
-   A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10580"; a="310026053"
-X-IronPort-AV: E=Sophos;i="5.96,303,1665471600"; 
-   d="scan'208";a="310026053"
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jan 2023 07:50:21 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10580"; a="633190458"
-X-IronPort-AV: E=Sophos;i="5.96,303,1665471600"; 
-   d="scan'208";a="633190458"
-Received: from lkp-server02.sh.intel.com (HELO f1920e93ebb5) ([10.239.97.151])
-  by orsmga006.jf.intel.com with ESMTP; 05 Jan 2023 07:50:18 -0800
-Received: from kbuild by f1920e93ebb5 with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1pDSVV-0001zD-1E;
-        Thu, 05 Jan 2023 15:50:17 +0000
-Date:   Thu, 05 Jan 2023 23:49:40 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Andrew Morton <akpm@linux-foundation.org>
-Cc:     loongarch@lists.linux.dev, linux-omap@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-arm-msm@vger.kernel.org, dri-devel@lists.freedesktop.org,
-        Linux Memory Management List <linux-mm@kvack.org>
-Subject: [linux-next:master] BUILD REGRESSION
- cc3c08b41a9c9402ead726ec6deb1217081d0d8b
-Message-ID: <63b6f194.O4eKwdyFWFrII4HE%lkp@intel.com>
-User-Agent: Heirloom mailx 12.5 6/20/10
+        with ESMTP id S229828AbjAEQTG (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 5 Jan 2023 11:19:06 -0500
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C4B514E42F;
+        Thu,  5 Jan 2023 08:19:05 -0800 (PST)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 59D3F17846;
+        Thu,  5 Jan 2023 16:18:56 +0000 (UTC)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 271F213338;
+        Thu,  5 Jan 2023 16:18:56 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id bxuMCHD4tmM3QwAAMHmgww
+        (envelope-from <mkoutny@suse.com>); Thu, 05 Jan 2023 16:18:56 +0000
+Date:   Thu, 5 Jan 2023 17:18:54 +0100
+From:   Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>
+To:     Jinke Han <hanjinke.666@bytedance.com>
+Cc:     tj@kernel.org, josef@toxicpanda.com, axboe@kernel.dk,
+        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, yinxin.x@bytedance.com, jack@suse.cz
+Subject: Re: [PATCH v3] blk-throtl: Introduce sync and async queues for
+ blk-throtl
+Message-ID: <20230105161854.GA1259@blackbody.suse.cz>
+References: <20221226130505.7186-1-hanjinke.666@bytedance.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="9jxsPFA5p3P2qPhR"
+Content-Disposition: inline
+In-Reply-To: <20221226130505.7186-1-hanjinke.666@bytedance.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+Authentication-Results: smtp-out1.suse.de;
+        none
+X-Spamd-Result: default: False [-2.20 / 50.00];
+         ARC_NA(0.00)[];
+         RCVD_VIA_SMTP_AUTH(0.00)[];
+         FROM_HAS_DN(0.00)[];
+         TO_DN_SOME(0.00)[];
+         TO_MATCH_ENVRCPT_ALL(0.00)[];
+         MIME_GOOD(-0.20)[multipart/signed,text/plain];
+         RCPT_COUNT_SEVEN(0.00)[9];
+         SIGNED_PGP(-2.00)[];
+         FROM_EQ_ENVFROM(0.00)[];
+         MIME_TRACE(0.00)[0:+,1:+,2:~];
+         RCVD_COUNT_TWO(0.00)[2];
+         RCVD_TLS_ALL(0.00)[]
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git master
-branch HEAD: cc3c08b41a9c9402ead726ec6deb1217081d0d8b  Add linux-next specific files for 20230105
 
-Error/Warning reports:
+--9jxsPFA5p3P2qPhR
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-https://lore.kernel.org/oe-kbuild-all/202212090509.NjAl9tbo-lkp@intel.com
-https://lore.kernel.org/oe-kbuild-all/202212170128.DFuMhkwh-lkp@intel.com
+Hello Jinke.
 
-Error/Warning: (recently discovered and may have been fixed)
+On Mon, Dec 26, 2022 at 09:05:05PM +0800, Jinke Han <hanjinke.666@bytedance.com> wrote:
+> In our test, fio writes a 100g file in sequential 4k blocksize in
+> a container with low bps limit configured (wbps=10M).
+> [...]
+> At the same time, the operation of saving a small file by vim will be
+> blocked amolst 140s.
 
-Documentation/gpu/drm-internals:179: ./include/drm/drm_file.h:411: WARNING: undefined label: drm_accel_node (if the link has no caption the label must precede a section header)
-Warning: tools/power/cpupower/man/cpupower-powercap-info.1 references a file that doesn't exist: Documentation/power/powercap/powercap.txt
-aarch64-linux-ld: ID map text too big or misaligned
-arch/loongarch/kernel/asm-offsets.c:265:6: warning: no previous prototype for 'output_pbe_defines' [-Wmissing-prototypes]
-drivers/gpu/drm/ttm/ttm_bo_util.c:364:32: error: implicit declaration of function 'vmap'; did you mean 'kmap'? [-Werror=implicit-function-declaration]
-drivers/gpu/drm/ttm/ttm_bo_util.c:429:17: error: implicit declaration of function 'vunmap'; did you mean 'kunmap'? [-Werror=implicit-function-declaration]
+Could you please elaborate why is this specific to blk-throtl?
 
-Unverified Error/Warning (likely false positive, please contact us if interested):
+I guess similar problem would arise for devices that are "naturally"
+slow.
+Then:
+a) it must have been solved elsewhere in the block layer (but it's
+   broken),
+b) it should be solved generically in the block layer (thus this is only
+   a partial solution).
 
-drivers/block/null_blk/zoned.c:769 zone_cond_store() warn: potential spectre issue 'dev->zones' [w] (local cap)
-drivers/clk/qcom/camcc-sm6350.c:1745:15: sparse: sparse: symbol 'camcc_sm6350_hws' was not declared. Should it be static?
-fs/udf/file.c:177 udf_file_write_iter() warn: inconsistent returns '&iinfo->i_data_sem'.
+Alternatively, I imagine your problem could be reduced with
+corresponding memory limits on IO-constrained cgroups. (The memory limit
+would increase cgwb's dirty throttling and consequently leaves more
+IO bandwidth for sync IOs.)
 
-Error/Warning ids grouped by kconfigs:
+Could you describe how the submitted solution compares to memory
+limiting?
 
-gcc_recent_errors
-|-- arm64-allyesconfig
-|   `-- aarch64-linux-ld:ID-map-text-too-big-or-misaligned
-|-- loongarch-allyesconfig
-|   `-- arch-loongarch-kernel-asm-offsets.c:warning:no-previous-prototype-for-output_pbe_defines
-|-- mips-allyesconfig
-|   |-- drivers-gpu-drm-ttm-ttm_bo_util.c:error:implicit-declaration-of-function-vmap
-|   `-- drivers-gpu-drm-ttm-ttm_bo_util.c:error:implicit-declaration-of-function-vunmap
-|-- parisc-randconfig-m041-20230102
-|   `-- fs-udf-file.c-udf_file_write_iter()-warn:inconsistent-returns-iinfo-i_data_sem-.
-|-- riscv-randconfig-m031-20230105
-|   |-- drivers-block-null_blk-zoned.c-zone_cond_store()-warn:potential-spectre-issue-dev-zones-w-(local-cap)
-|   `-- drivers-regulator-tps65219-regulator.c-tps65219_regulator_probe()-warn:unsigned-rdev-is-never-less-than-zero.
-|-- riscv-randconfig-s032-20230105
-|   `-- drivers-clk-qcom-camcc-sm6350.c:sparse:sparse:symbol-camcc_sm6350_hws-was-not-declared.-Should-it-be-static
-`-- x86_64-allnoconfig
-    |-- Documentation-gpu-drm-internals:.-include-drm-drm_file.h:WARNING:undefined-label:drm_accel_node-(if-the-link-has-no-caption-the-label-must-precede-a-section-header)
-    `-- Warning:tools-power-cpupower-man-cpupower-powercap-info.-references-a-file-that-doesn-t-exist:Documentation-power-powercap-powercap.txt
-clang_recent_errors
-`-- x86_64-rhel-8.3-rust
-    `-- vmlinux.o:warning:objtool:___ksymtab_gpl-_RNvNtCsfATHBUcknU9_6kernel5print16call_printk_cont:data-relocation-to-ENDBR:_RNvNtCsfATHBUcknU9_6kernel5print16call_printk_cont
+> This patch splits bio queue into sync and async queues for blk-throtl
+> and gives a huge priority to sync write ios.
 
-elapsed time: 726m
+The "huge priority" corresponds to the THROTL_SYNC_FACTOR, right?
+I'm slightly concerned about the introduction of the magical value.
+What is the reasoning behind this? (E.g. I'd expect 1:1 could work as
+well, while 1:4 suggests this is somehow better (empirically?).)
 
-configs tested: 62
-configs skipped: 2
+Thanks,
+Michal
 
-gcc tested configs:
-um                             i386_defconfig
-x86_64                            allnoconfig
-um                           x86_64_defconfig
-i386                                defconfig
-x86_64                        randconfig-a004
-x86_64                        randconfig-a002
-x86_64                           rhel-8.3-bpf
-x86_64                           rhel-8.3-syz
-m68k                             allmodconfig
-powerpc                           allnoconfig
-x86_64                    rhel-8.3-kselftests
-x86_64                         rhel-8.3-kunit
-x86_64                        randconfig-a006
-x86_64                          rhel-8.3-func
-i386                          randconfig-a014
-x86_64                           rhel-8.3-kvm
-arc                              allyesconfig
-i386                          randconfig-a012
-alpha                            allyesconfig
-i386                          randconfig-a016
-x86_64                              defconfig
-m68k                             allyesconfig
-arc                                 defconfig
-x86_64                        randconfig-a013
-x86_64                        randconfig-a011
-ia64                             allmodconfig
-x86_64                               rhel-8.3
-x86_64                           allyesconfig
-i386                          randconfig-a001
-alpha                               defconfig
-arc                  randconfig-r043-20230105
-s390                                defconfig
-i386                          randconfig-a003
-s390                             allmodconfig
-x86_64                        randconfig-a015
-i386                          randconfig-a005
-s390                 randconfig-r044-20230105
-i386                             allyesconfig
-arm                                 defconfig
-s390                             allyesconfig
-riscv                randconfig-r042-20230105
-sh                               allmodconfig
-mips                             allyesconfig
-powerpc                          allmodconfig
-arm64                            allyesconfig
-arm                              allyesconfig
 
-clang tested configs:
-x86_64                          rhel-8.3-rust
-x86_64                        randconfig-a001
-i386                          randconfig-a013
-x86_64                        randconfig-a003
-x86_64                        randconfig-a005
-i386                          randconfig-a011
-i386                          randconfig-a015
-x86_64                        randconfig-a012
-x86_64                        randconfig-a014
-arm                  randconfig-r046-20230105
-i386                          randconfig-a002
-x86_64                        randconfig-a016
-hexagon              randconfig-r041-20230105
-i386                          randconfig-a004
-hexagon              randconfig-r045-20230105
-i386                          randconfig-a006
+--9jxsPFA5p3P2qPhR
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: Digital signature
 
--- 
-0-DAY CI Kernel Test Service
-https://01.org/lkp
+-----BEGIN PGP SIGNATURE-----
+
+iHUEARYIAB0WIQTrXXag4J0QvXXBmkMkDQmsBEOquQUCY7b4bAAKCRAkDQmsBEOq
+uQrgAQDs2aA08ChLFwdUU9xtUvTksAkbg4kIOJ6eonBHzYLMmQD9Eku/xsu7q+JO
+bkt+bgPn6r1by/lxIByZFdvliq70/g0=
+=VUBu
+-----END PGP SIGNATURE-----
+
+--9jxsPFA5p3P2qPhR--
