@@ -2,123 +2,165 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F60FC3DA7A
-	for <linux-block@archiver.kernel.org>; Thu,  5 Jan 2023 03:56:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DFD4C5479D
+	for <linux-block@archiver.kernel.org>; Thu,  5 Jan 2023 07:28:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229569AbjAED4B (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 4 Jan 2023 22:56:01 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58498 "EHLO
+        id S229944AbjAEH2t (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 5 Jan 2023 02:28:49 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37332 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230427AbjAEDzf (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 4 Jan 2023 22:55:35 -0500
-Received: from esa5.hgst.iphmx.com (esa5.hgst.iphmx.com [216.71.153.144])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1FD304680A
-        for <linux-block@vger.kernel.org>; Wed,  4 Jan 2023 19:54:36 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1672890876; x=1704426876;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=sJcj1FWMwglYSv5QiOXtM+NnlMSpPPvz2qAzxEE634I=;
-  b=Pu3AhIQRNesAlksBBmNBOWzAQrdg10LG8Y/11Lb8VVH8Jk8G/AEpdd1k
-   eo3V96o17xrTKywwcTVpVRwwybg+mSlW09iWSEe2dqUcMryvaCsf129D1
-   ZXUS/S+NqYsHt5Urr44kiRKySxGS+iz/WOcFuqJhCfwR0h/MPkH7xscQT
-   Pma6pIJL7kAjx4o8q3ao8kU7X68Xwlq2+b2oTKUCsLs4ChnpGde6VCAuc
-   0DytluTMPRFY/fP4ioWs5cHxv37POwnUP4k+iPDukfdpDEhzXEt2sIrjF
-   6Tut5AnllxwhqXQu4nLWYjjH/4zpVnGEdtiKTPr4eEhwzl2cbJo1zceTY
-   A==;
-X-IronPort-AV: E=Sophos;i="5.96,301,1665417600"; 
-   d="scan'208";a="219944752"
-Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 05 Jan 2023 11:54:34 +0800
-IronPort-SDR: /a5WXz4qjlCC4SHYU1THHIuriMv31T2uklq2XZT+s1BPJghpqXl8/BBuLyI08nHZKA9g95cDN2
- jI1W58PGA0JpoIBJCcslAUdWGQRHTVJkukn3X9nV6pI8zPGpBj1Ijl+4YBuOwQfmnBhnuFJb3S
- oX6zVzBa4PMefUoMUhOo1uFKGv1wxBTfsGExJ7bfdOoc3v9M7poE7tH94Box/e8/zYchS+vHqx
- DiKSjIY9SAt9pVcWQ91S8LuXhFVikYCX30Wg5/RxQQ/UOV/GIHKv/XEev+31KOSQ0Uq3fQc+vH
- G/0=
-Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 04 Jan 2023 19:12:30 -0800
-IronPort-SDR: +VUtI+rznv8OpEUGKJk/q9s62xz4t9Wwbd11vMkPeMii1BxNjdZHI3S23/GpA3CoebUI1vAC7n
- hHCqMz6RKVqTLGwWCqDv5JwbCtRYYzkYWueqaGKTcA2WLw2+iwA6aNxU5MF3EasJ7GwolWDcO5
- bUUNf1LPRYfWV4jN6KiZ3I7g1zHR+Xs+rIG7BfoF7iRBMHYVxgllTe6/WfM0NWBNkF8GsT4DxH
- h5M42M4GrChCptk5NUwtdQomsXpmPYuoCAgd7mEyHSwC5+T/XL26fCmLHmgk3Z0ARD+4SYRwsz
- 5j4=
-WDCIronportException: Internal
-Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
-  by uls-op-cesaip02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 04 Jan 2023 19:54:35 -0800
-Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4NnXfL0K2Jz1Rwt8
-        for <linux-block@vger.kernel.org>; Wed,  4 Jan 2023 19:54:34 -0800 (PST)
-Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
-        reason="pass (just generated, assumed good)"
-        header.d=opensource.wdc.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
-        opensource.wdc.com; h=content-transfer-encoding:content-type
-        :in-reply-to:organization:from:references:to:content-language
-        :subject:user-agent:mime-version:date:message-id; s=dkim; t=
-        1672890873; x=1675482874; bh=sJcj1FWMwglYSv5QiOXtM+NnlMSpPPvz2qA
-        zxEE634I=; b=gt8Bv3KCNKzQawY2EQHomLUUCncLi7AIKFX97AOQ4XfnZCawQne
-        fZ/at8b2bJ2e/k9rzyr95kzTYdj6eeysqbTmGdirr5V76uGb4gD9PE7il5lMFpnM
-        IPy5jSpc2oco18XTjrNk81+LKVo2evf1tkySo2pwOKAnsjGo9lMCVfb75WXBENA0
-        FiZSW+HiB8kbZ2gsChtu0nwrHre872iJkmPdzlqUK6Bg6WUgbYwyEPqEbLa1Lhce
-        h+IvyuLbehnijj+7ZSqaPRBRvOiA6ExRXelOCtqIEuDJIPa8jn0Cd2I0woX51IWT
-        h0ouSlX1Pi0xJxAk90ONGJcRj7H9wGZzxGw==
-X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
-Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
-        by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id Kh3ZmsGiGv3Z for <linux-block@vger.kernel.org>;
-        Wed,  4 Jan 2023 19:54:33 -0800 (PST)
-Received: from [10.149.53.254] (washi.fujisawa.hgst.com [10.149.53.254])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4NnXfJ1nv7z1RvLy;
-        Wed,  4 Jan 2023 19:54:32 -0800 (PST)
-Message-ID: <964fb51e-c37e-824f-25bd-ed46d9418a20@opensource.wdc.com>
-Date:   Thu, 5 Jan 2023 12:54:31 +0900
+        with ESMTP id S231233AbjAEH2s (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 5 Jan 2023 02:28:48 -0500
+Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 415E452769
+        for <linux-block@vger.kernel.org>; Wed,  4 Jan 2023 23:28:24 -0800 (PST)
+Received: by mail-pj1-x102a.google.com with SMTP id q64so543544pjq.4
+        for <linux-block@vger.kernel.org>; Wed, 04 Jan 2023 23:28:24 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance-com.20210112.gappssmtp.com; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=qt1/1jt/A2jfQF0MWqTApdHyZ/eifCsttJnc6t5bAhc=;
+        b=ljjg/ss9Lr0VO0mLUyc8ixTvn6Ok2pFNoVH+NGeMcx1aPc7QRcxbtAKSBTSKNkWSJL
+         Nb/hAeuEZCNR9DsrceMmOedZ/y3fCBj7dVamRS83iFoMnySckQHIqS9y2lWDvFGNmUKQ
+         LZQZwPi91qAHOF/LoG+aTj8j0fkARFuKmXRNt4gAia446UDCDgELl3oY78P8vDyEEn1A
+         QbJNDLj/IvL8GY6MRRNWNXXGYhMsgxi2LRYKivmjdjG8Cn0zSBNmLK+lGzTdFKTDrxVM
+         eu7DTiCavtT8mJeqwi0Thp1Sj87Sn9tp9v1eS6DoCk9AdWdne67kBmKDkumdQyFuaVqx
+         9ivQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=qt1/1jt/A2jfQF0MWqTApdHyZ/eifCsttJnc6t5bAhc=;
+        b=dpFK2rJ0MbOWfPW85gmAHabvoL8DKoogy7ydUN+9GV7fWhBuNrFEg2gxIRIsAyMwp1
+         K1tcSUShaQkVpgpoGNkkRv77ksibZJ6GeosDdS8xVrACKre50k5yfDB+TaLFwXp0tCAB
+         XnuyHEHfL0FtbjwL67IHe9QEc8OZ8b501dRXeEMEPp2lib3rI2vvY1YhVQY/L0268pxM
+         7drZWd5u6yxQwwAE16vdyJ80pECAt9SduNeE/sm2LZ6wtWryacigOX9aFgRjIjt/tsdt
+         700HF2WZZ7I1vhh9ui3wW9TRi0wQ5trVH0Ecxv8sMDsqSzbBhVb7iWApgI1zW81pyOO/
+         b4AA==
+X-Gm-Message-State: AFqh2koWQyLUhh4TLKjGinr3AkvmrT1nc6gqJwpOPxQgUb32aVyLqQ9F
+        zh1qkcUYdN/FgfQqKPBZxPLG5Lc/L9Vei/JRPH2RqA==
+X-Google-Smtp-Source: AMrXdXsnbMemu2nVkzxSdqMRJx7ZyMX5+UPy2NhBqROjcigZp5T+NspeFAmJU3SqyL94m5ik8saxFw==
+X-Received: by 2002:a17:902:c9d2:b0:192:ee98:664c with SMTP id q18-20020a170902c9d200b00192ee98664cmr3888405pld.54.1672903703559;
+        Wed, 04 Jan 2023 23:28:23 -0800 (PST)
+Received: from [10.3.153.16] ([61.213.176.8])
+        by smtp.gmail.com with ESMTPSA id x4-20020a1709029a4400b00189af02aba4sm25421862plv.3.2023.01.04.23.28.20
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 04 Jan 2023 23:28:23 -0800 (PST)
+Message-ID: <4d4f0a3f-6906-0c9b-1b56-22b9ff8795d4@bytedance.com>
+Date:   Thu, 5 Jan 2023 15:28:17 +0800
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.0
-Subject: Re: [PATCH v7 1/7] block: add a sanity check for non-write flush/fua
- bios
-Content-Language: en-US
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     linux-ide@vger.kernel.org, linux-block@vger.kernel.org,
-        Jens Axboe <axboe@kernel.dk>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Hannes Reinecke <hare@suse.de>, Christoph Hellwig <hch@lst.de>,
-        Niklas Cassel <niklas.cassel@wdc.com>
-References: <20230103051924.233796-1-damien.lemoal@opensource.wdc.com>
- <20230103051924.233796-2-damien.lemoal@opensource.wdc.com>
- <Y7WL1GXmpDSSYD3/@T590>
-From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
-Organization: Western Digital Research
-In-Reply-To: <Y7WL1GXmpDSSYD3/@T590>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.2.2
+Subject: Re: [External] Re: [PATCH v3] blk-throtl: Introduce sync and async
+ queues for blk-throtl
+To:     Tejun Heo <tj@kernel.org>
+Cc:     josef@toxicpanda.com, axboe@kernel.dk, cgroups@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yinxin.x@bytedance.com
+References: <20221226130505.7186-1-hanjinke.666@bytedance.com>
+ <Y7X5rsnYCAAYRGQd@slm.duckdns.org>
+From:   hanjinke <hanjinke.666@bytedance.com>
+In-Reply-To: <Y7X5rsnYCAAYRGQd@slm.duckdns.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/4/23 23:23, Ming Lei wrote:
-> On Tue, Jan 03, 2023 at 02:19:18PM +0900, Damien Le Moal wrote:
->> From: Christoph Hellwig <hch@infradead.org>
->>
->> Check that the PREFUSH and FUA flags are only set on write bios,
->> given that the flush state machine expects that.
-> 
-> flush state machine is only for request based driver, but FUA is
-> used by bio drivers(dm, md, ...) too, just wondering if bio drivers
-> are covered for this change? If yes, can you add words in the
-> commit log?
 
-I think they are since it already was the responsibility of
-dm_submit_bio() and md_submit_bio() to handle PREFLUSH and FUA.
 
+在 2023/1/5 上午6:11, Tejun Heo 写道:
+> Hello,
 > 
+> On Mon, Dec 26, 2022 at 09:05:05PM +0800, Jinke Han wrote:
+>>   static void throtl_pending_timer_fn(struct timer_list *t);
+>> +static inline struct bio *throtl_qnode_bio_list_pop(struct throtl_qnode *qn);
 > 
-> Thanks,
-> Ming
+> Just define it before the first usage? Also, I think it'd be fine to let the
+> compiler decide whether to inline.
+> 
+>> +#define BLK_THROTL_SYNC(bio) (bio->bi_opf & (REQ_SYNC | REQ_META | REQ_PRIO))
+> 
+> Nitpick but the above is used only in one place. Does it help to define it
+> as a macro?
+> 
+>> +/**
+>> + * throtl_qnode_bio_peek - peek a bio for a qn
+>> + * @qn: the qnode to peek from
+>> + *
+>> + * For read qn, just peek bio from the SYNC queue and return.
+>> + * For write qn, we first ask the next_to_disp for bio and will pop a bio
+>> + * to fill it if it's NULL. The next_to_disp is used to pin the bio for
+>> + * next to dispatch. It is necessary. In the dispatching  process, a peeked
+>> + * bio may can't be dispatched due to lack of budget and has to wait, the
+>> + * dispatching process may give up and the spin lock of the request queue
+>> + * will be released. New bio may be queued in as the spin lock were released.
+>> + * When it's time to dispatch the waiting bio, another bio may be selected to
+>> + * check the limit and may be dispatched. If the dispatched bio is smaller
+>> + * than the waiting bio, the bandwidth may be hard to satisfied as we may
+>> + * trim the slice after each dispatch.
+>> + * So pinning the next_to_disp to make sure that the waiting bio and the
+>> + * dispatched one later always the same one in case that the spin lock of
+>> + * queue was released and re-holded.
+> 
+> Can you please format it better and proof-read it. I can mostly understand
+> what it's saying but it can be improved quite a bit. Can you elaborate the
+> starvation scenario further? What about the [a]sync queue split makes this
+> more likely?
+> 
+>> +/**
+>> + * throtl_qnode_bio_pop: pop a bio from sync/async queue
+>> + * @qn: the qnode to pop a bio from
+>> + *
+>> + * For write io qn, the target queue to pop was determined by the disp_sync_cnt.
+>> + * Try to pop bio from target queue, fetch the bio and return it when it is not
+>> + * empty. If the target queue empty, pop bio from another queue instead.
+> 
+> How about:
+> 
+>          For reads, always pop from the ASYNC queue. For writes, target SYNC
+>          or ASYNC queue based on disp_sync_cnt. If empty, try the other
+>          queue.
+> 
+>> +static inline struct bio *throtl_qnode_bio_list_pop(struct throtl_qnode *qn)
+>> +{
+>> +	struct bio *bio;
+>> +	int from = SYNC;
+>> +
+>> +	if (qn->disp_sync_cnt == THROTL_SYNC_FACTOR)
+>> +		from = ASYNC;
+> 
+> ?: often is less readable but I wonder whether it'd be more readable here:
+> 
+>          from = qn->disp_sync_cnt == THROTL_SYNC_FACTOR ? ASYNC : SYNC;
+> 
+>> +
+>> +	bio = bio_list_pop(&qn->bios[from]);
+>> +	if (!bio) {
+>> +		from = 1 - from;
+>> +		bio = bio_list_pop(&qn->bios[from]);
+>> +	}
+>> +
+>> +	if ((qn->disp_sync_cnt < THROTL_SYNC_FACTOR) &&
+>> +		(from == SYNC))
+> 
+> Why the line break? Also, this may be more personal preference but I'm not
+> sure the parentheses are helping much here.
+> 
+>> +		qn->disp_sync_cnt++;
+>> +	else
+>> +		qn->disp_sync_cnt = 0;
+>> +
+>> +	return bio;
+>> +}
+> 
+> Thanks.
 > 
 
--- 
-Damien Le Moal
-Western Digital Research
+Thanks. Your suggestion is detailed and helpful. I will accept it and 
+send the v4.
 
+Thanks.
