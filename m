@@ -2,98 +2,198 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 925C7C3DA7D
-	for <linux-block@archiver.kernel.org>; Thu,  5 Jan 2023 17:36:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E3D2EC3DA7D
+	for <linux-block@archiver.kernel.org>; Thu,  5 Jan 2023 17:52:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235035AbjAERgR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 5 Jan 2023 12:36:17 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48724 "EHLO
+        id S235346AbjAERwP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 5 Jan 2023 12:52:15 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59988 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235408AbjAERgE (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 5 Jan 2023 12:36:04 -0500
-Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A3C3BC87;
-        Thu,  5 Jan 2023 09:36:02 -0800 (PST)
-Received: by mail-pl1-x629.google.com with SMTP id p24so17532234plw.11;
-        Thu, 05 Jan 2023 09:36:02 -0800 (PST)
+        with ESMTP id S235337AbjAERwN (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 5 Jan 2023 12:52:13 -0500
+Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DDD6E3DBC6
+        for <linux-block@vger.kernel.org>; Thu,  5 Jan 2023 09:52:12 -0800 (PST)
+Received: by mail-pj1-x1032.google.com with SMTP id n65-20020a17090a2cc700b0021bc5ef7a14so2778440pjd.0
+        for <linux-block@vger.kernel.org>; Thu, 05 Jan 2023 09:52:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:sender
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=gkjsNq+41nhz5t6YNHufJptj0TXGHPydjE1ADy7+6FM=;
-        b=F7AETA8YmQngoALJiwWtbL0ff8RtVbY4EEr53C6FVlL+DjvgCS7aideTdCWmxjFESd
-         SeiRq631vXOAX++cF5PyZgvg1K66m5yYZ1/kNZWXsC6IwAeKeSZd5dJI25JEOakb5hTn
-         koOxsxdTnhPtdbZa50u70QRWGBbgPhkudNr+UVeZO49V+rJahQKqkZ1pZR+sqjplBze3
-         q35Wqugk6MwBc7S+ubvDZFqhYjXGVsB/XPQOU15imjrES3mE+4jS6D5EO6hub0FHZxAT
-         +zCaPPlxhFluLFItLj3F5QdevNoFUcoaXuo+CM0bND1qvelEblmhqLuD8fraDS1YHsIn
-         MT+g==
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=rn0mF4Rzt2xJGz/OjuUC/0FM9L+vJsdwZ8UojIiYWoI=;
+        b=SxFG/ohYh8wv3Ao6a+M8yftbqKwAdlRUQC87v1SSWnm9U7SQkbTtLAMxlErTEckqYA
+         W4AZL4kJZMOt+am1SvzT2PRd/TUHbEIUH7PI3b7YWPcK/hkMI3uzlOx5JEiHbHbU1imr
+         HIxnWOk0eqxStXYOiIStxrt3j+7oaVfB1CKG4IiyxInOtZ+Th7YYnsi09fb4XvZQIpJw
+         X8lW2L4O3oOWcDwPiqEaWRKyVmd31aj+QubYOQ5b3ebecSdvsGv7nRXcX5z2x8HoZkci
+         Fu1+kRtrC6mmLc+cHuQyFMRFW+zga4u65veS/8HhQ5WBG+sWeq2c1KbY1c4GBrd3SU5s
+         89xg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:sender
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=gkjsNq+41nhz5t6YNHufJptj0TXGHPydjE1ADy7+6FM=;
-        b=p5e2ZMMoptC1P2yTbIajKKg4yBAKQL0trXTiN8O3nAcR3IttqcE7EBNDrBqJG8pRSC
-         MzUzQUSdwWa+E9J2tZE9DhPMOrn0r20wq6vWSIcbrizoN0A5HTDJVSkQls07Q/jdj690
-         a046HU1Ce4w5NS7j712wX1DZBgplC8yXXPjxkwCmUmvTDK1fPRL0UkVC2PbSjiLP1N63
-         ExSaEbzLX+MoTZEfooswVkVl6ofiq8q1mtGOAbCFK4NMju34vnEDO88lDmjg7qdz+Uac
-         nzRnGs0jF1TgwVWuLRPVXJAhYU24FFw66mFT9F8FL+UD/SAGPzdXNnGGqvw9lZeK8zND
-         iRAw==
-X-Gm-Message-State: AFqh2kqdDKJP09Xqx9r7rpuWoLvsByQA+9t1/fJl1DP/SYaCrbsFPjOc
-        jya8L+A5m9bprZyxzbpZrlwL/mCI7Fs=
-X-Google-Smtp-Source: AMrXdXsYDWP5shGMiAXXVQkIfz7JzRr2YwOxVFcN+ZqNqk6WEmOWE6UE2GTNjP8E23+8A9XtfuGZfQ==
-X-Received: by 2002:a17:90a:f309:b0:219:9e19:8259 with SMTP id ca9-20020a17090af30900b002199e198259mr55174897pjb.46.1672940161933;
-        Thu, 05 Jan 2023 09:36:01 -0800 (PST)
-Received: from localhost (2603-800c-1a02-1bae-a7fa-157f-969a-4cde.res6.spectrum.com. [2603:800c:1a02:1bae:a7fa:157f:969a:4cde])
-        by smtp.gmail.com with ESMTPSA id mz4-20020a17090b378400b0020aacde1964sm1623674pjb.32.2023.01.05.09.36.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 05 Jan 2023 09:36:01 -0800 (PST)
-Sender: Tejun Heo <htejun@gmail.com>
-Date:   Thu, 5 Jan 2023 07:35:59 -1000
-From:   Tejun Heo <tj@kernel.org>
-To:     Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>
-Cc:     Jinke Han <hanjinke.666@bytedance.com>, josef@toxicpanda.com,
-        axboe@kernel.dk, cgroups@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        yinxin.x@bytedance.com, jack@suse.cz
-Subject: Re: [PATCH v3] blk-throtl: Introduce sync and async queues for
- blk-throtl
-Message-ID: <Y7cKf7IH+FJ/6IyV@slm.duckdns.org>
-References: <20221226130505.7186-1-hanjinke.666@bytedance.com>
- <20230105161854.GA1259@blackbody.suse.cz>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20230105161854.GA1259@blackbody.suse.cz>
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=rn0mF4Rzt2xJGz/OjuUC/0FM9L+vJsdwZ8UojIiYWoI=;
+        b=XSsmCSV0ES6OXU+AZQ+FlFWt7iSS92N+vRJDB3YLVceqHbLG28rvx0152eCsI4ryjR
+         thq9YEBcvwCG0nIlZv3CoF6Mh7fWKCeHsuAw3Ha61NweeHcuBi3Jwa32vtl12jSO0A+W
+         sMq2Nmnaic3GcNl/GDwPJv6oZR1aaxIOPjAg/1Dxy8o5uE1PL0hmgm70hxdYEE5K+mre
+         jqrZHjUXjO+7/HKQXdr4cZKwDRGKB3ZokwaKrz2OV38vDGbFOPR8ZOmaSSzE7gXyG39T
+         xl41swlcN1iFrdKpuOIjsMgkDmrjaZu/qAtxOKkn/bZaivHxaD1mzBbHopSyJXhfoL4K
+         jNWA==
+X-Gm-Message-State: AFqh2kqtLw33ouOPLGjUasXo+ylB+zkkssiqSO7M/NBCqEQZ8RO7P9v4
+        O4OkjpSDlF8JOoWf2+ofGIk=
+X-Google-Smtp-Source: AMrXdXvtL7T6TKp0VscS/YynVzMr8k7Bd12d4lE6bTB8wdTngvpNInt754vMu1mKrclqB2A14UKQsQ==
+X-Received: by 2002:a17:903:1315:b0:192:ccfc:c178 with SMTP id iy21-20020a170903131500b00192ccfcc178mr15429207plb.52.1672941132058;
+        Thu, 05 Jan 2023 09:52:12 -0800 (PST)
+Received: from smtpclient.apple (c-24-6-216-183.hsd1.ca.comcast.net. [24.6.216.183])
+        by smtp.gmail.com with ESMTPSA id b8-20020a1709027e0800b00189a7fbfd44sm26262351plm.211.2023.01.05.09.52.10
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 05 Jan 2023 09:52:11 -0800 (PST)
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3731.300.101.1.3\))
+Subject: Re: Potential hang on ublk_ctrl_del_dev()
+From:   Nadav Amit <nadav.amit@gmail.com>
+In-Reply-To: <Y7ZA/ULE4hg3lkbY@T590>
+Date:   Thu, 5 Jan 2023 09:52:00 -0800
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <B7B3A381-60CD-402D-8F81-D65E7D186215@gmail.com>
+References: <862272BC-C6A3-4A60-A620-4C5596972D01@gmail.com>
+ <Y7URsuwxaAHFmn8S@T590> <20EBDD77-21AD-4C39-B1F2-E9A9954FA360@gmail.com>
+ <Y7ZA/ULE4hg3lkbY@T590>
+To:     Ming Lei <ming.lei@redhat.com>
+X-Mailer: Apple Mail (2.3731.300.101.1.3)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
 
-On Thu, Jan 05, 2023 at 05:18:54PM +0100, Michal Koutný wrote:
-> I guess similar problem would arise for devices that are "naturally"
-> slow.
-> Then:
-> a) it must have been solved elsewhere in the block layer (but it's
->    broken),
-> b) it should be solved generically in the block layer (thus this is only
->    a partial solution).
 
-Hard limits tend to make this sort of problems a lot more pronounced because
-the existing mechanisms tend to break down for the users which are severely
-throttled down even while the device as a whole is fairly idle. cpu.max
-often triggers severe priority inversions too, so it isn't too surprising
-that people hit severe priority inversion issues w/ io.max.
+> On Jan 4, 2023, at 7:16 PM, Ming Lei <ming.lei@redhat.com> wrote:
+>=20
+> On Wed, Jan 04, 2023 at 10:13:05AM -0800, Nadav Amit wrote:
+>>=20
+>>=20
+>>> On Jan 3, 2023, at 9:42 PM, Ming Lei <ming.lei@redhat.com> wrote:
+>>>=20
+>>> On Tue, Jan 03, 2023 at 01:47:37PM -0800, Nadav Amit wrote:
+>>>> Hello Ming,
+>>>>=20
+>>>> I am trying the ublk and it seems very exciting.
+>>>>=20
+>>>> However, I encounter an issue when I remove a ublk device that is =
+mounted or
+>>>> in use.
+>>>>=20
+>>>> In ublk_ctrl_del_dev(), shouldn=E2=80=99t we *not* wait if =
+ublk_idr_freed() is false?
+>>>> It seems to me that it is saner to return -EBUSY in such a case and =
+let
+>>>> userspace deal with the results.
+>>>>=20
+>>>> For instance, if I run the following (using ubdsrv):
+>>>>=20
+>>>> $ mkfs.ext4 /dev/ram0
+>>>> $ ./ublk add -t loop -f /dev/ram0
+>>>> $ sudo mount /dev/ublkb0 tmp
+>>>> $ sudo ./ublk del -a
+>>>>=20
+>>>> ublk_ctrl_del_dev() would not be done until the partition is =
+unmounted, and you
+>>>> can get a splat that is similar to the one below.
+>>>=20
+>>> The splat itself can be avoided easily by replace wait_event with
+>>> wait_event_timeout() plus loop, but I guess you think the sync =
+delete
+>>> isn't good too?
+>>=20
+>> I don=E2=80=99t think the splat is the issue. The issue is the =
+blocking behavior,
+>> which is both unconditional and unbounded in time, and (worse) takes =
+place
+>> without relinquishing the locks. wait_event_timeout() is therefore =
+not a
+>> valid solution IMHO.
+>>=20
+>>>=20
+>>>>=20
+>>>> What do you say? Would you agree to change the behavior to return =
+-EBUSY?
+>>>=20
+>>> It is designed in this way from beginning, and I believe it is just =
+for
+>>> the sake of simplicity, and one point is that the device number =
+needs
+>>> to be freed after 'ublk del' returns.
+>>>=20
+>>> But if it isn't friendly from user's viewpoint, we can change to =
+return
+>>> -EBUSY. One simple solution is to check if the ublk block device
+>>> is opened before running any deletion action, if yes, stop to delete =
+it
+>>> and return -EBUSY; otherwise go ahead and stop & delete the pair of =
+devices.
+>>> And the userspace part(ublk utility) needs update too.
+>>>=20
+>>> However, -EBUSY isn't perfect too, cause user has to retry the =
+delete
+>>> command manually.
+>>=20
+>> I understand your considerations. My intuition is that just as umount
+>> cannot be done while a file is opened and would return -EBUSY, so =
+should
+>> deleting the ublock while the ublk is in use.
+>>=20
+>> So as I see it, there are 2 possible options for proper deletion of =
+ublk,
+>> and actually both can be implemented and distinguished with a new =
+flag
+>> (UBLK_F_*):
+>>=20
+>> 1. Blocking - similar to the way it is done today, but (hopefully) =
+without
+>>   holding locks, and with using wait_event_interruptible() instead of
+>>   wait_event() to allow interruption (and return EINTR if =
+interrupted).
+>>=20
+>> 2. Best-effort - returning EBUSY if it cannot be removed.
+>>=20
+>> I can imagine use-cases for both, and it would also allow you not to
+>> change ubdsrv if you choose so.
+>>=20
+>> Does it make sense?
+>=20
+> I prefer to the 1st approach:
+>=20
+> 1) the wait event is still one positive signal for user to cleanup the
+> device use, since the correct step is to umount ublk disk before =
+deleting
+> the device.
+>=20
+> 2) the wait still can avoid the current context to reuse the device
+> number
+>=20
+> 3) after switching to wait_event_interruptible(), we need to avoid
+> double delete, and one flag of UB_STATE_DELETED can be used for =
+failing
+> new delete command.
+>=20
+> 4) IMO new flag(UBLK_F_*) isn't needed to distinguish this change
+> with current behavior.
+>=20
+> Please let us know if you'd like to cook one patch for improving
+> the delete handling.
 
-Another problem with blk-throttle is that it doesn't prioritize shared IOs
-identified by bio_issue_as_root_blkg() like iolatency and iocost do, so
-there can be very severe priority inversions when e.g. journal commit gets
-trapped in a low priority cgroup further exacerbating issues like this.
+I can take a stab on it, but only in about 2 weeks time.
 
-Thanks.
+>=20
+> BTW, there could be another option, such as, 'ublk delete --no-wait' =
+just
+> run the remove and without waiting at all, but not sure if it is =
+useful.
+>=20
 
--- 
-tejun
+I considered the userspace ublk as one possible implementation. I am not
+sure this affects the kernel interfaces that are needed.
+
