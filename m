@@ -2,79 +2,134 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F857C3DA7A
-	for <linux-block@archiver.kernel.org>; Thu,  5 Jan 2023 21:36:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7555C4708E
+	for <linux-block@archiver.kernel.org>; Thu,  5 Jan 2023 21:39:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235327AbjAEVgb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 5 Jan 2023 16:36:31 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57780 "EHLO
+        id S230402AbjAEVje (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 5 Jan 2023 16:39:34 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58308 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233552AbjAEVga (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 5 Jan 2023 16:36:30 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9EB72631B9
-        for <linux-block@vger.kernel.org>; Thu,  5 Jan 2023 13:36:29 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 26BD961AC7
-        for <linux-block@vger.kernel.org>; Thu,  5 Jan 2023 21:36:29 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0902EC433F0;
-        Thu,  5 Jan 2023 21:36:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1672954588;
-        bh=KeVh1jKw9BdIxVrO4YoO91oxJe9JPk+ZXs+C4ESN3kA=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=aUBCQLuUzfMFj/5r+4dh2WQ4w8XavYfVqJmDlYPP84J7CMruT6eBpUATrNy4saVU5
-         Lr7ar8muwWvySAP1+xXYmTx5/WOMpvL+lEwIUAtLaw3KVdJ0XaOoUfmR8AyKHRQzBS
-         xGE+bfdduXpYVImVSJXaPm4TIt5e1tCB4FdxODvhpkElBtWRIdgu41TTJktqMm8lom
-         /JMPVMY+7Ly98vhU+X9X3A+4tEdWZyvYhBJpsTJNhBsE88sVXreitp/AkGNCgk3pA+
-         WVHQznhG0H8VzarkbrskGg2fjLXj5z3x+IcoJ2ibV9/WhUc/P4u2/GKiFVLklOwzLJ
-         znQzxbGEOU56g==
-Date:   Thu, 5 Jan 2023 14:36:25 -0700
-From:   Keith Busch <kbusch@kernel.org>
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     Keith Busch <kbusch@meta.com>, linux-block@vger.kernel.org,
-        axboe@kernel.dk, hch@lst.de, martin.petersen@oracle.com,
-        Damien Le Moal <damien.lemoal@opensource.wdc.com>
-Subject: Re: [PATCHv4 2/2] block: save user max_sectors limit
-Message-ID: <Y7dC2TsYBA4DeC0k@kbusch-mbp.dhcp.thefacebook.com>
-References: <20230105205146.3610282-1-kbusch@meta.com>
- <20230105205146.3610282-3-kbusch@meta.com>
- <fff1ca57-b0ee-9598-9ea8-e6c8b7571f0d@acm.org>
+        with ESMTP id S235729AbjAEVjd (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 5 Jan 2023 16:39:33 -0500
+Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13E51676C6;
+        Thu,  5 Jan 2023 13:39:30 -0800 (PST)
+Received: by mail-pj1-x1034.google.com with SMTP id z9-20020a17090a468900b00226b6e7aeeaso3434960pjf.1;
+        Thu, 05 Jan 2023 13:39:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:sender
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=2B/6xg54aJ7idENEindVKE0XwrAKLTxScGdP8EUbfT4=;
+        b=ZkNdyUzEpnyBd0OlCkttYyZAG/3I+W6QG3eMejUnJp8CrNHDsyjvOt9clDf0vayE2i
+         r6lkarY5scvvcjm/rCs+97/cb8gqnaQAyMmK3VSY0WyGE8IlHrmP+m2hv6sg2w9Hc7Fj
+         oYJ+KVy30yL4L97vccgDToFnVKpG2sQ9Ip0kAUHayWMzIMzCVKcCkw/30gSAWKVx/ibj
+         VQPPP3O/BeKowqjHlsVjOEGUI1eb+l6qP37gQQoSu+PFjSgNwn7pF8Nk2hVOW4m+375W
+         JFPztt3e6nOUrCAXynvNsPVdzbNfSJw4YG57GZ8mO8YbvQ343sLQ7vMFYumsPmD5GZfz
+         ZXaw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:sender
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=2B/6xg54aJ7idENEindVKE0XwrAKLTxScGdP8EUbfT4=;
+        b=EZNx0srpG5vSZRg1JsK8/gd6qHWOvnz15IYzZkcsPSHqKf+EAvLATZoWz6o1qTPna9
+         0l52ybsN18UfzdHA5srBUEOLhfo6M4uvJM9fbMZzsXWXUqx3pihpHDD+x5y9MTm14mbK
+         QmhYLLvlXMIh1hHmvtg777rYHL9pLAPJDeR4OlXIDyrBNrR7JiIE4UZkKkEMmrw4Sgza
+         CXUmVFi+fEKVvbIx3PFo4YrHvfVOOv9/lt9qNF9eZmivf/7tb5Tga2zbNhnrQB6S2hxN
+         rlu+q6nW9HXyE6zwUTnSV9CMT+Bywcsja6O6+kFuD3Ey2LyWWvBbgOFQJ42UXY/PucOF
+         HI8Q==
+X-Gm-Message-State: AFqh2krCGTZcNef4OH+FhoD9GAOAm80ifwwlTbdEXc+Qn5QlQRExTc8L
+        40hVddHlckCQZJPM1Jn7nzwVZmPIY+M=
+X-Google-Smtp-Source: AMrXdXvOKSzzM60MzcrxrGTOI1KuEb5c6Cr23VJevx4+hCvku1p09/yos5Tpv8O6ZF7fXbWnpFdzgw==
+X-Received: by 2002:a05:6a21:999d:b0:9e:9685:f15e with SMTP id ve29-20020a056a21999d00b0009e9685f15emr81430335pzb.0.1672954769421;
+        Thu, 05 Jan 2023 13:39:29 -0800 (PST)
+Received: from localhost (2603-800c-1a02-1bae-a7fa-157f-969a-4cde.res6.spectrum.com. [2603:800c:1a02:1bae:a7fa:157f:969a:4cde])
+        by smtp.gmail.com with ESMTPSA id 128-20020a630086000000b004a099a12937sm9627542pga.84.2023.01.05.13.39.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 05 Jan 2023 13:39:28 -0800 (PST)
+Sender: Tejun Heo <htejun@gmail.com>
+Date:   Thu, 5 Jan 2023 11:39:27 -1000
+From:   Tejun Heo <tj@kernel.org>
+To:     Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>
+Cc:     Jinke Han <hanjinke.666@bytedance.com>, josef@toxicpanda.com,
+        axboe@kernel.dk, cgroups@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yinxin.x@bytedance.com, jack@suse.cz
+Subject: Re: [PATCH v3] blk-throtl: Introduce sync and async queues for
+ blk-throtl
+Message-ID: <Y7dDjyT1Gl5Mt3fl@slm.duckdns.org>
+References: <20221226130505.7186-1-hanjinke.666@bytedance.com>
+ <20230105161854.GA1259@blackbody.suse.cz>
+ <Y7cKf7IH+FJ/6IyV@slm.duckdns.org>
+ <20230105192247.GB16920@blackbody.suse.cz>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <fff1ca57-b0ee-9598-9ea8-e6c8b7571f0d@acm.org>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20230105192247.GB16920@blackbody.suse.cz>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jan 05, 2023 at 01:28:35PM -0800, Bart Van Assche wrote:
-> On 1/5/23 12:51, Keith Busch wrote:
-> > diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-> > index 93d9e9c9a6ea8..5486b6c57f6b8 100644
-> > --- a/block/blk-sysfs.c
-> > +++ b/block/blk-sysfs.c
-> > @@ -239,19 +239,28 @@ static ssize_t queue_zone_append_max_show(struct request_queue *q, char *page)
-> >   static ssize_t
-> >   queue_max_sectors_store(struct request_queue *q, const char *page, size_t count)
-> >   {
-> > -	unsigned long max_sectors_kb,
-> > +	unsigned long var;
-> > +	unsigned int max_sectors_kb,
-> >   		max_hw_sectors_kb = queue_max_hw_sectors(q) >> 1,
-> >   			page_kb = 1 << (PAGE_SHIFT - 10);
-> > -	ssize_t ret = queue_var_store(&max_sectors_kb, page, count);
-> > +	ssize_t ret = queue_var_store(&var, page, count);
-> >   	if (ret < 0)
-> >   		return ret;
-> > -	max_hw_sectors_kb = min_not_zero(max_hw_sectors_kb, (unsigned long)
-> > +	max_sectors_kb = (unsigned int)var;
-> 
-> Shouldn't this function report an error if 'var' is too large to fit into an
-> unsigned int?
+Hello, Michal.
 
-Yes it should, and queue_var_store() will return -EINVAL if that
-happens. That's certainly not clear just from reading this patch, but
-the condition is handled.
+On Thu, Jan 05, 2023 at 08:22:47PM +0100, Michal Koutný wrote:
+> On Thu, Jan 05, 2023 at 07:35:59AM -1000, Tejun Heo <tj@kernel.org> wrote:
+> > Hard limits tend to make this sort of problems a lot more pronounced because
+> > the existing mechanisms tend to break down for the users which are severely
+> > throttled down even while the device as a whole is fairly idle. cpu.max
+> > often triggers severe priority inversions too, so it isn't too surprising
+> > that people hit severe priority inversion issues w/ io.max.
+> 
+> To be on the same page:
+> 1) severe PI == priority inversion across cgroups (progated e.g. via
+>    global locks (as with cpu.max) or FS journal (as with io.max)),
+
+Another important inversion vector is memory reclaim as writeback operations
+get trapped in blk-throttle and the system can pile on waiting for clean
+pages.
+
+> 2) ordinary PI == priority inversion contained within a single cgroup,
+>    i.e. no different from an under-provisioned system.
+
+I didn't use the term in a precise manner but yeah both can be problematic.
+The former a lot more so.
+
+> The reported issue sounds like 2) but even with the separated queues 1)
+> is still possible :-/
+
+Yeah, definitely.
+
+> > Another problem with blk-throttle is that it doesn't prioritize shared IOs
+> > identified by bio_issue_as_root_blkg() like iolatency and iocost do, so
+> > there can be very severe priority inversions when e.g. journal commit gets
+> > trapped in a low priority cgroup further exacerbating issues like this.
+> 
+> Thanks for the broader view. So the separated queues are certainly an
+> improvement but ultimately a mechanism based on bio_issue_as_root_blkg()
+> predicate and deferred throttling would be better? Or is permanent limit
+> enforcement more important?
+
+Generally true but the specific scenario raised by Jinke is rather unusual
+and isn't covered by issue_as_root mechanism as it doesn't promote REQ_SYNC
+data writes. Then again, this usually isn't a problem as in most cases dirty
+throttling through writeback should stave off severe starvations.
+
+blk-throttle is pretty outdated and kinda broken and separating out sync
+writes isn't gonna solve most of its problems. However, it will help in some
+cases like the one described by Jinke and can sometimes lessen wider scope
+inversions too. Given the partial nature, I don't feel too enthusiastic but
+at the same time can't find good reasons to reject either. I don't know. I
+don't feel too strong either way.
+
+On a tangential note, I've been thinking about implementing io.max on top of
+iocost so that each cgroup can just configure the max % of total device IO
+capacity that's allowed for it, which should be a lot easier to use and has
+many of the problems already solved.
+
+Thanks.
+
+-- 
+tejun
