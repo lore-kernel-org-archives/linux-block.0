@@ -2,154 +2,110 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5526C3DA7D
-	for <linux-block@archiver.kernel.org>; Thu,  5 Jan 2023 16:49:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9B2DC3DA7A
+	for <linux-block@archiver.kernel.org>; Thu,  5 Jan 2023 16:59:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234408AbjAEQtP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 5 Jan 2023 11:49:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40632 "EHLO
+        id S234758AbjAEQ7r (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 5 Jan 2023 11:59:47 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45454 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229905AbjAEQtO (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 5 Jan 2023 11:49:14 -0500
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2061.outbound.protection.outlook.com [40.107.92.61])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A417B94;
-        Thu,  5 Jan 2023 08:49:13 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=MBlFFwPLQO/1TFReSPwfNLv3MywTb7SuI/SAggATRPHQ/wddtkoOiAuqM4hLsGOQet+kh0s1lnMFltUY9nr5xP5W0VopPwwwhR2Dusq5p6G6vAR6tOLihmlWmzWkpXa7SuUVNsec4qY2VSAFJc/YasR/psr85P4BbDeNFkcC5xFzIr5V0O/9LDgwR63XEfg+vX9l38qvFyKD7Fb6nDxV/NOX9R+mv/DwGwi5wUqWsLxCPckMHWKjU8DFeJ3/GQWH6eV9B+ozeqk7Z3G1D7rdxqBQy741inUFkGecQPJRy7juq+dUzN6A10qOmdir9If9v2trTh5PQ5fpXniSLFBdow==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=46HH5jU30E4uMtkSMdWxGR48qFBI2bk7uI63FWW7Pnc=;
- b=JWG4CxgkrQ7yJYoEhfMzqiC2qiacHi3k8c3t+fVh7s+MoHRkUfi7lwaAstgMPi6VeQk6OCGbubUCNrzTAe5sCNtzZHCxQZruUDH3pzAJtWbvTOMBDe0cqNTkHOR8IUCDEwF3jtH8YBDW0W7KL28CmwbxwIvjrBys3nVR94gwfy8CofTi+iYRgOGJgu/TLTKlraOWmI/xCwLZXu8Fos5SWB0FR63RM1XOMFc2eK0IvWDM6T22mclTv162lTZY3Y9pFgDom9k+JCfp3Q++GFYv0jfa14x8jp1CDY7Fja9cf2Ucl4grXh5rKFrhE/1GZhGtcZLOJQz6XLWBC0CLCGtYrg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=46HH5jU30E4uMtkSMdWxGR48qFBI2bk7uI63FWW7Pnc=;
- b=O5XJelbJoWlO04Gpwu4PWEfkKXLoR2zn5bsdw+TYJAlWcyZ7lvmR/DyZkuFIq76VN+I6MhNSEk2sWn9MHo1QKOlFT0ox4U/naJcyBOTa2etzkP7pY5Yq69IPJEDf8WENiDVMhZg0sZhjQm+UXXQOzlyTES0qEEl+nPcwLNqF7bL7fHTAdaM8+D30nJdearztkNMNGw694Rch8zhHyp/Eunft0woNLeGxCxbZ4aUIxzTqZp5v8w9Ap5T1peKjZlijiyP0AGdQJ+NiWAa1NltmmasMzVmtzYn8OlxO8JUf2mP1iO2RDV6wHE4kTjbXHZuhnkz3sJaSbKlK4Xrt14F4aw==
-Received: from BN9PR03CA0691.namprd03.prod.outlook.com (2603:10b6:408:ef::6)
- by DS7PR12MB8347.namprd12.prod.outlook.com (2603:10b6:8:e5::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5944.19; Thu, 5 Jan
- 2023 16:49:11 +0000
-Received: from BN8NAM11FT010.eop-nam11.prod.protection.outlook.com
- (2603:10b6:408:ef:cafe::f6) by BN9PR03CA0691.outlook.office365.com
- (2603:10b6:408:ef::6) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5986.15 via Frontend
- Transport; Thu, 5 Jan 2023 16:49:11 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- BN8NAM11FT010.mail.protection.outlook.com (10.13.177.53) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.5944.17 via Frontend Transport; Thu, 5 Jan 2023 16:49:10 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.36; Thu, 5 Jan 2023
- 08:48:55 -0800
-Received: from [172.27.14.162] (10.126.231.37) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.36; Thu, 5 Jan 2023
- 08:48:52 -0800
-Message-ID: <3b48a6c7-7834-6ca0-db85-df3c23ac745d@nvidia.com>
-Date:   Thu, 5 Jan 2023 18:48:50 +0200
+        with ESMTP id S234772AbjAEQ7j (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 5 Jan 2023 11:59:39 -0500
+Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 43D325C938;
+        Thu,  5 Jan 2023 08:59:28 -0800 (PST)
+Received: by mail-pj1-x102e.google.com with SMTP id fz16-20020a17090b025000b002269d6c2d83so3981769pjb.0;
+        Thu, 05 Jan 2023 08:59:28 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:sender
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=W6/pyn3vLiTu4LQPjq1YDQtDVZvW+kSX5YHBAxRyFO8=;
+        b=pAjIbIyMHaELzfUibrA3v9W+sRKujPM33MXbNJU5pgHSE0PXYNtxJxzhKIuEhbYX2I
+         //w0bNp5rM4kUuyqlJjg7UH2U6kdWagMOCFswiNMHO+MP5kKQmUJ0lnzwkYYNOWZOZVn
+         EdugV+lRv0hIvf8c7FMNOtMle0x7h2E6Qnb049/E/YE/sTad3y00z5hxyx+IYbCfMZQc
+         Peeez2SyIRJYa/Cj1o+eYfzKr7hFOa5Ue+JIcn3JJ8BHQ6F4lmQkn177ETZTiaIvddtn
+         Kr2lAChV22biUhSCqdGzYEksLBQahie9+eCOp4KdEsgpyAzBOn9evh4V+o6ZsiU80js2
+         jV2g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:sender
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=W6/pyn3vLiTu4LQPjq1YDQtDVZvW+kSX5YHBAxRyFO8=;
+        b=LNE++JbH4C6eqUwPggnyrlPOVGBXUM7uJZKpNQKKbnEeFL+rIE8hNnPEhT50JFaQz3
+         qe8IxfPgy4MwRbt94Q5XhF0Pfsyd3c9jJAlofw3uwmT6hSMTza6gPhPRJjbKMDPTwyJS
+         7oXpoApUK7nY0Rqq0I3js8tgrCHEI2DsUDAQ1CYaMl4lCHDSpjFZymFO3yQVsX8rluvV
+         PoOZB2bRZesn1c1VMMYPq8lUf5zw59pj8vGcJAtAbOtweUesF2AfO7GWihFF1RUhVAVT
+         a60rcqL5LhtDqA11BRTQgZD9jaG0kqZ4G3G1b/WS9lpyc2pXOcwG+E4sYSKCXKdd/phZ
+         lPUg==
+X-Gm-Message-State: AFqh2koDqV5jzRxALMUccAjw4bHPy2h77pCEIrpnwCZj4VvVbbNkwikd
+        74UH62pzjT5tYLO3Bq8XCuIx2rmv0mc=
+X-Google-Smtp-Source: AMrXdXuDyUGyV/XJrWFjFnkkcvkqRgsKtzwm6TwmyvBHXxb32lJHO9KtvdBYppQq8dRbKT93jTqqyQ==
+X-Received: by 2002:a05:6a20:d819:b0:b2:3b40:32b1 with SMTP id iv25-20020a056a20d81900b000b23b4032b1mr60554726pzb.57.1672937967583;
+        Thu, 05 Jan 2023 08:59:27 -0800 (PST)
+Received: from localhost (2603-800c-1a02-1bae-a7fa-157f-969a-4cde.res6.spectrum.com. [2603:800c:1a02:1bae:a7fa:157f:969a:4cde])
+        by smtp.gmail.com with ESMTPSA id g7-20020a625207000000b00573a9d13e9esm21345455pfb.36.2023.01.05.08.59.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 05 Jan 2023 08:59:26 -0800 (PST)
+Sender: Tejun Heo <htejun@gmail.com>
+Date:   Thu, 5 Jan 2023 06:59:25 -1000
+From:   Tejun Heo <tj@kernel.org>
+To:     Yu Kuai <yukuai1@huaweicloud.com>
+Cc:     Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>,
+        josef@toxicpanda.com, axboe@kernel.dk, cgroups@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yi.zhang@huawei.com, yangerkun@huawei.com,
+        "yukuai (C)" <yukuai3@huawei.com>
+Subject: Re: [PATCH] blk-cgroup: fix missing pd_online_fn() while activating
+ policy
+Message-ID: <Y7cB7f98+PNdXUnj@slm.duckdns.org>
+References: <20230103112833.2013432-1-yukuai1@huaweicloud.com>
+ <20230104151241.GA13268@blackbody.suse.cz>
+ <4b559d1d-31e4-6049-4548-451bf7afb4f4@huaweicloud.com>
+ <20230105104241.GA16920@blackbody.suse.cz>
+ <6f54c858-be91-0fd3-d377-1aabb8a70c6f@huaweicloud.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.1
-Subject: Re: [PATCH] lib/scatterlist: Fix to merge contiguous pages into the
- last SG properly
-Content-Language: en-US
-To:     Jason Gunthorpe <jgg@nvidia.com>
-CC:     <linux-kernel@vger.kernel.org>, <linux-block@vger.kernel.org>,
-        <linux-mm@kvack.org>, <axboe@kernel.dk>, <logang@deltatee.com>,
-        <hch@lst.de>, <alex.williamson@redhat.com>, <leonro@nvidia.com>,
-        <maorg@nvidia.com>
-References: <20230105112339.107969-1-yishaih@nvidia.com>
- <Y7bSXpw40dgWlRYn@nvidia.com>
-From:   Yishai Hadas <yishaih@nvidia.com>
-In-Reply-To: <Y7bSXpw40dgWlRYn@nvidia.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.126.231.37]
-X-ClientProxiedBy: rnnvmail201.nvidia.com (10.129.68.8) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BN8NAM11FT010:EE_|DS7PR12MB8347:EE_
-X-MS-Office365-Filtering-Correlation-Id: 301bfc73-1c2f-41c3-dad3-08daef3cc527
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: kXprou7LtqZKhBapJZ7jh0Kc0Nb7PliXo3stHLdb5P8pwLRf+E2q7DL7olvNwCtrQk8W15INd24DPG6qVrKccOivhoaW2FmAvK4zHuJIapU0Sh1JBrONAO6ZUObKjVWdaEKpWsGRoq4kbRgZ0y/389FWR32E6b7bI1i4dywavkeaMZ+05DzVJ/SDJNqT+2ezctOs9lYFeHCEmqLw3w8fe8SQRj8DOkGOb4UJRx5THJaei4sT9i5G3CVpZ8eEVxAWXx2NqysUUkxCodQLHQqWHeRxOhJ8Pj1buaCfYbyWDw7XZMVQFDLXXQtHGk+i+H5SyNufNKYJEU8bYztRuH2aPCVu7sIOHJYfaEFUSzXsBHEsU5TT8x6u1E+sEAreoN5uiJVqaxcWdp4eMv7uoxycVLR2NQijKAhkQh7qxgKIRQWNASL+I5UA1X9Z420StuefZ308hSiScsEyD67S9Vv+jYdt5rBh61LqawE4HMr4Wyl2HMTNmhz/wvFYAp8f3W/L3Z/xTAMKSFqsNCEPzO769dVaXv2gOjTZBu3O5Cgq91w9iB9qaPNB/isBwSvppR8E8msmVdJOk5DVTbXpJK+v2zAuW4zlHOHLIhDSzRaEt0rHFLCmt25AzjBtNiOe0WwUIHqq9mslru4GfE1wrWFcXSXLw9hlT+LrKSwn/M5fqMly+x/llEvnvVhUSJyxe/+kmKxFs/E5O78zqVp7cU89vkmAgsT7Z6fjRg8FvnTMtQg=
-X-Forefront-Antispam-Report: CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230022)(4636009)(39860400002)(396003)(376002)(136003)(346002)(451199015)(36840700001)(46966006)(40470700004)(70586007)(5660300002)(6862004)(8936002)(41300700001)(8676002)(4326008)(2906002)(16576012)(70206006)(37006003)(316002)(6636002)(54906003)(31686004)(478600001)(2616005)(336012)(186003)(26005)(82310400005)(40480700001)(16526019)(107886003)(83380400001)(426003)(53546011)(47076005)(82740400003)(7636003)(356005)(86362001)(40460700003)(31696002)(36756003)(36860700001)(43740500002);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Jan 2023 16:49:10.8646
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 301bfc73-1c2f-41c3-dad3-08daef3cc527
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: BN8NAM11FT010.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB8347
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <6f54c858-be91-0fd3-d377-1aabb8a70c6f@huaweicloud.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 05/01/2023 15:36, Jason Gunthorpe wrote:
-> On Thu, Jan 05, 2023 at 01:23:39PM +0200, Yishai Hadas wrote:
->> When sg_alloc_append_table_from_pages() calls to pages_are_mergeable()
->> in its 'sgt_append->prv' flow to check whether it can merge contiguous
->> pages into the last SG, it passes the page arguments in the wrong order.
->>
->> The first parameter should be the next candidate page to be merged to
->> the last page and not the opposite.
->>
->> The current code leads to a corrupted SG which resulted in OOPs and
->> unexpected errors when non-contiguous pages are merged wrongly.
->>
->> Fix to pass the page parameters in the right order.
->>
->> Fixes: 1567b49d1a40 ("lib/scatterlist: add check when merging zone device pages")
->> Signed-off-by: Yishai Hadas <yishaih@nvidia.com>
->> ---
->>   lib/scatterlist.c | 2 +-
->>   1 file changed, 1 insertion(+), 1 deletion(-)
-> Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
+On Thu, Jan 05, 2023 at 09:52:29PM +0800, Yu Kuai wrote:
+> Hi,
+> 
+> 在 2023/01/05 18:45, Michal Koutný 写道:
+> > On Thu, Jan 05, 2023 at 09:43:02AM +0800, Yu Kuai <yukuai1@huaweicloud.com> wrote:
+> > > This is based only on code review, currently the only negative effects
+> > > is that root blkg from blk-throtl won't call pd_online_fn().
+> > 
+> > Good, that's a NOP and there are no other uses of pd_online_fn.
+> > 
+> > I wonder are the separate pd_init_fn and pd_online_fn callbacks
+> > necessary today?
+> 
+> I think online can combine to init, consider that only blk-throttle
+> implement pd_online_fn(), but I'm not sure...
+> 
+> It seems to me the policies(bfq, iocost...) seem don't honor how pd
+> apis works: alloc->init->online->offline->free, bfq combines online to
+> init, iocost combines offline to free, ...
 
-Thanks Jason
+So, the distinction between alloc and online is that a pd which gets
+allocated may be freed without ever going online if later allocations fail.
+This is following cgroup init/exit pattern. Maybe it's a bit too elaborate
+but the distinction is meaningful, at least in principle.
 
->
-> Also, I'm looking more closely at '156 and this is not right either:
->
-> -               unsigned long paddr =
-> -                       (page_to_pfn(sg_page(sgt_append->prv)) * PAGE_SIZE +
-> -                        sgt_append->prv->offset + sgt_append->prv->length) /
-> -                       PAGE_SIZE;
-> -
-> -               while (n_pages && page_to_pfn(pages[0]) == paddr) {
-> +               last_pg = sg_page(sgt_append->prv);
-> +               while (n_pages && pages_are_mergeable(last_pg, pages[0])) {
->
-> This change will break things like multi-page combining, sub page
-> scenarios and maybe more.
->
-> The contiguity test here has to be done a phys, it should go back to
-> struct page to check if the pgmap is OK.
->
-> Can you fix it as well?
+What seems truly spurious is pd_init_fn(). All that pd_init_fn() can do
+should be achievable between pd_alloc_fn() and pd_online_fn(). The overlap
+seems at least partially historical and we used to have pd_exit_fn() too.
+So, yeah, getting rid of pd_init_fn() would be a nice first step.
 
+Thanks.
 
-Yes, I have locally some candidate patch as you asked, on top of this one.
-
-I would like to run some extra testing on, then may send it.
-
-Yishai
-
+-- 
+tejun
