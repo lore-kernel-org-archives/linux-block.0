@@ -2,165 +2,93 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DFD4C5479D
-	for <linux-block@archiver.kernel.org>; Thu,  5 Jan 2023 07:28:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7629BC3DA7A
+	for <linux-block@archiver.kernel.org>; Thu,  5 Jan 2023 08:06:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229944AbjAEH2t (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 5 Jan 2023 02:28:49 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37332 "EHLO
+        id S231429AbjAEIGC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 5 Jan 2023 03:06:02 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51450 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231233AbjAEH2s (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 5 Jan 2023 02:28:48 -0500
-Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 415E452769
-        for <linux-block@vger.kernel.org>; Wed,  4 Jan 2023 23:28:24 -0800 (PST)
-Received: by mail-pj1-x102a.google.com with SMTP id q64so543544pjq.4
-        for <linux-block@vger.kernel.org>; Wed, 04 Jan 2023 23:28:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance-com.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=qt1/1jt/A2jfQF0MWqTApdHyZ/eifCsttJnc6t5bAhc=;
-        b=ljjg/ss9Lr0VO0mLUyc8ixTvn6Ok2pFNoVH+NGeMcx1aPc7QRcxbtAKSBTSKNkWSJL
-         Nb/hAeuEZCNR9DsrceMmOedZ/y3fCBj7dVamRS83iFoMnySckQHIqS9y2lWDvFGNmUKQ
-         LZQZwPi91qAHOF/LoG+aTj8j0fkARFuKmXRNt4gAia446UDCDgELl3oY78P8vDyEEn1A
-         QbJNDLj/IvL8GY6MRRNWNXXGYhMsgxi2LRYKivmjdjG8Cn0zSBNmLK+lGzTdFKTDrxVM
-         eu7DTiCavtT8mJeqwi0Thp1Sj87Sn9tp9v1eS6DoCk9AdWdne67kBmKDkumdQyFuaVqx
-         9ivQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=qt1/1jt/A2jfQF0MWqTApdHyZ/eifCsttJnc6t5bAhc=;
-        b=dpFK2rJ0MbOWfPW85gmAHabvoL8DKoogy7ydUN+9GV7fWhBuNrFEg2gxIRIsAyMwp1
-         K1tcSUShaQkVpgpoGNkkRv77ksibZJ6GeosDdS8xVrACKre50k5yfDB+TaLFwXp0tCAB
-         XnuyHEHfL0FtbjwL67IHe9QEc8OZ8b501dRXeEMEPp2lib3rI2vvY1YhVQY/L0268pxM
-         7drZWd5u6yxQwwAE16vdyJ80pECAt9SduNeE/sm2LZ6wtWryacigOX9aFgRjIjt/tsdt
-         700HF2WZZ7I1vhh9ui3wW9TRi0wQ5trVH0Ecxv8sMDsqSzbBhVb7iWApgI1zW81pyOO/
-         b4AA==
-X-Gm-Message-State: AFqh2koWQyLUhh4TLKjGinr3AkvmrT1nc6gqJwpOPxQgUb32aVyLqQ9F
-        zh1qkcUYdN/FgfQqKPBZxPLG5Lc/L9Vei/JRPH2RqA==
-X-Google-Smtp-Source: AMrXdXsnbMemu2nVkzxSdqMRJx7ZyMX5+UPy2NhBqROjcigZp5T+NspeFAmJU3SqyL94m5ik8saxFw==
-X-Received: by 2002:a17:902:c9d2:b0:192:ee98:664c with SMTP id q18-20020a170902c9d200b00192ee98664cmr3888405pld.54.1672903703559;
-        Wed, 04 Jan 2023 23:28:23 -0800 (PST)
-Received: from [10.3.153.16] ([61.213.176.8])
-        by smtp.gmail.com with ESMTPSA id x4-20020a1709029a4400b00189af02aba4sm25421862plv.3.2023.01.04.23.28.20
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 04 Jan 2023 23:28:23 -0800 (PST)
-Message-ID: <4d4f0a3f-6906-0c9b-1b56-22b9ff8795d4@bytedance.com>
-Date:   Thu, 5 Jan 2023 15:28:17 +0800
+        with ESMTP id S231432AbjAEIGB (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 5 Jan 2023 03:06:01 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B0544086D;
+        Thu,  5 Jan 2023 00:06:00 -0800 (PST)
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3057MfYq032307;
+        Thu, 5 Jan 2023 08:05:55 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : references : mime-version : content-type :
+ content-transfer-encoding : in-reply-to; s=pp1;
+ bh=fOrCrBR39K3gwlEhzZZbNnz3h0BbHtsclLCHEbf+Mq0=;
+ b=itX8SP5mM+sMYFaxNKk4yq4R7Cya3DSMd0RxTo/7X0M1W8/mhdKCrlm3w59nH8xwVIQI
+ gRGQjk22oQligKETm88N9QqPbASSaXD/MpWdhxvr6JCWNuNmVHkOMj0ydc7hWpK1Of0d
+ F/6ocAMUhJsaBYKoSPCj+a42o7QgzNNlwzUkbd0XkvnJfvXZxD1xr/9MClQzI5Yjh8FR
+ R/nmDiJyyj3p0VZ4Pk+F4KWb/Jo+LIFvwHLTkgXZ2JPnxp6vK+oUGVZ2S5tWOEkPdzbt
+ uhQ5bcpJgog7HqRwmoR8PbUauhbIWYf5H7/BVrKoVVGzPMBF+FVjRZ1PZVx+zoj57z1b dg== 
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3mwsxns4jp-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 05 Jan 2023 08:05:54 +0000
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 305535xK001543;
+        Thu, 5 Jan 2023 08:05:52 GMT
+Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
+        by ppma06ams.nl.ibm.com (PPS) with ESMTPS id 3mtcbfeegn-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 05 Jan 2023 08:05:52 +0000
+Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
+        by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 30585nU948628010
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 5 Jan 2023 08:05:49 GMT
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id CCA3A20043;
+        Thu,  5 Jan 2023 08:05:49 +0000 (GMT)
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 52CE020040;
+        Thu,  5 Jan 2023 08:05:49 +0000 (GMT)
+Received: from osiris (unknown [9.171.68.186])
+        by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+        Thu,  5 Jan 2023 08:05:49 +0000 (GMT)
+Date:   Thu, 5 Jan 2023 09:05:47 +0100
+From:   Heiko Carstens <hca@linux.ibm.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     "Paul E. McKenney" <paulmck@kernel.org>, rcu@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kernel-team@meta.com,
+        rostedt@goodmis.org, linux-block@vger.kernel.org
+Subject: Re: [PATCH rcu 07/27] block: Remove "select SRCU"
+Message-ID: <Y7aE2zzdTyjNId6w@osiris>
+References: <20230105003759.GA1769545@paulmck-ThinkPad-P17-Gen-1>
+ <20230105003813.1770367-7-paulmck@kernel.org>
+ <1a9d0cdf-d39e-7eb5-39dd-3e425016c579@kernel.dk>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.2.2
-Subject: Re: [External] Re: [PATCH v3] blk-throtl: Introduce sync and async
- queues for blk-throtl
-To:     Tejun Heo <tj@kernel.org>
-Cc:     josef@toxicpanda.com, axboe@kernel.dk, cgroups@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        yinxin.x@bytedance.com
-References: <20221226130505.7186-1-hanjinke.666@bytedance.com>
- <Y7X5rsnYCAAYRGQd@slm.duckdns.org>
-From:   hanjinke <hanjinke.666@bytedance.com>
-In-Reply-To: <Y7X5rsnYCAAYRGQd@slm.duckdns.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <1a9d0cdf-d39e-7eb5-39dd-3e425016c579@kernel.dk>
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: eWEV7vV7VjxkHgEDcwbCLUDx6EPtEpk7
+X-Proofpoint-GUID: eWEV7vV7VjxkHgEDcwbCLUDx6EPtEpk7
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.923,Hydra:6.0.545,FMLib:17.11.122.1
+ definitions=2023-01-05_02,2023-01-04_02,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ spamscore=0 malwarescore=0 clxscore=1011 suspectscore=0 bulkscore=0
+ mlxlogscore=597 mlxscore=0 adultscore=0 phishscore=0 impostorscore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2212070000 definitions=main-2301050066
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Wed, Jan 04, 2023 at 05:43:07PM -0700, Jens Axboe wrote:
+> On 1/4/23 5:37 PM, Paul E. McKenney wrote:
+> > Now that the SRCU Kconfig option is unconditionally selected, there is
+> > no longer any point in selecting it.  Therefore, remove the "select SRCU"
+> > Kconfig statements.
+> 
+> I'm assuming something earlier made this true (only CC'ed on this patch,
+> not the cover letter or interesting btis...), then:
 
-
-在 2023/1/5 上午6:11, Tejun Heo 写道:
-> Hello,
-> 
-> On Mon, Dec 26, 2022 at 09:05:05PM +0800, Jinke Han wrote:
->>   static void throtl_pending_timer_fn(struct timer_list *t);
->> +static inline struct bio *throtl_qnode_bio_list_pop(struct throtl_qnode *qn);
-> 
-> Just define it before the first usage? Also, I think it'd be fine to let the
-> compiler decide whether to inline.
-> 
->> +#define BLK_THROTL_SYNC(bio) (bio->bi_opf & (REQ_SYNC | REQ_META | REQ_PRIO))
-> 
-> Nitpick but the above is used only in one place. Does it help to define it
-> as a macro?
-> 
->> +/**
->> + * throtl_qnode_bio_peek - peek a bio for a qn
->> + * @qn: the qnode to peek from
->> + *
->> + * For read qn, just peek bio from the SYNC queue and return.
->> + * For write qn, we first ask the next_to_disp for bio and will pop a bio
->> + * to fill it if it's NULL. The next_to_disp is used to pin the bio for
->> + * next to dispatch. It is necessary. In the dispatching  process, a peeked
->> + * bio may can't be dispatched due to lack of budget and has to wait, the
->> + * dispatching process may give up and the spin lock of the request queue
->> + * will be released. New bio may be queued in as the spin lock were released.
->> + * When it's time to dispatch the waiting bio, another bio may be selected to
->> + * check the limit and may be dispatched. If the dispatched bio is smaller
->> + * than the waiting bio, the bandwidth may be hard to satisfied as we may
->> + * trim the slice after each dispatch.
->> + * So pinning the next_to_disp to make sure that the waiting bio and the
->> + * dispatched one later always the same one in case that the spin lock of
->> + * queue was released and re-holded.
-> 
-> Can you please format it better and proof-read it. I can mostly understand
-> what it's saying but it can be improved quite a bit. Can you elaborate the
-> starvation scenario further? What about the [a]sync queue split makes this
-> more likely?
-> 
->> +/**
->> + * throtl_qnode_bio_pop: pop a bio from sync/async queue
->> + * @qn: the qnode to pop a bio from
->> + *
->> + * For write io qn, the target queue to pop was determined by the disp_sync_cnt.
->> + * Try to pop bio from target queue, fetch the bio and return it when it is not
->> + * empty. If the target queue empty, pop bio from another queue instead.
-> 
-> How about:
-> 
->          For reads, always pop from the ASYNC queue. For writes, target SYNC
->          or ASYNC queue based on disp_sync_cnt. If empty, try the other
->          queue.
-> 
->> +static inline struct bio *throtl_qnode_bio_list_pop(struct throtl_qnode *qn)
->> +{
->> +	struct bio *bio;
->> +	int from = SYNC;
->> +
->> +	if (qn->disp_sync_cnt == THROTL_SYNC_FACTOR)
->> +		from = ASYNC;
-> 
-> ?: often is less readable but I wonder whether it'd be more readable here:
-> 
->          from = qn->disp_sync_cnt == THROTL_SYNC_FACTOR ? ASYNC : SYNC;
-> 
->> +
->> +	bio = bio_list_pop(&qn->bios[from]);
->> +	if (!bio) {
->> +		from = 1 - from;
->> +		bio = bio_list_pop(&qn->bios[from]);
->> +	}
->> +
->> +	if ((qn->disp_sync_cnt < THROTL_SYNC_FACTOR) &&
->> +		(from == SYNC))
-> 
-> Why the line break? Also, this may be more personal preference but I'm not
-> sure the parentheses are helping much here.
-> 
->> +		qn->disp_sync_cnt++;
->> +	else
->> +		qn->disp_sync_cnt = 0;
->> +
->> +	return bio;
->> +}
-> 
-> Thanks.
-> 
-
-Thanks. Your suggestion is detailed and helpful. I will accept it and 
-send the v4.
-
-Thanks.
+I was wondering the same. But it is already unconditionally enabled
+since commit 0cd7e350abc4 ("rcu: Make SRCU mandatory").
