@@ -2,65 +2,108 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F27BC4708E
-	for <linux-block@archiver.kernel.org>; Thu,  5 Jan 2023 21:19:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2919AC3DA7D
+	for <linux-block@archiver.kernel.org>; Thu,  5 Jan 2023 21:24:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235592AbjAEVTc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 5 Jan 2023 16:19:32 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45122 "EHLO
+        id S235600AbjAEVYl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 5 Jan 2023 16:24:41 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48556 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235598AbjAEVT3 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 5 Jan 2023 16:19:29 -0500
-Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA3175D435
-        for <linux-block@vger.kernel.org>; Thu,  5 Jan 2023 13:19:27 -0800 (PST)
-Received: by mail-pl1-f172.google.com with SMTP id c2so13103777plc.5
-        for <linux-block@vger.kernel.org>; Thu, 05 Jan 2023 13:19:27 -0800 (PST)
+        with ESMTP id S235621AbjAEVYk (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 5 Jan 2023 16:24:40 -0500
+Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D32C36319A;
+        Thu,  5 Jan 2023 13:24:39 -0800 (PST)
+Received: by mail-pf1-x430.google.com with SMTP id k19so18606040pfg.11;
+        Thu, 05 Jan 2023 13:24:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:sender:from:to:cc:subject:date:message-id:reply-to;
+        bh=m4p393MWB7Oqj56DlLo7/CNa0wXky/kq19Hx63x8OIY=;
+        b=giUbr3pUIc8jRWD6RjxTY6287ijomf3pG85WCAw9dujJo9kwTWK17AqM0tgrbKxtlv
+         hl07TQgV9qzPMx/lNE0CNlAqTU5h9yglwiMXcLwYbQ4cE8WhZxnZZ5WNlW/76FfYIVCq
+         bJ7grOVyCed32kgehj8cF8QaYwotuLAjeXHnCAaQdVlpnwthgJCFyuYnTMxYOydZkhiu
+         7rr/41mchOWM2PDXKDoZu5Bqex2sAyTMGhuh98BQR8Q/J6ex41LhM/WyNQGTqZoI2Aqg
+         sha9ZEl2kSjIWSLMG2yhcrFPaNcjKrTs269mL1kmmqV/aLpcoXOoPnd7fRrdg6NewgXM
+         vm2Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=xOQ2HLCxzL2beoBReil+5Eiz0t4yNOfu4jZCHGn2sog=;
-        b=YMmf+gL8Ng9OxLoPRG1pwohc+XNjUSMOp21NlXpPIic3Ra9clyxVhhlULI0gcjQiRo
-         yGY7GfgvguGfAD8KzaRpZfYjGdJ2NMdpHzBuO+Tn8larF982+4XWG7Mk13+LHzE20p4z
-         kAh4LOX9aFWPql8Bk8YMWNYwH1yFxeoPWcPGoT85u/6gpqr8F/W3bwPy9dkSf3DpJ/6u
-         wrSqmegQ0uYgjpeW7AG0z294M9RSKkELVy3p7ePt3JeqXx03gLbDIODUhESpSa+oIVwy
-         2jwBQ2TS0kou6iHcOQDw6YkW1F+kcTAwNS9DyVvrH/hPICcAxpYdvVRslNQx2ZUqEX3j
-         jUMw==
-X-Gm-Message-State: AFqh2kpoBPJiaT/x80RukIrHLx0a3X2lmxQ/4zY5/dUfR4w7WlzgURrT
-        IAQ2umPETMCYk32UvHTgiSQ=
-X-Google-Smtp-Source: AMrXdXtUaU2GV59+/0wk0//bz+FYRIqSruFpNod3uwd0e2ESMoLI9C6HSiterbhUYj1simh8r7MX4g==
-X-Received: by 2002:a17:902:e84d:b0:192:8824:e516 with SMTP id t13-20020a170902e84d00b001928824e516mr47776514plg.51.1672953567218;
-        Thu, 05 Jan 2023 13:19:27 -0800 (PST)
-Received: from ?IPV6:2620:15c:211:201:f9eb:49b6:75b:111e? ([2620:15c:211:201:f9eb:49b6:75b:111e])
-        by smtp.gmail.com with ESMTPSA id b8-20020a1709027e0800b00189a7fbfd44sm26390367plm.211.2023.01.05.13.19.25
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 05 Jan 2023 13:19:26 -0800 (PST)
-Message-ID: <619f3afc-1121-1a80-7cd1-e8cefce93498@acm.org>
-Date:   Thu, 5 Jan 2023 13:19:23 -0800
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:sender:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=m4p393MWB7Oqj56DlLo7/CNa0wXky/kq19Hx63x8OIY=;
+        b=8FQds3Ue+tXuQMTyErJyCA3AeDP9HFtotp+9LSVKx4dp9Bq3hnOKE0gocfpbIS2SJX
+         /BFkU2CGvaGG5YoN1kozw1Wgz1uEpSQe/+ujF/+addTUkv+R0jrG1pkg92i6al1OH2KP
+         SnHebD0E4bCx8KfLvN7pt6a/KdBYPWj2rN1Uxu/K5TxB5UfJn5c3E8u/xWo3BNWt59Ni
+         tvZqhmV7zXkckoZcPUzwms+eCiDgpP5D05R+MIjcxTpUbnydX/cWeiy82xZG95en2PBj
+         GE+B0EMmmhRzeCqSMqlB7QoIDJYdAiAf13pm5ejp/iFRxp016KLc3wvkamoHCB2mXyqY
+         Y3VA==
+X-Gm-Message-State: AFqh2krEAemA+fMHeFI3DX2Z12X+bBQAN1ug5omVyrm5c8CUFCYVd/BC
+        ywO+696hVF5vZSpuu+zB1sU=
+X-Google-Smtp-Source: AMrXdXs8IJzjDnJVpKYPolCSwM4/h+iYaLqJoM8lk6eA58DtyS7ZIQrPA9L979WEyL5WAhq4EUXs/A==
+X-Received: by 2002:a62:5801:0:b0:574:a541:574a with SMTP id m1-20020a625801000000b00574a541574amr50022955pfb.0.1672953879176;
+        Thu, 05 Jan 2023 13:24:39 -0800 (PST)
+Received: from localhost (2603-800c-1a02-1bae-a7fa-157f-969a-4cde.res6.spectrum.com. [2603:800c:1a02:1bae:a7fa:157f:969a:4cde])
+        by smtp.gmail.com with ESMTPSA id f186-20020a6251c3000000b0056c3a0dc65fsm25034563pfb.71.2023.01.05.13.24.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 05 Jan 2023 13:24:38 -0800 (PST)
+Sender: Tejun Heo <htejun@gmail.com>
+From:   Tejun Heo <tj@kernel.org>
+To:     axboe@kernel.dk, josef@toxicpanda.com, hch@lst.de
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCHSET v2 block/for-next] blkcg: Improve blkg config helpers and make iolatency init lazy
+Date:   Thu,  5 Jan 2023 11:24:28 -1000
+Message-Id: <20230105212432.289569-1-tj@kernel.org>
+X-Mailer: git-send-email 2.39.0
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.1
-Subject: Re: [PATCHv4 1/2] block: make BLK_DEF_MAX_SECTORS unsigned
-Content-Language: en-US
-To:     Keith Busch <kbusch@meta.com>, linux-block@vger.kernel.org,
-        axboe@kernel.dk
-Cc:     hch@lst.de, martin.petersen@oracle.com,
-        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-        Keith Busch <kbusch@kernel.org>
-References: <20230105205146.3610282-1-kbusch@meta.com>
- <20230105205146.3610282-2-kbusch@meta.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20230105205146.3610282-2-kbusch@meta.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/5/23 12:51, Keith Busch wrote:
-> This is used as an unsigned value, so define it that way to avoid
-> having to cast it.
+Hello,
 
-Reviewed-by: Bart Van Assche <bvanassche@acm.org>
+v2 fixes the build failure caused by v1[1] forgetting to update bfq.
+
+This patchset:
+
+* Improves blkg config helpers so that they can be used consistently for all
+  the existing use cases. This also allows keeps using the same bdev open
+  instance across lazy init of rq_qos policies.
+
+* Updates iolatency so that it initializes lazily when a latency target is
+  set for the first time. This avoids registering the rq_qos policy when
+  iolatency is not used which removes unnecessary calls into iolat from IO
+  hot paths.
+
+and contains the following four patches:
+
+ 0001-blkcg-Drop-unnecessary-RCU-read-un-locks-from-blkg_c.patch
+ 0002-blkcg-Restructure-blkg_conf_prep-and-friends.patch
+ 0003-blk-iolatency-s-blkcg_rq_qos-iolat_rq_qos.patch
+ 0004-blk-iolatency-Make-initialization-lazy.patch
+
+and is also available in the following git branch.
+
+ git://git.kernel.org/pub/scm/linux/kernel/git/tj/misc.git iolat-lazy-init-v2
+
+diffstat follows. Thanks.
+
+ block/bfq-cgroup.c    |    8 +++--
+ block/blk-cgroup.c    |  120 ++++++++++++++++++++++++++++++++++++++++++----------------------------------
+ block/blk-cgroup.h    |   10 +++---
+ block/blk-iocost.c    |   58 +++++++++++++++++++++---------------
+ block/blk-iolatency.c |   39 +++++++++++++++++++++---
+ block/blk-rq-qos.h    |    2 -
+ block/blk-throttle.c  |   16 ++++++----
+ block/blk.h           |    6 ---
+ 8 files changed, 157 insertions(+), 102 deletions(-)
+
+[1] https://lkml.kernel.org/r/20230105002007.157497-1-tj@kernel.org
+
+--
+tejun
+
+
+
