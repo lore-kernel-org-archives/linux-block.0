@@ -2,135 +2,156 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E33E8C53210
-	for <linux-block@archiver.kernel.org>; Thu,  5 Jan 2023 01:53:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E205C4708D
+	for <linux-block@archiver.kernel.org>; Thu,  5 Jan 2023 03:17:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229805AbjAEBxs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 4 Jan 2023 20:53:48 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38760 "EHLO
+        id S229812AbjAEDRV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 4 Jan 2023 22:17:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60110 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229792AbjAEBxq (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 4 Jan 2023 20:53:46 -0500
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B1DF43A1F;
-        Wed,  4 Jan 2023 17:53:43 -0800 (PST)
-Received: from mail02.huawei.com (unknown [172.30.67.153])
-        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4NnTyn4yxfz4f3mSC;
-        Thu,  5 Jan 2023 09:53:37 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-        by APP4 (Coremail) with SMTP id gCh0CgAHvbCiLbZjBgh8BA--.64460S3;
-        Thu, 05 Jan 2023 09:53:40 +0800 (CST)
-Subject: Re: [PATCH v3 4/5] blk-iocost: fix divide by 0 error in calc_lcoefs()
-To:     Tejun Heo <tj@kernel.org>, Yu Kuai <yukuai1@huaweicloud.com>
-Cc:     josef@toxicpanda.com, axboe@kernel.dk, cgroups@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        yi.zhang@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
-References: <20221226085859.2701195-1-yukuai1@huaweicloud.com>
- <20221226085859.2701195-5-yukuai1@huaweicloud.com>
- <Y7X1fFO4UP7QnwkC@slm.duckdns.org>
-From:   Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <9b23b5a9-c730-1156-cd59-772f5559b4f7@huaweicloud.com>
-Date:   Thu, 5 Jan 2023 09:53:38 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        with ESMTP id S229886AbjAEDRM (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 4 Jan 2023 22:17:12 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C85E165F1
+        for <linux-block@vger.kernel.org>; Wed,  4 Jan 2023 19:16:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1672888586;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=jlIoIdIFG2dVWZi2K+OCOkv3+deoG+uvdHhvJiUMwkc=;
+        b=axK0Rq+D6hqhh5maU11TmtzjvVj+KqtTX/g569QHHWVWm5vbBqSta2lJwRrtD86tYx0r/W
+        T/WupgJxR3uBgx04112Dsru6MEfApsuFvvo8lvkSGUeGIMJS84/4Ktqbph5ZSBeUi2FUuK
+        XcyEjXCVxbRyvuDZSKjXGQkG9Bp8BnA=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-465-KtsVNwuQN4q-wGBvptFzYA-1; Wed, 04 Jan 2023 22:16:23 -0500
+X-MC-Unique: KtsVNwuQN4q-wGBvptFzYA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 19C3E38041D5;
+        Thu,  5 Jan 2023 03:16:23 +0000 (UTC)
+Received: from T590 (ovpn-8-26.pek2.redhat.com [10.72.8.26])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 93891C15BA0;
+        Thu,  5 Jan 2023 03:16:19 +0000 (UTC)
+Date:   Thu, 5 Jan 2023 11:16:13 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Nadav Amit <nadav.amit@gmail.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        ming.lei@redhat.com
+Subject: Re: Potential hang on ublk_ctrl_del_dev()
+Message-ID: <Y7ZA/ULE4hg3lkbY@T590>
+References: <862272BC-C6A3-4A60-A620-4C5596972D01@gmail.com>
+ <Y7URsuwxaAHFmn8S@T590>
+ <20EBDD77-21AD-4C39-B1F2-E9A9954FA360@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <Y7X1fFO4UP7QnwkC@slm.duckdns.org>
-Content-Type: text/plain; charset=gbk; format=flowed
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgAHvbCiLbZjBgh8BA--.64460S3
-X-Coremail-Antispam: 1UD129KBjvJXoW7WrWkZF17Jr18KrWxWw1DGFg_yoW8uw1xpr
-        Wfu3W5uFnagrnrCFWIqF1IqFySvrs2qF10qw1xtwnIgry7Arn3K3Wqgw1jgrWkArWxJ3yF
-        9ayIvry5uw1Yk37anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUkE14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-        1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-        JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-        CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-        2Ix0cI8IcVAFwI0_JrI_JrylYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-        W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lc7I2V7IY0VAS07AlzVAY
-        IcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14
-        v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkG
-        c2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI
-        0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6rWUJVWrZr1UMIIF0xvEx4A2jsIE14v26r1j
-        6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUZa9
-        -UUUUU=
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
-X-CFilter-Loop: Reflected
+In-Reply-To: <20EBDD77-21AD-4C39-B1F2-E9A9954FA360@gmail.com>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
+On Wed, Jan 04, 2023 at 10:13:05AM -0800, Nadav Amit wrote:
+> 
+> 
+> > On Jan 3, 2023, at 9:42 PM, Ming Lei <ming.lei@redhat.com> wrote:
+> > 
+> > On Tue, Jan 03, 2023 at 01:47:37PM -0800, Nadav Amit wrote:
+> >> Hello Ming,
+> >> 
+> >> I am trying the ublk and it seems very exciting.
+> >> 
+> >> However, I encounter an issue when I remove a ublk device that is mounted or
+> >> in use.
+> >> 
+> >> In ublk_ctrl_del_dev(), shouldnâ€™t we *not* wait if ublk_idr_freed() is false?
+> >> It seems to me that it is saner to return -EBUSY in such a case and let
+> >> userspace deal with the results.
+> >> 
+> >> For instance, if I run the following (using ubdsrv):
+> >> 
+> >> $ mkfs.ext4 /dev/ram0
+> >> $ ./ublk add -t loop -f /dev/ram0
+> >> $ sudo mount /dev/ublkb0 tmp
+> >> $ sudo ./ublk del -a
+> >> 
+> >> ublk_ctrl_del_dev() would not be done until the partition is unmounted, and you
+> >> can get a splat that is similar to the one below.
+> > 
+> > The splat itself can be avoided easily by replace wait_event with
+> > wait_event_timeout() plus loop, but I guess you think the sync delete
+> > isn't good too?
+> 
+> I donâ€™t think the splat is the issue. The issue is the blocking behavior,
+> which is both unconditional and unbounded in time, and (worse) takes place
+> without relinquishing the locks. wait_event_timeout() is therefore not a
+> valid solution IMHO.
+> 
+> > 
+> >> 
+> >> What do you say? Would you agree to change the behavior to return -EBUSY?
+> > 
+> > It is designed in this way from beginning, and I believe it is just for
+> > the sake of simplicity, and one point is that the device number needs
+> > to be freed after 'ublk del' returns.
+> > 
+> > But if it isn't friendly from user's viewpoint, we can change to return
+> > -EBUSY. One simple solution is to check if the ublk block device
+> > is opened before running any deletion action, if yes, stop to delete it
+> > and return -EBUSY; otherwise go ahead and stop & delete the pair of devices.
+> > And the userspace part(ublk utility) needs update too.
+> > 
+> > However, -EBUSY isn't perfect too, cause user has to retry the delete
+> > command manually.
+> 
+> I understand your considerations. My intuition is that just as umount
+> cannot be done while a file is opened and would return -EBUSY, so should
+> deleting the ublock while the ublk is in use.
+> 
+> So as I see it, there are 2 possible options for proper deletion of ublk,
+> and actually both can be implemented and distinguished with a new flag
+> (UBLK_F_*):
+> 
+> 1. Blocking - similar to the way it is done today, but (hopefully) without
+>    holding locks, and with using wait_event_interruptible() instead of
+>    wait_event() to allow interruption (and return EINTR if interrupted).
+> 
+> 2. Best-effort - returning EBUSY if it cannot be removed.
+> 
+> I can imagine use-cases for both, and it would also allow you not to
+> change ubdsrv if you choose so.
+> 
+> Does it make sense?
+ 
+I prefer to the 1st approach:
 
-ÔÚ 2023/01/05 5:54, Tejun Heo Ð´µÀ:
-> On Mon, Dec 26, 2022 at 04:58:58PM +0800, Yu Kuai wrote:
->> From: Li Nan <linan122@huawei.com>
->>
->> echo max of u64 to cost.model can cause divide by 0 error.
->>
->>    # echo 8:0 rbps=18446744073709551615 > /sys/fs/cgroup/io.cost.model
->>
->>    divide error: 0000 [#1] PREEMPT SMP
->>    RIP: 0010:calc_lcoefs+0x4c/0xc0
->>    Call Trace:
->>     <TASK>
->>     ioc_refresh_params+0x2b3/0x4f0
->>     ioc_cost_model_write+0x3cb/0x4c0
->>     ? _copy_from_iter+0x6d/0x6c0
->>     ? kernfs_fop_write_iter+0xfc/0x270
->>     cgroup_file_write+0xa0/0x200
->>     kernfs_fop_write_iter+0x17d/0x270
->>     vfs_write+0x414/0x620
->>     ksys_write+0x73/0x160
->>     __x64_sys_write+0x1e/0x30
->>     do_syscall_64+0x35/0x80
->>     entry_SYSCALL_64_after_hwframe+0x63/0xcd
->>
->> calc_lcoefs() uses the input value of cost.model in DIV_ROUND_UP_ULL,
->> overflow would happen if bps plus IOC_PAGE_SIZE is greater than
->> ULLONG_MAX, it can cause divide by 0 error.
->>
->> Fix the problem by setting basecost
->>
->> Signed-off-by: Li Nan <linan122@huawei.com>
->> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
->> ---
->>   block/blk-iocost.c | 10 +++++++---
->>   1 file changed, 7 insertions(+), 3 deletions(-)
->>
->> diff --git a/block/blk-iocost.c b/block/blk-iocost.c
->> index f8726e20da20..c6b39024117b 100644
->> --- a/block/blk-iocost.c
->> +++ b/block/blk-iocost.c
->> @@ -866,9 +866,13 @@ static void calc_lcoefs(u64 bps, u64 seqiops, u64 randiops,
->>   
->>   	*page = *seqio = *randio = 0;
->>   
->> -	if (bps)
->> -		*page = DIV64_U64_ROUND_UP(VTIME_PER_SEC,
->> -					   DIV_ROUND_UP_ULL(bps, IOC_PAGE_SIZE));
->> +	if (bps) {
->> +		if (bps >= U64_MAX - IOC_PAGE_SIZE)
->> +			*page = 1;
->> +		else
->> +			*page = DIV64_U64_ROUND_UP(VTIME_PER_SEC,
->> +					DIV_ROUND_UP_ULL(bps, IOC_PAGE_SIZE));
->> +	}
-> 
-> This is a nitpick but wouldn't something like the following be easier to
-> understand?
-> 
->          if (bps) {
->                  u64 bps_pages = DIV_ROUND_UP_ULL(bps, IOC_PAGE_SIZE);
-> 
->                  if (bps_pages)
->                          *pages = DIV64_U64_ROUND_UP(VTIME_PER_SEC, bps_pages);
->                  else
->                          *pages = 1;
->          }
-> 
-Yes, I agree that this is better to understand. I'll send a new version.
+1) the wait event is still one positive signal for user to cleanup the
+device use, since the correct step is to umount ublk disk before deleting
+the device.
 
-Thanks,
-Kuai
+2) the wait still can avoid the current context to reuse the device
+number
+
+3) after switching to wait_event_interruptible(), we need to avoid
+double delete, and one flag of UB_STATE_DELETED can be used for failing
+new delete command.
+
+4) IMO new flag(UBLK_F_*) isn't needed to distinguish this change
+with current behavior.
+
+Please let us know if you'd like to cook one patch for improving
+the delete handling.
+
+BTW, there could be another option, such as, 'ublk delete --no-wait' just
+run the remove and without waiting at all, but not sure if it is useful.
+
+
+thanks,
+Ming
 
