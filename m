@@ -2,97 +2,99 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25B21C54E76
-	for <linux-block@archiver.kernel.org>; Wed,  4 Jan 2023 22:17:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 80808C54E76
+	for <linux-block@archiver.kernel.org>; Thu,  5 Jan 2023 00:20:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240521AbjADWRQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 4 Jan 2023 17:17:16 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40660 "EHLO
+        id S231210AbjAEAUS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 4 Jan 2023 19:20:18 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58562 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240520AbjADWRQ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 4 Jan 2023 17:17:16 -0500
-Received: from mail-pg1-x533.google.com (mail-pg1-x533.google.com [IPv6:2607:f8b0:4864:20::533])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5381F65F8;
-        Wed,  4 Jan 2023 14:17:15 -0800 (PST)
-Received: by mail-pg1-x533.google.com with SMTP id 36so23234446pgp.10;
-        Wed, 04 Jan 2023 14:17:15 -0800 (PST)
+        with ESMTP id S229759AbjAEAUQ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 4 Jan 2023 19:20:16 -0500
+Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D78261D0CB;
+        Wed,  4 Jan 2023 16:20:12 -0800 (PST)
+Received: by mail-pf1-x432.google.com with SMTP id w203so7542216pfc.12;
+        Wed, 04 Jan 2023 16:20:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:sender
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=mBdR1OYvv5zIjW+hrNHEjqsBYdzTVZarSCYttdRP9P0=;
-        b=QMHC+W+cPdzEvzu7OmXQnPcvd3ozAn24UBAx+NJZqCwKaCIFamFDpMO5+0fusnSF32
-         7rMEcXxCkh4xwbepxkxjCAqOfToVfBsCo5T4Zhh1dfX2BqcKbKxuLLFRvRk+KozCh6mx
-         PiCfloJVXYuGwuqkgKdvzg966p0QrHBmHM/DBZD5gJ4Ko0FRf6GQKmkum04ZTwYAA9cE
-         driK/F8H6DubpL+VDkSG5dj/M2uRgMqzRORN7tTGUotYlF33zztJk2LStCylCgiyWQTH
-         E2UEA+UtPJK0jAs+7pXInfPnzlYTC2Q7qiiRVolqUUgI1DbrVvUN8MvIboES+bgyLdJg
-         tq2w==
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:sender:from:to:cc:subject:date:message-id:reply-to;
+        bh=8HGYh4uvWX6khV9cMo5O6XnraOEnVQvZkHWgtr4zshY=;
+        b=mAMyC1Zedw/SVH8CBbI8/Bh/R/ayqOA8HXQCzlmmlSIIOwoS5mHiCDBawPxT4SEbh1
+         +lDjjKLqUecLpp9AXe0Mex6YM3CGSVQIjETZo9553G6BoTVoO9RIBUHWA/P0snroa0R5
+         3s/RNHxi6z22X18i1yLpGO4m+aLioV8eUKpt3TxLktpgISlPMDhWhv0hH8BZ00ggjtub
+         ttgz9gkqA5pUL7DJ27wH4rXoBFEal/nDABT8cqpklsbhNMbWlQ566hwk6zCfYkB33Mpr
+         46gwmOxnZSIYdtiInuw0TvZoaLJ/E8b/H0nvYhrkwrF6UZXX6SNyfMJjKMpBe4Pf9Bsn
+         f3BA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:sender
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=mBdR1OYvv5zIjW+hrNHEjqsBYdzTVZarSCYttdRP9P0=;
-        b=EFryHCV7JWZRztQ1l6im6JTuZjHo6Qyu1Hm56+O+Tt6uLRsG6awVGDOHz3h23RFLJu
-         Uq6ReGIgZLOx850KXd4GdEXoy/V03Xb78NQ4Uo5BB8M/+M9oKRqNYa1vAdLnVlOBFYRb
-         lhkiyaNHQGQYdB5f1IHNE+eG5kqRV18g6U5EGKDK9qUMfKUxqd2cjFMa6mYlghdQzK/I
-         uRhPWB/WQkMDS/69FtciLXWd7h58MGnaT9S+w87pxwmXUmMHUKoljhB+7qhzC7FZ2ctw
-         JPaCFw6pDb5Sm71iq4YPX2rDk5n7W6GMjO9dIric10MvdjK/n5qPhU3sxLQPYbYzB8Kq
-         WvyQ==
-X-Gm-Message-State: AFqh2krBaUgmiHoc5OE+n8Fmh8JdSQau4vpQMsg7NK2X/Fqq9dvonMG/
-        RBp65VVpXZEYJxlGYLiM/fs=
-X-Google-Smtp-Source: AMrXdXtp1FOgKJapFay7R/Uc+L09gGitWWTApSjT57fgZ9XZutFON8Lz6yWq6yuVU18c/qzHQWw+pw==
-X-Received: by 2002:a62:cf42:0:b0:581:a004:3f36 with SMTP id b63-20020a62cf42000000b00581a0043f36mr26189605pfg.25.1672870634700;
-        Wed, 04 Jan 2023 14:17:14 -0800 (PST)
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:sender:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8HGYh4uvWX6khV9cMo5O6XnraOEnVQvZkHWgtr4zshY=;
+        b=L3Sqf+wMEYAXSdv2HMocy1SfMxWVEVZQTIqDUp+jxhNxVPABw2zfeEbncRR3K6GXr8
+         Ok7TbpWZirOpc3VfDbplKKuxUf/uaHI8IRQXYfUgsXhZCjp1zhlAGRafMBz5xM5wiYTe
+         E6Sowjo14Ds9tlg4HbESV0TairC36rNJCXjH7jCWLHTsWw8xwouTow0Vpq2+EXKmWhwv
+         KP8ns6PddEbhmfcA4+QFRW/OorlJP3DnS/fqW3xAXfEY2V5+R3PlmqVeSJwBhED7YQOW
+         07Pf88hVbmeTEsllfFTjne9I1j1NE3ZryoB2fmoRBqCzd59q+194e211wm3WjM0LWweJ
+         rXRQ==
+X-Gm-Message-State: AFqh2krzU53/4vr5GY4JBVqHl4BGAbyTkyCkspyFqr7rqi1WsotDLVzE
+        z5xGqVouU6AnNESbpseay+e65/Pbm+0=
+X-Google-Smtp-Source: AMrXdXvG031p3vb0bU8kfmasYwfg27oYIIveXBcmlOkqNfFM/NQo/J2LSZXVcZpPITF1JI+KidIOUw==
+X-Received: by 2002:a05:6a00:27a0:b0:57f:cf88:edf5 with SMTP id bd32-20020a056a0027a000b0057fcf88edf5mr65805887pfb.24.1672878012266;
+        Wed, 04 Jan 2023 16:20:12 -0800 (PST)
 Received: from localhost (2603-800c-1a02-1bae-a7fa-157f-969a-4cde.res6.spectrum.com. [2603:800c:1a02:1bae:a7fa:157f:969a:4cde])
-        by smtp.gmail.com with ESMTPSA id b27-20020aa78edb000000b0056b9ec7e2desm23036966pfr.125.2023.01.04.14.17.13
+        by smtp.gmail.com with ESMTPSA id k10-20020aa7998a000000b00582197fa7b4sm9443486pfh.7.2023.01.04.16.20.10
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 04 Jan 2023 14:17:14 -0800 (PST)
+        Wed, 04 Jan 2023 16:20:11 -0800 (PST)
 Sender: Tejun Heo <htejun@gmail.com>
-Date:   Wed, 4 Jan 2023 12:17:13 -1000
 From:   Tejun Heo <tj@kernel.org>
-To:     Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>
-Cc:     Yann Droneaud <ydroneaud@opteya.com>,
-        Josef Bacik <josef@toxicpanda.com>,
-        Jens Axboe <axboe@kernel.dk>, cgroups@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] blk-iocost: don't make all constants unsigned long long
-Message-ID: <Y7X66RDNGhB45rzZ@slm.duckdns.org>
-References: <20221220201819.1497577-1-ydroneaud@opteya.com>
- <20221222135855.GC20830@blackbody.suse.cz>
- <Y7X6ajqnPrtFAL0C@slm.duckdns.org>
+To:     axboe@kernel.dk, josef@toxicpanda.com, hch@lst.de
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCHSET block/for-next] blkcg: Improve blkg config helpers and make iolatency init lazy
+Date:   Wed,  4 Jan 2023 14:20:03 -1000
+Message-Id: <20230105002007.157497-1-tj@kernel.org>
+X-Mailer: git-send-email 2.39.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <Y7X6ajqnPrtFAL0C@slm.duckdns.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jan 04, 2023 at 12:15:06PM -1000, Tejun Heo wrote:
-> On Thu, Dec 22, 2022 at 02:58:55PM +0100, Michal Koutný wrote:
-> > On Tue, Dec 20, 2022 at 09:18:19PM +0100, Yann Droneaud <ydroneaud@opteya.com> wrote:
-> > > +enum {
-> > >  	/* switch iff the conditions are met for longer than this */
-> > >  	AUTOP_CYCLE_NSEC	= 10LLU * NSEC_PER_SEC,
-> > > +};
-> > 
-> > This looks gratuitous.
-> > 
-> > What about indivudial #defines with typed literals instead of the "lazy
-> > splitting"?
-> 
-> enums are so much better for debugging and tracing. This is a gcc caused
-> problem where there's no other way to generate the same code between two gcc
-> versions without splitting the enum definitions. I'm kinda baffled that this
-> is what they chose to do but can't think of a better way to work around it.
+Hello,
 
-I thought this was the other patch addressing this issue. The proposed patch
-is rather painful to look at. The other one splits it into two groups.
+* Improve blkg config helpers so that they can be used consistently for all
+  the existing use cases. This also allows keeps using the same bdev open
+  instance across lazy init of rq_qos policies.
 
-Thanks.
+* Update iolatency so that it initializes lazily when a latency target is
+  set for the first time. This avoids registering the rq_qos policy when
+  iolatency is not used which removes unnecessary calls into iolat from IO
+  hot paths.
 
--- 
+This patchset contains the following four patches:
+
+ 0001-blkcg-Drop-unnecessary-RCU-read-un-locks-from-blkg_c.patch
+ 0002-blkcg-Restructure-blkg_conf_prep-and-friends.patch
+ 0003-blk-iolatency-s-blkcg_rq_qos-iolat_rq_qos.patch
+ 0004-blk-iolatency-Make-initialization-lazy.patch
+
+and is also available in the following git branch.
+
+ git://git.kernel.org/pub/scm/linux/kernel/git/tj/misc.git iolat-lazy-init
+
+diffstat follows. Thanks.
+
+ block/blk-cgroup.c    |  120 +++++++++++++++++++++++++++-----------------------
+ block/blk-cgroup.h    |   10 ++--
+ block/blk-iocost.c    |   58 ++++++++++++++----------
+ block/blk-iolatency.c |   39 ++++++++++++++--
+ block/blk-rq-qos.h    |    2 
+ block/blk-throttle.c  |   16 ++++--
+ block/blk.h           |    6 --
+ 7 files changed, 152 insertions(+), 99 deletions(-)
+
+--
 tejun
+
