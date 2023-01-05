@@ -2,93 +2,106 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7629BC3DA7A
-	for <linux-block@archiver.kernel.org>; Thu,  5 Jan 2023 08:06:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A4C3C3DA7A
+	for <linux-block@archiver.kernel.org>; Thu,  5 Jan 2023 10:46:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231429AbjAEIGC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 5 Jan 2023 03:06:02 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51450 "EHLO
+        id S232251AbjAEKpu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 5 Jan 2023 05:45:50 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36838 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231432AbjAEIGB (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 5 Jan 2023 03:06:01 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B0544086D;
-        Thu,  5 Jan 2023 00:06:00 -0800 (PST)
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3057MfYq032307;
-        Thu, 5 Jan 2023 08:05:55 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : references : mime-version : content-type :
- content-transfer-encoding : in-reply-to; s=pp1;
- bh=fOrCrBR39K3gwlEhzZZbNnz3h0BbHtsclLCHEbf+Mq0=;
- b=itX8SP5mM+sMYFaxNKk4yq4R7Cya3DSMd0RxTo/7X0M1W8/mhdKCrlm3w59nH8xwVIQI
- gRGQjk22oQligKETm88N9QqPbASSaXD/MpWdhxvr6JCWNuNmVHkOMj0ydc7hWpK1Of0d
- F/6ocAMUhJsaBYKoSPCj+a42o7QgzNNlwzUkbd0XkvnJfvXZxD1xr/9MClQzI5Yjh8FR
- R/nmDiJyyj3p0VZ4Pk+F4KWb/Jo+LIFvwHLTkgXZ2JPnxp6vK+oUGVZ2S5tWOEkPdzbt
- uhQ5bcpJgog7HqRwmoR8PbUauhbIWYf5H7/BVrKoVVGzPMBF+FVjRZ1PZVx+zoj57z1b dg== 
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3mwsxns4jp-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 05 Jan 2023 08:05:54 +0000
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 305535xK001543;
-        Thu, 5 Jan 2023 08:05:52 GMT
-Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
-        by ppma06ams.nl.ibm.com (PPS) with ESMTPS id 3mtcbfeegn-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 05 Jan 2023 08:05:52 +0000
-Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-        by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 30585nU948628010
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 5 Jan 2023 08:05:49 GMT
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id CCA3A20043;
-        Thu,  5 Jan 2023 08:05:49 +0000 (GMT)
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 52CE020040;
-        Thu,  5 Jan 2023 08:05:49 +0000 (GMT)
-Received: from osiris (unknown [9.171.68.186])
-        by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-        Thu,  5 Jan 2023 08:05:49 +0000 (GMT)
-Date:   Thu, 5 Jan 2023 09:05:47 +0100
-From:   Heiko Carstens <hca@linux.ibm.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     "Paul E. McKenney" <paulmck@kernel.org>, rcu@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kernel-team@meta.com,
-        rostedt@goodmis.org, linux-block@vger.kernel.org
-Subject: Re: [PATCH rcu 07/27] block: Remove "select SRCU"
-Message-ID: <Y7aE2zzdTyjNId6w@osiris>
-References: <20230105003759.GA1769545@paulmck-ThinkPad-P17-Gen-1>
- <20230105003813.1770367-7-paulmck@kernel.org>
- <1a9d0cdf-d39e-7eb5-39dd-3e425016c579@kernel.dk>
+        with ESMTP id S232344AbjAEKpU (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 5 Jan 2023 05:45:20 -0500
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 147CB3D9D8;
+        Thu,  5 Jan 2023 02:45:19 -0800 (PST)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 12EDC33B5B;
+        Thu,  5 Jan 2023 10:45:10 +0000 (UTC)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id C65FC138DF;
+        Thu,  5 Jan 2023 10:45:09 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id cmPILjWqtmNLGgAAMHmgww
+        (envelope-from <mkoutny@suse.com>); Thu, 05 Jan 2023 10:45:09 +0000
+Date:   Thu, 5 Jan 2023 11:45:08 +0100
+From:   Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>
+To:     Yu Kuai <yukuai1@huaweicloud.com>
+Cc:     tj@kernel.org, josef@toxicpanda.com, axboe@kernel.dk,
+        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, yi.zhang@huawei.com,
+        yangerkun@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
+Subject: Re: [PATCH] blk-cgroup: fix missing pd_online_fn() while activating
+ policy
+Message-ID: <20230105104241.GA16920@blackbody.suse.cz>
+References: <20230103112833.2013432-1-yukuai1@huaweicloud.com>
+ <20230104151241.GA13268@blackbody.suse.cz>
+ <4b559d1d-31e4-6049-4548-451bf7afb4f4@huaweicloud.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="mojUlQ0s9EVzWg2t"
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <1a9d0cdf-d39e-7eb5-39dd-3e425016c579@kernel.dk>
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: eWEV7vV7VjxkHgEDcwbCLUDx6EPtEpk7
-X-Proofpoint-GUID: eWEV7vV7VjxkHgEDcwbCLUDx6EPtEpk7
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.923,Hydra:6.0.545,FMLib:17.11.122.1
- definitions=2023-01-05_02,2023-01-04_02,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- spamscore=0 malwarescore=0 clxscore=1011 suspectscore=0 bulkscore=0
- mlxlogscore=597 mlxscore=0 adultscore=0 phishscore=0 impostorscore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2212070000 definitions=main-2301050066
+In-Reply-To: <4b559d1d-31e4-6049-4548-451bf7afb4f4@huaweicloud.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+Authentication-Results: smtp-out1.suse.de;
+        none
+X-Spamd-Result: default: False [-2.20 / 50.00];
+         ARC_NA(0.00)[];
+         RCVD_VIA_SMTP_AUTH(0.00)[];
+         FROM_HAS_DN(0.00)[];
+         TO_DN_SOME(0.00)[];
+         TO_MATCH_ENVRCPT_ALL(0.00)[];
+         MIME_GOOD(-0.20)[multipart/signed,text/plain];
+         RCPT_COUNT_SEVEN(0.00)[10];
+         SIGNED_PGP(-2.00)[];
+         FROM_EQ_ENVFROM(0.00)[];
+         MIME_TRACE(0.00)[0:+,1:+,2:~];
+         RCVD_COUNT_TWO(0.00)[2];
+         RCVD_TLS_ALL(0.00)[]
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jan 04, 2023 at 05:43:07PM -0700, Jens Axboe wrote:
-> On 1/4/23 5:37 PM, Paul E. McKenney wrote:
-> > Now that the SRCU Kconfig option is unconditionally selected, there is
-> > no longer any point in selecting it.  Therefore, remove the "select SRCU"
-> > Kconfig statements.
-> 
-> I'm assuming something earlier made this true (only CC'ed on this patch,
-> not the cover letter or interesting btis...), then:
 
-I was wondering the same. But it is already unconditionally enabled
-since commit 0cd7e350abc4 ("rcu: Make SRCU mandatory").
+--mojUlQ0s9EVzWg2t
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+
+On Thu, Jan 05, 2023 at 09:43:02AM +0800, Yu Kuai <yukuai1@huaweicloud.com> wrote:
+> This is based only on code review, currently the only negative effects
+> is that root blkg from blk-throtl won't call pd_online_fn().
+
+Good, that's a NOP and there are no other uses of pd_online_fn.
+
+I wonder are the separate pd_init_fn and pd_online_fn callbacks
+necessary today?
+(IOW your fixup is a good catch and looks correct to me; I'd suggest
+more of a clean up. Shall I look into that?)
+
+> No, this is not true, before blkcg_activate_policy() is called,
+> blkg_create() won't see this policy, hence pd_init_fn/pd_online_fn won't
+> be called from blkg_create().
+
+Thanks, I missed the q->blkcg_pols bit.
+
+Michal
+
+--mojUlQ0s9EVzWg2t
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: Digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEARYIAB0WIQTrXXag4J0QvXXBmkMkDQmsBEOquQUCY7aqMgAKCRAkDQmsBEOq
+udG/AP443o4fnN2JypjVdH6EZJPRY/O5O0N3ywlBupWqtBkSeQD8DIJhUF+tVjlL
+zXTyjDqKPgE2Ri3wEWklUqmarfiGJg4=
+=7FAl
+-----END PGP SIGNATURE-----
+
+--mojUlQ0s9EVzWg2t--
