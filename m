@@ -2,92 +2,129 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EE50C53210
-	for <linux-block@archiver.kernel.org>; Thu,  5 Jan 2023 15:48:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D75A2C3DA7A
+	for <linux-block@archiver.kernel.org>; Thu,  5 Jan 2023 15:51:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234467AbjAEPsf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 5 Jan 2023 10:48:35 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38000 "EHLO
+        id S234876AbjAEPvK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 5 Jan 2023 10:51:10 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38554 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234780AbjAEPse (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 5 Jan 2023 10:48:34 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 414814BD53;
-        Thu,  5 Jan 2023 07:48:33 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id EDF12B8199B;
-        Thu,  5 Jan 2023 15:48:31 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A7EEEC433D2;
-        Thu,  5 Jan 2023 15:48:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1672933710;
-        bh=yCNCkr5VzIXt98C2D4zbMi7v5ISBOFLwXiuOYk5O40w=;
-        h=Date:From:To:Cc:Subject:Reply-To:References:In-Reply-To:From;
-        b=F1KtVeH4oiYy3MWCNN0ZTszzWywtawrffg+X9XnLB4Bm+U8OxBpJAkFjnxeJogxPb
-         YKY7dftd4tUguJ4lmuVmb1VIMhzDowhUqhbu6CyzuSv2vg6THSV1bJpAbIPtwcokbM
-         BXal/aFnPy/zhu7a/Q3fMiZqGeTgkiH3ludIxQvY74S/QfwjjeMM+R88FPe8znNiUB
-         oQ2rGwET1w0au++btMG5GYJwAVgyLcxRfYoTpIkuwMVquDoex1r8UXhY+ESihadeWi
-         QRkVjcptr2+XSU9ppAiqSi5ymZVjloZ9k6kYz0S7L3qIM/8KgtijDNfJXgOjrt20m5
-         ijZ05Pocbs2Rg==
-Received: by paulmck-ThinkPad-P17-Gen-1.home (Postfix, from userid 1000)
-        id 50C575C029A; Thu,  5 Jan 2023 07:48:30 -0800 (PST)
-Date:   Thu, 5 Jan 2023 07:48:30 -0800
-From:   "Paul E. McKenney" <paulmck@kernel.org>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Heiko Carstens <hca@linux.ibm.com>, rcu@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kernel-team@meta.com,
-        rostedt@goodmis.org, linux-block@vger.kernel.org
-Subject: Re: [PATCH rcu 07/27] block: Remove "select SRCU"
-Message-ID: <20230105154830.GW4028633@paulmck-ThinkPad-P17-Gen-1>
-Reply-To: paulmck@kernel.org
-References: <20230105003759.GA1769545@paulmck-ThinkPad-P17-Gen-1>
- <20230105003813.1770367-7-paulmck@kernel.org>
- <1a9d0cdf-d39e-7eb5-39dd-3e425016c579@kernel.dk>
- <Y7aE2zzdTyjNId6w@osiris>
- <20230105153314.GS4028633@paulmck-ThinkPad-P17-Gen-1>
- <f4dc3c65-c9e6-b961-cf94-f8058a67e256@kernel.dk>
+        with ESMTP id S234954AbjAEPuW (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 5 Jan 2023 10:50:22 -0500
+Received: from outgoing.mit.edu (outgoing-auth-1.mit.edu [18.9.28.11])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A26BA5D43E
+        for <linux-block@vger.kernel.org>; Thu,  5 Jan 2023 07:50:18 -0800 (PST)
+Received: from letrec.thunk.org (host-67-21-23-146.mtnsat.com [67.21.23.146] (may be forged))
+        (authenticated bits=0)
+        (User authenticated as tytso@ATHENA.MIT.EDU)
+        by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 305FnZPB011422
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 5 Jan 2023 10:49:44 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mit.edu; s=outgoing;
+        t=1672933788; bh=SwRwXE7W0BAf789h44Lpm0WiZ8Jk4yCRVsQWnf58tQ0=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To;
+        b=TWjo6ehQJMOdGDOS3GyzzMTHfBLKSbdtpKKlth14VGSLkrbqBtSQ2kroPogEvf4OX
+         lzrX97+nCQ51R0BJvoeTTIuhvLi60KUruuT8esOIiVi3Fvem7+pYZZDULwFcu03ZIl
+         h/C+KC8+HtlMhFZWqB77VShWfrvLnC5qa77df6rr1LtZvd1o+7y39ywk+S4FEk+nA3
+         F39uFVUQchu/C8AUqdg8wlrjQIqYYZbdu70FwNwia7Sh+4K7APP6cPeUUgrzy/lu/r
+         Jk9FEZn1y5U15N1HLLWLjtQ+fyh4GY29zG9tNgffaajL9CAJ5PdGy66Y+pZDtYIx4G
+         EkUGvnba+IlTg==
+Received: by letrec.thunk.org (Postfix, from userid 15806)
+        id 02E768C0850; Thu,  5 Jan 2023 10:49:32 -0500 (EST)
+Date:   Thu, 5 Jan 2023 10:49:32 -0500
+From:   "Theodore Ts'o" <tytso@mit.edu>
+To:     Sarthak Kukreti <sarthakkukreti@chromium.org>
+Cc:     "Darrick J. Wong" <djwong@kernel.org>, sarthakkukreti@google.com,
+        dm-devel@redhat.com, linux-block@vger.kernel.org,
+        linux-ext4@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Alasdair Kergon <agk@redhat.com>,
+        Mike Snitzer <snitzer@kernel.org>,
+        Christoph Hellwig <hch@infradead.org>,
+        Brian Foster <bfoster@redhat.com>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Bart Van Assche <bvanassche@google.com>,
+        Daniil Lunev <dlunev@google.com>
+Subject: Re: [PATCH v2 3/7] fs: Introduce FALLOC_FL_PROVISION
+Message-ID: <Y7bxjKusa2L/TNRE@mit.edu>
+References: <20221229081252.452240-1-sarthakkukreti@chromium.org>
+ <20221229081252.452240-4-sarthakkukreti@chromium.org>
+ <Y7Wr2uadI+82BB6a@magnolia>
+ <CAG9=OMNbeU=Xg5bWvHUSfzRf8vsk6csvcw5BGZeMD5Lo7dfKFQ@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <f4dc3c65-c9e6-b961-cf94-f8058a67e256@kernel.dk>
+In-Reply-To: <CAG9=OMNbeU=Xg5bWvHUSfzRf8vsk6csvcw5BGZeMD5Lo7dfKFQ@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jan 05, 2023 at 08:36:43AM -0700, Jens Axboe wrote:
-> On 1/5/23 8:33 AM, Paul E. McKenney wrote:
-> > On Thu, Jan 05, 2023 at 09:05:47AM +0100, Heiko Carstens wrote:
-> >> On Wed, Jan 04, 2023 at 05:43:07PM -0700, Jens Axboe wrote:
-> >>> On 1/4/23 5:37 PM, Paul E. McKenney wrote:
-> >>>> Now that the SRCU Kconfig option is unconditionally selected, there is
-> >>>> no longer any point in selecting it.  Therefore, remove the "select SRCU"
-> >>>> Kconfig statements.
-> >>>
-> >>> I'm assuming something earlier made this true (only CC'ed on this patch,
-> >>> not the cover letter or interesting btis...), then:
-> >>
-> >> I was wondering the same. But it is already unconditionally enabled
-> >> since commit 0cd7e350abc4 ("rcu: Make SRCU mandatory").
-> > 
-> > Ah, apologies for the terseness!
-> > 
-> > I took the coward's way out by making CONFIG_SRCU unconditional during
-> > the last merge window and removing all references during this merge
-> > window.  ;-)
+On Wed, Jan 04, 2023 at 01:22:06PM -0800, Sarthak Kukreti wrote:
+> > How expensive is this expected to be?  Is this why you wanted a separate
+> > mode flag?
+>
+> Yes, the exact latency will depend on the stacked block devices and
+> the fragmentation at the allocation layers.
 > 
-> Are you intending for maintainers to pick up these patches, or are you
-> collecting acks for sending the series separately? That part is also
-> not clear :-)
+> I did a quick test for benchmarking fallocate() with an:
+> A) ext4 filesystem mounted with 'noprovision'
+> B) ext4 filesystem mounted with 'provision' on a dm-thin device.
+> C) ext4 filesystem mounted with 'provision' on a loop device with a
+> sparse backing file on the filesystem in (B).
+> 
+> I tested file sizes from 512M to 8G, time taken for fallocate() in (A)
+> remains expectedly flat at ~0.01-0.02s, but for (B), it scales from
+> 0.03-0.4s and for (C) it scales from 0.04s-0.52s (I captured the exact
+> time distribution in the cover letter
+> https://marc.info/?l=linux-ext4&m=167230113520636&w=2)
+> 
+> +0.5s for a 8G fallocate doesn't sound a lot but I think fragmentation
+> and how the block device is layered can make this worse...
 
-Fair point!
+If userspace uses fallocate(2) there are generally two reasons.
+Either they **really** don't want to get the NOSPC, in which case
+noprovision will not give them what they want unless we modify their
+source code to add this new FALLOC_FL_PROVISION flag --- which may not
+be possible if it is provided in a binary-only format (for example,
+proprietary databases shipped by companies beginning with the letters
+'I' or 'O').
 
-Maintainer's choice.  By default, I collect acks and send it.  But if
-(for example) this change is in a high-traffic area, the maintainer
-might want to take it, in which case I drop it from my tree.
+Or, they really care about avoiding fragmentation by giving a hint to
+the file system that layout is important, and so **please** allocate
+the space right away so that it is more likely that the space will be
+laid out in a contiguous fashion.  Of course, the moment you use
+thin-provisioning this goes out the window, since even if the space is
+contiguous on the dm-thin layer, on the underlying storage layer it is
+likely that things will be fragmented to a fare-thee-well, and either
+(a) you have a vast amount of flash to try to mitigate the performance
+hit of using thin-provisioning (example, hardware thin-provisioning
+such as EMC storage arrays), or (b) you really don't care about
+performance since space savings is what you're going for.
 
-Either way works for me, as long as you let me know.  ;-)
+So.... because of the issue of changing the semantics of what
+fallocate(2) will guarantee, unless programs are forced to change
+their code to use this new FALLOC flag, I really am not very fond of
+it.
 
-							Thanx, Paul
+I suspect that using a mount option (which should default to
+"provision"; if you want to break user API expectations, it should
+require a mount option for the system administrator to explicitly OK
+such a change), is OK.
+
+As far as the per-file mode --- I'm not convinced it's really
+necessary.  In general if you are using thin-provisioning file systems
+tend to be used explicitly for one purpose, so adding the complexity
+of doing it on a per-file basis is probably not really needed.  That
+being said, your existing prototype requires searching for the
+extended attribute on every single file allocation, which is not a
+great idea.  On a system with SELinux enabled, every file will have an
+xattr block, and requiring that it be searched on every file
+allocation would be unfortunate.  It would be better to check for the
+xattr when the file is opened, and then setting a flag in the struct
+file.  However, it might be better to see if it there is a real demand
+for such a feature before adding it.
+
+						- Ted
