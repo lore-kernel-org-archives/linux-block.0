@@ -2,84 +2,96 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CAA3CC5479D
-	for <linux-block@archiver.kernel.org>; Thu,  5 Jan 2023 17:01:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 925C7C3DA7D
+	for <linux-block@archiver.kernel.org>; Thu,  5 Jan 2023 17:36:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231585AbjAERAq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 5 Jan 2023 12:00:46 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46050 "EHLO
+        id S235035AbjAERgR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 5 Jan 2023 12:36:17 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48724 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234803AbjAERAh (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 5 Jan 2023 12:00:37 -0500
-Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C33754DAA;
-        Thu,  5 Jan 2023 09:00:37 -0800 (PST)
-Received: by mail-pl1-x632.google.com with SMTP id d15so39939047pls.6;
-        Thu, 05 Jan 2023 09:00:37 -0800 (PST)
+        with ESMTP id S235408AbjAERgE (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 5 Jan 2023 12:36:04 -0500
+Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A3C3BC87;
+        Thu,  5 Jan 2023 09:36:02 -0800 (PST)
+Received: by mail-pl1-x629.google.com with SMTP id p24so17532234plw.11;
+        Thu, 05 Jan 2023 09:36:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=lWuNYcgMRUdXt3lrKpOOAhpTNHvmJnhLtWA6WFPkqzw=;
-        b=Ip639JaYOV1aW93fhR9fwRH10jtovSU7bc+87GLEpQ+7rAxYP89lDQrJAJsr2FX6W4
-         aI4VpoefbHI4W7mUgseXFMeB3elqfgJAmZIvaMFo5/s6Z0OjDK3eHaWaHAmCn0uFnX6t
-         kOHaQWZWvNX8ogHf+qeBkzT3vQbBpAo48dSLguLwXtrFfBJXmtjwkHNqJUhPzdXc6PkS
-         BDkw7vuxKXEyvEu4F9Bk2v+2c9TDA3TXClOaIDNfSxIYjOkAwt6/suSKu1swOAB2Ut44
-         rhTI0gv4n6qsAGEuBQGHyBx0fZFcj9lXGw6KBaKYwIypB0W5q90hjWTlQKrYwgVG5yUy
-         JbhA==
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:sender
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=gkjsNq+41nhz5t6YNHufJptj0TXGHPydjE1ADy7+6FM=;
+        b=F7AETA8YmQngoALJiwWtbL0ff8RtVbY4EEr53C6FVlL+DjvgCS7aideTdCWmxjFESd
+         SeiRq631vXOAX++cF5PyZgvg1K66m5yYZ1/kNZWXsC6IwAeKeSZd5dJI25JEOakb5hTn
+         koOxsxdTnhPtdbZa50u70QRWGBbgPhkudNr+UVeZO49V+rJahQKqkZ1pZR+sqjplBze3
+         q35Wqugk6MwBc7S+ubvDZFqhYjXGVsB/XPQOU15imjrES3mE+4jS6D5EO6hub0FHZxAT
+         +zCaPPlxhFluLFItLj3F5QdevNoFUcoaXuo+CM0bND1qvelEblmhqLuD8fraDS1YHsIn
+         MT+g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=lWuNYcgMRUdXt3lrKpOOAhpTNHvmJnhLtWA6WFPkqzw=;
-        b=TAxQWxHlVfoOXJz22YiBaCVYN5qXikQAt+XDMMYkIhY/1dwueouziYYRK0x2Q5MUjz
-         HMgaYEWZAa29YFa1RvdPREukV4RYQZLfw+MHX0cd/RAYWQdPZtnGncMn3ruuqdnI0DGw
-         C8QNVNbgEfhAoT8p6AWBl+CJLhJa520Zkb26q+ovJqP6Th+mCmdT/YDsrkiJGqtH2NdR
-         kljw9sv3q6icY0BpQWnvscN1KY8oAkAQOUySXyDFSbWiLzw14qUv1aGu1FDOvd1siOvA
-         B8fV+yqRbt8Vp/bCLS2WpNvUYtQ6o/8sVsKcOEhQ0SHf1GlXAZEY276Cy2ZVE8dC9yZH
-         8DHQ==
-X-Gm-Message-State: AFqh2krxoqiVhl4JxsxIDaU4/aYBkQg8hp4NzxaceQ0aq7ZAHaKWsqT3
-        17w5v7tMMqkWJzJdV/kE1eA=
-X-Google-Smtp-Source: AMrXdXt4uRQVRgPNn+82sQpY7HLkRbMOO20I+dRTWJJ/bfU20RYAkQ2J+eEF8mhTo+v0yZuvmxdXlA==
-X-Received: by 2002:a05:6a20:9591:b0:ad:7428:d326 with SMTP id iu17-20020a056a20959100b000ad7428d326mr70011472pzb.30.1672938036598;
-        Thu, 05 Jan 2023 09:00:36 -0800 (PST)
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:sender
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=gkjsNq+41nhz5t6YNHufJptj0TXGHPydjE1ADy7+6FM=;
+        b=p5e2ZMMoptC1P2yTbIajKKg4yBAKQL0trXTiN8O3nAcR3IttqcE7EBNDrBqJG8pRSC
+         MzUzQUSdwWa+E9J2tZE9DhPMOrn0r20wq6vWSIcbrizoN0A5HTDJVSkQls07Q/jdj690
+         a046HU1Ce4w5NS7j712wX1DZBgplC8yXXPjxkwCmUmvTDK1fPRL0UkVC2PbSjiLP1N63
+         ExSaEbzLX+MoTZEfooswVkVl6ofiq8q1mtGOAbCFK4NMju34vnEDO88lDmjg7qdz+Uac
+         nzRnGs0jF1TgwVWuLRPVXJAhYU24FFw66mFT9F8FL+UD/SAGPzdXNnGGqvw9lZeK8zND
+         iRAw==
+X-Gm-Message-State: AFqh2kqdDKJP09Xqx9r7rpuWoLvsByQA+9t1/fJl1DP/SYaCrbsFPjOc
+        jya8L+A5m9bprZyxzbpZrlwL/mCI7Fs=
+X-Google-Smtp-Source: AMrXdXsYDWP5shGMiAXXVQkIfz7JzRr2YwOxVFcN+ZqNqk6WEmOWE6UE2GTNjP8E23+8A9XtfuGZfQ==
+X-Received: by 2002:a17:90a:f309:b0:219:9e19:8259 with SMTP id ca9-20020a17090af30900b002199e198259mr55174897pjb.46.1672940161933;
+        Thu, 05 Jan 2023 09:36:01 -0800 (PST)
 Received: from localhost (2603-800c-1a02-1bae-a7fa-157f-969a-4cde.res6.spectrum.com. [2603:800c:1a02:1bae:a7fa:157f:969a:4cde])
-        by smtp.gmail.com with ESMTPSA id k201-20020a6284d2000000b005822ce3b2acsm10560119pfd.115.2023.01.05.09.00.35
+        by smtp.gmail.com with ESMTPSA id mz4-20020a17090b378400b0020aacde1964sm1623674pjb.32.2023.01.05.09.36.01
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 05 Jan 2023 09:00:36 -0800 (PST)
+        Thu, 05 Jan 2023 09:36:01 -0800 (PST)
 Sender: Tejun Heo <htejun@gmail.com>
-Date:   Thu, 5 Jan 2023 07:00:35 -1000
+Date:   Thu, 5 Jan 2023 07:35:59 -1000
 From:   Tejun Heo <tj@kernel.org>
-To:     Yu Kuai <yukuai1@huaweicloud.com>
-Cc:     josef@toxicpanda.com, axboe@kernel.dk, cgroups@vger.kernel.org,
+To:     Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>
+Cc:     Jinke Han <hanjinke.666@bytedance.com>, josef@toxicpanda.com,
+        axboe@kernel.dk, cgroups@vger.kernel.org,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        yukuai3@huawei.com, yi.zhang@huawei.com, yangerkun@huawei.com
-Subject: Re: [PATCH] blk-cgroup: fix missing pd_online_fn() while activating
- policy
-Message-ID: <Y7cCM60kalx+MnYu@slm.duckdns.org>
-References: <20230103112833.2013432-1-yukuai1@huaweicloud.com>
+        yinxin.x@bytedance.com, jack@suse.cz
+Subject: Re: [PATCH v3] blk-throtl: Introduce sync and async queues for
+ blk-throtl
+Message-ID: <Y7cKf7IH+FJ/6IyV@slm.duckdns.org>
+References: <20221226130505.7186-1-hanjinke.666@bytedance.com>
+ <20230105161854.GA1259@blackbody.suse.cz>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20230103112833.2013432-1-yukuai1@huaweicloud.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20230105161854.GA1259@blackbody.suse.cz>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jan 03, 2023 at 07:28:33PM +0800, Yu Kuai wrote:
-> From: Yu Kuai <yukuai3@huawei.com>
-> 
-> If the policy defines pd_online_fn(), it should be called after
-> pd_init_fn(), like blkg_create().
-> 
-> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+Hello,
 
-Acked-by: Tejun Heo <tj@kernel.org>
+On Thu, Jan 05, 2023 at 05:18:54PM +0100, Michal Koutný wrote:
+> I guess similar problem would arise for devices that are "naturally"
+> slow.
+> Then:
+> a) it must have been solved elsewhere in the block layer (but it's
+>    broken),
+> b) it should be solved generically in the block layer (thus this is only
+>    a partial solution).
 
-However, it'd be useful to note the practical implication of the bug in the
-patch description, which seems like not much as discussed in the thread.
+Hard limits tend to make this sort of problems a lot more pronounced because
+the existing mechanisms tend to break down for the users which are severely
+throttled down even while the device as a whole is fairly idle. cpu.max
+often triggers severe priority inversions too, so it isn't too surprising
+that people hit severe priority inversion issues w/ io.max.
+
+Another problem with blk-throttle is that it doesn't prioritize shared IOs
+identified by bio_issue_as_root_blkg() like iolatency and iocost do, so
+there can be very severe priority inversions when e.g. journal commit gets
+trapped in a low priority cgroup further exacerbating issues like this.
 
 Thanks.
 
