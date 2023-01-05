@@ -2,85 +2,109 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0244C3DA7A
-	for <linux-block@archiver.kernel.org>; Thu,  5 Jan 2023 18:56:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FD30C3DA7A
+	for <linux-block@archiver.kernel.org>; Thu,  5 Jan 2023 19:29:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231975AbjAES42 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 5 Jan 2023 13:56:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34656 "EHLO
+        id S233772AbjAET31 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 5 Jan 2023 14:29:27 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58492 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235058AbjAES41 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 5 Jan 2023 13:56:27 -0500
-Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08B5838AC0;
-        Thu,  5 Jan 2023 10:56:26 -0800 (PST)
-Received: by mail-pj1-x1033.google.com with SMTP id v23so40807124pju.3;
-        Thu, 05 Jan 2023 10:56:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=zq1H+uB2+TPFwR7JPq5kiGxVeV7Cch9Igvb+l9VMkoU=;
-        b=GhGjZD9BB3QbgnyPJCaaoMELJWaEY6VztHanVKgGEBXsSyHxLHHPZ/IJ9hH6X/l4WM
-         9fq6OtuN5sKeR7SAkmrJU2UVPDb/Hdx4C4Qsm+opMN4VdE9eVtrPzM1CbSm5AB6mRr0a
-         VV2dYenznVMFEHLCN7RTQ3/8g9Ktky8JtMO0N+aHLa6FzrqPoS0LXu373YMJ+e9hcu/u
-         Z7KX3oC07Sa3qCZtkGANw1HceMDAaOcwvvvH/byHu31frsz8zNZg/e43biYqVSDeyZWr
-         98fVK7jPmddHpJz+FY51Kq+yaOLKEQeT6vwHob+gJxmTRZqEZXTkkIjpkjTh/LkdO5yW
-         QGnQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=zq1H+uB2+TPFwR7JPq5kiGxVeV7Cch9Igvb+l9VMkoU=;
-        b=U+OXIr9r+XgSVm6FBNMZuunzjxpbbkax0/pXQHualnR7DjMbUWQyxFX7obQsIsVa2G
-         FvaDx2+UuiAfJZHoBRcDprPnalz1b6U+Q5ajuvccrM1GDzZrjNfXtxyCG+DFN+SepBbl
-         7rjMKdlHLEukJu4VCrQUAHn1YAgCkvaR6y+lOW3yM8Zy/mQYlmiSN2vkSCJV4jmYpes3
-         thsVR7pisbCSCIMVmTZxHevcyYJYikIhsYp30l7SJ1+PzkbMhrKBVVZSZl8fq3ppVTB5
-         FduQ9N2bhYUmIZGrPXmZbqQYyM8e9T+vGejOBAb2uJRnqIjSz220iWn6+w7nC3DNaTgD
-         VfBQ==
-X-Gm-Message-State: AFqh2krYENB/5XHkRjXJEBSxvHTN2bjrj1MSopu6rQSWRPzE4EYL9tIZ
-        GJaZ4v59ZR45K4JlLzn+6cc=
-X-Google-Smtp-Source: AMrXdXsm1ZesheS5aaRquP+/qq4vvR+aTui9k5ETx9QVJ82Wf3o+MeYG325HuUvJ/BxY8vEaHZUewg==
-X-Received: by 2002:a17:902:ccce:b0:189:e577:c83e with SMTP id z14-20020a170902ccce00b00189e577c83emr62761826ple.36.1672944985441;
-        Thu, 05 Jan 2023 10:56:25 -0800 (PST)
-Received: from localhost (2603-800c-1a02-1bae-a7fa-157f-969a-4cde.res6.spectrum.com. [2603:800c:1a02:1bae:a7fa:157f:969a:4cde])
-        by smtp.gmail.com with ESMTPSA id b14-20020a170903228e00b00192e7269af1sm3764350plh.253.2023.01.05.10.56.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 05 Jan 2023 10:56:24 -0800 (PST)
-Sender: Tejun Heo <htejun@gmail.com>
-Date:   Thu, 5 Jan 2023 08:56:23 -1000
-From:   Tejun Heo <tj@kernel.org>
-To:     axboe@kernel.dk, josef@toxicpanda.com, hch@lst.de
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCHSET block/for-next] blkcg: Improve blkg config helpers and
- make iolatency init lazy
-Message-ID: <Y7cdV0vlExjtkF6C@slm.duckdns.org>
-References: <20230105002007.157497-1-tj@kernel.org>
+        with ESMTP id S234650AbjAET24 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 5 Jan 2023 14:28:56 -0500
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35A7F392F4;
+        Thu,  5 Jan 2023 11:23:56 -0800 (PST)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id CC3FB22A9F;
+        Thu,  5 Jan 2023 19:22:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+        t=1672946568; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=mg38u8VDBZl2kUeOIq51W5k4gswYU2BaFcdprzVD4ho=;
+        b=Pl5Grl6tSEVdgCpRGyl9PaXajNlIjlsYnWLjdUuBJ9XyAdWiXq6MEejzoZsxIUDGG6j+fT
+        lc67hk77bkVQlX0KMffLrClAfSEboithD4tgcYWrNKrRvGSfxo21bcE0CZXZWhS7vnheSM
+        E7b9KRVkcC/0SIePI5VNChHJAIe2xCE=
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 97374138DF;
+        Thu,  5 Jan 2023 19:22:48 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id bo3iI4gjt2N2EwAAMHmgww
+        (envelope-from <mkoutny@suse.com>); Thu, 05 Jan 2023 19:22:48 +0000
+Date:   Thu, 5 Jan 2023 20:22:47 +0100
+From:   Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>
+To:     Tejun Heo <tj@kernel.org>
+Cc:     Jinke Han <hanjinke.666@bytedance.com>, josef@toxicpanda.com,
+        axboe@kernel.dk, cgroups@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yinxin.x@bytedance.com, jack@suse.cz
+Subject: Re: [PATCH v3] blk-throtl: Introduce sync and async queues for
+ blk-throtl
+Message-ID: <20230105192247.GB16920@blackbody.suse.cz>
+References: <20221226130505.7186-1-hanjinke.666@bytedance.com>
+ <20230105161854.GA1259@blackbody.suse.cz>
+ <Y7cKf7IH+FJ/6IyV@slm.duckdns.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="eHhjakXzOLJAF9wJ"
 Content-Disposition: inline
-In-Reply-To: <20230105002007.157497-1-tj@kernel.org>
+In-Reply-To: <Y7cKf7IH+FJ/6IyV@slm.duckdns.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jan 04, 2023 at 02:20:03PM -1000, Tejun Heo wrote:
-> Hello,
-> 
-> * Improve blkg config helpers so that they can be used consistently for all
->   the existing use cases. This also allows keeps using the same bdev open
->   instance across lazy init of rq_qos policies.
-> 
-> * Update iolatency so that it initializes lazily when a latency target is
->   set for the first time. This avoids registering the rq_qos policy when
->   iolatency is not used which removes unnecessary calls into iolat from IO
->   hot paths.
 
-I forgot to update bfq. Will post v2 soon.
+--eHhjakXzOLJAF9wJ
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Thanks.
+On Thu, Jan 05, 2023 at 07:35:59AM -1000, Tejun Heo <tj@kernel.org> wrote:
+> Hard limits tend to make this sort of problems a lot more pronounced because
+> the existing mechanisms tend to break down for the users which are severely
+> throttled down even while the device as a whole is fairly idle. cpu.max
+> often triggers severe priority inversions too, so it isn't too surprising
+> that people hit severe priority inversion issues w/ io.max.
 
--- 
-tejun
+To be on the same page:
+1) severe PI == priority inversion across cgroups (progated e.g. via
+   global locks (as with cpu.max) or FS journal (as with io.max)),
+2) ordinary PI == priority inversion contained within a single cgroup,
+   i.e. no different from an under-provisioned system.
+
+The reported issue sounds like 2) but even with the separated queues 1)
+is still possible :-/
+
+> Another problem with blk-throttle is that it doesn't prioritize shared IOs
+> identified by bio_issue_as_root_blkg() like iolatency and iocost do, so
+> there can be very severe priority inversions when e.g. journal commit gets
+> trapped in a low priority cgroup further exacerbating issues like this.
+
+Thanks for the broader view. So the separated queues are certainly an
+improvement but ultimately a mechanism based on bio_issue_as_root_blkg()
+predicate and deferred throttling would be better? Or is permanent limit
+enforcement more important?
+
+Thanks,
+Michal
+
+--eHhjakXzOLJAF9wJ
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: Digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEARYIAB0WIQTrXXag4J0QvXXBmkMkDQmsBEOquQUCY7cjfQAKCRAkDQmsBEOq
+uXQsAP99LZP7f/n8ygASlLevHgj9Zm/D5kI8jlxOD2LanjzNzQD+JY4fvNFnGQmI
+edy1iZb/lxGcHMME7EZPqkuZJbXbcw4=
+=w2/G
+-----END PGP SIGNATURE-----
+
+--eHhjakXzOLJAF9wJ--
