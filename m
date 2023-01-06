@@ -2,179 +2,147 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19F23C4708D
-	for <linux-block@archiver.kernel.org>; Fri,  6 Jan 2023 15:51:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F23C9C3DA7A
+	for <linux-block@archiver.kernel.org>; Fri,  6 Jan 2023 16:28:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233792AbjAFPu5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 6 Jan 2023 10:50:57 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56398 "EHLO
+        id S235440AbjAFQ2H (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 6 Jan 2023 11:28:07 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49372 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229935AbjAFPu4 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 6 Jan 2023 10:50:56 -0500
-Received: from mail-qt1-x82d.google.com (mail-qt1-x82d.google.com [IPv6:2607:f8b0:4864:20::82d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C561E13D16
-        for <linux-block@vger.kernel.org>; Fri,  6 Jan 2023 07:50:49 -0800 (PST)
-Received: by mail-qt1-x82d.google.com with SMTP id v14so2380006qtq.3
-        for <linux-block@vger.kernel.org>; Fri, 06 Jan 2023 07:50:49 -0800 (PST)
+        with ESMTP id S235556AbjAFQ15 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 6 Jan 2023 11:27:57 -0500
+Received: from mail-il1-x134.google.com (mail-il1-x134.google.com [IPv6:2607:f8b0:4864:20::134])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8271976EE8
+        for <linux-block@vger.kernel.org>; Fri,  6 Jan 2023 08:27:55 -0800 (PST)
+Received: by mail-il1-x134.google.com with SMTP id h26so1190888ila.11
+        for <linux-block@vger.kernel.org>; Fri, 06 Jan 2023 08:27:55 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=toxicpanda-com.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:content-disposition:mime-version
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=/lXpoIfaZTxbS2QRN9RfCIEN9vyUFx7ZzXfKlV5Axnk=;
-        b=VczK0CKG873/g1w+1QU8CxC4ftcvgTK9vA6BMHGenhPMKFhjsXkZRbfOT4pEoXQCA1
-         lnG4mSp0PSQd2JDN7/u2OQ5wQ+CjOLSGcKZsUVwFW9Gk35pOGpqVOKYHxg+wJnvtojqO
-         aNSI0T2LMzmupUZ24i3q2hpCtGbnNx/SLO5PwdCXckdTW7A2lYCzEHO8VfwppiAZF05E
-         npc0j05wJsy4kyjjrKACUrExn4tf4EKaYdmCYm8InQvddpW10ZoehOlw5H+SOwPluG3R
-         MECpiIemvkgGMixzlYaPbtx4dbQ3HGKVp2yipd2vwrngoyI4A6QLf24YRRhNRs4HEh3f
-         PZiA==
+        bh=DKrVGoXgnsCRRWhNdnFQqDkSk2/oUR/D2swwml1Qvtg=;
+        b=L9lW01QDqfCm4ZMlYyKPm1q7/ijTTS4E7mQ25heYKwcVUKuIz+gRTfTbbMz9rwib7z
+         DDWFaALrx1BlWj096KM2Btl9fbk3JftoHqlKY6xmx7FXn6PrDhM130to6qtdilPu1wiI
+         RcN7L8ZUXLq6XFbSkHCO23pMOCVPfDeAzHvF6qsPYyT5UOnLEXMkjYsvSsuBwi3xjY6X
+         0wBZMRJmD5dp4py83bkz9Hhzk8Mz0EUMvITbVLqV/7sh53D9XqilxSaGzGg01PgoOMeI
+         cv0TcZoud9NTRTdau9oNCARUBok8FXFH5Pt7XAMZNemvOJTC8pNztbTL0CctHzterGdv
+         3+ZA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:content-disposition:mime-version
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=/lXpoIfaZTxbS2QRN9RfCIEN9vyUFx7ZzXfKlV5Axnk=;
-        b=X8XEW1CyR61OD29eVMcw9HkVEF4CeENxG4lu3CW/Pcny1ulNFvFqfnt2lmhnVRBj3M
-         8s/rdKy0RjC11pQePRfg8Hl7h0ee2Qb0x1bi3JCoqa7QzyBMrfj8IijdDhKOws18x7sr
-         YcNDqNVEQz5p8UQkmGUmbIGj6R/IMUA4UVjiCKgGxmrAv+Y26iBqtwQ7eQw7yK24DUrt
-         TunbuY7G+EmH41p+4ivvyFewjFzKFS1ttGg3r4rxFgroXzRv1pfR1Jz+ENPscaJhSYOc
-         aaazNmlggIgsETfiMIZYyxmcWD61PCj3O47hQIRJYSIT6rU7vm8c9aG0RwA8IqbX0OIc
-         K0ow==
-X-Gm-Message-State: AFqh2kr2jhoijl5+PPAZd//cFOvG0qy85QOOq2P9LfcKoH+FcErPDuWA
-        Rbff7K8Q4MhpcrQm0TVFSNSO+w==
-X-Google-Smtp-Source: AMrXdXtc7PWmTSHdCDcPJ2d/kmBDEJP1055b985rDFtVppY/PUVNujWwHos/D72bfVswPQ2KbSH8Mw==
-X-Received: by 2002:a05:622a:1f14:b0:3a5:43af:d7ac with SMTP id ca20-20020a05622a1f1400b003a543afd7acmr83801465qtb.67.1673020248733;
-        Fri, 06 Jan 2023 07:50:48 -0800 (PST)
-Received: from localhost (cpe-174-109-170-245.nc.res.rr.com. [174.109.170.245])
-        by smtp.gmail.com with ESMTPSA id s13-20020ac85ecd000000b003a69de747c9sm664205qtx.19.2023.01.06.07.50.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 06 Jan 2023 07:50:48 -0800 (PST)
-Date:   Fri, 6 Jan 2023 10:50:46 -0500
-From:   Josef Bacik <josef@toxicpanda.com>
-To:     lsf-pc@lists.linuxfoundation.org
-Cc:     linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-nvme@lists.infradead.org, bpf@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: LSF/MM/BPF: 2023: Call for Proposals
-Message-ID: <Y7hDVliKq+PzY1yY@localhost.localdomain>
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=DKrVGoXgnsCRRWhNdnFQqDkSk2/oUR/D2swwml1Qvtg=;
+        b=jCbfXdeYxubaTvSgKLR/y9XiZnxnOjEdUzCyVV2uQqdhZ7nUk4bxrnItexbrnfEoCP
+         CRuvOJa0CjGsvhLxyxZSBQtCtJqQrD3N/OyzBJV5oOO9WcG+T11IeA/J5kYxM8P5Li9N
+         gZskw5rqJmRYclXb6IkKuLOn8JoWDTzDd4CsdFFQUawSYtwQru5PC7QDjv4ETscxYcoh
+         OFg9HJc+HF4rZVP+mZUOufbPhxRBfyYrgOX1U357pA8G6d0WmI6RFi6LIGZps+RxB5Ht
+         VMFQmstEvB26u3IevYjEKn/8/tn8CoSC/Zaw89qlgk6fFNti2lgsWapENoipwJTUDocO
+         Y3aA==
+X-Gm-Message-State: AFqh2kqJDXALbzNnsRLtmfuxs6r7SEFkkm7Q299ieOTednE7hNKoF0UI
+        PnsA9YKa+eNA/b60u9anGINjEmaQfvXBDKaS
+X-Google-Smtp-Source: AMrXdXsyj8HBVpPifkgvKohnZ8og/i2acXs8OX4IR8KfmcpRIUzJIZiQT+YYueRSDH9taVHaCo4QRg==
+X-Received: by 2002:a92:d307:0:b0:30b:d947:6bc8 with SMTP id x7-20020a92d307000000b0030bd9476bc8mr7680607ila.1.1673022474734;
+        Fri, 06 Jan 2023 08:27:54 -0800 (PST)
+Received: from [192.168.1.94] ([207.135.234.126])
+        by smtp.gmail.com with ESMTPSA id f26-20020a02a11a000000b00389d6a02740sm408863jag.157.2023.01.06.08.27.54
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 06 Jan 2023 08:27:54 -0800 (PST)
+Message-ID: <e9134737-84e2-143c-258b-6945d492a789@kernel.dk>
+Date:   Fri, 6 Jan 2023 09:27:53 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
+ Thunderbird/102.6.0
+Content-Language: en-US
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From:   Jens Axboe <axboe@kernel.dk>
+Subject: [GIT PULL] Block fixes for 6.2-rc3
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The annual Linux Storage, Filesystem, Memory Management, and BPF
-(LSF/MM/BPF) Summit for 2023 will be held from May 8 to May 10 at the
-Vancouver Convention Center in Vancouver, British Columbia, Canada.
-LSF/MM/BPF is an invitation-only technical workshop to map out
-improvements to the Linux storage, filesystem, BPF, and memory
-management subsystems that will make their way into the mainline kernel
-within the coming years.
+Hi Linus,
 
-LSF/MM/BPF 2023 will be a three day, stand-alone conference with four
-subsystem-specific tracks, cross-track discussions, as well as BoF and
-hacking sessions.
+The big change here is obviously the revert of the pktcdvd driver
+removal. Outside of that, just minor tweaks. In detail:
 
-	https://events.linuxfoundation.org/lsfmm/
+- Re-instate the pktcdvd driver, which necessitates adding back
+  bio_copy_data_iter() and the fops->devnode() hook for now (me)
 
-On behalf of the committee I am issuing a call for agenda proposals
-that are suitable for cross-track discussion as well as technical
-subjects for the breakout sessions.
+- Fix for splitting of a bio marked as NOWAIT, causing either nowait
+  reads or writes to error with EAGAIN even if parts of the IO completed
+  (me)
 
-If advance notice is required for visa applications then please point
-that out in your proposal or request to attend, and submit the topic as
-soon as possible.
+- Fix for ublk, punting management commands to io-wq as they can all
+  easily block for extended periods of time (Ming)
 
-We're asking that you please let us know you want to be invited by March
-1, 2023.  We realize that travel is an ever changing target, but it
-helps us get an idea of possible attendance numbers.  Clearly things can
-and will change, so consider the request to attend deadline more about
-planning and less about concrete plans.
+- Removal of SRCU dependency for the block layer (Paul)
 
-1) Fill out the following Google form to request attendance and
-suggest any topics
+Please pull!
 
-	https://forms.gle/VKVXjWGBHZbnsz226
 
-In previous years we have accidentally missed people's attendance
-requests because they either didn't cc lsf-pc@ or we simply missed them
-in the flurry of emails we get.  Our community is large and our
-volunteers are busy, filling this out will help us make sure we don't
-miss anybody.
+The following changes since commit 1551ed5a178ca030adc92b1eb29157b5e92bf134:
 
-2) Proposals for agenda topics should still be sent to the following
-lists to allow for discussion among your peers.  This will help us
-figure out which topics are important for the agenda.
+  Merge tag 'nvme-6.2-2022-12-29' of git://git.infradead.org/nvme into block-6.2 (2022-12-29 11:31:45 -0700)
 
-        lsf-pc@lists.linux-foundation.org
+are available in the Git repository at:
 
-and CC the mailing lists that are relevant for the topic in question:
+  git://git.kernel.dk/linux.git tags/block-2023-01-06
 
-        FS:     linux-fsdevel@vger.kernel.org
-        MM:     linux-mm@kvack.org
-        Block:  linux-block@vger.kernel.org
-        ATA:    linux-ide@vger.kernel.org
-        SCSI:   linux-scsi@vger.kernel.org
-        NVMe:   linux-nvme@lists.infradead.org
-        BPF:    bpf@vger.kernel.org
+for you to fetch changes up to b2b50d572135c5c6e10c2ff79cd828d5a8141ef6:
 
-Please tag your proposal with [LSF/MM/BPF TOPIC] to make it easier to
-track. In addition, please make sure to start a new thread for each
-topic rather than following up to an existing one. Agenda topics and
-attendees will be selected by the program committee, but the final
-agenda will be formed by consensus of the attendees on the day.
+  block: Remove "select SRCU" (2023-01-05 08:50:10 -0700)
 
-3) This year we would like to try and make sure we are including new
-members in the community that the program committee may not be familiar
-with.  The Google form has an area for people to add required/optional
-attendees.  Please encourage new members of the community to submit a
-request for an invite as well, but additionally if maintainers or long
-term community members could add nominees to the form it would help us
-make sure that new members get the proper consideration.
+----------------------------------------------------------------
+block-2023-01-06
 
-For discussion leaders, slides and visualizations are encouraged to
-outline the subject matter and focus the discussions. Please refrain
-from lengthy presentations and talks; the sessions are supposed to be
-interactive, inclusive discussions.
+----------------------------------------------------------------
+Jens Axboe (5):
+      block: handle bio_split_to_limits() NULL return
+      block: don't allow splitting of a REQ_NOWAIT bio
+      Revert "block: bio_copy_data_iter"
+      Revert "block: remove devnode callback from struct block_device_operations"
+      Revert "pktcdvd: remove driver."
 
-The COVID related restrictions can be found here, however at this time
-there are no protocols defined.
+Ming Lei (1):
+      ublk: honor IO_URING_F_NONBLOCK for handling control command
 
-	https://events.linuxfoundation.org/lsfmm/attend/health-and-safety/
+Paul E. McKenney (1):
+      block: Remove "select SRCU"
 
-We are still looking into the virtual component.  We will likely run
-something similar to what we did in 2022, but details on that will be
-forthcoming.
+ Documentation/ABI/testing/debugfs-pktcdvd     |   18 +
+ Documentation/ABI/testing/sysfs-class-pktcdvd |   97 +
+ MAINTAINERS                                   |    7 +
+ block/Kconfig                                 |    1 -
+ block/bio.c                                   |   37 +-
+ block/blk-merge.c                             |   14 +-
+ block/blk-mq.c                                |    5 +-
+ block/genhd.c                                 |   11 +
+ drivers/block/Kconfig                         |   43 +
+ drivers/block/Makefile                        |    1 +
+ drivers/block/drbd/drbd_req.c                 |    2 +
+ drivers/block/pktcdvd.c                       | 2944 +++++++++++++++++++++++++
+ drivers/block/ps3vram.c                       |    2 +
+ drivers/block/ublk_drv.c                      |    3 +
+ drivers/md/dm.c                               |    2 +
+ drivers/md/md.c                               |    2 +
+ drivers/nvme/host/multipath.c                 |    2 +
+ drivers/s390/block/dcssblk.c                  |    2 +
+ include/linux/bio.h                           |    2 +
+ include/linux/blkdev.h                        |    1 +
+ include/linux/pktcdvd.h                       |  197 ++
+ include/uapi/linux/pktcdvd.h                  |  112 +
+ 22 files changed, 3487 insertions(+), 18 deletions(-)
+ create mode 100644 Documentation/ABI/testing/debugfs-pktcdvd
+ create mode 100644 Documentation/ABI/testing/sysfs-class-pktcdvd
+ create mode 100644 drivers/block/pktcdvd.c
+ create mode 100644 include/linux/pktcdvd.h
+ create mode 100644 include/uapi/linux/pktcdvd.h
 
-2022: https://lwn.net/Articles/lsfmm2022/
+-- 
+Jens Axboe
 
-2019: https://lwn.net/Articles/lsfmm2019/
-
-2018: https://lwn.net/Articles/lsfmm2018/
-
-2017: https://lwn.net/Articles/lsfmm2017/
-
-2016: https://lwn.net/Articles/lsfmm2016/
-
-2015: https://lwn.net/Articles/lsfmm2015/
-
-2014: http://lwn.net/Articles/LSFMM2014/
-
-3) If you have feedback on last year's meeting that we can use to
-improve this year's, please also send that to:
-
-        lsf-pc@lists.linux-foundation.org
-
-Thank you on behalf of the program committee:
-
-        Josef Bacik (Filesystems)
-        Amir Goldstein (Filesystems)
-        Martin K. Petersen (Storage)
-        Javier González (Storage)
-        Michal Hocko (MM)
-        Dan Williams (MM)
-        Martin KaFai Lau (BPF)
-        Daniel Borkmann (BPF)
