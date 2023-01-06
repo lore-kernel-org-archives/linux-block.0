@@ -2,127 +2,117 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D02DEC3DA7A
-	for <linux-block@archiver.kernel.org>; Fri,  6 Jan 2023 20:19:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5BADC61DB3
+	for <linux-block@archiver.kernel.org>; Fri,  6 Jan 2023 20:34:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231690AbjAFUTb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 6 Jan 2023 15:19:31 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56672 "EHLO
+        id S235330AbjAFUej (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 6 Jan 2023 15:34:39 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39144 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236357AbjAFUTC (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 6 Jan 2023 15:19:02 -0500
-Received: from mail-pg1-x534.google.com (mail-pg1-x534.google.com [IPv6:2607:f8b0:4864:20::534])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B88F3C71C;
-        Fri,  6 Jan 2023 12:18:44 -0800 (PST)
-Received: by mail-pg1-x534.google.com with SMTP id d10so1871727pgm.13;
-        Fri, 06 Jan 2023 12:18:44 -0800 (PST)
+        with ESMTP id S229552AbjAFUeO (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 6 Jan 2023 15:34:14 -0500
+Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F19555AC40;
+        Fri,  6 Jan 2023 12:34:12 -0800 (PST)
+Received: by mail-pl1-x62b.google.com with SMTP id p24so2829769plw.11;
+        Fri, 06 Jan 2023 12:34:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:sender
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=pkeYcttUcyfVrFL8X+osrQ13cRbijdYYhUpcZOzwgVQ=;
-        b=TVhIvkrP1GydF6XTEwRgMc0p7+PudExrV0d9GFdbYVxpNRsluyY1colI3e/NeKEtfU
-         s/Eizxr1yYhXxQrAX9ywQiW2ITYXw49/JBSP2VERJMGlcIuUKEk1ZAQixCDviFa+0aZV
-         6Bnr7lfzH1wm8zI4+lk+YeF2UM4Bh7q/ocrTurSu/Q6A/auHyG9ckPAKZh+NPzFvwsyM
-         gGVsxz4EELJ58//kjaxDrXlLlZLupXJsVMzZLdK89y8YW/RoOJkHg+awQTiMxq6gpeyI
-         mohFe/Ml0fFJ/oK6h0uGIv6bsMK7IvAQgRAcZuVCXQQ9eih1lSW7Qkp7rSHskDR0rpAn
-         FD5g==
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=4DT+/huwtQo/Hb3OM+ZFYw7lz+P7V1u4iH9OMjxXR9I=;
+        b=TyYWgfhTM3HUIjd7gJ5EtNhIsQmtclO/JJBnQw05cqqM1htMS9Iz4jj3hqvCi5jHsd
+         Z7ErPjOy50rpGgRl4d+ka6KQKzbEhjB2GCPvY/WkURtIVtk7LK0O/woLERu5lz+56kIZ
+         kGiFsrYvyNSPgl0dCRopGB5pAhsjOTXAKf+1fkGHNnamy5aSmgKkOkXzouZzR/yerIKU
+         rzotxk8KfwqpTi3NgVJr6VljHEznnM53vevaUGvmpKnVHt3Lu23pC6gr5Hyd7oXbdEw4
+         7BlRkXXtLuLN3PSJZFIArc/DDmQlpvk2e02Wce5tLtCFI39xGB91YFWFBBO8CTqLDkeL
+         jweg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:sender
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=pkeYcttUcyfVrFL8X+osrQ13cRbijdYYhUpcZOzwgVQ=;
-        b=Uchti6I3Ae7T7LoV5crkWVhEezXuwrYoQKDz6443tbkbG3wOh1Xs8Br1nh7Ij4+EnK
-         5V/69SduuiVEFd/SEHg52ELsmxchA0sn5N17MnZ5nIcNVSRDwjvqi3dmvUPIyiFbpEZF
-         m6j99kfi801bpyvzUlJc03tOtEhkdVrFopH47M9NcSH4J7ae5gpmpOVO3GAynl7gJMCd
-         89PtrMyXrbX+LbOF94SI0F+vn5JcN4GsDMtz5o+NRQKHYFI58DDDA61YYzPfpdn9y/Xm
-         WTijux+xjaB+WsE56QddM0AhnPhMPETArEoUVi92oQmLJxMa3uG/efbhFzrsNXoNRAb/
-         QUmQ==
-X-Gm-Message-State: AFqh2kolAS6OMokiyQpwSqXMhB5X44umMaCqhg+n8THmAswMRue80eHA
-        FR4jhJMbpyCKd0grbyjN+uQ=
-X-Google-Smtp-Source: AMrXdXt2A9473kqnImKIHqnN0Y3fAk6hSHiIirDvHd4RwRDUYPsDbcaw4Q3ijpC8TG3n3ohCfojBCw==
-X-Received: by 2002:aa7:96f9:0:b0:582:7007:3fec with SMTP id i25-20020aa796f9000000b0058270073fecmr20068579pfq.11.1673036323362;
-        Fri, 06 Jan 2023 12:18:43 -0800 (PST)
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=4DT+/huwtQo/Hb3OM+ZFYw7lz+P7V1u4iH9OMjxXR9I=;
+        b=lLgqaCBILuRAf0U2L95yL/RvweHsxsgUZv1XJBFbQT1ZvCvd+J4pAZmoWbpLVNjEvd
+         IkKvu+XhlxUd0gDANoGdf9wk4UCuCqOyFG76zOC9pJWjuBrQ8bm92T+LzK9cO3CPKP0e
+         /uu3meHUSdjalw+loDCe/vHRl1m4Lf0XFL1rHErGkEcQO/ODzjHxBOvtZeU49d/FpKaX
+         MoMXyX2frh3I3GhbId8LvMRhN7SO5S18D+IFhl/5i7pLaugvt0T4In1dAnRRojGLT9fh
+         g82xhfJRngwAdeTr+OJ1JfjF0Ct/1czdoGIQpu8DVo13dS3p1CCpM9XtD20Oh8wACzdO
+         0s+g==
+X-Gm-Message-State: AFqh2koGBYwweZAU68lUmghyhG0ET7iMK1FY7xTrxS8Svdeh1dZssu4n
+        XReUQAUmZG7xQsamNNou4gc=
+X-Google-Smtp-Source: AMrXdXu3ANdUQS5ELLp6Ej4q37pOTz53uQtmaHIHheb8C65lnfc0UhC5Mwve6aC06Y3kdcmsXgBpug==
+X-Received: by 2002:a05:6a20:bb10:b0:ad:2c7c:9510 with SMTP id fc16-20020a056a20bb1000b000ad2c7c9510mr62398353pzb.19.1673037252423;
+        Fri, 06 Jan 2023 12:34:12 -0800 (PST)
 Received: from localhost (2603-800c-1a02-1bae-a7fa-157f-969a-4cde.res6.spectrum.com. [2603:800c:1a02:1bae:a7fa:157f:969a:4cde])
-        by smtp.gmail.com with ESMTPSA id b29-20020a62a11d000000b005769ccca18csm1480351pff.85.2023.01.06.12.18.42
+        by smtp.gmail.com with ESMTPSA id k15-20020a170902c40f00b0019276616e9fsm1310530plk.183.2023.01.06.12.34.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 06 Jan 2023 12:18:42 -0800 (PST)
+        Fri, 06 Jan 2023 12:34:12 -0800 (PST)
 Sender: Tejun Heo <htejun@gmail.com>
-Date:   Fri, 6 Jan 2023 10:18:41 -1000
+Date:   Fri, 6 Jan 2023 10:34:10 -1000
 From:   Tejun Heo <tj@kernel.org>
-To:     Yu Kuai <yukuai1@huaweicloud.com>
-Cc:     hch@infradead.org, josef@toxicpanda.com, axboe@kernel.dk,
-        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, yi.zhang@huawei.com,
-        "yukuai (C)" <yukuai3@huawei.com>
-Subject: Re: [PATCH v2 1/2] blk-iocost: add refcounting for iocg
-Message-ID: <Y7iCId3pnEnLqY8G@slm.duckdns.org>
-References: <20221227125502.541931-1-yukuai1@huaweicloud.com>
- <20221227125502.541931-2-yukuai1@huaweicloud.com>
- <Y7XzUee5Bq+DoIC1@slm.duckdns.org>
- <c63ee2ad-23d5-3be0-c731-28494398b391@huaweicloud.com>
- <Y7cX0SJ0y6+EIY5Q@slm.duckdns.org>
- <7dcdaef3-65c1-8175-fea7-53076f39697f@huaweicloud.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Dan Carpenter <error27@gmail.com>, Christoph Hellwig <hch@lst.de>,
+        Luis Chamberlain <mcgrof@kernel.org>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH block/for-6.2-fixes] block: Drop spurious might_sleep() from
+ blk_put_queue()
+Message-ID: <Y7iFwjN+XzWvLv3y@slm.duckdns.org>
+References: <Y7g3L6fntnTtOm63@kili>
+ <Y7hbYPSdLqW++y/p@slm.duckdns.org>
+ <9ac3390c-055b-546c-f1f4-68350dfe04f8@kernel.dk>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <7dcdaef3-65c1-8175-fea7-53076f39697f@huaweicloud.com>
+In-Reply-To: <9ac3390c-055b-546c-f1f4-68350dfe04f8@kernel.dk>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Jan 06, 2023 at 09:08:45AM +0800, Yu Kuai wrote:
-> Hi,
-> 
-> 在 2023/01/06 2:32, Tejun Heo 写道:
-> > On Thu, Jan 05, 2023 at 09:14:07AM +0800, Yu Kuai wrote:
-> > > 1) is related to blkg, while 2) is not, hence refcnting from blkg can't
-> > > fix the problem. refcnting from blkcg_policy_data should be ok, but I
-> > > see that bfq already has the similar refcnting, while other policy
-> > > doesn't require such refcnting.
-> > 
-> > Hmm... taking a step back, wouldn't this be solved by moving the first part
-> > of ioc_pd_free() to pd_offline_fn()? The ordering is strictly defined there,
-> > right?
-> > 
-> 
-> Moving first part to pd_offline_fn() has some requirements, like what I
-> did in the other thread:
-> 
-> iocg can be activated again after pd_offline_fn(), which is possible
-> because bio can be dispatched when cgroup is removed. I tried to avoid
-> that by:
-> 
-> 1) dispatch all throttled bio io ioc_pd_offline()
-> 2) don't throttle bio after ioc_pd_offline()
-> 
-> However, you already disagreed with that. 😔
+Dan reports the following smatch detected the following:
 
-Okay, I was completely wrong while I was replying to your original patch.
-Should have looked at the code closer, my apologies.
+  block/blk-cgroup.c:1863 blkcg_schedule_throttle() warn: sleeping in atomic context
 
-What I missed is that pd_offline doesn't happen when the cgroup goes
-offline. Please take a look at the following two commits:
+caused by blkcg_schedule_throttle() calling blk_put_queue() in an
+non-sleepable context.
 
- 59b57717fff8 ("blkcg: delay blkg destruction until after writeback has finished")
- d866dbf61787 ("blkcg: rename blkcg->cgwb_refcnt to ->online_pin and always use it")
+blk_put_queue() acquired might_sleep() in 63f93fd6fa57 ("block: mark
+blk_put_queue as potentially blocking") which transferred the might_sleep()
+from blk_free_queue().
 
-After the above two commits, ->pd_offline_fn() is called only after all
-possible writebacks are complete, so it shouldn't allow mass escapes to
-root. With writebacks out of the picture, it might be that there can be no
-further IOs once ->pd_offline_fn() is called too as there can be no tasks
-left in it and no dirty pages, but best to confirm that.
+blk_free_queue() acquired might_sleep() in e8c7d14ac6c3 ("block: revert back
+to synchronous request_queue removal") while turning request_queue removal
+synchronous. However, this isn't necessary as nothing in the free path
+actually requires sleeping.
 
-So, yeah, the original approach you took should work although I'm not sure
-the patches that you added to make offline blkg to bypass are necessary
-(that also contributed to my assumption that there will be more IOs on those
-blkg's). Have you seen more IOs coming down the pipeline after offline? If
-so, can you dump some backtraces and see where they're coming from?
+It's pretty unusual to require a sleeping context in a put operation and
+it's not needed in the first place. Let's drop it.
 
-Thanks.
+Signed-off-by: Tejun Heo <tj@kernel.org>
+Reported-by: Dan Carpenter <error27@gmail.com>
+Link: https://lkml.kernel.org/r/Y7g3L6fntnTtOm63@kili
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Luis Chamberlain <mcgrof@kernel.org>
+Fixes: e8c7d14ac6c3 ("block: revert back to synchronous request_queue removal") # v5.9+
+--
+ block/blk-core.c |    3 ---
+ 1 file changed, 3 deletions(-)
 
--- 
-tejun
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 9321767470dc..b5098355d8b2 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -283,12 +283,9 @@ static void blk_free_queue(struct request_queue *q)
+  *
+  * Decrements the refcount of the request_queue and free it when the refcount
+  * reaches 0.
+- *
+- * Context: Can sleep.
+  */
+ void blk_put_queue(struct request_queue *q)
+ {
+-	might_sleep();
+ 	if (refcount_dec_and_test(&q->refs))
+ 		blk_free_queue(q);
+ }
