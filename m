@@ -2,160 +2,123 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A4EB6C3DA7A
-	for <linux-block@archiver.kernel.org>; Fri,  6 Jan 2023 17:33:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77B5CC54EBD
+	for <linux-block@archiver.kernel.org>; Fri,  6 Jan 2023 18:03:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233742AbjAFRd0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 6 Jan 2023 12:33:26 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33450 "EHLO
+        id S235556AbjAFSDo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 6 Jan 2023 13:03:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49466 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231860AbjAFRdZ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 6 Jan 2023 12:33:25 -0500
-Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2FEE3736E9;
-        Fri,  6 Jan 2023 09:33:23 -0800 (PST)
-Received: by mail-pl1-x635.google.com with SMTP id p24so2306561plw.11;
-        Fri, 06 Jan 2023 09:33:23 -0800 (PST)
+        with ESMTP id S235636AbjAFSDn (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 6 Jan 2023 13:03:43 -0500
+Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 195D57CDF4;
+        Fri,  6 Jan 2023 10:03:42 -0800 (PST)
+Received: by mail-pl1-x62d.google.com with SMTP id d3so2392705plr.10;
+        Fri, 06 Jan 2023 10:03:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=yMcDfkI0rlioSp3cevcHgp/4Iw+XQm90p8imIzrlRw8=;
-        b=Yzycu3lj0Teez9Xakr7BNa3mIWk3E9hAEauKy0IBLT18vgvEeAyy1hJj8RemL9Jx5L
-         R6IFeNfbBASyfRTOAq2QmJS+K2ZQ2kv/g9cZhsLQY9jcwxVWEjn6ZTpfkHwcc3iTmaw7
-         AZoUoWeuiutkRKGEDyCE9Hax1892cWAPGnaaIVSoupVptbVykPEbwmU5fYxPAUpS0CbT
-         7XIDfFC4PghanMJkJtW0NnrSUM4/vN7hozzmf1/1OYdasrcMjPbJYdpX9B2frbz5joTi
-         LstA0vpWZFz2P+n5tsqKSTrgaXaoDluOq4eiB6Dcakd3ek1IJwqbc1D2p7xULQYJCXNH
-         0gQg==
+        bh=vWDaqFMcXX5TWgX/5qac+ZYspgZYWZjBytjPR/OEpdE=;
+        b=Ewzi0VtBGhfV/3Ib8M1v3WCtChhF7KVlZw1ioqaD5XYElVwOrb/AWAW7lHdqfrGSUJ
+         wJCrQdP6xEk6gdAuCZnjQDXPTjXg0FHoJR3l5orpl5WvfL3YiMf4jLEAj02bOJkMOsnP
+         Z3in5vrXPWwdpZsv1tDew0/3NNVH80TvfrcRkR14Or1K7j63HZkvKu3j8uiYv26rLdWn
+         tKmwhytA7AMiNQf1/QhprOgKB44ilfeFP7BAojVrTLQpHm7HXLsosbgrFAoBSTcA5/Pd
+         qasz8QCWc89G3Cjd6KoZBepaX4Ri3mO9WUgbF+TmfKSUGLzgSvcOBC4iPE17dzt7Nxnn
+         TuOg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=yMcDfkI0rlioSp3cevcHgp/4Iw+XQm90p8imIzrlRw8=;
-        b=3VNqDitOPK7eprBHjd0t09bS+2pc75U6//UZ1aN3ag8XNl4KPCBLEvYqFKwNUEVXDQ
-         K0j0996azagVUrfKry3bxWnIiy34DhnbDHSmSx/W680B+QYnMbNhalod4tRAFcDDOerV
-         9oqCzweQJdO9oPj9Q2gFN88ZYpLOWalRPhADQRZ+6+v/yV1Bmq0xHvlagnRv93cR0xDR
-         SaYYQKiAdRMpkg1wdjbBl1O9/HN4XJvi6ojmPO/50DoGsxzg32YtQ1mfM9hMead1xV6L
-         K2vrsUbjQ5bW5OtHQBgemYAo8mtOz55ojXn83VvnwH2+voT1k/XIdQeta5WrA/XTglmu
-         fiBQ==
-X-Gm-Message-State: AFqh2krgTkNesFNDGCuS4S7SNh1HrRpmUAMFUyljKlGAMuXbHfokoZhg
-        yGTItcX+YfXTdIyY/XMY8e0=
-X-Google-Smtp-Source: AMrXdXvcLcUVGwQBvGXNpz0c5ypR8tSyiua3MTdcNRrPMkc6HXaM5prd/8mFwlAtM7jmLT6wEoDJ/Q==
-X-Received: by 2002:a05:6a20:13a6:b0:af:9c75:6699 with SMTP id w38-20020a056a2013a600b000af9c756699mr93581078pzh.1.1673026402534;
-        Fri, 06 Jan 2023 09:33:22 -0800 (PST)
+        bh=vWDaqFMcXX5TWgX/5qac+ZYspgZYWZjBytjPR/OEpdE=;
+        b=sOwoOppeagU9iz9VQGayMsfixerMIUIpsbD7V4Q//+XfomBP5ur0X5673ezMOCYGgG
+         W9BKaZ8s6VzXg/6IV6qq8QtSYNR3xk7/zC6xOwuUj8vubuTdPs07MRpqh8Eu00IKq+0r
+         Dp6VSDLoW0UGWan3bEsfOxZUgJpUZygSneL6/BqFaNNJQuENIIM1Yb3C7ky+Bhr7vIEN
+         5FmGKIKz28n7LIoZjnWwxjugTfLuBGpLZbXBDefBU01ZwQN70dq0yQvuW9UzxK26hJWD
+         uIFlvSLtGPJVNG/tlN8zmS/Tz4omBHJakJByZzftalVRQROHZwXkDawUi9QBO0nw33aX
+         iEkA==
+X-Gm-Message-State: AFqh2krUKxnzPOBFziI4sOoGvmvYl2qNeKAwdkBJCrjnjv/cSatcu0Hq
+        /qvX0lt90GFChkGIXtf1iwE=
+X-Google-Smtp-Source: AMrXdXt3Si1Cghhk/yKA0O+DIxU+4J57vpMQfyfJD76gnF0eoT92xWESDplshrlIrVeNyzCJYiaidQ==
+X-Received: by 2002:a17:902:ab85:b0:192:f469:5283 with SMTP id f5-20020a170902ab8500b00192f4695283mr9933663plr.3.1673028221366;
+        Fri, 06 Jan 2023 10:03:41 -0800 (PST)
 Received: from localhost (2603-800c-1a02-1bae-a7fa-157f-969a-4cde.res6.spectrum.com. [2603:800c:1a02:1bae:a7fa:157f:969a:4cde])
-        by smtp.gmail.com with ESMTPSA id a13-20020aa7970d000000b00582197fa7b4sm1397020pfg.7.2023.01.06.09.33.21
+        by smtp.gmail.com with ESMTPSA id c4-20020a170902c1c400b00189af02aba4sm1294355plc.3.2023.01.06.10.03.39
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 06 Jan 2023 09:33:21 -0800 (PST)
+        Fri, 06 Jan 2023 10:03:40 -0800 (PST)
 Sender: Tejun Heo <htejun@gmail.com>
-Date:   Fri, 6 Jan 2023 07:33:20 -1000
+Date:   Fri, 6 Jan 2023 08:03:38 -1000
 From:   Tejun Heo <tj@kernel.org>
-To:     Dan Carpenter <error27@gmail.com>, Christoph Hellwig <hch@lst.de>,
-        Luis Chamberlain <mcgrof@kernel.org>,
-        Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [bug report] memcontrol: schedule throttling if we are congested
-Message-ID: <Y7hbYPSdLqW++y/p@slm.duckdns.org>
-References: <Y7g3L6fntnTtOm63@kili>
+To:     Damien Le Moal <damien.lemoal@opensource.wdc.com>
+Cc:     linux-ide@vger.kernel.org, linux-block@vger.kernel.org,
+        Jens Axboe <axboe@kernel.dk>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Hannes Reinecke <hare@suse.de>, Christoph Hellwig <hch@lst.de>,
+        Niklas Cassel <niklas.cassel@wdc.com>
+Subject: Re: [PATCH v7 0/7] Improve libata support for FUA
+Message-ID: <Y7hiemMjV5y/ToIF@slm.duckdns.org>
+References: <20230103051924.233796-1-damien.lemoal@opensource.wdc.com>
+ <Y7WuEqMgySOCCTqy@slm.duckdns.org>
+ <79260c74-92dd-2cdf-ad71-e70d9fa0f8a9@opensource.wdc.com>
+ <Y7cT3SSssHzBYqU4@slm.duckdns.org>
+ <b5c57ca5-49b0-b9c6-4a65-a8867a74e950@opensource.wdc.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Y7g3L6fntnTtOm63@kili>
+In-Reply-To: <b5c57ca5-49b0-b9c6-4a65-a8867a74e950@opensource.wdc.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 Hello,
 
-(cc'ing Luis, Christoph and Jens and quoting whole body)
+On Fri, Jan 06, 2023 at 03:51:48PM +0900, Damien Le Moal wrote:
+> OK. Granted. But for this particular case, scsi & nvme subsystem do not
+> treat FUA as "optional". If it is supported, it will be used even though
+> you are correct that we can work without it. I do not think we should
+> treat ATA devices any differently.
 
-On Fri, Jan 06, 2023 at 05:58:55PM +0300, Dan Carpenter wrote:
-> Hello Tejun Heo,
-> 
-> The patch 2cf855837b89: "memcontrol: schedule throttling if we are
-> congested" from Jul 3, 2018, leads to the following Smatch static
-> checker warning:
-> 
-> block/blk-cgroup.c:1863 blkcg_schedule_throttle() warn: sleeping in atomic context
-> 
-> The call tree looks like:
-> 
-> ioc_rqos_merge() <- disables preempt
-> __cgroup_throttle_swaprate() <- disables preempt
-> -> blkcg_schedule_throttle()
-> 
-> Here is one of the callers:
-> mm/swapfile.c
->   3657          spin_lock(&swap_avail_lock);
->                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-> Takes spin lock.
-> 
->   3658          plist_for_each_entry_safe(si, next, &swap_avail_heads[nid],
->   3659                                    avail_lists[nid]) {
->   3660                  if (si->bdev) {
->   3661                          blkcg_schedule_throttle(si->bdev->bd_disk, true);
->                                 ^^^^^^^^^^^^^^^^^^^^^^^
-> Calls blkcg_schedule_throttle().
-> 
->   3662                          break;
->   3663                  }
->   3664          }
-> 
-> block/blk-cgroup.c
->   1851  void blkcg_schedule_throttle(struct gendisk *disk, bool use_memdelay)
->   1852  {
->   1853          struct request_queue *q = disk->queue;
->   1854  
->   1855          if (unlikely(current->flags & PF_KTHREAD))
->   1856                  return;
->   1857  
->   1858          if (current->throttle_queue != q) {
->   1859                  if (!blk_get_queue(q))
->   1860                          return;
->   1861  
->   1862                  if (current->throttle_queue)
->   1863                          blk_put_queue(current->throttle_queue);
->                                 ^^^^^^^^^^^^^^
-> Sleeps.
-> 
->   1864                  current->throttle_queue = q;
->   1865          }
->   1866  
->   1867          if (use_memdelay)
->   1868                  current->use_memdelay = use_memdelay;
->   1869          set_notify_resume(current);
->   1870  }
+What matters isn't that they have a featured with the same name but the
+actual circumstances. e.g. for nvme, FUA has been there from the beginning
+and we used it from the beginning so we know that they're safe. For ATA,
+it's something added later on and we know that there are a bunch of devices
+which choke on it and we don't know whether anyone else is using it at any
+scale.
 
-In general, it's quite unusual for a put operation to require a sleepable
-context and I could be missing sth but the actual put / release paths don't
-seem to actually need might_sleep(). It seems sprious.
+> > On a quick glance, there are some uses of REQ_FUA w/o REQ_PREFLUSH which
+> > indicates that there can be actual gains to be had. However, ext4 AFAICS
+> > always pairs PREFLUSH w/ FUA, so a lot of use cases won't see any gain while
+> > taking on the possible risk of being exposed to FUA commands.
+> 
+> Yes. Most FSes will do PREFLUSH | FUA. For the risk, see above.
 
-The might_sleep() in put was added by Christoph's 63f93fd6fa57 ("block: mark
-blk_put_queue as potentially blocking") which promoted it from release to
-put cuz the caller usually can't tell whether its put is the last put.
+Someone should benchmark it but it's likelyt that PREFLUSH | FUA vs.
+PREFLUSH | WRITE | POSTFLUSH isn't gonna show any meaningful difference in
+any realistic scenario. The main gain of NCQ'd FUA is that we don't have to
+drain the in-flight commands but PREFLUSH needs that anyway.
 
-And that put in release was added by Luis in e8c7d14ac6c3 ("block: revert
-back to synchronous request_queue removal") while making the release path
-synchronous, the rationale being that releasing asynchronously makes dynamic
-device removal / readdition behaviors unpredictable and it also seems to
-note that might_sleep() is no longer needed but still kept, which seems a
-bit odd to me.
+> > I feel rather uneasy about enabling FUA by default given history. We can
+> > improve its chances by restricting it to newer devices and maybe even just
+> > hard disks, but it kinda comes back to the root question of why. Why would
+> > we want to do this? What are the benefits? Right now, there are a bunch of
+> > really tricky cons and not whole lot on the pro column.
+> 
+> OK. But again, why treat ATA devices differently from scsi/nvme/ufs ?
+> These have FUA used by default if it is supported.
 
-Here's my take on it:
+This part hopefully is answered above.
 
-* Let's please not require a sleepable context in a put operation. It's
-  unusual, inconvenient and error-prone, and likely to cause its users to
-  implement multiple copies of async mechanisms around it.
+> We can take a big hammer here and start with enabling only ACS-5 and
+> above for now. That will represent the set of devices that are in
+> development right now, and only a few already released (I have some in
+> my test boxes and they are not even a few months old...).
 
-* A better way to deal with removal / readdition race is flushing release
-  operaitons either at the end of removal or before trying to add something
-  (you can get fancy w/ flushing only if there's name collision too), not
-  making a put path synchronously call release which needs to sleep.
-
-* If might_sleep() is currently not needed, let's please drop it. It just
-  makes people scratch their head when reading the code.
+All that said, yeah, if we restrict it to only the newest devices, they're
+more likely to be well behaved and a lot more visible when they misbehave.
+That sounds reasonable to me.
 
 Thanks.
 
