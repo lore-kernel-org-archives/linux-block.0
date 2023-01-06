@@ -2,125 +2,100 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77B5CC54EBD
-	for <linux-block@archiver.kernel.org>; Fri,  6 Jan 2023 18:03:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41A6BC3DA7A
+	for <linux-block@archiver.kernel.org>; Fri,  6 Jan 2023 18:08:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235556AbjAFSDo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 6 Jan 2023 13:03:44 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49466 "EHLO
+        id S229547AbjAFSII (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 6 Jan 2023 13:08:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50728 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235636AbjAFSDn (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 6 Jan 2023 13:03:43 -0500
-Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 195D57CDF4;
-        Fri,  6 Jan 2023 10:03:42 -0800 (PST)
-Received: by mail-pl1-x62d.google.com with SMTP id d3so2392705plr.10;
-        Fri, 06 Jan 2023 10:03:42 -0800 (PST)
+        with ESMTP id S229448AbjAFSIH (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 6 Jan 2023 13:08:07 -0500
+Received: from mail-pf1-x429.google.com (mail-pf1-x429.google.com [IPv6:2607:f8b0:4864:20::429])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E60861A05C
+        for <linux-block@vger.kernel.org>; Fri,  6 Jan 2023 10:07:43 -0800 (PST)
+Received: by mail-pf1-x429.google.com with SMTP id a184so1612024pfa.9
+        for <linux-block@vger.kernel.org>; Fri, 06 Jan 2023 10:07:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=vWDaqFMcXX5TWgX/5qac+ZYspgZYWZjBytjPR/OEpdE=;
-        b=Ewzi0VtBGhfV/3Ib8M1v3WCtChhF7KVlZw1ioqaD5XYElVwOrb/AWAW7lHdqfrGSUJ
-         wJCrQdP6xEk6gdAuCZnjQDXPTjXg0FHoJR3l5orpl5WvfL3YiMf4jLEAj02bOJkMOsnP
-         Z3in5vrXPWwdpZsv1tDew0/3NNVH80TvfrcRkR14Or1K7j63HZkvKu3j8uiYv26rLdWn
-         tKmwhytA7AMiNQf1/QhprOgKB44ilfeFP7BAojVrTLQpHm7HXLsosbgrFAoBSTcA5/Pd
-         qasz8QCWc89G3Cjd6KoZBepaX4Ri3mO9WUgbF+TmfKSUGLzgSvcOBC4iPE17dzt7Nxnn
-         TuOg==
+        d=bytedance-com.20210112.gappssmtp.com; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=//4YyY+R3Zvxj//qrfQ/8SUpcqPL2BUP4S2f+8LppsI=;
+        b=GjNGe87iarMz9xzLWJbvuTpMDWCQA2+W1WVxnP+fJYjnmMv7m/6p9+01ELwcZGYByN
+         sp+8DGsECa67c/twZDqrpNNIeNrZR84IzoPJgyp25dPCHvXXT7VlsAXvjYRBKMK9KT0K
+         U3WxvQeLLXYTtteKi9iuV0Xmx18QLICl7dsCCpXPElWxet+sH1a4y7Y7TWBiTaU4nhZo
+         80fA6E6O8WzBkJgHlTbZ5T2b4qjLpExO7alWown5M6oReIgqYyQXQq3dayus2N1Ut+S8
+         V+J0Tf2Bq4Y+HIoRdcE92fZz0DNtzggABrgBoSijo2SFq+rEuHkMXS8gQRQAQeGL/gRn
+         RKmQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=vWDaqFMcXX5TWgX/5qac+ZYspgZYWZjBytjPR/OEpdE=;
-        b=sOwoOppeagU9iz9VQGayMsfixerMIUIpsbD7V4Q//+XfomBP5ur0X5673ezMOCYGgG
-         W9BKaZ8s6VzXg/6IV6qq8QtSYNR3xk7/zC6xOwuUj8vubuTdPs07MRpqh8Eu00IKq+0r
-         Dp6VSDLoW0UGWan3bEsfOxZUgJpUZygSneL6/BqFaNNJQuENIIM1Yb3C7ky+Bhr7vIEN
-         5FmGKIKz28n7LIoZjnWwxjugTfLuBGpLZbXBDefBU01ZwQN70dq0yQvuW9UzxK26hJWD
-         uIFlvSLtGPJVNG/tlN8zmS/Tz4omBHJakJByZzftalVRQROHZwXkDawUi9QBO0nw33aX
-         iEkA==
-X-Gm-Message-State: AFqh2krUKxnzPOBFziI4sOoGvmvYl2qNeKAwdkBJCrjnjv/cSatcu0Hq
-        /qvX0lt90GFChkGIXtf1iwE=
-X-Google-Smtp-Source: AMrXdXt3Si1Cghhk/yKA0O+DIxU+4J57vpMQfyfJD76gnF0eoT92xWESDplshrlIrVeNyzCJYiaidQ==
-X-Received: by 2002:a17:902:ab85:b0:192:f469:5283 with SMTP id f5-20020a170902ab8500b00192f4695283mr9933663plr.3.1673028221366;
-        Fri, 06 Jan 2023 10:03:41 -0800 (PST)
-Received: from localhost (2603-800c-1a02-1bae-a7fa-157f-969a-4cde.res6.spectrum.com. [2603:800c:1a02:1bae:a7fa:157f:969a:4cde])
-        by smtp.gmail.com with ESMTPSA id c4-20020a170902c1c400b00189af02aba4sm1294355plc.3.2023.01.06.10.03.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 06 Jan 2023 10:03:40 -0800 (PST)
-Sender: Tejun Heo <htejun@gmail.com>
-Date:   Fri, 6 Jan 2023 08:03:38 -1000
-From:   Tejun Heo <tj@kernel.org>
-To:     Damien Le Moal <damien.lemoal@opensource.wdc.com>
-Cc:     linux-ide@vger.kernel.org, linux-block@vger.kernel.org,
-        Jens Axboe <axboe@kernel.dk>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Hannes Reinecke <hare@suse.de>, Christoph Hellwig <hch@lst.de>,
-        Niklas Cassel <niklas.cassel@wdc.com>
-Subject: Re: [PATCH v7 0/7] Improve libata support for FUA
-Message-ID: <Y7hiemMjV5y/ToIF@slm.duckdns.org>
-References: <20230103051924.233796-1-damien.lemoal@opensource.wdc.com>
- <Y7WuEqMgySOCCTqy@slm.duckdns.org>
- <79260c74-92dd-2cdf-ad71-e70d9fa0f8a9@opensource.wdc.com>
- <Y7cT3SSssHzBYqU4@slm.duckdns.org>
- <b5c57ca5-49b0-b9c6-4a65-a8867a74e950@opensource.wdc.com>
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=//4YyY+R3Zvxj//qrfQ/8SUpcqPL2BUP4S2f+8LppsI=;
+        b=aFpMoqeissua3uJdJop/4/aaBDho5IHPtJ/xstqqc4ENPQN4DxMZmmEnAkQkrjcmv/
+         h5EKBWC7hnrvZRvw4EFfXEUmaiDVXh139joVHeNe5wUwlVElM39CagRr3NyI9TVXKKjj
+         r6Uo+MZFRHF8yL3XWNladUu2tkNg3Rg1hX1ao6e7mcYowDVpHDwUX1WY5SwY7qXDBl9L
+         uwQMxudj4YGqzUcW1VZF0Gw1CyJnp+BZZSysisuzCze60L4+PROMaH8/XIyClB1pFCjm
+         u2uIhzxPi4ClKkXXUkBtvjpm2uvYegm1BMaXjBpJUrxMVWzjLqJWkkFUnX3V7DhYpYzf
+         /Rtw==
+X-Gm-Message-State: AFqh2koj6a365T6yBps9Es/0deupVW4FV9m/2iWd4azbKC2dvf2JmNfH
+        AVmUOdyoKIgUNjO1MrxsjJ5zAQ==
+X-Google-Smtp-Source: AMrXdXtCwTCe/Z1erNxyHU+FOuguAbrMXDNIsjW7nphPRq8ZDn5GFcuLxYCKVdaiJMB4i952xNE3OA==
+X-Received: by 2002:aa7:9154:0:b0:57b:30b6:9e85 with SMTP id 20-20020aa79154000000b0057b30b69e85mr54858191pfi.22.1673028463336;
+        Fri, 06 Jan 2023 10:07:43 -0800 (PST)
+Received: from [10.255.208.163] ([139.177.225.230])
+        by smtp.gmail.com with ESMTPSA id y12-20020aa78f2c000000b00581dd94be3asm1412263pfr.61.2023.01.06.10.07.40
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 06 Jan 2023 10:07:42 -0800 (PST)
+Message-ID: <c839ba6c-80ac-6d92-af64-5c0e1956ae93@bytedance.com>
+Date:   Sat, 7 Jan 2023 02:07:38 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b5c57ca5-49b0-b9c6-4a65-a8867a74e950@opensource.wdc.com>
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.2.2
+Subject: Re: [External] Re: [PATCH v3] blk-throtl: Introduce sync and async
+ queues for blk-throtl
+To:     Tejun Heo <tj@kernel.org>, Jan Kara <jack@suse.cz>
+Cc:     =?UTF-8?Q?Michal_Koutn=c3=bd?= <mkoutny@suse.com>,
+        josef@toxicpanda.com, axboe@kernel.dk, cgroups@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yinxin.x@bytedance.com
+References: <20221226130505.7186-1-hanjinke.666@bytedance.com>
+ <20230105161854.GA1259@blackbody.suse.cz>
+ <20230106153813.4ttyuikzaagkk2sc@quack3> <Y7hTHZQYsCX6EHIN@slm.duckdns.org>
+From:   hanjinke <hanjinke.666@bytedance.com>
+In-Reply-To: <Y7hTHZQYsCX6EHIN@slm.duckdns.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
 
-On Fri, Jan 06, 2023 at 03:51:48PM +0900, Damien Le Moal wrote:
-> OK. Granted. But for this particular case, scsi & nvme subsystem do not
-> treat FUA as "optional". If it is supported, it will be used even though
-> you are correct that we can work without it. I do not think we should
-> treat ATA devices any differently.
 
-What matters isn't that they have a featured with the same name but the
-actual circumstances. e.g. for nvme, FUA has been there from the beginning
-and we used it from the beginning so we know that they're safe. For ATA,
-it's something added later on and we know that there are a bunch of devices
-which choke on it and we don't know whether anyone else is using it at any
-scale.
+在 2023/1/7 上午12:58, Tejun Heo 写道:
 
-> > On a quick glance, there are some uses of REQ_FUA w/o REQ_PREFLUSH which
-> > indicates that there can be actual gains to be had. However, ext4 AFAICS
-> > always pairs PREFLUSH w/ FUA, so a lot of use cases won't see any gain while
-> > taking on the possible risk of being exposed to FUA commands.
 > 
-> Yes. Most FSes will do PREFLUSH | FUA. For the risk, see above.
-
-Someone should benchmark it but it's likelyt that PREFLUSH | FUA vs.
-PREFLUSH | WRITE | POSTFLUSH isn't gonna show any meaningful difference in
-any realistic scenario. The main gain of NCQ'd FUA is that we don't have to
-drain the in-flight commands but PREFLUSH needs that anyway.
-
-> > I feel rather uneasy about enabling FUA by default given history. We can
-> > improve its chances by restricting it to newer devices and maybe even just
-> > hard disks, but it kinda comes back to the root question of why. Why would
-> > we want to do this? What are the benefits? Right now, there are a bunch of
-> > really tricky cons and not whole lot on the pro column.
+> Jinke, is the case you described in the original email what you actually saw
+> in production or a simplified test case for demonstration? If the latter,
+> can you describe actual problems seen in production?
 > 
-> OK. But again, why treat ATA devices differently from scsi/nvme/ufs ?
-> These have FUA used by default if it is supported.
+> Thanks.
+> 
 
-This part hopefully is answered above.
+Hi
 
-> We can take a big hammer here and start with enabling only ACS-5 and
-> above for now. That will represent the set of devices that are in
-> development right now, and only a few already released (I have some in
-> my test boxes and they are not even a few months old...).
+In our internal scenario, iocost has been deployed as the main io 
+isolation method and is gradually spreading。
 
-All that said, yeah, if we restrict it to only the newest devices, they're
-more likely to be well behaved and a lot more visible when they misbehave.
-That sounds reasonable to me.
+But for some specific scenarios with old kernel versions, blk-throtl
+is alose needed. The scenario described in my email is in the early 
+stage of research and extensive testing for it. During this period，some 
+priority inversion issues amoug cgroups or within one cgroup have been 
+observed. So I send this patch to try to fix or mitigate some of these 
+issues.
 
-Thanks.
+Thanks
 
--- 
-tejun
+Jinke
