@@ -2,117 +2,86 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5BADC61DB3
-	for <linux-block@archiver.kernel.org>; Fri,  6 Jan 2023 20:34:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77307C54EBD
+	for <linux-block@archiver.kernel.org>; Fri,  6 Jan 2023 20:45:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235330AbjAFUej (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 6 Jan 2023 15:34:39 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39144 "EHLO
+        id S229686AbjAFUpT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 6 Jan 2023 15:45:19 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44242 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229552AbjAFUeO (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 6 Jan 2023 15:34:14 -0500
-Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F19555AC40;
-        Fri,  6 Jan 2023 12:34:12 -0800 (PST)
-Received: by mail-pl1-x62b.google.com with SMTP id p24so2829769plw.11;
-        Fri, 06 Jan 2023 12:34:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=4DT+/huwtQo/Hb3OM+ZFYw7lz+P7V1u4iH9OMjxXR9I=;
-        b=TyYWgfhTM3HUIjd7gJ5EtNhIsQmtclO/JJBnQw05cqqM1htMS9Iz4jj3hqvCi5jHsd
-         Z7ErPjOy50rpGgRl4d+ka6KQKzbEhjB2GCPvY/WkURtIVtk7LK0O/woLERu5lz+56kIZ
-         kGiFsrYvyNSPgl0dCRopGB5pAhsjOTXAKf+1fkGHNnamy5aSmgKkOkXzouZzR/yerIKU
-         rzotxk8KfwqpTi3NgVJr6VljHEznnM53vevaUGvmpKnVHt3Lu23pC6gr5Hyd7oXbdEw4
-         7BlRkXXtLuLN3PSJZFIArc/DDmQlpvk2e02Wce5tLtCFI39xGB91YFWFBBO8CTqLDkeL
-         jweg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=4DT+/huwtQo/Hb3OM+ZFYw7lz+P7V1u4iH9OMjxXR9I=;
-        b=lLgqaCBILuRAf0U2L95yL/RvweHsxsgUZv1XJBFbQT1ZvCvd+J4pAZmoWbpLVNjEvd
-         IkKvu+XhlxUd0gDANoGdf9wk4UCuCqOyFG76zOC9pJWjuBrQ8bm92T+LzK9cO3CPKP0e
-         /uu3meHUSdjalw+loDCe/vHRl1m4Lf0XFL1rHErGkEcQO/ODzjHxBOvtZeU49d/FpKaX
-         MoMXyX2frh3I3GhbId8LvMRhN7SO5S18D+IFhl/5i7pLaugvt0T4In1dAnRRojGLT9fh
-         g82xhfJRngwAdeTr+OJ1JfjF0Ct/1czdoGIQpu8DVo13dS3p1CCpM9XtD20Oh8wACzdO
-         0s+g==
-X-Gm-Message-State: AFqh2koGBYwweZAU68lUmghyhG0ET7iMK1FY7xTrxS8Svdeh1dZssu4n
-        XReUQAUmZG7xQsamNNou4gc=
-X-Google-Smtp-Source: AMrXdXu3ANdUQS5ELLp6Ej4q37pOTz53uQtmaHIHheb8C65lnfc0UhC5Mwve6aC06Y3kdcmsXgBpug==
-X-Received: by 2002:a05:6a20:bb10:b0:ad:2c7c:9510 with SMTP id fc16-20020a056a20bb1000b000ad2c7c9510mr62398353pzb.19.1673037252423;
-        Fri, 06 Jan 2023 12:34:12 -0800 (PST)
-Received: from localhost (2603-800c-1a02-1bae-a7fa-157f-969a-4cde.res6.spectrum.com. [2603:800c:1a02:1bae:a7fa:157f:969a:4cde])
-        by smtp.gmail.com with ESMTPSA id k15-20020a170902c40f00b0019276616e9fsm1310530plk.183.2023.01.06.12.34.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 06 Jan 2023 12:34:12 -0800 (PST)
-Sender: Tejun Heo <htejun@gmail.com>
-Date:   Fri, 6 Jan 2023 10:34:10 -1000
-From:   Tejun Heo <tj@kernel.org>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Dan Carpenter <error27@gmail.com>, Christoph Hellwig <hch@lst.de>,
-        Luis Chamberlain <mcgrof@kernel.org>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH block/for-6.2-fixes] block: Drop spurious might_sleep() from
- blk_put_queue()
-Message-ID: <Y7iFwjN+XzWvLv3y@slm.duckdns.org>
+        with ESMTP id S229498AbjAFUpS (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 6 Jan 2023 15:45:18 -0500
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09CDE9C;
+        Fri,  6 Jan 2023 12:45:18 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
+        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=xiUR5yo1Xf+kMhRxDbcyFgKeRt/FmPsE+7rBoN9l/64=; b=mB3DXq7p6xE0ZmjOtPLKf39Eac
+        RlcwzW41zXRbvidWKT98jr/aUtzfKlHqHQAoVJCPd0u+2S+8BuiqcD//5cRF0vMnJu29ccM6pgMDy
+        CMtKeT1WzPMayddbXJP8zY6NNB6ItbBYYgu7brL0mNSNxjJTFVjyZHcKmb7xfr8+FN7JD78w5lbs4
+        jFVgMTSBT32CErD6eG6IS5m/hPGUu4sBaVwYrcob/Ut3TdeQxWhg4xD38N8Fj2W+gIAnICYFTr5tU
+        QD0piuJjbQhObchkwzBOD2wv/vJD3UHdmqFVcumN3+6Rpnys805rtfmEggn9H/9lO/dDMgbQqtZtG
+        8nQE8opw==;
+Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1pDtaS-00ErfA-KQ; Fri, 06 Jan 2023 20:45:12 +0000
+Date:   Fri, 6 Jan 2023 12:45:12 -0800
+From:   Luis Chamberlain <mcgrof@kernel.org>
+To:     Tejun Heo <tj@kernel.org>
+Cc:     Jens Axboe <axboe@kernel.dk>, Dan Carpenter <error27@gmail.com>,
+        Christoph Hellwig <hch@lst.de>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH block/for-6.2-fixes] block: Drop spurious might_sleep()
+ from blk_put_queue()
+Message-ID: <Y7iIWA6h88cYjhcO@bombadil.infradead.org>
 References: <Y7g3L6fntnTtOm63@kili>
  <Y7hbYPSdLqW++y/p@slm.duckdns.org>
  <9ac3390c-055b-546c-f1f4-68350dfe04f8@kernel.dk>
+ <Y7iFwjN+XzWvLv3y@slm.duckdns.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <9ac3390c-055b-546c-f1f4-68350dfe04f8@kernel.dk>
+In-Reply-To: <Y7iFwjN+XzWvLv3y@slm.duckdns.org>
+Sender: Luis Chamberlain <mcgrof@infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Dan reports the following smatch detected the following:
+On Fri, Jan 06, 2023 at 10:34:10AM -1000, Tejun Heo wrote:
+> Dan reports the following smatch detected the following:
+> 
+>   block/blk-cgroup.c:1863 blkcg_schedule_throttle() warn: sleeping in atomic context
+> 
+> caused by blkcg_schedule_throttle() calling blk_put_queue() in an
+> non-sleepable context.
+> 
+> blk_put_queue() acquired might_sleep() in 63f93fd6fa57 ("block: mark
+> blk_put_queue as potentially blocking") which transferred the might_sleep()
+> from blk_free_queue().
+> 
+> blk_free_queue() acquired might_sleep() in e8c7d14ac6c3 ("block: revert back
+> to synchronous request_queue removal") while turning request_queue removal
+> synchronous. However, this isn't necessary as nothing in the free path
+> actually requires sleeping.
+> 
+> It's pretty unusual to require a sleeping context in a put operation and
+> it's not needed in the first place. Let's drop it.
+> 
+> Signed-off-by: Tejun Heo <tj@kernel.org>
+> Reported-by: Dan Carpenter <error27@gmail.com>
+> Link: https://lkml.kernel.org/r/Y7g3L6fntnTtOm63@kili
+> Cc: Christoph Hellwig <hch@lst.de>
+> Cc: Luis Chamberlain <mcgrof@kernel.org>
+> Fixes: e8c7d14ac6c3 ("block: revert back to synchronous request_queue removal") # v5.9+
 
-  block/blk-cgroup.c:1863 blkcg_schedule_throttle() warn: sleeping in atomic context
+*tons* has changed since e8c7d14ac6c3 and so the bots might think that
+*if* this patch is applied upstream it is justified for older kernels
+and I don't think that's yet been verified and doubt it.
 
-caused by blkcg_schedule_throttle() calling blk_put_queue() in an
-non-sleepable context.
+And so I think adding a "Fixes" tag is not appropriate here.
 
-blk_put_queue() acquired might_sleep() in 63f93fd6fa57 ("block: mark
-blk_put_queue as potentially blocking") which transferred the might_sleep()
-from blk_free_queue().
+First I'd like to hear from Christoph if he agrees with this patch
+upstream. For stable, someone would have to do the homework.
 
-blk_free_queue() acquired might_sleep() in e8c7d14ac6c3 ("block: revert back
-to synchronous request_queue removal") while turning request_queue removal
-synchronous. However, this isn't necessary as nothing in the free path
-actually requires sleeping.
-
-It's pretty unusual to require a sleeping context in a put operation and
-it's not needed in the first place. Let's drop it.
-
-Signed-off-by: Tejun Heo <tj@kernel.org>
-Reported-by: Dan Carpenter <error27@gmail.com>
-Link: https://lkml.kernel.org/r/Y7g3L6fntnTtOm63@kili
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Luis Chamberlain <mcgrof@kernel.org>
-Fixes: e8c7d14ac6c3 ("block: revert back to synchronous request_queue removal") # v5.9+
---
- block/blk-core.c |    3 ---
- 1 file changed, 3 deletions(-)
-
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 9321767470dc..b5098355d8b2 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -283,12 +283,9 @@ static void blk_free_queue(struct request_queue *q)
-  *
-  * Decrements the refcount of the request_queue and free it when the refcount
-  * reaches 0.
-- *
-- * Context: Can sleep.
-  */
- void blk_put_queue(struct request_queue *q)
- {
--	might_sleep();
- 	if (refcount_dec_and_test(&q->refs))
- 		blk_free_queue(q);
- }
+  Luis
