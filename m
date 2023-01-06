@@ -2,53 +2,53 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E222CC3DA7A
-	for <linux-block@archiver.kernel.org>; Fri,  6 Jan 2023 11:00:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 629F0C3DA7A
+	for <linux-block@archiver.kernel.org>; Fri,  6 Jan 2023 11:01:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232599AbjAFLAy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 6 Jan 2023 06:00:54 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49902 "EHLO
+        id S233148AbjAFLB1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 6 Jan 2023 06:01:27 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50300 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232688AbjAFLAt (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 6 Jan 2023 06:00:49 -0500
-Received: from esa3.hgst.iphmx.com (esa3.hgst.iphmx.com [216.71.153.141])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4059D6E42D
-        for <linux-block@vger.kernel.org>; Fri,  6 Jan 2023 03:00:45 -0800 (PST)
+        with ESMTP id S229833AbjAFLBU (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 6 Jan 2023 06:01:20 -0500
+Received: from esa1.hgst.iphmx.com (esa1.hgst.iphmx.com [68.232.141.245])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A60A97148F
+        for <linux-block@vger.kernel.org>; Fri,  6 Jan 2023 03:01:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1673002845; x=1704538845;
+  t=1673002871; x=1704538871;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=dzMGYcC76vsGLcqnozoVnvpsbbrZPxZlS6l3+6NEWPY=;
-  b=VDtpwSlKu7lJ64v3F1rFz7XAjkj6KO7yhJcUIF0tnKZ9A9A7D6dyRin/
-   vqQdJOJwGBWy4yB97z3WB5Zsd1RbPETRry9POFXcCEnMI8uFkwieyqAF8
-   nY/HKMDMtwMfvWfmArYG/K2JGNFQkhMvnp9yQz9DxPW9Li+wBqYpZYfxg
-   v0XVLvUQE85z5arfo6K1BVFBky+GOblUtdIS0fmoQ0vCC5yEDz+R+iaOz
-   SZRrLSgsN/myU55+8ybl5wBIWo3rQ/8D8eoPvxqbqzuwGMP/P3sHsDn6M
-   53YlnPlnsBCLY7URBBNIVQiUfSN2plW6RuiXj/ufFPPUNVuuM/RV0hL9g
-   Q==;
+  bh=ydpjo/PG9rszJfVuf0/cnxIuUewKQhm2ZsznqLALiPE=;
+  b=HEeL7gMwggfF6ZV0oSFCvBSgVTDH4xkCjLFYL5YqhVJSPpwq+da5JT5X
+   3O1VctMF9HfvurTeB8fK/8HjVcDCA5ct2gvqGMTXAXxOT3uhU0J4Ztue5
+   MNtOnOsmaVnZh24VvHK2nAwLttF3kvIurAoKY5HxIGryhfj30iqitcQo5
+   wB+gmUGcFVrik66eZmZw13qAEKculJ5opQZdd5e1ucfgT682++vISzMif
+   /6Vljcv71LE/XCX5JUR/8j1Tr3lQ/hG7+B6ZX3SLma9SRCcZCNp7pg+11
+   ZDadzqOahTfvqW0i6vxvP2/mjq6emCcl53/NbmMuu/QgP1nJe89dlHtqc
+   g==;
 X-IronPort-AV: E=Sophos;i="5.96,305,1665417600"; 
-   d="scan'208";a="225224632"
-Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 06 Jan 2023 19:00:43 +0800
-IronPort-SDR: tiGyv+sp92xU23//kCL9DAYxpMNfvhbZ7OuQtD2wTcuIAYv5RyPkrurPv/X2RUxq5xcvdidRV1
- uNrLDE/RPduqixO5pr0XsSRERK7RNAHl4PcVxjbZfwXOIdvBA1HC6yKnnZ4MlxdPvMb46paBBv
- u443A2RuJbF2jvzJ5n6/+zQfs+QZR2d+s7LQkYI5C0+1kSvyOvknNTWV76g7DJb//9tBo/j64k
- umDKYOLBT0Z0mJs7uS3FyFxu1X1cvYQIjsZrow81dQeJK805AnJq1hQsS+RBu9azNGO7trJ8vc
- u/I=
+   d="scan'208";a="332176807"
+Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
+  by ob1.hgst.iphmx.com with ESMTP; 06 Jan 2023 19:01:10 +0800
+IronPort-SDR: K7NuFBmYf0JfagTJNURm80S5IA/OSwB0UTLH74kFmiArY1Rbu7IbZxsye09l1ey7Z0rk5XMNWX
+ Rl11hzZHsgrGvpOBXglBjhBxs/xgmoufAhYhyedUXd8iMMwKY1NahzpO0TKIQhNf8C23OnqWKm
+ 83P/YpSY06of/QXhkXDVRrpdbc6jl0eJxPeVQ4B/AEvpCqryaHrwxWI98gvWkjmWh3bZCTPyNM
+ Gdvo3mlRlqgVXhTHZyX6AKGfpO46VhISslljmR9zxgBcsz4PrjwDsFKZtwto0vDCDpYD+2qcPx
+ TtI=
 Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 06 Jan 2023 02:12:53 -0800
-IronPort-SDR: L1QtWZkE0SHZT/393pgtx6pK1IHYIosECj4bxjkfAilrm8mrTioptrM3CP6sqOre3xXuhSXOiY
- QbG8AywrIGdv9V+IIlyIPrRxcfA6f0QpsRukspZv6sa37Rz294ihdOvzgHA7n98aYvEF77sRwh
- 2z4bZZ94QoIGqdfNLt2Jg+MWOKwmlN9xE2mljuRUDqqTTcFTOMz/OxnbGYpkMGRSPlBrqlGwbP
- FydFgeLonugbBxd2mwfLYQ1qSyhvYfgY54qrLYBtTsMzrXw8qXmnSEcPK2JyPu9wUQt+f4cKjA
- 4i0=
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 06 Jan 2023 02:19:05 -0800
+IronPort-SDR: jOO6YWpD1cxNBanR0vujv9T3LZ4au4nwtsKnLLG1jbzU/e3ooWlqb2DgU7LIdz7N5UZoKlPrnn
+ GaVZAfcpFtO3dTXRDF6vZnUmnDfO8EmFCDYsxzymeytXYFQhBVypoHZr9CjqVYVg+aktwLCQYu
+ 3DivmXCiVxurj9ly+efL86QVhjtr9tMG0UQZnhVMrdro3yOydSMRt0fq5jIbguFWpJiHzR/5z2
+ HfwIL8rFI++j8RP+O/qXQetV2WceFBu83Mwt6HFDDzfG9kB0Z3DaKobrcloS8Y6vMgLXgyVm7B
+ UM4=
 WDCIronportException: Internal
 Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
-  by uls-op-cesaip02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 06 Jan 2023 03:00:45 -0800
+  by uls-op-cesaip02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 06 Jan 2023 03:01:12 -0800
 Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4NpL3b1sxKz1Rwt8
-        for <linux-block@vger.kernel.org>; Fri,  6 Jan 2023 03:00:43 -0800 (PST)
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4NpL462Tfxz1Rwt8
+        for <linux-block@vger.kernel.org>; Fri,  6 Jan 2023 03:01:10 -0800 (PST)
 Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
         reason="pass (just generated, assumed good)"
         header.d=opensource.wdc.com
@@ -56,28 +56,28 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
         opensource.wdc.com; h=content-transfer-encoding:content-type
         :in-reply-to:organization:from:references:to:content-language
         :subject:user-agent:mime-version:date:message-id; s=dkim; t=
-        1673002841; x=1675594842; bh=dzMGYcC76vsGLcqnozoVnvpsbbrZPxZlS6l
-        3+6NEWPY=; b=bI2spnR+FSiaJZD4rCqOcAS5ZC4aFxAg5nxQYH9ZyzdPB6qzPqK
-        qJl9DAxhBKDWf75kvgRz6sFKhkvGo50dpTfOtfOw5I8MQXCgPtZvgnoa/XgMBmkC
-        wJHygiz9VZ/Az5WOlI3Sdx7uHm/Ao6zAZDxNQktjEiG78uC3st3QbwZQLWOukKxZ
-        DUDsw4M1M3dbDDQNyDNtaAOQjAiUl5Sw1+bS5x7hERVnVcEQQFO1JwIP8BGbgppB
-        FOg+lp5YUtPl5ESQQVtmFQMXdwq9uWaQHrrW3FyDCmkFvGTM0kyzMmxZI6O0eUPi
-        Qtj2WFVnjNkfsy2c8K9rcPVMSkjP2XxaCmA==
+        1673002869; x=1675594870; bh=ydpjo/PG9rszJfVuf0/cnxIuUewKQhm2Zsz
+        nqLALiPE=; b=aE9aLrbAxdk6xM3YjipPdKlKR+YBrKVCr7tYG5UMv/LfblT78Jz
+        zZHTm9i+K1jvg4YO+cnrNRbVEkzQE+S6XyHCkv/8P6gt4mxRqqOjFxqi4qVbpM2k
+        Cm8m2wgwu2SWy+zEQiSotsjNMFsjRXmbWLiRxY8xtgN03ctFd81o7d0F/CEuwfJG
+        80b/4o0zu30Ut0aQ0x+fqiwGii+AZi9H1iGjhraY9fedjAkzGoK/wfXhYOLeL2KT
+        EheQMkJXTKvT0Y/xJsz4/T5jsgFhuc80MyVBvlugUgUFdyKOSR8UjewAplW3FZyJ
+        53LzhVSbb7FzBzKDvirJAcdxtEV9WO/SRwg==
 X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
 Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
         by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id UbGaDG-cDWgU for <linux-block@vger.kernel.org>;
-        Fri,  6 Jan 2023 03:00:41 -0800 (PST)
+        with ESMTP id MaYhwlnD9bAJ for <linux-block@vger.kernel.org>;
+        Fri,  6 Jan 2023 03:01:09 -0800 (PST)
 Received: from [10.149.53.254] (washi.fujisawa.hgst.com [10.149.53.254])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4NpL3X00tLz1RvLy;
-        Fri,  6 Jan 2023 03:00:39 -0800 (PST)
-Message-ID: <32aaa034-dc39-75dd-f4ec-e0e5ef9dd29c@opensource.wdc.com>
-Date:   Fri, 6 Jan 2023 20:00:38 +0900
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4NpL436MGRz1RvTp;
+        Fri,  6 Jan 2023 03:01:07 -0800 (PST)
+Message-ID: <22e12d95-d00d-270d-8119-8587672976a7@opensource.wdc.com>
+Date:   Fri, 6 Jan 2023 20:01:06 +0900
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.6.0
-Subject: Re: [PATCH 2/7] block: add a new helper bdev_{is_zone_start,
- offset_from_zone_start}
+Subject: Re: [PATCH 1/7] block: remove superfluous check for request queue in
+ bdev_is_zoned
 Content-Language: en-US
 To:     Pankaj Raghav <p.raghav@samsung.com>, axboe@kernel.dk
 Cc:     kernel@pankajraghav.com, linux-kernel@vger.kernel.org,
@@ -85,11 +85,11 @@ Cc:     kernel@pankajraghav.com, linux-kernel@vger.kernel.org,
         dm-devel@redhat.com, linux-nvme@lists.infradead.org, hch@lst.de,
         linux-block@vger.kernel.org, gost.dev@samsung.com
 References: <20230106083317.93938-1-p.raghav@samsung.com>
- <CGME20230106083320eucas1p1f8de0c6ecf351738e8f0ee5f3390d94f@eucas1p1.samsung.com>
- <20230106083317.93938-3-p.raghav@samsung.com>
+ <CGME20230106083319eucas1p1e58f4ab0d3ff59a328a2da2922d76038@eucas1p1.samsung.com>
+ <20230106083317.93938-2-p.raghav@samsung.com>
 From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
 Organization: Western Digital Research
-In-Reply-To: <20230106083317.93938-3-p.raghav@samsung.com>
+In-Reply-To: <20230106083317.93938-2-p.raghav@samsung.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
@@ -97,94 +97,34 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 On 1/6/23 17:33, Pankaj Raghav wrote:
-> Instead of open coding to check for zone start, add a helper to improve
-> readability and store the logic in one place.
-> 
-> bdev_offset_from_zone_start() will be used later in the series.
+> Remove the superfluous request queue check in bdev_is_zoned() as the
+> bdev_get_queue can never return NULL.
 > 
 > Signed-off-by: Pankaj Raghav <p.raghav@samsung.com>
 > ---
->  block/blk-core.c       |  2 +-
->  block/blk-zoned.c      |  4 ++--
->  include/linux/blkdev.h | 18 ++++++++++++++++++
->  3 files changed, 21 insertions(+), 3 deletions(-)
+>  include/linux/blkdev.h | 7 +------
+>  1 file changed, 1 insertion(+), 6 deletions(-)
 > 
-> diff --git a/block/blk-core.c b/block/blk-core.c
-> index 9321767470dc..0405b3144e7a 100644
-> --- a/block/blk-core.c
-> +++ b/block/blk-core.c
-> @@ -573,7 +573,7 @@ static inline blk_status_t blk_check_zone_append(struct request_queue *q,
->  		return BLK_STS_NOTSUPP;
->  
->  	/* The bio sector must point to the start of a sequential zone */
-> -	if (bio->bi_iter.bi_sector & (bdev_zone_sectors(bio->bi_bdev) - 1) ||
-> +	if (!bdev_is_zone_start(bio->bi_bdev, bio->bi_iter.bi_sector) ||
->  	    !bio_zone_is_seq(bio))
->  		return BLK_STS_IOERR;
->  
-> diff --git a/block/blk-zoned.c b/block/blk-zoned.c
-> index db829401d8d0..614b575be899 100644
-> --- a/block/blk-zoned.c
-> +++ b/block/blk-zoned.c
-> @@ -277,10 +277,10 @@ int blkdev_zone_mgmt(struct block_device *bdev, enum req_op op,
->  		return -EINVAL;
->  
->  	/* Check alignment (handle eventual smaller last zone) */
-> -	if (sector & (zone_sectors - 1))
-> +	if (!bdev_is_zone_start(bdev, sector))
->  		return -EINVAL;
->  
-> -	if ((nr_sectors & (zone_sectors - 1)) && end_sector != capacity)
-> +	if (!bdev_is_zone_start(bdev, nr_sectors) && end_sector != capacity)
->  		return -EINVAL;
->  
->  	/*
 > diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-> index 0e40b014c40b..04b7cbfd7a2a 100644
+> index 43d4e073b111..0e40b014c40b 100644
 > --- a/include/linux/blkdev.h
 > +++ b/include/linux/blkdev.h
-> @@ -715,6 +715,7 @@ static inline unsigned int disk_zone_no(struct gendisk *disk, sector_t sector)
+> @@ -1283,12 +1283,7 @@ static inline enum blk_zoned_model bdev_zoned_model(struct block_device *bdev)
+>  
+>  static inline bool bdev_is_zoned(struct block_device *bdev)
 >  {
->  	return 0;
->  }
-> +
-
-whiteline change
-
->  static inline unsigned int bdev_max_open_zones(struct block_device *bdev)
->  {
->  	return 0;
-> @@ -1304,6 +1305,23 @@ static inline sector_t bdev_zone_sectors(struct block_device *bdev)
->  	return q->limits.chunk_sectors;
+> -	struct request_queue *q = bdev_get_queue(bdev);
+> -
+> -	if (q)
+> -		return blk_queue_is_zoned(q);
+> -
+> -	return false;
+> +	return blk_queue_is_zoned(bdev_get_queue(bdev));
 >  }
 >  
-> +static inline sector_t bdev_offset_from_zone_start(struct block_device *bdev,
-> +						   sector_t sec)
-> +{
-> +	if (!bdev_is_zoned(bdev))
+>  static inline bool bdev_op_is_zoned_write(struct block_device *bdev,
 
-this helper should never be called outside of code supporting zones. So
-why this check ?
-
-> +		return 0;
-> +
-> +	return sec & (bdev_zone_sectors(bdev) - 1);
-> +}
-> +
-> +static inline bool bdev_is_zone_start(struct block_device *bdev, sector_t sec)
-> +{
-> +	if (!bdev_is_zoned(bdev))
-> +		return false;
-
-Same here.
-
-> +
-> +	return bdev_offset_from_zone_start(bdev, sec) == 0;
-> +}
-> +
->  static inline int queue_dma_alignment(const struct request_queue *q)
->  {
->  	return q ? q->limits.dma_alignment : 511;
+Reviewed-by: Damien Le Moal <damien.lemoal@opensource.wdc.com>
 
 -- 
 Damien Le Moal
