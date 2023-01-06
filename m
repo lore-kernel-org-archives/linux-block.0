@@ -2,101 +2,127 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 86BD2C54EBD
-	for <linux-block@archiver.kernel.org>; Fri,  6 Jan 2023 19:30:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D02DEC3DA7A
+	for <linux-block@archiver.kernel.org>; Fri,  6 Jan 2023 20:19:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235525AbjAFTap (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 6 Jan 2023 14:30:45 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59812 "EHLO
+        id S231690AbjAFUTb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 6 Jan 2023 15:19:31 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56672 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234720AbjAFTao (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 6 Jan 2023 14:30:44 -0500
-Received: from mail-oa1-x30.google.com (mail-oa1-x30.google.com [IPv6:2001:4860:4864:20::30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D269E14D02
-        for <linux-block@vger.kernel.org>; Fri,  6 Jan 2023 11:30:43 -0800 (PST)
-Received: by mail-oa1-x30.google.com with SMTP id 586e51a60fabf-12c8312131fso2631387fac.4
-        for <linux-block@vger.kernel.org>; Fri, 06 Jan 2023 11:30:43 -0800 (PST)
+        with ESMTP id S236357AbjAFUTC (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 6 Jan 2023 15:19:02 -0500
+Received: from mail-pg1-x534.google.com (mail-pg1-x534.google.com [IPv6:2607:f8b0:4864:20::534])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B88F3C71C;
+        Fri,  6 Jan 2023 12:18:44 -0800 (PST)
+Received: by mail-pg1-x534.google.com with SMTP id d10so1871727pgm.13;
+        Fri, 06 Jan 2023 12:18:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=dubeyko-com.20210112.gappssmtp.com; s=20210112;
-        h=to:references:message-id:content-transfer-encoding:cc:date
-         :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=n1fk0YAUxvXFlZJTRQ3F9ZCTQJkHjJR6GtTYlUtgX2A=;
-        b=FmxcEfBuZ3BcJBPLeEXAm+2UU+kfkrYXMXnG8AYdHxqzNoxM5he0X9/wo2YMM5PGJR
-         6fHt3+425DZfxKvYI0IAAZPdnhDoCxSEXe6947GLQUfJnRv4PfS8POfHiGAu41H9mM6i
-         Nr2GZZwvpjqezvuVgiGhCnINqy9v0DVPL/AzvB7/aBZBPr6NVCsRBXiTk0wMuJ8EWSZ6
-         zV9Mtp+4av+TS2n57dEk0OqDfXSEEJ0sMu5X5JBZMY6zyVzCIedtxuqElF/pLUqI5IAR
-         9QLXlirxTuPm+E0mff4kOVHRKCqg01JldZN7T273QMFbjpeSFUa7+QXLHSR9m0iQo3Jn
-         S+2A==
+        d=gmail.com; s=20210112;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:sender
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=pkeYcttUcyfVrFL8X+osrQ13cRbijdYYhUpcZOzwgVQ=;
+        b=TVhIvkrP1GydF6XTEwRgMc0p7+PudExrV0d9GFdbYVxpNRsluyY1colI3e/NeKEtfU
+         s/Eizxr1yYhXxQrAX9ywQiW2ITYXw49/JBSP2VERJMGlcIuUKEk1ZAQixCDviFa+0aZV
+         6Bnr7lfzH1wm8zI4+lk+YeF2UM4Bh7q/ocrTurSu/Q6A/auHyG9ckPAKZh+NPzFvwsyM
+         gGVsxz4EELJ58//kjaxDrXlLlZLupXJsVMzZLdK89y8YW/RoOJkHg+awQTiMxq6gpeyI
+         mohFe/Ml0fFJ/oK6h0uGIv6bsMK7IvAQgRAcZuVCXQQ9eih1lSW7Qkp7rSHskDR0rpAn
+         FD5g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=to:references:message-id:content-transfer-encoding:cc:date
-         :in-reply-to:from:subject:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=n1fk0YAUxvXFlZJTRQ3F9ZCTQJkHjJR6GtTYlUtgX2A=;
-        b=5EJHL6piE82xmp/Rw/7cTBIKE1ztZG5mSLj5EQ+WCaBezNr+tons1wzD5XXqjlSAka
-         tUDMa70sfeIBnY7UOHWYK7qlurQaBwxBSYQtBqF7WzxQOAIUo2WGdehbq80eAcF2/y4H
-         BcX9kxgFwXXlz23PY0NqEete9aLMnXLtsW9BYkvn9/VX73zo5EGdSc9zM1eC8S3BWeEq
-         Ilyc68USLLFIonS+sYaJjJikoqlGrY18PHgpxgUuFjH3GtT7aAK5txgNxdyt+FX44/M1
-         TJrOdSn9TW2CCoe3AMZNOWPoXpyG6uvZv1cESycYOfTRMnlLjh9Vd6cCDjGxKspr5iFt
-         70tA==
-X-Gm-Message-State: AFqh2kr3DpCac84E7mD3aUQkkvRdiVdRJp73XnucOtqH+7DTpCWesBCf
-        5YpY8nnMVxGmNvXarS5PpmDe5A==
-X-Google-Smtp-Source: AMrXdXsvHZ9u4bFQxdqZb/uJ+OAfMpLls8q+RcQZsj1KEc+W1LBtxDQpGAZZzeXMfu0NZUkW9EKUjg==
-X-Received: by 2002:a05:6870:f815:b0:14f:a68c:7c76 with SMTP id fr21-20020a056870f81500b0014fa68c7c76mr28267020oab.42.1673033443164;
-        Fri, 06 Jan 2023 11:30:43 -0800 (PST)
-Received: from smtpclient.apple (172-125-78-211.lightspeed.sntcca.sbcglobal.net. [172.125.78.211])
-        by smtp.gmail.com with ESMTPSA id f8-20020a056870d14800b00136f3e4bc29sm922396oac.9.2023.01.06.11.30.41
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 06 Jan 2023 11:30:42 -0800 (PST)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3696.120.41.1.1\))
-Subject: Re: [LSF/MM/BPF BoF] Session for Zoned Storage 2023
-From:   Viacheslav Dubeyko <slava@dubeyko.com>
-In-Reply-To: <Y7h0F0w06cNM89hO@bombadil.infradead.org>
-Date:   Fri, 6 Jan 2023 11:30:39 -0800
-Cc:     Linux FS Devel <linux-fsdevel@vger.kernel.org>,
-        linux-block@vger.kernel.org,
-        =?utf-8?Q?Javier_Gonz=C3=A1lez?= <javier.gonz@samsung.com>,
-        =?utf-8?Q?Matias_Bj=C3=B8rling?= <Matias.Bjorling@wdc.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-        Adam Manzanares <a.manzanares@samsung.com>,
-        Hans Holmberg <hans.holmberg@wdc.com>,
-        "Viacheslav A. Dubeyko" <viacheslav.dubeyko@bytedance.com>
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <4CC4F55E-17B3-47E2-A8C5-9098CCEB65D6@dubeyko.com>
-References: <F6BF25E2-FF26-48F2-8378-3CB36E362313@dubeyko.com>
- <Y7h0F0w06cNM89hO@bombadil.infradead.org>
-To:     Luis Chamberlain <mcgrof@kernel.org>
-X-Mailer: Apple Mail (2.3696.120.41.1.1)
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:sender
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=pkeYcttUcyfVrFL8X+osrQ13cRbijdYYhUpcZOzwgVQ=;
+        b=Uchti6I3Ae7T7LoV5crkWVhEezXuwrYoQKDz6443tbkbG3wOh1Xs8Br1nh7Ij4+EnK
+         5V/69SduuiVEFd/SEHg52ELsmxchA0sn5N17MnZ5nIcNVSRDwjvqi3dmvUPIyiFbpEZF
+         m6j99kfi801bpyvzUlJc03tOtEhkdVrFopH47M9NcSH4J7ae5gpmpOVO3GAynl7gJMCd
+         89PtrMyXrbX+LbOF94SI0F+vn5JcN4GsDMtz5o+NRQKHYFI58DDDA61YYzPfpdn9y/Xm
+         WTijux+xjaB+WsE56QddM0AhnPhMPETArEoUVi92oQmLJxMa3uG/efbhFzrsNXoNRAb/
+         QUmQ==
+X-Gm-Message-State: AFqh2kolAS6OMokiyQpwSqXMhB5X44umMaCqhg+n8THmAswMRue80eHA
+        FR4jhJMbpyCKd0grbyjN+uQ=
+X-Google-Smtp-Source: AMrXdXt2A9473kqnImKIHqnN0Y3fAk6hSHiIirDvHd4RwRDUYPsDbcaw4Q3ijpC8TG3n3ohCfojBCw==
+X-Received: by 2002:aa7:96f9:0:b0:582:7007:3fec with SMTP id i25-20020aa796f9000000b0058270073fecmr20068579pfq.11.1673036323362;
+        Fri, 06 Jan 2023 12:18:43 -0800 (PST)
+Received: from localhost (2603-800c-1a02-1bae-a7fa-157f-969a-4cde.res6.spectrum.com. [2603:800c:1a02:1bae:a7fa:157f:969a:4cde])
+        by smtp.gmail.com with ESMTPSA id b29-20020a62a11d000000b005769ccca18csm1480351pff.85.2023.01.06.12.18.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 06 Jan 2023 12:18:42 -0800 (PST)
+Sender: Tejun Heo <htejun@gmail.com>
+Date:   Fri, 6 Jan 2023 10:18:41 -1000
+From:   Tejun Heo <tj@kernel.org>
+To:     Yu Kuai <yukuai1@huaweicloud.com>
+Cc:     hch@infradead.org, josef@toxicpanda.com, axboe@kernel.dk,
+        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, yi.zhang@huawei.com,
+        "yukuai (C)" <yukuai3@huawei.com>
+Subject: Re: [PATCH v2 1/2] blk-iocost: add refcounting for iocg
+Message-ID: <Y7iCId3pnEnLqY8G@slm.duckdns.org>
+References: <20221227125502.541931-1-yukuai1@huaweicloud.com>
+ <20221227125502.541931-2-yukuai1@huaweicloud.com>
+ <Y7XzUee5Bq+DoIC1@slm.duckdns.org>
+ <c63ee2ad-23d5-3be0-c731-28494398b391@huaweicloud.com>
+ <Y7cX0SJ0y6+EIY5Q@slm.duckdns.org>
+ <7dcdaef3-65c1-8175-fea7-53076f39697f@huaweicloud.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <7dcdaef3-65c1-8175-fea7-53076f39697f@huaweicloud.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Fri, Jan 06, 2023 at 09:08:45AM +0800, Yu Kuai wrote:
+> Hi,
+> 
+> 在 2023/01/06 2:32, Tejun Heo 写道:
+> > On Thu, Jan 05, 2023 at 09:14:07AM +0800, Yu Kuai wrote:
+> > > 1) is related to blkg, while 2) is not, hence refcnting from blkg can't
+> > > fix the problem. refcnting from blkcg_policy_data should be ok, but I
+> > > see that bfq already has the similar refcnting, while other policy
+> > > doesn't require such refcnting.
+> > 
+> > Hmm... taking a step back, wouldn't this be solved by moving the first part
+> > of ioc_pd_free() to pd_offline_fn()? The ordering is strictly defined there,
+> > right?
+> > 
+> 
+> Moving first part to pd_offline_fn() has some requirements, like what I
+> did in the other thread:
+> 
+> iocg can be activated again after pd_offline_fn(), which is possible
+> because bio can be dispatched when cgroup is removed. I tried to avoid
+> that by:
+> 
+> 1) dispatch all throttled bio io ioc_pd_offline()
+> 2) don't throttle bio after ioc_pd_offline()
+> 
+> However, you already disagreed with that. 😔
 
+Okay, I was completely wrong while I was replying to your original patch.
+Should have looked at the code closer, my apologies.
 
-> On Jan 6, 2023, at 11:18 AM, Luis Chamberlain <mcgrof@kernel.org> =
-wrote:
->=20
-> On Fri, Jan 06, 2023 at 11:17:19AM -0800, Viacheslav Dubeyko wrote:
->> Hello,
->>=20
->> As far as I can see, I have two topics for discussion.
->=20
-> What's that?
+What I missed is that pd_offline doesn't happen when the cgroup goes
+offline. Please take a look at the following two commits:
 
-I am going to share these topics in separate emails. :)
+ 59b57717fff8 ("blkcg: delay blkg destruction until after writeback has finished")
+ d866dbf61787 ("blkcg: rename blkcg->cgwb_refcnt to ->online_pin and always use it")
 
-(1) I am going to share SSDFS patchset soon. And topic is:
-SSDFS + ZNS SSD: deterministic architecture decreasing TCO cost of data =
-infrastructure.
+After the above two commits, ->pd_offline_fn() is called only after all
+possible writebacks are complete, so it shouldn't allow mass escapes to
+root. With writebacks out of the picture, it might be that there can be no
+further IOs once ->pd_offline_fn() is called too as there can be no tasks
+left in it and no dirty pages, but best to confirm that.
 
-(2) Second topic is:
-How to achieve better lifetime and performance of caching layer with ZNS =
-SSD?
+So, yeah, the original approach you took should work although I'm not sure
+the patches that you added to make offline blkg to bypass are necessary
+(that also contributed to my assumption that there will be more IOs on those
+blkg's). Have you seen more IOs coming down the pipeline after offline? If
+so, can you dump some backtraces and see where they're coming from?
 
-Thanks,
-Slava.
+Thanks.
 
+-- 
+tejun
