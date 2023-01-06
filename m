@@ -2,204 +2,173 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A854C4708E
-	for <linux-block@archiver.kernel.org>; Fri,  6 Jan 2023 01:33:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F0E0C3DA7A
+	for <linux-block@archiver.kernel.org>; Fri,  6 Jan 2023 01:42:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229887AbjAFBdg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 5 Jan 2023 20:33:36 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56532 "EHLO
+        id S229455AbjAFBl6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 5 Jan 2023 20:41:58 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59846 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229732AbjAFBdf (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 5 Jan 2023 20:33:35 -0500
-Received: from dggsgout12.his.huawei.com (unknown [45.249.212.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9CBD657B;
-        Thu,  5 Jan 2023 17:33:32 -0800 (PST)
-Received: from mail02.huawei.com (unknown [172.30.67.153])
-        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4Np5T30zgSz4f436J;
-        Fri,  6 Jan 2023 09:33:27 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-        by APP1 (Coremail) with SMTP id cCh0CgCHpjBmerdjjyhpBA--.22531S3;
-        Fri, 06 Jan 2023 09:33:28 +0800 (CST)
-Subject: Re: [PATCH -next 3/4] block/rq_qos: use a global mutex to protect
- rq_qos apis
-To:     Tejun Heo <tj@kernel.org>, Yu Kuai <yukuai1@huaweicloud.com>
-Cc:     hch@infradead.org, josef@toxicpanda.com, axboe@kernel.dk,
-        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, yi.zhang@huawei.com,
-        yangerkun@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
-References: <20230104085354.2343590-1-yukuai1@huaweicloud.com>
- <20230104085354.2343590-4-yukuai1@huaweicloud.com>
- <Y7XyIzGptuqO8EAt@slm.duckdns.org> <Y7YZnM/nqb0gxOei@slm.duckdns.org>
- <df2f7a60-467f-08ce-2a3e-1dc7853424aa@huaweicloud.com>
- <Y7cYKdOwSlfHtj7t@slm.duckdns.org>
-From:   Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <ef55a0f1-d3c2-3979-963e-2fa10ba3c2ff@huaweicloud.com>
-Date:   Fri, 6 Jan 2023 09:33:26 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        with ESMTP id S229451AbjAFBl5 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 5 Jan 2023 20:41:57 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C5A31C43E
+        for <linux-block@vger.kernel.org>; Thu,  5 Jan 2023 17:41:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1672969270;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=CBJhSwYV1tuKteAVlo1H6QqanTgJudbWjRcpgIdpDE4=;
+        b=Bg8PB96sEKK65ITMZ0ovnw6pZvbDAIJi8PZWuPTkhAcjv0Qh5nLER1U2XebV0ThEFeHgS2
+        Fzn0mTgNV5D4WM2fdMB9pD6UqKHYed7BB4HNxw+ZyGr+YR8DQLIczKx+8773ibZc1A+Ywb
+        PuKDEtLCe9AqbHTn6aDuPXx7KQ3cBic=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-357-rPHGIqcpM2q7p8WERR7sTA-1; Thu, 05 Jan 2023 20:41:07 -0500
+X-MC-Unique: rPHGIqcpM2q7p8WERR7sTA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B0D6C85C06A;
+        Fri,  6 Jan 2023 01:41:06 +0000 (UTC)
+Received: from T590 (ovpn-8-16.pek2.redhat.com [10.72.8.16])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 848481121315;
+        Fri,  6 Jan 2023 01:41:03 +0000 (UTC)
+Date:   Fri, 6 Jan 2023 09:40:57 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Nadav Amit <nadav.amit@gmail.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        ming.lei@redhat.com
+Subject: Re: Potential hang on ublk_ctrl_del_dev()
+Message-ID: <Y7d8KT+J7xEUrpGl@T590>
+References: <862272BC-C6A3-4A60-A620-4C5596972D01@gmail.com>
+ <Y7URsuwxaAHFmn8S@T590>
+ <20EBDD77-21AD-4C39-B1F2-E9A9954FA360@gmail.com>
+ <Y7ZA/ULE4hg3lkbY@T590>
+ <B7B3A381-60CD-402D-8F81-D65E7D186215@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <Y7cYKdOwSlfHtj7t@slm.duckdns.org>
-Content-Type: text/plain; charset=gbk; format=flowed
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: cCh0CgCHpjBmerdjjyhpBA--.22531S3
-X-Coremail-Antispam: 1UD129KBjvJXoWxXry7CFWrWr1fJF4rJF1xuFg_yoW7Jw47pF
-        4UtF4UCr4kKr15Xa17Ary5Ja1UJrsY93W5Jr1xGr1fAa4j9r1DXr1ktFWjqrykJr4DAa17
-        XayDJ3yFqrn8GaUanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUU9214x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-        1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-        JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-        CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-        2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-        W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka
-        0xkIwI1lc7I2V7IY0VAS07AlzVAYIcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7x
-        kEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E
-        67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCw
-        CI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6rWUJVWr
-        Zr1UMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYx
-        BIdaVFxhVjvjDU0xZFpf9x0JUdHUDUUUUU=
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
-X-CFilter-Loop: Reflected
+In-Reply-To: <B7B3A381-60CD-402D-8F81-D65E7D186215@gmail.com>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
-
-ÔÚ 2023/01/06 2:34, Tejun Heo Ð´µÀ:
-> Hello,
+On Thu, Jan 05, 2023 at 09:52:00AM -0800, Nadav Amit wrote:
 > 
-> On Thu, Jan 05, 2023 at 09:35:21AM +0800, Yu Kuai wrote:
->>> Can you please take a look at the following patchset I just posted:
->>>
->>>     https://lkml.kernel.org/r/20230105002007.157497-1-tj@kernel.org
->>>
->>> After that, all these configuration operations are wrapped between
->>> blkg_conf_init() and blkg_conf_exit() which probably are the right place to
->>> implement the synchronization.
->>
->> I see that, blkg_conf_init() and blkg_conf_exit() is good, however there
->> are some details I want to confirm:
->>
->> 1) rq_qos_add() can be called from iocost/iolatency, where
->> blkg_conf_init() will be called first, while rq_qos_add() can also be
->> called from wbt, where there is no blkg_conf_init(). Hence it seems to
->> me we need two locks here, one to protect rq_qos apis; one to
->> synchronize policy configuration and device removal.
 > 
-> wbt's lazy init is tied to one of the block device sysfs files, right? So,
-> it *should* already be protected against device removal.
+> > On Jan 4, 2023, at 7:16 PM, Ming Lei <ming.lei@redhat.com> wrote:
+> > 
+> > On Wed, Jan 04, 2023 at 10:13:05AM -0800, Nadav Amit wrote:
+> >> 
+> >> 
+> >>> On Jan 3, 2023, at 9:42 PM, Ming Lei <ming.lei@redhat.com> wrote:
+> >>> 
+> >>> On Tue, Jan 03, 2023 at 01:47:37PM -0800, Nadav Amit wrote:
+> >>>> Hello Ming,
+> >>>> 
+> >>>> I am trying the ublk and it seems very exciting.
+> >>>> 
+> >>>> However, I encounter an issue when I remove a ublk device that is mounted or
+> >>>> in use.
+> >>>> 
+> >>>> In ublk_ctrl_del_dev(), shouldnâ€™t we *not* wait if ublk_idr_freed() is false?
+> >>>> It seems to me that it is saner to return -EBUSY in such a case and let
+> >>>> userspace deal with the results.
+> >>>> 
+> >>>> For instance, if I run the following (using ubdsrv):
+> >>>> 
+> >>>> $ mkfs.ext4 /dev/ram0
+> >>>> $ ./ublk add -t loop -f /dev/ram0
+> >>>> $ sudo mount /dev/ublkb0 tmp
+> >>>> $ sudo ./ublk del -a
+> >>>> 
+> >>>> ublk_ctrl_del_dev() would not be done until the partition is unmounted, and you
+> >>>> can get a splat that is similar to the one below.
+> >>> 
+> >>> The splat itself can be avoided easily by replace wait_event with
+> >>> wait_event_timeout() plus loop, but I guess you think the sync delete
+> >>> isn't good too?
+> >> 
+> >> I donâ€™t think the splat is the issue. The issue is the blocking behavior,
+> >> which is both unconditional and unbounded in time, and (worse) takes place
+> >> without relinquishing the locks. wait_event_timeout() is therefore not a
+> >> valid solution IMHO.
+> >> 
+> >>> 
+> >>>> 
+> >>>> What do you say? Would you agree to change the behavior to return -EBUSY?
+> >>> 
+> >>> It is designed in this way from beginning, and I believe it is just for
+> >>> the sake of simplicity, and one point is that the device number needs
+> >>> to be freed after 'ublk del' returns.
+> >>> 
+> >>> But if it isn't friendly from user's viewpoint, we can change to return
+> >>> -EBUSY. One simple solution is to check if the ublk block device
+> >>> is opened before running any deletion action, if yes, stop to delete it
+> >>> and return -EBUSY; otherwise go ahead and stop & delete the pair of devices.
+> >>> And the userspace part(ublk utility) needs update too.
+> >>> 
+> >>> However, -EBUSY isn't perfect too, cause user has to retry the delete
+> >>> command manually.
+> >> 
+> >> I understand your considerations. My intuition is that just as umount
+> >> cannot be done while a file is opened and would return -EBUSY, so should
+> >> deleting the ublock while the ublk is in use.
+> >> 
+> >> So as I see it, there are 2 possible options for proper deletion of ublk,
+> >> and actually both can be implemented and distinguished with a new flag
+> >> (UBLK_F_*):
+> >> 
+> >> 1. Blocking - similar to the way it is done today, but (hopefully) without
+> >>   holding locks, and with using wait_event_interruptible() instead of
+> >>   wait_event() to allow interruption (and return EINTR if interrupted).
+> >> 
+> >> 2. Best-effort - returning EBUSY if it cannot be removed.
+> >> 
+> >> I can imagine use-cases for both, and it would also allow you not to
+> >> change ubdsrv if you choose so.
+> >> 
+> >> Does it make sense?
+> > 
+> > I prefer to the 1st approach:
+> > 
+> > 1) the wait event is still one positive signal for user to cleanup the
+> > device use, since the correct step is to umount ublk disk before deleting
+> > the device.
+> > 
+> > 2) the wait still can avoid the current context to reuse the device
+> > number
+> > 
+> > 3) after switching to wait_event_interruptible(), we need to avoid
+> > double delete, and one flag of UB_STATE_DELETED can be used for failing
+> > new delete command.
+> > 
+> > 4) IMO new flag(UBLK_F_*) isn't needed to distinguish this change
+> > with current behavior.
+> > 
+> > Please let us know if you'd like to cook one patch for improving
+> > the delete handling.
+> 
+> I can take a stab on it, but only in about 2 weeks time.
+> 
+> > 
+> > BTW, there could be another option, such as, 'ublk delete --no-wait' just
+> > run the remove and without waiting at all, but not sure if it is useful.
+> > 
+> 
+> I considered the userspace ublk as one possible implementation. I am not
+> sure this affects the kernel interfaces that are needed.
 
-That seems not true, I don't think q->sysfs_lock can protect that,
-consider that queue_wb_lat_store() doesn't check if del_gendisk() is
-called or not:
+ublk driver needs to be told if --no-wait is applied, so either one
+UBLK_F_* or a parameter of UBLK_CMD_DEL_DEV is needed.
 
-t1: wbt lazy init		t2: remove device
-queue_attr_store
-				del_gendisk
-				blk_unregister_queue
-				 mutex_lock(&q->sysfs_lock)
-			         ...
-				 mutex_unlock(&q->sysfs_lock);
-				rq_qos_exit
-  mutex_lock(&q->sysfs_lock);
-   queue_wb_lat_store
-   wbt_init
-    rq_qos_add
-  mutex_unlock(&q->sysfs_lock);
-
-I tried to comfirm that by adding following delay:
-
-diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index 93d9e9c9a6ea..101c33cb0a2b 100644
---- a/block/blk-sysfs.c
-+++ b/block/blk-sysfs.c
-@@ -11,6 +11,7 @@
-  #include <linux/blktrace_api.h>
-  #include <linux/blk-mq.h>
-  #include <linux/debugfs.h>
-+#include <linux/delay.h>
-
-  #include "blk.h"
-  #include "blk-mq.h"
-@@ -734,6 +735,8 @@ queue_attr_store(struct kobject *kobj, struct 
-attribute *attr,
-         if (!entry->store)
-                 return -EIO;
-
-+       msleep(10000);
-+
-         mutex_lock(&q->sysfs_lock);
-         res = entry->store(q, page, length);
-         mutex_unlock(&q->sysfs_lock);
-
-And then do the following test:
-
-1) echo 10000 > /sys/block/sdb/queue/wbt_lat_usec &
-2) echo 1 > /sys/block/sda/device/delete
-
-Then, following bug is triggered:
-
-[   51.923642] BUG: unable to handle page fault for address: 
-ffffffffffffffed
-[   51.924294] #PF: supervisor read access in kernel mode
-[   51.924773] #PF: error_code(0x0000) - not-present page
-[   51.925252] PGD 1820b067 P4D 1820b067 PUD 1820d067 PMD 0
-[   51.925754] Oops: 0000 [#1] PREEMPT SMP
-[   51.926123] CPU: 1 PID: 539 Comm: bash Tainted: G        W 
-6.2.0-rc1-next-202212267
-[   51.927124] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), 
-BIOS ?-20190727_073836-b4
-[   51.928334] RIP: 0010:__rq_qos_issue+0x30/0x60
-[   51.928761] Code: 48 89 f5 53 48 89 fb 48 83 05 eb eb c9 0b 01 eb 19 
-48 89 df 48 83 05 e6 e9
-[   51.930426] RSP: 0018:ffffc90000c3b9b0 EFLAGS: 00010206
-[   51.930905] RAX: 0000000000000000 RBX: ffffffffffffffed RCX: 
-0000000000000017
-[   51.931554] RDX: 000007c329800000 RSI: ffff8881022c0380 RDI: 
-ffffffffffffffed
-[   51.932197] RBP: ffff8881022c0380 R08: 0000000c385056e3 R09: 
-ffff8881022c05c8
-[   51.932841] R10: 0000000000000000 R11: ffff888100a94000 R12: 
-ffff888102145000
-[   51.933488] R13: 0000000000000000 R14: ffff888100a94000 R15: 
-ffff8881022c04a0
-[   51.934140] FS:  00007fd23def9700(0000) GS:ffff88813bd00000(0000) 
-knlGS:0000000000000000
-[   51.934856] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[   51.935379] CR2: ffffffffffffffed CR3: 0000000106fff000 CR4: 
-00000000000006e0
-[   51.936036] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 
-0000000000000000
-[   51.936675] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 
-0000000000000400
-[   51.937315] Call Trace:
-[   51.937545]  <TASK>
-[   51.937749]  blk_mq_start_request+0x1d1/0x240
-[   51.938151]  scsi_queue_rq+0x347/0x1190
-[   51.938513]  blk_mq_dispatch_rq_list+0x366/0xef0
-[   51.938938]  ? tick_nohz_tick_stopped+0x1a/0x40
-[   51.939356]  ? __irq_work_queue_local+0x59/0xd0
-[   51.939769]  ? __sbitmap_get_word+0x3b/0xb0
-[   51.940153]  __blk_mq_sched_dispatch_requests+0xdd/0x210
-[   51.940633]  blk_mq_sched_dispatch_requests+0x38/0xa0
-[   51.941089]  __blk_mq_run_hw_queue+0xca/0x110
-[   51.941483]  __blk_mq_delay_run_hw_queue+0x1fc/0x210
-[   51.941931]  blk_mq_run_hw_queue+0x15c/0x1d0
-[   51.942327]  blk_mq_sched_insert_request+0x9c/0x210
-[   51.942769]  blk_execute_rq+0xec/0x290
-[   51.943121]  __scsi_execute+0x131/0x310
-[   51.943492]  sd_sync_cache+0xc6/0x280
-[   51.943831]  sd_shutdown+0x7f/0x180
-[   51.944155]  sd_remove+0x53/0x80
-[   51.944457]  device_remove+0x80/0xa0
-[   51.944785]  device_release_driver_internal+0x131/0x270
-[   51.945257]  device_release_driver+0x16/0x20
-[   51.945643]  bus_remove_device+0x135/0x200
 
 Thanks,
-Kuai
-> 
-> Thanks.
-> 
+Ming
 
