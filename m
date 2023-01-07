@@ -2,77 +2,219 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67479C61DB3
-	for <linux-block@archiver.kernel.org>; Fri,  6 Jan 2023 22:39:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6176C5479D
+	for <linux-block@archiver.kernel.org>; Sat,  7 Jan 2023 00:34:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232530AbjAFWjl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 6 Jan 2023 17:39:41 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58188 "EHLO
+        id S236382AbjAGAeZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 6 Jan 2023 19:34:25 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43334 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229561AbjAFWjk (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 6 Jan 2023 17:39:40 -0500
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C432B872AA;
-        Fri,  6 Jan 2023 14:39:39 -0800 (PST)
-Received: by mail-pl1-f177.google.com with SMTP id c4so3209382plc.5;
-        Fri, 06 Jan 2023 14:39:39 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=9wllrSnnUtP2lGzMZ5NnJc5XBcURZs1X9kJ2O+mtnmI=;
-        b=bP9/h1lh06CmWlRZUK8dr9BunGFdM6/10n32IKDuXsqbBn4je5Y+4n8c+jCTzfoGpi
-         +4Jd1gSW3WdZKZ5zKE+LB+sYoatt1aOJ1ds/31zhZYyP0m/5AOUnxBc7ymXJ0XArZQ5O
-         QB/5mayIRR2VeVy1FhwzcNUzwQG6jy8WYIWIr3Q7vHnYEuPOzKECFVvlFuptXNALx34f
-         L9WSPlHCblsmEd6IKZ07xvYX3+IZDIjcO90XucQ+HFoFmPOvOiboGTnMNJQzkcBtT9Zw
-         IgGoHDAs9DVvbd8NGbq/yYUAC+RV5sMauC5FUGKmwv/1LMRm7CuxsqRXQAfZRbySUuum
-         DNaw==
-X-Gm-Message-State: AFqh2kovZWBNfWwHhcDEeU4EqY+NJ2C7Shr1dcIK6hJS4uOlDcfLgyQu
-        C0hPsG546WTazsMgWZmbOE0=
-X-Google-Smtp-Source: AMrXdXuMcgHd17Og+hOTPa7FzU9kTPhBKiF/SMXTbwL3fZXTnntDEJhZH/XSa/hH2zGddJvohv5qng==
-X-Received: by 2002:a17:902:f7c2:b0:192:6cc9:922 with SMTP id h2-20020a170902f7c200b001926cc90922mr43243418plw.59.1673044779250;
-        Fri, 06 Jan 2023 14:39:39 -0800 (PST)
-Received: from ?IPV6:2620:15c:211:201:23c3:f25b:a19d:c75a? ([2620:15c:211:201:23c3:f25b:a19d:c75a])
-        by smtp.gmail.com with ESMTPSA id u11-20020a170902e80b00b00174c0dd29f0sm1410874plg.144.2023.01.06.14.39.37
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 06 Jan 2023 14:39:38 -0800 (PST)
-Message-ID: <1484d284-e55e-4e3d-b4fc-5a685002c656@acm.org>
-Date:   Fri, 6 Jan 2023 14:39:36 -0800
+        with ESMTP id S235233AbjAGAeY (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 6 Jan 2023 19:34:24 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B4F67CBE6
+        for <linux-block@vger.kernel.org>; Fri,  6 Jan 2023 16:33:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1673051618;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=SUBPjX7Z5mZLCRVw93gerYdodDIv8TWR14UIlWwTlcc=;
+        b=DQgYv/RtuaVIjYGHlYa8oimXknry+5ynmIwaWb3Wlb9CGpMJmVIIkK315sOAg7LB+0xtqR
+        OgkVir8CFxDTCGq1fHKlc3lCNtXVcybRiTkd/qtKkWULG5Wdau6RqusLbpKpWAiHJppuMT
+        AdXxIO8ycUpZvSoqpaP/M9KkbCXx+hE=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-479-esqWfMWzMZ2QK6nB1gTV2A-1; Fri, 06 Jan 2023 19:33:33 -0500
+X-MC-Unique: esqWfMWzMZ2QK6nB1gTV2A-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 7711F802C1D;
+        Sat,  7 Jan 2023 00:33:32 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.33.36.87])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 251CC492B06;
+        Sat,  7 Jan 2023 00:33:29 +0000 (UTC)
+Subject: [PATCH v4 0/7] iov_iter: Add extraction helpers
+From:   David Howells <dhowells@redhat.com>
+To:     Al Viro <viro@zeniv.linux.org.uk>
+Cc:     linux-fsdevel@vger.kernel.org, linux-cifs@vger.kernel.org,
+        Christoph Hellwig <hch@lst.de>,
+        Steve French <sfrench@samba.org>, linux-mm@kvack.org,
+        Jens Axboe <axboe@kernel.dk>,
+        Logan Gunthorpe <logang@deltatee.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        John Hubbard <jhubbard@nvidia.com>, linux-cachefs@redhat.com,
+        Rohith Surabattula <rohiths.msft@gmail.com>,
+        Shyam Prasad N <nspmangalore@gmail.com>,
+        Jeff Layton <jlayton@kernel.org>, dhowells@redhat.com,
+        Christoph Hellwig <hch@infradead.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        Jens Axboe <axboe@kernel.dk>, Jeff Layton <jlayton@kernel.org>,
+        Logan Gunthorpe <logang@deltatee.com>,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Date:   Sat, 07 Jan 2023 00:33:29 +0000
+Message-ID: <167305160937.1521586.133299343565358971.stgit@warthog.procyon.org.uk>
+User-Agent: StGit/1.5
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.1
-Subject: Re: [PATCH 3/7] nvmet: introduce bdev_zone_no helper
-Content-Language: en-US
-To:     Pankaj Raghav <p.raghav@samsung.com>, axboe@kernel.dk
-Cc:     kernel@pankajraghav.com, linux-kernel@vger.kernel.org,
-        hare@suse.de, snitzer@kernel.org, dm-devel@redhat.com,
-        damien.lemoal@opensource.wdc.com, linux-nvme@lists.infradead.org,
-        hch@lst.de, linux-block@vger.kernel.org, gost.dev@samsung.com
-References: <20230106083317.93938-1-p.raghav@samsung.com>
- <CGME20230106083320eucas1p1d23de4ad21d0a7aecb74c549ebc7757c@eucas1p1.samsung.com>
- <20230106083317.93938-4-p.raghav@samsung.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20230106083317.93938-4-p.raghav@samsung.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/6/23 00:33, Pankaj Raghav wrote:
-> A generic bdev_zone_no() helper is added to calculate zone number for a
-> given sector in a block device. This helper internally uses disk_zone_no()
-> to find the zone number.
-> 
-> Use the helper bdev_zone_no() to calculate nr of zones. This let's us
-> make modifications to the math if needed in one place.
 
-Please use the imperative mood in patch descriptions (... is added -> 
-add ...).
+Hi Al,
 
-let's -> lets
+Here are patches clean up some use of READ/WRITE and ITER_SOURCE/DEST,
+patches to provide support for extracting pages from an iov_iter and a
+patch to use the primary extraction function in the block layer bio code if
+you could take a look?
 
-If these two issues are addressed, please add:
+[!] NOTE that I've switched the functions to be exported GPL-only at
+    Christoph's request[1].  They are, however, intended as a replacement
+    for iov_iter_get_pages*(), which is not marked _GPL - so that
+    functionality will probably become unavailable to non-GPL 3rd party
+    modules in future.
 
-Reviewed-by: Bart Van Assche <bvanassche@acm.org>
+The first three patches deal with ITER_SOURCE/DEST:
+
+ (1) Switch ITER_SOURCE/DEST to an enum and add a couple of helper
+     functions to query if an iterator represents a source or a destination
+     buffer.  Using an enum may allow extra consistency warnings from the
+     compiler.
+
+ (2) Use the ITER_SOURCE/DEST values in the iov_iter core functions rather
+     than READ/WRITE.
+
+ (3) Get rid of most of the callers of iov_iter_rw(), using the IOCB_WRITE
+     and IOMAP_WRITE instead where available.  This leaves only two places
+     looking at the this value: a consistency check in cifs and a single
+     place in the block layer.
+
+The next patch adds a replacement for iov_iter_get_pages*(), including
+Logan's new version:
+
+ (4) Add a function to list-only, get or pin pages from an iterator as a
+     future replacement for iov_iter_get_pages*().  Pointers to the pages
+     are placed into an array (which will get allocated if not provided)
+     and, depending on the iterator type and direction, the pages will have
+     a ref or a pin get on them or be left untouched (on the assumption
+     that the caller manages their lifetime).
+
+     The determination is:
+
+	UBUF/IOVEC + DEST	-> pin
+	UBUF/IOVEC + SOURCE	-> get
+	PIPE + DEST		-> list-only
+	BVEC/XARRAY		-> list-only
+	Anything else		-> EFAULT
+
+     The function also returns an indication of which of "list only, get or
+     pin" the extraction function did to aid in cleaning up (returning 0,
+     FOLL_GET or FOLL_PIN as appropriate).
+
+Then there are a couple of patches that add stuff to netfslib that I want
+to use there as well as in cifs:
+
+ (5) Add a netfslib function to use (4) to extract pages from an ITER_IOBUF
+     or ITER_UBUF iterator into an ITER_BVEC iterator.  This will get or
+     pin the pages as appropriate.
+
+ (6) Add a netfslib function to extract pages from an iterator that's of
+     type ITER_UBUF/IOVEC/BVEC/KVEC/XARRAY and add them to a scatterlist.
+
+     The function in (4) is used for a UBUF and IOVEC iterators, so those
+     need cleaning up afterwards.  BVEC and XARRAY iterators are ungot and
+     unpinned and may be rendered into elements that span multiple pages,
+     for example if large folios are present.
+
+Finally, there's an example test patch for the extract pages:
+
+ (7) Make the block layer's BIO code pin pages or leave pages unaltered
+     rather than getting a ref on the pages when the circumstances warrant,
+     and noting in the bio struct what cleanups should be performed so that
+     the bio cleanup code then does the right thing.
+
+Changes:
+========
+ver #4)
+ - Drop the patch to move the FOLL_* flags to linux/mm_types.h as they're
+   no longer referenced by linux/uio.h.
+ - Add patches 1-3 and 7.
+ - Make patches 4-6 use ITER_SOURCE/DEST.
+ - Allow additional gup_flags to be passed into iov_iter_extract_pages().
+
+ver #3)
+ - Switch to using EXPORT_SYMBOL_GPL to prevent indirect 3rd-party access
+   to get/pin_user_pages_fast()[1].
+
+ver #2)
+ - Rolled the extraction cleanup mode query function into the extraction
+   function, returning the indication through the argument list.
+ - Fixed patch 4 (extract to scatterlist) to actually use the new
+   extraction API.
+
+I've pushed the patches here also:
+
+	https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/log/?h=iov-extract
+
+David
+
+Link: https://lore.kernel.org/r/Y3zFzdWnWlEJ8X8/@infradead.org/ [1]
+Link: https://lore.kernel.org/r/166697254399.61150.1256557652599252121.stgit@warthog.procyon.org.uk/ # rfc
+Link: https://lore.kernel.org/r/166722777223.2555743.162508599131141451.stgit@warthog.procyon.org.uk/ # rfc
+Link: https://lore.kernel.org/r/166732024173.3186319.18204305072070871546.stgit@warthog.procyon.org.uk/ # rfc
+Link: https://lore.kernel.org/r/166869687556.3723671.10061142538708346995.stgit@warthog.procyon.org.uk/ # rfc
+Link: https://lore.kernel.org/r/166920902005.1461876.2786264600108839814.stgit@warthog.procyon.org.uk/ # v2
+Link: https://lore.kernel.org/r/166997419665.9475.15014699817597102032.stgit@warthog.procyon.org.uk/ # v3
+
+---
+David Howells (7):
+      iov_iter: Change the direction macros into an enum
+      iov_iter: Use the direction in the iterator functions
+      iov_iter: Use IOCB/IOMAP_WRITE if available rather than iterator direction
+      iov_iter: Add a function to extract a page list from an iterator
+      netfs: Add a function to extract a UBUF or IOVEC into a BVEC iterator
+      netfs: Add a function to extract an iterator into a scatterlist
+      iov_iter, block: Make bio structs pin pages rather than ref'ing if appropriate
+
+
+ block/bio.c               |  47 +++--
+ block/fops.c              |   8 +-
+ fs/9p/vfs_addr.c          |   2 +-
+ fs/affs/file.c            |   4 +-
+ fs/ceph/file.c            |   2 +-
+ fs/dax.c                  |   6 +-
+ fs/direct-io.c            |  22 +--
+ fs/exfat/inode.c          |   6 +-
+ fs/ext2/inode.c           |   2 +-
+ fs/f2fs/file.c            |  10 +-
+ fs/fat/inode.c            |   4 +-
+ fs/fuse/dax.c             |   2 +-
+ fs/fuse/file.c            |   8 +-
+ fs/hfs/inode.c            |   2 +-
+ fs/hfsplus/inode.c        |   2 +-
+ fs/iomap/direct-io.c      |   6 +-
+ fs/jfs/inode.c            |   2 +-
+ fs/netfs/Makefile         |   1 +
+ fs/netfs/iterator.c       | 367 ++++++++++++++++++++++++++++++++++
+ fs/nfs/direct.c           |   2 +-
+ fs/nilfs2/inode.c         |   2 +-
+ fs/ntfs3/inode.c          |   2 +-
+ fs/ocfs2/aops.c           |   2 +-
+ fs/orangefs/inode.c       |   2 +-
+ fs/reiserfs/inode.c       |   2 +-
+ fs/udf/inode.c            |   2 +-
+ include/linux/blk_types.h |   1 +
+ include/linux/netfs.h     |   7 +
+ include/linux/uio.h       |  59 ++++--
+ lib/iov_iter.c            | 407 +++++++++++++++++++++++++++++++++++---
+ mm/vmalloc.c              |   1 +
+ 31 files changed, 889 insertions(+), 103 deletions(-)
+ create mode 100644 fs/netfs/iterator.c
+
+
