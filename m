@@ -2,245 +2,123 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FB37C54EBD
-	for <linux-block@archiver.kernel.org>; Sat,  7 Jan 2023 00:36:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6B7AC54EBD
+	for <linux-block@archiver.kernel.org>; Sat,  7 Jan 2023 01:57:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236638AbjAGAgc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 6 Jan 2023 19:36:32 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43354 "EHLO
+        id S231470AbjAGB5B (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 6 Jan 2023 20:57:01 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48390 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236639AbjAGAfW (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 6 Jan 2023 19:35:22 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA08387291
-        for <linux-block@vger.kernel.org>; Fri,  6 Jan 2023 16:34:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1673051672;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=OhwJrX+/uggIQK7yrDCabQsdugOCpi4Tzwg2wYNTyQg=;
-        b=REEFjSToe7f/TrE/N4Qi7Zg/HlWm7O/9c34AhEPk39/S/c2OS5dKSCJzIRiP+Dxq7TpXXR
-        2fuSQdkqbE9ekEL60zYDsYfi21o/ALm5aEXyX8fg9PnMLD1Umdg0wDqv3mq/qkzQtEwvBh
-        oVI/IC7lBvxrHYHjRGBYUDdYYayI/r8=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-26-Cddw6XzOOKa2Yet_lD6Qbw-1; Fri, 06 Jan 2023 19:34:23 -0500
-X-MC-Unique: Cddw6XzOOKa2Yet_lD6Qbw-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 640A7802D19;
-        Sat,  7 Jan 2023 00:34:23 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.33.36.87])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 17AD1492B07;
-        Sat,  7 Jan 2023 00:34:21 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-Subject: [PATCH v4 7/7] iov_iter,
- block: Make bio structs pin pages rather than ref'ing if appropriate
-From:   David Howells <dhowells@redhat.com>
-To:     Al Viro <viro@zeniv.linux.org.uk>
-Cc:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-        Matthew Wilcox <willy@infradead.org>,
-        Logan Gunthorpe <logang@deltatee.com>, dhowells@redhat.com,
-        Christoph Hellwig <hch@infradead.org>,
-        Matthew Wilcox <willy@infradead.org>,
-        Jens Axboe <axboe@kernel.dk>, Jeff Layton <jlayton@kernel.org>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Date:   Sat, 07 Jan 2023 00:34:21 +0000
-Message-ID: <167305166150.1521586.10220949115402059720.stgit@warthog.procyon.org.uk>
-In-Reply-To: <167305160937.1521586.133299343565358971.stgit@warthog.procyon.org.uk>
-References: <167305160937.1521586.133299343565358971.stgit@warthog.procyon.org.uk>
-User-Agent: StGit/1.5
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
+        with ESMTP id S229561AbjAGB5A (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 6 Jan 2023 20:57:00 -0500
+Received: from mail-oi1-x229.google.com (mail-oi1-x229.google.com [IPv6:2607:f8b0:4864:20::229])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80F95BE19
+        for <linux-block@vger.kernel.org>; Fri,  6 Jan 2023 17:56:37 -0800 (PST)
+Received: by mail-oi1-x229.google.com with SMTP id o66so2532441oia.6
+        for <linux-block@vger.kernel.org>; Fri, 06 Jan 2023 17:56:37 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance-com.20210112.gappssmtp.com; s=20210112;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=J9ykbBgKBZV6FU4/LOBwCWniqrM4IT15rEg/LDaszi0=;
+        b=Hp7RDK1T4MTeLPWqoateGOJUUNQXKsaqDz53JVg8WmdPsfDAh7yOnQByCLm/cz69ao
+         xujnVoSsVoSpwYTwojx8VRI6xyaRQO32MQ3MdWcCuWz0wUY8My1LjRJU4BgJ7L4LG0fB
+         jCR5fPkFRpPWvzmGtqDF9m946/zeiPegD21MRirOZ/Qfnuw/hMeuhGNCHaT+i6bq5Rt5
+         0Wy+BlUcdnv1+cXLmGWZOytIUH8X2P1U8xn4S/TZCdpH2VsuMF2/f+aSPt3LCpcMenDn
+         3YF9kKedrkqXj70gUSYik3Cf+C2nwcqvUg0x1kOGsM/YFAEtEpQGwxdpuls0Q5cla1Z+
+         ZZpw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=J9ykbBgKBZV6FU4/LOBwCWniqrM4IT15rEg/LDaszi0=;
+        b=cTv/mlByXcHf2a5nntwEIVEHGR9Rvz//vMDsfOvsXXmUTxLBIteqOF9bZyFZEPsTvd
+         /DSWAvolDj2pMc/lG73FLQgYap3dI+vYuo174y5nSiob0K3WL/A4hNUNIMOdJ9ZPidCJ
+         p7/+ZMqe/yHICPZIwFNKksYYPeS837BLuNMln4ML/y9LiQKYq9PnjW/a5c5Yj4dTQQNy
+         8C2SWki782Ymg1ilhH0qdRULuTNckhAqYXc8WFjSWYO8VzeOjCF38m099SSfuC8l3yOt
+         u2yx2SrtYCXmIm4hF3Pd5i36HqjkLVzYpxJjxWv/SnKz+Sy4lNgJxUscOP3NYPKgcO7z
+         jyYA==
+X-Gm-Message-State: AFqh2kpq98kR6XXLTL+I6MKtweIthDq7VOAv6r1nAWhTm5TxnWaicz1h
+        BHSLq9hhHKNhOyBPqXPKsaIYfw==
+X-Google-Smtp-Source: AMrXdXsX7/ocgMuBmhZAyTiWEsO26xIEVMPm87p+6teNszs25TWA/cRXzEPG3ohOcSqgH7/lPrPTRQ==
+X-Received: by 2002:a05:6808:1414:b0:35e:d937:7d35 with SMTP id w20-20020a056808141400b0035ed9377d35mr35703216oiv.11.1673056596809;
+        Fri, 06 Jan 2023 17:56:36 -0800 (PST)
+Received: from smtpclient.apple (172-125-78-211.lightspeed.sntcca.sbcglobal.net. [172.125.78.211])
+        by smtp.gmail.com with ESMTPSA id w18-20020a056830411200b00670747b88c9sm1287038ott.39.2023.01.06.17.56.35
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 06 Jan 2023 17:56:36 -0800 (PST)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3731.300.101.1.3\))
+Subject: Re: [External] [LSF/MM/BPF BoF] Session for Zoned Storage 2023
+From:   "Viacheslav A.Dubeyko" <viacheslav.dubeyko@bytedance.com>
+In-Reply-To: <4CC4F55E-17B3-47E2-A8C5-9098CCEB65D6@dubeyko.com>
+Date:   Fri, 6 Jan 2023 17:56:24 -0800
+Cc:     Luis Chamberlain <mcgrof@kernel.org>,
+        Linux FS Devel <linux-fsdevel@vger.kernel.org>,
+        linux-block@vger.kernel.org,
+        =?utf-8?Q?Javier_Gonz=C3=A1lez?= <javier.gonz@samsung.com>,
+        =?utf-8?Q?Matias_Bj=C3=B8rling?= <Matias.Bjorling@wdc.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+        Adam Manzanares <a.manzanares@samsung.com>,
+        Hans Holmberg <hans.holmberg@wdc.com>,
+        lsf-pc@lists.linux-foundation.org
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <5DF10459-88F3-48DA-AEB2-5B436549A194@bytedance.com>
+References: <F6BF25E2-FF26-48F2-8378-3CB36E362313@dubeyko.com>
+ <Y7h0F0w06cNM89hO@bombadil.infradead.org>
+ <4CC4F55E-17B3-47E2-A8C5-9098CCEB65D6@dubeyko.com>
+To:     Viacheslav Dubeyko <slava@dubeyko.com>
+X-Mailer: Apple Mail (2.3731.300.101.1.3)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Convert the block layer's bio code to use iov_iter_extract_pages() instead
-of iov_iter_get_pages().  This will pin pages or leave them unaltered
-rather than getting a ref on them as appropriate to the source iterator.
 
-A field, bi_cleanup_mode, is added to the bio struct that gets set by
-iov_iter_extract_pages() with FOLL_* flags indicating what cleanup is
-necessary.  FOLL_GET -> put_page(), FOLL_PIN -> unpin_user_page().  Other
-flags could also be used in future.
 
-Newly allocated bio structs have bi_cleanup_mode set to FOLL_GET to
-indicate that attached pages are ref'd by default.  Cloning sets it to 0.
-__bio_iov_iter_get_pages() overrides it to what iov_iter_extract_pages()
-indicates.
+> On Jan 6, 2023, at 11:30 AM, Viacheslav Dubeyko <slava@dubeyko.com> =
+wrote:
+>=20
+>=20
+>=20
+>> On Jan 6, 2023, at 11:18 AM, Luis Chamberlain <mcgrof@kernel.org> =
+wrote:
+>>=20
+>> On Fri, Jan 06, 2023 at 11:17:19AM -0800, Viacheslav Dubeyko wrote:
+>>> Hello,
+>>>=20
+>>> As far as I can see, I have two topics for discussion.
+>>=20
+>> What's that?
+>=20
+> I am going to share these topics in separate emails. :)
+>=20
+> (1) I am going to share SSDFS patchset soon. And topic is:
+> SSDFS + ZNS SSD: deterministic architecture decreasing TCO cost of =
+data infrastructure.
+>=20
+> (2) Second topic is:
+> How to achieve better lifetime and performance of caching layer with =
+ZNS SSD?
+>=20
 
-[!] Note that this is tested a bit with ext4, but nothing else.
+I think we can consider such discussions:
+(1) I assume that we still need to discuss PO2 zone sizes?
+(2) Status of ZNS SSD support in F2FS, btrfs (maybe, bcachefs and other =
+file systems)
+(3) Any news from ZoneFS (+ ZenFS maybe)?
+(4) New ZNS standard features that we need to support on block layer + =
+FS levels?
+(5) ZNS drive emulation + additional testing features?
+(6) ZNS + computational drive? What new features would we like to see =
+from ZNS SSD?
+(7) ZNS + CXL: does it make sense?
 
-Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Al Viro <viro@zeniv.linux.org.uk>
-cc: Jens Axboe <axboe@kernel.dk>
-cc: Christoph Hellwig <hch@lst.de>
-cc: Matthew Wilcox <willy@infradead.org>
-cc: Logan Gunthorpe <logang@deltatee.com>
----
+Thanks,
+Slava
 
- block/bio.c               |   47 +++++++++++++++++++++++++++++++++------------
- include/linux/blk_types.h |    1 +
- 2 files changed, 35 insertions(+), 13 deletions(-)
-
-diff --git a/block/bio.c b/block/bio.c
-index 5f96fcae3f75..eafcbeba0bab 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -243,6 +243,11 @@ static void bio_free(struct bio *bio)
-  * Users of this function have their own bio allocation. Subsequently,
-  * they must remember to pair any call to bio_init() with bio_uninit()
-  * when IO has completed, or when the bio is released.
-+ *
-+ * We set the initial assumption that pages attached to the bio will be
-+ * released with put_page() by setting bi_cleanup_mode to FOLL_GET, but this
-+ * should be set to FOLL_PIN if the page should be unpinned instead; if the
-+ * pages should not be put or unpinned, this should be set to 0
-  */
- void bio_init(struct bio *bio, struct block_device *bdev, struct bio_vec *table,
- 	      unsigned short max_vecs, blk_opf_t opf)
-@@ -274,6 +279,7 @@ void bio_init(struct bio *bio, struct block_device *bdev, struct bio_vec *table,
- #ifdef CONFIG_BLK_DEV_INTEGRITY
- 	bio->bi_integrity = NULL;
- #endif
-+	bio->bi_cleanup_mode = FOLL_GET;
- 	bio->bi_vcnt = 0;
- 
- 	atomic_set(&bio->__bi_remaining, 1);
-@@ -302,6 +308,7 @@ void bio_reset(struct bio *bio, struct block_device *bdev, blk_opf_t opf)
- {
- 	bio_uninit(bio);
- 	memset(bio, 0, BIO_RESET_BYTES);
-+	bio->bi_cleanup_mode = FOLL_GET;
- 	atomic_set(&bio->__bi_remaining, 1);
- 	bio->bi_bdev = bdev;
- 	if (bio->bi_bdev)
-@@ -814,6 +821,7 @@ static int __bio_clone(struct bio *bio, struct bio *bio_src, gfp_t gfp)
- 	bio_set_flag(bio, BIO_CLONED);
- 	bio->bi_ioprio = bio_src->bi_ioprio;
- 	bio->bi_iter = bio_src->bi_iter;
-+	bio->bi_cleanup_mode = 0;
- 
- 	if (bio->bi_bdev) {
- 		if (bio->bi_bdev == bio_src->bi_bdev &&
-@@ -1168,6 +1176,18 @@ bool bio_add_folio(struct bio *bio, struct folio *folio, size_t len,
- 	return bio_add_page(bio, &folio->page, len, off) > 0;
- }
- 
-+/*
-+ * Clean up a page according to the mode indicated by iov_iter_extract_pages(),
-+ * where the page is may be pinned or may have a ref taken on it.
-+ */
-+static void bio_release_page(struct bio *bio, struct page *page)
-+{
-+	if (bio->bi_cleanup_mode & FOLL_PIN)
-+		unpin_user_page(page);
-+	if (bio->bi_cleanup_mode & FOLL_GET)
-+		put_page(page);
-+}
-+
- void __bio_release_pages(struct bio *bio, bool mark_dirty)
- {
- 	struct bvec_iter_all iter_all;
-@@ -1176,7 +1196,7 @@ void __bio_release_pages(struct bio *bio, bool mark_dirty)
- 	bio_for_each_segment_all(bvec, bio, iter_all) {
- 		if (mark_dirty && !PageCompound(bvec->bv_page))
- 			set_page_dirty_lock(bvec->bv_page);
--		put_page(bvec->bv_page);
-+		bio_release_page(bio, bvec->bv_page);
- 	}
- }
- EXPORT_SYMBOL_GPL(__bio_release_pages);
-@@ -1213,7 +1233,7 @@ static int bio_iov_add_page(struct bio *bio, struct page *page,
- 	}
- 
- 	if (same_page)
--		put_page(page);
-+		bio_release_page(bio, page);
- 	return 0;
- }
- 
-@@ -1227,7 +1247,7 @@ static int bio_iov_add_zone_append_page(struct bio *bio, struct page *page,
- 			queue_max_zone_append_sectors(q), &same_page) != len)
- 		return -EINVAL;
- 	if (same_page)
--		put_page(page);
-+		bio_release_page(bio, page);
- 	return 0;
- }
- 
-@@ -1238,10 +1258,10 @@ static int bio_iov_add_zone_append_page(struct bio *bio, struct page *page,
-  * @bio: bio to add pages to
-  * @iter: iov iterator describing the region to be mapped
-  *
-- * Pins pages from *iter and appends them to @bio's bvec array. The
-- * pages will have to be released using put_page() when done.
-- * For multi-segment *iter, this function only adds pages from the
-- * next non-empty segment of the iov iterator.
-+ * Pins pages from *iter and appends them to @bio's bvec array.  The pages will
-+ * have to be released using put_page() or unpin_user_page() when done as
-+ * according to bi_cleanup_mode.  For multi-segment *iter, this function only
-+ * adds pages from the next non-empty segment of the iov iterator.
-  */
- static int __bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
- {
-@@ -1273,9 +1293,10 @@ static int __bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
- 	 * result to ensure the bio's total size is correct. The remainder of
- 	 * the iov data will be picked up in the next bio iteration.
- 	 */
--	size = iov_iter_get_pages(iter, pages,
--				  UINT_MAX - bio->bi_iter.bi_size,
--				  nr_pages, &offset, gup_flags);
-+	size = iov_iter_extract_pages(iter, &pages,
-+				      UINT_MAX - bio->bi_iter.bi_size,
-+				      nr_pages, gup_flags,
-+				      &offset, &bio->bi_cleanup_mode);
- 	if (unlikely(size <= 0))
- 		return size ? size : -EFAULT;
- 
-@@ -1308,7 +1329,7 @@ static int __bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
- 	iov_iter_revert(iter, left);
- out:
- 	while (i < nr_pages)
--		put_page(pages[i++]);
-+		bio_release_page(bio, pages[i++]);
- 
- 	return ret;
- }
-@@ -1489,8 +1510,8 @@ void bio_set_pages_dirty(struct bio *bio)
-  * the BIO and re-dirty the pages in process context.
-  *
-  * It is expected that bio_check_pages_dirty() will wholly own the BIO from
-- * here on.  It will run one put_page() against each page and will run one
-- * bio_put() against the BIO.
-+ * here on.  It will run one put_page() or unpin_user_page() against each page
-+ * and will run one bio_put() against the BIO.
-  */
- 
- static void bio_dirty_fn(struct work_struct *work);
-diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-index 99be590f952f..883f873a01ef 100644
---- a/include/linux/blk_types.h
-+++ b/include/linux/blk_types.h
-@@ -289,6 +289,7 @@ struct bio {
- #endif
- 	};
- 
-+	unsigned int		bi_cleanup_mode; /* How to clean up pages */
- 	unsigned short		bi_vcnt;	/* how many bio_vec's */
- 
- 	/*
 
 
