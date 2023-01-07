@@ -2,257 +2,245 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 79BEBC678D5
-	for <linux-block@archiver.kernel.org>; Sat,  7 Jan 2023 00:35:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FB37C54EBD
+	for <linux-block@archiver.kernel.org>; Sat,  7 Jan 2023 00:36:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230329AbjAGAfd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 6 Jan 2023 19:35:33 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43582 "EHLO
+        id S236638AbjAGAgc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 6 Jan 2023 19:36:32 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43354 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236747AbjAGAfP (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 6 Jan 2023 19:35:15 -0500
+        with ESMTP id S236639AbjAGAfW (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 6 Jan 2023 19:35:22 -0500
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7FF5487296
-        for <linux-block@vger.kernel.org>; Fri,  6 Jan 2023 16:34:13 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA08387291
+        for <linux-block@vger.kernel.org>; Fri,  6 Jan 2023 16:34:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1673051652;
+        s=mimecast20190719; t=1673051672;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=p5FqX6wgeTJdF7BCkVTnz37qBgc2kKUyMX+o8KfLQEw=;
-        b=i+lhlxACT3jiI/vLqBLH1UlBUbLC6tpRQchorby0NSUKWgptS8neHblxSchAiGArSM4lXn
-        tersBew6PqTmg0nyp3u7bvVcwQOimAUw6inNGfD/A1vhIpmKd75vrQeaRfCFMkxgT4+b1W
-        BFyzGJiKdtoUwWi4HolUJ21YznXwJuw=
+        bh=OhwJrX+/uggIQK7yrDCabQsdugOCpi4Tzwg2wYNTyQg=;
+        b=REEFjSToe7f/TrE/N4Qi7Zg/HlWm7O/9c34AhEPk39/S/c2OS5dKSCJzIRiP+Dxq7TpXXR
+        2fuSQdkqbE9ekEL60zYDsYfi21o/ALm5aEXyX8fg9PnMLD1Umdg0wDqv3mq/qkzQtEwvBh
+        oVI/IC7lBvxrHYHjRGBYUDdYYayI/r8=
 Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
  [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-654-i1vVWkQjNnuSPL2FXwyBrA-1; Fri, 06 Jan 2023 19:34:09 -0500
-X-MC-Unique: i1vVWkQjNnuSPL2FXwyBrA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+ us-mta-26-Cddw6XzOOKa2Yet_lD6Qbw-1; Fri, 06 Jan 2023 19:34:23 -0500
+X-MC-Unique: Cddw6XzOOKa2Yet_lD6Qbw-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id CF31A1871CD5;
-        Sat,  7 Jan 2023 00:34:08 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 640A7802D19;
+        Sat,  7 Jan 2023 00:34:23 +0000 (UTC)
 Received: from warthog.procyon.org.uk (unknown [10.33.36.87])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 1A1FF40C2064;
-        Sat,  7 Jan 2023 00:34:07 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 17AD1492B07;
+        Sat,  7 Jan 2023 00:34:21 +0000 (UTC)
 Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
         Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
         Kingdom.
         Registered in England and Wales under Company Registration No. 3798903
-Subject: [PATCH v4 5/7] netfs: Add a function to extract a UBUF or IOVEC into
- a BVEC iterator
+Subject: [PATCH v4 7/7] iov_iter,
+ block: Make bio structs pin pages rather than ref'ing if appropriate
 From:   David Howells <dhowells@redhat.com>
 To:     Al Viro <viro@zeniv.linux.org.uk>
-Cc:     Jeff Layton <jlayton@kernel.org>, Steve French <sfrench@samba.org>,
-        Shyam Prasad N <nspmangalore@gmail.com>,
-        Rohith Surabattula <rohiths.msft@gmail.com>,
-        linux-cachefs@redhat.com, linux-cifs@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, dhowells@redhat.com,
+Cc:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+        Matthew Wilcox <willy@infradead.org>,
+        Logan Gunthorpe <logang@deltatee.com>, dhowells@redhat.com,
         Christoph Hellwig <hch@infradead.org>,
         Matthew Wilcox <willy@infradead.org>,
         Jens Axboe <axboe@kernel.dk>, Jeff Layton <jlayton@kernel.org>,
         Logan Gunthorpe <logang@deltatee.com>,
         linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Date:   Sat, 07 Jan 2023 00:34:06 +0000
-Message-ID: <167305164634.1521586.12199658904363317567.stgit@warthog.procyon.org.uk>
+Date:   Sat, 07 Jan 2023 00:34:21 +0000
+Message-ID: <167305166150.1521586.10220949115402059720.stgit@warthog.procyon.org.uk>
 In-Reply-To: <167305160937.1521586.133299343565358971.stgit@warthog.procyon.org.uk>
 References: <167305160937.1521586.133299343565358971.stgit@warthog.procyon.org.uk>
 User-Agent: StGit/1.5
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.1
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Add a function to extract the pages from a user-space supplied iterator
-(UBUF- or IOVEC-type) into a BVEC-type iterator, retaining the pages by
-getting a ref on them (ITER_SOURCE, ie. WRITE) or pinning them (ITER_DEST,
-ie. READ) as we go.
+Convert the block layer's bio code to use iov_iter_extract_pages() instead
+of iov_iter_get_pages().  This will pin pages or leave them unaltered
+rather than getting a ref on them as appropriate to the source iterator.
 
-This is useful in three situations:
+A field, bi_cleanup_mode, is added to the bio struct that gets set by
+iov_iter_extract_pages() with FOLL_* flags indicating what cleanup is
+necessary.  FOLL_GET -> put_page(), FOLL_PIN -> unpin_user_page().  Other
+flags could also be used in future.
 
- (1) A userspace thread may have a sibling that unmaps or remaps the
-     process's VM during the operation, changing the assignment of the
-     pages and potentially causing an error.  Retaining the pages keeps
-     some pages around, even if this occurs; futher, we find out at the
-     point of extraction if EFAULT is going to be incurred.
+Newly allocated bio structs have bi_cleanup_mode set to FOLL_GET to
+indicate that attached pages are ref'd by default.  Cloning sets it to 0.
+__bio_iov_iter_get_pages() overrides it to what iov_iter_extract_pages()
+indicates.
 
- (2) Pages might get swapped out/discarded if not retained, so we want to
-     retain them to avoid the reload causing a deadlock due to a DIO
-     from/to an mmapped region on the same file.
-
- (3) The iterator may get passed to sendmsg() by the filesystem.  If a
-     fault occurs, we may get a short write to a TCP stream that's then
-     tricky to recover from.
-
-We don't deal with other types of iterator here, leaving it to other
-mechanisms to retain the pages (eg. PG_locked, PG_writeback and the pipe
-lock).
-
-Changes:
-========
-ver #3)
- - Switch to using EXPORT_SYMBOL_GPL to prevent indirect 3rd-party access
-   to get/pin_user_pages_fast()[1].
+[!] Note that this is tested a bit with ext4, but nothing else.
 
 Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Jeff Layton <jlayton@kernel.org>
-cc: Steve French <sfrench@samba.org>
-cc: Shyam Prasad N <nspmangalore@gmail.com>
-cc: Rohith Surabattula <rohiths.msft@gmail.com>
-cc: linux-cachefs@redhat.com
-cc: linux-cifs@vger.kernel.org
-cc: linux-fsdevel@vger.kernel.org
-
-Link: https://lore.kernel.org/r/Y3zFzdWnWlEJ8X8/@infradead.org/ [1]
-Link: https://lore.kernel.org/r/166697255265.61150.6289490555867717077.stgit@warthog.procyon.org.uk/ # rfc
-Link: https://lore.kernel.org/r/166732026503.3186319.12020462741051772825.stgit@warthog.procyon.org.uk/ # rfc
-Link: https://lore.kernel.org/r/166869690376.3723671.8813331570219190705.stgit@warthog.procyon.org.uk/ # rfc
-Link: https://lore.kernel.org/r/166920904810.1461876.11603559311247187100.stgit@warthog.procyon.org.uk/ # v2
-Link: https://lore.kernel.org/r/166997422579.9475.12101700945635692496.stgit@warthog.procyon.org.uk/ # v3
+cc: Al Viro <viro@zeniv.linux.org.uk>
+cc: Jens Axboe <axboe@kernel.dk>
+cc: Christoph Hellwig <hch@lst.de>
+cc: Matthew Wilcox <willy@infradead.org>
+cc: Logan Gunthorpe <logang@deltatee.com>
 ---
 
- fs/netfs/Makefile     |    1 
- fs/netfs/iterator.c   |   99 +++++++++++++++++++++++++++++++++++++++++++++++++
- include/linux/netfs.h |    3 +
- 3 files changed, 103 insertions(+)
- create mode 100644 fs/netfs/iterator.c
+ block/bio.c               |   47 +++++++++++++++++++++++++++++++++------------
+ include/linux/blk_types.h |    1 +
+ 2 files changed, 35 insertions(+), 13 deletions(-)
 
-diff --git a/fs/netfs/Makefile b/fs/netfs/Makefile
-index f684c0cd1ec5..386d6fb92793 100644
---- a/fs/netfs/Makefile
-+++ b/fs/netfs/Makefile
-@@ -3,6 +3,7 @@
- netfs-y := \
- 	buffered_read.o \
- 	io.o \
-+	iterator.o \
- 	main.o \
- 	objects.o
+diff --git a/block/bio.c b/block/bio.c
+index 5f96fcae3f75..eafcbeba0bab 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -243,6 +243,11 @@ static void bio_free(struct bio *bio)
+  * Users of this function have their own bio allocation. Subsequently,
+  * they must remember to pair any call to bio_init() with bio_uninit()
+  * when IO has completed, or when the bio is released.
++ *
++ * We set the initial assumption that pages attached to the bio will be
++ * released with put_page() by setting bi_cleanup_mode to FOLL_GET, but this
++ * should be set to FOLL_PIN if the page should be unpinned instead; if the
++ * pages should not be put or unpinned, this should be set to 0
+  */
+ void bio_init(struct bio *bio, struct block_device *bdev, struct bio_vec *table,
+ 	      unsigned short max_vecs, blk_opf_t opf)
+@@ -274,6 +279,7 @@ void bio_init(struct bio *bio, struct block_device *bdev, struct bio_vec *table,
+ #ifdef CONFIG_BLK_DEV_INTEGRITY
+ 	bio->bi_integrity = NULL;
+ #endif
++	bio->bi_cleanup_mode = FOLL_GET;
+ 	bio->bi_vcnt = 0;
  
-diff --git a/fs/netfs/iterator.c b/fs/netfs/iterator.c
-new file mode 100644
-index 000000000000..7d802d21b9c5
---- /dev/null
-+++ b/fs/netfs/iterator.c
-@@ -0,0 +1,99 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
-+/* Iterator helpers.
-+ *
-+ * Copyright (C) 2022 Red Hat, Inc. All Rights Reserved.
-+ * Written by David Howells (dhowells@redhat.com)
+ 	atomic_set(&bio->__bi_remaining, 1);
+@@ -302,6 +308,7 @@ void bio_reset(struct bio *bio, struct block_device *bdev, blk_opf_t opf)
+ {
+ 	bio_uninit(bio);
+ 	memset(bio, 0, BIO_RESET_BYTES);
++	bio->bi_cleanup_mode = FOLL_GET;
+ 	atomic_set(&bio->__bi_remaining, 1);
+ 	bio->bi_bdev = bdev;
+ 	if (bio->bi_bdev)
+@@ -814,6 +821,7 @@ static int __bio_clone(struct bio *bio, struct bio *bio_src, gfp_t gfp)
+ 	bio_set_flag(bio, BIO_CLONED);
+ 	bio->bi_ioprio = bio_src->bi_ioprio;
+ 	bio->bi_iter = bio_src->bi_iter;
++	bio->bi_cleanup_mode = 0;
+ 
+ 	if (bio->bi_bdev) {
+ 		if (bio->bi_bdev == bio_src->bi_bdev &&
+@@ -1168,6 +1176,18 @@ bool bio_add_folio(struct bio *bio, struct folio *folio, size_t len,
+ 	return bio_add_page(bio, &folio->page, len, off) > 0;
+ }
+ 
++/*
++ * Clean up a page according to the mode indicated by iov_iter_extract_pages(),
++ * where the page is may be pinned or may have a ref taken on it.
 + */
-+
-+#include <linux/export.h>
-+#include <linux/slab.h>
-+#include <linux/uio.h>
-+#include <linux/netfs.h>
-+#include "internal.h"
-+
-+/**
-+ * netfs_extract_user_iter - Extract the pages from a user iterator into a bvec
-+ * @orig: The original iterator
-+ * @orig_len: The amount of iterator to copy
-+ * @new: The iterator to be set up
-+ * @cleanup_mode: Where to indicate the cleanup mode
-+ *
-+ * Extract the page fragments from the given amount of the source iterator and
-+ * build up a second iterator that refers to all of those bits.  This allows
-+ * the original iterator to disposed of.
-+ *
-+ * On success, the number of elements in the bvec is returned, the original
-+ * iterator will have been advanced by the amount extracted and @*cleanup_mode
-+ * will have been set to FOLL_GET, FOLL_PIN or 0.
-+ */
-+ssize_t netfs_extract_user_iter(struct iov_iter *orig, size_t orig_len,
-+				struct iov_iter *new, unsigned int *cleanup_mode)
++static void bio_release_page(struct bio *bio, struct page *page)
 +{
-+	struct bio_vec *bv = NULL;
-+	struct page **pages;
-+	unsigned int cur_npages;
-+	unsigned int max_pages;
-+	unsigned int npages = 0;
-+	unsigned int i;
-+	ssize_t ret;
-+	size_t count = orig_len, offset, len;
-+	size_t bv_size, pg_size;
-+
-+	if (WARN_ON_ONCE(!iter_is_ubuf(orig) && !iter_is_iovec(orig)))
-+		return -EIO;
-+
-+	max_pages = iov_iter_npages(orig, INT_MAX);
-+	bv_size = array_size(max_pages, sizeof(*bv));
-+	bv = kvmalloc(bv_size, GFP_KERNEL);
-+	if (!bv)
-+		return -ENOMEM;
-+
-+	*cleanup_mode = 0;
-+
-+	/* Put the page list at the end of the bvec list storage.  bvec
-+	 * elements are larger than page pointers, so as long as we work
-+	 * 0->last, we should be fine.
-+	 */
-+	pg_size = array_size(max_pages, sizeof(*pages));
-+	pages = (void *)bv + bv_size - pg_size;
-+
-+	while (count && npages < max_pages) {
-+		ret = iov_iter_extract_pages(orig, &pages, count,
-+					     max_pages - npages, 0,
-+					     &offset, cleanup_mode);
-+		if (ret < 0) {
-+			pr_err("Couldn't get user pages (rc=%zd)\n", ret);
-+			break;
-+		}
-+
-+		if (ret > count) {
-+			pr_err("get_pages rc=%zd more than %zu\n", ret, count);
-+			break;
-+		}
-+
-+		count -= ret;
-+		ret += offset;
-+		cur_npages = DIV_ROUND_UP(ret, PAGE_SIZE);
-+
-+		if (npages + cur_npages > max_pages) {
-+			pr_err("Out of bvec array capacity (%u vs %u)\n",
-+			       npages + cur_npages, max_pages);
-+			break;
-+		}
-+
-+		for (i = 0; i < cur_npages; i++) {
-+			len = ret > PAGE_SIZE ? PAGE_SIZE : ret;
-+			bv[npages + i].bv_page	 = *pages++;
-+			bv[npages + i].bv_offset = offset;
-+			bv[npages + i].bv_len	 = len - offset;
-+			ret -= len;
-+			offset = 0;
-+		}
-+
-+		npages += cur_npages;
-+	}
-+
-+	iov_iter_bvec(new, iov_iter_rw(orig), bv, npages, orig_len - count);
-+	return npages;
++	if (bio->bi_cleanup_mode & FOLL_PIN)
++		unpin_user_page(page);
++	if (bio->bi_cleanup_mode & FOLL_GET)
++		put_page(page);
 +}
-+EXPORT_SYMBOL_GPL(netfs_extract_user_iter);
-diff --git a/include/linux/netfs.h b/include/linux/netfs.h
-index 4c76ddfb6a67..26fe3e6bafa1 100644
---- a/include/linux/netfs.h
-+++ b/include/linux/netfs.h
-@@ -296,6 +296,9 @@ void netfs_get_subrequest(struct netfs_io_subrequest *subreq,
- void netfs_put_subrequest(struct netfs_io_subrequest *subreq,
- 			  bool was_async, enum netfs_sreq_ref_trace what);
- void netfs_stats_show(struct seq_file *);
-+ssize_t netfs_extract_user_iter(struct iov_iter *orig, size_t orig_len,
-+				struct iov_iter *new,
-+				unsigned int *cleanup_mode);
++
+ void __bio_release_pages(struct bio *bio, bool mark_dirty)
+ {
+ 	struct bvec_iter_all iter_all;
+@@ -1176,7 +1196,7 @@ void __bio_release_pages(struct bio *bio, bool mark_dirty)
+ 	bio_for_each_segment_all(bvec, bio, iter_all) {
+ 		if (mark_dirty && !PageCompound(bvec->bv_page))
+ 			set_page_dirty_lock(bvec->bv_page);
+-		put_page(bvec->bv_page);
++		bio_release_page(bio, bvec->bv_page);
+ 	}
+ }
+ EXPORT_SYMBOL_GPL(__bio_release_pages);
+@@ -1213,7 +1233,7 @@ static int bio_iov_add_page(struct bio *bio, struct page *page,
+ 	}
  
- /**
-  * netfs_inode - Get the netfs inode context from the inode
+ 	if (same_page)
+-		put_page(page);
++		bio_release_page(bio, page);
+ 	return 0;
+ }
+ 
+@@ -1227,7 +1247,7 @@ static int bio_iov_add_zone_append_page(struct bio *bio, struct page *page,
+ 			queue_max_zone_append_sectors(q), &same_page) != len)
+ 		return -EINVAL;
+ 	if (same_page)
+-		put_page(page);
++		bio_release_page(bio, page);
+ 	return 0;
+ }
+ 
+@@ -1238,10 +1258,10 @@ static int bio_iov_add_zone_append_page(struct bio *bio, struct page *page,
+  * @bio: bio to add pages to
+  * @iter: iov iterator describing the region to be mapped
+  *
+- * Pins pages from *iter and appends them to @bio's bvec array. The
+- * pages will have to be released using put_page() when done.
+- * For multi-segment *iter, this function only adds pages from the
+- * next non-empty segment of the iov iterator.
++ * Pins pages from *iter and appends them to @bio's bvec array.  The pages will
++ * have to be released using put_page() or unpin_user_page() when done as
++ * according to bi_cleanup_mode.  For multi-segment *iter, this function only
++ * adds pages from the next non-empty segment of the iov iterator.
+  */
+ static int __bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
+ {
+@@ -1273,9 +1293,10 @@ static int __bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
+ 	 * result to ensure the bio's total size is correct. The remainder of
+ 	 * the iov data will be picked up in the next bio iteration.
+ 	 */
+-	size = iov_iter_get_pages(iter, pages,
+-				  UINT_MAX - bio->bi_iter.bi_size,
+-				  nr_pages, &offset, gup_flags);
++	size = iov_iter_extract_pages(iter, &pages,
++				      UINT_MAX - bio->bi_iter.bi_size,
++				      nr_pages, gup_flags,
++				      &offset, &bio->bi_cleanup_mode);
+ 	if (unlikely(size <= 0))
+ 		return size ? size : -EFAULT;
+ 
+@@ -1308,7 +1329,7 @@ static int __bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
+ 	iov_iter_revert(iter, left);
+ out:
+ 	while (i < nr_pages)
+-		put_page(pages[i++]);
++		bio_release_page(bio, pages[i++]);
+ 
+ 	return ret;
+ }
+@@ -1489,8 +1510,8 @@ void bio_set_pages_dirty(struct bio *bio)
+  * the BIO and re-dirty the pages in process context.
+  *
+  * It is expected that bio_check_pages_dirty() will wholly own the BIO from
+- * here on.  It will run one put_page() against each page and will run one
+- * bio_put() against the BIO.
++ * here on.  It will run one put_page() or unpin_user_page() against each page
++ * and will run one bio_put() against the BIO.
+  */
+ 
+ static void bio_dirty_fn(struct work_struct *work);
+diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+index 99be590f952f..883f873a01ef 100644
+--- a/include/linux/blk_types.h
++++ b/include/linux/blk_types.h
+@@ -289,6 +289,7 @@ struct bio {
+ #endif
+ 	};
+ 
++	unsigned int		bi_cleanup_mode; /* How to clean up pages */
+ 	unsigned short		bi_vcnt;	/* how many bio_vec's */
+ 
+ 	/*
 
 
