@@ -2,39 +2,45 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 43000C54EBD
-	for <linux-block@archiver.kernel.org>; Sun,  8 Jan 2023 17:16:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 04D25C53210
+	for <linux-block@archiver.kernel.org>; Sun,  8 Jan 2023 17:49:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233104AbjAHRQZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 8 Jan 2023 12:16:25 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50546 "EHLO
+        id S231134AbjAHRtX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 8 Jan 2023 12:49:23 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33872 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235924AbjAHROB (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 8 Jan 2023 12:14:01 -0500
+        with ESMTP id S229520AbjAHRtW (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 8 Jan 2023 12:49:22 -0500
 Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 664FCBC08
-        for <linux-block@vger.kernel.org>; Sun,  8 Jan 2023 09:14:00 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 62C4EE025;
+        Sun,  8 Jan 2023 09:49:21 -0800 (PST)
 Received: by verein.lst.de (Postfix, from userid 2407)
-        id C916368AA6; Sun,  8 Jan 2023 18:13:57 +0100 (CET)
-Date:   Sun, 8 Jan 2023 18:13:57 +0100
+        id 39E8768AA6; Sun,  8 Jan 2023 18:49:18 +0100 (CET)
+Date:   Sun, 8 Jan 2023 18:49:17 +0100
 From:   Christoph Hellwig <hch@lst.de>
-To:     Keith Busch <kbusch@meta.com>
-Cc:     linux-block@vger.kernel.org, axboe@kernel.dk, hch@lst.de,
-        martin.petersen@oracle.com,
-        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-        Keith Busch <kbusch@kernel.org>
-Subject: Re: [PATCHv4 2/2] block: save user max_sectors limit
-Message-ID: <20230108171357.GB20522@lst.de>
-References: <20230105205146.3610282-1-kbusch@meta.com> <20230105205146.3610282-3-kbusch@meta.com>
+To:     Tejun Heo <tj@kernel.org>
+Cc:     Jens Axboe <axboe@kernel.dk>, Dan Carpenter <error27@gmail.com>,
+        Ming Lei <ming.lei@redhat.com>,
+        Luis Chamberlain <mcgrof@kernel.org>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH block/for-6.2-fixes] block: Drop spurious might_sleep()
+ from blk_put_queue()
+Message-ID: <20230108174917.GA22751@lst.de>
+References: <Y7g3L6fntnTtOm63@kili> <Y7hbYPSdLqW++y/p@slm.duckdns.org> <9ac3390c-055b-546c-f1f4-68350dfe04f8@kernel.dk> <Y7iFwjN+XzWvLv3y@slm.duckdns.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230105205146.3610282-3-kbusch@meta.com>
+In-Reply-To: <Y7iFwjN+XzWvLv3y@slm.duckdns.org>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Looks good:
+I walked through everything called from blk_free_queue and can't find
+anything that sleeps either, so:
 
 Reviewed-by: Christoph Hellwig <hch@lst.de>
+
+I wonder if we could not also revert
+d578c770c85233af592e54537f93f3831bde7e9a as I think that was added
+to avoid calling blk_put_queue from atomic context.
