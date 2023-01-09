@@ -2,202 +2,169 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EAD08C54EBE
-	for <linux-block@archiver.kernel.org>; Mon,  9 Jan 2023 15:02:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E95F8C5479D
+	for <linux-block@archiver.kernel.org>; Mon,  9 Jan 2023 15:05:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233120AbjAIPCv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 9 Jan 2023 10:02:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48474 "EHLO
+        id S229619AbjAIPFQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 9 Jan 2023 10:05:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50866 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230186AbjAIPCg (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 9 Jan 2023 10:02:36 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6ABC81C415
-        for <linux-block@vger.kernel.org>; Mon,  9 Jan 2023 07:01:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1673276508;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+        with ESMTP id S235400AbjAIPFQ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 9 Jan 2023 10:05:16 -0500
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87F101C92F;
+        Mon,  9 Jan 2023 07:05:14 -0800 (PST)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id D18E14680;
+        Mon,  9 Jan 2023 15:05:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+        t=1673276712; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=5BnqkcP/B7SGlD7ivTZ2uRzTlawgLKPgKJY+C2gEHLI=;
-        b=CqJBcKMyt9OifljU/s+bd92+WgKHcGH5vn31p7JOTRGnBltT0ArRodpmtLWprkFx/7bpNR
-        Llm2MOMmbTTJyebHNjUw5ofDhOolPolV3XJHk7ZdTWE+bciaOBo6iMx6EzK0+1CV9/XYa9
-        zfJGGxjfXgvVWvXAcZmEzKSn3wi8Et8=
-Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
- [209.85.160.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-606-ysOktiU9M564aPaSVfU6_w-1; Mon, 09 Jan 2023 10:01:47 -0500
-X-MC-Unique: ysOktiU9M564aPaSVfU6_w-1
-Received: by mail-qt1-f197.google.com with SMTP id ez10-20020a05622a4c8a00b003ab6c16856fso3982592qtb.17
-        for <linux-block@vger.kernel.org>; Mon, 09 Jan 2023 07:01:46 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5BnqkcP/B7SGlD7ivTZ2uRzTlawgLKPgKJY+C2gEHLI=;
-        b=YM+HE3uQ2dQVXiF8cDEOoEMBLCxjNLcRbiPt+9q5SQq0iGshHeI0E6NX81+MAnVYvo
-         s0kbbl8ThmpeunQXj8e7623yQT+FIVklQelBZp1Z9EPMvNLam6lXodqnP5PAnItkBRAG
-         wEgZTNnUbZyyEtmxR/Bfp5UEVBUg/ViSIyV+W++QVdNw0ErrXG/1tVWR4N4D8NwdRw8e
-         eWuCpoZE5A8FMEg2arectNO0HQ+1mdvmhBHTdsezss4E0OM5fyUuGIE/0MqJY95Mqlz1
-         jdlLS1iAVN7H6oXLw4mV475lQzhXx6cIFh9q9N1l1O0maaWKt6xJAaHTwRDh562tqkpG
-         IBGQ==
-X-Gm-Message-State: AFqh2kri8oHyZDD0jwedPOnhpBjfMtksC96PgNgsrf1NCXns44K8P+7q
-        cCkXdoFgzevM/bfnIBOxTJ3+w72KwDZ8fNqsSw7dRR7fHqnjn5ItreYemm6ovCvem6C5PrCTB2L
-        ULpJEtCFGXTlTjEkIS2ShP4Q=
-X-Received: by 2002:ac8:6b4c:0:b0:39c:da20:d47c with SMTP id x12-20020ac86b4c000000b0039cda20d47cmr84648923qts.17.1673276506393;
-        Mon, 09 Jan 2023 07:01:46 -0800 (PST)
-X-Google-Smtp-Source: AMrXdXvzZP+QWbMTML85dKaCimKI1eGsnIuLcS2Bp/8ib3jUiLno1dRkiK90vxVouiizF3DOW2wqRA==
-X-Received: by 2002:ac8:6b4c:0:b0:39c:da20:d47c with SMTP id x12-20020ac86b4c000000b0039cda20d47cmr84648900qts.17.1673276506083;
-        Mon, 09 Jan 2023 07:01:46 -0800 (PST)
-Received: from bfoster (c-24-61-119-116.hsd1.ma.comcast.net. [24.61.119.116])
-        by smtp.gmail.com with ESMTPSA id bi1-20020a05620a318100b006fb0e638f12sm5457812qkb.4.2023.01.09.07.01.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 Jan 2023 07:01:45 -0800 (PST)
-Date:   Mon, 9 Jan 2023 10:02:46 -0500
-From:   Brian Foster <bfoster@redhat.com>
-To:     Sarthak Kukreti <sarthakkukreti@chromium.org>
-Cc:     sarthakkukreti@google.com, dm-devel@redhat.com,
-        linux-block@vger.kernel.org, linux-ext4@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        Jens Axboe <axboe@kernel.dk>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Alasdair Kergon <agk@redhat.com>,
-        Mike Snitzer <snitzer@kernel.org>,
-        Christoph Hellwig <hch@infradead.org>,
-        Theodore Ts'o <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Bart Van Assche <bvanassche@google.com>,
-        Daniil Lunev <dlunev@google.com>,
-        "Darrick J. Wong" <djwong@kernel.org>
-Subject: Re: [PATCH v2 6/7] ext4: Add mount option for provisioning blocks
- during allocations
-Message-ID: <Y7wsluqX+eFqV1XB@bfoster>
-References: <20221229081252.452240-1-sarthakkukreti@chromium.org>
- <20221229081252.452240-7-sarthakkukreti@chromium.org>
+        bh=r5AchZgkjBMvT1rTdbO0/ZY4pyGy39ipbS0uUdkYcRY=;
+        b=ALlw8jrDaBsAMeOsxe37gz788mxvsiIal84uC3vh8oCPb/RUOGaMrHPWS4u/XZ7YaTrojO
+        /0vL7JTxDXcpiY4JVHHOHWSEoBC2rfvC7jt/VeA1fco6NMz+r9weMsFMOgQlN3Lxf7gIPR
+        Wxpn6kaoTqLV/lIjIHJInWbL6UGGQMA=
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id AA32C134AD;
+        Mon,  9 Jan 2023 15:05:12 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id fK85KCgtvGMGQwAAMHmgww
+        (envelope-from <jgross@suse.com>); Mon, 09 Jan 2023 15:05:12 +0000
+Message-ID: <055adce8-ceba-983a-19cc-b09ec30bb3c3@suse.com>
+Date:   Mon, 9 Jan 2023 16:05:12 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221229081252.452240-7-sarthakkukreti@chromium.org>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.6.1
+Subject: Re: [PATCH 0/4] xen/blkback: some cleanups
+Content-Language: en-US
+To:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
+Cc:     =?UTF-8?Q?Roger_Pau_Monn=c3=a9?= <roger.pau@citrix.com>,
+        Jens Axboe <axboe@kernel.dk>, xen-devel@lists.xenproject.org
+References: <20221216145816.27374-1-jgross@suse.com>
+From:   Juergen Gross <jgross@suse.com>
+In-Reply-To: <20221216145816.27374-1-jgross@suse.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="------------Bn9el70qiXK9dBtQDHvkBxHs"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Dec 29, 2022 at 12:12:51AM -0800, Sarthak Kukreti wrote:
-> Add a mount option that sets the default provisioning mode for
-> all files within the filesystem.
-> 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--------------Bn9el70qiXK9dBtQDHvkBxHs
+Content-Type: multipart/mixed; boundary="------------5FtRzSy4gpSehjOHS0zh00HX";
+ protected-headers="v1"
+From: Juergen Gross <jgross@suse.com>
+To: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
+Cc: =?UTF-8?Q?Roger_Pau_Monn=c3=a9?= <roger.pau@citrix.com>,
+ Jens Axboe <axboe@kernel.dk>, xen-devel@lists.xenproject.org
+Message-ID: <055adce8-ceba-983a-19cc-b09ec30bb3c3@suse.com>
+Subject: Re: [PATCH 0/4] xen/blkback: some cleanups
+References: <20221216145816.27374-1-jgross@suse.com>
+In-Reply-To: <20221216145816.27374-1-jgross@suse.com>
 
-There's not much description here to explain what a user should expect
-from this mode. Should the user expect -ENOSPC from the lower layers
-once out of space? What about files that are provisioned by the fs and
-then freed? Should the user/admin know to run fstrim or also enable an
-online discard mechanism to ensure freed filesystem blocks are returned
-to the free pool in the block/dm layer in order to avoid premature fs
--ENOSPC conditions?
+--------------5FtRzSy4gpSehjOHS0zh00HX
+Content-Type: multipart/mixed; boundary="------------KfBHdy9WwI9ryEeh1hcoeXvF"
 
-Also, what about dealing with block level snapshots? There is some
-discussion on previous patches wrt to expectations on how provision
-might handle unsharing of cow'd blocks. If the fs only provisions on
-initial allocation, then a subsequent snapshot means we run into the
-same sort of ENOSPC problem on overwrites of already allocated blocks.
-That also doesn't consider things like an internal log, which may have
-been physically allocated (provisioned?) at mkfs time and yet is subject
-to the same general problem.
+--------------KfBHdy9WwI9ryEeh1hcoeXvF
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: base64
 
-So what is the higher level goal with this sort of mode? Is
-provision-on-alloc sufficient to provide a practical benefit to users,
-or should this perhaps consider other scenarios where a provision might
-be warranted before submitting writes to a thinly provisioned device?
+T24gMTYuMTIuMjIgMTU6NTgsIEp1ZXJnZW4gR3Jvc3Mgd3JvdGU6DQo+IFNvbWUgc21hbGwg
+Y2xlYW51cCBwYXRjaGVzIEkgaGFkIGx5aW5nIGFyb3VuZCBmb3Igc29tZSB0aW1lIG5vdy4N
+Cj4gDQo+IEp1ZXJnZW4gR3Jvc3MgKDQpOg0KPiAgICB4ZW4vYmxrYmFjazogZml4IHdoaXRl
+IHNwYWNlIGNvZGUgc3R5bGUgaXNzdWVzDQo+ICAgIHhlbi9ibGtiYWNrOiByZW1vdmUgc3Rh
+bGUgcHJvdG90eXBlDQo+ICAgIHhlbi9ibGtiYWNrOiBzaW1wbGlmeSBmcmVlX3BlcnNpc3Rl
+bnRfZ250cygpIGludGVyZmFjZQ0KPiAgICB4ZW4vYmxrYmFjazogbW92ZSBibGtpZl9nZXRf
+eDg2XypfcmVxKCkgaW50byBibGtiYWNrLmMNCj4gDQo+ICAgZHJpdmVycy9ibG9jay94ZW4t
+YmxrYmFjay9ibGtiYWNrLmMgfCAxMjYgKysrKysrKysrKysrKysrKysrKysrKysrKy0tLQ0K
+PiAgIGRyaXZlcnMvYmxvY2sveGVuLWJsa2JhY2svY29tbW9uLmggIHwgMTAzICstLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tDQo+ICAgMiBmaWxlcyBjaGFuZ2VkLCAxMTggaW5zZXJ0aW9ucygr
+KSwgMTExIGRlbGV0aW9ucygtKQ0KPiANCg0KUGluZz8NCg0KDQpKdWVyZ2VuDQo=
+--------------KfBHdy9WwI9ryEeh1hcoeXvF
+Content-Type: application/pgp-keys; name="OpenPGP_0xB0DE9DD628BF132F.asc"
+Content-Disposition: attachment; filename="OpenPGP_0xB0DE9DD628BF132F.asc"
+Content-Description: OpenPGP public key
+Content-Transfer-Encoding: quoted-printable
 
-FWIW, it seems reasonable to me to introduce this without snapshot
-support and work toward it later, but it should be made clear what is
-being advertised in the meantime. Unless there's some nice way to
-explicitly limit the scope of use, such as preventing snapshots or
-something, the fs might want to consider this sort of feature
-experimental until it is more fully functional.
+-----BEGIN PGP PUBLIC KEY BLOCK-----
 
-Brian
+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
+jR/i1DG86lem3iBDXzXsZDn8R38=3D
+=3D2wuH
+-----END PGP PUBLIC KEY BLOCK-----
 
-> Signed-off-by: Sarthak Kukreti <sarthakkukreti@chromium.org>
-> ---
->  fs/ext4/ext4.h    | 1 +
->  fs/ext4/extents.c | 7 +++++++
->  fs/ext4/super.c   | 7 +++++++
->  3 files changed, 15 insertions(+)
-> 
-> diff --git a/fs/ext4/ext4.h b/fs/ext4/ext4.h
-> index 49832e90b62f..29cab2e2ea20 100644
-> --- a/fs/ext4/ext4.h
-> +++ b/fs/ext4/ext4.h
-> @@ -1269,6 +1269,7 @@ struct ext4_inode_info {
->  #define EXT4_MOUNT2_MB_OPTIMIZE_SCAN	0x00000080 /* Optimize group
->  						    * scanning in mballoc
->  						    */
-> +#define EXT4_MOUNT2_PROVISION		0x00000100 /* Provision while allocating file blocks */
->  
->  #define clear_opt(sb, opt)		EXT4_SB(sb)->s_mount_opt &= \
->  						~EXT4_MOUNT_##opt
-> diff --git a/fs/ext4/extents.c b/fs/ext4/extents.c
-> index 2e64a9211792..a73f44264fe2 100644
-> --- a/fs/ext4/extents.c
-> +++ b/fs/ext4/extents.c
-> @@ -4441,6 +4441,13 @@ static int ext4_alloc_file_blocks(struct file *file, ext4_lblk_t offset,
->  	unsigned int credits;
->  	loff_t epos;
->  
-> +	/*
-> +	 * Attempt to provision file blocks if the mount is mounted with
-> +	 * provision.
-> +	 */
-> +	if (test_opt2(inode->i_sb, PROVISION))
-> +		flags |= EXT4_GET_BLOCKS_PROVISION;
-> +
->  	BUG_ON(!ext4_test_inode_flag(inode, EXT4_INODE_EXTENTS));
->  	map.m_lblk = offset;
->  	map.m_len = len;
-> diff --git a/fs/ext4/super.c b/fs/ext4/super.c
-> index 260c1b3e3ef2..5bc376f6a6f0 100644
-> --- a/fs/ext4/super.c
-> +++ b/fs/ext4/super.c
-> @@ -1591,6 +1591,7 @@ enum {
->  	Opt_max_dir_size_kb, Opt_nojournal_checksum, Opt_nombcache,
->  	Opt_no_prefetch_block_bitmaps, Opt_mb_optimize_scan,
->  	Opt_errors, Opt_data, Opt_data_err, Opt_jqfmt, Opt_dax_type,
-> +	Opt_provision, Opt_noprovision,
->  #ifdef CONFIG_EXT4_DEBUG
->  	Opt_fc_debug_max_replay, Opt_fc_debug_force
->  #endif
-> @@ -1737,6 +1738,8 @@ static const struct fs_parameter_spec ext4_param_specs[] = {
->  	fsparam_flag	("reservation",		Opt_removed),	/* mount option from ext2/3 */
->  	fsparam_flag	("noreservation",	Opt_removed),	/* mount option from ext2/3 */
->  	fsparam_u32	("journal",		Opt_removed),	/* mount option from ext2/3 */
-> +	fsparam_flag	("provision",		Opt_provision),
-> +	fsparam_flag	("noprovision",		Opt_noprovision),
->  	{}
->  };
->  
-> @@ -1826,6 +1829,8 @@ static const struct mount_opts {
->  	{Opt_nombcache, EXT4_MOUNT_NO_MBCACHE, MOPT_SET},
->  	{Opt_no_prefetch_block_bitmaps, EXT4_MOUNT_NO_PREFETCH_BLOCK_BITMAPS,
->  	 MOPT_SET},
-> +	{Opt_provision, EXT4_MOUNT2_PROVISION, MOPT_SET | MOPT_2},
-> +	{Opt_noprovision, EXT4_MOUNT2_PROVISION, MOPT_CLEAR | MOPT_2},
->  #ifdef CONFIG_EXT4_DEBUG
->  	{Opt_fc_debug_force, EXT4_MOUNT2_JOURNAL_FAST_COMMIT,
->  	 MOPT_SET | MOPT_2 | MOPT_EXT4_ONLY},
-> @@ -2977,6 +2982,8 @@ static int _ext4_show_options(struct seq_file *seq, struct super_block *sb,
->  		SEQ_OPTS_PUTS("dax=never");
->  	} else if (test_opt2(sb, DAX_INODE)) {
->  		SEQ_OPTS_PUTS("dax=inode");
-> +	} else if (test_opt2(sb, PROVISION)) {
-> +		SEQ_OPTS_PUTS("provision");
->  	}
->  
->  	if (sbi->s_groups_count >= MB_DEFAULT_LINEAR_SCAN_THRESHOLD &&
-> -- 
-> 2.37.3
-> 
+--------------KfBHdy9WwI9ryEeh1hcoeXvF--
 
+--------------5FtRzSy4gpSehjOHS0zh00HX--
+
+--------------Bn9el70qiXK9dBtQDHvkBxHs
+Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="OpenPGP_signature"
+
+-----BEGIN PGP SIGNATURE-----
+
+wsB5BAABCAAjFiEEhRJncuj2BJSl0Jf3sN6d1ii/Ey8FAmO8LSgFAwAAAAAACgkQsN6d1ii/Ey8T
+rgf/YPspae1H6xxWZbx8KKP2yS3WylDZF0YoQUBMlTxslcwhIiRltIckPFalUVdJclpwj8v2DyXK
+gIqKYpP1LJvXxIwty70hNd7lsWtSUeG633XCeEmkm/UlxGtk901ELOiPC6Pz4kHOS2Q+24CumPyV
+Cto1pzmm4K0PiXaAZyLLJ1B9GBpKnoOBJoL4H9Gxoq3lNr+FATjxbIQaPNS45hKx9qFhlVqAsDUX
+s+KMdJQsyhXcIakEzwBiqpZ0A4DAP7I8zHuoMeELoPR7DpZB+rPh8MlobYvQfv/eR1hIRjlq8zeB
+5UV+XYYQGFDp1Z2p4QHR4IerT9sRCNCqyiQ8/AlYjw==
+=sGDi
+-----END PGP SIGNATURE-----
+
+--------------Bn9el70qiXK9dBtQDHvkBxHs--
