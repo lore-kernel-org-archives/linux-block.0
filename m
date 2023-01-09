@@ -2,92 +2,138 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5745C61DB3
-	for <linux-block@archiver.kernel.org>; Mon,  9 Jan 2023 17:52:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED8AEC61DB3
+	for <linux-block@archiver.kernel.org>; Mon,  9 Jan 2023 18:10:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234868AbjAIRwX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 9 Jan 2023 12:52:23 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43996 "EHLO
+        id S232429AbjAISKP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 9 Jan 2023 13:10:15 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58444 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237591AbjAIRvi (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 9 Jan 2023 12:51:38 -0500
-Received: from mail-il1-x12e.google.com (mail-il1-x12e.google.com [IPv6:2607:f8b0:4864:20::12e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6AB7D271B
-        for <linux-block@vger.kernel.org>; Mon,  9 Jan 2023 09:47:58 -0800 (PST)
-Received: by mail-il1-x12e.google.com with SMTP id i1so1727569ilu.8
-        for <linux-block@vger.kernel.org>; Mon, 09 Jan 2023 09:47:58 -0800 (PST)
+        with ESMTP id S237291AbjAISI5 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 9 Jan 2023 13:08:57 -0500
+Received: from mail-pg1-x52a.google.com (mail-pg1-x52a.google.com [IPv6:2607:f8b0:4864:20::52a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C1BC232;
+        Mon,  9 Jan 2023 10:08:40 -0800 (PST)
+Received: by mail-pg1-x52a.google.com with SMTP id q9so6444975pgq.5;
+        Mon, 09 Jan 2023 10:08:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:subject:from:to:content-language
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=y7LcyydZFhGrE/n8mOpMLasvDg3mRxcl0EglIxC2lYc=;
-        b=OIrc91n5OS9Q+wJn8ye+ZBD4251Lm2dGGEC6vqK4HstGQJfdPxjtBoromNFHFwud1f
-         oGA6XHmHL/uu6uD4WsBd35OeelsDe/VWWMyPw3dl2h6OwZECQZfu634/BYTDxefnbj/0
-         SeTzSYbo72sxzEJ7CukS0nXprIHEcfwDvW4oqRKR7U6jD804QdLnF7xRC5FQ6bZyPd+H
-         xeQdHJ+upyEvTg65K/KTxl1WtKIRbvw4VoKm5C3uLjPrYKfsTeA30+MgannAoDZYLFV+
-         4H7iZo8CQJB82Au4SPKco4UVIGyxDCzFDDIksJHcRCljWX2vuCO1IeAs22/15bZAHkjg
-         Rurg==
+        d=gmail.com; s=20210112;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:sender
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=v8mDl6z8HZB+9Kmvxhak2TbVtn9xL/oPkERHONVaK/o=;
+        b=IrAiD+WenjCOrXbXt8CHP0KM/kRGlzZglFdJYig8j5c+YduPyy214fU95mZg19YZkQ
+         6If8TiMTCLETa696jiUhr8lxUtbHqo/oWKanSDA1M81PLYUn5V8qOopxrztev4v2o+xS
+         V2WA8iphWw18eOMfI2BgQAfYq1ZX2nlK2k5EoWL9e5OUP6fgSnLqENq/CIg9Sh9q6iu4
+         vV+CoMLnAbgl8Fzj2B+BU+TrePgajPu1J04qyNvFN2hRraF72WvETFCxK7Xy32dwolKT
+         aKdW3jdopXXVKJ7gmLyeqSd2CfFnMBbrBjyC614BjE2lw+mf0XsK77jr5I5etdCJOh6A
+         0MHA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:subject:from:to:content-language
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=y7LcyydZFhGrE/n8mOpMLasvDg3mRxcl0EglIxC2lYc=;
-        b=jpAdeDe9idmg5SilVKJArQQyN4QgJjd48FVApRKIUEdJ57N2cSANycS4u1SJ5cujf9
-         w5bFPn79M2r6bgUDs/n7i+7jIsXC+DHw7fbkmmX3DC9W+S4shLVje/m47MzHm93I4ou6
-         dTQioQA7VPrBihqz77VMxqlh0oZ3wLpv8YTCGtuUzrH5rik7kUuSz/EJc/RtlFPAbxwn
-         74dze5cYz3Vt+FhURDNW/xhx8Q5c9hb+RzL6Wh1Z2hpXydTtz7rQ5G8sjZ8sI/cMvQvC
-         cYprKdpI0pM+n4DFhLm+EY2wrCqY8UUjtrWp2QiLQEk4/aF+yBPSy5sWF1deuJaf3HSL
-         TUcQ==
-X-Gm-Message-State: AFqh2kpS5u/+XXsQpfRDhJecUilKvUVCBobLN1oXM+/+uXX9yPwo0o1b
-        PYTP6gt3jrmrOFCNKQ7AQ2TrHyu8S6v3LCvV
-X-Google-Smtp-Source: AMrXdXsGChJB94TPu2kUhyIR5q2a0Bbwec4Xdi+exwxuAPplf2MJjclHQpx9syS/7iH0a1JaZGGRjg==
-X-Received: by 2002:a92:c151:0:b0:303:9c30:7eff with SMTP id b17-20020a92c151000000b003039c307effmr9960918ilh.2.1673286472361;
-        Mon, 09 Jan 2023 09:47:52 -0800 (PST)
-Received: from [192.168.1.94] ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id w17-20020a92ad11000000b0030c44ed932asm2833213ilh.29.2023.01.09.09.47.51
-        for <linux-block@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 09 Jan 2023 09:47:52 -0800 (PST)
-Message-ID: <da48fbb7-ec78-f382-919e-cdf23fa200db@kernel.dk>
-Date:   Mon, 9 Jan 2023 10:47:51 -0700
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:sender
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=v8mDl6z8HZB+9Kmvxhak2TbVtn9xL/oPkERHONVaK/o=;
+        b=39JLb+tqVUa57D27OmnDZbbowm7WmniRk4DFjqrabzcND/jC4WaBCH6aWxDqv4+jbA
+         Vp4R5vMCgleg/XdASu0yCHqf4dQj0nJrUl3gKDcgeBs1CwNTwYZZMWYq90nawMIkC7xP
+         4qI6NmEadrTwLW5HjsH24LW+Jw6J4GVw/0SeDIimzw/puEHnPBCD0sPCIKP/Tv+ai/Lx
+         +WhJLpY8bXC/c/VREMoNjWivmQhAjyJbUyfTj+emHTqgzme/5f45IdUjlNNrYLe9UDvd
+         8qM+tqrJhtiE1RjUMnS0pu+UAqvunkARumdjpqqYXfiCc8IWGz7I/Yx0HAeJ4a78V6bo
+         XJbg==
+X-Gm-Message-State: AFqh2krUpwYnOZY/wPEu78WxcG0THPClhtXuRDE1u5VRzKkIJzKqq5gv
+        pjijonAvFdBWEtxaeSURZjA=
+X-Google-Smtp-Source: AMrXdXvF6SQqW4OIsHaOrTkEXKKQcWrsf8pD0JyZy4xDSSGlS0ZUbM9NQXxmWMDmJpbz+9pRCA2+1w==
+X-Received: by 2002:aa7:96f9:0:b0:582:7007:3fec with SMTP id i25-20020aa796f9000000b0058270073fecmr29248932pfq.11.1673287719766;
+        Mon, 09 Jan 2023 10:08:39 -0800 (PST)
+Received: from localhost (2603-800c-1a02-1bae-a7fa-157f-969a-4cde.res6.spectrum.com. [2603:800c:1a02:1bae:a7fa:157f:969a:4cde])
+        by smtp.gmail.com with ESMTPSA id 186-20020a6216c3000000b0057fec210d33sm5215812pfw.152.2023.01.09.10.08.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 09 Jan 2023 10:08:39 -0800 (PST)
+Sender: Tejun Heo <htejun@gmail.com>
+Date:   Mon, 9 Jan 2023 08:08:37 -1000
+From:   Tejun Heo <tj@kernel.org>
+To:     hanjinke <hanjinke.666@bytedance.com>
+Cc:     Jan Kara <jack@suse.cz>,
+        Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>,
+        josef@toxicpanda.com, axboe@kernel.dk, cgroups@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yinxin.x@bytedance.com
+Subject: Re: [External] Re: [PATCH v3] blk-throtl: Introduce sync and async
+ queues for blk-throtl
+Message-ID: <Y7xYJfRLSMYk9tj9@slm.duckdns.org>
+References: <20221226130505.7186-1-hanjinke.666@bytedance.com>
+ <20230105161854.GA1259@blackbody.suse.cz>
+ <20230106153813.4ttyuikzaagkk2sc@quack3>
+ <Y7hTHZQYsCX6EHIN@slm.duckdns.org>
+ <c839ba6c-80ac-6d92-af64-5c0e1956ae93@bytedance.com>
+ <Y7hlX4T1UOmQHiGf@slm.duckdns.org>
+ <e499f088-8ed9-2e19-b2e5-efaa4f9738f0@bytedance.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.0
-Content-Language: en-US
-To:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From:   Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH] block: add a BUILD_BUG_ON() for adding more bio flags than we
- have space
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <e499f088-8ed9-2e19-b2e5-efaa4f9738f0@bytedance.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-We have BIO_FLAG_LAST in the enum for bio specific flags, but it's
-not used to check that we're not exceeding the size of them. Add
-such a check.
+Hello,
 
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
+On Sat, Jan 07, 2023 at 12:44:35PM +0800, hanjinke wrote:
+> For cost.model setting, We first use the tools iocost provided to test the
+> benchmark model parameters of different types of disks online, and then save
+> these benchmark parameters to a parametric Model Table. During the
+> deployment process, pull and set the corresponding model parameters
+> according to the type of disk.
+> 
+> The setting of cost.qos should be considered slightly more，we need to make
+> some compromises between overall disk throughput and io latency.
+> The average disk utilization of the entire disk on a specific business and
+> the RLA（if it is io sensitive） of key businesses will be taken as
+> important input considerations. The cost.qos will be dynamically fine-tuned
+> according to the health status monitoring of key businesses.
 
----
+Ah, I see. Do you use the latency targets and min/max ranges or just fixate
+the vrate by setting min == max?
 
-diff --git a/block/bio.c b/block/bio.c
-index 5f96fcae3f75..633d1a2af785 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -1785,6 +1785,8 @@ static int __init init_bio(void)
- {
- 	int i;
- 
-+	BUILD_BUG_ON(BIO_FLAG_LAST > 8 * sizeof_field(struct bio, bi_flags));
-+
- 	bio_integrity_init();
- 
- 	for (i = 0; i < ARRAY_SIZE(bvec_slabs); i++) {
+> For cost.weight setting, high-priority services  will gain greater
+> advantages through weight settings to deal with a large number of io
+> requests in a short period of time. It works fine as work-conservation
+> of iocost works well according to our observation.
+
+Glad to hear.
+
+> These practices can be done better and I look forward to your better
+> suggestions.
+
+It's still in progress but resctl-bench's iocost-tune benchmark is what
+we're starting to use:
+
+ https://github.com/facebookexperimental/resctl-demo/blob/main/resctl-bench/doc/iocost-tune.md
+
+The benchmark takes like 6 hours and what it does is probing the whole vrate
+range looking for behavior inflection points given the scenario of
+protecting a latency sensitive workload against memory leak. On completion,
+it provides several solutions based on the behavior observed.
+
+The benchmark is destructive (to the content on the target ssd) and can be
+tricky to set up. There's installable image to help setting up and running
+the benchmark:
+
+ https://github.com/iocost-benchmark/resctl-demo-image-recipe/actions
+
+The eventual goal is collecting these benchmark results in the following git
+repo:
+
+ https://github.com/iocost-benchmark/iocost-benchmarks
+
+which generates hwdb files describing all the found solution and make
+systemd apply the appropriate configuration on boot automatically.
+
+It's still all a work in progress but hopefully we should be able to
+configure iocost reasonably on boot on most SSDs.
+
+Thanks.
 
 -- 
-Jens Axboe
-
+tejun
