@@ -2,101 +2,149 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 28B9AC54EBD
-	for <linux-block@archiver.kernel.org>; Mon,  9 Jan 2023 17:07:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A42C7C54EBD
+	for <linux-block@archiver.kernel.org>; Mon,  9 Jan 2023 17:12:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229499AbjAIRHA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 9 Jan 2023 12:07:00 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55460 "EHLO
+        id S237257AbjAIRMW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 9 Jan 2023 12:12:22 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33994 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237334AbjAIRGX (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 9 Jan 2023 12:06:23 -0500
-Received: from mail-pg1-f174.google.com (mail-pg1-f174.google.com [209.85.215.174])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E13184102D;
-        Mon,  9 Jan 2023 09:05:31 -0800 (PST)
-Received: by mail-pg1-f174.google.com with SMTP id q9so6313472pgq.5;
-        Mon, 09 Jan 2023 09:05:31 -0800 (PST)
+        with ESMTP id S235272AbjAIRMC (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 9 Jan 2023 12:12:02 -0500
+Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6EFB03AB24;
+        Mon,  9 Jan 2023 09:10:25 -0800 (PST)
+Received: by mail-pl1-x633.google.com with SMTP id b17so2704313pld.7;
+        Mon, 09 Jan 2023 09:10:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=v2F7MnQjWUM2mz3fa62EsZ0QXZ22HhpfAIEPFOeLt3g=;
+        b=NUhh4xIZ+AOJcgsbU0xvlzbsJbVG+9T3Se2OyuTTwY9bT6lLSXeiL/gqBhuZRqP3gk
+         DcSVyYGX4HnFUgLJH2s4TxhsSe2evRnc6dYpBgAWjfnWyvzIJcdOSYmZYjTh0z6n7dS5
+         IDPQdCNb6odXMeAbi0edwjLaLnBRrvUSSKuDZ8KHQkTzhPmCuXO4iqDYkoDJ9gECFfyX
+         ElnMf/H5FC3HCww5Zd8pZUVzLTH19cA5dXo+zTlZkxrTTwZs4Kn/yWlUz0OTbjIEi4Vd
+         Oizt0ucUcD7hftQewLu/5aC2S9piZMYt0TUDDcyv3Ix1xigSYrBMFxSXTWg8QSXqjtFa
+         zSfg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=D+Jk43bfwlT9wi1gXomrMQ7R6y2uWjif0guEJB9OZDk=;
-        b=AgRpPFcCcEUfpvrnpf7tuWoBrY6hLMd2AMP3pyacjXORPUOFwBbSDJs1T8eYv3/If6
-         +GQ+kH7U/VH6cG4WOz7apqq9UyYjb8FfixYIDG+QOd4HW5NM5xyi12byIiHihJMtsIzw
-         uuvUwYlbzP63xVTffOxoJBOznvDIo0XQQLCmw5vafBbglrwqZxX9t0f7NH7R8nbVuhqK
-         /rLb9aKwhNe4VtSH8Uh42lFWJTQ3ZjT/QpZ/VpmH5JlTFyXNYu9xzLgyZYJh6icRMH5M
-         KyVtSkXcMApgUSi517Dak25tC4y+nwVvLKTP98lRGPGLvN7rW6SUlpzp1RX3wd4pbVL2
-         R/4Q==
-X-Gm-Message-State: AFqh2kqJsNZWtC0+NTRBgXXTBhhbruh2h0WK3L59kedC7oeA6KInTft4
-        T9mfttnwujlcwNO+S8DFguI=
-X-Google-Smtp-Source: AMrXdXt0A8n0S+XnWdQfOF5gLmeJIIc52A1L37LfeDPhxxtdIXnVFVgm2rLmk9/LhLAJaqj32xc5sw==
-X-Received: by 2002:a62:6145:0:b0:581:7cb0:1eb8 with SMTP id v66-20020a626145000000b005817cb01eb8mr44017246pfb.17.1673283931028;
-        Mon, 09 Jan 2023 09:05:31 -0800 (PST)
-Received: from ?IPV6:2620:15c:211:201:9f06:14dd:484f:e55c? ([2620:15c:211:201:9f06:14dd:484f:e55c])
-        by smtp.gmail.com with ESMTPSA id 69-20020a621748000000b005810a54fdefsm6311863pfx.114.2023.01.09.09.05.28
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 09 Jan 2023 09:05:30 -0800 (PST)
-Message-ID: <6079a21f-e8da-05bb-b6a5-be4cd350ac66@acm.org>
-Date:   Mon, 9 Jan 2023 09:05:28 -0800
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=v2F7MnQjWUM2mz3fa62EsZ0QXZ22HhpfAIEPFOeLt3g=;
+        b=ZeVqhYvALKllCSOmdT6L50lZb/3pa0FK68YQMIUhk/ULtL0lVxYNCOBhv1tlC4puVw
+         l6171FKPbKNUE0iY2APo13B9bHQxhba6az+leaIBMVG0pj1MrPENrnLp3XbRBuCS3mvc
+         XfblZpSDMxXws4YDS51TDvvqAA+QqQ/xoWpruFGWdsWLEKMAYl1ZZ29SFt9M0VlPW86o
+         YvdGH0cHeNHe5oNv/CG18R4jkXtsqkXi7ETaFVDaoIoCtSnYNYflo7vc0xK+xLEslb00
+         phy1zTLSzayEsNtM173dAcbnLja5SF8iXLvBVLRMdfIoaNKtXIs0d/XbJ+aTxwjXu3jG
+         NgOA==
+X-Gm-Message-State: AFqh2koB5UPlP9eYagRQyed8KaXfzhqODp8/fZgKatts/ukKHUtebufN
+        f3zkFcDoHUC+4ifhZOaUaZA=
+X-Google-Smtp-Source: AMrXdXuP4f5mFQ4/HE2YXlElOb2g+3Jrsg8Ro+CRnWQAfTXMHh/IP6Qvmy+W0FVCFR/ArXdFHluUTg==
+X-Received: by 2002:a17:90a:ead2:b0:226:f8dc:b237 with SMTP id ev18-20020a17090aead200b00226f8dcb237mr7360327pjb.31.1673284224688;
+        Mon, 09 Jan 2023 09:10:24 -0800 (PST)
+Received: from localhost (2603-800c-1a02-1bae-a7fa-157f-969a-4cde.res6.spectrum.com. [2603:800c:1a02:1bae:a7fa:157f:969a:4cde])
+        by smtp.gmail.com with ESMTPSA id k15-20020a17090a3ccf00b002195819d541sm7612899pjd.8.2023.01.09.09.10.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 09 Jan 2023 09:10:24 -0800 (PST)
+Sender: Tejun Heo <htejun@gmail.com>
+Date:   Mon, 9 Jan 2023 07:10:22 -1000
+From:   Tejun Heo <tj@kernel.org>
+To:     Jan Kara <jack@suse.cz>
+Cc:     Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>,
+        Jinke Han <hanjinke.666@bytedance.com>, josef@toxicpanda.com,
+        axboe@kernel.dk, cgroups@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yinxin.x@bytedance.com
+Subject: Re: [PATCH v3] blk-throtl: Introduce sync and async queues for
+ blk-throtl
+Message-ID: <Y7xKfl7gGt+wb/I2@slm.duckdns.org>
+References: <20221226130505.7186-1-hanjinke.666@bytedance.com>
+ <20230105161854.GA1259@blackbody.suse.cz>
+ <20230106153813.4ttyuikzaagkk2sc@quack3>
+ <Y7hTHZQYsCX6EHIN@slm.duckdns.org>
+ <20230109105916.jvnhjdseqkwejmws@quack3>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.1
-Subject: Re: [External] [LSF/MM/BPF BoF] Session for Zoned Storage 2023
-Content-Language: en-US
-To:     =?UTF-8?Q?Javier_Gonz=c3=a1lez?= <javier.gonz@samsung.com>,
-        "Viacheslav A.Dubeyko" <viacheslav.dubeyko@bytedance.com>
-Cc:     Viacheslav Dubeyko <slava@dubeyko.com>,
-        Luis Chamberlain <mcgrof@kernel.org>,
-        Linux FS Devel <linux-fsdevel@vger.kernel.org>,
-        linux-block@vger.kernel.org,
-        =?UTF-8?Q?Matias_Bj=c3=b8rling?= <Matias.Bjorling@wdc.com>,
-        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-        Adam Manzanares <a.manzanares@samsung.com>,
-        Hans Holmberg <hans.holmberg@wdc.com>,
-        lsf-pc@lists.linux-foundation.org
-References: <F6BF25E2-FF26-48F2-8378-3CB36E362313@dubeyko.com>
- <Y7h0F0w06cNM89hO@bombadil.infradead.org>
- <4CC4F55E-17B3-47E2-A8C5-9098CCEB65D6@dubeyko.com>
- <CGME20230107015641eucas1p13c2b37b5ca7a5b64eb520b79316d5186@eucas1p1.samsung.com>
- <5DF10459-88F3-48DA-AEB2-5B436549A194@bytedance.com>
- <20230109153315.waqfokse4srv6xlz@mpHalley-2.localdomain>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20230109153315.waqfokse4srv6xlz@mpHalley-2.localdomain>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230109105916.jvnhjdseqkwejmws@quack3>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/9/23 07:33, Javier González wrote:
-> On 06.01.2023 17:56, Viacheslav A.Dubeyko wrote:
-[ ... ]
-> As a general comment, do we want to talk about ZNS alone, or zoned
-> storage in general? We have of course SMR, but also zoned UFS with
-> actual use-cases.
+Hello, Jan.
 
-I propose to broaden the conversation from ZNS to ZNS (NVMe) + ZBC (SCSI).
+On Mon, Jan 09, 2023 at 11:59:16AM +0100, Jan Kara wrote:
+> Yeah, I agree there's no way back :). But actually I think a lot of the
+> functionality of IO schedulers is not needed (by you ;)) only because the
+> HW got performant enough and so some issues became less visible. And that
+> is all fine but if you end up in a configuration where your cgroup's IO
+> limits and IO demands are similar to how the old rotational disks were
+> underprovisioned for the amount of IO needed to be done by the system
+> (i.e., you can easily generate amount of IO that then takes minutes or tens
+> of minutes for your IO subsystem to crunch through), you hit all the same
+> problems IO schedulers were trying to solve again. And maybe these days we
+> incline more towards the answer "buy more appropriate HW / buy higher
+> limits from your infrastructure provider" but it is not like the original
+> issues in such configurations disappeared.
 
->> I think we can consider such discussions:
->> (1) I assume that we still need to discuss PO2 zone sizes?
+Yeah, but I think there's a better way out as there's still a difference
+between the two situations. W/ hard disks, you're actually out of bandwidth.
+With SSDs, we know that there are capacity that we can borrow to get out of
+the tough spot. e.g. w/ iocost, you can constrain a cgroup to a point where
+its throughput gets to a simliar level of hard disks; however, that still
+doesn't (or at least shouldn't) cause noticeable priority inversions outside
+of that cgroup because issue_as_root promotes the IOs which can be waited
+upon by other cgroups to root charging the cost to the cgroup as debts and
+further slowing it down afterwards.
+
+There's a lot to be improved - e.g. the debt accounting and payback, and
+propagation to originator throttling isn't very accurate leading to usually
+over-throttling and under-utilization in some cases. The coupling between IO
+control and dirty throttling is there and kinda works but it seems like it's
+pretty easy to make it misbehave under heavy control and so on. But, even
+with all those shortcomings, at least iocost is feature complete and already
+works (not perfectly but still) in most cases - it can actually distribute
+IO bandwidth across the cgroups with arbitrary weights without causing
+noticeable priority inversions across cgroups.
+
+blk-throttle unfortunately doesn't have issue_as_root and the issuer delay
+mechanism hooked up and we found that it's near impossible to configure
+properly in any scalable manner. Raw bw and iops limits just can't capture
+application behavior variances well enough. Often, the valid parameter space
+becomes null when trying to cover varied behaviors. Given the problem is
+pretty fundamental for the control scheme, I largely gave up on it with the
+long term goal of implementing io.max on top of iocost down the line.
+
+> > Another layering problem w/ controlling from elevators is that that's after
+> > request allocation and the issuer has already moved on. We used to have
+> > per-cgroup rq pools but ripped that out, so it's pretty easy to cause severe
+> > priority inversions by depleting the shared request pool, and the fact that
+> > throttling takes place after the issuing task returned from issue path makes
+> > propagating the throttling operation upwards more challenging too.
 > 
-> For this discussion to move forward, we need users rather than vendors
-> talking about the need. If someone is willing to drive this discussion,
-> then it makes sense. I do not believe we will make progress otherwise.
+> Well, we do have .limit_depth IO scheduler callback these days so BFQ uses
+> that to solve the problem of exhaustion of shared request pool but I agree
+> it's a bit of a hack on the side.
 
-In JEDEC meetings I hear that UFS vendors strongly request support for 
-zone sizes that are not a power of two. The JEDEC UFS committee is 
-currently busy with requesting an MoU from T10 for permission to base 
-JEDEC standards on ZBC. We plan to finalize the ZUFS (zoned UFS) 
-specification once that MoU has been established (probably later this 
-spring).
+Ah didn't know about that. Yeah, that'd help the situation to some degree.
 
-An additional topic I want to talk about is support for queue depths > 1 
-for sequential write required zone type. I plan to post patches soon 
-(later this week).
+> > My bet is that inversion issues are a lot more severe with blk-throttle
+> > because it's not work-conserving and not doing things like issue-as-root or
+> > other measures to alleviate issues which can arise from inversions.
+> 
+> Yes, I agree these features of blk-throttle make the problems much more
+> likely to happen in practice.
 
-Thanks,
+As I wrote above, I largely gave up on blk-throttle and things like tweaking
+sync write priority doesn't address most of its problems (e.g. it's still
+gonna be super easy to stall the whole system with a heavily throttled
+cgroup). However, it can still be useful for some use cases and if it can be
+tweaked to become a bit better, I don't see a reason to not do that.
 
-Bart.
+Thanks.
 
+-- 
+tejun
