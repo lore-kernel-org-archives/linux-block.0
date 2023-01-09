@@ -2,132 +2,163 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E6305C61DB3
-	for <linux-block@archiver.kernel.org>; Mon,  9 Jan 2023 18:26:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38783C5479D
+	for <linux-block@archiver.kernel.org>; Mon,  9 Jan 2023 19:13:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237539AbjAIS0h (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 9 Jan 2023 13:26:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44614 "EHLO
+        id S237345AbjAITNO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 9 Jan 2023 14:13:14 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51176 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234723AbjAIS0T (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 9 Jan 2023 13:26:19 -0500
-Received: from mail-pg1-x533.google.com (mail-pg1-x533.google.com [IPv6:2607:f8b0:4864:20::533])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F5A8AE62;
-        Mon,  9 Jan 2023 10:23:37 -0800 (PST)
-Received: by mail-pg1-x533.google.com with SMTP id 36so6459978pgp.10;
-        Mon, 09 Jan 2023 10:23:37 -0800 (PST)
+        with ESMTP id S229969AbjAITM5 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 9 Jan 2023 14:12:57 -0500
+Received: from mail-oi1-x22a.google.com (mail-oi1-x22a.google.com [IPv6:2607:f8b0:4864:20::22a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D906B6AD99
+        for <linux-block@vger.kernel.org>; Mon,  9 Jan 2023 11:11:59 -0800 (PST)
+Received: by mail-oi1-x22a.google.com with SMTP id d127so7989549oif.12
+        for <linux-block@vger.kernel.org>; Mon, 09 Jan 2023 11:11:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=NgVKC3NmcxxKrnQWmSerqqDaGhLOMoPMCbrmW5GVKVk=;
-        b=qewQu0vk4Nwlo4LFhzKWR6EMnRJh/XhktdhcuuMLJzHXnLsWf8U7fgWVovAVzLQgLe
-         DeAEVAeyCjNwGPETUlQL6Nb17w8G/1bsiS/0/qc7clbmBVPMWLaVQ9JljHwXzt5cJA2+
-         aSxCPG8HvjEcZvwjL+wRu1fZKx1Qx/DpAB/9v4gjX+99NiJv/8/866g3KaKAM6DAehOY
-         7TbHUhRsPDtNNqHcqjxNHyGFPqMQ6WIhMiuFxm0AjfzwupH8ibQAs/oPDTIPyoHYIMsx
-         1GpJDL5vWZJu1nQq+wpHacVi3pRyjumovgtqe7jEPXeDvyWSmldn+4FUP6xZBBocggZx
-         rWLA==
+        d=bytedance-com.20210112.gappssmtp.com; s=20210112;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=5CLv/P4JEp5Ex9rXibMOi19GoQyezrkIjWD2yymGGSY=;
+        b=OoGCPFxFgLV7aQGpsUf6D9b1RoicEIwWIXMQAapFlcjL2K2uuwKku8DTjmFRw9MSLH
+         HeoBi0Thj3idj3GAXd7tt6WV7dCeUZ1H3XutKHWEBM79tbeHssor5C9cCPeWKkg84H1k
+         4fCo+ouuiKc75DwhFVdbQJVgqGXKzaxDjdUz8q6Bvno/PWGzUrAtlnD+3qE70T/VqBA2
+         yZ0UV4XAPVrXzNl/taVpXO3Kcqr23nb2W9C15wMw7gf0g+N9vxjefGX8nl/a7MZyRmLi
+         sW/GcJ7qBn4FDY5eAOGd2k3QORzLykXN5z0LmFq2NTH1q3ddD/Lu6y7ir5m+FuxQcOkE
+         nRGQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=NgVKC3NmcxxKrnQWmSerqqDaGhLOMoPMCbrmW5GVKVk=;
-        b=1kbkWecXl+EsNQfkkVYRjt6iDa6t4VpxEJUGAPPOHp3z29wUFuIrYR/hH4XbK8FhZ0
-         JUibNrgrenh+djkNxp6Jv7hvGDeFuHm1U2RDGczaoBl6VLRZ66U60M5aky373NLZz8Yx
-         i23No5we+DvUX/nJyGO4HJEz4UcTW9AS+WHhik5TRYB02GcsoMcpJ1tKbdhEmkA705+C
-         fy66gPouTrpxcORD2kyGDXFcASYRPKO7amACJhZvDto4hfkeOaXFbpGDshdvIopRfbP7
-         sM2x6C/6v1P9YKLds/bbFo82h/HRy2/G/B52pL/KxtZV9iBqS+GZoLxYR+G1i+xxxoZu
-         mJwg==
-X-Gm-Message-State: AFqh2kqpSqbwFjq6ZHbsWy72AifVNv/gj5JjtvBfGJG6KVRgZqMjpU8I
-        L+UpmNCY1iWtIjcG8yCqTHM=
-X-Google-Smtp-Source: AMrXdXvOjR1muOMTzKTpSNs8q23B3jzxSKkQCMOrD/PQtF3jc8DHE+U1ihL5Ojyfsr2lRaEQjCW/Mw==
-X-Received: by 2002:a62:506:0:b0:56c:7216:fbc6 with SMTP id 6-20020a620506000000b0056c7216fbc6mr65035427pff.30.1673288616438;
-        Mon, 09 Jan 2023 10:23:36 -0800 (PST)
-Received: from localhost (2603-800c-1a02-1bae-a7fa-157f-969a-4cde.res6.spectrum.com. [2603:800c:1a02:1bae:a7fa:157f:969a:4cde])
-        by smtp.gmail.com with ESMTPSA id z24-20020aa79498000000b005821db4fd84sm6361045pfk.131.2023.01.09.10.23.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 Jan 2023 10:23:36 -0800 (PST)
-Sender: Tejun Heo <htejun@gmail.com>
-Date:   Mon, 9 Jan 2023 08:23:34 -1000
-From:   Tejun Heo <tj@kernel.org>
-To:     Yu Kuai <yukuai1@huaweicloud.com>
-Cc:     hch@infradead.org, josef@toxicpanda.com, axboe@kernel.dk,
-        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, yi.zhang@huawei.com,
-        "yukuai (C)" <yukuai3@huawei.com>
-Subject: Re: [PATCH v2 1/2] blk-iocost: add refcounting for iocg
-Message-ID: <Y7xbpidpq7+DqJan@slm.duckdns.org>
-References: <20221227125502.541931-1-yukuai1@huaweicloud.com>
- <20221227125502.541931-2-yukuai1@huaweicloud.com>
- <Y7XzUee5Bq+DoIC1@slm.duckdns.org>
- <c63ee2ad-23d5-3be0-c731-28494398b391@huaweicloud.com>
- <Y7cX0SJ0y6+EIY5Q@slm.duckdns.org>
- <7dcdaef3-65c1-8175-fea7-53076f39697f@huaweicloud.com>
- <Y7iCId3pnEnLqY8G@slm.duckdns.org>
- <875eb43e-202d-5b81-0bff-ef0434358d99@huaweicloud.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <875eb43e-202d-5b81-0bff-ef0434358d99@huaweicloud.com>
+        bh=5CLv/P4JEp5Ex9rXibMOi19GoQyezrkIjWD2yymGGSY=;
+        b=Bk7jODc0gVf6tiOB9i+/uBBkZDlwU3Jem38jjqXgAQoEC8CUEjohv6ryViZaMoVO2V
+         aLcCZPBNVCPHco0Xvimx2lhc3IDXXjxK0oC9E5x/YhJTn21Wfgu2jVXsnOmQApRirVUc
+         JQXdX/2Jw+5tUbFg0Ii7OjS6VjEDYrYTHpkBI64je/A1pf7lofy0yYPuiKMFN5/EvxmI
+         SbDigcQZ7xsf0OeNLxLzOB7zvRtzAWPwFZ79SWbpDZeNfmsYYNHSyQCo95g1EevReETK
+         PArVj3UtydKegzryQu51G8NAz7M9cGz4PIHudYUVp68SphvNCcRuTmmZRWWA5SEaksSj
+         sqbg==
+X-Gm-Message-State: AFqh2kpQgw/iRWoF0Su1COtYfRNC8clDMz0VByS5S+4qq8rMEHBNS6VJ
+        V4kBC2VIWbV6LUQZlTxlJ2zO8QOntnA7fz08
+X-Google-Smtp-Source: AMrXdXs8cnNq0YovQmXXwRPdxXElha0EMlat+xn4izmbck79CAnVPkLi8QNiIBXLawzROmB1Z3vq7g==
+X-Received: by 2002:aca:6285:0:b0:363:a5fd:9cd5 with SMTP id w127-20020aca6285000000b00363a5fd9cd5mr14032797oib.3.1673291519152;
+        Mon, 09 Jan 2023 11:11:59 -0800 (PST)
+Received: from smtpclient.apple (172-125-78-211.lightspeed.sntcca.sbcglobal.net. [172.125.78.211])
+        by smtp.gmail.com with ESMTPSA id i9-20020a9d6109000000b0066c3bbe927esm4977350otj.21.2023.01.09.11.11.57
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 09 Jan 2023 11:11:58 -0800 (PST)
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3731.300.101.1.3\))
+Subject: Re: [External] [LSF/MM/BPF BoF] Session for Zoned Storage 2023
+From:   "Viacheslav A.Dubeyko" <viacheslav.dubeyko@bytedance.com>
+In-Reply-To: <20230109153315.waqfokse4srv6xlz@mpHalley-2.localdomain>
+Date:   Mon, 9 Jan 2023 11:11:46 -0800
+Cc:     Viacheslav Dubeyko <slava@dubeyko.com>,
+        Luis Chamberlain <mcgrof@kernel.org>,
+        Linux FS Devel <linux-fsdevel@vger.kernel.org>,
+        linux-block@vger.kernel.org,
+        =?utf-8?Q?Matias_Bj=C3=B8rling?= <Matias.Bjorling@wdc.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+        Adam Manzanares <a.manzanares@samsung.com>,
+        Hans Holmberg <hans.holmberg@wdc.com>,
+        lsf-pc@lists.linux-foundation.org
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <AF3750AD-1B66-4F8A-936F-A14EC17DAC16@bytedance.com>
+References: <F6BF25E2-FF26-48F2-8378-3CB36E362313@dubeyko.com>
+ <Y7h0F0w06cNM89hO@bombadil.infradead.org>
+ <4CC4F55E-17B3-47E2-A8C5-9098CCEB65D6@dubeyko.com>
+ <CGME20230107015641eucas1p13c2b37b5ca7a5b64eb520b79316d5186@eucas1p1.samsung.com>
+ <5DF10459-88F3-48DA-AEB2-5B436549A194@bytedance.com>
+ <20230109153315.waqfokse4srv6xlz@mpHalley-2.localdomain>
+To:     =?utf-8?Q?Javier_Gonz=C3=A1lez?= <javier.gonz@samsung.com>
+X-Mailer: Apple Mail (2.3731.300.101.1.3)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
 
-On Mon, Jan 09, 2023 at 09:32:46AM +0800, Yu Kuai wrote:
-> >   59b57717fff8 ("blkcg: delay blkg destruction until after writeback has finished")
-> >   d866dbf61787 ("blkcg: rename blkcg->cgwb_refcnt to ->online_pin and always use it")
-> 
-> These two commits are applied for three years, I don't check the details
-> yet but they seem can't guarantee that no io will be handled by
-> rq_qos_throttle() after pd_offline_fn(), because I just reproduced this
-> in another problem:
-> 
-> f02be9002c48 ("block, bfq: fix null pointer dereference in bfq_bio_bfqg()")
-> 
-> User thread can issue async io, and io can be throttled by
-> blk-throttle(not writeback), then user thread can exit and cgroup can be
-> removed before such io is dispatched to rq_qos_throttle.
+> On Jan 9, 2023, at 7:33 AM, Javier Gonz=C3=A1lez =
+<javier.gonz@samsung.com> wrote:
+>=20
 
-I see.
+<skipped>
 
-> > After the above two commits, ->pd_offline_fn() is called only after all
-> > possible writebacks are complete, so it shouldn't allow mass escapes to
-> > root. With writebacks out of the picture, it might be that there can be no
-> > further IOs once ->pd_offline_fn() is called too as there can be no tasks
-> > left in it and no dirty pages, but best to confirm that.
-> > 
-> > So, yeah, the original approach you took should work although I'm not sure
-> > the patches that you added to make offline blkg to bypass are necessary
-> > (that also contributed to my assumption that there will be more IOs on those
-> > blkg's). Have you seen more IOs coming down the pipeline after offline? If
-> > so, can you dump some backtraces and see where they're coming from?
-> 
-> Currently I'm sure such IOs can come from blk-throttle, and I'm not sure
-> yet but I also suspect io_uring can do this.
+>>>=20
+>>> (1) I am going to share SSDFS patchset soon. And topic is:
+>>> SSDFS + ZNS SSD: deterministic architecture decreasing TCO cost of =
+data infrastructure.
+>=20
+>=20
+> Would be good to see the patches before LSF/MM/BPF.
+>=20
 
-Yeah, that's unfortunate. There are several options here:
+I am making code cleanup now. I am expecting to share patches in two =
+weeks.
 
-1. Do what you originally suggested - bypass to root after offline. I feel
-   uneasy about this. Both iolatency and throtl clear their configs on
-   offline but that's punting to the parent. For iocost it'd be bypassing
-   all controls, which can actually be exploited.
+> I saw your talk at Plumbers. Do you think you have more data to share
+> too? Maybe even a comparisson with btrfs in terms of WAF and Space =
+Amp?
+>=20
 
-2. Make all possible IO issuers use blkcg_[un]pin_online() and shift the
-   iocost shutdown to pd_offline_fn(). This likely is the most canonical
-   solution given the current situation but it's kinda nasty to add another
-   layer of refcnting all over the place.
+I am working to share more data. So, I should have more details.
+I have data for btrfs already. Do you mean that you would like to see =
+comparison
+btrfs + compression vs. ssdfs? By the way, I am using my own methodology
+to estimate WAF and space amplification. What methodology do you have in =
+mind?
+Maybe, I could improve mine. :)
 
-3. Order blkg free so that parents are never freed before children. You did
-   this by adding refcnts in iocost but shouldn't it be possible to simply
-   shift blkg_put(blkg->parent) in __blkg_release() to blkg_free_workfn()?
+<skipped>
 
-#3 seems the most logical to me. What do you thinK?
+>>>=20
+>>=20
+>> I think we can consider such discussions:
+>> (1) I assume that we still need to discuss PO2 zone sizes?
+>=20
+> For this discussion to move forward, we need users rather than vendors
+> talking about the need. If someone is willing to drive this =
+discussion,
+> then it makes sense. I do not believe we will make progress otherwise.
+>=20
 
-Thanks.
+As part of ByteDance, I am on user side now. :) So, let me have some =
+internal
+discussion and to summarize vision(s) on our side. I believe that, =
+maybe, it makes
+sense to summarize a list of pros and cons and to have something like =
+analysis or
+brainstorming here.
 
--- 
-tejun
+<skipped>
+
+>=20
+>> (4) New ZNS standard features that we need to support on block layer =
++ FS levels?
+>=20
+> Do you have any concrete examples in mind?
+>=20
+
+My point here that we could summarize:
+(1) what features already implemented and supported,
+(2) what features are under implementation and what is progress,
+(3) what features need to be implemented yet.
+
+Have we implemented everything already? :)
+
+>> (5) ZNS drive emulation + additional testing features?
+>=20
+> Is this QEMU alone or do you have other ideas in mind?
+>=20
+
+My point is the same here. Let=E2=80=99s summarize how reasonably good =
+is emulation now.
+Do we need to support the emulation of any additional features?
+And we can talk not only about QEMU.
+
+Thanks,
+Slava.
+=20
