@@ -2,50 +2,51 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E9086C54EBD
-	for <linux-block@archiver.kernel.org>; Mon,  9 Jan 2023 23:28:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AA640C63797
+	for <linux-block@archiver.kernel.org>; Mon,  9 Jan 2023 23:28:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237890AbjAIX2K (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 9 Jan 2023 18:28:10 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55374 "EHLO
+        id S237867AbjAIX2L (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 9 Jan 2023 18:28:11 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55438 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237906AbjAIX1s (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 9 Jan 2023 18:27:48 -0500
-Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1163A140F9
-        for <linux-block@vger.kernel.org>; Mon,  9 Jan 2023 15:27:48 -0800 (PST)
-Received: by mail-pf1-f173.google.com with SMTP id c9so7424578pfj.5
-        for <linux-block@vger.kernel.org>; Mon, 09 Jan 2023 15:27:48 -0800 (PST)
+        with ESMTP id S237945AbjAIX2C (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 9 Jan 2023 18:28:02 -0500
+Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3497CB49B
+        for <linux-block@vger.kernel.org>; Mon,  9 Jan 2023 15:28:01 -0800 (PST)
+Received: by mail-pf1-f175.google.com with SMTP id g20so7428173pfb.3
+        for <linux-block@vger.kernel.org>; Mon, 09 Jan 2023 15:28:01 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=cOlCWcSLEYoc+DC54TwVl5DO3M0BRFT5LbwS4adE59w=;
-        b=laNnJU9WToG2LLlAWI+Env9wpSm7Pf/qNzCQSZe+F6Az4uHeNGBt7yhmLFt5yW4Ol0
-         SjbtyKafehq+379qBkTc2maxPekppU5yWcNiqgvBSHc0q1x82si1i1UR8TkAFLmrneIr
-         3y5iR8sHnwcQSBWphy69P1VAORHBqFl1lOwGxWoPOW4F0wk3C2K0j99b/q4LIGKm0dSz
-         IdXZeLbab5gR2q5mdgzQezMDGMsbl+uptPl/nOm6wRojiXDs/A1mZARUihjJn1Y0AmPe
-         q5yJ/IwA4V4oWRzMf9Ytf9yU37fQk/iWq66ktdmrzgfQJ6iszZJpCf0J3B8D9+d95RXa
-         PS8A==
-X-Gm-Message-State: AFqh2kpjfYkfbQXnQ6L81EG8oobtlWU1ma5Sxb7rbvoHbIV+oOOxOZA2
-        FnzukCsi8ImCzJTpHuJRieI=
-X-Google-Smtp-Source: AMrXdXv5nV9jFTli4ksUbS0rt+NPMu18SNEYFKsvpQk2saFobpxLncRV7viwuqa6OCmQ9BY8ZlaYNQ==
-X-Received: by 2002:aa7:86ce:0:b0:582:f129:7b93 with SMTP id h14-20020aa786ce000000b00582f1297b93mr19843476pfo.33.1673306867500;
-        Mon, 09 Jan 2023 15:27:47 -0800 (PST)
+        bh=FWjzdVi+aWCeBtDSYSYYVmiFG7iSPPW9f3buG776fN4=;
+        b=QFKcjRYZASp+O+/2yx24VaWTKvxjwMc73XLcU7QQE9szzflEAnkOXEOKs5AxH0gOTk
+         uJFHWzoAar6k+tl8S+YytlGtJS1PNfPre6P7OAVwLmvPyjtjiWFCYKFNrdfg7dokpsqv
+         KjhLHAcm5UKDlS1NL0waSrzKEK9JFWFeeUN+/1NpNunJN5ziQS82dvGcR6qcHkKGnbUD
+         ewHgwU8BlhuDvyuCPDolb2n1/pn7G9PW06vkIUBNTUDdaW2pwunfzbphyzsKTaYXtbun
+         wITTZwqtXCzR2Krqh1Z+cb6+MLQ7ymcgnGSiglFZ+ppq1OZlrz4LAZQ3IKSEgcAFQiaV
+         q14g==
+X-Gm-Message-State: AFqh2kq3AMvQ5dR8086bTd2w8QFEpnLBO0quEVHRJ975jCClhuS1yHZw
+        mr/+DvXqH1ZbS16zUut501k=
+X-Google-Smtp-Source: AMrXdXtbrhAvSS4fg34fXFxwLfYAT7R8ti1/P5zSwM65EmGYclDYBq0GedKs7uAMmDr7p7ZaXe6PQQ==
+X-Received: by 2002:a62:1d0e:0:b0:57f:ef11:acf8 with SMTP id d14-20020a621d0e000000b0057fef11acf8mr64630016pfd.2.1673306880671;
+        Mon, 09 Jan 2023 15:28:00 -0800 (PST)
 Received: from bvanassche-linux.mtv.corp.google.com ([2620:15c:211:201:9f06:14dd:484f:e55c])
-        by smtp.gmail.com with ESMTPSA id s2-20020a625e02000000b0057ef155103asm5032244pfb.155.2023.01.09.15.27.45
+        by smtp.gmail.com with ESMTPSA id s2-20020a625e02000000b0057ef155103asm5032244pfb.155.2023.01.09.15.27.59
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 Jan 2023 15:27:46 -0800 (PST)
+        Mon, 09 Jan 2023 15:27:59 -0800 (PST)
 From:   Bart Van Assche <bvanassche@acm.org>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, Jaegeuk Kim <jaegeuk@kernel.org>,
         Avri Altman <avri.altman@wdc.com>,
         Bart Van Assche <bvanassche@acm.org>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
         Damien Le Moal <damien.lemoal@opensource.wdc.com>
-Subject: [PATCH 1/8] block: Document blk_queue_zone_is_seq() and blk_rq_zone_is_seq()
-Date:   Mon,  9 Jan 2023 15:27:31 -0800
-Message-Id: <20230109232738.169886-2-bvanassche@acm.org>
+Subject: [PATCH 8/8] scsi: ufs: Enable zoned write pipelining
+Date:   Mon,  9 Jan 2023 15:27:38 -0800
+Message-Id: <20230109232738.169886-9-bvanassche@acm.org>
 X-Mailer: git-send-email 2.39.0.314.g84b9a713c41-goog
 In-Reply-To: <20230109232738.169886-1-bvanassche@acm.org>
 References: <20230109232738.169886-1-bvanassche@acm.org>
@@ -55,52 +56,48 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Since it is nontrivial to figure out how disk_zone_is_seq() and
-blk_rq_zone_is_seq() handle sequential write preferred zones, document
-this.
+From the UFSHCI 4.0 specification, about the legacy (single queue) mode:
+"The host controller always process transfer requests in-order according
+to the order submitted to the list. In case of multiple commands with
+single doorbell register ringing (batch mode), The dispatch order for
+these transfer requests by host controller will base on their index in
+the List. A transfer request with lower index value will be executed
+before a transfer request with higher index value."
 
+From the UFSHCI 4.0 specification, about the MCQ mode:
+"Command Submission
+1. Host SW writes an Entry to SQ
+2. Host SW updates SQ doorbell tail pointer
+
+Command Processing
+3. After fetching the Entry, Host Controller updates SQ doorbell head
+   pointer
+4. Host controller sends COMMAND UPIU to UFS device"
+
+In other words, for both legacy and MCQ mode, UFS controllers are
+required to forward commands to the UFS device in the order these
+commands have been received from the host.
+
+Note: for legacy mode this is only correct if the host submits one
+command at a time. The UFS driver does this.
+
+Cc: Martin K. Petersen <martin.petersen@oracle.com>
 Cc: Damien Le Moal <damien.lemoal@opensource.wdc.com>
+Cc: Avri Altman <avri.altman@wdc.com>
 Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 ---
- include/linux/blk-mq.h | 7 +++++++
- include/linux/blkdev.h | 9 +++++++++
- 2 files changed, 16 insertions(+)
+ drivers/ufs/core/ufshcd.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index 779fba613bd0..6735db1ad24d 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -1155,6 +1155,13 @@ static inline unsigned int blk_rq_zone_no(struct request *rq)
- 	return disk_zone_no(rq->q->disk, blk_rq_pos(rq));
- }
+diff --git a/drivers/ufs/core/ufshcd.c b/drivers/ufs/core/ufshcd.c
+index e18c9f4463ec..9198505e953b 100644
+--- a/drivers/ufs/core/ufshcd.c
++++ b/drivers/ufs/core/ufshcd.c
+@@ -5031,6 +5031,7 @@ static int ufshcd_slave_configure(struct scsi_device *sdev)
  
-+/**
-+ * blk_rq_zone_is_seq() - Whether a request is for a sequential zone.
-+ * @rq: Request pointer.
-+ *
-+ * Return: true if and only if blk_rq_pos(@rq) refers either to a sequential
-+ * write required or to a sequential write preferred zone.
-+ */
- static inline unsigned int blk_rq_zone_is_seq(struct request *rq)
- {
- 	return disk_zone_is_seq(rq->q->disk, blk_rq_pos(rq));
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index b87ed829ab94..ef93e848b1fd 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -672,6 +672,15 @@ static inline unsigned int disk_zone_no(struct gendisk *disk, sector_t sector)
- 	return sector >> ilog2(disk->queue->limits.chunk_sectors);
- }
+ 	ufshcd_hpb_configure(hba, sdev);
  
-+/**
-+ * disk_zone_is_seq() - Whether a logical block is in a sequential zone.
-+ * @disk: Disk pointer.
-+ * @sector: Offset from start of block device in 512 byte units.
-+ *
-+ * Return: true if and only if @disk refers to a zoned block device and
-+ * @sector refers either to a sequential write required or a sequential
-+ * write preferred zone.
-+ */
- static inline bool disk_zone_is_seq(struct gendisk *disk, sector_t sector)
- {
- 	if (!blk_queue_is_zoned(disk->queue))
++	blk_queue_flag_set(QUEUE_FLAG_PIPELINE_ZONED_WRITES, q);
+ 	blk_queue_update_dma_pad(q, PRDT_DATA_BYTE_COUNT_PAD - 1);
+ 	if (hba->quirks & UFSHCD_QUIRK_ALIGN_SG_WITH_PAGE_SIZE)
+ 		blk_queue_update_dma_alignment(q, PAGE_SIZE - 1);
