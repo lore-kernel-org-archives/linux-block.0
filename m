@@ -2,103 +2,138 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E1D7C63797
-	for <linux-block@archiver.kernel.org>; Mon,  9 Jan 2023 09:44:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3074DC5479D
+	for <linux-block@archiver.kernel.org>; Mon,  9 Jan 2023 10:59:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236892AbjAIJoq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 9 Jan 2023 04:44:46 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38942 "EHLO
+        id S233045AbjAIK7X (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 9 Jan 2023 05:59:23 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33112 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236590AbjAIJoS (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 9 Jan 2023 04:44:18 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 22492331
-        for <linux-block@vger.kernel.org>; Mon,  9 Jan 2023 01:43:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1673257414;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=fz0AL8Y6vth0e0/TsVSMgT4T9wTeyk82M0u0xn5LNrE=;
-        b=V5OHWZ8rbeP+dD8OHuSU8KX7s+Si7dCVfetpUNQbl6ktF3Y5GlCHqviWFf0V4L9XKtJEA3
-        8DfAnuBfw1ISoI4iF0rviieFIw0C7DLSO1vn0ikZUP+K+MxoJwx2M9uG39n+fzr/lCvvA6
-        IA1e2GXH2SxrsGYQQUAQKHE+wkF0dz0=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-617-_8k4x7-8MfmxViukzD1sZA-1; Mon, 09 Jan 2023 04:43:28 -0500
-X-MC-Unique: _8k4x7-8MfmxViukzD1sZA-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        with ESMTP id S233331AbjAIK7U (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 9 Jan 2023 05:59:20 -0500
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC1DAF5AD;
+        Mon,  9 Jan 2023 02:59:18 -0800 (PST)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id EDE173C14841;
-        Mon,  9 Jan 2023 09:43:27 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.33.36.87])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id D689142238;
-        Mon,  9 Jan 2023 09:43:25 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <d86e6340-534c-c34c-ab1d-6ebacb213bb9@kernel.dk>
-References: <d86e6340-534c-c34c-ab1d-6ebacb213bb9@kernel.dk> <167305160937.1521586.133299343565358971.stgit@warthog.procyon.org.uk> <167305166150.1521586.10220949115402059720.stgit@warthog.procyon.org.uk>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     dhowells@redhat.com, Al Viro <viro@zeniv.linux.org.uk>,
-        Christoph Hellwig <hch@lst.de>,
-        Matthew Wilcox <willy@infradead.org>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Jeff Layton <jlayton@kernel.org>,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v4 7/7] iov_iter, block: Make bio structs pin pages rather than ref'ing if appropriate
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 656897690D;
+        Mon,  9 Jan 2023 10:59:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1673261957; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=0zum01+6W6CWGMuMAoT/HPm/pZWcmXb0ZmN9Mhpgb7I=;
+        b=ymj96arAyGY+TaDCybETNaeMAySXQp5KaSrVNcO0/OpY+kQw5rdon1sjJB7tKOPbOyxBwd
+        A2CoKC/TqexuuhGvp62eh3K/FkSGbUpPtWfJM7Q8WOHWgpjlmaSUOJRn9OKafa1k8qdnjW
+        t4yKDvi7JUiI9afyU16poZuHMUoIIU4=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1673261957;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=0zum01+6W6CWGMuMAoT/HPm/pZWcmXb0ZmN9Mhpgb7I=;
+        b=i8nH3Nw8dN1tGgWZlu3bylvucdc8gG2H7zcFWPr66gE2yEASNbya0Ohs/HqWFhRbPegPeF
+        LQGbI2DPoix2hhAA==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 561CC134AD;
+        Mon,  9 Jan 2023 10:59:17 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id 337/FIXzu2ORLwAAMHmgww
+        (envelope-from <jack@suse.cz>); Mon, 09 Jan 2023 10:59:17 +0000
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+        id D8AE9A0749; Mon,  9 Jan 2023 11:59:16 +0100 (CET)
+Date:   Mon, 9 Jan 2023 11:59:16 +0100
+From:   Jan Kara <jack@suse.cz>
+To:     Tejun Heo <tj@kernel.org>
+Cc:     Jan Kara <jack@suse.cz>,
+        Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>,
+        Jinke Han <hanjinke.666@bytedance.com>, josef@toxicpanda.com,
+        axboe@kernel.dk, cgroups@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yinxin.x@bytedance.com
+Subject: Re: [PATCH v3] blk-throtl: Introduce sync and async queues for
+ blk-throtl
+Message-ID: <20230109105916.jvnhjdseqkwejmws@quack3>
+References: <20221226130505.7186-1-hanjinke.666@bytedance.com>
+ <20230105161854.GA1259@blackbody.suse.cz>
+ <20230106153813.4ttyuikzaagkk2sc@quack3>
+ <Y7hTHZQYsCX6EHIN@slm.duckdns.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <1880792.1673257404.1@warthog.procyon.org.uk>
-Date:   Mon, 09 Jan 2023 09:43:24 +0000
-Message-ID: <1880793.1673257404@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.5
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Y7hTHZQYsCX6EHIN@slm.duckdns.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Jens Axboe <axboe@kernel.dk> wrote:
+Hello!
 
-> > A field, bi_cleanup_mode, is added to the bio struct that gets set by
-> > iov_iter_extract_pages() with FOLL_* flags indicating what cleanup is
-> > necessary.  FOLL_GET -> put_page(), FOLL_PIN -> unpin_user_page().  Other
-> > flags could also be used in future.
-> > 
-> > Newly allocated bio structs have bi_cleanup_mode set to FOLL_GET to
-> > indicate that attached pages are ref'd by default.  Cloning sets it to 0.
-> > __bio_iov_iter_get_pages() overrides it to what iov_iter_extract_pages()
-> > indicates.
+On Fri 06-01-23 06:58:05, Tejun Heo wrote:
+> Hello,
 > 
-> What's the motivation for this change?
+> On Fri, Jan 06, 2023 at 04:38:13PM +0100, Jan Kara wrote:
+> > Generally, problems are this are taken care of by IO schedulers. E.g. BFQ
+> > has quite a lot of logic exactly to reduce problems like this. Sync and
+> > async queues are one part of this logic inside BFQ (but there's more).
+> 
+> With modern ssd's, even deadline's overhead is too high and a lot (but
+> clearly not all) of what the IO schedulers do are no longer necessary. I
+> don't see a good way back to elevators.
 
-DIO reads in most filesystems and, I think, the block layer are currently
-broken with respect to concurrent fork in the same process because they take
-refs (FOLL_GET) on the pages involved which causes the CoW mechanism to
-malfunction, leading (I think) the parent process to not see the result of the
-DIO.  IIRC, the pages undergoing DIO get forcibly copied by fork - and the
-copies given to the parent.  Instead, DIO reads should be pinning the pages
-(FOLL_PIN).  Maybe Willy can weigh in on this?
+Yeah, I agree there's no way back :). But actually I think a lot of the
+functionality of IO schedulers is not needed (by you ;)) only because the
+HW got performant enough and so some issues became less visible. And that
+is all fine but if you end up in a configuration where your cgroup's IO
+limits and IO demands are similar to how the old rotational disks were
+underprovisioned for the amount of IO needed to be done by the system
+(i.e., you can easily generate amount of IO that then takes minutes or tens
+of minutes for your IO subsystem to crunch through), you hit all the same
+problems IO schedulers were trying to solve again. And maybe these days we
+incline more towards the answer "buy more appropriate HW / buy higher
+limits from your infrastructure provider" but it is not like the original
+issues in such configurations disappeared.
 
-Further, getting refs on pages in, say, a KVEC iterator is the wrong thing to
-do as the kvec may point to things that shouldn't be ref'd (vmap'd or
-vmalloc'd regions, for example).  Instead, the in-kernel caller should do what
-it needs to do to keep hold of the memory and the DIO should not take a ref at
-all.
+> > But given current architecture of the block layer IO schedulers are below
+> > throttling frameworks such as blk-throtl so they have no chance of
+> > influencing problems like this. So we are bound to reinvent the scheduling
+> > logic IO schedulers are already doing. That being said I don't have a good
+> > solution for this or architecture suggestion. Because implementing various
+> > throttling frameworks within IO schedulers is cumbersome (complex
+> > interactions) and generally the perfomance is too slow for some usecases.
+> > We've been there (that's why there's cgroup support in BFQ) and really
+> > the current architecture is much easier to reason about.
+> 
+> Another layering problem w/ controlling from elevators is that that's after
+> request allocation and the issuer has already moved on. We used to have
+> per-cgroup rq pools but ripped that out, so it's pretty easy to cause severe
+> priority inversions by depleting the shared request pool, and the fact that
+> throttling takes place after the issuing task returned from issue path makes
+> propagating the throttling operation upwards more challenging too.
 
-> It's growing struct bio, which we can have a lot of in the system. I read
-> the cover letter too and I can tell what the change does, but there's no
-> justification really for the change.
+Well, we do have .limit_depth IO scheduler callback these days so BFQ uses
+that to solve the problem of exhaustion of shared request pool but I agree
+it's a bit of a hack on the side.
 
-The FOLL_* flags I'm getting back from iov_iter_extract_pages() can be mapped
-to BIO_* flags in the bio.  For the moment, AFAIK, I think only FOLL_GET and
-FOLL_PIN are necessary.  There are three cleanup types: put, unpin and do
-nothing.
+> At least in terms of cgroup control, the new bio based behavior is a lot
+> better. In the fb fleet, iocost is deployed on most (virtually all) of the
+> machines and we don't see issues with severe priority inversions.
+> Cross-cgroup control is pretty well controlled. Inside each cgroup, sync
+> writes aren't prioritized but nobody seems to be troubled by that.
+> 
+> My bet is that inversion issues are a lot more severe with blk-throttle
+> because it's not work-conserving and not doing things like issue-as-root or
+> other measures to alleviate issues which can arise from inversions.
 
-David
+Yes, I agree these features of blk-throttle make the problems much more
+likely to happen in practice.
 
+								Honza
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
