@@ -2,20 +2,20 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C9DAFC71132
-	for <linux-block@archiver.kernel.org>; Mon,  9 Jan 2023 04:05:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 480CEC678DA
+	for <linux-block@archiver.kernel.org>; Mon,  9 Jan 2023 04:06:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236841AbjAIEFS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 8 Jan 2023 23:05:18 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55128 "EHLO
+        id S234205AbjAIEFl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 8 Jan 2023 23:05:41 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55144 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236594AbjAIEEY (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 8 Jan 2023 23:04:24 -0500
-Received: from lgeamrelo11.lge.com (lgeamrelo11.lge.com [156.147.23.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id B238911C17
+        with ESMTP id S236428AbjAIEE2 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 8 Jan 2023 23:04:28 -0500
+Received: from lgeamrelo11.lge.com (lgeamrelo13.lge.com [156.147.23.53])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id C122B11C26
         for <linux-block@vger.kernel.org>; Sun,  8 Jan 2023 20:03:54 -0800 (PST)
 Received: from unknown (HELO lgemrelse6q.lge.com) (156.147.1.121)
-        by 156.147.23.51 with ESMTP; 9 Jan 2023 12:33:53 +0900
+        by 156.147.23.53 with ESMTP; 9 Jan 2023 12:33:53 +0900
 X-Original-SENDERIP: 156.147.1.121
 X-Original-MAILFROM: byungchul.park@lge.com
 Received: from unknown (HELO localhost.localdomain) (10.177.244.38)
@@ -45,9 +45,9 @@ Cc:     torvalds@linux-foundation.org, damien.lemoal@opensource.wdc.com,
         melissa.srw@gmail.com, hamohammed.sa@gmail.com,
         42.hyeyoo@gmail.com, chris.p.wilson@intel.com,
         gwan-gyeong.mun@intel.com
-Subject: [PATCH RFC v7 12/23] dept: Distinguish each syscall context from another
-Date:   Mon,  9 Jan 2023 12:33:40 +0900
-Message-Id: <1673235231-30302-13-git-send-email-byungchul.park@lge.com>
+Subject: [PATCH RFC v7 17/23] dept: Track timeout waits separately with a new Kconfig
+Date:   Mon,  9 Jan 2023 12:33:45 +0900
+Message-Id: <1673235231-30302-18-git-send-email-byungchul.park@lge.com>
 X-Mailer: git-send-email 1.9.1
 In-Reply-To: <1673235231-30302-1-git-send-email-byungchul.park@lge.com>
 References: <1673235231-30302-1-git-send-email-byungchul.park@lge.com>
@@ -55,407 +55,387 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-It enters kernel mode on each syscall and each syscall handling should
-be considered independently from the point of view of Dept. Otherwise,
-Dept may wrongly track dependencies across different syscalls.
+Waits with valid timeouts don't actually cause deadlocks. However, Dept
+has been reporting the cases as well because it's worth informing the
+circular dependency for some cases where, for example, timeout is used
+to avoid a deadlock but not meant to be expired.
 
-That might be a real dependency from user mode. However, now that Dept
-just started to work, conservatively let Dept not track dependencies
-across different syscalls.
+However, yes, there are also a lot of, even more, cases where timeout
+is used for its clear purpose and meant to be expired.
+
+Let Dept report these as an information rather than shouting DEADLOCK.
+Plus, introduced CONFIG_DEPT_AGGRESSIVE_TIMEOUT_WAIT Kconfig to make it
+optional so that any reports involving waits with timeouts can be turned
+on/off depending on the purpose.
 
 Signed-off-by: Byungchul Park <byungchul.park@lge.com>
 ---
- arch/arm64/kernel/syscall.c |  2 ++
- arch/x86/entry/common.c     |  4 +++
- include/linux/dept.h        | 39 +++++++++++++++-----------
- kernel/dependency/dept.c    | 67 +++++++++++++++++++++++----------------------
- 4 files changed, 63 insertions(+), 49 deletions(-)
+ include/linux/dept.h     | 15 ++++++++----
+ include/linux/dept_ldt.h |  6 ++---
+ include/linux/dept_sdt.h | 35 +++++++++++++++++++++++++---
+ kernel/dependency/dept.c | 60 ++++++++++++++++++++++++++++++++++++++++--------
+ lib/Kconfig.debug        | 10 ++++++++
+ 5 files changed, 107 insertions(+), 19 deletions(-)
 
-diff --git a/arch/arm64/kernel/syscall.c b/arch/arm64/kernel/syscall.c
-index a5de47e..e26d0ca 100644
---- a/arch/arm64/kernel/syscall.c
-+++ b/arch/arm64/kernel/syscall.c
-@@ -7,6 +7,7 @@
- #include <linux/ptrace.h>
- #include <linux/randomize_kstack.h>
- #include <linux/syscalls.h>
-+#include <linux/dept.h>
- 
- #include <asm/daifflags.h>
- #include <asm/debug-monitors.h>
-@@ -105,6 +106,7 @@ static void el0_svc_common(struct pt_regs *regs, int scno, int sc_nr,
- 	 */
- 
- 	local_daif_restore(DAIF_PROCCTX);
-+	dept_kernel_enter();
- 
- 	if (flags & _TIF_MTE_ASYNC_FAULT) {
- 		/*
-diff --git a/arch/x86/entry/common.c b/arch/x86/entry/common.c
-index 6c28264..7cdd27a 100644
---- a/arch/x86/entry/common.c
-+++ b/arch/x86/entry/common.c
-@@ -19,6 +19,7 @@
- #include <linux/nospec.h>
- #include <linux/syscalls.h>
- #include <linux/uaccess.h>
-+#include <linux/dept.h>
- 
- #ifdef CONFIG_XEN_PV
- #include <xen/xen-ops.h>
-@@ -72,6 +73,7 @@ static __always_inline bool do_syscall_x32(struct pt_regs *regs, int nr)
- 
- __visible noinstr void do_syscall_64(struct pt_regs *regs, int nr)
- {
-+	dept_kernel_enter();
- 	add_random_kstack_offset();
- 	nr = syscall_enter_from_user_mode(regs, nr);
- 
-@@ -120,6 +122,7 @@ __visible noinstr void do_int80_syscall_32(struct pt_regs *regs)
- {
- 	int nr = syscall_32_enter(regs);
- 
-+	dept_kernel_enter();
- 	add_random_kstack_offset();
- 	/*
- 	 * Subtlety here: if ptrace pokes something larger than 2^31-1 into
-@@ -140,6 +143,7 @@ static noinstr bool __do_fast_syscall_32(struct pt_regs *regs)
- 	int nr = syscall_32_enter(regs);
- 	int res;
- 
-+	dept_kernel_enter();
- 	add_random_kstack_offset();
- 	/*
- 	 * This cannot use syscall_enter_from_user_mode() as it has to
 diff --git a/include/linux/dept.h b/include/linux/dept.h
-index f2a3057..777c837 100644
+index 21ecefc..4387d5a 100644
 --- a/include/linux/dept.h
 +++ b/include/linux/dept.h
-@@ -25,11 +25,16 @@
- #define DEPT_MAX_SUBCLASSES_USR		(DEPT_MAX_SUBCLASSES / DEPT_MAX_SUBCLASSES_EVT)
- #define DEPT_MAX_SUBCLASSES_CACHE	2
- 
--#define DEPT_SIRQ			0
--#define DEPT_HIRQ			1
--#define DEPT_IRQS_NR			2
--#define DEPT_SIRQF			(1UL << DEPT_SIRQ)
--#define DEPT_HIRQF			(1UL << DEPT_HIRQ)
-+enum {
-+	DEPT_CXT_SIRQ = 0,
-+	DEPT_CXT_HIRQ,
-+	DEPT_CXT_IRQS_NR,
-+	DEPT_CXT_PROCESS = DEPT_CXT_IRQS_NR,
-+	DEPT_CXTS_NR
-+};
+@@ -270,6 +270,11 @@ struct dept_wait {
+ 			 * whether this wait is for commit in scheduler
+ 			 */
+ 			bool		sched_sleep;
 +
-+#define DEPT_SIRQF			(1UL << DEPT_CXT_SIRQ)
-+#define DEPT_HIRQF			(1UL << DEPT_CXT_HIRQ)
- 
- struct dept_ecxt;
- struct dept_iecxt {
-@@ -94,8 +99,8 @@ struct dept_class {
- 			/*
- 			 * for tracking IRQ dependencies
- 			 */
--			struct dept_iecxt iecxt[DEPT_IRQS_NR];
--			struct dept_iwait iwait[DEPT_IRQS_NR];
-+			struct dept_iecxt iecxt[DEPT_CXT_IRQS_NR];
-+			struct dept_iwait iwait[DEPT_CXT_IRQS_NR];
- 
- 			/*
- 			 * classified by a map embedded in task_struct,
-@@ -207,8 +212,8 @@ struct dept_ecxt {
- 			/*
- 			 * where the IRQ-enabled happened
- 			 */
--			unsigned long	enirq_ip[DEPT_IRQS_NR];
--			struct dept_stack *enirq_stack[DEPT_IRQS_NR];
-+			unsigned long	enirq_ip[DEPT_CXT_IRQS_NR];
-+			struct dept_stack *enirq_stack[DEPT_CXT_IRQS_NR];
- 
- 			/*
- 			 * where the event context started
-@@ -252,8 +257,8 @@ struct dept_wait {
- 			/*
- 			 * where the IRQ wait happened
- 			 */
--			unsigned long	irq_ip[DEPT_IRQS_NR];
--			struct dept_stack *irq_stack[DEPT_IRQS_NR];
-+			unsigned long	irq_ip[DEPT_CXT_IRQS_NR];
-+			struct dept_stack *irq_stack[DEPT_CXT_IRQS_NR];
- 
- 			/*
- 			 * where the wait happened
-@@ -406,19 +411,19 @@ struct dept_task {
- 	int				wait_hist_pos;
++			/*
++			 * whether a timeout is set
++			 */
++			bool				timeout;
+ 		};
+ 	};
+ };
+@@ -458,6 +463,7 @@ struct dept_task {
+ 	bool				stage_sched_map;
+ 	const char			*stage_w_fn;
+ 	unsigned long			stage_ip;
++	bool				stage_timeout;
  
  	/*
--	 * sequential id to identify each IRQ context
-+	 * sequential id to identify each context
- 	 */
--	unsigned int			irq_id[DEPT_IRQS_NR];
-+	unsigned int			cxt_id[DEPT_CXTS_NR];
+ 	 * the number of missing ecxts
+@@ -496,6 +502,7 @@ struct dept_task {
+ 	.stage_sched_map = false,				\
+ 	.stage_w_fn = NULL,					\
+ 	.stage_ip = 0UL,					\
++	.stage_timeout = false,					\
+ 	.missing_ecxt = 0,					\
+ 	.hardirqs_enabled = false,				\
+ 	.softirqs_enabled = false,				\
+@@ -513,8 +520,8 @@ struct dept_task {
+ extern void dept_map_reinit(struct dept_map *m, struct dept_key *k, int sub_u, const char *n);
+ extern void dept_map_copy(struct dept_map *to, struct dept_map *from);
  
- 	/*
- 	 * for tracking IRQ-enabled points with cross-event
- 	 */
--	unsigned int			wgen_enirq[DEPT_IRQS_NR];
-+	unsigned int			wgen_enirq[DEPT_CXT_IRQS_NR];
+-extern void dept_wait(struct dept_map *m, unsigned long w_f, unsigned long ip, const char *w_fn, int sub_l);
+-extern void dept_stage_wait(struct dept_map *m, struct dept_key *k, unsigned long ip, const char *w_fn, bool strong);
++extern void dept_wait(struct dept_map *m, unsigned long w_f, unsigned long ip, const char *w_fn, int sub_l, bool timeout);
++extern void dept_stage_wait(struct dept_map *m, struct dept_key *k, unsigned long ip, const char *w_fn, bool strong, bool timeout);
+ extern void dept_request_event_wait_commit(void);
+ extern void dept_clean_stage(void);
+ extern void dept_stage_event(struct task_struct *t, unsigned long ip);
+@@ -564,8 +571,8 @@ static inline void dept_ecxt_enter_nokeep(struct dept_map *m)
+ #define dept_map_reinit(m, k, su, n)			do { (void)(n); (void)(k); } while (0)
+ #define dept_map_copy(t, f)				do { } while (0)
  
- 	/*
- 	 * for keeping up-to-date IRQ-enabled points
- 	 */
--	unsigned long			enirq_ip[DEPT_IRQS_NR];
-+	unsigned long			enirq_ip[DEPT_CXT_IRQS_NR];
+-#define dept_wait(m, w_f, ip, w_fn, sl)			do { (void)(w_fn); } while (0)
+-#define dept_stage_wait(m, k, ip, w_fn, s)		do { (void)(k); (void)(w_fn); } while (0)
++#define dept_wait(m, w_f, ip, w_fn, sl, t)		do { (void)(w_fn); } while (0)
++#define dept_stage_wait(m, k, ip, w_fn, s, t)		do { (void)(k); (void)(w_fn); } while (0)
+ #define dept_request_event_wait_commit()		do { } while (0)
+ #define dept_clean_stage()				do { } while (0)
+ #define dept_stage_event(t, ip)				do { } while (0)
+diff --git a/include/linux/dept_ldt.h b/include/linux/dept_ldt.h
+index b8c00bc..9a88aa3 100644
+--- a/include/linux/dept_ldt.h
++++ b/include/linux/dept_ldt.h
+@@ -27,7 +27,7 @@
+ 		else if (t)						\
+ 			dept_ecxt_enter(m, LDT_EVT_L, i, "trylock", "unlock", sl);\
+ 		else {							\
+-			dept_wait(m, LDT_EVT_L, i, "lock", sl);		\
++			dept_wait(m, LDT_EVT_L, i, "lock", sl, false);	\
+ 			dept_ecxt_enter(m, LDT_EVT_L, i, "lock", "unlock", sl);\
+ 		}							\
+ 	} while (0)
+@@ -39,7 +39,7 @@
+ 		else if (t)						\
+ 			dept_ecxt_enter(m, LDT_EVT_R, i, "read_trylock", "read_unlock", sl);\
+ 		else {							\
+-			dept_wait(m, LDT_EVT_W, i, "read_lock", sl);	\
++			dept_wait(m, LDT_EVT_W, i, "read_lock", sl, false);\
+ 			dept_ecxt_enter(m, LDT_EVT_R, i, "read_lock", "read_unlock", sl);\
+ 		}							\
+ 	} while (0)
+@@ -51,7 +51,7 @@
+ 		else if (t)						\
+ 			dept_ecxt_enter(m, LDT_EVT_W, i, "write_trylock", "write_unlock", sl);\
+ 		else {							\
+-			dept_wait(m, LDT_EVT_RW, i, "write_lock", sl);	\
++			dept_wait(m, LDT_EVT_RW, i, "write_lock", sl, false);\
+ 			dept_ecxt_enter(m, LDT_EVT_W, i, "write_lock", "write_unlock", sl);\
+ 		}							\
+ 	} while (0)
+diff --git a/include/linux/dept_sdt.h b/include/linux/dept_sdt.h
+index 2644e77..94bfef1 100644
+--- a/include/linux/dept_sdt.h
++++ b/include/linux/dept_sdt.h
+@@ -24,7 +24,13 @@
+ #define sdt_wait(m)							\
+ 	do {								\
+ 		dept_request_event(m);					\
+-		dept_wait(m, 1UL, _THIS_IP_, __func__, 0);		\
++		dept_wait(m, 1UL, _THIS_IP_, __func__, 0, false);	\
++	} while (0)
++
++#define sdt_wait_timeout(m)						\
++	do {								\
++		dept_request_event(m);					\
++		dept_wait(m, 1UL, _THIS_IP_, __func__, 0, true);	\
+ 	} while (0)
  
- 	/*
- 	 * current effective IRQ-enabled flag
-@@ -470,7 +475,7 @@ struct dept_task {
- 	.wait_hist = { { .wait = NULL, } },			\
- 	.ecxt_held_pos = 0,					\
- 	.wait_hist_pos = 0,					\
--	.irq_id = { 0U },					\
-+	.cxt_id = { 0U },					\
- 	.wgen_enirq = { 0U },					\
- 	.enirq_ip = { 0UL },					\
- 	.eff_enirqf = 0UL,					\
-@@ -509,6 +514,7 @@ struct dept_task {
- extern void dept_ecxt_exit(struct dept_map *m, unsigned long e_f, unsigned long ip);
- extern void dept_sched_enter(void);
- extern void dept_sched_exit(void);
-+extern void dept_kernel_enter(void);
+ /*
+@@ -40,7 +46,17 @@
+ 	do {								\
+ 		struct dept_map *__m = m;				\
+ 		static struct dept_key __key;				\
+-		dept_stage_wait(__m, __m ? NULL : &__key, _THIS_IP_, __func__, true);\
++		dept_stage_wait(__m, __m ? NULL : &__key, _THIS_IP_, __func__, true, false);\
++	} while (0)
++
++/*
++ * Use the code location as the class key if an explicit map is not used.
++ */
++#define sdt_might_sleep_strong_timeout(m)				\
++	do {								\
++		struct dept_map *__m = m;				\
++		static struct dept_key __key;				\
++		dept_stage_wait(__m, __m ? NULL : &__key, _THIS_IP_, __func__, true, true);\
+ 	} while (0)
  
- static inline void dept_ecxt_enter_nokeep(struct dept_map *m)
- {
-@@ -558,6 +564,7 @@ static inline void dept_ecxt_enter_nokeep(struct dept_map *m)
- #define dept_ecxt_exit(m, e_f, ip)			do { } while (0)
- #define dept_sched_enter()				do { } while (0)
- #define dept_sched_exit()				do { } while (0)
-+#define dept_kernel_enter()				do { } while (0)
- #define dept_ecxt_enter_nokeep(m)			do { } while (0)
- #define dept_key_init(k)				do { (void)(k); } while (0)
- #define dept_key_destroy(k)				do { (void)(k); } while (0)
+ /*
+@@ -50,7 +66,17 @@
+ 	do {								\
+ 		struct dept_map *__m = m;				\
+ 		static struct dept_key __key;				\
+-		dept_stage_wait(__m, __m ? NULL : &__key, _THIS_IP_, __func__, false);\
++		dept_stage_wait(__m, __m ? NULL : &__key, _THIS_IP_, __func__, false, false);\
++	} while (0)
++
++/*
++ * Use the code location as the class key if an explicit map is not used.
++ */
++#define sdt_might_sleep_weak_timeout(m)					\
++	do {								\
++		struct dept_map *__m = m;				\
++		static struct dept_key __key;				\
++		dept_stage_wait(__m, __m ? NULL : &__key, _THIS_IP_, __func__, false, true);\
+ 	} while (0)
+ 
+ #define sdt_might_sleep_finish()	dept_clean_stage()
+@@ -62,8 +88,11 @@
+ #define sdt_map_init(m)			do { } while (0)
+ #define sdt_map_init_key(m, k)		do { (void)(k); } while (0)
+ #define sdt_wait(m)			do { } while (0)
++#define sdt_wait_timeout(m)		do { } while (0)
+ #define sdt_might_sleep_strong(m)	do { } while (0)
+ #define sdt_might_sleep_weak(m)		do { } while (0)
++#define sdt_might_sleep_strong_timeout(m) do { } while (0)
++#define sdt_might_sleep_weak_timeout(m) do { } while (0)
+ #define sdt_might_sleep_finish()	do { } while (0)
+ #define sdt_ecxt_enter(m)		do { } while (0)
+ #define sdt_event(m)			do { } while (0)
 diff --git a/kernel/dependency/dept.c b/kernel/dependency/dept.c
-index d164482..e98617b 100644
+index 11d4f75..cd25995 100644
 --- a/kernel/dependency/dept.c
 +++ b/kernel/dependency/dept.c
-@@ -220,9 +220,9 @@ static inline struct dept_class *dep_tc(struct dept_dep *d)
- 
- static inline const char *irq_str(int irq)
- {
--	if (irq == DEPT_SIRQ)
-+	if (irq == DEPT_CXT_SIRQ)
- 		return "softirq";
--	if (irq == DEPT_HIRQ)
-+	if (irq == DEPT_CXT_HIRQ)
- 		return "hardirq";
- 	return "(unknown)";
- }
-@@ -406,7 +406,7 @@ static void initialize_class(struct dept_class *c)
- {
- 	int i;
- 
--	for (i = 0; i < DEPT_IRQS_NR; i++) {
-+	for (i = 0; i < DEPT_CXT_IRQS_NR; i++) {
- 		struct dept_iecxt *ie = &c->iecxt[i];
- 		struct dept_iwait *iw = &c->iwait[i];
- 
-@@ -431,7 +431,7 @@ static void initialize_ecxt(struct dept_ecxt *e)
- {
- 	int i;
- 
--	for (i = 0; i < DEPT_IRQS_NR; i++) {
-+	for (i = 0; i < DEPT_CXT_IRQS_NR; i++) {
- 		e->enirq_stack[i] = NULL;
- 		e->enirq_ip[i] = 0UL;
+@@ -739,6 +739,8 @@ static void print_diagram(struct dept_dep *d)
+ 	if (!irqf) {
+ 		print_spc(spc, "[S] %s(%s:%d)\n", c_fn, fc_n, fc->sub_id);
+ 		print_spc(spc, "[W] %s(%s:%d)\n", w_fn, tc_n, tc->sub_id);
++		if (w->timeout)
++			print_spc(spc, "--------------- >8 timeout ---------------\n");
+ 		print_spc(spc, "[E] %s(%s:%d)\n", e_fn, fc_n, fc->sub_id);
  	}
-@@ -447,7 +447,7 @@ static void initialize_wait(struct dept_wait *w)
- {
- 	int i;
- 
--	for (i = 0; i < DEPT_IRQS_NR; i++) {
-+	for (i = 0; i < DEPT_CXT_IRQS_NR; i++) {
- 		w->irq_stack[i] = NULL;
- 		w->irq_ip[i] = 0UL;
- 	}
-@@ -486,7 +486,7 @@ static void destroy_ecxt(struct dept_ecxt *e)
- {
- 	int i;
- 
--	for (i = 0; i < DEPT_IRQS_NR; i++)
-+	for (i = 0; i < DEPT_CXT_IRQS_NR; i++)
- 		if (e->enirq_stack[i])
- 			put_stack(e->enirq_stack[i]);
- 	if (e->class)
-@@ -502,7 +502,7 @@ static void destroy_wait(struct dept_wait *w)
- {
- 	int i;
- 
--	for (i = 0; i < DEPT_IRQS_NR; i++)
-+	for (i = 0; i < DEPT_CXT_IRQS_NR; i++)
- 		if (w->irq_stack[i])
- 			put_stack(w->irq_stack[i]);
- 	if (w->class)
-@@ -651,7 +651,7 @@ static void print_diagram(struct dept_dep *d)
- 	const char *tc_n = tc->sched_map ? "<sched>" : (tc->name ?: "(unknown)");
- 
- 	irqf = e->enirqf & w->irqf;
--	for_each_set_bit(irq, &irqf, DEPT_IRQS_NR) {
-+	for_each_set_bit(irq, &irqf, DEPT_CXT_IRQS_NR) {
- 		if (!firstline)
- 			pr_warn("\nor\n\n");
- 		firstline = false;
-@@ -684,7 +684,7 @@ static void print_dep(struct dept_dep *d)
- 	const char *tc_n = tc->sched_map ? "<sched>" : (tc->name ?: "(unknown)");
- 
- 	irqf = e->enirqf & w->irqf;
--	for_each_set_bit(irq, &irqf, DEPT_IRQS_NR) {
-+	for_each_set_bit(irq, &irqf, DEPT_CXT_IRQS_NR) {
- 		pr_warn("%s has been enabled:\n", irq_str(irq));
- 		print_ip_stack(e->enirq_ip[irq], e->enirq_stack[irq]);
- 		pr_warn("\n");
-@@ -910,7 +910,7 @@ static void bfs(struct dept_class *c, bfs_f *cb, void *in, void **out)
-  */
- 
- static inline unsigned long cur_enirqf(void);
--static inline int cur_irq(void);
-+static inline int cur_cxt(void);
- static inline unsigned int cur_ctxt_id(void);
- 
- static inline struct dept_iecxt *iecxt(struct dept_class *c, int irq)
-@@ -1458,7 +1458,7 @@ static void add_dep(struct dept_ecxt *e, struct dept_wait *w)
- 	if (d) {
- 		check_dl_bfs(d);
- 
--		for (i = 0; i < DEPT_IRQS_NR; i++) {
-+		for (i = 0; i < DEPT_CXT_IRQS_NR; i++) {
- 			struct dept_iwait *fiw = iwait(fc, i);
- 			struct dept_iecxt *found_ie;
- 			struct dept_iwait *found_iw;
-@@ -1494,7 +1494,7 @@ static void add_wait(struct dept_class *c, unsigned long ip,
- 	struct dept_task *dt = dept_task();
- 	struct dept_wait *w;
- 	unsigned int wg = 0U;
--	int irq;
-+	int cxt;
- 	int i;
- 
- 	if (DEPT_WARN_ON(!valid_class(c)))
-@@ -1510,9 +1510,9 @@ static void add_wait(struct dept_class *c, unsigned long ip,
- 	w->wait_stack = get_current_stack();
- 	w->sched_sleep = sched_sleep;
- 
--	irq = cur_irq();
--	if (irq < DEPT_IRQS_NR)
--		add_iwait(c, irq, w);
-+	cxt = cur_cxt();
-+	if (cxt == DEPT_CXT_HIRQ || cxt == DEPT_CXT_SIRQ)
-+		add_iwait(c, cxt, w);
- 
- 	/*
- 	 * Avoid adding dependency between user aware nested ecxt and
-@@ -1593,7 +1593,7 @@ static bool add_ecxt(struct dept_map *m, struct dept_class *c,
- 	eh->sub_l = sub_l;
- 
- 	irqf = cur_enirqf();
--	for_each_set_bit(irq, &irqf, DEPT_IRQS_NR)
-+	for_each_set_bit(irq, &irqf, DEPT_CXT_IRQS_NR)
- 		add_iecxt(c, irq, e, false);
- 
- 	del_ecxt(e);
-@@ -1745,7 +1745,7 @@ static void do_event(struct dept_map *m, struct dept_class *c,
- 			add_dep(eh->ecxt, wh->wait);
- 	}
- 
--	for (i = 0; i < DEPT_IRQS_NR; i++) {
-+	for (i = 0; i < DEPT_CXT_IRQS_NR; i++) {
- 		struct dept_ecxt *e;
- 
- 		if (before(dt->wgen_enirq[i], wg))
-@@ -1787,7 +1787,7 @@ static void disconnect_class(struct dept_class *c)
- 		call_rcu(&d->rh, del_dep_rcu);
- 	}
- 
--	for (i = 0; i < DEPT_IRQS_NR; i++) {
-+	for (i = 0; i < DEPT_CXT_IRQS_NR; i++) {
- 		stale_iecxt(iecxt(c, i));
- 		stale_iwait(iwait(c, i));
- 	}
-@@ -1812,27 +1812,21 @@ static inline unsigned long cur_enirqf(void)
- 	return 0UL;
  }
+@@ -792,6 +794,24 @@ static void print_dep(struct dept_dep *d)
  
--static inline int cur_irq(void)
-+static inline int cur_cxt(void)
- {
- 	if (lockdep_softirq_context(current))
--		return DEPT_SIRQ;
-+		return DEPT_CXT_SIRQ;
- 	if (lockdep_hardirq_context())
--		return DEPT_HIRQ;
--	return DEPT_IRQS_NR;
-+		return DEPT_CXT_HIRQ;
-+	return DEPT_CXT_PROCESS;
- }
+ static void save_current_stack(int skip);
  
- static inline unsigned int cur_ctxt_id(void)
- {
- 	struct dept_task *dt = dept_task();
--	int irq = cur_irq();
-+	int cxt = cur_cxt();
- 
--	/*
--	 * Normal process context
--	 */
--	if (irq == DEPT_IRQS_NR)
--		return 0U;
--
--	return dt->irq_id[irq] | (1UL << irq);
-+	return dt->cxt_id[cxt] | (1UL << cxt);
- }
- 
- static void enirq_transition(int irq)
-@@ -1883,7 +1877,7 @@ static void enirq_update(unsigned long ip)
- 	/*
- 	 * Do enirq_transition() only on an OFF -> ON transition.
- 	 */
--	for_each_set_bit(irq, &irqf, DEPT_IRQS_NR) {
-+	for_each_set_bit(irq, &irqf, DEPT_CXT_IRQS_NR) {
- 		if (prev & (1UL << irq))
- 			continue;
- 
-@@ -1960,6 +1954,13 @@ void dept_hardirqs_off(unsigned long ip)
- }
- EXPORT_SYMBOL_GPL(dept_hardirqs_off);
- 
-+void dept_kernel_enter(void)
++static bool is_timeout_wait_circle(struct dept_class *c)
 +{
-+	struct dept_task *dt = dept_task();
++	struct dept_class *fc = c->bfs_parent;
++	struct dept_class *tc = c;
 +
-+	dt->cxt_id[DEPT_CXT_PROCESS] += 1UL << DEPT_CXTS_NR;
++	do {
++		struct dept_dep *d = lookup_dep(fc, tc);
++
++		if (d->wait->timeout)
++			return true;
++
++		tc = fc;
++		fc = fc->bfs_parent;
++	} while (tc != c);
++
++	return false;
 +}
 +
  /*
-  * Ensure it's the outmost softirq context.
+  * Print all classes in a circle.
   */
-@@ -1967,7 +1968,7 @@ void dept_softirq_enter(void)
+@@ -814,10 +834,14 @@ static void print_circle(struct dept_class *c)
+ 	pr_warn("summary\n");
+ 	pr_warn("---------------------------------------------------\n");
+ 
+-	if (fc == tc)
++	if (is_timeout_wait_circle(c)) {
++		pr_warn("NOT A DEADLOCK BUT A CIRCULAR DEPENDENCY\n");
++		pr_warn("CHECK IF THE TIMEOUT IS INTENDED\n\n");
++	} else if (fc == tc) {
+ 		pr_warn("*** AA DEADLOCK ***\n\n");
+-	else
++	} else {
+ 		pr_warn("*** DEADLOCK ***\n\n");
++	}
+ 
+ 	i = 0;
+ 	do {
+@@ -1563,7 +1587,8 @@ static void add_dep(struct dept_ecxt *e, struct dept_wait *w)
+ static atomic_t wgen = ATOMIC_INIT(1);
+ 
+ static void add_wait(struct dept_class *c, unsigned long ip,
+-		     const char *w_fn, int sub_l, bool sched_sleep)
++		     const char *w_fn, int sub_l, bool sched_sleep,
++		     bool timeout)
  {
  	struct dept_task *dt = dept_task();
+ 	struct dept_wait *w;
+@@ -1583,6 +1608,7 @@ static void add_wait(struct dept_class *c, unsigned long ip,
+ 	w->wait_fn = w_fn;
+ 	w->wait_stack = get_current_stack();
+ 	w->sched_sleep = sched_sleep;
++	w->timeout = timeout;
  
--	dt->irq_id[DEPT_SIRQ] += 1UL << DEPT_IRQS_NR;
-+	dt->cxt_id[DEPT_CXT_SIRQ] += 1UL << DEPT_CXTS_NR;
+ 	cxt = cur_cxt();
+ 	if (cxt == DEPT_CXT_HIRQ || cxt == DEPT_CXT_SIRQ)
+@@ -2315,7 +2341,7 @@ static struct dept_class *check_new_class(struct dept_key *local,
+  */
+ static void __dept_wait(struct dept_map *m, unsigned long w_f,
+ 			unsigned long ip, const char *w_fn, int sub_l,
+-			bool sched_sleep, bool sched_map)
++			bool sched_sleep, bool sched_map, bool timeout)
+ {
+ 	int e;
+ 
+@@ -2338,7 +2364,7 @@ static void __dept_wait(struct dept_map *m, unsigned long w_f,
+ 		if (!c)
+ 			continue;
+ 
+-		add_wait(c, ip, w_fn, sub_l, sched_sleep);
++		add_wait(c, ip, w_fn, sub_l, sched_sleep, timeout);
+ 	}
  }
  
- /*
-@@ -1977,7 +1978,7 @@ void dept_hardirq_enter(void)
+@@ -2380,7 +2406,8 @@ static void __dept_event(struct dept_map *m, unsigned long e_f,
+ }
+ 
+ void dept_wait(struct dept_map *m, unsigned long w_f,
+-	       unsigned long ip, const char *w_fn, int sub_l)
++	       unsigned long ip, const char *w_fn, int sub_l,
++	       bool timeout)
  {
  	struct dept_task *dt = dept_task();
+ 	unsigned long flags;
+@@ -2388,6 +2415,11 @@ void dept_wait(struct dept_map *m, unsigned long w_f,
+ 	if (unlikely(!dept_working()))
+ 		return;
  
--	dt->irq_id[DEPT_HIRQ] += 1UL << DEPT_IRQS_NR;
-+	dt->cxt_id[DEPT_CXT_HIRQ] += 1UL << DEPT_CXTS_NR;
++#if !defined(CONFIG_DEPT_AGGRESSIVE_TIMEOUT_WAIT)
++	if (timeout)
++		return;
++#endif
++
+ 	if (dt->recursive)
+ 		return;
+ 
+@@ -2396,14 +2428,15 @@ void dept_wait(struct dept_map *m, unsigned long w_f,
+ 
+ 	flags = dept_enter();
+ 
+-	__dept_wait(m, w_f, ip, w_fn, sub_l, false, false);
++	__dept_wait(m, w_f, ip, w_fn, sub_l, false, false, timeout);
+ 
+ 	dept_exit(flags);
  }
+ EXPORT_SYMBOL_GPL(dept_wait);
  
- void dept_sched_enter(void)
+ void dept_stage_wait(struct dept_map *m, struct dept_key *k,
+-		     unsigned long ip, const char *w_fn, bool strong)
++		     unsigned long ip, const char *w_fn, bool strong,
++		     bool timeout)
+ {
+ 	struct dept_task *dt = dept_task();
+ 	unsigned long flags;
+@@ -2411,6 +2444,11 @@ void dept_stage_wait(struct dept_map *m, struct dept_key *k,
+ 	if (unlikely(!dept_working()))
+ 		return;
+ 
++#if !defined(CONFIG_DEPT_AGGRESSIVE_TIMEOUT_WAIT)
++	if (timeout)
++		return;
++#endif
++
+ 	if (m && m->nocheck)
+ 		return;
+ 
+@@ -2455,6 +2493,7 @@ void dept_stage_wait(struct dept_map *m, struct dept_key *k,
+ 
+ 	dt->stage_w_fn = w_fn;
+ 	dt->stage_ip = ip;
++	dt->stage_timeout = timeout;
+ unlock:
+ 	arch_spin_unlock(&stage_spin);
+ 
+@@ -2480,6 +2519,7 @@ void dept_clean_stage(void)
+ 	dt->stage_sched_map = false;
+ 	dt->stage_w_fn = NULL;
+ 	dt->stage_ip = 0UL;
++	dt->stage_timeout = false;
+ 	arch_spin_unlock(&stage_spin);
+ 
+ 	dept_exit_recursive(flags);
+@@ -2497,6 +2537,7 @@ void dept_request_event_wait_commit(void)
+ 	unsigned long ip;
+ 	const char *w_fn;
+ 	bool sched_map;
++	bool timeout;
+ 
+ 	if (unlikely(!dept_working()))
+ 		return;
+@@ -2519,6 +2560,7 @@ void dept_request_event_wait_commit(void)
+ 	w_fn = dt->stage_w_fn;
+ 	ip = dt->stage_ip;
+ 	sched_map = dt->stage_sched_map;
++	timeout = dt->stage_timeout;
+ 
+ 	/*
+ 	 * Avoid zero wgen.
+@@ -2526,7 +2568,7 @@ void dept_request_event_wait_commit(void)
+ 	wg = atomic_inc_return(&wgen) ?: atomic_inc_return(&wgen);
+ 	WRITE_ONCE(dt->stage_m.wgen, wg);
+ 
+-	__dept_wait(&dt->stage_m, 1UL, ip, w_fn, 0, true, sched_map);
++	__dept_wait(&dt->stage_m, 1UL, ip, w_fn, 0, true, sched_map, timeout);
+ exit:
+ 	dept_exit(flags);
+ }
+diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
+index 611fd01..912309b 100644
+--- a/lib/Kconfig.debug
++++ b/lib/Kconfig.debug
+@@ -1282,6 +1282,16 @@ config DEPT
+ 	  noting, to mitigate the impact by the false positives, multi
+ 	  reporting has been supported.
+ 
++config DEPT_AGGRESSIVE_TIMEOUT_WAIT
++	bool "Aggressively track even timeout waits"
++	depends on DEPT
++	default n
++	help
++	  Timeout wait doesn't contribute to a deadlock. However,
++	  informing a circular dependency might be helpful for cases
++	  that timeout is used to avoid a deadlock. Say N if you'd like
++	  to avoid verbose reports.
++
+ config LOCK_DEBUGGING_SUPPORT
+ 	bool
+ 	depends on TRACE_IRQFLAGS_SUPPORT && STACKTRACE_SUPPORT && LOCKDEP_SUPPORT
 -- 
 1.9.1
 
