@@ -2,100 +2,114 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0635C5479D
-	for <linux-block@archiver.kernel.org>; Mon,  9 Jan 2023 20:49:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 99AF7C678DC
+	for <linux-block@archiver.kernel.org>; Mon,  9 Jan 2023 21:40:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230032AbjAIUtK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 9 Jan 2023 15:49:10 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57992 "EHLO
+        id S238148AbjAIVkd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 9 Jan 2023 16:40:33 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49804 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231258AbjAIUs6 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 9 Jan 2023 15:48:58 -0500
-Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F1D5E1A3AD;
-        Mon,  9 Jan 2023 12:48:57 -0800 (PST)
-Received: by mail-pj1-x102d.google.com with SMTP id o7-20020a17090a0a0700b00226c9b82c3aso11069976pjo.3;
-        Mon, 09 Jan 2023 12:48:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ozgtWXStaifDCNgxslV51L9a9hMuGEd0/nehBJs5fnk=;
-        b=T8qovgWlSZC8V8Nu5uttH59MXaChBsCI/gnRaGKVGLwOPQP6JFSyxkip3cXJyVVf4C
-         D1lTIpYnSayynxqxocTY1T9GjZ27L5IL4oJMha83QTPliGYrb2NIimWL6HTbDgeUukF/
-         sw/ucV9zAwNXGqArc4hctwBhSUSyZrb4DqBbm8HFR9xoVIQQrlNeNe+0R/rQ2eiV+b39
-         uLqnlqmESQe7kw1/Q/CxwryGKiaibMv18//JGsUPhnCBmehCTomfIZzKXC7hWb82tDwz
-         YygbLAukH01JVtMnE5vf1+hVqAXXYtj/7AOMvBRR4dQczyc1rQJMtMaqy1qDIpwXwjMc
-         9nng==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ozgtWXStaifDCNgxslV51L9a9hMuGEd0/nehBJs5fnk=;
-        b=zTdNcrGvo/50YGE/05ws8RQVjrXDRuXOdLdNrNcZfGV9UUUtfUbbP+VWI6ZoQzm9T4
-         GVbTckOBz9ooIfPqLhlBS/rPaAzbSrldQGL/6ldZ0fvMebMac5DcY9VYWZ+5AgGEN8st
-         Ve6N4SS4S1NOG9dJxMmpczhK/BF3KC5q2hdmNiHmKpmBgeqF1ZDpo0vtNKcd1sf7Y5oc
-         v+1meQWj8wPmEdHmYdeyDR3Nbxo/NXYtY1ppz/o0FZF2VqSR4HhiXxK/gU0Vyi0dRwHZ
-         B2DtkJe79rCMgr4UA/tl3R2PUwNQBo94pv74DeBKEhfLWOVEMViHL46gnmzbxQ0t/Pl6
-         h3SA==
-X-Gm-Message-State: AFqh2ko4Ox7d6l6fDZy64GKlrF6LfDmG/np6sf4SHBXYRNDQ7qp1dd/E
-        2N1MrTMsk36DC+eKek5d0lM=
-X-Google-Smtp-Source: AMrXdXudu3zGX1Bk6RQEqbaxea7o8PBKNte85xa8wTy0U7BSYdzI3mqcMO0/sha5+LEP8Yr+76tpJA==
-X-Received: by 2002:a17:902:7583:b0:189:4bf4:2cfc with SMTP id j3-20020a170902758300b001894bf42cfcmr66193787pll.31.1673297337405;
-        Mon, 09 Jan 2023 12:48:57 -0800 (PST)
-Received: from localhost (2603-800c-1a02-1bae-a7fa-157f-969a-4cde.res6.spectrum.com. [2603:800c:1a02:1bae:a7fa:157f:969a:4cde])
-        by smtp.gmail.com with ESMTPSA id a16-20020a170902ecd000b001868ed86a95sm6526556plh.174.2023.01.09.12.48.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 Jan 2023 12:48:57 -0800 (PST)
-Sender: Tejun Heo <htejun@gmail.com>
-Date:   Mon, 9 Jan 2023 10:48:55 -1000
-From:   Tejun Heo <tj@kernel.org>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     axboe@kernel.dk, josef@toxicpanda.com, linux-block@vger.kernel.org,
+        with ESMTP id S238225AbjAIVj7 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 9 Jan 2023 16:39:59 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 484DCE0B1
+        for <linux-block@vger.kernel.org>; Mon,  9 Jan 2023 13:37:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1673300263;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=a63DA35gJAAxc0zkeF1e3iqtqNPsmNmAAW3yG6Igeec=;
+        b=X0w0YKHvcroFIRmb7fV1oy5ITn/4bx4dxqNrTG7Wr9eCM4mauTBxBIpzPJy1Adio5Vne5M
+        zcy4y6Y6kpYeQ8ZoeqWRGGBeNPtopridtMLOHsHZm/RjuQYRa11SPfI1si5ST/6ajLmlAC
+        qec2GE1rdIDj4v0tVuNzMgH7ZaRtrsc=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-1-FYzDasRJMNu5P2dWnJSLYw-1; Mon, 09 Jan 2023 16:37:38 -0500
+X-MC-Unique: FYzDasRJMNu5P2dWnJSLYw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 7CDAC29AA3B4;
+        Mon,  9 Jan 2023 21:37:37 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.33.36.87])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 1BEEF40C2064;
+        Mon,  9 Jan 2023 21:37:36 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <20230109173513.htfqbkrtqm52pnye@quack3>
+References: <20230109173513.htfqbkrtqm52pnye@quack3> <167305160937.1521586.133299343565358971.stgit@warthog.procyon.org.uk> <167305166150.1521586.10220949115402059720.stgit@warthog.procyon.org.uk>
+To:     Jan Kara <jack@suse.cz>
+Cc:     dhowells@redhat.com, Al Viro <viro@zeniv.linux.org.uk>,
+        Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+        Matthew Wilcox <willy@infradead.org>,
+        Logan Gunthorpe <logang@deltatee.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Jeff Layton <jlayton@kernel.org>,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/4] blkcg: Drop unnecessary RCU read [un]locks from
- blkg_conf_prep/finish()
-Message-ID: <Y7x9t+4EwXFl7OwS@slm.duckdns.org>
-References: <20230105212432.289569-1-tj@kernel.org>
- <20230105212432.289569-2-tj@kernel.org>
- <20230108170240.GA19165@lst.de>
+Subject: Re: [PATCH v4 7/7] iov_iter, block: Make bio structs pin pages rather than ref'ing if appropriate
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230108170240.GA19165@lst.de>
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <2008443.1673300255.1@warthog.procyon.org.uk>
+Date:   Mon, 09 Jan 2023 21:37:35 +0000
+Message-ID: <2008444.1673300255@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.1
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello, Christoph.
+Jan Kara <jack@suse.cz> wrote:
 
-On Sun, Jan 08, 2023 at 06:02:40PM +0100, Christoph Hellwig wrote:
-> On Thu, Jan 05, 2023 at 11:24:29AM -1000, Tejun Heo wrote:
-> > Holding the queue lock now implies RCU read lock, so no need to use
-> > rcu_read_[un]lock() explicitly. This shouldn't cause any behavior changes.
-> 
-> How so?
+> So currently we already have BIO_NO_PAGE_REF flag and what you do in this
+> patch partially duplicates that. So either I'd drop that flag or instead of
+> bi_cleanup_mode variable (which honestly looks a bit wasteful given how we
+> microoptimize struct bio) just add another BIO_ flag...
 
-Now that all RCU flavors have been combined, holding a spin lock, disabling
-irq, disabling preemption all imply RCU read lock.
+I'm fine with translating the FOLL_* flags to the BIO_* flags.  I could add a
+BIO_PAGE_PINNED and translate:
 
-> > While at it, drop __acquires() annotation on the queue lock too. The
-> > __acquires() part was already out of sync and it doesn't catch anything that
-> > lockdep can't.
-> 
-> This makes sparse even more unhappy than it was before.  For now
-> please keep the annotation.
+	FOLL_GET => 0
+	FOLL_PIN => BIO_PAGE_PINNED
+	0	 => BIO_NO_PAGE_REF
 
-I can drop the changes but this actually bothers me. The annotation has been
-broken for a *long* time and nobody noticed. Furthermore, I can't remember a
-time when __acquires/__releases notation caught anything that lockdep
-couldn't trivially and can't even think of a way how it could. AFAICS, these
-annotations don't contribute anything other than preservation of themselves.
-I don't see why we would want to keep them.
+It would seem that BIO_NO_PAGE_REF can't be set for BIO_PAGE_PINNED because
+BIO_NO_PAGE_REF governs whether bio_release_pages() calls
+__bio_release_pages() - which would be necessary.  However, bio_release_page()
+can do one or the other on the basis of BIO_PAGE_PINNED being specified.  So
+in my patch I would end up with:
 
-Thanks.
+	static void bio_release_page(struct bio *bio, struct page *page)
+	{
+		if (bio->bi_flags & BIO_NO_PAGE_REF)
+			;
+		else if (bio->bi_flags & BIO_PAGE_PINNED)
+			unpin_user_page(page);
+		else
+			put_page(page);
+	}
 
--- 
-tejun
+(This is called from four places, so it has to handle BIO_NO_PAGE_REF).
+
+It might make sense flip the logic of BIO_NO_PAGE_REF so that we have, say:
+
+	FOLL_GET => BIO_PAGE_REFFED
+	FOLL_PIN => BIO_PAGE_PINNED
+	0	 => 0
+
+Set BIO_PAGE_REFFED by default and clear it in bio_iov_bvec_set().
+
+Note that one reason I was thinking of saving the returned FOLL_* flags is
+that I don't know if, at some point, the VM will acquire yet more different
+cleanup modes - or even if a page could at some point be both ref'd *and*
+pinned.
+
+Also, I could change the interface to return something other than FOLL_* - it
+just seems that they're appropriate given the underlying VM interface.
+
+David
+
