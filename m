@@ -2,169 +2,441 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E95F8C5479D
-	for <linux-block@archiver.kernel.org>; Mon,  9 Jan 2023 15:05:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2D3CC54EBD
+	for <linux-block@archiver.kernel.org>; Mon,  9 Jan 2023 15:07:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229619AbjAIPFQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 9 Jan 2023 10:05:16 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50866 "EHLO
+        id S234192AbjAIPHr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 9 Jan 2023 10:07:47 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52072 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235400AbjAIPFQ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 9 Jan 2023 10:05:16 -0500
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87F101C92F;
-        Mon,  9 Jan 2023 07:05:14 -0800 (PST)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id D18E14680;
-        Mon,  9 Jan 2023 15:05:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-        t=1673276712; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
+        with ESMTP id S235285AbjAIPHJ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 9 Jan 2023 10:07:09 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BAA2838AB
+        for <linux-block@vger.kernel.org>; Mon,  9 Jan 2023 07:06:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1673276780;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=r5AchZgkjBMvT1rTdbO0/ZY4pyGy39ipbS0uUdkYcRY=;
-        b=ALlw8jrDaBsAMeOsxe37gz788mxvsiIal84uC3vh8oCPb/RUOGaMrHPWS4u/XZ7YaTrojO
-        /0vL7JTxDXcpiY4JVHHOHWSEoBC2rfvC7jt/VeA1fco6NMz+r9weMsFMOgQlN3Lxf7gIPR
-        Wxpn6kaoTqLV/lIjIHJInWbL6UGGQMA=
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id AA32C134AD;
-        Mon,  9 Jan 2023 15:05:12 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id fK85KCgtvGMGQwAAMHmgww
-        (envelope-from <jgross@suse.com>); Mon, 09 Jan 2023 15:05:12 +0000
-Message-ID: <055adce8-ceba-983a-19cc-b09ec30bb3c3@suse.com>
-Date:   Mon, 9 Jan 2023 16:05:12 +0100
+        bh=uFbKNKQ2g/VHh77vfbre1DKedasd16128f+ksLeeeHc=;
+        b=GQcHZbh18bVAF73WhHyFOHz/P0ohqVLJSPGPp718eQGDvAwAr4tryj/NBLli74Nz3dbpT7
+        FgFkCUCjlFGax3ihX9cD2A6EH2KMdn63n78vVXaq0wbjPfsPY3X6HyRcAoloui4ewz/Vmw
+        HVcQJuvjvm8/xmp6A3z5VWImfNThdGU=
+Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
+ [209.85.160.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-421-8v0iSJZLMNmvIXa0bV1yEQ-1; Mon, 09 Jan 2023 10:06:19 -0500
+X-MC-Unique: 8v0iSJZLMNmvIXa0bV1yEQ-1
+Received: by mail-qt1-f197.google.com with SMTP id p20-20020ac84614000000b003a977d7a2ecso3990452qtn.23
+        for <linux-block@vger.kernel.org>; Mon, 09 Jan 2023 07:06:19 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=uFbKNKQ2g/VHh77vfbre1DKedasd16128f+ksLeeeHc=;
+        b=McakHBPJpjy4/ugR7GvBunJRNB5eopGDVKdLs1dV4QSsTJWzA7nwp91kbA+Huwlfv0
+         sxlQ3duju1OnZErdRoQtXyx/xoynGcVNdA8jOrILFfFFqREmbY7nK71lK5mjn9USZguR
+         0oA0hZc0+xNOCxxidX8+sECSI5abFCRwCXWYiJjim+bEl2Nyuz/fqOQxX3zGjwYXXK2g
+         XAaby9mWJ9vr6BtO+kK7U8tzUiQlVkBmkd4/6SR5kHcYZ2CSBcqy4bGP6DjIqPMXGINP
+         jJUyQWSBkiJ+jpCSjTfg1/1uM8ZcD6FiGWY4AdYj0qufrAn0n1wzJmzTdOLqeNAv+1LR
+         FF9w==
+X-Gm-Message-State: AFqh2koJtvIlcGcg0ptBaL1rxsuOwqzIxKRrbI8UDPLu7VpWSfiL7I5B
+        1Z3UYn+Dz51b+LpZLy9vOL8r+P2BwrqrO1mSLgvlAPk8WSzry9vrT+C6+7kl3+ZISQlTbd+1zWx
+        8iHagXRKhB5X5Qr2nDV393G8=
+X-Received: by 2002:a05:622a:229f:b0:3a7:f552:fd5f with SMTP id ay31-20020a05622a229f00b003a7f552fd5fmr88265745qtb.50.1673276778755;
+        Mon, 09 Jan 2023 07:06:18 -0800 (PST)
+X-Google-Smtp-Source: AMrXdXtwaUxsnmZ85TM3q+nOwUJaFYORudsTgAYMhbUOi5osI7Iwk0X8xJoS3W5XmEsTcLkUbrMgIQ==
+X-Received: by 2002:a05:622a:229f:b0:3a7:f552:fd5f with SMTP id ay31-20020a05622a229f00b003a7f552fd5fmr88265716qtb.50.1673276778336;
+        Mon, 09 Jan 2023 07:06:18 -0800 (PST)
+Received: from bfoster (c-24-61-119-116.hsd1.ma.comcast.net. [24.61.119.116])
+        by smtp.gmail.com with ESMTPSA id dt9-20020a05620a478900b006fbf88667bcsm809298qkb.77.2023.01.09.07.06.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 09 Jan 2023 07:06:17 -0800 (PST)
+Date:   Mon, 9 Jan 2023 10:07:19 -0500
+From:   Brian Foster <bfoster@redhat.com>
+To:     "Darrick J. Wong" <djwong@kernel.org>
+Cc:     Sarthak Kukreti <sarthakkukreti@chromium.org>,
+        sarthakkukreti@google.com, dm-devel@redhat.com,
+        linux-block@vger.kernel.org, linux-ext4@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        Jens Axboe <axboe@kernel.dk>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Alasdair Kergon <agk@redhat.com>,
+        Mike Snitzer <snitzer@kernel.org>,
+        Christoph Hellwig <hch@infradead.org>,
+        Theodore Ts'o <tytso@mit.edu>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Bart Van Assche <bvanassche@google.com>,
+        Daniil Lunev <dlunev@google.com>
+Subject: Re: [PATCH v2 3/7] fs: Introduce FALLOC_FL_PROVISION
+Message-ID: <Y7wtp+jU67Ae1kW8@bfoster>
+References: <20221229081252.452240-1-sarthakkukreti@chromium.org>
+ <20221229081252.452240-4-sarthakkukreti@chromium.org>
+ <Y7Wr2uadI+82BB6a@magnolia>
+ <CAG9=OMNbeU=Xg5bWvHUSfzRf8vsk6csvcw5BGZeMD5Lo7dfKFQ@mail.gmail.com>
+ <Y7biricgMfXxcQBU@bfoster>
+ <Y7cmiIrSVdBf3Opq@magnolia>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.1
-Subject: Re: [PATCH 0/4] xen/blkback: some cleanups
-Content-Language: en-US
-To:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
-Cc:     =?UTF-8?Q?Roger_Pau_Monn=c3=a9?= <roger.pau@citrix.com>,
-        Jens Axboe <axboe@kernel.dk>, xen-devel@lists.xenproject.org
-References: <20221216145816.27374-1-jgross@suse.com>
-From:   Juergen Gross <jgross@suse.com>
-In-Reply-To: <20221216145816.27374-1-jgross@suse.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="------------Bn9el70qiXK9dBtQDHvkBxHs"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Y7cmiIrSVdBf3Opq@magnolia>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---------------Bn9el70qiXK9dBtQDHvkBxHs
-Content-Type: multipart/mixed; boundary="------------5FtRzSy4gpSehjOHS0zh00HX";
- protected-headers="v1"
-From: Juergen Gross <jgross@suse.com>
-To: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
-Cc: =?UTF-8?Q?Roger_Pau_Monn=c3=a9?= <roger.pau@citrix.com>,
- Jens Axboe <axboe@kernel.dk>, xen-devel@lists.xenproject.org
-Message-ID: <055adce8-ceba-983a-19cc-b09ec30bb3c3@suse.com>
-Subject: Re: [PATCH 0/4] xen/blkback: some cleanups
-References: <20221216145816.27374-1-jgross@suse.com>
-In-Reply-To: <20221216145816.27374-1-jgross@suse.com>
+On Thu, Jan 05, 2023 at 11:35:36AM -0800, Darrick J. Wong wrote:
+> On Thu, Jan 05, 2023 at 09:46:06AM -0500, Brian Foster wrote:
+> > On Wed, Jan 04, 2023 at 01:22:06PM -0800, Sarthak Kukreti wrote:
+> > > (Resend; the text flow made the last reply unreadable)
+> > > 
+> > > On Wed, Jan 4, 2023 at 8:39 AM Darrick J. Wong <djwong@kernel.org> wrote:
+> > > >
+> > > > On Thu, Dec 29, 2022 at 12:12:48AM -0800, Sarthak Kukreti wrote:
+> > > > > FALLOC_FL_PROVISION is a new fallocate() allocation mode that
+> > > > > sends a hint to (supported) thinly provisioned block devices to
+> > > > > allocate space for the given range of sectors via REQ_OP_PROVISION.
+> > > > >
+> > > > > The man pages for both fallocate(2) and posix_fallocate(3) describe
+> > > > > the default allocation mode as:
+> > > > >
+> > > > > ```
+> > > > > The default operation (i.e., mode is zero) of fallocate()
+> > > > > allocates the disk space within the range specified by offset and len.
+> > > > > ...
+> > > > > subsequent writes to bytes in the specified range are guaranteed
+> > > > > not to fail because of lack of disk space.
+> > > > > ```
+> > > > >
+> > > > > For thinly provisioned storage constructs (dm-thin, filesystems on sparse
+> > > > > files), the term 'disk space' is overloaded and can either mean the apparent
+> > > > > disk space in the filesystem/thin logical volume or the true disk
+> > > > > space that will be utilized on the underlying non-sparse allocation layer.
+> > > > >
+> > > > > The use of a separate mode allows us to cleanly disambiguate whether fallocate()
+> > > > > causes allocation only at the current layer (default mode) or whether it propagates
+> > > > > allocations to underlying layers (provision mode)
+> > > >
+> > > > Why is it important to make this distinction?  The outcome of fallocate
+> > > > is supposed to be that subsequent writes do not fail with ENOSPC.  In my
+> > > > (fs developer) mind, REQ_OP_PROVISION simply an extra step to be taken
+> > > > after allocating file blocks.
+> > > >
+> > > Some use cases still benefit from keeping the default mode - eg.
+> > > virtual machines running on massive storage pools that don't expect to
+> > > hit the storage limit anytime soon (like most cloud storage
+> > > providers). Essentially, if the 'no ENOSPC' guarantee is maintained
+> > > via other means, then REQ_OP_PROVISION adds latency that isn't needed
+> > > (and cloud storage providers don't need to set aside that extra space
+> > > that may or may not be used).
+> > > 
+> > 
+> > What's the granularity that needs to be managed at? Do you really need
+> > an fallocate command for this, or would one of the filesystem level
+> > features you've already implemented for ext4 suffice?
+> > 
+> > I mostly agree with Darrick in that FALLOC_FL_PROVISION stills feels a
+> > bit wonky to me. I can see that there might be some legitimate use cases
+> > for it, but I'm not convinced that it won't just end up being confusing
+> > to many users. At the same time, I think the approach of unconditional
+> > provision on falloc could eventually lead to complaints associated with
+> > the performance impact or similar sorts of confusion. For example,
+> > should an falloc of an already allocated range in the fs send a
+> > provision or not?
+> 
+> For a user-initiated fallocate call, I think that's reasonable.
+> 
 
---------------5FtRzSy4gpSehjOHS0zh00HX
-Content-Type: multipart/mixed; boundary="------------KfBHdy9WwI9ryEeh1hcoeXvF"
+I think so as well, but that doesn't appear to be what the proposed
+implementation for ext4 does. I'm not intimately familiar with ext4, but
+it looks to me like it only provisions on initial allocation..?
 
---------------KfBHdy9WwI9ryEeh1hcoeXvF
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: base64
+> My first thought is to make the XFS allocator issue REQ_OP_PROVISION on
+> every allocation if the device supports it.  The fs has decided that
+> it's going to allocate and presumably write to some space, so the
+> underlying storage really ought to have some space ready.
+> 
 
-T24gMTYuMTIuMjIgMTU6NTgsIEp1ZXJnZW4gR3Jvc3Mgd3JvdGU6DQo+IFNvbWUgc21hbGwg
-Y2xlYW51cCBwYXRjaGVzIEkgaGFkIGx5aW5nIGFyb3VuZCBmb3Igc29tZSB0aW1lIG5vdy4N
-Cj4gDQo+IEp1ZXJnZW4gR3Jvc3MgKDQpOg0KPiAgICB4ZW4vYmxrYmFjazogZml4IHdoaXRl
-IHNwYWNlIGNvZGUgc3R5bGUgaXNzdWVzDQo+ICAgIHhlbi9ibGtiYWNrOiByZW1vdmUgc3Rh
-bGUgcHJvdG90eXBlDQo+ICAgIHhlbi9ibGtiYWNrOiBzaW1wbGlmeSBmcmVlX3BlcnNpc3Rl
-bnRfZ250cygpIGludGVyZmFjZQ0KPiAgICB4ZW4vYmxrYmFjazogbW92ZSBibGtpZl9nZXRf
-eDg2XypfcmVxKCkgaW50byBibGtiYWNrLmMNCj4gDQo+ICAgZHJpdmVycy9ibG9jay94ZW4t
-YmxrYmFjay9ibGtiYWNrLmMgfCAxMjYgKysrKysrKysrKysrKysrKysrKysrKysrKy0tLQ0K
-PiAgIGRyaXZlcnMvYmxvY2sveGVuLWJsa2JhY2svY29tbW9uLmggIHwgMTAzICstLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tDQo+ICAgMiBmaWxlcyBjaGFuZ2VkLCAxMTggaW5zZXJ0aW9ucygr
-KSwgMTExIGRlbGV0aW9ucygtKQ0KPiANCg0KUGluZz8NCg0KDQpKdWVyZ2VuDQo=
---------------KfBHdy9WwI9ryEeh1hcoeXvF
-Content-Type: application/pgp-keys; name="OpenPGP_0xB0DE9DD628BF132F.asc"
-Content-Disposition: attachment; filename="OpenPGP_0xB0DE9DD628BF132F.asc"
-Content-Description: OpenPGP public key
-Content-Transfer-Encoding: quoted-printable
+That makes sense for a purely thin provisioned device, but runs into
+issues with block layer snapshots (re: my comments on the provision
+mount option patch). I wonder if it makes more sense to provision at
+some point before submitting writes or dirtying pagecache. IIRC we had
+prototyped something in XFS a while back that performed an analogous
+dm-thin fallocate at the time an extent is mapped for writes. I'm not
+sure what the performance impact of that would be or if there's a nice
+way to optimize away the obvious side effect of spurious requests.
 
------BEGIN PGP PUBLIC KEY BLOCK-----
+> But then it occurred to me -- what if the IO fails with ENOSPC?  Do we
+> keep going and hope for the best?  Or maybe we should undo the
+> allocation?  That could be tricky since we'd have to add a transaction
+> to undo the allocation, commit that, and then throw an error to the
+> upper layers.
+> 
 
-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
-jR/i1DG86lem3iBDXzXsZDn8R38=3D
-=3D2wuH
------END PGP PUBLIC KEY BLOCK-----
+Yeah, that's a good question. IMO we should be able to use something
+like this to improve the failure handling for fs' over thinly
+provisioned storage with dangerously low free space. There's not much
+point in just submitting writes in response to failed provisions in that
+case, but perhaps there is some more incremental use case or benefit I'm
+not aware of..?
 
---------------KfBHdy9WwI9ryEeh1hcoeXvF--
+The flipside of more reliably graceful error handling is there may be
+more to the minimal solution than just firing off provisions on initial
+allocation, unless you wanted to just rule out snapshots I guess. That
+said, I think there's still potential opportunity for improvement. For
+example, if a prototype did something like the following:
 
---------------5FtRzSy4gpSehjOHS0zh00HX--
+- Provision the log at opportunistic points (i.e., on mount, first
+  transaction to a covered log, etc.) to guarantee log writes won't
+  fail.
+- Provision extents mapped for data writes before the write is allowed
+  to proceed.
+- Do something similar for metadata in AIL processing or some such,
+  where each item must be provisioned before written back.
+- Shutdown the fs in response to any provision failure.
 
---------------Bn9el70qiXK9dBtQDHvkBxHs
-Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="OpenPGP_signature"
+... obviously that comes with caveats, possibly bad performance, etc.,
+but it would be interesting to see if that is sufficient to catch most
+scenarios where a write would otherwise get to an out of space volume
+causing it to become inactive. If that could be made to work well
+enough, perhaps the fs shutdown step could be replaced with some kind of
+in-core pause/freeze like mode where the admin has the opportunity to
+either add more storage and continue or explicitly shutdown to save the
+volume.
 
------BEGIN PGP SIGNATURE-----
+OTOH if that just doesn't work out, perhaps this can be combined with
+other schemes to reliably prevent inactivation, such as the reservation
+mechanism the dm guys had prototyped in the past. Of course that
+potentially complicates the interface between the fs and dm-layer.
 
-wsB5BAABCAAjFiEEhRJncuj2BJSl0Jf3sN6d1ii/Ey8FAmO8LSgFAwAAAAAACgkQsN6d1ii/Ey8T
-rgf/YPspae1H6xxWZbx8KKP2yS3WylDZF0YoQUBMlTxslcwhIiRltIckPFalUVdJclpwj8v2DyXK
-gIqKYpP1LJvXxIwty70hNd7lsWtSUeG633XCeEmkm/UlxGtk901ELOiPC6Pz4kHOS2Q+24CumPyV
-Cto1pzmm4K0PiXaAZyLLJ1B9GBpKnoOBJoL4H9Gxoq3lNr+FATjxbIQaPNS45hKx9qFhlVqAsDUX
-s+KMdJQsyhXcIakEzwBiqpZ0A4DAP7I8zHuoMeELoPR7DpZB+rPh8MlobYvQfv/eR1hIRjlq8zeB
-5UV+XYYQGFDp1Z2p4QHR4IerT9sRCNCqyiQ8/AlYjw==
-=sGDi
------END PGP SIGNATURE-----
+> Should the allocator instead find the space it wants and issue the
+> provisioning IO with the AGF locked, and try again somewhere else if the
+> IO returns ENOSPC?  If the space management IO takes forever, we've
+> pinned the that AG for the duration, which is one of the not very nice
+> aspects of the XFS FITRIM implementation on crappy SSDs.
+> 
+> For a directio write, it's simple enough to throw that error back to
+> userspace.  I think the same applies to buffered writeback -- we'll
+> cancel the writeback and set AS_ENOSPC on the mapping.
+> 
+> But then, what about *metadata* allocation?  If those fail because the
+> provisioning encounters ENOSPC, we'll shut down the filesystem, which
+> isn't nice.  For XFS I guess we could reuse the existing metadata IO
+> error config knobs to make it retry for some amount of time until
+> (hopefully) the admin buys more storage.
+> 
+> Let's go with the simplest implementation (issue it with the free space
+> locked), and iterate from there.
+> 
+> > Should filesystems that don't otherwise support UNSHARE_RANGE need to
+> > support it in order to support an unshare request to COW'd blocks on
+> > an underlying block device?
+> 
+> Hmm.  Currently, fallocate'ing part of a file that's already mapped to
+> shared blocks is a nop.  That's technically an omission in the
+> implementation, since a subsequent write can fail during COW setup due
+> to insufficient space.  My memory about funshare is a bit murky since
+> it's been years now.
+> 
+> As I remember it, originally, I had allocate mode also calling unshare,
+> but Dave or someone pointed out that unsharing generates a flood of
+> dirty pagecache, and it would be a bit surprising that fallocate
+> suddenly takes a long time to run.  There also wasn't much precedent for
+> fallocate to unshare blocks, since btrfs doesn't do that:
+> 
+> # filefrag -v /mnt/[ab]
+> Filesystem type is: 9123683e
+> File size of /mnt/a is 1048576 (256 blocks of 4096 bytes)
+>  ext:     logical_offset:        physical_offset: length:   expected: flags:
+>    0:        0..     255:       3328..      3583:    256:             last,shared,eof
+> /mnt/a: 1 extent found
+> File size of /mnt/b is 1048576 (256 blocks of 4096 bytes)
+>  ext:     logical_offset:        physical_offset: length:   expected: flags:
+>    0:        0..     255:       3328..      3583:    256:             last,shared,eof
+> /mnt/b: 1 extent found
+> 
+> # xfs_io -c 'falloc 512k 36k' /mnt/b
+> 
+> # filefrag -v /mnt/[ab]
+> Filesystem type is: 9123683e
+> File size of /mnt/a is 1048576 (256 blocks of 4096 bytes)
+>  ext:     logical_offset:        physical_offset: length:   expected: flags:
+>    0:        0..     255:       3328..      3583:    256:             last,shared,eof
+> /mnt/a: 1 extent found
+> File size of /mnt/b is 1048576 (256 blocks of 4096 bytes)
+>  ext:     logical_offset:        physical_offset: length:   expected: flags:
+>    0:        0..     255:       3328..      3583:    256:             last,shared,eof
+> /mnt/b: 1 extent found
+> 
+> I took funshare out of the patchset entirely (minimum viable product,
+> yadda yadda) and a few months later, I think hch or someone asked for a
+> knob for userspace to get a file back to pure overwrite mode.  That's
+> where it's been ever since.
+> 
+> So to answer your question: fallocate mode 0 and REQ_OP_PROVISION
+> probably ought to be allocating the holes and unsharing existing shared
+> mappings.  However, we could also wriggle out of that by <cough>
+> claiming that fallocate has been consistent across filesystems in
+> leaving that wart for userspace to trip over. :/
+> 
 
---------------Bn9el70qiXK9dBtQDHvkBxHs--
+Thanks. That seems reasonable to me, but again isn't what the patches
+appear to implement. ;P
+
+I guess from the standpoint of an I/O command, it probably makes more
+sense to unshare by default. Why else would one send the command
+otherwise? The falloc api is what it is at this point, so the bdev folks
+could always decide if/how to implement a non-unsharing variant if there
+happens to be some reason to do that.
+
+Brian
+
+> > I wonder if the smart thing to do here is separate out the question of a
+> > new fallocate interface from the mechanism entirely. For example,
+> > implement REQ_OP_PROVISION as you've already done, enable block layer
+> > mode = 0 fallocate support (i.e. without FL_PROVISION, so whether a
+> > request propagates from a loop device will be up to the backing fs),
+> > implement the various fs features to support REQ_OP_PROVISION (i.e.,
+> > mount option, file attr, etc.), then tack on FL_FALLOC + ext4 support at
+> > the end as an RFC/prototype.
+> 
+> Yeah.
+> 
+> > Even if we ultimately ended up with FL_PROVISION support, it might
+> > actually make some sense to kick that can down the road a bit regardless
+> > to give fs' a chance to implement basic REQ_OP_PROVISION support, get a
+> > better understanding of how it works in practice, and then perhaps make
+> > more informed decisions on things like sane defaults and/or how best to
+> > expose it via fallocate. Thoughts?
+> 
+> Agree. :)
+> 
+> --D
+> 
+> > 
+> > Brian
+> > 
+> > > > If you *don't* add this API flag and simply bake the REQ_OP_PROVISION
+> > > > call into mode 0 fallocate, then the new functionality can be added (or
+> > > > even backported) to existing kernels and customers can use it
+> > > > immediately.  If you *do*, then you get to wait a few years for
+> > > > developers to add it to their codebases only after enough enterprise
+> > > > distros pick up a new kernel to make it worth their while.
+> > > >
+> > > > > for thinly provisioned filesystems/
+> > > > > block devices. For devices that do not support REQ_OP_PROVISION, both these
+> > > > > allocation modes will be equivalent. Given the performance cost of sending provision
+> > > > > requests to the underlying layers, keeping the default mode as-is allows users to
+> > > > > preserve existing behavior.
+> > > >
+> > > > How expensive is this expected to be?  Is this why you wanted a separate
+> > > > mode flag?
+> > > >
+> > > Yes, the exact latency will depend on the stacked block devices and
+> > > the fragmentation at the allocation layers.
+> > > 
+> > > I did a quick test for benchmarking fallocate() with an:
+> > > A) ext4 filesystem mounted with 'noprovision'
+> > > B) ext4 filesystem mounted with 'provision' on a dm-thin device.
+> > > C) ext4 filesystem mounted with 'provision' on a loop device with a
+> > > sparse backing file on the filesystem in (B).
+> > > 
+> > > I tested file sizes from 512M to 8G, time taken for fallocate() in (A)
+> > > remains expectedly flat at ~0.01-0.02s, but for (B), it scales from
+> > > 0.03-0.4s and for (C) it scales from 0.04s-0.52s (I captured the exact
+> > > time distribution in the cover letter
+> > > https://marc.info/?l=linux-ext4&m=167230113520636&w=2)
+> > > 
+> > > +0.5s for a 8G fallocate doesn't sound a lot but I think fragmentation
+> > > and how the block device is layered can make this worse...
+> > > 
+> > > > --D
+> > > >
+> > > > > Signed-off-by: Sarthak Kukreti <sarthakkukreti@chromium.org>
+> > > > > ---
+> > > > >  block/fops.c                | 15 +++++++++++----
+> > > > >  include/linux/falloc.h      |  3 ++-
+> > > > >  include/uapi/linux/falloc.h |  8 ++++++++
+> > > > >  3 files changed, 21 insertions(+), 5 deletions(-)
+> > > > >
+> > > > > diff --git a/block/fops.c b/block/fops.c
+> > > > > index 50d245e8c913..01bde561e1e2 100644
+> > > > > --- a/block/fops.c
+> > > > > +++ b/block/fops.c
+> > > > > @@ -598,7 +598,8 @@ static ssize_t blkdev_read_iter(struct kiocb *iocb, struct iov_iter *to)
+> > > > >
+> > > > >  #define      BLKDEV_FALLOC_FL_SUPPORTED                                      \
+> > > > >               (FALLOC_FL_KEEP_SIZE | FALLOC_FL_PUNCH_HOLE |           \
+> > > > > -              FALLOC_FL_ZERO_RANGE | FALLOC_FL_NO_HIDE_STALE)
+> > > > > +              FALLOC_FL_ZERO_RANGE | FALLOC_FL_NO_HIDE_STALE |       \
+> > > > > +              FALLOC_FL_PROVISION)
+> > > > >
+> > > > >  static long blkdev_fallocate(struct file *file, int mode, loff_t start,
+> > > > >                            loff_t len)
+> > > > > @@ -634,9 +635,11 @@ static long blkdev_fallocate(struct file *file, int mode, loff_t start,
+> > > > >       filemap_invalidate_lock(inode->i_mapping);
+> > > > >
+> > > > >       /* Invalidate the page cache, including dirty pages. */
+> > > > > -     error = truncate_bdev_range(bdev, file->f_mode, start, end);
+> > > > > -     if (error)
+> > > > > -             goto fail;
+> > > > > +     if (mode != FALLOC_FL_PROVISION) {
+> > > > > +             error = truncate_bdev_range(bdev, file->f_mode, start, end);
+> > > > > +             if (error)
+> > > > > +                     goto fail;
+> > > > > +     }
+> > > > >
+> > > > >       switch (mode) {
+> > > > >       case FALLOC_FL_ZERO_RANGE:
+> > > > > @@ -654,6 +657,10 @@ static long blkdev_fallocate(struct file *file, int mode, loff_t start,
+> > > > >               error = blkdev_issue_discard(bdev, start >> SECTOR_SHIFT,
+> > > > >                                            len >> SECTOR_SHIFT, GFP_KERNEL);
+> > > > >               break;
+> > > > > +     case FALLOC_FL_PROVISION:
+> > > > > +             error = blkdev_issue_provision(bdev, start >> SECTOR_SHIFT,
+> > > > > +                                            len >> SECTOR_SHIFT, GFP_KERNEL);
+> > > > > +             break;
+> > > > >       default:
+> > > > >               error = -EOPNOTSUPP;
+> > > > >       }
+> > > > > diff --git a/include/linux/falloc.h b/include/linux/falloc.h
+> > > > > index f3f0b97b1675..b9a40a61a59b 100644
+> > > > > --- a/include/linux/falloc.h
+> > > > > +++ b/include/linux/falloc.h
+> > > > > @@ -30,7 +30,8 @@ struct space_resv {
+> > > > >                                        FALLOC_FL_COLLAPSE_RANGE |     \
+> > > > >                                        FALLOC_FL_ZERO_RANGE |         \
+> > > > >                                        FALLOC_FL_INSERT_RANGE |       \
+> > > > > -                                      FALLOC_FL_UNSHARE_RANGE)
+> > > > > +                                      FALLOC_FL_UNSHARE_RANGE |      \
+> > > > > +                                      FALLOC_FL_PROVISION)
+> > > > >
+> > > > >  /* on ia32 l_start is on a 32-bit boundary */
+> > > > >  #if defined(CONFIG_X86_64)
+> > > > > diff --git a/include/uapi/linux/falloc.h b/include/uapi/linux/falloc.h
+> > > > > index 51398fa57f6c..2d323d113eed 100644
+> > > > > --- a/include/uapi/linux/falloc.h
+> > > > > +++ b/include/uapi/linux/falloc.h
+> > > > > @@ -77,4 +77,12 @@
+> > > > >   */
+> > > > >  #define FALLOC_FL_UNSHARE_RANGE              0x40
+> > > > >
+> > > > > +/*
+> > > > > + * FALLOC_FL_PROVISION acts as a hint for thinly provisioned devices to allocate
+> > > > > + * blocks for the range/EOF.
+> > > > > + *
+> > > > > + * FALLOC_FL_PROVISION can only be used with allocate-mode fallocate.
+> > > > > + */
+> > > > > +#define FALLOC_FL_PROVISION          0x80
+> > > > > +
+> > > > >  #endif /* _UAPI_FALLOC_H_ */
+> > > > > --
+> > > > > 2.37.3
+> > > > >
+> > > 
+> > 
+> 
+
