@@ -2,70 +2,101 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E597C61DB3
-	for <linux-block@archiver.kernel.org>; Mon,  9 Jan 2023 15:14:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28B9AC54EBD
+	for <linux-block@archiver.kernel.org>; Mon,  9 Jan 2023 17:07:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236688AbjAIPOE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 9 Jan 2023 10:14:04 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53910 "EHLO
+        id S229499AbjAIRHA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 9 Jan 2023 12:07:00 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55460 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237040AbjAIPNH (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 9 Jan 2023 10:13:07 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85B311A1;
-        Mon,  9 Jan 2023 07:12:18 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 222726117E;
-        Mon,  9 Jan 2023 15:12:18 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EB33AC433D2;
-        Mon,  9 Jan 2023 15:12:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1673277137;
-        bh=uo7fc0mmKrGkfOcf5guy0Az6XhMXNwAy01tztDAqFu8=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=ARs3SeRseq7l2W5O8NbAsxmyFUlrz1czglO2P2+kEicK8nHKYaOIVANWlGwMoV1mw
-         uzXrhYeu+GFOZlGCDpCfh9UBE7wNzouby1DViZuJ+GhDWSZlIjijOceg810VWTNoaZ
-         4tZSVsqLkojuUS13ntWYF+PGXnu/DW9cg47uPLJFDpl6oC+TwaTSTDdDsaEl5U25t7
-         adKPRoSm2Z8k3F8RfnlQ0vP+2XfauwiedH1Kf/pUBTq9lJgb9LR0d05GK/FKolJQDe
-         JV4j00zhxAwW5S+KJcq+9cudh3nO6hPeSSGWzFrhg9RCmAEK0qaRNgdosxLnIe5rd+
-         CVqd0OL0jZ2rQ==
-Date:   Mon, 9 Jan 2023 08:12:13 -0700
-From:   Keith Busch <kbusch@kernel.org>
-To:     David Howells <dhowells@redhat.com>
-Cc:     Christoph Hellwig <hch@lst.de>, Keith Busch <kbusch@meta.com>,
-        linux-kernel@vger.kernel.org,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Jens Axboe <axboe@kernel.dk>, linux-aio@kvack.org,
-        linux-fsdevel@vger.kernel.org, io-uring@vger.kernel.org,
-        Pavel Begunkov <asml.silence@gmail.com>,
-        Eric Dumazet <edumazet@google.com>,
-        Steven Rostedt <rostedt@goodmis.org>, davem@davemloft.net,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        Paul Moore <paul@paul-moore.com>, keyrings@vger.kernel.org,
-        linux-security-module@vger.kernel.org,
-        linux-trace-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        netdev@vger.kernel.org
-Subject: Re: [PATCHv2 00/12] iov_iter: replace import_single_range with ubuf
-Message-ID: <Y7wuzaXhypvExrNF@kbusch-mbp>
-References: <20230108171241.GA20314@lst.de>
- <20230105190741.2405013-1-kbusch@meta.com>
- <1880281.1673256668@warthog.procyon.org.uk>
+        with ESMTP id S237334AbjAIRGX (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 9 Jan 2023 12:06:23 -0500
+Received: from mail-pg1-f174.google.com (mail-pg1-f174.google.com [209.85.215.174])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E13184102D;
+        Mon,  9 Jan 2023 09:05:31 -0800 (PST)
+Received: by mail-pg1-f174.google.com with SMTP id q9so6313472pgq.5;
+        Mon, 09 Jan 2023 09:05:31 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=D+Jk43bfwlT9wi1gXomrMQ7R6y2uWjif0guEJB9OZDk=;
+        b=AgRpPFcCcEUfpvrnpf7tuWoBrY6hLMd2AMP3pyacjXORPUOFwBbSDJs1T8eYv3/If6
+         +GQ+kH7U/VH6cG4WOz7apqq9UyYjb8FfixYIDG+QOd4HW5NM5xyi12byIiHihJMtsIzw
+         uuvUwYlbzP63xVTffOxoJBOznvDIo0XQQLCmw5vafBbglrwqZxX9t0f7NH7R8nbVuhqK
+         /rLb9aKwhNe4VtSH8Uh42lFWJTQ3ZjT/QpZ/VpmH5JlTFyXNYu9xzLgyZYJh6icRMH5M
+         KyVtSkXcMApgUSi517Dak25tC4y+nwVvLKTP98lRGPGLvN7rW6SUlpzp1RX3wd4pbVL2
+         R/4Q==
+X-Gm-Message-State: AFqh2kqJsNZWtC0+NTRBgXXTBhhbruh2h0WK3L59kedC7oeA6KInTft4
+        T9mfttnwujlcwNO+S8DFguI=
+X-Google-Smtp-Source: AMrXdXt0A8n0S+XnWdQfOF5gLmeJIIc52A1L37LfeDPhxxtdIXnVFVgm2rLmk9/LhLAJaqj32xc5sw==
+X-Received: by 2002:a62:6145:0:b0:581:7cb0:1eb8 with SMTP id v66-20020a626145000000b005817cb01eb8mr44017246pfb.17.1673283931028;
+        Mon, 09 Jan 2023 09:05:31 -0800 (PST)
+Received: from ?IPV6:2620:15c:211:201:9f06:14dd:484f:e55c? ([2620:15c:211:201:9f06:14dd:484f:e55c])
+        by smtp.gmail.com with ESMTPSA id 69-20020a621748000000b005810a54fdefsm6311863pfx.114.2023.01.09.09.05.28
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 09 Jan 2023 09:05:30 -0800 (PST)
+Message-ID: <6079a21f-e8da-05bb-b6a5-be4cd350ac66@acm.org>
+Date:   Mon, 9 Jan 2023 09:05:28 -0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1880281.1673256668@warthog.procyon.org.uk>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.5.1
+Subject: Re: [External] [LSF/MM/BPF BoF] Session for Zoned Storage 2023
+Content-Language: en-US
+To:     =?UTF-8?Q?Javier_Gonz=c3=a1lez?= <javier.gonz@samsung.com>,
+        "Viacheslav A.Dubeyko" <viacheslav.dubeyko@bytedance.com>
+Cc:     Viacheslav Dubeyko <slava@dubeyko.com>,
+        Luis Chamberlain <mcgrof@kernel.org>,
+        Linux FS Devel <linux-fsdevel@vger.kernel.org>,
+        linux-block@vger.kernel.org,
+        =?UTF-8?Q?Matias_Bj=c3=b8rling?= <Matias.Bjorling@wdc.com>,
+        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+        Adam Manzanares <a.manzanares@samsung.com>,
+        Hans Holmberg <hans.holmberg@wdc.com>,
+        lsf-pc@lists.linux-foundation.org
+References: <F6BF25E2-FF26-48F2-8378-3CB36E362313@dubeyko.com>
+ <Y7h0F0w06cNM89hO@bombadil.infradead.org>
+ <4CC4F55E-17B3-47E2-A8C5-9098CCEB65D6@dubeyko.com>
+ <CGME20230107015641eucas1p13c2b37b5ca7a5b64eb520b79316d5186@eucas1p1.samsung.com>
+ <5DF10459-88F3-48DA-AEB2-5B436549A194@bytedance.com>
+ <20230109153315.waqfokse4srv6xlz@mpHalley-2.localdomain>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20230109153315.waqfokse4srv6xlz@mpHalley-2.localdomain>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Jan 09, 2023 at 09:31:08AM +0000, David Howells wrote:
-> lore.kernel.org doesn't seem to have the patches.
-> 
-> https://lore.kernel.org/lkml/20230105190741.2405013-1-kbusch@meta.com/
+On 1/9/23 07:33, Javier González wrote:
+> On 06.01.2023 17:56, Viacheslav A.Dubeyko wrote:
+[ ... ]
+> As a general comment, do we want to talk about ZNS alone, or zoned
+> storage in general? We have of course SMR, but also zoned UFS with
+> actual use-cases.
 
-That's frustrating. Seems like an email setup problem on my end. I'll
-split this series up and resend.
+I propose to broaden the conversation from ZNS to ZNS (NVMe) + ZBC (SCSI).
+
+>> I think we can consider such discussions:
+>> (1) I assume that we still need to discuss PO2 zone sizes?
+> 
+> For this discussion to move forward, we need users rather than vendors
+> talking about the need. If someone is willing to drive this discussion,
+> then it makes sense. I do not believe we will make progress otherwise.
+
+In JEDEC meetings I hear that UFS vendors strongly request support for 
+zone sizes that are not a power of two. The JEDEC UFS committee is 
+currently busy with requesting an MoU from T10 for permission to base 
+JEDEC standards on ZBC. We plan to finalize the ZUFS (zoned UFS) 
+specification once that MoU has been established (probably later this 
+spring).
+
+An additional topic I want to talk about is support for queue depths > 1 
+for sequential write required zone type. I plan to post patches soon 
+(later this week).
+
+Thanks,
+
+Bart.
+
