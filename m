@@ -2,162 +2,202 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B04FC54EBD
-	for <linux-block@archiver.kernel.org>; Mon,  9 Jan 2023 14:51:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EAD08C54EBE
+	for <linux-block@archiver.kernel.org>; Mon,  9 Jan 2023 15:02:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234723AbjAIOvp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 9 Jan 2023 09:51:45 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41316 "EHLO
+        id S233120AbjAIPCv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 9 Jan 2023 10:02:51 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48474 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234937AbjAIOvX (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 9 Jan 2023 09:51:23 -0500
-Received: from NAM02-SN1-obe.outbound.protection.outlook.com (mail-sn1nam02on2073.outbound.protection.outlook.com [40.107.96.73])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 04DE832180;
-        Mon,  9 Jan 2023 06:48:10 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=fbnnXR/MBAdNCly/STVR9eQ7xwKtsQpwXFU8U1fcVbqn5Qy3mEfIVwFgmcqhdDZsyPnlRn1Z83NMFqMF0copPTtX8hmKv+u52izcNbolgLmi2v6dVtMaKgZSguFdMAn29gZUY7ZSNnRUCwF0NSaGMppvflquylWHs7bYqqlT9OFRKVhAwv/CyI3Zi2fABkjJMKW778bKXHFlA4STmAomR/icmOp3YvLkpGe/R2m9CAj/PtQFBMuCs4wDKnluEOkCra9K7TNASStgHWtEMHBZqf0oLPApEZlRc0OhLojjVmtf40Q8j+aMc8BW00CfTxkxy+sfqvl2PK6/znc0hCgWJg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=jbdZuSp73u/h7tOKBD3doKfJsV6a4vr5Yt0pui6hGgU=;
- b=LPSo8rJikAk8eDcNTGFKt/oRD+Un4srt+un6RZQGxQLaKMjUQEQKneZChsZIDVPeXAhUiFsg3XeITyPpCdGt2leWuOERdbrF63/9zMg0WXy1q1OS+DmttFW3ehYIrnqCqR3NJrutlghhQGyukl8lIAuTL2l0kJCqtLQdUpMJg/impLGewkkFlM8sAqq8yrpBHr2GkHrK9E9KnShnKsrL7IhsiZ1ETfdivNEeYBiTEHPYj3Kx+MqlsCVP5pVq6BC11ZOzAGktoZ3afrR/Jllgtc66ePnWnNITPWiQtV+pmrejzJy7GjYm3kgmthGlxfTGFNqd39d+3Az39GjOsvr06w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.118.233) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=jbdZuSp73u/h7tOKBD3doKfJsV6a4vr5Yt0pui6hGgU=;
- b=sh78pmE9c35LFn6TV10c3kNu3w33E1PA3AIRD9WMuROrVSLrp6inqI9vF2qyXeEPudikhk+tFyeEVYX4Gt5MxpXJz5tytjvSDXVcHmaB4TuF22wQh3ZvB/JtyookcdjFU5sRgwCNoADFiBcLy6/fAD4FYcyECYp461paPfC4qL3TKeNA9pqWUMI8Hca6J4i0LVm3ROkdvFuIKK62f9KDfLYGhvyoKnDSs8Ynh9iFLoBQSizOq/175WOv4r5QW/V8c3Zn0xUUsAbW9aB8MsaqNAU9mdctUtmEPp4WFeNxb43gBFb6V2vI/nlCcq693FxKkL0Hn6fSJxKp3CrY/Urhhw==
-Received: from BN8PR15CA0068.namprd15.prod.outlook.com (2603:10b6:408:80::45)
- by MN2PR12MB4096.namprd12.prod.outlook.com (2603:10b6:208:1dc::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5986.18; Mon, 9 Jan
- 2023 14:48:08 +0000
-Received: from BN8NAM11FT093.eop-nam11.prod.protection.outlook.com
- (2603:10b6:408:80:cafe::51) by BN8PR15CA0068.outlook.office365.com
- (2603:10b6:408:80::45) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5986.18 via Frontend
- Transport; Mon, 9 Jan 2023 14:48:08 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.233)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.118.233 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.118.233; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.118.233) by
- BN8NAM11FT093.mail.protection.outlook.com (10.13.177.22) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.5986.18 via Frontend Transport; Mon, 9 Jan 2023 14:48:07 +0000
-Received: from drhqmail201.nvidia.com (10.126.190.180) by mail.nvidia.com
- (10.127.129.6) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.36; Mon, 9 Jan 2023
- 06:47:59 -0800
-Received: from drhqmail201.nvidia.com (10.126.190.180) by
- drhqmail201.nvidia.com (10.126.190.180) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.986.36; Mon, 9 Jan 2023 06:47:59 -0800
-Received: from vdi.nvidia.com (10.127.8.10) by mail.nvidia.com
- (10.126.190.180) with Microsoft SMTP Server id 15.2.986.36 via Frontend
- Transport; Mon, 9 Jan 2023 06:47:56 -0800
-From:   Yishai Hadas <yishaih@nvidia.com>
-To:     <linux-kernel@vger.kernel.org>, <linux-block@vger.kernel.org>,
-        <linux-mm@kvack.org>, <jgg@nvidia.com>, <axboe@kernel.dk>,
-        <logang@deltatee.com>
-CC:     <hch@lst.de>, <alex.williamson@redhat.com>, <yishaih@nvidia.com>,
-        <leonro@nvidia.com>, <maorg@nvidia.com>
-Subject: [PATCH] lib/scatterlist: Fix to calculate the last_pg properly
-Date:   Mon, 9 Jan 2023 16:47:01 +0200
-Message-ID: <20230109144701.83021-1-yishaih@nvidia.com>
-X-Mailer: git-send-email 2.21.0
+        with ESMTP id S230186AbjAIPCg (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 9 Jan 2023 10:02:36 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6ABC81C415
+        for <linux-block@vger.kernel.org>; Mon,  9 Jan 2023 07:01:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1673276508;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=5BnqkcP/B7SGlD7ivTZ2uRzTlawgLKPgKJY+C2gEHLI=;
+        b=CqJBcKMyt9OifljU/s+bd92+WgKHcGH5vn31p7JOTRGnBltT0ArRodpmtLWprkFx/7bpNR
+        Llm2MOMmbTTJyebHNjUw5ofDhOolPolV3XJHk7ZdTWE+bciaOBo6iMx6EzK0+1CV9/XYa9
+        zfJGGxjfXgvVWvXAcZmEzKSn3wi8Et8=
+Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
+ [209.85.160.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-606-ysOktiU9M564aPaSVfU6_w-1; Mon, 09 Jan 2023 10:01:47 -0500
+X-MC-Unique: ysOktiU9M564aPaSVfU6_w-1
+Received: by mail-qt1-f197.google.com with SMTP id ez10-20020a05622a4c8a00b003ab6c16856fso3982592qtb.17
+        for <linux-block@vger.kernel.org>; Mon, 09 Jan 2023 07:01:46 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=5BnqkcP/B7SGlD7ivTZ2uRzTlawgLKPgKJY+C2gEHLI=;
+        b=YM+HE3uQ2dQVXiF8cDEOoEMBLCxjNLcRbiPt+9q5SQq0iGshHeI0E6NX81+MAnVYvo
+         s0kbbl8ThmpeunQXj8e7623yQT+FIVklQelBZp1Z9EPMvNLam6lXodqnP5PAnItkBRAG
+         wEgZTNnUbZyyEtmxR/Bfp5UEVBUg/ViSIyV+W++QVdNw0ErrXG/1tVWR4N4D8NwdRw8e
+         eWuCpoZE5A8FMEg2arectNO0HQ+1mdvmhBHTdsezss4E0OM5fyUuGIE/0MqJY95Mqlz1
+         jdlLS1iAVN7H6oXLw4mV475lQzhXx6cIFh9q9N1l1O0maaWKt6xJAaHTwRDh562tqkpG
+         IBGQ==
+X-Gm-Message-State: AFqh2kri8oHyZDD0jwedPOnhpBjfMtksC96PgNgsrf1NCXns44K8P+7q
+        cCkXdoFgzevM/bfnIBOxTJ3+w72KwDZ8fNqsSw7dRR7fHqnjn5ItreYemm6ovCvem6C5PrCTB2L
+        ULpJEtCFGXTlTjEkIS2ShP4Q=
+X-Received: by 2002:ac8:6b4c:0:b0:39c:da20:d47c with SMTP id x12-20020ac86b4c000000b0039cda20d47cmr84648923qts.17.1673276506393;
+        Mon, 09 Jan 2023 07:01:46 -0800 (PST)
+X-Google-Smtp-Source: AMrXdXvzZP+QWbMTML85dKaCimKI1eGsnIuLcS2Bp/8ib3jUiLno1dRkiK90vxVouiizF3DOW2wqRA==
+X-Received: by 2002:ac8:6b4c:0:b0:39c:da20:d47c with SMTP id x12-20020ac86b4c000000b0039cda20d47cmr84648900qts.17.1673276506083;
+        Mon, 09 Jan 2023 07:01:46 -0800 (PST)
+Received: from bfoster (c-24-61-119-116.hsd1.ma.comcast.net. [24.61.119.116])
+        by smtp.gmail.com with ESMTPSA id bi1-20020a05620a318100b006fb0e638f12sm5457812qkb.4.2023.01.09.07.01.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 09 Jan 2023 07:01:45 -0800 (PST)
+Date:   Mon, 9 Jan 2023 10:02:46 -0500
+From:   Brian Foster <bfoster@redhat.com>
+To:     Sarthak Kukreti <sarthakkukreti@chromium.org>
+Cc:     sarthakkukreti@google.com, dm-devel@redhat.com,
+        linux-block@vger.kernel.org, linux-ext4@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        Jens Axboe <axboe@kernel.dk>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Alasdair Kergon <agk@redhat.com>,
+        Mike Snitzer <snitzer@kernel.org>,
+        Christoph Hellwig <hch@infradead.org>,
+        Theodore Ts'o <tytso@mit.edu>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Bart Van Assche <bvanassche@google.com>,
+        Daniil Lunev <dlunev@google.com>,
+        "Darrick J. Wong" <djwong@kernel.org>
+Subject: Re: [PATCH v2 6/7] ext4: Add mount option for provisioning blocks
+ during allocations
+Message-ID: <Y7wsluqX+eFqV1XB@bfoster>
+References: <20221229081252.452240-1-sarthakkukreti@chromium.org>
+ <20221229081252.452240-7-sarthakkukreti@chromium.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BN8NAM11FT093:EE_|MN2PR12MB4096:EE_
-X-MS-Office365-Filtering-Correlation-Id: 4c011757-627f-4d61-a566-08daf25085aa
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: r6GZHzmUOv47X0B/zH3IjwQhaYzgYpxC9PFiq+vxqAyYAgIEaeuuc0VOPOP8Kas5hjLjTywzy4KM8txEqyjqfhB3r5OwPhMJk3kiwAyTTPpDZb3RKAA2vJ+9jPFeaIr0q/ERqkYEr6yuxV/1Ht1ECNEU7yJicu+uPuhRSkcq+FJnbb9IP6b9l0FE66+vzef3ClN1sjv+mXgu+REiQ/O/NCWmUtsDNSx7Ch0EGRUZNCQDD9x1lLi1G5YzcrdGgzXyUt5P2Ox7gdBsxlBqsBjTZE9jHpJYCTcfx8lhi8V9dieLARkVcKG2riJpYXCPkHVlThMZ+w20RKVTGb9EodynyzLctMdW84IjWBNwCoFspxkswcyhKSYK686vfHBC2iv4nzTQ9C8DoT0JRwTRZgGqJtsjP7L0eoWSP7+PCk8+pTytnWhQjTFUpJHPgR8txJQycGTLQL2NcxlV/pG4M42i4trlePHxLvqS5PAVzNUdXN8comt5cNz3nvL9h8SM3ZQRMd7XbKslr+ZLpFQV8hiB5uL9jXgI5A+3Oss3nemGXnaazc9AyEWMgeI0Zbmojc9XHToCxZooWgy3UvcDPUCKVaULGoFTI7nN0OyIY5ZoDmt+FQ5lT8BrNqAsyjmTDztWI4WMl+/GF3qqwXPZMqkw+qSmKJGA0t4G1JYQN6yF+R1Cq8KjFi+dgig3sph8pex69NpjS3acdhx+sIOUapYRBJ6b3DWacO6vHjVKgfIS6xo=
-X-Forefront-Antispam-Report: CIP:216.228.118.233;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge2.nvidia.com;CAT:NONE;SFS:(13230022)(4636009)(136003)(396003)(376002)(346002)(39860400002)(451199015)(36840700001)(40470700004)(46966006)(1076003)(316002)(5660300002)(40480700001)(26005)(7696005)(186003)(478600001)(2616005)(40460700003)(426003)(47076005)(41300700001)(110136005)(70206006)(336012)(54906003)(4326008)(8676002)(70586007)(82310400005)(8936002)(83380400001)(86362001)(36756003)(6666004)(107886003)(36860700001)(82740400003)(356005)(2906002)(7636003)(2101003);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Jan 2023 14:48:07.8174
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4c011757-627f-4d61-a566-08daf25085aa
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.233];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: BN8NAM11FT093.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB4096
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221229081252.452240-7-sarthakkukreti@chromium.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The last_pg is wrong, it is actually the first page of the last
-scatterlist element. To get the last page of the last scatterlist
-element we have to add prv->length. So it is checking mergability
-against the wrong page, Further, a SG element is not guaranteed to end
-on a page boundary, so we have to check the sub page location also for
-merge eligibility.
+On Thu, Dec 29, 2022 at 12:12:51AM -0800, Sarthak Kukreti wrote:
+> Add a mount option that sets the default provisioning mode for
+> all files within the filesystem.
+> 
 
-Fix the above by checking physical contiguity, compute the actual last
-page and then call pages_are_mergable().
+There's not much description here to explain what a user should expect
+from this mode. Should the user expect -ENOSPC from the lower layers
+once out of space? What about files that are provisioned by the fs and
+then freed? Should the user/admin know to run fstrim or also enable an
+online discard mechanism to ensure freed filesystem blocks are returned
+to the free pool in the block/dm layer in order to avoid premature fs
+-ENOSPC conditions?
 
-Fixes: 1567b49d1a40 ("lib/scatterlist: add check when merging zone device pages")
-Reported-by: Jason Gunthorpe <jgg@nvidia.com>
-Signed-off-by: Yishai Hadas <yishaih@nvidia.com>
----
- lib/scatterlist.c | 27 +++++++++++++++++----------
- 1 file changed, 17 insertions(+), 10 deletions(-)
+Also, what about dealing with block level snapshots? There is some
+discussion on previous patches wrt to expectations on how provision
+might handle unsharing of cow'd blocks. If the fs only provisions on
+initial allocation, then a subsequent snapshot means we run into the
+same sort of ENOSPC problem on overwrites of already allocated blocks.
+That also doesn't consider things like an internal log, which may have
+been physically allocated (provisioned?) at mkfs time and yet is subject
+to the same general problem.
 
-diff --git a/lib/scatterlist.c b/lib/scatterlist.c
-index f72aa50c6654..2377917893e7 100644
---- a/lib/scatterlist.c
-+++ b/lib/scatterlist.c
-@@ -470,22 +470,29 @@ int sg_alloc_append_table_from_pages(struct sg_append_table *sgt_append,
- 		return -EOPNOTSUPP;
- 
- 	if (sgt_append->prv) {
-+		unsigned long paddr =
-+			(page_to_pfn(sg_page(sgt_append->prv)) * PAGE_SIZE +
-+			 sgt_append->prv->offset + sgt_append->prv->length) /
-+			PAGE_SIZE;
-+
- 		if (WARN_ON(offset))
- 			return -EINVAL;
- 
- 		/* Merge contiguous pages into the last SG */
- 		prv_len = sgt_append->prv->length;
--		last_pg = sg_page(sgt_append->prv);
--		while (n_pages && pages_are_mergeable(pages[0], last_pg)) {
--			if (sgt_append->prv->length + PAGE_SIZE > max_segment)
--				break;
--			sgt_append->prv->length += PAGE_SIZE;
--			last_pg = pages[0];
--			pages++;
--			n_pages--;
-+		if (page_to_pfn(pages[0]) == paddr) {
-+			last_pg = pfn_to_page(paddr - PAGE_SIZE);
-+			while (n_pages && pages_are_mergeable(pages[0], last_pg)) {
-+				if (sgt_append->prv->length + PAGE_SIZE > max_segment)
-+					break;
-+				sgt_append->prv->length += PAGE_SIZE;
-+				last_pg = pages[0];
-+				pages++;
-+				n_pages--;
-+			}
-+			if (!n_pages)
-+				goto out;
- 		}
--		if (!n_pages)
--			goto out;
- 	}
- 
- 	/* compute number of contiguous chunks */
--- 
-2.18.1
+So what is the higher level goal with this sort of mode? Is
+provision-on-alloc sufficient to provide a practical benefit to users,
+or should this perhaps consider other scenarios where a provision might
+be warranted before submitting writes to a thinly provisioned device?
+
+FWIW, it seems reasonable to me to introduce this without snapshot
+support and work toward it later, but it should be made clear what is
+being advertised in the meantime. Unless there's some nice way to
+explicitly limit the scope of use, such as preventing snapshots or
+something, the fs might want to consider this sort of feature
+experimental until it is more fully functional.
+
+Brian
+
+> Signed-off-by: Sarthak Kukreti <sarthakkukreti@chromium.org>
+> ---
+>  fs/ext4/ext4.h    | 1 +
+>  fs/ext4/extents.c | 7 +++++++
+>  fs/ext4/super.c   | 7 +++++++
+>  3 files changed, 15 insertions(+)
+> 
+> diff --git a/fs/ext4/ext4.h b/fs/ext4/ext4.h
+> index 49832e90b62f..29cab2e2ea20 100644
+> --- a/fs/ext4/ext4.h
+> +++ b/fs/ext4/ext4.h
+> @@ -1269,6 +1269,7 @@ struct ext4_inode_info {
+>  #define EXT4_MOUNT2_MB_OPTIMIZE_SCAN	0x00000080 /* Optimize group
+>  						    * scanning in mballoc
+>  						    */
+> +#define EXT4_MOUNT2_PROVISION		0x00000100 /* Provision while allocating file blocks */
+>  
+>  #define clear_opt(sb, opt)		EXT4_SB(sb)->s_mount_opt &= \
+>  						~EXT4_MOUNT_##opt
+> diff --git a/fs/ext4/extents.c b/fs/ext4/extents.c
+> index 2e64a9211792..a73f44264fe2 100644
+> --- a/fs/ext4/extents.c
+> +++ b/fs/ext4/extents.c
+> @@ -4441,6 +4441,13 @@ static int ext4_alloc_file_blocks(struct file *file, ext4_lblk_t offset,
+>  	unsigned int credits;
+>  	loff_t epos;
+>  
+> +	/*
+> +	 * Attempt to provision file blocks if the mount is mounted with
+> +	 * provision.
+> +	 */
+> +	if (test_opt2(inode->i_sb, PROVISION))
+> +		flags |= EXT4_GET_BLOCKS_PROVISION;
+> +
+>  	BUG_ON(!ext4_test_inode_flag(inode, EXT4_INODE_EXTENTS));
+>  	map.m_lblk = offset;
+>  	map.m_len = len;
+> diff --git a/fs/ext4/super.c b/fs/ext4/super.c
+> index 260c1b3e3ef2..5bc376f6a6f0 100644
+> --- a/fs/ext4/super.c
+> +++ b/fs/ext4/super.c
+> @@ -1591,6 +1591,7 @@ enum {
+>  	Opt_max_dir_size_kb, Opt_nojournal_checksum, Opt_nombcache,
+>  	Opt_no_prefetch_block_bitmaps, Opt_mb_optimize_scan,
+>  	Opt_errors, Opt_data, Opt_data_err, Opt_jqfmt, Opt_dax_type,
+> +	Opt_provision, Opt_noprovision,
+>  #ifdef CONFIG_EXT4_DEBUG
+>  	Opt_fc_debug_max_replay, Opt_fc_debug_force
+>  #endif
+> @@ -1737,6 +1738,8 @@ static const struct fs_parameter_spec ext4_param_specs[] = {
+>  	fsparam_flag	("reservation",		Opt_removed),	/* mount option from ext2/3 */
+>  	fsparam_flag	("noreservation",	Opt_removed),	/* mount option from ext2/3 */
+>  	fsparam_u32	("journal",		Opt_removed),	/* mount option from ext2/3 */
+> +	fsparam_flag	("provision",		Opt_provision),
+> +	fsparam_flag	("noprovision",		Opt_noprovision),
+>  	{}
+>  };
+>  
+> @@ -1826,6 +1829,8 @@ static const struct mount_opts {
+>  	{Opt_nombcache, EXT4_MOUNT_NO_MBCACHE, MOPT_SET},
+>  	{Opt_no_prefetch_block_bitmaps, EXT4_MOUNT_NO_PREFETCH_BLOCK_BITMAPS,
+>  	 MOPT_SET},
+> +	{Opt_provision, EXT4_MOUNT2_PROVISION, MOPT_SET | MOPT_2},
+> +	{Opt_noprovision, EXT4_MOUNT2_PROVISION, MOPT_CLEAR | MOPT_2},
+>  #ifdef CONFIG_EXT4_DEBUG
+>  	{Opt_fc_debug_force, EXT4_MOUNT2_JOURNAL_FAST_COMMIT,
+>  	 MOPT_SET | MOPT_2 | MOPT_EXT4_ONLY},
+> @@ -2977,6 +2982,8 @@ static int _ext4_show_options(struct seq_file *seq, struct super_block *sb,
+>  		SEQ_OPTS_PUTS("dax=never");
+>  	} else if (test_opt2(sb, DAX_INODE)) {
+>  		SEQ_OPTS_PUTS("dax=inode");
+> +	} else if (test_opt2(sb, PROVISION)) {
+> +		SEQ_OPTS_PUTS("provision");
+>  	}
+>  
+>  	if (sbi->s_groups_count >= MB_DEFAULT_LINEAR_SCAN_THRESHOLD &&
+> -- 
+> 2.37.3
+> 
 
