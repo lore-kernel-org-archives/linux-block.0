@@ -2,124 +2,198 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77391C5479D
-	for <linux-block@archiver.kernel.org>; Mon,  9 Jan 2023 22:56:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1AD7BC5479D
+	for <linux-block@archiver.kernel.org>; Mon,  9 Jan 2023 22:57:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237273AbjAIW4c (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 9 Jan 2023 17:56:32 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38488 "EHLO
+        id S237503AbjAIW5O (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 9 Jan 2023 17:57:14 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38628 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235579AbjAIW4b (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 9 Jan 2023 17:56:31 -0500
-Received: from esa6.hgst.iphmx.com (esa6.hgst.iphmx.com [216.71.154.45])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 55D9FF035
-        for <linux-block@vger.kernel.org>; Mon,  9 Jan 2023 14:56:30 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1673304990; x=1704840990;
-  h=message-id:date:mime-version:subject:to:references:from:
-   in-reply-to:content-transfer-encoding;
-  bh=gQo7Jjr0i/IPqE2WEcFW6tO5Q+cCGtDHCzYXA91stGk=;
-  b=heAjcICofoViQsFqXFsyKIR9W9/r9Y1kYvzNUatLZqqJt1DawDWpLp8h
-   06j+B19lCZFNN+bDjJ4LuwRUsqyfAPgljkHTJnheFmiVehQ1eKehewK7Y
-   hCQpPcIoHOora7ZLvLdoq6KOGqqyk7WdMcVfiCP+LwSd245E2xDP7rWWW
-   vNyyQiMtRjYNttarRdF1wOxmCZBPB624k6o5TXrAa+QMSk3BZ+Gzd9UMs
-   0sOFG5CaUVI4bgGpnE3u1LWM7CfHPxMsfM+2cTf+pOp5gJRl1beIBIv4+
-   1mZ24k+g72rdkK18AnJQK3bn4tZ9bp6xoRv7VVa+OIpj+SfiteupvvTNc
-   g==;
-X-IronPort-AV: E=Sophos;i="5.96,313,1665417600"; 
-   d="scan'208";a="220503290"
-Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 10 Jan 2023 06:56:29 +0800
-IronPort-SDR: ChjZz4PW8E6jGjylHaqfETInR82vT9CinJrBA/WtExfkGK0HzWrF45NSM4rkmpPYaHNlTf5KaP
- Pmf4lX9Fo71P5siMyVgYi0/Dqc41TBOTQbXOAFQBDwOnDWNtPCO9x+rEsWjoka62i1ipfbGy2r
- QX5z8aDdSjXgaoc6G9OGDc0U+piAKE744m8ixCqG4vPwfeYn3qh3lWFB6dNl2QwB1pv4DzJ2BN
- YS2a8hQ6OP4xcqdtANm6niqU4AIMODsdLsI2Nr+g/aOuXsh1Y1NVO3mu7CLfj0WNtk0v//AsDE
- 17g=
-Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
-  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 09 Jan 2023 14:14:20 -0800
-IronPort-SDR: NyMOzVT4q1RN8GI5O1VyT3ThB05XXOjY8+pd9WJD1Z5gHz+OL1WGdxJsEJI2FZXytZ3B3yXgeU
- IyKyYum4Whs+k5QOZJ9NDrGnrHklFyiEWZFhNSVtnffG2dlYkDXJkRDxa2DKH3rQcF0Lmvbsgk
- Q6zM0dhI6wV3861Lz2+A6wey3RAZFdnqqnSnKSmiWiwm3BwwfY2j3ricEKN86qhKOhoghv+IZL
- 7lR7scF1Vo0SaoH/6MvVKnhx1QV/piCRaVpUdKPPUZP1RsOqeTxBEhQXIP+yYzUspJKn/TKYmN
- KG8=
-WDCIronportException: Internal
-Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
-  by uls-op-cesaip01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 09 Jan 2023 14:56:29 -0800
-Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4NrTp51XxLz1RwqL
-        for <linux-block@vger.kernel.org>; Mon,  9 Jan 2023 14:56:29 -0800 (PST)
-Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
-        reason="pass (just generated, assumed good)"
-        header.d=opensource.wdc.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
-        opensource.wdc.com; h=content-transfer-encoding:content-type
-        :in-reply-to:organization:from:references:to:content-language
-        :subject:user-agent:mime-version:date:message-id; s=dkim; t=
-        1673304988; x=1675896989; bh=gQo7Jjr0i/IPqE2WEcFW6tO5Q+cCGtDHCzY
-        XA91stGk=; b=ZcUV3iE+7Kdpe6WDHCAIqfWtke+kjhbIGiwD4Wsj5CpdnhlpljT
-        Z70S/7GmaeeqQr2H3T0EJAX9lyHU8Frb44BwM/xg4W3fqdP8LO3DB78lLeXgSN0y
-        mFnF+lyPiI98nfr/Rrr30bdao/xeGenvxwXQPZnOFDaSpmwIoyv0HZBdQAzQUFKi
-        B3dVm/VVLRvAGxb/CrD96g81k2LCQypk9EglwCrxVBq4Y5CD93R0YDw0IJy8pF7k
-        UjnxRqiCcIE4m4vQM6+dUAeWiIEIzwdnOUeGztAhn+M27D0Xg4e3kR5UTOiTS8WZ
-        1Ic4cOnj+UsDW/FBHbsO6WXOnmxXGyqAmew==
-X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
-Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
-        by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id PRO5W-521CMB for <linux-block@vger.kernel.org>;
-        Mon,  9 Jan 2023 14:56:28 -0800 (PST)
-Received: from [10.225.163.12] (unknown [10.225.163.12])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4NrTp41qkLz1RvLy;
-        Mon,  9 Jan 2023 14:56:28 -0800 (PST)
-Message-ID: <7322a471-f69f-a6b7-59b8-7355d7a8bd7d@opensource.wdc.com>
-Date:   Tue, 10 Jan 2023 07:56:27 +0900
+        with ESMTP id S235172AbjAIW5N (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 9 Jan 2023 17:57:13 -0500
+Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA86E11809
+        for <linux-block@vger.kernel.org>; Mon,  9 Jan 2023 14:57:10 -0800 (PST)
+Received: by mail-pj1-x1031.google.com with SMTP id cp9-20020a17090afb8900b00226a934e0e5so121676pjb.1
+        for <linux-block@vger.kernel.org>; Mon, 09 Jan 2023 14:57:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=mdo2/wDqCM6o38jdj1jQCw6QRnTv8QbOLw7MxYlHlrk=;
+        b=16g0R6uNNKJzKpGNX1lPaagFx4n+ocJT15a6CdoHNRa3kXLdm6l+X8tfKfzip4O9jL
+         Yx+m9c63FhJXRDdVtlpHrKcAbabIPQouM2gr+v0XMy5vTKHj4VsH3CPzwF1bUWbwotNw
+         KN5ErzbzOn9FYZdNIAv81d6HVQGw3Eajg7Ab4eJ1Q9kXLwN5JNxyjSeGtLh5npdkpksS
+         SwjDmHsj0OK8Rjo+CUmHIxDJKovAiZ66EMy2Bi6LW2PDGeoYVleAk0fUx4zyoA9jkJI6
+         WIxcVTURovOsbweHx5PapLCSaZWH9/pzAywtrDuhZle66SzY1c7kNobHrQjZulVuFbQ9
+         GeEg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=mdo2/wDqCM6o38jdj1jQCw6QRnTv8QbOLw7MxYlHlrk=;
+        b=1AM4CjXIIsAIFwSpPyjSQskEGMtCPkGV2p8ZOwkDB3unMLMA01WwPGvV8azGjUxcqg
+         /i5NEsZpHvRdx0rAV2rqi6thITurCaawAufj77CHzfF/UVHgIZk4ZBQPJFByZ1gvpj0o
+         NjSsmeugSGYwlixzuZyyo/IsWP08ysR5Kx7fWsLFzO7ne0zsXaXIUsPIQFTDGF7aYTDa
+         coV35zwfVaLXDfgAkwm1VqX69LqafNWUkwt6ZUtpmUp1lY6i8uJ1w7QLmau+WExhlVZ5
+         RmG7I6VUKXwRhdtOkT0bBs8L4foFo6GXou8C4y9zYeq5snmg5A1RcESP738CgK6MgMah
+         yaOA==
+X-Gm-Message-State: AFqh2kpMcGmTFZtHUFIhke5/LQ5GtPJXTor54tOdOkLz0lmX0c/y2Pzt
+        pFPbvdxbWWTTiR+XUePg+zZ0Mw==
+X-Google-Smtp-Source: AMrXdXs87F2FmsDn6dLx5iqTdvODtWQXUv1Vh3rhPVK2TwOslYFMDwqA/V5nf4J9/gYFu2qn91zWXA==
+X-Received: by 2002:a17:902:b611:b0:189:f277:3834 with SMTP id b17-20020a170902b61100b00189f2773834mr14677883pls.6.1673305030113;
+        Mon, 09 Jan 2023 14:57:10 -0800 (PST)
+Received: from [192.168.1.136] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id c6-20020a170902c1c600b00177f4ef7970sm6681389plc.11.2023.01.09.14.57.09
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 09 Jan 2023 14:57:09 -0800 (PST)
+Message-ID: <bbd9cde3-7cbb-f3e4-a2a4-7b1b5ae392e0@kernel.dk>
+Date:   Mon, 9 Jan 2023 15:57:08 -0700
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
  Thunderbird/102.6.0
-Subject: Re: [PATCH] block: add a BUILD_BUG_ON() for adding more bio flags
- than we have space
+Subject: Re: [PATCH v4 7/7] iov_iter, block: Make bio structs pin pages rather
+ than ref'ing if appropriate
+To:     David Howells <dhowells@redhat.com>
+Cc:     Jan Kara <jack@suse.cz>, Al Viro <viro@zeniv.linux.org.uk>,
+        Christoph Hellwig <hch@lst.de>,
+        Matthew Wilcox <willy@infradead.org>,
+        Logan Gunthorpe <logang@deltatee.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Jeff Layton <jlayton@kernel.org>,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <d0bb04e7-7e58-d494-0e39-6e98f3368a7b@kernel.dk>
+ <20230109173513.htfqbkrtqm52pnye@quack3>
+ <167305160937.1521586.133299343565358971.stgit@warthog.procyon.org.uk>
+ <167305166150.1521586.10220949115402059720.stgit@warthog.procyon.org.uk>
+ <2008444.1673300255@warthog.procyon.org.uk>
+ <2084839.1673303046@warthog.procyon.org.uk>
 Content-Language: en-US
-To:     Jens Axboe <axboe@kernel.dk>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-References: <da48fbb7-ec78-f382-919e-cdf23fa200db@kernel.dk>
-From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
-Organization: Western Digital Research
-In-Reply-To: <da48fbb7-ec78-f382-919e-cdf23fa200db@kernel.dk>
+From:   Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <2084839.1673303046@warthog.procyon.org.uk>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/10/23 02:47, Jens Axboe wrote:
-> We have BIO_FLAG_LAST in the enum for bio specific flags, but it's
-> not used to check that we're not exceeding the size of them. Add
-> such a check.
+On 1/9/23 3:24?PM, David Howells wrote:
+> Would you be okay with me flipping the logic of BIO_NO_PAGE_REF, so I end up
+> with:
 > 
-> Signed-off-by: Jens Axboe <axboe@kernel.dk>
+> 	static void bio_release_page(struct bio *bio, struct page *page)
+> 	{
+> 		if (bio_flagged(bio, BIO_PAGE_PINNED))
+> 			unpin_user_page(page);
+> 		if (bio_flagged(bio, BIO_PAGE_REFFED))
+> 			put_page(page);
+> 	}
 > 
-> ---
-> 
+> See attached patch.
+
+I think it makes more sense to have NO_REF check, to be honest, as that
+means the general path doesn't have to set that flag. But I don't feel
+too strongly about that part.
+
 > diff --git a/block/bio.c b/block/bio.c
-> index 5f96fcae3f75..633d1a2af785 100644
+> index 5f96fcae3f75..5b9f9fc62345 100644
 > --- a/block/bio.c
 > +++ b/block/bio.c
-> @@ -1785,6 +1785,8 @@ static int __init init_bio(void)
+> @@ -243,6 +243,11 @@ static void bio_free(struct bio *bio)
+>   * Users of this function have their own bio allocation. Subsequently,
+>   * they must remember to pair any call to bio_init() with bio_uninit()
+>   * when IO has completed, or when the bio is released.
+> + *
+> + * We set the initial assumption that pages attached to the bio will be
+> + * released with put_page() by setting BIO_PAGE_REFFED, but this should be set
+> + * to BIO_PAGE_PINNED if the page should be unpinned instead; if the pages
+> + * should not be put or unpinned, these flags should be cleared.
+>   */
+>  void bio_init(struct bio *bio, struct block_device *bdev, struct bio_vec *table,
+>  	      unsigned short max_vecs, blk_opf_t opf)
+> @@ -274,6 +279,7 @@ void bio_init(struct bio *bio, struct block_device *bdev, struct bio_vec *table,
+>  #ifdef CONFIG_BLK_DEV_INTEGRITY
+>  	bio->bi_integrity = NULL;
+>  #endif
+> +	bio_set_flag(bio, BIO_PAGE_REFFED);
+
+This is first set to zero, then you set the flag. Why not just
+initialize it like that to begin with?
+
+> @@ -302,6 +308,8 @@ void bio_reset(struct bio *bio, struct block_device *bdev, blk_opf_t opf)
 >  {
->  	int i;
+>  	bio_uninit(bio);
+>  	memset(bio, 0, BIO_RESET_BYTES);
+> +	bio_set_flag(bio, BIO_PAGE_REFFED);
+> +	bio_clear_flag(bio, BIO_PAGE_PINNED);
+>  	atomic_set(&bio->__bi_remaining, 1);
+>  	bio->bi_bdev = bdev;
+>  	if (bio->bi_bdev)
+
+You just memset bi_flags here, surely we don't need to clear
+BIO_PAGE_PINNED after that?
+
+> @@ -814,6 +822,8 @@ static int __bio_clone(struct bio *bio, struct bio *bio_src, gfp_t gfp)
+>  	bio_set_flag(bio, BIO_CLONED);
+>  	bio->bi_ioprio = bio_src->bi_ioprio;
+>  	bio->bi_iter = bio_src->bi_iter;
+> +	bio_clear_flag(bio, BIO_PAGE_REFFED);
+> +	bio_clear_flag(bio, BIO_PAGE_PINNED);
+
+Maybe it would make sense to have a set/clear mask operation? Not
+strictly required for this patch, but probably worth checking after the
+fact.
+
+> @@ -1273,12 +1295,20 @@ static int __bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
+>  	 * result to ensure the bio's total size is correct. The remainder of
+>  	 * the iov data will be picked up in the next bio iteration.
+>  	 */
+> -	size = iov_iter_get_pages(iter, pages,
+> -				  UINT_MAX - bio->bi_iter.bi_size,
+> -				  nr_pages, &offset, gup_flags);
+> +	size = iov_iter_extract_pages(iter, &pages,
+> +				      UINT_MAX - bio->bi_iter.bi_size,
+> +				      nr_pages, gup_flags,
+> +				      &offset, &cleanup_mode);
+>  	if (unlikely(size <= 0))
+>  		return size ? size : -EFAULT;
 >  
-> +	BUILD_BUG_ON(BIO_FLAG_LAST > 8 * sizeof_field(struct bio, bi_flags));
+> +	bio_clear_flag(bio, BIO_PAGE_REFFED);
+> +	bio_clear_flag(bio, BIO_PAGE_PINNED);
+> +	if (cleanup_mode & FOLL_GET)
+> +		bio_set_flag(bio, BIO_PAGE_REFFED);
+> +	if (cleanup_mode & FOLL_PIN)
+> +		bio_set_flag(bio, BIO_PAGE_PINNED);
 > +
->  	bio_integrity_init();
+>  	nr_pages = DIV_ROUND_UP(offset + size, PAGE_SIZE);
+
+The cleanup_mode pass-back isn't the prettiest thing in the world, and
+that's a lot of arguments. Maybe it'd be slightly better if we just have
+gup_flags be an output parameter too?
+
+Also not great to first clear both flags, then set them with the two
+added branches...
+
+> diff --git a/include/linux/bio.h b/include/linux/bio.h
+> index 22078a28d7cb..1c6f051f6ff2 100644
+> --- a/include/linux/bio.h
+> +++ b/include/linux/bio.h
+> @@ -482,7 +482,8 @@ void zero_fill_bio(struct bio *bio);
 >  
->  	for (i = 0; i < ARRAY_SIZE(bvec_slabs); i++) {
-> 
+>  static inline void bio_release_pages(struct bio *bio, bool mark_dirty)
+>  {
+> -	if (!bio_flagged(bio, BIO_NO_PAGE_REF))
+> +	if (bio_flagged(bio, BIO_PAGE_REFFED) ||
+> +	    bio_flagged(bio, BIO_PAGE_PINNED))
+>  		__bio_release_pages(bio, mark_dirty);
+>  }
 
-Looks OK to me.
-
-Reviewed-by: Damien Le Moal <damien.lemoal@opensource.wdc.com>
+Same here on a mask check, but perhaps it ends up generating the same
+code?
 
 -- 
-Damien Le Moal
-Western Digital Research
+Jens Axboe
 
