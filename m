@@ -2,198 +2,109 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1AD7BC5479D
-	for <linux-block@archiver.kernel.org>; Mon,  9 Jan 2023 22:57:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9886DC5479D
+	for <linux-block@archiver.kernel.org>; Mon,  9 Jan 2023 23:00:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237503AbjAIW5O (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 9 Jan 2023 17:57:14 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38628 "EHLO
+        id S234413AbjAIXAO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 9 Jan 2023 18:00:14 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39986 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235172AbjAIW5N (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 9 Jan 2023 17:57:13 -0500
-Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA86E11809
-        for <linux-block@vger.kernel.org>; Mon,  9 Jan 2023 14:57:10 -0800 (PST)
-Received: by mail-pj1-x1031.google.com with SMTP id cp9-20020a17090afb8900b00226a934e0e5so121676pjb.1
-        for <linux-block@vger.kernel.org>; Mon, 09 Jan 2023 14:57:10 -0800 (PST)
+        with ESMTP id S234466AbjAIXAL (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 9 Jan 2023 18:00:11 -0500
+Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 453991C930
+        for <linux-block@vger.kernel.org>; Mon,  9 Jan 2023 15:00:11 -0800 (PST)
+Received: by mail-pl1-x62a.google.com with SMTP id jl4so11236630plb.8
+        for <linux-block@vger.kernel.org>; Mon, 09 Jan 2023 15:00:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=mdo2/wDqCM6o38jdj1jQCw6QRnTv8QbOLw7MxYlHlrk=;
-        b=16g0R6uNNKJzKpGNX1lPaagFx4n+ocJT15a6CdoHNRa3kXLdm6l+X8tfKfzip4O9jL
-         Yx+m9c63FhJXRDdVtlpHrKcAbabIPQouM2gr+v0XMy5vTKHj4VsH3CPzwF1bUWbwotNw
-         KN5ErzbzOn9FYZdNIAv81d6HVQGw3Eajg7Ab4eJ1Q9kXLwN5JNxyjSeGtLh5npdkpksS
-         SwjDmHsj0OK8Rjo+CUmHIxDJKovAiZ66EMy2Bi6LW2PDGeoYVleAk0fUx4zyoA9jkJI6
-         WIxcVTURovOsbweHx5PapLCSaZWH9/pzAywtrDuhZle66SzY1c7kNobHrQjZulVuFbQ9
-         GeEg==
+        bh=UfjdNbo/a5wmInQAWo7oYpvbLlD6TTieiLl61R7A90U=;
+        b=eC3r8cWCQvhArgMEaUrZdKTgzA87hw+p8m6Y36mvbxA0E//+40mxIxzLabHVc+utRg
+         +q6VDHUOOkbBXhKWvN9WqJ5ie08DWiqllo3gDSTlik+R8QuPPXjhlYUe/fSqI37N8ytf
+         hcO5k6OmQ/7SaBshjISCjlfzmrZPkOBHAAQdFh9t4lD0e2eEU/0dY8UPc4iswrwo9b7Q
+         yuZw14nSgU4kZSKWc4HZdCn0W2zNe0Hln5yq5s1VlzD7dWywoBV9yQJLiJT/J9vc8d64
+         01qgpSc4jXjVyxRc8wuipr8fJK7opbBSGavZfW93ZP23beHhksjfczFAACtwIpd5OXH3
+         8J5w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=mdo2/wDqCM6o38jdj1jQCw6QRnTv8QbOLw7MxYlHlrk=;
-        b=1AM4CjXIIsAIFwSpPyjSQskEGMtCPkGV2p8ZOwkDB3unMLMA01WwPGvV8azGjUxcqg
-         /i5NEsZpHvRdx0rAV2rqi6thITurCaawAufj77CHzfF/UVHgIZk4ZBQPJFByZ1gvpj0o
-         NjSsmeugSGYwlixzuZyyo/IsWP08ysR5Kx7fWsLFzO7ne0zsXaXIUsPIQFTDGF7aYTDa
-         coV35zwfVaLXDfgAkwm1VqX69LqafNWUkwt6ZUtpmUp1lY6i8uJ1w7QLmau+WExhlVZ5
-         RmG7I6VUKXwRhdtOkT0bBs8L4foFo6GXou8C4y9zYeq5snmg5A1RcESP738CgK6MgMah
-         yaOA==
-X-Gm-Message-State: AFqh2kpMcGmTFZtHUFIhke5/LQ5GtPJXTor54tOdOkLz0lmX0c/y2Pzt
-        pFPbvdxbWWTTiR+XUePg+zZ0Mw==
-X-Google-Smtp-Source: AMrXdXs87F2FmsDn6dLx5iqTdvODtWQXUv1Vh3rhPVK2TwOslYFMDwqA/V5nf4J9/gYFu2qn91zWXA==
-X-Received: by 2002:a17:902:b611:b0:189:f277:3834 with SMTP id b17-20020a170902b61100b00189f2773834mr14677883pls.6.1673305030113;
-        Mon, 09 Jan 2023 14:57:10 -0800 (PST)
+        bh=UfjdNbo/a5wmInQAWo7oYpvbLlD6TTieiLl61R7A90U=;
+        b=Dd+GX3T4h6/7bVZhpta84isZvdEuYhfpJVr0iv1HbHtIO6Jz8YgSbhxGp5vDkM18TD
+         Mdk+OeTnvfX7Ga7/Rt0PedSJaAGcXTnh7MBixnqkYNiRSq3bFp1YQMo/qrtxTroqbMoH
+         AgWiAUcijcfRfD0lai4e+1ogkPHuVJR+38tMDBYWaiKtnJHEMR/NieJ0n7pWKkr8PYCK
+         03IB9OtZl8FhQgDmB9CgXPSxf50E6XVtOGHtezdb25M9vOJGIJbr4NOwrRLdOx7hCLW5
+         +nNHqfD3RaLzm9VnwrHyM9oeRW7t0q/0gWEBkzSMUA5qg4vfJMpJzTFQQJvEapZZbO1+
+         FypQ==
+X-Gm-Message-State: AFqh2kqb+J9dfUwkMLjsSddS1KhHwoyj/65YgSYkhv674F2/qvPVY/ak
+        P0zIK+JxCFLWAbWwD5BHvgKKQg==
+X-Google-Smtp-Source: AMrXdXtwjdC1Q2CROWQZPqhM9noHle29NLrBmP4R6D+/tZ+LLN/Nwwh60rHXhVU5AWHg2svpe8NIgQ==
+X-Received: by 2002:a05:6a21:3288:b0:af:a896:850c with SMTP id yt8-20020a056a21328800b000afa896850cmr22584855pzb.5.1673305210731;
+        Mon, 09 Jan 2023 15:00:10 -0800 (PST)
 Received: from [192.168.1.136] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id c6-20020a170902c1c600b00177f4ef7970sm6681389plc.11.2023.01.09.14.57.09
+        by smtp.gmail.com with ESMTPSA id t9-20020a6549c9000000b00478e7f87f3bsm5566423pgs.67.2023.01.09.15.00.09
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 09 Jan 2023 14:57:09 -0800 (PST)
-Message-ID: <bbd9cde3-7cbb-f3e4-a2a4-7b1b5ae392e0@kernel.dk>
-Date:   Mon, 9 Jan 2023 15:57:08 -0700
+        Mon, 09 Jan 2023 15:00:10 -0800 (PST)
+Message-ID: <ca30360e-ab51-6282-bd3c-208399e5a552@kernel.dk>
+Date:   Mon, 9 Jan 2023 16:00:08 -0700
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
  Thunderbird/102.6.0
-Subject: Re: [PATCH v4 7/7] iov_iter, block: Make bio structs pin pages rather
- than ref'ing if appropriate
-To:     David Howells <dhowells@redhat.com>
-Cc:     Jan Kara <jack@suse.cz>, Al Viro <viro@zeniv.linux.org.uk>,
-        Christoph Hellwig <hch@lst.de>,
-        Matthew Wilcox <willy@infradead.org>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Jeff Layton <jlayton@kernel.org>,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <d0bb04e7-7e58-d494-0e39-6e98f3368a7b@kernel.dk>
- <20230109173513.htfqbkrtqm52pnye@quack3>
- <167305160937.1521586.133299343565358971.stgit@warthog.procyon.org.uk>
- <167305166150.1521586.10220949115402059720.stgit@warthog.procyon.org.uk>
- <2008444.1673300255@warthog.procyon.org.uk>
- <2084839.1673303046@warthog.procyon.org.uk>
+Subject: Re: [External] [LSF/MM/BPF BoF] Session for Zoned Storage 2023
 Content-Language: en-US
+To:     Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+        "Viacheslav A.Dubeyko" <viacheslav.dubeyko@bytedance.com>,
+        =?UTF-8?Q?Javier_Gonz=c3=a1lez?= <javier.gonz@samsung.com>
+Cc:     Viacheslav Dubeyko <slava@dubeyko.com>,
+        Luis Chamberlain <mcgrof@kernel.org>,
+        Linux FS Devel <linux-fsdevel@vger.kernel.org>,
+        linux-block@vger.kernel.org,
+        =?UTF-8?Q?Matias_Bj=c3=b8rling?= <Matias.Bjorling@wdc.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Adam Manzanares <a.manzanares@samsung.com>,
+        Hans Holmberg <hans.holmberg@wdc.com>,
+        lsf-pc@lists.linux-foundation.org
+References: <F6BF25E2-FF26-48F2-8378-3CB36E362313@dubeyko.com>
+ <Y7h0F0w06cNM89hO@bombadil.infradead.org>
+ <4CC4F55E-17B3-47E2-A8C5-9098CCEB65D6@dubeyko.com>
+ <CGME20230107015641eucas1p13c2b37b5ca7a5b64eb520b79316d5186@eucas1p1.samsung.com>
+ <5DF10459-88F3-48DA-AEB2-5B436549A194@bytedance.com>
+ <20230109153315.waqfokse4srv6xlz@mpHalley-2.localdomain>
+ <AF3750AD-1B66-4F8A-936F-A14EC17DAC16@bytedance.com>
+ <04cc803e-0246-bf8a-c083-f556a373ae4f@opensource.wdc.com>
 From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <2084839.1673303046@warthog.procyon.org.uk>
+In-Reply-To: <04cc803e-0246-bf8a-c083-f556a373ae4f@opensource.wdc.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/9/23 3:24?PM, David Howells wrote:
-> Would you be okay with me flipping the logic of BIO_NO_PAGE_REF, so I end up
-> with:
+>> My point here that we could summarize:
+>> (1) what features already implemented and supported,
+>> (2) what features are under implementation and what is progress,
+>> (3) what features need to be implemented yet.
+>>
+>> Have we implemented everything already? :)
 > 
-> 	static void bio_release_page(struct bio *bio, struct page *page)
-> 	{
-> 		if (bio_flagged(bio, BIO_PAGE_PINNED))
-> 			unpin_user_page(page);
-> 		if (bio_flagged(bio, BIO_PAGE_REFFED))
-> 			put_page(page);
-> 	}
-> 
-> See attached patch.
+> Standards are full of features that are not useful in a general purpose
+> system. So we likely never will implement everything. We never did for
+> SCSI and ATA and never will either.
+Indeed, and that's a very important point. Some people read specs and
+find things that aren't in the Linux driver (any spec, not a specific
+one), and think they need to be added. No. We only add them if they make
+sense, both in terms of use cases, but also as long as they can get
+implemented cleanly. Parts of basically any spec is garbage and don't
+necessarily fit within the given subsystem either.
 
-I think it makes more sense to have NO_REF check, to be honest, as that
-means the general path doesn't have to set that flag. But I don't feel
-too strongly about that part.
-
-> diff --git a/block/bio.c b/block/bio.c
-> index 5f96fcae3f75..5b9f9fc62345 100644
-> --- a/block/bio.c
-> +++ b/block/bio.c
-> @@ -243,6 +243,11 @@ static void bio_free(struct bio *bio)
->   * Users of this function have their own bio allocation. Subsequently,
->   * they must remember to pair any call to bio_init() with bio_uninit()
->   * when IO has completed, or when the bio is released.
-> + *
-> + * We set the initial assumption that pages attached to the bio will be
-> + * released with put_page() by setting BIO_PAGE_REFFED, but this should be set
-> + * to BIO_PAGE_PINNED if the page should be unpinned instead; if the pages
-> + * should not be put or unpinned, these flags should be cleared.
->   */
->  void bio_init(struct bio *bio, struct block_device *bdev, struct bio_vec *table,
->  	      unsigned short max_vecs, blk_opf_t opf)
-> @@ -274,6 +279,7 @@ void bio_init(struct bio *bio, struct block_device *bdev, struct bio_vec *table,
->  #ifdef CONFIG_BLK_DEV_INTEGRITY
->  	bio->bi_integrity = NULL;
->  #endif
-> +	bio_set_flag(bio, BIO_PAGE_REFFED);
-
-This is first set to zero, then you set the flag. Why not just
-initialize it like that to begin with?
-
-> @@ -302,6 +308,8 @@ void bio_reset(struct bio *bio, struct block_device *bdev, blk_opf_t opf)
->  {
->  	bio_uninit(bio);
->  	memset(bio, 0, BIO_RESET_BYTES);
-> +	bio_set_flag(bio, BIO_PAGE_REFFED);
-> +	bio_clear_flag(bio, BIO_PAGE_PINNED);
->  	atomic_set(&bio->__bi_remaining, 1);
->  	bio->bi_bdev = bdev;
->  	if (bio->bi_bdev)
-
-You just memset bi_flags here, surely we don't need to clear
-BIO_PAGE_PINNED after that?
-
-> @@ -814,6 +822,8 @@ static int __bio_clone(struct bio *bio, struct bio *bio_src, gfp_t gfp)
->  	bio_set_flag(bio, BIO_CLONED);
->  	bio->bi_ioprio = bio_src->bi_ioprio;
->  	bio->bi_iter = bio_src->bi_iter;
-> +	bio_clear_flag(bio, BIO_PAGE_REFFED);
-> +	bio_clear_flag(bio, BIO_PAGE_PINNED);
-
-Maybe it would make sense to have a set/clear mask operation? Not
-strictly required for this patch, but probably worth checking after the
-fact.
-
-> @@ -1273,12 +1295,20 @@ static int __bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
->  	 * result to ensure the bio's total size is correct. The remainder of
->  	 * the iov data will be picked up in the next bio iteration.
->  	 */
-> -	size = iov_iter_get_pages(iter, pages,
-> -				  UINT_MAX - bio->bi_iter.bi_size,
-> -				  nr_pages, &offset, gup_flags);
-> +	size = iov_iter_extract_pages(iter, &pages,
-> +				      UINT_MAX - bio->bi_iter.bi_size,
-> +				      nr_pages, gup_flags,
-> +				      &offset, &cleanup_mode);
->  	if (unlikely(size <= 0))
->  		return size ? size : -EFAULT;
->  
-> +	bio_clear_flag(bio, BIO_PAGE_REFFED);
-> +	bio_clear_flag(bio, BIO_PAGE_PINNED);
-> +	if (cleanup_mode & FOLL_GET)
-> +		bio_set_flag(bio, BIO_PAGE_REFFED);
-> +	if (cleanup_mode & FOLL_PIN)
-> +		bio_set_flag(bio, BIO_PAGE_PINNED);
-> +
->  	nr_pages = DIV_ROUND_UP(offset + size, PAGE_SIZE);
-
-The cleanup_mode pass-back isn't the prettiest thing in the world, and
-that's a lot of arguments. Maybe it'd be slightly better if we just have
-gup_flags be an output parameter too?
-
-Also not great to first clear both flags, then set them with the two
-added branches...
-
-> diff --git a/include/linux/bio.h b/include/linux/bio.h
-> index 22078a28d7cb..1c6f051f6ff2 100644
-> --- a/include/linux/bio.h
-> +++ b/include/linux/bio.h
-> @@ -482,7 +482,8 @@ void zero_fill_bio(struct bio *bio);
->  
->  static inline void bio_release_pages(struct bio *bio, bool mark_dirty)
->  {
-> -	if (!bio_flagged(bio, BIO_NO_PAGE_REF))
-> +	if (bio_flagged(bio, BIO_PAGE_REFFED) ||
-> +	    bio_flagged(bio, BIO_PAGE_PINNED))
->  		__bio_release_pages(bio, mark_dirty);
->  }
-
-Same here on a mask check, but perhaps it ends up generating the same
-code?
+The above would make me worried about patches coming from anyone with
+that mindset.
 
 -- 
 Jens Axboe
+
 
