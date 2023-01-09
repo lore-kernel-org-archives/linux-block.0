@@ -2,91 +2,92 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 455B9C5479D
-	for <linux-block@archiver.kernel.org>; Mon,  9 Jan 2023 03:30:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6FFCBC61DB3
+	for <linux-block@archiver.kernel.org>; Mon,  9 Jan 2023 03:49:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233652AbjAIDaI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 8 Jan 2023 22:30:08 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35594 "EHLO
+        id S235736AbjAIDti (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 8 Jan 2023 22:49:38 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45124 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229534AbjAIDaI (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 8 Jan 2023 22:30:08 -0500
-Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 151E05F82
-        for <linux-block@vger.kernel.org>; Sun,  8 Jan 2023 19:30:04 -0800 (PST)
-Received: by mail-pl1-x629.google.com with SMTP id p24so8130999plw.11
-        for <linux-block@vger.kernel.org>; Sun, 08 Jan 2023 19:30:04 -0800 (PST)
+        with ESMTP id S236027AbjAIDth (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 8 Jan 2023 22:49:37 -0500
+Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F409BB1F0
+        for <linux-block@vger.kernel.org>; Sun,  8 Jan 2023 19:49:35 -0800 (PST)
+Received: by mail-pl1-x631.google.com with SMTP id y1so8200341plb.2
+        for <linux-block@vger.kernel.org>; Sun, 08 Jan 2023 19:49:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=l1Q0s3QZP3zgMoieH09ETwIZdLie5eQr6iy50h+rqPs=;
-        b=53o2f2czGsiadqF8jeoKIJ9bjpIMB+3jP+24mrPAyfFwUmUX6qSkx0LpX8JBjk/y2D
-         /zVzBFSraoYAG/2RZZNqZm6+7XyQ8qGpOB0d97N2ATqfS0AFBsBGjmD7dbUtaoD1Efti
-         EPDzn3gUBg+rAFjHwy8VAxPg8a/RIxruvrKbFg2/DyWNnrXa/XM6FpphPhyG/0fd4JyK
-         8mccONWce58PXfyURCPRZbDGQpwgBzQyLLzLV9d6oY5Ztgu7hQl0cdT+X4jPwYPnwMfB
-         tQ56VmDyFhqMj94Z3D6Y+XPiJLF4L61cTueI67N2tar93NMNbYTBMFECfnTAAvZ6D3E/
-         B7OQ==
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=KP691JFoFX0F9mveORmXODQf26CLdeHZBmwv8xyQAK4=;
+        b=NKsNbgg8wksBTkZA9izhAmGudq3SmRArU6MnD4q6AvxhNbdbEwaVAJIsqrxO+1H4Rs
+         Y3exk+A6aNMAFitufjcpUqS7scx8AUaJWK4L1JPRqro5B6yWDE23LAsby3dCacOv3CHw
+         RRsz8Jun5oxlhTeH7dNjxbGo0EGOArhSqpeC1ZXusSx0X6cpSGd3gXBjMbWS5sHK3gOq
+         X7ipV5HabAtO9ScPChsqUwls0yO6vpl1iqnoZ+eVQuo7QAHCaHHXC6rWU4qMwjmXMDD3
+         cdpABbOsWBUIJ/yd/Q2WFAe+autl8rYIabU9HCaYgMTLPeQeYmsf6fjDGF4B0uVnK1ar
+         JdPQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=l1Q0s3QZP3zgMoieH09ETwIZdLie5eQr6iy50h+rqPs=;
-        b=Sfl4fw2y6ZUkGtT/hqo8URXABmsa/QNbuN2Cn5KDy4P0sd0A417CegIVKcaafLeaFe
-         TiZ8iKtGXzNPyeQsaut8351DEyF5Dmf1t0Wv9b7+t2JMbA8LmUPBS1PSEtLJr9yew9Va
-         jeEfnmzmwhY/3ks0KRHqL7uRnctef8tbewP85tnTHlgDLwg/qZX4XOXLU2yitT2BqiTt
-         T9wCmS0pcV6lwh7ZaGkIubbi+nwfAXokDI8BUZH0PPX1n0MoG6SxO9Mbuc9v24EMadvv
-         Knk+C1Mk4tAK566At3i/MFQtTJZzaB18lGGgcA99nHygmSOVRVm09Pek+MqQp9y2QonI
-         aoow==
-X-Gm-Message-State: AFqh2kqU1wEAab4Cn5WtSVIERfdc7G1L8r77182aVOInj1TwxY39H/j5
-        O6j/iiSp/9hsh/zFYtcPy6T2NA==
-X-Google-Smtp-Source: AMrXdXsxPtBfJ2yhCEFV7jgfVbDZJ4zEnmdJgwY/fXZ8EruCYvaNWOFlrqmk9onvRakIQ2QISugdbQ==
-X-Received: by 2002:a05:6a20:a6a7:b0:b5:c751:78ac with SMTP id ba39-20020a056a20a6a700b000b5c75178acmr780704pzb.2.1673235003564;
-        Sun, 08 Jan 2023 19:30:03 -0800 (PST)
-Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id ik9-20020a170902ab0900b00183c67844aesm4858264plb.22.2023.01.08.19.30.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 08 Jan 2023 19:30:03 -0800 (PST)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     Tejun Heo <tj@kernel.org>
-Cc:     Dan Carpenter <error27@gmail.com>, Christoph Hellwig <hch@lst.de>,
-        Luis Chamberlain <mcgrof@kernel.org>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-In-Reply-To: <Y7iFwjN+XzWvLv3y@slm.duckdns.org>
-References: <Y7g3L6fntnTtOm63@kili> <Y7hbYPSdLqW++y/p@slm.duckdns.org>
- <9ac3390c-055b-546c-f1f4-68350dfe04f8@kernel.dk>
- <Y7iFwjN+XzWvLv3y@slm.duckdns.org>
-Subject: Re: [PATCH block/for-6.2-fixes] block: Drop spurious might_sleep()
- from blk_put_queue()
-Message-Id: <167323500264.3803.6715346209932603598.b4-ty@kernel.dk>
-Date:   Sun, 08 Jan 2023 20:30:02 -0700
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=KP691JFoFX0F9mveORmXODQf26CLdeHZBmwv8xyQAK4=;
+        b=s1kdi/lqydtL6NEtuxhuXB8x55zS2Yt6rbLHaXvl880pU+nb3x4Dd+or7+tIbHcXPz
+         HXGFKiYAeQoQvNVZ+3txNxqfQC4Ky9yaDpAvmwlFU+Tlpu0np9DAzFSLP1Nc/MGu6qjS
+         W1iY4IwydjtlAy6X/icvLFFQsqr+H3Yohy/bnFFFiWlvP4HDFVix+OXXF1N4CFMBO2Wv
+         /5LgSt84/v+LVkzOv61rTUE40nt0v1H7Oju8y8gGxQQnFFRfN40tq2lQ8OCDRFV7kxcY
+         HM1f8XFWHhi7xDWsS72Cptl5GuLFyYbYjkdW3i4PZ6oiIz7GdWNrhwpJbgYTX01ZDjWa
+         m5cg==
+X-Gm-Message-State: AFqh2krfe5KyG3FJgcS+jMIhW40cdJMebUKl/5BJ0LgXKkNKjziiouAu
+        k9wmT0TKV3kcr/a7fEZHTVwSUA==
+X-Google-Smtp-Source: AMrXdXvyRJwqKDgZCDuZ6jAXItL4F2pZpF0BzEckjsAGNoNIPaBgXmEAP/wdvWmCLDP+ZAakP42bMw==
+X-Received: by 2002:a17:902:b08f:b0:193:2a8c:28c7 with SMTP id p15-20020a170902b08f00b001932a8c28c7mr926386plr.5.1673236175471;
+        Sun, 08 Jan 2023 19:49:35 -0800 (PST)
+Received: from [192.168.1.136] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id s6-20020a170902ea0600b001913c5fc051sm4819955plg.274.2023.01.08.19.49.33
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 08 Jan 2023 19:49:35 -0800 (PST)
+Message-ID: <92fb9521-9ae6-d43c-71a4-cc1b2e6e8c62@kernel.dk>
+Date:   Sun, 8 Jan 2023 20:49:33 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.12-dev-cc11a
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
+ Thunderbird/102.6.0
+Subject: Re: [PATCHv2 02/12] io_uring: switch network send/recv to ITER_UBUF
+Content-Language: en-US
+To:     Keith Busch <kbusch@meta.com>, linux-kernel@vger.kernel.org,
+        Alexander Viro <viro@zeniv.linux.org.uk>
+Cc:     linux-aio@kvack.org, linux-fsdevel@vger.kernel.org, hch@lst.de,
+        io-uring@vger.kernel.org, Pavel Begunkov <asml.silence@gmail.com>,
+        Eric Dumazet <edumazet@google.com>,
+        Steven Rostedt <rostedt@goodmis.org>, davem@davemloft.net,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        David Howells <dhowells@redhat.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        Paul Moore <paul@paul-moore.com>, keyrings@vger.kernel.org,
+        linux-security-module@vger.kernel.org,
+        linux-trace-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        netdev@vger.kernel.org, Keith Busch <kbusch@kernel.org>
+References: <20230105190741.2405013-1-kbusch@meta.com>
+ <20230105190741.2405013-3-kbusch@meta.com>
+From:   Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20230105190741.2405013-3-kbusch@meta.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
-On Fri, 06 Jan 2023 10:34:10 -1000, Tejun Heo wrote:
-> Dan reports the following smatch detected the following:
+On 1/5/23 12:07 PM, Keith Busch wrote:
+> From: Jens Axboe <axboe@kernel.dk>
 > 
->   block/blk-cgroup.c:1863 blkcg_schedule_throttle() warn: sleeping in atomic context
-> 
-> caused by blkcg_schedule_throttle() calling blk_put_queue() in an
-> non-sleepable context.
-> 
-> [...]
+> This is more efficient that iter_iov.
 
-Applied, thanks!
+Looks like that s/that/than typo ended up in a few spots throughout
+this series... Nothing major, but figured I'd bring it up.
 
-[1/1] block: Drop spurious might_sleep() from blk_put_queue()
-      commit: 49e4d04f0486117ac57a97890eb1db6d52bf82b3
-
-Best regards,
 -- 
 Jens Axboe
 
