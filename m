@@ -2,97 +2,106 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D4AC6C5479D
-	for <linux-block@archiver.kernel.org>; Tue, 10 Jan 2023 01:17:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DC60C54EBE
+	for <linux-block@archiver.kernel.org>; Tue, 10 Jan 2023 01:39:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229845AbjAJBRU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 9 Jan 2023 20:17:20 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48636 "EHLO
+        id S230453AbjAJBjy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 9 Jan 2023 20:39:54 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56438 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232803AbjAJBRU (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 9 Jan 2023 20:17:20 -0500
-Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com [209.85.215.170])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F28625D3
-        for <linux-block@vger.kernel.org>; Mon,  9 Jan 2023 17:17:19 -0800 (PST)
-Received: by mail-pg1-f170.google.com with SMTP id 36so7136467pgp.10
-        for <linux-block@vger.kernel.org>; Mon, 09 Jan 2023 17:17:19 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=9mWoij97YZYZU5Ut7Rt0KH1q/vM62BOVW2vRPTJEw0Y=;
-        b=m0R7ywUzlTTjVr7iI0bAulY2NDGsrRMHJbr8p1IGzTM8Q+nx4/SzsddlElVpsDLw2X
-         8dh8nxEZqNv4jOTGqcBqSuLr51gd+Q1sJ4dT3h0eEPR9KapOocRpjsf8opDEEQUL7CNg
-         3XAQLvFy70Uri37HWmlTY89Dghq9BfJKLSXHMFpyAEPe6UsR5hBf4KqPJLht9EC0tgWf
-         +UmH8CpXghX9IKCUSjwpiwBJhnZzcznDSOv+Si95CxZjCwAdsKc8IqFOIOqUMnYGanGL
-         ddQ1KvsdfGqoeR5qAoJ3bUIjtHLLdO9AwpWKuS2Rilksle3hVPL0DWxWhwVexvdkVXHb
-         ZEDg==
-X-Gm-Message-State: AFqh2kqBZ8F5dImCIxaPb4UH+d3RBeAytTDSjRGyQaiHZtRy+dG/RO7d
-        3e7XDRuxzwPOJiu8vO1E0uchY5M914Q=
-X-Google-Smtp-Source: AMrXdXtGTFNxDQ+1FKuTy3XY9Uj7yFRPlKwzICEJWduvxFSsr+YJggwffScNQt+QmXiUCt1gCgXnHg==
-X-Received: by 2002:a62:4dc7:0:b0:586:210b:2b67 with SMTP id a190-20020a624dc7000000b00586210b2b67mr9299985pfb.6.1673313438891;
-        Mon, 09 Jan 2023 17:17:18 -0800 (PST)
-Received: from ?IPV6:2620:15c:211:201:9f06:14dd:484f:e55c? ([2620:15c:211:201:9f06:14dd:484f:e55c])
-        by smtp.gmail.com with ESMTPSA id c76-20020a624e4f000000b00589c467ed88sm1446543pfb.69.2023.01.09.17.17.17
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 09 Jan 2023 17:17:18 -0800 (PST)
-Message-ID: <f47f32d8-92a3-b7d5-a462-d34da9263d34@acm.org>
-Date:   Mon, 9 Jan 2023 17:17:16 -0800
+        with ESMTP id S230026AbjAJBjx (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 9 Jan 2023 20:39:53 -0500
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E63882027;
+        Mon,  9 Jan 2023 17:39:50 -0800 (PST)
+Received: from mail02.huawei.com (unknown [172.30.67.153])
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4NrYQS2HGGz4f3tq5;
+        Tue, 10 Jan 2023 09:39:44 +0800 (CST)
+Received: from [10.174.176.73] (unknown [10.174.176.73])
+        by APP1 (Coremail) with SMTP id cCh0CgBXxC7hwbxjr2xaBQ--.9417S3;
+        Tue, 10 Jan 2023 09:39:46 +0800 (CST)
+Subject: Re: [PATCH v2 1/2] blk-iocost: add refcounting for iocg
+To:     Tejun Heo <tj@kernel.org>, Yu Kuai <yukuai1@huaweicloud.com>
+Cc:     hch@infradead.org, josef@toxicpanda.com, axboe@kernel.dk,
+        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, yi.zhang@huawei.com,
+        "yukuai (C)" <yukuai3@huawei.com>
+References: <20221227125502.541931-1-yukuai1@huaweicloud.com>
+ <20221227125502.541931-2-yukuai1@huaweicloud.com>
+ <Y7XzUee5Bq+DoIC1@slm.duckdns.org>
+ <c63ee2ad-23d5-3be0-c731-28494398b391@huaweicloud.com>
+ <Y7cX0SJ0y6+EIY5Q@slm.duckdns.org>
+ <7dcdaef3-65c1-8175-fea7-53076f39697f@huaweicloud.com>
+ <Y7iCId3pnEnLqY8G@slm.duckdns.org>
+ <875eb43e-202d-5b81-0bff-ef0434358d99@huaweicloud.com>
+ <Y7xbpidpq7+DqJan@slm.duckdns.org>
+From:   Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <a71f997f-6cae-d57b-85dd-2fd499d238f6@huaweicloud.com>
+Date:   Tue, 10 Jan 2023 09:39:44 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.1
-Subject: Re: [PATCH 4/8] block/mq-deadline: Only use zone locking if necessary
-Content-Language: en-US
-To:     Jens Axboe <axboe@kernel.dk>,
-        Damien Le Moal <damien.lemoal@opensource.wdc.com>
-Cc:     linux-block@vger.kernel.org, Jaegeuk Kim <jaegeuk@kernel.org>,
-        Avri Altman <avri.altman@wdc.com>,
-        Damien Le Moal <damien.lemoal@wdc.com>
-References: <20230109232738.169886-1-bvanassche@acm.org>
- <20230109232738.169886-5-bvanassche@acm.org>
- <92096c6d-fe0a-7b5b-222f-c532286c0c8b@opensource.wdc.com>
- <7bf28b7e-7301-29b5-c610-dff04ad6337f@acm.org>
- <a4f42abc-08dd-9a2e-3e6d-371e3ed695d2@opensource.wdc.com>
- <b72e484c-2985-a755-b0e1-e9ccd93cfc3b@acm.org>
- <681a991f-e09a-eeb6-805a-ee807250c399@opensource.wdc.com>
- <2f0f4f28-4096-ab76-5be3-56c44231fed3@kernel.dk>
- <49a9fd49-c9dd-8e5d-368a-ac182f7165ca@kernel.dk>
- <07084f70-00a7-d142-479c-52c75af28246@acm.org>
- <72092951-3de8-35a3-9e50-74cdcc9ee772@kernel.dk>
- <31d32f69-4c14-c9be-494f-7071112073f9@acm.org>
- <86eef990-0725-9669-6b7e-1fe935a6b648@kernel.dk>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <86eef990-0725-9669-6b7e-1fe935a6b648@kernel.dk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <Y7xbpidpq7+DqJan@slm.duckdns.org>
+Content-Type: text/plain; charset=gbk; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: cCh0CgBXxC7hwbxjr2xaBQ--.9417S3
+X-Coremail-Antispam: 1UD129KBjvJXoW7ur1DGF4kur4DXrWDtr1kZrb_yoW8Wr18pF
+        Z3Gay3G39xtrySkr17Za1xXa4rtws5Ja45G3yfGw4rur45X3s3Aw1ayryfCF1DZFs5Za4j
+        qr409FyDGr1qya7anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUU9Y14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+        1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+        JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+        CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+        2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+        W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka
+        0xkIwI1lc7I2V7IY0VAS07AlzVAYIcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7x
+        kEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E
+        67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCw
+        CI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6rW3Jr0E
+        3s1lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVWUJVW8JbIYCT
+        nIWIevJa73UjIFyTuYvjfUoOJ5UUUUU
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/9/23 17:03, Jens Axboe wrote:
-> Because I'm really not thrilled to see the addition of various "is this
-> device ordered" all over the place, and now we are getting "is this
-> device ordered AND pipelined". Do you see what I mean? It's making
-> things _worse_, not better, and we really should be making it better
-> rather than pile more stuff on top of it.
+Hi,
 
-Hi Jens,
+ÔÚ 2023/01/10 2:23, Tejun Heo Ð´µÀ:
+> Yeah, that's unfortunate. There are several options here:
+> 
+> 1. Do what you originally suggested - bypass to root after offline. I feel
+>     uneasy about this. Both iolatency and throtl clear their configs on
+>     offline but that's punting to the parent. For iocost it'd be bypassing
+>     all controls, which can actually be exploited.
+> 
+> 2. Make all possible IO issuers use blkcg_[un]pin_online() and shift the
+>     iocost shutdown to pd_offline_fn(). This likely is the most canonical
+>     solution given the current situation but it's kinda nasty to add another
+>     layer of refcnting all over the place.
+> 
+> 3. Order blkg free so that parents are never freed before children. You did
+>     this by adding refcnts in iocost but shouldn't it be possible to simply
+>     shift blkg_put(blkg->parent) in __blkg_release() to blkg_free_workfn()?
 
-I agree with you that the additional complexity is unfortunate.
+As I tried to explain before, we can make sure blkg_free() is called
+in order, but blkg_free() from remove cgroup can concurrent with
+deactivate policy, and we can't guarantee the order of ioc_pd_free()
+that is called both from blkg_free() and blkcg_deactivate_policy().
+Hence I don't think #3 is possible.
 
-For most zoned storage use cases a queue depth above one is not an 
-option if the zoned device expects zoned write commands in LBA order. 
-ATA controllers do not support preserving the command order. Transports 
-like NVMeOF do not support preserving the command order either. UFS is 
-an exception. The only use case supported by the UFS specification is a 
-1:1 connection between UFS controller and UFS device with a link with a 
-low BER between controller and device. UFS controllers must preserve the 
-command order per command queue. I think this context is well suited for 
-pipelining zoned write commands.
+I personaly prefer #1, I don't see any real use case about the defect
+that you described, and actually in cgroup v1 blk-throtl is bypassed to
+no limit as well.
+
+I'm not sure about #2, that sounds a possible solution but I'm not quite
+familiar with the implementations here.
+
+Consider that bfq already has such refcounting for bfqg, perhaps
+similiar refcounting is acceptable?
 
 Thanks,
-
-Bart.
-
+Kuai
 
