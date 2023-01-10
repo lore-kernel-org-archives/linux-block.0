@@ -2,61 +2,52 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EA26C54EBE
-	for <linux-block@archiver.kernel.org>; Tue, 10 Jan 2023 05:08:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BC93C61DB3
+	for <linux-block@archiver.kernel.org>; Tue, 10 Jan 2023 06:49:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229791AbjAJFIg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 10 Jan 2023 00:08:36 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45134 "EHLO
+        id S229538AbjAJGtF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 10 Jan 2023 01:49:05 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57658 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229783AbjAJFIV (ORCPT
+        with ESMTP id S229763AbjAJGtE (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 10 Jan 2023 00:08:21 -0500
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 175F01CFD4;
-        Mon,  9 Jan 2023 21:08:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=s3eeXxhx4tpS7pmZqfCJKqLGMlzmrOgdka1kjKMznI4=; b=XGJEFCmW/g7ojPqXxDzSIo/bZf
-        2a1smaf/JQQz3olueaj9Y/Wc9QEAHCtgcy/b088rjTbOT7NQvB4EWdhUDrvh4EYj9IicLMmUDh6vF
-        3eMwCkdKa3Sa+CQyan10aMktrXtIQ7GNYZ+mSs2eNJcC1xWRHZk5YgJJYlST66qQAoRpxqTROL8T4
-        T232bsST3sdD/CpGNKEQBwDYVhkPgZSp0qRqj4Srl4tvHyDk0aiaaaw47+4+cCxG1s5iLl59Km8fF
-        EHw2/n22dBHQXzTjC6VfjYdPM3tnT5jcbbCsn50bm0zeldFCJaFDuJAFwM1mv61F6FP5s0EHEoIWN
-        ZRBIX7bQ==;
-Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1pF6s5-002w7R-Jj; Tue, 10 Jan 2023 05:08:25 +0000
-Date:   Tue, 10 Jan 2023 05:08:25 +0000
-From:   Matthew Wilcox <willy@infradead.org>
-To:     Yishai Hadas <yishaih@nvidia.com>
-Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-mm@kvack.org, jgg@nvidia.com, axboe@kernel.dk,
-        logang@deltatee.com, hch@lst.de, alex.williamson@redhat.com,
-        leonro@nvidia.com, maorg@nvidia.com
-Subject: Re: [PATCH] lib/scatterlist: Fix to calculate the last_pg properly
-Message-ID: <Y7zyyTxdoJulq7OD@casper.infradead.org>
-References: <20230109144701.83021-1-yishaih@nvidia.com>
+        Tue, 10 Jan 2023 01:49:04 -0500
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09E16321BB;
+        Mon,  9 Jan 2023 22:49:03 -0800 (PST)
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id 6E23168B05; Tue, 10 Jan 2023 07:49:00 +0100 (CET)
+Date:   Tue, 10 Jan 2023 07:49:00 +0100
+From:   Christoph Hellwig <hch@lst.de>
+To:     Tejun Heo <tj@kernel.org>
+Cc:     Christoph Hellwig <hch@lst.de>, axboe@kernel.dk,
+        josef@toxicpanda.com, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/4] blkcg: Drop unnecessary RCU read [un]locks from
+ blkg_conf_prep/finish()
+Message-ID: <20230110064900.GA10277@lst.de>
+References: <20230105212432.289569-1-tj@kernel.org> <20230105212432.289569-2-tj@kernel.org> <20230108170240.GA19165@lst.de> <Y7x9t+4EwXFl7OwS@slm.duckdns.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230109144701.83021-1-yishaih@nvidia.com>
+In-Reply-To: <Y7x9t+4EwXFl7OwS@slm.duckdns.org>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Jan 09, 2023 at 04:47:01PM +0200, Yishai Hadas wrote:
->  	if (sgt_append->prv) {
-> +		unsigned long paddr =
-> +			(page_to_pfn(sg_page(sgt_append->prv)) * PAGE_SIZE +
+On Mon, Jan 09, 2023 at 10:48:55AM -1000, Tejun Heo wrote:
+> Now that all RCU flavors have been combined, holding a spin lock, disabling
+> irq, disabling preemption all imply RCU read lock.
 
-1. page_to_pfn() * PAGE_SIZE is spelled page_to_phys()
+Can you write it like this in the commit log, please? 
 
-2. physical addresses have type phys_addr_t.  Oh, wait, paddr isn't a
-physical address, it's a pfn because you divide by PAGE_SIZE at the end.
-But you will get truncation on 32-bit, because page_to_pfn() has type
-unsigned long.  Anyway, this shouldn't be called paddr.  Maybe last_pfn
-or something?
+> I can drop the changes but this actually bothers me. The annotation has been
+> broken for a *long* time and nobody noticed. Furthermore, I can't remember a
+> time when __acquires/__releases notation caught anything that lockdep
+> couldn't trivially and can't even think of a way how it could. AFAICS, these
+> annotations don't contribute anything other than preservation of themselves.
+> I don't see why we would want to keep them.
 
-> +			 sgt_append->prv->offset + sgt_append->prv->length) /
-> +			PAGE_SIZE;
+People have noticed it.  It just hasn't been a priority as there are
+lots of even more problematic things.
