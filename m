@@ -2,52 +2,42 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BC93C61DB3
-	for <linux-block@archiver.kernel.org>; Tue, 10 Jan 2023 06:49:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 39A4CC46467
+	for <linux-block@archiver.kernel.org>; Tue, 10 Jan 2023 06:53:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229538AbjAJGtF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 10 Jan 2023 01:49:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57658 "EHLO
+        id S229700AbjAJGxG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 10 Jan 2023 01:53:06 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59978 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229763AbjAJGtE (ORCPT
+        with ESMTP id S229727AbjAJGxE (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 10 Jan 2023 01:49:04 -0500
+        Tue, 10 Jan 2023 01:53:04 -0500
 Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09E16321BB;
-        Mon,  9 Jan 2023 22:49:03 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B47716329;
+        Mon,  9 Jan 2023 22:53:03 -0800 (PST)
 Received: by verein.lst.de (Postfix, from userid 2407)
-        id 6E23168B05; Tue, 10 Jan 2023 07:49:00 +0100 (CET)
-Date:   Tue, 10 Jan 2023 07:49:00 +0100
+        id DE5A968BFE; Tue, 10 Jan 2023 07:52:57 +0100 (CET)
+Date:   Tue, 10 Jan 2023 07:52:57 +0100
 From:   Christoph Hellwig <hch@lst.de>
-To:     Tejun Heo <tj@kernel.org>
-Cc:     Christoph Hellwig <hch@lst.de>, axboe@kernel.dk,
-        josef@toxicpanda.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/4] blkcg: Drop unnecessary RCU read [un]locks from
- blkg_conf_prep/finish()
-Message-ID: <20230110064900.GA10277@lst.de>
-References: <20230105212432.289569-1-tj@kernel.org> <20230105212432.289569-2-tj@kernel.org> <20230108170240.GA19165@lst.de> <Y7x9t+4EwXFl7OwS@slm.duckdns.org>
+To:     Pankaj Raghav <p.raghav@samsung.com>
+Cc:     axboe@kernel.dk, kernel@pankajraghav.com,
+        linux-kernel@vger.kernel.org, hare@suse.de, bvanassche@acm.org,
+        snitzer@kernel.org, dm-devel@redhat.com,
+        damien.lemoal@opensource.wdc.com, linux-nvme@lists.infradead.org,
+        hch@lst.de, linux-block@vger.kernel.org, gost.dev@samsung.com
+Subject: Re: [PATCH 1/7] block: remove superfluous check for request queue
+ in bdev_is_zoned
+Message-ID: <20230110065257.GA10289@lst.de>
+References: <20230106083317.93938-1-p.raghav@samsung.com> <CGME20230106083319eucas1p1e58f4ab0d3ff59a328a2da2922d76038@eucas1p1.samsung.com> <20230106083317.93938-2-p.raghav@samsung.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Y7x9t+4EwXFl7OwS@slm.duckdns.org>
+In-Reply-To: <20230106083317.93938-2-p.raghav@samsung.com>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Jan 09, 2023 at 10:48:55AM -1000, Tejun Heo wrote:
-> Now that all RCU flavors have been combined, holding a spin lock, disabling
-> irq, disabling preemption all imply RCU read lock.
+Looks good:
 
-Can you write it like this in the commit log, please? 
-
-> I can drop the changes but this actually bothers me. The annotation has been
-> broken for a *long* time and nobody noticed. Furthermore, I can't remember a
-> time when __acquires/__releases notation caught anything that lockdep
-> couldn't trivially and can't even think of a way how it could. AFAICS, these
-> annotations don't contribute anything other than preservation of themselves.
-> I don't see why we would want to keep them.
-
-People have noticed it.  It just hasn't been a priority as there are
-lots of even more problematic things.
+Reviewed-by: Christoph Hellwig <hch@lst.de>
