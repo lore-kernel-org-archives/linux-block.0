@@ -2,161 +2,149 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B2510C54EBC
-	for <linux-block@archiver.kernel.org>; Tue, 10 Jan 2023 12:41:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E55C3C46467
+	for <linux-block@archiver.kernel.org>; Tue, 10 Jan 2023 13:07:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232265AbjAJMl1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 10 Jan 2023 07:41:27 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52866 "EHLO
+        id S230432AbjAJNHz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 10 Jan 2023 08:07:55 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39788 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238088AbjAJMlX (ORCPT
+        with ESMTP id S232310AbjAJNHx (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 10 Jan 2023 07:41:23 -0500
-Received: from esa5.hgst.iphmx.com (esa5.hgst.iphmx.com [216.71.153.144])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3ACD0373BE
-        for <linux-block@vger.kernel.org>; Tue, 10 Jan 2023 04:41:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1673354482; x=1704890482;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=aw2S4rmP8A/gp1vT9siYMrdwhAZnnd8+vWSGGUuuLeo=;
-  b=bbO6UpQVotAMXGsne/aMuLyDCZQLtdw/EPgjsYaQjUli3EHNAWFLs+XE
-   3dkoHWbHSDSWr4BXN22ZgH2oPkzu8q9MILGM9C6Lb2pIn5BSoSfYIOfUT
-   A/saXP/J0UrYy+iBZyzruLBbMZty8vbAILMyF83f4lDLrX+GghH3hfIMA
-   rw8HlRu9vc8Go3z5rBRfIGuCANNd66HCKaU6OSpxJi+aWwK2vNRpM7lxy
-   2WsKM2FTex7f4yy8uu54pvDH+LNMBAe6qSWktotsE7Gtw6Zmf/bxAuivH
-   f23V36OSM/BaDXNoLUwuFtCtt18Qe2C8IOB/QQf6vXIEq9n1UhyTAAZNe
-   Q==;
-X-IronPort-AV: E=Sophos;i="5.96,315,1665417600"; 
-   d="scan'208";a="220318042"
-Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 10 Jan 2023 20:41:21 +0800
-IronPort-SDR: RJLL1aWyIDNSQLENJo1+rh+CnA0+QU5p5IJeFGnnCCpdusK9mYUfGRI0Od0P6jd0zPR/N3VRH9
- CjWGIL32J865eQcTJqrqsaWM7pYYgfjYpuG8z+2eUOGZ2CK7yy2PKGbuNP8gzNXmt3aQW+YGc2
- X9ly3yL7Xi1gPbO9QmC2X/Xq5h1jQH4j2D/4m1r45IatCXAHySAJJd8knqrdRzB3ZQ17DeBoGr
- 5c83bvQddRTG4kOzm4YOiCA43ozvMX7iDejY5X5SQ+O92ntaYrIONWM2XD+GQ/FMr1UJFsVUmr
- jyk=
-Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 10 Jan 2023 03:59:11 -0800
-IronPort-SDR: LxV1MwejFqg1vZpouvH6lvO+XChoGNzZpjU+4RzLwrLxaseYrIARVzSmctdwtjGMg/Z6y/GaiW
- JEoyYaU2/DlM/xoUteOTbnOWB6K9V6c/VTk/X7gjRKfqeFFkKH0+iujuw+zJMXcbR8xYOYXIrY
- vDjBRCZj1KejHtGt1ujbmiPIaEa86GOn07lY4eOuVFpr6a3XTg3pHGeOVcE0KZw/VUgdpV1vBQ
- MgTHnNmvizjWT/NbKL+fth9A4JktZjO5rGnUx7B3tilHc1f2HDggCHSgc5CFlNfRxbiFS28Mfb
- A9Q=
-WDCIronportException: Internal
-Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
-  by uls-op-cesaip02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 10 Jan 2023 04:41:21 -0800
-Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4Nrr5s0M1Nz1Rwt8
-        for <linux-block@vger.kernel.org>; Tue, 10 Jan 2023 04:41:21 -0800 (PST)
-Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
-        reason="pass (just generated, assumed good)"
-        header.d=opensource.wdc.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
-        opensource.wdc.com; h=content-transfer-encoding:content-type
-        :in-reply-to:organization:from:references:to:content-language
-        :subject:user-agent:mime-version:date:message-id; s=dkim; t=
-        1673354480; x=1675946481; bh=aw2S4rmP8A/gp1vT9siYMrdwhAZnnd8+vWS
-        GGUuuLeo=; b=O7VC3gRMOO6jiX8IVrsLD4U+we8Bj+vMLuyjIh5yHxK8y84ANgE
-        +TScg87R/HlQDk2MjmgO8yXf5ewTphu6ZP0SARKhMGSA1U5MQE3wPeMX9OBFX8Mm
-        +x+GzEi/YIl+JiEXZYFH/dV6d0YWQ9We7EWBCTwux4H4GqeVlLbArukFd68iEtXw
-        8S8znhL+4c0UAobZd1Mas+wDRdqd+LjefHWvckYv46uab3t6Hm09w9NgO+e0bGIk
-        qiMsfj585MUCxyuJ/WngER77y8y9kJABwHz70Zx+PsZ4pGIUTUmRx4cDpkwnSjbg
-        lasUN3O8CdUNlnlp0uhWCBCvISGfncpj4uA==
-X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
-Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
-        by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id NT8FQwDy3gj4 for <linux-block@vger.kernel.org>;
-        Tue, 10 Jan 2023 04:41:20 -0800 (PST)
-Received: from [10.225.163.12] (unknown [10.225.163.12])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4Nrr5q3mQVz1RvLy;
-        Tue, 10 Jan 2023 04:41:19 -0800 (PST)
-Message-ID: <685dc05a-0b8a-7c2a-c6ca-8d8f394219ef@opensource.wdc.com>
-Date:   Tue, 10 Jan 2023 21:41:17 +0900
+        Tue, 10 Jan 2023 08:07:53 -0500
+Received: from mail-pg1-x52e.google.com (mail-pg1-x52e.google.com [IPv6:2607:f8b0:4864:20::52e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A76FB5DE41
+        for <linux-block@vger.kernel.org>; Tue, 10 Jan 2023 05:07:31 -0800 (PST)
+Received: by mail-pg1-x52e.google.com with SMTP id v3so8184424pgh.4
+        for <linux-block@vger.kernel.org>; Tue, 10 Jan 2023 05:07:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance-com.20210112.gappssmtp.com; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=0b3RSYe8mQauTsHJUs6ykMcTgur4za2xftvbQNqIJa0=;
+        b=RLUlg0vAPGTz4hMSALnOAbA95CQ2QhiAPu67CW1t5ndi5fYQvoHNRfl2s9mmbfxynC
+         n5Hl26i2wnPo3Po7VVrtnQueuJ9LNMFdRz54SOR0UzQpuEPMsDS42Z/bO4BEb4COnlqZ
+         Yhl/RGwxFnAkY+cH1otEhavspwfCl0FOYahc2kH+YxTr3TQTFwyb+jOHwd6AbOmhbT/k
+         UrCTqXrRr5OpYjY6+L/mYlkYPUtgEqwUoG1lp5ywtifFjrif5++oGbE8puNRSkItokP8
+         ieNDdz1XkqTFKhhlST3mTca31Q50kVpZqKIC7YfgyJEYf+TFUH4gcW9m3mBKjOdd53dv
+         s+jQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=0b3RSYe8mQauTsHJUs6ykMcTgur4za2xftvbQNqIJa0=;
+        b=YueqZ4oX8b4zcq0gHZF3RpON1qp1pbtudlgt13QAK9i7bBxK2vGAjwzRJZlT80JG4e
+         Rnhz1DYprCm2GKArvWw+JCq/fU0ri+Yyx5LPrz+vw1pOsgJwCwf0cION6SXqcJeFTb/k
+         xcDJhdJUal/i2zPKtm/iEsxVE+mpmcWMFg4GlITlgrebua5w8/CNXk28OaZCHgPQV1Rb
+         OWjVmGOgdvN3iyViZjLhpG/mFGz+lJX0MzWnCyGndvkp4C7nWMs7awUWWBMsUoFxd/KA
+         +oetjYVtUHrexhGZNqb077iDGHt20FxYRxckDyGyufARlrht1/+VVc+zBCZj4BJnys3x
+         JmQA==
+X-Gm-Message-State: AFqh2kq2+3D502weZRiqauqfzYe4bVBAQQhjT1o57cgnAnqqknrcIaBk
+        K9+itQSMk0xbGPBrU/gjrcrrtw==
+X-Google-Smtp-Source: AMrXdXuOnsxeqzWi+BrT/XazxVd/FkhSHxizdXq9xmqS2MG3LGJFCe4KApI5JgYxg1Fm6XPKXt5zLA==
+X-Received: by 2002:aa7:85c8:0:b0:588:14ce:7e64 with SMTP id z8-20020aa785c8000000b0058814ce7e64mr7017731pfn.30.1673356051158;
+        Tue, 10 Jan 2023 05:07:31 -0800 (PST)
+Received: from [10.3.157.223] ([61.213.176.11])
+        by smtp.gmail.com with ESMTPSA id v67-20020a622f46000000b00581ad007a9fsm8004776pfv.153.2023.01.10.05.07.27
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 10 Jan 2023 05:07:30 -0800 (PST)
+Message-ID: <f9b8e682-92aa-c39c-4d91-d77d104e0767@bytedance.com>
+Date:   Tue, 10 Jan 2023 21:07:25 +0800
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.0
-Subject: Re: [PATCH 2/8] block: Introduce the blk_rq_is_seq_zone_write()
- function
-Content-Language: en-US
-To:     Niklas Cassel <Niklas.Cassel@wdc.com>
-Cc:     Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        Avri Altman <Avri.Altman@wdc.com>
-References: <20230109232738.169886-1-bvanassche@acm.org>
- <20230109232738.169886-3-bvanassche@acm.org>
- <7b90e9e6-4a32-eb0d-bb42-8cd0a75159f9@opensource.wdc.com>
- <22912d92-dd0f-8fc9-8dc5-10a81866e4ee@acm.org> <Y701TJtNyj86G1QV@x1-carbon>
- <278a9c42-bfa3-1602-622d-bdbbf72649a6@opensource.wdc.com>
- <Y71WVAAVzYEyKedM@x1-carbon>
-From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
-Organization: Western Digital Research
-In-Reply-To: <Y71WVAAVzYEyKedM@x1-carbon>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.2.2
+Subject: Re: [External] Re: [PATCH v3] blk-throtl: Introduce sync and async
+ queues for blk-throtl
+To:     Tejun Heo <tj@kernel.org>
+Cc:     Jan Kara <jack@suse.cz>,
+        =?UTF-8?Q?Michal_Koutn=c3=bd?= <mkoutny@suse.com>,
+        josef@toxicpanda.com, axboe@kernel.dk, cgroups@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yinxin.x@bytedance.com
+References: <20221226130505.7186-1-hanjinke.666@bytedance.com>
+ <20230105161854.GA1259@blackbody.suse.cz>
+ <20230106153813.4ttyuikzaagkk2sc@quack3> <Y7hTHZQYsCX6EHIN@slm.duckdns.org>
+ <c839ba6c-80ac-6d92-af64-5c0e1956ae93@bytedance.com>
+ <Y7hlX4T1UOmQHiGf@slm.duckdns.org>
+ <e499f088-8ed9-2e19-b2e5-efaa4f9738f0@bytedance.com>
+ <Y7xYJfRLSMYk9tj9@slm.duckdns.org>
+From:   hanjinke <hanjinke.666@bytedance.com>
+In-Reply-To: <Y7xYJfRLSMYk9tj9@slm.duckdns.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/10/23 21:13, Niklas Cassel wrote:
-> On Tue, Jan 10, 2023 at 08:54:24PM +0900, Damien Le Moal wrote:
->> On 1/10/23 18:52, Niklas Cassel wrote:
->>> On Mon, Jan 09, 2023 at 03:52:23PM -0800, Bart Van Assche wrote:
->>>> On 1/9/23 15:38, Damien Le Moal wrote:
->>>>> On 1/10/23 08:27, Bart Van Assche wrote:
->>>>>> +static inline bool blk_rq_is_seq_zone_write(struct request *rq)
->>>>>> +{
->>>>>> +	switch (req_op(rq)) {
->>>>>> +	case REQ_OP_WRITE:
->>>>>> +	case REQ_OP_WRITE_ZEROES:
->>>>>
->>>>> REQ_OP_ZONE_APPEND ?
->>>>
->>>> I will add REQ_OP_ZONE_APPEND.
->>>>
->>>
->>> Hello Bart, Damien,
->>>
->>> +       if (blk_queue_pipeline_zoned_writes(rq->q) &&
->>> +           blk_rq_is_seq_zone_write(rq))
->>> +               cmd->allowed += rq->q->nr_requests;
->>>
->>> Considering that this function, blk_rq_is_seq_zone_write(), only seems to
->>> be used to determine if a request should be allowed to be retried, I think
->>> that it is incorrect to add REQ_OP_ZONE_APPEND, since a zone append
->>> operation will never result in a ILLEGAL REQUEST/UNALIGNED WRITE COMMAND.
->>>
->>> (If this instead was a function that said which operations that needed to
->>> be held back, then you would probably need to include REQ_OP_ZONE_APPEND,
->>> as otherwise the reordered+retried write would never be able to succeed.)
+
+
+在 2023/1/10 上午2:08, Tejun Heo 写道:
+> Hello,
+> 
+> On Sat, Jan 07, 2023 at 12:44:35PM +0800, hanjinke wrote:
+>> For cost.model setting, We first use the tools iocost provided to test the
+>> benchmark model parameters of different types of disks online, and then save
+>> these benchmark parameters to a parametric Model Table. During the
+>> deployment process, pull and set the corresponding model parameters
+>> according to the type of disk.
 >>
->> Unless UFS defines a zone append operation, REQ_OP_ZONE_APPEND will be
->> processed using regular writes in the sd driver.
+>> The setting of cost.qos should be considered slightly more，we need to make
+>> some compromises between overall disk throughput and io latency.
+>> The average disk utilization of the entire disk on a specific business and
+>> the RLA（if it is io sensitive） of key businesses will be taken as
+>> important input considerations. The cost.qos will be dynamically fine-tuned
+>> according to the health status monitoring of key businesses.
 > 
-> Sure, but I still think that my point is valid.
-> 
-> A REQ_OP_ZONE_APPEND should never be able to result in a
-> "UNALIGNED WRITE COMMAND".
+> Ah, I see. Do you use the latency targets and min/max ranges or just fixate
+> the vrate by setting min == max?
 
-Yes, but that semantic should not be associated with a function named
-blk_rq_is_seq_zone_write() :)
-
-> 
-> If the SCSI REQ_OP_ZONE_APPEND emulation can result in a
-> "UNALIGNED WRITE COMMAND", I would argue that the SCSI zone append
-> emulation is faulty.
-
-or a passthrough command was used and screwed up the zone write pointer
-tracking....
+Currently we use the former.
 
 > 
+>> For cost.weight setting, high-priority services  will gain greater
+>> advantages through weight settings to deal with a large number of io
+>> requests in a short period of time. It works fine as work-conservation
+>> of iocost works well according to our observation.
 > 
-> Kind regards,
-> Niklas
+> Glad to hear.
+> 
+>> These practices can be done better and I look forward to your better
+>> suggestions.
+> 
+> It's still in progress but resctl-bench's iocost-tune benchmark is what
+> we're starting to use:
+> 
+>   https://github.com/facebookexperimental/resctl-demo/blob/main/resctl-bench/doc/iocost-tune.md
+> 
+> The benchmark takes like 6 hours and what it does is probing the whole vrate
+> range looking for behavior inflection points given the scenario of
+> protecting a latency sensitive workload against memory leak. On completion,
+> it provides several solutions based on the behavior observed.
+> 
+> The benchmark is destructive (to the content on the target ssd) and can be
+> tricky to set up. There's installable image to help setting up and running
+> the benchmark:
+> 
+>   https://github.com/iocost-benchmark/resctl-demo-image-recipe/actions
+> 
+> The eventual goal is collecting these benchmark results in the following git
+> repo:
+> 
+>   https://github.com/iocost-benchmark/iocost-benchmarks
+> 
+> which generates hwdb files describing all the found solution and make
+> systemd apply the appropriate configuration on boot automatically.
+> 
+> It's still all a work in progress but hopefully we should be able to
+> configure iocost reasonably on boot on most SSDs.
+> 
+> Thanks.
+> 
 
--- 
-Damien Le Moal
-Western Digital Research
+These methodologies are worthy of our study and will definitely help our 
+future deployment of iocost. Thanks a lot.
+
+Thanks.
 
