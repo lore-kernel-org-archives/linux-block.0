@@ -2,101 +2,90 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B557C678D6
-	for <linux-block@archiver.kernel.org>; Tue, 10 Jan 2023 18:28:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D484BC677F1
+	for <linux-block@archiver.kernel.org>; Tue, 10 Jan 2023 18:39:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234608AbjAJS2y (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 10 Jan 2023 13:28:54 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42284 "EHLO
+        id S239472AbjAJSjK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 10 Jan 2023 13:39:10 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54532 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234439AbjAJS23 (ORCPT
+        with ESMTP id S239618AbjAJSiZ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 10 Jan 2023 13:28:29 -0500
-Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC075633AD;
-        Tue, 10 Jan 2023 10:24:10 -0800 (PST)
-Received: by mail-pl1-x62a.google.com with SMTP id jn22so14055797plb.13;
-        Tue, 10 Jan 2023 10:24:10 -0800 (PST)
+        Tue, 10 Jan 2023 13:38:25 -0500
+Received: from mail-pf1-x431.google.com (mail-pf1-x431.google.com [IPv6:2607:f8b0:4864:20::431])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F229843192;
+        Tue, 10 Jan 2023 10:33:51 -0800 (PST)
+Received: by mail-pf1-x431.google.com with SMTP id c26so5109703pfp.10;
+        Tue, 10 Jan 2023 10:33:51 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=7DSDWSC5oI8TQxnm4gch91xIJryMU4lgAF90s/UwWWk=;
-        b=A3fMIP7fGQT8mhJMIpgNcr0rts9CVAZRFeqHDJG8x53GoQiiiIF1b8cGpuE0hHa53P
-         ltgntzNTQNGojWqN/Lnq9CocTb1V8MOhbc3yb0lUZ25Ycbj+YNGEAToLIZ+UAozb9OmE
-         ZypcGHDDE4xhl5bYlMtsNeO+L+J6omu91J/8swISZgxP8phCaglMphO8dcyP+lSMdERs
-         9S+9JHgsFjD+HylQ3fAksbrOVnsc/zIo6yP5bc7ikoyO8mMFSN4uLi5mGOuKtOJeNPoz
-         Rx05hFTUZqJZODLB+URCvYmDuogQgRdLBDVFRD9G52SiuDzRrVw4Qe1vGnXr6NzW1myl
-         pCiA==
+        bh=KsouuxBuiJc8vCJmbxhsGZquFChD89mMF5fleuPLAHA=;
+        b=D1xx5iOXYizVGZVmUvuz9gRyo14PnGlDQ6ranZeCRfesSPH8+Qnz4auvd5EtnC0PE8
+         MgHP/5WpYr/2G7BerNwWDjje1kCygPwKyDHSkS1+JGa7oAnZ9bcnrPKioWVbtH4I8Ryn
+         db3M9NylNS+zcLnako5DP2hGo/vHzlHySxJQqhz7coImcT/ibiJhXMNUudg7tzekFWsN
+         LmEPtrzPrTqeCbF4HrZ8seNfARqO4pGKuC0b7MVsdctCiRtutKrpXYypFDvmcppzvHUT
+         ou2I6QDlhQqfwxIpNdSaMXod5hCHrKWtixZdSqaqAiji9CtnHmno4Oq5afQtpYf7CLrL
+         JHag==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=7DSDWSC5oI8TQxnm4gch91xIJryMU4lgAF90s/UwWWk=;
-        b=O5vkKvg9cgMTBWssww5RVOy73y7E8DSyOL+piG+7BNIiRb+ho+DPVfm/c2QnzUIDfC
-         +gS+ndFGd/i42bqJOWJwK1UGBu0f1oh4lpSpOUUUn1nZkB5GyqjBVwAEvExEgURic4kG
-         FQEGiPChulg47TS0+QL9pMOOvuT2X2UH+Tp7WWJBLctyO8wkbk0eSZbYJ2OnLfzbcK2p
-         38mNiSTk1/rsN+ep4PTmBf2KsT5uXukyUc3JQv9x5HYm+I1gfmGrTTG/9/n8zu1KF4+Q
-         b+2s5eRy1R831TLEhk/9qCVaZa0xmROn4W/Vhkwf+Tec5iSyM+wUz79vfUqXzACreMlp
-         OwRA==
-X-Gm-Message-State: AFqh2koDorprPTuUMWnga1ZQh9CUo64ZLQLD4ILb0RUHxKASMi48jskF
-        3GBlJiTY141Z+sxp581o0fU=
-X-Google-Smtp-Source: AMrXdXtXVoul7y2ASo4NkUZUjHF15E9skqNkwo6cBqs0hjiByPDcgbex+D2ueZTZGIZGi8AVuISzWg==
-X-Received: by 2002:a05:6a20:8423:b0:b5:f180:56ab with SMTP id c35-20020a056a20842300b000b5f18056abmr8270009pzd.60.1673375049955;
-        Tue, 10 Jan 2023 10:24:09 -0800 (PST)
+        bh=KsouuxBuiJc8vCJmbxhsGZquFChD89mMF5fleuPLAHA=;
+        b=VMH+148sM1EmukXsp7IMol80NAhg5oaWUjvyeavGk+bKVFMC1wzsSkG0YUvF1RA3MC
+         /Au98wJjedrE/peCe+46WSIFe6Mqff9o2NEda5M5Krx4u7zJycgsSiJD7WNiz6Rsr3hI
+         uF7JuzWUPlUNhzRGE/e6z2WnrIHL81pL/2e97Za2zdnMnUGzTnNDbTIKoaOTn150MHSK
+         w/BHKOiKMZye07LwmopyMX/3x6Gop4HVVeF1vw6F3FcivfnWcDmK9gWyK5pYnkM23XUN
+         71ZonbivI7j4N4oO+WojphK3VHrzEyXwFjWDtW0vuAbHK8Temgh9Qa6UELv8SO5MAT4G
+         UBDA==
+X-Gm-Message-State: AFqh2kqTGymroRQrvhG7HT1b+OVlwSz8TzS+bMhF8zjMVUcHlIeh1lhw
+        Xd2E+DI0DBQQMvXF4FKmEtQ=
+X-Google-Smtp-Source: AMrXdXsWYPTxoousUtpq9sVyFa/er9qVXOf9kYAZG7rErauBT29M3xD6Lax0ObNnEeh1iAkFj72Obg==
+X-Received: by 2002:a62:2903:0:b0:56b:f51d:820a with SMTP id p3-20020a622903000000b0056bf51d820amr67420322pfp.7.1673375631351;
+        Tue, 10 Jan 2023 10:33:51 -0800 (PST)
 Received: from localhost (2603-800c-1a02-1bae-a7fa-157f-969a-4cde.res6.spectrum.com. [2603:800c:1a02:1bae:a7fa:157f:969a:4cde])
-        by smtp.gmail.com with ESMTPSA id w18-20020a170902e89200b00186a2444a43sm8400073plg.27.2023.01.10.10.24.09
+        by smtp.gmail.com with ESMTPSA id p62-20020a622941000000b0058130f1eca1sm8348609pfp.182.2023.01.10.10.33.50
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Jan 2023 10:24:09 -0800 (PST)
+        Tue, 10 Jan 2023 10:33:51 -0800 (PST)
 Sender: Tejun Heo <htejun@gmail.com>
-Date:   Tue, 10 Jan 2023 08:24:08 -1000
+Date:   Tue, 10 Jan 2023 08:33:49 -1000
 From:   Tejun Heo <tj@kernel.org>
 To:     Christoph Hellwig <hch@lst.de>
 Cc:     axboe@kernel.dk, josef@toxicpanda.com, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/4] blkcg: Drop unnecessary RCU read [un]locks from
- blkg_conf_prep/finish()
-Message-ID: <Y72tSI0eQky7Tr42@slm.duckdns.org>
+Subject: Re: [PATCH 2/4] blkcg: Restructure blkg_conf_prep() and friends
+Message-ID: <Y72vjbufcqtRdl2C@slm.duckdns.org>
 References: <20230105212432.289569-1-tj@kernel.org>
- <20230105212432.289569-2-tj@kernel.org>
- <20230108170240.GA19165@lst.de>
- <Y7x9t+4EwXFl7OwS@slm.duckdns.org>
- <20230110064900.GA10277@lst.de>
+ <20230105212432.289569-3-tj@kernel.org>
+ <20230110070929.GH10289@lst.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230110064900.GA10277@lst.de>
+In-Reply-To: <20230110070929.GH10289@lst.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
-
-On Tue, Jan 10, 2023 at 07:49:00AM +0100, Christoph Hellwig wrote:
-> On Mon, Jan 09, 2023 at 10:48:55AM -1000, Tejun Heo wrote:
-> > Now that all RCU flavors have been combined, holding a spin lock, disabling
-> > irq, disabling preemption all imply RCU read lock.
+On Tue, Jan 10, 2023 at 08:09:29AM +0100, Christoph Hellwig wrote:
+> On Thu, Jan 05, 2023 at 11:24:30AM -1000, Tejun Heo wrote:
+> > * blkg_conf_open_bdev() is updated to take a pointer to blkg_conf_ctx like
+> >   blkg_conf_prep() and can be called multiple times safely. Instead of
+> >   modifying the double pointer to input string directly,
+> >   blkg_conf_open_bdev() now sets blkg_conf_ctx->body.
 > 
-> Can you write it like this in the commit log, please? 
+> This looks pretty awkward for the externals callers of blkcg_conf_open_bdev
+> in blk-iocost.  I'd either keep the calling conventions as they are
+> at the moment, or just open code blkcg_conf_open_bdev in blk-iocost.
 
-Sure, will do.
-
-> > I can drop the changes but this actually bothers me. The annotation has been
-> > broken for a *long* time and nobody noticed. Furthermore, I can't remember a
-> > time when __acquires/__releases notation caught anything that lockdep
-> > couldn't trivially and can't even think of a way how it could. AFAICS, these
-> > annotations don't contribute anything other than preservation of themselves.
-> > I don't see why we would want to keep them.
-> 
-> People have noticed it.  It just hasn't been a priority as there are
-> lots of even more problematic things.
-
-That doesn't really shed a positive light on them, does it? I'll drop this
-part but can you think of actual reasons to keep these around other than to
-keep sparse happy? I'm genuninely curious and have asked several people.
-Nobody had a good answer.
+Because we're coming in from cgroupfs, we aren't synchronizing properly
+against blkdevs going away. For all config attempt coming in from cgroup
+side, we'll need to synchronize explicitly and these config helper blocks
+look like a good place to do so. Please take a look at the thread with Yu
+Kuai. Imma update the comment to include that but yeah let's keep it this
+way for that.
 
 Thanks.
 
