@@ -2,106 +2,155 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DC60C54EBE
-	for <linux-block@archiver.kernel.org>; Tue, 10 Jan 2023 01:39:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 76CC0C678D5
+	for <linux-block@archiver.kernel.org>; Tue, 10 Jan 2023 01:40:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230453AbjAJBjy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 9 Jan 2023 20:39:54 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56438 "EHLO
+        id S234778AbjAJBko (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 9 Jan 2023 20:40:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56654 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230026AbjAJBjx (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 9 Jan 2023 20:39:53 -0500
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E63882027;
-        Mon,  9 Jan 2023 17:39:50 -0800 (PST)
-Received: from mail02.huawei.com (unknown [172.30.67.153])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4NrYQS2HGGz4f3tq5;
-        Tue, 10 Jan 2023 09:39:44 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-        by APP1 (Coremail) with SMTP id cCh0CgBXxC7hwbxjr2xaBQ--.9417S3;
-        Tue, 10 Jan 2023 09:39:46 +0800 (CST)
-Subject: Re: [PATCH v2 1/2] blk-iocost: add refcounting for iocg
-To:     Tejun Heo <tj@kernel.org>, Yu Kuai <yukuai1@huaweicloud.com>
-Cc:     hch@infradead.org, josef@toxicpanda.com, axboe@kernel.dk,
-        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, yi.zhang@huawei.com,
-        "yukuai (C)" <yukuai3@huawei.com>
-References: <20221227125502.541931-1-yukuai1@huaweicloud.com>
- <20221227125502.541931-2-yukuai1@huaweicloud.com>
- <Y7XzUee5Bq+DoIC1@slm.duckdns.org>
- <c63ee2ad-23d5-3be0-c731-28494398b391@huaweicloud.com>
- <Y7cX0SJ0y6+EIY5Q@slm.duckdns.org>
- <7dcdaef3-65c1-8175-fea7-53076f39697f@huaweicloud.com>
- <Y7iCId3pnEnLqY8G@slm.duckdns.org>
- <875eb43e-202d-5b81-0bff-ef0434358d99@huaweicloud.com>
- <Y7xbpidpq7+DqJan@slm.duckdns.org>
-From:   Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <a71f997f-6cae-d57b-85dd-2fd499d238f6@huaweicloud.com>
-Date:   Tue, 10 Jan 2023 09:39:44 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
-MIME-Version: 1.0
-In-Reply-To: <Y7xbpidpq7+DqJan@slm.duckdns.org>
-Content-Type: text/plain; charset=gbk; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: cCh0CgBXxC7hwbxjr2xaBQ--.9417S3
-X-Coremail-Antispam: 1UD129KBjvJXoW7ur1DGF4kur4DXrWDtr1kZrb_yoW8Wr18pF
-        Z3Gay3G39xtrySkr17Za1xXa4rtws5Ja45G3yfGw4rur45X3s3Aw1ayryfCF1DZFs5Za4j
-        qr409FyDGr1qya7anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUU9Y14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-        1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-        JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-        CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-        2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-        W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka
-        0xkIwI1lc7I2V7IY0VAS07AlzVAYIcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7x
-        kEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E
-        67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCw
-        CI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6rW3Jr0E
-        3s1lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVWUJVW8JbIYCT
-        nIWIevJa73UjIFyTuYvjfUoOJ5UUUUU
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
-X-CFilter-Loop: Reflected
+        with ESMTP id S237219AbjAJBkl (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 9 Jan 2023 20:40:41 -0500
+Received: from mail-oa1-x2c.google.com (mail-oa1-x2c.google.com [IPv6:2001:4860:4864:20::2c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C78773BE84
+        for <linux-block@vger.kernel.org>; Mon,  9 Jan 2023 17:40:10 -0800 (PST)
+Received: by mail-oa1-x2c.google.com with SMTP id 586e51a60fabf-15b9c93848dso2456475fac.1
+        for <linux-block@vger.kernel.org>; Mon, 09 Jan 2023 17:40:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance-com.20210112.gappssmtp.com; s=20210112;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vo1e4WWMG0A+UpXNNq0JvhgPHSnNnupFRrUwtyDiEi8=;
+        b=UVFtu729mVqGxLV9fgWbAgdeKymaXIXXaTe+t+mtZ6RJ5fKXI93ef8NdiulzsB+63q
+         uIM3miO59Ubsi321YvyrJJwJK1f/WLy8CcblapK8wcKcXB1wAlboAeEGR3AGvsHiEqhn
+         KrFniy1dOgycS207g/2DU1QxADZ+RPBtTXVt1UROtyjpwAoxqNnyj/ugK8DW4Sg6LFy5
+         NW3+eztLkFDESMNhMPt/AYEmkNnkv5vGf+rbkQEJtKXY7/7JUoxr+Kmpf3tGmZJBuxBu
+         iNetOy/UpWT/gaqjHyvZNftP0XG1kiBUjwmFMJZtLZNjwPGcNn2JLxf70VfptTkvJc3z
+         pFaQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=vo1e4WWMG0A+UpXNNq0JvhgPHSnNnupFRrUwtyDiEi8=;
+        b=SM/wiAX83RoOwhyBnDH7TBymV5ONIrtTat8Foh5LN5RLHTyXrnFMGovX2qT0jiEWOz
+         yzSJTFKjki75zmZqis8TKl/KeGPFWKA+IXSHFVPn/ovi7pUYPduOuwGUx1eLqjLtXQGL
+         Ug5utPWf1FUXQ6Sperr+2DqJu8+KCDj7jaFYc1wswrJVhYBDS7UhCz3RjxjS13CdDinO
+         n8Ucg6WOGqwxXqI/wg2Xdfn9nBAcDo8T4V7oAQPkts+LOfst5Gxf6IK9MH8sOirjW/L1
+         dI7Nyha6O2YTIBnMhA1CenJJni5XqqsJSebDLsQqHDb9umHu8v83gwDOJx/8nlpOxD4t
+         SC6A==
+X-Gm-Message-State: AFqh2kqGs1cxJL4CiUIBuCrL8O3oStvcHY76DtuE1pkaZH7xjCLmqP4/
+        /V0VVXwSyvOmAT+vvD25HAkLyQ==
+X-Google-Smtp-Source: AMrXdXv11hD6h514xocgmuNbpwdwVEaqCmSQ20fkSOuCjdQWqCcgpIsSP+dLtDehzf73vXScxO1wQg==
+X-Received: by 2002:a05:6871:a186:b0:14f:e2b7:242d with SMTP id vt6-20020a056871a18600b0014fe2b7242dmr24041224oab.17.1673314809346;
+        Mon, 09 Jan 2023 17:40:09 -0800 (PST)
+Received: from smtpclient.apple (172-125-78-211.lightspeed.sntcca.sbcglobal.net. [172.125.78.211])
+        by smtp.gmail.com with ESMTPSA id i8-20020a056871028800b0014c83629498sm5100802oae.43.2023.01.09.17.40.08
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 09 Jan 2023 17:40:09 -0800 (PST)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3731.300.101.1.3\))
+Subject: Re: [External] [LSF/MM/BPF BoF] Session for Zoned Storage 2023
+From:   "Viacheslav A.Dubeyko" <viacheslav.dubeyko@bytedance.com>
+In-Reply-To: <e4a972f4-50fd-4c0e-1b44-dc702fd9c445@kernel.dk>
+Date:   Mon, 9 Jan 2023 17:39:57 -0800
+Cc:     Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+        =?utf-8?Q?Javier_Gonz=C3=A1lez?= <javier.gonz@samsung.com>,
+        Viacheslav Dubeyko <slava@dubeyko.com>,
+        Luis Chamberlain <mcgrof@kernel.org>,
+        Linux FS Devel <linux-fsdevel@vger.kernel.org>,
+        linux-block@vger.kernel.org,
+        =?utf-8?Q?Matias_Bj=C3=B8rling?= <Matias.Bjorling@wdc.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Adam Manzanares <a.manzanares@samsung.com>,
+        Hans Holmberg <hans.holmberg@wdc.com>,
+        lsf-pc@lists.linux-foundation.org
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <B512D508-4460-44B8-9067-84F78BA43E0E@bytedance.com>
+References: <F6BF25E2-FF26-48F2-8378-3CB36E362313@dubeyko.com>
+ <Y7h0F0w06cNM89hO@bombadil.infradead.org>
+ <4CC4F55E-17B3-47E2-A8C5-9098CCEB65D6@dubeyko.com>
+ <CGME20230107015641eucas1p13c2b37b5ca7a5b64eb520b79316d5186@eucas1p1.samsung.com>
+ <5DF10459-88F3-48DA-AEB2-5B436549A194@bytedance.com>
+ <20230109153315.waqfokse4srv6xlz@mpHalley-2.localdomain>
+ <AF3750AD-1B66-4F8A-936F-A14EC17DAC16@bytedance.com>
+ <04cc803e-0246-bf8a-c083-f556a373ae4f@opensource.wdc.com>
+ <ca30360e-ab51-6282-bd3c-208399e5a552@kernel.dk>
+ <E2BA234A-D3D3-440B-BBDB-230B772B2D01@bytedance.com>
+ <e4a972f4-50fd-4c0e-1b44-dc702fd9c445@kernel.dk>
+To:     Jens Axboe <axboe@kernel.dk>
+X-Mailer: Apple Mail (2.3731.300.101.1.3)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
 
-ÔÚ 2023/01/10 2:23, Tejun Heo Ð´µÀ:
-> Yeah, that's unfortunate. There are several options here:
-> 
-> 1. Do what you originally suggested - bypass to root after offline. I feel
->     uneasy about this. Both iolatency and throtl clear their configs on
->     offline but that's punting to the parent. For iocost it'd be bypassing
->     all controls, which can actually be exploited.
-> 
-> 2. Make all possible IO issuers use blkcg_[un]pin_online() and shift the
->     iocost shutdown to pd_offline_fn(). This likely is the most canonical
->     solution given the current situation but it's kinda nasty to add another
->     layer of refcnting all over the place.
-> 
-> 3. Order blkg free so that parents are never freed before children. You did
->     this by adding refcnts in iocost but shouldn't it be possible to simply
->     shift blkg_put(blkg->parent) in __blkg_release() to blkg_free_workfn()?
 
-As I tried to explain before, we can make sure blkg_free() is called
-in order, but blkg_free() from remove cgroup can concurrent with
-deactivate policy, and we can't guarantee the order of ioc_pd_free()
-that is called both from blkg_free() and blkcg_deactivate_policy().
-Hence I don't think #3 is possible.
+> On Jan 9, 2023, at 5:09 PM, Jens Axboe <axboe@kernel.dk> wrote:
+>=20
+> On 1/9/23 4:20?PM, Viacheslav A.Dubeyko wrote:
+>>=20
+>>=20
+>>> On Jan 9, 2023, at 3:00 PM, Jens Axboe <axboe@kernel.dk> wrote:
+>>>=20
+>>>>> My point here that we could summarize:
+>>>>> (1) what features already implemented and supported,
+>>>>> (2) what features are under implementation and what is progress,
+>>>>> (3) what features need to be implemented yet.
+>>>>>=20
+>>>>> Have we implemented everything already? :)
+>>>>=20
+>>>> Standards are full of features that are not useful in a general =
+purpose
+>>>> system. So we likely never will implement everything. We never did =
+for
+>>>> SCSI and ATA and never will either.
+>>> Indeed, and that's a very important point. Some people read specs =
+and
+>>> find things that aren't in the Linux driver (any spec, not a =
+specific
+>>> one), and think they need to be added. No. We only add them if they =
+make
+>>> sense, both in terms of use cases, but also as long as they can get
+>>> implemented cleanly. Parts of basically any spec is garbage and =
+don't
+>>> necessarily fit within the given subsystem either.
+>>>=20
+>>> The above would make me worried about patches coming from anyone =
+with
+>>> that mindset.
+>>>=20
+>>=20
+>> OK. We already have discussion about garbage in spec. :)
+>> So, what would we like finally implement and what never makes sense =
+to do?
+>> Should we identify really important stuff for implementation?
+>=20
+> Well if you did have that discussion, then it seemed you got nothing
+> from it. Because asking that kind of question is EXACTLY what I'm =
+saying
+> is the opposite of what should be done. If there's a demand for a
+> feature, then it can be looked at and ultimately implemented if it =
+makes
+> sense. You're still talking about proactively finding features and
+> implementing them "just in case they are needed", which is very much =
+the
+> opposite and wrong approach, and how any kind of software ends up =
+being
+> bloated, slow, and buggy/useless.
+>=20
 
-I personaly prefer #1, I don't see any real use case about the defect
-that you described, and actually in cgroup v1 blk-throtl is bypassed to
-no limit as well.
+I simply tried to suggest some space for this discussion and nothing =
+more.
+If all important features have been implemented already and nobody would
+like to discuss new feature(s), then we can simply exclude this topic =
+from the list.
 
-I'm not sure about #2, that sounds a possible solution but I'm not quite
-familiar with the implementations here.
-
-Consider that bfq already has such refcounting for bfqg, perhaps
-similiar refcounting is acceptable?
+If you would like to say that I am a reason of slow software, then I =
+take this credit. :)
 
 Thanks,
-Kuai
+Slava.
 
