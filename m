@@ -2,130 +2,284 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 116BBC63797
-	for <linux-block@archiver.kernel.org>; Tue, 10 Jan 2023 12:26:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 245BDC46467
+	for <linux-block@archiver.kernel.org>; Tue, 10 Jan 2023 12:35:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232301AbjAJMZb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 10 Jan 2023 07:25:31 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40870 "EHLO
+        id S238502AbjAJMf0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 10 Jan 2023 07:35:26 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47994 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238363AbjAJMYy (ORCPT
+        with ESMTP id S232513AbjAJMfR (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 10 Jan 2023 07:24:54 -0500
-Received: from mail-ed1-x533.google.com (mail-ed1-x533.google.com [IPv6:2a00:1450:4864:20::533])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED82DCC1
-        for <linux-block@vger.kernel.org>; Tue, 10 Jan 2023 04:23:50 -0800 (PST)
-Received: by mail-ed1-x533.google.com with SMTP id v30so17250927edb.9
-        for <linux-block@vger.kernel.org>; Tue, 10 Jan 2023 04:23:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=CVE17Z1afUE5aimPhcBOm02ZYutHWykpOarYjQuH6oY=;
-        b=O3KW7QMzUkRxbxZYSfVj6E8EIMHx2hQE7B4YBSgnv2rr+0Ut8myBphgkl2Dz3+eRjQ
-         et8NTH6KzDA9ZbMhkVvLqzulCxaKS3hu0S+QRSn/AgpTJUVvjApmHTAwhSdaGjCYXoFk
-         mNklK9mwc8ubagHuDaL13fB9iAQDeqfunOUw5ccBAoxzj2ktkmAMguIuCEawdO7gp5lx
-         mVZMLoO1q23tc6pPy6RqJs1Bt7NhHlQeiBMzgWQOcFKLdufFgQFotWzH6rNlIYgTRg6C
-         PvO+HVB2OVe2y8wM2yg0KV+gTXoggxsxoU9jweVxFnCYAs9gaUNteXuzNh39aRPFcnnD
-         9kaA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=CVE17Z1afUE5aimPhcBOm02ZYutHWykpOarYjQuH6oY=;
-        b=CRboKfBw1r36y+lD7DsBlR4hAYCPQlIj7oIDrhhk2C68lquwqVuGsIF0U+kAdFSjIU
-         PMbAw1RpTE5njZsjwFyEj4r/SAFtx8zw+A+gYwAlqpwCyAYbniIj6Ey02BhXuY4u6q3R
-         dWr4Sbs2KHPBb5jrPir+89rqeE0ILIjhzPlqBct0eIfNQO1ne0i13UrUuHWDWSGjNT47
-         vIBtGIqhbTgx5TwPjNw8CGPhraQfS7MQU7pEqsUPV8x5RjCNRqlvVw2YcYmgbo9Dx/OG
-         siqXuJBRvontzLkc110qQrIWTC2FywEWudSXHQBv1vJjhPNKRTkNQoYIrD/f7LeoUvRO
-         bGxA==
-X-Gm-Message-State: AFqh2kpBjTMBJecJ0KwvhUqbEPk1zR/y+7ED66+cw4r+cRkeIGrF0E5o
-        TaBMH1o5ufkai2krZbZxJ/0aQsIwUSs=
-X-Google-Smtp-Source: AMrXdXvoil0HbCFGhJu7V2Ra/oSUdXCn6aK0tyU7Kgn5avSVdb2q/k/4LLXzDnV4G2Uug4iGtz0qIQ==
-X-Received: by 2002:a05:6402:7c4:b0:499:376e:6b35 with SMTP id u4-20020a05640207c400b00499376e6b35mr7890600edy.25.1673353429416;
-        Tue, 10 Jan 2023 04:23:49 -0800 (PST)
-Received: from [10.176.235.173] ([137.201.254.41])
-        by smtp.gmail.com with ESMTPSA id k16-20020a05640212d000b0048b4e2aaba0sm4888067edx.34.2023.01.10.04.23.48
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 10 Jan 2023 04:23:48 -0800 (PST)
-Message-ID: <9666c23b-dba0-7025-8be7-7abbc3c0fae2@gmail.com>
-Date:   Tue, 10 Jan 2023 13:23:46 +0100
+        Tue, 10 Jan 2023 07:35:17 -0500
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A1C03DBD6;
+        Tue, 10 Jan 2023 04:35:10 -0800 (PST)
+Received: from mail02.huawei.com (unknown [172.30.67.153])
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4NrqyZ1VFqz4f3jqP;
+        Tue, 10 Jan 2023 20:35:02 +0800 (CST)
+Received: from [10.174.178.129] (unknown [10.174.178.129])
+        by APP4 (Coremail) with SMTP id gCh0CgBnHLB3W71jiJTWBQ--.49270S2;
+        Tue, 10 Jan 2023 20:35:04 +0800 (CST)
+Subject: Re: [PATCH v2 08/13] blk-mq: simplify flush check in
+ blk_mq_dispatch_rq_list
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     axboe@kernel.dk, dwagner@suse.de, hare@suse.de,
+        ming.lei@redhat.com, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, john.garry@huawei.com, jack@suse.cz
+References: <20230104142259.2673013-1-shikemeng@huaweicloud.com>
+ <20230104142259.2673013-9-shikemeng@huaweicloud.com>
+ <20230108180611.GG23466@lst.de>
+ <86677943-1c5e-370f-ba69-25e10738b67b@huaweicloud.com>
+ <20230110080923.GA11231@lst.de>
+From:   Kemeng Shi <shikemeng@huaweicloud.com>
+Message-ID: <540fdd7d-e13b-fffb-20e2-95b59bac0009@huaweicloud.com>
+Date:   Tue, 10 Jan 2023 20:35:02 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.5.0
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.4.2
-Subject: Re: [PATCH 8/8] scsi: ufs: Enable zoned write pipelining
-To:     Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Jaegeuk Kim <jaegeuk@kernel.org>,
-        Avri Altman <avri.altman@wdc.com>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Damien Le Moal <damien.lemoal@opensource.wdc.com>
-References: <20230109232738.169886-1-bvanassche@acm.org>
- <20230109232738.169886-9-bvanassche@acm.org>
-Content-Language: en-US
-From:   Bean Huo <huobean@gmail.com>
-In-Reply-To: <20230109232738.169886-9-bvanassche@acm.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+In-Reply-To: <20230110080923.GA11231@lst.de>
+Content-Type: text/plain; charset=gbk
 Content-Transfer-Encoding: 7bit
+X-CM-TRANSID: gCh0CgBnHLB3W71jiJTWBQ--.49270S2
+X-Coremail-Antispam: 1UD129KBjvJXoW3XF4fXF1rtrWUJr4DGFyxuFg_yoWxZFWrpF
+        W5Ja1ayrW8Xr4xX348Jan7uFy3ArsxtrW29rySyw1aqrW5K39aqr43Jry7AF92yr4kCw43
+        WF45Xr9Iyr45JrUanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUyKb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
+        6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+        vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7Cj
+        xVAFwI0_Cr0_Gr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I
+        0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40E
+        x7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x
+        0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lc7I2V7IY0VAS07AlzVAYIcxG8wCF04k20xvY0x0E
+        wIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E74
+        80Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0
+        I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04
+        k26cxKx2IYs7xG6rW3Jr0E3s1lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY
+        1x0267AKxVWUJVW8JbIYCTnIWIevJa73UjIFyTuYvjxUrR6zUUUUU
+X-CM-SenderInfo: 5vklyvpphqwq5kxd4v5lfo033gof0z/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Bart,
 
-So few changes to the UFS and SCSI layers! Does this require a VPD probe 
-to check if the UFS
 
-device is a Zoned block device and Zone size?
-
-Kind regards,
-
-Bean
-
-On 10.01.23 12:27 AM, Bart Van Assche wrote:
->  From the UFSHCI 4.0 specification, about the legacy (single queue) mode:
-> "The host controller always process transfer requests in-order according
-> to the order submitted to the list. In case of multiple commands with
-> single doorbell register ringing (batch mode), The dispatch order for
-> these transfer requests by host controller will base on their index in
-> the List. A transfer request with lower index value will be executed
-> before a transfer request with higher index value."
->
->  From the UFSHCI 4.0 specification, about the MCQ mode:
-> "Command Submission
-> 1. Host SW writes an Entry to SQ
-> 2. Host SW updates SQ doorbell tail pointer
->
-> Command Processing
-> 3. After fetching the Entry, Host Controller updates SQ doorbell head
->     pointer
-> 4. Host controller sends COMMAND UPIU to UFS device"
->
-> In other words, for both legacy and MCQ mode, UFS controllers are
-> required to forward commands to the UFS device in the order these
-> commands have been received from the host.
->
-> Note: for legacy mode this is only correct if the host submits one
-> command at a time. The UFS driver does this.
->
-> Cc: Martin K. Petersen <martin.petersen@oracle.com>
-> Cc: Damien Le Moal <damien.lemoal@opensource.wdc.com>
-> Cc: Avri Altman <avri.altman@wdc.com>
-> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+on 1/10/2023 4:09 PM, Christoph Hellwig wrote:
+> On Mon, Jan 09, 2023 at 10:27:33AM +0800, Kemeng Shi wrote:
+>> After we queue request[s] to one driver queue, we need to notify driver
+>> that there are no more request to the queue or driver will keep waiting
+>> for the last request to be queued and IO hung could happen.
+> 
+> Yes.
+> 
+>> Normaly, we will notify this by setting .last in struct blk_mq_queue_data
+>> along with the normal last request .rq in struct blk_mq_queue_data. The
+>> extra commit is only needed if normal last information in .last is lost.
+>> (See comment in struct blk_mq_ops for commit_rqs).
+>>
+>> The lost could occur if error happens for sending last request with .last
+>> set or error happen in middle of list and we even do not send the request
+>> with .last set.
+> 
+> Yes. So the rule is:
+> 
+>  1) did not queue everything initially scheduled to queue
+> 
+> OR
+> 
+>  2) the last attempt to queue a request failed
+> 
+> I think we need to find a way to clearly document that and that
+> make all callers match it.
+> For most this becomes a
+> 
+> 	if (ret || !list_empty(list))
+> 
+> or even just
+> 
+> 	if (ret)
+> 
+> as an error is often the only way to break out of the submission
+> loop.
+> 
+> I wonder if we need to split the queued clearing from blk_mq_commit_rqs
+> and just clear it in the existing callers, so that we can use that
+> helpers for all commits, nicely hiding the ->commit_rqs presence
+> check, and then move that call to where it is needed directly.  Something
+> like this untested patch (which needs to be split up), which also
+> makes sure we trace these calls consistently:
+Yes, using helper also makes queued check consistently. Currently, most code
+only calls commit_rqs if any request is queued, one exception is that
+blk_mq_plug_issue_direct calls commit_rqs without queued check.
+Besides, we can document the the rule before blk_mq_commit_rqs. Any caller
+in future can notice the rule and match it.
+I will send next version based on suggested helper.
+Thanks.
 > ---
->   drivers/ufs/core/ufshcd.c | 1 +
->   1 file changed, 1 insertion(+)
->
-> diff --git a/drivers/ufs/core/ufshcd.c b/drivers/ufs/core/ufshcd.c
-> index e18c9f4463ec..9198505e953b 100644
-> --- a/drivers/ufs/core/ufshcd.c
-> +++ b/drivers/ufs/core/ufshcd.c
-> @@ -5031,6 +5031,7 @@ static int ufshcd_slave_configure(struct scsi_device *sdev)
->   
->   	ufshcd_hpb_configure(hba, sdev);
->   
-> +	blk_queue_flag_set(QUEUE_FLAG_PIPELINE_ZONED_WRITES, q);
->   	blk_queue_update_dma_pad(q, PRDT_DATA_BYTE_COUNT_PAD - 1);
->   	if (hba->quirks & UFSHCD_QUIRK_ALIGN_SG_WITH_PAGE_SIZE)
->   		blk_queue_update_dma_alignment(q, PAGE_SIZE - 1);
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index c5cf0dbca1db8d..436ca56a0b7172 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -2001,6 +2001,15 @@ static void blk_mq_release_budgets(struct request_queue *q,
+>  	}
+>  }
+>  
+> +static void blk_mq_commit_rqs(struct blk_mq_hw_ctx *hctx, int queued,
+> +			      bool from_schedule)
+> +{
+> +	if (queued && hctx->queue->mq_ops->commit_rqs) {
+> +		trace_block_unplug(hctx->queue, queued, !from_schedule);
+> +		hctx->queue->mq_ops->commit_rqs(hctx);
+> +	}
+> +}
+> +
+>  /*
+>   * Returns true if we did some work AND can potentially do more.
+>   */
+> @@ -2082,12 +2091,9 @@ bool blk_mq_dispatch_rq_list(struct blk_mq_hw_ctx *hctx, struct list_head *list,
+>  	if (!list_empty(&zone_list))
+>  		list_splice_tail_init(&zone_list, list);
+>  
+> -	/* If we didn't flush the entire list, we could have told the driver
+> -	 * there was more coming, but that turned out to be a lie.
+> -	 */
+> -	if ((!list_empty(list) || errors || needs_resource ||
+> -	     ret == BLK_STS_DEV_RESOURCE) && q->mq_ops->commit_rqs && queued)
+> -		q->mq_ops->commit_rqs(hctx);
+> +	if (!list_empty(list) || ret)
+> +		blk_mq_commit_rqs(hctx, queued, false);
+> +
+>  	/*
+>  	 * Any items that need requeuing? Stuff them into hctx->dispatch,
+>  	 * that is where we will continue on next queue run.
+> @@ -2548,16 +2554,6 @@ void blk_mq_insert_requests(struct blk_mq_hw_ctx *hctx, struct blk_mq_ctx *ctx,
+>  	spin_unlock(&ctx->lock);
+>  }
+>  
+> -static void blk_mq_commit_rqs(struct blk_mq_hw_ctx *hctx, int *queued,
+> -			      bool from_schedule)
+> -{
+> -	if (hctx->queue->mq_ops->commit_rqs) {
+> -		trace_block_unplug(hctx->queue, *queued, !from_schedule);
+> -		hctx->queue->mq_ops->commit_rqs(hctx);
+> -	}
+> -	*queued = 0;
+> -}
+> -
+>  static void blk_mq_bio_to_request(struct request *rq, struct bio *bio,
+>  		unsigned int nr_segs)
+>  {
+> @@ -2684,17 +2680,17 @@ static blk_status_t blk_mq_request_issue_directly(struct request *rq, bool last)
+>  static void blk_mq_plug_issue_direct(struct blk_plug *plug, bool from_schedule)
+>  {
+>  	struct blk_mq_hw_ctx *hctx = NULL;
+> +	blk_status_t ret = BLK_STS_OK;
+>  	struct request *rq;
+>  	int queued = 0;
+> -	int errors = 0;
+>  
+>  	while ((rq = rq_list_pop(&plug->mq_list))) {
+>  		bool last = rq_list_empty(plug->mq_list);
+> -		blk_status_t ret;
+>  
+>  		if (hctx != rq->mq_hctx) {
+>  			if (hctx)
+> -				blk_mq_commit_rqs(hctx, &queued, from_schedule);
+> +				blk_mq_commit_rqs(hctx, queued, from_schedule);
+> +			queued = 0;
+>  			hctx = rq->mq_hctx;
+>  		}
+>  
+> @@ -2706,21 +2702,15 @@ static void blk_mq_plug_issue_direct(struct blk_plug *plug, bool from_schedule)
+>  		case BLK_STS_RESOURCE:
+>  		case BLK_STS_DEV_RESOURCE:
+>  			blk_mq_request_bypass_insert(rq, false, true);
+> -			blk_mq_commit_rqs(hctx, &queued, from_schedule);
+> -			return;
+> +			goto out;
+>  		default:
+>  			blk_mq_end_request(rq, ret);
+> -			errors++;
+>  			break;
+>  		}
+>  	}
+> -
+> -	/*
+> -	 * If we didn't flush the entire list, we could have told the driver
+> -	 * there was more coming, but that turned out to be a lie.
+> -	 */
+> -	if (errors)
+> -		blk_mq_commit_rqs(hctx, &queued, from_schedule);
+> +out:
+> +	if (ret)
+> +		blk_mq_commit_rqs(hctx, queued, from_schedule);
+>  }
+>  
+>  static void __blk_mq_flush_plug_list(struct request_queue *q,
+> @@ -2804,37 +2794,33 @@ void blk_mq_flush_plug_list(struct blk_plug *plug, bool from_schedule)
+>  void blk_mq_try_issue_list_directly(struct blk_mq_hw_ctx *hctx,
+>  		struct list_head *list)
+>  {
+> +	blk_status_t ret = BLK_STS_OK;
+> +	struct request *rq;
+>  	int queued = 0;
+> -	int errors = 0;
+> -
+> -	while (!list_empty(list)) {
+> -		blk_status_t ret;
+> -		struct request *rq = list_first_entry(list, struct request,
+> -				queuelist);
+> +	bool last;
+>  
+> +	while ((rq = list_first_entry_or_null(list, struct request,
+> +			queuelist))) {
+>  		list_del_init(&rq->queuelist);
+> -		ret = blk_mq_request_issue_directly(rq, list_empty(list));
+> -		if (ret != BLK_STS_OK) {
+> -			errors++;
+> -			if (ret == BLK_STS_RESOURCE ||
+> -					ret == BLK_STS_DEV_RESOURCE) {
+> -				blk_mq_request_bypass_insert(rq, false,
+> -							list_empty(list));
+> -				break;
+> -			}
+> -			blk_mq_end_request(rq, ret);
+> -		} else
+> +		last = list_empty(list);
+> +
+> +		ret = blk_mq_request_issue_directly(rq, last);
+> +		switch (ret) {
+> +		case BLK_STS_OK:
+>  			queued++;
+> +			break;
+> +		case BLK_STS_RESOURCE:
+> +		case BLK_STS_DEV_RESOURCE:
+> +			blk_mq_request_bypass_insert(rq, false, last);
+> +			goto out;
+> +		default:
+> +			blk_mq_end_request(rq, ret);
+> +			break;
+> +		}
+>  	}
+> -
+> -	/*
+> -	 * If we didn't flush the entire list, we could have told
+> -	 * the driver there was more coming, but that turned out to
+> -	 * be a lie.
+> -	 */
+> -	if ((!list_empty(list) || errors) &&
+> -	     hctx->queue->mq_ops->commit_rqs && queued)
+> -		hctx->queue->mq_ops->commit_rqs(hctx);
+> +out:
+> +	if (ret)
+> +		blk_mq_commit_rqs(hctx, queued, false);
+>  }
+>  
+>  static bool blk_mq_attempt_bio_merge(struct request_queue *q,
+> 
+
+-- 
+Best wishes
+Kemeng Shi
+
