@@ -2,177 +2,138 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4F78C54EBC
-	for <linux-block@archiver.kernel.org>; Tue, 10 Jan 2023 13:27:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 547BBC54EBC
+	for <linux-block@archiver.kernel.org>; Tue, 10 Jan 2023 13:56:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233589AbjAJN1l (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 10 Jan 2023 08:27:41 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53356 "EHLO
+        id S231767AbjAJN4B (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 10 Jan 2023 08:56:01 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44858 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233134AbjAJN1S (ORCPT
+        with ESMTP id S238610AbjAJNzk (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 10 Jan 2023 08:27:18 -0500
-Received: from esa5.hgst.iphmx.com (esa5.hgst.iphmx.com [216.71.153.144])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F9A5BF1
-        for <linux-block@vger.kernel.org>; Tue, 10 Jan 2023 05:27:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1673357237; x=1704893237;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=/IW0E0zt4+oK414/Fnxtbs0u089eGYcEATsrMArum+s=;
-  b=bkI3ft/fidq98NUPEj9ie3beEEFrGC94fPQfrd+VHWlc1GdqcC+7jFOO
-   j32b4qaWZYaFJ1bjgjJ7INVSkI/2airpvy1o9CxQm30AOw5y5B9MBL0eb
-   e2eFNdQt40tM0lPIU1xvHfm2iLm450w3oc8XrYDPXca4MNxxYEx49BAFC
-   gxgrsD0x9DGcyJLcIfshokpcpRBp+5NH41pm47B13HUuPo0ZVB7CYm1/g
-   htqtrKdW9o4ERd9euwLkHq9We0Goqcq+eXLtDspgX2AvrC7u8K+ao0a4l
-   brGUrgovh9Mw/nN4LA/LTntSNpiuJaUvxvq4b1ROQNoCFR9ng0hFmWIS/
-   g==;
-X-IronPort-AV: E=Sophos;i="5.96,315,1665417600"; 
-   d="scan'208";a="220321122"
-Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 10 Jan 2023 21:27:17 +0800
-IronPort-SDR: jQJ/VrSkRTnU9C2URA3PNbF/eA94szeJbCJYFb1mi/cwjJca7dni3Bhm4BHYWlpyA4kgrz0H8n
- n73wojJC2Py1gk0qoEpFo3gv0D69Tbqr58s6/WwmRH0cMb7qX63HSotz1RQBmpWy5WI7xwwFTi
- XGy3ZOCBnRjUds61q2SHvQYRE/iQy2THGLmvMCWtecQS0Q6V1U/YHti/70SCmT3p+WjqdE7LUY
- uXz1ET0M4SXv4FayvwAinUQ1p2ZCr3rbhVA6yB4BW1wKgDPHdW9yMuaYR9xLKikkpKlxOkz/bA
- 8os=
-Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 10 Jan 2023 04:39:23 -0800
-IronPort-SDR: i2lIOqKg1zAXniQmaAao+Hqt2n05DmXKmY2BZgWReY6Sli6E5EAn5qORI8ko9pQADvp5vhX1VV
- 83iOHSzKxFDHzkUQ+r7sES0d34RN9hf7x/mgKmMYtt8dsT5QG63wIVluPR7fhvMd1NYHjh5Pjc
- swn5TSiUzD7vWBcUJvDFJ5G+k3mJjp1mO8VFj6Tp5gzYhzkeeD67UShS/pRGQ3R7T8T7C5sypv
- 3JLsI21lI+MeopyPVXwcLxnFfCv4mZpqm3SzoBnBml/ZdZUfC8vsykgwVteCSSbhzxa846/vKX
- pIc=
-WDCIronportException: Internal
-Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
-  by uls-op-cesaip02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 10 Jan 2023 05:27:17 -0800
-Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4Nrs6s0wYqz1RwqL
-        for <linux-block@vger.kernel.org>; Tue, 10 Jan 2023 05:27:17 -0800 (PST)
-Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
-        reason="pass (just generated, assumed good)"
-        header.d=opensource.wdc.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
-        opensource.wdc.com; h=content-transfer-encoding:mime-version
-        :references:in-reply-to:x-mailer:message-id:date:subject:to
-        :from; s=dkim; t=1673357236; x=1675949237; bh=/IW0E0zt4+oK414/Fn
-        xtbs0u089eGYcEATsrMArum+s=; b=MK2CxU/ZEzcf1au7Z2bvfttpHm9I2cNPKw
-        PX3BHXPNgZKZpgwSJeIfUy/QcQySlZifexjcEvrRK2iXLqDxIW/2GSGxjkeEz5XY
-        Z7trTCPKm7odrhLWbXpE3MzZA3wmGP35cZKlyuynDg4rUxs2bZPTI9vIq+Bjv8By
-        Pz76YAq4J9DRfduLwDSJQ6pQpA+MJuH4OxsF0ycUPSBrUzF4V3J7HhBzbMRnjwpF
-        Ui1d5DboQzqvGp9K5HoWi7j6m970ox8JCBOjuR/LsyWkPjRPs9376oQqrdIPizSn
-        VLoGec4/49c432j9S88hHcx2xedj+Tq2a4QwF1P80oIlRH7e4GOQ==
-X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
-Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
-        by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id IBc6y5x1qkRp for <linux-block@vger.kernel.org>;
-        Tue, 10 Jan 2023 05:27:16 -0800 (PST)
-Received: from washi.fujisawa.hgst.com (washi.fujisawa.hgst.com [10.149.53.254])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4Nrs6q5SHhz1RvTp;
-        Tue, 10 Jan 2023 05:27:15 -0800 (PST)
-From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
-To:     linux-ide@vger.kernel.org, linux-block@vger.kernel.org,
-        Jens Axboe <axboe@kernel.dk>
-Cc:     "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Christoph Hellwig <hch@lst.de>
-Subject: [PATCH v9 3/6] ata: libata: Rename and cleanup ata_rwcmd_protocol()
-Date:   Tue, 10 Jan 2023 22:27:07 +0900
-Message-Id: <20230110132710.252015-4-damien.lemoal@opensource.wdc.com>
-X-Mailer: git-send-email 2.39.0
-In-Reply-To: <20230110132710.252015-1-damien.lemoal@opensource.wdc.com>
-References: <20230110132710.252015-1-damien.lemoal@opensource.wdc.com>
+        Tue, 10 Jan 2023 08:55:40 -0500
+Received: from NAM02-SN1-obe.outbound.protection.outlook.com (mail-sn1nam02on2058.outbound.protection.outlook.com [40.107.96.58])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30ABC921CC;
+        Tue, 10 Jan 2023 05:53:48 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=f/909idTsQbLckDWKKsok/5PomHtzsmBjE84zJFlrZ9u4QlaGFKVzrauISBtezjQh5057Ev+U21mQIu2X/mW0hOn4ermHHC47hMhq6J1pAyAdvuq14+veFNRkfoToMQ6dWFNhC2fZ3NerOQn2LCY7s1Cahj29eXfbdFoKTYUERTEQFBB+39PxwTOpTKCroQ4t3iCtg+/NZWASR6h1zfqP6EAA3t4Ds8iqyaRKXxEO+sf6cgo6Q1l5Lm9ZpPNSJzkS2JQE4Lc/FEbudBX+lE9L0VLbiS9UTIYTm5pEDQ0vm3m/G8KAIGT1m2o2u4IgjTWn1u+7w+L4oX2ozR8E611Bw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=L8EM953M/zgLAt1OaeSXbwzWc4O+1o0A8sKM26V4row=;
+ b=nS/nlAH/90fNPhYkmHxVurftxlXffjuCwT61uRIbp2+Nz6hGr0J0xYhSuT24CLBxSPHsOdrJs+Z8Y4nswbOPchUCf97WNyjHeHhctwVjO2pxyB46L8wTT9AusGcII1QO5Q0jIzJSGq0xWSu+s43kw1pFAMlJlc7YkaKxtM2Q6gjT5/uZ/X38C+ZgsU5Iv5YgTM6GgvWF0QrRU0VgcoGf+FwsebKkIDz04Yfc+tmq83Y3Cfe9en9RSbc9A/9BsxpdLUFJ4ybtlPYDMOg1WS/7JWWseprFnQk8xzrKGoQ5DzdcPLD8YsQeFEgmrw6zAUCnnEPYxIsGLy5mYOpwcMEoDw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=L8EM953M/zgLAt1OaeSXbwzWc4O+1o0A8sKM26V4row=;
+ b=Sn4tqINNKnIPXsjFmpmCqlnytmZ1Vh6HIwgVoWlQkhxrLjAOESlOeHs8FF+5I3bMRms9Ms7qnfxTQ7nU+7Hybhc9/GK+9UPBsS4Xv4rOt8L82sS8qgytN8K0dTbMQYV3bKxZZMUjRpO04OLl4KoQNbsnMoNLnKPBMC0L5/HwzF1uzKCM6XE1FsDYlGLCqUWrBLXLVRe7s+flBgwsr6Ps5+bkuyDDQrbr1egs8CrWePKD7iM2Tx9OTCybiISrdpWVyeuOzTI/7EqKyH4wMQyzyztFmVc40L+Gr1MLNHgB3QJGEwB+LwebVmWWOPLPM6d7DPp8qk/wLpACsvFDoVmLjw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by IA0PR12MB7752.namprd12.prod.outlook.com (2603:10b6:208:431::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5986.18; Tue, 10 Jan
+ 2023 13:53:36 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::f8b0:df13:5f8d:12a]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::f8b0:df13:5f8d:12a%8]) with mapi id 15.20.5986.018; Tue, 10 Jan 2023
+ 13:53:36 +0000
+Date:   Tue, 10 Jan 2023 09:53:35 -0400
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Yishai Hadas <yishaih@nvidia.com>
+Cc:     Matthew Wilcox <willy@infradead.org>, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-mm@kvack.org, axboe@kernel.dk,
+        logang@deltatee.com, hch@lst.de, alex.williamson@redhat.com,
+        leonro@nvidia.com, maorg@nvidia.com
+Subject: Re: [PATCH] lib/scatterlist: Fix to calculate the last_pg properly
+Message-ID: <Y71t3yyFvdLXM+qd@nvidia.com>
+References: <20230109144701.83021-1-yishaih@nvidia.com>
+ <Y7zyyTxdoJulq7OD@casper.infradead.org>
+ <a1f3b6ad-7173-70c7-4361-d01f9af1b7d6@nvidia.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <a1f3b6ad-7173-70c7-4361-d01f9af1b7d6@nvidia.com>
+X-ClientProxiedBy: MN2PR07CA0029.namprd07.prod.outlook.com
+ (2603:10b6:208:1a0::39) To LV2PR12MB5869.namprd12.prod.outlook.com
+ (2603:10b6:408:176::16)
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|IA0PR12MB7752:EE_
+X-MS-Office365-Filtering-Correlation-Id: c1a4e4fa-34be-48b1-80b3-08daf31211ef
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: RgWz9+xfz9Abo9Dp0ub6X10ytJWKf5SS6XP4tIIjzPUHPcJ/GOeouQTbZmGGAqTLWhNgDovP/9GWJTSEdTRGvi83LgQ9djxK3dXwlAVrrjVXS2DMHWdY03EjDqnUdY9JkD5gxGbSJ0B16zjIaUVG3DxVtoc0XP4X1C6DoW0xLxW7bcs/QrxrMpAz7H5G+rNUKQ6JxcSAdlVdri6z8/8cpgclQtgkqlr/JeU+olUq5PzhgCi9KnfoNXAFR9OGli+UdawcHCnCxrLlgtM24zKlftprhO9eLouBWLg6dU6iI6b0/lELZAs65oa7FUcsl5Wq2KKs2+SzQVOi1XXoHqJbJGNL944nv/8h5edqr8gND63r2R5OfD6V20R9Px+EdMfj3O8graYIzWR82lohjYeveMOdQMeBjlr65dc37GhtqYatWtw3j9BrnDmfMzxfQBUHOyvubIuXgdrG6bfewhBWibXNIU9LocHs1HKHDjeRtDUPu2DPwXijXdgoV42/iQHtQr37E2XJmwlowT4JrMKNf2RH6gHPc8c2obvZkyj4weDLXU0/TIViDtRm4Akph4mMZzo9a11X3piImEjYEkT24Vwe8vF2ctaj4uVgTW6OcmOZwYhRrtfUWA3e4+RDpxJz5WQwQArrS7PrrCLNJXFul5WJInv7mF2x8/ZauPqRiYbxjx0DbOEFG3OHg08OLJCQ
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(366004)(396003)(136003)(39860400002)(346002)(376002)(451199015)(4744005)(316002)(5660300002)(26005)(6512007)(186003)(478600001)(6486002)(2616005)(41300700001)(66946007)(6636002)(4326008)(66556008)(66476007)(8676002)(6862004)(8936002)(86362001)(37006003)(36756003)(107886003)(53546011)(6506007)(38100700002)(2906002)(67856001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?g910uR3fUeLqeOUgKfr9YNuz24o4DyivjBhP9COWGrGCOZQI9RxYWkY/Cy/2?=
+ =?us-ascii?Q?AH8moHYdzToXcOqPb22nBBuVqIVLHpUs++v6MliXuDXltnCr2E8MhUhIUMRA?=
+ =?us-ascii?Q?LvnXsc8ANAAl2WwXpa0JwKaapzVI74TXDNkx2a71lYIpw7mOJz0fNNlkPZyO?=
+ =?us-ascii?Q?BmbszyKJ/+sn1LhmULqNesBdzSZ0mAI6H0mJHy4ahhFa3TqVCeJfsA+dRM6m?=
+ =?us-ascii?Q?59BXfDu4UDA05IJf6gnqV9L4k2Gm2QOQqcbsuo667i6qq5ejLsV+nGk8pz1f?=
+ =?us-ascii?Q?UNV+JGtES310cqKNT/2nRFcGbyT6JbcowY/ttNus7WB1gQvsk/9pVvONsJmh?=
+ =?us-ascii?Q?LW318tzEc2mIxHn8lDcg+VkeeE7lGeH4mVv8ksp6PDI9Y/VnD3q02XFlQIgq?=
+ =?us-ascii?Q?hl9UILuChNIe54Hb4/Li5oHoQxORMUGYwfyQVnRdvW68D8uEavVlrnVKuTHn?=
+ =?us-ascii?Q?F/WJjdUneEEhCmvC2VzQmdwEws+H/zAN3isGae1pyyLQljWuy0W5zI9HqgpU?=
+ =?us-ascii?Q?7xHH/WnHE2cTQpwveS0eP6XmAagxWoFQ/uLvAAvdooebB9TzosCPcF7hHAiI?=
+ =?us-ascii?Q?SQn86K6NMQsEFRREvNK8LrBeF5c8jwsoAh1xq2X54RxDrBM/qCXV/HCfkD9s?=
+ =?us-ascii?Q?lkpI7gmR/Mjyzjx3L0hxJE3j9o0h3X7KuWBAXHtwG4Rnlx8zE5NDYQ2YLMx3?=
+ =?us-ascii?Q?k7NOD1pkUoycsBPrcAtLVqfBTEmXL+gTX1rlg6aCVVdTf8kPc4/B1ULcBEQQ?=
+ =?us-ascii?Q?1EEATZbkm4DTH4KDdZaoa9zzrFtmcEO5nD7MWrAugnwfHZgjMJjk29pL39ZK?=
+ =?us-ascii?Q?hYFqKDxPj0BXiwZaSDqHSa6g+TJ0UdaTvC0WTp0CyVdUZ6hc7e6vIxkHv5KX?=
+ =?us-ascii?Q?zRgYIVlK8xMBWravYTnp/9BMx0kq8TSMyNkjb6yk2WU9pOZH8idgSDG7cR5l?=
+ =?us-ascii?Q?sb1GYA17eypz3Bwm/FO1n/D14ouE4Jg7yJiMVwx7J6lQN+rNkJowk2HCIOxn?=
+ =?us-ascii?Q?3DX35ipBxnpRud+5A5gDx60Ws70iJ8GKJk50iS3K7etKmgPiW6U0YRkYMvmd?=
+ =?us-ascii?Q?3n9e/+3B0GxR9K/isfYxP1BDsj9Mzn/rTQDxgXOZp18sMQqCqIoSSDVKWIn6?=
+ =?us-ascii?Q?0UFKAvYMZ3ShS1jUfJ4ePllhTAZqgemFOOg6sjJGrRXhCBxIDOjLR1zBevRn?=
+ =?us-ascii?Q?dSa6oI/Qkr4/IQcA64xN3F6tonl7EydzmpBxlnCTZfM4YDyd5TJAiwsEdSrh?=
+ =?us-ascii?Q?nOLVKrPtzkWpyYghzL6WeeufFEaYFVJTHd3lHtEHTtmpfPgE30a8sILpkufg?=
+ =?us-ascii?Q?EIwc5kgyf7Vwf6vAfy43P4N82MfA08aJyORXEorU3FX2xfyJ++YJeDXf7s7Z?=
+ =?us-ascii?Q?vMazM482/j40zDUgwVEiXktH/S+N350rIWfe5J8ajVtV5+m4yclkCveYdEhU?=
+ =?us-ascii?Q?DI7X0ecC3OVz+AnS4EdQQLwzjhrMBh0+FjHC4PacVx9slTt+1bQbn1WOaFWw?=
+ =?us-ascii?Q?lZypiDWpG1osE0CDF6Gm7ANkyUOwbnxhpPoMl+qorxxAAT1xGlym4NYqqB38?=
+ =?us-ascii?Q?5NfAhjpexUCSU2aBbRM7l3qWzC3W9f/7w38kPjb4?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c1a4e4fa-34be-48b1-80b3-08daf31211ef
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Jan 2023 13:53:36.4559
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: SiUgJ3V2ua0y6vGLQo+i1AyiI17w/7ihzny5OTNBBrb0uyinUd2WqzRammqgO+MB
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR12MB7752
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Rename ata_rwcmd_protocol() to ata_set_rwcmd_protocol() to better
-reflect the fact that this function sets a task file command and
-protocol. The arguments order is also reversed and the function return
-type changed to a bool to indicate if the command and protocol were set
-correctly (instead of returning a completely arbitrary "-1" value.
+On Tue, Jan 10, 2023 at 10:01:53AM +0200, Yishai Hadas wrote:
+> On 10/01/2023 7:08, Matthew Wilcox wrote:
+> > On Mon, Jan 09, 2023 at 04:47:01PM +0200, Yishai Hadas wrote:
+> > >   	if (sgt_append->prv) {
+> > > +		unsigned long paddr =
+> > > +			(page_to_pfn(sg_page(sgt_append->prv)) * PAGE_SIZE +
+> > 1. page_to_pfn() * PAGE_SIZE is spelled page_to_phys()
+> > 
+> > 2. physical addresses have type phys_addr_t.  Oh, wait, paddr isn't a
+> > physical address, it's a pfn because you divide by PAGE_SIZE at the end.
+> > But you will get truncation on 32-bit, because page_to_pfn() has type
+> > unsigned long.  Anyway, this shouldn't be called paddr.  Maybe last_pfn
+> > or something?
+> > 
+> > > +			 sgt_append->prv->offset + sgt_append->prv->length) /
+> > > +			PAGE_SIZE;
+> 
+> In this area of the patch I just reverted to what we had in 6.1 [1] where we
+> were good.
+> 
+> I can send V1 and replace the 'paddr' to be called 'last_pfn' if it's really
+> needed.
 
-Signed-off-by: Damien Le Moal <damien.lemoal@opensource.wdc.com>
-Reviewed-by: Hannes Reinecke <hare@suse.de>
-Reviewed-by: Chaitanya Kulkarni <kch@nvidia.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
-Reviewed-by: Niklas Cassel <niklas.cassel@wdc.com>
----
- drivers/ata/libata-core.c | 28 +++++++++++++++-------------
- 1 file changed, 15 insertions(+), 13 deletions(-)
+Please change it as Matthew describes so it is clearer
 
-diff --git a/drivers/ata/libata-core.c b/drivers/ata/libata-core.c
-index 6b03bebcde50..1c16342dda08 100644
---- a/drivers/ata/libata-core.c
-+++ b/drivers/ata/libata-core.c
-@@ -574,17 +574,18 @@ static const u8 ata_rw_cmds[] =3D {
- };
-=20
- /**
-- *	ata_rwcmd_protocol - set taskfile r/w commands and protocol
-- *	@tf: command to examine and configure
-- *	@dev: device tf belongs to
-+ *	ata_set_rwcmd_protocol - set taskfile r/w command and protocol
-+ *	@dev: target device for the taskfile
-+ *	@tf: taskfile to examine and configure
-  *
-- *	Examine the device configuration and tf->flags to calculate
-- *	the proper read/write commands and protocol to use.
-+ *	Examine the device configuration and tf->flags to determine
-+ *	the proper read/write command and protocol to use for @tf.
-  *
-  *	LOCKING:
-  *	caller.
-  */
--static int ata_rwcmd_protocol(struct ata_taskfile *tf, struct ata_device=
- *dev)
-+static bool ata_set_rwcmd_protocol(struct ata_device *dev,
-+				   struct ata_taskfile *tf)
- {
- 	u8 cmd;
-=20
-@@ -607,11 +608,12 @@ static int ata_rwcmd_protocol(struct ata_taskfile *=
-tf, struct ata_device *dev)
- 	}
-=20
- 	cmd =3D ata_rw_cmds[index + fua + lba48 + write];
--	if (cmd) {
--		tf->command =3D cmd;
--		return 0;
--	}
--	return -1;
-+	if (!cmd)
-+		return false;
-+
-+	tf->command =3D cmd;
-+
-+	return true;
- }
-=20
- /**
-@@ -744,7 +746,7 @@ int ata_build_rw_tf(struct ata_queued_cmd *qc, u64 bl=
-ock, u32 n_block,
- 			/* request too large even for LBA48 */
- 			return -ERANGE;
-=20
--		if (unlikely(ata_rwcmd_protocol(tf, dev) < 0))
-+		if (unlikely(!ata_set_rwcmd_protocol(dev, tf)))
- 			return -EINVAL;
-=20
- 		tf->nsect =3D n_block & 0xff;
-@@ -762,7 +764,7 @@ int ata_build_rw_tf(struct ata_queued_cmd *qc, u64 bl=
-ock, u32 n_block,
- 		if (!lba_28_ok(block, n_block))
- 			return -ERANGE;
-=20
--		if (unlikely(ata_rwcmd_protocol(tf, dev) < 0))
-+		if (unlikely(!ata_set_rwcmd_protocol(dev, tf)))
- 			return -EINVAL;
-=20
- 		/* Convert LBA to CHS */
---=20
-2.39.0
-
+Jason
