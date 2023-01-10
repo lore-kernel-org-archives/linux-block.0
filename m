@@ -2,101 +2,81 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F187C54EBC
-	for <linux-block@archiver.kernel.org>; Tue, 10 Jan 2023 16:25:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 40377C54EBC
+	for <linux-block@archiver.kernel.org>; Tue, 10 Jan 2023 17:41:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232868AbjAJQYo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 10 Jan 2023 11:24:44 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45272 "EHLO
+        id S234635AbjAJRlg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 10 Jan 2023 12:41:36 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60920 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238799AbjAJQYj (ORCPT
+        with ESMTP id S234774AbjAJRle (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 10 Jan 2023 11:24:39 -0500
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0BB9E73E04;
-        Tue, 10 Jan 2023 08:24:38 -0800 (PST)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 3363333D84;
-        Tue, 10 Jan 2023 16:24:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1673367876; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=d/5pDvEAH6ziY1DIANvMSCuLk/bLD0B7fvx7KbhcUkA=;
-        b=juc7gNyxPdrxpjyRom5zMdxhfaprj9rnRosS1A35qlC/Qhp5Il7NEMhJ9PpDC7YAW3Sc08
-        RVVEcKk+UMx9ECodrCSpxeoACzIOUnOEU9W7e/z7EBTBJI8t5K/i0HXaPcAYY3OFUBOQRv
-        +nS6CY6I4OCvkxAtPRq1Fac5O+dU40I=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1673367876;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=d/5pDvEAH6ziY1DIANvMSCuLk/bLD0B7fvx7KbhcUkA=;
-        b=P29X1PbKWbwEh5FvGpKgC/w12mnwrTRRG0r3i6mQZfCdmZIFEi4Hy7zgE1b5Ln/gnE4zdB
-        zhZo++lYIJ2zdKAg==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 161C01358A;
-        Tue, 10 Jan 2023 16:24:36 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id W2twBESRvWN8IQAAMHmgww
-        (envelope-from <hare@suse.de>); Tue, 10 Jan 2023 16:24:36 +0000
-Message-ID: <d3b707e6-3f17-6e8a-739a-bde53a5a9e99@suse.de>
-Date:   Tue, 10 Jan 2023 17:24:35 +0100
+        Tue, 10 Jan 2023 12:41:34 -0500
+Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 29DB343192
+        for <linux-block@vger.kernel.org>; Tue, 10 Jan 2023 09:41:22 -0800 (PST)
+Received: by mail-pf1-f179.google.com with SMTP id s3so6901466pfd.12
+        for <linux-block@vger.kernel.org>; Tue, 10 Jan 2023 09:41:22 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=wpdwvCCSdX1jZMp+HTfKx/go71aChAkI+zbDrzqgpAo=;
+        b=4H4Nx0xUJ/4CUDaX0PWn2eRTjPkEtWdcFg0a7WiWZWAo8AgsdfxnTizLLPV+8Cp7pg
+         A3CsOkrCCZ0LiVvscAJu7VtLh/sqQ9kpME79hC1Tm/RkIUp5IpgG2h9x9czBkBFdGh7d
+         AAA8Lmb7K6xlm6+xd3+jFU4IbaqWtxQ+9dXiGItnlvmAp22NPdHhDMZDkj1pw/Q3Cq5n
+         bVbWzFeiCXi1jbbIhGQrdNkXp6lGwW+VGxR3HdkGlCEN0nqMTr6mCPr/I7DfDtS5ubl9
+         dHW0cxztR4jkcDm2sZoI1D1CBm9rPHdB8ofpR/Gmr2NPITCNvfzyMvG8hmkSlqEOVl69
+         4ewQ==
+X-Gm-Message-State: AFqh2kpZrIgOqibTJ3RJ+lR/NzGUxM2/YAYn9lkP7DOJzWPyayQZxqhu
+        7B75FHMsA6ryAJDUR8Y+oVU=
+X-Google-Smtp-Source: AMrXdXsEXSX/zfy7O+1FQ4yM8jcUG7kaS5uPcmG89tiKuEQqG1yeO3BL6BWV5ZLN3DzBZx1MPZrV0g==
+X-Received: by 2002:a05:6a00:1c82:b0:587:4171:30c9 with SMTP id y2-20020a056a001c8200b00587417130c9mr9121630pfw.18.1673372481472;
+        Tue, 10 Jan 2023 09:41:21 -0800 (PST)
+Received: from ?IPV6:2620:15c:211:201:aeba:fdb:7986:a5f9? ([2620:15c:211:201:aeba:fdb:7986:a5f9])
+        by smtp.gmail.com with ESMTPSA id i8-20020a056a00004800b00576145a9bd0sm8333994pfk.127.2023.01.10.09.41.20
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 10 Jan 2023 09:41:20 -0800 (PST)
+Message-ID: <a88ac514-09a2-09c2-488e-69237c612fc2@acm.org>
+Date:   Tue, 10 Jan 2023 09:41:19 -0800
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.5.1
-Subject: Re: [PATCH v8 5/6] ata: libata: Fix FUA handling in ata_build_rw_tf()
+Subject: Re: [PATCH 8/8] scsi: ufs: Enable zoned write pipelining
 Content-Language: en-US
-To:     Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-        linux-ide@vger.kernel.org, linux-block@vger.kernel.org,
-        Jens Axboe <axboe@kernel.dk>
-Cc:     "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Christoph Hellwig <hch@lst.de>
-References: <20230110131503.251712-1-damien.lemoal@opensource.wdc.com>
- <20230110131503.251712-6-damien.lemoal@opensource.wdc.com>
-From:   Hannes Reinecke <hare@suse.de>
-In-Reply-To: <20230110131503.251712-6-damien.lemoal@opensource.wdc.com>
+To:     Bean Huo <huobean@gmail.com>, Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Jaegeuk Kim <jaegeuk@kernel.org>,
+        Avri Altman <avri.altman@wdc.com>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Damien Le Moal <damien.lemoal@opensource.wdc.com>
+References: <20230109232738.169886-1-bvanassche@acm.org>
+ <20230109232738.169886-9-bvanassche@acm.org>
+ <9666c23b-dba0-7025-8be7-7abbc3c0fae2@gmail.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <9666c23b-dba0-7025-8be7-7abbc3c0fae2@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/10/23 14:15, Damien Le Moal wrote:
-> If a user issues a write command with the FUA bit set for a device with
-> NCQ support disabled (that is, the device queue depth was set to 1), the
-> LBA 48 command WRITE DMA FUA EXT must be used. However,
-> ata_build_rw_tf() ignores this and first tests if LBA 28 can be used
-> based on the write command sector and number of blocks. That is, for
-> small FUA writes at low LBAs, ata_rwcmd_protocol() will cause the write
-> to fail.
-> 
-> Fix this by preventing the use of LBA 28 for any FUA write request.
-> 
-> Given that the WRITE MULTI FUA EXT command is marked as obsolete in the
-> ATA specification since ACS-3 (published in 2013), remove the
-> ATA_CMD_WRITE_MULTI_FUA_EXT command from the ata_rw_cmds array.
-> 
-> Signed-off-by: Damien Le Moal <damien.lemoal@opensource.wdc.com>
-> Reviewed-by: Christoph Hellwig <hch@lst.de>
-> Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
-> Reviewed-by: Niklas Cassel <niklas.cassel@wdc.com>
-> ---
->   drivers/ata/libata-core.c | 8 +++++---
->   1 file changed, 5 insertions(+), 3 deletions(-)
-> 
-Reviewed-by: Hannes Reinecke <hare@suse.de>
+On 1/10/23 04:23, Bean Huo wrote:
+> So few changes to the UFS and SCSI layers! Does this require a VPD probe 
+> to check if the UFS device is a Zoned block device and Zone size?
 
-Cheers,
+Hi Bean,
 
-Hannes
+I think it is safe to set QUEUE_FLAG_PIPELINE_ZONED_WRITES for any UFS 
+logical unit - zoned or not. The changes in the SCSI disk (sd) driver 
+are such that the number of retries is only adjusted for zoned logical 
+units. Only zoned logical units should report the "UNALIGNED WRITE 
+COMMAND" sense code.
+
+As you may have noticed, Damien Le Moal plans to implement a new 
+approach - a single queue per zoned logical unit for all write commands.
+
+Thanks,
+
+Bart.
 
