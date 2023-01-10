@@ -2,138 +2,178 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 547BBC54EBC
-	for <linux-block@archiver.kernel.org>; Tue, 10 Jan 2023 13:56:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E0B63C54EBC
+	for <linux-block@archiver.kernel.org>; Tue, 10 Jan 2023 14:36:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231767AbjAJN4B (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 10 Jan 2023 08:56:01 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44858 "EHLO
+        id S234273AbjAJOgp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 10 Jan 2023 09:36:45 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52318 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238610AbjAJNzk (ORCPT
+        with ESMTP id S232301AbjAJOgo (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 10 Jan 2023 08:55:40 -0500
-Received: from NAM02-SN1-obe.outbound.protection.outlook.com (mail-sn1nam02on2058.outbound.protection.outlook.com [40.107.96.58])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30ABC921CC;
-        Tue, 10 Jan 2023 05:53:48 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=f/909idTsQbLckDWKKsok/5PomHtzsmBjE84zJFlrZ9u4QlaGFKVzrauISBtezjQh5057Ev+U21mQIu2X/mW0hOn4ermHHC47hMhq6J1pAyAdvuq14+veFNRkfoToMQ6dWFNhC2fZ3NerOQn2LCY7s1Cahj29eXfbdFoKTYUERTEQFBB+39PxwTOpTKCroQ4t3iCtg+/NZWASR6h1zfqP6EAA3t4Ds8iqyaRKXxEO+sf6cgo6Q1l5Lm9ZpPNSJzkS2JQE4Lc/FEbudBX+lE9L0VLbiS9UTIYTm5pEDQ0vm3m/G8KAIGT1m2o2u4IgjTWn1u+7w+L4oX2ozR8E611Bw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=L8EM953M/zgLAt1OaeSXbwzWc4O+1o0A8sKM26V4row=;
- b=nS/nlAH/90fNPhYkmHxVurftxlXffjuCwT61uRIbp2+Nz6hGr0J0xYhSuT24CLBxSPHsOdrJs+Z8Y4nswbOPchUCf97WNyjHeHhctwVjO2pxyB46L8wTT9AusGcII1QO5Q0jIzJSGq0xWSu+s43kw1pFAMlJlc7YkaKxtM2Q6gjT5/uZ/X38C+ZgsU5Iv5YgTM6GgvWF0QrRU0VgcoGf+FwsebKkIDz04Yfc+tmq83Y3Cfe9en9RSbc9A/9BsxpdLUFJ4ybtlPYDMOg1WS/7JWWseprFnQk8xzrKGoQ5DzdcPLD8YsQeFEgmrw6zAUCnnEPYxIsGLy5mYOpwcMEoDw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=L8EM953M/zgLAt1OaeSXbwzWc4O+1o0A8sKM26V4row=;
- b=Sn4tqINNKnIPXsjFmpmCqlnytmZ1Vh6HIwgVoWlQkhxrLjAOESlOeHs8FF+5I3bMRms9Ms7qnfxTQ7nU+7Hybhc9/GK+9UPBsS4Xv4rOt8L82sS8qgytN8K0dTbMQYV3bKxZZMUjRpO04OLl4KoQNbsnMoNLnKPBMC0L5/HwzF1uzKCM6XE1FsDYlGLCqUWrBLXLVRe7s+flBgwsr6Ps5+bkuyDDQrbr1egs8CrWePKD7iM2Tx9OTCybiISrdpWVyeuOzTI/7EqKyH4wMQyzyztFmVc40L+Gr1MLNHgB3QJGEwB+LwebVmWWOPLPM6d7DPp8qk/wLpACsvFDoVmLjw==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by IA0PR12MB7752.namprd12.prod.outlook.com (2603:10b6:208:431::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5986.18; Tue, 10 Jan
- 2023 13:53:36 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::f8b0:df13:5f8d:12a]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::f8b0:df13:5f8d:12a%8]) with mapi id 15.20.5986.018; Tue, 10 Jan 2023
- 13:53:36 +0000
-Date:   Tue, 10 Jan 2023 09:53:35 -0400
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Yishai Hadas <yishaih@nvidia.com>
-Cc:     Matthew Wilcox <willy@infradead.org>, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-mm@kvack.org, axboe@kernel.dk,
-        logang@deltatee.com, hch@lst.de, alex.williamson@redhat.com,
-        leonro@nvidia.com, maorg@nvidia.com
-Subject: Re: [PATCH] lib/scatterlist: Fix to calculate the last_pg properly
-Message-ID: <Y71t3yyFvdLXM+qd@nvidia.com>
-References: <20230109144701.83021-1-yishaih@nvidia.com>
- <Y7zyyTxdoJulq7OD@casper.infradead.org>
- <a1f3b6ad-7173-70c7-4361-d01f9af1b7d6@nvidia.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <a1f3b6ad-7173-70c7-4361-d01f9af1b7d6@nvidia.com>
-X-ClientProxiedBy: MN2PR07CA0029.namprd07.prod.outlook.com
- (2603:10b6:208:1a0::39) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
+        Tue, 10 Jan 2023 09:36:44 -0500
+Received: from mailout1.w1.samsung.com (mailout1.w1.samsung.com [210.118.77.11])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 775D443A26
+        for <linux-block@vger.kernel.org>; Tue, 10 Jan 2023 06:36:42 -0800 (PST)
+Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
+        by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20230110143639euoutp01fc9a82b364b3f634594bab54bd64f800~4_VPAclvP3204332043euoutp017
+        for <linux-block@vger.kernel.org>; Tue, 10 Jan 2023 14:36:39 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20230110143639euoutp01fc9a82b364b3f634594bab54bd64f800~4_VPAclvP3204332043euoutp017
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1673361399;
+        bh=G/NS82KayjnGwwjEEFhhHx3EPrjIVAhcZLJ4LNXd4zM=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=iMdvrEW7jcP+qwuS6nc0Jn+dzBDRkomY7hy3TU1NLjJWQW0GbH6uBBJWF4J5rwMBb
+         /xmon9NmJgYupcxuq/lDR7lO4rSe/0GjzHJLf6idikUC/crS+O3LJd1dS/mxm+eMw+
+         myQg5DYAzuctUIYI2i6aKq890cFBc7dDE22C+E+A=
+Received: from eusmges1new.samsung.com (unknown [203.254.199.242]) by
+        eucas1p2.samsung.com (KnoxPortal) with ESMTP id
+        20230110143638eucas1p29d4ef05afa377a30424445d5d08ceda7~4_VOS8wPO2559425594eucas1p27;
+        Tue, 10 Jan 2023 14:36:38 +0000 (GMT)
+Received: from eucas1p2.samsung.com ( [182.198.249.207]) by
+        eusmges1new.samsung.com (EUCPMTA) with SMTP id 18.A6.56180.6F77DB36; Tue, 10
+        Jan 2023 14:36:38 +0000 (GMT)
+Received: from eusmtrp2.samsung.com (unknown [182.198.249.139]) by
+        eucas1p1.samsung.com (KnoxPortal) with ESMTPA id
+        20230110143638eucas1p1551ada551876f82df671162860f08d7d~4_VN9kV5o1940819408eucas1p1R;
+        Tue, 10 Jan 2023 14:36:38 +0000 (GMT)
+Received: from eusmgms1.samsung.com (unknown [182.198.249.179]) by
+        eusmtrp2.samsung.com (KnoxPortal) with ESMTP id
+        20230110143638eusmtrp2253f535994defd647ada71e3498fafc3~4_VN8zmqG0701607016eusmtrp2W;
+        Tue, 10 Jan 2023 14:36:38 +0000 (GMT)
+X-AuditID: cbfec7f2-ab5ff7000000db74-09-63bd77f67d21
+Received: from eusmtip1.samsung.com ( [203.254.199.221]) by
+        eusmgms1.samsung.com (EUCPMTA) with SMTP id D4.1C.23420.6F77DB36; Tue, 10
+        Jan 2023 14:36:38 +0000 (GMT)
+Received: from localhost (unknown [106.210.248.241]) by eusmtip1.samsung.com
+        (KnoxPortal) with ESMTPA id
+        20230110143638eusmtip1b69c7bedc2a1239472475578e3da8991~4_VNx7tui1830618306eusmtip1P;
+        Tue, 10 Jan 2023 14:36:38 +0000 (GMT)
+From:   Pankaj Raghav <p.raghav@samsung.com>
+To:     axboe@kernel.dk
+Cc:     linux-nvme@lists.infradead.org, hch@lst.de, bvanassche@acm.org,
+        linux-block@vger.kernel.org, damien.lemoal@opensource.wdc.com,
+        gost.dev@samsung.com, snitzer@kernel.org,
+        Pankaj Raghav <p.raghav@samsung.com>,
+        Chaitanya Kulkarni <kch@nvidia.com>
+Subject: [PATCH v2 2/3] block: add a new helper bdev_{is_zone_start,
+ offset_from_zone_start}
+Date:   Tue, 10 Jan 2023 15:36:34 +0100
+Message-Id: <20230110143635.77300-3-p.raghav@samsung.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20230110143635.77300-1-p.raghav@samsung.com>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|IA0PR12MB7752:EE_
-X-MS-Office365-Filtering-Correlation-Id: c1a4e4fa-34be-48b1-80b3-08daf31211ef
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: RgWz9+xfz9Abo9Dp0ub6X10ytJWKf5SS6XP4tIIjzPUHPcJ/GOeouQTbZmGGAqTLWhNgDovP/9GWJTSEdTRGvi83LgQ9djxK3dXwlAVrrjVXS2DMHWdY03EjDqnUdY9JkD5gxGbSJ0B16zjIaUVG3DxVtoc0XP4X1C6DoW0xLxW7bcs/QrxrMpAz7H5G+rNUKQ6JxcSAdlVdri6z8/8cpgclQtgkqlr/JeU+olUq5PzhgCi9KnfoNXAFR9OGli+UdawcHCnCxrLlgtM24zKlftprhO9eLouBWLg6dU6iI6b0/lELZAs65oa7FUcsl5Wq2KKs2+SzQVOi1XXoHqJbJGNL944nv/8h5edqr8gND63r2R5OfD6V20R9Px+EdMfj3O8graYIzWR82lohjYeveMOdQMeBjlr65dc37GhtqYatWtw3j9BrnDmfMzxfQBUHOyvubIuXgdrG6bfewhBWibXNIU9LocHs1HKHDjeRtDUPu2DPwXijXdgoV42/iQHtQr37E2XJmwlowT4JrMKNf2RH6gHPc8c2obvZkyj4weDLXU0/TIViDtRm4Akph4mMZzo9a11X3piImEjYEkT24Vwe8vF2ctaj4uVgTW6OcmOZwYhRrtfUWA3e4+RDpxJz5WQwQArrS7PrrCLNJXFul5WJInv7mF2x8/ZauPqRiYbxjx0DbOEFG3OHg08OLJCQ
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(366004)(396003)(136003)(39860400002)(346002)(376002)(451199015)(4744005)(316002)(5660300002)(26005)(6512007)(186003)(478600001)(6486002)(2616005)(41300700001)(66946007)(6636002)(4326008)(66556008)(66476007)(8676002)(6862004)(8936002)(86362001)(37006003)(36756003)(107886003)(53546011)(6506007)(38100700002)(2906002)(67856001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?g910uR3fUeLqeOUgKfr9YNuz24o4DyivjBhP9COWGrGCOZQI9RxYWkY/Cy/2?=
- =?us-ascii?Q?AH8moHYdzToXcOqPb22nBBuVqIVLHpUs++v6MliXuDXltnCr2E8MhUhIUMRA?=
- =?us-ascii?Q?LvnXsc8ANAAl2WwXpa0JwKaapzVI74TXDNkx2a71lYIpw7mOJz0fNNlkPZyO?=
- =?us-ascii?Q?BmbszyKJ/+sn1LhmULqNesBdzSZ0mAI6H0mJHy4ahhFa3TqVCeJfsA+dRM6m?=
- =?us-ascii?Q?59BXfDu4UDA05IJf6gnqV9L4k2Gm2QOQqcbsuo667i6qq5ejLsV+nGk8pz1f?=
- =?us-ascii?Q?UNV+JGtES310cqKNT/2nRFcGbyT6JbcowY/ttNus7WB1gQvsk/9pVvONsJmh?=
- =?us-ascii?Q?LW318tzEc2mIxHn8lDcg+VkeeE7lGeH4mVv8ksp6PDI9Y/VnD3q02XFlQIgq?=
- =?us-ascii?Q?hl9UILuChNIe54Hb4/Li5oHoQxORMUGYwfyQVnRdvW68D8uEavVlrnVKuTHn?=
- =?us-ascii?Q?F/WJjdUneEEhCmvC2VzQmdwEws+H/zAN3isGae1pyyLQljWuy0W5zI9HqgpU?=
- =?us-ascii?Q?7xHH/WnHE2cTQpwveS0eP6XmAagxWoFQ/uLvAAvdooebB9TzosCPcF7hHAiI?=
- =?us-ascii?Q?SQn86K6NMQsEFRREvNK8LrBeF5c8jwsoAh1xq2X54RxDrBM/qCXV/HCfkD9s?=
- =?us-ascii?Q?lkpI7gmR/Mjyzjx3L0hxJE3j9o0h3X7KuWBAXHtwG4Rnlx8zE5NDYQ2YLMx3?=
- =?us-ascii?Q?k7NOD1pkUoycsBPrcAtLVqfBTEmXL+gTX1rlg6aCVVdTf8kPc4/B1ULcBEQQ?=
- =?us-ascii?Q?1EEATZbkm4DTH4KDdZaoa9zzrFtmcEO5nD7MWrAugnwfHZgjMJjk29pL39ZK?=
- =?us-ascii?Q?hYFqKDxPj0BXiwZaSDqHSa6g+TJ0UdaTvC0WTp0CyVdUZ6hc7e6vIxkHv5KX?=
- =?us-ascii?Q?zRgYIVlK8xMBWravYTnp/9BMx0kq8TSMyNkjb6yk2WU9pOZH8idgSDG7cR5l?=
- =?us-ascii?Q?sb1GYA17eypz3Bwm/FO1n/D14ouE4Jg7yJiMVwx7J6lQN+rNkJowk2HCIOxn?=
- =?us-ascii?Q?3DX35ipBxnpRud+5A5gDx60Ws70iJ8GKJk50iS3K7etKmgPiW6U0YRkYMvmd?=
- =?us-ascii?Q?3n9e/+3B0GxR9K/isfYxP1BDsj9Mzn/rTQDxgXOZp18sMQqCqIoSSDVKWIn6?=
- =?us-ascii?Q?0UFKAvYMZ3ShS1jUfJ4ePllhTAZqgemFOOg6sjJGrRXhCBxIDOjLR1zBevRn?=
- =?us-ascii?Q?dSa6oI/Qkr4/IQcA64xN3F6tonl7EydzmpBxlnCTZfM4YDyd5TJAiwsEdSrh?=
- =?us-ascii?Q?nOLVKrPtzkWpyYghzL6WeeufFEaYFVJTHd3lHtEHTtmpfPgE30a8sILpkufg?=
- =?us-ascii?Q?EIwc5kgyf7Vwf6vAfy43P4N82MfA08aJyORXEorU3FX2xfyJ++YJeDXf7s7Z?=
- =?us-ascii?Q?vMazM482/j40zDUgwVEiXktH/S+N350rIWfe5J8ajVtV5+m4yclkCveYdEhU?=
- =?us-ascii?Q?DI7X0ecC3OVz+AnS4EdQQLwzjhrMBh0+FjHC4PacVx9slTt+1bQbn1WOaFWw?=
- =?us-ascii?Q?lZypiDWpG1osE0CDF6Gm7ANkyUOwbnxhpPoMl+qorxxAAT1xGlym4NYqqB38?=
- =?us-ascii?Q?5NfAhjpexUCSU2aBbRM7l3qWzC3W9f/7w38kPjb4?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c1a4e4fa-34be-48b1-80b3-08daf31211ef
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Jan 2023 13:53:36.4559
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: SiUgJ3V2ua0y6vGLQo+i1AyiI17w/7ihzny5OTNBBrb0uyinUd2WqzRammqgO+MB
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR12MB7752
+Content-Transfer-Encoding: 8bit
+X-Brightmail-Tracker: H4sIAAAAAAAAA02SWUwTURiFvTPtdFqtjgXpH1HQJsSIASQxOgouGB8mIUYffBKt1HYEtRTs
+        Iq5YNhfQukRQEMUFZIupIigVECQoixAakYhWMNGiUnFBQK1sUqZG385//+/cc09ySVxi5s8m
+        d2r0rFajUMsIEe/eE2dbwI/4auXiImsQXdJ1mqAzvzlxeri1Dadf1lowuqjkMUb3dGRjdPWr
+        RXTuzR4BPZCfIqAbX3mvETHtz8OZ9lYDU1p8gmDu5h1hKl8aCeZU8heCsaS+4TOmsmLEDJT6
+        bBRuFoWqWPXOvaw2aFWkKNqYN4rizkv2fbthFRiRcUYaEpJALYH79TUoDYlICVWIoNr2g+CG
+        QQTOpH4+NwwgKB7qI/5aUqsKBdyiAMHp9D63vxfBp2tZExRJEpQ/JJ4QuAyelAfUHE/luRic
+        GkEw3tXEcy08KDm86+jAXZpH+cGzD98ntZhaDi+G6nlcmi9kPfs5eZGQWgHWs8OIY2ZCU5Z9
+        ksEnmOTyS7grAKiPJCSN1Ag48zoor8jhc9oDHA1l7vM5MG7JxTh9EHo6h93mlIk6FvNkA6BC
+        wNSidkmcWgjmB0EcHgamX/luYjp0fp7JPWE6nLt3AeeOxXD8qISjZWBx2t2hAO1JOe5WDFR3
+        nyTOoPnZ/5XJ/q9M9r/cqwgvRlLWoIuJYnXBGjY+UKeI0Rk0UYHK2JhSNPGnno41fK9Alx39
+        gXUII1EdAhKXeYqLhFVKiVil2H+A1cZu0xrUrK4OeZM8mVR8sTxXKaGiFHp2N8vGsdq/W4wU
+        zjZiayNqvWKn4qOhjbtG5aE5Wc7hHZGtO6xWQ3N4CAr1Nen5Gzb4HlHFLUn5cO1t423jRd2C
+        1RAoVTtKGgdTVacqFKo7DclzE8TRjgz7qm7jUnn+4PmEMdvQWr+hzlsR4dttY5p56YmtwfdF
+        Fes7l+XZp+l5HrFLA47VxtdgG71t3W/jsd8+/mU+41e22qUj1wMS+pRhEYe21Ulz2uR+o3vo
+        qMhZu9N7xzuu+u678HWarX9KyIrgpoY26bmWd6gyM+PzloKIJPxhU9/62kVpKttHI6buWfnr
+        0NmEM+Zur6+OR703j246Zn/tVWiqv9UeZpYfphMzNnfNu0tm6omCZs/3KhlPF60I9se1OsUf
+        A2LiasIDAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprLIsWRmVeSWpSXmKPExsVy+t/xu7rfyvcmGzy5I2ux+m4/m8W0Dz+Z
+        LX6fPc9scfPATiaLlauPMlk8vTqLyWLvLW2L+cueslt8XtrCbnHilrQDl8flK94el8+Wemxa
+        1cnmsXlJvcfumw1sHr3N79g8drbeZ/Xo27KK0ePzJrkAzig9m6L80pJUhYz84hJbpWhDCyM9
+        Q0sLPSMTSz1DY/NYKyNTJX07m5TUnMyy1CJ9uwS9jIYlfxkLpghVfFh8gb2BsYG/i5GTQ0LA
+        RKJ1zwr2LkYuDiGBpYwS+5+uYYRISEjcXtgEZQtL/LnWxQZR9JxRovfFRdYuRg4ONgEticZO
+        dpAaEaCa/R2tLCA1zAJtTBKrln1gAkkIC8RIHD4+kQ3EZhFQlbj0/BMziM0rYClx/esRFogF
+        8hIzL30HG8QpYCVxYeJvRpD5QkA1/RelIcoFJU7OfAJWzgxU3rx1NvMERoFZSFKzkKQWMDKt
+        YhRJLS3OTc8tNtQrTswtLs1L10vOz93ECIynbcd+bt7BOO/VR71DjEwcjIcYJTiYlUR4V3Lu
+        SRbiTUmsrEotyo8vKs1JLT7EaAp09kRmKdHkfGBE55XEG5oZmBqamFkamFqaGSuJ83oWdCQK
+        CaQnlqRmp6YWpBbB9DFxcEo1MDUpznarndZ8eAUvXwrjoaZDP1Y1vHNZZrTo5vE5D1866god
+        zzm4/Z4mt3q1hsdCcfNU1+DNc/NXr3zB+zMkLGP69OXr9AqfSqmVZN5ytBec46qzjOclo/Tv
+        e1xzzfj0vlgo7uQWSfb//HdjVFqC7mslqYSm4FnmtQUTp++N4plfcsj2bd6uc031Gxvepzif
+        qp+2ZXqV2hGOz7s4/omsTVi0akmCh/86pecM2rMz70xbwvjYIrro9PYWj7MPeY/0ZTS+iLw7
+        T4ntxkdl3+NXGmPeJp2o3cv6IGWaopxHWmmhxedzv8SO9vgbOr4XnuDnL/nN9NQH3t3Tfy2Z
+        1pW4f3KGjKbEXSeNX1+l6o2M7iixFGckGmoxFxUnAgDMeJZgMAMAAA==
+X-CMS-MailID: 20230110143638eucas1p1551ada551876f82df671162860f08d7d
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+X-RootMTR: 20230110143638eucas1p1551ada551876f82df671162860f08d7d
+X-EPHeader: CA
+CMS-TYPE: 201P
+X-CMS-RootMailID: 20230110143638eucas1p1551ada551876f82df671162860f08d7d
+References: <20230110143635.77300-1-p.raghav@samsung.com>
+        <CGME20230110143638eucas1p1551ada551876f82df671162860f08d7d@eucas1p1.samsung.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jan 10, 2023 at 10:01:53AM +0200, Yishai Hadas wrote:
-> On 10/01/2023 7:08, Matthew Wilcox wrote:
-> > On Mon, Jan 09, 2023 at 04:47:01PM +0200, Yishai Hadas wrote:
-> > >   	if (sgt_append->prv) {
-> > > +		unsigned long paddr =
-> > > +			(page_to_pfn(sg_page(sgt_append->prv)) * PAGE_SIZE +
-> > 1. page_to_pfn() * PAGE_SIZE is spelled page_to_phys()
-> > 
-> > 2. physical addresses have type phys_addr_t.  Oh, wait, paddr isn't a
-> > physical address, it's a pfn because you divide by PAGE_SIZE at the end.
-> > But you will get truncation on 32-bit, because page_to_pfn() has type
-> > unsigned long.  Anyway, this shouldn't be called paddr.  Maybe last_pfn
-> > or something?
-> > 
-> > > +			 sgt_append->prv->offset + sgt_append->prv->length) /
-> > > +			PAGE_SIZE;
-> 
-> In this area of the patch I just reverted to what we had in 6.1 [1] where we
-> were good.
-> 
-> I can send V1 and replace the 'paddr' to be called 'last_pfn' if it's really
-> needed.
+Instead of open coding to check for zone start, add a helper to improve
+readability and store the logic in one place.
 
-Please change it as Matthew describes so it is clearer
+Reviewed-by: Chaitanya Kulkarni <kch@nvidia.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Pankaj Raghav <p.raghav@samsung.com>
+---
+ block/blk-core.c       |  2 +-
+ block/blk-zoned.c      |  4 ++--
+ include/linux/blkdev.h | 12 ++++++++++++
+ 3 files changed, 15 insertions(+), 3 deletions(-)
 
-Jason
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 9321767470dc..0405b3144e7a 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -573,7 +573,7 @@ static inline blk_status_t blk_check_zone_append(struct request_queue *q,
+ 		return BLK_STS_NOTSUPP;
+ 
+ 	/* The bio sector must point to the start of a sequential zone */
+-	if (bio->bi_iter.bi_sector & (bdev_zone_sectors(bio->bi_bdev) - 1) ||
++	if (!bdev_is_zone_start(bio->bi_bdev, bio->bi_iter.bi_sector) ||
+ 	    !bio_zone_is_seq(bio))
+ 		return BLK_STS_IOERR;
+ 
+diff --git a/block/blk-zoned.c b/block/blk-zoned.c
+index db829401d8d0..614b575be899 100644
+--- a/block/blk-zoned.c
++++ b/block/blk-zoned.c
+@@ -277,10 +277,10 @@ int blkdev_zone_mgmt(struct block_device *bdev, enum req_op op,
+ 		return -EINVAL;
+ 
+ 	/* Check alignment (handle eventual smaller last zone) */
+-	if (sector & (zone_sectors - 1))
++	if (!bdev_is_zone_start(bdev, sector))
+ 		return -EINVAL;
+ 
+-	if ((nr_sectors & (zone_sectors - 1)) && end_sector != capacity)
++	if (!bdev_is_zone_start(bdev, nr_sectors) && end_sector != capacity)
+ 		return -EINVAL;
+ 
+ 	/*
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 0956bc0fb5b0..7822c6f4c7bd 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -1306,6 +1306,18 @@ static inline sector_t bdev_zone_sectors(struct block_device *bdev)
+ 	return q->limits.chunk_sectors;
+ }
+ 
++static inline sector_t bdev_offset_from_zone_start(struct block_device *bdev,
++						   sector_t sector)
++{
++	return sector & (bdev_zone_sectors(bdev) - 1);
++}
++
++static inline bool bdev_is_zone_start(struct block_device *bdev,
++				      sector_t sector)
++{
++	return bdev_offset_from_zone_start(bdev, sector) == 0;
++}
++
+ static inline int queue_dma_alignment(const struct request_queue *q)
+ {
+ 	return q ? q->limits.dma_alignment : 511;
+-- 
+2.25.1
+
