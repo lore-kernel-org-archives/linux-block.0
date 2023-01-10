@@ -2,132 +2,57 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 669F3C54EBE
-	for <linux-block@archiver.kernel.org>; Tue, 10 Jan 2023 08:40:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45336C46467
+	for <linux-block@archiver.kernel.org>; Tue, 10 Jan 2023 08:41:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235313AbjAJIjr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 10 Jan 2023 03:39:47 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60628 "EHLO
+        id S231284AbjAJIll (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 10 Jan 2023 03:41:41 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34422 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237809AbjAJIjV (ORCPT
+        with ESMTP id S238062AbjAJIlY (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 10 Jan 2023 03:39:21 -0500
-Received: from mailout2.w1.samsung.com (mailout2.w1.samsung.com [210.118.77.12])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3026DE8
-        for <linux-block@vger.kernel.org>; Tue, 10 Jan 2023 00:39:19 -0800 (PST)
-Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
-        by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id 20230110083916euoutp021fc9b343a0bd0dc03b992e5d2ac95c6b~45dME_GFZ2860928609euoutp02Q
-        for <linux-block@vger.kernel.org>; Tue, 10 Jan 2023 08:39:16 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w1.samsung.com 20230110083916euoutp021fc9b343a0bd0dc03b992e5d2ac95c6b~45dME_GFZ2860928609euoutp02Q
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1673339956;
-        bh=flRUX4TXNKSuq6zxzZbc4RMO77h5oBaEM+JJT0NzPuQ=;
-        h=Date:Subject:To:CC:From:In-Reply-To:References:From;
-        b=o7kkEarM1CznXX7RJ6r94lN+FiErcCw8U6N+KM0lFWdBb9PLN4u28xJJa62EMUqby
-         fbhjf6VIc18HL+e60cAThZ/ttssss6V92lfjiIvRyuYDXIJqrA0rK9Sbdqvta2D49N
-         5XTNT4mkIFPlD5U3etdvtQ0rxnU7vgZMCC1sP6CQ=
-Received: from eusmges3new.samsung.com (unknown [203.254.199.245]) by
-        eucas1p2.samsung.com (KnoxPortal) with ESMTP id
-        20230110083915eucas1p2e373a528e893339a83cb5c74002c3856~45dLp5blg2209722097eucas1p2M;
-        Tue, 10 Jan 2023 08:39:15 +0000 (GMT)
-Received: from eucas1p2.samsung.com ( [182.198.249.207]) by
-        eusmges3new.samsung.com (EUCPMTA) with SMTP id 49.35.43884.3342DB36; Tue, 10
-        Jan 2023 08:39:15 +0000 (GMT)
-Received: from eusmtrp2.samsung.com (unknown [182.198.249.139]) by
-        eucas1p1.samsung.com (KnoxPortal) with ESMTPA id
-        20230110083915eucas1p18a4b032bf44b21f8733d0280acbf8688~45dLNThQk0606106061eucas1p1C;
-        Tue, 10 Jan 2023 08:39:15 +0000 (GMT)
-Received: from eusmgms1.samsung.com (unknown [182.198.249.179]) by
-        eusmtrp2.samsung.com (KnoxPortal) with ESMTP id
-        20230110083915eusmtrp2096c2edc072337b430b2b22f8dc0805f~45dLMeU5A2380423804eusmtrp27;
-        Tue, 10 Jan 2023 08:39:15 +0000 (GMT)
-X-AuditID: cbfec7f5-25bff7000000ab6c-0b-63bd24331d39
-Received: from eusmtip2.samsung.com ( [203.254.199.222]) by
-        eusmgms1.samsung.com (EUCPMTA) with SMTP id 31.EC.23420.2342DB36; Tue, 10
-        Jan 2023 08:39:14 +0000 (GMT)
-Received: from CAMSVWEXC01.scsc.local (unknown [106.1.227.71]) by
-        eusmtip2.samsung.com (KnoxPortal) with ESMTPA id
-        20230110083914eusmtip26c71070d1d01301789f4728eca911ea0~45dK-lUgV3238632386eusmtip2A;
-        Tue, 10 Jan 2023 08:39:14 +0000 (GMT)
-Received: from [192.168.8.107] (106.210.248.241) by CAMSVWEXC01.scsc.local
-        (2002:6a01:e347::6a01:e347) with Microsoft SMTP Server (TLS) id 15.0.1497.2;
-        Tue, 10 Jan 2023 08:39:13 +0000
-Message-ID: <01349d02-123d-3c49-bd92-8b8b3c645e1c@samsung.com>
-Date:   Tue, 10 Jan 2023 09:39:13 +0100
+        Tue, 10 Jan 2023 03:41:24 -0500
+Received: from mail.lokoho.com (mail.lokoho.com [217.61.105.98])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D40F1AD97
+        for <linux-block@vger.kernel.org>; Tue, 10 Jan 2023 00:41:23 -0800 (PST)
+Received: by mail.lokoho.com (Postfix, from userid 1001)
+        id E147783E6C; Tue, 10 Jan 2023 08:40:58 +0000 (GMT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=lokoho.com; s=mail;
+        t=1673340081; bh=Z0N5VlX9/JlryGOL5I747Le9USomZJCRNNGRT3LbbKc=;
+        h=Date:From:To:Subject:From;
+        b=ReWmXxgrX+BRMArBR6n4gYkCBxLhFBSq8tfejQcnRjGta6NChzfT0yVrRrqwFELNR
+         yyvAwilWWF5e7gx4Is3Yw3jzkBARIyDanKlq41yATBu6GNJAizqPfTnhi4ditMaC2N
+         ytaviuhdIZyu3rqHxoElUNsJ2lhXxzayjXvezNhMo+KzSirlR1fipAsLbdZ/QFTPI7
+         4xANoNVdAWFtfWful9DPBCDgUziXCgM6eXcehGOJmHk1S1XbBOdF0NtopR78hXec4I
+         7UqbScPewRfnr/X/5TJSXccz/DGB3g+BDanOIaoC/Em/SZ+gx9tOvXpeG2zFN5U+vz
+         reyIwh0t7U3lA==
+Received: by mail.lokoho.com for <linux-block@vger.kernel.org>; Tue, 10 Jan 2023 08:40:32 GMT
+Message-ID: <20230110074501-0.1.3b.li53.0.jpglob2v61@lokoho.com>
+Date:   Tue, 10 Jan 2023 08:40:32 GMT
+From:   "Adam Charachuta" <adam.charachuta@lokoho.com>
+To:     <linux-block@vger.kernel.org>
+Subject: =?UTF-8?Q?S=C5=82owa_kluczowe_do_wypozycjonowania?=
+X-Mailer: mail.lokoho.com
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
-        Thunderbird/102.4.2
-Subject: Re: [PATCH 5/7] dm-zoned: ensure only power of 2 zone sizes are
- allowed
-Content-Language: en-US
-To:     Christoph Hellwig <hch@lst.de>
-CC:     <axboe@kernel.dk>, <kernel@pankajraghav.com>,
-        <linux-kernel@vger.kernel.org>, <hare@suse.de>,
-        <bvanassche@acm.org>, <snitzer@kernel.org>, <dm-devel@redhat.com>,
-        <damien.lemoal@opensource.wdc.com>,
-        <linux-nvme@lists.infradead.org>, <linux-block@vger.kernel.org>,
-        <gost.dev@samsung.com>, Luis Chamberlain <mcgrof@kernel.org>,
-        Johannes Thumshirn <johannes.thumshirn@wdc.com>
-From:   Pankaj Raghav <p.raghav@samsung.com>
-In-Reply-To: <20230110065623.GD10289@lst.de>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [106.210.248.241]
-X-ClientProxiedBy: CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347) To
-        CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347)
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFrrGKsWRmVeSWpSXmKPExsWy7djP87rGKnuTDda8k7NYfbefzWLah5/M
-        Fr/Pnme22PtuNqvFnkWTmCxWrj7KZPG36x6TxZmXn1ks9t7Stri8aw6bxfxlT9ktbkx4ymhx
-        4pa0A6/H5SveHpfPlnpsWtXJ5rF5Sb3H7psNbB47W++zepxd6ejxft9VoPDpao/Pm+Q82g90
-        MwVwR3HZpKTmZJalFunbJXBl/N91nLmgk7li/7br7A2MG5m6GDk5JARMJOb/ns3excjFISSw
-        glFi/+/1UM4XRomLH5azQjifGSVanoCUQbQ0H+thhkgsZ5S4uvgSO1zVs5lXoTK7GSVWfloL
-        1sIrYCfx/tkeVhCbRUBVYtaJRawQcUGJkzOfsIDYogJREk0XfoLZwgJBEk9fv2IDsZkFxCVu
-        PZkPdq2IgJLE01dnGUEWMAs0Mkt8+HEfyOHgYBPQkmjsBNvFKaAjce/2L1aIXk2J1u2/2SFs
-        eYntb+cwQ7ygLLH4wjVGCLtWYu2xM2AfSAhc45Q4sPosG0TCReLOm5VQRcISr45vgfpfRuL/
-        zvnQ4KuWeHrjNzNEcwujRP/O9WwgB0kIWEv0ncmBqHGUWLN4FQtEmE/ixltBiHv4JCZtm848
-        gVF1FlJQzELy8iwkL8xC8sICRpZVjOKppcW56anFxnmp5XrFibnFpXnpesn5uZsYgUnv9L/j
-        X3cwrnj1Ue8QIxMH4yFGCQ5mJRHelZx7koV4UxIrq1KL8uOLSnNSiw8xSnOwKInzztg6P1lI
-        ID2xJDU7NbUgtQgmy8TBKdXAlL704LdApc9rp2S8U7VgFmRwfZnUv/O3q03/g7K4HraKoEu/
-        OlgLPfOlAh8z1GlF/V2QUhZxyj/DWPdMyFFPCZtpYYa/9aX7r5R+sszcbLGt2PhhW/XsDaZ7
-        jgfaVr5/MmMym5nJseCviYtlV+xgX+XaVVsdZZl4qvuZ++fElfliDBwPt60v0M7+YXdxzpKj
-        Ut6CnB1vHy51C1RflcdQHvR7jkluyfdFJnITbzjdXRB2yze+neP3ytDp348G2XnWv2RY8H5a
-        kpL8zYiMif/KoqMOz6uQaH9w1ND63n6BKZ4H+0Q3pWt+yL7LzJRn/HJTnNZZZ2bD0Kr/d5IX
-        OEy2C2B0OiZtyfhBRNtzRbISS3FGoqEWc1FxIgAjtb2z6QMAAA==
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFupkleLIzCtJLcpLzFFi42I5/e/4PV0jlb3JBhuf2VisvtvPZjHtw09m
-        i99nzzNb7H03m9Viz6JJTBYrVx9lsvjbdY/J4szLzywWe29pW1zeNYfNYv6yp+wWNyY8ZbQ4
-        cUvagdfj8hVvj8tnSz02repk89i8pN5j980GNo+drfdZPc6udPR4v+8qUPh0tcfnTXIe7Qe6
-        mQK4o/RsivJLS1IVMvKLS2yVog0tjPQMLS30jEws9QyNzWOtjEyV9O1sUlJzMstSi/TtEvQy
-        /u86zlzQyVyxf9t19gbGjUxdjJwcEgImEs3Hepi7GLk4hASWMkpMufUNKiEj8enKR3YIW1ji
-        z7UuNhBbSOAjo8TShUIQDbsZJS7eucYIkuAVsJN4/2wPK4jNIqAqMevEIlaIuKDEyZlPWEBs
-        UYEoiZvnH4ItEBYIknj6+hXYUGYBcYlbT+aDxUUElCSevjrLCLKAWaCRWeLDj/uMEJvvMkq8
-        3azZxcjBwSagJdHYCXYcp4COxL3bv1gh5mhKtG7/zQ5hy0tsfzuHGeIBZYnFFyDulBColXh1
-        fzfjBEbRWUjOm4XkjFlIRs1CMmoBI8sqRpHU0uLc9NxiQ73ixNzi0rx0veT83E2MwDSx7djP
-        zTsY5736qHeIkYmD8RCjBAezkgjvSs49yUK8KYmVValF+fFFpTmpxYcYTYFhNJFZSjQ5H5io
-        8kriDc0MTA1NzCwNTC3NjJXEeT0LOhKFBNITS1KzU1MLUotg+pg4OKUamFY9nvJ2UUf15svC
-        pv7K74QrP7xbbxrAInmnwyY76Kf9xhPVaaz8D9UtvJ1mMTzzNGCzCJi7raxlW/t9uePHd/3Y
-        8rD32WG9RMMO/0PRvVvsj/HIrRcXceOZcfjh+RW9zoFTP29Z9DPlyprlizbM+Tev58P6mR3r
-        EgrUToZ3TP3nybVyyUez7VsCT8Z6TVPks5G8EWIt7Gi8N/7uBZlq8b6N/dqHU2oj/4ea9mX5
-        f19+aNYclnSlzL2PVyX4zH5zn7Hw5Mdd+yKezTTu33xz1VTj1ZoFqxeaJQic2ajMG3Vt4p1u
-        I8FEdc6FZi7C/cnped5fDxw9Jd+19cKOJfzyc0+KajLcYfSY4GWg84b1fLASS3FGoqEWc1Fx
-        IgD1OIivnAMAAA==
-X-CMS-MailID: 20230110083915eucas1p18a4b032bf44b21f8733d0280acbf8688
-X-Msg-Generator: CA
-X-RootMTR: 20230106083322eucas1p2414f1f7f121fbbd7a0e5e1b1b622f5c0
-X-EPHeader: CA
-CMS-TYPE: 201P
-X-CMS-RootMailID: 20230106083322eucas1p2414f1f7f121fbbd7a0e5e1b1b622f5c0
-References: <20230106083317.93938-1-p.raghav@samsung.com>
-        <CGME20230106083322eucas1p2414f1f7f121fbbd7a0e5e1b1b622f5c0@eucas1p2.samsung.com>
-        <20230106083317.93938-6-p.raghav@samsung.com>
-        <20230110065623.GD10289@lst.de>
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2023-01-10 07:56, Christoph Hellwig wrote:
-> Given that we don't even support the non pow of 2 zones in the block
-> layer I don't see why this is needed.  But either way it doesn't really
-> seem to fit into this series.
+Dzie=C5=84 dobry,
 
-You are right. It is just an extra stop gap, but it is not needed as block
-layer does not support pow of 2 anyway! I will remove this patch in the
-next version.
+zapozna=C5=82em si=C4=99 z Pa=C5=84stwa ofert=C4=85 i z przyjemno=C5=9Bci=
+=C4=85 przyznaj=C4=99, =C5=BCe przyci=C4=85ga uwag=C4=99 i zach=C4=99ca d=
+o dalszych rozm=C3=B3w.=20
+
+Pomy=C5=9Bla=C5=82em, =C5=BCe mo=C5=BCe m=C3=B3g=C5=82bym mie=C4=87 sw=C3=
+=B3j wk=C5=82ad w Pa=C5=84stwa rozw=C3=B3j i pom=C3=B3c dotrze=C4=87 z t=C4=
+=85 ofert=C4=85 do wi=C4=99kszego grona odbiorc=C3=B3w. Pozycjonuj=C4=99 =
+strony www, dzi=C4=99ki czemu generuj=C4=85 =C5=9Bwietny ruch w sieci.
+
+Mo=C5=BCemy porozmawia=C4=87 w najbli=C5=BCszym czasie?
+
+
+Pozdrawiam
+Adam Charachuta
