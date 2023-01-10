@@ -2,127 +2,315 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D155C54EBE
-	for <linux-block@archiver.kernel.org>; Tue, 10 Jan 2023 13:23:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BDB83C63797
+	for <linux-block@archiver.kernel.org>; Tue, 10 Jan 2023 13:27:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230322AbjAJNXT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 10 Jan 2023 08:23:19 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49040 "EHLO
+        id S232697AbjAJN1d (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 10 Jan 2023 08:27:33 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53348 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232697AbjAJNXR (ORCPT
+        with ESMTP id S233139AbjAJN1U (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 10 Jan 2023 08:23:17 -0500
-Received: from esa6.hgst.iphmx.com (esa6.hgst.iphmx.com [216.71.154.45])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 93E08BF1
-        for <linux-block@vger.kernel.org>; Tue, 10 Jan 2023 05:23:15 -0800 (PST)
+        Tue, 10 Jan 2023 08:27:20 -0500
+Received: from esa3.hgst.iphmx.com (esa3.hgst.iphmx.com [216.71.153.141])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 10F3FB8B
+        for <linux-block@vger.kernel.org>; Tue, 10 Jan 2023 05:27:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1673356995; x=1704892995;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=QTBZrQdLHDsAsAqEoVMFsJCKFUD0i+1isXzUx2uayrY=;
-  b=RZUO27LR8gBJ+Rhuc9d5qm/rsZcPdaLHtPwuvLRz4WlRljlda1zZQngq
-   PAy1P3R+HhBNU92RbDY03qoL8BwP6gOvBQfujQRQgoPQcZsjVBmqebVgH
-   2tb2KXdn7E//mFLKVy1gtw+X1Lq+5w8wHKy1dQpGCNYwCt+nb78mqUDS4
-   bR2Yo23HZSEkmH5iQS0eaeB0obv+IKOp1W+Qn6svIcDP7PPgaAogEeu9N
-   T7J8E/J9UNvqwnebiHpU6kmYqKMoTkGzD95Cf5rjEmTTBuBI+2jQSVTBG
-   sE9pzlzQPLaRoERgjCqbOpGpC1zJ08lUaDlv221Iy/01rR1954lo8ouAD
+  t=1673357238; x=1704893238;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=X3kzvQdGX1FhwiReGoda+divC3uvv6Zg1kXuu40s1fM=;
+  b=T4QkB8bgiIBOlfFoYxXRktRtLWvvfc3pHT0t26ydknUuv1HMLL1pyU/0
+   8ZLyyZCnbL5/t8Bzsf59fNaz7O1O1wKVNXV9k51+fR2FKi7PHnFn839DW
+   g+kqPr13EgrLkEDinOl8gQy3TpbgBLKWrJHjRNl6R2HWo58vtoO332XCq
+   jF9gDc8KNMZwk7n6FF/8vOaKhtHFD7TYqXlq0Ir1umLHI5VuE35nzcjk/
+   aH3KQThu7II7vOuJ04NigokRNURQ3zZHNC/oJBgQFO+G14Q7yQbmOHrK4
+   jGcF0z/1Vvh01uKS5oZ4Oevq1jlE1j614k0g6yTaulQZ1z7kiF5upXXKy
    w==;
 X-IronPort-AV: E=Sophos;i="5.96,315,1665417600"; 
-   d="scan'208";a="220556150"
-Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 10 Jan 2023 21:23:14 +0800
-IronPort-SDR: AhK4aIULZ74qt7AFueeEzZ3iFvu3Y3EWvPl0CIAn2hGVk/aEnvcqAglwoRHSL8Nq7TvsyJ1GoK
- X/WesXedp7UFWVpbVjSlm1X0Y+Uei8fz+Z3CBa+JgllQy6C03pYornSQHvULBavKZiD/QMp/uJ
- 55RWqGWsNIvD9s0dyKqZ8vDO8LSuOTpTXZimLjDqUTW8WO4MvMDpH0FhDx7pGuUfj0KzTaYjUo
- YFdQ/XY7KUA53yyKZeLXtU1Y4Bkk3Bf+6PSEH1oKuED6djPnsos9Y+DY8zmr2lOp3//4YiVDKP
- eZA=
+   d="scan'208";a="225493138"
+Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
+  by ob1.hgst.iphmx.com with ESMTP; 10 Jan 2023 21:27:18 +0800
+IronPort-SDR: D3u/Vt5F/F081Gk00ijU+UzFi5bUzIjE+d+UTJoWJQ6MnQ/z7LsVU2oI2auJZPJv7fyz2AgKns
+ nrDtshiZTxQV4OGL48S72xYoEKMIbTULt02fNcQzJFRSIFtfP/CiaDBhUx/lZ5z5RqClreMCO+
+ K4/oY1Jl9n+uP/DH4zzFRDDUFp87seRZ6WPPiRRf2UvP9JewqKXfFNt+GF90Teg/YvrayXiwPB
+ Mliin3954LEoZeMVvkPhJm+CpJRZNfM2TvmErjrx1/MV7kDBvIijzwQEkPZzMJjUd4VqNlEEkj
+ 9mE=
 Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 10 Jan 2023 04:41:04 -0800
-IronPort-SDR: +wQJ3qW3qSoURgsSMcOm7lAdU9ckMXFwkbgcICJYB+ioz8apSujjoXdvVxW/N8juyHyws8tAwy
- BO9EVsYeBtHrDXSrV4WaaavQ36V9xc6w2W4TRXf72q1kRt4naXuuYtWSdeC0T/JA7kgjg9XGYV
- lRfE7kXEp1h8zMkUki1R46Di7kMz6761I0ClNTkowVJACyvz5VgH6+0C69WGHgHtsuBQ+RryIl
- rn4ULBnoG0zb46MwEKtAYw9fiBAiCqIym6El52uLf7O50FbCaWh519Ec8UypCoAcsQaWyPAaO8
- IA0=
+  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 10 Jan 2023 04:39:24 -0800
+IronPort-SDR: C+CcWyhOV3wJeZ0pLPcs3DV31qp4634rxpJBSMvRSHDQb16smbn7gJYdUT0uTz1SYtendhKNDb
+ f9mnSchz6Rbn6IA+AlR/4yooShoeDe97Pzwaw9mFu+dg83Nyk1vwMMqmIHE5/7mFMR23v78WQW
+ Qj/jwZfVrZQcNZHt15nnBFpyQEiQTiAiQA5AfK01da4gZtQMC2q8lAyd26RVjEui9dvBogLyJZ
+ klexkqznslgCIFqyWcQ9MIbNdmYkC+bMgwMs2K1p5GZrW1yjyDwWqJ3JNhEnZY+20+10Szk5Kk
+ yaQ=
 WDCIronportException: Internal
 Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
-  by uls-op-cesaip02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 10 Jan 2023 05:23:15 -0800
+  by uls-op-cesaip02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 10 Jan 2023 05:27:19 -0800
 Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4Nrs2B4jCgz1RwqL
-        for <linux-block@vger.kernel.org>; Tue, 10 Jan 2023 05:23:14 -0800 (PST)
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4Nrs6t3v3nz1RwqL
+        for <linux-block@vger.kernel.org>; Tue, 10 Jan 2023 05:27:18 -0800 (PST)
 Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
         reason="pass (just generated, assumed good)"
         header.d=opensource.wdc.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
-        opensource.wdc.com; h=content-transfer-encoding:content-type
-        :in-reply-to:organization:from:references:to:content-language
-        :subject:user-agent:mime-version:date:message-id; s=dkim; t=
-        1673356994; x=1675948995; bh=QTBZrQdLHDsAsAqEoVMFsJCKFUD0i+1isXz
-        Ux2uayrY=; b=Yz+xO2Mqtrx0XY1yk8sQYcfRq9jOTUKiSg/HN7jFNe0q23pjrTr
-        P+fenOPLHjxDfQS4/28cCio9+KYAdwm5j85ax/nDOFgUw2qadQjxYHsNjxbEhkmj
-        +B+LkFiFxdgXrfjb+f7ZWczynqPqXE6HdzoLgo8k1Qd6Q+PeJ5STj4A9HeQMk2JJ
-        Bt9WpKa4UgkkEU7xIHTiLSeKEZQjl6pzRBT2VOQ+2TVDzpYH5QXngI6kAvajODIA
-        kuvCX94fQ6wGfqVedf7FhYrsG8FWDPPXaCulir9cdzUWtrd4rqe8Xrte+koJQjlu
-        HnvSR0uruYWX9mVPOcCHpJSTyOm5sIQ1uQg==
+        opensource.wdc.com; h=content-transfer-encoding:mime-version
+        :references:in-reply-to:x-mailer:message-id:date:subject:to
+        :from; s=dkim; t=1673357237; x=1675949238; bh=X3kzvQdGX1FhwiReGo
+        da+divC3uvv6Zg1kXuu40s1fM=; b=i0QnYU0dXOdK3ZjQmAJXdrFXkdPpN5nmgX
+        nwmKK6kzaYQk4yevn/untFd9uX9aEs3StiMw196OkMsezMEGOFj4F9wxCF8/LReE
+        JegYIsBYMFjRnv0oj9YgwyMlb6gQg5QUdbrHZDPxuSyz1ren1JtcgKqmpbIOKEWN
+        D3LE+1xM1fTPflPl7NrLZnwxMamphd/D7fDn97Carw/d7bdTAOOPo2B4XCvrniKB
+        M8W729b4RskpUAKVGdn0RbZx4ArE5WBkLjNAv4VBuaDII6kywGQuJ8ngT9poPJAy
+        ZyVefVz9DOpxp2F2a+AEo4MhzojxlIdR1YEcACEYU+IyovjijoKg==
 X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
 Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
         by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id aUh4KPc3XF0s for <linux-block@vger.kernel.org>;
-        Tue, 10 Jan 2023 05:23:14 -0800 (PST)
-Received: from [10.225.163.12] (unknown [10.225.163.12])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4Nrs286pFSz1RvLy;
-        Tue, 10 Jan 2023 05:23:12 -0800 (PST)
-Message-ID: <6172d4fc-9747-7003-84bb-899dbff33865@opensource.wdc.com>
-Date:   Tue, 10 Jan 2023 22:23:11 +0900
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.0
-Subject: Re: [PATCH v7 0/7] Improve libata support for FUA
-Content-Language: en-US
-To:     Tejun Heo <tj@kernel.org>
-Cc:     linux-ide@vger.kernel.org, linux-block@vger.kernel.org,
-        Jens Axboe <axboe@kernel.dk>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Hannes Reinecke <hare@suse.de>, Christoph Hellwig <hch@lst.de>,
-        Niklas Cassel <niklas.cassel@wdc.com>
-References: <20230103051924.233796-1-damien.lemoal@opensource.wdc.com>
- <Y7WuEqMgySOCCTqy@slm.duckdns.org>
- <79260c74-92dd-2cdf-ad71-e70d9fa0f8a9@opensource.wdc.com>
- <Y7cT3SSssHzBYqU4@slm.duckdns.org>
- <b5c57ca5-49b0-b9c6-4a65-a8867a74e950@opensource.wdc.com>
- <Y7hiemMjV5y/ToIF@slm.duckdns.org>
+        with ESMTP id QMP2lhSyemZu for <linux-block@vger.kernel.org>;
+        Tue, 10 Jan 2023 05:27:17 -0800 (PST)
+Received: from washi.fujisawa.hgst.com (washi.fujisawa.hgst.com [10.149.53.254])
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4Nrs6r6jmkz1RvLy;
+        Tue, 10 Jan 2023 05:27:16 -0800 (PST)
 From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
-Organization: Western Digital Research
-In-Reply-To: <Y7hiemMjV5y/ToIF@slm.duckdns.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+To:     linux-ide@vger.kernel.org, linux-block@vger.kernel.org,
+        Jens Axboe <axboe@kernel.dk>
+Cc:     "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Christoph Hellwig <hch@lst.de>
+Subject: [PATCH v9 4/6] ata: libata: cleanup fua support detection
+Date:   Tue, 10 Jan 2023 22:27:08 +0900
+Message-Id: <20230110132710.252015-5-damien.lemoal@opensource.wdc.com>
+X-Mailer: git-send-email 2.39.0
+In-Reply-To: <20230110132710.252015-1-damien.lemoal@opensource.wdc.com>
+References: <20230110132710.252015-1-damien.lemoal@opensource.wdc.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/7/23 03:03, Tejun Heo wrote:
->> We can take a big hammer here and start with enabling only ACS-5 and
->> above for now. That will represent the set of devices that are in
->> development right now, and only a few already released (I have some in
->> my test boxes and they are not even a few months old...).
-> 
-> All that said, yeah, if we restrict it to only the newest devices, they're
-> more likely to be well behaved and a lot more visible when they misbehave.
-> That sounds reasonable to me.
+Move the detection of a device FUA support from
+ata_scsiop_mode_sense()/ata_dev_supports_fua() to device scan time in
+ata_dev_configure().
 
-I re-posted the series without patch 7 enabling FUA by default. This
-maintains the current state of libata while still cleaning up nicely all
-the code around FUA.
+The function ata_dev_config_fua() is introduced to detect if a device
+supports FUA and this support is indicated using the new device flag
+ATA_DFLAG_FUA.
 
-I will send 1 or 2 patches later after thinking a little more about how to
-safely enable FUA by default only for recent drives or drives of interest.
-E.g. SMR drives as the lack of FUA support for them forces the use of the
-block layer flush machinery, which itself causes write reordering... That
-needs to be addressed too, and will look at that.
+In order to blacklist known buggy devices, the horkage flag
+ATA_HORKAGE_NO_FUA is introduced. Similarly to other horkage flags, the
+libata.force=3D arguments "fua" and "nofua" are also introduced to allow
+a user to control this horkage flag through the "force" libata
+module parameter.
 
-Thanks for the feedback.
+The ATA_DFLAG_FUA device flag is set only and only if all the following
+conditions are met:
+* libata.fua module parameter is set to 1
+* The device supports the WRITE DMA FUA EXT command,
+* The device is not marked with the ATA_HORKAGE_NO_FUA flag, either from
+  the blacklist or set by the user with libata.force=3Dnofua
+* The device supports NCQ (while this is not mandated by the standards,
+  this restriction is introduced to avoid problems with older non-NCQ
+  devices).
 
--- 
-Damien Le Moal
-Western Digital Research
+Enabling or diabling libata FUA support for all devices can now also be
+done using the "force=3D[no]fua" module parameter when libata.fua is set
+to 1.
+
+Signed-off-by: Damien Le Moal <damien.lemoal@opensource.wdc.com>
+Reviewed-by: Hannes Reinecke <hare@suse.de>
+Reviewed-by: Chaitanya Kulkarni <kch@nvidia.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
+Reviewed-by: Niklas Cassel <niklas.cassel@wdc.com>
+---
+ .../admin-guide/kernel-parameters.txt         |  3 ++
+ drivers/ata/libata-core.c                     | 30 ++++++++++++++++++-
+ drivers/ata/libata-scsi.c                     | 30 ++-----------------
+ include/linux/libata.h                        |  8 +++--
+ 4 files changed, 39 insertions(+), 32 deletions(-)
+
+diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentat=
+ion/admin-guide/kernel-parameters.txt
+index 6cfa6e3996cf..3d0f2de7dc03 100644
+--- a/Documentation/admin-guide/kernel-parameters.txt
++++ b/Documentation/admin-guide/kernel-parameters.txt
+@@ -2816,6 +2816,9 @@
+ 			* [no]setxfer: Indicate if transfer speed mode setting
+ 			  should be skipped.
+=20
++			* [no]fua: Disable or enable FUA (Force Unit Access)
++			  support for devices supporting this feature.
++
+ 			* dump_id: Dump IDENTIFY data.
+=20
+ 			* disable: Disable this device.
+diff --git a/drivers/ata/libata-core.c b/drivers/ata/libata-core.c
+index 1c16342dda08..d25a53a873dc 100644
+--- a/drivers/ata/libata-core.c
++++ b/drivers/ata/libata-core.c
+@@ -2422,6 +2422,28 @@ static void ata_dev_config_chs(struct ata_device *=
+dev)
+ 			     dev->heads, dev->sectors);
+ }
+=20
++static void ata_dev_config_fua(struct ata_device *dev)
++{
++	/* Ignore FUA support if its use is disabled globally */
++	if (!libata_fua)
++		goto nofua;
++
++	/* Ignore devices without support for WRITE DMA FUA EXT */
++	if (!(dev->flags & ATA_DFLAG_LBA48) || !ata_id_has_fua(dev->id))
++		goto nofua;
++
++	/* Ignore known bad devices and devices that lack NCQ support */
++	if (!ata_ncq_supported(dev) || (dev->horkage & ATA_HORKAGE_NO_FUA))
++		goto nofua;
++
++	dev->flags |=3D ATA_DFLAG_FUA;
++
++	return;
++
++nofua:
++	dev->flags &=3D ~ATA_DFLAG_FUA;
++}
++
+ static void ata_dev_config_devslp(struct ata_device *dev)
+ {
+ 	u8 *sata_setting =3D dev->link->ap->sector_buf;
+@@ -2510,7 +2532,8 @@ static void ata_dev_print_features(struct ata_devic=
+e *dev)
+ 		return;
+=20
+ 	ata_dev_info(dev,
+-		     "Features:%s%s%s%s%s%s\n",
++		     "Features:%s%s%s%s%s%s%s\n",
++		     dev->flags & ATA_DFLAG_FUA ? " FUA" : "",
+ 		     dev->flags & ATA_DFLAG_TRUSTED ? " Trust" : "",
+ 		     dev->flags & ATA_DFLAG_DA ? " Dev-Attention" : "",
+ 		     dev->flags & ATA_DFLAG_DEVSLP ? " Dev-Sleep" : "",
+@@ -2671,6 +2694,7 @@ int ata_dev_configure(struct ata_device *dev)
+ 			ata_dev_config_chs(dev);
+ 		}
+=20
++		ata_dev_config_fua(dev);
+ 		ata_dev_config_devslp(dev);
+ 		ata_dev_config_sense_reporting(dev);
+ 		ata_dev_config_zac(dev);
+@@ -4105,6 +4129,9 @@ static const struct ata_blacklist_entry ata_device_=
+blacklist [] =3D {
+ 	 */
+ 	{ "SATADOM-ML 3ME",		NULL,	ATA_HORKAGE_NO_LOG_DIR },
+=20
++	/* Buggy FUA */
++	{ "Maxtor",		"BANC1G10",	ATA_HORKAGE_NO_FUA },
++
+ 	/* End Marker */
+ 	{ }
+ };
+@@ -6216,6 +6243,7 @@ static const struct ata_force_param force_tbl[] __i=
+nitconst =3D {
+ 	force_horkage_onoff(lpm,	ATA_HORKAGE_NOLPM),
+ 	force_horkage_onoff(setxfer,	ATA_HORKAGE_NOSETXFER),
+ 	force_horkage_on(dump_id,	ATA_HORKAGE_DUMP_ID),
++	force_horkage_onoff(fua,	ATA_HORKAGE_NO_FUA),
+=20
+ 	force_horkage_on(disable,	ATA_HORKAGE_DISABLE),
+ };
+diff --git a/drivers/ata/libata-scsi.c b/drivers/ata/libata-scsi.c
+index 46109bde8a04..aa338f10cef2 100644
+--- a/drivers/ata/libata-scsi.c
++++ b/drivers/ata/libata-scsi.c
+@@ -2240,30 +2240,6 @@ static unsigned int ata_msense_rw_recovery(u8 *buf=
+, bool changeable)
+ 	return sizeof(def_rw_recovery_mpage);
+ }
+=20
+-/*
+- * We can turn this into a real blacklist if it's needed, for now just
+- * blacklist any Maxtor BANC1G10 revision firmware
+- */
+-static int ata_dev_supports_fua(u16 *id)
+-{
+-	unsigned char model[ATA_ID_PROD_LEN + 1], fw[ATA_ID_FW_REV_LEN + 1];
+-
+-	if (!libata_fua)
+-		return 0;
+-	if (!ata_id_has_fua(id))
+-		return 0;
+-
+-	ata_id_c_string(id, model, ATA_ID_PROD, sizeof(model));
+-	ata_id_c_string(id, fw, ATA_ID_FW_REV, sizeof(fw));
+-
+-	if (strcmp(model, "Maxtor"))
+-		return 1;
+-	if (strcmp(fw, "BANC1G10"))
+-		return 1;
+-
+-	return 0; /* blacklisted */
+-}
+-
+ /**
+  *	ata_scsiop_mode_sense - Simulate MODE SENSE 6, 10 commands
+  *	@args: device IDENTIFY data / SCSI command of interest.
+@@ -2287,7 +2263,7 @@ static unsigned int ata_scsiop_mode_sense(struct at=
+a_scsi_args *args, u8 *rbuf)
+ 	};
+ 	u8 pg, spg;
+ 	unsigned int ebd, page_control, six_byte;
+-	u8 dpofua, bp =3D 0xff;
++	u8 dpofua =3D 0, bp =3D 0xff;
+ 	u16 fp;
+=20
+ 	six_byte =3D (scsicmd[0] =3D=3D MODE_SENSE);
+@@ -2350,9 +2326,7 @@ static unsigned int ata_scsiop_mode_sense(struct at=
+a_scsi_args *args, u8 *rbuf)
+ 		goto invalid_fld;
+ 	}
+=20
+-	dpofua =3D 0;
+-	if (ata_dev_supports_fua(args->id) && (dev->flags & ATA_DFLAG_LBA48) &&
+-	    (!(dev->flags & ATA_DFLAG_PIO) || dev->multi_count))
++	if (dev->flags & ATA_DFLAG_FUA)
+ 		dpofua =3D 1 << 4;
+=20
+ 	if (six_byte) {
+diff --git a/include/linux/libata.h b/include/linux/libata.h
+index 059ca7f2b69c..a759dfbdcc91 100644
+--- a/include/linux/libata.h
++++ b/include/linux/libata.h
+@@ -90,6 +90,7 @@ enum {
+ 	ATA_DFLAG_ACPI_FAILED	=3D (1 << 6), /* ACPI on devcfg has failed */
+ 	ATA_DFLAG_AN		=3D (1 << 7), /* AN configured */
+ 	ATA_DFLAG_TRUSTED	=3D (1 << 8), /* device supports trusted send/recv */
++	ATA_DFLAG_FUA		=3D (1 << 9), /* device supports FUA */
+ 	ATA_DFLAG_DMADIR	=3D (1 << 10), /* device requires DMADIR */
+ 	ATA_DFLAG_NCQ_SEND_RECV =3D (1 << 11), /* device supports NCQ SEND and =
+RECV */
+ 	ATA_DFLAG_NCQ_PRIO	=3D (1 << 12), /* device supports NCQ priority */
+@@ -112,9 +113,9 @@ enum {
+ 	ATA_DFLAG_D_SENSE	=3D (1 << 29), /* Descriptor sense requested */
+ 	ATA_DFLAG_ZAC		=3D (1 << 30), /* ZAC device */
+=20
+-	ATA_DFLAG_FEATURES_MASK	=3D ATA_DFLAG_TRUSTED | ATA_DFLAG_DA | \
+-				  ATA_DFLAG_DEVSLP | ATA_DFLAG_NCQ_SEND_RECV | \
+-				  ATA_DFLAG_NCQ_PRIO,
++	ATA_DFLAG_FEATURES_MASK	=3D (ATA_DFLAG_TRUSTED | ATA_DFLAG_DA |	\
++				   ATA_DFLAG_DEVSLP | ATA_DFLAG_NCQ_SEND_RECV | \
++				   ATA_DFLAG_NCQ_PRIO | ATA_DFLAG_FUA),
+=20
+ 	ATA_DEV_UNKNOWN		=3D 0,	/* unknown device */
+ 	ATA_DEV_ATA		=3D 1,	/* ATA device */
+@@ -381,6 +382,7 @@ enum {
+ 	ATA_HORKAGE_NO_NCQ_ON_ATI =3D (1 << 27),	/* Disable NCQ on ATI chipset =
+*/
+ 	ATA_HORKAGE_NO_ID_DEV_LOG =3D (1 << 28),	/* Identify device log missing=
+ */
+ 	ATA_HORKAGE_NO_LOG_DIR	=3D (1 << 29),	/* Do not read log directory */
++	ATA_HORKAGE_NO_FUA	=3D (1 << 30),	/* Do not use FUA */
+=20
+ 	 /* DMA mask for user DMA control: User visible values; DO NOT
+ 	    renumber */
+--=20
+2.39.0
 
