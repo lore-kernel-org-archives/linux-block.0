@@ -2,79 +2,103 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DB5AC46467
-	for <linux-block@archiver.kernel.org>; Tue, 10 Jan 2023 17:42:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B557C678D6
+	for <linux-block@archiver.kernel.org>; Tue, 10 Jan 2023 18:28:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235073AbjAJRm2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 10 Jan 2023 12:42:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33336 "EHLO
+        id S234608AbjAJS2y (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 10 Jan 2023 13:28:54 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42284 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234945AbjAJRmY (ORCPT
+        with ESMTP id S234439AbjAJS23 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 10 Jan 2023 12:42:24 -0500
-Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 619255E658
-        for <linux-block@vger.kernel.org>; Tue, 10 Jan 2023 09:42:16 -0800 (PST)
-Received: by mail-pj1-f54.google.com with SMTP id o1-20020a17090a678100b00219cf69e5f0so17314166pjj.2
-        for <linux-block@vger.kernel.org>; Tue, 10 Jan 2023 09:42:16 -0800 (PST)
+        Tue, 10 Jan 2023 13:28:29 -0500
+Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC075633AD;
+        Tue, 10 Jan 2023 10:24:10 -0800 (PST)
+Received: by mail-pl1-x62a.google.com with SMTP id jn22so14055797plb.13;
+        Tue, 10 Jan 2023 10:24:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=7DSDWSC5oI8TQxnm4gch91xIJryMU4lgAF90s/UwWWk=;
+        b=A3fMIP7fGQT8mhJMIpgNcr0rts9CVAZRFeqHDJG8x53GoQiiiIF1b8cGpuE0hHa53P
+         ltgntzNTQNGojWqN/Lnq9CocTb1V8MOhbc3yb0lUZ25Ycbj+YNGEAToLIZ+UAozb9OmE
+         ZypcGHDDE4xhl5bYlMtsNeO+L+J6omu91J/8swISZgxP8phCaglMphO8dcyP+lSMdERs
+         9S+9JHgsFjD+HylQ3fAksbrOVnsc/zIo6yP5bc7ikoyO8mMFSN4uLi5mGOuKtOJeNPoz
+         Rx05hFTUZqJZODLB+URCvYmDuogQgRdLBDVFRD9G52SiuDzRrVw4Qe1vGnXr6NzW1myl
+         pCiA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Tdlg6j4tQuHi943D1bnrP/kfGJQJ0Oe1JiVqWMd0Eg0=;
-        b=eljR0hv2KDOTgFIi79Srgk8qiYITpL36gjf59Jb/24TMwQm3+nZJYPQljcve1JG3x9
-         AyLn8rRGi4DhDpJzd25k+a2GYFhITgn707wBC7OhL6en2QWCGLf8uqksYiCIN9CxlR9E
-         xbwxDH6G41IRwHkQluS0XocsibDEbp8FXdkPO+MY3JqbmYOkqIDEz27IvR0GRLmmRBAX
-         8zwFl4f3BZ03OlB8kwIeD0mWn2Tf03NIl3tZsn/vD+63b2AMFLp39GGXRjmHyH0NsgzF
-         50666zcMJ7ctdssX5ZZ2vOdsSJC7/hugALyHRcghEEDxPrI9veqCapc5IqP5Xyx5msjK
-         Hgqw==
-X-Gm-Message-State: AFqh2kosvAljOVFXsMKXXxa9q+vo4Ehd/MsAc7xOCyadKGyn9XEqPgYM
-        j/HxKznoaUPoo/HKRN4Wsnk=
-X-Google-Smtp-Source: AMrXdXu7Op7moBEkrN2rqcGMYcdiSzlQYFctpVQ23NxRL/2QShD61kX0yBHl4x68eE9Nsd0r9ZdmjA==
-X-Received: by 2002:a17:903:3014:b0:191:1987:9f67 with SMTP id o20-20020a170903301400b0019119879f67mr59668006pla.34.1673372536238;
-        Tue, 10 Jan 2023 09:42:16 -0800 (PST)
-Received: from ?IPV6:2620:15c:211:201:aeba:fdb:7986:a5f9? ([2620:15c:211:201:aeba:fdb:7986:a5f9])
-        by smtp.gmail.com with ESMTPSA id j14-20020a170903024e00b0019101215f63sm8450085plh.93.2023.01.10.09.42.14
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 10 Jan 2023 09:42:15 -0800 (PST)
-Message-ID: <b138485d-9922-3071-9803-f51665874a06@acm.org>
-Date:   Tue, 10 Jan 2023 09:42:13 -0800
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=7DSDWSC5oI8TQxnm4gch91xIJryMU4lgAF90s/UwWWk=;
+        b=O5vkKvg9cgMTBWssww5RVOy73y7E8DSyOL+piG+7BNIiRb+ho+DPVfm/c2QnzUIDfC
+         +gS+ndFGd/i42bqJOWJwK1UGBu0f1oh4lpSpOUUUn1nZkB5GyqjBVwAEvExEgURic4kG
+         FQEGiPChulg47TS0+QL9pMOOvuT2X2UH+Tp7WWJBLctyO8wkbk0eSZbYJ2OnLfzbcK2p
+         38mNiSTk1/rsN+ep4PTmBf2KsT5uXukyUc3JQv9x5HYm+I1gfmGrTTG/9/n8zu1KF4+Q
+         b+2s5eRy1R831TLEhk/9qCVaZa0xmROn4W/Vhkwf+Tec5iSyM+wUz79vfUqXzACreMlp
+         OwRA==
+X-Gm-Message-State: AFqh2koDorprPTuUMWnga1ZQh9CUo64ZLQLD4ILb0RUHxKASMi48jskF
+        3GBlJiTY141Z+sxp581o0fU=
+X-Google-Smtp-Source: AMrXdXtXVoul7y2ASo4NkUZUjHF15E9skqNkwo6cBqs0hjiByPDcgbex+D2ueZTZGIZGi8AVuISzWg==
+X-Received: by 2002:a05:6a20:8423:b0:b5:f180:56ab with SMTP id c35-20020a056a20842300b000b5f18056abmr8270009pzd.60.1673375049955;
+        Tue, 10 Jan 2023 10:24:09 -0800 (PST)
+Received: from localhost (2603-800c-1a02-1bae-a7fa-157f-969a-4cde.res6.spectrum.com. [2603:800c:1a02:1bae:a7fa:157f:969a:4cde])
+        by smtp.gmail.com with ESMTPSA id w18-20020a170902e89200b00186a2444a43sm8400073plg.27.2023.01.10.10.24.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 10 Jan 2023 10:24:09 -0800 (PST)
+Sender: Tejun Heo <htejun@gmail.com>
+Date:   Tue, 10 Jan 2023 08:24:08 -1000
+From:   Tejun Heo <tj@kernel.org>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     axboe@kernel.dk, josef@toxicpanda.com, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/4] blkcg: Drop unnecessary RCU read [un]locks from
+ blkg_conf_prep/finish()
+Message-ID: <Y72tSI0eQky7Tr42@slm.duckdns.org>
+References: <20230105212432.289569-1-tj@kernel.org>
+ <20230105212432.289569-2-tj@kernel.org>
+ <20230108170240.GA19165@lst.de>
+ <Y7x9t+4EwXFl7OwS@slm.duckdns.org>
+ <20230110064900.GA10277@lst.de>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.1
-Subject: Re: [PATCH 8/8] scsi: ufs: Enable zoned write pipelining
-Content-Language: en-US
-To:     Avri Altman <Avri.Altman@wdc.com>, Jens Axboe <axboe@kernel.dk>
-Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Damien Le Moal <damien.lemoal@opensource.wdc.com>
-References: <20230109232738.169886-1-bvanassche@acm.org>
- <20230109232738.169886-9-bvanassche@acm.org>
- <DM6PR04MB65758465088561BC2632D91AFCFF9@DM6PR04MB6575.namprd04.prod.outlook.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <DM6PR04MB65758465088561BC2632D91AFCFF9@DM6PR04MB6575.namprd04.prod.outlook.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230110064900.GA10277@lst.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/10/23 01:16, Avri Altman wrote:
-> Please include scsi lkml as well to allow ufs stakeholders to be aware and comment.
+Hello,
 
-Hi Avri,
+On Tue, Jan 10, 2023 at 07:49:00AM +0100, Christoph Hellwig wrote:
+> On Mon, Jan 09, 2023 at 10:48:55AM -1000, Tejun Heo wrote:
+> > Now that all RCU flavors have been combined, holding a spin lock, disabling
+> > irq, disabling preemption all imply RCU read lock.
+> 
+> Can you write it like this in the commit log, please? 
 
-I will do that when reposting this patch series.
+Sure, will do.
 
-As you may have noticed, Damien Le Moal plans to implement a new 
-approach - a single queue per zoned logical unit for all write commands. 
-I will wait with reworking this patch series until that approach has 
-been implemented.
+> > I can drop the changes but this actually bothers me. The annotation has been
+> > broken for a *long* time and nobody noticed. Furthermore, I can't remember a
+> > time when __acquires/__releases notation caught anything that lockdep
+> > couldn't trivially and can't even think of a way how it could. AFAICS, these
+> > annotations don't contribute anything other than preservation of themselves.
+> > I don't see why we would want to keep them.
+> 
+> People have noticed it.  It just hasn't been a priority as there are
+> lots of even more problematic things.
 
-Thanks,
+That doesn't really shed a positive light on them, does it? I'll drop this
+part but can you think of actual reasons to keep these around other than to
+keep sparse happy? I'm genuninely curious and have asked several people.
+Nobody had a good answer.
 
-Bart.
+Thanks.
 
-
+-- 
+tejun
