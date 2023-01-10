@@ -2,129 +2,97 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1472EC5479D
-	for <linux-block@archiver.kernel.org>; Tue, 10 Jan 2023 01:09:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4AC6C5479D
+	for <linux-block@archiver.kernel.org>; Tue, 10 Jan 2023 01:17:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230001AbjAJBJu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 9 Jan 2023 20:09:50 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46480 "EHLO
+        id S229845AbjAJBRU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 9 Jan 2023 20:17:20 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48636 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229991AbjAJBJt (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 9 Jan 2023 20:09:49 -0500
-Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9EA36334
-        for <linux-block@vger.kernel.org>; Mon,  9 Jan 2023 17:09:48 -0800 (PST)
-Received: by mail-pl1-x62a.google.com with SMTP id jl4so11524436plb.8
-        for <linux-block@vger.kernel.org>; Mon, 09 Jan 2023 17:09:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=d6MijzBZB5rlx1R58nq0Sv7teK8nGEA82eTxDtWCKsE=;
-        b=Bn4yejJ7fm69v3cYkvQR6/XZ0ITpifW6lvLuH+6LO/RNIKd6RVLus29e3eNTTUYgPb
-         BhxS6AHI3lZE0WKKMqt0CS7vGXTLZB0fo63MFYyY8HBV68B62Y7LcdFA/1oUdIBP6AId
-         MhbA8lbdcfi9yjrqtzdnjy3FvUsTOOuCY1/MLUI9KzzIJWFAQcXbcGZV/tkLNJeTVaDR
-         GTlLW6X9HGj5gR68MlI+Ml1FDNcAgg83bb4DK4mQY8nMRJmQ5oVonvjIj1/ktoC9V5V3
-         K/B+XasBfZgXYKxE20Y8HVpB5cLiNjShSwyzTYelpX2QgmUAsQI7PDJTl4cK1SRlpf/8
-         k4pA==
+        with ESMTP id S232803AbjAJBRU (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 9 Jan 2023 20:17:20 -0500
+Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com [209.85.215.170])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F28625D3
+        for <linux-block@vger.kernel.org>; Mon,  9 Jan 2023 17:17:19 -0800 (PST)
+Received: by mail-pg1-f170.google.com with SMTP id 36so7136467pgp.10
+        for <linux-block@vger.kernel.org>; Mon, 09 Jan 2023 17:17:19 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=d6MijzBZB5rlx1R58nq0Sv7teK8nGEA82eTxDtWCKsE=;
-        b=euGijX0CmV8JJKR3ppsB8yB7+AkJ1ApSHKW50wueHva6DFaUxOAcEtAyXHOZIcV6rO
-         IrWPtEShwrRIcQOen5XL5AA3beEjS2mNWDG7FKZkTbnQcsI74pkP7igZt9qPfAAzwnRN
-         XGjisHXejuimfdHFlFb5trwRLsRSA51OVuB+yY6mIP+7NrQqoKmmMMwVfad+7brAXN9H
-         Ptp9HOTGsS8eWJ3u9fp0zjozCpz9YySLbcfbvcsH7AYEB+8yxTXJhEwDBrX882EHbuBI
-         xOCP74pKj+KgY3U+YnC06yzIpWVu8wlMBW+XfT7vrH/MKFYPDUO2RYFAzk9BqV2jO4MG
-         KkdQ==
-X-Gm-Message-State: AFqh2kq0gvcRNeqjRn1fcs77nh+ls64KVetiuET3oyXzldKvKrHpmqcb
-        XEwzescirJc5cLsAd7eees0JTw==
-X-Google-Smtp-Source: AMrXdXt/eG8JeXT+AOt5cuhRRWuhgub2urGxlAeT04df4poSCCuXhbRnkGeiLsicq4wsrvmtXpkYkg==
-X-Received: by 2002:a17:903:3311:b0:189:d0fa:230f with SMTP id jk17-20020a170903331100b00189d0fa230fmr17111254plb.4.1673312988310;
-        Mon, 09 Jan 2023 17:09:48 -0800 (PST)
-Received: from [192.168.1.136] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id u18-20020a170903125200b00189adf6770fsm6733097plh.233.2023.01.09.17.09.46
+        bh=9mWoij97YZYZU5Ut7Rt0KH1q/vM62BOVW2vRPTJEw0Y=;
+        b=m0R7ywUzlTTjVr7iI0bAulY2NDGsrRMHJbr8p1IGzTM8Q+nx4/SzsddlElVpsDLw2X
+         8dh8nxEZqNv4jOTGqcBqSuLr51gd+Q1sJ4dT3h0eEPR9KapOocRpjsf8opDEEQUL7CNg
+         3XAQLvFy70Uri37HWmlTY89Dghq9BfJKLSXHMFpyAEPe6UsR5hBf4KqPJLht9EC0tgWf
+         +UmH8CpXghX9IKCUSjwpiwBJhnZzcznDSOv+Si95CxZjCwAdsKc8IqFOIOqUMnYGanGL
+         ddQ1KvsdfGqoeR5qAoJ3bUIjtHLLdO9AwpWKuS2Rilksle3hVPL0DWxWhwVexvdkVXHb
+         ZEDg==
+X-Gm-Message-State: AFqh2kqBZ8F5dImCIxaPb4UH+d3RBeAytTDSjRGyQaiHZtRy+dG/RO7d
+        3e7XDRuxzwPOJiu8vO1E0uchY5M914Q=
+X-Google-Smtp-Source: AMrXdXtGTFNxDQ+1FKuTy3XY9Uj7yFRPlKwzICEJWduvxFSsr+YJggwffScNQt+QmXiUCt1gCgXnHg==
+X-Received: by 2002:a62:4dc7:0:b0:586:210b:2b67 with SMTP id a190-20020a624dc7000000b00586210b2b67mr9299985pfb.6.1673313438891;
+        Mon, 09 Jan 2023 17:17:18 -0800 (PST)
+Received: from ?IPV6:2620:15c:211:201:9f06:14dd:484f:e55c? ([2620:15c:211:201:9f06:14dd:484f:e55c])
+        by smtp.gmail.com with ESMTPSA id c76-20020a624e4f000000b00589c467ed88sm1446543pfb.69.2023.01.09.17.17.17
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 09 Jan 2023 17:09:47 -0800 (PST)
-Message-ID: <e4a972f4-50fd-4c0e-1b44-dc702fd9c445@kernel.dk>
-Date:   Mon, 9 Jan 2023 18:09:46 -0700
+        Mon, 09 Jan 2023 17:17:18 -0800 (PST)
+Message-ID: <f47f32d8-92a3-b7d5-a462-d34da9263d34@acm.org>
+Date:   Mon, 9 Jan 2023 17:17:16 -0800
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.0
-Subject: Re: [External] [LSF/MM/BPF BoF] Session for Zoned Storage 2023
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.5.1
+Subject: Re: [PATCH 4/8] block/mq-deadline: Only use zone locking if necessary
 Content-Language: en-US
-To:     "Viacheslav A.Dubeyko" <viacheslav.dubeyko@bytedance.com>
-Cc:     Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-        =?UTF-8?Q?Javier_Gonz=c3=a1lez?= <javier.gonz@samsung.com>,
-        Viacheslav Dubeyko <slava@dubeyko.com>,
-        Luis Chamberlain <mcgrof@kernel.org>,
-        Linux FS Devel <linux-fsdevel@vger.kernel.org>,
-        linux-block@vger.kernel.org,
-        =?UTF-8?Q?Matias_Bj=c3=b8rling?= <Matias.Bjorling@wdc.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Adam Manzanares <a.manzanares@samsung.com>,
-        Hans Holmberg <hans.holmberg@wdc.com>,
-        lsf-pc@lists.linux-foundation.org
-References: <F6BF25E2-FF26-48F2-8378-3CB36E362313@dubeyko.com>
- <Y7h0F0w06cNM89hO@bombadil.infradead.org>
- <4CC4F55E-17B3-47E2-A8C5-9098CCEB65D6@dubeyko.com>
- <CGME20230107015641eucas1p13c2b37b5ca7a5b64eb520b79316d5186@eucas1p1.samsung.com>
- <5DF10459-88F3-48DA-AEB2-5B436549A194@bytedance.com>
- <20230109153315.waqfokse4srv6xlz@mpHalley-2.localdomain>
- <AF3750AD-1B66-4F8A-936F-A14EC17DAC16@bytedance.com>
- <04cc803e-0246-bf8a-c083-f556a373ae4f@opensource.wdc.com>
- <ca30360e-ab51-6282-bd3c-208399e5a552@kernel.dk>
- <E2BA234A-D3D3-440B-BBDB-230B772B2D01@bytedance.com>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <E2BA234A-D3D3-440B-BBDB-230B772B2D01@bytedance.com>
-Content-Type: text/plain; charset=UTF-8
+To:     Jens Axboe <axboe@kernel.dk>,
+        Damien Le Moal <damien.lemoal@opensource.wdc.com>
+Cc:     linux-block@vger.kernel.org, Jaegeuk Kim <jaegeuk@kernel.org>,
+        Avri Altman <avri.altman@wdc.com>,
+        Damien Le Moal <damien.lemoal@wdc.com>
+References: <20230109232738.169886-1-bvanassche@acm.org>
+ <20230109232738.169886-5-bvanassche@acm.org>
+ <92096c6d-fe0a-7b5b-222f-c532286c0c8b@opensource.wdc.com>
+ <7bf28b7e-7301-29b5-c610-dff04ad6337f@acm.org>
+ <a4f42abc-08dd-9a2e-3e6d-371e3ed695d2@opensource.wdc.com>
+ <b72e484c-2985-a755-b0e1-e9ccd93cfc3b@acm.org>
+ <681a991f-e09a-eeb6-805a-ee807250c399@opensource.wdc.com>
+ <2f0f4f28-4096-ab76-5be3-56c44231fed3@kernel.dk>
+ <49a9fd49-c9dd-8e5d-368a-ac182f7165ca@kernel.dk>
+ <07084f70-00a7-d142-479c-52c75af28246@acm.org>
+ <72092951-3de8-35a3-9e50-74cdcc9ee772@kernel.dk>
+ <31d32f69-4c14-c9be-494f-7071112073f9@acm.org>
+ <86eef990-0725-9669-6b7e-1fe935a6b648@kernel.dk>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <86eef990-0725-9669-6b7e-1fe935a6b648@kernel.dk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/9/23 4:20?PM, Viacheslav A.Dubeyko wrote:
-> 
-> 
->> On Jan 9, 2023, at 3:00 PM, Jens Axboe <axboe@kernel.dk> wrote:
->>
->>>> My point here that we could summarize:
->>>> (1) what features already implemented and supported,
->>>> (2) what features are under implementation and what is progress,
->>>> (3) what features need to be implemented yet.
->>>>
->>>> Have we implemented everything already? :)
->>>
->>> Standards are full of features that are not useful in a general purpose
->>> system. So we likely never will implement everything. We never did for
->>> SCSI and ATA and never will either.
->> Indeed, and that's a very important point. Some people read specs and
->> find things that aren't in the Linux driver (any spec, not a specific
->> one), and think they need to be added. No. We only add them if they make
->> sense, both in terms of use cases, but also as long as they can get
->> implemented cleanly. Parts of basically any spec is garbage and don't
->> necessarily fit within the given subsystem either.
->>
->> The above would make me worried about patches coming from anyone with
->> that mindset.
->>
-> 
-> OK. We already have discussion about garbage in spec. :)
-> So, what would we like finally implement and what never makes sense to do?
-> Should we identify really important stuff for implementation?
+On 1/9/23 17:03, Jens Axboe wrote:
+> Because I'm really not thrilled to see the addition of various "is this
+> device ordered" all over the place, and now we are getting "is this
+> device ordered AND pipelined". Do you see what I mean? It's making
+> things _worse_, not better, and we really should be making it better
+> rather than pile more stuff on top of it.
 
-Well if you did have that discussion, then it seemed you got nothing
-from it. Because asking that kind of question is EXACTLY what I'm saying
-is the opposite of what should be done. If there's a demand for a
-feature, then it can be looked at and ultimately implemented if it makes
-sense. You're still talking about proactively finding features and
-implementing them "just in case they are needed", which is very much the
-opposite and wrong approach, and how any kind of software ends up being
-bloated, slow, and buggy/useless.
+Hi Jens,
 
--- 
-Jens Axboe
+I agree with you that the additional complexity is unfortunate.
+
+For most zoned storage use cases a queue depth above one is not an 
+option if the zoned device expects zoned write commands in LBA order. 
+ATA controllers do not support preserving the command order. Transports 
+like NVMeOF do not support preserving the command order either. UFS is 
+an exception. The only use case supported by the UFS specification is a 
+1:1 connection between UFS controller and UFS device with a link with a 
+low BER between controller and device. UFS controllers must preserve the 
+command order per command queue. I think this context is well suited for 
+pipelining zoned write commands.
+
+Thanks,
+
+Bart.
+
 
