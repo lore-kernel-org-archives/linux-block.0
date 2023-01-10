@@ -2,77 +2,58 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 07748C54EBE
-	for <linux-block@archiver.kernel.org>; Tue, 10 Jan 2023 06:57:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6FD7EC54EBE
+	for <linux-block@archiver.kernel.org>; Tue, 10 Jan 2023 06:58:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234969AbjAJG5q (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 10 Jan 2023 01:57:46 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34376 "EHLO
+        id S229861AbjAJG6f (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 10 Jan 2023 01:58:35 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35074 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230510AbjAJG5n (ORCPT
+        with ESMTP id S231228AbjAJG60 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 10 Jan 2023 01:57:43 -0500
+        Tue, 10 Jan 2023 01:58:26 -0500
 Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B62BE392D8;
-        Mon,  9 Jan 2023 22:57:41 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E5E90392D8;
+        Mon,  9 Jan 2023 22:58:25 -0800 (PST)
 Received: by verein.lst.de (Postfix, from userid 2407)
-        id BFF2F68D06; Tue, 10 Jan 2023 07:57:38 +0100 (CET)
-Date:   Tue, 10 Jan 2023 07:57:38 +0100
+        id 47C9D68D08; Tue, 10 Jan 2023 07:58:23 +0100 (CET)
+Date:   Tue, 10 Jan 2023 07:58:22 +0100
 From:   Christoph Hellwig <hch@lst.de>
 To:     Pankaj Raghav <p.raghav@samsung.com>
 Cc:     axboe@kernel.dk, kernel@pankajraghav.com,
         linux-kernel@vger.kernel.org, hare@suse.de, bvanassche@acm.org,
         snitzer@kernel.org, dm-devel@redhat.com,
         damien.lemoal@opensource.wdc.com, linux-nvme@lists.infradead.org,
-        hch@lst.de, linux-block@vger.kernel.org, gost.dev@samsung.com,
-        Luis Chamberlain <mcgrof@kernel.org>,
-        Johannes Thumshirn <johannes.thumshirn@wdc.com>
-Subject: Re: [PATCH 6/7] dm-zone: use generic helpers to calculate offset
- from zone start
-Message-ID: <20230110065738.GE10289@lst.de>
-References: <20230106083317.93938-1-p.raghav@samsung.com> <CGME20230106083322eucas1p1ce3ca7b02ca87bb2be8543291e223338@eucas1p1.samsung.com> <20230106083317.93938-7-p.raghav@samsung.com>
+        hch@lst.de, linux-block@vger.kernel.org, gost.dev@samsung.com
+Subject: Re: [PATCH 7/7] dm: call dm_zone_endio after the target endio
+ callback for zoned devices
+Message-ID: <20230110065822.GF10289@lst.de>
+References: <20230106083317.93938-1-p.raghav@samsung.com> <CGME20230106083323eucas1p2f0f6d5d5c1c3713be35b841157ae463e@eucas1p2.samsung.com> <20230106083317.93938-8-p.raghav@samsung.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230106083317.93938-7-p.raghav@samsung.com>
+In-Reply-To: <20230106083317.93938-8-p.raghav@samsung.com>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Jan 06, 2023 at 09:33:16AM +0100, Pankaj Raghav wrote:
-> Use the bdev_offset_from_zone_start() helper function to calculate
-> the offset from zone start instead of open coding.
+On Fri, Jan 06, 2023 at 09:33:17AM +0100, Pankaj Raghav wrote:
+> dm_zone_endio() updates the bi_sector of orig bio for zoned devices that
+> uses either native append or append emulation, and it is called before the
+> endio of the target. But target endio can still update the clone bio
+> after dm_zone_endio is called, thereby, the orig bio does not contain
+> the updated information anymore.
 > 
-> Signed-off-by: Pankaj Raghav <p.raghav@samsung.com>
-> Reviewed-by: Luis Chamberlain <mcgrof@kernel.org>
-> Reviewed-by: Damien Le Moal <damien.lemoal@opensource.wdc.com>
-> Reviewed-by: Bart Van Assche <bvanassche@acm.org>
-> Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
-> Reviewed-by: Mike Snitzer <snitzer@kernel.org>
-> ---
->  drivers/md/dm-zone.c | 8 +++-----
->  1 file changed, 3 insertions(+), 5 deletions(-)
+> Currently, this is not a problem as the targets that support zoned devices
+> such as dm-zoned, dm-linear, and dm-crypt do not have an endio function,
+> and even if they do (such as dm-flakey), they don't modify the
+> bio->bi_iter.bi_sector of the cloned bio that is used to update the
+> orig_bio's bi_sector in dm_zone_endio function.
 > 
-> diff --git a/drivers/md/dm-zone.c b/drivers/md/dm-zone.c
-> index 3dafc0e8b7a9..ac6fc1293d41 100644
-> --- a/drivers/md/dm-zone.c
-> +++ b/drivers/md/dm-zone.c
-> @@ -390,7 +390,8 @@ static bool dm_zone_map_bio_begin(struct mapped_device *md,
->  	case REQ_OP_WRITE_ZEROES:
->  	case REQ_OP_WRITE:
->  		/* Writes must be aligned to the zone write pointer */
-> -		if ((clone->bi_iter.bi_sector & (zsectors - 1)) != zwp_offset)
-> +		if (bdev_offset_from_zone_start(md->disk->part0,
-> +						clone->bi_iter.bi_sector) != zwp_offset)
+> Call dm_zone_endio for zoned devices after calling the target's endio
+> function.
 
-I can't see how this actually cleans antyhing up, while it does add an
-overly long line.
+This looks sensible, but I fail to see why we need this or how it fits
+into the earlier block layer part of the series.
 
->  		if (clone->bi_status == BLK_STS_OK &&
->  		    bio_op(clone) == REQ_OP_ZONE_APPEND) {
->  			orig_bio->bi_iter.bi_sector +=
-> -				clone->bi_iter.bi_sector & mask;
-> +				bdev_offset_from_zone_start(disk->part0, clone->bi_iter.bi_sector);
-
-Same here.
