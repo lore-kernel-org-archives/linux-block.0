@@ -2,37 +2,38 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C735C5479D
-	for <linux-block@archiver.kernel.org>; Wed, 11 Jan 2023 09:54:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 293B5C67871
+	for <linux-block@archiver.kernel.org>; Wed, 11 Jan 2023 09:55:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235879AbjAKJyS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 11 Jan 2023 04:54:18 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51600 "EHLO
+        id S238816AbjAKJzr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 11 Jan 2023 04:55:47 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52246 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235993AbjAKJxo (ORCPT
+        with ESMTP id S236347AbjAKJzT (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 11 Jan 2023 04:53:44 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF3A5D109;
-        Wed, 11 Jan 2023 01:51:27 -0800 (PST)
+        Wed, 11 Jan 2023 04:55:19 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 384091AD89;
+        Wed, 11 Jan 2023 01:52:15 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 9221EB81B76;
-        Wed, 11 Jan 2023 09:51:26 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 54F6DC433F1;
-        Wed, 11 Jan 2023 09:51:24 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 24F1061B9A;
+        Wed, 11 Jan 2023 09:52:14 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 827F6C433EF;
+        Wed, 11 Jan 2023 09:52:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1673430685;
-        bh=z0ZYgHqL1YLvYl+ue5zNy1KMy+u3shk6BmiAvHiQZSA=;
+        s=korg; t=1673430733;
+        bh=hkuo7qNDuli+lY95kty3I8u2gv4csLJIhFbudWsHe44=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=xZGcZ5JDRrdXTJbt9tLPDzh24ToBaCeG04aIrg63SxaV0mqioT6pGZXGHiVeh9ZOU
-         sO0JuLfJTFUVrJVMPgoU9Fwio7tkoa1uh4VeY/xzIKAbqvAAsfPDw+kuuk3E42lxBv
-         sJ9yu85to26aoTWWeVLBJDsI3mtwYFGQ3RchmYyA=
-Date:   Wed, 11 Jan 2023 10:51:22 +0100
+        b=hlUjMxfxt0z7KP7jhGBcW0mbvluD21ZU5AMs1exGjhcHCcNtCt2tujvNtHoCc84RR
+         AZrGEOSQj9OQpn95tznKo4sX8isYo7p8QwqWycSgsIcnfk+WGrTzY3MMLiTZ8IqXpg
+         6a9zIgsqx4b3HroVDVYyjIDs5L+hk4EDNJSkmWUw=
+Date:   Wed, 11 Jan 2023 10:52:10 +0100
 From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     "Rafael J. Wysocki" <rafael@kernel.org>
+To:     Mika Westerberg <mika.westerberg@linux.intel.com>
 Cc:     linux-kernel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        "Rafael J. Wysocki" <rafael@kernel.org>,
         Len Brown <lenb@kernel.org>,
         Stefan Richter <stefanr@s5r6.in-berlin.de>,
         Wolfram Sang <wsa@kernel.org>,
@@ -51,7 +52,6 @@ Cc:     linux-kernel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
         Sanyog Kale <sanyog.r.kale@intel.com>,
         Andreas Noever <andreas.noever@gmail.com>,
         Michael Jamet <michael.jamet@intel.com>,
-        Mika Westerberg <mika.westerberg@linux.intel.com>,
         Yehezkel Bernat <YehezkelShB@gmail.com>,
         Jiri Slaby <jirislaby@kernel.org>,
         Heikki Krogerus <heikki.krogerus@linux.intel.com>,
@@ -76,27 +76,25 @@ Cc:     linux-kernel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
         platform-driver-x86@vger.kernel.org
 Subject: Re: [PATCH 3/5] driver core: make struct device_type.uevent() take a
  const *
-Message-ID: <Y76GmvOD9KxSuD7o@kroah.com>
+Message-ID: <Y76Gyhbb8aNGPh+I@kroah.com>
 References: <20221123122523.1332370-1-gregkh@linuxfoundation.org>
  <20221123122523.1332370-3-gregkh@linuxfoundation.org>
- <CAJZ5v0gqD_TW3iGLAiH=us1B0-JLGtv2VGTJjQwiWxCmris9ag@mail.gmail.com>
+ <Y34mpkqds3NEZclU@black.fi.intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAJZ5v0gqD_TW3iGLAiH=us1B0-JLGtv2VGTJjQwiWxCmris9ag@mail.gmail.com>
+In-Reply-To: <Y34mpkqds3NEZclU@black.fi.intel.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Nov 23, 2022 at 01:38:05PM +0100, Rafael J. Wysocki wrote:
-> On Wed, Nov 23, 2022 at 1:25 PM Greg Kroah-Hartman
-> <gregkh@linuxfoundation.org> wrote:
-> >
+On Wed, Nov 23, 2022 at 03:56:54PM +0200, Mika Westerberg wrote:
+> On Wed, Nov 23, 2022 at 01:25:21PM +0100, Greg Kroah-Hartman wrote:
 > > The uevent() callback in struct device_type should not be modifying the
 > > device that is passed into it, so mark it as a const * and propagate the
 > > function signature changes out into all relevant subsystems that use
 > > this callback.
-> >
+> > 
 > > Cc: Jens Axboe <axboe@kernel.dk>
 > > Cc: "Rafael J. Wysocki" <rafael@kernel.org>
 > > Cc: Len Brown <lenb@kernel.org>
@@ -118,41 +116,7 @@ On Wed, Nov 23, 2022 at 01:38:05PM +0100, Rafael J. Wysocki wrote:
 > > Cc: Andreas Noever <andreas.noever@gmail.com>
 > > Cc: Michael Jamet <michael.jamet@intel.com>
 > > Cc: Mika Westerberg <mika.westerberg@linux.intel.com>
-> > Cc: Yehezkel Bernat <YehezkelShB@gmail.com>
-> > Cc: Jiri Slaby <jirislaby@kernel.org>
-> > Cc: Heikki Krogerus <heikki.krogerus@linux.intel.com>
-> > Cc: "Matthew Wilcox (Oracle)" <willy@infradead.org>
-> > Cc: "Martin K. Petersen" <martin.petersen@oracle.com>
-> > Cc: Chaitanya Kulkarni <kch@nvidia.com>
-> > Cc: Ming Lei <ming.lei@redhat.com>
-> > Cc: Jilin Yuan <yuanjilin@cdjrlc.com>
-> > Cc: Alan Stern <stern@rowland.harvard.edu>
-> > Cc: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-> > Cc: Sakari Ailus <sakari.ailus@linux.intel.com>
-> > Cc: Jason Gunthorpe <jgg@ziepe.ca>
-> > Cc: Thomas Gleixner <tglx@linutronix.de>
-> > Cc: Ira Weiny <ira.weiny@intel.com>
-> > Cc: Dan Williams <dan.j.williams@intel.com>
-> > Cc: Won Chung <wonchung@google.com>
-> > Cc: alsa-devel@alsa-project.org
-> > Cc: devicetree@vger.kernel.org
-> > Cc: linux-acpi@vger.kernel.org
-> > Cc: linux-block@vger.kernel.org
-> > Cc: linux-i2c@vger.kernel.org
-> > Cc: linux-i3c@lists.infradead.org
-> > Cc: linux-input@vger.kernel.org
-> > Cc: linux-kernel@vger.kernel.org
-> > Cc: linux-media@vger.kernel.org
-> > Cc: linux-serial@vger.kernel.org
-> > Cc: linux-usb@vger.kernel.org
-> > Cc: linux1394-devel@lists.sourceforge.net
-> > Cc: platform-driver-x86@vger.kernel.org
-> > Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 > 
-> Acked-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
-> 
-> (which my ACPI maintainer hat on).
+> Acked-by: Mika Westerberg <mika.westerberg@linux.intel.com> # for Thunderbolt
 
-thanks for the review, I'll add it to the v2 patch.
-
-greg k-h
+Thanks for the review.
