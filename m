@@ -2,87 +2,100 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD280C67871
-	for <linux-block@archiver.kernel.org>; Wed, 11 Jan 2023 05:03:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F184C46467
+	for <linux-block@archiver.kernel.org>; Wed, 11 Jan 2023 05:03:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231899AbjAKFDq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 11 Jan 2023 00:03:46 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48380 "EHLO
+        id S232388AbjAKFDr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 11 Jan 2023 00:03:47 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48390 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233598AbjAKFDe (ORCPT
+        with ESMTP id S234505AbjAKFDf (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 11 Jan 2023 00:03:34 -0500
+        Wed, 11 Jan 2023 00:03:35 -0500
 Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA8A5D100;
-        Tue, 10 Jan 2023 21:03:33 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 655CDD2D8;
+        Tue, 10 Jan 2023 21:03:34 -0800 (PST)
 Received: from mail02.huawei.com (unknown [172.30.67.153])
-        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4NsFv340gHz4f3s6m;
-        Wed, 11 Jan 2023 13:03:27 +0800 (CST)
+        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4NsFv25BYrz4f3lJx;
+        Wed, 11 Jan 2023 13:03:26 +0800 (CST)
 Received: from huaweicloud.com (unknown [10.175.124.27])
-        by APP1 (Coremail) with SMTP id cCh0CgDX9S8fQ75jGl2gBQ--.10280S7;
-        Wed, 11 Jan 2023 13:03:30 +0800 (CST)
+        by APP1 (Coremail) with SMTP id cCh0CgDX9S8fQ75jGl2gBQ--.10280S5;
+        Wed, 11 Jan 2023 13:03:29 +0800 (CST)
 From:   Kemeng Shi <shikemeng@huaweicloud.com>
 To:     hch@lst.de, axboe@kernel.dk, dwagner@suse.de, hare@suse.de,
         ming.lei@redhat.com, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org
 Cc:     john.garry@huawei.com, jack@suse.cz
-Subject: [PATCH v3 05/14] blk-mq: remove unnecessary list_empty check in blk_mq_try_issue_list_directly
-Date:   Wed, 11 Jan 2023 21:01:50 +0800
-Message-Id: <20230111130159.3741753-6-shikemeng@huaweicloud.com>
+Subject: [PATCH v3 03/14] blk-mq: wait on correct sbitmap_queue in blk_mq_mark_tag_wait
+Date:   Wed, 11 Jan 2023 21:01:48 +0800
+Message-Id: <20230111130159.3741753-4-shikemeng@huaweicloud.com>
 X-Mailer: git-send-email 2.30.0
 In-Reply-To: <20230111130159.3741753-1-shikemeng@huaweicloud.com>
 References: <20230111130159.3741753-1-shikemeng@huaweicloud.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: cCh0CgDX9S8fQ75jGl2gBQ--.10280S7
-X-Coremail-Antispam: 1UD129KBjvdXoWrKr1xWry5Kw1Utw48Ww18uFg_yoWDArX_uF
-        y0yw1kXayDJF17Ar4I93W0yFn8KryDWr1fXFZ3KFy5GFyfXFn8Was5KF4rZ3y7Gay7K34a
-        9r1rXF9Fyr10gjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-        9fnUUIcSsGvfJTRUUUbSxYFVCjjxCrM7AC8VAFwI0_Wr0E3s1l1xkIjI8I6I8E6xAIw20E
-        Y4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l87I20VAvwVAaII0Ic2I_JFv_Gryl82
-        xGYIkIc2x26280x7IE14v26r126s0DM28IrcIa0xkI8VCY1x0267AKxVW5JVCq3wA2ocxC
-        64kIII0Yj41l84x0c7CEw4AK67xGY2AK021l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM2
-        8EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4UJVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq
-        3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_GcCE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8w
-        Aqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_JrI_JrylYx0Ex4A2jsIE
-        14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwIxGrwCF04k20xvY0x
-        0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E
-        7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcV
-        C0I7IYx2IY67AKxVWUCVW8JwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Cr0_Gr1UMIIF0xvE
-        42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6x
-        kF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUxD7aUUUUU
+X-CM-TRANSID: cCh0CgDX9S8fQ75jGl2gBQ--.10280S5
+X-Coremail-Antispam: 1UD129KBjvJXoW7tF15AF1rKFW7tr4rZry3twb_yoW8XF47pF
+        43Cw4jkas3tr1jvFWkJa9rC3WF939xKr97Grs3Cw4Ygr48Grsaqr10gF4UXFyFvrs5Ca98
+        Ar4qyryrZr1UX37anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUB0b4IE77IF4wAFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k2
+        6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M280x2IEY4vEnII2IxkI6r1a6r45M2
+        8IrcIa0xkI8VA2jI8067AKxVWUWwA2048vs2IY020Ec7CjxVAFwI0_Xr0E3s1l8cAvFVAK
+        0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVWDJVCq3wA2z4
+        x0Y4vE2Ix0cI8IcVCY1x0267AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l
+        84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I
+        8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r106r15McIj6I8E87Iv67AK
+        xVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41l42xK82IYc2Ij64
+        vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8G
+        jcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2I
+        x0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK
+        8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I
+        0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUx4SrUUUUU
 X-CM-SenderInfo: 5vklyvpphqwq5kxd4v5lfo033gof0z/
 X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-We only break the list walk if we get 'BLK_STS_*RESOURCE'. We also
-count errors for 'BLK_STS_*RESOURCE' error. If list is not empty,
-errors will always be non-zero. So we can remove unnecessary list_empty
-check. This will remove redundant list_empty check for case that
-error happened at sending last request in list.
+For shared queues case, we will only wait on bitmap_tags if we fail to get
+driver tag. However, rq could be from breserved_tags, then two problems
+will occur:
+1. io hung if no tag is currently allocated from bitmap_tags.
+2. unnecessary wakeup when tag is freed to bitmap_tags while no tag is
+freed to breserved_tags.
+Wait on the bitmap which rq from to fix this.
 
+Fixes: f906a6a0f426 ("blk-mq: improve tag waiting setup for non-shared tags")
 Reviewed-by: Christoph Hellwig <hch@lst.de>
 Signed-off-by: Kemeng Shi <shikemeng@huaweicloud.com>
 ---
- block/blk-mq.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ block/blk-mq.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
 diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 2bfe83f2bcca..ca2be137d6db 100644
+index f2586d485be6..de0e0d70cba2 100644
 --- a/block/blk-mq.c
 +++ b/block/blk-mq.c
-@@ -2839,8 +2839,7 @@ void blk_mq_try_issue_list_directly(struct blk_mq_hw_ctx *hctx,
- 	 * the driver there was more coming, but that turned out to
- 	 * be a lie.
- 	 */
--	if ((!list_empty(list) || errors) &&
--	     hctx->queue->mq_ops->commit_rqs && queued)
-+	if (errors && hctx->queue->mq_ops->commit_rqs && queued)
- 		hctx->queue->mq_ops->commit_rqs(hctx);
- }
+@@ -1826,7 +1826,7 @@ static int blk_mq_dispatch_wake(wait_queue_entry_t *wait, unsigned mode,
+ static bool blk_mq_mark_tag_wait(struct blk_mq_hw_ctx *hctx,
+ 				 struct request *rq)
+ {
+-	struct sbitmap_queue *sbq = &hctx->tags->bitmap_tags;
++	struct sbitmap_queue *sbq;
+ 	struct wait_queue_head *wq;
+ 	wait_queue_entry_t *wait;
+ 	bool ret;
+@@ -1849,6 +1849,10 @@ static bool blk_mq_mark_tag_wait(struct blk_mq_hw_ctx *hctx,
+ 	if (!list_empty_careful(&wait->entry))
+ 		return false;
  
++	if (blk_mq_tag_is_reserved(rq->mq_hctx->sched_tags, rq->internal_tag))
++		sbq = &hctx->tags->breserved_tags;
++	else
++		sbq = &hctx->tags->bitmap_tags;
+ 	wq = &bt_wait_ptr(sbq, hctx)->wait;
+ 
+ 	spin_lock_irq(&wq->lock);
 -- 
 2.30.0
 
