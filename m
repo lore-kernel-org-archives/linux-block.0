@@ -2,139 +2,39 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9677CC46467
-	for <linux-block@archiver.kernel.org>; Wed, 11 Jan 2023 03:19:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D8136C67871
+	for <linux-block@archiver.kernel.org>; Wed, 11 Jan 2023 04:29:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235551AbjAKDTX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 10 Jan 2023 22:19:23 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59774 "EHLO
+        id S231465AbjAKE3Z (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 10 Jan 2023 23:29:25 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34476 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233839AbjAKDSn (ORCPT
+        with ESMTP id S235911AbjAKE2g (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 10 Jan 2023 22:18:43 -0500
-Received: from mail-pg1-x534.google.com (mail-pg1-x534.google.com [IPv6:2607:f8b0:4864:20::534])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E601314020
-        for <linux-block@vger.kernel.org>; Tue, 10 Jan 2023 19:18:18 -0800 (PST)
-Received: by mail-pg1-x534.google.com with SMTP id h192so9629373pgc.7
-        for <linux-block@vger.kernel.org>; Tue, 10 Jan 2023 19:18:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance-com.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=eGHT4vYdNOhHiGD97YLPBDr6shSnsxjPas88Q21AiMY=;
-        b=jFBW2mIkZHMNoZLfVGNPbAdx519BSUVMAo/NE6OsGHp70A8bQeEAib8cs1pv8IRqJe
-         l39fAfpTcLoYmCNR/21reJI/7kUZVE2XGnC9KWa6LFRXeCmyVbchb6SMVvb6mmOl2zVx
-         MgKYhNd74n2Q0qgNwoWJUdnXi8pbtxGmWuCfe5fi/bDwY3QxLhf6bVxhNjJkRF4Q30Wd
-         wojCogkEvN6Y17CTJ4dFaIqvVJOpUkZRqD84gAnoN7kT0rayzlAhXfzlYWlVE4JL/8gY
-         iwbLX8tju52Z1cpQ0xftM+D9qE+TQF/yZQg5mRdekQwpZ6MQVQ9LoTpIlByjhxLBAATj
-         b5Hg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=eGHT4vYdNOhHiGD97YLPBDr6shSnsxjPas88Q21AiMY=;
-        b=F5A6Em2hOpL3q7lVqe92ohd43kQG2f5Jkd93bWxvKNLY81/caw1ff0HP2tn6uf8Obz
-         3eAWAy3ty8xa7gSO7KWyFVexGmyY0+ry60keCO0VeAb66lbhzUyWCaQ2ypifnol1EP+x
-         UG72Uw95Fe+0qjGkxk25hYEeWe99LK7ZnR5vI/fEOe7ORiH/5lNyl3uEeNFxm+Hgz3mg
-         tL1d20xIjrqId6yz3isx8QwA5QTccVb3A4wqsU04EFh8oGwBfdLLN93tew0/C1zimWeG
-         4lzrUgl+q8We7zTZnXwrFMnkOG+TAzGCR9rg91ihnihwgalCWcB49g4luXLQuxNe5iSh
-         9HYQ==
-X-Gm-Message-State: AFqh2krHd5C4Pta9A19lx1/F0Kmasdy3sNQchd9GLgn55wYhpxnjN6MF
-        IPPyr7UtGin9vXbgJGHKkDKlGg==
-X-Google-Smtp-Source: AMrXdXuVINS6yFtiYkAMSSYGJg1gD6z09uXLy6JvidaRG+/s5pb+gLQtz5/4pq/EtUuvG4KQDItHAQ==
-X-Received: by 2002:aa7:87d0:0:b0:57e:c106:d50c with SMTP id i16-20020aa787d0000000b0057ec106d50cmr502082pfo.17.1673407098427;
-        Tue, 10 Jan 2023 19:18:18 -0800 (PST)
-Received: from [10.254.85.126] ([139.177.225.248])
-        by smtp.gmail.com with ESMTPSA id y127-20020a623285000000b0058abddad316sm2111846pfy.209.2023.01.10.19.18.15
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 10 Jan 2023 19:18:17 -0800 (PST)
-Message-ID: <f152b853-6f22-bce5-a1b2-3ea29310f628@bytedance.com>
-Date:   Wed, 11 Jan 2023 11:18:13 +0800
+        Tue, 10 Jan 2023 23:28:36 -0500
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ECA1B13CE7;
+        Tue, 10 Jan 2023 20:28:09 -0800 (PST)
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id C43C368BEB; Wed, 11 Jan 2023 05:27:50 +0100 (CET)
+Date:   Wed, 11 Jan 2023 05:27:50 +0100
+From:   Christoph Hellwig <hch@lst.de>
+To:     Damien Le Moal <damien.lemoal@opensource.wdc.com>
+Cc:     linux-ide@vger.kernel.org, linux-block@vger.kernel.org,
+        Jens Axboe <axboe@kernel.dk>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH v9 1/6] block: add a sanity check for non-write
+ flush/fua bios
+Message-ID: <20230111042750.GA15234@lst.de>
+References: <20230110132710.252015-1-damien.lemoal@opensource.wdc.com> <20230110132710.252015-2-damien.lemoal@opensource.wdc.com> <4a278c42-1f7b-f4c2-13c1-06d6fe52997f@opensource.wdc.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.2.2
-Subject: Re: [External] Re: [PATCH v4] blk-throtl: Introduce sync and async
- queues for blk-throtl
-To:     Tejun Heo <tj@kernel.org>
-Cc:     josef@toxicpanda.com, axboe@kernel.dk, cgroups@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        yinxin.x@bytedance.com
-References: <20230107130738.75640-1-hanjinke.666@bytedance.com>
- <Y7x7yq5YmcXhVkQf@slm.duckdns.org>
- <b4cf040e-a9d9-8b7a-10cf-80b01d02848f@bytedance.com>
- <Y73k04BhpY/SuwGB@slm.duckdns.org>
-From:   hanjinke <hanjinke.666@bytedance.com>
-In-Reply-To: <Y73k04BhpY/SuwGB@slm.duckdns.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <4a278c42-1f7b-f4c2-13c1-06d6fe52997f@opensource.wdc.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
-
-在 2023/1/11 上午6:21, Tejun Heo 写道:
-> On Tue, Jan 10, 2023 at 11:59:09PM +0800, hanjinke wrote:
->>
->>
->> 在 2023/1/10 上午4:40, Tejun Heo 写道:
->>> On Sat, Jan 07, 2023 at 09:07:38PM +0800, Jinke Han wrote:
->>>> + * Assumed that there were only bios queued in ASYNC queue and the SYNC
->>>> + * queue was empty. The ASYNC bio was selected to dispatch and the
->>>> + * disp_sync_cnt was set to 0 after each dispatching. If a ASYNC bio
->>>> + * can't be dispatched because of overlimit in current slice, the process
->>>> + * of dispatch should give up and the spin lock of the request queue
->>>> + * may be released. A new SYNC bio may be queued in the SYNC queue then.
->>>> + * When it's time to dispatch this tg, the SYNC bio was selected and pop
->>>> + * to dispatch as the disp_sync_cnt is 0 and the SYNC queue is no-empty.
->>>> + * If the dispatched bio is smaller than the waiting bio, the bandwidth
->>>> + * may be hard to satisfied as the slice may be trimed after each dispatch.
->>>
->>> I still can't make a good sense of this scenario. Can you give concrete
->>> example scenarios with IOs and why it would matter?
->>>
->>> Thanks.
->>>
->>
->> Assumed that there are many buffer write bios queued in ASYNC queue and the
->> SYNC queue is empty. The buffer write bios are all 1M in size and the bps
->> limit is 1M/s. The throtl_slice is 100ms.
->>
->> Assumed that the start/end_slice is [jiffies1, jiffies1+100] and
->> bytes_disp[w] = 0. The next ASYNC bio can't dispatch because of overlimit
->> within this slice. The wait time is 900ms and the slice will be extended to
->> [jiffies1, jiffies1 + 1000] in tg_may_dispatch.
->>
->> During the waiting of the ASYNC bio, a SYNC 4k bio be queued in SYNC queue.
->> After 900ms, it's time to dispatch the ASYNC io, but the SYNC 4k bio be
->> selected to be dispatched. Now the slice is [jiffies1, jiffies1+1000] and
->> the byte_disp[w] = 4k. The slice may be extended to
->> [jiffies1, jiffies1+1100]. In tg_dispatch_one_bio, the slice will be trimed
->> to [jiffies1+1000, jiffies1+1100], the byte_disp[w] will set 0.
->>
->> After the 4k SYNC bio be dispatched, the WAITING ASYNC bio still cann't
->> be dispatched because of overlimit within this slice.
->>
->> The same thing may happen DISPACH_SYNC_FACTOR times if alway there is a SYNC
->> bio be queued in the SYNC queue when the ASYNC bio is waiting.
->>
->> This means that in nearly 5s, we have dispathed 4 4k SYNC bios and a 1m
->> ASYNC bio.
->>
->> In our test, with 100M/s bps limit setted, the bps only reach to ~80m/s
->> when a fio generate buffer write ios and fsync continuous generated by
->> dbench in same cgroup.
-> 
-> That makes sense to me. Thanks for the explanation. It'd probably a good
-> idea to expand the explanation in the comment tho.
-> 
-> Thanks.
-> 
-
-I will be glad to do so and send the v5.
-
-Thanks.
-Jinke
-
+Yes, I'm ok with the updates to it.
