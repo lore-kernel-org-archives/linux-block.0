@@ -2,96 +2,106 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A678BC54EBC
-	for <linux-block@archiver.kernel.org>; Wed, 11 Jan 2023 04:32:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 76892C46467
+	for <linux-block@archiver.kernel.org>; Wed, 11 Jan 2023 05:03:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230291AbjAKEci (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 10 Jan 2023 23:32:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38004 "EHLO
+        id S230194AbjAKFDn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 11 Jan 2023 00:03:43 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48330 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230106AbjAKEch (ORCPT
+        with ESMTP id S233452AbjAKFDe (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 10 Jan 2023 23:32:37 -0500
-Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CEDF512AE4
-        for <linux-block@vger.kernel.org>; Tue, 10 Jan 2023 20:32:35 -0800 (PST)
-Received: by mail-pl1-x62f.google.com with SMTP id d3so15500361plr.10
-        for <linux-block@vger.kernel.org>; Tue, 10 Jan 2023 20:32:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=to:in-reply-to:cc:references:message-id:date:subject:mime-version
-         :from:content-transfer-encoding:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=eO2nJDYhT5GJxHEdBGWFsvi67zSmV874nT01DvMhuq4=;
-        b=outEOh82QabNhEiQ1TrZgFNAMf9mYkCkzjsLTDA+BlNK1lEPmT6UiEVvIBBKZ/yQsY
-         hJ2S0oeeZFvpRpa6yJ9u9nQzC6tFEupSYt6gUu82ThSpTOLJ7wrOKdrOxRWCVBpDlS9y
-         Xiqvm1fgVel3l27ViiaYZvzkk65ycpClBNzLG+h2c2L+z1c7iZtpcbXaamzucDWqXkJ0
-         6PN99lkoaxPDpMCX3Y9DUkFl9Mmyad+/tqIDsyA06SY0fYPmTMhM8QtJ1Lo2WCN/OiGi
-         46aA+mL2JVDGCLmO0XHHTWF8BI8EmGsUV7DLPj6U7FigkfbD/6SVHIaNssh0+SO4E5xO
-         48LQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=to:in-reply-to:cc:references:message-id:date:subject:mime-version
-         :from:content-transfer-encoding:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=eO2nJDYhT5GJxHEdBGWFsvi67zSmV874nT01DvMhuq4=;
-        b=VVdESBHGgLloC56uGkSwBARcomukgXP+VaSYkvLYndyVu5Of6tw4Ijvs59umzXmhUw
-         mO6Sc3nECuNLevrp/Zr5K+0EcC3uKGPl3lmIS+/xtSS+sn2Iq4/qhpSlTpyn+AnUKE0D
-         XBVkKDBODc5GPa3KrCctBOO3dcIm2FxHVf6rNA2l3cGuypAQDvJ3vGd/4qX5f/Fsx59M
-         U4fx/SOKFtr+52Bh/7ycW4q7OdmxQKPiKycwva1bT0jhHdSD6nNBh8qoDVq9Z69gMrU8
-         s4EyfWsDtvzfUbYmkGeqc14KSTJpOdxVBv7AewRE2wNhI034hMPumy99bzVNuehup2SU
-         E+kA==
-X-Gm-Message-State: AFqh2kqrS9hAYoLen/bJ0SH16O6z9S8ck8nCDpiNUXSGQahoxwpyBxNl
-        k4XvyUnOmo181S4s44ezLu1V9zpgnYV4qx5f
-X-Google-Smtp-Source: AMrXdXsRDZ+nyVopkTlB5QMAjMsj66+Frkyrar/TGB/ULwNFDuM+Sicw/MST3pQtKnKZpNzwzNKx7A==
-X-Received: by 2002:a05:6a20:a587:b0:a7:c027:f84a with SMTP id bc7-20020a056a20a58700b000a7c027f84amr22724548pzb.1.1673411555266;
-        Tue, 10 Jan 2023 20:32:35 -0800 (PST)
-Received: from smtpclient.apple ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id w67-20020a628246000000b005892ea4f092sm4429975pfd.95.2023.01.10.20.32.34
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 10 Jan 2023 20:32:34 -0800 (PST)
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-From:   Jens Axboe <axboe@kernel.dk>
-Mime-Version: 1.0 (1.0)
-Subject: Re: [PATCH v9 1/6] block: add a sanity check for non-write flush/fua bios
-Date:   Tue, 10 Jan 2023 21:32:23 -0700
-Message-Id: <2544F354-58C0-4E90-8A1E-721AD455D6C8@kernel.dk>
-References: <4a278c42-1f7b-f4c2-13c1-06d6fe52997f@opensource.wdc.com>
-Cc:     linux-ide@vger.kernel.org, linux-block@vger.kernel.org,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Christoph Hellwig <hch@lst.de>
-In-Reply-To: <4a278c42-1f7b-f4c2-13c1-06d6fe52997f@opensource.wdc.com>
-To:     Damien Le Moal <damien.lemoal@opensource.wdc.com>
-X-Mailer: iPhone Mail (20C65)
+        Wed, 11 Jan 2023 00:03:34 -0500
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 211E7CE3A;
+        Tue, 10 Jan 2023 21:03:32 -0800 (PST)
+Received: from mail02.huawei.com (unknown [172.30.67.153])
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4NsFv152Q5z4f3p0f;
+        Wed, 11 Jan 2023 13:03:25 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.175.124.27])
+        by APP1 (Coremail) with SMTP id cCh0CgDX9S8fQ75jGl2gBQ--.10280S2;
+        Wed, 11 Jan 2023 13:03:28 +0800 (CST)
+From:   Kemeng Shi <shikemeng@huaweicloud.com>
+To:     hch@lst.de, axboe@kernel.dk, dwagner@suse.de, hare@suse.de,
+        ming.lei@redhat.com, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Cc:     john.garry@huawei.com, jack@suse.cz
+Subject: [PATCH v3 00/14] A few bugfix and cleanup patches for blk-mq
+Date:   Wed, 11 Jan 2023 21:01:45 +0800
+Message-Id: <20230111130159.3741753-1-shikemeng@huaweicloud.com>
+X-Mailer: git-send-email 2.30.0
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: cCh0CgDX9S8fQ75jGl2gBQ--.10280S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7uF1xXF4kAFW8Jw4xAry7Jrb_yoW8uryrpF
+        W3Ka13Gw4fXr17Xw1Syw47ZF9ayws7GrW7Xw13G3s5Xr4DCr18Gr4Iqa1fAFy0yFZ5Ca17
+        JF4Fv345KF1v937anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUkFb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
+        6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M280x2IEY4vEnII2IxkI6r1a6r45M2
+        8lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E
+        3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26r
+        xl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv
+        0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUGVWUXwAv7VC2z2
+        80aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JMxAIw28I
+        cxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2
+        IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI
+        42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42
+        IY6xAIw20EY4v20xvaj40_WFyUJVCq3wCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E
+        87Iv6xkF7I0E14v26r1j6r4UYxBIdaVFxhVjvjDU0xZFpf9x07j7NVkUUUUU=
+X-CM-SenderInfo: 5vklyvpphqwq5kxd4v5lfo033gof0z/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Jan 10, 2023, at 2:58 PM, Damien Le Moal <damien.lemoal@opensource.wdc.co=
-m> wrote:
->=20
-> =EF=BB=BFOn 1/10/23 22:27, Damien Le Moal wrote:
->> From: Christoph Hellwig <hch@infradead.org>
->>=20
->> Check that the PREFUSH and FUA flags are only set on write bios,
->> given that the flush state machine expects that.
->>=20
->> [Damien] The check is also extended to REQ_OP_ZONE_APPEND operations as
->> these are data write operations used by btrfs and zonefs and may also
->> have the REQ_FUA bit set.
->>=20
->> Reported-by: Damien Le Moal <damien.lemoal@opensource.wdc.com>
->> Signed-off-by: Christoph Hellwig <hch@lst.de>
->> Signed-off-by: Damien Le Moal <damien.lemoal@opensource.wdc.com>
->> Reviewed-by: Niklas Cassel <niklas.cassel@wdc.com>
->=20
-> Christoph, Jens,
->=20
-> Are you OK with this patch ?
+Hi, this series contain several bugfix patches to fix potential io
+hung and a few cleanup patches to remove stale codes and unnecessary
+check. Most changes are in request issue and dispatch path. Thanks.
 
-I already acked a previous version, you just didn=E2=80=99t pick it up.=20
+---
+V3:
+ -Collect Reviewed-by from Christoph
+ -Add new patch "blk-mq: make blk_mq_commit_rqs a general function for all
+commits" suggested-by Christoph
+ -Move patch "blk-mq: remove unncessary from_schedule parameter in
+blk_mq_plug_issue_direct" forwad. This is because of some abandoned
+work, no influence anyway. No special attention should be paied.
+ -Make patch based on rewriten blk_mq_commit_rqs.
 
-=E2=80=94=20
-Jens Axboe
+V2:
+ -Thanks Christoph for review and there are two fixes in v2 according
+to recommends from Christoph.
+  1)Avoid overly long line in patch "blk-mq: avoid sleep in
+blk_mq_alloc_request_hctx"
+  2)Check BLK_MQ_REQ_NOWAIT and BLK_MQ_REQ_RESERVED in two WARN_ON_ONCE
+---
+
+Kemeng Shi (14):
+  blk-mq: avoid sleep in blk_mq_alloc_request_hctx
+  blk-mq: remove stale comment for blk_mq_sched_mark_restart_hctx
+  blk-mq: wait on correct sbitmap_queue in blk_mq_mark_tag_wait
+  blk-mq: Fix potential io hung for shared sbitmap per tagset
+  blk-mq: remove unnecessary list_empty check in
+    blk_mq_try_issue_list_directly
+  blk-mq: remove unncessary from_schedule parameter in
+    blk_mq_plug_issue_direct
+  blk-mq: make blk_mq_commit_rqs a general function for all commits
+  blk-mq: remove unncessary error count and commit in
+    blk_mq_plug_issue_direct
+  blk-mq: use blk_mq_commit_rqs helper in blk_mq_try_issue_list_directly
+  blk-mq: simplify flush check in blk_mq_dispatch_rq_list
+  blk-mq: remove unnecessary error count and check in
+    blk_mq_dispatch_rq_list
+  blk-mq: remove set of bd->last when get driver tag for next request
+    fails
+  blk-mq: use switch/case to improve readability in
+    blk_mq_try_issue_list_directly
+  blk-mq: correct stale comment of .get_budget
+
+ block/blk-mq-sched.c |   7 +--
+ block/blk-mq.c       | 147 ++++++++++++++++++++-----------------------
+ 2 files changed, 71 insertions(+), 83 deletions(-)
+
+-- 
+2.30.0
 
