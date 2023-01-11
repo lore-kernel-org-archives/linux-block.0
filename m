@@ -2,100 +2,95 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F184C46467
-	for <linux-block@archiver.kernel.org>; Wed, 11 Jan 2023 05:03:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78B31C54EBE
+	for <linux-block@archiver.kernel.org>; Wed, 11 Jan 2023 05:04:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232388AbjAKFDr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 11 Jan 2023 00:03:47 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48390 "EHLO
+        id S235391AbjAKFDt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 11 Jan 2023 00:03:49 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48404 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234505AbjAKFDf (ORCPT
+        with ESMTP id S234664AbjAKFDf (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Wed, 11 Jan 2023 00:03:35 -0500
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 655CDD2D8;
-        Tue, 10 Jan 2023 21:03:34 -0800 (PST)
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A05FDF21;
+        Tue, 10 Jan 2023 21:03:35 -0800 (PST)
 Received: from mail02.huawei.com (unknown [172.30.67.153])
-        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4NsFv25BYrz4f3lJx;
-        Wed, 11 Jan 2023 13:03:26 +0800 (CST)
-Received: from huaweicloud.com (unknown [10.175.124.27])
-        by APP1 (Coremail) with SMTP id cCh0CgDX9S8fQ75jGl2gBQ--.10280S5;
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4NsFv54X93z4f3ydK;
         Wed, 11 Jan 2023 13:03:29 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.175.124.27])
+        by APP1 (Coremail) with SMTP id cCh0CgDX9S8fQ75jGl2gBQ--.10280S12;
+        Wed, 11 Jan 2023 13:03:32 +0800 (CST)
 From:   Kemeng Shi <shikemeng@huaweicloud.com>
 To:     hch@lst.de, axboe@kernel.dk, dwagner@suse.de, hare@suse.de,
         ming.lei@redhat.com, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org
 Cc:     john.garry@huawei.com, jack@suse.cz
-Subject: [PATCH v3 03/14] blk-mq: wait on correct sbitmap_queue in blk_mq_mark_tag_wait
-Date:   Wed, 11 Jan 2023 21:01:48 +0800
-Message-Id: <20230111130159.3741753-4-shikemeng@huaweicloud.com>
+Subject: [PATCH v3 10/14] blk-mq: simplify flush check in blk_mq_dispatch_rq_list
+Date:   Wed, 11 Jan 2023 21:01:55 +0800
+Message-Id: <20230111130159.3741753-11-shikemeng@huaweicloud.com>
 X-Mailer: git-send-email 2.30.0
 In-Reply-To: <20230111130159.3741753-1-shikemeng@huaweicloud.com>
 References: <20230111130159.3741753-1-shikemeng@huaweicloud.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: cCh0CgDX9S8fQ75jGl2gBQ--.10280S5
-X-Coremail-Antispam: 1UD129KBjvJXoW7tF15AF1rKFW7tr4rZry3twb_yoW8XF47pF
-        43Cw4jkas3tr1jvFWkJa9rC3WF939xKr97Grs3Cw4Ygr48Grsaqr10gF4UXFyFvrs5Ca98
-        Ar4qyryrZr1UX37anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUB0b4IE77IF4wAFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k2
+X-CM-TRANSID: cCh0CgDX9S8fQ75jGl2gBQ--.10280S12
+X-Coremail-Antispam: 1UD129KBjvJXoW7ZFW7tr1DXFW7tryrWr43Awb_yoW8Xr47pF
+        ZxCa9Fkr4agw17try8ua97Ga4DAwsYkF15Wrs3Aw1agF45Cr4xKrWSqw47WFykArsYyw4Y
+        qFWDWFWjvFyUXa7anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUBIb4IE77IF4wAFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k2
         6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M280x2IEY4vEnII2IxkI6r1a6r45M2
-        8IrcIa0xkI8VA2jI8067AKxVWUWwA2048vs2IY020Ec7CjxVAFwI0_Xr0E3s1l8cAvFVAK
-        0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVWDJVCq3wA2z4
-        x0Y4vE2Ix0cI8IcVCY1x0267AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l
-        84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I
-        8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r106r15McIj6I8E87Iv67AK
-        xVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41l42xK82IYc2Ij64
-        vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8G
-        jcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2I
-        x0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK
-        8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I
-        0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUx4SrUUUUU
+        8IrcIa0xkI8VA2jI8067AKxVWUAVCq3wA2048vs2IY020Ec7CjxVAFwI0_Xr0E3s1l8cAv
+        FVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVWDJVCq3w
+        A2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE
+        3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr2
+        1l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r106r15McIj6I8E87Iv
+        67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41l42xK82IYc2
+        Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s02
+        6x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0x
+        vE2Ix0cI8IcVAFwI0_Gr0_Xr1lIxAIcVC0I7IYx2IY6xkF7I0E14v26F4j6r4UJwCI42IY
+        6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Gr0_Cr1lIxAIcVC2z280aV
+        CY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU058n7UUUUU==
 X-CM-SenderInfo: 5vklyvpphqwq5kxd4v5lfo033gof0z/
 X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-For shared queues case, we will only wait on bitmap_tags if we fail to get
-driver tag. However, rq could be from breserved_tags, then two problems
-will occur:
-1. io hung if no tag is currently allocated from bitmap_tags.
-2. unnecessary wakeup when tag is freed to bitmap_tags while no tag is
-freed to breserved_tags.
-Wait on the bitmap which rq from to fix this.
+1. Remove check of needs_resource and ret == BLK_STS_DEV_RESOURCE.
+For busy error BLK_STS*_RESOURCE, request will always be added
+back to list, so need_resource will not be true and ret will
+not be == BLK_STS_DEV_RESOURCE if list is empty. We could remove
+these dead check.
 
-Fixes: f906a6a0f426 ("blk-mq: improve tag waiting setup for non-shared tags")
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+2. Check ret of last request instead of errors
+If list is empty, we only need to explicitly commit_rqs
+if error happens at last request which is stored in ret. So check
+ret of last request instead of errors to remove unnecessary
+commit_rqs triggered by errors returned from previous request.
+
 Signed-off-by: Kemeng Shi <shikemeng@huaweicloud.com>
 ---
- block/blk-mq.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+ block/blk-mq.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/block/blk-mq.c b/block/blk-mq.c
-index f2586d485be6..de0e0d70cba2 100644
+index f45d81e20d9e..8fd25713751c 100644
 --- a/block/blk-mq.c
 +++ b/block/blk-mq.c
-@@ -1826,7 +1826,7 @@ static int blk_mq_dispatch_wake(wait_queue_entry_t *wait, unsigned mode,
- static bool blk_mq_mark_tag_wait(struct blk_mq_hw_ctx *hctx,
- 				 struct request *rq)
- {
--	struct sbitmap_queue *sbq = &hctx->tags->bitmap_tags;
-+	struct sbitmap_queue *sbq;
- 	struct wait_queue_head *wq;
- 	wait_queue_entry_t *wait;
- 	bool ret;
-@@ -1849,6 +1849,10 @@ static bool blk_mq_mark_tag_wait(struct blk_mq_hw_ctx *hctx,
- 	if (!list_empty_careful(&wait->entry))
- 		return false;
- 
-+	if (blk_mq_tag_is_reserved(rq->mq_hctx->sched_tags, rq->internal_tag))
-+		sbq = &hctx->tags->breserved_tags;
-+	else
-+		sbq = &hctx->tags->bitmap_tags;
- 	wq = &bt_wait_ptr(sbq, hctx)->wait;
- 
- 	spin_lock_irq(&wq->lock);
+@@ -2114,9 +2114,9 @@ bool blk_mq_dispatch_rq_list(struct blk_mq_hw_ctx *hctx, struct list_head *list,
+ 	/* If we didn't flush the entire list, we could have told the driver
+ 	 * there was more coming, but that turned out to be a lie.
+ 	 */
+-	if ((!list_empty(list) || errors || needs_resource ||
+-	     ret == BLK_STS_DEV_RESOURCE) && q->mq_ops->commit_rqs && queued)
+-		q->mq_ops->commit_rqs(hctx);
++	if ((!list_empty(list) || ret != BLK_STS_OK))
++		blk_mq_commit_rqs(hctx, queued);
++
+ 	/*
+ 	 * Any items that need requeuing? Stuff them into hctx->dispatch,
+ 	 * that is where we will continue on next queue run.
 -- 
 2.30.0
 
