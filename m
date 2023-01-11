@@ -2,106 +2,88 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 76892C46467
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4D55C5479D
 	for <linux-block@archiver.kernel.org>; Wed, 11 Jan 2023 05:03:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230194AbjAKFDn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 11 Jan 2023 00:03:43 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48330 "EHLO
+        id S230463AbjAKFDo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 11 Jan 2023 00:03:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48382 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233452AbjAKFDe (ORCPT
+        with ESMTP id S233683AbjAKFDe (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Wed, 11 Jan 2023 00:03:34 -0500
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 211E7CE3A;
-        Tue, 10 Jan 2023 21:03:32 -0800 (PST)
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E0C34D11D;
+        Tue, 10 Jan 2023 21:03:33 -0800 (PST)
 Received: from mail02.huawei.com (unknown [172.30.67.153])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4NsFv152Q5z4f3p0f;
-        Wed, 11 Jan 2023 13:03:25 +0800 (CST)
+        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4NsFv22Njcz4f3nqQ;
+        Wed, 11 Jan 2023 13:03:26 +0800 (CST)
 Received: from huaweicloud.com (unknown [10.175.124.27])
-        by APP1 (Coremail) with SMTP id cCh0CgDX9S8fQ75jGl2gBQ--.10280S2;
+        by APP1 (Coremail) with SMTP id cCh0CgDX9S8fQ75jGl2gBQ--.10280S4;
         Wed, 11 Jan 2023 13:03:28 +0800 (CST)
 From:   Kemeng Shi <shikemeng@huaweicloud.com>
 To:     hch@lst.de, axboe@kernel.dk, dwagner@suse.de, hare@suse.de,
         ming.lei@redhat.com, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org
 Cc:     john.garry@huawei.com, jack@suse.cz
-Subject: [PATCH v3 00/14] A few bugfix and cleanup patches for blk-mq
-Date:   Wed, 11 Jan 2023 21:01:45 +0800
-Message-Id: <20230111130159.3741753-1-shikemeng@huaweicloud.com>
+Subject: [PATCH v3 02/14] blk-mq: remove stale comment for blk_mq_sched_mark_restart_hctx
+Date:   Wed, 11 Jan 2023 21:01:47 +0800
+Message-Id: <20230111130159.3741753-3-shikemeng@huaweicloud.com>
 X-Mailer: git-send-email 2.30.0
+In-Reply-To: <20230111130159.3741753-1-shikemeng@huaweicloud.com>
+References: <20230111130159.3741753-1-shikemeng@huaweicloud.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: cCh0CgDX9S8fQ75jGl2gBQ--.10280S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7uF1xXF4kAFW8Jw4xAry7Jrb_yoW8uryrpF
-        W3Ka13Gw4fXr17Xw1Syw47ZF9ayws7GrW7Xw13G3s5Xr4DCr18Gr4Iqa1fAFy0yFZ5Ca17
-        JF4Fv345KF1v937anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUkFb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
-        6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M280x2IEY4vEnII2IxkI6r1a6r45M2
-        8lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E
-        3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26r
-        xl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv
-        0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUGVWUXwAv7VC2z2
-        80aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JMxAIw28I
-        cxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2
-        IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI
-        42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42
-        IY6xAIw20EY4v20xvaj40_WFyUJVCq3wCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E
-        87Iv6xkF7I0E14v26r1j6r4UYxBIdaVFxhVjvjDU0xZFpf9x07j7NVkUUUUU=
+X-CM-TRANSID: cCh0CgDX9S8fQ75jGl2gBQ--.10280S4
+X-Coremail-Antispam: 1UD129KBjvdXoW7Jw18Ary5CF1UZw45KFyDKFg_yoWkJrX_W3
+        W5Crn7GrWDJrn0vrWakF1UZF48K34kJa4UCay5Jr9rtw18XFZxGr4UKr15XrZ8W3ZrGay3
+        J3Z8XrykA3WS9jkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+        9fnUUIcSsGvfJTRUUUbfxYFVCjjxCrM7AC8VAFwI0_Wr0E3s1l1xkIjI8I6I8E6xAIw20E
+        Y4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l87I20VAvwVAaII0Ic2I_JFv_Gryl82
+        xGYIkIc2x26280x7IE14v26r15M28IrcIa0xkI8VCY1x0267AKxVW8JVW5JwA2ocxC64kI
+        II0Yj41l84x0c7CEw4AK67xGY2AK021l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7
+        xvwVC0I7IYx2IY6xkF7I0E14v26r4UJVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2
+        z4x0Y4vEx4A2jsIEc7CjxVAFwI0_GcCE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4
+        xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_JrI_JrylYx0Ex4A2jsIE14v2
+        6r1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwIxGrwCF04k20xvY0x0EwI
+        xGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480
+        Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7
+        IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k2
+        6cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxV
+        AFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x07jhUUbUUUUU=
 X-CM-SenderInfo: 5vklyvpphqwq5kxd4v5lfo033gof0z/
 X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi, this series contain several bugfix patches to fix potential io
-hung and a few cleanup patches to remove stale codes and unnecessary
-check. Most changes are in request issue and dispatch path. Thanks.
+Commit 97889f9ac24f8 ("blk-mq: remove synchronize_rcu() from
+blk_mq_del_queue_tag_set()") remove handle of TAG_SHARED in restart,
+then shared_hctx_restart counted for how many hardware queues are marked
+for restart is removed too.
+Remove the stale comment that we still count hardware queues need restart.
 
+Fixes: 97889f9ac24f ("blk-mq: remove synchronize_rcu() from blk_mq_del_queue_tag_set()")
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Kemeng Shi <shikemeng@huaweicloud.com>
 ---
-V3:
- -Collect Reviewed-by from Christoph
- -Add new patch "blk-mq: make blk_mq_commit_rqs a general function for all
-commits" suggested-by Christoph
- -Move patch "blk-mq: remove unncessary from_schedule parameter in
-blk_mq_plug_issue_direct" forwad. This is because of some abandoned
-work, no influence anyway. No special attention should be paied.
- -Make patch based on rewriten blk_mq_commit_rqs.
+ block/blk-mq-sched.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-V2:
- -Thanks Christoph for review and there are two fixes in v2 according
-to recommends from Christoph.
-  1)Avoid overly long line in patch "blk-mq: avoid sleep in
-blk_mq_alloc_request_hctx"
-  2)Check BLK_MQ_REQ_NOWAIT and BLK_MQ_REQ_RESERVED in two WARN_ON_ONCE
----
-
-Kemeng Shi (14):
-  blk-mq: avoid sleep in blk_mq_alloc_request_hctx
-  blk-mq: remove stale comment for blk_mq_sched_mark_restart_hctx
-  blk-mq: wait on correct sbitmap_queue in blk_mq_mark_tag_wait
-  blk-mq: Fix potential io hung for shared sbitmap per tagset
-  blk-mq: remove unnecessary list_empty check in
-    blk_mq_try_issue_list_directly
-  blk-mq: remove unncessary from_schedule parameter in
-    blk_mq_plug_issue_direct
-  blk-mq: make blk_mq_commit_rqs a general function for all commits
-  blk-mq: remove unncessary error count and commit in
-    blk_mq_plug_issue_direct
-  blk-mq: use blk_mq_commit_rqs helper in blk_mq_try_issue_list_directly
-  blk-mq: simplify flush check in blk_mq_dispatch_rq_list
-  blk-mq: remove unnecessary error count and check in
-    blk_mq_dispatch_rq_list
-  blk-mq: remove set of bd->last when get driver tag for next request
-    fails
-  blk-mq: use switch/case to improve readability in
-    blk_mq_try_issue_list_directly
-  blk-mq: correct stale comment of .get_budget
-
- block/blk-mq-sched.c |   7 +--
- block/blk-mq.c       | 147 ++++++++++++++++++++-----------------------
- 2 files changed, 71 insertions(+), 83 deletions(-)
-
+diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+index 23d1a90fec42..ae40cdb7a383 100644
+--- a/block/blk-mq-sched.c
++++ b/block/blk-mq-sched.c
+@@ -19,8 +19,7 @@
+ #include "blk-wbt.h"
+ 
+ /*
+- * Mark a hardware queue as needing a restart. For shared queues, maintain
+- * a count of how many hardware queues are marked for restart.
++ * Mark a hardware queue as needing a restart.
+  */
+ void blk_mq_sched_mark_restart_hctx(struct blk_mq_hw_ctx *hctx)
+ {
 -- 
 2.30.0
 
