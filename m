@@ -2,237 +2,293 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C8C6C5479D
-	for <linux-block@archiver.kernel.org>; Wed, 11 Jan 2023 14:32:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 29059C46467
+	for <linux-block@archiver.kernel.org>; Wed, 11 Jan 2023 14:32:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239165AbjAKOcL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 11 Jan 2023 09:32:11 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43034 "EHLO
+        id S239174AbjAKOcd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 11 Jan 2023 09:32:33 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42952 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238429AbjAKObq (ORCPT
+        with ESMTP id S234250AbjAKOby (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 11 Jan 2023 09:31:46 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C5C31DDE7
-        for <linux-block@vger.kernel.org>; Wed, 11 Jan 2023 06:27:46 -0800 (PST)
+        Wed, 11 Jan 2023 09:31:54 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 648F7616D
+        for <linux-block@vger.kernel.org>; Wed, 11 Jan 2023 06:27:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1673447265;
+        s=mimecast20190719; t=1673447276;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=Encmrg/Q4pn4U4TaedIzlRttIsiQ9mtGF2IR0CVdSuk=;
-        b=fR8I6AJC1JxNLLZ1qV5PGJtS9zVcz5LIC3mPtm1Y4BamdrPn4ZothMfpNXLvrAgsV85DWD
-        qvQn2w7m50z2RkncbmACxLkPluTpkz1oXlMSEjUn+IXCySAOl+5uI1PeTWIKqf272so7oV
-        QHlbrK0sbHkM4CWkKtMA3TidQPry3dY=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Yds06ULQmuHhcEcqXR7Mw+R1dRGODj6RvMYPw7Kl45k=;
+        b=ZVS1yXfDjdVa9Bd33ktP+/cv+kJamLamum8knRMCgSmuX88Jo8+1RekBgUILEFt/QEPIdm
+        ubwBW2Rigc6154xKxmsXNaELKJ5XcNcfQc17QQ5c3a3gLCjWlNq+uD1ow4iGPJVqLcAG6k
+        ZHMcGdSot+rDOi46fuEcbDIRqTdkfvY=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-661-lPtvx7LnPke_XH7ONluRdw-1; Wed, 11 Jan 2023 09:27:39 -0500
-X-MC-Unique: lPtvx7LnPke_XH7ONluRdw-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+ us-mta-136-oU2WHs16N8u6L4sF7xcBmw-1; Wed, 11 Jan 2023 09:27:53 -0500
+X-MC-Unique: oU2WHs16N8u6L4sF7xcBmw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id F1301857D0D;
-        Wed, 11 Jan 2023 14:27:38 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id EB7613C1485D;
+        Wed, 11 Jan 2023 14:27:52 +0000 (UTC)
 Received: from warthog.procyon.org.uk (unknown [10.33.36.87])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id B0D39492C14;
-        Wed, 11 Jan 2023 14:27:35 +0000 (UTC)
-Subject: [PATCH v5 0/9] iov_iter: Add extraction helpers
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 9E32640C2064;
+        Wed, 11 Jan 2023 14:27:51 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+Subject: [PATCH v5 2/9] iov_iter: Use the direction in the iterator functions
 From:   David Howells <dhowells@redhat.com>
 To:     Al Viro <viro@zeniv.linux.org.uk>
-Cc:     linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        Rohith Surabattula <rohiths.msft@gmail.com>,
-        linux-block@vger.kernel.org, Matthew Wilcox <willy@infradead.org>,
-        Jeff Layton <jlayton@kernel.org>, linux-cachefs@redhat.com,
-        Jan Kara <jack@suse.cz>, Logan Gunthorpe <logang@deltatee.com>,
-        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        Steve French <sfrench@samba.org>,
-        Shyam Prasad N <nspmangalore@gmail.com>,
-        John Hubbard <jhubbard@nvidia.com>, linux-cifs@vger.kernel.org,
-        dhowells@redhat.com, Christoph Hellwig <hch@infradead.org>,
+Cc:     dhowells@redhat.com, Christoph Hellwig <hch@infradead.org>,
         Matthew Wilcox <willy@infradead.org>,
         Jens Axboe <axboe@kernel.dk>, Jan Kara <jack@suse.cz>,
         Jeff Layton <jlayton@kernel.org>,
         Logan Gunthorpe <logang@deltatee.com>,
         linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Date:   Wed, 11 Jan 2023 14:27:35 +0000
-Message-ID: <167344725490.2425628.13771289553670112965.stgit@warthog.procyon.org.uk>
+Date:   Wed, 11 Jan 2023 14:27:51 +0000
+Message-ID: <167344727112.2425628.995771894170560721.stgit@warthog.procyon.org.uk>
+In-Reply-To: <167344725490.2425628.13771289553670112965.stgit@warthog.procyon.org.uk>
+References: <167344725490.2425628.13771289553670112965.stgit@warthog.procyon.org.uk>
 User-Agent: StGit/1.5
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.1
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Use the direction in the iterator functions rather than READ/WRITE.
 
-Hi Al,
-
-Here are patches clean up some use of READ/WRITE and ITER_SOURCE/DEST,
-patches to provide support for extracting pages from an iov_iter and a
-patch to use the primary extraction function in the block layer bio code if
-you could take a look?
-
-[!] NOTE that I've switched the functions to be exported GPL-only at
-    Christoph's request[1].  They are, however, intended as a replacement
-    for iov_iter_get_pages*(), which is not marked _GPL - so that
-    functionality will probably become unavailable to non-GPL 3rd party
-    modules in future.
-
-The first three patches deal with ITER_SOURCE/DEST:
-
- (1) Switch ITER_SOURCE/DEST to an enum and add a couple of helper
-     functions to query if an iterator represents a source or a destination
-     buffer.  Using an enum may allow extra consistency warnings from the
-     compiler.
-
- (2) Use the ITER_SOURCE/DEST values in the iov_iter core functions rather
-     than READ/WRITE.
-
- (3) Get rid of most of the callers of iov_iter_rw(), using the IOCB_WRITE
-     and IOMAP_WRITE instead where available.  This leaves only two places
-     looking at the this value: a consistency check in cifs and a single
-     place in the block layer.
-
-The next patch adds a replacement for iov_iter_get_pages*(), including
-Logan's new version:
-
- (4) Add a function to list-only, get or pin pages from an iterator as a
-     future replacement for iov_iter_get_pages*().  Pointers to the pages
-     are placed into an array (which will get allocated if not provided)
-     and, depending on the iterator type and direction, the pages will have
-     a ref or a pin get on them or be left untouched (on the assumption
-     that the caller manages their lifetime).
-
-     The determination is:
-
-	UBUF/IOVEC + DEST	-> pin
-	UBUF/IOVEC + SOURCE	-> get
-	PIPE + DEST		-> list-only
-	BVEC/XARRAY		-> list-only
-	Anything else		-> EFAULT
-
-     The function also returns an indication of which of "list only, get or
-     pin" the extraction function did to aid in cleaning up (returning 0,
-     FOLL_GET or FOLL_PIN as appropriate).
-
-Then there are a couple of patches that add stuff to netfslib that I want
-to use there as well as in cifs:
-
- (5) Add a netfslib function to use (4) to extract pages from an ITER_IOBUF
-     or ITER_UBUF iterator into an ITER_BVEC iterator.  This will get or
-     pin the pages as appropriate.
-
- (6) Add a netfslib function to extract pages from an iterator that's of
-     type ITER_UBUF/IOVEC/BVEC/KVEC/XARRAY and add them to a scatterlist.
-
-     The function in (4) is used for a UBUF and IOVEC iterators, so those
-     need cleaning up afterwards.  BVEC and XARRAY iterators are ungot and
-     unpinned and may be rendered into elements that span multiple pages,
-     for example if large folios are present.
-
-Finally, there are a set of three patches to make the block layer's BIO
-code use iov_iter_extract_pages():
-
- (7) Replace BIO_NO_PAGE_REF with BIO_PAGE_REFFED (opposite logic).
-
- (8) Make the block layer's BIO code pin pages or leave pages unaltered
-     rather than getting a ref on the pages when the circumstances warrant,
-     and noting in the bio struct what cleanups should be performed so that
-     the bio cleanup code then does the right thing.
-
- (9) Remove an unnecessary check against 0 in bio_flagged() (it returns
-     bool) thus allowing the gcc optimiser to combine multiple instances of
-     the bitwise-AND on the same flags value.
-
-Changes:
-========
-ver #5)
- - Replace BIO_NO_PAGE_REF with BIO_PAGE_REFFED and split into own patch.
- - Transcribe FOLL_GET/PIN into BIO_PAGE_REFFED/PINNED flags.
- - Add patch to allow bio_flagged() to be combined by gcc.
-
-ver #4)
- - Drop the patch to move the FOLL_* flags to linux/mm_types.h as they're
-   no longer referenced by linux/uio.h.
- - Add ITER_SOURCE/DEST cleanup patches.
- - Make iov_iter/netfslib iter extraction patches use ITER_SOURCE/DEST.
- - Allow additional gup_flags to be passed into iov_iter_extract_pages().
- - Add struct bio patch.
-
-ver #3)
- - Switch to using EXPORT_SYMBOL_GPL to prevent indirect 3rd-party access
-   to get/pin_user_pages_fast()[1].
-
-ver #2)
- - Rolled the extraction cleanup mode query function into the extraction
-   function, returning the indication through the argument list.
- - Fixed patch 4 (extract to scatterlist) to actually use the new
-   extraction API.
-
-I've pushed the patches here also:
-
-	https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/log/?h=iov-extract
-
-David
-
-Link: https://lore.kernel.org/r/Y3zFzdWnWlEJ8X8/@infradead.org/ [1]
-Link: https://lore.kernel.org/r/166697254399.61150.1256557652599252121.stgit@warthog.procyon.org.uk/ # rfc
-Link: https://lore.kernel.org/r/166722777223.2555743.162508599131141451.stgit@warthog.procyon.org.uk/ # rfc
-Link: https://lore.kernel.org/r/166732024173.3186319.18204305072070871546.stgit@warthog.procyon.org.uk/ # rfc
-Link: https://lore.kernel.org/r/166869687556.3723671.10061142538708346995.stgit@warthog.procyon.org.uk/ # rfc
-Link: https://lore.kernel.org/r/166920902005.1461876.2786264600108839814.stgit@warthog.procyon.org.uk/ # v2
-Link: https://lore.kernel.org/r/166997419665.9475.15014699817597102032.stgit@warthog.procyon.org.uk/ # v3
-Link: https://lore.kernel.org/r/167305160937.1521586.133299343565358971.stgit@warthog.procyon.org.uk/ # v4
-
+Signed-off-by: David Howells <dhowells@redhat.com>
+cc: Al Viro <viro@zeniv.linux.org.uk>
+Link: https://lore.kernel.org/r/167305162465.1521586.18077838937455153675.stgit@warthog.procyon.org.uk/ # v4
 ---
-David Howells (9):
-      iov_iter: Change the direction macros into an enum
-      iov_iter: Use the direction in the iterator functions
-      iov_iter: Use IOCB/IOMAP_WRITE if available rather than iterator direction
-      iov_iter: Add a function to extract a page list from an iterator
-      netfs: Add a function to extract a UBUF or IOVEC into a BVEC iterator
-      netfs: Add a function to extract an iterator into a scatterlist
-      bio: Rename BIO_NO_PAGE_REF to BIO_PAGE_REFFED and invert the meaning
-      iov_iter, block: Make bio structs pin pages rather than ref'ing if appropriate
-      bio: Fix bio_flagged() so that it can be combined
 
+ include/linux/uio.h |   22 +++++++++++-----------
+ lib/iov_iter.c      |   46 +++++++++++++++++++++++-----------------------
+ 2 files changed, 34 insertions(+), 34 deletions(-)
 
- block/bio.c               |  59 ++++--
- block/fops.c              |   8 +-
- fs/9p/vfs_addr.c          |   2 +-
- fs/affs/file.c            |   4 +-
- fs/ceph/file.c            |   2 +-
- fs/dax.c                  |   6 +-
- fs/direct-io.c            |  22 +--
- fs/exfat/inode.c          |   6 +-
- fs/ext2/inode.c           |   2 +-
- fs/f2fs/file.c            |  10 +-
- fs/fat/inode.c            |   4 +-
- fs/fuse/dax.c             |   2 +-
- fs/fuse/file.c            |   8 +-
- fs/hfs/inode.c            |   2 +-
- fs/hfsplus/inode.c        |   2 +-
- fs/iomap/direct-io.c      |   6 +-
- fs/jfs/inode.c            |   2 +-
- fs/netfs/Makefile         |   1 +
- fs/netfs/iterator.c       | 367 ++++++++++++++++++++++++++++++++++
- fs/nfs/direct.c           |   2 +-
- fs/nilfs2/inode.c         |   2 +-
- fs/ntfs3/inode.c          |   2 +-
- fs/ocfs2/aops.c           |   2 +-
- fs/orangefs/inode.c       |   2 +-
- fs/reiserfs/inode.c       |   2 +-
- fs/udf/inode.c            |   2 +-
- include/linux/bio.h       |   5 +-
- include/linux/blk_types.h |   3 +-
- include/linux/netfs.h     |   7 +
- include/linux/uio.h       |  59 ++++--
- lib/iov_iter.c            | 407 +++++++++++++++++++++++++++++++++++---
- mm/vmalloc.c              |   1 +
- 32 files changed, 903 insertions(+), 108 deletions(-)
- create mode 100644 fs/netfs/iterator.c
+diff --git a/include/linux/uio.h b/include/linux/uio.h
+index 4b0f4a773d90..acb1ae3324ed 100644
+--- a/include/linux/uio.h
++++ b/include/linux/uio.h
+@@ -261,16 +261,16 @@ bool iov_iter_is_aligned(const struct iov_iter *i, unsigned addr_mask,
+ 			unsigned len_mask);
+ unsigned long iov_iter_alignment(const struct iov_iter *i);
+ unsigned long iov_iter_gap_alignment(const struct iov_iter *i);
+-void iov_iter_init(struct iov_iter *i, unsigned int direction, const struct iovec *iov,
++void iov_iter_init(struct iov_iter *i, enum iter_dir direction, const struct iovec *iov,
+ 			unsigned long nr_segs, size_t count);
+-void iov_iter_kvec(struct iov_iter *i, unsigned int direction, const struct kvec *kvec,
++void iov_iter_kvec(struct iov_iter *i, enum iter_dir direction, const struct kvec *kvec,
+ 			unsigned long nr_segs, size_t count);
+-void iov_iter_bvec(struct iov_iter *i, unsigned int direction, const struct bio_vec *bvec,
++void iov_iter_bvec(struct iov_iter *i, enum iter_dir direction, const struct bio_vec *bvec,
+ 			unsigned long nr_segs, size_t count);
+-void iov_iter_pipe(struct iov_iter *i, unsigned int direction, struct pipe_inode_info *pipe,
++void iov_iter_pipe(struct iov_iter *i, enum iter_dir direction, struct pipe_inode_info *pipe,
+ 			size_t count);
+-void iov_iter_discard(struct iov_iter *i, unsigned int direction, size_t count);
+-void iov_iter_xarray(struct iov_iter *i, unsigned int direction, struct xarray *xarray,
++void iov_iter_discard(struct iov_iter *i, enum iter_dir direction, size_t count);
++void iov_iter_xarray(struct iov_iter *i, enum iter_dir direction, struct xarray *xarray,
+ 		     loff_t start, size_t count);
+ ssize_t iov_iter_get_pages(struct iov_iter *i, struct page **pages,
+ 		size_t maxsize, unsigned maxpages, size_t *start,
+@@ -360,19 +360,19 @@ size_t hash_and_copy_to_iter(const void *addr, size_t bytes, void *hashp,
+ struct iovec *iovec_from_user(const struct iovec __user *uvector,
+ 		unsigned long nr_segs, unsigned long fast_segs,
+ 		struct iovec *fast_iov, bool compat);
+-ssize_t import_iovec(int type, const struct iovec __user *uvec,
++ssize_t import_iovec(enum iter_dir direction, const struct iovec __user *uvec,
+ 		 unsigned nr_segs, unsigned fast_segs, struct iovec **iovp,
+ 		 struct iov_iter *i);
+-ssize_t __import_iovec(int type, const struct iovec __user *uvec,
++ssize_t __import_iovec(enum iter_dir direction, const struct iovec __user *uvec,
+ 		 unsigned nr_segs, unsigned fast_segs, struct iovec **iovp,
+ 		 struct iov_iter *i, bool compat);
+-int import_single_range(int type, void __user *buf, size_t len,
++int import_single_range(enum iter_dir direction, void __user *buf, size_t len,
+ 		 struct iovec *iov, struct iov_iter *i);
+ 
+-static inline void iov_iter_ubuf(struct iov_iter *i, unsigned int direction,
++static inline void iov_iter_ubuf(struct iov_iter *i, enum iter_dir direction,
+ 			void __user *buf, size_t count)
+ {
+-	WARN_ON(direction & ~(READ | WRITE));
++	WARN_ON(!iov_iter_dir_valid(direction));
+ 	*i = (struct iov_iter) {
+ 		.iter_type = ITER_UBUF,
+ 		.user_backed = true,
+diff --git a/lib/iov_iter.c b/lib/iov_iter.c
+index f9a3ff37ecd1..fec1c5513197 100644
+--- a/lib/iov_iter.c
++++ b/lib/iov_iter.c
+@@ -421,11 +421,11 @@ size_t fault_in_iov_iter_writeable(const struct iov_iter *i, size_t size)
+ }
+ EXPORT_SYMBOL(fault_in_iov_iter_writeable);
+ 
+-void iov_iter_init(struct iov_iter *i, unsigned int direction,
++void iov_iter_init(struct iov_iter *i, enum iter_dir direction,
+ 			const struct iovec *iov, unsigned long nr_segs,
+ 			size_t count)
+ {
+-	WARN_ON(direction & ~(READ | WRITE));
++	WARN_ON(!iov_iter_dir_valid(direction));
+ 	*i = (struct iov_iter) {
+ 		.iter_type = ITER_IOVEC,
+ 		.nofault = false,
+@@ -994,11 +994,11 @@ size_t iov_iter_single_seg_count(const struct iov_iter *i)
+ }
+ EXPORT_SYMBOL(iov_iter_single_seg_count);
+ 
+-void iov_iter_kvec(struct iov_iter *i, unsigned int direction,
++void iov_iter_kvec(struct iov_iter *i, enum iter_dir direction,
+ 			const struct kvec *kvec, unsigned long nr_segs,
+ 			size_t count)
+ {
+-	WARN_ON(direction & ~(READ | WRITE));
++	WARN_ON(!iov_iter_dir_valid(direction));
+ 	*i = (struct iov_iter){
+ 		.iter_type = ITER_KVEC,
+ 		.data_source = direction,
+@@ -1010,11 +1010,11 @@ void iov_iter_kvec(struct iov_iter *i, unsigned int direction,
+ }
+ EXPORT_SYMBOL(iov_iter_kvec);
+ 
+-void iov_iter_bvec(struct iov_iter *i, unsigned int direction,
++void iov_iter_bvec(struct iov_iter *i, enum iter_dir direction,
+ 			const struct bio_vec *bvec, unsigned long nr_segs,
+ 			size_t count)
+ {
+-	WARN_ON(direction & ~(READ | WRITE));
++	WARN_ON(!iov_iter_dir_valid(direction));
+ 	*i = (struct iov_iter){
+ 		.iter_type = ITER_BVEC,
+ 		.data_source = direction,
+@@ -1026,15 +1026,15 @@ void iov_iter_bvec(struct iov_iter *i, unsigned int direction,
+ }
+ EXPORT_SYMBOL(iov_iter_bvec);
+ 
+-void iov_iter_pipe(struct iov_iter *i, unsigned int direction,
++void iov_iter_pipe(struct iov_iter *i, enum iter_dir direction,
+ 			struct pipe_inode_info *pipe,
+ 			size_t count)
+ {
+-	BUG_ON(direction != READ);
++	BUG_ON(direction != ITER_DEST);
+ 	WARN_ON(pipe_full(pipe->head, pipe->tail, pipe->ring_size));
+ 	*i = (struct iov_iter){
+ 		.iter_type = ITER_PIPE,
+-		.data_source = false,
++		.data_source = ITER_DEST,
+ 		.pipe = pipe,
+ 		.head = pipe->head,
+ 		.start_head = pipe->head,
+@@ -1057,10 +1057,10 @@ EXPORT_SYMBOL(iov_iter_pipe);
+  * from evaporation, either by taking a ref on them or locking them by the
+  * caller.
+  */
+-void iov_iter_xarray(struct iov_iter *i, unsigned int direction,
++void iov_iter_xarray(struct iov_iter *i, enum iter_dir direction,
+ 		     struct xarray *xarray, loff_t start, size_t count)
+ {
+-	BUG_ON(direction & ~1);
++	WARN_ON(!iov_iter_dir_valid(direction));
+ 	*i = (struct iov_iter) {
+ 		.iter_type = ITER_XARRAY,
+ 		.data_source = direction,
+@@ -1079,14 +1079,14 @@ EXPORT_SYMBOL(iov_iter_xarray);
+  * @count: The size of the I/O buffer in bytes.
+  *
+  * Set up an I/O iterator that just discards everything that's written to it.
+- * It's only available as a READ iterator.
++ * It's only available as a destination iterator.
+  */
+-void iov_iter_discard(struct iov_iter *i, unsigned int direction, size_t count)
++void iov_iter_discard(struct iov_iter *i, enum iter_dir direction, size_t count)
+ {
+-	BUG_ON(direction != READ);
++	BUG_ON(direction != ITER_DEST);
+ 	*i = (struct iov_iter){
+ 		.iter_type = ITER_DISCARD,
+-		.data_source = false,
++		.data_source = ITER_DEST,
+ 		.count = count,
+ 		.iov_offset = 0
+ 	};
+@@ -1447,7 +1447,7 @@ static ssize_t __iov_iter_get_pages_alloc(struct iov_iter *i,
+ 		unsigned long addr;
+ 		int res;
+ 
+-		if (iov_iter_rw(i) != WRITE)
++		if (iov_iter_is_dest(i))
+ 			gup_flags |= FOLL_WRITE;
+ 		if (i->nofault)
+ 			gup_flags |= FOLL_NOFAULT;
+@@ -1784,7 +1784,7 @@ struct iovec *iovec_from_user(const struct iovec __user *uvec,
+ 	return iov;
+ }
+ 
+-ssize_t __import_iovec(int type, const struct iovec __user *uvec,
++ssize_t __import_iovec(enum iter_dir direction, const struct iovec __user *uvec,
+ 		 unsigned nr_segs, unsigned fast_segs, struct iovec **iovp,
+ 		 struct iov_iter *i, bool compat)
+ {
+@@ -1823,7 +1823,7 @@ ssize_t __import_iovec(int type, const struct iovec __user *uvec,
+ 		total_len += len;
+ 	}
+ 
+-	iov_iter_init(i, type, iov, nr_segs, total_len);
++	iov_iter_init(i, direction, iov, nr_segs, total_len);
+ 	if (iov == *iovp)
+ 		*iovp = NULL;
+ 	else
+@@ -1836,7 +1836,7 @@ ssize_t __import_iovec(int type, const struct iovec __user *uvec,
+  *     into the kernel, check that it is valid, and initialize a new
+  *     &struct iov_iter iterator to access it.
+  *
+- * @type: One of %READ or %WRITE.
++ * @direction: One of %ITER_SOURCE or %ITER_DEST.
+  * @uvec: Pointer to the userspace array.
+  * @nr_segs: Number of elements in userspace array.
+  * @fast_segs: Number of elements in @iov.
+@@ -1853,16 +1853,16 @@ ssize_t __import_iovec(int type, const struct iovec __user *uvec,
+  *
+  * Return: Negative error code on error, bytes imported on success
+  */
+-ssize_t import_iovec(int type, const struct iovec __user *uvec,
++ssize_t import_iovec(enum iter_dir direction, const struct iovec __user *uvec,
+ 		 unsigned nr_segs, unsigned fast_segs,
+ 		 struct iovec **iovp, struct iov_iter *i)
+ {
+-	return __import_iovec(type, uvec, nr_segs, fast_segs, iovp, i,
++	return __import_iovec(direction, uvec, nr_segs, fast_segs, iovp, i,
+ 			      in_compat_syscall());
+ }
+ EXPORT_SYMBOL(import_iovec);
+ 
+-int import_single_range(int rw, void __user *buf, size_t len,
++int import_single_range(enum iter_dir direction, void __user *buf, size_t len,
+ 		 struct iovec *iov, struct iov_iter *i)
+ {
+ 	if (len > MAX_RW_COUNT)
+@@ -1872,7 +1872,7 @@ int import_single_range(int rw, void __user *buf, size_t len,
+ 
+ 	iov->iov_base = buf;
+ 	iov->iov_len = len;
+-	iov_iter_init(i, rw, iov, 1, len);
++	iov_iter_init(i, direction, iov, 1, len);
+ 	return 0;
+ }
+ EXPORT_SYMBOL(import_single_range);
 
 
