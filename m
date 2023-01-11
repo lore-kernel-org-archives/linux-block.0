@@ -2,170 +2,206 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB06AC5479D
-	for <linux-block@archiver.kernel.org>; Wed, 11 Jan 2023 10:13:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0FA7EC46467
+	for <linux-block@archiver.kernel.org>; Wed, 11 Jan 2023 10:21:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238079AbjAKKNG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 11 Jan 2023 05:13:06 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40350 "EHLO
+        id S233966AbjAKKU4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 11 Jan 2023 05:20:56 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46894 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238389AbjAKKMW (ORCPT
+        with ESMTP id S231888AbjAKKUp (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 11 Jan 2023 05:12:22 -0500
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2041.outbound.protection.outlook.com [40.107.93.41])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C2B4611171;
-        Wed, 11 Jan 2023 02:11:30 -0800 (PST)
+        Wed, 11 Jan 2023 05:20:45 -0500
+Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03A54AE4C;
+        Wed, 11 Jan 2023 02:20:41 -0800 (PST)
+Received: from pps.filterd (m0246629.ppops.net [127.0.0.1])
+        by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 30BAJ7rG008035;
+        Wed, 11 Jan 2023 10:20:34 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=message-id : date :
+ subject : to : cc : references : from : in-reply-to : content-type :
+ content-transfer-encoding : mime-version; s=corp-2022-7-12;
+ bh=sC2cAwdqGw9OKA83Fg+t6RM+Zi0J9CyRSc5J9Ic+UEE=;
+ b=AzKSctOzj09OmCyrf3sC+myqd1jevH81hltHpDS4jmvaXo6bzSX2MZbgztS2LSCcFgHo
+ ZWeMT5itXoaNHXK3Lqy9+kF+04t//ieAmvakC/9jDqv+Z56V1smvfzEXD+XspZxsXEhP
+ H3UR34o+AASyiRJ0zscEpaPA4t+jxBKjN7HNiDdiiiAOCqGIE5ymqagqeopi4fpfqXrg
+ SqnWFEaUl+6hPDefU3FEMtAJq/dLhE3bUkqCrdwZjGNzxRMGgEJNhE8+2gXWU2Fls1Z0
+ /CfcuN5WmyZY4PnvkUrPqzyh1U2xDfTMRRrdccJVGFE23zMAE1PjIZ2p3zISP45vN6Dn nA== 
+Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.appoci.oracle.com [130.35.100.223])
+        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3n1t0tg475-8
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 11 Jan 2023 10:20:34 +0000
+Received: from pps.filterd (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+        by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.5/8.17.1.5) with ESMTP id 30B8vwrK040371;
+        Wed, 11 Jan 2023 10:16:09 GMT
+Received: from nam12-mw2-obe.outbound.protection.outlook.com (mail-mw2nam12lp2040.outbound.protection.outlook.com [104.47.66.40])
+        by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3n1k4dgtym-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 11 Jan 2023 10:16:09 +0000
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=YMhQLXonhqAetESOcnrb/aq/qA5BV8XE78TchX+be25Fj2ROzmRccHkFFkopq3/LyzwBDi3QV1tzKjQ4+wHK64WqW9iT7ZKF44mIFBs8+ptV12iLf2fUeMAz6tEmkCEqAd5NSw20zr0Sn5g9CkS/Wrnq4bYkZbPNFBKpCKNszON7CCqH0QI/xShfiQhrOA8HYAlGsW/SYyL6K+eSHX1mPOfkg+ZSiJ2eW4UMzRnFNdB+D1x7JQV+TwoASMJWX+m5Vvl88rxBYJdh3WqBVM/Pj5YNN6p/fSMC+Hd3bmWBWnYd7NGih8DXKDgWYOtaUtrfRg+jcuKSoZSQUvTRTzwB4g==
+ b=guSmH9ZOdzJMiHGi5X4zqri57vVL5mClnwuIVIOrVSpPYLgwqr6G7uIk1q2XtbKHNVzrxeJAtorUbySfJ3HQnPjlwNZFKuoBGtDWch8reNPtYGI4PgcyPWgNloTEiHvFPqYln3X0UmbMevkJkbv3HzhNGfHfTUYwww0hm907VJKAHOp7CoF2GN2p80VHy5E0BJxL2xZiKm5NCK/j+xgecSc03HJTUkMLn/1qo21zZpyYSHBXQgVwDcgWZIqMehnZc5KRoEmggKU3y5RJCZQPUmrvlgc6O0mYOBRQAmEyb8FmOCJB25osqWvWYHAZ/oE67Dwx7h14yXBxOUEyF8Hkyg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=2zjgT4vdkGo4gQu7/4ZRdw/Ox8zBut/9qO68TuHMAIQ=;
- b=Is3yvyATvcqPfoWht9baSSSxHWenGAY/KtZQLAOFc/PuHFAzxJf0rLM3C9lSUtppfkezQnhrHUxcJmj0AfGbRT0C6txGhh6THq3IdzFslF4i7CIdWvbVAOqGPKS9EgdzYMOl0vSBOe+1WUFOGoNFbO/6ZkGWPPJPjH1uMeMWu1DRIBVn60A/qVymWsDE4I2qQ0baxSEApnwaC0INJUqbnl6syR7f3Y8ZiTuHTK/PEPWbXikNNkyteI3DlUkvuNFpb8MI0IAxKrAh8kY0YqcIleYLyQO5nyaGxuWBwvdF7796v0Kef72Bz+osTyHxrNTsQv99dQ/fDTYmfhMBcrKEtQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.118.232) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
+ bh=sC2cAwdqGw9OKA83Fg+t6RM+Zi0J9CyRSc5J9Ic+UEE=;
+ b=A8EPpxQetKOzoWUHk29bJ/716du5LV5Bb5ZzshL/z5JtIv/tksWjill6D74MbHMwLodb01tSlDSyQO1NRJ++hIN1/vI5yKl6J3smsrz2GK+2tkH39e4+79V05QpMooO/9iitxk0W+lSXyhzcXPshCWfkN60UKI3SA8lc4gXUNNhfICUhWdNa3XQxF2UOswGIpetaWWGAdkz3jAkhZTA6bHZhpEeVWW2Z7VzBiqdfhq0T680lp6WOPMVKP+pGmpSdcXdE1/rKpYEbVi5aIp4U604TiDmuXnZoO/Np18Mxk4/Rdad8k/B7wxwZoSSNE2BK5iE4cdz/ICf25uNenurIgA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=2zjgT4vdkGo4gQu7/4ZRdw/Ox8zBut/9qO68TuHMAIQ=;
- b=uDXV4wnsAKCGHskAHdFmyFD6i+ukiW56MyZJEhhaNfIOsn9sXcFABepqCI5qAh07HwpUFyk1973fMrcmTQZF06HonW0fXtBAbhHYnz6kzbqeIEoTA7He8pOpF8eqtE/Qig/TEG/XXJSagukQ1zEjvnAZOVpPws/vw9l7orAVmlPSz2oO0bvBrpDeFhc2NEAiv3fdKdr6m9Ve07P5fWnofHC4lTvNN5qCVB6gGbU8Y0tYPdm7j3gOd7PJnrfWMEaZxHr7p4Dxt+sY3eDeImklZtwG/oPiCxET8HQzf31V+qCSRV7x8ujv5Cziik3lr5mlQYFwslGflQPQIrTeYwqbIw==
-Received: from BN8PR16CA0018.namprd16.prod.outlook.com (2603:10b6:408:4c::31)
- by SA1PR12MB8119.namprd12.prod.outlook.com (2603:10b6:806:337::19) with
+ bh=sC2cAwdqGw9OKA83Fg+t6RM+Zi0J9CyRSc5J9Ic+UEE=;
+ b=KMuaCfgjY4tGe03yLDq9mPgSPZfC8shPpIgoP/SwUa/wjPE/z4DY0NYZ9okIkT1mrpBPL7XtNCaETF3PGfN9Vhb9hB2fHU7SCAPbM/RhD1D9hO58kBnI6A1Th2uEvYnxyZsQkUtY+/6faRYTB+5FvF5arOkq7KbJvbZ6mq/wHCE=
+Received: from DM6PR10MB4313.namprd10.prod.outlook.com (2603:10b6:5:212::20)
+ by DS7PR10MB7321.namprd10.prod.outlook.com (2603:10b6:8:e5::16) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5986.18; Wed, 11 Jan
- 2023 10:11:29 +0000
-Received: from BN8NAM11FT087.eop-nam11.prod.protection.outlook.com
- (2603:10b6:408:4c:cafe::63) by BN8PR16CA0018.outlook.office365.com
- (2603:10b6:408:4c::31) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5986.18 via Frontend
- Transport; Wed, 11 Jan 2023 10:11:29 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.232)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.118.232 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.118.232; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.118.232) by
- BN8NAM11FT087.mail.protection.outlook.com (10.13.177.24) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6002.13 via Frontend Transport; Wed, 11 Jan 2023 10:11:28 +0000
-Received: from drhqmail201.nvidia.com (10.126.190.180) by mail.nvidia.com
- (10.127.129.5) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.36; Wed, 11 Jan
- 2023 02:11:24 -0800
-Received: from drhqmail201.nvidia.com (10.126.190.180) by
- drhqmail201.nvidia.com (10.126.190.180) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.986.36; Wed, 11 Jan 2023 02:11:23 -0800
-Received: from vdi.nvidia.com (10.127.8.10) by mail.nvidia.com
- (10.126.190.180) with Microsoft SMTP Server id 15.2.986.36 via Frontend
- Transport; Wed, 11 Jan 2023 02:11:20 -0800
-From:   Yishai Hadas <yishaih@nvidia.com>
-To:     <linux-kernel@vger.kernel.org>, <linux-block@vger.kernel.org>,
-        <linux-mm@kvack.org>, <jgg@nvidia.com>, <axboe@kernel.dk>,
-        <logang@deltatee.com>, <akpm@linux-foundation.org>,
-        <willy@infradead.org>
-CC:     <hch@lst.de>, <alex.williamson@redhat.com>, <yishaih@nvidia.com>,
-        <leonro@nvidia.com>, <maorg@nvidia.com>
-Subject: [PATCH V1] lib/scatterlist: Fix to calculate the last_pg properly
-Date:   Wed, 11 Jan 2023 12:10:54 +0200
-Message-ID: <20230111101054.188136-1-yishaih@nvidia.com>
-X-Mailer: git-send-email 2.21.0
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6002.12; Wed, 11 Jan
+ 2023 10:16:07 +0000
+Received: from DM6PR10MB4313.namprd10.prod.outlook.com
+ ([fe80::1040:f0e3:c129:cff]) by DM6PR10MB4313.namprd10.prod.outlook.com
+ ([fe80::1040:f0e3:c129:cff%8]) with mapi id 15.20.6002.013; Wed, 11 Jan 2023
+ 10:16:07 +0000
+Message-ID: <60539053-419a-d8e7-79c3-d23c005505b4@oracle.com>
+Date:   Wed, 11 Jan 2023 10:16:02 +0000
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.6.1
+Subject: Re: [PATCH V4 3/6] genirq/affinity: Don't pass irq_affinity_desc
+ array to irq_build_affinity_masks
+Content-Language: en-US
+To:     Ming Lei <ming.lei@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Jens Axboe <axboe@kernel.dk>
+Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@lst.de>
+References: <20221227022905.352674-1-ming.lei@redhat.com>
+ <20221227022905.352674-4-ming.lei@redhat.com>
+From:   John Garry <john.g.garry@oracle.com>
+Organization: Oracle Corporation
+In-Reply-To: <20221227022905.352674-4-ming.lei@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: LO4P265CA0141.GBRP265.PROD.OUTLOOK.COM
+ (2603:10a6:600:2c4::11) To DM6PR10MB4313.namprd10.prod.outlook.com
+ (2603:10b6:5:212::20)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BN8NAM11FT087:EE_|SA1PR12MB8119:EE_
-X-MS-Office365-Filtering-Correlation-Id: 2f57fa33-e1ed-46ae-5b62-08daf3bc34c6
+X-MS-TrafficTypeDiagnostic: DM6PR10MB4313:EE_|DS7PR10MB7321:EE_
+X-MS-Office365-Filtering-Correlation-Id: 89135d19-1944-4c9e-b20c-08daf3bcda71
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: vRzdh97HJ4zjUlpKApHWm/Fx2fM+VHO12hAGIz6qJbXXXhZw9YAKYVp1C+meCr1w5xfgevbumOwA79enYObyjICkpkjqK0lOS4yBUvVvr1438OjgZ1ciKSStYO5zthjRoxJ3UUw6CQKibgV4rpCKJyZ1GcrzHddSoZU7sCLCS+6rqSuyF68ws3qYScDoyHxKYwSRyo7sy1oARD+lwzNxiTrfV3BPjAFREDSOioNsejC58aGM1lyTBWMNAOQ9M/UKgNEzGQm1VQjXAEplGRJXBTEZGjpa1MBgjkuxxKh5C/4G3JR3vXUUxm9j8Ki3VR4EF8+ZUX8jkq8seZButrDV7bcBQ9nUhEd4P3pQbseNoJr0AP2Ea9h/bLonXE7E/k0VBH2C3WM34v8ioF2Fv7Tzr3LaQX56w90PXxDKJB964X3kVjrApS+eK5hEICT7TVXMcH2Q5cCULhNv4OnigrkXzCPkvn5J00DqyOcz6qw4xJUXzEC0wxHDXSd6mulQ/gSgfPXE4ts0ZrG7J1Y1qqbnPNFff2qDFUlYMEEX3G/+9Ri4GsZxuWe5mjqCd7hc/GIBW7BUdbFH53QVU7cZxo4IPGqoTGsKDh94FY5NxN/acqxpIa2Q3wBZtxp3XcVVsuxGP/UGvdRnZ2RusG7HvEouWa61VK72dJYA0DMGE2s422dLgh7n71PZfs1IJlk3S5RKTUntHlBi+ljHYpZmnKud+4mcmqFDk5G5xl8uff76dvxC2Y26LREkIK6PMw69yBMngUE1vz74G7HX7+i5gtE97F9xNRh0zb6ThrVRz3LPaZ7O6+9KEUK8oC8Tzo1HjZnu
-X-Forefront-Antispam-Report: CIP:216.228.118.232;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge1.nvidia.com;CAT:NONE;SFS:(13230022)(4636009)(376002)(396003)(346002)(136003)(39860400002)(451199015)(40470700004)(36840700001)(46966006)(7696005)(186003)(5660300002)(26005)(4326008)(40460700003)(966005)(110136005)(54906003)(336012)(8676002)(316002)(70206006)(40480700001)(1076003)(70586007)(2616005)(82310400005)(36756003)(83380400001)(8936002)(86362001)(47076005)(426003)(82740400003)(478600001)(41300700001)(107886003)(6666004)(36860700001)(7636003)(2906002)(356005)(2101003);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Jan 2023 10:11:28.9287
+X-Microsoft-Antispam-Message-Info: 17phN1oOYj9+VefNBK7gob0pr2CHkragU/A3SCHZ4++OsVKFCw4B0YJN8lCNq+fdtM46vXHpKj8Pf6Li9/d+ypdCBal4N5q1R3WVezrn/CAp1AJbEk70v/Th0YTxlBKTXVNHki5CQu74963G5qeZdJ3J+g2FpoGvl5JDvP6FVI5cKX1Jv5Fu8f3YaTxeNjozOpvV2imj/iKtoGpLFM0VOBUZ4E+QzL8wkoYpScsnVwxzmGbvyPtENR6vNkjq6kmuAgyxlKUBY+xp0AUt+9ucrP5nutdKUclj2cZanEozQXH0gJTlWK/FPhDriOV5BWhA3c25j0s3IOPaMIigtdgz7/QdrIF2bABPa003dzcaH9ssYnT4tf7J4d1CaLPKiigmIofQW/aZTbNsy0ulAUxwJ2Pjijis0XLXKrPgociFH14wckCZYfufNFlwrBew4hy4b5Y/WNgMgg/oMRShx4dhz4CJT6v4Pu3TGBajs/45ER617bUa3wHDh8s2huEQD/6IzHdMQ6o+UW4KN6FxvXtV1e2ejJSQdxurI+2JbPidZ9qxSULcDVX956YWlcXDXB+ifVorqk164j1pDXlAswP/y/z3uCqEdosxrxfPjpfC2ufX+hhtjnHroifB5UojSRQF1gMpx1J3iH2OQo9fgwEc88PyEf6VSesW+Up729c6N9LV+3MSmF6Nxldc5weGdj/2VI75BGqjXInZwNcsDJOCGKea7d5NSmxR6Zv2ZC+UysE=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR10MB4313.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(39860400002)(136003)(376002)(346002)(366004)(396003)(451199015)(110136005)(2906002)(31686004)(4326008)(5660300002)(31696002)(86362001)(36756003)(8936002)(41300700001)(8676002)(66476007)(66946007)(66556008)(38100700002)(316002)(53546011)(6486002)(83380400001)(6506007)(36916002)(2616005)(6666004)(6512007)(26005)(478600001)(186003)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?M3pCejlvVTFHdk04VlVMNmx4UGNBSytzS2g1TFJoNzI2ZUJseEJFaTVDendK?=
+ =?utf-8?B?cVU3aGZFOW9DWjlobEFmMnJDM3Y4VnNVYmR3WjYveVRrVURpMFArUlpYL3ZO?=
+ =?utf-8?B?bXpxZ1pGeEZNQnVYSWRuY1h0Tk14bDBaYnZWWGVZQkRGOWcvUXBiMDkrTlV1?=
+ =?utf-8?B?WlRpNDZ1UjZtYUo2TWp1MWxyVmVCY3NFSVF0T3RyOEQ2MVIzb0R3ZGpYWXBL?=
+ =?utf-8?B?NUJOZ2xXeW1WeFZsYlJvNzRpMDMycWFuY2VoNk42T2l1eHpaajlDa2lpbk42?=
+ =?utf-8?B?MUNUcUFwQkxtcHFqeWFOaEVMZXdyVnhwL2Z5YkY5YW5FL0xXdG9rSWRTK2F2?=
+ =?utf-8?B?UVhzTXdoMEVSWjc0MmJ4Zkk0cStiZzkwNDdCSHBONnozbTAxci9wZmRxYTEz?=
+ =?utf-8?B?ZjhHem5TMUp4M2hPYWZoSUZ4WVBPL3kwT2RRVWxxTG5LMmd6N3EwOU4ybXIy?=
+ =?utf-8?B?Rk5oZWFyVFRWcjFyVFRwd2gydWJpdUl5SWRmMFQxNy9lL0tCR3MzcHJvZUN1?=
+ =?utf-8?B?anEvdnluNDJVcytVV1VSRGdJc1VnQUlOREVSUk5mVW5FbjRKOGdDTDdJRkxS?=
+ =?utf-8?B?ZHE2T0ExWjJMb1pwT3Z2eEVDT0VaVm5FS2RzbTc1dlZKcEo5VE92cTl1L3BT?=
+ =?utf-8?B?U1hBbGczVitnYm1RT2VidVFMMSsvanVHKzhXY1dpb2NYL3QxZVJMT29mWjBG?=
+ =?utf-8?B?QWx5Z1NUYTB5eGo1STZMMGk0RnhzZmhaUHhOWkZtMXdnQ25TcFc5YWcyODg5?=
+ =?utf-8?B?dDJ6a3NMWURwWXk4aDIvemdrYXV3Tkx2N0pRc2Rrc2FmaGxRaFduV3JGb05v?=
+ =?utf-8?B?NVFFZnByYXR3dnVSTkh4N2MweHJJcGF2d05vaHlZSW4zRnJDaHBqZUpmcTNP?=
+ =?utf-8?B?VmhiZ2hUYzdBNmZHcnFncTBKRlJwOTdvQ0tZYUpLaDZPU3BFZFVXVStGMndr?=
+ =?utf-8?B?Z2hFNGNocWVXNFQ5QnpPNGRzMW1TUUg5WG5qdHE5RDlPTUd3N3QzbngxMTZC?=
+ =?utf-8?B?UmpYOW51T1hVa0FGZ3FIVXpEMnZNTFE1THpIeEJFdFpTd2g5OW9nL251QVlt?=
+ =?utf-8?B?d29Sbm1VdlMvWSs2aGNNT3VnZitvdXo4RGhLQ2RXSVFCL0JpNVlFb1dQdEhU?=
+ =?utf-8?B?Z2xUaW5wellpZHpvcHpyTFAzRFVuc1h6SDBtamh1U1BnQnNxbEhkZEF3SEMv?=
+ =?utf-8?B?K0U2MFdONUdYZFplS0RaRTF6c0NuZkQ4SUVBaFFtRlRMZ0FrcDV5VEFNSHY2?=
+ =?utf-8?B?Zm9vL3BpdTYrSUtKdmphR0ExaFhCR2ZzZlhIRHRFd014alFJSFJvWWN0dThR?=
+ =?utf-8?B?MUw4bmZUaUZ5UWdOZThTbWVFcnlWWks5dTdHZDVWdTNGSHpJTTIxSXNWUEJ2?=
+ =?utf-8?B?U1RxaWVwWnpBSWpBZmlNWDdYeVdnRXpxTU1MVS92YjIzK3BkZ090RU4zUlJU?=
+ =?utf-8?B?dTJvZDlWM3VIU2p6OXR6d3NUbWJBd005MHpOYXM2Um9KRnhLUkJDMnRrNDU3?=
+ =?utf-8?B?bTlNY0tLOWwvMkcyYSt5dzg3VTIvOFRjOElncGRRUVlMY092cGh5NXdFOXhi?=
+ =?utf-8?B?cEc3TjRsMHVtcVNZMFdZL2MwZmVYOGNBR0xYUTd2T3VvRDBFK1FBK3MrN3FR?=
+ =?utf-8?B?SjFxd0lmNS9SOXpPTTlyWW5odlpFSk5GbDR3NUs4VmN3R3FWa3JOUlcwWGkv?=
+ =?utf-8?B?OUVmUXhCSWJ4blh1dUdlYkZZUlVZRFo1Nit6YkxmaHlydktLQmY4a3BML0pM?=
+ =?utf-8?B?TWJsUG5xeHgwUUU5dnQ0ZVpqd2ZKbzZLRDN2WGhlQS9UbnVrVy8yM21ZRzFM?=
+ =?utf-8?B?Y3NLdTZQZUd6WEpvd3Zrd2IyYkN1ZHNZQTdhSHNxR2c1aDJvVExRMk5EaTZE?=
+ =?utf-8?B?WjZkTFl0N05FNmRta2MyTlVza0ZURFR0b04zQlQ0bnpMTzY1Y3JhSFUwNFBM?=
+ =?utf-8?B?dUdzTGJFZFVvV2NYYzc5bDlkR1VRTlQ4a0JDSlluTzJRdE1jOThlNElJNXc3?=
+ =?utf-8?B?dTg4TDhqOTZNVTlBalFMdjlGRWh0VUdpNlVMYzBnTG05UUZQTmh3Ris1SUx3?=
+ =?utf-8?B?bzc2QUc4YWd1RElybGJzZXZPcVhLSUZtclhjaXpBaFB5SWNVaUNXUkduZHEz?=
+ =?utf-8?B?WU03bzJnZitkYlpCTWJibTBzYm4wK0pVTlB4eXFOT3FyenFEeDA0UlJicDlh?=
+ =?utf-8?B?REE9PQ==?=
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: uoS3VH/U4BOE8e6+QLJSRl+bTuEI/Wmv/hmRX+ObZ76Q8icvAwGhS7t4oJ1QiDCSk/9dkCxSe13veFF5F0NpdsZ2CWrd5mUdjB68kZhA/F7BCrNOFUALGGeBe3yZK5jI4RCMa8ExgMmTGBnC9V9ZRvhYKA64eTsIjREQ4/ghkuSYKDz19j8yxGShUHBLfvWW1vGgomkgCsjk2i5Y3+42mGXO4FvpNcruFj6c59bV1dWf0qOYC9Fxh2V2XrBxo1B74x7gF+DaxQ5j/AR0jMC74wTezgGpyjSG0Qu6m3ax3mTgFQYrtfo+Ql/7cCHgke9V99mwNmEH2OT0mEckA4MH7eArH0+pppRDjw/7i/JFM6W990UIukVxphDTenmYDDWMUoulQYKFR9zPwDArTv9yECQJoBiFNqkXVYlU/9vUEzu/etvgbywjHORmMu/FxaebvXy2gLXihgJqOe8CfoKHtevuZUJFS2DJFRoF2rjONSU245aOXZ18W9XC+jkpwV/Wp6j6R+2u5vBJdokLK6Ok83V58oHyWbQRy11DMuVlYe3uzHz8FG5fw3gVnnzE2pA8k0ZPnNF5AwVozspyH3g/2jNXUcCHqSFMTY+ITEoEsQI2Uy5HYTbekFAvHny6e/VQdNXaghFH1N7Y/uN3z0dhds2AThmxozy/lQb038b9SmYj9atz1Pd4ySIMg/ps6TM/j6WxGCcsy5Tmj5wBjXP69FOgNFifQ7jO5a04N03b7WlBKres84QOfkSr/LwsTN+P5ADjB7wjBU+/ns2NWkvToLznNTvhnvqvqP4GfNXLDaSbwobvtE2QSVGCUIkejLb50PTj2silCQt270INoAlQfAjCV0Vn0arZCiJjnpcx8MmYwipaLnnXaNFXepVFg61G
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 89135d19-1944-4c9e-b20c-08daf3bcda71
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR10MB4313.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Jan 2023 10:16:07.2194
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2f57fa33-e1ed-46ae-5b62-08daf3bc34c6
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.232];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: BN8NAM11FT087.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB8119
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: uWZu5KlFkW4993qQZvet21hQYSEubvgX9IWbKrRnH5YHH7DBRIVnmw+eROOAFyZLFUuY0zxNZOoZPc8w/WY1yA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR10MB7321
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.923,Hydra:6.0.545,FMLib:17.11.122.1
+ definitions=2023-01-11_04,2023-01-11_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 mlxlogscore=999
+ malwarescore=0 mlxscore=0 suspectscore=0 phishscore=0 adultscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2212070000 definitions=main-2301110078
+X-Proofpoint-ORIG-GUID: Opesb6kRJVXut-mZ63dkvS2z2EWsrYW5
+X-Proofpoint-GUID: Opesb6kRJVXut-mZ63dkvS2z2EWsrYW5
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The last_pg is wrong, it is actually the first page of the last
-scatterlist element. To get the last page of the last scatterlist
-element we have to add prv->length. So it is checking mergability
-against the wrong page, Further, a SG element is not guaranteed to end
-on a page boundary, so we have to check the sub page location also for
-merge eligibility.
+On 27/12/2022 02:29, Ming Lei wrote:
+> Prepare for abstracting irq_build_affinity_masks() into one public helper
+> for assigning all CPUs evenly into several groups. Don't pass
+> irq_affinity_desc array to irq_build_affinity_masks, instead return
+> a cpumask array by storing each assigned group into one element of
+> the array.
+> 
+> This way helps us to provide generic interface for grouping all CPUs
+> evenly from NUMA and CPU locality viewpoint, and the cost is one extra
+> allocation in irq_build_affinity_masks(), which should be fine since
+> it is done via GFP_KERNEL and irq_build_affinity_masks() is called very
+> less.
+> 
+> Reviewed-by: Christoph Hellwig<hch@lst.de>
+> Signed-off-by: Ming Lei<ming.lei@redhat.com>
 
-Fix the above by checking physical contiguity based on PFNs, compute the
-actual last page and then call pages_are_mergable().
+Reviewed-by: John Garry <john.g.garry@oracle.com>
 
-Fixes: 1567b49d1a40 ("lib/scatterlist: add check when merging zone device pages")
-Reported-by: Jason Gunthorpe <jgg@nvidia.com>
-Signed-off-by: Yishai Hadas <yishaih@nvidia.com>
----
-Changelog:
-v1:
- * Rename 'paddr' to 'next_pfn' as it's actually.
- * Move to use page_to_phys() to clarify the code.
- * Fix to use (next_pfn - 1) instead of (paddr - PAGE_SIZE).
-v0:
-https://lore.kernel.org/lkml/Y7zyyTxdoJulq7OD@casper.infradead.org/T/
+> ---
+>   kernel/irq/affinity.c | 34 ++++++++++++++++++++++++----------
+>   1 file changed, 24 insertions(+), 10 deletions(-)
+> 
+> diff --git a/kernel/irq/affinity.c b/kernel/irq/affinity.c
+> index da6379cd27fd..00bba1020ecb 100644
+> --- a/kernel/irq/affinity.c
+> +++ b/kernel/irq/affinity.c
+> @@ -249,7 +249,7 @@ static int __irq_build_affinity_masks(unsigned int startvec,
 
- lib/scatterlist.c | 25 +++++++++++++++----------
- 1 file changed, 15 insertions(+), 10 deletions(-)
 
-diff --git a/lib/scatterlist.c b/lib/scatterlist.c
-index f72aa50c6654..8d7519a8f308 100644
---- a/lib/scatterlist.c
-+++ b/lib/scatterlist.c
-@@ -470,22 +470,27 @@ int sg_alloc_append_table_from_pages(struct sg_append_table *sgt_append,
- 		return -EOPNOTSUPP;
- 
- 	if (sgt_append->prv) {
-+		unsigned long next_pfn = (page_to_phys(sg_page(sgt_append->prv)) +
-+			sgt_append->prv->offset + sgt_append->prv->length) / PAGE_SIZE;
-+
- 		if (WARN_ON(offset))
- 			return -EINVAL;
- 
- 		/* Merge contiguous pages into the last SG */
- 		prv_len = sgt_append->prv->length;
--		last_pg = sg_page(sgt_append->prv);
--		while (n_pages && pages_are_mergeable(pages[0], last_pg)) {
--			if (sgt_append->prv->length + PAGE_SIZE > max_segment)
--				break;
--			sgt_append->prv->length += PAGE_SIZE;
--			last_pg = pages[0];
--			pages++;
--			n_pages--;
-+		if (page_to_pfn(pages[0]) == next_pfn) {
-+			last_pg = pfn_to_page(next_pfn - 1);
-+			while (n_pages && pages_are_mergeable(pages[0], last_pg)) {
-+				if (sgt_append->prv->length + PAGE_SIZE > max_segment)
-+					break;
-+				sgt_append->prv->length += PAGE_SIZE;
-+				last_pg = pages[0];
-+				pages++;
-+				n_pages--;
-+			}
-+			if (!n_pages)
-+				goto out;
- 		}
--		if (!n_pages)
--			goto out;
- 	}
- 
- 	/* compute number of contiguous chunks */
--- 
-2.18.1
+>   
+>    fail_npresmsk:
+> @@ -393,7 +398,11 @@ static int irq_build_affinity_masks(unsigned int numvecs,
+>   
+>    fail_nmsk:
+>   	free_cpumask_var(nmsk);
+> -	return ret < 0 ? ret : 0;
+> +	if (ret < 0) {
+> +		kfree(masks);
+> +		return NULL;
+
+I dislike non-failure path passing through "fail" labels, but that is 
+how the current code is...
+
+> +	}
+> +	return masks;
+>   }
+>   
 
