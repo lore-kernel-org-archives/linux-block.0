@@ -2,43 +2,43 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D86D2C678D5
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00DA5C678D8
 	for <linux-block@archiver.kernel.org>; Wed, 11 Jan 2023 05:04:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235615AbjAKFDy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 11 Jan 2023 00:03:54 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48418 "EHLO
+        id S235647AbjAKFDz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 11 Jan 2023 00:03:55 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48428 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235245AbjAKFDh (ORCPT
+        with ESMTP id S235276AbjAKFDh (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Wed, 11 Jan 2023 00:03:37 -0500
 Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 163B9DF4B;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 809E1DF50;
         Tue, 10 Jan 2023 21:03:36 -0800 (PST)
 Received: from mail02.huawei.com (unknown [172.30.67.153])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4NsFv52qnjz4f3v5L;
-        Wed, 11 Jan 2023 13:03:29 +0800 (CST)
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4NsFv63x2Tz4f3jQP;
+        Wed, 11 Jan 2023 13:03:30 +0800 (CST)
 Received: from huaweicloud.com (unknown [10.175.124.27])
-        by APP1 (Coremail) with SMTP id cCh0CgDX9S8fQ75jGl2gBQ--.10280S11;
-        Wed, 11 Jan 2023 13:03:31 +0800 (CST)
+        by APP1 (Coremail) with SMTP id cCh0CgDX9S8fQ75jGl2gBQ--.10280S14;
+        Wed, 11 Jan 2023 13:03:32 +0800 (CST)
 From:   Kemeng Shi <shikemeng@huaweicloud.com>
 To:     hch@lst.de, axboe@kernel.dk, dwagner@suse.de, hare@suse.de,
         ming.lei@redhat.com, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org
 Cc:     john.garry@huawei.com, jack@suse.cz
-Subject: [PATCH v3 09/14] blk-mq: use blk_mq_commit_rqs helper in blk_mq_try_issue_list_directly
-Date:   Wed, 11 Jan 2023 21:01:54 +0800
-Message-Id: <20230111130159.3741753-10-shikemeng@huaweicloud.com>
+Subject: [PATCH v3 12/14] blk-mq: remove set of bd->last when get driver tag for next request fails
+Date:   Wed, 11 Jan 2023 21:01:57 +0800
+Message-Id: <20230111130159.3741753-13-shikemeng@huaweicloud.com>
 X-Mailer: git-send-email 2.30.0
 In-Reply-To: <20230111130159.3741753-1-shikemeng@huaweicloud.com>
 References: <20230111130159.3741753-1-shikemeng@huaweicloud.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: cCh0CgDX9S8fQ75jGl2gBQ--.10280S11
-X-Coremail-Antispam: 1UD129KBjvJXoW7uFyfJryDGFyUGF1UKr4fuFg_yoW8Aw1rpF
-        W3Ganxtr4Sqr4xZFykAay7ZFy7Jrs8Kry7Xryakw1aqrWUCrW0gFsxtr1xXFyrtFWkAa13
-        XFyDWr98tF4UWwUanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUBIb4IE77IF4wAFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k2
+X-CM-TRANSID: cCh0CgDX9S8fQ75jGl2gBQ--.10280S14
+X-Coremail-Antispam: 1UD129KBjvJXoW7ZryrKr17Cr1DAw1rCrWxWFg_yoW8Kr18pF
+        W3Ja1akr45XF40gFW8AwsrWr45Jw4DArWayrsI934Sqrn0krs7KFy8J3y8ZFySvrWkCrsI
+        gr1qgryDZr48XFDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUBSb4IE77IF4wAFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k2
         6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M280x2IEY4vEnII2IxkI6r1a6r45M2
         8IrcIa0xkI8VA2jI8067AKxVWUAVCq3wA2048vs2IY020Ec7CjxVAFwI0_Xr0E3s1l8cAv
         FVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVWDJVCq3w
@@ -48,68 +48,84 @@ X-Coremail-Antispam: 1UD129KBjvJXoW7uFyfJryDGFyUGF1UKr4fuFg_yoW8Aw1rpF
         67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41l42xK82IYc2
         Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s02
         6x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0x
-        vE2Ix0cI8IcVAFwI0_JFI_Gr1lIxAIcVC0I7IYx2IY6xkF7I0E14v26F4j6r4UJwCI42IY
-        6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aV
-        CY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU058n7UUUUU==
+        vE2Ix0cI8IcVAFwI0_Gr0_Xr1lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4UJVWxJr1lIxAI
+        cVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r4j6F4UMIIF0xvEx4A2js
+        IEc7CjxVAFwI0_Gr1j6F4UJbIYCTnIWIevJa73UjIFyTuYvjxUxD7aUUUUU
 X-CM-SenderInfo: 5vklyvpphqwq5kxd4v5lfo033gof0z/
 X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Call blk_mq_commit_rqs instead of access ->commit_rqs directly. As you
-can see in comment of blk_mq_commit_rqs, we only need explicitly call
-this in two cases:
- -did not queue everything initially scheduled to queue
- -the last attempt to queue a request failed
-Both cases can be checked with ret of last request which breaks list
-walk. Then we can remove unnecessary error count and unnecessary
-commit triggered by error besides cases described above.
+Commit 113285b473824 ("blk-mq: ensure that bd->last is always set
+correctly") will set last if we failed to get driver tag for next
+request to avoid flush miss as we break the list walk and will not
+send the last request in the list which will be sent with last set
+normally.
+This code seems stale now becase the flush introduced is always
+redundant as:
+For case tag is really out, we will send a extra flush if we find
+list is not empty after list walk.
+For case some tag is freed before retry in blk_mq_prep_dispatch_rq for
+next, then we can get a tag for next request in retry and flush notified
+already is not necessary.
+
+Just remove these stale codes.
 
 Signed-off-by: Kemeng Shi <shikemeng@huaweicloud.com>
 ---
- block/blk-mq.c | 13 +++----------
- 1 file changed, 3 insertions(+), 10 deletions(-)
+ block/blk-mq.c | 24 ++----------------------
+ 1 file changed, 2 insertions(+), 22 deletions(-)
 
 diff --git a/block/blk-mq.c b/block/blk-mq.c
-index c6c84f44c7a6..f45d81e20d9e 100644
+index b2133af1c846..1b66a5169be2 100644
 --- a/block/blk-mq.c
 +++ b/block/blk-mq.c
-@@ -2819,17 +2819,15 @@ void blk_mq_try_issue_list_directly(struct blk_mq_hw_ctx *hctx,
- 		struct list_head *list)
+@@ -1923,16 +1923,6 @@ static void blk_mq_update_dispatch_busy(struct blk_mq_hw_ctx *hctx, bool busy)
+ static void blk_mq_handle_dev_resource(struct request *rq,
+ 				       struct list_head *list)
  {
- 	int queued = 0;
--	int errors = 0;
-+	blk_status_t ret;
- 
- 	while (!list_empty(list)) {
--		blk_status_t ret;
- 		struct request *rq = list_first_entry(list, struct request,
- 				queuelist);
- 
- 		list_del_init(&rq->queuelist);
- 		ret = blk_mq_request_issue_directly(rq, list_empty(list));
- 		if (ret != BLK_STS_OK) {
--			errors++;
- 			if (ret == BLK_STS_RESOURCE ||
- 					ret == BLK_STS_DEV_RESOURCE) {
- 				blk_mq_request_bypass_insert(rq, false,
-@@ -2841,13 +2839,8 @@ void blk_mq_try_issue_list_directly(struct blk_mq_hw_ctx *hctx,
- 			queued++;
- 	}
- 
+-	struct request *next =
+-		list_first_entry_or_null(list, struct request, queuelist);
+-
 -	/*
--	 * If we didn't flush the entire list, we could have told
--	 * the driver there was more coming, but that turned out to
--	 * be a lie.
+-	 * If an I/O scheduler has been configured and we got a driver tag for
+-	 * the next request already, free it.
 -	 */
--	if (errors && hctx->queue->mq_ops->commit_rqs && queued)
--		hctx->queue->mq_ops->commit_rqs(hctx);
-+	if (ret != BLK_STS_OK)
-+		blk_mq_commit_rqs(hctx, queued);
+-	if (next)
+-		blk_mq_put_driver_tag(next);
+-
+ 	list_add(&rq->queuelist, list);
+ 	__blk_mq_requeue_request(rq);
  }
+@@ -2038,7 +2028,7 @@ bool blk_mq_dispatch_rq_list(struct blk_mq_hw_ctx *hctx, struct list_head *list,
+ {
+ 	enum prep_dispatch prep;
+ 	struct request_queue *q = hctx->queue;
+-	struct request *rq, *nxt;
++	struct request *rq;
+ 	int queued;
+ 	blk_status_t ret = BLK_STS_OK;
+ 	LIST_HEAD(zone_list);
+@@ -2064,17 +2054,7 @@ bool blk_mq_dispatch_rq_list(struct blk_mq_hw_ctx *hctx, struct list_head *list,
+ 		list_del_init(&rq->queuelist);
  
- static bool blk_mq_attempt_bio_merge(struct request_queue *q,
+ 		bd.rq = rq;
+-
+-		/*
+-		 * Flag last if we have no more requests, or if we have more
+-		 * but can't assign a driver tag to it.
+-		 */
+-		if (list_empty(list))
+-			bd.last = true;
+-		else {
+-			nxt = list_first_entry(list, struct request, queuelist);
+-			bd.last = !blk_mq_get_driver_tag(nxt);
+-		}
++		bd.last = list_empty(list);
+ 
+ 		/*
+ 		 * once the request is queued to lld, no need to cover the
 -- 
 2.30.0
 
