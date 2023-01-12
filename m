@@ -2,177 +2,119 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 661BAC61DB3
-	for <linux-block@archiver.kernel.org>; Thu, 12 Jan 2023 08:44:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6FCF6C54EBD
+	for <linux-block@archiver.kernel.org>; Thu, 12 Jan 2023 09:11:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229780AbjALIo4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 12 Jan 2023 03:44:56 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37446 "EHLO
+        id S239713AbjALJLQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 12 Jan 2023 04:11:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57180 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239731AbjALIoJ (ORCPT
+        with ESMTP id S239876AbjALJKO (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 12 Jan 2023 03:44:09 -0500
-Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 277B3479CB
-        for <linux-block@vger.kernel.org>; Thu, 12 Jan 2023 00:42:06 -0800 (PST)
-Received: by mail-pl1-x62d.google.com with SMTP id jl4so19534216plb.8
-        for <linux-block@vger.kernel.org>; Thu, 12 Jan 2023 00:42:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance-com.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=oEg4bQ6lpGrIUrq1T+gt3Ejj1Swr0qeWVL35vq5Po6U=;
-        b=taeeV0OMcAkInTg8vAnOBHKivystFadZ28hvDI0CRtwa+zGUkmuuJu7s9CY8olfEfk
-         qYZrKNb6EcrIunkCdUNwZOAq4VfeqVujcPa7tVQc8BA76qqjKZhZAhBzWc+jX2sqof7r
-         ul7kG0Bjc5Tc10dUdtw0rTwQte2dYX1xBwWVBKzngl1A8MkFOwgTRwbnDYREbIb+YN4k
-         6hOeggaxJLEhFqPiB2Pt7c7cFL+PaDDjC86ZHH2OgweCaxY+gCMRhjR3u7Lo0awYAExv
-         3KMpqRcm6JSeIgk5HKR3aosi302Hjr+guXh7/sC/IeC0DvalkGby20ZNib2af+AOc5Fc
-         AJsA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=oEg4bQ6lpGrIUrq1T+gt3Ejj1Swr0qeWVL35vq5Po6U=;
-        b=Sr7wEXim/ZlAWTXLIY85U/3RHSGugvGU62AG2s9ooKFJxSGjkeaOW0/yVVxXK+OMIG
-         a8TBkCz+3U5o0pALKxqW8fpzG+OG5B3Q2D3ambBhLyGmNxzuCpRSGbaIvXjW2eV65HN3
-         cmDWfhwC5qHqwubeJHSwUAmPmILpJvuIzgVh/fAnA99uW1e79wZNQSOInwMGGwJdT1TV
-         AEiorWNkPiuuJUB3D2bPj+8jQCbh4XIv2bPqZ5v4xFzQ4ChlhSqRU9MPth+xPUOPzBKT
-         Gj074RVbziaCceHgbUbhRHk9yC4bbke7NlGKIJcPlacBGci2zXrkGAm4QxD3iPE3JiTH
-         0Esg==
-X-Gm-Message-State: AFqh2krnetPRy53eedSLOhfF/bAfFG1+x2KHq9sMgovxUzhRf7ut5cjH
-        APaKb6UDDj78rW/dNG8A1ojfJA==
-X-Google-Smtp-Source: AMrXdXtKyU3I2NR2YXrzW14f3Qypnb5R1CkBKI+EepMfwkROtVQP9h0wsQxWgy9dbYBQVA3lyM/SgQ==
-X-Received: by 2002:a17:903:1355:b0:193:3a92:f4bd with SMTP id jl21-20020a170903135500b001933a92f4bdmr5929867plb.47.1673512925646;
-        Thu, 12 Jan 2023 00:42:05 -0800 (PST)
-Received: from [10.254.85.126] ([139.177.225.248])
-        by smtp.gmail.com with ESMTPSA id x11-20020a170902b40b00b001931c37da2dsm10242468plr.20.2023.01.12.00.42.02
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 12 Jan 2023 00:42:05 -0800 (PST)
-Message-ID: <7a348aec-0e5c-ec6a-36cd-30a844d276ad@bytedance.com>
-Date:   Thu, 12 Jan 2023 16:42:00 +0800
+        Thu, 12 Jan 2023 04:10:14 -0500
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4CEFE517D6;
+        Thu, 12 Jan 2023 01:05:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+        Content-ID:Content-Description:In-Reply-To:References;
+        bh=Tko9eKbjkyt4wSrlR3e8NXL7dgXUGaa8h+OV4dGo39g=; b=ty3akuZPgFsW8w3F43KUtsxn8y
+        TZYxlKaifUHH2WDxUgPoPSWk0U0A8y9Y82C5Xnz/ZOy+jvDk2k6bVn8FzdhOmNW+bcQMiQZhJh4PK
+        P6Uv/1erA3rJN+vJeB1F3anDqxzoHq8u8YukhyQXSNyyWxF5hnDzhdM7iDwVG7C4lzMAruxR+dYHR
+        PWb6OdMUzik+xeSBKEOxJiIffl4qQ+4kWzhdgpkWxuvo8+gxGENW1Q9gTGMBqT4lZBFeBvs6itcbQ
+        DOttE/MY7KX07B5g0C4LyVVfpw8oq3uZ8H9kXIzxrDoP37ox1UAOeYUXFX7I2WVVXzXsqPXM4Dqa+
+        fJmXt2Uw==;
+Received: from [2001:4bb8:181:656b:c87d:36c9:914c:c2ea] (helo=localhost)
+        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1pFtWg-00EGAX-2d; Thu, 12 Jan 2023 09:05:34 +0000
+From:   Christoph Hellwig <hch@lst.de>
+To:     Chris Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>,
+        David Sterba <dsterba@suse.com>
+Cc:     Damien Le Moal <damien.lemoal@wdc.com>,
+        Naohiro Aota <naohiro.aota@wdc.com>,
+        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+        Qu Wenruo <wqu@suse.com>, Jens Axboe <axboe@kernel.dk>,
+        "Darrick J. Wong" <djwong@kernel.org>, linux-block@vger.kernel.org,
+        linux-btrfs@vger.kernel.org, linux-fsdevel@vger.kernel.org
+Subject: consolidate btrfs checksumming, repair and bio splitting v3
+Date:   Thu, 12 Jan 2023 10:05:12 +0100
+Message-Id: <20230112090532.1212225-1-hch@lst.de>
+X-Mailer: git-send-email 2.35.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.2.2
-Subject: Re: [External] Re: [PATCH v5] blk-throtl: Introduce sync and async
- queues for blk-throtl
-To:     Tejun Heo <tj@kernel.org>
-Cc:     josef@toxicpanda.com, axboe@kernel.dk, cgroups@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        yinxin.x@bytedance.com
-References: <20230111162030.31094-1-hanjinke.666@bytedance.com>
- <Y77sVSbS6fIXh3jp@slm.duckdns.org>
-From:   hanjinke <hanjinke.666@bytedance.com>
-In-Reply-To: <Y77sVSbS6fIXh3jp@slm.duckdns.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Hi all,
 
+this series moves a large amount of duplicate code below btrfs_submit_bio
+into what I call the 'storage' layer.  Instead of duplicating code to
+checksum, check checksums and repair and split bios in all the caller
+of btrfs_submit_bio (buffered I/O, direct I/O, compressed I/O, encoded
+I/O), the work is done one in a central place, often more optiomal and
+without slight changes in behavior.  Once that is done the upper layers
+also don't need to split the bios for extent boundaries, as the storage
+layer can do that itself, including splitting the bios for the zone
+append limits for zoned I/O.
 
-在 2023/1/12 上午1:05, Tejun Heo 写道:
-> On Thu, Jan 12, 2023 at 12:20:30AM +0800, Jinke Han wrote:
->> From: Jinke Han <hanjinke.666@bytedance.com>
->>
->> Now we don't distinguish sync write ios from normal buffer write ios
->> in blk-throtl. A bio with REQ_SYNC tagged always mean it will be wait
->> until write completion soon after it submit. So it's reasonable for sync
->> io to complete as soon as possible.
->>
->> In our test, fio writes a 100g file in sequential 4k blocksize in
->> a container with low bps limit configured (wbps=10M). More than 1200
->> ios were throttled in blk-throtl queue and the avarage throtle time
->> of each io is 140s. At the same time, the operation of saving a small
->> file by vim will be blocked amolst 140s. As a fsync will be send by vim,
->> the sync ios of fsync will be blocked by a huge amount of buffer write
->> ios ahead. This is also a priority inversion problem within one cgroup.
->> In the database scene, things got really bad with blk-throtle enabled
->> as fsync is called very often.
->>
->> This patch splits bio queue into sync and async queues for blk-throtl
->> and gives a huge priority to sync write ios. Sync queue only make sense
->> for write ios as we treat all read io as sync io. I think it's a nice
->> respond to the semantics of REQ_SYNC. Bios with REQ_META and REQ_PRIO
->> gains the same priority as they are important to fs. This may avoid
->> some potential priority inversion problems.
->>
->> With this patch, do the same test above, the duration of the fsync sent
->> by vim drops to several hundreds of milliseconds.
->>
->> Signed-off-by: Jinke Han <hanjinke.666@bytedance.com>
->> Signed-off-by: Xin Yin <yinxin.x@bytedance.com>
-> 
-> Acked-by: Tejun Heo <tj@kernel.org>
-> 
-> with some nits below:
-> 
->> +/**
->> + * throtl_qnode_bio_peek - peek a bio from a qn
->> + * @qn: the qnode to peek from
->> + *
->> + * For read, always peek bio from the SYNC queue.
->> + *
->> + * For write, we always peek bio from next_to_disp. If it's NULL, a bio
->                      ^
->                      first
-> 
->> + * will be popped from SYNC or ASYNC queue to fill it. The next_to_disp
->> + * is used to make sure that the peeked bio and the next popped bio are
->                                     ^
->                                     previously
-> 
->> + * always the same even in case that the spinlock of queue was released
->> + * and re-holded.
->            ^
->            re-grabbed / re-acquired
->> + *
->> + * Without the next_to_disp, consider the following situation:
->        ^^^^^^^^^^^^^^^^^^^^^^^^^^
->        maybe drop this part and move the latter part to the end of the
->        previous para?
-> 
->> + * Assumed that there are only bios queued in ASYNC queue and the SYNC
->        ^
->        Assume
-> 
->> + * queue is empty and all ASYNC bios are 1M in size and the bps limit is
->> + * 1M/s. The throtl_slice is 100ms. The current slice is [jiffies1,
->> + * jiffies1+100] and the bytes_disp[w] is 0.
->> + *
->> + * The disp_sync_cnt is 0 as it was set 0 after each dispatching of a
->> + * ASYNC bio. A ASYNC bio wil be peeked to check in tg_may_dispatch.
->> + * Obviously, it can't be dispatched in current slice and the wait time
->> + * is 900ms. The slice will be extended to [jiffies1, jiffies1+1000] in
->> + * tg_may_dispatch. The spinlock of the queue will be released after the
->> + * process of dispatch giving up. A 4k size SYNC bio was queued in and
->> + * the SYNC queue becomes no-empty. After 900ms, it's time to dispatch
->> + * the tg, the SYNC bio will be popped to dispatched as the disp_sync_cnt
->> + * is 0 and the SYNC queue is no-empty. The slice will be extended to
->        ^
->   Maybe combine the previous several sentences like:
-> 
->   The queue lock is released and a 4k SYNC bio gets queued during the 900ms
->   wait.
-> 
->> + * [jiffies1, jiffies1+1100] in tg_may_dispatch. Then the slice will be
->> + * trimed to [jiffies1+1000, jiffies1+1100] after the SYNC bio was
->> + * dispatched. Then the former 1M size ASYNC bio will be peeked to be
->> + * checked and still can't be dispatched because of overlimit within
->> + * the current slice. The same thing may happen DISPACH_SYNC_FACTOR times
->> + * if always there is a SYNC bio be queued in the SYNC queue when the
->> + * ASYNC bio is waiting. This means that in nearly 5s, we have dispathed
->> + * four 4k SYNC bios and one  1M ASYNC bio. It is hard to fill up the
->> + * bandwidth considering that the bps limit is 1M/s.
-> 
-> Simiarly I think the information can be conveyed in a more compact form.
-> 
-> Thanks.
-> 
-The comment will be further adjusted based on your suggestions and the
-v6 with your Acked-by will be send.
+The split work is inspired by an earlier series from Qu, from which it
+also reuses a few patches.
 
-Thanks
-Jinke
+Note that Dave commented on patch 2 to be split due to "doing multiple
+things at once".  I've got not comment on how that should be done,
+except for the discussion with Josef on the previous iteration, where
+opting into the new functionality by the callers through a new flag
+would be possible, but actually making the whole series more complex
+and harder to bisect.  I can still do that even if I think it's not
+very helpful, but I can't really think of any other split.
+
+A git tree is also available:
+
+    git://git.infradead.org/users/hch/misc.git btrfs-bio-split
+
+Gitweb:
+
+    http://git.infradead.org/users/hch/misc.git/shortlog/refs/heads/btrfs-bio-split
+
+Changes since v2:
+ - minor rebase to latest misc-next
+ - pick up various reviews for all patches
+
+Changes since v1:
+ - rebased to latest btrfs/misc-next
+ - added a new patch to remove the fs_info argument to btrfs_submit_bio
+ - clean up the repair_one_sector calling convention a bit
+ - don't move file_offset for ONE_ORDERED bios in btrfs_split_bio
+ - temporarily use btrfs_zoned_get_device in alloc_compressed_bio
+ - minor refactoring of some of the checksum helpers
+ - split up a few patches
+ - drop a few of the blk_status_t to int conversion for now
+ - various whitespace fixes
+
+Diffstat:
+ block/blk-merge.c         |    3 
+ fs/btrfs/bio.c            |  547 ++++++++++++++++++++++++++++++++++++----
+ fs/btrfs/bio.h            |   67 +---
+ fs/btrfs/btrfs_inode.h    |   22 -
+ fs/btrfs/compression.c    |  273 +++-----------------
+ fs/btrfs/compression.h    |    3 
+ fs/btrfs/disk-io.c        |  203 +--------------
+ fs/btrfs/disk-io.h        |   11 
+ fs/btrfs/extent-io-tree.h |    1 
+ fs/btrfs/extent_io.c      |  556 ++++-------------------------------------
+ fs/btrfs/extent_io.h      |   31 --
+ fs/btrfs/file-item.c      |   74 +----
+ fs/btrfs/file-item.h      |    8 
+ fs/btrfs/fs.h             |    5 
+ fs/btrfs/inode.c          |  621 ++++++----------------------------------------
+ fs/btrfs/volumes.c        |  115 ++------
+ fs/btrfs/volumes.h        |   18 -
+ fs/btrfs/zoned.c          |   85 ++----
+ fs/btrfs/zoned.h          |   16 -
+ fs/iomap/direct-io.c      |   10 
+ include/linux/bio.h       |    4 
+ include/linux/iomap.h     |    3 
+ 22 files changed, 819 insertions(+), 1857 deletions(-)
