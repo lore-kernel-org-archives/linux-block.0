@@ -2,32 +2,32 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 05DFEC61DB3
-	for <linux-block@archiver.kernel.org>; Thu, 12 Jan 2023 09:11:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DEBAC54EBD
+	for <linux-block@archiver.kernel.org>; Thu, 12 Jan 2023 09:12:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233710AbjALJLt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 12 Jan 2023 04:11:49 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56146 "EHLO
+        id S240055AbjALJLx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 12 Jan 2023 04:11:53 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57280 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239993AbjALJKW (ORCPT
+        with ESMTP id S239964AbjALJKZ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 12 Jan 2023 04:10:22 -0500
+        Thu, 12 Jan 2023 04:10:25 -0500
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03AF1517F9;
-        Thu, 12 Jan 2023 01:06:11 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 382735130E;
+        Thu, 12 Jan 2023 01:06:18 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
         :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=9mb0kyHxDl1+PmOFJUo6mem5tdD7oKogCrg9MA/CUPc=; b=Xbt12lBwrZ5XtYsSoyNqjbWTlj
-        XJO5glm3t/mFRLN4dUUN3WW/otEg9iWEdRvhM0h5FegtzJ0R4G5jzpyuQ9LSp5aDtgJd3qvaw59nA
-        yHeFevKPjt2nDarUT2pmUTPfRXJlG5sMCuFXy6rFa0C6uQWZbK1joASjE0KkqdPZm0ZYBdupXqNTS
-        1kpGxuaKao8hZxdbed8g0hKqElIDvjjspnMer1QF7oaYmMC6oU1gZV0trbIQ8dhUU5NJnFtJa6MkT
-        wlEtb4M7qteJ1Fu3nQ/hemniWVqb3f2XFYvsetFn6QngfXrp2HZeirgR02fL7qQXxqyC7JPen37Kn
-        d/cwFyDA==;
+        bh=rxgocRSSsG31/epmYK904xbGZ2oxKgip0pe+IorJTRo=; b=sLuwBOkUBFynAng2QltFHyH7Ae
+        D7XSnLUFUeN8cnluGYhxdixpcyiJH+x9mYzy3Mn4j775fhW3XfbWxx8p+MLw0khLMb0ZTlpp5/4YM
+        yBQF68jpdI2lF+uiwasjFNNk9jDdvp869FOfHfYZFxYN/RjLVoLyjtfSsXc7iuwK4b8OSq9mhHw9W
+        gIbNYX65BSarvyayUaxXx32jVdVGlbc22q22iQjCj314SKPikJ/KjhaYx9iG8Do9bVUimKFOVd3/F
+        WyGa1hzC2kTRFjNwgnit7kFEmM//FICj37gz1qm/Y3lodRqeV3dTAqXeDW/mQFKSQM+0ENdjn2MMe
+        kzNPOUGw==;
 Received: from [2001:4bb8:181:656b:c87d:36c9:914c:c2ea] (helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1pFtX6-00EGNC-JO; Thu, 12 Jan 2023 09:06:01 +0000
+        id 1pFtXI-00EGSw-UO; Thu, 12 Jan 2023 09:06:13 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Chris Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>,
         David Sterba <dsterba@suse.com>
@@ -37,9 +37,9 @@ Cc:     Damien Le Moal <damien.lemoal@wdc.com>,
         Qu Wenruo <wqu@suse.com>, Jens Axboe <axboe@kernel.dk>,
         "Darrick J. Wong" <djwong@kernel.org>, linux-block@vger.kernel.org,
         linux-btrfs@vger.kernel.org, linux-fsdevel@vger.kernel.org
-Subject: [PATCH 09/19] btrfs: pass the iomap bio to btrfs_submit_bio
-Date:   Thu, 12 Jan 2023 10:05:21 +0100
-Message-Id: <20230112090532.1212225-10-hch@lst.de>
+Subject: [PATCH 13/19] btrfs: remove struct btrfs_io_geometry
+Date:   Thu, 12 Jan 2023 10:05:25 +0100
+Message-Id: <20230112090532.1212225-14-hch@lst.de>
 X-Mailer: git-send-email 2.35.1
 In-Reply-To: <20230112090532.1212225-1-hch@lst.de>
 References: <20230112090532.1212225-1-hch@lst.de>
@@ -50,296 +50,216 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Now that btrfs_submit_bio splits the bio when crossing stripe boundaries,
-there is no need for the higher level code to do that manually.
-
-For direct I/O this is really helpful, as btrfs_submit_io can now simply
-take the bio allocated by iomap and send it on to btrfs_submit_bio
-instead of allocating clones.
-
-For that to work, the bio embedded into struct btrfs_dio_private needs to
-become a full btrfs_bio as expected by btrfs_submit_bio.
-
-With this change there is a single work item to offload the entire iomap
-bio so the heuristics to skip async processing for bios that were split
-isn't needed anymore either.
+Now that btrfs_get_io_geometry has a single caller, we can massage it
+into a form that is more suitable for that caller and remove the
+marshalling into and out of struct btrfs_io_geometry.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 Reviewed-by: Josef Bacik <josef@toxicpanda.com>
 Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
 ---
- fs/btrfs/bio.c   |  19 +-----
- fs/btrfs/bio.h   |   6 +-
- fs/btrfs/inode.c | 161 ++++++++++-------------------------------------
- 3 files changed, 36 insertions(+), 150 deletions(-)
+ fs/btrfs/volumes.c | 115 +++++++++++++--------------------------------
+ fs/btrfs/volumes.h |  18 -------
+ 2 files changed, 32 insertions(+), 101 deletions(-)
 
-diff --git a/fs/btrfs/bio.c b/fs/btrfs/bio.c
-index 393fe453fb4876..f5e677588df07b 100644
---- a/fs/btrfs/bio.c
-+++ b/fs/btrfs/bio.c
-@@ -31,7 +31,7 @@ struct btrfs_failed_bio {
-  * Initialize a btrfs_bio structure.  This skips the embedded bio itself as it
-  * is already initialized by the block layer.
-  */
--static void btrfs_bio_init(struct btrfs_bio *bbio, struct btrfs_inode *inode,
-+void btrfs_bio_init(struct btrfs_bio *bbio, struct btrfs_inode *inode,
- 			   btrfs_bio_end_io_t end_io, void *private)
- {
- 	memset(bbio, 0, offsetof(struct btrfs_bio, bio));
-@@ -59,23 +59,6 @@ struct bio *btrfs_bio_alloc(unsigned int nr_vecs, blk_opf_t opf,
- 	return bio;
+diff --git a/fs/btrfs/volumes.c b/fs/btrfs/volumes.c
+index bcfef75b97da0d..675598c3cb35ab 100644
+--- a/fs/btrfs/volumes.c
++++ b/fs/btrfs/volumes.c
+@@ -6266,91 +6266,43 @@ static bool need_full_stripe(enum btrfs_map_op op)
+ 	return (op == BTRFS_MAP_WRITE || op == BTRFS_MAP_GET_READ_MIRRORS);
  }
  
--struct bio *btrfs_bio_clone_partial(struct bio *orig, u64 offset, u64 size,
--				    struct btrfs_inode *inode,
--				    btrfs_bio_end_io_t end_io, void *private)
--{
--	struct bio *bio;
--	struct btrfs_bio *bbio;
--
--	ASSERT(offset <= UINT_MAX && size <= UINT_MAX);
--
--	bio = bio_alloc_clone(orig->bi_bdev, orig, GFP_NOFS, &btrfs_bioset);
--	bbio = btrfs_bio(bio);
--	btrfs_bio_init(bbio, inode, end_io, private);
--
--	bio_trim(bio, offset >> 9, size >> 9);
--	return bio;
--}
--
- static struct bio *btrfs_split_bio(struct bio *orig, u64 map_length)
+-/*
+- * Calculate the geometry of a particular (address, len) tuple. This
+- * information is used to calculate how big a particular bio can get before it
+- * straddles a stripe.
+- *
+- * @fs_info: the filesystem
+- * @em:      mapping containing the logical extent
+- * @op:      type of operation - write or read
+- * @logical: address that we want to figure out the geometry of
+- * @io_geom: pointer used to return values
+- *
+- * Returns < 0 in case a chunk for the given logical address cannot be found,
+- * usually shouldn't happen unless @logical is corrupted, 0 otherwise.
+- */
+-int btrfs_get_io_geometry(struct btrfs_fs_info *fs_info, struct extent_map *em,
+-			  enum btrfs_map_op op, u64 logical,
+-			  struct btrfs_io_geometry *io_geom)
++static u64 btrfs_max_io_len(struct map_lookup *map, enum btrfs_map_op op,
++			    u64 offset, u64 *stripe_nr, u64 *stripe_offset,
++			    u64 *full_stripe_start)
  {
- 	struct btrfs_bio *orig_bbio = btrfs_bio(orig);
-diff --git a/fs/btrfs/bio.h b/fs/btrfs/bio.h
-index 7c50f757cf5106..5acbcc18026d52 100644
---- a/fs/btrfs/bio.h
-+++ b/fs/btrfs/bio.h
-@@ -73,13 +73,11 @@ static inline struct btrfs_bio *btrfs_bio(struct bio *bio)
- int __init btrfs_bioset_init(void);
- void __cold btrfs_bioset_exit(void);
+-	struct map_lookup *map;
+-	u64 len;
+-	u64 offset;
+-	u64 stripe_offset;
+-	u64 stripe_nr;
+-	u32 stripe_len;
+-	u64 raid56_full_stripe_start = (u64)-1;
+-	int data_stripes;
++	u32 stripe_len = map->stripe_len;
  
-+void btrfs_bio_init(struct btrfs_bio *bbio, struct btrfs_inode *inode,
-+		    btrfs_bio_end_io_t end_io, void *private);
- struct bio *btrfs_bio_alloc(unsigned int nr_vecs, blk_opf_t opf,
- 			    struct btrfs_inode *inode,
- 			    btrfs_bio_end_io_t end_io, void *private);
--struct bio *btrfs_bio_clone_partial(struct bio *orig, u64 offset, u64 size,
--				    struct btrfs_inode *inode,
--				    btrfs_bio_end_io_t end_io, void *private);
+ 	ASSERT(op != BTRFS_MAP_DISCARD);
+ 
+-	map = em->map_lookup;
+-	/* Offset of this logical address in the chunk */
+-	offset = logical - em->start;
+-	/* Len of a stripe in a chunk */
+-	stripe_len = map->stripe_len;
+ 	/*
+-	 * Stripe_nr is where this block falls in
+-	 * stripe_offset is the offset of this block in its stripe.
++	 * Stripe_nr is the stripe where this block falls.
++	 * Stripe_offset is the offset of this block in its stripe.
+ 	 */
+-	stripe_nr = div64_u64_rem(offset, stripe_len, &stripe_offset);
+-	ASSERT(stripe_offset < U32_MAX);
++	*stripe_nr = div64_u64_rem(offset, stripe_len, stripe_offset);
++	ASSERT(*stripe_offset < U32_MAX);
+ 
+-	data_stripes = nr_data_stripes(map);
++	if (map->type & BTRFS_BLOCK_GROUP_RAID56_MASK) {
++		unsigned long full_stripe_len =
++			stripe_len * nr_data_stripes(map);
+ 
+-	/* Only stripe based profiles needs to check against stripe length. */
+-	if (map->type & BTRFS_BLOCK_GROUP_STRIPE_MASK) {
+-		u64 max_len = stripe_len - stripe_offset;
++		*full_stripe_start =
++			div64_u64(offset, full_stripe_len) * full_stripe_len;
+ 
+ 		/*
+-		 * In case of raid56, we need to know the stripe aligned start
++		 * For writes to RAID[56], allow to write a full stripe set, but
++		 * no straddling of stripe sets.
+ 		 */
+-		if (map->type & BTRFS_BLOCK_GROUP_RAID56_MASK) {
+-			unsigned long full_stripe_len = stripe_len * data_stripes;
+-			raid56_full_stripe_start = offset;
 -
- 
- static inline void btrfs_bio_end_io(struct btrfs_bio *bbio, blk_status_t status)
- {
-diff --git a/fs/btrfs/inode.c b/fs/btrfs/inode.c
-index 8f768863cbebbc..5e73f571b57ce9 100644
---- a/fs/btrfs/inode.c
-+++ b/fs/btrfs/inode.c
-@@ -84,24 +84,12 @@ struct btrfs_dio_data {
- };
- 
- struct btrfs_dio_private {
--	struct btrfs_inode *inode;
+-			/*
+-			 * Allow a write of a full stripe, but make sure we
+-			 * don't allow straddling of stripes
+-			 */
+-			raid56_full_stripe_start = div64_u64(raid56_full_stripe_start,
+-					full_stripe_len);
+-			raid56_full_stripe_start *= full_stripe_len;
 -
--	/*
--	 * Since DIO can use anonymous page, we cannot use page_offset() to
--	 * grab the file offset, thus need a dedicated member for file offset.
--	 */
-+	/* Range of I/O */
- 	u64 file_offset;
--	/* Used for bio::bi_size */
- 	u32 bytes;
- 
--	/*
--	 * References to this structure. There is one reference per in-flight
--	 * bio plus one while we're still setting up.
--	 */
--	refcount_t refs;
--
- 	/* This must be last */
--	struct bio bio;
-+	struct btrfs_bio bbio;
- };
- 
- static struct bio_set btrfs_dio_bioset;
-@@ -7765,131 +7753,48 @@ static int btrfs_dio_iomap_end(struct inode *inode, loff_t pos, loff_t length,
- 	return ret;
- }
- 
--static void btrfs_dio_private_put(struct btrfs_dio_private *dip)
-+static void btrfs_dio_end_io(struct btrfs_bio *bbio)
- {
--	/*
--	 * This implies a barrier so that stores to dio_bio->bi_status before
--	 * this and loads of dio_bio->bi_status after this are fully ordered.
--	 */
--	if (!refcount_dec_and_test(&dip->refs))
--		return;
--
--	if (btrfs_op(&dip->bio) == BTRFS_MAP_WRITE) {
--		btrfs_mark_ordered_io_finished(dip->inode, NULL,
--					       dip->file_offset, dip->bytes,
--					       !dip->bio.bi_status);
+-			/*
+-			 * For writes to RAID[56], allow a full stripeset across
+-			 * all disks. For other RAID types and for RAID[56]
+-			 * reads, just allow a single stripe (on a single disk).
+-			 */
+-			if (op == BTRFS_MAP_WRITE) {
+-				max_len = stripe_len * data_stripes -
+-					  (offset - raid56_full_stripe_start);
+-			}
+-		}
+-		len = min_t(u64, em->len - offset, max_len);
 -	} else {
--		unlock_extent(&dip->inode->io_tree,
--			      dip->file_offset,
--			      dip->file_offset + dip->bytes - 1, NULL);
--	}
--
--	bio_endio(&dip->bio);
--}
--
--static void btrfs_end_dio_bio(struct btrfs_bio *bbio)
--{
--	struct btrfs_dio_private *dip = bbio->private;
-+	struct btrfs_dio_private *dip =
-+		container_of(bbio, struct btrfs_dio_private, bbio);
-+	struct btrfs_inode *inode = bbio->inode;
- 	struct bio *bio = &bbio->bio;
--	blk_status_t err = bio->bi_status;
- 
--	if (err) {
--		btrfs_warn(dip->inode->root->fs_info,
--			   "direct IO failed ino %llu rw %d,%u sector %#Lx len %u err no %d",
--			   btrfs_ino(dip->inode), bio_op(bio),
--			   bio->bi_opf, bio->bi_iter.bi_sector,
--			   bio->bi_iter.bi_size, err);
--		dip->bio.bi_status = err;
-+	if (bio->bi_status) {
-+		btrfs_warn(inode->root->fs_info,
-+			   "direct IO failed ino %llu op 0x%0x offset %#llx len %u err no %d",
-+			   btrfs_ino(inode), bio->bi_opf,
-+			   dip->file_offset, dip->bytes, bio->bi_status);
+-		len = em->len - offset;
++		if (op == BTRFS_MAP_WRITE)
++			return full_stripe_len - (offset - *full_stripe_start);
  	}
  
--	bio_put(bio);
--	btrfs_dio_private_put(dip);
-+	if (btrfs_op(bio) == BTRFS_MAP_WRITE)
-+		btrfs_mark_ordered_io_finished(inode, NULL, dip->file_offset,
-+					       dip->bytes, !bio->bi_status);
-+	else
-+		unlock_extent(&inode->io_tree, dip->file_offset,
-+			      dip->file_offset + dip->bytes - 1, NULL);
-+
-+	bbio->bio.bi_private = bbio->private;
-+	iomap_dio_bio_end_io(bio);
+-	io_geom->len = len;
+-	io_geom->offset = offset;
+-	io_geom->stripe_len = stripe_len;
+-	io_geom->stripe_nr = stripe_nr;
+-	io_geom->stripe_offset = stripe_offset;
+-	io_geom->raid56_stripe_offset = raid56_full_stripe_start;
+-
+-	return 0;
++	/*
++	 * For other RAID types and for RAID[56] reads, just allow a single
++	 * stripe (on a single disk).
++	 */
++	if (map->type & BTRFS_BLOCK_GROUP_STRIPE_MASK)
++		return stripe_len - *stripe_offset;
++	return U64_MAX;
  }
  
--static void btrfs_submit_direct(const struct iomap_iter *iter,
--		struct bio *dio_bio, loff_t file_offset)
-+static void btrfs_dio_submit_io(const struct iomap_iter *iter, struct bio *bio,
-+				loff_t file_offset)
+ static void set_io_stripe(struct btrfs_io_stripe *dst, const struct map_lookup *map,
+@@ -6369,6 +6321,7 @@ int __btrfs_map_block(struct btrfs_fs_info *fs_info, enum btrfs_map_op op,
  {
-+	struct btrfs_bio *bbio = btrfs_bio(bio);
- 	struct btrfs_dio_private *dip =
--		container_of(dio_bio, struct btrfs_dio_private, bio);
--	struct inode *inode = iter->inode;
--	struct btrfs_fs_info *fs_info = btrfs_sb(inode->i_sb);
--	struct bio *bio;
--	u64 start_sector;
--	u64 submit_len;
--	u64 clone_offset = 0;
--	u64 clone_len;
--	u64 logical;
--	int ret;
--	blk_status_t status;
+ 	struct extent_map *em;
+ 	struct map_lookup *map;
++	u64 map_offset;
+ 	u64 stripe_offset;
+ 	u64 stripe_nr;
+ 	u64 stripe_len;
+@@ -6387,7 +6340,7 @@ int __btrfs_map_block(struct btrfs_fs_info *fs_info, enum btrfs_map_op op,
+ 	int patch_the_first_stripe_for_dev_replace = 0;
+ 	u64 physical_to_patch_in_first_stripe = 0;
+ 	u64 raid56_full_stripe_start = (u64)-1;
 -	struct btrfs_io_geometry geom;
-+		container_of(bbio, struct btrfs_dio_private, bbio);
- 	struct btrfs_dio_data *dio_data = iter->private;
--	struct extent_map *em = NULL;
++	u64 max_len;
  
--	dip->inode = BTRFS_I(inode);
--	dip->file_offset = file_offset;
--	dip->bytes = dio_bio->bi_iter.bi_size;
--	refcount_set(&dip->refs, 1);
-+	btrfs_bio_init(bbio, BTRFS_I(iter->inode), btrfs_dio_end_io,
-+			bio->bi_private);
-+	bbio->file_offset = file_offset;
+ 	ASSERT(bioc_ret);
+ 	ASSERT(op != BTRFS_MAP_DISCARD);
+@@ -6395,18 +6348,14 @@ int __btrfs_map_block(struct btrfs_fs_info *fs_info, enum btrfs_map_op op,
+ 	em = btrfs_get_chunk_map(fs_info, logical, *length);
+ 	ASSERT(!IS_ERR(em));
  
--	start_sector = dio_bio->bi_iter.bi_sector;
--	submit_len = dio_bio->bi_iter.bi_size;
+-	ret = btrfs_get_io_geometry(fs_info, em, op, logical, &geom);
+-	if (ret < 0)
+-		return ret;
 -
--	do {
--		logical = start_sector << 9;
--		em = btrfs_get_chunk_map(fs_info, logical, submit_len);
--		if (IS_ERR(em)) {
--			status = errno_to_blk_status(PTR_ERR(em));
--			em = NULL;
--			goto out_err;
--		}
--		ret = btrfs_get_io_geometry(fs_info, em, btrfs_op(dio_bio),
--					    logical, &geom);
--		if (ret) {
--			status = errno_to_blk_status(ret);
--			goto out_err_em;
--		}
+ 	map = em->map_lookup;
 -
--		clone_len = min(submit_len, geom.len);
--		ASSERT(clone_len <= UINT_MAX);
--
--		/*
--		 * This will never fail as it's passing GPF_NOFS and
--		 * the allocation is backed by btrfs_bioset.
--		 */
--		bio = btrfs_bio_clone_partial(dio_bio, clone_offset, clone_len,
--					      BTRFS_I(inode), btrfs_end_dio_bio,
--					      dip);
--		btrfs_bio(bio)->file_offset = file_offset;
--
--		ASSERT(submit_len >= clone_len);
--		submit_len -= clone_len;
--
--		/*
--		 * Increase the count before we submit the bio so we know
--		 * the end IO handler won't happen before we increase the
--		 * count. Otherwise, the dip might get freed before we're
--		 * done setting it up.
--		 *
--		 * We transfer the initial reference to the last bio, so we
--		 * don't need to increment the reference count for the last one.
--		 */
--		if (submit_len > 0)
--			refcount_inc(&dip->refs);
--
--		btrfs_submit_bio(fs_info, bio, 0);
--
--		dio_data->submitted += clone_len;
--		clone_offset += clone_len;
--		start_sector += clone_len >> 9;
--		file_offset += clone_len;
--
--		free_extent_map(em);
--	} while (submit_len > 0);
--	return;
-+	dip->file_offset = file_offset;
-+	dip->bytes = bio->bi_iter.bi_size;
+-	*length = geom.len;
+-	stripe_len = geom.stripe_len;
+-	stripe_nr = geom.stripe_nr;
+-	stripe_offset = geom.stripe_offset;
+-	raid56_full_stripe_start = geom.raid56_stripe_offset;
+ 	data_stripes = nr_data_stripes(map);
++	stripe_len = map->stripe_len;
++
++	map_offset = logical - em->start;
++	max_len = btrfs_max_io_len(map, op, map_offset, &stripe_nr,
++				   &stripe_offset, &raid56_full_stripe_start);
++	*length = min_t(u64, em->len - map_offset, max_len);
  
--out_err_em:
--	free_extent_map(em);
--	dio_bio->bi_status = status;
--	btrfs_dio_private_put(dip);
-+	dio_data->submitted += bio->bi_iter.bi_size;
-+	btrfs_submit_bio(btrfs_sb(iter->inode->i_sb), bio, 0);
- }
- 
- static const struct iomap_ops btrfs_dio_iomap_ops = {
-@@ -7898,7 +7803,7 @@ static const struct iomap_ops btrfs_dio_iomap_ops = {
+ 	down_read(&dev_replace->rwsem);
+ 	dev_replace_is_ongoing = btrfs_dev_replace_is_ongoing(dev_replace);
+diff --git a/fs/btrfs/volumes.h b/fs/btrfs/volumes.h
+index 6b7a05f6cf8237..7e51f2238f72e6 100644
+--- a/fs/btrfs/volumes.h
++++ b/fs/btrfs/volumes.h
+@@ -53,21 +53,6 @@ enum btrfs_raid_types {
+ 	BTRFS_NR_RAID_TYPES
  };
  
- static const struct iomap_dio_ops btrfs_dio_ops = {
--	.submit_io		= btrfs_submit_direct,
-+	.submit_io		= btrfs_dio_submit_io,
- 	.bio_set		= &btrfs_dio_bioset,
- };
- 
-@@ -8733,7 +8638,7 @@ int __init btrfs_init_cachep(void)
- 		goto fail;
- 
- 	if (bioset_init(&btrfs_dio_bioset, BIO_POOL_SIZE,
--			offsetof(struct btrfs_dio_private, bio),
-+			offsetof(struct btrfs_dio_private, bbio.bio),
- 			BIOSET_NEED_BVECS))
- 		goto fail;
- 
+-struct btrfs_io_geometry {
+-	/* remaining bytes before crossing a stripe */
+-	u64 len;
+-	/* offset of logical address in chunk */
+-	u64 offset;
+-	/* length of single IO stripe */
+-	u32 stripe_len;
+-	/* offset of address in stripe */
+-	u32 stripe_offset;
+-	/* number of stripe where address falls */
+-	u64 stripe_nr;
+-	/* offset of raid56 stripe into the chunk */
+-	u64 raid56_stripe_offset;
+-};
+-
+ /*
+  * Use sequence counter to get consistent device stat data on
+  * 32-bit processors.
+@@ -545,9 +530,6 @@ int __btrfs_map_block(struct btrfs_fs_info *fs_info, enum btrfs_map_op op,
+ struct btrfs_discard_stripe *btrfs_map_discard(struct btrfs_fs_info *fs_info,
+ 					       u64 logical, u64 *length_ret,
+ 					       u32 *num_stripes);
+-int btrfs_get_io_geometry(struct btrfs_fs_info *fs_info, struct extent_map *map,
+-			  enum btrfs_map_op op, u64 logical,
+-			  struct btrfs_io_geometry *io_geom);
+ int btrfs_read_sys_array(struct btrfs_fs_info *fs_info);
+ int btrfs_read_chunk_tree(struct btrfs_fs_info *fs_info);
+ struct btrfs_block_group *btrfs_create_chunk(struct btrfs_trans_handle *trans,
 -- 
 2.35.1
 
