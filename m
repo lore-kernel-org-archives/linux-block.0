@@ -2,81 +2,49 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C087DC54EBC
-	for <linux-block@archiver.kernel.org>; Thu, 12 Jan 2023 15:12:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EFD7EC54EBC
+	for <linux-block@archiver.kernel.org>; Thu, 12 Jan 2023 15:13:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233833AbjALPME (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 12 Jan 2023 10:12:04 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56732 "EHLO
+        id S230166AbjALPNN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 12 Jan 2023 10:13:13 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57904 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238569AbjALPLi (ORCPT
+        with ESMTP id S234804AbjALPM0 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 12 Jan 2023 10:11:38 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 19894676F9
-        for <linux-block@vger.kernel.org>; Thu, 12 Jan 2023 06:59:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1673535540;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=GztunHCq+mIngJvFy29Ro+sBMsKVWY2R+zU+9WUPV28=;
-        b=CzHMIyfwrzWXUCDbkm8sqfIDxCvFbca9yWHiFRqJWoPjuuMmSvxgyPnoTFHW94k5oEj/JT
-        3PHwWczIrILcjSJtmL6qkwWRK5sCuKtJMlWTQHVDzsP3dnEDyQkfh4D0T3s+P7UkeztVLn
-        CnL5wJVqs+BpZlRPAAlu172qA4oIPMg=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-208-teJhew-AMAa7OkEPq8LOXA-1; Thu, 12 Jan 2023 09:58:52 -0500
-X-MC-Unique: teJhew-AMAa7OkEPq8LOXA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 3290B857F82;
-        Thu, 12 Jan 2023 14:58:51 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.33.36.23])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id DAC02C15BAD;
-        Thu, 12 Jan 2023 14:58:49 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <Y8AWY991ilrO5Yco@infradead.org>
-References: <Y8AWY991ilrO5Yco@infradead.org> <Y7+6YVkhZsvdW+Hr@infradead.org> <167344725490.2425628.13771289553670112965.stgit@warthog.procyon.org.uk> <167344731521.2425628.5403113335062567245.stgit@warthog.procyon.org.uk> <15237.1673519321@warthog.procyon.org.uk> <Y8AUjB5hxkwxhnGK@infradead.org>
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     dhowells@redhat.com, Al Viro <viro@zeniv.linux.org.uk>,
+        Thu, 12 Jan 2023 10:12:26 -0500
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E446E551DE;
+        Thu, 12 Jan 2023 07:02:08 -0800 (PST)
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id 274BA68BEB; Thu, 12 Jan 2023 16:02:05 +0100 (CET)
+Date:   Thu, 12 Jan 2023 16:02:04 +0100
+From:   Christoph Hellwig <hch@lst.de>
+To:     David Howells <dhowells@redhat.com>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        Al Viro <viro@zeniv.linux.org.uk>,
         Jens Axboe <axboe@kernel.dk>, Jan Kara <jack@suse.cz>,
         Christoph Hellwig <hch@lst.de>,
         Matthew Wilcox <willy@infradead.org>,
         Logan Gunthorpe <logang@deltatee.com>,
         linux-block@vger.kernel.org, Jeff Layton <jlayton@kernel.org>,
         linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v5 8/9] iov_iter, block: Make bio structs pin pages rather than ref'ing if appropriate
+Subject: Re: [PATCH v5 8/9] iov_iter, block: Make bio structs pin pages
+ rather than ref'ing if appropriate
+Message-ID: <20230112150204.GA11315@lst.de>
+References: <Y8AWY991ilrO5Yco@infradead.org> <Y7+6YVkhZsvdW+Hr@infradead.org> <167344725490.2425628.13771289553670112965.stgit@warthog.procyon.org.uk> <167344731521.2425628.5403113335062567245.stgit@warthog.procyon.org.uk> <15237.1673519321@warthog.procyon.org.uk> <Y8AUjB5hxkwxhnGK@infradead.org> <147887.1673535529@warthog.procyon.org.uk>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <147886.1673535529.1@warthog.procyon.org.uk>
-Date:   Thu, 12 Jan 2023 14:58:49 +0000
-Message-ID: <147887.1673535529@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <147887.1673535529@warthog.procyon.org.uk>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Christoph Hellwig <hch@infradead.org> wrote:
+On Thu, Jan 12, 2023 at 02:58:49PM +0000, David Howells wrote:
+> That's kind of what I'm doing - though I've left out the else just in case the
+> VM decides to indicate back both FOLL_GET and FOLL_PIN.  I'm not sure why it
+> would but...
 
-> But given that all calls for the same iter type return the same
-> cleanup_mode by defintion I'm not even sure we need any of this
-> debug checking, and might as well just do:
-> 
-> 	if (cleanup_mode & FOLL_GET)
->  		bio_set_flag(bio, BIO_PAGE_REFFED);
->  	else if (cleanup_mode & FOLL_PIN)
->  		bio_set_flag(bio, BIO_PAGE_PINNED);
-
-That's kind of what I'm doing - though I've left out the else just in case the
-VM decides to indicate back both FOLL_GET and FOLL_PIN.  I'm not sure why it
-would but...
-
-David
-
+It really can't - they are exclusive.  Maybe we need an assert for that
+somewhere, but we surely shouldn't try to deal with it.
