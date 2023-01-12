@@ -2,86 +2,177 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A04AC54EBD
-	for <linux-block@archiver.kernel.org>; Thu, 12 Jan 2023 08:25:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 661BAC61DB3
+	for <linux-block@archiver.kernel.org>; Thu, 12 Jan 2023 08:44:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231469AbjALIZ3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 12 Jan 2023 03:25:29 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57644 "EHLO
+        id S229780AbjALIo4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 12 Jan 2023 03:44:56 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37446 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231752AbjALIZ2 (ORCPT
+        with ESMTP id S239731AbjALIoJ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 12 Jan 2023 03:25:28 -0500
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 65B3762D8
-        for <linux-block@vger.kernel.org>; Thu, 12 Jan 2023 00:25:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Content-Type:MIME-Version:Message-ID:
-        Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-        Content-Description:In-Reply-To:References;
-        bh=e2kI7aQUDYcH/lJiomT62w0Uil99ZHDntE95VjNwqqk=; b=CFdQElbGGpR28An47QVTz9lIFJ
-        a9O7+0T6vKJd21v7yiwWpOW6gVxoVR17BfQYoxHEJW13yLqGqyO98ha586Ci89Cj/qdbdHaaOh1yl
-        yIS0lY0MmRMHmozZN/5DdxIsCCxcZio6wp1n+slxaMOEh/2CX04p3tlnDdN41CGMSMYyck8GjAU/B
-        IoA5r+yH5dQfydI5f0sGbkTrO+mQxSI1mKLzm/GEAcfuU+KwbhcsIP9Zsbo/MMM6uFTLOho4PzmIw
-        pb2ndK9Iu/A/RBvtx3F4c3kacz5S5tgR7IyDKINdaxKqTERN3TVWydZODLotlxeWoojXob4MSYlrA
-        uJcthpkA==;
-Received: from [2001:4bb8:181:656b:c87d:36c9:914c:c2ea] (helo=localhost)
-        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1pFsth-00E5sD-HA; Thu, 12 Jan 2023 08:25:17 +0000
-Date:   Thu, 12 Jan 2023 09:25:15 +0100
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
-Subject: [GIT PULL] nvme fixes for Linux 6.2
-Message-ID: <Y7/D64Qubtqmdv04@infradead.org>
+        Thu, 12 Jan 2023 03:44:09 -0500
+Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 277B3479CB
+        for <linux-block@vger.kernel.org>; Thu, 12 Jan 2023 00:42:06 -0800 (PST)
+Received: by mail-pl1-x62d.google.com with SMTP id jl4so19534216plb.8
+        for <linux-block@vger.kernel.org>; Thu, 12 Jan 2023 00:42:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance-com.20210112.gappssmtp.com; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=oEg4bQ6lpGrIUrq1T+gt3Ejj1Swr0qeWVL35vq5Po6U=;
+        b=taeeV0OMcAkInTg8vAnOBHKivystFadZ28hvDI0CRtwa+zGUkmuuJu7s9CY8olfEfk
+         qYZrKNb6EcrIunkCdUNwZOAq4VfeqVujcPa7tVQc8BA76qqjKZhZAhBzWc+jX2sqof7r
+         ul7kG0Bjc5Tc10dUdtw0rTwQte2dYX1xBwWVBKzngl1A8MkFOwgTRwbnDYREbIb+YN4k
+         6hOeggaxJLEhFqPiB2Pt7c7cFL+PaDDjC86ZHH2OgweCaxY+gCMRhjR3u7Lo0awYAExv
+         3KMpqRcm6JSeIgk5HKR3aosi302Hjr+guXh7/sC/IeC0DvalkGby20ZNib2af+AOc5Fc
+         AJsA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=oEg4bQ6lpGrIUrq1T+gt3Ejj1Swr0qeWVL35vq5Po6U=;
+        b=Sr7wEXim/ZlAWTXLIY85U/3RHSGugvGU62AG2s9ooKFJxSGjkeaOW0/yVVxXK+OMIG
+         a8TBkCz+3U5o0pALKxqW8fpzG+OG5B3Q2D3ambBhLyGmNxzuCpRSGbaIvXjW2eV65HN3
+         cmDWfhwC5qHqwubeJHSwUAmPmILpJvuIzgVh/fAnA99uW1e79wZNQSOInwMGGwJdT1TV
+         AEiorWNkPiuuJUB3D2bPj+8jQCbh4XIv2bPqZ5v4xFzQ4ChlhSqRU9MPth+xPUOPzBKT
+         Gj074RVbziaCceHgbUbhRHk9yC4bbke7NlGKIJcPlacBGci2zXrkGAm4QxD3iPE3JiTH
+         0Esg==
+X-Gm-Message-State: AFqh2krnetPRy53eedSLOhfF/bAfFG1+x2KHq9sMgovxUzhRf7ut5cjH
+        APaKb6UDDj78rW/dNG8A1ojfJA==
+X-Google-Smtp-Source: AMrXdXtKyU3I2NR2YXrzW14f3Qypnb5R1CkBKI+EepMfwkROtVQP9h0wsQxWgy9dbYBQVA3lyM/SgQ==
+X-Received: by 2002:a17:903:1355:b0:193:3a92:f4bd with SMTP id jl21-20020a170903135500b001933a92f4bdmr5929867plb.47.1673512925646;
+        Thu, 12 Jan 2023 00:42:05 -0800 (PST)
+Received: from [10.254.85.126] ([139.177.225.248])
+        by smtp.gmail.com with ESMTPSA id x11-20020a170902b40b00b001931c37da2dsm10242468plr.20.2023.01.12.00.42.02
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 12 Jan 2023 00:42:05 -0800 (PST)
+Message-ID: <7a348aec-0e5c-ec6a-36cd-30a844d276ad@bytedance.com>
+Date:   Thu, 12 Jan 2023 16:42:00 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.2.2
+Subject: Re: [External] Re: [PATCH v5] blk-throtl: Introduce sync and async
+ queues for blk-throtl
+To:     Tejun Heo <tj@kernel.org>
+Cc:     josef@toxicpanda.com, axboe@kernel.dk, cgroups@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yinxin.x@bytedance.com
+References: <20230111162030.31094-1-hanjinke.666@bytedance.com>
+ <Y77sVSbS6fIXh3jp@slm.duckdns.org>
+From:   hanjinke <hanjinke.666@bytedance.com>
+In-Reply-To: <Y77sVSbS6fIXh3jp@slm.duckdns.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The following changes since commit 49e4d04f0486117ac57a97890eb1db6d52bf82b3:
 
-  block: Drop spurious might_sleep() from blk_put_queue() (2023-01-08 20:29:28 -0700)
 
-are available in the Git repository at:
+在 2023/1/12 上午1:05, Tejun Heo 写道:
+> On Thu, Jan 12, 2023 at 12:20:30AM +0800, Jinke Han wrote:
+>> From: Jinke Han <hanjinke.666@bytedance.com>
+>>
+>> Now we don't distinguish sync write ios from normal buffer write ios
+>> in blk-throtl. A bio with REQ_SYNC tagged always mean it will be wait
+>> until write completion soon after it submit. So it's reasonable for sync
+>> io to complete as soon as possible.
+>>
+>> In our test, fio writes a 100g file in sequential 4k blocksize in
+>> a container with low bps limit configured (wbps=10M). More than 1200
+>> ios were throttled in blk-throtl queue and the avarage throtle time
+>> of each io is 140s. At the same time, the operation of saving a small
+>> file by vim will be blocked amolst 140s. As a fsync will be send by vim,
+>> the sync ios of fsync will be blocked by a huge amount of buffer write
+>> ios ahead. This is also a priority inversion problem within one cgroup.
+>> In the database scene, things got really bad with blk-throtle enabled
+>> as fsync is called very often.
+>>
+>> This patch splits bio queue into sync and async queues for blk-throtl
+>> and gives a huge priority to sync write ios. Sync queue only make sense
+>> for write ios as we treat all read io as sync io. I think it's a nice
+>> respond to the semantics of REQ_SYNC. Bios with REQ_META and REQ_PRIO
+>> gains the same priority as they are important to fs. This may avoid
+>> some potential priority inversion problems.
+>>
+>> With this patch, do the same test above, the duration of the fsync sent
+>> by vim drops to several hundreds of milliseconds.
+>>
+>> Signed-off-by: Jinke Han <hanjinke.666@bytedance.com>
+>> Signed-off-by: Xin Yin <yinxin.x@bytedance.com>
+> 
+> Acked-by: Tejun Heo <tj@kernel.org>
+> 
+> with some nits below:
+> 
+>> +/**
+>> + * throtl_qnode_bio_peek - peek a bio from a qn
+>> + * @qn: the qnode to peek from
+>> + *
+>> + * For read, always peek bio from the SYNC queue.
+>> + *
+>> + * For write, we always peek bio from next_to_disp. If it's NULL, a bio
+>                      ^
+>                      first
+> 
+>> + * will be popped from SYNC or ASYNC queue to fill it. The next_to_disp
+>> + * is used to make sure that the peeked bio and the next popped bio are
+>                                     ^
+>                                     previously
+> 
+>> + * always the same even in case that the spinlock of queue was released
+>> + * and re-holded.
+>            ^
+>            re-grabbed / re-acquired
+>> + *
+>> + * Without the next_to_disp, consider the following situation:
+>        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+>        maybe drop this part and move the latter part to the end of the
+>        previous para?
+> 
+>> + * Assumed that there are only bios queued in ASYNC queue and the SYNC
+>        ^
+>        Assume
+> 
+>> + * queue is empty and all ASYNC bios are 1M in size and the bps limit is
+>> + * 1M/s. The throtl_slice is 100ms. The current slice is [jiffies1,
+>> + * jiffies1+100] and the bytes_disp[w] is 0.
+>> + *
+>> + * The disp_sync_cnt is 0 as it was set 0 after each dispatching of a
+>> + * ASYNC bio. A ASYNC bio wil be peeked to check in tg_may_dispatch.
+>> + * Obviously, it can't be dispatched in current slice and the wait time
+>> + * is 900ms. The slice will be extended to [jiffies1, jiffies1+1000] in
+>> + * tg_may_dispatch. The spinlock of the queue will be released after the
+>> + * process of dispatch giving up. A 4k size SYNC bio was queued in and
+>> + * the SYNC queue becomes no-empty. After 900ms, it's time to dispatch
+>> + * the tg, the SYNC bio will be popped to dispatched as the disp_sync_cnt
+>> + * is 0 and the SYNC queue is no-empty. The slice will be extended to
+>        ^
+>   Maybe combine the previous several sentences like:
+> 
+>   The queue lock is released and a 4k SYNC bio gets queued during the 900ms
+>   wait.
+> 
+>> + * [jiffies1, jiffies1+1100] in tg_may_dispatch. Then the slice will be
+>> + * trimed to [jiffies1+1000, jiffies1+1100] after the SYNC bio was
+>> + * dispatched. Then the former 1M size ASYNC bio will be peeked to be
+>> + * checked and still can't be dispatched because of overlimit within
+>> + * the current slice. The same thing may happen DISPACH_SYNC_FACTOR times
+>> + * if always there is a SYNC bio be queued in the SYNC queue when the
+>> + * ASYNC bio is waiting. This means that in nearly 5s, we have dispathed
+>> + * four 4k SYNC bios and one  1M ASYNC bio. It is hard to fill up the
+>> + * bandwidth considering that the bps limit is 1M/s.
+> 
+> Simiarly I think the information can be conveyed in a more compact form.
+> 
+> Thanks.
+> 
+The comment will be further adjusted based on your suggestions and the
+v6 with your Acked-by will be send.
 
-  git://git.infradead.org/nvme.git tags/nvme-6.2-2023-01-12
-
-for you to fetch changes up to c7c0644ead24c59cc5e0f2ff0ade89b21783614a:
-
-  MAINTAINERS: stop nvme matching for nvmem files (2023-01-10 08:16:39 +0100)
-
-----------------------------------------------------------------
-nvme fixes for Linux 6.2
-
- - Identify quirks for Apple controllers (Hector Martin)
- - fix error handling in nvme_pci_enable (Tong Zhang)
- - refuse unprivileged passthrough on partitions (Christoph Hellwig)
- - fix MAINTAINERS to not match nvmem subsystem headers (Russell King)
-
-----------------------------------------------------------------
-Christoph Hellwig (3):
-      nvme: remove __nvme_ioctl
-      nvme: replace the "bool vec" arguments with flags in the ioctl path
-      nvme: don't allow unprivileged passthrough on partitions
-
-Hector Martin (2):
-      nvme-apple: add NVME_QUIRK_IDENTIFY_CNS quirk to fix regression
-      nvme-pci: add NVME_QUIRK_IDENTIFY_CNS quirk to Apple T2 controllers
-
-Russell King (Oracle) (1):
-      MAINTAINERS: stop nvme matching for nvmem files
-
-Tong Zhang (1):
-      nvme-pci: fix error handling in nvme_pci_enable()
-
- MAINTAINERS               |   3 +-
- drivers/nvme/host/apple.c |   2 +-
- drivers/nvme/host/ioctl.c | 110 ++++++++++++++++++++++++++--------------------
- drivers/nvme/host/pci.c   |  12 +++--
- 4 files changed, 75 insertions(+), 52 deletions(-)
+Thanks
+Jinke
