@@ -2,61 +2,86 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82CD7C54EBD
-	for <linux-block@archiver.kernel.org>; Thu, 12 Jan 2023 07:56:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A04AC54EBD
+	for <linux-block@archiver.kernel.org>; Thu, 12 Jan 2023 08:25:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239524AbjALH4F (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 12 Jan 2023 02:56:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40168 "EHLO
+        id S231469AbjALIZ3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 12 Jan 2023 03:25:29 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57644 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239538AbjALH4C (ORCPT
+        with ESMTP id S231752AbjALIZ2 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 12 Jan 2023 02:56:02 -0500
+        Thu, 12 Jan 2023 03:25:28 -0500
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8FC77F25;
-        Wed, 11 Jan 2023 23:56:01 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 65B3762D8
+        for <linux-block@vger.kernel.org>; Thu, 12 Jan 2023 00:25:27 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=3juqZYwYPTt6tYEzQZfyxL5E5PLSuO+2HSviGS3R84Q=; b=yHH+FvQEgFBHDaoK7vAimdW6QQ
-        mlQx+dHomBLYLTETU/w8pivXgj/VKBndhNI/vLBEh3+c+nmCQvJqIMwz3g/fP4BK5IYQSVwc8iN/I
-        GZcumX2URlF+kG4ol10ClDTVLZKeB5P5HUaoEe1j7xShPynHoVubvwvBI5lSyRlNbvlJuHEMQJWOD
-        8WHZZ1Nd57scQpLchQQiAULaeG09penseslfGyWVVmCM2YxKk+YXhpT+lTTzgK0dHHyFcExCrpt2L
-        4raHtXhkJinUZnbHhhauHChgWfjC/pw3H7pN0WZVqLaJoJ+JUGh6H2db9XdsozB+lOQ71Hifa6qwx
-        E3OwZkdQ==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1pFsRD-00E3Dq-VL; Thu, 12 Jan 2023 07:55:51 +0000
-Date:   Wed, 11 Jan 2023 23:55:51 -0800
+        d=infradead.org; s=bombadil.20210309; h=Content-Type:MIME-Version:Message-ID:
+        Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+        Content-Description:In-Reply-To:References;
+        bh=e2kI7aQUDYcH/lJiomT62w0Uil99ZHDntE95VjNwqqk=; b=CFdQElbGGpR28An47QVTz9lIFJ
+        a9O7+0T6vKJd21v7yiwWpOW6gVxoVR17BfQYoxHEJW13yLqGqyO98ha586Ci89Cj/qdbdHaaOh1yl
+        yIS0lY0MmRMHmozZN/5DdxIsCCxcZio6wp1n+slxaMOEh/2CX04p3tlnDdN41CGMSMYyck8GjAU/B
+        IoA5r+yH5dQfydI5f0sGbkTrO+mQxSI1mKLzm/GEAcfuU+KwbhcsIP9Zsbo/MMM6uFTLOho4PzmIw
+        pb2ndK9Iu/A/RBvtx3F4c3kacz5S5tgR7IyDKINdaxKqTERN3TVWydZODLotlxeWoojXob4MSYlrA
+        uJcthpkA==;
+Received: from [2001:4bb8:181:656b:c87d:36c9:914c:c2ea] (helo=localhost)
+        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1pFsth-00E5sD-HA; Thu, 12 Jan 2023 08:25:17 +0000
+Date:   Thu, 12 Jan 2023 09:25:15 +0100
 From:   Christoph Hellwig <hch@infradead.org>
-To:     David Howells <dhowells@redhat.com>
-Cc:     Al Viro <viro@zeniv.linux.org.uk>, Christoph Hellwig <hch@lst.de>,
-        John Hubbard <jhubbard@nvidia.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        Christoph Hellwig <hch@infradead.org>,
-        Jens Axboe <axboe@kernel.dk>, Jan Kara <jack@suse.cz>,
-        Jeff Layton <jlayton@kernel.org>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v5 4/9] iov_iter: Add a function to extract a page list
- from an iterator
-Message-ID: <Y7+9B/GB3M2HyRs+@infradead.org>
-References: <167344725490.2425628.13771289553670112965.stgit@warthog.procyon.org.uk>
- <167344728530.2425628.9613910866466387722.stgit@warthog.procyon.org.uk>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
+Subject: [GIT PULL] nvme fixes for Linux 6.2
+Message-ID: <Y7/D64Qubtqmdv04@infradead.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <167344728530.2425628.9613910866466387722.stgit@warthog.procyon.org.uk>
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-> +	BUG(); // if it had been empty, we wouldn't get called
+The following changes since commit 49e4d04f0486117ac57a97890eb1db6d52bf82b3:
 
-Please use a normal /* */ comment here.
+  block: Drop spurious might_sleep() from blk_put_queue() (2023-01-08 20:29:28 -0700)
 
-Otherwise looks good:
+are available in the Git repository at:
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+  git://git.infradead.org/nvme.git tags/nvme-6.2-2023-01-12
+
+for you to fetch changes up to c7c0644ead24c59cc5e0f2ff0ade89b21783614a:
+
+  MAINTAINERS: stop nvme matching for nvmem files (2023-01-10 08:16:39 +0100)
+
+----------------------------------------------------------------
+nvme fixes for Linux 6.2
+
+ - Identify quirks for Apple controllers (Hector Martin)
+ - fix error handling in nvme_pci_enable (Tong Zhang)
+ - refuse unprivileged passthrough on partitions (Christoph Hellwig)
+ - fix MAINTAINERS to not match nvmem subsystem headers (Russell King)
+
+----------------------------------------------------------------
+Christoph Hellwig (3):
+      nvme: remove __nvme_ioctl
+      nvme: replace the "bool vec" arguments with flags in the ioctl path
+      nvme: don't allow unprivileged passthrough on partitions
+
+Hector Martin (2):
+      nvme-apple: add NVME_QUIRK_IDENTIFY_CNS quirk to fix regression
+      nvme-pci: add NVME_QUIRK_IDENTIFY_CNS quirk to Apple T2 controllers
+
+Russell King (Oracle) (1):
+      MAINTAINERS: stop nvme matching for nvmem files
+
+Tong Zhang (1):
+      nvme-pci: fix error handling in nvme_pci_enable()
+
+ MAINTAINERS               |   3 +-
+ drivers/nvme/host/apple.c |   2 +-
+ drivers/nvme/host/ioctl.c | 110 ++++++++++++++++++++++++++--------------------
+ drivers/nvme/host/pci.c   |  12 +++--
+ 4 files changed, 75 insertions(+), 52 deletions(-)
