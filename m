@@ -2,59 +2,112 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A81F2C678D4
-	for <linux-block@archiver.kernel.org>; Fri, 13 Jan 2023 05:33:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 67534C54EBD
+	for <linux-block@archiver.kernel.org>; Fri, 13 Jan 2023 07:50:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234380AbjAMFdn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 13 Jan 2023 00:33:43 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36308 "EHLO
+        id S229462AbjAMHuG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 13 Jan 2023 02:50:06 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39438 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232602AbjAMFdI (ORCPT
+        with ESMTP id S234718AbjAMHuC (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 13 Jan 2023 00:33:08 -0500
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 57ECC61455;
-        Thu, 12 Jan 2023 21:33:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=ysUCfBrwMEP/gKZvWSb1F9GpsO921UxR4IBhrY7rzmA=; b=eltYYegCYuaDF2OLOCNenA+MS/
-        CJY5LRGNK7trbl5wIFc0/jpq68bC42ljrQTOspX75Hp68CeUs1QkBOGhmXiibOwzcjfwLKcbRCE3n
-        ZrzmSarQSHrbj2S386A5nT0taBrT0f/aLoevjW2ry1LTgYwZoLG9UoBOTzmdbM44wm1BOxrBlEZKq
-        NcJUVUPWW+PMc4rV5dFTjppnd7Q7yYiYqKVPJhT1xLiw9FYUsUzQuEBAJ77Vt4Fqvwz9/qQ1X7tPI
-        tQl9Y1rrZ8Pb611cAL01E3KI95x43t8T1Ev+cjwDGx/z/Ex3fTnZbqSnlIqoVhTQesqt9AhOrWZXE
-        Gd0RVsYw==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1pGCgW-000VVZ-C9; Fri, 13 Jan 2023 05:33:00 +0000
-Date:   Thu, 12 Jan 2023 21:33:00 -0800
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Al Viro <viro@zeniv.linux.org.uk>
-Cc:     David Howells <dhowells@redhat.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Matthew Wilcox <willy@infradead.org>,
-        Jens Axboe <axboe@kernel.dk>, Jan Kara <jack@suse.cz>,
-        Jeff Layton <jlayton@kernel.org>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v5 3/9] iov_iter: Use IOCB/IOMAP_WRITE if available
- rather than iterator direction
-Message-ID: <Y8DtDDZSWcrfLmy/@infradead.org>
-References: <167344725490.2425628.13771289553670112965.stgit@warthog.procyon.org.uk>
- <167344727810.2425628.4715663653893036683.stgit@warthog.procyon.org.uk>
- <Y8CCCQLrm9vshGw0@ZenIV>
+        Fri, 13 Jan 2023 02:50:02 -0500
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C30F763185;
+        Thu, 12 Jan 2023 23:49:50 -0800 (PST)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 2B0FF5FBDC;
+        Fri, 13 Jan 2023 07:49:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1673596189; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Qr45SYM5k3TQ5Ca9ilptJQCk+nFtroXeKFE0zYAlz5M=;
+        b=e2gk5fK+Fg8VsLy4gVxkeBjQhAKVcJg55uMbswGMHSJ38f+CWGNtnBMC350UmKUKLlIMyH
+        EJzhteMm9Vm3jnCmqjl/hpn1P4FpRDN8vRkwD5r8oAmd7AO9cXEYo/vgXBkW7F4ucC1kc+
+        ee1UCHBfYayFZSvLJ/u76dk9yLkpDlA=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1673596189;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Qr45SYM5k3TQ5Ca9ilptJQCk+nFtroXeKFE0zYAlz5M=;
+        b=R9MnoZYGulzb3qoGcxYMbGvLANJ6mtnQt9z2lUwPttk4iTDaC5biUBqoIu4dz9UPd+gk68
+        9iYXdAYw9/+n33CA==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id A296613913;
+        Fri, 13 Jan 2023 07:49:48 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id TuStJBwNwWN3QgAAMHmgww
+        (envelope-from <hare@suse.de>); Fri, 13 Jan 2023 07:49:48 +0000
+Message-ID: <88a6a525-9922-b07e-75c3-a54a00c18950@suse.de>
+Date:   Fri, 13 Jan 2023 08:49:47 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Y8CCCQLrm9vshGw0@ZenIV>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.5.1
+Subject: Re: [PATCH v2 01/18] ata: libata: allow ata_scsi_set_sense() to not
+ set CHECK_CONDITION
+Content-Language: en-US
+To:     Niklas Cassel <niklas.cassel@wdc.com>,
+        Damien Le Moal <damien.lemoal@opensource.wdc.com>
+Cc:     linux-scsi@vger.kernel.org, linux-ide@vger.kernel.org,
+        linux-block@vger.kernel.org
+References: <20230112140412.667308-1-niklas.cassel@wdc.com>
+ <20230112140412.667308-2-niklas.cassel@wdc.com>
+From:   Hannes Reinecke <hare@suse.de>
+In-Reply-To: <20230112140412.667308-2-niklas.cassel@wdc.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jan 12, 2023 at 09:56:25PM +0000, Al Viro wrote:
-> Incidentally, I'd suggest iocb_is_write(iocb) - just look at the amount of
-> places where you end up with clumsy parentheses...
+On 1/12/23 15:03, Niklas Cassel wrote:
+> Current ata_scsi_set_sense() calls scsi_build_sense(), which,
+> in addition to setting the sense data, unconditionally sets the
+> scsicmd->result to SAM_STAT_CHECK_CONDITION.
+> 
+> For Command Duration Limits policy 0xD:
+> The device shall complete the command without error (SAM_STAT_GOOD)
+> with the additional sense code set to DATA CURRENTLY UNAVAILABLE.
+> 
+> It is perfectly fine to have sense data for a command that returned
+> completion without error.
+> 
+> In order to support for CDL policy 0xD, we have to remove this
+> assumption that having sense data means that the command failed
+> (SAM_STAT_CHECK_CONDITION).
+> 
+> Add a new parameter to ata_scsi_set_sense() to allow us to set
+> sense data without unconditionally setting SAM_STAT_CHECK_CONDITION.
+> This new parameter will be used in a follow-up patch.
+> 
+> Signed-off-by: Niklas Cassel <niklas.cassel@wdc.com>
+> ---
+>   drivers/ata/libata-eh.c   |  3 ++-
+>   drivers/ata/libata-sata.c |  4 ++--
+>   drivers/ata/libata-scsi.c | 38 ++++++++++++++++++++------------------
+>   drivers/ata/libata.h      |  4 ++--
+>   4 files changed, 26 insertions(+), 23 deletions(-)
+> 
+Reviewed-by: Hannes Reinecke <hare@suse.de>
 
-Agreed, a little helper won't hurt.
+Cheers,
+
+Hannes
+-- 
+Dr. Hannes Reinecke                Kernel Storage Architect
+hare@suse.de                              +49 911 74053 688
+SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
+HRB 36809 (AG Nürnberg), Geschäftsführer: Ivo Totev, Andrew
+Myers, Andrew McDonald, Martje Boudien Moerman
+
