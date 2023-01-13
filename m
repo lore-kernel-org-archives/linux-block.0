@@ -2,113 +2,68 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BF6FAC54EBD
-	for <linux-block@archiver.kernel.org>; Fri, 13 Jan 2023 01:25:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 02BDDC54EBD
+	for <linux-block@archiver.kernel.org>; Fri, 13 Jan 2023 05:28:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240575AbjAMBZV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 12 Jan 2023 20:25:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34484 "EHLO
+        id S238280AbjAMF2K (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 13 Jan 2023 00:28:10 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32808 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236952AbjAMBZU (ORCPT
+        with ESMTP id S235576AbjAMF1H (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 12 Jan 2023 20:25:20 -0500
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C456B5D8B3;
-        Thu, 12 Jan 2023 17:25:17 -0800 (PST)
-Received: from mail02.huawei.com (unknown [172.30.67.143])
-        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4NtNyG3g5Xz4f3nqD;
-        Fri, 13 Jan 2023 09:25:10 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-        by APP3 (Coremail) with SMTP id _Ch0CgDX0R_3ssBjUrLoBQ--.19657S3;
-        Fri, 13 Jan 2023 09:25:13 +0800 (CST)
-Subject: Re: [PATCH v2 1/2] blk-iocost: add refcounting for iocg
-To:     Tejun Heo <tj@kernel.org>, Yu Kuai <yukuai1@huaweicloud.com>
-Cc:     hch@infradead.org, josef@toxicpanda.com, axboe@kernel.dk,
-        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, yi.zhang@huawei.com,
-        "yukuai (C)" <yukuai3@huawei.com>
-References: <Y7iCId3pnEnLqY8G@slm.duckdns.org>
- <875eb43e-202d-5b81-0bff-ef0434358d99@huaweicloud.com>
- <Y7xbpidpq7+DqJan@slm.duckdns.org>
- <a71f997f-6cae-d57b-85dd-2fd499d238f6@huaweicloud.com>
- <Y72wF/b0/xNRmP7f@slm.duckdns.org>
- <53b30ac8-d608-ba0b-8b1b-7fe5cfed6d61@huaweicloud.com>
- <Y77s0f741mFfGlTO@slm.duckdns.org>
- <4aeef320-c6c8-d9b4-8826-d58f00ea6264@huaweicloud.com>
- <Y8CrloCDGhbU42OH@slm.duckdns.org>
- <efa1c73b-e94f-373f-e535-2cfc32ce2433@huaweicloud.com>
- <Y8CwwghZ0adMsHFC@slm.duckdns.org>
-From:   Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <ac95dfb8-b1b6-8916-bde8-1edb573e7ca5@huaweicloud.com>
-Date:   Fri, 13 Jan 2023 09:25:11 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        Fri, 13 Jan 2023 00:27:07 -0500
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4F78625E9;
+        Thu, 12 Jan 2023 21:26:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=u6svsDv3oPWCvjudHdQlqCOrFDk6O3xm8BGo5fakt5c=; b=KNt+kaL9IbofAf4FmOV2p0jmO2
+        KviAq8o+wi4QQVov9jCIrj6U+6brA6mRic08K1Y2tpB9yJMyQq2EPYZ0zPfXf+IDz/D/PLdOHZmIS
+        7Z85UbD94tOm552z4CxOYzo0SHvDSp/L//wlZcos9lbz8Xj+24Iu6id18I6GU5RAC1VxdWFr5tnZh
+        y+rcTSWRJH9zjdjpVluK0YoFs05Zwqrd5UrzKMnFBIvSt6rXf3Mop7n8a2bZO4DXXB5kFqXOLvmsC
+        ViTQBlANr/J/qn9T5+2zQP4TRnpxHXQrXz6mFYTAP9aQpxiWR13bpMdKv8Em4eKb6f/AmUEvoZ4/u
+        t8NCnQKQ==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1pGCaK-000UfJ-It; Fri, 13 Jan 2023 05:26:36 +0000
+Date:   Thu, 12 Jan 2023 21:26:36 -0800
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Al Viro <viro@zeniv.linux.org.uk>
+Cc:     David Howells <dhowells@redhat.com>,
+        Christoph Hellwig <hch@lst.de>,
+        John Hubbard <jhubbard@nvidia.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        Christoph Hellwig <hch@infradead.org>,
+        Jens Axboe <axboe@kernel.dk>, Jan Kara <jack@suse.cz>,
+        Jeff Layton <jlayton@kernel.org>,
+        Logan Gunthorpe <logang@deltatee.com>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v5 4/9] iov_iter: Add a function to extract a page list
+ from an iterator
+Message-ID: <Y8DrjAuB6kT7tymi@infradead.org>
+References: <167344725490.2425628.13771289553670112965.stgit@warthog.procyon.org.uk>
+ <167344728530.2425628.9613910866466387722.stgit@warthog.procyon.org.uk>
+ <Y8B4hpF5czsk7pK1@ZenIV>
 MIME-Version: 1.0
-In-Reply-To: <Y8CwwghZ0adMsHFC@slm.duckdns.org>
-Content-Type: text/plain; charset=gbk; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: _Ch0CgDX0R_3ssBjUrLoBQ--.19657S3
-X-Coremail-Antispam: 1UD129KBjvdXoW7XF4fCw17uF17tFWUXFWfGrg_yoWkJrX_u3
-        4093WUW348GrnxCas5KF45X397KryUGry8ur40gr97GF9aq3yqkFn7Cwn3CFyUA3ykXr9I
-        vr95Zw18Gry7WjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-        9fnUUIcSsGvfJTRUUUba8FF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
-        6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
-        A2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j
-        6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
-        Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
-        I7IYx2IY67AKxVWUGVWUXwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
-        4UM4x0Y48IcVAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2kI
-        c2xKxwCYjI0SjxkI62AI1cAE67vIY487MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4
-        AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE
-        17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMI
-        IF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Wr1j6rW3
-        Jr1lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcS
-        sGvfC2KfnxnUUI43ZEXa7VU1a9aPUUUUU==
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Y8B4hpF5czsk7pK1@ZenIV>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
-
-ÔÚ 2023/01/13 9:15, Tejun Heo Ð´µÀ:
-> Hello,
+On Thu, Jan 12, 2023 at 09:15:50PM +0000, Al Viro wrote:
+> This cleanup_mode thing is wrong.  It's literally a trivial
+> function of ->user_backed and ->data_source - we don't
+> even need to look at the ->type.
 > 
-> On Fri, Jan 13, 2023 at 09:10:25AM +0800, Yu Kuai wrote:
->>> only activate the policy when the controller is actually enabled. So, idk.
->>> What's wrong with synchronizing the two removal paths? blkcg policies are
->>> combinations of cgroups and block device configurations, so having exit
->>> paths from both sides is kinda natural.
->>
->> I still can't figure out how to synchronizing them will a mutex. Maybe
->> I'm being foolish...
+> Separate it into an inline helper and be done with that;
+> don't carry it all over the place.
 > 
-> Hmm... can't you just use e.g. per-bdev mutex which is grabbed by both
-> blkg_free_workfn() and blkcg_deactivate_policy()?
-> 
+> It's really "if not user-backed => 0, otherwise it's FOLL_PIN or FOLL_GET,
+> depending upon the direction".
 
-I think hold the lock in blkg_free_workfn() is too late, pd_free_fn()
-for parent from blkcg_deactivate_policy() can be called first.
-
-t1: remove cgroup t1/t2
-blkcg_destroy_blkgs
-  blkg_destroy
-   percpu_ref_kill(&blkg->refcnt)
-    blkg_release
-     blkg_free
-      schedule_work(&blkg->free_work)
-      // t1 is done
-
-t2: handle t1 from removing device
-blkcg_deactivate_policy
-  pd_free_fn
-  // free parent
-				t3: from t1
-				blkg_free_workfn
-				 pd_free_fn
-				 // free child
-
-Thanks,
-Kuai
-
+That would defintively clean up the bio code as well..
