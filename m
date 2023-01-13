@@ -2,54 +2,54 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C37F9C54EBD
-	for <linux-block@archiver.kernel.org>; Fri, 13 Jan 2023 12:45:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 444ACC54EBE
+	for <linux-block@archiver.kernel.org>; Fri, 13 Jan 2023 12:45:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241405AbjAMMpI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 13 Jan 2023 07:45:08 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55856 "EHLO
+        id S241471AbjAMMpL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 13 Jan 2023 07:45:11 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54166 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241941AbjAMMoK (ORCPT
+        with ESMTP id S241985AbjAMMoQ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 13 Jan 2023 07:44:10 -0500
-Received: from mail-ej1-x633.google.com (mail-ej1-x633.google.com [IPv6:2a00:1450:4864:20::633])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F9643D9C5
-        for <linux-block@vger.kernel.org>; Fri, 13 Jan 2023 04:36:25 -0800 (PST)
-Received: by mail-ej1-x633.google.com with SMTP id u9so52054940ejo.0
-        for <linux-block@vger.kernel.org>; Fri, 13 Jan 2023 04:36:25 -0800 (PST)
+        Fri, 13 Jan 2023 07:44:16 -0500
+Received: from mail-ej1-x629.google.com (mail-ej1-x629.google.com [IPv6:2a00:1450:4864:20::629])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35926101F9
+        for <linux-block@vger.kernel.org>; Fri, 13 Jan 2023 04:36:30 -0800 (PST)
+Received: by mail-ej1-x629.google.com with SMTP id fy8so51883771ejc.13
+        for <linux-block@vger.kernel.org>; Fri, 13 Jan 2023 04:36:30 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linbit-com.20210112.gappssmtp.com; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Q42egUmEzuPqHWtFCe0+w1qRK0bznL4xm46gw6YdelU=;
-        b=N5XvOWhmZAIxoqz0Mv8fo7mI6busGg9qPdX3HilGBwZQxgFvj+4vVuZndJoENqpEsa
-         hLEsBoy3BrNWRRpFJMhjrKnFtsW5QRZ1vVOZK2Z8+8kYz8uy12xZ2+JNMz+Km8bSQ5/F
-         KVLf/VgDjgMfxaPkrWX5QZhf3xVU6+BJqrgUE8MamG4P3iojy8MDaI6WxLI8R5jyDzbg
-         x2UISx1ynqccb1aK4lvyzA5luhJOHxj6SmMHtA0rm6dKYxhCsocA4seaj+taXZD1LH+A
-         qzwrwnHNJqE1ko9RHKZvjI0dKkwvnRvycZsFWC6TxiO7s2V3WnlyCkptC9ywktGJevvS
-         Tdvw==
+        bh=T5KT6Auu94HJGq65sn5VmhXW8yJRnWzEtldTHa29AT0=;
+        b=iEvtkhCXslE72xJ4rRq1o4dPaZjuX9JLsa7ypmZFDHZvO1spA7qgOqdlMIgNqmOd4Q
+         BmnYm1AreZ0f08H6qA5zzq1vhit1vtTePd21UHj1cHFD1HjWkkgvd6vUd0NYq3Flo4tW
+         PU4z44ieH6GRE99WOpB7LDRHJPfdP/JK0iDdurBhlgpJdztFtfu1wNuJqycRTt4DfmwJ
+         DKQGPJsW0QdNBPlwzpGCReJQBTQGz5fJbIzvrcijgWMbeBy62bZDqSBq0eYILOugbfBK
+         POQt3cU00BEvXOTS6Px7H7/seYT2YAjrwmY0BkAOAChZsa+VBCMGVy2V6DjUXPacBhb7
+         5YvQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Q42egUmEzuPqHWtFCe0+w1qRK0bznL4xm46gw6YdelU=;
-        b=ODAf+GlzlUjN8VeQ8MWhuLyDdEDpl6hOhiKTDEigif3TmQoKDwGKO4H+4vy5DHn19v
-         27z4WrfhTsIollWoCpf1ENVpovbRssMASsBFMlnZF6+4LqgkqTx2iJiSVFgN4D7T7j22
-         U6Sx2/eyjH6yvBi+30av0GoVkDS7eVIcdrwp4ZHZ0hufSNYwjBqx1U8ala3dNqsO9Q6C
-         ONNwVmPW1LFndP8+JQZ2troLVsPh8NFAEOd+LT5Kfy2Z2oPVJHcrCV34rwIzP3+eeJZH
-         YKpX8oKg0gpQdCCT7cq1mym4CdjN0keccJ9TFFZ6yx7/qYqyPoYlT0bQQNyioo1SlpHT
-         VYEg==
-X-Gm-Message-State: AFqh2krhpHgRePycUm9ujGH90F+jUQe9V58aZnR+f4xqGyMq22nPM1jN
-        jn0rJRAybJzT4lakzdopdVJFTg==
-X-Google-Smtp-Source: AMrXdXvd2pKW/mm3VjXyhZ3M1Vlb7+wisqmEQArEMCnS1+zu55X8UKGjZK6dCSM/+mYx+2MdWiBl6A==
-X-Received: by 2002:a17:906:5f98:b0:84d:1b67:cecb with SMTP id a24-20020a1709065f9800b0084d1b67cecbmr22933542eju.43.1673613345049;
-        Fri, 13 Jan 2023 04:35:45 -0800 (PST)
+        bh=T5KT6Auu94HJGq65sn5VmhXW8yJRnWzEtldTHa29AT0=;
+        b=MeXr7PLRrJD6Uq7/KXUb9gxItuB1ccZkUdlwm2OvqJ3rjgUZvaXMlzvdEfEuRmDLxo
+         SECC1Zfc8QSsbTS2zg+Vq2/PZfeD7MZtv8vZinY/qTKDYUm6KfNNzLkj4fbCLyUGfmeu
+         mwudCCkosoGdvUZjHsVEDNFH5IoAHm0BT847Qmvz5l8dyYDBDKi86cP/ieOCZqUzojWp
+         jRI/y/68UhFu1rnPP7oE5IxkLCMuiuliI1js9PXTt3svaxgX5GU/Dzr++V3SCzpD0ggV
+         LSyBdwgO2dfsg1Y0vhe26jtVbERL/jH0NK/foaDKUqa7/RXE3rcovVUD8zjO+3DNKMNp
+         wI2g==
+X-Gm-Message-State: AFqh2kpHez/KIeMJqdwRwW60k022KX3ZtxXNgyhz9CnJb4/1rLA2AmLI
+        P9mpUJRxuTvsKIe3E6Ax1uT4vA==
+X-Google-Smtp-Source: AMrXdXv2f3WJ7TxaCpga5NoHE+9yIqEbHRcFtx8jGKJkLWIR0zf6tV2L+T7DlJE4PxvQYKOiiXMw5A==
+X-Received: by 2002:a17:907:7f12:b0:7c1:9eb:845b with SMTP id qf18-20020a1709077f1200b007c109eb845bmr3841305ejc.16.1673613348224;
+        Fri, 13 Jan 2023 04:35:48 -0800 (PST)
 Received: from localhost.localdomain (h082218028181.host.wavenet.at. [82.218.28.181])
-        by smtp.gmail.com with ESMTPSA id 17-20020a170906329100b007c0bb571da5sm8402496ejw.41.2023.01.13.04.35.44
+        by smtp.gmail.com with ESMTPSA id 17-20020a170906329100b007c0bb571da5sm8402496ejw.41.2023.01.13.04.35.47
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 13 Jan 2023 04:35:44 -0800 (PST)
+        Fri, 13 Jan 2023 04:35:47 -0800 (PST)
 From:   =?UTF-8?q?Christoph=20B=C3=B6hmwalder?= 
         <christoph.boehmwalder@linbit.com>
 To:     Jens Axboe <axboe@kernel.dk>
@@ -58,11 +58,10 @@ Cc:     drbd-dev@lists.linbit.com, linux-kernel@vger.kernel.org,
         Philipp Reisner <philipp.reisner@linbit.com>,
         linux-block@vger.kernel.org,
         =?UTF-8?q?Christoph=20B=C3=B6hmwalder?= 
-        <christoph.boehmwalder@linbit.com>,
-        Joel Colledge <joel.colledge@linbit.com>
-Subject: [PATCH 3/8] drbd: make limits unsigned
-Date:   Fri, 13 Jan 2023 13:35:33 +0100
-Message-Id: <20230113123538.144276-4-christoph.boehmwalder@linbit.com>
+        <christoph.boehmwalder@linbit.com>
+Subject: [PATCH 7/8] drbd: interval tree: make removing an "empty" interval a no-op
+Date:   Fri, 13 Jan 2023 13:35:37 +0100
+Message-Id: <20230113123538.144276-8-christoph.boehmwalder@linbit.com>
 X-Mailer: git-send-email 2.38.1
 In-Reply-To: <20230113123538.144276-1-christoph.boehmwalder@linbit.com>
 References: <20230113123538.144276-1-christoph.boehmwalder@linbit.com>
@@ -73,342 +72,37 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-These are almost always used as unsigned integers, so mark them as such.
+From: Lars Ellenberg <lars.ellenberg@linbit.com>
 
+Trying to remove an "empty" (just initialized, or "cleared") interval
+from the tree, this results in an endless loop.
+
+As we typically protect the tree with a spinlock_irq,
+the result is a hung system.
+
+Be nice to error cleanup code paths, ignore removal of empty intervals.
+
+Signed-off-by: Lars Ellenberg <lars.ellenberg@linbit.com>
 Signed-off-by: Christoph Böhmwalder <christoph.boehmwalder@linbit.com>
-Reviewed-by: Joel Colledge <joel.colledge@linbit.com>
 ---
- include/linux/drbd_limits.h | 202 ++++++++++++++++++------------------
- 1 file changed, 101 insertions(+), 101 deletions(-)
+ drivers/block/drbd/drbd_interval.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/include/linux/drbd_limits.h b/include/linux/drbd_limits.h
-index 058f7600f79c..5b042fb427e9 100644
---- a/include/linux/drbd_limits.h
-+++ b/include/linux/drbd_limits.h
-@@ -16,123 +16,123 @@
+diff --git a/drivers/block/drbd/drbd_interval.c b/drivers/block/drbd/drbd_interval.c
+index 5024ffd6143d..b6aaf0d4d85b 100644
+--- a/drivers/block/drbd/drbd_interval.c
++++ b/drivers/block/drbd/drbd_interval.c
+@@ -95,6 +95,10 @@ drbd_contains_interval(struct rb_root *root, sector_t sector,
+ void
+ drbd_remove_interval(struct rb_root *root, struct drbd_interval *this)
+ {
++	/* avoid endless loop */
++	if (drbd_interval_empty(this))
++		return;
++
+ 	rb_erase_augmented(&this->rb, root, &augment_callbacks);
+ }
  
- #define DEBUG_RANGE_CHECK 0
- 
--#define DRBD_MINOR_COUNT_MIN 1
--#define DRBD_MINOR_COUNT_MAX 255
--#define DRBD_MINOR_COUNT_DEF 32
-+#define DRBD_MINOR_COUNT_MIN 1U
-+#define DRBD_MINOR_COUNT_MAX 255U
-+#define DRBD_MINOR_COUNT_DEF 32U
- #define DRBD_MINOR_COUNT_SCALE '1'
- 
--#define DRBD_VOLUME_MAX 65534
-+#define DRBD_VOLUME_MAX 65534U
- 
--#define DRBD_DIALOG_REFRESH_MIN 0
--#define DRBD_DIALOG_REFRESH_MAX 600
-+#define DRBD_DIALOG_REFRESH_MIN 0U
-+#define DRBD_DIALOG_REFRESH_MAX 600U
- #define DRBD_DIALOG_REFRESH_SCALE '1'
- 
- /* valid port number */
--#define DRBD_PORT_MIN 1
--#define DRBD_PORT_MAX 0xffff
-+#define DRBD_PORT_MIN 1U
-+#define DRBD_PORT_MAX 0xffffU
- #define DRBD_PORT_SCALE '1'
- 
- /* startup { */
-   /* if you want more than 3.4 days, disable */
--#define DRBD_WFC_TIMEOUT_MIN 0
--#define DRBD_WFC_TIMEOUT_MAX 300000
--#define DRBD_WFC_TIMEOUT_DEF 0
-+#define DRBD_WFC_TIMEOUT_MIN 0U
-+#define DRBD_WFC_TIMEOUT_MAX 300000U
-+#define DRBD_WFC_TIMEOUT_DEF 0U
- #define DRBD_WFC_TIMEOUT_SCALE '1'
- 
--#define DRBD_DEGR_WFC_TIMEOUT_MIN 0
--#define DRBD_DEGR_WFC_TIMEOUT_MAX 300000
--#define DRBD_DEGR_WFC_TIMEOUT_DEF 0
-+#define DRBD_DEGR_WFC_TIMEOUT_MIN 0U
-+#define DRBD_DEGR_WFC_TIMEOUT_MAX 300000U
-+#define DRBD_DEGR_WFC_TIMEOUT_DEF 0U
- #define DRBD_DEGR_WFC_TIMEOUT_SCALE '1'
- 
--#define DRBD_OUTDATED_WFC_TIMEOUT_MIN 0
--#define DRBD_OUTDATED_WFC_TIMEOUT_MAX 300000
--#define DRBD_OUTDATED_WFC_TIMEOUT_DEF 0
-+#define DRBD_OUTDATED_WFC_TIMEOUT_MIN 0U
-+#define DRBD_OUTDATED_WFC_TIMEOUT_MAX 300000U
-+#define DRBD_OUTDATED_WFC_TIMEOUT_DEF 0U
- #define DRBD_OUTDATED_WFC_TIMEOUT_SCALE '1'
- /* }*/
- 
- /* net { */
-   /* timeout, unit centi seconds
-    * more than one minute timeout is not useful */
--#define DRBD_TIMEOUT_MIN 1
--#define DRBD_TIMEOUT_MAX 600
--#define DRBD_TIMEOUT_DEF 60       /* 6 seconds */
-+#define DRBD_TIMEOUT_MIN 1U
-+#define DRBD_TIMEOUT_MAX 600U
-+#define DRBD_TIMEOUT_DEF 60U       /* 6 seconds */
- #define DRBD_TIMEOUT_SCALE '1'
- 
-  /* If backing disk takes longer than disk_timeout, mark the disk as failed */
--#define DRBD_DISK_TIMEOUT_MIN 0    /* 0 = disabled */
--#define DRBD_DISK_TIMEOUT_MAX 6000 /* 10 Minutes */
--#define DRBD_DISK_TIMEOUT_DEF 0    /* disabled */
-+#define DRBD_DISK_TIMEOUT_MIN 0U    /* 0 = disabled */
-+#define DRBD_DISK_TIMEOUT_MAX 6000U /* 10 Minutes */
-+#define DRBD_DISK_TIMEOUT_DEF 0U    /* disabled */
- #define DRBD_DISK_TIMEOUT_SCALE '1'
- 
-   /* active connection retries when C_WF_CONNECTION */
--#define DRBD_CONNECT_INT_MIN 1
--#define DRBD_CONNECT_INT_MAX 120
--#define DRBD_CONNECT_INT_DEF 10   /* seconds */
-+#define DRBD_CONNECT_INT_MIN 1U
-+#define DRBD_CONNECT_INT_MAX 120U
-+#define DRBD_CONNECT_INT_DEF 10U   /* seconds */
- #define DRBD_CONNECT_INT_SCALE '1'
- 
-   /* keep-alive probes when idle */
--#define DRBD_PING_INT_MIN 1
--#define DRBD_PING_INT_MAX 120
--#define DRBD_PING_INT_DEF 10
-+#define DRBD_PING_INT_MIN 1U
-+#define DRBD_PING_INT_MAX 120U
-+#define DRBD_PING_INT_DEF 10U
- #define DRBD_PING_INT_SCALE '1'
- 
-  /* timeout for the ping packets.*/
--#define DRBD_PING_TIMEO_MIN  1
--#define DRBD_PING_TIMEO_MAX  300
--#define DRBD_PING_TIMEO_DEF  5
-+#define DRBD_PING_TIMEO_MIN  1U
-+#define DRBD_PING_TIMEO_MAX  300U
-+#define DRBD_PING_TIMEO_DEF  5U
- #define DRBD_PING_TIMEO_SCALE '1'
- 
-   /* max number of write requests between write barriers */
--#define DRBD_MAX_EPOCH_SIZE_MIN 1
--#define DRBD_MAX_EPOCH_SIZE_MAX 20000
--#define DRBD_MAX_EPOCH_SIZE_DEF 2048
-+#define DRBD_MAX_EPOCH_SIZE_MIN 1U
-+#define DRBD_MAX_EPOCH_SIZE_MAX 20000U
-+#define DRBD_MAX_EPOCH_SIZE_DEF 2048U
- #define DRBD_MAX_EPOCH_SIZE_SCALE '1'
- 
-   /* I don't think that a tcp send buffer of more than 10M is useful */
--#define DRBD_SNDBUF_SIZE_MIN  0
--#define DRBD_SNDBUF_SIZE_MAX  (10<<20)
--#define DRBD_SNDBUF_SIZE_DEF  0
-+#define DRBD_SNDBUF_SIZE_MIN  0U
-+#define DRBD_SNDBUF_SIZE_MAX  (10U<<20)
-+#define DRBD_SNDBUF_SIZE_DEF  0U
- #define DRBD_SNDBUF_SIZE_SCALE '1'
- 
--#define DRBD_RCVBUF_SIZE_MIN  0
--#define DRBD_RCVBUF_SIZE_MAX  (10<<20)
--#define DRBD_RCVBUF_SIZE_DEF  0
-+#define DRBD_RCVBUF_SIZE_MIN  0U
-+#define DRBD_RCVBUF_SIZE_MAX  (10U<<20)
-+#define DRBD_RCVBUF_SIZE_DEF  0U
- #define DRBD_RCVBUF_SIZE_SCALE '1'
- 
-   /* @4k PageSize -> 128kB - 512MB */
--#define DRBD_MAX_BUFFERS_MIN  32
--#define DRBD_MAX_BUFFERS_MAX  131072
--#define DRBD_MAX_BUFFERS_DEF  2048
-+#define DRBD_MAX_BUFFERS_MIN  32U
-+#define DRBD_MAX_BUFFERS_MAX  131072U
-+#define DRBD_MAX_BUFFERS_DEF  2048U
- #define DRBD_MAX_BUFFERS_SCALE '1'
- 
-   /* @4k PageSize -> 4kB - 512MB */
--#define DRBD_UNPLUG_WATERMARK_MIN  1
--#define DRBD_UNPLUG_WATERMARK_MAX  131072
-+#define DRBD_UNPLUG_WATERMARK_MIN  1U
-+#define DRBD_UNPLUG_WATERMARK_MAX  131072U
- #define DRBD_UNPLUG_WATERMARK_DEF (DRBD_MAX_BUFFERS_DEF/16)
- #define DRBD_UNPLUG_WATERMARK_SCALE '1'
- 
-   /* 0 is disabled.
-    * 200 should be more than enough even for very short timeouts */
--#define DRBD_KO_COUNT_MIN  0
--#define DRBD_KO_COUNT_MAX  200
--#define DRBD_KO_COUNT_DEF  7
-+#define DRBD_KO_COUNT_MIN  0U
-+#define DRBD_KO_COUNT_MAX  200U
-+#define DRBD_KO_COUNT_DEF  7U
- #define DRBD_KO_COUNT_SCALE '1'
- /* } */
- 
- /* syncer { */
-   /* FIXME allow rate to be zero? */
--#define DRBD_RESYNC_RATE_MIN 1
-+#define DRBD_RESYNC_RATE_MIN 1U
- /* channel bonding 10 GbE, or other hardware */
- #define DRBD_RESYNC_RATE_MAX (4 << 20)
--#define DRBD_RESYNC_RATE_DEF 250
-+#define DRBD_RESYNC_RATE_DEF 250U
- #define DRBD_RESYNC_RATE_SCALE 'k'  /* kilobytes */
- 
--#define DRBD_AL_EXTENTS_MIN  67
-+#define DRBD_AL_EXTENTS_MIN  67U
-   /* we use u16 as "slot number", (u16)~0 is "FREE".
-    * If you use >= 292 kB on-disk ring buffer,
-    * this is the maximum you can use: */
--#define DRBD_AL_EXTENTS_MAX  0xfffe
--#define DRBD_AL_EXTENTS_DEF  1237
-+#define DRBD_AL_EXTENTS_MAX  0xfffeU
-+#define DRBD_AL_EXTENTS_DEF  1237U
- #define DRBD_AL_EXTENTS_SCALE '1'
- 
- #define DRBD_MINOR_NUMBER_MIN  -1
-@@ -147,9 +147,9 @@
-  * the upper limit with 64bit kernel, enough ram and flexible meta data
-  * is 1 PiB, currently. */
- /* DRBD_MAX_SECTORS */
--#define DRBD_DISK_SIZE_MIN  0
--#define DRBD_DISK_SIZE_MAX  (1 * (2LLU << 40))
--#define DRBD_DISK_SIZE_DEF  0 /* = disabled = no user size... */
-+#define DRBD_DISK_SIZE_MIN  0LLU
-+#define DRBD_DISK_SIZE_MAX  (1LLU * (2LLU << 40))
-+#define DRBD_DISK_SIZE_DEF  0LLU /* = disabled = no user size... */
- #define DRBD_DISK_SIZE_SCALE 's'  /* sectors */
- 
- #define DRBD_ON_IO_ERROR_DEF EP_DETACH
-@@ -162,39 +162,39 @@
- #define DRBD_ON_CONGESTION_DEF OC_BLOCK
- #define DRBD_READ_BALANCING_DEF RB_PREFER_LOCAL
- 
--#define DRBD_MAX_BIO_BVECS_MIN 0
--#define DRBD_MAX_BIO_BVECS_MAX 128
--#define DRBD_MAX_BIO_BVECS_DEF 0
-+#define DRBD_MAX_BIO_BVECS_MIN 0U
-+#define DRBD_MAX_BIO_BVECS_MAX 128U
-+#define DRBD_MAX_BIO_BVECS_DEF 0U
- #define DRBD_MAX_BIO_BVECS_SCALE '1'
- 
--#define DRBD_C_PLAN_AHEAD_MIN  0
--#define DRBD_C_PLAN_AHEAD_MAX  300
--#define DRBD_C_PLAN_AHEAD_DEF  20
-+#define DRBD_C_PLAN_AHEAD_MIN  0U
-+#define DRBD_C_PLAN_AHEAD_MAX  300U
-+#define DRBD_C_PLAN_AHEAD_DEF  20U
- #define DRBD_C_PLAN_AHEAD_SCALE '1'
- 
--#define DRBD_C_DELAY_TARGET_MIN 1
--#define DRBD_C_DELAY_TARGET_MAX 100
--#define DRBD_C_DELAY_TARGET_DEF 10
-+#define DRBD_C_DELAY_TARGET_MIN 1U
-+#define DRBD_C_DELAY_TARGET_MAX 100U
-+#define DRBD_C_DELAY_TARGET_DEF 10U
- #define DRBD_C_DELAY_TARGET_SCALE '1'
- 
--#define DRBD_C_FILL_TARGET_MIN 0
--#define DRBD_C_FILL_TARGET_MAX (1<<20) /* 500MByte in sec */
--#define DRBD_C_FILL_TARGET_DEF 100 /* Try to place 50KiB in socket send buffer during resync */
-+#define DRBD_C_FILL_TARGET_MIN 0U
-+#define DRBD_C_FILL_TARGET_MAX (1U<<20) /* 500MByte in sec */
-+#define DRBD_C_FILL_TARGET_DEF 100U /* Try to place 50KiB in socket send buffer during resync */
- #define DRBD_C_FILL_TARGET_SCALE 's'  /* sectors */
- 
--#define DRBD_C_MAX_RATE_MIN     250
--#define DRBD_C_MAX_RATE_MAX     (4 << 20)
--#define DRBD_C_MAX_RATE_DEF     102400
-+#define DRBD_C_MAX_RATE_MIN     250U
-+#define DRBD_C_MAX_RATE_MAX     (4U << 20)
-+#define DRBD_C_MAX_RATE_DEF     102400U
- #define DRBD_C_MAX_RATE_SCALE	'k'  /* kilobytes */
- 
--#define DRBD_C_MIN_RATE_MIN     0
--#define DRBD_C_MIN_RATE_MAX     (4 << 20)
--#define DRBD_C_MIN_RATE_DEF     250
-+#define DRBD_C_MIN_RATE_MIN     0U
-+#define DRBD_C_MIN_RATE_MAX     (4U << 20)
-+#define DRBD_C_MIN_RATE_DEF     250U
- #define DRBD_C_MIN_RATE_SCALE	'k'  /* kilobytes */
- 
--#define DRBD_CONG_FILL_MIN	0
--#define DRBD_CONG_FILL_MAX	(10<<21) /* 10GByte in sectors */
--#define DRBD_CONG_FILL_DEF	0
-+#define DRBD_CONG_FILL_MIN	0U
-+#define DRBD_CONG_FILL_MAX	(10U<<21) /* 10GByte in sectors */
-+#define DRBD_CONG_FILL_DEF	0U
- #define DRBD_CONG_FILL_SCALE	's'  /* sectors */
- 
- #define DRBD_CONG_EXTENTS_MIN	DRBD_AL_EXTENTS_MIN
-@@ -204,48 +204,48 @@
- 
- #define DRBD_PROTOCOL_DEF DRBD_PROT_C
- 
--#define DRBD_DISK_BARRIER_DEF	0
--#define DRBD_DISK_FLUSHES_DEF	1
--#define DRBD_DISK_DRAIN_DEF	1
--#define DRBD_MD_FLUSHES_DEF	1
--#define DRBD_TCP_CORK_DEF	1
--#define DRBD_AL_UPDATES_DEF     1
-+#define DRBD_DISK_BARRIER_DEF	0U
-+#define DRBD_DISK_FLUSHES_DEF	1U
-+#define DRBD_DISK_DRAIN_DEF	1U
-+#define DRBD_MD_FLUSHES_DEF	1U
-+#define DRBD_TCP_CORK_DEF	1U
-+#define DRBD_AL_UPDATES_DEF     1U
- 
- /* We used to ignore the discard_zeroes_data setting.
-  * To not change established (and expected) behaviour,
-  * by default assume that, for discard_zeroes_data=0,
-  * we can make that an effective discard_zeroes_data=1,
-  * if we only explicitly zero-out unaligned partial chunks. */
--#define DRBD_DISCARD_ZEROES_IF_ALIGNED_DEF 1
-+#define DRBD_DISCARD_ZEROES_IF_ALIGNED_DEF 1U
- 
- /* Some backends pretend to support WRITE SAME,
-  * but fail such requests when they are actually submitted.
-  * This is to tell DRBD to not even try. */
--#define DRBD_DISABLE_WRITE_SAME_DEF 0
-+#define DRBD_DISABLE_WRITE_SAME_DEF 0U
- 
--#define DRBD_ALLOW_TWO_PRIMARIES_DEF	0
--#define DRBD_ALWAYS_ASBP_DEF	0
--#define DRBD_USE_RLE_DEF	1
--#define DRBD_CSUMS_AFTER_CRASH_ONLY_DEF 0
-+#define DRBD_ALLOW_TWO_PRIMARIES_DEF	0U
-+#define DRBD_ALWAYS_ASBP_DEF	0U
-+#define DRBD_USE_RLE_DEF	1U
-+#define DRBD_CSUMS_AFTER_CRASH_ONLY_DEF 0U
- 
--#define DRBD_AL_STRIPES_MIN     1
--#define DRBD_AL_STRIPES_MAX     1024
--#define DRBD_AL_STRIPES_DEF     1
-+#define DRBD_AL_STRIPES_MIN     1U
-+#define DRBD_AL_STRIPES_MAX     1024U
-+#define DRBD_AL_STRIPES_DEF     1U
- #define DRBD_AL_STRIPES_SCALE   '1'
- 
--#define DRBD_AL_STRIPE_SIZE_MIN   4
--#define DRBD_AL_STRIPE_SIZE_MAX   16777216
--#define DRBD_AL_STRIPE_SIZE_DEF   32
-+#define DRBD_AL_STRIPE_SIZE_MIN   4U
-+#define DRBD_AL_STRIPE_SIZE_MAX   16777216U
-+#define DRBD_AL_STRIPE_SIZE_DEF   32U
- #define DRBD_AL_STRIPE_SIZE_SCALE 'k' /* kilobytes */
- 
--#define DRBD_SOCKET_CHECK_TIMEO_MIN 0
-+#define DRBD_SOCKET_CHECK_TIMEO_MIN 0U
- #define DRBD_SOCKET_CHECK_TIMEO_MAX DRBD_PING_TIMEO_MAX
--#define DRBD_SOCKET_CHECK_TIMEO_DEF 0
-+#define DRBD_SOCKET_CHECK_TIMEO_DEF 0U
- #define DRBD_SOCKET_CHECK_TIMEO_SCALE '1'
- 
--#define DRBD_RS_DISCARD_GRANULARITY_MIN 0
--#define DRBD_RS_DISCARD_GRANULARITY_MAX (1<<20)  /* 1MiByte */
--#define DRBD_RS_DISCARD_GRANULARITY_DEF 0     /* disabled by default */
-+#define DRBD_RS_DISCARD_GRANULARITY_MIN 0U
-+#define DRBD_RS_DISCARD_GRANULARITY_MAX (1U<<20)  /* 1MiByte */
-+#define DRBD_RS_DISCARD_GRANULARITY_DEF 0U     /* disabled by default */
- #define DRBD_RS_DISCARD_GRANULARITY_SCALE '1' /* bytes */
- 
- #endif
 -- 
 2.38.1
 
