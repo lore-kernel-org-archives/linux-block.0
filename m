@@ -2,99 +2,115 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 255E0C54EBE
-	for <linux-block@archiver.kernel.org>; Fri, 13 Jan 2023 15:51:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FD0CC54EBE
+	for <linux-block@archiver.kernel.org>; Fri, 13 Jan 2023 17:28:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229527AbjAMPvw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 13 Jan 2023 10:51:52 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39782 "EHLO
+        id S230087AbjAMR2Q (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 13 Jan 2023 12:28:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38840 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229878AbjAMPuW (ORCPT
+        with ESMTP id S229825AbjAMR1h (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 13 Jan 2023 10:50:22 -0500
-Received: from mail-il1-x131.google.com (mail-il1-x131.google.com [IPv6:2607:f8b0:4864:20::131])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5904883E07
-        for <linux-block@vger.kernel.org>; Fri, 13 Jan 2023 07:43:30 -0800 (PST)
-Received: by mail-il1-x131.google.com with SMTP id x6so6329695ill.10
-        for <linux-block@vger.kernel.org>; Fri, 13 Jan 2023 07:43:30 -0800 (PST)
+        Fri, 13 Jan 2023 12:27:37 -0500
+Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80F71820DC;
+        Fri, 13 Jan 2023 09:16:16 -0800 (PST)
+Received: by mail-pj1-x1033.google.com with SMTP id q64so23037933pjq.4;
+        Fri, 13 Jan 2023 09:16:16 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=aMDRFQNMM2p+WOSwQ9Dba5m08/eqZCwGnutuShqS2I0=;
-        b=bGjx8gC+nt5yLHeWJhR7JzVbtjLaL40agjy66eW4Tk8RWtrhc12wcNn6fkhEG6y/jZ
-         6cLWZWJan3dr7e+4w59+lgy7w4UqMn8/VcQcjyA2XFPiw6l3CjNs5ROH9ZgdtVZQ054l
-         AWyM1p0sXu1xbdZIg2jHm+WliH2vi36pirBaH4JXl653dlRY8hOEacTlvv37Qe0KQBVp
-         bQDpPqVMM6bPM9apFNY1dfUiHT8AKyn/laJrmIja8wn3E8R43uky+Fffh/QrEodPu645
-         pGejc3dIerQZjDuPALpaGhI3JcztfmmoziUlHgAh4nzPhnR+AMmfQISrWzN3+k22k0Sk
-         clQg==
+        d=gmail.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=52MNpdUJgF3+oIlWggDDfrxPPD9Ztp6sCT03jqLjxgI=;
+        b=qoUH+lwlmFLafVPNtyZsi5g+/lFmY4VRICVR8nxpfZhir2UA9+ZTFVSHv+aWHGONgc
+         prVifwhDZCRV7oQCr4MZQ5QVlmQFFdwuzZLzjKHmn4QCNEXbKj7Cy0Fdsv86hLM5l/pi
+         oT7ITQFfR39idU7/bOxREINUvmmagDFYP136gv8nIIUarzMSDfpAK54f5xmEWMH88iEj
+         X2gTJ4rdxMOuLkRlsUeaLFdN/vX01WRDAfvjOsO2FkaL/sN5xX3K039opZjKA08lXh8E
+         vcQ7X2mwFgpX7DvPYjhRZ5d+/IAt+3QxtgfHvI3o/dEEvRQw2nigPv6L/aUng/Kf9Rlp
+         fExA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=aMDRFQNMM2p+WOSwQ9Dba5m08/eqZCwGnutuShqS2I0=;
-        b=FW7Icg76EZ9aX470VZ7ijiyMYRmNBZ+MMUr7zZ0SPytRUlKBgRWvza8Px2L5RMSc08
-         YqbLApooX5qSxraABRStbd1E//Bygy4o7qaHTzeVlBmzQzoRtxstn4+rinDiInsRJdSy
-         rftnIDfNG2eQprmABK8DBZXnI4LMS1boIhaVNZGKZ5r8SgcOWLJGYTeC4pR5asi8i1tJ
-         M2Kd9FuhIsNrwVi0l2c9gnDdDs9aXQnLc7Y6CdWWG8SPFdpc0sVtMrfPFfVboRVZ0TU5
-         EJK4xuE0+bCMmCt3mlVkL26Ibld+fwQezHBy99Eph3FE29a+wrxMHyIjO1n9Er7ZR/Qz
-         qlgw==
-X-Gm-Message-State: AFqh2krgRKXLkKPQRG4EnawCL9tHpxsX75xhHwI1kJSsLuR+kMHi4bMC
-        gRB1K4BpfacOzE6Q8YdTHew8xA==
-X-Google-Smtp-Source: AMrXdXtxFHd2A+4/Ksfx8D+/irZoy4dYAzcM0F/2HZJcXPHxaCnvJignIzh+g3mVFjIGPbgOFqaGLg==
-X-Received: by 2002:a92:b703:0:b0:30c:1dda:42dd with SMTP id k3-20020a92b703000000b0030c1dda42ddmr7873529ili.1.1673624609549;
-        Fri, 13 Jan 2023 07:43:29 -0800 (PST)
-Received: from [127.0.0.1] ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id 125-20020a020a83000000b0039dc4d26bd2sm6193106jaw.58.2023.01.13.07.43.28
+        bh=52MNpdUJgF3+oIlWggDDfrxPPD9Ztp6sCT03jqLjxgI=;
+        b=H/FNNin8ThBdeltrsi+mMuuQ+blU68a32o+ZbbOr63olGLcbdEILiMTJ/osYuRa7hf
+         hnv7H6x0rrNB1LSwb54L0DnyxC4nu9Ws+wLM163jsw9sapVAfzcl2kIFWQ9gNqw3wHX6
+         nOGNxA3b4Ih8jwrWfQoUbXiuxnVHzxyDq8qGlSzolryq509+kZcaB/gwUi3rsp9Ov00E
+         sLC8LauX6YyfW/VD0sZb6z2YhE/95m4Lop0ufc4G0GbjW7r2ywYThWYbjqSoXZE3FFH5
+         WF+TjXPfUTJ/AxQdLbCVGLJMLRB60b/EhH7R4xetZT4qGcqLNSniZhARB8J6UfdZt3v4
+         ihMg==
+X-Gm-Message-State: AFqh2kokLCtnDAi8n3IgcqXwp+hjWP/A8NwEh/mVyGTAf/xXwpDgYnBe
+        J61iMsG4JWb+6pyvenQchYEA8cfS/7s=
+X-Google-Smtp-Source: AMrXdXsOb1/cz5idjSPHBBq+vj1mwFSPSnXMu9ltctsJRZDrbkxp8zVi6idyzHv+1TBw3SupYD9W2w==
+X-Received: by 2002:a17:90a:9a89:b0:229:306b:6111 with SMTP id e9-20020a17090a9a8900b00229306b6111mr2039192pjp.20.1673630175811;
+        Fri, 13 Jan 2023 09:16:15 -0800 (PST)
+Received: from localhost (2603-800c-1a02-1bae-a7fa-157f-969a-4cde.res6.spectrum.com. [2603:800c:1a02:1bae:a7fa:157f:969a:4cde])
+        by smtp.gmail.com with ESMTPSA id z15-20020a17090a608f00b00225d7c0dc14sm14586012pji.28.2023.01.13.09.16.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 13 Jan 2023 07:43:29 -0800 (PST)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     =?utf-8?q?Christoph_B=C3=B6hmwalder?= 
-        <christoph.boehmwalder@linbit.com>
-Cc:     drbd-dev@lists.linbit.com, linux-kernel@vger.kernel.org,
-        Lars Ellenberg <lars.ellenberg@linbit.com>,
-        Philipp Reisner <philipp.reisner@linbit.com>,
-        linux-block@vger.kernel.org
-In-Reply-To: <20230113123506.144082-1-christoph.boehmwalder@linbit.com>
-References: <20230113123506.144082-1-christoph.boehmwalder@linbit.com>
-Subject: Re: [RESEND PATCH 0/3] DRBD file structure reorganization
-Message-Id: <167362460873.11790.14664102108857579461.b4-ty@kernel.dk>
-Date:   Fri, 13 Jan 2023 08:43:28 -0700
+        Fri, 13 Jan 2023 09:16:15 -0800 (PST)
+Sender: Tejun Heo <htejun@gmail.com>
+Date:   Fri, 13 Jan 2023 07:16:13 -1000
+From:   Tejun Heo <tj@kernel.org>
+To:     Yu Kuai <yukuai1@huaweicloud.com>
+Cc:     hch@infradead.org, josef@toxicpanda.com, axboe@kernel.dk,
+        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, yi.zhang@huawei.com,
+        "yukuai (C)" <yukuai3@huawei.com>
+Subject: Re: [PATCH v2 1/2] blk-iocost: add refcounting for iocg
+Message-ID: <Y8GR3V3RsdS+XYzh@slm.duckdns.org>
+References: <Y7xbpidpq7+DqJan@slm.duckdns.org>
+ <a71f997f-6cae-d57b-85dd-2fd499d238f6@huaweicloud.com>
+ <Y72wF/b0/xNRmP7f@slm.duckdns.org>
+ <53b30ac8-d608-ba0b-8b1b-7fe5cfed6d61@huaweicloud.com>
+ <Y77s0f741mFfGlTO@slm.duckdns.org>
+ <4aeef320-c6c8-d9b4-8826-d58f00ea6264@huaweicloud.com>
+ <Y8CrloCDGhbU42OH@slm.duckdns.org>
+ <efa1c73b-e94f-373f-e535-2cfc32ce2433@huaweicloud.com>
+ <Y8CwwghZ0adMsHFC@slm.duckdns.org>
+ <ac95dfb8-b1b6-8916-bde8-1edb573e7ca5@huaweicloud.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-Mailer: b4 0.12-dev-78c63
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ac95dfb8-b1b6-8916-bde8-1edb573e7ca5@huaweicloud.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Hello,
 
-On Fri, 13 Jan 2023 13:35:03 +0100, Christoph Böhmwalder wrote:
-> To make our lives easier when sending future, more complex patches,
-> we want to align the file structure as best as possible with what we
-> have in the out-of-tree module.
+On Fri, Jan 13, 2023 at 09:25:11AM +0800, Yu Kuai wrote:
+> I think hold the lock in blkg_free_workfn() is too late, pd_free_fn()
+> for parent from blkcg_deactivate_policy() can be called first.
 > 
-> Christoph Böhmwalder (3):
->   drbd: split off drbd_buildtag into separate file
->   drbd: drop API_VERSION define
->   drbd: split off drbd_config into separate file
+> t1: remove cgroup t1/t2
+> blkcg_destroy_blkgs
+>  blkg_destroy
+>   percpu_ref_kill(&blkg->refcnt)
+>    blkg_release
+>     blkg_free
+>      schedule_work(&blkg->free_work)
+>      // t1 is done
 > 
-> [...]
+> t2: handle t1 from removing device
+> blkcg_deactivate_policy
+>  pd_free_fn
+>  // free parent
+> 				t3: from t1
+> 				blkg_free_workfn
+> 				 pd_free_fn
+> 				 // free child
 
-Applied, thanks!
+As we discussed before, you'd have to order the actual freeing by shifting
+the ref puts into the free_work. If you move `blkg_put(blkg->parent)` and
+`list_del_init(&blkg->q_node)` to blkg_free_workfn() (this will require
+adjustments as these things are used from other places too), the free work
+items will be ordered and the blkg would remain iterable - IOW,
+deactivate_policy would be able to see it allowing the two paths to
+synchronize, right?
 
-[1/3] drbd: split off drbd_buildtag into separate file
-      commit: c058c9c9dcb137f395e1946b0f3595538479b3fd
-[2/3] drbd: drop API_VERSION define
-      commit: a68176e0f7cf1b68a84c3b7c08271af0d3d2e796
-[3/3] drbd: split off drbd_config into separate file
-      commit: 26547cb41a9f459535300275a319681a70cf69fe
+Thanks.
 
-Best regards,
 -- 
-Jens Axboe
-
-
-
+tejun
