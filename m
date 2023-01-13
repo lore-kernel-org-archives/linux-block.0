@@ -2,123 +2,108 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F3CEC677F1
-	for <linux-block@archiver.kernel.org>; Fri, 13 Jan 2023 19:38:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00344C3DA78
+	for <linux-block@archiver.kernel.org>; Fri, 13 Jan 2023 20:44:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230305AbjAMTiD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 13 Jan 2023 14:38:03 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51860 "EHLO
+        id S229585AbjAMUoL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 13 Jan 2023 15:44:11 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58082 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230455AbjAMTha (ORCPT
+        with ESMTP id S229631AbjAMUoK (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 13 Jan 2023 14:37:30 -0500
-Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0D73889BF7
-        for <linux-block@vger.kernel.org>; Fri, 13 Jan 2023 11:33:57 -0800 (PST)
-Received: by mail-pl1-x629.google.com with SMTP id jl4so24416385plb.8
-        for <linux-block@vger.kernel.org>; Fri, 13 Jan 2023 11:33:57 -0800 (PST)
+        Fri, 13 Jan 2023 15:44:10 -0500
+Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6ECBB8793C
+        for <linux-block@vger.kernel.org>; Fri, 13 Jan 2023 12:44:09 -0800 (PST)
+Received: by mail-pj1-x1035.google.com with SMTP id m7-20020a17090a730700b00225ebb9cd01so28114907pjk.3
+        for <linux-block@vger.kernel.org>; Fri, 13 Jan 2023 12:44:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ej+Vbuo8R7RPvMelIEyuS3sxus6so3ykmcpy+hkZfjI=;
-        b=xuXD+FoNlIq0cDf6CN3v3aP+q6vGDuYmmGvqDLXUk86NVkkyui+1mvPjXTeUPtRwIs
-         b3l/djS7z2mDTaM6OQaLgiCH3xsd0IRSmDU6+vdWBuW/gSds65hG5B3QshbxPamvB1zT
-         8Kuv+G1CRNDSCpYUpS+DHv5yrSN5Vt+acP3J/duZ5ddHbs5KNq7rF/QFtlzuSqJOn6NO
-         1ons8l5iQRjL4BJovItDD8EFmSPV2adZEF799sL30+sLpEKooByB5KQmVE17kVOtET94
-         wkMZShpWVnAsZAWgBnftOPwfXmNH6GsRT2WKoHao1ETPhSvPDkV3LrRig/Ie+Hq9W3jM
-         eyMw==
+        bh=wFX1TAztefX49Dlr88yQWueCiK9uug2GKKIgj7SNmgw=;
+        b=t3T7bdFcRj0TMIIRv4lrC1ysO6ZajfDnSWPjuxjJd+Z67qU9yBY0ugR12YXRcDDZfb
+         yxwtc1P88m6Fg+/6USQKKxCzVsFQoZD/MtbG9DRbDTR5xBKx/xgu7ciOHyNwzZmVZi+s
+         ydPfsQJTDM1ncZiqGQ9/l24VlAYJuNoTLRzH9MBWSEYpmXSbp34j2yAS6MFCeLDgeQm8
+         ZNo+3pnPUV0pxPVZBiGOY6ZyoSFOUpg/X3U3pPZpILQgREGmZAzaZqGTKFQIJ/LeFaBH
+         vdFaoek2Uoosyfl7wDUCuHP/3gfWzAhfm662amVz9GYoWPxYoAaWiJoesYH25hvo6SIx
+         b5MQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=ej+Vbuo8R7RPvMelIEyuS3sxus6so3ykmcpy+hkZfjI=;
-        b=G38OeRO9zpu//TSUbWDgP0aFRN9WzcIDI3/PT5KRmiZh2DdkJ3SFWy3u5fRq7vsl58
-         /5NgwMzgW2k/44YOfdo7ax4xKG0bFh7z0nlcqFFtIAHeegkQXMXTyE01ZuPBezgMzflx
-         8SHYuO1gAUeUgHsm6YUaTsaa4/slbUArKmThTaS/nifY65+ja/6YedceTjpVcmPbBUUN
-         u9gXFzqksmVlqoyeRsIlwn8fIbR3xyeMD9SDYvZoyWyfL71GTcNOqrCRWa/+yWgFynAm
-         6VRxgQ+J9VrEUQ+NGOfJBz99qr7ZovE7fx74D6uMpG6vhDvv0k4fcHpY1zhPCA0FY3Ci
-         fbmw==
-X-Gm-Message-State: AFqh2krPJ/Wx0G83ocHT6bl+zdTglDeK2EDjhTaXjNawWn1vvDe4rWrm
-        j7Iq50gTKomh20J2ZlLBIvT4FMpc0j6g6n1+
-X-Google-Smtp-Source: AMrXdXtuRPbcCae1z2rFwIwBoa8PBgFuKtC8kkpc9YU06RIVidkq3bOHygmeZBpR8AUPD4VIZI3AgQ==
-X-Received: by 2002:a17:902:b611:b0:189:f277:3834 with SMTP id b17-20020a170902b61100b00189f2773834mr168681pls.6.1673638429719;
-        Fri, 13 Jan 2023 11:33:49 -0800 (PST)
-Received: from [192.168.1.136] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id u7-20020a17090341c700b00186c3afb49esm14464095ple.209.2023.01.13.11.33.48
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 13 Jan 2023 11:33:49 -0800 (PST)
-Message-ID: <2ccb1b3a-ea42-134c-b906-4a3ecdd6f29b@kernel.dk>
-Date:   Fri, 13 Jan 2023 12:33:48 -0700
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.0
-Content-Language: en-US
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=wFX1TAztefX49Dlr88yQWueCiK9uug2GKKIgj7SNmgw=;
+        b=Ata6cAk5dQ1X54vYhickDSP2A3vho4rBuEuPgpBSvf5sU1GVTFUmsftBPRT0/Y2Z7U
+         CV6ZYU2Nz8Db+5VwaIZR6/Jt9JvpJ9B40MUuQfZprUlF7lc8kYta1025xSRUxeyYkTF3
+         ptpj6RXJfmQeyXlqDc21q6VX4oaP/E3dkYwEw27XvJj8PovnTgZUbc2qNO/qqsZ9RX5/
+         F0o9YO+IM2AAb5hnIp/aYjlDAGqK7U5i6wZf0GSiDTdOmo9SNyDmH33aVCBaWKVhgxou
+         oB9BHMTYgYO2w7q3bfPETTlRn4XG9mdUmbisj5Q79qr6Up2nL4VUhnqBH78BvRFeWAvp
+         QXAg==
+X-Gm-Message-State: AFqh2kqWsbAwUUb179qgH0ywFtWabig5BbrW5oeyq0LuncwQ79WDQ5iA
+        o0gQvMQ26T+Pkb5tAge+DHSOsg==
+X-Google-Smtp-Source: AMrXdXtX0nXp49pBZlB9bSrCFWdMWJXGiP3+ghZrlZ3nXV0E++DXWEHapsnIM08THmpGR7hFMQhz1Q==
+X-Received: by 2002:a17:90a:5416:b0:226:6470:af3d with SMTP id z22-20020a17090a541600b002266470af3dmr10568808pjh.3.1673642648824;
+        Fri, 13 Jan 2023 12:44:08 -0800 (PST)
+Received: from [127.0.0.1] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id lb3-20020a17090b4a4300b0021900ba8eeesm1447661pjb.2.2023.01.13.12.44.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 13 Jan 2023 12:44:08 -0800 (PST)
 From:   Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Block fixes for 6.2-rc4
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+To:     =?utf-8?q?Christoph_B=C3=B6hmwalder?= 
+        <christoph.boehmwalder@linbit.com>
+Cc:     drbd-dev@lists.linbit.com, linux-kernel@vger.kernel.org,
+        Lars Ellenberg <lars.ellenberg@linbit.com>,
+        Philipp Reisner <philipp.reisner@linbit.com>,
+        linux-block@vger.kernel.org
+In-Reply-To: <20230113123538.144276-1-christoph.boehmwalder@linbit.com>
+References: <20230113123538.144276-1-christoph.boehmwalder@linbit.com>
+Subject: Re: [RESEND PATCH 0/8] Miscellaneous DRBD reorganization
+Message-Id: <167364264790.13167.1164501758187135700.b4-ty@kernel.dk>
+Date:   Fri, 13 Jan 2023 13:44:07 -0700
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-Mailer: b4 0.12-dev-78c63
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Linus,
 
-Nothing major in here, just a collection of NVMe fixes and dropping a
-wrong might_sleep() that static checkers tripped over but which isn't
-valid.
+On Fri, 13 Jan 2023 13:35:30 +0100, Christoph Böhmwalder wrote:
+> Some more mostly trivial "alignment patches" to (slowly but surely)
+> move further in the direction of re-upstreaming DRBD.
+> 
+> These should be fairly uncontroversial.
+> 
+> Andreas Gruenbacher (1):
+>   drbd: drbd_insert_interval(): Clarify comment
+> 
+> [...]
 
-Please pull!
+Applied, thanks!
 
+[1/8] drbd: adjust drbd_limits license header
+      commit: f4095e7643c0fd00f1c125388d6d83d60875d489
+[2/8] drbd: fix DRBD_VOLUME_MAX 65535 -> 65534
+      commit: f7fb0227ae90fff4d09d969c353e8a30f2e0edcc
+[3/8] drbd: make limits unsigned
+      commit: 4e5ebce4a5dde36316a78550c9f7b97a9e03302b
+[4/8] drbd: remove unnecessary assignment in vli_encode_bits
+      commit: 93a8026b0d7161597437eb2d87ceac4f194991c4
+[5/8] drbd: remove macros using require_context
+      commit: 00f0c8eccb383782621c74e5bd2ce9b4b8dbad5a
+[6/8] MAINTAINERS: add drbd headers
+      commit: 463afd417b268d18d3c83ec0851e978dd12daaa2
+[7/8] drbd: interval tree: make removing an "empty" interval a no-op
+      commit: 6928e2f7919aa3cd4e31aba5b16f6f212df2bb35
+[8/8] drbd: drbd_insert_interval(): Clarify comment
+      commit: 2b0802d1ac9333d060312b22e9d898614253adcf
 
-The following changes since commit b2b50d572135c5c6e10c2ff79cd828d5a8141ef6:
-
-  block: Remove "select SRCU" (2023-01-05 08:50:10 -0700)
-
-are available in the Git repository at:
-
-  git://git.kernel.dk/linux.git tags/block-6.2-2023-01-13
-
-for you to fetch changes up to 3d25b1e8369273d76f5f2634f164236ba9e40d32:
-
-  Merge tag 'nvme-6.2-2023-01-12' of git://git.infradead.org/nvme into block-6.2 (2023-01-12 10:36:35 -0700)
-
-----------------------------------------------------------------
-block-6.2-2023-01-13
-
-----------------------------------------------------------------
-Christoph Hellwig (3):
-      nvme: remove __nvme_ioctl
-      nvme: replace the "bool vec" arguments with flags in the ioctl path
-      nvme: don't allow unprivileged passthrough on partitions
-
-Hector Martin (2):
-      nvme-apple: add NVME_QUIRK_IDENTIFY_CNS quirk to fix regression
-      nvme-pci: add NVME_QUIRK_IDENTIFY_CNS quirk to Apple T2 controllers
-
-Jens Axboe (1):
-      Merge tag 'nvme-6.2-2023-01-12' of git://git.infradead.org/nvme into block-6.2
-
-Russell King (Oracle) (1):
-      MAINTAINERS: stop nvme matching for nvmem files
-
-Tejun Heo (1):
-      block: Drop spurious might_sleep() from blk_put_queue()
-
-Tong Zhang (1):
-      nvme-pci: fix error handling in nvme_pci_enable()
-
- MAINTAINERS               |   3 +-
- block/blk-core.c          |   3 --
- drivers/nvme/host/apple.c |   2 +-
- drivers/nvme/host/ioctl.c | 110 ++++++++++++++++++++++++++--------------------
- drivers/nvme/host/pci.c   |  12 +++--
- 5 files changed, 75 insertions(+), 55 deletions(-)
-
+Best regards,
 -- 
 Jens Axboe
+
+
 
