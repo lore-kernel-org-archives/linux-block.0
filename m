@@ -2,100 +2,99 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8AC52C61DB3
-	for <linux-block@archiver.kernel.org>; Fri, 13 Jan 2023 13:51:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 255E0C54EBE
+	for <linux-block@archiver.kernel.org>; Fri, 13 Jan 2023 15:51:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241246AbjAMNvN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 13 Jan 2023 08:51:13 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48876 "EHLO
+        id S229527AbjAMPvw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 13 Jan 2023 10:51:52 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39782 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233066AbjAMNup (ORCPT
+        with ESMTP id S229878AbjAMPuW (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 13 Jan 2023 08:50:45 -0500
-X-Greylist: delayed 483 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Fri, 13 Jan 2023 05:46:35 PST
-Received: from mail.itouring.de (mail.itouring.de [IPv6:2a01:4f8:a0:4463::2])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0707F6415
-        for <linux-block@vger.kernel.org>; Fri, 13 Jan 2023 05:46:34 -0800 (PST)
-Received: from tux.applied-asynchrony.com (p5b2e8e20.dip0.t-ipconnect.de [91.46.142.32])
-        by mail.itouring.de (Postfix) with ESMTPSA id 253BDCF1A9D;
-        Fri, 13 Jan 2023 14:38:30 +0100 (CET)
-Received: from [192.168.100.221] (hho.applied-asynchrony.com [192.168.100.221])
-        by tux.applied-asynchrony.com (Postfix) with ESMTP id D848EF01581;
-        Fri, 13 Jan 2023 14:38:29 +0100 (CET)
-Subject: Re: [PATCH] block, bfq: fix uaf for bfqq in bic_set_bfqq()
-To:     Yu Kuai <yukuai3@huawei.com>, Jan Kara <jack@suse.com>,
-        linux-block <linux-block@vger.kernel.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        Paolo Valente <paolo.valente@linaro.org>
-References: <20230113094410.2907223-1-yukuai3@huawei.com>
-From:   =?UTF-8?Q?Holger_Hoffst=c3=a4tte?= <holger@applied-asynchrony.com>
-Organization: Applied Asynchrony, Inc.
-Message-ID: <bab60ee7-b0b7-4e45-40b4-29d77de67372@applied-asynchrony.com>
-Date:   Fri, 13 Jan 2023 14:38:29 +0100
+        Fri, 13 Jan 2023 10:50:22 -0500
+Received: from mail-il1-x131.google.com (mail-il1-x131.google.com [IPv6:2607:f8b0:4864:20::131])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5904883E07
+        for <linux-block@vger.kernel.org>; Fri, 13 Jan 2023 07:43:30 -0800 (PST)
+Received: by mail-il1-x131.google.com with SMTP id x6so6329695ill.10
+        for <linux-block@vger.kernel.org>; Fri, 13 Jan 2023 07:43:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=aMDRFQNMM2p+WOSwQ9Dba5m08/eqZCwGnutuShqS2I0=;
+        b=bGjx8gC+nt5yLHeWJhR7JzVbtjLaL40agjy66eW4Tk8RWtrhc12wcNn6fkhEG6y/jZ
+         6cLWZWJan3dr7e+4w59+lgy7w4UqMn8/VcQcjyA2XFPiw6l3CjNs5ROH9ZgdtVZQ054l
+         AWyM1p0sXu1xbdZIg2jHm+WliH2vi36pirBaH4JXl653dlRY8hOEacTlvv37Qe0KQBVp
+         bQDpPqVMM6bPM9apFNY1dfUiHT8AKyn/laJrmIja8wn3E8R43uky+Fffh/QrEodPu645
+         pGejc3dIerQZjDuPALpaGhI3JcztfmmoziUlHgAh4nzPhnR+AMmfQISrWzN3+k22k0Sk
+         clQg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=aMDRFQNMM2p+WOSwQ9Dba5m08/eqZCwGnutuShqS2I0=;
+        b=FW7Icg76EZ9aX470VZ7ijiyMYRmNBZ+MMUr7zZ0SPytRUlKBgRWvza8Px2L5RMSc08
+         YqbLApooX5qSxraABRStbd1E//Bygy4o7qaHTzeVlBmzQzoRtxstn4+rinDiInsRJdSy
+         rftnIDfNG2eQprmABK8DBZXnI4LMS1boIhaVNZGKZ5r8SgcOWLJGYTeC4pR5asi8i1tJ
+         M2Kd9FuhIsNrwVi0l2c9gnDdDs9aXQnLc7Y6CdWWG8SPFdpc0sVtMrfPFfVboRVZ0TU5
+         EJK4xuE0+bCMmCt3mlVkL26Ibld+fwQezHBy99Eph3FE29a+wrxMHyIjO1n9Er7ZR/Qz
+         qlgw==
+X-Gm-Message-State: AFqh2krgRKXLkKPQRG4EnawCL9tHpxsX75xhHwI1kJSsLuR+kMHi4bMC
+        gRB1K4BpfacOzE6Q8YdTHew8xA==
+X-Google-Smtp-Source: AMrXdXtxFHd2A+4/Ksfx8D+/irZoy4dYAzcM0F/2HZJcXPHxaCnvJignIzh+g3mVFjIGPbgOFqaGLg==
+X-Received: by 2002:a92:b703:0:b0:30c:1dda:42dd with SMTP id k3-20020a92b703000000b0030c1dda42ddmr7873529ili.1.1673624609549;
+        Fri, 13 Jan 2023 07:43:29 -0800 (PST)
+Received: from [127.0.0.1] ([207.135.234.126])
+        by smtp.gmail.com with ESMTPSA id 125-20020a020a83000000b0039dc4d26bd2sm6193106jaw.58.2023.01.13.07.43.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 13 Jan 2023 07:43:29 -0800 (PST)
+From:   Jens Axboe <axboe@kernel.dk>
+To:     =?utf-8?q?Christoph_B=C3=B6hmwalder?= 
+        <christoph.boehmwalder@linbit.com>
+Cc:     drbd-dev@lists.linbit.com, linux-kernel@vger.kernel.org,
+        Lars Ellenberg <lars.ellenberg@linbit.com>,
+        Philipp Reisner <philipp.reisner@linbit.com>,
+        linux-block@vger.kernel.org
+In-Reply-To: <20230113123506.144082-1-christoph.boehmwalder@linbit.com>
+References: <20230113123506.144082-1-christoph.boehmwalder@linbit.com>
+Subject: Re: [RESEND PATCH 0/3] DRBD file structure reorganization
+Message-Id: <167362460873.11790.14664102108857579461.b4-ty@kernel.dk>
+Date:   Fri, 13 Jan 2023 08:43:28 -0700
 MIME-Version: 1.0
-In-Reply-To: <20230113094410.2907223-1-yukuai3@huawei.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-Mailer: b4 0.12-dev-78c63
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2023-01-13 10:44, Yu Kuai wrote:
-> After commit 64dc8c732f5c ("block, bfq: fix possible uaf for 'bfqq->bic'"),
-> bic->bfqq will be accessed in bic_set_bfqq(), however, in some context
-> bic->bfqq will be freed first, and bic_set_bfqq() is called with the freed
-> bic->bfqq.
-> 
-> Fix the problem by always freeing bfqq after bic_set_bfqq().
-> 
-> Fixes: 64dc8c732f5c ("block, bfq: fix possible uaf for 'bfqq->bic'")
-> Reported-and-tested-by: Shinichiro Kawasaki <shinichiro.kawasaki-Sjgp3cTcYWE@public.gmane.org>
-> Signed-off-by: Yu Kuai <yukuai3-hv44wF8Li93QT0dZR+AlfA@public.gmane.org>
-> ---
->   block/bfq-cgroup.c  | 2 +-
->   block/bfq-iosched.c | 4 +++-
->   2 files changed, 4 insertions(+), 2 deletions(-)
-> 
-> diff --git a/block/bfq-cgroup.c b/block/bfq-cgroup.c
-> index a6e8da5f5cfd..feb13ac25557 100644
-> --- a/block/bfq-cgroup.c
-> +++ b/block/bfq-cgroup.c
-> @@ -749,8 +749,8 @@ static void bfq_sync_bfqq_move(struct bfq_data *bfqd,
->   		 * old cgroup.
->   		 */
->   		bfq_put_cooperator(sync_bfqq);
-> -		bfq_release_process_ref(bfqd, sync_bfqq);
->   		bic_set_bfqq(bic, NULL, true, act_idx);
-> +		bfq_release_process_ref(bfqd, sync_bfqq);
->   	}
->   }
->   
-> diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-> index 815b884d6c5a..2ddf831221c4 100644
-> --- a/block/bfq-iosched.c
-> +++ b/block/bfq-iosched.c
-> @@ -5581,9 +5581,11 @@ static void bfq_check_ioprio_change(struct bfq_io_cq *bic, struct bio *bio)
->   
->   	bfqq = bic_to_bfqq(bic, false, bfq_actuator_index(bfqd, bio));
->   	if (bfqq) {
-> -		bfq_release_process_ref(bfqd, bfqq);
-> +		struct bfq_queue *old_bfqq = bfqq;
-> +
->   		bfqq = bfq_get_queue(bfqd, bio, false, bic, true);
->   		bic_set_bfqq(bic, bfqq, false, bfq_actuator_index(bfqd, bio));
-> +		bfq_release_process_ref(bfqd, old_bfqq);
->   	}
->   
->   	bfqq = bic_to_bfqq(bic, true, bfq_actuator_index(bfqd, bio));
-> 
 
-Hello,
+On Fri, 13 Jan 2023 13:35:03 +0100, Christoph Böhmwalder wrote:
+> To make our lives easier when sending future, more complex patches,
+> we want to align the file structure as best as possible with what we
+> have in the out-of-tree module.
+> 
+> Christoph Böhmwalder (3):
+>   drbd: split off drbd_buildtag into separate file
+>   drbd: drop API_VERSION define
+>   drbd: split off drbd_config into separate file
+> 
+> [...]
 
-does this condition also affect the current code? I ask since the patch does not apply
-as bfq_sync_bfqq_move() is only part of the multi-actuator work, which is only in
-Jens' for-next. Comparing the code sections it seems it should also be necessary for
-current 6.1/6.2, but I wanted to check.
+Applied, thanks!
 
-thanks
-Holger
+[1/3] drbd: split off drbd_buildtag into separate file
+      commit: c058c9c9dcb137f395e1946b0f3595538479b3fd
+[2/3] drbd: drop API_VERSION define
+      commit: a68176e0f7cf1b68a84c3b7c08271af0d3d2e796
+[3/3] drbd: split off drbd_config into separate file
+      commit: 26547cb41a9f459535300275a319681a70cf69fe
+
+Best regards,
+-- 
+Jens Axboe
+
+
+
