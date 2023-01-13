@@ -2,102 +2,94 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87470C677F1
-	for <linux-block@archiver.kernel.org>; Fri, 13 Jan 2023 07:59:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 22240C54EBE
+	for <linux-block@archiver.kernel.org>; Fri, 13 Jan 2023 09:27:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240492AbjAMH7V (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 13 Jan 2023 02:59:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45506 "EHLO
+        id S240902AbjAMJ06 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 13 Jan 2023 04:26:58 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53670 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240334AbjAMH7M (ORCPT
+        with ESMTP id S240903AbjAMJZ6 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 13 Jan 2023 02:59:12 -0500
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E2DAB52C55;
-        Thu, 12 Jan 2023 23:59:06 -0800 (PST)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 5BE435F918;
-        Fri, 13 Jan 2023 07:59:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1673596745; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=DCRg2lnR02NQsqYB1GueGRSSozK1REnSUfBjMiZw4ew=;
-        b=Kr8KWv+yLvToYJVIUs80wp8pnOI0i5nHXikt7F4ZrU0HYzOviAyPYpXeJPhY42sBC5zwhG
-        07gDR0q845esLNmwxLAOTI3Rq6sCQMhLN4cmY0SMJk8jIXpIxmWSgjeEAeK9yf2TbvxipH
-        bmuEnFQzwxGESSZAXvfgSKmMdIICDTE=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1673596745;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=DCRg2lnR02NQsqYB1GueGRSSozK1REnSUfBjMiZw4ew=;
-        b=p6Opx1F43iv/kBl3rMtiRIGfqlf6WISSte0ocV8VerdDiad4vSPvmLi3sxwm8XEHrE2m+J
-        USArLACFqEzI1yBQ==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 241D113913;
-        Fri, 13 Jan 2023 07:59:05 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id Ys4oBEkPwWPfRgAAMHmgww
-        (envelope-from <hare@suse.de>); Fri, 13 Jan 2023 07:59:05 +0000
-Message-ID: <6bc61255-d0ca-ffd7-3339-3550dbaaf10d@suse.de>
-Date:   Fri, 13 Jan 2023 08:59:04 +0100
+        Fri, 13 Jan 2023 04:25:58 -0500
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 39A3213DD0;
+        Fri, 13 Jan 2023 01:19:50 -0800 (PST)
+Received: from kwepemm600009.china.huawei.com (unknown [172.30.72.55])
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4NtbNL2NLGzqVHW;
+        Fri, 13 Jan 2023 17:14:58 +0800 (CST)
+Received: from huawei.com (10.175.127.227) by kwepemm600009.china.huawei.com
+ (7.193.23.164) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.34; Fri, 13 Jan
+ 2023 17:19:46 +0800
+From:   Yu Kuai <yukuai3@huawei.com>
+To:     <jack@suse.cz>, <tj@kernel.org>, <josef@toxicpanda.com>,
+        <axboe@kernel.dk>, <paolo.valente@linaro.org>,
+        <shinichiro.kawasaki@wdc.com>, <yukuai3@huawei.com>
+CC:     <cgroups@vger.kernel.org>, <linux-block@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <yukuai1@huaweicloud.com>,
+        <yi.zhang@huawei.com>, <yangerkun@huawei.com>
+Subject: [PATCH] block, bfq: fix uaf for bfqq in bic_set_bfqq()
+Date:   Fri, 13 Jan 2023 17:44:10 +0800
+Message-ID: <20230113094410.2907223-1-yukuai3@huawei.com>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.1
-Subject: Re: [PATCH v2 05/18] scsi: support retrieving sub-pages of mode pages
-Content-Language: en-US
-To:     Niklas Cassel <niklas.cassel@wdc.com>,
-        "James E.J. Bottomley" <jejb@linux.ibm.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>
-Cc:     Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-        linux-scsi@vger.kernel.org, linux-ide@vger.kernel.org,
-        linux-block@vger.kernel.org
-References: <20230112140412.667308-1-niklas.cassel@wdc.com>
- <20230112140412.667308-6-niklas.cassel@wdc.com>
-From:   Hannes Reinecke <hare@suse.de>
-In-Reply-To: <20230112140412.667308-6-niklas.cassel@wdc.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.175.127.227]
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ kwepemm600009.china.huawei.com (7.193.23.164)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/12/23 15:03, Niklas Cassel wrote:
-> From: Damien Le Moal <damien.lemoal@opensource.wdc.com>
-> 
-> Allow scsi_mode_sense() to retrieve sub-pages of mode pages by adding
-> the subpage argument. Change all the current caller sites to specify
-> the subpage 0.
-> 
-> Signed-off-by: Damien Le Moal <damien.lemoal@opensource.wdc.com>
-> Signed-off-by: Niklas Cassel <niklas.cassel@wdc.com>
-> ---
->   drivers/scsi/scsi_lib.c           | 4 +++-
->   drivers/scsi/scsi_transport_sas.c | 2 +-
->   drivers/scsi/sd.c                 | 9 ++++-----
->   drivers/scsi/sr.c                 | 2 +-
->   include/scsi/scsi_device.h        | 5 +++--
->   5 files changed, 12 insertions(+), 10 deletions(-)
-> 
-Reviewed-by: Hannes Reinecke <hare@suse.de>
+After commit 64dc8c732f5c ("block, bfq: fix possible uaf for 'bfqq->bic'"),
+bic->bfqq will be accessed in bic_set_bfqq(), however, in some context
+bic->bfqq will be freed first, and bic_set_bfqq() is called with the freed
+bic->bfqq.
 
-Cheers,
+Fix the problem by always freeing bfqq after bic_set_bfqq().
 
-Hannes
+Fixes: 64dc8c732f5c ("block, bfq: fix possible uaf for 'bfqq->bic'")
+Reported-and-tested-by: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+---
+ block/bfq-cgroup.c  | 2 +-
+ block/bfq-iosched.c | 4 +++-
+ 2 files changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/block/bfq-cgroup.c b/block/bfq-cgroup.c
+index a6e8da5f5cfd..feb13ac25557 100644
+--- a/block/bfq-cgroup.c
++++ b/block/bfq-cgroup.c
+@@ -749,8 +749,8 @@ static void bfq_sync_bfqq_move(struct bfq_data *bfqd,
+ 		 * old cgroup.
+ 		 */
+ 		bfq_put_cooperator(sync_bfqq);
+-		bfq_release_process_ref(bfqd, sync_bfqq);
+ 		bic_set_bfqq(bic, NULL, true, act_idx);
++		bfq_release_process_ref(bfqd, sync_bfqq);
+ 	}
+ }
+ 
+diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+index 815b884d6c5a..2ddf831221c4 100644
+--- a/block/bfq-iosched.c
++++ b/block/bfq-iosched.c
+@@ -5581,9 +5581,11 @@ static void bfq_check_ioprio_change(struct bfq_io_cq *bic, struct bio *bio)
+ 
+ 	bfqq = bic_to_bfqq(bic, false, bfq_actuator_index(bfqd, bio));
+ 	if (bfqq) {
+-		bfq_release_process_ref(bfqd, bfqq);
++		struct bfq_queue *old_bfqq = bfqq;
++
+ 		bfqq = bfq_get_queue(bfqd, bio, false, bic, true);
+ 		bic_set_bfqq(bic, bfqq, false, bfq_actuator_index(bfqd, bio));
++		bfq_release_process_ref(bfqd, old_bfqq);
+ 	}
+ 
+ 	bfqq = bic_to_bfqq(bic, true, bfq_actuator_index(bfqd, bio));
 -- 
-Dr. Hannes Reinecke                Kernel Storage Architect
-hare@suse.de                              +49 911 74053 688
-SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
-HRB 36809 (AG Nürnberg), Geschäftsführer: Ivo Totev, Andrew
-Myers, Andrew McDonald, Martje Boudien Moerman
+2.31.1
 
