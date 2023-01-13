@@ -2,103 +2,97 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 925B4C61DB3
-	for <linux-block@archiver.kernel.org>; Fri, 13 Jan 2023 12:08:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 08A15C54EBE
+	for <linux-block@archiver.kernel.org>; Fri, 13 Jan 2023 12:43:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230079AbjAMMIw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 13 Jan 2023 07:08:52 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45188 "EHLO
+        id S241757AbjAMMnc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 13 Jan 2023 07:43:32 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52952 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231287AbjAMMHi (ORCPT
+        with ESMTP id S241704AbjAMMnF (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 13 Jan 2023 07:07:38 -0500
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6904B1E;
-        Fri, 13 Jan 2023 03:59:44 -0800 (PST)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 86E2560342;
-        Fri, 13 Jan 2023 11:59:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1673611182; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=tdXhu25xCaoKfctj+4QtD3EmAFz1me/AClgm10945/k=;
-        b=rK2KIDCTgkeR9lOjHcikY/Q0bTXdRfxMGRcx/y0uNFPCzQYHSqu7bO0ZcQgeV0ShpbssBZ
-        ov7akNm8OxwFDKc0ZP1/ran8gk/G6g5SMzzPbIoxbc1VJ5yr+7oRFgOxT0lCelOeUHgCi9
-        yR08UffuO7sEOaly74lEW2/1y99Hw8c=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1673611182;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=tdXhu25xCaoKfctj+4QtD3EmAFz1me/AClgm10945/k=;
-        b=cNeQRMuQ9ihp730yambyUzODdYOQFJnBdf8g/GxQdPtMLIdfRG3pC5Hkh5flhYCB+3glCd
-        TmUukWzx0b/Wx0DA==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 7A4631358A;
-        Fri, 13 Jan 2023 11:59:42 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id 45WhHa5HwWMzRgAAMHmgww
-        (envelope-from <hare@suse.de>); Fri, 13 Jan 2023 11:59:42 +0000
-Message-ID: <f69a38ff-871c-dea7-c9e9-c075e2f74993@suse.de>
-Date:   Fri, 13 Jan 2023 12:59:42 +0100
+        Fri, 13 Jan 2023 07:43:05 -0500
+Received: from mail-ej1-x634.google.com (mail-ej1-x634.google.com [IPv6:2a00:1450:4864:20::634])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 89B6D8793B
+        for <linux-block@vger.kernel.org>; Fri, 13 Jan 2023 04:35:46 -0800 (PST)
+Received: by mail-ej1-x634.google.com with SMTP id mp20so5393352ejc.7
+        for <linux-block@vger.kernel.org>; Fri, 13 Jan 2023 04:35:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linbit-com.20210112.gappssmtp.com; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=NGS8p58llTH0j/JtmBIf8IcqQNNb3dOfgpZWMO+4qxc=;
+        b=G5XERQe1fAt3Kb9rlbCJGlE/89ixGm3qrHLrpxM52o9W/0TyCmxSK8KQYB+DUYZTCl
+         AY4qBORSFTisRda10PDMY+5R4iuPQsg9ejNoGN0oAsC0KmmDTingntoX093fWxIcrj+l
+         UCE5EExAVjAxNtM0FNgYMtoLw/XQgmXjT6fiMaAgJz92EOyw+9QhW40mYzZl3TtoVTnG
+         xTq+RBQHqeDUbXoAayRw0mInjrPtl8dXWHZBcCLRPNTqRIel4A3i1BVADEN1KuHalqpG
+         rDbDh9YTvY3a008v1wbhhbnxzKGt+Z/U9hhC072Jib9MCA5BUVcpEzd1sOxgmJ3eCboL
+         /rog==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=NGS8p58llTH0j/JtmBIf8IcqQNNb3dOfgpZWMO+4qxc=;
+        b=MzvN3bj6W6yfL43DHPeAbpEh9qzmTjONtvAVhJJShYsbg+H3rOoTbwxTgSqhT7tXoO
+         4KORXYc/PoyJH7uCdW2/HDc5ihpc70N33bV9nxQ+7NqjyEboODEeUED3AX8v0BItVp4u
+         hEKeW0z55wWQ6+n3VaCuB4B1c+DRHBm0GbTbOcKLapBupplzb1xapWC8lTT8CTgn3oFN
+         yDWF1Dsf9d3rso04BmB0wIYWOhTWqnzbBrnT2AULITmj1KZ4OAKYMduU6Nukr6ClxpLm
+         l37XQtTUrAAr/KKkQVrQIVK2SgwTTLkAoq7OKPvMoNEeqWY3q7LNEvHY42+YGzahDIEL
+         WhBg==
+X-Gm-Message-State: AFqh2kpaIgkMJJ2dYrwyI/PIxs8z66JjJZRKnOjAtylr0sQRDEADEjH9
+        5L/CFqikXBRao821f+yRXsntsgwShDnNWH6nDcg=
+X-Google-Smtp-Source: AMrXdXt9Y/gN9hPS5KrmX/hHe2LMLmsSTU6vMBSp1QqWDvsKO+j0a8BW8SZ67KSgwDQIo/CICV+jqA==
+X-Received: by 2002:a17:906:a18c:b0:7c1:5467:39b1 with SMTP id s12-20020a170906a18c00b007c1546739b1mr70848155ejy.72.1673613318750;
+        Fri, 13 Jan 2023 04:35:18 -0800 (PST)
+Received: from localhost.localdomain (h082218028181.host.wavenet.at. [82.218.28.181])
+        by smtp.gmail.com with ESMTPSA id 18-20020a170906201200b00846734faa9asm8386323ejo.164.2023.01.13.04.35.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 13 Jan 2023 04:35:18 -0800 (PST)
+From:   =?UTF-8?q?Christoph=20B=C3=B6hmwalder?= 
+        <christoph.boehmwalder@linbit.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     drbd-dev@lists.linbit.com, linux-kernel@vger.kernel.org,
+        Lars Ellenberg <lars.ellenberg@linbit.com>,
+        Philipp Reisner <philipp.reisner@linbit.com>,
+        linux-block@vger.kernel.org,
+        =?UTF-8?q?Christoph=20B=C3=B6hmwalder?= 
+        <christoph.boehmwalder@linbit.com>
+Subject: [RESEND PATCH 0/3] DRBD file structure reorganization
+Date:   Fri, 13 Jan 2023 13:35:03 +0100
+Message-Id: <20230113123506.144082-1-christoph.boehmwalder@linbit.com>
+X-Mailer: git-send-email 2.38.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.1
-Subject: Re: [PATCH v2 09/18] ata: libata: detect support for command duration
- limits
-Content-Language: en-US
-To:     Niklas Cassel <niklas.cassel@wdc.com>,
-        Damien Le Moal <damien.lemoal@opensource.wdc.com>
-Cc:     linux-scsi@vger.kernel.org, linux-ide@vger.kernel.org,
-        linux-block@vger.kernel.org
-References: <20230112140412.667308-1-niklas.cassel@wdc.com>
- <20230112140412.667308-10-niklas.cassel@wdc.com>
-From:   Hannes Reinecke <hare@suse.de>
-In-Reply-To: <20230112140412.667308-10-niklas.cassel@wdc.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/12/23 15:03, Niklas Cassel wrote:
-> From: Damien Le Moal <damien.lemoal@opensource.wdc.com>
-> 
-> Use the supported capabilities identify device data log page to detect
-> if a device supports the command duration limits feature. For devices
-> supporting this feature, set the device flag ATA_DFLAG_CDL. To support
-> scsi-ata translation, retrieve the command duration limits log page 18h
-> and cache this page content using the cdl array added to the ata_device
-> data structure.
-> 
-> Signed-off-by: Damien Le Moal <damien.lemoal@opensource.wdc.com>
-> Co-developed-by: Niklas Cassel <niklas.cassel@wdc.com>
-> Signed-off-by: Niklas Cassel <niklas.cassel@wdc.com>
-> ---
->   drivers/ata/libata-core.c | 52 ++++++++++++++++++++++++++++++++++++++-
->   drivers/ata/libata-scsi.c | 17 ++++++-------
->   include/linux/ata.h       |  5 +++-
->   include/linux/libata.h    | 29 +++++++++++++---------
->   4 files changed, 80 insertions(+), 23 deletions(-)
-> 
-Reviewed-by: Hannes Reinecke <hare@suse.de>
+To make our lives easier when sending future, more complex patches,
+we want to align the file structure as best as possible with what we
+have in the out-of-tree module.
 
-Cheers,
+Christoph Böhmwalder (3):
+  drbd: split off drbd_buildtag into separate file
+  drbd: drop API_VERSION define
+  drbd: split off drbd_config into separate file
 
-Hannes
+ drivers/block/drbd/Makefile        |  2 +-
+ drivers/block/drbd/drbd_buildtag.c | 22 ++++++++++++++++++++++
+ drivers/block/drbd/drbd_debugfs.c  |  2 +-
+ drivers/block/drbd/drbd_int.h      |  1 +
+ drivers/block/drbd/drbd_main.c     | 20 +-------------------
+ drivers/block/drbd/drbd_proc.c     |  2 +-
+ include/linux/drbd.h               |  7 -------
+ include/linux/drbd_config.h        | 16 ++++++++++++++++
+ include/linux/drbd_genl_api.h      |  2 +-
+ 9 files changed, 44 insertions(+), 30 deletions(-)
+ create mode 100644 drivers/block/drbd/drbd_buildtag.c
+ create mode 100644 include/linux/drbd_config.h
+
+
+base-commit: f596da3efaf4130ff61cd029558845808df9bf99
 -- 
-Dr. Hannes Reinecke		           Kernel Storage Architect
-hare@suse.de			                  +49 911 74053 688
-SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 Nürnberg
-HRB 36809 (AG Nürnberg), GF: Felix Imendörffer
+2.38.1
 
