@@ -2,115 +2,123 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FD0CC54EBE
-	for <linux-block@archiver.kernel.org>; Fri, 13 Jan 2023 17:28:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F3CEC677F1
+	for <linux-block@archiver.kernel.org>; Fri, 13 Jan 2023 19:38:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230087AbjAMR2Q (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 13 Jan 2023 12:28:16 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38840 "EHLO
+        id S230305AbjAMTiD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 13 Jan 2023 14:38:03 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51860 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229825AbjAMR1h (ORCPT
+        with ESMTP id S230455AbjAMTha (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 13 Jan 2023 12:27:37 -0500
-Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80F71820DC;
-        Fri, 13 Jan 2023 09:16:16 -0800 (PST)
-Received: by mail-pj1-x1033.google.com with SMTP id q64so23037933pjq.4;
-        Fri, 13 Jan 2023 09:16:16 -0800 (PST)
+        Fri, 13 Jan 2023 14:37:30 -0500
+Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0D73889BF7
+        for <linux-block@vger.kernel.org>; Fri, 13 Jan 2023 11:33:57 -0800 (PST)
+Received: by mail-pl1-x629.google.com with SMTP id jl4so24416385plb.8
+        for <linux-block@vger.kernel.org>; Fri, 13 Jan 2023 11:33:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=52MNpdUJgF3+oIlWggDDfrxPPD9Ztp6sCT03jqLjxgI=;
-        b=qoUH+lwlmFLafVPNtyZsi5g+/lFmY4VRICVR8nxpfZhir2UA9+ZTFVSHv+aWHGONgc
-         prVifwhDZCRV7oQCr4MZQ5QVlmQFFdwuzZLzjKHmn4QCNEXbKj7Cy0Fdsv86hLM5l/pi
-         oT7ITQFfR39idU7/bOxREINUvmmagDFYP136gv8nIIUarzMSDfpAK54f5xmEWMH88iEj
-         X2gTJ4rdxMOuLkRlsUeaLFdN/vX01WRDAfvjOsO2FkaL/sN5xX3K039opZjKA08lXh8E
-         vcQ7X2mwFgpX7DvPYjhRZ5d+/IAt+3QxtgfHvI3o/dEEvRQw2nigPv6L/aUng/Kf9Rlp
-         fExA==
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ej+Vbuo8R7RPvMelIEyuS3sxus6so3ykmcpy+hkZfjI=;
+        b=xuXD+FoNlIq0cDf6CN3v3aP+q6vGDuYmmGvqDLXUk86NVkkyui+1mvPjXTeUPtRwIs
+         b3l/djS7z2mDTaM6OQaLgiCH3xsd0IRSmDU6+vdWBuW/gSds65hG5B3QshbxPamvB1zT
+         8Kuv+G1CRNDSCpYUpS+DHv5yrSN5Vt+acP3J/duZ5ddHbs5KNq7rF/QFtlzuSqJOn6NO
+         1ons8l5iQRjL4BJovItDD8EFmSPV2adZEF799sL30+sLpEKooByB5KQmVE17kVOtET94
+         wkMZShpWVnAsZAWgBnftOPwfXmNH6GsRT2WKoHao1ETPhSvPDkV3LrRig/Ie+Hq9W3jM
+         eyMw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=52MNpdUJgF3+oIlWggDDfrxPPD9Ztp6sCT03jqLjxgI=;
-        b=H/FNNin8ThBdeltrsi+mMuuQ+blU68a32o+ZbbOr63olGLcbdEILiMTJ/osYuRa7hf
-         hnv7H6x0rrNB1LSwb54L0DnyxC4nu9Ws+wLM163jsw9sapVAfzcl2kIFWQ9gNqw3wHX6
-         nOGNxA3b4Ih8jwrWfQoUbXiuxnVHzxyDq8qGlSzolryq509+kZcaB/gwUi3rsp9Ov00E
-         sLC8LauX6YyfW/VD0sZb6z2YhE/95m4Lop0ufc4G0GbjW7r2ywYThWYbjqSoXZE3FFH5
-         WF+TjXPfUTJ/AxQdLbCVGLJMLRB60b/EhH7R4xetZT4qGcqLNSniZhARB8J6UfdZt3v4
-         ihMg==
-X-Gm-Message-State: AFqh2kokLCtnDAi8n3IgcqXwp+hjWP/A8NwEh/mVyGTAf/xXwpDgYnBe
-        J61iMsG4JWb+6pyvenQchYEA8cfS/7s=
-X-Google-Smtp-Source: AMrXdXsOb1/cz5idjSPHBBq+vj1mwFSPSnXMu9ltctsJRZDrbkxp8zVi6idyzHv+1TBw3SupYD9W2w==
-X-Received: by 2002:a17:90a:9a89:b0:229:306b:6111 with SMTP id e9-20020a17090a9a8900b00229306b6111mr2039192pjp.20.1673630175811;
-        Fri, 13 Jan 2023 09:16:15 -0800 (PST)
-Received: from localhost (2603-800c-1a02-1bae-a7fa-157f-969a-4cde.res6.spectrum.com. [2603:800c:1a02:1bae:a7fa:157f:969a:4cde])
-        by smtp.gmail.com with ESMTPSA id z15-20020a17090a608f00b00225d7c0dc14sm14586012pji.28.2023.01.13.09.16.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 13 Jan 2023 09:16:15 -0800 (PST)
-Sender: Tejun Heo <htejun@gmail.com>
-Date:   Fri, 13 Jan 2023 07:16:13 -1000
-From:   Tejun Heo <tj@kernel.org>
-To:     Yu Kuai <yukuai1@huaweicloud.com>
-Cc:     hch@infradead.org, josef@toxicpanda.com, axboe@kernel.dk,
-        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, yi.zhang@huawei.com,
-        "yukuai (C)" <yukuai3@huawei.com>
-Subject: Re: [PATCH v2 1/2] blk-iocost: add refcounting for iocg
-Message-ID: <Y8GR3V3RsdS+XYzh@slm.duckdns.org>
-References: <Y7xbpidpq7+DqJan@slm.duckdns.org>
- <a71f997f-6cae-d57b-85dd-2fd499d238f6@huaweicloud.com>
- <Y72wF/b0/xNRmP7f@slm.duckdns.org>
- <53b30ac8-d608-ba0b-8b1b-7fe5cfed6d61@huaweicloud.com>
- <Y77s0f741mFfGlTO@slm.duckdns.org>
- <4aeef320-c6c8-d9b4-8826-d58f00ea6264@huaweicloud.com>
- <Y8CrloCDGhbU42OH@slm.duckdns.org>
- <efa1c73b-e94f-373f-e535-2cfc32ce2433@huaweicloud.com>
- <Y8CwwghZ0adMsHFC@slm.duckdns.org>
- <ac95dfb8-b1b6-8916-bde8-1edb573e7ca5@huaweicloud.com>
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=ej+Vbuo8R7RPvMelIEyuS3sxus6so3ykmcpy+hkZfjI=;
+        b=G38OeRO9zpu//TSUbWDgP0aFRN9WzcIDI3/PT5KRmiZh2DdkJ3SFWy3u5fRq7vsl58
+         /5NgwMzgW2k/44YOfdo7ax4xKG0bFh7z0nlcqFFtIAHeegkQXMXTyE01ZuPBezgMzflx
+         8SHYuO1gAUeUgHsm6YUaTsaa4/slbUArKmThTaS/nifY65+ja/6YedceTjpVcmPbBUUN
+         u9gXFzqksmVlqoyeRsIlwn8fIbR3xyeMD9SDYvZoyWyfL71GTcNOqrCRWa/+yWgFynAm
+         6VRxgQ+J9VrEUQ+NGOfJBz99qr7ZovE7fx74D6uMpG6vhDvv0k4fcHpY1zhPCA0FY3Ci
+         fbmw==
+X-Gm-Message-State: AFqh2krPJ/Wx0G83ocHT6bl+zdTglDeK2EDjhTaXjNawWn1vvDe4rWrm
+        j7Iq50gTKomh20J2ZlLBIvT4FMpc0j6g6n1+
+X-Google-Smtp-Source: AMrXdXtuRPbcCae1z2rFwIwBoa8PBgFuKtC8kkpc9YU06RIVidkq3bOHygmeZBpR8AUPD4VIZI3AgQ==
+X-Received: by 2002:a17:902:b611:b0:189:f277:3834 with SMTP id b17-20020a170902b61100b00189f2773834mr168681pls.6.1673638429719;
+        Fri, 13 Jan 2023 11:33:49 -0800 (PST)
+Received: from [192.168.1.136] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id u7-20020a17090341c700b00186c3afb49esm14464095ple.209.2023.01.13.11.33.48
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 13 Jan 2023 11:33:49 -0800 (PST)
+Message-ID: <2ccb1b3a-ea42-134c-b906-4a3ecdd6f29b@kernel.dk>
+Date:   Fri, 13 Jan 2023 12:33:48 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ac95dfb8-b1b6-8916-bde8-1edb573e7ca5@huaweicloud.com>
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
+ Thunderbird/102.6.0
+Content-Language: en-US
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From:   Jens Axboe <axboe@kernel.dk>
+Subject: [GIT PULL] Block fixes for 6.2-rc4
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
+Hi Linus,
 
-On Fri, Jan 13, 2023 at 09:25:11AM +0800, Yu Kuai wrote:
-> I think hold the lock in blkg_free_workfn() is too late, pd_free_fn()
-> for parent from blkcg_deactivate_policy() can be called first.
-> 
-> t1: remove cgroup t1/t2
-> blkcg_destroy_blkgs
->  blkg_destroy
->   percpu_ref_kill(&blkg->refcnt)
->    blkg_release
->     blkg_free
->      schedule_work(&blkg->free_work)
->      // t1 is done
-> 
-> t2: handle t1 from removing device
-> blkcg_deactivate_policy
->  pd_free_fn
->  // free parent
-> 				t3: from t1
-> 				blkg_free_workfn
-> 				 pd_free_fn
-> 				 // free child
+Nothing major in here, just a collection of NVMe fixes and dropping a
+wrong might_sleep() that static checkers tripped over but which isn't
+valid.
 
-As we discussed before, you'd have to order the actual freeing by shifting
-the ref puts into the free_work. If you move `blkg_put(blkg->parent)` and
-`list_del_init(&blkg->q_node)` to blkg_free_workfn() (this will require
-adjustments as these things are used from other places too), the free work
-items will be ordered and the blkg would remain iterable - IOW,
-deactivate_policy would be able to see it allowing the two paths to
-synchronize, right?
+Please pull!
 
-Thanks.
+
+The following changes since commit b2b50d572135c5c6e10c2ff79cd828d5a8141ef6:
+
+  block: Remove "select SRCU" (2023-01-05 08:50:10 -0700)
+
+are available in the Git repository at:
+
+  git://git.kernel.dk/linux.git tags/block-6.2-2023-01-13
+
+for you to fetch changes up to 3d25b1e8369273d76f5f2634f164236ba9e40d32:
+
+  Merge tag 'nvme-6.2-2023-01-12' of git://git.infradead.org/nvme into block-6.2 (2023-01-12 10:36:35 -0700)
+
+----------------------------------------------------------------
+block-6.2-2023-01-13
+
+----------------------------------------------------------------
+Christoph Hellwig (3):
+      nvme: remove __nvme_ioctl
+      nvme: replace the "bool vec" arguments with flags in the ioctl path
+      nvme: don't allow unprivileged passthrough on partitions
+
+Hector Martin (2):
+      nvme-apple: add NVME_QUIRK_IDENTIFY_CNS quirk to fix regression
+      nvme-pci: add NVME_QUIRK_IDENTIFY_CNS quirk to Apple T2 controllers
+
+Jens Axboe (1):
+      Merge tag 'nvme-6.2-2023-01-12' of git://git.infradead.org/nvme into block-6.2
+
+Russell King (Oracle) (1):
+      MAINTAINERS: stop nvme matching for nvmem files
+
+Tejun Heo (1):
+      block: Drop spurious might_sleep() from blk_put_queue()
+
+Tong Zhang (1):
+      nvme-pci: fix error handling in nvme_pci_enable()
+
+ MAINTAINERS               |   3 +-
+ block/blk-core.c          |   3 --
+ drivers/nvme/host/apple.c |   2 +-
+ drivers/nvme/host/ioctl.c | 110 ++++++++++++++++++++++++++--------------------
+ drivers/nvme/host/pci.c   |  12 +++--
+ 5 files changed, 75 insertions(+), 55 deletions(-)
 
 -- 
-tejun
+Jens Axboe
+
