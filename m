@@ -2,90 +2,100 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CC76C54EBE
-	for <linux-block@archiver.kernel.org>; Fri, 13 Jan 2023 13:39:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8AC52C61DB3
+	for <linux-block@archiver.kernel.org>; Fri, 13 Jan 2023 13:51:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241525AbjAMNjW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 13 Jan 2023 08:39:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41198 "EHLO
+        id S241246AbjAMNvN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 13 Jan 2023 08:51:13 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48876 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241828AbjAMNil (ORCPT
+        with ESMTP id S233066AbjAMNup (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 13 Jan 2023 08:38:41 -0500
-Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4FB3B10C1;
-        Fri, 13 Jan 2023 05:33:30 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1673616810; x=1705152810;
-  h=from:to:cc:subject:in-reply-to:references:date:
-   message-id:mime-version;
-  bh=SIimS6dlFX7jkCJ504BScuOul7TISPli5vt+Yekfd2g=;
-  b=JWqMAXaI3NY0NUrLwAfgHteNbeUosSi9422ea7XNGO4HvafBN6G8IUci
-   Tz6SonHdvmmseG03Df+B1a1WhRVd+UnYs92xoGf5LWwl9bkc0E1eSlZjZ
-   2GN2u06a+fWZD1aobmavS2IK0OxZYunczGFlq/k+pa4DfZ5IUAurveZrO
-   mWQbglwK1ZQ1n/PinYgWdUUKZcbZZRuNFfmN00+rgrqQholH08WjiDaKo
-   yA+8l2oj1yg2W7krbwHY2M1CjWjxAqfi9SplyZ+mLA9PslisIFrRspMYD
-   a8toEbJPgomuMgcKIkd8nb2JnUE6gPuWgkPd3ME+soWR1XwxuzBzDIKrW
-   g==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10588"; a="351224602"
-X-IronPort-AV: E=Sophos;i="5.97,214,1669104000"; 
-   d="scan'208";a="351224602"
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jan 2023 05:33:29 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10588"; a="903572429"
-X-IronPort-AV: E=Sophos;i="5.97,214,1669104000"; 
-   d="scan'208";a="903572429"
-Received: from ubik.fi.intel.com (HELO localhost) ([10.237.72.184])
-  by fmsmga006.fm.intel.com with ESMTP; 13 Jan 2023 05:33:23 -0800
-From:   Alexander Shishkin <alexander.shishkin@linux.intel.com>
-To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        linux-kernel@vger.kernel.org
-Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Fri, 13 Jan 2023 08:50:45 -0500
+X-Greylist: delayed 483 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Fri, 13 Jan 2023 05:46:35 PST
+Received: from mail.itouring.de (mail.itouring.de [IPv6:2a01:4f8:a0:4463::2])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0707F6415
+        for <linux-block@vger.kernel.org>; Fri, 13 Jan 2023 05:46:34 -0800 (PST)
+Received: from tux.applied-asynchrony.com (p5b2e8e20.dip0.t-ipconnect.de [91.46.142.32])
+        by mail.itouring.de (Postfix) with ESMTPSA id 253BDCF1A9D;
+        Fri, 13 Jan 2023 14:38:30 +0100 (CET)
+Received: from [192.168.100.221] (hho.applied-asynchrony.com [192.168.100.221])
+        by tux.applied-asynchrony.com (Postfix) with ESMTP id D848EF01581;
+        Fri, 13 Jan 2023 14:38:29 +0100 (CET)
+Subject: Re: [PATCH] block, bfq: fix uaf for bfqq in bic_set_bfqq()
+To:     Yu Kuai <yukuai3@huawei.com>, Jan Kara <jack@suse.com>,
+        linux-block <linux-block@vger.kernel.org>,
         Jens Axboe <axboe@kernel.dk>,
-        Alison Schofield <alison.schofield@intel.com>,
-        Vishal Verma <vishal.l.verma@intel.com>,
-        Ira Weiny <ira.weiny@intel.com>,
-        Ben Widawsky <bwidawsk@kernel.org>,
-        Jeremy Kerr <jk@ozlabs.org>, Joel Stanley <joel@jms.id.au>,
-        Alistar Popple <alistair@popple.id.au>,
-        Eddie James <eajames@linux.ibm.com>,
-        Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-        Jilin Yuan <yuanjilin@cdjrlc.com>,
-        Heikki Krogerus <heikki.krogerus@linux.intel.com>,
-        Alan Stern <stern@rowland.harvard.edu>,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
-        Won Chung <wonchung@google.com>, linux-block@vger.kernel.org,
-        linux-cxl@vger.kernel.org, linux-fsi@lists.ozlabs.org,
-        linux-usb@vger.kernel.org, Dan Williams <dan.j.williams@intel.com>,
-        alexander.shishkin@linux.intel.com
-Subject: Re: [PATCH v2 06/16] driver core: make struct device_type.devnode()
- take a const *
-In-Reply-To: <20230111113018.459199-7-gregkh@linuxfoundation.org>
-References: <20230111113018.459199-1-gregkh@linuxfoundation.org>
- <20230111113018.459199-7-gregkh@linuxfoundation.org>
-Date:   Fri, 13 Jan 2023 15:33:16 +0200
-Message-ID: <877cxqsgo3.fsf@ubik.fi.intel.com>
+        Paolo Valente <paolo.valente@linaro.org>
+References: <20230113094410.2907223-1-yukuai3@huawei.com>
+From:   =?UTF-8?Q?Holger_Hoffst=c3=a4tte?= <holger@applied-asynchrony.com>
+Organization: Applied Asynchrony, Inc.
+Message-ID: <bab60ee7-b0b7-4e45-40b4-29d77de67372@applied-asynchrony.com>
+Date:   Fri, 13 Jan 2023 14:38:29 +0100
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <20230113094410.2907223-1-yukuai3@huawei.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Greg Kroah-Hartman <gregkh@linuxfoundation.org> writes:
+On 2023-01-13 10:44, Yu Kuai wrote:
+> After commit 64dc8c732f5c ("block, bfq: fix possible uaf for 'bfqq->bic'"),
+> bic->bfqq will be accessed in bic_set_bfqq(), however, in some context
+> bic->bfqq will be freed first, and bic_set_bfqq() is called with the freed
+> bic->bfqq.
+> 
+> Fix the problem by always freeing bfqq after bic_set_bfqq().
+> 
+> Fixes: 64dc8c732f5c ("block, bfq: fix possible uaf for 'bfqq->bic'")
+> Reported-and-tested-by: Shinichiro Kawasaki <shinichiro.kawasaki-Sjgp3cTcYWE@public.gmane.org>
+> Signed-off-by: Yu Kuai <yukuai3-hv44wF8Li93QT0dZR+AlfA@public.gmane.org>
+> ---
+>   block/bfq-cgroup.c  | 2 +-
+>   block/bfq-iosched.c | 4 +++-
+>   2 files changed, 4 insertions(+), 2 deletions(-)
+> 
+> diff --git a/block/bfq-cgroup.c b/block/bfq-cgroup.c
+> index a6e8da5f5cfd..feb13ac25557 100644
+> --- a/block/bfq-cgroup.c
+> +++ b/block/bfq-cgroup.c
+> @@ -749,8 +749,8 @@ static void bfq_sync_bfqq_move(struct bfq_data *bfqd,
+>   		 * old cgroup.
+>   		 */
+>   		bfq_put_cooperator(sync_bfqq);
+> -		bfq_release_process_ref(bfqd, sync_bfqq);
+>   		bic_set_bfqq(bic, NULL, true, act_idx);
+> +		bfq_release_process_ref(bfqd, sync_bfqq);
+>   	}
+>   }
+>   
+> diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+> index 815b884d6c5a..2ddf831221c4 100644
+> --- a/block/bfq-iosched.c
+> +++ b/block/bfq-iosched.c
+> @@ -5581,9 +5581,11 @@ static void bfq_check_ioprio_change(struct bfq_io_cq *bic, struct bio *bio)
+>   
+>   	bfqq = bic_to_bfqq(bic, false, bfq_actuator_index(bfqd, bio));
+>   	if (bfqq) {
+> -		bfq_release_process_ref(bfqd, bfqq);
+> +		struct bfq_queue *old_bfqq = bfqq;
+> +
+>   		bfqq = bfq_get_queue(bfqd, bio, false, bic, true);
+>   		bic_set_bfqq(bic, bfqq, false, bfq_actuator_index(bfqd, bio));
+> +		bfq_release_process_ref(bfqd, old_bfqq);
+>   	}
+>   
+>   	bfqq = bic_to_bfqq(bic, true, bfq_actuator_index(bfqd, bio));
+> 
 
-> The devnode() callback in struct device_type should not be modifying the
-> device that is passed into it, so mark it as a const * and propagate the
-> function signature changes out into all relevant subsystems that use
-> this callback.
+Hello,
 
-For the intel-th bit:
-Acked-by: Alexander Shishkin <alexander.shishkin@linux.intel.com>
+does this condition also affect the current code? I ask since the patch does not apply
+as bfq_sync_bfqq_move() is only part of the multi-actuator work, which is only in
+Jens' for-next. Comparing the code sections it seems it should also be necessary for
+current 6.1/6.2, but I wanted to check.
 
-Thanks,
---
-Alex
+thanks
+Holger
