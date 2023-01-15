@@ -2,89 +2,98 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C227C677F1
-	for <linux-block@archiver.kernel.org>; Sun, 15 Jan 2023 07:56:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E990EC3DA78
+	for <linux-block@archiver.kernel.org>; Sun, 15 Jan 2023 08:04:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229719AbjAOH4H (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 15 Jan 2023 02:56:07 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59692 "EHLO
+        id S229952AbjAOIEm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 15 Jan 2023 03:04:42 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60306 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229752AbjAOH4G (ORCPT
+        with ESMTP id S229890AbjAOIEl (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 15 Jan 2023 02:56:06 -0500
-Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A67E44B1
-        for <linux-block@vger.kernel.org>; Sat, 14 Jan 2023 23:56:03 -0800 (PST)
-Received: by mail-pf1-x42a.google.com with SMTP id g205so1851086pfb.6
-        for <linux-block@vger.kernel.org>; Sat, 14 Jan 2023 23:56:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=solid-run-com.20210112.gappssmtp.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=7mPR+tYk06dWyheXQlcDvaKFF6VE45BY4pbiBRMyTf0=;
-        b=3NkR14+qMITtW5c/bhsV3TZxEqserp/0VOuYZNP4g42CclG/xB4agcQEBFDlmIceTy
-         Dnb+Gl8ZEbazw6K9BfxSDP353kv8wFoCOzjafOmUpIbb4bA7nygi/+rMVSO+5njloKYR
-         CozVxIQlSZAJd9UjP1d+cle8o4s32xooYBqoBz9VDUN4Kv2V66W4gZ/lzxrzL1gZJnQp
-         K0Y17q39OljeeFaoVglpyHwGXhK4Mt6LJ+78vfLmrPrS6m4q6R7Fp2b5nvw978ioGuYa
-         DvfLxm5eVIN11nZKAUWWpvXXHr/Z67Zvf6tZ92vL3945LZ7OFwpYeJ/q/rEZb0zOV70O
-         U5bg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=7mPR+tYk06dWyheXQlcDvaKFF6VE45BY4pbiBRMyTf0=;
-        b=xWIbMEI/39GjrOcvsInH2OyD12+BgD2n5BcZWxkwNsxwAKKJUSTszkzLrg0Pe3yUM3
-         HIHHb7cpGPgu0f2H9aB/gaa3KKkqIdnjklfdUGlxvqr0BTquSfDftCRDCb5QYdRXoeLn
-         xBNdZ1VUS7SlUvWgaBWwWOZK8ubYvcKnoM2JYbXl/MigxZ8LnaY61FaeE9gAbG0Dbazu
-         x+TJ0hukO0LNIoIfYDVIjvRC7HN05toCW0mJ4e+rUloGYRmaxvOWr1DJc7v+J4IbS0Hs
-         HJbgM7E6EU6WX1ck3b8vCMdlxue7L4QR3C9zG26d4aDdv8f0BKIl1ckpjQkIxRjX6JND
-         PGPg==
-X-Gm-Message-State: AFqh2kp4y6dhE7d1EWwyYtGV8zXaoBBk+irF9HsLS8rhK5CNRqfroU9g
-        n+mK7NMmSf9tIcz8zIunyJHC8XmF3EYM31dQ5iouETazxAvThYdN
-X-Google-Smtp-Source: AMrXdXvAiyCmTWvJ9EHpfBDvUbeHLHSy+j5Yk8c2u2aPfRmZEEnLTIdJUxpu9gEHkkwwhxqg/OcINr2IlsC0dkOvol4=
-X-Received: by 2002:a65:45c8:0:b0:48c:5903:2f5b with SMTP id
- m8-20020a6545c8000000b0048c59032f5bmr4778556pgr.504.1673769363038; Sat, 14
- Jan 2023 23:56:03 -0800 (PST)
+        Sun, 15 Jan 2023 03:04:41 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E8FDB47B;
+        Sun, 15 Jan 2023 00:04:40 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 2825160C53;
+        Sun, 15 Jan 2023 08:04:40 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0C804C433D2;
+        Sun, 15 Jan 2023 08:04:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1673769879;
+        bh=qm7hyC0LUcDgDBxuDWXDhly2lFnkKUN2YKEnH4CRa8Q=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=TOVodW3/W+kLvSDGrLFSUb3XjtmMs7WVRscM0i0DMoDYKTRmx82lcFEcwEDOd94rH
+         HZ+4kJFALknAhdiBPzTip+vPj0+ohAWgdB+LR3/N63yRzHrqT/QI5NSPCpS0I5IjL2
+         wGz4G/2X1r3lutsGlX6uiDH891qeUF3wP9s9KnT4=
+Date:   Sun, 15 Jan 2023 09:04:36 +0100
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     Fedor Pchelkin <pchelkin@ispras.ru>
+Cc:     stable@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        Christoph Hellwig <hch@lst.de>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Alexey Khoroshilov <khoroshilov@ispras.ru>,
+        lvc-project@linuxtesting.org
+Subject: Re: [PATCH 5.10 1/1] block: fix and cleanup bio_check_ro
+Message-ID: <Y8OzlLXW4WvgvwDw@kroah.com>
+References: <20230114222709.180795-1-pchelkin@ispras.ru>
+ <20230114222709.180795-2-pchelkin@ispras.ru>
 MIME-Version: 1.0
-From:   Alvaro Karsz <alvaro.karsz@solid-run.com>
-Date:   Sun, 15 Jan 2023 09:55:26 +0200
-Message-ID: <CAJs=3_C+K0iumqYyKhphYLp=Qd7i6-Y6aDUgmYyY_rdnN1NAag@mail.gmail.com>
-Subject: Virtio-blk extended lifetime feature
-To:     virtualization <virtualization@lists.linux-foundation.org>,
-        linux-block@vger.kernel.org, dm-devel@redhat.com,
-        linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org
-Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
-        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Jens Axboe <axboe@kernel.dk>, egranata@google.com,
-        Bart Van Assche <bvanassche@acm.org>,
-        Christoph Hellwig <hch@infradead.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230114222709.180795-2-pchelkin@ispras.ru>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi guys,
+On Sun, Jan 15, 2023 at 01:27:09AM +0300, Fedor Pchelkin wrote:
+> From: Christoph Hellwig <hch@lst.de>
+> 
+> commit 57e95e4670d1126c103305bcf34a9442f49f6d6a upstream.
+> 
+> Don't use a WARN_ONCE when printing a potentially user triggered
+> condition.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> Reviewed-by: Chaitanya Kulkarni <kch@nvidia.com>
+> Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
+> Link: https://lore.kernel.org/r/20220304180105.409765-2-hch@lst.de
+> Signed-off-by: Jens Axboe <axboe@kernel.dk>
+> Signed-off-by: Fedor Pchelkin <pchelkin@ispras.ru>
+> ---
+>  block/blk-core.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
+> 
+> diff --git a/block/blk-core.c b/block/blk-core.c
+> index 26664f2a139e..921d436fa3c6 100644
+> --- a/block/blk-core.c
+> +++ b/block/blk-core.c
+> @@ -701,8 +701,7 @@ static inline bool bio_check_ro(struct bio *bio, struct hd_struct *part)
+>  		if (op_is_flush(bio->bi_opf) && !bio_sectors(bio))
+>  			return false;
+>  
+> -		WARN_ONCE(1,
+> -		       "Trying to write to read-only block-device %s (partno %d)\n",
+> +		pr_warn("Trying to write to read-only block-device %s (partno %d)\n",
+>  			bio_devname(bio, b), part->partno);
+>  		/* Older lvm-tools actually trigger this */
+>  		return false;
+> -- 
+> 2.34.1
+> 
 
-While trying to upstream the implementation of VIRTIO_BLK_F_LIFETIME
-feature, many developers suggested that this feature should be
-extended to include more cell types, since its current implementation
-in virtio spec is relevant for MMC and UFS devices only.
+Again, we CAN NOT take patches for older kernels and not for newer ones,
+that one will cause regressions when people upgrade to newer kernels.
 
-The VIRTIO_BLK_F_LIFETIME defines the following fields:
+So I'm dropping all of your patches from my queue, please resend them so
+that all trees are properly covered.  As-is, I can not take the, and
+most importantly, you do not want me to accept such a thing!
 
-- pre_eol_info:  the percentage of reserved blocks that are consumed.
-- device_lifetime_est_typ_a: wear of SLC cells.
-- device_lifetime_est_typ_b: wear of MLC cells.
+thanks,
 
-(https://docs.oasis-open.org/virtio/virtio/v1.2/virtio-v1.2.html)
-
-Following Michael's suggestion, I'd like to add to the virtio spec
-with a new, extended lifetime command.
-Since I'm more familiar with embedded type storage devices, I'd like
-to ask you guys what fields you think should be included in the
-extended command.
-
-Thanks,
-
-Alvaro
+greg k-h
