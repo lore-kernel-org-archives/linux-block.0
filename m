@@ -2,42 +2,42 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03DA1C3DA78
-	for <linux-block@archiver.kernel.org>; Mon, 16 Jan 2023 01:53:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 686FEC63797
+	for <linux-block@archiver.kernel.org>; Mon, 16 Jan 2023 01:53:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231739AbjAPBxc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 15 Jan 2023 20:53:32 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34890 "EHLO
+        id S231621AbjAPBxj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 15 Jan 2023 20:53:39 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34962 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231743AbjAPBx3 (ORCPT
+        with ESMTP id S231744AbjAPBx3 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Sun, 15 Jan 2023 20:53:29 -0500
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF3314EFD;
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 648FC4C33;
         Sun, 15 Jan 2023 17:53:27 -0800 (PST)
 Received: from mail02.huawei.com (unknown [172.30.67.169])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4NwFRQ3SDkz4f3nVG;
-        Mon, 16 Jan 2023 09:53:22 +0800 (CST)
+        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4NwFRP6L1Wz4f436w;
+        Mon, 16 Jan 2023 09:53:21 +0800 (CST)
 Received: from huaweicloud.com (unknown [10.175.124.27])
-        by APP4 (Coremail) with SMTP id gCh0CgD3rbERrsRj9iw3Bw--.37368S7;
+        by APP4 (Coremail) with SMTP id gCh0CgD3rbERrsRj9iw3Bw--.37368S6;
         Mon, 16 Jan 2023 09:53:24 +0800 (CST)
 From:   Kemeng Shi <shikemeng@huaweicloud.com>
 To:     jack@suse.com, damien.lemoal@opensource.wdc.com,
         paolo.valente@linaro.org, axboe@kernel.dk
 Cc:     hch@lst.de, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH v4 5/8] block, bfq: remove unnecessary dereference to get async_bfqq
-Date:   Mon, 16 Jan 2023 17:51:50 +0800
-Message-Id: <20230116095153.3810101-6-shikemeng@huaweicloud.com>
+Subject: [PATCH v4 4/8] block, bfq: use helper macro RQ_BFQQ to get bfqq of request
+Date:   Mon, 16 Jan 2023 17:51:49 +0800
+Message-Id: <20230116095153.3810101-5-shikemeng@huaweicloud.com>
 X-Mailer: git-send-email 2.30.0
 In-Reply-To: <20230116095153.3810101-1-shikemeng@huaweicloud.com>
 References: <20230116095153.3810101-1-shikemeng@huaweicloud.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgD3rbERrsRj9iw3Bw--.37368S7
-X-Coremail-Antispam: 1UD129KBjvdXoWruFW7tryDWw13Xw4rAFWxtFb_yoWfJrX_C3
-        W8K3Z3uF1kGFy3Cr4rAry3tws0kryFqa1rCF90qry5WFnrAan8CasFqrZ0va98Zay7GFya
-        gr9rur13AF1q9jkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+X-CM-TRANSID: gCh0CgD3rbERrsRj9iw3Bw--.37368S6
+X-Coremail-Antispam: 1UD129KBjvdXoWrZF47Xry3Xry7Cr4Utw47Jwb_yoWfKFg_Ca
+        y8KF93Jr4kA3y5Zr4FyFWYqF47CFWaqF15ur98tFs8Wa43Canayr9FqrsxZFZ8ua1UCa9x
+        tFn0v343Jr9F9jkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
         9fnUUIcSsGvfJTRUUUbS8YFVCjjxCrM7AC8VAFwI0_Wr0E3s1l1xkIjI8I6I8E6xAIw20E
         Y4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l87I20VAvwVAaII0Ic2I_JFv_Gryl82
         xGYIkIc2x26280x7IE14v26r126s0DM28IrcIa0xkI8VCY1x0267AKxVW5JVCq3wA2ocxC
@@ -48,7 +48,7 @@ X-Coremail-Antispam: 1UD129KBjvdXoWruFW7tryDWw13Xw4rAFWxtFb_yoWfJrX_C3
         14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwIxGrwCF04k20xvY0x
         0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E
         7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_JF0_Jw1lIxkGc2Ij64vIr41lIxAIcV
-        C0I7IYx2IY67AKxVWUCVW8JwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF
+        C0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF
         04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7
         CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x07jstxDUUUUU=
 X-CM-SenderInfo: 5vklyvpphqwq5kxd4v5lfo033gof0z/
@@ -57,27 +57,36 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The async_bfqq is assigned with bfqq->bic->bfqq[0], use it directly.
+Use helper macro RQ_BFQQ to get bfqq of request.
 
 Signed-off-by: Kemeng Shi <shikemeng@huaweicloud.com>
 Reviewed-by: Jan Kara <jack@suse.cz>
 ---
- block/bfq-iosched.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ block/bfq-iosched.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index 6f38a0130034..4a17b22327f1 100644
+index 698c5918ad10..6f38a0130034 100644
 --- a/block/bfq-iosched.c
 +++ b/block/bfq-iosched.c
-@@ -4989,7 +4989,7 @@ static struct bfq_queue *bfq_select_queue(struct bfq_data *bfqd)
- 		    icq_to_bic(async_bfqq->next_rq->elv.icq) == bfqq->bic &&
- 		    bfq_serv_to_charge(async_bfqq->next_rq, async_bfqq) <=
- 		    bfq_bfqq_budget_left(async_bfqq))
--			bfqq = bfqq->bic->bfqq[0][act_idx];
-+			bfqq = async_bfqq;
- 		else if (bfqq->waker_bfqq &&
- 			   bfq_bfqq_busy(bfqq->waker_bfqq) &&
- 			   bfqq->waker_bfqq->next_rq &&
+@@ -6859,14 +6859,14 @@ static struct bfq_queue *bfq_init_rq(struct request *rq)
+ 		return NULL;
+ 
+ 	/*
+-	 * Assuming that elv.priv[1] is set only if everything is set
++	 * Assuming that RQ_BFQQ(rq) is set only if everything is set
+ 	 * for this rq. This holds true, because this function is
+ 	 * invoked only for insertion or merging, and, after such
+ 	 * events, a request cannot be manipulated any longer before
+ 	 * being removed from bfq.
+ 	 */
+-	if (rq->elv.priv[1])
+-		return rq->elv.priv[1];
++	if (RQ_BFQQ(rq))
++		return RQ_BFQQ(rq);
+ 
+ 	bic = icq_to_bic(rq->elv.icq);
+ 
 -- 
 2.30.0
 
