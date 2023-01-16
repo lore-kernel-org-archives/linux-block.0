@@ -2,91 +2,103 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 686FEC63797
-	for <linux-block@archiver.kernel.org>; Mon, 16 Jan 2023 01:53:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B420DC3DA78
+	for <linux-block@archiver.kernel.org>; Mon, 16 Jan 2023 01:53:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231621AbjAPBxj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 15 Jan 2023 20:53:39 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34962 "EHLO
+        id S231755AbjAPBxk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 15 Jan 2023 20:53:40 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34960 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231744AbjAPBx3 (ORCPT
+        with ESMTP id S231742AbjAPBx3 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Sun, 15 Jan 2023 20:53:29 -0500
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 648FC4C33;
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5FB9A4C0E;
         Sun, 15 Jan 2023 17:53:27 -0800 (PST)
 Received: from mail02.huawei.com (unknown [172.30.67.169])
-        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4NwFRP6L1Wz4f436w;
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4NwFRP56MHz4f3wR6;
         Mon, 16 Jan 2023 09:53:21 +0800 (CST)
 Received: from huaweicloud.com (unknown [10.175.124.27])
-        by APP4 (Coremail) with SMTP id gCh0CgD3rbERrsRj9iw3Bw--.37368S6;
+        by APP4 (Coremail) with SMTP id gCh0CgD3rbERrsRj9iw3Bw--.37368S5;
         Mon, 16 Jan 2023 09:53:24 +0800 (CST)
 From:   Kemeng Shi <shikemeng@huaweicloud.com>
 To:     jack@suse.com, damien.lemoal@opensource.wdc.com,
         paolo.valente@linaro.org, axboe@kernel.dk
 Cc:     hch@lst.de, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH v4 4/8] block, bfq: use helper macro RQ_BFQQ to get bfqq of request
-Date:   Mon, 16 Jan 2023 17:51:49 +0800
-Message-Id: <20230116095153.3810101-5-shikemeng@huaweicloud.com>
+Subject: [PATCH v4 3/8] block, bfq: initialize bfqq->decrease_time_jif correctly
+Date:   Mon, 16 Jan 2023 17:51:48 +0800
+Message-Id: <20230116095153.3810101-4-shikemeng@huaweicloud.com>
 X-Mailer: git-send-email 2.30.0
 In-Reply-To: <20230116095153.3810101-1-shikemeng@huaweicloud.com>
 References: <20230116095153.3810101-1-shikemeng@huaweicloud.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgD3rbERrsRj9iw3Bw--.37368S6
-X-Coremail-Antispam: 1UD129KBjvdXoWrZF47Xry3Xry7Cr4Utw47Jwb_yoWfKFg_Ca
-        y8KF93Jr4kA3y5Zr4FyFWYqF47CFWaqF15ur98tFs8Wa43Canayr9FqrsxZFZ8ua1UCa9x
-        tFn0v343Jr9F9jkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-        9fnUUIcSsGvfJTRUUUbS8YFVCjjxCrM7AC8VAFwI0_Wr0E3s1l1xkIjI8I6I8E6xAIw20E
-        Y4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l87I20VAvwVAaII0Ic2I_JFv_Gryl82
-        xGYIkIc2x26280x7IE14v26r126s0DM28IrcIa0xkI8VCY1x0267AKxVW5JVCq3wA2ocxC
-        64kIII0Yj41l84x0c7CEw4AK67xGY2AK021l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM2
-        8EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4UJVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq
-        3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_GcCE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8w
-        Aqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE
-        14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwIxGrwCF04k20xvY0x
-        0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E
-        7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_JF0_Jw1lIxkGc2Ij64vIr41lIxAIcV
-        C0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF
-        04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7
-        CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x07jstxDUUUUU=
+X-CM-TRANSID: gCh0CgD3rbERrsRj9iw3Bw--.37368S5
+X-Coremail-Antispam: 1UD129KBjvJXoW7Cr4Utw1kuw4fJr45tF4ruFg_yoW8Aw4xpa
+        9Fgr47KF1jqFW3Wr1UAa1kGF90grs09ry7J3WUW392y3yUArnFgFsYkrWYvFyfGrs7Cw10
+        qw4vqF9ruw1FkFJanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUB0b4IE77IF4wAFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k2
+        6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M280x2IEY4vEnII2IxkI6r1a6r45M2
+        8IrcIa0xkI8VA2jI8067AKxVWUWwA2048vs2IY020Ec7CjxVAFwI0_Xr0E3s1l8cAvFVAK
+        0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVW7JVWDJwA2z4
+        x0Y4vE2Ix0cI8IcVCY1x0267AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l
+        84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I
+        8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AK
+        xVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41l42xK82IYc2Ij64
+        vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8G
+        jcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r126r1DMIIYrxkI7VAKI48JMIIF0xvE2I
+        x0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK
+        8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I
+        0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUIq2MUUUUU
 X-CM-SenderInfo: 5vklyvpphqwq5kxd4v5lfo033gof0z/
 X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Use helper macro RQ_BFQQ to get bfqq of request.
+Inject limit is updated or reset when time_is_before_eq_jiffies(
+decrease_time_jif + several msecs) or think-time state changes.
+decrease_time_jif is initialized to 0 and will be set to current jiffies
+when inject limit is updated or reset. If the jiffies is slightly greater
+than LONG_MAX, time_is_after_eq_jiffies(0) will keep for a long time, so as
+time_is_after_eq_jiffies(decrease_time_jif + several msecs). If the
+think-time state never chages, then the injection will not work as expected
+for long time.
+
+To be more specific:
+Function bfq_update_inject_limit maybe triggered when jiffies pasts
+decrease_time_jif + msecs_to_jiffies(10) in bfq_add_request by setting
+bfqd->wait_dispatch to true.
+Function bfq_reset_inject_limit are called in two conditions:
+1. jiffies pasts bfqq->decrease_time_jif + msecs_to_jiffies(1000) in
+function bfq_add_request.
+2. jiffies pasts bfqq->decrease_time_jif + msecs_to_jiffies(100) or
+bfq think-time state change from short to long.
+
+Fix this by initializing bfqq->decrease_time_jif to current jiffies
+to trigger service injection soon when service injection conditions
+are met.
 
 Signed-off-by: Kemeng Shi <shikemeng@huaweicloud.com>
 Reviewed-by: Jan Kara <jack@suse.cz>
 ---
- block/bfq-iosched.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ block/bfq-iosched.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
 diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index 698c5918ad10..6f38a0130034 100644
+index f038b4d16d86..698c5918ad10 100644
 --- a/block/bfq-iosched.c
 +++ b/block/bfq-iosched.c
-@@ -6859,14 +6859,14 @@ static struct bfq_queue *bfq_init_rq(struct request *rq)
- 		return NULL;
+@@ -5654,6 +5654,8 @@ static void bfq_init_bfqq(struct bfq_data *bfqd, struct bfq_queue *bfqq,
  
- 	/*
--	 * Assuming that elv.priv[1] is set only if everything is set
-+	 * Assuming that RQ_BFQQ(rq) is set only if everything is set
- 	 * for this rq. This holds true, because this function is
- 	 * invoked only for insertion or merging, and, after such
- 	 * events, a request cannot be manipulated any longer before
- 	 * being removed from bfq.
- 	 */
--	if (rq->elv.priv[1])
--		return rq->elv.priv[1];
-+	if (RQ_BFQQ(rq))
-+		return RQ_BFQQ(rq);
+ 	/* first request is almost certainly seeky */
+ 	bfqq->seek_history = 1;
++
++	bfqq->decrease_time_jif = jiffies;
+ }
  
- 	bic = icq_to_bic(rq->elv.icq);
- 
+ static struct bfq_queue **bfq_async_queue_prio(struct bfq_data *bfqd,
 -- 
 2.30.0
 
