@@ -2,71 +2,76 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D6D3C54EBE
-	for <linux-block@archiver.kernel.org>; Mon, 16 Jan 2023 03:28:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D13A9C46467
+	for <linux-block@archiver.kernel.org>; Mon, 16 Jan 2023 03:53:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231685AbjAPD2T (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 15 Jan 2023 22:28:19 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37920 "EHLO
+        id S231695AbjAPDxz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 15 Jan 2023 22:53:55 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47990 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231586AbjAPD2S (ORCPT
+        with ESMTP id S231685AbjAPDxx (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 15 Jan 2023 22:28:18 -0500
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B0EB9524B;
-        Sun, 15 Jan 2023 19:28:17 -0800 (PST)
-Received: from mail02.huawei.com (unknown [172.30.67.143])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4NwHXr0VFQz4f3k65;
-        Mon, 16 Jan 2023 11:28:12 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-        by APP3 (Coremail) with SMTP id _Ch0CgA35CFNxMRjJiiYBg--.11221S3;
-        Mon, 16 Jan 2023 11:28:14 +0800 (CST)
+        Sun, 15 Jan 2023 22:53:53 -0500
+Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E637383CB
+        for <linux-block@vger.kernel.org>; Sun, 15 Jan 2023 19:53:51 -0800 (PST)
+Received: by mail-pl1-x62c.google.com with SMTP id v23so24143066plo.1
+        for <linux-block@vger.kernel.org>; Sun, 15 Jan 2023 19:53:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=XeL2aMm/FlBSF1QP/YxXM0H+2tWA4RrG/z4nLNj/C5A=;
+        b=Nm6l1cDkz2vKYpYch7neC71ii3Ml4A0/rJ0KvUmcnWfdFsSMdtGXrTzG1/moOYv8TK
+         iWmbHXm3dqOaO2vRzYj/4hXl9g5NrIJUb0FO2TT8Pbp5ptAoadGB5kUxcaW7jUhPIgKG
+         PRV5Y4mkwxImAB2LaNRbOljmMaoIJ07SeqDdWqX979SvzmpCEKSuLVG6UF3KsEWUejne
+         eL8Yf4ZgKHMkunkjP2JjMIqY7woGKaaf+2WBxb9EuIXafNBxjibsOUyU3ahj84Bbl+9i
+         yVxqB7uo70jIKu7kQfXMAYreaiMbZ/SkmYBbVAWgHpeoz2usqc11XDCygHZz17mSGfuP
+         VIGQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=XeL2aMm/FlBSF1QP/YxXM0H+2tWA4RrG/z4nLNj/C5A=;
+        b=FZ2DidWl8tIUOlKQmaXj02wlAnS+QaMr0jvRLpr4ImBXbcK88w8mCcslr33hZBheOZ
+         rbyREvC1QKThWpfPiFLjoYmqdMPW1Es27Q6p9nRxDPM9QiYXngsWx7MPW1tO9WKydYw1
+         6hTaWrF/Xd+DJlDNpeqej1rSfufTNRBIt/Mgw+JpoTWT2iKdCCZA7aPcpN3YGi+8KljM
+         ESC4xD31uoJoNusw82Nl+cYcincIImUsDxiZ9F7a6VUkI5RRdGZduWvuwMYAH4VvHfEk
+         uPRBPy7YUz//02XF4rYaah4MoU9Xtv24x9aCfdm6qAQaYZVOEeH6AvO/HQ68uLoMDLV/
+         St7A==
+X-Gm-Message-State: AFqh2koMFsdHYd1lRMXP78AO58tu7ecppwG7Ei1mjAVrFpEmFomACVse
+        UwHfaguenXgQwkMjz/AyRYLQGw==
+X-Google-Smtp-Source: AMrXdXtJkUkxD2XGU3GP1AMcajSPxDY0bC3EiVPGlzcexk5O5DtAyG2PJsrGWwdv5HGdgyw4Phq0Ww==
+X-Received: by 2002:a05:6a20:1455:b0:aa:512:82fc with SMTP id a21-20020a056a20145500b000aa051282fcmr31630673pzi.1.1673841231379;
+        Sun, 15 Jan 2023 19:53:51 -0800 (PST)
+Received: from [127.0.0.1] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id g8-20020aa79f08000000b0058d928374f2sm1975504pfr.20.2023.01.15.19.53.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 15 Jan 2023 19:53:50 -0800 (PST)
+From:   Jens Axboe <axboe@kernel.dk>
+To:     jack@suse.cz, paolo.valente@linaro.org, tj@kernel.org,
+        josef@toxicpanda.com, Yu Kuai <yukuai1@huaweicloud.com>
+Cc:     linux-block@vger.kernel.org, cgroups@vger.kernel.org,
+        linux-kernel@vger.kernel.org, yukuai3@huawei.com,
+        yi.zhang@huawei.com, yangerkun@huawei.com
+In-Reply-To: <20230103084755.1256479-1-yukuai1@huaweicloud.com>
+References: <20230103084755.1256479-1-yukuai1@huaweicloud.com>
 Subject: Re: [PATCH] block, bfq: switch 'bfqg->ref' to use atomic refcount
  apis
-To:     Yu Kuai <yukuai1@huaweicloud.com>, jack@suse.cz,
-        paolo.valente@linaro.org, axboe@kernel.dk, tj@kernel.org,
-        josef@toxicpanda.com
-Cc:     linux-block@vger.kernel.org, cgroups@vger.kernel.org,
-        linux-kernel@vger.kernel.org, yi.zhang@huawei.com,
-        yangerkun@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
-References: <20230103084755.1256479-1-yukuai1@huaweicloud.com>
-From:   Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <a562c6d1-3b20-15db-0487-dd99c09d68b0@huaweicloud.com>
-Date:   Mon, 16 Jan 2023 11:28:13 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+Message-Id: <167384123010.165459.4491550988140898321.b4-ty@kernel.dk>
+Date:   Sun, 15 Jan 2023 20:53:50 -0700
 MIME-Version: 1.0
-In-Reply-To: <20230103084755.1256479-1-yukuai1@huaweicloud.com>
-Content-Type: text/plain; charset=gbk; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: _Ch0CgA35CFNxMRjJiiYBg--.11221S3
-X-Coremail-Antispam: 1UD129KBjvJXoW7uw18Kr1ftFW3GF1rWrWkCrg_yoW8urWDpF
-        n0qa45J345Jrn7W3WUJ3WUXry8Jw4fCry8K3y8W3sayry3X3WSg3Z0y3yrJryfZF93ur4U
-        Zr1Ygayqkr1IvFUanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUU9Y14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-        1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-        JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-        CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-        2Ix0cI8IcVAFwI0_JrI_JrylYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-        W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka
-        0xkIwI1lc7I2V7IY0VAS07AlzVAYIcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7x
-        kEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E
-        67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCw
-        CI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6Fyj6rWU
-        JwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCT
-        nIWIevJa73UjIFyTuYvjfUF9a9DUUUU
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.12-dev-78c63
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi, Jens
 
-ÔÚ 2023/01/03 16:47, Yu Kuai Ð´µÀ:
-> From: Yu Kuai <yukuai3@huawei.com>
-> 
+On Tue, 03 Jan 2023 16:47:55 +0800, Yu Kuai wrote:
 > The updating of 'bfqg->ref' should be protected by 'bfqd->lock', however,
 > during code review, we found that bfq_pd_free() update 'bfqg->ref'
 > without holding the lock, which is problematic:
@@ -75,65 +80,16 @@ Hi, Jens
 > 2) bfqq will grab bfqg reference, and exit bfqq will drop the reference,
 > which can concurrent with 1).
 > 
-> Unfortunately, 'bfqd->lock' can't be held here because 'bfqd' might already
-> be freed in bfq_pd_free(). Fix the problem by using atomic refcount apis.
-> 
-> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+> [...]
 
-Can you apply this patch?
+Applied, thanks!
 
-Thanks,
-Kuai
-> ---
-> Changes from RFC:
->   - refcount_dec_and_test(bfqg->ref) -> refcount_dec_and_test(&bfqg->ref)
-> 
->   block/bfq-cgroup.c  | 8 +++-----
->   block/bfq-iosched.h | 2 +-
->   2 files changed, 4 insertions(+), 6 deletions(-)
-> 
-> diff --git a/block/bfq-cgroup.c b/block/bfq-cgroup.c
-> index 1b2829e99dad..7d9b15f0dbd5 100644
-> --- a/block/bfq-cgroup.c
-> +++ b/block/bfq-cgroup.c
-> @@ -316,14 +316,12 @@ struct bfq_group *bfqq_group(struct bfq_queue *bfqq)
->   
->   static void bfqg_get(struct bfq_group *bfqg)
->   {
-> -	bfqg->ref++;
-> +	refcount_inc(&bfqg->ref);
->   }
->   
->   static void bfqg_put(struct bfq_group *bfqg)
->   {
-> -	bfqg->ref--;
-> -
-> -	if (bfqg->ref == 0)
-> +	if (refcount_dec_and_test(&bfqg->ref))
->   		kfree(bfqg);
->   }
->   
-> @@ -530,7 +528,7 @@ static struct blkg_policy_data *bfq_pd_alloc(gfp_t gfp, struct request_queue *q,
->   	}
->   
->   	/* see comments in bfq_bic_update_cgroup for why refcounting */
-> -	bfqg_get(bfqg);
-> +	refcount_set(&bfqg->ref, 1);
->   	return &bfqg->pd;
->   }
->   
-> diff --git a/block/bfq-iosched.h b/block/bfq-iosched.h
-> index 41aa151ccc22..466e4865ace6 100644
-> --- a/block/bfq-iosched.h
-> +++ b/block/bfq-iosched.h
-> @@ -928,7 +928,7 @@ struct bfq_group {
->   	char blkg_path[128];
->   
->   	/* reference counter (see comments in bfq_bic_update_cgroup) */
-> -	int ref;
-> +	refcount_t ref;
->   	/* Is bfq_group still online? */
->   	bool online;
->   
-> 
+[1/1] block, bfq: switch 'bfqg->ref' to use atomic refcount apis
+      commit: 216f764716f34fe68cedc7296ae2043a7727e640
+
+Best regards,
+-- 
+Jens Axboe
+
+
 
