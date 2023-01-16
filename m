@@ -2,69 +2,92 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93052C46467
-	for <linux-block@archiver.kernel.org>; Mon, 16 Jan 2023 23:35:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72BCEC54EBE
+	for <linux-block@archiver.kernel.org>; Mon, 16 Jan 2023 23:35:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235398AbjAPXfC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 16 Jan 2023 18:35:02 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39610 "EHLO
+        id S235503AbjAPXfJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 16 Jan 2023 18:35:09 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40758 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235368AbjAPXek (ORCPT
+        with ESMTP id S235515AbjAPXev (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 16 Jan 2023 18:34:40 -0500
-Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F33392CC56
-        for <linux-block@vger.kernel.org>; Mon, 16 Jan 2023 15:29:42 -0800 (PST)
-Received: by mail-pj1-x1034.google.com with SMTP id x2-20020a17090a46c200b002295ca9855aso4363026pjg.2
-        for <linux-block@vger.kernel.org>; Mon, 16 Jan 2023 15:29:42 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:references:cc:to:from
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=OpwxE8KOKo7vs8TiNgi5SF3L44fg9BagOWF/T6JqWgM=;
-        b=CFRupfU+1ibvmseGdYxQckdYDvJ68yCcjmuAM06E163LalPfBI39nu5E8vDHJ2nz89
-         +YhIKU1CS0Xhd5PPv2h44hwWShWimSo/P01RrGnIZKRoCzPz64oZsoWBtI1QoVYb+k8L
-         wdVN8/LKen4NuJklYU8pUCP0SH4kD0WjT/SV31Mj10naqA1XSR6dypphJivFZjR4VhDJ
-         ZIS4ryeMpUqyZbP95ugCeIsdMUMGJAWcpRrBs4XrAcQ8aAhyy8HeKHLnwYbD5GcbSNpg
-         TtJiBKYpIspPa0LbcGlDw6VXzScolnq+KCovA6aoiAcU+2W6t61yyUb7sK1KzJ12c/5U
-         nXwQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:references:cc:to:from
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=OpwxE8KOKo7vs8TiNgi5SF3L44fg9BagOWF/T6JqWgM=;
-        b=4OtYU3VgsdIx2Wzq4q9ReCZe6pSswfJdbEf1aUddZd/s0RrQaWtWfrQGOQvPUSEG8I
-         YQABLeC5w3EmeVY4Xe8KG8kQio4xoOtpFcjHrP+15LYJueTeRDlWJZKZolMCRygI2uhm
-         j4Yi6kmJ/JxZndn8p5D68G1SHWEipgGo4aOn+kmadjrtN8QjTMsFGeEbEp0DaFkJp9W1
-         oNFmTDyIQX2W4rHUeZNIE+8W+AnVabteXthvSMLDw28k+BKN5ufd/HDvYdKxLDzBv3bZ
-         keUvBSf/8uyPDRr6IzN97IUnQ/6surphNQSB+q1i/E97QuVVYEgCJo4RCf4pEhN+LS8z
-         JPEQ==
-X-Gm-Message-State: AFqh2ko+iT5gm9xAyjUv7qQEwFMp0fOpAihDTSNWEvzs35StDDbH5uMe
-        di1KTzq3XR3F2VLmqSibpAz2pX+gztWG/8qD
-X-Google-Smtp-Source: AMrXdXvpUrdLTKB1TN1/c4hhUvynD6j58laptg2XGGRToYzHT53d2Hqibs9JfHnI4mJwoG4/f3sT1w==
-X-Received: by 2002:a05:6a20:a682:b0:b1:d045:2818 with SMTP id ba2-20020a056a20a68200b000b1d0452818mr232027pzb.2.1673911782288;
-        Mon, 16 Jan 2023 15:29:42 -0800 (PST)
-Received: from [192.168.1.136] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id d21-20020a630e15000000b0047781f8ac17sm16111023pgl.77.2023.01.16.15.29.41
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 16 Jan 2023 15:29:41 -0800 (PST)
-Message-ID: <1e2c9225-4d29-051e-e1f5-e0948d7889e3@kernel.dk>
-Date:   Mon, 16 Jan 2023 16:29:40 -0700
+        Mon, 16 Jan 2023 18:34:51 -0500
+Received: from esa5.hgst.iphmx.com (esa5.hgst.iphmx.com [216.71.153.144])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 919EA29E0C
+        for <linux-block@vger.kernel.org>; Mon, 16 Jan 2023 15:31:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1673911917; x=1705447917;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=AWy+sFg7dsIyAT85GW0B6MmtlIPZ/5f3Zkm6/gXaQf0=;
+  b=R5ASq9DToAPXk2yr4cJ3s1jTOsSNWV/RvZIx1nn46N8H6zdoDnqqkhNu
+   GZRcRa7q/FQ/TCNbviBm8Qi5YGHW8FyiNawGAH9iLLyJv8fTF9WGegHBh
+   2HylDDgrNufv4EDK66Ipkf1LDlKAipGG84wmQUEbPROp0o/xkVnVgfSxl
+   NM8SF//rqHx7px88UbgUrwoKIW7vU2B30rpHc8SxXa9eJ9+HVzlOiZ62f
+   c7CwiBhn3tQ1XKhSnLE/pL1onMPWVxN/qCEsWBpLUzLiunNRMPACw83jp
+   Lp8OEUFzoVpX6VX/yBZQh04885hcRozG3qPL9so7KEkpFI9jusYrp2cEa
+   A==;
+X-IronPort-AV: E=Sophos;i="5.97,222,1669046400"; 
+   d="scan'208";a="220789375"
+Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
+  by ob1.hgst.iphmx.com with ESMTP; 17 Jan 2023 07:31:57 +0800
+IronPort-SDR: Gei+nxnjOrwzvtGDgp2U4t8zPmLPaahqJbXJ2ZzsnBSu/0BVF2zU7SzpJS0mxTwUYukQU574U9
+ tHTlcpNA0CSi9BRBdo6xuH3xol5DIBLl9dRIPQPtvg+rj1yqgItOfetrSFwgDeeG7aBHibwzu4
+ zKmsXjApyDPiJ+cR5ST2v4bk7IXRjtjvjUyYez7uoZgihP6ISrwAS5qB9cQ8Rq3x/fg3vXfsEp
+ kfhW6XGjgHYr8jDv8rq25D87ew04pAcXRPWAZYwFK073IcoIz9Ja82+J4kWHm2kbRU00H1C30s
+ /70=
+Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
+  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 16 Jan 2023 14:43:54 -0800
+IronPort-SDR: wsbVDxODSP1YdUMQ5o1SyUb/4BjRyOEyy+gxI0RhY/zjlZDdsZHS39VU0M43TZNOWTxbRy+zH2
+ t9K0AnmktM6Yqto3UW/7s52gyxDtoFW8bfcSy9OCTMAizPGii8s/lRJrCJuhtyj7xTwPPcqIwr
+ uEgaSt22OWt3bcZSxHxEfDBIZQQ2TFH2TETC9jVfi/6fM55EiQqzVxP1jjGjLSVEYwsysORozu
+ m1DkZahw5RVrDkOOyNz5+2gj1eTWWGR59O48u4pxNLFi8SoOn1k0M0Pq+oli4dUpruawC/7mr8
+ 6Ps=
+WDCIronportException: Internal
+Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
+  by uls-op-cesaip01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 16 Jan 2023 15:31:58 -0800
+Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4NwpFn0Tlqz1Rwrq
+        for <linux-block@vger.kernel.org>; Mon, 16 Jan 2023 15:31:57 -0800 (PST)
+Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
+        reason="pass (just generated, assumed good)"
+        header.d=opensource.wdc.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
+        opensource.wdc.com; h=content-transfer-encoding:content-type
+        :in-reply-to:organization:from:references:to:content-language
+        :subject:user-agent:mime-version:date:message-id; s=dkim; t=
+        1673911916; x=1676503917; bh=AWy+sFg7dsIyAT85GW0B6MmtlIPZ/5f3Zkm
+        6/gXaQf0=; b=ciDXSAA3WTdC31Kauna1OIvCEMj8pOVRrfpfrFaj5tc+DOX/hjX
+        PdERbRabQeu9p4s7VfGN6kFRp91sEFwPBlj5ayYRQ3EUfUWl/EZ4kIW2iYRsp/q2
+        AzRfmsiNA4Dx+9EcH3GGZG01sVe0bm4j8DF4IYCDu2J8neHgohdNCFQAO7mzun/T
+        A8VAsd9+JTboA6ATtkzBjLsEP/+pkmjvOfmACZ/hQcoOSsog08bvZwHd1VBoKOta
+        fqZ0VFAjIFgw67qyvSpcSs+MSLjjXjpRDv1Aon+A9jryrJXEBQgJnfJSBKLXjRw5
+        WWF7yRlNbb1T4tSMIufODXMI2v1fIyinhzw==
+X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
+Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
+        by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
+        with ESMTP id oAf1Q23M0QV2 for <linux-block@vger.kernel.org>;
+        Mon, 16 Jan 2023 15:31:56 -0800 (PST)
+Received: from [10.225.163.30] (unknown [10.225.163.30])
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4NwpFl4JbQz1RvLy;
+        Mon, 16 Jan 2023 15:31:55 -0800 (PST)
+Message-ID: <88d454ab-97bf-f5a9-7645-5fb89c4bc0e0@opensource.wdc.com>
+Date:   Tue, 17 Jan 2023 08:31:54 +0900
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.6.0
 Subject: Re: [PATCH v2] block: don't allow multiple bios for IOCB_NOWAIT issue
 Content-Language: en-US
-From:   Jens Axboe <axboe@kernel.dk>
-To:     Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+To:     Jens Axboe <axboe@kernel.dk>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 Cc:     Christoph Hellwig <hch@lst.de>,
         Michael Kelley <mikelley@microsoft.com>
 References: <1ce71005-c81b-374d-5bcf-e3b7e7c48d0d@kernel.dk>
  <7c69e3b5-c81b-a3ba-9588-9a59c32c45b7@opensource.wdc.com>
  <4ed4090b-7bff-dd43-da23-915f269bd759@kernel.dk>
+From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
+Organization: Western Digital Research
 In-Reply-To: <4ed4090b-7bff-dd43-da23-915f269bd759@kernel.dk>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
@@ -72,7 +95,7 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/16/23 4:28?PM, Jens Axboe wrote:
+On 1/17/23 08:28, Jens Axboe wrote:
 > On 1/16/23 4:20?PM, Damien Le Moal wrote:
 >> On 1/17/23 06:06, Jens Axboe wrote:
 >>> If we're doing a large IO request which needs to be split into multiple
@@ -143,12 +166,14 @@ On 1/16/23 4:28?PM, Jens Axboe wrote:
 > being written to disk or read from disk, but EAGAIN being returned for
 > the request as a whole.
 
-BTW, this is no different than eg doing a buffered read and needing to
-read in the data. You'd get EAGAIN, and no amount of repeated retries
-would change that. You need to either block for the IO at that point, or
-otherwise start it so it will become available directly at some later
-point (eg readahead).
+Yes, I understood all that and completely agree with it.
+
+I was only wondering if this change may not surprise some (bad) userspace
+stuff. Do we need to update some man page or other doc, mentioning that
+there are no guarantees that a NOWAIT IO may actually be executed if it
+too large (e.g. larger than max_sectors_kb) ?
 
 -- 
-Jens Axboe
+Damien Le Moal
+Western Digital Research
 
