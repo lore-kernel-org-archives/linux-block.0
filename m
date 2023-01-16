@@ -2,102 +2,79 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF9F6C54EBE
-	for <linux-block@archiver.kernel.org>; Mon, 16 Jan 2023 23:35:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EFDF3C46467
+	for <linux-block@archiver.kernel.org>; Mon, 16 Jan 2023 23:39:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235130AbjAPXfM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 16 Jan 2023 18:35:12 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40778 "EHLO
+        id S231268AbjAPXj3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 16 Jan 2023 18:39:29 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43448 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235529AbjAPXex (ORCPT
+        with ESMTP id S233784AbjAPXj2 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 16 Jan 2023 18:34:53 -0500
-Received: from esa5.hgst.iphmx.com (esa5.hgst.iphmx.com [216.71.153.144])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF0F31D90A
-        for <linux-block@vger.kernel.org>; Mon, 16 Jan 2023 15:32:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1673911961; x=1705447961;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=fpa6If5z8gNwdZ6N8yMP49PoqfWu8Cr3FlsfdmaqgHo=;
-  b=a/hJwQcFSYCs0a4WyFCMreQz5DsS0UA1GKdGu7nn7JyXAVLwBGdKoKgf
-   CVi/nATcy+4lketlgB9JtnIbaBG28QgOmVYJDLpINK1+kFl1HnW5sxg/A
-   Mw0peW7GbOycSeZywOSzAlCcDJiGMNvIOfM+1g5jKFUTktlPkw+1PJOqq
-   +jPCMpjegMK9GS2RbGdWkujh1m1CEEckQCTD85dv6UY2koA7kr/EZguiV
-   MMd/tKi1vKmBuoeHVZUO6WbBuGtGd/htU3i4XEkSsLm0x6oV9saN39N96
-   RXHF7tafWfhYTq60m7huReiPYHhhtnJP74mh3oxRcVlTJWWzJT//CJmS+
-   Q==;
-X-IronPort-AV: E=Sophos;i="5.97,222,1669046400"; 
-   d="scan'208";a="220789411"
-Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 17 Jan 2023 07:32:41 +0800
-IronPort-SDR: Phy63Vt8xzHlQMeJ6J1sUYVbXZIeoCJbxg5fYUZEuu+YY3XuXPdDNQezGzMkwzBl4aDJA7ZHiq
- Q++4tUNunZ+x9totp8QVK0hGtc28WHPJo5m7pt7i9HOWkMRIRhUAJrelKVGskUeqHvetJro2Jg
- /GUz2BEYz7THWExRODeog1QdbFNi9aInt+NQaMLK+MnIBfTF25RvB0L1euD7vUx429nE7p4V8B
- raLp9O/YmSkyrJR7PJItZ96f8oiJeOeArvwLdmBtKoMcbvUaEwkoESHZYMpnRhY+6aNoTMInh+
- 2NM=
-Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
-  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 16 Jan 2023 14:44:38 -0800
-IronPort-SDR: +ZVaUmayME+MOYsfpxEuduixesP+ftCwqbXtLBW2yhHHGoiXM/X4F8DKrATV3GH7DILAyXwabS
- tuDtH7SqODKFk6wf1RXQxt8w8p8MjaY/GDSWxdisUio66Joye9rc00Bu7rO/Gth+UH4gN+OQfL
- WuzyGivbOVOo0O3xROvr0kfJv+iz3DY3/C6oMmAlal3BwqlKWfZsNaZvPBcj4O/oLx9cNhb718
- upNtlz44nrHyBQb9819/xJ7RSkBfUDWEyA0L8YLPjdxT3kLuR5v2DU+m1yLIC3VRoX9gYFXUfJ
- B6g=
-WDCIronportException: Internal
-Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
-  by uls-op-cesaip01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 16 Jan 2023 15:32:42 -0800
-Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4NwpGd1qjQz1Rwrq
-        for <linux-block@vger.kernel.org>; Mon, 16 Jan 2023 15:32:41 -0800 (PST)
-Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
-        reason="pass (just generated, assumed good)"
-        header.d=opensource.wdc.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
-        opensource.wdc.com; h=content-transfer-encoding:content-type
-        :in-reply-to:organization:from:references:to:content-language
-        :subject:user-agent:mime-version:date:message-id; s=dkim; t=
-        1673911960; x=1676503961; bh=fpa6If5z8gNwdZ6N8yMP49PoqfWu8Cr3Fls
-        fdmaqgHo=; b=olObt5L9MKjHcwdRL3iXNMndGEyXiC3z9g+BuZWDqLjXrrhcTa6
-        jZPBz+Ule/agklg5vayoXdVybyEdL18VJ+8vrJaxzng8wrkSHZs7pPnsMRmppXgo
-        8dJip6LBbksXMtUNtNkg4Hw9znEUPYjhitFU4za3Kw7/u41kAlUq26bTvO4VqGL8
-        bxiXFp8USBiIWZP31zV44sMNMuyRFzamUeNWOSy+6w+7L30nCeIioQd+7iiESzM0
-        vP9B6B2C73xwsZ/eMfVFYj9/D5HD+ed11AEa3M9H7lsku3IafW7zU8ZuYc424sZq
-        yLx5uCRyY2/OoXM3BPwcpEJutwZ9VA9JH+w==
-X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
-Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
-        by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id acfa1Jc3SaZ2 for <linux-block@vger.kernel.org>;
-        Mon, 16 Jan 2023 15:32:40 -0800 (PST)
-Received: from [10.225.163.30] (unknown [10.225.163.30])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4NwpGb5xFbz1RvLy;
-        Mon, 16 Jan 2023 15:32:39 -0800 (PST)
-Message-ID: <b77ae47c-a17e-4536-cecc-23a089f35be7@opensource.wdc.com>
-Date:   Tue, 17 Jan 2023 08:32:38 +0900
+        Mon, 16 Jan 2023 18:39:28 -0500
+Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 153984C0A
+        for <linux-block@vger.kernel.org>; Mon, 16 Jan 2023 15:39:27 -0800 (PST)
+Received: by mail-pl1-x62b.google.com with SMTP id k18so7750502pll.5
+        for <linux-block@vger.kernel.org>; Mon, 16 Jan 2023 15:39:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=yQF0auPzxI4Mn/L1YLBp7JsEV+bsm8x9t/TAEYcUnjs=;
+        b=L7mqi0qHb/Pwi+2Fj1AIsRt+qnM/BV+vjIVc+GklKWXcdccRjVGyVVxDBYHZRVfSat
+         SKjM3FtwqB8CcJsbLIfbdOORDNYuYCAwyvUw7OSQ/EdCdglSWAct92gapIbl8bgrpC2t
+         Pj1cXIJl/CWN72Q0ITkcOfGthkJkoEm+i7HAgiM/qKzBA5w0FhuRi12vj23kK/4VthLv
+         rBp8W1RzQLsKMNZwmG9fo9lA3IK6y4DIcblYQlUFqCRvYbA54qVMoO3ytfBZH/EZXVRs
+         7dU3tdLQ1rs7Ig84BljaZKOqJTLR1x0An7oa18e90bC1+05CwAso0jRrdwX+2SLsQzcJ
+         70gw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=yQF0auPzxI4Mn/L1YLBp7JsEV+bsm8x9t/TAEYcUnjs=;
+        b=gc1hOXe4NqJhxTcKwmSzSscdm5j+b8FmM56qNLOoKXvrhMeiX10xHUahU97xqepUyz
+         YODqPNZ1jcMfsqmAEGPMTjanFpsyMrMqLxs0EA6+zn6Gvnv0v4nJyyI1MPW3k5igMTq7
+         o9o9o2bVAkzcfmSf+LJLhMsRSXY3rBNL4VdBqZOf5fsNL+b6vQwFruPaNt+B57N7bvij
+         xGUL80UdNWao6YMWUJLSyaEOzLbX+OotyDS1QhZV0CcscolHTpr0ZSVl6OImKkErfNN1
+         i8RcCE+aySAUYj0DoGqw7XtOXV2cmmmLxyx8Yv+bCWA1d+3Wts1yew0k18pnEa5FaUTl
+         AK/A==
+X-Gm-Message-State: AFqh2kop7KGLlsK2HIS/a/z3d1PRtMikbKLKFtLSs3Ej5gNwBIu9+o0W
+        QqIwCDzkpkLVxeNYBZXFWsKZZQ==
+X-Google-Smtp-Source: AMrXdXtIZu0YPeyVxijlg0syxhmIA0sNGY+YbxS8OQMUxGMMritzc3aDimSEgdtJR1UkgNGjwmJM1A==
+X-Received: by 2002:a17:903:41d2:b0:193:1c8f:183a with SMTP id u18-20020a17090341d200b001931c8f183amr345253ple.5.1673912366462;
+        Mon, 16 Jan 2023 15:39:26 -0800 (PST)
+Received: from [192.168.1.136] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id a7-20020a1709027e4700b00192740bb02dsm18517956pln.45.2023.01.16.15.39.25
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 16 Jan 2023 15:39:26 -0800 (PST)
+Message-ID: <da64245b-4127-f6be-76e4-a9c9546c8226@kernel.dk>
+Date:   Mon, 16 Jan 2023 16:39:25 -0700
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
  Thunderbird/102.6.0
 Subject: Re: [PATCH v2] block: don't allow multiple bios for IOCB_NOWAIT issue
 Content-Language: en-US
-To:     Jens Axboe <axboe@kernel.dk>,
+To:     Damien Le Moal <damien.lemoal@opensource.wdc.com>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 Cc:     Christoph Hellwig <hch@lst.de>,
         Michael Kelley <mikelley@microsoft.com>
 References: <1ce71005-c81b-374d-5bcf-e3b7e7c48d0d@kernel.dk>
  <7c69e3b5-c81b-a3ba-9588-9a59c32c45b7@opensource.wdc.com>
  <4ed4090b-7bff-dd43-da23-915f269bd759@kernel.dk>
- <1e2c9225-4d29-051e-e1f5-e0948d7889e3@kernel.dk>
-From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
-Organization: Western Digital Research
-In-Reply-To: <1e2c9225-4d29-051e-e1f5-e0948d7889e3@kernel.dk>
+ <88d454ab-97bf-f5a9-7645-5fb89c4bc0e0@opensource.wdc.com>
+From:   Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <88d454ab-97bf-f5a9-7645-5fb89c4bc0e0@opensource.wdc.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/17/23 08:29, Jens Axboe wrote:
-> On 1/16/23 4:28?PM, Jens Axboe wrote:
+On 1/16/23 4:31 PM, Damien Le Moal wrote:
+> On 1/17/23 08:28, Jens Axboe wrote:
 >> On 1/16/23 4:20?PM, Damien Le Moal wrote:
 >>> On 1/17/23 06:06, Jens Axboe wrote:
 >>>> If we're doing a large IO request which needs to be split into multiple
@@ -168,15 +145,21 @@ On 1/17/23 08:29, Jens Axboe wrote:
 >> being written to disk or read from disk, but EAGAIN being returned for
 >> the request as a whole.
 > 
-> BTW, this is no different than eg doing a buffered read and needing to
-> read in the data. You'd get EAGAIN, and no amount of repeated retries
-> would change that. You need to either block for the IO at that point, or
-> otherwise start it so it will become available directly at some later
-> point (eg readahead).
+> Yes, I understood all that and completely agree with it.
+> 
+> I was only wondering if this change may not surprise some (bad) userspace
+> stuff. Do we need to update some man page or other doc, mentioning that
+> there are no guarantees that a NOWAIT IO may actually be executed if it
+> too large (e.g. larger than max_sectors_kb) ?
 
-Indeed.
+We can certainly add it to the man pages talking about RWF_NOWAIT. But
+there's never been a guarantee that any EAGAIN will later succeed
+under the same conditions, and honestly there are various conditions
+where this is already not true. And those same cases would spuriously
+yield EAGAIN before already, it's not a new condition for those sizes
+of IOs.
 
 -- 
-Damien Le Moal
-Western Digital Research
+Jens Axboe
+
 
