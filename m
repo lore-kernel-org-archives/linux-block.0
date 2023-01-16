@@ -2,111 +2,120 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 967F1C677F1
-	for <linux-block@archiver.kernel.org>; Mon, 16 Jan 2023 16:02:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2142EC46467
+	for <linux-block@archiver.kernel.org>; Mon, 16 Jan 2023 16:03:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231971AbjAPQCp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 16 Jan 2023 11:02:45 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44096 "EHLO
+        id S232079AbjAPQDq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 16 Jan 2023 11:03:46 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44818 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231965AbjAPQBu (ORCPT
+        with ESMTP id S232149AbjAPQDJ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 16 Jan 2023 11:01:50 -0500
-Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6AF823862
-        for <linux-block@vger.kernel.org>; Mon, 16 Jan 2023 08:01:40 -0800 (PST)
-Received: by mail-pj1-x1029.google.com with SMTP id q5so3338752pjh.1
-        for <linux-block@vger.kernel.org>; Mon, 16 Jan 2023 08:01:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:cc:subject:from:to:content-language
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=tOJn3wS3KaLs6GJKewX/FweGyqsXLb3UQ+ewziaYEJY=;
-        b=d1AK46xwVySZG1F1Beno0yDzk6pEnXEU4sGRTGUufps5MeM0PmeiUi/wONItGnX4fo
-         wz6UkoFvm8V0u+vJo3Z7YCrC9JGiBS1hq6JdUMRm82hhR4aHJ9+63kS+7eu+/Wzd3gon
-         kGKFbcGhi6orgz4uZqfDsXh7vLezmHiBbvW3YDLvrVAm5V6RL10BoBGqQQtH6oZlBWRD
-         hCbCovAgfWe6a1dXbwPKhNYcieBlF7Yd9bOAYAedfp/1ufWbe3mLZAt4Y6h6275JezXd
-         PWI3iQbjL54I0hEmanUx1WuL4w1kZVBeW4dtNiHQGMHsS33KUxhCqVt0NB9W+Ffoso7f
-         qvTg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:cc:subject:from:to:content-language
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=tOJn3wS3KaLs6GJKewX/FweGyqsXLb3UQ+ewziaYEJY=;
-        b=jnJlclQIR1dACEA/Qt1kchJrsU5VMgQ8BVKdaDBjQKoF9sbRbShdkfyDH6i10az3Tz
-         A85FJ19VBYJBnFME2a0K8dbjqGQP35rwVlQg9uitG2A+z48+Fb1zkEgD5JPcIAMTz1kB
-         kkHaLIBgngm3aItZQGt8kvPiVQhLePKWujK+HrFdRy/mepBGpOgJUCwAC/Ix5QAxKsbP
-         5SvTEBjnVvt8beDPZH2SOdF2zsNBiCBgBEeQjxjuLBH/wZ+Hg9xbrSaQNIbukSSxKO6C
-         ILbN3zkKnZ2LQwz947aahLkwR2IZHLgjbbmD72/15Q/aAGB9zckGiYqZRku1TQm57baq
-         ro4w==
-X-Gm-Message-State: AFqh2koXxV5mWnlB7d6xSJvNJeTK88AntrHcIw70LO5r3LGVUvMvlQnO
-        4vThz3DeozBqMslo/iEROzkIh5Mc6KmOqdV/
-X-Google-Smtp-Source: AMrXdXsVvVmKK8LKCEsmktI9PnRqjHnFt3w+3tMeoZcmzZOzaEpqbg6IhF/CCsVMZATp/tHMb/eHKA==
-X-Received: by 2002:a17:902:8c87:b0:194:6979:7f2e with SMTP id t7-20020a1709028c8700b0019469797f2emr85005plo.0.1673884899298;
-        Mon, 16 Jan 2023 08:01:39 -0800 (PST)
-Received: from [192.168.1.136] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id k7-20020a170902ce0700b001885d15e3c1sm19525162plg.26.2023.01.16.08.01.38
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 16 Jan 2023 08:01:38 -0800 (PST)
-Message-ID: <c5631d66-3627-5d04-c810-c060c9fd7077@kernel.dk>
-Date:   Mon, 16 Jan 2023 09:01:37 -0700
+        Mon, 16 Jan 2023 11:03:09 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 994A523DA2
+        for <linux-block@vger.kernel.org>; Mon, 16 Jan 2023 08:02:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1673884919;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=8pukx+I4QrScYN3Z5nRX9xtPFWya2FweofKXHmiiGPg=;
+        b=EooujqzXAQQa3Md6hEaFdSjIQ/bhDHzirnIvlQqTlOB77x0qTW5eg0uu+gADVtQ9les5PN
+        swAVJ4eT1jNPv7yq8XLHZ+I4apX3HblBqKmmjXa+qmfn7YiPIyZtbo7GOKQcjxXghZvVsh
+        4vPgVLFyMsT6EdZhCGUMWJZ71kf0+Wg=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-159-ifNPrZcoO5aLBvu_n-6qtw-1; Mon, 16 Jan 2023 11:01:54 -0500
+X-MC-Unique: ifNPrZcoO5aLBvu_n-6qtw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 4ECF91C00426;
+        Mon, 16 Jan 2023 16:01:52 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.33.36.23])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 9562140C2008;
+        Mon, 16 Jan 2023 16:01:50 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@infradead.org>
+cc:     linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+cc:     dhowells@redhat.com
+Subject: Is there a reason why REQ_OP_READ has to be 0?
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.0
-Content-Language: en-US
-To:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From:   Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH] block: don't allow multiple bios for IOCB_NOWAIT issue
-Cc:     Michael Kelley <mikelley@microsoft.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <2117828.1673884910.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date:   Mon, 16 Jan 2023 16:01:50 +0000
+Message-ID: <2117829.1673884910@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.1
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-If we're doing a large IO request which needs to be split into multiple
-bios for issue, then we can run into the same situation as the below
-marked commit fixes - parts will complete just fine, one or more parts
-will fail to allocate a request. This will result in a partially
-completed read or write request, where the caller gets EAGAIN even though
-parts of the IO completed just fine.
+Hi Jens, Christoph,
 
-Do the same for large bios as we do for splits - fail a NOWAIT request
-with EAGAIN. This isn't technically fixing an issue in the below marked
-patch, but for stable purposes, we should have either none of them or
-both.
+Do you know if there's a reason why REQ_OP_READ has to be 0?  I'm seeing a
+circumstance where a direct I/O write on a blockdev is BUG'ing in my modif=
+ied
+iov_iter code because the iterator says it's a source iterator (correct), =
+but
+the bio->bi_opf =3D=3D REQ_OP_READ (which should be wrong).
 
-This depends on: 613b14884b85 ("block: handle bio_split_to_limits() NULL return")
+I thought I'd move REQ_OP_READ to, say, 4 so that I could try and see if i=
+t's
+just undefined but the kernel BUGs and then panics during boot.
 
-Cc: stable@vger.kernel.org # 5.15+
-Fixes: 9cea62b2cbab ("block: don't allow splitting of a REQ_NOWAIT bio")
-Link: https://github.com/axboe/liburing/issues/766
-Reported-and-tested-by: Michael Kelley <mikelley@microsoft.com>
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
+David
 
----
-
-diff --git a/block/fops.c b/block/fops.c
-index 50d245e8c913..a03cb732c2a7 100644
---- a/block/fops.c
-+++ b/block/fops.c
-@@ -368,6 +368,14 @@ static ssize_t blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter)
- 			return __blkdev_direct_IO_simple(iocb, iter, nr_pages);
- 		return __blkdev_direct_IO_async(iocb, iter, nr_pages);
- 	}
-+	/*
-+	 * We're doing more than a bio worth of IO (> 256 pages), and we
-+	 * cannot guarantee that one of the sub bios will not fail getting
-+	 * issued FOR NOWAIT as error results are coalesced across all of
-+	 * them. Be safe and ask for a retry of this from blocking context.
-+	 */
-+	if (iocb->ki_flags & IOCB_NOWAIT)
-+		return -EAGAIN;
- 	return __blkdev_direct_IO(iocb, iter, bio_max_segs(nr_pages));
- }
- 
--- 
-Jens Axboe
+------------[ cut here ]------------
+kernel BUG at mm/filemap.c:1615!
+------------[ cut here ]------------
+invalid opcode: 0000 [#1] PREEMPT SMP PTI
+kernel BUG at mm/filemap.c:1615!
+CPU: 1 PID: 2196 Comm: systemd-udevd Not tainted 6.2.0-rc2-build3+ #12783
+Hardware name: ASUS All Series/H97-PLUS, BIOS 2306 10/09/2014
+RIP: 0010:folio_end_writeback+0x30/0x70
+Code: 48 8b 07 48 89 fb 0f ba e0 12 73 0a f0 80 67 02 fb e8 d0 de 00 00 48=
+ 89 df e8 fe df ff ff 48 89 df e8 f9 ac 00 00 84 c0 75 02 <0f> 0b 48 8b 03=
+ 84 c0 79 0d be 0f 00 00 00 48 89 df e8 44 f3 ff ff
+RSP: 0000:ffff8881091a3db8 EFLAGS: 00010246
+RAX: 0000000000000000 RBX: ffffea0004271d40 RCX: 0000000000001000
+RDX: 0000000000000101 RSI: 0000000000000246 RDI: ffff888107694000
+RBP: ffff888100b6f600 R08: 000000204d567e99 R09: 0000000000000200
+R10: 0000000000000000 R11: 0000000000000000 R12: 0000000000000000
+R13: 0000000000000001 R14: 0000000000001000 R15: ffff888107402080
+FS:  00007f65ecde8940(0000) GS:ffff88840fa80000(0000) knlGS:00000000000000=
+00
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007fb269292ba1 CR3: 0000000107140004 CR4: 00000000001706e0
+Call Trace:
+ <TASK>
+ mpage_end_io+0x91/0x9b
+ blk_update_request+0x200/0x2be
+ scsi_end_request+0x27/0xf3
+ scsi_io_completion+0x151/0x21e
+ blk_complete_reqs+0x41/0x4c
+ __do_softirq+0x123/0x27d
+ __irq_exit_rcu+0x5a/0xcd
+ common_interrupt+0x36/0xbc
+ asm_common_interrupt+0x22/0x40
+RIP: 0033:0x7f65edc7ab60
+Code: 00 41 29 c5 4a 8d 14 ed 00 00 00 00 49 8d 34 0c 49 8d 7c 0c f8 e8 d0=
+ 5e ff ff 83 6d 20 01 eb 9f 66 2e 0f 1f 84 00 00 00 00 00 <f3> 0f 1e fa 53=
+ 48 89 fb 48 83 c7 08 e8 7f 60 ff ff 85 c0 75 0b 48
+RSP: 002b:00007ffe0b70bd88 EFLAGS: 00000202
+RAX: 0000000000000000 RBX: 000055ddc430c5dc RCX: 000055ddc4301f98
+RDX: 00000000000000ff RSI: 000000000000000c RDI: 000055ddc4301f98
+RBP: 00007ffe0b7102d0 R08: 45d54cec8b358fc3 R09: 00544145535f4449
+R10: 000000000000000c R11: f17eedd8cae0d043 R12: 000055ddc4302920
+R13: 000055ddc432091a R14: 000055ddc4308460 R15: 000055ddc42d90dc
+ </TASK>
+Modules linked in:
+invalid opcode: 0000 [#2] PREEMPT SMP PTI
 
