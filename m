@@ -2,107 +2,84 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 86ED3C63797
-	for <linux-block@archiver.kernel.org>; Mon, 16 Jan 2023 01:53:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB2E7C3DA78
+	for <linux-block@archiver.kernel.org>; Mon, 16 Jan 2023 01:53:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231757AbjAPBxo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 15 Jan 2023 20:53:44 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34896 "EHLO
+        id S231788AbjAPBxp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 15 Jan 2023 20:53:45 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34846 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231531AbjAPBxa (ORCPT
+        with ESMTP id S231722AbjAPBxa (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Sun, 15 Jan 2023 20:53:30 -0500
 Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3261544B9;
-        Sun, 15 Jan 2023 17:53:27 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BAC1B44BF;
+        Sun, 15 Jan 2023 17:53:28 -0800 (PST)
 Received: from mail02.huawei.com (unknown [172.30.67.169])
-        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4NwFRN5dpGz4f3v7h;
-        Mon, 16 Jan 2023 09:53:20 +0800 (CST)
+        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4NwFRQ4bjJz4f4374;
+        Mon, 16 Jan 2023 09:53:22 +0800 (CST)
 Received: from huaweicloud.com (unknown [10.175.124.27])
-        by APP4 (Coremail) with SMTP id gCh0CgD3rbERrsRj9iw3Bw--.37368S3;
-        Mon, 16 Jan 2023 09:53:23 +0800 (CST)
+        by APP4 (Coremail) with SMTP id gCh0CgD3rbERrsRj9iw3Bw--.37368S8;
+        Mon, 16 Jan 2023 09:53:25 +0800 (CST)
 From:   Kemeng Shi <shikemeng@huaweicloud.com>
 To:     jack@suse.com, damien.lemoal@opensource.wdc.com,
         paolo.valente@linaro.org, axboe@kernel.dk
 Cc:     hch@lst.de, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH v4 1/8] block, bfq: correctly raise inject limit in bfq_choose_bfqq_for_injection
-Date:   Mon, 16 Jan 2023 17:51:46 +0800
-Message-Id: <20230116095153.3810101-2-shikemeng@huaweicloud.com>
+Subject: [PATCH v4 6/8] block, bfq: remove redundant check in bfq_put_cooperator
+Date:   Mon, 16 Jan 2023 17:51:51 +0800
+Message-Id: <20230116095153.3810101-7-shikemeng@huaweicloud.com>
 X-Mailer: git-send-email 2.30.0
 In-Reply-To: <20230116095153.3810101-1-shikemeng@huaweicloud.com>
 References: <20230116095153.3810101-1-shikemeng@huaweicloud.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgD3rbERrsRj9iw3Bw--.37368S3
-X-Coremail-Antispam: 1UD129KBjvJXoW7uF4xCr1xXrWruF18AF45trb_yoW8ZF17pa
-        y7Ka47u348JF1ruFyjq3WfZFyYqan5CrnrtF13G34Fqr97ur92gasFg3y5Xa1ftFZ3Aw4j
-        v3WUWa4q9F15CaDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUB0b4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
-        6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M280x2IEY4vEnII2IxkI6r1a6r45M2
-        8IrcIa0xkI8VA2jI8067AKxVWUGwA2048vs2IY020Ec7CjxVAFwI0_JFI_Gr1l8cAvFVAK
-        0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVW7JVWDJwA2z4
-        x0Y4vE2Ix0cI8IcVCY1x0267AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l
-        84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I
-        8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AK
-        xVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41l42xK82IYc2Ij64
-        vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8G
-        jcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r126r1DMIIYrxkI7VAKI48JMIIF0xvE2I
-        x0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK
-        8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I
-        0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUsgyZUUUUU
+X-CM-TRANSID: gCh0CgD3rbERrsRj9iw3Bw--.37368S8
+X-Coremail-Antispam: 1UD129KBjvdXoWrKrWxAFWUXr1xWw48Gw1Utrb_yoW3GFc_t3
+        9YkFWrJrW8G345Ar1ftF95Jw1jyayxJF1DJF4Fqw4DXF1UWFn5Aa9FgFWayF45Gay7Ca4a
+        ya40q3WDtr1DWjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+        9fnUUIcSsGvfJTRUUUbS8YFVCjjxCrM7AC8VAFwI0_Wr0E3s1l1xkIjI8I6I8E6xAIw20E
+        Y4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l87I20VAvwVAaII0Ic2I_JFv_Gryl82
+        xGYIkIc2x26280x7IE14v26r126s0DM28IrcIa0xkI8VCY1x0267AKxVW5JVCq3wA2ocxC
+        64kIII0Yj41l84x0c7CEw4AK67xGY2AK021l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM2
+        8EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4UJVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq
+        3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_GcCE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8w
+        Aqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE
+        14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwIxGrwCF04k20xvY0x
+        0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E
+        7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_JF0_Jw1lIxkGc2Ij64vIr41lIxAIcV
+        C0I7IYx2IY67AKxVWUCVW8JwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF
+        04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7
+        CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x07jstxDUUUUU=
 X-CM-SenderInfo: 5vklyvpphqwq5kxd4v5lfo033gof0z/
 X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Function bfq_choose_bfqq_for_injection may temporarily raise inject limit
-to one request if current inject_limit is 0 before search of the source
-queue for injection. However the search below will reset inject limit to
-bfqd->in_service_queue which is zero for raised inject limit. Then the
-temporarily raised inject limit never works as expected.
-Assigment limit to bfqd->in_service_queue in search is needed as limit
-maybe overwriten to min_t(unsigned int, 1, limit) for condition that
-a large in-flight request is on non-rotational devices in found queue.
-So we need to reset limit to bfqd->in_service_queue for normal case.
-
-Actually, we have already make sure bfqd->rq_in_driver is < limit before
-search, then
- -Limit is >= 1 as bfqd->rq_in_driver is >= 0. Then min_t(unsigned int,
-1, limit) is always 1. So we can simply check bfqd->rq_in_driver with
-1 instead of result of min_t(unsigned int, 1, limit) for larget request in
-non-rotational device case to avoid overwritting limit and the bug is gone.
- -For normal case, we have already check bfqd->rq_in_driver is < limit,
-so we can return found bfqq unconditionally to remove unncessary check.
+We have already avoided a circular list in bfq_setup_merge (see comments
+in bfq_setup_merge() for details), so bfq_queue will not appear in it's
+new_bfqq list. Just remove this check.
 
 Signed-off-by: Kemeng Shi <shikemeng@huaweicloud.com>
 Reviewed-by: Jan Kara <jack@suse.cz>
 ---
- block/bfq-iosched.c | 10 ++++------
- 1 file changed, 4 insertions(+), 6 deletions(-)
+ block/bfq-iosched.c | 2 --
+ 1 file changed, 2 deletions(-)
 
 diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index 815b884d6c5a..8836221a2673 100644
+index 4a17b22327f1..dbee5c61830c 100644
 --- a/block/bfq-iosched.c
 +++ b/block/bfq-iosched.c
-@@ -4730,12 +4730,10 @@ bfq_choose_bfqq_for_injection(struct bfq_data *bfqd)
- 			 */
- 			if (blk_queue_nonrot(bfqd->queue) &&
- 			    blk_rq_sectors(bfqq->next_rq) >=
--			    BFQQ_SECT_THR_NONROT)
--				limit = min_t(unsigned int, 1, limit);
--			else
--				limit = in_serv_bfqq->inject_limit;
--
--			if (bfqd->tot_rq_in_driver < limit) {
-+			    BFQQ_SECT_THR_NONROT &&
-+			    bfqd->tot_rq_in_driver >= 1)
-+				continue;
-+			else {
- 				bfqd->rqs_injected = true;
- 				return bfqq;
- 			}
+@@ -5429,8 +5429,6 @@ void bfq_put_cooperator(struct bfq_queue *bfqq)
+ 	 */
+ 	__bfqq = bfqq->new_bfqq;
+ 	while (__bfqq) {
+-		if (__bfqq == bfqq)
+-			break;
+ 		next = __bfqq->new_bfqq;
+ 		bfq_put_queue(__bfqq);
+ 		__bfqq = next;
 -- 
 2.30.0
 
