@@ -2,84 +2,101 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB2E7C3DA78
-	for <linux-block@archiver.kernel.org>; Mon, 16 Jan 2023 01:53:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 34FB1C46467
+	for <linux-block@archiver.kernel.org>; Mon, 16 Jan 2023 02:15:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231788AbjAPBxp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 15 Jan 2023 20:53:45 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34846 "EHLO
+        id S230358AbjAPCPP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 15 Jan 2023 21:15:15 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42920 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231722AbjAPBxa (ORCPT
+        with ESMTP id S231607AbjAPCPP (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 15 Jan 2023 20:53:30 -0500
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BAC1B44BF;
-        Sun, 15 Jan 2023 17:53:28 -0800 (PST)
+        Sun, 15 Jan 2023 21:15:15 -0500
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C7DB527A;
+        Sun, 15 Jan 2023 18:15:13 -0800 (PST)
 Received: from mail02.huawei.com (unknown [172.30.67.169])
-        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4NwFRQ4bjJz4f4374;
-        Mon, 16 Jan 2023 09:53:22 +0800 (CST)
-Received: from huaweicloud.com (unknown [10.175.124.27])
-        by APP4 (Coremail) with SMTP id gCh0CgD3rbERrsRj9iw3Bw--.37368S8;
-        Mon, 16 Jan 2023 09:53:25 +0800 (CST)
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4NwFwW61xZz4f3v5b;
+        Mon, 16 Jan 2023 10:15:07 +0800 (CST)
+Received: from [10.174.178.129] (unknown [10.174.178.129])
+        by APP1 (Coremail) with SMTP id cCh0CgBXxS8ss8RjAsTDBg--.33134S2;
+        Mon, 16 Jan 2023 10:15:10 +0800 (CST)
+Subject: Re: [PATCH RESEND v2 5/5] sbitmap: correct wake_batch recalculation
+ to avoid potential IO hung
 From:   Kemeng Shi <shikemeng@huaweicloud.com>
-To:     jack@suse.com, damien.lemoal@opensource.wdc.com,
-        paolo.valente@linaro.org, axboe@kernel.dk
-Cc:     hch@lst.de, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH v4 6/8] block, bfq: remove redundant check in bfq_put_cooperator
-Date:   Mon, 16 Jan 2023 17:51:51 +0800
-Message-Id: <20230116095153.3810101-7-shikemeng@huaweicloud.com>
-X-Mailer: git-send-email 2.30.0
-In-Reply-To: <20230116095153.3810101-1-shikemeng@huaweicloud.com>
-References: <20230116095153.3810101-1-shikemeng@huaweicloud.com>
+To:     Yu Kuai <yukuai1@huaweicloud.com>, Jan Kara <jack@suse.cz>,
+        Ming Lei <ming.lei@redhat.com>,
+        "yukuai (C)" <yukuai3@huawei.com>
+Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kbusch@kernel.org,
+        Laibin Qiu <qiulaibin@huawei.com>
+References: <20221222143353.598042-1-shikemeng@huaweicloud.com>
+ <20221222143353.598042-6-shikemeng@huaweicloud.com>
+ <20221222134146.khucy5afnxwl75px@quack3>
+ <d00297d7-a77a-770a-1cd7-1632f8ae77e0@huaweicloud.com>
+ <3662b1aa-546b-e4e0-3705-0bc5626067f6@huaweicloud.com>
+ <f8df9153-eeff-f3ca-c4c2-2be0cf876298@huaweicloud.com>
+Message-ID: <16d02f7b-8e0e-097c-63bc-ef83eb9cb05b@huaweicloud.com>
+Date:   Mon, 16 Jan 2023 10:15:08 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.5.0
 MIME-Version: 1.0
+In-Reply-To: <f8df9153-eeff-f3ca-c4c2-2be0cf876298@huaweicloud.com>
+Content-Type: text/plain; charset=gbk
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgD3rbERrsRj9iw3Bw--.37368S8
-X-Coremail-Antispam: 1UD129KBjvdXoWrKrWxAFWUXr1xWw48Gw1Utrb_yoW3GFc_t3
-        9YkFWrJrW8G345Ar1ftF95Jw1jyayxJF1DJF4Fqw4DXF1UWFn5Aa9FgFWayF45Gay7Ca4a
-        ya40q3WDtr1DWjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-        9fnUUIcSsGvfJTRUUUbS8YFVCjjxCrM7AC8VAFwI0_Wr0E3s1l1xkIjI8I6I8E6xAIw20E
-        Y4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l87I20VAvwVAaII0Ic2I_JFv_Gryl82
-        xGYIkIc2x26280x7IE14v26r126s0DM28IrcIa0xkI8VCY1x0267AKxVW5JVCq3wA2ocxC
-        64kIII0Yj41l84x0c7CEw4AK67xGY2AK021l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM2
-        8EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4UJVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq
-        3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_GcCE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8w
-        Aqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE
-        14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwIxGrwCF04k20xvY0x
-        0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E
-        7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_JF0_Jw1lIxkGc2Ij64vIr41lIxAIcV
-        C0I7IYx2IY67AKxVWUCVW8JwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF
-        04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7
-        CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x07jstxDUUUUU=
+X-CM-TRANSID: cCh0CgBXxS8ss8RjAsTDBg--.33134S2
+X-Coremail-Antispam: 1UD129KBjvdXoW7JF13ZFWfGF48ur18JF4Utwb_yoW3twb_Xr
+        4v93Z7C39xGa1xKw1kKr4YqFZIga4DWFy8ArZ5Xr1Fq395t3yfAr4DtrZ5XayDtw4rJFnI
+        qry3uasrXw4UujkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+        9fnUUIcSsGvfJTRUUUb4AFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
+        6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
+        A2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j
+        6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
+        Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
+        I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
+        4UM4x0Y48IcVAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwCYjI0SjxkI62AI1cAE67vI
+        Y487MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI
+        0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y
+        0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxV
+        WUJVW8JwCI42IY6xAIw20EY4v20xvaj40_Wr1j6rW3Jr1lIxAIcVC2z280aVAFwI0_Gr0_
+        Cr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7VUbXdbU
+        UUUUU==
 X-CM-SenderInfo: 5vklyvpphqwq5kxd4v5lfo033gof0z/
 X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-We have already avoided a circular list in bfq_setup_merge (see comments
-in bfq_setup_merge() for details), so bfq_queue will not appear in it's
-new_bfqq list. Just remove this check.
 
-Signed-off-by: Kemeng Shi <shikemeng@huaweicloud.com>
-Reviewed-by: Jan Kara <jack@suse.cz>
----
- block/bfq-iosched.c | 2 --
- 1 file changed, 2 deletions(-)
 
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index 4a17b22327f1..dbee5c61830c 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -5429,8 +5429,6 @@ void bfq_put_cooperator(struct bfq_queue *bfqq)
- 	 */
- 	__bfqq = bfqq->new_bfqq;
- 	while (__bfqq) {
--		if (__bfqq == bfqq)
--			break;
- 		next = __bfqq->new_bfqq;
- 		bfq_put_queue(__bfqq);
- 		__bfqq = next;
+on 1/3/2023 10:12 AM, Kemeng Shi wrote:
+> Friendly ping...
+> 
+> on 12/26/2022 4:57 PM, Yu Kuai wrote:
+>> ÔÚ 2022/12/26 15:50, Yu Kuai Ð´µÀ:
+>>
+>>>> why using
+>>>> wake batch of 4 is safe for cards with say 32 tags in case active_users is
+>>>> currently 32. Because I don't see why that is correct either.
+>>>>
+>>
+>> I see, you guys are worried that during the period that some hctx
+>> complete all it's not idle yet. It's right waiter might wait for
+>> other hctx to become idle to be awaken in this case. However, I'm
+>> not sure which way is better.
+>>
+>> Ming, do you have any idea?
+>>
+>> Thanks,
+>> Kuai
+>>
+> 
+Hi Jan. The magic batch 4 seems just for performance initially while
+lacks of full consideration. And there is no better solution provided
+in futher. Do you have any suggestion that I can do to make more
+progress.
+
 -- 
-2.30.0
+Best wishes
+Kemeng Shi
 
