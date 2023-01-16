@@ -2,73 +2,89 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12A51C54EBE
-	for <linux-block@archiver.kernel.org>; Mon, 16 Jan 2023 19:14:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BF662C54EBE
+	for <linux-block@archiver.kernel.org>; Mon, 16 Jan 2023 21:01:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230238AbjAPTOC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 16 Jan 2023 14:14:02 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37748 "EHLO
+        id S232026AbjAPVA7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 16 Jan 2023 16:00:59 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51930 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231171AbjAPTOB (ORCPT
+        with ESMTP id S231171AbjAPVA6 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 16 Jan 2023 14:14:01 -0500
-Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C1BD25E01;
-        Mon, 16 Jan 2023 11:14:00 -0800 (PST)
-From:   Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1673896437;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=KP+ZeJKhuV/1h9DZDudWe7VjOB3jLOne6JPka+DBq8M=;
-        b=C9PO+ig6Jpks3ETupv65OF37rXjMN7bOzL0sYy8VrGSm2FO+XAi1rICQvmYq/G+JvdRWSk
-        3qFt9mOpx4RjU2yOKGl1iWr4xB0J0LtxTfufdQqHuSlUodFjzQsPYO9sa4MiU8632mQ4uS
-        0X73peZulLRpU7Ifp/BcFp5JDw8gd7cqYqQ2OZV2YFJNkJgFZiY801QUP6iH02sOBZWZQ+
-        DwqSQRofZaz/apD4BI2OZ4D+rE06Xr2X9HvAH44KeKUorBUEL7XcyGTVjqlaMlK5bsl1Dg
-        +Yqd4PCiEGZ0xtesirs2tgQxzKfrS9ridYo4OPyAFftYjDDNzcJJxc71iyAs3g==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1673896437;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=KP+ZeJKhuV/1h9DZDudWe7VjOB3jLOne6JPka+DBq8M=;
-        b=3oRThO1aWKtOAMPVzSZ3Jvsam7g7zi1gCi4gRsaFMrwChAFsoIiJfa6GiQlYmpvLx72fcR
-        irBTjH1BIZvxg0Cg==
-To:     Jens Axboe <axboe@kernel.dk>, Ming Lei <ming.lei@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        Mon, 16 Jan 2023 16:00:58 -0500
+Received: from mail.ispras.ru (mail.ispras.ru [83.149.199.84])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6507035A7;
+        Mon, 16 Jan 2023 13:00:56 -0800 (PST)
+Received: from fedcomp.intra.ispras.ru (unknown [46.242.14.200])
+        by mail.ispras.ru (Postfix) with ESMTPSA id 2890F40D403D;
+        Mon, 16 Jan 2023 21:00:52 +0000 (UTC)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.ispras.ru 2890F40D403D
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ispras.ru;
+        s=default; t=1673902852;
+        bh=aPV6pXyHE8sCh3Ryx3ARXM6RJp4EZ+mnoTRRwaCNjdo=;
+        h=From:To:Cc:Subject:Date:From;
+        b=FXCbw/QYuC8QnIz1VNr3ed5sUSwXO+2jdNi2CUXmtNds4aa/CS3hT4oasox2nhI9z
+         jElg7zq6MjptUH5BBY/pSMziVwEJFJWyttGtjKoqkIDocsvibya9FyGhuaIKitkC+k
+         KDFGNPPA51SsCRpn0sViNH0BKo5iiste8F5iYMXw=
+From:   Fedor Pchelkin <pchelkin@ispras.ru>
+To:     stable@vger.kernel.org,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc:     Fedor Pchelkin <pchelkin@ispras.ru>, Jens Axboe <axboe@kernel.dk>,
         Christoph Hellwig <hch@lst.de>,
-        John Garry <john.garry@huawei.com>
-Subject: Re: [PATCH V4 0/6] genirq/affinity: Abstract APIs from managed irq
- affinity spread
-In-Reply-To: <ca08f6b8-a491-3a7e-f576-833acdf2135b@kernel.dk>
-References: <20221227022905.352674-1-ming.lei@redhat.com>
- <Y74cXN4SP7FNtSl3@T590> <ca08f6b8-a491-3a7e-f576-833acdf2135b@kernel.dk>
-Date:   Mon, 16 Jan 2023 20:13:56 +0100
-Message-ID: <87k01mmgwb.ffs@tglx>
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Alexey Khoroshilov <khoroshilov@ispras.ru>
+Subject: [PATCH 5.15] block: fix and cleanup bio_check_ro
+Date:   Tue, 17 Jan 2023 00:00:40 +0300
+Message-Id: <20230116210040.804629-1-pchelkin@ispras.ru>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Jens!
+From: Christoph Hellwig <hch@lst.de>
 
-On Wed, Jan 11 2023 at 12:04, Jens Axboe wrote:
-> On 1/10/23 7:18=E2=80=AFPM, Ming Lei wrote:
->> Hello Thomas, Jens and guys,
->
-> I took a look and it looks good to me, no immediate issues spotted.
+commit 57e95e4670d1126c103305bcf34a9442f49f6d6a upstream.
 
-Want me to take the blk-mq change through tip too or do you prefer to
-merge that into your tree?
+Don't use a WARN_ON when printing a potentially user triggered
+condition. Also don't print the partno when the block device name
+already includes it, and use the %pg specifier to simplify printing
+the block device name.
 
-If this goes through tip, I'd appreciate an Ack. If you want it through
-block, then I give you a tag with the irq parts for you to pull.
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Chaitanya Kulkarni <kch@nvidia.com>
+Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
+Link: https://lore.kernel.org/r/20220304180105.409765-2-hch@lst.de
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+Signed-off-by: Fedor Pchelkin <pchelkin@ispras.ru>
+---
+ block/blk-core.c | 8 ++------
+ 1 file changed, 2 insertions(+), 6 deletions(-)
 
-Thanks,
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 13e1fca1e923..ed6271dcc1b1 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -698,14 +698,10 @@ static inline bool should_fail_request(struct block_device *part,
+ static inline bool bio_check_ro(struct bio *bio)
+ {
+ 	if (op_is_write(bio_op(bio)) && bdev_read_only(bio->bi_bdev)) {
+-		char b[BDEVNAME_SIZE];
+-
+ 		if (op_is_flush(bio->bi_opf) && !bio_sectors(bio))
+ 			return false;
+-
+-		WARN_ONCE(1,
+-		       "Trying to write to read-only block-device %s (partno %d)\n",
+-			bio_devname(bio, b), bio->bi_bdev->bd_partno);
++		pr_warn("Trying to write to read-only block-device %pg\n",
++			bio->bi_bdev);
+ 		/* Older lvm-tools actually trigger this */
+ 		return false;
+ 	}
+-- 
+2.34.1
 
-        tglx
