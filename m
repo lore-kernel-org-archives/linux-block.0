@@ -2,163 +2,129 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 14CCDC54EBE
-	for <linux-block@archiver.kernel.org>; Mon, 16 Jan 2023 23:11:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC4B6C67871
+	for <linux-block@archiver.kernel.org>; Mon, 16 Jan 2023 23:12:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235166AbjAPXLq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 16 Jan 2023 18:11:46 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48934 "EHLO
+        id S235357AbjAPXMT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 16 Jan 2023 18:12:19 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48278 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235114AbjAPXKl (ORCPT
+        with ESMTP id S235273AbjAPXLE (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 16 Jan 2023 18:10:41 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 865512C642
-        for <linux-block@vger.kernel.org>; Mon, 16 Jan 2023 15:09:20 -0800 (PST)
+        Mon, 16 Jan 2023 18:11:04 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC99914EAC
+        for <linux-block@vger.kernel.org>; Mon, 16 Jan 2023 15:09:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1673910559;
+        s=mimecast20190719; t=1673910575;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=Girl2YBNSmk/RhHD3I8qnvIF9Ng617btd8CJd+5Emo0=;
-        b=QbtqwaZXNZ0LyFeFY8vzcCPeC69ihK8fFGvWvOVlBVkS1e8GLXLuGxbdaT+w8YvG/ewceL
-        vmW6I0FqbZz0CGdgin0N4ubIdNRqZrefCXXdXP0VhlJMqTDNRHlyrqTj+O+JymSXT5FoQL
-        qbLbdjDjzWsEvAc+ZB6qT46dL9GeSmI=
+        bh=YVa1ryPTQBH/SP1C4Yj88p68hB8CmUr5EMTQUgrIC1o=;
+        b=EWR3CiUhcdkvi+fknZXWf/Mg4akdWLv4/Wpq7jOXnRFIfpXj6E68O/A21F96zT++XcX+6v
+        ZYbHrSQzExAZY6l36N0uZh5ZCBVdzzTedSPdnM0KMKXXovAZDCaX8PeHt8LMUNSbljjIwY
+        a4bJdwxz0nzUh+QNBBrATm/sGBAVQPY=
 Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
  [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-355-QG4fZcgpOoC_YVw6MQevGA-1; Mon, 16 Jan 2023 18:09:16 -0500
-X-MC-Unique: QG4fZcgpOoC_YVw6MQevGA-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+ us-mta-20-qc22pDstOuC3dJ8UShOP6g-1; Mon, 16 Jan 2023 18:09:29 -0500
+X-MC-Unique: qc22pDstOuC3dJ8UShOP6g-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 533ED1C0518D;
-        Mon, 16 Jan 2023 23:09:15 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 4B38B2806046;
+        Mon, 16 Jan 2023 23:09:29 +0000 (UTC)
 Received: from warthog.procyon.org.uk (unknown [10.33.36.23])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id E91BE492B11;
-        Mon, 16 Jan 2023 23:09:13 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 1BE9A14171B8;
+        Mon, 16 Jan 2023 23:09:28 +0000 (UTC)
 Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
         Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
         Kingdom.
         Registered in England and Wales under Company Registration No. 3798903
-Subject: [PATCH v6 10/34] mm,
- block: Make BIO_PAGE_REFFED/PINNED the same as FOLL_GET/PIN numerically
+Subject: [PATCH v6 12/34] bio: Fix bio_flagged() so that gcc can better
+ optimise it
 From:   David Howells <dhowells@redhat.com>
 To:     Al Viro <viro@zeniv.linux.org.uk>
-Cc:     Jens Axboe <axboe@kernel.dk>, Jan Kara <jack@suse.cz>,
-        Christoph Hellwig <hch@lst.de>,
-        Matthew Wilcox <willy@infradead.org>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        linux-block@vger.kernel.org, dhowells@redhat.com,
-        Christoph Hellwig <hch@infradead.org>,
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        dhowells@redhat.com, Christoph Hellwig <hch@infradead.org>,
         Matthew Wilcox <willy@infradead.org>,
         Jens Axboe <axboe@kernel.dk>, Jan Kara <jack@suse.cz>,
         Jeff Layton <jlayton@kernel.org>,
         Logan Gunthorpe <logang@deltatee.com>,
         linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Date:   Mon, 16 Jan 2023 23:09:13 +0000
-Message-ID: <167391055339.2311931.11902422289425837725.stgit@warthog.procyon.org.uk>
+Date:   Mon, 16 Jan 2023 23:09:27 +0000
+Message-ID: <167391056756.2311931.356007731815807265.stgit@warthog.procyon.org.uk>
 In-Reply-To: <167391047703.2311931.8115712773222260073.stgit@warthog.procyon.org.uk>
 References: <167391047703.2311931.8115712773222260073.stgit@warthog.procyon.org.uk>
 User-Agent: StGit/1.5
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.7
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Make BIO_PAGE_REFFED the same as FOLL_GET and BIO_PAGE_PINNED the same as
-FOLL_PIN numerically so that the BIO_* flags can be passed directly to
-page_put_unpin().
+Fix bio_flagged() so that multiple instances of it, such as:
 
-Provide a build-time assertion to check this.
+	if (bio_flagged(bio, BIO_PAGE_REFFED) ||
+	    bio_flagged(bio, BIO_PAGE_PINNED))
 
+can be combined by the gcc optimiser into a single test in assembly
+(arguably, this is a compiler optimisation issue[1]).
+
+The missed optimisation stems from bio_flagged() comparing the result of
+the bitwise-AND to zero.  This results in an out-of-line bio_release_page()
+being compiled to something like:
+
+   <+0>:     mov    0x14(%rdi),%eax
+   <+3>:     test   $0x1,%al
+   <+5>:     jne    0xffffffff816dac53 <bio_release_pages+11>
+   <+7>:     test   $0x2,%al
+   <+9>:     je     0xffffffff816dac5c <bio_release_pages+20>
+   <+11>:    movzbl %sil,%esi
+   <+15>:    jmp    0xffffffff816daba1 <__bio_release_pages>
+   <+20>:    jmp    0xffffffff81d0b800 <__x86_return_thunk>
+
+However, the test is superfluous as the return type is bool.  Removing it
+results in:
+
+   <+0>:     testb  $0x3,0x14(%rdi)
+   <+4>:     je     0xffffffff816e4af4 <bio_release_pages+15>
+   <+6>:     movzbl %sil,%esi
+   <+10>:    jmp    0xffffffff816dab7c <__bio_release_pages>
+   <+15>:    jmp    0xffffffff81d0b7c0 <__x86_return_thunk>
+
+instead.
+
+Also, the MOVZBL instruction looks unnecessary[2] - I think it's just
+'re-booling' the mark_dirty parameter.
+
+Fixes: b7c44ed9d2fc ("block: manipulate bio->bi_flags through helpers")
 Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Al Viro <viro@zeniv.linux.org.uk>
 cc: Jens Axboe <axboe@kernel.dk>
-cc: Jan Kara <jack@suse.cz>
-cc: Christoph Hellwig <hch@lst.de>
-cc: Matthew Wilcox <willy@infradead.org>
-cc: Logan Gunthorpe <logang@deltatee.com>
 cc: linux-block@vger.kernel.org
+Link: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=108370 [1]
+Link: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=108371 [2]
 ---
 
- block/bio.c               |    3 +++
- include/linux/blk_types.h |    1 +
- include/linux/mm.h        |   17 ++++++++++-------
- 3 files changed, 14 insertions(+), 7 deletions(-)
+ include/linux/bio.h |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/block/bio.c b/block/bio.c
-index 5b6a76c3e620..d8c636cefcdd 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -1798,6 +1798,9 @@ static int __init init_bio(void)
+diff --git a/include/linux/bio.h b/include/linux/bio.h
+index 856b28e41d24..5e34bcfcfa2c 100644
+--- a/include/linux/bio.h
++++ b/include/linux/bio.h
+@@ -241,7 +241,7 @@ static inline void bio_cnt_set(struct bio *bio, unsigned int count)
+ 
+ static inline bool bio_flagged(struct bio *bio, unsigned int bit)
  {
- 	int i;
+-	return (bio->bi_flags & (1U << bit)) != 0;
++	return bio->bi_flags & (1U << bit);
+ }
  
-+	BUILD_BUG_ON((1 << BIO_PAGE_REFFED) != FOLL_GET);
-+	BUILD_BUG_ON((1 << BIO_PAGE_PINNED) != FOLL_PIN);
-+
- 	bio_integrity_init();
- 
- 	for (i = 0; i < ARRAY_SIZE(bvec_slabs); i++) {
-diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-index 86711fb0534a..42b40156c517 100644
---- a/include/linux/blk_types.h
-+++ b/include/linux/blk_types.h
-@@ -319,6 +319,7 @@ struct bio {
-  */
- enum {
- 	BIO_PAGE_REFFED,	/* Pages need refs putting (equivalent to FOLL_GET) */
-+	BIO_PAGE_PINNED,	/* Pages need unpinning (equivalent to FOLL_PIN) */
- 	BIO_CLONED,		/* doesn't own data */
- 	BIO_BOUNCED,		/* bio is a bounce bio */
- 	BIO_QUIET,		/* Make BIO Quiet */
-diff --git a/include/linux/mm.h b/include/linux/mm.h
-index 8e746a930945..f14edb192394 100644
---- a/include/linux/mm.h
-+++ b/include/linux/mm.h
-@@ -3074,12 +3074,13 @@ static inline vm_fault_t vmf_error(int err)
- struct page *follow_page(struct vm_area_struct *vma, unsigned long address,
- 			 unsigned int foll_flags);
- 
--#define FOLL_WRITE	0x01	/* check pte is writable */
--#define FOLL_TOUCH	0x02	/* mark page accessed */
--#define FOLL_GET	0x04	/* do get_page on page */
--#define FOLL_DUMP	0x08	/* give error on hole if it would be zero */
--#define FOLL_FORCE	0x10	/* get_user_pages read/write w/o permission */
--#define FOLL_NOWAIT	0x20	/* if a disk transfer is needed, start the IO
-+#define FOLL_GET	0x01	/* do get_page on page (equivalent to BIO_FOLL_GET) */
-+#define FOLL_PIN	0x02	/* pages must be released via unpin_user_page */
-+#define FOLL_WRITE	0x04	/* check pte is writable */
-+#define FOLL_TOUCH	0x08	/* mark page accessed */
-+#define FOLL_DUMP	0x10	/* give error on hole if it would be zero */
-+#define FOLL_FORCE	0x20	/* get_user_pages read/write w/o permission */
-+#define FOLL_NOWAIT	0x40	/* if a disk transfer is needed, start the IO
- 				 * and return without waiting upon it */
- #define FOLL_NOFAULT	0x80	/* do not fault in pages */
- #define FOLL_HWPOISON	0x100	/* check page is hwpoisoned */
-@@ -3088,7 +3089,6 @@ struct page *follow_page(struct vm_area_struct *vma, unsigned long address,
- #define FOLL_ANON	0x8000	/* don't do file mappings */
- #define FOLL_LONGTERM	0x10000	/* mapping lifetime is indefinite: see below */
- #define FOLL_SPLIT_PMD	0x20000	/* split huge pmd before returning */
--#define FOLL_PIN	0x40000	/* pages must be released via unpin_user_page */
- #define FOLL_FAST_ONLY	0x80000	/* gup_fast: prevent fall-back to slow gup */
- #define FOLL_PCI_P2PDMA	0x100000 /* allow returning PCI P2PDMA pages */
- #define FOLL_INTERRUPTIBLE  0x200000 /* allow interrupts from generic signals */
-@@ -3098,6 +3098,9 @@ struct page *follow_page(struct vm_area_struct *vma, unsigned long address,
- #define FOLL_BUF_MASK	FOLL_WRITE
- 
- /*
-+ * FOLL_GET must be the same bit as BIO_FOLL_GET and FOLL_PIN must be the same
-+ * bit as BIO_FOLL_PIN.
-+ *
-  * FOLL_PIN and FOLL_LONGTERM may be used in various combinations with each
-  * other. Here is what they mean, and how to use them:
-  *
+ static inline void bio_set_flag(struct bio *bio, unsigned int bit)
 
 
