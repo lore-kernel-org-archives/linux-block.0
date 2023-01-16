@@ -2,91 +2,114 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CFB20C63797
-	for <linux-block@archiver.kernel.org>; Mon, 16 Jan 2023 12:55:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00A44C46467
+	for <linux-block@archiver.kernel.org>; Mon, 16 Jan 2023 13:05:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230293AbjAPMz1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 16 Jan 2023 07:55:27 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45630 "EHLO
+        id S231486AbjAPNFF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 16 Jan 2023 08:05:05 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52580 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231302AbjAPMy5 (ORCPT
+        with ESMTP id S231774AbjAPNES (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 16 Jan 2023 07:54:57 -0500
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5285D1EFE7;
-        Mon, 16 Jan 2023 04:52:34 -0800 (PST)
-Received: from mail02.huawei.com (unknown [172.30.67.143])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4NwX3v0y71z4f419B;
-        Mon, 16 Jan 2023 20:52:27 +0800 (CST)
-Received: from huaweicloud.com (unknown [10.175.124.27])
-        by APP2 (Coremail) with SMTP id Syh0CgBH7uuMSMVjYH02Bw--.361S2;
-        Mon, 16 Jan 2023 20:52:29 +0800 (CST)
-From:   Kemeng Shi <shikemeng@huaweicloud.com>
-To:     jack@suse.cz, axboe@kernel.dk
-Cc:     kbusch@kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, shikemeng@huaweicloud.com
-Subject: [PATCH v3 0/5] A few bugfix and cleanup patches for sbitmap
-Date:   Tue, 17 Jan 2023 04:50:54 +0800
-Message-Id: <20230116205059.3821738-1-shikemeng@huaweicloud.com>
-X-Mailer: git-send-email 2.30.0
+        Mon, 16 Jan 2023 08:04:18 -0500
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5A2D1710;
+        Mon, 16 Jan 2023 05:03:43 -0800 (PST)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 5140267838;
+        Mon, 16 Jan 2023 13:03:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1673874222; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=8HTDNZq8o98W3LfkLNWznZ2gGr+LyFivo+02SGi1JGM=;
+        b=f1gWOTxZd+01daI39fPUkEdnRvZAub6QxTYFSFYxqKaw7IBjylrVUfemyo3rWCZW/j63A0
+        TPG841KJc19d/I2Qb4l6c/lDOmiGG2LImqzp3ori3LjkLvGF5OEvDIkpPYLVEPd6R7glKG
+        PGrnDcjA7S+F0718tsiCy6DCYqg5JV8=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1673874222;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=8HTDNZq8o98W3LfkLNWznZ2gGr+LyFivo+02SGi1JGM=;
+        b=Z9ekvVCmLtCFGeX1DBAAHlfiA0paaJhPjQlGPceNFjLzFTAEHnVai4GReoacXLmJLUKWh7
+        rPc4WbuPBPzNvVCQ==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 41F15138FA;
+        Mon, 16 Jan 2023 13:03:42 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id W9EREC5LxWN4MAAAMHmgww
+        (envelope-from <jack@suse.cz>); Mon, 16 Jan 2023 13:03:42 +0000
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+        id C2546A06AD; Mon, 16 Jan 2023 14:03:41 +0100 (CET)
+Date:   Mon, 16 Jan 2023 14:03:41 +0100
+From:   Jan Kara <jack@suse.cz>
+To:     Paolo Valente <paolo.valente@linaro.org>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, arie.vanderhoeven@seagate.com,
+        rory.c.chen@seagate.com, glen.valante@linaro.org,
+        damien.lemoal@opensource.wdc.com
+Subject: Re: [PATCH V13 REBASED 0/8] block, bfq: extend bfq to support
+ multi-actuator drives
+Message-ID: <20230116130341.lci7hixndnxvjuhz@quack3>
+References: <20230103145503.71712-1-paolo.valente@linaro.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: Syh0CgBH7uuMSMVjYH02Bw--.361S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7uw15Zr18uw43Jw1DCF1UGFg_yoW8Jw4fpr
-        1fKF1fGwn3KFy7Xr17A343JFySyw4kKrnxJw1IkF1ruF1UAF9IkrWkKFWfA34UJFy3tFW7
-        JF1rXr18Kr1UZaUanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUvY14x267AKxVWUJVW8JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2jI8I6cxK62vIxIIY0VWUZVW8XwA2ocxC64kIII
-        0Yj41l84x0c7CEw4AK67xGY2AK021l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xv
-        wVC0I7IYx2IY6xkF7I0E14v26r4UJVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4
-        x0Y4vEx4A2jsIEc7CjxVAFwI0_GcCE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG
-        64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r
-        1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAq
-        YI8I648v4I1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4
-        xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r126r1D
-        MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I
-        0E14v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWrZr1j6s0DMIIF0xvEx4A2jsIE14v2
-        6r4j6F4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0p
-        RVc_3UUUUU=
-X-CM-SenderInfo: 5vklyvpphqwq5kxd4v5lfo033gof0z/
-X-CFilter-Loop: Reflected
+In-Reply-To: <20230103145503.71712-1-paolo.valente@linaro.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi, this series contain a bugfix patch to correct wake_batch
-recalculation to avoid potential IO hung and a few cleanup patches to
-remove unnecessary check and repeat code in sbitmap. Thanks.
+Hi Paolo!
 
----
-v3:
- -Thank Jan for review. Collect Reviewed-by from Jan for all patches.
- -some cleanups according to recommends from Jan:
-   1)Add Fixes tag in patch 2/5 "sbitmap: remove redundant check in
-__sbitmap_queue_get_batch"
-   2)Avoid lines over 80 characters in patch 3/5 "sbitmap: rewrite
-sbitmap_find_bit_in_index to reduce repeat code"
-   3)Remove pointless line in patch 4/5 "sbitmap: add sbitmap_find_bit
-to remove repeat code in __sbitmap_get/__sbitmap_get_shallow"
+On Tue 03-01-23 15:54:55, Paolo Valente wrote:
+> Here is the whole description of this patch series again.  This
+> extension addresses the following issue. Single-LUN multi-actuator
+> SCSI drives, as well as all multi-actuator SATA drives appear as a
+> single device to the I/O subsystem [1].  Yet they address commands to
+> different actuators internally, as a function of Logical Block
+> Addressing (LBAs). A given sector is reachable by only one of the
+> actuators. For example, Seagate’s Serial Advanced Technology
+> Attachment (SATA) version contains two actuators and maps the lower
+> half of the SATA LBA space to the lower actuator and the upper half to
+> the upper actuator.
+> 
+> Evidently, to fully utilize actuators, no actuator must be left idle
+> or underutilized while there is pending I/O for it. To reach this
+> goal, the block layer must somehow control the load of each actuator
+> individually. This series enriches BFQ with such a per-actuator
+> control, as a first step. Then it also adds a simple mechanism for
+> guaranteeing that actuators with pending I/O are never left idle.
+> 
+> See [1] for a more detailed overview of the problem and of the
+> solutions implemented in this patch series. There you will also find
+> some preliminary performance results.
 
----
-v2:
- -add patch "sbitmap: correct wake_batch recalculation to avoid potential
-IO hung"
----
+Sorry, I didn't find time to look into this earlier. I've just had a
+high-level look into the patches and I have one question: Did you consider
+a solution where you'd basically duplicate all of the scheduling for each
+actuator (thus making them effectively independent devices from the point
+of view of BFQ)? From the first look it would look like somewhat simpler
+solution than splitting all the BFQ queues and implementing special
+injection mechanism for other actuators and perhaps lead to better
+utilization of the actuators. OTOH the latecy and QoS for tasks using
+multiple actuators would be probably worse because it would be basically
+determined by the busiest of the actuators. So I'm asking mostly out of
+curiosity :)
 
-Kemeng Shi (5):
-  sbitmap: remove unnecessary calculation of alloc_hint in
-    __sbitmap_get_shallow
-  sbitmap: remove redundant check in __sbitmap_queue_get_batch
-  sbitmap: rewrite sbitmap_find_bit_in_index to reduce repeat code
-  sbitmap: add sbitmap_find_bit to remove repeat code in
-    __sbitmap_get/__sbitmap_get_shallow
-  sbitmap: correct wake_batch recalculation to avoid potential IO hung
-
- lib/sbitmap.c | 102 ++++++++++++++++++++++----------------------------
- 1 file changed, 45 insertions(+), 57 deletions(-)
-
+								Honza
+ 
 -- 
-2.30.0
-
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
