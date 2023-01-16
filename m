@@ -2,98 +2,102 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E990EC3DA78
-	for <linux-block@archiver.kernel.org>; Sun, 15 Jan 2023 08:04:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B545C3DA78
+	for <linux-block@archiver.kernel.org>; Mon, 16 Jan 2023 01:07:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229952AbjAOIEm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 15 Jan 2023 03:04:42 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60306 "EHLO
+        id S231482AbjAPBHL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 15 Jan 2023 20:07:11 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53982 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229890AbjAOIEl (ORCPT
+        with ESMTP id S231531AbjAPBHK (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 15 Jan 2023 03:04:41 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E8FDB47B;
-        Sun, 15 Jan 2023 00:04:40 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 2825160C53;
-        Sun, 15 Jan 2023 08:04:40 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0C804C433D2;
-        Sun, 15 Jan 2023 08:04:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1673769879;
-        bh=qm7hyC0LUcDgDBxuDWXDhly2lFnkKUN2YKEnH4CRa8Q=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=TOVodW3/W+kLvSDGrLFSUb3XjtmMs7WVRscM0i0DMoDYKTRmx82lcFEcwEDOd94rH
-         HZ+4kJFALknAhdiBPzTip+vPj0+ohAWgdB+LR3/N63yRzHrqT/QI5NSPCpS0I5IjL2
-         wGz4G/2X1r3lutsGlX6uiDH891qeUF3wP9s9KnT4=
-Date:   Sun, 15 Jan 2023 09:04:36 +0100
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     Fedor Pchelkin <pchelkin@ispras.ru>
-Cc:     stable@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Christoph Hellwig <hch@lst.de>,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Alexey Khoroshilov <khoroshilov@ispras.ru>,
-        lvc-project@linuxtesting.org
-Subject: Re: [PATCH 5.10 1/1] block: fix and cleanup bio_check_ro
-Message-ID: <Y8OzlLXW4WvgvwDw@kroah.com>
-References: <20230114222709.180795-1-pchelkin@ispras.ru>
- <20230114222709.180795-2-pchelkin@ispras.ru>
+        Sun, 15 Jan 2023 20:07:10 -0500
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA318E3AC;
+        Sun, 15 Jan 2023 17:07:05 -0800 (PST)
+Received: from mail02.huawei.com (unknown [172.30.67.169])
+        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4NwDPv1psmz4f3jMq;
+        Mon, 16 Jan 2023 09:06:59 +0800 (CST)
+Received: from [10.174.178.129] (unknown [10.174.178.129])
+        by APP1 (Coremail) with SMTP id cCh0CgBHsy00o8RjcP3ABg--.29754S2;
+        Mon, 16 Jan 2023 09:07:01 +0800 (CST)
+Subject: Re: [PATCH v3 07/14] blk-mq: make blk_mq_commit_rqs a general
+ function for all commits
+From:   Kemeng Shi <shikemeng@huaweicloud.com>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     axboe@kernel.dk, dwagner@suse.de, hare@suse.de,
+        ming.lei@redhat.com, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, john.garry@huawei.com, jack@suse.cz
+References: <20230111130159.3741753-1-shikemeng@huaweicloud.com>
+ <20230111130159.3741753-8-shikemeng@huaweicloud.com>
+ <20230111054520.GA17158@lst.de>
+ <c51cbadb-bfd8-5f26-6bc3-5ad975b5db39@huaweicloud.com>
+Message-ID: <e2ba1495-e9a8-8dfc-4eee-d9a2984bc0d2@huaweicloud.com>
+Date:   Mon, 16 Jan 2023 09:07:00 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.5.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230114222709.180795-2-pchelkin@ispras.ru>
+In-Reply-To: <c51cbadb-bfd8-5f26-6bc3-5ad975b5db39@huaweicloud.com>
+Content-Type: text/plain; charset=gbk
+Content-Transfer-Encoding: 7bit
+X-CM-TRANSID: cCh0CgBHsy00o8RjcP3ABg--.29754S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7Cr4kJw1DtF1kZryftw48Xrb_yoW8XF18pF
+        4UJa98ta1rJrsFywn5Ja1xZFyxJ39aqry3Xr9rt34rWrWYgFyfur43KrnrWFZrCr4kJ3y3
+        u3y3Cr90qa4rurJanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUyEb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
+        6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+        vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7Cj
+        xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
+        0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
+        6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
+        Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JMxk0xIA0c2IEe2xFo4CEbIxvr21l42xK82IYc2Ij
+        64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x
+        8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE
+        2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42
+        xK8VAvwI8IcIk0rVWrZr1j6s0DMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIE
+        c7CjxVAFwI0_Jr0_GrUvcSsGvfC2KfnxnUUI43ZEXa7IU1zuWJUUUUU==
+X-CM-SenderInfo: 5vklyvpphqwq5kxd4v5lfo033gof0z/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sun, Jan 15, 2023 at 01:27:09AM +0300, Fedor Pchelkin wrote:
-> From: Christoph Hellwig <hch@lst.de>
+
+on 1/11/2023 2:30 PM, Kemeng Shi wrote:
 > 
-> commit 57e95e4670d1126c103305bcf34a9442f49f6d6a upstream.
-> 
-> Don't use a WARN_ONCE when printing a potentially user triggered
-> condition.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> Reviewed-by: Chaitanya Kulkarni <kch@nvidia.com>
-> Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
-> Link: https://lore.kernel.org/r/20220304180105.409765-2-hch@lst.de
-> Signed-off-by: Jens Axboe <axboe@kernel.dk>
-> Signed-off-by: Fedor Pchelkin <pchelkin@ispras.ru>
-> ---
->  block/blk-core.c | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
-> 
-> diff --git a/block/blk-core.c b/block/blk-core.c
-> index 26664f2a139e..921d436fa3c6 100644
-> --- a/block/blk-core.c
-> +++ b/block/blk-core.c
-> @@ -701,8 +701,7 @@ static inline bool bio_check_ro(struct bio *bio, struct hd_struct *part)
->  		if (op_is_flush(bio->bi_opf) && !bio_sectors(bio))
->  			return false;
->  
-> -		WARN_ONCE(1,
-> -		       "Trying to write to read-only block-device %s (partno %d)\n",
-> +		pr_warn("Trying to write to read-only block-device %s (partno %d)\n",
->  			bio_devname(bio, b), part->partno);
->  		/* Older lvm-tools actually trigger this */
->  		return false;
-> -- 
-> 2.34.1
+> Hi Christoph, thank you for taking time to review, alos sorry for the bother
+> of code style problem. I will fix them in next version.
+> on 1/11/2023 1:45 PM, Christoph Hellwig wrote:
+>> On Wed, Jan 11, 2023 at 09:01:52PM +0800, Kemeng Shi wrote:
+>>> 1. rename orignal blk_mq_commit_rqs to blk_mq_plug_commit_rqs as
+>>> trace_block_unplug is only needed when we dispatch request from plug list.
+>>
+>> Why?  I think always having the trace even for the commit case seems
+>> very useful for making the traces useful.
+> I think unplug event more likely means that request going to be sent to driver
+> was plugged and in plug list. And the current code do only trace unplug event
+> when dispatching requests from plug list. If so, would it be better to add
+> a new event to trace commit?
+Hi Christoph, which way do you prefer now? Keep unplug event consistent to
+trace commit of requests from plug list only or trace all commits with
+unplug event. Please let me know and I will consider it in next version.
+Thanks.
+>>> +/* blk_mq_commit_rqs and blk_mq_plug_commit_rqs notify driver using
+>>> + * bd->last that there is no more requests. (See comment in struct
+>>
+>> This is not the normal kernel comment style.
+>>
+>>> +static void blk_mq_commit_rqs(struct blk_mq_hw_ctx *hctx, int queued)
+>>> +{
+>>> +	if (hctx->queue->mq_ops->commit_rqs && queued) {
+>>> +		hctx->queue->mq_ops->commit_rqs(hctx);
+>>> +	}
+>>
+>> No need for the braces.
+>>
 > 
 
-Again, we CAN NOT take patches for older kernels and not for newer ones,
-that one will cause regressions when people upgrade to newer kernels.
+-- 
+Best wishes
+Kemeng Shi
 
-So I'm dropping all of your patches from my queue, please resend them so
-that all trees are properly covered.  As-is, I can not take the, and
-most importantly, you do not want me to accept such a thing!
-
-thanks,
-
-greg k-h
