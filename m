@@ -2,120 +2,61 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2142EC46467
-	for <linux-block@archiver.kernel.org>; Mon, 16 Jan 2023 16:03:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 39A02C677F1
+	for <linux-block@archiver.kernel.org>; Mon, 16 Jan 2023 16:07:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232079AbjAPQDq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 16 Jan 2023 11:03:46 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44818 "EHLO
+        id S232303AbjAPQHD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 16 Jan 2023 11:07:03 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44040 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232149AbjAPQDJ (ORCPT
+        with ESMTP id S232202AbjAPQGV (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 16 Jan 2023 11:03:09 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 994A523DA2
-        for <linux-block@vger.kernel.org>; Mon, 16 Jan 2023 08:02:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1673884919;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=8pukx+I4QrScYN3Z5nRX9xtPFWya2FweofKXHmiiGPg=;
-        b=EooujqzXAQQa3Md6hEaFdSjIQ/bhDHzirnIvlQqTlOB77x0qTW5eg0uu+gADVtQ9les5PN
-        swAVJ4eT1jNPv7yq8XLHZ+I4apX3HblBqKmmjXa+qmfn7YiPIyZtbo7GOKQcjxXghZvVsh
-        4vPgVLFyMsT6EdZhCGUMWJZ71kf0+Wg=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-159-ifNPrZcoO5aLBvu_n-6qtw-1; Mon, 16 Jan 2023 11:01:54 -0500
-X-MC-Unique: ifNPrZcoO5aLBvu_n-6qtw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 4ECF91C00426;
-        Mon, 16 Jan 2023 16:01:52 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.33.36.23])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 9562140C2008;
-        Mon, 16 Jan 2023 16:01:50 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@infradead.org>
-cc:     linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        Mon, 16 Jan 2023 11:06:21 -0500
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3600925E17;
+        Mon, 16 Jan 2023 08:04:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=MzbI4mK0CdoF3B/H//+HN9YCPUxyR571ZP+T0wNHvZ0=; b=QJSFklNnf+i6dh9mOZ+zKH9pic
+        sRJWL91C9t4/H3Rcx3RdAEDawNh698CoHXxLq8pPk5Pm+wgSEf1IqhFOV1Lxp5QLckQeGnMVaIxIl
+        MAqslVYsYz2HeCHFV/IDJ/hUybuiDA6r6S8qbLii4deV8OcSm8+GaJj3p2WXZx8XAZeSfBBK84537
+        mFobmy17auOErrY1837R+bqLE0y2IiDXt2BCB3R8luJeWdC9LjvR7nedzoRNY51UsSv7hF7bebDIa
+        PIqfAjcVSdqg6K030sWyMpRO+Zo54tCBW+FmxBnH9piSMattV7taZS8VH7CDCdlIQah1qQT56a/sq
+        bK53n4gg==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1pHRyZ-00BCBj-Tb; Mon, 16 Jan 2023 16:04:47 +0000
+Date:   Mon, 16 Jan 2023 08:04:47 -0800
+From:   Christoph Hellwig <hch@infradead.org>
+To:     David Howells <dhowells@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        Christoph Hellwig <hch@infradead.org>,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
         linux-kernel@vger.kernel.org
-cc:     dhowells@redhat.com
-Subject: Is there a reason why REQ_OP_READ has to be 0?
+Subject: Re: Is there a reason why REQ_OP_READ has to be 0?
+Message-ID: <Y8V1n4e/eeOd4n8/@infradead.org>
+References: <2117829.1673884910@warthog.procyon.org.uk>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <2117828.1673884910.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date:   Mon, 16 Jan 2023 16:01:50 +0000
-Message-ID: <2117829.1673884910@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.1
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <2117829.1673884910@warthog.procyon.org.uk>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Jens, Christoph,
+On Mon, Jan 16, 2023 at 04:01:50PM +0000, David Howells wrote:
+> Hi Jens, Christoph,
+> 
+> Do you know if there's a reason why REQ_OP_READ has to be 0?  I'm seeing a
+> circumstance where a direct I/O write on a blockdev is BUG'ing in my modified
+> iov_iter code because the iterator says it's a source iterator (correct), but
+> the bio->bi_opf == REQ_OP_READ (which should be wrong).
+> 
+> I thought I'd move REQ_OP_READ to, say, 4 so that I could try and see if it's
+> just undefined but the kernel BUGs and then panics during boot.
 
-Do you know if there's a reason why REQ_OP_READ has to be 0?  I'm seeing a
-circumstance where a direct I/O write on a blockdev is BUG'ing in my modif=
-ied
-iov_iter code because the iterator says it's a source iterator (correct), =
-but
-the bio->bi_opf =3D=3D REQ_OP_READ (which should be wrong).
-
-I thought I'd move REQ_OP_READ to, say, 4 so that I could try and see if i=
-t's
-just undefined but the kernel BUGs and then panics during boot.
-
-David
-
-------------[ cut here ]------------
-kernel BUG at mm/filemap.c:1615!
-------------[ cut here ]------------
-invalid opcode: 0000 [#1] PREEMPT SMP PTI
-kernel BUG at mm/filemap.c:1615!
-CPU: 1 PID: 2196 Comm: systemd-udevd Not tainted 6.2.0-rc2-build3+ #12783
-Hardware name: ASUS All Series/H97-PLUS, BIOS 2306 10/09/2014
-RIP: 0010:folio_end_writeback+0x30/0x70
-Code: 48 8b 07 48 89 fb 0f ba e0 12 73 0a f0 80 67 02 fb e8 d0 de 00 00 48=
- 89 df e8 fe df ff ff 48 89 df e8 f9 ac 00 00 84 c0 75 02 <0f> 0b 48 8b 03=
- 84 c0 79 0d be 0f 00 00 00 48 89 df e8 44 f3 ff ff
-RSP: 0000:ffff8881091a3db8 EFLAGS: 00010246
-RAX: 0000000000000000 RBX: ffffea0004271d40 RCX: 0000000000001000
-RDX: 0000000000000101 RSI: 0000000000000246 RDI: ffff888107694000
-RBP: ffff888100b6f600 R08: 000000204d567e99 R09: 0000000000000200
-R10: 0000000000000000 R11: 0000000000000000 R12: 0000000000000000
-R13: 0000000000000001 R14: 0000000000001000 R15: ffff888107402080
-FS:  00007f65ecde8940(0000) GS:ffff88840fa80000(0000) knlGS:00000000000000=
-00
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007fb269292ba1 CR3: 0000000107140004 CR4: 00000000001706e0
-Call Trace:
- <TASK>
- mpage_end_io+0x91/0x9b
- blk_update_request+0x200/0x2be
- scsi_end_request+0x27/0xf3
- scsi_io_completion+0x151/0x21e
- blk_complete_reqs+0x41/0x4c
- __do_softirq+0x123/0x27d
- __irq_exit_rcu+0x5a/0xcd
- common_interrupt+0x36/0xbc
- asm_common_interrupt+0x22/0x40
-RIP: 0033:0x7f65edc7ab60
-Code: 00 41 29 c5 4a 8d 14 ed 00 00 00 00 49 8d 34 0c 49 8d 7c 0c f8 e8 d0=
- 5e ff ff 83 6d 20 01 eb 9f 66 2e 0f 1f 84 00 00 00 00 00 <f3> 0f 1e fa 53=
- 48 89 fb 48 83 c7 08 e8 7f 60 ff ff 85 c0 75 0b 48
-RSP: 002b:00007ffe0b70bd88 EFLAGS: 00000202
-RAX: 0000000000000000 RBX: 000055ddc430c5dc RCX: 000055ddc4301f98
-RDX: 00000000000000ff RSI: 000000000000000c RDI: 000055ddc4301f98
-RBP: 00007ffe0b7102d0 R08: 45d54cec8b358fc3 R09: 00544145535f4449
-R10: 000000000000000c R11: f17eedd8cae0d043 R12: 000055ddc4302920
-R13: 000055ddc432091a R14: 000055ddc4308460 R15: 000055ddc42d90dc
- </TASK>
-Modules linked in:
-invalid opcode: 0000 [#2] PREEMPT SMP PTI
-
+There's all kind of assumptions of that from basically day 1 of
+Linux.  The most obvious one is in op_is_write, but I'm pretty sure
+there are more hidden somewhere.
