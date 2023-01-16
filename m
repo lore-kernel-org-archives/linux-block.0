@@ -2,109 +2,111 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1AF98C54EBE
-	for <linux-block@archiver.kernel.org>; Mon, 16 Jan 2023 13:14:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 967F1C677F1
+	for <linux-block@archiver.kernel.org>; Mon, 16 Jan 2023 16:02:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230210AbjAPNOp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 16 Jan 2023 08:14:45 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35626 "EHLO
+        id S231971AbjAPQCp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 16 Jan 2023 11:02:45 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44096 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231940AbjAPNOV (ORCPT
+        with ESMTP id S231965AbjAPQBu (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 16 Jan 2023 08:14:21 -0500
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66DA03A92;
-        Mon, 16 Jan 2023 05:11:35 -0800 (PST)
-Received: from mail02.huawei.com (unknown [172.30.67.143])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4NwX3w599Pz4f43Lr;
-        Mon, 16 Jan 2023 20:52:28 +0800 (CST)
-Received: from huaweicloud.com (unknown [10.175.124.27])
-        by APP2 (Coremail) with SMTP id Syh0CgBH7uuMSMVjYH02Bw--.361S7;
-        Mon, 16 Jan 2023 20:52:31 +0800 (CST)
-From:   Kemeng Shi <shikemeng@huaweicloud.com>
-To:     jack@suse.cz, axboe@kernel.dk
-Cc:     kbusch@kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, shikemeng@huaweicloud.com
-Subject: [PATCH v3 5/5] sbitmap: correct wake_batch recalculation to avoid potential IO hung
-Date:   Tue, 17 Jan 2023 04:50:59 +0800
-Message-Id: <20230116205059.3821738-6-shikemeng@huaweicloud.com>
-X-Mailer: git-send-email 2.30.0
-In-Reply-To: <20230116205059.3821738-1-shikemeng@huaweicloud.com>
-References: <20230116205059.3821738-1-shikemeng@huaweicloud.com>
+        Mon, 16 Jan 2023 11:01:50 -0500
+Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6AF823862
+        for <linux-block@vger.kernel.org>; Mon, 16 Jan 2023 08:01:40 -0800 (PST)
+Received: by mail-pj1-x1029.google.com with SMTP id q5so3338752pjh.1
+        for <linux-block@vger.kernel.org>; Mon, 16 Jan 2023 08:01:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=content-transfer-encoding:cc:subject:from:to:content-language
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=tOJn3wS3KaLs6GJKewX/FweGyqsXLb3UQ+ewziaYEJY=;
+        b=d1AK46xwVySZG1F1Beno0yDzk6pEnXEU4sGRTGUufps5MeM0PmeiUi/wONItGnX4fo
+         wz6UkoFvm8V0u+vJo3Z7YCrC9JGiBS1hq6JdUMRm82hhR4aHJ9+63kS+7eu+/Wzd3gon
+         kGKFbcGhi6orgz4uZqfDsXh7vLezmHiBbvW3YDLvrVAm5V6RL10BoBGqQQtH6oZlBWRD
+         hCbCovAgfWe6a1dXbwPKhNYcieBlF7Yd9bOAYAedfp/1ufWbe3mLZAt4Y6h6275JezXd
+         PWI3iQbjL54I0hEmanUx1WuL4w1kZVBeW4dtNiHQGMHsS33KUxhCqVt0NB9W+Ffoso7f
+         qvTg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:cc:subject:from:to:content-language
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=tOJn3wS3KaLs6GJKewX/FweGyqsXLb3UQ+ewziaYEJY=;
+        b=jnJlclQIR1dACEA/Qt1kchJrsU5VMgQ8BVKdaDBjQKoF9sbRbShdkfyDH6i10az3Tz
+         A85FJ19VBYJBnFME2a0K8dbjqGQP35rwVlQg9uitG2A+z48+Fb1zkEgD5JPcIAMTz1kB
+         kkHaLIBgngm3aItZQGt8kvPiVQhLePKWujK+HrFdRy/mepBGpOgJUCwAC/Ix5QAxKsbP
+         5SvTEBjnVvt8beDPZH2SOdF2zsNBiCBgBEeQjxjuLBH/wZ+Hg9xbrSaQNIbukSSxKO6C
+         ILbN3zkKnZ2LQwz947aahLkwR2IZHLgjbbmD72/15Q/aAGB9zckGiYqZRku1TQm57baq
+         ro4w==
+X-Gm-Message-State: AFqh2koXxV5mWnlB7d6xSJvNJeTK88AntrHcIw70LO5r3LGVUvMvlQnO
+        4vThz3DeozBqMslo/iEROzkIh5Mc6KmOqdV/
+X-Google-Smtp-Source: AMrXdXsVvVmKK8LKCEsmktI9PnRqjHnFt3w+3tMeoZcmzZOzaEpqbg6IhF/CCsVMZATp/tHMb/eHKA==
+X-Received: by 2002:a17:902:8c87:b0:194:6979:7f2e with SMTP id t7-20020a1709028c8700b0019469797f2emr85005plo.0.1673884899298;
+        Mon, 16 Jan 2023 08:01:39 -0800 (PST)
+Received: from [192.168.1.136] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id k7-20020a170902ce0700b001885d15e3c1sm19525162plg.26.2023.01.16.08.01.38
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 16 Jan 2023 08:01:38 -0800 (PST)
+Message-ID: <c5631d66-3627-5d04-c810-c060c9fd7077@kernel.dk>
+Date:   Mon, 16 Jan 2023 09:01:37 -0700
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: Syh0CgBH7uuMSMVjYH02Bw--.361S7
-X-Coremail-Antispam: 1UD129KBjvJXoW7CF4fAF4rAw4xWr47KFy8Krg_yoW8tFy3p3
-        yrt3ZrGrnYyrWSkrZrJr4UAF12v3yktwnxGF4Sv3yrAw15GFna9r4FgFZxXw1IvFs5GF45
-        A343GrZ5GayUZFJanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUPF14x267AKxVWrJVCq3wAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2jI8I6cxK62vIxIIY0VWUZVW8XwA2048vs2IY02
-        0E87I2jVAFwI0_JF0E3s1l82xGYIkIc2x26xkF7I0E14v26ryj6s0DM28lY4IEw2IIxxk0
-        rwA2F7IY1VAKz4vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6x
-        IIjxv20xvEc7CjxVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xv
-        wVC2z280aVCY1x0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFc
-        xC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_
-        Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2
-        IErcIFxwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E
-        14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_JF0_Jw1lIx
-        kGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUCVW8JwCI42IY6xIIjxv20xvEc7CjxVAF
-        wI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r4j6F
-        4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr1j6F4UJbIYCTnIWIevJa73UjIFyTuYvjTRKfOw
-        UUUUU
-X-CM-SenderInfo: 5vklyvpphqwq5kxd4v5lfo033gof0z/
-X-CFilter-Loop: Reflected
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
+ Thunderbird/102.6.0
+Content-Language: en-US
+To:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From:   Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH] block: don't allow multiple bios for IOCB_NOWAIT issue
+Cc:     Michael Kelley <mikelley@microsoft.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Commit 180dccb0dba4f ("blk-mq: fix tag_get wait task can't be awakened")
-mentioned that in case of shared tags, there could be just one real
-active hctx(queue) because of lazy detection of tag idle. Then driver tag
-allocation may wait forever on this real active hctx(queue) if wake_batch
-is > hctx_max_depth where hctx_max_depth is available tags depth for the
-actve hctx(queue). However, the condition wake_batch > hctx_max_depth is
-not strong enough to avoid IO hung as the sbitmap_queue_wake_up will only
-wake up one wait queue for each wake_batch even though there is only one
-waiter in the woken wait queue. After this, there is only one tag to free
-and wake_batch may not be reached anymore. Commit 180dccb0dba4f ("blk-mq:
-fix tag_get wait task can't be awakened") methioned that driver tag
-allocation may wait forever. Actually, the inactive hctx(queue) will be
-truely idle after at most 30 seconds and will call blk_mq_tag_wakeup_all
-to wake one waiter per wait queue to break the hung. But IO hung for 30
-seconds is also not acceptable. Set batch size to small enough that depth
-of the shared hctx(queue) is enough to wake up all of the queues like
-sbq_calc_wake_batch do to fix this potential IO hung.
+If we're doing a large IO request which needs to be split into multiple
+bios for issue, then we can run into the same situation as the below
+marked commit fixes - parts will complete just fine, one or more parts
+will fail to allocate a request. This will result in a partially
+completed read or write request, where the caller gets EAGAIN even though
+parts of the IO completed just fine.
 
-Although hctx_max_depth will be clamped to at least 4 while wake_batch
-recalculation does not do the clamp, the wake_batch will be always
-recalculated to 1 when hctx_max_depth <= 4.
+Do the same for large bios as we do for splits - fail a NOWAIT request
+with EAGAIN. This isn't technically fixing an issue in the below marked
+patch, but for stable purposes, we should have either none of them or
+both.
 
-Fixes: 180dccb0dba4 ("blk-mq: fix tag_get wait task can't be awakened")
-Reviewed-by: Jan Kara <jack@suse.cz>
-Signed-off-by: Kemeng Shi <shikemeng@huaweicloud.com>
+This depends on: 613b14884b85 ("block: handle bio_split_to_limits() NULL return")
+
+Cc: stable@vger.kernel.org # 5.15+
+Fixes: 9cea62b2cbab ("block: don't allow splitting of a REQ_NOWAIT bio")
+Link: https://github.com/axboe/liburing/issues/766
+Reported-and-tested-by: Michael Kelley <mikelley@microsoft.com>
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+
 ---
- lib/sbitmap.c | 5 +----
- 1 file changed, 1 insertion(+), 4 deletions(-)
 
-diff --git a/lib/sbitmap.c b/lib/sbitmap.c
-index 2514e7a3f6ca..eff4e42c425a 100644
---- a/lib/sbitmap.c
-+++ b/lib/sbitmap.c
-@@ -457,13 +457,10 @@ void sbitmap_queue_recalculate_wake_batch(struct sbitmap_queue *sbq,
- 					    unsigned int users)
- {
- 	unsigned int wake_batch;
--	unsigned int min_batch;
- 	unsigned int depth = (sbq->sb.depth + users - 1) / users;
- 
--	min_batch = sbq->sb.depth >= (4 * SBQ_WAIT_QUEUES) ? 4 : 1;
--
- 	wake_batch = clamp_val(depth / SBQ_WAIT_QUEUES,
--			min_batch, SBQ_WAKE_BATCH);
-+			1, SBQ_WAKE_BATCH);
- 
- 	WRITE_ONCE(sbq->wake_batch, wake_batch);
+diff --git a/block/fops.c b/block/fops.c
+index 50d245e8c913..a03cb732c2a7 100644
+--- a/block/fops.c
++++ b/block/fops.c
+@@ -368,6 +368,14 @@ static ssize_t blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter)
+ 			return __blkdev_direct_IO_simple(iocb, iter, nr_pages);
+ 		return __blkdev_direct_IO_async(iocb, iter, nr_pages);
+ 	}
++	/*
++	 * We're doing more than a bio worth of IO (> 256 pages), and we
++	 * cannot guarantee that one of the sub bios will not fail getting
++	 * issued FOR NOWAIT as error results are coalesced across all of
++	 * them. Be safe and ask for a retry of this from blocking context.
++	 */
++	if (iocb->ki_flags & IOCB_NOWAIT)
++		return -EAGAIN;
+ 	return __blkdev_direct_IO(iocb, iter, bio_max_segs(nr_pages));
  }
+ 
 -- 
-2.30.0
+Jens Axboe
 
