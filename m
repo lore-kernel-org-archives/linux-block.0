@@ -2,30 +2,30 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BF662C54EBE
-	for <linux-block@archiver.kernel.org>; Mon, 16 Jan 2023 21:01:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 87601C677F1
+	for <linux-block@archiver.kernel.org>; Mon, 16 Jan 2023 21:02:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232026AbjAPVA7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 16 Jan 2023 16:00:59 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51930 "EHLO
+        id S232583AbjAPVCU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 16 Jan 2023 16:02:20 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52884 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231171AbjAPVA6 (ORCPT
+        with ESMTP id S232671AbjAPVCT (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 16 Jan 2023 16:00:58 -0500
+        Mon, 16 Jan 2023 16:02:19 -0500
 Received: from mail.ispras.ru (mail.ispras.ru [83.149.199.84])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6507035A7;
-        Mon, 16 Jan 2023 13:00:56 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 50A2921963;
+        Mon, 16 Jan 2023 13:02:18 -0800 (PST)
 Received: from fedcomp.intra.ispras.ru (unknown [46.242.14.200])
-        by mail.ispras.ru (Postfix) with ESMTPSA id 2890F40D403D;
-        Mon, 16 Jan 2023 21:00:52 +0000 (UTC)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.ispras.ru 2890F40D403D
+        by mail.ispras.ru (Postfix) with ESMTPSA id BD07840D403D;
+        Mon, 16 Jan 2023 21:02:16 +0000 (UTC)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.ispras.ru BD07840D403D
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ispras.ru;
-        s=default; t=1673902852;
-        bh=aPV6pXyHE8sCh3Ryx3ARXM6RJp4EZ+mnoTRRwaCNjdo=;
+        s=default; t=1673902936;
+        bh=4kw1QVgX7O7Y5Cc2cOPB5opeDLXtwox1qw8ig56WKY0=;
         h=From:To:Cc:Subject:Date:From;
-        b=FXCbw/QYuC8QnIz1VNr3ed5sUSwXO+2jdNi2CUXmtNds4aa/CS3hT4oasox2nhI9z
-         jElg7zq6MjptUH5BBY/pSMziVwEJFJWyttGtjKoqkIDocsvibya9FyGhuaIKitkC+k
-         KDFGNPPA51SsCRpn0sViNH0BKo5iiste8F5iYMXw=
+        b=aigFG8121I2YihAOh/hqqMnZsIx5GKQb9KFpy59C5mDhW/5gm8mmC15HfG3RbcTh7
+         Ve1gflOVyAVTjlr+pORl4ShYNhPAKX3i9O2xlu25+DLcYaSrRCscuLxHqTX0OBWSPN
+         Pq9LiP7uAnT6GbtEOef6VbSxhVS1TbAmG61MzPuM=
 From:   Fedor Pchelkin <pchelkin@ispras.ru>
 To:     stable@vger.kernel.org,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>
@@ -34,10 +34,11 @@ Cc:     Fedor Pchelkin <pchelkin@ispras.ru>, Jens Axboe <axboe@kernel.dk>,
         Chaitanya Kulkarni <kch@nvidia.com>,
         Johannes Thumshirn <johannes.thumshirn@wdc.com>,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Alexey Khoroshilov <khoroshilov@ispras.ru>
-Subject: [PATCH 5.15] block: fix and cleanup bio_check_ro
-Date:   Tue, 17 Jan 2023 00:00:40 +0300
-Message-Id: <20230116210040.804629-1-pchelkin@ispras.ru>
+        Alexey Khoroshilov <khoroshilov@ispras.ru>,
+        lvc-project@linuxtesting.org
+Subject: [PATCH 5.10] block: fix and cleanup bio_check_ro
+Date:   Tue, 17 Jan 2023 00:02:05 +0300
+Message-Id: <20230116210205.805024-1-pchelkin@ispras.ru>
 X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -49,10 +50,8 @@ From: Christoph Hellwig <hch@lst.de>
 
 commit 57e95e4670d1126c103305bcf34a9442f49f6d6a upstream.
 
-Don't use a WARN_ON when printing a potentially user triggered
-condition. Also don't print the partno when the block device name
-already includes it, and use the %pg specifier to simplify printing
-the block device name.
+Don't use a WARN_ONCE when printing a potentially user triggered
+condition.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 Reviewed-by: Chaitanya Kulkarni <kch@nvidia.com>
@@ -61,30 +60,24 @@ Link: https://lore.kernel.org/r/20220304180105.409765-2-hch@lst.de
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 Signed-off-by: Fedor Pchelkin <pchelkin@ispras.ru>
 ---
- block/blk-core.c | 8 ++------
- 1 file changed, 2 insertions(+), 6 deletions(-)
+ block/blk-core.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
 diff --git a/block/blk-core.c b/block/blk-core.c
-index 13e1fca1e923..ed6271dcc1b1 100644
+index 26664f2a139e..9afb79b322fb 100644
 --- a/block/blk-core.c
 +++ b/block/blk-core.c
-@@ -698,14 +698,10 @@ static inline bool should_fail_request(struct block_device *part,
- static inline bool bio_check_ro(struct bio *bio)
- {
- 	if (op_is_write(bio_op(bio)) && bdev_read_only(bio->bi_bdev)) {
--		char b[BDEVNAME_SIZE];
--
+@@ -700,9 +700,7 @@ static inline bool bio_check_ro(struct bio *bio, struct hd_struct *part)
+ 
  		if (op_is_flush(bio->bi_opf) && !bio_sectors(bio))
  			return false;
 -
 -		WARN_ONCE(1,
 -		       "Trying to write to read-only block-device %s (partno %d)\n",
--			bio_devname(bio, b), bio->bi_bdev->bd_partno);
-+		pr_warn("Trying to write to read-only block-device %pg\n",
-+			bio->bi_bdev);
++		pr_warn("Trying to write to read-only block-device %s (partno %d)\n",
+ 			bio_devname(bio, b), part->partno);
  		/* Older lvm-tools actually trigger this */
  		return false;
- 	}
 -- 
 2.34.1
 
