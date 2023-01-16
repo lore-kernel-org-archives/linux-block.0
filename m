@@ -2,42 +2,42 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B6146C678D6
-	for <linux-block@archiver.kernel.org>; Mon, 16 Jan 2023 01:53:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72744C46467
+	for <linux-block@archiver.kernel.org>; Mon, 16 Jan 2023 01:53:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231761AbjAPBxl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 15 Jan 2023 20:53:41 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34910 "EHLO
+        id S231661AbjAPBxm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 15 Jan 2023 20:53:42 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34948 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231749AbjAPBxb (ORCPT
+        with ESMTP id S231747AbjAPBxb (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Sun, 15 Jan 2023 20:53:31 -0500
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E5C2044A8;
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A3D8C44BC;
         Sun, 15 Jan 2023 17:53:28 -0800 (PST)
 Received: from mail02.huawei.com (unknown [172.30.67.169])
-        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4NwFRR2fk0z4f42hw;
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4NwFRR1g6zz4f3wRJ;
         Mon, 16 Jan 2023 09:53:23 +0800 (CST)
 Received: from huaweicloud.com (unknown [10.175.124.27])
-        by APP4 (Coremail) with SMTP id gCh0CgD3rbERrsRj9iw3Bw--.37368S10;
+        by APP4 (Coremail) with SMTP id gCh0CgD3rbERrsRj9iw3Bw--.37368S9;
         Mon, 16 Jan 2023 09:53:25 +0800 (CST)
 From:   Kemeng Shi <shikemeng@huaweicloud.com>
 To:     jack@suse.com, damien.lemoal@opensource.wdc.com,
         paolo.valente@linaro.org, axboe@kernel.dk
 Cc:     hch@lst.de, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH v4 8/8] block, bfq: remove unused bfq_wr_max_time in struct bfq_data
-Date:   Mon, 16 Jan 2023 17:51:53 +0800
-Message-Id: <20230116095153.3810101-9-shikemeng@huaweicloud.com>
+Subject: [PATCH v4 7/8] block, bfq: remove unnecessary goto tag in bfq_dispatch_rq_from_bfqq
+Date:   Mon, 16 Jan 2023 17:51:52 +0800
+Message-Id: <20230116095153.3810101-8-shikemeng@huaweicloud.com>
 X-Mailer: git-send-email 2.30.0
 In-Reply-To: <20230116095153.3810101-1-shikemeng@huaweicloud.com>
 References: <20230116095153.3810101-1-shikemeng@huaweicloud.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgD3rbERrsRj9iw3Bw--.37368S10
-X-Coremail-Antispam: 1UD129KBjvJXoW7KFyUJw1kCr15GFyUtry3twb_yoW8WFWxpa
-        1DK347WF17tr4FgF1DAa4rXF13ta1fCF9rKa1a9w4YyFW8XF1a93ZYyw1fX3Z2vFZ3Cr4f
-        Zw1Fqa4Dtw18K3DanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+X-CM-TRANSID: gCh0CgD3rbERrsRj9iw3Bw--.37368S9
+X-Coremail-Antispam: 1UD129KBjvJXoW7AF1fZryrKr48CF47AF17trb_yoW8JF43p3
+        WfGa1Y93WfKa1FqFW8Xa1Iyr17J3WfC3s7tw1UWw4rA3yUZwnF93Way340vanagrZ5Canx
+        Xa4Iq3s0vw1DJrDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
         9KBjDU0xBIdaVrnRJUUUBIb4IE77IF4wAFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k2
         6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M280x2IEY4vEnII2IxkI6r1a6r45M2
         8IrcIa0xkI8VA2jI8067AKxVWUAVCq3wA2048vs2IY020Ec7CjxVAFwI0_Xr0E3s1l8cAv
@@ -57,52 +57,44 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-bfqd->bfq_wr_max_time is set to 0 in bfq_init_queue and is never changed.
-It is only used in bfq_wr_duration when bfq_wr_max_time > 0 which never
-meets, so bfqd->bfq_wr_max_time is not used actually. Just remove it.
+We jump to tag only for returning current rq. Return directly to
+remove this tag.
 
-Signed-off-by: Kemeng Shi <shikemeng@huaweicloud.com>
 Reviewed-by: Jan Kara <jack@suse.cz>
+Reviewed-by: Damien Le Moal <damien.lemoal@opensource.wdc.com>
+Signed-off-by: Kemeng Shi <shikemeng@huaweicloud.com>
 ---
- block/bfq-iosched.c | 4 ----
- block/bfq-iosched.h | 2 --
- 2 files changed, 6 deletions(-)
+ block/bfq-iosched.c | 9 +++------
+ 1 file changed, 3 insertions(+), 6 deletions(-)
 
 diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index 0416dfe05983..4705c4be90e7 100644
+index dbee5c61830c..0416dfe05983 100644
 --- a/block/bfq-iosched.c
 +++ b/block/bfq-iosched.c
-@@ -1093,9 +1093,6 @@ static unsigned int bfq_wr_duration(struct bfq_data *bfqd)
- {
- 	u64 dur;
+@@ -5120,7 +5120,7 @@ static struct request *bfq_dispatch_rq_from_bfqq(struct bfq_data *bfqd,
+ 	bfq_dispatch_remove(bfqd->queue, rq);
  
--	if (bfqd->bfq_wr_max_time > 0)
--		return bfqd->bfq_wr_max_time;
+ 	if (bfqq != bfqd->in_service_queue)
+-		goto return_rq;
++		return rq;
+ 
+ 	/*
+ 	 * If weight raising has to terminate for bfqq, then next
+@@ -5140,12 +5140,9 @@ static struct request *bfq_dispatch_rq_from_bfqq(struct bfq_data *bfqd,
+ 	 * belongs to CLASS_IDLE and other queues are waiting for
+ 	 * service.
+ 	 */
+-	if (!(bfq_tot_busy_queues(bfqd) > 1 && bfq_class_idle(bfqq)))
+-		goto return_rq;
++	if (bfq_tot_busy_queues(bfqd) > 1 && bfq_class_idle(bfqq))
++		bfq_bfqq_expire(bfqd, bfqq, false, BFQQE_BUDGET_EXHAUSTED);
+ 
+-	bfq_bfqq_expire(bfqd, bfqq, false, BFQQE_BUDGET_EXHAUSTED);
 -
- 	dur = bfqd->rate_dur_prod;
- 	do_div(dur, bfqd->peak_rate);
+-return_rq:
+ 	return rq;
+ }
  
-@@ -7299,7 +7296,6 @@ static int bfq_init_queue(struct request_queue *q, struct elevator_type *e)
- 	 */
- 	bfqd->bfq_wr_coeff = 30;
- 	bfqd->bfq_wr_rt_max_time = msecs_to_jiffies(300);
--	bfqd->bfq_wr_max_time = 0;
- 	bfqd->bfq_wr_min_idle_time = msecs_to_jiffies(2000);
- 	bfqd->bfq_wr_min_inter_arr_async = msecs_to_jiffies(500);
- 	bfqd->bfq_wr_max_softrt_rate = 7000; /*
-diff --git a/block/bfq-iosched.h b/block/bfq-iosched.h
-index 058af701bbbe..ed2be7d32151 100644
---- a/block/bfq-iosched.h
-+++ b/block/bfq-iosched.h
-@@ -769,8 +769,6 @@ struct bfq_data {
- 	 * is multiplied.
- 	 */
- 	unsigned int bfq_wr_coeff;
--	/* maximum duration of a weight-raising period (jiffies) */
--	unsigned int bfq_wr_max_time;
- 
- 	/* Maximum weight-raising duration for soft real-time processes */
- 	unsigned int bfq_wr_rt_max_time;
 -- 
 2.30.0
 
