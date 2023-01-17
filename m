@@ -2,64 +2,113 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 43F1FC3DA78
-	for <linux-block@archiver.kernel.org>; Tue, 17 Jan 2023 08:47:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D97D0C3DA78
+	for <linux-block@archiver.kernel.org>; Tue, 17 Jan 2023 08:49:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235956AbjAQIrH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 17 Jan 2023 03:47:07 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50750 "EHLO
+        id S235965AbjAQItH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 17 Jan 2023 03:49:07 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52882 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236289AbjAQIqo (ORCPT
+        with ESMTP id S236197AbjAQIsv (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 17 Jan 2023 03:46:44 -0500
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 96692193C4;
-        Tue, 17 Jan 2023 00:46:33 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=8H+PHMNzo2HTcMqyv+E+gLhkOMic9ckrnZ4L2irIROs=; b=ewKhMhzGcG3aOo3RcHc5EN27n7
-        mkq1oCd9tNjMBxLrAfxEARYjoKMBXRSsG3rDqFLCGrJvsxstT0AL+hbnqARczQ5t94xOwglkIc4BI
-        QjkuTNg61vfQTWPjX8/aWGN8QhzwXoQT/ecQemS2zPGLa9m8s68PFFiTv2axFeDchjYzX+q81+y3N
-        z3Ysh053KfiqdPVs50cBKUxO0AR7L2fAfYaFClIL9byP54CYpnSD9KatAM3KJ5R+eXNAcwWc9AOdz
-        ILHTly/1a+9IHP/Ovy4rPdbuIb/n9cSTSLyjQ3Yv3jTdWnz484sYPS8tpAfOaoDYUw3zkCadHw2Pa
-        ZpG2sz+Q==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1pHhbv-00DN6U-Hb; Tue, 17 Jan 2023 08:46:27 +0000
-Date:   Tue, 17 Jan 2023 00:46:27 -0800
-From:   Christoph Hellwig <hch@infradead.org>
-To:     David Howells <dhowells@redhat.com>
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
+        Tue, 17 Jan 2023 03:48:51 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AAE936A43
+        for <linux-block@vger.kernel.org>; Tue, 17 Jan 2023 00:48:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1673945282;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=TaBtCGp30bd4qdJlAJHixSF5/cb929y7jNy9iLh1Hbs=;
+        b=BWZi0gmaPGdFbNGAuDWcCnqsjDMP1t1qoo90nchSXRyeEw1ixX/NIvjpzo+Fo+wZ/klRDD
+        2inI6NQgRa3F2RIss8Y3XuWPR1SmDLsTNHFnXWSCCMC89tjZFJVz2b0cdsssr8M562Yxk4
+        YuNE8Jc0m729PTk1GUS6uAZQO5UVuoU=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-500-yhTI2FXTPRegnvSXOINmNw-1; Tue, 17 Jan 2023 03:48:01 -0500
+X-MC-Unique: yhTI2FXTPRegnvSXOINmNw-1
+Received: by mail-wm1-f71.google.com with SMTP id c7-20020a1c3507000000b003d355c13ba8so16118171wma.6
+        for <linux-block@vger.kernel.org>; Tue, 17 Jan 2023 00:48:01 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:organization:from:references
+         :cc:to:content-language:subject:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=TaBtCGp30bd4qdJlAJHixSF5/cb929y7jNy9iLh1Hbs=;
+        b=03rcwCZCb37Mkx3bagiXjFzUhT4aG/baUBu+Q+dQGdkneBF7p0y/oEGTbBabN4V8me
+         L013sQpMPflp+iV2HoT+B86vjCTBBNcXCEra5dUUPH4HLupz0YTTkCsdkFsRtk7t5vwE
+         42lt0XvqfNG6LdPfFykEYZlAgU3smlT/nAorSd5ahtZD0D+n49pOz8927I/1yN+tyzua
+         52vQ55eG3gMkCwgRO2gCbBHijtL4Dopv5T9rEPnKOCxz74OPdNjdzEJR/WShBehvCUnP
+         CbehmJTppHvo4s9249jK1yzIkp+tecZO+/sMs1um6zeuYSKEEoqu8Ddy0F6fumg4tnzN
+         QDlw==
+X-Gm-Message-State: AFqh2kqbo6dpgX3quuvUOQ86JYwhgfOoGBLq9yUKceQUdVyX5fQjZ/I0
+        zwDab98VCTp8WP9PYBNrAEI6MtNG7e9o00FJt5+ACWk07txQnNBxvVNLt/6lKdrQdQ38Y8knehB
+        wNok6CySQmerTr6JXLjErnZ4=
+X-Received: by 2002:a05:600c:1c8e:b0:3d9:e5f9:984c with SMTP id k14-20020a05600c1c8e00b003d9e5f9984cmr2452721wms.2.1673945280410;
+        Tue, 17 Jan 2023 00:48:00 -0800 (PST)
+X-Google-Smtp-Source: AMrXdXvDDzpU1v6vQHWYN8fG5rSMIjxKzFqF3b169vbw/ZlEbBRTr3avFpJjRo1SAi5GChrfzi90Aw==
+X-Received: by 2002:a05:600c:1c8e:b0:3d9:e5f9:984c with SMTP id k14-20020a05600c1c8e00b003d9e5f9984cmr2452695wms.2.1673945280046;
+        Tue, 17 Jan 2023 00:48:00 -0800 (PST)
+Received: from ?IPV6:2003:cb:c708:f00:323e:5956:8da1:9237? (p200300cbc7080f00323e59568da19237.dip0.t-ipconnect.de. [2003:cb:c708:f00:323e:5956:8da1:9237])
+        by smtp.gmail.com with ESMTPSA id l24-20020a05600c1d1800b003daf6e3bc2fsm9924673wms.1.2023.01.17.00.47.59
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 17 Jan 2023 00:47:59 -0800 (PST)
+Message-ID: <137f9567-411e-b411-3945-e553a57f6793@redhat.com>
+Date:   Tue, 17 Jan 2023 09:47:58 +0100
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.6.0
+Subject: Re: [PATCH v6 03/34] iov_iter: Pass I/O direction into
+ iov_iter_get_pages*()
+Content-Language: en-US
+To:     David Howells <dhowells@redhat.com>,
+        Christoph Hellwig <hch@infradead.org>
+Cc:     Al Viro <viro@zeniv.linux.org.uk>,
         Matthew Wilcox <willy@infradead.org>,
         Jens Axboe <axboe@kernel.dk>, Jan Kara <jack@suse.cz>,
         Jeff Layton <jlayton@kernel.org>,
         Logan Gunthorpe <logang@deltatee.com>,
         linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Peter Zijlstra <peterz@infradead.org>,
-        David Hildenbrand <david@redhat.com>
-Subject: Re: [PATCH v6 03/34] iov_iter: Pass I/O direction into
- iov_iter_get_pages*()
-Message-ID: <Y8ZgYwkLKPTcp5vn@infradead.org>
+        linux-kernel@vger.kernel.org, Peter Zijlstra <peterz@infradead.org>
 References: <Y8ZU1Jjx5VSetvOn@infradead.org>
  <167391047703.2311931.8115712773222260073.stgit@warthog.procyon.org.uk>
  <167391050409.2311931.7103784292954267373.stgit@warthog.procyon.org.uk>
  <2331410.1673945056@warthog.procyon.org.uk>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+From:   David Hildenbrand <david@redhat.com>
+Organization: Red Hat
 In-Reply-To: <2331410.1673945056@warthog.procyon.org.uk>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jan 17, 2023 at 08:44:16AM +0000, David Howells wrote:
-> Also, I don't want it to be FOLL_WRITE or 0.  I want it to be written
-> explicitly in both cases.  If you're going to insist on using FOLL_WRITE, then
-> there should be a FOLL_READ to go with it, even if it's #defined to 0.
+On 17.01.23 09:44, David Howells wrote:
+> Christoph Hellwig <hch@infradead.org> wrote:
+> 
+>> On Mon, Jan 16, 2023 at 11:08:24PM +0000, David Howells wrote:
+>>> Define FOLL_SOURCE_BUF and FOLL_DEST_BUF to indicate to get_user_pages*()
+>>> and iov_iter_get_pages*() how the buffer is intended to be used in an I/O
+>>> operation.  Don't use READ and WRITE as a read I/O writes to memory and
+>>> vice versa - which causes confusion.
+>>>
+>>> The direction is checked against the iterator's data_source.
+>>
+>> Why can't we use the existing FOLL_WRITE?
+> 
+> Because FOLL_WRITE doesn't mean the same as WRITE:
+> 
+>   (1) It looks like it should really be FOLL_CHECK_PTES_WRITABLE.  It's not
+>       defined as being anything to do with the I/O.
 
-Well, that's not how FOLL_* works.  And another new flag that is defined
-to 0 but only used by some I/O callers is really confusing.
+Especially combined with FOLL_FORCE, this is not true.
+
+-- 
+Thanks,
+
+David / dhildenb
+
