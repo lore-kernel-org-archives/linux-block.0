@@ -2,103 +2,151 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F431C678D4
-	for <linux-block@archiver.kernel.org>; Tue, 17 Jan 2023 17:24:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 05D4DC54E76
+	for <linux-block@archiver.kernel.org>; Tue, 17 Jan 2023 17:34:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230326AbjAQRYI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 17 Jan 2023 12:24:08 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47984 "EHLO
+        id S232523AbjAQRer (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 17 Jan 2023 12:34:47 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54306 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235390AbjAQRXh (ORCPT
+        with ESMTP id S235646AbjAQRaf (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 17 Jan 2023 12:23:37 -0500
-Received: from mail-io1-xd2e.google.com (mail-io1-xd2e.google.com [IPv6:2607:f8b0:4864:20::d2e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8758E4C0C3
-        for <linux-block@vger.kernel.org>; Tue, 17 Jan 2023 09:23:04 -0800 (PST)
-Received: by mail-io1-xd2e.google.com with SMTP id j1so6941273iob.6
-        for <linux-block@vger.kernel.org>; Tue, 17 Jan 2023 09:23:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=92h0XMY9EaikZnxcpvvswgmJ+pfFWmReslOm2xWD2c4=;
-        b=QPQDnNNt9AptVDLEj1KH0uPd0l9zdFs3HeHISmrUALMGQZyglqoSYB1FNsCYB2KTGB
-         LlNiysXHxIHV02kTEXdd7NPOkhAKs97hM7dlk/b9WBn0xM7bn6YQ8DIOm6xLQWm6FpGt
-         bplOSqqPWU5eEcZTjlj254Fs1P+LMJv5CdESH8qq4bXHgInIHII1VxVL2L7/mjlpnPJR
-         y/PXZdkXN9LCaULduBHcObK4QhDOxzEXcImmwy825V3+uqVQeguGDGGhjM0BHmifykeo
-         WTTjE2bljFvco40lJVvVTbu2j4c6s8tTinkRKgWh2c1sphjbg6Mj4/Tm9bentqH0NS0y
-         BMbA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=92h0XMY9EaikZnxcpvvswgmJ+pfFWmReslOm2xWD2c4=;
-        b=DCoPHJEXFN072EWw45VGQcI8mXohErNXcEu5xgI9ZiiUwRYBdmKugNnHWBxvcvQVzV
-         dGpWr2hLBCltxOlP0lqgck/j37k3E2n0RDgVa1IM8v3IZrCnSgXf4ScAruShyQVCd8gm
-         AkYjpKsAhy+cnTamyY2TlhIcaVzKPVyC9KiI5CG67fCdBc2OGjqgCauQtLDhX18aFc8d
-         AuyRsJvx8O2dYSi1F5FQsXrH1en1/deF7RL1MAObuG5wBtRyo5n4wPbLvhYtEElbr+tS
-         4F/juFRyxBESnVMh2pG3F3CBWMUdMQeVpcKpCQXkUO8cDpcjvh74LUtzt9p6mv1OUSEc
-         IX6Q==
-X-Gm-Message-State: AFqh2krcAm6dheqDEMSW+w/93W4fuSQ/XoHh7+EgaRrpS6fQXyeBENdz
-        3t30RL9dE0Ea1NGdX0gI/eqJx2FDd/Ltalsm
-X-Google-Smtp-Source: AMrXdXvp2p1DAbTDUvZuqq5o35o8Q6vrxFO3+JrbSo9vfkCgkq5Cmk40Xi+lRfB0weNRQ6tMHTcjAw==
-X-Received: by 2002:a5e:dd04:0:b0:6dd:f251:caf7 with SMTP id t4-20020a5edd04000000b006ddf251caf7mr559039iop.0.1673976183850;
-        Tue, 17 Jan 2023 09:23:03 -0800 (PST)
-Received: from [127.0.0.1] ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id h31-20020a056638339f00b0039e8a5930a2sm7549588jav.8.2023.01.17.09.23.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 Jan 2023 09:23:03 -0800 (PST)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     linux-block@vger.kernel.org,
-        ZiyangZhang <ZiyangZhang@linux.alibaba.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>
-In-Reply-To: <20230106041711.914434-1-ming.lei@redhat.com>
-References: <20230106041711.914434-1-ming.lei@redhat.com>
-Subject: Re: [PATCH V4 0/6] ublk_drv: add mechanism for supporting
- unprivileged ublk device
-Message-Id: <167397618329.17297.7950838345623192951.b4-ty@kernel.dk>
-Date:   Tue, 17 Jan 2023 10:23:03 -0700
+        Tue, 17 Jan 2023 12:30:35 -0500
+Received: from mailout2.w1.samsung.com (mailout2.w1.samsung.com [210.118.77.12])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C4E016AE2
+        for <linux-block@vger.kernel.org>; Tue, 17 Jan 2023 09:28:18 -0800 (PST)
+Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
+        by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id 20230117172815euoutp0255d291e15d4ac338ddc809c4d2c66ab8~7KMDjNbma0070600706euoutp02F
+        for <linux-block@vger.kernel.org>; Tue, 17 Jan 2023 17:28:15 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w1.samsung.com 20230117172815euoutp0255d291e15d4ac338ddc809c4d2c66ab8~7KMDjNbma0070600706euoutp02F
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1673976495;
+        bh=ppgbS9otra+l3yNgfUZn3vLxr94OaomCYTi/AzlB998=;
+        h=Date:Subject:To:CC:From:In-Reply-To:References:From;
+        b=LeQcHs3Q65bVO+Phv/o2O8SvWrz3UPM0KDzAPTud+xJHaLH1QuGBiLdrWdN7yVH6n
+         TGHHXdzPnYBLlfqb9Qw95WC9o/MB7So7aH/UBsbrO8clqckNg52C3EsHrwOT4o3aXd
+         f5KKmIbBpnSBP4gjGXSa8jNB0Mt76ktGAPDIRxFY=
+Received: from eusmges2new.samsung.com (unknown [203.254.199.244]) by
+        eucas1p2.samsung.com (KnoxPortal) with ESMTP id
+        20230117172815eucas1p2f208a8baf5de0337668c3c8217c690cf~7KMDOnh6x0536905369eucas1p2V;
+        Tue, 17 Jan 2023 17:28:15 +0000 (GMT)
+Received: from eucas1p1.samsung.com ( [182.198.249.206]) by
+        eusmges2new.samsung.com (EUCPMTA) with SMTP id 38.31.61936.EAAD6C36; Tue, 17
+        Jan 2023 17:28:14 +0000 (GMT)
+Received: from eusmtrp2.samsung.com (unknown [182.198.249.139]) by
+        eucas1p2.samsung.com (KnoxPortal) with ESMTPA id
+        20230117172814eucas1p2b1f69afa48bb56b8e8a3edb0a3bc75e0~7KMC7glhB0536905369eucas1p2U;
+        Tue, 17 Jan 2023 17:28:14 +0000 (GMT)
+Received: from eusmgms1.samsung.com (unknown [182.198.249.179]) by
+        eusmtrp2.samsung.com (KnoxPortal) with ESMTP id
+        20230117172814eusmtrp2e04e3912e6676c0532a5bfadc4b18786~7KMC6_DSm0072400724eusmtrp2D;
+        Tue, 17 Jan 2023 17:28:14 +0000 (GMT)
+X-AuditID: cbfec7f4-a43ff7000002f1f0-60-63c6daaeeafc
+Received: from eusmtip2.samsung.com ( [203.254.199.222]) by
+        eusmgms1.samsung.com (EUCPMTA) with SMTP id 07.EE.23420.EAAD6C36; Tue, 17
+        Jan 2023 17:28:14 +0000 (GMT)
+Received: from CAMSVWEXC01.scsc.local (unknown [106.1.227.71]) by
+        eusmtip2.samsung.com (KnoxPortal) with ESMTPA id
+        20230117172814eusmtip22e8c59fdbfd7cc75bceec47210399095~7KMCv38ns0222802228eusmtip2J;
+        Tue, 17 Jan 2023 17:28:14 +0000 (GMT)
+Received: from [192.168.8.107] (106.210.248.178) by CAMSVWEXC01.scsc.local
+        (2002:6a01:e347::6a01:e347) with Microsoft SMTP Server (TLS) id 15.0.1497.2;
+        Tue, 17 Jan 2023 17:28:13 +0000
+Message-ID: <eac2263f-43b0-f6f5-2a75-33e571075dc8@samsung.com>
+Date:   Tue, 17 Jan 2023 18:28:13 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+        Thunderbird/102.4.2
+Subject: Re: [PATCH v2 0/3] block zoned cleanups
+Content-Language: en-US
+To:     <axboe@kernel.dk>
+CC:     <linux-nvme@lists.infradead.org>, <hch@lst.de>,
+        <bvanassche@acm.org>, <linux-block@vger.kernel.org>,
+        <damien.lemoal@opensource.wdc.com>, <gost.dev@samsung.com>,
+        <snitzer@kernel.org>
+From:   Pankaj Raghav <p.raghav@samsung.com>
+In-Reply-To: <20230110143635.77300-1-p.raghav@samsung.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.12-dev-78c63
+X-Originating-IP: [106.210.248.178]
+X-ClientProxiedBy: CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347) To
+        CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347)
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprPKsWRmVeSWpSXmKPExsWy7djPc7rrbh1LNrjcYG2x+m4/m8W0Dz+Z
+        LX6fPc9ssXL1USaLvbe0LeYve8puceKWtAO7x+Ur3h6Xz5Z6bFrVyeaxeUm9x+6bDWweO1vv
+        s3p83iQXwB7FZZOSmpNZllqkb5fAlXH+3ln2ghdcFYc/KzYwHuPoYuTkkBAwkdix4SULiC0k
+        sIJRYuNsAwj7C6PEtgWyXYxcQPZnRokj5z+ywzRcuriADaJoOaPE8atKcEXtVzvZIZzdjBLN
+        TdtZuxg5OHgF7CTWvZIBaWARUJVYOGk72DZeAUGJkzOfgNmiAlESTRd+gtnCAgYS93fcZQax
+        mQXEJW49mc8EMkZEQFRizqJKkPHMAnsZJTY9esQIEmcT0JJo7AS7jVPASuLCxN+MEK2aEq3b
+        f7ND2PIS29/OYYa4X1nix4bTbBB2rcTaY2fATpYQ6OeU6Gp+DJVwkdiwcCZUg7DEq+NboJ6X
+        kfi/E+QeELta4umN38wQzS2MEv0717OBHCQhYC3RdyYHwnSU6L+rCGHySdx4KwhxDp/EpG3T
+        mScwqs5CCohZSB6eheSDWUg+WMDIsopRPLW0ODc9tdgoL7Vcrzgxt7g0L10vOT93EyMwDZ3+
+        d/zLDsblrz7qHWJk4mA8xCjBwawkwuu363CyEG9KYmVValF+fFFpTmrxIUZpDhYlcd4ZW+cn
+        CwmkJ5akZqemFqQWwWSZODilGpgm9K/1if8yq4ahfLoXe3t+xY0c+1cpe2ViXK62dwkVWS4V
+        ePBEY3LSMY5lzz64lt0rctnAvv9K/5IGl/hau032DZsO7dH6Nf2SXcTbtZPSr3pMzdm929Fw
+        5kHNywcygoJZ3s19eY/3yDKZJaVbNe1tj0QfVrlwufSEiMG/zw+3uzk39e6plguQ/PdG4bhC
+        z0wHldIT7os3Sd8XDC22OPI7wOrqw1NcDyadqPj6YPmcF8mG9s+rn7i2VrgH+f2TZuJ4JCsk
+        +UbSZIFa9AHrw2tbN5boz8hYvNvF8tyvlqZ8lbI3T7XLVsZ9LhI6dkM2YvVkUc2Epu83oyPf
+        RW2pLLJY2OA35ewztfU6P/cu2TJBiaU4I9FQi7moOBEAoTzzHrIDAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFrrBIsWRmVeSWpSXmKPExsVy+t/xe7rrbh1LNjj6T91i9d1+NotpH34y
+        W/w+e57ZYuXqo0wWe29pW8xf9pTd4sQtaQd2j8tXvD0uny312LSqk81j85J6j903G9g8drbe
+        Z/X4vEkugD1Kz6Yov7QkVSEjv7jEVina0MJIz9DSQs/IxFLP0Ng81srIVEnfziYlNSezLLVI
+        3y5BL+P8vbPsBS+4Kg5/VmxgPMbRxcjJISFgInHp4gK2LkYuDiGBpYwS228vZIVIyEh8uvKR
+        HcIWlvhzrQuq6COjRM/jQ4wQzm5Giamn7jB3MXJw8ArYSax7JQPSwCKgKrFw0nYWEJtXQFDi
+        5MwnYLaoQJTEzfMPmUBsYQEDifs77jKD2MwC4hK3nsxnAhkjIiAqMWdRJch4ZoG9jBKbHj2C
+        2tXLKPHzfx8jSBGbgJZEYyfYcZwCVhIXJv5mhJijKdG6/Tc7hC0vsf3tHGaIB5Qlfmw4zQZh
+        10q8ur+bcQKj6Cwk581CcsYsJKNmIRm1gJFlFaNIamlxbnpusaFecWJucWleul5yfu4mRmAU
+        bzv2c/MOxnmvPuodYmTiYDzEKMHBrCTC67frcLIQb0piZVVqUX58UWlOavEhRlNgGE1klhJN
+        zgemkbySeEMzA1NDEzNLA1NLM2MlcV7Pgo5EIYH0xJLU7NTUgtQimD4mDk6pBqY4109N7BX3
+        RB96Fc+e98Vis+br32mRy5+u9Oq6Xz/t6Vr+K9ufWt9oborKvlnWv27yPqfnkryWxzR4bmlZ
+        LlnVeu3S/aAv1ydrOrSLqVwX8nn6Q2Dh0SkX9Z/MDHlYfj5bzqtw6uPSiqs2X04afcvfz55Z
+        6uIV/u78o9Pnm1bbZ+zwnnXj6qyg/9L7tbTkYlctaerM+HeLMeBG0XR11nkfBdUmt3+aq/HF
+        QOmtxrf/XvvmvnY2XrmQW+3l8hwh81snHsjk99St/3Dih5b//Ijo+VWX7dpmrzlfIfLneHDP
+        zfJulx/zde6VmfpWHrnxJvaQyuqr5j/DBH9IBXtJP3+48fnVNdYhmb/X8lgG/6/VVWIpzkg0
+        1GIuKk4EAD5sMiprAwAA
+X-CMS-MailID: 20230117172814eucas1p2b1f69afa48bb56b8e8a3edb0a3bc75e0
+X-Msg-Generator: CA
+X-RootMTR: 20230110143637eucas1p1d82528b632ccda1de4fb2795ff691fe2
+X-EPHeader: CA
+CMS-TYPE: 201P
+X-CMS-RootMailID: 20230110143637eucas1p1d82528b632ccda1de4fb2795ff691fe2
+References: <CGME20230110143637eucas1p1d82528b632ccda1de4fb2795ff691fe2@eucas1p1.samsung.com>
+        <20230110143635.77300-1-p.raghav@samsung.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Hi Jens,
+  There is a Reviewed-by tag by different reviewers in all the patches.
+Could we queue this up for the next release?
 
-On Fri, 06 Jan 2023 12:17:05 +0800, Ming Lei wrote:
-> Stefan Hajnoczi suggested un-privileged ublk device[1] for container
-> use case.
+Regards,
+Pankaj
+
+On 2023-01-10 15:36, Pankaj Raghav wrote:
+> Hi Jens,
+>   It is still unclear whether the support for non-po2 zone size devices
+>   will be added anytime soon [1]. I have extracted out the cleanup
+>   patches that doesn't do any functional change but improves the
+>   readability by adding helpers. This also helps a bit to
+>   maintain off-tree support as there is an interest to have this feature
+>   in some companies.
 > 
-> So far only administrator can create/control ublk device which is too
-> strict and increase system administrator burden, and this patchset
-> implements un-privileged ublk device:
+> [1] https://lore.kernel.org/lkml/20220923173618.6899-1-p.raghav@samsung.com/
 > 
-> [...]
-
-Applied, thanks!
-
-[1/6] ublk_drv: remove nr_aborted_queues from ublk_device
-      commit: d66a012deb6567dd127f38d068806adcfc3a5051
-[2/6] ublk_drv: don't probe partitions if the ubq daemon isn't trusted
-      commit: 6faa01c8bf3ba4ba6eec95b3ce646a9af9473988
-[3/6] ublk_drv: move ublk_get_device_from_id into ublk_ctrl_uring_cmd
-      commit: a5d140c503b6d17800911e2cd9070d5933b11a26
-[4/6] ublk_drv: add device parameter UBLK_PARAM_TYPE_DEVT
-      commit: 620183fd3cda8ef7fa9dec07d81ce2551420af8e
-[5/6] ublk_drv: add module parameter of ublks_max for limiting max allowed ublk dev
-      commit: 961ccca54ad53c4945c4e36982eaff304c3c2624
-[6/6] ublk_drv: add mechanism for supporting unprivileged ublk device
-      commit: 56f5160bc1b8d9756a5353f79bd00be989834c7d
-
-Best regards,
--- 
-Jens Axboe
-
-
-
+> Changes since v1:
+> - Remove blk_is_zoned() check in bdev_{is_zone_start, offset_from_zone_start} (Damien)
+> - Minor spelling and variable name changes (Bart and Johannes)
+> - Remove zonefs patch for now (Damien)
+> - Send dm patches separately(Christoph)
+> 
+> Pankaj Raghav (3):
+>   block: remove superfluous check for request queue in bdev_is_zoned()
+>   block: add a new helper bdev_{is_zone_start, offset_from_zone_start}
+>   block: introduce bdev_zone_no helper
+> 
+>  block/blk-core.c          |  2 +-
+>  block/blk-zoned.c         |  4 ++--
+>  drivers/nvme/target/zns.c |  3 +--
+>  include/linux/blkdev.h    | 22 +++++++++++++++++-----
+>  4 files changed, 21 insertions(+), 10 deletions(-)
+> 
