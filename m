@@ -2,142 +2,115 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1A2EC3DA78
-	for <linux-block@archiver.kernel.org>; Tue, 17 Jan 2023 20:46:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EE022C38142
+	for <linux-block@archiver.kernel.org>; Tue, 17 Jan 2023 22:46:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229667AbjAQUpp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 17 Jan 2023 15:45:45 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53880 "EHLO
+        id S229510AbjAQWp5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 17 Jan 2023 17:45:57 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40622 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233268AbjAQUhZ (ORCPT
+        with ESMTP id S229539AbjAQWnf (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 17 Jan 2023 15:37:25 -0500
-Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E17A845239
-        for <linux-block@vger.kernel.org>; Tue, 17 Jan 2023 11:22:07 -0800 (PST)
-Received: by mail-pj1-x1031.google.com with SMTP id u1-20020a17090a450100b0022936a63a21so11753631pjg.4
-        for <linux-block@vger.kernel.org>; Tue, 17 Jan 2023 11:22:07 -0800 (PST)
+        Tue, 17 Jan 2023 17:43:35 -0500
+Received: from mail-vs1-xe2c.google.com (mail-vs1-xe2c.google.com [IPv6:2607:f8b0:4864:20::e2c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9FFA166CF2
+        for <linux-block@vger.kernel.org>; Tue, 17 Jan 2023 14:30:32 -0800 (PST)
+Received: by mail-vs1-xe2c.google.com with SMTP id v127so29494598vsb.12
+        for <linux-block@vger.kernel.org>; Tue, 17 Jan 2023 14:30:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=V0qcABF+rC2+wypY9Co8ogyd9bMie1DG0YXrqCGR92M=;
-        b=jQ9R9GO6CcL14A488fdRl0hUZC+f54CPIRgkg9E2CCgREegJcouLOr1z7BUrh8BwMF
-         WYSKkwE48/wbtZz/bimn1F6f+bRfr3uQZ5mKXzhWeKdYDwcTRGpvvL5D923glniNz32f
-         MCR5oZaSIULnOnsKBCs/q6pHMheyvzt9FSTXyU4p2eBISjB68RQW3IBdkWsDM972bxLq
-         DRIaYNQfteFoi6a9JND1UT5WzUggyBjjwqL9keEN1cIUcV5HbbqWafukgTWZZg0notCs
-         dAohn7ZovOOl3arn/j/o9pwP6KpY4G6Et+mPf7AcWTlJDsONluMg+owroNlRQ2uUzQQn
-         phSA==
+        bh=ScEkSv/4ujt+FscJGahMwM/oQgqzcSsBVgCxU70QRJI=;
+        b=g2jwoIxQwdTnr1B7YJPOxcb2LNHairUXX0OqXhUcefSUqfesJfyBh6TTKdZh2u/frr
+         btO0PTYoDQPJuS1xetwC9tGF45q7xFo8K/czu2UqDUjOM5OPHWVkW/YMHlN/AkTRYQJ4
+         NMOCD1DNUSXb/N07F+oIjlhs4p8j3Zb9YsAU+n0/Gt1R+PDRdr5E6zP7MJUcXC3Ukjuh
+         yAqgC2od1nSX98bQRUs7rndYvCGOOwmIS8v/7raRWbYykEwv8WGVQUb2hyXYLbeR4R4/
+         NQbmbUX1HjuteCKPj4XZ+/dOnefbi7/2I2+ij8iMNJlsEA7JjGV2J2LMUN61elv3nEzA
+         wKBg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=V0qcABF+rC2+wypY9Co8ogyd9bMie1DG0YXrqCGR92M=;
-        b=qrQx5OpOZ2I5ZmTKhOqI9CtSq8Fm5BeT26DAyzaw58ycO36ksujLaUwuI6W0YPQc7o
-         Hn0cEWAuc547rQgb700AIiq3vl1JsYcndupLCBzmheawyVRdVb0NV0rf8uZHpJNWv7Iv
-         aAd9vYKNMiAkuuYH4pmF+z5hF8IOyt30zV6SRKl3vx9kmBwo/9gqcyb4gmmgiZ4TPf8H
-         jKJX5znaOT213Ui6z1CpLyWG8bTuO7lIN4eIFz95E8A8+PoPffSdqtJr6yLzxjSWTKpR
-         4ARzZXmVY4tE5/l7h9wIn7Csi5kP77ziJj1X9D2rgLylAbgNainYv4D/BU/ah++tJq3j
-         OTYA==
-X-Gm-Message-State: AFqh2kpNmzZknqNH+dXh3fxPIZvl1wDADC2fIq/ZGBEpZfHNN9ffKGYF
-        Twx+MVjEphKPrxJs7AwYDIY54kK8G1Yld0S3v7iQjBfNOJ2wvg==
-X-Google-Smtp-Source: AMrXdXsATbyHIe7ZlH83NjP1r0fhxSqw0ijai8PbLlQzO/fEUf9l3lua68zv5B61GkcM9Xvp5pZkzS9SForTOUpSijM=
-X-Received: by 2002:a17:90b:48d0:b0:226:b5f4:d420 with SMTP id
- li16-20020a17090b48d000b00226b5f4d420mr471440pjb.102.1673983327042; Tue, 17
- Jan 2023 11:22:07 -0800 (PST)
+        bh=ScEkSv/4ujt+FscJGahMwM/oQgqzcSsBVgCxU70QRJI=;
+        b=Ft/rhHCsgqSXb9zwzZ3dZOaPS1EPucvFK6/DjR1m38eLEHrNyuGbLEAkZPtZdsIdqc
+         BhPuYEVRDhEReie0XG6G6r5+UTX4iORM9S1V3+IDKS8TB6SaI+HX+1ciSurKQg0srmyL
+         zWsKU0LS+j/ohspkcflaZxWkt2x1mC0DHWgluniilwVSU97QrQwGzLNkS6uPXRYUSc45
+         S/akZrW6vFxgQiFUwTl4wG2cbIk9dHcwuJL0Am7JQZ/YlJBbfGxzxEaw5Uk0CrIrEp47
+         xvqnVu3FSLu0VMoIVclAYiBG4eKxfUDbmL0nNsWdXWe9hK5vE1fKmdOcu9bXyewF+BFG
+         e5UA==
+X-Gm-Message-State: AFqh2krhpB/FFCWmAidkrFx/4S4zsj+Hojc03G2tMg1XDPyM1mJp3nqq
+        dj3/zJqFmRQCdk+/N4v6anuSp9vbNV9rX7MC6Cz52Q==
+X-Google-Smtp-Source: AMrXdXsasxzFes28B36W71fU5Iue+c6SDhtfvo6j1Ld/ub9DRIvDly3xpJu8wO0cQ3K8NP967lAk53nFxEnNJD9i4tI=
+X-Received: by 2002:a67:fb42:0:b0:3d0:d3fe:3d48 with SMTP id
+ e2-20020a67fb42000000b003d0d3fe3d48mr557188vsr.32.1673994631663; Tue, 17 Jan
+ 2023 14:30:31 -0800 (PST)
 MIME-Version: 1.0
-References: <20230114170113.3985630-1-trix@redhat.com>
-In-Reply-To: <20230114170113.3985630-1-trix@redhat.com>
-From:   Nick Desaulniers <ndesaulniers@google.com>
-Date:   Tue, 17 Jan 2023 11:21:55 -0800
-Message-ID: <CAKwvOdk=3GrWN_h41nPi_TKgw1uwB2twaV38B+Fj_paVuZ2nxw@mail.gmail.com>
-Subject: Re: [PATCH] paride/pcd: return earlier when an error happens in pcd_atapi()
-To:     Tom Rix <trix@redhat.com>
-Cc:     tim@cyberelk.net, axboe@kernel.dk, nathan@kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        llvm@lists.linux.dev
+References: <CAJs=3_C+K0iumqYyKhphYLp=Qd7i6-Y6aDUgmYyY_rdnN1NAag@mail.gmail.com>
+In-Reply-To: <CAJs=3_C+K0iumqYyKhphYLp=Qd7i6-Y6aDUgmYyY_rdnN1NAag@mail.gmail.com>
+From:   Enrico Granata <egranata@google.com>
+Date:   Tue, 17 Jan 2023 15:30:20 -0700
+Message-ID: <CAPR809uYp6vGvCk4ugWOjbmd13WTm8fRg0f2Mdq3pxj6=d1McQ@mail.gmail.com>
+Subject: Re: Virtio-blk extended lifetime feature
+To:     Alvaro Karsz <alvaro.karsz@solid-run.com>,
+        Jahdiel Alvarez <jahdiel@google.com>
+Cc:     virtualization <virtualization@lists.linux-foundation.org>,
+        linux-block@vger.kernel.org, dm-devel@redhat.com,
+        linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Christoph Hellwig <hch@infradead.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, Jan 14, 2023 at 9:01 AM Tom Rix <trix@redhat.com> wrote:
->
-> clang static analysis reports
-> drivers/block/paride/pcd.c:856:36: warning: The left operand of '&'
->   is a garbage value [core.UndefinedBinaryOperatorResult]
->   tocentry->cdte_ctrl = buffer[5] & 0xf;
->                         ~~~~~~~~~ ^
->
-> When the call to pcd_atapi() fails, buffer[] is in an unknown state,
-> so return early.
->
-> Signed-off-by: Tom Rix <trix@redhat.com>
-> ---
->  drivers/block/paride/pcd.c | 11 ++++++-----
->  1 file changed, 6 insertions(+), 5 deletions(-)
->
-> diff --git a/drivers/block/paride/pcd.c b/drivers/block/paride/pcd.c
-> index a5ab40784119..4524d8880463 100644
-> --- a/drivers/block/paride/pcd.c
-> +++ b/drivers/block/paride/pcd.c
-> @@ -827,12 +827,13 @@ static int pcd_audio_ioctl(struct cdrom_device_info *cdi, unsigned int cmd, void
->                         char buffer[32];
->                         int r;
+Hi,
+I am going to add +Jahdiel Alvarez who is also looking into a similar
+issue, and also I would like to hear thoughts of people who may have
+worked with (embedded or otherwise) storage more recently than I have
 
-Hi Tom, Thanks for the patch!
-It looks like `r` is now unused; mind removing that in v2?
+One thought that Jahdiel and myself were pondering is whether we need
+"type_a" and "type_b" fields at all, or if there should simply be a
+"wear estimate" field, which for eMMC, it could be max(typ_a, typ_b)
+but it could generalize to any number of cell or other algorithm, as
+long as it produces one unique estimate of wear
 
-Same below.
-
->
-> -                       r = pcd_atapi(cd, cmd, 12, buffer, "read toc header");
-> +                       if (pcd_atapi(cd, cmd, 12, buffer, "read toc header"))
-> +                               return -EIO;
->
->                         tochdr->cdth_trk0 = buffer[2];
->                         tochdr->cdth_trk1 = buffer[3];
->
-> -                       return r ? -EIO : 0;
-> +                       return 0;
->                 }
->
->         case CDROMREADTOCENTRY:
-> @@ -845,13 +846,13 @@ static int pcd_audio_ioctl(struct cdrom_device_info *cdi, unsigned int cmd, void
->                         struct cdrom_tocentry *tocentry =
->                             (struct cdrom_tocentry *) arg;
->                         unsigned char buffer[32];
-> -                       int r;
-
-^
-
->
->                         cmd[1] =
->                             (tocentry->cdte_format == CDROM_MSF ? 0x02 : 0);
->                         cmd[6] = tocentry->cdte_track;
->
-> -                       r = pcd_atapi(cd, cmd, 12, buffer, "read toc entry");
-> +                       if (pcd_atapi(cd, cmd, 12, buffer, "read toc entry"))
-> +                               return -EIO;
->
->                         tocentry->cdte_ctrl = buffer[5] & 0xf;
->                         tocentry->cdte_adr = buffer[5] >> 4;
-> @@ -866,7 +867,7 @@ static int pcd_audio_ioctl(struct cdrom_device_info *cdi, unsigned int cmd, void
->                                     (((((buffer[8] << 8) + buffer[9]) << 8)
->                                       + buffer[10]) << 8) + buffer[11];
->
-> -                       return r ? -EIO : 0;
-> +                       return 0;
->                 }
->
->         default:
-> --
-> 2.27.0
->
->
-
-
--- 
 Thanks,
-~Nick Desaulniers
+- Enrico
+
+Thanks,
+- Enrico
+
+
+On Sun, Jan 15, 2023 at 12:56 AM Alvaro Karsz
+<alvaro.karsz@solid-run.com> wrote:
+>
+> Hi guys,
+>
+> While trying to upstream the implementation of VIRTIO_BLK_F_LIFETIME
+> feature, many developers suggested that this feature should be
+> extended to include more cell types, since its current implementation
+> in virtio spec is relevant for MMC and UFS devices only.
+>
+> The VIRTIO_BLK_F_LIFETIME defines the following fields:
+>
+> - pre_eol_info:  the percentage of reserved blocks that are consumed.
+> - device_lifetime_est_typ_a: wear of SLC cells.
+> - device_lifetime_est_typ_b: wear of MLC cells.
+>
+> (https://docs.oasis-open.org/virtio/virtio/v1.2/virtio-v1.2.html)
+>
+> Following Michael's suggestion, I'd like to add to the virtio spec
+> with a new, extended lifetime command.
+> Since I'm more familiar with embedded type storage devices, I'd like
+> to ask you guys what fields you think should be included in the
+> extended command.
+>
+> Thanks,
+>
+> Alvaro
