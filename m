@@ -2,91 +2,104 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1632AC6379F
-	for <linux-block@archiver.kernel.org>; Tue, 17 Jan 2023 15:52:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4364C3DA78
+	for <linux-block@archiver.kernel.org>; Tue, 17 Jan 2023 16:56:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232553AbjAQPwf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 17 Jan 2023 10:52:35 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48324 "EHLO
+        id S231347AbjAQQ4w (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 17 Jan 2023 11:56:52 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34146 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233632AbjAQPwM (ORCPT
+        with ESMTP id S233801AbjAQQ4q (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 17 Jan 2023 10:52:12 -0500
-Received: from smtp.tiscali.it (santino-notr.mail.tiscali.it [213.205.33.215])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 33FA142DD0
-        for <linux-block@vger.kernel.org>; Tue, 17 Jan 2023 07:51:35 -0800 (PST)
-Received: from [192.168.178.50] ([79.21.79.228])
-        by santino.mail.tiscali.it with 
-        id 9rrU2902i4vZGgn01rrVmv; Tue, 17 Jan 2023 15:51:32 +0000
-x-auth-user: fantonifabio@tiscali.it
-Message-ID: <521902b6-d40d-f445-dbee-0280e526cae0@tiscali.it>
-Date:   Tue, 17 Jan 2023 16:51:26 +0100
+        Tue, 17 Jan 2023 11:56:46 -0500
+Received: from mail-il1-x129.google.com (mail-il1-x129.google.com [IPv6:2607:f8b0:4864:20::129])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75ACA442FC
+        for <linux-block@vger.kernel.org>; Tue, 17 Jan 2023 08:56:44 -0800 (PST)
+Received: by mail-il1-x129.google.com with SMTP id a3so9728674ilp.6
+        for <linux-block@vger.kernel.org>; Tue, 17 Jan 2023 08:56:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=gKb8xJoYl6ZJqTS0ZBbwa7NM5feNsZQ4ab5wEkrYrnA=;
+        b=nmkwpIYVV4COrWMjAbiKd/bsMPS/czQLuIGdvISyBvXbRQ4Xy4d7ibCVtEGEOkS1Hi
+         yNpiCVOAfR0HomNKwf4HP7VLmH8Dmnww+qf6lZUx2IZ3ldq3G2f1qV9NM6UAl0sL7L38
+         rTkLNmuA2lT/OYVLpipq+Qr/kvhLg4Xr+99N+FFX3EAVy55RNNm+rzDXNGIPIg27GVRH
+         0iVxNdpdVRbNUVT75M0CflxadC8S1kDXWuz8HomJDjn7OaqU5rhAh3uk9eijZmRadyoQ
+         V4ldoOpwmitUxuylfgNyxhhXJ7hayWZKh+wmI6r/hFXTLbLbc3K3p5DKN5VGSfwwpy8w
+         JXuA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=gKb8xJoYl6ZJqTS0ZBbwa7NM5feNsZQ4ab5wEkrYrnA=;
+        b=o2kqxTRQtcLMNiNhN2W5MqsUC7HMs75IkcgGnu7Sv2gwtQvrzyQI7gEEIkzYQ3AYgl
+         fGByJsAg/vRDcFF+nsvacoH7AfRxcNZa+54mq57zQ6HOyUHltiH1AHbdMIHucwcgGZA3
+         kJp07qdQQvUEFj5Uc4VnT3vPQX5jUxwPMOZkRefHJtMyLEJ08/XifbWj2lxhpvjBxO9A
+         lw2ndfKlyQ9Rmtqy8y2NpAcz18IZLoaaILZwedzDNxSoPAqgsXnsxNmUYSMPYOj3Pm2O
+         8aPqwfocgkXbnJ2XJsOcUjtzMHGPS5PdtQRO/DOMXwmYlaAfcPT6uff2hLNxk70DCEY/
+         mj5w==
+X-Gm-Message-State: AFqh2kqsSbPotR73Ng5EMDFsN/qpg18TCP6MFbqclConvybfuWCbdUvW
+        Cdww3lnINjyEKsoR4Xn5lajGzX1E1/4YlTOw
+X-Google-Smtp-Source: AMrXdXvCZ/wV7Q84305D4Qv2msOFoKVH9adbWiKPObiDop7SUeQAUKGb93dDRDZI9NteSDrA9vCzxg==
+X-Received: by 2002:a05:6e02:be7:b0:30e:f0e7:dddb with SMTP id d7-20020a056e020be700b0030ef0e7dddbmr651137ilu.1.1673974603735;
+        Tue, 17 Jan 2023 08:56:43 -0800 (PST)
+Received: from [192.168.1.94] ([207.135.234.126])
+        by smtp.gmail.com with ESMTPSA id l1-20020a92d941000000b0030ef5881a51sm2602388ilq.34.2023.01.17.08.56.43
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 17 Jan 2023 08:56:43 -0800 (PST)
+Message-ID: <8a0c0416-2994-ebb9-42ba-66262da35ff2@kernel.dk>
+Date:   Tue, 17 Jan 2023 09:56:42 -0700
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.1
-Reply-To: fantonifabio@tiscali.it
-Subject: Re: [PATCH v2] documentation: fix Generic Block Device Capability
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     corbet@lwn.net, axboe@kernel.dk, linux-block@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Sergei Shtepa <sergei.shtepa@veeam.com>
-References: <20230110132104.12499-1-fantonifabio@tiscali.it>
- <Y8WPFMFxpfdZKs5a@infradead.org>
- <62a18c7d-93d9-657e-48fd-1af06d6d1d9e@tiscali.it>
- <Y8Y6jLdXnnBTps7l@infradead.org>
-From:   Fabio Fantoni <fantonifabio@tiscali.it>
-In-Reply-To: <Y8Y6jLdXnnBTps7l@infradead.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
+ Thunderbird/102.6.0
+Subject: Re: [PATCH for-next] block: fix hctx checks for batch allocation
+To:     Pavel Begunkov <asml.silence@gmail.com>,
+        linux-block@vger.kernel.org
+References: <80d4511011d7d4751b4cf6375c4e38f237d935e3.1673955390.git.asml.silence@gmail.com>
+Content-Language: en-US
+From:   Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <80d4511011d7d4751b4cf6375c4e38f237d935e3.1673955390.git.asml.silence@gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Antivirus: Avast (VPS 230117-2, 17/1/2023), Outbound message
-X-Antivirus-Status: Clean
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tiscali.it; s=smtp;
-        t=1673970693; bh=htFWbz6gHdfiZHubJoYDHAUUk8NJyt1xhcczoshiPb8=;
-        h=Date:Reply-To:Subject:To:Cc:References:From:In-Reply-To;
-        b=24SUTDbJqs2YXRS69GAiYaenfKYRr+NmRN1iTwQdOjaQ3cdoDronuyncqeisnUvJW
-         GS6Il7F0wRxXUfqKgTVkEUd3mAgpKZ2JCoG0462uwii3u91E7NJNv5KMu4y3qmzsNl
-         Ub9l+4bX3Ed6VBNlbGnbfpzAQN3xIwIQP+OHEdDs=
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Il 17/01/2023 07:05, Christoph Hellwig ha scritto:
-> On Mon, Jan 16, 2023 at 07:14:41PM +0100, Fabio Fantoni wrote:
->> Il 16/01/2023 18:53, Christoph Hellwig ha scritto:
->>> On Tue, Jan 10, 2023 at 02:21:04PM +0100, Fabio Fantoni wrote:
->>>> - * ``GENHD_FL_REMOVABLE``: indicates that the block device gives access to
->>>> + * ``GENHD_FL_REMOVABLE`` (0x01): indicates that the block device gives access to
->>> The numberic values really do not belong into the documentation.  They
->>> are just implementation details.
->>>
->> Thanks for reply, if values are not into the documentation see from
->> /sys/block/<disk>/capability output what flags are enabled will require look
->> to source code of include/linux/blkdev.h and
->> Documentation/block/capability.rst will be less useful, or I'm wrong?
-> Urgg.  I think this file is generally just a bad idea.  The flags are
-> kernel internal and not isolated from userspace.  It seems nothing broke
-> with the various renumbering lately, but we need to isolate it from
-> the implementation details.  And if it really should be a user API
-> we need a text version of it.
+On 1/17/23 4:42?AM, Pavel Begunkov wrote:
+> When there are no read queues read requests will be assigned a
+> default queue on allocation. However, blk_mq_get_cached_request() is not
+> prepared for that and will fail all attempts to grab read requests from
+> the cache. Worst case it doubles the number of requests allocated,
+> roughly half of which will be returned by blk_mq_free_plug_rqs().
+> 
+> It only affects batched allocations and so is io_uring specific.
+> For reference, QD8 t/io_uring benchmark improves by 20-35%.
 
-Up to 5.13 the page was "ok" 
-(https://www.kernel.org/doc/html/v5.13/block/capability.html) from 5.14 
-doc comments of other functions was appaired, from 5.17 the flags had 
-"major" changes and values was removed from doc comment 
-(https://www.kernel.org/doc/html/v5.17/block/capability.html)
+This does make a big difference for me. Usual peak test (24 drives), and
+I get 63-65M IOPS with IRQ based IO. With the patch:
 
-With this patch return to have only block capability flags in this file 
-and including the values: https://snipboard.io/QrN6hg.jpg
+polled=0, fixedbufs=1/0, register_files=1, buffered=0, QD=128
+Engine=io_uring, sq_ring=128, cq_ring=128
+IOPS=64.79M, BW=31.64GiB/s, IOS/call=32/31
+IOPS=73.45M, BW=35.86GiB/s, IOS/call=32/32
+IOPS=73.70M, BW=35.99GiB/s, IOS/call=31/31
+IOPS=74.57M, BW=36.41GiB/s, IOS/call=31/31
+IOPS=75.18M, BW=36.71GiB/s, IOS/call=31/31
+IOPS=74.33M, BW=36.29GiB/s, IOS/call=32/32
+IOPS=74.53M, BW=36.39GiB/s, IOS/call=32/32
+IOPS=74.61M, BW=36.43GiB/s, IOS/call=32/32
 
-But as you tell that this file is a bad idea, 
-Documentation/block/capability.rst should be removed?
+which is 15-19% better.
 
-About if should be a user API, I don't have enough experience to be able 
-to say if and in which cases it could be useful on the user side. From 
-what I could see with the documentation page correct is that you can at 
-least immediately see (after a very fast search) for example if the 
-block device is removable and if it is partitionable. And even if the 
-values was changed pointing to the doc page of the used kernel version 
-and having the values in doc is still possible see what flags are 
-enabled from doc page.
+> It might be a good idea to always use HCTX_TYPE_DEFAULT, so the cache
+> always can accomodate combined write with read reqs.
+
+I think it makes sense to do so, particularly now that we have support
+for not just polled IO.
+
+-- 
+Jens Axboe
 
