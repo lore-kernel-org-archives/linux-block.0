@@ -2,76 +2,74 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DF51BC63797
-	for <linux-block@archiver.kernel.org>; Tue, 17 Jan 2023 08:10:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44551C63797
+	for <linux-block@archiver.kernel.org>; Tue, 17 Jan 2023 08:13:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235983AbjAQIKB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 17 Jan 2023 03:10:01 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56114 "EHLO
+        id S235988AbjAQINJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 17 Jan 2023 03:13:09 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58464 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235986AbjAQIJm (ORCPT
+        with ESMTP id S235407AbjAQIND (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 17 Jan 2023 03:09:42 -0500
+        Tue, 17 Jan 2023 03:13:03 -0500
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 373512748C;
-        Tue, 17 Jan 2023 00:09:38 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A0A9422011;
+        Tue, 17 Jan 2023 00:13:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=pQjSKmSw6p/N0OMSHc7at4GiVU7Rg/XB3qkDkMiu+rs=; b=sFzD+basG4rvAZOsDrubDxcusL
-        KFAWUTWkOY8ubdQ9rE5S0ri3fww/A//S0+L4dcIVxCUc8J4WVyFO+NRipr3GI5MV48YehqqS+7PIP
-        B9uaCAs/Y2fc6HCamTtbb5sRHsKgRex7dDNaEKfnO2WIc4fX2F+My4M+KBm2AsuDiukCA8FWLvNy6
-        RR6mZTk8cYOaAKhP8LHq52JGxWcLoRB7XXKnlxzSEofxxsNnIywjle0Edqar0aRttUtBtp9M+ZdLR
-        r5TF5S6JJ2KD9UgNmaw7nsUn0w+ck/yj60pHY4vaLLkqTKZjT8u5Gf+qR5KAXI+kg0jeX4ZmtNZCS
-        kBvwUJ/A==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1pHh2A-00DHQP-F9; Tue, 17 Jan 2023 08:09:30 +0000
-Date:   Tue, 17 Jan 2023 00:09:30 -0800
-From:   Christoph Hellwig <hch@infradead.org>
-To:     David Hildenbrand <david@redhat.com>
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        David Howells <dhowells@redhat.com>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Matthew Wilcox <willy@infradead.org>,
-        Jens Axboe <axboe@kernel.dk>, Jan Kara <jack@suse.cz>,
-        Jeff Layton <jlayton@kernel.org>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Peter Zijlstra <peterz@infradead.org>
-Subject: Re: [PATCH v6 03/34] iov_iter: Pass I/O direction into
- iov_iter_get_pages*()
-Message-ID: <Y8ZXukUbg0/9cYtV@infradead.org>
-References: <167391047703.2311931.8115712773222260073.stgit@warthog.procyon.org.uk>
- <167391050409.2311931.7103784292954267373.stgit@warthog.procyon.org.uk>
- <Y8ZU1Jjx5VSetvOn@infradead.org>
- <3515368f-d622-f7d2-5854-9503d4a19fb2@redhat.com>
+        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+        Content-ID:Content-Description:In-Reply-To:References;
+        bh=tBaVz7h6Ls5siSdNgvaB/QpLtiTcpj4YxidHypc3EsY=; b=TPAf0kJR2DrWHNeTZaF0cwyCha
+        oXCkMJtO/yr5NEOzj5pVvHgaw3LPe8wIkVvXv4uZEG8Wyw1r2G4C3lHoqXC3gC6RHblhADFQq6qGy
+        xlDTcUHbKrZnLaZUK/SgToLvXY2Kt7dw9EuUAkLJ7j8O1dcUs/sJNWE5d8/l7tpn1cbI2Tx124G/F
+        ijXaaOaeRDQAIosHFZDvlzPWQWdmWsSzuTPwwRKKBfRxwLI4IBmhUhNNKdeVZtPDN8WpODx4zhPU8
+        Qy6O20qOK19+q2Op0q38iZ0M4oDM3SddzvtQk/em5usPHPaBph6Pjep3WHSQ2N29gQ1u+hjUygNnZ
+        +q8w6LmA==;
+Received: from [2001:4bb8:19a:2039:eaa2:3b9e:be2e:bd2a] (helo=localhost)
+        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1pHh5Y-00DHgU-3V; Tue, 17 Jan 2023 08:13:00 +0000
+From:   Christoph Hellwig <hch@lst.de>
+To:     Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
+        Josef Bacik <josef@toxicpanda.com>
+Cc:     linux-block@vger.kernel.org, cgroups@vger.kernel.org
+Subject: switch blk-cgroup to work on gendisk
+Date:   Tue, 17 Jan 2023 09:12:42 +0100
+Message-Id: <20230117081257.3089859-1-hch@lst.de>
+X-Mailer: git-send-email 2.39.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <3515368f-d622-f7d2-5854-9503d4a19fb2@redhat.com>
+Content-Transfer-Encoding: 8bit
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jan 17, 2023 at 09:07:48AM +0100, David Hildenbrand wrote:
-> Agreed. What I understand, David considers that confusing when considering
-> the I/O side of things.
-> 
-> I recall that there is
-> 
-> DMA_BIDIRECTIONAL -> FOLL_WRITE
-> DMA_TO_DEVICE -> !FOLL_WRITE
-> DMA_FROM_DEVICE -> FOLL_WRITE
-> 
-> that used different defines for a different API. Such terminology would be
-> easier to get ... but then, again, not sure if we really need acronyms here.
-> 
-> We're pinning pages and FOLL_WRITE defines how we (pinning the page) are
-> going to access these pages: R/O or R/W. So the read vs. write is never from
-> the POC of the device (DMA read will write to the page).
+Hi all,
 
-Yes.  Maybe the name could be a little more verboe, FOLL_MEM_WRITE or
-FOLL_WRITE_TO_MEM.  But I'd really prefer any renaming to be split from
-logic changes.
+blk-cgroup works on only on live disks and "file system" I/O from bios.
+This all the information should be in the gendisk, and not the
+request_queue that also exists for pure passthrough request based
+devices.
+
+Diffstat:
+ block/bfq-cgroup.c        |   18 ++--
+ block/bfq-iosched.c       |    6 -
+ block/blk-cgroup-rwstat.c |    2 
+ block/blk-cgroup.c        |  185 +++++++++++++++++++++-------------------------
+ block/blk-cgroup.h        |   41 ++++------
+ block/blk-iocost.c        |   40 ++++-----
+ block/blk-iolatency.c     |   41 ++++------
+ block/blk-ioprio.c        |    6 -
+ block/blk-mq-debugfs.c    |   10 --
+ block/blk-rq-qos.c        |   67 ++++++++++++++++
+ block/blk-rq-qos.h        |   66 +---------------
+ block/blk-stat.c          |    3 
+ block/blk-sysfs.c         |    4 
+ block/blk-throttle.c      |   31 ++++---
+ block/blk-wbt.c           |   39 ++++-----
+ block/blk-wbt.h           |   12 +-
+ block/genhd.c             |   17 ++--
+ include/linux/blkdev.h    |   10 +-
+ include/linux/sched.h     |    2 
+ kernel/fork.c             |    2 
+ mm/swapfile.c             |    2 
+ 21 files changed, 292 insertions(+), 312 deletions(-)
