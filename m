@@ -2,115 +2,88 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A4DCC63797
-	for <linux-block@archiver.kernel.org>; Tue, 17 Jan 2023 08:00:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 19E5CC63797
+	for <linux-block@archiver.kernel.org>; Tue, 17 Jan 2023 08:02:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235853AbjAQIAL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 17 Jan 2023 03:00:11 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50732 "EHLO
+        id S235878AbjAQICK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 17 Jan 2023 03:02:10 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51498 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235840AbjAQIAI (ORCPT
+        with ESMTP id S235771AbjAQICH (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 17 Jan 2023 03:00:08 -0500
-Received: from esa5.hgst.iphmx.com (esa5.hgst.iphmx.com [216.71.153.144])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E18EB25E0F
-        for <linux-block@vger.kernel.org>; Tue, 17 Jan 2023 00:00:07 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1673942407; x=1705478407;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=g9jZ4NXxoTsdj4fcvmZe+9a9/ft8JBcGnJUfqd1G/YM=;
-  b=iI7dYovdadgv3yXtwp7eXJ/QIse7V0ffyDxdNGZ4h9OMBqcvtR3SOn5F
-   8Ex36tzX6dgoGPl3rBSERPG1aWFrijfnDk53nXl+RWW/B66vg4qQh+FUF
-   qB4s5pUaPkI/hKRIWc8rIejBSqWfoLMAvEF31yiOFELZHFHM+unx3P32w
-   XQW3ZEsOp/Fl+QQN2j4PUfOO5pDgU6vGqO4leLePQfwELPlAjyAF33KWe
-   nbiZ/o2SKXJU31FVsrNV0ydtX8oQmQUOGYrw1cVhTiYu0ByBbY2c9izo8
-   9wCg8E/toQiEhYbOmSBT2AfV/swY46lnNyCyx1cyHQURH4VUJ77jatucO
-   w==;
-X-IronPort-AV: E=Sophos;i="5.97,222,1669046400"; 
-   d="scan'208";a="220819956"
-Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 17 Jan 2023 16:00:07 +0800
-IronPort-SDR: 2aqmXHVjmLecwJXvOQfKfXaM1Ue77knciWRnYlNkikyQPMcg9BaSqpIRxWakKIcf5cNoR1sG86
- CrxO1/dhubwIPZxQsbPihwfihBjjTyyuCHrjghlQCe/D1SXkSYugh48/z2ePZOouhrzreD7FD/
- sz815SQYt4U20Wee9P7pxzkV15shHyUREZ3Cg7du+5qdOC0dzBLo+d/AQ8C8JdHSl46Sqp11fb
- E01T5ypQJCUMomDSX7Bad1M+CvrPx/43zy0NP2yBC+MTfr/6beQxRPwjBpDQyM7V7enC8GqGzr
- 1II=
-Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 16 Jan 2023 23:17:49 -0800
-IronPort-SDR: S3iuipaacmUyKcOIlTy4hRTCyldAWjOwPqU8A++LXOcEA8xXfsLGdevd4IqLwXb/Ih1W89wdph
- ocac/7kKhhcJgnkkmaRObjR7KLVEYVSGblc0r5w924cGvxU+WJtkG0PLUrVw0+B2VudYLX0ePy
- SFoSW8Js80vMSErDSf5Dkx/FT4e0cPdKZSaurtNZAEPH1UURA9nqMzuSBscE3iGwfqX9Z3UG/l
- R0W/257PAbI44BOx30TQWjcWb8iOnUhg/KUcSqEXHo+iDafsvNSrWzY5G6Mtlgk1Wkm65WO1IB
- RsQ=
-WDCIronportException: Internal
-Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
-  by uls-op-cesaip02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 17 Jan 2023 00:00:08 -0800
-Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4Nx1X70bDXz1RvTr
-        for <linux-block@vger.kernel.org>; Tue, 17 Jan 2023 00:00:07 -0800 (PST)
-Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
-        reason="pass (just generated, assumed good)"
-        header.d=opensource.wdc.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
-        opensource.wdc.com; h=content-transfer-encoding:content-type
-        :in-reply-to:organization:from:references:to:content-language
-        :subject:user-agent:mime-version:date:message-id; s=dkim; t=
-        1673942406; x=1676534407; bh=g9jZ4NXxoTsdj4fcvmZe+9a9/ft8JBcGnJU
-        fqd1G/YM=; b=gh+HNdU5lPDHjtYtR8YwkLMsGJcCWv0G5fvflwB4/e79NO4dc95
-        CATSrXcZ3Hq0ngy8y5zaWrZl1c/tM0v+J/VEtzb5EqDCRTqg+7dM9f8LWFNswk34
-        batIoLERiycRRwPhxp3tvG0vhfu/Mf7Qbhst/wFKoTRscOcO9vtBCeKLqQj3ee1D
-        pyA1yP4KDRjvVZ39vpyO6/dphfv8oZAF05HlR95Bx6mQDflzukwuc5JgYILNasq4
-        m7HPVA+71cQRWFjOU4zK/hNTbfA3gxAeUK8EZ6uzVEEObnSuWcuH/IgypkD7RiJF
-        TDs3dvl4udySqNBAt8aQdh7F8Os5b310S2w==
-X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
-Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
-        by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id EPcG4_f1vioa for <linux-block@vger.kernel.org>;
-        Tue, 17 Jan 2023 00:00:06 -0800 (PST)
-Received: from [10.225.163.30] (unknown [10.225.163.30])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4Nx1X5302dz1RvLy;
-        Tue, 17 Jan 2023 00:00:05 -0800 (PST)
-Message-ID: <16676885-5e71-4a5d-1b75-db2ddeb8e16f@opensource.wdc.com>
-Date:   Tue, 17 Jan 2023 17:00:03 +0900
+        Tue, 17 Jan 2023 03:02:07 -0500
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B16636E95;
+        Tue, 17 Jan 2023 00:02:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=cmVV6xRQmaK0l4HRL/lhH4XySz+BO5RzfEmX6d+cJZM=; b=KLeqLLx0NC+cXLbPhHSUJXvm/7
+        R/nl/8FixpSCZgHfNJHIPElbnFHiIR85J0mANjkPduyvsnh1TOci2q3m71cXS3BTbn0rB7Cz89ZKR
+        QJAkNO6pNAybiWH/mXlGOEdMFq76IoX3V3FwiGVTg4NHWsFd/mnXxJ25MuAMbuJ7LQ+p227fBxOR3
+        Un7EcKwFO+MI7nMp+e4NwGZ0ykdgaaqkKmYEVm7lp8JJsaj7uZsVdxh3ZYbuzZKlGAOlGi3wAv6H9
+        sZsf0ybxabL89GqyzG8JI9EW8On10C7w0tMsJWtBI0gBakel51gCmn+QjxRoDvc2+FTWOhTth9ZBN
+        b7LOBerA==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1pHgut-00DGYh-Be; Tue, 17 Jan 2023 08:01:59 +0000
+Date:   Tue, 17 Jan 2023 00:01:59 -0800
+From:   Christoph Hellwig <hch@infradead.org>
+To:     David Howells <dhowells@redhat.com>
+Cc:     Al Viro <viro@zeniv.linux.org.uk>, Christoph Hellwig <hch@lst.de>,
+        John Hubbard <jhubbard@nvidia.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        Christoph Hellwig <hch@infradead.org>,
+        Jens Axboe <axboe@kernel.dk>, Jan Kara <jack@suse.cz>,
+        Jeff Layton <jlayton@kernel.org>,
+        Logan Gunthorpe <logang@deltatee.com>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v6 07/34] iov_iter: Add a function to extract a page list
+ from an iterator
+Message-ID: <Y8ZV9x9gawJPbQho@infradead.org>
+References: <167391047703.2311931.8115712773222260073.stgit@warthog.procyon.org.uk>
+ <167391053207.2311931.16398133457201442907.stgit@warthog.procyon.org.uk>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.0
-Subject: Re: [PATCH v2 14/18] scsi: sd: detect support for command duration
- limits
-Content-Language: en-US
-To:     Christoph Hellwig <hch@infradead.org>,
-        Niklas Cassel <niklas.cassel@wdc.com>
-Cc:     "James E.J. Bottomley" <jejb@linux.ibm.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Hannes Reinecke <hare@suse.de>, linux-scsi@vger.kernel.org,
-        linux-ide@vger.kernel.org, linux-block@vger.kernel.org
-References: <20230112140412.667308-1-niklas.cassel@wdc.com>
- <20230112140412.667308-15-niklas.cassel@wdc.com>
- <Y8ZQQRO/O/3JjHtV@infradead.org>
-From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
-Organization: Western Digital Research
-In-Reply-To: <Y8ZQQRO/O/3JjHtV@infradead.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <167391053207.2311931.16398133457201442907.stgit@warthog.procyon.org.uk>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/17/23 16:37, Christoph Hellwig wrote:
-> Is sysfs really the right interface here?  I would have expected an
-> ioctl (and for kernel use method) on the block device to more
-> useful.  Especially all the dynamic sysfs manipulation from a driver
-> is a little scary to me.
+> Changes:
+> ========
+> ver #6)
+>  - Add back the function to indicate the cleanup mode.
+>  - Drop the cleanup_mode return arg to iov_iter_extract_pages().
+>  - Pass FOLL_SOURCE/DEST_BUF in gup_flags.  Check this against the iter
+>    data_source.
 
-I found it convenient to have everything in sysfs as everything is visible
-from the shell without needing any extra tooling. And I did that because I
-thought ioctls should not be added... We could add one though, but then I
-do not see much value since cdl-tools (cdladm utility) and sg3utils/sdparm
-can give that information already.
+FYI, the changelog goes after the --- so that it doesn't get added
+to the git history.
 
--- 
-Damien Le Moal
-Western Digital Research
+> Link: https://lore.kernel.org/r/166732025748.3186319.8314014902727092626.stgit@warthog.procyon.org.uk/ # rfc
+> Link: https://lore.kernel.org/r/166869689451.3723671.18242195992447653092.stgit@warthog.procyon.org.uk/ # rfc
+> Link: https://lore.kernel.org/r/166920903885.1461876.692029808682876184.stgit@warthog.procyon.org.uk/ # v2
+> Link: https://lore.kernel.org/r/166997421646.9475.14837976344157464997.stgit@warthog.procyon.org.uk/ # v3
+> Link: https://lore.kernel.org/r/167305163883.1521586.10777155475378874823.stgit@warthog.procyon.org.uk/ # v4
+> Link: https://lore.kernel.org/r/167344728530.2425628.9613910866466387722.stgit@warthog.procyon.org.uk/ # v5
 
+And all these links aren't exactly useful.  This fairly trivial commit
+is going to look like a hot mess in git.
+
+> +ssize_t iov_iter_extract_pages(struct iov_iter *i, struct page ***pages,
+> +			       size_t maxsize, unsigned int maxpages,
+> +			       unsigned int gup_flags, size_t *offset0);
+
+This function isn't actually added in the current patch.
+
+> +#define iov_iter_extract_mode(iter, gup_flags) \
+> +	(user_backed_iter(iter) ?				\
+> +	 (gup_flags & FOLL_BUF_MASK) == FOLL_SOURCE_BUF ?	\
+> +	 FOLL_GET : FOLL_PIN : 0)
+
+And inline function would be nice here.  I guess that would require
+moving the FULL flags into mm_types.h, though.
