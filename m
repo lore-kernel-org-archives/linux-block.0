@@ -2,164 +2,93 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EFDF3C46467
-	for <linux-block@archiver.kernel.org>; Mon, 16 Jan 2023 23:39:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 56223C46467
+	for <linux-block@archiver.kernel.org>; Tue, 17 Jan 2023 01:01:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231268AbjAPXj3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 16 Jan 2023 18:39:29 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43448 "EHLO
+        id S233936AbjAQBBY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 16 Jan 2023 20:01:24 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36132 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233784AbjAPXj2 (ORCPT
+        with ESMTP id S232403AbjAQBBY (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 16 Jan 2023 18:39:28 -0500
-Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 153984C0A
-        for <linux-block@vger.kernel.org>; Mon, 16 Jan 2023 15:39:27 -0800 (PST)
-Received: by mail-pl1-x62b.google.com with SMTP id k18so7750502pll.5
-        for <linux-block@vger.kernel.org>; Mon, 16 Jan 2023 15:39:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=yQF0auPzxI4Mn/L1YLBp7JsEV+bsm8x9t/TAEYcUnjs=;
-        b=L7mqi0qHb/Pwi+2Fj1AIsRt+qnM/BV+vjIVc+GklKWXcdccRjVGyVVxDBYHZRVfSat
-         SKjM3FtwqB8CcJsbLIfbdOORDNYuYCAwyvUw7OSQ/EdCdglSWAct92gapIbl8bgrpC2t
-         Pj1cXIJl/CWN72Q0ITkcOfGthkJkoEm+i7HAgiM/qKzBA5w0FhuRi12vj23kK/4VthLv
-         rBp8W1RzQLsKMNZwmG9fo9lA3IK6y4DIcblYQlUFqCRvYbA54qVMoO3ytfBZH/EZXVRs
-         7dU3tdLQ1rs7Ig84BljaZKOqJTLR1x0An7oa18e90bC1+05CwAso0jRrdwX+2SLsQzcJ
-         70gw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=yQF0auPzxI4Mn/L1YLBp7JsEV+bsm8x9t/TAEYcUnjs=;
-        b=gc1hOXe4NqJhxTcKwmSzSscdm5j+b8FmM56qNLOoKXvrhMeiX10xHUahU97xqepUyz
-         YODqPNZ1jcMfsqmAEGPMTjanFpsyMrMqLxs0EA6+zn6Gvnv0v4nJyyI1MPW3k5igMTq7
-         o9o9o2bVAkzcfmSf+LJLhMsRSXY3rBNL4VdBqZOf5fsNL+b6vQwFruPaNt+B57N7bvij
-         xGUL80UdNWao6YMWUJLSyaEOzLbX+OotyDS1QhZV0CcscolHTpr0ZSVl6OImKkErfNN1
-         i8RcCE+aySAUYj0DoGqw7XtOXV2cmmmLxyx8Yv+bCWA1d+3Wts1yew0k18pnEa5FaUTl
-         AK/A==
-X-Gm-Message-State: AFqh2kop7KGLlsK2HIS/a/z3d1PRtMikbKLKFtLSs3Ej5gNwBIu9+o0W
-        QqIwCDzkpkLVxeNYBZXFWsKZZQ==
-X-Google-Smtp-Source: AMrXdXtIZu0YPeyVxijlg0syxhmIA0sNGY+YbxS8OQMUxGMMritzc3aDimSEgdtJR1UkgNGjwmJM1A==
-X-Received: by 2002:a17:903:41d2:b0:193:1c8f:183a with SMTP id u18-20020a17090341d200b001931c8f183amr345253ple.5.1673912366462;
-        Mon, 16 Jan 2023 15:39:26 -0800 (PST)
-Received: from [192.168.1.136] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id a7-20020a1709027e4700b00192740bb02dsm18517956pln.45.2023.01.16.15.39.25
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 16 Jan 2023 15:39:26 -0800 (PST)
-Message-ID: <da64245b-4127-f6be-76e4-a9c9546c8226@kernel.dk>
-Date:   Mon, 16 Jan 2023 16:39:25 -0700
+        Mon, 16 Jan 2023 20:01:24 -0500
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0DB22222D5;
+        Mon, 16 Jan 2023 17:01:21 -0800 (PST)
+Received: from mail02.huawei.com (unknown [172.30.67.169])
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4NwrDq24RPz4f3vsg;
+        Tue, 17 Jan 2023 09:01:15 +0800 (CST)
+Received: from [10.174.178.129] (unknown [10.174.178.129])
+        by APP4 (Coremail) with SMTP id gCh0CgBXDLBc88VjDmVyBw--.15852S2;
+        Tue, 17 Jan 2023 09:01:17 +0800 (CST)
+Subject: Re: [PATCH v3 07/14] blk-mq: make blk_mq_commit_rqs a general
+ function for all commits
+To:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>
+Cc:     dwagner@suse.de, hare@suse.de, ming.lei@redhat.com,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        john.garry@huawei.com, jack@suse.cz
+References: <20230111130159.3741753-1-shikemeng@huaweicloud.com>
+ <20230111130159.3741753-8-shikemeng@huaweicloud.com>
+ <20230111054520.GA17158@lst.de>
+ <c51cbadb-bfd8-5f26-6bc3-5ad975b5db39@huaweicloud.com>
+ <e2ba1495-e9a8-8dfc-4eee-d9a2984bc0d2@huaweicloud.com>
+ <20230116160958.GB23434@lst.de>
+ <d1244b25-9ae6-33b0-e6b7-3e3c463b1224@kernel.dk>
+From:   Kemeng Shi <shikemeng@huaweicloud.com>
+Message-ID: <5511fa8a-b59b-a127-15ae-50425740ba52@huaweicloud.com>
+Date:   Tue, 17 Jan 2023 09:01:16 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.5.0
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.0
-Subject: Re: [PATCH v2] block: don't allow multiple bios for IOCB_NOWAIT issue
-Content-Language: en-US
-To:     Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Cc:     Christoph Hellwig <hch@lst.de>,
-        Michael Kelley <mikelley@microsoft.com>
-References: <1ce71005-c81b-374d-5bcf-e3b7e7c48d0d@kernel.dk>
- <7c69e3b5-c81b-a3ba-9588-9a59c32c45b7@opensource.wdc.com>
- <4ed4090b-7bff-dd43-da23-915f269bd759@kernel.dk>
- <88d454ab-97bf-f5a9-7645-5fb89c4bc0e0@opensource.wdc.com>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <88d454ab-97bf-f5a9-7645-5fb89c4bc0e0@opensource.wdc.com>
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <d1244b25-9ae6-33b0-e6b7-3e3c463b1224@kernel.dk>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: gCh0CgBXDLBc88VjDmVyBw--.15852S2
+X-Coremail-Antispam: 1UD129KBjvdXoWruF4UtryrAw1kAw1kWFWktFb_yoWDCFX_uF
+        15u3srGrW3G3srtrZ8tF45Zrs0gay5W3W5Jw4ktrW0qa4FyFs7WFnFgFy8K3WfG3yj9F9I
+        9F9Iqwn09rWfWjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+        9fnUUIcSsGvfJTRUUUbzAYFVCjjxCrM7AC8VAFwI0_Gr0_Xr1l1xkIjI8I6I8E6xAIw20E
+        Y4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwV
+        A0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVWDJVCq3wA2z4x0Y4vE2Ix0cI8IcVCY1x02
+        67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I
+        0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40E
+        x7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x
+        0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lc7I2V7IY0VAS07AlzVAYIcxG8wCF04k20xvY0x0E
+        wIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E74
+        80Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0
+        I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04
+        k26cxKx2IYs7xG6rW3Jr0E3s1lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY
+        1x0267AKxVWUJVW8JbIYCTnIWIevJa73UjIFyTuYvjxUrR6zUUUUU
+X-CM-SenderInfo: 5vklyvpphqwq5kxd4v5lfo033gof0z/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/16/23 4:31 PM, Damien Le Moal wrote:
-> On 1/17/23 08:28, Jens Axboe wrote:
->> On 1/16/23 4:20?PM, Damien Le Moal wrote:
->>> On 1/17/23 06:06, Jens Axboe wrote:
->>>> If we're doing a large IO request which needs to be split into multiple
->>>> bios for issue, then we can run into the same situation as the below
->>>> marked commit fixes - parts will complete just fine, one or more parts
->>>> will fail to allocate a request. This will result in a partially
->>>> completed read or write request, where the caller gets EAGAIN even though
->>>> parts of the IO completed just fine.
->>>>
->>>> Do the same for large bios as we do for splits - fail a NOWAIT request
->>>> with EAGAIN. This isn't technically fixing an issue in the below marked
->>>> patch, but for stable purposes, we should have either none of them or
->>>> both.
->>>>
->>>> This depends on: 613b14884b85 ("block: handle bio_split_to_limits() NULL return")
->>>>
->>>> Cc: stable@vger.kernel.org # 5.15+
->>>> Fixes: 9cea62b2cbab ("block: don't allow splitting of a REQ_NOWAIT bio")
->>>> Link: https://github.com/axboe/liburing/issues/766
->>>> Reported-and-tested-by: Michael Kelley <mikelley@microsoft.com>
->>>> Signed-off-by: Jens Axboe <axboe@kernel.dk>
->>>>
->>>> ---
->>>>
->>>> Since v1: catch this at submit time instead, since we can have various
->>>> valid cases where the number of single page segments will not take a
->>>> bio segment (page merging, huge pages).
->>>>
->>>> diff --git a/block/fops.c b/block/fops.c
->>>> index 50d245e8c913..d2e6be4e3d1c 100644
->>>> --- a/block/fops.c
->>>> +++ b/block/fops.c
->>>> @@ -221,6 +221,24 @@ static ssize_t __blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter,
->>>>  			bio_endio(bio);
->>>>  			break;
->>>>  		}
->>>> +		if (iocb->ki_flags & IOCB_NOWAIT) {
->>>> +			/*
->>>> +			 * This is nonblocking IO, and we need to allocate
->>>> +			 * another bio if we have data left to map. As we
->>>> +			 * cannot guarantee that one of the sub bios will not
->>>> +			 * fail getting issued FOR NOWAIT and as error results
->>>> +			 * are coalesced across all of them, be safe and ask for
->>>> +			 * a retry of this from blocking context.
->>>> +			 */
->>>> +			if (unlikely(iov_iter_count(iter))) {
->>>> +				bio_release_pages(bio, false);
->>>> +				bio_clear_flag(bio, BIO_REFFED);
->>>> +				bio_put(bio);
->>>> +				blk_finish_plug(&plug);
->>>> +				return -EAGAIN;
->>>
->>> Doesn't this mean that for a really very large IO request that has 100%
->>> chance of being split, the user will always get -EAGAIN ? Not that I mind,
->>> doing super large IOs with NOWAIT is not a smart thing to do in the first
->>> place... But as a user interface, it seems that this will prevent any
->>> forward progress for such really large NOWAIT IOs. Is that OK ?
->>
->> Right, if you asked for NOWAIT, then it would not necessarily succeed if
->> it:
->>
->> 1) Needs multiple bios
->> 2) Needs splitting
->>
->> You're expected to attempt blocking issue at that point. Reasoning is
->> explained in this (and the previous commit related to the issue),
->> otherwise you end up with potentially various amounts of the request
->> being written to disk or read from disk, but EAGAIN being returned for
->> the request as a whole.
-> 
-> Yes, I understood all that and completely agree with it.
-> 
-> I was only wondering if this change may not surprise some (bad) userspace
-> stuff. Do we need to update some man page or other doc, mentioning that
-> there are no guarantees that a NOWAIT IO may actually be executed if it
-> too large (e.g. larger than max_sectors_kb) ?
 
-We can certainly add it to the man pages talking about RWF_NOWAIT. But
-there's never been a guarantee that any EAGAIN will later succeed
-under the same conditions, and honestly there are various conditions
-where this is already not true. And those same cases would spuriously
-yield EAGAIN before already, it's not a new condition for those sizes
-of IOs.
+
+on 1/17/2023 12:13 AM, Jens Axboe wrote:
+> On 1/16/23 9:09 AM, Christoph Hellwig wrote:
+>> On Mon, Jan 16, 2023 at 09:07:00AM +0800, Kemeng Shi wrote:
+>>>>> Why?  I think always having the trace even for the commit case seems
+>>>>> very useful for making the traces useful.
+>>>> I think unplug event more likely means that request going to be sent to driver
+>>>> was plugged and in plug list. And the current code do only trace unplug event
+>>>> when dispatching requests from plug list. If so, would it be better to add
+>>>> a new event to trace commit?
+>>> Hi Christoph, which way do you prefer now? Keep unplug event consistent to
+>>> trace commit of requests from plug list only or trace all commits with
+>>> unplug event. Please let me know and I will consider it in next version.
+>>> Thanks.
+>>
+>> To me always having the trace feels more useful, but let's see if Jens
+>> has an opinion on it.
+> 
+> Agree, that is probably the saner option.
+> 
+Thanks for replies, I will trace all commits with unplug event in next version.
 
 -- 
-Jens Axboe
-
+Best wishes
+Kemeng Shi
 
