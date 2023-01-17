@@ -2,97 +2,89 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0745EC67871
-	for <linux-block@archiver.kernel.org>; Tue, 17 Jan 2023 01:02:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2CE08C46467
+	for <linux-block@archiver.kernel.org>; Tue, 17 Jan 2023 02:04:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230040AbjAQBCJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 16 Jan 2023 20:02:09 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36402 "EHLO
+        id S235175AbjAQCER (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 16 Jan 2023 21:04:17 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52194 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234199AbjAQBCH (ORCPT
+        with ESMTP id S235133AbjAQCEQ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 16 Jan 2023 20:02:07 -0500
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E85D222E0;
-        Mon, 16 Jan 2023 17:02:04 -0800 (PST)
-Received: from mail02.huawei.com (unknown [172.30.67.143])
-        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4NwrFd6mJ2z4f3tDB;
-        Tue, 17 Jan 2023 09:01:57 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-        by APP3 (Coremail) with SMTP id _Ch0CgA35CGG88VjI6vKBg--.26932S3;
-        Tue, 17 Jan 2023 09:02:00 +0800 (CST)
-Subject: Re: [PATCH] blk-cgroup: fix missing pd_online_fn() while activating
- policy
-To:     Yu Kuai <yukuai1@huaweicloud.com>, tj@kernel.org,
-        josef@toxicpanda.com, axboe@kernel.dk
+        Mon, 16 Jan 2023 21:04:16 -0500
+Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A805023315
+        for <linux-block@vger.kernel.org>; Mon, 16 Jan 2023 18:04:15 -0800 (PST)
+Received: by mail-pj1-x102d.google.com with SMTP id v23so30849285pju.3
+        for <linux-block@vger.kernel.org>; Mon, 16 Jan 2023 18:04:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=SExj9sPYRI5nvri+f4hPOSN0wQyEHXBODvypNoBRz/E=;
+        b=Gh1phClZGkEjfMyk7PFqNeMBC2BIMQscw5aErf3bX7JD7N4WENyYXGTvElDfKcp44g
+         gR6v9FsUAlk3gLf+hll8ixHOu2Go53fjYr7VQw4w95GZqyidqq1U5/9JWWE6a9ksmjBx
+         R7FDsKTErGWvXlNdJ1lh9Op1clvxpjFkY4/nJRgPJNEG2X6u0GbCcPWm3bnobYNDO1t1
+         6SrPvB96sAFFi3J2LM9YgqfSuf39ca1gBny1IMzDsrP+RNhFbdFHORnBShPzbFGHE3A/
+         SpzuwiNuEAVIP7kvNXqWXUUX9bIMkwC3jehvlsSwzEM/T6QBR2UBYgEkN7KNwXoa5LKq
+         mUcA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=SExj9sPYRI5nvri+f4hPOSN0wQyEHXBODvypNoBRz/E=;
+        b=fciEWpmUHglz978Cog6jSvoRHicNSYZcByqxmaLjEszBpRJBSLlkWSBTf0Ph660zHF
+         qeKvdwgDWjHsJhGmQBHnNlAH5K4vyFP038M8/QOp5Ruu7pCEs0w9NeknWgZGx9YyAwPb
+         xS9hyBVhrTjUY+OlpROmx35uIDlitcg+L0MzaUDCJ9pftlERUndHmTjZOeoRJKLx0RRt
+         thwinWPuyuavora/fvyiIylwLAfgukQVaCww5D70JL2mjBF5g7+GkBgPlkIUxpOGqPBH
+         d2qC4+xhH33HKQrON7/eQdIK6/CGHbscnX3xeS9CYfTOEz3vnGKk1g/NRJrxbf7oNswN
+         uLtQ==
+X-Gm-Message-State: AFqh2krLFco54T7GLoX5y1+3jYFfhskSFMZa2ejO8O+KnjUZppFnmeSG
+        2ALejT45y2ynTJVXNr0RunK2Uw==
+X-Google-Smtp-Source: AMrXdXuylkNfB24jq6lP5eNrDj0l8ogCU88AsbWP5oRdsJ/+84Sp6SEdDIbnJnwlrTXObRb9zwkMkw==
+X-Received: by 2002:a17:902:b611:b0:194:52ed:7a37 with SMTP id b17-20020a170902b61100b0019452ed7a37mr419970pls.4.1673921055052;
+        Mon, 16 Jan 2023 18:04:15 -0800 (PST)
+Received: from [127.0.0.1] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id n3-20020a1709026a8300b0019492b949fbsm2860762plk.272.2023.01.16.18.04.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 16 Jan 2023 18:04:14 -0800 (PST)
+From:   Jens Axboe <axboe@kernel.dk>
+To:     tj@kernel.org, josef@toxicpanda.com,
+        Yu Kuai <yukuai1@huaweicloud.com>
 Cc:     cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, yi.zhang@huawei.com,
-        yangerkun@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
-References: <20230103112833.2013432-1-yukuai1@huaweicloud.com>
-From:   Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <1d490092-09b2-d1ec-ebfe-195113cef0a3@huaweicloud.com>
-Date:   Tue, 17 Jan 2023 09:01:58 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
-MIME-Version: 1.0
+        linux-kernel@vger.kernel.org, yukuai3@huawei.com,
+        yi.zhang@huawei.com, yangerkun@huawei.com
 In-Reply-To: <20230103112833.2013432-1-yukuai1@huaweicloud.com>
-Content-Type: text/plain; charset=gbk; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: _Ch0CgA35CGG88VjI6vKBg--.26932S3
-X-Coremail-Antispam: 1UD129KBjvdXoW7JF1kur1fGrW8Wr15Kw1rZwb_yoWfCFc_ua
-        4kZFy7tFsxA3WI9F1vyFyrXrZYkrW0qr42gF95KryxJF1DJay2yw1agw1UWay7CFyfGFyr
-        uFyqgr4ktr95ZjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-        9fnUUIcSsGvfJTRUUUb3kFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
-        6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
-        A2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j
-        6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
-        Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
-        I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
-        4UM4x0Y48IcVAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2kI
-        c2xKxwCYjI0SjxkI62AI1cAE67vIY487MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4
-        AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE
-        17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMI
-        IF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw20EY4v20xvaj40_WFyUJVCq
-        3wCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r1j6r4UYxBIda
-        VFxhVjvjDU0xZFpf9x0JUdHUDUUUUU=
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
-X-CFilter-Loop: Reflected
+References: <20230103112833.2013432-1-yukuai1@huaweicloud.com>
+Subject: Re: [PATCH] blk-cgroup: fix missing pd_online_fn() while
+ activating policy
+Message-Id: <167392105396.441215.10700011927533380031.b4-ty@kernel.dk>
+Date:   Mon, 16 Jan 2023 19:04:13 -0700
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.12-dev-78c63
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi, Jens
 
-ÔÚ 2023/01/03 19:28, Yu Kuai Ð´µÀ:
-> From: Yu Kuai <yukuai3@huawei.com>
-> 
+On Tue, 03 Jan 2023 19:28:33 +0800, Yu Kuai wrote:
 > If the policy defines pd_online_fn(), it should be called after
 > pd_init_fn(), like blkg_create().
 > 
-> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
-
-Can you apply this patch?
-
-Thanks,
-Kuai
-> ---
->   block/blk-cgroup.c | 4 ++++
->   1 file changed, 4 insertions(+)
 > 
-> diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-> index ce6a2b7d3dfb..4c94a6560f62 100644
-> --- a/block/blk-cgroup.c
-> +++ b/block/blk-cgroup.c
-> @@ -1455,6 +1455,10 @@ int blkcg_activate_policy(struct request_queue *q,
->   		list_for_each_entry_reverse(blkg, &q->blkg_list, q_node)
->   			pol->pd_init_fn(blkg->pd[pol->plid]);
->   
-> +	if (pol->pd_online_fn)
-> +		list_for_each_entry_reverse(blkg, &q->blkg_list, q_node)
-> +			pol->pd_online_fn(blkg->pd[pol->plid]);
-> +
->   	__set_bit(pol->plid, q->blkcg_pols);
->   	ret = 0;
->   
-> 
+
+Applied, thanks!
+
+[1/1] blk-cgroup: fix missing pd_online_fn() while activating policy
+      commit: e3ff8887e7db757360f97634e0d6f4b8e27a8c46
+
+Best regards,
+-- 
+Jens Axboe
+
+
 
