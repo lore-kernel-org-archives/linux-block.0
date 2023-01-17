@@ -2,39 +2,39 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 910A5C678D7
-	for <linux-block@archiver.kernel.org>; Tue, 17 Jan 2023 08:13:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9944C678D4
+	for <linux-block@archiver.kernel.org>; Tue, 17 Jan 2023 08:13:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236033AbjAQIN4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 17 Jan 2023 03:13:56 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59094 "EHLO
+        id S236015AbjAQINz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 17 Jan 2023 03:13:55 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58886 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236048AbjAQIN2 (ORCPT
+        with ESMTP id S236082AbjAQINd (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 17 Jan 2023 03:13:28 -0500
+        Tue, 17 Jan 2023 03:13:33 -0500
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2EA0B28868;
-        Tue, 17 Jan 2023 00:13:23 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F6B127D50;
+        Tue, 17 Jan 2023 00:13:29 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
         :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=D7iveQQJvLZA+RyWbRj86WCFcsszq3bZhAAbH9IGkEc=; b=uA1chXUQ+v2W3OmeiRzuWVlKkg
-        f/WyGcEHq1NhAGU6r56rADizFFgjT7XRWDGH6jJGTTNcDg4y3GmF/8zFh/4gMQ80mRMFt6lGU09r/
-        iWigeKjSPCVkAXT3tWvUn+tRSKcM8jiR57OpinaI20cGNkUYwfhvyyL4xfNRNzDFbpENDfP6i44v8
-        5VngnNWra3VZqrKl+NLRCpr55UYwIwLy3DB2MexEoVHntblQrnSrd0bYLJIXC+sqDgb2XBs2TDsi4
-        zS71e2rkLB6snN7H9vNOhdSEx4kxREs1FMhjPKcMn14Ow5GyI+FXDdIYWZqlyNxhzC7CJ6egbLVE6
-        foTr/iIg==;
+        bh=kcfN0rGy+gKuDXeo8z8cnBn9IqKRNsC824zuS4VZFCw=; b=o2udHMuAaUuOe+wVoYHp3yQr2c
+        EAdWuZjddo+fxZe3lCuCorCVSmNNG6+QFt8d4cWgtpo1s+Z2fK5qtFE2bJCyDu6hL9b1Bo10uKghh
+        LXFRyeU8+2KjaM9BIEa8iBVUkEtJi0fMjkuM9jDy+P+oODBBX3ixeXjPGB00ldniBiOHXY+8KuQYQ
+        kaQUJbyNsqEdAsFkZ9UEsaeNHD8OwxDPHep5qtzkfC2ipGI5OLI7av7l0AG50Lfo4HDeFpEke9CI9
+        SMH7OTUt+6UTHnG86Agbmg8/DGMgtfF8lICdqTDp0qFugfU/ZoCmHLB739njeKHgtYcpIVgv9IpmA
+        udMzDXaw==;
 Received: from [2001:4bb8:19a:2039:eaa2:3b9e:be2e:bd2a] (helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1pHh5t-00DHkV-LZ; Tue, 17 Jan 2023 08:13:22 +0000
+        id 1pHh5y-00DHm8-Ri; Tue, 17 Jan 2023 08:13:27 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
         Josef Bacik <josef@toxicpanda.com>
 Cc:     linux-block@vger.kernel.org, cgroups@vger.kernel.org
-Subject: [PATCH 08/15] blk-wbt: open code wbt_queue_depth_changed in wbt_update_limits
-Date:   Tue, 17 Jan 2023 09:12:50 +0100
-Message-Id: <20230117081257.3089859-9-hch@lst.de>
+Subject: [PATCH 10/15] blk-rq-qos: constify rq_qos_ops
+Date:   Tue, 17 Jan 2023 09:12:52 +0100
+Message-Id: <20230117081257.3089859-11-hch@lst.de>
 X-Mailer: git-send-email 2.39.0
 In-Reply-To: <20230117081257.3089859-1-hch@lst.de>
 References: <20230117081257.3089859-1-hch@lst.de>
@@ -45,30 +45,91 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-No real need to all the method here, so open code to it to prepare
-for some paramter passing changes.
+These op vectors are constant, so mark them const.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- block/blk-wbt.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ block/blk-iocost.c    | 2 +-
+ block/blk-iolatency.c | 2 +-
+ block/blk-rq-qos.c    | 2 +-
+ block/blk-rq-qos.h    | 4 ++--
+ block/blk-wbt.c       | 2 +-
+ 5 files changed, 6 insertions(+), 6 deletions(-)
 
+diff --git a/block/blk-iocost.c b/block/blk-iocost.c
+index 9b5c0d23c9ce8b..73f09e3556d7e4 100644
+--- a/block/blk-iocost.c
++++ b/block/blk-iocost.c
+@@ -2825,7 +2825,7 @@ static void ioc_rqos_exit(struct rq_qos *rqos)
+ 	kfree(ioc);
+ }
+ 
+-static struct rq_qos_ops ioc_rqos_ops = {
++static const struct rq_qos_ops ioc_rqos_ops = {
+ 	.throttle = ioc_rqos_throttle,
+ 	.merge = ioc_rqos_merge,
+ 	.done_bio = ioc_rqos_done_bio,
+diff --git a/block/blk-iolatency.c b/block/blk-iolatency.c
+index 1c394bd77aa0b4..f6aeb3d3fdae59 100644
+--- a/block/blk-iolatency.c
++++ b/block/blk-iolatency.c
+@@ -650,7 +650,7 @@ static void blkcg_iolatency_exit(struct rq_qos *rqos)
+ 	kfree(blkiolat);
+ }
+ 
+-static struct rq_qos_ops blkcg_iolatency_ops = {
++static const struct rq_qos_ops blkcg_iolatency_ops = {
+ 	.throttle = blkcg_iolatency_throttle,
+ 	.done_bio = blkcg_iolatency_done_bio,
+ 	.exit = blkcg_iolatency_exit,
+diff --git a/block/blk-rq-qos.c b/block/blk-rq-qos.c
+index 14bee1bd761362..8e83734cfe8dbc 100644
+--- a/block/blk-rq-qos.c
++++ b/block/blk-rq-qos.c
+@@ -296,7 +296,7 @@ void rq_qos_exit(struct request_queue *q)
+ }
+ 
+ int rq_qos_add(struct rq_qos *rqos, struct gendisk *disk, enum rq_qos_id id,
+-		struct rq_qos_ops *ops)
++		const struct rq_qos_ops *ops)
+ {
+ 	struct request_queue *q = disk->queue;
+ 
+diff --git a/block/blk-rq-qos.h b/block/blk-rq-qos.h
+index 22552785aa31ed..2b7b668479f71a 100644
+--- a/block/blk-rq-qos.h
++++ b/block/blk-rq-qos.h
+@@ -25,7 +25,7 @@ struct rq_wait {
+ };
+ 
+ struct rq_qos {
+-	struct rq_qos_ops *ops;
++	const struct rq_qos_ops *ops;
+ 	struct request_queue *q;
+ 	enum rq_qos_id id;
+ 	struct rq_qos *next;
+@@ -86,7 +86,7 @@ static inline void rq_wait_init(struct rq_wait *rq_wait)
+ }
+ 
+ int rq_qos_add(struct rq_qos *rqos, struct gendisk *disk, enum rq_qos_id id,
+-		struct rq_qos_ops *ops);
++		const struct rq_qos_ops *ops);
+ void rq_qos_del(struct rq_qos *rqos);
+ 
+ typedef bool (acquire_inflight_cb_t)(struct rq_wait *rqw, void *private_data);
 diff --git a/block/blk-wbt.c b/block/blk-wbt.c
-index 542271fa99e8f7..473ae72befaf1a 100644
+index 97149a4f10e600..1c4469f9962de8 100644
 --- a/block/blk-wbt.c
 +++ b/block/blk-wbt.c
-@@ -863,9 +863,9 @@ int wbt_init(struct gendisk *disk)
- 	rwb->enable_state = WBT_STATE_ON_DEFAULT;
- 	rwb->wc = test_bit(QUEUE_FLAG_WC, &q->queue_flags);
- 	rwb->rq_depth.default_depth = RWB_DEF_DEPTH;
-+	rwb->rq_depth.queue_depth = blk_queue_depth(q);
- 	rwb->min_lat_nsec = wbt_default_latency_nsec(q);
--
--	wbt_queue_depth_changed(&rwb->rqos);
-+	wbt_update_limits(rwb);
+@@ -821,7 +821,7 @@ static const struct blk_mq_debugfs_attr wbt_debugfs_attrs[] = {
+ };
+ #endif
  
- 	/*
- 	 * Assign rwb and add the stats callback.
+-static struct rq_qos_ops wbt_rqos_ops = {
++static const struct rq_qos_ops wbt_rqos_ops = {
+ 	.throttle = wbt_wait,
+ 	.issue = wbt_issue,
+ 	.track = wbt_track,
 -- 
 2.39.0
 
