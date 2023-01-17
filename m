@@ -2,82 +2,66 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DF24C3DA78
-	for <linux-block@archiver.kernel.org>; Tue, 17 Jan 2023 08:29:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BF5BC6379F
+	for <linux-block@archiver.kernel.org>; Tue, 17 Jan 2023 08:45:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235985AbjAQI30 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 17 Jan 2023 03:29:26 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40714 "EHLO
+        id S234106AbjAQIpC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 17 Jan 2023 03:45:02 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49568 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236129AbjAQI3U (ORCPT
+        with ESMTP id S236061AbjAQIpA (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 17 Jan 2023 03:29:20 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B1F8827D50
-        for <linux-block@vger.kernel.org>; Tue, 17 Jan 2023 00:28:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1673944111;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=klkiVSCpY++au35oajKGu2DLvY6hcJmrE6UdavRFD3Y=;
-        b=fZLFB8TkQ8f7I+hpI6NCpVvlfQNfI6pYHxP15ahrPjzrBGSM4LwmqrK/X3fykGmEE7FKZD
-        i5/98tzbJvh12BFhgSyGNI599dAgqBe23Z/giil/JOh6s/VJ2A/mtoCZvfit6kRu3BRgdD
-        CGLlpsfFWD2dqNwFUrW4nWkYHQXwyEw=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-466-uebr828wOSKoOig1xd0BvA-1; Tue, 17 Jan 2023 03:28:27 -0500
-X-MC-Unique: uebr828wOSKoOig1xd0BvA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 71D4E29AA2D8;
-        Tue, 17 Jan 2023 08:28:26 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.33.36.23])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 2B44540C2064;
-        Tue, 17 Jan 2023 08:28:25 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <Y8ZTyx7vM8NpnUAj@infradead.org>
-References: <Y8ZTyx7vM8NpnUAj@infradead.org> <167391047703.2311931.8115712773222260073.stgit@warthog.procyon.org.uk> <167391048988.2311931.1567396746365286847.stgit@warthog.procyon.org.uk>
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     dhowells@redhat.com, Al Viro <viro@zeniv.linux.org.uk>,
+        Tue, 17 Jan 2023 03:45:00 -0500
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F5B02CFF1;
+        Tue, 17 Jan 2023 00:45:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=SaB++xvXHwAfFw7T6p++KA81QX2bKnVNppi3/0l0wi8=; b=bjT5FfIFMPoAEwdbNbeOUq627N
+        ddU2muMk+HILzP51F3tH79ZRkFe3Vh486bkosFXHREUqSmK5MZW+WAYu+HYHlXgn79UqAw4/bw9k4
+        R6Wq2XBCte1YDZ3Rri54Pi6w0T/BG/PbsF/wcjXVIVgwUlNECzWnoZ1NE/nxlBt4HEg6n/ifDKwIX
+        d+Ek05x+zQZ6AqezVLxU9OH2YyCtBBnBNESEcerbvZKAtEu8LiLadeAiE1Q3t5zqD46++lL+045y1
+        Wl41sm414DuE8A/HODG2a3XI2rZm3z4+ZAX6Odx5D3koIN1OF7/eaSHReehLU/4OGEH5awyIieI6y
+        IEMUNOOA==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1pHhaS-00DMfV-8l; Tue, 17 Jan 2023 08:44:56 +0000
+Date:   Tue, 17 Jan 2023 00:44:56 -0800
+From:   Christoph Hellwig <hch@infradead.org>
+To:     David Howells <dhowells@redhat.com>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        Al Viro <viro@zeniv.linux.org.uk>,
         Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
         linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
         Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>,
         Jeff Layton <jlayton@kernel.org>,
         Logan Gunthorpe <logang@deltatee.com>,
         linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v6 01/34] vfs: Unconditionally set IOCB_WRITE in call_write_iter()
+Subject: Re: [PATCH v6 01/34] vfs: Unconditionally set IOCB_WRITE in
+ call_write_iter()
+Message-ID: <Y8ZgCA90yNOYpDZG@infradead.org>
+References: <Y8ZTyx7vM8NpnUAj@infradead.org>
+ <167391047703.2311931.8115712773222260073.stgit@warthog.procyon.org.uk>
+ <167391048988.2311931.1567396746365286847.stgit@warthog.procyon.org.uk>
+ <2330920.1673944104@warthog.procyon.org.uk>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <2330919.1673944104.1@warthog.procyon.org.uk>
-Date:   Tue, 17 Jan 2023 08:28:24 +0000
-Message-ID: <2330920.1673944104@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.1
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <2330920.1673944104@warthog.procyon.org.uk>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Christoph Hellwig <hch@infradead.org> wrote:
-
-> I suspect the best is to:
+On Tue, Jan 17, 2023 at 08:28:24AM +0000, David Howells wrote:
+> Christoph Hellwig <hch@infradead.org> wrote:
 > 
->  - rename init_sync_kiocb to init_kiocb
->  - pass a new argument for the destination
+> > I suspect the best is to:
+> > 
+> >  - rename init_sync_kiocb to init_kiocb
+> >  - pass a new argument for the destination
+> 
+> Do you mean the direction rather than the destination?
 
-Do you mean the direction rather than the destination?
-
->    to it.  I'm not entirely
->    sure if flags is a good thing, or an explicit READ/WRITE might be
->    better because it's harder to get wrong, even if a the compiler
->    might generate worth code for it.
->  - also use it in the async callers (io_uring, aio, overlayfs, loop,
->    nvmet, target, cachefs, file backed swap)
-
-David
-
+Yes.
