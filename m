@@ -2,131 +2,114 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AB109C3DA78
-	for <linux-block@archiver.kernel.org>; Tue, 17 Jan 2023 08:07:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E2BB8C63797
+	for <linux-block@archiver.kernel.org>; Tue, 17 Jan 2023 08:07:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235878AbjAQIHc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 17 Jan 2023 03:07:32 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54696 "EHLO
+        id S235944AbjAQIHp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 17 Jan 2023 03:07:45 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54718 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235887AbjAQIHb (ORCPT
+        with ESMTP id S235892AbjAQIHf (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 17 Jan 2023 03:07:31 -0500
-Received: from esa4.hgst.iphmx.com (esa4.hgst.iphmx.com [216.71.154.42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 519C693C3
-        for <linux-block@vger.kernel.org>; Tue, 17 Jan 2023 00:07:30 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1673942850; x=1705478850;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=h+hpWb1N2z+sU/R5W+ZfOI5VrXzlmlexOMQc9+gqGoI=;
-  b=n7rceKAJ2gvN9KQxNYgiGFj9I/1WOPJ7Cuzkmp4wkNmoGd7WwCHA59Ao
-   ckKXmeeYDAKWFbY2oQ76qb8USY1FXTbwK9ZvXJGJ1KSSQnt1gK32QS2zp
-   ejE/V9L1wFASDbihPoptXQ670Xhu5iE0OZ2Cz872ySaGxBV4y95Kab9A3
-   DQXWLc2F/JhsdX+mOh/moTtrbOzms7PfXTsQYA+2PWB5JDQl0Nf3oJueb
-   MRq3OQFow0HvSasESmRnM5aJR1FXXOjoNLJC0lNiOE8DwwP7Xe7hFuIhH
-   OGLkmRP+rMNNtNeGw2gW+x74wqiycoyqC+tCVdMXLlTi3XL6BoIKgtSMt
-   g==;
-X-IronPort-AV: E=Sophos;i="5.97,222,1669046400"; 
-   d="scan'208";a="219318752"
-Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 17 Jan 2023 16:07:29 +0800
-IronPort-SDR: CX3RX0ktcms+WgBwLBH3TgJzksqJVv1KrneF1vSQ8d4uf/KPWSp39OruON8Eb/yyjkVvIxZg2i
- 3giCMPmOaqKELa3t/M5PIy/aKUhFmx2pXOX7d7Ona63EibSPB3/EU/Fb33cqjysf6AbpAL0ICI
- 7Amm0Tq8a1FTVzzK11PuVNJcoNAttk/3D0iUcaax/q27XKWL4gf/lv/Fum0KqrLZ6KXPuwbt5U
- wHxXuIoo32kN/nM7tw1FDnpawymf5BdnFJTIaeG5dowGGRiUmI1ZbXr0QV6z0xHgCBr0RJdlcL
- eKY=
-Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 16 Jan 2023 23:24:37 -0800
-IronPort-SDR: mX/wWisAbxSLHcUHUn4KdeZIL2m5fR3nyfxtgxuBIIP+I2u4tCp14aP3UL20XFlf7pdpW6ssFk
- pWQj5/6MsZrtqCTKrxuUyzu4vQ+PxZX9vRBgnpAGifbjQyRhZkjM5tSi+GNLuo+laiCcioXK+e
- ON+0TegVJu7MXHyLkSmB3zJwzbQHVf3HsvsusIccDq3N3oaDXncuKuiqIPMgQzEhkdjUuHMJhb
- xXiAWHHAA9lI05WCM1DenEYQiYHH1AJb+7/uUa+51xMpEIwhEHJRVZsbLaQqBVjsIv9hl3jnA3
- 4Sw=
-WDCIronportException: Internal
-Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
-  by uls-op-cesaip02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 17 Jan 2023 00:06:56 -0800
-Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4Nx1gz1CCJz1RvTr
-        for <linux-block@vger.kernel.org>; Tue, 17 Jan 2023 00:06:55 -0800 (PST)
-Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
-        reason="pass (just generated, assumed good)"
-        header.d=opensource.wdc.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
-        opensource.wdc.com; h=content-transfer-encoding:content-type
-        :in-reply-to:organization:from:references:to:content-language
-        :subject:user-agent:mime-version:date:message-id; s=dkim; t=
-        1673942814; x=1676534815; bh=h+hpWb1N2z+sU/R5W+ZfOI5VrXzlmlexOMQ
-        c9+gqGoI=; b=iHt7q5R6/sEMGvZ/mKYvjSUXdc8Z2SGxfcYpbOLKOwiR4XeNv9Y
-        s/1MJEBcguILOW5Pr0FX4Ip2j/8KPCrzLLqsaZVyApGBIUTo1gPEnLr2zLanV1Z6
-        K/FK/xqBF6hqu/1WIWobJ5gyFZ8pdaVpmKAq/o2qbzDL8ajfBt2vGMUMl6DKzY37
-        f9rsI4zDi2hBL9uJVFximnJ08YMeCcWHnppHghhV285D0lTlGJ5zJmIY+6DXaXva
-        +9SNheIQ2i/Q9r2n7GnV1C7ODQ45P7IuMCyWuAxnrTvnCjaL0xNl7fXScqSOuxMi
-        7bz+QUbVMBbidxXD2JhHnooxMOU+8+FgVMQ==
-X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
-Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
-        by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id N-A4veIPETG4 for <linux-block@vger.kernel.org>;
-        Tue, 17 Jan 2023 00:06:54 -0800 (PST)
-Received: from [10.225.163.30] (unknown [10.225.163.30])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4Nx1gx2ppjz1RvLy;
-        Tue, 17 Jan 2023 00:06:53 -0800 (PST)
-Message-ID: <2bd49412-de68-91d3-e710-0b24fed625d2@opensource.wdc.com>
-Date:   Tue, 17 Jan 2023 17:06:52 +0900
+        Tue, 17 Jan 2023 03:07:35 -0500
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0EFDCA245;
+        Tue, 17 Jan 2023 00:07:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=Hvgk7w+cUmN1kDaRzCfPjjA8Chz40k3bd5sO917U728=; b=Zw7gwJnEfuWdz1VemBkqeJ2nTL
+        1QRninlkVKWFylUm6HgSoGtqM8u3ynHzM3idlmVOoms+CooSh1Oq79+yaYQnDqRx/uBHGV+YBg/70
+        GU8Oxg4TXSdonnoti1wdWo8SzcW1tcFMCZrqZegLHQxXEPrvfzJcpdzFYuud4tcLtn3AcpYzaBXrV
+        znWlWOR0xk5YdfWWx/l92KYFVFgQfQSLuPxaNdtPXGBKVE9SdINsrOup/ZKDx+K2tbay4BvK+cuPi
+        g9ooiV3WK1sFAxrJTzM+dC9KEzi2gANG184w62EibrDb8rUorN1FUWQOidgiMzsed2OKyb1dSfpQ7
+        XuMRqyjA==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1pHh0C-00DHAu-Pc; Tue, 17 Jan 2023 08:07:28 +0000
+Date:   Tue, 17 Jan 2023 00:07:28 -0800
+From:   Christoph Hellwig <hch@infradead.org>
+To:     David Howells <dhowells@redhat.com>
+Cc:     Al Viro <viro@zeniv.linux.org.uk>, Jens Axboe <axboe@kernel.dk>,
+        Jan Kara <jack@suse.cz>, Christoph Hellwig <hch@lst.de>,
+        Matthew Wilcox <willy@infradead.org>,
+        Logan Gunthorpe <logang@deltatee.com>,
+        linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
+        Jeff Layton <jlayton@kernel.org>,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v6 11/34] iov_iter, block: Make bio structs pin pages
+ rather than ref'ing if appropriate
+Message-ID: <Y8ZXQArEsIRNO9k/@infradead.org>
+References: <167391047703.2311931.8115712773222260073.stgit@warthog.procyon.org.uk>
+ <167391056047.2311931.6772604381276147664.stgit@warthog.procyon.org.uk>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.0
-Subject: Re: [PATCH v2 07/18] block: introduce duration-limits priority class
-Content-Language: en-US
-To:     Christoph Hellwig <hch@infradead.org>,
-        Niklas Cassel <niklas.cassel@wdc.com>
-Cc:     Paolo Valente <paolo.valente@linaro.org>,
-        Jens Axboe <axboe@kernel.dk>, Hannes Reinecke <hare@suse.de>,
-        linux-scsi@vger.kernel.org, linux-ide@vger.kernel.org,
-        linux-block@vger.kernel.org
-References: <20230112140412.667308-1-niklas.cassel@wdc.com>
- <20230112140412.667308-8-niklas.cassel@wdc.com>
- <Y8ZNftvsEIuPqMFP@infradead.org>
-From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
-Organization: Western Digital Research
-In-Reply-To: <Y8ZNftvsEIuPqMFP@infradead.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <167391056047.2311931.6772604381276147664.stgit@warthog.procyon.org.uk>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/17/23 16:25, Christoph Hellwig wrote:
-> On Thu, Jan 12, 2023 at 03:03:56PM +0100, Niklas Cassel wrote:
->> From: Damien Le Moal <damien.lemoal@opensource.wdc.com>
->>
->> Introduce the IOPRIO_CLASS_DL priority class to indicate that IOs should
->> be executed using duration-limits targets. The duration target to apply
->> to a command is indicated using the priority level. Up to 8 levels are
->> supported, with level 0 indiating "no limit".
->>
->> This priority class has effect only if the target device supports the
->> command duration limits feature and this feature is enabled by the user.
->> In BFQ and mq-deadline, all requests with this new priority class are
->> handled using the highest priority class RT and priority level 0.
-> 
-> Hmm, does it make sense to force a high priority?  Can't applications
-> use CDL to also fore a lower priority?
+> +	size = iov_iter_extract_pages(iter, &pages,
+> +				      UINT_MAX - bio->bi_iter.bi_size,
+> +				      nr_pages, gup_flags, &offset);
+>  	if (unlikely(size <= 0))
 
-They can, by using a large limit for "low priority" IOs. But then, these
-would still have a limit while any IO issued simultaneously without a CDL
-index specified would have no limit at all. So strictly speaking, the no
-limit IOs should be considered as even lower priority that CDL IOs with
-large limits.
 
-The other aspect here is that on ATA drives, CDL and NCQ priority cannot
-be used together. A mix of CDL and high priority commands cannot be sent
-to a device. Combining this with the above thinking, it made sense to me
-to have the CDL priority class handled the same as the RT class (as that
-is the one that maps to ATA NCQ high prio commands).
+> +	bio_set_cleanup_mode(bio, iter, gup_flags);
 
--- 
-Damien Le Moal
-Western Digital Research
+This should move out to bio_iov_iter_get_pages and only be called
+once.
+
+> +++ b/block/blk-map.c
+> @@ -285,24 +285,24 @@ static int bio_map_user_iov(struct request *rq, struct iov_iter *iter,
+>  		gup_flags |= FOLL_PCI_P2PDMA;
+>  
+>  	while (iov_iter_count(iter)) {
+> -		struct page **pages, *stack_pages[UIO_FASTIOV];
+> +		struct page *stack_pages[UIO_FASTIOV];
+> +		struct page **pages = stack_pages;
+>  		ssize_t bytes;
+>  		size_t offs;
+>  		int npages;
+>  
+> -		if (nr_vecs <= ARRAY_SIZE(stack_pages)) {
+> -			pages = stack_pages;
+> -			bytes = iov_iter_get_pages(iter, pages, LONG_MAX,
+> -						   nr_vecs, &offs, gup_flags);
+> -		} else {
+> -			bytes = iov_iter_get_pages_alloc(iter, &pages,
+> -						LONG_MAX, &offs, gup_flags);
+> -		}
+> +		if (nr_vecs > ARRAY_SIZE(stack_pages))
+> +			pages = NULL;
+> +
+> +		bytes = iov_iter_extract_pages(iter, &pages, LONG_MAX,
+> +					       nr_vecs, gup_flags, &offs);
+>  		if (unlikely(bytes <= 0)) {
+>  			ret = bytes ? bytes : -EFAULT;
+>  			goto out_unmap;
+>  		}
+>  
+> +		bio_set_cleanup_mode(bio, iter, gup_flags);
+
+Same here - one call outside of the loop.
+
+> +static inline void bio_set_cleanup_mode(struct bio *bio, struct iov_iter *iter,
+> +					unsigned int gup_flags)
+> +{
+> +	unsigned int cleanup_mode;
+> +
+> +	bio_clear_flag(bio, BIO_PAGE_REFFED);
+
+.. and this should not be needed.  Instead:
+
+> +	cleanup_mode = iov_iter_extract_mode(iter, gup_flags);
+> +	if (cleanup_mode & FOLL_GET)
+> +		bio_set_flag(bio, BIO_PAGE_REFFED);
+> +	if (cleanup_mode & FOLL_PIN)
+> +		bio_set_flag(bio, BIO_PAGE_PINNED);
+
+We could warn if a not match flag is set here if we really care.
 
