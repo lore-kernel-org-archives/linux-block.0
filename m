@@ -2,87 +2,76 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 06C65C3DA78
-	for <linux-block@archiver.kernel.org>; Tue, 17 Jan 2023 08:09:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DF51BC63797
+	for <linux-block@archiver.kernel.org>; Tue, 17 Jan 2023 08:10:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235927AbjAQIJY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 17 Jan 2023 03:09:24 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55708 "EHLO
+        id S235983AbjAQIKB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 17 Jan 2023 03:10:01 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56114 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235958AbjAQIJH (ORCPT
+        with ESMTP id S235986AbjAQIJm (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 17 Jan 2023 03:09:07 -0500
-X-Greylist: delayed 903 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 17 Jan 2023 00:09:04 PST
-Received: from m12.mail.163.com (m12.mail.163.com [220.181.12.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 37C3A27494;
-        Tue, 17 Jan 2023 00:09:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-        s=s110527; h=From:Subject:Date:Message-Id; bh=r3n04DJgFHVshEDEg+
-        AUJ2higmuVvr0IAv+oKTfkU5w=; b=hvPQEkl7vLmnnVGbiby/qgFOJ3lbmnooCD
-        mk4X6V8gWMeAM4D03HtPowa+m0EjoldoyOxvG0GDf9vRwlx9boOSKJ6RfYDNVTg7
-        qyyyNQHAPASyAZT3J/4+MBA6AzCL1Tu81R4Kv12k1Z5mBeFfuikDu/LCassZfrZq
-        U5ypyA7nI=
-Received: from bj.company.local (unknown [210.12.115.82])
-        by zwqz-smtp-mta-g0-4 (Coremail) with SMTP id _____wB3nUX6U8ZjmpW1Ag--.1680S2;
-        Tue, 17 Jan 2023 15:53:30 +0800 (CST)
-From:   Jie Wang <wangjie2011cs@163.com>
-To:     axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        wangjie2011cs@163.com
-Subject: [PATCH] block: check disk flag before setting scan bit
-Date:   Tue, 17 Jan 2023 15:53:29 +0800
-Message-Id: <20230117075329.14968-1-wangjie2011cs@163.com>
-X-Mailer: git-send-email 2.17.1
-X-CM-TRANSID: _____wB3nUX6U8ZjmpW1Ag--.1680S2
-X-Coremail-Antispam: 1Uf129KBjvJXoW7tF1UAFy8Kw4xZF1Dtr1rtFb_yoW8Ar1xpF
-        4kCFW5Kay8Xws0gFWqga1Iyr15Ga92yw48JFW3A39FvwnxArsakF4kKa4DCFy7trW7A3y2
-        gF1FgFW5WFyxuFJanT9S1TB71UUUUjUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0zRcdb5UUUUU=
-X-Originating-IP: [210.12.115.82]
-X-CM-SenderInfo: pzdqwytlhsiiwrfvqiywtou0bp/1tbiRxz5RFc7aKEkegAAsd
+        Tue, 17 Jan 2023 03:09:42 -0500
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 373512748C;
+        Tue, 17 Jan 2023 00:09:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=pQjSKmSw6p/N0OMSHc7at4GiVU7Rg/XB3qkDkMiu+rs=; b=sFzD+basG4rvAZOsDrubDxcusL
+        KFAWUTWkOY8ubdQ9rE5S0ri3fww/A//S0+L4dcIVxCUc8J4WVyFO+NRipr3GI5MV48YehqqS+7PIP
+        B9uaCAs/Y2fc6HCamTtbb5sRHsKgRex7dDNaEKfnO2WIc4fX2F+My4M+KBm2AsuDiukCA8FWLvNy6
+        RR6mZTk8cYOaAKhP8LHq52JGxWcLoRB7XXKnlxzSEofxxsNnIywjle0Edqar0aRttUtBtp9M+ZdLR
+        r5TF5S6JJ2KD9UgNmaw7nsUn0w+ck/yj60pHY4vaLLkqTKZjT8u5Gf+qR5KAXI+kg0jeX4ZmtNZCS
+        kBvwUJ/A==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1pHh2A-00DHQP-F9; Tue, 17 Jan 2023 08:09:30 +0000
+Date:   Tue, 17 Jan 2023 00:09:30 -0800
+From:   Christoph Hellwig <hch@infradead.org>
+To:     David Hildenbrand <david@redhat.com>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        David Howells <dhowells@redhat.com>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Matthew Wilcox <willy@infradead.org>,
+        Jens Axboe <axboe@kernel.dk>, Jan Kara <jack@suse.cz>,
+        Jeff Layton <jlayton@kernel.org>,
+        Logan Gunthorpe <logang@deltatee.com>,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Peter Zijlstra <peterz@infradead.org>
+Subject: Re: [PATCH v6 03/34] iov_iter: Pass I/O direction into
+ iov_iter_get_pages*()
+Message-ID: <Y8ZXukUbg0/9cYtV@infradead.org>
+References: <167391047703.2311931.8115712773222260073.stgit@warthog.procyon.org.uk>
+ <167391050409.2311931.7103784292954267373.stgit@warthog.procyon.org.uk>
+ <Y8ZU1Jjx5VSetvOn@infradead.org>
+ <3515368f-d622-f7d2-5854-9503d4a19fb2@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <3515368f-d622-f7d2-5854-9503d4a19fb2@redhat.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-No need to scan partitions for disk who has set flag GENHD_FL_NO_PART in
-driver code. In disk_scan_partitions function, the same checking is
-existing, so we believe this change is reasonable.
+On Tue, Jan 17, 2023 at 09:07:48AM +0100, David Hildenbrand wrote:
+> Agreed. What I understand, David considers that confusing when considering
+> the I/O side of things.
+> 
+> I recall that there is
+> 
+> DMA_BIDIRECTIONAL -> FOLL_WRITE
+> DMA_TO_DEVICE -> !FOLL_WRITE
+> DMA_FROM_DEVICE -> FOLL_WRITE
+> 
+> that used different defines for a different API. Such terminology would be
+> easier to get ... but then, again, not sure if we really need acronyms here.
+> 
+> We're pinning pages and FOLL_WRITE defines how we (pinning the page) are
+> going to access these pages: R/O or R/W. So the read vs. write is never from
+> the POC of the device (DMA read will write to the page).
 
-In our case, some virtual block devices are not managed by GPT, then scan
-partition operation is not a must. So we set GENHD_FL_NO_PART flag in
-driver intended to avoid partitions being dropped/added.
-But GD_NEED_PART_SCAN bit was still set by bdev_check_media_change, which
-causing problems here.
-
-Signed-off-by: Jie Wang <wangjie2011cs@163.com>
----
- block/disk-events.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
-
-diff --git a/block/disk-events.c b/block/disk-events.c
-index aee25a7e1ab7..68d911135bc7 100644
---- a/block/disk-events.c
-+++ b/block/disk-events.c
-@@ -284,7 +284,8 @@ bool bdev_check_media_change(struct block_device *bdev)
- 	if (__invalidate_device(bdev, true))
- 		pr_warn("VFS: busy inodes on changed media %s\n",
- 			bdev->bd_disk->disk_name);
--	set_bit(GD_NEED_PART_SCAN, &bdev->bd_disk->state);
-+	if (!(bdev->bd_disk->flags & GENHD_FL_NO_PART))
-+		set_bit(GD_NEED_PART_SCAN, &bdev->bd_disk->state);
- 	return true;
- }
- EXPORT_SYMBOL(bdev_check_media_change);
-@@ -310,7 +311,8 @@ bool disk_force_media_change(struct gendisk *disk, unsigned int events)
- 	if (__invalidate_device(disk->part0, true))
- 		pr_warn("VFS: busy inodes on changed media %s\n",
- 			disk->disk_name);
--	set_bit(GD_NEED_PART_SCAN, &disk->state);
-+	if (!(bdev->bd_disk->flags & GENHD_FL_NO_PART))
-+		set_bit(GD_NEED_PART_SCAN, &disk->state);
- 	return true;
- }
- EXPORT_SYMBOL_GPL(disk_force_media_change);
--- 
-2.17.1
-
+Yes.  Maybe the name could be a little more verboe, FOLL_MEM_WRITE or
+FOLL_WRITE_TO_MEM.  But I'd really prefer any renaming to be split from
+logic changes.
