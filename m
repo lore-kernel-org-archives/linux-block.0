@@ -2,72 +2,65 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D940FC32793
-	for <linux-block@archiver.kernel.org>; Wed, 18 Jan 2023 23:04:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF035C32793
+	for <linux-block@archiver.kernel.org>; Wed, 18 Jan 2023 23:14:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229469AbjARXEJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 18 Jan 2023 18:04:09 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54304 "EHLO
+        id S229572AbjARXOW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 18 Jan 2023 18:14:22 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59272 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229476AbjARXEH (ORCPT
+        with ESMTP id S229481AbjARXOV (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 18 Jan 2023 18:04:07 -0500
+        Wed, 18 Jan 2023 18:14:21 -0500
 Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [IPv6:2a03:a000:7:0:5054:ff:fe1c:15ff])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2853A305FB;
-        Wed, 18 Jan 2023 15:04:06 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 86779613E1;
+        Wed, 18 Jan 2023 15:14:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=linux.org.uk; s=zeniv-20220401; h=Sender:In-Reply-To:Content-Type:
         MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=6dWUI5icFFmxxhB3zoj79O8xUzc1bN/i/tm3I5lQXJU=; b=WNX9/lZWP0n5ceC+COxrRxCY4i
-        LIqiQjw7YxNsyy1dUOy+TIz40RbUuU8Qpm7ExiMRbW9kMprvytFCmxy1qCSdRVQiEbZe/JQulm4Mx
-        Fndvm/lYebesmLUJQyC3icibaC2llpY1Eclokrn2LYyw8X7P6jVqnZNdYchgJSDPVvtBVfEKyfSJA
-        Z6IKyctzuqiXpiJ1JrKvG3ZYmxxxdlPNdCNGm+oku9+2OKQ9TiA6kgQv5zVnqR1H5o0yFce5bx9On
-        jbiD7OjO6mehbLyuuNYzA8V9nQlLJLAmAPD6YehSe6lYAvUlK3BBS0ptGZDE2vMhulB7C2K+Zkr5P
-        kA6Qw52Q==;
+        bh=Iy1uWwVulPG3hrx1I1WJTYNcZh04GnKRBWwHbBjzu8E=; b=nRjWm/jIaPLeKa9UhHLJFo5Pum
+        n9V0mCn4+uFm0H1kcsJssX4s9/142JWVlZxOnx0bhMbMrdDb4zQOqPmIsRODxLKTV4pWaalWqeG79
+        fQxJjdSg0L2O11bIQhU5rShiuLiR+Trsq8jRkrMD3rdfszZjZoTgiXx+7Qa3Mb48BHXA2Jc7wkjg+
+        Q2VRO9YObBQ/iwj7xt0mriULw0mewtvvZbjdZMrpbnh/4acjG4d1OK157rnsIDMWemA6RD2qoeZrh
+        1dLvhqB/g+HH1mZ1mNEFM55nYL+vqsHD+GGkWB2jNUxLENTNZR3KSpDCkBfqkM/8D2nxXJDCbAI/z
+        0yGHPGtQ==;
 Received: from viro by zeniv.linux.org.uk with local (Exim 4.96 #2 (Red Hat Linux))
-        id 1pIHTE-002dMI-1h;
-        Wed, 18 Jan 2023 23:03:52 +0000
-Date:   Wed, 18 Jan 2023 23:03:52 +0000
+        id 1pIHdD-002dQf-31;
+        Wed, 18 Jan 2023 23:14:12 +0000
+Date:   Wed, 18 Jan 2023 23:14:11 +0000
 From:   Al Viro <viro@zeniv.linux.org.uk>
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     David Howells <dhowells@redhat.com>,
+To:     David Howells <dhowells@redhat.com>
+Cc:     Christoph Hellwig <hch@infradead.org>,
         Matthew Wilcox <willy@infradead.org>,
         Jens Axboe <axboe@kernel.dk>, Jan Kara <jack@suse.cz>,
         Jeff Layton <jlayton@kernel.org>,
         Logan Gunthorpe <logang@deltatee.com>,
         linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Peter Zijlstra <peterz@infradead.org>,
-        David Hildenbrand <david@redhat.com>
-Subject: Re: [PATCH v6 03/34] iov_iter: Pass I/O direction into
- iov_iter_get_pages*()
-Message-ID: <Y8h62KsnI8g/xaRz@ZenIV>
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v6 05/34] iov_iter: Change the direction macros into an
+ enum
+Message-ID: <Y8h9Q9fyUGBFsiMj@ZenIV>
 References: <167391047703.2311931.8115712773222260073.stgit@warthog.procyon.org.uk>
- <167391050409.2311931.7103784292954267373.stgit@warthog.procyon.org.uk>
- <Y8ZU1Jjx5VSetvOn@infradead.org>
+ <167391051810.2311931.8545361041888737395.stgit@warthog.procyon.org.uk>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Y8ZU1Jjx5VSetvOn@infradead.org>
+In-Reply-To: <167391051810.2311931.8545361041888737395.stgit@warthog.procyon.org.uk>
 Sender: Al Viro <viro@ftp.linux.org.uk>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Jan 16, 2023 at 11:57:08PM -0800, Christoph Hellwig wrote:
-> On Mon, Jan 16, 2023 at 11:08:24PM +0000, David Howells wrote:
-> > Define FOLL_SOURCE_BUF and FOLL_DEST_BUF to indicate to get_user_pages*()
-> > and iov_iter_get_pages*() how the buffer is intended to be used in an I/O
-> > operation.  Don't use READ and WRITE as a read I/O writes to memory and
-> > vice versa - which causes confusion.
-> > 
-> > The direction is checked against the iterator's data_source.
+On Mon, Jan 16, 2023 at 11:08:38PM +0000, David Howells wrote:
+> Change the ITER_SOURCE and ITER_DEST direction macros into an enum and
+> provide three new helper functions:
 > 
-> Why can't we use the existing FOLL_WRITE?
+>  iov_iter_dir() - returns the iterator direction
+>  iov_iter_is_dest() - returns true if it's an ITER_DEST iterator
+>  iov_iter_is_source() - returns true if it's an ITER_SOURCE iterator
 
-	I'm really not fond of passing FOLL_... stuff into iov_iter
-primitives.  That space contains things like FOLL_PIN, which makes
-no sense whatsoever for non-user-backed iterators; having the
-callers pass it in makes them automatically dependent upon the
-iov_iter flavour.
+What for?  We have two valid values -
+	1) it is a data source
+	2) it is not a data source
+Why do we need to store that as an enum?
