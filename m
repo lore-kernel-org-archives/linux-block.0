@@ -2,115 +2,132 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 446ECC00A5A
-	for <linux-block@archiver.kernel.org>; Wed, 18 Jan 2023 01:39:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94000C00A5A
+	for <linux-block@archiver.kernel.org>; Wed, 18 Jan 2023 02:22:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229645AbjARBj0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 17 Jan 2023 20:39:26 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54752 "EHLO
+        id S229446AbjARCWb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 17 Jan 2023 21:22:31 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52258 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229734AbjARBjF (ORCPT
+        with ESMTP id S229693AbjARCWa (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 17 Jan 2023 20:39:05 -0500
-Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E52B51C7B;
-        Tue, 17 Jan 2023 17:39:03 -0800 (PST)
-Received: from mail02.huawei.com (unknown [172.30.67.143])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4NxT1t1Cfzz4f4fwn;
-        Wed, 18 Jan 2023 09:38:58 +0800 (CST)
-Received: from huaweicloud.com (unknown [10.175.124.27])
-        by APP2 (Coremail) with SMTP id Syh0CgDnjOqxTcdjBACUBw--.30342S9;
-        Wed, 18 Jan 2023 09:39:00 +0800 (CST)
-From:   Kemeng Shi <shikemeng@huaweicloud.com>
-To:     hch@lst.de, axboe@kernel.dk, dwagner@suse.de, hare@suse.de,
-        ming.lei@redhat.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Cc:     john.garry@huawei.com, jack@suse.cz
-Subject: [PATCH v4 08/14] blk-mq: remove unncessary error count and commit in blk_mq_plug_issue_direct
-Date:   Wed, 18 Jan 2023 17:37:20 +0800
-Message-Id: <20230118093726.3939160-8-shikemeng@huaweicloud.com>
-X-Mailer: git-send-email 2.30.0
-In-Reply-To: <20230118093726.3939160-1-shikemeng@huaweicloud.com>
-References: <20230118093726.3939160-1-shikemeng@huaweicloud.com>
+        Tue, 17 Jan 2023 21:22:30 -0500
+Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4BBED53574
+        for <linux-block@vger.kernel.org>; Tue, 17 Jan 2023 18:22:29 -0800 (PST)
+Received: by mail-pl1-x632.google.com with SMTP id k18so11435655pll.5
+        for <linux-block@vger.kernel.org>; Tue, 17 Jan 2023 18:22:29 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=UyxeS9oQOODP8SELR2uJe0F1y/SrJQ+greOxtnkfjIY=;
+        b=v9l6SBK8OHBDeK/HCxBbpds5/0w0I0Qhwkkp4MmAwcKj2bxcwKwGhaaXYz6pHUK45P
+         8gQER5QhtNkL1eaMIg6zWclLqW3GOKeoMEGiW4SxMQ3p8zvUcuKWFDs8qAyk0nZ3dzV1
+         RXxLrmyJ2kQrPehLdvimjtS4ug40Ms/Ovo1YLTSItjHIM+0BFED6uLcbT1FSXICn6ITa
+         V/oqP9qA8qsWNnPGuc3pVi5p1zrlRod+4nNGbSqhhcmYExi9SmkN+3R7I5Ob5+HQXJIA
+         ZnAhAFW2SYCWu+UZ8fAoy8DvJq+ubi69D1P4JK7Han34fgSmGScDsxJfXSZUya//3XY1
+         O5Wg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=UyxeS9oQOODP8SELR2uJe0F1y/SrJQ+greOxtnkfjIY=;
+        b=4hVcxJXwA72syZeoG4WbWWNMUDHEGfwxi2dkXzAqO3PO+tKyYjR7tl3Zsok3/kjrvZ
+         DkwFszNiapZoJyAITSW3p/P8c2fuopO0N08qf1M+7XdbWayhgdDGhQr0ABB97FjsiXbb
+         yrFLHoaLzFmeYIFdu7WyLNssN3p3kCBy9+4J+Jk/7Tx2q3W3cgDm32tppDNwhsQEKrO4
+         V2iJhTZjCbaQ7ZMHBBzty+tvJNcXD8zZiPq/ra/eoD5o/W/yDOaHaV8EVhPDu9fNsoLR
+         wUlNECsYcGn9lF7Dl6hFu+L/u7UAROfDqVoM24h2yw9AWNzQ7Uzl6RFzV2R3xSj1i/m3
+         zsGA==
+X-Gm-Message-State: AFqh2krIOmYic86y1stOnWdtoDJNGeVDpCiOwsEQSdQQzMgPuO52uHZn
+        QcsYlC6o+XteittMSS/Cw2hsSA==
+X-Google-Smtp-Source: AMrXdXsI+9uih7cXIRwsieE+Cqws52DIAdhYBMJsGlq/FShrddCeLE2HVcs/bPTfI/aAoz/3BmNV6g==
+X-Received: by 2002:a05:6a20:158e:b0:b6:5687:17b1 with SMTP id h14-20020a056a20158e00b000b6568717b1mr1482734pzj.4.1674008548684;
+        Tue, 17 Jan 2023 18:22:28 -0800 (PST)
+Received: from [192.168.1.136] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id b37-20020a631b25000000b0047917991e83sm12335970pgb.48.2023.01.17.18.22.27
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 17 Jan 2023 18:22:28 -0800 (PST)
+Message-ID: <98e06a63-2b76-4454-d6d1-8586424e1206@kernel.dk>
+Date:   Tue, 17 Jan 2023 19:22:26 -0700
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
+ Thunderbird/102.6.0
+Subject: Re: [PATCH 1/2] block: handle bio_split_to_limits() NULL return
+Content-Language: en-US
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     linux-block@vger.kernel.org, mikelley@microsoft.com
+References: <20230104160938.62636-1-axboe@kernel.dk>
+ <20230104160938.62636-2-axboe@kernel.dk> <Y70t2r+fOadEnDpE@infradead.org>
+From:   Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <Y70t2r+fOadEnDpE@infradead.org>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: Syh0CgDnjOqxTcdjBACUBw--.30342S9
-X-Coremail-Antispam: 1UD129KBjvJXoW7uFyfJryDGFyUGF18Jry5urg_yoW8WF18pF
-        W3Ga9Ikrs2qr4xZa48JayxZ3WUJws5KryUA3yYkw1aq3yDGr4Iqr4rtrWxX340yrZ3Aa17
-        Wry5W34DJF15Ww7anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUBIb4IE77IF4wAFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k2
-        6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M280x2IEY4vEnII2IxkI6r1a6r45M2
-        8IrcIa0xkI8VA2jI8067AKxVWUAVCq3wA2048vs2IY020Ec7CjxVAFwI0_Xr0E3s1l8cAv
-        FVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVWDJVCq3w
-        A2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE
-        3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr2
-        1l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r106r15McIj6I8E87Iv
-        67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41l42xK82IYc2
-        Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s02
-        6x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0x
-        vE2Ix0cI8IcVAFwI0_JFI_Gr1lIxAIcVC0I7IYx2IY6xkF7I0E14v26F4j6r4UJwCI42IY
-        6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aV
-        CY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU058n7UUUUU==
-X-CM-SenderInfo: 5vklyvpphqwq5kxd4v5lfo033gof0z/
-X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-We need only to explicitly commit in two error cases:
- -did not queue everything initially scheduled to queue
- -the last attempt to queue a request failed
-(see comment of blk_mq_commit_rqs for more details).
-Both cases can be checked with ret of last request which breaks list walk.
-Remove unnecessary error count and unnecessary commit triggered by error
-which is not covered by cases described above.
+On 1/10/23 2:20 AM, Christoph Hellwig wrote:
+> On Wed, Jan 04, 2023 at 09:09:37AM -0700, Jens Axboe wrote:
+>> This can't happen right now, but in preparation for allowing
+>> bio_split_to_limits() returning NULL if it ended the bio, check for it
+>> in all the callers.
+>>
+>> Signed-off-by: Jens Axboe <axboe@kernel.dk>
+>> ---
+>>  block/blk-merge.c             | 4 +++-
+>>  block/blk-mq.c                | 5 ++++-
+>>  drivers/block/drbd/drbd_req.c | 2 ++
+>>  drivers/block/ps3vram.c       | 2 ++
+>>  drivers/md/dm.c               | 2 ++
+>>  drivers/md/md.c               | 2 ++
+>>  drivers/nvme/host/multipath.c | 2 ++
+>>  drivers/s390/block/dcssblk.c  | 2 ++
+>>  8 files changed, 19 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/block/blk-merge.c b/block/blk-merge.c
+>> index 35a8f75cc45d..071c5f8cf0cf 100644
+>> --- a/block/blk-merge.c
+>> +++ b/block/blk-merge.c
+>> @@ -358,11 +358,13 @@ struct bio *__bio_split_to_limits(struct bio *bio,
+>>  	default:
+>>  		split = bio_split_rw(bio, lim, nr_segs, bs,
+>>  				get_max_io_size(bio, lim) << SECTOR_SHIFT);
+>> +		if (IS_ERR(split))
+>> +			return NULL;
+> 
+> Can we decide on either passing an ERR_PTR or NULL and do it through
+> the whole stack? 
 
-Signed-off-by: Kemeng Shi <shikemeng@huaweicloud.com>
----
- block/blk-mq.c | 14 ++++----------
- 1 file changed, 4 insertions(+), 10 deletions(-)
+We need the error return here as we could just return NULL and it not
+be an error, but for further down the stack I feel like returning an
+error that you can't do anything with (as it's already been dealt with)
+would be confusing. That's why I did it that way.
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 159d9163c46c..4066fe5c3147 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -2700,11 +2700,10 @@ static void blk_mq_plug_issue_direct(struct blk_plug *plug)
- 	struct blk_mq_hw_ctx *hctx = NULL;
- 	struct request *rq;
- 	int queued = 0;
--	int errors = 0;
-+	blk_status_t ret = BLK_STS_OK;
- 
- 	while ((rq = rq_list_pop(&plug->mq_list))) {
- 		bool last = rq_list_empty(plug->mq_list);
--		blk_status_t ret;
- 
- 		if (hctx != rq->mq_hctx) {
- 			if (hctx) {
-@@ -2722,20 +2721,15 @@ static void blk_mq_plug_issue_direct(struct blk_plug *plug)
- 		case BLK_STS_RESOURCE:
- 		case BLK_STS_DEV_RESOURCE:
- 			blk_mq_request_bypass_insert(rq, false, true);
--			blk_mq_commit_rqs(hctx, queued, false);
--			return;
-+			goto out;
- 		default:
- 			blk_mq_end_request(rq, ret);
--			errors++;
- 			break;
- 		}
- 	}
- 
--	/*
--	 * If we didn't flush the entire list, we could have told the driver
--	 * there was more coming, but that turned out to be a lie.
--	 */
--	if (errors)
-+out:
-+	if (ret != BLK_STS_OK)
- 		blk_mq_commit_rqs(hctx, queued, false);
- }
- 
+>> diff --git a/drivers/block/drbd/drbd_req.c b/drivers/block/drbd/drbd_req.c
+>> index eb14ec8ec04c..e36216d50753 100644
+>> --- a/drivers/block/drbd/drbd_req.c
+>> +++ b/drivers/block/drbd/drbd_req.c
+>> @@ -1607,6 +1607,8 @@ void drbd_submit_bio(struct bio *bio)
+>>  	struct drbd_device *device = bio->bi_bdev->bd_disk->private_data;
+>>  
+>>  	bio = bio_split_to_limits(bio);
+>> +	if (!bio)
+>> +		return;
+> 
+> So for the callers in drivers, do we need thee checks for drivers
+> that don't even support REQ_NOWAIT? 
+
+Good point, probably not, we should be erroring these out before they
+reach the driver.
+
+Doesn't hurt though, it would not necessarily be obvious that you'd
+now need to start checking bio_split_to_limits() return values when
+you set NOWAIT on the queue.
+
 -- 
-2.30.0
+Jens Axboe
+
 
