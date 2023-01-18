@@ -2,83 +2,128 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A4A0C38159
-	for <linux-block@archiver.kernel.org>; Wed, 18 Jan 2023 23:25:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 121CDC677F1
+	for <linux-block@archiver.kernel.org>; Wed, 18 Jan 2023 23:40:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229939AbjARXZp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 18 Jan 2023 18:25:45 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39600 "EHLO
+        id S229644AbjARXkj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 18 Jan 2023 18:40:39 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46652 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229919AbjARXZp (ORCPT
+        with ESMTP id S229944AbjARXkj (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 18 Jan 2023 18:25:45 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2DEDB15563
-        for <linux-block@vger.kernel.org>; Wed, 18 Jan 2023 15:24:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1674084298;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=AW3tkCBDUNfgbMADK1c0JyGSAze/ydEol1BmkC/mn3o=;
-        b=W/AxWfuWRWHt52b12g1ILvkUitHvaBUNqZ+PS7+RmWMALRbHzmD6SNlN4NCjC4jb2BMV4Y
-        3jUF+s4dp5HtXuwxOykrhVWKi/fSEWzN8vC7vB+1avE3b9SCk3UFFYvyxo6bJnrWvAPPXP
-        fNs5fAXVYR08sb3bZCZEt2btNRmb4b8=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-543-DkfEEPfdMxiNAOry4-loeQ-1; Wed, 18 Jan 2023 18:24:53 -0500
-X-MC-Unique: DkfEEPfdMxiNAOry4-loeQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 6395A811E6E;
-        Wed, 18 Jan 2023 23:24:52 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.33.36.23])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 2522840C6EC4;
-        Wed, 18 Jan 2023 23:24:51 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <Y8h+naEJmlxIjyh1@ZenIV>
-References: <Y8h+naEJmlxIjyh1@ZenIV> <Y8h9Q9fyUGBFsiMj@ZenIV> <167391047703.2311931.8115712773222260073.stgit@warthog.procyon.org.uk> <167391051810.2311931.8545361041888737395.stgit@warthog.procyon.org.uk> <2704044.1674083861@warthog.procyon.org.uk>
-To:     Al Viro <viro@zeniv.linux.org.uk>
-Cc:     dhowells@redhat.com, Christoph Hellwig <hch@infradead.org>,
-        Matthew Wilcox <willy@infradead.org>,
-        Jens Axboe <axboe@kernel.dk>, Jan Kara <jack@suse.cz>,
-        Jeff Layton <jlayton@kernel.org>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v6 05/34] iov_iter: Change the direction macros into an enum
+        Wed, 18 Jan 2023 18:40:39 -0500
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E7CBD654F3;
+        Wed, 18 Jan 2023 15:40:37 -0800 (PST)
+Received: by mail-pl1-f175.google.com with SMTP id d9so661261pll.9;
+        Wed, 18 Jan 2023 15:40:37 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=fUpnfuil0lI1NIKG1PFbIEZeU6dqCK4MK5QIOJ5PnzE=;
+        b=rtDVt/rY2/5bpPdm83X/eZuXZir1GgscWx7XaOB/+ZD+lTjEVY1DA79xRh7s07rbZW
+         CeZ4w71Ysr0Ghy5oueeHZEnh1hMkEr8AkiYsDZkfhjIt4amLu/U5XlOIFGz83yle/qgK
+         ok2O6ADeo6wcAct7aBjwK2Rq2bhZ4bVKrvfoOkqVEqLMwwGWy6hSm4Tw6YK/qr4jsx+G
+         8gR3oquYGWTd2uZoNWtep+2Aic8ub/mTG41JR7Bd0akam7QoTTRDcoYzfe4dSrvzOjhW
+         SxVGWMg4jNWWYpPryo0p1BCIfmMaPy5aTnNK3lXVKe8qg8QaC77tOw581JMoMOa7ByJc
+         PW7A==
+X-Gm-Message-State: AFqh2krpdIGOvGtqYd7rRuBdxBT3mD4vc8HgVXOn2D59TI71wQcUqs63
+        Qg8y4CS8mB4xjTyZSaumOrM=
+X-Google-Smtp-Source: AMrXdXunBe3Em4ihK+pm1IYFAFGP+gvQYgmCYMx0bYpQEFeuoF1K1RHkUwd1vL3REkaoHqLIeCt3PQ==
+X-Received: by 2002:a17:902:8602:b0:189:e55d:ec72 with SMTP id f2-20020a170902860200b00189e55dec72mr7837489plo.20.1674085237385;
+        Wed, 18 Jan 2023 15:40:37 -0800 (PST)
+Received: from ?IPV6:2620:15c:211:201:22ae:3ae3:fde6:2308? ([2620:15c:211:201:22ae:3ae3:fde6:2308])
+        by smtp.gmail.com with ESMTPSA id v21-20020a1709028d9500b001868981a18esm6255933plo.6.2023.01.18.15.40.35
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 18 Jan 2023 15:40:36 -0800 (PST)
+Message-ID: <3b96872f-45d1-2acb-d251-d14e82b9d9bf@acm.org>
+Date:   Wed, 18 Jan 2023 15:40:34 -0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <2704402.1674084290.1@warthog.procyon.org.uk>
-Date:   Wed, 18 Jan 2023 23:24:50 +0000
-Message-ID: <2704405.1674084290@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.5.1
+Subject: Re: [PATCH v3 1/9] block: Introduce QUEUE_FLAG_SUB_PAGE_SEGMENTS and
+ CONFIG_BLK_SUB_PAGE_SEGMENTS
+Content-Language: en-US
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        Avri Altman <avri.altman@wdc.com>,
+        Adrian Hunter <adrian.hunter@intel.com>,
+        Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>,
+        Keith Busch <kbusch@kernel.org>
+References: <20230118225447.2809787-1-bvanassche@acm.org>
+ <20230118225447.2809787-2-bvanassche@acm.org>
+ <4f308b47-e08c-efa6-6a86-965ba6761350@kernel.dk>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <4f308b47-e08c-efa6-6a86-965ba6761350@kernel.dk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Al Viro <viro@zeniv.linux.org.uk> wrote:
-
-> > Compile time type checking.
+On 1/18/23 15:02, Jens Axboe wrote:
+> On 1/18/23 3:54 PM, Bart Van Assche wrote:
+>> Prepare for introducing support for segments smaller than the page size
+>> by introducing the request queue flag QUEUE_FLAG_SUB_PAGE_SEGMENTS.
+>> Introduce CONFIG_BLK_SUB_PAGE_SEGMENTS to prevent that performance of
+>> block drivers that support segments >= PAGE_SIZE would be affected.
+>>
+>> Cc: Christoph Hellwig <hch@lst.de>
+>> Cc: Ming Lei <ming.lei@redhat.com>
+>> Cc: Keith Busch <kbusch@kernel.org>
+>> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+>> ---
+>>   block/Kconfig          | 9 +++++++++
+>>   include/linux/blkdev.h | 7 +++++++
+>>   2 files changed, 16 insertions(+)
+>>
+>> diff --git a/block/Kconfig b/block/Kconfig
+>> index 5d9d9c84d516..e85061d2175b 100644
+>> --- a/block/Kconfig
+>> +++ b/block/Kconfig
+>> @@ -35,6 +35,15 @@ config BLOCK_LEGACY_AUTOLOAD
+>>   	  created on demand, but scripts that manually create device nodes and
+>>   	  then call losetup might rely on this behavior.
+>>   
+>> +config BLK_SUB_PAGE_SEGMENTS
+>> +       bool "Support segments smaller than the page size"
+>> +       default n
+>> +       help
+>> +	  Most storage controllers support DMA segments larger than the typical
+>> +	  size of a virtual memory page. Some embedded controllers only support
+>> +	  DMA segments smaller than the page size. Enable this option to support
+>> +	  such controllers.
 > 
-> Huh?  int-to-enum conversion is quiet; it would catch explicit
-> huge constants, but that's it...
+> This should not be a visible option at all, affected drivers should just
+> select it.
 
-*shrug*.
+Hi Jens,
 
-But can we at least get rid of the:
+Thanks for the feedback. Unless anyone requests me to realize this in another
+way, I plan to merge the patch below into the patch above:
 
-	iov_iter_foo(&iter, ITER_SOURCE, ...);
 
-	WARN_ON(direction & ~(READ | WRITE));
+diff --git a/block/Kconfig b/block/Kconfig
+index e85061d2175b..b44b449c47bf 100644
+--- a/block/Kconfig
++++ b/block/Kconfig
+@@ -36,13 +36,7 @@ config BLOCK_LEGACY_AUTOLOAD
+  	  then call losetup might rely on this behavior.
 
-mismatch?  Either use ITER_SOURCE/DEST or use READ/WRITE but not mix them.
+  config BLK_SUB_PAGE_SEGMENTS
+-       bool "Support segments smaller than the page size"
+-       default n
+-       help
+-	  Most storage controllers support DMA segments larger than the typical
+-	  size of a virtual memory page. Some embedded controllers only support
+-	  DMA segments smaller than the page size. Enable this option to support
+-	  such controllers.
++       bool
 
-David
+  config BLK_RQ_ALLOC_TIME
+  	bool
+
 
