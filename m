@@ -2,42 +2,42 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CB59C38142
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F01FEC00A5A
 	for <linux-block@archiver.kernel.org>; Wed, 18 Jan 2023 01:39:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229728AbjARBjL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 17 Jan 2023 20:39:11 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54730 "EHLO
+        id S229791AbjARBjN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 17 Jan 2023 20:39:13 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54858 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229750AbjARBjF (ORCPT
+        with ESMTP id S229765AbjARBjG (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 17 Jan 2023 20:39:05 -0500
+        Tue, 17 Jan 2023 20:39:06 -0500
 Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3AEC751C7C;
-        Tue, 17 Jan 2023 17:39:03 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 47F6051404;
+        Tue, 17 Jan 2023 17:39:04 -0800 (PST)
 Received: from mail02.huawei.com (unknown [172.30.67.143])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4NxT1t1nxSz4f3jJ5;
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4NxT1t73qPz4f4fws;
         Wed, 18 Jan 2023 09:38:58 +0800 (CST)
 Received: from huaweicloud.com (unknown [10.175.124.27])
-        by APP2 (Coremail) with SMTP id Syh0CgDnjOqxTcdjBACUBw--.30342S7;
-        Wed, 18 Jan 2023 09:38:59 +0800 (CST)
+        by APP2 (Coremail) with SMTP id Syh0CgDnjOqxTcdjBACUBw--.30342S11;
+        Wed, 18 Jan 2023 09:39:01 +0800 (CST)
 From:   Kemeng Shi <shikemeng@huaweicloud.com>
 To:     hch@lst.de, axboe@kernel.dk, dwagner@suse.de, hare@suse.de,
         ming.lei@redhat.com, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org
 Cc:     john.garry@huawei.com, jack@suse.cz
-Subject: [PATCH v4 06/14] blk-mq: remove unncessary from_schedule parameter in blk_mq_plug_issue_direct
-Date:   Wed, 18 Jan 2023 17:37:18 +0800
-Message-Id: <20230118093726.3939160-6-shikemeng@huaweicloud.com>
+Subject: [PATCH v4 10/14] blk-mq: simplify flush check in blk_mq_dispatch_rq_list
+Date:   Wed, 18 Jan 2023 17:37:22 +0800
+Message-Id: <20230118093726.3939160-10-shikemeng@huaweicloud.com>
 X-Mailer: git-send-email 2.30.0
 In-Reply-To: <20230118093726.3939160-1-shikemeng@huaweicloud.com>
 References: <20230118093726.3939160-1-shikemeng@huaweicloud.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: Syh0CgDnjOqxTcdjBACUBw--.30342S7
-X-Coremail-Antispam: 1UD129KBjvJXoW7CryxAF45uw43WF4rCrWrAFb_yoW8tw1DpF
-        W5Xa12yrWrXrZ7X3y8Aan3Zry3Cr4kKrW3Kr1ay34fXr45K3yIqw4rJ343ArWIyFs5Ar43
-        ur45K343Jr15GwUanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+X-CM-TRANSID: Syh0CgDnjOqxTcdjBACUBw--.30342S11
+X-Coremail-Antispam: 1UD129KBjvJXoW7ZFW7tr1DXFW7tryrWr43Awb_yoW8Xr4DpF
+        W3Ca9Fkr4agw42yry8CaykG3WDAwsYkFn8WrZ3Cw1agF45Cr4xtrWSgw47WFWkArsaya1a
+        qFWUWFWjvFyUXa7anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
         9KBjDU0xBIdaVrnRJUUUBIb4IE77IF4wAFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k2
         6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M280x2IEY4vEnII2IxkI6r1a6r45M2
         8IrcIa0xkI8VA2jI8067AKxVWUAVCq3wA2048vs2IY020Ec7CjxVAFwI0_Xr0E3s1l8cAv
@@ -48,8 +48,8 @@ X-Coremail-Antispam: 1UD129KBjvJXoW7CryxAF45uw43WF4rCrWrAFb_yoW8tw1DpF
         67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41l42xK82IYc2
         Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s02
         6x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0x
-        vE2Ix0cI8IcVAFwI0_JFI_Gr1lIxAIcVC0I7IYx2IY6xkF7I0E14v26F4j6r4UJwCI42IY
-        6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aV
+        vE2Ix0cI8IcVAFwI0_Gr0_Xr1lIxAIcVC0I7IYx2IY6xkF7I0E14v26F4j6r4UJwCI42IY
+        6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Gr0_Cr1lIxAIcVC2z280aV
         CY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU058n7UUUUU==
 X-CM-SenderInfo: 5vklyvpphqwq5kxd4v5lfo033gof0z/
 X-CFilter-Loop: Reflected
@@ -57,66 +57,40 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Function blk_mq_plug_issue_direct tries to issue batch requests in plug
-list to driver directly. We will only issue plug request to driver if we
-are not from scheduler, so from_scheduler parameter of
-blk_mq_plug_issue_direct is always false.
-Remove unncessary from_scheduler of blk_mq_plug_issue_direct.
+1. Remove check of needs_resource and ret == BLK_STS_DEV_RESOURCE.
+For busy error BLK_STS*_RESOURCE, request will always be added
+back to list, so need_resource will not be true and ret will
+not be == BLK_STS_DEV_RESOURCE if list is empty. We could remove
+these dead check.
+
+2. Check ret of last request instead of errors
+If list is empty, we only need to explicitly commit_rqs
+if error happens at last request which is stored in ret. So check
+ret of last request instead of errors to remove unnecessary
+commit_rqs triggered by errors returned from previous request.
 
 Signed-off-by: Kemeng Shi <shikemeng@huaweicloud.com>
 ---
- block/blk-mq.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ block/blk-mq.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 7160af49c245..5d146ec9f8cb 100644
+index c945a4602849..d4fdb01475b6 100644
 --- a/block/blk-mq.c
 +++ b/block/blk-mq.c
-@@ -2688,7 +2688,7 @@ static blk_status_t blk_mq_request_issue_directly(struct request *rq, bool last)
- 	return __blk_mq_try_issue_directly(rq->mq_hctx, rq, true, last);
- }
- 
--static void blk_mq_plug_issue_direct(struct blk_plug *plug, bool from_schedule)
-+static void blk_mq_plug_issue_direct(struct blk_plug *plug)
- {
- 	struct blk_mq_hw_ctx *hctx = NULL;
- 	struct request *rq;
-@@ -2701,7 +2701,7 @@ static void blk_mq_plug_issue_direct(struct blk_plug *plug, bool from_schedule)
- 
- 		if (hctx != rq->mq_hctx) {
- 			if (hctx)
--				blk_mq_commit_rqs(hctx, &queued, from_schedule);
-+				blk_mq_commit_rqs(hctx, &queued, false);
- 			hctx = rq->mq_hctx;
- 		}
- 
-@@ -2713,7 +2713,7 @@ static void blk_mq_plug_issue_direct(struct blk_plug *plug, bool from_schedule)
- 		case BLK_STS_RESOURCE:
- 		case BLK_STS_DEV_RESOURCE:
- 			blk_mq_request_bypass_insert(rq, false, true);
--			blk_mq_commit_rqs(hctx, &queued, from_schedule);
-+			blk_mq_commit_rqs(hctx, &queued, false);
- 			return;
- 		default:
- 			blk_mq_end_request(rq, ret);
-@@ -2727,7 +2727,7 @@ static void blk_mq_plug_issue_direct(struct blk_plug *plug, bool from_schedule)
+@@ -2108,9 +2108,9 @@ bool blk_mq_dispatch_rq_list(struct blk_mq_hw_ctx *hctx, struct list_head *list,
+ 	/* If we didn't flush the entire list, we could have told the driver
  	 * there was more coming, but that turned out to be a lie.
  	 */
- 	if (errors)
--		blk_mq_commit_rqs(hctx, &queued, from_schedule);
-+		blk_mq_commit_rqs(hctx, &queued, false);
- }
- 
- static void __blk_mq_flush_plug_list(struct request_queue *q,
-@@ -2798,7 +2798,7 @@ void blk_mq_flush_plug_list(struct blk_plug *plug, bool from_schedule)
- 		}
- 
- 		blk_mq_run_dispatch_ops(q,
--				blk_mq_plug_issue_direct(plug, false));
-+				blk_mq_plug_issue_direct(plug));
- 		if (rq_list_empty(plug->mq_list))
- 			return;
- 	}
+-	if ((!list_empty(list) || errors || needs_resource ||
+-	     ret == BLK_STS_DEV_RESOURCE) && q->mq_ops->commit_rqs && queued)
+-		q->mq_ops->commit_rqs(hctx);
++	if (!list_empty(list) || ret != BLK_STS_OK)
++		blk_mq_commit_rqs(hctx, queued, false);
++
+ 	/*
+ 	 * Any items that need requeuing? Stuff them into hctx->dispatch,
+ 	 * that is where we will continue on next queue run.
 -- 
 2.30.0
 
