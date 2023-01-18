@@ -2,102 +2,153 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A648FC38159
-	for <linux-block@archiver.kernel.org>; Wed, 18 Jan 2023 01:39:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DFE2CC00A5A
+	for <linux-block@archiver.kernel.org>; Wed, 18 Jan 2023 01:39:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229736AbjARBjJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 17 Jan 2023 20:39:09 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54814 "EHLO
+        id S229760AbjARBjL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 17 Jan 2023 20:39:11 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54776 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229744AbjARBjE (ORCPT
+        with ESMTP id S229749AbjARBjF (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 17 Jan 2023 20:39:04 -0500
+        Tue, 17 Jan 2023 20:39:05 -0500
 Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9FB7351C6E;
-        Tue, 17 Jan 2023 17:39:01 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13E8E51C77;
+        Tue, 17 Jan 2023 17:39:02 -0800 (PST)
 Received: from mail02.huawei.com (unknown [172.30.67.143])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4NxT1r3msYz4f3tqb;
-        Wed, 18 Jan 2023 09:38:56 +0800 (CST)
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4NxT1s5gP7z4f3v4s;
+        Wed, 18 Jan 2023 09:38:57 +0800 (CST)
 Received: from huaweicloud.com (unknown [10.175.124.27])
-        by APP2 (Coremail) with SMTP id Syh0CgDnjOqxTcdjBACUBw--.30342S5;
-        Wed, 18 Jan 2023 09:38:58 +0800 (CST)
+        by APP2 (Coremail) with SMTP id Syh0CgDnjOqxTcdjBACUBw--.30342S8;
+        Wed, 18 Jan 2023 09:39:00 +0800 (CST)
 From:   Kemeng Shi <shikemeng@huaweicloud.com>
 To:     hch@lst.de, axboe@kernel.dk, dwagner@suse.de, hare@suse.de,
         ming.lei@redhat.com, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org
 Cc:     john.garry@huawei.com, jack@suse.cz
-Subject: [PATCH v4 04/14] blk-mq: Fix potential io hung for shared sbitmap per tagset
-Date:   Wed, 18 Jan 2023 17:37:16 +0800
-Message-Id: <20230118093726.3939160-4-shikemeng@huaweicloud.com>
+Subject: [PATCH v4 07/14] blk-mq: make blk_mq_commit_rqs a general function for all commits
+Date:   Wed, 18 Jan 2023 17:37:19 +0800
+Message-Id: <20230118093726.3939160-7-shikemeng@huaweicloud.com>
 X-Mailer: git-send-email 2.30.0
 In-Reply-To: <20230118093726.3939160-1-shikemeng@huaweicloud.com>
 References: <20230118093726.3939160-1-shikemeng@huaweicloud.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: Syh0CgDnjOqxTcdjBACUBw--.30342S5
-X-Coremail-Antispam: 1UD129KBjvJXoW7CFW7tFy5CFyfXr4Duw1ftFb_yoW8AF48pr
-        WrtF1UKrsaqr1qvFWxXa17JF1Fkrs5Kwn3J393Wr4av3y5Kr1xJFWIgay3J3W0vFZ3ArW7
-        Za1UtFyUX3Z5X37anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUB0b4IE77IF4wAFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k2
+X-CM-TRANSID: Syh0CgDnjOqxTcdjBACUBw--.30342S8
+X-Coremail-Antispam: 1UD129KBjvJXoWxAr45Xw1ruF45KFyxXw48Crg_yoW5CFy7pF
+        43Ja1ayrWkJrs7Zas5Ja17ZFy3Grs3trWjg34ft343Xr4UKr1kWw4rtryxAFyIyr4kAF47
+        urW5ur9xCF15CwUanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUBIb4IE77IF4wAFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k2
         6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M280x2IEY4vEnII2IxkI6r1a6r45M2
-        8IrcIa0xkI8VA2jI8067AKxVWUWwA2048vs2IY020Ec7CjxVAFwI0_Xr0E3s1l8cAvFVAK
-        0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVWDJVCq3wA2z4
-        x0Y4vE2Ix0cI8IcVCY1x0267AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l
-        84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I
-        8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r106r15McIj6I8E87Iv67AK
-        xVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41l42xK82IYc2Ij64
-        vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8G
-        jcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2I
-        x0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK
-        8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I
-        0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUx4SrUUUUU
+        8IrcIa0xkI8VA2jI8067AKxVWUAVCq3wA2048vs2IY020Ec7CjxVAFwI0_Xr0E3s1l8cAv
+        FVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVWDJVCq3w
+        A2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE
+        3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr2
+        1l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r106r15McIj6I8E87Iv
+        67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41l42xK82IYc2
+        Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s02
+        6x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0x
+        vE2Ix0cI8IcVAFwI0_JFI_Gr1lIxAIcVC0I7IYx2IY6xkF7I0E14v26F4j6r4UJwCI42IY
+        6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aV
+        CY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU058n7UUUUU==
 X-CM-SenderInfo: 5vklyvpphqwq5kxd4v5lfo033gof0z/
 X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Commit f906a6a0f4268 ("blk-mq: improve tag waiting setup for non-shared
-tags") mark restart for unshared tags for improvement. At that time,
-tags is only shared betweens queues and we can check if tags is shared
-by test BLK_MQ_F_TAG_SHARED.
-Afterwards, commit 32bc15afed04b ("blk-mq: Facilitate a shared sbitmap per
-tagset") enabled tags share betweens hctxs inside a queue. We only
-mark restart for shared hctxs inside a queue and may cause io hung if
-there is no tag currently allocated by hctxs going to be marked restart.
-Wait on sbitmap_queue instead of mark restart for shared hctxs case to
-fix this.
+1. move blk_mq_commit_rqs forward before functions need commits.
+2. add queued check and only commits request if any request was queued
+in blk_mq_commit_rqs to keep commit behavior consistent and remove
+unnecessary commit.
+3. split the queued clearing from blk_mq_plug_commit_rqs as it is
+not wanted general.
+4. sync current caller of blk_mq_commit_rqs with new general
+blk_mq_commit_rqs.
+5. document rule for unusual cases which need explicit commit_rqs.
 
-Fixes: 32bc15afed04 ("blk-mq: Facilitate a shared sbitmap per tagset")
+Suggested-by: Christoph Hellwig <hch@lst.de>
 Signed-off-by: Kemeng Shi <shikemeng@huaweicloud.com>
 ---
- block/blk-mq.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ block/blk-mq.c | 37 +++++++++++++++++++++++--------------
+ 1 file changed, 23 insertions(+), 14 deletions(-)
 
 diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 943f2ce1e674..6eb23bbe1787 100644
+index 5d146ec9f8cb..159d9163c46c 100644
 --- a/block/blk-mq.c
 +++ b/block/blk-mq.c
-@@ -1831,7 +1831,8 @@ static bool blk_mq_mark_tag_wait(struct blk_mq_hw_ctx *hctx,
- 	wait_queue_entry_t *wait;
- 	bool ret;
+@@ -2007,6 +2007,23 @@ static void blk_mq_release_budgets(struct request_queue *q,
+ 	}
+ }
  
--	if (!(hctx->flags & BLK_MQ_F_TAG_QUEUE_SHARED)) {
-+	if (!(hctx->flags & BLK_MQ_F_TAG_QUEUE_SHARED) &&
-+	    !(blk_mq_is_shared_tags(hctx->flags))) {
- 		blk_mq_sched_mark_restart_hctx(hctx);
++/*
++ * blk_mq_commit_rqs will notify driver using bd->last that there is no
++ * more requests. (See comment in struct blk_mq_ops for commit_rqs for
++ * details)
++ * Attention, we should explicitly call this in unusual cases:
++ *  1) did not queue everything initially scheduled to queue
++ *  2) the last attempt to queue a request failed
++ */
++static void blk_mq_commit_rqs(struct blk_mq_hw_ctx *hctx, int queued,
++			      bool from_schedule)
++{
++	if (hctx->queue->mq_ops->commit_rqs && queued) {
++		trace_block_unplug(hctx->queue, queued, !from_schedule);
++		hctx->queue->mq_ops->commit_rqs(hctx);
++	}
++}
++
+ /*
+  * Returns true if we did some work AND can potentially do more.
+  */
+@@ -2555,16 +2572,6 @@ void blk_mq_insert_requests(struct blk_mq_hw_ctx *hctx, struct blk_mq_ctx *ctx,
+ 	spin_unlock(&ctx->lock);
+ }
  
- 		/*
-@@ -2101,7 +2102,8 @@ bool blk_mq_dispatch_rq_list(struct blk_mq_hw_ctx *hctx, struct list_head *list,
- 		bool needs_restart;
- 		/* For non-shared tags, the RESTART check will suffice */
- 		bool no_tag = prep == PREP_DISPATCH_NO_TAG &&
--			(hctx->flags & BLK_MQ_F_TAG_QUEUE_SHARED);
-+			((hctx->flags & BLK_MQ_F_TAG_QUEUE_SHARED) ||
-+			blk_mq_is_shared_tags(hctx->flags));
+-static void blk_mq_commit_rqs(struct blk_mq_hw_ctx *hctx, int *queued,
+-			      bool from_schedule)
+-{
+-	if (hctx->queue->mq_ops->commit_rqs) {
+-		trace_block_unplug(hctx->queue, *queued, !from_schedule);
+-		hctx->queue->mq_ops->commit_rqs(hctx);
+-	}
+-	*queued = 0;
+-}
+-
+ static void blk_mq_bio_to_request(struct request *rq, struct bio *bio,
+ 		unsigned int nr_segs)
+ {
+@@ -2700,8 +2707,10 @@ static void blk_mq_plug_issue_direct(struct blk_plug *plug)
+ 		blk_status_t ret;
  
- 		if (nr_budgets)
- 			blk_mq_release_budgets(q, list);
+ 		if (hctx != rq->mq_hctx) {
+-			if (hctx)
+-				blk_mq_commit_rqs(hctx, &queued, false);
++			if (hctx) {
++				blk_mq_commit_rqs(hctx, queued, false);
++				queued = 0;
++			}
+ 			hctx = rq->mq_hctx;
+ 		}
+ 
+@@ -2713,7 +2722,7 @@ static void blk_mq_plug_issue_direct(struct blk_plug *plug)
+ 		case BLK_STS_RESOURCE:
+ 		case BLK_STS_DEV_RESOURCE:
+ 			blk_mq_request_bypass_insert(rq, false, true);
+-			blk_mq_commit_rqs(hctx, &queued, false);
++			blk_mq_commit_rqs(hctx, queued, false);
+ 			return;
+ 		default:
+ 			blk_mq_end_request(rq, ret);
+@@ -2727,7 +2736,7 @@ static void blk_mq_plug_issue_direct(struct blk_plug *plug)
+ 	 * there was more coming, but that turned out to be a lie.
+ 	 */
+ 	if (errors)
+-		blk_mq_commit_rqs(hctx, &queued, false);
++		blk_mq_commit_rqs(hctx, queued, false);
+ }
+ 
+ static void __blk_mq_flush_plug_list(struct request_queue *q,
 -- 
 2.30.0
 
