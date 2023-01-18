@@ -2,144 +2,85 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 34DC7C38159
-	for <linux-block@archiver.kernel.org>; Wed, 18 Jan 2023 11:31:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 66BDEC32793
+	for <linux-block@archiver.kernel.org>; Wed, 18 Jan 2023 12:45:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229665AbjARLbo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 18 Jan 2023 06:31:44 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46628 "EHLO
+        id S230327AbjARMp2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 18 Jan 2023 07:45:28 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44714 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229450AbjARLbW (ORCPT
+        with ESMTP id S230432AbjARMnX (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 18 Jan 2023 06:31:22 -0500
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3CF905DC27;
-        Wed, 18 Jan 2023 02:51:25 -0800 (PST)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id E49AD204B1;
-        Wed, 18 Jan 2023 10:51:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1674039083; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=L/9erNZdmzZn06cCNOJDly4yn3eTixjSiK6j9e1hIz0=;
-        b=ZZ64m24AmxiunAMNKMk1YSLi61k72uBpxt6gftuoB5sdtukVtpzIqukV0XZxBrgxeKTNvS
-        lB4zfOvU0DjBhcR7HKtIwT/T8E/Oyw0zhYgInbqGnuldi6aQz/k1bObogoBRz4M3i66nu3
-        er5WssaIJAuOa3N9RKkhl3lhez4wEy0=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1674039083;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=L/9erNZdmzZn06cCNOJDly4yn3eTixjSiK6j9e1hIz0=;
-        b=euhQysow3RJUvUioeSoWe8nop2Xt3mGFRF00fzmNQSKGQwfW2NjvSrMRBh7v7BgzODktN2
-        xcXeD7DNWd86G5Cw==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id D4244138FE;
-        Wed, 18 Jan 2023 10:51:23 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id 1SRxMyvPx2ObZAAAMHmgww
-        (envelope-from <hare@suse.de>); Wed, 18 Jan 2023 10:51:23 +0000
-Message-ID: <ce97ebc9-f8c1-cd1e-f364-60866cfb092a@suse.de>
-Date:   Wed, 18 Jan 2023 11:51:23 +0100
+        Wed, 18 Jan 2023 07:43:23 -0500
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF55210A83;
+        Wed, 18 Jan 2023 04:07:40 -0800 (PST)
+Received: from mail02.huawei.com (unknown [172.30.67.143])
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4NxkzB6RLTz4f3m7B;
+        Wed, 18 Jan 2023 20:07:34 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.175.127.227])
+        by APP3 (Coremail) with SMTP id _Ch0CgCHgR8G4cdjY2MdBw--.48220S4;
+        Wed, 18 Jan 2023 20:07:36 +0800 (CST)
+From:   Yu Kuai <yukuai1@huaweicloud.com>
+To:     tj@kernel.org, hch@lst.de, josef@toxicpanda.com, axboe@kernel.dk
+Cc:     cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, yukuai3@huawei.com,
+        yukuai1@huaweicloud.com, yi.zhang@huawei.com, yangerkun@huawei.com
+Subject: [PATCH -next v2 0/3] blk-cgroup: make sure pd_free_fn() is called in order
+Date:   Wed, 18 Jan 2023 20:31:49 +0800
+Message-Id: <20230118123152.1926314-1-yukuai1@huaweicloud.com>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.1
-Subject: Re: [PATCH v2 00/21] blksnap - block devices snapshots module
-To:     Mike Snitzer <snitzer@redhat.com>,
-        Sergei Shtepa <sergei.shtepa@veeam.com>
-Cc:     axboe@kernel.dk, corbet@lwn.net, linux-block@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20221209142331.26395-1-sergei.shtepa@veeam.com>
- <Y8cNVv4O+vjL+aAy@redhat.com>
-Content-Language: en-US
-From:   Hannes Reinecke <hare@suse.de>
-In-Reply-To: <Y8cNVv4O+vjL+aAy@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: _Ch0CgCHgR8G4cdjY2MdBw--.48220S4
+X-Coremail-Antispam: 1UD129KBjvdXoWrKFyfKF4DGryfAr1xuw1DGFg_yoWkXFgEka
+        4vgryrC34UA3W2kF92krn0vFZ8KrWjqr18XayqqrWxWF17Xw4xtan3K34ruF47ua109r15
+        Jasavrs2qrnFqjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+        9fnUUIcSsGvfJTRUUUbxxFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
+        6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
+        A2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Cr0_
+        Gr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s
+        0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xII
+        jxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr
+        1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7M4IIrI8v6xkF7I0E8cxa
+        n2IY04v7MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrV
+        AFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCI
+        c40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267
+        AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_WFyUJVCq3wCI42IY6I8E87Iv67AKxVWU
+        JVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfUoO
+        J5UUUUU
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/17/23 22:04, Mike Snitzer wrote:
-> On Fri, Dec 09 2022 at  9:23P -0500,
-> Sergei Shtepa <sergei.shtepa@veeam.com> wrote:
-> 
->> Hi Jens. Hi Jonathan. Hi all.
->>
->> I am happy to offer a modified version of the Block Devices Snapshots
->> Module. It allows to create non-persistent snapshots of any block devices.
->> The main purpose of such snapshots is to provide backups of block devices.
->> See more in Documentation/block/blksnap.rst.
->>
->> The Block Device Filtering Mechanism is added to the block layer. This
->> allows to attach and detach block device filters to the block layer.
->> Filters allow to extend the functionality of the block layer.
->> See more in Documentation/block/blkfilter.rst.
->>
->> A tool, a library for working with blksnap and tests can be found at
->> www.github.com/veeam/blksnap.
->>
->> The first version was suggested at 13 June 2022. Many thanks to
->> Christoph Hellwig and Randy Dunlap for the review of that version.
->>
->> Changes:
->> - Forgotten "static" declarations have been added.
->> - The text of the comments has been corrected.
->> - It is possible to connect only one filter, since there are no others in
->>    upstream.
->> - Do not have additional locks for attach/detach filter.
->> - blksnap.h moved to include/uapi/.
->> - #pragma once and commented code removed.
->> - uuid_t removed from user API.
->> - Removed default values for module parameters from the configuration file.
->> - The debugging code for tracking memory leaks has been removed.
->> - Simplified Makefile.
->> - Optimized work with large memory buffers, CBT tables are now in virtual
->>    memory.
->> - The allocation code of minor numbers has been optimized.
->> - The implementation of the snapshot image block device has been
->>    simplified, now it is a bio-based block device.
->> - Removed initialization of global variables with null values.
->> - Only one bio is used to copy one chunk.
->> - Checked on ppc64le.
->>
->> The v1 version was suggested at 2 November 2022. Many thanks to Fabio
->> Fantoni for his for his participation in the "blksnap" project on github
->> and Jonathan Corbet for his article https://lwn.net/Articles/914031/.
->> Thanks to the impartial kernel test robot.
->>
->> Changes:
->> - Added documentation for Block Device Filtering Mechanism.
->> - Added documentation for Block Devices Snapshots Module (blksnap).
->> - The MAINTAINERS file has been updated.
->> - Optimized queue code for snapshot images.
->> - Fixed comments, log messages and code for better readability.
-> 
-> [this reply got long...]
-> 
-[ .. ]
-> 
-> But you've already bypassed me, my hope is that Jens and Christoph
-> agree that we need this line of development to be in service to other
-> areas of the Linux block subsystem and its drivers that were
-> established for the purposes of remapping IO.  It cannot just be
-> the subset needed to cement veeam's ability to use Linux for its
-> purposes (but I completely understand that is the point of veeam's
-> exercise).
-> 
-That's why I proposed my topic at LSF/MM, precisely to figure out how to 
-handle these issues.
+From: Yu Kuai <yukuai3@huawei.com>
 
-Cheers,
+The problem was found in iocost orignally([1]) that ioc can be freed in
+ioc_pd_free(). And later we found that there are more problem in
+iocost([2]).
 
-Hannes
+After some discussion, as suggested by Tejun([3]), we decide to fix the
+problem that parent pd can be freed before child pd in cgroup layer
+first. And the problem in [1] will be fixed later if this patchset is
+applied.
+
+[1] https://lore.kernel.org/all/20221130132156.2836184-8-linan122@huawei.com/
+[2] https://lore.kernel.org/all/aa924294-2f54-1b53-fc6e-e4f8fa019b14@huaweicloud.com/
+[3] https://lore.kernel.org/all/20221227125502.541931-1-yukuai1@huaweicloud.com/
+
+Yu Kuai (3):
+  blk-cgroup: dropping parent refcount after pd_free_fn() is done
+  blk-cgroup: support to track if policy is online
+  blk-cgroup: synchronize pd_free_fn() from blkg_free_workfn() and
+    blkcg_deactivate_policy()
+
+ block/blk-cgroup.c     | 61 +++++++++++++++++++++++++++++++-----------
+ block/blk-cgroup.h     |  1 +
+ include/linux/blkdev.h |  1 +
+ 3 files changed, 48 insertions(+), 15 deletions(-)
+
+-- 
+2.31.1
+
