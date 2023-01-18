@@ -2,42 +2,42 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DA6A1C38159
-	for <linux-block@archiver.kernel.org>; Wed, 18 Jan 2023 01:39:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DB04C00A5A
+	for <linux-block@archiver.kernel.org>; Wed, 18 Jan 2023 01:39:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229575AbjARBjX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 17 Jan 2023 20:39:23 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54758 "EHLO
+        id S229802AbjARBjY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 17 Jan 2023 20:39:24 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54748 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229708AbjARBjG (ORCPT
+        with ESMTP id S229685AbjARBjG (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Tue, 17 Jan 2023 20:39:06 -0500
 Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B936551C4E;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 54C865143A;
         Tue, 17 Jan 2023 17:39:04 -0800 (PST)
 Received: from mail02.huawei.com (unknown [172.30.67.143])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4NxT1v4tHjz4f3jqY;
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4NxT1v2pcZz4f4fwl;
         Wed, 18 Jan 2023 09:38:59 +0800 (CST)
 Received: from huaweicloud.com (unknown [10.175.124.27])
-        by APP2 (Coremail) with SMTP id Syh0CgDnjOqxTcdjBACUBw--.30342S13;
-        Wed, 18 Jan 2023 09:39:02 +0800 (CST)
+        by APP2 (Coremail) with SMTP id Syh0CgDnjOqxTcdjBACUBw--.30342S12;
+        Wed, 18 Jan 2023 09:39:01 +0800 (CST)
 From:   Kemeng Shi <shikemeng@huaweicloud.com>
 To:     hch@lst.de, axboe@kernel.dk, dwagner@suse.de, hare@suse.de,
         ming.lei@redhat.com, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org
 Cc:     john.garry@huawei.com, jack@suse.cz
-Subject: [PATCH v4 12/14] blk-mq: remove set of bd->last when get driver tag for next request fails
-Date:   Wed, 18 Jan 2023 17:37:24 +0800
-Message-Id: <20230118093726.3939160-12-shikemeng@huaweicloud.com>
+Subject: [PATCH v4 11/14] blk-mq: remove unnecessary error count and check in blk_mq_dispatch_rq_list
+Date:   Wed, 18 Jan 2023 17:37:23 +0800
+Message-Id: <20230118093726.3939160-11-shikemeng@huaweicloud.com>
 X-Mailer: git-send-email 2.30.0
 In-Reply-To: <20230118093726.3939160-1-shikemeng@huaweicloud.com>
 References: <20230118093726.3939160-1-shikemeng@huaweicloud.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: Syh0CgDnjOqxTcdjBACUBw--.30342S13
-X-Coremail-Antispam: 1UD129KBjvJXoW7ZryrKr17Cr1DAw1rCrWxWFg_yoW8Kr18pF
-        W3Ja1akr45XF40gFW8AwsrWF45Jw4DArWayrs8u34Fqrn09rs7KFyxJ3y8ZFyFvrZ7CrsI
-        gr4vgryDXr48XFDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+X-CM-TRANSID: Syh0CgDnjOqxTcdjBACUBw--.30342S12
+X-Coremail-Antispam: 1UD129KBjvJXoW7Ar47WrW5WFW7Cr45Cr45Jrb_yoW8tw4rpF
+        45Gan0y34rXr40qry8Aa9xGwn0qrs5AryDWF9xC3yavF17Krs7Jr4rJrWUuFyfKrs0kF47
+        XF18WrWYyws7XrDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
         9KBjDU0xBIdaVrnRJUUUBSb4IE77IF4wAFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k2
         6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M280x2IEY4vEnII2IxkI6r1a6r45M2
         8IrcIa0xkI8VA2jI8067AKxVWUAVCq3wA2048vs2IY020Ec7CjxVAFwI0_Xr0E3s1l8cAv
@@ -57,75 +57,72 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Commit 113285b473824 ("blk-mq: ensure that bd->last is always set
-correctly") will set last if we failed to get driver tag for next
-request to avoid flush miss as we break the list walk and will not
-send the last request in the list which will be sent with last set
-normally.
-This code seems stale now becase the flush introduced is always
-redundant as:
-For case tag is really out, we will send a extra flush if we find
-list is not empty after list walk.
-For case some tag is freed before retry in blk_mq_prep_dispatch_rq for
-next, then we can get a tag for next request in retry and flush notified
-already is not necessary.
+blk_mq_dispatch_rq_list will notify if hctx is busy in return bool. It will
+return true if we are not busy and can handle more and return false on the
+opposite. Inside blk_mq_dispatch_rq_list, errors is only used if list is
+empty and we will return true if list is empty and (errors + queued) != 0.
 
-Just remove these stale codes.
+There are three types of status returned from request:
+ -busy error BLK_STS*_RESOURCE: the failed request will be added back
+to list and list will not be empty.
+ -BLK_STS_OK: We count queued for BLK_STS_OK
+ -rest error: We count errors for rest error
+
+If list is empty, there is no request gets busy error then (errors +
+queued) will be total requests in the list which is checked not empty at
+beginning of blk_mq_dispatch_rq_list. So (errors + queued) != 0 is always
+met if list is empty. Then the (errors + queued) != 0 check and errors
+number count is not needed.
 
 Signed-off-by: Kemeng Shi <shikemeng@huaweicloud.com>
 ---
- block/blk-mq.c | 24 ++----------------------
- 1 file changed, 2 insertions(+), 22 deletions(-)
+ block/blk-mq.c | 11 +++++------
+ 1 file changed, 5 insertions(+), 6 deletions(-)
 
 diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 90471b5c868f..afd4f0c3166b 100644
+index d4fdb01475b6..90471b5c868f 100644
 --- a/block/blk-mq.c
 +++ b/block/blk-mq.c
-@@ -1923,16 +1923,6 @@ static void blk_mq_update_dispatch_busy(struct blk_mq_hw_ctx *hctx, bool busy)
- static void blk_mq_handle_dev_resource(struct request *rq,
- 				       struct list_head *list)
- {
--	struct request *next =
--		list_first_entry_or_null(list, struct request, queuelist);
--
--	/*
--	 * If an I/O scheduler has been configured and we got a driver tag for
--	 * the next request already, free it.
--	 */
--	if (next)
--		blk_mq_put_driver_tag(next);
--
- 	list_add(&rq->queuelist, list);
- 	__blk_mq_requeue_request(rq);
- }
-@@ -2032,7 +2022,7 @@ bool blk_mq_dispatch_rq_list(struct blk_mq_hw_ctx *hctx, struct list_head *list,
- {
+@@ -2033,7 +2033,7 @@ bool blk_mq_dispatch_rq_list(struct blk_mq_hw_ctx *hctx, struct list_head *list,
  	enum prep_dispatch prep;
  	struct request_queue *q = hctx->queue;
--	struct request *rq, *nxt;
-+	struct request *rq;
- 	int queued;
+ 	struct request *rq, *nxt;
+-	int errors, queued;
++	int queued;
  	blk_status_t ret = BLK_STS_OK;
  	LIST_HEAD(zone_list);
-@@ -2058,17 +2048,7 @@ bool blk_mq_dispatch_rq_list(struct blk_mq_hw_ctx *hctx, struct list_head *list,
- 		list_del_init(&rq->queuelist);
+ 	bool needs_resource = false;
+@@ -2044,7 +2044,7 @@ bool blk_mq_dispatch_rq_list(struct blk_mq_hw_ctx *hctx, struct list_head *list,
+ 	/*
+ 	 * Now process all the entries, sending them to the driver.
+ 	 */
+-	errors = queued = 0;
++	queued = 0;
+ 	do {
+ 		struct blk_mq_queue_data bd;
  
- 		bd.rq = rq;
--
--		/*
--		 * Flag last if we have no more requests, or if we have more
--		 * but can't assign a driver tag to it.
--		 */
--		if (list_empty(list))
--			bd.last = true;
--		else {
--			nxt = list_first_entry(list, struct request, queuelist);
--			bd.last = !blk_mq_get_driver_tag(nxt);
--		}
-+		bd.last = list_empty(list);
+@@ -2097,7 +2097,6 @@ bool blk_mq_dispatch_rq_list(struct blk_mq_hw_ctx *hctx, struct list_head *list,
+ 			needs_resource = true;
+ 			break;
+ 		default:
+-			errors++;
+ 			blk_mq_end_request(rq, ret);
+ 		}
+ 	} while (!list_empty(list));
+@@ -2175,10 +2174,10 @@ bool blk_mq_dispatch_rq_list(struct blk_mq_hw_ctx *hctx, struct list_head *list,
  
- 		/*
- 		 * once the request is queued to lld, no need to cover the
+ 		blk_mq_update_dispatch_busy(hctx, true);
+ 		return false;
+-	} else
+-		blk_mq_update_dispatch_busy(hctx, false);
++	}
+ 
+-	return (queued + errors) != 0;
++	blk_mq_update_dispatch_busy(hctx, false);
++	return true;
+ }
+ 
+ /**
 -- 
 2.30.0
 
