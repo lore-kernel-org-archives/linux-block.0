@@ -2,112 +2,107 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21685C677F1
-	for <linux-block@archiver.kernel.org>; Wed, 18 Jan 2023 13:34:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C3A0C46467
+	for <linux-block@archiver.kernel.org>; Wed, 18 Jan 2023 13:43:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231199AbjARNei (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 18 Jan 2023 08:34:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35770 "EHLO
+        id S231143AbjARNnW convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 18 Jan 2023 08:43:22 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42298 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230287AbjARNeW (ORCPT
+        with ESMTP id S230460AbjARNmz (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 18 Jan 2023 08:34:22 -0500
-Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C5B787644;
-        Wed, 18 Jan 2023 05:01:02 -0800 (PST)
-From:   Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1674046861;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=PvU5ktIQmVNE7PMEvHhaDxnSXDUDDxFR9HB1GTxmaWs=;
-        b=zqvl7Bj+ZRP9DSrW/fabry1GJ6PA3Qs7F0wn8VIaO3nv79rgrCMrMlgJcMINIqL9TcAz6a
-        P8bb+kjC3vFVYjKqtFTr2wq5LoUKf+cRMpTyTa6OFw1uIS842CRMYDilcYo5ld1kHwt+BM
-        Lpk6hvrc0bUAVHQdFG+nNoPV7xV14/Z2zZ+AMPBkDEl1eQpu8xWhx5HxJckCd6It3gtwOp
-        b00/Ba7HLqNcXFVoI9RBqA1XXiX/QSg0sLO/wio0GiDmh9tAQOgXOFfbfIrSWIknG7fvQG
-        dVIxwGYgY4T9XvjdSg8nnQ1rNvaAiKcBKllNi8/QiKvD6BLG71Crj8WAdF07dQ==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1674046861;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=PvU5ktIQmVNE7PMEvHhaDxnSXDUDDxFR9HB1GTxmaWs=;
-        b=QXhl89bqfWvcYxf1pYaDR/+FRpRaGdsHvTHK92uTVq3RXeDDH1cKWqHk6Icb4ZDeglUhSq
-        KVsyMn+ekUETd0DQ==
-To:     Byungchul Park <byungchul.park@lge.com>,
-        linux-kernel@vger.kernel.org
-Cc:     torvalds@linux-foundation.org, damien.lemoal@opensource.wdc.com,
-        linux-ide@vger.kernel.org, adilger.kernel@dilger.ca,
-        linux-ext4@vger.kernel.org, mingo@redhat.com, peterz@infradead.org,
-        will@kernel.org, rostedt@goodmis.org, joel@joelfernandes.org,
-        sashal@kernel.org, daniel.vetter@ffwll.ch, duyuyang@gmail.com,
-        johannes.berg@intel.com, tj@kernel.org, tytso@mit.edu,
-        willy@infradead.org, david@fromorbit.com, amir73il@gmail.com,
-        gregkh@linuxfoundation.org, kernel-team@lge.com,
-        linux-mm@kvack.org, akpm@linux-foundation.org, mhocko@kernel.org,
-        minchan@kernel.org, hannes@cmpxchg.org, vdavydov.dev@gmail.com,
-        sj@kernel.org, jglisse@redhat.com, dennis@kernel.org, cl@linux.com,
-        penberg@kernel.org, rientjes@google.com, vbabka@suse.cz,
-        ngupta@vflare.org, linux-block@vger.kernel.org,
-        paolo.valente@linaro.org, josef@toxicpanda.com,
-        linux-fsdevel@vger.kernel.org, viro@zeniv.linux.org.uk,
-        jack@suse.cz, jlayton@kernel.org, dan.j.williams@intel.com,
-        hch@infradead.org, djwong@kernel.org,
-        dri-devel@lists.freedesktop.org, rodrigosiqueiramelo@gmail.com,
-        melissa.srw@gmail.com, hamohammed.sa@gmail.com,
-        42.hyeyoo@gmail.com, chris.p.wilson@intel.com,
-        gwan-gyeong.mun@intel.com
-Subject: Re: [PATCH RFC v7 03/23] dept: Add single event dependency tracker
- APIs
-In-Reply-To: <1673235231-30302-4-git-send-email-byungchul.park@lge.com>
-References: <1673235231-30302-1-git-send-email-byungchul.park@lge.com>
- <1673235231-30302-4-git-send-email-byungchul.park@lge.com>
-Date:   Wed, 18 Jan 2023 14:01:01 +0100
-Message-ID: <87tu0ohu9e.ffs@tglx>
+        Wed, 18 Jan 2023 08:42:55 -0500
+X-Greylist: delayed 242 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 18 Jan 2023 05:12:28 PST
+Received: from mail6.swissbit.com (mail5.swissbit.com [148.251.244.252])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79DB2474FD;
+        Wed, 18 Jan 2023 05:12:28 -0800 (PST)
+Received: from mail6.swissbit.com (localhost [127.0.0.1])
+        by DDEI (Postfix) with ESMTP id EC6572227A7;
+        Wed, 18 Jan 2023 13:07:35 +0000 (UTC)
+Received: from mail6.swissbit.com (localhost [127.0.0.1])
+        by DDEI (Postfix) with ESMTP id DF3592227A3;
+        Wed, 18 Jan 2023 13:07:35 +0000 (UTC)
+X-TM-AS-ERS: 10.181.10.103-127.5.254.253
+X-TM-AS-SMTP: 1.0 bXgxLmRtei5zd2lzc2JpdC5jb20= Y2xvZWhsZUBoeXBlcnN0b25lLmNvb
+        Q==
+X-DDEI-TLS-USAGE: Used
+Received: from mx1.dmz.swissbit.com (mx1.dmz.swissbit.com [10.181.10.103])
+        by mail6.swissbit.com (Postfix) with ESMTPS;
+        Wed, 18 Jan 2023 13:07:35 +0000 (UTC)
+From:   =?iso-8859-1?Q?Christian_L=F6hle?= <CLoehle@hyperstone.com>
+To:     "axboe@kernel.dk" <axboe@kernel.dk>,
+        "ulf.hansson@linaro.org" <ulf.hansson@linaro.org>,
+        "linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+CC:     Avri Altman <Avri.Altman@wdc.com>,
+        "adrian.hunter@intel.com" <adrian.hunter@intel.com>,
+        "vincent.whitchurch@axis.com" <vincent.whitchurch@axis.com>,
+        "bvanassche@acm.org" <bvanassche@acm.org>
+Subject: RE: [PATCH 1/3] block: Requeue req as head if driver touched it
+Thread-Topic: [PATCH 1/3] block: Requeue req as head if driver touched it
+Thread-Index: AdjpDEQm2rub+3iRTPCN7zrgvOwESBCMHO2A
+Date:   Wed, 18 Jan 2023 13:08:06 +0000
+Message-ID: <4e2b1f4c81ca478cb7e5644f5ae892cb@hyperstone.com>
+References: <22aa78389c9b4613841716c5b7bd89aa@hyperstone.com>
+In-Reply-To: <22aa78389c9b4613841716c5b7bd89aa@hyperstone.com>
+Accept-Language: en-US, de-DE
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+Content-Type: text/plain;
+        charset="iso-8859-1"
+Content-Transfer-Encoding: 8BIT
 MIME-Version: 1.0
-Content-Type: text/plain
+X-TMASE-Version: DDEI-5.1-9.0.1002-27392.007
+X-TMASE-Result: 10--9.637700-10.000000
+X-TMASE-MatchedRID: dwNgap4H9hjUL3YCMmnG4jo39wOA02LhlDt5PQMgj03kd9mvuqBe1m1d
+        AMAJtyyxOuzeNmOGKnPgvgZ753XHBrnccJTUpEM4rMZ+BqQt2NqnHBIbyMjCFJm3OIVSf4P5oon
+        zJ5ed8cDYgJy0r7VcQsLLQE2dzCJpL/tBTZzO5Q0D2WXLXdz+AUEe5VjFzwNbqIZZzG59lfQXnx
+        dWTEAtaYdAx4ypyagHfyYDewMOrQBccB/zVZ7coklXctromFFi+gtHj7OwNO38o7Ys1NK4Y7R7t
+        YRRx1roS/k5gHS6NuVwOxODheruVjSFiyUesjTO
+X-TMASE-SNAP-Result: 1.821001.0001-0-1-22:0,33:0,34:0-0
+X-TMASE-INERTIA: 0-0;;;;
+X-TMASE-XGENCLOUD: 6ddb0a30-efa8-4746-a997-ae18fdbdbf9b-0-0-200-0
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Jan 09 2023 at 12:33, Byungchul Park wrote:
-> +/*
-> + * sdt_might_sleep() and its family will be committed in __schedule()
-> + * when it actually gets to __schedule(). Both dept_request_event() and
-> + * dept_wait() will be performed on the commit.
-> + */
-> +
-> +/*
-> + * Use the code location as the class key if an explicit map is not used.
-> + */
-> +#define sdt_might_sleep_strong(m)					\
-> +	do {								\
-> +		struct dept_map *__m = m;				\
-> +		static struct dept_key __key;				\
-> +		dept_stage_wait(__m, __m ? NULL : &__key, _THIS_IP_, __func__, true);\
-> +	} while (0)
-> +
-> +/*
-> + * Use the code location as the class key if an explicit map is not used.
-> + */
-> +#define sdt_might_sleep_weak(m)						\
-> +	do {								\
-> +		struct dept_map *__m = m;				\
-> +		static struct dept_key __key;				\
-> +		dept_stage_wait(__m, __m ? NULL : &__key, _THIS_IP_, __func__, false);\
-> +	} while (0)
-> +
-> +#define sdt_might_sleep_finish()	dept_clean_stage()
-> +
-> +#define sdt_ecxt_enter(m)		dept_ecxt_enter(m, 1UL, _THIS_IP_, "start", "event", 0)
-> +#define sdt_event(m)			dept_event(m, 1UL, _THIS_IP_, __func__)
-> +#define sdt_ecxt_exit(m)		dept_ecxt_exit(m, 1UL, _THIS_IP_)
+Jens could you consider this patch?
+As far as I can see Barts series has not been merged in any form that would fix my problem and even if it does, requeuing RQF_DONTPREP as head seems on par at worst and a performance improvement at best.
 
-None of the above comes with a proper documentation of the various
-macros/functions. How should anyone aside of you understand what this is
-about and how this should be used?
 
-Thanks,
+-----Original Message-----
+From: Christian Löhle 
+Sent: Mittwoch, 26. Oktober 2022 09:29
+To: axboe@kernel.dk; ulf.hansson@linaro.org; linux-mmc@vger.kernel.org; linux-kernel@vger.kernel.org; 'linux-block@vger.kernel.org' <linux-block@vger.kernel.org>
+Cc: 'Avri Altman' <Avri.Altman@wdc.com>; adrian.hunter@intel.com; vincent.whitchurch@axis.com; 'Christian Löhle' <CLoehle@hyperstone.com>
+Subject: [PATCH 1/3] block: Requeue req as head if driver touched it
 
-        tglx
+In case the driver set RQF_DONTPREP flag, requeue the request as head as it is likely that the backing storage already had a request to an adjacent region, so getting the requeued request out as soon as possible may give us some performance benefit.
+
+Signed-off-by: Christian Loehle <cloehle@hyperstone.com>
+---
+ block/blk-mq.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/block/blk-mq.c b/block/blk-mq.c index 33292c01875d..d863c826fb23 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -1429,7 +1429,7 @@ static void blk_mq_requeue_work(struct work_struct *work)
+ 		 * merge.
+ 		 */
+ 		if (rq->rq_flags & RQF_DONTPREP)
+-			blk_mq_request_bypass_insert(rq, false, false);
++			blk_mq_request_bypass_insert(rq, true, false);
+ 		else
+ 			blk_mq_sched_insert_request(rq, true, false, false);
+ 	}
+--
+2.37.3
+
+Hyperstone GmbH | Reichenaustr. 39a  | 78467 Konstanz
+Managing Director: Dr. Jan Peter Berns.
+Commercial register of local courts: Freiburg HRB381782
+
