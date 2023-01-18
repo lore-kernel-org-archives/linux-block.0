@@ -2,114 +2,105 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42560C38142
-	for <linux-block@archiver.kernel.org>; Wed, 18 Jan 2023 01:39:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DEFEC38142
+	for <linux-block@archiver.kernel.org>; Wed, 18 Jan 2023 01:39:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229804AbjARBjP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 17 Jan 2023 20:39:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54820 "EHLO
+        id S229554AbjARBjT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 17 Jan 2023 20:39:19 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54752 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229763AbjARBjG (ORCPT
+        with ESMTP id S229725AbjARBjG (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Tue, 17 Jan 2023 20:39:06 -0500
 Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B9A551C7E;
-        Tue, 17 Jan 2023 17:39:03 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D19451C58;
+        Tue, 17 Jan 2023 17:39:05 -0800 (PST)
 Received: from mail02.huawei.com (unknown [172.30.67.143])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4NxT1t466sz4f3vdf;
-        Wed, 18 Jan 2023 09:38:58 +0800 (CST)
-Received: from huaweicloud.com (unknown [10.175.124.27])
-        by APP2 (Coremail) with SMTP id Syh0CgDnjOqxTcdjBACUBw--.30342S10;
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4NxT1w1hQqz4f3vdb;
         Wed, 18 Jan 2023 09:39:00 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.175.124.27])
+        by APP2 (Coremail) with SMTP id Syh0CgDnjOqxTcdjBACUBw--.30342S14;
+        Wed, 18 Jan 2023 09:39:02 +0800 (CST)
 From:   Kemeng Shi <shikemeng@huaweicloud.com>
 To:     hch@lst.de, axboe@kernel.dk, dwagner@suse.de, hare@suse.de,
         ming.lei@redhat.com, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org
 Cc:     john.garry@huawei.com, jack@suse.cz
-Subject: [PATCH v4 09/14] blk-mq: use blk_mq_commit_rqs helper in blk_mq_try_issue_list_directly
-Date:   Wed, 18 Jan 2023 17:37:21 +0800
-Message-Id: <20230118093726.3939160-9-shikemeng@huaweicloud.com>
+Subject: [PATCH v4 13/14] blk-mq: use switch/case to improve readability in blk_mq_try_issue_list_directly
+Date:   Wed, 18 Jan 2023 17:37:25 +0800
+Message-Id: <20230118093726.3939160-13-shikemeng@huaweicloud.com>
 X-Mailer: git-send-email 2.30.0
 In-Reply-To: <20230118093726.3939160-1-shikemeng@huaweicloud.com>
 References: <20230118093726.3939160-1-shikemeng@huaweicloud.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: Syh0CgDnjOqxTcdjBACUBw--.30342S10
-X-Coremail-Antispam: 1UD129KBjvJXoW7uFyfJryDGFyUGF1UKr4fuFg_yoW8Cr1UpF
-        W3GanIyr4Sqr4xZFW8Aay7uF17Jrs8Kry7Xryakw1aqrWUCrWSgF4aqr1xXFyrtrWkAa13
-        WFWDXr98AF4UWwUanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUBIb4IE77IF4wAFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k2
-        6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M280x2IEY4vEnII2IxkI6r1a6r45M2
-        8IrcIa0xkI8VA2jI8067AKxVWUAVCq3wA2048vs2IY020Ec7CjxVAFwI0_Xr0E3s1l8cAv
-        FVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVWDJVCq3w
-        A2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE
-        3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr2
-        1l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r106r15McIj6I8E87Iv
-        67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41l42xK82IYc2
-        Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s02
-        6x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0x
-        vE2Ix0cI8IcVAFwI0_JFI_Gr1lIxAIcVC0I7IYx2IY6xkF7I0E14v26F4j6r4UJwCI42IY
-        6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aV
-        CY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU058n7UUUUU==
+X-CM-TRANSID: Syh0CgDnjOqxTcdjBACUBw--.30342S14
+X-Coremail-Antispam: 1UD129KBjvdXoW7Xry5WF4kGw43ur15uw13CFg_yoWkZFb_ur
+        929rZ7JFs8KF15XrZYka12yFnrK34kJF1xuFW7tF95WF1IgFs8Gw15JF1YqrZrGay7Ca4r
+        Wry5ZrnYkr1xJjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+        9fnUUIcSsGvfJTRUUUbSAYFVCjjxCrM7AC8VAFwI0_Wr0E3s1l1xkIjI8I6I8E6xAIw20E
+        Y4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l87I20VAvwVAaII0Ic2I_JFv_Gryl82
+        xGYIkIc2x26280x7IE14v26r126s0DM28IrcIa0xkI8VCY1x0267AKxVW5JVCq3wA2ocxC
+        64kIII0Yj41l84x0c7CEw4AK67xGY2AK021l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM2
+        8EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4UJVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq
+        3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_GcCE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8w
+        Aqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_JrI_JrylYx0Ex4A2jsIE
+        14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwIxGrwCF04k20xvY0x
+        0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E
+        7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcV
+        C0I7IYx2IY67AKxVW8JVW5JwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr1j6F4UJwCI42IY
+        6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Gr0_Cr1lIxAIcVC2z280aV
+        CY1x0267AKxVW8Jr0_Cr1UYxBIdaVFxhVjvjDU0xZFpf9x07jcjjkUUUUU=
 X-CM-SenderInfo: 5vklyvpphqwq5kxd4v5lfo033gof0z/
 X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Call blk_mq_commit_rqs instead of access ->commit_rqs directly. As you
-can see in comment of blk_mq_commit_rqs, we only need explicitly call
-this in two cases:
- -did not queue everything initially scheduled to queue
- -the last attempt to queue a request failed
-Both cases can be checked with ret of last request which breaks list
-walk. Then we can remove unnecessary error count and unnecessary
-commit triggered by error besides cases described above.
+Use switch/case handle error as other function do to improve
+readability in blk_mq_try_issue_list_directly.
 
 Signed-off-by: Kemeng Shi <shikemeng@huaweicloud.com>
 ---
- block/blk-mq.c | 13 +++----------
- 1 file changed, 3 insertions(+), 10 deletions(-)
+ block/blk-mq.c | 22 +++++++++++++---------
+ 1 file changed, 13 insertions(+), 9 deletions(-)
 
 diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 4066fe5c3147..c945a4602849 100644
+index afd4f0c3166b..bc6d7e411b1a 100644
 --- a/block/blk-mq.c
 +++ b/block/blk-mq.c
-@@ -2815,17 +2815,15 @@ void blk_mq_try_issue_list_directly(struct blk_mq_hw_ctx *hctx,
- 		struct list_head *list)
- {
- 	int queued = 0;
--	int errors = 0;
-+	blk_status_t ret = BLK_STS_OK;
- 
- 	while (!list_empty(list)) {
--		blk_status_t ret;
- 		struct request *rq = list_first_entry(list, struct request,
- 				queuelist);
+@@ -2802,18 +2802,22 @@ void blk_mq_try_issue_list_directly(struct blk_mq_hw_ctx *hctx,
  
  		list_del_init(&rq->queuelist);
  		ret = blk_mq_request_issue_directly(rq, list_empty(list));
- 		if (ret != BLK_STS_OK) {
--			errors++;
- 			if (ret == BLK_STS_RESOURCE ||
- 					ret == BLK_STS_DEV_RESOURCE) {
- 				blk_mq_request_bypass_insert(rq, false,
-@@ -2837,13 +2835,8 @@ void blk_mq_try_issue_list_directly(struct blk_mq_hw_ctx *hctx,
+-		if (ret != BLK_STS_OK) {
+-			if (ret == BLK_STS_RESOURCE ||
+-					ret == BLK_STS_DEV_RESOURCE) {
+-				blk_mq_request_bypass_insert(rq, false,
+-							list_empty(list));
+-				break;
+-			}
+-			blk_mq_end_request(rq, ret);
+-		} else
++		switch (ret) {
++		case BLK_STS_OK:
  			queued++;
++			break;
++		case BLK_STS_RESOURCE:
++		case BLK_STS_DEV_RESOURCE:
++			blk_mq_request_bypass_insert(rq, false,
++						     list_empty(list));
++			goto out;
++		default:
++			blk_mq_end_request(rq, ret);
++			break;
++		}
  	}
  
--	/*
--	 * If we didn't flush the entire list, we could have told
--	 * the driver there was more coming, but that turned out to
--	 * be a lie.
--	 */
--	if (errors && hctx->queue->mq_ops->commit_rqs && queued)
--		hctx->queue->mq_ops->commit_rqs(hctx);
-+	if (ret != BLK_STS_OK)
-+		blk_mq_commit_rqs(hctx, queued, false);
++out:
+ 	if (ret != BLK_STS_OK)
+ 		blk_mq_commit_rqs(hctx, queued, false);
  }
- 
- static bool blk_mq_attempt_bio_merge(struct request_queue *q,
 -- 
 2.30.0
 
