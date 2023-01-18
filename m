@@ -2,107 +2,80 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C3A0C46467
-	for <linux-block@archiver.kernel.org>; Wed, 18 Jan 2023 13:43:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA0D2C38147
+	for <linux-block@archiver.kernel.org>; Wed, 18 Jan 2023 14:21:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231143AbjARNnW convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 18 Jan 2023 08:43:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42298 "EHLO
+        id S230133AbjAROVI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 18 Jan 2023 09:21:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48114 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230460AbjARNmz (ORCPT
+        with ESMTP id S230256AbjAROUf (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 18 Jan 2023 08:42:55 -0500
-X-Greylist: delayed 242 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 18 Jan 2023 05:12:28 PST
-Received: from mail6.swissbit.com (mail5.swissbit.com [148.251.244.252])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79DB2474FD;
-        Wed, 18 Jan 2023 05:12:28 -0800 (PST)
-Received: from mail6.swissbit.com (localhost [127.0.0.1])
-        by DDEI (Postfix) with ESMTP id EC6572227A7;
-        Wed, 18 Jan 2023 13:07:35 +0000 (UTC)
-Received: from mail6.swissbit.com (localhost [127.0.0.1])
-        by DDEI (Postfix) with ESMTP id DF3592227A3;
-        Wed, 18 Jan 2023 13:07:35 +0000 (UTC)
-X-TM-AS-ERS: 10.181.10.103-127.5.254.253
-X-TM-AS-SMTP: 1.0 bXgxLmRtei5zd2lzc2JpdC5jb20= Y2xvZWhsZUBoeXBlcnN0b25lLmNvb
-        Q==
-X-DDEI-TLS-USAGE: Used
-Received: from mx1.dmz.swissbit.com (mx1.dmz.swissbit.com [10.181.10.103])
-        by mail6.swissbit.com (Postfix) with ESMTPS;
-        Wed, 18 Jan 2023 13:07:35 +0000 (UTC)
-From:   =?iso-8859-1?Q?Christian_L=F6hle?= <CLoehle@hyperstone.com>
-To:     "axboe@kernel.dk" <axboe@kernel.dk>,
-        "ulf.hansson@linaro.org" <ulf.hansson@linaro.org>,
-        "linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-CC:     Avri Altman <Avri.Altman@wdc.com>,
-        "adrian.hunter@intel.com" <adrian.hunter@intel.com>,
-        "vincent.whitchurch@axis.com" <vincent.whitchurch@axis.com>,
-        "bvanassche@acm.org" <bvanassche@acm.org>
-Subject: RE: [PATCH 1/3] block: Requeue req as head if driver touched it
-Thread-Topic: [PATCH 1/3] block: Requeue req as head if driver touched it
-Thread-Index: AdjpDEQm2rub+3iRTPCN7zrgvOwESBCMHO2A
-Date:   Wed, 18 Jan 2023 13:08:06 +0000
-Message-ID: <4e2b1f4c81ca478cb7e5644f5ae892cb@hyperstone.com>
-References: <22aa78389c9b4613841716c5b7bd89aa@hyperstone.com>
-In-Reply-To: <22aa78389c9b4613841716c5b7bd89aa@hyperstone.com>
-Accept-Language: en-US, de-DE
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-Content-Type: text/plain;
-        charset="iso-8859-1"
-Content-Transfer-Encoding: 8BIT
+        Wed, 18 Jan 2023 09:20:35 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E45001E5EE
+        for <linux-block@vger.kernel.org>; Wed, 18 Jan 2023 06:01:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1674050490;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=ciJVSFE+YF6g3e2z4P8ZEvg2a2y1ihge8c1pR/PRMpg=;
+        b=a9UYzOwChhWLvphn+ehHlj3sD6UuCWZcfnir4job9pJrHzgaSfDF32Ufr/MEWyz+ffQsyG
+        fLWaWo2bl888T9f8Hfh58DLbLFGfGDiw9fvDROgAU61KdVKb7s5BGoV/NBpx4S5RQxuGau
+        4PkXOtKz9w08CkhT6xnleotrePWUpmY=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-530-vjE-fqjJOoKFX9u26vYQ6w-1; Wed, 18 Jan 2023 09:01:25 -0500
+X-MC-Unique: vjE-fqjJOoKFX9u26vYQ6w-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B3FF984B097;
+        Wed, 18 Jan 2023 14:00:57 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.33.36.23])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id E59E040C2006;
+        Wed, 18 Jan 2023 14:00:54 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <167391054631.2311931.7588488803802952158.stgit@warthog.procyon.org.uk>
+References: <167391054631.2311931.7588488803802952158.stgit@warthog.procyon.org.uk> <167391047703.2311931.8115712773222260073.stgit@warthog.procyon.org.uk>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     dhowells@redhat.com, Al Viro <viro@zeniv.linux.org.uk>,
+        Jens Axboe <axboe@kernel.dk>, Jan Kara <jack@suse.cz>,
+        Matthew Wilcox <willy@infradead.org>,
+        Logan Gunthorpe <logang@deltatee.com>,
+        linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
+        Jeff Layton <jlayton@kernel.org>,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v6 09/34] bio: Rename BIO_NO_PAGE_REF to BIO_PAGE_REFFED and invert the meaning
 MIME-Version: 1.0
-X-TMASE-Version: DDEI-5.1-9.0.1002-27392.007
-X-TMASE-Result: 10--9.637700-10.000000
-X-TMASE-MatchedRID: dwNgap4H9hjUL3YCMmnG4jo39wOA02LhlDt5PQMgj03kd9mvuqBe1m1d
-        AMAJtyyxOuzeNmOGKnPgvgZ753XHBrnccJTUpEM4rMZ+BqQt2NqnHBIbyMjCFJm3OIVSf4P5oon
-        zJ5ed8cDYgJy0r7VcQsLLQE2dzCJpL/tBTZzO5Q0D2WXLXdz+AUEe5VjFzwNbqIZZzG59lfQXnx
-        dWTEAtaYdAx4ypyagHfyYDewMOrQBccB/zVZ7coklXctromFFi+gtHj7OwNO38o7Ys1NK4Y7R7t
-        YRRx1roS/k5gHS6NuVwOxODheruVjSFiyUesjTO
-X-TMASE-SNAP-Result: 1.821001.0001-0-1-22:0,33:0,34:0-0
-X-TMASE-INERTIA: 0-0;;;;
-X-TMASE-XGENCLOUD: 6ddb0a30-efa8-4746-a997-ae18fdbdbf9b-0-0-200-0
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <2673695.1674050454.1@warthog.procyon.org.uk>
+Date:   Wed, 18 Jan 2023 14:00:54 +0000
+Message-ID: <2673696.1674050454@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.1
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Jens could you consider this patch?
-As far as I can see Barts series has not been merged in any form that would fix my problem and even if it does, requeuing RQF_DONTPREP as head seems on par at worst and a performance improvement at best.
+Actually, should I make it so that the bottom two bits of bi_flags are a
+four-state variable and make it such that bio_release_page() gives a warning
+if the state is 0 - ie. unset?
 
+The states would then be, say:
 
------Original Message-----
-From: Christian Löhle 
-Sent: Mittwoch, 26. Oktober 2022 09:29
-To: axboe@kernel.dk; ulf.hansson@linaro.org; linux-mmc@vger.kernel.org; linux-kernel@vger.kernel.org; 'linux-block@vger.kernel.org' <linux-block@vger.kernel.org>
-Cc: 'Avri Altman' <Avri.Altman@wdc.com>; adrian.hunter@intel.com; vincent.whitchurch@axis.com; 'Christian Löhle' <CLoehle@hyperstone.com>
-Subject: [PATCH 1/3] block: Requeue req as head if driver touched it
+	0	WARN(), do no cleanup
+	1	FOLL_GET
+	2	FOLL_PUT
+	3	do no cleanup
 
-In case the driver set RQF_DONTPREP flag, requeue the request as head as it is likely that the backing storage already had a request to an adjacent region, so getting the requeued request out as soon as possible may give us some performance benefit.
+This should help debug any places, such as iomap_dio_zero() that I just found,
+that add pages with refs without calling iov_iter_extract_pages().
 
-Signed-off-by: Christian Loehle <cloehle@hyperstone.com>
----
- block/blk-mq.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/block/blk-mq.c b/block/blk-mq.c index 33292c01875d..d863c826fb23 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1429,7 +1429,7 @@ static void blk_mq_requeue_work(struct work_struct *work)
- 		 * merge.
- 		 */
- 		if (rq->rq_flags & RQF_DONTPREP)
--			blk_mq_request_bypass_insert(rq, false, false);
-+			blk_mq_request_bypass_insert(rq, true, false);
- 		else
- 			blk_mq_sched_insert_request(rq, true, false, false);
- 	}
---
-2.37.3
-
-Hyperstone GmbH | Reichenaustr. 39a  | 78467 Konstanz
-Managing Director: Dr. Jan Peter Berns.
-Commercial register of local courts: Freiburg HRB381782
+David
 
