@@ -2,80 +2,82 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F412C32793
-	for <linux-block@archiver.kernel.org>; Wed, 18 Jan 2023 21:20:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 936AEC46467
+	for <linux-block@archiver.kernel.org>; Wed, 18 Jan 2023 22:06:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230024AbjARVUM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 18 Jan 2023 16:20:12 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50088 "EHLO
+        id S229482AbjARWGE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 18 Jan 2023 17:06:04 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52850 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230432AbjARVUI (ORCPT
+        with ESMTP id S230005AbjARWFp (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 18 Jan 2023 16:20:08 -0500
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88C33457CA
-        for <linux-block@vger.kernel.org>; Wed, 18 Jan 2023 13:20:07 -0800 (PST)
-Received: by mail-pl1-f175.google.com with SMTP id b17so355241pld.7
-        for <linux-block@vger.kernel.org>; Wed, 18 Jan 2023 13:20:07 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=c6h6kbarYsbc6Mk1Wk8cEyAYd12ve3nrJTJAhuMtgC0=;
-        b=SSP6F2YLPwBuk6ozleKtE9hWR31Bjn7VdTbuqZTORv5riZjnyXuQB7yOxxHTWRMF+c
-         0XWeKr/xmftqE8qn0WK7mUmO2Ikke9YXoKRUJ3ZLmwJ3XyiFabBrXwr3W4adX9GxhXzp
-         sDZVlZIIvaohe56+WaR5xkM0m6Gc8XEOx/JnIDjeSA7L51h+vJZ6UobS+k5ji2iwJdno
-         qYBG6/gEKrcVwjXuDcNXqkW8AJ50NqsLhtS1Wbr/HA9i8p7sRojpDBaGAZiXDtO9A4Xc
-         PS5buqYlbEq1Lua9xYTE9jQ2J0LIT4HBqE9XeBPuxO+GXRLndqrwSUIhnjTobH5c1UGa
-         9ObA==
-X-Gm-Message-State: AFqh2kruYyUfWQMnaiSDjnx3zKagrkFoD1EPQuXw2pKF94s7pKXTnxnf
-        62upPUHscrB8GHTwUdmrqEA=
-X-Google-Smtp-Source: AMrXdXsC2eELVU/sLwrE7rJa3rmR/u49YIDJ7Bh8fIZqunhpW3GDB6CbmKv7YchdD8ozoh8FbloaNQ==
-X-Received: by 2002:a17:902:8216:b0:194:59c2:a155 with SMTP id x22-20020a170902821600b0019459c2a155mr7736461pln.16.1674076806996;
-        Wed, 18 Jan 2023 13:20:06 -0800 (PST)
-Received: from ?IPV6:2620:15c:211:201:22ae:3ae3:fde6:2308? ([2620:15c:211:201:22ae:3ae3:fde6:2308])
-        by smtp.gmail.com with ESMTPSA id y2-20020a17090264c200b001930b7e2c04sm20516803pli.287.2023.01.18.13.20.05
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 18 Jan 2023 13:20:06 -0800 (PST)
-Message-ID: <c46f4aed-de57-9964-42ca-c34fce3d003e@acm.org>
-Date:   Wed, 18 Jan 2023 13:20:04 -0800
+        Wed, 18 Jan 2023 17:05:45 -0500
+Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [IPv6:2a03:a000:7:0:5054:ff:fe1c:15ff])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83635630BD;
+        Wed, 18 Jan 2023 14:05:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=linux.org.uk; s=zeniv-20220401; h=Sender:In-Reply-To:Content-Type:
+        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=Ph23ln2G3weWAIQMclCijpBxjfjqbvcIl1UPbyjflns=; b=m/Oc3dNKwITBehTqZzLwzPDz5K
+        igmF/szwBv4jT+BwWx4trHSh9wDmQ9fPO5Rp/PtMfG/HFdtpb3K8OqZivOX8o9VYS3o1j2N0k0NzY
+        etrpkOb0RbM4TRsLL9FuA0QJ2kPOz3hf88kQ8eM1DoKNJbgTVuk9EYO4NzWjkb4Sy/6dYcKevBr/Z
+        LQlEVF+tf67BuZcQO3sMorpBlwIHxhvu95LITp2+MoX9vK/CpNYfPBCbwKeT6jlPoDaWjlZu/gtAX
+        pR4pDHU4ebG1e9/zDM573RDjNMLdOZn2oqBhdqpA6QA6IT1lC9kOmzcH2u4Xb5oAnXuJ1xORdJwqx
+        AqsMKpBw==;
+Received: from viro by zeniv.linux.org.uk with local (Exim 4.96 #2 (Red Hat Linux))
+        id 1pIGYs-002cyB-2r;
+        Wed, 18 Jan 2023 22:05:38 +0000
+Date:   Wed, 18 Jan 2023 22:05:38 +0000
+From:   Al Viro <viro@zeniv.linux.org.uk>
+To:     David Howells <dhowells@redhat.com>
+Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>,
+        Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>,
+        Jeff Layton <jlayton@kernel.org>,
+        Logan Gunthorpe <logang@deltatee.com>,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v6 01/34] vfs: Unconditionally set IOCB_WRITE in
+ call_write_iter()
+Message-ID: <Y8htMvG33I73oG9z@ZenIV>
+References: <167391047703.2311931.8115712773222260073.stgit@warthog.procyon.org.uk>
+ <167391048988.2311931.1567396746365286847.stgit@warthog.procyon.org.uk>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.1
-Subject: Re: [PATCH v2] block: Improve shared tag set performance
-Content-Language: en-US
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Ming Lei <ming.lei@redhat.com>,
-        Keith Busch <kbusch@kernel.org>,
-        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-        Ed Tsai <ed.tsai@mediatek.com>
-References: <20230103195337.158625-1-bvanassche@acm.org>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20230103195337.158625-1-bvanassche@acm.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <167391048988.2311931.1567396746365286847.stgit@warthog.procyon.org.uk>
+Sender: Al Viro <viro@ftp.linux.org.uk>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/3/23 11:53, Bart Van Assche wrote:
-> Remove the code for fair tag sharing because it significantly hurts
-> performance for UFS devices. Removing this code is safe because the
-> legacy block layer worked fine without any equivalent fairness
-> algorithm.
+On Mon, Jan 16, 2023 at 11:08:09PM +0000, David Howells wrote:
+> IOCB_WRITE is set by aio, io_uring and cachefiles before submitting a write
+> operation to the VFS, but it isn't set by, say, the write() system call.
 > 
-> This algorithm hurts performance for UFS devices because UFS devices
-> have multiple logical units. One of these logical units (WLUN) is used
-> to submit control commands, e.g. START STOP UNIT. If any request is
-> submitted to the WLUN, the queue depth is reduced from 31 to 15 or
-> lower for data LUNs.
+> Fix this by setting IOCB_WRITE unconditionally in call_write_iter().
 
-Can anyone please help with reviewing this patch?
+	Which does nothing for places that do not use call_write_iter()...
+__kernel_write_iter() is one such; for less obvious specimen see
+drivers/nvme/target/io-cmd-file.c:nvmet_file_submit_bvec() - there
+we have iocb coming from the caller and *not* fed to init_sync_kiocb(),
+so Christoph's suggestion doesn't work either.  Sure, we could take
+care of that by adding ki_flags |= IOCB_WRITE in there, but...
 
-Thanks,
+FWIW, call chains for ->write_iter() (as an explicit method call) are:
 
-Bart.
+->write_iter() <- __kernel_write_iter() [init_sync_kiocb()]
+->write_iter() <- call_write_iter() <- new_sync_write() [init_sync_kiocb()]
+->write_iter() <- call_write_iter() <- do_iter_read_write() [init_sync_kiocb()]
+->write_iter() <- call_write_iter() <- aio_write() [sets KIOCB_WRITE]
+->write_iter() <- call_write_iter() <- io_write() [sets KIOCB_WRITE]
 
+->write_iter() <- nvmet_file_submit_bvec()
+->write_iter() <- call_write_iter() <- lo_rw_aio()
+->write_iter() <- call_write_iter() <- fd_execute_rw_aio()
+->write_iter() <- call_write_iter() <- vfs_iocb_iter_write()
+
+The last 4 neither set KIOCB_WRITE nor call init_sync_kiocb().  What's
+more, there are places that call instances (or their guts - look at
+btrfs_do_write_iter() callers) directly...
