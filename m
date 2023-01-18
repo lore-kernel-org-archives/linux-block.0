@@ -2,118 +2,100 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B12DDC00A5A
-	for <linux-block@archiver.kernel.org>; Wed, 18 Jan 2023 01:30:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5662AC38142
+	for <linux-block@archiver.kernel.org>; Wed, 18 Jan 2023 01:39:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229674AbjARBam (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 17 Jan 2023 20:30:42 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50512 "EHLO
+        id S229739AbjARBjH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 17 Jan 2023 20:39:07 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54748 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229658AbjARBaj (ORCPT
+        with ESMTP id S229741AbjARBjD (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 17 Jan 2023 20:30:39 -0500
+        Tue, 17 Jan 2023 20:39:03 -0500
 Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 473843EC48;
-        Tue, 17 Jan 2023 17:30:33 -0800 (PST)
-Received: from mail02.huawei.com (unknown [172.30.67.169])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4NxSr406M2z4f3pGD;
-        Wed, 18 Jan 2023 09:30:28 +0800 (CST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9FBC751C70;
+        Tue, 17 Jan 2023 17:39:01 -0800 (PST)
+Received: from mail02.huawei.com (unknown [172.30.67.143])
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4NxT1r03ySz4f3jYb;
+        Wed, 18 Jan 2023 09:38:56 +0800 (CST)
 Received: from huaweicloud.com (unknown [10.175.124.27])
-        by APP4 (Coremail) with SMTP id gCh0CgBHr7K0S8djLtqxBw--.50004S2;
-        Wed, 18 Jan 2023 09:30:30 +0800 (CST)
+        by APP2 (Coremail) with SMTP id Syh0CgDnjOqxTcdjBACUBw--.30342S4;
+        Wed, 18 Jan 2023 09:38:58 +0800 (CST)
 From:   Kemeng Shi <shikemeng@huaweicloud.com>
 To:     hch@lst.de, axboe@kernel.dk, dwagner@suse.de, hare@suse.de,
         ming.lei@redhat.com, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org
 Cc:     john.garry@huawei.com, jack@suse.cz
-Subject: [PATCH v4 00/14] A few bugfix and cleanup patches for blk-mq
-Date:   Wed, 18 Jan 2023 17:28:44 +0800
-Message-Id: <20230118092858.3911211-1-shikemeng@huaweicloud.com>
+Subject: [PATCH v4 03/14] blk-mq: wait on correct sbitmap_queue in blk_mq_mark_tag_wait
+Date:   Wed, 18 Jan 2023 17:37:15 +0800
+Message-Id: <20230118093726.3939160-3-shikemeng@huaweicloud.com>
 X-Mailer: git-send-email 2.30.0
+In-Reply-To: <20230118093726.3939160-1-shikemeng@huaweicloud.com>
+References: <20230118093726.3939160-1-shikemeng@huaweicloud.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgBHr7K0S8djLtqxBw--.50004S2
-X-Coremail-Antispam: 1UD129KBjvJXoWxWF45Kw1fXw1DCw1DWr1Utrb_yoW5GrWfpF
-        W3Ka13Jr4fXry7Xw1Syw47ZF9ayan7GrW7Xw13Gw1fXr4qkr18Krs2qw4fAFy8tFZ8Ca17
-        JF4rZ345KF10ya7anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUkFb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
+X-CM-TRANSID: Syh0CgDnjOqxTcdjBACUBw--.30342S4
+X-Coremail-Antispam: 1UD129KBjvJXoW7tF15AF1rKFW7tr4rZry3twb_yoW8XF47pF
+        43Cw4jkasaqr1jvFWkta9rC3WF939xKr93Grs3Cw4Ygr4rGrsxXr10gF4UXry0vrs5Ca98
+        Ar4qyryrAr1UX37anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUB0b4IE77IF4wAFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k2
         6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M280x2IEY4vEnII2IxkI6r1a6r45M2
-        8lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E
-        3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26r
-        xl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv
-        0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z2
-        80aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JMxAIw28I
-        cxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2
-        IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI
-        42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42
-        IY6xAIw20EY4v20xvaj40_WFyUJVCq3wCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E
-        87Iv6xkF7I0E14v26r1j6r4UYxBIdaVFxhVjvjDU0xZFpf9x07jIGQDUUUUU=
+        8IrcIa0xkI8VA2jI8067AKxVWUXwA2048vs2IY020Ec7CjxVAFwI0_Gr0_Xr1l8cAvFVAK
+        0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVWDJVCq3wA2z4
+        x0Y4vE2Ix0cI8IcVCY1x0267AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l
+        84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I
+        8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r106r15McIj6I8E87Iv67AK
+        xVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41l42xK82IYc2Ij64
+        vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8G
+        jcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2I
+        x0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK
+        8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I
+        0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUVDUUDUUUU
 X-CM-SenderInfo: 5vklyvpphqwq5kxd4v5lfo033gof0z/
 X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi, this series contain several bugfix patches to fix potential io
-hung and a few cleanup patches to remove stale codes and unnecessary
-check. Most changes are in request issue and dispatch path. Thanks.
+For shared queues case, we will only wait on bitmap_tags if we fail to get
+driver tag. However, rq could be from breserved_tags, then two problems
+will occur:
+1. io hung if no tag is currently allocated from bitmap_tags.
+2. unnecessary wakeup when tag is freed to bitmap_tags while no tag is
+freed to breserved_tags.
+Wait on the bitmap which rq from to fix this.
 
+Fixes: f906a6a0f426 ("blk-mq: improve tag waiting setup for non-shared tags")
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Kemeng Shi <shikemeng@huaweicloud.com>
 ---
-V4:
- -Eliminate remove of from_schedule parameter in blk_mq_commit_rqs in
-patch "blk-mq: remove unncessary from_schedule parameter in" and
-remove Reviewed-by tag of this changed patch.
- -Trace unplug event for all commits and make patches based on new
-general blk_mq_commit_rqs
- -Fix some code style issues.
- -Initialize ret to BLK_STS_OK in patches "blk-mq: remove unncessary
-error count and commit in" and "blk-mq: use blk_mq_commit_rqs helper in
-blk_mq_try_issue_list_directly".
+ block/blk-mq.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-V3:
- -Collect Reviewed-by from Christoph
- -Add new patch "blk-mq: make blk_mq_commit_rqs a general function for all
-commits" suggested-by Christoph
- -Move patch "blk-mq: remove unncessary from_schedule parameter in
-blk_mq_plug_issue_direct" forwad. This is because of some abandoned
-work, no influence anyway. No special attention should be paied.
- -Make patch based on rewriten blk_mq_commit_rqs.
-
-V2:
- -Thanks Christoph for review and there are two fixes in v2 according
-to recommends from Christoph.
-  1)Avoid overly long line in patch "blk-mq: avoid sleep in
-blk_mq_alloc_request_hctx"
-  2)Check BLK_MQ_REQ_NOWAIT and BLK_MQ_REQ_RESERVED in two WARN_ON_ONCE
----
-
-
-Kemeng Shi (14):
-  blk-mq: avoid sleep in blk_mq_alloc_request_hctx
-  blk-mq: remove stale comment for blk_mq_sched_mark_restart_hctx
-  blk-mq: wait on correct sbitmap_queue in blk_mq_mark_tag_wait
-  blk-mq: Fix potential io hung for shared sbitmap per tagset
-  blk-mq: remove unnecessary list_empty check in
-    blk_mq_try_issue_list_directly
-  blk-mq: remove unncessary from_schedule parameter in
-    blk_mq_plug_issue_direct
-  blk-mq: make blk_mq_commit_rqs a general function for all commits
-  blk-mq: remove unncessary error count and commit in
-    blk_mq_plug_issue_direct
-  blk-mq: use blk_mq_commit_rqs helper in blk_mq_try_issue_list_directly
-  blk-mq: simplify flush check in blk_mq_dispatch_rq_list
-  blk-mq: remove unnecessary error count and check in
-    blk_mq_dispatch_rq_list
-  blk-mq: remove set of bd->last when get driver tag for next request
-    fails
-  blk-mq: use switch/case to improve readability in
-    blk_mq_try_issue_list_directly
-  blk-mq: correct stale comment of .get_budget
-
- block/blk-mq-sched.c |   7 +--
- block/blk-mq.c       | 144 +++++++++++++++++++------------------------
- 2 files changed, 68 insertions(+), 83 deletions(-)
-
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 9c6a6ce9eaf2..943f2ce1e674 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -1826,7 +1826,7 @@ static int blk_mq_dispatch_wake(wait_queue_entry_t *wait, unsigned mode,
+ static bool blk_mq_mark_tag_wait(struct blk_mq_hw_ctx *hctx,
+ 				 struct request *rq)
+ {
+-	struct sbitmap_queue *sbq = &hctx->tags->bitmap_tags;
++	struct sbitmap_queue *sbq;
+ 	struct wait_queue_head *wq;
+ 	wait_queue_entry_t *wait;
+ 	bool ret;
+@@ -1849,6 +1849,10 @@ static bool blk_mq_mark_tag_wait(struct blk_mq_hw_ctx *hctx,
+ 	if (!list_empty_careful(&wait->entry))
+ 		return false;
+ 
++	if (blk_mq_tag_is_reserved(rq->mq_hctx->sched_tags, rq->internal_tag))
++		sbq = &hctx->tags->breserved_tags;
++	else
++		sbq = &hctx->tags->bitmap_tags;
+ 	wq = &bt_wait_ptr(sbq, hctx)->wait;
+ 
+ 	spin_lock_irq(&wq->lock);
 -- 
 2.30.0
 
