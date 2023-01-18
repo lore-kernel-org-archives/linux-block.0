@@ -2,71 +2,87 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B563C32793
-	for <linux-block@archiver.kernel.org>; Wed, 18 Jan 2023 22:14:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DB10C32793
+	for <linux-block@archiver.kernel.org>; Wed, 18 Jan 2023 22:19:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229861AbjARWOX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 18 Jan 2023 17:14:23 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58402 "EHLO
+        id S229830AbjARWTS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 18 Jan 2023 17:19:18 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33086 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230061AbjARWOW (ORCPT
+        with ESMTP id S230110AbjARWTH (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 18 Jan 2023 17:14:22 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8077065EDB
-        for <linux-block@vger.kernel.org>; Wed, 18 Jan 2023 14:14:18 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 1E6B761A5F
-        for <linux-block@vger.kernel.org>; Wed, 18 Jan 2023 22:14:18 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D9C75C433EF;
-        Wed, 18 Jan 2023 22:14:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1674080057;
-        bh=7ZVHrmFuhcTTsxU/5F6Zot2MiaTb9msyW5hSlnxeNM0=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=kvEpSKbAy5E8hV0JSlEZXPt3+d+nA225GXGSQrDzq/UsNxLrszMpv334fwChRVyiL
-         GQ6AfN10PsdkD42L7HM8Qky8srD/gn6gjaNnJtT9qwegMETNVTo2kULUE1VJV3xDyC
-         wUO8sO/2s7pFhZ7GMur8q6EMJmygfzAKw4i7KdJS90452V0yUAiKlkZ/U6a23MJTEZ
-         omE+XauYXsh9m3gGRA2DWFojp6QRMOdhbyTEah8QrB2vWVFZnqt8Z1UE39yJmBl6Ko
-         VXrXFVLpkO4CVzYOUJqA7etYLKX69+gI0wGNKTD+zthN5m0TEHDAShw+7mSyBSeHuV
-         up9DQEOeT6tiA==
-Date:   Wed, 18 Jan 2023 15:14:14 -0700
-From:   Keith Busch <kbusch@kernel.org>
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Ming Lei <ming.lei@redhat.com>,
-        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-        Ed Tsai <ed.tsai@mediatek.com>
-Subject: Re: [PATCH v2] block: Improve shared tag set performance
-Message-ID: <Y8hvNmyR3U1ge3H3@kbusch-mbp>
-References: <20230103195337.158625-1-bvanassche@acm.org>
+        Wed, 18 Jan 2023 17:19:07 -0500
+Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [IPv6:2a03:a000:7:0:5054:ff:fe1c:15ff])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 71BBA65EE0;
+        Wed, 18 Jan 2023 14:19:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=linux.org.uk; s=zeniv-20220401; h=Sender:In-Reply-To:Content-Type:
+        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=afuJng7oPx7uuacLqACHC95XAapdL6M+Vp9I11Mjg/c=; b=P94xXEwVLF+0g3HlNxc3bGIzfh
+        z2kHnyswepqw17ESp0zp12Fr/epS2ALte+qk7FXKrlOnaUK4+NItHlBs/RvoU7jWpjnUYwkIPk+Hw
+        3/DM1+54lHP82PB85J+GdtJ8pQQyMBnsV8dYnwbw2RRtDbyHoBVt93UPeuyXG+6cvH2JEeKttZYdL
+        oLIIi4jQBdYrqjHm/0F2ykrks+lDZr5grzRFv8+rTt2qxD/XORjJz++MmWGTgFIjpSehhojHTA+82
+        GQBd02LTe7Dg1qLRuhKd+0/Y5P5RdWgCxCQEVUUlh4Eip5lEq0L+vFQdxZQGpP8k8SvCMRpPyctPJ
+        uncilvcQ==;
+Received: from viro by zeniv.linux.org.uk with local (Exim 4.96 #2 (Red Hat Linux))
+        id 1pIGlh-002d3w-11;
+        Wed, 18 Jan 2023 22:18:53 +0000
+Date:   Wed, 18 Jan 2023 22:18:53 +0000
+From:   Al Viro <viro@zeniv.linux.org.uk>
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     David Howells <dhowells@redhat.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        Jens Axboe <axboe@kernel.dk>, Jan Kara <jack@suse.cz>,
+        Jeff Layton <jlayton@kernel.org>,
+        Logan Gunthorpe <logang@deltatee.com>,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v6 02/34] iov_iter: Use IOCB/IOMAP_WRITE/op_is_write
+ rather than iterator direction
+Message-ID: <Y8hwTQZziwA6U+bn@ZenIV>
+References: <167391047703.2311931.8115712773222260073.stgit@warthog.procyon.org.uk>
+ <167391049698.2311931.13641162904441620555.stgit@warthog.procyon.org.uk>
+ <Y8ZUXEB/W+K0Jt6k@infradead.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230103195337.158625-1-bvanassche@acm.org>
+In-Reply-To: <Y8ZUXEB/W+K0Jt6k@infradead.org>
+Sender: Al Viro <viro@ftp.linux.org.uk>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jan 03, 2023 at 11:53:37AM -0800, Bart Van Assche wrote:
-> Remove the code for fair tag sharing because it significantly hurts
-> performance for UFS devices. Removing this code is safe because the
-> legacy block layer worked fine without any equivalent fairness
-> algorithm.
+On Mon, Jan 16, 2023 at 11:55:08PM -0800, Christoph Hellwig wrote:
+> On Mon, Jan 16, 2023 at 11:08:17PM +0000, David Howells wrote:
+> > Use information other than the iterator direction to determine the
+> > direction of the I/O:
+> > 
+> >  (*) If a kiocb is available, use the IOCB_WRITE flag.
+> > 
+> >  (*) If an iomap_iter is available, use the IOMAP_WRITE flag.
+> > 
+> >  (*) If a request is available, use op_is_write().
+> 
+> The really should be three independent patches.  Plus another one
+> to drop the debug checks in cifs.
+> 
+> The changes themselves look good to me.
+> 
+> >  
+> > +static unsigned char iov_iter_rw(const struct iov_iter *i)
+> > +{
+> > +	return i->data_source ? WRITE : READ;
+> > +}
+> 
+> It might as well make sense to just open code this in the only
+> caller as well (yet another patch).
 
-The legacy block layer didn't have a limited tag resource that can block
-request allocations though, so I don't think we can appeal to that
-example to conclude removing this is safe. As much as I'd like to get
-rid of this code, I honestly have no idea if this isn't helping anyone.
- 
-> This algorithm hurts performance for UFS devices because UFS devices
-> have multiple logical units. One of these logical units (WLUN) is used
-> to submit control commands, e.g. START STOP UNIT. If any request is
-> submitted to the WLUN, the queue depth is reduced from 31 to 15 or
-> lower for data LUNs.
+Especially since
+		/* if it's a destination, tell g-u-p we want them writable */
+                if (!i->data_source)
+			gup_flags |= FOLL_WRITE;
+is less confusing than the current
+                if (iov_iter_rw(i) != WRITE)
+			gup_flags |= FOLL_WRITE;
 
-Can you give the WLUN it's own tagset instead?
