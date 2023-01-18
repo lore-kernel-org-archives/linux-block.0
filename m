@@ -2,88 +2,101 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6BE33C32793
-	for <linux-block@archiver.kernel.org>; Wed, 18 Jan 2023 14:43:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6931C32793
+	for <linux-block@archiver.kernel.org>; Wed, 18 Jan 2023 16:43:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230500AbjAROm5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 18 Jan 2023 09:42:57 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42260 "EHLO
+        id S230509AbjARQne (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 18 Jan 2023 11:43:34 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47312 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230031AbjAROlk (ORCPT
+        with ESMTP id S230344AbjARQnH (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 18 Jan 2023 09:41:40 -0500
-Received: from mail-il1-x12b.google.com (mail-il1-x12b.google.com [IPv6:2607:f8b0:4864:20::12b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 463245898C
-        for <linux-block@vger.kernel.org>; Wed, 18 Jan 2023 06:33:05 -0800 (PST)
-Received: by mail-il1-x12b.google.com with SMTP id u8so17063012ilq.13
-        for <linux-block@vger.kernel.org>; Wed, 18 Jan 2023 06:33:05 -0800 (PST)
+        Wed, 18 Jan 2023 11:43:07 -0500
+Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 037BE36FE7;
+        Wed, 18 Jan 2023 08:42:22 -0800 (PST)
+Received: by mail-pl1-x635.google.com with SMTP id r21so5355653plg.13;
+        Wed, 18 Jan 2023 08:42:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=sV/bqJT0gVZWvkACWfZdZZBtU/ph+2jBiIeN5ghXaKM=;
-        b=n3SEWKvZMrtu6BXBZWwuNIsCVRUCpTUXN0rOG6ISeO93P8PW5eHsTAdVEKJy3J/9Ht
-         ZEqyHN/vantWbegueXVI1qUjY5BWOMsWsUBzd/8DP82H65mqhfCMf7fT0ZslUwTBix0K
-         gTo1vBDup77kHOyB9CkSs0o4VQrIwBqYNK+O75G9P9R8Eks1X2mrwghcpBRI1Vf+7noB
-         qQXs9t7PtlvpbzyWJCAA1EcVttgmN53X6rxP8ecpoRnnX5QPNxJgcbgoI6MTkBUbLoaH
-         U7+Tn1TE4zr8iAeppFWyslTAn+vrhximYW/Gb9spXMMvAKjlGR8GuWlzqrl5X/TKcXHZ
-         6B1Q==
+        d=gmail.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=KQ5UR3/Xa0Iypn0NjAFlzAel5UzlsAahE0Mxf3hKvNI=;
+        b=HtEWoLc8/L8ms4jJfUX7yuSxC/Ev6BsvXo78m11rO02Mzvft0bqOU5nHJgEf2x1UOF
+         /frnN6FGr41Nzz9l7f4WNhNmhFM+Hfgqp8pt3ow80dUdKeRavboRhpPEoyCbap8j3Fxy
+         wEocSwLplENYxRNL0PmIkZOLr9oWalRRzl2+xOKKJawaoTvVPMks6Qc17rxKKr3B5d0V
+         qss+BaOxZucT4h29rQah3MOgKACtPm5b+WhTWvXH7xQqoz2v7+pDlfBBlECIGW2XTIIG
+         dx5jRtIW6M5uiMLHssv7ZCc8/7Yre8vncxwYpn2gyCTGVEYlUzpml7Flz0KFVJ1gBlwY
+         zwpg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=sV/bqJT0gVZWvkACWfZdZZBtU/ph+2jBiIeN5ghXaKM=;
-        b=D/1U66KAlvLp03V7Mh4xJp8XBW56UYOWwMP47PoWTrxxn2iux0LaHGSm8RY2LKJMnG
-         XFQWJUHifx7bzH30gYbmMIUy5gt/ISWodwe2eA36mfS75kLV3ZbNBuwk/sGImTCWrIep
-         TR/6qyj1vOnZLshxqsPR3O1J6sh70AlWm0V+Fw/YkoXAVOTw+3bgcr28TRCFXGVz/5Rf
-         5xc8E1NESQg/SdD4HjzHJeAG2CLpXZc2qzLCeuCbhtUnUf9BP/tcGIUIqbdwQ8W+AoON
-         VWPwShPgzT80IM2tYlXPMsNwFCOJOyhzxW/7r1hniLl/PABAD2ULC04GMpr3WEC/iMe/
-         rQCQ==
-X-Gm-Message-State: AFqh2kp0WvL1evMEm+ChxBD0JELeQNwoVjecLoNaUuWm30W764lCtzS1
-        voPT//qrSfAEtBI2Vn8ip4Sb/KhaHf2pUej5
-X-Google-Smtp-Source: AMrXdXurdYq56S6XLRII2FFmbvU3TKa69cl6igLZgzY3Ock9zecoFcBozomK0bRFtQrsgcj+zE0MDQ==
-X-Received: by 2002:a05:6e02:d4a:b0:30d:6d3f:59e5 with SMTP id h10-20020a056e020d4a00b0030d6d3f59e5mr1210972ilj.2.1674052384469;
-        Wed, 18 Jan 2023 06:33:04 -0800 (PST)
-Received: from [127.0.0.1] ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id m30-20020a02a15e000000b00375a885f908sm6801456jah.36.2023.01.18.06.33.03
+        bh=KQ5UR3/Xa0Iypn0NjAFlzAel5UzlsAahE0Mxf3hKvNI=;
+        b=BH5nny4P2NZUutfGZwJ/DpBMIgxuWu1N0cTASWfC+VlHsz1VbFsj9AHv2q4JgjPAQe
+         aP1lcc9tsa754mVV4TtJ/LAcjy9ZbEFSfmg1U6qCh7AFsf2bDrH3G9RLA3uV3Bescosl
+         3gZj0pKu8HhCdvJc/5SW7W5CDIz/fcIpx2209fQRkUF6XdNbfoftMiaO5NPL1oQTI0vm
+         Xu/8voY1aJidL7hlowI+J1UMBode5EnlekvXXUI+ZDrbLxBhMX6GAo4/yrrxWqhuKpbQ
+         4A8LsGSgQqliPU5qUKTijctPpJbNabBiCP1AMFY2sFMT/236kdAx06mpYK5dQb/LLT00
+         OQdg==
+X-Gm-Message-State: AFqh2kprUe6sgfJwAPmPdvff8cOMhAZg33sdUglCX78ETMRePiYAJ9YL
+        NA+JBIQqkre7StsJZ3k3Jms=
+X-Google-Smtp-Source: AMrXdXueQTctacY4LEDI4404AeLAbKX2kqptjDwyJqnpB1bBvgnsXJapr6+bC4djWGYj98C7/xZDFQ==
+X-Received: by 2002:a17:90a:88c:b0:226:8d3:7ed6 with SMTP id v12-20020a17090a088c00b0022608d37ed6mr7730465pjc.41.1674060141694;
+        Wed, 18 Jan 2023 08:42:21 -0800 (PST)
+Received: from localhost (2603-800c-1a02-1bae-a7fa-157f-969a-4cde.res6.spectrum.com. [2603:800c:1a02:1bae:a7fa:157f:969a:4cde])
+        by smtp.gmail.com with ESMTPSA id t7-20020a17090a024700b00228fe43d959sm1578813pje.5.2023.01.18.08.42.20
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Jan 2023 06:33:03 -0800 (PST)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     linux-block@vger.kernel.org,
-        Stephen Rothwell <sfr@canb.auug.org.au>
-In-Reply-To: <20230118042318.127900-1-ming.lei@redhat.com>
-References: <20230118042318.127900-1-ming.lei@redhat.com>
-Subject: Re: [PATCH] block: ublk: fix doc build warning
-Message-Id: <167405238353.131182.3975035373952672227.b4-ty@kernel.dk>
-Date:   Wed, 18 Jan 2023 07:33:03 -0700
+        Wed, 18 Jan 2023 08:42:21 -0800 (PST)
+Sender: Tejun Heo <htejun@gmail.com>
+Date:   Wed, 18 Jan 2023 06:42:19 -1000
+From:   Tejun Heo <tj@kernel.org>
+To:     Arnd Bergmann <arnd@kernel.org>
+Cc:     Josef Bacik <josef@toxicpanda.com>, Jens Axboe <axboe@kernel.dk>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Kemeng Shi <shikemeng@huawei.com>,
+        Andreas Herrmann <aherrmann@suse.de>,
+        Yu Kuai <yukuai3@huawei.com>,
+        Chengming Zhou <zhouchengming@bytedance.com>,
+        Jinke Han <hanjinke.666@bytedance.com>,
+        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] blk-iocost: avoid 64-bit division in ioc_timer_fn
+Message-ID: <Y8gha8kL5yG3RQ2w@slm.duckdns.org>
+References: <20230118080706.3303186-1-arnd@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.12-dev-78c63
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230118080706.3303186-1-arnd@kernel.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
-On Wed, 18 Jan 2023 12:23:18 +0800, Ming Lei wrote:
-> Fix the following warning:
+On Wed, Jan 18, 2023 at 09:07:01AM +0100, Arnd Bergmann wrote:
+> From: Arnd Bergmann <arnd@arndb.de>
 > 
-> Documentation/block/ublk.rst:157: WARNING: Enumerated list ends without a blank line; unexpected unindent.
-> Documentation/block/ublk.rst:171: WARNING: Enumerated list ends without a blank line; unexpected unindent.
+> The behavior of 'enum' types has changed in gcc-13, so now the
+> UNBUSY_THR_PCT constant is interpreted as a 64-bit number because
+> it is defined as part of the same enum definition as some other
+> constants that do not fit within a 32-bit integer. This in turn
+> leads to some inefficient code on 32-bit architectures as well
+> as a link error:
 > 
+> arm-linux-gnueabi/bin/arm-linux-gnueabi-ld: block/blk-iocost.o: in function `ioc_timer_fn':
+> blk-iocost.c:(.text+0x68e8): undefined reference to `__aeabi_uldivmod'
+> arm-linux-gnueabi-ld: blk-iocost.c:(.text+0x6908): undefined reference to `__aeabi_uldivmod'
 > 
+> Split the enum definition to keep the 64-bit timing constants in
+> a separate enum type from those constants that can clearly fit
+> within a smaller type.
+> 
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 
-Applied, thanks!
+Acked-by: Tejun Heo <tj@kernel.org>
 
-[1/1] block: ublk: fix doc build warning
-      commit: 5d5ce3a05940b3d72cfe8a6d22efd8e533f59d80
+Thanks.
 
-Best regards,
 -- 
-Jens Axboe
-
-
-
+tejun
