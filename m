@@ -2,43 +2,43 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DB04C00A5A
-	for <linux-block@archiver.kernel.org>; Wed, 18 Jan 2023 01:39:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 446ECC00A5A
+	for <linux-block@archiver.kernel.org>; Wed, 18 Jan 2023 01:39:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229802AbjARBjY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 17 Jan 2023 20:39:24 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54748 "EHLO
+        id S229645AbjARBj0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 17 Jan 2023 20:39:26 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54752 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229685AbjARBjG (ORCPT
+        with ESMTP id S229734AbjARBjF (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 17 Jan 2023 20:39:06 -0500
+        Tue, 17 Jan 2023 20:39:05 -0500
 Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 54C865143A;
-        Tue, 17 Jan 2023 17:39:04 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E52B51C7B;
+        Tue, 17 Jan 2023 17:39:03 -0800 (PST)
 Received: from mail02.huawei.com (unknown [172.30.67.143])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4NxT1v2pcZz4f4fwl;
-        Wed, 18 Jan 2023 09:38:59 +0800 (CST)
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4NxT1t1Cfzz4f4fwn;
+        Wed, 18 Jan 2023 09:38:58 +0800 (CST)
 Received: from huaweicloud.com (unknown [10.175.124.27])
-        by APP2 (Coremail) with SMTP id Syh0CgDnjOqxTcdjBACUBw--.30342S12;
-        Wed, 18 Jan 2023 09:39:01 +0800 (CST)
+        by APP2 (Coremail) with SMTP id Syh0CgDnjOqxTcdjBACUBw--.30342S9;
+        Wed, 18 Jan 2023 09:39:00 +0800 (CST)
 From:   Kemeng Shi <shikemeng@huaweicloud.com>
 To:     hch@lst.de, axboe@kernel.dk, dwagner@suse.de, hare@suse.de,
         ming.lei@redhat.com, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org
 Cc:     john.garry@huawei.com, jack@suse.cz
-Subject: [PATCH v4 11/14] blk-mq: remove unnecessary error count and check in blk_mq_dispatch_rq_list
-Date:   Wed, 18 Jan 2023 17:37:23 +0800
-Message-Id: <20230118093726.3939160-11-shikemeng@huaweicloud.com>
+Subject: [PATCH v4 08/14] blk-mq: remove unncessary error count and commit in blk_mq_plug_issue_direct
+Date:   Wed, 18 Jan 2023 17:37:20 +0800
+Message-Id: <20230118093726.3939160-8-shikemeng@huaweicloud.com>
 X-Mailer: git-send-email 2.30.0
 In-Reply-To: <20230118093726.3939160-1-shikemeng@huaweicloud.com>
 References: <20230118093726.3939160-1-shikemeng@huaweicloud.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: Syh0CgDnjOqxTcdjBACUBw--.30342S12
-X-Coremail-Antispam: 1UD129KBjvJXoW7Ar47WrW5WFW7Cr45Cr45Jrb_yoW8tw4rpF
-        45Gan0y34rXr40qry8Aa9xGwn0qrs5AryDWF9xC3yavF17Krs7Jr4rJrWUuFyfKrs0kF47
-        XF18WrWYyws7XrDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUBSb4IE77IF4wAFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k2
+X-CM-TRANSID: Syh0CgDnjOqxTcdjBACUBw--.30342S9
+X-Coremail-Antispam: 1UD129KBjvJXoW7uFyfJryDGFyUGF18Jry5urg_yoW8WF18pF
+        W3Ga9Ikrs2qr4xZa48JayxZ3WUJws5KryUA3yYkw1aq3yDGr4Iqr4rtrWxX340yrZ3Aa17
+        Wry5W34DJF15Ww7anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUBIb4IE77IF4wAFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k2
         6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M280x2IEY4vEnII2IxkI6r1a6r45M2
         8IrcIa0xkI8VA2jI8067AKxVWUAVCq3wA2048vs2IY020Ec7CjxVAFwI0_Xr0E3s1l8cAv
         FVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVWDJVCq3w
@@ -48,81 +48,69 @@ X-Coremail-Antispam: 1UD129KBjvJXoW7Ar47WrW5WFW7Cr45Cr45Jrb_yoW8tw4rpF
         67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41l42xK82IYc2
         Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s02
         6x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0x
-        vE2Ix0cI8IcVAFwI0_Gr0_Xr1lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4UJVWxJr1lIxAI
-        cVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r4j6F4UMIIF0xvEx4A2js
-        IEc7CjxVAFwI0_Gr1j6F4UJbIYCTnIWIevJa73UjIFyTuYvjxUxD7aUUUUU
+        vE2Ix0cI8IcVAFwI0_JFI_Gr1lIxAIcVC0I7IYx2IY6xkF7I0E14v26F4j6r4UJwCI42IY
+        6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aV
+        CY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU058n7UUUUU==
 X-CM-SenderInfo: 5vklyvpphqwq5kxd4v5lfo033gof0z/
 X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-blk_mq_dispatch_rq_list will notify if hctx is busy in return bool. It will
-return true if we are not busy and can handle more and return false on the
-opposite. Inside blk_mq_dispatch_rq_list, errors is only used if list is
-empty and we will return true if list is empty and (errors + queued) != 0.
-
-There are three types of status returned from request:
- -busy error BLK_STS*_RESOURCE: the failed request will be added back
-to list and list will not be empty.
- -BLK_STS_OK: We count queued for BLK_STS_OK
- -rest error: We count errors for rest error
-
-If list is empty, there is no request gets busy error then (errors +
-queued) will be total requests in the list which is checked not empty at
-beginning of blk_mq_dispatch_rq_list. So (errors + queued) != 0 is always
-met if list is empty. Then the (errors + queued) != 0 check and errors
-number count is not needed.
+We need only to explicitly commit in two error cases:
+ -did not queue everything initially scheduled to queue
+ -the last attempt to queue a request failed
+(see comment of blk_mq_commit_rqs for more details).
+Both cases can be checked with ret of last request which breaks list walk.
+Remove unnecessary error count and unnecessary commit triggered by error
+which is not covered by cases described above.
 
 Signed-off-by: Kemeng Shi <shikemeng@huaweicloud.com>
 ---
- block/blk-mq.c | 11 +++++------
- 1 file changed, 5 insertions(+), 6 deletions(-)
+ block/blk-mq.c | 14 ++++----------
+ 1 file changed, 4 insertions(+), 10 deletions(-)
 
 diff --git a/block/blk-mq.c b/block/blk-mq.c
-index d4fdb01475b6..90471b5c868f 100644
+index 159d9163c46c..4066fe5c3147 100644
 --- a/block/blk-mq.c
 +++ b/block/blk-mq.c
-@@ -2033,7 +2033,7 @@ bool blk_mq_dispatch_rq_list(struct blk_mq_hw_ctx *hctx, struct list_head *list,
- 	enum prep_dispatch prep;
- 	struct request_queue *q = hctx->queue;
- 	struct request *rq, *nxt;
--	int errors, queued;
-+	int queued;
- 	blk_status_t ret = BLK_STS_OK;
- 	LIST_HEAD(zone_list);
- 	bool needs_resource = false;
-@@ -2044,7 +2044,7 @@ bool blk_mq_dispatch_rq_list(struct blk_mq_hw_ctx *hctx, struct list_head *list,
- 	/*
- 	 * Now process all the entries, sending them to the driver.
- 	 */
--	errors = queued = 0;
-+	queued = 0;
- 	do {
- 		struct blk_mq_queue_data bd;
+@@ -2700,11 +2700,10 @@ static void blk_mq_plug_issue_direct(struct blk_plug *plug)
+ 	struct blk_mq_hw_ctx *hctx = NULL;
+ 	struct request *rq;
+ 	int queued = 0;
+-	int errors = 0;
++	blk_status_t ret = BLK_STS_OK;
  
-@@ -2097,7 +2097,6 @@ bool blk_mq_dispatch_rq_list(struct blk_mq_hw_ctx *hctx, struct list_head *list,
- 			needs_resource = true;
- 			break;
+ 	while ((rq = rq_list_pop(&plug->mq_list))) {
+ 		bool last = rq_list_empty(plug->mq_list);
+-		blk_status_t ret;
+ 
+ 		if (hctx != rq->mq_hctx) {
+ 			if (hctx) {
+@@ -2722,20 +2721,15 @@ static void blk_mq_plug_issue_direct(struct blk_plug *plug)
+ 		case BLK_STS_RESOURCE:
+ 		case BLK_STS_DEV_RESOURCE:
+ 			blk_mq_request_bypass_insert(rq, false, true);
+-			blk_mq_commit_rqs(hctx, queued, false);
+-			return;
++			goto out;
  		default:
--			errors++;
  			blk_mq_end_request(rq, ret);
+-			errors++;
+ 			break;
  		}
- 	} while (!list_empty(list));
-@@ -2175,10 +2174,10 @@ bool blk_mq_dispatch_rq_list(struct blk_mq_hw_ctx *hctx, struct list_head *list,
+ 	}
  
- 		blk_mq_update_dispatch_busy(hctx, true);
- 		return false;
--	} else
--		blk_mq_update_dispatch_busy(hctx, false);
-+	}
- 
--	return (queued + errors) != 0;
-+	blk_mq_update_dispatch_busy(hctx, false);
-+	return true;
+-	/*
+-	 * If we didn't flush the entire list, we could have told the driver
+-	 * there was more coming, but that turned out to be a lie.
+-	 */
+-	if (errors)
++out:
++	if (ret != BLK_STS_OK)
+ 		blk_mq_commit_rqs(hctx, queued, false);
  }
  
- /**
 -- 
 2.30.0
 
