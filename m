@@ -2,76 +2,88 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 74448C32793
-	for <linux-block@archiver.kernel.org>; Wed, 18 Jan 2023 14:25:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6BE33C32793
+	for <linux-block@archiver.kernel.org>; Wed, 18 Jan 2023 14:43:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231245AbjAROZr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 18 Jan 2023 09:25:47 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54494 "EHLO
+        id S230500AbjAROm5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 18 Jan 2023 09:42:57 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42260 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231295AbjAROZ2 (ORCPT
+        with ESMTP id S230031AbjAROlk (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 18 Jan 2023 09:25:28 -0500
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E923D8B303;
-        Wed, 18 Jan 2023 06:09:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=MFcR0OGBOZF6nFAA9jXYIyh+Hu0YfDAUMAAwjfRCkqc=; b=3SD7Vdt5AdW0YvzZzC12FMR9aL
-        W9WO1g7u7H/F/QxKA94pPX4KgPaws20mnQRb9EWhS61g3sN+SkwoJNIApn55lUy+3+rwB1CfjS10z
-        rUdZ4zwzUYCfdxtc36QlvXCRBE5ze8P3CniwiDeoU5yAFhtanBI30KfBwMSN1YGPtqlUAmO416saT
-        tctAs+YVGlvg9RsOb/6dtOVKnuJPD+NXC+2sewv4aTXnZND9MFqgCwy2HHGlE4BNSn5rtJiOFakcJ
-        ix7/T8E6dBA/F6hiLhPZcDu701pHd2DriNYKHCiWtW35N+VL5Jdwz1quemNt9yDeCbx6mzsc2PpBj
-        DlBYgbjA==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1pI985-001HFU-3c; Wed, 18 Jan 2023 14:09:29 +0000
-Date:   Wed, 18 Jan 2023 06:09:29 -0800
-From:   Christoph Hellwig <hch@infradead.org>
-To:     David Howells <dhowells@redhat.com>
-Cc:     Christoph Hellwig <hch@lst.de>, Al Viro <viro@zeniv.linux.org.uk>,
-        Jens Axboe <axboe@kernel.dk>, Jan Kara <jack@suse.cz>,
-        Matthew Wilcox <willy@infradead.org>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
-        Jeff Layton <jlayton@kernel.org>,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v6 09/34] bio: Rename BIO_NO_PAGE_REF to BIO_PAGE_REFFED
- and invert the meaning
-Message-ID: <Y8f9mSt+QuxuHOm9@infradead.org>
-References: <167391054631.2311931.7588488803802952158.stgit@warthog.procyon.org.uk>
- <167391047703.2311931.8115712773222260073.stgit@warthog.procyon.org.uk>
- <2673696.1674050454@warthog.procyon.org.uk>
+        Wed, 18 Jan 2023 09:41:40 -0500
+Received: from mail-il1-x12b.google.com (mail-il1-x12b.google.com [IPv6:2607:f8b0:4864:20::12b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 463245898C
+        for <linux-block@vger.kernel.org>; Wed, 18 Jan 2023 06:33:05 -0800 (PST)
+Received: by mail-il1-x12b.google.com with SMTP id u8so17063012ilq.13
+        for <linux-block@vger.kernel.org>; Wed, 18 Jan 2023 06:33:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=sV/bqJT0gVZWvkACWfZdZZBtU/ph+2jBiIeN5ghXaKM=;
+        b=n3SEWKvZMrtu6BXBZWwuNIsCVRUCpTUXN0rOG6ISeO93P8PW5eHsTAdVEKJy3J/9Ht
+         ZEqyHN/vantWbegueXVI1qUjY5BWOMsWsUBzd/8DP82H65mqhfCMf7fT0ZslUwTBix0K
+         gTo1vBDup77kHOyB9CkSs0o4VQrIwBqYNK+O75G9P9R8Eks1X2mrwghcpBRI1Vf+7noB
+         qQXs9t7PtlvpbzyWJCAA1EcVttgmN53X6rxP8ecpoRnnX5QPNxJgcbgoI6MTkBUbLoaH
+         U7+Tn1TE4zr8iAeppFWyslTAn+vrhximYW/Gb9spXMMvAKjlGR8GuWlzqrl5X/TKcXHZ
+         6B1Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=sV/bqJT0gVZWvkACWfZdZZBtU/ph+2jBiIeN5ghXaKM=;
+        b=D/1U66KAlvLp03V7Mh4xJp8XBW56UYOWwMP47PoWTrxxn2iux0LaHGSm8RY2LKJMnG
+         XFQWJUHifx7bzH30gYbmMIUy5gt/ISWodwe2eA36mfS75kLV3ZbNBuwk/sGImTCWrIep
+         TR/6qyj1vOnZLshxqsPR3O1J6sh70AlWm0V+Fw/YkoXAVOTw+3bgcr28TRCFXGVz/5Rf
+         5xc8E1NESQg/SdD4HjzHJeAG2CLpXZc2qzLCeuCbhtUnUf9BP/tcGIUIqbdwQ8W+AoON
+         VWPwShPgzT80IM2tYlXPMsNwFCOJOyhzxW/7r1hniLl/PABAD2ULC04GMpr3WEC/iMe/
+         rQCQ==
+X-Gm-Message-State: AFqh2kp0WvL1evMEm+ChxBD0JELeQNwoVjecLoNaUuWm30W764lCtzS1
+        voPT//qrSfAEtBI2Vn8ip4Sb/KhaHf2pUej5
+X-Google-Smtp-Source: AMrXdXurdYq56S6XLRII2FFmbvU3TKa69cl6igLZgzY3Ock9zecoFcBozomK0bRFtQrsgcj+zE0MDQ==
+X-Received: by 2002:a05:6e02:d4a:b0:30d:6d3f:59e5 with SMTP id h10-20020a056e020d4a00b0030d6d3f59e5mr1210972ilj.2.1674052384469;
+        Wed, 18 Jan 2023 06:33:04 -0800 (PST)
+Received: from [127.0.0.1] ([207.135.234.126])
+        by smtp.gmail.com with ESMTPSA id m30-20020a02a15e000000b00375a885f908sm6801456jah.36.2023.01.18.06.33.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 18 Jan 2023 06:33:03 -0800 (PST)
+From:   Jens Axboe <axboe@kernel.dk>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     linux-block@vger.kernel.org,
+        Stephen Rothwell <sfr@canb.auug.org.au>
+In-Reply-To: <20230118042318.127900-1-ming.lei@redhat.com>
+References: <20230118042318.127900-1-ming.lei@redhat.com>
+Subject: Re: [PATCH] block: ublk: fix doc build warning
+Message-Id: <167405238353.131182.3975035373952672227.b4-ty@kernel.dk>
+Date:   Wed, 18 Jan 2023 07:33:03 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2673696.1674050454@warthog.procyon.org.uk>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.12-dev-78c63
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jan 18, 2023 at 02:00:54PM +0000, David Howells wrote:
-> Actually, should I make it so that the bottom two bits of bi_flags are a
-> four-state variable and make it such that bio_release_page() gives a warning
-> if the state is 0 - ie. unset?
-> 
-> The states would then be, say:
-> 
-> 	0	WARN(), do no cleanup
-> 	1	FOLL_GET
-> 	2	FOLL_PUT
-> 	3	do no cleanup
-> 
-> This should help debug any places, such as iomap_dio_zero() that I just found,
-> that add pages with refs without calling iov_iter_extract_pages().
 
-I don't really see a point.  The fundamental use case of the bio itself
-isn't really to this at all.  So we're stealing one, or in the future
-two bits mostly to optimize some direct I/O use cases.  In fact I
-wonder if instead we should just drop this micro-optimization entirely
-an just add a member for the foll flags to the direct I/O container
-structures (struct blkdev_dio, strut iomap_dio, struct dio, or just on
-stack for __blkdev_direct_IO_simple and zonefs_file_dio_append) and
-pass that to bio_release_pages.
+On Wed, 18 Jan 2023 12:23:18 +0800, Ming Lei wrote:
+> Fix the following warning:
+> 
+> Documentation/block/ublk.rst:157: WARNING: Enumerated list ends without a blank line; unexpected unindent.
+> Documentation/block/ublk.rst:171: WARNING: Enumerated list ends without a blank line; unexpected unindent.
+> 
+> 
+
+Applied, thanks!
+
+[1/1] block: ublk: fix doc build warning
+      commit: 5d5ce3a05940b3d72cfe8a6d22efd8e533f59d80
+
+Best regards,
+-- 
+Jens Axboe
+
+
+
