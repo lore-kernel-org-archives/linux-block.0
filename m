@@ -2,96 +2,114 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D65F5C00A5A
-	for <linux-block@archiver.kernel.org>; Thu, 19 Jan 2023 04:49:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C392C00A5A
+	for <linux-block@archiver.kernel.org>; Thu, 19 Jan 2023 05:09:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229963AbjASEtg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 18 Jan 2023 23:49:36 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38034 "EHLO
+        id S229845AbjASFJR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 19 Jan 2023 00:09:17 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47318 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229831AbjASEsb (ORCPT
+        with ESMTP id S229776AbjASFIu (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 18 Jan 2023 23:48:31 -0500
-Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1125E78578;
-        Wed, 18 Jan 2023 20:43:39 -0800 (PST)
-Received: by mail-pj1-f44.google.com with SMTP id a14-20020a17090a70ce00b00229a2f73c56so4679343pjm.3;
-        Wed, 18 Jan 2023 20:43:39 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=0d4sY4KYUa7j537BEEIS3yVmB57Y9RzPLByhF0pYcg0=;
-        b=p1u9uQAtSu11kyaQ7NN86iY92w1WAoNEPWqTeMMo0ZT9OMydhNSP1zawCZdQe31/m/
-         CwZIQ+5Tya4Txs8IR3Wjn0pU/CQvwziC/EYZbVCmFZMq5uSSNg2UBtgweeZ+IsqOhqcc
-         YaEpaEBzcsFaMr+AmDwYD8ebv3bMywThknoTSr0xzhVZLvRe5JkVpTiZNwqLpfv3geHl
-         fFuV1GJsJt8halKm6aY8oo7IiXPrkM6bf5jVP6F8dgq/pLGML2MmQ52oXk7aFFwfoafa
-         uOeWxOu6XQYz6Uc01aTrNCtqTIFQxpEcpFD8iofqWknT+JXwQgoavudgMQf+jG//qHxI
-         8sag==
-X-Gm-Message-State: AFqh2kqZEbr8ANLb8gwcXU+LVdXAqNIQR4kXKpye4hPbZELUQTpHyCje
-        hzssSYhY07hAPdMff1LT/6g=
-X-Google-Smtp-Source: AMrXdXsA+sH1dun7aToK6KPMwZLBrSu2P+Ad0hT+aymj16K/rYS4kTMxv9n52wqM9jKUZGY5rYEtKw==
-X-Received: by 2002:a17:902:ebc9:b0:194:85da:16 with SMTP id p9-20020a170902ebc900b0019485da0016mr10777949plg.13.1674103393875;
-        Wed, 18 Jan 2023 20:43:13 -0800 (PST)
-Received: from [192.168.51.14] ([98.51.102.78])
-        by smtp.gmail.com with ESMTPSA id j15-20020a170903028f00b00190c6518e30sm24032502plr.243.2023.01.18.20.43.12
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 18 Jan 2023 20:43:13 -0800 (PST)
-Message-ID: <0e120274-29d8-cb53-2190-d82eabf4c431@acm.org>
-Date:   Wed, 18 Jan 2023 20:43:10 -0800
+        Thu, 19 Jan 2023 00:08:50 -0500
+Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [IPv6:2a03:a000:7:0:5054:ff:fe1c:15ff])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26E4C38E87;
+        Wed, 18 Jan 2023 21:04:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=linux.org.uk; s=zeniv-20220401; h=Sender:In-Reply-To:Content-Type:
+        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=NAMvashxzYH+spBRFwlJgqXsMFHLHxqFKBzzhdwgkjk=; b=rYU+ISrMtx552gxyvUYbfwOBGl
+        w0lWoJMHEipIW61re+ulGiG9id0ySKJZB53iPHOOu92CR1fi95zZ9A6Hvz9aORCxevWXuGg0R+EV2
+        Ivq3j7DMDuiAHbbhr0XP4gPKp6rbsGJ7zX0jGGMBiGh5OZFqdGcD0Lm9+0v4mgN4/6JJ63pC7/kuT
+        20ZWQr1p7rWIDnKqsoOD2XaUw7yKtUip6tSgPG58lGD/ZjPaEayFNcVX4qHvITvqDd9Zd6GB3dTRO
+        niI0iBk2H6b3mJzNJ1K/Ir0iVhQL5gIkXfWs7q9os+BfY9p+arQ7gZu2lCYGxqBR3dNOQqz0NbTEs
+        E5gMTcbQ==;
+Received: from viro by zeniv.linux.org.uk with local (Exim 4.96 #2 (Red Hat Linux))
+        id 1pIN64-002g9x-2g;
+        Thu, 19 Jan 2023 05:04:21 +0000
+Date:   Thu, 19 Jan 2023 05:04:20 +0000
+From:   Al Viro <viro@zeniv.linux.org.uk>
+To:     David Howells <dhowells@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, Jan Kara <jack@suse.cz>,
+        Christoph Hellwig <hch@lst.de>,
+        Matthew Wilcox <willy@infradead.org>,
+        Logan Gunthorpe <logang@deltatee.com>,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>,
+        Jeff Layton <jlayton@kernel.org>, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v6 18/34] dio: Pin pages rather than ref'ing if
+ appropriate
+Message-ID: <Y8jPVLewUaaiuplq@ZenIV>
+References: <167391047703.2311931.8115712773222260073.stgit@warthog.procyon.org.uk>
+ <167391061117.2311931.16807283804788007499.stgit@warthog.procyon.org.uk>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.1
-Subject: Re: [PATCH v3 0/9] Add support for segments smaller than one page
-Content-Language: en-US
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        Avri Altman <avri.altman@wdc.com>,
-        Adrian Hunter <adrian.hunter@intel.com>,
-        Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>
-References: <20230118225447.2809787-1-bvanassche@acm.org>
- <52073ee8-72ab-f424-1738-c56bc8d5cd67@kernel.dk>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <52073ee8-72ab-f424-1738-c56bc8d5cd67@kernel.dk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <167391061117.2311931.16807283804788007499.stgit@warthog.procyon.org.uk>
+Sender: Al Viro <viro@ftp.linux.org.uk>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/18/23 17:18, Jens Axboe wrote:
-> On 1/18/23 3:54?PM, Bart Van Assche wrote:
->> Hi Jens,
->>
->> Several embedded storage controllers need support for DMA segments that are
->> smaller than the size of one virtual memory page. Hence this patch series.
->> Please consider this patch series for the next merge window.
+On Mon, Jan 16, 2023 at 11:10:11PM +0000, David Howells wrote:
+> Convert the generic direct-I/O code to use iov_iter_extract_pages() instead
+> of iov_iter_get_pages().  This will pin pages or leave them unaltered
+> rather than getting a ref on them as appropriate to the iterator.
 > 
-> Before any real reviews are done, I have to ask "why?". This is pretty
-> hairy code in the middle of the fast path for some obscure controller.
-> Why would anyone ship that with > 4k page sizes rather than ship it with
-> a controller that is sane?
+> The pages need to be pinned for DIO-read rather than having refs taken on
+> them to prevent VM copy-on-write from malfunctioning during a concurrent
+> fork() (the result of the I/O would otherwise end up only visible to the
+> child process and not the parent).
 
-Hi Jens,
+Several observations:
 
-The new config variable CONFIG_BLK_SUB_PAGE_SEGMENTS has been introduced 
-to make sure that the hot path is *not* affected if that config variable 
-is disabled.
+1) fs/direct-io.c is ancient, grotty and has few remaining users.
+The case of block devices got split off first; these days it's in
+block/fops.c.  Then iomap-using filesystems went to fs/iomap/direct-io.c,
+leaving this sucker used only by affs, ext2, fat, exfat, hfs, hfsplus, jfs,
+nilfs2, ntfs3, reiserfs, udf and ocfs2.  And frankly, the sooner it dies
+the better off we are.  IOW, you've picked an uninteresting part and left
+the important ones untouched.
 
-Regarding the question "why": the Google Android team would like to 
-improve performance by switching from 4 KiB pages to 16 KiB pages. One 
-of the widely used UFS controllers (Exynos) has a maximum segment size 
-of 4 KiB. Hence this patch series.
+2) if you look at the "should_dirty" logics in either of those (including
+fs/direct-io.c itself) you'll see a funny thing.  First of all,
+dio->should_dirty (or its counterparts) gets set iff we have a user-backed
+iter and operation is a read.  I.e. precisely the case when you get bio
+marked with BIO_PAGE_PINNED.  And that's not an accident - look at the
+places where we check that predicate: dio_bio_submit() calls
+bio_set_pages_dirty() if that predicate is true before submitting the
+sucker and dio_bio_complete() uses it to choose between bio_check_pages_dirty()
+and bio_release_pages() + bio_put().
 
-This patch series is not only useful for phones but also for Tesla cars 
-since Tesla cars use an Exynos UFS controller.
+Look at bio_check_pages_dirty() - it checks if any of the pages we were
+reading into had managed to lose the dirty bit; if none had it does
+bio_release_pages(bio, false) + bio_put(bio) and returns.  If some had,
+it shoves bio into bio_dirty_list and arranges for bio_release_pages(bio, true)
++ bio_put(bio) called from upper half (via schedule_work()).  The effect
+of the second argument of bio_release_pages() is to (re)dirty the pages;
+it can't be done from interrupt, so we have to defer it to process context.
 
-A contributor to the MMC driver told me that this patch series would 
-allow to simplify the MMC driver significantly (I have not yet double 
-checked this).
+Now, do we need to redirty anything there?  Recall that page pinning had
+been introduced precisely to prevent writeback while the page is getting
+DMA into it.  Who is going to mark it clean before we unpin it?
 
-Bart.
+Unless I misunderstand something fundamental about the whole thing,
+this crap should become useless with that conversion.  And it's not just
+the ->should_dirty and its equivalents - bio_check_pages_dirty() and
+the stuff around it should also be gone once block/fops.c and
+fs/iomap/direct-io.c are switched to your iov_iter_extract_pages.
+Moreover, that way the only places legitimately passing true to
+bio_release_pages() are blk_rq_unmap_user() (on completion of
+bypass read request mapping a user page) and __blkdev_direct_IO_simple()
+(on completion of short sync O_DIRECT read from block device).
+Both could just as well call bio_set_pages_dirty(bio) +
+bio_release_pages(bio, false), killing the "dirty on release" logics
+and losing the 'mark_dirty' argument.
 
-
+BTW, where do we dirty the pages on IO_URING_OP_READ_FIXED with
+O_DIRECT file?  AFAICS, bio_set_pages_dirty() won't be called
+(ITER_BVEC iter) and neither will bio_release_pages() do anything
+(BIO_NO_PAGE_REF set on the bio by bio_iov_bvec_set() called
+due to the same ITER_BVEC iter).  Am I missing something trivial
+here?  Jens?
