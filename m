@@ -2,91 +2,98 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9059FC004D4
-	for <linux-block@archiver.kernel.org>; Thu, 19 Jan 2023 13:34:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F352EC00A5A
+	for <linux-block@archiver.kernel.org>; Thu, 19 Jan 2023 14:24:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231303AbjASNeb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 19 Jan 2023 08:34:31 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41836 "EHLO
+        id S229872AbjASOYX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 19 Jan 2023 09:24:23 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46600 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231265AbjASNeP (ORCPT
+        with ESMTP id S229820AbjASOYW (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 19 Jan 2023 08:34:15 -0500
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 617B87CCC7;
-        Thu, 19 Jan 2023 05:34:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=Dd4KE++vWIKamqThkehHj7fJpHW3aChCNzZyFef73OI=; b=ZiBP9IU8e0RQ32NiZKka8MnWTR
-        Dn0s9lTcFdzt4feEZuNn6vIgEPzmD5cviY4HNiw+EGim/+fdqSp83CwedDaJFyd2q2vePAOMF7R47
-        /mT/pV3FrXZ0OCNIOm/rgdNiJAiF9udqbmgCvdv8tlfjrQES8QDp+06hIwoNapYXBTR+i6XKWX5ij
-        qkK3CEH0iS8hZp+JgId9L10gYqA1yZnepzrHrEzU/DThBM4jGZH4pD6906x9w3V5a2ZVJlG7+GsLd
-        IX8t76QoYPJmUT+lx0lOj7EEt0PIr724UtBaPXC85udHqrL+r1umcOCxsWYgULtsg+F/hymdVlFkZ
-        MS0yEAZA==;
-Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1pIV3G-00106x-OP; Thu, 19 Jan 2023 13:33:58 +0000
-Date:   Thu, 19 Jan 2023 13:33:58 +0000
-From:   Matthew Wilcox <willy@infradead.org>
-To:     Byungchul Park <byungchul.park@lge.com>
-Cc:     boqun.feng@gmail.com, linux-kernel@vger.kernel.org,
-        torvalds@linux-foundation.org, damien.lemoal@opensource.wdc.com,
-        linux-ide@vger.kernel.org, adilger.kernel@dilger.ca,
-        linux-ext4@vger.kernel.org, mingo@redhat.com, peterz@infradead.org,
-        will@kernel.org, tglx@linutronix.de, rostedt@goodmis.org,
-        joel@joelfernandes.org, sashal@kernel.org, daniel.vetter@ffwll.ch,
-        duyuyang@gmail.com, johannes.berg@intel.com, tj@kernel.org,
-        tytso@mit.edu, david@fromorbit.com, amir73il@gmail.com,
-        gregkh@linuxfoundation.org, kernel-team@lge.com,
-        linux-mm@kvack.org, akpm@linux-foundation.org, mhocko@kernel.org,
-        minchan@kernel.org, hannes@cmpxchg.org, vdavydov.dev@gmail.com,
-        sj@kernel.org, jglisse@redhat.com, dennis@kernel.org, cl@linux.com,
-        penberg@kernel.org, rientjes@google.com, vbabka@suse.cz,
-        ngupta@vflare.org, linux-block@vger.kernel.org,
-        paolo.valente@linaro.org, josef@toxicpanda.com,
-        linux-fsdevel@vger.kernel.org, viro@zeniv.linux.org.uk,
-        jack@suse.cz, jlayton@kernel.org, dan.j.williams@intel.com,
-        hch@infradead.org, djwong@kernel.org,
-        dri-devel@lists.freedesktop.org, rodrigosiqueiramelo@gmail.com,
-        melissa.srw@gmail.com, hamohammed.sa@gmail.com,
-        42.hyeyoo@gmail.com, chris.p.wilson@intel.com,
-        gwan-gyeong.mun@intel.com, max.byungchul.park@gmail.com,
-        longman@redhat.com
-Subject: Re: [PATCH RFC v7 00/23] DEPT(Dependency Tracker)
-Message-ID: <Y8lGxkBrls6qQOdM@casper.infradead.org>
-References: <Y8bmeffIQ3iXU3Ux@boqun-archlinux>
- <1674109388-6663-1-git-send-email-byungchul.park@lge.com>
+        Thu, 19 Jan 2023 09:24:22 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49281359B
+        for <linux-block@vger.kernel.org>; Thu, 19 Jan 2023 06:23:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1674138222;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+        bh=xcrjXPZDX7R9jSoNCpV3rPeVgVzgUf1s0d7wCqmxknY=;
+        b=AT+y0lcJfs/3/NDzG8xVlfjmld+4pRZD7cJjwVcnWFe0J13Nr1C6v6TArA+6C8uAl+qUeb
+        /LpaMWXh3kPeTXu8ilqJkEZxRGu76FmIiuzx+/rwfO5QPiEpjbmSH3cISIqPoC4nySHQeH
+        TV8/0cow/9ORO/SV2eSwDmKyuPyvGzY=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-428-4vCX5u6kOv-DIqVNu1Hkpw-1; Thu, 19 Jan 2023 09:23:39 -0500
+X-MC-Unique: 4vCX5u6kOv-DIqVNu1Hkpw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 6ECC7181E3F5;
+        Thu, 19 Jan 2023 14:23:38 +0000 (UTC)
+Received: from T590 (ovpn-8-27.pek2.redhat.com [10.72.8.27])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 4F0AD40C6EC4;
+        Thu, 19 Jan 2023 14:23:33 +0000 (UTC)
+Date:   Thu, 19 Jan 2023 22:23:28 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     io-uring@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, nbd@other.debian.org
+Cc:     ming.lei@redhat.com
+Subject: ublk-nbd: ublk-nbd is avaialbe
+Message-ID: <Y8lSYBU9q5fjs7jS@T590>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1674109388-6663-1-git-send-email-byungchul.park@lge.com>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jan 19, 2023 at 03:23:08PM +0900, Byungchul Park wrote:
-> Boqun wrote:
-> > *	Looks like the DEPT dependency graph doesn't handle the
-> > 	fair/unfair readers as lockdep current does. Which bring the
-> > 	next question.
-> 
-> No. DEPT works better for unfair read. It works based on wait/event. So
-> read_lock() is considered a potential wait waiting on write_unlock()
-> while write_lock() is considered a potential wait waiting on either
-> write_unlock() or read_unlock(). DEPT is working perfect for it.
-> 
-> For fair read (maybe you meant queued read lock), I think the case
-> should be handled in the same way as normal lock. I might get it wrong.
-> Please let me know if I miss something.
+Hi,
 
-From the lockdep/DEPT point of view, the question is whether:
+ublk-nbd[1] is available now.
 
-	read_lock(A)
-	read_lock(A)
+Basically it is one nbd client, but totally implemented in userspace,
+and wrt. current nbd-client in [2], the transmission phase is done
+by linux block nbd driver.
 
-can deadlock if a writer comes in between the two acquisitions and
-sleeps waiting on A to be released.  A fair lock will block new
-readers when a writer is waiting, while an unfair lock will allow
-new readers even while a writer is waiting.
+The handshake implementation is borrowed from nbd project[2], so
+basically ublk-nbd just adds new code for implementing transmission
+phase, and it can be thought as moving linux block nbd driver into
+userspace.
+
+The added new code is basically in nbd/tgt_nbd.cpp, and io handling
+is based on liburing[3], and implemented by c++20 coroutine, so
+everything is done in single pthread totally lockless, meantime turns
+out it is pretty easy to design & implement, attributed to ublk framework,
+c++20 coroutine and liburing.
+
+ublk-nbd supports both tcp and unix socket, and allows to enable io_uring
+send zero copy via command line '--send_zc', see details in README[4].
+
+No regression is found in xfstests by using ublk-nbd as both test device
+and scratch device, and builtin test(make test T=nbd) runs well.
+
+Fio test("make test T=nbd") shows that ublk-nbd performance is
+basically same with nbd-client/nbd driver when running fio on real
+ethernet link(1g, 10+g), but ublk-nbd IOPS is higher by ~40% than
+nbd-client(nbd driver) with 512K BS, which is because linux nbd
+driver sets max_sectors_kb as 64KB at default.
+
+But when running fio over local tcp socket, it is observed in my test
+machine that ublk-nbd performs better than nbd-client/nbd driver,
+especially with 2 queue/2 jobs, and the gap could be 10% ~ 30%
+according to different block size.
+
+Any comments are welcome!
+
+[1] https://github.com/ming1/ubdsrv/blob/master/nbd
+[2] https://github.com/NetworkBlockDevice/nbd
+[3] https://github.com/axboe/liburing
+[4] https://github.com/ming1/ubdsrv/blob/master/nbd/README.rst
+
+Thanks,
+Ming
 
