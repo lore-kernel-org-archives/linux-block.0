@@ -2,88 +2,77 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CC73C004D4
-	for <linux-block@archiver.kernel.org>; Thu, 19 Jan 2023 19:28:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DF9EC678D4
+	for <linux-block@archiver.kernel.org>; Thu, 19 Jan 2023 21:24:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229661AbjAST23 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 19 Jan 2023 14:28:29 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43728 "EHLO
+        id S230255AbjASVYb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 19 Jan 2023 16:24:31 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37960 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229811AbjAST22 (ORCPT
+        with ESMTP id S230254AbjASVW2 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 19 Jan 2023 14:28:28 -0500
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 33F3293713
-        for <linux-block@vger.kernel.org>; Thu, 19 Jan 2023 11:28:27 -0800 (PST)
-Received: by mail-pl1-f169.google.com with SMTP id p24so3221539plw.11
-        for <linux-block@vger.kernel.org>; Thu, 19 Jan 2023 11:28:27 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=SmJAnlAt95K35Bv1y5VX9yNdsbwOrlhGc1QwL/wBLNQ=;
-        b=V5dnLtA6u14MBFlImUPM5TMDY4Rhg7KKuOhNz1KsGgUSpA0zb9Da1/mKIMu4DYLWzy
-         QFaSL5giB0cZZikHr8FeqNpsfyr/VVQw8beAynqDqvHrFW6kcoKLXqoinNPqTA/ZNRlt
-         72T/8bps0yBHtjh3q6iBc280Hw8fFXq3U8Ds71TzzE3ZIlFJza0yYyqyCVmluGn0xD3X
-         gp7covvIkQHZ7qB4iuc/UggLw/nEl4oGipFzoXysqBCdJpLoEhMyBsBDp/mu7PUktZMO
-         KiTNk9l0wHNAqKAMJkEtBYGEug+Hq2z45IYsnNRKRf9eUDUDLkqxENlVld4x0YgAcg7u
-         w8HA==
-X-Gm-Message-State: AFqh2koyH8XzuHriIfUQKNAAtCZpWkUtOlqPiidQ/3ahitsrfyTEk1nR
-        ZGSWF3qMfy15JfilUB0hNYk=
-X-Google-Smtp-Source: AMrXdXs3Iac5Qe0UPSy0bjY1LQ/BmgaWToiimu63v79jlnefH6Yc7XxVMte9jDdzB6uxUH2hKThIUg==
-X-Received: by 2002:a17:903:1252:b0:194:d9ca:7c56 with SMTP id u18-20020a170903125200b00194d9ca7c56mr1210165plh.58.1674156506543;
-        Thu, 19 Jan 2023 11:28:26 -0800 (PST)
-Received: from ?IPV6:2620:15c:211:201:ff60:f896:307d:56f7? ([2620:15c:211:201:ff60:f896:307d:56f7])
-        by smtp.gmail.com with ESMTPSA id j18-20020a635952000000b004cd1f1a14f6sm7281532pgm.86.2023.01.19.11.28.24
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 19 Jan 2023 11:28:25 -0800 (PST)
-Message-ID: <1f50643c-0f34-4477-789d-f86185330c27@acm.org>
-Date:   Thu, 19 Jan 2023 11:28:23 -0800
+        Thu, 19 Jan 2023 16:22:28 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49D32A2961
+        for <linux-block@vger.kernel.org>; Thu, 19 Jan 2023 13:14:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1674162892;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=i1IMCqddgWykv8AXR/YeAqVJq9PsFQed00N0J64kJGo=;
+        b=N+XavR/d04kvy+vNmHXdROxgc6zSa1gu52k4JmGlCInBqaqV4a56nO74nl7efG96BZ1Yuu
+        jYppticNL32L/kHl0dh82P71m+qmi17pZAfpHMZdn+YMZOfFe89bTU6YauZ9gXD1uwbmbB
+        QIs0Y1IK7NjSKbHCf2indjYjliyE9bU=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-153-hi1FagP5OzO-eBN77YCRog-1; Thu, 19 Jan 2023 16:14:49 -0500
+X-MC-Unique: hi1FagP5OzO-eBN77YCRog-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id BAE92181E3F4;
+        Thu, 19 Jan 2023 21:14:48 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.33.36.23])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id D291A51EF;
+        Thu, 19 Jan 2023 21:14:46 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <Y8l0Xdd0MKbuVa7z@infradead.org>
+References: <Y8l0Xdd0MKbuVa7z@infradead.org> <Y8jYrahu45kkCRlq@infradead.org> <167391047703.2311931.8115712773222260073.stgit@warthog.procyon.org.uk> <167391048988.2311931.1567396746365286847.stgit@warthog.procyon.org.uk> <Y8ZTyx7vM8NpnUAj@infradead.org> <Y8huoSe4j6ysLUTT@ZenIV> <2731230.1674128066@warthog.procyon.org.uk>
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     dhowells@redhat.com, Al Viro <viro@zeniv.linux.org.uk>,
+        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>,
+        Jeff Layton <jlayton@kernel.org>,
+        Logan Gunthorpe <logang@deltatee.com>,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v6 01/34] vfs: Unconditionally set IOCB_WRITE in call_write_iter()
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.1
-Subject: Re: [PATCH v2] block: Improve shared tag set performance
-Content-Language: en-US
-To:     Keith Busch <kbusch@kernel.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Ming Lei <ming.lei@redhat.com>,
-        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-        Ed Tsai <ed.tsai@mediatek.com>
-References: <20230103195337.158625-1-bvanassche@acm.org>
- <Y8hvNmyR3U1ge3H3@kbusch-mbp> <4be69fc0-af32-b552-6a36-f75eb798ca95@acm.org>
- <Y8mQWTRze+SXD7Oz@kbusch-mbp>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <Y8mQWTRze+SXD7Oz@kbusch-mbp>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <3037548.1674162886.1@warthog.procyon.org.uk>
+Date:   Thu, 19 Jan 2023 21:14:46 +0000
+Message-ID: <3037549.1674162886@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.5
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/19/23 10:47, Keith Busch wrote:
-> I think the potential performance sacrifice was done on purpose in order
-> to guarantee all tagset subscribers can have at least one unblocked
-> access to the pool, otherwise one LUN could starve all the others by
-> tying up all the tags in long-running operations. Is anyone actually
-> benefiting from the current sharing, though? I really do not know, so
-> I'm having trouble weighing in on removing it.
+Christoph Hellwig <hch@infradead.org> wrote:
 
-Hi Keith,
+> So what about deferring this whole cleanup for now?
 
-Hmm ... does reserving tags for one logical unit / namespace really help 
-if long-running operations are active on another logical unit or 
-namespace? For storage devices where the storage medium is shared across 
-logical units or namespaces reserving tags won't help if the storage 
-controller is not able to interrupt ongoing medium accesses. For storage 
-devices with multiple "spindles" (e.g. a NAS) the tag fairness algorithm 
-may help but this is not guaranteed.
+So you'd rather I stick with the direction indicator in the iov_iter struct
+for now?
 
-How about making it configurable (request queue flag?) whether the tag 
-fairness algorithm is active and leaving this algorithm disabled by default?
+I still want to add iov_iter_extract_pages(), netfs_extract_user_iter() and
+netfs_extract_iter_to_sg(), even if it's only cifs and netfslib that use them
+for the moment.
 
-Thanks,
+David
 
-Bart.
