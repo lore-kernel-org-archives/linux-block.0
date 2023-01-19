@@ -2,72 +2,190 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E9BEC677F1
-	for <linux-block@archiver.kernel.org>; Thu, 19 Jan 2023 02:32:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A18CAC677F1
+	for <linux-block@archiver.kernel.org>; Thu, 19 Jan 2023 02:52:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229615AbjASCcE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 18 Jan 2023 21:32:04 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46550 "EHLO
+        id S229851AbjASCwe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 18 Jan 2023 21:52:34 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56584 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229446AbjASCcD (ORCPT
+        with ESMTP id S229838AbjASCwe (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 18 Jan 2023 21:32:03 -0500
+        Wed, 18 Jan 2023 21:52:34 -0500
 Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [IPv6:2a03:a000:7:0:5054:ff:fe1c:15ff])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC3FAA24E;
-        Wed, 18 Jan 2023 18:32:02 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3AF114490;
+        Wed, 18 Jan 2023 18:52:33 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=linux.org.uk; s=zeniv-20220401; h=Sender:In-Reply-To:Content-Type:
         MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=ALLkriTWE+SzQ0sqzMUjGDLtM+PH1VXpy/CU3zVeJ/E=; b=ENObJlCpA6C70A+samIfTPkGeo
-        5zl+m9fp7s4ZnPB0kuPmwyEkDZujgpYlmLu0t4X5ZAzAwUPxgOXOqRVRgMy8ATxPO72aTVyZ18Mg9
-        4JW3pJPVJFDK8G2VxY37mD3WdE+qOz6wLrsMbh6AG+4gTYdZua0jHS/MFtCOwzXv3TXjsKnsnUGqO
-        fq4aYMHb+HygThlbM6fSCQMmpt2glx+yY/+m2fOKCbET69IKJihm+fhkdChtyFwxPFOB6l3O3E/6F
-        HfLhAqZoEUnk3Y3AK5ufM9wTGFHm70MzOLZIFGgDvw9A8hhfBiMixFbq0mVTPpjqB9VcYUYksS3Dn
-        ch6T6PcQ==;
+        bh=HnE8fVbkB/BVCYxP+S1x8sDjBJ0ldtemNXen2hWnksk=; b=oqdy5dQXQK8UKr2bchgDpmzr4u
+        /YEa4vss13qzDFzF/5SZ6+YIyD4koYihP2urPA99HHyQPAeqFTwNoDCD/nwRMM99Gud8hcYQ6kWQO
+        3NNQaUuORpB5S2seuDUMhMGySxvMub3F89zZnCiXz9KHoAAHJdZMXDiLpsAp6znVF4da8iOzr0OlJ
+        +QiwMga1XvlbOpQz+A4ICPE0otE5Y88xCqIwMlyvaVVGTJ+Ydurhxd3SADgPaxnJ8iVYYPN4h04JC
+        tmtjCQB/Ozgx7lcaNDD7I9yYZ5Ja69xsVH95GxSK8u16M5ZaZ3m/9nHWKGUeSsd/a5KcWAHDZbfft
+        Vmx9DLiw==;
 Received: from viro by zeniv.linux.org.uk with local (Exim 4.96 #2 (Red Hat Linux))
-        id 1pIKib-002euc-2o;
-        Thu, 19 Jan 2023 02:31:57 +0000
-Date:   Thu, 19 Jan 2023 02:31:57 +0000
+        id 1pIL2C-002f1r-1E;
+        Thu, 19 Jan 2023 02:52:12 +0000
+Date:   Thu, 19 Jan 2023 02:52:12 +0000
 From:   Al Viro <viro@zeniv.linux.org.uk>
 To:     David Howells <dhowells@redhat.com>
-Cc:     Christoph Hellwig <hch@lst.de>,
-        Matthew Wilcox <willy@infradead.org>,
-        linux-fsdevel@vger.kernel.org,
+Cc:     Dominique Martinet <asmadeus@codewreck.org>,
+        Eric Van Hensbergen <ericvh@gmail.com>,
+        Latchesar Ionkov <lucho@ionkov.net>,
+        Christian Schoenebeck <linux_oss@crudebyte.com>,
+        v9fs-developer@lists.sourceforge.net,
         Christoph Hellwig <hch@infradead.org>,
+        Matthew Wilcox <willy@infradead.org>,
         Jens Axboe <axboe@kernel.dk>, Jan Kara <jack@suse.cz>,
         Jeff Layton <jlayton@kernel.org>,
         Logan Gunthorpe <logang@deltatee.com>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v6 20/34] vfs: Make splice use iov_iter_extract_pages()
-Message-ID: <Y8irne7Dj6H6GIc8@ZenIV>
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v6 21/34] 9p: Pin pages rather than ref'ing if appropriate
+Message-ID: <Y8iwXJ2gMcCyXzm4@ZenIV>
 References: <167391047703.2311931.8115712773222260073.stgit@warthog.procyon.org.uk>
- <167391062544.2311931.15195962488932892568.stgit@warthog.procyon.org.uk>
+ <167391063242.2311931.3275290816918213423.stgit@warthog.procyon.org.uk>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <167391062544.2311931.15195962488932892568.stgit@warthog.procyon.org.uk>
+In-Reply-To: <167391063242.2311931.3275290816918213423.stgit@warthog.procyon.org.uk>
 Sender: Al Viro <viro@ftp.linux.org.uk>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Jan 16, 2023 at 11:10:25PM +0000, David Howells wrote:
+On Mon, Jan 16, 2023 at 11:10:32PM +0000, David Howells wrote:
 
-> diff --git a/fs/splice.c b/fs/splice.c
-> index 19c5b5adc548..c3433266ba1b 100644
-> --- a/fs/splice.c
-> +++ b/fs/splice.c
-> @@ -1159,14 +1159,18 @@ static int iter_to_pipe(struct iov_iter *from,
->  	size_t total = 0;
->  	int ret = 0;
+> @@ -310,73 +310,34 @@ static int p9_get_mapped_pages(struct virtio_chan *chan,
+>  			       struct iov_iter *data,
+>  			       int count,
+>  			       size_t *offs,
+> -			       int *need_drop,
+> +			       int *cleanup_mode,
+>  			       unsigned int gup_flags)
+>  {
+>  	int nr_pages;
+>  	int err;
+> +	int n;
 >  
-> +	/* For the moment, all pages attached to a pipe must have refs, not pins. */
-> +	if (WARN_ON(iov_iter_extract_mode(from, FOLL_SOURCE_BUF) != FOLL_GET))
-> +		return -EIO;
+>  	if (!iov_iter_count(data))
+>  		return 0;
+>  
+> -	if (!iov_iter_is_kvec(data)) {
+> -		int n;
+> -		/*
+> -		 * We allow only p9_max_pages pinned. We wait for the
+> -		 * Other zc request to finish here
+> -		 */
+> -		if (atomic_read(&vp_pinned) >= chan->p9_max_pages) {
+> -			err = wait_event_killable(vp_wq,
+> -			      (atomic_read(&vp_pinned) < chan->p9_max_pages));
+> -			if (err == -ERESTARTSYS)
+> -				return err;
+> -		}
+> -		n = iov_iter_get_pages_alloc(data, pages, count, offs,
+> -					     gup_flags);
+> -		if (n < 0)
+> -			return n;
+> -		*need_drop = 1;
+> -		nr_pages = DIV_ROUND_UP(n + *offs, PAGE_SIZE);
+> -		atomic_add(nr_pages, &vp_pinned);
+> -		return n;
+> -	} else {
+> -		/* kernel buffer, no need to pin pages */
+> -		int index;
+> -		size_t len;
+> -		void *p;
+> -
+> -		/* we'd already checked that it's non-empty */
+> -		while (1) {
+> -			len = iov_iter_single_seg_count(data);
+> -			if (likely(len)) {
+> -				p = data->kvec->iov_base + data->iov_offset;
+> -				break;
+> -			}
+> -			iov_iter_advance(data, 0);
+> -		}
+> -		if (len > count)
+> -			len = count;
+> -
+> -		nr_pages = DIV_ROUND_UP((unsigned long)p + len, PAGE_SIZE) -
+> -			   (unsigned long)p / PAGE_SIZE;
+> -
+> -		*pages = kmalloc_array(nr_pages, sizeof(struct page *),
+> -				       GFP_NOFS);
+> -		if (!*pages)
+> -			return -ENOMEM;
+> -
+> -		*need_drop = 0;
+> -		p -= (*offs = offset_in_page(p));
+> -		for (index = 0; index < nr_pages; index++) {
+> -			if (is_vmalloc_addr(p))
+> -				(*pages)[index] = vmalloc_to_page(p);
+> -			else
+> -				(*pages)[index] = kmap_to_page(p);
+> -			p += PAGE_SIZE;
+> -		}
+> -		iov_iter_advance(data, len);
+> -		return len;
+> +	/*
+> +	 * We allow only p9_max_pages pinned. We wait for the
+> +	 * Other zc request to finish here
+> +	 */
+> +	if (atomic_read(&vp_pinned) >= chan->p9_max_pages) {
+> +		err = wait_event_killable(vp_wq,
+> +					  (atomic_read(&vp_pinned) < chan->p9_max_pages));
+> +		if (err == -ERESTARTSYS)
+> +			return err;
+>  	}
+> +
+> +	n = iov_iter_extract_pages(data, pages, count, offs, gup_flags);
 
-Huh?  WTF does that have to do with pins?  Why would we be pinning the _source_
-pages anyway?  We do want them referenced, for obvious reasons (they might be
-stuck in the pipe), but that has nothing to do with get vs. pin.
+Wait a sec; just how would that work for ITER_KVEC?  AFAICS, in your
+tree that would blow with -EFAULT...
 
-If anything, this is one place where we want the semantics of iov_iter_get_pages...
+Yup; in p9_client_readdir() in your tree:
+
+net/9p/client.c:2057:	iov_iter_kvec(&to, ITER_DEST, &kv, 1, count);
+
+net/9p/client.c:2077:		req = p9_client_zc_rpc(clnt, P9_TREADDIR, &to, NULL, rsize, 0,
+net/9p/client.c:2078:				       11, "dqd", fid->fid, offset, rsize);
+
+where
+net/9p/client.c:799:	err = c->trans_mod->zc_request(c, req, uidata, uodata,
+net/9p/client.c:800:				       inlen, olen, in_hdrlen);
+
+and in p9_virtio_zc_request(), which is a possible ->zc_request() instance
+net/9p/trans_virtio.c:402:		int n = p9_get_mapped_pages(chan, &out_pages, uodata,
+net/9p/trans_virtio.c:403:					    outlen, &offs, &cleanup_mode,
+net/9p/trans_virtio.c:404:					    FOLL_DEST_BUF);
+
+with p9_get_mapped_pages() hitting
+net/9p/trans_virtio.c:334:	n = iov_iter_extract_pages(data, pages, count, offs, gup_flags);
+net/9p/trans_virtio.c:335:	if (n < 0)
+net/9p/trans_virtio.c:336:		return n;
+
+and in iov_iter_extract_get_pages()
+lib/iov_iter.c:2250:	if (likely(user_backed_iter(i)))
+lib/iov_iter.c:2251:		return iov_iter_extract_user_pages(i, pages, maxsize,
+lib/iov_iter.c:2252:						   maxpages, gup_flags,
+lib/iov_iter.c:2253:						   offset0);
+lib/iov_iter.c:2254:	if (iov_iter_is_bvec(i))
+lib/iov_iter.c:2255:		return iov_iter_extract_bvec_pages(i, pages, maxsize,
+lib/iov_iter.c:2256:						   maxpages, gup_flags,
+lib/iov_iter.c:2257:						   offset0);
+lib/iov_iter.c:2258:	if (iov_iter_is_pipe(i))
+lib/iov_iter.c:2259:		return iov_iter_extract_pipe_pages(i, pages, maxsize,
+lib/iov_iter.c:2260:						   maxpages, gup_flags,
+lib/iov_iter.c:2261:						   offset0);
+lib/iov_iter.c:2262:	if (iov_iter_is_xarray(i))
+lib/iov_iter.c:2263:		return iov_iter_extract_xarray_pages(i, pages, maxsize,
+lib/iov_iter.c:2264:						     maxpages, gup_flags,
+lib/iov_iter.c:2265:						     offset0);
+lib/iov_iter.c:2266:	return -EFAULT;
+
+All quoted lines by your
+https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/tree/
+How could that possibly work?
