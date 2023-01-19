@@ -2,114 +2,188 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C392C00A5A
-	for <linux-block@archiver.kernel.org>; Thu, 19 Jan 2023 05:09:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC449C678D6
+	for <linux-block@archiver.kernel.org>; Thu, 19 Jan 2023 05:13:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229845AbjASFJR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 19 Jan 2023 00:09:17 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47318 "EHLO
+        id S229787AbjASFNO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 19 Jan 2023 00:13:14 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48684 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229776AbjASFIu (ORCPT
+        with ESMTP id S229804AbjASFMe (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 19 Jan 2023 00:08:50 -0500
-Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [IPv6:2a03:a000:7:0:5054:ff:fe1c:15ff])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26E4C38E87;
-        Wed, 18 Jan 2023 21:04:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=linux.org.uk; s=zeniv-20220401; h=Sender:In-Reply-To:Content-Type:
-        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=NAMvashxzYH+spBRFwlJgqXsMFHLHxqFKBzzhdwgkjk=; b=rYU+ISrMtx552gxyvUYbfwOBGl
-        w0lWoJMHEipIW61re+ulGiG9id0ySKJZB53iPHOOu92CR1fi95zZ9A6Hvz9aORCxevWXuGg0R+EV2
-        Ivq3j7DMDuiAHbbhr0XP4gPKp6rbsGJ7zX0jGGMBiGh5OZFqdGcD0Lm9+0v4mgN4/6JJ63pC7/kuT
-        20ZWQr1p7rWIDnKqsoOD2XaUw7yKtUip6tSgPG58lGD/ZjPaEayFNcVX4qHvITvqDd9Zd6GB3dTRO
-        niI0iBk2H6b3mJzNJ1K/Ir0iVhQL5gIkXfWs7q9os+BfY9p+arQ7gZu2lCYGxqBR3dNOQqz0NbTEs
-        E5gMTcbQ==;
-Received: from viro by zeniv.linux.org.uk with local (Exim 4.96 #2 (Red Hat Linux))
-        id 1pIN64-002g9x-2g;
-        Thu, 19 Jan 2023 05:04:21 +0000
-Date:   Thu, 19 Jan 2023 05:04:20 +0000
-From:   Al Viro <viro@zeniv.linux.org.uk>
-To:     David Howells <dhowells@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, Jan Kara <jack@suse.cz>,
-        Christoph Hellwig <hch@lst.de>,
-        Matthew Wilcox <willy@infradead.org>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>,
-        Jeff Layton <jlayton@kernel.org>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v6 18/34] dio: Pin pages rather than ref'ing if
- appropriate
-Message-ID: <Y8jPVLewUaaiuplq@ZenIV>
-References: <167391047703.2311931.8115712773222260073.stgit@warthog.procyon.org.uk>
- <167391061117.2311931.16807283804788007499.stgit@warthog.procyon.org.uk>
+        Thu, 19 Jan 2023 00:12:34 -0500
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4796D24128;
+        Wed, 18 Jan 2023 21:11:26 -0800 (PST)
+Received: from mail02.huawei.com (unknown [172.30.67.143])
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4Ny7HX4Tmnz4f3xcK;
+        Thu, 19 Jan 2023 11:23:04 +0800 (CST)
+Received: from [10.174.176.73] (unknown [10.174.176.73])
+        by APP3 (Coremail) with SMTP id _Ch0CgDn4R+Zt8hj+1ZBBw--.54593S3;
+        Thu, 19 Jan 2023 11:23:06 +0800 (CST)
+Subject: Re: [PATCH -next v2 3/3] blk-cgroup: synchronize pd_free_fn() from
+ blkg_free_workfn() and blkcg_deactivate_policy()
+To:     Tejun Heo <tj@kernel.org>, Yu Kuai <yukuai1@huaweicloud.com>
+Cc:     hch@lst.de, josef@toxicpanda.com, axboe@kernel.dk,
+        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, yi.zhang@huawei.com,
+        yangerkun@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
+References: <20230118123152.1926314-1-yukuai1@huaweicloud.com>
+ <20230118123152.1926314-4-yukuai1@huaweicloud.com>
+ <Y8gm0BVh5d83lVXN@slm.duckdns.org>
+From:   Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <9a9b6f38-9d1b-b007-96d7-2cda433763f4@huaweicloud.com>
+Date:   Thu, 19 Jan 2023 11:23:05 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <167391061117.2311931.16807283804788007499.stgit@warthog.procyon.org.uk>
-Sender: Al Viro <viro@ftp.linux.org.uk>
+In-Reply-To: <Y8gm0BVh5d83lVXN@slm.duckdns.org>
+Content-Type: text/plain; charset=gbk; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: _Ch0CgDn4R+Zt8hj+1ZBBw--.54593S3
+X-Coremail-Antispam: 1UD129KBjvJXoWxZFWkCF4xAFWkJrWfGryUJrb_yoW5tw1rpr
+        ZxGas8trZ5tr4Ik3Wjvr13Wr9agw4rtrWUG3yrGa4Ykr4Y9rsYqFnrCrWvkFWxAFs5GF4f
+        Zr4DKFnxGw48GrDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUU9F14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+        1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+        JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+        CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+        2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+        W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka
+        0xkIwI1lc7I2V7IY0VAS07AlzVAYIcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7x
+        kEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E
+        67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCw
+        CI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6rW3Jr0E
+        3s1lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcS
+        sGvfC2KfnxnUUI43ZEXa7VUbXdbUUUUUU==
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Jan 16, 2023 at 11:10:11PM +0000, David Howells wrote:
-> Convert the generic direct-I/O code to use iov_iter_extract_pages() instead
-> of iov_iter_get_pages().  This will pin pages or leave them unaltered
-> rather than getting a ref on them as appropriate to the iterator.
+Hi,
+
+ÔÚ 2023/01/19 1:05, Tejun Heo Ð´µÀ:
+> Hello,
 > 
-> The pages need to be pinned for DIO-read rather than having refs taken on
-> them to prevent VM copy-on-write from malfunctioning during a concurrent
-> fork() (the result of the I/O would otherwise end up only visible to the
-> child process and not the parent).
+> On Wed, Jan 18, 2023 at 08:31:52PM +0800, Yu Kuai wrote:
+>> From: Yu Kuai <yukuai3@huawei.com>
+>>
+>> Currently parent pd can be freed before child pd:
+>>
+>> t1: remove cgroup C1
+>> blkcg_destroy_blkgs
+>>   blkg_destroy
+>>    list_del_init(&blkg->q_node)
+>>    // remove blkg from queue list
+>>    percpu_ref_kill(&blkg->refcnt)
+>>     blkg_release
+>>      call_rcu
+>>
+>> t2: from t1
+>> __blkg_release
+>>   blkg_free
+>>    schedule_work
+>> 			t4: deactivate policy
+>> 			blkcg_deactivate_policy
+>> 			 pd_free_fn
+>> 			 // parent of C1 is freed first
+>> t3: from t2
+>>   blkg_free_workfn
+>>    pd_free_fn
+>>
+>> If policy(for example, ioc_timer_fn() from iocost) access parent pd from
+>> child pd after pd_offline_fn(), then UAF can be triggered.
+>>
+>> Fix the problem by delaying 'list_del_init(&blkg->q_node)' from
+>> blkg_destroy() to blkg_free_workfn(), and use a new disk level mutex to
+>                                              ^
+>                                              using
+> 
+>> protect blkg_free_workfn() and blkcg_deactivate_policy).
+>    ^                                                     ^
+>    synchronize?                                          ()
+> 
+>> @@ -118,16 +118,26 @@ static void blkg_free_workfn(struct work_struct *work)
+>>   {
+>>   	struct blkcg_gq *blkg = container_of(work, struct blkcg_gq,
+>>   					     free_work);
+>> +	struct request_queue *q = blkg->q;
+>>   	int i;
+>>   
+>> +	if (q)
+>> +		mutex_lock(&q->blkcg_mutex);
+> 
+> A comment explaining what the above is synchronizing would be useful.
+> 
+>> +
+>>   	for (i = 0; i < BLKCG_MAX_POLS; i++)
+>>   		if (blkg->pd[i])
+>>   			blkcg_policy[i]->pd_free_fn(blkg->pd[i]);
+>>   
+>>   	if (blkg->parent)
+>>   		blkg_put(blkg->parent);
+>> -	if (blkg->q)
+>> -		blk_put_queue(blkg->q);
+>> +
+>> +	if (q) {
+>> +		if (!list_empty(&blkg->q_node))
+> 
+> We can drop the above if.
+> 
+>> +			list_del_init(&blkg->q_node);
+>> +		mutex_unlock(&q->blkcg_mutex);
+>> +		blk_put_queue(q);
+>> +	}
+>> +
+>>   	free_percpu(blkg->iostat_cpu);
+>>   	percpu_ref_exit(&blkg->refcnt);
+>>   	kfree(blkg);
+>> @@ -462,9 +472,14 @@ static void blkg_destroy(struct blkcg_gq *blkg)
+>>   	lockdep_assert_held(&blkg->q->queue_lock);
+>>   	lockdep_assert_held(&blkcg->lock);
+>>   
+>> -	/* Something wrong if we are trying to remove same group twice */
+>> -	WARN_ON_ONCE(list_empty(&blkg->q_node));
+>> -	WARN_ON_ONCE(hlist_unhashed(&blkg->blkcg_node));
+>> +	/*
+>> +	 * blkg is removed from queue list in blkg_free_workfn(), hence this
+>> +	 * function can be called from blkcg_destroy_blkgs() first, and then
+>> +	 * before blkg_free_workfn(), this function can be called again in
+>> +	 * blkg_destroy_all().
+> 
+> How about?
+> 
+> 	 * blkg stays on the queue list until blkg_free_workfn(), hence this
+> 	 * function can be called from blkcg_destroy_blkgs() first and again
+> 	 * from blkg_destroy_all() before blkg_free_workfn().
+> 
+>> +	 */
+>> +	if (hlist_unhashed(&blkg->blkcg_node))
+>> +		return;
+>>   
+>>   	for (i = 0; i < BLKCG_MAX_POLS; i++) {
+>>   		struct blkcg_policy *pol = blkcg_policy[i];
+>> @@ -478,8 +493,11 @@ static void blkg_destroy(struct blkcg_gq *blkg)
+>>   
+>>   	blkg->online = false;
+>>   
+>> +	/*
+>> +	 * Delay deleting list blkg->q_node to blkg_free_workfn() to synchronize
+>> +	 * pd_free_fn() from blkg_free_workfn() and blkcg_deactivate_policy().
+>> +	 */
+> 
+> So, it'd be better to add a more comprehensive comment in blkg_free_workfn()
+> explaining why we need this synchronization and how it works and then point
+> to it from here.
+> 
+> Other than comments, it looks great to me. Thanks a lot for your patience
+> and seeing it through.
+Thanks for the suggestions, I'll send a new patch based on your
+suggestions.
 
-Several observations:
+Kuai
+> 
 
-1) fs/direct-io.c is ancient, grotty and has few remaining users.
-The case of block devices got split off first; these days it's in
-block/fops.c.  Then iomap-using filesystems went to fs/iomap/direct-io.c,
-leaving this sucker used only by affs, ext2, fat, exfat, hfs, hfsplus, jfs,
-nilfs2, ntfs3, reiserfs, udf and ocfs2.  And frankly, the sooner it dies
-the better off we are.  IOW, you've picked an uninteresting part and left
-the important ones untouched.
-
-2) if you look at the "should_dirty" logics in either of those (including
-fs/direct-io.c itself) you'll see a funny thing.  First of all,
-dio->should_dirty (or its counterparts) gets set iff we have a user-backed
-iter and operation is a read.  I.e. precisely the case when you get bio
-marked with BIO_PAGE_PINNED.  And that's not an accident - look at the
-places where we check that predicate: dio_bio_submit() calls
-bio_set_pages_dirty() if that predicate is true before submitting the
-sucker and dio_bio_complete() uses it to choose between bio_check_pages_dirty()
-and bio_release_pages() + bio_put().
-
-Look at bio_check_pages_dirty() - it checks if any of the pages we were
-reading into had managed to lose the dirty bit; if none had it does
-bio_release_pages(bio, false) + bio_put(bio) and returns.  If some had,
-it shoves bio into bio_dirty_list and arranges for bio_release_pages(bio, true)
-+ bio_put(bio) called from upper half (via schedule_work()).  The effect
-of the second argument of bio_release_pages() is to (re)dirty the pages;
-it can't be done from interrupt, so we have to defer it to process context.
-
-Now, do we need to redirty anything there?  Recall that page pinning had
-been introduced precisely to prevent writeback while the page is getting
-DMA into it.  Who is going to mark it clean before we unpin it?
-
-Unless I misunderstand something fundamental about the whole thing,
-this crap should become useless with that conversion.  And it's not just
-the ->should_dirty and its equivalents - bio_check_pages_dirty() and
-the stuff around it should also be gone once block/fops.c and
-fs/iomap/direct-io.c are switched to your iov_iter_extract_pages.
-Moreover, that way the only places legitimately passing true to
-bio_release_pages() are blk_rq_unmap_user() (on completion of
-bypass read request mapping a user page) and __blkdev_direct_IO_simple()
-(on completion of short sync O_DIRECT read from block device).
-Both could just as well call bio_set_pages_dirty(bio) +
-bio_release_pages(bio, false), killing the "dirty on release" logics
-and losing the 'mark_dirty' argument.
-
-BTW, where do we dirty the pages on IO_URING_OP_READ_FIXED with
-O_DIRECT file?  AFAICS, bio_set_pages_dirty() won't be called
-(ITER_BVEC iter) and neither will bio_release_pages() do anything
-(BIO_NO_PAGE_REF set on the bio by bio_iov_bvec_set() called
-due to the same ITER_BVEC iter).  Am I missing something trivial
-here?  Jens?
