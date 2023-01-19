@@ -2,75 +2,81 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E9368C46467
-	for <linux-block@archiver.kernel.org>; Thu, 19 Jan 2023 16:52:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4B0AC46467
+	for <linux-block@archiver.kernel.org>; Thu, 19 Jan 2023 17:03:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229904AbjASQwu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 19 Jan 2023 11:52:50 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44480 "EHLO
+        id S230455AbjASRDo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 19 Jan 2023 12:03:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49420 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230208AbjASQwf (ORCPT
+        with ESMTP id S230456AbjASRDl (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 19 Jan 2023 11:52:35 -0500
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 373098C90B;
-        Thu, 19 Jan 2023 08:52:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=6baCIjpxFWqtburgiU9owFRWWB+OsgVl9mMP/UXy3Fs=; b=ON5gWcaPIXHKSUs8dzkEuU5BPU
-        E2GWyQaoM8UfBF+ZUDUdpuHhHlruqqIPtXHXqmt+mgvZT1sfp/Dh0QYYtv2EUSpmtbOvQZLPRuJDO
-        5rWOkb7+GjTsosErJw2uBcDWrKvIzPiVH3/m+o520DwKyYx5EVdHyAupcLIbnC8ax1bfl4/LCZOE/
-        GNuUEi9vWjW7bG0yw/aC4oKTIOCFNi6C6xwYQFFB+at8qozQ4lMz0zQ0PKxqVsnII/NJuzbkxRvV+
-        OkCSI8sUeM/EFMa85/AeOdvJSQbuHiWCZcTkuDZgOl+X1ZeqLuTwmm/2beh/7wE1bCpVozxEBUane
-        //PIDckA==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1pIY8t-0066Rw-Pc; Thu, 19 Jan 2023 16:51:59 +0000
-Date:   Thu, 19 Jan 2023 08:51:59 -0800
-From:   Christoph Hellwig <hch@infradead.org>
-To:     David Howells <dhowells@redhat.com>
-Cc:     Al Viro <viro@zeniv.linux.org.uk>,
-        Dominique Martinet <asmadeus@codewreck.org>,
-        Eric Van Hensbergen <ericvh@gmail.com>,
-        Latchesar Ionkov <lucho@ionkov.net>,
-        Christian Schoenebeck <linux_oss@crudebyte.com>,
-        v9fs-developer@lists.sourceforge.net,
-        Christoph Hellwig <hch@infradead.org>,
-        Matthew Wilcox <willy@infradead.org>,
-        Jens Axboe <axboe@kernel.dk>, Jan Kara <jack@suse.cz>,
-        Jeff Layton <jlayton@kernel.org>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v6 21/34] 9p: Pin pages rather than ref'ing if appropriate
-Message-ID: <Y8l1L9B48prS2o9c@infradead.org>
-References: <Y8iwXJ2gMcCyXzm4@ZenIV>
- <167391047703.2311931.8115712773222260073.stgit@warthog.procyon.org.uk>
- <167391063242.2311931.3275290816918213423.stgit@warthog.procyon.org.uk>
- <3030212.1674146654@warthog.procyon.org.uk>
+        Thu, 19 Jan 2023 12:03:41 -0500
+Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06D408455B;
+        Thu, 19 Jan 2023 09:03:34 -0800 (PST)
+Received: by mail-pj1-x1030.google.com with SMTP id bj3so3058871pjb.0;
+        Thu, 19 Jan 2023 09:03:33 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=CQoTJcoI0zudP9kqEp3QP7XD1mX3VxGZCw8MlkN3oyA=;
+        b=hYG6+PIItfIJ8RaYvrETkb1iEq22Peoj6RQaavU/zimVQAD1HERJ+3gkMl1FEPriVS
+         Bb80iDejEzIY050s7ahNT6VLftXVfGWSX/VBKCmhcCzZsUndo44FmyJgpBTIaWCIyI27
+         h25sq8scf7twn/fjK2cqZdOj33D4EttK+Oq/QCGwktPToLV/YpuBR3ckpQZHQnjKdUFS
+         sc3Hw5fxdfg3akD1Ew8I65aIaVOhEhO8jNRaugq9ihIEIdgeZtYpAef5dO7g+pAb4fUb
+         MlCeresDFfHSBlKCBLHAlkim1el8jHIlNSFjPn3ji3UXy+Mz4rI7uW6y/7oC/fGcK1cB
+         WEmg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=CQoTJcoI0zudP9kqEp3QP7XD1mX3VxGZCw8MlkN3oyA=;
+        b=66oqS3fMdy9LLuUdKSzUjY2fnamOs1NmQl+mDKO0Xsj9T5tLMDFxvxxSRZHKmTNBS3
+         6nUerlXNwyApI4/SXU1sHXONfwkQMDhiD1gj+pkzza+kGYMSNJrVsYP9zGS37zyLSFk4
+         Tdf7yMVhpFL99dxOo+apY52dkuEnh3r7meCGzr5p6Wzm2JZ5jIYi58jeQUu1F3DMtJLT
+         x7Pd8m5TgaFOyNPoYzzGcZCQd7iOIXH+U7z6HfzHZ/b5QUzbGavpGu3giSS1psUS/mKk
+         sdHbkb+Oo7/1KEK2Cu++/pJes+sP0tuVtYjoxKsB8uRxcMlaT1j5SvzC6yoQk+Bgk+o5
+         qm+A==
+X-Gm-Message-State: AFqh2kqfJs5edkg113N6/ZcDpfQjL4iHlbBDMxA44NIaBQ4Gz+RRT91K
+        SRr0bgRKAGCCR4oGsr85oKI=
+X-Google-Smtp-Source: AMrXdXs0yhVs81RqjlAAAvmXVpjhwSEp9wPJlVq3Ilbp8sNjZu5jtrw4jhcnOsjU3DuY9okNuvFBJw==
+X-Received: by 2002:a17:902:b788:b0:193:3678:dc3e with SMTP id e8-20020a170902b78800b001933678dc3emr10418524pls.21.1674147813323;
+        Thu, 19 Jan 2023 09:03:33 -0800 (PST)
+Received: from localhost (2603-800c-1a02-1bae-a7fa-157f-969a-4cde.res6.spectrum.com. [2603:800c:1a02:1bae:a7fa:157f:969a:4cde])
+        by smtp.gmail.com with ESMTPSA id e18-20020a170902ef5200b00187033cac81sm25349929plx.145.2023.01.19.09.03.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 19 Jan 2023 09:03:32 -0800 (PST)
+Sender: Tejun Heo <htejun@gmail.com>
+Date:   Thu, 19 Jan 2023 07:03:31 -1000
+From:   Tejun Heo <tj@kernel.org>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, Josef Bacik <josef@toxicpanda.com>,
+        linux-block@vger.kernel.org, cgroups@vger.kernel.org
+Subject: Re: switch blk-cgroup to work on gendisk
+Message-ID: <Y8l34/qeHPLV4rKJ@slm.duckdns.org>
+References: <20230117081257.3089859-1-hch@lst.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <3030212.1674146654@warthog.procyon.org.uk>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20230117081257.3089859-1-hch@lst.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jan 19, 2023 at 04:44:14PM +0000, David Howells wrote:
-> Al Viro <viro@zeniv.linux.org.uk> wrote:
-> You're right.  I wonder if I should handle ITER_KVEC in
-> iov_iter_extract_pages(), though I'm sure I've been told that a kvec might
-> point to data that doesn't have a matching page struct.  Or maybe it's that
-> the refcount shouldn't be changed on it.
+On Tue, Jan 17, 2023 at 09:12:42AM +0100, Christoph Hellwig wrote:
+> blk-cgroup works on only on live disks and "file system" I/O from bios.
+> This all the information should be in the gendisk, and not the
+> request_queue that also exists for pure passthrough request based
+> devices.
 
-They could in theory contain non-page backed memory, even if I don't
-think we currently have that in tree.  The worst case is probably
-vmalloc()ed memory.  Many instance will have no good way to deal with
-something that isn't page backed.  That's one reason why I'd relaly
-love to see ITER_KVEC go away - for most use cases ITER_BVEC is the
-right thing, and the others are probably broken for various combinations
-already, but that's going to be a fair amount of work.  For now just
-failing the I/O if the instance can't deal with it is probably the
-right thing.
+Can't blk-throttle be used w/ bio based ones tho? I always thought that was
+the reason why we didn't move it into rq-qos framework.
+
+Thanks.
+
+-- 
+tejun
