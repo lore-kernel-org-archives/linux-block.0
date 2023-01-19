@@ -2,98 +2,113 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F352EC00A5A
-	for <linux-block@archiver.kernel.org>; Thu, 19 Jan 2023 14:24:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09FB5C004D4
+	for <linux-block@archiver.kernel.org>; Thu, 19 Jan 2023 16:16:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229872AbjASOYX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 19 Jan 2023 09:24:23 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46600 "EHLO
+        id S229635AbjASQQA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 19 Jan 2023 11:16:00 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41046 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229820AbjASOYW (ORCPT
+        with ESMTP id S229459AbjASQP7 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 19 Jan 2023 09:24:22 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49281359B
-        for <linux-block@vger.kernel.org>; Thu, 19 Jan 2023 06:23:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1674138222;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-        bh=xcrjXPZDX7R9jSoNCpV3rPeVgVzgUf1s0d7wCqmxknY=;
-        b=AT+y0lcJfs/3/NDzG8xVlfjmld+4pRZD7cJjwVcnWFe0J13Nr1C6v6TArA+6C8uAl+qUeb
-        /LpaMWXh3kPeTXu8ilqJkEZxRGu76FmIiuzx+/rwfO5QPiEpjbmSH3cISIqPoC4nySHQeH
-        TV8/0cow/9ORO/SV2eSwDmKyuPyvGzY=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-428-4vCX5u6kOv-DIqVNu1Hkpw-1; Thu, 19 Jan 2023 09:23:39 -0500
-X-MC-Unique: 4vCX5u6kOv-DIqVNu1Hkpw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 6ECC7181E3F5;
-        Thu, 19 Jan 2023 14:23:38 +0000 (UTC)
-Received: from T590 (ovpn-8-27.pek2.redhat.com [10.72.8.27])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 4F0AD40C6EC4;
-        Thu, 19 Jan 2023 14:23:33 +0000 (UTC)
-Date:   Thu, 19 Jan 2023 22:23:28 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     io-uring@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, nbd@other.debian.org
-Cc:     ming.lei@redhat.com
-Subject: ublk-nbd: ublk-nbd is avaialbe
-Message-ID: <Y8lSYBU9q5fjs7jS@T590>
+        Thu, 19 Jan 2023 11:15:59 -0500
+Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A62EC8A63;
+        Thu, 19 Jan 2023 08:15:58 -0800 (PST)
+Received: by mail-pl1-x634.google.com with SMTP id z13so2749404plg.6;
+        Thu, 19 Jan 2023 08:15:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ae6CLA/wyp/IvxNOrUUr/ZjdhSOngZFFYXXmGXpC8Eo=;
+        b=IHB4k/BCpN5sgx7Si8MmzTbFCivgZU+rJneogVjYsDfEIK9Z03JTHrf+NRUAAjBV6j
+         le9FgFaerU+8HdJ8/cF3P4PUTaJ7NduhYrsyULClMw+M38tARHzdUegH3US59Ru9HpRi
+         M3mmkyFOa+I6j6zZ+drM9VxU0fmrxERrcei5iEBQUkPAwEW0Ah8alPIVjPblmz9jY74S
+         gnT22G4f13X5F0ExocvzTFlib3QcpSXseTC3YwSJMlXTJnEWM+boHGUkV4HgSkXCDi7y
+         DcDyLOQfSr42qNBkzng4sdtwAhXb2o/2M8effxXUzeBEtd2sAdPgswgOSgEpFGPOsxaZ
+         f1SA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ae6CLA/wyp/IvxNOrUUr/ZjdhSOngZFFYXXmGXpC8Eo=;
+        b=0dZ5dKiXTvlloMF7eDmE9v8IBr+6fPn7SaejlNPRu0fuozlliQAf4SD/jjlifDex1f
+         drgf1OBr3LMYYdIPhX1shxZyk0dAk52lRygh+gn1Ab2q1ir5dThoQsfGzfN1JxC/ZqvS
+         qp4BGX0tfYosH5uu/6ZREdddlAlqpTQ+PI6lzzNUSeEW8mP3Tn3IJ0WAt0cUbmazW84s
+         0o3wiwTOlECpGFUH3XHrYfzgrpb5+1s/W3P+/xZ03uJWNK7sNNGo/uuVdLKj2zUMgGTl
+         B+88xArj8pfktB7nbbb3k7T4L/d3Fe9AL0Jo1Zw02vtzwoPbdf629vdUnA6WidW87hpV
+         HR2w==
+X-Gm-Message-State: AFqh2kou3/JoB75SXZ7odhA/9Q2AKXseurWKuevscgnjwNd74r2F/cnR
+        SYh2lqFMVJJnE+flDR7LqP0=
+X-Google-Smtp-Source: AMrXdXspFzzS2HXhwJrLcJG5i/Aallzz9+C7ZBwTLaOY7D1XGy5hDDKJwlvUa55ER8X7YauF7UHgxg==
+X-Received: by 2002:a05:6a20:2a9a:b0:a5:6e3d:107b with SMTP id v26-20020a056a202a9a00b000a56e3d107bmr16265430pzh.0.1674144957813;
+        Thu, 19 Jan 2023 08:15:57 -0800 (PST)
+Received: from localhost ([2600:380:4a69:c93e:fcd6:9a91:e25c:65a6])
+        by smtp.gmail.com with ESMTPSA id u7-20020a17090341c700b00186e34524e3sm25324085ple.136.2023.01.19.08.15.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 19 Jan 2023 08:15:57 -0800 (PST)
+Sender: Tejun Heo <htejun@gmail.com>
+Date:   Thu, 19 Jan 2023 06:15:55 -1000
+From:   Tejun Heo <tj@kernel.org>
+To:     Yu Kuai <yukuai1@huaweicloud.com>
+Cc:     hch@lst.de, josef@toxicpanda.com, axboe@kernel.dk,
+        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, yukuai3@huawei.com,
+        yi.zhang@huawei.com, yangerkun@huawei.com
+Subject: Re: [PATCH -next v3 3/3] blk-cgroup: synchronize pd_free_fn() from
+ blkg_free_workfn() and blkcg_deactivate_policy()
+Message-ID: <Y8lsuwtrCYE9jiHb@slm.duckdns.org>
+References: <20230119110350.2287325-1-yukuai1@huaweicloud.com>
+ <20230119110350.2287325-4-yukuai1@huaweicloud.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
+In-Reply-To: <20230119110350.2287325-4-yukuai1@huaweicloud.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
+On Thu, Jan 19, 2023 at 07:03:50PM +0800, Yu Kuai wrote:
+> From: Yu Kuai <yukuai3@huawei.com>
+> 
+> Currently parent pd can be freed before child pd:
+> 
+> t1: remove cgroup C1
+> blkcg_destroy_blkgs
+>  blkg_destroy
+>   list_del_init(&blkg->q_node)
+>   // remove blkg from queue list
+>   percpu_ref_kill(&blkg->refcnt)
+>    blkg_release
+>     call_rcu
+> 
+> t2: from t1
+> __blkg_release
+>  blkg_free
+>   schedule_work
+> 			t4: deactivate policy
+> 			blkcg_deactivate_policy
+> 			 pd_free_fn
+> 			 // parent of C1 is freed first
+> t3: from t2
+>  blkg_free_workfn
+>   pd_free_fn
+> 
+> If policy(for example, ioc_timer_fn() from iocost) access parent pd from
+> child pd after pd_offline_fn(), then UAF can be triggered.
+> 
+> Fix the problem by delaying 'list_del_init(&blkg->q_node)' from
+> blkg_destroy() to blkg_free_workfn(), and using a new disk level mutex to
+> synchronize blkg_free_workfn() and blkcg_deactivate_policy().
+> 
+> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
 
-ublk-nbd[1] is available now.
+Acked-by: Tejun Heo <tj@kernel.org>
 
-Basically it is one nbd client, but totally implemented in userspace,
-and wrt. current nbd-client in [2], the transmission phase is done
-by linux block nbd driver.
+Thanks.
 
-The handshake implementation is borrowed from nbd project[2], so
-basically ublk-nbd just adds new code for implementing transmission
-phase, and it can be thought as moving linux block nbd driver into
-userspace.
-
-The added new code is basically in nbd/tgt_nbd.cpp, and io handling
-is based on liburing[3], and implemented by c++20 coroutine, so
-everything is done in single pthread totally lockless, meantime turns
-out it is pretty easy to design & implement, attributed to ublk framework,
-c++20 coroutine and liburing.
-
-ublk-nbd supports both tcp and unix socket, and allows to enable io_uring
-send zero copy via command line '--send_zc', see details in README[4].
-
-No regression is found in xfstests by using ublk-nbd as both test device
-and scratch device, and builtin test(make test T=nbd) runs well.
-
-Fio test("make test T=nbd") shows that ublk-nbd performance is
-basically same with nbd-client/nbd driver when running fio on real
-ethernet link(1g, 10+g), but ublk-nbd IOPS is higher by ~40% than
-nbd-client(nbd driver) with 512K BS, which is because linux nbd
-driver sets max_sectors_kb as 64KB at default.
-
-But when running fio over local tcp socket, it is observed in my test
-machine that ublk-nbd performs better than nbd-client/nbd driver,
-especially with 2 queue/2 jobs, and the gap could be 10% ~ 30%
-according to different block size.
-
-Any comments are welcome!
-
-[1] https://github.com/ming1/ubdsrv/blob/master/nbd
-[2] https://github.com/NetworkBlockDevice/nbd
-[3] https://github.com/axboe/liburing
-[4] https://github.com/ming1/ubdsrv/blob/master/nbd/README.rst
-
-Thanks,
-Ming
-
+-- 
+tejun
