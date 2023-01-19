@@ -2,96 +2,179 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB471C46467
-	for <linux-block@archiver.kernel.org>; Thu, 19 Jan 2023 18:54:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EBB8BC46467
+	for <linux-block@archiver.kernel.org>; Thu, 19 Jan 2023 19:26:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230023AbjASSyG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 19 Jan 2023 13:54:06 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37940 "EHLO
+        id S229487AbjAST0D (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 19 Jan 2023 14:26:03 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41968 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230031AbjASSyF (ORCPT
+        with ESMTP id S229876AbjASTZ5 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 19 Jan 2023 13:54:05 -0500
-Received: from mail-il1-x12b.google.com (mail-il1-x12b.google.com [IPv6:2607:f8b0:4864:20::12b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 15679485B6
-        for <linux-block@vger.kernel.org>; Thu, 19 Jan 2023 10:54:03 -0800 (PST)
-Received: by mail-il1-x12b.google.com with SMTP id m15so1645287ilq.2
-        for <linux-block@vger.kernel.org>; Thu, 19 Jan 2023 10:54:03 -0800 (PST)
+        Thu, 19 Jan 2023 14:25:57 -0500
+Received: from mail-qt1-x835.google.com (mail-qt1-x835.google.com [IPv6:2607:f8b0:4864:20::835])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 46BDC530ED;
+        Thu, 19 Jan 2023 11:25:45 -0800 (PST)
+Received: by mail-qt1-x835.google.com with SMTP id s4so2378091qtx.6;
+        Thu, 19 Jan 2023 11:25:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=sa8Oz+7EARYAtQ0WLnCqgtp/WsCMus/3I6/+CNJ1OPw=;
-        b=sPzq1KJuKnyasXRpxYhl2vyV/bYi9yVZ56Vqego/VjuHdzz/5dWCi47UX2CUDpoDNC
-         CcC5wYt/hUVVEpFkHtyZ89U3S4NTWky0LrDtrtiFDdFrjZELyHOpVBHxbNELtKnQ2iw4
-         nr1fs0E0gGKpdnwRST07vzvNPYUzWsF4Vi012BPK68GyqhQejq7mymG62LbNctNk1H5z
-         ANiECjUYn3uY98+hJ+kIU7gfPJH2vu/HOgNnNuH23TbDVW4pbv+weD5qebAzq+j5ja3T
-         n2GpBO55V9L6Il8+jeulDNzuo2GKi68Gu59deOK6KEDsKNVjB9594cAWwGeunxMF6FhC
-         vCiQ==
+        d=gmail.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:feedback-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=xamYJZSiEPy9Mjo2njH+JPn5/UHZCpsx0WYfjjoyGiY=;
+        b=MrwOCC5ehcze1hpMjcT+s1KhKEgcE4YPuq3yqI1Cm5uRCIw1PUevaLEC6XkTcNhbT9
+         Zw0OvgbmLEFdn1tUM2fjgufvEQCRxf9F5A/ADdKpwTfdOwWf/0FqKiy1RuuQeUDtT2r1
+         WOQNX4WCd5xldt11cYOVTcAYa8grKYNOtlZuJLBY7Hqr8xr25RNCaSO7DWHMR1iJ2wZ4
+         jILLDKWwZP8GiSLOga1KZkHZ1Quhj6gfAe4Q0cx1AezAz9Aw7s1aRjjoXenbgYqQO8nm
+         QgeiFuARK8oNcrVywEUZQ78eB39jl9apcTRWslHRMXoRBD4K3HuCxamntvSxOTPxK4uE
+         BODA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=sa8Oz+7EARYAtQ0WLnCqgtp/WsCMus/3I6/+CNJ1OPw=;
-        b=n/k0MXPM82Di2oWNGYabUKMIpKbZWUB/GM8J5XZOzR3WsJz5Pw3v+rfNBd/sGeTLs+
-         4/eNshq3WwShd/+Fw6bmKZ2jNyQuz5E5VCXOeAHtt0cIm2aaNRDiVR1+UujvJeT7mvqA
-         We5BZ/PjRUAhg0QoHHPYx32fOgZop+KcbNsyHlmyTUVw3M+oKpF888ibZ9W8Zqrg9Uu2
-         50lsSoXITHICN7/GUM5qEm4S5H9+93VaumT3qICSJ++U7y7ohTls7eZSIWAxXbuwLqmJ
-         fsNitKIDrQyiyBFkvTYWWhYuYCGHwHYmAprfseqxj5odHuZbSALTTSUFw4Ccr0gAHB3c
-         FhKg==
-X-Gm-Message-State: AFqh2krmcfIf8fEon8usTT05rb+reC3fD5/fECdbYLac5ZmNKfVvdm8K
-        lDe2tlRErCdUpf+oa3vwuodDi3j9uQ27TfiV
-X-Google-Smtp-Source: AMrXdXuIIp/c0w2El/LzauKFa6i872EXwxoi+fHEVHbXfB+cDnoMsFA/jCYUDrbbR0SKLLTI269Tgg==
-X-Received: by 2002:a92:cda4:0:b0:30d:bf1a:b174 with SMTP id g4-20020a92cda4000000b0030dbf1ab174mr2555528ild.1.1674154442314;
-        Thu, 19 Jan 2023 10:54:02 -0800 (PST)
-Received: from [192.168.1.94] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id e36-20020a028627000000b003a7c2e97005sm763264jai.126.2023.01.19.10.54.01
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 19 Jan 2023 10:54:01 -0800 (PST)
-Message-ID: <bd1c347b-cbf8-3917-401a-ed85c6ccb956@kernel.dk>
-Date:   Thu, 19 Jan 2023 11:54:00 -0700
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:feedback-id:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=xamYJZSiEPy9Mjo2njH+JPn5/UHZCpsx0WYfjjoyGiY=;
+        b=tq+trOZ8NniRqlPpQ7ZVgULWMFj+94r3w+jkwm10HiVyr9mcUrJ1zM7eWM1RuvhA+J
+         AyiD9Sa8Ldoz3wvlkRJkMH9300p0A/e0MFDMlnGHARDj/0+DlKPcagJ5bXYiWHSt+kzX
+         PzMqIrIfRaPSrIXqtFGORt3MQ0WHbSNtmF4LMbsuAJYlmZD9OwNT4f8fKb18oTh4XFjI
+         p87Dhz2pBuiTEuikcF4jj+o4nmt75pbcPai2AjYAgD/AVjjWH2aci8Nig3JnN4brCfTV
+         Q89Kvvr62SK2CBdPhcxuKwgF2m7EKkdczO1pXLHPt2HOiJiOQeJZ5LlARTOz29kyPn8A
+         SKJg==
+X-Gm-Message-State: AFqh2ko8vWAYA3M0ykHLj3EZ8kOcTjd2Gh/vh+wqy610HCTwbnbroTIh
+        9iKSTNRumdPDf0csLzDAu+SmksT/kbk=
+X-Google-Smtp-Source: AMrXdXv6/5PtZaK3QzptagCsxzBPPETPDBX9eIEhj7kPWY4WuBsc33JbZzxeaNRbDyw281mOZy4DMg==
+X-Received: by 2002:ac8:4446:0:b0:3b6:377b:e05c with SMTP id m6-20020ac84446000000b003b6377be05cmr12291034qtn.47.1674156344292;
+        Thu, 19 Jan 2023 11:25:44 -0800 (PST)
+Received: from auth2-smtp.messagingengine.com (auth2-smtp.messagingengine.com. [66.111.4.228])
+        by smtp.gmail.com with ESMTPSA id ej4-20020a05622a4f8400b003b693fe4427sm727836qtb.90.2023.01.19.11.25.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 19 Jan 2023 11:25:43 -0800 (PST)
+Received: from compute6.internal (compute6.nyi.internal [10.202.2.47])
+        by mailauth.nyi.internal (Postfix) with ESMTP id 20B2C27C0054;
+        Thu, 19 Jan 2023 14:25:42 -0500 (EST)
+Received: from mailfrontend1 ([10.202.2.162])
+  by compute6.internal (MEProxy); Thu, 19 Jan 2023 14:25:43 -0500
+X-ME-Sender: <xms:NZnJYwTxwYLfh8N7togMMPPYVeKdqLNSU6cBkqgYw1MVfb1Q7g283w>
+    <xme:NZnJY9xSw9qvXrrAIJEbpvx12Y2TyP_RnRTmtBw-y1f1OYtEkrBMU_4YXAozbQqOh
+    zbQZ0y4tj_ONrG2QQ>
+X-ME-Received: <xmr:NZnJY91HzMP2Iy60XcV_ZcT4yKf2IQY3ocx0fpLzHGwRF2CeF0X43zzN0DQ>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvhedruddutddguddviecutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
+    necuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+    enucfjughrpeffhffvvefukfhfgggtuggjsehttdertddttddvnecuhfhrohhmpeeuohhq
+    uhhnucfhvghnghcuoegsohhquhhnrdhfvghnghesghhmrghilhdrtghomheqnecuggftrf
+    grthhtvghrnhephedugfduffffteeutddvheeuveelvdfhleelieevtdeguefhgeeuveei
+    udffiedvnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomh
+    epsghoqhhunhdomhgvshhmthhprghuthhhphgvrhhsohhnrghlihhthidqieelvdeghedt
+    ieegqddujeejkeehheehvddqsghoqhhunhdrfhgvnhhgpeepghhmrghilhdrtghomhesfh
+    higihmvgdrnhgrmhgv
+X-ME-Proxy: <xmx:NZnJY0CTKhGEBWy1veKc6w2hVzbwm1Rf2uZ1Xsyyk9_pC7SbEHDNOw>
+    <xmx:NZnJY5j2rwpIuu1Rn9fBKWIyoQvQrI42uB43xg7d0VHM2TJ04SwWGA>
+    <xmx:NZnJYworf0mYeiLAkASjr3os2e8ECpvW0MlaGgzHEya6_0aWJpdS2A>
+    <xmx:NpnJY464YDfl0tqd71pt0eI__JWNhiE-bQVw-oxLk6HFFui_uQOFPuiI1T8>
+Feedback-ID: iad51458e:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
+ 19 Jan 2023 14:25:40 -0500 (EST)
+Date:   Thu, 19 Jan 2023 11:25:16 -0800
+From:   Boqun Feng <boqun.feng@gmail.com>
+To:     Matthew Wilcox <willy@infradead.org>
+Cc:     Byungchul Park <byungchul.park@lge.com>,
+        linux-kernel@vger.kernel.org, torvalds@linux-foundation.org,
+        damien.lemoal@opensource.wdc.com, linux-ide@vger.kernel.org,
+        adilger.kernel@dilger.ca, linux-ext4@vger.kernel.org,
+        mingo@redhat.com, peterz@infradead.org, will@kernel.org,
+        tglx@linutronix.de, rostedt@goodmis.org, joel@joelfernandes.org,
+        sashal@kernel.org, daniel.vetter@ffwll.ch, duyuyang@gmail.com,
+        johannes.berg@intel.com, tj@kernel.org, tytso@mit.edu,
+        david@fromorbit.com, amir73il@gmail.com,
+        gregkh@linuxfoundation.org, kernel-team@lge.com,
+        linux-mm@kvack.org, akpm@linux-foundation.org, mhocko@kernel.org,
+        minchan@kernel.org, hannes@cmpxchg.org, vdavydov.dev@gmail.com,
+        sj@kernel.org, jglisse@redhat.com, dennis@kernel.org, cl@linux.com,
+        penberg@kernel.org, rientjes@google.com, vbabka@suse.cz,
+        ngupta@vflare.org, linux-block@vger.kernel.org,
+        paolo.valente@linaro.org, josef@toxicpanda.com,
+        linux-fsdevel@vger.kernel.org, viro@zeniv.linux.org.uk,
+        jack@suse.cz, jlayton@kernel.org, dan.j.williams@intel.com,
+        hch@infradead.org, djwong@kernel.org,
+        dri-devel@lists.freedesktop.org, rodrigosiqueiramelo@gmail.com,
+        melissa.srw@gmail.com, hamohammed.sa@gmail.com,
+        42.hyeyoo@gmail.com, chris.p.wilson@intel.com,
+        gwan-gyeong.mun@intel.com, max.byungchul.park@gmail.com,
+        longman@redhat.com
+Subject: Re: [PATCH RFC v7 00/23] DEPT(Dependency Tracker)
+Message-ID: <Y8mZHKJV4FH17vGn@boqun-archlinux>
+References: <Y8bmeffIQ3iXU3Ux@boqun-archlinux>
+ <1674109388-6663-1-git-send-email-byungchul.park@lge.com>
+ <Y8lGxkBrls6qQOdM@casper.infradead.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.0
-Subject: Re: [PATCH -next v3 0/3] blk-cgroup: make sure pd_free_fn() is called
- in order
-Content-Language: en-US
-To:     Yu Kuai <yukuai1@huaweicloud.com>, tj@kernel.org, hch@lst.de,
-        josef@toxicpanda.com
-Cc:     cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, yukuai3@huawei.com,
-        yi.zhang@huawei.com, yangerkun@huawei.com
-References: <20230119110350.2287325-1-yukuai1@huaweicloud.com>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20230119110350.2287325-1-yukuai1@huaweicloud.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Y8lGxkBrls6qQOdM@casper.infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/19/23 4:03 AM, Yu Kuai wrote:
-> From: Yu Kuai <yukuai3@huawei.com>
+On Thu, Jan 19, 2023 at 01:33:58PM +0000, Matthew Wilcox wrote:
+> On Thu, Jan 19, 2023 at 03:23:08PM +0900, Byungchul Park wrote:
+> > Boqun wrote:
+> > > *	Looks like the DEPT dependency graph doesn't handle the
+> > > 	fair/unfair readers as lockdep current does. Which bring the
+> > > 	next question.
+> > 
+> > No. DEPT works better for unfair read. It works based on wait/event. So
+> > read_lock() is considered a potential wait waiting on write_unlock()
+> > while write_lock() is considered a potential wait waiting on either
+> > write_unlock() or read_unlock(). DEPT is working perfect for it.
+> > 
+> > For fair read (maybe you meant queued read lock), I think the case
+> > should be handled in the same way as normal lock. I might get it wrong.
+> > Please let me know if I miss something.
 > 
-> Changes in v3:
->  - add ack tag from Tejun for patch 1,2
->  - as suggested by Tejun, update commit message and comments in patch 3
+> From the lockdep/DEPT point of view, the question is whether:
 > 
-> The problem was found in iocost orignally([1]) that ioc can be freed in
-> ioc_pd_free(). And later we found that there are more problem in
-> iocost([2]).
+> 	read_lock(A)
+> 	read_lock(A)
 > 
-> After some discussion, as suggested by Tejun([3]), we decide to fix the
-> problem that parent pd can be freed before child pd in cgroup layer
-> first. And the problem in [1] will be fixed later if this patchset is
-> applied.
+> can deadlock if a writer comes in between the two acquisitions and
+> sleeps waiting on A to be released.  A fair lock will block new
+> readers when a writer is waiting, while an unfair lock will allow
+> new readers even while a writer is waiting.
+> 
 
-Doesn't apply against for-6.3/block (or linux-next or my for-next, for
-that matter). Can you resend a tested one against for-6.3/block?
+To be more accurate, a fair reader will wait if there is a writer
+waiting for other reader (fair or not) to unlock, and an unfair reader
+won't.
 
--- 
-Jens Axboe
+In kernel there are read/write locks that can have both fair and unfair
+readers (e.g. queued rwlock). Regarding deadlocks,
 
+	T0		T1		T2
+	--		--		--
+	fair_read_lock(A);
+			write_lock(B);
+					write_lock(A);
+	write_lock(B);
+			unfair_read_lock(A);
 
+the above is not a deadlock, since T1's unfair reader can "steal" the
+lock. However the following is a deadlock:
+
+	T0		T1		T2
+	--		--		--
+	unfair_read_lock(A);
+			write_lock(B);
+					write_lock(A);
+	write_lock(B);
+			fair_read_lock(A);
+
+, since T'1 fair reader will wait.
+
+FWIW, lockdep is able to catch this (figuring out which is deadlock and
+which is not) since two years ago, plus other trivial deadlock detection
+for read/write locks. Needless to say, if lib/lock-selftests.c was given
+a try, one could find it out on one's own.
+
+Regards,
+Boqun
