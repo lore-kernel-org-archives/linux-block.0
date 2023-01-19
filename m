@@ -2,85 +2,201 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D851EC38142
-	for <linux-block@archiver.kernel.org>; Thu, 19 Jan 2023 05:52:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 50487C00A5A
+	for <linux-block@archiver.kernel.org>; Thu, 19 Jan 2023 06:23:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229695AbjASFwH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 19 Jan 2023 00:52:07 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40396 "EHLO
+        id S229723AbjASGXa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 19 Jan 2023 01:23:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51394 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229593AbjASFwH (ORCPT
+        with ESMTP id S229689AbjASGX0 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 19 Jan 2023 00:52:07 -0500
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79F83BA;
-        Wed, 18 Jan 2023 21:52:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=HV20o5DJoYejH4ZxhgolHlvJcr34R1PSBryHehLovgc=; b=OA+Vp86krsp9Bm3bY8YID9wbtz
-        l4r1JaKf6WSW/XCx1VilImlA4K2In6L3j7JmCCVGvg+qj1gx3MZK/WnznqYdCdsKLjdNi6CZWMN+9
-        q0KGasFax4jUaAIRwi2w9dJD1Y5JTab2CAxJBfjuNqZ/P+8332Fqou7UGYPI1sOsI+5/ne9a99vmI
-        r2tIXLg70iTdrz7UCbdrvAY8plHIWklrKAtfcd8F3u+tXq1sIRBdyd6vbTKo966UriXiRa4vCdVtb
-        7C8G/1chYtTsrdA9pvz1yWo+shpaKpcJbwVDMwDrBkfR+Dh0albhuyWyoF/evf6xafPeT9M6PUYTg
-        zFvO+imQ==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1pINq9-003hee-Da; Thu, 19 Jan 2023 05:51:57 +0000
-Date:   Wed, 18 Jan 2023 21:51:57 -0800
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Al Viro <viro@zeniv.linux.org.uk>
-Cc:     David Howells <dhowells@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-        Jan Kara <jack@suse.cz>, Christoph Hellwig <hch@lst.de>,
-        Matthew Wilcox <willy@infradead.org>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>,
-        Jeff Layton <jlayton@kernel.org>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v6 18/34] dio: Pin pages rather than ref'ing if
- appropriate
-Message-ID: <Y8jafackRu7t2Jf4@infradead.org>
-References: <167391047703.2311931.8115712773222260073.stgit@warthog.procyon.org.uk>
- <167391061117.2311931.16807283804788007499.stgit@warthog.procyon.org.uk>
- <Y8jPVLewUaaiuplq@ZenIV>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Y8jPVLewUaaiuplq@ZenIV>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+        Thu, 19 Jan 2023 01:23:26 -0500
+Received: from lgeamrelo11.lge.com (lgeamrelo12.lge.com [156.147.23.52])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 5AF5D5C0FD
+        for <linux-block@vger.kernel.org>; Wed, 18 Jan 2023 22:23:23 -0800 (PST)
+Received: from unknown (HELO lgeamrelo01.lge.com) (156.147.1.125)
+        by 156.147.23.52 with ESMTP; 19 Jan 2023 15:23:21 +0900
+X-Original-SENDERIP: 156.147.1.125
+X-Original-MAILFROM: byungchul.park@lge.com
+Received: from unknown (HELO localhost.localdomain) (10.177.244.38)
+        by 156.147.1.125 with ESMTP; 19 Jan 2023 15:23:21 +0900
+X-Original-SENDERIP: 10.177.244.38
+X-Original-MAILFROM: byungchul.park@lge.com
+From:   Byungchul Park <byungchul.park@lge.com>
+To:     boqun.feng@gmail.com
+Cc:     linux-kernel@vger.kernel.org, torvalds@linux-foundation.org,
+        damien.lemoal@opensource.wdc.com, linux-ide@vger.kernel.org,
+        adilger.kernel@dilger.ca, linux-ext4@vger.kernel.org,
+        mingo@redhat.com, peterz@infradead.org, will@kernel.org,
+        tglx@linutronix.de, rostedt@goodmis.org, joel@joelfernandes.org,
+        sashal@kernel.org, daniel.vetter@ffwll.ch, duyuyang@gmail.com,
+        johannes.berg@intel.com, tj@kernel.org, tytso@mit.edu,
+        willy@infradead.org, david@fromorbit.com, amir73il@gmail.com,
+        gregkh@linuxfoundation.org, kernel-team@lge.com,
+        linux-mm@kvack.org, akpm@linux-foundation.org, mhocko@kernel.org,
+        minchan@kernel.org, hannes@cmpxchg.org, vdavydov.dev@gmail.com,
+        sj@kernel.org, jglisse@redhat.com, dennis@kernel.org, cl@linux.com,
+        penberg@kernel.org, rientjes@google.com, vbabka@suse.cz,
+        ngupta@vflare.org, linux-block@vger.kernel.org,
+        paolo.valente@linaro.org, josef@toxicpanda.com,
+        linux-fsdevel@vger.kernel.org, viro@zeniv.linux.org.uk,
+        jack@suse.cz, jlayton@kernel.org, dan.j.williams@intel.com,
+        hch@infradead.org, djwong@kernel.org,
+        dri-devel@lists.freedesktop.org, rodrigosiqueiramelo@gmail.com,
+        melissa.srw@gmail.com, hamohammed.sa@gmail.com,
+        42.hyeyoo@gmail.com, chris.p.wilson@intel.com,
+        gwan-gyeong.mun@intel.com, max.byungchul.park@gmail.com,
+        longman@redhat.com
+Subject: Re: [PATCH RFC v7 00/23] DEPT(Dependency Tracker)
+Date:   Thu, 19 Jan 2023 15:23:08 +0900
+Message-Id: <1674109388-6663-1-git-send-email-byungchul.park@lge.com>
+X-Mailer: git-send-email 1.9.1
+In-Reply-To: <Y8bmeffIQ3iXU3Ux@boqun-archlinux>
+References: <Y8bmeffIQ3iXU3Ux@boqun-archlinux>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jan 19, 2023 at 05:04:20AM +0000, Al Viro wrote:
-> 1) fs/direct-io.c is ancient, grotty and has few remaining users.
-> The case of block devices got split off first; these days it's in
-> block/fops.c.  Then iomap-using filesystems went to fs/iomap/direct-io.c,
-> leaving this sucker used only by affs, ext2, fat, exfat, hfs, hfsplus, jfs,
-> nilfs2, ntfs3, reiserfs, udf and ocfs2.  And frankly, the sooner it dies
-> the better off we are.  IOW, you've picked an uninteresting part and left
-> the important ones untouched.
+Boqun wrote:
+> On Mon, Jan 16, 2023 at 10:00:52AM -0800, Linus Torvalds wrote:
+> > [ Back from travel, so trying to make sense of this series..  ]
+> > 
+> > On Sun, Jan 8, 2023 at 7:33 PM Byungchul Park <byungchul.park@lge.com> wrote:
+> > >
+> > > I've been developing a tool for detecting deadlock possibilities by
+> > > tracking wait/event rather than lock(?) acquisition order to try to
+> > > cover all synchonization machanisms. It's done on v6.2-rc2.
+> > 
+> > Ugh. I hate how this adds random patterns like
+> > 
+> >         if (timeout == MAX_SCHEDULE_TIMEOUT)
+> >                 sdt_might_sleep_strong(NULL);
+> >         else
+> >                 sdt_might_sleep_strong_timeout(NULL);
+> >    ...
+> >         sdt_might_sleep_finish();
+> > 
+> > to various places, it seems so very odd and unmaintainable.
+> > 
+> > I also recall this giving a fair amount of false positives, are they all fixed?
+> > 
+> 
+> From the following part in the cover letter, I guess the answer is no?
 
-Agreed.  That being said if we want file systems (including those not
-using this legacy version) to be able to rely on correct page dirtying
-eventually everything needs to pin pages it writes to.  So we need to
-either actually fix or remove this code in the forseeable future.  It's
-by far not the most interesting and highest priority, though.   And as
-I said this series is already too large too review anyway, I'd really
-prefer to get a core set done ASAP and then iterate on the callers and
-additional bits.
+I fixed what we found anyway.
 
-> Unless I misunderstand something fundamental about the whole thing,
-> this crap should become useless with that conversion.
+> 	...
+> 	6. Multiple reports are allowed.
+> 	7. Deduplication control on multiple reports.
+> 	8. Withstand false positives thanks to 6.
+> 	...
+> 
+> seems to me that the logic is since DEPT allows multiple reports so that
+> false positives are fitlerable by users?
 
-It should - mostly.  But we need to be very careful about that, so
-I'd prefer a separate small series for it to be honest.
+At lease, it's needed until DEPT is considered stable because stronger
+detection inevitably has more chance of false alarms unless we do manual
+fix on each, which is the same as Lockdep.
 
-> BTW, where do we dirty the pages on IO_URING_OP_READ_FIXED with
-> O_DIRECT file?  AFAICS, bio_set_pages_dirty() won't be called
-> (ITER_BVEC iter) and neither will bio_release_pages() do anything
-> (BIO_NO_PAGE_REF set on the bio by bio_iov_bvec_set() called
-> due to the same ITER_BVEC iter).  Am I missing something trivial
-> here?  Jens?
+> > Anyway, I'd really like the lockdep people to comment and be involved.
+> 
+> I never get Cced, so I'm unware of this for a long time...
 
-I don't think we do that all right now.
+Sorry I missed it. I will cc you from now on.
+
+> A few comments after a quick look:
+> 
+> *	Looks like the DEPT dependency graph doesn't handle the
+> 	fair/unfair readers as lockdep current does. Which bring the
+> 	next question.
+
+No. DEPT works better for unfair read. It works based on wait/event. So
+read_lock() is considered a potential wait waiting on write_unlock()
+while write_lock() is considered a potential wait waiting on either
+write_unlock() or read_unlock(). DEPT is working perfect for it.
+
+For fair read (maybe you meant queued read lock), I think the case
+should be handled in the same way as normal lock. I might get it wrong.
+Please let me know if I miss something.
+
+> *	Can DEPT pass all the selftests of lockdep in
+> 	lib/locking-selftests.c?
+> 
+> *	Instead of introducing a brand new detector/dependency tracker,
+> 	could we first improve the lockdep's dependency tracker? I think
+
+At the beginning of this work, of course I was thinking to improve
+Lockdep but I decided to implement a new tool because:
+
+	1. What we need to check for deadlock detection is no longer
+	   lock dependency but more fundamental dependency by wait/event.
+	   A better design would have a separate dependency engine for
+	   that, not within Lockdep. Remind lock/unlock are also
+	   wait/event after all.
+
+	2. I was thinking to revert the revert of cross-release. But it
+	   will start to report false alarms as Lockdep was at the
+	   beginning, and require us to keep fixing things until being
+	   able to see what we are interested in, maybe for ever. How
+	   can we control that situation? I wouldn't use this extention.
+
+	3. Okay. Let's think about modifying the current Lockdep to make
+	   it work similar to DEPT. It'd require us to pay more effort
+	   than developing a new simple tool from the scratch with the
+	   basic requirement.
+
+	4. Big change at once right away? No way. The new tool need to
+	   be matured and there are ones who want to make use of DEPT at
+	   the same time. The best approach would be I think to go along
+	   together for a while.
+
+Please don't look at each detail but the big picture, the architecture.
+Plus, please consider I introduce a tool only focucing on fundamental
+dependency itself that Lockdep can make use of. I wish great developers
+like you would join improve the common engine togather.
+
+> 	Byungchul also agrees that DEPT and lockdep should share the
+> 	same dependency tracker and the benefit of improving the
+
+I agree that both should share a single tracker.
+
+> 	existing one is that we can always use the self test to catch
+> 	any regression. Thoughts?
+
+I imagine the follownig look for the final form:
+
+     Lock correctness checker(LOCKDEP)
+     +-----------------------------------------+
+     | Lock usage correctness check            |
+     |                                         |
+     |                                         |
+     |       (Request dependency check)        |
+     |                           T             |
+     +---------------------------|-------------+
+                                 |
+     Dependency tracker(DEPT)    V
+     +-----------------------------------------+
+     | Dependency check                        |
+     | (by tracking wait and event context)    |
+     +-----------------------------------------+
+
+> Actually the above sugguest is just to revert revert cross-release
+> without exposing any annotation, which I think is more practical to
+> review and test.
+
+Reverting the revert of cross-release is not bad. But I'd suggest a
+nicer design for the reasons I explained above.
+
+	Byungchul
+
+> I'd sugguest we 1) first improve the lockdep dependency tracker with
+> wait/event in mind and then 2) introduce wait related annotation so that
+> users can use, and then 3) look for practical ways to resolve false
+> positives/multi reports with the help of users, if all goes well,
+> 4) make it all operation annotated.
+> 
+> Thoughts?
+> 
+> Regards,
+> Boqun
