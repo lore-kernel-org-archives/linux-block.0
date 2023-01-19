@@ -2,89 +2,81 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E0B1C00A5A
-	for <linux-block@archiver.kernel.org>; Thu, 19 Jan 2023 17:13:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 22536C46467
+	for <linux-block@archiver.kernel.org>; Thu, 19 Jan 2023 17:27:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229592AbjASRNz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 19 Jan 2023 12:13:55 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57310 "EHLO
+        id S229765AbjASR1s (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 19 Jan 2023 12:27:48 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37404 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229575AbjASRNy (ORCPT
+        with ESMTP id S229618AbjASR1m (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 19 Jan 2023 12:13:54 -0500
-Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F1ED4DCE4;
-        Thu, 19 Jan 2023 09:13:53 -0800 (PST)
-Received: by mail-pl1-x633.google.com with SMTP id 12so149685plo.3;
-        Thu, 19 Jan 2023 09:13:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=HFfg4vjHMlgAnxwHU0IZDYXZDE9o/oiWwSlrAYq3R5g=;
-        b=X+pv9m4dyfqTTh7NZfU1L4amF07biWIPm63cC9fNYYpkbNI0qpBHzcRDEv4T/Ejr6i
-         A8E2+JfZ8da4ELFsiatHjimOU/8/kDX4+Q2aI4BH5PlPLP/vNFa9ivtY4/SeqnH4eQt7
-         3e5QyZ3SiaUZmmuYD2krSfow7EB8PfehPb2FJ6/jkd4AvvjmG/wMjAWv6r4mxsNPgLQ+
-         YEk2ItBSLWk4QGxz9SHfCz73gwCT0SaDHLePGGsb//2+m8NuJX4oBZtDS2poXWWNLHfE
-         CesCZu9SCOOJuAaxeea6v6eSExq26OGrje6hH+Q7kSvUlpXYKXyfvWO0f+X1BxpOsUGR
-         IX2Q==
+        Thu, 19 Jan 2023 12:27:42 -0500
+Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D497C44A0;
+        Thu, 19 Jan 2023 09:27:33 -0800 (PST)
+Received: by mail-pf1-f174.google.com with SMTP id g205so2038934pfb.6;
+        Thu, 19 Jan 2023 09:27:33 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=HFfg4vjHMlgAnxwHU0IZDYXZDE9o/oiWwSlrAYq3R5g=;
-        b=IFSJmy5NYqZlQ0iTRl+4J8aiM5LKjBkSdiCwB9xbdC2NvQLn+Ij0snXtESIu8DgTRy
-         phua9lKFIe/rrrwT5T9xDZjl9Y6yP+eFUF4HRMRxJvSTvChNV2grnitDamSyvIQyKZfi
-         U26S7rs+CNScvx9sDffMml4ZTeYuvKbogK0uekjxOb1X5JKQaG8eBBJ8hKdgoPqQ+486
-         r0Ltnon3O38JmxIHdOzQEMc12Bg50s4RfSjK8ygExPXNK3DAxfblKI8RyAS1HjdPri4x
-         HH+ttPQ5LRcv2CfI5H/8Lxx6vbhj3iexOBBxj09dBD+VtB+5BOPYJ0Pv6osmd3Y+Dbfq
-         37AQ==
-X-Gm-Message-State: AFqh2kpEzCq0h9rfGyyw2k0aAVwckG1nNICWZtF48RoC7Gwptqnj6Ks2
-        U+i76S1uSAHu6bY1PP5LDko=
-X-Google-Smtp-Source: AMrXdXs2mFA/OwbxBCuHRWmgmsuQjXGvbvfgePhmcD+Y2Nd7vLoGSKS6AH9stxCTjLb8hktGmkko3g==
-X-Received: by 2002:a17:902:e84b:b0:194:ddc2:60e8 with SMTP id t11-20020a170902e84b00b00194ddc260e8mr428202plg.48.1674148432849;
-        Thu, 19 Jan 2023 09:13:52 -0800 (PST)
-Received: from localhost (2603-800c-1a02-1bae-a7fa-157f-969a-4cde.res6.spectrum.com. [2603:800c:1a02:1bae:a7fa:157f:969a:4cde])
-        by smtp.gmail.com with ESMTPSA id j14-20020a170903024e00b00177f25f8ab3sm25431298plh.89.2023.01.19.09.13.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 19 Jan 2023 09:13:52 -0800 (PST)
-Sender: Tejun Heo <htejun@gmail.com>
-Date:   Thu, 19 Jan 2023 07:13:51 -1000
-From:   Tejun Heo <tj@kernel.org>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, Josef Bacik <josef@toxicpanda.com>,
-        linux-block@vger.kernel.org, cgroups@vger.kernel.org
-Subject: Re: switch blk-cgroup to work on gendisk
-Message-ID: <Y8l6TySjEuGT9Q+5@slm.duckdns.org>
-References: <20230117081257.3089859-1-hch@lst.de>
- <Y8l34/qeHPLV4rKJ@slm.duckdns.org>
- <20230119170526.GA5050@lst.de>
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Uevu+pvo3ZIi+T3WwIxEqVbeApxQC0IOyRnax7XyE0g=;
+        b=hMt7VTVU+Vog/MW1LEswDd0ZhkmX0ofin0LyHazIAp3FfieY8pt4d6wutLplHm5Gmx
+         jjTcGuPp6imxepjaIKT1S55sqEKoqdFOI460a5BhON6LEhROgBZEaxFKD2NbPiEPrQpT
+         1F1LMzKEL287P3mePwL6ZpaGASb7oJ9+O/TyBBrORO+FrF1u9UVwxufH5aWdv0w7JhYb
+         y5r6KkahBdMeSUm4q3Ros7g6mVjNoO724dsXmb3y1y/crBUn1ZUk/7GkYIwEzvFB/2JN
+         BG9cYCAXdbk7MWAllJZ3c78V1ePro1bi+lETScyg5fqNk+zJaY9G1ZT3z7/gwiw3wxWD
+         nPQQ==
+X-Gm-Message-State: AFqh2krhEiYL7aX+/juLfAEsC70hpkoEKMSISr+YUwfHiOeZrc+Q2WLI
+        PJUNrEVSWn9nzcXgpD4BXnuMLHnW5YU=
+X-Google-Smtp-Source: AMrXdXsmP/s8P80OwssBj+z7YDI11lTYIyvM8NlAJDTadbx7AcxRqEXTLCVlb72+ZvG1IHJ+yo9TSw==
+X-Received: by 2002:aa7:9399:0:b0:58d:272a:52a0 with SMTP id t25-20020aa79399000000b0058d272a52a0mr10567279pfe.32.1674149253310;
+        Thu, 19 Jan 2023 09:27:33 -0800 (PST)
+Received: from ?IPV6:2620:15c:211:201:ff60:f896:307d:56f7? ([2620:15c:211:201:ff60:f896:307d:56f7])
+        by smtp.gmail.com with ESMTPSA id c205-20020a624ed6000000b00580a0bb411fsm3505268pfb.174.2023.01.19.09.27.31
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 19 Jan 2023 09:27:32 -0800 (PST)
+Message-ID: <a849cb56-a384-530d-e12e-1dba2bed4355@acm.org>
+Date:   Thu, 19 Jan 2023 09:27:29 -0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230119170526.GA5050@lst.de>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.5.1
+Subject: Re: [PATCH v3 8/9] scsi: core: Set BLK_SUB_PAGE_SEGMENTS for small
+ max_segment_size values
+Content-Language: en-US
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        linux-scsi@vger.kernel.org, Jaegeuk Kim <jaegeuk@kernel.org>,
+        Avri Altman <avri.altman@wdc.com>,
+        Adrian Hunter <adrian.hunter@intel.com>,
+        Ming Lei <ming.lei@redhat.com>,
+        Alim Akhtar <alim.akhtar@samsung.com>,
+        Kiwoong Kim <kwmad.kim@samsung.com>
+References: <20230118225447.2809787-1-bvanassche@acm.org>
+ <20230118225447.2809787-9-bvanassche@acm.org> <20230119053852.GA16933@lst.de>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20230119053852.GA16933@lst.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jan 19, 2023 at 06:05:26PM +0100, Christoph Hellwig wrote:
-> Yes, it can.  Not sure if my sentence was unclear, but:
+On 1/18/23 21:38, Christoph Hellwig wrote:
+>> +	if (shost->max_segment_size && shost->max_segment_size < PAGE_SIZE)
+>> +		blk_queue_flag_set(QUEUE_FLAG_SUB_PAGE_SEGMENTS, q);
 > 
->  - everything doing non-passthrough I/O only should be in the gendisk
->  - everything related to blk-mq, including infrastruture for passthrough
->    should remain in the request_queue
-> 
-> The idea that the request_queue will eventually become a blk-mq only
-> data structure and not exist (or just have a very leight weight stub)
-> for bio based drivers.
+> Independ of me really not wanting this code at all if we can avoid it:
+> this has no business in the SCSI midlayer or drivers.  Once the config
+> option is enabled, setting the flag should happen inside
+> blk_queue_max_segment_size.
 
-That makes sense. I was thinking about it the other way around. Yeah, genhd
-would exist for everybody. request_queue only for the ones which are
-actually handling rq's.
+Hi Christoph,
 
-Thanks.
+Thanks for having taken a look. I will move this code into the block layer.
 
--- 
-tejun
+Thanks,
+
+Bart.
