@@ -2,77 +2,124 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DF9EC678D4
-	for <linux-block@archiver.kernel.org>; Thu, 19 Jan 2023 21:24:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D7143C46467
+	for <linux-block@archiver.kernel.org>; Thu, 19 Jan 2023 22:23:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230255AbjASVYb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 19 Jan 2023 16:24:31 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37960 "EHLO
+        id S230255AbjASWXo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 19 Jan 2023 17:23:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54424 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230254AbjASVW2 (ORCPT
+        with ESMTP id S230050AbjASWWH (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 19 Jan 2023 16:22:28 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49D32A2961
-        for <linux-block@vger.kernel.org>; Thu, 19 Jan 2023 13:14:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1674162892;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=i1IMCqddgWykv8AXR/YeAqVJq9PsFQed00N0J64kJGo=;
-        b=N+XavR/d04kvy+vNmHXdROxgc6zSa1gu52k4JmGlCInBqaqV4a56nO74nl7efG96BZ1Yuu
-        jYppticNL32L/kHl0dh82P71m+qmi17pZAfpHMZdn+YMZOfFe89bTU6YauZ9gXD1uwbmbB
-        QIs0Y1IK7NjSKbHCf2indjYjliyE9bU=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-153-hi1FagP5OzO-eBN77YCRog-1; Thu, 19 Jan 2023 16:14:49 -0500
-X-MC-Unique: hi1FagP5OzO-eBN77YCRog-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id BAE92181E3F4;
-        Thu, 19 Jan 2023 21:14:48 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.33.36.23])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id D291A51EF;
-        Thu, 19 Jan 2023 21:14:46 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <Y8l0Xdd0MKbuVa7z@infradead.org>
-References: <Y8l0Xdd0MKbuVa7z@infradead.org> <Y8jYrahu45kkCRlq@infradead.org> <167391047703.2311931.8115712773222260073.stgit@warthog.procyon.org.uk> <167391048988.2311931.1567396746365286847.stgit@warthog.procyon.org.uk> <Y8ZTyx7vM8NpnUAj@infradead.org> <Y8huoSe4j6ysLUTT@ZenIV> <2731230.1674128066@warthog.procyon.org.uk>
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     dhowells@redhat.com, Al Viro <viro@zeniv.linux.org.uk>,
-        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>,
-        Jeff Layton <jlayton@kernel.org>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v6 01/34] vfs: Unconditionally set IOCB_WRITE in call_write_iter()
+        Thu, 19 Jan 2023 17:22:07 -0500
+Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C0F9613D8;
+        Thu, 19 Jan 2023 14:07:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1674166062; x=1705702062;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=5S3BuqC24+NJu2M0zXACS9Pp/HfCry1iDRW8QTKi5vo=;
+  b=iMxw66YZnG/H+UMdCgf3JqDp9XlKYAMeDSoVxtNbAjyzr8vLd4LJrhWL
+   x1E4ibYFUPpbGDTHcPQVfRiWkkGetM8sJSLRjL36+Qjru3nvE8m/01ydI
+   65tzKduX4u+khKacsZ63eckn6aZD+5c5cUt40Eodo/yI2ZDCyrFDock1g
+   4ksmE/B5IMdk2c0abspo7CSALwy9RzJSxi4jF44naghyOW7XTLNdG8X05
+   LehkUNaa2SKenMaCmzYMnFm7wCuuzPmbnJZL53imwLM0ZmuroAYL2Fnef
+   EaLj4SjNDMX9h1m5yth+2p2qnAykpAQBv8fFpSFVn3w//0CKUk548ECOc
+   Q==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10595"; a="323130642"
+X-IronPort-AV: E=Sophos;i="5.97,230,1669104000"; 
+   d="scan'208";a="323130642"
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Jan 2023 14:07:42 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10595"; a="784226638"
+X-IronPort-AV: E=Sophos;i="5.97,230,1669104000"; 
+   d="scan'208";a="784226638"
+Received: from black.fi.intel.com ([10.237.72.28])
+  by orsmga004.jf.intel.com with ESMTP; 19 Jan 2023 14:07:40 -0800
+Received: by black.fi.intel.com (Postfix, from userid 1003)
+        id 35AE092; Fri, 20 Jan 2023 00:08:15 +0200 (EET)
+From:   Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To:     Jens Axboe <axboe@kernel.dk>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Subject: [PATCH v1 2/9] pktcdvd: replace sscanf() by kstrtoul()
+Date:   Fri, 20 Jan 2023 00:08:02 +0200
+Message-Id: <20230119220809.5518-2-andriy.shevchenko@linux.intel.com>
+X-Mailer: git-send-email 2.39.0
+In-Reply-To: <20230119220809.5518-1-andriy.shevchenko@linux.intel.com>
+References: <20230119220809.5518-1-andriy.shevchenko@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <3037548.1674162886.1@warthog.procyon.org.uk>
-Date:   Thu, 19 Jan 2023 21:14:46 +0000
-Message-ID: <3037549.1674162886@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.5
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Christoph Hellwig <hch@infradead.org> wrote:
+The checkpatch.pl warns: "Prefer kstrto<type> to single variable sscanf".
+Fix the code accordingly.
 
-> So what about deferring this whole cleanup for now?
+Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+---
+ drivers/block/pktcdvd.c | 34 ++++++++++++++++++----------------
+ 1 file changed, 18 insertions(+), 16 deletions(-)
 
-So you'd rather I stick with the direction indicator in the iov_iter struct
-for now?
-
-I still want to add iov_iter_extract_pages(), netfs_extract_user_iter() and
-netfs_extract_iter_to_sg(), even if it's only cifs and netfslib that use them
-for the moment.
-
-David
+diff --git a/drivers/block/pktcdvd.c b/drivers/block/pktcdvd.c
+index 0ec8dc8ee5ed..ad4336ae9927 100644
+--- a/drivers/block/pktcdvd.c
++++ b/drivers/block/pktcdvd.c
+@@ -236,15 +236,16 @@ static ssize_t congestion_off_store(struct device *dev,
+ 				    const char *buf, size_t len)
+ {
+ 	struct pktcdvd_device *pd = dev_get_drvdata(dev);
+-	int val;
++	int val, ret;
+ 
+-	if (sscanf(buf, "%d", &val) == 1) {
+-		spin_lock(&pd->lock);
+-		pd->write_congestion_off = val;
+-		init_write_congestion_marks(&pd->write_congestion_off,
+-					&pd->write_congestion_on);
+-		spin_unlock(&pd->lock);
+-	}
++	ret = kstrtoint(buf, 10, &val);
++	if (ret)
++		return ret;
++
++	spin_lock(&pd->lock);
++	pd->write_congestion_off = val;
++	init_write_congestion_marks(&pd->write_congestion_off, &pd->write_congestion_on);
++	spin_unlock(&pd->lock);
+ 	return len;
+ }
+ static DEVICE_ATTR_RW(congestion_off);
+@@ -266,15 +267,16 @@ static ssize_t congestion_on_store(struct device *dev,
+ 				   const char *buf, size_t len)
+ {
+ 	struct pktcdvd_device *pd = dev_get_drvdata(dev);
+-	int val;
++	int val, ret;
+ 
+-	if (sscanf(buf, "%d", &val) == 1) {
+-		spin_lock(&pd->lock);
+-		pd->write_congestion_on = val;
+-		init_write_congestion_marks(&pd->write_congestion_off,
+-					&pd->write_congestion_on);
+-		spin_unlock(&pd->lock);
+-	}
++	ret = kstrtoint(buf, 10, &val);
++	if (ret)
++		return ret;
++
++	spin_lock(&pd->lock);
++	pd->write_congestion_on = val;
++	init_write_congestion_marks(&pd->write_congestion_off, &pd->write_congestion_on);
++	spin_unlock(&pd->lock);
+ 	return len;
+ }
+ static DEVICE_ATTR_RW(congestion_on);
+-- 
+2.39.0
 
