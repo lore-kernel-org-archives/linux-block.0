@@ -2,119 +2,76 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C0AFC004D4
-	for <linux-block@archiver.kernel.org>; Thu, 19 Jan 2023 09:05:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F25A2C004D4
+	for <linux-block@archiver.kernel.org>; Thu, 19 Jan 2023 10:03:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229851AbjASJFt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 19 Jan 2023 04:05:49 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60672 "EHLO
+        id S230232AbjASKDY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 19 Jan 2023 05:03:24 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38632 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229986AbjASJFh (ORCPT
+        with ESMTP id S230305AbjASKCj (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 19 Jan 2023 04:05:37 -0500
-Received: from lgeamrelo11.lge.com (lgeamrelo13.lge.com [156.147.23.53])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 6BBFD68404
-        for <linux-block@vger.kernel.org>; Thu, 19 Jan 2023 01:05:25 -0800 (PST)
-Received: from unknown (HELO lgemrelse6q.lge.com) (156.147.1.121)
-        by 156.147.23.53 with ESMTP; 19 Jan 2023 18:05:24 +0900
-X-Original-SENDERIP: 156.147.1.121
-X-Original-MAILFROM: byungchul.park@lge.com
-Received: from unknown (HELO localhost.localdomain) (10.177.244.38)
-        by 156.147.1.121 with ESMTP; 19 Jan 2023 18:05:24 +0900
-X-Original-SENDERIP: 10.177.244.38
-X-Original-MAILFROM: byungchul.park@lge.com
-From:   Byungchul Park <byungchul.park@lge.com>
-To:     tglx@linutronix.de
-Cc:     linux-kernel@vger.kernel.org, torvalds@linux-foundation.org,
-        damien.lemoal@opensource.wdc.com, linux-ide@vger.kernel.org,
-        adilger.kernel@dilger.ca, linux-ext4@vger.kernel.org,
-        mingo@redhat.com, peterz@infradead.org, will@kernel.org,
-        rostedt@goodmis.org, joel@joelfernandes.org, sashal@kernel.org,
-        daniel.vetter@ffwll.ch, duyuyang@gmail.com,
-        johannes.berg@intel.com, tj@kernel.org, tytso@mit.edu,
-        willy@infradead.org, david@fromorbit.com, amir73il@gmail.com,
-        gregkh@linuxfoundation.org, kernel-team@lge.com,
-        linux-mm@kvack.org, akpm@linux-foundation.org, mhocko@kernel.org,
-        minchan@kernel.org, hannes@cmpxchg.org, vdavydov.dev@gmail.com,
-        sj@kernel.org, jglisse@redhat.com, dennis@kernel.org, cl@linux.com,
-        penberg@kernel.org, rientjes@google.com, vbabka@suse.cz,
-        ngupta@vflare.org, linux-block@vger.kernel.org,
-        paolo.valente@linaro.org, josef@toxicpanda.com,
-        linux-fsdevel@vger.kernel.org, viro@zeniv.linux.org.uk,
-        jack@suse.cz, jlayton@kernel.org, dan.j.williams@intel.com,
-        hch@infradead.org, djwong@kernel.org,
-        dri-devel@lists.freedesktop.org, rodrigosiqueiramelo@gmail.com,
-        melissa.srw@gmail.com, hamohammed.sa@gmail.com,
-        42.hyeyoo@gmail.com, chris.p.wilson@intel.com,
-        gwan-gyeong.mun@intel.com, max.byungchul.park@gmail.com,
-        boqun.feng@gmail.com, longman@redhat.com
-Subject: Re: [PATCH RFC v7 00/23] DEPT(Dependency Tracker)
-Date:   Thu, 19 Jan 2023 18:05:11 +0900
-Message-Id: <1674119111-12759-1-git-send-email-byungchul.park@lge.com>
-X-Mailer: git-send-email 1.9.1
-In-Reply-To: <873588j92x.ffs@tglx>
-References: <873588j92x.ffs@tglx>
+        Thu, 19 Jan 2023 05:02:39 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 897E46E80E
+        for <linux-block@vger.kernel.org>; Thu, 19 Jan 2023 02:01:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1674122495;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=MlfOpaZo8+JXQHQHhPM627Bpxxgi0KKq6Kx0UKuosSU=;
+        b=JJbDXEZ623XHiXZ6HJpBMiUVhvbj9npN1Yc2odyViROi5HTLx3MmUijIJx8Qm4v6sBZtwB
+        sTOOyOk9FpBZGdpPVY/rLQaOjpwLzSdI4aOcuUEe5AwGZxlmu+WR0m5W2ngv45mDFfGmGD
+        qFHmZ7MHK1E/75LpxGgL0rj4idaMnNY=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-351-t_bvYwokPH-AQe0Qgd0v9A-1; Thu, 19 Jan 2023 05:01:28 -0500
+X-MC-Unique: t_bvYwokPH-AQe0Qgd0v9A-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 293E1811E9C;
+        Thu, 19 Jan 2023 10:01:28 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.33.36.23])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id C6DD12026D68;
+        Thu, 19 Jan 2023 10:01:26 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <Y8htMvG33I73oG9z@ZenIV>
+References: <Y8htMvG33I73oG9z@ZenIV> <167391047703.2311931.8115712773222260073.stgit@warthog.procyon.org.uk> <167391048988.2311931.1567396746365286847.stgit@warthog.procyon.org.uk>
+To:     Al Viro <viro@zeniv.linux.org.uk>
+Cc:     dhowells@redhat.com, Christoph Hellwig <hch@lst.de>,
+        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>,
+        Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>,
+        Jeff Layton <jlayton@kernel.org>,
+        Logan Gunthorpe <logang@deltatee.com>,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v6 01/34] vfs: Unconditionally set IOCB_WRITE in call_write_iter()
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <2724946.1674122486.1@warthog.procyon.org.uk>
+Date:   Thu, 19 Jan 2023 10:01:26 +0000
+Message-ID: <2724947.1674122486@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Thomas wrote:
-> On Tue, Jan 17 2023 at 10:18, Boqun Feng wrote:
-> > On Mon, Jan 16, 2023 at 10:00:52AM -0800, Linus Torvalds wrote:
-> > > I also recall this giving a fair amount of false positives, are they all fixed?
-> >
-> > From the following part in the cover letter, I guess the answer is no?
-> >	...
-> >       6. Multiple reports are allowed.
-> >       7. Deduplication control on multiple reports.
-> >       8. Withstand false positives thanks to 6.
-> >	...
-> >
-> > seems to me that the logic is since DEPT allows multiple reports so that
-> > false positives are fitlerable by users?
-> 
-> I really do not know what's so valuable about multiple reports. They
-> produce a flood of information which needs to be filtered, while a
-> single report ensures that the first detected issue is dumped, which
-> increases the probability that it can be recorded and acted upon.
+Al Viro <viro@zeniv.linux.org.uk> wrote:
 
-Assuming the following 2 assumptions, you are right.
+> 	Which does nothing for places that do not use call_write_iter()...
+> __kernel_write_iter() is one such; for less obvious specimen see
+> drivers/nvme/target/io-cmd-file.c:nvmet_file_submit_bvec()
 
-Assumption 1. There will be too many reports with the multi-report
-	      support, like all the combination of dependencies between
-	      e.g. in-irq and irq-enabled-context.
+Should these be calling call_read/write_iter()?  If not, should
+call_read/write_iter() be dropped?
 
-Assumption 2. The detection is matured enough so that it barely happens
-	      to fix false onces to see true one which is not a big deal.
+David
 
-However, DEPT doesn't generate all the combination of irq things as
-Lockdep does so we only see a few multi-reports even with the support,
-and I admit DEPT hasn't matured enough yet because fine classification
-is required anyway to suppress false alarms. That's why I introduced
-multi-report support at least for now. IMHO, it'd be still useful even
-if it's gonna report a few true ones at once w/o false ones some day.
-
-> Filtering out false positives is just the wrong approach. Decoding
-> dependency issues from any tracker is complex enough given the nature of
-> the problem, so adding the burden of filtering out issues from a stream
-> of dumps is not helpful at all. It's just a marketing gag.
-> 
-> > *	Instead of introducing a brand new detector/dependency tracker,
-> >	could we first improve the lockdep's dependency tracker? I think
-> >	Byungchul also agrees that DEPT and lockdep should share the
-> >	same dependency tracker and the benefit of improving the
-> >	existing one is that we can always use the self test to catch
-> >	any regression. Thoughts?
-> 
-> Ack. If the internal implementation of lockdep has shortcomings, then we
-> can expand and/or replace it instead of having yet another
-> infrastructure which is not even remotely as mature.
-
-Ultimately, yes. We should expand or replace it instead of having
-another ultimately.
-
-	Byungchul
-> 
-> Thanks,
-> 
->         tglx
