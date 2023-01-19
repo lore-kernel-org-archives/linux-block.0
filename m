@@ -2,35 +2,35 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CAA7C46467
-	for <linux-block@archiver.kernel.org>; Thu, 19 Jan 2023 07:07:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C0AFC004D4
+	for <linux-block@archiver.kernel.org>; Thu, 19 Jan 2023 09:05:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229751AbjASHHC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 19 Jan 2023 02:07:02 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33766 "EHLO
+        id S229851AbjASJFt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 19 Jan 2023 04:05:49 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60672 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229468AbjASHHB (ORCPT
+        with ESMTP id S229986AbjASJFh (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 19 Jan 2023 02:07:01 -0500
+        Thu, 19 Jan 2023 04:05:37 -0500
 Received: from lgeamrelo11.lge.com (lgeamrelo13.lge.com [156.147.23.53])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A1E22589A6
-        for <linux-block@vger.kernel.org>; Wed, 18 Jan 2023 23:06:52 -0800 (PST)
-Received: from unknown (HELO lgemrelse7q.lge.com) (156.147.1.151)
-        by 156.147.23.53 with ESMTP; 19 Jan 2023 16:06:51 +0900
-X-Original-SENDERIP: 156.147.1.151
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 6BBFD68404
+        for <linux-block@vger.kernel.org>; Thu, 19 Jan 2023 01:05:25 -0800 (PST)
+Received: from unknown (HELO lgemrelse6q.lge.com) (156.147.1.121)
+        by 156.147.23.53 with ESMTP; 19 Jan 2023 18:05:24 +0900
+X-Original-SENDERIP: 156.147.1.121
 X-Original-MAILFROM: byungchul.park@lge.com
 Received: from unknown (HELO localhost.localdomain) (10.177.244.38)
-        by 156.147.1.151 with ESMTP; 19 Jan 2023 16:06:51 +0900
+        by 156.147.1.121 with ESMTP; 19 Jan 2023 18:05:24 +0900
 X-Original-SENDERIP: 10.177.244.38
 X-Original-MAILFROM: byungchul.park@lge.com
 From:   Byungchul Park <byungchul.park@lge.com>
-To:     boqun.feng@gmail.com
+To:     tglx@linutronix.de
 Cc:     linux-kernel@vger.kernel.org, torvalds@linux-foundation.org,
         damien.lemoal@opensource.wdc.com, linux-ide@vger.kernel.org,
         adilger.kernel@dilger.ca, linux-ext4@vger.kernel.org,
         mingo@redhat.com, peterz@infradead.org, will@kernel.org,
-        tglx@linutronix.de, rostedt@goodmis.org, joel@joelfernandes.org,
-        sashal@kernel.org, daniel.vetter@ffwll.ch, duyuyang@gmail.com,
+        rostedt@goodmis.org, joel@joelfernandes.org, sashal@kernel.org,
+        daniel.vetter@ffwll.ch, duyuyang@gmail.com,
         johannes.berg@intel.com, tj@kernel.org, tytso@mit.edu,
         willy@infradead.org, david@fromorbit.com, amir73il@gmail.com,
         gregkh@linuxfoundation.org, kernel-team@lge.com,
@@ -47,167 +47,74 @@ Cc:     linux-kernel@vger.kernel.org, torvalds@linux-foundation.org,
         melissa.srw@gmail.com, hamohammed.sa@gmail.com,
         42.hyeyoo@gmail.com, chris.p.wilson@intel.com,
         gwan-gyeong.mun@intel.com, max.byungchul.park@gmail.com,
-        longman@redhat.com
+        boqun.feng@gmail.com, longman@redhat.com
 Subject: Re: [PATCH RFC v7 00/23] DEPT(Dependency Tracker)
-Date:   Thu, 19 Jan 2023 16:06:38 +0900
-Message-Id: <1674111998-25175-1-git-send-email-byungchul.park@lge.com>
+Date:   Thu, 19 Jan 2023 18:05:11 +0900
+Message-Id: <1674119111-12759-1-git-send-email-byungchul.park@lge.com>
 X-Mailer: git-send-email 1.9.1
-In-Reply-To: <1674109388-6663-1-git-send-email-byungchul.park@lge.com>
-References: <1674109388-6663-1-git-send-email-byungchul.park@lge.com>
+In-Reply-To: <873588j92x.ffs@tglx>
+References: <873588j92x.ffs@tglx>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Byungchul wrote:
-> Boqun wrote:
+Thomas wrote:
+> On Tue, Jan 17 2023 at 10:18, Boqun Feng wrote:
 > > On Mon, Jan 16, 2023 at 10:00:52AM -0800, Linus Torvalds wrote:
-> > > [ Back from travel, so trying to make sense of this series..  ]
-> > > 
-> > > On Sun, Jan 8, 2023 at 7:33 PM Byungchul Park <byungchul.park@lge.com> wrote:
-> > > >
-> > > > I've been developing a tool for detecting deadlock possibilities by
-> > > > tracking wait/event rather than lock(?) acquisition order to try to
-> > > > cover all synchonization machanisms. It's done on v6.2-rc2.
-> > > 
-> > > Ugh. I hate how this adds random patterns like
-> > > 
-> > >         if (timeout == MAX_SCHEDULE_TIMEOUT)
-> > >                 sdt_might_sleep_strong(NULL);
-> > >         else
-> > >                 sdt_might_sleep_strong_timeout(NULL);
-> > >    ...
-> > >         sdt_might_sleep_finish();
-> > > 
-> > > to various places, it seems so very odd and unmaintainable.
-> > > 
 > > > I also recall this giving a fair amount of false positives, are they all fixed?
-> > > 
-> > 
+> >
 > > From the following part in the cover letter, I guess the answer is no?
-> 
-> I fixed what we found anyway.
-> 
-> > 	...
-> > 	6. Multiple reports are allowed.
-> > 	7. Deduplication control on multiple reports.
-> > 	8. Withstand false positives thanks to 6.
-> > 	...
-> > 
+> >	...
+> >       6. Multiple reports are allowed.
+> >       7. Deduplication control on multiple reports.
+> >       8. Withstand false positives thanks to 6.
+> >	...
+> >
 > > seems to me that the logic is since DEPT allows multiple reports so that
 > > false positives are fitlerable by users?
 > 
-> At lease, it's needed until DEPT is considered stable because stronger
-> detection inevitably has more chance of false alarms unless we do manual
-> fix on each, which is the same as Lockdep.
+> I really do not know what's so valuable about multiple reports. They
+> produce a flood of information which needs to be filtered, while a
+> single report ensures that the first detected issue is dumped, which
+> increases the probability that it can be recorded and acted upon.
+
+Assuming the following 2 assumptions, you are right.
+
+Assumption 1. There will be too many reports with the multi-report
+	      support, like all the combination of dependencies between
+	      e.g. in-irq and irq-enabled-context.
+
+Assumption 2. The detection is matured enough so that it barely happens
+	      to fix false onces to see true one which is not a big deal.
+
+However, DEPT doesn't generate all the combination of irq things as
+Lockdep does so we only see a few multi-reports even with the support,
+and I admit DEPT hasn't matured enough yet because fine classification
+is required anyway to suppress false alarms. That's why I introduced
+multi-report support at least for now. IMHO, it'd be still useful even
+if it's gonna report a few true ones at once w/o false ones some day.
+
+> Filtering out false positives is just the wrong approach. Decoding
+> dependency issues from any tracker is complex enough given the nature of
+> the problem, so adding the burden of filtering out issues from a stream
+> of dumps is not helpful at all. It's just a marketing gag.
 > 
-> > > Anyway, I'd really like the lockdep people to comment and be involved.
-> > 
-> > I never get Cced, so I'm unware of this for a long time...
-> 
-> Sorry I missed it. I will cc you from now on.
-> 
-> > A few comments after a quick look:
-> > 
-> > *	Looks like the DEPT dependency graph doesn't handle the
-> > 	fair/unfair readers as lockdep current does. Which bring the
-> > 	next question.
-> 
-> No. DEPT works better for unfair read. It works based on wait/event. So
-> read_lock() is considered a potential wait waiting on write_unlock()
-> while write_lock() is considered a potential wait waiting on either
-> write_unlock() or read_unlock(). DEPT is working perfect for it.
-> 
-> For fair read (maybe you meant queued read lock), I think the case
-> should be handled in the same way as normal lock. I might get it wrong.
-> Please let me know if I miss something.
-> 
-> > *	Can DEPT pass all the selftests of lockdep in
-> > 	lib/locking-selftests.c?
-> > 
 > > *	Instead of introducing a brand new detector/dependency tracker,
-> > 	could we first improve the lockdep's dependency tracker? I think
+> >	could we first improve the lockdep's dependency tracker? I think
+> >	Byungchul also agrees that DEPT and lockdep should share the
+> >	same dependency tracker and the benefit of improving the
+> >	existing one is that we can always use the self test to catch
+> >	any regression. Thoughts?
 > 
-> At the beginning of this work, of course I was thinking to improve
-> Lockdep but I decided to implement a new tool because:
-> 
-> 	1. What we need to check for deadlock detection is no longer
-> 	   lock dependency but more fundamental dependency by wait/event.
-> 	   A better design would have a separate dependency engine for
-> 	   that, not within Lockdep. Remind lock/unlock are also
-> 	   wait/event after all.
-> 
-> 	2. I was thinking to revert the revert of cross-release. But it
-> 	   will start to report false alarms as Lockdep was at the
-> 	   beginning, and require us to keep fixing things until being
-> 	   able to see what we are interested in, maybe for ever. How
-> 	   can we control that situation? I wouldn't use this extention.
-> 
-> 	3. Okay. Let's think about modifying the current Lockdep to make
-> 	   it work similar to DEPT. It'd require us to pay more effort
-> 	   than developing a new simple tool from the scratch with the
-> 	   basic requirement.
-> 
-> 	4. Big change at once right away? No way. The new tool need to
-> 	   be matured and there are ones who want to make use of DEPT at
-> 	   the same time. The best approach would be I think to go along
-> 	   together for a while.
+> Ack. If the internal implementation of lockdep has shortcomings, then we
+> can expand and/or replace it instead of having yet another
+> infrastructure which is not even remotely as mature.
 
-(Appologize for this. Let me re-write this part.)
+Ultimately, yes. We should expand or replace it instead of having
+another ultimately.
 
-	4. Big change at once right away? No way. The new feature need
-	   to be matured and there are ones who want to use the new
-	   feature at the same time. The best approach would be I think
-	   to go along together for a while.
-
-Thanks,
 	Byungchul
-
-> Please don't look at each detail but the big picture, the architecture.
-> Plus, please consider I introduce a tool only focucing on fundamental
-> dependency itself that Lockdep can make use of. I wish great developers
-> like you would join improve the common engine togather.
 > 
-> > 	Byungchul also agrees that DEPT and lockdep should share the
-> > 	same dependency tracker and the benefit of improving the
+> Thanks,
 > 
-> I agree that both should share a single tracker.
-> 
-> > 	existing one is that we can always use the self test to catch
-> > 	any regression. Thoughts?
-> 
-> I imagine the follownig look for the final form:
-> 
->      Lock correctness checker(LOCKDEP)
->      +-----------------------------------------+
->      | Lock usage correctness check            |
->      |                                         |
->      |                                         |
->      |       (Request dependency check)        |
->      |                           T             |
->      +---------------------------|-------------+
->                                  |
->      Dependency tracker(DEPT)    V
->      +-----------------------------------------+
->      | Dependency check                        |
->      | (by tracking wait and event context)    |
->      +-----------------------------------------+
-> 
-> > Actually the above sugguest is just to revert revert cross-release
-> > without exposing any annotation, which I think is more practical to
-> > review and test.
-> 
-> Reverting the revert of cross-release is not bad. But I'd suggest a
-> nicer design for the reasons I explained above.
-> 
-> 	Byungchul
-> 
-> > I'd sugguest we 1) first improve the lockdep dependency tracker with
-> > wait/event in mind and then 2) introduce wait related annotation so that
-> > users can use, and then 3) look for practical ways to resolve false
-> > positives/multi reports with the help of users, if all goes well,
-> > 4) make it all operation annotated.
-> > 
-> > Thoughts?
-> > 
-> > Regards,
-> > Boqun
+>         tglx
