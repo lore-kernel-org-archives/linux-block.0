@@ -2,53 +2,53 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D3084C6379F
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BB431C004D4
 	for <linux-block@archiver.kernel.org>; Thu, 19 Jan 2023 22:23:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230079AbjASWXy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 19 Jan 2023 17:23:54 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54432 "EHLO
+        id S230284AbjASWXx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 19 Jan 2023 17:23:53 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54856 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230072AbjASWWK (ORCPT
+        with ESMTP id S230073AbjASWWK (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Thu, 19 Jan 2023 17:22:10 -0500
 Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E10799430A;
-        Thu, 19 Jan 2023 14:07:44 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 831D6A1007;
+        Thu, 19 Jan 2023 14:07:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1674166064; x=1705702064;
+  t=1674166067; x=1705702067;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=0YiGwGYUEGq5e7hHdmSy+17dhbmnQ48wDY8W4pMp3mk=;
-  b=VYjgfhE6i2IMDN9MN2PdaBv3qcPu5T03VmGEbJ5vpSAPOqPDZf/OD1gD
-   k1P6LhPD76JYraebJ5bqt5niPVrnn0nFcYB86N5O7uCfueC2CI85sC15w
-   WiBbRVlqInl/npsIYF+m1suxZPml/Xer919UQVOzjLRBw4SO6gEOEfiA3
-   hKiBOzGKPnpx4C/jpLV8d3z+IgaGXdDYoQUbzIBS2tw1voA7kIQxZ3Jbn
-   o36Trjb61TPjfVytOaxZIHsCNFiHlO7x/9QG+mA6lTaIkWuWIQhTQwhdg
-   MvZ0oS1V6ggjWc8Q/mGOJOIQALBq3OBbUnBuU3HwxvY8/p2zPM5scoHga
+  bh=SB0OeZdWiLkarVjZZSXMF9jf/8tzMUUbELrTM8zHlBE=;
+  b=aoVupjRtE+cAdnZBqhETH0KQOmUNWJtM+s8DK0POD5vL0QOxlRfpu2cI
+   mrWQ5P4lX12dltLI95PrjXP4dqtBtAUl6ILVAzHz/Vezh1e1a8aumf1GQ
+   EHLwCeEZHmGy8WctThgUJ5RZxP2guwl6U6tf+bxYp0kNeXToJfXCd9wZG
+   YlTFtXqYhglh0fZwG4BOPVG+8MOWsmjOV5MzSGHgUzlsrEEv4lQeBtWy+
+   RM1aFabXysz/aHDPs2bXjFRJjFNno7bmRD5CZnqyDXFhEbF3JX5wWYn11
+   8CR0hnM3fWGJPH8CLwRQzndWny0wh3tIxorEIrPveCJX4fKwipc0jM2Zu
    g==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10595"; a="323130647"
+X-IronPort-AV: E=McAfee;i="6500,9779,10595"; a="323130660"
 X-IronPort-AV: E=Sophos;i="5.97,230,1669104000"; 
-   d="scan'208";a="323130647"
+   d="scan'208";a="323130660"
 Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Jan 2023 14:07:42 -0800
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Jan 2023 14:07:44 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10595"; a="784226637"
+X-IronPort-AV: E=McAfee;i="6500,9779,10595"; a="784226649"
 X-IronPort-AV: E=Sophos;i="5.97,230,1669104000"; 
-   d="scan'208";a="784226637"
+   d="scan'208";a="784226649"
 Received: from black.fi.intel.com ([10.237.72.28])
-  by orsmga004.jf.intel.com with ESMTP; 19 Jan 2023 14:07:40 -0800
+  by orsmga004.jf.intel.com with ESMTP; 19 Jan 2023 14:07:43 -0800
 Received: by black.fi.intel.com (Postfix, from userid 1003)
-        id 3FA9836D; Fri, 20 Jan 2023 00:08:15 +0200 (EET)
+        id 8B38C57E; Fri, 20 Jan 2023 00:08:15 +0200 (EET)
 From:   Andy Shevchenko <andriy.shevchenko@linux.intel.com>
 To:     Jens Axboe <axboe@kernel.dk>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
 Cc:     Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Subject: [PATCH v1 3/9] pktcdvd: use sysfs_emit() to instead of scnprintf()
-Date:   Fri, 20 Jan 2023 00:08:03 +0200
-Message-Id: <20230119220809.5518-3-andriy.shevchenko@linux.intel.com>
+Subject: [PATCH v1 9/9] pktcdvd: Sort headers
+Date:   Fri, 20 Jan 2023 00:08:09 +0200
+Message-Id: <20230119220809.5518-9-andriy.shevchenko@linux.intel.com>
 X-Mailer: git-send-email 2.39.0
 In-Reply-To: <20230119220809.5518-1-andriy.shevchenko@linux.intel.com>
 References: <20230119220809.5518-1-andriy.shevchenko@linux.intel.com>
@@ -58,28 +58,64 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Follow the advice of the Documentation/filesystems/sysfs.rst and show()
-should only use sysfs_emit() or sysfs_emit_at() when formatting the
-value to be returned to user space.
+Sort the headers in alphabetic order in order to ease
+the maintenance for this part.
 
 Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
 ---
- drivers/block/pktcdvd.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/block/pktcdvd.c | 31 ++++++++++++++++---------------
+ 1 file changed, 16 insertions(+), 15 deletions(-)
 
 diff --git a/drivers/block/pktcdvd.c b/drivers/block/pktcdvd.c
-index ad4336ae9927..98a5c388eabf 100644
+index 22048739a245..93597bde9c33 100644
 --- a/drivers/block/pktcdvd.c
 +++ b/drivers/block/pktcdvd.c
-@@ -339,7 +339,7 @@ static ssize_t device_map_show(struct class *c, struct class_attribute *attr,
- 		struct pktcdvd_device *pd = pkt_devs[idx];
- 		if (!pd)
- 			continue;
--		n += sprintf(data+n, "%s %u:%u %u:%u\n",
-+		n += sysfs_emit_at(data, n, "%s %u:%u %u:%u\n",
- 			pd->disk->disk_name,
- 			MAJOR(pd->pkt_dev), MINOR(pd->pkt_dev),
- 			MAJOR(pd->bdev->bd_dev),
+@@ -46,29 +46,30 @@
+ 
+ #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
+ 
+-#include <linux/pktcdvd.h>
+-#include <linux/module.h>
+-#include <linux/types.h>
+-#include <linux/kernel.h>
++#include <linux/backing-dev.h>
+ #include <linux/compat.h>
+-#include <linux/kthread.h>
++#include <linux/debugfs.h>
++#include <linux/device.h>
+ #include <linux/errno.h>
+-#include <linux/spinlock.h>
+ #include <linux/file.h>
+-#include <linux/proc_fs.h>
+-#include <linux/seq_file.h>
+-#include <linux/miscdevice.h>
+ #include <linux/freezer.h>
++#include <linux/kernel.h>
++#include <linux/kthread.h>
++#include <linux/miscdevice.h>
++#include <linux/module.h>
+ #include <linux/mutex.h>
++#include <linux/nospec.h>
++#include <linux/pktcdvd.h>
++#include <linux/proc_fs.h>
++#include <linux/seq_file.h>
+ #include <linux/slab.h>
+-#include <linux/backing-dev.h>
++#include <linux/spinlock.h>
++#include <linux/types.h>
++#include <linux/uaccess.h>
++
++#include <scsi/scsi.h>
+ #include <scsi/scsi_cmnd.h>
+ #include <scsi/scsi_ioctl.h>
+-#include <scsi/scsi.h>
+-#include <linux/debugfs.h>
+-#include <linux/device.h>
+-#include <linux/nospec.h>
+-#include <linux/uaccess.h>
+ 
+ #include <asm/unaligned.h>
+ 
 -- 
 2.39.0
 
