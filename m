@@ -2,88 +2,95 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CF675C38159
-	for <linux-block@archiver.kernel.org>; Thu, 19 Jan 2023 01:24:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38518C678D4
+	for <linux-block@archiver.kernel.org>; Thu, 19 Jan 2023 01:48:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230054AbjASBYe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 18 Jan 2023 20:24:34 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41010 "EHLO
+        id S229714AbjASBr4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 18 Jan 2023 20:47:56 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50766 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230061AbjASBWf (ORCPT
+        with ESMTP id S229832AbjASBpm (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 18 Jan 2023 20:22:35 -0500
-Received: from mail-pg1-x52f.google.com (mail-pg1-x52f.google.com [IPv6:2607:f8b0:4864:20::52f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E202B689C0
-        for <linux-block@vger.kernel.org>; Wed, 18 Jan 2023 17:18:56 -0800 (PST)
-Received: by mail-pg1-x52f.google.com with SMTP id e10so316538pgc.9
-        for <linux-block@vger.kernel.org>; Wed, 18 Jan 2023 17:18:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=qobjLpEuxGX3xdvqrIZDZFHZE7PU5XKHK0RePQ+jGnI=;
-        b=nFz7CwgA3p8y+mO43XetfLCQceWdrv0a1Vo2Frm8Vi7NS5qLz2aVt1D3diCEB9hs+1
-         i8XDPgy0iKsAHNtvDGcH1eR5emwNflCewTnO+b5UH/XSSrEf9wJqyHfFStiZ7XOpjdhj
-         KuN1cTOgANA5/6RAcQ9DTW6Xow2YgyQ549spE66zMOnO63axzZNhl6Q5JzcR9VQU5Kfu
-         kaqYBGykfPLYplwe+AT/SaiWrwVL93//v8VUMzOPwBR0RmHCfLS9+XcRxCTxFcAUeiit
-         DdIhR2VUPRYwNaLymkSPm5PgShzBHaoXFygEwHTvgcfRujKau0po55UwlPXyGp1CCPrb
-         vr0g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=qobjLpEuxGX3xdvqrIZDZFHZE7PU5XKHK0RePQ+jGnI=;
-        b=oHcWegqR4thBAj0LM7vMzBNbySQUBgdHkcSBWzQ1Wb+Lc2F5t1GufW4xIn4XI/TY+Z
-         0kDE1zj7OTsCK5M6SOvQFurH90kfH+cYuiD5eY1SKOhRm+vX9FpdHsptAIZkW0NNgiWp
-         ssRnI7tafh+jEzRE5wOHC0MlnVZw5qO4/Yx6WvUt1N4O16M7pHKdXR0WWkbuQ9sT6of1
-         odQgG8/6IkcJEGUZi3VbKsxay7nHNGeI2uZQuWlagyvEucXAUg9k2/iZxSfmhbbManyN
-         b0dXNOBwZB54td8jCdsosyeU8fya3ZougTMkLQaHSSMmzAJuhf16br6d/w4k21Yw9rcd
-         /WqQ==
-X-Gm-Message-State: AFqh2kqadzLRQJsvh2Ie0D+rZUaB0oie7J16tBEaedlrqa2a7mcjoF8g
-        NuTHiOPgrNYFnK+PsGQQ3mslNA==
-X-Google-Smtp-Source: AMrXdXvqvczVFdli9BliWRtKxeXFWX+U7PgVoK8yHRaaHEhsE0vGRGpeQ1SU+eQ68nRbTm36XbYfMA==
-X-Received: by 2002:a05:6a00:27a4:b0:58d:fc29:430c with SMTP id bd36-20020a056a0027a400b0058dfc29430cmr135956pfb.1.1674091136366;
-        Wed, 18 Jan 2023 17:18:56 -0800 (PST)
-Received: from [192.168.1.136] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id y127-20020a623285000000b0058abddad316sm15905948pfy.209.2023.01.18.17.18.55
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 18 Jan 2023 17:18:55 -0800 (PST)
-Message-ID: <52073ee8-72ab-f424-1738-c56bc8d5cd67@kernel.dk>
-Date:   Wed, 18 Jan 2023 18:18:54 -0700
+        Wed, 18 Jan 2023 20:45:42 -0500
+Received: from dggsgout12.his.huawei.com (unknown [45.249.212.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 31BE96CCD1;
+        Wed, 18 Jan 2023 17:40:34 -0800 (PST)
+Received: from mail02.huawei.com (unknown [172.30.67.169])
+        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4Ny5166LGDz4f3v6d;
+        Thu, 19 Jan 2023 09:40:26 +0800 (CST)
+Received: from [10.174.178.129] (unknown [10.174.178.129])
+        by APP1 (Coremail) with SMTP id cCh0CgCXAy6Ln8hj1mNwBw--.27187S2;
+        Thu, 19 Jan 2023 09:40:29 +0800 (CST)
+Subject: Re: [PATCH v4 07/14] blk-mq: make blk_mq_commit_rqs a general
+ function for all commits
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     axboe@kernel.dk, dwagner@suse.de, hare@suse.de,
+        ming.lei@redhat.com, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, john.garry@huawei.com, jack@suse.cz
+References: <20230118093726.3939160-1-shikemeng@huaweicloud.com>
+ <20230118093726.3939160-7-shikemeng@huaweicloud.com>
+ <20230118173745.GC12399@lst.de>
+From:   Kemeng Shi <shikemeng@huaweicloud.com>
+Message-ID: <f4dea0fc-5fcf-ceec-84d5-468b25c947ff@huaweicloud.com>
+Date:   Thu, 19 Jan 2023 09:40:27 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.5.0
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.0
-Subject: Re: [PATCH v3 0/9] Add support for segments smaller than one page
-Content-Language: en-US
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        Avri Altman <avri.altman@wdc.com>,
-        Adrian Hunter <adrian.hunter@intel.com>,
-        Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>
-References: <20230118225447.2809787-1-bvanassche@acm.org>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20230118225447.2809787-1-bvanassche@acm.org>
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <20230118173745.GC12399@lst.de>
+Content-Type: text/plain; charset=gbk
 Content-Transfer-Encoding: 7bit
+X-CM-TRANSID: cCh0CgCXAy6Ln8hj1mNwBw--.27187S2
+X-Coremail-Antispam: 1UD129KBjvdXoW7GFyDCr1xXr45JF1DJryxZrb_yoWkXFgE9F
+        yakrykWw4DWws2kws2kF43XFW8Ka4kXF98tF4DtFyrGrykJrZ5GFyDXFn8Zay7Gw42yF1f
+        AF9xZ3WUCrnFgjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+        9fnUUIcSsGvfJTRUUUbzAYFVCjjxCrM7AC8VAFwI0_Gr0_Xr1l1xkIjI8I6I8E6xAIw20E
+        Y4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwV
+        A0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVWDJVCq3wA2z4x0Y4vE2Ix0cI8IcVCY1x02
+        67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I
+        0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40E
+        x7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x
+        0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lc7I2V7IY0VAS07AlzVAYIcxG8wCF04k20xvY0x0E
+        wIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E74
+        80Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0
+        I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04
+        k26cxKx2IYs7xG6rW3Jr0E3s1lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY
+        1x0267AKxVWUJVW8JbIYCTnIWIevJa73UjIFyTuYvjxUrR6zUUUUU
+X-CM-SenderInfo: 5vklyvpphqwq5kxd4v5lfo033gof0z/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/18/23 3:54?PM, Bart Van Assche wrote:
-> Hi Jens,
-> 
-> Several embedded storage controllers need support for DMA segments that are
-> smaller than the size of one virtual memory page. Hence this patch series.
-> Please consider this patch series for the next merge window.
 
-Before any real reviews are done, I have to ask "why?". This is pretty
-hairy code in the middle of the fast path for some obscure controller.
-Why would anyone ship that with > 4k page sizes rather than ship it with
-a controller that is sane?
+
+on 1/19/2023 1:37 AM, Christoph Hellwig wrote:
+> On Wed, Jan 18, 2023 at 05:37:19PM +0800, Kemeng Shi wrote:
+>> +/*
+>> + * blk_mq_commit_rqs will notify driver using bd->last that there is no
+>> + * more requests. (See comment in struct blk_mq_ops for commit_rqs for
+>> + * details)
+>> + * Attention, we should explicitly call this in unusual cases:
+>> + *  1) did not queue everything initially scheduled to queue
+>> + *  2) the last attempt to queue a request failed
+>> + */
+>> +static void blk_mq_commit_rqs(struct blk_mq_hw_ctx *hctx, int queued,
+>> +			      bool from_schedule)
+> 
+> Isn't from_schedule always false here as well now?
+Hi Christoph ,
+Yes, it's always false now. As blk_mq_commit_rqs is a general function
+for all commits now, I keep the from_schedule for commits where
+from_schedule maybe true in future. We can remove from_schedule now
+and add it back when from_schedule is indeed needed. Both way is
+acceptable for me. Please let me know which way do you prefer and I
+will send a new version if needed.
+Thanks.
+> Otherwise looks good:
+> 
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
+> 
 
 -- 
-Jens Axboe
+Best wishes
+Kemeng Shi
 
