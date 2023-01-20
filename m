@@ -2,283 +2,104 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 841B6C38159
-	for <linux-block@archiver.kernel.org>; Fri, 20 Jan 2023 03:27:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 065F5C46467
+	for <linux-block@archiver.kernel.org>; Fri, 20 Jan 2023 03:50:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229540AbjATD1N (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 19 Jan 2023 22:27:13 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38834 "EHLO
+        id S229525AbjATDui (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 19 Jan 2023 22:50:38 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47648 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229461AbjATD1L (ORCPT
+        with ESMTP id S229713AbjATDuh (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 19 Jan 2023 22:27:11 -0500
-Received: from mail-qt1-x82c.google.com (mail-qt1-x82c.google.com [IPv6:2607:f8b0:4864:20::82c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F5DD9F393;
-        Thu, 19 Jan 2023 19:27:10 -0800 (PST)
-Received: by mail-qt1-x82c.google.com with SMTP id g16so1216946qtu.2;
-        Thu, 19 Jan 2023 19:27:10 -0800 (PST)
+        Thu, 19 Jan 2023 22:50:37 -0500
+Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45A2D5BBE
+        for <linux-block@vger.kernel.org>; Thu, 19 Jan 2023 19:50:35 -0800 (PST)
+Received: by mail-pj1-x1036.google.com with SMTP id z1-20020a17090a66c100b00226f05b9595so3765593pjl.0
+        for <linux-block@vger.kernel.org>; Thu, 19 Jan 2023 19:50:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:feedback-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=JeWp3AI1idtCEb/tlL53bEeivC6lDxwyV5blCIKy/sI=;
-        b=D95ICNhlrG/KdBynQggCzgLLAuHuGk8Mbpn0AL6BtzmVJuwt9WLmxuMoNSN3Y+XCMO
-         A0aGLaI2i9Pb7TYV++tON7pfjMGVz6QtncDV6ZIxUJ7qAbl6riZ/0bLOUAHlynHjFGsz
-         jgZVEcHtW3eKzavFDaTW+lcKQBpQIJV9juezWz9TH3ad/TrZxMpCU34vumJYYHMfRc1Y
-         501UIWK6arIlIiH+yxvspE8eXr88BU8njgy1Qj1Xu6KYAiaysbSWJuyXE94KWodqZ+z9
-         ClwOUM+ZlBc5IEY4fdogkJMblmn1q3LV1t8V45ul6R/ubPabPfsWrmHeu2wAKLk6BH4g
-         OYMQ==
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=mFN3Pnflf7Lk6KrUCrXdwU3ftbMEbdq7bXTt4T9oMnk=;
+        b=3GxR20l1A3kV14z6TIJmlyG1UzFJ0xZZdX8c/uqp2LYg4snHuUqylNb4B/UEKZi3N4
+         6CNSTR9H61jHVlz+yV1d8G0hXTaA/Z2EJM0u1u8sD2JgSUwO3ZO+yXfKY7Yb2kSVqzzJ
+         FwE/EinXXQTjF0882qTMt4bQbvi6baVnBi1HdZHxB65PZKG2EnGBONTYb62FVSm2zdzA
+         +vZwPmCUKEtZyVts4rii+NPxeLtsjZqD9ntVWMPcx9rw/K3y/aVvvFHnbjk8glfJw74N
+         0MEYtX5MvD7qPwZi2Q5oPxjQgmMKz4qGlXbvcd5TewE7jf2Deff1Qyh5tx9VtYat8Eld
+         mUdw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:feedback-id:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=JeWp3AI1idtCEb/tlL53bEeivC6lDxwyV5blCIKy/sI=;
-        b=FoNPKVX/VOQ1XI3x3bdYE6kolzQt+S0rApHRv6k25bl6DQrMmUki470fGfmgKs47Gt
-         B7Feu6d3kZM9UUF+uOvFcXnpxg0ZpK2tDpd8ey3HiLj6SemC83cGCVoWpMHBD3SM7OWS
-         ww0kYJYCnaJtQdp/gzwq6+Polqmu7DkYsB07sroeWcvQf5ZWSq368x4oauSTPOa6l76B
-         p0mcbCyRutM1LTfrlDPywp+wdedyPywpRZne/0gokeCA0r8LMpwWkzk6FluZ0qOplhLP
-         5zbsVlcb5ohLi/RqqwX/9tBzKoNqaVVW84ZFiZbumn51/klvRLnwqULN7QjUqHkCrVMe
-         P9fw==
-X-Gm-Message-State: AFqh2kq9DY1EzRS2sZOHSYFyZKG1IxtlhcftowvWtosWXHlPZixdWZEa
-        NDhmiAShvgcOs5o/iT9pooQ=
-X-Google-Smtp-Source: AMrXdXspB/m3c11KId3S124GHsnd9AxQ5adO5FiPfDnJeirGNlXW53ODOB1roTWwhkoUmwBEK/xWzA==
-X-Received: by 2002:ac8:7ec2:0:b0:3b4:7efb:36a7 with SMTP id x2-20020ac87ec2000000b003b47efb36a7mr31586928qtj.27.1674185229244;
-        Thu, 19 Jan 2023 19:27:09 -0800 (PST)
-Received: from auth1-smtp.messagingengine.com (auth1-smtp.messagingengine.com. [66.111.4.227])
-        by smtp.gmail.com with ESMTPSA id h4-20020a05620a244400b00706adbdf8b8sm5427634qkn.83.2023.01.19.19.27.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 19 Jan 2023 19:27:08 -0800 (PST)
-Received: from compute3.internal (compute3.nyi.internal [10.202.2.43])
-        by mailauth.nyi.internal (Postfix) with ESMTP id 2B70F27C0054;
-        Thu, 19 Jan 2023 22:27:07 -0500 (EST)
-Received: from mailfrontend2 ([10.202.2.163])
-  by compute3.internal (MEProxy); Thu, 19 Jan 2023 22:27:08 -0500
-X-ME-Sender: <xms:CArKY4-bWIS_PR3UkTdlBgbzrFKh-a3BgQXVxR-4DGNCnuvEhHPMsg>
-    <xme:CArKYwvSRqclehgEJgn8cidZMbyNOtU0Tn6YfPcEuO-Src_b4RJpDVV-qS1m8ApV2
-    JrIiHGouEI6Sig1EQ>
-X-ME-Received: <xmr:CArKY-CoYf3q3kJtJ4B0WRwzPXpRcbiVfQn4OdWkmW4PaTbYODDaCJor5J8>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvhedrudduuddgiedtucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhepfffhvfevuffkfhggtggujgesthdtredttddtvdenucfhrhhomhepuehoqhhu
-    nhcuhfgvnhhguceosghoqhhunhdrfhgvnhhgsehgmhgrihhlrdgtohhmqeenucggtffrrg
-    htthgvrhhnpeehudfgudffffetuedtvdehueevledvhfelleeivedtgeeuhfegueeviedu
-    ffeivdenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpe
-    gsohhquhhnodhmvghsmhhtphgruhhthhhpvghrshhonhgrlhhithihqdeiledvgeehtdei
-    gedqudejjeekheehhedvqdgsohhquhhnrdhfvghngheppehgmhgrihhlrdgtohhmsehfih
-    igmhgvrdhnrghmvg
-X-ME-Proxy: <xmx:CArKY4eTsdPYtx5S1ulFKrSQeaZdUQa1lO9U0e9yyG9_84xEKglp0Q>
-    <xmx:CArKY9Pe3vvEVsg-PyNqO1XydZ01qWcu3caKgaj5G9AchN-yBioRgA>
-    <xmx:CArKYykOgV911d_EQKVFaz3nwEKdfUUzBnnqcAjytECsWnYWgE1GNg>
-    <xmx:CwrKY5FUOhn0H6pQqE_DyQIe_hj2HlsjhMPJ4Ejkwf9YMmYSziyWkd6xWxE>
-Feedback-ID: iad51458e:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
- 19 Jan 2023 22:27:04 -0500 (EST)
-Date:   Thu, 19 Jan 2023 19:26:39 -0800
-From:   Boqun Feng <boqun.feng@gmail.com>
-To:     Byungchul Park <byungchul.park@lge.com>
-Cc:     linux-kernel@vger.kernel.org, torvalds@linux-foundation.org,
-        damien.lemoal@opensource.wdc.com, linux-ide@vger.kernel.org,
-        adilger.kernel@dilger.ca, linux-ext4@vger.kernel.org,
-        mingo@redhat.com, peterz@infradead.org, will@kernel.org,
-        tglx@linutronix.de, rostedt@goodmis.org, joel@joelfernandes.org,
-        sashal@kernel.org, daniel.vetter@ffwll.ch, duyuyang@gmail.com,
-        johannes.berg@intel.com, tj@kernel.org, tytso@mit.edu,
-        willy@infradead.org, david@fromorbit.com, amir73il@gmail.com,
-        gregkh@linuxfoundation.org, kernel-team@lge.com,
-        linux-mm@kvack.org, akpm@linux-foundation.org, mhocko@kernel.org,
-        minchan@kernel.org, hannes@cmpxchg.org, vdavydov.dev@gmail.com,
-        sj@kernel.org, jglisse@redhat.com, dennis@kernel.org, cl@linux.com,
-        penberg@kernel.org, rientjes@google.com, vbabka@suse.cz,
-        ngupta@vflare.org, linux-block@vger.kernel.org,
-        paolo.valente@linaro.org, josef@toxicpanda.com,
-        linux-fsdevel@vger.kernel.org, viro@zeniv.linux.org.uk,
-        jack@suse.cz, jlayton@kernel.org, dan.j.williams@intel.com,
-        hch@infradead.org, djwong@kernel.org,
-        dri-devel@lists.freedesktop.org, rodrigosiqueiramelo@gmail.com,
-        melissa.srw@gmail.com, hamohammed.sa@gmail.com,
-        42.hyeyoo@gmail.com, chris.p.wilson@intel.com,
-        gwan-gyeong.mun@intel.com, max.byungchul.park@gmail.com,
-        longman@redhat.com
-Subject: Re: [PATCH RFC v7 00/23] DEPT(Dependency Tracker)
-Message-ID: <Y8oJ70iWpBmRuaGN@boqun-archlinux>
-References: <Y8mZHKJV4FH17vGn@boqun-archlinux>
- <1674179505-26987-1-git-send-email-byungchul.park@lge.com>
- <Y8n7NdFl9WEbGXH1@boqun-archlinux>
- <Y8oFj9A19cw3enHB@boqun-archlinux>
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=mFN3Pnflf7Lk6KrUCrXdwU3ftbMEbdq7bXTt4T9oMnk=;
+        b=i0upUIRnqwf6Tr1NSQrASSwVXpWnRiR13kmTOAbSqyX5DjUl1vV+4r1tJxkkkNfFRe
+         T+unds3Z5rs41CuKJzm3GMNjx1QcpPz7JG+QSksKGqMPjf7sMTzNWT86Td1i5egStIg+
+         HPZnrSmRKv5TKxcCnHwY8yA1j/LPDMx2YLvv+GhIYBsec9+nJjiuh6xAYQoKhUJbiDd2
+         Wu+0n9IPDVVkN0ZoPomz5smTHFAsbbTRQKFqmY8XwMsXjmbVfWXxA3JkpijZj/UvMSGO
+         fKxuaD+nQXVWAhhNyremObPHM43hnqvKuKj0W3BDNC6aYSIbg1Hj2IY+SdliHXudkqBr
+         3h1w==
+X-Gm-Message-State: AFqh2ko8hAGME7n1L9oz60AMOyfAxHgIYax1rMOU5Cqbri+ee4EzHUjb
+        39BbI/RarnUq0S8sy5VznJi0gQ==
+X-Google-Smtp-Source: AMrXdXtv3X5Fw1PJqm0+RQ7mNmEYpHfgAMiljyMT0W1dC6GzMitviZUt7sOY8MmOgv0LF67eGAMdjw==
+X-Received: by 2002:a17:902:b702:b0:194:5d47:b47d with SMTP id d2-20020a170902b70200b001945d47b47dmr3295198pls.1.1674186634502;
+        Thu, 19 Jan 2023 19:50:34 -0800 (PST)
+Received: from ?IPV6:2620:10d:c085:21c8::1739? ([2620:10d:c090:400::5:ccda])
+        by smtp.gmail.com with ESMTPSA id ik9-20020a170902ab0900b00183c67844aesm25873870plb.22.2023.01.19.19.50.32
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 19 Jan 2023 19:50:34 -0800 (PST)
+Message-ID: <3ed9db5a-f527-2c53-3926-74bd802a3086@kernel.dk>
+Date:   Thu, 19 Jan 2023 20:50:31 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Y8oFj9A19cw3enHB@boqun-archlinux>
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
+ Thunderbird/102.6.0
+Subject: Re: [PATCH-next v3] lib: parser: optimize match_NUMER apis to use
+ local array
+Content-Language: en-US
+To:     Tejun Heo <tj@kernel.org>, Li Lingfeng <lilingfeng3@huawei.com>
+Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        akpm@linux-foundation.org, jack@suse.cz, bingjingc@synology.com,
+        ebiggers@google.com, james.smart@broadcom.com, houtao1@huawei.com,
+        yi.zhang@huawei.com, yangerkun@huawei.com, yukuai3@huawei.com
+References: <20230120021304.5773-1-lilingfeng3@huawei.com>
+ <Y8n1rOLdMGDfOgpe@slm.duckdns.org>
+From:   Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <Y8n1rOLdMGDfOgpe@slm.duckdns.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jan 19, 2023 at 07:07:59PM -0800, Boqun Feng wrote:
-> On Thu, Jan 19, 2023 at 06:23:49PM -0800, Boqun Feng wrote:
-> > On Fri, Jan 20, 2023 at 10:51:45AM +0900, Byungchul Park wrote:
-> > > Boqun wrote:
-> > > > On Thu, Jan 19, 2023 at 01:33:58PM +0000, Matthew Wilcox wrote:
-> > > > > On Thu, Jan 19, 2023 at 03:23:08PM +0900, Byungchul Park wrote:
-> > > > > > Boqun wrote:
-> > > > > > > *Looks like the DEPT dependency graph doesn't handle the
-> > > > > > > fair/unfair readers as lockdep current does. Which bring the
-> > > > > > > next question.
-> > > > > > 
-> > > > > > No. DEPT works better for unfair read. It works based on wait/event. So
-> > > > > > read_lock() is considered a potential wait waiting on write_unlock()
-> > > > > > while write_lock() is considered a potential wait waiting on either
-> > > > > > write_unlock() or read_unlock(). DEPT is working perfect for it.
-> > > > > > 
-> > > > > > For fair read (maybe you meant queued read lock), I think the case
-> > > > > > should be handled in the same way as normal lock. I might get it wrong.
-> > > > > > Please let me know if I miss something.
-> > > > > 
-> > > > > From the lockdep/DEPT point of view, the question is whether:
-> > > > > 
-> > > > >	read_lock(A)
-> > > > >	read_lock(A)
-> > > > > 
-> > > > > can deadlock if a writer comes in between the two acquisitions and
-> > > > > sleeps waiting on A to be released.  A fair lock will block new
-> > > > > readers when a writer is waiting, while an unfair lock will allow
-> > > > > new readers even while a writer is waiting.
-> > > > > 
-> > > > 
-> > > > To be more accurate, a fair reader will wait if there is a writer
-> > > > waiting for other reader (fair or not) to unlock, and an unfair reader
-> > > > won't.
-> > > 
-> > > What a kind guys, both of you! Thanks.
-> > > 
-> > > I asked to check if there are other subtle things than this. Fortunately,
-> > > I already understand what you guys shared.
-> > > 
-> > > > In kernel there are read/write locks that can have both fair and unfair
-> > > > readers (e.g. queued rwlock). Regarding deadlocks,
-> > > > 
-> > > > 	T0		T1		T2
-> > > > 	--		--		--
-> > > > 	fair_read_lock(A);
-> > > > 			write_lock(B);
-> > > > 					write_lock(A);
-> > > > 	write_lock(B);
-> > > > 			unfair_read_lock(A);
-> > > 
-> > > With the DEPT's point of view (let me re-write the scenario):
-> > > 
-> > > 	T0		T1		T2
-> > > 	--		--		--
-> > > 	fair_read_lock(A);
-> > > 			write_lock(B);
-> > > 					write_lock(A);
-> > > 	write_lock(B);
-> > > 			unfair_read_lock(A);
-> > > 	write_unlock(B);
-> > > 	read_unlock(A);
-> > > 			read_unlock(A);
-> > > 			write_unlock(B);
-> > > 					write_unlock(A);
-> > > 
-> > > T0: read_unlock(A) cannot happen if write_lock(B) is stuck by a B owner
-> > >     not doing either write_unlock(B) or read_unlock(B). In other words:
-> > > 
-> > >       1. read_unlock(A) happening depends on write_unlock(B) happening.
-> > >       2. read_unlock(A) happening depends on read_unlock(B) happening.
-> > > 
-> > > T1: write_unlock(B) cannot happen if unfair_read_lock(A) is stuck by a A
-> > >     owner not doing write_unlock(A). In other words:
-> > > 
-> > >       3. write_unlock(B) happening depends on write_unlock(A) happening.
-> > > 
-> > > 1, 2 and 3 give the following dependencies:
-> > > 
-> > >     1. read_unlock(A) -> write_unlock(B)
-> > >     2. read_unlock(A) -> read_unlock(B)
-> > >     3. write_unlock(B) -> write_unlock(A)
-> > > 
-> > > There's no circular dependency so it's safe. DEPT doesn't report this.
-> > > 
-> > > > the above is not a deadlock, since T1's unfair reader can "steal" the
-> > > > lock. However the following is a deadlock:
-> > > > 
-> > > > 	T0		T1		T2
-> > > > 	--		--		--
-> > > > 	unfair_read_lock(A);
-> > > > 			write_lock(B);
-> > > > 					write_lock(A);
-> > > > 	write_lock(B);
-> > > > 			fair_read_lock(A);
-> > > > 
-> > > > , since T'1 fair reader will wait.
-> > > 
-> > > With the DEPT's point of view (let me re-write the scenario):
-> > > 
-> > > 	T0		T1		T2
-> > > 	--		--		--
-> > > 	unfair_read_lock(A);
-> > > 			write_lock(B);
-> > > 					write_lock(A);
-> > > 	write_lock(B);
-> > > 			fair_read_lock(A);
-> > > 	write_unlock(B);
-> > > 	read_unlock(A);
-> > > 			read_unlock(A);
-> > > 			write_unlock(B);
-> > > 					write_unlock(A);
-> > > 
-> > > T0: read_unlock(A) cannot happen if write_lock(B) is stuck by a B owner
-> > >     not doing either write_unlock(B) or read_unlock(B). In other words:
-> > > 
-> > >       1. read_unlock(A) happening depends on write_unlock(B) happening.
-> > >       2. read_unlock(A) happening depends on read_unlock(B) happening.
-> > > 
-> > > T1: write_unlock(B) cannot happen if fair_read_lock(A) is stuck by a A
-> > >     owner not doing either write_unlock(A) or read_unlock(A). In other
-> > >     words:
-> > > 
-> > >       3. write_unlock(B) happening depends on write_unlock(A) happening.
-> > >       4. write_unlock(B) happening depends on read_unlock(A) happening.
-> > > 
-> > > 1, 2, 3 and 4 give the following dependencies:
-> > > 
-> > >     1. read_unlock(A) -> write_unlock(B)
-> > >     2. read_unlock(A) -> read_unlock(B)
-> > >     3. write_unlock(B) -> write_unlock(A)
-> > >     4. write_unlock(B) -> read_unlock(A)
-> > > 
-> > > With 1 and 4, there's a circular dependency so DEPT definitely report
-> > > this as a problem.
-> > > 
-> > > REMIND: DEPT focuses on waits and events.
-> > 
-> > Do you have the test cases showing DEPT can detect this?
-> > 
+On 1/19/23 7:00?PM, Tejun Heo wrote:
+> On Fri, Jan 20, 2023 at 10:13:04AM +0800, Li Lingfeng wrote:
+>> Memory will be allocated to store substring_t in match_strdup(), which means
+>> the caller of match_strdup() may need to be scheduled out to wait for reclaiming
+>> memory.
+>>
+>> Using local array to store substring_t to remove the restriction.
+>>
+>> Link: https://lore.kernel.org/all/20221104023938.2346986-5-yukuai1@huaweicloud.com/
+>> Signed-off-by: Li Lingfeng <lilingfeng3@huawei.com>
 > 
-> Just tried the following on your latest GitHub branch, I commented all
-> but one deadlock case. Lockdep CAN detect it but DEPT CANNOT detect it.
-> Feel free to double check.
+>  Acked-by: Tejun Heo <tj@kernel.org>
 > 
+> This fixes a sleep-while-atomic splat in blk-iocost, so it'd be a good idea to add:
+> 
+>  Fixes: 2c0647988433 ("blk-iocost: don't release 'ioc->lock' while updating params").
+> 
+> The mm tree likely is the best fit but given the splat the block tree can
+> work too. Andrew, Jens, what do you think?
 
-In case anyone else want to try, let me explain a little bit how to
-verify the behavior of the detectors. With the change, the only test
-that runs is 
+I can take it through the block tree once folks are happy with it, as
+the buggy patch came through there. Doesn't really matter to me,
+however.
 
-	dotest(queued_read_lock_hardirq_RE_Er, FAILURE, LOCKTYPE_RWLOCK);
+Why is it marked for-next though, seems like this is a regression in
+this series?
 
-"FAILURE" indicates selftests think lockdep should report a deadlock,
-therefore for lockdep if all goes well, you will see:
+-- 
+Jens Axboe
 
-	[...]       hardirq read-lock/lock-read:  ok  |
-
-If you expect lockdep to print a full splat in the test (lockdep is
-silent by default), you can add "debug_locks_verbose=2" in the kernel
-command line, "2" mean RWLOCK testsuite.
-
-Regards,
-Boqun
-
-> Regards,
-> Boqun
