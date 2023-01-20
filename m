@@ -2,104 +2,74 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 065F5C46467
-	for <linux-block@archiver.kernel.org>; Fri, 20 Jan 2023 03:50:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F680C46467
+	for <linux-block@archiver.kernel.org>; Fri, 20 Jan 2023 05:53:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229525AbjATDui (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 19 Jan 2023 22:50:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47648 "EHLO
+        id S229530AbjATFxN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 20 Jan 2023 00:53:13 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34782 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229713AbjATDuh (ORCPT
+        with ESMTP id S229539AbjATFxL (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 19 Jan 2023 22:50:37 -0500
-Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45A2D5BBE
-        for <linux-block@vger.kernel.org>; Thu, 19 Jan 2023 19:50:35 -0800 (PST)
-Received: by mail-pj1-x1036.google.com with SMTP id z1-20020a17090a66c100b00226f05b9595so3765593pjl.0
-        for <linux-block@vger.kernel.org>; Thu, 19 Jan 2023 19:50:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=mFN3Pnflf7Lk6KrUCrXdwU3ftbMEbdq7bXTt4T9oMnk=;
-        b=3GxR20l1A3kV14z6TIJmlyG1UzFJ0xZZdX8c/uqp2LYg4snHuUqylNb4B/UEKZi3N4
-         6CNSTR9H61jHVlz+yV1d8G0hXTaA/Z2EJM0u1u8sD2JgSUwO3ZO+yXfKY7Yb2kSVqzzJ
-         FwE/EinXXQTjF0882qTMt4bQbvi6baVnBi1HdZHxB65PZKG2EnGBONTYb62FVSm2zdzA
-         +vZwPmCUKEtZyVts4rii+NPxeLtsjZqD9ntVWMPcx9rw/K3y/aVvvFHnbjk8glfJw74N
-         0MEYtX5MvD7qPwZi2Q5oPxjQgmMKz4qGlXbvcd5TewE7jf2Deff1Qyh5tx9VtYat8Eld
-         mUdw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=mFN3Pnflf7Lk6KrUCrXdwU3ftbMEbdq7bXTt4T9oMnk=;
-        b=i0upUIRnqwf6Tr1NSQrASSwVXpWnRiR13kmTOAbSqyX5DjUl1vV+4r1tJxkkkNfFRe
-         T+unds3Z5rs41CuKJzm3GMNjx1QcpPz7JG+QSksKGqMPjf7sMTzNWT86Td1i5egStIg+
-         HPZnrSmRKv5TKxcCnHwY8yA1j/LPDMx2YLvv+GhIYBsec9+nJjiuh6xAYQoKhUJbiDd2
-         Wu+0n9IPDVVkN0ZoPomz5smTHFAsbbTRQKFqmY8XwMsXjmbVfWXxA3JkpijZj/UvMSGO
-         fKxuaD+nQXVWAhhNyremObPHM43hnqvKuKj0W3BDNC6aYSIbg1Hj2IY+SdliHXudkqBr
-         3h1w==
-X-Gm-Message-State: AFqh2ko8hAGME7n1L9oz60AMOyfAxHgIYax1rMOU5Cqbri+ee4EzHUjb
-        39BbI/RarnUq0S8sy5VznJi0gQ==
-X-Google-Smtp-Source: AMrXdXtv3X5Fw1PJqm0+RQ7mNmEYpHfgAMiljyMT0W1dC6GzMitviZUt7sOY8MmOgv0LF67eGAMdjw==
-X-Received: by 2002:a17:902:b702:b0:194:5d47:b47d with SMTP id d2-20020a170902b70200b001945d47b47dmr3295198pls.1.1674186634502;
-        Thu, 19 Jan 2023 19:50:34 -0800 (PST)
-Received: from ?IPV6:2620:10d:c085:21c8::1739? ([2620:10d:c090:400::5:ccda])
-        by smtp.gmail.com with ESMTPSA id ik9-20020a170902ab0900b00183c67844aesm25873870plb.22.2023.01.19.19.50.32
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 19 Jan 2023 19:50:34 -0800 (PST)
-Message-ID: <3ed9db5a-f527-2c53-3926-74bd802a3086@kernel.dk>
-Date:   Thu, 19 Jan 2023 20:50:31 -0700
+        Fri, 20 Jan 2023 00:53:11 -0500
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E03EB2B2A9
+        for <linux-block@vger.kernel.org>; Thu, 19 Jan 2023 21:52:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Content-Type:MIME-Version:Message-ID:
+        Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+        Content-Description:In-Reply-To:References;
+        bh=6ViBnn5rTvABzhDsmOUPIL37W9aUkZVjQn6d+l8lARw=; b=llhFXqZrRa5D5SlUxVEcJgwLL1
+        3M0x9OIEAQ4sdbNlR1i3nekEN71TwFu7iSbHBfbe+q24bhEU8MdtZ4HY25z2dty61VJ4xFBBzJa6J
+        DSibyjwDJgpqX3u1cpq1obQ0FzuqcGtCKuxuunJQBj54y0DyRByfRLOnTaaKDLmET+npG/pVBoKxl
+        9uE0amBaZYRTFqIPDWOB6EdUUtBatWPz1bJJOzwVubhzaS4aJVJ/PEcH9VMSSsW+EztOE1LQKALbL
+        /eofmqZGzZ/+RBN9RcnWWCNdxuY9ex5rwIhTRY4cGMehWLmDdK/8kWB4Sky2yx0oPOAN2sJ4cadXd
+        mauYtzfw==;
+Received: from [2001:4bb8:19a:2039:1233:6ec3:7a32:5885] (helo=localhost)
+        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1pIkKT-008XpC-5T; Fri, 20 Jan 2023 05:52:45 +0000
+Date:   Fri, 20 Jan 2023 06:52:42 +0100
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
+Subject: [GIT PULL] nvme fixes for Linux 6.2
+Message-ID: <Y8osKhxLSgeKMrSj@infradead.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.0
-Subject: Re: [PATCH-next v3] lib: parser: optimize match_NUMER apis to use
- local array
-Content-Language: en-US
-To:     Tejun Heo <tj@kernel.org>, Li Lingfeng <lilingfeng3@huawei.com>
-Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        akpm@linux-foundation.org, jack@suse.cz, bingjingc@synology.com,
-        ebiggers@google.com, james.smart@broadcom.com, houtao1@huawei.com,
-        yi.zhang@huawei.com, yangerkun@huawei.com, yukuai3@huawei.com
-References: <20230120021304.5773-1-lilingfeng3@huawei.com>
- <Y8n1rOLdMGDfOgpe@slm.duckdns.org>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <Y8n1rOLdMGDfOgpe@slm.duckdns.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/19/23 7:00?PM, Tejun Heo wrote:
-> On Fri, Jan 20, 2023 at 10:13:04AM +0800, Li Lingfeng wrote:
->> Memory will be allocated to store substring_t in match_strdup(), which means
->> the caller of match_strdup() may need to be scheduled out to wait for reclaiming
->> memory.
->>
->> Using local array to store substring_t to remove the restriction.
->>
->> Link: https://lore.kernel.org/all/20221104023938.2346986-5-yukuai1@huaweicloud.com/
->> Signed-off-by: Li Lingfeng <lilingfeng3@huawei.com>
-> 
->  Acked-by: Tejun Heo <tj@kernel.org>
-> 
-> This fixes a sleep-while-atomic splat in blk-iocost, so it'd be a good idea to add:
-> 
->  Fixes: 2c0647988433 ("blk-iocost: don't release 'ioc->lock' while updating params").
-> 
-> The mm tree likely is the best fit but given the splat the block tree can
-> work too. Andrew, Jens, what do you think?
+The following changes since commit 7746564793978fe2f43b18a302b22dca0ad3a0e8:
 
-I can take it through the block tree once folks are happy with it, as
-the buggy patch came through there. Doesn't really matter to me,
-however.
+  block: fix hctx checks for batch allocation (2023-01-17 09:56:52 -0700)
 
-Why is it marked for-next though, seems like this is a regression in
-this series?
+are available in the Git repository at:
 
--- 
-Jens Axboe
+  ssh://git.infradead.org/var/lib/git/nvme.git tags/nvme-6.2-2023-01-20
 
+for you to fetch changes up to 1c5842085851f786eba24a39ecd02650ad892064:
+
+  nvme-pci: fix timeout request state check (2023-01-19 09:08:01 +0100)
+
+----------------------------------------------------------------
+nvme fixes for Linux 6.2
+
+ - fix  controller shutdown regression in nvme-apple (Janne Grunau)
+ - fix a polling on timeout regression in nvme-pci (Keith Busch)
+
+----------------------------------------------------------------
+Janne Grunau (2):
+      nvme-apple: reset controller during shutdown
+      nvme-apple: only reset the controller when RTKit is running
+
+Keith Busch (1):
+      nvme-pci: fix timeout request state check
+
+ drivers/nvme/host/apple.c | 24 ++++++++++++++++++++----
+ drivers/nvme/host/pci.c   |  2 +-
+ 2 files changed, 21 insertions(+), 5 deletions(-)
