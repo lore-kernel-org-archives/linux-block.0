@@ -2,66 +2,47 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BAE4AC004D4
-	for <linux-block@archiver.kernel.org>; Fri, 20 Jan 2023 02:00:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D6EA9C004D4
+	for <linux-block@archiver.kernel.org>; Fri, 20 Jan 2023 02:07:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229765AbjATCAQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 19 Jan 2023 21:00:16 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58060 "EHLO
+        id S229613AbjATCHc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 19 Jan 2023 21:07:32 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33562 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229460AbjATCAQ (ORCPT
+        with ESMTP id S229568AbjATCHb (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 19 Jan 2023 21:00:16 -0500
-Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5DD53A501D;
-        Thu, 19 Jan 2023 18:00:15 -0800 (PST)
-Received: by mail-pj1-x1034.google.com with SMTP id x2-20020a17090a46c200b002295ca9855aso7713357pjg.2;
-        Thu, 19 Jan 2023 18:00:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=GRJ0AvCA7jxvP9hH13X6SrrE1Ee5xHATb9NhsOelXA0=;
-        b=JQEe5EU3/1qcH6Js22EDxwOVz1RtS5j7JqHKPKAJeexyaq01sniHLYFMG4jk6liK5l
-         RJpn0M2eulQd35Kj00mE/xRONgVS38m2Odq+gxn5yEgOkkCe3vws4QPktouJHCcYRznS
-         Qv66S7W0AKtOQXyE8xVaaD4lU8HO7FrUAoSNJBJscuWTotUBUk1um9+QHFBu8kWxOmyl
-         PEPVpSf6tTBw/sbPyN4jZrgpKGDWgRkkGp87cBQBy7OL43NwP2KiJFrLl5FAqne0UQfX
-         hGBHSLtm0T0R098KomqwM8uYzcQmYCN+nzlh+ylGaiLtRqrnKHByxDTc+P7syR/7zrzk
-         /xEg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=GRJ0AvCA7jxvP9hH13X6SrrE1Ee5xHATb9NhsOelXA0=;
-        b=uslhlxTCEADp8DYdsHOGvpBL2vAWy98jgkqQ36Z/WSNFqYdzON9cKTtaJ69AXXav9w
-         koGhueU5diEpMn/h0ZZgdzxNHhN3gcS0zOtHoRg7ydU9UORE+DKqYcOHIGsgiQ30xMiS
-         S42V4dHM75rkQO7biRNYI7qcHCVodfe1m8ZIqewEXcGfvEZzDCiVXDQUz+1/bghuQxQV
-         8iV9CCAn7cv/GbJOpukIe8rP52iDrPzTR2Roi3wlxmcJwxniIrlS6lG9qKXGLHQ5HMaQ
-         h/DA7ELnokbIKkNpUZF+Pjaw0ubIIsTp8fZ8L8DNSd2QsOyxMbPA91QzypSTtSWIA60K
-         RbHQ==
-X-Gm-Message-State: AFqh2koq7zVpfEzOpkm2R56wWkoe0hm9Y7Gn497oPT8JAw/pOwCwAkau
-        0/wdWV2ZQ7if1Z4xniiFNh8=
-X-Google-Smtp-Source: AMrXdXu9wBPZ3qJ8Tao1NsJmLu+7hnqmRA5vfwmEUVW6eUH0blm+Uow5VEgXuxCCAqgoF1ub+F7r/A==
-X-Received: by 2002:a17:902:8a98:b0:194:9c0d:9732 with SMTP id p24-20020a1709028a9800b001949c0d9732mr13437141plo.46.1674180014619;
-        Thu, 19 Jan 2023 18:00:14 -0800 (PST)
-Received: from localhost (2603-800c-1a02-1bae-a7fa-157f-969a-4cde.res6.spectrum.com. [2603:800c:1a02:1bae:a7fa:157f:969a:4cde])
-        by smtp.gmail.com with ESMTPSA id h4-20020a170902680400b0019488a36e2esm9669108plk.266.2023.01.19.18.00.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 19 Jan 2023 18:00:14 -0800 (PST)
-Sender: Tejun Heo <htejun@gmail.com>
-Date:   Thu, 19 Jan 2023 16:00:12 -1000
-From:   Tejun Heo <tj@kernel.org>
+        Thu, 19 Jan 2023 21:07:31 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D5E5FA5780;
+        Thu, 19 Jan 2023 18:07:30 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 7067E61DD6;
+        Fri, 20 Jan 2023 02:07:30 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6CFE0C433EF;
+        Fri, 20 Jan 2023 02:07:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1674180449;
+        bh=OHBGrZDS9hYZ63xAQOgXs0txuOMdKJTNhNwlzli36zY=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=YTPbThVNWK36wc5fhugZEj3dN20uYbPQj7oqWbo6/3N4Wh9OTpkOzpwwagGM5hhqT
+         y1jpadu4XfDN6XdaT32gg2VOfKiGc72rVYCs/Dnm/Cn/xQXAWQvf+Vzk21kjNJap2S
+         9S2DtiE6g+su/ecIxt3OTgJ4uyf33uSugwspf4LnqLM3YZ3BAftC/nQKyQQwhBoKaX
+         b8i3BvbW2Fxv5yx8LyH9aETnnM+qjFOdEyh8niCknK0sH6Oh+GqEKaHTUpQGpb4GWb
+         bVXlsfQilxFgQFsuRvRuLZ4ICfxPb4myQ0vCEXmQCJSA0XP1PjwFTb0Zg4IDvziXTn
+         2hOBDN5P980OA==
+Date:   Thu, 19 Jan 2023 18:07:27 -0800
+From:   Eric Biggers <ebiggers@kernel.org>
 To:     Li Lingfeng <lilingfeng3@huawei.com>
 Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        axboe@kernel.dk, akpm@linux-foundation.org, jack@suse.cz,
-        bingjingc@synology.com, ebiggers@google.com,
-        james.smart@broadcom.com, houtao1@huawei.com, yi.zhang@huawei.com,
-        yangerkun@huawei.com, yukuai3@huawei.com
+        tj@kernel.org, axboe@kernel.dk, akpm@linux-foundation.org,
+        jack@suse.cz, bingjingc@synology.com, james.smart@broadcom.com,
+        houtao1@huawei.com, yi.zhang@huawei.com, yangerkun@huawei.com,
+        yukuai3@huawei.com
 Subject: Re: [PATCH-next v3] lib: parser: optimize match_NUMER apis to use
  local array
-Message-ID: <Y8n1rOLdMGDfOgpe@slm.duckdns.org>
+Message-ID: <Y8n3Xxh+Rqo9vWHx@sol.localdomain>
 References: <20230120021304.5773-1-lilingfeng3@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
@@ -72,25 +53,34 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 On Fri, Jan 20, 2023 at 10:13:04AM +0800, Li Lingfeng wrote:
+> [PATCH-next v3] lib: parser: optimize match_NUMER apis to use
+
+NUMER => NUMBER
+
 > Memory will be allocated to store substring_t in match_strdup(), which means
 > the caller of match_strdup() may need to be scheduled out to wait for reclaiming
 > memory.
-> 
-> Using local array to store substring_t to remove the restriction.
-> 
-> Link: https://lore.kernel.org/all/20221104023938.2346986-5-yukuai1@huaweicloud.com/
-> Signed-off-by: Li Lingfeng <lilingfeng3@huawei.com>
 
- Acked-by: Tejun Heo <tj@kernel.org>
+Text in commit messages should be wrapped at 72 columns.
 
-This fixes a sleep-while-atomic splat in blk-iocost, so it'd be a good idea to add:
+> @@ -163,18 +169,16 @@ static int match_number(substring_t *s, int *result, int base)
+>   */
+>  static int match_u64int(substring_t *s, u64 *result, int base)
+>  {
+> -	char *buf;
+> +	char buf[NUMBER_BUF_LEN];
+>  	int ret;
+>  	u64 val;
+>  
+> -	buf = match_strdup(s);
+> -	if (!buf)
+> -		return -ENOMEM;
+> -
+> +	if ((s->to - s->from) >= NUMBER_BUF_LEN)
+> +		return -ERANGE;
+> +	match_strlcpy(buf, s, NUMBER_BUF_LEN);
 
- Fixes: 2c0647988433 ("blk-iocost: don't release 'ioc->lock' while updating params").
+As I requested on v2, the return value of match_strlcpy() should be used instead
+of checking '((s->to - s->from) >= NUMBER_BUF_LEN'.
 
-The mm tree likely is the best fit but given the splat the block tree can
-work too. Andrew, Jens, what do you think?
-
-Thanks.
-
--- 
-tejun
+- Eric
