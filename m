@@ -2,68 +2,91 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F914C25B50
-	for <linux-block@archiver.kernel.org>; Fri, 20 Jan 2023 20:59:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1ADE6C05027
+	for <linux-block@archiver.kernel.org>; Fri, 20 Jan 2023 22:26:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229863AbjATU7j (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 20 Jan 2023 15:59:39 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53414 "EHLO
+        id S229632AbjATW0M (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 20 Jan 2023 17:26:12 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41316 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229787AbjATU7h (ORCPT
+        with ESMTP id S229635AbjATW0L (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 20 Jan 2023 15:59:37 -0500
-Received: from sin.source.kernel.org (sin.source.kernel.org [IPv6:2604:1380:40e1:4800::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E801A95AC
-        for <linux-block@vger.kernel.org>; Fri, 20 Jan 2023 12:59:36 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        Fri, 20 Jan 2023 17:26:11 -0500
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D040C71BDF
+        for <linux-block@vger.kernel.org>; Fri, 20 Jan 2023 14:26:05 -0800 (PST)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by sin.source.kernel.org (Postfix) with ESMTPS id 85ADFCE2AB5
-        for <linux-block@vger.kernel.org>; Fri, 20 Jan 2023 20:59:34 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id CB9C9C433D2;
-        Fri, 20 Jan 2023 20:59:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1674248372;
-        bh=NB8EmiE8vb4+uwtIPCgt5/0+gIikxKh1TRXCAV+0mkU=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=KcZlp3+VfQMB0WL1QK/VSt4eGqVi9L/iCcMMfplfoIZvA7CKrHNj2ljA/Pa9VSqRs
-         mJqFf95FDKJgDAZKctktdd0NqOsY4ZIuxW7iGn6Gq8zbuBUEnFTH3CSGm1TIuaCiyQ
-         z8rUZxjVLL2q7X+Gdd790S5eyyRxs5ZJztMCQEb6yCvddJ0UfidORsA+CqcX36lg9E
-         ou4rw1lBn4z02Rh6boQFsXnfJkSG5QtjhqVIZZ0NW0lNvCHMl0JPvuD4MU52QVQ0tL
-         tN61mHPVuDo7X+Ux7OD2QtVCF3iMK/gseOOa8qeFzVOE4oi4b5E0kb6y0DTHmnjX35
-         VGAlCaM1vldag==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id B974EC04E31;
-        Fri, 20 Jan 2023 20:59:32 +0000 (UTC)
-Subject: Re: [GIT PULL] Block fixes for 6.2-rc5
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <305650d8-0477-19df-c043-f59b9b75cb48@kernel.dk>
-References: <305650d8-0477-19df-c043-f59b9b75cb48@kernel.dk>
-X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
-X-PR-Tracked-Message-Id: <305650d8-0477-19df-c043-f59b9b75cb48@kernel.dk>
-X-PR-Tracked-Remote: git://git.kernel.dk/linux.git tags/block-6.2-2023-01-20
-X-PR-Tracked-Commit-Id: 955bc12299b17aa60325e1748336e1fd1e664ed0
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: edc00350d205d2de8871b514c8f9b403d588e5d1
-Message-Id: <167424837275.22595.7708241474464372958.pr-tracker-bot@kernel.org>
-Date:   Fri, 20 Jan 2023 20:59:32 +0000
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 800275C94A
+        for <linux-block@vger.kernel.org>; Fri, 20 Jan 2023 22:26:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1674253564; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
+         mime-version:mime-version:content-type:content-type;
+        bh=Izntz5qxQBRNdHj/e+L8YxlSPXyZSgP88+HNDf01GKU=;
+        b=RvtjSNpa79IeMKnhouteWBU94muoLSMe5I4ksmqhqvJ1S5AZUhq6XyBWj4jm+GiE5kqSum
+        QXaTTDArjBcSxuL0nXXvvXjCQ2kH0y2WuV9JbRxyt3LL4XBeKSOTb6FVDxgg6rtWzb90GS
+        Qf4Ia43oOnljmJY+Bva/lNbOVDTXK8g=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1674253564;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
+         mime-version:mime-version:content-type:content-type;
+        bh=Izntz5qxQBRNdHj/e+L8YxlSPXyZSgP88+HNDf01GKU=;
+        b=a6gVZ3/1JdMsR75sqUU8qPCjIGeM8HLCbAoxgXBnD1sB4PzoImeljmo0JdgH435ku2E+Mp
+        PfHOuA24F3sO7vDw==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 34EE61390C
+        for <linux-block@vger.kernel.org>; Fri, 20 Jan 2023 22:26:04 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id t3CLBfwUy2O1SwAAMHmgww
+        (envelope-from <rgoldwyn@suse.de>)
+        for <linux-block@vger.kernel.org>; Fri, 20 Jan 2023 22:26:04 +0000
+Date:   Fri, 20 Jan 2023 16:26:07 -0600
+From:   Goldwyn Rodrigues <rgoldwyn@suse.de>
+To:     linux-block@vger.kernel.org
+Subject: [PATCH] atari: stricter partition validation
+Message-ID: <20230120222607.gjyi4uxyg4in52sp@kora>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The pull request you sent on Fri, 20 Jan 2023 13:02:10 -0700:
+The atari partition detect sequence has a simple sequence, if the three
+consecutive characters at the offset are alphanumeric, then call it as
+an atari partition. This results in many false positive where devices
+are shown as ATARI partitions when they are not. There are many users
+suffering this and they are finding ways to circumvent it (Search for
+"linux atari partition" in your popular search engine). This is more
+common with cloud based installations where a device with garbage is
+used and is falsely detected as an ATARI partition.
 
-> git://git.kernel.dk/linux.git tags/block-6.2-2023-01-20
+Make the detect condition stricter so Linux does not detect them as
+ATARI and continues with the detection sequence. There is already an
+existing function OK_id() which checks for legitimate partition strings.
+Use the function in the VALID_PARTITION() sequence.
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/edc00350d205d2de8871b514c8f9b403d588e5d1
+Signed-off-by: Goldwyn Rodrigues <rgoldwyn@suse.com>
 
-Thank you!
+diff --git a/block/partitions/atari.c b/block/partitions/atari.c
+index 9655c728262a..5f4d5faab399 100644
+--- a/block/partitions/atari.c
++++ b/block/partitions/atari.c
+@@ -20,7 +20,7 @@
+    least one of the primary entries is ok this way */
+ #define	VALID_PARTITION(pi,hdsiz)					     \
+     (((pi)->flg & 1) &&							     \
+-     isalnum((pi)->id[0]) && isalnum((pi)->id[1]) && isalnum((pi)->id[2]) && \
++     (OK_id((pi)->id) || memcmp((pi)->id, "XGM", 3)) &&			     \
+      be32_to_cpu((pi)->st) <= (hdsiz) &&				     \
+      be32_to_cpu((pi)->st) + be32_to_cpu((pi)->siz) <= (hdsiz))
+ 
 
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+Goldwyn
