@@ -2,92 +2,103 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DFB6C05027
-	for <linux-block@archiver.kernel.org>; Fri, 20 Jan 2023 15:09:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 338B3C27C7C
+	for <linux-block@archiver.kernel.org>; Fri, 20 Jan 2023 15:41:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229975AbjATPJW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 20 Jan 2023 10:09:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43528 "EHLO
+        id S231151AbjATPlH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 20 Jan 2023 10:41:07 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44760 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231288AbjATPJV (ORCPT
+        with ESMTP id S229864AbjATPlD (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 20 Jan 2023 10:09:21 -0500
-Received: from mail-io1-xd2a.google.com (mail-io1-xd2a.google.com [IPv6:2607:f8b0:4864:20::d2a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 766D8C41EA
-        for <linux-block@vger.kernel.org>; Fri, 20 Jan 2023 07:09:17 -0800 (PST)
-Received: by mail-io1-xd2a.google.com with SMTP id r71so2575945iod.2
-        for <linux-block@vger.kernel.org>; Fri, 20 Jan 2023 07:09:17 -0800 (PST)
+        Fri, 20 Jan 2023 10:41:03 -0500
+Received: from mail-il1-x129.google.com (mail-il1-x129.google.com [IPv6:2607:f8b0:4864:20::129])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D4363518E8
+        for <linux-block@vger.kernel.org>; Fri, 20 Jan 2023 07:40:45 -0800 (PST)
+Received: by mail-il1-x129.google.com with SMTP id f8so2877498ilj.5
+        for <linux-block@vger.kernel.org>; Fri, 20 Jan 2023 07:40:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=G/R9KZW2ypRwSFYmNL3DdGEYqt1RnjYffMb7JhYlSXM=;
-        b=UfMaYiIiaMMe9NQYNKdvlcBwHZjsGmkTJkAw2JgQxng/BX3fP7aJ+Z2hEhKuS9rvUs
-         57CvIFeWZYRAKV+EFOVGICIGM8syssDzylE9hvwO9FWsSSGYkv7nCDLss6GcNm2SK/eK
-         O36O7CWmUvYR29RB5c728FcWs6ikE0OZ8HnWgXqfPDgysK40Pk5XXa5edK5L3+f/V9ld
-         THbBqzyqJ625SoWFlP4QbH+wLAQ/tDGaA5yPc3wCMQl/rnQLHr1YMSiHsdNc6Yu+78l0
-         yWr+6vTRXY+UQdRwlrdpAA+rjA6CKpWvPH5APyLadwAuMVqQlN7Ziiv3f6pjGdl6jOag
-         ghTw==
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=WWZZyEASnVJeDNF1yNLqxhUJXWQQRy8pnWrzIYnrXKE=;
+        b=v2V3ahcwOyuebwYuu9dRu7UT8QxS8g94SXGFFKxIyCBqAbk2llyobeFPWj5Awzp1qK
+         hyFTDrKlLj0HTzsuVN0Ycdxcns3gvZ7iqlYGkwPE2i5qvSixBE4o0cfm+EEi1B5j0JK6
+         ri82Hp2zJUo/yb/sbEGQLhndTz2ilFTLxLp4O1EpOrAyXL/ALrRKupl+oJM1y3NRFE9w
+         uKjWYSkQL4ktfGdUg9UY01GzXNAu42C2JMxhoW87zWGYXh3QEyHSrhPd46XOC8A+z9GY
+         eDuwuA9oIBHqazOS+DFeQff3wzNLoBTwTZ+LeSOqKS9M1AVp0XJ8FxZuFv7tDnv25Sqq
+         3nSg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=G/R9KZW2ypRwSFYmNL3DdGEYqt1RnjYffMb7JhYlSXM=;
-        b=459v4C3h/ch3sbkD1wp3RhUtvtn8BLVRbivd3SRr+iw86bG2OziX/pVTXqTS+wJ6Zo
-         Bkc64j41/YQ1z8t7z5Geu3L2Z6sIPhiAqWbEAm+wEKHD8PkC1F+BW8EteK1ptEd0L+dJ
-         vxC2ioZljgfauVI09cj87y/oB355gup1KsMHQbeubY0ChHyXQhT1CXzLIkgz31tczvyj
-         cJnur2rbfIbO3Hxstz9mcIySDgrMA6lApNZP1TBbgo/uN531WErPXmtJWKQ5TtAuxVEp
-         CEQ4gJrXtGGAcIvqLPvIXgkuXXOwRVL+Ot2VO2HYaMj7SaC7X7nE2Ux05RNL1Wv8JmBE
-         7ojw==
-X-Gm-Message-State: AFqh2kqlA1hIVnfAz6lI69mkNi+AdpE4YSCHErbxw903rglYpjEdQdPQ
-        5WCZm7HRq4iJB3ISRcZrMSwTTqO9CYEppQMB
-X-Google-Smtp-Source: AMrXdXsQblyHcEqK/fT04ILN7rk3rYlA4Hz3TToRbe+MU5lipN5BkyBWLq5KUz0L4UNQ/vmjbYWIXA==
-X-Received: by 2002:a5d:9482:0:b0:6cc:8b29:9a73 with SMTP id v2-20020a5d9482000000b006cc8b299a73mr1897192ioj.1.1674227356776;
-        Fri, 20 Jan 2023 07:09:16 -0800 (PST)
-Received: from [192.168.1.94] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id i13-20020a0566022c8d00b00704d3db650bsm3050076iow.46.2023.01.20.07.09.16
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 20 Jan 2023 07:09:16 -0800 (PST)
-Message-ID: <1cdd9e67-c62f-6c41-1308-5dab525e56e6@kernel.dk>
-Date:   Fri, 20 Jan 2023 08:09:15 -0700
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.0
-Subject: Re: [GIT PULL] nvme fixes for Linux 6.2
-Content-Language: en-US
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
-References: <Y8osKhxLSgeKMrSj@infradead.org>
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=WWZZyEASnVJeDNF1yNLqxhUJXWQQRy8pnWrzIYnrXKE=;
+        b=YbA1ZRGYGdkptL2XbXHHlU0pNLEMoi4dAIOZnOkwM68HQNLiL8yCPxcTaQfBwjxFJG
+         H1ijJpyW585LISN+QBxSDZ9dl6aiMzOauf+lBTtM7PxK55nPadX2ZJxgoVfr5tHwCLFk
+         +sdUeH2zfGsz+OzPKR+2wfj9CofxIFsXVciCjgn+0Sd34Unhhl+jckJ7o9zhZekY026T
+         zqRzocvgrqECEzBnu5U0vQdJBmmlj66HlqsaXikVF2CEuYQ+O2ppj4lX7+L3wkBHr7BU
+         XG2y7a1zAzljNJb5Pieb5y8R+nM3U+ugvlTLunONeRmBodTrkmnbUu07lGzGMZFBcPT2
+         Tdew==
+X-Gm-Message-State: AFqh2kqofn4UVVusbMrZJUaaBJB+Tc4Zbrwo8MYEvfPJfq6Z0UPNpyH0
+        pid/J+MbyoFqJOykijMwVXL/oA==
+X-Google-Smtp-Source: AMrXdXvqr1gf6LsriZhblEuwsV/ojwQoD+SuMayTzyNfyKJSMR0jJ5jvc3wSVt0hqkM81B1PB2EQbw==
+X-Received: by 2002:a92:c5d1:0:b0:30d:9eea:e51 with SMTP id s17-20020a92c5d1000000b0030d9eea0e51mr2273147ilt.1.1674229245097;
+        Fri, 20 Jan 2023 07:40:45 -0800 (PST)
+Received: from [127.0.0.1] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id b11-20020a02a58b000000b003a60e5a2638sm1886075jam.94.2023.01.20.07.40.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 20 Jan 2023 07:40:44 -0800 (PST)
 From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <Y8osKhxLSgeKMrSj@infradead.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+To:     tj@kernel.org, josef@toxicpanda.com,
+        Yu Kuai <yukuai1@huaweicloud.com>
+Cc:     cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, yukuai3@huawei.com,
+        yi.zhang@huawei.com, yangerkun@huawei.com
+In-Reply-To: <20230117070806.3857142-1-yukuai1@huaweicloud.com>
+References: <20230117070806.3857142-1-yukuai1@huaweicloud.com>
+Subject: Re: [PATCH v4 0/5] blk-iocost: random bugfix
+Message-Id: <167422924424.669768.14436700036484270833.b4-ty@kernel.dk>
+Date:   Fri, 20 Jan 2023 08:40:44 -0700
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.12-dev-78c63
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/19/23 10:52 PM, Christoph Hellwig wrote:
-> The following changes since commit 7746564793978fe2f43b18a302b22dca0ad3a0e8:
+
+On Tue, 17 Jan 2023 15:08:01 +0800, Yu Kuai wrote:
+> changes in v4:
+>  - a litter code optimization to make it easier to understand in patch
+>  4.
 > 
->   block: fix hctx checks for batch allocation (2023-01-17 09:56:52 -0700)
+> changes in v3:
+>  - move some patches into separate patchset
+>  - don't return other error number for match_u64() in patch 1
+>  - instead of checking user input separately, set page directly if
+>  'bps + IOC_PAGE_SIZE' will overflow.
 > 
-> are available in the Git repository at:
-> 
->   ssh://git.infradead.org/var/lib/git/nvme.git tags/nvme-6.2-2023-01-20
+> [...]
 
-You really need to fix your script, I used:
+Applied, thanks!
 
-git://git.infradead.org/nvme
+[1/5] blk-iocost: check return value of match_u64()
+      commit: 7b6a2c89052bfaf750260691dee29c2e457c0929
+[2/5] blk-iocost: don't allow to configure bio based device
+      commit: 204a9e1eeb4b72cd260274f14e521162b130a978
+[3/5] blk-iocost: read params inside lock in sysfs apis
+      commit: 7b810b50390b53c2a81051adce8fcbff3200fc74
+[4/5] blk-iocost: fix divide by 0 error in calc_lcoefs()
+      commit: 4e952a32301a77faea0d36c540ae16847cf2a8ee
+[5/5] blk-iocost: change div64_u64 to DIV64_U64_ROUND_UP in ioc_refresh_params()
+      commit: ad5572498be17b800e75bc36f7d810dd3b673802
 
-as per usual (with that tag).
-
-Pulled, thanks.
-
+Best regards,
 -- 
 Jens Axboe
+
 
 
