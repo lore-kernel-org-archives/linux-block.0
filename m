@@ -2,48 +2,104 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3022C05027
-	for <linux-block@archiver.kernel.org>; Mon, 23 Jan 2023 16:53:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DF1BDC05027
+	for <linux-block@archiver.kernel.org>; Mon, 23 Jan 2023 17:20:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231912AbjAWQxl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 23 Jan 2023 11:53:41 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60760 "EHLO
+        id S233632AbjAWRU4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 23 Jan 2023 12:20:56 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57078 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229848AbjAWQxk (ORCPT
+        with ESMTP id S233624AbjAWRUx (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 23 Jan 2023 11:53:40 -0500
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD0EA4219;
-        Mon, 23 Jan 2023 08:53:39 -0800 (PST)
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 3D2CB68C7B; Mon, 23 Jan 2023 17:53:36 +0100 (CET)
-Date:   Mon, 23 Jan 2023 17:53:36 +0100
-From:   Christoph Hellwig <hch@lst.de>
-To:     Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
-Cc:     Christoph Hellwig <hch@lst.de>, Chris Mason <clm@fb.com>,
-        Josef Bacik <josef@toxicpanda.com>,
-        David Sterba <dsterba@suse.com>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>,
-        Naohiro Aota <Naohiro.Aota@wdc.com>, Qu Wenruo <wqu@suse.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        "Darrick J. Wong" <djwong@kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-btrfs@vger.kernel.org" <linux-btrfs@vger.kernel.org>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>
-Subject: Re: [PATCH 13/34] btrfs: remove now unused checksumming helpers
-Message-ID: <20230123165336.GA9451@lst.de>
-References: <20230121065031.1139353-1-hch@lst.de> <20230121065031.1139353-14-hch@lst.de> <7e94c06d-3b08-4101-3e5e-ce9001c14bcf@wdc.com>
+        Mon, 23 Jan 2023 12:20:53 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 456BB5582
+        for <linux-block@vger.kernel.org>; Mon, 23 Jan 2023 09:19:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1674494395;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=pOoqxnL289W8RYJpdgnKmU7vs7+RtONm5/MOnF58uqA=;
+        b=XDY7P9OeVHNyCnFYsy/9dl7X96shus4UoMsDAblYUP1ythRNGvGHxAVumWSHLj1dQgx1Hz
+        XnAl1D9BSc96cwg15qKfD0r8v8FAuzNn0iokvoYrMI2lA1/AyIe7pLjuTDS4BQNRFmLFJn
+        VHpU8+E7WZcjxtIksYWMBOJ6WDSa5P0=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-164-DQJIWadMMVONSMP0SVtNSQ-1; Mon, 23 Jan 2023 12:19:53 -0500
+X-MC-Unique: DQJIWadMMVONSMP0SVtNSQ-1
+Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id EE35D3C10220;
+        Mon, 23 Jan 2023 17:19:52 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.33.36.97])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id A1421492B02;
+        Mon, 23 Jan 2023 17:19:51 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <Y865EIsHv3oyz+8U@casper.infradead.org>
+References: <Y865EIsHv3oyz+8U@casper.infradead.org> <Y862ZL5umO30Vu/D@casper.infradead.org> <20230120175556.3556978-1-dhowells@redhat.com> <318138.1674491927@warthog.procyon.org.uk>
+To:     Matthew Wilcox <willy@infradead.org>
+Cc:     dhowells@redhat.com, John Hubbard <jhubbard@nvidia.com>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Christoph Hellwig <hch@infradead.org>,
+        Jens Axboe <axboe@kernel.dk>, Jan Kara <jack@suse.cz>,
+        Jeff Layton <jlayton@kernel.org>,
+        Logan Gunthorpe <logang@deltatee.com>,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v7 0/8] iov_iter: Improve page extraction (ref, pin or just list)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <7e94c06d-3b08-4101-3e5e-ce9001c14bcf@wdc.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <324814.1674494391.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date:   Mon, 23 Jan 2023 17:19:51 +0000
+Message-ID: <324815.1674494391@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.10
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Jan 23, 2023 at 04:49:30PM +0000, Johannes Thumshirn wrote:
-> We could even go as far as that:
+Matthew Wilcox <willy@infradead.org> wrote:
 
-That looks nice.  Care to send an incremental patch once the series is
-in?
+> > Wouldn't that potentially make someone's entire malloc() heap entirely=
+ NOCOW
+> > if they did a single DIO to/from it.
+> =
+
+> Yes.  Would that be an actual problem for any real application?
+
+Without auditing all applications that do direct I/O writes, it's hard to
+say - but a big database engine, Oracle for example, forking off a process=
+,
+say, could cause a massive slow down as fork suddenly has to copy a huge
+amount of malloc'd data unnecessarily[*].
+
+[*] I'm making wild assumptions about how Oracle's DB engine works.
+
+> > Also you only mention DIO read - but what about "start DIO write; fork=
+();
+> > touch buffer" in the parent - now the write buffer belongs to the chil=
+d
+> > and they can affect the parent's write.
+> =
+
+> I'm struggling to see the problem here.  If the child hasn't exec'd, the
+> parent and child are still in the same security domain.  The parent
+> could have modified the buffer before calling fork().
+
+It could still inadvertently change the data its parent set to write out. =
+ The
+child *shouldn't* be able to change the parent's in-progress write.  The m=
+ost
+obvious problem would be in something that does DIO from a stack buffer, I
+think.
+
+David
+
