@@ -2,188 +2,578 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1880C27C76
-	for <linux-block@archiver.kernel.org>; Mon, 23 Jan 2023 01:00:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC2D1C25B4E
+	for <linux-block@archiver.kernel.org>; Mon, 23 Jan 2023 01:03:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230097AbjAWBAG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 22 Jan 2023 20:00:06 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34472 "EHLO
+        id S230168AbjAWBDc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 22 Jan 2023 20:03:32 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35234 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230091AbjAWBAF (ORCPT
+        with ESMTP id S229836AbjAWBD1 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 22 Jan 2023 20:00:05 -0500
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2040.outbound.protection.outlook.com [40.107.93.40])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A3A912F30;
-        Sun, 22 Jan 2023 16:59:58 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=cYIZpCgYGHSBybMNosVMM9g0TuVlngBmVoVk4CJgfVmpC5bBRZKLtYQxUCFi4QZkSV1yImmxfw/OER+eWh22yhf2X1ysuSmpiKoIJAuLtHljES7d0YfdFeoj6uFWgXUYqSlEDKlnGXF4RC70Aqk1Tc6RoMFaHao+SSF0lfonH+/UI886gz1YE5Vt+sYPxT1C0FoBaKymKek/Ui2iI7oQP11iPCrRYdKw7dGUjAgww2xCSZbaEOEqJ2yFbcwA/3VHaAMo+7aa1px8OqOqXYRaDMXYrykrBEH+J9cgHOVauFwf5SyZEsCGYqr/nu82hI7vLeCHtbSyvH51zJ1RtAMt3w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=n+KFjfesObm3WW5AWlzfGZlbu09MQxzrXfocmCr2N7g=;
- b=Duaq0DIvw7kICwrl6K9XmydVVm1YDzoIh+fOyz44Q+UUXypchaJKDIiTYmVSokKzrwqIcXI3JViGTzJibQb2bBr1QWrsfaG1WabHTgSyHZmZ8+QnTMT0EieMpnR9zCM9addkQzbjhZs78BagSHx7V7EPu+A8pb33D4hKkremwZaY48fGLOrzVk5+tLkgkCZBFhugPAHg4AC82rdUQa5fuM6uJklpS6b6KZ0/dfCqpdUM8ogrRWLxwH9L6EoymyYCI9u7BKpX1vRD6FrOuHvV8gy70nfN6GUS2oqC6FgUNNJRcyrORhepE3/h1mP4xoBOwvbBnqCAYKfHCSkLqrUSyg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=n+KFjfesObm3WW5AWlzfGZlbu09MQxzrXfocmCr2N7g=;
- b=LGLnaAGttJRtNWRP9T14PmAIutm2O66rIFKEzkA2xmU5U2xUidTvoeiMJ7sYQshjmZEjQtMkvVKIbtEQH1NglASEtAxZbK4s8643BrpV6i+Y5/JQ5gYL78HbvnsmfIXiezLihaPdTe1bLEtpFnz+D1BA0U0MlCpvCsYAG3Rj2cuYh6uf+aWzkxxBl9zCFE8+VDnm0t9bsOrpFNzz7I7Wo/bFuwERn7Ijmbs6ImUu9kvG9hZTdCXFTyXTpcWeT0YjzJSkG+IwWff6nIPotYpuRCWAzS4OzfX02EfNywabwJSDNU6KKbhY4JLkVkUahal7kzImRFyTOnoQEVmRW5v49A==
-Received: from MW2PR12MB4667.namprd12.prod.outlook.com (2603:10b6:302:12::28)
- by IA1PR12MB8517.namprd12.prod.outlook.com (2603:10b6:208:449::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6002.27; Mon, 23 Jan
- 2023 00:59:54 +0000
-Received: from MW2PR12MB4667.namprd12.prod.outlook.com
- ([fe80::b84c:b6e:dc0:8d7]) by MW2PR12MB4667.namprd12.prod.outlook.com
- ([fe80::b84c:b6e:dc0:8d7%2]) with mapi id 15.20.6002.033; Mon, 23 Jan 2023
- 00:59:47 +0000
-From:   Chaitanya Kulkarni <chaitanyak@nvidia.com>
-To:     Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-CC:     "lsf-pc@lists.linux-foundation.org" 
-        <lsf-pc@lists.linux-foundation.org>,
-        "linux-fsdevel@vger.kernel.org >> linux-fsdevel" 
-        <linux-fsdevel@vger.kernel.org>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        Bart Van Assche <bvanassche@acm.org>,
-        "josef@toxicpanda.com" <josef@toxicpanda.com>,
-        Amir Goldstein <amir73il@gmail.com>,
-        =?utf-8?B?SmF2aWVyIEdvbnrDoWxleg==?= <javier@javigon.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Keith Busch <kbusch@kernel.org>,
-        Hannes Reinecke <hare@suse.de>,
-        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-        Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
-        "jack@suse.com" <jack@suse.com>, Ming Lei <ming.lei@redhat.com>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Theodore Ts'o <tytso@mit.edu>,
-        "snitzer@kernel.org" <snitzer@kernel.org>,
-        "dm-devel@redhat.com" <dm-devel@redhat.com>
-Subject: Re: [LSF/MM/BPF ATTEND][LSF/MM/BPF TOPIC] : blktests: status, an
- expansion plan for the storage stack test framework
-Thread-Topic: [LSF/MM/BPF ATTEND][LSF/MM/BPF TOPIC] : blktests: status, an
- expansion plan for the storage stack test framework
-Thread-Index: AQHZK5fy4D60HvoJAkGWFwtQ6nnwK66lAiUAgAYyowA=
-Date:   Mon, 23 Jan 2023 00:59:46 +0000
-Message-ID: <9a8c1645-c4bc-728e-6002-ae6986286c56@nvidia.com>
-References: <e24383ca-8ba8-3eb3-776c-047aba58173d@nvidia.com>
- <20230119022056.plpe5wejji6gl3fp@shindev>
-In-Reply-To: <20230119022056.plpe5wejji6gl3fp@shindev>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-user-agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.9.0
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: MW2PR12MB4667:EE_|IA1PR12MB8517:EE_
-x-ms-office365-filtering-correlation-id: 8b1056ca-b516-4f69-aa10-08dafcdd1f45
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: ceh3TeHXQLnkHPtdtlBJeA6YB0aKpHo5VCYBAGZQdMSExyFEtNvbl7IR9vcPFYHWWkRT98slm0BZT0lilwZnaEt6z+jXKsd/SybXJyLe+jlxsx0S1c1i+ccD4L5bOLDPaPHPfbS3xlXAaa6OV3+bvq7SS3MXwLrVz8eLV8nq5H4S6ZQsIu10NUU3Bcrl/EYq3zavs1F7U3+JAJtUKBtNULHYfwRwWI4/hNTYWyXbWnppBodobPl5w7wwffi43had5hMfI9oeZmVzz3qErR4INWgM9nSHNuNorbaaDycqzCS7P/c76IWNOIIeh4hAcZf3rNJi59BbXHdATsvMdY3VyXoBg6PoxKdDNk9IM0cPF1FLyTrWh5IWBJ1C/3nycpldXruTyGYq/qqSXNmIzcZBy4kyRrdW1A1SMXd+CVZVo+wFa7KfkmEZ41k92E05WummJTOilbQa942qo8OvneT7S6HfqJVGAV2FX11h8UUTVluiDDPYayFkARwfI88WKZHevfsbB8cOra24nVdc5D17KUsoyQTxK2+CeB+ccpxocE6Eu36ygkT8B7U9CeEoWMPW4r9GXgB0fV98c8OiWtlj2uD70kwZDg23bsvV5R0fmLJ0Gm088hAVt2O6zUgNJpbZwQlCQ+rImm/kcb4SXQgO3C1puPS9+3Fdp/lyU85eeQy0pZ4IviDubGwtzIu4eJC0pX+TncttcLe08+tyIx5keV2wIUCzlerrQtQJ946W+8kzTxy5goLsK9++0XV5HpNHX1XFct4dCA5CC6F2Tl83/X6elqEBgO13gDbLZ4fvduHGF96JMlDbpDzb03iECF9bjeqTXMmu5Ye5WcUOfmSelhcMbPHjwiphTUm1YkIUicw=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW2PR12MB4667.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(376002)(39860400002)(136003)(366004)(396003)(346002)(451199015)(8936002)(31686004)(4326008)(7416002)(66476007)(66446008)(8676002)(64756008)(66556008)(66946007)(91956017)(5660300002)(6916009)(76116006)(53546011)(71200400001)(38100700002)(31696002)(478600001)(2906002)(6506007)(186003)(6486002)(36756003)(966005)(2616005)(316002)(122000001)(54906003)(6512007)(83380400001)(41300700001)(86362001)(38070700005)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?ZEhYSFlMMWk2eHdGSklhVVFHbENHQW1ZdTljbERiOUFZMFR1R2o2N3lCYnJp?=
- =?utf-8?B?ejNGUzZaTW1mTVlBZUpMUVFmNWdoemVWT1RZMGQrQVZMVi9CTmNMcmpCM0lv?=
- =?utf-8?B?RVVFVk5jeTZmVmlnTDRmaUpQSE1yT3NiR3RSOE9wMnRrVGdrN3A2WW9VbldD?=
- =?utf-8?B?V2dvR0YzSThSWk1tZmtLRmx4S2RyQ2tnL0praXdDRE5zRUZLQ25GZWtMMUFz?=
- =?utf-8?B?a2pYbDJYU1BERC9oNGdmT3l4MTVDdXNlTkxuckpWUlhuVUJFdDc4TzhCT3gx?=
- =?utf-8?B?YVBUSjkrOFhGR3FMMVVmRUZ3M3JVMkFsYTFFNmRZaFZOZlNZTzkyaHpqaFB4?=
- =?utf-8?B?ekI2aUFrcTVsbnVjazJNRVVKZjd3U3VWNmxVQVd6RUg0WUNZSnhlT0x5Z0pk?=
- =?utf-8?B?aTVCWWRWbkFRTWFrdFhUMWNJa0FVRFYxcVYzWWZNMmhXaW1aVDl1NGtrTjNp?=
- =?utf-8?B?aFIwTldnUkFFU0FYQkZpT1RockMvUk5OWWR6djRtamFUM1dOZjM3Mkh5eWds?=
- =?utf-8?B?aXhKQlhMcFp6a2d6dlRKR0trcmFlZjhKQVd3YkVHVTFOcjVUdklEVUYxUk5P?=
- =?utf-8?B?dysrRm5DTWxUelJWcWllTE94eFV5Q3U0REcwYU03OW1IN1VPbk5JWTFGbWZj?=
- =?utf-8?B?eFEwbVpYZG9Gb0RkMGNXYnBtd0xHTmRoZ3pTVklhbXNTZWYxa3p4OXZ1Q1pT?=
- =?utf-8?B?dE15NDBTTUhkUVlmV1ZzWEVtTlIydTFCeWhYaXFRK1hvbTJpQ3M2UnlzMlNk?=
- =?utf-8?B?SHk2Z1hjMm50TjJ2clJNYTljKzhMUVp0OWFZNzhDckRMR0h2VEZaVVZDMkVv?=
- =?utf-8?B?WUk4VGpTRWI0UVNOUC9xaXFZTXBYb2lGMGQ3N2llOEdqRmlZdzdaVm0vVzlN?=
- =?utf-8?B?azIrZm5VdERqeU9SSzNKUHRyVjlsa2JjQ2tNcEw3RjgzZURTaWFnRzlkYmF4?=
- =?utf-8?B?ZUlabHZQamNaR09TR3l0b0YwOVMyZFgzVkYyY2VyelBSTWRRUjI3ZEVHbDhi?=
- =?utf-8?B?U2FpTWlHTE5LNFV5MEdvU0dmM2JwYnhZcGdjMWlzQzVCN0thK01EdFVHMmdx?=
- =?utf-8?B?R1pCSWRsSFBzSUNJZ3AwT1JXZmR4WXdvYU9jTmlIL1lXTzZpUy9KdDUxQ1Rp?=
- =?utf-8?B?TmdUeEpBQ0hkcGx0OWNLNDJiMldLdVdHOWtDOTluUkFUN1lvR09IcGhFemIr?=
- =?utf-8?B?dTN1b2dPdmRxK3A5cUJvRnAxSkJmUUxlbkc0N21qb0c4SDhmeStyeXhMNWVY?=
- =?utf-8?B?Sm5ONS9jcmNIWXJjbGU5NEtKem1SM1lpN01xYTVyd1BoaUdLSHV6YnlCTGFI?=
- =?utf-8?B?OUc3S2dzTjRxWktvV0k3bXVQRkN6Mmp1Y2pDMmI0OExKN3A4dEoxQXIyWU54?=
- =?utf-8?B?T1VLV1g0Nm0vNTU1cnJWQ1duclFsVFM2aTlvbjN1Y09GTXFRMlRPc3Q0K2Zu?=
- =?utf-8?B?OVIwakFpYlJKR1AySFhFdCtRODZiZ0U2SXFpOWVaUElLNUQ4QW9Bc2t2OFRm?=
- =?utf-8?B?Mk9UVjVQSzRNS3dKYm5UL3kyZW1YQlZlWnNMcFc4NkVXeElhTXJHaUFVYnY3?=
- =?utf-8?B?T2pYYXhHNC9GaUJSOUlPV1Y5MmE3bWttZHdDVUFhV1I5OEM4TU95cFRBQmxL?=
- =?utf-8?B?RWRRYjZNSkl4OXBMVFBPTUpqYnpqSWJBdWYxT2lncUFNZjlWR2Q1ZjJHR2ta?=
- =?utf-8?B?SkRLYmtqRWZURVlMZFlOb1dWbnFGSHpyQ3Y2Q1YrZ3FqWG9pSmR3eXltb3dJ?=
- =?utf-8?B?UVJHN3E5cFlUV2VhbGxaMzNCcVBjY2h4OE10bU1GQWdQQlZULyt2bCtyRjBP?=
- =?utf-8?B?bzQ5V05yRnpKYXAzbXNLSjMyTFN3c1BQa2VyZGNUWklZcTNZTm9zOU5Xcnhw?=
- =?utf-8?B?S1dLNVI3ZUhDUi9RQWZ6QzMrQnoxUUlBNURHbFAxV3ZkQStKNFRNc25Ka1B0?=
- =?utf-8?B?MUhQVVF6b0ZMcE52SzUxRmpBSlFQYWY3bmc4Z3l2ZS8yUVdDbHc4V3ZHOEdq?=
- =?utf-8?B?a1hPbjcxYjg3bEZVL2ZMSWxXbFpNVThJRzlRWWI1VWNXeEZuVDhwZjE5Q3pT?=
- =?utf-8?B?VnpYc1FvYVZqNFVRdGdaVkNncmp3SUVUZGlrVTZwRk1qRVZkVWk4KzR3UUsr?=
- =?utf-8?B?ZmRhVlF3ZDd0aWlnalFoNzd1NW0vanNneGswS3hrR1N3aEltQzc4eU0xdXZl?=
- =?utf-8?Q?GLJR351scyqBp4Z7gFC14zGFYgy89s+j6bcnihMRWhCU?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <FD02A1E988E6D34EA2DBF52D34455603@namprd12.prod.outlook.com>
-Content-Transfer-Encoding: base64
+        Sun, 22 Jan 2023 20:03:27 -0500
+Received: from esa6.hgst.iphmx.com (esa6.hgst.iphmx.com [216.71.154.45])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D349E13DC8
+        for <linux-block@vger.kernel.org>; Sun, 22 Jan 2023 17:03:24 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1674435804; x=1705971804;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=pN2HDtGApIdBIl3ZvJOgqtds3RPT7epxorJjMdFLsOE=;
+  b=O08JxZlgyhnTszPuKkJ0n8W0HzkeJgfzQGU/7+M/kuqxPhfIVIqyg0G4
+   YNJ59jKPQLeI/+58dEWT8/8X50gtzWS6Wzp4Znl3usmXY2hKUxCWUGut6
+   ab/pp4mg67JT1GnsGv2TGhnsOhWbbc9LWplQnbCn4b7CAvcim+U5/pgKI
+   B5SpkHi4vTDqcN+9W0eoNndMMxkm99qAd/Jk7wiTLel8htDWqqZNgciNO
+   UArGBuPxarXnzscb2KNSbUsPnUoXjvM20AN6H4/UwkoYScjH5Np+bRMML
+   FB/17V05aE4QJqV/zDh8dVrRIAZyHHGY1qu4YyY4ML+1jUiw5sYDTJucQ
+   A==;
+X-IronPort-AV: E=Sophos;i="5.97,238,1669046400"; 
+   d="scan'208";a="221581296"
+Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
+  by ob1.hgst.iphmx.com with ESMTP; 23 Jan 2023 09:03:21 +0800
+IronPort-SDR: IkSRN+Rt5Kt3DxH3ib1RjDnvWNRF4Fm9tDdEQd5xUmzC4GtxQXgMO8bwEtBS3gosCxvHi1vLTP
+ /P4gSnMnSciKHYkCHnPQWWo3ndb+XBoOIRSRyaq1dWxbSUWo5ePyz2KySvY5kgermq2/x63vbj
+ dMTQZF6wTssCSl6FmPcAF7BhEJKNqGq2sXTbtHDukixVZqt6wV8ChuQp0eojO9N26hA/HcA6DP
+ +3/fDitWXOrwtuDeAaqhWoBWTVHu80CyJYmi4GXGmS3L69FxK/r8w5PUwKF9+eqH2tHpFDw+3B
+ f4c=
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 22 Jan 2023 16:15:12 -0800
+IronPort-SDR: LJq4gZV1qgFP8eCzsZc3CejNhyw9TbT/Pybf5Ph1XG35PeA/Dp9axAs+4r6ov4NG10VIw6vfz5
+ dRlDS5QscSVSYMrATXq8cWKsrMwnDOSWhs734mc3FBbg0Xixrl+7WEBFej/Yax58ii0l9wRgYN
+ AV3yjzOH2me9vGYWc09G5RXVejdJX/CjEQJH5ijvupkLsiXcmlJC5U3yTT1LHlxwGOnXjDIX/8
+ jYUoxT+6xWv919IM1ZxrRlmCKmUdCiFbjGC5KGSDUpwteO/vNDywRdCDAMLtf8uibPNKxOiTsz
+ MlQ=
+WDCIronportException: Internal
+Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
+  by uls-op-cesaip02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 22 Jan 2023 17:03:21 -0800
+Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4P0X0T2Xs1z1Rwt8
+        for <linux-block@vger.kernel.org>; Sun, 22 Jan 2023 17:03:21 -0800 (PST)
+Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
+        reason="pass (just generated, assumed good)"
+        header.d=opensource.wdc.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
+        opensource.wdc.com; h=content-transfer-encoding:content-type
+        :in-reply-to:organization:from:content-language:references:to
+        :subject:user-agent:mime-version:date:message-id; s=dkim; t=
+        1674435799; x=1677027800; bh=pN2HDtGApIdBIl3ZvJOgqtds3RPT7epxorJ
+        jMdFLsOE=; b=Ao/Wt6atS3+uC8y3jFIVm+EZ7jdScJSJbS+A/5Ru4MTZ5XLWyo3
+        MWbN8f2HtqH4WmbOSjB/VcZ8TFmXqBnOEEsTaYXlJVayqsWdFrlFQYX6B2fIXARo
+        YNE89XQjnhzGFSWswQge3DHvjWgxH2gpMuV+nNxVHdUUVgAFR1+KSGSsP58xDg0x
+        xWchzx45IJ0PM/GJL2FSNjjPXy5GkKUY0E2i5psKFDOcig6dUeNKetb/ppDSuuHA
+        b+/NR1WHyQSGGi5dQH/BuxTAUSeDufh3O8Zr8Todvy35gLaUaiREkEV/gBwFhzAj
+        qCIs/F6txxgX55rmOlJHQHNLgyrrjcJzO1g==
+X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
+Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
+        by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
+        with ESMTP id xzvGqdlogDDO for <linux-block@vger.kernel.org>;
+        Sun, 22 Jan 2023 17:03:19 -0800 (PST)
+Received: from [10.225.163.50] (unknown [10.225.163.50])
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4P0X0P4c6Rz1RvLy;
+        Sun, 22 Jan 2023 17:03:17 -0800 (PST)
+Message-ID: <425b5646-23e2-e271-5ca6-0f3783d39a3b@opensource.wdc.com>
+Date:   Mon, 23 Jan 2023 10:03:16 +0900
 MIME-Version: 1.0
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: MW2PR12MB4667.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8b1056ca-b516-4f69-aa10-08dafcdd1f45
-X-MS-Exchange-CrossTenant-originalarrivaltime: 23 Jan 2023 00:59:46.8665
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: WrvqsW1zl1FQyfnjAbRNKCsyJLDBltvrgHlIe2qRTKGEgDcrA6VS4VFjihk7vTb8dkefXbktbJ80lsN3hrdvLA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB8517
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.6.0
+Subject: Re: [PATCH v2] pata_parport: add driver (PARIDE replacement)
+To:     Ondrej Zary <linux@zary.sk>
+Cc:     Christoph Hellwig <hch@lst.de>,
+        Sergey Shtylyov <s.shtylyov@omp.ru>,
+        Jens Axboe <axboe@kernel.dk>, Tim Waugh <tim@cyberelk.net>,
+        linux-block@vger.kernel.org, linux-parport@lists.infradead.org,
+        linux-ide@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20230121225314.32459-1-linux@zary.sk>
+Content-Language: en-US
+From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
+Organization: Western Digital Research
+In-Reply-To: <20230121225314.32459-1-linux@zary.sk>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-T24gMS8xOC8yMyAxODoyMCwgU2hpbmljaGlybyBLYXdhc2FraSB3cm90ZToNCj4gQ0MrOiBNaWtl
-LCBkbS1kZXZlbCwNCj4gDQo+IEhpIENoYWl0YW55YSwgdGhhbmtzIGZvciBicmluZ2luZyB0aGlz
-IHVwISBJIGRlZmluaXRlbHkgd2FudCB0byBqb2luIGFuZCBsZWFybg0KPiBmcm9tIHRoZSBkaXNj
-dXNzaW9ucy4gSGVyZSBJIG5vdGUgbXkgY29tbWVudHMgYWJvdXQgdGhlbS4NCj4gDQo+IE9uIEph
-biAxOCwgMjAyMyAvIDIzOjUyLCBDaGFpdGFueWEgS3Vsa2Fybmkgd3JvdGU6DQo+IFsuLi5dDQo+
-PiBGb3Igc3RvcmFnZSB0cmFjaywgSSB3b3VsZCBsaWtlIHRvIHByb3Bvc2UgYSBzZXNzaW9uIGRl
-ZGljYXRlZCB0bw0KPj4gYmxrdGVzdHMuIEl0IGlzIGEgZ3JlYXQgb3Bwb3J0dW5pdHkgZm9yIHRo
-ZSBzdG9yYWdlIGRldmVsb3BlcnMgdG8gZ2F0aGVyDQo+PiBhbmQgaGF2ZSBhIGRpc2N1c3Npb24g
-YWJvdXQ6LQ0KPj4NCj4+IDEuIEN1cnJlbnQgc3RhdHVzIG9mIHRoZSBibGt0ZXN0cyBmcmFtZXdv
-cmsuDQo+IA0KPiBJbiB0aGUgc2Vzc2lvbiwgSSBjYW4gdGFsayBzaG9ydGx5IGFib3V0IHJlY2Vu
-dCBibGt0ZXN0cyBpbXByb3ZlbWVudHMgYW5kDQo+IGZhaWx1cmUgY2FzZXMuDQo+IA0KPj4gMi4g
-QW55IG5ldy9taXNzaW5nIGZlYXR1cmVzIHRoYXQgd2Ugd2FudCB0byBhZGQgaW4gdGhlIGJsa3Rl
-c3RzLg0KPiANCj4gQSBmZWF0dXJlIEkgd2lzaCBpcyB0byBtYXJrIGRhbmdlcm91cyB0ZXN0IGNh
-c2VzIHdoaWNoIGNhdXNlIHN5c3RlbSBjcmFzaCwgaW4NCj4gc2ltaWxhciB3YXkgYXMgZnN0ZXN0
-cyBkb2VzLiBJIHRoaW5rIHRoZXkgc2hvdWxkIGJlIHNraXBwZWQgYnkgZGVmYXVsdCBub3QgdG8N
-Cj4gY29uZnVzZSBuZXcgYmxrdGVzdHMgdXNlcnMuDQo+IA0KPiBJIHJlbWVtYmVyIHRoYXQgZG1l
-c2cgbG9nZ2luZyB3YXMgZGlzY3Vzc2VkIGF0IHRoZSBsYXN0IExTRk1NQlBGLCBidXQgaXQgaXMg
-bm90DQo+IHlldCBpbXBsZW1lbnRlZC4gSXQgbWF5IHdvcnRoIHJldmlzaXQuDQo+IA0KPj4gMy4g
-QW55IG5ldyBrZXJuZWwgZmVhdHVyZXMgdGhhdCBjb3VsZCBiZSB1c2VkIHRvIG1ha2UgdGVzdGlu
-ZyBlYXNpZXI/DQo+PiA0LiBETS9NRCBUZXN0Y2FzZXMuDQo+IA0KPiBJIHRvb2sgYSBsaWJlcnR5
-IHRvIGFkZCBNaWtlIGFuZCBkbS1kZXZlbCB0byBDQy4gUmVjZW50bHksIGEgcGF0Y2ggd2FzIHBv
-c3RlZCB0bw0KPiBhZGQgJ2RtJyB0ZXN0IGNhdGVnb3J5IFsxXS4gSSBob3BlIGl0IHdpbGwgaGVs
-cCBETS9NRCBkZXZlbG9wZXJzIHRvIGFkZCBtb3JlDQo+IHRlc3RzIGluIHRoZSBjYXRlZ29yeS4g
-SSB3b3VsZCBsaWtlIHRvIGRpc2N1c3MgaWYgaXQgaXMgYSBnb29kIHN0YXJ0LCBvciBpZg0KPiBh
-bnl0aGluZyBpcyBtaXNzaW5nIGluIGJsa3Rlc3RzIHRvIHN1cHBvcnQgRE0vTUQgdGVzdGluZy4N
-Cj4gDQo+IFsxXSBodHRwczovL2xvcmUua2VybmVsLm9yZy9saW51eC1ibG9jay8yMDIyMTIzMDA2
-NTQyNC4xOTk5OC0xLXl1a3VhaTFAaHVhd2VpY2xvdWQuY29tLyN0DQoNCndlIHJlYWxseSBuZWVk
-IHRvIHNvcnQgb3V0IHRoZSBkbSB0ZXN0Y2FzZXMsIHdpdGhvdXQgZG0gdGVzdGNhc2VzIGl0DQpu
-b3QgYWxsb3dpbmcgdXMgdG8gY3JlYXRlIGJhc2VsaW5lIGNvcnJlY3RuZXNzIGZvciBibG9jayBs
-YXllciwNCkkndmUgYWxyZWFkeSBkaXNjdXNzZWQgdGhhdCBpbiB0aGUgbGFzdCBMU0YuDQoNCj4g
-DQo+Pg0KPj4gRS5nLiBJbXBsZW1lbnRpbmcgbmV3IGZlYXR1cmVzIGluIHRoZSBudWxsX2Jsay5j
-IGluIG9yZGVyIHRvIGhhdmUgZGV2aWNlDQo+PiBpbmRlcGVuZGVudCBjb21wbGV0ZSB0ZXN0IGNv
-dmVyYWdlLiAoZS5nLiBhZGRpbmcgZGlzY2FyZCBjb21tYW5kIGZvcg0KPj4gbnVsbF9ibGsgb3Ig
-YW55IG90aGVyIHNwZWNpZmljIFJFUV9PUCkuIERpc2N1c3Npb24gYWJvdXQgaGF2aW5nIGFueSBu
-ZXcNCj4+IHRyYWNlcG9pbnQgZXZlbnRzIGluIHRoZSBibG9jayBsYXllci4NCj4+DQo+PiA0LiBB
-bnkgbmV3IHRlc3QgY2FzZXMvY2F0ZWdvcmllcyB3aGljaCBhcmUgbGFja2luZyBpbiB0aGUgYmxr
-dGVzdHMNCj4+IGZyYW1ld29yay4NCj4gDQo+IE9uZSB0aGluZyBpbiBteSBtaW5kIGlzIGNoYXJh
-Y3RlciBkZXZpY2UuIEZyb20gcmVjZW50IGRpc2N1c3Npb25zIFsyXVszXSwgaXQNCj4gbG9va3Mg
-d29ydGggYWRkaW5nIHNvbWUgYmFzaWMgdGVzdCBjYXNlcyBmb3IgTlZNRSBjaGFyYWN0ZXIgZGV2
-aWNlcyBhbmQgU0cNCj4gZGV2aWNlcy4NCj4gDQoNCkFncmVlDQoNCi1jaw0KDQo=
+On 1/22/23 07:53, Ondrej Zary wrote:
+> The pata_parport is a libata-based replacement of the old PARIDE
+> subsystem - driver for parallel port IDE devices.
+> It uses the original paride low-level protocol drivers but does not
+> need the high-level drivers (pd, pcd, pf, pt, pg). The IDE devices
+> behind parallel port adapters are handled by the ATA layer.
+> 
+> This will allow paride and its high-level drivers to be removed.
+> 
+> Unfortunately, libata drivers cannot sleep so pata_parport claims
+> parport before activating the ata host and keeps it claimed (and
+> protocol connected) until the ata host is removed. This means that
+> no devices can be chained (neither other pata_parport devices nor
+> a printer).
+> 
+> paride and pata_parport are mutually exclusive because the compiled
+> protocol drivers are incompatible.
+> 
+> Tested with:
+>  - Imation SuperDisk LS-120 and HP C4381A (EPAT)
+>  - Freecom Parallel CD (FRPW)
+>  - Toshiba Mobile CD-RW 2793008 w/Freecom Parallel Cable rev.903 (FRIQ)
+>  - Backpack CD-RW 222011 and CD-RW 19350 (BPCK6)
+> 
+> The following bugs in low-level protocol drivers were found and will
+> be fixed later:
+> 
+> Note: EPP-32 mode is buggy in EPAT - and also in all other protocol
+> drivers - they don't handle non-multiple-of-4 block transfers
+> correctly. This causes problems with LS-120 drive.
+> There is also another bug in EPAT: EPP modes don't work unless a 4-bit
+> or 8-bit mode is used first (probably some initialization missing?).
+> Once the device is initialized, EPP works until power cycle.
+> 
+> So after device power on, you have to:
+> echo "parport0 epat 0" >/sys/bus/pata_parport/new_device
+> echo pata_parport.0 >/sys/bus/pata_parport/delete_device
+> echo "parport0 epat 4" >/sys/bus/pata_parport/new_device
+> (autoprobe will initialize correctly as it tries the slowest modes
+> first but you'll get the broken EPP-32 mode)
+> 
+> Note: EPP modes are buggy in FRPW, only modes 0 and 1 work.
+> Signed-off-by: Ondrej Zary <linux@zary.sk>
+
+Overall, look good to me. Several comments below about simple
+cleanups/improvements.
+
+> ---
+
+[...]
+> diff --git a/drivers/ata/pata_parport.c b/drivers/ata/pata_parport.c
+> new file mode 100644
+> index 000000000000..1c583e54d083
+> --- /dev/null
+> +++ b/drivers/ata/pata_parport.c
+> @@ -0,0 +1,783 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +/*
+> + * Copyright 2023 Ondrej Zary
+> + * based on paride.c by Grant R. Guenther <grant@torque.net>
+> + */
+> +#include <linux/kernel.h>
+> +#include <linux/module.h>
+> +#include <linux/parport.h>
+> +#include <linux/pata_parport.h>
+> +
+> +#define DRV_NAME "pata_parport"
+> +
+> +static DEFINE_IDR(parport_list);
+> +static DEFINE_IDR(protocols);
+> +static DEFINE_IDA(pata_parport_bus_dev_ids);
+> +static DEFINE_MUTEX(pi_mutex);
+> +
+> +static bool probe = true;
+> +module_param(probe, bool, 0644);
+> +MODULE_PARM_DESC(probe, "Enable automatic device probing (0=off, 1=on [default])");
+> +
+> +static bool verbose;
+> +module_param(verbose, bool, 0644);
+> +MODULE_PARM_DESC(verbose, "Enable verbose messages (0=off [default], 1=on)");
+
+This is not needed. Use dynamic pr_debug()/dev_dbg() instead.
+
+> +
+> +#define DISCONNECT_TIMEOUT	(HZ / 10)
+> +
+> +/* libata drivers cannot sleep so this driver claims parport before activating
+> + * the ata host and keeps it claimed (and protocol connected) until the ata
+> + * host is removed. Unfortunately, this means that you cannot use any chained
+> + * devices (neither other pata_parport devices nor a printer).
+> + */
+
+Incorrect comment format. This should start with a "/*" line.
+
+> +static void pi_connect(struct pi_adapter *pi)
+> +{
+> +	parport_claim_or_block(pi->pardev);
+> +	pi->proto->connect(pi);
+> +}
+> +
+> +static void pi_disconnect(struct pi_adapter *pi)
+> +{
+> +	pi->proto->disconnect(pi);
+> +	parport_release(pi->pardev);
+> +}
+> +
+> +/* functions taken from libata-sff.c and converted from direct port I/O */
+
+I do not see how this comment is useful. I think you can drop it.
+
+> +static void pata_parport_dev_select(struct ata_port *ap, unsigned int device)
+> +{
+> +	struct pi_adapter *pi = ap->host->private_data;
+> +	u8 tmp;
+> +
+> +	if (device == 0)
+> +		tmp = ATA_DEVICE_OBS;
+> +	else
+> +		tmp = ATA_DEVICE_OBS | ATA_DEV1;
+> +
+> +	pi->proto->write_regr(pi, 0, ATA_REG_DEVICE, tmp);
+> +	ata_sff_pause(ap);
+> +}
+> +
+> +static bool pata_parport_devchk(struct ata_port *ap, unsigned int device)
+> +{
+> +	struct pi_adapter *pi = ap->host->private_data;
+> +	u8 nsect, lbal;
+> +
+> +	pata_parport_dev_select(ap, device);
+> +
+> +	pi->proto->write_regr(pi, 0, ATA_REG_NSECT, 0x55);
+> +	pi->proto->write_regr(pi, 0, ATA_REG_LBAL, 0xaa);
+> +
+> +	pi->proto->write_regr(pi, 0, ATA_REG_NSECT, 0xaa);
+> +	pi->proto->write_regr(pi, 0, ATA_REG_LBAL, 0x55);
+> +
+> +	pi->proto->write_regr(pi, 0, ATA_REG_NSECT, 055);
+> +	pi->proto->write_regr(pi, 0, ATA_REG_LBAL, 0xaa);
+> +
+> +	nsect = pi->proto->read_regr(pi, 0, ATA_REG_NSECT);
+> +	lbal = pi->proto->read_regr(pi, 0, ATA_REG_LBAL);
+> +
+> +	if ((nsect == 0x55) && (lbal == 0xaa))
+> +		return true;	/* we found a device */
+> +
+> +	return false;		/* nothing found */
+
+Simplify:
+
+	return (nsect == 0x55) && (lbal == 0xaa);
+
+[...]
+
+> +static u8 pata_parport_check_status(struct ata_port *ap)
+> +{
+> +	u8 status;
+> +	struct pi_adapter *pi = ap->host->private_data;
+> +
+> +	status = pi->proto->read_regr(pi, 0, ATA_REG_STATUS);
+> +
+> +	return status;
+
+The status variable is not necessary. Simply do:
+
+	return pi->proto->read_regr(pi, 0, ATA_REG_STATUS);
+
+> +}
+> +
+> +static u8 pata_parport_check_altstatus(struct ata_port *ap)
+> +{
+> +	u8 altstatus;
+> +	struct pi_adapter *pi = ap->host->private_data;
+> +
+> +	altstatus = pi->proto->read_regr(pi, 1, 6);
+> +
+> +	return altstatus;
+
+Same here for altstatus.
+
+[...]
+
+> +static int default_test_proto(struct pi_adapter *pi, char *scratch)
+> +{
+> +	int j, k;
+> +	int e[2] = { 0, 0 };
+> +
+> +	pi->proto->connect(pi);
+> +
+> +	for (j = 0; j < 2; j++) {
+> +		pi->proto->write_regr(pi, 0, 6, 0xa0 + j * 0x10);
+> +		for (k = 0; k < 256; k++) {
+> +			pi->proto->write_regr(pi, 0, 2, k ^ 0xaa);
+> +			pi->proto->write_regr(pi, 0, 3, k ^ 0x55);
+> +			if (pi->proto->read_regr(pi, 0, 2) != (k ^ 0xaa))
+> +				e[j]++;
+> +		}
+> +	}
+> +	pi->proto->disconnect(pi);
+> +
+> +	if (verbose)
+> +		dev_info(&pi->dev, "%s: port 0x%x, mode %d, test=(%d,%d)\n",
+> +		       pi->proto->name, pi->port,
+> +		       pi->mode, e[0], e[1]);
+
+Please remove the "if (verbose)" and use dev_dbg().
+
+[...]
+
+> +static struct bus_type pata_parport_bus_type = {
+> +	.name = DRV_NAME,
+> +};
+> +
+> +static struct device pata_parport_bus = {
+> +	.init_name = DRV_NAME,
+> +	.release = pata_parport_bus_release,
+> +};
+> +
+> +/* temporary for old paride protocol modules */
+
+s/temporary/necessary ?
+
+[...]
+
+> +int pata_parport_register_driver(struct pi_protocol *pr)
+> +{
+> +	int error;
+> +	struct parport *parport;
+> +	int port_num;
+> +
+> +	pr->driver.bus = &pata_parport_bus_type;
+> +	pr->driver.name = pr->name;
+> +	error = driver_register(&pr->driver);
+> +	if (error)
+> +		return error;
+> +
+> +	mutex_lock(&pi_mutex);
+> +	error = idr_alloc(&protocols, pr, 0, 0, GFP_KERNEL);
+> +	if (error < 0) {
+> +		driver_unregister(&pr->driver);
+> +		mutex_unlock(&pi_mutex);
+> +		return error;
+> +	}
+> +
+> +	pr_info("pata_parport: protocol %s registered\n", pr->name);
+> +
+> +	if (probe) {
+> +		/* probe all parports using this protocol */
+> +		idr_for_each_entry(&parport_list, parport, port_num)
+> +			pi_init_one(parport, pr, -1, 0, -1);
+> +	}
+> +	mutex_unlock(&pi_mutex);
+> +
+> +	return 0;
+> +}
+> +EXPORT_SYMBOL(pata_parport_register_driver);
+
+EXPORT_SYMBOL_GPL()
+
+> +
+> +void pata_parport_unregister_driver(struct pi_protocol *pr)
+> +{
+> +	struct pi_protocol *pr_iter;
+> +	int id = -1;
+> +
+> +	mutex_lock(&pi_mutex);
+> +	idr_for_each_entry(&protocols, pr_iter, id) {
+> +		if (pr_iter == pr)
+> +			break;
+> +	}
+> +	idr_remove(&protocols, id);
+> +	mutex_unlock(&pi_mutex);
+> +	driver_unregister(&pr->driver);
+> +}
+> +EXPORT_SYMBOL(pata_parport_unregister_driver);
+
+Same here.
+
+> +
+> +static ssize_t new_device_store(struct bus_type *bus, const char *buf,
+> +				size_t count)
+> +{
+> +	char port[12] = "auto";
+> +	char protocol[8] = "auto";
+> +	int mode = -1, unit = -1, delay = -1;
+> +	struct pi_protocol *pr, *pr_wanted;
+> +	struct device_driver *drv;
+> +	struct parport *parport;
+> +	int port_num, port_wanted, pr_num;
+> +	bool ok = false;
+> +
+> +	if (sscanf(buf, "%11s %7s %d %d %d",
+> +			port, protocol, &mode, &unit, &delay) < 1)
+> +		return -EINVAL;
+> +
+> +	if (sscanf(port, "parport%u", &port_wanted) < 1) {
+> +		if (!strcmp(port, "auto")) {
+> +			port_wanted = -1;
+> +		} else {
+> +			pr_err("invalid port name %s\n", port);
+> +			return -EINVAL;
+> +		}
+
+It would be nicer to reverse the if condition to drop the else:
+
+		if (strcmp(port, "auto")) {
+			pr_err("invalid port name %s\n", port);
+			return -EINVAL;
+		}
+		port_wanted = -1;
+
+> +	}
+> +
+> +	drv = driver_find(protocol, &pata_parport_bus_type);
+> +	if (!drv) {
+> +		if (!strcmp(protocol, "auto")) {
+> +			pr_wanted = NULL;
+> +		} else {
+> +			pr_err("protocol %s not found\n", protocol);
+> +			return -EINVAL;
+> +		}
+
+Same here.
+
+[...]
+
+> +static ssize_t delete_device_store(struct bus_type *bus, const char *buf,
+> +				   size_t count)
+> +{
+> +	struct device *dev;
+> +	char device_name[32];
+> +
+> +	if (sscanf(buf, "%31s", device_name) < 1)
+> +		return -EINVAL;
+
+Why sscanf() ? You can strncpy from buf to device_name directly, no ?
+And given how you use device_name below, I think that you do not even need
+the device_name variable.
+
+> +
+> +	mutex_lock(&pi_mutex);
+> +	dev = bus_find_device_by_name(bus, NULL, device_name);
+> +	if (!dev) {
+> +		mutex_unlock(&pi_mutex);
+> +		return -ENODEV;
+> +	}
+> +
+> +	pi_remove_one(dev);
+> +	mutex_unlock(&pi_mutex);
+> +
+> +	return count;
+> +}
+> +static BUS_ATTR_WO(delete_device);
+
+[...]
+
+> diff --git a/include/linux/pata_parport.h b/include/linux/pata_parport.h
+> new file mode 100644
+> index 000000000000..913f49ff1fad
+> --- /dev/null
+> +++ b/include/linux/pata_parport.h
+> @@ -0,0 +1,106 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only */
+> +/*
+> + *	pata_parport.h	(c) 1997-8  Grant R. Guenther <grant@torque.net>
+> + *				    Under the terms of the GPL.
+> + *
+> + * This file defines the interface for parallel port IDE adapter chip drivers.
+> + */
+> +
+
+You are missing:
+
+#ifndef LINUX_PATA_PARPORT_H
+#define LINUX_PATA_PARPORT_H
+
+> +#include <linux/libata.h>
+> +
+> +#define PI_PCD	1	/* dummy for paride protocol modules */
+> +
+> +struct pi_adapter {
+> +	struct device dev;
+> +	struct pi_protocol *proto;	/* adapter protocol */
+> +	int port;			/* base address of parallel port */
+> +	int mode;			/* transfer mode in use */
+> +	int delay;			/* adapter delay setting */
+> +	int devtype;			/* dummy for paride protocol modules */
+> +	char *device;			/* dummy for paride protocol modules */
+> +	int unit;			/* unit number for chained adapters */
+> +	int saved_r0;			/* saved port state */
+> +	int saved_r2;			/* saved port state */
+> +	unsigned long private;		/* for protocol module */
+> +	struct pardevice *pardev;	/* pointer to pardevice */
+> +};
+> +
+> +typedef struct pi_adapter PIA;	/* for paride protocol modules */
+> +
+> +/* registers are addressed as (cont,regr)
+> + *	cont: 0 for command register file, 1 for control register(s)
+> + *	regr: 0-7 for register number.
+> + */
+> +
+> +/* macros and functions exported to the protocol modules */
+> +#define delay_p			(pi->delay ? udelay(pi->delay) : (void)0)
+> +#define out_p(offs, byte)	do { outb(byte, pi->port + offs); delay_p; } while (0)
+> +#define in_p(offs)		(delay_p, inb(pi->port + offs))
+
+It would be way nicer to have these as inline functions.
+
+> +
+> +#define w0(byte)		out_p(0, byte)
+> +#define r0()			in_p(0)
+> +#define w1(byte)		out_p(1, byte)
+> +#define r1()			in_p(1)
+> +#define w2(byte)		out_p(2, byte)
+> +#define r2()			in_p(2)
+> +#define w3(byte)		out_p(3, byte)
+> +#define w4(byte)		out_p(4, byte)
+> +#define r4()			in_p(4)
+> +#define w4w(data)		do { outw(data, pi->port + 4); delay_p; } while (0)
+> +#define w4l(data)		do { outl(data, pi->port + 4); delay_p; } while (0)
+> +#define r4w()			(delay_p, inw(pi->port + 4))
+> +#define r4l()			(delay_p, inl(pi->port + 4))
+> +
+> +static inline u16 pi_swab16(char *b, int k)
+> +{
+> +	union { u16 u; char t[2]; } r;
+> +
+> +	r.t[0] = b[2 * k + 1]; r.t[1] = b[2 * k];
+> +	return r.u;
+> +}
+> +
+> +static inline u32 pi_swab32(char *b, int k)
+> +{
+> +	union { u32 u; char f[4]; } r;
+> +
+> +	r.f[0] = b[4 * k + 1]; r.f[1] = b[4 * k];
+> +	r.f[2] = b[4 * k + 3]; r.f[3] = b[4 * k + 2];
+> +	return r.u;
+> +}
+> +
+> +struct pi_protocol {
+> +	char name[8];
+> +
+> +	int max_mode;
+> +	int epp_first;		/* modes >= this use 8 ports */
+> +
+> +	int default_delay;
+> +	int max_units;		/* max chained units probed for */
+> +
+> +	void (*write_regr)(struct pi_adapter *pi, int cont, int regr, int val);
+> +	int (*read_regr)(struct pi_adapter *pi, int cont, int regr);
+> +	void (*write_block)(struct pi_adapter *pi, char *buf, int count);
+> +	void (*read_block)(struct pi_adapter *pi, char *buf, int count);
+> +
+> +	void (*connect)(struct pi_adapter *pi);
+> +	void (*disconnect)(struct pi_adapter *pi);
+> +
+> +	int (*test_port)(struct pi_adapter *pi);
+> +	int (*probe_unit)(struct pi_adapter *pi);
+> +	int (*test_proto)(struct pi_adapter *pi, char *scratch, int verbose);
+> +	void (*log_adapter)(struct pi_adapter *pi, char *scratch, int verbose);
+> +
+> +	int (*init_proto)(struct pi_adapter *pi);
+> +	void (*release_proto)(struct pi_adapter *pi);
+> +	struct module *owner;
+> +	struct device_driver driver;
+> +	struct scsi_host_template sht;
+> +};
+> +
+> +#define PATA_PARPORT_SHT ATA_PIO_SHT
+> +
+> +int pata_parport_register_driver(struct pi_protocol *pr);
+> +void pata_parport_unregister_driver(struct pi_protocol *pr);
+> +/* defines for old paride protocol modules */
+> +#define paride_register pata_parport_register_driver
+> +#define paride_unregister pata_parport_unregister_driver
+
+-- 
+Damien Le Moal
+Western Digital Research
+
