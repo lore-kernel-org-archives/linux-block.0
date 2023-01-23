@@ -2,71 +2,46 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 302B7C05027
-	for <linux-block@archiver.kernel.org>; Mon, 23 Jan 2023 04:36:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 82613C54EAA
+	for <linux-block@archiver.kernel.org>; Mon, 23 Jan 2023 06:52:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230150AbjAWEgo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 22 Jan 2023 23:36:44 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47844 "EHLO
+        id S230365AbjAWGwN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 23 Jan 2023 01:52:13 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43658 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230072AbjAWEgn (ORCPT
+        with ESMTP id S230224AbjAWGwM (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 22 Jan 2023 23:36:43 -0500
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 008AC12F34;
-        Sun, 22 Jan 2023 20:36:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=gn+EEhD9AwqmASOet+WmWkkx11j/sBtEj1r0Vez2fZ8=; b=cnSg/aTEkcd6NarLXKMWFH55Hj
-        +tnCgTrOR1ZFnaARi0DacKX4/GvKX6g9aY7vLQiWcHE03/Q++qgFKL5/KLz6IvbiusZFSRqQjzodp
-        hzGE5KGiQM4bkWS0tbn132VKC+JnGmdfLjVKLfVoEukfFHOTHxIuGxL0XsZKqJQ1w1131oDNRScq6
-        IJHLfNnq1urBDj6F2ZAJeNs68ZIuPMrMyQ9s1xTAt83D5QmmygtC31t7L8Gz+QZmANxmvYOtIB+fs
-        I0eKJDci8/bA4Wp1N3jeQ2dA4mixnjLp0Bb13foCgJQTnoy9ebMBWQ0/hSAkW4t6biPiQqK7Y2RAQ
-        bHU9lDQQ==;
-Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1pJoZF-003yRD-Jz; Mon, 23 Jan 2023 04:36:25 +0000
-Date:   Mon, 23 Jan 2023 04:36:25 +0000
-From:   Matthew Wilcox <willy@infradead.org>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     lsf-pc@lists.linuxfoundation.org, linux-mm@kvack.org,
-        iommu@lists.linux.dev, linux-rdma@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>,
-        Joao Martins <joao.m.martins@oracle.com>,
-        John Hubbard <jhubbard@nvidia.com>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org,
-        netdev@vger.kernel.org, dri-devel@lists.freedesktop.org,
-        nvdimm@lists.linux.dev, Shakeel Butt <shakeelb@google.com>
-Subject: Re: [LSF/MM/BPF proposal]: Physr discussion
-Message-ID: <Y84OyQSKHelPOkW3@casper.infradead.org>
-References: <Y8v+qVZ8OmodOCQ9@nvidia.com>
+        Mon, 23 Jan 2023 01:52:12 -0500
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9341C193EB;
+        Sun, 22 Jan 2023 22:52:11 -0800 (PST)
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id 8615D68BEB; Mon, 23 Jan 2023 07:52:07 +0100 (CET)
+Date:   Mon, 23 Jan 2023 07:52:07 +0100
+From:   Christoph Hellwig <hch@lst.de>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Christoph Hellwig <hch@lst.de>, Ondrej Zary <linux@zary.sk>,
+        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+        Sergey Shtylyov <s.shtylyov@omp.ru>,
+        Tim Waugh <tim@cyberelk.net>, linux-block@vger.kernel.org,
+        linux-parport@lists.infradead.org, linux-ide@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2] pata_parport: add driver (PARIDE replacement)
+Message-ID: <20230123065207.GA30529@lst.de>
+References: <20230121225314.32459-1-linux@zary.sk> <20230122075710.GA4046@lst.de> <38af9155-b940-d4df-b6cd-7420d1183927@kernel.dk>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Y8v+qVZ8OmodOCQ9@nvidia.com>
+In-Reply-To: <38af9155-b940-d4df-b6cd-7420d1183927@kernel.dk>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, Jan 21, 2023 at 11:03:05AM -0400, Jason Gunthorpe wrote:
-> I would like to have a session at LSF to talk about Matthew's
-> physr discussion starter:
-> 
->  https://lore.kernel.org/linux-mm/YdyKWeU0HTv8m7wD@casper.infradead.org/
+On Sun, Jan 22, 2023 at 11:24:32AM -0700, Jens Axboe wrote:
+> Since Ondrej is probably one of the few (maybe the only) user of this
+> code, why don't we just kill off the paride code in a separate patch
+> right after?
 
-I'm definitely interested in discussing phyrs (even if you'd rather
-pronounce it "fizzers" than "fires" ;-)
-
-> I've been working on an implementation and hope to have something
-> draft to show on the lists in a few weeks. It is pretty clear there
-> are several interesting decisions to make that I think will benefit
-> from a live discussion.
-
-Cool!  Here's my latest noodlings:
-https://git.infradead.org/users/willy/pagecache.git/shortlog/refs/heads/phyr
-
-Just the top two commits; the other stuff is unrelated.  Shakeel has
-also been interested in this.
-
+That seems a little too fast too me.  I'd give it at least another merge
+window if not two.
