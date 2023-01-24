@@ -2,178 +2,393 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DD7EC38142
-	for <linux-block@archiver.kernel.org>; Tue, 24 Jan 2023 11:14:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D57C9C25B50
+	for <linux-block@archiver.kernel.org>; Tue, 24 Jan 2023 11:44:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233845AbjAXLOG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 24 Jan 2023 06:14:06 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44234 "EHLO
+        id S233691AbjAXLo4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 24 Jan 2023 06:44:56 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39672 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233858AbjAXLOE (ORCPT
+        with ESMTP id S234297AbjAXLoy (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 24 Jan 2023 06:14:04 -0500
-Received: from esa6.hgst.iphmx.com (esa6.hgst.iphmx.com [216.71.154.45])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87A3912074;
-        Tue, 24 Jan 2023 03:14:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1674558840; x=1706094840;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=joufdrNO2/FLdgGzlnaieoHfZ28FYCwNXGhrZ08f24E=;
-  b=G4d47gnmln7lF92BgykQ7iPO1jZt7Izn9ffYQOhlS5fmwGeRsRNyBX08
-   zcr7NCFYNk4bDXYYQZ05P/f+9mDc9N8PRfsUq6d1hrVIXR35O9e886uQ5
-   7vdl2OW0TYY4fSIqtPJE2Wq3SA9VICnMngVj/n/otBchfEKbKdaiKabsn
-   USLT6Gf1aigvJLTnZxeywy9hSWCGwqMK330gPVNeMN/AQYcUD35Wr5Kf0
-   MNrkFnuQDoeSZBqm24qY+vekdSLn48wo5tj2iCHs3Mg9sNCg/t0Xk5Z4B
-   yd3N3M5ZYCeaUWhKoqIYFv2fQyr+7/gy++0H1jVqmFkOOyWJgJeEQfXxI
-   g==;
-X-IronPort-AV: E=Sophos;i="5.97,242,1669046400"; 
-   d="scan'208";a="221693227"
-Received: from mail-bn8nam12lp2177.outbound.protection.outlook.com (HELO NAM12-BN8-obe.outbound.protection.outlook.com) ([104.47.55.177])
-  by ob1.hgst.iphmx.com with ESMTP; 24 Jan 2023 19:13:58 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=b9pQV2jrooN8GLddPy4Ci233hfXdamzp6oUBjKQqe1R7h7GEu0a5qJqzCGO7W4k0rlxILW0CsX8W9JM8WEQXciSx44zRApUYL/lZov4wM0ne/WbwcsGE5+EMP2IUlFzu9Y4hWRr++739Wms4SeiE0X0ficHL+tXkm4IONM9p9Zr6WrfIJPJ6zW6TRwHrIOnzOQ18kvCTIC5v5U1uSATkwdIk7hOrD45PuZH58b3WGvpkEy0Cz3alezoRc1rqVcWafC/toUKa1djlq7bkMcNATxXp421O4Z3z0J7IYBzGSPIexw95EJh0H6CRfpDETCUmQfVTKWBND4pGdWZFILU6iw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=joufdrNO2/FLdgGzlnaieoHfZ28FYCwNXGhrZ08f24E=;
- b=mfHUfHWxZ2bBuXylbJuZ01C4yfnovd2GGRo+8KlUzo4nRLJ+l8mh6CofytF3zoi43GYNrb2Lx6e9kB5W+N4SrOeGwZECZVpTZ59qDYCJVvD2NmuXO9GrqbB82tG+49wOZ8mON5o/QjhSu5wIhoUbCUKVCrsfY0/RLg2co4Lra2MJuT8tcRLnB6E+lSPjLv6fsO1rAUhK1gdI+6skFfuOk7regwo8+N88gQfLP3CxpSgTZ0zAOj10MyKR1BXf9eBfNC9HJzZ1rFLysEp7rv4eIWZsnqmwYuEFjWA/x8FS28xEOYM4fI1KrSq40xeZ88WkWGrVigmbtzgGipevbXhHyg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=joufdrNO2/FLdgGzlnaieoHfZ28FYCwNXGhrZ08f24E=;
- b=Lmw0v7NR0IKyMFchpJatTJ3t1bqouxlIT1alNhK6MyjehUex2WcmP3hYukeVLbjGpIyyUq7wTLTAtV2hxv2Rem0h/zoyCQe7TbwS3+ef/QjidF8rL5p4eZ3NOCpc9t11iCOLHrGvcnHCoUP6R+OUXARYd6fljZk4clHzt0EPR/g=
-Received: from PH0PR04MB7416.namprd04.prod.outlook.com (2603:10b6:510:12::17)
- by DM6PR04MB6812.namprd04.prod.outlook.com (2603:10b6:5:240::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6002.33; Tue, 24 Jan
- 2023 11:13:55 +0000
-Received: from PH0PR04MB7416.namprd04.prod.outlook.com
- ([fe80::d4bd:b4ef:5bff:2329]) by PH0PR04MB7416.namprd04.prod.outlook.com
- ([fe80::d4bd:b4ef:5bff:2329%3]) with mapi id 15.20.6002.033; Tue, 24 Jan 2023
- 11:13:55 +0000
-From:   Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
-To:     Christoph Hellwig <hch@lst.de>, Chris Mason <clm@fb.com>,
-        Josef Bacik <josef@toxicpanda.com>,
-        David Sterba <dsterba@suse.com>
-CC:     Damien Le Moal <Damien.LeMoal@wdc.com>,
-        Naohiro Aota <Naohiro.Aota@wdc.com>, Qu Wenruo <wqu@suse.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        "Darrick J. Wong" <djwong@kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-btrfs@vger.kernel.org" <linux-btrfs@vger.kernel.org>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>
-Subject: Re: [PATCH 17/34] btrfs: remove the is_metadata flag in struct
- btrfs_bio
-Thread-Topic: [PATCH 17/34] btrfs: remove the is_metadata flag in struct
- btrfs_bio
-Thread-Index: AQHZLWTIQzpnI2+Dp0azLXrb0Ru2A66tbxoA
-Date:   Tue, 24 Jan 2023 11:13:55 +0000
-Message-ID: <8516aad4-449a-a8b2-a590-afb2599ce347@wdc.com>
-References: <20230121065031.1139353-1-hch@lst.de>
- <20230121065031.1139353-18-hch@lst.de>
-In-Reply-To: <20230121065031.1139353-18-hch@lst.de>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-user-agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.6.1
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=wdc.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PH0PR04MB7416:EE_|DM6PR04MB6812:EE_
-x-ms-office365-filtering-correlation-id: b79e6bfb-4546-4329-c4de-08dafdfc1518
-wdcipoutbound: EOP-TRUE
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 92tPwz0bYEdgxNdwTbsEAOLCay8WlpeAbsWBO7FEb188EaYqVfNfs1qIyXP50MjVhP0/WOdnAtXI+blVkIhFwTKuCRB/grFkZBw4lw3+CXMonRn08bsEt9aNm54YmhwehlgDCGoytc3WJ4p6/wIsJodSEJZs5cz/5VxaNFNVDcI0qMed20Y+qW9ecR9lEErVSk+lrSaKBsUtG/joQeNRMvY+cpRxQEu/YIx7OFADLnXq1kTcLJpEua8K4oDb9a6v0ndwmb9UBqp28SzVF2oN1eAk+F4+oosXHtCVy9dEXWxl0Gc9iDbLGWuXLcQ2AnCIafHYk7+xdJq3ZG6UilZr+d48JUemJvPG6m8r5gRxlpPURisFkJ49K38evd85D8tZM9neo0x99DNnIOu+TaYn8o/VmseoCDRfCelflN1Yl9JnCG8ZsMkeryS85PJKukBX5N1Hcb+Yu1Tly2kJHod1WU/EDyiH52OVErwIAETI83E8lMat4dIHkL2fgsfn3d4Ixwjn5PIT5UvaicfwsoKx+Gq99J6YjyuoOF+RxtSMmuHz0QjQbmGNkobjlNPcvtF2KKolJnSxjB1cPYiOy1TC9hRAzOJMMJhTRAePBTyPRuWuhLqtTJLLBitL9bKJgf9u+k+jLswjF5fKju6hO2tYdGzAsPNdhTSgVUJZx405ePXhipfo/1H1F7WkxaUsS3XErrFfPms5MJCPRlCxN7hdBP8jgIhgLzgInI7uzyNBnx4CsutPKZfJ5yZBJTd+eatYLyamTIhHbP9mySu2PuDPhA==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR04MB7416.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(39860400002)(346002)(396003)(376002)(366004)(136003)(451199015)(558084003)(31686004)(38070700005)(2616005)(19618925003)(41300700001)(2906002)(38100700002)(82960400001)(31696002)(122000001)(8936002)(5660300002)(7416002)(316002)(4326008)(8676002)(71200400001)(6506007)(36756003)(54906003)(110136005)(66476007)(66946007)(66446008)(91956017)(86362001)(64756008)(76116006)(66556008)(478600001)(6486002)(4270600006)(26005)(186003)(6512007)(43740500002)(45980500001);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?WGNpTlByQ2oxYVdmc1hBMExEa0ZueDh4QmpPQkp2Qi9RNlFNcW9ubWs0VkQz?=
- =?utf-8?B?bFdnTmpyeDRqQ05XQ3l5RlFnYm5lVXNoaXk4RGpjMk9mMitybkVrcTZLY0xm?=
- =?utf-8?B?Wk5TbGJHTVhja2k0Z2p3ZVplOStnUjdIbVl3SFljZFVjY0lWVjVGbnBkRDBw?=
- =?utf-8?B?SkNqMHllbnFFb2VJWVJrclV6c0E4T1RIWUN1Q2pNQTBmL2FiSjkxaDg3WW5w?=
- =?utf-8?B?V2d2M0hDY0RhNVFnRkpoUVgrNC9pNSt3TWoyZjhiRHVmVmZvUmUwbkpNMzEx?=
- =?utf-8?B?Y3FNbm9Fb2xpemJnemhUenNOaGRFZXdNZEN0Q1UrQ255dXZyL29WSmh6MkEw?=
- =?utf-8?B?em95N2tXczhTbjN2L0RTUHRiUkNvejR4ZVV1cnVHc2dlZlhOSUFkNFJWdkFQ?=
- =?utf-8?B?Q1lLRUM5RkFLaDRMK3hDdUtlTVRaZkRTWHIzS0NHOUdtR3pUSkFYRFRheWFp?=
- =?utf-8?B?US9WYkRPMXdtK0NTTFgveHRkYms0WnU0djAwNGdoRGlnMzdISWoyRU9vUHlH?=
- =?utf-8?B?bGtDZzhjZjRsZnMwdnFFa3RwQUEwemE1eEwyTlJXWFhNS2thb2ZUREVwalJP?=
- =?utf-8?B?eSs2ZEI1TFVSaktBeWFZb29Rb2NKVk5admFqbTBpUG5rTjRacmxlN0tXUllS?=
- =?utf-8?B?Rnd6bjZBZDBCYVNTKzNvR0NxWCs5Lzh5cXNjVlBtWHdIT2oydFhTVTNLaTBw?=
- =?utf-8?B?U3BDaG5nS3pJTzdJTXg1b1MxRVZmOFhZSENpTFA4eE1aUzRaRllhRmxZQ3Rt?=
- =?utf-8?B?ZjJVMWVmelZCNU5ucllUbktUYkJjVC9qSFF4OGphbEdTYU45S0M1eVlRQ1lr?=
- =?utf-8?B?ZzZtMGdoVkVmMkNwMzV2R2phbjM4VXhHRUV5NXdaekRvTHozZExpUS90andF?=
- =?utf-8?B?b2dqKzlOZ0VOdVJqWm1MUFR1MlRPT2svb0Z1SUhVbkxiYjJ5ZzZ0T21MdEdF?=
- =?utf-8?B?cFdodUdKTUYwbGlXa0x1dkhaeHZFNm1lMjhOTnRJbkpGUDJxTzRnY1k1YUlY?=
- =?utf-8?B?N0Rnd0FOT1ZQcXoxS0NqOHZuUng3NE9MT2Q1c085Y0RmR0pnRFU0ZXBpOGtQ?=
- =?utf-8?B?R3c2OWk5ajYzNzk5L2FIOGp5U0dOdzA0azJhOHc3RE9CaEg2aVA3TkllcC9x?=
- =?utf-8?B?UEFrMC9vNGVYSDhlSHlyamZLYkFrRHpWdlI5Q0V4YXAydXI0dHIxOEtuOEc4?=
- =?utf-8?B?Tk9iekNaTngrUWhELzhINHhUdGpoYitkemZPelRFUExCNjZJSW15dHdzdlJh?=
- =?utf-8?B?S2dTMDRyQmJXNkw3MTAyemxFTnhCeGtHVk5pSmpQanYyM2dZSVBKWXlrakJP?=
- =?utf-8?B?WldpNWRqR3JGeWVXSUZXb0xvSVgrZnpyK05hMEh6N1o2QXVrYTFSaWRSVHEz?=
- =?utf-8?B?bnNGNUpablNIaC92elJkNXNqWFJ6WE1wOERLemI1VjJNSWJFWXlrNkZjT29U?=
- =?utf-8?B?eFQxaXdBQ2ZBZERqTWYxZm9BanNkUkk2RXdXRGZEUjFqS203RGIxRDlvZXJj?=
- =?utf-8?B?Tncyc1NlcTJNMG1PWVAwVVBsQ0lKcTBLeTU2NTNhT0kwMDNTMDJCS1dSdzYx?=
- =?utf-8?B?WU5KdWFqVkZiRDdqQVZpOWNxNDJnZWl0V2ZHV2h2VXZvazVZeFdKVkt0UkJV?=
- =?utf-8?B?Slo5eERmREt5dXFQK0c5d2hVZ2ZSNjk3VG55Y0VBYkNRcC9qQlNtUlk2ZFhD?=
- =?utf-8?B?eTdHdXRueW8wb0xvSDEvOXdZY2h3eUYvTnF0ZjJ4WkY0MC9RbERPVk9yaDcw?=
- =?utf-8?B?a3FOSk1CWEh6QU1Wc1JvMVI1YlNra2diWERKRGdmTG8wc0lDaTBURXptTUhu?=
- =?utf-8?B?NmVjbUN0dWNpVTZ0d3I1N3libkIyOE9SelM4dTFGNTVaanA4dlVQSUh3dk50?=
- =?utf-8?B?ZVBwUmMwTSs1WWxHSHgrMFArYlJhOVRvN0hmSUl2MzEzNHBZZ0ZXRjZ1QVlW?=
- =?utf-8?B?SEhIbHJMeHIzU3FQT1VpeWZlMUhpY0J5WUdVM0wxZG1ZUmNmekdQSzNpOXNK?=
- =?utf-8?B?S044QVBReFhjVGFzU095UmxHYTlCYm1uT0w3VTNRVmVzQlRuV1JMVlBXKzNV?=
- =?utf-8?B?dkV5djdRRE9GSGMrSC9uNlNlQ25JNm9wRnRSUWFhUHg5WWk3cDFmQWZicnJL?=
- =?utf-8?B?U3piR0FpMlkxVHcwUFpaOHJFTmhyWXR5Umhlc1YxUHA2MDhjcjUzMG5Mamxr?=
- =?utf-8?Q?yeWB7TlfzY1hnmDlxEFO6qs=3D?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <5CFB04D3CB0F88459D8BAB5A7837F41C@namprd04.prod.outlook.com>
-Content-Transfer-Encoding: base64
+        Tue, 24 Jan 2023 06:44:54 -0500
+X-Greylist: delayed 584 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 24 Jan 2023 03:44:40 PST
+Received: from mx2.veeam.com (mx2.veeam.com [64.129.123.6])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB1A13FF0E;
+        Tue, 24 Jan 2023 03:44:40 -0800 (PST)
+Received: from mail.veeam.com (prgmbx01.amust.local [172.24.128.102])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mx2.veeam.com (Postfix) with ESMTPS id ADBE840959;
+        Tue, 24 Jan 2023 06:34:52 -0500 (EST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=veeam.com;
+        s=mx2-2022; t=1674560092;
+        bh=jA2l3cFKmlF7rxnk2lzG/Ltsz1rHVfCSvsUajt501c8=;
+        h=Date:Subject:To:CC:References:From:In-Reply-To:From;
+        b=AC8ZIxd+Q3fSY+zjgCO5UYIJG96cc1Ul1e//ZmOfE7NX2WnR8ilEjIJvp1G6mYCg0
+         JkvmJkyv5pjVtMTRIMQhw75v9IyRBwi6ln3XErn9CZ2SWChBEhIH4I+G3QhxnqVJHg
+         /bhqeqsf1ApHLddv78nDH2fA4n6qeiNQyQocfw1iPrUjHY5vp3vMZDFYvCsfMdhAUG
+         H1Qjaujd2wZ6C5fo6/Vel2rHGrZz7gHnIb9l5nKfzGM164qZBT48XE6xYWrT42ixwa
+         OteWsYxwjDwH4YZjmjL2kCZ13YaRg2lL3SiZuxIrU5eyfk/6Xr4r9Dvnd6kv4SB7aB
+         /kOLXmQUvBoxg==
+Received: from [172.24.10.107] (172.24.10.107) by prgmbx01.amust.local
+ (172.24.128.102) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.20; Tue, 24 Jan
+ 2023 12:34:49 +0100
+Message-ID: <15ffd4bb-cb87-4bc9-53fc-4e0b941db0b7@veeam.com>
+Date:   Tue, 24 Jan 2023 12:34:44 +0100
 MIME-Version: 1.0
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: =?utf-8?B?Z3BicHBDeGZyUEcrbXNEaVFlL3VERGtuZzNFNkFiTkRhT0I2QkxQN01OM1Jk?=
- =?utf-8?B?b0M0Q0pVemRuL1hVR2tYMFBLbVlyOUVaWUNlNVVrMHJLZmU0dWZvMmJmUVY4?=
- =?utf-8?B?d0FucDlta2ZDS2V6SmVXL25pSklxdmN4Q283STNpajVJNWJOcDZQYnd6eDN1?=
- =?utf-8?B?V052b1JLVjZPcGZpZ1daOEx1UFN0cUpmUGNpQjlJS3RUVUpHZmRZUUpPV3Ni?=
- =?utf-8?B?YmZmc24zUEI3ZkFUc0ZsK3FnczVnMTh1Q2RBL211OGlPWFJHMUtQZm80N2Zq?=
- =?utf-8?B?RTVIMHFYUzlXMncxeXEzZWpOdXg1RWdDcHdJd21IZVAxMXNnN3NNMXBZbFNl?=
- =?utf-8?B?cWZrUllZbEpDLzNJdm1JQzgwYUVMdTdRQnI5eTVZQ0tiUTJ4b290KzdDS3V0?=
- =?utf-8?B?NDFiWlZJeTFkVVhwU2s4eDVkL1p4NkxPNDhhL2NuZk5rby9WaHc4dzZRVUZW?=
- =?utf-8?B?M2lPOU5YVW1EYUsxSGhscnErdDM2cmN4QUVKU0Uvalh1SmNiMGhVcnp3SXRa?=
- =?utf-8?B?cDZ4ZEptNjVMb1AyY3RzTUNnYVZsU25tMHZrYmZVbzJ4QlowczNPRHB4QXdm?=
- =?utf-8?B?S0hQMktudVVveExSb2ZjM05NM2ppdXpaeHFENFhIRW5mRmU5U1lYcUNmYkw0?=
- =?utf-8?B?UXo2RTZwM2VMaDY4MHZZY0RBeC8xL1A1QmNjRFUrYzJ6c0E4aG9FK0UwYjVD?=
- =?utf-8?B?YXN2VnB3OE1kZlNiY2lzYS83dEtxeTJ2c2RvcGxvMkhaeHpsamVMOHJXaWxR?=
- =?utf-8?B?TzQ3eVYxNHVjY0grWUpnOFVvR1RicXNwQVFlV0dPcVhIUU5yMlNQOVpnSnF5?=
- =?utf-8?B?RG84QU53VU5Vc3NnZDh1NmVoenVETWpKanVEL0JORFN6Nk9IZHNHS3BaT0I3?=
- =?utf-8?B?TlVEUFJDZWY5R3pUZnVkUFB0aWZXVGx4alFUR2h1UWttN3psLzArUGh6TGxK?=
- =?utf-8?B?UUd3NWkxcm45bmZYc3I1Q050cXVHMnVJSEtEcW03QTRiZlZZUWpla3JWbHVW?=
- =?utf-8?B?ZnJaU0cxTXdTMm41eG04ZENiWXE3OWRSSWU4alhMcnpCZlVqRzNab0dzekpZ?=
- =?utf-8?B?bUIxM0NYTWg5eTAxZGhGSm9vNXVxd2Frb01UUjJKN0ppbVJveHA0QnFqQ04v?=
- =?utf-8?B?SDVCQmdXYWRSNk50NTcxNU5wNUd2bDlTU1N6LzBXTnVrb1Vtb1pmNUNVekw2?=
- =?utf-8?B?MnkzenVhRnVLWGthNVJUckQ3c2J2Nkx0bFg3SjdoaUE4TmEzQUliaHdnQm9m?=
- =?utf-8?Q?61+lRbiydvTnEYD?=
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR04MB7416.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b79e6bfb-4546-4329-c4de-08dafdfc1518
-X-MS-Exchange-CrossTenant-originalarrivaltime: 24 Jan 2023 11:13:55.3564
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: XtGUKffHXm8d+6lMkBwFlZeS6ghQ2d7ipdIwNI5f8oPybFk7eC3+qzyoHA4hlh58f3nMm0wuzES99PQvdxm6ao0EuJje7J0HM7VkE024CRk=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR04MB6812
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.6.1
+Subject: Re: [PATCH v2 00/21] blksnap - block devices snapshots module
+Content-Language: en-US
+To:     Mike Snitzer <snitzer@redhat.com>
+CC:     "axboe@kernel.dk" <axboe@kernel.dk>,
+        "corbet@lwn.net" <corbet@lwn.net>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+References: <20221209142331.26395-1-sergei.shtepa@veeam.com>
+ <Y8cNVv4O+vjL+aAy@redhat.com>
+From:   Sergei Shtepa <sergei.shtepa@veeam.com>
+In-Reply-To: <Y8cNVv4O+vjL+aAy@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [172.24.10.107]
+X-ClientProxiedBy: prgmbx02.amust.local (172.24.128.103) To
+ prgmbx01.amust.local (172.24.128.102)
+X-EsetResult: clean, is OK
+X-EsetId: 37303A2924031555677D6B
+X-Veeam-MMEX: True
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-TG9va3MgZ29vZCwNClJldmlld2VkLWJ5OiBKb2hhbm5lcyBUaHVtc2hpcm4gPGpvaGFubmVzLnRo
-dW1zaGlybkB3ZGMuY29tPg0K
+DearMike
+
+I am very glad that you noticed my patch version 2.
+I'm sure your experience will help.
+
+On 1/17/23 22:04, Mike Snitzer wrote:
+> Subject:
+> Re: [PATCH v2 00/21] blksnap - block devices snapshots module
+> From:
+> Mike Snitzer <snitzer@redhat.com>
+> Date:
+> 1/17/23, 22:04
+> 
+> To:
+> Sergei Shtepa <sergei.shtepa@veeam.com>
+> CC:
+> "axboe@kernel.dk" <axboe@kernel.dk>, "corbet@lwn.net" <corbet@lwn.net>, "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+> 
+> 
+> On Fri, Dec 09 2022 at 9:23P -0500,
+> Sergei Shtepa wrote:
+> 
+>  > Hi Jens. Hi Jonathan. Hi all.
+>  >
+>  > I am happy to offer a modified version of the Block Devices Snapshots
+>  > Module. It allows to create non-persistent snapshots of any block devices.
+>  > The main purpose of such snapshots is to provide backups of block devices.
+>  > See more in Documentation/block/blksnap.rst.
+>  >
+>  > The Block Device Filtering Mechanism is added to the block layer. This
+>  > allows to attach and detach block device filters to the block layer.
+>  > Filters allow to extend the functionality of the block layer.
+>  > See more in Documentation/block/blkfilter.rst.
+>  >
+>  > A tool, a library for working with blksnap and tests can be found at
+>  > https://github.com/veeam/blksnap.
+>  >
+>  > The first version was suggested at 13 June 2022. Many thanks to
+>  > Christoph Hellwig and Randy Dunlap for the review of that version.
+>  >
+>  > Changes:
+>  > - Forgotten "static" declarations have been added.
+>  > - The text of the comments has been corrected.
+>  > - It is possible to connect only one filter, since there are no others in
+>  > upstream.
+>  > - Do not have additional locks for attach/detach filter.
+>  > - blksnap.h moved to include/uapi/.
+>  > - #pragma once and commented code removed.
+>  > - uuid_t removed from user API.
+>  > - Removed default values for module parameters from the configuration file.
+>  > - The debugging code for tracking memory leaks has been removed.
+>  > - Simplified Makefile.
+>  > - Optimized work with large memory buffers, CBT tables are now in virtual
+>  > memory.
+>  > - The allocation code of minor numbers has been optimized.
+>  > - The implementation of the snapshot image block device has been
+>  > simplified, now it is a bio-based block device.
+>  > - Removed initialization of global variables with null values.
+>  > - Only one bio is used to copy one chunk.
+>  > - Checked on ppc64le.
+>  >
+>  > The v1 version was suggested at 2 November 2022. Many thanks to Fabio
+>  > Fantoni for his for his participation in the "blksnap" project on github
+>  > and Jonathan Corbet for his article https://lwn.net/Articles/914031/.
+>  > Thanks to the impartial kernel test robot.
+>  >
+>  > Changes:
+>  > - Added documentation for Block Device Filtering Mechanism.
+>  > - Added documentation for Block Devices Snapshots Module (blksnap).
+>  > - The MAINTAINERS file has been updated.
+>  > - Optimized queue code for snapshot images.
+>  > - Fixed comments, log messages and code for better readability.
+> 
+> [this reply got long...]
+> 
+> I think it is important to revisit how we've gotten to this point.
+> The catalyst for blkfilter and now blksnap was that I removed the
+> export for blk_mq_submit_bio -- which veeam was using for enablement
+> of their commercial backup software product, the offending commit was
+> 681cc5e8667e ("dm: fix request-based DM to not bounce through indirect 
+> dm_submit_bio")
+> 
+> The way veeam started to address this change was to request Red Hat
+> modify RHEL (by reverting my change in RHEL8, whereby restoring the
+> export) to give them a stopgap while they worked to identify a more
+> lasting solution to them having depended on such a fragile interface
+> with which to hijack IO for all Linux block devices.
+> 
+
+Thank you so much for your help with the function blk_mq_submit_bio().
+This fix helped the veeamsnap module to continue working on RHEL 8
+with a minimal set of crutches. But besides RHEL 8, there are other
+distributions that required support.
+
+The catalyst was the optimization of Christoph and the removal of
+the make_request_fn() callback function in v5.9. See:
+https://elixir.bootlin.com/linux/v5.8.18/source/include/linux/blkdev.h#L406
+Overriding this function allowed handling I/O units.
+
+> They then came up with blk-interposer. I tried to be helpful and
+> replied quite regularly to blk-interposer patchsets, e.g.:
+> https://listman.redhat.com/archives/dm-devel/2021-March/045900.html
+> https://listman.redhat.com/archives/dm-devel/2021-March/045838.html
+> (I won't dig out more pointers, but can if you doubt this assertion).
+> The last reply I got on this topic was very dense and so I
+> tabled it with the idea of revisiting it. But I dropped the ball and
+> never did reply to this:
+> https://listman.redhat.com/archives/dm-devel/2021-April/046184.html
+> 
+> Sorry. But that wasn't out of malice. I was just busy with other
+> things and blk-interposer took the back seat. I never imagined that my
+> inaction would foster completely abandoning the approach.
+> 
+
+And yes, I’ve spent several months trying to refine the DM in order to
+implement the feature of attaching DM devices on the fly, that you said you
+would like to have in DM. Alas, I have not achieved success. I figured that
+it would take a lot of changes in the DM code before its non-persistent
+snapshots can be used for backup, and some architectural changes will be
+required. Although you have been very helpful for a while, at some point
+you stopped providing any feedback and thus I started to explore other
+possibilities to solve the problem.
+
+Seeing your annoyance now, I wonder what would be the better way to continue
+my work in the given circumstances? What kind of action would you expect from
+me in such situation? Being left without any feedback and guidance on DM,
+I decided to work directly with the community to find better solution.
+
+That is, I took another route (blksnap) not because I thought the initial 
+DM-based approach proposed by you was inferior or bad, but because only this
+direction remained available to me.
+
+> But my thanks is I'm now made to defend myself on LWN:
+> https://lwn.net/Articles/920245/
+> https://lwn.net/Articles/920249/
+> 
+> I happened to trip over that LWN thread because I saw Hannes reference
+> "blksnap" as something that somehow is a tolerated advance but other
+> efforts are not:
+> https://lore.kernel.org/linux-block/06e4d03c-3ecf-7e91-b80e-6600b3618b98@suse.de/
+> 
+> blksnap really needs to stand on its own merits and it could be that
+> in conjunction with blkfilter it does. But the way it has evolved has
+> been antithetical to how to properly engage the Linux community and
+> subsystem mainatiners like myself. The PR campaign to raise awareness
+> with LWN became more important than cc'ing me. That says it all
+> really.
+> 
+
+As for the article on LWN:
+
+I am very grateful to Jonathan for his article. It attract some attention
+to my work. However, it’s wasn’t a deliberate PR company from Veeam.
+In fact, Veeam has nothing to do with the article.
+
+Yes, I work for the company, but the company has neither requested the
+article, nor has started any other PR regarding the matter.
+
+If I were organizing a PR campaign, the article would be similar to this:
+https://github.com/veeam/blksnap/blob/master/doc/Something-wrong-with-snapshots-for-Linux.md
+But be careful! In the article I try to change the reader's opinion about
+snapshots. Feedback, as usual, is welcome.
+
+> But hopefully you can take my words as my truth: I think what you're
+> wanting to do is useful. I never intended to act as some gatekeeper. I
+> don't have a problem with what your goals are, I just ask that _how_
+> you achieve your goals be done with care and consideration (the
+> attempts I reviewed prior to your most recent work were lacking).
+> 
+
+Mike, I assure you, I have one goal. Snapshots of block devices in the
+Linux kernel for backup.
+
+I think we got off to a good start initially, but then something went wrong 
+(miscommunications, misunderstanding, and a lack of time) so here we are.
+If you could clarify what could have been the proper way of dealing with
+that situation from my side, I would really appreciate that.
+
+> But my one and only request for this line of development would be: I
+> _really_ want DM code to be able to used as an endpoint for IO
+> remapping associated with any new block core hook added to accomplish
+> dynamic remapping of IO. If I need to take an active role in the
+> development of that capability, so be it.
+> 
+
+I am sure that this is quite achievable. If the dm-dev team has special
+needs when attaching DM devices via blkfilter, we will be able to upgrade it.
+At the moment I don't see any problems with this.
+I can promise you to add you to СС when sending next patches.
+
+Sounds good?
+
+> I've yet to look closely at all this code (but wow there is quite a
+> lot under drivers/block/blksnap). I'll have a look at the block-core
+> changes and then try to make sense of things from there.
+>
+
+Yes, that's right. There are quite a few changes in block-core.
+From the blksnap, it is enough to view tracker.c. I/O handling is
+implemented there.
+But it's probably better to wait for the next version of patch that takes
+into account Christoph's comments. There are a lot of changes, and first
+of all in the interface.
+
+> But you've already bypassed me, my hope is that Jens and Christoph
+> agree that we need this line of development to be in service to other
+> areas of the Linux block subsystem and its drivers that were
+> established for the purposes of remapping IO. It cannot just be
+> the subset needed to cement veeam's ability to use Linux for its
+> purposes (but I completely understand that is the point of veeam's
+> exercise).
+> 
+> Mike
+
+It’s not about Veeam at all. I am sure that my work will help many backup 
+vendors and average users to build more robust and efficient backup tools.
+So, the argument that I do it just because Veeam needs it does not hold
+any water – I know that many people need the feature, not just Veeam.
+
+> 
+> 
+> 
+>  >
+>  > Sergei Shtepa (21):
+>  > documentation, blkfilter: Block Device Filtering Mechanism
+>  > block, blkfilter: Block Device Filtering Mechanism
+>  > documentation, capability: fix Generic Block Device Capability
+>  > documentation, blksnap: Block Devices Snapshots Module
+>  > block, blksnap: header file of the module interface
+>  > block, blksnap: module management interface functions
+>  > block, blksnap: init() and exit() functions
+>  > block, blksnap: interaction with sysfs
+>  > block, blksnap: attaching and detaching the filter and handling I/O
+>  > units
+>  > block, blksnap: map of change block tracking
+>  > block, blksnap: minimum data storage unit of the original block device
+>  > block, blksnap: buffer in memory for the minimum data storage unit
+>  > block, blksnap: functions and structures for performing block I/O
+>  > operations
+>  > block, blksnap: storage for storing difference blocks
+>  > block, blksnap: event queue from the difference storage
+>  > block, blksnap: owner of information about overwritten blocks of the
+>  > original block device
+>  > block, blksnap: snapshot image block device
+>  > block, blksnap: snapshot
+>  > block, blksnap: Kconfig and Makefile
+>  > block, blksnap: adds a blksnap to the kernel tree
+>  > block, blksnap: adds a maintainer for new files
+>  >
+>  > Documentation/block/blkfilter.rst | 50 ++
+>  > Documentation/block/blksnap.rst | 348 ++++++++++++++
+>  > Documentation/block/capability.rst | 3 +
+>  > Documentation/block/index.rst | 2 +
+>  > MAINTAINERS | 14 +
+>  > block/bdev.c | 70 +++
+>  > block/blk-core.c | 19 +-
+>  > drivers/block/Kconfig | 2 +
+>  > drivers/block/Makefile | 2 +
+>  > drivers/block/blksnap/Kconfig | 12 +
+>  > drivers/block/blksnap/Makefile | 18 +
+>  > drivers/block/blksnap/cbt_map.c | 268 +++++++++++
+>  > drivers/block/blksnap/cbt_map.h | 114 +++++
+>  > drivers/block/blksnap/chunk.c | 345 ++++++++++++++
+>  > drivers/block/blksnap/chunk.h | 139 ++++++
+>  > drivers/block/blksnap/ctrl.c | 410 ++++++++++++++++
+>  > drivers/block/blksnap/ctrl.h | 9 +
+>  > drivers/block/blksnap/diff_area.c | 655 +++++++++++++++++++++++++
+>  > drivers/block/blksnap/diff_area.h | 177 +++++++
+>  > drivers/block/blksnap/diff_buffer.c | 133 ++++++
+>  > drivers/block/blksnap/diff_buffer.h | 75 +++
+>  > drivers/block/blksnap/diff_io.c | 168 +++++++
+>  > drivers/block/blksnap/diff_io.h | 118 +++++
+>  > drivers/block/blksnap/diff_storage.c | 317 +++++++++++++
+>  > drivers/block/blksnap/diff_storage.h | 93 ++++
+>  > drivers/block/blksnap/event_queue.c | 86 ++++
+>  > drivers/block/blksnap/event_queue.h | 63 +++
+>  > drivers/block/blksnap/main.c | 164 +++++++
+>  > drivers/block/blksnap/params.h | 12 +
+>  > drivers/block/blksnap/snapimage.c | 275 +++++++++++
+>  > drivers/block/blksnap/snapimage.h | 69 +++
+>  > drivers/block/blksnap/snapshot.c | 670 ++++++++++++++++++++++++++
+>  > drivers/block/blksnap/snapshot.h | 78 +++
+>  > drivers/block/blksnap/sysfs.c | 80 ++++
+>  > drivers/block/blksnap/sysfs.h | 7 +
+>  > drivers/block/blksnap/tracker.c | 683 +++++++++++++++++++++++++++
+>  > drivers/block/blksnap/tracker.h | 74 +++
+>  > drivers/block/blksnap/version.h | 10 +
+>  > include/linux/blk_types.h | 2 +
+>  > include/linux/blkdev.h | 71 +++
+>  > include/uapi/linux/blksnap.h | 549 +++++++++++++++++++++
+>  > 41 files changed, 6452 insertions(+), 2 deletions(-)
+>  > create mode 100644 Documentation/block/blkfilter.rst
+>  > create mode 100644 Documentation/block/blksnap.rst
+>  > create mode 100644 drivers/block/blksnap/Kconfig
+>  > create mode 100644 drivers/block/blksnap/Makefile
+>  > create mode 100644 drivers/block/blksnap/cbt_map.c
+>  > create mode 100644 drivers/block/blksnap/cbt_map.h
+>  > create mode 100644 drivers/block/blksnap/chunk.c
+>  > create mode 100644 drivers/block/blksnap/chunk.h
+>  > create mode 100644 drivers/block/blksnap/ctrl.c
+>  > create mode 100644 drivers/block/blksnap/ctrl.h
+>  > create mode 100644 drivers/block/blksnap/diff_area.c
+>  > create mode 100644 drivers/block/blksnap/diff_area.h
+>  > create mode 100644 drivers/block/blksnap/diff_buffer.c
+>  > create mode 100644 drivers/block/blksnap/diff_buffer.h
+>  > create mode 100644 drivers/block/blksnap/diff_io.c
+>  > create mode 100644 drivers/block/blksnap/diff_io.h
+>  > create mode 100644 drivers/block/blksnap/diff_storage.c
+>  > create mode 100644 drivers/block/blksnap/diff_storage.h
+>  > create mode 100644 drivers/block/blksnap/event_queue.c
+>  > create mode 100644 drivers/block/blksnap/event_queue.h
+>  > create mode 100644 drivers/block/blksnap/main.c
+>  > create mode 100644 drivers/block/blksnap/params.h
+>  > create mode 100644 drivers/block/blksnap/snapimage.c
+>  > create mode 100644 drivers/block/blksnap/snapimage.h
+>  > create mode 100644 drivers/block/blksnap/snapshot.c
+>  > create mode 100644 drivers/block/blksnap/snapshot.h
+>  > create mode 100644 drivers/block/blksnap/sysfs.c
+>  > create mode 100644 drivers/block/blksnap/sysfs.h
+>  > create mode 100644 drivers/block/blksnap/tracker.c
+>  > create mode 100644 drivers/block/blksnap/tracker.h
+>  > create mode 100644 drivers/block/blksnap/version.h
+>  > create mode 100644 include/uapi/linux/blksnap.h
+>  >
+>  > --
+>  > 2.20.1
+>  >
+> 
