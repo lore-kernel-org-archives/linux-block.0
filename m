@@ -2,47 +2,48 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 60E08C38142
-	for <linux-block@archiver.kernel.org>; Tue, 24 Jan 2023 13:43:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 03AA3C38142
+	for <linux-block@archiver.kernel.org>; Tue, 24 Jan 2023 13:45:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233674AbjAXNnV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 24 Jan 2023 08:43:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35712 "EHLO
+        id S233298AbjAXNo7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 24 Jan 2023 08:44:59 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35506 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234355AbjAXNm7 (ORCPT
+        with ESMTP id S234414AbjAXNoj (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 24 Jan 2023 08:42:59 -0500
+        Tue, 24 Jan 2023 08:44:39 -0500
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA33146148;
-        Tue, 24 Jan 2023 05:42:25 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 76FB615540;
+        Tue, 24 Jan 2023 05:43:26 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 4C46961050;
-        Tue, 24 Jan 2023 13:42:25 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 10626C433EF;
-        Tue, 24 Jan 2023 13:42:23 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 9782860FAC;
+        Tue, 24 Jan 2023 13:43:22 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8A5DEC4339C;
+        Tue, 24 Jan 2023 13:43:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1674567744;
-        bh=ptS80CaKmAaxnVgO5uFtYCDNS250QnOe4rrGaZZzuYE=;
+        s=k20201202; t=1674567802;
+        bh=mJLPCi/3sB+LqCzxEK11/00G7g5mPE/RTW6D4kkkB5M=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=jyo8uSvZRQ6kWIeWKE4ERRPhX/O1KXCU3i1wST1hDl/3wt9UD8N5X7qT8CkGhkr/p
-         ot0cMRkZ70jTjecgKpfLAta88CjCI7xTfDs3TEhzMsz2BRMfQXEliSH1r2S+gkjRra
-         VZaaI1pTpcAb5HQtWmauD+UPHkXazXzJDfbwJeD2eJIrTV6NpFqu6PycUtc95tRn6C
-         nU4AQzmXZTYCbFOH/uPdJO/ryHhVzJg43Dn9V3cDUPKGnqNqa5D3j/D+oaITmFY8ak
-         Q0Pj233Nysq6cGuNEaKwxqYFJTJL07RGHrVu9W2noKEwPYVrRlACs7yVM9KHLjsGxv
-         2lUJh4KKjV+kg==
+        b=LgVisdwT7H50R31VxcMgggTZ/I+BfDpDMu5lJkWRV/Uucmd+7TdF50iNL3EeyoCNa
+         Hwslc4OfTaLpJ1vXQN5YSx8XXjyZUsqbDIyOpyeey4UQY7tR6J2kynBSnOT/YEA4Vb
+         MZoHR16vtZ4zxKakbIWexi07SAcTF4kFJ2yjOOxJ+NvSvrgBKJ5XQ0nLFmNuWaq66b
+         DzvrAj8T7s+5pp8f0sD3LUMDxGndlA7qMjj+QWJxABV0xGphiCiaW3lqW0O/vn7ScH
+         Hpr4yV9vsrYqoFtcIGWSbdmTyDSdfVmkYHqAqBZV1eR8sm58nAScdI+iIAbEhEFzHl
+         BPL8rad4CcrlQ==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Pavel Begunkov <asml.silence@gmail.com>,
+Cc:     Yu Kuai <yukuai3@huawei.com>, Tejun Heo <tj@kernel.org>,
         Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
+        josef@toxicpanda.com, cgroups@vger.kernel.org,
         linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.1 19/35] block: fix hctx checks for batch allocation
-Date:   Tue, 24 Jan 2023 08:41:15 -0500
-Message-Id: <20230124134131.637036-19-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.15 10/14] blk-cgroup: fix missing pd_online_fn() while activating policy
+Date:   Tue, 24 Jan 2023 08:42:53 -0500
+Message-Id: <20230124134257.637523-10-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.0
-In-Reply-To: <20230124134131.637036-1-sashal@kernel.org>
-References: <20230124134131.637036-1-sashal@kernel.org>
+In-Reply-To: <20230124134257.637523-1-sashal@kernel.org>
+References: <20230124134257.637523-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -51,51 +52,37 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Pavel Begunkov <asml.silence@gmail.com>
+From: Yu Kuai <yukuai3@huawei.com>
 
-[ Upstream commit 7746564793978fe2f43b18a302b22dca0ad3a0e8 ]
+[ Upstream commit e3ff8887e7db757360f97634e0d6f4b8e27a8c46 ]
 
-When there are no read queues read requests will be assigned a
-default queue on allocation. However, blk_mq_get_cached_request() is not
-prepared for that and will fail all attempts to grab read requests from
-the cache. Worst case it doubles the number of requests allocated,
-roughly half of which will be returned by blk_mq_free_plug_rqs().
+If the policy defines pd_online_fn(), it should be called after
+pd_init_fn(), like blkg_create().
 
-It only affects batched allocations and so is io_uring specific.
-For reference, QD8 t/io_uring benchmark improves by 20-35%.
-
-Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
-Link: https://lore.kernel.org/r/80d4511011d7d4751b4cf6375c4e38f237d935e3.1673955390.git.asml.silence@gmail.com
+Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+Acked-by: Tejun Heo <tj@kernel.org>
+Link: https://lore.kernel.org/r/20230103112833.2013432-1-yukuai1@huaweicloud.com
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- block/blk-mq.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+ block/blk-cgroup.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 63abbe342b28..83fbc7c54617 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -2858,6 +2858,7 @@ static inline struct request *blk_mq_get_cached_request(struct request_queue *q,
- 		struct blk_plug *plug, struct bio **bio, unsigned int nsegs)
- {
- 	struct request *rq;
-+	enum hctx_type type, hctx_type;
+diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+index ce5858dadca5..3ee4c1217b63 100644
+--- a/block/blk-cgroup.c
++++ b/block/blk-cgroup.c
+@@ -1360,6 +1360,10 @@ int blkcg_activate_policy(struct request_queue *q,
+ 		list_for_each_entry_reverse(blkg, &q->blkg_list, q_node)
+ 			pol->pd_init_fn(blkg->pd[pol->plid]);
  
- 	if (!plug)
- 		return NULL;
-@@ -2870,7 +2871,10 @@ static inline struct request *blk_mq_get_cached_request(struct request_queue *q,
- 		return NULL;
- 	}
++	if (pol->pd_online_fn)
++		list_for_each_entry_reverse(blkg, &q->blkg_list, q_node)
++			pol->pd_online_fn(blkg->pd[pol->plid]);
++
+ 	__set_bit(pol->plid, q->blkcg_pols);
+ 	ret = 0;
  
--	if (blk_mq_get_hctx_type((*bio)->bi_opf) != rq->mq_hctx->type)
-+	type = blk_mq_get_hctx_type((*bio)->bi_opf);
-+	hctx_type = rq->mq_hctx->type;
-+	if (type != hctx_type &&
-+	    !(type == HCTX_TYPE_READ && hctx_type == HCTX_TYPE_DEFAULT))
- 		return NULL;
- 	if (op_is_flush(rq->cmd_flags) != op_is_flush((*bio)->bi_opf))
- 		return NULL;
 -- 
 2.39.0
 
