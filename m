@@ -2,26 +2,26 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D02E8C54EED
-	for <linux-block@archiver.kernel.org>; Tue, 24 Jan 2023 20:31:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AD732C61D97
+	for <linux-block@archiver.kernel.org>; Tue, 24 Jan 2023 20:32:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232952AbjAXUbN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 24 Jan 2023 15:31:13 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44348 "EHLO
+        id S231553AbjAXUcJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 24 Jan 2023 15:32:09 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44860 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231538AbjAXUbN (ORCPT
+        with ESMTP id S230334AbjAXUcI (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 24 Jan 2023 15:31:13 -0500
-Received: from NAM02-BN1-obe.outbound.protection.outlook.com (mail-bn1nam02on2087.outbound.protection.outlook.com [40.107.212.87])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C025E618E;
-        Tue, 24 Jan 2023 12:31:11 -0800 (PST)
+        Tue, 24 Jan 2023 15:32:08 -0500
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2064.outbound.protection.outlook.com [40.107.243.64])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F2C2AD2A;
+        Tue, 24 Jan 2023 12:32:07 -0800 (PST)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Y8qvFo2VO7a5uP7WNJ8t/nnvvTYE3PusYjM40oWhCl5I9AvnqOZk6id6Z154hYKeGWb48sy7hcQWjtOPrrmOJExbmXgCn8BDbYb8tiNEFjNEd6Dt8JLBNSRjEcghyvI6OxywzL/xmJSe/sRfOI45ohVpHmW142YA05MQnUqS+9ewR6YcUbBO2gsw1ZFEDDccQ+6wdekd0tZXFRFKO0ExTV/npVoCrbDbY0vdO1rIWe5t1lWWvRAeoomkbriuRxvFhkaI3D8kG4bW9qGW1XNhuCtDdMjhkg/8/MUxXt4gUD+cHdMb0eKQZHKLyfFtboJGlwKknf91luiy1ezWYYMLpA==
+ b=BVsAXeGxOvz2kFADzljmZEWqBA1RfztE/tlD2nwuFxdGshcgNC42WmcOafAWOEeOHBtywVTJ7xIxoIXEMRSwzZd/IYmxhkfih/aiGMQdkVvnQ54IUexV20vXMhGgLgAmdXjYfZ5VYAqCBTfHQrqVc3ZG+23uxIpFSX0KIUl+9eQTPZaL2HvkV9Qhn4hE1+abDaTs+Wwz9aYsrESkcL5CvcPNS2bDP+x9U1IAzxTOzLCfhWKKtCb225Tuqdwm7Eo/cfqmSRVGNB6uCc/VO/MAgGwrohrY0+hQ6NkXfv1nitRn5Ny9Bwfp2Sq4InKjsn5Q+0ARD4JqO6X7S8FCdDM3/A==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=EEsO9jWKQ/Xx2n3ylmJJMK9le/H9/ZmRWJo08T6VYn0=;
- b=D+uB+SqodJbMfov6BKoEJchjOpdbD9B2bBW05L7r57khUZoJyhhylxFw+VvJxvZ/dTP8tAJkdVu4kyCjagU0jXR/aDjqNJMf3tATBoGydk2rm8+hWpIpbn1gj//8BjHmixp7XGfPXkLzHR/FTo1AdBqm3o2xlsbytZTx7sk5KrRwAhJpumnQRE6SS/oRabnJjYXCxxIGUldKhMGN+jp00WmTOyJQ/6Cs7s7QQDW7Ujbl3qfa2OYRfXZctVrUzjv8Ge5HsPyHz/lQSb8wyiqb0/i9/t1XiJ8BF2fUBbh5j7pGaU3u6yFJZns2Zaw5KgBj0bZu9d9AtviJ24gj2Ds+WQ==
+ bh=u2fda49ycLyC38hvtVHurB4o1JnTe0GhHvqYhEsRXBs=;
+ b=GQxUn6ZEGFLQzufTu6bAjDpUXGAdOgxP9iLHTM/rIqcQTyQOxByFH+KDCsvVVjJvlXJHBlEZrx6cAsoxRKDIT4jOhoYiEefckjfbw6eekbHmp03U55af2+Kf8v+DipdEpkOIVscTVnCUIv9TltI8LlM0WiwaOSs3FH4ZHC1qaXatogLEx4JihCLK/12MWg8ufhTknhkRjyWivpbUlda6pPJGt+wywQhOEMQlG4qk9cLAZO9/1Nz84XssEkr4psmnH62/5KOuJgQBE4zLi2uXR/a1UkxktYGHL7KsitLi9VrjkDUpoFeUS2XUWbv7c6QisMb543JRaS3znEdq2oqAXQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  216.228.117.160) smtp.rcpttodomain=redhat.com smtp.mailfrom=nvidia.com;
  dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
@@ -29,17 +29,18 @@ ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=EEsO9jWKQ/Xx2n3ylmJJMK9le/H9/ZmRWJo08T6VYn0=;
- b=FUaoYOZy/nVn81I2XN8M8j3PB6775QknY2zPABDlOM9KnnM7462gPXFSzhOtMiQdbbcKEWhBF3sNogtJmDKX3w/AnjpVH7JdtRmGL8I/pty4AmhlzL/hIVFSW8qBYL7XaMoEx7tUDHytQ2iFadLQwirbwtKX2GX3P0FrA8pnS7GzJkFkjx7LoXZ5TWaiX0UJRiQBa7P42OMJtAy3RuQzgqGocvZqdgfHAU9Q+GYgY4R6/TS/E14lDl4yRD8PY0qlRGLlJ84IKnAxWjqYFLbMCfywZkexavVKpNi6iLfKkqw2HtAWnaSkOp40lPWDcaZBKby8mOsiq9M8z825PN/+5A==
-Received: from DM6PR08CA0028.namprd08.prod.outlook.com (2603:10b6:5:80::41) by
- CY5PR12MB6549.namprd12.prod.outlook.com (2603:10b6:930:43::6) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6002.33; Tue, 24 Jan 2023 20:31:09 +0000
-Received: from DS1PEPF0000E63C.namprd02.prod.outlook.com
- (2603:10b6:5:80:cafe::9c) by DM6PR08CA0028.outlook.office365.com
- (2603:10b6:5:80::41) with Microsoft SMTP Server (version=TLS1_2,
+ bh=u2fda49ycLyC38hvtVHurB4o1JnTe0GhHvqYhEsRXBs=;
+ b=n1tKWewEsM1xGQ3w9ZaJqg8X9xvm0024a2/ebdq59bAK0R9ADfCxHkBTI1IqdMFrmrtxucq6TVVtZgJSGVWeE4k0ujyegbGBcVPHUqc47IwS0sJXxhM98fUxei5Aywm7OdY1mY4WoLX2qPnJeD1r4wmWZ+8ayf+dg8YPxMSGpw2Nvyl4bY5jO1mxhwXOS6JqXsmHWPOIoZLxRgcDqcaSnH1L0Yp1/+raCG0G1UiUNcj8tXxvoM5cxA8zoHhva6slNUb/JlfRFjTbtyAk4yua4sfxe0FCVk1MnxuiGOxDMW4iDsPVT+Mxxw/pjFMbiXWpzw2SaOcjQtjuo/ax+ypsLQ==
+Received: from DM6PR11CA0012.namprd11.prod.outlook.com (2603:10b6:5:190::25)
+ by SN7PR12MB7323.namprd12.prod.outlook.com (2603:10b6:806:29a::5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6002.28; Tue, 24 Jan
+ 2023 20:32:06 +0000
+Received: from DS1PEPF0000E63D.namprd02.prod.outlook.com
+ (2603:10b6:5:190:cafe::7e) by DM6PR11CA0012.outlook.office365.com
+ (2603:10b6:5:190::25) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6002.33 via Frontend
- Transport; Tue, 24 Jan 2023 20:31:09 +0000
+ Transport; Tue, 24 Jan 2023 20:32:06 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
  smtp.mailfrom=nvidia.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=nvidia.com;
@@ -47,23 +48,24 @@ Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
  216.228.117.160 as permitted sender) receiver=protection.outlook.com;
  client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
 Received: from mail.nvidia.com (216.228.117.160) by
- DS1PEPF0000E63C.mail.protection.outlook.com (10.167.17.74) with Microsoft
+ DS1PEPF0000E63D.mail.protection.outlook.com (10.167.17.75) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6043.10 via Frontend Transport; Tue, 24 Jan 2023 20:31:09 +0000
+ 15.20.6043.12 via Frontend Transport; Tue, 24 Jan 2023 20:32:05 +0000
 Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
  (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.36; Tue, 24 Jan
- 2023 11:50:17 -0800
-Received: from [10.110.48.28] (10.126.231.37) by rnnvmail201.nvidia.com
+ 2023 12:08:16 -0800
+Received: from [10.110.48.28] (10.126.230.37) by rnnvmail201.nvidia.com
  (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.36; Tue, 24 Jan
- 2023 11:50:17 -0800
-Message-ID: <7390d21a-c5f5-8f21-9f3e-524252e73b46@nvidia.com>
-Date:   Tue, 24 Jan 2023 11:50:16 -0800
+ 2023 12:08:15 -0800
+Message-ID: <df718bc0-2163-a7a7-8c5c-db22e9320b7c@nvidia.com>
+Date:   Tue, 24 Jan 2023 12:08:15 -0800
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.6.1
-Subject: Re: [PATCH v9 6/8] block: Switch to pinning pages.
+Subject: Re: [PATCH v9 8/8] block: convert bio_map_user_iov to use
+ iov_iter_extract_pages
 Content-Language: en-US
 To:     David Howells <dhowells@redhat.com>,
         Al Viro <viro@zeniv.linux.org.uk>,
@@ -76,40 +78,45 @@ CC:     Matthew Wilcox <willy@infradead.org>, Jens Axboe <axboe@kernel.dk>,
         <linux-fsdevel@vger.kernel.org>, <linux-block@vger.kernel.org>,
         <linux-kernel@vger.kernel.org>, "Christoph Hellwig" <hch@lst.de>
 References: <20230124170108.1070389-1-dhowells@redhat.com>
- <20230124170108.1070389-7-dhowells@redhat.com>
+ <20230124170108.1070389-9-dhowells@redhat.com>
 From:   John Hubbard <jhubbard@nvidia.com>
-In-Reply-To: <20230124170108.1070389-7-dhowells@redhat.com>
+In-Reply-To: <20230124170108.1070389-9-dhowells@redhat.com>
 Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.126.231.37]
-X-ClientProxiedBy: rnnvmail201.nvidia.com (10.129.68.8) To
+X-Originating-IP: [10.126.230.37]
+X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
  rnnvmail201.nvidia.com (10.129.68.8)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS1PEPF0000E63C:EE_|CY5PR12MB6549:EE_
-X-MS-Office365-Filtering-Correlation-Id: e1868385-6799-4026-d9bd-08dafe49ed76
+X-MS-TrafficTypeDiagnostic: DS1PEPF0000E63D:EE_|SN7PR12MB7323:EE_
+X-MS-Office365-Filtering-Correlation-Id: 5e1a86b5-52f9-4424-d4c7-08dafe4a0f0f
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: +1potaqWGwwIo0/juUumNqjiefgl2uA94JT6FIrlNBAHeUwbkjAGS5B1gpQ/o/8XGHuZmb/3/PN+0bwbuEIlQgqkK+Ckf717jn79CwCyswZ+OQL69LyoEg7+qdJuOB+dIMgwGQn7gsf/O+lDTqPkkV7Ny41sXMrrNrGWSv0ShwJtkO8TGq+R7ZP+o+eF8/e4zBrxnpFovZvZedtwf41P2Dkmnik/XGaK/ho/qv/S1AodM8GxOwIpevMqwqJpNxH5Ygp6rRzoKG365A9SJqrHD6jMbXCiFnXoXjZRXLxdwDArcA+LkMQJi4PxRf5wDodwkP9tPKroysutOT3lx6lgVKFJVLRK9iPKtlh4sd5KAomdO4kH1R09lx6zhOCWs1/A+Qjq/fnRn3c5LqePmWdY66qXf/WPj7CzN89+QjRnQZa1PuZcAX8x3a3txDpGwOgVdwExHNgdLk4h5LHWmtDS9u3HCthh5npc7EPBTSyAGlXkubIeNqZHyRKSmuOZAIQukRU90yWPIzmhhKJkMXK1GEg5tUaelFAV/+k237MIkLOZ0A0xlbK/plEPjZNsw7b9UlzLCH3Mb2e2vBvfRlgm/YdKXiYH9q4Zj7m0vC6x0WK+NjwEtEYbjHrrLiRHo2qYV+Ywk3sImgsiwpUFJjoMDXon7U3vf3t4McI8OCa6/8q+gDBNcF+WDGB0JmvWuMjPfdZAstY7oztFetwzfY0rSoRfh49CusByVumAJdGHxro=
-X-Forefront-Antispam-Report: CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230025)(4636009)(346002)(39860400002)(376002)(396003)(136003)(451199018)(40470700004)(36840700001)(46966006)(36756003)(5660300002)(7636003)(82740400003)(2906002)(7416002)(356005)(2616005)(8936002)(41300700001)(83380400001)(82310400005)(36860700001)(31696002)(4326008)(8676002)(110136005)(31686004)(86362001)(478600001)(40460700003)(16526019)(70206006)(40480700001)(316002)(70586007)(186003)(53546011)(16576012)(26005)(54906003)(336012)(426003)(47076005)(43740500002);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: Wqc65LRXfWXoQPdJAoVXsvffjESIhpTypEft6/bnDP4WjjG2hpJbQezFXqjbnu2jC8ZjAPPToRHBMU5A+n6RfWTsoMTbdeXbpcztBtuV+amssWHveYe7HJe4Es1/Yx8uxWD0C69GPKWVK1UD76iojJ1xCPkBE+2rxLbjjflGHFWAvdEBl8zC0iu9Fnfca16dN+IgcM8DvZN7tRd8Mzz15lBqojxp8lKCF55w7qHAW7przzfJE9YMRSLoV3BdU+45rzCszC2k7Msf+S+24NkWnZXBKUDeTpSjkHrYFaeDCdxuofUBj8B/HmCcfNf8us5gbeWYRZnjqLEhqbWAaJGmhx/T3C0I7aE1NWPHUTPtqKEXT5tClL1NDXVxjCcYUKLkNeMZkhQerEoHKmKrDrUVop0O+w9olSt6NR+mr4HP863kAH/pIr2Sx6/uL4b8K+fRuE+O1ur3vnyuR3l/tPaZA7BDde5cBJ7Wlk1BHnlnjkld1aDwzqWjQPDPKgD0v/Adhn4JbkONinW0U1vdRV/KuRJDsBCaXcP7PVGQkZJw2LjCLvkJr/sQUODKk53ws90GX+OwnC2v2kPPQUvm11iOGMr1mAQ8ZXHchhmS7OSGh1VwfgRrpX/0X2Nkx8cRWkDl6/SuXYYY/+bANM8ZMKRSigz1H75E9yr2Tf98zc0cW19/kV7E+OorQC5aLuRtLhJn9w0lfIIA3TNqz3RU8xJqQAEpwO/u6qfqGfdVXyB1WQA=
+X-Forefront-Antispam-Report: CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230025)(4636009)(346002)(376002)(396003)(136003)(39860400002)(451199018)(40470700004)(36840700001)(46966006)(31686004)(36756003)(86362001)(40480700001)(70586007)(82740400003)(356005)(83380400001)(8676002)(31696002)(8936002)(5660300002)(7416002)(2906002)(70206006)(7636003)(16576012)(36860700001)(316002)(40460700003)(478600001)(82310400005)(110136005)(54906003)(426003)(16526019)(47076005)(41300700001)(4326008)(26005)(336012)(2616005)(186003)(53546011)(43740500002);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Jan 2023 20:31:09.4840
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Jan 2023 20:32:05.8514
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: e1868385-6799-4026-d9bd-08dafe49ed76
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5e1a86b5-52f9-4424-d4c7-08dafe4a0f0f
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: DS1PEPF0000E63C.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthSource: DS1PEPF0000E63D.namprd02.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY5PR12MB6549
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB7323
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 On 1/24/23 09:01, David Howells wrote:
-> Add BIO_PAGE_PINNED to indicate that the pages in a bio are pinned
-> (FOLL_PIN) and that the pin will need removing.
+> This will pin pages or leave them unaltered rather than getting a ref on
+> them as appropriate to the iterator.
+> 
+> The pages need to be pinned for DIO rather than having refs taken on them
+> to prevent VM copy-on-write from malfunctioning during a concurrent fork()
+> (the result of the I/O could otherwise end up being visible to/affected by
+> the child process).
 > 
 > Signed-off-by: David Howells <dhowells@redhat.com>
 > cc: Al Viro <viro@zeniv.linux.org.uk>
@@ -122,28 +129,22 @@ On 1/24/23 09:01, David Howells wrote:
 > ---
 > 
 > Notes:
->      ver #9)
->       - Only consider pinning in bio_set_cleanup_mode().  Ref'ing pages in
->         struct bio is going away.
->       - page_put_unpin() is removed; call unpin_user_page() and put_page()
->         directly.
->       - Use bio_release_page() in __bio_release_pages().
->       - BIO_PAGE_PINNED and BIO_PAGE_REFFED can't both be set, so use if-else
->         when testing both of them.
->      
 >      ver #8)
->       - Move the infrastructure to clean up pinned pages to this patch [hch].
->       - Put BIO_PAGE_PINNED before BIO_PAGE_REFFED as the latter should
->         probably be removed at some point.  FOLL_PIN can then be renumbered
->         first.
+>       - Split the patch up a bit [hch].
+>       - We should only be using pinned/non-pinned pages and not ref'd pages,
+>         so adjust the comments appropriately.
+>      
+>      ver #7)
+>       - Don't treat BIO_PAGE_REFFED/PINNED as being the same as FOLL_GET/PIN.
+>      
+>      ver #5)
+>       - Transcribe the FOLL_* flags returned by iov_iter_extract_pages() to
+>         BIO_* flags and got rid of bi_cleanup_mode.
+>       - Replaced BIO_NO_PAGE_REF to BIO_PAGE_REFFED in the preceding patch.
 > 
->   block/bio.c               |  6 +++---
->   block/blk.h               | 21 +++++++++++++++++++++
->   include/linux/bio.h       |  3 ++-
->   include/linux/blk_types.h |  1 +
->   4 files changed, 27 insertions(+), 4 deletions(-)
-
-Neatly avoiding any use of FOLL_PIN or FOLL_GET, good. :)
+>   block/blk-map.c | 22 ++++++++++------------
+>   1 file changed, 10 insertions(+), 12 deletions(-)
+> 
 
 Reviewed-by: John Hubbard <jhubbard@nvidia.com>
 
@@ -152,88 +153,57 @@ thanks,
 John Hubbard
 NVIDIA
 
-> 
-> diff --git a/block/bio.c b/block/bio.c
-> index 851c23641a0d..fc45aaa97696 100644
-> --- a/block/bio.c
-> +++ b/block/bio.c
-> @@ -1176,7 +1176,7 @@ void __bio_release_pages(struct bio *bio, bool mark_dirty)
->   	bio_for_each_segment_all(bvec, bio, iter_all) {
->   		if (mark_dirty && !PageCompound(bvec->bv_page))
->   			set_page_dirty_lock(bvec->bv_page);
-> -		put_page(bvec->bv_page);
-> +		bio_release_page(bio, bvec->bv_page);
->   	}
->   }
->   EXPORT_SYMBOL_GPL(__bio_release_pages);
-> @@ -1496,8 +1496,8 @@ void bio_set_pages_dirty(struct bio *bio)
->    * the BIO and re-dirty the pages in process context.
->    *
->    * It is expected that bio_check_pages_dirty() will wholly own the BIO from
-> - * here on.  It will run one put_page() against each page and will run one
-> - * bio_put() against the BIO.
-> + * here on.  It will unpin each page and will run one bio_put() against the
-> + * BIO.
->    */
+> diff --git a/block/blk-map.c b/block/blk-map.c
+> index 0e2b0a861ba3..4e22dccdbe9b 100644
+> --- a/block/blk-map.c
+> +++ b/block/blk-map.c
+> @@ -282,21 +282,19 @@ static int bio_map_user_iov(struct request *rq, struct iov_iter *iter,
+>   	if (blk_queue_pci_p2pdma(rq->q))
+>   		extraction_flags |= ITER_ALLOW_P2PDMA;
 >   
->   static void bio_dirty_fn(struct work_struct *work);
-> diff --git a/block/blk.h b/block/blk.h
-> index 4c3b3325219a..32b252903f9a 100644
-> --- a/block/blk.h
-> +++ b/block/blk.h
-> @@ -425,6 +425,27 @@ int bio_add_hw_page(struct request_queue *q, struct bio *bio,
->   		struct page *page, unsigned int len, unsigned int offset,
->   		unsigned int max_sectors, bool *same_page);
+> -	bio_set_flag(bio, BIO_PAGE_REFFED);
+> +	bio_set_cleanup_mode(bio, iter);
+>   	while (iov_iter_count(iter)) {
+> -		struct page **pages, *stack_pages[UIO_FASTIOV];
+> +		struct page *stack_pages[UIO_FASTIOV];
+> +		struct page **pages = stack_pages;
+>   		ssize_t bytes;
+>   		size_t offs;
+>   		int npages;
 >   
-> +/*
-> + * Set the cleanup mode for a bio from an iterator and the extraction flags.
-> + */
-> +static inline void bio_set_cleanup_mode(struct bio *bio, struct iov_iter *iter)
-> +{
-> +	if (iov_iter_extract_will_pin(iter))
-> +		bio_set_flag(bio, BIO_PAGE_PINNED);
-> +}
+> -		if (nr_vecs <= ARRAY_SIZE(stack_pages)) {
+> -			pages = stack_pages;
+> -			bytes = iov_iter_get_pages(iter, pages, LONG_MAX,
+> -						   nr_vecs, &offs, extraction_flags);
+> -		} else {
+> -			bytes = iov_iter_get_pages_alloc(iter, &pages,
+> -						LONG_MAX, &offs, extraction_flags);
+> -		}
+> +		if (nr_vecs > ARRAY_SIZE(stack_pages))
+> +			pages = NULL;
 > +
-> +/*
-> + * Clean up a page appropriately, where the page may be pinned, may have a
-> + * ref taken on it or neither.
-> + */
-> +static inline void bio_release_page(struct bio *bio, struct page *page)
-> +{
-> +	if (bio_flagged(bio, BIO_PAGE_PINNED))
-> +		unpin_user_page(page);
-> +	else if (bio_flagged(bio, BIO_PAGE_REFFED))
-> +		put_page(page);
-> +}
-> +
->   struct request_queue *blk_alloc_queue(int node_id);
+> +		bytes = iov_iter_extract_pages(iter, &pages, LONG_MAX,
+> +					       nr_vecs, extraction_flags, &offs);
+>   		if (unlikely(bytes <= 0)) {
+>   			ret = bytes ? bytes : -EFAULT;
+>   			goto out_unmap;
+> @@ -318,7 +316,7 @@ static int bio_map_user_iov(struct request *rq, struct iov_iter *iter,
+>   				if (!bio_add_hw_page(rq->q, bio, page, n, offs,
+>   						     max_sectors, &same_page)) {
+>   					if (same_page)
+> -						put_page(page);
+> +						bio_release_page(bio, page);
+>   					break;
+>   				}
 >   
->   int disk_scan_partitions(struct gendisk *disk, fmode_t mode, void *owner);
-> diff --git a/include/linux/bio.h b/include/linux/bio.h
-> index 805957c99147..b2c09997d79c 100644
-> --- a/include/linux/bio.h
-> +++ b/include/linux/bio.h
-> @@ -484,7 +484,8 @@ void zero_fill_bio(struct bio *bio);
->   
->   static inline void bio_release_pages(struct bio *bio, bool mark_dirty)
->   {
-> -	if (bio_flagged(bio, BIO_PAGE_REFFED))
-> +	if (bio_flagged(bio, BIO_PAGE_REFFED) ||
-> +	    bio_flagged(bio, BIO_PAGE_PINNED))
->   		__bio_release_pages(bio, mark_dirty);
->   }
->   
-> diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-> index 7daa261f4f98..a0e339ff3d09 100644
-> --- a/include/linux/blk_types.h
-> +++ b/include/linux/blk_types.h
-> @@ -318,6 +318,7 @@ struct bio {
->    * bio flags
->    */
->   enum {
-> +	BIO_PAGE_PINNED,	/* Unpin pages in bio_release_pages() */
->   	BIO_PAGE_REFFED,	/* put pages in bio_release_pages() */
->   	BIO_CLONED,		/* doesn't own data */
->   	BIO_BOUNCED,		/* bio is a bounce bio */
+> @@ -330,7 +328,7 @@ static int bio_map_user_iov(struct request *rq, struct iov_iter *iter,
+>   		 * release the pages we didn't map into the bio, if any
+>   		 */
+>   		while (j < npages)
+> -			put_page(pages[j++]);
+> +			bio_release_page(bio, pages[j++]);
+>   		if (pages != stack_pages)
+>   			kvfree(pages);
+>   		/* couldn't stuff something into bio? */
 > 
 
