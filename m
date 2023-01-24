@@ -2,239 +2,301 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92463C54E94
-	for <linux-block@archiver.kernel.org>; Tue, 24 Jan 2023 19:05:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13472C25B50
+	for <linux-block@archiver.kernel.org>; Tue, 24 Jan 2023 19:24:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234443AbjAXTFr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 24 Jan 2023 14:05:47 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42460 "EHLO
+        id S233239AbjAXTYF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 24 Jan 2023 14:24:05 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56464 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234434AbjAXTFJ (ORCPT
+        with ESMTP id S229792AbjAXTYE (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 24 Jan 2023 14:05:09 -0500
-Received: from esa5.hgst.iphmx.com (esa5.hgst.iphmx.com [216.71.153.144])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2CFC34FCFD;
-        Tue, 24 Jan 2023 11:04:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1674587052; x=1706123052;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=OOqiYKfmWDTAp+2e6ZBSGTgyOhzF068SxglszHxUP28=;
-  b=DbQCLA43W7uZiC23d6ii0Y7/wfZEFnF7BqGYLNf2d+bH2euuRofTjk5X
-   jKZU3QQQ8uIGMNCvW6S7+nLuhqbhDSyDN+drPlyA1tQ9NABFlUmCwn5ep
-   kk3XrtG4PGtiGBxM3HtgTbL9xjeHamXqlfM99N9S/UouaC451nuUCtzy7
-   kkgWYF0Ufe8bA/z9wYO+yQzUuobCtzgoI1wGP1KqzMln1VqsSbSCRXjp1
-   JjrE3jBNV6uc1tLfIoOfT/XtBAa5G01qbQx7gCWJIQQ6AkC7lTdSLS1Jy
-   AzPIGY+r/6rtNTFe6gEGbDuz2Dx91n47gBHgCiGiP4qH6HJB04svflogi
-   w==;
-X-IronPort-AV: E=Sophos;i="5.97,243,1669046400"; 
-   d="scan'208";a="221472992"
-Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 25 Jan 2023 03:04:11 +0800
-IronPort-SDR: xR9iu7IKWzhmLgsT9J72gZcikp0axPQQH4kDGrMikRIqGtT1T0O5eRoJU3ZtIYmd3kdp7b9he7
- mBnCwOx2O+SdRhHfkOSBABpyTSTUVYUFNz/FHc6lQDvDi+2lRpE2qlK2lAtbOOym02l6oxIadO
- IX3tf+gSB3alA2IQq910UBprfGwL1QCd4npDy1nJtnuKUdvIoewn7aiIfC4V/IulMYM9qfVBI8
- Kck0u6qPIRwSvb9bLXzdiB8NxDFc/spvEt0gbNEvZ6s2juWJrPQxJDCgIM4dW0XnhQ4umRU5fK
- Upc=
-Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 24 Jan 2023 10:16:00 -0800
-IronPort-SDR: yvox5jcHKJanTm6+tqUTC5eJy6q85LJ2+66/Lv7Twnq4g5JuwnTiKLtmgSMQ/Ds14KgfO+x5kU
- NEEueRAcxYamWS3JJf/z10bawlgkHMmXRRzhgzdWwJHGSf+l7RekM813Zofc2XmigmgTT1401T
- TEm+/ivBrNW7GbIT5PKAZRMDZ0kkXea3bAOrYXGaROrG4wXxBKdQ2mbMJrA/OlVlSZukJQkcNr
- Ul4CbI9iSQ0vxJP+hrX50mRw/0HG2+upeh2YueMZQ6FUHF2TKDxVhpw0YPH7DRD+dwMhCSJt7n
- jU8=
-WDCIronportException: Internal
-Received: from unknown (HELO x1-carbon.lan) ([10.225.164.48])
-  by uls-op-cesaip02.wdc.com with ESMTP; 24 Jan 2023 11:04:09 -0800
-From:   Niklas Cassel <niklas.cassel@wdc.com>
-To:     linux-kernel@vger.kernel.org
-Cc:     Christoph Hellwig <hch@lst.de>, Hannes Reinecke <hare@suse.de>,
-        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-        linux-scsi@vger.kernel.org, linux-ide@vger.kernel.org,
-        linux-block@vger.kernel.org, Niklas Cassel <niklas.cassel@wdc.com>
-Subject: [PATCH v3 18/18] Documentation: sysfs-block-device: document command duration limits
-Date:   Tue, 24 Jan 2023 20:03:04 +0100
-Message-Id: <20230124190308.127318-19-niklas.cassel@wdc.com>
-X-Mailer: git-send-email 2.39.1
-In-Reply-To: <20230124190308.127318-1-niklas.cassel@wdc.com>
-References: <20230124190308.127318-1-niklas.cassel@wdc.com>
+        Tue, 24 Jan 2023 14:24:04 -0500
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2047.outbound.protection.outlook.com [40.107.243.47])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 247534955F;
+        Tue, 24 Jan 2023 11:24:02 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=WwjqJlJWoAONN85MtJpr7Mk+gLnBhgFqOLvzZk2+KPak3aq4bdyspAzcz9O+fuNH86s33iGy+SiwADxQBNCQkt3JbGnNJANQskrdwFBOxmead8TbD9cTvcbenkeVbA6Z1vzTB7/6XsLIcC5WHjig0ZGyur4fwyhLAgHBRtCX3HhUb/YpLZuy1dn3GCr5/HClApna4FmataDuwFuEXXI6X9j716bkMJnA3iXCCf2YcCTox/UZwWCXcXc04OsshFxXFSvdUThaUfBdrHXcXG1ou5LpLAxxaeon46gWbAAIH0VZ55hL++OrlPFx8ptBuW9O9bVfSB6iev89WPIhLFVg5A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=8QuvB1oM4EJJ+ZuvjgfLIqaq1Vt9v2caYSIMwBGvw9I=;
+ b=jOOlCJce0+MVgvhxPx2aMHmlVWCki65f1XlHhkKEUU6d4jMLiEie/s08k+SZAj+1yq6pAJVtIvxghbDN/jN9YyM99q7F/5mJFCgkUgSM7SdBBxq47CYtUaD2bIvhgQt+BFJ+/67NFJwY8jknii2WCNoQuTJB7KATHM8mFVtxjSKnp7djMYyBRJhLvuzROc5Kr1tUZNykuboeC8Pl403oFZkCFxlF5hxTIGlMQS+eLDKpnxR6RDNrC3pnSx5QHCMWh149aec+nZZw/5qR5yRaFLP5azgqV8qVsS856+Q/IOXMZ4I7mM2CWS4DJN8hVLnEKO9fofiRvWpVttvBDWcbvw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.160) smtp.rcpttodomain=redhat.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=8QuvB1oM4EJJ+ZuvjgfLIqaq1Vt9v2caYSIMwBGvw9I=;
+ b=lwYy7ctwyc8N7px2TrApMKSzOWNS8dAj3MbSx1Cv1riCpd97an+yNUxXX59azWTWqmOSoxL8rLT7173EGuMx22dMCZD46hch45xFg1M6Ua1noLvShL9TwscfqlD1oDeJP5huObyImaO+vG47juki7Y/wGzo/RF3VbvmwsrlzOerX5lMpLPDpfUeBtE9NHn1LVPrCSmSFWCLSuJTkweC/p1Hf2F5wpNqRP7XVlHVeJXfqyb4sZKLlTNk3hb1JCvgmbJOY89vVjC/1Qu4/a98bh2F3DMcaO+xBNVtZ+9cjCiiVVVtwfel5fzhJ0TWSDaABm4OAXVmUUhx5pxxglkVlDg==
+Received: from BN0PR04CA0146.namprd04.prod.outlook.com (2603:10b6:408:ed::31)
+ by DS7PR12MB6007.namprd12.prod.outlook.com (2603:10b6:8:7e::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6002.33; Tue, 24 Jan
+ 2023 19:24:01 +0000
+Received: from BN8NAM11FT099.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:408:ed:cafe::98) by BN0PR04CA0146.outlook.office365.com
+ (2603:10b6:408:ed::31) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6002.33 via Frontend
+ Transport; Tue, 24 Jan 2023 19:24:01 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ BN8NAM11FT099.mail.protection.outlook.com (10.13.177.197) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6002.13 via Frontend Transport; Tue, 24 Jan 2023 19:24:00 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.36; Tue, 24 Jan
+ 2023 11:23:47 -0800
+Received: from [10.110.48.28] (10.126.230.37) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.36; Tue, 24 Jan
+ 2023 11:23:46 -0800
+Message-ID: <0b649477-8e61-b330-aba5-eba4761a56d5@nvidia.com>
+Date:   Tue, 24 Jan 2023 11:23:45 -0800
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.6.1
+Subject: Re: [PATCH v9 1/8] iov_iter: Define flags to qualify page extraction.
+Content-Language: en-US
+To:     David Howells <dhowells@redhat.com>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Christoph Hellwig <hch@infradead.org>
+CC:     Matthew Wilcox <willy@infradead.org>, Jens Axboe <axboe@kernel.dk>,
+        "Jan Kara" <jack@suse.cz>, Jeff Layton <jlayton@kernel.org>,
+        David Hildenbrand <david@redhat.com>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Logan Gunthorpe <logang@deltatee.com>,
+        <linux-fsdevel@vger.kernel.org>, <linux-block@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
+References: <20230124170108.1070389-1-dhowells@redhat.com>
+ <20230124170108.1070389-2-dhowells@redhat.com>
+From:   John Hubbard <jhubbard@nvidia.com>
+In-Reply-To: <20230124170108.1070389-2-dhowells@redhat.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.126.230.37]
+X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BN8NAM11FT099:EE_|DS7PR12MB6007:EE_
+X-MS-Office365-Filtering-Correlation-Id: 9a7559f2-725f-43c3-9e1d-08dafe408c50
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: YFe2qDmQs/LDKPFIaY+ZeeguF6ZTXL71XPoe7K1Uc2RbS8l1NydHSABNl8W+3UnwyG/Vo6E5dKgSngWKx2YKdwFeLAO4NY5NJiU0VHNMNmqFQYKEFVVKQi8lJMqNAHIuzf6yMj/nhM9T9NKBNDOHKZc7VjBw7Z+RrrXs5Ksot+BbF5mZQlUVhQ5BcCwMBAr7y5yleoR3onUPQWF3At54nU2AxvTrbs5QNasCDH4ehLxWCLAP5FSkIRtJppGDGnWMNAf/OnhQTj4zt+HfBroSJxE3pasdI18L20afmk3dVIFML2eIMqO+H57Nl86BXWSwjOJ3aaSErWL18PaklV/njJfkAT93l+aj7MHOxezeyzF40XWBDeAg191Kcy7VTnIKi6dtRhXwD4RrwOEcIMHjlV7JHNOx9kb1/23jxlk5Os8QXkYpo7A3KROo6WsFRGlJe+STcbLW8pmqFcJF5VWPObHZj2njlGpZPoDr78nA/GpWyWXcdU2ZBTyVLZSLrUJBsR8HQS8QobUpzByFHVMoko0IsozHTGwaZQ+caSlXxir0PYkC2FmvUS36fY4XnLZgEOImt++YuyEkFIAU90TbHk1G7G+DFqv9h7O5QWnhpmcv/fedVCnZ331eEdQ42e/IZedCpMy+2pTzoG2XAZAHBMxlI1k4PYjFZN00XW8IFWPA9PIZmu/8I/sGMa7k4PI3y3e/wyqyDHKqsJU/YA+NCcb5gkXnoI9GtPhOSEzqRF0=
+X-Forefront-Antispam-Report: CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230025)(4636009)(346002)(376002)(396003)(39860400002)(136003)(451199018)(46966006)(40470700004)(36840700001)(2616005)(36756003)(2906002)(7416002)(356005)(5660300002)(7636003)(82740400003)(4326008)(82310400005)(41300700001)(83380400001)(36860700001)(31696002)(16576012)(86362001)(40460700003)(478600001)(31686004)(110136005)(40480700001)(53546011)(8676002)(26005)(186003)(70206006)(316002)(8936002)(54906003)(426003)(336012)(47076005)(70586007)(16526019)(43740500002);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Jan 2023 19:24:00.9771
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9a7559f2-725f-43c3-9e1d-08dafe408c50
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: BN8NAM11FT099.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB6007
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Damien Le Moal <damien.lemoal@opensource.wdc.com>
+On 1/24/23 09:01, David Howells wrote:
+> Define flags to qualify page extraction to pass into iov_iter_*_pages*()
+> rather than passing in FOLL_* flags.
+> 
+> For now only a flag to allow peer-to-peer DMA is supported.
+> 
+> Signed-off-by: David Howells <dhowells@redhat.com>
+> cc: Al Viro <viro@zeniv.linux.org.uk>
+> cc: Christoph Hellwig <hch@infradead.org>
+> cc: Jens Axboe <axboe@kernel.dk>
+> cc: Logan Gunthorpe <logang@deltatee.com>
+> cc: linux-fsdevel@vger.kernel.org
+> cc: linux-block@vger.kernel.org
+> ---
+> 
+> Notes:
+>      ver #9)
+>       - Change extract_flags to extraction_flags.
 
-Document ABI/testing/sysfs-block-device the sysfs attributes present
-under /sys/block/*/device/duration_limits for ATA and SCSI devices
-supporting the command duration limits feature.
+Reviewed-by: John Hubbard <jhubbard@nvidia.com>
 
-Signed-off-by: Damien Le Moal <damien.lemoal@opensource.wdc.com>
-Signed-off-by: Niklas Cassel <niklas.cassel@wdc.com>
----
- Documentation/ABI/testing/sysfs-block-device | 150 +++++++++++++++++++
- 1 file changed, 150 insertions(+)
-
-diff --git a/Documentation/ABI/testing/sysfs-block-device b/Documentation/ABI/testing/sysfs-block-device
-index 7ac7b19b2f72..3a32c86942f5 100644
---- a/Documentation/ABI/testing/sysfs-block-device
-+++ b/Documentation/ABI/testing/sysfs-block-device
-@@ -95,3 +95,153 @@ Description:
- 		This file does not exist if the HBA driver does not implement
- 		support for the SATA NCQ priority feature, regardless of the
- 		device support for this feature.
-+
-+
-+What:		/sys/block/*/device/duration_limits/enable
-+Date:		Dec, 2022
-+KernelVersion:	v6.3
-+Contact:	linux-scsi@vger.kernel.org
-+Description:
-+		(RW) For ATA and SCSI devices supporting the command duration
-+		limits feature, write to the file to turn on or off the
-+		feature. By default this feature is turned off. If the device
-+		does not support the command duration limits feature, this
-+		attribute does not exist (the directory
-+		"/sys/block/\*/device/duration_limits" does not exist).
-+		Writing "1" to this file enables the use of command duration
-+		limits for read and write commands in the kernel and turns on
-+		the feature on the device. Writing "0" disables the feature.
-+
-+
-+What:		/sys/block/*/device/duration_limits/read/[1-7]/*
-+Date:		Dec, 2022
-+KernelVersion:	v6.3
-+Contact:	linux-scsi@vger.kernel.org
-+Description:
-+		(RO) For ATA and SCSI devices supporting the command duration
-+		limits feature, this shows the set of 7 command duration limits
-+		descriptors for read commands currently set on the device. For
-+		each of the 7 descritors, the following read-only attributes
-+		are present:
-+
-+		  - duration_guideline: specifies the preferred length of time
-+		    in microseconds for the completion of a command.
-+
-+		  - duration_guideline_policy: specifies the policy action
-+		    taken if the duration_guideline attribute specifies a
-+		    non-zero command duration guideline that the device is
-+		    unable to achieve for a command.
-+
-+		    Possible values are:
-+
-+		      - 0x0: The device will complete the command at the
-+			earliest possible time consistent with the specified
-+			command duration guideline.
-+
-+		      - 0x1: If the specified command duration guideline has not
-+			been achieved and the command duration guideline policy
-+			field is not in the seventh command duration limits
-+			descriptor, then the device continues processing that
-+			command using the command duration limits descriptor
-+			that has the next higher number.
-+
-+		      - 0x2: The device will continue processing the command as
-+			with no command duration limits descriptor being used.
-+
-+		      - 0xD: The device will complete the command and an IO
-+			failure will be reported to the user with the ETIME
-+			error code.
-+
-+		      - 0xF: Same as 0xD.
-+
-+		  - max_active_time: specifies an upper limit in microseconds
-+		    on the time that elapses from the time at which the device
-+		    initiates actions to access, transfer, or act upon the
-+		    specified data until the time the device returns status for
-+		    the command.
-+
-+		  - max_active_time_policy: specifies the policy action taken
-+		    if the time used to process a command exceeds a non-zero
-+		    time specified by the max_active_time attribute.
-+
-+		    Possible values are:
-+
-+		      - 0x0: The device will complete the command at the
-+			earliest possible time (i.e, do nothing based on the max
-+			time limit not being met).
-+
-+		      - 0xD: The device will complete the command and an IO
-+			failure will be reported to the user with the ETIME
-+			error code.
-+
-+		      - 0xE: Same as 0xD.
-+
-+		      - 0xF: Same as 0xD.
-+
-+		  - max_inactive_time: specifies an upper limit in microseconds
-+		    on the time that elapses from the time at which the device
-+		    receives the command until the time at which the device
-+		    initiates actions to access, transfer, or act upon the
-+		    specified data.
-+
-+		  - max_inactive_time_policy: specifies the policy action taken
-+		    if a non-zero max_inactive_time limit is not met.
-+
-+		    Possible values are:
-+
-+		      - 0x0: The device will complete the command at the
-+			earliest possible time (i.e, do nothing based on the max
-+			time limit not being met).
-+
-+		      - 0xD: The device will complete the command and an IO
-+			failure will be reported to the user with the ETIME
-+			error code.
-+
-+		      - 0xF: Same as 0xD.
-+
-+
-+What:		/sys/block/*/device/duration_limits/read/page
-+Date:		Dec, 2022
-+KernelVersion:	v6.3
-+Contact:	linux-scsi@vger.kernel.org
-+Description:
-+		(RO) For ATA and SCSI devices supporting the command duration
-+		limits feature, this shows the name of the device VPD page
-+		specifying the set of 7 command duration limits descriptors for
-+		read commands. Possible values are "T2A" and "T2B".
-+
-+
-+What:		/sys/block/*/device/duration_limits/write/[1-7]/*
-+Date:		Dec, 2022
-+KernelVersion:	v6.3
-+Contact:	linux-scsi@vger.kernel.org
-+Description:
-+		(RO) For ATA and SCSI devices supporting the command duration
-+		limits feature, this shows the set of 7 command duration limits
-+		descriptors for write commands currently set on the device. For
-+		each of the 7 descritors, the same set of read-only attributes
-+		as for read commands is present.
-+
-+
-+What:		/sys/block/*/device/duration_limits/write/page
-+Date:		Dec, 2022
-+KernelVersion:	v6.3
-+Contact:	linux-scsi@vger.kernel.org
-+Description:
-+		(RO) For ATA and SCSI devices supporting the command duration
-+		limits feature, this shows the name of the device VPD page
-+		specifying the set of 7 command duration limits descriptors for
-+		write commands. Possible values are "T2A" and "T2B".
-+
-+
-+What:		/sys/block/*/device/duration_limits/perf_vs_duration_guideline
-+Date:		Dec, 2022
-+KernelVersion:	v6.3
-+Contact:	linux-scsi@vger.kernel.org
-+Description:
-+		(RO) For ATA and SCSI devices supporting the command duration
-+		limits feature, this specifies the maximum percentage increase
-+		in average command completion times (reduction in IOPS) that
-+		is allowed for the device to perform actions based on the
-+		contents of the duration guideline field in every command
-+		duration limit descriptor for both read and write commands.
+thanks,
 -- 
-2.39.1
+John Hubbard
+NVIDIA
+
+>      
+>      ver #7)
+>       - Don't use FOLL_* as a parameter, but rather define constants
+>         specifically to use with iov_iter_*_pages*().
+>       - Drop the I/O direction constants for now.
+> 
+>   block/bio.c         |  6 +++---
+>   block/blk-map.c     |  8 ++++----
+>   include/linux/uio.h |  7 +++++--
+>   lib/iov_iter.c      | 14 ++++++++------
+>   4 files changed, 20 insertions(+), 15 deletions(-)
+> 
+> diff --git a/block/bio.c b/block/bio.c
+> index ab59a491a883..683444e6b711 100644
+> --- a/block/bio.c
+> +++ b/block/bio.c
+> @@ -1249,7 +1249,7 @@ static int __bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
+>   	unsigned short entries_left = bio->bi_max_vecs - bio->bi_vcnt;
+>   	struct bio_vec *bv = bio->bi_io_vec + bio->bi_vcnt;
+>   	struct page **pages = (struct page **)bv;
+> -	unsigned int gup_flags = 0;
+> +	unsigned int extraction_flags = 0;
+>   	ssize_t size, left;
+>   	unsigned len, i = 0;
+>   	size_t offset, trim;
+> @@ -1264,7 +1264,7 @@ static int __bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
+>   	pages += entries_left * (PAGE_PTRS_PER_BVEC - 1);
+>   
+>   	if (bio->bi_bdev && blk_queue_pci_p2pdma(bio->bi_bdev->bd_disk->queue))
+> -		gup_flags |= FOLL_PCI_P2PDMA;
+> +		extraction_flags |= ITER_ALLOW_P2PDMA;
+>   
+>   	/*
+>   	 * Each segment in the iov is required to be a block size multiple.
+> @@ -1275,7 +1275,7 @@ static int __bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
+>   	 */
+>   	size = iov_iter_get_pages(iter, pages,
+>   				  UINT_MAX - bio->bi_iter.bi_size,
+> -				  nr_pages, &offset, gup_flags);
+> +				  nr_pages, &offset, extraction_flags);
+>   	if (unlikely(size <= 0))
+>   		return size ? size : -EFAULT;
+>   
+> diff --git a/block/blk-map.c b/block/blk-map.c
+> index 19940c978c73..7db52ad5b2d0 100644
+> --- a/block/blk-map.c
+> +++ b/block/blk-map.c
+> @@ -267,7 +267,7 @@ static int bio_map_user_iov(struct request *rq, struct iov_iter *iter,
+>   {
+>   	unsigned int max_sectors = queue_max_hw_sectors(rq->q);
+>   	unsigned int nr_vecs = iov_iter_npages(iter, BIO_MAX_VECS);
+> -	unsigned int gup_flags = 0;
+> +	unsigned int extraction_flags = 0;
+>   	struct bio *bio;
+>   	int ret;
+>   	int j;
+> @@ -280,7 +280,7 @@ static int bio_map_user_iov(struct request *rq, struct iov_iter *iter,
+>   		return -ENOMEM;
+>   
+>   	if (blk_queue_pci_p2pdma(rq->q))
+> -		gup_flags |= FOLL_PCI_P2PDMA;
+> +		extraction_flags |= ITER_ALLOW_P2PDMA;
+>   
+>   	while (iov_iter_count(iter)) {
+>   		struct page **pages, *stack_pages[UIO_FASTIOV];
+> @@ -291,10 +291,10 @@ static int bio_map_user_iov(struct request *rq, struct iov_iter *iter,
+>   		if (nr_vecs <= ARRAY_SIZE(stack_pages)) {
+>   			pages = stack_pages;
+>   			bytes = iov_iter_get_pages(iter, pages, LONG_MAX,
+> -						   nr_vecs, &offs, gup_flags);
+> +						   nr_vecs, &offs, extraction_flags);
+>   		} else {
+>   			bytes = iov_iter_get_pages_alloc(iter, &pages,
+> -						LONG_MAX, &offs, gup_flags);
+> +						LONG_MAX, &offs, extraction_flags);
+>   		}
+>   		if (unlikely(bytes <= 0)) {
+>   			ret = bytes ? bytes : -EFAULT;
+> diff --git a/include/linux/uio.h b/include/linux/uio.h
+> index 9f158238edba..58fda77f6847 100644
+> --- a/include/linux/uio.h
+> +++ b/include/linux/uio.h
+> @@ -252,12 +252,12 @@ void iov_iter_xarray(struct iov_iter *i, unsigned int direction, struct xarray *
+>   		     loff_t start, size_t count);
+>   ssize_t iov_iter_get_pages(struct iov_iter *i, struct page **pages,
+>   		size_t maxsize, unsigned maxpages, size_t *start,
+> -		unsigned gup_flags);
+> +		unsigned extraction_flags);
+>   ssize_t iov_iter_get_pages2(struct iov_iter *i, struct page **pages,
+>   			size_t maxsize, unsigned maxpages, size_t *start);
+>   ssize_t iov_iter_get_pages_alloc(struct iov_iter *i,
+>   		struct page ***pages, size_t maxsize, size_t *start,
+> -		unsigned gup_flags);
+> +		unsigned extraction_flags);
+>   ssize_t iov_iter_get_pages_alloc2(struct iov_iter *i, struct page ***pages,
+>   			size_t maxsize, size_t *start);
+>   int iov_iter_npages(const struct iov_iter *i, int maxpages);
+> @@ -360,4 +360,7 @@ static inline void iov_iter_ubuf(struct iov_iter *i, unsigned int direction,
+>   	};
+>   }
+>   
+> +/* Flags for iov_iter_get/extract_pages*() */
+> +#define ITER_ALLOW_P2PDMA	0x01	/* Allow P2PDMA on the extracted pages */
+> +
+>   #endif
+> diff --git a/lib/iov_iter.c b/lib/iov_iter.c
+> index f9a3ff37ecd1..da7db39075c6 100644
+> --- a/lib/iov_iter.c
+> +++ b/lib/iov_iter.c
+> @@ -1432,9 +1432,9 @@ static struct page *first_bvec_segment(const struct iov_iter *i,
+>   static ssize_t __iov_iter_get_pages_alloc(struct iov_iter *i,
+>   		   struct page ***pages, size_t maxsize,
+>   		   unsigned int maxpages, size_t *start,
+> -		   unsigned int gup_flags)
+> +		   unsigned int extraction_flags)
+>   {
+> -	unsigned int n;
+> +	unsigned int n, gup_flags = 0;
+>   
+>   	if (maxsize > i->count)
+>   		maxsize = i->count;
+> @@ -1442,6 +1442,8 @@ static ssize_t __iov_iter_get_pages_alloc(struct iov_iter *i,
+>   		return 0;
+>   	if (maxsize > MAX_RW_COUNT)
+>   		maxsize = MAX_RW_COUNT;
+> +	if (extraction_flags & ITER_ALLOW_P2PDMA)
+> +		gup_flags |= FOLL_PCI_P2PDMA;
+>   
+>   	if (likely(user_backed_iter(i))) {
+>   		unsigned long addr;
+> @@ -1495,14 +1497,14 @@ static ssize_t __iov_iter_get_pages_alloc(struct iov_iter *i,
+>   
+>   ssize_t iov_iter_get_pages(struct iov_iter *i,
+>   		   struct page **pages, size_t maxsize, unsigned maxpages,
+> -		   size_t *start, unsigned gup_flags)
+> +		   size_t *start, unsigned extraction_flags)
+>   {
+>   	if (!maxpages)
+>   		return 0;
+>   	BUG_ON(!pages);
+>   
+>   	return __iov_iter_get_pages_alloc(i, &pages, maxsize, maxpages,
+> -					  start, gup_flags);
+> +					  start, extraction_flags);
+>   }
+>   EXPORT_SYMBOL_GPL(iov_iter_get_pages);
+>   
+> @@ -1515,14 +1517,14 @@ EXPORT_SYMBOL(iov_iter_get_pages2);
+>   
+>   ssize_t iov_iter_get_pages_alloc(struct iov_iter *i,
+>   		   struct page ***pages, size_t maxsize,
+> -		   size_t *start, unsigned gup_flags)
+> +		   size_t *start, unsigned extraction_flags)
+>   {
+>   	ssize_t len;
+>   
+>   	*pages = NULL;
+>   
+>   	len = __iov_iter_get_pages_alloc(i, pages, maxsize, ~0U, start,
+> -					 gup_flags);
+> +					 extraction_flags);
+>   	if (len <= 0) {
+>   		kvfree(*pages);
+>   		*pages = NULL;
+> 
 
