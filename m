@@ -2,113 +2,126 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20DADC38142
-	for <linux-block@archiver.kernel.org>; Tue, 24 Jan 2023 16:47:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13478C25B4E
+	for <linux-block@archiver.kernel.org>; Tue, 24 Jan 2023 16:59:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233979AbjAXQrm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 24 Jan 2023 11:47:42 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52922 "EHLO
+        id S234143AbjAXQ7X (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 24 Jan 2023 11:59:23 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60462 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229792AbjAXQrl (ORCPT
+        with ESMTP id S233259AbjAXQ7W (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 24 Jan 2023 11:47:41 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 82D1B10E
-        for <linux-block@vger.kernel.org>; Tue, 24 Jan 2023 08:46:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1674578817;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=AzVI7y/XknPI0cUXSqe1BbmcfE0qXgoZKVccnfEMNGg=;
-        b=GvuWkzkJLVSWTkcj9no1ip6641SEaDeZ7ttLVc4Cb9WiI5EsXju15q2n9KLgMOdvg3egdX
-        uR8XK2T4TmxZB97k2LFT04NuHoa4A64IAkp8oVBfAEj9i0E8hWC1gJYqGPbxGHNU/ucJjn
-        QgOqTStvjVWS3mykUcXHD63dRINdsGI=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-47-gt5kHH14MPuP_yQ0PWNQBA-1; Tue, 24 Jan 2023 11:46:56 -0500
-X-MC-Unique: gt5kHH14MPuP_yQ0PWNQBA-1
-Received: by mail-wm1-f69.google.com with SMTP id l19-20020a05600c1d1300b003dc13fc9e42so1111202wms.3
-        for <linux-block@vger.kernel.org>; Tue, 24 Jan 2023 08:46:55 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:organization:from:references
-         :cc:to:content-language:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=AzVI7y/XknPI0cUXSqe1BbmcfE0qXgoZKVccnfEMNGg=;
-        b=YAlnWXY87krzoUbUa9L4cjA7+It5upLhT96qFDDULz3tbcnFueUQT+asuwAfDkUu7t
-         lf9/lVRbeqDyOz3paqdtAGvwnZweGheaDghbdw+63iS/Bk/Kv5SCMDtKl/BEL0CfNN13
-         1F9ItEZHSTMVhkoixjhXWqDZQASHU7/1DhSgKc+sQoD2xGAwuuX8csHTxku6AGoKOkbE
-         tMn5mcTP0plo53Ivr80AZTjFsQ51TKmwfpYaiunN3iT3LAblURZps85xlpi2IQheqvS9
-         R4PqCwF1+GS8eUKj+FhePl+lti26z/XUuTda/hFBGKNdbQ9B/JTf9Qui8SKuUSijaPC0
-         OXFw==
-X-Gm-Message-State: AFqh2ko7fnbOMdbgWvvKXKkLsSAUJ2l1snuMa9U3kJ9HYH+9TCrYbqqf
-        2gTISbKyqtP+O63yRBZPLx3C2KR5Zqa544WPS1fJsrLB1WRZl4/9y/6AIDH8HEhF4k01FfxbP0d
-        Jk+sO0dnQnAWeVb+8kaTZ1aM=
-X-Received: by 2002:a05:600c:11:b0:3db:162f:3551 with SMTP id g17-20020a05600c001100b003db162f3551mr24694576wmc.21.1674578814951;
-        Tue, 24 Jan 2023 08:46:54 -0800 (PST)
-X-Google-Smtp-Source: AMrXdXsuq8kMWZJOxuD81FxqWA2x0JPKsdYTiKSGjyZW4md/Vl44YCClZdGliDY2lYz6DFu4PeNHYA==
-X-Received: by 2002:a05:600c:11:b0:3db:162f:3551 with SMTP id g17-20020a05600c001100b003db162f3551mr24694561wmc.21.1674578814690;
-        Tue, 24 Jan 2023 08:46:54 -0800 (PST)
-Received: from ?IPV6:2003:cb:c707:9d00:9303:90ce:6dcb:2bc9? (p200300cbc7079d00930390ce6dcb2bc9.dip0.t-ipconnect.de. [2003:cb:c707:9d00:9303:90ce:6dcb:2bc9])
-        by smtp.gmail.com with ESMTPSA id d4-20020a05600c3ac400b003daf7721bb3sm13735123wms.12.2023.01.24.08.46.53
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 24 Jan 2023 08:46:54 -0800 (PST)
-Message-ID: <2172496c-2cd2-a2c8-9ddb-cd7d56bcfc75@redhat.com>
-Date:   Tue, 24 Jan 2023 17:46:53 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.0
-Subject: Re: [PATCH v8 07/10] block: Switch to pinning pages.
-Content-Language: en-US
-To:     Christoph Hellwig <hch@infradead.org>,
-        David Howells <dhowells@redhat.com>
-Cc:     Al Viro <viro@zeniv.linux.org.uk>,
+        Tue, 24 Jan 2023 11:59:22 -0500
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EBA1145BC1;
+        Tue, 24 Jan 2023 08:59:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=q20iUbFBo/EcilBlEOdYiKbbeE+E9KmIcH2y2ndCPzk=; b=LyEZb98S6B9XMIA36VIxeHHP10
+        CgK2aWuT4/E+GXo1cKuqntP1JpAv1b9g34KBlFRM2yvTpFsyYkjcBFEQED6r7RqnBEGZItbuiOTjB
+        CULh2BtVvwMGEYtPLK2d4sPM+0dGz1hxSG3dC7vm60GOVvXfvnebeUJelkYqEl94Ifcam5USBN+9G
+        LAejGHvl9T+qx/6TR8r3lbuW9Jmkpj1t7tYEadZRYpqmbxSvY1MaeJZeuOYp1vKJq2a+uYurbo0w7
+        /tDZGOdLxq15qt8QRHRtIP2Dp4REGGz+Mhw4Ok5Ad2EwwumdBlXwVJXHZfOkejeV4WZ9LJ10ol5KG
+        A5t+q5OQ==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1pKMdd-004kcJ-Tw; Tue, 24 Jan 2023 16:59:13 +0000
+Date:   Tue, 24 Jan 2023 08:59:13 -0800
+From:   Christoph Hellwig <hch@infradead.org>
+To:     David Howells <dhowells@redhat.com>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        David Hildenbrand <david@redhat.com>,
+        Al Viro <viro@zeniv.linux.org.uk>,
         Matthew Wilcox <willy@infradead.org>,
         Jens Axboe <axboe@kernel.dk>, Jan Kara <jack@suse.cz>,
         Jeff Layton <jlayton@kernel.org>,
         Logan Gunthorpe <logang@deltatee.com>,
         linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org, Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH v8 07/10] block: Switch to pinning pages.
+Message-ID: <Y9AOYXpU1cRAHfQz@infradead.org>
 References: <Y8/xApRVtqK7IlYT@infradead.org>
  <2431ffa0-4a37-56a2-17fa-74a5f681bcb8@redhat.com>
  <20230123173007.325544-1-dhowells@redhat.com>
  <20230123173007.325544-8-dhowells@redhat.com>
  <874829.1674571671@warthog.procyon.org.uk>
- <875433.1674572633@warthog.procyon.org.uk> <Y9AK+yW7mZ2SNMcj@infradead.org>
-From:   David Hildenbrand <david@redhat.com>
-Organization: Red Hat
+ <875433.1674572633@warthog.procyon.org.uk>
+ <Y9AK+yW7mZ2SNMcj@infradead.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 In-Reply-To: <Y9AK+yW7mZ2SNMcj@infradead.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 24.01.23 17:44, Christoph Hellwig wrote:
-> On Tue, Jan 24, 2023 at 03:03:53PM +0000, David Howells wrote:
->> Christoph Hellwig <hch@infradead.org> wrote:
->>
->>> It can't.  Per your latest branch:
->>
->> Yes it can.  Patch 6:
-> 
-> This never involves the cleanup mode as input.  And as I pointed out
-> in the other mail, there is no need for the FOLL_ flags on the
-> cleanup side.  You can just check the bio flag in bio_release_apges
-> and call either put_page or unpin_user_page on that.  The direct
-> callers of bio_release_page never mix them pin and get cases anyway.
-> Let me find some time to code this up if it's easier to understand
-> that way.
+This is the incremental patch.  Doesn't do the FOLL_PIN to bool
+conversion for the extra helper yet, and needs to be folded into the
+original patches still.
 
-In case this series gets resend (which I assume), it would be great to 
-CC linux-mm on the whole thing.
 
--- 
-Thanks,
-
-David / dhildenb
-
+diff --git a/block/bio.c b/block/bio.c
+index 6dc54bf3ed27d4..bd8433f3644fd7 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -1170,14 +1170,20 @@ bool bio_add_folio(struct bio *bio, struct folio *folio, size_t len,
+ 
+ void __bio_release_pages(struct bio *bio, bool mark_dirty)
+ {
+-	unsigned int gup_flags = bio_to_gup_flags(bio);
++	bool pinned = bio_flagged(bio, BIO_PAGE_PINNED);
++	bool reffed = bio_flagged(bio, BIO_PAGE_REFFED);
+ 	struct bvec_iter_all iter_all;
+ 	struct bio_vec *bvec;
+ 
+ 	bio_for_each_segment_all(bvec, bio, iter_all) {
+ 		if (mark_dirty && !PageCompound(bvec->bv_page))
+ 			set_page_dirty_lock(bvec->bv_page);
+-		page_put_unpin(bvec->bv_page, gup_flags);
++
++		if (pinned)
++			unpin_user_page(bvec->bv_page);
++		/* this can go away once direct-io.c is converted: */
++		else if (reffed)
++			put_page(bvec->bv_page);
+ 	}
+ }
+ EXPORT_SYMBOL_GPL(__bio_release_pages);
+diff --git a/block/blk.h b/block/blk.h
+index 294044d696e09f..a16d4425d2751c 100644
+--- a/block/blk.h
++++ b/block/blk.h
+@@ -430,27 +430,19 @@ int bio_add_hw_page(struct request_queue *q, struct bio *bio,
+  */
+ static inline void bio_set_cleanup_mode(struct bio *bio, struct iov_iter *iter)
+ {
+-	unsigned int cleanup_mode = iov_iter_extract_mode(iter);
+-
+-	if (cleanup_mode & FOLL_GET)
+-		bio_set_flag(bio, BIO_PAGE_REFFED);
+-	if (cleanup_mode & FOLL_PIN)
++	if (iov_iter_extract_mode(iter) & FOLL_PIN)
+ 		bio_set_flag(bio, BIO_PAGE_PINNED);
+ }
+ 
+-static inline unsigned int bio_to_gup_flags(struct bio *bio)
+-{
+-	return (bio_flagged(bio, BIO_PAGE_REFFED) ? FOLL_GET : 0) |
+-		(bio_flagged(bio, BIO_PAGE_PINNED) ? FOLL_PIN : 0);
+-}
+-
+ /*
+  * Clean up a page appropriately, where the page may be pinned, may have a
+  * ref taken on it or neither.
+  */
+ static inline void bio_release_page(struct bio *bio, struct page *page)
+ {
+-	page_put_unpin(page, bio_to_gup_flags(bio));
++	WARN_ON_ONCE(bio_flagged(bio, BIO_PAGE_REFFED));
++	if (bio_flagged(bio, BIO_PAGE_PINNED))
++		unpin_user_page(page);
+ }
+ 
+ struct request_queue *blk_alloc_queue(int node_id);
