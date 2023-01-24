@@ -2,400 +2,153 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3CEAC25B4E
-	for <linux-block@archiver.kernel.org>; Tue, 24 Jan 2023 06:58:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B7D1C38142
+	for <linux-block@archiver.kernel.org>; Tue, 24 Jan 2023 07:03:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233376AbjAXG63 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 24 Jan 2023 01:58:29 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39560 "EHLO
+        id S231228AbjAXHDZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 24 Jan 2023 02:03:25 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40816 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229838AbjAXG62 (ORCPT
+        with ESMTP id S229838AbjAXHDZ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 24 Jan 2023 01:58:28 -0500
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C97B5FEB;
-        Mon, 23 Jan 2023 22:58:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
-        :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=IVaDrIGiKzmkyl+zwYHyR8Gy6nUd7iSVXthSCEYFTwE=; b=0IwaKLGSqbmnYEa21AamRuVu6e
-        PmIfWkVBZhj5UQgT2dfSe7i0hfbQ1oeJ5wD45Ml2isFLM17CaT3swNxTdifBKYbzK4lBxxi9KwtsW
-        Xj5T1pYX89Whfkar1P3RXN4AAP9NQicvIHwWv7xJhfF93ivCeH9XTCUuRyB0IjnKUAl5dX5tuOJjP
-        I8U1bPCr8mux8pxhSmTxsIbnLWOTE9/3zBgQHWOob6AEN4mN//OmxXgauYyMxUiSed9ouAy82tT6I
-        7lqaAk6oGc3/UJGzj0HA3aaOTSbpNVwa1uT6BTGBdg++hg5uT9doemM7UebTvlmLYwK49zhx4+5iU
-        t4g7QOrw==;
-Received: from [2001:4bb8:19a:27af:ea4c:1aa8:8f64:2866] (helo=localhost)
-        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1pKDG3-002aXT-Kf; Tue, 24 Jan 2023 06:58:16 +0000
-From:   Christoph Hellwig <hch@lst.de>
-To:     Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
-        Josef Bacik <josef@toxicpanda.com>
-Cc:     linux-block@vger.kernel.org, cgroups@vger.kernel.org,
-        Andreas Herrmann <aherrmann@suse.de>
-Subject: [PATCH 15/15] blk-cgroup: move the cgroup information to struct gendisk
-Date:   Tue, 24 Jan 2023 07:57:15 +0100
-Message-Id: <20230124065716.152286-16-hch@lst.de>
-X-Mailer: git-send-email 2.39.0
-In-Reply-To: <20230124065716.152286-1-hch@lst.de>
-References: <20230124065716.152286-1-hch@lst.de>
+        Tue, 24 Jan 2023 02:03:25 -0500
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2049.outbound.protection.outlook.com [40.107.92.49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49D1F6A5D;
+        Mon, 23 Jan 2023 23:03:24 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=TXPw8sHAcLUzE2Y87WiiFRAUSoPGdQTyfJRKGMZI+7sDe/6wlJore/ZWsWGJfyj+YIqMhbjXgBEtJhAMLJ8AaIsWXM8ik3EJFNPGTXNfNKcxhVHsGJqnEQYwADsWynALE+5sikJFJJNWcmmCR06INwYXAOs2X+JnZZeGMgUF2yj8uI2TFpkXy/xjN0/spjIWoWWzJ+EomcNKI2fDQww0b0lA3dQJ45JDHWu7nn6uYmksxyk9vvh/hhL0TCiSBe1ckz4dJm5yvEpdNDUeTh+XnzOnHZEjgM+H3/SIyK+3HJ6OEXWFs7fO6w5El4EQM4GU+rP00zbqSfxTaukZLmzTug==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=zgw/2xD3fYp3lJKof6egbcJZ3mppftq/lFdh98nAVNQ=;
+ b=W/nZxFfdRYL4XifpNewknnyiniOe+JbaNCcseBfF898oIv0BOPz0eiuNHblPakLmB3uoEzAwFLxD/51C4+VVh+Em8B3feHhVS0LZfCEmno1KVkAzTU0PVez3Kd7PryBAxmkdp/Bk31giEtEpbzS1yuSTigipmWWhdW4KleJVWsAKGmqyYs8gldPYgtEg5YD4x+0sDO9/l7ahYHB1xwAo8U/osQsujBOdulizORT8309VW1qkWbXiPXxz3a/l20JxnUFN+bX7lYPp9mUYmsykZACNDpkME1BXyLmz/0vk2LUV8MuSRQgucKFqtzPxcPXwRL6qzppJcBjAYRo3PE/hGQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=zgw/2xD3fYp3lJKof6egbcJZ3mppftq/lFdh98nAVNQ=;
+ b=YQw8wjJP0U82m3m1uevFF++pLXZ6dYpQ1wNmetlfusoKtgwvFK56uaz3zEakGTYTqHGKEKHMiRAsUqPqo4ktaASGu7jycWPxb8jFwgfON1eOBgq9ZZJ7wDOII1pUcXCtxLK67VALsfBDASgBfTQaCbXBwBids6N+QbiXlnDK0iBoFWpbMX6rmxnqS5SBhhCWAFSSzkXrm4YmxtP+bS5pKwBWLHgiSIVu/Ai4Fsd5c1+DA2XpEozKYTSw3dbVbPOg8oMB5eoHLC4y2ihRPBy+a8wCWLADjmU6pl5TmXNBkRSSIE+qLBXJ7RdZ4dY8gJ3psKSAkR3D/bNFoOhQTJd51w==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from BY5PR12MB4130.namprd12.prod.outlook.com (2603:10b6:a03:20b::16)
+ by IA1PR12MB7568.namprd12.prod.outlook.com (2603:10b6:208:42c::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6002.33; Tue, 24 Jan
+ 2023 07:03:22 +0000
+Received: from BY5PR12MB4130.namprd12.prod.outlook.com
+ ([fe80::7895:c4d1:27d2:5b0a]) by BY5PR12MB4130.namprd12.prod.outlook.com
+ ([fe80::7895:c4d1:27d2:5b0a%9]) with mapi id 15.20.6002.033; Tue, 24 Jan 2023
+ 07:03:22 +0000
+Message-ID: <f2a2ec3a-d4ef-985c-2324-736fb863575a@nvidia.com>
+Date:   Mon, 23 Jan 2023 23:03:20 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.6.1
+Subject: Re: [PATCH v8 04/10] iomap: don't get an reference on ZERO_PAGE for
+ direct I/O block zeroing
+Content-Language: en-US
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     David Howells <dhowells@redhat.com>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Matthew Wilcox <willy@infradead.org>,
+        Jens Axboe <axboe@kernel.dk>, Jan Kara <jack@suse.cz>,
+        Jeff Layton <jlayton@kernel.org>,
+        Logan Gunthorpe <logang@deltatee.com>,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Christoph Hellwig <hch@lst.de>
+References: <20230123173007.325544-1-dhowells@redhat.com>
+ <20230123173007.325544-5-dhowells@redhat.com>
+ <eb1f8849-f0d8-9d3d-d80d-7fe8487a15f4@nvidia.com>
+ <Y89zypNE5z7rgdtX@infradead.org>
+From:   John Hubbard <jhubbard@nvidia.com>
+In-Reply-To: <Y89zypNE5z7rgdtX@infradead.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: BY5PR03CA0026.namprd03.prod.outlook.com
+ (2603:10b6:a03:1e0::36) To BY5PR12MB4130.namprd12.prod.outlook.com
+ (2603:10b6:a03:20b::16)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BY5PR12MB4130:EE_|IA1PR12MB7568:EE_
+X-MS-Office365-Filtering-Correlation-Id: 8b4f1a7e-af44-4bc7-5666-08dafdd91494
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 65kiD5qnrruIbY1bMBdyJUmMrKUPfLjZqBtHgaYxnjgO29FvWszdw0kFWSZH1FiAhsU4Z+g+iWa9F9Q4YIg1a2ix3iJGDvIX9f23tpm9JvN8YL+PxxDMXI5+Jbov1/fx7RnPVaPXzXlg2734RugOGZZ8TYbhvDXKChXUhSGggi5BjA48w21YW7jhJalTZCvvVcV42TG/Y2xbwqpBUfKvlQfuDfVSrYOW/yoAwVgOxgZT4X1tnTHlaJ4epxlJlltaGVJOTyglwc3uCV4+EN+cAoZgU5VrWxRRDwIBbtjWiw8UAgqVZLm+lOt7ce510WiaJGu0jXyv1dWsDO/66wuQGbih5zQx5kcfZeVRuDWT/Kzmn8nsdwCZkRtmfrFQTgqU7PL1B8tfc1Loz3p9so/3LYwZIZa9+AOvMujEH+R4u1c9Edu2XJMV68QeiTEtGLIg7kwXm31YPdUdstF8tBvGWm2aT0c7raiVqWXLuFBzR6OM9g2fk6N/A0/QxTaYDRqBKvcV6SBqoeQgpIpbIXVK7DwBPDFy4gbFucKadKDEHTyeKcODLx8KIwIK/QjN77Cs+Brm6PLJooGBzOYYvIThlnkYFGloSK8TG1Nbg7fVQoKI65OB67NIbv21wNjr0Xu4m0GOvTrIJJuo/5V8ZbsUOiUlIY4wBH5vpf9Klaex9CPqYNp/3lRy3zgNxELuPxxZOQzgHZpEtjm5nPJ8vhQfJqKzmmpEjnSVP0PAWrxBGVc=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BY5PR12MB4130.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(136003)(39860400002)(366004)(396003)(346002)(376002)(451199015)(38100700002)(36756003)(31696002)(86362001)(316002)(478600001)(54906003)(66946007)(66556008)(8676002)(6916009)(4326008)(66476007)(6486002)(2616005)(31686004)(2906002)(6506007)(53546011)(8936002)(186003)(26005)(41300700001)(4744005)(7416002)(6512007)(5660300002)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?aVJXS1Jnd0I1MFNBOXljSngwKzZHby9nR2hRNDlhQUxLVG9GWG5OLzRKaEJq?=
+ =?utf-8?B?WS83dUNlYzI1bFlKWDNrbTVCMDZiWE9BOU5ubVJOZVUxUTdYVzBXblF2TkRj?=
+ =?utf-8?B?L3d1a1l2NC9kNVk5YnUxVmwzZmNhOWdaZ0w5OUpVcjNPMGthNUpGdDNFbFVW?=
+ =?utf-8?B?dy84Q29YdWppTVRxemozTEp6VkloaEhYV2ZDY3FPNlFuNUI0bFU3MnF3U291?=
+ =?utf-8?B?RnRjeWNpS0c3YzJ1ZERUYjN0NFRrNmhYY2NONWIxZUxkTS8wNzBWWnQyeU1C?=
+ =?utf-8?B?L081NnJ6MzBVQVJVTFBHS2ZjZGVHNlJmakRoOGZXU25NZDJScGxWQzJJVlV5?=
+ =?utf-8?B?NW15b0I3RGpZU3RVMURPOVhYTGhGa1hVV3lFaDZLOURRV3ZnRVJyWU1vb09U?=
+ =?utf-8?B?NG9zUVY3T1ZjL3hVaFdpeGU4T014aEpjR0I5RWxub2taSmRTTmlHSVZpeVg3?=
+ =?utf-8?B?S1JZOUY4THF6U1ArNmNZajBNa25xSDlQQm52KzNKbkhpbmNGeDNmMHhkaGZP?=
+ =?utf-8?B?dTAvWUJUTjZIU09lMmZnM2lWaFpZamhtMkpIMXdlUkJGc0wwRlFZREpvcEpp?=
+ =?utf-8?B?QUs2ajdoc1hLQkh3cUdkTTllVEJabXZMQ0RFb2FiR2U2QWE5VG50MWloQ1M4?=
+ =?utf-8?B?eWRLTkE4UU5mcnZwbGhHRjZvWjZLRXVPZGtEUzB5MUk0VTVBL28zaWQ4M1Jj?=
+ =?utf-8?B?eThTczk1clJqeXJjR3JnWHo5S3dTNTZXMURJYUZESlRDSVhjcFpRcTA4cTF2?=
+ =?utf-8?B?a1BoMURnZU9JaTNPTTgwTktRT1NpWnMycStPQmhvNmdxUWtpbVFuM0dHQmpq?=
+ =?utf-8?B?OVNnS1F5ekFJZlQ4WHVkTmZxM0VvZUdmZWVMK0xGTnZ3N3liN0VwVGtTV2Jl?=
+ =?utf-8?B?eVA3Z0E4bW1DUjZ0S2lzdjlCaytaQzJCSEF2OUlwUXJDV3ptWUFoeGc1MkhU?=
+ =?utf-8?B?ODdHd2htVFJkd0ZUUDRnMmFtVllKeEY2R1QvM3d6RjhNcXErWFRxS2NoL2lT?=
+ =?utf-8?B?enVRbUZESStCY0RxR1dEeWFJdEpQRTk0aWdKd2FFMWZkaTkvUmZYd0d6RDNW?=
+ =?utf-8?B?aXdtOERES3JnVGFQek5GMEZzVFdSY0NRREtNUHY4OFFNVVpYSnBVbk9lTFBL?=
+ =?utf-8?B?SkErMXBNczVIaU5KWW1XT3FoNk4rWDR5MGpTWXkzVDlBTE1XckMzMVNnOVlE?=
+ =?utf-8?B?Rk0vaXhXcFdmNmRySXYxd21MZ0F2QkNBMFhaeklWSnJnaStsZU9ndnovbVFB?=
+ =?utf-8?B?UjdOMFcxRURBODA2eDc4ZjU0aEp0K3RVZ3NzT3QwakpRYWJQK3lxTWlUS0hU?=
+ =?utf-8?B?UE5jakMrZG5PYnhJSGZMTyt1QmJQbTZqcTBwc2xqV29KcUZ2M0JpSW1WZGxj?=
+ =?utf-8?B?ME5QTVdabUhqVjV0OHRvWXoreUpTczR0QU5wOEc0TURNVWdsc0JKd05tMjNN?=
+ =?utf-8?B?MVJOMGU3Z0FSV0l5cjVpMXFQUDk0ZXhvWHB6dUoxOExUQytVWTZ2TDZpZkVk?=
+ =?utf-8?B?TExaZktiZjB6c01ia1Q1aFBDZDBjSnZmNVkyTlNKUUhrSzBia1pENWZiSmRO?=
+ =?utf-8?B?OEw3R0MybFE1Z0U3ZlQxY3ptaVdhbGJWakxTSjNDbmZmd2VaYmZWV090V1BR?=
+ =?utf-8?B?d0JGTzU0aURVVEpjUGFUSTh1UlZyU0NDWFVwY2pTQVNKS3hXWm4rcUl6QnQ1?=
+ =?utf-8?B?b3VSdCtoTU5YUllWcDF6WUh4d1RnUHRQeDd0eUFjcVJJcVpvV25oREJBd0VZ?=
+ =?utf-8?B?dlM2ckYvdVNIQ0VIRlgzd1dpcGp3VzNsa3hPTmxGNTMzcktxRFlFNFJNMnAy?=
+ =?utf-8?B?ZDZjRUhveFU1VGI1R214YWRjeHdQOXBXUjBhaGU5K29IOWE3R09OZ3dRZEIw?=
+ =?utf-8?B?a094NjNraFZqanNVRGMrWmhuLzd3Qlh5QnhSYWk2aFFpWjNLamhoRGR5aUhy?=
+ =?utf-8?B?ZFg0UC9MMXpSSGN6UmFmRGZ0SGxORW5YZitSMlRnQjlTR0I5ZUpFOUpTK0NT?=
+ =?utf-8?B?SkpZT0tGc1NmS1dObEJjdWVwRVd0bGErVkRCdE5EcGkrV0JiWEh2dlN2OE51?=
+ =?utf-8?B?MytnUHUzbDFITEc4Y3A3enBiYUNvQWFHRUhTbkswMWZXbjdXWVpMMk5YTzBB?=
+ =?utf-8?Q?e2w62qaysd85Kxndr2u2DJvcH?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8b4f1a7e-af44-4bc7-5666-08dafdd91494
+X-MS-Exchange-CrossTenant-AuthSource: BY5PR12MB4130.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Jan 2023 07:03:22.2905
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: O2rYu9qzk3mpNZOKXFAat5ijSjhTWqZK1HjW/SfKtWoFluAM64sE7Hvy4YGK+stsAyHh1g/wZxetv9Kw6sp/Ig==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB7568
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-cgroup information only makes sense on a live gendisk that allows
-file system I/O (which includes the raw block device).  So move over
-the cgroup related members.
+On 1/23/23 21:59, Christoph Hellwig wrote:
+> On Mon, Jan 23, 2023 at 06:42:28PM -0800, John Hubbard wrote:
+>>> @@ -202,7 +202,7 @@ static void iomap_dio_zero(const struct iomap_iter *iter, struct iomap_dio *dio,
+>>>   	bio->bi_private = dio;
+>>>   	bio->bi_end_io = iomap_dio_bio_end_io;
+>>> -	get_page(page);
+>>> +	bio_set_flag(bio, BIO_NO_PAGE_REF);
+>>
+>> ...is it accurate to assume that the entire bio is pointing to the zero
+>> page? I recall working through this area earlier last year, and ended up
+>> just letting the zero page get pinned, and then unpinning upon release,
+>> which is harmless.
+> 
+> Yes, the bio is built 4 lines above what is quoted here, and submitted
+> right after it.  It only contains the ZERO_PAGE.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Andreas Herrmann <aherrmann@suse.de>
----
- block/bfq-cgroup.c     |  4 ++--
- block/blk-cgroup.c     | 48 +++++++++++++++++++++---------------------
- block/blk-cgroup.h     |  2 +-
- block/blk-iolatency.c  |  2 +-
- block/blk-throttle.c   | 16 ++++++++------
- include/linux/blkdev.h | 10 ++++-----
- 6 files changed, 43 insertions(+), 39 deletions(-)
+OK, yes. All good, then.
 
-diff --git a/block/bfq-cgroup.c b/block/bfq-cgroup.c
-index 055f9684c1c502..c13ba851c5221a 100644
---- a/block/bfq-cgroup.c
-+++ b/block/bfq-cgroup.c
-@@ -1003,7 +1003,7 @@ void bfq_end_wr_async(struct bfq_data *bfqd)
- {
- 	struct blkcg_gq *blkg;
- 
--	list_for_each_entry(blkg, &bfqd->queue->blkg_list, q_node) {
-+	list_for_each_entry(blkg, &bfqd->queue->disk->blkg_list, q_node) {
- 		struct bfq_group *bfqg = blkg_to_bfqg(blkg);
- 
- 		bfq_end_wr_async_queues(bfqd, bfqg);
-@@ -1297,7 +1297,7 @@ struct bfq_group *bfq_create_group_hierarchy(struct bfq_data *bfqd, int node)
- 	if (ret)
- 		return NULL;
- 
--	return blkg_to_bfqg(bfqd->queue->root_blkg);
-+	return blkg_to_bfqg(bfqd->queue->disk->root_blkg);
- }
- 
- struct blkcg_policy blkcg_policy_bfq = {
-diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-index b9883ea81ad0da..6a0aa51668db62 100644
---- a/block/blk-cgroup.c
-+++ b/block/blk-cgroup.c
-@@ -108,10 +108,10 @@ static struct cgroup_subsys_state *blkcg_css(void)
- 	return task_css(current, io_cgrp_id);
- }
- 
--static bool blkcg_policy_enabled(struct request_queue *q,
-+static bool blkcg_policy_enabled(struct gendisk *disk,
- 				 const struct blkcg_policy *pol)
- {
--	return pol && test_bit(pol->plid, q->blkcg_pols);
-+	return pol && test_bit(pol->plid, disk->blkcg_pols);
- }
- 
- /**
-@@ -264,7 +264,7 @@ static struct blkcg_gq *blkg_alloc(struct blkcg *blkcg, struct gendisk *disk,
- 		struct blkcg_policy *pol = blkcg_policy[i];
- 		struct blkg_policy_data *pd;
- 
--		if (!blkcg_policy_enabled(disk->queue, pol))
-+		if (!blkcg_policy_enabled(disk, pol))
- 			continue;
- 
- 		/* alloc per-policy data and attach it to blkg */
-@@ -341,7 +341,7 @@ static struct blkcg_gq *blkg_create(struct blkcg *blkcg, struct gendisk *disk,
- 	ret = radix_tree_insert(&blkcg->blkg_tree, disk->queue->id, blkg);
- 	if (likely(!ret)) {
- 		hlist_add_head_rcu(&blkg->blkcg_node, &blkcg->blkg_list);
--		list_add(&blkg->q_node, &disk->queue->blkg_list);
-+		list_add(&blkg->q_node, &disk->blkg_list);
- 
- 		for (i = 0; i < BLKCG_MAX_POLS; i++) {
- 			struct blkcg_policy *pol = blkcg_policy[i];
-@@ -410,7 +410,7 @@ static struct blkcg_gq *blkg_lookup_create(struct blkcg *blkcg,
- 	while (true) {
- 		struct blkcg *pos = blkcg;
- 		struct blkcg *parent = blkcg_parent(blkcg);
--		struct blkcg_gq *ret_blkg = q->root_blkg;
-+		struct blkcg_gq *ret_blkg = disk->root_blkg;
- 
- 		while (parent) {
- 			blkg = blkg_lookup(parent, disk);
-@@ -485,7 +485,7 @@ static void blkg_destroy_all(struct gendisk *disk)
- 
- restart:
- 	spin_lock_irq(&q->queue_lock);
--	list_for_each_entry_safe(blkg, n, &q->blkg_list, q_node) {
-+	list_for_each_entry_safe(blkg, n, &disk->blkg_list, q_node) {
- 		struct blkcg *blkcg = blkg->blkcg;
- 
- 		spin_lock(&blkcg->lock);
-@@ -504,7 +504,7 @@ static void blkg_destroy_all(struct gendisk *disk)
- 		}
- 	}
- 
--	q->root_blkg = NULL;
-+	disk->root_blkg = NULL;
- 	spin_unlock_irq(&q->queue_lock);
- }
- 
-@@ -579,7 +579,7 @@ void blkcg_print_blkgs(struct seq_file *sf, struct blkcg *blkcg,
- 	rcu_read_lock();
- 	hlist_for_each_entry_rcu(blkg, &blkcg->blkg_list, blkcg_node) {
- 		spin_lock_irq(&blkg->disk->queue->queue_lock);
--		if (blkcg_policy_enabled(blkg->disk->queue, pol))
-+		if (blkcg_policy_enabled(blkg->disk, pol))
- 			total += prfill(sf, blkg->pd[pol->plid], data);
- 		spin_unlock_irq(&blkg->disk->queue->queue_lock);
- 	}
-@@ -687,7 +687,7 @@ int blkg_conf_prep(struct blkcg *blkcg, const struct blkcg_policy *pol,
- 	rcu_read_lock();
- 	spin_lock_irq(&q->queue_lock);
- 
--	if (!blkcg_policy_enabled(q, pol)) {
-+	if (!blkcg_policy_enabled(disk, pol)) {
- 		ret = -EOPNOTSUPP;
- 		goto fail_unlock;
- 	}
-@@ -730,7 +730,7 @@ int blkg_conf_prep(struct blkcg *blkcg, const struct blkcg_policy *pol,
- 		rcu_read_lock();
- 		spin_lock_irq(&q->queue_lock);
- 
--		if (!blkcg_policy_enabled(q, pol)) {
-+		if (!blkcg_policy_enabled(disk, pol)) {
- 			blkg_free(new_blkg);
- 			ret = -EOPNOTSUPP;
- 			goto fail_preloaded;
-@@ -910,7 +910,7 @@ static void blkcg_fill_root_iostats(void)
- 	class_dev_iter_init(&iter, &block_class, NULL, &disk_type);
- 	while ((dev = class_dev_iter_next(&iter))) {
- 		struct block_device *bdev = dev_to_bdev(dev);
--		struct blkcg_gq *blkg = bdev->bd_disk->queue->root_blkg;
-+		struct blkcg_gq *blkg = bdev->bd_disk->root_blkg;
- 		struct blkg_iostat tmp;
- 		int cpu;
- 		unsigned long flags;
-@@ -1257,7 +1257,7 @@ int blkcg_init_disk(struct gendisk *disk)
- 	bool preloaded;
- 	int ret;
- 
--	INIT_LIST_HEAD(&q->blkg_list);
-+	INIT_LIST_HEAD(&disk->blkg_list);
- 
- 	new_blkg = blkg_alloc(&blkcg_root, disk, GFP_KERNEL);
- 	if (!new_blkg)
-@@ -1271,7 +1271,7 @@ int blkcg_init_disk(struct gendisk *disk)
- 	blkg = blkg_create(&blkcg_root, disk, new_blkg);
- 	if (IS_ERR(blkg))
- 		goto err_unlock;
--	q->root_blkg = blkg;
-+	disk->root_blkg = blkg;
- 	spin_unlock_irq(&q->queue_lock);
- 
- 	if (preloaded)
-@@ -1384,7 +1384,7 @@ int blkcg_activate_policy(struct gendisk *disk, const struct blkcg_policy *pol)
- 	struct blkcg_gq *blkg, *pinned_blkg = NULL;
- 	int ret;
- 
--	if (blkcg_policy_enabled(q, pol))
-+	if (blkcg_policy_enabled(disk, pol))
- 		return 0;
- 
- 	if (queue_is_mq(q))
-@@ -1393,7 +1393,7 @@ int blkcg_activate_policy(struct gendisk *disk, const struct blkcg_policy *pol)
- 	spin_lock_irq(&q->queue_lock);
- 
- 	/* blkg_list is pushed at the head, reverse walk to allocate parents first */
--	list_for_each_entry_reverse(blkg, &q->blkg_list, q_node) {
-+	list_for_each_entry_reverse(blkg, &disk->blkg_list, q_node) {
- 		struct blkg_policy_data *pd;
- 
- 		if (blkg->pd[pol->plid])
-@@ -1437,10 +1437,10 @@ int blkcg_activate_policy(struct gendisk *disk, const struct blkcg_policy *pol)
- 
- 	/* all allocated, init in the same order */
- 	if (pol->pd_init_fn)
--		list_for_each_entry_reverse(blkg, &q->blkg_list, q_node)
-+		list_for_each_entry_reverse(blkg, &disk->blkg_list, q_node)
- 			pol->pd_init_fn(blkg->pd[pol->plid]);
- 
--	__set_bit(pol->plid, q->blkcg_pols);
-+	__set_bit(pol->plid, disk->blkcg_pols);
- 	ret = 0;
- 
- 	spin_unlock_irq(&q->queue_lock);
-@@ -1456,7 +1456,7 @@ int blkcg_activate_policy(struct gendisk *disk, const struct blkcg_policy *pol)
- enomem:
- 	/* alloc failed, nothing's initialized yet, free everything */
- 	spin_lock_irq(&q->queue_lock);
--	list_for_each_entry(blkg, &q->blkg_list, q_node) {
-+	list_for_each_entry(blkg, &disk->blkg_list, q_node) {
- 		struct blkcg *blkcg = blkg->blkcg;
- 
- 		spin_lock(&blkcg->lock);
-@@ -1486,7 +1486,7 @@ void blkcg_deactivate_policy(struct gendisk *disk,
- 	struct request_queue *q = disk->queue;
- 	struct blkcg_gq *blkg;
- 
--	if (!blkcg_policy_enabled(q, pol))
-+	if (!blkcg_policy_enabled(disk, pol))
- 		return;
- 
- 	if (queue_is_mq(q))
-@@ -1494,9 +1494,9 @@ void blkcg_deactivate_policy(struct gendisk *disk,
- 
- 	spin_lock_irq(&q->queue_lock);
- 
--	__clear_bit(pol->plid, q->blkcg_pols);
-+	__clear_bit(pol->plid, disk->blkcg_pols);
- 
--	list_for_each_entry(blkg, &q->blkg_list, q_node) {
-+	list_for_each_entry(blkg, &disk->blkg_list, q_node) {
- 		struct blkcg *blkcg = blkg->blkcg;
- 
- 		spin_lock(&blkcg->lock);
-@@ -1909,7 +1909,7 @@ static inline struct blkcg_gq *blkg_tryget_closest(struct bio *bio,
-  * Associate @bio with the blkg found by combining the css's blkg and the
-  * request_queue of the @bio.  An association failure is handled by walking up
-  * the blkg tree.  Therefore, the blkg associated can be anything between @blkg
-- * and q->root_blkg.  This situation only happens when a cgroup is dying and
-+ * and disk->root_blkg.  This situation only happens when a cgroup is dying and
-  * then the remaining bios will spill to the closest alive blkg.
-  *
-  * A reference will be taken on the blkg and will be released when @bio is
-@@ -1924,8 +1924,8 @@ void bio_associate_blkg_from_css(struct bio *bio,
- 	if (css && css->parent) {
- 		bio->bi_blkg = blkg_tryget_closest(bio, css);
- 	} else {
--		blkg_get(bdev_get_queue(bio->bi_bdev)->root_blkg);
--		bio->bi_blkg = bdev_get_queue(bio->bi_bdev)->root_blkg;
-+		blkg_get(bio->bi_bdev->bd_disk->root_blkg);
-+		bio->bi_blkg = bio->bi_bdev->bd_disk->root_blkg;
- 	}
- }
- EXPORT_SYMBOL_GPL(bio_associate_blkg_from_css);
-diff --git a/block/blk-cgroup.h b/block/blk-cgroup.h
-index 3e7508907f33d8..81eca9be7f9105 100644
---- a/block/blk-cgroup.h
-+++ b/block/blk-cgroup.h
-@@ -246,7 +246,7 @@ static inline struct blkcg_gq *blkg_lookup(struct blkcg *blkcg,
- 	WARN_ON_ONCE(!rcu_read_lock_held());
- 
- 	if (blkcg == &blkcg_root)
--		return disk->queue->root_blkg;
-+		return disk->root_blkg;
- 
- 	blkg = rcu_dereference(blkcg->blkg_hint);
- 	if (blkg && blkg->disk == disk)
-diff --git a/block/blk-iolatency.c b/block/blk-iolatency.c
-index bc0d217f5c1723..5d5aa1e526b742 100644
---- a/block/blk-iolatency.c
-+++ b/block/blk-iolatency.c
-@@ -665,7 +665,7 @@ static void blkiolatency_timer_fn(struct timer_list *t)
- 
- 	rcu_read_lock();
- 	blkg_for_each_descendant_pre(blkg, pos_css,
--				     blkiolat->rqos.disk->queue->root_blkg) {
-+				     blkiolat->rqos.disk->root_blkg) {
- 		struct iolatency_grp *iolat;
- 		struct child_latency_info *lat_info;
- 		unsigned long flags;
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index 74bb1e753ea09d..902203bdddb4b4 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -451,7 +451,8 @@ static void blk_throtl_update_limit_valid(struct throtl_data *td)
- 	bool low_valid = false;
- 
- 	rcu_read_lock();
--	blkg_for_each_descendant_post(blkg, pos_css, td->queue->root_blkg) {
-+	blkg_for_each_descendant_post(blkg, pos_css,
-+			td->queue->disk->root_blkg) {
- 		struct throtl_grp *tg = blkg_to_tg(blkg);
- 
- 		if (tg->bps[READ][LIMIT_LOW] || tg->bps[WRITE][LIMIT_LOW] ||
-@@ -1180,7 +1181,7 @@ static void throtl_pending_timer_fn(struct timer_list *t)
- 
- 	spin_lock_irq(&q->queue_lock);
- 
--	if (!q->root_blkg)
-+	if (!q->disk->root_blkg)
- 		goto out_unlock;
- 
- 	if (throtl_can_upgrade(td, NULL))
-@@ -1322,7 +1323,8 @@ static void tg_conf_updated(struct throtl_grp *tg, bool global)
- 	 * blk-throttle.
- 	 */
- 	blkg_for_each_descendant_pre(blkg, pos_css,
--			global ? tg->td->queue->root_blkg : tg_to_blkg(tg)) {
-+			global ? tg->td->queue->disk->root_blkg :
-+			tg_to_blkg(tg)) {
- 		struct throtl_grp *this_tg = blkg_to_tg(blkg);
- 		struct throtl_grp *parent_tg;
- 
-@@ -1717,7 +1719,7 @@ void blk_throtl_cancel_bios(struct gendisk *disk)
- 	 * path need RCU protection and to prevent warning from lockdep.
- 	 */
- 	rcu_read_lock();
--	blkg_for_each_descendant_post(blkg, pos_css, q->root_blkg) {
-+	blkg_for_each_descendant_post(blkg, pos_css, disk->root_blkg) {
- 		struct throtl_grp *tg = blkg_to_tg(blkg);
- 		struct throtl_service_queue *sq = &tg->service_queue;
- 
-@@ -1871,7 +1873,8 @@ static bool throtl_can_upgrade(struct throtl_data *td,
- 		return false;
- 
- 	rcu_read_lock();
--	blkg_for_each_descendant_post(blkg, pos_css, td->queue->root_blkg) {
-+	blkg_for_each_descendant_post(blkg, pos_css,
-+			td->queue->disk->root_blkg) {
- 		struct throtl_grp *tg = blkg_to_tg(blkg);
- 
- 		if (tg == this_tg)
-@@ -1917,7 +1920,8 @@ static void throtl_upgrade_state(struct throtl_data *td)
- 	td->low_upgrade_time = jiffies;
- 	td->scale = 0;
- 	rcu_read_lock();
--	blkg_for_each_descendant_post(blkg, pos_css, td->queue->root_blkg) {
-+	blkg_for_each_descendant_post(blkg, pos_css,
-+			td->queue->disk->root_blkg) {
- 		struct throtl_grp *tg = blkg_to_tg(blkg);
- 		struct throtl_service_queue *sq = &tg->service_queue;
- 
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 89f51d68c68ad6..8d16e3da0d5c68 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -163,6 +163,11 @@ struct gendisk {
- 	struct timer_rand_state *random;
- 	atomic_t sync_io;		/* RAID */
- 	struct disk_events *ev;
-+#ifdef CONFIG_BLK_CGROUP
-+	DECLARE_BITMAP		(blkcg_pols, BLKCG_MAX_POLS);
-+	struct blkcg_gq		*root_blkg;
-+	struct list_head	blkg_list;
-+#endif
- #ifdef  CONFIG_BLK_DEV_INTEGRITY
- 	struct kobject integrity_kobj;
- #endif	/* CONFIG_BLK_DEV_INTEGRITY */
-@@ -481,11 +486,6 @@ struct request_queue {
- 	struct blk_mq_tags	*sched_shared_tags;
- 
- 	struct list_head	icq_list;
--#ifdef CONFIG_BLK_CGROUP
--	DECLARE_BITMAP		(blkcg_pols, BLKCG_MAX_POLS);
--	struct blkcg_gq		*root_blkg;
--	struct list_head	blkg_list;
--#endif
- 
- 	struct queue_limits	limits;
- 
+thanks,
 -- 
-2.39.0
+John Hubbard
+NVIDIA
 
