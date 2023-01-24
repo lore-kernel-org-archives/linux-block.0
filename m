@@ -2,92 +2,78 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 871ADC38142
-	for <linux-block@archiver.kernel.org>; Tue, 24 Jan 2023 07:06:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4067AC25B4E
+	for <linux-block@archiver.kernel.org>; Tue, 24 Jan 2023 07:53:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233193AbjAXHG4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 24 Jan 2023 02:06:56 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42418 "EHLO
+        id S232697AbjAXHxH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 24 Jan 2023 02:53:07 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33694 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232771AbjAXHGz (ORCPT
+        with ESMTP id S232855AbjAXHxG (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 24 Jan 2023 02:06:55 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 56D08367CD
-        for <linux-block@vger.kernel.org>; Mon, 23 Jan 2023 23:06:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1674543965;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=rhCMs9O93TP3iVRzGs1BbEvUjRACrPO+EAB004pe+8U=;
-        b=Jvy3Hn03NL0rMuididrwqjQiMeOvy8LewI2DpD1dN/yutAsibBskMjjLZfGBY4RHU2bZqV
-        V6LsHw9ZWp68t44VgKV6IJ2GN8wIWjTcQPLpHpuCxCq07QhhRCs3hOUVBjY1TbW1W8jPYn
-        sOn5/FybW+JbXBNeRZ5h00ik/qRitxM=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-134-E8IQKbPzP6aPaqoZBUn9Iw-1; Tue, 24 Jan 2023 02:06:00 -0500
-X-MC-Unique: E8IQKbPzP6aPaqoZBUn9Iw-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B9D02811E6E;
-        Tue, 24 Jan 2023 07:05:59 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.33.36.97])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 83142C15BA0;
-        Tue, 24 Jan 2023 07:05:57 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <31f7d71d-0eb9-2250-78c0-2e8f31023c66@nvidia.com>
-References: <31f7d71d-0eb9-2250-78c0-2e8f31023c66@nvidia.com> <20230123173007.325544-1-dhowells@redhat.com> <20230123173007.325544-11-dhowells@redhat.com>
-To:     John Hubbard <jhubbard@nvidia.com>
-Cc:     dhowells@redhat.com, Al Viro <viro@zeniv.linux.org.uk>,
-        Christoph Hellwig <hch@infradead.org>,
-        Matthew Wilcox <willy@infradead.org>,
-        Jens Axboe <axboe@kernel.dk>, "Jan Kara" <jack@suse.cz>,
-        Jeff Layton <jlayton@kernel.org>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, "Christoph Hellwig" <hch@lst.de>,
-        linux-mm@kvack.org
-Subject: Re: [PATCH v8 10/10] mm: Renumber FOLL_PIN and FOLL_GET down
+        Tue, 24 Jan 2023 02:53:06 -0500
+Received: from mout.gmx.net (mout.gmx.net [212.227.17.20])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AA6FC44A9;
+        Mon, 23 Jan 2023 23:53:01 -0800 (PST)
+Received: from [0.0.0.0] ([149.28.201.231]) by mail.gmx.net (mrgmx105
+ [212.227.17.174]) with ESMTPSA (Nemesis) id 1MiaYJ-1onNXC3C23-00ffqK; Tue, 24
+ Jan 2023 08:52:42 +0100
+Message-ID: <88b3df41-1a62-a6c8-911c-de8b4bca3196@gmx.com>
+Date:   Tue, 24 Jan 2023 15:52:38 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <545460.1674543956.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date:   Tue, 24 Jan 2023 07:05:56 +0000
-Message-ID: <545461.1674543956@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.6.1
+Subject: Re: What would happen if the block device driver/firmware found some
+ block of a bio is corrupted?
+Content-Language: en-US
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Keith Busch <kbusch@kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Linux FS Devel <linux-fsdevel@vger.kernel.org>
+References: <5be2cd86-e535-a4ae-b989-887bf9c2c36d@gmx.com>
+ <Y89iSQJEpMFBSd2G@kbusch-mbp.dhcp.thefacebook.com>
+ <08def3ca-ccbd-88c7-acda-f155c1359c3b@gmx.com>
+ <Y897ZrBFdfLcHFma@infradead.org>
+From:   Qu Wenruo <quwenruo.btrfs@gmx.com>
+In-Reply-To: <Y897ZrBFdfLcHFma@infradead.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Provags-ID: V03:K1:1ggwe0DwWqkhD6T2lrbJXFXYeNTc8EyksCMroS3owgQMzDf08JT
+ 3h/G/XiC3C6ZK9B22zZ8liSCG1QpzAQ6Yr7Ke9KumpMyxRI9nyWNcxDKHE93JZ1spdmqI7H
+ 90lHSUIeZdUsKeMLEebnRu7Xvlb7N/6CfSmdt60GMJq2kuuCoAQuxa+/MMG8dlIouWHG5rv
+ h840o5MJzmfJ8FjqCMPHg==
+UI-OutboundReport: notjunk:1;M01:P0:1WVatoXm5Dc=;dp9fzRTpkXxykxzMOxNZobVea/N
+ LGQLs8+ere0EUeayQJeRf2rcNajqczQt+qGU9yOsZTnu+xIRd499I/ZqcmtlMp6F2geQecCYH
+ Z9917am8TGIw13Oz7p65HNPkO2f8OwLuxYLp5VVwiB/Ie1bVDiLyrGCNWtHJSHHuFsmNLOGqm
+ asuAsnLFO61WZKrQS+L9TD18A/f16Qx1o1r/OdaQHSFZfzQuZK8Cm13lMKGl1pPT8GYA044d3
+ /zC8kQFQwG1JDJsb54ft1roc320snHvdxDaGtz2rAdhgeAWVe0AO64H0zNiKmRe7cmp49Wpxz
+ WkSL6PX4w8GmbBSD+wKJLt6J3rYt9tqBrA+NW8V4Y4V1GVf4xIK1e0QYDQZjtgC5o2CcPVvXk
+ aaWFePu2/aT0R1AT/rrZ5ztun4Un9Yl7Y/B2gOCdMQPOrSmJAtT6j9XQ67c8UF3NzfcEhKKzR
+ dS44PzXTE1gvM0eTX2UzCG5gEIIpFGOoYA5kY+QOeaIWI2JKHAqpYTM/Tc6RIO4YzKNjg2nfb
+ PSuX3B97wIloTtqr8VRG/2QEGnLndGQDQQHzdjRMrlScg/sY8MspyZhMW6/18jiYZlO7ueY9V
+ +KlXsGSlStJmPH+d2R8u3qVus26xUfEeHLRnH69bEfKPk9ztvUyBjpBpgnqJnRGl8uC9ITYtC
+ NLcdmtI5jyp/C0Hjzdg/RYYB3DlYBd/1eaKNiUBiRLbWHsiTTbF76j53nbtIHWa/9KlQROPHF
+ DfLvbOHosyZzJHC0KdGClVo7ImoSEvNBwIwlRBdRu2OGqDNjOI/bZdbDMqwAvHeVLsXdiLDKx
+ WIqBSgTUHtffK0wr8QYx5NiAUbgas5dSQF0gh3R5pSnRdLR0capaaoYQYl/1xIt0proC2xDXO
+ XCLSZLi9g/nkgb4v+jcUsb0RiCKBI3XthX9/cZM/hlsR9bfFs2viIwnyLvZT/NY8IncKQqP4I
+ deWu2N+s979bZ+VWI5OuJYRQANo=
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-John Hubbard <jhubbard@nvidia.com> wrote:
 
-> > Renumber FOLL_PIN and FOLL_GET down to bit 0 and 1 respectively so tha=
-t
-> > they are coincidentally the same as BIO_PAGE_PINNED and BIO_PAGE_REFFE=
-D and
-> > also so that they can be stored in the bottom two bits of a page point=
-er
-> > (something I'm looking at for zerocopy socket fragments).
-> > (Note that BIO_PAGE_REFFED should probably be got rid of at some point=
-,
-> > hence why FOLL_PIN is at 0.)
-> > Also renumber down the other FOLL_* flags to close the gaps.
-> =
 
-> Should we also get these sorted into internal-to-mm and public sets?
-> Because Jason (+Cc) again was about to split them apart into
-> mm/internal.h [1] and that might make that a little cleaner.
+On 2023/1/24 14:32, Christoph Hellwig wrote:
+> On Tue, Jan 24, 2023 at 01:38:41PM +0800, Qu Wenruo wrote:
+>> The retry for file read is indeed triggered inside VFS, not fs/block/dm
+>> layer itself.
+> 
+> Well, it's really MM code.  If ->readahead fails, we eventually fall
+> back to a single-page ->radpage.  That might still be more than one
+> sector in some cases, but at least nicely narrows down the range.
 
-My plan was to push this patch by itself through akpm since it's only an
-optimisation and not necessary to the rest of the patches here.
+This also means, if some internal work (like btrfs scrub) is not 
+triggered by MM, then we have to do the split all by ourselves...
 
-David
-
+Thanks,
+Qu
