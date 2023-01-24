@@ -2,144 +2,120 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4182DC54EAA
-	for <linux-block@archiver.kernel.org>; Tue, 24 Jan 2023 10:03:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C4131C54EAA
+	for <linux-block@archiver.kernel.org>; Tue, 24 Jan 2023 10:24:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233235AbjAXKDH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 24 Jan 2023 05:03:07 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45408 "EHLO
+        id S233366AbjAXKY6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 24 Jan 2023 05:24:58 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60086 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233330AbjAXKDF (ORCPT
+        with ESMTP id S233412AbjAXKY5 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 24 Jan 2023 05:03:05 -0500
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 145FB1E5EF;
-        Tue, 24 Jan 2023 02:03:04 -0800 (PST)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id AE6EE1F45B;
-        Tue, 24 Jan 2023 10:03:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1674554582; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
+        Tue, 24 Jan 2023 05:24:57 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 23117402CB
+        for <linux-block@vger.kernel.org>; Tue, 24 Jan 2023 02:24:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1674555851;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=XlyGLp9iAeImFLsnSAcMxEWopq1s7dMOnOrqAcJb5aI=;
-        b=iJDUQkn/cNwIAVgveFSobSI3meetZed44h7lnlZflvh4gDI46mQBSDkxqHvrqeHMfYls6f
-        9EWA/IotXTRFDUB0S9wT9at9zLO0tXlK3CpdY4EWQJsLzz4JDGUL+eMvI/eysH5fokc2EY
-        iLKuAju/gW/5MPS+zYspo9Anb6VcSbk=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1674554582;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=XlyGLp9iAeImFLsnSAcMxEWopq1s7dMOnOrqAcJb5aI=;
-        b=1g2PDkp0PuOb8PuA74YKfnsTkM9oHi5HzEuRXHxv53mKfiTZNvEGV/U2nocVh5EYQDjvUN
-        Oyka4gXQ2GVZS6Ag==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id B8173139FB;
-        Tue, 24 Jan 2023 10:03:01 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id 8JCTJ9Wsz2O3ZgAAMHmgww
-        (envelope-from <hare@suse.de>); Tue, 24 Jan 2023 10:03:01 +0000
-Message-ID: <45e64c7c-8a78-d15c-0cc5-9ba465acf691@suse.de>
-Date:   Tue, 24 Jan 2023 11:02:21 +0100
+        bh=aN9Czgm5CvGAuhzMkEVI/TT2p7pAyYcgvgmwqZIYz7k=;
+        b=YCjy4xJy7zuNfkMyrWt8qTgBSseh3GQIqR2/cfS7Pcao08VXSzrTSNI2XxpyuMZ5g83lLJ
+        gXzOykwTW7PQFPClGcjiIWZ5RU3ZefLut3Ji7AGILDHu50AJ44BxXu9aVNM95mofYkSuu8
+        +4iAfsSx/MHatxSWwLk2Czr2HbUKVUk=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-633-pkBJC6XLOpye8JEriE3Hog-1; Tue, 24 Jan 2023 05:24:09 -0500
+X-MC-Unique: pkBJC6XLOpye8JEriE3Hog-1
+Received: by mail-wm1-f72.google.com with SMTP id bg24-20020a05600c3c9800b003db0ddddb6fso9002564wmb.0
+        for <linux-block@vger.kernel.org>; Tue, 24 Jan 2023 02:24:09 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:organization:from:references
+         :cc:to:content-language:subject:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=aN9Czgm5CvGAuhzMkEVI/TT2p7pAyYcgvgmwqZIYz7k=;
+        b=ZJRCRsRYOaaO8p1Y/WKTfrc/7Sk38TSgwgUfp2rUsGzq9aZA46+fYo3El2aRbYmSMt
+         i8C5y1Wp03aLpmuFD9hmPB6AXhOaEHJ8bWM/xnWJu97Lutq3TX5WUXirPrTmmrEe0HZu
+         2HwVWCqtMbn900DFpfgX5yG61GYWyjBxysIJ17CrCPfcdpg6gAyEWygEoJ2XjuF/2MTK
+         9L2JFklAaLWdpj/wbLWB8baLihQ5E805K+DAohzUcmv9DYt5C70GJkSsDTbBPquY4CR5
+         0sxZJPE+Emw36SrUdODzklJVM3WANVZmHbcqJe18R5Ze5yHSQSiqQKtor1qrdreYjfsE
+         6jCA==
+X-Gm-Message-State: AFqh2kr6QWtcM1Hvoxle46b4ckXjZ6dnC7qloTvmgz3k5B5a7mtvufHs
+        0Fp7c7qcZGL4EFtzD6tEXJ9Sx6TebcTJq8Vs/rxHmlgtUiPfoHoVATTRGLBtKhMvblf6/QxVmaR
+        Xju9q912Kc9Kg/DsxlR4Lsgg=
+X-Received: by 2002:adf:cd83:0:b0:2bd:d839:9918 with SMTP id q3-20020adfcd83000000b002bdd8399918mr24886325wrj.64.1674555848060;
+        Tue, 24 Jan 2023 02:24:08 -0800 (PST)
+X-Google-Smtp-Source: AMrXdXvXXP7Tc/e17pSmW1GpJFeCPP5/mQ+K8WAe0128IKdfjGI9rBrCOa1/WAOJCs/1tWe8RBEGig==
+X-Received: by 2002:adf:cd83:0:b0:2bd:d839:9918 with SMTP id q3-20020adfcd83000000b002bdd8399918mr24886301wrj.64.1674555847781;
+        Tue, 24 Jan 2023 02:24:07 -0800 (PST)
+Received: from ?IPV6:2003:cb:c707:9d00:9303:90ce:6dcb:2bc9? (p200300cbc7079d00930390ce6dcb2bc9.dip0.t-ipconnect.de. [2003:cb:c707:9d00:9303:90ce:6dcb:2bc9])
+        by smtp.gmail.com with ESMTPSA id y15-20020adfdf0f000000b00236883f2f5csm1532407wrl.94.2023.01.24.02.24.06
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 24 Jan 2023 02:24:07 -0800 (PST)
+Message-ID: <e5eb9d67-dbbe-a0d9-1973-d6e6bee4db3a@redhat.com>
+Date:   Tue, 24 Jan 2023 11:24:06 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.1
-Subject: Re: [PATCH v2] pata_parport: add driver (PARIDE replacement)
-To:     Ondrej Zary <linux@zary.sk>,
-        Damien Le Moal <damien.lemoal@opensource.wdc.com>
-Cc:     Christoph Hellwig <hch@lst.de>,
-        Sergey Shtylyov <s.shtylyov@omp.ru>,
-        Jens Axboe <axboe@kernel.dk>, Tim Waugh <tim@cyberelk.net>,
-        linux-block@vger.kernel.org, linux-parport@lists.infradead.org,
-        linux-ide@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20230121225314.32459-1-linux@zary.sk>
+ Thunderbird/102.6.0
+Subject: Re: [PATCH v7 0/8] iov_iter: Improve page extraction (ref, pin or
+ just list)
 Content-Language: en-US
-From:   Hannes Reinecke <hare@suse.de>
-In-Reply-To: <20230121225314.32459-1-linux@zary.sk>
+To:     Jan Kara <jack@suse.cz>, Matthew Wilcox <willy@infradead.org>
+Cc:     David Howells <dhowells@redhat.com>,
+        John Hubbard <jhubbard@nvidia.com>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Christoph Hellwig <hch@infradead.org>,
+        Jens Axboe <axboe@kernel.dk>, Jeff Layton <jlayton@kernel.org>,
+        Logan Gunthorpe <logang@deltatee.com>,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <Y862ZL5umO30Vu/D@casper.infradead.org>
+ <20230120175556.3556978-1-dhowells@redhat.com>
+ <318138.1674491927@warthog.procyon.org.uk>
+ <Y865EIsHv3oyz+8U@casper.infradead.org>
+ <20230123172529.woo34hnycrn7xhwk@quack3>
+From:   David Hildenbrand <david@redhat.com>
+Organization: Red Hat
+In-Reply-To: <20230123172529.woo34hnycrn7xhwk@quack3>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/21/23 23:53, Ondrej Zary wrote:
-> The pata_parport is a libata-based replacement of the old PARIDE
-> subsystem - driver for parallel port IDE devices.
-> It uses the original paride low-level protocol drivers but does not
-> need the high-level drivers (pd, pcd, pf, pt, pg). The IDE devices
-> behind parallel port adapters are handled by the ATA layer.
+On 23.01.23 18:25, Jan Kara wrote:
+> On Mon 23-01-23 16:42:56, Matthew Wilcox wrote:
+>> On Mon, Jan 23, 2023 at 04:38:47PM +0000, David Howells wrote:
+>>> Matthew Wilcox <willy@infradead.org> wrote:
+>>> Also you only mention DIO read - but what about "start DIO write; fork(); touch
+>>> buffer" in the parent - now the write buffer belongs to the child and they can
+>>> affect the parent's write.
+>>
+>> I'm struggling to see the problem here.  If the child hasn't exec'd, the
+>> parent and child are still in the same security domain.  The parent
+>> could have modified the buffer before calling fork().
 > 
-> This will allow paride and its high-level drivers to be removed.
-> 
-> Unfortunately, libata drivers cannot sleep so pata_parport claims
-> parport before activating the ata host and keeps it claimed (and
-> protocol connected) until the ata host is removed. This means that
-> no devices can be chained (neither other pata_parport devices nor
-> a printer).
-> 
-> paride and pata_parport are mutually exclusive because the compiled
-> protocol drivers are incompatible.
-> 
-> Tested with:
->   - Imation SuperDisk LS-120 and HP C4381A (EPAT)
->   - Freecom Parallel CD (FRPW)
->   - Toshiba Mobile CD-RW 2793008 w/Freecom Parallel Cable rev.903 (FRIQ)
->   - Backpack CD-RW 222011 and CD-RW 19350 (BPCK6)
-> 
-> The following bugs in low-level protocol drivers were found and will
-> be fixed later:
-> 
-> Note: EPP-32 mode is buggy in EPAT - and also in all other protocol
-> drivers - they don't handle non-multiple-of-4 block transfers
-> correctly. This causes problems with LS-120 drive.
-> There is also another bug in EPAT: EPP modes don't work unless a 4-bit
-> or 8-bit mode is used first (probably some initialization missing?).
-> Once the device is initialized, EPP works until power cycle.
-> 
-> So after device power on, you have to:
-> echo "parport0 epat 0" >/sys/bus/pata_parport/new_device
-> echo pata_parport.0 >/sys/bus/pata_parport/delete_device
-> echo "parport0 epat 4" >/sys/bus/pata_parport/new_device
-> (autoprobe will initialize correctly as it tries the slowest modes
-> first but you'll get the broken EPP-32 mode)
-> 
-> Note: EPP modes are buggy in FRPW, only modes 0 and 1 work.
-> Signed-off-by: Ondrej Zary <linux@zary.sk>
-> ---
-> 
-> Changes in v2:
->   - keep device connected, remove disconnect timer
-> 
->   Documentation/admin-guide/blockdev/paride.rst |  52 ++
->   drivers/Makefile                              |   2 +-
->   drivers/ata/Kconfig                           |  14 +
->   drivers/ata/Makefile                          |   2 +
->   drivers/ata/pata_parport.c                    | 783 ++++++++++++++++++
->   drivers/block/paride/Kconfig                  |  32 +-
->   drivers/block/paride/paride.h                 |  13 +
->   include/linux/pata_parport.h                  | 106 +++
->   8 files changed, 987 insertions(+), 17 deletions(-)
->   create mode 100644 drivers/ata/pata_parport.c
->   create mode 100644 include/linux/pata_parport.h
-> 
-Reviewed-by: Hannes Reinecke <hare@suse.de>
+> Sadly they are not. Android in particular starts applications by forking
+> one big binary (zygote) that has multiple apps linked together and relies
+> on the fact the child cannot influence the parent after the fork. We've
+> already had CVEs with GUP & COW & fork due to this. David Hildebrand has a
+> lot of memories regarding this I believe ;)
 
-Cheers,
+:)
 
-Hannes
+Once FOLL_PIN is used most of the issues go away and we don't have to 
+play any games with VM flags or similar ...
+
+With FOLL_PIN, I consider anon a solved problem and not worth any new 
+fancy ideas.
+
 -- 
-Dr. Hannes Reinecke		           Kernel Storage Architect
-hare@suse.de			                  +49 911 74053 688
-SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 Nürnberg
-HRB 36809 (AG Nürnberg), GF: Felix Imendörffer
+Thanks,
+
+David / dhildenb
 
