@@ -2,208 +2,98 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD732C61D97
-	for <linux-block@archiver.kernel.org>; Tue, 24 Jan 2023 20:32:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8753CC54EED
+	for <linux-block@archiver.kernel.org>; Tue, 24 Jan 2023 20:32:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231553AbjAXUcJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 24 Jan 2023 15:32:09 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44860 "EHLO
+        id S229879AbjAXUci (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 24 Jan 2023 15:32:38 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45164 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230334AbjAXUcI (ORCPT
+        with ESMTP id S229625AbjAXUch (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 24 Jan 2023 15:32:08 -0500
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2064.outbound.protection.outlook.com [40.107.243.64])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F2C2AD2A;
-        Tue, 24 Jan 2023 12:32:07 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=BVsAXeGxOvz2kFADzljmZEWqBA1RfztE/tlD2nwuFxdGshcgNC42WmcOafAWOEeOHBtywVTJ7xIxoIXEMRSwzZd/IYmxhkfih/aiGMQdkVvnQ54IUexV20vXMhGgLgAmdXjYfZ5VYAqCBTfHQrqVc3ZG+23uxIpFSX0KIUl+9eQTPZaL2HvkV9Qhn4hE1+abDaTs+Wwz9aYsrESkcL5CvcPNS2bDP+x9U1IAzxTOzLCfhWKKtCb225Tuqdwm7Eo/cfqmSRVGNB6uCc/VO/MAgGwrohrY0+hQ6NkXfv1nitRn5Ny9Bwfp2Sq4InKjsn5Q+0ARD4JqO6X7S8FCdDM3/A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=u2fda49ycLyC38hvtVHurB4o1JnTe0GhHvqYhEsRXBs=;
- b=GQxUn6ZEGFLQzufTu6bAjDpUXGAdOgxP9iLHTM/rIqcQTyQOxByFH+KDCsvVVjJvlXJHBlEZrx6cAsoxRKDIT4jOhoYiEefckjfbw6eekbHmp03U55af2+Kf8v+DipdEpkOIVscTVnCUIv9TltI8LlM0WiwaOSs3FH4ZHC1qaXatogLEx4JihCLK/12MWg8ufhTknhkRjyWivpbUlda6pPJGt+wywQhOEMQlG4qk9cLAZO9/1Nz84XssEkr4psmnH62/5KOuJgQBE4zLi2uXR/a1UkxktYGHL7KsitLi9VrjkDUpoFeUS2XUWbv7c6QisMb543JRaS3znEdq2oqAXQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=redhat.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=u2fda49ycLyC38hvtVHurB4o1JnTe0GhHvqYhEsRXBs=;
- b=n1tKWewEsM1xGQ3w9ZaJqg8X9xvm0024a2/ebdq59bAK0R9ADfCxHkBTI1IqdMFrmrtxucq6TVVtZgJSGVWeE4k0ujyegbGBcVPHUqc47IwS0sJXxhM98fUxei5Aywm7OdY1mY4WoLX2qPnJeD1r4wmWZ+8ayf+dg8YPxMSGpw2Nvyl4bY5jO1mxhwXOS6JqXsmHWPOIoZLxRgcDqcaSnH1L0Yp1/+raCG0G1UiUNcj8tXxvoM5cxA8zoHhva6slNUb/JlfRFjTbtyAk4yua4sfxe0FCVk1MnxuiGOxDMW4iDsPVT+Mxxw/pjFMbiXWpzw2SaOcjQtjuo/ax+ypsLQ==
-Received: from DM6PR11CA0012.namprd11.prod.outlook.com (2603:10b6:5:190::25)
- by SN7PR12MB7323.namprd12.prod.outlook.com (2603:10b6:806:29a::5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6002.28; Tue, 24 Jan
- 2023 20:32:06 +0000
-Received: from DS1PEPF0000E63D.namprd02.prod.outlook.com
- (2603:10b6:5:190:cafe::7e) by DM6PR11CA0012.outlook.office365.com
- (2603:10b6:5:190::25) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6002.33 via Frontend
- Transport; Tue, 24 Jan 2023 20:32:06 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- DS1PEPF0000E63D.mail.protection.outlook.com (10.167.17.75) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6043.12 via Frontend Transport; Tue, 24 Jan 2023 20:32:05 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.36; Tue, 24 Jan
- 2023 12:08:16 -0800
-Received: from [10.110.48.28] (10.126.230.37) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.36; Tue, 24 Jan
- 2023 12:08:15 -0800
-Message-ID: <df718bc0-2163-a7a7-8c5c-db22e9320b7c@nvidia.com>
-Date:   Tue, 24 Jan 2023 12:08:15 -0800
+        Tue, 24 Jan 2023 15:32:37 -0500
+Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3395E4A1F5;
+        Tue, 24 Jan 2023 12:32:36 -0800 (PST)
+Received: by mail-pj1-f48.google.com with SMTP id u1-20020a17090a450100b0022936a63a21so19860300pjg.4;
+        Tue, 24 Jan 2023 12:32:36 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=MRLbM6oiJ1QftHSOm/qd3LNPBpHZQaBYTRDMNWAHmcE=;
+        b=N1S8VN9oemIpQ4CVQ0Xjrbc6pQHVsPC4nRvxobmxP+qZqZW1m8rFwQCYGSS2cpqtIm
+         yxfiygaZSFsogqKDc3Zd4/Q2WpPbggadPzW+RIEQHaIM2n9haUxZxVX9rW0MfCeUhTdB
+         F71wz9gBwwywDL8sZ4ofCpSFZ6+w1Ym5VIzbnj4fywcEvrNnYr4iZ+keHRekUhyfqpYY
+         THgeohoN9/RvNW4R2VGb/R6l91CNdwsxi0E+84gRQ8dW+SsJYfzHoJzza4Td9SKco6uy
+         s0VfkHQ40DhNnrlYbE6FzbNXncmyhIYAjZuPKRB4SWWgyiwbBmYPyALBietNRmCzZvTT
+         aFsw==
+X-Gm-Message-State: AFqh2kpPRSZfxs83LtCTm/gdf95mcA5aaim1wc7P2WZ3/4PaW5IsdOBS
+        WYZXzF11D56+0p4MpLYBQsc=
+X-Google-Smtp-Source: AMrXdXt/0cv+RxYDWkSC+nI6MnkTCay37uiKfqsw65sY7I4TS/Ps5COm4BXrj978PTiKq/ROwMEFCQ==
+X-Received: by 2002:a17:902:b598:b0:194:645a:fa9a with SMTP id a24-20020a170902b59800b00194645afa9amr28795976pls.8.1674592352224;
+        Tue, 24 Jan 2023 12:32:32 -0800 (PST)
+Received: from ?IPV6:2620:15c:211:201:c69a:cf2c:dc2d:7829? ([2620:15c:211:201:c69a:cf2c:dc2d:7829])
+        by smtp.gmail.com with ESMTPSA id jc11-20020a17090325cb00b00189c62eac37sm2105659plb.32.2023.01.24.12.32.30
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 24 Jan 2023 12:32:31 -0800 (PST)
+Message-ID: <a127b2d1-b7b0-66e4-5af1-bd292a46e752@acm.org>
+Date:   Tue, 24 Jan 2023 12:32:29 -0800
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.1
-Subject: Re: [PATCH v9 8/8] block: convert bio_map_user_iov to use
- iov_iter_extract_pages
+ Thunderbird/102.5.1
+Subject: Re: [PATCH v3 02/18] block: introduce BLK_STS_DURATION_LIMIT
 Content-Language: en-US
-To:     David Howells <dhowells@redhat.com>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Christoph Hellwig <hch@infradead.org>
-CC:     Matthew Wilcox <willy@infradead.org>, Jens Axboe <axboe@kernel.dk>,
-        "Jan Kara" <jack@suse.cz>, Jeff Layton <jlayton@kernel.org>,
-        David Hildenbrand <david@redhat.com>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        <linux-fsdevel@vger.kernel.org>, <linux-block@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, "Christoph Hellwig" <hch@lst.de>
-References: <20230124170108.1070389-1-dhowells@redhat.com>
- <20230124170108.1070389-9-dhowells@redhat.com>
-From:   John Hubbard <jhubbard@nvidia.com>
-In-Reply-To: <20230124170108.1070389-9-dhowells@redhat.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+To:     Keith Busch <kbusch@kernel.org>
+Cc:     Niklas Cassel <niklas.cassel@wdc.com>,
+        Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+        Hannes Reinecke <hare@suse.de>,
+        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+        linux-scsi@vger.kernel.org, linux-ide@vger.kernel.org,
+        linux-block@vger.kernel.org
+References: <20230124190308.127318-1-niklas.cassel@wdc.com>
+ <20230124190308.127318-3-niklas.cassel@wdc.com>
+ <517c119a-38cf-2600-0443-9bda93e03f32@acm.org>
+ <Y9A4s5tlsdx0S8s4@kbusch-mbp.dhcp.thefacebook.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <Y9A4s5tlsdx0S8s4@kbusch-mbp.dhcp.thefacebook.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.126.230.37]
-X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS1PEPF0000E63D:EE_|SN7PR12MB7323:EE_
-X-MS-Office365-Filtering-Correlation-Id: 5e1a86b5-52f9-4424-d4c7-08dafe4a0f0f
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: Wqc65LRXfWXoQPdJAoVXsvffjESIhpTypEft6/bnDP4WjjG2hpJbQezFXqjbnu2jC8ZjAPPToRHBMU5A+n6RfWTsoMTbdeXbpcztBtuV+amssWHveYe7HJe4Es1/Yx8uxWD0C69GPKWVK1UD76iojJ1xCPkBE+2rxLbjjflGHFWAvdEBl8zC0iu9Fnfca16dN+IgcM8DvZN7tRd8Mzz15lBqojxp8lKCF55w7qHAW7przzfJE9YMRSLoV3BdU+45rzCszC2k7Msf+S+24NkWnZXBKUDeTpSjkHrYFaeDCdxuofUBj8B/HmCcfNf8us5gbeWYRZnjqLEhqbWAaJGmhx/T3C0I7aE1NWPHUTPtqKEXT5tClL1NDXVxjCcYUKLkNeMZkhQerEoHKmKrDrUVop0O+w9olSt6NR+mr4HP863kAH/pIr2Sx6/uL4b8K+fRuE+O1ur3vnyuR3l/tPaZA7BDde5cBJ7Wlk1BHnlnjkld1aDwzqWjQPDPKgD0v/Adhn4JbkONinW0U1vdRV/KuRJDsBCaXcP7PVGQkZJw2LjCLvkJr/sQUODKk53ws90GX+OwnC2v2kPPQUvm11iOGMr1mAQ8ZXHchhmS7OSGh1VwfgRrpX/0X2Nkx8cRWkDl6/SuXYYY/+bANM8ZMKRSigz1H75E9yr2Tf98zc0cW19/kV7E+OorQC5aLuRtLhJn9w0lfIIA3TNqz3RU8xJqQAEpwO/u6qfqGfdVXyB1WQA=
-X-Forefront-Antispam-Report: CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230025)(4636009)(346002)(376002)(396003)(136003)(39860400002)(451199018)(40470700004)(36840700001)(46966006)(31686004)(36756003)(86362001)(40480700001)(70586007)(82740400003)(356005)(83380400001)(8676002)(31696002)(8936002)(5660300002)(7416002)(2906002)(70206006)(7636003)(16576012)(36860700001)(316002)(40460700003)(478600001)(82310400005)(110136005)(54906003)(426003)(16526019)(47076005)(41300700001)(4326008)(26005)(336012)(2616005)(186003)(53546011)(43740500002);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Jan 2023 20:32:05.8514
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5e1a86b5-52f9-4424-d4c7-08dafe4a0f0f
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: DS1PEPF0000E63D.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB7323
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/24/23 09:01, David Howells wrote:
-> This will pin pages or leave them unaltered rather than getting a ref on
-> them as appropriate to the iterator.
+On 1/24/23 11:59, Keith Busch wrote:
+> On Tue, Jan 24, 2023 at 11:29:10AM -0800, Bart Van Assche wrote:
+>> On 1/24/23 11:02, Niklas Cassel wrote:
+>>> Introduce the new block IO status BLK_STS_DURATION_LIMIT for LLDDs to
+>>> report command that failed due to a command duration limit being
+>>> exceeded. This new status is mapped to the ETIME error code to allow
+>>> users to differentiate "soft" duration limit failures from other more
+>>> serious hardware related errors.
+>>
+>> What makes exceeding the duration limit different from an I/O timeout
+>> (BLK_STS_TIMEOUT)? Why is it important to tell the difference between an I/O
+>> timeout and exceeding the command duration limit?
 > 
-> The pages need to be pinned for DIO rather than having refs taken on them
-> to prevent VM copy-on-write from malfunctioning during a concurrent fork()
-> (the result of the I/O could otherwise end up being visible to/affected by
-> the child process).
-> 
-> Signed-off-by: David Howells <dhowells@redhat.com>
-> cc: Al Viro <viro@zeniv.linux.org.uk>
-> cc: Jens Axboe <axboe@kernel.dk>
-> cc: Jan Kara <jack@suse.cz>
-> cc: Christoph Hellwig <hch@lst.de>
-> cc: Matthew Wilcox <willy@infradead.org>
-> cc: Logan Gunthorpe <logang@deltatee.com>
-> cc: linux-block@vger.kernel.org
-> ---
-> 
-> Notes:
->      ver #8)
->       - Split the patch up a bit [hch].
->       - We should only be using pinned/non-pinned pages and not ref'd pages,
->         so adjust the comments appropriately.
->      
->      ver #7)
->       - Don't treat BIO_PAGE_REFFED/PINNED as being the same as FOLL_GET/PIN.
->      
->      ver #5)
->       - Transcribe the FOLL_* flags returned by iov_iter_extract_pages() to
->         BIO_* flags and got rid of bi_cleanup_mode.
->       - Replaced BIO_NO_PAGE_REF to BIO_PAGE_REFFED in the preceding patch.
-> 
->   block/blk-map.c | 22 ++++++++++------------
->   1 file changed, 10 insertions(+), 12 deletions(-)
-> 
+> BLK_STS_TIMEOUT should be used if the target device doesn't provide any
+> response to the command. The DURATION_LIMIT status is used when the device
+> completes a command with that status.
 
-Reviewed-by: John Hubbard <jhubbard@nvidia.com>
+Hi Keith,
 
-thanks,
--- 
-John Hubbard
-NVIDIA
+ From SPC-6: "The MAX ACTIVE TIME field specifies an upper limit on the 
+time that elapses from the time at which the device server initiates 
+actions to access, transfer, or act upon the specified data until the 
+time the device server returns status for the command."
 
-> diff --git a/block/blk-map.c b/block/blk-map.c
-> index 0e2b0a861ba3..4e22dccdbe9b 100644
-> --- a/block/blk-map.c
-> +++ b/block/blk-map.c
-> @@ -282,21 +282,19 @@ static int bio_map_user_iov(struct request *rq, struct iov_iter *iter,
->   	if (blk_queue_pci_p2pdma(rq->q))
->   		extraction_flags |= ITER_ALLOW_P2PDMA;
->   
-> -	bio_set_flag(bio, BIO_PAGE_REFFED);
-> +	bio_set_cleanup_mode(bio, iter);
->   	while (iov_iter_count(iter)) {
-> -		struct page **pages, *stack_pages[UIO_FASTIOV];
-> +		struct page *stack_pages[UIO_FASTIOV];
-> +		struct page **pages = stack_pages;
->   		ssize_t bytes;
->   		size_t offs;
->   		int npages;
->   
-> -		if (nr_vecs <= ARRAY_SIZE(stack_pages)) {
-> -			pages = stack_pages;
-> -			bytes = iov_iter_get_pages(iter, pages, LONG_MAX,
-> -						   nr_vecs, &offs, extraction_flags);
-> -		} else {
-> -			bytes = iov_iter_get_pages_alloc(iter, &pages,
-> -						LONG_MAX, &offs, extraction_flags);
-> -		}
-> +		if (nr_vecs > ARRAY_SIZE(stack_pages))
-> +			pages = NULL;
-> +
-> +		bytes = iov_iter_extract_pages(iter, &pages, LONG_MAX,
-> +					       nr_vecs, extraction_flags, &offs);
->   		if (unlikely(bytes <= 0)) {
->   			ret = bytes ? bytes : -EFAULT;
->   			goto out_unmap;
-> @@ -318,7 +316,7 @@ static int bio_map_user_iov(struct request *rq, struct iov_iter *iter,
->   				if (!bio_add_hw_page(rq->q, bio, page, n, offs,
->   						     max_sectors, &same_page)) {
->   					if (same_page)
-> -						put_page(page);
-> +						bio_release_page(bio, page);
->   					break;
->   				}
->   
-> @@ -330,7 +328,7 @@ static int bio_map_user_iov(struct request *rq, struct iov_iter *iter,
->   		 * release the pages we didn't map into the bio, if any
->   		 */
->   		while (j < npages)
-> -			put_page(pages[j++]);
-> +			bio_release_page(bio, pages[j++]);
->   		if (pages != stack_pages)
->   			kvfree(pages);
->   		/* couldn't stuff something into bio? */
-> 
+My interpretation of the above text is that the SCSI command duration 
+limit specifies a hard limit, the same type of limit reported by the 
+status code BLK_STS_TIMEOUT. It is not clear to me from the patch 
+description why a new status code is needed for reporting that the 
+command duration limit has been exceeded.
 
+Thanks,
+
+Bart.
