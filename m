@@ -2,146 +2,83 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 582ABC05027
-	for <linux-block@archiver.kernel.org>; Tue, 24 Jan 2023 03:11:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D7D3FC25B4E
+	for <linux-block@archiver.kernel.org>; Tue, 24 Jan 2023 04:45:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232315AbjAXDL6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 23 Jan 2023 22:11:58 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48548 "EHLO
+        id S230435AbjAXEpC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 23 Jan 2023 23:45:02 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45898 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229870AbjAXDL5 (ORCPT
+        with ESMTP id S229930AbjAXEpC (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 23 Jan 2023 22:11:57 -0500
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2084.outbound.protection.outlook.com [40.107.237.84])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F01B725297;
-        Mon, 23 Jan 2023 19:11:55 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=jL4/DYgsjShsC2D1s5XCUcft6sN0Ox8X3n1NApbD2QjFkq2SJErFHt0XwmOqMllxyxZi41b9VE/Hb+eotAWPUvOOhrup3DIsqWApjjaQTbB+zS3CGvfDXzrkUttyzHKjb9vEWRdwJtoco/nELfOVhA8N4bEmxJe5VI+x3mvdkYR3gXytmfFNmOfgfEWLJdIe2mWlNy09eTJrsgBY93GGG7kj5YKndwGh+QKJM5LjSSkYFcU2n7+CsibYzuEswq0wpigNuP4i0Nru+bl0nlc5tIzX7Y4f7fEFYK/MGhSR59gRT+yWRJhpV3HS54NXMXNumOmKlNN3rrp/IQ477bJ5IQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=uUuA28hc8DRt2hNAadbDCsh652Ffi5eqAqVkZKCgxC0=;
- b=icSV/NXRUKZIgU+ucCOuMKo3UtpbxP07kq8Afecmx8T9Qq3oZOX1gc/MdyQD4lnfNxuX+uS4Xk9l91mRqleXW5LoZGuXwWPm8SQ6EOz6bj+07XUpwWUm6aptoud8LzofMR9iusba9fCVdYxLR4GGCcfub2DUmxRXRRVj+txv432CwMx8PE/Csc8XcKNOT1k8JcbDyLIQNrEn7LbhIHCviXM7yglJaXfe7PH7pgmSUIbVXPDHVQBKO9AqzkCWMpRsCXYNcZjO8pUfNgVYTRo/SZL4G/Kt42t3bIVi/INDqH5MF9faDaWopCcuirxwNBtaFm9rgZ2rcahhXLhoEs8aHA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=redhat.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=uUuA28hc8DRt2hNAadbDCsh652Ffi5eqAqVkZKCgxC0=;
- b=KQQ3TwGVDxp56SmxJBSHgU7iTCv1rdx8Wp4fGDPukrmLfrHB3yZhfOd01EmJUC4Fl3pqRKBqGGwLUY/pPmq+8nWH65QF9WgzAdbnxf1Etklf4HhfvPRvTdVHrobjxHC6tW0DwAEzvhDUsvDfhDgp8jTt71BYzyJY8Ud6WqLGRrXJdTk2kWbMvRKpMqCvYfPk9jgtKCJuXvzYtbafj85hS2a6ptWCnHABOgVRx6wqp6j056Lu7zT+d2/KWPowwLrYAPcVegHps8OW0Mj4Rvh80ruscyZqERRlyqqlUHKUfCCqVcgvY+7iOhzij2Ai+7C73nGOEBitrItWg11VRVYyzg==
-Received: from MW4PR03CA0176.namprd03.prod.outlook.com (2603:10b6:303:8d::31)
- by CY8PR12MB8244.namprd12.prod.outlook.com (2603:10b6:930:72::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6002.33; Tue, 24 Jan
- 2023 03:11:53 +0000
-Received: from CO1NAM11FT055.eop-nam11.prod.protection.outlook.com
- (2603:10b6:303:8d:cafe::19) by MW4PR03CA0176.outlook.office365.com
- (2603:10b6:303:8d::31) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6002.33 via Frontend
- Transport; Tue, 24 Jan 2023 03:11:53 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- CO1NAM11FT055.mail.protection.outlook.com (10.13.175.129) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6043.17 via Frontend Transport; Tue, 24 Jan 2023 03:11:53 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.36; Mon, 23 Jan
- 2023 19:11:43 -0800
-Received: from [10.110.48.28] (10.126.231.37) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.36; Mon, 23 Jan
- 2023 19:11:42 -0800
-Message-ID: <84721e8d-d40e-617c-b75e-ead51c3e1edf@nvidia.com>
-Date:   Mon, 23 Jan 2023 19:11:42 -0800
+        Mon, 23 Jan 2023 23:45:02 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 533CF367D9;
+        Mon, 23 Jan 2023 20:45:01 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id C0808611C8;
+        Tue, 24 Jan 2023 04:45:00 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D7E69C433EF;
+        Tue, 24 Jan 2023 04:44:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1674535500;
+        bh=uLobooDvuBLURSCK8z3RoEGS4cS1PpKpDD7QQUTMSD8=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=SdRV0h4/9wqTp6KPfHa6Si4KC562GC3ojVCDi8BBaWItEoPR6qLWzqTVqwgZjfEVW
+         PWR1mRaLVCQfhQXQjGIz+tOcQ3XybYFpTTz1cTYbK/IvHbGXfvoff1itK6CbceI2zV
+         u2hAQh7shcbt6mDphAr8VXMOOZe08a+NUbbNnaoLgXA4xFteTGX3xC+tnTeMYQsH3b
+         iblJcu+BlCgM7O9J8F8S4gmXywpmNmIPTwfi6kF3hzlz9j3IsUu5kTW+V8kczaVxYC
+         M6W2FhanDbbnWWz7ebjSP5XQQv1Lv8wVzAOCDGP+fnRp7geE4ztjfhvbZiD5XMDWqY
+         CR88zcivq/+wQ==
+Date:   Mon, 23 Jan 2023 21:44:57 -0700
+From:   Keith Busch <kbusch@kernel.org>
+To:     Qu Wenruo <quwenruo.btrfs@gmx.com>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Linux FS Devel <linux-fsdevel@vger.kernel.org>
+Subject: Re: What would happen if the block device driver/firmware found some
+ block of a bio is corrupted?
+Message-ID: <Y89iSQJEpMFBSd2G@kbusch-mbp.dhcp.thefacebook.com>
+References: <5be2cd86-e535-a4ae-b989-887bf9c2c36d@gmx.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.1
-Subject: Re: [PATCH v8 10/10] mm: Renumber FOLL_PIN and FOLL_GET down
-Content-Language: en-US
-From:   John Hubbard <jhubbard@nvidia.com>
-To:     David Howells <dhowells@redhat.com>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Christoph Hellwig <hch@infradead.org>,
-        Jason Gunthorpe <jgg@nvidia.com>
-CC:     Matthew Wilcox <willy@infradead.org>, Jens Axboe <axboe@kernel.dk>,
-        "Jan Kara" <jack@suse.cz>, Jeff Layton <jlayton@kernel.org>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        <linux-fsdevel@vger.kernel.org>, <linux-block@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, "Christoph Hellwig" <hch@lst.de>,
-        <linux-mm@kvack.org>
-References: <20230123173007.325544-1-dhowells@redhat.com>
- <20230123173007.325544-11-dhowells@redhat.com>
- <31f7d71d-0eb9-2250-78c0-2e8f31023c66@nvidia.com>
-In-Reply-To: <31f7d71d-0eb9-2250-78c0-2e8f31023c66@nvidia.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.126.231.37]
-X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1NAM11FT055:EE_|CY8PR12MB8244:EE_
-X-MS-Office365-Filtering-Correlation-Id: 453ee89a-92d1-42e7-1f07-08dafdb8be53
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: RlCI1DU7fxHRzIWFrY5OC8QoGWm2cwAaJNK8llD6F2aBhcrnQqUROyz0uYhzL5bQj4x3VsuRfzxuMYJ6An6srKvyvJumaUqVvuP1qrh3JwCNKBLneYo0PCs1tS1Xsh0Tful1veZQp9Dc3OPz2GWX/76dE7Lt8jd20ETdF/HreoWtVbycU0OM39byjEL6or4hwm7cmayyU2Z0XJexD7k6t5cAikcifRMQz/LXlvE0N516AnUQzxbRk47uw2ZMiAQok3aTukKOLNBZswgY6DM8TQ9w/2/QEtfBNfxDjnENnDGSp+oOGLZFaN8qUszlPl1m0SLRUUbDytliKyc7pKRWUHOkozcAm7lhRIwYkJZqXYqvEUTqSMVkhECHsqCgSZBD9hbbRsJ/f3k/sdp2pdlysPanZ5isj6t+LgzMA/ns9HpxRJ9yD/M8/j7wjCGESkPR1osInEYUMmG6OhgvRmvKiydsmG6FdpZyOj4e5j8Bt+iSRSJGIk726dXisNoqGqov90IuXdoLGg/f8DG2OU1d6jIMZJ7cxGYSnp24PI9k+xu/p5RsgqLRmGFUQgHYa/OdgEE/Aek7C6fY18A2C55GOETYqfKIDtoSm+xqdIwkcyOD3P+hiXWHFqS/4BbyfMS09lPIltLyR7d2ZVqG9DUI+tKE5R93shO57wX/GHgIaT017x7nFHhMdpM8eaPsesD3f+CQJDjsZ74q3fh2RtEJ2+hnoiMhq01X6BbSlKhghGkhfSQsU/LIL1mDgt0NbiTpicfvwKmzE5iKVRIedMUycXNZgnLF4KOUm6z4uO+83KhrKG2MMKEDWw/19V6LeZIx
-X-Forefront-Antispam-Report: CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230022)(4636009)(39860400002)(136003)(376002)(396003)(346002)(451199015)(40470700004)(46966006)(36840700001)(40460700003)(40480700001)(86362001)(31696002)(36756003)(6636002)(316002)(54906003)(16576012)(110136005)(478600001)(966005)(5660300002)(2906002)(70206006)(4326008)(8676002)(8936002)(70586007)(41300700001)(7416002)(36860700001)(7636003)(356005)(82740400003)(82310400005)(2616005)(186003)(26005)(53546011)(16526019)(83380400001)(336012)(47076005)(426003)(31686004)(43740500002);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Jan 2023 03:11:53.3556
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 453ee89a-92d1-42e7-1f07-08dafdb8be53
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: CO1NAM11FT055.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB8244
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5be2cd86-e535-a4ae-b989-887bf9c2c36d@gmx.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/23/23 19:08, John Hubbard wrote:
-> On 1/23/23 09:30, David Howells wrote:
->> Renumber FOLL_PIN and FOLL_GET down to bit 0 and 1 respectively so that
->> they are coincidentally the same as BIO_PAGE_PINNED and BIO_PAGE_REFFED and
->> also so that they can be stored in the bottom two bits of a page pointer
->> (something I'm looking at for zerocopy socket fragments).
->>
->> (Note that BIO_PAGE_REFFED should probably be got rid of at some point,
->> hence why FOLL_PIN is at 0.)
->>
->> Also renumber down the other FOLL_* flags to close the gaps.
+On Tue, Jan 24, 2023 at 10:31:47AM +0800, Qu Wenruo wrote:
+> I'm wondering what would happen if we submit a read bio containing multiple
+> sectors, while the block disk driver/firmware has internal checksum and
+> found just one sector is corrupted (mismatch with its internal csum)?
 > 
-> Should we also get these sorted into internal-to-mm and public sets?
-> Because Jason (+Cc) again was about to split them apart into
-> mm/internal.h [1] and that might make that a little cleaner.
+> For example, we submit a read bio sized 16KiB, and the device is in 4K
+> sector size (like most modern HDD/SSD).
+> The corruption happens at the 2nd sector of the 16KiB.
+> 
+> My instinct points to either of them:
+> 
+> A) Mark the whole 16KiB bio as BLK_STS_IOERR
+>    This means even we have 3 good sectors, we have to treat them all as
+>    errors.
 
-I see that I omitted both Jason's Cc and the reference, so I'll resend.
-Sorry for the extra noise.
+I believe BLK_STS_MEDIUM is the appropriate status for this scenario,
+not IOERR. The MEDIUM errno is propogated up as ENODATA.
 
-[1] https://lore.kernel.org/all/fcdb3294-3740-a0e0-b115-12842eb0696d@nvidia.com/
+Finding specific failed sectors makes sense if a partial of the
+originally requested data is useful. That's application specific, so the
+retry logic should probably be driven at a higher level than the block
+layer based on seeing a MEDIUM error.
 
-> 
-> Also, I don't think that there is any large readability difference
-> either way between 0x and <<1, so whatever you and Christophe settle on
-> there seems fine.
-> 
-> So either way with those points,
-> 
-> Reviewed-by: John Hubbard <jhubbard@nvidia.com>
-> 
-> thanks,
+Some protocols can report partial transfers. If you trust the device,
+you could know the first unreadable sector and retry from there.
 
-thanks,
--- 
-John Hubbard
-NVIDIA
+Some protocols like NVMe optionally support querying which sectors are
+not readable. We're not making use of that in kernel, but these kinds of
+features exist if you need to know which LBAs to exclude for future
+retries.
+
+Outside that, you could search for specific unrecoverable LBAs with
+split retries till you find them all, divide-and-conquer.
