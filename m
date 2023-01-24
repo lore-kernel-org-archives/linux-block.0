@@ -2,87 +2,67 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B931C38142
-	for <linux-block@archiver.kernel.org>; Tue, 24 Jan 2023 14:02:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C8B5CC25B4E
+	for <linux-block@archiver.kernel.org>; Tue, 24 Jan 2023 14:03:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233390AbjAXOCg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 24 Jan 2023 09:02:36 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37538 "EHLO
+        id S232320AbjAXODV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 24 Jan 2023 09:03:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39720 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233727AbjAXOCg (ORCPT
+        with ESMTP id S233694AbjAXODV (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 24 Jan 2023 09:02:36 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66E84474F6
-        for <linux-block@vger.kernel.org>; Tue, 24 Jan 2023 06:01:28 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1674568867;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=eo2GrUnkx8jKUa516q4eKoqkbm41JbPUJ1rKGdvQbMk=;
-        b=LFGd2BlDaPFvVGFCkctlRjZnzdXL5x5sygtYrR0Xc/gcqqNrymPW2JDSZ+HmeBIKNrrajv
-        CoGdWiD+2r+08hDc65UgGcoBaVuY32VJoJT5dKYuTVzNoZ8S0iJmhp4UkC2UKMZy+t95SK
-        KkXeB6JHs/aH5VGk5uDmuPQ3hOZ1u0I=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-556-a7Q6G-m3MkiaJjWzkfrdVQ-1; Tue, 24 Jan 2023 08:44:58 -0500
-X-MC-Unique: a7Q6G-m3MkiaJjWzkfrdVQ-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 6E2A83C025C7;
-        Tue, 24 Jan 2023 13:44:57 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.33.36.97])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 244C640444C3;
-        Tue, 24 Jan 2023 13:44:56 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <02063032-61e7-e1e5-cd51-a50337405159@redhat.com>
-References: <02063032-61e7-e1e5-cd51-a50337405159@redhat.com> <20230123173007.325544-1-dhowells@redhat.com>
-To:     David Hildenbrand <david@redhat.com>
-Cc:     dhowells@redhat.com, Al Viro <viro@zeniv.linux.org.uk>,
+        Tue, 24 Jan 2023 09:03:21 -0500
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 82747EF85;
+        Tue, 24 Jan 2023 06:03:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=DYKGL6jdW48jjLGtQGlo55UCRBRwJlq9pwc27T0p/Fw=; b=uzqa9ZQSlszDjcu6uDXWUFQU6g
+        7BWFS8WeyYycIR8/yV1oPiCkXkIbUdIrFRugUUl6frhM3lLNixOqXnylZ9u0sK4Jb25zT+Z/iun8/
+        z9G2P3jznLcBVcHpZWp0P2N8AqYz2bcdCYsS7hviWclG71eCIP8z7xO100DANWwiOaMw8FsYVwdB8
+        CKtr0IabzAMwXEoBbeQ/Y44NO5jEjlF80/mn5IEptD8E1VCmfQ1Q8txYzgeyde7UtmkYPfPA+aWOt
+        dCyb+zeQmorRLkRRIjmcZa/BDqT0SKJwlW3z5AGl0OQXTn/+7CQGTGLGy+jqqtW9kjlPUujPJtOnD
+        pNrvrT7A==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1pKJt3-004AUs-72; Tue, 24 Jan 2023 14:02:57 +0000
+Date:   Tue, 24 Jan 2023 06:02:57 -0800
+From:   Christoph Hellwig <hch@infradead.org>
+To:     David Howells <dhowells@redhat.com>
+Cc:     Jason Gunthorpe <jgg@nvidia.com>,
+        John Hubbard <jhubbard@nvidia.com>,
+        Al Viro <viro@zeniv.linux.org.uk>,
         Christoph Hellwig <hch@infradead.org>,
         Matthew Wilcox <willy@infradead.org>,
         Jens Axboe <axboe@kernel.dk>, Jan Kara <jack@suse.cz>,
         Jeff Layton <jlayton@kernel.org>,
         Logan Gunthorpe <logang@deltatee.com>,
         linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v8 00/10] iov_iter: Improve page extraction (pin or just list)
+        linux-kernel@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        linux-mm@kvack.org
+Subject: Re: [PATCH v8 10/10] mm: Renumber FOLL_PIN and FOLL_GET down
+Message-ID: <Y8/lEVirzumLn4OG@infradead.org>
+References: <Y8/hhvfDtVcsgQd6@nvidia.com>
+ <Y8/ZekMEAfi8VeFl@nvidia.com>
+ <20230123173007.325544-1-dhowells@redhat.com>
+ <20230123173007.325544-11-dhowells@redhat.com>
+ <31f7d71d-0eb9-2250-78c0-2e8f31023c66@nvidia.com>
+ <84721e8d-d40e-617c-b75e-ead51c3e1edf@nvidia.com>
+ <852117.1674567983@warthog.procyon.org.uk>
+ <852914.1674568628@warthog.procyon.org.uk>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <852028.1674567895.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date:   Tue, 24 Jan 2023 13:44:55 +0000
-Message-ID: <852029.1674567895@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.1
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <852914.1674568628@warthog.procyon.org.uk>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-If you look here:
+On Tue, Jan 24, 2023 at 01:57:08PM +0000, David Howells wrote:
+> 	[include/linux/mm_types.h]
+> 	#define PAGE_CLEANUP_UNPIN	(1U << 0)
+> 	#define PAGE_CLEANUP_PUT	(1U << 0)
 
-	https://lore.kernel.org/r/167391047703.2311931.8115712773222260073.stgit@=
-warthog.procyon.org.uk/
-
-you can see additional patches fixing other users.  Christoph asked if I c=
-ould
-pare down the patchset to the minimum to fix the bio case for the moment.
-
-It will be easier to do the others once iov_iter_extract_pages() is upstre=
-am
-as the individual bits can go via their respective maintainers.
-
-However, I do want to see about adding cifs iteratorisation in this merge
-window also, which also depends on the iov_iter_extract_pages() function b=
-eing
-added.
-
-David
-
+With the latest series we don't need PAGE_CLEANUP_PUT at all.
