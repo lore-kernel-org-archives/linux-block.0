@@ -2,32 +2,32 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C57AC25B4E
-	for <linux-block@archiver.kernel.org>; Tue, 24 Jan 2023 19:01:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D712C54E94
+	for <linux-block@archiver.kernel.org>; Tue, 24 Jan 2023 19:01:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233586AbjAXTBN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 24 Jan 2023 14:01:13 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38598 "EHLO
+        id S234477AbjAXTBm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 24 Jan 2023 14:01:42 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39212 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233549AbjAXTBM (ORCPT
+        with ESMTP id S234063AbjAXTBe (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 24 Jan 2023 14:01:12 -0500
+        Tue, 24 Jan 2023 14:01:34 -0500
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 691434C6C8;
-        Tue, 24 Jan 2023 11:01:09 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 200544DCD9;
+        Tue, 24 Jan 2023 11:01:31 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
         :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=wUIvYwP9fsit2iMfgfdaW3+bhvI90/rC/aH72KemOcM=; b=Fqa6KkJ/pTEy1IXNJfFxc/scHe
-        ilJkZm8LBVVyQU8SBFpithAOHc9dtYIdOYnz1TXMhAAsLqYr4NUdLE7WkRztldYpGzJRsgZT8gRNW
-        UAouh962tNQRiVSTrAuySJh0kP7G+Hh6bugGmyNpTmcDLS3Q077DeOaMUVtTMLUw+DGGWEIszKkCh
-        tReXDOotIAVUVlWPwy2KP6l+YUilVvDXuuglA+2AqeLLBLEXfT3HF/y5bzvjFgT8fOJXVj48gN/PD
-        wwkpWCUEBf9feOQ1eWDA8TX9NzK+gfhV5QkDBPHuCy9excBnc7nhim+eQoKNq7AJE+qgoG2GhdRMc
-        ecoTZ8iA==;
+        bh=M7NmYC/Iylm9myghHwqILim55SAUt9QrM+UZYk0eJlw=; b=I2LSE/gNflJgPGeMH4Z2keN/YI
+        PvtX07ROIY65bgS716Qv7a7cTX0sFJApENOp7KJ6T7Qc5hUT+sCTZ9p5q+c5PJE0Sl61xeGDKVJOb
+        OkPjNtsT9Daaj/059U77qFhPadPZHMJbFfGqubTBgEPIkXU61EMh28ktK3Qgu4INDH+v77YN1qP8a
+        R5H0WcNqc3PkCUs0HtvbeSMDkdN+rq0ufVf2fhiPDpyANHsuPXnD6wfmPvCj5HCzdoQNb7+0d/9Sw
+        s5FPcqdqIXdCb7ghAtePI4MNhrmZ9TSMillCbg3Xjxy3YQ5Yx/t7mfjqPdWWE87TM3j+GtSrVfSaC
+        2uLaCjBQ==;
 Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1pKOXV-005007-Kp; Tue, 24 Jan 2023 19:01:01 +0000
-Date:   Tue, 24 Jan 2023 11:01:01 -0800
+        id 1pKOXs-00502Z-43; Tue, 24 Jan 2023 19:01:24 +0000
+Date:   Tue, 24 Jan 2023 11:01:24 -0800
 From:   Christoph Hellwig <hch@infradead.org>
 To:     David Howells <dhowells@redhat.com>
 Cc:     Al Viro <viro@zeniv.linux.org.uk>,
@@ -39,25 +39,21 @@ Cc:     Al Viro <viro@zeniv.linux.org.uk>,
         Jason Gunthorpe <jgg@nvidia.com>,
         Logan Gunthorpe <logang@deltatee.com>,
         linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v9 3/8] iomap: Don't get an reference on ZERO_PAGE for
- direct I/O block zeroing
-Message-ID: <Y9Aq7eJ/RKSDiliq@infradead.org>
+        linux-kernel@vger.kernel.org, Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH v9 5/8] block: Replace BIO_NO_PAGE_REF with
+ BIO_PAGE_REFFED with inverted logic
+Message-ID: <Y9ArBOYnhCXcJdil@infradead.org>
 References: <20230124170108.1070389-1-dhowells@redhat.com>
- <20230124170108.1070389-4-dhowells@redhat.com>
+ <20230124170108.1070389-6-dhowells@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230124170108.1070389-4-dhowells@redhat.com>
+In-Reply-To: <20230124170108.1070389-6-dhowells@redhat.com>
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jan 24, 2023 at 05:01:03PM +0000, David Howells wrote:
-> ZERO_PAGE can't go away, no need to hold an extra reference.
-> 
-> Signed-off-by: David Howells <dhowells@redhat.com>
-> Reviewed-by: David Hildenbrand <david@redhat.com>
+Looks good:
 
-If you send this on this needs your signoff as well, btw.
+Reviewed-by: Christoph Hellwig <hch@lst.de>
