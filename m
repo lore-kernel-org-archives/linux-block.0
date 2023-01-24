@@ -2,50 +2,51 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D3B1C54EED
-	for <linux-block@archiver.kernel.org>; Tue, 24 Jan 2023 13:46:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E39AEC25B4E
+	for <linux-block@archiver.kernel.org>; Tue, 24 Jan 2023 13:51:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234701AbjAXNq1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 24 Jan 2023 08:46:27 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35780 "EHLO
+        id S234753AbjAXNve (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 24 Jan 2023 08:51:34 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44474 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234530AbjAXNpm (ORCPT
+        with ESMTP id S234671AbjAXNvU (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 24 Jan 2023 08:45:42 -0500
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2067.outbound.protection.outlook.com [40.107.243.67])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC24D47EE3;
-        Tue, 24 Jan 2023 05:44:01 -0800 (PST)
+        Tue, 24 Jan 2023 08:51:20 -0500
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2069.outbound.protection.outlook.com [40.107.220.69])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B53946152;
+        Tue, 24 Jan 2023 05:49:04 -0800 (PST)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=RvXZnMsA8pHUsAGe551sLXh0MbVCKcZWFIHzsj50sItvlsLUhXPRwYTl/yG40JA4HwLhT/qBwV66OHIkv5s4kJD8eKdA1TRSeikgqGXqNlXuSsY61wg70yt85yyea9ziTztoiCKRqHIW2E9QZ143O7UgIOgRCYhNHx83DtUbjZtfyzzGGbiXPDwZCGadaw+l0/DktwZ7z+dBdTPbalZVx+DvAqHZN4SHv7xHONFklGqFYSEguZnPHH92kiwoTHqYM8OmMXQAYy7MBQiBSONBtV/8Cgi/GCO/0Fgc3J1AiEJpb6YrCANL0Y3wF5cEc4Jv3S7nfU5P5sJLJO2BcNA6tw==
+ b=oCahvWCJtnEbKwK/4f49N1T2jC9AXhE7hdi3m8MugrcN7OPbd3n89ZS6Qg1hX+bXxbCLMm0zsrl6ATJN6TDmt7fSqtyJ7eMQLknWCAv1a7YADk+jOSRYrISQ7NwL2tBpzW2jrEDPyMW97coxT8GiHcrpSaWTwF3jKMj9WZmf5yRKbTzeBy6u44RX/QxvFZhZCzTOz6HTmX3PYt5bceosN1g1ZqeUdYWlGBziMIusEdJ8Vjqmd6C8uEED9FbQ3Y91pxBCAyhVncQt87dGbyo6VYEU2ntTUUDhM5pRr/6QILxjROqvXBM1JVCDiwr0MPZkYsakc3VaN2GBkFh1Gw+iOA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=qeaEBHG980ovNvnkyFcVitfAuITfVhQYbiWU8YTDtt0=;
- b=a+aAmXN5T60p3KepaoFbV1dS3/LdEQPBou2wR1riUOZUDsSIr1xnXtmjkErlGdp43sv1YQIogPigPER8EXxwtoEOWHZxe80MvIMKnwGY3I4EjWQdeaxHFHI2DHlMkbzrSMs0Q3x6iDInKN619rEeDqDcd+tpUi/954Xt+F2NLfn4GVUFinipG4+Atp2CZbKOqPG6KgFYeO7JAxcFgDDD7SuLElwbVjAJdvWNq7wOZ1h6SSN7kA7mqpG+efZRWw8w/T0EHatV7eUKam3lcZ+LhAOMIGjuBI4Rx25v1QawoBIm5UCkwPbknvoXMR8XmKuHL7L8GtqJQItZ856RfvpmBA==
+ bh=qRUCK+jkPfw0uw2asMJoQeL7Bj+1tylrAOZP9+rn83Q=;
+ b=Y6jCA7z9NfFDlNFH6UhuRPrYCz1/oCcoI/BjgBcStGvZE8kHfFKbzT15qPh91hc8qiYfo6wkpWDuTU3VvPN1egr1JIhQAbpNuNhEGUmigplHjDmmLidYJaFADmSB2udn4gEJnzy/NKPV9MyotL8fGTa0rFbxdhGEATErsdbLz4IQH8vGFi+e1PERAvEUtHM/nEe4pbJdsDdE+/8F5B2yp7JDUpiekEQVBJwGHAc48DUmKlb6Rnpq5EparEASEz4oLRaFC40u2gm2dRrWWuSPNmV0Gvu9XEqSA9my3ux2pQMblqmO5oiU7l6T3MdpwjjaGmyGPVOTT5Aiog2ClCd+Wg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
  dkim=pass header.d=nvidia.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=qeaEBHG980ovNvnkyFcVitfAuITfVhQYbiWU8YTDtt0=;
- b=itTicEKOTsx8L+TsOYYRirqFAruiK9gpffzbFdZ4Z6bOYu9Eqah8IuTelTmpouhFP4xSbChNBWASswV4Iox/3SV9dhP9V1sNPsivD1GIbxXVBz52Sr8GBy34VGOtzdzIhtYEq3tYZbt5NPVq6UujfUZh8IZawqH6eFYbFIX5G7/ewIS44gcbLgZJF4zeTGkQmCAjLZhU1AXMtVEFsQDyQTfrHCDoqK/Y0ZmGdB351+zaTP7l02D5n+7JW9wKGOHxZJyYlrkIcYeNaKOC4mWcbDrtUi3Kwcez0CYFOtQmGAkrj03NJ6T0R6RbX/pCrhJI+VeNLLTYxmFrRrp9so5Tcg==
+ bh=qRUCK+jkPfw0uw2asMJoQeL7Bj+1tylrAOZP9+rn83Q=;
+ b=VfcOBd22hsu3hg07VSjbMWqQ+zT/7RIYRlrkKWcoWW2xsGXo++E6SkuPnxQiZPZhtgqDhfsXPZzX9eZ7dA3RBBhsnlRmTVjo/uHe+xvEa9YrU+AwQoxx3UwFaaHCXl58tPQ3BK+zgTAIZ3N05o8qHW/4YEMpYSZwR5DhIAnqqJZaaBnPx/HvDKpSyoPOHNu0ho20CJNVY9R4foKB0eIFr/OKULxNBpVaeJyXCuDn/75Y1dlnHaAynAW/zCh3Nbo5g8Ex/VklKm6lNeeuQfWCr55g6dfpNHhHZ8s9RQksasxFQGyrsqzSqRSCXXQZELnulMWHpFjasG0GZuFoLZpb9w==
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=nvidia.com;
 Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by DS7PR12MB6144.namprd12.prod.outlook.com (2603:10b6:8:98::8) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6002.33; Tue, 24 Jan 2023 13:43:29 +0000
+ by IA1PR12MB6043.namprd12.prod.outlook.com (2603:10b6:208:3d5::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6002.33; Tue, 24 Jan
+ 2023 13:47:51 +0000
 Received: from LV2PR12MB5869.namprd12.prod.outlook.com
  ([fe80::3cb3:2fce:5c8f:82ee]) by LV2PR12MB5869.namprd12.prod.outlook.com
  ([fe80::3cb3:2fce:5c8f:82ee%4]) with mapi id 15.20.6002.033; Tue, 24 Jan 2023
- 13:43:29 +0000
-Date:   Tue, 24 Jan 2023 09:43:27 -0400
+ 13:47:51 +0000
+Date:   Tue, 24 Jan 2023 09:47:50 -0400
 From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Christoph Hellwig <hch@infradead.org>
+To:     David Howells <dhowells@redhat.com>
 Cc:     John Hubbard <jhubbard@nvidia.com>,
-        David Howells <dhowells@redhat.com>,
         Al Viro <viro@zeniv.linux.org.uk>,
+        Christoph Hellwig <hch@infradead.org>,
         Matthew Wilcox <willy@infradead.org>,
         Jens Axboe <axboe@kernel.dk>, Jan Kara <jack@suse.cz>,
         Jeff Layton <jlayton@kernel.org>,
@@ -54,90 +55,86 @@ Cc:     John Hubbard <jhubbard@nvidia.com>,
         linux-kernel@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
         linux-mm@kvack.org
 Subject: Re: [PATCH v8 10/10] mm: Renumber FOLL_PIN and FOLL_GET down
-Message-ID: <Y8/gfyonV18PVkKU@nvidia.com>
-References: <20230123173007.325544-1-dhowells@redhat.com>
+Message-ID: <Y8/hhvfDtVcsgQd6@nvidia.com>
+References: <Y8/ZekMEAfi8VeFl@nvidia.com>
+ <20230123173007.325544-1-dhowells@redhat.com>
  <20230123173007.325544-11-dhowells@redhat.com>
  <31f7d71d-0eb9-2250-78c0-2e8f31023c66@nvidia.com>
  <84721e8d-d40e-617c-b75e-ead51c3e1edf@nvidia.com>
- <Y8/ZekMEAfi8VeFl@nvidia.com>
- <Y8/ajxH0PF8PaiA9@infradead.org>
+ <852117.1674567983@warthog.procyon.org.uk>
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Y8/ajxH0PF8PaiA9@infradead.org>
-X-ClientProxiedBy: MN2PR19CA0023.namprd19.prod.outlook.com
- (2603:10b6:208:178::36) To LV2PR12MB5869.namprd12.prod.outlook.com
+In-Reply-To: <852117.1674567983@warthog.procyon.org.uk>
+X-ClientProxiedBy: BL1PR13CA0193.namprd13.prod.outlook.com
+ (2603:10b6:208:2be::18) To LV2PR12MB5869.namprd12.prod.outlook.com
  (2603:10b6:408:176::16)
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|DS7PR12MB6144:EE_
-X-MS-Office365-Filtering-Correlation-Id: 4fc769d5-e9f7-4aee-1736-08dafe10f9d2
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|IA1PR12MB6043:EE_
+X-MS-Office365-Filtering-Correlation-Id: 31f821d3-c2ee-4ba4-8d1d-08dafe1195dc
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: vDRuOekzhQNgwkLnOqoh7U6w143nqc9om5clNoK9ZMo16x6pqz877ASdgFonAvekhBEumt1mqZh2bH9Lw5opIjd9V4NZ3Tkac4TzCIh/PcQhbdn1DOZFrIsyMudTPPTmNAjeODmAd6RZdvdv13/Ggqgzo/4oVjK7dJD0VCFN0QTa5F2UZJve2I8fi4w0tG+wBgpZF9cpSQu7T7m3H0PqSOctRn0lqmHA5wH0MR/g0PxFqwIaYj0xNQCE+ASRtHHOm2mRpFWM79AofLeOfk6vSJCkLL0+WW/xFy0Qy19Zk62kHdRgfq9U3J8Tp95w74L8z/qh7eOC3b1mwW6eSq785//Ex1Kgsf1KIEAo1rPkMrOdTRdFlvUlsXcPc5SBarVg2ASLr/zsr2dIB+jWHntAozqallCiQY0enFU+G9FMfoVjPYzLw9363BOHrVzlkVwJls87gOcN55SxDBTWwcP7rZkR1vi1yr/sBxEgwhChIAQWKzIautNI6CYjzQcBaGUn+DVY66h7XxvyCSF7aOifP7KCMyVIldb+hMcfWecGOu+OCgXWIgXgbqOEtjQ3RELD+JcJFEYf87wTm8BTUeVUUoTZxyPReKSCl0cvlBvOkYwUHZJvG74Z/uYbtxir21vhsnHkXKQ5C00CSNy0SYGqeQ==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(39860400002)(366004)(346002)(376002)(136003)(396003)(451199015)(36756003)(86362001)(2906002)(7416002)(4326008)(4744005)(8936002)(5660300002)(41300700001)(83380400001)(38100700002)(478600001)(6486002)(66946007)(6916009)(8676002)(6506007)(26005)(6512007)(186003)(66556008)(54906003)(66476007)(2616005)(316002);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: 0yanf4wYPsUE4L+O4QSXxBpGCJvjTO3WkeYiZgUgLx5LWSILpodaGfZf/2y1Cx3ouKriwR9kGZNq4TqkS2APU4x/6zsy8neiFjc4aAV94yUdkbZwBrOv3MfKt6i6tZmiCRrKt0UGtVFYjMBHDUu916ddbmIQFFYJwgtpEOs8s7WYGDVnYbTSFdcsgCva+khz2lprNE+jmB30Xh+mbF6o906lQysZa/AV7iV+AqJygvr6cleSA4Veg/k2nMomDECHWDk9cbq3C4326EwqmA+NLFgPHp4HNxODeLLwITsrUtF3RQTVhPjc0HI9L76Wknqdb1vBK9Vgg7y+9kd60epBEuoS2XwYVBbhTv8EJveIcRf7IY1coc1Z1jpWuXwVna/GmEJFok35YE1bbsmDgfRVIoSltW3Nxr0Z7+dV8+kyXXUH+Gmwa/5WsKmrl7UoM03ED8PFXZ3CQ+ZT4D3fUwsU+EVoIK9zXE6o3gSTkbXXdcPZ7no6a5QVnHftEjqT8H/Hf/fEjMv1a3hg55E1/Ugy1If1Sck7aFTly3u/Mk42LJ5MQvLZH8mY4ttksqTnIMYVDP1eeDxQapGJP0FCtClLgMXyBpRR+ILq7gQMsH7VHgd5ur7rzi7xFAcFq0ybIL4MQ91oWegbGetg26I55Lvo1Q==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(136003)(376002)(346002)(396003)(366004)(39860400002)(451199015)(8936002)(7416002)(5660300002)(2906002)(478600001)(4744005)(6486002)(26005)(186003)(6512007)(2616005)(6506007)(66476007)(4326008)(6916009)(8676002)(66946007)(66556008)(41300700001)(86362001)(38100700002)(54906003)(316002)(36756003);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?EU5Y9y6k4N5a2kHkxWueNuOQCzNM0fdmdayaz5omFN5iO6FTjjatXRHGl2SS?=
- =?us-ascii?Q?QuFPEW1r0e2U/spKFuHsESosuI8HVvrJl8ZOFx5T+E/SlJMgbH3qidIk/yTT?=
- =?us-ascii?Q?ztRGlOJc7cfLDGUjw5WtzPkoNDEbC4EFCoB9U38JEqOrry9O/8Be83A2byLx?=
- =?us-ascii?Q?M90DPzem6a7CHCIOIx+EG+GI2C7zuS+38Cb753aEyhXruzFFGVnBdbcS+IYq?=
- =?us-ascii?Q?O9MCwh9iUhk6Vihy0DtY+isFNSBsiGtz2jcYhHJfEEvqcqClJouYQUDW67zp?=
- =?us-ascii?Q?7XOfU+ICOLf4f+sMzZ01m/aRt5xO9ngCaxPpEfs1TCWHRM7gCBxQGShYyx0Y?=
- =?us-ascii?Q?zX8SRvEIX7+I4MvpGo7m1pFMGvx50AaKcPZ3PgByC/QLvUnxpj3hq34A9BJM?=
- =?us-ascii?Q?Yl53b6BI3TBs5d5bf5+HnC2Qfe80BAvC8nUV5qWlX8MO9NwAIFWjmko31pd+?=
- =?us-ascii?Q?hOM2JueOQvVJ64RmMw4RgdU4k+gratmGnVaM8lRlh691f5H6L7WUQT0XyFgo?=
- =?us-ascii?Q?EYg4qSX01NJ2X6ah0vj3flvB8aRerNmXPL/aMkJECAFbGephOky2wpgUQMQn?=
- =?us-ascii?Q?MEvCK6+2925Y/lpczNfLAwCivuAWAL6QI/iOB+M6fca5fUVnZPYSqlxvsjEo?=
- =?us-ascii?Q?lxCvZyXhhAqn5LmMVWvlgSLw+Er7fgHK2vdz+fcpdUM+PvsM/KM8W6nA9ubN?=
- =?us-ascii?Q?J/yWtJ83dgXGraBPYx4cs1CzhNqcbQyWtjSPnMbu6tpH5eXoMjRPUBMoz/5F?=
- =?us-ascii?Q?cJVNLIp6Xl2ZuPMSO+gbQD1895KL10ITXnbKgmYNjwAY2EbJtjdPPF+KU+Te?=
- =?us-ascii?Q?7nZiSON9hQ7YTJOb1bBTUI7r06dDB6wtUUwshZZvRpByIXkvAMGhhuTRbDt0?=
- =?us-ascii?Q?VnH2Qgt1jhlmZggTHxsKkVvLZjJvJwmwLYsjPNIelxTbi1FDEDQ430YAE7v9?=
- =?us-ascii?Q?1b32ghst96AUmb8o5js2YezTID6JFbHQUIvMXhZEBhN0+AkyrR7toNqdodG3?=
- =?us-ascii?Q?IR4qnHokuzjCT7KwsGpK7YcjIRv6/U4H0141kMAHEk/spvlEnABIH8P7swXi?=
- =?us-ascii?Q?fuleDedaszdyR9KHSYzP0jog/mfgY1Xn/xDgJul86c8RA/TDVyNyY44qlbR+?=
- =?us-ascii?Q?DWZhlI3AmN/MvydyIDIKW8lB4flAOMbn/tfdUuflhdzN+ExLOSq3oLDcP2C4?=
- =?us-ascii?Q?AwPh/XUvNosOahkJ/cbfsyWrJcVlVnPEA/iBGHj0dot5G43bxcHrak4E+UB0?=
- =?us-ascii?Q?53+wsjkzmRTcY4sUXQpKx9rDZheARa4yigRh9e7CqNyyOCV3RDsmJUu5WyMj?=
- =?us-ascii?Q?18SVwuh+PV05Wykzk03Ejuf5DlSBmZjJof9iTWIy0N+GZgHiW5d2Ct5gPj4V?=
- =?us-ascii?Q?/MS9cYZrPDRLFwe88JxKbdL6dQE/BCnUZnF7KmzeHXQ0WXpl0JOpZYL1MI+D?=
- =?us-ascii?Q?/gnUAeyE4H1pBZwBoj3oguE25nt6vepIbeoQcXNR9FSD0mxr8B1EVkXbKlfv?=
- =?us-ascii?Q?nHFxXY2DyA9pgEbH1TZFTjTkG8Tq4LbS93aGhlGZ7/BepsnSfQrhNinD0jlp?=
- =?us-ascii?Q?tcgDRMTOkbaoxyYARfTb8qSFJJGT93TWHkBBUjSQ?=
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?Y93cqHX068NjmZ+6vFQXvc8wszoXOJ7RDqTIx9lqEuj6jRtxPzUsQG7bir4u?=
+ =?us-ascii?Q?2BP4XzxR4TQo3iPHDRUg+qYomzBxyGTJcitro9mW4q5t+Py0cPKcXIOgyqA7?=
+ =?us-ascii?Q?LTyspWDZY6LIo9mTh03u9KL8Yd7cX8WwSOPeOgRMgyLaxEZ2TfH13sR5q7P1?=
+ =?us-ascii?Q?IzGrVBnU642XfxSg93EDsoatsIyqdUr6XBZBGQtjhHnVv3uSVV3YMz5azGCs?=
+ =?us-ascii?Q?JBZX3bKOF0leuHqsUmwKWyJYJ50FAkZvSSPRiO8X9boQkRn19mD0b7OdnOJi?=
+ =?us-ascii?Q?ywMAENEgng2pf+xKoQnJv7nSbo6Upht3noPIufOkWMXwGpGHg6Po5/PNgAQ9?=
+ =?us-ascii?Q?2ebBalBRCPlFgDiM8AvEM0FcLkJylfp8UeWNU563kmDevCMJcodGu0rg789a?=
+ =?us-ascii?Q?vbgzGExxufxW34s0a6CyEw8tR7o/B9Lc1QxsjtE5XjlUPD+XSWML2v8oOOQg?=
+ =?us-ascii?Q?iSPweL4GuXBOnv5gmhin2y551k24iSlhhH/JGP+XbQaXIQuS2VWeAHpyoqeb?=
+ =?us-ascii?Q?geZa4EkGrGdL2c/zTH11zshTsOEUkd4thaktp14SvYOSWHwc9bVdQ/7o2uT9?=
+ =?us-ascii?Q?Zjb/N+mmB0xFxC453AsUk3sNDlaOOyzp1h1VvsZSHu6T2vecSyPrX45NOoCp?=
+ =?us-ascii?Q?yNj5+lHkasMNqdR9JwnvWp+2mIsrfaUurFWUSwJh8gs2u9i+72b8wqLLsYyS?=
+ =?us-ascii?Q?PcBI3YMDk9+rH9p68/69lmAcYZnPuldHTmO/pnz9QcS/pR8U66IcRG2z39YK?=
+ =?us-ascii?Q?T/r1huWhoVxvGopxQkle8VpseCH+RVf7jbEVwrzCuS9LrTBwq02d9LhXSDsa?=
+ =?us-ascii?Q?0NZxsOVxiaSZgMr9VE9qf7sdZGjcoWvKLgi8ezAuTRngeBccRf5FPhGOtfnl?=
+ =?us-ascii?Q?qwM/0a4SST9d3ucBvqHRu5/Vg998W4iHQZbcu7V3tKpqgMyXyGFAEM/B4DfI?=
+ =?us-ascii?Q?DD+YLQiv4QedWh7qlmG6qeVTTaFCtlS1fNMaFg0g/ASlPalMLN257EuTU0QX?=
+ =?us-ascii?Q?6IyLx8UlG7uhwLDIG3KbSEHt0iuA0Sje1hosgSFjuN2jU1k8PcKa2UT5k4fk?=
+ =?us-ascii?Q?qjbIzmqxw2RoIFGci74n2Ajlsivap7WwfVzdJjJz1Y8TMivebW8FlL56eJ+/?=
+ =?us-ascii?Q?+O8R60RV3OnkWiDBnt+OCcVO8WNKvMljKD25n+i+g+8mxaDEE5LthvH3WKn3?=
+ =?us-ascii?Q?PapydQLLb7rL0ZziRlDO0xT1THdgo6RzVhfwVbvkKQy6hCOyvMBXfpL9VLKS?=
+ =?us-ascii?Q?Kov2n3XWxlaalqMm8nlGOjag6/mTsIeEnOnYOqyZz8FiVsN+JyIVH5R5dEhF?=
+ =?us-ascii?Q?wWvOTbZcjB+E8tBRWsBc3ZRk/Yj7ZNSedmgZYrd59VSqDV3zYMXjbVH7RL+g?=
+ =?us-ascii?Q?4IqIqmIUKLRly53/D26Py5C1zD+cK7ZXYNXvLj5fi/G96MJbNIk2woplhk/e?=
+ =?us-ascii?Q?A/bL0247HLPS+DuU4/jlXyCwTsgzdcXl9aUJyoQs2m8cSvdnrGWQqh4KfWsl?=
+ =?us-ascii?Q?NZn4edx5rzBWBBZpouGlyngLrZoS6OOvAd5nJOMfRNT0+HCa6SxrWJH3ZkvC?=
+ =?us-ascii?Q?d6W+RiBSl4E+zKQ5ReGjnxPFiE3cw7A/cO3Zpj5O?=
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4fc769d5-e9f7-4aee-1736-08dafe10f9d2
+X-MS-Exchange-CrossTenant-Network-Message-Id: 31f821d3-c2ee-4ba4-8d1d-08dafe1195dc
 X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Jan 2023 13:43:29.1667
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Jan 2023 13:47:51.0067
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 7prtQsKRAP7rfoycjVtcrfP1/7tpDiHIt5/EGrP1TAYHGkFiCRfx8Fhtm8akrILl
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB6144
+X-MS-Exchange-CrossTenant-UserPrincipalName: wcu892uNs6+MHOlwbvsQBRod+EvJMXtP34vhC5xdBqB0Qs46pvNS4bcT1VEYs7jD
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB6043
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jan 24, 2023 at 05:18:07AM -0800, Christoph Hellwig wrote:
-> On Tue, Jan 24, 2023 at 09:13:30AM -0400, Jason Gunthorpe wrote:
+On Tue, Jan 24, 2023 at 01:46:23PM +0000, David Howells wrote:
+> Jason Gunthorpe <jgg@nvidia.com> wrote:
+> 
 > > Yeah, I already wrote a similar patch, using the 1<< notation, 
 > > splitting the internal/external, and rebasing on the move to
 > > mm_types.. I can certainly drop that patch if we'd rather do this.
 > 
-> Given that you are doing more work in that area it might be best
-> to drop this patch from this series.
+> Note that I've already given Andrew a patch to move FOLL_* to mm_types.h.
 > 
-> > Though, I'm not so keen on using FOLL_ internal flags inside the block
-> > layer.. Can you stick with the BIO versions of these?
-> 
-> The block layer doesn't really use it - the new helper in iov_iter.c
-> returns it, and the block layer instantly turns it into an internal
-> flag.  But maybe it should just return a bool pinned (by reference)
-> now?
+> I'm happy to go with your patch on top of that if you can just renumber
+> FOLL_PIN to 0 and FOLL_GET to 1.
 
-Yes, a bool flag to the new mm helper instead of a FOLL_* seems good
-to me
+I moved FOLL_PIN to internal.h because it is not supposed to be used
+outside mm/*
 
-Thanks,
+I would prefer to keep it that way.
+
 Jason
