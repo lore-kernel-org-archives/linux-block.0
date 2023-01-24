@@ -2,67 +2,44 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C8B5CC25B4E
-	for <linux-block@archiver.kernel.org>; Tue, 24 Jan 2023 14:03:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 74DEDC54EAA
+	for <linux-block@archiver.kernel.org>; Tue, 24 Jan 2023 14:11:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232320AbjAXODV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 24 Jan 2023 09:03:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39720 "EHLO
+        id S234288AbjAXOLB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 24 Jan 2023 09:11:01 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49004 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233694AbjAXODV (ORCPT
+        with ESMTP id S233652AbjAXOLB (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 24 Jan 2023 09:03:21 -0500
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 82747EF85;
-        Tue, 24 Jan 2023 06:03:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=DYKGL6jdW48jjLGtQGlo55UCRBRwJlq9pwc27T0p/Fw=; b=uzqa9ZQSlszDjcu6uDXWUFQU6g
-        7BWFS8WeyYycIR8/yV1oPiCkXkIbUdIrFRugUUl6frhM3lLNixOqXnylZ9u0sK4Jb25zT+Z/iun8/
-        z9G2P3jznLcBVcHpZWp0P2N8AqYz2bcdCYsS7hviWclG71eCIP8z7xO100DANWwiOaMw8FsYVwdB8
-        CKtr0IabzAMwXEoBbeQ/Y44NO5jEjlF80/mn5IEptD8E1VCmfQ1Q8txYzgeyde7UtmkYPfPA+aWOt
-        dCyb+zeQmorRLkRRIjmcZa/BDqT0SKJwlW3z5AGl0OQXTn/+7CQGTGLGy+jqqtW9kjlPUujPJtOnD
-        pNrvrT7A==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1pKJt3-004AUs-72; Tue, 24 Jan 2023 14:02:57 +0000
-Date:   Tue, 24 Jan 2023 06:02:57 -0800
-From:   Christoph Hellwig <hch@infradead.org>
-To:     David Howells <dhowells@redhat.com>
-Cc:     Jason Gunthorpe <jgg@nvidia.com>,
-        John Hubbard <jhubbard@nvidia.com>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Christoph Hellwig <hch@infradead.org>,
-        Matthew Wilcox <willy@infradead.org>,
-        Jens Axboe <axboe@kernel.dk>, Jan Kara <jack@suse.cz>,
-        Jeff Layton <jlayton@kernel.org>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        linux-mm@kvack.org
-Subject: Re: [PATCH v8 10/10] mm: Renumber FOLL_PIN and FOLL_GET down
-Message-ID: <Y8/lEVirzumLn4OG@infradead.org>
-References: <Y8/hhvfDtVcsgQd6@nvidia.com>
- <Y8/ZekMEAfi8VeFl@nvidia.com>
- <20230123173007.325544-1-dhowells@redhat.com>
- <20230123173007.325544-11-dhowells@redhat.com>
- <31f7d71d-0eb9-2250-78c0-2e8f31023c66@nvidia.com>
- <84721e8d-d40e-617c-b75e-ead51c3e1edf@nvidia.com>
- <852117.1674567983@warthog.procyon.org.uk>
- <852914.1674568628@warthog.procyon.org.uk>
+        Tue, 24 Jan 2023 09:11:01 -0500
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8961042BDB;
+        Tue, 24 Jan 2023 06:11:00 -0800 (PST)
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id 3427068D09; Tue, 24 Jan 2023 14:45:18 +0100 (CET)
+Date:   Tue, 24 Jan 2023 14:45:17 +0100
+From:   Christoph Hellwig <hch@lst.de>
+To:     Alexander Gordeev <agordeev@linux.ibm.com>
+Cc:     Christoph Hellwig <hch@lst.de>, hca@linux.ibm.com,
+        gor@linux.ibm.com, linux-s390@vger.kernel.org,
+        linux-block@vger.kernel.org,
+        Gerald Schaefer <gerald.schaefer@de.ibm.com>
+Subject: Re: [PATCH] s390/dcssblk:: don't call bio_split_to_limits
+Message-ID: <20230124134517.GA26408@lst.de>
+References: <20230123075356.60847-1-hch@lst.de> <Y8/gDgQfQA7++8tw@li-4a3a4a4c-28e5-11b2-a85c-a8d192c6f089.ibm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <852914.1674568628@warthog.procyon.org.uk>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <Y8/gDgQfQA7++8tw@li-4a3a4a4c-28e5-11b2-a85c-a8d192c6f089.ibm.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jan 24, 2023 at 01:57:08PM +0000, David Howells wrote:
-> 	[include/linux/mm_types.h]
-> 	#define PAGE_CLEANUP_UNPIN	(1U << 0)
-> 	#define PAGE_CLEANUP_PUT	(1U << 0)
+On Tue, Jan 24, 2023 at 02:41:34PM +0100, Alexander Gordeev wrote:
+> If my understanding is correct that this change was as good as
+> early as commit 54efd50bfd87 ("block: make generic_make_request
+> handle arbitrarily sized bios") took place and simply fell into
+> the second category?
 
-With the latest series we don't need PAGE_CLEANUP_PUT at all.
+Yes.
