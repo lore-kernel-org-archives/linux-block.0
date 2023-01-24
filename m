@@ -2,121 +2,87 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 80E37C38142
-	for <linux-block@archiver.kernel.org>; Tue, 24 Jan 2023 13:41:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 81A5DC54E94
+	for <linux-block@archiver.kernel.org>; Tue, 24 Jan 2023 13:43:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233975AbjAXNlx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 24 Jan 2023 08:41:53 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60934 "EHLO
+        id S234292AbjAXNnI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 24 Jan 2023 08:43:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35508 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234191AbjAXNls (ORCPT
+        with ESMTP id S234319AbjAXNmw (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 24 Jan 2023 08:41:48 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B1ECB4588E;
-        Tue, 24 Jan 2023 05:41:46 -0800 (PST)
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 30OCePeZ021804;
-        Tue, 24 Jan 2023 13:41:43 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : references : mime-version : content-type :
- in-reply-to; s=pp1; bh=SOYnKhD5dQT63yZmrzh4+hpWYPFBvl/pDlnfVZmuzFI=;
- b=hAO/G/p+YhzIVLJmKM5GyU608jh0oQeUlIr2aRd8g6cXLdCIR9cvmFbwDLfqutK7xpdy
- nHCkc7XUwczHF6D9sFk3btqRh/rrZMF8uQCa2jYeWkqLtZ8FcHd1yZx4p2Qc/PolxKrj
- t4AgQnob+ydJG2GQJ1/KMgDZs821XlT5bpTsDULyq3+RM/LLOEpP2JqbrZ9AaWajEjF9
- ODY4LhcDd9GK5TzdMal5xngzpai6Qq3q0niuizWcud8WuhYCN91PoCSHPB1ESPtj5QxF
- PpdBISxJ3cRzbh3QHVWUgpF1EH6TGL0lNZF3jOnfNHCV2WKpjPm/u+BHNncS0VBm9tVB Ug== 
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3naagtrqn5-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 24 Jan 2023 13:41:43 +0000
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 30O559QO027489;
-        Tue, 24 Jan 2023 13:41:41 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-        by ppma04ams.nl.ibm.com (PPS) with ESMTPS id 3n87p6bv7s-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 24 Jan 2023 13:41:41 +0000
-Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
-        by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 30ODfbLE52101516
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 24 Jan 2023 13:41:37 GMT
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 36BBE20043;
-        Tue, 24 Jan 2023 13:41:37 +0000 (GMT)
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 4F59420040;
-        Tue, 24 Jan 2023 13:41:36 +0000 (GMT)
-Received: from li-4a3a4a4c-28e5-11b2-a85c-a8d192c6f089.ibm.com (unknown [9.171.94.199])
-        by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-        Tue, 24 Jan 2023 13:41:36 +0000 (GMT)
-Date:   Tue, 24 Jan 2023 14:41:34 +0100
-From:   Alexander Gordeev <agordeev@linux.ibm.com>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     hca@linux.ibm.com, gor@linux.ibm.com, linux-s390@vger.kernel.org,
-        linux-block@vger.kernel.org,
-        Gerald Schaefer <gerald.schaefer@de.ibm.com>
-Subject: Re: [PATCH] s390/dcssblk:: don't call bio_split_to_limits
-Message-ID: <Y8/gDgQfQA7++8tw@li-4a3a4a4c-28e5-11b2-a85c-a8d192c6f089.ibm.com>
-References: <20230123075356.60847-1-hch@lst.de>
+        Tue, 24 Jan 2023 08:42:52 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2893C45235;
+        Tue, 24 Jan 2023 05:42:11 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id DA42F611F4;
+        Tue, 24 Jan 2023 13:42:06 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D2256C4339B;
+        Tue, 24 Jan 2023 13:42:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1674567726;
+        bh=jmVxCeavWO+FBi8yxOKCkQ7COU927JaLBNSDf/y4n/w=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=XZiqvLF9hbEAvczjGpp92ZDbSuAVa9Qz0SgHgCspWhVMk8ai5oJf2O3FlWZ5E/ufT
+         Lxe2w1pwYf05JzI6XCqBVJ+9/pHA0qHGsMTxC643ZBtSoAqGGv5g1hEMAuHHDKBqbQ
+         EuqpTOnMbtaAUzijwY0joCM4aCKYWi2iI9xZHWli1MnKRyE4WZPaX9qIPSCEYP8TPv
+         Ssy9RocH4KI+PTJZdYvGycNeEM7ZHQy/IH4jDEPnQNxXoBnlSv8D9ygsPfeWySwFLz
+         r9ST88QPiE1jMOqucbDXRNq3VXknxEG1ine+8iUN6RjAccxJpLWb3H12cBEHGrEk+h
+         0O4OS7HC+td3Q==
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Yu Kuai <yukuai3@huawei.com>, Tejun Heo <tj@kernel.org>,
+        Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
+        josef@toxicpanda.com, cgroups@vger.kernel.org,
+        linux-block@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.1 16/35] blk-cgroup: fix missing pd_online_fn() while activating policy
+Date:   Tue, 24 Jan 2023 08:41:12 -0500
+Message-Id: <20230124134131.637036-16-sashal@kernel.org>
+X-Mailer: git-send-email 2.39.0
+In-Reply-To: <20230124134131.637036-1-sashal@kernel.org>
+References: <20230124134131.637036-1-sashal@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230123075356.60847-1-hch@lst.de>
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: RXwsrWpnsBnBhgap0qJ9PJEH_ZBlGWbf
-X-Proofpoint-GUID: RXwsrWpnsBnBhgap0qJ9PJEH_ZBlGWbf
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.122.1
- definitions=2023-01-23_12,2023-01-24_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011
- lowpriorityscore=0 spamscore=0 impostorscore=0 phishscore=0
- priorityscore=1501 adultscore=0 bulkscore=0 mlxscore=0 malwarescore=0
- mlxlogscore=900 suspectscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2212070000 definitions=main-2301240124
+X-stable: review
+X-Patchwork-Hint: Ignore
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Jan 23, 2023 at 08:53:56AM +0100, Christoph Hellwig wrote:
+From: Yu Kuai <yukuai3@huawei.com>
 
-Hi Christoph,
+[ Upstream commit e3ff8887e7db757360f97634e0d6f4b8e27a8c46 ]
 
-> s390 iterates over the bio using bio_for_each_segment and doesn't need
-> any bio splitting.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> ---
->  drivers/s390/block/dcssblk.c | 4 ----
->  1 file changed, 4 deletions(-)
-> 
-> diff --git a/drivers/s390/block/dcssblk.c b/drivers/s390/block/dcssblk.c
-> index c0f85ffb2b62de..c09f2e053bf863 100644
-> --- a/drivers/s390/block/dcssblk.c
-> +++ b/drivers/s390/block/dcssblk.c
-> @@ -864,10 +864,6 @@ dcssblk_submit_bio(struct bio *bio)
->  	unsigned long source_addr;
->  	unsigned long bytes_done;
->  
-> -	bio = bio_split_to_limits(bio);
-> -	if (!bio)
-> -		return;
-> -
->  	bytes_done = 0;
->  	dev_info = bio->bi_bdev->bd_disk->private_data;
->  	if (dev_info == NULL)
+If the policy defines pd_online_fn(), it should be called after
+pd_init_fn(), like blkg_create().
 
-If my understanding is correct that this change was as good as
-early as commit 54efd50bfd87 ("block: make generic_make_request
-handle arbitrarily sized bios") took place and simply fell into
-the second category?
+Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+Acked-by: Tejun Heo <tj@kernel.org>
+Link: https://lore.kernel.org/r/20230103112833.2013432-1-yukuai1@huaweicloud.com
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ block/blk-cgroup.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-	...
-	Some make_request_fn() callbacks were simple enough to audit and verify     
-	they don't need blk_queue_split() calls. The skipped ones are:              
-	...
-	Some others are almost certainly safe to remove now, but will be left       
-	for future patches.                                                         
-	...
+diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+index fcf9cf49f5de..7c91d9195da8 100644
+--- a/block/blk-cgroup.c
++++ b/block/blk-cgroup.c
+@@ -1408,6 +1408,10 @@ int blkcg_activate_policy(struct request_queue *q,
+ 		list_for_each_entry_reverse(blkg, &q->blkg_list, q_node)
+ 			pol->pd_init_fn(blkg->pd[pol->plid]);
+ 
++	if (pol->pd_online_fn)
++		list_for_each_entry_reverse(blkg, &q->blkg_list, q_node)
++			pol->pd_online_fn(blkg->pd[pol->plid]);
++
+ 	__set_bit(pol->plid, q->blkcg_pols);
+ 	ret = 0;
+ 
+-- 
+2.39.0
 
-Thanks!
