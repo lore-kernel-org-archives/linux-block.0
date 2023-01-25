@@ -2,299 +2,203 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B219FC27C76
-	for <linux-block@archiver.kernel.org>; Wed, 25 Jan 2023 18:37:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF8CFC54EED
+	for <linux-block@archiver.kernel.org>; Wed, 25 Jan 2023 18:38:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235192AbjAYSh6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 25 Jan 2023 13:37:58 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34328 "EHLO
+        id S235312AbjAYSiq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 25 Jan 2023 13:38:46 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34482 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230257AbjAYSh5 (ORCPT
+        with ESMTP id S230257AbjAYSip (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 25 Jan 2023 13:37:57 -0500
-Received: from mail-pj1-f49.google.com (mail-pj1-f49.google.com [209.85.216.49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A25AD113E8;
-        Wed, 25 Jan 2023 10:37:55 -0800 (PST)
-Received: by mail-pj1-f49.google.com with SMTP id x2-20020a17090a46c200b002295ca9855aso2983497pjg.2;
-        Wed, 25 Jan 2023 10:37:55 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=9kuEv51EG0zNMhrIvpDUzfQvpav0zuBUyyhhMrhPuDU=;
-        b=YHbtP6IQ4xnXMVZvdnC+iBxvWJDgTLxqjIPfg2L/ezur/RikdA8uqjtkXhlvMKr3oy
-         fwwhamILbA7/qty19OxzTTCLbBIJpPOFnvxcz3sXD6PEabqcXP6JhZc/j2T6oPRKNvVl
-         wSqepjN0pCszKI8WZxN/KFF3i2bWklxO/zBHN7gyoLGdsrO9Gr9pYsOeEj1gUFktMMY1
-         zFQDWbm5QYc0/yFTDeQuqUOMqy55NWvP53AuxupVSEu4aG4gv57xO3Ywm87Dzo/yhUFi
-         bgDRm7B2s50reVZStoEGJ7PKMyzaQQCTyPqiK/1fvQxmTtMp1iPZ2Z7r2ok0WiWWPC+T
-         59nA==
-X-Gm-Message-State: AO0yUKWFTENIzV2L78/isS1gCaFcj8i+4IIIVH4WdGCXefXgg62I/5cC
-        lz6P8LEcPP5A4kCmJrmNaaE=
-X-Google-Smtp-Source: AK7set/eyzU5R1T8RxHzrGu8mMDZMxDBM+2Wemi9pKnGYeykwIi4w4++/Z8BzcQHI35taNc4h0qMxw==
-X-Received: by 2002:a17:90b:3e8e:b0:22c:1613:1656 with SMTP id rj14-20020a17090b3e8e00b0022c16131656mr976291pjb.26.1674671874852;
-        Wed, 25 Jan 2023 10:37:54 -0800 (PST)
-Received: from ?IPV6:2620:15c:211:201:7512:ed47:db25:4294? ([2620:15c:211:201:7512:ed47:db25:4294])
-        by smtp.gmail.com with ESMTPSA id j3-20020a17090a3e0300b002263faf8431sm1986677pjc.17.2023.01.25.10.37.53
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 25 Jan 2023 10:37:54 -0800 (PST)
-Message-ID: <e8324901-7c18-153f-b47f-112a394832bd@acm.org>
-Date:   Wed, 25 Jan 2023 10:37:52 -0800
+        Wed, 25 Jan 2023 13:38:45 -0500
+Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D84D2457FE;
+        Wed, 25 Jan 2023 10:38:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1674671924; x=1706207924;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=cjJlmbsBJqA2otXOfFc4i1k2x0jo01D67fOxrZxjL10=;
+  b=FkbWcd4qcd9nwPHoeltSlde9DDLN8gTk233qzOyXLuOLJZmB3UgRAc8W
+   D69Ti5FI96qPdXhItHDJ2XguCL6d7Z0kVL3J3TG7YAHGNn3o4sszw9dkQ
+   saxIxcre4enPfrQj23jmfaF6/WI6n1rWcir+Nm/oMpaUoYcw8mDk6W/jZ
+   feSUGB5itlt7G2Dg24YZFo8O95UH+caZBPn/Apu1aDVc3xxq5HHdQUNif
+   dYncoEIrJaOtFi9PJtdRKMq4JjidUhV1PdJr5Nu8SCSN9DJJb2/G92Oe5
+   4JqIOR/qE/D1saauErVNFtFlqC/yyMxJ3OUvfEUrqTzmdqM+jwzxIIeZf
+   g==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10601"; a="391150329"
+X-IronPort-AV: E=Sophos;i="5.97,246,1669104000"; 
+   d="scan'208";a="391150329"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jan 2023 10:38:44 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10601"; a="770834697"
+X-IronPort-AV: E=Sophos;i="5.97,246,1669104000"; 
+   d="scan'208";a="770834697"
+Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
+  by fmsmga002.fm.intel.com with ESMTP; 25 Jan 2023 10:38:44 -0800
+Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.16; Wed, 25 Jan 2023 10:38:43 -0800
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.16; Wed, 25 Jan 2023 10:38:43 -0800
+Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.16 via Frontend Transport; Wed, 25 Jan 2023 10:38:43 -0800
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.169)
+ by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.16; Wed, 25 Jan 2023 10:38:42 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Emeasv8tfmarsj+1UxXvdH9K8YLfsUnfASAaEY0Vt5pZ4rJaa1uB5OY4Qwzv/k60xd65vQSo+4Q/ADHmihbfs01N1yWSJPXCSjnlxwygMxMIoTY/1f+eKbmL7pEjmlMClR4v5UYBj+oxXKVCMYbx0wTLfKDJRH63PONA6MierWbMspOZ8EFeHd8/92vfMEtpO/iDqoCCemmoB34KRqc0MNZ/9ChCNpwjkSGGPv9kAVxv9cLAmTHbvHS5GJ5cYNouoIbP19exdWYRQNTRiDqEcA6C/Y+jOYunX4B00Q8rFmd/zkmYG5b5odblEre1FZ811WDNdMhOIgtb3XOUFJtg6Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=snFB5qfw7aNAw5sHQ2vQeXZVp6MuttF/LdLpK3eVoKU=;
+ b=hjOKukWXNgyFkJag0WZ0GlmuhbWMe6UoLkcfqFUpwAMRndsLwp/QtpNlJzWABR/tW/oo2S4vJdIgTKRdTarVvaali+3HKDeNINe99WcySbBnw2iTRoxL0fsdz420iIRTgiOmTdPeFy/Ul6o8IQEmhrpeshHUPXLV7+vsB3aFERZA+H/6aGEjSd3Agk1nbFxfF+SOrsqB659pqb+g+Zx4HX24DOsiLPeZPWZnVyEYjRNwM0UdbPLk6KSi2IHQcBfvlKq1Ub43caaWoFmBHOojO4HvJEH4hVtH2qJfTTYV2DgfeOt3P7Gje/vD7cC89YZ0iLPwxg7qyIP9Y0QP0ubepA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from PH8PR11MB8107.namprd11.prod.outlook.com (2603:10b6:510:256::6)
+ by SJ0PR11MB5024.namprd11.prod.outlook.com (2603:10b6:a03:2dd::24) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6043.21; Wed, 25 Jan
+ 2023 18:38:40 +0000
+Received: from PH8PR11MB8107.namprd11.prod.outlook.com
+ ([fe80::421b:865b:f356:7dfc]) by PH8PR11MB8107.namprd11.prod.outlook.com
+ ([fe80::421b:865b:f356:7dfc%5]) with mapi id 15.20.6002.033; Wed, 25 Jan 2023
+ 18:38:40 +0000
+Date:   Wed, 25 Jan 2023 10:38:34 -0800
+From:   Dan Williams <dan.j.williams@intel.com>
+To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        Minchan Kim <minchan@kernel.org>,
+        Sergey Senozhatsky <senozhatsky@chromium.org>,
+        "Dan Williams" <dan.j.williams@intel.com>,
+        Vishal Verma <vishal.l.verma@intel.com>,
+        Dave Jiang <dave.jiang@intel.com>,
+        Ira Weiny <ira.weiny@intel.com>
+CC:     Andrew Morton <akpm@linux-foundation.org>,
+        <linux-block@vger.kernel.org>, <nvdimm@lists.linux.dev>,
+        <linux-fsdevel@vger.kernel.org>, <linux-mm@kvack.org>
+Subject: RE: [PATCH 7/7] block: remove ->rw_page
+Message-ID: <63d1772ae1bfd_3a36e529479@dwillia2-xfh.jf.intel.com.notmuch>
+References: <20230125133436.447864-1-hch@lst.de>
+ <20230125133436.447864-8-hch@lst.de>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20230125133436.447864-8-hch@lst.de>
+X-ClientProxiedBy: BL1PR13CA0120.namprd13.prod.outlook.com
+ (2603:10b6:208:2b9::35) To PH8PR11MB8107.namprd11.prod.outlook.com
+ (2603:10b6:510:256::6)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.0
-Subject: Re: [PATCH v3 01/18] block: introduce duration-limits priority class
-Content-Language: en-US
-To:     Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-        Niklas Cassel <niklas.cassel@wdc.com>,
-        Paolo Valente <paolo.valente@linaro.org>,
-        Jens Axboe <axboe@kernel.dk>
-Cc:     Christoph Hellwig <hch@lst.de>, Hannes Reinecke <hare@suse.de>,
-        linux-scsi@vger.kernel.org, linux-ide@vger.kernel.org,
-        linux-block@vger.kernel.org
-References: <20230124190308.127318-1-niklas.cassel@wdc.com>
- <20230124190308.127318-2-niklas.cassel@wdc.com>
- <bd0ce7ad-cf9e-a647-9b1e-cb36e7bbe30f@acm.org>
- <731aeacc-74c0-396b-efa0-f9ae950566d8@opensource.wdc.com>
- <873e0213-94b5-0d81-a8aa-4671241e198c@acm.org>
- <4c345d8b-7efa-85c9-fe1c-1124ea5d9de6@opensource.wdc.com>
- <5066441f-e265-ed64-fa39-f77a931ab998@acm.org>
- <275993f1-f9e8-e7a8-e901-2f7d3a6bb501@opensource.wdc.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <275993f1-f9e8-e7a8-e901-2f7d3a6bb501@opensource.wdc.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH8PR11MB8107:EE_|SJ0PR11MB5024:EE_
+X-MS-Office365-Filtering-Correlation-Id: b8671f18-07e3-4a30-e04b-08daff03610a
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: wZKHECNcRq0c8Nlp/iRCNel3NO6OJi1ixK2xmTYXdYFtIfKP4GxGckQR1kouFs0XG/VzHEy2cJK/ZjbEyffQhjpHIYYf6uDfxIjQBbDXj/xCBQfYS8AW6pCxjCgJrwmI492TOpNUa1AdnAyMLjoYiZD7rYZTAbM8faFoevaJ49nr6YzFaf1X6odFDL5JYxnTsV8lDWSWL8hR7h6H8ml5wI/QEdFT2Osm4sE8vbJkDJgyhdRTv7Ldc1fdpruYqMfq21vl51H4qVmZVPNw3mxVu0Fjz3yduCvTUIWOTSX72ocmBC/pE+oDVEk/0zJMaZGIZTOlXBtqbRAr0MHNttjgU6k7Ll4V8II36Ovj4Sq+wPGZxqWwy9zs0Sn0FIyy7NWO42YZ3nY4owPJw7fK6O9ACxXYFEqFYY85WKWkRyX5WhV/c5+AphQL/M9YCKviILx6eHcG/HWl9L9MnEeieYNpdNV+vmBOZBeBSr54YAKh98jAWm3m8vPA/SUdxfjhO8qrvfgDy2n5P6n1M3JK6s+0X2LaKIHzY/ISAwJtfJLK03AnG0kKZIIbh6WCG5IuJINGvvsnaVQH1oUAgim2Yq0NbvU7vk7X039EeNl15E7a2/fSgtYWlh2+1e2J1R9iOQe0+ec6pVo8zsSgVnKzmcnvxg==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH8PR11MB8107.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(376002)(136003)(396003)(366004)(346002)(39860400002)(451199018)(41300700001)(8936002)(38100700002)(2906002)(82960400001)(5660300002)(83380400001)(6486002)(6506007)(86362001)(186003)(6512007)(26005)(478600001)(6666004)(9686003)(66946007)(66476007)(66556008)(4326008)(8676002)(316002)(6636002)(110136005);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?XzlqRaHFNJs4n+tmsYwAyBp/s4trqZWYYvqeLawXtE2FxKBcQ6io+pMIHv/J?=
+ =?us-ascii?Q?VzttMNPDyMXWVmh+vPn2VS+3yP6scKQOvNlrapaD1spA+M02k09ZdnA27aed?=
+ =?us-ascii?Q?0Il1I8X0EtezX/kE0QUuoA/FzhbKWT/medF10BSOWM9GmKuEpMVzDxp/kppW?=
+ =?us-ascii?Q?t4RLX9GpgioUoAJEUi72j706JrcW3QWKRHLpHtU065QDP9wEaHhF2NrcXtZo?=
+ =?us-ascii?Q?3qMadttOWGih1FHfSCmSs8c2yemTGVRWdvGDABvPBF3Uv5nHDVSyUJGY8o2g?=
+ =?us-ascii?Q?Olu0Vjpl+UxE/QDW1edIS0K9dvXm8on4DCy8isUc61nIEa+f8lDd86lDz9Bx?=
+ =?us-ascii?Q?8eyfDhnHhaOkJe7BvCUdzlHgd/w8IyFIgbhhr54iy9s7me78JPmiTfRKk+55?=
+ =?us-ascii?Q?PSwBTQfc7MSE6NVTgUOgNsrxHWWgPkzMDrRn4Vm3Ad1lBjZkrOc5Z8jCjtaK?=
+ =?us-ascii?Q?iwcRGf/6JOkzkQVDidg0wwrLogg2vNG/aoo57qL0NKB8UbPLezoObpmBRpzZ?=
+ =?us-ascii?Q?etsl9hlB3kPinBAg026OrKbUq44RQbqWS4QZJCuoHyYe1ZJip6a14KjMzsIQ?=
+ =?us-ascii?Q?4qoEf5GvDK/pSvd+5NvqpTRYKuzh5r9Q/7pSpQJVgvr2t8yLldNqOi4FJdbi?=
+ =?us-ascii?Q?OSCS6HokA7JhTmGWVrBdO+6kn4+m0XgRaeC66L+bIfrZaVBqnO7Jjsz4rKeO?=
+ =?us-ascii?Q?GnwtdT0SNIkbiY8h4fLsllgnKymI1oK74tD4y1/71VEVMrsml1ZDFXAiajkO?=
+ =?us-ascii?Q?orf+qbn7NEWSKVf8O+SaTxWCXMMz3EOTGfipQQQZLsnV1rheivIJ9P5k8ZkI?=
+ =?us-ascii?Q?OEUGNVF+y+eVCxvlq6gC6KmY7d/XLtl6FuDaDYkd367BoMCgsN0msCHqxSjx?=
+ =?us-ascii?Q?aC0WkFyy7n1/6ZPHd102BjytODJMBr4L1/GwCvDBz8BRAIjntdN38yfw4bQB?=
+ =?us-ascii?Q?yyaVTFQIOVnbkIb/cF1xA23Q0a1CY8/yzy3sriljtowU/paBhHZXI/s/vM/y?=
+ =?us-ascii?Q?kyKt+Bz3yvYc5uqqyxiSnPf898kOhN/Yppun24neTLCmPhfc/ZHzU+Llm3uP?=
+ =?us-ascii?Q?NLBQRkkHv+IOSwwaQNAXUV5g7f/4WhERO4N8IYZetJfZcSyRKGX+nubE7DCW?=
+ =?us-ascii?Q?X1hRzrMk+EDGZUKN3IIDAUX4RjkAloXI1bQo6Uv+1ejHHcuIj78o+2Wehgbr?=
+ =?us-ascii?Q?MbmfPwr8/AwFFHEhFYTqbjtFFQjTZZyit2U5WGNuEwRbSBA324thBx+lt+b2?=
+ =?us-ascii?Q?vjr/u+Aqa84ez1QJBT+SV1dH3LID87Hbrfv6ItjhVTUoxdb19F5XO4sCCogF?=
+ =?us-ascii?Q?Nh6w92o7Q13tLOy68CV+Cv8Azz0CWRi5a3h6WBEv6R3VnoJkBp7I7BZpv9h5?=
+ =?us-ascii?Q?Z4nph88qCiQaS7v+Ae8WNJSYeW1GYzVHJT1ZKT/wslHXFhadjIYnpx8BuLe2?=
+ =?us-ascii?Q?VQo2bop2B63szt2hC5zIrNbPFknPXBiI+Nlrg47OMr39BWxE9mCNYsabeBHc?=
+ =?us-ascii?Q?CDrKBi9C/RzpD2PjlzJceFR6BryLm/UcmEdO2TodQ+9x9ays/Rxv1sUcxC/9?=
+ =?us-ascii?Q?e8+4fZVV3NCEgi7icPOyENAs1JugTBzgwv3em0EenBCFiZOG/5aLcs7R5wBB?=
+ =?us-ascii?Q?Sg=3D=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: b8671f18-07e3-4a30-e04b-08daff03610a
+X-MS-Exchange-CrossTenant-AuthSource: PH8PR11MB8107.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Jan 2023 18:38:40.5996
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 60yrdDvIB+4fECgpCMu6K/Uv6m5KoF1+a3/+ivawN/rPrqop2wE8ILkyIARF4Z2ZrZvSXAO9yKMWCDtKr/iuuyz6dkXyMLGuSWp0MDCfKLo=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR11MB5024
+X-OriginatorOrg: intel.com
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/24/23 17:19, Damien Le Moal wrote:
-> On 1/25/23 09:05, Bart Van Assche wrote:
->> Thanks again for the detailed reply. Your replies are very informative
->> and help me understand the context better.
->>
->> However, I'm still less than enthusiast about the introduction of the
->> I/O priority class IOPRIO_CLASS_DL. To me command duration limits (CDL)
->> is a mechanism that is supported by one storage standard (SCSI) and of
+Christoph Hellwig wrote:
+> The ->rw_page method is a special purpose bypass of the usual bio
+> handling path that is limited to single-page reads and writes and
+> synchronous which causes a lot of extra code in the drivers, callers
+> and the block layer.
 > 
-> And ATA (ACS) too. Not just SCSI. This is actually an improvement over IO
-> priority (command priority) that is supported only by ATA NCQ and does not
-> exist with SCSI/SBC.
+> The only remaining user is the MM swap code.  Switch that swap code to
+> simply submit a single-vec on-stack bio an synchronously wait on it
+> based on a newly added QUEUE_FLAG_SYNCHRONOUS flag set by the drivers
+> that currently implement ->rw_page instead.  While this touches one
+> extra cache line and executes extra code, it simplifies the block
+> layer and drivers and ensures that all feastures are properly supported
+> by all drivers, e.g. right now ->rw_page bypassed cgroup writeback
+> entirely.
 > 
->> which it is not sure that it will be integrated in other storage
->> standards (NVMe, ...). Isn't the purpose of the block layer to provide
->> an interface that is independent of the specifics of a single storage
->> standard? This is why I'm in favor of letting the ATA core translate one
->> of the existing I/O priority classes into a CDL instead of introducing a
->> new I/O priority class (IOPRIO_CLASS_DL) in the block layer.
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>  block/bdev.c                  | 78 -----------------------------------
+>  drivers/block/brd.c           | 15 +------
+>  drivers/block/zram/zram_drv.c | 61 +--------------------------
+>  drivers/nvdimm/btt.c          | 16 +------
+>  drivers/nvdimm/pmem.c         | 24 +----------
+>  include/linux/blkdev.h        | 12 +++---
+>  mm/page_io.c                  | 53 ++++++++++++++----------
+>  mm/swapfile.c                 |  2 +-
+>  8 files changed, 44 insertions(+), 217 deletions(-)
 > 
-> We discussed CDL with Hannes in the context of NVMe over fabrics. Their
-> may be interesting extensions to consider for NVMe in that context (the
-> value for local PCI attached NVMe drive is more limited at best).
-> 
-> I would argue that IO priority is the same: that is not supported by all
-> device classes either, and for those that support it, the semantic is not
-> identical (ATA vs NVMe). Yet, we have the RT class that maps to high
-> priority for ATA, and nothing else as far as I know.
-> 
-> CDL at least covers SCSI *and* ATA, and as mentioned above, could be used
-> by NVMe-of host drivers to do fancy link selection for a multipath setup
-> based on the link speed for instance.
-> 
-> We could overload the RT class with a mapping to CDL feature on scsi and
-> ata, but I think this is more confusing/messy than a separate class as we
-> implemented.
+[..]
+> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+> index 89f51d68c68ad6..1bffe8f44ae9a8 100644
+> --- a/include/linux/blkdev.h
+> +++ b/include/linux/blkdev.h
+> @@ -555,6 +555,7 @@ struct request_queue {
+>  #define QUEUE_FLAG_IO_STAT	7	/* do disk/partitions IO accounting */
+>  #define QUEUE_FLAG_NOXMERGES	9	/* No extended merges */
+>  #define QUEUE_FLAG_ADD_RANDOM	10	/* Contributes to random pool */
+> +#define QUEUE_FLAG_SYNCHRONOUS	11	/* always complets in submit context */
 
-Hi Damien,
+s/complets/completes/
 
-The more I think about this, the more I'm convinced that it would be wrong
-to introduce IOPRIO_CLASS_DL. Datacenters will have a mix of drives that
-support CDL and drives that do not support CDL. It seems wrong to me to
-make user space software responsible for figuring out whether or not the
-drive supports CDL before it can be decided which I/O priority class should
-be used. This is something the kernel should do instead of user space
-software.
+>  #define QUEUE_FLAG_SAME_FORCE	12	/* force complete on same CPU */
+>  #define QUEUE_FLAG_INIT_DONE	14	/* queue is initialized */
+>  #define QUEUE_FLAG_STABLE_WRITES 15	/* don't modify blks until WB is done */
+> @@ -1252,6 +1253,12 @@ static inline bool bdev_nonrot(struct block_device *bdev)
+>  	return blk_queue_nonrot(bdev_get_queue(bdev));
+>  }
+>  
 
-If we would ask Android storage vendors to implement CDL then IOPRIO_CLASS_DL
-would cause trouble too. Android has support since considerable time to give
-the foreground application a higher I/O priority than background applications.
-The cgroup settings for foreground and background applications come from the
-task_profiles.json file (see also
-https://android.googlesource.com/platform/system/core/+/master/libprocessgroup/profiles/task_profiles.json).
-As one can see all the settings in that file are independent of the features
-of the storage device. Introducing IOPRIO_CLASS_DL in the kernel and using it
-in task_profiles.json would imply that the storage device type has to be
-determined before it can be decided whether or not IOPRIO_CLASS_DL can be used.
-This seems wrong to me.
+Other than that, this looks good and passes regression:
 
-I downloaded the patch series in its entirety and applied it on a local kernel
-branch. I verified which changes would be needed to replace IOPRIO_CLASS_DL
-with IOPRIO_CLASS_RT. Can you help me with verifying the patch below?
-
-Regarding the BFQ changes in the patch below, is an I/O scheduler useful at all
-if CDL is used since a comment in the BFQ driver says that the disk should do
-the scheduling instead of BFQ if CDL is used?
-
-Thanks,
-
-Bart.
-
-
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index 7add9346c585..815b884d6c5a 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -5545,14 +5545,6 @@ bfq_set_next_ioprio_data(struct bfq_queue *bfqq, struct bfq_io_cq *bic)
-  		bfqq->new_ioprio_class = IOPRIO_CLASS_IDLE;
-  		bfqq->new_ioprio = 7;
-  		break;
--	case IOPRIO_CLASS_DL:
--		/*
--		 * For the duration-limits class, we want the disk to do the
--		 * scheduling. So map all levels to the highest RT level.
--		 */
--		bfqq->new_ioprio = 0;
--		bfqq->new_ioprio_class = IOPRIO_CLASS_RT;
--		break;
-  	}
-
-  	if (bfqq->new_ioprio >= IOPRIO_NR_LEVELS) {
-@@ -5681,8 +5673,6 @@ static struct bfq_queue **bfq_async_queue_prio(struct bfq_data *bfqd,
-  		return &bfqg->async_bfqq[1][ioprio][act_idx];
-  	case IOPRIO_CLASS_IDLE:
-  		return &bfqg->async_idle_bfqq[act_idx];
--	case IOPRIO_CLASS_DL:
--		return &bfqg->async_bfqq[0][0][act_idx];
-  	default:
-  		return NULL;
-  	}
-diff --git a/block/blk-ioprio.c b/block/blk-ioprio.c
-index dfb5c3f447f4..8bb6b8eba4ce 100644
---- a/block/blk-ioprio.c
-+++ b/block/blk-ioprio.c
-@@ -27,7 +27,6 @@
-   * @POLICY_RESTRICT_TO_BE: modify IOPRIO_CLASS_NONE and IOPRIO_CLASS_RT into
-   *		IOPRIO_CLASS_BE.
-   * @POLICY_ALL_TO_IDLE: change the I/O priority class into IOPRIO_CLASS_IDLE.
-- * @POLICY_ALL_TO_DL: change the I/O priority class into IOPRIO_CLASS_DL.
-   *
-   * See also <linux/ioprio.h>.
-   */
-@@ -36,7 +35,6 @@ enum prio_policy {
-  	POLICY_NONE_TO_RT	= 1,
-  	POLICY_RESTRICT_TO_BE	= 2,
-  	POLICY_ALL_TO_IDLE	= 3,
--	POLICY_ALL_TO_DL	= 4,
-  };
-
-  static const char *policy_name[] = {
-@@ -44,7 +42,6 @@ static const char *policy_name[] = {
-  	[POLICY_NONE_TO_RT]	= "none-to-rt",
-  	[POLICY_RESTRICT_TO_BE]	= "restrict-to-be",
-  	[POLICY_ALL_TO_IDLE]	= "idle",
--	[POLICY_ALL_TO_DL]	= "duration-limits",
-  };
-
-  static struct blkcg_policy ioprio_policy;
-diff --git a/block/ioprio.c b/block/ioprio.c
-index 1b3a9da82597..32a456b45804 100644
---- a/block/ioprio.c
-+++ b/block/ioprio.c
-@@ -37,7 +37,6 @@ int ioprio_check_cap(int ioprio)
-
-  	switch (class) {
-  		case IOPRIO_CLASS_RT:
--		case IOPRIO_CLASS_DL:
-  			/*
-  			 * Originally this only checked for CAP_SYS_ADMIN,
-  			 * which was implicitly allowed for pid 0 by security
-@@ -48,7 +47,7 @@ int ioprio_check_cap(int ioprio)
-  			if (!capable(CAP_SYS_ADMIN) && !capable(CAP_SYS_NICE))
-  				return -EPERM;
-  			fallthrough;
--			/* RT and DL have prio field too */
-+			/* rt has prio field too */
-  		case IOPRIO_CLASS_BE:
-  			if (data >= IOPRIO_NR_LEVELS || data < 0)
-  				return -EINVAL;
-diff --git a/block/mq-deadline.c b/block/mq-deadline.c
-index 526d0ea4dbf9..f10c2a0d18d4 100644
---- a/block/mq-deadline.c
-+++ b/block/mq-deadline.c
-@@ -113,7 +113,6 @@ static const enum dd_prio ioprio_class_to_prio[] = {
-  	[IOPRIO_CLASS_RT]	= DD_RT_PRIO,
-  	[IOPRIO_CLASS_BE]	= DD_BE_PRIO,
-  	[IOPRIO_CLASS_IDLE]	= DD_IDLE_PRIO,
--	[IOPRIO_CLASS_DL]	= DD_RT_PRIO,
-  };
-
-  static inline struct rb_root *
-diff --git a/drivers/ata/libata-core.c b/drivers/ata/libata-core.c
-index b4761c3c4b91..3065b632e6ae 100644
---- a/drivers/ata/libata-core.c
-+++ b/drivers/ata/libata-core.c
-@@ -673,7 +673,7 @@ static inline void ata_set_tf_cdl(struct ata_queued_cmd *qc, int ioprio)
-  	struct ata_taskfile *tf = &qc->tf;
-  	int cdl;
-
--	if (IOPRIO_PRIO_CLASS(ioprio) != IOPRIO_CLASS_DL)
-+	if (IOPRIO_PRIO_CLASS(ioprio) != IOPRIO_CLASS_RT)
-  		return;
-
-  	cdl = IOPRIO_PRIO_DATA(ioprio) & 0x07;
-diff --git a/drivers/scsi/sd_cdl.c b/drivers/scsi/sd_cdl.c
-index 59d02dbb5ea1..c5286f5ddae4 100644
---- a/drivers/scsi/sd_cdl.c
-+++ b/drivers/scsi/sd_cdl.c
-@@ -880,10 +880,10 @@ int sd_cdl_dld(struct scsi_disk *sdkp, struct scsi_cmnd *scmd)
-  	unsigned int dld;
-
-  	/*
--	 * Use "no limit" if the request ioprio class is not IOPRIO_CLASS_DL
-+	 * Use "no limit" if the request ioprio class is not IOPRIO_CLASS_RT
-  	 * or if the user specified an invalid CDL descriptor index.
-  	 */
--	if (IOPRIO_PRIO_CLASS(ioprio) != IOPRIO_CLASS_DL)
-+	if (IOPRIO_PRIO_CLASS(ioprio) != IOPRIO_CLASS_RT)
-  		return 0;
-
-  	dld = IOPRIO_PRIO_DATA(ioprio);
-diff --git a/include/linux/ioprio.h b/include/linux/ioprio.h
-index 2f3fc2fbd668..7578d4f6a969 100644
---- a/include/linux/ioprio.h
-+++ b/include/linux/ioprio.h
-@@ -20,7 +20,7 @@ static inline bool ioprio_valid(unsigned short ioprio)
-  {
-  	unsigned short class = IOPRIO_PRIO_CLASS(ioprio);
-
--	return class > IOPRIO_CLASS_NONE && class <= IOPRIO_CLASS_DL;
-+	return class > IOPRIO_CLASS_NONE && class <= IOPRIO_CLASS_IDLE;
-  }
-
-  /*
-diff --git a/include/uapi/linux/ioprio.h b/include/uapi/linux/ioprio.h
-index 15908b9e9d8c..f70f2596a6bf 100644
---- a/include/uapi/linux/ioprio.h
-+++ b/include/uapi/linux/ioprio.h
-@@ -29,7 +29,6 @@ enum {
-  	IOPRIO_CLASS_RT,
-  	IOPRIO_CLASS_BE,
-  	IOPRIO_CLASS_IDLE,
--	IOPRIO_CLASS_DL,
-  };
-
-  /*
-@@ -38,12 +37,6 @@ enum {
-  #define IOPRIO_NR_LEVELS	8
-  #define IOPRIO_BE_NR		IOPRIO_NR_LEVELS
-
--/*
-- * The Duration limits class allows 8 levels: level 0 for "no limit" and levels
-- * 1 to 7, each corresponding to a read or write limit descriptor.
-- */
--#define IOPRIO_DL_NR_LEVELS	8
--
-  enum {
-  	IOPRIO_WHO_PROCESS = 1,
-  	IOPRIO_WHO_PGRP,
-
+Reviewed-by: Dan Williams <dan.j.williams@intel.com>
