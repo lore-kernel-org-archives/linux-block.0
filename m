@@ -2,70 +2,46 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 86A4FC27C76
-	for <linux-block@archiver.kernel.org>; Wed, 25 Jan 2023 06:30:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E085C61D9D
+	for <linux-block@archiver.kernel.org>; Wed, 25 Jan 2023 06:34:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234431AbjAYGaj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 25 Jan 2023 01:30:39 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38404 "EHLO
+        id S233965AbjAYGeA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 25 Jan 2023 01:34:00 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39842 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234163AbjAYGai (ORCPT
+        with ESMTP id S230160AbjAYGeA (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 25 Jan 2023 01:30:38 -0500
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AAC063C29E;
-        Tue, 24 Jan 2023 22:30:36 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=r0FuSmIbgkYy4WewyKyVPD9wcDWCGfj1WkmqOviCddk=; b=ihARzO3OK8WC8X+vTJmE+5otl8
-        LZP1ZuRMG3qrzWCWLr4tH9hnsQeyWtOrepDcCtrtfxAZxnvpvzVfhAMtzCO/DX7pYsT464vkm5oYm
-        C5r4hEewgpigvEvUYkh2MDp2gWbcd3Jn75drGz1IIataCn30kMqVUrpu/gVcb7+rvch02c9A++JZ4
-        YhAEPHpLEYDPuz4mFdAAOh4CyY/qe9UuUm/aNKAQlOxaTLGCP5wt6ji7eKAU4FyvHr5ZmfzNiwrk2
-        /wOeqaX3hMpc/jJRBpO2Qy5YOda7852iLJmNMucamNSA+W80370DYMZiU3oar3x8PcOqa4/6d40cL
-        sGRYk8ig==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1pKZIi-0067v4-MS; Wed, 25 Jan 2023 06:30:28 +0000
-Date:   Tue, 24 Jan 2023 22:30:28 -0800
-From:   Christoph Hellwig <hch@infradead.org>
-To:     David Howells <dhowells@redhat.com>
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Matthew Wilcox <willy@infradead.org>,
-        Jens Axboe <axboe@kernel.dk>, Jan Kara <jack@suse.cz>,
-        Jeff Layton <jlayton@kernel.org>,
-        David Hildenbrand <david@redhat.com>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Christoph Hellwig <hch@lst.de>
-Subject: Re: [PATCH v9 6/8] block: Switch to pinning pages.
-Message-ID: <Y9DMhJ4NczaA6HGL@infradead.org>
-References: <Y9ArYfXEix7t3gVI@infradead.org>
- <20230124170108.1070389-1-dhowells@redhat.com>
- <20230124170108.1070389-7-dhowells@redhat.com>
- <1297804.1674593951@warthog.procyon.org.uk>
+        Wed, 25 Jan 2023 01:34:00 -0500
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BFF243F2B0;
+        Tue, 24 Jan 2023 22:33:58 -0800 (PST)
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id 093C76732D; Wed, 25 Jan 2023 07:33:55 +0100 (CET)
+Date:   Wed, 25 Jan 2023 07:33:54 +0100
+From:   Christoph Hellwig <hch@lst.de>
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+        Niklas Cassel <niklas.cassel@wdc.com>,
+        Paolo Valente <paolo.valente@linaro.org>,
+        Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+        Hannes Reinecke <hare@suse.de>, linux-scsi@vger.kernel.org,
+        linux-ide@vger.kernel.org, linux-block@vger.kernel.org
+Subject: Re: [PATCH v3 01/18] block: introduce duration-limits priority
+ class
+Message-ID: <20230125063354.GA1766@lst.de>
+References: <20230124190308.127318-1-niklas.cassel@wdc.com> <20230124190308.127318-2-niklas.cassel@wdc.com> <bd0ce7ad-cf9e-a647-9b1e-cb36e7bbe30f@acm.org> <731aeacc-74c0-396b-efa0-f9ae950566d8@opensource.wdc.com> <873e0213-94b5-0d81-a8aa-4671241e198c@acm.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1297804.1674593951@warthog.procyon.org.uk>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <873e0213-94b5-0d81-a8aa-4671241e198c@acm.org>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jan 24, 2023 at 08:59:11PM +0000, David Howells wrote:
-> Christoph Hellwig <hch@infradead.org> wrote:
-> 
-> > > Add BIO_PAGE_PINNED to indicate that the pages in a bio are pinned
-> > > (FOLL_PIN) and that the pin will need removing.
-> > 
-> > The subject is odd when this doesn't actually switch anything,
-> > but just adds the infrastructure to unpin pages.
-> 
-> How about:
-> 
-> 	block: Add BIO_PAGE_PINNED and associated infrastructure
+On Tue, Jan 24, 2023 at 02:43:24PM -0800, Bart Van Assche wrote:
+> What if a device that supports I/O priorities (e.g. an NVMe device that 
+> supports configuring the SQ priority)
 
-sounds good.
+NVMe does not have any I/O priorities, it only has a very limited
+priority scheme for queue arbitration.
