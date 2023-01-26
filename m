@@ -2,83 +2,79 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 81059C61DA0
-	for <linux-block@archiver.kernel.org>; Thu, 26 Jan 2023 09:39:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E6BCC54E94
+	for <linux-block@archiver.kernel.org>; Thu, 26 Jan 2023 09:50:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229543AbjAZJjY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 26 Jan 2023 04:39:24 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45672 "EHLO
+        id S236748AbjAZJuU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 26 Jan 2023 04:50:20 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52546 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229657AbjAZJjX (ORCPT
+        with ESMTP id S229558AbjAZJuT (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 26 Jan 2023 04:39:23 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45D135CFEA;
-        Thu, 26 Jan 2023 01:39:23 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        Thu, 26 Jan 2023 04:50:19 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 04EA710414
+        for <linux-block@vger.kernel.org>; Thu, 26 Jan 2023 01:49:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1674726574;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=EG/449qSmt5dxUptSk+N35YPkCWa7qDSTbYqeA0hffw=;
+        b=Jjb8nhu+ZxzmiVZ7s02PjW6DTd2x4L4trl/T8gulN7oicSxLcKHL490Dsg4q2M5iMNLzAS
+        UtNeH29NZmmCIwbCt8WGbyR47eXQ6FaGQ2hof8MdEFOt/JSnyCiptgFmMaXMn8suZcgobm
+        xCuWQ2U98MOXk+sK2cytIaVVLt/AByE=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-571-_19ox34JNBWf8p6rKRDejQ-1; Thu, 26 Jan 2023 04:49:30 -0500
+X-MC-Unique: _19ox34JNBWf8p6rKRDejQ-1
+Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id C99126177C;
-        Thu, 26 Jan 2023 09:39:22 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2B1DBC433D2;
-        Thu, 26 Jan 2023 09:39:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1674725962;
-        bh=ZVfkZK/3rtmQ0HI/dGtBJXuuEqesnN3UrC2d9Id/22U=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=jPHR1tsysvXfEcAXi3dVKJzUK+/pBcLMN81V0rrV3lmJSitmZ4dzX2dg51hi5IejN
-         7zEL7Xap67RZv3VIzSlaiGiUZdkRohbmuBt6g1G6k/ZDi5w4ErbGUQzamGymp/2NAN
-         /pJpCqLuAJbsS7TQBPReskyZpzFgV+3QY8OuQL/WhZVfC+T0+8u9vOvjEiG2Oyz3az
-         QJ0nBWa4aWc9iOXY1sXphvYX2+rpFeNABo5LS/x4hv9HRfZpwHSA0CMCq+G8UuXlKn
-         +pNbjyotsjQUd9+f7lksSfZ3pI2eP1YfAMNkOmd6YHDneNBbuqYHPRthY6aI1BzTUE
-         4YD93KKDkzx3g==
-Date:   Thu, 26 Jan 2023 11:39:07 +0200
-From:   Mike Rapoport <rppt@kernel.org>
-To:     Matthew Wilcox <willy@infradead.org>
-Cc:     Jason Gunthorpe <jgg@nvidia.com>, lsf-pc@lists.linuxfoundation.org,
-        linux-mm@kvack.org, iommu@lists.linux.dev,
-        linux-rdma@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        Joao Martins <joao.m.martins@oracle.com>,
-        John Hubbard <jhubbard@nvidia.com>,
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 87602830F51;
+        Thu, 26 Jan 2023 09:49:29 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.33.36.97])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 6ED69492B01;
+        Thu, 26 Jan 2023 09:49:27 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <af0e448a-9559-32c0-cc59-10b159459495@redhat.com>
+References: <af0e448a-9559-32c0-cc59-10b159459495@redhat.com> <20230125210657.2335748-1-dhowells@redhat.com> <20230125210657.2335748-2-dhowells@redhat.com>
+To:     David Hildenbrand <david@redhat.com>
+Cc:     dhowells@redhat.com, Al Viro <viro@zeniv.linux.org.uk>,
+        Christoph Hellwig <hch@infradead.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        Jens Axboe <axboe@kernel.dk>, Jan Kara <jack@suse.cz>,
+        Jeff Layton <jlayton@kernel.org>,
+        Jason Gunthorpe <jgg@nvidia.com>,
         Logan Gunthorpe <logang@deltatee.com>,
-        Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org,
-        netdev@vger.kernel.org, dri-devel@lists.freedesktop.org,
-        nvdimm@lists.linux.dev, Shakeel Butt <shakeelb@google.com>
-Subject: Re: [LSF/MM/BPF proposal]: Physr discussion
-Message-ID: <Y9JKO7FITJQ7dxAv@kernel.org>
-References: <Y8v+qVZ8OmodOCQ9@nvidia.com>
- <Y84OyQSKHelPOkW3@casper.infradead.org>
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        Christoph Hellwig <hch@lst.de>,
+        John Hubbard <jhubbard@nvidia.com>
+Subject: Re: [PATCH v10 1/8] iov_iter: Define flags to qualify page extraction.
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <Y84OyQSKHelPOkW3@casper.infradead.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <2613248.1674726566.1@warthog.procyon.org.uk>
+Date:   Thu, 26 Jan 2023 09:49:26 +0000
+Message-ID: <2613249.1674726566@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.10
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Jan 23, 2023 at 04:36:25AM +0000, Matthew Wilcox wrote:
-> On Sat, Jan 21, 2023 at 11:03:05AM -0400, Jason Gunthorpe wrote:
-> > I would like to have a session at LSF to talk about Matthew's
-> > physr discussion starter:
-> > 
-> >  https://lore.kernel.org/linux-mm/YdyKWeU0HTv8m7wD@casper.infradead.org/
-> 
-> I'm definitely interested in discussing phyrs (even if you'd rather
-> pronounce it "fizzers" than "fires" ;-)
+David Hildenbrand <david@redhat.com> wrote:
 
-I'm also interested in this discussion. With my accent it will be фыр,
-though ;-)
- 
-> > I've been working on an implementation and hope to have something
-> > draft to show on the lists in a few weeks. It is pretty clear there
-> > are several interesting decisions to make that I think will benefit
-> > from a live discussion.
+> Just a note that the usage of new __bitwise types instead of "unsigned" is
+> encouraged for flags.
 > 
-> Cool!  Here's my latest noodlings:
-> https://git.infradead.org/users/willy/pagecache.git/shortlog/refs/heads/phyr
-> 
-> Just the top two commits; the other stuff is unrelated.  Shakeel has
-> also been interested in this.
-> 
-> 
+> See rmap_t in include/linux/rmap.h as an example.
+
+Hmmm...  rmap_t really ought to be unsigned int.
+
+David
+
