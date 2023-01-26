@@ -2,50 +2,48 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC73AC05027
-	for <linux-block@archiver.kernel.org>; Thu, 26 Jan 2023 05:21:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ABE92C61D9D
+	for <linux-block@archiver.kernel.org>; Thu, 26 Jan 2023 05:26:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229898AbjAZFVt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 26 Jan 2023 00:21:49 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53500 "EHLO
+        id S235772AbjAZF0a (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 26 Jan 2023 00:26:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54032 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229677AbjAZFVt (ORCPT
+        with ESMTP id S229510AbjAZF03 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 26 Jan 2023 00:21:49 -0500
+        Thu, 26 Jan 2023 00:26:29 -0500
 Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B84D14609F;
-        Wed, 25 Jan 2023 21:21:47 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9D0A47ED3;
+        Wed, 25 Jan 2023 21:26:28 -0800 (PST)
 Received: by verein.lst.de (Postfix, from userid 2407)
-        id A569268D09; Thu, 26 Jan 2023 06:21:43 +0100 (CET)
-Date:   Thu, 26 Jan 2023 06:21:43 +0100
+        id 3565968D09; Thu, 26 Jan 2023 06:26:25 +0100 (CET)
+Date:   Thu, 26 Jan 2023 06:26:24 +0100
 From:   Christoph Hellwig <hch@lst.de>
-To:     Josef Bacik <josef@toxicpanda.com>
-Cc:     Christoph Hellwig <hch@lst.de>, Chris Mason <clm@fb.com>,
-        David Sterba <dsterba@suse.com>,
-        Damien Le Moal <damien.lemoal@wdc.com>,
-        Naohiro Aota <naohiro.aota@wdc.com>,
-        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
-        Qu Wenruo <wqu@suse.com>, Jens Axboe <axboe@kernel.dk>,
-        "Darrick J. Wong" <djwong@kernel.org>, linux-block@vger.kernel.org,
-        linux-btrfs@vger.kernel.org, linux-fsdevel@vger.kernel.org
-Subject: Re: [PATCH 23/34] btrfs: allow btrfs_submit_bio to split bios
-Message-ID: <20230126052143.GA28195@lst.de>
-References: <20230121065031.1139353-1-hch@lst.de> <20230121065031.1139353-24-hch@lst.de> <Y9GkVONZJFXVe8AH@localhost.localdomain>
+To:     Keith Busch <kbusch@kernel.org>
+Cc:     Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Niklas Cassel <niklas.cassel@wdc.com>,
+        Paolo Valente <paolo.valente@linaro.org>,
+        Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+        Hannes Reinecke <hare@suse.de>, linux-scsi@vger.kernel.org,
+        linux-ide@vger.kernel.org, linux-block@vger.kernel.org
+Subject: Re: [PATCH v3 01/18] block: introduce duration-limits priority
+ class
+Message-ID: <20230126052624.GA28310@lst.de>
+References: <20230124190308.127318-1-niklas.cassel@wdc.com> <20230124190308.127318-2-niklas.cassel@wdc.com> <bd0ce7ad-cf9e-a647-9b1e-cb36e7bbe30f@acm.org> <731aeacc-74c0-396b-efa0-f9ae950566d8@opensource.wdc.com> <873e0213-94b5-0d81-a8aa-4671241e198c@acm.org> <4c345d8b-7efa-85c9-fe1c-1124ea5d9de6@opensource.wdc.com> <5066441f-e265-ed64-fa39-f77a931ab998@acm.org> <275993f1-f9e8-e7a8-e901-2f7d3a6bb501@opensource.wdc.com> <Y9G3LUem6X/fUz22@kbusch-mbp.dhcp.thefacebook.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Y9GkVONZJFXVe8AH@localhost.localdomain>
+In-Reply-To: <Y9G3LUem6X/fUz22@kbusch-mbp.dhcp.thefacebook.com>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jan 25, 2023 at 04:51:16PM -0500, Josef Bacik wrote:
-> This is causing a panic in btrfs/125 because you set bbio to
-> btrfs_bio(split_bio), which has a NULL end_io.  You need something like the
-> following so that we're ending the correct bbio.  Thanks,
+On Wed, Jan 25, 2023 at 04:11:41PM -0700, Keith Busch wrote:
+> I wouldn't necessarily rule out CDL for PCI attached in some future TP. NVMe
+> does allow rotating media, and they'll want feature parity if CDL is considered
+> useful in other protocols.
 
-Just curious, what are the other configuration details as I've never been
-able to hit it?
-
-The fix itself looks good.
+NVMe has a TP for CDL that is technically active, although it doesn't
+seem to be actively worked on right now.
