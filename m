@@ -2,52 +2,52 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DED3C05027
-	for <linux-block@archiver.kernel.org>; Thu, 26 Jan 2023 03:34:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DF13C61DA3
+	for <linux-block@archiver.kernel.org>; Thu, 26 Jan 2023 03:34:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236383AbjAZDeT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 25 Jan 2023 22:34:19 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59336 "EHLO
+        id S236302AbjAZDeW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 25 Jan 2023 22:34:22 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59504 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236248AbjAZDeP (ORCPT
+        with ESMTP id S236337AbjAZDeU (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 25 Jan 2023 22:34:15 -0500
+        Wed, 25 Jan 2023 22:34:20 -0500
 Received: from out3-smtp.messagingengine.com (out3-smtp.messagingengine.com [66.111.4.27])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D27E46D42;
-        Wed, 25 Jan 2023 19:34:10 -0800 (PST)
-Received: from compute1.internal (compute1.nyi.internal [10.202.2.41])
-        by mailout.nyi.internal (Postfix) with ESMTP id EBFE75C05BC;
-        Wed, 25 Jan 2023 22:34:09 -0500 (EST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 72E4665EF0;
+        Wed, 25 Jan 2023 19:34:14 -0800 (PST)
+Received: from compute6.internal (compute6.nyi.internal [10.202.2.47])
+        by mailout.nyi.internal (Postfix) with ESMTP id CE38E5C05B8;
+        Wed, 25 Jan 2023 22:34:13 -0500 (EST)
 Received: from mailfrontend2 ([10.202.2.163])
-  by compute1.internal (MEProxy); Wed, 25 Jan 2023 22:34:09 -0500
+  by compute6.internal (MEProxy); Wed, 25 Jan 2023 22:34:13 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
         invisiblethingslab.com; h=cc:cc:content-transfer-encoding:date
         :date:from:from:in-reply-to:in-reply-to:message-id:mime-version
         :references:reply-to:sender:subject:subject:to:to; s=fm3; t=
-        1674704049; x=1674790449; bh=x0BohMGPEmmAQv3ZigspASmDgPSDsM1UcU2
-        Bewuui3w=; b=shU7A7QoonmUIxllylGbEv6EGhkh3ywZhyPtFTIJi9Cge9Hx9Ls
-        UhlSQF2iUaG6BwKSu3h0FPwfliYXD4a8HP87jwCImKMcJA14E7ZDcDYPkNl6ZG2T
-        /n75zWlQAsBnaIMRX/7uFYTPNKL20RcmCeuHCmZaPUBtaECY4I/yt2PIIU0+hiE+
-        XxtdD4XKor0xsD6NrdHklI+NDC27+/E/sX3Pc0+1ApGiqOr3HZnFYwEarK1lFlhq
-        1nqTlZH8mg/y2IpjNYDyDg+S3hSVjG39PXN8RAwpHOkFJeE5lzlBXn4J0NlNDdnD
-        P8ewJ4cUaysdFp2K0nPW3ddIUwVz4Zu99xQ==
+        1674704053; x=1674790453; bh=sHxeYo7zgfjFccvxCuuph95svfpElxK2vn8
+        +J41Up4A=; b=adUQaXp/oYs3g7OS0f7kpq6+GmWpux+QVtFXmFgtDpZ+2VjYKeP
+        9TItVn12LYJcNB5LUo9myKpUTXtUrub4Cu3SZHp9B+8vNaXlQInbcta8Jgb5Rdm3
+        GDMdlpRs9T01yZ8uWOdhyDKShEL87ywJ2VNVgFYUH1bDwbHFK2dO0qr3yq0cvVFy
+        3eoUWxCkpQavHyEfCY5wDHOBniqwVCTrJuMQ2SieXTo8oPvzh6pG7gmtGRGPdCnT
+        tedZ2CBSXoGlenczbkKFo4+j/OkQjZR3Py3rH3eqHWaVVP0NndZ+GzPKlFzxNqkO
+        myxdVg9hbn03ZDe/5l/5s9z/r+Y8ZAjNyBg==
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
         messagingengine.com; h=cc:cc:content-transfer-encoding:date:date
         :feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
         :message-id:mime-version:references:reply-to:sender:subject
         :subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
-        :x-sasl-enc; s=fm3; t=1674704049; x=1674790449; bh=x0BohMGPEmmAQ
-        v3ZigspASmDgPSDsM1UcU2Bewuui3w=; b=dSggqvsLBPqOQbwC+RWEeOIhmcoRT
-        4MX2VBxayPzSZP0MIgy/eWWdbnXC+gSo9R/9PI/YLYBrhhcQliJtRtIySnOt+szp
-        3I+23QWpvJiqcCRmVtPLAIQA2zCEfK7GJQlsKg5UVFpHP/m1TliE4zdxLHC3ZXD/
-        xdg80sFRzQW4wnari/b4m7NUE3ooE2PzI0DAEw/3jL4c6LEPbGLWO1Qh9nINu0Nc
-        EzCJlclWFJMEIJKvp2dK0bI6Cy50yQYYGrkLSOa1nTVxE+khbACOxhpJwAoFGoKR
-        jPlKDmMugkqE32uOvxf2i519UuBqPi16f8y75Q4+pTT3+IvUyop08xzSA==
-X-ME-Sender: <xms:sfTRY9qpfS4unN-oG_sfX_RvAodQGAKVhiSMY08k39M5J-dC_5XI1A>
-    <xme:sfTRY_pJCZvLBMCfuhQDJfaMuCwkRI1B8N1YH7K8K641Tc_6CON6hd9bBD0DVhArj
-    KesfMoRAoHkdJA>
-X-ME-Received: <xmr:sfTRY6NzQ1HB2TzHCukYtzQq3pUswSiDndmEdvF1HlhxoKDPqEu9YMk2UqRa-IgDiYzrpARbSXMx>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvhedruddvfedgheekucetufdoteggodetrfdotf
+        :x-sasl-enc; s=fm3; t=1674704053; x=1674790453; bh=sHxeYo7zgfjFc
+        cvxCuuph95svfpElxK2vn8+J41Up4A=; b=XIQCpZ3lX4/2fvGEl+smR04IQxUTp
+        YuK64iAV32C+MVzzlelSu8NtBFy3/erKTDaWxxRgFI9OYqQVuQ/DJz9Tv+hoFKOm
+        4FxRc/bDupPlBYUU4UYdCHegdxMEunUBGzNtYiKm9AtHfexmQpZVGpBIxAahaA1T
+        fvGb/rfnrO7ezrUMGViTPOF1DjPNXbqTAxFzq3hW9JBb0TLR8dNXWzO1JOmt26Eb
+        tvOejPXmncG8791tijP4bM4Kd9ujFo1RIPbMn81uxM3JiB5xsMiPNiHHrpZi1QYx
+        Yea9SHaJ1U7hOEBIAMxH2y4mx1MZa2AwwK0EUaeLP30w2vkPrVQp9AZWw==
+X-ME-Sender: <xms:tfTRY6RAol72fj1u1ITTzffjf13SuYDGvZJW2kpYz2bGieIW_GJMDg>
+    <xme:tfTRY_z5TiiBtt-0BX8vAhX0ddJaRfaz7MQoewPgHdks3DUCcV7DWixXEkMi6HfQg
+    yaK_fc4IaFHbzw>
+X-ME-Received: <xmr:tfTRY30w6RETlzCYZ2lEM_tWt6QmFeDgVkMAK_hrqJo3fjZxERsl3au4LUOn--qRx7btPnOYLcmD>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvhedruddvfedgheelucetufdoteggodetrfdotf
     fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
     uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
     cujfgurhephffvvefufffkofgjfhgggfestdekredtredttdenucfhrhhomhepffgvmhhi
@@ -56,22 +56,24 @@ X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvhedruddvfedgheekucetufdoteggod
     gffhhfffjeetkeelueefffetfffhtdduheetnecuvehluhhsthgvrhfuihiivgeptdenuc
     frrghrrghmpehmrghilhhfrhhomhepuggvmhhisehinhhvihhsihgslhgvthhhihhnghhs
     lhgrsgdrtghomh
-X-ME-Proxy: <xmx:sfTRY44axGy_vEpaydEMvuJv3aAmNQb4RtCr1eiezO13Zn9a5JkHbA>
-    <xmx:sfTRY86mhlp4thAtALntivo-41VIJ_MchsA-zeQY63SQ-FbUPbDD4A>
-    <xmx:sfTRYwi2AHClU9M9JEQY-WwJ45LWgJ0r-DjiTgzovyKW-asw3OE1hA>
-    <xmx:sfTRY8F_hhevGgA7c7I2BthT8CbLWC_HDk0LQ1hxvzObsOWYkEupng>
+X-ME-Proxy: <xmx:tfTRY2Bf-X_3FCTLk3Szue3EOF95aEtMIVdgXBWa31wVr91cDPl6RA>
+    <xmx:tfTRYzigofFurxcrjTtFYCetZEOw1dSBgitqG3wjwcRhN6oaNQe4VQ>
+    <xmx:tfTRYyokStzJCyD_7oSZHto9b08SZEox4pnzEh5ptU9hKuHtd9tSqw>
+    <xmx:tfTRY-UWccG3HaEP6VIIgwpptXZDMU3fICCe6fG84ssRJodWhMRKNg>
 Feedback-ID: iac594737:Fastmail
 Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
- 25 Jan 2023 22:34:09 -0500 (EST)
+ 25 Jan 2023 22:34:13 -0500 (EST)
 From:   Demi Marie Obenour <demi@invisiblethingslab.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Demi Marie Obenour <demi@invisiblethingslab.com>,
+To:     =?UTF-8?q?Roger=20Pau=20Monn=C3=A9?= <roger.pau@citrix.com>,
+        Juergen Gross <jgross@suse.com>, Jens Axboe <axboe@kernel.dk>
+Cc:     Demi Marie Obenour <demiobenour@gmail.com>,
         =?UTF-8?q?Marek=20Marczykowski-G=C3=B3recki?= 
-        <marmarek@invisiblethingslab.com>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [RFC PATCH 1/7] block: Support creating a struct file from a block device
-Date:   Wed, 25 Jan 2023 22:33:53 -0500
-Message-Id: <20230126033358.1880-2-demi@invisiblethingslab.com>
+        <marmarek@invisiblethingslab.com>, xen-devel@lists.xenproject.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Demi Marie Obenour <demi@invisiblethingslab.com>
+Subject: [RFC PATCH 3/7] Implement diskseq checks in blkback
+Date:   Wed, 25 Jan 2023 22:33:55 -0500
+Message-Id: <20230126033358.1880-4-demi@invisiblethingslab.com>
 X-Mailer: git-send-email 2.39.1
 In-Reply-To: <20230126033358.1880-1-demi@invisiblethingslab.com>
 References: <20230126033358.1880-1-demi@invisiblethingslab.com>
@@ -81,172 +83,215 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The newly added blkdev_get_file() function allows kernel code to create
-a struct file for any block device.  The main use-case is for the
-struct file to be exposed to userspace as a file descriptor.  A future
-patch will modify the DM_DEV_CREATE_CREATE ioctl to allow userspace to
-get a file descriptor to the newly created block device, avoiding nasty
-race conditions.
+From: Demi Marie Obenour <demiobenour@gmail.com>
+
+This allows specifying a disk sequence number in XenStore.  If it does
+not match the disk sequence number of the underlying device, the device
+will not be exported and a warning will be logged.  Userspace can use
+this to eliminate race conditions due to major/minor number reuse.
+Older kernels will ignore this, so it is safe for userspace to set it
+unconditionally.
+
+This also makes physical-device parsing stricter.  I do not believe this
+will break any extant userspace tools.
 
 Signed-off-by: Demi Marie Obenour <demi@invisiblethingslab.com>
 ---
- block/bdev.c           | 77 +++++++++++++++++++++++++++++++++++-------
- include/linux/blkdev.h |  5 +++
- 2 files changed, 70 insertions(+), 12 deletions(-)
+ drivers/block/xen-blkback/xenbus.c | 137 +++++++++++++++++++++--------
+ 1 file changed, 100 insertions(+), 37 deletions(-)
 
-diff --git a/block/bdev.c b/block/bdev.c
-index edc110d90df4041e7d337976951bd0d17525f1f7..09cb5ef900ca9ad5b21250bb63e64cc2a79f9289 100644
---- a/block/bdev.c
-+++ b/block/bdev.c
-@@ -459,10 +459,33 @@ static struct file_system_type bd_type = {
- struct super_block *blockdev_superblock __read_mostly;
- EXPORT_SYMBOL_GPL(blockdev_superblock);
+diff --git a/drivers/block/xen-blkback/xenbus.c b/drivers/block/xen-blkback/xenbus.c
+index 4807af1d58059394d7a992335dabaf2bc3901721..2c43bfc7ab5ba6954f11d4b949a5668660dbd290 100644
+--- a/drivers/block/xen-blkback/xenbus.c
++++ b/drivers/block/xen-blkback/xenbus.c
+@@ -24,6 +24,7 @@ struct backend_info {
+ 	struct xenbus_watch	backend_watch;
+ 	unsigned		major;
+ 	unsigned		minor;
++	unsigned long long	diskseq;
+ 	char			*mode;
+ };
  
-+static struct vfsmount *bd_mnt __read_mostly;
-+
-+struct file *
-+blkdev_get_file(struct block_device *bdev, fmode_t flags, void *holder)
-+{
-+	struct inode *inode;
-+	struct file *filp;
-+	int ret;
-+
-+	ret = blkdev_do_open(bdev, flags, holder);
-+	if (ret)
-+		return ERR_PTR(ret);
-+	inode = bdev->bd_inode;
-+	filp = alloc_file_pseudo(inode, bd_mnt, "[block]", flags | O_CLOEXEC, &def_blk_fops);
-+	if (IS_ERR(filp)) {
-+		blkdev_put(bdev, flags);
-+	} else {
-+		filp->f_mapping = inode->i_mapping;
-+		filp->f_wb_err = filemap_sample_wb_err(filp->f_mapping);
-+	}
-+	return filp;
-+}
-+EXPORT_SYMBOL(blkdev_get_file);
-+
- void __init bdev_cache_init(void)
- {
- 	int err;
--	static struct vfsmount *bd_mnt;
+@@ -479,7 +480,7 @@ static void xen_vbd_free(struct xen_vbd *vbd)
  
- 	bdev_cachep = kmem_cache_create("bdev_cache", sizeof(struct bdev_inode),
- 			0, (SLAB_HWCACHE_ALIGN|SLAB_RECLAIM_ACCOUNT|
-@@ -775,7 +798,7 @@ void blkdev_put_no_open(struct block_device *bdev)
-  *
-  * Use this interface ONLY if you really do not have anything better - i.e. when
-  * you are behind a truly sucky interface and all you are given is a device
-- * number.  Everything else should use blkdev_get_by_path().
-+ * number.  Everything else should use blkdev_get_by_path() or blkdev_do_open().
-  *
-  * CONTEXT:
-  * Might sleep.
-@@ -785,9 +808,7 @@ void blkdev_put_no_open(struct block_device *bdev)
-  */
- struct block_device *blkdev_get_by_dev(dev_t dev, fmode_t mode, void *holder)
+ static int xen_vbd_create(struct xen_blkif *blkif, blkif_vdev_t handle,
+ 			  unsigned major, unsigned minor, int readonly,
+-			  int cdrom)
++			  bool cdrom, u64 diskseq)
  {
--	bool unblock_events = true;
+ 	struct xen_vbd *vbd;
  	struct block_device *bdev;
--	struct gendisk *disk;
- 	int ret;
- 
- 	ret = devcgroup_check_permission(DEVCG_DEV_BLOCK,
-@@ -800,18 +821,52 @@ struct block_device *blkdev_get_by_dev(dev_t dev, fmode_t mode, void *holder)
- 	bdev = blkdev_get_no_open(dev);
- 	if (!bdev)
- 		return ERR_PTR(-ENXIO);
--	disk = bdev->bd_disk;
+@@ -507,6 +508,25 @@ static int xen_vbd_create(struct xen_blkif *blkif, blkif_vdev_t handle,
+ 		xen_vbd_free(vbd);
+ 		return -ENOENT;
+ 	}
 +
-+	ret = blkdev_do_open(bdev, mode, holder);
-+	if (ret) {
-+		blkdev_put_no_open(bdev);
-+		return ERR_PTR(ret);
++	if (diskseq) {
++		struct gendisk *disk = bdev->bd_disk;
++		if (unlikely(disk == NULL)) {
++			pr_err("xen_vbd_create: device %08x has no gendisk\n",
++			       vbd->pdevice);
++			xen_vbd_free(vbd);
++			return -EFAULT;
++		}
++
++		if (unlikely(disk->diskseq != diskseq)) {
++			pr_warn("xen_vbd_create: device %08x has incorrect sequence "
++				"number 0x%llx (expected 0x%llx)\n",
++				vbd->pdevice, disk->diskseq, diskseq);
++			xen_vbd_free(vbd);
++			return -ENODEV;
++		}
 +	}
 +
-+	return bdev;
-+}
-+EXPORT_SYMBOL(blkdev_get_by_dev);
-+
-+/**
-+ * blkdev_do_open - open a block device by device pointer
-+ * @bdev: pointer to the device to open
-+ * @mode: FMODE_* mask
-+ * @holder: exclusive holder identifier
-+ *
-+ * Open the block device pointed to by @bdev. If @mode includes
-+ * %FMODE_EXCL, the block device is opened with exclusive access.  Specifying
-+ * %FMODE_EXCL with a %NULL @holder is invalid.  Exclusive opens may nest for
-+ * the same @holder.
-+ *
-+ * Unlike blkdev_get_by_dev() and bldev_get_by_path(), this function does not
-+ * do any permission checks.  The most common use-case is where the device
-+ * was freshly created by userspace.
-+ *
-+ * CONTEXT:
-+ * Might sleep.
-+ *
-+ * RETURNS:
-+ * Reference 0 on success, -errno on failure.
-+ */
-+int blkdev_do_open(struct block_device *bdev, fmode_t mode, void *holder) {
-+	struct gendisk *disk = bdev->bd_disk;
-+	int ret = -ENXIO;
-+	bool unblock_events = true;
+ 	vbd->size = vbd_sz(vbd);
  
- 	if (mode & FMODE_EXCL) {
- 		ret = bd_prepare_to_claim(bdev, holder);
- 		if (ret)
--			goto put_blkdev;
-+			return ret;
+ 	if (cdrom || disk_to_cdi(vbd->bdev->bd_disk))
+@@ -690,6 +710,55 @@ static int xen_blkbk_probe(struct xenbus_device *dev,
+ 	return err;
+ }
+ 
++static bool read_physical_device(struct xenbus_device *dev,
++				 unsigned long long *diskseq,
++				 unsigned *major, unsigned *minor)
++{
++	char *physical_device, *problem;
++	int i, physical_device_length;
++	char junk;
++
++	physical_device = xenbus_read(XBT_NIL, dev->nodename, "physical-device",
++				      &physical_device_length);
++
++	if (IS_ERR(physical_device)) {
++		int err = PTR_ERR(physical_device);
++		/*
++		 * Since this watch will fire once immediately after it is
++		 * registered, we expect "does not exist" errors.  Ignore
++		 * them and wait for the hotplug scripts.
++		 */
++		if (unlikely(!XENBUS_EXIST_ERR(err)))
++			xenbus_dev_fatal(dev, err, "reading physical-device");
++		return false;
++	}
++
++	for (i = 0; i < physical_device_length; ++i)
++		if (unlikely(physical_device[i] <= 0x20 || physical_device[i] >= 0x7F)) {
++			problem = "bad byte in physical-device";
++			goto fail;
++		}
++
++	if (sscanf(physical_device, "%16llx@%8x:%8x%c",
++		   diskseq, major, minor, &junk) == 3) {
++		if (*diskseq == 0) {
++			problem = "diskseq 0 is invalid";
++			goto fail;
++		}
++	} else if (sscanf(physical_device, "%8x:%8x%c", major, minor, &junk) == 2) {
++		*diskseq = 0;
++	} else {
++		problem = "invalid physical-device";
++		goto fail;
++	}
++	kfree(physical_device);
++	return true;
++fail:
++	kfree(physical_device);
++	xenbus_dev_fatal(dev, -EINVAL, problem);
++	return false;
++}
++
+ /*
+  * Callback received when the hotplug scripts have placed the physical-device
+  * node.  Read it and the mode node, and create a vbd.  If the frontend is
+@@ -707,28 +776,17 @@ static void backend_changed(struct xenbus_watch *watch,
+ 	int cdrom = 0;
+ 	unsigned long handle;
+ 	char *device_type;
++	unsigned long long diskseq;
+ 
+ 	pr_debug("%s %p %d\n", __func__, dev, dev->otherend_id);
+-
+-	err = xenbus_scanf(XBT_NIL, dev->nodename, "physical-device", "%x:%x",
+-			   &major, &minor);
+-	if (XENBUS_EXIST_ERR(err)) {
+-		/*
+-		 * Since this watch will fire once immediately after it is
+-		 * registered, we expect this.  Ignore it, and wait for the
+-		 * hotplug scripts.
+-		 */
++	if (!read_physical_device(dev, &diskseq, &major, &minor))
+ 		return;
+-	}
+-	if (err != 2) {
+-		xenbus_dev_fatal(dev, err, "reading physical-device");
+-		return;
+-	}
+ 
+-	if (be->major | be->minor) {
+-		if (be->major != major || be->minor != minor)
+-			pr_warn("changing physical device (from %x:%x to %x:%x) not supported.\n",
+-				be->major, be->minor, major, minor);
++	if (be->major | be->minor | be->diskseq) {
++		if (be->major != major || be->minor != minor || be->diskseq != diskseq)
++			pr_warn("changing physical device (from %x:%x:%llx to %x:%x:%llx)"
++				" not supported.\n",
++				be->major, be->minor, be->diskseq, major, minor, diskseq);
+ 		return;
  	}
  
- 	disk_block_events(disk);
+@@ -756,29 +814,34 @@ static void backend_changed(struct xenbus_watch *watch,
  
- 	mutex_lock(&disk->open_mutex);
--	ret = -ENXIO;
- 	if (!disk_live(disk))
- 		goto abort_claiming;
- 	if (!try_module_get(disk->fops->owner))
-@@ -842,7 +897,7 @@ struct block_device *blkdev_get_by_dev(dev_t dev, fmode_t mode, void *holder)
+ 	be->major = major;
+ 	be->minor = minor;
++	be->diskseq = diskseq;
  
- 	if (unblock_events)
- 		disk_unblock_events(disk);
--	return bdev;
-+	return 0;
- put_module:
- 	module_put(disk->fops->owner);
- abort_claiming:
-@@ -850,11 +905,9 @@ struct block_device *blkdev_get_by_dev(dev_t dev, fmode_t mode, void *holder)
- 		bd_abort_claiming(bdev, holder);
- 	mutex_unlock(&disk->open_mutex);
- 	disk_unblock_events(disk);
--put_blkdev:
--	blkdev_put_no_open(bdev);
--	return ERR_PTR(ret);
-+	return ret;
+ 	err = xen_vbd_create(be->blkif, handle, major, minor,
+-			     !strchr(be->mode, 'w'), cdrom);
+-
+-	if (err)
+-		xenbus_dev_fatal(dev, err, "creating vbd structure");
+-	else {
+-		err = xenvbd_sysfs_addif(dev);
+-		if (err) {
+-			xen_vbd_free(&be->blkif->vbd);
+-			xenbus_dev_fatal(dev, err, "creating sysfs entries");
+-		}
+-	}
++			     !strchr(be->mode, 'w'), cdrom, diskseq);
+ 
+ 	if (err) {
+-		kfree(be->mode);
+-		be->mode = NULL;
+-		be->major = 0;
+-		be->minor = 0;
+-	} else {
+-		/* We're potentially connected now */
+-		xen_update_blkif_status(be->blkif);
++		xenbus_dev_fatal(dev, err, "creating vbd structure");
++		goto fail;
+ 	}
++
++	err = xenvbd_sysfs_addif(dev);
++	if (err) {
++		xenbus_dev_fatal(dev, err, "creating sysfs entries");
++		goto free_vbd;
++	}
++
++	/* We're potentially connected now */
++	xen_update_blkif_status(be->blkif);
++	return;
++
++free_vbd:
++	xen_vbd_free(&be->blkif->vbd);
++fail:
++	kfree(be->mode);
++	be->mode = NULL;
++	be->major = 0;
++	be->minor = 0;
++	be->diskseq = 0;
  }
--EXPORT_SYMBOL(blkdev_get_by_dev);
-+EXPORT_SYMBOL(blkdev_do_open);
  
- /**
-  * blkdev_get_by_path - open a block device by name
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 43d4e073b1115e4628a001081fbf08b296d342df..04635cb5ee29d22394a34c65eb34bea4e7847d8d 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -325,6 +325,11 @@ typedef int (*report_zones_cb)(struct blk_zone *zone, unsigned int idx,
- 
- void disk_set_zoned(struct gendisk *disk, enum blk_zoned_model model);
- 
-+struct file *
-+blkdev_get_file(struct block_device *bdev, fmode_t flags, void *holder);
-+
-+int blkdev_do_open(struct block_device *bdev, fmode_t flags, void *holder);
-+
- #ifdef CONFIG_BLK_DEV_ZONED
- 
- #define BLK_ALL_ZONES  ((unsigned int)-1)
+ /*
 -- 
 Sincerely,
 Demi Marie Obenour (she/her/hers)
