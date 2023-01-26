@@ -2,140 +2,71 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC121C61DA3
-	for <linux-block@archiver.kernel.org>; Thu, 26 Jan 2023 19:39:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6863EC61DA7
+	for <linux-block@archiver.kernel.org>; Thu, 26 Jan 2023 21:54:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232664AbjAZTjN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 26 Jan 2023 14:39:13 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41012 "EHLO
+        id S233053AbjAZVym (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 26 Jan 2023 16:54:42 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36678 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232513AbjAZTio (ORCPT
+        with ESMTP id S233051AbjAZVyf (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 26 Jan 2023 14:38:44 -0500
-Received: from mail-qt1-x829.google.com (mail-qt1-x829.google.com [IPv6:2607:f8b0:4864:20::829])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D36EA6DFEA
-        for <linux-block@vger.kernel.org>; Thu, 26 Jan 2023 11:38:18 -0800 (PST)
-Received: by mail-qt1-x829.google.com with SMTP id o5so2181941qtr.11
-        for <linux-block@vger.kernel.org>; Thu, 26 Jan 2023 11:38:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=548u3Fp4tscAsRqm8ZTE2VWhUoxZOCMAGUWVcX6Go58=;
-        b=epV5VW3hrViYljNLAdWJDqX3fAl4wYMv55qfvqUl+cZybWCeeDvqryFJs7Zk1z1ge0
-         +YfWxsTDgetquN/yOeHPal429etypXOBpel4tIAV8vd4EP8H055kKatEvKe6oZxMs3PT
-         LcO0xq4K0msdWtCUNqYN4NK0vLHs5L0h44+WlAHrYWvJgXcgjDmqAFXJlLbfBB/UTvvN
-         9vIhPdjjmCe8giVOUtXcRKZC0HKhopCXDpNQUBIZSpW7Qbo2/7o+/aS/ZPpfQVm1O7vS
-         K1a26f+LNFd2YzHSgykx3DHZbq9/58TJ23dpXqRpwr3NjRuHpKkuas3uu7YQGuqzHxWI
-         HpSQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=548u3Fp4tscAsRqm8ZTE2VWhUoxZOCMAGUWVcX6Go58=;
-        b=eG49Oz8tybpwZ1G+RGzcVu05Ddgtq7iSyeUSqHvHBBsOHCIzlcOXIvOjRete/tbnnI
-         GSjI7iW8Ag+u213Yp0SmZWNNOSQPFMzJPj0df4vQhu3hmIj5lHKCWEokCbjeXP3LFpHS
-         n3Hi2LNUE9X6oXC9wEggH6cut+pPRiDbvU6ggrcr40uyuQW6ldgkxXhHKE1447hWDZbJ
-         zTBklaDFLLBQNAHvr3YMXwKQCBVwRRvky+owGcPAC4Ws2oYbRVYn0z+czwA8M3xY75Ok
-         qF/kbQyhy+BA0NqrQbe0I/e+xaU+usR3eocbV2tBwaxgtCAW2Z1C8AKyttvEopT+NHeo
-         ESfg==
-X-Gm-Message-State: AFqh2krX+LCbqeTzWj3cYN4a8UcDSIeH3wtkogy/vwduDSonV+4zgdeS
-        MPWWNgaaExKT7tE6YBCvDF7UP1rYUXQlkjuK
-X-Google-Smtp-Source: AMrXdXv+huCHA7ip/FVnskiv66KzYaO0gWPYCPL7QS4WBmaP67lWrrmrdvcrLuRJ9ZU3cV/x/SyhoQ==
-X-Received: by 2002:ac8:70a:0:b0:3b1:c477:eb65 with SMTP id g10-20020ac8070a000000b003b1c477eb65mr52142649qth.60.1674761897975;
-        Thu, 26 Jan 2023 11:38:17 -0800 (PST)
-Received: from ziepe.ca (hlfxns017vw-142-167-59-176.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.167.59.176])
-        by smtp.gmail.com with ESMTPSA id v3-20020ac87283000000b003b62e9c82ebsm1276806qto.48.2023.01.26.11.38.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 26 Jan 2023 11:38:16 -0800 (PST)
-Received: from jgg by wakko with local (Exim 4.95)
-        (envelope-from <jgg@ziepe.ca>)
-        id 1pL84e-00HP8B-92;
-        Thu, 26 Jan 2023 15:38:16 -0400
-Date:   Thu, 26 Jan 2023 15:38:16 -0400
-From:   Jason Gunthorpe <jgg@ziepe.ca>
-To:     Dan Williams <dan.j.williams@intel.com>
-Cc:     Matthew Wilcox <willy@infradead.org>, nvdimm@lists.linux.dev,
-        lsf-pc@lists.linuxfoundation.org, linux-rdma@vger.kernel.org,
-        John Hubbard <jhubbard@nvidia.com>,
-        dri-devel@lists.freedesktop.org, Ming Lei <ming.lei@redhat.com>,
-        linux-block@vger.kernel.org, linux-mm@kvack.org,
-        iommu@lists.linux.dev, netdev@vger.kernel.org,
-        Joao Martins <joao.m.martins@oracle.com>,
-        Jason Gunthorpe via Lsf-pc 
-        <lsf-pc@lists.linux-foundation.org>,
+        Thu, 26 Jan 2023 16:54:35 -0500
+Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [IPv6:2a03:a000:7:0:5054:ff:fe1c:15ff])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 97A5A611DD;
+        Thu, 26 Jan 2023 13:54:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=linux.org.uk; s=zeniv-20220401; h=Sender:In-Reply-To:Content-Type:
+        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=JJwCfXL4BYUpCEb2XPDFHx9R/zNmK1q+22jJU+x9B7c=; b=ktqSuYI3IdQfkyDAWZIMLp5SLn
+        eOY0i9SJtPz38FegUd7y7e9/3KGwB+S6nF5cNWJlqKc6FOzTCHBMqczRirZC5wwSc9UF8JytYWfJO
+        tSSScv4TV3KgvVYaybT2eIv6p/Vk+yqT4YGi3ZobBApeDhQCaHIDjIvaDeevF5PNxlupjfcN1dQ1l
+        75GPZdXUaA/aw0NkPLXu/N/xsvjixuWSde/ZEOMlRa3yZmhABUvM0N0eIpXghdfXNeJ+3uSxOVyeN
+        F4z2/2t325lgo84QNfxo1vs/g8vTSr3ojEOENqvWpFuXEg0Ore49vRihkyNMm3SULCvp41EDv9j84
+        bOW4Mr7g==;
+Received: from viro by zeniv.linux.org.uk with local (Exim 4.96 #2 (Red Hat Linux))
+        id 1pLACG-004K1b-2x;
+        Thu, 26 Jan 2023 21:54:17 +0000
+Date:   Thu, 26 Jan 2023 21:54:16 +0000
+From:   Al Viro <viro@zeniv.linux.org.uk>
+To:     David Howells <dhowells@redhat.com>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        Jens Axboe <axboe@kernel.dk>, Jan Kara <jack@suse.cz>,
+        Jeff Layton <jlayton@kernel.org>,
+        David Hildenbrand <david@redhat.com>,
+        Jason Gunthorpe <jgg@nvidia.com>,
         Logan Gunthorpe <logang@deltatee.com>,
-        Christoph Hellwig <hch@lst.de>
-Subject: Re: [Lsf-pc] [LSF/MM/BPF proposal]: Physr discussion
-Message-ID: <Y9LWqEtmkmsMrHne@ziepe.ca>
-References: <Y8v+qVZ8OmodOCQ9@nvidia.com>
- <63cee1d3eaaef_3a36e529488@dwillia2-xfh.jf.intel.com.notmuch>
- <Y87p9i0vCZo/3Qa0@casper.infradead.org>
- <63cef32cbafc3_3a36e529465@dwillia2-xfh.jf.intel.com.notmuch>
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        Christoph Hellwig <hch@lst.de>,
+        John Hubbard <jhubbard@nvidia.com>
+Subject: Re: [PATCH v11 1/8] iov_iter: Define flags to qualify page
+ extraction.
+Message-ID: <Y9L2iFZlC4CFwN4t@ZenIV>
+References: <20230126141626.2809643-1-dhowells@redhat.com>
+ <20230126141626.2809643-2-dhowells@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <63cef32cbafc3_3a36e529465@dwillia2-xfh.jf.intel.com.notmuch>
+In-Reply-To: <20230126141626.2809643-2-dhowells@redhat.com>
+Sender: Al Viro <viro@ftp.linux.org.uk>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Jan 23, 2023 at 12:50:52PM -0800, Dan Williams wrote:
-> Matthew Wilcox wrote:
-> > On Mon, Jan 23, 2023 at 11:36:51AM -0800, Dan Williams wrote:
-> > > Jason Gunthorpe via Lsf-pc wrote:
-> > > > I would like to have a session at LSF to talk about Matthew's
-> > > > physr discussion starter:
-> > > > 
-> > > >  https://lore.kernel.org/linux-mm/YdyKWeU0HTv8m7wD@casper.infradead.org/
-> > > > 
-> > > > I have become interested in this with some immediacy because of
-> > > > IOMMUFD and this other discussion with Christoph:
-> > > > 
-> > > >  https://lore.kernel.org/kvm/4-v2-472615b3877e+28f7-vfio_dma_buf_jgg@nvidia.com/
-> > > 
-> > > I think this is a worthwhile discussion. My main hangup with 'struct
-> > > page' elimination in general is that if anything needs to be allocated
-> > 
-> > You're the first one to bring up struct page elimination.  Neither Jason
-> > nor I have that as our motivation.
-> 
-> Oh, ok, then maybe I misread the concern in the vfio discussion. I
-> thought the summary there is debating the ongoing requirement for
-> 'struct page' for P2PDMA?
+On Thu, Jan 26, 2023 at 02:16:19PM +0000, David Howells wrote:
 
-The VFIO problem is we need a unique pgmap at 4k granuals (or maybe
-smaller, technically), tightly packed, because VFIO exposes PCI BAR
-space that can be sized in such small amounts.
+> +typedef unsigned int iov_iter_extraction_t;
 
-So, using struct page means some kind of adventure in the memory
-hotplug code to allow tightly packed 4k pgmaps.
+> +/* Flags for iov_iter_get/extract_pages*() */
+> +/* Allow P2PDMA on the extracted pages */
+> +#define ITER_ALLOW_P2PDMA	((__force iov_iter_extraction_t)0x01)
 
-And that is assuming that every architecture that wants to support
-VFIO supports pgmap and memory hot plug. I was just told that s390
-doesn't, that is kind of important..
+That __force makes sense only if you make it a bitwise type -
+otherwise it's meaningless.  IOW, either turn the typedef into
 
-If there is a straightforward way to get a pgmap into VFIO then I'd do
-that and give up this quest :)
+typedef unsigned int __bitwise iov_iter_extraction_t;
 
-I've never been looking at this from the angle of eliminating struct
-page, but from the perspective of allowing the DMA API to correctly do
-scatter/gather IO to non-struct page P2P memory because I *can't* get
-a struct page for it. Ie make dma_map_resource() better. Make P2P
-DMABUF work properly.
-
-This has to come along with a different way to store address ranges
-because the basic datum that needs to cross all the functional
-boundaries we have is an address range list.
-
-My general current sketch is we'd allocate some 'DMA P2P provider'
-structure analogous to the MEMORY_DEVICE_PCI_P2PDMA pgmap and a single
-provider would cover the entire MMIO aperture - eg the providing
-device's MMIO BAR. This is enough information for the DMA API to do
-its job.
-
-We get this back either by searching an interval treey thing on the
-physical address or by storing it directly in the address range list.
-
-Jason
+or lose __force in the cast...
