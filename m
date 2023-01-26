@@ -2,42 +2,42 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A1D30C61DA2
-	for <linux-block@archiver.kernel.org>; Thu, 26 Jan 2023 14:18:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6186FC54E94
+	for <linux-block@archiver.kernel.org>; Thu, 26 Jan 2023 14:18:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231811AbjAZOSC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 26 Jan 2023 09:18:02 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49704 "EHLO
+        id S231926AbjAZOS2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 26 Jan 2023 09:18:28 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49784 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230510AbjAZORl (ORCPT
+        with ESMTP id S231847AbjAZOSK (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 26 Jan 2023 09:17:41 -0500
+        Thu, 26 Jan 2023 09:18:10 -0500
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A760A41097
-        for <linux-block@vger.kernel.org>; Thu, 26 Jan 2023 06:16:52 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4538544BED
+        for <linux-block@vger.kernel.org>; Thu, 26 Jan 2023 06:16:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1674742611;
+        s=mimecast20190719; t=1674742616;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=dqniJi1fcm9DuVb2jGUzwy7ATEE/wnT//KjRosSsKEA=;
-        b=Q0SmdH1EAIf8UulK1WX37+cTBgNLyvkTU8FbccpfMat2LyVzynMrdpZGCpqhYXGrdGP6uu
-        Aidmj3WAVCC6uZgYZ851yyaC+wyfcfc99VblSa6415zHyIsDmn/xqNbUHKofyRx4NmArgd
-        BOEmDTmpR6bFfPNNfgT5Nb6RdTw8FZA=
+        bh=YX3eOMnEnHmNO2fsUm7QGJ9rpDZ86GbDPShQEUjns7k=;
+        b=R6XRf0t2MQIQE7djLvhDVQ4oBBc3c1n+INKIN+7L1NYuFhGPGL+2nCAxvn4ACqjRl/jyzj
+        2XzIeT34eX6YdEoxFc6cHR3B8IpAA59PfhRm4hARgfnXS7C0ICc1cuUprwpcwHWd8S5fOF
+        +ekT2DMEZBfGlFDGUIZPSbiMwsbzwaE=
 Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
  [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-649-U4AecB_RMYiOOnaZf-fd3w-1; Thu, 26 Jan 2023 09:16:47 -0500
-X-MC-Unique: U4AecB_RMYiOOnaZf-fd3w-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
+ us-mta-257-pCAwC_fgPBOmzVMPFYtKxA-1; Thu, 26 Jan 2023 09:16:53 -0500
+X-MC-Unique: pCAwC_fgPBOmzVMPFYtKxA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 82D6E811E6E;
-        Thu, 26 Jan 2023 14:16:46 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 8F8A0885623;
+        Thu, 26 Jan 2023 14:16:52 +0000 (UTC)
 Received: from warthog.procyon.org.uk.com (unknown [10.33.36.97])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 6F31C4221F;
-        Thu, 26 Jan 2023 14:16:44 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 906022026D4B;
+        Thu, 26 Jan 2023 14:16:50 +0000 (UTC)
 From:   David Howells <dhowells@redhat.com>
 To:     Al Viro <viro@zeniv.linux.org.uk>,
         Christoph Hellwig <hch@infradead.org>
@@ -52,26 +52,28 @@ Cc:     David Howells <dhowells@redhat.com>,
         linux-kernel@vger.kernel.org, linux-mm@kvack.org,
         Christoph Hellwig <hch@lst.de>,
         John Hubbard <jhubbard@nvidia.com>
-Subject: [PATCH v11 5/8] block: Replace BIO_NO_PAGE_REF with BIO_PAGE_REFFED with inverted logic
-Date:   Thu, 26 Jan 2023 14:16:23 +0000
-Message-Id: <20230126141626.2809643-6-dhowells@redhat.com>
+Subject: [PATCH v11 7/8] block: Convert bio_iov_iter_get_pages to use iov_iter_extract_pages
+Date:   Thu, 26 Jan 2023 14:16:25 +0000
+Message-Id: <20230126141626.2809643-8-dhowells@redhat.com>
 In-Reply-To: <20230126141626.2809643-1-dhowells@redhat.com>
 References: <20230126141626.2809643-1-dhowells@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.5
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Christoph Hellwig <hch@lst.de>
+This will pin pages or leave them unaltered rather than getting a ref on
+them as appropriate to the iterator.
 
-Replace BIO_NO_PAGE_REF with a BIO_PAGE_REFFED flag that has the inverted
-meaning is only set when a page reference has been acquired that needs to
-be released by bio_release_pages().
+The pages need to be pinned for DIO rather than having refs taken on them to
+prevent VM copy-on-write from malfunctioning during a concurrent fork() (the
+result of the I/O could otherwise end up being affected by/visible to the
+child process).
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
 Signed-off-by: David Howells <dhowells@redhat.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
 Reviewed-by: John Hubbard <jhubbard@nvidia.com>
 cc: Al Viro <viro@zeniv.linux.org.uk>
 cc: Jens Axboe <axboe@kernel.dk>
@@ -82,102 +84,92 @@ cc: linux-block@vger.kernel.org
 ---
 
 Notes:
+    ver #10)
+     - Drop bio_set_cleanup_mode(), open coding it instead.
+    
     ver #8)
-     - Split out from another patch [hch].
-     - Don't default to BIO_PAGE_REFFED [hch].
+     - Split the patch up a bit [hch].
+     - We should only be using pinned/non-pinned pages and not ref'd pages,
+       so adjust the comments appropriately.
+    
+    ver #7)
+     - Don't treat BIO_PAGE_REFFED/PINNED as being the same as FOLL_GET/PIN.
     
     ver #5)
-     - Split from patch that uses iov_iter_extract_pages().
+     - Transcribe the FOLL_* flags returned by iov_iter_extract_pages() to
+       BIO_* flags and got rid of bi_cleanup_mode.
+     - Replaced BIO_NO_PAGE_REF to BIO_PAGE_REFFED in the preceding patch.
 
- block/bio.c               | 2 +-
- block/blk-map.c           | 1 +
- fs/direct-io.c            | 2 ++
- fs/iomap/direct-io.c      | 1 -
- include/linux/bio.h       | 2 +-
- include/linux/blk_types.h | 2 +-
- 6 files changed, 6 insertions(+), 4 deletions(-)
+ block/bio.c | 23 ++++++++++++-----------
+ 1 file changed, 12 insertions(+), 11 deletions(-)
 
 diff --git a/block/bio.c b/block/bio.c
-index b97f3991c904..bf9bf53232be 100644
+index 547e38883934..fc57f0aa098e 100644
 --- a/block/bio.c
 +++ b/block/bio.c
-@@ -1198,7 +1198,6 @@ void bio_iov_bvec_set(struct bio *bio, struct iov_iter *iter)
- 	bio->bi_io_vec = (struct bio_vec *)iter->bvec;
- 	bio->bi_iter.bi_bvec_done = iter->iov_offset;
- 	bio->bi_iter.bi_size = size;
--	bio_set_flag(bio, BIO_NO_PAGE_REF);
- 	bio_set_flag(bio, BIO_CLONED);
+@@ -1212,7 +1212,7 @@ static int bio_iov_add_page(struct bio *bio, struct page *page,
+ 	}
+ 
+ 	if (same_page)
+-		put_page(page);
++		bio_release_page(bio, page);
+ 	return 0;
  }
  
-@@ -1343,6 +1342,7 @@ int bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
+@@ -1226,7 +1226,7 @@ static int bio_iov_add_zone_append_page(struct bio *bio, struct page *page,
+ 			queue_max_zone_append_sectors(q), &same_page) != len)
+ 		return -EINVAL;
+ 	if (same_page)
+-		put_page(page);
++		bio_release_page(bio, page);
+ 	return 0;
+ }
+ 
+@@ -1237,10 +1237,10 @@ static int bio_iov_add_zone_append_page(struct bio *bio, struct page *page,
+  * @bio: bio to add pages to
+  * @iter: iov iterator describing the region to be mapped
+  *
+- * Pins pages from *iter and appends them to @bio's bvec array. The
+- * pages will have to be released using put_page() when done.
+- * For multi-segment *iter, this function only adds pages from the
+- * next non-empty segment of the iov iterator.
++ * Extracts pages from *iter and appends them to @bio's bvec array.  The pages
++ * will have to be cleaned up in the way indicated by the BIO_PAGE_PINNED flag.
++ * For a multi-segment *iter, this function only adds pages from the next
++ * non-empty segment of the iov iterator.
+  */
+ static int __bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
+ {
+@@ -1272,9 +1272,9 @@ static int __bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
+ 	 * result to ensure the bio's total size is correct. The remainder of
+ 	 * the iov data will be picked up in the next bio iteration.
+ 	 */
+-	size = iov_iter_get_pages(iter, pages,
+-				  UINT_MAX - bio->bi_iter.bi_size,
+-				  nr_pages, &offset, extraction_flags);
++	size = iov_iter_extract_pages(iter, &pages,
++				      UINT_MAX - bio->bi_iter.bi_size,
++				      nr_pages, extraction_flags, &offset);
+ 	if (unlikely(size <= 0))
+ 		return size ? size : -EFAULT;
+ 
+@@ -1307,7 +1307,7 @@ static int __bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
+ 	iov_iter_revert(iter, left);
+ out:
+ 	while (i < nr_pages)
+-		put_page(pages[i++]);
++		bio_release_page(bio, pages[i++]);
+ 
+ 	return ret;
+ }
+@@ -1342,7 +1342,8 @@ int bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
  		return 0;
  	}
  
-+	bio_set_flag(bio, BIO_PAGE_REFFED);
+-	bio_set_flag(bio, BIO_PAGE_REFFED);
++	if (iov_iter_extract_will_pin(iter))
++		bio_set_flag(bio, BIO_PAGE_PINNED);
  	do {
  		ret = __bio_iov_iter_get_pages(bio, iter);
  	} while (!ret && iov_iter_count(iter) && !bio_full(bio, 0));
-diff --git a/block/blk-map.c b/block/blk-map.c
-index 080dd60485be..f1f70b50388d 100644
---- a/block/blk-map.c
-+++ b/block/blk-map.c
-@@ -282,6 +282,7 @@ static int bio_map_user_iov(struct request *rq, struct iov_iter *iter,
- 	if (blk_queue_pci_p2pdma(rq->q))
- 		extraction_flags |= ITER_ALLOW_P2PDMA;
- 
-+	bio_set_flag(bio, BIO_PAGE_REFFED);
- 	while (iov_iter_count(iter)) {
- 		struct page **pages, *stack_pages[UIO_FASTIOV];
- 		ssize_t bytes;
-diff --git a/fs/direct-io.c b/fs/direct-io.c
-index 03d381377ae1..07810465fc9d 100644
---- a/fs/direct-io.c
-+++ b/fs/direct-io.c
-@@ -403,6 +403,8 @@ dio_bio_alloc(struct dio *dio, struct dio_submit *sdio,
- 		bio->bi_end_io = dio_bio_end_aio;
- 	else
- 		bio->bi_end_io = dio_bio_end_io;
-+	/* for now require references for all pages */
-+	bio_set_flag(bio, BIO_PAGE_REFFED);
- 	sdio->bio = bio;
- 	sdio->logical_offset_in_bio = sdio->cur_page_fs_offset;
- }
-diff --git a/fs/iomap/direct-io.c b/fs/iomap/direct-io.c
-index 47db4ead1e74..c0e75900e754 100644
---- a/fs/iomap/direct-io.c
-+++ b/fs/iomap/direct-io.c
-@@ -202,7 +202,6 @@ static void iomap_dio_zero(const struct iomap_iter *iter, struct iomap_dio *dio,
- 	bio->bi_private = dio;
- 	bio->bi_end_io = iomap_dio_bio_end_io;
- 
--	bio_set_flag(bio, BIO_NO_PAGE_REF);
- 	__bio_add_page(bio, page, len, 0);
- 	iomap_dio_submit_bio(iter, dio, bio, pos);
- }
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index 10366b8bdb13..805957c99147 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -484,7 +484,7 @@ void zero_fill_bio(struct bio *bio);
- 
- static inline void bio_release_pages(struct bio *bio, bool mark_dirty)
- {
--	if (!bio_flagged(bio, BIO_NO_PAGE_REF))
-+	if (bio_flagged(bio, BIO_PAGE_REFFED))
- 		__bio_release_pages(bio, mark_dirty);
- }
- 
-diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-index 99be590f952f..7daa261f4f98 100644
---- a/include/linux/blk_types.h
-+++ b/include/linux/blk_types.h
-@@ -318,7 +318,7 @@ struct bio {
-  * bio flags
-  */
- enum {
--	BIO_NO_PAGE_REF,	/* don't put release vec pages */
-+	BIO_PAGE_REFFED,	/* put pages in bio_release_pages() */
- 	BIO_CLONED,		/* doesn't own data */
- 	BIO_BOUNCED,		/* bio is a bounce bio */
- 	BIO_QUIET,		/* Make BIO Quiet */
 
