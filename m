@@ -2,76 +2,104 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 22E71C52D11
-	for <linux-block@archiver.kernel.org>; Thu, 26 Jan 2023 17:38:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DADDC05027
+	for <linux-block@archiver.kernel.org>; Thu, 26 Jan 2023 17:43:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229529AbjAZRiX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 26 Jan 2023 12:38:23 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42514 "EHLO
+        id S231641AbjAZRnK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 26 Jan 2023 12:43:10 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46098 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230287AbjAZRiW (ORCPT
+        with ESMTP id S231843AbjAZRnI (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 26 Jan 2023 12:38:22 -0500
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A68CE6A708
-        for <linux-block@vger.kernel.org>; Thu, 26 Jan 2023 09:38:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Content-Type:MIME-Version:Message-ID:
-        Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-        Content-Description:In-Reply-To:References;
-        bh=sxJBaTN19A70jHkuOMUFcmvbgXlT2VUpb4rKJphDDN8=; b=uajMenBIr8eCQhs1dW/vNOBwPu
-        Kxrg7S/wEvyr0WbUHeSTvcqMOv2R5QCTHBi4ncG88/G9cXBYvtNSi+AxQ2ofNbaFDTToJ2ch0cKJh
-        NSh/AJukkXoouPLMaFtDHT2KiqQoZgmKGu9NqhPgX2oGjZY1g5AuCLePee7Os15CNcpSp+Q//qQ3T
-        vKI49h6DaF4/Ix6DUFMdUewacU5NB6oawxkOFgnqAle2KSF9BJwH7J/IBVBaWaeb4Hmt7Y1Q5pyIG
-        rreDnpI3S3BGVNTch7PdoICOn0ZARGCPtEJ8JjOQDq5af7aShw9DiiVg9hMVvBfbjHGc3Xpsw6KHb
-        qZROfs5w==;
-Received: from 213-225-9-99.nat.highway.a1.net ([213.225.9.99] helo=localhost)
-        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1pL6CQ-00C3zC-L7; Thu, 26 Jan 2023 17:38:11 +0000
-Date:   Thu, 26 Jan 2023 18:38:05 +0100
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
-Subject: [GIT PULL] nvme fixes for Linux 6.2
-Message-ID: <Y9K6fTTrhXSWkVeZ@infradead.org>
+        Thu, 26 Jan 2023 12:43:08 -0500
+Received: from mail-qt1-x830.google.com (mail-qt1-x830.google.com [IPv6:2607:f8b0:4864:20::830])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D7D05DBCB
+        for <linux-block@vger.kernel.org>; Thu, 26 Jan 2023 09:43:04 -0800 (PST)
+Received: by mail-qt1-x830.google.com with SMTP id m26so1883867qtp.9
+        for <linux-block@vger.kernel.org>; Thu, 26 Jan 2023 09:43:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=toxicpanda-com.20210112.gappssmtp.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=1n8f/ZaA0DF1cGBFp+8fWPAvuN+H2UR763MDSJjtLDQ=;
+        b=mqd8oyblK50pqgWM0k7weSQeKHOSmU0YGiwe880FqeeVgbRhYPp4/snCShI5rSB0B9
+         bTFJNqIduG3qpNlPT7Gmp98QQ3/sx884jMM7ivzOUeqseAKdLQ5eNQOnzWkkbvkUhBp9
+         DbGi4I4JtUjseknb5UP5Dsw5n73MCXHCd6vKktEFO7prtkqMSx/sAAd+9MhU3XRi1DAx
+         3eZBXl0fT7vP4byPoNYlrAHPJZf7eVJ1CBh0YFgVl8tcD9jiTjhyib1/h5PoprY49YA0
+         L9+c/2nx8176q9/YMh1XP6TGeNx/I9QMXqJnrHvO8eZtTt3LSQ2spt+D5dUmKcatGXVE
+         4A4Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1n8f/ZaA0DF1cGBFp+8fWPAvuN+H2UR763MDSJjtLDQ=;
+        b=vrX6R32hvGqcSTZAjBDfxscq8nJjQzN2xS0SUubnF6q1Z9QNAqyiT2+cCZ3o9oApeB
+         0a4M1wBHkP+pAUmY/Pma4avAIXLzOpv/SpaDsWxz/Bz3N1WdHa7a/Q8+nBnRv9bbzdd/
+         WhO9SK80XXgSnsVR4pj3DlIPJT3XrBAHDqz/d+/xdHKdGnD/d88xXSNphzioDxj7Vco8
+         ocjv9eWKM4W0nFpBq4EbJbnuBg8/6Z6tL+/lUZljyOmlgtWHqXWo9I5ghNo5PyewTHpj
+         jV+hTyVdxPpjPTxbjvAzDLXssOrhiTzVTx0/yZFbkERk4jYtkCyb7vgYyKhYTvqk+M9p
+         HVoA==
+X-Gm-Message-State: AFqh2koaa/lmaZlTSJDAuhHipSiiRMTbMNmV5NpEdLWeuuwEnKw7BT4u
+        exbJFODVvaihG0msjYU2bmj0+A==
+X-Google-Smtp-Source: AMrXdXsJM2cdIc/uwbgYYj6EDGr39yA/dYAmC0FcFl5/idkvEBzBIzOIl9tWHWxrb8ASHTpvFadRYg==
+X-Received: by 2002:a05:622a:5917:b0:3a8:175a:fd48 with SMTP id ga23-20020a05622a591700b003a8175afd48mr58098269qtb.64.1674754983909;
+        Thu, 26 Jan 2023 09:43:03 -0800 (PST)
+Received: from localhost (cpe-174-109-170-245.nc.res.rr.com. [174.109.170.245])
+        by smtp.gmail.com with ESMTPSA id s20-20020a05622a179400b003b81a90f117sm356865qtk.60.2023.01.26.09.43.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 26 Jan 2023 09:43:03 -0800 (PST)
+Date:   Thu, 26 Jan 2023 12:43:01 -0500
+From:   Josef Bacik <josef@toxicpanda.com>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Chris Mason <clm@fb.com>, David Sterba <dsterba@suse.com>,
+        Damien Le Moal <damien.lemoal@wdc.com>,
+        Naohiro Aota <naohiro.aota@wdc.com>,
+        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+        Qu Wenruo <wqu@suse.com>, Jens Axboe <axboe@kernel.dk>,
+        "Darrick J. Wong" <djwong@kernel.org>, linux-block@vger.kernel.org,
+        linux-btrfs@vger.kernel.org, linux-fsdevel@vger.kernel.org
+Subject: Re: [PATCH 23/34] btrfs: allow btrfs_submit_bio to split bios
+Message-ID: <Y9K7pZq2h9aXiKCJ@localhost.localdomain>
+References: <20230121065031.1139353-1-hch@lst.de>
+ <20230121065031.1139353-24-hch@lst.de>
+ <Y9GkVONZJFXVe8AH@localhost.localdomain>
+ <20230126052143.GA28195@lst.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20230126052143.GA28195@lst.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The following changes since commit 955bc12299b17aa60325e1748336e1fd1e664ed0:
+On Thu, Jan 26, 2023 at 06:21:43AM +0100, Christoph Hellwig wrote:
+> On Wed, Jan 25, 2023 at 04:51:16PM -0500, Josef Bacik wrote:
+> > This is causing a panic in btrfs/125 because you set bbio to
+> > btrfs_bio(split_bio), which has a NULL end_io.  You need something like the
+> > following so that we're ending the correct bbio.  Thanks,
+> 
+> Just curious, what are the other configuration details as I've never been
+> able to hit it?
+> 
+> The fix itself looks good.
 
-  Merge tag 'nvme-6.2-2023-01-20' of git://git.infradead.org/nvme into block-6.2 (2023-01-20 08:08:29 -0700)
+I reproduced it on the CI setup I've got for us, this was the config
 
-are available in the Git repository at:
+[btrfs_normal_freespacetree]
+TEST_DIR=/mnt/test
+TEST_DEV=/dev/mapper/vg0-lv0
+SCRATCH_DEV_POOL="/dev/mapper/vg0-lv7 /dev/mapper/vg0-lv6 /dev/mapper/vg0-lv5 /dev/mapper/vg0-lv4 /dev/mapper/vg0-lv3 /dev/mapper/vg0-lv2 /dev/mapper/vg0-lv1 "
+SCRATCH_MNT=/mnt/scratch
+LOGWRITES_DEV=/dev/mapper/vg0-lv8
+PERF_CONFIGNAME=jbacik
+MKFS_OPTIONS="-K -f -O ^no-holes"
+MOUNT_OPTIONS="-o space_cache=v2"
+FSTYP=btrfs
 
-  git://git.infradead.org/nvme.git tags/nvme-6.2-2023-01-26
+I actually hadn't been running 125 because it wasn't in the auto group, Dave
+noticed it, I just tried it on this VM and hit it right away.  No worries,
+that's why we have the CI stuff, sometimes it just doesn't trigger for us but
+will trigger with the CI setup.  Thanks,
 
-for you to fetch changes up to 85eee6341abb81ac6a35062ffd5c3029eb53be6b:
-
-  nvme: fix passthrough csi check (2023-01-25 07:09:38 +0100)
-
-----------------------------------------------------------------
-nvme fixes for Linux 6.2
-
- - flush initial scan_work for async probe (Keith Busch)
- - fix passthrough csi check (Keith Busch)
- - fix nvme-fc initialization order (Ross Lagerwall)
-
-----------------------------------------------------------------
-Keith Busch (2):
-      nvme-pci: flush initial scan_work for async probe
-      nvme: fix passthrough csi check
-
-Ross Lagerwall (1):
-      nvme-fc: fix initialization order
-
- drivers/nvme/host/core.c |  2 +-
- drivers/nvme/host/fc.c   | 18 ++++++++----------
- drivers/nvme/host/pci.c  |  1 +
- 3 files changed, 10 insertions(+), 11 deletions(-)
+Josef
