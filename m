@@ -2,84 +2,88 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 119AAC54E94
-	for <linux-block@archiver.kernel.org>; Thu, 26 Jan 2023 15:14:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EEFC9C61DA3
+	for <linux-block@archiver.kernel.org>; Thu, 26 Jan 2023 16:40:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230016AbjAZPOa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 26 Jan 2023 10:14:30 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48114 "EHLO
+        id S232167AbjAZQk4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 26 Jan 2023 11:40:56 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52284 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231859AbjAZPO2 (ORCPT
+        with ESMTP id S232067AbjAZQkz (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 26 Jan 2023 10:14:28 -0500
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B36E36680;
-        Thu, 26 Jan 2023 07:14:27 -0800 (PST)
+        Thu, 26 Jan 2023 11:40:55 -0500
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00E8159B42;
+        Thu, 26 Jan 2023 08:40:46 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=jf0GYlkID4WfHzv9bLTw/+0umA4SZs7LmCsUqDXilJ4=; b=QgrN4+6HqfZ8xoumbUmAGVXdqP
-        V3/DBO2YX15rUYgjoN9DvriVOWX8B2PmIyJfWF0wqWOACDGuzhIaiCdG7smMtUVOpqxuTlGzfSF9j
-        bQjRvgwp6NB4YTYWEoVD6RIvW5t3SrmaNTZlJqmMNEpVJeTTklB9uABrJ2uZ8FOZReb8VYR2/ruEH
-        YMvzWw8+ERFV6N3HrgVHiItcJsgstfLipVb+fKQGgVgRsYQe4sWg0cBx1/bHcfh9z9UduSSaGHlOx
-        lMPtv2QaRcACKRFrqseKdsE1JTvaVCz74i84qn533KpeJ9hthmSpCZX7Uh1tV8V+NYeE9apl2BoBi
-        2QcL+v/Q==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1pL3xA-00BRFc-Mn; Thu, 26 Jan 2023 15:14:16 +0000
-Date:   Thu, 26 Jan 2023 07:14:16 -0800
-From:   Christoph Hellwig <hch@infradead.org>
-To:     David Howells <dhowells@redhat.com>
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        David Hildenbrand <david@redhat.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        Jens Axboe <axboe@kernel.dk>, Jan Kara <jack@suse.cz>,
-        Jeff Layton <jlayton@kernel.org>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        Christoph Hellwig <hch@lst.de>,
-        John Hubbard <jhubbard@nvidia.com>
-Subject: Re: [PATCH v10 5/8] block: Replace BIO_NO_PAGE_REF with
- BIO_PAGE_REFFED with inverted logic
-Message-ID: <Y9KYyPvFsGgZe4Gd@infradead.org>
-References: <f70c9b67-5284-cd6a-7360-92a883bf9bb5@redhat.com>
- <20230125210657.2335748-1-dhowells@redhat.com>
- <20230125210657.2335748-6-dhowells@redhat.com>
- <2642148.1674732850@warthog.procyon.org.uk>
+        d=infradead.org; s=casper.20170209; h=Content-Type:MIME-Version:Message-ID:
+        Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+        Content-Description:In-Reply-To:References;
+        bh=St7IrS1mX9F0RKDBGEEFoebKrWt9ulX8fBNwRg7efIc=; b=Eg3hNBdDGz6MmWSRYZAiHki/eE
+        lqofbPItG5HE7VLsezYljzQ1GYuqfgr/xpQ/G5btMaRZLA1Y9KXs4WlRInUMGu6QuUVLsxPqcszh7
+        wkBxk+VAdUw26ftVTdoTBVoM48/XpwfRXNr6x9+1o+vpVQJCz+xENydh9aHYrOg7LGO/Bn+uCk+kZ
+        9VP6oYuzy2VNB4n5jugCQ4H3LhlJltty78aGk0qxW71KhXi/ax2RJvjjXI9+VoHsJR2k4KYIwb3hj
+        B+FIyRAUbWBFqdShQ7cCSoed4oUCdWJ9MtkfMBoVCRSN8nIyT+TP1u+FCs8pf7fyfchlVGPNxcCbn
+        2W3TJ5EA==;
+Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1pL5In-006uHI-SO; Thu, 26 Jan 2023 16:40:41 +0000
+Date:   Thu, 26 Jan 2023 16:40:41 +0000
+From:   Matthew Wilcox <willy@infradead.org>
+To:     lsf-pc@lists.linux-foundation.org
+Cc:     linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        linux-block@vger.kernel.org, linux-ide@vger.kernel.org,
+        linux-scsi@vger.kernel.org, linux-nvme@lists.infradead.org,
+        bpf@vger.kernel.org
+Subject: [LSF/MM/BPF TOPIC] State Of The Page
+Message-ID: <Y9KtCc+4n5uANB2f@casper.infradead.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <2642148.1674732850@warthog.procyon.org.uk>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jan 26, 2023 at 11:34:10AM +0000, David Howells wrote:
-> David Hildenbrand <david@redhat.com> wrote:
-> 
-> > > Signed-off-by: David Howells <dhowells@redhat.com>
-> > > Reviewed-by: Christoph Hellwig <hch@lst.de>
-> > > Reviewed-by: John Hubbard <jhubbard@nvidia.com>
-> > > cc: Al Viro <viro@zeniv.linux.org.uk>
-> > > cc: Jens Axboe <axboe@kernel.dk>
-> > > cc: Jan Kara <jack@suse.cz>
-> > > cc: Matthew Wilcox <willy@infradead.org>
-> > > cc: Logan Gunthorpe <logang@deltatee.com>
-> > > cc: linux-block@vger.kernel.org
-> > > ---
-> > 
-> > Oh, and I agree with a previous comment that this patch should also hold a
-> > Signed-off-by from Christoph above your Signed-off-by, if he is mentioned as
-> > the author via "From:".
-> 
-> I think that was actually in reference to patch 3, but yes - and possibly a
-> Co-developed-by tag.  Christoph?
+I'd like to do another session on how the struct page dismemberment
+is going and what remains to be done.  Given how widely struct page is
+used, I think there will be interest from more than just MM, so I'd
+suggest a plenary session.
 
-As I said feel free to add a co-developed by if you want.  But more
-importantly restore my signoff from here:
+If I were hosting this session today, topics would include:
 
-http://git.infradead.org/users/hch/misc.git/commitdiff/37ea178d5d95166196112905aa75d85cb0416d49
+Splitting out users:
+
+ - slab (done!)
+ - netmem (in progress)
+ - hugetlb (in akpm)
+ - tail pages (in akpm)
+ - page tables
+ - ZONE_DEVICE
+
+Users that really should have their own types:
+
+ - zsmalloc
+ - bootmem
+ - percpu
+ - buddy
+ - vmalloc
+
+Converting filesystems to folios:
+
+ - XFS (done)
+ - AFS (done)
+ - NFS (in progress)
+ - ext4 (in progress)
+ - f2fs (in progress)
+ - ... others?
+
+Unresolved challenges:
+
+ - mapcount
+ - AnonExclusive
+ - Splitting anon & file folios apart
+ - Removing PG_error & PG_private
+
+This will probably all change before May.
+
+I'd like to nominate Vishal Moola & Sidhartha Kumar as invitees based on
+their work to convert various functions from pages to folios.
