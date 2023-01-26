@@ -2,150 +2,142 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 398DEC54EAA
-	for <linux-block@archiver.kernel.org>; Thu, 26 Jan 2023 22:49:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D4F0C05027
+	for <linux-block@archiver.kernel.org>; Thu, 26 Jan 2023 23:43:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229828AbjAZWtl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 26 Jan 2023 17:49:41 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49122 "EHLO
+        id S232563AbjAZXnT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 26 Jan 2023 18:43:19 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53292 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232388AbjAZWtj (ORCPT
+        with ESMTP id S229874AbjAZXnS (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 26 Jan 2023 17:49:39 -0500
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2087.outbound.protection.outlook.com [40.107.244.87])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5CFAF577C4;
-        Thu, 26 Jan 2023 14:49:30 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=eJ7JvpXsrwFjOt9+HpB6z9eH79sGY+0+PSzMcrTEcowNzgrWNuCj6C8ouyKqFJg5uGu8GjgYZRNpMIeOsZpcSXSYbanKZa412L1NQX35QMccyUrkwdv+ewLIctL1aiEA3V0DdR/CHL303cJgcHckG5wEi+cOcGBq53DsG1OYpQyMc40bdbr11lHQUSVxg2cKmE1NtoEF/XTtNN6vPDDfoZxnlFNWnNTnNpnZIh95jvSTthY0DOEVeEfo2O4mHqC4DMeuk9i0hmzz1Nn7rQjy7eVsKznyLbocXych8sk6UiJGfU2qBGPj81khNGhPQSrdHtFVTb9NWzVI2JyF5WAHVQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=72MlngrVJhO8vi22N2nyiNPWPhFojC+8hVnkjp9yON4=;
- b=EUoX8164jG5JoMsrzktbsbI5rSeQTWC1pIixo4tJ/7CCRsvQ2BLx2KXW3DPG/fG0dbbsO4nAmu1yhKgmX76h04B5F0+FDgc7g7lTzorLtq+AdmvgUKeUHOtfTT5B5rVupSRcXjyUDD4mz/zKHtpLu1G7vt1RoWXf9L9iaDtJwNZp/VGVWsFl+b6Qc80G8iM+u8DCezUGHnYgcXfy/B9SCpf1l0Y35p30JIGUzteMjY9B6YpaZLE4bW70bXkp5IYxBYKiKjUGLUUp46oN0YAF66qkWigBYqYoFKyy4/SNSCPl18saAFzG6SOztheq2imAdSceb/ms7MmUuS/5s+pbGg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=zeniv.linux.org.uk
- smtp.mailfrom=nvidia.com; dmarc=pass (p=reject sp=reject pct=100) action=none
- header.from=nvidia.com; dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=72MlngrVJhO8vi22N2nyiNPWPhFojC+8hVnkjp9yON4=;
- b=RtyK/11kkuP1qrdWTvco3wocOCGASsIKXoDnEJQMN1xKj1kh10Am1CcGbHDB6Y7DMAer813Sfr/6+0cMi2y+6bF9oDLpjZ4dZA+7gOb+mkRGuZ0IsOMcKFkq2qRm7BXjzMfGibdVxFEaRIxW1Cf1fIQe2nGp03CVU9zUzr44syAshLOtYilBrb+e4glmIioSir4HSw6Kjifusu3bHcNzYu2en4iIcFYl+FwpCHYk1HH75EAcCZaSIexlQE+5gOg1no/go3N7kQ93GdjYep2qKtJefvIukfiA/bwO4HIh45wCtsZSW4mL12it3ApLpDuiH1YPk3lOvKDuNsvB18lJIw==
-Received: from DM6PR13CA0032.namprd13.prod.outlook.com (2603:10b6:5:bc::45) by
- CY5PR12MB6370.namprd12.prod.outlook.com (2603:10b6:930:20::22) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6043.22; Thu, 26 Jan 2023 22:49:27 +0000
-Received: from DM6NAM11FT009.eop-nam11.prod.protection.outlook.com
- (2603:10b6:5:bc:cafe::f4) by DM6PR13CA0032.outlook.office365.com
- (2603:10b6:5:bc::45) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6043.22 via Frontend
- Transport; Thu, 26 Jan 2023 22:49:27 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- DM6NAM11FT009.mail.protection.outlook.com (10.13.173.20) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6043.22 via Frontend Transport; Thu, 26 Jan 2023 22:49:27 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.36; Thu, 26 Jan
- 2023 14:49:18 -0800
-Received: from [10.110.48.28] (10.126.231.37) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.36; Thu, 26 Jan
- 2023 14:49:18 -0800
-Message-ID: <bf3edf11-02d1-128c-ebc0-11bb38404ac9@nvidia.com>
-Date:   Thu, 26 Jan 2023 14:49:17 -0800
+        Thu, 26 Jan 2023 18:43:18 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9039474DF
+        for <linux-block@vger.kernel.org>; Thu, 26 Jan 2023 15:42:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1674776473;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=hgp2csT/5N2GgfmM2EojwNPbWSvoxY/hrLJRyt5ZyZI=;
+        b=ico2nsL1J50vZg8BOQ0Pu7Oim2rJSV445t0zkwm1jVqxicv08SBt7+Tw/4fV8V+jApXWtS
+        f2sIy3XoVxwMJ9wvl/zJb8nhtD5KwghYkQzRJpoTawiu0rNjQ9RUnXZq9xCfnqlP96Z/Pa
+        ACRcCpR9wpA4ecrvxXAvkQYo2IbSok8=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-433-Dn8gPfD2PbaxXAoU42G5-Q-1; Thu, 26 Jan 2023 18:41:11 -0500
+X-MC-Unique: Dn8gPfD2PbaxXAoU42G5-Q-1
+Received: by mail-wm1-f70.google.com with SMTP id r15-20020a05600c35cf00b003d9a14517b2so3649029wmq.2
+        for <linux-block@vger.kernel.org>; Thu, 26 Jan 2023 15:41:11 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:organization:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=hgp2csT/5N2GgfmM2EojwNPbWSvoxY/hrLJRyt5ZyZI=;
+        b=wkgo9zCxEDgK6NCOMO7VX37tCetxClzwIKhXp9k/jWIbKHftzzQtsXYjxhDdmdE3jr
+         lBFbSh5tU0n73+ERZREF/sCATwCQWe5SxDZgOxLT9KNsJbV1PNGhcrA/qRgl9IEsFf5J
+         a+ihke7juPxqKyVANwTlSWD3prUYuduKGEqqT//iRK3fCm5x859ogZeh50du1/+SoouX
+         kK6WzytbbyzWaGeATzjSL9F26AN3VryNE8OAduqDafOdCqK4TKve8nZLmq+K3/Z7qCP+
+         pMQ8Dz9ETfCkZDpWk9iGQ3aiyGNQ7EQ8bVDmExt2Hdztehp0dDa7WeNh2gEEAUUMi4/T
+         GAZw==
+X-Gm-Message-State: AO0yUKUL6n1Wvy6QFVFMB8/V0FZ/b1liKyoya8EsTfeZdFMteOCNLaa/
+        WzqDrK/h0um3etyTn0VD8FWzGL8NlOTT7nSpYYaFIse84GDv9TPXNWKUDP8rrOeGNKVTdE0btVO
+        V/TU+IKNzURkK0FC/ubDrx9k=
+X-Received: by 2002:a05:600c:4691:b0:3dc:24fc:ef6f with SMTP id p17-20020a05600c469100b003dc24fcef6fmr4321092wmo.40.1674776470750;
+        Thu, 26 Jan 2023 15:41:10 -0800 (PST)
+X-Google-Smtp-Source: AK7set+lzFboGivn/VNW6G+eB5vRq3OTKvz6ptdlIfr3a3nxgdbjnY8Utt36TAGPBJAaiqBnRnN+hg==
+X-Received: by 2002:a05:600c:4691:b0:3dc:24fc:ef6f with SMTP id p17-20020a05600c469100b003dc24fcef6fmr4321075wmo.40.1674776470367;
+        Thu, 26 Jan 2023 15:41:10 -0800 (PST)
+Received: from ?IPV6:2003:cb:c707:5e00:9e97:86d:5ed5:bb95? (p200300cbc7075e009e97086d5ed5bb95.dip0.t-ipconnect.de. [2003:cb:c707:5e00:9e97:86d:5ed5:bb95])
+        by smtp.gmail.com with ESMTPSA id v21-20020a05600c429500b003dc1a525f22sm2429845wmc.25.2023.01.26.15.41.09
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 26 Jan 2023 15:41:09 -0800 (PST)
+Message-ID: <5a1796f3-e49c-80e8-2dd6-9a6e82939271@redhat.com>
+Date:   Fri, 27 Jan 2023 00:41:08 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.1
-Subject: Re: [PATCH v11 2/8] iov_iter: Add a function to extract a page list
+ Thunderbird/102.6.0
+Subject: Re: [PATCH v7 2/8] iov_iter: Add a function to extract a page list
  from an iterator
-Content-Language: en-US
-To:     Al Viro <viro@zeniv.linux.org.uk>,
-        David Howells <dhowells@redhat.com>
-CC:     Christoph Hellwig <hch@infradead.org>,
+To:     Al Viro <viro@zeniv.linux.org.uk>
+Cc:     David Howells <dhowells@redhat.com>,
+        Christoph Hellwig <hch@infradead.org>,
         Matthew Wilcox <willy@infradead.org>,
         Jens Axboe <axboe@kernel.dk>, Jan Kara <jack@suse.cz>,
         Jeff Layton <jlayton@kernel.org>,
-        David Hildenbrand <david@redhat.com>,
-        "Jason Gunthorpe" <jgg@nvidia.com>,
         Logan Gunthorpe <logang@deltatee.com>,
-        <linux-fsdevel@vger.kernel.org>, <linux-block@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <linux-mm@kvack.org>,
-        Christoph Hellwig <hch@lst.de>
-References: <20230126141626.2809643-1-dhowells@redhat.com>
- <20230126141626.2809643-3-dhowells@redhat.com> <Y9L3yA+B1rrnrGK8@ZenIV>
- <Y9MAbYt6DIRFm954@ZenIV>
-From:   John Hubbard <jhubbard@nvidia.com>
-In-Reply-To: <Y9MAbYt6DIRFm954@ZenIV>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        John Hubbard <jhubbard@nvidia.com>, linux-mm@kvack.org
+References: <7bbcccc9-6ebf-ffab-7425-2a12f217ba15@redhat.com>
+ <246ba813-698b-8696-7f4d-400034a3380b@redhat.com>
+ <20230120175556.3556978-1-dhowells@redhat.com>
+ <20230120175556.3556978-3-dhowells@redhat.com>
+ <3814749.1674474663@warthog.procyon.org.uk>
+ <3903251.1674479992@warthog.procyon.org.uk>
+ <c742e47b-dcc0-1fef-dc8c-3bf85d26b046@redhat.com> <Y9L7cRFFZh9A7kZY@ZenIV>
+Content-Language: en-US
+From:   David Hildenbrand <david@redhat.com>
+Organization: Red Hat
+In-Reply-To: <Y9L7cRFFZh9A7kZY@ZenIV>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.126.231.37]
-X-ClientProxiedBy: rnnvmail201.nvidia.com (10.129.68.8) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6NAM11FT009:EE_|CY5PR12MB6370:EE_
-X-MS-Office365-Filtering-Correlation-Id: 6f665809-61e2-4588-6374-08daffef9443
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 0lRFA3zuBlsjKiFn7am25PoK9oeD/TkumaWRLlZ/ZksQmzgLeaWf/Kp8NcfiPaYbLuw17OoVqQYtJResbHDIaVQzDppOX1k/rc8VlvknSNrxltv3VWDIBaUypDJlifR4DMKFhxLXAHIk9/eM1Zwrb50X7WYdxGNXxwM1pk75+sMu1fScuIwfRWNmkqH09ClgwEXjj2ErpJuMEjaD+16sLfdjCkqvtEVOK2C/vChR89d2mey1yJ0Rsw5LJPQUTHy1/y2QvEZUHDomD1vw9pZavZET6g+wCVO61jk5IGCMksPt182lc4sgTP+csfZaX7xiGsB101WhQ/0IL6/y+fgN5RjdmoaaH4bPDOpW3uEiAa6PtuF8P69IfMwEUknb7FaH0x178nbg40PdEzqdtC33W1uKBMoYCywarGVxQWZAfqzjWEGYIncZTRlBZJtwhAYDEEtT5NFZTsmNGytLve1Xa+RdsLBitSwjRhgo5IsOm4coRAnNiF4Hoa7ywACD/jhltboSJ4hkOCKutocSNCf9PCWe8XGMjuTC3C9cpttChKSr6kGTo+l2OFVjScDIfPhkQtW8FHm6v1kYl5fnHbvwWtGLAOL2KvcSkbn9hrE+LH7ep4wcBX2wmN1+z6NBSzFjTR1hZuJl3KVW0wXCb/0e9WWZ9XkHLTrGWSV2UUCsHCcIJzVGAkLIMquzxEZXWUxnmkIgvKfS3RwJaJXKsD5T1cXio55BDRoC3w8C4NlbdBobO4kIXMTqsCT54Q0mBKG9u4pPnpxBQPOIfdOlBz80jKaQjyKhGVItd1hf28pbsK6k4wMJmu8OrYGe3qtfV1/t
-X-Forefront-Antispam-Report: CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230025)(4636009)(396003)(136003)(376002)(346002)(39860400002)(451199018)(40470700004)(46966006)(36840700001)(16526019)(186003)(31686004)(26005)(478600001)(966005)(47076005)(336012)(2616005)(82310400005)(426003)(83380400001)(316002)(54906003)(41300700001)(8676002)(7636003)(356005)(70206006)(53546011)(82740400003)(16576012)(110136005)(86362001)(36756003)(5660300002)(40460700003)(7416002)(8936002)(4326008)(70586007)(31696002)(40480700001)(2906002)(36860700001)(43740500002);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Jan 2023 22:49:27.4651
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6f665809-61e2-4588-6374-08daffef9443
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT009.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY5PR12MB6370
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/26/23 14:36, Al Viro wrote:
-...
->>> +static inline bool iov_iter_extract_will_pin(const struct iov_iter *iter)
->>> +{
->>> +	return user_backed_iter(iter);
->>> +}
->>> +
+On 26.01.23 23:15, Al Viro wrote:
+> On Mon, Jan 23, 2023 at 02:24:13PM +0100, David Hildenbrand wrote:
+>> On 23.01.23 14:19, David Howells wrote:
+>>> David Hildenbrand <david@redhat.com> wrote:
+>>>
+>>>> Switching from FOLL_GET to FOLL_PIN was in the works by John H. Not sure what
+>>>> the status is. Interestingly, Documentation/core-api/pin_user_pages.rst
+>>>> already documents that "CASE 1: Direct IO (DIO)" uses FOLL_PIN ... which does,
+>>>> unfortunately, no reflect reality yet.
+>>>
+>>> Yeah - I just came across that.
+>>>
+>>> Should iov_iter.c then switch entirely to using pin_user_pages(), rather than
+>>> get_user_pages()?  In which case my patches only need keep track of
+>>> pinned/not-pinned and never "got".
 >>
->> Wait a sec; why would we want a pin for pages we won't be modifying?
->> A reference - sure, but...
+>> That would be the ideal case: whenever intending to access page content, use
+>> FOLL_PIN instead of FOLL_GET.
+>>
+>> The issue that John was trying to sort out was that there are plenty of
+>> callsites that do a simple put_page() instead of calling unpin_user_page().
+>> IIRC, handling that correctly in existing code -- what was pinned must be
+>> released via unpin_user_page() -- was the biggest workitem.
+>>
+>> Not sure how that relates to your work here (that's why I was asking): if
+>> you could avoid FOLL_GET, that would be great :)
 > 
-> After having looked through the earlier iterations of the patchset -
-> sorry, but that won't fly for (at least) vmsplice().  There we can't
-> pin those suckers; thankfully, we don't need to - they are used only
-> for fetches, so FOLL_GET is sufficient.  With your "we'll just pin them,
-> source or destination" you won't be able to convert at least that
-> call of iov_iter_get_pages2().  And there might be other similar cases;
-> I won't swear there's more, but ISTR running into more than one of
-> the "pin won't be OK here, but fortunately it's a data source" places.
+> Take a good look at iter_to_pipe().  It does *not* need to pin anything
+> (we have an ITER_SOURCE there); with this approach it will.  And it
+> will stuff those pinned references into a pipe, where they can sit
+> indefinitely.
+> 
+> IOW, I don't believe it's a usable approach.
+> 
 
-Assuming that "page is a data source" means that we are writing out from
-the page to a block device (so, a WRITE operation, which of course
-actually *reads* from the page), then...
+Not sure what makes you believe that FOLL_GET is any better for this 
+long-term pinning, I'd like to learn about that.
 
-...one thing I'm worried about now is whether Jan's original problem
-report [1] can be fixed, because that involves page writeback. And it
-seems like we need to mark the pages involved as "maybe dma-pinned" via
-FOLL_PIN pins, in order to solve it.
+As raised already somewhere in the whole discussion by me, the right way 
+to take such a long-term ping as vmsplice() does is to use 
+FOLL_PIN|FOLL_LONGTERM. As also raised, that will fix the last remaining 
+vmsplice()+hugetlb COW issue as tested by the cow.c vm selftest and make 
+sure to migrate that memory off of MIGRATE_MOVABLE/CMA memory where we 
+cannot tolerate to have long-term unmovable memory sitting around.
 
-Or am I missing a key point (I hope)?
-
-
-[1] https://lore.kernel.org/linux-mm/20180103100430.GE4911@quack2.suse.cz/T/#u
-
-thanks,
 -- 
-John Hubbard
-NVIDIA
+Thanks,
+
+David / dhildenb
+
