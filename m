@@ -2,97 +2,140 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89118C05027
-	for <linux-block@archiver.kernel.org>; Thu, 26 Jan 2023 18:45:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CC121C61DA3
+	for <linux-block@archiver.kernel.org>; Thu, 26 Jan 2023 19:39:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232535AbjAZSpC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 26 Jan 2023 13:45:02 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36200 "EHLO
+        id S232664AbjAZTjN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 26 Jan 2023 14:39:13 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41012 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232274AbjAZSol (ORCPT
+        with ESMTP id S232513AbjAZTio (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 26 Jan 2023 13:44:41 -0500
-Received: from mail-il1-x133.google.com (mail-il1-x133.google.com [IPv6:2607:f8b0:4864:20::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5FC713C11
-        for <linux-block@vger.kernel.org>; Thu, 26 Jan 2023 10:44:19 -0800 (PST)
-Received: by mail-il1-x133.google.com with SMTP id i1so1147547ilu.8
-        for <linux-block@vger.kernel.org>; Thu, 26 Jan 2023 10:44:19 -0800 (PST)
+        Thu, 26 Jan 2023 14:38:44 -0500
+Received: from mail-qt1-x829.google.com (mail-qt1-x829.google.com [IPv6:2607:f8b0:4864:20::829])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D36EA6DFEA
+        for <linux-block@vger.kernel.org>; Thu, 26 Jan 2023 11:38:18 -0800 (PST)
+Received: by mail-qt1-x829.google.com with SMTP id o5so2181941qtr.11
+        for <linux-block@vger.kernel.org>; Thu, 26 Jan 2023 11:38:18 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=mawGGYl3xNzEUxiRbmjEZ0yUhhxKM/y8ziqjypj5Hbc=;
-        b=CQx57DH6Eeo+qgKuXMRJqhwzCCxkOX+3HyvZpvJA7Lu0mF8EcXY014KBj3nPMgXZYg
-         5r8s2uRObOhGHGCUDv4jap2+wbgGmN+feoeAwb2mYW/xle+KvOKYqevSeSEBH+CtsTsV
-         /d21+ih+RrNSgiWmBLDNSNOxl4FwOcXABy2Xeu6jgExVTGuwG12Z+tOB65ag97GqMs40
-         p/sv+rUIcDulF6Rg5ix5R782jNOptQV9bDTfCHXyaIIlQ7kn/IzT7l1uHNyvmorf2DTq
-         jlwFcwEPyPJ5Gz0H9iN5XGOqlSeXYx3QpwO/Ly8rdwEdsHV9he9/wpnYKvgWhcX9Mj40
-         Sylg==
+        d=ziepe.ca; s=google;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=548u3Fp4tscAsRqm8ZTE2VWhUoxZOCMAGUWVcX6Go58=;
+        b=epV5VW3hrViYljNLAdWJDqX3fAl4wYMv55qfvqUl+cZybWCeeDvqryFJs7Zk1z1ge0
+         +YfWxsTDgetquN/yOeHPal429etypXOBpel4tIAV8vd4EP8H055kKatEvKe6oZxMs3PT
+         LcO0xq4K0msdWtCUNqYN4NK0vLHs5L0h44+WlAHrYWvJgXcgjDmqAFXJlLbfBB/UTvvN
+         9vIhPdjjmCe8giVOUtXcRKZC0HKhopCXDpNQUBIZSpW7Qbo2/7o+/aS/ZPpfQVm1O7vS
+         K1a26f+LNFd2YzHSgykx3DHZbq9/58TJ23dpXqRpwr3NjRuHpKkuas3uu7YQGuqzHxWI
+         HpSQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=mawGGYl3xNzEUxiRbmjEZ0yUhhxKM/y8ziqjypj5Hbc=;
-        b=KhEcNtQHPBHEt2vNo+x7/dm62C/fUK+9lXNirDqRbDAxwhyV9rTJ4w4th/qXuV7kqk
-         FwJKz/7NQw4A5YnH3GuXSfdBH+dSi/6QTZRHYLsAYa8oQknQuNbBhzeWrUP3mMOWAfVr
-         /fHjfMs/8c5F4Of2e41QrZM2idtatE7HOQkbl8B9VYTXo10s23gNA5EF3OJ0hNpc+sqH
-         /fJ1yuz6JQMmwWtJeCZ3qOA6E7ZAxjafCZQdxTCcjz+hG5WgpKSp2L8pJMIuwLL77vov
-         PEIOlYInEJHN4rEijq0r8CyLqY71Pn6gmUu9YFD+sO86mZzXXnQt79X7zdd3m98ac8g0
-         zvlQ==
-X-Gm-Message-State: AFqh2konCRyqo9+yHRQFjfWHk2qgVvTH4f408eNf7NOwAp8ACu6nsgTA
-        RzEcKvhKHdD47hFqq7XCHMPCKw==
-X-Google-Smtp-Source: AMrXdXvrxP1Mfi9c66OovR6VnwlvB8hiVUCItG1eLAdItfplPqowUFYgb9MaB10+ckqksUQ+yOFRig==
-X-Received: by 2002:a92:cda4:0:b0:30d:bf1a:b174 with SMTP id g4-20020a92cda4000000b0030dbf1ab174mr7145796ild.1.1674758658715;
-        Thu, 26 Jan 2023 10:44:18 -0800 (PST)
-Received: from [192.168.1.94] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id u15-20020a02aa8f000000b00385f2a30781sm195589jai.72.2023.01.26.10.44.17
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 26 Jan 2023 10:44:18 -0800 (PST)
-Message-ID: <6bea4ea1-9dac-6d74-c3b8-54982fd3de66@kernel.dk>
-Date:   Thu, 26 Jan 2023 11:44:17 -0700
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=548u3Fp4tscAsRqm8ZTE2VWhUoxZOCMAGUWVcX6Go58=;
+        b=eG49Oz8tybpwZ1G+RGzcVu05Ddgtq7iSyeUSqHvHBBsOHCIzlcOXIvOjRete/tbnnI
+         GSjI7iW8Ag+u213Yp0SmZWNNOSQPFMzJPj0df4vQhu3hmIj5lHKCWEokCbjeXP3LFpHS
+         n3Hi2LNUE9X6oXC9wEggH6cut+pPRiDbvU6ggrcr40uyuQW6ldgkxXhHKE1447hWDZbJ
+         zTBklaDFLLBQNAHvr3YMXwKQCBVwRRvky+owGcPAC4Ws2oYbRVYn0z+czwA8M3xY75Ok
+         qF/kbQyhy+BA0NqrQbe0I/e+xaU+usR3eocbV2tBwaxgtCAW2Z1C8AKyttvEopT+NHeo
+         ESfg==
+X-Gm-Message-State: AFqh2krX+LCbqeTzWj3cYN4a8UcDSIeH3wtkogy/vwduDSonV+4zgdeS
+        MPWWNgaaExKT7tE6YBCvDF7UP1rYUXQlkjuK
+X-Google-Smtp-Source: AMrXdXv+huCHA7ip/FVnskiv66KzYaO0gWPYCPL7QS4WBmaP67lWrrmrdvcrLuRJ9ZU3cV/x/SyhoQ==
+X-Received: by 2002:ac8:70a:0:b0:3b1:c477:eb65 with SMTP id g10-20020ac8070a000000b003b1c477eb65mr52142649qth.60.1674761897975;
+        Thu, 26 Jan 2023 11:38:17 -0800 (PST)
+Received: from ziepe.ca (hlfxns017vw-142-167-59-176.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.167.59.176])
+        by smtp.gmail.com with ESMTPSA id v3-20020ac87283000000b003b62e9c82ebsm1276806qto.48.2023.01.26.11.38.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 26 Jan 2023 11:38:16 -0800 (PST)
+Received: from jgg by wakko with local (Exim 4.95)
+        (envelope-from <jgg@ziepe.ca>)
+        id 1pL84e-00HP8B-92;
+        Thu, 26 Jan 2023 15:38:16 -0400
+Date:   Thu, 26 Jan 2023 15:38:16 -0400
+From:   Jason Gunthorpe <jgg@ziepe.ca>
+To:     Dan Williams <dan.j.williams@intel.com>
+Cc:     Matthew Wilcox <willy@infradead.org>, nvdimm@lists.linux.dev,
+        lsf-pc@lists.linuxfoundation.org, linux-rdma@vger.kernel.org,
+        John Hubbard <jhubbard@nvidia.com>,
+        dri-devel@lists.freedesktop.org, Ming Lei <ming.lei@redhat.com>,
+        linux-block@vger.kernel.org, linux-mm@kvack.org,
+        iommu@lists.linux.dev, netdev@vger.kernel.org,
+        Joao Martins <joao.m.martins@oracle.com>,
+        Jason Gunthorpe via Lsf-pc 
+        <lsf-pc@lists.linux-foundation.org>,
+        Logan Gunthorpe <logang@deltatee.com>,
+        Christoph Hellwig <hch@lst.de>
+Subject: Re: [Lsf-pc] [LSF/MM/BPF proposal]: Physr discussion
+Message-ID: <Y9LWqEtmkmsMrHne@ziepe.ca>
+References: <Y8v+qVZ8OmodOCQ9@nvidia.com>
+ <63cee1d3eaaef_3a36e529488@dwillia2-xfh.jf.intel.com.notmuch>
+ <Y87p9i0vCZo/3Qa0@casper.infradead.org>
+ <63cef32cbafc3_3a36e529465@dwillia2-xfh.jf.intel.com.notmuch>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.0
-Subject: Re: [GIT PULL] nvme fixes for Linux 6.2
-Content-Language: en-US
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
-References: <Y9K6fTTrhXSWkVeZ@infradead.org>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <Y9K6fTTrhXSWkVeZ@infradead.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <63cef32cbafc3_3a36e529465@dwillia2-xfh.jf.intel.com.notmuch>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/26/23 10:38 AM, Christoph Hellwig wrote:
-> The following changes since commit 955bc12299b17aa60325e1748336e1fd1e664ed0:
+On Mon, Jan 23, 2023 at 12:50:52PM -0800, Dan Williams wrote:
+> Matthew Wilcox wrote:
+> > On Mon, Jan 23, 2023 at 11:36:51AM -0800, Dan Williams wrote:
+> > > Jason Gunthorpe via Lsf-pc wrote:
+> > > > I would like to have a session at LSF to talk about Matthew's
+> > > > physr discussion starter:
+> > > > 
+> > > >  https://lore.kernel.org/linux-mm/YdyKWeU0HTv8m7wD@casper.infradead.org/
+> > > > 
+> > > > I have become interested in this with some immediacy because of
+> > > > IOMMUFD and this other discussion with Christoph:
+> > > > 
+> > > >  https://lore.kernel.org/kvm/4-v2-472615b3877e+28f7-vfio_dma_buf_jgg@nvidia.com/
+> > > 
+> > > I think this is a worthwhile discussion. My main hangup with 'struct
+> > > page' elimination in general is that if anything needs to be allocated
+> > 
+> > You're the first one to bring up struct page elimination.  Neither Jason
+> > nor I have that as our motivation.
 > 
->   Merge tag 'nvme-6.2-2023-01-20' of git://git.infradead.org/nvme into block-6.2 (2023-01-20 08:08:29 -0700)
-> 
-> are available in the Git repository at:
-> 
->   git://git.infradead.org/nvme.git tags/nvme-6.2-2023-01-26
-> 
-> for you to fetch changes up to 85eee6341abb81ac6a35062ffd5c3029eb53be6b:
-> 
->   nvme: fix passthrough csi check (2023-01-25 07:09:38 +0100)
-> 
-> ----------------------------------------------------------------
-> nvme fixes for Linux 6.2
-> 
->  - flush initial scan_work for async probe (Keith Busch)
->  - fix passthrough csi check (Keith Busch)
->  - fix nvme-fc initialization order (Ross Lagerwall)
+> Oh, ok, then maybe I misread the concern in the vfio discussion. I
+> thought the summary there is debating the ongoing requirement for
+> 'struct page' for P2PDMA?
 
-Pulled, thanks.
+The VFIO problem is we need a unique pgmap at 4k granuals (or maybe
+smaller, technically), tightly packed, because VFIO exposes PCI BAR
+space that can be sized in such small amounts.
 
--- 
-Jens Axboe
+So, using struct page means some kind of adventure in the memory
+hotplug code to allow tightly packed 4k pgmaps.
 
+And that is assuming that every architecture that wants to support
+VFIO supports pgmap and memory hot plug. I was just told that s390
+doesn't, that is kind of important..
 
+If there is a straightforward way to get a pgmap into VFIO then I'd do
+that and give up this quest :)
+
+I've never been looking at this from the angle of eliminating struct
+page, but from the perspective of allowing the DMA API to correctly do
+scatter/gather IO to non-struct page P2P memory because I *can't* get
+a struct page for it. Ie make dma_map_resource() better. Make P2P
+DMABUF work properly.
+
+This has to come along with a different way to store address ranges
+because the basic datum that needs to cross all the functional
+boundaries we have is an address range list.
+
+My general current sketch is we'd allocate some 'DMA P2P provider'
+structure analogous to the MEMORY_DEVICE_PCI_P2PDMA pgmap and a single
+provider would cover the entire MMIO aperture - eg the providing
+device's MMIO BAR. This is enough information for the DMA API to do
+its job.
+
+We get this back either by searching an interval treey thing on the
+physical address or by storing it directly in the address range list.
+
+Jason
