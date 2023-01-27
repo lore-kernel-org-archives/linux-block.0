@@ -2,120 +2,217 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D4E7FC54EAA
-	for <linux-block@archiver.kernel.org>; Fri, 27 Jan 2023 00:11:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CBE1C54EAA
+	for <linux-block@archiver.kernel.org>; Fri, 27 Jan 2023 00:20:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231531AbjA0ALa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 26 Jan 2023 19:11:30 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44948 "EHLO
+        id S229611AbjA0AUt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 26 Jan 2023 19:20:49 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55728 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229531AbjA0AL3 (ORCPT
+        with ESMTP id S233478AbjA0ATz (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 26 Jan 2023 19:11:29 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74E135143C
-        for <linux-block@vger.kernel.org>; Thu, 26 Jan 2023 16:10:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1674778243;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=WFCRwwoODaZccr7NcmMarl4NMoXDR8hwKLWDxPSkIE0=;
-        b=aWvjd3l5tCx0nhpqD62V9Q0dVFPMRNM18xa8Cil96g3FSa5NYNCYObKsgsoX3Mn+2Erq2f
-        ydFtZGwJwLNgEdsWXLeCdxRzhuyMTmhhfUVLNh7FB+AK7kVuj2WLFdvEcq6HoiF3XODnTy
-        035XFlIiql0OJqz40knIqrI5gmQLsqE=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-154-KLSr1sj_OA6eQMKXJJQDJQ-1; Thu, 26 Jan 2023 19:10:42 -0500
-X-MC-Unique: KLSr1sj_OA6eQMKXJJQDJQ-1
-Received: by mail-wm1-f71.google.com with SMTP id az37-20020a05600c602500b003da50af44b3so1880740wmb.1
-        for <linux-block@vger.kernel.org>; Thu, 26 Jan 2023 16:10:42 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:subject:organization:from
-         :content-language:references:cc:to:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=WFCRwwoODaZccr7NcmMarl4NMoXDR8hwKLWDxPSkIE0=;
-        b=Sks0o1piOVGBuw6AfU6jGNYum25jfDQ4swot4CJ964/dRI+wnnY9KemPYUxt9k7733
-         9iMTfA8EAzTY5wh9r1LnkF3tbfgJIASpQ18UYcOl1mcwYJWBiQ/n6XAyyGwgWxXYqvIf
-         EgeKtqnEBKc8dcD+mWeVZkublCoTx4HvhoiAj07KnPT9hsxziYeDcUdTKNcofm57evTr
-         MJOSxDnTOZSVQIpYVHAtfUmfVd8mILVkJTAurQafXTfTevG2Y1N3qjMYBSqSECq/dfeG
-         hht4CogsLxrhvA3qOa8PCGsRAFRzM/4cP7ERrDm+GeiUEJRBo7i27cO5eIZ/LEMg8KD8
-         MO+g==
-X-Gm-Message-State: AFqh2kpiDk0Uxc6V9PMiKG5yIo3w2IZk8rSoFvQ5NQXU2e9sepxITHMC
-        R6trfeBw5tZA/qylc3lZSU0GCODWDomWDVVzABQikTjjascas/jlDMeMfcBMX5tE5gPfWOLxiak
-        +UVtTFbvS0NWOg9iMD7RHEYk=
-X-Received: by 2002:a1c:4c04:0:b0:3d9:f0d8:708c with SMTP id z4-20020a1c4c04000000b003d9f0d8708cmr45243537wmf.26.1674778241431;
-        Thu, 26 Jan 2023 16:10:41 -0800 (PST)
-X-Google-Smtp-Source: AMrXdXuIVvTV3+Y5mMoncMUvJp0bRzJpK5PiB4pT8WE56lw5xCntGDrrPKnbs5J1gjhF3vHcyTl7Ow==
-X-Received: by 2002:a1c:4c04:0:b0:3d9:f0d8:708c with SMTP id z4-20020a1c4c04000000b003d9f0d8708cmr45243516wmf.26.1674778241115;
-        Thu, 26 Jan 2023 16:10:41 -0800 (PST)
-Received: from [192.168.3.108] (p5b0c6387.dip0.t-ipconnect.de. [91.12.99.135])
-        by smtp.gmail.com with ESMTPSA id a18-20020a05600c069200b003db305bece4sm2638720wmn.45.2023.01.26.16.10.39
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 26 Jan 2023 16:10:40 -0800 (PST)
-Message-ID: <3e5df0cf-d2bd-7795-617d-06a3a32fc18b@redhat.com>
-Date:   Fri, 27 Jan 2023 01:10:39 +0100
+        Thu, 26 Jan 2023 19:19:55 -0500
+Received: from esa6.hgst.iphmx.com (esa6.hgst.iphmx.com [216.71.154.45])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6ADA7579C
+        for <linux-block@vger.kernel.org>; Thu, 26 Jan 2023 16:19:09 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1674778749; x=1706314749;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=Dl33qZ2NMd80jSjRhMGYNurwfaUC2jL2dxyNCoKSqO8=;
+  b=fl6w1EFp8/QpACNOeXWQLB6oICNhzrI87wYj0P1Rk+etpzecvDoKH7Ob
+   9Uyd2EB/8rWFtvLlXuiQViYaBqHnCmVGa5WRkc9Yc75I4RQF0hCKeU7ZW
+   NLjhpTJrBj9bZhejT36gtrHN6x1mNtosQ3MW8WBQX2suTMw0IdHk+2XJM
+   hPvbFm03XZMLRgqEX09pUXZ2J5x0bP24e3zKkBXEPD2HsB/yMEC6r6XS4
+   NcmAqU8docTiTIayTEmleqNJmvjzzPhffqY0tDMir+Qz1zE695KZq+aVX
+   6Bbtb7+aFQffJFiFav7TFHU5Ek11s5yC2p7PTPUy3Fm3dfQCof69bUFcJ
+   A==;
+X-IronPort-AV: E=Sophos;i="5.97,249,1669046400"; 
+   d="scan'208";a="221913466"
+Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
+  by ob1.hgst.iphmx.com with ESMTP; 27 Jan 2023 08:18:14 +0800
+IronPort-SDR: nhC4w/Yn7QDiYbqTIIiksOw2yWUG0O53e4002Zraca2hLi2pkUeDdoXts7CrCfy+AfMs4GyksZ
+ wOMx4SLVAqVfDjo4pIQ7IU7Kg+fh1xYN5M1nVtmljnQOVJ+APa2C3/A2SUlKu0PdAxxhaDD82l
+ u0wZ3DEjMvAvVHA0N/x8STDnoKuiPn+5wDCdIpWYLpXSHWNGxLksBWLFShBaeapxiSLBsmc36R
+ BOzztaKgQDMFE759c9VZdrPBccwsMY78BYAfT38wOlrdxfbQRTFV9AqhZoEtuWqlYa06zIf3D5
+ cig=
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 26 Jan 2023 15:35:44 -0800
+IronPort-SDR: C4XEsFaDKDF+BHSkRU9E7tVgbGQRkp/YVGH0t0AaOHCNfMy1fZ2NVhF8+FlanqrpH3GhBlCeaT
+ 15ecWT46YGP9Sovxota67zj3/Fz6/5ARuu+MarClk3SF8yhwuiwlqmVDud6jWwO8Omi1Z3okeT
+ iNqRD9A2p/v+YG5QGIDMRtom4NL4U7YldrbtYJn9Ws+FTUIga3f/p2P+0SEE6WR2e/lIa0x5pa
+ m3tsSEA+zUkm9XERbEUr95yEsmyx0hKDX3ajsNEVanCJKf5B2TrxKAMzPlF96HyKmq36RZt5fh
+ D3U=
+WDCIronportException: Internal
+Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
+  by uls-op-cesaip02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 26 Jan 2023 16:18:14 -0800
+Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4P2ypZ28H6z1Rwt8
+        for <linux-block@vger.kernel.org>; Thu, 26 Jan 2023 16:18:14 -0800 (PST)
+Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
+        reason="pass (just generated, assumed good)"
+        header.d=opensource.wdc.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
+        opensource.wdc.com; h=content-transfer-encoding:content-type
+        :in-reply-to:organization:from:content-language:references:to
+        :subject:user-agent:mime-version:date:message-id; s=dkim; t=
+        1674778692; x=1677370693; bh=Dl33qZ2NMd80jSjRhMGYNurwfaUC2jL2dxy
+        NCoKSqO8=; b=l9ITvW71QUkeNE27Jbti0dh4ezQyCpKlO8TVat2mIEdZ4nB3lux
+        KphBQcfeW5svJGnu3ZMkW+lqTFtsp7vkztxqt149PdIo+OjlAhiQIih/g1AEau6p
+        AMlkqGkju9a7O1J1M5Ry4ESkmqPE8UVmqzj/++8MjVvtSMcIdgrME5+59b0gP0yt
+        cB9FO9zguExW8v7FtV7ocDXZLc9RGL/Oc2lWw+3Ruhe25Go4NrhmoPqb5rcf3xiw
+        ZcUVTZR5B3wHM/kp42c6FCqU6JFeQv0UQshkTnEiNNJV8Ym7PXrfYUnlZHijWjep
+        zbChx0vRFNZjU2ejcw97l5byJVzqNGWo1Ig==
+X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
+Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
+        by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
+        with ESMTP id XrbKaV1wJu4L for <linux-block@vger.kernel.org>;
+        Thu, 26 Jan 2023 16:18:12 -0800 (PST)
+Received: from [10.225.163.63] (unknown [10.225.163.63])
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4P2ypW46PPz1RvLy;
+        Thu, 26 Jan 2023 16:18:11 -0800 (PST)
+Message-ID: <29b50dbd-76e9-cdce-4227-a22223850c9a@opensource.wdc.com>
+Date:   Fri, 27 Jan 2023 09:18:10 +0900
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.6.0
-To:     David Howells <dhowells@redhat.com>
-Cc:     Al Viro <viro@zeniv.linux.org.uk>,
-        Christoph Hellwig <hch@infradead.org>,
-        Matthew Wilcox <willy@infradead.org>,
-        Jens Axboe <axboe@kernel.dk>, Jan Kara <jack@suse.cz>,
-        Jeff Layton <jlayton@kernel.org>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        Christoph Hellwig <hch@lst.de>,
-        John Hubbard <jhubbard@nvidia.com>
-References: <ba3adce1-ddea-98e0-fc3a-1cb660edae4c@redhat.com>
- <20230126141626.2809643-1-dhowells@redhat.com>
- <20230126141626.2809643-3-dhowells@redhat.com> <Y9L3yA+B1rrnrGK8@ZenIV>
- <Y9MAbYt6DIRFm954@ZenIV> <2907150.1674777410@warthog.procyon.org.uk>
+Subject: Re: [PATCH v3 01/18] block: introduce duration-limits priority class
+To:     Bart Van Assche <bvanassche@acm.org>,
+        Niklas Cassel <Niklas.Cassel@wdc.com>
+Cc:     Paolo Valente <paolo.valente@linaro.org>,
+        Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+        Hannes Reinecke <hare@suse.de>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "linux-ide@vger.kernel.org" <linux-ide@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+References: <20230124190308.127318-2-niklas.cassel@wdc.com>
+ <bd0ce7ad-cf9e-a647-9b1e-cb36e7bbe30f@acm.org>
+ <731aeacc-74c0-396b-efa0-f9ae950566d8@opensource.wdc.com>
+ <873e0213-94b5-0d81-a8aa-4671241e198c@acm.org>
+ <4c345d8b-7efa-85c9-fe1c-1124ea5d9de6@opensource.wdc.com>
+ <5066441f-e265-ed64-fa39-f77a931ab998@acm.org>
+ <275993f1-f9e8-e7a8-e901-2f7d3a6bb501@opensource.wdc.com>
+ <e8324901-7c18-153f-b47f-112a394832bd@acm.org> <Y9Gd0eI1t8V61yzO@x1-carbon>
+ <86de1e78-0ff2-be70-f592-673bce76e5ac@opensource.wdc.com>
+ <Y9KF5z/v0Qp5E4sI@x1-carbon> <7f0a2464-673a-f64a-4ebb-e599c3123a24@acm.org>
 Content-Language: en-US
-From:   David Hildenbrand <david@redhat.com>
-Organization: Red Hat
-Subject: Re: [PATCH v11 2/8] iov_iter: Add a function to extract a page list
- from an iterator
-In-Reply-To: <2907150.1674777410@warthog.procyon.org.uk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
+Organization: Western Digital Research
+In-Reply-To: <7f0a2464-673a-f64a-4ebb-e599c3123a24@acm.org>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 27.01.23 00:56, David Howells wrote:
-> Al says that pinning a page (ie. FOLL_PIN) could cause a deadlock if a page is
-> vmspliced into a pipe with the pipe holding a pin on it because pinned pages
-> are removed from all page tables.  Is this actually the case?  I can't see
-> offhand where in mm/gup.c it does this.
+On 1/27/23 02:33, Bart Van Assche wrote:
+> On 1/26/23 05:53, Niklas Cassel wrote:
+>> On Thu, Jan 26, 2023 at 09:24:12AM +0900, Damien Le Moal wrote:
+>>> But again, the difficulty with this overloading is that we *cannot* implement a
+>>> solid level-based scheduling in IO schedulers because ordering the CDLs in a
+>>> meaningful way is impossible. So BFQ handling of the RT class would likely not
+>>> result in the most ideal scheduling (that would depend heavily on how the CDL
+>>> descriptors are defined on the drive). Hence my reluctance to overload the RT
+>>> class for CDL.
+>>
+>> Well, if CDL were to reuse IOPRIO_CLASS_RT, then the user would either have to
+>> disable the IO scheduler, so that lower classdata levels wouldn't be prioritized
+>> over higher classdata levels, or simply use an IO scheduler that does not care
+>> about the classdata level, e.g. mq-deadline.
+> 
+> How about making the information about whether or not CDL has been 
+> enabled available to the scheduler such that the scheduler can include 
+> that information in its decisions?
 
-Pinning a page is mostly taking a "special" reference on the page, 
-indicating to the system that the page maybe pinned. For an ordinary 
-order-0 page, this is increasing the refcount by 1024 instead of 1.
+Sure, that is easy to do. But as I mentioned before, I think that is
+something we can do after this initial support series.
 
-In addition, we'll do some COW-unsharing magic depending on the page 
-type (e.g., anon vs. fike-backed), and FOLL_LONGTERM. So if the page is 
-mapped R/O only and we want to pin it R/O (!FOLL_WRITE), we might 
-replace it in the page table by a different page via a fault 
-(FAULT_FLAG_UNSHARE).
+>> However, for CDL, things are not as simple as setting a single bit in the
+>> command, because of all the different descriptors, so we must let the classdata
+>> represent the device side priority level, and not the host side priority level
+>> (as we cannot have both, and I agree with you, it is very hard define an order
+>> between the descriptors.. e.g. should a 20 ms policy 0xf descriptor be ranked
+>> higher or lower than a 20 ms policy 0xd descriptor?).
+> 
+> How about only supporting a subset of the standard such that it becomes 
+> easy to map CDLs to host side priority levels?
 
-Last but not least, with FOLL_LONGTERM we will make sure to migrate the 
-target page off of MIGRATE_MOVABLE/CMA memory where the unmovable page 
-(while pinned) could otherwise cause trouble (e.g., blocking memory 
-hotunplug). So again, we'd replace it in the page tale by a different 
-page via a fault.
+I am opposed to this, for several reasons:
 
-In all cases, the page won't be unmapped from the page table.
+1) We are seeing different use cases from users that cover a wide range of
+use of CDL descriptors with various definitions.
+
+2) Passthrough commands can be used by a user to change a drive CDL
+descriptors without the kernel knowing about it, unless we spend our time
+revalidating the CDL descriptor log page(s)...
+
+3) CDL standard as is is actually very sensible and not overloaded with
+stuff that is only useful in niche use cases. For each CDL descriptor, you
+have:
+ * The active time limit, which is a clean way to specify how much time
+you allow a drive to deal with bad sectors (mostly read case). A typical
+HDD will try very hard to recover data from a sector, always. As a result,
+the HDD may spend up to several seconds reading a sector again and again
+applying different signal processing techniques until it gets the sector
+ECC checked to return valid data. That of course can hugely increase an IO
+latency seen by the host. In applications such as erasure coded
+distributed object stores, maximum latency for an object access can thus
+be kept low using this limit without compromising the data since the
+object can always be rebuilt from the erasure codes if one HDD is slow to
+respond. This limit is also interesting for video streaming/playback to
+avoid video buffer underflow (at the expense of may be some block noise
+depending on the codec).
+ * The inactive time limit can be used to tell the drive how long it is
+allowed to let a command stand in the drive internal queue before
+processing. This is thus a parameter that allows a host to tune the drive
+RPO optimization (rotational positioning optimization, e.g. HDD internal
+command scheduling based on angular sector position on tracks withe the
+head current position). This is a neat way to control max IOPS vs tail
+latency since drives tend to privilege maximizing IOPS over lowering max
+tail latency.
+ * The duration guideline limit defines an overall time limit for a
+command without distinguishing between active and inactive time. It is the
+easiest to use (the easiest one to understand from a beginner user point
+of view). This is a neat way to define an intelligent IO prioritization in
+fact, way better than RT class scheduling on the host or the use of ATA
+NCQ high priority, as it provides more information to the drive about the
+urgency of a particular command. That allows the drive to still perform
+RPO to maximize IOPS without long tail latencies. Chaining such limit with
+an active+inactive time limit descriptor using the "next limit" policy
+(0x1 policy) can also finely define what the drive should if the guideline
+limit is exceeded (as the next descriptor can define what to do based on
+the reason for the limit being exceeded: long internal queueing vs bad
+sector long access time).
+
+> If users really need the ability to use all standardized CDL features 
+> and if there is no easy way to map CDL levels to an I/O priority, is the 
+> I/O priority mechanism really the best basis for a user space interface 
+> for CDLs?
+
+As you can see above, yes, we need everything and should not attempt
+restricting CDL use. The IO priority interface is a perfect fit for CDL in
+the sense that all we need to pass along from user to device is one
+number: the CDL index to use for a command. So creating a different
+interface for this while the IO priority interface exactly does that
+sounds silly to me.
+
+One compromise we could do is: have the IO schedulers completely ignore
+CDL prio class for now, that is, have them assume that no IO prio
+class/level was specified. Given that they are not tuned to handle CDL
+well anyway, this is probably the best thing to do for now.
+
+We still need to have the block layer prevent merging of requests with
+different CDL descriptors though, which is another reason to reuse the IO
+prio interface as the block layer already does this. Less code, which is
+always a good thing.
+
+> 
+> Thanks,
+> 
+> Bart.
 
 -- 
-Thanks,
-
-David / dhildenb
+Damien Le Moal
+Western Digital Research
 
