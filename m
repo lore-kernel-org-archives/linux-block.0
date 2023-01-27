@@ -2,18 +2,18 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6124EC61DB3
-	for <linux-block@archiver.kernel.org>; Fri, 27 Jan 2023 01:52:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2204FC05027
+	for <linux-block@archiver.kernel.org>; Fri, 27 Jan 2023 01:53:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233504AbjA0Bwx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 26 Jan 2023 20:52:53 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32884 "EHLO
+        id S233205AbjA0Bwy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 26 Jan 2023 20:52:54 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34190 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233502AbjA0Bus (ORCPT
+        with ESMTP id S233491AbjA0Bur (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 26 Jan 2023 20:50:48 -0500
+        Thu, 26 Jan 2023 20:50:47 -0500
 Received: from lgeamrelo11.lge.com (lgeamrelo11.lge.com [156.147.23.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id CF4B075189
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id E42A17518E
         for <linux-block@vger.kernel.org>; Thu, 26 Jan 2023 17:49:50 -0800 (PST)
 Received: from unknown (HELO lgemrelse7q.lge.com) (156.147.1.151)
         by 156.147.23.51 with ESMTP; 27 Jan 2023 10:19:43 +0900
@@ -47,9 +47,9 @@ Cc:     torvalds@linux-foundation.org, damien.lemoal@opensource.wdc.com,
         42.hyeyoo@gmail.com, chris.p.wilson@intel.com,
         gwan-gyeong.mun@intel.com, max.byungchul.park@gmail.com,
         boqun.feng@gmail.com, longman@redhat.com, hdanton@sina.com
-Subject: [PATCH v8 18/25] dept: Apply timeout consideration to wait_for_completion()/complete()
-Date:   Fri, 27 Jan 2023 10:19:11 +0900
-Message-Id: <1674782358-25542-19-git-send-email-max.byungchul.park@gmail.com>
+Subject: [PATCH v8 22/25] dept: Apply timeout consideration to dma fence wait
+Date:   Fri, 27 Jan 2023 10:19:15 +0900
+Message-Id: <1674782358-25542-23-git-send-email-max.byungchul.park@gmail.com>
 X-Mailer: git-send-email 1.9.1
 In-Reply-To: <1674782358-25542-1-git-send-email-max.byungchul.park@gmail.com>
 References: <1674782358-25542-1-git-send-email-max.byungchul.park@gmail.com>
@@ -58,43 +58,35 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 Now that CONFIG_DEPT_AGGRESSIVE_TIMEOUT_WAIT was introduced, apply the
-consideration to wait_for_completion()/complete().
+consideration to dma fence wait.
 
 Signed-off-by: Byungchul Park <max.byungchul.park@gmail.com>
 ---
- include/linux/completion.h | 4 ++--
- kernel/sched/completion.c  | 2 +-
- 2 files changed, 3 insertions(+), 3 deletions(-)
+ drivers/dma-buf/dma-fence.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/include/linux/completion.h b/include/linux/completion.h
-index 32d535a..15eede0 100644
---- a/include/linux/completion.h
-+++ b/include/linux/completion.h
-@@ -41,9 +41,9 @@ struct completion {
-  */
- #define init_completion_map(x, m) init_completion(x)
+diff --git a/drivers/dma-buf/dma-fence.c b/drivers/dma-buf/dma-fence.c
+index 1db4bc0..a1ede7b46 100644
+--- a/drivers/dma-buf/dma-fence.c
++++ b/drivers/dma-buf/dma-fence.c
+@@ -783,7 +783,7 @@ struct default_wait_cb {
+ 	cb.task = current;
+ 	list_add(&cb.base.node, &fence->cb_list);
  
--static inline void complete_acquire(struct completion *x)
-+static inline void complete_acquire(struct completion *x, long timeout)
- {
--	sdt_might_sleep_start(&x->dmap);
-+	sdt_might_sleep_start_timeout(&x->dmap, timeout);
- }
+-	sdt_might_sleep_start(NULL);
++	sdt_might_sleep_start_timeout(NULL, timeout);
+ 	while (!test_bit(DMA_FENCE_FLAG_SIGNALED_BIT, &fence->flags) && ret > 0) {
+ 		if (intr)
+ 			__set_current_state(TASK_INTERRUPTIBLE);
+@@ -887,7 +887,7 @@ struct default_wait_cb {
+ 		}
+ 	}
  
- static inline void complete_release(struct completion *x)
-diff --git a/kernel/sched/completion.c b/kernel/sched/completion.c
-index d57a5c1..261807f 100644
---- a/kernel/sched/completion.c
-+++ b/kernel/sched/completion.c
-@@ -100,7 +100,7 @@ void complete_all(struct completion *x)
- {
- 	might_sleep();
- 
--	complete_acquire(x);
-+	complete_acquire(x, timeout);
- 
- 	raw_spin_lock_irq(&x->wait.lock);
- 	timeout = do_wait_for_common(x, action, timeout, state);
+-	sdt_might_sleep_start(NULL);
++	sdt_might_sleep_start_timeout(NULL, timeout);
+ 	while (ret > 0) {
+ 		if (intr)
+ 			set_current_state(TASK_INTERRUPTIBLE);
 -- 
 1.9.1
 
