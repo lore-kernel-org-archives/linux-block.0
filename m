@@ -2,102 +2,107 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C9E12C54EAA
-	for <linux-block@archiver.kernel.org>; Fri, 27 Jan 2023 07:43:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 802ECC54EAA
+	for <linux-block@archiver.kernel.org>; Fri, 27 Jan 2023 08:32:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232787AbjA0HnW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 27 Jan 2023 02:43:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51438 "EHLO
+        id S232216AbjA0Ib7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 27 Jan 2023 03:31:59 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40334 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232784AbjA0HnV (ORCPT
+        with ESMTP id S229964AbjA0Ib6 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 27 Jan 2023 02:43:21 -0500
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C12D39282;
-        Thu, 26 Jan 2023 23:43:20 -0800 (PST)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 19A1E21D67;
-        Fri, 27 Jan 2023 07:43:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1674805399; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=4JI/wpxgIv1o0sTmnkxzVSGkE+8mTK7sPuU0QG23TKI=;
-        b=EqIDPXJijHRpJFC0wlMxMNVbRlqW2RwIS8I1Lqz9jGoxXM7jFvfzghk13Grp77m1uFVnV8
-        0KDjgbR+/TI8SY5RIb/Bd2ltnat8wZ7zyvXGhGVSgzg7yZv+ZeDD6CDKa8FAcUSu1euLsj
-        JHx9EI5fDMCuR5gvKu+XrvSaFggUC5w=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1674805399;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=4JI/wpxgIv1o0sTmnkxzVSGkE+8mTK7sPuU0QG23TKI=;
-        b=/twYLq2i4LDG1Ix54DAMhGZf7aVUb/GyfOdsvaMgkiHhWCxxpyHc+eCrPChILIYvin406D
-        zv8pa6Mqh0Ai25Aw==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id ECDE0138E3;
-        Fri, 27 Jan 2023 07:43:18 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id oY3hOJaA02PLZAAAMHmgww
-        (envelope-from <hare@suse.de>); Fri, 27 Jan 2023 07:43:18 +0000
-Message-ID: <df9c772c-6fb5-1ebe-6b9a-7d052d9f05f0@suse.de>
-Date:   Fri, 27 Jan 2023 08:43:18 +0100
+        Fri, 27 Jan 2023 03:31:58 -0500
+Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5AB722D44;
+        Fri, 27 Jan 2023 00:31:57 -0800 (PST)
+Received: by mail-pj1-x1034.google.com with SMTP id z1-20020a17090a66c100b00226f05b9595so4263615pjl.0;
+        Fri, 27 Jan 2023 00:31:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=66V2H9uMWCTRaA6bOL7mqSHGYaXxw+3xsRWEjcD/2LM=;
+        b=o8qKotc6mv5djGUSZBx7HMqCut5Uci/7TO/HXrO8MwQfLzYWKDhHany+YqWhFPCouk
+         N8keiS3DEGjSjPx0W/goa7dRJEkP3YtG7EHlNmPO4rpKTx0O+tema9z3vXmB0IjvCwLB
+         gDyxrr9dpgCQpIBgbb1nffY6UZanmbeIzHd/7czyTYZSnF8h7Fe4nMIGeXUVLNetGnEm
+         K+rqTeYrA/dgbOamyU21xTNkyTiggduQjjmu2IzrMdkkP7gd2haNyUl1hZjuKstEsURg
+         x4EFRAgvjYoswIwAX/D2c/INUfCZBn9Z7quE1UFdCx5koIn2t9ngi/aqNbzBEMvMgoLF
+         FkfQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=66V2H9uMWCTRaA6bOL7mqSHGYaXxw+3xsRWEjcD/2LM=;
+        b=59MNSkLKKdGTIyINnZWEgxG2F7QM+rrG/ea51+6/MnohInbGSs2Guc3rvtuu2bdJjE
+         FEZwtJ2rjCH959OTxcxFZhwvN2fxlcYO3DcnUSsAP+kbMdQqwvTAPajfU98nuTHpLXKE
+         j6+aILXh3lLsywy3k+XWBOhi467qjDvVHAa6UCSgeECaXAgvYDwpeUqDATJc7/pltuvj
+         K2NAYp1JFn6gDI8PcQVU2j4Z7mHio4CTVU6aMvZvVyyLHmkJe9eBx5xZfZ7efu5cMdMr
+         uCkDqgKroBrP0g8H/Ap8LH6p+iY0XwiigxaYbUJtsKUK9c7BQm7g3KUSdWPfRWcNBMlk
+         7Tcg==
+X-Gm-Message-State: AFqh2koY4Jy8E1xBlVHxYHRokQIn+Zcl1i+LCLopVO5iNBXYZaro1UQS
+        mjc7eSgJoWdMRKFOBYIcHVQ=
+X-Google-Smtp-Source: AMrXdXti7dHUxR9YyF0XMct43cHAokzIPXS0vuTmMdtdMzfF/iOKXsOUAfhSvb1n13BWc7Qut7Yudw==
+X-Received: by 2002:a05:6a20:4392:b0:b6:e9:d3d1 with SMTP id i18-20020a056a20439200b000b600e9d3d1mr37989353pzl.11.1674808316854;
+        Fri, 27 Jan 2023 00:31:56 -0800 (PST)
+Received: from debian.me (subs02-180-214-232-24.three.co.id. [180.214.232.24])
+        by smtp.gmail.com with ESMTPSA id o17-20020a170902d4d100b00196077ba463sm2263467plg.123.2023.01.27.00.31.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 27 Jan 2023 00:31:56 -0800 (PST)
+Received: by debian.me (Postfix, from userid 1000)
+        id 15528105582; Fri, 27 Jan 2023 15:31:54 +0700 (WIB)
+Date:   Fri, 27 Jan 2023 15:31:54 +0700
+From:   Bagas Sanjaya <bagasdotme@gmail.com>
+To:     Randy Dunlap <rdunlap@infradead.org>, linux-kernel@vger.kernel.org
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org
+Subject: Re: [PATCH 03/35] Documentation: block: correct spelling
+Message-ID: <Y9OL+iyaQtXLSCKc@debian.me>
+References: <20230127064005.1558-1-rdunlap@infradead.org>
+ <20230127064005.1558-4-rdunlap@infradead.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.1
-Subject: Re: [PATCH 01/15] blk-cgroup: don't defer blkg_free to a workqueue
-Content-Language: en-US
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
-        Josef Bacik <josef@toxicpanda.com>,
-        linux-block@vger.kernel.org, cgroups@vger.kernel.org
-References: <20230117081257.3089859-1-hch@lst.de>
- <20230117081257.3089859-2-hch@lst.de>
- <b4622942-67e7-969b-4439-0aea7c5bd165@suse.de> <20230127070754.GB4180@lst.de>
-From:   Hannes Reinecke <hare@suse.de>
-In-Reply-To: <20230127070754.GB4180@lst.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+        protocol="application/pgp-signature"; boundary="NFcrGMdwwynsd7VO"
+Content-Disposition: inline
+In-Reply-To: <20230127064005.1558-4-rdunlap@infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/27/23 08:07, Christoph Hellwig wrote:
-> On Fri, Jan 27, 2023 at 07:59:23AM +0100, Hannes Reinecke wrote:
->> On 1/17/23 09:12, Christoph Hellwig wrote:
->>> Now that blk_put_queue can be called from process context, ther is no
->>> need for the asynchronous execution.
->>>
->> Can you clarify 'now'?
->> IE point to the commit introducing the change?
-> 
-> 49e4d04f0486117ac57a97890eb1db6d52bf82b3
-> Author: Tejun Heo <tj@kernel.org>
-> Date:   Fri Jan 6 10:34:10 2023 -1000
-> 
->      block: Drop spurious might_sleep() from blk_put_queue()
-> 
-Can we please have it in the patch comment?
-To clarify that this is a pre-requisite for this patch?
 
-Thanks.
+--NFcrGMdwwynsd7VO
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Cheers,
+On Thu, Jan 26, 2023 at 10:39:33PM -0800, Randy Dunlap wrote:
+> diff -- a/Documentation/block/data-integrity.rst b/Documentation/block/da=
+ta-integrity.rst
+> --- a/Documentation/block/data-integrity.rst
+> +++ b/Documentation/block/data-integrity.rst
+> @@ -209,7 +209,7 @@ will require extra work due to the appli
+>        sector must be set, and the bio should have all data pages
+>        added.  It is up to the caller to ensure that the bio does not
+>        change while I/O is in progress.
+> -      Complete bio with error if prepare failed for some reson.
+> +      Complete bio with error if prepare failed for some reason.
+> =20
 
-Hannes
--- 
-Dr. Hannes Reinecke                Kernel Storage Architect
-hare@suse.de                              +49 911 74053 688
-SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
-HRB 36809 (AG Nürnberg), Geschäftsführer: Ivo Totev, Andrew
-Myers, Andrew McDonald, Martje Boudien Moerman
+So if prepare returns error, bio is completed not successfully but also
+errored?
 
+--=20
+An old man doll... just what I always wanted! - Clara
+
+--NFcrGMdwwynsd7VO
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCY9OL+QAKCRD2uYlJVVFO
+o88fAQCsOKd9AplfKaQndXR99PSk8FdWs2KbBUgWCZEF6c/hFAEA6xJGzGugAh97
+CphKXaFwCAZgHkStr9ZWEjyHP6G9Vwg=
+=uQna
+-----END PGP SIGNATURE-----
+
+--NFcrGMdwwynsd7VO--
