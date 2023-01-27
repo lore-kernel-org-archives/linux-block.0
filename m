@@ -2,115 +2,123 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D0063C61DA7
-	for <linux-block@archiver.kernel.org>; Fri, 27 Jan 2023 12:39:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C0AFC61DA7
+	for <linux-block@archiver.kernel.org>; Fri, 27 Jan 2023 12:43:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234399AbjA0Mje (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 27 Jan 2023 07:39:34 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49260 "EHLO
+        id S234226AbjA0Mnt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 27 Jan 2023 07:43:49 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57156 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234285AbjA0MjB (ORCPT
+        with ESMTP id S234125AbjA0Mnt (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 27 Jan 2023 07:39:01 -0500
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 675EE74A63;
-        Fri, 27 Jan 2023 04:38:14 -0800 (PST)
+        Fri, 27 Jan 2023 07:43:49 -0500
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 15E1D1258C;
+        Fri, 27 Jan 2023 04:43:46 -0800 (PST)
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 191481FEC1;
-        Fri, 27 Jan 2023 12:38:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1674823093; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+        by smtp-out2.suse.de (Postfix) with ESMTPS id C59891FEB5;
+        Fri, 27 Jan 2023 12:43:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1674823424; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=zFTeq0Ir3N0EQQDMB0lGOwLZFNJenO+6frYOzCsuQKs=;
-        b=jCP327G2dfrI2QqS8DkXJJpArCLMvNvuEfU8Ewt1Uhmy0Kb0xGllkzkgC22K2pWQlOmfMD
-        4kGWg2Rrm7MiaRAoRvF6COqldN+34BS4lxlqdicszAUnAZjf9sKAEKSc704MViQht8nNl9
-        7mw+T5A3gPoWHWrh48v4ZDRRmM4LJUs=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1674823093;
+        bh=YKbZcZc/4mXDr965fGTr3TWHM/Dw6UDm7skEUHa/txU=;
+        b=ZgVSXqFaZe7sEz9fWOSm+Am8J+dDQXEXDxBMSuW7pnwGcLdG98iJ+DyCdWiOv3TKo0J3I8
+        bG8Xv9DjPmJCWtuitszIDRCFF54R8jk/7bCqwLJrzuqe8WS+7TPitt1Pfv1zpG0idN/JS3
+        jlKNH478DH60gAkjPvvgOt6jQkop7x8=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1674823424;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=zFTeq0Ir3N0EQQDMB0lGOwLZFNJenO+6frYOzCsuQKs=;
-        b=54sm+x/VqYq1b99FVNZ6kbI0fjZp3HiJ+ifLGBybOL1CSDsvofjo0hQHokdR38PbQ6VFNr
-        OCgoKYXa5FSjmMCA==
+        bh=YKbZcZc/4mXDr965fGTr3TWHM/Dw6UDm7skEUHa/txU=;
+        b=AZzU7XsG2h9kILGelpyQWLErlF/8xt2hL4AqpaVflfnT73wCg/TIqFgWPp3MkGsJ8O3Yk0
+        tXKfzXmNeONZIqCw==
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 02A961336F;
-        Fri, 27 Jan 2023 12:38:13 +0000 (UTC)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id B04161336F;
+        Fri, 27 Jan 2023 12:43:44 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id l3KmALXF02MdBwAAMHmgww
-        (envelope-from <jack@suse.cz>); Fri, 27 Jan 2023 12:38:13 +0000
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-        id 77ED2A06B4; Fri, 27 Jan 2023 13:38:12 +0100 (CET)
-Date:   Fri, 27 Jan 2023 13:38:12 +0100
-From:   Jan Kara <jack@suse.cz>
-To:     Al Viro <viro@zeniv.linux.org.uk>
-Cc:     David Howells <dhowells@redhat.com>,
-        David Hildenbrand <david@redhat.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Matthew Wilcox <willy@infradead.org>,
-        Jens Axboe <axboe@kernel.dk>, Jan Kara <jack@suse.cz>,
-        Jeff Layton <jlayton@kernel.org>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        Christoph Hellwig <hch@lst.de>,
-        John Hubbard <jhubbard@nvidia.com>
-Subject: Re: [PATCH v11 2/8] iov_iter: Add a function to extract a page list
- from an iterator
-Message-ID: <20230127123812.qj2v5mtjllutawcq@quack3>
-References: <ba3adce1-ddea-98e0-fc3a-1cb660edae4c@redhat.com>
- <20230126141626.2809643-1-dhowells@redhat.com>
- <20230126141626.2809643-3-dhowells@redhat.com>
- <Y9L3yA+B1rrnrGK8@ZenIV>
- <Y9MAbYt6DIRFm954@ZenIV>
- <2907150.1674777410@warthog.procyon.org.uk>
- <Y9MgVsrMdgGsxNHC@ZenIV>
+        id Bw6SKgDH02P7CQAAMHmgww
+        (envelope-from <hare@suse.de>); Fri, 27 Jan 2023 12:43:44 +0000
+Message-ID: <8e5be3df-18ab-a543-0cb1-b4db6009436d@suse.de>
+Date:   Fri, 27 Jan 2023 13:43:44 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Y9MgVsrMdgGsxNHC@ZenIV>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.6.1
+Subject: Re: [PATCH v3 01/18] block: introduce duration-limits priority class
+Content-Language: en-US
+To:     Niklas Cassel <niklas.cassel@wdc.com>,
+        Paolo Valente <paolo.valente@linaro.org>,
+        Jens Axboe <axboe@kernel.dk>
+Cc:     Christoph Hellwig <hch@lst.de>,
+        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+        linux-scsi@vger.kernel.org, linux-ide@vger.kernel.org,
+        linux-block@vger.kernel.org
+References: <20230124190308.127318-1-niklas.cassel@wdc.com>
+ <20230124190308.127318-2-niklas.cassel@wdc.com>
+From:   Hannes Reinecke <hare@suse.de>
+In-Reply-To: <20230124190308.127318-2-niklas.cassel@wdc.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri 27-01-23 00:52:38, Al Viro wrote:
-> On Thu, Jan 26, 2023 at 11:56:50PM +0000, David Howells wrote:
-> > Al says that pinning a page (ie. FOLL_PIN) could cause a deadlock if a page is
-> > vmspliced into a pipe with the pipe holding a pin on it because pinned pages
-> > are removed from all page tables.  Is this actually the case?  I can't see
-> > offhand where in mm/gup.c it does this.
+On 1/24/23 20:02, Niklas Cassel wrote:
+> From: Damien Le Moal <damien.lemoal@opensource.wdc.com>
 > 
-> It doesn't; sorry, really confused memories of what's going on, took a while
-> to sort them out (FWIW, writeback is where we unmap and check if page is
-> pinned, while pin_user_pages running into an unmapped page will end up
-> with handle_mm_fault() (->fault(), actually) try to get the sucker locked
-> and block on that until the writeback is over).
+> Introduce the IOPRIO_CLASS_DL priority class to indicate that IOs should
+> be executed using duration-limits targets. The duration target to apply
+> to a command is indicated using the priority level. Up to 8 levels are
+> supported, with level 0 indiating "no limit".
 > 
-> Said that, I still think that pinned pages (arbitrary pagecache ones,
-> at that) ending up in a pipe is a seriously bad idea.  It's trivial to
-> arrange for them to stay that way indefinitely - no priveleges needed,
-> very few limits, etc.
+> This priority class has effect only if the target device supports the
+> command duration limits feature and this feature is enabled by the user.
+> 
+> While it is recommended to not use an ioscheduler when using the
+> IOPRIO_CLASS_DL priority class, if using the BFQ or mq-deadline scheduler,
+> IOPRIO_CLASS_DL is mapped to IOPRIO_CLASS_RT.
+> 
+> The reason for this is twofold:
+> 1) Each priority level for the IOPRIO_CLASS_DL priority class represents a
+> duration limit descriptor (DLD) inside the device. Users can configure
+> these limits themselves using passthrough commands, so from a block layer
+> perspective, Linux has no idea of how each DLD is actually configured.
+> 
+> By mapping a command to IOPRIO_CLASS_RT, the chance that a command exceeds
+> its duration limit (because it was held too long in the scheduler) is
+> decreased. It is still possible to use the IOPRIO_CLASS_DL priority class
+> for "low priority" IOs by configuring a large limit in the respective DLD.
+> 
+> 2) On ATA drives, IOPRIO_CLASS_DL commands and NCQ priority commands
+> (IOPRIO_CLASS_RT) cannot be used together. A mix of CDL and high priority
+> commands cannot be sent to a device. By mapping IOPRIO_CLASS_DL to
+> IOPRIO_CLASS_RT, we ensure that a device will never receive a mix of these
+> two incompatible priority classes.
+> 
+> Signed-off-by: Damien Le Moal <damien.lemoal@opensource.wdc.com>
+> Signed-off-by: Niklas Cassel <niklas.cassel@wdc.com>
+> ---
+>   block/bfq-iosched.c         | 10 ++++++++++
+>   block/blk-ioprio.c          |  3 +++
+>   block/ioprio.c              |  3 ++-
+>   block/mq-deadline.c         |  1 +
+>   include/linux/ioprio.h      |  2 +-
+>   include/uapi/linux/ioprio.h |  7 +++++++
+>   6 files changed, 24 insertions(+), 2 deletions(-)
+> 
+Reviewed-by: Hannes Reinecke <hare@suse.de>
 
-I tend to agree but is there a big difference compared to normal page
-references? There's no difference for memory usage, pages still can be
-truncated from the file and disk space reclaimed (this is where DAX has
-problems...) so standard file operations won't notice. The only difference
-is that they could stay permanently dirty (we don't know whether the pin
-owner copies data to or from the page) so it could cause trouble with dirty
-throttling - and it is really only the throttling itself - page reclaim
-will have the same troubles with both pins and ordinary page references...
-Am I missing something?
+Cheers,
 
-								Honza
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+Hannes
+
