@@ -2,112 +2,80 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E36DC38142
-	for <linux-block@archiver.kernel.org>; Fri, 27 Jan 2023 23:40:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F963C54EAA
+	for <linux-block@archiver.kernel.org>; Fri, 27 Jan 2023 23:56:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230081AbjA0XkP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 27 Jan 2023 18:40:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42916 "EHLO
+        id S229681AbjA0X4n (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 27 Jan 2023 18:56:43 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51118 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232630AbjA0XkL (ORCPT
+        with ESMTP id S229495AbjA0X4m (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 27 Jan 2023 18:40:11 -0500
-Received: from mail-pf1-x431.google.com (mail-pf1-x431.google.com [IPv6:2607:f8b0:4864:20::431])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7EC268715D;
-        Fri, 27 Jan 2023 15:40:03 -0800 (PST)
-Received: by mail-pf1-x431.google.com with SMTP id 144so4307187pfv.11;
-        Fri, 27 Jan 2023 15:40:03 -0800 (PST)
+        Fri, 27 Jan 2023 18:56:42 -0500
+Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 69BD124C9F;
+        Fri, 27 Jan 2023 15:56:40 -0800 (PST)
+Received: by mail-pl1-x632.google.com with SMTP id k13so6594126plg.0;
+        Fri, 27 Jan 2023 15:56:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=bHHdtG+qXLcunlXNSfmfexDXB5Ie4ZWaLHsKQA0ypsg=;
-        b=kWP7axAIAtVonz+dlVJ3RVeoMAQb5wNQDtnG8ZL+p+cDNkrcqxHDH+2wR9e2YdY7Y5
-         VuXfcsYd3QMZJ9br4KDhGElnbKo4U4ew3/2by/ku8JmUV906waHSDKvCz6gGVyMRwn5B
-         pnlf+idt8VvHUr/bGyz/Y2YKZDmrYEIXUFmJQbJLIpJlBDDPIxfQlqTdCatge49SgsQx
-         BpcOUGflTFSTupzdJcmuIAYjZjdcl3yemUwlXQ1rm1RdviEX80BAbNnFi+v+mLabqzVJ
-         zOur3OntiXiWboeV6v2XdDQ+fe/MHZL+AK2hsJTxXY/sEhduIApf5gmE/oiNi/uZKRMw
-         YC5w==
+        bh=LBcMmlP1oNR6HwzicKU5lpUtRWz5wSpADFnTmuSK9G4=;
+        b=JekLdnK+ZQwksZmuaCiVS64kjOmWLje3UCcDBdnV9poXYxxuO+wkHGWpYnTJq7cAmU
+         7XZRUIICytVduVw1l40UPjKGwrrFde3ClLvR8MDo3QI5/Uoj7X9ZwY463+xFMh0nHsX/
+         45Nz5HNkjA8BwSVUuxl9NY+ibbh873bLevbT9A718Ou6dQG5pFX/6qQtefVbYHWfRLZb
+         EvP/H4NLJczStEuCukbH77eRYHjNXSDJS8yZszY8A6Q9gXy5FpZbxK7Zki4AVpeh+75F
+         2sWpeMNcxaN5AKttnaU2bkB/rDn+b00yFHKCerXGzrCvrTYWazvQe+CqZH1j8V08HyxS
+         Iq3w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=bHHdtG+qXLcunlXNSfmfexDXB5Ie4ZWaLHsKQA0ypsg=;
-        b=DytM/khs/NnWXsvf0Qh9hbUGDkUkNYxnmvNo5yvSpnOng1+IXyeJFYBmb3TkX5kx6p
-         hJB6g3ZpUrCHeuJzK876EnuLcB1uaqgoESzgmunN7/NjKNocY9GceQhg99mckUNwXFb5
-         8EC8Tct3MouIqzIeOP1mlQ6n/LBthHL1Zorl3BM+ZSP1h/hXU0MyvoWjGlCDCZDceYZJ
-         Hf5gX/s1uaTpS/gzsu8PQzcyctzLMK/ljHqvhiFSQGnxJddpva4/bjeLIF7L40EvX810
-         rhDZdYhNiOvBRFzMp2nd0hDybXSCjgi/qZdjihx3rXLadqgxlETtfi4oNhvuKoLyHRpf
-         MtKA==
-X-Gm-Message-State: AO0yUKXX2tC762LUYh4RamLw1tFTktKC8I1S5jnAt22+xgSlSqsooNPL
-        M36bl6+PRMrzu8EqxlZEGeY=
-X-Google-Smtp-Source: AK7set8qQJFmTKkPtU6UYKh0jVCdPX/nc0PR8EzOvrCbShEy1W5LsgEx3oNiUKcF0XR5V1+wPA0tfA==
-X-Received: by 2002:a62:1d55:0:b0:592:4d85:ecb1 with SMTP id d82-20020a621d55000000b005924d85ecb1mr6004251pfd.33.1674862802731;
-        Fri, 27 Jan 2023 15:40:02 -0800 (PST)
+        bh=LBcMmlP1oNR6HwzicKU5lpUtRWz5wSpADFnTmuSK9G4=;
+        b=k5VlO0rY2ks6oN87tt5RW9z/eEQS2z+JhpJ0JsW/wSH8p+8qtIMS2r+KJdZVujTctb
+         ZeRFBh/c1nDRn3EMf3IawHs0FlsxLAhSrYO5tt174ugPdCvP9e4VQiuXqKMqGZH8aalS
+         Y2QkgikzlEkI5o3IDxgHy0eB/OyYC7H1UmFosYOPYQxGDRzQb4vj9v44SFASC66feeuy
+         001aXKa5Yldvtz3r2sQHBjbYtcR7P/oWPj9W8MmlWfmB3v7RYuCqRCqz/uYk7JXi16IM
+         axC+XhXkbyxiv+XEBhc8socy7+MCIrT+iX+1NYdTpxhVrpYhyvO6MOLeTvOIfyECQzQ2
+         Eptw==
+X-Gm-Message-State: AO0yUKV/c1K2mJwgAp+L6ptMiiDQNVkNUyp9DNz/RSK5LasdAz0dSCWm
+        JgwwtE2/by9ZEAHTWBbfygI=
+X-Google-Smtp-Source: AK7set+e5UtDRvuLI3S8notjW7Si4+KoIkMPDzLf8KWTOdJSkNLrRou4YX5oBWsvVSF4Vy36F0lGyQ==
+X-Received: by 2002:a17:902:e5c1:b0:196:2d55:5b93 with SMTP id u1-20020a170902e5c100b001962d555b93mr12888767plf.20.1674863799806;
+        Fri, 27 Jan 2023 15:56:39 -0800 (PST)
 Received: from localhost (2603-800c-1a02-1bae-a7fa-157f-969a-4cde.res6.spectrum.com. [2603:800c:1a02:1bae:a7fa:157f:969a:4cde])
-        by smtp.gmail.com with ESMTPSA id q6-20020aa79826000000b00592543d7363sm2650724pfl.1.2023.01.27.15.40.01
+        by smtp.gmail.com with ESMTPSA id jj4-20020a170903048400b00189743ed3b6sm3418731plb.64.2023.01.27.15.56.39
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 27 Jan 2023 15:40:02 -0800 (PST)
+        Fri, 27 Jan 2023 15:56:39 -0800 (PST)
 Sender: Tejun Heo <htejun@gmail.com>
-Date:   Fri, 27 Jan 2023 13:40:00 -1000
+Date:   Fri, 27 Jan 2023 13:56:38 -1000
 From:   Tejun Heo <tj@kernel.org>
 To:     Christoph Hellwig <hch@lst.de>
 Cc:     Jens Axboe <axboe@kernel.dk>, Josef Bacik <josef@toxicpanda.com>,
         linux-block@vger.kernel.org, cgroups@vger.kernel.org,
         Andreas Herrmann <aherrmann@suse.de>
-Subject: Re: [PATCH 05/15] blk-cgroup: store a gendisk to throttle in struct
- task_struct
-Message-ID: <Y9Rg0GuNAmJPlDri@slm.duckdns.org>
+Subject: Re: [PATCH 08/15] blk-wbt: open code wbt_queue_depth_changed in
+ wbt_update_limits
+Message-ID: <Y9RkttC/XAScKdQp@slm.duckdns.org>
 References: <20230124065716.152286-1-hch@lst.de>
- <20230124065716.152286-6-hch@lst.de>
+ <20230124065716.152286-9-hch@lst.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230124065716.152286-6-hch@lst.de>
+In-Reply-To: <20230124065716.152286-9-hch@lst.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jan 24, 2023 at 07:57:05AM +0100, Christoph Hellwig wrote:
->  void blkcg_maybe_throttle_current(void)
->  {
-> -	struct request_queue *q = current->throttle_queue;
-> +	struct gendisk *disk = current->throttle_disk;
->  	struct blkcg *blkcg;
->  	struct blkcg_gq *blkg;
->  	bool use_memdelay = current->use_memdelay;
->  
-> -	if (!q)
-> +	if (!disk)
->  		return;
->  
-> -	current->throttle_queue = NULL;
-> +	current->throttle_disk = NULL;
->  	current->use_memdelay = false;
->  
-> +	if (test_bit(GD_DEAD, &disk->state))
-> +		goto out_put_disk;
-...
-> @@ -1835,18 +1839,15 @@ void blkcg_maybe_throttle_current(void)
->   */
->  void blkcg_schedule_throttle(struct gendisk *disk, bool use_memdelay)
->  {
-> -	struct request_queue *q = disk->queue;
-> -
->  	if (unlikely(current->flags & PF_KTHREAD))
->  		return;
->  
-> -	if (current->throttle_queue != q) {
-> -		if (!blk_get_queue(q))
-> -			return;
-> +	if (current->throttle_disk != disk) {
-> +		get_device(disk_to_dev(disk));
+On Tue, Jan 24, 2023 at 07:57:08AM +0100, Christoph Hellwig wrote:
+> No real need to all the method here, so open code to it to prepare
 
-So, we're shifting the dead test from schedule to the actual throttle path,
-which makes sense but I think this should at least be mentioned in the
-description if not put in its own patch.
+I might be being slow but can't understand what the first sentence is
+saying. I think making the descriptions a bit more detailed would be
+generally helpful.
 
 Thanks.
 
