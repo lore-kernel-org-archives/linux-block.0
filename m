@@ -2,118 +2,77 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 197E1C05027
-	for <linux-block@archiver.kernel.org>; Fri, 27 Jan 2023 00:21:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D16AFC61D97
+	for <linux-block@archiver.kernel.org>; Fri, 27 Jan 2023 00:52:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231714AbjA0AVj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 26 Jan 2023 19:21:39 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57440 "EHLO
+        id S229505AbjA0Aw4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 26 Jan 2023 19:52:56 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42364 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231655AbjA0AVh (ORCPT
+        with ESMTP id S232828AbjA0Awy (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 26 Jan 2023 19:21:37 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A9F9574C2C
-        for <linux-block@vger.kernel.org>; Thu, 26 Jan 2023 16:20:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1674778809;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=zhv1sJ/5W0UVM3IUaKfTJOk/lsk/OG7li8FezRc9IqY=;
-        b=DkTunwBpJSYy9e1W7sU472ZkNv4MM0IFJWe1JsveDEugSr8Wd9Autzjn7MEykf4FjOuQBT
-        AW4IFLMoce8iV6RPWEueK9r8xGgCBKn2kZAD9P572Mkfqg6eW2VL7Cwbf6VrSiDhQs69zC
-        DOxYElIqYVP9pcuJM0tn7QuTOkB/taI=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-296-yoSg5G6iPc2SpFlAJV0ung-1; Thu, 26 Jan 2023 19:20:08 -0500
-X-MC-Unique: yoSg5G6iPc2SpFlAJV0ung-1
-Received: by mail-wm1-f69.google.com with SMTP id j8-20020a05600c190800b003db2dc83dafso1871287wmq.7
-        for <linux-block@vger.kernel.org>; Thu, 26 Jan 2023 16:20:08 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:subject:organization:from
-         :references:cc:to:content-language:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=zhv1sJ/5W0UVM3IUaKfTJOk/lsk/OG7li8FezRc9IqY=;
-        b=agLw6YVbWmlurygfYQeVtqox4kmZNu/vy7RPZj5s6LCedbz/6qjPyDyPpXrPFnbiwQ
-         jRCoGOkYU4NkTw65PagMR3bTt5jeTQx1I7CUn4WasEy9FFBUMlcx8jWSErWIAC6JcfGT
-         uFkxbaSXubj+qBL74aJHH+1y5ulIdHO8PvBtSPObmQNxW1W7uSJwMl88BmxIUNuBTYdd
-         BK192r3MULasENRSbPWnnmELPH1GTLjIkCjKqiC+afBTsgOB9AduxlPthfeBBM+HmwSn
-         wZLlgHZ7Yybp9f1LqLbcXQRcyGfGgUvgKI59mkLPkLmBycXQTGH11rJlj0lnu/Jjyfsc
-         t3ug==
-X-Gm-Message-State: AO0yUKUqI6ytwXvjXwlXS7rZeOSK9L7MymkTMttxkBvq5x4mZG+CCVQ1
-        YBSipj+8RIuf54EjHXqNLnv1wv6JK+kFYrbY+lnwM1Ep3PLEfg/az4ZLVv6+dCCQnaBVOA/bQuc
-        z2ukKf81TweRXC7au+c3Dqbg=
-X-Received: by 2002:a05:600c:310c:b0:3dc:18de:b20d with SMTP id g12-20020a05600c310c00b003dc18deb20dmr9805065wmo.33.1674778807382;
-        Thu, 26 Jan 2023 16:20:07 -0800 (PST)
-X-Google-Smtp-Source: AK7set+gxf09mnZS2txjdvCu5CPjJ98z7mHcuibpRYdj9hAoCYlhY/aoOQNZFqN0DCrStRv4arpcvw==
-X-Received: by 2002:a05:600c:310c:b0:3dc:18de:b20d with SMTP id g12-20020a05600c310c00b003dc18deb20dmr9805046wmo.33.1674778807122;
-        Thu, 26 Jan 2023 16:20:07 -0800 (PST)
-Received: from ?IPV6:2003:cb:c707:5e00:9e97:86d:5ed5:bb95? (p200300cbc7075e009e97086d5ed5bb95.dip0.t-ipconnect.de. [2003:cb:c707:5e00:9e97:86d:5ed5:bb95])
-        by smtp.gmail.com with ESMTPSA id q18-20020a05600c2e5200b003d1de805de5sm2656808wmf.16.2023.01.26.16.20.05
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 26 Jan 2023 16:20:06 -0800 (PST)
-Message-ID: <3396eec4-a469-5b95-06db-c40e5616465b@redhat.com>
-Date:   Fri, 27 Jan 2023 01:20:05 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.0
-Content-Language: en-US
+        Thu, 26 Jan 2023 19:52:54 -0500
+Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [IPv6:2a03:a000:7:0:5054:ff:fe1c:15ff])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06E35234F3;
+        Thu, 26 Jan 2023 16:52:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=linux.org.uk; s=zeniv-20220401; h=Sender:In-Reply-To:Content-Type:
+        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=Hm0uBZa9+i23jOL/6obx9nGe1Bq/+5PzZ2Lpi5YV8JU=; b=TToFPZwE24QuzHo7nhz5kCSns1
+        /V3jpJs8G5wwSIpaaX369oTF1vfx7neyQqGgOOnOJaK46vGNTihUSpAowTSnkNQDVfSj+cr5cM+X9
+        xWP3vQRRQdie3mkQsXyyoQb0p1zbiqnIlabAqAJy3hQGfvKfFcDiH7i5UcBY74P7Ri5upXIAQWEXl
+        9YjJi66P1ufguiDuRH/pDNU1GP63Yr7CXRwZ4lSxnZnF1Wv/QomcA+diwfZHOT77JS81AwxrKnFgg
+        MYmicL+thuIZVio1T0gSVNK3B5kq64bl1sv87DkZXWFhGh9B/bdk8LJXXJuckeo3DxDoNiYwnX2yH
+        6wWGGEpQ==;
+Received: from viro by zeniv.linux.org.uk with local (Exim 4.96 #2 (Red Hat Linux))
+        id 1pLCys-004Liy-3A;
+        Fri, 27 Jan 2023 00:52:39 +0000
+Date:   Fri, 27 Jan 2023 00:52:38 +0000
+From:   Al Viro <viro@zeniv.linux.org.uk>
 To:     David Howells <dhowells@redhat.com>
-Cc:     Al Viro <viro@zeniv.linux.org.uk>,
+Cc:     David Hildenbrand <david@redhat.com>,
         Christoph Hellwig <hch@infradead.org>,
         Matthew Wilcox <willy@infradead.org>,
         Jens Axboe <axboe@kernel.dk>, Jan Kara <jack@suse.cz>,
         Jeff Layton <jlayton@kernel.org>,
+        Jason Gunthorpe <jgg@nvidia.com>,
         Logan Gunthorpe <logang@deltatee.com>,
         linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        John Hubbard <jhubbard@nvidia.com>, linux-mm@kvack.org
-References: <5a1796f3-e49c-80e8-2dd6-9a6e82939271@redhat.com>
- <7bbcccc9-6ebf-ffab-7425-2a12f217ba15@redhat.com>
- <246ba813-698b-8696-7f4d-400034a3380b@redhat.com>
- <20230120175556.3556978-1-dhowells@redhat.com>
- <20230120175556.3556978-3-dhowells@redhat.com>
- <3814749.1674474663@warthog.procyon.org.uk>
- <3903251.1674479992@warthog.procyon.org.uk>
- <c742e47b-dcc0-1fef-dc8c-3bf85d26b046@redhat.com> <Y9L7cRFFZh9A7kZY@ZenIV>
- <2907560.1674777959@warthog.procyon.org.uk>
-From:   David Hildenbrand <david@redhat.com>
-Organization: Red Hat
-Subject: Re: [PATCH v7 2/8] iov_iter: Add a function to extract a page list
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        Christoph Hellwig <hch@lst.de>,
+        John Hubbard <jhubbard@nvidia.com>
+Subject: Re: [PATCH v11 2/8] iov_iter: Add a function to extract a page list
  from an iterator
-In-Reply-To: <2907560.1674777959@warthog.procyon.org.uk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Message-ID: <Y9MgVsrMdgGsxNHC@ZenIV>
+References: <ba3adce1-ddea-98e0-fc3a-1cb660edae4c@redhat.com>
+ <20230126141626.2809643-1-dhowells@redhat.com>
+ <20230126141626.2809643-3-dhowells@redhat.com>
+ <Y9L3yA+B1rrnrGK8@ZenIV>
+ <Y9MAbYt6DIRFm954@ZenIV>
+ <2907150.1674777410@warthog.procyon.org.uk>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <2907150.1674777410@warthog.procyon.org.uk>
+Sender: Al Viro <viro@ftp.linux.org.uk>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 27.01.23 01:05, David Howells wrote:
-> David Hildenbrand <david@redhat.com> wrote:
-> 
->> As raised already somewhere in the whole discussion by me, the right way to
->> take such a long-term ping as vmsplice() does is to use
->> FOLL_PIN|FOLL_LONGTERM.
-> 
-> So the pipe infrastructure would have to be able to pin pages instead of
-> carrying refs on them?  What about pages just allocated and added to the pipe
-> ring in normal pipe use?
-Ordinary kernel allocations (alloc_page() ...) always have to be freed 
-via put_page() and friends. Such allocations are unmovable as default 
-and don't require any special care.
+On Thu, Jan 26, 2023 at 11:56:50PM +0000, David Howells wrote:
+> Al says that pinning a page (ie. FOLL_PIN) could cause a deadlock if a page is
+> vmspliced into a pipe with the pipe holding a pin on it because pinned pages
+> are removed from all page tables.  Is this actually the case?  I can't see
+> offhand where in mm/gup.c it does this.
 
-Pages mapped into user space are movable as default and might be placed 
-on ZONE_MOVABLE/CMA memory (well, and might be swapped out). 
-FOLL_LONGTERM makes sure to migrate these pages off of such problematic 
-physical memory regions, such that we can safely pin them until eternity.
+It doesn't; sorry, really confused memories of what's going on, took a while
+to sort them out (FWIW, writeback is where we unmap and check if page is
+pinned, while pin_user_pages running into an unmapped page will end up
+with handle_mm_fault() (->fault(), actually) try to get the sucker locked
+and block on that until the writeback is over).
 
--- 
-Thanks,
-
-David / dhildenb
-
+Said that, I still think that pinned pages (arbitrary pagecache ones,
+at that) ending up in a pipe is a seriously bad idea.  It's trivial to
+arrange for them to stay that way indefinitely - no priveleges needed,
+very few limits, etc.
