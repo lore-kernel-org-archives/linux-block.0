@@ -2,78 +2,78 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E0FCBC38142
-	for <linux-block@archiver.kernel.org>; Fri, 27 Jan 2023 22:58:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 20882C38142
+	for <linux-block@archiver.kernel.org>; Fri, 27 Jan 2023 22:59:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232119AbjA0W6Q (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 27 Jan 2023 17:58:16 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49982 "EHLO
+        id S232227AbjA0W7X (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 27 Jan 2023 17:59:23 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50612 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229804AbjA0W6P (ORCPT
+        with ESMTP id S231681AbjA0W7X (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 27 Jan 2023 17:58:15 -0500
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA4067BBF2;
-        Fri, 27 Jan 2023 14:58:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-        Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
-        Message-ID:Sender:Reply-To:Content-ID:Content-Description;
-        bh=SJZ+A2OL+Vg6dtfC1j/ujgXrKkOduxhhQrMqb42By6o=; b=n3f2+ScPxrf179PWoH5j30R2lL
-        7/+KjQ8XTMa085+Cd9jHNfJmbKf2KtJRxqKXUuWTsWKpkA98Q73fJ6GSeZUZrX9VuIH/Ic6cHZzIy
-        XdIrcRBSykbl3yJRzNhM3xYii9DqKvOkroFu6ILh8lJwSsmCKExPkR7iyAxqStFNlzx8uS91KQjm3
-        vJJEWWpag8Le5OcFF1bk9ZX+FWULv2SqJ9gkSTNyS3fXS/BQTPvPzTSNT0PZ/Tr8b1LZS6QjbIgm7
-        MJ2DooRvTu7LrK8kzCxORHbjelCP16T6YmH9PVirTaCkICqapc9s4uzB352xw523PAV46i2js26d7
-        HHvsQGFg==;
-Received: from [2601:1c2:d00:6a60::9526]
-        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1pLXfh-00GlSz-50; Fri, 27 Jan 2023 22:58:13 +0000
-Message-ID: <f88f03c9-06c6-dbf2-d67e-111b875b3c58@infradead.org>
-Date:   Fri, 27 Jan 2023 14:58:12 -0800
+        Fri, 27 Jan 2023 17:59:23 -0500
+Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E86D118;
+        Fri, 27 Jan 2023 14:59:22 -0800 (PST)
+Received: by mail-pj1-x1030.google.com with SMTP id lp10so5982380pjb.4;
+        Fri, 27 Jan 2023 14:59:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=LGAfOWe0SVdQsDd5eQVWsjHBkUXpqcdLORzkGX51TD4=;
+        b=UxC+CFvuSnuV2UzyNwU2S/v/4cv76y60avmTZr83q6O2y6KXdHH1ohB+6X2mgxOmG3
+         IBkV3bxAkLptT7RCK0sRjfXIFLSghj+b5KOXiOhL7J4KC8zNPwGEvdCzDjWpol22D8aL
+         dCOXAU+zQUaE4tu1+fUDq4clpiz2WDb6RZiR8SNRqFjJQBlBvffO/RwqZ8N8MGZW923w
+         jQjrVPQjlwA01Jfn+PAaqtlJpvZxBgk3UePk0EO2PcrMfAbznBUemtT/PcQBn4/f9F27
+         LOaMLDu/2r9C4Wfsi44ILdVgD18JITmWMTF09g4NDOh/v14tWhopqFJ2kD/wIVXkS+aj
+         T2sA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=LGAfOWe0SVdQsDd5eQVWsjHBkUXpqcdLORzkGX51TD4=;
+        b=sAkhlz8Oxv5/KacwKmAz4ioVtXlT2QN2u3qZAcgfMdcMYmMAh/dyuK0w9OYb9CuXW2
+         UbaMq6InHVJh38tJJq1EkoeGCYdAMJwGOhKM6EO221EmUQlIrERytuRmWZyhZ/3c71qb
+         H2WPmlNG8elkOua0UApobb9CFAAXCsy0FS5mVSS1o3IQeZzWbIBtvPL/4i2IA1JAWiQ7
+         WuXpbF9mBLbtQpp3DRJlcDLXmqigas/3fSQ433Bhe5odqpD24AadMD3nNWsqDFOYUAKQ
+         vGo54FUPj2F4LzpVUDfyUcUVcZGCDsZmNcpR/FIUva0JEdJgMG03wytXZL8Om9SsqYwz
+         ABUQ==
+X-Gm-Message-State: AFqh2kpD+RYsGRxM1iT5/eKlJFVAI5WymxtrjkiC7bTgiLpH3T+X1OqR
+        9IOPJFexanb4NZIPXZNKG6lK1agMjmI=
+X-Google-Smtp-Source: AMrXdXtQ73cQM7in7zSsbwhUlWiyJXizTwlmhfy8gbnppRg99C3gkRLTf2FBObBynockFic4wodoPQ==
+X-Received: by 2002:a17:90a:51e4:b0:219:818f:9da3 with SMTP id u91-20020a17090a51e400b00219818f9da3mr44774347pjh.17.1674860361932;
+        Fri, 27 Jan 2023 14:59:21 -0800 (PST)
+Received: from localhost (2603-800c-1a02-1bae-a7fa-157f-969a-4cde.res6.spectrum.com. [2603:800c:1a02:1bae:a7fa:157f:969a:4cde])
+        by smtp.gmail.com with ESMTPSA id r63-20020a17090a43c500b0022bacef5fbdsm5423195pjg.52.2023.01.27.14.59.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 27 Jan 2023 14:59:21 -0800 (PST)
+Sender: Tejun Heo <htejun@gmail.com>
+Date:   Fri, 27 Jan 2023 12:59:20 -1000
+From:   Tejun Heo <tj@kernel.org>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, Josef Bacik <josef@toxicpanda.com>,
+        linux-block@vger.kernel.org, cgroups@vger.kernel.org,
+        Andreas Herrmann <aherrmann@suse.de>
+Subject: Re: [PATCH 03/15] blk-cgroup: delay blk-cgroup initialization until
+ add_disk
+Message-ID: <Y9RXSHQtpLKFLDOq@slm.duckdns.org>
+References: <20230124065716.152286-1-hch@lst.de>
+ <20230124065716.152286-4-hch@lst.de>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.1
-Subject: Re: [PATCH 03/35] Documentation: block: correct spelling
-Content-Language: en-US
-To:     Bagas Sanjaya <bagasdotme@gmail.com>, linux-kernel@vger.kernel.org
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org
-References: <20230127064005.1558-1-rdunlap@infradead.org>
- <20230127064005.1558-4-rdunlap@infradead.org> <Y9OL+iyaQtXLSCKc@debian.me>
-From:   Randy Dunlap <rdunlap@infradead.org>
-In-Reply-To: <Y9OL+iyaQtXLSCKc@debian.me>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230124065716.152286-4-hch@lst.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
-
-On 1/27/23 00:31, Bagas Sanjaya wrote:
-> On Thu, Jan 26, 2023 at 10:39:33PM -0800, Randy Dunlap wrote:
->> diff -- a/Documentation/block/data-integrity.rst b/Documentation/block/data-integrity.rst
->> --- a/Documentation/block/data-integrity.rst
->> +++ b/Documentation/block/data-integrity.rst
->> @@ -209,7 +209,7 @@ will require extra work due to the appli
->>        sector must be set, and the bio should have all data pages
->>        added.  It is up to the caller to ensure that the bio does not
->>        change while I/O is in progress.
->> -      Complete bio with error if prepare failed for some reson.
->> +      Complete bio with error if prepare failed for some reason.
->>  
-> 
-> So if prepare returns error, bio is completed not successfully but also
-> errored?
-
-I think that
->> +      Complete bio with error if prepare failed for some reason.
-says that the caller of bio_integrity_prep() should treat the bio as an
-error condition. I don't see any guarantee that the bio is completed
-as far as adding an integrity payload to it, any more than what the bio
-was upon calling bio_integrity_prep().
-
-But I could also be wrong.  :)
+On Tue, Jan 24, 2023 at 07:57:03AM +0100, Christoph Hellwig wrote:
+> There is no need to initialize the group code before the disk is marked
+                                     ^
+				     cgroup
 
 -- 
-~Randy
+tejun
