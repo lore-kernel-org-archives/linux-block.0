@@ -2,113 +2,75 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC1D8C38142
-	for <linux-block@archiver.kernel.org>; Sat, 28 Jan 2023 02:40:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8496AC38142
+	for <linux-block@archiver.kernel.org>; Sat, 28 Jan 2023 02:49:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231527AbjA1CkT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 27 Jan 2023 21:40:19 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43114 "EHLO
+        id S232492AbjA1CtC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 27 Jan 2023 21:49:02 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45660 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229498AbjA1CkT (ORCPT
+        with ESMTP id S229681AbjA1CtB (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 27 Jan 2023 21:40:19 -0500
-Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E1E3025291;
-        Fri, 27 Jan 2023 18:40:17 -0800 (PST)
-Received: from kwepemm600002.china.huawei.com (unknown [172.30.72.57])
-        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4P3dpv1wMFzJqGQ;
-        Sat, 28 Jan 2023 10:35:51 +0800 (CST)
-Received: from localhost.localdomain (10.175.127.227) by
- kwepemm600002.china.huawei.com (7.193.23.29) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.34; Sat, 28 Jan 2023 10:40:15 +0800
-From:   Zhong Jinghua <zhongjinghua@huawei.com>
-To:     <axboe@kernel.dk>
-CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <zhongjinghua@huawei.com>, <yi.zhang@huawei.com>,
-        <yukuai3@huawei.com>
-Subject: [PATCH-next v3] blk-mq: cleanup unused methods: blk_mq_hw_sysfs_store
-Date:   Sat, 28 Jan 2023 11:04:19 +0800
-Message-ID: <20230128030419.2780298-1-zhongjinghua@huawei.com>
-X-Mailer: git-send-email 2.31.1
+        Fri, 27 Jan 2023 21:49:01 -0500
+Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B06C14EA0
+        for <linux-block@vger.kernel.org>; Fri, 27 Jan 2023 18:49:00 -0800 (PST)
+Received: by mail-pf1-f171.google.com with SMTP id 144so4472588pfv.11
+        for <linux-block@vger.kernel.org>; Fri, 27 Jan 2023 18:49:00 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ALv3IajnYqBwEbZwMHxRLgVmK0t3Zs8Bgo9cdHJGQtw=;
+        b=pxXif0V7D3NN3mpsvV1oh8SZjgPvYAzvp+qCSWe3+bDTl0wPof3rz8JriG4Jkz8asz
+         e+pTr6YSLUEWQwHwkjKt1wSfa+R2bxgI1Aq8FRYCYNkxeCZaghy/G5XM0j+bKUc8RrmY
+         ONqgRxlGjB+UzLKImpOBuwz9eMz3FDaA9R9Q1Blhsuu43q0ivJAUDRJKRNsw5oEBsAaK
+         5Dvsm/iNfRshxXq0dm2gkisCvOeEKVPpXFB7e6ChXt+16BVADY9VW0b9SiaZ3M3gPfRe
+         UVLw0gDwTlrY7hcKxU1xpAite4ovtaTEnVIQOecabqaXiWn7ONYSAVmaAoBui/O71Fhk
+         wz1A==
+X-Gm-Message-State: AO0yUKXwawWp3oACr7vFGGHpH9Pv97HHjRxeHwTDmHEyL2rX2N9Wy4i6
+        2E+28FRi47hojO+jIOqFnNE=
+X-Google-Smtp-Source: AK7set+px1sIqkTJasasSDzGyMZZ/ikvww7waBMsy24x3kr17Qz4dMslX4rvxNUFcAMCxILHwnjndQ==
+X-Received: by 2002:a62:64cb:0:b0:590:1bfe:cf63 with SMTP id y194-20020a6264cb000000b005901bfecf63mr11809492pfb.24.1674874138928;
+        Fri, 27 Jan 2023 18:48:58 -0800 (PST)
+Received: from [192.168.51.14] ([98.51.102.78])
+        by smtp.gmail.com with ESMTPSA id b3-20020aa78103000000b00582388bd80csm308418pfi.83.2023.01.27.18.48.57
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 27 Jan 2023 18:48:57 -0800 (PST)
+Message-ID: <beafab98-df34-8f1c-1108-7e61080a7e21@acm.org>
+Date:   Fri, 27 Jan 2023 18:48:57 -0800
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.175.127.227]
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- kwepemm600002.china.huawei.com (7.193.23.29)
-X-CFilter-Loop: Reflected
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.5.1
+Subject: Re: [PATCH] null_blk: Support configuring the maximum segment size
+Content-Language: en-US
+To:     Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+        Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        Ming Lei <ming.lei@redhat.com>,
+        Chaitanya Kulkarni <kch@nvidia.com>
+References: <20230128005926.79336-1-bvanassche@acm.org>
+ <ff478889-7a02-135f-57b6-f56d386d7065@opensource.wdc.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <ff478889-7a02-135f-57b6-f56d386d7065@opensource.wdc.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-We found that the blk_mq_hw_sysfs_store interface has no place to use.
-The object default_hw_ctx_attrs using blk_mq_hw_sysfs_ops only uses
-the show method and does not use the store method.
+On 1/27/23 17:18, Damien Le Moal wrote:
+> On 1/28/23 09:59, Bart Van Assche wrote:
+>> +	WARN_ONCE(len > dev->max_segment_size, "%u > %u\n", len,
+>> +		  dev->max_segment_size);
+> 
+> Shouldn't this be an EIO return as this is not supposed to happen ?
 
-Since this patch:
-4a46f05ebf99 ("blk-mq: move hctx and ctx counters from sysfs to debugfs")
-moved the store method to debugfs, the store method is not used anymore.
+Hmm ... the above WARN_ONCE() statement is intended as a precondition 
+check. This statement is intended as a help for developers to check that 
+the code below works fine. I'm not sure how returning EIO here would help?
 
-So let me do some tiny work to clean up unused code.
+Thanks
 
-Signed-off-by: Zhong Jinghua <zhongjinghua@huawei.com>
----
- v1->v2: changed debuffs to debugfs in commit message
- v2->v3: as suggested by Christoph Hellwig, remove now unused store method
- from struct blk_mq_hw_ctx_sysfs_entry
- block/blk-mq-sysfs.c | 24 ------------------------
- 1 file changed, 24 deletions(-)
-
-diff --git a/block/blk-mq-sysfs.c b/block/blk-mq-sysfs.c
-index 93997d297d42..847c0151070f 100644
---- a/block/blk-mq-sysfs.c
-+++ b/block/blk-mq-sysfs.c
-@@ -46,7 +46,6 @@ static void blk_mq_hw_sysfs_release(struct kobject *kobj)
- struct blk_mq_hw_ctx_sysfs_entry {
- 	struct attribute attr;
- 	ssize_t (*show)(struct blk_mq_hw_ctx *, char *);
--	ssize_t (*store)(struct blk_mq_hw_ctx *, const char *, size_t);
- };
- 
- static ssize_t blk_mq_hw_sysfs_show(struct kobject *kobj,
-@@ -70,28 +69,6 @@ static ssize_t blk_mq_hw_sysfs_show(struct kobject *kobj,
- 	return res;
- }
- 
--static ssize_t blk_mq_hw_sysfs_store(struct kobject *kobj,
--				     struct attribute *attr, const char *page,
--				     size_t length)
--{
--	struct blk_mq_hw_ctx_sysfs_entry *entry;
--	struct blk_mq_hw_ctx *hctx;
--	struct request_queue *q;
--	ssize_t res;
--
--	entry = container_of(attr, struct blk_mq_hw_ctx_sysfs_entry, attr);
--	hctx = container_of(kobj, struct blk_mq_hw_ctx, kobj);
--	q = hctx->queue;
--
--	if (!entry->store)
--		return -EIO;
--
--	mutex_lock(&q->sysfs_lock);
--	res = entry->store(hctx, page, length);
--	mutex_unlock(&q->sysfs_lock);
--	return res;
--}
--
- static ssize_t blk_mq_hw_sysfs_nr_tags_show(struct blk_mq_hw_ctx *hctx,
- 					    char *page)
- {
-@@ -150,7 +127,6 @@ ATTRIBUTE_GROUPS(default_hw_ctx);
- 
- static const struct sysfs_ops blk_mq_hw_sysfs_ops = {
- 	.show	= blk_mq_hw_sysfs_show,
--	.store	= blk_mq_hw_sysfs_store,
- };
- 
- static struct kobj_type blk_mq_ktype = {
--- 
-2.31.1
-
+Bart.
