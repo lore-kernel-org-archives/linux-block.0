@@ -2,54 +2,54 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4883AC38142
-	for <linux-block@archiver.kernel.org>; Sat, 28 Jan 2023 00:51:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9922BC54EAA
+	for <linux-block@archiver.kernel.org>; Sat, 28 Jan 2023 00:59:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230110AbjA1Avw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 27 Jan 2023 19:51:52 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59616 "EHLO
+        id S233572AbjA1A7X (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 27 Jan 2023 19:59:23 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36382 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232216AbjA1Avv (ORCPT
+        with ESMTP id S233571AbjA1A7W (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 27 Jan 2023 19:51:51 -0500
-Received: from esa4.hgst.iphmx.com (esa4.hgst.iphmx.com [216.71.154.42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 979097D287
-        for <linux-block@vger.kernel.org>; Fri, 27 Jan 2023 16:51:50 -0800 (PST)
+        Fri, 27 Jan 2023 19:59:22 -0500
+Received: from esa1.hgst.iphmx.com (esa1.hgst.iphmx.com [68.232.141.245])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE5C383249
+        for <linux-block@vger.kernel.org>; Fri, 27 Jan 2023 16:59:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1674867110; x=1706403110;
+  t=1674867561; x=1706403561;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=h7HJst5pTVD4tI4PoTjmbvCy7uRR3w+1cYqbNxk7D+s=;
-  b=CJqQXmzZ9vsDc/QBlqrhdFG26Q5smL+e5JYC9jui43+FE9usko/Jv/n6
-   xeQG/N3QgYzl1rqjOcdIZeVPMdprJiLcSCwR8HAJmeYa2Oj1y//cpTlLI
-   YtPdVZ9QYuf75D4s5VIU42vSzUSs5xO8CjpAq/ZFp8MovvdGK1zwBg6rb
-   ft21BYUrHcSxxBESmXDr8aZ4/lF8hOuhAMb9b/dOjMHOTYJG3m1PldNAL
-   nDJyuun3E9IKuX6vYq1VStDN5UDLvbOpflaNjN925n56+qlSfVrR7bkQh
-   UYFhfBMIdLYyXA5YBtVcQ1ZSIqnJgstjrqlK6b+uSd6uADywgyMSWzmEx
+  bh=0Enc1ChW/jUaR4OPasM8k1ypKYxaX9fNzHfctVpe1yU=;
+  b=gi4gsB3IEUxYfN/343MAjyS6SvN0r75yPaVRel6GzZBatq2EgoAb2ho3
+   VtnuphSYFS4LpPQvvUnJEl4vDYJC5tTSJ/sGRmFD4L+qOZrlgNsI+AGkV
+   /DeeyBIDM/4eFK2jshfrq5TV7fjvtVS0GPlSVV4g0avsD5hrLJVdxTXxx
+   XvN1PdYcq1Ks2IveIAXxOMPORcRGSL3SKeh6Tvp+VDRYZjgFtgKurGfFV
+   mziJlUbL6HpTpW/0U/lezTucOljYURMknmdc5rfmpw4JseYq/iRAyvvcY
+   DdA3TcVliniXvUAXv6hEuCEi84dbvynGIkIJJKdLRvr4Od285tlg/8CU1
    Q==;
 X-IronPort-AV: E=Sophos;i="5.97,252,1669046400"; 
-   d="scan'208";a="220264668"
-Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 28 Jan 2023 08:51:48 +0800
-IronPort-SDR: ZETWAo2Tdd89grEeUMWpKVROD5PIJZXx1BrjLZYdvPZaDaeSPep7twatDqAfmk7WFHRPpJppDT
- k1yqWjLnGsDPnKLmJWXCeJ7dXPzZXMJ/n9RzKHiHeN7DcLnFqb3bIbEcWc0475RxJapB1aBs7A
- jMdB+2MfWV+B9b8+NZtoQ6EgS/BHl9SNwXhgGyhcO7ZpSId7d0PjKLgwpnI8flJEsLEEQW7IQv
- 3Kvgm6A0xvs1w4KBHAHUcHS2MfAjNtR2O+Z5i61GOeM6cp43Flm25qaD/MZS/iHrSGRL4JQWYQ
- wqI=
+   d="scan'208";a="333915824"
+Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
+  by ob1.hgst.iphmx.com with ESMTP; 28 Jan 2023 08:59:20 +0800
+IronPort-SDR: 3JKpT1Z8SRH/pNihc5xX2zYTuJm0I5vIWPSX2CJa1sxSpAE2ZRN7RoE8DS+TE/aN11rhrzhPUq
+ wgeXotwsfq7FbXHdz1TlobS+6j4Wa5belowaFrmUYPXi8VVP4adiaMBE17ecmDNv3F25daOXcX
+ Tr0PAr6Ul9VsPMkalwOEc2AoiLQ0xVgo1DVDZm77ioKWO/TtXGNo2UNph2SGOC2VWtjzd8auG6
+ xiIHVCi8oKlh/TdO2jtBkPzUUGh8rm6HxwkuK3U1DylvIFx6rRlBwTu3kI3LfSdeY3yBwxjHgA
+ l3I=
 Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
-  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 27 Jan 2023 16:03:33 -0800
-IronPort-SDR: D8v1OjVvFs5qyp+XUR8geGXMkMgyFeAlwRU+kDI3xn9kmdqkaZvPr2RukL3AFTivy7MkTFOMyX
- x3OKKiCiH5KUTx4ZQhDaYiNu+kXyXNtJxIb0/rts8AVvZm1pVbHPHzK6ZakmHbaTceC2AX+pwZ
- EhP6V7xo6FGmnhEa7xlk8R4eTqF9Bf2U28Hbmq7YAna/c3cRZC/UH5qtZsMuK7y21fA2VZG0TP
- wCZpz7qAABGyrh95JkUIlzJlAdJB/A5RNRgEnZArQtfhYD6qFCx0+nlJPVSmEx329x2ay9/mVA
- RsE=
+  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 27 Jan 2023 16:11:04 -0800
+IronPort-SDR: X26sPPk5mohvAFmoG11SXPwRUIj9anGAaOzSfqFy3Ue6aIAkessVeRB6L3iloF8B5/KgiaLQQw
+ uYCKl8Z2NowFdiqXMcf0U2jeeG7ygwij7Oji0iRufASIqU8lnx0qHPcBXgD2L8pUWkZf3QNRzN
+ RZCrYE9esUxJvdd45+lHMpCCfNXcLdUwyFA2oEQJTm5fTPhaluDNOkJ6GVTzXMpnGvBn027wbH
+ baoPAEQHp82H2RuV44Ai7NtjwVwO0hj9gtGseAuAJQcdrW+xYDWtolc8m9oiAM1KjgKnkRZmci
+ LJ8=
 WDCIronportException: Internal
 Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
-  by uls-op-cesaip01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 27 Jan 2023 16:51:49 -0800
+  by uls-op-cesaip01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 27 Jan 2023 16:59:21 -0800
 Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4P3bVr4Rv5z1RwtC
-        for <linux-block@vger.kernel.org>; Fri, 27 Jan 2023 16:51:48 -0800 (PST)
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4P3bgW65nKz1RvTp
+        for <linux-block@vger.kernel.org>; Fri, 27 Jan 2023 16:59:19 -0800 (PST)
 Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
         reason="pass (just generated, assumed good)"
         header.d=opensource.wdc.com
@@ -57,197 +57,101 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
         opensource.wdc.com; h=content-transfer-encoding:content-type
         :in-reply-to:organization:from:references:to:content-language
         :subject:user-agent:mime-version:date:message-id; s=dkim; t=
-        1674867107; x=1677459108; bh=h7HJst5pTVD4tI4PoTjmbvCy7uRR3w+1cYq
-        bNxk7D+s=; b=At8TcGXn8NZI++9iOEcoMCsPW6ZshSEv/oDt2iL3VqM5hCcQOMk
-        1Xk0GljZY2PZ2FyOx/11i0zGNF/kqeKJ//aLzCsjdIAQmuuQYSgRdze1/3GzlEax
-        +8dEkuRzhUzRXWMN6D5RxCnhzmdk3HejhKMP9ccSnJWYriDQH+CsiySMIK9A6MA/
-        dNxMoQnWTMxlv5bnSl2Ppwml84nnKJ1FGn3yOiFK7j/5PXANcMvJ8RWm06Ip8PlM
-        UjsiRikqd/LqdMzho30/WZ84XzwAvQHSakTLAdpc3ccVbet6+wxMAjZ1S5m/9CXN
-        tfwKjVSqrfymGr1eXXK+Vz0N7ko4tV2+1Ng==
+        1674867559; x=1677459560; bh=0Enc1ChW/jUaR4OPasM8k1ypKYxaX9fNzHf
+        ctVpe1yU=; b=sFdZ5J4UDrXEnatR4KZhpRYvKQsrGw+Wnr7GlSyxQ6KLPUGkXQq
+        07ZJ5l6C+6MusK8J4u7+2wojs5wLnzxkE3+D/T5aRrdbATkRpfjIIfvTFNuAdRvh
+        ShXcdhxl1/m7oXV72uyq3uTpI6gSEyy8UEv9Cu/pJJ2H4yN5aVxlqRYNs5UFDJjA
+        SZA/yTWERIjiYA2v6kN5m+YEPv8yrXUQybL4AA3kBkIC0wd6l1unMMuyfhUOob8I
+        7BxjmYylesJFo289K8/D41rD24ybrbgv9zvvxhUWSiix13wxRQl1X9USFYpNW8Pq
+        H1hAVTQ2SH+73M1IPOs7hZNNPFzuLpVa7Fw==
 X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
 Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
         by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id Ok7YVyeTGs6l for <linux-block@vger.kernel.org>;
-        Fri, 27 Jan 2023 16:51:47 -0800 (PST)
+        with ESMTP id rGBG1csnxQvx for <linux-block@vger.kernel.org>;
+        Fri, 27 Jan 2023 16:59:19 -0800 (PST)
 Received: from [10.225.163.66] (unknown [10.225.163.66])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4P3bVp2CsXz1RvLy;
-        Fri, 27 Jan 2023 16:51:46 -0800 (PST)
-Message-ID: <99e6b267-6e2e-2233-19c2-1acf7c9135b2@opensource.wdc.com>
-Date:   Sat, 28 Jan 2023 09:51:45 +0900
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4P3bgT5KkCz1RvLy;
+        Fri, 27 Jan 2023 16:59:17 -0800 (PST)
+Message-ID: <4e803108-9526-6a75-f209-789a06ef52f9@opensource.wdc.com>
+Date:   Sat, 28 Jan 2023 09:59:16 +0900
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.6.0
-Subject: Re: [PATCH v3 07/18] scsi: sd: detect support for command duration
- limits
+Subject: Re: [PATCH v3 01/18] block: introduce duration-limits priority class
 Content-Language: en-US
-To:     Hannes Reinecke <hare@suse.de>,
-        Niklas Cassel <niklas.cassel@wdc.com>,
-        "James E.J. Bottomley" <jejb@linux.ibm.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>
-Cc:     Christoph Hellwig <hch@lst.de>, linux-scsi@vger.kernel.org,
-        linux-ide@vger.kernel.org, linux-block@vger.kernel.org
-References: <20230124190308.127318-1-niklas.cassel@wdc.com>
- <20230124190308.127318-8-niklas.cassel@wdc.com>
- <f0793325-3022-e7b8-672d-00f2f9ee0cd9@suse.de>
+To:     Bart Van Assche <bvanassche@acm.org>,
+        Niklas Cassel <Niklas.Cassel@wdc.com>
+Cc:     Paolo Valente <paolo.valente@linaro.org>,
+        Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+        Hannes Reinecke <hare@suse.de>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "linux-ide@vger.kernel.org" <linux-ide@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+References: <20230124190308.127318-2-niklas.cassel@wdc.com>
+ <bd0ce7ad-cf9e-a647-9b1e-cb36e7bbe30f@acm.org>
+ <731aeacc-74c0-396b-efa0-f9ae950566d8@opensource.wdc.com>
+ <873e0213-94b5-0d81-a8aa-4671241e198c@acm.org>
+ <4c345d8b-7efa-85c9-fe1c-1124ea5d9de6@opensource.wdc.com>
+ <5066441f-e265-ed64-fa39-f77a931ab998@acm.org>
+ <275993f1-f9e8-e7a8-e901-2f7d3a6bb501@opensource.wdc.com>
+ <e8324901-7c18-153f-b47f-112a394832bd@acm.org> <Y9Gd0eI1t8V61yzO@x1-carbon>
+ <86de1e78-0ff2-be70-f592-673bce76e5ac@opensource.wdc.com>
+ <Y9KF5z/v0Qp5E4sI@x1-carbon> <7f0a2464-673a-f64a-4ebb-e599c3123a24@acm.org>
+ <29b50dbd-76e9-cdce-4227-a22223850c9a@opensource.wdc.com>
+ <c8ef76be-c285-c797-5bdb-3a960821048b@opensource.wdc.com>
+ <ddc88fa1-5aaa-4123-e43b-18dc37f477e9@acm.org>
+ <049a7e88-89d1-804f-a0b5-9e5d93d505f7@opensource.wdc.com>
+ <b77d5e44-bc1e-7524-7e09-a609ba471dbc@acm.org>
 From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
 Organization: Western Digital Research
-In-Reply-To: <f0793325-3022-e7b8-672d-00f2f9ee0cd9@suse.de>
+In-Reply-To: <b77d5e44-bc1e-7524-7e09-a609ba471dbc@acm.org>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/27/23 22:00, Hannes Reinecke wrote:
-> On 1/24/23 20:02, Niklas Cassel wrote:
->> From: Damien Le Moal <damien.lemoal@opensource.wdc.com>
+On 1/28/23 09:47, Bart Van Assche wrote:
+> On 1/27/23 16:40, Damien Le Moal wrote:
+>> On 1/28/23 02:23, Bart Van Assche wrote:
+>>> I hope that I have it made it clear that I think that the proposed user
+>>> space API will be very painful to use for application developers.
 >>
->> Detect if a disk supports command duration limits. Support for
->> the READ 16, WRITE 16, READ 32 and WRITE 32 commands is tested using
->> the function scsi_report_opcode(). For a disk supporting command
->> duration limits, the mode page indicating the command duration limits
->> descriptors that apply to the command is indicated using the rwcdlp
->> and cdlp bits.
+>> I completely disagree. Reusing the prio class/level API made it easy to allow
+>> applications to use the feature. fio support for CDL requires exactly *one line*
+>> change, to allow for the CDL class number 4. That's it. From there, one can use
+>> the --cmdprio_class=4 nd --cmdprio=idx options to exercise a drive. The value of
+>> "idx" here of course depends on how the descriptors are set on the drive. But
+>> back to the point above. This depends on the application goals and the
+>> descriptors are set accordingly for that goal. There is no real discovery needed
+>> by the application. The application expect a certain set of CDL limits for its
+>> use case, and checking that this set is the one currently defined on the drive
+>> is easy to do from an application with the sysfs interface we added.
 >>
->> Support duration limits is advertizes through sysfs using the new
->> "duration_limits" sysfs sub-directory of the generic device directory,
->> that is, /sys/block/sdX/device/duration_limits. Within this new
->> directory, the limit descriptors that apply to read and write operatio=
-ns
->> are exposed within the read and write directories, with descriptor
->> attributes grouped together in directories. The overall sysfs structur=
-e
->> created is:
->>
->> /sys/block/sde/device/duration_limits/
->> =E2=94=9C=E2=94=80=E2=94=80 perf_vs_duration_guideline
->> =E2=94=9C=E2=94=80=E2=94=80 read
->> =E2=94=82=C2=A0=C2=A0 =E2=94=9C=E2=94=80=E2=94=80 1
->> =E2=94=82=C2=A0=C2=A0 =E2=94=82=C2=A0=C2=A0 =E2=94=9C=E2=94=80=E2=94=80=
- duration_guideline
->> =E2=94=82=C2=A0=C2=A0 =E2=94=82=C2=A0=C2=A0 =E2=94=9C=E2=94=80=E2=94=80=
- duration_guideline_policy
->> =E2=94=82=C2=A0=C2=A0 =E2=94=82=C2=A0=C2=A0 =E2=94=9C=E2=94=80=E2=94=80=
- max_active_time
->> =E2=94=82=C2=A0=C2=A0 =E2=94=82=C2=A0=C2=A0 =E2=94=9C=E2=94=80=E2=94=80=
- max_active_time_policy
->> =E2=94=82=C2=A0=C2=A0 =E2=94=82=C2=A0=C2=A0 =E2=94=9C=E2=94=80=E2=94=80=
- max_inactive_time
->> =E2=94=82=C2=A0=C2=A0 =E2=94=82=C2=A0=C2=A0 =E2=94=94=E2=94=80=E2=94=80=
- max_inactive_time_policy
->> =E2=94=82=C2=A0=C2=A0 =E2=94=9C=E2=94=80=E2=94=80 2
->> =E2=94=82=C2=A0=C2=A0 =E2=94=82=C2=A0=C2=A0 =E2=94=9C=E2=94=80=E2=94=80=
- duration_guideline
->> ...
->> =E2=94=82=C2=A0=C2=A0 =E2=94=94=E2=94=80=E2=94=80 page
->> =E2=94=94=E2=94=80=E2=94=80 write
->>      =E2=94=9C=E2=94=80=E2=94=80 1
->>      =E2=94=82=C2=A0=C2=A0 =E2=94=9C=E2=94=80=E2=94=80 duration_guidel=
-ine
->>      =E2=94=82=C2=A0=C2=A0 =E2=94=9C=E2=94=80=E2=94=80 duration_guidel=
-ine_policy
->> ...
->>
->> For each of the read and write descriptor directories, the page
->> attribute file indicate the command duration limit page providing the
->> descriptors. The possible values for the page attribute are "A", "B",
->> "T2A" and "T2B".
->>
->> The new "duration_limits" attributes directory is added only for disks
->> that supports command duration limits.
->>
->> Signed-off-by: Damien Le Moal <damien.lemoal@opensource.wdc.com>
->> Signed-off-by: Niklas Cassel <niklas.cassel@wdc.com>
->> ---
->>   drivers/scsi/Makefile |   2 +-
->>   drivers/scsi/sd.c     |   2 +
->>   drivers/scsi/sd.h     |  61 ++++
->>   drivers/scsi/sd_cdl.c | 764 ++++++++++++++++++++++++++++++++++++++++=
-++
->>   4 files changed, 828 insertions(+), 1 deletion(-)
->>   create mode 100644 drivers/scsi/sd_cdl.c
->>
-> I'm not particularly happy with having sysfs reflect user settings, but=
-=20
-> every other place I can think of is even more convoluted.
-> So there.
->=20
->> diff --git a/drivers/scsi/Makefile b/drivers/scsi/Makefile
->> index f055bfd54a68..0e48cb6d21d6 100644
->> --- a/drivers/scsi/Makefile
->> +++ b/drivers/scsi/Makefile
->> @@ -170,7 +170,7 @@ scsi_mod-$(CONFIG_BLK_DEV_BSG)	+=3D scsi_bsg.o
->>  =20
->>   hv_storvsc-y			:=3D storvsc_drv.o
->>  =20
->> -sd_mod-objs	:=3D sd.o
->> +sd_mod-objs	:=3D sd.o sd_cdl.o
->>   sd_mod-$(CONFIG_BLK_DEV_INTEGRITY) +=3D sd_dif.o
->>   sd_mod-$(CONFIG_BLK_DEV_ZONED) +=3D sd_zbc.o
->>  =20
->> diff --git a/drivers/scsi/sd.c b/drivers/scsi/sd.c
->> index 45945bfeee92..7879a5470773 100644
->> --- a/drivers/scsi/sd.c
->> +++ b/drivers/scsi/sd.c
->> @@ -3326,6 +3326,7 @@ static int sd_revalidate_disk(struct gendisk *di=
-sk)
->>   		sd_read_write_same(sdkp, buffer);
->>   		sd_read_security(sdkp, buffer);
->>   		sd_config_protection(sdkp);
->> +		sd_read_cdl(sdkp, buffer);
->>   	}
->>  =20
->>   	/*
->> @@ -3646,6 +3647,7 @@ static void scsi_disk_release(struct device *dev=
-)
->>  =20
->>   	ida_free(&sd_index_ida, sdkp->index);
->>   	sd_zbc_free_zone_info(sdkp);
->> +	sd_cdl_release(sdkp);
->>   	put_device(&sdkp->device->sdev_gendev);
->>   	free_opal_dev(sdkp->opal_dev);
->>  =20
-> Hmm. Calling this during revalidate() makes sense, but how can we ensur=
-e=20
-> that we call revalidate() when the user issues a MODE_SELECT command?
+>> Many users out there have deployed and using applications taking advantage of
+>> ATA NCQ priority feature, using class RT for high priority IOs. The new CDL
+>> class does not require many application changes to be enabled for next gen
+>> drives that will have CDL.
+>   As I mentioned before, the new I/O priority class IOPRIO_CLASS_DL 
+> makes it impossible to use a single I/O priority class across devices 
+> that support CDL and devices that do not support CDL. I'm surprised that 
+> you keep denying that IOPRIO_CLASS_DL is a royal pain for users who have 
+> to support devices that support CDL and devices that do not support CDL.
 
-Given that CDLs can be changed with a passthrough command, I do not think=
- we can
-do anything about that, unfortunately. But I think the same is true of ma=
-ny
-things like that. E.g. "let's turn onf/off the write cache without the ke=
-rnel
-noticing"... But given that on a normal system only privileged applicatio=
-ns can
-do passthrough, if that happens, then the system has been hacked or the u=
-ser is
-shooting himself in the foot.
+I am not denying anything. I simply keep telling you that CDL is not a generic
+feature for random applications to use, including those that already use
+RT/BE/IDLE. It is for applications that know and expect it, and so have a setup
+suited for CDL use down to the drive CDL descriptors. That includes DM setups.
 
-cdl-tools project (cdladm utility) uses passtrhough but triggers a revali=
-date
-after changing CDLs to make sure sysfs stays in sync.
+Thinking about CDL in a generic setup for any random application to use is
+nonsense. And even if that happens and a user not knowing about it still tries
+it, than as mentioned, nothing bad will happen. Using CDL in a setup that does
+not support it is a NOP. That would be the same as not using it.
 
-As Christoph suggested, we could change all this to an ioctl(GET_CDL) for
-applications... But sysfs is so much simpler in my opinion, not to mentio=
-n that
-it allows access to the information for any application written in a lang=
-uage
-that does not have ioctl() or an equivalent.
+> 
+> Bart.
 
-cdl-tools has a test suite all written in bash scripts thanks to the sysf=
-s
-interface :)
-
->=20
-> Other than that:
->=20
-> Reviewed-by: Hannes Reinecke <hare@suse.de>
->=20
-> Cheers,
->=20
-> Hannes
-
---=20
+-- 
 Damien Le Moal
 Western Digital Research
 
