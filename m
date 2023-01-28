@@ -2,100 +2,113 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93422C54EAA
-	for <linux-block@archiver.kernel.org>; Sat, 28 Jan 2023 02:03:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CC1D8C38142
+	for <linux-block@archiver.kernel.org>; Sat, 28 Jan 2023 02:40:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229681AbjA1CDv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 27 Jan 2023 21:03:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33354 "EHLO
+        id S231527AbjA1CkT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 27 Jan 2023 21:40:19 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43114 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229498AbjA1CDu (ORCPT
+        with ESMTP id S229498AbjA1CkT (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 27 Jan 2023 21:03:50 -0500
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 332251B543;
-        Fri, 27 Jan 2023 18:03:48 -0800 (PST)
-Received: from mail02.huawei.com (unknown [172.30.67.169])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4P3d5p31Tgz4f3wRB;
-        Sat, 28 Jan 2023 10:03:42 +0800 (CST)
-Received: from [10.174.178.129] (unknown [10.174.178.129])
-        by APP4 (Coremail) with SMTP id gCh0CgBnF6uAgtRjI5wnCg--.29566S2;
-        Sat, 28 Jan 2023 10:03:44 +0800 (CST)
-Subject: Re: [PATCH v4 12/14] blk-mq: remove set of bd->last when get driver
- tag for next request fails
-From:   Kemeng Shi <shikemeng@huaweicloud.com>
-To:     ming.lei@redhat.com
-Cc:     Christoph Hellwig <hch@lst.de>, axboe@kernel.dk, dwagner@suse.de,
-        hare@suse.de, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, john.garry@huawei.com, jack@suse.cz
-References: <20230118093726.3939160-1-shikemeng@huaweicloud.com>
- <20230118093726.3939160-12-shikemeng@huaweicloud.com>
- <20230118174208.GH12399@lst.de>
- <1f116b9b-8194-54c8-eedb-7f2c9cd493c6@huaweicloud.com>
-Message-ID: <0526b518-0894-10f6-e428-c03644d39c02@huaweicloud.com>
-Date:   Sat, 28 Jan 2023 10:03:43 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.5.0
+        Fri, 27 Jan 2023 21:40:19 -0500
+Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E1E3025291;
+        Fri, 27 Jan 2023 18:40:17 -0800 (PST)
+Received: from kwepemm600002.china.huawei.com (unknown [172.30.72.57])
+        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4P3dpv1wMFzJqGQ;
+        Sat, 28 Jan 2023 10:35:51 +0800 (CST)
+Received: from localhost.localdomain (10.175.127.227) by
+ kwepemm600002.china.huawei.com (7.193.23.29) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.34; Sat, 28 Jan 2023 10:40:15 +0800
+From:   Zhong Jinghua <zhongjinghua@huawei.com>
+To:     <axboe@kernel.dk>
+CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <zhongjinghua@huawei.com>, <yi.zhang@huawei.com>,
+        <yukuai3@huawei.com>
+Subject: [PATCH-next v3] blk-mq: cleanup unused methods: blk_mq_hw_sysfs_store
+Date:   Sat, 28 Jan 2023 11:04:19 +0800
+Message-ID: <20230128030419.2780298-1-zhongjinghua@huawei.com>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-In-Reply-To: <1f116b9b-8194-54c8-eedb-7f2c9cd493c6@huaweicloud.com>
-Content-Type: text/plain; charset=gbk
-Content-Transfer-Encoding: 7bit
-X-CM-TRANSID: gCh0CgBnF6uAgtRjI5wnCg--.29566S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7tF47Xr15GFW3ZF17Kw18uFg_yoW8GrWDpF
-        W8Jayjkrs8tFsFvrn2ywsFgFyvqw43XrWaqry5uryrXws8ur13KrykKr42v3W7Cr4xGan0
-        9w4jgas0q3W8Za7anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUk0b4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
-        6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-        vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7Cj
-        xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
-        0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
-        6I80ewAv7VC0I7IYx2IY67AKxVWUGVWUXwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
-        Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JMxk0xIA0c2IEe2xFo4CEbIxvr21l42xK82IYc2Ij
-        64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x
-        8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE
-        2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42
-        xK8VAvwI8IcIk0rVWrJr0_WFyUJwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv
-        6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUOyCJDUUUU
-X-CM-SenderInfo: 5vklyvpphqwq5kxd4v5lfo033gof0z/
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.175.127.227]
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ kwepemm600002.china.huawei.com (7.193.23.29)
 X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+We found that the blk_mq_hw_sysfs_store interface has no place to use.
+The object default_hw_ctx_attrs using blk_mq_hw_sysfs_ops only uses
+the show method and does not use the store method.
 
+Since this patch:
+4a46f05ebf99 ("blk-mq: move hctx and ctx counters from sysfs to debugfs")
+moved the store method to debugfs, the store method is not used anymore.
 
-on 1/19/2023 9:45 AM, Kemeng Shi wrote:
-> 
-> 
-> on 1/19/2023 1:42 AM, Christoph Hellwig wrote:
->> On Wed, Jan 18, 2023 at 05:37:24PM +0800, Kemeng Shi wrote:
->>> Commit 113285b473824 ("blk-mq: ensure that bd->last is always set
->>> correctly") will set last if we failed to get driver tag for next
->>> request to avoid flush miss as we break the list walk and will not
->>> send the last request in the list which will be sent with last set
->>> normally.
->>> This code seems stale now becase the flush introduced is always
->>> redundant as:
->>> For case tag is really out, we will send a extra flush if we find
->>> list is not empty after list walk.
->>> For case some tag is freed before retry in blk_mq_prep_dispatch_rq for
->>> next, then we can get a tag for next request in retry and flush notified
->>> already is not necessary.
->>
->> I think Ming will know this code better than me, but aren't we
->> losing the blk_mq_get_driver_tag call entirely here now.  Where
->> is getting the driver tag covered now?
->>
-> We will get driver tag in blk_mq_prep_dispatch_rq at beginning of dispatch
-> loop, so it's fine to remove blk_mq_get_driver_tag here. Thanks.
-> 
+So let me do some tiny work to clean up unused code.
 
-Hi Ming and everyone familiar with code invovled, could you help with
-reviewing this patch and patch "[PATCH v4 04/14] blk-mq: Fix potential
-io hung for shared sbitmap per tagset" in the same patchset.
-Thanks.
+Signed-off-by: Zhong Jinghua <zhongjinghua@huawei.com>
+---
+ v1->v2: changed debuffs to debugfs in commit message
+ v2->v3: as suggested by Christoph Hellwig, remove now unused store method
+ from struct blk_mq_hw_ctx_sysfs_entry
+ block/blk-mq-sysfs.c | 24 ------------------------
+ 1 file changed, 24 deletions(-)
 
+diff --git a/block/blk-mq-sysfs.c b/block/blk-mq-sysfs.c
+index 93997d297d42..847c0151070f 100644
+--- a/block/blk-mq-sysfs.c
++++ b/block/blk-mq-sysfs.c
+@@ -46,7 +46,6 @@ static void blk_mq_hw_sysfs_release(struct kobject *kobj)
+ struct blk_mq_hw_ctx_sysfs_entry {
+ 	struct attribute attr;
+ 	ssize_t (*show)(struct blk_mq_hw_ctx *, char *);
+-	ssize_t (*store)(struct blk_mq_hw_ctx *, const char *, size_t);
+ };
+ 
+ static ssize_t blk_mq_hw_sysfs_show(struct kobject *kobj,
+@@ -70,28 +69,6 @@ static ssize_t blk_mq_hw_sysfs_show(struct kobject *kobj,
+ 	return res;
+ }
+ 
+-static ssize_t blk_mq_hw_sysfs_store(struct kobject *kobj,
+-				     struct attribute *attr, const char *page,
+-				     size_t length)
+-{
+-	struct blk_mq_hw_ctx_sysfs_entry *entry;
+-	struct blk_mq_hw_ctx *hctx;
+-	struct request_queue *q;
+-	ssize_t res;
+-
+-	entry = container_of(attr, struct blk_mq_hw_ctx_sysfs_entry, attr);
+-	hctx = container_of(kobj, struct blk_mq_hw_ctx, kobj);
+-	q = hctx->queue;
+-
+-	if (!entry->store)
+-		return -EIO;
+-
+-	mutex_lock(&q->sysfs_lock);
+-	res = entry->store(hctx, page, length);
+-	mutex_unlock(&q->sysfs_lock);
+-	return res;
+-}
+-
+ static ssize_t blk_mq_hw_sysfs_nr_tags_show(struct blk_mq_hw_ctx *hctx,
+ 					    char *page)
+ {
+@@ -150,7 +127,6 @@ ATTRIBUTE_GROUPS(default_hw_ctx);
+ 
+ static const struct sysfs_ops blk_mq_hw_sysfs_ops = {
+ 	.show	= blk_mq_hw_sysfs_show,
+-	.store	= blk_mq_hw_sysfs_store,
+ };
+ 
+ static struct kobj_type blk_mq_ktype = {
 -- 
-Best wishes
-Kemeng Shi
+2.31.1
 
