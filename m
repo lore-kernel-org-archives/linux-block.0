@@ -2,169 +2,108 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C0D54C636BD
-	for <linux-block@archiver.kernel.org>; Sat, 28 Jan 2023 10:49:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D969BC27C76
+	for <linux-block@archiver.kernel.org>; Sat, 28 Jan 2023 11:35:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234119AbjA1Ks6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 28 Jan 2023 05:48:58 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51328 "EHLO
+        id S233188AbjA1Lf2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 28 Jan 2023 06:35:28 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37208 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234320AbjA1Ksy (ORCPT
+        with ESMTP id S230474AbjA1Lf1 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 28 Jan 2023 05:48:54 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F9837963E;
-        Sat, 28 Jan 2023 02:48:38 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        Sat, 28 Jan 2023 06:35:27 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 32EAF233D5
+        for <linux-block@vger.kernel.org>; Sat, 28 Jan 2023 03:34:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1674905680;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=vhnwvkrxI3b8cKGQbCxF3BGuyIUNQ+hsLoVh9xY6Qas=;
+        b=aT5DUwDyFl6RxQ5y/3Hs9ZXwrLzAIVQZcB7PW1BZKUpoHT4oZlmZrvejciMiEPsc7ti8FJ
+        wfsd6xH+wt+pceAbuAzP613GAMuVx5+iQd0aXXZ3IGw4F3fwUZre4e0NUb6dL7k1coen0e
+        NDfQJeP89TM8FD7ZN3tW6nQUAwwxbDc=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-462-GRhoCibNOKq_tWOyR7Wcnw-1; Sat, 28 Jan 2023 06:34:36 -0500
+X-MC-Unique: GRhoCibNOKq_tWOyR7Wcnw-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id C60C360B49;
-        Sat, 28 Jan 2023 10:48:37 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F057DC433D2;
-        Sat, 28 Jan 2023 10:48:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1674902917;
-        bh=Y432cQgFP5F34pSdT8J5cN2U4/Abh03N/7/nnZFsfgA=;
-        h=From:To:Cc:In-Reply-To:References:Subject:Date:From;
-        b=ucQIwNrYn1j82n5kEO9WaLijY1byLMow61bm47krLw9/rm4ppKVrlbLz6phB9zNbS
-         qYY9lfErpOzRey8+JWhrlP2K20ge8aTXRGAB1RaAXSma5mb3gsVcM7JjsMlaYHRq6p
-         5Sc6Wb+I4Y9+t6nEP7exbyKAI00PmKAmlmdPi+RpRtLkxQxgwEsoweOc60InbgtjXH
-         FqvZ8MvQZkaZTFpjHfucUR24TwuTg8tFdRbslI7LaInKzs0Rwp3ur5+5MyfOIl4uaR
-         6DEA3qekp8dP3oIUZTw+yBhAfVg6biPer6tOhWjPLMuQk2/uOpgUZPcQmhGK5/Sihz
-         AcjSu+HZd6TdA==
-From:   Mark Brown <broonie@kernel.org>
-To:     linux-kernel@vger.kernel.org, Randy Dunlap <rdunlap@infradead.org>
-Cc:     Jonathan Corbet <corbet@lwn.net>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Russell King <linux@armlinux.org.uk>,
-        Jens Axboe <axboe@kernel.dk>,
-        Andrii Nakryiko <andrii@kernel.org>,
-        Alexei Starovoitov <ast@kernel.org>,
-        Daniel Borkmann <daniel@iogearbox.net>,
-        Vladimir Oltean <olteanv@gmail.com>,
-        Steffen Klassert <steffen.klassert@secunet.com>,
-        Daniel Jordan <daniel.m.jordan@oracle.com>,
-        Akinobu Mita <akinobu.mita@gmail.com>,
-        Helge Deller <deller@gmx.de>,
-        "Rafael J. Wysocki" <rafael@kernel.org>,
-        Jiri Kosina <jikos@kernel.org>,
-        Benjamin Tissoires <benjamin.tissoires@redhat.com>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        Wolfram Sang <wsa@kernel.org>,
-        Dmitry Torokhov <dmitry.torokhov@gmail.com>,
-        Henrik Rydberg <rydberg@bitmath.org>,
-        Karsten Keil <isdn@linux-pingi.de>,
-        Pavel Machek <pavel@ucw.cz>, Lee Jones <lee@kernel.org>,
-        Josh Poimboeuf <jpoimboe@kernel.org>,
-        Miroslav Benes <mbenes@suse.cz>,
-        Petr Mladek <pmladek@suse.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Ingo Molnar <mingo@redhat.com>,
-        =?utf-8?q?J=C3=A9r=C3=B4me_Glisse?= <jglisse@redhat.com>,
-        Naoya Horiguchi <naoya.horiguchi@nec.com>,
-        Miaohe Lin <linmiaohe@huawei.com>,
-        Jonas Bonn <jonas@southpole.se>,
-        Stefan Kristiansson <stefan.kristiansson@saunalahti.fi>,
-        Stafford Horne <shorne@gmail.com>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        Lorenzo Pieralisi <lpieralisi@kernel.org>,
-        Marc Zyngier <maz@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Len Brown <len.brown@intel.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Juri Lelli <juri.lelli@redhat.com>,
-        Vincent Guittot <vincent.guittot@linaro.org>,
-        David Howells <dhowells@redhat.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        Paul Moore <paul@paul-moore.com>,
-        James Morris <jmorris@namei.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>,
-        Jaroslav Kysela <perex@perex.cz>,
-        Takashi Iwai <tiwai@suse.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Daniel Bristot de Oliveira <bristot@kernel.org>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Masami Hiramatsu <mhiramat@kernel.org>,
-        Mathieu Poirier <mathieu.poirier@linaro.org>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Evgeniy Polyakov <zbr@ioremap.net>,
-        Fenghua Yu <fenghua.yu@intel.com>,
-        Reinette Chatre <reinette.chatre@intel.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Borislav Petkov <bp@alien8.de>,
-        Chris Zankel <chris@zankel.net>,
-        Max Filippov <jcmvbkbc@gmail.com>, alsa-devel@alsa-project.org,
-        coresight@lists.linaro.org, bpf@vger.kernel.org,
-        dri-devel@lists.freedesktop.org, isdn4linux@listserv.isdn4linux.de,
-        keyrings@vger.kernel.org, linux-acpi@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-fbdev@vger.kernel.org,
-        linux-i2c@vger.kernel.org, linux-input@vger.kernel.org,
-        linux-leds@vger.kernel.org, linux-pci@vger.kernel.org,
-        linux-s390@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-sgx@vger.kernel.org, linux-spi@vger.kernel.org,
-        linux-trace-devel@vger.kernel.org,
-        linux-trace-kernel@vger.kernel.org, live-patching@vger.kernel.org,
-        linux-pm@vger.kernel.org, linux-security-module@vger.kernel.org,
-        linux-usb@vger.kernel.org, netdev@vger.kernel.org,
-        target-devel@vger.kernel.org, linux-mm@kvack.org,
-        openrisc@lists.librecores.org,
-        linux-arm-kernel@lists.infradead.org,
-        linux-xtensa@linux-xtensa.org, linuxppc-dev@lists.ozlabs.org,
-        x86@kernel.org
-In-Reply-To: <20230127064005.1558-1-rdunlap@infradead.org>
-References: <20230127064005.1558-1-rdunlap@infradead.org>
-Subject: Re: (subset) [PATCH 00/35] Documentation: correct lots of spelling
- errors (series 1)
-Message-Id: <167490289567.2145989.15703368734300500078.b4-ty@kernel.org>
-Date:   Sat, 28 Jan 2023 10:48:15 +0000
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B942229AA3B8;
+        Sat, 28 Jan 2023 11:34:35 +0000 (UTC)
+Received: from T590 (ovpn-8-23.pek2.redhat.com [10.72.8.23])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 6D86014171BE;
+        Sat, 28 Jan 2023 11:34:27 +0000 (UTC)
+Date:   Sat, 28 Jan 2023 19:34:22 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     "Viacheslav A.Dubeyko" <viacheslav.dubeyko@bytedance.com>
+Cc:     Viacheslav Dubeyko <slava@dubeyko.com>,
+        Luis Chamberlain <mcgrof@kernel.org>,
+        Linux FS Devel <linux-fsdevel@vger.kernel.org>,
+        linux-block@vger.kernel.org,
+        Javier =?iso-8859-1?Q?Gonz=E1lez?= <javier.gonz@samsung.com>,
+        Matias =?iso-8859-1?Q?Bj=F8rling?= <Matias.Bjorling@wdc.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+        Adam Manzanares <a.manzanares@samsung.com>,
+        Hans Holmberg <hans.holmberg@wdc.com>,
+        lsf-pc@lists.linux-foundation.org, andreas@metaspace.dk
+Subject: Re: [External] [LSF/MM/BPF BoF] Session for Zoned Storage 2023
+Message-ID: <Y9UIPsp479CysMmX@T590>
+References: <F6BF25E2-FF26-48F2-8378-3CB36E362313@dubeyko.com>
+ <Y7h0F0w06cNM89hO@bombadil.infradead.org>
+ <4CC4F55E-17B3-47E2-A8C5-9098CCEB65D6@dubeyko.com>
+ <5DF10459-88F3-48DA-AEB2-5B436549A194@bytedance.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.12.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5DF10459-88F3-48DA-AEB2-5B436549A194@bytedance.com>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.7
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, 26 Jan 2023 22:39:30 -0800, Randy Dunlap wrote:
-> Correct many spelling errors in Documentation/ as reported by codespell.
+On Fri, Jan 06, 2023 at 05:56:24PM -0800, Viacheslav A.Dubeyko wrote:
 > 
-> Maintainers of specific kernel subsystems are only Cc-ed on their
-> respective patches, not the entire series. [if all goes well]
 > 
-> These patches are based on linux-next-20230125.
+> > On Jan 6, 2023, at 11:30 AM, Viacheslav Dubeyko <slava@dubeyko.com> wrote:
+> > 
+> > 
+> > 
+> >> On Jan 6, 2023, at 11:18 AM, Luis Chamberlain <mcgrof@kernel.org> wrote:
+> >> 
+> >> On Fri, Jan 06, 2023 at 11:17:19AM -0800, Viacheslav Dubeyko wrote:
+> >>> Hello,
+> >>> 
+> >>> As far as I can see, I have two topics for discussion.
+> >> 
+> >> What's that?
+> > 
+> > I am going to share these topics in separate emails. :)
+> > 
+> > (1) I am going to share SSDFS patchset soon. And topic is:
+> > SSDFS + ZNS SSD: deterministic architecture decreasing TCO cost of data infrastructure.
+> > 
+> > (2) Second topic is:
+> > How to achieve better lifetime and performance of caching layer with ZNS SSD?
+> > 
 > 
-> [...]
+> I think we can consider such discussions:
+> (1) I assume that we still need to discuss PO2 zone sizes?
+> (2) Status of ZNS SSD support in F2FS, btrfs (maybe, bcachefs and other file systems)
+> (3) Any news from ZoneFS (+ ZenFS maybe)?
+> (4) New ZNS standard features that we need to support on block layer + FS levels?
+> (5) ZNS drive emulation + additional testing features?
 
-Applied to
+ZNS drive emulation can be done as one ublk target(userspace
+implementation with ublk driver extension), and it was discussed before:
 
-   broonie/spi.git for-next
+https://github.com/ming1/ubdsrv/pull/28
 
-Thanks!
 
-[27/35] Documentation: spi: correct spelling
-        commit: 0f6d2cee58f1ff2ebf66f0bceb113d79f66ecb07
-
-All being well this means that it will be integrated into the linux-next
-tree (usually sometime in the next 24 hours) and sent to Linus during
-the next merge window (or sooner if it is a bug fix), however if
-problems are discovered then the patch may be dropped or reverted.
-
-You may get further e-mails resulting from automated or manual testing
-and review of the tree, please engage with people reporting problems and
-send followup patches addressing any issues that are reported if needed.
-
-If any updates are required or you are submitting further changes they
-should be sent as incremental updates against current git, existing
-patches will not be replaced.
-
-Please add any relevant lists and maintainers to the CCs when replying
-to this mail.
-
-Thanks,
-Mark
+Thanks, 
+Ming
 
