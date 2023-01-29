@@ -2,74 +2,145 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64022C61DA4
-	for <linux-block@archiver.kernel.org>; Sun, 29 Jan 2023 05:39:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 674CCC05027
+	for <linux-block@archiver.kernel.org>; Sun, 29 Jan 2023 05:51:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230300AbjA2FfF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 29 Jan 2023 00:35:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56900 "EHLO
+        id S231184AbjA2Fvc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 29 Jan 2023 00:51:32 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60180 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229436AbjA2FfE (ORCPT
+        with ESMTP id S231312AbjA2Fvb (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 29 Jan 2023 00:35:04 -0500
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B188212AC;
-        Sat, 28 Jan 2023 21:35:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Sender:Content-Type:MIME-Version:
-        Message-ID:Subject:Cc:To:From:Date:Reply-To:Content-Transfer-Encoding:
-        Content-ID:Content-Description:In-Reply-To:References;
-        bh=VKxlaGMrI0cp0ye3H9Jmx6z3Rmpn9Z9p0OcUfzcS/oA=; b=nbpw9oZ9+eUaa2rK2vTNyKdREg
-        ra/ZABuEmnzsfMygFg2JjR8HqA7CsdnqE6Rut5g7a86By3qnU8k288DbSkuignY6kiHSW6O1IbwYE
-        8Om32g0UTek8t5gusVEU4fN+yY2pl21g78mWnvBf9NErom7t7zNF5iko8sZyvjxOLKJNcz/n89nQF
-        f8GGStR9xGwZ2UpmCU7tBqDHC/13vJ7B42MefmwlsHOPtFj18nERLMlNIjQ0fbxriFqIr0fYE1DaH
-        hKWFGHGOjkm5qoL+eiRiySd1iS7qBLSkQ6zAbd1CN3lB9BmEaLWlWcdG3d67/tjFSvxDhXUa9i2rf
-        SWjUalYQ==;
-Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1pM0LA-0014cV-3J; Sun, 29 Jan 2023 05:34:56 +0000
-Date:   Sat, 28 Jan 2023 21:34:56 -0800
-From:   Luis Chamberlain <mcgrof@kernel.org>
-To:     lsf-pc@lists.linux-foundation.org
-Cc:     amir73il@gmail.com, a.manzanares@samsung.com,
-        chandan.babu@oracle.com, jlayton@kernel.org, josef@toxicpanda.com,
-        Pankaj Raghav <p.raghav@samsung.com>,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org
-Subject: LSF/MM/BPF BoF: pains / goods with automation with kdevops
-Message-ID: <Y9YFgDXnB9dTZIXA@bombadil.infradead.org>
+        Sun, 29 Jan 2023 00:51:31 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 909C521A05
+        for <linux-block@vger.kernel.org>; Sat, 28 Jan 2023 21:50:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1674971443;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=1ESfJeO4v/Sc9kZuGNKusexDTFykbAPKz0X+uhnEfDU=;
+        b=MLV/P/Rdubq5VcL7aPcEpSPNS8/P6co70ymJohI84/ffAPeYeKeI+9TvQ+faXRDdtoW8Le
+        OlV4y0hJC0PqYecotHk+uRu3b3vxP5pqsX8XsAV5Mr+a7k2RRupJ1Ijfn03khcJEZTxtKr
+        uAOMlzf6WN4AraIQeg4sRxoYxJUYYeI=
+Received: from mail-oa1-f70.google.com (mail-oa1-f70.google.com
+ [209.85.160.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-346-gRhEWoLCMYK41M1cgd06YQ-1; Sun, 29 Jan 2023 00:50:41 -0500
+X-MC-Unique: gRhEWoLCMYK41M1cgd06YQ-1
+Received: by mail-oa1-f70.google.com with SMTP id 586e51a60fabf-16364c64654so2331549fac.10
+        for <linux-block@vger.kernel.org>; Sat, 28 Jan 2023 21:50:41 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=1ESfJeO4v/Sc9kZuGNKusexDTFykbAPKz0X+uhnEfDU=;
+        b=Ymaht4Jna2UPqPngvdrX5fNQGyGq11DbWlLWt+TApozbHo9gu8UvJGmcummxW+W9ai
+         yuVgtdk4VJjHhweRBis6GdDAgEpr1LQ923gcQli8wlEecGXnlnsUKtORit4asxQ+OQrC
+         TM+ss5+3dU+b1eHoA392juV6YEWqF07i8ltB8AQvTNU9+kIK/NzpKkd+Nr5cI5DWo9oa
+         qOk805NcSxR8z6yOBADGxjRoO0KrI5UJBpjULScKfCiYDidRaO4BOdM8NkhzCHFC3AiE
+         vEDFagpQtCLQIyTrD0AJFN2QIbOTilGv94vfXKYiDfaIbqH2tabH6gEru922MkFqLqGt
+         n5dw==
+X-Gm-Message-State: AO0yUKXly/LWFu9Y652DnyBsSP1k2u7l8I/VhNFhooFnKnYFYWNWBpU6
+        CwO5I4zSKeljYMi9urXmPdAQ96Uhq6rocGP+KgL4zPytTU+/3gDra70v7mmTIpOMxMerBPRgC+P
+        uhQn2wzs8x/ab3905lEJDcUJgSUcRMqJOHo+4o/E=
+X-Received: by 2002:a05:6870:959e:b0:163:9cea:eea7 with SMTP id k30-20020a056870959e00b001639ceaeea7mr115404oao.35.1674971440496;
+        Sat, 28 Jan 2023 21:50:40 -0800 (PST)
+X-Google-Smtp-Source: AK7set+UoO/1kphXCPY28/DKX9hwQUG6JjAGE74TUF7dLTKDNr1tk08D4Bhi3bKgLWdo5+0Rqlh3eus5Dyvey48IMPg=
+X-Received: by 2002:a05:6870:959e:b0:163:9cea:eea7 with SMTP id
+ k30-20020a056870959e00b001639ceaeea7mr115403oao.35.1674971440262; Sat, 28 Jan
+ 2023 21:50:40 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Sender: Luis Chamberlain <mcgrof@infradead.org>
+References: <20221128021005.232105-1-lizetao1@huawei.com> <20221128042945-mutt-send-email-mst@kernel.org>
+ <20230127061055-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20230127061055-mutt-send-email-mst@kernel.org>
+From:   Jason Wang <jasowang@redhat.com>
+Date:   Sun, 29 Jan 2023 13:50:29 +0800
+Message-ID: <CACGkMEszd0O-juD93nMQEmOA0w+rq_pE-je5xj+XkMc7nwUR4w@mail.gmail.com>
+Subject: Re: [PATCH 0/4] Fix probe failed when modprobe modules
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     Li Zetao <lizetao1@huawei.com>, pbonzini@redhat.com,
+        stefanha@redhat.com, axboe@kernel.dk, kraxel@redhat.com,
+        david@redhat.com, ericvh@gmail.com, lucho@ionkov.net,
+        asmadeus@codewreck.org, linux_oss@crudebyte.com,
+        davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+        pabeni@redhat.com, rusty@rustcorp.com.au,
+        virtualization@lists.linux-foundation.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        v9fs-developer@lists.sourceforge.net, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-More suitable towards a BoF as I don't *think* a larger audience would be
-interested. At the last LSF during our talks about automation it was suggested
-we could share a repo and go to town as we're all adults. That's been done:
+On Fri, Jan 27, 2023 at 7:12 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+>
+> On Mon, Nov 28, 2022 at 05:14:44AM -0500, Michael S. Tsirkin wrote:
+> > On Mon, Nov 28, 2022 at 10:10:01AM +0800, Li Zetao wrote:
+> > > This patchset fixes similar issue, the root cause of the
+> > > problem is that the virtqueues are not stopped on error
+> > > handling path.
+> >
+> > I've been thinking about this.
+> > Almost all drivers are affected.
+> >
+> > The reason really is that it used to be the right thing to do:
+> > On legacy pci del_vqs writes 0
+> > into vq index and this resets the device as a side effect
+> > (we actually do this multiple times, what e.g. writes of MSI vector
+> >  after the 1st reset do I have no idea).
+> >
+> > mmio ccw and modern pci don't.
+> >
+> > Given this has been with us for a while I am inlined to look for
+> > a global solution rather than tweaking each driver.
+> >
+> > Given many drivers are supposed to work on legacy too, we know del_vqs
+> > includes a reset for many of them. So I think I see a better way to do
+> > this:
+> >
+> > Add virtio_reset_device_and_del_vqs()
+> >
+> > and convert all drivers to that.
+> >
+> > When doing this, we also need to/can fix a related problem (and related
+> > to the hardening that Jason Wang was looking into):
+> > virtio_reset_device is inherently racy: vq interrupts could
+> > be in flight when we do reset. We need to prevent handlers from firing in
+> > the window between reset and freeing the irq, so we should first
+> > free irqs and only then start changing the state by e.g.
+> > device reset.
+> >
+> >
+> > Quite a lot of core work here. Jason are you still looking into
+> > hardening?
+> >
+>
+> Li Zetao, Jason, any updates. You guys looking into this?
 
-https://github.com/linux-kdevops/kdevops
+At least I will continue the work of IRQ hardening. And this work
+could be done on top.
 
-At ALPSS folks suggested maybe non-github, best we can do for now is
-gitlab:
+Thanks
 
-https://gitlab.com/linux-kdevops/kdevops
+>
+>
+> >
+> > > Li Zetao (4):
+> > >   9p: Fix probe failed when modprobe 9pnet_virtio
+> > >   virtio-mem: Fix probe failed when modprobe virtio_mem
+> > >   virtio-input: Fix probe failed when modprobe virtio_input
+> > >   virtio-blk: Fix probe failed when modprobe virtio_blk
+> > >
+> > >  drivers/block/virtio_blk.c    | 1 +
+> > >  drivers/virtio/virtio_input.c | 1 +
+> > >  drivers/virtio/virtio_mem.c   | 1 +
+> > >  net/9p/trans_virtio.c         | 1 +
+> > >  4 files changed, 4 insertions(+)
+> > >
+> > > --
+> > > 2.25.1
+>
 
-There's been quite a bit of development from folks on the To list. But
-there's also bugs even on the upstream kernel now that can sometimes erk us.
-One example is 9p is now used to be able to compile Linux on the host
-instead of the guests. Well if you edit a file after boot on the host
-for Linux, the guest won't see the update, so I guess 9p doesn't update
-the guest's copy yet. Guests just have to reboot now. So we have to fix that
-and I guess add 9p to fstests. Or now that we have NFS support thanks to
-Jeff, maybe use that as an option? What's the overhead for automation Vs 9p?
-
-We dicussed sharing more archive of results for fstests/blktests. Done.
-What are the other developer's pain points? What would folks like? If
-folks want demos for complex setups let me know and we can just do that
-through zoom and record them / publish online to help as documentation
-(please reply to this thread in private to me and I can set up a
-session). Let's use the time at LSF more for figuring out what is needed
-for the next year.
-
-  Luis
