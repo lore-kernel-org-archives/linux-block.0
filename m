@@ -2,85 +2,127 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 69873C38142
-	for <linux-block@archiver.kernel.org>; Sun, 29 Jan 2023 01:38:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DBED5C61D97
+	for <linux-block@archiver.kernel.org>; Sun, 29 Jan 2023 02:03:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230156AbjA2BiT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 28 Jan 2023 20:38:19 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49026 "EHLO
+        id S229999AbjA2CDf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 28 Jan 2023 21:03:35 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53462 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230008AbjA2BiS (ORCPT
+        with ESMTP id S229787AbjA2CDf (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 28 Jan 2023 20:38:18 -0500
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 43D49CA08;
-        Sat, 28 Jan 2023 17:38:16 -0800 (PST)
-Received: from mail02.huawei.com (unknown [172.30.67.143])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4P4DTt6vSmz4f3t0s;
-        Sun, 29 Jan 2023 09:38:10 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-        by APP3 (Coremail) with SMTP id _Ch0CgCnUyEDztVjX9x2CQ--.33658S3;
-        Sun, 29 Jan 2023 09:38:13 +0800 (CST)
-Subject: Re: [PATCH] block, bfq: fix uaf for bfqq in bic_set_bfqq()
-To:     jack@suse.cz, tj@kernel.org, josef@toxicpanda.com, axboe@kernel.dk,
-        paolo.valente@linaro.org, shinichiro.kawasaki@wdc.com
-Cc:     cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, yukuai1@huaweicloud.com,
-        yi.zhang@huawei.com, yangerkun@huawei.com,
-        "yukuai (C)" <yukuai3@huawei.com>
-References: <20230113094410.2907223-1-yukuai3@huawei.com>
-From:   Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <4d3f6183-f9d4-b657-0205-fc240bc24c76@huaweicloud.com>
-Date:   Sun, 29 Jan 2023 09:38:11 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        Sat, 28 Jan 2023 21:03:35 -0500
+Received: from esa5.hgst.iphmx.com (esa5.hgst.iphmx.com [216.71.153.144])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 29E6218AA9
+        for <linux-block@vger.kernel.org>; Sat, 28 Jan 2023 18:03:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1674957812; x=1706493812;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=pgP9dGv/7HefR5zcDi5KT6z3WySDMJ9u8/jMVJF6zaM=;
+  b=AUHYAFLUJD5FqH9aY38UVbXSr5FAoJciblWRD3AGyZ5wSBA8byAdqxkm
+   p5N5156BJQyUfFLuroiL4eiUolaM0Mf50O6mNO2mHULzCck7HvaIQM8AA
+   hbPt5LyxQspt9XpDUtNOpxNQWblz1OOS9Ur2r9d18TN+kVwMynVPdIDL5
+   2T8A3sAN+rbIZZNMl/U+/fReIPqIf7ZIWpJgdhFIWjXRlJxzSGtrfVF5N
+   bBDmwd63aj6C1SBFMKjCEGrSK4k4xQ57Bt6ybjvnDZBDdctm2WuNlSZRm
+   I6zAj41Awi0zY2OSapLSQeM0opcRNkzfsB2SSfiPO26+aZMVfYyCGBL9s
+   A==;
+X-IronPort-AV: E=Sophos;i="5.97,254,1669046400"; 
+   d="scan'208";a="221792504"
+Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
+  by ob1.hgst.iphmx.com with ESMTP; 29 Jan 2023 10:03:31 +0800
+IronPort-SDR: 21BBPtay1pleeO8BR2Fi0A8NWauku3gTcNqsOwS6vhIOn9like0io0xXak9Ztq/x/do3h5xewl
+ l2JrLLTNfwvMtI+gkkUChfuSdvnV3l95VwRK2SWGo0xgEmWPRrpbrx/QRzQb90bxxSO0k5yves
+ M69Q+NA+VuLQbm9QBNSLdPACiWS/yGgV+P4iJoua3SafuW4ZNJi9uDbk388G1lTz9l+Lxl5CxJ
+ ++0RScha7nxo5gCYVu5NVa1TjvJwQcZ6h0A7FFUfP3Z11mKGHPvsvcy2jPpJWggv9N1Xb54Aig
+ w4M=
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 28 Jan 2023 17:20:59 -0800
+IronPort-SDR: W2SDT7a1dYml4qN8CtX4irOPrsBXbmitWqJz1h/Wr2VzaT+Sh2fdNNi3UnrT2kNdaGwvAnbHUB
+ r5dACiifk3/cPsvvuBcQlWXFf1IEMwsWFivRb5Zopb33F4uJZ+oYMRfA9LOG9jfdgk6uN24WzS
+ lazIpZ80nPTU0iJCKpM+PGAZOF9iqiVEdaFTXqbG52Lz5ms62RO83Smqnw1bsrjEWRHfSP2msx
+ I1eRf9aKfCZSZxmiOr4HCQYAmuS7RwqHiYunK1wGMOc3FjTshVmdSz/rPkx3J44jBMcb1oSGcz
+ 4l8=
+WDCIronportException: Internal
+Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
+  by uls-op-cesaip02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 28 Jan 2023 18:03:31 -0800
+Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4P4F366DKvz1Rwrq
+        for <linux-block@vger.kernel.org>; Sat, 28 Jan 2023 18:03:30 -0800 (PST)
+Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
+        reason="pass (just generated, assumed good)"
+        header.d=opensource.wdc.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
+        opensource.wdc.com; h=content-transfer-encoding:content-type
+        :in-reply-to:organization:from:references:to:content-language
+        :subject:user-agent:mime-version:date:message-id; s=dkim; t=
+        1674957810; x=1677549811; bh=pgP9dGv/7HefR5zcDi5KT6z3WySDMJ9u8/j
+        MVJF6zaM=; b=fTjSREUjv2NTaHZ4tgZURFgi04QQqO8/pp4l2Qm25t0PRC8gpYn
+        wubHHPvW35U0JjKR1jGM//pXoWWnGaDBWwGMi4tbg4gon4cXmU5EFQqSPDBukDaO
+        0wfVODPsGBFT2HeTw+NAiI/SzPZbF/kge4LbSgFITdr1L82QsisgqVfy/gWtT1QO
+        HziX2ctOhX572j2n8rqS5+UWhWI8UOAigfaS3EJkzyWDFup0BPmnGxsQKmX/X4Ee
+        SCr1E79zUHzdSA6l0Dy9X1SW1LlBZ7UkH3FDo3F78C09U6mawu6p73zG15hS/8jm
+        nj9wdPyne5Ze5Jo0LuykokKtkJ5biMb0h/g==
+X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
+Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
+        by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
+        with ESMTP id FuKFsH044jEs for <linux-block@vger.kernel.org>;
+        Sat, 28 Jan 2023 18:03:30 -0800 (PST)
+Received: from [10.225.163.66] (unknown [10.225.163.66])
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4P4F3535Byz1RvLy;
+        Sat, 28 Jan 2023 18:03:29 -0800 (PST)
+Message-ID: <66b9601f-148e-3954-036b-b053d2d04316@opensource.wdc.com>
+Date:   Sun, 29 Jan 2023 11:03:27 +0900
 MIME-Version: 1.0
-In-Reply-To: <20230113094410.2907223-1-yukuai3@huawei.com>
-Content-Type: text/plain; charset=gbk; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: _Ch0CgCnUyEDztVjX9x2CQ--.33658S3
-X-Coremail-Antispam: 1UD129KBjvdXoWrKrW7CFyxAFyxXr1rtFyxZrb_yoW3Zrc_WF
-        sayFZ3Ww1UWF18t3W7t3W3CFWxG3yfXr18XryFyr1fXryUZrWxGa1kW34fXrW5WrZ29as3
-        Jr1kXw4UKr1rZjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-        9fnUUIcSsGvfJTRUUUba8FF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
-        6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
-        A2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j
-        6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
-        Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
-        I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
-        4UM4x0Y48IcVAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2kI
-        c2xKxwCYjI0SjxkI62AI1cAE67vIY487MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4
-        AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE
-        17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMI
-        IF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Wr1j6rW3
-        Jr1lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcS
-        sGvfC2KfnxnUUI43ZEXa7VUbXdbUUUUUU==
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
-X-CFilter-Loop: Reflected
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.6.0
+Subject: Re: [PATCH] null_blk: Support configuring the maximum segment size
+Content-Language: en-US
+To:     Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        Ming Lei <ming.lei@redhat.com>,
+        Chaitanya Kulkarni <kch@nvidia.com>
+References: <20230128005926.79336-1-bvanassche@acm.org>
+ <ff478889-7a02-135f-57b6-f56d386d7065@opensource.wdc.com>
+ <beafab98-df34-8f1c-1108-7e61080a7e21@acm.org>
+From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
+Organization: Western Digital Research
+In-Reply-To: <beafab98-df34-8f1c-1108-7e61080a7e21@acm.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi, Jens
-
-ÔÚ 2023/01/13 17:44, Yu Kuai Ð´µÀ:
-> After commit 64dc8c732f5c ("block, bfq: fix possible uaf for 'bfqq->bic'"),
-> bic->bfqq will be accessed in bic_set_bfqq(), however, in some context
-> bic->bfqq will be freed first, and bic_set_bfqq() is called with the freed
-> bic->bfqq.
+On 1/28/23 11:48, Bart Van Assche wrote:
+> On 1/27/23 17:18, Damien Le Moal wrote:
+>> On 1/28/23 09:59, Bart Van Assche wrote:
+>>> +	WARN_ONCE(len > dev->max_segment_size, "%u > %u\n", len,
+>>> +		  dev->max_segment_size);
+>>
+>> Shouldn't this be an EIO return as this is not supposed to happen ?
 > 
-> Fix the problem by always freeing bfqq after bic_set_bfqq().
+> Hmm ... the above WARN_ONCE() statement is intended as a precondition 
+> check. This statement is intended as a help for developers to check that 
+> the code below works fine. I'm not sure how returning EIO here would help?
+
+My point was that given that null_transfer() is called like this:
+
+	rq_for_each_segment(bvec, rq, iter) {
+                len = bvec.bv_len;
+                err = null_transfer(nullb, bvec.bv_page, len, bvec.bv_offset,
+                                     ...);
+
+len should never be larger than max_segment_size, no ? Unless I am missing
+something else...
+
 > 
+> Thanks
+> 
+> Bart.
 
-Sorry that I send this patch will wrong email, and you might missed this
-patch.
-
-Can you apply this patch? This patch can't be applied directly to lower
-version due to Paolo's patchset, I'll send lts patch seperately.
-
-Thanks,
-Kuai
-> Fixes: 64dc8c732f5c ("block, bfq: fix possible uaf for 'bfqq->bic'")
-> Reported-and-tested-by: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+-- 
+Damien Le Moal
+Western Digital Research
 
