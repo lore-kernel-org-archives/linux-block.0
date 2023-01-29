@@ -2,100 +2,98 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DF0DEC61D97
-	for <linux-block@archiver.kernel.org>; Sun, 29 Jan 2023 21:51:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A9CFC54EED
+	for <linux-block@archiver.kernel.org>; Sun, 29 Jan 2023 22:21:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229549AbjA2Vvn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 29 Jan 2023 16:51:43 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56188 "EHLO
+        id S235399AbjA2WU6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 29 Jan 2023 17:20:58 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41538 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235228AbjA2Vvl (ORCPT
+        with ESMTP id S234335AbjA2WU5 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 29 Jan 2023 16:51:41 -0500
-Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C919B1A496
-        for <linux-block@vger.kernel.org>; Sun, 29 Jan 2023 13:51:40 -0800 (PST)
-Received: by mail-pj1-x1030.google.com with SMTP id w6-20020a17090ac98600b0022c58cc7a18so4890171pjt.1
-        for <linux-block@vger.kernel.org>; Sun, 29 Jan 2023 13:51:40 -0800 (PST)
+        Sun, 29 Jan 2023 17:20:57 -0500
+Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 204E220690
+        for <linux-block@vger.kernel.org>; Sun, 29 Jan 2023 14:20:32 -0800 (PST)
+Received: by mail-pl1-x62f.google.com with SMTP id e6so1588634plg.12
+        for <linux-block@vger.kernel.org>; Sun, 29 Jan 2023 14:20:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=10Pr4T3evkPPQKg3Z4WSUnPLk+n8TOgwlOyguzNlXvc=;
-        b=kQM+1CafTz4AifPNzW97tONzVLTLm+vEF8Iyye32LSIsoi36btod+M6SMhwuSjChID
-         zoAjW+MhRE5AHd/9nnVasiSpPfx2pFhRz3w2VPXdeyyOtvIb0S/9kAPn3cO7p/a5Bids
-         4i0kl0sV79hfhMzgfrww/yDdoYXYhA93VWWmIWzdY4wLIh8bCkz6sf4Dv0eT/eJBHJVw
-         CX1cNIeOco0O1UHvXPSnM9nKEC4GoupqFJ3XcRc641i547oql4Ae23OUNhxjPGAluSYA
-         vevkYAgoZjnI4OWp703RysiiS3knD9jAWzR/HP2wCXH/XmwtGDrxBiMBb9lx7oai85kP
-         Ny+w==
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=PaWOdTWb/BaPcMrfWb0OI2BnQ5NRhvslPHB9PaY2czM=;
+        b=bSlmnlpDPVJKHl8Ffvd1webJtnqNaWXDEXWAQNGHj+jalLonYk3eGyf9SeIpq1BOg6
+         ZP1JHTvOyuYq0rBU6JKuasQzCF0kqyUlIYxZSeWZdCENAa5OxWXBFJhGwuH6Ca4eDC0E
+         2oUU0dR+w+fKBn1TVUAGKuMOufVG3GrRU5E9NI3ASKx0DtMyRwwn0aV77msXgVUFMKcy
+         O8JTdKE6cAOpKZBKfS+bxtcSsAP8oghB0pcfpfP+qrE6tFjyzcwnDils1ZYhHKHwkP0o
+         BQgJXcT9BEenssOUSVckjG6UwLYw1C986N/6o/DgTJVrw2hbV0nSciHCqpFNh2S7mTBu
+         XIoQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=10Pr4T3evkPPQKg3Z4WSUnPLk+n8TOgwlOyguzNlXvc=;
-        b=OVR3DvQftNq7GSiZJTdo2P2n9pEhEYLhK9b1CP3c115gmJ2LKqbEY1SN6Sv4K19Yt9
-         /q6IW/V41xzgTQ5NJD8PgH/4B4nIyD87VScrdd2Vse1qfzUeAnKzy3Z9X1sk99OocF3o
-         8pJgRpLg0s0vd3BHuK35M8nzc/ww87IJbyl2eartBfafMmMQVvnV4bvl1OCPGvfeehjE
-         t793bLuFFW1/LE05p4j80c5N0bU+gGeEXR3MMAbreZVscHpGcdwWY4+HheqmrG07u19A
-         EnHboU4V+1wEMV3/EBfm5CO6ldCezzk39MLqVgEXNHlsKQVwUzFqP+ehpi1zh0mmv6S3
-         y9TQ==
-X-Gm-Message-State: AO0yUKWEjGsIDBU24y8j5B/t/SXol4wxLmglC0ZvGgnKuXgtuQLcXQH/
-        oBXvMnYiG4Iad/1ERBJtOM+pNA==
-X-Google-Smtp-Source: AK7set9UwyyS480BvbwK2q/t9G/ERX1sK6n1yKDw4WAIvyBBQLF0ETzkHs48lSwH06DxKPhLr30o6w==
-X-Received: by 2002:a17:902:780a:b0:196:5640:b065 with SMTP id p10-20020a170902780a00b001965640b065mr2217816pll.6.1675029100217;
-        Sun, 29 Jan 2023 13:51:40 -0800 (PST)
-Received: from [192.168.1.136] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id c4-20020a170902b68400b0019644d4242dsm90993pls.82.2023.01.29.13.51.38
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 29 Jan 2023 13:51:39 -0800 (PST)
-Message-ID: <7ae20fa2-d9b4-9e21-4209-81bf4845a3c5@kernel.dk>
-Date:   Sun, 29 Jan 2023 14:51:38 -0700
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.0
-Subject: Re: [PATCH] block, bfq: fix uaf for bfqq in bic_set_bfqq()
-Content-Language: en-US
-To:     Yu Kuai <yukuai1@huaweicloud.com>, jack@suse.cz, tj@kernel.org,
-        josef@toxicpanda.com, paolo.valente@linaro.org,
-        shinichiro.kawasaki@wdc.com
-Cc:     cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, yi.zhang@huawei.com,
-        yangerkun@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
-References: <20230113094410.2907223-1-yukuai3@huawei.com>
- <4d3f6183-f9d4-b657-0205-fc240bc24c76@huaweicloud.com>
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=PaWOdTWb/BaPcMrfWb0OI2BnQ5NRhvslPHB9PaY2czM=;
+        b=JUzCVS4MIhAMqd5X65BE7P/QvkV+yP1gQsK/Miry3owOIkLNJ5czfB96UG+BhJ1DO/
+         mSaXISbEz/fjN0NTgJAPMvNGeQ5g8NR/WmB5KfRsS2URfjNDIBC9pz2gR1r1jdZp8vCo
+         5Fr81ylzVSdJNJHj4nBO5Y7CKh2vQDFPphrRrQJ9CGxQjfJ1P4j6bkNBULAVeeK/6POn
+         ApOBuDKoqLGcKTcSV3lQiF7RKqkjKw1jO4Khw4xuCOl6xaNbRp2npidb86qGIeW5Av15
+         WPHAJQoaDlIUzWU/emyghHc9XmV6Nt4W1Pos5oKEObe0YEcNAAiJQdZ3GD8nbbcPIcac
+         jSdg==
+X-Gm-Message-State: AFqh2kpfaWj9O2tqdwfagitSNYUC37wCosTSfYU5ZPCDjkA5jHf08rGr
+        JcyphRN6meoPL5f/0s3BZPcSKQ==
+X-Google-Smtp-Source: AMrXdXvAHw97vibrROFpK/kUdk8lNr6QstPYl8Bwstm0UmgWV52Sf0KG6dD81f7+VosrWn1jiWixkQ==
+X-Received: by 2002:a17:903:543:b0:192:fa8a:568a with SMTP id jo3-20020a170903054300b00192fa8a568amr11609822plb.2.1675030831334;
+        Sun, 29 Jan 2023 14:20:31 -0800 (PST)
+Received: from [127.0.0.1] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id x15-20020a170902ec8f00b001968b529c98sm23603plg.128.2023.01.29.14.20.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 29 Jan 2023 14:20:30 -0800 (PST)
 From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <4d3f6183-f9d4-b657-0205-fc240bc24c76@huaweicloud.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+To:     tj@kernel.org, hch@lst.de, josef@toxicpanda.com,
+        Yu Kuai <yukuai1@huaweicloud.com>
+Cc:     cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, yukuai3@huawei.com,
+        yi.zhang@huawei.com, yangerkun@huawei.com
+In-Reply-To: <20230119110350.2287325-1-yukuai1@huaweicloud.com>
+References: <20230119110350.2287325-1-yukuai1@huaweicloud.com>
+Subject: Re: [PATCH -next v3 0/3] blk-cgroup: make sure pd_free_fn() is
+ called in order
+Message-Id: <167503083019.59803.12005563665423303861.b4-ty@kernel.dk>
+Date:   Sun, 29 Jan 2023 15:20:30 -0700
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.12.0
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/28/23 6:38 PM, Yu Kuai wrote:
-> Hi, Jens
-> 
-> 在 2023/01/13 17:44, Yu Kuai 写道:
->> After commit 64dc8c732f5c ("block, bfq: fix possible uaf for 'bfqq->bic'"),
->> bic->bfqq will be accessed in bic_set_bfqq(), however, in some context
->> bic->bfqq will be freed first, and bic_set_bfqq() is called with the freed
->> bic->bfqq.
->>
->> Fix the problem by always freeing bfqq after bic_set_bfqq().
->>
-> 
-> Sorry that I send this patch will wrong email, and you might missed this
-> patch.
-> 
-> Can you apply this patch? This patch can't be applied directly to lower
-> version due to Paolo's patchset, I'll send lts patch seperately.
 
-I'm confused... So this patch only applies to the 6.3 branch, yet we
-need it in 6.2 as far as I can tell. Why isn't it against block-6.2
-then?
+On Thu, 19 Jan 2023 19:03:47 +0800, Yu Kuai wrote:
+> Changes in v3:
+>  - add ack tag from Tejun for patch 1,2
+>  - as suggested by Tejun, update commit message and comments in patch 3
+> 
+> The problem was found in iocost orignally([1]) that ioc can be freed in
+> ioc_pd_free(). And later we found that there are more problem in
+> iocost([2]).
+> 
+> [...]
 
+Applied, thanks!
+
+[1/3] blk-cgroup: dropping parent refcount after pd_free_fn() is done
+      commit: c7241babf0855d8a6180cd1743ff0ec34de40b4e
+[2/3] blk-cgroup: support to track if policy is online
+      commit: dfd6200a095440b663099d8d42f1efb0175a1ce3
+[3/3] blk-cgroup: synchronize pd_free_fn() from blkg_free_workfn() and blkcg_deactivate_policy()
+      commit: f1c006f1c6850c14040f8337753a63119bba39b9
+
+Best regards,
 -- 
 Jens Axboe
+
 
 
