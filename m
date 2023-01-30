@@ -2,504 +2,142 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B946BC7618B
-	for <linux-block@archiver.kernel.org>; Mon, 30 Jan 2023 22:59:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 851F3C61DA4
+	for <linux-block@archiver.kernel.org>; Mon, 30 Jan 2023 23:18:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229518AbjA3W7M (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 30 Jan 2023 17:59:12 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55250 "EHLO
+        id S230138AbjA3XSj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 30 Jan 2023 18:18:39 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46252 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229725AbjA3W6p (ORCPT
+        with ESMTP id S230058AbjA3XSi (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 30 Jan 2023 17:58:45 -0500
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 74C3A1E9F7;
-        Mon, 30 Jan 2023 14:58:42 -0800 (PST)
-Received: by linux.microsoft.com (Postfix, from userid 1052)
-        id 1685920EA1E6; Mon, 30 Jan 2023 14:58:41 -0800 (PST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 1685920EA1E6
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-        s=default; t=1675119522;
-        bh=oBH6B/7tvfVHuvCYy6kWpso1VakQP0OiUtr5HYsOjkM=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=Ist+8lG+cgW2nhL8x+uKJHzbKXnINu/qPx7Ne6sG38uD/2uRp7JzUdM8ZihJyXlyO
-         mYHEeG9YCS8OyLcQ7XFw6fgbAiA1SaKG4acnGXyAzm4pdZ4hbxEOkMMuI7q4gwj1dI
-         GjYdiTbQYdWGKz4HujYpLUSbc5pfM0I6UvrZth5w=
-From:   Fan Wu <wufan@linux.microsoft.com>
-To:     corbet@lwn.net, zohar@linux.ibm.com, jmorris@namei.org,
-        serge@hallyn.com, tytso@mit.edu, ebiggers@kernel.org,
-        axboe@kernel.dk, agk@redhat.com, snitzer@kernel.org,
-        eparis@redhat.com, paul@paul-moore.com
-Cc:     linux-doc@vger.kernel.org, linux-integrity@vger.kernel.org,
-        linux-security-module@vger.kernel.org,
-        linux-fscrypt@vger.kernel.org, linux-block@vger.kernel.org,
-        dm-devel@redhat.com, linux-audit@redhat.com,
-        roberto.sassu@huawei.com, linux-kernel@vger.kernel.org,
-        Deven Bowers <deven.desai@linux.microsoft.com>,
-        Fan Wu <wufan@linux.microsoft.com>
-Subject: [RFC PATCH v9 03/16] ipe: add evaluation loop and introduce 'boot_verified' as a trust provider
-Date:   Mon, 30 Jan 2023 14:57:18 -0800
-Message-Id: <1675119451-23180-4-git-send-email-wufan@linux.microsoft.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1675119451-23180-1-git-send-email-wufan@linux.microsoft.com>
-References: <1675119451-23180-1-git-send-email-wufan@linux.microsoft.com>
+        Mon, 30 Jan 2023 18:18:38 -0500
+Received: from esa3.hgst.iphmx.com (esa3.hgst.iphmx.com [216.71.153.141])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9837F27D79
+        for <linux-block@vger.kernel.org>; Mon, 30 Jan 2023 15:18:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1675120716; x=1706656716;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=Vbd5tFkeprAIcq+FYPAfIxJtlFp/qJLwVv9T4su6GKg=;
+  b=gJg6QVSyID2bp9rhPhecokeHm475FmYB7PpPTSYeVVOcyAwoY6eNrqea
+   GbAftFFUv72wGQ4l1FlKvwIfU3+GldkOd9U05n3tKc+uPgRXnDrwUy+5o
+   EaCjZjsPqGL+X6Rpx3n8yCQVcHVuYHWzngpXZr2m2jHU0szGViD1wAPsJ
+   R3Epk3rIV3QW72LT6sBROKSjdbAKTqaoSx3W47C/+mcDcFhKssJcNcQQr
+   MTLNOc8TIy3jWCuGIL+ZXWMsIKeYEE7y3yYwPrqd7YoGkreIO2G8ectyg
+   w3HGwYUOtHh3soIgIZW3m9wQOvMcl0sIJA0lRtWebQHqKqNhFAGNRZC3l
+   g==;
+X-IronPort-AV: E=Sophos;i="5.97,259,1669046400"; 
+   d="scan'208";a="227090615"
+Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
+  by ob1.hgst.iphmx.com with ESMTP; 31 Jan 2023 07:18:35 +0800
+IronPort-SDR: Rt21ZAQAtuxiASQop1UxzOPPKCBULNMbyFkl6XrM9JTRefuQo7+Ll+0LkAnEbvaaRYjAM0TeHg
+ HDLyhaWdPq9lzz/yfpBGA2SCC2J1sV75EwTWUrFR3aGE58zdQ89u3x9+D8NRRCVOq5DY/FN9Rr
+ V6ejOvqB3FaGQb5qig7su7qLRgDgWylw4hdjwDaXgoO8kLjwykRU+iZd9t9RCE3YC9BqQYIzGA
+ PW1xYkxknwCtWuGKuIq2tlTKFbl/BnI2aIxoq2LGZNTtN4Hrfg5azn8pdkogKW1PLMWwNnx147
+ N1s=
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 30 Jan 2023 14:30:17 -0800
+IronPort-SDR: YtYQkwqv8I+rc65iHJzrWC7ZyZxIKcr6J5dYw3rI4VHt8rOcvox6uaQOIWlfWkIjYXjk5BoqKa
+ 69/YxPc3RXkTWBvnsS2Ly4SvYh52yLIA0/RSBHWSl2O8hVozQk8yJlPhs2O0G0oN6dQrgcqwdA
+ Vnjq0Vq/vLF+SMXebZ77zHmgu/6TXztfVjNBxDy8aRF99Xp1i83vxQPIdDOhScWkTCEMjOm7V7
+ eIdq/PosokA/22BPfCL6Kwz0NxkVnCIGvdvDk3z4HzI9fY/TobI0uUC7kFaXHXr6g+oHeP4Wbs
+ 100=
+WDCIronportException: Internal
+Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
+  by uls-op-cesaip02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 30 Jan 2023 15:18:37 -0800
+Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4P5PHv3fnNz1RwqL
+        for <linux-block@vger.kernel.org>; Mon, 30 Jan 2023 15:18:35 -0800 (PST)
+Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
+        reason="pass (just generated, assumed good)"
+        header.d=opensource.wdc.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
+        opensource.wdc.com; h=content-transfer-encoding:content-type
+        :in-reply-to:organization:from:references:to:content-language
+        :subject:user-agent:mime-version:date:message-id; s=dkim; t=
+        1675120714; x=1677712715; bh=Vbd5tFkeprAIcq+FYPAfIxJtlFp/qJLwVv9
+        T4su6GKg=; b=Zop0i3VQ3u0/Kkq/wuoVylW+23K85upEkoq/q6NTalzD6owpopr
+        QE/5VBD7F1seNe97EvN9SqvP5DlWDe0pksqGH0l9DUYRJBtewJycL9JczGbE866a
+        W7K4aQMYIEySRX5r+nkVehAHhwdOCXNSqe01eOpAWv2Ib9S41sSRH/7lk8PIqiQy
+        dv6v0ud7xbsnRcDKhfJKtf3Oydm5Gn5xK7/aYtjeMA+DCv5KCB4fWqiM5uYI3Fmb
+        HqGTEfDiP7ycpXIRYkD/eCNa+mYNFvVfAGF05ppp4OjfOvNmAOXnamKkQEYQyBx3
+        FCLnLLjIZi/HLJvRSePWy3ve2aWNNs+3P9Q==
+X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
+Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
+        by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
+        with ESMTP id gC8-4ScUOO-n for <linux-block@vger.kernel.org>;
+        Mon, 30 Jan 2023 15:18:34 -0800 (PST)
+Received: from [10.225.163.70] (unknown [10.225.163.70])
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4P5PHs3SlDz1RvLy;
+        Mon, 30 Jan 2023 15:18:33 -0800 (PST)
+Message-ID: <1ad62b40-28ed-f452-ecda-6470068b4034@opensource.wdc.com>
+Date:   Tue, 31 Jan 2023 08:18:31 +0900
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.6.0
+Subject: Re: [PATCH v3] pata_parport: add driver (PARIDE replacement)
+Content-Language: en-US
+To:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>
+Cc:     Ondrej Zary <linux@zary.sk>, Sergey Shtylyov <s.shtylyov@omp.ru>,
+        Tim Waugh <tim@cyberelk.net>, linux-block@vger.kernel.org,
+        linux-parport@lists.infradead.org, linux-ide@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <425b5646-23e2-e271-5ca6-0f3783d39a3b@opensource.wdc.com>
+ <20230123190954.5085-1-linux@zary.sk>
+ <d4f7ebd5-d90d-fb96-0fad-bd129ac162dc@opensource.wdc.com>
+ <e843fde8-7295-dd30-6d98-a62f63d7753c@kernel.dk>
+ <20230130064815.GA31925@lst.de>
+ <569cb9ba-52d6-da73-dba0-cc62c91f6db2@opensource.wdc.com>
+ <7a2f5b2f-3ed9-eabb-6c9b-dcb2bfe82a08@kernel.dk>
+From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
+Organization: Western Digital Research
+In-Reply-To: <7a2f5b2f-3ed9-eabb-6c9b-dcb2bfe82a08@kernel.dk>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Deven Bowers <deven.desai@linux.microsoft.com>
+On 1/31/23 00:25, Jens Axboe wrote:
+> On 1/30/23 12:10=E2=80=AFAM, Damien Le Moal wrote:
+>> On 1/30/23 15:48, Christoph Hellwig wrote:
+>>> On Sun, Jan 29, 2023 at 08:44:06PM -0700, Jens Axboe wrote:
+>>>> I would prefer if we just delete it after merging this one, in the s=
+ame
+>>>> release. I don't think there's any point in delaying, as we're not
+>>>> removing any functionality.
+>>>>
+>>>> You could just queue that up too when adding this patch.
+>>>
+>>> I'd prefer to just deprecate.  But most importantly I want this patch
+>>> in ASAP in some form.
+>>
+>> I will queue it. But I think it needs a follow up to result in somethi=
+ng
+>> consistent with KConfig. So either deprecate or delete PARPORT. I can =
+queue the
+>> deprecate patch and delete in 6.4, even though I share Jen's opinion t=
+o simply
+>> delete directly. I am still fine either way.
+>>
+>> Jens,
+>>
+>> If you are OK with that, can I get your ack for the deprecate patch ? =
+Unless you
+>> prefer taking it through the block tree. Either way is fine with me.
+>=20
+> Yeah I'd be happy to ack that, did you post it? You can add my ack to t=
+he
+> new driver, fine with that now.
 
-IPE must have a centralized function to evaluate incoming callers
-against IPE's policy. This iteration of the policy against the rules
-for that specific caller is known as the evaluation loop.
+Will do. But I did not want to queue the new driver without killing (or
+deprecating) the old code too. Ondrej has now sent 2 patches to remove th=
+e old
+code. Please ack that !
 
-In addition, IPE is designed to provide system level trust guarantees,
-this usually implies that trust starts from bootup with a hardware root
-of trust, which validates the bootloader. After this, the bootloader
-verifies the kernel and the initramfs.
-
-As there's no currently supported integrity method for initramfs, and
-it's typically already verified by the bootloader, introduce a property
-that causes the first superblock to have an execution to be "pinned",
-which is typically initramfs.
-
-Signed-off-by: Deven Bowers <deven.desai@linux.microsoft.com>
-Signed-off-by: Fan Wu <wufan@linux.microsoft.com>
-
----
-v2:
-  + Split evaluation loop, access control hooks,
-    and evaluation loop from policy parser and userspace
-    interface to pass mailing list character limit
-
-v3:
-  + Move ipe_load_properties to patch 04.
-  + Remove useless 0-initializations
-  + Prefix extern variables with ipe_
-  + Remove kernel module parameters, as these are
-    exposed through sysctls.
-  + Add more prose to the IPE base config option
-    help text.
-  + Use GFP_KERNEL for audit_log_start.
-  + Remove unnecessary caching system.
-  + Remove comments from headers
-  + Use rcu_access_pointer for rcu-pointer null check
-  + Remove usage of reqprot; use prot only.
-  + Move policy load and activation audit event to 03/12
-
-v4:
-  + Remove sysctls in favor of securityfs nodes
-  + Re-add kernel module parameters, as these are now
-    exposed through securityfs.
-  + Refactor property audit loop to a separate function.
-
-v5:
-  + fix minor grammatical errors
-  + do not group rule by curly-brace in audit record,
-    reconstruct the exact rule.
-
-v6:
-  + No changes
-
-v7:
-  + Further split lsm creation into a separate commit from the
-    evaluation loop and audit system, for easier review.
-
-  + Propogating changes to support the new ipe_context structure in the
-    evaluation loop.
-
-v8:
-  + Remove ipe_hook enumeration; hooks can be correlated via syscall
-    record.
-
-v9:
-  + Remove ipe_context related code and simplify the evaluation loop.
-  + Merge the evaluation loop commit with the boot_verified commit.
----
- security/ipe/Makefile        |   1 +
- security/ipe/eval.c          | 180 +++++++++++++++++++++++++++++++++++
- security/ipe/eval.h          |  28 ++++++
- security/ipe/hooks.c         |  25 +++++
- security/ipe/hooks.h         |  14 +++
- security/ipe/ipe.c           |   1 +
- security/ipe/policy.c        |  20 ++++
- security/ipe/policy.h        |   3 +
- security/ipe/policy_parser.c |   8 +-
- 9 files changed, 279 insertions(+), 1 deletion(-)
- create mode 100644 security/ipe/eval.c
- create mode 100644 security/ipe/eval.h
- create mode 100644 security/ipe/hooks.c
- create mode 100644 security/ipe/hooks.h
-
-diff --git a/security/ipe/Makefile b/security/ipe/Makefile
-index 16bbe80991f1..d7f2870d7c09 100644
---- a/security/ipe/Makefile
-+++ b/security/ipe/Makefile
-@@ -6,6 +6,7 @@
- #
- 
- obj-$(CONFIG_SECURITY_IPE) += \
-+	eval.o \
- 	hooks.o \
- 	ipe.o \
- 	policy.o \
-diff --git a/security/ipe/eval.c b/security/ipe/eval.c
-new file mode 100644
-index 000000000000..48b5104a3463
---- /dev/null
-+++ b/security/ipe/eval.c
-@@ -0,0 +1,180 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * Copyright (C) Microsoft Corporation. All rights reserved.
-+ */
-+
-+#include "ipe.h"
-+#include "eval.h"
-+#include "hooks.h"
-+#include "policy.h"
-+
-+#include <linux/fs.h>
-+#include <linux/types.h>
-+#include <linux/slab.h>
-+#include <linux/file.h>
-+#include <linux/sched.h>
-+#include <linux/rcupdate.h>
-+#include <linux/spinlock.h>
-+
-+struct ipe_policy __rcu *ipe_active_policy;
-+
-+static struct super_block *pinned_sb;
-+static DEFINE_SPINLOCK(pin_lock);
-+#define FILE_SUPERBLOCK(f) ((f)->f_path.mnt->mnt_sb)
-+
-+/**
-+ * pin_sb - Pin the underlying superblock of @f, marking it as trusted.
-+ * @f: Supplies a file structure to source the super_block from.
-+ */
-+static void pin_sb(const struct file *f)
-+{
-+	if (!f)
-+		return;
-+	spin_lock(&pin_lock);
-+	if (pinned_sb)
-+		goto out;
-+	pinned_sb = FILE_SUPERBLOCK(f);
-+out:
-+	spin_unlock(&pin_lock);
-+}
-+
-+/**
-+ * from_pinned - Determine whether @f is source from the pinned super_block.
-+ * @f: Supplies a file structure to check against the pinned super_block.
-+ *
-+ * Return:
-+ * * true	- @f is sourced from the pinned super_block
-+ * * false	- @f is not sourced from the pinned super_block
-+ */
-+static bool from_pinned(const struct file *f)
-+{
-+	bool rv;
-+
-+	if (!f)
-+		return false;
-+	spin_lock(&pin_lock);
-+	rv = !IS_ERR_OR_NULL(pinned_sb) && pinned_sb == FILE_SUPERBLOCK(f);
-+	spin_unlock(&pin_lock);
-+	return rv;
-+}
-+
-+/**
-+ * build_eval_ctx - Build an evaluation context.
-+ * @ctx: Supplies a pointer to the context to be populdated.
-+ * @file: Supplies a pointer to the file to associated with the evaluation.
-+ * @op: Supplies the IPE policy operation associated with the evaluation.
-+ */
-+void build_eval_ctx(struct ipe_eval_ctx *ctx,
-+		    const struct file *file,
-+		    enum ipe_op_type op)
-+{
-+	ctx->file = file;
-+	ctx->op = op;
-+	ctx->from_init_sb = from_pinned(file);
-+}
-+
-+/**
-+ * evaluate_property - Analyze @ctx against a property.
-+ * @ctx: Supplies a pointer to the context to be evaluated.
-+ * @p: Supplies a pointer to the property to be evaluated.
-+ *
-+ * Return:
-+ * * true	- The current @ctx match the @p
-+ * * false	- The current @ctx doesn't match the @p
-+ */
-+static bool evaluate_property(const struct ipe_eval_ctx *const ctx,
-+			      struct ipe_prop *p)
-+{
-+	bool eval = false;
-+
-+	switch (p->type) {
-+	case ipe_prop_boot_verified_false:
-+		eval = !ctx->from_init_sb;
-+		break;
-+	case ipe_prop_boot_verified_true:
-+		eval = ctx->from_init_sb;
-+		break;
-+	default:
-+		eval = false;
-+	}
-+
-+	return eval;
-+}
-+
-+/**
-+ * ipe_evaluate_event - Analyze @ctx against the current active policy.
-+ * @ctx: Supplies a pointer to the context to be evaluated.
-+ *
-+ * This is the loop where all policy evaluation happens against IPE policy.
-+ *
-+ * Return:
-+ * * 0		- OK
-+ * * -EACCES	- @ctx did not pass evaluation.
-+ * * !0		- Error
-+ */
-+int ipe_evaluate_event(const struct ipe_eval_ctx *const ctx)
-+{
-+	int rc = 0;
-+	bool match = false;
-+	enum ipe_action_type action;
-+	struct ipe_policy *pol = NULL;
-+	const struct ipe_rule *rule = NULL;
-+	const struct ipe_op_table *rules = NULL;
-+	struct ipe_prop *prop = NULL;
-+
-+	if (ctx->op == ipe_op_exec)
-+		pin_sb(ctx->file);
-+
-+	pol = ipe_get_policy_rcu(ipe_active_policy);
-+	if (!pol)
-+		goto out;
-+
-+	if (ctx->op == ipe_op_max) {
-+		action = pol->parsed->global_default_action;
-+		goto eval;
-+	}
-+
-+	rules = &pol->parsed->rules[ctx->op];
-+
-+	list_for_each_entry(rule, &rules->rules, next) {
-+		match = true;
-+
-+		list_for_each_entry(prop, &rule->props, next)
-+			match = match && evaluate_property(ctx, prop);
-+
-+		if (match)
-+			break;
-+	}
-+
-+	if (match)
-+		action = rule->action;
-+	else if (rules->default_action != ipe_action_max)
-+		action = rules->default_action;
-+	else
-+		action = pol->parsed->global_default_action;
-+
-+eval:
-+	if (action == ipe_action_deny)
-+		rc = -EACCES;
-+
-+out:
-+	return rc;
-+}
-+
-+/**
-+ * ipe_invalidate_pinned_sb - invalidte the ipe pinned super_block.
-+ * @mnt_sb: super_block to check against the pinned super_block.
-+ *
-+ * This function is called a super_block like the initramfs's is freed,
-+ * if the super_block is currently pinned by ipe it will be invalided,
-+ * so ipe won't consider the block device is boot verified afterward.
-+ */
-+void ipe_invalidate_pinned_sb(const struct super_block *mnt_sb)
-+{
-+	spin_lock(&pin_lock);
-+
-+	if (!IS_ERR_OR_NULL(pinned_sb) && mnt_sb == pinned_sb)
-+		pinned_sb = ERR_PTR(-EIO);
-+
-+	spin_unlock(&pin_lock);
-+}
-diff --git a/security/ipe/eval.h b/security/ipe/eval.h
-new file mode 100644
-index 000000000000..887797438b9b
---- /dev/null
-+++ b/security/ipe/eval.h
-@@ -0,0 +1,28 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+/*
-+ * Copyright (C) Microsoft Corporation. All rights reserved.
-+ */
-+
-+#ifndef IPE_EVAL_H
-+#define IPE_EVAL_H
-+
-+#include <linux/file.h>
-+#include <linux/types.h>
-+
-+#include "hooks.h"
-+#include "policy.h"
-+
-+extern struct ipe_policy __rcu *ipe_active_policy;
-+
-+struct ipe_eval_ctx {
-+	enum ipe_op_type op;
-+
-+	const struct file *file;
-+	bool from_init_sb;
-+};
-+
-+void build_eval_ctx(struct ipe_eval_ctx *ctx, const struct file *file, enum ipe_op_type op);
-+int ipe_evaluate_event(const struct ipe_eval_ctx *const ctx);
-+void ipe_invalidate_pinned_sb(const struct super_block *mnt_sb);
-+
-+#endif /* IPE_EVAL_H */
-diff --git a/security/ipe/hooks.c b/security/ipe/hooks.c
-new file mode 100644
-index 000000000000..335b773c7ae1
---- /dev/null
-+++ b/security/ipe/hooks.c
-@@ -0,0 +1,25 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * Copyright (C) Microsoft Corporation. All rights reserved.
-+ */
-+
-+#include "ipe.h"
-+#include "hooks.h"
-+#include "eval.h"
-+
-+#include <linux/fs.h>
-+#include <linux/types.h>
-+#include <linux/binfmts.h>
-+#include <linux/mman.h>
-+
-+/**
-+ * ipe_sb_free_security - ipe security hook function for super_block.
-+ * @mnt_sb: Supplies a pointer to a super_block is about to be freed.
-+ *
-+ * IPE does not have any structures with mnt_sb, but uses this hook to
-+ * invalidate a pinned super_block.
-+ */
-+void ipe_sb_free_security(struct super_block *mnt_sb)
-+{
-+	ipe_invalidate_pinned_sb(mnt_sb);
-+}
-diff --git a/security/ipe/hooks.h b/security/ipe/hooks.h
-new file mode 100644
-index 000000000000..30fe455389bf
---- /dev/null
-+++ b/security/ipe/hooks.h
-@@ -0,0 +1,14 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+/*
-+ * Copyright (C) Microsoft Corporation. All rights reserved.
-+ */
-+#ifndef IPE_HOOKS_H
-+#define IPE_HOOKS_H
-+
-+#include <linux/fs.h>
-+#include <linux/binfmts.h>
-+#include <linux/security.h>
-+
-+void ipe_sb_free_security(struct super_block *mnt_sb);
-+
-+#endif /* IPE_HOOKS_H */
-diff --git a/security/ipe/ipe.c b/security/ipe/ipe.c
-index 9ed3bf4dcc04..551c6d90ac11 100644
---- a/security/ipe/ipe.c
-+++ b/security/ipe/ipe.c
-@@ -9,6 +9,7 @@ static struct lsm_blob_sizes ipe_blobs __lsm_ro_after_init = {
- };
- 
- static struct security_hook_list ipe_hooks[] __lsm_ro_after_init = {
-+	LSM_HOOK_INIT(sb_free_security, ipe_sb_free_security),
- };
- 
- /**
-diff --git a/security/ipe/policy.c b/security/ipe/policy.c
-index e446f4b84152..772d876b1087 100644
---- a/security/ipe/policy.c
-+++ b/security/ipe/policy.c
-@@ -97,3 +97,23 @@ struct ipe_policy *ipe_new_policy(const char *text, size_t textlen,
- err:
- 	return ERR_PTR(rc);
- }
-+
-+/**
-+ * ipe_get_policy_rcu - Dereference a rcu-protected policy pointer.
-+ *
-+ * @p: rcu-protected pointer to a policy.
-+ *
-+ * Not safe to call on IS_ERR.
-+ *
-+ * Return: the value of @p
-+ */
-+struct ipe_policy *ipe_get_policy_rcu(struct ipe_policy __rcu *p)
-+{
-+	struct ipe_policy *rv = NULL;
-+
-+	rcu_read_lock();
-+	rv = rcu_dereference(p);
-+	rcu_read_unlock();
-+
-+	return rv;
-+}
-diff --git a/security/ipe/policy.h b/security/ipe/policy.h
-index 6af2d9a811ec..967d816cd5cd 100644
---- a/security/ipe/policy.h
-+++ b/security/ipe/policy.h
-@@ -26,6 +26,8 @@ enum ipe_action_type {
- };
- 
- enum ipe_prop_type {
-+	ipe_prop_boot_verified_false,
-+	ipe_prop_boot_verified_true,
- 	ipe_prop_max
- };
- 
-@@ -73,5 +75,6 @@ struct ipe_policy {
- struct ipe_policy *ipe_new_policy(const char *text, size_t textlen,
- 				  const char *pkcs7, size_t pkcs7len);
- void ipe_free_policy(struct ipe_policy *pol);
-+struct ipe_policy *ipe_get_policy_rcu(struct ipe_policy __rcu *p);
- 
- #endif /* IPE_POLICY_H */
-diff --git a/security/ipe/policy_parser.c b/security/ipe/policy_parser.c
-index c7ba0e865366..7efafc482e46 100644
---- a/security/ipe/policy_parser.c
-+++ b/security/ipe/policy_parser.c
-@@ -265,7 +265,9 @@ static enum ipe_action_type parse_action(char *t)
- }
- 
- static const match_table_t property_tokens = {
--	{ipe_prop_max,					NULL}
-+	{ipe_prop_boot_verified_false,	"boot_verified=FALSE"},
-+	{ipe_prop_boot_verified_true,	"boot_verified=TRUE"},
-+	{ipe_prop_max,			NULL}
- };
- 
- /**
-@@ -295,6 +297,10 @@ int parse_property(char *t, struct ipe_rule *r)
- 	token = match_token(t, property_tokens, args);
- 
- 	switch (token) {
-+	case ipe_prop_boot_verified_false:
-+	case ipe_prop_boot_verified_true:
-+		p->type = token;
-+		break;
- 	case ipe_prop_max:
- 	default:
- 		rc = -EBADMSG;
--- 
-2.39.0
+--=20
+Damien Le Moal
+Western Digital Research
 
