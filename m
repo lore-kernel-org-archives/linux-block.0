@@ -2,42 +2,42 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C528C54EAA
-	for <linux-block@archiver.kernel.org>; Mon, 30 Jan 2023 21:27:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 960E5C64EC3
+	for <linux-block@archiver.kernel.org>; Mon, 30 Jan 2023 21:27:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230514AbjA3V1N (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 30 Jan 2023 16:27:13 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47476 "EHLO
+        id S231127AbjA3V1P (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 30 Jan 2023 16:27:15 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47500 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230515AbjA3V1K (ORCPT
+        with ESMTP id S230513AbjA3V1N (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 30 Jan 2023 16:27:10 -0500
-Received: from mail-pj1-f49.google.com (mail-pj1-f49.google.com [209.85.216.49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30E9E485A7;
-        Mon, 30 Jan 2023 13:27:10 -0800 (PST)
-Received: by mail-pj1-f49.google.com with SMTP id n20-20020a17090aab9400b00229ca6a4636so16957511pjq.0;
-        Mon, 30 Jan 2023 13:27:10 -0800 (PST)
+        Mon, 30 Jan 2023 16:27:13 -0500
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F88636FD8;
+        Mon, 30 Jan 2023 13:27:13 -0800 (PST)
+Received: by mail-pl1-f174.google.com with SMTP id m13so1146938plx.13;
+        Mon, 30 Jan 2023 13:27:13 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=idfcEYfQnXda9MtyBSs+vCtAqmQuKIMEL+tvI67zHT4=;
-        b=CYUGwHJjHOdyqdJpHoTPbLpBV5xn+h+U5bJoS/bMdcZPdGoItDYlsskq3aInsKKZSJ
-         Q4xhL559Sizq8cdNNFXuQ//eusGZz7sljr/LVtAxfqcqcmfwJYcUfoQWrbdVjMZb5+Fd
-         WX6cvpY5kisDiqtC9k81beX9OA8UnnwENohBLTmeg0gqaSYD1e5XGxm+iF0G/JfYnWGZ
-         dZpTBASl7uIqqEJxYgEUEoqT4Sw7ua+MHARXAVaxj83fypg4RSR+yUJioseSBdh5hITu
-         N6QBJqvaArz+V8U4BkYsVoaofMFRVVZsbnodcjPKw/VKxct2uEQMaliIQfQNJ36MZAne
-         vXpg==
-X-Gm-Message-State: AO0yUKWN2Ld+PeytkzfBGtOXfp3pQ+luPCW05Q7JIBYQkqHSlYOqtEnz
-        kS7jefsjGl/B1fU6v/xKsyQ=
-X-Google-Smtp-Source: AK7set9yBb5kiXQ8NbiLhcIuk9sp63h3wbmDzuyqRDEXkfNmNx3bMFqDe2LHwBDOg4/bS7nPPeQUcQ==
-X-Received: by 2002:a17:903:32c1:b0:196:82d2:93a with SMTP id i1-20020a17090332c100b0019682d2093amr6168491plr.11.1675114029446;
-        Mon, 30 Jan 2023 13:27:09 -0800 (PST)
+        bh=rtucAFCDyuLZyrm6z27M/7hQlUm2l9x/qBJJhm+fNmU=;
+        b=nbLprZAxrbq+6CTEVxAAhbkwXujmC2CeZ62qcKuIgDaw7yQ6C5w9n4A55yVRXOYFFQ
+         Yz6z4F0/E3yQEtyU1tqdVTyPdNU6FStpjGUjTJovBBIxUwnGkSpyrM/ar97SumsBTj6H
+         n1i54/6ZDe6S/XDXZpncWXAOmlHLh1rrxGxIxEQ0b00L1+9/Hy+ZWc2+Oc8ivAoV37vc
+         j0IwoAbWE9y4+lmkQtgPLLuWkTuYD2JbtMssNclmxkwVXlU+v/RhECPa58pH48OgDcu+
+         ESmbiMWAIAGaGBTsl7E2SukJv0uzWccQx131j5R4Cx8MXe00W7e/b9B1Ri9A4DLZsN5t
+         pSHQ==
+X-Gm-Message-State: AFqh2kprDdFO1ClLM3A/yU8typMYTvKnyecDFrA6XOSJVfAgsENYQd2M
+        HEhOKcwhyfauVnmwSbPXIho=
+X-Google-Smtp-Source: AMrXdXtlZP1XxVoQCk5h0aRRePW2d8tgHgY7Xxu8XR1dpG1TYt/mXu08DHFujMUaY5mJx99pADsEag==
+X-Received: by 2002:a17:903:248f:b0:189:6ab3:9e64 with SMTP id p15-20020a170903248f00b001896ab39e64mr47521682plw.34.1675114032726;
+        Mon, 30 Jan 2023 13:27:12 -0800 (PST)
 Received: from bvanassche-linux.mtv.corp.google.com ([2620:15c:211:201:5016:3bcd:59fe:334b])
-        by smtp.gmail.com with ESMTPSA id u18-20020a170902e5d200b00196087a3d7csm7425613plf.77.2023.01.30.13.27.07
+        by smtp.gmail.com with ESMTPSA id u18-20020a170902e5d200b00196087a3d7csm7425613plf.77.2023.01.30.13.27.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 30 Jan 2023 13:27:08 -0800 (PST)
+        Mon, 30 Jan 2023 13:27:12 -0800 (PST)
 From:   Bart Van Assche <bvanassche@acm.org>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
@@ -47,9 +47,9 @@ Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
         Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>,
         Bart Van Assche <bvanassche@acm.org>,
         Keith Busch <kbusch@kernel.org>
-Subject: [PATCH v4 3/7] block: Support submitting passthrough requests with small segments
-Date:   Mon, 30 Jan 2023 13:26:52 -0800
-Message-Id: <20230130212656.876311-4-bvanassche@acm.org>
+Subject: [PATCH v4 5/7] block: Add support for small segments in blk_rq_map_user_iov()
+Date:   Mon, 30 Jan 2023 13:26:54 -0800
+Message-Id: <20230130212656.876311-6-bvanassche@acm.org>
 X-Mailer: git-send-email 2.39.1.456.gfc5497dd1b-goog
 In-Reply-To: <20230130212656.876311-1-bvanassche@acm.org>
 References: <20230130212656.876311-1-bvanassche@acm.org>
@@ -59,58 +59,70 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-If the segment size is smaller than the page size there may be multiple
-segments per bvec even if a bvec only contains a single page. Hence this
-patch.
+Before changing the return value of bio_add_hw_page() into a value in
+the range [0, len], make blk_rq_map_user_iov() fall back to copying data
+if mapping the data is not possible due to the segment limit.
 
 Cc: Christoph Hellwig <hch@lst.de>
 Cc: Ming Lei <ming.lei@redhat.com>
 Cc: Keith Busch <kbusch@kernel.org>
 Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 ---
- block/blk-map.c |  2 +-
- block/blk.h     | 18 ++++++++++++++++++
- 2 files changed, 19 insertions(+), 1 deletion(-)
+ block/blk-map.c | 27 ++++++++++++++++++++++-----
+ 1 file changed, 22 insertions(+), 5 deletions(-)
 
 diff --git a/block/blk-map.c b/block/blk-map.c
-index 9ee4be4ba2f1..eb059d3a1be2 100644
+index eb059d3a1be2..b1dad4690472 100644
 --- a/block/blk-map.c
 +++ b/block/blk-map.c
-@@ -534,7 +534,7 @@ int blk_rq_append_bio(struct request *rq, struct bio *bio)
- 	unsigned int nr_segs = 0;
+@@ -307,17 +307,26 @@ static int bio_map_user_iov(struct request *rq, struct iov_iter *iter,
+ 		else {
+ 			for (j = 0; j < npages; j++) {
+ 				struct page *page = pages[j];
+-				unsigned int n = PAGE_SIZE - offs;
++				unsigned int n = PAGE_SIZE - offs, added;
+ 				bool same_page = false;
  
- 	bio_for_each_bvec(bv, bio, iter)
--		nr_segs++;
-+		nr_segs += blk_segments(&rq->q->limits, bv.bv_len);
+ 				if (n > bytes)
+ 					n = bytes;
  
- 	if (!rq->bio) {
- 		blk_rq_bio_prep(rq, bio, nr_segs);
-diff --git a/block/blk.h b/block/blk.h
-index 9a56d7002efc..b39938255d13 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -86,6 +86,24 @@ struct bio_vec *bvec_alloc(mempool_t *pool, unsigned short *nr_vecs,
- 		gfp_t gfp_mask);
- void bvec_free(mempool_t *pool, struct bio_vec *bv, unsigned short nr_vecs);
+-				if (!bio_add_hw_page(rq->q, bio, page, n, offs,
+-						     max_sectors, &same_page)) {
++				added = bio_add_hw_page(rq->q, bio, page, n,
++						offs, max_sectors, &same_page);
++				if (added == 0) {
+ 					if (same_page)
+ 						put_page(page);
+ 					break;
++				} else if (added != n) {
++					/*
++					 * The segment size is smaller than the
++					 * page size and an iov exceeds the
++					 * segment size. Give up.
++					 */
++					ret = -EREMOTEIO;
++					goto out_unmap;
+ 				}
  
-+/* Number of DMA segments required to transfer @bytes data. */
-+static inline unsigned int blk_segments(const struct queue_limits *limits,
-+					unsigned int bytes)
-+{
-+	if (!blk_queue_sub_page_limits(limits))
-+		return 1;
-+
-+	{
-+		const unsigned int mss = limits->max_segment_size;
-+
-+		if (bytes <= mss)
-+			return 1;
-+		if (is_power_of_2(mss))
-+			return round_up(bytes, mss) >> ilog2(mss);
-+		return (bytes + mss - 1) / mss;
-+	}
-+}
-+
- static inline bool biovec_phys_mergeable(struct request_queue *q,
- 		struct bio_vec *vec1, struct bio_vec *vec2)
- {
+ 				bytes -= n;
+@@ -657,10 +666,18 @@ int blk_rq_map_user_iov(struct request_queue *q, struct request *rq,
+ 
+ 	i = *iter;
+ 	do {
+-		if (copy)
++		if (copy) {
+ 			ret = bio_copy_user_iov(rq, map_data, &i, gfp_mask);
+-		else
++		} else {
+ 			ret = bio_map_user_iov(rq, &i, gfp_mask);
++			/*
++			 * Fall back to copying the data if bio_map_user_iov()
++			 * returns -EREMOTEIO.
++			 */
++			if (ret == -EREMOTEIO)
++				ret = bio_copy_user_iov(rq, map_data, &i,
++							gfp_mask);
++		}
+ 		if (ret)
+ 			goto unmap_rq;
+ 		if (!bio)
