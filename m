@@ -2,29 +2,29 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E461C76188
-	for <linux-block@archiver.kernel.org>; Mon, 30 Jan 2023 22:59:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 331E6C6FD19
+	for <linux-block@archiver.kernel.org>; Mon, 30 Jan 2023 22:59:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230109AbjA3W7I (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 30 Jan 2023 17:59:08 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55302 "EHLO
+        id S229680AbjA3W7J (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 30 Jan 2023 17:59:09 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55254 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230035AbjA3W6s (ORCPT
+        with ESMTP id S229740AbjA3W6p (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 30 Jan 2023 17:58:48 -0500
+        Mon, 30 Jan 2023 17:58:45 -0500
 Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 5D8CD1F934;
-        Mon, 30 Jan 2023 14:58:45 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id C89A61EFFE;
+        Mon, 30 Jan 2023 14:58:43 -0800 (PST)
 Received: by linux.microsoft.com (Postfix, from userid 1052)
-        id 91C1820EA209; Mon, 30 Jan 2023 14:58:42 -0800 (PST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 91C1820EA209
+        id 3F61120EA1F0; Mon, 30 Jan 2023 14:58:42 -0800 (PST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 3F61120EA1F0
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
         s=default; t=1675119522;
-        bh=0v4CLeAlSJFRbVnsZFQZ28G1grcdrkF/J5b3OEN3KLI=;
+        bh=0c0+AaCGGBDGeKFGA+85oI5UMusd99Vy2wjZaBp/JcE=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=cTQk42qKRKI62Ruuqhajj72yhzffMQkIQlKg1Gik+fziL/hRKWGpdwH5pd+drvizq
-         yyFvx8bj94FHgav3CzlEnyKta9v205uMmOztA7f39PuuNEOYZy+eciZUvMIpkbrAoa
-         bZ05RF1/fOxURAvDZImm1DA/wnZC89Ieki1zbGY4=
+        b=MYfUyc5caOURmq49LUTd7XT6B3dgpKpozAsen+YIpLXv3iHzbK96ywti2/7vyJVLY
+         hCNF8JXnES8hK17SiOY/B6dLWuuqWdVWW2qlRAo1brTtT5IbqwNrxxQLdUgoXxyk/E
+         sAyia8eRBCNLaRWoOtw0f/H/xbJNFqmGMlNstoJg=
 From:   Fan Wu <wufan@linux.microsoft.com>
 To:     corbet@lwn.net, zohar@linux.ibm.com, jmorris@namei.org,
         serge@hallyn.com, tytso@mit.edu, ebiggers@kernel.org,
@@ -35,11 +35,11 @@ Cc:     linux-doc@vger.kernel.org, linux-integrity@vger.kernel.org,
         linux-fscrypt@vger.kernel.org, linux-block@vger.kernel.org,
         dm-devel@redhat.com, linux-audit@redhat.com,
         roberto.sassu@huawei.com, linux-kernel@vger.kernel.org,
-        Fan Wu <wufan@linux.microsoft.com>,
-        Deven Bowers <deven.desai@linux.microsoft.com>
-Subject: [RFC PATCH v9 12/16] fsverity: consume builtin signature via LSM hook
-Date:   Mon, 30 Jan 2023 14:57:27 -0800
-Message-Id: <1675119451-23180-13-git-send-email-wufan@linux.microsoft.com>
+        Deven Bowers <deven.desai@linux.microsoft.com>,
+        Fan Wu <wufan@linux.microsoft.com>
+Subject: [RFC PATCH v9 06/16] ipe: add LSM hooks on execution and kernel read
+Date:   Mon, 30 Jan 2023 14:57:21 -0800
+Message-Id: <1675119451-23180-7-git-send-email-wufan@linux.microsoft.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1675119451-23180-1-git-send-email-wufan@linux.microsoft.com>
 References: <1675119451-23180-1-git-send-email-wufan@linux.microsoft.com>
@@ -47,131 +47,291 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-fsverity represents a mechanism to support both integrity and
-authenticity protection of a file, supporting both signed and unsigned
-digests.
+From: Deven Bowers <deven.desai@linux.microsoft.com>
 
-An LSM which controls access to a resource based on authenticity and
-integrity of said resource, can then use this data to make an informed
-decision on the authorization (provided by the LSM's policy) of said
-claim.
+IPE's initial goal is to control both execution and the loading of
+kernel modules based on the system's definition of trust. It
+accomplishes this by plugging into the security hooks for
+bprm_check_security, file_mprotect, mmap_file, kernel_load_data,
+and kernel_read_data.
 
-This effectively allows the extension of a policy enforcement layer in
-LSM for fsverity, allowing for more granular control of how a
-particular authenticity claim can be used. For example, "all (built-in)
-signed fsverity files should be allowed to execute, but only these
-hashes are allowed to be loaded as kernel modules".
-
-This enforcement must be done in kernel space, as a userspace only
-solution would fail a simple litmus test: Download a self-contained
-malicious binary that never touches the userspace stack. This
-binary would still be able to execute.
-
-Signed-off-by: Fan Wu <wufan@linux.microsoft.com>
 Signed-off-by: Deven Bowers <deven.desai@linux.microsoft.com>
+Signed-off-by: Fan Wu <wufan@linux.microsoft.com>
 ---
-v1-v6:
-  + Not present
+v2:
+  + Split evaluation loop, access control hooks,
+    and evaluation loop from policy parser and userspace
+    interface to pass mailing list character limit
+
+v3:
+  + Move ipe_load_properties to patch 04.
+  + Remove useless 0-initializations
+  + Prefix extern variables with ipe_
+  + Remove kernel module parameters, as these are
+    exposed through sysctls.
+  + Add more prose to the IPE base config option
+    help text.
+  + Use GFP_KERNEL for audit_log_start.
+  + Remove unnecessary caching system.
+  + Remove comments from headers
+  + Use rcu_access_pointer for rcu-pointer null check
+  + Remove usage of reqprot; use prot only.
+  + Move policy load and activation audit event to 03/12
+
+v4:
+  + Remove sysctls in favor of securityfs nodes
+  + Re-add kernel module parameters, as these are now
+    exposed through securityfs.
+  + Refactor property audit loop to a separate function.
+
+v5:
+  + fix minor grammatical errors
+  + do not group rule by curly-brace in audit record,
+    reconstruct the exact rule.
+
+v6:
+  + No changes
 
 v7:
-  Introduced
+  + Further split lsm creation, the audit system, the evaluation loop
+    and access control hooks into separate commits.
 
 v8:
-  + Split fs/verity/ changes and security/ changes into separate patches
-  + Change signature of fsverity_create_info to accept non-const inode
-  + Change signature of fsverity_verify_signature to accept non-const inode
-  + Don't cast-away const from inode.
-  + Digest functionality dropped in favor of:
-    ("fs-verity: define a function to return the integrity protected
-      file digest")
-  + Reworded commit description and title to match changes.
-  + Fix a bug wherein no LSM implements the particular fsverity @name
-    (or LSM is disabled), and returns -EOPNOTSUPP, causing errors.
+  + Rename hook functions to follow the lsmname_hook_name convention
+  + Remove ipe_hook enumeration, can be derived from correlation with
+    syscall audit record.
 
 v9:
-  + No changes
+  + Minor changes for adapting to the new parser
 ---
- fs/verity/fsverity_private.h |  2 +-
- fs/verity/open.c             | 13 ++++++++++++-
- fs/verity/signature.c        |  1 +
- include/linux/fsverity.h     |  2 ++
- 4 files changed, 16 insertions(+), 2 deletions(-)
+ security/ipe/hooks.c | 169 +++++++++++++++++++++++++++++++++++++++++++
+ security/ipe/hooks.h |  13 ++++
+ security/ipe/ipe.c   |   6 ++
+ 3 files changed, 188 insertions(+)
 
-diff --git a/fs/verity/fsverity_private.h b/fs/verity/fsverity_private.h
-index c7fcb855e068..3194a1f4a705 100644
---- a/fs/verity/fsverity_private.h
-+++ b/fs/verity/fsverity_private.h
-@@ -117,7 +117,7 @@ int fsverity_init_merkle_tree_params(struct merkle_tree_params *params,
- 				     unsigned int log_blocksize,
- 				     const u8 *salt, size_t salt_size);
- 
--struct fsverity_info *fsverity_create_info(const struct inode *inode,
-+struct fsverity_info *fsverity_create_info(struct inode *inode,
- 					   struct fsverity_descriptor *desc);
- 
- void fsverity_set_info(struct inode *inode, struct fsverity_info *vi);
-diff --git a/fs/verity/open.c b/fs/verity/open.c
-index 81ff94442f7b..7e6fa52c0e9c 100644
---- a/fs/verity/open.c
-+++ b/fs/verity/open.c
-@@ -7,7 +7,9 @@
- 
- #include "fsverity_private.h"
- 
-+#include <linux/security.h>
- #include <linux/slab.h>
-+#include <crypto/public_key.h>
- 
- static struct kmem_cache *fsverity_info_cachep;
- 
-@@ -146,7 +148,7 @@ static int compute_file_digest(struct fsverity_hash_alg *hash_alg,
-  * appended signature), and check the signature if present.  The
-  * fsverity_descriptor must have already undergone basic validation.
-  */
--struct fsverity_info *fsverity_create_info(const struct inode *inode,
-+struct fsverity_info *fsverity_create_info(struct inode *inode,
- 					   struct fsverity_descriptor *desc)
+diff --git a/security/ipe/hooks.c b/security/ipe/hooks.c
+index 335b773c7ae1..fd5109e29c76 100644
+--- a/security/ipe/hooks.c
++++ b/security/ipe/hooks.c
+@@ -23,3 +23,172 @@ void ipe_sb_free_security(struct super_block *mnt_sb)
  {
- 	struct fsverity_info *vi;
-@@ -182,6 +184,15 @@ struct fsverity_info *fsverity_create_info(const struct inode *inode,
- 
- 	err = fsverity_verify_signature(vi, desc->signature,
- 					le32_to_cpu(desc->sig_size));
-+	if (err) {
-+		fsverity_err(inode, "Error %d verifying signature", err);
-+		goto out;
+ 	ipe_invalidate_pinned_sb(mnt_sb);
+ }
++
++/**
++ * ipe_bprm_check_security - ipe security hook function for bprm check.
++ * @bprm: Supplies a pointer to a linux_binprm structure to source the file
++ *	  being evaluated.
++ *
++ * This LSM hook is called when a binary is loaded through the exec
++ * family of system calls.
++ * Return:
++ * *0	- OK
++ * *!0	- Error
++ */
++int ipe_bprm_check_security(struct linux_binprm *bprm)
++{
++	struct ipe_eval_ctx ctx = { 0 };
++
++	build_eval_ctx(&ctx, bprm->file, ipe_op_exec);
++	return ipe_evaluate_event(&ctx);
++}
++
++/**
++ * ipe_mmap_file - ipe security hook function for mmap check.
++ * @f: File being mmap'd. Can be NULL in the case of anonymous memory.
++ * @reqprot: The requested protection on the mmap, passed from usermode.
++ * @prot: The effective protection on the mmap, resolved from reqprot and
++ *	  system configuration.
++ * @flags: Unused.
++ *
++ * This hook is called when a file is loaded through the mmap
++ * family of system calls.
++ *
++ * Return:
++ * * 0	- OK
++ * * !0	- Error
++ */
++int ipe_mmap_file(struct file *f, unsigned long reqprot, unsigned long prot,
++		  unsigned long flags)
++{
++	struct ipe_eval_ctx ctx = { 0 };
++
++	if (prot & PROT_EXEC || reqprot & PROT_EXEC) {
++		build_eval_ctx(&ctx, f, ipe_op_exec);
++		return ipe_evaluate_event(&ctx);
 +	}
 +
-+	err = security_inode_setsecurity(inode, FS_VERITY_INODE_SEC_NAME, desc->signature,
-+					 le32_to_cpu(desc->sig_size), 0);
-+	if (err == -EOPNOTSUPP)
-+		err = 0;
- out:
- 	if (err) {
- 		fsverity_free_info(vi);
-diff --git a/fs/verity/signature.c b/fs/verity/signature.c
-index 143a530a8008..5d7b9496f9c4 100644
---- a/fs/verity/signature.c
-+++ b/fs/verity/signature.c
-@@ -9,6 +9,7 @@
- 
- #include <linux/cred.h>
- #include <linux/key.h>
-+#include <linux/security.h>
- #include <linux/slab.h>
- #include <linux/verification.h>
- 
-diff --git a/include/linux/fsverity.h b/include/linux/fsverity.h
-index 40f14e5fed9d..29e9888287ba 100644
---- a/include/linux/fsverity.h
-+++ b/include/linux/fsverity.h
-@@ -254,4 +254,6 @@ static inline bool fsverity_active(const struct inode *inode)
- 	return fsverity_get_info(inode) != NULL;
- }
- 
-+#define FS_VERITY_INODE_SEC_NAME "fsverity.inode-info"
++	return 0;
++}
 +
- #endif	/* _LINUX_FSVERITY_H */
++/**
++ * ipe_file_mprotect - ipe security hook function for mprotect check.
++ * @vma: Existing virtual memory area created by mmap or similar.
++ * @reqprot: The requested protection on the mmap, passed from usermode.
++ * @prot: The effective protection on the mmap, resolved from reqprot and
++ *	  system configuration.
++ *
++ * This LSM hook is called when a mmap'd region of memory is changing
++ * its protections via mprotect.
++ *
++ * Return:
++ * * 0	- OK
++ * * !0	- Error
++ */
++int ipe_file_mprotect(struct vm_area_struct *vma, unsigned long reqprot,
++		      unsigned long prot)
++{
++	struct ipe_eval_ctx ctx = { 0 };
++
++	/* Already Executable */
++	if (vma->vm_flags & VM_EXEC)
++		return 0;
++
++	if (prot & PROT_EXEC) {
++		build_eval_ctx(&ctx, vma->vm_file, ipe_op_exec);
++		return ipe_evaluate_event(&ctx);
++	}
++
++	return 0;
++}
++
++/**
++ * ipe_kernel_read_file - ipe security hook function for kernel read.
++ * @file: Supplies a pointer to the file structure being read in from disk.
++ * @id: Supplies the enumeration identifying the purpose of the read.
++ * @contents: Unused.
++ *
++ * This LSM hook is called when a file is being read in from disk from
++ * the kernel.
++ *
++ * Return:
++ * 0 - OK
++ * !0 - Error
++ */
++int ipe_kernel_read_file(struct file *file, enum kernel_read_file_id id,
++			 bool contents)
++{
++	enum ipe_op_type op;
++	struct ipe_eval_ctx ctx;
++
++	switch (id) {
++	case READING_FIRMWARE:
++		op = ipe_op_firmware;
++		break;
++	case READING_MODULE:
++		op = ipe_op_kernel_module;
++		break;
++	case READING_KEXEC_INITRAMFS:
++		op = ipe_op_kexec_initramfs;
++		break;
++	case READING_KEXEC_IMAGE:
++		op = ipe_op_kexec_image;
++		break;
++	case READING_POLICY:
++		op = ipe_op_ima_policy;
++		break;
++	case READING_X509_CERTIFICATE:
++		op = ipe_op_ima_x509;
++		break;
++	default:
++		op = ipe_op_max;
++		WARN(op == ipe_op_max, "no rule setup for enum %d", id);
++	}
++
++	build_eval_ctx(&ctx, file, op);
++	return ipe_evaluate_event(&ctx);
++}
++
++/**
++ * ipe_kernel_load_data - ipe security hook function for kernel load data.
++ * @id: Supplies the enumeration identifying the purpose of the read.
++ * @contents: Unused.
++ *
++ * This LSM hook is called when a buffer is being read in from disk.
++ *
++ * Return:
++ * * 0	- OK
++ * * !0	- Error
++ */
++int ipe_kernel_load_data(enum kernel_load_data_id id, bool contents)
++{
++	enum ipe_op_type op;
++	struct ipe_eval_ctx ctx = { 0 };
++
++	switch (id) {
++	case LOADING_FIRMWARE:
++		op = ipe_op_firmware;
++		break;
++	case LOADING_MODULE:
++		op = ipe_op_kernel_module;
++		break;
++	case LOADING_KEXEC_INITRAMFS:
++		op = ipe_op_kexec_initramfs;
++		break;
++	case LOADING_KEXEC_IMAGE:
++		op = ipe_op_kexec_image;
++		break;
++	case LOADING_POLICY:
++		op = ipe_op_ima_policy;
++		break;
++	case LOADING_X509_CERTIFICATE:
++		op = ipe_op_ima_x509;
++		break;
++	default:
++		op = ipe_op_max;
++		WARN(op == ipe_op_max, "no rule setup for enum %d", id);
++	}
++
++	build_eval_ctx(&ctx, NULL, op);
++	return ipe_evaluate_event(&ctx);
++}
+diff --git a/security/ipe/hooks.h b/security/ipe/hooks.h
+index 30fe455389bf..857cae69678c 100644
+--- a/security/ipe/hooks.h
++++ b/security/ipe/hooks.h
+@@ -11,4 +11,17 @@
+ 
+ void ipe_sb_free_security(struct super_block *mnt_sb);
+ 
++int ipe_bprm_check_security(struct linux_binprm *bprm);
++
++int ipe_mmap_file(struct file *f, unsigned long reqprot, unsigned long prot,
++		  unsigned long flags);
++
++int ipe_file_mprotect(struct vm_area_struct *vma, unsigned long reqprot,
++		      unsigned long prot);
++
++int ipe_kernel_read_file(struct file *file, enum kernel_read_file_id id,
++			 bool contents);
++
++int ipe_kernel_load_data(enum kernel_load_data_id id, bool contents);
++
+ #endif /* IPE_HOOKS_H */
+diff --git a/security/ipe/ipe.c b/security/ipe/ipe.c
+index bef923026b50..7af2f942decd 100644
+--- a/security/ipe/ipe.c
++++ b/security/ipe/ipe.c
+@@ -4,6 +4,7 @@
+  */
+ 
+ #include "ipe.h"
++#include "hooks.h"
+ 
+ bool ipe_enabled;
+ 
+@@ -12,6 +13,11 @@ static struct lsm_blob_sizes ipe_blobs __lsm_ro_after_init = {
+ 
+ static struct security_hook_list ipe_hooks[] __lsm_ro_after_init = {
+ 	LSM_HOOK_INIT(sb_free_security, ipe_sb_free_security),
++	LSM_HOOK_INIT(bprm_check_security, ipe_bprm_check_security),
++	LSM_HOOK_INIT(mmap_file, ipe_mmap_file),
++	LSM_HOOK_INIT(file_mprotect, ipe_file_mprotect),
++	LSM_HOOK_INIT(kernel_read_file, ipe_kernel_read_file),
++	LSM_HOOK_INIT(kernel_load_data, ipe_kernel_load_data),
+ };
+ 
+ /**
 -- 
 2.39.0
 
