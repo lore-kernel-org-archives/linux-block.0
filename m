@@ -2,96 +2,133 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ADA00C61D97
-	for <linux-block@archiver.kernel.org>; Mon, 30 Jan 2023 18:01:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E4B6AC636CB
+	for <linux-block@archiver.kernel.org>; Mon, 30 Jan 2023 18:02:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237393AbjA3SBg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 30 Jan 2023 13:01:36 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39326 "EHLO
+        id S237463AbjA3SCZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 30 Jan 2023 13:02:25 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39604 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237463AbjA3SBa (ORCPT
+        with ESMTP id S235278AbjA3SCY (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 30 Jan 2023 13:01:30 -0500
-Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE75C3E616;
-        Mon, 30 Jan 2023 10:01:27 -0800 (PST)
-Received: by mail-pj1-x1033.google.com with SMTP id e8-20020a17090a9a8800b0022c387f0f93so11271223pjp.3;
-        Mon, 30 Jan 2023 10:01:27 -0800 (PST)
+        Mon, 30 Jan 2023 13:02:24 -0500
+Received: from mail-ej1-x62b.google.com (mail-ej1-x62b.google.com [IPv6:2a00:1450:4864:20::62b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1640F1EFF3;
+        Mon, 30 Jan 2023 10:02:22 -0800 (PST)
+Received: by mail-ej1-x62b.google.com with SMTP id gr7so9606757ejb.5;
+        Mon, 30 Jan 2023 10:02:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=I4D1Ztp5PXdnjePzURg65Mwo279xYxNPa3f1/sKE5u4=;
-        b=P28ybXbqk2lUQqqrphJjk3zFN2/7Ucbw6CuzRIwJahxQ7K4MRZhALIYagoVDPYFWjO
-         2Q51er32H9qfSTZNepRmTyVQVLX0Rm+jkg7cfMgfc0qSjN4hapg6vklx6rESi+CO2fXb
-         0BbWtRy04i1kxXbSo2XE+PuSBJ61G5jC1vtiOfX8sFv/VUOtNnOr3pu9UiLNAL1Ee+k5
-         purXcAwlBZ7hzw7sq/D5XmM3rA2DXDf+PVaGnP98DKpIv81uKcSpQLxmHPSw9rPWdtm/
-         7cGZkdwSqjpQKym7TFguaUgvz5qaW/UdQ8e8z0OatL+23U6Hi50W1eG4ngJa84Iryd0k
-         /o/g==
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=2e4q4vLnV4kvKyozPY83n3uJMaYkgSTzaraxFCK6VlE=;
+        b=QjPHN5B6CALVYF8eJzNIPsG0g1pzceiE2hsCvWmpJNAGD1vrWbJvCZeCcjQ6eADy7X
+         +rHhPzs8YzfZY27hQrxxOVws+NeMmpQzs2dZvJyF9ePDcY6pL5qFpcxv6Z3gjK7XJP8V
+         cByRrvJBuUR2bPrhmi5d/WnmANG7Y6jQK9ldIaDSqBxh3ID4IGOHEOX0TaogXKy8B68f
+         YdGt9CF227lvD+bRgHbXuA/ANtLnfNmLv2C8td08GoyJe+3J4zL8gQFKZUR4Wjx07grD
+         jmy6zNmOrRAYNi0zk7CarTBn76RGSVuzRP3TFEnE334v1V1ZIQxbXypKDzhXSbc1rITc
+         v3Wg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=I4D1Ztp5PXdnjePzURg65Mwo279xYxNPa3f1/sKE5u4=;
-        b=wYQ1HkBLvxeD9QiSDGjc4XAjDGjLWMnXR3Rbp9tRGTgq6/b+GZJOPvSioq1XAqzqpn
-         klZ0n95Lg20MG+Fh2Jpszy1GZiUa9Iwi4/E1FifN2dbin7icmSMj35tVlIZYMYsqmnhp
-         Yo5DIYSx3VJtZdm8+jRu5FM4PMd0GG+LtUtf1nKoY650ymPXtROxdyxW37e1wLa5YcuO
-         QnFUzNI80ezLMEX6h2UNg1SY8Rx5fTy5eaDV80YuIIlRYHEn6mERgdSQmx5MWkl0+7Uo
-         Mto88tEk1G1tY+fhfLJmXN5Yh/tRUhmaqiKRULl9Dfsbhwd0hDbz19ttC/dr/z865tR1
-         ZhoQ==
-X-Gm-Message-State: AO0yUKXJamN66mLBxspFXcp4HkzR6h2OZy7bfUWD76akAX3iV8p6G14L
-        BqPVArF0xsdIYPHOBCa3SiE=
-X-Google-Smtp-Source: AK7set9Vi/N1eTHHTsLb46fowrg6kZs54hy5jnjNYC/R7hR10XQucmJtGgVjqA8aR7sEEtyjOUQgaA==
-X-Received: by 2002:a17:903:2093:b0:192:ef8e:4258 with SMTP id d19-20020a170903209300b00192ef8e4258mr6351497plc.14.1675101686559;
-        Mon, 30 Jan 2023 10:01:26 -0800 (PST)
-Received: from localhost (2603-800c-1a02-1bae-a7fa-157f-969a-4cde.res6.spectrum.com. [2603:800c:1a02:1bae:a7fa:157f:969a:4cde])
-        by smtp.gmail.com with ESMTPSA id ix1-20020a170902f80100b001960e9dd05esm8111845plb.112.2023.01.30.10.01.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 30 Jan 2023 10:01:26 -0800 (PST)
-Sender: Tejun Heo <htejun@gmail.com>
-Date:   Mon, 30 Jan 2023 08:01:24 -1000
-From:   Tejun Heo <tj@kernel.org>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        Josef Bacik <josef@toxicpanda.com>,
-        linux-block@vger.kernel.org, cgroups@vger.kernel.org,
-        Andreas Herrmann <aherrmann@suse.de>
-Subject: Re: [PATCH 01/15] blk-cgroup: don't defer blkg_free to a workqueue
-Message-ID: <Y9gF9DEx8zDKVDTE@slm.duckdns.org>
-References: <20230124065716.152286-1-hch@lst.de>
- <20230124065716.152286-2-hch@lst.de>
- <Y9U7TZQtjnMd6snm@T590>
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=2e4q4vLnV4kvKyozPY83n3uJMaYkgSTzaraxFCK6VlE=;
+        b=GJIa4WvkGKZ88PB0p8X1zX1uWylaJLL2Bj+nscAyU5amcoy/P+WWn4d43arpjQ1doJ
+         O5Al60N4NXlvgMsfUXi5SSCRsDvP6zn+6NPfTYoP0pHaQmu8uSz8HhIliTQG+m9ldTwe
+         JVJRFgqRH0WNy0LxxwiwbwK4O1VIi5Gb2Amz2N/4eIaW54HVdI248qGAMtjYd4p6+JNm
+         4ZHUcx/vvlVXimKUL+gg/KVpPDDU1BmUqKYi7LkXyPw1JaAmB8itxbCCzoGMHeTbz1aB
+         mWhizaJgGRenKF5OWspL3cP91luTbk1vWzVJfHUkaMGnPZrhc9xFU6UARyG+6+2cJxCL
+         uDlA==
+X-Gm-Message-State: AFqh2kov34Uh6BHUvYOdgfbuBUaL2AF0DKWW2Yh2jiyxZ1NzKzCkMz6U
+        8dE0sPEEGYsZWLmVqB73y7hK05/+nUB590thxDQ=
+X-Google-Smtp-Source: AMrXdXt2v8RXnqr0n63brJW64DYfr9lJj0iX+IQ07lAj+juWDoh3rFhuQaZ3DIDSg0TjGFzZmicnL1ZkcXc8EtRtQFI=
+X-Received: by 2002:a17:906:7754:b0:86f:2cc2:7028 with SMTP id
+ o20-20020a170906775400b0086f2cc27028mr7689625ejn.133.1675101740519; Mon, 30
+ Jan 2023 10:02:20 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Y9U7TZQtjnMd6snm@T590>
+References: <20230130092157.1759539-1-hch@lst.de> <20230130092157.1759539-13-hch@lst.de>
+In-Reply-To: <20230130092157.1759539-13-hch@lst.de>
+From:   Ilya Dryomov <idryomov@gmail.com>
+Date:   Mon, 30 Jan 2023 19:02:08 +0100
+Message-ID: <CAOi1vP_b77Pq=hYmFMi1zGGRMee2uNjbAbHz_gCCoByOdbRqLw@mail.gmail.com>
+Subject: Re: [PATCH 12/23] ceph: use bvec_set_page to initialize a bvec
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Minchan Kim <minchan@kernel.org>,
+        Sergey Senozhatsky <senozhatsky@chromium.org>,
+        Keith Busch <kbusch@kernel.org>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        David Howells <dhowells@redhat.com>,
+        Marc Dionne <marc.dionne@auristor.com>,
+        Xiubo Li <xiubli@redhat.com>, Steve French <sfrench@samba.org>,
+        Trond Myklebust <trond.myklebust@hammerspace.com>,
+        Anna Schumaker <anna@kernel.org>,
+        Mike Marshall <hubcap@omnibond.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Chuck Lever <chuck.lever@oracle.com>,
+        linux-block@vger.kernel.org, ceph-devel@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org,
+        target-devel@vger.kernel.org, kvm@vger.kernel.org,
+        netdev@vger.kernel.org, linux-afs@lists.infradead.org,
+        linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+        linux-fsdevel@vger.kernel.org, linux-nfs@vger.kernel.org,
+        devel@lists.orangefs.org, io-uring@vger.kernel.org,
+        linux-mm@kvack.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, Jan 28, 2023 at 11:12:13PM +0800, Ming Lei wrote:
-> On Tue, Jan 24, 2023 at 07:57:01AM +0100, Christoph Hellwig wrote:
-> > Now that blk_put_queue can be called from process context, there is no
-> 
-> s/process/atomic?
-> 
-> > need for the asynchronous execution.
-> > 
-> > This effectively reverts commit d578c770c85233af592e54537f93f3831bde7e9a.
-> 
-> blkg_free() can be called with ->queue_lock, and:
-> 
-> - del_timer_sync(&tg->service_queue.pending_timer) is called from throtl_pd_free().
-> 
-> - queue_lock is required by throtl_pending_timer_fn
-> 
-> So there is deadlock risk if the above commit is reverted.
+On Mon, Jan 30, 2023 at 10:22 AM Christoph Hellwig <hch@lst.de> wrote:
+>
+> Use the bvec_set_page helper to initialize a bvec.
+>
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>  fs/ceph/file.c | 10 +++++-----
+>  1 file changed, 5 insertions(+), 5 deletions(-)
+>
+> diff --git a/fs/ceph/file.c b/fs/ceph/file.c
+> index 764598e1efd91f..6419dce7c57987 100644
+> --- a/fs/ceph/file.c
+> +++ b/fs/ceph/file.c
+> @@ -103,11 +103,11 @@ static ssize_t __iter_get_bvecs(struct iov_iter *iter, size_t maxsize,
+>                 size += bytes;
+>
+>                 for ( ; bytes; idx++, bvec_idx++) {
+> -                       struct bio_vec bv = {
+> -                               .bv_page = pages[idx],
+> -                               .bv_len = min_t(int, bytes, PAGE_SIZE - start),
+> -                               .bv_offset = start,
+> -                       };
+> +                       struct bio_vec bv;
+> +
+> +                       bvec_set_page(&bv, pages[idx],
 
-Ah, good catch. Looks like we'd have to leave this async.
+Hi Christoph,
 
-Thanks.
+There is trailing whitespace on this line which git complains about
+and it made me take a second look.  I think bvec_set_page() allows to
+make this more compact:
 
--- 
-tejun
+        for ( ; bytes; idx++, bvec_idx++) {
+                int len = min_t(int, bytes, PAGE_SIZE - start);
+
+                bvec_set_page(&bvecs[bvec_idx], pages[idx], len, start);
+                bytes -= len;
+                start = 0;
+        }
+
+Thanks,
+
+                Ilya
