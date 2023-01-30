@@ -2,50 +2,53 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82C18C636CD
-	for <linux-block@archiver.kernel.org>; Mon, 30 Jan 2023 21:13:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 19566C636CD
+	for <linux-block@archiver.kernel.org>; Mon, 30 Jan 2023 21:27:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229605AbjA3VN5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 30 Jan 2023 16:13:57 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39810 "EHLO
+        id S230476AbjA3V1G (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 30 Jan 2023 16:27:06 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47416 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229494AbjA3VN4 (ORCPT
+        with ESMTP id S229963AbjA3V1G (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 30 Jan 2023 16:13:56 -0500
-Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AA97D101
-        for <linux-block@vger.kernel.org>; Mon, 30 Jan 2023 13:13:55 -0800 (PST)
-Received: by mail-pj1-f46.google.com with SMTP id l4-20020a17090a850400b0023013402671so213402pjn.5
-        for <linux-block@vger.kernel.org>; Mon, 30 Jan 2023 13:13:55 -0800 (PST)
+        Mon, 30 Jan 2023 16:27:06 -0500
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A75330E9D;
+        Mon, 30 Jan 2023 13:27:05 -0800 (PST)
+Received: by mail-pl1-f182.google.com with SMTP id b5so5793911plz.5;
+        Mon, 30 Jan 2023 13:27:05 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=1EXP/MQjcZ0X3AwaWowhVCnBNYI4a3X3hD54NPfI1tg=;
-        b=u7aRBWTmYuij0GVU90BxgnCMr/YmcmggUfigVsUhvBBerXEh/3LiXIm6MNTVU3yMbY
-         i9tQ8/qd6dqOm9x2LlKlbBUEX4dKD/Gh4IUe+2EZtFhxAGntNDOF2uYKa4tik3fEWDEn
-         umkAf6eKnKV7puBv8EWlwmgCHEMe04PprytYpYZ4aQSEB5cY4AIgg+9kHRtVvhLl5fio
-         s4HBhMNEs0eyO3neMVVhex8sRGBD1yU+HTzDwOeXR1MIdfrKdXVOfsHg66UYoHdby+y5
-         JjVzxtznXFc9QYtsAVIhUrgPHHhW/l45FDu9nvDmIDhWsTi0kw/ruQAr0pDPrHAnpmxL
-         Xn6A==
-X-Gm-Message-State: AO0yUKUzr7rZUG/5fULSNGzmKxtqxFiwU4zI3YZ/lsFmalyaJsfh0K5L
-        Az5tY+MdgNpHr1VTLTDQZOE=
-X-Google-Smtp-Source: AK7set/U+HVmCaGeJkTPhTvo7CYMGfbNp/n6a53KKF43gOkFwkOZAfld3QvNoBnotkkH2y+Me8FZPA==
-X-Received: by 2002:a17:902:f2cb:b0:196:5e71:e50 with SMTP id h11-20020a170902f2cb00b001965e710e50mr10072269plc.23.1675113235059;
-        Mon, 30 Jan 2023 13:13:55 -0800 (PST)
+        bh=Va1b/Ohoy79n+u2MXTGHTdUDX3T7M+BNVNtwasEEI3g=;
+        b=XH0IrxG6XpOVEth4cqSH5ZyM5iUsMsth9LEpgEA/zSrTnjWsZWRa5hp25kkg0nKAtV
+         25OqO3F/pz2UW6c7DV4lzjEpplAJHSnNWnfHAfbpbOOLo3pN5RLdvf2DYr++mcpdjTHR
+         1r6x/UXI2fvi4Jg66Nq4GL1TIv1w7MhYqrRWbCNAFkJoUyhcWGPg+vqC4fsXV8WzNSvJ
+         8qI8AtcvAtXYcxMMoqpFvftIFol39hMAEJGRekXtn32b80Kp2YerruicnlKzai1ItEeX
+         K2b3puQ3fs6ic5080OS/QqkimevVnuoU8PrN05qJsWo7IvFdjC5/ZKOtLJdQ3nliYMFl
+         ZXYQ==
+X-Gm-Message-State: AFqh2krd8MVA20ZdZssYtV11K/ZKODv1OqD7R01/fn/yzHdzaPJFgxUF
+        eImByWq6F6nnZxsUzmELJvw=
+X-Google-Smtp-Source: AMrXdXtnitI1HYZc9yFj3SnC0zTXUYnt0RPwsnJqp8+Iy5tz6vjss85yy5wuROmTB+zzdc25CmMOqQ==
+X-Received: by 2002:a17:902:b20f:b0:194:a268:1201 with SMTP id t15-20020a170902b20f00b00194a2681201mr45004223plr.43.1675114024433;
+        Mon, 30 Jan 2023 13:27:04 -0800 (PST)
 Received: from bvanassche-linux.mtv.corp.google.com ([2620:15c:211:201:5016:3bcd:59fe:334b])
-        by smtp.gmail.com with ESMTPSA id 12-20020a170902ee4c00b00194ae12a313sm8223174plo.222.2023.01.30.13.13.53
+        by smtp.gmail.com with ESMTPSA id u18-20020a170902e5d200b00196087a3d7csm7425613plf.77.2023.01.30.13.27.02
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 30 Jan 2023 13:13:54 -0800 (PST)
+        Mon, 30 Jan 2023 13:27:03 -0800 (PST)
 From:   Bart Van Assche <bvanassche@acm.org>
 To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Bart Van Assche <bvanassche@acm.org>,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        Himanshu Madhani <himanshu.madhani@oracle.com>
-Subject: [PATCH] loop: Improve the hw_queue_depth kernel module parameter implementation
-Date:   Mon, 30 Jan 2023 13:13:47 -0800
-Message-Id: <20230130211347.832110-1-bvanassche@acm.org>
+Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        Avri Altman <avri.altman@wdc.com>,
+        Adrian Hunter <adrian.hunter@intel.com>,
+        Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>,
+        Bart Van Assche <bvanassche@acm.org>
+Subject: [PATCH v4 0/7] Add support for limits below the page size
+Date:   Mon, 30 Jan 2023 13:26:49 -0800
+Message-Id: <20230130212656.876311-1-bvanassche@acm.org>
 X-Mailer: git-send-email 2.39.1.456.gfc5497dd1b-goog
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -53,81 +56,58 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Make the following minor changes which were reported by colleagues
-while reviewing this code:
-- Remove the parentheses from around the LOOP_DEFAULT_HW_Q_DEPTH
-  definition since these are superfluous.
-- Accept other number formats than decimal, e.g. hexadecimal.
-- Do not set hw_queue_depth to an out-of-range value, even if that value
-  won't be used.
-- Use the LOOP_DEFAULT_HW_Q_DEPTH macro in the kernel module parameter
-  description to prevent that the description gets out of sync.
+Hi Jens,
 
-This patch has been tested as follows:
+We want to improve Android performance by increasing the page size from 4 KiB
+to 16 KiB. However, some of the storage controllers we care about do not support
+DMA segments larger than 4 KiB. Hence the need support for DMA segments that are
+smaller than the size of one virtual memory page. This patch series implements
+that support. Please consider this patch series for the next merge window.
 
- # modprobe -r loop
- # modprobe loop hw_queue_depth=-1
- modprobe: ERROR: could not insert 'loop': Invalid argument
- # modprobe loop hw_queue_depth=0
- modprobe: ERROR: could not insert 'loop': Invalid argument
- # modprobe loop hw_queue_depth=1; cat /sys/module/loop/parameters/hw_queue_depth
- 1
- # modprobe -r loop; modprobe loop; cat /sys/module/loop/parameters/hw_queue_depth hw_queue_depth=0x10
- 16
- # modprobe -r loop; modprobe loop; cat /sys/module/loop/parameters/hw_queue_depth hw_queue_depth=128
- 128
- # modprobe -r loop; modprobe loop hw_queue_depth=129; cat /sys/module/loop/parameters/hw_queue_depth
- 129
- # modprobe -r loop; modprobe loop hw_queue_depth=$((1<<32))
- modprobe: ERROR: could not insert 'loop': Numerical result out of range
+Thanks,
 
-See also commit ef44c50837ab ("loop: allow user to set the queue
-depth").
+Bart.
 
-Cc: Chaitanya Kulkarni <kch@nvidia.com>
-Cc: Himanshu Madhani <himanshu.madhani@oracle.com>
-Signed-off-by: Bart Van Assche <bvanassche@acm.org>
----
- drivers/block/loop.c | 14 ++++++++++----
- 1 file changed, 10 insertions(+), 4 deletions(-)
+Changes compared to v3:
+- Removed CONFIG_BLK_SUB_PAGE_SEGMENTS and QUEUE_FLAG_SUB_PAGE_SEGMENTS.
+  Replaced these by a new member in struct queue_limits and a static branch.
+- The static branch that controls whether or not sub-page limits are enabled
+  is set by the block layer core instead of by block drivers.
+- Dropped the patches that are no longer needed (SCSI core and UFS Exynos
+  driver).
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 1518a6423279..5f04235e4ff7 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -90,7 +90,7 @@ struct loop_cmd {
- };
- 
- #define LOOP_IDLE_WORKER_TIMEOUT (60 * HZ)
--#define LOOP_DEFAULT_HW_Q_DEPTH (128)
-+#define LOOP_DEFAULT_HW_Q_DEPTH 128
- 
- static DEFINE_IDR(loop_index_idr);
- static DEFINE_MUTEX(loop_ctl_mutex);
-@@ -1792,9 +1792,15 @@ static int hw_queue_depth = LOOP_DEFAULT_HW_Q_DEPTH;
- 
- static int loop_set_hw_queue_depth(const char *s, const struct kernel_param *p)
- {
--	int ret = kstrtoint(s, 10, &hw_queue_depth);
-+	int qd, ret;
- 
--	return (ret || (hw_queue_depth < 1)) ? -EINVAL : 0;
-+	ret = kstrtoint(s, 0, &qd);
-+	if (ret < 0)
-+		return ret;
-+	if (qd < 1)
-+		return -EINVAL;
-+	hw_queue_depth = qd;
-+	return 0;
- }
- 
- static const struct kernel_param_ops loop_hw_qdepth_param_ops = {
-@@ -1803,7 +1809,7 @@ static const struct kernel_param_ops loop_hw_qdepth_param_ops = {
- };
- 
- device_param_cb(hw_queue_depth, &loop_hw_qdepth_param_ops, &hw_queue_depth, 0444);
--MODULE_PARM_DESC(hw_queue_depth, "Queue depth for each hardware queue. Default: 128");
-+MODULE_PARM_DESC(hw_queue_depth, "Queue depth for each hardware queue. Default: " __stringify(LOOP_DEFAULT_HW_Q_DEPTH));
- 
- MODULE_LICENSE("GPL");
- MODULE_ALIAS_BLOCKDEV_MAJOR(LOOP_MAJOR);
+Changes compared to v2:
+- For SCSI drivers, only set flag QUEUE_FLAG_SUB_PAGE_SEGMENTS if necessary.
+- In the scsi_debug patch, sorted kernel module parameters alphabetically.
+  Only set flag QUEUE_FLAG_SUB_PAGE_SEGMENTS if necessary.
+- Added a patch for the UFS Exynos driver that enables
+  CONFIG_BLK_SUB_PAGE_SEGMENTS if the page size exceeds 4 KiB.
+
+Changes compared to v1:
+- Added a CONFIG variable that controls whether or not small segment support
+  is enabled.
+- Improved patch descriptions.
+
+Bart Van Assche (7):
+  block: Introduce blk_mq_debugfs_init()
+  block: Support configuring limits below the page size
+  block: Support submitting passthrough requests with small segments
+  block: Add support for filesystem requests and small segments
+  block: Add support for small segments in blk_rq_map_user_iov()
+  scsi_debug: Support configuring the maximum segment size
+  null_blk: Support configuring the maximum segment size
+
+ block/blk-core.c                  |  4 +-
+ block/blk-map.c                   | 29 ++++++++---
+ block/blk-merge.c                 |  7 ++-
+ block/blk-mq-debugfs.c            | 10 ++++
+ block/blk-mq-debugfs.h            |  6 +++
+ block/blk-mq.c                    |  2 +
+ block/blk-settings.c              | 82 ++++++++++++++++++++++++++++---
+ block/blk.h                       | 39 ++++++++++++---
+ drivers/block/null_blk/main.c     | 19 +++++--
+ drivers/block/null_blk/null_blk.h |  1 +
+ drivers/scsi/scsi_debug.c         |  4 ++
+ include/linux/blkdev.h            |  2 +
+ 12 files changed, 179 insertions(+), 26 deletions(-)
+
