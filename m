@@ -2,124 +2,85 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB1F2C54EAA
-	for <linux-block@archiver.kernel.org>; Mon, 30 Jan 2023 07:10:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5422EC54EED
+	for <linux-block@archiver.kernel.org>; Mon, 30 Jan 2023 07:41:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235731AbjA3HK4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 30 Jan 2023 02:10:56 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39962 "EHLO
+        id S230422AbjA3Hlp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 30 Jan 2023 02:41:45 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50306 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231258AbjA3HKy (ORCPT
+        with ESMTP id S229965AbjA3Hlo (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 30 Jan 2023 02:10:54 -0500
-Received: from esa1.hgst.iphmx.com (esa1.hgst.iphmx.com [68.232.141.245])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C022024137
-        for <linux-block@vger.kernel.org>; Sun, 29 Jan 2023 23:10:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1675062653; x=1706598653;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=PL8Lnq9pEFeL1Z1v5KoXHjGiWf+Wd0+HxXQ5TzyyMB4=;
-  b=KJF2q3lxDutor/0CkYAqtbdZsG9hHGFmYbVYQOf/zdDOP4m8f5BC0CYF
-   61EU9LIoHZauXxZfvUFTfa1+YgbCqMInPGZwqOmfG1NEFc6FqPcvWUyaw
-   uXZBLQDYurUcoNksRpl8p/Y8gQVsjh4wKLpS4lCOv2Q4X2KKKDeADRmwA
-   vYCowWx4N8M5yK7yhZ2dQv+M0dlK3/WgWUQe8H8rfHZ8uzCMF9weGFmUH
-   YuEPEKtybe1yvAlC/QGa70LJSTqQYaBX063bmfOmeetvvvpZRQHJKGQrO
-   qmfhfGumDVO0CSuBX+SMy65Rv/Cfn3xdEEaqQoZaSiUtK+ebSamBYxcoQ
-   Q==;
-X-IronPort-AV: E=Sophos;i="5.97,257,1669046400"; 
-   d="scan'208";a="334022337"
-Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 30 Jan 2023 15:10:52 +0800
-IronPort-SDR: Xg0wAGGaIfOGH8XQ77Tk9129SXD3dedHSC1cLE1BdmVXZRk6sXmbGuQ7yOxFJLb4KHsNjlDfbl
- toouUlFrLQOXTlfey0Xhsa+/WYf/M8ZP/pXEyCpxtol4zAvh9zKpzY0xRMAAyH6KHD/7cUYKCU
- J+dzGyMuRfdAP7pKa72/mXly6MLB2P4XziJNoO8tNUDCZsjGtNZiB1tB9c3LJxt0URYy+wH7RG
- mJ2WHEu4t6ml8sfSt90J6gaPVHlokLTfH7GdTegNqxgHSjBTT2FATKg3lgMNtmB7oX1uXKwgir
- +jE=
-Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 29 Jan 2023 22:28:18 -0800
-IronPort-SDR: C0wOZ1a7+utKdRIgq9gsSsSHgCTNGTm7TQSsgSrY1CeIGTk3pJbVUoF1FP5repoIZTkBud9TLd
- ms7qdgl7X7xxOGkpHZ8LuaR8AEndbeOGb33unPusp3XJ87+jf7DhPeYWihA3bsta0g3ZrY2POQ
- L8Cih5J1am5OxKg/I5YhivWRTQpy7YVfO2U2EPCxSNTIRjmf2RVze7pODomtt7TKjviDuRtcK1
- /rq1GPF3nvC9qPBKnlrxOSK53GIQVc+prpDJMYYG3wtUPVDe/Cj3BThFgeTB3pD2TpAN29Tr3G
- qwg=
-WDCIronportException: Internal
-Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
-  by uls-op-cesaip02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 29 Jan 2023 23:10:53 -0800
-Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4P4zqH6Fdlz1RwqL
-        for <linux-block@vger.kernel.org>; Sun, 29 Jan 2023 23:10:51 -0800 (PST)
-Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
-        reason="pass (just generated, assumed good)"
-        header.d=opensource.wdc.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
-        opensource.wdc.com; h=content-transfer-encoding:content-type
-        :in-reply-to:organization:from:references:to:content-language
-        :subject:user-agent:mime-version:date:message-id; s=dkim; t=
-        1675062651; x=1677654652; bh=PL8Lnq9pEFeL1Z1v5KoXHjGiWf+Wd0+HxXQ
-        5TzyyMB4=; b=opqERaEqJ150TbkCWlAbq11jv+vVl4igNIi3xPZN0mdfGACuZvp
-        vBaxbEBjz+85TyLe2FlUDTN5BlP6/JzXbjokz7Ax96xBdxjCRL3yJlTRzQpsug+l
-        FmuuYzHE+jWq2nwaX797vVOQlIU75z5D92QTQHe11kdTZsQSJFEeyb2Z3scqSi1u
-        DBppLgTWFy9wKxQfhtE9rtW26fmOXCvzwAUF/d3cVHSbQQLrL6wZKIvPIVolmm2J
-        UbWVqXVBeroP5T/oHKGUGWYgxkxIq6k6ano2r5jPgmg2d8Nk3U9BDnCTKKNymeL5
-        y71gnjVdectGeRG1sVV+oJ2itDKKMlBtyyg==
-X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
-Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
-        by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id uO2qaC171dN3 for <linux-block@vger.kernel.org>;
-        Sun, 29 Jan 2023 23:10:51 -0800 (PST)
-Received: from [10.225.163.66] (unknown [10.225.163.66])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4P4zqF6KkRz1RvLy;
-        Sun, 29 Jan 2023 23:10:49 -0800 (PST)
-Message-ID: <569cb9ba-52d6-da73-dba0-cc62c91f6db2@opensource.wdc.com>
-Date:   Mon, 30 Jan 2023 16:10:48 +0900
+        Mon, 30 Jan 2023 02:41:44 -0500
+Received: from mail-pg1-x533.google.com (mail-pg1-x533.google.com [IPv6:2607:f8b0:4864:20::533])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A8DE241D8
+        for <linux-block@vger.kernel.org>; Sun, 29 Jan 2023 23:41:44 -0800 (PST)
+Received: by mail-pg1-x533.google.com with SMTP id 78so7004013pgb.8
+        for <linux-block@vger.kernel.org>; Sun, 29 Jan 2023 23:41:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7Wa4WRnsKtnxyryeAkeLMil3fZbp4U2WqsUJUssOKyY=;
+        b=eHcc5UixAAKKUIer3AGWabkdnpH3eKCNftr0KIAYujXYvrEvJm+3TXGcxWLNgIIomO
+         t7g/mOPuINYcq+7zzknXkcFgfdpkpuPUX3EYtDEOua0SmmBLvK9PUFfnPHMCVnCWJ7PZ
+         RrZBTZm1mIhjA8gmmenOuH+oKT7EjzRuguIq/i+rk/soxGtCmjmoVM5o5bvQD3Y1lfwp
+         eNHFKSeMKbz5RAssMm/ddeP8obPC1cCAJqY3cnrTH7af3BMfjMPS5NvV9FcljjUfAd5E
+         V7G/OahoAYXlBDrrHMuq101UvzYwvRc2iAVurLerxKGyh1P1TdzEGKLvOrKCFyigiP4b
+         zc7w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=7Wa4WRnsKtnxyryeAkeLMil3fZbp4U2WqsUJUssOKyY=;
+        b=FONI14jcmTy7sKLFrTnfNnM2ZiSXkO3i9noYqNG4wJh8FpFAbJ9qEnaYX+u2tvNxoz
+         uPZZP2WQo0vV1JWabijivUSB4t27gSsyWGkQXPwCaofEbM5KwNQ4NnX8QpklmnkVQpW+
+         flizYIqS2ngYIYpbuIhTkC6vA0PgMyWGObcYwFMd9o2AY49MKY9YW+Z5DU2BK0z+PRFR
+         GfmtMM/TC4hnz4dfKWx6HKoRUfgo1X1vSVMS4rbMklPhV0D9aTRBmvkLIlV9GzsScrW8
+         qS646CThZDsZVfBDJO5ascnV3eMdLr7PVLVkKyGU3DPu+RrP/CSca361DKa3DROAVjDN
+         Y5qA==
+X-Gm-Message-State: AO0yUKUkADqB9AJuUY4Wn294mVWH3QVBRKOfYAANDkujPOby+KlkPRCF
+        aB0d0xgMCZLWz3uiONq85W0xuQ==
+X-Google-Smtp-Source: AK7set8Qt8AjHVXxLhDGUh1q7E1driVciP+P94S8PBr9mCyXFHUBsSMhsytYSnS78m6SzeTcDznXOg==
+X-Received: by 2002:a05:6a00:278e:b0:592:52a0:6817 with SMTP id bd14-20020a056a00278e00b0059252a06817mr11856005pfb.6.1675064503424;
+        Sun, 29 Jan 2023 23:41:43 -0800 (PST)
+Received: from localhost.localdomain ([124.123.172.194])
+        by smtp.gmail.com with ESMTPSA id o125-20020a62cd83000000b00575fbe1cf2esm6705696pfg.109.2023.01.29.23.41.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 29 Jan 2023 23:41:41 -0800 (PST)
+From:   Naresh Kamboju <naresh.kamboju@linaro.org>
+To:     dhowells@redhat.com
+Cc:     axboe@kernel.dk, david@redhat.com, hch@infradead.org, jack@suse.cz,
+        jgg@nvidia.com, jlayton@kernel.org, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, logang@deltatee.com, viro@zeniv.linux.org.uk,
+        willy@infradead.org, anders.roxell@linaro.org,
+        lkft-triage@lists.linaro.org,
+        Linux Kernel Functional Testing <lkft@linaro.org>
+Subject: [PATCH v11 0/8] iov_iter: Improve page extraction (pin or just list)
+Date:   Mon, 30 Jan 2023 13:11:29 +0530
+Message-Id: <20230130074129.28120-1-naresh.kamboju@linaro.org>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20230126141626.2809643-1-dhowells@redhat.com>
+References: <20230126141626.2809643-1-dhowells@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.0
-Subject: Re: [PATCH v3] pata_parport: add driver (PARIDE replacement)
-Content-Language: en-US
-To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
-Cc:     Ondrej Zary <linux@zary.sk>, Sergey Shtylyov <s.shtylyov@omp.ru>,
-        Tim Waugh <tim@cyberelk.net>, linux-block@vger.kernel.org,
-        linux-parport@lists.infradead.org, linux-ide@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <425b5646-23e2-e271-5ca6-0f3783d39a3b@opensource.wdc.com>
- <20230123190954.5085-1-linux@zary.sk>
- <d4f7ebd5-d90d-fb96-0fad-bd129ac162dc@opensource.wdc.com>
- <e843fde8-7295-dd30-6d98-a62f63d7753c@kernel.dk>
- <20230130064815.GA31925@lst.de>
-From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
-Organization: Western Digital Research
-In-Reply-To: <20230130064815.GA31925@lst.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/30/23 15:48, Christoph Hellwig wrote:
-> On Sun, Jan 29, 2023 at 08:44:06PM -0700, Jens Axboe wrote:
->> I would prefer if we just delete it after merging this one, in the same
->> release. I don't think there's any point in delaying, as we're not
->> removing any functionality.
->>
->> You could just queue that up too when adding this patch.
-> 
-> I'd prefer to just deprecate.  But most importantly I want this patch
-> in ASAP in some form.
+Build test pass on arm, arm64, i386, mips, parisc, powerpc, riscv, s390, sh,
+sparc and x86_64.
+Boot and LTP smoke pass on qemu-arm64, qemu-armv7, qemu-i386 and qemu-x86_64.
 
-I will queue it. But I think it needs a follow up to result in something
-consistent with KConfig. So either deprecate or delete PARPORT. I can queue the
-deprecate patch and delete in 6.4, even though I share Jen's opinion to simply
-delete directly. I am still fine either way.
+Tested-by: Linux Kernel Functional Testing <lkft@linaro.org>
+Tested-by: Anders Roxell <anders.roxell@linaro.org>
 
-Jens,
+Please refer following link for details of testing.
+https://qa-reports.linaro.org/~anders.roxell/linux-mainline-patches/build/lore_kernel_org_linux-mm_20230126141626_2809643-1-dhowells_redhat_com/?results_layout=table&failures_only=false#!#test-results
 
-If you are OK with that, can I get your ack for the deprecate patch ? Unless you
-prefer taking it through the block tree. Either way is fine with me.
-
--- 
-Damien Le Moal
-Western Digital Research
-
+--
+Linaro LKFT
+https://lkft.linaro.org
