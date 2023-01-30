@@ -2,142 +2,97 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 851F3C61DA4
-	for <linux-block@archiver.kernel.org>; Mon, 30 Jan 2023 23:18:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6D76C61DA4
+	for <linux-block@archiver.kernel.org>; Mon, 30 Jan 2023 23:23:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230138AbjA3XSj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 30 Jan 2023 18:18:39 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46252 "EHLO
+        id S229701AbjA3XXI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 30 Jan 2023 18:23:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49034 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230058AbjA3XSi (ORCPT
+        with ESMTP id S229511AbjA3XXH (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 30 Jan 2023 18:18:38 -0500
-Received: from esa3.hgst.iphmx.com (esa3.hgst.iphmx.com [216.71.153.141])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9837F27D79
-        for <linux-block@vger.kernel.org>; Mon, 30 Jan 2023 15:18:36 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1675120716; x=1706656716;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=Vbd5tFkeprAIcq+FYPAfIxJtlFp/qJLwVv9T4su6GKg=;
-  b=gJg6QVSyID2bp9rhPhecokeHm475FmYB7PpPTSYeVVOcyAwoY6eNrqea
-   GbAftFFUv72wGQ4l1FlKvwIfU3+GldkOd9U05n3tKc+uPgRXnDrwUy+5o
-   EaCjZjsPqGL+X6Rpx3n8yCQVcHVuYHWzngpXZr2m2jHU0szGViD1wAPsJ
-   R3Epk3rIV3QW72LT6sBROKSjdbAKTqaoSx3W47C/+mcDcFhKssJcNcQQr
-   MTLNOc8TIy3jWCuGIL+ZXWMsIKeYEE7y3yYwPrqd7YoGkreIO2G8ectyg
-   w3HGwYUOtHh3soIgIZW3m9wQOvMcl0sIJA0lRtWebQHqKqNhFAGNRZC3l
-   g==;
-X-IronPort-AV: E=Sophos;i="5.97,259,1669046400"; 
-   d="scan'208";a="227090615"
-Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 31 Jan 2023 07:18:35 +0800
-IronPort-SDR: Rt21ZAQAtuxiASQop1UxzOPPKCBULNMbyFkl6XrM9JTRefuQo7+Ll+0LkAnEbvaaRYjAM0TeHg
- HDLyhaWdPq9lzz/yfpBGA2SCC2J1sV75EwTWUrFR3aGE58zdQ89u3x9+D8NRRCVOq5DY/FN9Rr
- V6ejOvqB3FaGQb5qig7su7qLRgDgWylw4hdjwDaXgoO8kLjwykRU+iZd9t9RCE3YC9BqQYIzGA
- PW1xYkxknwCtWuGKuIq2tlTKFbl/BnI2aIxoq2LGZNTtN4Hrfg5azn8pdkogKW1PLMWwNnx147
- N1s=
-Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 30 Jan 2023 14:30:17 -0800
-IronPort-SDR: YtYQkwqv8I+rc65iHJzrWC7ZyZxIKcr6J5dYw3rI4VHt8rOcvox6uaQOIWlfWkIjYXjk5BoqKa
- 69/YxPc3RXkTWBvnsS2Ly4SvYh52yLIA0/RSBHWSl2O8hVozQk8yJlPhs2O0G0oN6dQrgcqwdA
- Vnjq0Vq/vLF+SMXebZ77zHmgu/6TXztfVjNBxDy8aRF99Xp1i83vxQPIdDOhScWkTCEMjOm7V7
- eIdq/PosokA/22BPfCL6Kwz0NxkVnCIGvdvDk3z4HzI9fY/TobI0uUC7kFaXHXr6g+oHeP4Wbs
- 100=
-WDCIronportException: Internal
-Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
-  by uls-op-cesaip02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 30 Jan 2023 15:18:37 -0800
-Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4P5PHv3fnNz1RwqL
-        for <linux-block@vger.kernel.org>; Mon, 30 Jan 2023 15:18:35 -0800 (PST)
-Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
-        reason="pass (just generated, assumed good)"
-        header.d=opensource.wdc.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
-        opensource.wdc.com; h=content-transfer-encoding:content-type
-        :in-reply-to:organization:from:references:to:content-language
-        :subject:user-agent:mime-version:date:message-id; s=dkim; t=
-        1675120714; x=1677712715; bh=Vbd5tFkeprAIcq+FYPAfIxJtlFp/qJLwVv9
-        T4su6GKg=; b=Zop0i3VQ3u0/Kkq/wuoVylW+23K85upEkoq/q6NTalzD6owpopr
-        QE/5VBD7F1seNe97EvN9SqvP5DlWDe0pksqGH0l9DUYRJBtewJycL9JczGbE866a
-        W7K4aQMYIEySRX5r+nkVehAHhwdOCXNSqe01eOpAWv2Ib9S41sSRH/7lk8PIqiQy
-        dv6v0ud7xbsnRcDKhfJKtf3Oydm5Gn5xK7/aYtjeMA+DCv5KCB4fWqiM5uYI3Fmb
-        HqGTEfDiP7ycpXIRYkD/eCNa+mYNFvVfAGF05ppp4OjfOvNmAOXnamKkQEYQyBx3
-        FCLnLLjIZi/HLJvRSePWy3ve2aWNNs+3P9Q==
-X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
-Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
-        by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id gC8-4ScUOO-n for <linux-block@vger.kernel.org>;
-        Mon, 30 Jan 2023 15:18:34 -0800 (PST)
-Received: from [10.225.163.70] (unknown [10.225.163.70])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4P5PHs3SlDz1RvLy;
-        Mon, 30 Jan 2023 15:18:33 -0800 (PST)
-Message-ID: <1ad62b40-28ed-f452-ecda-6470068b4034@opensource.wdc.com>
-Date:   Tue, 31 Jan 2023 08:18:31 +0900
+        Mon, 30 Jan 2023 18:23:07 -0500
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D4B1B7684
+        for <linux-block@vger.kernel.org>; Mon, 30 Jan 2023 15:23:06 -0800 (PST)
+Received: by mail-pl1-f174.google.com with SMTP id k13so13366810plg.0
+        for <linux-block@vger.kernel.org>; Mon, 30 Jan 2023 15:23:06 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=p54MTDqlwADC+0KEf6cImeivCfa29snzzezJGFnDkXY=;
+        b=XPZBME3iBMg4L2iyk3agGkYEQtj8lrh3UQdxUaUsAP94QzhkoNuEh//7iA9KyDha+e
+         OfWYFY8sinNWxkSo0j2iH6nYKxNnWLOelhQiGqHon1/3lMXMcI3WBhxhAQzCK3G/hX/D
+         aPsK5sw4joKE4CxWjqHRuBKc0H5n7ndSDHjgF/pVz6CerTjQsXEiYcEAR6t5c0ym5YdH
+         Lr2uz38bF1jyMWcSJc5rKAWn4nf89xLH5JSjt0OYKTEc9HRa//6iTAVpGEl+OcZntFoz
+         fQ8asn5NTxmuL9mJslswnJYdz4bB8tjhSP5mbyPmL7QjqeILH+FmY+docO+11rxY5Jf4
+         h8wg==
+X-Gm-Message-State: AO0yUKViLOpEgrUNr6Nfde+imavSLQ0mi8k+lOsFcVdmiSOkSlmIBgOf
+        36TOsfoVPPmJ+IZpWwIN31cKn+M2G5M=
+X-Google-Smtp-Source: AK7set8fM9P0k62EOM2NbpsBRVekjEoCjEWaqfzj8Q/QjhPPTXsGC651akhUlQ/jgfEGwN0wjzUkYg==
+X-Received: by 2002:a05:6a20:1602:b0:be:8e8d:330c with SMTP id l2-20020a056a20160200b000be8e8d330cmr5290692pzj.27.1675120986300;
+        Mon, 30 Jan 2023 15:23:06 -0800 (PST)
+Received: from bvanassche-linux.mtv.corp.google.com ([2620:15c:211:201:5016:3bcd:59fe:334b])
+        by smtp.gmail.com with ESMTPSA id t1-20020aa79461000000b0058da7e58008sm7991629pfq.36.2023.01.30.15.23.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 30 Jan 2023 15:23:05 -0800 (PST)
+From:   Bart Van Assche <bvanassche@acm.org>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Bart Van Assche <bvanassche@acm.org>,
+        Ming Lei <ming.lei@redhat.com>, Christoph Hellwig <hch@lst.de>
+Subject: [PATCH] block: Revert "let blkcg_gq grab request queue's refcnt"
+Date:   Mon, 30 Jan 2023 15:22:57 -0800
+Message-Id: <20230130232257.972224-1-bvanassche@acm.org>
+X-Mailer: git-send-email 2.39.1.456.gfc5497dd1b-goog
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.0
-Subject: Re: [PATCH v3] pata_parport: add driver (PARIDE replacement)
-Content-Language: en-US
-To:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>
-Cc:     Ondrej Zary <linux@zary.sk>, Sergey Shtylyov <s.shtylyov@omp.ru>,
-        Tim Waugh <tim@cyberelk.net>, linux-block@vger.kernel.org,
-        linux-parport@lists.infradead.org, linux-ide@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <425b5646-23e2-e271-5ca6-0f3783d39a3b@opensource.wdc.com>
- <20230123190954.5085-1-linux@zary.sk>
- <d4f7ebd5-d90d-fb96-0fad-bd129ac162dc@opensource.wdc.com>
- <e843fde8-7295-dd30-6d98-a62f63d7753c@kernel.dk>
- <20230130064815.GA31925@lst.de>
- <569cb9ba-52d6-da73-dba0-cc62c91f6db2@opensource.wdc.com>
- <7a2f5b2f-3ed9-eabb-6c9b-dcb2bfe82a08@kernel.dk>
-From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
-Organization: Western Digital Research
-In-Reply-To: <7a2f5b2f-3ed9-eabb-6c9b-dcb2bfe82a08@kernel.dk>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/31/23 00:25, Jens Axboe wrote:
-> On 1/30/23 12:10=E2=80=AFAM, Damien Le Moal wrote:
->> On 1/30/23 15:48, Christoph Hellwig wrote:
->>> On Sun, Jan 29, 2023 at 08:44:06PM -0700, Jens Axboe wrote:
->>>> I would prefer if we just delete it after merging this one, in the s=
-ame
->>>> release. I don't think there's any point in delaying, as we're not
->>>> removing any functionality.
->>>>
->>>> You could just queue that up too when adding this patch.
->>>
->>> I'd prefer to just deprecate.  But most importantly I want this patch
->>> in ASAP in some form.
->>
->> I will queue it. But I think it needs a follow up to result in somethi=
-ng
->> consistent with KConfig. So either deprecate or delete PARPORT. I can =
-queue the
->> deprecate patch and delete in 6.4, even though I share Jen's opinion t=
-o simply
->> delete directly. I am still fine either way.
->>
->> Jens,
->>
->> If you are OK with that, can I get your ack for the deprecate patch ? =
-Unless you
->> prefer taking it through the block tree. Either way is fine with me.
->=20
-> Yeah I'd be happy to ack that, did you post it? You can add my ack to t=
-he
-> new driver, fine with that now.
+Since commit 0a9a25ca7843 ("block: let blkcg_gq grab request queue's
+refcnt") for many request queues the reference count drops to 1 when
+the request queue is destroyed instead of to 0. In other words, the
+request queue is leaked. Fix this by reverting that commit.
 
-Will do. But I did not want to queue the new driver without killing (or
-deprecating) the old code too. Ondrej has now sent 2 patches to remove th=
-e old
-code. Please ack that !
+This leak was discovered by running the following shell command before
+and after the sub-page block layer tests:
 
---=20
-Damien Le Moal
-Western Digital Research
+cat /sys/kernel/debug/block/sub_page_limit_queues
 
+Without this patch, the above debugfs attribute is increased by one
+after each such sub-page block layer test. With this revert applied,
+that debugfs attribute drops to zero after each sub-page block layer
+test.
+
+Cc: Ming Lei <ming.lei@redhat.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+---
+ block/blk-cgroup.c | 4 ----
+ 1 file changed, 4 deletions(-)
+
+diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+index cb110fc51940..2e531268f725 100644
+--- a/block/blk-cgroup.c
++++ b/block/blk-cgroup.c
+@@ -141,7 +141,6 @@ static void blkg_free_workfn(struct work_struct *work)
+ 	if (q) {
+ 		list_del_init(&blkg->q_node);
+ 		mutex_unlock(&q->blkcg_mutex);
+-		blk_put_queue(q);
+ 	}
+ 
+ 	free_percpu(blkg->iostat_cpu);
+@@ -273,9 +272,6 @@ static struct blkcg_gq *blkg_alloc(struct blkcg *blkcg, struct gendisk *disk,
+ 	if (!blkg->iostat_cpu)
+ 		goto err_free;
+ 
+-	if (!blk_get_queue(disk->queue))
+-		goto err_free;
+-
+ 	blkg->q = disk->queue;
+ 	INIT_LIST_HEAD(&blkg->q_node);
+ 	spin_lock_init(&blkg->async_bio_lock);
