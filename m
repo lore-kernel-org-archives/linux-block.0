@@ -2,278 +2,204 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1FF3CC636CB
-	for <linux-block@archiver.kernel.org>; Mon, 30 Jan 2023 18:14:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E3E43C54EAA
+	for <linux-block@archiver.kernel.org>; Mon, 30 Jan 2023 18:21:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235791AbjA3SOG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 30 Jan 2023 13:14:06 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46238 "EHLO
+        id S238049AbjA3SVT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 30 Jan 2023 13:21:19 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51536 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235989AbjA3SNw (ORCPT
+        with ESMTP id S237501AbjA3SVC (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 30 Jan 2023 13:13:52 -0500
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F2121421C;
-        Mon, 30 Jan 2023 10:13:50 -0800 (PST)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 983A7200DD;
-        Mon, 30 Jan 2023 18:13:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1675102429; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=SNxI0eILZsT0ZpJU4Ikym3U4bJ8bsY1RVhe6JapEDyM=;
-        b=Pu9D8ttYkHk0pqHlPKwpwzOqBdf/MV34GxxD/3Yrakj3Sst+O1WzH+tVIFFVSu1DDaQNL6
-        4a/NqSfErFtrnLux7TMHH2WqsGJKvjQZ1DZ9sLqqeeT25FtW/8H3Mblb72f5SV0cluGH1L
-        lbbx32a8i0sgIjMYUcfe5I8m7BNulGs=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1675102429;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=SNxI0eILZsT0ZpJU4Ikym3U4bJ8bsY1RVhe6JapEDyM=;
-        b=E5Fb+il3EJ015R5rQIN8t/9qW/HauTXNSV90bmERe7R11XKmzlNidymUolidsdSKbQLSE7
-        IzyAhGWBv5+bQiBg==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 70A4513A06;
-        Mon, 30 Jan 2023 18:13:49 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id bLLPGt0I2GPsXwAAMHmgww
-        (envelope-from <hare@suse.de>); Mon, 30 Jan 2023 18:13:49 +0000
-Message-ID: <85b5ddfa-ad7b-1f8d-a130-72a281b4aa7f@suse.de>
-Date:   Mon, 30 Jan 2023 19:13:47 +0100
+        Mon, 30 Jan 2023 13:21:02 -0500
+Received: from mail-ej1-x62d.google.com (mail-ej1-x62d.google.com [IPv6:2a00:1450:4864:20::62d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 55689460A8;
+        Mon, 30 Jan 2023 10:20:33 -0800 (PST)
+Received: by mail-ej1-x62d.google.com with SMTP id gr7so9762584ejb.5;
+        Mon, 30 Jan 2023 10:20:33 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=ESqBBPYpgVN5uZcCivO5DaR4zZN15VVDdNsOZiTKtrU=;
+        b=nKCKI2eUxGRcaSZgTmFPehKr3qVxRp0sSTX6As0CJA6cEO7S5tDGHwTtxcWOBvjG+5
+         ClZltX4Y3POVohJyazbmQlAgJeqcXDECvGEvMfxGmFMz3/p/ZhQ+I4K6gGF2MU13LJ4z
+         19Axk50kaCOy1pUa9HjxYbHCoGtn4Ea+kFtIk141HMca3CQJQn9DvmK96fWyEakjLuFq
+         iS3N2a/s6O/Q2gCI7ySoWzJQ5GPGtaTalwh8TJ4L/KQFPakIBY+KAO+Np+5mMe0R40Ay
+         cBp8FloBIDKo0FIkdpo6fBsfxBdHgDQ9NaLb0nfuj9pZ+SEcS+GIfKSiynUsG/BBJ7OX
+         +CfQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ESqBBPYpgVN5uZcCivO5DaR4zZN15VVDdNsOZiTKtrU=;
+        b=FWDa/aINAz59v3oAKXa78d67noq6gIFj9igZ3ngf8wUdHDTlqSQC/pPHuhgKTRWnEl
+         gmJPtjLwIP1FU4QHDcJk1724QBUwQwNSpsLv2d+2aGz1d/NtGC13vBQCNcMhI2JcJ2CF
+         dgIitT1hCv+SvXwG6TWCRnibJdTVhjPoTlFoGvW0uCFvh/3GtmMpvyPwI+c2co72GdVs
+         4OPRLesjxPWlE18swXCbquIe0T5kfAGdColCL63nMCn2pX5glQ9eqHPM/bPzNJMpqJNz
+         +x3GvU1qUlPZrI+vEwQof5lws/eM/FovnbmRqHLEetPgCSXQwiikepcSIuEBoYZUavqs
+         oXgA==
+X-Gm-Message-State: AFqh2kqhkBqTu5nmwU64lJvLdqKWD8o+BaPaOHrfvig+aZExtB2GyQrr
+        BYJnXl4gMbkj1RJoJYHm1fU0LPgtUxcfcoV/fiQPWkWJ6gx/qA==
+X-Google-Smtp-Source: AMrXdXunXSZTlv6MlRv2Hm0y6kSEWFLV2akgLcFsz+yoVqsfzKFvu004fWkS1yRIAW4Rk97VhQXcJdOpL6Dcz/TIiuw=
+X-Received: by 2002:a17:906:7754:b0:86f:2cc2:7028 with SMTP id
+ o20-20020a170906775400b0086f2cc27028mr7705802ejn.133.1675102831692; Mon, 30
+ Jan 2023 10:20:31 -0800 (PST)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.1
-Subject: Re: [PATCH v3 08/18] scsi: sd: set read/write commands CDL index
-Content-Language: en-US
-To:     Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-        Niklas Cassel <niklas.cassel@wdc.com>,
-        "James E.J. Bottomley" <jejb@linux.ibm.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>
-Cc:     Christoph Hellwig <hch@lst.de>, linux-scsi@vger.kernel.org,
-        linux-ide@vger.kernel.org, linux-block@vger.kernel.org
-References: <20230124190308.127318-1-niklas.cassel@wdc.com>
- <20230124190308.127318-9-niklas.cassel@wdc.com>
- <e257cab1-7eed-d1d5-4129-f2bedb50953e@suse.de>
- <416d42f5-d2a3-1f6e-122a-10771dc44e55@opensource.wdc.com>
-From:   Hannes Reinecke <hare@suse.de>
-In-Reply-To: <416d42f5-d2a3-1f6e-122a-10771dc44e55@opensource.wdc.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+References: <20230130092157.1759539-1-hch@lst.de> <20230130092157.1759539-24-hch@lst.de>
+In-Reply-To: <20230130092157.1759539-24-hch@lst.de>
+From:   Ilya Dryomov <idryomov@gmail.com>
+Date:   Mon, 30 Jan 2023 19:20:15 +0100
+Message-ID: <CAOi1vP9U6kTyLgiXDFPtg4nr2ut++cAoowZONsoAtzWV0VosUw@mail.gmail.com>
+Subject: Re: [PATCH 23/23] net-ceph: use bvec_set_page to initialize bvecs
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Minchan Kim <minchan@kernel.org>,
+        Sergey Senozhatsky <senozhatsky@chromium.org>,
+        Keith Busch <kbusch@kernel.org>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        David Howells <dhowells@redhat.com>,
+        Marc Dionne <marc.dionne@auristor.com>,
+        Xiubo Li <xiubli@redhat.com>, Steve French <sfrench@samba.org>,
+        Trond Myklebust <trond.myklebust@hammerspace.com>,
+        Anna Schumaker <anna@kernel.org>,
+        Mike Marshall <hubcap@omnibond.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Chuck Lever <chuck.lever@oracle.com>,
+        linux-block@vger.kernel.org, ceph-devel@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org,
+        target-devel@vger.kernel.org, kvm@vger.kernel.org,
+        netdev@vger.kernel.org, linux-afs@lists.infradead.org,
+        linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+        linux-fsdevel@vger.kernel.org, linux-nfs@vger.kernel.org,
+        devel@lists.orangefs.org, io-uring@vger.kernel.org,
+        linux-mm@kvack.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/28/23 01:03, Damien Le Moal wrote:
-> On 1/28/23 00:30, Hannes Reinecke wrote:
->> On 1/24/23 20:02, Niklas Cassel wrote:
->>> From: Damien Le Moal <damien.lemoal@opensource.wdc.com>
->>>
->>> Introduce the command duration limits helper function
->>> sd_cdl_cmd_limit() to retrieve and set the DLD bits of the
->>> READ/WRITE 16 and READ/WRITE 32 commands to indicate to the device
->>> the command duration limit descriptor to apply to the command.
->>>
->>> When command duration limits are enabled, sd_cdl_cmd_limit() obtains the
->>> index of the descriptor to apply to the command for requests that have
->>> the IOPRIO_CLASS_DL priority class with a priority data sepcifying a
->>> valid descriptor index (1 to 7).
->>>
->>> The read-write sysfs attribute "enable" is introduced to control
->>> setting the command duration limits indexes. If this attribute is set
->>> to 0 (default), command duration limits specified by the user are
->>> ignored. The user must set this attribute to 1 for command duration
->>> limits to be set. Enabling and disabling the command duration limits
->>> feature for ATA devices must be done using the ATA feature sub-page of
->>> the control mode page. The sd_cdl_enable() function is introduced to
->>> check if this mode page is supported by the device and if it is, use
->>> it to enable/disable CDL.
->>>
->>> Signed-off-by: Damien Le Moal <damien.lemoal@opensource.wdc.com>
->>> Co-developed-by: Niklas Cassel <niklas.cassel@wdc.com>
->>> Signed-off-by: Niklas Cassel <niklas.cassel@wdc.com>
->>> ---
->>>    drivers/scsi/sd.c     |  16 +++--
->>>    drivers/scsi/sd.h     |  10 ++++
->>>    drivers/scsi/sd_cdl.c | 134 +++++++++++++++++++++++++++++++++++++++++-
->>>    3 files changed, 152 insertions(+), 8 deletions(-)
->>>
->>> diff --git a/drivers/scsi/sd.c b/drivers/scsi/sd.c
->>> index 7879a5470773..d2eb01337943 100644
->>> --- a/drivers/scsi/sd.c
->>> +++ b/drivers/scsi/sd.c
->>> @@ -1045,13 +1045,14 @@ static blk_status_t sd_setup_flush_cmnd(struct scsi_cmnd *cmd)
->>>    
->>>    static blk_status_t sd_setup_rw32_cmnd(struct scsi_cmnd *cmd, bool write,
->>>    				       sector_t lba, unsigned int nr_blocks,
->>> -				       unsigned char flags)
->>> +				       unsigned char flags, unsigned int dld)
->>>    {
->>>    	cmd->cmd_len = SD_EXT_CDB_SIZE;
->>>    	cmd->cmnd[0]  = VARIABLE_LENGTH_CMD;
->>>    	cmd->cmnd[7]  = 0x18; /* Additional CDB len */
->>>    	cmd->cmnd[9]  = write ? WRITE_32 : READ_32;
->>>    	cmd->cmnd[10] = flags;
->>> +	cmd->cmnd[11] = dld & 0x07;
->>>    	put_unaligned_be64(lba, &cmd->cmnd[12]);
->>>    	put_unaligned_be32(lba, &cmd->cmnd[20]); /* Expected Indirect LBA */
->>>    	put_unaligned_be32(nr_blocks, &cmd->cmnd[28]);
->>> @@ -1061,12 +1062,12 @@ static blk_status_t sd_setup_rw32_cmnd(struct scsi_cmnd *cmd, bool write,
->>>    
->>>    static blk_status_t sd_setup_rw16_cmnd(struct scsi_cmnd *cmd, bool write,
->>>    				       sector_t lba, unsigned int nr_blocks,
->>> -				       unsigned char flags)
->>> +				       unsigned char flags, unsigned int dld)
->>>    {
->>>    	cmd->cmd_len  = 16;
->>>    	cmd->cmnd[0]  = write ? WRITE_16 : READ_16;
->>> -	cmd->cmnd[1]  = flags;
->>> -	cmd->cmnd[14] = 0;
->>> +	cmd->cmnd[1]  = flags | ((dld >> 2) & 0x01);
->>> +	cmd->cmnd[14] = (dld & 0x03) << 6;
->>>    	cmd->cmnd[15] = 0;
->>>    	put_unaligned_be64(lba, &cmd->cmnd[2]);
->>>    	put_unaligned_be32(nr_blocks, &cmd->cmnd[10]);
->>> @@ -1129,6 +1130,7 @@ static blk_status_t sd_setup_read_write_cmnd(struct scsi_cmnd *cmd)
->>>    	unsigned int mask = logical_to_sectors(sdp, 1) - 1;
->>>    	bool write = rq_data_dir(rq) == WRITE;
->>>    	unsigned char protect, fua;
->>> +	unsigned int dld = 0;
->>>    	blk_status_t ret;
->>>    	unsigned int dif;
->>>    	bool dix;
->>> @@ -1178,6 +1180,8 @@ static blk_status_t sd_setup_read_write_cmnd(struct scsi_cmnd *cmd)
->>>    	fua = rq->cmd_flags & REQ_FUA ? 0x8 : 0;
->>>    	dix = scsi_prot_sg_count(cmd);
->>>    	dif = scsi_host_dif_capable(cmd->device->host, sdkp->protection_type);
->>> +	if (sd_cdl_enabled(sdkp))
->>> +		dld = sd_cdl_dld(sdkp, cmd);
->>>    
->>>    	if (dif || dix)
->>>    		protect = sd_setup_protect_cmnd(cmd, dix, dif);
->>> @@ -1186,10 +1190,10 @@ static blk_status_t sd_setup_read_write_cmnd(struct scsi_cmnd *cmd)
->>>    
->>>    	if (protect && sdkp->protection_type == T10_PI_TYPE2_PROTECTION) {
->>>    		ret = sd_setup_rw32_cmnd(cmd, write, lba, nr_blocks,
->>> -					 protect | fua);
->>> +					 protect | fua, dld);
->>>    	} else if (sdp->use_16_for_rw || (nr_blocks > 0xffff)) {
->>>    		ret = sd_setup_rw16_cmnd(cmd, write, lba, nr_blocks,
->>> -					 protect | fua);
->>> +					 protect | fua, dld);
->>>    	} else if ((nr_blocks > 0xff) || (lba > 0x1fffff) ||
->>>    		   sdp->use_10_for_rw || protect) {
->>>    		ret = sd_setup_rw10_cmnd(cmd, write, lba, nr_blocks,
->>> diff --git a/drivers/scsi/sd.h b/drivers/scsi/sd.h
->>> index e60d33bd222a..5b6b6dc4b92d 100644
->>> --- a/drivers/scsi/sd.h
->>> +++ b/drivers/scsi/sd.h
->>> @@ -130,8 +130,11 @@ struct sd_cdl_page {
->>>    	struct sd_cdl_desc      descs[SD_CDL_MAX_DESC];
->>>    };
->>>    
->>> +struct scsi_disk;
->>> +
->>>    struct sd_cdl {
->>>    	struct kobject		kobj;
->>> +	struct scsi_disk	*sdkp;
->>>    	bool			sysfs_registered;
->>>    	u8			perf_vs_duration_guideline;
->>>    	struct sd_cdl_page	pages[SD_CDL_RW];
->>> @@ -188,6 +191,7 @@ struct scsi_disk {
->>>    	u8		zeroing_mode;
->>>    	u8		nr_actuators;		/* Number of actuators */
->>>    	struct sd_cdl	*cdl;
->>> +	unsigned	cdl_enabled : 1;
->>>    	unsigned	ATO : 1;	/* state of disk ATO bit */
->>>    	unsigned	cache_override : 1; /* temp override of WCE,RCD */
->>>    	unsigned	WCE : 1;	/* state of disk WCE bit */
->>> @@ -355,5 +359,11 @@ void sd_print_result(const struct scsi_disk *sdkp, const char *msg, int result);
->>>    /* Command duration limits support (in sd_cdl.c) */
->>>    void sd_read_cdl(struct scsi_disk *sdkp, unsigned char *buf);
->>>    void sd_cdl_release(struct scsi_disk *sdkp);
->>> +int sd_cdl_dld(struct scsi_disk *sdkp, struct scsi_cmnd *scmd);
->>> +
->>> +static inline bool sd_cdl_enabled(struct scsi_disk *sdkp)
->>> +{
->>> +	return sdkp->cdl && sdkp->cdl_enabled;
->>> +}
->>>    
->>>    #endif /* _SCSI_DISK_H */
->>> diff --git a/drivers/scsi/sd_cdl.c b/drivers/scsi/sd_cdl.c
->>> index 513cd989f19a..59d02dbb5ea1 100644
->>> --- a/drivers/scsi/sd_cdl.c
->>> +++ b/drivers/scsi/sd_cdl.c
->>> @@ -93,6 +93,63 @@ static const char *sd_cdl_policy_name(u8 policy)
->>>    	}
->>>    }
->>>    
->>> +/*
->>> + * Enable/disable CDL.
->>> + */
->>> +static int sd_cdl_enable(struct scsi_disk *sdkp, bool enable)
->>> +{
->>> +	struct scsi_device *sdp = sdkp->device;
->>> +	struct scsi_mode_data data;
->>> +	struct scsi_sense_hdr sshdr;
->>> +	struct scsi_vpd *vpd;
->>> +	bool is_ata = false;
->>> +	char buf[64];
->>> +	int ret;
->>> +
->>> +	rcu_read_lock();
->>> +	vpd = rcu_dereference(sdp->vpd_pg89);
->>> +	if (vpd)
->>> +		is_ata = true;
->>> +	rcu_read_unlock();
->>> +
->>> +	/*
->>> +	 * For ATA devices, CDL needs to be enabled with a SET FEATURES command.
->>> +	 */
->>> +	if (is_ata) {
->>> +		char *buf_data;
->>> +		int len;
->>> +
->>> +		ret = scsi_mode_sense(sdp, 0x08, 0x0a, 0xf2, buf, sizeof(buf),
->>> +				      SD_TIMEOUT, sdkp->max_retries, &data,
->>> +				      NULL);
->>> +		if (ret)
->>> +			return -EINVAL;
->>> +
->> That is a tad odd.
->> Is CDL always enabled for 'normal' SCSI?
-> 
-> Yes it is on the device side. There is no mode sense to turn it on/off. Not sure
-> why it was designed like that in the specs... The sysfs duration_limits/enable
-> attribute is a "soft" on/off switch and it is off by default, even for drives
-> reporting supporting CDL.
-> Hence the "if (is_ata)" to do the mode sense to enable the feature on the device
-> side only for ATA devices. We need this to avoid having 2 different enable
-> pathes with 2 different sysfs "enable" attributes. Doing it like this is a lot
-> less code.
-> 
-Thought as much.
-No-one cares about 'real' SCSI devices anymore ;-)
+On Mon, Jan 30, 2023 at 10:23 AM Christoph Hellwig <hch@lst.de> wrote:
+>
+> Use the bvec_set_page helper to initialize bvecs.
+>
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>  net/ceph/messenger_v1.c |  7 ++-----
+>  net/ceph/messenger_v2.c | 28 +++++++++++-----------------
+>  2 files changed, 13 insertions(+), 22 deletions(-)
+>
+> diff --git a/net/ceph/messenger_v1.c b/net/ceph/messenger_v1.c
+> index d1787d7d33ef9a..d664cb1593a777 100644
+> --- a/net/ceph/messenger_v1.c
+> +++ b/net/ceph/messenger_v1.c
+> @@ -40,15 +40,12 @@ static int ceph_tcp_recvmsg(struct socket *sock, void *buf, size_t len)
+>  static int ceph_tcp_recvpage(struct socket *sock, struct page *page,
+>                      int page_offset, size_t length)
+>  {
+> -       struct bio_vec bvec = {
+> -               .bv_page = page,
+> -               .bv_offset = page_offset,
+> -               .bv_len = length
+> -       };
+> +       struct bio_vec bvec;
+>         struct msghdr msg = { .msg_flags = MSG_DONTWAIT | MSG_NOSIGNAL };
+>         int r;
+>
+>         BUG_ON(page_offset + length > PAGE_SIZE);
+> +       bvec_set_page(&bvec, page, length, page_offset);
+>         iov_iter_bvec(&msg.msg_iter, ITER_DEST, &bvec, 1, length);
+>         r = sock_recvmsg(sock, &msg, msg.msg_flags);
+>         if (r == -EAGAIN)
+> diff --git a/net/ceph/messenger_v2.c b/net/ceph/messenger_v2.c
+> index 3009028c4fa28f..301a991dc6a68e 100644
+> --- a/net/ceph/messenger_v2.c
+> +++ b/net/ceph/messenger_v2.c
+> @@ -149,10 +149,10 @@ static int do_try_sendpage(struct socket *sock, struct iov_iter *it)
+>
+>         while (iov_iter_count(it)) {
+>                 /* iov_iter_iovec() for ITER_BVEC */
+> -               bv.bv_page = it->bvec->bv_page;
+> -               bv.bv_offset = it->bvec->bv_offset + it->iov_offset;
+> -               bv.bv_len = min(iov_iter_count(it),
+> -                               it->bvec->bv_len - it->iov_offset);
+> +               bvec_set_page(&bv, it->bvec->bv_page,
+> +                             min(iov_iter_count(it),
+> +                                 it->bvec->bv_len - it->iov_offset),
+> +                             it->bvec->bv_offset + it->iov_offset);
+>
+>                 /*
+>                  * sendpage cannot properly handle pages with
+> @@ -286,9 +286,8 @@ static void set_out_bvec_zero(struct ceph_connection *con)
+>         WARN_ON(iov_iter_count(&con->v2.out_iter));
+>         WARN_ON(!con->v2.out_zero);
+>
+> -       con->v2.out_bvec.bv_page = ceph_zero_page;
+> -       con->v2.out_bvec.bv_offset = 0;
+> -       con->v2.out_bvec.bv_len = min(con->v2.out_zero, (int)PAGE_SIZE);
+> +       bvec_set_page(&con->v2.out_bvec, ceph_zero_page,
+> +                     min(con->v2.out_zero, (int)PAGE_SIZE), 0);
+>         con->v2.out_iter_sendpage = true;
+>         iov_iter_bvec(&con->v2.out_iter, ITER_SOURCE, &con->v2.out_bvec, 1,
+>                       con->v2.out_bvec.bv_len);
+> @@ -863,10 +862,7 @@ static void get_bvec_at(struct ceph_msg_data_cursor *cursor,
+>
+>         /* get a piece of data, cursor isn't advanced */
+>         page = ceph_msg_data_next(cursor, &off, &len);
+> -
+> -       bv->bv_page = page;
+> -       bv->bv_offset = off;
+> -       bv->bv_len = len;
+> +       bvec_set_page(bv, page, len, off);
+>  }
+>
+>  static int calc_sg_cnt(void *buf, int buf_len)
+> @@ -1855,9 +1851,8 @@ static void prepare_read_enc_page(struct ceph_connection *con)
+>              con->v2.in_enc_resid);
+>         WARN_ON(!con->v2.in_enc_resid);
+>
+> -       bv.bv_page = con->v2.in_enc_pages[con->v2.in_enc_i];
+> -       bv.bv_offset = 0;
+> -       bv.bv_len = min(con->v2.in_enc_resid, (int)PAGE_SIZE);
+> +       bvec_set_page(&bv, con->v2.in_enc_pages[con->v2.in_enc_i],
+> +                     min(con->v2.in_enc_resid, (int)PAGE_SIZE), 0);
+>
+>         set_in_bvec(con, &bv);
+>         con->v2.in_enc_i++;
+> @@ -2998,9 +2993,8 @@ static void queue_enc_page(struct ceph_connection *con)
+>              con->v2.out_enc_resid);
+>         WARN_ON(!con->v2.out_enc_resid);
+>
+> -       bv.bv_page = con->v2.out_enc_pages[con->v2.out_enc_i];
+> -       bv.bv_offset = 0;
+> -       bv.bv_len = min(con->v2.out_enc_resid, (int)PAGE_SIZE);
+> +       bvec_set_page(&bv, con->v2.out_enc_pages[con->v2.out_enc_i],
+> +                     min(con->v2.out_enc_resid, (int)PAGE_SIZE), 0);
+>
+>         set_out_bvec(con, &bv, false);
+>         con->v2.out_enc_i++;
+> --
+> 2.39.0
+>
 
-Reviewed-by: Hannes Reinecke <hare@suse.de>
+Hi Christoph,
 
-Cheers,
+Nit on the patch title: this subsystem should be referred to as
+libceph instead of net-ceph or similar, see "git log -- net/ceph" or
+MAINTAINERS.
 
-Hannes
--- 
-Dr. Hannes Reinecke                Kernel Storage Architect
-hare@suse.de                              +49 911 74053 688
-SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
-HRB 36809 (AG Nürnberg), Geschäftsführer: Ivo Totev, Andrew
-Myers, Andrew McDonald, Martje Boudien Moerman
+Reviewed-by: Ilya Dryomov <idryomov@gmail.com>
 
+Thanks,
+
+                Ilya
