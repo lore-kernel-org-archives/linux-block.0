@@ -2,75 +2,143 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3217C636D0
-	for <linux-block@archiver.kernel.org>; Mon, 30 Jan 2023 10:36:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A7987C54EED
+	for <linux-block@archiver.kernel.org>; Mon, 30 Jan 2023 10:42:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236007AbjA3Kg1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 30 Jan 2023 05:36:27 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33384 "EHLO
+        id S235731AbjA3Kme (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 30 Jan 2023 05:42:34 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36900 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235494AbjA3Kg0 (ORCPT
+        with ESMTP id S233646AbjA3Kmd (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 30 Jan 2023 05:36:26 -0500
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6ED752133;
-        Mon, 30 Jan 2023 02:36:25 -0800 (PST)
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id DCD3968D07; Mon, 30 Jan 2023 11:36:19 +0100 (CET)
-Date:   Mon, 30 Jan 2023 11:36:19 +0100
-From:   Christoph Hellwig <hch@lst.de>
-To:     David Howells <dhowells@redhat.com>
-Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        Ilya Dryomov <idryomov@gmail.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Minchan Kim <minchan@kernel.org>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>,
-        Keith Busch <kbusch@kernel.org>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Marc Dionne <marc.dionne@auristor.com>,
-        Xiubo Li <xiubli@redhat.com>, Steve French <sfrench@samba.org>,
-        Trond Myklebust <trond.myklebust@hammerspace.com>,
-        Anna Schumaker <anna@kernel.org>,
-        Mike Marshall <hubcap@omnibond.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Chuck Lever <chuck.lever@oracle.com>,
-        linux-block@vger.kernel.org, ceph-devel@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org,
-        target-devel@vger.kernel.org, kvm@vger.kernel.org,
-        netdev@vger.kernel.org, linux-afs@lists.infradead.org,
-        linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
-        linux-fsdevel@vger.kernel.org, linux-nfs@vger.kernel.org,
-        devel@lists.orangefs.org, io-uring@vger.kernel.org,
-        linux-mm@kvack.org
-Subject: Re: [PATCH 01/23] block: factor out a bvec_set_page helper
-Message-ID: <20230130103619.GA11874@lst.de>
-References: <20230130092157.1759539-2-hch@lst.de> <20230130092157.1759539-1-hch@lst.de> <3347557.1675074816@warthog.procyon.org.uk>
+        Mon, 30 Jan 2023 05:42:33 -0500
+Received: from mail-yw1-x1133.google.com (mail-yw1-x1133.google.com [IPv6:2607:f8b0:4864:20::1133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D358C30E91
+        for <linux-block@vger.kernel.org>; Mon, 30 Jan 2023 02:42:32 -0800 (PST)
+Received: by mail-yw1-x1133.google.com with SMTP id 00721157ae682-510476ee20aso46324247b3.3
+        for <linux-block@vger.kernel.org>; Mon, 30 Jan 2023 02:42:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=HTcQjIvbHVmW9cM95PUDKhv0DPJ5bSRN6ntRWQAraOs=;
+        b=hvDI4lgPJWRZk3R2QKawvHU7sbVj90oUD4pDMefOvLlJuOFpuHXf7IDx8EPa1sNvuo
+         ij2r55/20IbHj9jGPHiJoszw0RE52sEmWQrfJMoLctxQMT8gjxq7P6pE5UGKyyvv05xn
+         +l+uuGkP2kW9LIDWh9qSoCV9RntjZdRQZheoz8ZUj9Y5V+iYW1RWtYG0ou+O7/DfPMoC
+         6aYqvMd9jKjXboyHdFk35mDYfzxAojJuoPnTkvvHmkTLHsiOfWz+UqJvX7KF0iMhhr01
+         scgqV81iLwimaCSfN7SGs+4KJLD5eZbn+JldkTlRErQFW0bfQO7PygVOueO6pnbtCVjy
+         BBIw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=HTcQjIvbHVmW9cM95PUDKhv0DPJ5bSRN6ntRWQAraOs=;
+        b=p8v3AQD3WrRiEBBqAa3muaxPU0qebhfuzvHQiYlC6ORpxsoVsSb7FLJG3hrz/pkKpP
+         WxG3lIOS0SqjE1DIQMH3xxHpZxgC40OPfsVQpUVehhrqNDO0vwFkHMfyvXIACLln1eN8
+         REE3dWLmM9f9c6es+DXXO6W0njtH3MQHjJim1+Nm86xFHByxvVd5DqEWGulVi9feLER2
+         4s9nuL2QIg8FbRRa10KwMiAqRAnRiBiyKxi3ufmsgtRZuJ+bFo597Yvq3KPkQudRlFyj
+         eU/34bmExrhJYWE7IFZ55DPeSUNu/22T+bfi/gaka39chjJNT/LA0kaWiLMKAbzT8/IL
+         Jr+w==
+X-Gm-Message-State: AO0yUKXnjjQYzCCDimVwr8D0EO06rLEhceQK66f941G+/GUn5ZZ3zeTx
+        LFWOWBZUkPZOmPL/4KRVTXPx66FTFq1L2RPaNzPmvw==
+X-Google-Smtp-Source: AK7set9g7Y3OqYeylx2cTaM4vJZeY9JJp5UI012KzYSTcxzdLerxCAhlffcILUniJNZLW4MYBGDVIIXeNZMefeeimB8=
+X-Received: by 2002:a05:690c:706:b0:506:6952:b9c9 with SMTP id
+ bs6-20020a05690c070600b005066952b9c9mr2387036ywb.477.1675075351739; Mon, 30
+ Jan 2023 02:42:31 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <3347557.1675074816@warthog.procyon.org.uk>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+References: <20230127154339.157460-1-ulf.hansson@linaro.org> <5743fb1b-eb4b-d169-a467-ee618bcd75f5@kernel.dk>
+In-Reply-To: <5743fb1b-eb4b-d169-a467-ee618bcd75f5@kernel.dk>
+From:   Linus Walleij <linus.walleij@linaro.org>
+Date:   Mon, 30 Jan 2023 11:42:20 +0100
+Message-ID: <CACRpkdbyOcTBbv+EmDcnMXDjgiP1HKpuYgMF_JhTMOnLj7MA3g@mail.gmail.com>
+Subject: Re: [PATCH] block: Default to build the BFQ I/O scheduler
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Ulf Hansson <ulf.hansson@linaro.org>, linux-block@vger.kernel.org,
+        Paolo Valente <paolo.valente@linaro.org>,
+        linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Jan 30, 2023 at 10:33:36AM +0000, David Howells wrote:
-> Christoph Hellwig <hch@lst.de> wrote:
-> 
-> > +static inline void bvec_set_page(struct bio_vec *bv, struct page *page,
-> > +		unsigned int len, unsigned int offset)
-> 
-> Could you swap len and offset around?  It reads better offset first.  You move
-> offset into the page and then do something with len bytes.
+On Fri, Jan 27, 2023 at 4:48 PM Jens Axboe <axboe@kernel.dk> wrote:
+> On 1/27/23 8:43=E2=80=AFAM, Ulf Hansson wrote:
+> > Today BFQ is widely used and it's also the default choice for some of t=
+he
+> > single-queue-based storage devices. Therefore, let's make it more
+> > convenient to build it as default, along with the other I/O schedulers.
+> >
+> > Let's also build the cgroup support for BFQ as default, as it's likely =
+that
+> > it's wanted too, assuming CONFIG_BLK_CGROUP is also set, of course.
+>
+> This won't make much of a difference, when the symbols are already in
+> the .config. So let's please not. It may be a 'y' for you by default,
+> but for lots of others it is not. Don't impose it on folks.
 
-This matches bio_add_page and the order inside bio_vec itself.  willy
-wanted to switch it around for bio_add_folio but Jens didn't like it,
-so I'll stick to the current convention in this area as well.
+This part:
+
+ config BFQ_GROUP_IOSCHED
+        bool "BFQ hierarchical scheduling support"
+        depends on IOSCHED_BFQ && BLK_CGROUP
++       default y
+        select BLK_CGROUP_RWSTAT
+        help
+
+should certainly be fine. If you select BFQ then it is helpful to get the
+group scheduler as well if you have BLK_CGROUP, so Ulf could you
+please send this part separately with that motivation?
+
+For the selection of BFQ_IOSCHED:
+
+As major distributions have it in their .configs it is kind of established
+standard for them.
+
+The general policy is that the kernel should
+provide "sensible defaults", so it is easy to make correct choices even
+if starting from scratch, relying on a few different out-of-kernel .configs
+from different distros isn't helpful for someone starting from scratch.
+
+What about default enabling it when enabling the relevant subsystems?
+
+The udev script looks like so:
+
+ACTION=3D=3D"add", SUBSYSTEM=3D=3D"block", ENV{DEVTYPE}=3D=3D"disk", \
+  KERNEL=3D=3D"mmcblk*[0-9]|msblk*[0-9]|mspblk*[0-9]|sd*[!0-9]|sr*", \
+  ATTR{queue/scheduler}=3D"bfq"
+
+i.e. drivers/[mmc|memstick|scsi|ata|cdrom]
+
+This can be achieved by adding weak reverse dependencies to these
+subsystems, meaning it will not be default-selected unless you make
+use of one of them, and even then it can be manually removed (in
+difference from using "select").
+
+Example:
+
+diff --git a/drivers/mmc/core/Kconfig b/drivers/mmc/core/Kconfig
+index 6f25c34e4fec..52fe9d7c21cc 100644
+--- a/drivers/mmc/core/Kconfig
++++ b/drivers/mmc/core/Kconfig
+@@ -37,6 +37,7 @@ config PWRSEQ_SIMPLE
+ config MMC_BLOCK
+        tristate "MMC block device driver"
+        depends on BLOCK
++       imply IOSCHED_BFQ
+        default y
+        help
+          Say Y here to enable the MMC block device driver support.
+
+Since all MMC devices will use BFQ on all major distributions this
+makes sense to me. Also it is a policy that can be chosen by each
+subsystem maintainer individually.
+
+There is however the bigger problem of how to make a system come
+up on eg MMC with BFQ on from the start, which I battled before but
+it can be treated as an orthogonal problem.
+
+Yours,
+Linus Walleij
