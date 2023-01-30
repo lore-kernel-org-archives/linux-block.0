@@ -2,95 +2,101 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 91A2FC05027
-	for <linux-block@archiver.kernel.org>; Mon, 30 Jan 2023 01:06:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 98CD1C05027
+	for <linux-block@archiver.kernel.org>; Mon, 30 Jan 2023 01:16:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235075AbjA3BGw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 29 Jan 2023 20:06:52 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48794 "EHLO
+        id S229694AbjA3BQD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 29 Jan 2023 20:16:03 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50518 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233396AbjA3BGv (ORCPT
+        with ESMTP id S229614AbjA3BQC (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 29 Jan 2023 20:06:51 -0500
+        Sun, 29 Jan 2023 20:16:02 -0500
 Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB3F711E8C;
-        Sun, 29 Jan 2023 17:06:46 -0800 (PST)
-Received: from mail02.huawei.com (unknown [172.30.67.143])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4P4ql540C6z4f3kKc;
-        Mon, 30 Jan 2023 09:06:41 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-        by APP3 (Coremail) with SMTP id _Ch0CgDHcyEiGNdjTvytCQ--.44652S3;
-        Mon, 30 Jan 2023 09:06:43 +0800 (CST)
-Subject: Re: [PATCH] block, bfq: fix uaf for bfqq in bic_set_bfqq()
-To:     Jens Axboe <axboe@kernel.dk>, Yu Kuai <yukuai1@huaweicloud.com>,
-        jack@suse.cz, tj@kernel.org, josef@toxicpanda.com,
-        paolo.valente@linaro.org, shinichiro.kawasaki@wdc.com
-Cc:     cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, yi.zhang@huawei.com,
-        yangerkun@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
-References: <20230113094410.2907223-1-yukuai3@huawei.com>
- <4d3f6183-f9d4-b657-0205-fc240bc24c76@huaweicloud.com>
- <7ae20fa2-d9b4-9e21-4209-81bf4845a3c5@kernel.dk>
-From:   Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <e0379fe4-68b4-5590-e9c4-dd0d85a635b6@huaweicloud.com>
-Date:   Mon, 30 Jan 2023 09:06:41 +0800
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3388513DC4;
+        Sun, 29 Jan 2023 17:16:01 -0800 (PST)
+Received: from mail02.huawei.com (unknown [172.30.67.169])
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4P4qxm0M48z4f3tvK;
+        Mon, 30 Jan 2023 09:15:56 +0800 (CST)
+Received: from [10.174.178.129] (unknown [10.174.178.129])
+        by APP1 (Coremail) with SMTP id cCh0CgAHcStMGtdjEr3wCQ--.59762S2;
+        Mon, 30 Jan 2023 09:15:58 +0800 (CST)
+From:   Kemeng Shi <shikemeng@huaweicloud.com>
+Subject: Re: [PATCH v3 0/5] A few bugfix and cleanup patches for sbitmap
+To:     axboe@kernel.dk
+Cc:     jack@suse.cz, kbusch@kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20230116205059.3821738-1-shikemeng@huaweicloud.com>
+Message-ID: <f0428eec-f56e-4425-cc9b-4f352f90fc95@huaweicloud.com>
+Date:   Mon, 30 Jan 2023 09:15:56 +0800
 User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ Thunderbird/60.5.0
 MIME-Version: 1.0
-In-Reply-To: <7ae20fa2-d9b4-9e21-4209-81bf4845a3c5@kernel.dk>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: _Ch0CgDHcyEiGNdjTvytCQ--.44652S3
-X-Coremail-Antispam: 1UD129KBjvdXoW7Xr4rtrW5GFy7Zr17uryUZFb_yoWfAFc_WF
-        s0ka97Gw4jgr4ftFnFya1YyrWkKFyrX34rJry8tr1fAry7ZF4UCa1DWas3Aw45Wr9YkF93
-        AryqgFyYqr4rZjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-        9fnUUIcSsGvfJTRUUUb3AFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
-        6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
-        A2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j
-        6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
-        Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
-        I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
-        4UM4x0Y48IcVAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2kI
-        c2xKxwCYjI0SjxkI62AI1cAE67vIY487MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4
-        AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE
-        17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMI
-        IF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_WFyUJVCq
-        3wCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCT
-        nIWIevJa73UjIFyTuYvjfUoOJ5UUUUU
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+In-Reply-To: <20230116205059.3821738-1-shikemeng@huaweicloud.com>
+Content-Type: text/plain; charset=gbk
+Content-Transfer-Encoding: 7bit
+X-CM-TRANSID: cCh0CgAHcStMGtdjEr3wCQ--.59762S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7KFW7JFyfGF1UWFWDZw1DJrb_yoW8Xw13pr
+        1SqF1fGw1rKr9rWrnFy345JF1Sqw4ktrnrJw1I9F1rur1UAF9xKrykKFWfA34UXFy5tFW7
+        GF4rXr18KF1UXaDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUyEb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k2
+        6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+        vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7Cj
+        xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
+        0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
+        6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
+        Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JMxk0xIA0c2IEe2xFo4CEbIxvr21l42xK82IYc2Ij
+        64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x
+        8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r126r1DMIIYrxkI7VAKI48JMIIF0xvE
+        2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42
+        xK8VAvwI8IcIk0rVWrZr1j6s0DMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIE
+        c7CjxVAFwI0_Jr0_GrUvcSsGvfC2KfnxnUUI43ZEXa7IU1CPfJUUUUU==
+X-CM-SenderInfo: 5vklyvpphqwq5kxd4v5lfo033gof0z/
 X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
 
-在 2023/01/30 5:51, Jens Axboe 写道:
-> On 1/28/23 6:38 PM, Yu Kuai wrote:
->> Hi, Jens
->>
->> 在 2023/01/13 17:44, Yu Kuai 写道:
->>> After commit 64dc8c732f5c ("block, bfq: fix possible uaf for 'bfqq->bic'"),
->>> bic->bfqq will be accessed in bic_set_bfqq(), however, in some context
->>> bic->bfqq will be freed first, and bic_set_bfqq() is called with the freed
->>> bic->bfqq.
->>>
->>> Fix the problem by always freeing bfqq after bic_set_bfqq().
->>>
->>
->> Sorry that I send this patch will wrong email, and you might missed this
->> patch.
->>
->> Can you apply this patch? This patch can't be applied directly to lower
->> version due to Paolo's patchset, I'll send lts patch seperately.
+Hi Jens. Could you apply this patchset and the patchset "[PATCH v4 0/8]
+A few bugfix and cleancode patch for bfq" sent on the same day.
+
+on 1/17/2023 4:50 AM, Kemeng Shi wrote:
+> Hi, this series contain a bugfix patch to correct wake_batch
+> recalculation to avoid potential IO hung and a few cleanup patches to
+> remove unnecessary check and repeat code in sbitmap. Thanks.
 > 
-> I'm confused... So this patch only applies to the 6.3 branch, yet we
-> need it in 6.2 as far as I can tell. Why isn't it against block-6.2
-> then?
+> ---
+> v3:
+>  -Thank Jan for review. Collect Reviewed-by from Jan for all patches.
+>  -some cleanups according to recommends from Jan:
+>    1)Add Fixes tag in patch 2/5 "sbitmap: remove redundant check in
+> __sbitmap_queue_get_batch"
+>    2)Avoid lines over 80 characters in patch 3/5 "sbitmap: rewrite
+> sbitmap_find_bit_in_index to reduce repeat code"
+>    3)Remove pointless line in patch 4/5 "sbitmap: add sbitmap_find_bit
+> to remove repeat code in __sbitmap_get/__sbitmap_get_shallow"
+> 
+> ---
+> v2:
+>  -add patch "sbitmap: correct wake_batch recalculation to avoid potential
+> IO hung"
+> ---
+> 
+> Kemeng Shi (5):
+>   sbitmap: remove unnecessary calculation of alloc_hint in
+>     __sbitmap_get_shallow
+>   sbitmap: remove redundant check in __sbitmap_queue_get_batch
+>   sbitmap: rewrite sbitmap_find_bit_in_index to reduce repeat code
+>   sbitmap: add sbitmap_find_bit to remove repeat code in
+>     __sbitmap_get/__sbitmap_get_shallow
+>   sbitmap: correct wake_batch recalculation to avoid potential IO hung
+> 
+>  lib/sbitmap.c | 102 ++++++++++++++++++++++----------------------------
+>  1 file changed, 45 insertions(+), 57 deletions(-)
 > 
 
-Ok, I'll send a new patch against block-6.2.
-
-Thanks,
-Kuai
+-- 
+Best wishes
+Kemeng Shi
 
