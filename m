@@ -2,97 +2,88 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C6D76C61DA4
-	for <linux-block@archiver.kernel.org>; Mon, 30 Jan 2023 23:23:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2904DC636D3
+	for <linux-block@archiver.kernel.org>; Mon, 30 Jan 2023 23:24:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229701AbjA3XXI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 30 Jan 2023 18:23:08 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49034 "EHLO
+        id S230286AbjA3XY2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 30 Jan 2023 18:24:28 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49424 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229511AbjA3XXH (ORCPT
+        with ESMTP id S230212AbjA3XY1 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 30 Jan 2023 18:23:07 -0500
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D4B1B7684
-        for <linux-block@vger.kernel.org>; Mon, 30 Jan 2023 15:23:06 -0800 (PST)
-Received: by mail-pl1-f174.google.com with SMTP id k13so13366810plg.0
-        for <linux-block@vger.kernel.org>; Mon, 30 Jan 2023 15:23:06 -0800 (PST)
+        Mon, 30 Jan 2023 18:24:27 -0500
+Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 722D7EC50
+        for <linux-block@vger.kernel.org>; Mon, 30 Jan 2023 15:24:26 -0800 (PST)
+Received: by mail-pl1-x62b.google.com with SMTP id 5so13322476plo.3
+        for <linux-block@vger.kernel.org>; Mon, 30 Jan 2023 15:24:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=dwROn1mPsy/kk9N99ydvqBeMM2O2HAtXlONjIBsBtw8=;
+        b=xxGxFvWVTHchteWkrGLVN87rZtWQkFiCxzY68BpeJVBgX7tReOeydvbM95V0Aq4CCl
+         vHzAuADH9mpHuHkcDV4y077Mku51ieEhX4uv3tNKLg/fV9wlVnghUZC+Qqcj6qtUIjsd
+         52uIMtucOiDZGo2ciwqYGgRNZXxUwDdB/GH/0GwMSwijRy26JsMBQP74zJnIayIyl9lJ
+         Te26KbAIxlqkbU86bhr3lqJrGiC7szZ64p9T2BTXJwRMqMhg0+VkpYfJn1Lt/CgaeQ0f
+         dya2uNnHiWPBP3Qvak5U7gKtqN7IrqRBasItA/nM7ffaS1txsYKSc+xc8lG1z++B6XOF
+         WSwg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=p54MTDqlwADC+0KEf6cImeivCfa29snzzezJGFnDkXY=;
-        b=XPZBME3iBMg4L2iyk3agGkYEQtj8lrh3UQdxUaUsAP94QzhkoNuEh//7iA9KyDha+e
-         OfWYFY8sinNWxkSo0j2iH6nYKxNnWLOelhQiGqHon1/3lMXMcI3WBhxhAQzCK3G/hX/D
-         aPsK5sw4joKE4CxWjqHRuBKc0H5n7ndSDHjgF/pVz6CerTjQsXEiYcEAR6t5c0ym5YdH
-         Lr2uz38bF1jyMWcSJc5rKAWn4nf89xLH5JSjt0OYKTEc9HRa//6iTAVpGEl+OcZntFoz
-         fQ8asn5NTxmuL9mJslswnJYdz4bB8tjhSP5mbyPmL7QjqeILH+FmY+docO+11rxY5Jf4
-         h8wg==
-X-Gm-Message-State: AO0yUKViLOpEgrUNr6Nfde+imavSLQ0mi8k+lOsFcVdmiSOkSlmIBgOf
-        36TOsfoVPPmJ+IZpWwIN31cKn+M2G5M=
-X-Google-Smtp-Source: AK7set8fM9P0k62EOM2NbpsBRVekjEoCjEWaqfzj8Q/QjhPPTXsGC651akhUlQ/jgfEGwN0wjzUkYg==
-X-Received: by 2002:a05:6a20:1602:b0:be:8e8d:330c with SMTP id l2-20020a056a20160200b000be8e8d330cmr5290692pzj.27.1675120986300;
-        Mon, 30 Jan 2023 15:23:06 -0800 (PST)
-Received: from bvanassche-linux.mtv.corp.google.com ([2620:15c:211:201:5016:3bcd:59fe:334b])
-        by smtp.gmail.com with ESMTPSA id t1-20020aa79461000000b0058da7e58008sm7991629pfq.36.2023.01.30.15.23.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 30 Jan 2023 15:23:05 -0800 (PST)
-From:   Bart Van Assche <bvanassche@acm.org>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Bart Van Assche <bvanassche@acm.org>,
-        Ming Lei <ming.lei@redhat.com>, Christoph Hellwig <hch@lst.de>
-Subject: [PATCH] block: Revert "let blkcg_gq grab request queue's refcnt"
-Date:   Mon, 30 Jan 2023 15:22:57 -0800
-Message-Id: <20230130232257.972224-1-bvanassche@acm.org>
-X-Mailer: git-send-email 2.39.1.456.gfc5497dd1b-goog
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=dwROn1mPsy/kk9N99ydvqBeMM2O2HAtXlONjIBsBtw8=;
+        b=aWzBo/Bb/R4OuCYPs7li27N9TTb5k+uCNsVpbmKWAcqco1cBAtOsL5mqq7rq5mTZRq
+         ddYtk4oezPJS0qF1hLvn3KtwQ6Z0Ar1khQjiBPfK0mMACdt0FrdNbsKcvMHnoyDfQmz9
+         iKrCTKW2/EszxvsHEi4edQmaJ0DLw5+Yc8FdFHKWGuKXFxsMyyQBihKHscLRy5qH23VE
+         bE2xG8F/wIMlWs20Vy2srmCF3nLG/8SLaQ7r+q1Gs32gYUqMKYqJUcNUV2Lt5mA/WPe1
+         ootin24XSFkcszTMK/KRHnwyK00+bYTVaNDQcdi1VkN99FIwlAjiIXwNgbEjvQqRIhte
+         SFng==
+X-Gm-Message-State: AFqh2koLHfBu8AuEr9JU4M/ksEgJg6y7YXhvBV6ufSj4pQMyKSVc75ek
+        SJxI7FF4kRHiht8N9+q9w4KRFQ==
+X-Google-Smtp-Source: AMrXdXtwvzAVUVQcTEDmRvSkP9UYKDjI1dCGwoHCj3Jhl1jNF1LvHS4uV9XDtAqnjyagFkGrzW5Hqg==
+X-Received: by 2002:a17:902:ab16:b0:195:ea0e:3221 with SMTP id ik22-20020a170902ab1600b00195ea0e3221mr9818704plb.3.1675121065913;
+        Mon, 30 Jan 2023 15:24:25 -0800 (PST)
+Received: from [192.168.1.136] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id g12-20020a63374c000000b00476d1385265sm7190333pgn.25.2023.01.30.15.24.23
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 30 Jan 2023 15:24:25 -0800 (PST)
+Message-ID: <f3a157d7-839f-ffa9-f2a0-d50ad8d45792@kernel.dk>
+Date:   Mon, 30 Jan 2023 16:24:23 -0700
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
+ Thunderbird/102.7.1
+Subject: Re: [PATCH 1/2] drivers/block: Remove PARIDE core and high-level
+ protocols
+To:     Ondrej Zary <linux@zary.sk>,
+        Damien Le Moal <damien.lemoal@opensource.wdc.com>
+Cc:     Christoph Hellwig <hch@lst.de>,
+        Sergey Shtylyov <s.shtylyov@omp.ru>,
+        Tim Waugh <tim@cyberelk.net>, linux-block@vger.kernel.org,
+        linux-parport@lists.infradead.org, linux-ide@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <d4f7ebd5-d90d-fb96-0fad-bd129ac162dc@opensource.wdc.com>
+ <20230130211050.16753-1-linux@zary.sk>
+Content-Language: en-US
+From:   Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20230130211050.16753-1-linux@zary.sk>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Since commit 0a9a25ca7843 ("block: let blkcg_gq grab request queue's
-refcnt") for many request queues the reference count drops to 1 when
-the request queue is destroyed instead of to 0. In other words, the
-request queue is leaked. Fix this by reverting that commit.
+On 1/30/23 2:10 PM, Ondrej Zary wrote:
+> Remove PARIDE core and high level protocols, taking care not to break
+> low-level drivers (used by pata_parport). Also update documentation.
+> 
+> Signed-off-by: Ondrej Zary <linux@zary.sk>
 
-This leak was discovered by running the following shell command before
-and after the sub-page block layer tests:
+Acked-by: Jens Axboe <axboe@kernel.dk>
 
-cat /sys/kernel/debug/block/sub_page_limit_queues
+-- 
+Jens Axboe
 
-Without this patch, the above debugfs attribute is increased by one
-after each such sub-page block layer test. With this revert applied,
-that debugfs attribute drops to zero after each sub-page block layer
-test.
 
-Cc: Ming Lei <ming.lei@redhat.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Bart Van Assche <bvanassche@acm.org>
----
- block/blk-cgroup.c | 4 ----
- 1 file changed, 4 deletions(-)
-
-diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-index cb110fc51940..2e531268f725 100644
---- a/block/blk-cgroup.c
-+++ b/block/blk-cgroup.c
-@@ -141,7 +141,6 @@ static void blkg_free_workfn(struct work_struct *work)
- 	if (q) {
- 		list_del_init(&blkg->q_node);
- 		mutex_unlock(&q->blkcg_mutex);
--		blk_put_queue(q);
- 	}
- 
- 	free_percpu(blkg->iostat_cpu);
-@@ -273,9 +272,6 @@ static struct blkcg_gq *blkg_alloc(struct blkcg *blkcg, struct gendisk *disk,
- 	if (!blkg->iostat_cpu)
- 		goto err_free;
- 
--	if (!blk_get_queue(disk->queue))
--		goto err_free;
--
- 	blkg->q = disk->queue;
- 	INIT_LIST_HEAD(&blkg->q_node);
- 	spin_lock_init(&blkg->async_bio_lock);
