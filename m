@@ -2,101 +2,170 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 75C12C636CD
-	for <linux-block@archiver.kernel.org>; Mon, 30 Jan 2023 22:15:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 48DD7C636CD
+	for <linux-block@archiver.kernel.org>; Mon, 30 Jan 2023 22:21:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230106AbjA3WPq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 30 Jan 2023 17:15:46 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59396 "EHLO
+        id S229501AbjA3WVY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 30 Jan 2023 17:21:24 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33808 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230040AbjA3WPp (ORCPT
+        with ESMTP id S229468AbjA3WVX (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 30 Jan 2023 17:15:45 -0500
-Received: from mail-io1-xd30.google.com (mail-io1-xd30.google.com [IPv6:2607:f8b0:4864:20::d30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2D1E28D39
-        for <linux-block@vger.kernel.org>; Mon, 30 Jan 2023 14:15:44 -0800 (PST)
-Received: by mail-io1-xd30.google.com with SMTP id l7so2616724ioa.7
-        for <linux-block@vger.kernel.org>; Mon, 30 Jan 2023 14:15:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=UpRPgXbzyPldfryxFZ4ysKITNhIghKFBROqanj/f/Sk=;
-        b=Rimt7EyQJHAERbMyCMmnlRKfnzUd6ivIuLZcpvfDAKKf1XtrAzyKZgGyH4SsI1VCFl
-         y71zP0cpkkZADufU3KMqa/2ZG7kemElm2dlXFsHsQwBCYQdp9/LMEKIABfWkxUUL24fs
-         nOyHaogacUTLL2qE3KxiNjWzUgstTBfVOGGxj1ot6sSbvHczG4x2gEc06S02JBVFQqw/
-         Zk3AjJ6WbeoqERAzuBWIbsxeQKQs2RwDjQsb6pWpRLl6lHoMSOdPV/+Xz+yX9n9BFKuA
-         +q6AWSjEehghz28No7wOXPpAhkJQIqEVkeiyYYwlAzeLcE2jfwoVSl+BSXAQkNUkoEnX
-         jnmg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=UpRPgXbzyPldfryxFZ4ysKITNhIghKFBROqanj/f/Sk=;
-        b=aygXZCz+WTEPbV74NbXbMUtOT3AwLP7AtKEg6/RK9RBTF2q/0HzxCi0doEWJjmNBs2
-         rZ7R5rRudYD3f8arzEZfSzmCDcHq5a5ZKfKI4//YFz29sgVmtrBcSNx4nob6z+o8AdfL
-         8iUbIjK53MmxkhyCWqiX7UmjTh6yglYShYyhynDICzJ1CID2tYplHq2vuvaZMhe3FND3
-         8ySxTcjOeIrIL7INV/kGJGPZewUvzwujRDAUV0Mev+3l36K5Zd9L+oIjUL0ydlRsY5Dt
-         WYnOnKxGUt11f4hCd5dJe78IxvhCiG4ON8Hw7d4KNGJRW2xgr6GGo2NTPlQdv0u5091Y
-         OzdQ==
-X-Gm-Message-State: AO0yUKXWB1tZBwcAo/123D7bUdkIe/F2nzGtsBgEEnEp1y5I9svkADza
-        1NLVN6Sctg/UT6+cZtFE3s4aIQ==
-X-Google-Smtp-Source: AK7set/tqTtKUOkSBhdUWbUnjfzdSsFonAnOVZ3meWLdw53puoZxOKpLq8oYEyvusW9O1BKkg3hUeQ==
-X-Received: by 2002:a5d:9d11:0:b0:718:2fa2:6648 with SMTP id j17-20020a5d9d11000000b007182fa26648mr1422084ioj.2.1675116944142;
-        Mon, 30 Jan 2023 14:15:44 -0800 (PST)
-Received: from [192.168.1.94] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id q22-20020a5d8516000000b0071db3975335sm1082375ion.12.2023.01.30.14.15.42
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 30 Jan 2023 14:15:43 -0800 (PST)
-Message-ID: <f392399b-a4c4-2251-e12b-e89fff351c4d@kernel.dk>
-Date:   Mon, 30 Jan 2023 15:15:42 -0700
+        Mon, 30 Jan 2023 17:21:23 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8CE5D39B86
+        for <linux-block@vger.kernel.org>; Mon, 30 Jan 2023 14:20:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1675117235;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=8fWVhH491yPpXf+szPJHgyS9uxnj8Fdldgu4orhy9P0=;
+        b=ahWWlBB1F76T6UhEcXhxWkTeUwAAwZVRO6vOIuNus/eZlITHe2ZxKXIpETgtrzBqpnsy+k
+        6R5JKJI9PV0+6bImn3GzYJ+iP7snypN1kd+bjS9qPOvEtCdD0TQun3PJfY6nNUUxjwNwcs
+        Ifrxi552N8HbgPJVTVgGDuVJ27xQCKU=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-668-qoh5nZAaPRa1CU1j-9GK8A-1; Mon, 30 Jan 2023 17:20:33 -0500
+X-MC-Unique: qoh5nZAaPRa1CU1j-9GK8A-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 78C741C06918;
+        Mon, 30 Jan 2023 22:20:33 +0000 (UTC)
+Received: from localhost (unknown [10.39.195.80])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id C1303492B05;
+        Mon, 30 Jan 2023 22:20:32 +0000 (UTC)
+Date:   Mon, 30 Jan 2023 17:20:30 -0500
+From:   Stefan Hajnoczi <stefanha@redhat.com>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        ZiyangZhang <ZiyangZhang@linux.alibaba.com>,
+        Jonathan Corbet <corbet@lwn.net>
+Subject: Re: [PATCH V4 0/6] ublk_drv: add mechanism for supporting
+ unprivileged ublk device
+Message-ID: <Y9hCrrTYnFf+1Z2Y@fedora>
+References: <20230106041711.914434-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.0
-Subject: Re: [GIT PULL] iov_iter: Improve page extraction (pin or just list)
-Content-Language: en-US
-To:     David Howells <dhowells@redhat.com>,
-        John Hubbard <jhubbard@nvidia.com>
-Cc:     Al Viro <viro@zeniv.linux.org.uk>,
-        Christoph Hellwig <hch@infradead.org>,
-        Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>,
-        David Hildenbrand <david@redhat.com>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        Jeff Layton <jlayton@kernel.org>, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org
-References: <e68c5cab-c3a6-1872-98fa-9f909f23be79@nvidia.com>
- <3351099.1675077249@warthog.procyon.org.uk>
- <fd0003a0-a133-3daf-891c-ba7deafad768@kernel.dk>
- <f57ee72f-38e9-6afa-182f-2794638eadcb@kernel.dk>
- <e8480b18-08af-d101-a721-50d213893492@kernel.dk>
- <3520518.1675116740@warthog.procyon.org.uk>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <3520518.1675116740@warthog.procyon.org.uk>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="GCi/UuuoliWJorVU"
+Content-Disposition: inline
+In-Reply-To: <20230106041711.914434-1-ming.lei@redhat.com>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/30/23 3:12 PM, David Howells wrote:
-> John Hubbard <jhubbard@nvidia.com> wrote:
-> 
->> This is something that we say when adding pin_user_pages_fast(),
->> yes. I doubt that I can quickly find the email thread, but we
->> measured it and weren't immediately able to come up with a way
->> to make it faster.
-> 
-> percpu counters maybe - add them up at the point of viewing?
 
-They are percpu, see my last email. But for every 108 changes (on
-my system), they will do two atomic_long_adds(). So not very
-useful for anything but low frequency modifications.
+--GCi/UuuoliWJorVU
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
--- 
-Jens Axboe
+On Fri, Jan 06, 2023 at 12:17:05PM +0800, Ming Lei wrote:
+> Hello,
+>=20
+> Stefan Hajnoczi suggested un-privileged ublk device[1] for container
+> use case.
+>=20
+> So far only administrator can create/control ublk device which is too
+> strict and increase system administrator burden, and this patchset
+> implements un-privileged ublk device:
+>=20
+> - any user can create ublk device, which can only be controlled &
+>   accessed by the owner of the device or administrator
+>=20
+> For using such mechanism, system administrator needs to deploy two
+> simple udev rules[2] after running 'make install' in ublksrv.
+>=20
+> Userspace(ublksrv):
+>=20
+> 	https://github.com/ming1/ubdsrv/tree/unprivileged-ublk
+>    =20
+> 'ublk add -t $TYPE --un_privileged' is for creating one un-privileged
+> ublk device if the user is un-privileged.
 
+Hi Ming,
+Sorry for the late reply. Is there anything stopping processes with a
+different uid/gid from accessing the unprivileged block device
+(/dev/ublkbN)?
+
+The scenario I'm thinking about is:
+1. Evil user runs "chmod 666 /dev/ublkbN". They are allowed to do this
+   because they are the owner of the block device node.
+2. Evil user causes another user's process (e.g. suid) to open the block
+   device.
+3. Evil user's ublksrv either abuses timing (e.g. never responding or
+   responding after an artifical delay) to DoS or returns corrupted data
+   to exploit bugs in the victim process.
+
+FUSE has exactly the same issue and I think that's why an unprivileged
+FUSE mount cannot be accessed by processes with a different uid/gid.
+
+That extra protection is probably necessary for ublk too.
+
+Stefan
+
+>=20
+>=20
+> [1] https://lore.kernel.org/linux-block/YoOr6jBfgVm8GvWg@stefanha-x1.loca=
+ldomain/
+> [2] https://github.com/ming1/ubdsrv/blob/unprivileged-ublk/README.rst#un-=
+privileged-mode
+>=20
+> V4:
+> 	- only allow to create unprivileged udev for current user, as
+> 	  suggested by Jonathan Corbet
+> 	- fix misc bug for handling failure
+> 	- add detailed document
+> 	- update userspace
+>=20
+> V3:
+> 	- don't warn on invalid user input for setting devt parameter, as
+> 	  suggested by Ziyang, patch 4/6
+> 	- fix one memory corruption issue, patch 6/6
+>=20
+> V2:
+> 	- fix "ublk_ctrl_uring_cmd_permission() error: uninitialized symbol 'mas=
+k'", reported
+> 	by  Dan Carpenter' test robot
+> 	- address Ziyang's comment on dealing with nr_privileged_daemon
+>=20
+>=20
+>=20
+> Ming Lei (6):
+>   ublk_drv: remove nr_aborted_queues from ublk_device
+>   ublk_drv: don't probe partitions if the ubq daemon isn't trusted
+>   ublk_drv: move ublk_get_device_from_id into ublk_ctrl_uring_cmd
+>   ublk_drv: add device parameter UBLK_PARAM_TYPE_DEVT
+>   ublk_drv: add module parameter of ublks_max for limiting max allowed
+>     ublk dev
+>   ublk_drv: add mechanism for supporting unprivileged ublk device
+>=20
+>  Documentation/block/ublk.rst  |  49 ++++-
+>  drivers/block/ublk_drv.c      | 341 ++++++++++++++++++++++++----------
+>  include/uapi/linux/ublk_cmd.h |  49 ++++-
+>  3 files changed, 332 insertions(+), 107 deletions(-)
+>=20
+> --=20
+> 2.31.1
+>=20
+
+--GCi/UuuoliWJorVU
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmPYQq4ACgkQnKSrs4Gr
+c8jSVAgAyCKmn+0SNZSu+vIvt+/3XSkQgv01eibVmgOgLc9B9LOdOKHFPKbGH/Cr
+L7UAi3ncyzp6zwzLIRpx5sjcEi2rjaG6bsTgyCHYoYurdsYS0x9Vl51X2QqQPXzT
+NS7LGaMiFM3NBl4sijBrmx6mdpQpyUXqSf8KAY1+0DKPbHhATjMXiWiiQySpn3DL
+tucxlsshchkaurfk3sPeEOaxxfrnzCHOB99edqoQLmqnLCtdHDHFKK3wlc1B8SlA
+Qae1V4cS4pm5NnTSQZHnk1PNObO7HQNVwXW6gIyhUWcDccB0cCs0w9nxdb7w9m5y
+d6jvG/gskv7Yg3fmwaEpDYMIHT5H9Q==
+=DWFc
+-----END PGP SIGNATURE-----
+
+--GCi/UuuoliWJorVU--
 
