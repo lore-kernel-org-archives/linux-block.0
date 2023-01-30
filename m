@@ -2,170 +2,291 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 48DD7C636CD
-	for <linux-block@archiver.kernel.org>; Mon, 30 Jan 2023 22:21:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 210DFC636D7
+	for <linux-block@archiver.kernel.org>; Mon, 30 Jan 2023 22:58:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229501AbjA3WVY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 30 Jan 2023 17:21:24 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33808 "EHLO
+        id S229966AbjA3W6s (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 30 Jan 2023 17:58:48 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55228 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229468AbjA3WVX (ORCPT
+        with ESMTP id S229495AbjA3W6n (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 30 Jan 2023 17:21:23 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8CE5D39B86
-        for <linux-block@vger.kernel.org>; Mon, 30 Jan 2023 14:20:36 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1675117235;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=8fWVhH491yPpXf+szPJHgyS9uxnj8Fdldgu4orhy9P0=;
-        b=ahWWlBB1F76T6UhEcXhxWkTeUwAAwZVRO6vOIuNus/eZlITHe2ZxKXIpETgtrzBqpnsy+k
-        6R5JKJI9PV0+6bImn3GzYJ+iP7snypN1kd+bjS9qPOvEtCdD0TQun3PJfY6nNUUxjwNwcs
-        Ifrxi552N8HbgPJVTVgGDuVJ27xQCKU=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-668-qoh5nZAaPRa1CU1j-9GK8A-1; Mon, 30 Jan 2023 17:20:33 -0500
-X-MC-Unique: qoh5nZAaPRa1CU1j-9GK8A-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 78C741C06918;
-        Mon, 30 Jan 2023 22:20:33 +0000 (UTC)
-Received: from localhost (unknown [10.39.195.80])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id C1303492B05;
-        Mon, 30 Jan 2023 22:20:32 +0000 (UTC)
-Date:   Mon, 30 Jan 2023 17:20:30 -0500
-From:   Stefan Hajnoczi <stefanha@redhat.com>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        ZiyangZhang <ZiyangZhang@linux.alibaba.com>,
-        Jonathan Corbet <corbet@lwn.net>
-Subject: Re: [PATCH V4 0/6] ublk_drv: add mechanism for supporting
- unprivileged ublk device
-Message-ID: <Y9hCrrTYnFf+1Z2Y@fedora>
-References: <20230106041711.914434-1-ming.lei@redhat.com>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="GCi/UuuoliWJorVU"
-Content-Disposition: inline
-In-Reply-To: <20230106041711.914434-1-ming.lei@redhat.com>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
+        Mon, 30 Jan 2023 17:58:43 -0500
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 4E8A11A49C;
+        Mon, 30 Jan 2023 14:58:42 -0800 (PST)
+Received: by linux.microsoft.com (Postfix, from userid 1052)
+        id EED8320E9FBB; Mon, 30 Jan 2023 14:58:41 -0800 (PST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com EED8320E9FBB
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+        s=default; t=1675119521;
+        bh=mYR+OEaThgLLY/6YxfcXMNKUyeQmZ7wUTKxCR0+jVhs=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=G0pG9aBJ5q3oNSfkvZqbi6sZ8UL2EysbWbse1Vhc9DFmNFmlIv8C6QZSKAPAdq/XM
+         Lk4md5URozP7XpHaqbNqzEEkfmRjFjTpBihlO1w5412oZPNeTP+PnnIqIl7iyqQI2t
+         5VacINOrqfY5G/rL8FHVJrirU8jVYxVwpyWVCt0U=
+From:   Fan Wu <wufan@linux.microsoft.com>
+To:     corbet@lwn.net, zohar@linux.ibm.com, jmorris@namei.org,
+        serge@hallyn.com, tytso@mit.edu, ebiggers@kernel.org,
+        axboe@kernel.dk, agk@redhat.com, snitzer@kernel.org,
+        eparis@redhat.com, paul@paul-moore.com
+Cc:     linux-doc@vger.kernel.org, linux-integrity@vger.kernel.org,
+        linux-security-module@vger.kernel.org,
+        linux-fscrypt@vger.kernel.org, linux-block@vger.kernel.org,
+        dm-devel@redhat.com, linux-audit@redhat.com,
+        roberto.sassu@huawei.com, linux-kernel@vger.kernel.org,
+        Deven Bowers <deven.desai@linux.microsoft.com>,
+        Fan Wu <wufan@linux.microsoft.com>
+Subject: [RFC PATCH v9 01/16] security: add ipe lsm
+Date:   Mon, 30 Jan 2023 14:57:16 -0800
+Message-Id: <1675119451-23180-2-git-send-email-wufan@linux.microsoft.com>
+X-Mailer: git-send-email 1.8.3.1
+In-Reply-To: <1675119451-23180-1-git-send-email-wufan@linux.microsoft.com>
+References: <1675119451-23180-1-git-send-email-wufan@linux.microsoft.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+From: Deven Bowers <deven.desai@linux.microsoft.com>
 
---GCi/UuuoliWJorVU
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Integrity Policy Enforcement (IPE) is an LSM that provides an
+complimentary approach to Mandatory Access Control than existing LSMs
+today.
 
-On Fri, Jan 06, 2023 at 12:17:05PM +0800, Ming Lei wrote:
-> Hello,
->=20
-> Stefan Hajnoczi suggested un-privileged ublk device[1] for container
-> use case.
->=20
-> So far only administrator can create/control ublk device which is too
-> strict and increase system administrator burden, and this patchset
-> implements un-privileged ublk device:
->=20
-> - any user can create ublk device, which can only be controlled &
->   accessed by the owner of the device or administrator
->=20
-> For using such mechanism, system administrator needs to deploy two
-> simple udev rules[2] after running 'make install' in ublksrv.
->=20
-> Userspace(ublksrv):
->=20
-> 	https://github.com/ming1/ubdsrv/tree/unprivileged-ublk
->    =20
-> 'ublk add -t $TYPE --un_privileged' is for creating one un-privileged
-> ublk device if the user is un-privileged.
+Existing LSMs have centered around the concept of access to a resource
+should be controlled by the current user's credentials. IPE's approach,
+is that access to a resource should be controlled by the system's trust
+of a current resource.
 
-Hi Ming,
-Sorry for the late reply. Is there anything stopping processes with a
-different uid/gid from accessing the unprivileged block device
-(/dev/ublkbN)?
+The basis of this approach is defining a global policy to specify which
+resource can be trusted.
 
-The scenario I'm thinking about is:
-1. Evil user runs "chmod 666 /dev/ublkbN". They are allowed to do this
-   because they are the owner of the block device node.
-2. Evil user causes another user's process (e.g. suid) to open the block
-   device.
-3. Evil user's ublksrv either abuses timing (e.g. never responding or
-   responding after an artifical delay) to DoS or returns corrupted data
-   to exploit bugs in the victim process.
+Signed-off-by: Deven Bowers <deven.desai@linux.microsoft.com>
+Signed-off-by: Fan Wu <wufan@linux.microsoft.com>
+---
+v2:
+  + Split evaluation loop, access control hooks,
+    and evaluation loop from policy parser and userspace
+    interface to pass mailing list character limit
 
-FUSE has exactly the same issue and I think that's why an unprivileged
-FUSE mount cannot be accessed by processes with a different uid/gid.
+v3:
+  + Move ipe_load_properties to patch 04.
+  + Remove useless 0-initializations
+  + Prefix extern variables with ipe_
+  + Remove kernel module parameters, as these are
+    exposed through sysctls.
+  + Add more prose to the IPE base config option
+    help text.
+  + Use GFP_KERNEL for audit_log_start.
+  + Remove unnecessary caching system.
+  + Remove comments from headers
+  + Use rcu_access_pointer for rcu-pointer null check
+  + Remove usage of reqprot; use prot only.
+  + Move policy load and activation audit event to 03/12
 
-That extra protection is probably necessary for ublk too.
+v4:
+  + Remove sysctls in favor of securityfs nodes
+  + Re-add kernel module parameters, as these are now
+    exposed through securityfs.
+  + Refactor property audit loop to a separate function.
 
-Stefan
+v5:
+  + fix minor grammatical errors
+  + do not group rule by curly-brace in audit record,
+    reconstruct the exact rule.
 
->=20
->=20
-> [1] https://lore.kernel.org/linux-block/YoOr6jBfgVm8GvWg@stefanha-x1.loca=
-ldomain/
-> [2] https://github.com/ming1/ubdsrv/blob/unprivileged-ublk/README.rst#un-=
-privileged-mode
->=20
-> V4:
-> 	- only allow to create unprivileged udev for current user, as
-> 	  suggested by Jonathan Corbet
-> 	- fix misc bug for handling failure
-> 	- add detailed document
-> 	- update userspace
->=20
-> V3:
-> 	- don't warn on invalid user input for setting devt parameter, as
-> 	  suggested by Ziyang, patch 4/6
-> 	- fix one memory corruption issue, patch 6/6
->=20
-> V2:
-> 	- fix "ublk_ctrl_uring_cmd_permission() error: uninitialized symbol 'mas=
-k'", reported
-> 	by  Dan Carpenter' test robot
-> 	- address Ziyang's comment on dealing with nr_privileged_daemon
->=20
->=20
->=20
-> Ming Lei (6):
->   ublk_drv: remove nr_aborted_queues from ublk_device
->   ublk_drv: don't probe partitions if the ubq daemon isn't trusted
->   ublk_drv: move ublk_get_device_from_id into ublk_ctrl_uring_cmd
->   ublk_drv: add device parameter UBLK_PARAM_TYPE_DEVT
->   ublk_drv: add module parameter of ublks_max for limiting max allowed
->     ublk dev
->   ublk_drv: add mechanism for supporting unprivileged ublk device
->=20
->  Documentation/block/ublk.rst  |  49 ++++-
->  drivers/block/ublk_drv.c      | 341 ++++++++++++++++++++++++----------
->  include/uapi/linux/ublk_cmd.h |  49 ++++-
->  3 files changed, 332 insertions(+), 107 deletions(-)
->=20
-> --=20
-> 2.31.1
->=20
+v6:
+  + No changes
 
---GCi/UuuoliWJorVU
-Content-Type: application/pgp-signature; name="signature.asc"
+v7:
+  + Further split lsm creation into a separate commit from the
+    evaluation loop and audit system, for easier review.
 
------BEGIN PGP SIGNATURE-----
+  + Introduce the concept of an ipe_context, a scoped way to
+    introduce execution policies, used initially for allowing for
+    kunit tests in isolation.
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmPYQq4ACgkQnKSrs4Gr
-c8jSVAgAyCKmn+0SNZSu+vIvt+/3XSkQgv01eibVmgOgLc9B9LOdOKHFPKbGH/Cr
-L7UAi3ncyzp6zwzLIRpx5sjcEi2rjaG6bsTgyCHYoYurdsYS0x9Vl51X2QqQPXzT
-NS7LGaMiFM3NBl4sijBrmx6mdpQpyUXqSf8KAY1+0DKPbHhATjMXiWiiQySpn3DL
-tucxlsshchkaurfk3sPeEOaxxfrnzCHOB99edqoQLmqnLCtdHDHFKK3wlc1B8SlA
-Qae1V4cS4pm5NnTSQZHnk1PNObO7HQNVwXW6gIyhUWcDccB0cCs0w9nxdb7w9m5y
-d6jvG/gskv7Yg3fmwaEpDYMIHT5H9Q==
-=DWFc
------END PGP SIGNATURE-----
+v8:
+  + Follow lsmname_hook_name convention for lsm hooks.
+  + Move LSM blob accessors to ipe.c and mark LSM blobs as static.
 
---GCi/UuuoliWJorVU--
+v9:
+  + Remove ipe_context for simplification
+---
+ MAINTAINERS           |  5 +++++
+ security/Kconfig      | 11 ++++++-----
+ security/Makefile     |  1 +
+ security/ipe/Kconfig  | 17 +++++++++++++++++
+ security/ipe/Makefile | 10 ++++++++++
+ security/ipe/ipe.c    | 40 ++++++++++++++++++++++++++++++++++++++++
+ security/ipe/ipe.h    | 13 +++++++++++++
+ 7 files changed, 92 insertions(+), 5 deletions(-)
+ create mode 100644 security/ipe/Kconfig
+ create mode 100644 security/ipe/Makefile
+ create mode 100644 security/ipe/ipe.c
+ create mode 100644 security/ipe/ipe.h
+
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 8a5c25c20d00..5e27e84763cc 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -10273,6 +10273,11 @@ T:	git git://git.kernel.org/pub/scm/linux/kernel/git/zohar/linux-integrity.git
+ F:	security/integrity/ima/
+ F:	security/integrity/
+ 
++INTEGRITY POLICY ENFORCEMENT (IPE)
++M:	Fan Wu <wufan@linux.microsoft.com>
++S:	Supported
++F:	security/ipe/
++
+ INTEL 810/815 FRAMEBUFFER DRIVER
+ M:	Antonino Daplas <adaplas@gmail.com>
+ L:	linux-fbdev@vger.kernel.org
+diff --git a/security/Kconfig b/security/Kconfig
+index e6db09a779b7..9f59add2d16c 100644
+--- a/security/Kconfig
++++ b/security/Kconfig
+@@ -207,6 +207,7 @@ source "security/yama/Kconfig"
+ source "security/safesetid/Kconfig"
+ source "security/lockdown/Kconfig"
+ source "security/landlock/Kconfig"
++source "security/ipe/Kconfig"
+ 
+ source "security/integrity/Kconfig"
+ 
+@@ -246,11 +247,11 @@ endchoice
+ 
+ config LSM
+ 	string "Ordered list of enabled LSMs"
+-	default "landlock,lockdown,yama,loadpin,safesetid,integrity,smack,selinux,tomoyo,apparmor,bpf" if DEFAULT_SECURITY_SMACK
+-	default "landlock,lockdown,yama,loadpin,safesetid,integrity,apparmor,selinux,smack,tomoyo,bpf" if DEFAULT_SECURITY_APPARMOR
+-	default "landlock,lockdown,yama,loadpin,safesetid,integrity,tomoyo,bpf" if DEFAULT_SECURITY_TOMOYO
+-	default "landlock,lockdown,yama,loadpin,safesetid,integrity,bpf" if DEFAULT_SECURITY_DAC
+-	default "landlock,lockdown,yama,loadpin,safesetid,integrity,selinux,smack,tomoyo,apparmor,bpf"
++	default "landlock,lockdown,yama,loadpin,safesetid,integrity,ipe,smack,selinux,tomoyo,apparmor,bpf" if DEFAULT_SECURITY_SMACK
++	default "landlock,lockdown,yama,loadpin,safesetid,integrity,ipe,apparmor,selinux,smack,tomoyo,bpf" if DEFAULT_SECURITY_APPARMOR
++	default "landlock,lockdown,yama,loadpin,safesetid,integrity,ipe,tomoyo,bpf" if DEFAULT_SECURITY_TOMOYO
++	default "landlock,lockdown,yama,loadpin,safesetid,integrity,ipe,bpf" if DEFAULT_SECURITY_DAC
++	default "landlock,lockdown,yama,loadpin,safesetid,integrity,ipe,selinux,smack,tomoyo,apparmor,bpf"
+ 	help
+ 	  A comma-separated list of LSMs, in initialization order.
+ 	  Any LSMs left off this list will be ignored. This can be
+diff --git a/security/Makefile b/security/Makefile
+index 18121f8f85cd..527b1864d96c 100644
+--- a/security/Makefile
++++ b/security/Makefile
+@@ -24,6 +24,7 @@ obj-$(CONFIG_SECURITY_LOCKDOWN_LSM)	+= lockdown/
+ obj-$(CONFIG_CGROUPS)			+= device_cgroup.o
+ obj-$(CONFIG_BPF_LSM)			+= bpf/
+ obj-$(CONFIG_SECURITY_LANDLOCK)		+= landlock/
++obj-$(CONFIG_SECURITY_IPE)		+= ipe/
+ 
+ # Object integrity file lists
+ obj-$(CONFIG_INTEGRITY)			+= integrity/
+diff --git a/security/ipe/Kconfig b/security/ipe/Kconfig
+new file mode 100644
+index 000000000000..e4875fb04883
+--- /dev/null
++++ b/security/ipe/Kconfig
+@@ -0,0 +1,17 @@
++# SPDX-License-Identifier: GPL-2.0-only
++#
++# Integrity Policy Enforcement (IPE) configuration
++#
++
++menuconfig SECURITY_IPE
++	bool "Integrity Policy Enforcement (IPE)"
++	depends on SECURITY && SECURITYFS
++	select PKCS7_MESSAGE_PARSER
++	select SYSTEM_DATA_VERIFICATION
++	help
++	  This option enables the Integrity Policy Enforcement LSM
++	  allowing users to define a policy to enforce a trust-based access
++	  control. A key feature of IPE is a customizable policy to allow
++	  admins to reconfigure trust requirements on the fly.
++
++	  If unsure, answer N.
+diff --git a/security/ipe/Makefile b/security/ipe/Makefile
+new file mode 100644
+index 000000000000..571648579991
+--- /dev/null
++++ b/security/ipe/Makefile
+@@ -0,0 +1,10 @@
++# SPDX-License-Identifier: GPL-2.0
++#
++# Copyright (C) Microsoft Corporation. All rights reserved.
++#
++# Makefile for building the IPE module as part of the kernel tree.
++#
++
++obj-$(CONFIG_SECURITY_IPE) += \
++	hooks.o \
++	ipe.o \
+diff --git a/security/ipe/ipe.c b/security/ipe/ipe.c
+new file mode 100644
+index 000000000000..9ed3bf4dcc04
+--- /dev/null
++++ b/security/ipe/ipe.c
+@@ -0,0 +1,40 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Copyright (C) Microsoft Corporation. All rights reserved.
++ */
++
++#include "ipe.h"
++
++static struct lsm_blob_sizes ipe_blobs __lsm_ro_after_init = {
++};
++
++static struct security_hook_list ipe_hooks[] __lsm_ro_after_init = {
++};
++
++/**
++ * ipe_init - Entry point of IPE.
++ *
++ * This is called at LSM init, which happens occurs early during kernel
++ * start up. During this phase, IPE loads the properties compiled into
++ * the kernel, and register's IPE's hooks. The boot policy is loaded
++ * later, during securityfs init, at which point IPE will start
++ * enforcing its policy.
++ *
++ * Return:
++ * * 0		- OK
++ * * -ENOMEM	- Context creation failed.
++ */
++static int __init ipe_init(void)
++{
++	int rc = 0;
++
++	security_add_hooks(ipe_hooks, ARRAY_SIZE(ipe_hooks), "ipe");
++
++	return rc;
++}
++
++DEFINE_LSM(ipe) = {
++	.name = "ipe",
++	.init = ipe_init,
++	.blobs = &ipe_blobs,
++};
+diff --git a/security/ipe/ipe.h b/security/ipe/ipe.h
+new file mode 100644
+index 000000000000..ee7ec3f3b55d
+--- /dev/null
++++ b/security/ipe/ipe.h
+@@ -0,0 +1,13 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/*
++ * Copyright (C) Microsoft Corporation. All rights reserved.
++ */
++
++#ifndef IPE_H
++#define IPE_H
++
++#define pr_fmt(fmt) "IPE " fmt "\n"
++
++#include <linux/lsm_hooks.h>
++
++#endif /* IPE_H */
+-- 
+2.39.0
 
