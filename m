@@ -2,92 +2,67 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0F32C636CC
-	for <linux-block@archiver.kernel.org>; Tue, 31 Jan 2023 21:50:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5903BC636D7
+	for <linux-block@archiver.kernel.org>; Tue, 31 Jan 2023 23:01:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229767AbjAaVug (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 31 Jan 2023 16:50:36 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60020 "EHLO
+        id S232123AbjAaXBC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 31 Jan 2023 18:01:02 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48230 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229615AbjAaVuf (ORCPT
+        with ESMTP id S229637AbjAaXBC (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 31 Jan 2023 16:50:35 -0500
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA2045FCE
-        for <linux-block@vger.kernel.org>; Tue, 31 Jan 2023 13:50:34 -0800 (PST)
-Received: by mail-pl1-f177.google.com with SMTP id d3so16467393plr.10
-        for <linux-block@vger.kernel.org>; Tue, 31 Jan 2023 13:50:34 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=wKD1L0WCvHn1Wu1fu9GE06Ee8ifVmPB55bUaTrUQqkc=;
-        b=dvm9d+tebqNxkgdZyJDCQzwi14TLfVwQEGpFfyT90na9BV7u5sJSk9tApwLIg61Hq2
-         7b7DtXHmmMN/TVM5Jd/Taewr7X35bTaaHzgx48K33MmTtgCy8RH2QX+5+OqWkKsIqP1z
-         RcBAw3kfFiccWXsRSM+IuGmo3J8ffV2iC5mauykSzguASRcxXr15/5eres2S/CFO1NVi
-         f1TD89hcvfDIiHhtwVg+k6kLxZHozmgOb71zbdiZWNNbeUrcpQmZPK2ow+ghUU+VvKxL
-         OXiANy9rXIJRAr5l+yBfVYzc+A+gIy5BuYDyRnNbvys8U0+tJmR3FH81n6VflN1tTC9J
-         2Oew==
-X-Gm-Message-State: AO0yUKUzWbrle3/sMg94KStaG6DTB0exZX7hm1Q5d8D6ZlUHApCqqOHt
-        4D4pUKHyU3a5a1j3rMGBzrK7r746LSo=
-X-Google-Smtp-Source: AK7set8rfcN3OeTt5jD1Hcf9Ylk+lnbtRxISojlGHaox8owIwmUGM7/OquJXk3WUutPG3TjHKOXAeA==
-X-Received: by 2002:a17:902:c40d:b0:196:82a0:4177 with SMTP id k13-20020a170902c40d00b0019682a04177mr507239plk.39.1675201834207;
-        Tue, 31 Jan 2023 13:50:34 -0800 (PST)
-Received: from ?IPV6:2620:15c:211:201:7e97:ee02:2248:2471? ([2620:15c:211:201:7e97:ee02:2248:2471])
-        by smtp.gmail.com with ESMTPSA id j7-20020a17090276c700b001932a9e4f2csm5821911plt.255.2023.01.31.13.50.32
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 31 Jan 2023 13:50:33 -0800 (PST)
-Message-ID: <5f5db20c-e66c-5295-0bbe-d71ad730dce2@acm.org>
-Date:   Tue, 31 Jan 2023 13:50:31 -0800
+        Tue, 31 Jan 2023 18:01:02 -0500
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 5DAD64ED23;
+        Tue, 31 Jan 2023 15:01:01 -0800 (PST)
+Received: by linux.microsoft.com (Postfix, from userid 1052)
+        id 02B2720E1A45; Tue, 31 Jan 2023 15:01:01 -0800 (PST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 02B2720E1A45
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+        s=default; t=1675206061;
+        bh=j1VoMU02KeLtjY8TDWq+rO4UuOvmlBPIER8JkQji2a8=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=TggEBO122eJ2C7kl74c+1SFcSJF6DkRp8p/6zKNdTJSzcQvm+ox90trpwmt9MaD16
+         IA13KrKuItDN//TlUQ6WNwy6rn8jpm1/6q1u1qz9vJZwJ7lTGIAYRz9qZ0H2E4RIfZ
+         vL2gNFuJd9e7cGHa1n52ljy9XW5xv9jEo/adSYpU=
+Date:   Tue, 31 Jan 2023 15:01:00 -0800
+From:   Fan Wu <wufan@linux.microsoft.com>
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     corbet@lwn.net, zohar@linux.ibm.com, jmorris@namei.org,
+        serge@hallyn.com, tytso@mit.edu, ebiggers@kernel.org,
+        axboe@kernel.dk, agk@redhat.com, snitzer@kernel.org,
+        eparis@redhat.com, paul@paul-moore.com, linux-doc@vger.kernel.org,
+        linux-integrity@vger.kernel.org,
+        linux-security-module@vger.kernel.org,
+        linux-fscrypt@vger.kernel.org, linux-block@vger.kernel.org,
+        dm-devel@redhat.com, linux-audit@redhat.com,
+        roberto.sassu@huawei.com, linux-kernel@vger.kernel.org,
+        Deven Bowers <deven.desai@linux.microsoft.com>
+Subject: Re: [RFC PATCH v9 09/16] block|security: add LSM blob to block_device
+Message-ID: <20230131230100.GA30104@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+References: <1675119451-23180-1-git-send-email-wufan@linux.microsoft.com>
+ <1675119451-23180-10-git-send-email-wufan@linux.microsoft.com>
+ <Y9jXJ8FrmAnzob7w@infradead.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.0
-Subject: Re: [PATCH] null_blk: Support configuring the maximum segment size
-Content-Language: en-US
-To:     Chaitanya Kulkarni <chaitanyak@nvidia.com>,
-        Jens Axboe <axboe@kernel.dk>
-Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>,
-        Damien Le Moal <damien.lemoal@opensource.wdc.com>
-References: <20230128005926.79336-1-bvanassche@acm.org>
- <8bd89413-bdef-7fe0-9e19-4419e9280f4e@nvidia.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <8bd89413-bdef-7fe0-9e19-4419e9280f4e@nvidia.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Y9jXJ8FrmAnzob7w@infradead.org>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/31/23 13:43, Chaitanya Kulkarni wrote:
-> On 1/27/23 16:59, Bart Van Assche wrote:
->> Add support for configuring the maximum segment size.
->>
->> Add support for segments smaller than the page size.
->>
->> This patch enables testing segments smaller than the page size with a
->> driver that does not call blk_rq_map_sg().
->>
->> Cc: Christoph Hellwig <hch@lst.de>
->> Cc: Ming Lei <ming.lei@redhat.com>
->> Cc: Damien Le Moal <damien.lemoal@opensource.wdc.com>
->> Cc: Chaitanya Kulkarni <kch@nvidia.com>
->> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+On Tue, Jan 31, 2023 at 12:53:59AM -0800, Christoph Hellwig wrote:
+> On Mon, Jan 30, 2023 at 02:57:24PM -0800, Fan Wu wrote:
+> > From: Deven Bowers <deven.desai@linux.microsoft.com>
+> > 
+> > block_device structures can have valuable security properties,
+> > based on how they are created, and what subsystem manages them.
 > 
-> Bart, if you can send a blktest for this it will be great.
+> That's a lot of cloudy talk but no real explanation.
 
-Hi Chaitanya,
+Sorry for being too general here. Currently the only use target of this hook is dm-verity. We use the newly added security hook to save the dm-verity roothash and signature to the new bdev security blob during the bdev creation time, so LSMs can leverage this information to protect the system. 
 
-This patch has been resent as patch 7/7 of the following series: "[PATCH 
-v4 0/7] Add support for limits below the page size" 
-(https://lore.kernel.org/linux-block/20230130212656.876311-1-bvanassche@acm.org/T/#t).
+I will add this example in the next version.
 
-blktests for that patch series are available here: 
-https://github.com/bvanassche/blktests/commits/master. Do you prefer 
-that I send a pull request for these blktests now or do you perhaps 
-prefer that I wait until the kernel patch series has been merged?
-
-Thanks,
-
-Bart.
+-Fan
