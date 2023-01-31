@@ -2,128 +2,141 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4562FC636D3
-	for <linux-block@archiver.kernel.org>; Tue, 31 Jan 2023 13:49:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B844C636CC
+	for <linux-block@archiver.kernel.org>; Tue, 31 Jan 2023 14:00:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229686AbjAaNth (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 31 Jan 2023 08:49:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59520 "EHLO
+        id S232433AbjAaOAN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 31 Jan 2023 09:00:13 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36488 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232358AbjAaNtg (ORCPT
+        with ESMTP id S232430AbjAaOAM (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 31 Jan 2023 08:49:36 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6ED834A238
-        for <linux-block@vger.kernel.org>; Tue, 31 Jan 2023 05:48:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1675172932;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=IjJLFD2d2G0+4FaeIQz9TlcS4nROfEwnimKGLhaKDRA=;
-        b=PZMp0m/Rr7OHld/3ObrDNwqSGqP4dKyP2z3EAGB/91L7KUJJI3fVVsiBJS1mUkRTtDzzS6
-        UgvtuCiIG+jovOAPliTJ71rSgWs5ikohOw2yCcLOpkHZC3DBTwI6XM/dpjdbXGUgxs6Cjw
-        EdL7sRSARlYJPJOsWIoxpi6AbCH6hrU=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-483-dT6_OaPRPEKj22LwE5rI1A-1; Tue, 31 Jan 2023 08:48:51 -0500
-X-MC-Unique: dT6_OaPRPEKj22LwE5rI1A-1
-Received: by mail-wr1-f70.google.com with SMTP id w23-20020adf8bd7000000b002bfbf6f23feso2473189wra.18
-        for <linux-block@vger.kernel.org>; Tue, 31 Jan 2023 05:48:51 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:organization:from:references
-         :cc:to:content-language:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=IjJLFD2d2G0+4FaeIQz9TlcS4nROfEwnimKGLhaKDRA=;
-        b=VIGoeKy2VDnR2Luet3zZTZyvaM4QoB4/axb2Lo5SjH7f7geCXn2uO30YrvPp5+lhXz
-         Ct8IPSLHAZgD/iZVpsXFGHnGbI+rsKxFmT651q88j5AO+ouo8skE2HTurqyO2E2mpO5C
-         VgUuukb7rGXeiz8FcilhF1x5l0ijFNwrFBM2nCWN9w3QGIlH+qMWCpy8/bhBrqLroaiL
-         C9yw1FuuM7m8qRg5AqVIxFdXDiXQSe6/7CLRSjG7hDw6lT074BoDesZ/jeNYNkg09mRI
-         j/64aIkX1tnVVcjXlADOho8A53W9nbSUGxeWiia5FWSj+KX6lCveXyidVPNjXCB6aq9G
-         /7xQ==
-X-Gm-Message-State: AFqh2krqQRdBP8+vsbhP7s+lcXhI3CEcDeC41dFgPzw07ZJh2Nxc8LlI
-        NFo6XVJLwEiOH+LB1332vR0lfLgPjd5jg7RG9j3im69ei5YYuP2g+7FLbNiE6RV/JRMB1hIM9v/
-        4QFsv+Y38rsdp31eM2eZ3wFk=
-X-Received: by 2002:a05:600c:198e:b0:3db:1d7e:c429 with SMTP id t14-20020a05600c198e00b003db1d7ec429mr47082368wmq.40.1675172930142;
-        Tue, 31 Jan 2023 05:48:50 -0800 (PST)
-X-Google-Smtp-Source: AMrXdXshlDM/kQP8UJqjwbUaYwp0yiDAedYva3SxuXjhG46v5k1mOFWlDh+q4kEbTiH/6PL7Sw4dLg==
-X-Received: by 2002:a05:600c:198e:b0:3db:1d7e:c429 with SMTP id t14-20020a05600c198e00b003db1d7ec429mr47082333wmq.40.1675172929825;
-        Tue, 31 Jan 2023 05:48:49 -0800 (PST)
-Received: from ?IPV6:2003:d8:2f0a:ca00:f74f:2017:1617:3ec3? (p200300d82f0aca00f74f201716173ec3.dip0.t-ipconnect.de. [2003:d8:2f0a:ca00:f74f:2017:1617:3ec3])
-        by smtp.gmail.com with ESMTPSA id j5-20020a05600c1c0500b003dc4aae4739sm13771171wms.27.2023.01.31.05.48.48
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 31 Jan 2023 05:48:48 -0800 (PST)
-Message-ID: <88d50843-9aa6-7930-433d-9b488857dc14@redhat.com>
-Date:   Tue, 31 Jan 2023 14:48:47 +0100
+        Tue, 31 Jan 2023 09:00:12 -0500
+Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F2D91227AE
+        for <linux-block@vger.kernel.org>; Tue, 31 Jan 2023 06:00:08 -0800 (PST)
+Received: from mail02.huawei.com (unknown [172.30.67.143])
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4P5mry1lN9z4f3tqM
+        for <linux-block@vger.kernel.org>; Tue, 31 Jan 2023 22:00:02 +0800 (CST)
+Received: from [10.174.176.73] (unknown [10.174.176.73])
+        by APP3 (Coremail) with SMTP id _Ch0CgCHgR_iHtljr5sFCg--.13384S3;
+        Tue, 31 Jan 2023 22:00:04 +0800 (CST)
+Subject: Re: [PATCH] block: Do not reread partition table on exclusively open
+ device
+To:     Jan Kara <jack@suse.cz>, Jens Axboe <axboe@kernel.dk>
+Cc:     Christoph Hellwig <hch@infradead.org>, linux-block@vger.kernel.org,
+        "yukuai (C)" <yukuai3@huawei.com>
+References: <20221130175653.24299-1-jack@suse.cz>
+From:   Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <ada13b1b-dd2a-8be0-3b12-3470a086bbf6@huaweicloud.com>
+Date:   Tue, 31 Jan 2023 22:00:02 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.0
-Subject: Re: [GIT PULL] iov_iter: Improve page extraction (pin or just list)
-Content-Language: en-US
-To:     David Howells <dhowells@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, John Hubbard <jhubbard@nvidia.com>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Christoph Hellwig <hch@infradead.org>,
-        Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        Jeff Layton <jlayton@kernel.org>, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org
-References: <040ed7a7-3f4d-dab7-5a49-1cd9933c5445@redhat.com>
- <e68c5cab-c3a6-1872-98fa-9f909f23be79@nvidia.com>
- <3351099.1675077249@warthog.procyon.org.uk>
- <fd0003a0-a133-3daf-891c-ba7deafad768@kernel.dk>
- <f57ee72f-38e9-6afa-182f-2794638eadcb@kernel.dk>
- <e8480b18-08af-d101-a721-50d213893492@kernel.dk>
- <3520518.1675116740@warthog.procyon.org.uk>
- <f392399b-a4c4-2251-e12b-e89fff351c4d@kernel.dk>
- <3791872.1675172490@warthog.procyon.org.uk>
-From:   David Hildenbrand <david@redhat.com>
-Organization: Red Hat
-In-Reply-To: <3791872.1675172490@warthog.procyon.org.uk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <20221130175653.24299-1-jack@suse.cz>
+Content-Type: text/plain; charset=gbk; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: _Ch0CgCHgR_iHtljr5sFCg--.13384S3
+X-Coremail-Antispam: 1UD129KBjvJXoW7KrWrtr4fXw1UXr17tw18Krg_yoW8tF4xpF
+        W5AFWYkrWDGr40gay0v3WUXw45Kr47Ga97AryxCFWSvwsxJrn0yFn2k395uryS9r9rCrWU
+        ZF45Jay3KFy8ArDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUkjb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k2
+        6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+        vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7Cj
+        xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
+        0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
+        6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
+        Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JMxk0xIA0c2IEe2xFo4CEbIxvr21l42xK82IYc2Ij
+        64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x
+        8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r126r1DMIIYrxkI7VAKI48JMIIF0xvE
+        2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42
+        xK8VAvwI8IcIk0rVWrZr1j6s0DMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIE
+        c7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x07UE-erUUUUU=
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 31.01.23 14:41, David Howells wrote:
-> David Hildenbrand <david@redhat.com> wrote:
-> 
->>>> percpu counters maybe - add them up at the point of viewing?
->>> They are percpu, see my last email. But for every 108 changes (on
->>> my system), they will do two atomic_long_adds(). So not very
->>> useful for anything but low frequency modifications.
->>>
->>
->> Can we just treat the whole acquired/released accounting as a debug mechanism
->> to detect missing releases and do it only for debug kernels?
->>
->>
->> The pcpu counter is an s8, so we have to flush on a regular basis and cannot
->> really defer it any longer ... but I'm curious if it would be of any help to
->> only have a single PINNED counter that goes into both directions (inc/dec on
->> pin/release), to reduce the flushing.
->>
->> Of course, once we pin/release more than ~108 pages in one go or we switch
->> CPUs frequently it won't be that much of a help ...
-> 
-> What are the stats actually used for?  Is it just debugging, or do we actually
-> have users for them (control groups spring to mind)?
+Hi, Jan
 
-As it's really just "how many pinning events" vs. "how many unpinning 
-events", I assume it's only for debugging.
+ÔÚ 2022/12/01 1:56, Jan Kara Ð´µÀ:
 
-For example, if you pin the same page twice it would not get accounted 
-as "a single page is pinned".
+> -int disk_scan_partitions(struct gendisk *disk, fmode_t mode)
+> +int disk_scan_partitions(struct gendisk *disk, fmode_t mode, void *owner)
+>   {
+>   	struct block_device *bdev;
+>   
+> @@ -366,6 +366,9 @@ int disk_scan_partitions(struct gendisk *disk, fmode_t mode)
+>   		return -EINVAL;
+>   	if (disk->open_partitions)
+>   		return -EBUSY;
+> +	/* Someone else has bdev exclusively open? */
+> +	if (disk->part0->bd_holder != owner)
+> +		return -EBUSY;
+>   
+>   	set_bit(GD_NEED_PART_SCAN, &disk->state);
+>   	bdev = blkdev_get_by_dev(disk_devt(disk), mode, NULL);
 
--- 
-Thanks,
+It just by code review, but I think the above checking should be inside
+open_mutex, which is used to protect bdev claming. Otherwise there can
+be race that this check is pass while someone else exclusive open the
+disk before blkdev_get_by_dev().
 
-David / dhildenb
+How do you think about open coding blkdev_get_by_dev() here, something
+like:
+
+diff --git a/block/genhd.c b/block/genhd.c
+index 23cf83b3331c..341af4db7d54 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -358,7 +358,7 @@ EXPORT_SYMBOL_GPL(disk_uevent);
+
+  int disk_scan_partitions(struct gendisk *disk, fmode_t mode, void *owner)
+  {
+-       struct block_device *bdev;
++       int ret = 0;
+
+         if (disk->flags & (GENHD_FL_NO_PART | GENHD_FL_HIDDEN))
+                 return -EINVAL;
+@@ -366,16 +366,31 @@ int disk_scan_partitions(struct gendisk *disk, 
+fmode_t mode, void *owner)
+                 return -EINVAL;
+         if (disk->open_partitions)
+                 return -EBUSY;
++
++       disk_block_events(disk);
++       mutex_lock(&disk->open_mutex);
++
+         /* Someone else has bdev exclusively open? */
+-       if (disk->part0->bd_holder && disk->part0->bd_holder != owner)
+-               return -EBUSY;
++       if (disk->part0->bd_holder && disk->part0->bd_holder != owner) {
++               ret = -EBUSY;
++               goto out;
++       }
++
++       if (!disk_live(disk)) {
++               ret = -ENODEV;
++               goto out;
++       }
+
+         set_bit(GD_NEED_PART_SCAN, &disk->state);
+-       bdev = blkdev_get_by_dev(disk_devt(disk), mode, NULL);
+-       if (IS_ERR(bdev))
+-               return PTR_ERR(bdev);
+-       blkdev_put(bdev, mode);
+-       return 0;
++       ret = blkdev_get_whole(disk->part0, mode);
++out:
++       mutex_unlock(&disk->open_mutex);
++       disk_unblock_events(disk);
++
++       if (!ret)
++               blkdev_put_whole(disk->part0, mode);
++
++       return ret;
+  }
+
+
 
