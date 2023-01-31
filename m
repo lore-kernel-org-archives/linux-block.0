@@ -2,57 +2,109 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 096B5C38142
-	for <linux-block@archiver.kernel.org>; Tue, 31 Jan 2023 08:37:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7410DC64EC4
+	for <linux-block@archiver.kernel.org>; Tue, 31 Jan 2023 08:40:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231590AbjAaIhM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 31 Jan 2023 03:37:12 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47802 "EHLO
+        id S231528AbjAaIkB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 31 Jan 2023 03:40:01 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52782 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231337AbjAaIgy (ORCPT
+        with ESMTP id S231513AbjAaIkA (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 31 Jan 2023 03:36:54 -0500
-Received: from mail.lokoho.com (mail.lokoho.com [217.61.105.98])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ACBA7485B5
-        for <linux-block@vger.kernel.org>; Tue, 31 Jan 2023 00:36:14 -0800 (PST)
-Received: by mail.lokoho.com (Postfix, from userid 1001)
-        id 7451483C7B; Tue, 31 Jan 2023 08:36:00 +0000 (GMT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=lokoho.com; s=mail;
-        t=1675154173; bh=Z0N5VlX9/JlryGOL5I747Le9USomZJCRNNGRT3LbbKc=;
-        h=Date:From:To:Subject:From;
-        b=YMADYyeCcphIjusiqWB5VIC3Smk6uKwtnwFrq+R0KRtfpzc8X4TzPTX2PGcB0vuVP
-         JeTSydUwjWCRIq9+EkhviB8Evk32IRMHlP9xgjOWunKm96mVcTyVhM6XtIc3WikvR3
-         k70zUIWUnbyWQUig9oUsk+hq00qX3Hq+ROj89sJ+DasO8YkAZaZnT2XvEOVLRUwIGc
-         vNrlDtodXGF/qV0XNRauz6leLVdqwJTV5dFctLav2oncdaZIbE0hgBwXoZxIMROB2G
-         8UQxMQtnP93AalvdHQIlzQ3Ips4zPsjRE4KYjIr6KsHQXLuXnFd0kzSViALngWTbV8
-         nrYHekJ0EjeLQ==
-Received: by mail.lokoho.com for <linux-block@vger.kernel.org>; Tue, 31 Jan 2023 08:35:43 GMT
-Message-ID: <20230131074501-0.1.3q.w1i6.0.vjbqgjkc53@lokoho.com>
-Date:   Tue, 31 Jan 2023 08:35:43 GMT
-From:   "Adam Charachuta" <adam.charachuta@lokoho.com>
-To:     <linux-block@vger.kernel.org>
-Subject: =?UTF-8?Q?S=C5=82owa_kluczowe_do_wypozycjonowania?=
-X-Mailer: mail.lokoho.com
-MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+        Tue, 31 Jan 2023 03:40:00 -0500
+Received: from lgeamrelo11.lge.com (lgeamrelo12.lge.com [156.147.23.52])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 9E29126873
+        for <linux-block@vger.kernel.org>; Tue, 31 Jan 2023 00:39:56 -0800 (PST)
+Received: from unknown (HELO lgeamrelo04.lge.com) (156.147.1.127)
+        by 156.147.23.52 with ESMTP; 31 Jan 2023 17:39:55 +0900
+X-Original-SENDERIP: 156.147.1.127
+X-Original-MAILFROM: max.byungchul.park@gmail.com
+Received: from unknown (HELO localhost.localdomain) (10.177.244.38)
+        by 156.147.1.127 with ESMTP; 31 Jan 2023 17:39:55 +0900
+X-Original-SENDERIP: 10.177.244.38
+X-Original-MAILFROM: max.byungchul.park@gmail.com
+From:   Byungchul Park <max.byungchul.park@gmail.com>
+To:     linux-kernel@vger.kernel.org
+Cc:     torvalds@linux-foundation.org, damien.lemoal@opensource.wdc.com,
+        linux-ide@vger.kernel.org, adilger.kernel@dilger.ca,
+        linux-ext4@vger.kernel.org, mingo@redhat.com, peterz@infradead.org,
+        will@kernel.org, tglx@linutronix.de, rostedt@goodmis.org,
+        joel@joelfernandes.org, sashal@kernel.org, daniel.vetter@ffwll.ch,
+        duyuyang@gmail.com, johannes.berg@intel.com, tj@kernel.org,
+        tytso@mit.edu, willy@infradead.org, david@fromorbit.com,
+        amir73il@gmail.com, gregkh@linuxfoundation.org,
+        kernel-team@lge.com, linux-mm@kvack.org, akpm@linux-foundation.org,
+        mhocko@kernel.org, minchan@kernel.org, hannes@cmpxchg.org,
+        vdavydov.dev@gmail.com, sj@kernel.org, jglisse@redhat.com,
+        dennis@kernel.org, cl@linux.com, penberg@kernel.org,
+        rientjes@google.com, vbabka@suse.cz, ngupta@vflare.org,
+        linux-block@vger.kernel.org, paolo.valente@linaro.org,
+        josef@toxicpanda.com, linux-fsdevel@vger.kernel.org,
+        viro@zeniv.linux.org.uk, jack@suse.cz, jlayton@kernel.org,
+        dan.j.williams@intel.com, hch@infradead.org, djwong@kernel.org,
+        dri-devel@lists.freedesktop.org, rodrigosiqueiramelo@gmail.com,
+        melissa.srw@gmail.com, hamohammed.sa@gmail.com,
+        42.hyeyoo@gmail.com, chris.p.wilson@intel.com,
+        gwan-gyeong.mun@intel.com, max.byungchul.park@gmail.com,
+        boqun.feng@gmail.com, longman@redhat.com, hdanton@sina.com
+Subject: [PATCH v9 01/25] llist: Move llist_{head,node} definition to types.h
+Date:   Tue, 31 Jan 2023 17:39:30 +0900
+Message-Id: <1675154394-25598-2-git-send-email-max.byungchul.park@gmail.com>
+X-Mailer: git-send-email 1.9.1
+In-Reply-To: <1675154394-25598-1-git-send-email-max.byungchul.park@gmail.com>
+References: <1675154394-25598-1-git-send-email-max.byungchul.park@gmail.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Dzie=C5=84 dobry,
+llist_head and llist_node can be used by very primitives. For example,
+Dept for tracking dependency uses llist things in its header. To avoid
+header dependency, move those to types.h.
 
-zapozna=C5=82em si=C4=99 z Pa=C5=84stwa ofert=C4=85 i z przyjemno=C5=9Bci=
-=C4=85 przyznaj=C4=99, =C5=BCe przyci=C4=85ga uwag=C4=99 i zach=C4=99ca d=
-o dalszych rozm=C3=B3w.=20
+Signed-off-by: Byungchul Park <max.byungchul.park@gmail.com>
+---
+ include/linux/llist.h | 8 --------
+ include/linux/types.h | 8 ++++++++
+ 2 files changed, 8 insertions(+), 8 deletions(-)
 
-Pomy=C5=9Bla=C5=82em, =C5=BCe mo=C5=BCe m=C3=B3g=C5=82bym mie=C4=87 sw=C3=
-=B3j wk=C5=82ad w Pa=C5=84stwa rozw=C3=B3j i pom=C3=B3c dotrze=C4=87 z t=C4=
-=85 ofert=C4=85 do wi=C4=99kszego grona odbiorc=C3=B3w. Pozycjonuj=C4=99 =
-strony www, dzi=C4=99ki czemu generuj=C4=85 =C5=9Bwietny ruch w sieci.
+diff --git a/include/linux/llist.h b/include/linux/llist.h
+index 85bda2d..99cc3c3 100644
+--- a/include/linux/llist.h
++++ b/include/linux/llist.h
+@@ -53,14 +53,6 @@
+ #include <linux/stddef.h>
+ #include <linux/types.h>
+ 
+-struct llist_head {
+-	struct llist_node *first;
+-};
+-
+-struct llist_node {
+-	struct llist_node *next;
+-};
+-
+ #define LLIST_HEAD_INIT(name)	{ NULL }
+ #define LLIST_HEAD(name)	struct llist_head name = LLIST_HEAD_INIT(name)
+ 
+diff --git a/include/linux/types.h b/include/linux/types.h
+index ea8cf60a..b12a444 100644
+--- a/include/linux/types.h
++++ b/include/linux/types.h
+@@ -187,6 +187,14 @@ struct hlist_node {
+ 	struct hlist_node *next, **pprev;
+ };
+ 
++struct llist_head {
++	struct llist_node *first;
++};
++
++struct llist_node {
++	struct llist_node *next;
++};
++
+ struct ustat {
+ 	__kernel_daddr_t	f_tfree;
+ #ifdef CONFIG_ARCH_32BIT_USTAT_F_TINODE
+-- 
+1.9.1
 
-Mo=C5=BCemy porozmawia=C4=87 w najbli=C5=BCszym czasie?
-
-
-Pozdrawiam
-Adam Charachuta
