@@ -2,170 +2,68 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 16A7FC636D3
-	for <linux-block@archiver.kernel.org>; Tue, 31 Jan 2023 15:08:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED7DBC636CC
+	for <linux-block@archiver.kernel.org>; Tue, 31 Jan 2023 15:13:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232949AbjAaPID (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 31 Jan 2023 10:08:03 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39684 "EHLO
+        id S232900AbjAaPNi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 31 Jan 2023 10:13:38 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47724 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232866AbjAaPHr (ORCPT
+        with ESMTP id S232734AbjAaPNT (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 31 Jan 2023 10:07:47 -0500
-Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 58B4A56EE8
-        for <linux-block@vger.kernel.org>; Tue, 31 Jan 2023 07:05:10 -0800 (PST)
-Received: by mail-pl1-x62b.google.com with SMTP id b5so8100067plz.5
-        for <linux-block@vger.kernel.org>; Tue, 31 Jan 2023 07:05:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=8uB3Z6qnpneL7fBnCtQQbgmmvnsrVox9LWLijWqPdBg=;
-        b=eu0W+8Bqo5Bcoxbv6tDsvAwivF6vSrDXoaGc/lpNfwiItYZRFNSC+lo5UQR6BbtBLh
-         siZtCrgKLJmaD0HGkrmedkm6U4HGIJdmlc+ySQdutigNcA9ihkjE+Hd0hPuuJE+776KX
-         WgpbxpAgKCpPqT/4tlICCaiclR6v9xbm98pEgWUP2Vmokh0UK9dTNL+ej4xrX/0JPmS4
-         enME4Y59XTqMGdVC22INOaZUHj6YoFE/xpDHNIvw2qxOPmmg78OxbcxJ8VulCpabagBd
-         MEfYiw7tCt0JILIAKZc2qvUzUGWSblg1vjFtim6FnJKb6iObapLgUFqA7jGNEdwOswUB
-         J9jQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=8uB3Z6qnpneL7fBnCtQQbgmmvnsrVox9LWLijWqPdBg=;
-        b=7Z+DIVk6/ZAvx7DTkgysl2oUX43zKLH9PUDx83x2W+cI4/iENGiORhsY+N3zaTnG4D
-         8yj7Ydt5OFB5iZzrdd8m7y/S0ovSmr+r24fRyu8/0wkCC+Bzp8ezRJsib5Tuo+FlgcBp
-         CLw75opXyem0q+5hPWmmPeV3OuzF8Wvkj1mQTGMBc2pj7YPw4rM0mCpQOshAwzo3Kcpc
-         VpkfXWZM/6/jIqpwBZQ56OcfbNoAAYdULFy2FYCouHz5fv9l6xKlCvlvmJoompt8A4mP
-         igw5fzPeBf/by8qj3yLlktpqV3MJ+LnAtxxl9zxzUQpC1mowZMfQIOlBCvbRvFUnPW13
-         kBqw==
-X-Gm-Message-State: AO0yUKVSHEgDyfNdHLnnXCuT+qa03iEiT6OCmKmQHeA48XhzCxuyn197
-        kfr9w3BzUy0l9WzYOMeXy2pjnA==
-X-Google-Smtp-Source: AK7set/Ze64lq3+f11Klcyol4ZjsNqkXL5s6RRKkDwsNA2gzWH3GDKWTh18fHiCZTlJOXcECR4zIhA==
-X-Received: by 2002:a17:902:db05:b0:198:a5d9:f2fd with SMTP id m5-20020a170902db0500b00198a5d9f2fdmr512965plx.6.1675177447799;
-        Tue, 31 Jan 2023 07:04:07 -0800 (PST)
-Received: from [192.168.1.136] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id j5-20020a170902758500b0019686d286e2sm3901802pll.13.2023.01.31.07.04.06
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 31 Jan 2023 07:04:07 -0800 (PST)
-Message-ID: <028c959d-e52a-5d08-6ac6-004ecdb3e549@kernel.dk>
-Date:   Tue, 31 Jan 2023 08:04:06 -0700
+        Tue, 31 Jan 2023 10:13:19 -0500
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AA0495926C;
+        Tue, 31 Jan 2023 07:11:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=M0NuK3BqCxrm1hvDFKgidQ69sL72ceicw1jaANPf97Y=; b=oT76y8fLlCjmSpI+FpgzxYBSeO
+        QPktthkSJRwextvp/E+5rQGIEUm6tHL3B43iC1F6FBhKrUdoWc/2zSHUQNAwcBy7YYz0eij0SmAT8
+        gErBoFp2Vq305WN3Li2PaWAOS1AVFXsqfyHnmuH/VW3n5RMAveDQ6u6ICFvP5h5IptUKouWfPdIU+
+        T1rTX+aa6okn0uwBqLxibGfUoNhPmJ/EQQX83EUS+XcnhgSXBKvaevtwEC0KB7FvBqMhFIxky7rap
+        groA6I+ScX9gHqX8EgOF1JJ3zuKazCP9HcweHNvWQdrsKoRBeXyIcJfYbwAp+H2Gwm6TOJW/VXh8+
+        ai/B1pDg==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1pMsHn-008Rce-Ru; Tue, 31 Jan 2023 15:11:03 +0000
+Date:   Tue, 31 Jan 2023 07:11:03 -0800
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Linus Walleij <linus.walleij@linaro.org>
+Cc:     Christoph Hellwig <hch@infradead.org>, linux-mmc@vger.kernel.org,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        linux-block@vger.kernel.org,
+        Paolo Valente <paolo.valente@linaro.org>
+Subject: Re: [PATCH] mmc: core: Imply IOSCHED_BFQ
+Message-ID: <Y9kvh42/T9rdqDH9@infradead.org>
+References: <20230131084742.1038135-1-linus.walleij@linaro.org>
+ <Y9jY2zsNbSCWluZG@infradead.org>
+ <CACRpkda3mk8wkdxWQFev9PrK6bPsxR6qLJo_gXnK+_jaTCFfjg@mail.gmail.com>
+ <Y9kVrh9VEz4/T76f@infradead.org>
+ <CACRpkdbd73PEAaNYr2cz=pmw7guHK0-hiPCYXgpgQfy-d9TTTQ@mail.gmail.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.1
-Subject: Re: [GIT PULL] iov_iter: Improve page extraction (pin or just list)
-Content-Language: en-US
-To:     David Hildenbrand <david@redhat.com>,
-        David Howells <dhowells@redhat.com>
-Cc:     John Hubbard <jhubbard@nvidia.com>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Christoph Hellwig <hch@infradead.org>,
-        Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        Jeff Layton <jlayton@kernel.org>, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org
-References: <040ed7a7-3f4d-dab7-5a49-1cd9933c5445@redhat.com>
- <e68c5cab-c3a6-1872-98fa-9f909f23be79@nvidia.com>
- <3351099.1675077249@warthog.procyon.org.uk>
- <fd0003a0-a133-3daf-891c-ba7deafad768@kernel.dk>
- <f57ee72f-38e9-6afa-182f-2794638eadcb@kernel.dk>
- <e8480b18-08af-d101-a721-50d213893492@kernel.dk>
- <3520518.1675116740@warthog.procyon.org.uk>
- <f392399b-a4c4-2251-e12b-e89fff351c4d@kernel.dk>
- <3791872.1675172490@warthog.procyon.org.uk>
- <88d50843-9aa6-7930-433d-9b488857dc14@redhat.com>
- <f2fb6cc5-ff95-ca51-b377-5e4bd239d5e8@kernel.dk>
- <7f8f2d0f-4bf2-71aa-c356-c78c6b7fd071@redhat.com>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <7f8f2d0f-4bf2-71aa-c356-c78c6b7fd071@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CACRpkdbd73PEAaNYr2cz=pmw7guHK0-hiPCYXgpgQfy-d9TTTQ@mail.gmail.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/31/23 8:02?AM, David Hildenbrand wrote:
-> On 31.01.23 15:50, Jens Axboe wrote:
->> On 1/31/23 6:48?AM, David Hildenbrand wrote:
->>> On 31.01.23 14:41, David Howells wrote:
->>>> David Hildenbrand <david@redhat.com> wrote:
->>>>
->>>>>>> percpu counters maybe - add them up at the point of viewing?
->>>>>> They are percpu, see my last email. But for every 108 changes (on
->>>>>> my system), they will do two atomic_long_adds(). So not very
->>>>>> useful for anything but low frequency modifications.
->>>>>>
->>>>>
->>>>> Can we just treat the whole acquired/released accounting as a debug mechanism
->>>>> to detect missing releases and do it only for debug kernels?
->>>>>
->>>>>
->>>>> The pcpu counter is an s8, so we have to flush on a regular basis and cannot
->>>>> really defer it any longer ... but I'm curious if it would be of any help to
->>>>> only have a single PINNED counter that goes into both directions (inc/dec on
->>>>> pin/release), to reduce the flushing.
->>>>>
->>>>> Of course, once we pin/release more than ~108 pages in one go or we switch
->>>>> CPUs frequently it won't be that much of a help ...
->>>>
->>>> What are the stats actually used for?  Is it just debugging, or do we actually
->>>> have users for them (control groups spring to mind)?
->>>
->>> As it's really just "how many pinning events" vs. "how many unpinning
->>> events", I assume it's only for debugging.
->>>
->>> For example, if you pin the same page twice it would not get accounted
->>> as "a single page is pinned".
->>
->> How about something like the below then? I can send it out as a real
->> patch, will run a sanity check on it first but would be surprised if
->> this doesn't fix it.
->>
->>
->> diff --git a/mm/gup.c b/mm/gup.c
->> index f45a3a5be53a..41abb16286ec 100644
->> --- a/mm/gup.c
->> +++ b/mm/gup.c
->> @@ -168,7 +168,9 @@ struct folio *try_grab_folio(struct page *page, int refs, unsigned int flags)
->>            */
->>           smp_mb__after_atomic();
->>   +#ifdef CONFIG_DEBUG_VM
->>           node_stat_mod_folio(folio, NR_FOLL_PIN_ACQUIRED, refs);
->> +#endif
->>             return folio;
->>       }
->> @@ -180,7 +182,9 @@ struct folio *try_grab_folio(struct page *page, int refs, unsigned int flags)
->>   static void gup_put_folio(struct folio *folio, int refs, unsigned int flags)
->>   {
->>       if (flags & FOLL_PIN) {
->> +#ifdef CONFIG_DEBUG_VM
->>           node_stat_mod_folio(folio, NR_FOLL_PIN_RELEASED, refs);
->> +#endif
->>           if (folio_test_large(folio))
->>               atomic_sub(refs, folio_pincount_ptr(folio));
->>           else
->> @@ -236,8 +240,9 @@ int __must_check try_grab_page(struct page *page, unsigned int flags)
->>           } else {
->>               folio_ref_add(folio, GUP_PIN_COUNTING_BIAS);
->>           }
->> -
->> +#ifdef CONFIG_DEBUG_VM
->>           node_stat_mod_folio(folio, NR_FOLL_PIN_ACQUIRED, 1);
->> +#endif
->>       }
->>         return 0;
->>
-> 
-> We might want to hide the counters completely by defining them only
-> with CONFIG_DEBUG_VM.
+On Tue, Jan 31, 2023 at 03:05:20PM +0100, Linus Walleij wrote:
+> To be clear, "works better" in this context means, solving a problem
+> for the interactive user, preventing random freezing of the UI on
+> resource-limited (memory, disk throughput) systems under high
+> I/O load.
 
-Are all of them debug aids only? If so, yes we should just have
-node_stat_* under CONFIG_DEBUG_VM.
+Which already has nothing to do with the mmc driver.  And the rest
+of your mail makes this even more clear.  You want bfq for interactive
+systems with little resources and really shitty storage device, which
+just happen to use mmc in your use case.
 
--- 
-Jens Axboe
+My use case for sd cards OTOH is extremely resource constrained systems
+where I absolutely do not want a bloated I/O scheduler.  In fact I'd
+love to be able to even compile the infrastructure for them away.
 
+In other words:  you want distro policy to use bfq for your use case,
+but that has no business being in the Kconfig.
