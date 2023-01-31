@@ -2,19 +2,19 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 07557C636D3
-	for <linux-block@archiver.kernel.org>; Tue, 31 Jan 2023 08:40:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F1DCC38142
+	for <linux-block@archiver.kernel.org>; Tue, 31 Jan 2023 08:41:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231475AbjAaIkz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 31 Jan 2023 03:40:55 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53430 "EHLO
+        id S231671AbjAaIlY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 31 Jan 2023 03:41:24 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53074 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231661AbjAaIkN (ORCPT
+        with ESMTP id S231669AbjAaIkN (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Tue, 31 Jan 2023 03:40:13 -0500
 Received: from lgeamrelo11.lge.com (lgeamrelo13.lge.com [156.147.23.53])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 0A1D742DD8
-        for <linux-block@vger.kernel.org>; Tue, 31 Jan 2023 00:39:58 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 7E4B429173
+        for <linux-block@vger.kernel.org>; Tue, 31 Jan 2023 00:39:59 -0800 (PST)
 Received: from unknown (HELO lgeamrelo04.lge.com) (156.147.1.127)
         by 156.147.23.53 with ESMTP; 31 Jan 2023 17:39:58 +0900
 X-Original-SENDERIP: 156.147.1.127
@@ -47,9 +47,9 @@ Cc:     torvalds@linux-foundation.org, damien.lemoal@opensource.wdc.com,
         42.hyeyoo@gmail.com, chris.p.wilson@intel.com,
         gwan-gyeong.mun@intel.com, max.byungchul.park@gmail.com,
         boqun.feng@gmail.com, longman@redhat.com, hdanton@sina.com
-Subject: [PATCH v9 09/25] dept: Apply sdt_might_sleep_{start,end}() to swait
-Date:   Tue, 31 Jan 2023 17:39:38 +0900
-Message-Id: <1675154394-25598-10-git-send-email-max.byungchul.park@gmail.com>
+Subject: [PATCH v9 11/25] dept: Apply sdt_might_sleep_{start,end}() to hashed-waitqueue wait
+Date:   Tue, 31 Jan 2023 17:39:40 +0900
+Message-Id: <1675154394-25598-12-git-send-email-max.byungchul.park@gmail.com>
 X-Mailer: git-send-email 1.9.1
 In-Reply-To: <1675154394-25598-1-git-send-email-max.byungchul.park@gmail.com>
 References: <1675154394-25598-1-git-send-email-max.byungchul.park@gmail.com>
@@ -57,37 +57,37 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Makes Dept able to track dependencies by swaits.
+Makes Dept able to track dependencies by hashed-waitqueue waits.
 
 Signed-off-by: Byungchul Park <max.byungchul.park@gmail.com>
 ---
- include/linux/swait.h | 3 +++
+ include/linux/wait_bit.h | 3 +++
  1 file changed, 3 insertions(+)
 
-diff --git a/include/linux/swait.h b/include/linux/swait.h
-index 6a8c22b..0284821 100644
---- a/include/linux/swait.h
-+++ b/include/linux/swait.h
+diff --git a/include/linux/wait_bit.h b/include/linux/wait_bit.h
+index 7725b75..fe89282 100644
+--- a/include/linux/wait_bit.h
++++ b/include/linux/wait_bit.h
 @@ -6,6 +6,7 @@
- #include <linux/stddef.h>
- #include <linux/spinlock.h>
+  * Linux wait-bit related types and methods:
+  */
  #include <linux/wait.h>
 +#include <linux/dept_sdt.h>
- #include <asm/current.h>
  
- /*
-@@ -161,6 +162,7 @@ static inline bool swq_has_sleeper(struct swait_queue_head *wq)
- 	struct swait_queue __wait;					\
- 	long __ret = ret;						\
+ struct wait_bit_key {
+ 	void			*flags;
+@@ -246,6 +247,7 @@ struct wait_bit_queue_entry {
+ 	struct wait_bit_queue_entry __wbq_entry;			\
+ 	long __ret = ret; /* explicit shadow */				\
  									\
 +	sdt_might_sleep_start(NULL);					\
- 	INIT_LIST_HEAD(&__wait.task_list);				\
+ 	init_wait_var_entry(&__wbq_entry, var,				\
+ 			    exclusive ? WQ_FLAG_EXCLUSIVE : 0);		\
  	for (;;) {							\
- 		long __int = prepare_to_swait_event(&wq, &__wait, state);\
-@@ -176,6 +178,7 @@ static inline bool swq_has_sleeper(struct swait_queue_head *wq)
+@@ -263,6 +265,7 @@ struct wait_bit_queue_entry {
  		cmd;							\
  	}								\
- 	finish_swait(&wq, &__wait);					\
+ 	finish_wait(__wq_head, &__wbq_entry.wq_entry);			\
 +	sdt_might_sleep_end();						\
  __out:	__ret;								\
  })
