@@ -2,103 +2,87 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 72FECC38142
-	for <linux-block@archiver.kernel.org>; Tue, 31 Jan 2023 10:16:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FA44C636CC
+	for <linux-block@archiver.kernel.org>; Tue, 31 Jan 2023 10:24:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230249AbjAaKQP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 31 Jan 2023 05:16:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42952 "EHLO
+        id S231373AbjAaKYe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 31 Jan 2023 05:24:34 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50750 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230334AbjAaKQL (ORCPT
+        with ESMTP id S231417AbjAaKYd (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 31 Jan 2023 05:16:11 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05FD24995A
-        for <linux-block@vger.kernel.org>; Tue, 31 Jan 2023 02:15:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1675160124;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=ZAQct07RmXjsPBydkh4gU6qVtTSDWIY2zc/YS0s3Fdw=;
-        b=YuQ9RPZIh16WlUVKexA4aJo8g1NgrRSkXRhuJlAqSHgw7ws9W6Kd/Ypae3ylY7c0lAy+GB
-        aygA5twQ/dBYVIpenn1/MGbfaODO/JpqVmiLEeeHLG9r0aSDe95z2iFlu/WkhmEWgVNXfS
-        chW7zkJAv3AQqXVFuo63IdzpTLJlPG4=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-590-Y5BX3Fx4Pweph0Y3k0Y3Yw-1; Tue, 31 Jan 2023 05:15:20 -0500
-X-MC-Unique: Y5BX3Fx4Pweph0Y3k0Y3Yw-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        Tue, 31 Jan 2023 05:24:33 -0500
+Received: from hosting.gsystem.sk (hosting.gsystem.sk [212.5.213.30])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 7783A38668;
+        Tue, 31 Jan 2023 02:24:26 -0800 (PST)
+Received: from [192.168.1.3] (gsystem.sk [85.248.217.30])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 6B09B800B23;
-        Tue, 31 Jan 2023 10:15:20 +0000 (UTC)
-Received: from T590 (ovpn-8-20.pek2.redhat.com [10.72.8.20])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id AE733140EBF4;
-        Tue, 31 Jan 2023 10:15:15 +0000 (UTC)
-Date:   Tue, 31 Jan 2023 18:15:09 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Liu Xiaodong <xiaodong.liu@intel.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Jim Harris <james.r.harris@intel.com>,
-        Ben Walker <benjamin.walker@intel.com>
-Subject: Re: [PATCH] block: ublk: extending queue_size to fix overflow
-Message-ID: <Y9jqLdZauz9mab4t@T590>
-References: <20230131070552.115067-1-xiaodong.liu@intel.com>
+        by hosting.gsystem.sk (Postfix) with ESMTPSA id 89F937A04D9;
+        Tue, 31 Jan 2023 11:24:25 +0100 (CET)
+From:   Ondrej Zary <linux@zary.sk>
+To:     Damien Le Moal <damien.lemoal@opensource.wdc.com>
+Subject: Re: [PATCH 2/2] drivers/block: Move PARIDE protocol modules to drivers/ata/pata_parport
+Date:   Tue, 31 Jan 2023 11:24:23 +0100
+User-Agent: KMail/1.9.10
+Cc:     Christoph Hellwig <hch@lst.de>,
+        Sergey Shtylyov <s.shtylyov@omp.ru>,
+        Jens Axboe <axboe@kernel.dk>, Tim Waugh <tim@cyberelk.net>,
+        linux-block@vger.kernel.org, linux-parport@lists.infradead.org,
+        linux-ide@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <d4f7ebd5-d90d-fb96-0fad-bd129ac162dc@opensource.wdc.com> <20230130211050.16753-2-linux@zary.sk> <e6041145-7336-2534-8449-7b9b6a842466@opensource.wdc.com>
+In-Reply-To: <e6041145-7336-2534-8449-7b9b6a842466@opensource.wdc.com>
+X-KMail-QuotePrefix: > 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: Text/Plain;
+  charset="utf-8"
+Content-Transfer-Encoding: 7bit
 Content-Disposition: inline
-In-Reply-To: <20230131070552.115067-1-xiaodong.liu@intel.com>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.7
+Message-Id: <202301311124.23302.linux@zary.sk>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jan 31, 2023 at 02:05:52AM -0500, Liu Xiaodong wrote:
-> When validating drafted SPDK ublk target, in a case that
-> assigning large queue depth to multiqueue ublk device,
-> ublk target would run into a weird incorrect state. During
-> rounds of review and debug, An overflow bug was found
-> in ublk driver.
+On Tuesday 31 January 2023, Damien Le Moal wrote:
+> On 1/31/23 06:10, Ondrej Zary wrote:
+> > diff --git a/drivers/Makefile b/drivers/Makefile
+> > index f1365608bc8c..de8aa561c95c 100644
+> > --- a/drivers/Makefile
+> > +++ b/drivers/Makefile
+> > @@ -98,7 +98,7 @@ obj-$(CONFIG_DIO)		+= dio/
+> >  obj-$(CONFIG_SBUS)		+= sbus/
+> >  obj-$(CONFIG_ZORRO)		+= zorro/
+> >  obj-$(CONFIG_ATA_OVER_ETH)	+= block/aoe/
+> > -obj-y		 		+= block/paride/
+> > +obj-$(CONFIG_PATA_PARPORT)	+= ata/pata_parport/
 > 
-> In ublk_cmd.h, UBLK_MAX_QUEUE_DEPTH is 4096 which means
-> each ublk queue depth can be set as large as 4096. But
-> when setting qd for a ublk device,
-> sizeof(struct ublk_queue) + depth * sizeof(struct ublk_io)
-> will be larger than 65535 if qd is larger than 2728.
-> Then queue_size is overflowed, and ublk_get_queue()
-> references a wrong pointer position. The wrong content of
-> ublk_queue elements will lead to out-of-bounds memory
-> access.
+> It would be better to have this in drivers/ata/Makefile, not here, so that doing
+> something like:
 > 
-> Extend queue_size in ublk_device as "unsigned int".
+> make -j64 M=drivers/ata W=1
+> or
+> make -j64 M=drivers/ata C=1
 > 
-> Signed-off-by: Liu Xiaodong <xiaodong.liu@intel.com>
-> ---
->  drivers/block/ublk_drv.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> actually also checks the parport protocol modules too.
 > 
-> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-> index e54693204630..6368b56eacf1 100644
-> --- a/drivers/block/ublk_drv.c
-> +++ b/drivers/block/ublk_drv.c
-> @@ -137,7 +137,7 @@ struct ublk_device {
->  
->  	char	*__queues;
->  
-> -	unsigned short  queue_size;
-> +	unsigned int	queue_size;
->  	struct ublksrv_ctrl_dev_info	dev_info;
+> diff --git a/drivers/ata/Makefile b/drivers/ata/Makefile
+> index 23588738cff0..2f85812e16ef 100644
+> --- a/drivers/ata/Makefile
+> +++ b/drivers/ata/Makefile
+> @@ -114,6 +114,7 @@ obj-$(CONFIG_PATA_SAMSUNG_CF)       += pata_samsung_cf.o
+> 
+>  obj-$(CONFIG_PATA_PXA)         += pata_pxa.o
+> 
+> +obj-$(CONFIG_PATA_PARPORT)     += pata_parport/
+>  obj-$(CONFIG_PATA_PARPORT)     += pata_parport.o
+> 
+> And then we could also have drivers/ata/pata_parport.c moved under
+> drivers/ata/pata_parport/ to tidy things up.
+> 
+> If you agree, I can fix that up, that is easy to do.
 
-Good catch,
-
-Fixes: 71f28f3136af ("ublk_drv: add io_uring based userspace block driver")
-
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
+OK, thank you.
 
 
-Thanks,
-Ming
-
+-- 
+Ondrej Zary
