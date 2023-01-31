@@ -2,196 +2,133 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DAA2AC636D3
-	for <linux-block@archiver.kernel.org>; Tue, 31 Jan 2023 02:31:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F3B0AC63797
+	for <linux-block@archiver.kernel.org>; Tue, 31 Jan 2023 02:32:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229503AbjAaCbe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 30 Jan 2023 21:31:34 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49190 "EHLO
+        id S229452AbjAaCcU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 30 Jan 2023 21:32:20 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49286 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229452AbjAaCbe (ORCPT
+        with ESMTP id S229605AbjAaCcT (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 30 Jan 2023 21:31:34 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C474FF0C
-        for <linux-block@vger.kernel.org>; Mon, 30 Jan 2023 18:30:47 -0800 (PST)
+        Mon, 30 Jan 2023 21:32:19 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D1AC25E24
+        for <linux-block@vger.kernel.org>; Mon, 30 Jan 2023 18:31:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1675132246;
+        s=mimecast20190719; t=1675132291;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=VLQQh/uutLlIM0duU2JS2bF3B/pzPSM9EmB78Rh0AsY=;
-        b=Tt76cuUHTIEFNUuj/3g6ADeuJO3gxmhadS2Awo3z+HQyAh3bMbnOOt2AV3hQ6EPZXe9glz
-        8jWPQQ/hmx4ChWc2r6IIRJFK6Y+hhStXzevrdYq+ngF8zuAe/akBCv9rEb8bxkB8uZbuBZ
-        l6YwKzLDPzqT0jaouP+rR7XDg/MzlYc=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-556-nMHfRg9xO2KPS5eIy0EouQ-1; Mon, 30 Jan 2023 21:30:44 -0500
-X-MC-Unique: nMHfRg9xO2KPS5eIy0EouQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 829FC3803912;
-        Tue, 31 Jan 2023 02:30:44 +0000 (UTC)
-Received: from T590 (ovpn-8-21.pek2.redhat.com [10.72.8.21])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 728954010D2A;
-        Tue, 31 Jan 2023 02:30:39 +0000 (UTC)
-Date:   Tue, 31 Jan 2023 10:30:33 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Stefan Hajnoczi <stefanha@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        ZiyangZhang <ZiyangZhang@linux.alibaba.com>,
-        Jonathan Corbet <corbet@lwn.net>, ming.lei@redhat.com
-Subject: Re: [PATCH V4 0/6] ublk_drv: add mechanism for supporting
- unprivileged ublk device
-Message-ID: <Y9h9Sefm+uRLG+8R@T590>
-References: <20230106041711.914434-1-ming.lei@redhat.com>
- <Y9hCrrTYnFf+1Z2Y@fedora>
+        bh=utT+RE/MkgWVBG/iNzPiYM+H0kp8FILH2HeviGKceUM=;
+        b=V0M3wGpdBBsw/qnBVJYGvqUuY6TgQf50fzKDFiI6thRAWkSc0D91LO7BU4MOA8viUUO0B8
+        BvdbvTyp47iIjrnKhfl27aaJNqLC2BQmEv7Q0EGEVF4u2Rix3+GlQJ0o4iusJM3sWlfqX4
+        FzyQ3m03bWC7v3ZqVshmtQvPuYD/st4=
+Received: from mail-oa1-f72.google.com (mail-oa1-f72.google.com
+ [209.85.160.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-301-VMnytV1KNqasf59q8P84zg-1; Mon, 30 Jan 2023 21:31:30 -0500
+X-MC-Unique: VMnytV1KNqasf59q8P84zg-1
+Received: by mail-oa1-f72.google.com with SMTP id 586e51a60fabf-163aaf19aecso1935599fac.15
+        for <linux-block@vger.kernel.org>; Mon, 30 Jan 2023 18:31:29 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=utT+RE/MkgWVBG/iNzPiYM+H0kp8FILH2HeviGKceUM=;
+        b=GGRplACOt7xWwjMkrmaSOJ+56c9aO64w4a99s9+oPpEjO1ofiG1xNXF3y0N8C6Qa5g
+         V5ASb/1rkxQttE6HvZ+fq90ZowhlSSKruE9P51w0TUrGqxz3xgp8dhjiXhy6cgEw8Kr/
+         X4cmrjofWZ08AaHRAUt+803fAlLAY/jSQLopb0mAEYZ/rTsuZYUwWH7jhQHvNIM20m6C
+         qNsBdTQFq2heL1k1T/hvHY3OJfrI8EEiMk9V+Jaf+KACiL4ALMbRYG7JyFpkOTeZCADt
+         +xI6/DY8WtZ8OE6PMjm1Lhe2kl4Qt7zNzTVL47SRP8VBAUba1BdtRl23TrQMXlD8MrlH
+         2OOQ==
+X-Gm-Message-State: AFqh2kqv2ZTrlpwE3jOwjaDg6F0g92GRkLrId723ZhZpvWK4+zXXka0c
+        an1CnFbv3CM/GgPKK+jiXp+1F9QXLIyLvBlfLQaBEdKItz1XIVH60e6/UprVOfBygx4wqv1qHjy
+        GP4GDHvXrV1wRYsZLk6FfxNYJNlg74Sp0IaMnKyU=
+X-Received: by 2002:aca:3f84:0:b0:36e:f5f8:cce1 with SMTP id m126-20020aca3f84000000b0036ef5f8cce1mr1057777oia.35.1675132289137;
+        Mon, 30 Jan 2023 18:31:29 -0800 (PST)
+X-Google-Smtp-Source: AMrXdXssco6mBUOhDTHWFT4/t2hB47krC6OsHE12Ww1f+hysvA2CpNEADdT3xvxh0DzmLnnFuHE/ftXAK22WOSTVfWk=
+X-Received: by 2002:aca:3f84:0:b0:36e:f5f8:cce1 with SMTP id
+ m126-20020aca3f84000000b0036ef5f8cce1mr1057763oia.35.1675132288910; Mon, 30
+ Jan 2023 18:31:28 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Y9hCrrTYnFf+1Z2Y@fedora>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
+References: <20230130092157.1759539-1-hch@lst.de> <20230130092157.1759539-23-hch@lst.de>
+In-Reply-To: <20230130092157.1759539-23-hch@lst.de>
+From:   Jason Wang <jasowang@redhat.com>
+Date:   Tue, 31 Jan 2023 10:31:18 +0800
+Message-ID: <CACGkMEsPvy5jVWA7AHJkyRKa8-xr9oi4DUAzBcU0pQ_n4rqCFA@mail.gmail.com>
+Subject: Re: [PATCH 22/23] vring: use bvec_set_page to initialize a bvec
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, Ilya Dryomov <idryomov@gmail.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Minchan Kim <minchan@kernel.org>,
+        Sergey Senozhatsky <senozhatsky@chromium.org>,
+        Keith Busch <kbusch@kernel.org>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        David Howells <dhowells@redhat.com>,
+        Marc Dionne <marc.dionne@auristor.com>,
+        Xiubo Li <xiubli@redhat.com>, Steve French <sfrench@samba.org>,
+        Trond Myklebust <trond.myklebust@hammerspace.com>,
+        Anna Schumaker <anna@kernel.org>,
+        Mike Marshall <hubcap@omnibond.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Chuck Lever <chuck.lever@oracle.com>,
+        linux-block@vger.kernel.org, ceph-devel@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org,
+        target-devel@vger.kernel.org, kvm@vger.kernel.org,
+        netdev@vger.kernel.org, linux-afs@lists.infradead.org,
+        linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+        linux-fsdevel@vger.kernel.org, linux-nfs@vger.kernel.org,
+        devel@lists.orangefs.org, io-uring@vger.kernel.org,
+        linux-mm@kvack.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Stefan,
+On Mon, Jan 30, 2023 at 5:23 PM Christoph Hellwig <hch@lst.de> wrote:
+>
+> Use the bvec_set_page helper to initialize a bvec.
+>
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-On Mon, Jan 30, 2023 at 05:20:30PM -0500, Stefan Hajnoczi wrote:
-> On Fri, Jan 06, 2023 at 12:17:05PM +0800, Ming Lei wrote:
-> > Hello,
-> > 
-> > Stefan Hajnoczi suggested un-privileged ublk device[1] for container
-> > use case.
-> > 
-> > So far only administrator can create/control ublk device which is too
-> > strict and increase system administrator burden, and this patchset
-> > implements un-privileged ublk device:
-> > 
-> > - any user can create ublk device, which can only be controlled &
-> >   accessed by the owner of the device or administrator
-> > 
-> > For using such mechanism, system administrator needs to deploy two
-> > simple udev rules[2] after running 'make install' in ublksrv.
-> > 
-> > Userspace(ublksrv):
-> > 
-> > 	https://github.com/ming1/ubdsrv/tree/unprivileged-ublk
-> >     
-> > 'ublk add -t $TYPE --un_privileged' is for creating one un-privileged
-> > ublk device if the user is un-privileged.
-> 
-> Hi Ming,
-> Sorry for the late reply. Is there anything stopping processes with a
-> different uid/gid from accessing the unprivileged block device
-> (/dev/ublkbN)?
+A typo in the subject, should be "vringh".
 
-The device is only owned by its owner, and other user can't open the
-device file.
+Other than this
 
-> 
-> The scenario I'm thinking about is:
-> 1. Evil user runs "chmod 666 /dev/ublkbN". They are allowed to do this
->    because they are the owner of the block device node.
-> 2. Evil user causes another user's process (e.g. suid) to open the block
->    device.
-> 3. Evil user's ublksrv either abuses timing (e.g. never responding or
->    responding after an artifical delay) to DoS or returns corrupted data
->    to exploit bugs in the victim process.
-> 
-> FUSE has exactly the same issue and I think that's why an unprivileged
-> FUSE mount cannot be accessed by processes with a different uid/gid.
-> 
-> That extra protection is probably necessary for ublk too.
+Acked-by: Jason Wang <jasowang@redhat.com>
 
-Looks like the evil user creates one trap, and wait for other users to
-be caught. And any unprivileged user needn't grant access to other users
-cause anyone can create it. OK, we can add the check when opening ublk
-disk, something like the following:
+Thanks
 
-
-diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-index a725a236a38f..f1a5d704ce33 100644
---- a/drivers/block/ublk_drv.c
-+++ b/drivers/block/ublk_drv.c
-@@ -377,8 +377,44 @@ static void ublk_free_disk(struct gendisk *disk)
- 	put_device(&ub->cdev_dev);
- }
- 
-+static void ublk_store_owner_uid_gid(unsigned int *owner_uid,
-+		unsigned int *owner_gid)
-+{
-+	kuid_t uid;
-+	kgid_t gid;
-+
-+	current_uid_gid(&uid, &gid);
-+
-+	*owner_uid = from_kuid(&init_user_ns, uid);
-+	*owner_gid = from_kgid(&init_user_ns, gid);
-+}
-+
-+static int ublk_open(struct block_device *bdev, fmode_t mode)
-+{
-+	struct ublk_device *ub = bdev->bd_disk->private_data;
-+
-+	/*
-+	 * If it is one unprivileged device, only owner can open
-+	 * the disk. Otherwise it could be one trap made by one
-+	 * evil user who may grant this disk's privileges to other
-+	 * users.
-+	 */
-+	if (ub->dev_info.flags & UBLK_F_UNPRIVILEGED_DEV) {
-+		unsigned int curr_uid, curr_gid;
-+
-+		ublk_store_owner_uid_gid(&curr_uid, &curr_gid);
-+
-+		if (curr_uid != ub->dev_info.owner_uid || curr_gid !=
-+				ub->dev_info.owner_gid)
-+			return -EPERM;
-+	}
-+
-+	return 0;
-+}
-+
- static const struct block_device_operations ub_fops = {
- 	.owner =	THIS_MODULE,
-+	.open =		ublk_open,
- 	.free_disk =	ublk_free_disk,
- };
- 
-@@ -1620,17 +1656,6 @@ static int ublk_ctrl_get_queue_affinity(struct ublk_device *ub,
- 	return ret;
- }
- 
--static void ublk_store_owner_uid_gid(struct ublksrv_ctrl_dev_info *info)
--{
--	kuid_t uid;
--	kgid_t gid;
--
--	current_uid_gid(&uid, &gid);
--
--	info->owner_uid = from_kuid(&init_user_ns, uid);
--	info->owner_gid = from_kgid(&init_user_ns, gid);
--}
--
- static inline void ublk_dump_dev_info(struct ublksrv_ctrl_dev_info *info)
- {
- 	pr_devel("%s: dev id %d flags %llx\n", __func__,
-@@ -1664,7 +1689,7 @@ static int ublk_ctrl_add_dev(struct io_uring_cmd *cmd)
- 		return -EPERM;
- 
- 	/* the created device is always owned by current user */
--	ublk_store_owner_uid_gid(&info);
-+	ublk_store_owner_uid_gid(&info.owner_uid, &info.owner_gid);
- 
- 	if (header->dev_id != info.dev_id) {
- 		pr_warn("%s: dev id not match %u %u\n",
-
-
-
-
-Thanks, 
-Ming
+> ---
+>  drivers/vhost/vringh.c | 5 ++---
+>  1 file changed, 2 insertions(+), 3 deletions(-)
+>
+> diff --git a/drivers/vhost/vringh.c b/drivers/vhost/vringh.c
+> index 33eb941fcf1546..a1e27da544814a 100644
+> --- a/drivers/vhost/vringh.c
+> +++ b/drivers/vhost/vringh.c
+> @@ -1126,9 +1126,8 @@ static int iotlb_translate(const struct vringh *vrh,
+>                 size = map->size - addr + map->start;
+>                 pa = map->addr + addr - map->start;
+>                 pfn = pa >> PAGE_SHIFT;
+> -               iov[ret].bv_page = pfn_to_page(pfn);
+> -               iov[ret].bv_len = min(len - s, size);
+> -               iov[ret].bv_offset = pa & (PAGE_SIZE - 1);
+> +               bvec_set_page(&iov[ret], pfn_to_page(pfn), min(len - s, size),
+> +                             pa & (PAGE_SIZE - 1));
+>                 s += size;
+>                 addr += size;
+>                 ++ret;
+> --
+> 2.39.0
+>
 
