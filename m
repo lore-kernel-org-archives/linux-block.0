@@ -2,124 +2,57 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D0374C63797
-	for <linux-block@archiver.kernel.org>; Tue, 31 Jan 2023 08:33:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 096B5C38142
+	for <linux-block@archiver.kernel.org>; Tue, 31 Jan 2023 08:37:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231350AbjAaId1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 31 Jan 2023 03:33:27 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45288 "EHLO
+        id S231590AbjAaIhM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 31 Jan 2023 03:37:12 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47802 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231297AbjAaIdV (ORCPT
+        with ESMTP id S231337AbjAaIgy (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 31 Jan 2023 03:33:21 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3199D21A1B
-        for <linux-block@vger.kernel.org>; Tue, 31 Jan 2023 00:32:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1675153953;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=mXC2zcAxG9G8Isnah+UEIve545QvqxOVfqOZABcZwZc=;
-        b=F0ttl8FdvWhpB9P5pKDkGj/92OFBNZU2BR45PmtXqqU0mpk0BZCrwyI5Go7e3VRK5nOwFu
-        FSz/vGX/6Lqpn9l22R4qf/xYqXuC4+tWFk+irqYrefyCwFs7aTTi0bzcRMd0TOrOr33vHK
-        6TrUejiHOlSjhjtmHWaLRhApo1wZqeI=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-346-rOck86xNPeSWVW-2EVnUPg-1; Tue, 31 Jan 2023 03:32:31 -0500
-X-MC-Unique: rOck86xNPeSWVW-2EVnUPg-1
-Received: by mail-wr1-f69.google.com with SMTP id y18-20020adffa52000000b002bfbd64ae48so2319686wrr.15
-        for <linux-block@vger.kernel.org>; Tue, 31 Jan 2023 00:32:30 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:subject:organization:from
-         :references:cc:to:content-language:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=mXC2zcAxG9G8Isnah+UEIve545QvqxOVfqOZABcZwZc=;
-        b=uU4PeCcPcEiK+mL7c8TQE9c2NKAM3HEGGDSD237QSNkmnw+dYOGTTSJ+MNwtGay1xv
-         8P1VgM5mRBo5NFuUVAjHBgxwNdC1sDLimoR5Z3bh0ViBpRigDU710ETgl9BbichSUv6I
-         IOJMUhyVa4ZDzU2Kos/v0FbhNZJRxGjhmmXSrZgzi66iJSvGHI+KC/7wVkCgu/JH8uXz
-         c5D6rI+YiLDVy0aqDxAFmvSqiEmcwVxD4AJcRUvMd82XTkVK8f9vQN0rNryj3ufEqegm
-         VcwYoCcZYF6/y/uMyG6pT75B4RuScUoQd7/ws1f3hHjVPuKLxc8SL/xBpEWGJsSCZ78T
-         NkDA==
-X-Gm-Message-State: AO0yUKUnEbLyiQ4ShIHI05ypbTF2VdAfRHibh2D+tzNKXPejSFXkVCZK
-        awwxc+xUNh2kY7qWksYYTL2CI+xfwqzwgVpXt9EifQWOZN9dMx8i8eUagnozISyUMFTD24UvHEf
-        T4lQfehtnR/OquOrK7JZXYaU=
-X-Received: by 2002:adf:a491:0:b0:2bf:b394:4f23 with SMTP id g17-20020adfa491000000b002bfb3944f23mr20583262wrb.51.1675153949864;
-        Tue, 31 Jan 2023 00:32:29 -0800 (PST)
-X-Google-Smtp-Source: AK7set+sWw0CLpzPTQgDsOCrke2BcwF/lz4GziC+6IvgWtlAZZxAVafKyoN+GsZbhWORcN9yHV3v8w==
-X-Received: by 2002:adf:a491:0:b0:2bf:b394:4f23 with SMTP id g17-20020adfa491000000b002bfb3944f23mr20583248wrb.51.1675153949544;
-        Tue, 31 Jan 2023 00:32:29 -0800 (PST)
-Received: from ?IPV6:2003:d8:2f0a:ca00:f74f:2017:1617:3ec3? (p200300d82f0aca00f74f201716173ec3.dip0.t-ipconnect.de. [2003:d8:2f0a:ca00:f74f:2017:1617:3ec3])
-        by smtp.gmail.com with ESMTPSA id a13-20020adfeecd000000b002bbedd60a9asm13865885wrp.77.2023.01.31.00.32.28
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 31 Jan 2023 00:32:28 -0800 (PST)
-Message-ID: <040ed7a7-3f4d-dab7-5a49-1cd9933c5445@redhat.com>
-Date:   Tue, 31 Jan 2023 09:32:27 +0100
+        Tue, 31 Jan 2023 03:36:54 -0500
+Received: from mail.lokoho.com (mail.lokoho.com [217.61.105.98])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ACBA7485B5
+        for <linux-block@vger.kernel.org>; Tue, 31 Jan 2023 00:36:14 -0800 (PST)
+Received: by mail.lokoho.com (Postfix, from userid 1001)
+        id 7451483C7B; Tue, 31 Jan 2023 08:36:00 +0000 (GMT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=lokoho.com; s=mail;
+        t=1675154173; bh=Z0N5VlX9/JlryGOL5I747Le9USomZJCRNNGRT3LbbKc=;
+        h=Date:From:To:Subject:From;
+        b=YMADYyeCcphIjusiqWB5VIC3Smk6uKwtnwFrq+R0KRtfpzc8X4TzPTX2PGcB0vuVP
+         JeTSydUwjWCRIq9+EkhviB8Evk32IRMHlP9xgjOWunKm96mVcTyVhM6XtIc3WikvR3
+         k70zUIWUnbyWQUig9oUsk+hq00qX3Hq+ROj89sJ+DasO8YkAZaZnT2XvEOVLRUwIGc
+         vNrlDtodXGF/qV0XNRauz6leLVdqwJTV5dFctLav2oncdaZIbE0hgBwXoZxIMROB2G
+         8UQxMQtnP93AalvdHQIlzQ3Ips4zPsjRE4KYjIr6KsHQXLuXnFd0kzSViALngWTbV8
+         nrYHekJ0EjeLQ==
+Received: by mail.lokoho.com for <linux-block@vger.kernel.org>; Tue, 31 Jan 2023 08:35:43 GMT
+Message-ID: <20230131074501-0.1.3q.w1i6.0.vjbqgjkc53@lokoho.com>
+Date:   Tue, 31 Jan 2023 08:35:43 GMT
+From:   "Adam Charachuta" <adam.charachuta@lokoho.com>
+To:     <linux-block@vger.kernel.org>
+Subject: =?UTF-8?Q?S=C5=82owa_kluczowe_do_wypozycjonowania?=
+X-Mailer: mail.lokoho.com
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.0
-Content-Language: en-US
-To:     Jens Axboe <axboe@kernel.dk>, David Howells <dhowells@redhat.com>,
-        John Hubbard <jhubbard@nvidia.com>
-Cc:     Al Viro <viro@zeniv.linux.org.uk>,
-        Christoph Hellwig <hch@infradead.org>,
-        Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        Jeff Layton <jlayton@kernel.org>, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org
-References: <e68c5cab-c3a6-1872-98fa-9f909f23be79@nvidia.com>
- <3351099.1675077249@warthog.procyon.org.uk>
- <fd0003a0-a133-3daf-891c-ba7deafad768@kernel.dk>
- <f57ee72f-38e9-6afa-182f-2794638eadcb@kernel.dk>
- <e8480b18-08af-d101-a721-50d213893492@kernel.dk>
- <3520518.1675116740@warthog.procyon.org.uk>
- <f392399b-a4c4-2251-e12b-e89fff351c4d@kernel.dk>
-From:   David Hildenbrand <david@redhat.com>
-Organization: Red Hat
-Subject: Re: [GIT PULL] iov_iter: Improve page extraction (pin or just list)
-In-Reply-To: <f392399b-a4c4-2251-e12b-e89fff351c4d@kernel.dk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 30.01.23 23:15, Jens Axboe wrote:
-> On 1/30/23 3:12 PM, David Howells wrote:
->> John Hubbard <jhubbard@nvidia.com> wrote:
->>
->>> This is something that we say when adding pin_user_pages_fast(),
->>> yes. I doubt that I can quickly find the email thread, but we
->>> measured it and weren't immediately able to come up with a way
->>> to make it faster.
->>
->> percpu counters maybe - add them up at the point of viewing?
-> 
-> They are percpu, see my last email. But for every 108 changes (on
-> my system), they will do two atomic_long_adds(). So not very
-> useful for anything but low frequency modifications.
-> 
+Dzie=C5=84 dobry,
 
-Can we just treat the whole acquired/released accounting as a debug 
-mechanism to detect missing releases and do it only for debug kernels?
+zapozna=C5=82em si=C4=99 z Pa=C5=84stwa ofert=C4=85 i z przyjemno=C5=9Bci=
+=C4=85 przyznaj=C4=99, =C5=BCe przyci=C4=85ga uwag=C4=99 i zach=C4=99ca d=
+o dalszych rozm=C3=B3w.=20
+
+Pomy=C5=9Bla=C5=82em, =C5=BCe mo=C5=BCe m=C3=B3g=C5=82bym mie=C4=87 sw=C3=
+=B3j wk=C5=82ad w Pa=C5=84stwa rozw=C3=B3j i pom=C3=B3c dotrze=C4=87 z t=C4=
+=85 ofert=C4=85 do wi=C4=99kszego grona odbiorc=C3=B3w. Pozycjonuj=C4=99 =
+strony www, dzi=C4=99ki czemu generuj=C4=85 =C5=9Bwietny ruch w sieci.
+
+Mo=C5=BCemy porozmawia=C4=87 w najbli=C5=BCszym czasie?
 
 
-The pcpu counter is an s8, so we have to flush on a regular basis and 
-cannot really defer it any longer ... but I'm curious if it would be of 
-any help to only have a single PINNED counter that goes into both 
-directions (inc/dec on pin/release), to reduce the flushing.
-
-Of course, once we pin/release more than ~108 pages in one go or we 
-switch CPUs frequently it won't be that much of a help ...
-
--- 
-Thanks,
-
-David / dhildenb
-
+Pozdrawiam
+Adam Charachuta
