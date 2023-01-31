@@ -2,105 +2,73 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 95E73C636CC
-	for <linux-block@archiver.kernel.org>; Tue, 31 Jan 2023 13:42:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B14CEC636D3
+	for <linux-block@archiver.kernel.org>; Tue, 31 Jan 2023 13:45:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232334AbjAaNm3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 31 Jan 2023 08:42:29 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52808 "EHLO
+        id S231799AbjAaNpe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 31 Jan 2023 08:45:34 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56310 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232330AbjAaNm1 (ORCPT
+        with ESMTP id S229680AbjAaNpd (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 31 Jan 2023 08:42:27 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E8D9351419
-        for <linux-block@vger.kernel.org>; Tue, 31 Jan 2023 05:41:38 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1675172498;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=N57QrcvIUdB6yMuxeijZFNjUyQe/qI762WSp3dGqEHA=;
-        b=U3PxU4FKamxhQqHaunvXMd9ksg8PB4ApNhG9C/IMNN6RgWI0TYeeox033DwptQHtdsCCsq
-        4QdOC/9oCwDLbw0sU+9yrfJK+dUSNX4Q0x8g9w2KW71HsX2/FAIPKhzPnC/LKkOY0quphB
-        u9pT9jAwp96VHLcxscfnbbH+kP2TVHo=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-392-rgZuwSzoNbaxXdxSRxQ9xQ-1; Tue, 31 Jan 2023 08:41:34 -0500
-X-MC-Unique: rgZuwSzoNbaxXdxSRxQ9xQ-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 6D35D857A89;
-        Tue, 31 Jan 2023 13:41:33 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.33.36.97])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 97CA140444C0;
-        Tue, 31 Jan 2023 13:41:31 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <040ed7a7-3f4d-dab7-5a49-1cd9933c5445@redhat.com>
-References: <040ed7a7-3f4d-dab7-5a49-1cd9933c5445@redhat.com> <e68c5cab-c3a6-1872-98fa-9f909f23be79@nvidia.com> <3351099.1675077249@warthog.procyon.org.uk> <fd0003a0-a133-3daf-891c-ba7deafad768@kernel.dk> <f57ee72f-38e9-6afa-182f-2794638eadcb@kernel.dk> <e8480b18-08af-d101-a721-50d213893492@kernel.dk> <3520518.1675116740@warthog.procyon.org.uk> <f392399b-a4c4-2251-e12b-e89fff351c4d@kernel.dk>
-To:     David Hildenbrand <david@redhat.com>
-Cc:     dhowells@redhat.com, Jens Axboe <axboe@kernel.dk>,
-        John Hubbard <jhubbard@nvidia.com>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Christoph Hellwig <hch@infradead.org>,
-        Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        Jeff Layton <jlayton@kernel.org>, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [GIT PULL] iov_iter: Improve page extraction (pin or just list)
+        Tue, 31 Jan 2023 08:45:33 -0500
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7084269F;
+        Tue, 31 Jan 2023 05:45:31 -0800 (PST)
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id A7B4968B05; Tue, 31 Jan 2023 14:45:22 +0100 (CET)
+Date:   Tue, 31 Jan 2023 14:45:21 +0100
+From:   Christoph Hellwig <hch@lst.de>
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        Ilya Dryomov <idryomov@gmail.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Minchan Kim <minchan@kernel.org>,
+        Sergey Senozhatsky <senozhatsky@chromium.org>,
+        Keith Busch <kbusch@kernel.org>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        David Howells <dhowells@redhat.com>,
+        Marc Dionne <marc.dionne@auristor.com>,
+        Xiubo Li <xiubli@redhat.com>, Steve French <sfrench@samba.org>,
+        Trond Myklebust <trond.myklebust@hammerspace.com>,
+        Anna Schumaker <anna@kernel.org>,
+        Mike Marshall <hubcap@omnibond.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Chuck Lever <chuck.lever@oracle.com>,
+        linux-block@vger.kernel.org, ceph-devel@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org,
+        target-devel@vger.kernel.org, kvm@vger.kernel.org,
+        netdev@vger.kernel.org, linux-afs@lists.infradead.org,
+        linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+        linux-fsdevel@vger.kernel.org, linux-nfs@vger.kernel.org,
+        devel@lists.orangefs.org, io-uring@vger.kernel.org,
+        linux-mm@kvack.org
+Subject: Re: [PATCH 01/23] block: factor out a bvec_set_page helper
+Message-ID: <20230131134521.GA24165@lst.de>
+References: <20230130092157.1759539-1-hch@lst.de> <20230130092157.1759539-2-hch@lst.de> <2bab7050-dec7-3af8-b643-31b414b8c4b4@acm.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <3791871.1675172490.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date:   Tue, 31 Jan 2023 13:41:30 +0000
-Message-ID: <3791872.1675172490@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.1
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <2bab7050-dec7-3af8-b643-31b414b8c4b4@acm.org>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-David Hildenbrand <david@redhat.com> wrote:
+On Mon, Jan 30, 2023 at 09:09:23AM -0800, Bart Van Assche wrote:
+> Has it been considered to use structure assignment instead of introducing 
+> bvec_set_page(), e.g. as follows?
+>
+> bip->bip_vec[bip->bip_vcnt] = (struct bio_vec) {
+>       .bv_page = page, .bv_len = len, .bv_offset = offset };
 
-> >> percpu counters maybe - add them up at the point of viewing?
-> > They are percpu, see my last email. But for every 108 changes (on
-> > my system), they will do two atomic_long_adds(). So not very
-> > useful for anything but low frequency modifications.
-> > =
-
-> =
-
-> Can we just treat the whole acquired/released accounting as a debug mech=
-anism
-> to detect missing releases and do it only for debug kernels?
-> =
-
-> =
-
-> The pcpu counter is an s8, so we have to flush on a regular basis and ca=
-nnot
-> really defer it any longer ... but I'm curious if it would be of any hel=
-p to
-> only have a single PINNED counter that goes into both directions (inc/de=
-c on
-> pin/release), to reduce the flushing.
-> =
-
-> Of course, once we pin/release more than ~108 pages in one go or we swit=
-ch
-> CPUs frequently it won't be that much of a help ...
-
-What are the stats actually used for?  Is it just debugging, or do we actu=
-ally
-have users for them (control groups spring to mind)?
-
-David
-
+Unless it's hidden behind a macro it doesn't solve the problem of
+abstraction away the layout.  I'm also find it less readable.
