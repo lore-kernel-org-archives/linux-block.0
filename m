@@ -2,25 +2,25 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D89CC636D3
-	for <linux-block@archiver.kernel.org>; Tue, 31 Jan 2023 08:43:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63DF2C636CC
+	for <linux-block@archiver.kernel.org>; Tue, 31 Jan 2023 08:43:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231956AbjAaIn1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 31 Jan 2023 03:43:27 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56344 "EHLO
+        id S231673AbjAaInq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 31 Jan 2023 03:43:46 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56384 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231829AbjAaImD (ORCPT
+        with ESMTP id S231847AbjAaImE (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 31 Jan 2023 03:42:03 -0500
-Received: from lgeamrelo11.lge.com (lgeamrelo11.lge.com [156.147.23.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A7F5947413
-        for <linux-block@vger.kernel.org>; Tue, 31 Jan 2023 00:40:04 -0800 (PST)
+        Tue, 31 Jan 2023 03:42:04 -0500
+Received: from lgeamrelo11.lge.com (lgeamrelo12.lge.com [156.147.23.52])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 416B748586
+        for <linux-block@vger.kernel.org>; Tue, 31 Jan 2023 00:40:10 -0800 (PST)
 Received: from unknown (HELO lgeamrelo04.lge.com) (156.147.1.127)
-        by 156.147.23.51 with ESMTP; 31 Jan 2023 17:39:59 +0900
+        by 156.147.23.52 with ESMTP; 31 Jan 2023 17:40:03 +0900
 X-Original-SENDERIP: 156.147.1.127
 X-Original-MAILFROM: max.byungchul.park@gmail.com
 Received: from unknown (HELO localhost.localdomain) (10.177.244.38)
-        by 156.147.1.127 with ESMTP; 31 Jan 2023 17:39:59 +0900
+        by 156.147.1.127 with ESMTP; 31 Jan 2023 17:40:02 +0900
 X-Original-SENDERIP: 10.177.244.38
 X-Original-MAILFROM: max.byungchul.park@gmail.com
 From:   Byungchul Park <max.byungchul.park@gmail.com>
@@ -47,9 +47,9 @@ Cc:     torvalds@linux-foundation.org, damien.lemoal@opensource.wdc.com,
         42.hyeyoo@gmail.com, chris.p.wilson@intel.com,
         gwan-gyeong.mun@intel.com, max.byungchul.park@gmail.com,
         boqun.feng@gmail.com, longman@redhat.com, hdanton@sina.com
-Subject: [PATCH v9 14/25] dept: Add a mechanism to refill the internal memory pools on running out
-Date:   Tue, 31 Jan 2023 17:39:43 +0900
-Message-Id: <1675154394-25598-15-git-send-email-max.byungchul.park@gmail.com>
+Subject: [PATCH v9 24/25] dept: Make Dept able to work with an external wgen
+Date:   Tue, 31 Jan 2023 17:39:53 +0900
+Message-Id: <1675154394-25598-25-git-send-email-max.byungchul.park@gmail.com>
 X-Mailer: git-send-email 1.9.1
 In-Reply-To: <1675154394-25598-1-git-send-email-max.byungchul.park@gmail.com>
 References: <1675154394-25598-1-git-send-email-max.byungchul.park@gmail.com>
@@ -57,268 +57,224 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Dept engine works in a constrained environment. For example, Dept cannot
-make use of dynamic allocation e.g. kmalloc(). So Dept has been using
-static pools to keep memory chunks Dept uses.
+There is a case where total maps for its wait/event is so large in size.
+For instance, struct page for PG_locked and PG_writeback is the case.
+The additional memory size for the maps would be 'the # of pages *
+sizeof(struct dept_map)' if each struct page keeps its map all the way,
+which might be too big to accept.
 
-However, Dept would barely work once any of the pools gets run out. So
-implemented a mechanism for the refill on the lack by any chance, using
-irq work and workqueue that fits on the contrained environment.
+It'd be better to keep the minimum data in the case, which is timestamp
+called 'wgen' that Dept makes use of. So made Dept able to work with an
+external wgen when needed.
 
 Signed-off-by: Byungchul Park <max.byungchul.park@gmail.com>
 ---
- include/linux/dept.h            |  19 ++++++--
- kernel/dependency/dept.c        | 104 ++++++++++++++++++++++++++++++++++------
- kernel/dependency/dept_object.h |  10 ++--
- kernel/dependency/dept_proc.c   |   8 ++--
- 4 files changed, 112 insertions(+), 29 deletions(-)
+ include/linux/dept.h     | 18 ++++++++++++++----
+ include/linux/dept_sdt.h |  4 ++--
+ kernel/dependency/dept.c | 30 +++++++++++++++++++++---------
+ 3 files changed, 37 insertions(+), 15 deletions(-)
 
 diff --git a/include/linux/dept.h b/include/linux/dept.h
-index d9ca9dd..583e8fe 100644
+index 0aa8d90..ad32ea7 100644
 --- a/include/linux/dept.h
 +++ b/include/linux/dept.h
-@@ -336,9 +336,19 @@ struct dept_pool {
- 	size_t				obj_sz;
- 
- 	/*
--	 * the number of the static array
-+	 * the remaining number of the object in spool
- 	 */
--	atomic_t			obj_nr;
-+	int				obj_nr;
-+
-+	/*
-+	 * the number of the object in spool
-+	 */
-+	int				tot_nr;
-+
-+	/*
-+	 * accumulated amount of memory used by the object in byte
-+	 */
-+	atomic_t			acc_sz;
- 
- 	/*
- 	 * offset of ->pool_node
-@@ -348,9 +358,10 @@ struct dept_pool {
- 	/*
- 	 * pointer to the pool
- 	 */
--	void				*spool;
-+	void				*spool; /* static pool */
-+	void				*rpool; /* reserved pool */
- 	struct llist_head		boot_pool;
--	struct llist_head __percpu	*lpool;
-+	struct llist_head __percpu	*lpool; /* local pool */
+@@ -487,6 +487,13 @@ struct dept_task {
+ 	bool				in_sched;
  };
  
- struct dept_ecxt_held {
++/*
++ * for subsystems that requires compact use of memory e.g. struct page
++ */
++struct dept_ext_wgen{
++	unsigned int wgen;
++};
++
+ #define DEPT_TASK_INITIALIZER(t)				\
+ {								\
+ 	.wait_hist = { { .wait = NULL, } },			\
+@@ -518,6 +525,7 @@ struct dept_task {
+ extern void dept_free_range(void *start, unsigned int sz);
+ extern void dept_map_init(struct dept_map *m, struct dept_key *k, int sub_u, const char *n);
+ extern void dept_map_reinit(struct dept_map *m, struct dept_key *k, int sub_u, const char *n);
++extern void dept_ext_wgen_init(struct dept_ext_wgen *ewg);
+ extern void dept_map_copy(struct dept_map *to, struct dept_map *from);
+ 
+ extern void dept_wait(struct dept_map *m, unsigned long w_f, unsigned long ip, const char *w_fn, int sub_l, long timeout);
+@@ -527,8 +535,8 @@ struct dept_task {
+ extern void dept_stage_event(struct task_struct *t, unsigned long ip);
+ extern void dept_ecxt_enter(struct dept_map *m, unsigned long e_f, unsigned long ip, const char *c_fn, const char *e_fn, int sub_l);
+ extern bool dept_ecxt_holding(struct dept_map *m, unsigned long e_f);
+-extern void dept_request_event(struct dept_map *m);
+-extern void dept_event(struct dept_map *m, unsigned long e_f, unsigned long ip, const char *e_fn);
++extern void dept_request_event(struct dept_map *m, struct dept_ext_wgen *ewg);
++extern void dept_event(struct dept_map *m, unsigned long e_f, unsigned long ip, const char *e_fn, struct dept_ext_wgen *ewg);
+ extern void dept_ecxt_exit(struct dept_map *m, unsigned long e_f, unsigned long ip);
+ extern void dept_sched_enter(void);
+ extern void dept_sched_exit(void);
+@@ -559,6 +567,7 @@ static inline void dept_ecxt_enter_nokeep(struct dept_map *m)
+ struct dept_key  { };
+ struct dept_map  { };
+ struct dept_task { };
++struct dept_ext_wgen { };
+ 
+ #define DEPT_MAP_INITIALIZER(n, k) { }
+ #define DEPT_TASK_INITIALIZER(t)   { }
+@@ -571,6 +580,7 @@ static inline void dept_ecxt_enter_nokeep(struct dept_map *m)
+ #define dept_free_range(s, sz)				do { } while (0)
+ #define dept_map_init(m, k, su, n)			do { (void)(n); (void)(k); } while (0)
+ #define dept_map_reinit(m, k, su, n)			do { (void)(n); (void)(k); } while (0)
++#define dept_ext_wgen_init(wg)				do { } while (0)
+ #define dept_map_copy(t, f)				do { } while (0)
+ 
+ #define dept_wait(m, w_f, ip, w_fn, sl, t)		do { (void)(w_fn); } while (0)
+@@ -580,8 +590,8 @@ static inline void dept_ecxt_enter_nokeep(struct dept_map *m)
+ #define dept_stage_event(t, ip)				do { } while (0)
+ #define dept_ecxt_enter(m, e_f, ip, c_fn, e_fn, sl)	do { (void)(c_fn); (void)(e_fn); } while (0)
+ #define dept_ecxt_holding(m, e_f)			false
+-#define dept_request_event(m)				do { } while (0)
+-#define dept_event(m, e_f, ip, e_fn)			do { (void)(e_fn); } while (0)
++#define dept_request_event(m, wg)			do { } while (0)
++#define dept_event(m, e_f, ip, e_fn, wg)		do { (void)(e_fn); } while (0)
+ #define dept_ecxt_exit(m, e_f, ip)			do { } while (0)
+ #define dept_sched_enter()				do { } while (0)
+ #define dept_sched_exit()				do { } while (0)
+diff --git a/include/linux/dept_sdt.h b/include/linux/dept_sdt.h
+index 21fce52..8cdac79 100644
+--- a/include/linux/dept_sdt.h
++++ b/include/linux/dept_sdt.h
+@@ -24,7 +24,7 @@
+ 
+ #define sdt_wait_timeout(m, t)						\
+ 	do {								\
+-		dept_request_event(m);					\
++		dept_request_event(m, NULL);				\
+ 		dept_wait(m, 1UL, _THIS_IP_, __func__, 0, t);		\
+ 	} while (0)
+ #define sdt_wait(m) sdt_wait_timeout(m, -1L)
+@@ -49,7 +49,7 @@
+ #define sdt_might_sleep_end()		dept_clean_stage()
+ 
+ #define sdt_ecxt_enter(m)		dept_ecxt_enter(m, 1UL, _THIS_IP_, "start", "event", 0)
+-#define sdt_event(m)			dept_event(m, 1UL, _THIS_IP_, __func__)
++#define sdt_event(m)			dept_event(m, 1UL, _THIS_IP_, __func__, NULL)
+ #define sdt_ecxt_exit(m)		dept_ecxt_exit(m, 1UL, _THIS_IP_)
+ #else /* !CONFIG_DEPT */
+ #define sdt_map_init(m)			do { } while (0)
 diff --git a/kernel/dependency/dept.c b/kernel/dependency/dept.c
-index 1f1aca4..0ac6442 100644
+index 2887858..bce3dc8 100644
 --- a/kernel/dependency/dept.c
 +++ b/kernel/dependency/dept.c
-@@ -74,6 +74,9 @@
- #include <linux/dept.h>
- #include <linux/utsname.h>
- #include <linux/kernel.h>
-+#include <linux/workqueue.h>
-+#include <linux/irq_work.h>
-+#include <linux/vmalloc.h>
- #include "dept_internal.h"
- 
- static int dept_stop;
-@@ -122,10 +125,12 @@
- 			WARN(1, "DEPT_STOP: " s);			\
- 	})
- 
--#define DEPT_INFO_ONCE(s...) pr_warn_once("DEPT_INFO_ONCE: " s)
-+#define DEPT_INFO_ONCE(s...)	pr_warn_once("DEPT_INFO_ONCE: " s)
-+#define DEPT_INFO(s...)		pr_warn("DEPT_INFO: " s)
- 
- static arch_spinlock_t dept_spin = (arch_spinlock_t)__ARCH_SPIN_LOCK_UNLOCKED;
- static arch_spinlock_t stage_spin = (arch_spinlock_t)__ARCH_SPIN_LOCK_UNLOCKED;
-+static arch_spinlock_t dept_pool_spin = (arch_spinlock_t)__ARCH_SPIN_LOCK_UNLOCKED;
- 
- /*
-  * DEPT internal engine should be careful in using outside functions
-@@ -264,6 +269,7 @@ static inline bool valid_key(struct dept_key *k)
- 
- #define OBJECT(id, nr)							\
- static struct dept_##id spool_##id[nr];					\
-+static struct dept_##id rpool_##id[nr];					\
- static DEFINE_PER_CPU(struct llist_head, lpool_##id);
- 	#include "dept_object.h"
- #undef  OBJECT
-@@ -272,14 +278,70 @@ struct dept_pool dept_pool[OBJECT_NR] = {
- #define OBJECT(id, nr) {						\
- 	.name = #id,							\
- 	.obj_sz = sizeof(struct dept_##id),				\
--	.obj_nr = ATOMIC_INIT(nr),					\
-+	.obj_nr = nr,							\
-+	.tot_nr = nr,							\
-+	.acc_sz = ATOMIC_INIT(sizeof(spool_##id) + sizeof(rpool_##id)), \
- 	.node_off = offsetof(struct dept_##id, pool_node),		\
- 	.spool = spool_##id,						\
-+	.rpool = rpool_##id,						\
- 	.lpool = &lpool_##id, },
- 	#include "dept_object.h"
- #undef  OBJECT
- };
- 
-+static void dept_wq_work_fn(struct work_struct *work)
-+{
-+	int i;
-+
-+	for (i = 0; i < OBJECT_NR; i++) {
-+		struct dept_pool *p = dept_pool + i;
-+		int sz = p->tot_nr * p->obj_sz;
-+		void *rpool;
-+		bool need;
-+
-+		arch_spin_lock(&dept_pool_spin);
-+		need = !p->rpool;
-+		arch_spin_unlock(&dept_pool_spin);
-+
-+		if (!need)
-+			continue;
-+
-+		rpool = vmalloc(sz);
-+
-+		if (!rpool) {
-+			DEPT_STOP("Failed to extend internal resources.\n");
-+			break;
-+		}
-+
-+		arch_spin_lock(&dept_pool_spin);
-+		if (!p->rpool) {
-+			p->rpool = rpool;
-+			rpool = NULL;
-+			atomic_add(sz, &p->acc_sz);
-+		}
-+		arch_spin_unlock(&dept_pool_spin);
-+
-+		if (rpool)
-+			vfree(rpool);
-+		else
-+			DEPT_INFO("Dept object(%s) just got refilled successfully.\n", p->name);
-+	}
-+}
-+
-+static DECLARE_WORK(dept_wq_work, dept_wq_work_fn);
-+
-+static void dept_irq_work_fn(struct irq_work *w)
-+{
-+	schedule_work(&dept_wq_work);
-+}
-+
-+static DEFINE_IRQ_WORK(dept_irq_work, dept_irq_work_fn);
-+
-+static void request_rpool_refill(void)
-+{
-+	irq_work_queue(&dept_irq_work);
-+}
-+
- /*
-  * Can use llist no matter whether CONFIG_ARCH_HAVE_NMI_SAFE_CMPXCHG is
-  * enabled or not because NMI and other contexts in the same CPU never
-@@ -315,19 +377,31 @@ static void *from_pool(enum object_t t)
- 	/*
- 	 * Try static pool.
- 	 */
--	if (atomic_read(&p->obj_nr) > 0) {
--		int idx = atomic_dec_return(&p->obj_nr);
-+	arch_spin_lock(&dept_pool_spin);
-+
-+	if (!p->obj_nr) {
-+		p->spool = p->rpool;
-+		p->obj_nr = p->rpool ? p->tot_nr : 0;
-+		p->rpool = NULL;
-+		request_rpool_refill();
-+	}
-+
-+	if (p->obj_nr) {
-+		void *ret;
-+
-+		p->obj_nr--;
-+		ret = p->spool + (p->obj_nr * p->obj_sz);
-+		arch_spin_unlock(&dept_pool_spin);
- 
--		if (idx >= 0)
--			return p->spool + (idx * p->obj_sz);
-+		return ret;
- 	}
-+	arch_spin_unlock(&dept_pool_spin);
- 
--	DEPT_INFO_ONCE("---------------------------------------------\n"
--		"  Some of Dept internal resources are run out.\n"
--		"  Dept might still work if the resources get freed.\n"
--		"  However, the chances are Dept will suffer from\n"
--		"  the lack from now. Needs to extend the internal\n"
--		"  resource pools. Ask max.byungchul.park@gmail.com\n");
-+	DEPT_INFO("------------------------------------------\n"
-+		"  Dept object(%s) is run out.\n"
-+		"  Dept is trying to refill the object.\n"
-+		"  Nevertheless, if it fails, Dept will stop.\n",
-+		p->name);
- 	return NULL;
+@@ -2230,6 +2230,11 @@ void dept_map_reinit(struct dept_map *m, struct dept_key *k, int sub_u,
  }
+ EXPORT_SYMBOL_GPL(dept_map_reinit);
  
-@@ -3000,8 +3074,8 @@ void __init dept_init(void)
- 	pr_info("... DEPT_MAX_ECXT_HELD  : %d\n", DEPT_MAX_ECXT_HELD);
- 	pr_info("... DEPT_MAX_SUBCLASSES : %d\n", DEPT_MAX_SUBCLASSES);
- #define OBJECT(id, nr)							\
--	pr_info("... memory used by %s: %zu KB\n",			\
--	       #id, B2KB(sizeof(struct dept_##id) * nr));
-+	pr_info("... memory initially used by %s: %zu KB\n",		\
-+	       #id, B2KB(sizeof(spool_##id) + sizeof(rpool_##id)));
- 	#include "dept_object.h"
- #undef  OBJECT
- #define HASH(id, bits)							\
-@@ -3009,6 +3083,6 @@ void __init dept_init(void)
- 	       #id, B2KB(sizeof(struct hlist_head) * (1 << (bits))));
- 	#include "dept_hash.h"
- #undef  HASH
--	pr_info("... total memory used by objects and hashs: %zu KB\n", B2KB(mem_total));
-+	pr_info("... total memory initially used by objects and hashs: %zu KB\n", B2KB(mem_total));
- 	pr_info("... per task memory footprint: %zu bytes\n", sizeof(struct dept_task));
- }
-diff --git a/kernel/dependency/dept_object.h b/kernel/dependency/dept_object.h
-index 0b7eb16..4f936ad 100644
---- a/kernel/dependency/dept_object.h
-+++ b/kernel/dependency/dept_object.h
-@@ -6,8 +6,8 @@
-  * nr: # of the object that should be kept in the pool.
-  */
- 
--OBJECT(dep, 1024 * 8)
--OBJECT(class, 1024 * 8)
--OBJECT(stack, 1024 * 32)
--OBJECT(ecxt, 1024 * 16)
--OBJECT(wait, 1024 * 32)
-+OBJECT(dep, 1024 * 4 * 2)
-+OBJECT(class, 1024 * 4)
-+OBJECT(stack, 1024 * 4 * 8)
-+OBJECT(ecxt, 1024 * 4 * 2)
-+OBJECT(wait, 1024 * 4 * 4)
-diff --git a/kernel/dependency/dept_proc.c b/kernel/dependency/dept_proc.c
-index 7d61dfb..f07a512 100644
---- a/kernel/dependency/dept_proc.c
-+++ b/kernel/dependency/dept_proc.c
-@@ -73,12 +73,10 @@ static int dept_stats_show(struct seq_file *m, void *v)
++void dept_ext_wgen_init(struct dept_ext_wgen *ewg)
++{
++	WRITE_ONCE(ewg->wgen, 0U);
++}
++
+ void dept_map_copy(struct dept_map *to, struct dept_map *from)
  {
- 	int r;
+ 	if (unlikely(!dept_working())) {
+@@ -2415,7 +2420,7 @@ static void __dept_wait(struct dept_map *m, unsigned long w_f,
+  */
+ static void __dept_event(struct dept_map *m, unsigned long e_f,
+ 			 unsigned long ip, const char *e_fn,
+-			 bool sched_map)
++			 bool sched_map, unsigned int *wgp)
+ {
+ 	struct dept_class *c;
+ 	struct dept_key *k;
+@@ -2437,14 +2442,14 @@ static void __dept_event(struct dept_map *m, unsigned long e_f,
+ 	c = check_new_class(&m->map_key, k, sub_id(m, e), m->name, sched_map);
  
--	seq_puts(m, "Availability in the static pools:\n\n");
-+	seq_puts(m, "Accumulated amount of memory used by pools:\n\n");
- #define OBJECT(id, nr)							\
--	r = atomic_read(&dept_pool[OBJECT_##id].obj_nr);		\
--	if (r < 0)							\
--		r = 0;							\
--	seq_printf(m, "%s\t%d/%d(%d%%)\n", #id, r, nr, (r * 100) / (nr));
-+	r = atomic_read(&dept_pool[OBJECT_##id].acc_sz);		\
-+	seq_printf(m, "%s\t%d KB\n", #id, r / 1024);
- 	#include "dept_object.h"
- #undef  OBJECT
+ 	if (c && add_ecxt(m, c, 0UL, NULL, e_fn, 0)) {
+-		do_event(m, c, READ_ONCE(m->wgen), ip);
++		do_event(m, c, READ_ONCE(*wgp), ip);
+ 		pop_ecxt(m, c);
+ 	}
+ exit:
+ 	/*
+ 	 * Keep the map diabled until the next sleep.
+ 	 */
+-	WRITE_ONCE(m->wgen, 0U);
++	WRITE_ONCE(*wgp, 0U);
+ }
  
+ void dept_wait(struct dept_map *m, unsigned long w_f,
+@@ -2654,7 +2659,7 @@ void dept_stage_event(struct task_struct *t, unsigned long ip)
+ 	if (!m.keys)
+ 		goto exit;
+ 
+-	__dept_event(&m, 1UL, ip, "try_to_wake_up", sched_map);
++	__dept_event(&m, 1UL, ip, "try_to_wake_up", sched_map, &m.wgen);
+ exit:
+ 	dept_exit(flags);
+ }
+@@ -2833,10 +2838,11 @@ bool dept_ecxt_holding(struct dept_map *m, unsigned long e_f)
+ }
+ EXPORT_SYMBOL_GPL(dept_ecxt_holding);
+ 
+-void dept_request_event(struct dept_map *m)
++void dept_request_event(struct dept_map *m, struct dept_ext_wgen *ewg)
+ {
+ 	unsigned long flags;
+ 	unsigned int wg;
++	unsigned int *wgp;
+ 
+ 	if (unlikely(!dept_working()))
+ 		return;
+@@ -2849,32 +2855,38 @@ void dept_request_event(struct dept_map *m)
+ 	 */
+ 	flags = dept_enter_recursive();
+ 
++	wgp = ewg ? &ewg->wgen : &m->wgen;
++
+ 	/*
+ 	 * Avoid zero wgen.
+ 	 */
+ 	wg = atomic_inc_return(&wgen) ?: atomic_inc_return(&wgen);
+-	WRITE_ONCE(m->wgen, wg);
++	WRITE_ONCE(*wgp, wg);
+ 
+ 	dept_exit_recursive(flags);
+ }
+ EXPORT_SYMBOL_GPL(dept_request_event);
+ 
+ void dept_event(struct dept_map *m, unsigned long e_f,
+-		unsigned long ip, const char *e_fn)
++		unsigned long ip, const char *e_fn,
++		struct dept_ext_wgen *ewg)
+ {
+ 	struct dept_task *dt = dept_task();
+ 	unsigned long flags;
++	unsigned int *wgp;
+ 
+ 	if (unlikely(!dept_working()))
+ 		return;
+ 
++	wgp = ewg ? &ewg->wgen : &m->wgen;
++
+ 	if (dt->recursive) {
+ 		/*
+ 		 * Dept won't work with this even though an event
+ 		 * context has been asked. Don't make it confused at
+ 		 * handling the event. Disable it until the next.
+ 		 */
+-		WRITE_ONCE(m->wgen, 0U);
++		WRITE_ONCE(*wgp, 0U);
+ 		return;
+ 	}
+ 
+@@ -2883,7 +2895,7 @@ void dept_event(struct dept_map *m, unsigned long e_f,
+ 
+ 	flags = dept_enter();
+ 
+-	__dept_event(m, e_f, ip, e_fn, false);
++	__dept_event(m, e_f, ip, e_fn, false, wgp);
+ 
+ 	dept_exit(flags);
+ }
 -- 
 1.9.1
 
