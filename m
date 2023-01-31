@@ -2,139 +2,196 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 63C7BC636D7
-	for <linux-block@archiver.kernel.org>; Tue, 31 Jan 2023 02:05:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DAA2AC636D3
+	for <linux-block@archiver.kernel.org>; Tue, 31 Jan 2023 02:31:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231316AbjAaCFl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 30 Jan 2023 21:05:41 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40062 "EHLO
+        id S229503AbjAaCbe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 30 Jan 2023 21:31:34 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49190 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230477AbjAaCFl (ORCPT
+        with ESMTP id S229452AbjAaCbe (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 30 Jan 2023 21:05:41 -0500
-Received: from esa1.hgst.iphmx.com (esa1.hgst.iphmx.com [68.232.141.245])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 263ED227BD
-        for <linux-block@vger.kernel.org>; Mon, 30 Jan 2023 18:05:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1675130740; x=1706666740;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=AcsiuLuDwWfVsTzWwmYa8LChhoDmQwERu0vhn8YNug0=;
-  b=ZEpXBRfTiE/K3Bbv6dTAVLdwtX1Czj8qUCmNQ/rwJwpy82HW9pbOtnq9
-   CO1DZKPmO7sbDSGEkMUAgUWIm49e03SrYKKUp7HMugrxO+uI/bIuSnVqR
-   J2STfxx2EX9c3STrWnXDtVrtLphh6o34l1ORixYQCsTMC0ScgmMcenJfC
-   YPvgMSqGGQRp6aWupAIyfZVdALx1qD/3uyGKleUlbP7V94Xi9FQUNGGGx
-   y4jGbaYiBBjnCx5SgdRnayAvex2fCzUjKRzJU/PBacrGZkAuX5ZdasEr9
-   YWMs+d2ITNpPDDUoygB4kNI07Ux/vIAdsCGfw3tGS7y5+r/LxJFSNCLpi
-   w==;
-X-IronPort-AV: E=Sophos;i="5.97,259,1669046400"; 
-   d="scan'208";a="334094199"
-Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 31 Jan 2023 10:05:39 +0800
-IronPort-SDR: ZC0FkpHat4iDl9By1MeqWfcf9ZGp0EijF/DhGQ+QMhRLMvW+MFO3Alvj9UAr7iDjz2e56pP8I+
- IqKKeRIzACX3VJXhzXHTmfN6AlSSzN7F4rdJwX0nNTomyW6B0ULz97dMq2SByF0tTk6t99MJTk
- nLl7Ief9hhI9eMCjIwyTw+mB7EQvINOBSl6mMEk5WGts7En2g2lqB4w7Kl8qCSEm++19br1pJ0
- HgPoF+17+0e2ebRU2kfXQyixW7ao9kSwS+ERPzz1SvFXWtaDitunQ5DXgbelwVZldrsgtRF3gq
- uZg=
-Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
-  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 30 Jan 2023 17:17:20 -0800
-IronPort-SDR: 0jv9RaXUUJYgR5A3CSNrKYyKe9k9KzhCGDPdfKHabrXyAgdQPVCD2mKZIlAlJpZpmy9o9+TJRA
- 7e+IVbQmZdVM4+K4FPwSV6r1Ey6ZKFAdXFAd/6195UIgXVUONIHNtzyOFa5/mXPWevjC95T4eV
- 3ryvMoCaE3uaE48kd7kwqf7MTgMU3Tyka4vSmnaQ5Nejc4FQOHmrOTBJFu6nvXFZdKY26al9JD
- JGxuRKVvomrEcEuRyVBIvaCOlJHfu0TCb8erSdb+3NmYjZNbl/Nhmj707FRpfp0zgzZKPNYBU9
- hXM=
-WDCIronportException: Internal
-Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
-  by uls-op-cesaip01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 30 Jan 2023 18:05:39 -0800
-Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4P5T0g09xhz1RvTr
-        for <linux-block@vger.kernel.org>; Mon, 30 Jan 2023 18:05:39 -0800 (PST)
-Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
-        reason="pass (just generated, assumed good)"
-        header.d=opensource.wdc.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
-        opensource.wdc.com; h=content-transfer-encoding:content-type
-        :in-reply-to:organization:from:references:to:content-language
-        :subject:user-agent:mime-version:date:message-id; s=dkim; t=
-        1675130738; x=1677722739; bh=AcsiuLuDwWfVsTzWwmYa8LChhoDmQwERu0v
-        hn8YNug0=; b=If7in8ACFpGd9feMG2WQjqjiESkIbI/SSsPJRd0A/fqdyxaPLLO
-        EIxXz42KfGgFXxlNtGWxobMWwIx3Ni5oYuYwu7RN2HtB4O4ljNyxJNwXkB5+tV7k
-        NEzMfXo2NsMs+OpIbM7l5jcczl1eRMXYCTqqgCwbN/7lbtUeKYf/3taHuZzV4Xqp
-        /yPBdjIVEqp5Ho/eckNcS9LedHOrNigrM1Oh93W9pQyaFlwNP/N83Ss6tzsEgaeY
-        +egN+bJGJSuAinpgS1jThyxyYxRs3/6c8tU9+qOytZie+44COimoUgdD3sdTccN8
-        QvaKLMoxgwPZZE/5mPNdaNMsfPoC0t9U4fg==
-X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
-Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
-        by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id Gh1RRxkws2_a for <linux-block@vger.kernel.org>;
-        Mon, 30 Jan 2023 18:05:38 -0800 (PST)
-Received: from [10.225.163.70] (unknown [10.225.163.70])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4P5T0d0H6Dz1RvLy;
-        Mon, 30 Jan 2023 18:05:36 -0800 (PST)
-Message-ID: <e6041145-7336-2534-8449-7b9b6a842466@opensource.wdc.com>
-Date:   Tue, 31 Jan 2023 11:05:35 +0900
+        Mon, 30 Jan 2023 21:31:34 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C474FF0C
+        for <linux-block@vger.kernel.org>; Mon, 30 Jan 2023 18:30:47 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1675132246;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=VLQQh/uutLlIM0duU2JS2bF3B/pzPSM9EmB78Rh0AsY=;
+        b=Tt76cuUHTIEFNUuj/3g6ADeuJO3gxmhadS2Awo3z+HQyAh3bMbnOOt2AV3hQ6EPZXe9glz
+        8jWPQQ/hmx4ChWc2r6IIRJFK6Y+hhStXzevrdYq+ngF8zuAe/akBCv9rEb8bxkB8uZbuBZ
+        l6YwKzLDPzqT0jaouP+rR7XDg/MzlYc=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-556-nMHfRg9xO2KPS5eIy0EouQ-1; Mon, 30 Jan 2023 21:30:44 -0500
+X-MC-Unique: nMHfRg9xO2KPS5eIy0EouQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 829FC3803912;
+        Tue, 31 Jan 2023 02:30:44 +0000 (UTC)
+Received: from T590 (ovpn-8-21.pek2.redhat.com [10.72.8.21])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 728954010D2A;
+        Tue, 31 Jan 2023 02:30:39 +0000 (UTC)
+Date:   Tue, 31 Jan 2023 10:30:33 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Stefan Hajnoczi <stefanha@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        ZiyangZhang <ZiyangZhang@linux.alibaba.com>,
+        Jonathan Corbet <corbet@lwn.net>, ming.lei@redhat.com
+Subject: Re: [PATCH V4 0/6] ublk_drv: add mechanism for supporting
+ unprivileged ublk device
+Message-ID: <Y9h9Sefm+uRLG+8R@T590>
+References: <20230106041711.914434-1-ming.lei@redhat.com>
+ <Y9hCrrTYnFf+1Z2Y@fedora>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.0
-Subject: Re: [PATCH 2/2] drivers/block: Move PARIDE protocol modules to
- drivers/ata/pata_parport
-Content-Language: en-US
-To:     Ondrej Zary <linux@zary.sk>
-Cc:     Christoph Hellwig <hch@lst.de>,
-        Sergey Shtylyov <s.shtylyov@omp.ru>,
-        Jens Axboe <axboe@kernel.dk>, Tim Waugh <tim@cyberelk.net>,
-        linux-block@vger.kernel.org, linux-parport@lists.infradead.org,
-        linux-ide@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <d4f7ebd5-d90d-fb96-0fad-bd129ac162dc@opensource.wdc.com>
- <20230130211050.16753-1-linux@zary.sk> <20230130211050.16753-2-linux@zary.sk>
-From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
-Organization: Western Digital Research
-In-Reply-To: <20230130211050.16753-2-linux@zary.sk>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Y9hCrrTYnFf+1Z2Y@fedora>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/31/23 06:10, Ondrej Zary wrote:
-> diff --git a/drivers/Makefile b/drivers/Makefile
-> index f1365608bc8c..de8aa561c95c 100644
-> --- a/drivers/Makefile
-> +++ b/drivers/Makefile
-> @@ -98,7 +98,7 @@ obj-$(CONFIG_DIO)		+= dio/
->  obj-$(CONFIG_SBUS)		+= sbus/
->  obj-$(CONFIG_ZORRO)		+= zorro/
->  obj-$(CONFIG_ATA_OVER_ETH)	+= block/aoe/
-> -obj-y		 		+= block/paride/
-> +obj-$(CONFIG_PATA_PARPORT)	+= ata/pata_parport/
+Hi Stefan,
 
-It would be better to have this in drivers/ata/Makefile, not here, so that doing
-something like:
+On Mon, Jan 30, 2023 at 05:20:30PM -0500, Stefan Hajnoczi wrote:
+> On Fri, Jan 06, 2023 at 12:17:05PM +0800, Ming Lei wrote:
+> > Hello,
+> > 
+> > Stefan Hajnoczi suggested un-privileged ublk device[1] for container
+> > use case.
+> > 
+> > So far only administrator can create/control ublk device which is too
+> > strict and increase system administrator burden, and this patchset
+> > implements un-privileged ublk device:
+> > 
+> > - any user can create ublk device, which can only be controlled &
+> >   accessed by the owner of the device or administrator
+> > 
+> > For using such mechanism, system administrator needs to deploy two
+> > simple udev rules[2] after running 'make install' in ublksrv.
+> > 
+> > Userspace(ublksrv):
+> > 
+> > 	https://github.com/ming1/ubdsrv/tree/unprivileged-ublk
+> >     
+> > 'ublk add -t $TYPE --un_privileged' is for creating one un-privileged
+> > ublk device if the user is un-privileged.
+> 
+> Hi Ming,
+> Sorry for the late reply. Is there anything stopping processes with a
+> different uid/gid from accessing the unprivileged block device
+> (/dev/ublkbN)?
 
-make -j64 M=drivers/ata W=1
-or
-make -j64 M=drivers/ata C=1
+The device is only owned by its owner, and other user can't open the
+device file.
 
-actually also checks the parport protocol modules too.
+> 
+> The scenario I'm thinking about is:
+> 1. Evil user runs "chmod 666 /dev/ublkbN". They are allowed to do this
+>    because they are the owner of the block device node.
+> 2. Evil user causes another user's process (e.g. suid) to open the block
+>    device.
+> 3. Evil user's ublksrv either abuses timing (e.g. never responding or
+>    responding after an artifical delay) to DoS or returns corrupted data
+>    to exploit bugs in the victim process.
+> 
+> FUSE has exactly the same issue and I think that's why an unprivileged
+> FUSE mount cannot be accessed by processes with a different uid/gid.
+> 
+> That extra protection is probably necessary for ublk too.
 
-diff --git a/drivers/ata/Makefile b/drivers/ata/Makefile
-index 23588738cff0..2f85812e16ef 100644
---- a/drivers/ata/Makefile
-+++ b/drivers/ata/Makefile
-@@ -114,6 +114,7 @@ obj-$(CONFIG_PATA_SAMSUNG_CF)       += pata_samsung_cf.o
+Looks like the evil user creates one trap, and wait for other users to
+be caught. And any unprivileged user needn't grant access to other users
+cause anyone can create it. OK, we can add the check when opening ublk
+disk, something like the following:
 
- obj-$(CONFIG_PATA_PXA)         += pata_pxa.o
 
-+obj-$(CONFIG_PATA_PARPORT)     += pata_parport/
- obj-$(CONFIG_PATA_PARPORT)     += pata_parport.o
+diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+index a725a236a38f..f1a5d704ce33 100644
+--- a/drivers/block/ublk_drv.c
++++ b/drivers/block/ublk_drv.c
+@@ -377,8 +377,44 @@ static void ublk_free_disk(struct gendisk *disk)
+ 	put_device(&ub->cdev_dev);
+ }
+ 
++static void ublk_store_owner_uid_gid(unsigned int *owner_uid,
++		unsigned int *owner_gid)
++{
++	kuid_t uid;
++	kgid_t gid;
++
++	current_uid_gid(&uid, &gid);
++
++	*owner_uid = from_kuid(&init_user_ns, uid);
++	*owner_gid = from_kgid(&init_user_ns, gid);
++}
++
++static int ublk_open(struct block_device *bdev, fmode_t mode)
++{
++	struct ublk_device *ub = bdev->bd_disk->private_data;
++
++	/*
++	 * If it is one unprivileged device, only owner can open
++	 * the disk. Otherwise it could be one trap made by one
++	 * evil user who may grant this disk's privileges to other
++	 * users.
++	 */
++	if (ub->dev_info.flags & UBLK_F_UNPRIVILEGED_DEV) {
++		unsigned int curr_uid, curr_gid;
++
++		ublk_store_owner_uid_gid(&curr_uid, &curr_gid);
++
++		if (curr_uid != ub->dev_info.owner_uid || curr_gid !=
++				ub->dev_info.owner_gid)
++			return -EPERM;
++	}
++
++	return 0;
++}
++
+ static const struct block_device_operations ub_fops = {
+ 	.owner =	THIS_MODULE,
++	.open =		ublk_open,
+ 	.free_disk =	ublk_free_disk,
+ };
+ 
+@@ -1620,17 +1656,6 @@ static int ublk_ctrl_get_queue_affinity(struct ublk_device *ub,
+ 	return ret;
+ }
+ 
+-static void ublk_store_owner_uid_gid(struct ublksrv_ctrl_dev_info *info)
+-{
+-	kuid_t uid;
+-	kgid_t gid;
+-
+-	current_uid_gid(&uid, &gid);
+-
+-	info->owner_uid = from_kuid(&init_user_ns, uid);
+-	info->owner_gid = from_kgid(&init_user_ns, gid);
+-}
+-
+ static inline void ublk_dump_dev_info(struct ublksrv_ctrl_dev_info *info)
+ {
+ 	pr_devel("%s: dev id %d flags %llx\n", __func__,
+@@ -1664,7 +1689,7 @@ static int ublk_ctrl_add_dev(struct io_uring_cmd *cmd)
+ 		return -EPERM;
+ 
+ 	/* the created device is always owned by current user */
+-	ublk_store_owner_uid_gid(&info);
++	ublk_store_owner_uid_gid(&info.owner_uid, &info.owner_gid);
+ 
+ 	if (header->dev_id != info.dev_id) {
+ 		pr_warn("%s: dev id not match %u %u\n",
 
-And then we could also have drivers/ata/pata_parport.c moved under
-drivers/ata/pata_parport/ to tidy things up.
 
-If you agree, I can fix that up, that is easy to do.
 
--- 
-Damien Le Moal
-Western Digital Research
+
+Thanks, 
+Ming
 
