@@ -2,90 +2,117 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A7968C636D3
-	for <linux-block@archiver.kernel.org>; Wed,  1 Feb 2023 00:48:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E7301C38142
+	for <linux-block@archiver.kernel.org>; Wed,  1 Feb 2023 01:04:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230028AbjBAAsy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 31 Jan 2023 19:48:54 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42348 "EHLO
+        id S230098AbjBABEU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 31 Jan 2023 20:04:20 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47120 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229613AbjBAAsx (ORCPT
+        with ESMTP id S229961AbjBABET (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 31 Jan 2023 19:48:53 -0500
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id BB297125A3;
-        Tue, 31 Jan 2023 16:48:52 -0800 (PST)
-Received: by linux.microsoft.com (Postfix, from userid 1052)
-        id 6F5F120E0A00; Tue, 31 Jan 2023 16:48:52 -0800 (PST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 6F5F120E0A00
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-        s=default; t=1675212532;
-        bh=QtJOGoJNRx6Y5psopcsbrkvVOd9n83DwG6TAX2fVAEM=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=qhvwMPCpPd9vbDNzrPjs1oZIe5jI0seyMdSzUuuc5HR6DkZ14Hf6P0cI2f+oh6DGv
-         76VMuAXIVoCv65wvxPld5tZex+OTLKcBVka2rNlJJBrhjS44ZIHEQ+lFV1y4yUS9qY
-         CduWMrllvFR26wDQtbMgNAHH2QmUm72WhSPXXT2E=
-Date:   Tue, 31 Jan 2023 16:48:52 -0800
-From:   Fan Wu <wufan@linux.microsoft.com>
-To:     Roberto Sassu <roberto.sassu@huaweicloud.com>
-Cc:     corbet@lwn.net, zohar@linux.ibm.com, jmorris@namei.org,
-        serge@hallyn.com, tytso@mit.edu, ebiggers@kernel.org,
-        axboe@kernel.dk, agk@redhat.com, snitzer@kernel.org,
-        eparis@redhat.com, paul@paul-moore.com, linux-doc@vger.kernel.org,
-        linux-integrity@vger.kernel.org,
-        linux-security-module@vger.kernel.org,
-        linux-fscrypt@vger.kernel.org, linux-block@vger.kernel.org,
-        dm-devel@redhat.com, linux-audit@redhat.com,
-        roberto.sassu@huawei.com, linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH v9 00/16] Integrity Policy Enforcement LSM (IPE)
-Message-ID: <20230201004852.GB30104@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
-References: <1675119451-23180-1-git-send-email-wufan@linux.microsoft.com>
- <033335b26f6becdc3dc0325ef926efd94fcc4dda.camel@huaweicloud.com>
+        Tue, 31 Jan 2023 20:04:19 -0500
+Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 324BE5140B
+        for <linux-block@vger.kernel.org>; Tue, 31 Jan 2023 17:04:18 -0800 (PST)
+Received: from mail02.huawei.com (unknown [172.30.67.143])
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4P63bJ2JKnz4f3t1K
+        for <linux-block@vger.kernel.org>; Wed,  1 Feb 2023 09:04:12 +0800 (CST)
+Received: from [10.174.176.73] (unknown [10.174.176.73])
+        by APP3 (Coremail) with SMTP id _Ch0CgCHgR+Mutlj1nAgCg--.56457S3;
+        Wed, 01 Feb 2023 09:04:14 +0800 (CST)
+Subject: Re: [PATCH] block: Do not reread partition table on exclusively open
+ device
+To:     Christoph Hellwig <hch@infradead.org>,
+        Yu Kuai <yukuai1@huaweicloud.com>
+Cc:     Jan Kara <jack@suse.cz>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org, "yukuai (C)" <yukuai3@huawei.com>
+References: <20221130175653.24299-1-jack@suse.cz>
+ <ada13b1b-dd2a-8be0-3b12-3470a086bbf6@huaweicloud.com>
+ <Y9kiltmuPSbRRLsO@infradead.org>
+From:   Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <92d53d6b-f83d-0767-4f6a-1b897b33b227@huaweicloud.com>
+Date:   Wed, 1 Feb 2023 09:04:12 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <033335b26f6becdc3dc0325ef926efd94fcc4dda.camel@huaweicloud.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+In-Reply-To: <Y9kiltmuPSbRRLsO@infradead.org>
+Content-Type: text/plain; charset=gbk; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: _Ch0CgCHgR+Mutlj1nAgCg--.56457S3
+X-Coremail-Antispam: 1UD129KBjvJXoW7Zw1DuFy7JFWxXw1rXr15CFg_yoW8Wrykpr
+        Z5XFWrKFWDWF1v9ay2ka1qqrn0gw1xtF18Aa4DAryIv39IywnI9Fyvk34Dtw15KrWkZr47
+        uF45JFyIqF1SkF7anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUkC14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+        1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+        JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+        CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+        2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+        W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lc7I2V7IY0VAS07AlzVAY
+        IcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14
+        v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_JF0_Jw1lIxkG
+        c2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI
+        0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6rW3Jr0E3s1lIxAIcVC2z280aVAFwI0_Jr0_
+        Gr1lIxAIcVC2z280aVCY1x0267AKxVWUJVW8JbIYCTnIWIevJa73UjIFyTuYvjfUoOJ5UU
+        UUU
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jan 31, 2023 at 03:22:05PM +0100, Roberto Sassu wrote:
-> On Mon, 2023-01-30 at 14:57 -0800, Fan Wu wrote:
-> > IPE has two known gaps:
-> > 
-> > 1. IPE cannot verify the integrity of anonymous executable memory, such as
-> >   the trampolines created by gcc closures and libffi (<3.4.2), or JIT'd code.
-> >   Unfortunately, as this is dynamically generated code, there is no way
-> >   for IPE to ensure the integrity of this code to form a trust basis. In all
-> >   cases, the return result for these operations will be whatever the admin
-> >   configures the DEFAULT action for "EXECUTE".
-> 
-> I think it would be useful to handle special cases, for example you
-> could allow a process that created a file with memfd to use it, at the
-> condition that nobody else writes it.
-> 
-> This would be required during the boot, otherwise services could fail
-> to start (depending on the policy).
-> 
-Thanks for the suggestion. I agree with your opinion and I think supporting
-memfd is possible but restricting read/write needs more hooks. We would like
-to avoid adding more complexity to this initial posting as necessary. 
-We will consider this as a future work and will post follow-on patches
-in the future.
+Hi, Christoph
 
--Fan
+ÔÚ 2023/01/31 22:15, Christoph Hellwig Ð´µÀ:
+> It might be easier to just move the check into blkdev_get_whole,
+> which also ensures that non-excluisve openers don't cause a partition
+> scan while someone else has the device exclusively open.
+> 
+> diff --git a/block/bdev.c b/block/bdev.c
+> index edc110d90df404..a831b6c9c627d7 100644
+> --- a/block/bdev.c
+> +++ b/block/bdev.c
+> @@ -666,25 +666,28 @@ static void blkdev_flush_mapping(struct block_device *bdev)
+>   static int blkdev_get_whole(struct block_device *bdev, fmode_t mode)
+>   {
+>   	struct gendisk *disk = bdev->bd_disk;
+> -	int ret;
+> +	int ret = 0;
+>   
+> -	if (disk->fops->open) {
+> +	if (disk->fops->open)
+>   		ret = disk->fops->open(bdev, mode);
+> -		if (ret) {
+> -			/* avoid ghost partitions on a removed medium */
+> -			if (ret == -ENOMEDIUM &&
+> -			     test_bit(GD_NEED_PART_SCAN, &disk->state))
+> -				bdev_disk_changed(disk, true);
+> +
+> +	if (ret) {
+> +		/* avoid ghost partitions on a removed medium */
+> +		if (ret != -ENOMEDIUM)
+>   			return ret;
+> -		}
+> +	} else {
+> +		if (!atomic_read(&bdev->bd_openers))
+> +			set_init_blocksize(bdev);
+> +		atomic_inc(&bdev->bd_openers);
+>   	}
+>   
+> -	if (!atomic_read(&bdev->bd_openers))
+> -		set_init_blocksize(bdev);
+> -	if (test_bit(GD_NEED_PART_SCAN, &disk->state))
+> +	/*
+> +	 * Skip the partition scan if someone else has the device exclusively
+> +	 * open.
+> +	 */
+> +	if (test_bit(GD_NEED_PART_SCAN, &disk->state) && !bdev->bd_holder)
+>   		bdev_disk_changed(disk, false);
 
-> > 2. IPE cannot verify the integrity of interpreted languages' programs when
-> >   these scripts invoked via ``<interpreter> <file>``. This is because the
-> >   way interpreters execute these files, the scripts themselves are not
-> >   evaluated as executable code through one of IPE's hooks. Interpreters
-> >   can be enlightened to the usage of IPE by trying to mmap a file into
-> >   executable memory (+X), after opening the file and responding to the
-> >   error code appropriately. This also applies to included files, or high
-> >   value files, such as configuration files of critical system components.
-> 
-> Ok, it is a well known issue. Hopefully, it will be fixed soon.
-> 
-> Roberto
-> 
+I think this is wrong here... We should at least allow the exclusively
+opener to scan partition, right?
+
+Thanks,
+Kuai
+
