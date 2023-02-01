@@ -2,96 +2,118 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ACA84C636CD
-	for <linux-block@archiver.kernel.org>; Wed,  1 Feb 2023 17:34:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB945C636D7
+	for <linux-block@archiver.kernel.org>; Wed,  1 Feb 2023 19:47:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231841AbjBAReZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 1 Feb 2023 12:34:25 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57712 "EHLO
+        id S232141AbjBATrI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 1 Feb 2023 14:47:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57416 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232127AbjBAReS (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 1 Feb 2023 12:34:18 -0500
-Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 049E168AEC;
-        Wed,  1 Feb 2023 09:33:51 -0800 (PST)
-Received: by mail-pj1-f41.google.com with SMTP id l4-20020a17090a850400b0023013402671so2930231pjn.5;
-        Wed, 01 Feb 2023 09:33:50 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=q/aU7Sx+Q2q+ijznzRLc/zl8vln97T87YSV2SvjpCmw=;
-        b=NoLXqe8+25lyX9nERFHTPag0M6UHjxIp4pH9S6XXo4J/pLBSPPoXYdZ1tlZvvxHZ7l
-         qaMqpUDbWB2cxw2FdJV0y0kMpsCKgWQ7BQ6F1Umhvk5HkQdDT25K2zGWl+haHBk3H8zO
-         /t38FsEYCbbG22gLfXFtuWBX8WXgsVONrLHmwayiAqS0Z+fP69xpLRxnKm/vRccOBrVI
-         PsUofoIJ5qICtoxPEKxrxEqGlR4UTIBaZ+3mkOc3Cdn0lGpIgbzl9h6v6zxOzfuCrWH4
-         WKtTEqDvzxAX+mOGAmA9mBsSA6B4hTeRTH7OfkyBN9sVt0ikhF4NJ9CNvTo+iSQDLFng
-         c8Qw==
-X-Gm-Message-State: AO0yUKVbTOnIDxAkx4AIIP2os1ja6HCjbqTOH3NmRFxAybxPMRCCH2gL
-        v0zvIQKTlRPPj3rN/6iTSblHycF9LKQ=
-X-Google-Smtp-Source: AK7set9Ycqux29N2wsB31xcfCQChDuOZNpbLrXNTTh/WzZIVKAYDMFTzZ4Xw5aYXc54sZ606NodI2Q==
-X-Received: by 2002:a17:903:cd:b0:195:f097:d65b with SMTP id x13-20020a17090300cd00b00195f097d65bmr12801187plc.49.1675272807088;
-        Wed, 01 Feb 2023 09:33:27 -0800 (PST)
-Received: from ?IPV6:2620:15c:211:201:f3cf:17ca:687:af15? ([2620:15c:211:201:f3cf:17ca:687:af15])
-        by smtp.gmail.com with ESMTPSA id p1-20020a1709026b8100b00192b23b8451sm12005700plk.108.2023.02.01.09.33.25
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 01 Feb 2023 09:33:26 -0800 (PST)
-Message-ID: <8c068af3-7199-11cf-5c69-a523c7c22d9a@acm.org>
-Date:   Wed, 1 Feb 2023 09:33:24 -0800
+        with ESMTP id S231712AbjBATrA (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 1 Feb 2023 14:47:00 -0500
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 0610A83253;
+        Wed,  1 Feb 2023 11:46:47 -0800 (PST)
+Received: by linux.microsoft.com (Postfix, from userid 1052)
+        id 5F2CE20B7102; Wed,  1 Feb 2023 11:46:47 -0800 (PST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 5F2CE20B7102
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+        s=default; t=1675280807;
+        bh=8MDyb8NfMEMA+gvGsYIH3Hk92qnGUNCXXiiUGYDGeY0=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=aGiTEE1l0zxKt35hRAw5O5rUjHIWcAoDjTu0gK/pqVOhoxy2wEnsm8ZNcF03j15OU
+         toc+XIsocCQ+PUZLhpiUjHGzrPbYhknyZg79wHeR50uEX2RjoQI/xWZzNaX8eA9EKw
+         t8/KxyA0u4mFqi9fvZeO3cXFFwKkFGDUqHnC4vOk=
+Date:   Wed, 1 Feb 2023 11:46:47 -0800
+From:   Fan Wu <wufan@linux.microsoft.com>
+To:     Roberto Sassu <roberto.sassu@huaweicloud.com>
+Cc:     corbet@lwn.net, zohar@linux.ibm.com, jmorris@namei.org,
+        serge@hallyn.com, tytso@mit.edu, ebiggers@kernel.org,
+        axboe@kernel.dk, agk@redhat.com, snitzer@kernel.org,
+        eparis@redhat.com, paul@paul-moore.com, linux-doc@vger.kernel.org,
+        linux-integrity@vger.kernel.org,
+        linux-security-module@vger.kernel.org,
+        linux-fscrypt@vger.kernel.org, linux-block@vger.kernel.org,
+        dm-devel@redhat.com, linux-audit@redhat.com,
+        roberto.sassu@huawei.com, linux-kernel@vger.kernel.org,
+        Deven Bowers <deven.desai@linux.microsoft.com>
+Subject: Re: [RFC PATCH v9 05/16] ipe: add userspace interface
+Message-ID: <20230201194647.GA11892@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+References: <1675119451-23180-1-git-send-email-wufan@linux.microsoft.com>
+ <1675119451-23180-6-git-send-email-wufan@linux.microsoft.com>
+ <255c119de8f8665b88c411d981762fddc0fe7eaa.camel@huaweicloud.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.0
-Subject: Re: [PATCH] blk-ioprio: Introduce promote-to-rt policy
-Content-Language: en-US
-To:     Hou Tao <houtao@huaweicloud.com>, linux-block@vger.kernel.org
-Cc:     Jan Kara <jack@suse.cz>, Jens Axboe <axboe@kernel.dk>,
-        cgroups@vger.kernel.org, Tejun Heo <tj@kernel.org>,
-        Zefan Li <lizefan.x@bytedance.com>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        Jonathan Corbet <corbet@lwn.net>, linux-kernel@vger.kernel.org,
-        linux-doc@vger.kernel.org, houtao1@huawei.com
-References: <20230201045227.2203123-1-houtao@huaweicloud.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20230201045227.2203123-1-houtao@huaweicloud.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <255c119de8f8665b88c411d981762fddc0fe7eaa.camel@huaweicloud.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/31/23 20:52, Hou Tao wrote:
->   /**
->    * enum prio_policy - I/O priority class policy.
->    * @POLICY_NO_CHANGE: (default) do not modify the I/O priority class.
-> @@ -27,21 +34,30 @@
->    * @POLICY_RESTRICT_TO_BE: modify IOPRIO_CLASS_NONE and IOPRIO_CLASS_RT into
->    *		IOPRIO_CLASS_BE.
->    * @POLICY_ALL_TO_IDLE: change the I/O priority class into IOPRIO_CLASS_IDLE.
-> - *
-> + * @POLICY_PROMOTE_TO_RT: modify IOPRIO_CLASS_NONE and IOPRIO_CLASS_BE into
-> + * 		IOPRIO_CLASS_RT.
->    * See also <linux/ioprio.h>.
->    */
->   enum prio_policy {
-> -	POLICY_NO_CHANGE	= 0,
-> -	POLICY_NONE_TO_RT	= 1,
-> -	POLICY_RESTRICT_TO_BE	= 2,
-> -	POLICY_ALL_TO_IDLE	= 3,
-> +	POLICY_NO_CHANGE	= IOPRIO_CLASS_NONE,
-> +	POLICY_NONE_TO_RT	= IOPRIO_CLASS_RT,
-> +	POLICY_RESTRICT_TO_BE	= IOPRIO_CLASS_BE,
-> +	POLICY_ALL_TO_IDLE	= IOPRIO_CLASS_IDLE,
-> +	POLICY_PROMOTE_TO_RT	= IOPRIO_CLASS_RT | IOPRIO_POL_PROMOTION,
-> +};
+On Tue, Jan 31, 2023 at 11:49:44AM +0100, Roberto Sassu wrote:
+> On Mon, 2023-01-30 at 14:57 -0800, Fan Wu wrote:
+> > From: Deven Bowers <deven.desai@linux.microsoft.com>
+> > +
+> > +/**
+> > + * new_policy - Write handler for the securityfs node, "ipe/new_policy".
+> > + * @f: Supplies a file structure representing the securityfs node.
+> > + * @data: Suppleis a buffer passed to the write syscall.
+> 
+> Typo: Suppleis.
+> 
+Thanks for spotting the typos!
 
-The above change complicates the ioprio code. Additionally, I'm 
-concerned that it makes the ioprio code slower. Has it been considered 
-to keep the numerical values for the existing policies, to assign the 
-number 4 to POLICY_PROMOTE_TO_RT and to use a lookup-array in 
-blkcg_set_ioprio() to convert the policy number into an IOPRIO_CLASS value?
+> > + * @len: Supplies the length of @data.
+> > + * @offset: unused.
+> > + *
+> > + * Return:
+> > + * * >0	- Success, Length of buffer written
+> > + * * <0	- Error
+> > + */
+> > +static ssize_t new_policy(struct file *f, const char __user *data,
+> > +			  size_t len, loff_t *offset)
+> > +{
+> > +	int rc = 0;
+> > +	char *copy = NULL;
+> > +	struct ipe_policy *p = NULL;
+> > +
+> > +	if (!file_ns_capable(f, &init_user_ns, CAP_MAC_ADMIN))
+> > +		return -EPERM;
+> > +
+> > +	copy = memdup_user_nul(data, len);
+> > +	if (IS_ERR(copy)) {
+> > +		rc = PTR_ERR(copy);
+> > +		goto err;
+> > +	}
+> > +
+> > +	p = ipe_new_policy(NULL, 0, copy, len);
+> > +	if (IS_ERR(p)) {
+> > +		rc = PTR_ERR(p);
+> > +		goto err;
+> > +	}
+> > +
+> > +	rc = ipe_new_policyfs_node(p);
+> > +	if (rc)
+> > +		goto err;
+> 
+> Uhm, don't you need to do cleanup of allocated memory or revert the
+> actions of ipe_new_policy()?
+> 
+Yes that should be cleaned up but should be done in ipe_new_policy instead,
+will add a ipe_free_policy call at the end. Thanks for pointing that out.
 
-Thanks,
+> 
+> I would like more to see all the functions managing the policy
+> together. If the patch is too long, you could further split by adding
+> the helpers (that don't directly deal with the policy) in a separate
+> patch.
+> 
+> Here you would simply instantiate dirs/files in securityfs and call the
+> existing functions previously introduced.
+> 
+> Roberto
+> 
 
-Bart.
-
+I will try to split them in the next version. Thanks for the suggestion.
+-Fan
