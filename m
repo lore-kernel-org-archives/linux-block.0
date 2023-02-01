@@ -2,232 +2,90 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B494C636CC
-	for <linux-block@archiver.kernel.org>; Tue, 31 Jan 2023 23:59:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A7968C636D3
+	for <linux-block@archiver.kernel.org>; Wed,  1 Feb 2023 00:48:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231376AbjAaX7Y (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 31 Jan 2023 18:59:24 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46386 "EHLO
+        id S230028AbjBAAsy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 31 Jan 2023 19:48:54 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42348 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231283AbjAaX7X (ORCPT
+        with ESMTP id S229613AbjBAAsx (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 31 Jan 2023 18:59:23 -0500
-Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D573D903D
-        for <linux-block@vger.kernel.org>; Tue, 31 Jan 2023 15:58:30 -0800 (PST)
-Received: by mail-qt1-f178.google.com with SMTP id m26so15242311qtp.9
-        for <linux-block@vger.kernel.org>; Tue, 31 Jan 2023 15:58:30 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5vIQf0a6iEAUT12k4trn79P1fVoQICHB1aSjSKSg7wk=;
-        b=yrxREmAiuAPXiRsSo+FM2e2MHk0HC059QJCnsExwOUBBITGaJ38ke84oeQP1BPiNMn
-         tx9b+CFYO528eoCXeyF/x1TgzrUc3RbTOKVGx4vPdFB5/ZLqUdxxhxHBiD6lVipItJmW
-         Bf9rWgvJBxmPGC6HzaI5v2xoDHHVObuvzKEG324mXtspTaCCs8hajv0bBz8Y7W/ZPmVu
-         l3b4W9k8qR98jcI3Zs5T6cAWxtoi28PZaX1oR+IRTOUrbX5jLWlbLwVSZ9nNAQzK+Ms4
-         iqWbyIdwQLplOYAbnVmCFmsvDw6JaOqshLPg/lEs0atEZowaFg/Ipe9X2BG1eILRXlct
-         Sxug==
-X-Gm-Message-State: AO0yUKX36a7lSoM4+rFuYZphSeq1ZG1Hj/6cIZywShPjFMEnyVJ/KDil
-        5IG4QGamU4Mz3+dRc5ahfeiA
-X-Google-Smtp-Source: AK7set9pRgnf40Mb2ZHzeSYJaZfnDJ+8lSeeU97IXIqs4L3d5aGqi7bIP2E3qtPVhbAnyYRyZOGPzw==
-X-Received: by 2002:ac8:57d6:0:b0:3b8:6cd5:eda with SMTP id w22-20020ac857d6000000b003b86cd50edamr1086689qta.47.1675209509939;
-        Tue, 31 Jan 2023 15:58:29 -0800 (PST)
-Received: from localhost (pool-68-160-166-30.bstnma.fios.verizon.net. [68.160.166.30])
-        by smtp.gmail.com with ESMTPSA id e24-20020ac80118000000b003b848759ed8sm6729656qtg.47.2023.01.31.15.58.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 31 Jan 2023 15:58:29 -0800 (PST)
-Date:   Tue, 31 Jan 2023 18:58:28 -0500
-From:   Mike Snitzer <snitzer@kernel.org>
-To:     Sergei Shtepa <sergei.shtepa@veeam.com>
-Cc:     axboe@kernel.dk, corbet@lwn.net, linux-block@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        dm-devel@redhat.com
-Subject: Re: [PATCH v2 02/21] block, blkfilter: Block Device Filtering
- Mechanism
-Message-ID: <Y9mrJJDFnMNWR7Vn@redhat.com>
-References: <20221209142331.26395-1-sergei.shtepa@veeam.com>
- <20221209142331.26395-3-sergei.shtepa@veeam.com>
+        Tue, 31 Jan 2023 19:48:53 -0500
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id BB297125A3;
+        Tue, 31 Jan 2023 16:48:52 -0800 (PST)
+Received: by linux.microsoft.com (Postfix, from userid 1052)
+        id 6F5F120E0A00; Tue, 31 Jan 2023 16:48:52 -0800 (PST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 6F5F120E0A00
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+        s=default; t=1675212532;
+        bh=QtJOGoJNRx6Y5psopcsbrkvVOd9n83DwG6TAX2fVAEM=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=qhvwMPCpPd9vbDNzrPjs1oZIe5jI0seyMdSzUuuc5HR6DkZ14Hf6P0cI2f+oh6DGv
+         76VMuAXIVoCv65wvxPld5tZex+OTLKcBVka2rNlJJBrhjS44ZIHEQ+lFV1y4yUS9qY
+         CduWMrllvFR26wDQtbMgNAHH2QmUm72WhSPXXT2E=
+Date:   Tue, 31 Jan 2023 16:48:52 -0800
+From:   Fan Wu <wufan@linux.microsoft.com>
+To:     Roberto Sassu <roberto.sassu@huaweicloud.com>
+Cc:     corbet@lwn.net, zohar@linux.ibm.com, jmorris@namei.org,
+        serge@hallyn.com, tytso@mit.edu, ebiggers@kernel.org,
+        axboe@kernel.dk, agk@redhat.com, snitzer@kernel.org,
+        eparis@redhat.com, paul@paul-moore.com, linux-doc@vger.kernel.org,
+        linux-integrity@vger.kernel.org,
+        linux-security-module@vger.kernel.org,
+        linux-fscrypt@vger.kernel.org, linux-block@vger.kernel.org,
+        dm-devel@redhat.com, linux-audit@redhat.com,
+        roberto.sassu@huawei.com, linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH v9 00/16] Integrity Policy Enforcement LSM (IPE)
+Message-ID: <20230201004852.GB30104@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+References: <1675119451-23180-1-git-send-email-wufan@linux.microsoft.com>
+ <033335b26f6becdc3dc0325ef926efd94fcc4dda.camel@huaweicloud.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20221209142331.26395-3-sergei.shtepa@veeam.com>
+In-Reply-To: <033335b26f6becdc3dc0325ef926efd94fcc4dda.camel@huaweicloud.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Dec 09 2022 at  9:23P -0500,
-Sergei Shtepa <sergei.shtepa@veeam.com> wrote:
-
-> Allows to attach block device filters to the block devices. Kernel
-> modules can use this functionality to extend the capabilities of the
-> block layer.
+On Tue, Jan 31, 2023 at 03:22:05PM +0100, Roberto Sassu wrote:
+> On Mon, 2023-01-30 at 14:57 -0800, Fan Wu wrote:
+> > IPE has two known gaps:
+> > 
+> > 1. IPE cannot verify the integrity of anonymous executable memory, such as
+> >   the trampolines created by gcc closures and libffi (<3.4.2), or JIT'd code.
+> >   Unfortunately, as this is dynamically generated code, there is no way
+> >   for IPE to ensure the integrity of this code to form a trust basis. In all
+> >   cases, the return result for these operations will be whatever the admin
+> >   configures the DEFAULT action for "EXECUTE".
 > 
-> Signed-off-by: Sergei Shtepa <sergei.shtepa@veeam.com>
-> ---
->  block/bdev.c              | 70 ++++++++++++++++++++++++++++++++++++++
->  block/blk-core.c          | 19 +++++++++--
->  include/linux/blk_types.h |  2 ++
->  include/linux/blkdev.h    | 71 +++++++++++++++++++++++++++++++++++++++
->  4 files changed, 160 insertions(+), 2 deletions(-)
+> I think it would be useful to handle special cases, for example you
+> could allow a process that created a file with memfd to use it, at the
+> condition that nobody else writes it.
 > 
-> diff --git a/block/bdev.c b/block/bdev.c
-> index d699ecdb3260..b820178824b2 100644
-> --- a/block/bdev.c
-> +++ b/block/bdev.c
-> @@ -427,6 +427,7 @@ static void init_once(void *data)
->  
->  static void bdev_evict_inode(struct inode *inode)
->  {
-> +	bdev_filter_detach(I_BDEV(inode));
->  	truncate_inode_pages_final(&inode->i_data);
->  	invalidate_inode_buffers(inode); /* is it needed here? */
->  	clear_inode(inode);
-> @@ -502,6 +503,7 @@ struct block_device *bdev_alloc(struct gendisk *disk, u8 partno)
->  		return NULL;
->  	}
->  	bdev->bd_disk = disk;
-> +	bdev->bd_filter = NULL;
->  	return bdev;
->  }
->  
-> @@ -1092,3 +1094,71 @@ void bdev_statx_dioalign(struct inode *inode, struct kstat *stat)
->  
->  	blkdev_put_no_open(bdev);
->  }
-> +
-> +/**
-> + * bdev_filter_attach - Attach the filter to the original block device.
-> + * @bdev:
-> + *	Block device.
-> + * @flt:
-> + *	Filter that needs to be attached to the block device.
-> + *
-> + * Before adding a filter, it is necessary to initialize &struct bdev_filter
-> + * using a bdev_filter_init() function.
-> + *
-> + * The bdev_filter_detach() function allows to detach the filter from the block
-> + * device.
-> + *
-> + * Return: 0 if succeeded, or -EALREADY if the filter already exists.
-> + */
-> +int bdev_filter_attach(struct block_device *bdev,
-> +				     struct bdev_filter *flt)
-> +{
-> +	int ret = 0;
-> +
-> +	blk_mq_freeze_queue(bdev->bd_queue);
-> +	blk_mq_quiesce_queue(bdev->bd_queue);
-> +
-> +	if (bdev->bd_filter)
-> +		ret = -EALREADY;
-> +	else
-> +		bdev->bd_filter = flt;
-> +
-> +	blk_mq_unquiesce_queue(bdev->bd_queue);
-> +	blk_mq_unfreeze_queue(bdev->bd_queue);
-> +
-> +	return ret;
-> +}
-> +EXPORT_SYMBOL(bdev_filter_attach);
-> +
-> +/**
-> + * bdev_filter_detach - Detach the filter from the block device.
-> + * @bdev:
-> + *	Block device.
-> + *
-> + * The filter should be added using the bdev_filter_attach() function.
-> + *
-> + * Return: 0 if succeeded, or -ENOENT if the filter was not found.
-> + */
-> +int bdev_filter_detach(struct block_device *bdev)
-> +{
-> +	int ret = 0;
-> +	struct bdev_filter *flt = NULL;
-> +
-> +	blk_mq_freeze_queue(bdev->bd_queue);
-> +	blk_mq_quiesce_queue(bdev->bd_queue);
-> +
-> +	flt = bdev->bd_filter;
-> +	if (flt)
-> +		bdev->bd_filter = NULL;
-> +	else
-> +		ret = -ENOENT;
-> +
-> +	blk_mq_unquiesce_queue(bdev->bd_queue);
-> +	blk_mq_unfreeze_queue(bdev->bd_queue);
-> +
-> +	if (flt)
-> +		bdev_filter_put(flt);
-> +
-> +	return ret;
-> +}
-> +EXPORT_SYMBOL(bdev_filter_detach);
+> This would be required during the boot, otherwise services could fail
+> to start (depending on the policy).
+> 
+Thanks for the suggestion. I agree with your opinion and I think supporting
+memfd is possible but restricting read/write needs more hooks. We would like
+to avoid adding more complexity to this initial posting as necessary. 
+We will consider this as a future work and will post follow-on patches
+in the future.
 
-What about bio-based devices? (DM, MD, etc)
+-Fan
 
-DM uses freeze_bdev() and thaw_bdev(), seems like you're missing some
-work here.
-
-> diff --git a/block/blk-core.c b/block/blk-core.c
-> index 5487912befe8..284b295a7b23 100644
-> --- a/block/blk-core.c
-> +++ b/block/blk-core.c
-> @@ -678,9 +678,24 @@ void submit_bio_noacct_nocheck(struct bio *bio)
->  	 * to collect a list of requests submited by a ->submit_bio method while
->  	 * it is active, and then process them after it returned.
->  	 */
-> -	if (current->bio_list)
-> +	if (current->bio_list) {
->  		bio_list_add(&current->bio_list[0], bio);
-> -	else if (!bio->bi_bdev->bd_disk->fops->submit_bio)
-> +		return;
-> +	}
-> +
-> +	if (bio->bi_bdev->bd_filter && !bio_flagged(bio, BIO_FILTERED)) {
-
-Shouldn't this be: if (unlikely(...))?
-
-But that obviously assumes a fair amount about the only consumer
-(temporary filter that lasts as long as it takes to do a backup).
-
-> +		bool pass;
-> +
-> +		pass = bio->bi_bdev->bd_filter->fops->submit_bio_cb(bio);
-> +		bio_set_flag(bio, BIO_FILTERED);
-> +		if (!pass) {
-> +			bio->bi_status = BLK_STS_OK;
-> +			bio_endio(bio);
-> +			return;
-> +		}
-> +	}
-> +
-> +	if (!bio->bi_bdev->bd_disk->fops->submit_bio)
->  		__submit_bio_noacct_mq(bio);
->  	else
->  		__submit_bio_noacct(bio);
-
-And you currently don't allow for blkfilter to be involved if a bio
-recurses (which is how bio splitting works now).  Not sure it
-matters, just mentioning it...
-
-But taking a step back, in the hopes of stepping out of your way:
-
-Myself and others on the DM team (past and present) have always hoped
-all block devices could have the flexibility of DM. It was that hope
-that caused my frustration when I first saw your blkfilter approach.
-
-But I was too idealistic that a byproduct of your efforts
-(blk-interposer before and blkfilter now) would usher in _all_ block
-devices being able to comprehensively change their identity (and IO
-processing) like DM enjoys.
-
-DM showcases all the extra code needed to achieve its extreme IO
-remapping and stacking flexibilty -- I don't yet see a way to distill
-the essence of what DM achieves without imposing too much on all block
-core.
-
-So I do think blkfilter is a pragmatic way to achieve your goals.
-
-Mike
+> > 2. IPE cannot verify the integrity of interpreted languages' programs when
+> >   these scripts invoked via ``<interpreter> <file>``. This is because the
+> >   way interpreters execute these files, the scripts themselves are not
+> >   evaluated as executable code through one of IPE's hooks. Interpreters
+> >   can be enlightened to the usage of IPE by trying to mmap a file into
+> >   executable memory (+X), after opening the file and responding to the
+> >   error code appropriately. This also applies to included files, or high
+> >   value files, such as configuration files of critical system components.
+> 
+> Ok, it is a well known issue. Hopefully, it will be fixed soon.
+> 
+> Roberto
+> 
