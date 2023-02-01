@@ -2,307 +2,98 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A211AC38142
-	for <linux-block@archiver.kernel.org>; Wed,  1 Feb 2023 04:24:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 85573C38142
+	for <linux-block@archiver.kernel.org>; Wed,  1 Feb 2023 04:30:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230031AbjBAEYJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 31 Jan 2023 23:24:09 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39282 "EHLO
+        id S230268AbjBAEam (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 31 Jan 2023 23:30:42 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40928 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229615AbjBAEYH (ORCPT
+        with ESMTP id S230204AbjBAEal (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 31 Jan 2023 23:24:07 -0500
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1279C38641;
-        Tue, 31 Jan 2023 20:24:05 -0800 (PST)
-Received: from mail02.huawei.com (unknown [172.30.67.169])
-        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4P681q2G67z4f3jJF;
-        Wed,  1 Feb 2023 12:23:59 +0800 (CST)
-Received: from huaweicloud.com (unknown [10.175.124.27])
-        by APP4 (Coremail) with SMTP id gCh0CgD3rLBf6dljLNYlCw--.26190S4;
-        Wed, 01 Feb 2023 12:24:01 +0800 (CST)
-From:   Hou Tao <houtao@huaweicloud.com>
-To:     linux-block@vger.kernel.org
-Cc:     Bart Van Assche <bvanassche@acm.org>, Jan Kara <jack@suse.cz>,
-        Jens Axboe <axboe@kernel.dk>, cgroups@vger.kernel.org,
-        Tejun Heo <tj@kernel.org>, Zefan Li <lizefan.x@bytedance.com>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        Jonathan Corbet <corbet@lwn.net>, linux-kernel@vger.kernel.org,
-        linux-doc@vger.kernel.org, houtao1@huawei.com
-Subject: [PATCH] blk-ioprio: Introduce promote-to-rt policy
-Date:   Wed,  1 Feb 2023 12:52:27 +0800
-Message-Id: <20230201045227.2203123-1-houtao@huaweicloud.com>
-X-Mailer: git-send-email 2.29.2
+        Tue, 31 Jan 2023 23:30:41 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F8DA196A0
+        for <linux-block@vger.kernel.org>; Tue, 31 Jan 2023 20:29:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1675225793;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=xiTFOTIA3n8Ir24XC9W+xENnHSE7PauDs8XZ2S0Dn3c=;
+        b=B3SHdGqE47lGmJc1nfZQdgg/dOVTkCtSAspLDb8lGijcJbjD2ybCzGQiY6D+uV6nTLs+xs
+        YXtKLvlgZ6dzRxEybgYCphwaariv6yKJ53DZdzXwg6TU1YJE6lQZHarvX3n7gUMyL79Kdv
+        7xg9Ud+0KUim+2kKk1auyut1G6n67sg=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-312-F0B4Y5IbPTi4_Cyx08xJIw-1; Tue, 31 Jan 2023 23:29:51 -0500
+X-MC-Unique: F0B4Y5IbPTi4_Cyx08xJIw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id D6B4C3828898;
+        Wed,  1 Feb 2023 04:29:50 +0000 (UTC)
+Received: from T590 (ovpn-8-23.pek2.redhat.com [10.72.8.23])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 45699C15BAE;
+        Wed,  1 Feb 2023 04:29:46 +0000 (UTC)
+Date:   Wed, 1 Feb 2023 12:29:41 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Bart Van Assche <bvanassche@acm.org>,
+        Waiman Long <longman@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH] block: Revert "let blkcg_gq grab request queue's refcnt"
+Message-ID: <Y9nqtcbKYAyE/lB7@T590>
+References: <20230130232257.972224-1-bvanassche@acm.org>
+ <Y9h0WMOqNau4s0c0@T590>
+ <102b71d2-ee00-c317-fd63-3f3d006505d4@acm.org>
+ <Y9nGsMEiecgnQDfE@T590>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgD3rLBf6dljLNYlCw--.26190S4
-X-Coremail-Antispam: 1UD129KBjvJXoW3GF1ftF4UWrW3Zw1ruFW3Jrb_yoWfJrWfpF
-        4fArZxCF9YqF1xtrnrXa18Xryrtw4fAw4UJF43GFWF9w1jvw1vgw10yrn7XFyfArWDXrZ8
-        JrZ8JrWUuF1UAr7anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUkFb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
-        6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-        vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7Cj
-        xVAFwI0_Cr0_Gr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I
-        0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40E
-        x7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x
-        0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41lFIxGxcIEc7CjxVA2Y2ka0xkIwI1l42xK82IY
-        c2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s
-        026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF
-        0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0x
-        vE42xK8VAvwI8IcIk0rVWrZr1j6s0DMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2
-        jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x07UWE__UUUUU=
-X-CM-SenderInfo: xkrx3t3r6k3tpzhluzxrxghudrp/
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Y9nGsMEiecgnQDfE@T590>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Hou Tao <houtao1@huawei.com>
+On Wed, Feb 01, 2023 at 09:56:00AM +0800, Ming Lei wrote:
+> On Tue, Jan 31, 2023 at 09:31:36AM -0800, Bart Van Assche wrote:
+> > On 1/30/23 17:52, Ming Lei wrote:
+> > > Hi Bart,
+> > > 
+> > > On Mon, Jan 30, 2023 at 03:22:57PM -0800, Bart Van Assche wrote:
+> > > > Since commit 0a9a25ca7843 ("block: let blkcg_gq grab request queue's
+> > > > refcnt") for many request queues the reference count drops to 1 when
+> > > > the request queue is destroyed instead of to 0. In other words, the
+> > > > request queue is leaked. Fix this by reverting that commit.
+> > > 
+> > > When/where you observe that the reference count drops to 1 instead of 0?
+> > > 
+> > > Do you have kmem leak log?
+> > > 
+> > > Probably, the last drop is in blkg_free_workfn().
+> > 
+> > Hi Ming,
+> > 
+> > The reference count leak was discovered while I was testing my patch series
+> > that adds support for sub-page limits (https://lore.kernel.org/linux-block/20230130212656.876311-1-bvanassche@acm.org/T/#t).
+> > The second patch in that series adds a counter that tracks the number of
+> > queues that need support for limits below the page size
+> > (sub_page_limit_queues). I noticed that without this patch that counter
+> > increases but never decreases. With this patch applied, that counter drops
+> > back to zero after having run a test that needs support for sub-page limits.
+> 
+> I can reproduce the issue by scsi_debug now, but blkg_release() isn't called,
+> so looks like one blkcg_gq lifetime issue since blkcg_exit_disk() is really
+> run.
 
-Since commit a78418e6a04c ("block: Always initialize bio IO priority on
-submit"), bio->bi_ioprio will never be IOPRIO_CLASS_NONE when calling
-blkcg_set_ioprio(), so there will be no way to promote the io-priority
-of one cgroup to IOPRIO_CLASS_RT, because bi_ioprio will always be
-greater than or equals to IOPRIO_CLASS_RT.
+The problem is caused by 3b8cc6298724 ("blk-cgroup: Optimize blkcg_rstat_flush()").
 
-It seems possible to call blkcg_set_ioprio() first then try to
-initialize bi_ioprio later in bio_set_ioprio(), but this doesn't work
-for bio in which bi_ioprio is already initialized (e.g., direct-io), so
-introduce a new ioprio policy to promote the iopriority of bio to
-IOPRIO_CLASS_RT if the ioprio is not already RT.
+This commit will hold blkg instance until blkcg_rstat_flush() is called,
+and which may be delayed to css_release_work_fn().
 
-To distinguish between the demotion policy and the promotion policy,
-use a bit in upper 16-bits of the policy to accomplish that and handle
-the bit accordingly in blkcg_set_ioprio().
-
-Signed-off-by: Hou Tao <houtao1@huawei.com>
----
- Documentation/admin-guide/cgroup-v2.rst | 38 ++++++----
- block/blk-ioprio.c                      | 94 +++++++++++++++++--------
- 2 files changed, 92 insertions(+), 40 deletions(-)
-
-diff --git a/Documentation/admin-guide/cgroup-v2.rst b/Documentation/admin-guide/cgroup-v2.rst
-index c8ae7c897f14..e0b9f73ef62a 100644
---- a/Documentation/admin-guide/cgroup-v2.rst
-+++ b/Documentation/admin-guide/cgroup-v2.rst
-@@ -2038,17 +2038,27 @@ that attribute:
- 	Change the I/O priority class of all requests into IDLE, the lowest
- 	I/O priority class.
- 
-+  promote-to-rt
-+	For requests that have I/O priority class BE or that have I/O priority
-+        class IDLE, change it into RT. Do not modify the I/O priority class
-+        of requests that have priority class RT.
-+
- The following numerical values are associated with the I/O priority policies:
- 
--+-------------+---+
--| no-change   | 0 |
--+-------------+---+
--| none-to-rt  | 1 |
--+-------------+---+
--| rt-to-be    | 2 |
--+-------------+---+
--| all-to-idle | 3 |
--+-------------+---+
-+
-++---------------+---------+-----+
-+| policy        | inst    | num |
-++---------------+---------+-----+
-+| no-change     | demote  | 0   |
-++---------------+---------+-----+
-+| none-to-rt    | demote  | 1   |
-++---------------+---------+-----+
-+| rt-to-be      | demote  | 2   |
-++---------------+---------+-----+
-+| idle          | demote  | 3   |
-++---------------+---------+-----+
-+| promote-to-rt | promote | 1   |
-++---------------+---------+-----+
- 
- The numerical value that corresponds to each I/O priority class is as follows:
- 
-@@ -2064,9 +2074,13 @@ The numerical value that corresponds to each I/O priority class is as follows:
- 
- The algorithm to set the I/O priority class for a request is as follows:
- 
--- Translate the I/O priority class policy into a number.
--- Change the request I/O priority class into the maximum of the I/O priority
--  class policy number and the numerical I/O priority class.
-+-- Translate the I/O priority class policy into an instruction and a number
-+-- If the instruction is demotion, change the request I/O priority class
-+-  into the maximum of the I/O priority class policy number and the numerical
-+-  I/O priority class.
-+-- If the instruction is promotion, change the request I/O priority class
-+-  into the minimum of the I/O priority class policy number and the numerical
-+-  I/O priority class.
- 
- PID
- ---
-diff --git a/block/blk-ioprio.c b/block/blk-ioprio.c
-index 8bb6b8eba4ce..0d400bee9c72 100644
---- a/block/blk-ioprio.c
-+++ b/block/blk-ioprio.c
-@@ -20,6 +20,13 @@
- #include "blk-ioprio.h"
- #include "blk-rq-qos.h"
- 
-+/*
-+ * Upper 16-bits are reserved for special flags.
-+ *
-+ * @IOPRIO_POL_PROMOTION: Promote bi_ioprio instead of demote it.
-+ */
-+#define IOPRIO_POL_PROMOTION (1U << 17)
-+
- /**
-  * enum prio_policy - I/O priority class policy.
-  * @POLICY_NO_CHANGE: (default) do not modify the I/O priority class.
-@@ -27,21 +34,30 @@
-  * @POLICY_RESTRICT_TO_BE: modify IOPRIO_CLASS_NONE and IOPRIO_CLASS_RT into
-  *		IOPRIO_CLASS_BE.
-  * @POLICY_ALL_TO_IDLE: change the I/O priority class into IOPRIO_CLASS_IDLE.
-- *
-+ * @POLICY_PROMOTE_TO_RT: modify IOPRIO_CLASS_NONE and IOPRIO_CLASS_BE into
-+ * 		IOPRIO_CLASS_RT.
-  * See also <linux/ioprio.h>.
-  */
- enum prio_policy {
--	POLICY_NO_CHANGE	= 0,
--	POLICY_NONE_TO_RT	= 1,
--	POLICY_RESTRICT_TO_BE	= 2,
--	POLICY_ALL_TO_IDLE	= 3,
-+	POLICY_NO_CHANGE	= IOPRIO_CLASS_NONE,
-+	POLICY_NONE_TO_RT	= IOPRIO_CLASS_RT,
-+	POLICY_RESTRICT_TO_BE	= IOPRIO_CLASS_BE,
-+	POLICY_ALL_TO_IDLE	= IOPRIO_CLASS_IDLE,
-+	POLICY_PROMOTE_TO_RT	= IOPRIO_CLASS_RT | IOPRIO_POL_PROMOTION,
-+};
-+
-+struct ioprio_policy_tuple {
-+	const char *name;
-+	enum prio_policy policy;
- };
- 
--static const char *policy_name[] = {
--	[POLICY_NO_CHANGE]	= "no-change",
--	[POLICY_NONE_TO_RT]	= "none-to-rt",
--	[POLICY_RESTRICT_TO_BE]	= "restrict-to-be",
--	[POLICY_ALL_TO_IDLE]	= "idle",
-+/* ioprio_alloc_cpd() needs POLICY_NO_CHANGE to be the first policy */
-+static const struct ioprio_policy_tuple ioprio_policies[] = {
-+	{ "no-change",		POLICY_NO_CHANGE },
-+	{ "none-to-rt",		POLICY_NONE_TO_RT },
-+	{ "restrict-to-be",	POLICY_RESTRICT_TO_BE },
-+	{ "idle",		POLICY_ALL_TO_IDLE },
-+	{ "promote-to-rt",	POLICY_PROMOTE_TO_RT }
- };
- 
- static struct blkcg_policy ioprio_policy;
-@@ -57,11 +73,11 @@ struct ioprio_blkg {
- /**
-  * struct ioprio_blkcg - Per cgroup data.
-  * @cpd: blkcg_policy_data structure.
-- * @prio_policy: One of the IOPRIO_CLASS_* values. See also <linux/ioprio.h>.
-+ * @ioprio: Policy name and definition.
-  */
- struct ioprio_blkcg {
- 	struct blkcg_policy_data cpd;
--	enum prio_policy	 prio_policy;
-+	const struct ioprio_policy_tuple *ioprio;
- };
- 
- static inline struct ioprio_blkg *pd_to_ioprio(struct blkg_policy_data *pd)
-@@ -95,23 +111,35 @@ static int ioprio_show_prio_policy(struct seq_file *sf, void *v)
- {
- 	struct ioprio_blkcg *blkcg = ioprio_blkcg_from_css(seq_css(sf));
- 
--	seq_printf(sf, "%s\n", policy_name[blkcg->prio_policy]);
-+	seq_printf(sf, "%s\n", blkcg->ioprio->name);
- 	return 0;
- }
- 
-+static const struct ioprio_policy_tuple *ioprio_match_policy(const char *buf)
-+{
-+	int i;
-+
-+	for (i = 0; i < ARRAY_SIZE(ioprio_policies); i++) {
-+		if (sysfs_streq(ioprio_policies[i].name, buf))
-+			return &ioprio_policies[i];
-+	}
-+
-+	return NULL;
-+}
-+
- static ssize_t ioprio_set_prio_policy(struct kernfs_open_file *of, char *buf,
- 				      size_t nbytes, loff_t off)
- {
- 	struct ioprio_blkcg *blkcg = ioprio_blkcg_from_css(of_css(of));
--	int ret;
-+	const struct ioprio_policy_tuple *ioprio;
- 
- 	if (off != 0)
- 		return -EIO;
- 	/* kernfs_fop_write_iter() terminates 'buf' with '\0'. */
--	ret = sysfs_match_string(policy_name, buf);
--	if (ret < 0)
--		return ret;
--	blkcg->prio_policy = ret;
-+	ioprio = ioprio_match_policy(buf);
-+	if (!ioprio)
-+		return -EINVAL;
-+	blkcg->ioprio = ioprio;
- 	return nbytes;
- }
- 
-@@ -141,7 +169,7 @@ static struct blkcg_policy_data *ioprio_alloc_cpd(gfp_t gfp)
- 	blkcg = kzalloc(sizeof(*blkcg), gfp);
- 	if (!blkcg)
- 		return NULL;
--	blkcg->prio_policy = POLICY_NO_CHANGE;
-+	blkcg->ioprio = &ioprio_policies[0];
- 	return &blkcg->cpd;
- }
- 
-@@ -186,20 +214,30 @@ void blkcg_set_ioprio(struct bio *bio)
- 	struct ioprio_blkcg *blkcg = ioprio_blkcg_from_bio(bio);
- 	u16 prio;
- 
--	if (!blkcg || blkcg->prio_policy == POLICY_NO_CHANGE)
-+	if (!blkcg || blkcg->ioprio->policy == POLICY_NO_CHANGE)
- 		return;
- 
-+	WARN_ON_ONCE(bio->bi_ioprio == IOPRIO_CLASS_NONE);
-+
- 	/*
- 	 * Except for IOPRIO_CLASS_NONE, higher I/O priority numbers
--	 * correspond to a lower priority. Hence, the max_t() below selects
--	 * the lower priority of bi_ioprio and the cgroup I/O priority class.
--	 * If the bio I/O priority equals IOPRIO_CLASS_NONE, the cgroup I/O
--	 * priority is assigned to the bio.
-+	 * correspond to a lower priority.
-+	 *
-+	 * When IOPRIO_POL_PROMOTION is enabled, the min_t() below selects
-+	 * the higher priority of bi_ioprio and the cgroup I/O priority class,
-+	 * otherwise the lower priority is selected.
- 	 */
--	prio = max_t(u16, bio->bi_ioprio,
--			IOPRIO_PRIO_VALUE(blkcg->prio_policy, 0));
--	if (prio > bio->bi_ioprio)
--		bio->bi_ioprio = prio;
-+	if (blkcg->ioprio->policy & IOPRIO_POL_PROMOTION) {
-+		prio = min_t(u16, bio->bi_ioprio,
-+				IOPRIO_PRIO_VALUE(blkcg->ioprio->policy, 0));
-+		if (prio < bio->bi_ioprio)
-+			bio->bi_ioprio = prio;
-+	} else {
-+		prio = max_t(u16, bio->bi_ioprio,
-+				IOPRIO_PRIO_VALUE(blkcg->ioprio->policy, 0));
-+		if (prio > bio->bi_ioprio)
-+			bio->bi_ioprio = prio;
-+	}
- }
- 
- void blk_ioprio_exit(struct gendisk *disk)
--- 
-2.29.2
+Thanks,
+Ming
 
