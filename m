@@ -2,39 +2,39 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BE71C636D3
-	for <linux-block@archiver.kernel.org>; Wed,  1 Feb 2023 13:42:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 70248C05027
+	for <linux-block@archiver.kernel.org>; Wed,  1 Feb 2023 13:42:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232341AbjBANmS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 1 Feb 2023 08:42:18 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35006 "EHLO
+        id S232123AbjBANmU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 1 Feb 2023 08:42:20 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34954 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232418AbjBANmN (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 1 Feb 2023 08:42:13 -0500
+        with ESMTP id S232334AbjBANmR (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 1 Feb 2023 08:42:17 -0500
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D58B46142;
-        Wed,  1 Feb 2023 05:42:10 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A6D44E511;
+        Wed,  1 Feb 2023 05:42:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
         :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=8QdrCHbU0/xEWy5uI3yyaXD1JEOOWddG7reDjBKnZMk=; b=Ln1gMfHm86QztDE5NrS0rf7JK8
-        FDEC1AX3M7GPOy88C5NbEdn8+vROkfcT3wosZr14XCzl33IxW66UKcr0ettSDD2YhP0EtF60j27Zs
-        TxW57qG+WswURK4VjJRl0n02ElIDUWqg4Gg/hCPtPUPQkBFoklM99d64KEKFlrmV155sFR1uaJdJE
-        xV6ZAl0P19VTGevViRi50ATt3reEBQCk8JcF5PsBR8SpTmEoY1pIConMXU2UuXcjoXnAiTyKI/BtX
-        2ArIvCCcVAbOu6MEI+njVd8Ewre1+jDivPZv4V++EabrjBnQFN7rOmEBFuQcZswAGZLTXV4upDlnE
-        Y8Y+1m5g==;
+        bh=DAIeZbJYx5i0ldClRtTjuGjGIQv0WSN3RY0WctjdZpI=; b=aiqyR9fRmIA/7V1no3yO/jznaZ
+        7CwcqnB48lgV1b0nnL32lIVXIko7grMj5bafFx2JjkkPRsf8zaCX12dISl2ger4agIJXdNVC6iuF0
+        8s4ssyQGl9vgF+YOA5YX5HQNUUM8YFMwIUrtM+oE6D8q+yyk2rP8AYxLIwLp1dqVWT2GQ/5b3Ai0D
+        dGCoxg2ze/iXO1DsaFmfUr9UuplicYQ1VYFLr0Rvpfmd2GStjY2qUA4EKUF5FVEymeH0kKTxUM9eA
+        ecPYp+vVcAl3MGxRUT6lDJi1I3/+cP7m0Ng7bnXD7s9MBDykaidIKxItubPmbBenmiCVlQDJpUkvb
+        DpO2pupQ==;
 Received: from [2001:4bb8:19a:272a:3635:31c6:c223:d428] (helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1pNDNH-00C7af-HV; Wed, 01 Feb 2023 13:42:07 +0000
+        id 1pNDNM-00C7bo-Ui; Wed, 01 Feb 2023 13:42:13 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
         Josef Bacik <josef@toxicpanda.com>
 Cc:     linux-block@vger.kernel.org, cgroups@vger.kernel.org,
         Andreas Herrmann <aherrmann@suse.de>
-Subject: [PATCH 15/19] blk-rq-qos: store a gendisk instead of request_queue in struct rq_qos
-Date:   Wed,  1 Feb 2023 14:41:19 +0100
-Message-Id: <20230201134123.2656505-16-hch@lst.de>
+Subject: [PATCH 17/19] blk-cgroup: pass a gendisk to pd_alloc_fn
+Date:   Wed,  1 Feb 2023 14:41:21 +0100
+Message-Id: <20230201134123.2656505-18-hch@lst.de>
 X-Mailer: git-send-email 2.39.0
 In-Reply-To: <20230201134123.2656505-1-hch@lst.de>
 References: <20230201134123.2656505-1-hch@lst.de>
@@ -45,272 +45,169 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This is what about half of the users already want, and it's only going to
-grow more.
+No need to the request_queue here, pass a gendisk and extract the
+node ids from that.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 Reviewed-by: Andreas Herrmann <aherrmann@suse.de>
 ---
- block/blk-iocost.c     | 12 ++++++------
- block/blk-iolatency.c  | 14 +++++++-------
- block/blk-mq-debugfs.c | 10 ++++------
- block/blk-rq-qos.c     |  4 ++--
- block/blk-rq-qos.h     |  2 +-
- block/blk-wbt.c        | 16 +++++++---------
- 6 files changed, 27 insertions(+), 31 deletions(-)
+ block/bfq-cgroup.c    |  6 +++---
+ block/blk-cgroup.c    | 10 +++++-----
+ block/blk-cgroup.h    |  4 ++--
+ block/blk-iocost.c    |  7 ++++---
+ block/blk-iolatency.c |  7 +++----
+ block/blk-ioprio.c    |  2 +-
+ block/blk-throttle.c  |  7 +++----
+ 7 files changed, 21 insertions(+), 22 deletions(-)
 
+diff --git a/block/bfq-cgroup.c b/block/bfq-cgroup.c
+index 032c14f0451a1d..37333c164ed458 100644
+--- a/block/bfq-cgroup.c
++++ b/block/bfq-cgroup.c
+@@ -513,12 +513,12 @@ static void bfq_cpd_free(struct blkcg_policy_data *cpd)
+ 	kfree(cpd_to_bfqgd(cpd));
+ }
+ 
+-static struct blkg_policy_data *bfq_pd_alloc(gfp_t gfp, struct request_queue *q,
+-					     struct blkcg *blkcg)
++static struct blkg_policy_data *bfq_pd_alloc(struct gendisk *disk,
++		struct blkcg *blkcg, gfp_t gfp)
+ {
+ 	struct bfq_group *bfqg;
+ 
+-	bfqg = kzalloc_node(sizeof(*bfqg), gfp, q->node);
++	bfqg = kzalloc_node(sizeof(*bfqg), gfp, disk->node_id);
+ 	if (!bfqg)
+ 		return NULL;
+ 
+diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+index f8e77fac0df406..4fa727542571ea 100644
+--- a/block/blk-cgroup.c
++++ b/block/blk-cgroup.c
+@@ -276,7 +276,7 @@ static struct blkcg_gq *blkg_alloc(struct blkcg *blkcg, struct gendisk *disk,
+ 			continue;
+ 
+ 		/* alloc per-policy data and attach it to blkg */
+-		pd = pol->pd_alloc_fn(gfp_mask, disk->queue, blkcg);
++		pd = pol->pd_alloc_fn(disk, blkcg, gfp_mask);
+ 		if (!pd)
+ 			goto out_free_pds;
+ 		blkg->pd[i] = pd;
+@@ -1432,8 +1432,8 @@ int blkcg_activate_policy(struct gendisk *disk, const struct blkcg_policy *pol)
+ 			pd = pd_prealloc;
+ 			pd_prealloc = NULL;
+ 		} else {
+-			pd = pol->pd_alloc_fn(GFP_NOWAIT | __GFP_NOWARN, q,
+-					      blkg->blkcg);
++			pd = pol->pd_alloc_fn(disk, blkg->blkcg,
++					      GFP_NOWAIT | __GFP_NOWARN);
+ 		}
+ 
+ 		if (!pd) {
+@@ -1450,8 +1450,8 @@ int blkcg_activate_policy(struct gendisk *disk, const struct blkcg_policy *pol)
+ 
+ 			if (pd_prealloc)
+ 				pol->pd_free_fn(pd_prealloc);
+-			pd_prealloc = pol->pd_alloc_fn(GFP_KERNEL, q,
+-						       blkg->blkcg);
++			pd_prealloc = pol->pd_alloc_fn(disk, blkg->blkcg,
++						       GFP_KERNEL);
+ 			if (pd_prealloc)
+ 				goto retry;
+ 			else
+diff --git a/block/blk-cgroup.h b/block/blk-cgroup.h
+index 27068faa2cd086..3d9e42c519db86 100644
+--- a/block/blk-cgroup.h
++++ b/block/blk-cgroup.h
+@@ -154,8 +154,8 @@ typedef struct blkcg_policy_data *(blkcg_pol_alloc_cpd_fn)(gfp_t gfp);
+ typedef void (blkcg_pol_init_cpd_fn)(struct blkcg_policy_data *cpd);
+ typedef void (blkcg_pol_free_cpd_fn)(struct blkcg_policy_data *cpd);
+ typedef void (blkcg_pol_bind_cpd_fn)(struct blkcg_policy_data *cpd);
+-typedef struct blkg_policy_data *(blkcg_pol_alloc_pd_fn)(gfp_t gfp,
+-				struct request_queue *q, struct blkcg *blkcg);
++typedef struct blkg_policy_data *(blkcg_pol_alloc_pd_fn)(struct gendisk *disk,
++		struct blkcg *blkcg, gfp_t gfp);
+ typedef void (blkcg_pol_init_pd_fn)(struct blkg_policy_data *pd);
+ typedef void (blkcg_pol_online_pd_fn)(struct blkg_policy_data *pd);
+ typedef void (blkcg_pol_offline_pd_fn)(struct blkg_policy_data *pd);
 diff --git a/block/blk-iocost.c b/block/blk-iocost.c
-index 6f1da7883905b3..a2e9bf30039bcd 100644
+index 078b7770951962..7a2dc9dc8e3ba0 100644
 --- a/block/blk-iocost.c
 +++ b/block/blk-iocost.c
-@@ -669,7 +669,7 @@ static struct ioc *q_to_ioc(struct request_queue *q)
+@@ -2923,13 +2923,14 @@ static void ioc_cpd_free(struct blkcg_policy_data *cpd)
+ 	kfree(container_of(cpd, struct ioc_cgrp, cpd));
+ }
  
- static const char __maybe_unused *ioc_name(struct ioc *ioc)
+-static struct blkg_policy_data *ioc_pd_alloc(gfp_t gfp, struct request_queue *q,
+-					     struct blkcg *blkcg)
++static struct blkg_policy_data *ioc_pd_alloc(struct gendisk *disk,
++		struct blkcg *blkcg, gfp_t gfp)
  {
--	struct gendisk *disk = ioc->rqos.q->disk;
-+	struct gendisk *disk = ioc->rqos.disk;
+ 	int levels = blkcg->css.cgroup->level + 1;
+ 	struct ioc_gq *iocg;
  
- 	if (!disk)
- 		return "<unknown>";
-@@ -808,11 +808,11 @@ static int ioc_autop_idx(struct ioc *ioc)
- 	u64 now_ns;
+-	iocg = kzalloc_node(struct_size(iocg, ancestors, levels), gfp, q->node);
++	iocg = kzalloc_node(struct_size(iocg, ancestors, levels), gfp,
++			    disk->node_id);
+ 	if (!iocg)
+ 		return NULL;
  
- 	/* rotational? */
--	if (!blk_queue_nonrot(ioc->rqos.q))
-+	if (!blk_queue_nonrot(ioc->rqos.disk->queue))
- 		return AUTOP_HDD;
- 
- 	/* handle SATA SSDs w/ broken NCQ */
--	if (blk_queue_depth(ioc->rqos.q) == 1)
-+	if (blk_queue_depth(ioc->rqos.disk->queue) == 1)
- 		return AUTOP_SSD_QD1;
- 
- 	/* use one of the normal ssd sets */
-@@ -2649,7 +2649,7 @@ static void ioc_rqos_throttle(struct rq_qos *rqos, struct bio *bio)
- 	if (use_debt) {
- 		iocg_incur_debt(iocg, abs_cost, &now);
- 		if (iocg_kick_delay(iocg, &now))
--			blkcg_schedule_throttle(rqos->q->disk,
-+			blkcg_schedule_throttle(rqos->disk,
- 					(bio->bi_opf & REQ_SWAP) == REQ_SWAP);
- 		iocg_unlock(iocg, ioc_locked, &flags);
- 		return;
-@@ -2750,7 +2750,7 @@ static void ioc_rqos_merge(struct rq_qos *rqos, struct request *rq,
- 	if (likely(!list_empty(&iocg->active_list))) {
- 		iocg_incur_debt(iocg, abs_cost, &now);
- 		if (iocg_kick_delay(iocg, &now))
--			blkcg_schedule_throttle(rqos->q->disk,
-+			blkcg_schedule_throttle(rqos->disk,
- 					(bio->bi_opf & REQ_SWAP) == REQ_SWAP);
- 	} else {
- 		iocg_commit_bio(iocg, bio, abs_cost, cost);
-@@ -2821,7 +2821,7 @@ static void ioc_rqos_exit(struct rq_qos *rqos)
- {
- 	struct ioc *ioc = rqos_to_ioc(rqos);
- 
--	blkcg_deactivate_policy(rqos->q, &blkcg_policy_iocost);
-+	blkcg_deactivate_policy(rqos->disk->queue, &blkcg_policy_iocost);
- 
- 	spin_lock_irq(&ioc->lock);
- 	ioc->running = IOC_STOP;
 diff --git a/block/blk-iolatency.c b/block/blk-iolatency.c
-index f6aeb3d3fdae59..8e1e43bbde6f0b 100644
+index 39853fc5c2b02f..bc0d217f5c1723 100644
 --- a/block/blk-iolatency.c
 +++ b/block/blk-iolatency.c
-@@ -292,7 +292,7 @@ static void __blkcg_iolatency_throttle(struct rq_qos *rqos,
- 	unsigned use_delay = atomic_read(&lat_to_blkg(iolat)->use_delay);
- 
- 	if (use_delay)
--		blkcg_schedule_throttle(rqos->q->disk, use_memdelay);
-+		blkcg_schedule_throttle(rqos->disk, use_memdelay);
- 
- 	/*
- 	 * To avoid priority inversions we want to just take a slot if we are
-@@ -330,7 +330,7 @@ static void scale_cookie_change(struct blk_iolatency *blkiolat,
- 				struct child_latency_info *lat_info,
- 				bool up)
- {
--	unsigned long qd = blkiolat->rqos.q->nr_requests;
-+	unsigned long qd = blkiolat->rqos.disk->queue->nr_requests;
- 	unsigned long scale = scale_amount(qd, up);
- 	unsigned long old = atomic_read(&lat_info->scale_cookie);
- 	unsigned long max_scale = qd << 1;
-@@ -372,7 +372,7 @@ static void scale_cookie_change(struct blk_iolatency *blkiolat,
-  */
- static void scale_change(struct iolatency_grp *iolat, bool up)
- {
--	unsigned long qd = iolat->blkiolat->rqos.q->nr_requests;
-+	unsigned long qd = iolat->blkiolat->rqos.disk->queue->nr_requests;
- 	unsigned long scale = scale_amount(qd, up);
- 	unsigned long old = iolat->max_depth;
- 
-@@ -646,7 +646,7 @@ static void blkcg_iolatency_exit(struct rq_qos *rqos)
- 
- 	timer_shutdown_sync(&blkiolat->timer);
- 	flush_work(&blkiolat->enable_work);
--	blkcg_deactivate_policy(rqos->q, &blkcg_policy_iolatency);
-+	blkcg_deactivate_policy(rqos->disk->queue, &blkcg_policy_iolatency);
- 	kfree(blkiolat);
+@@ -946,13 +946,12 @@ static void iolatency_pd_stat(struct blkg_policy_data *pd, struct seq_file *s)
+ 			iolat->max_depth, avg_lat, cur_win);
  }
  
-@@ -665,7 +665,7 @@ static void blkiolatency_timer_fn(struct timer_list *t)
+-static struct blkg_policy_data *iolatency_pd_alloc(gfp_t gfp,
+-						   struct request_queue *q,
+-						   struct blkcg *blkcg)
++static struct blkg_policy_data *iolatency_pd_alloc(struct gendisk *disk,
++		struct blkcg *blkcg, gfp_t gfp)
+ {
+ 	struct iolatency_grp *iolat;
  
- 	rcu_read_lock();
- 	blkg_for_each_descendant_pre(blkg, pos_css,
--				     blkiolat->rqos.q->root_blkg) {
-+				     blkiolat->rqos.disk->queue->root_blkg) {
- 		struct iolatency_grp *iolat;
- 		struct child_latency_info *lat_info;
- 		unsigned long flags;
-@@ -749,9 +749,9 @@ static void blkiolatency_enable_work_fn(struct work_struct *work)
- 	 */
- 	enabled = atomic_read(&blkiolat->enable_cnt);
- 	if (enabled != blkiolat->enabled) {
--		blk_mq_freeze_queue(blkiolat->rqos.q);
-+		blk_mq_freeze_queue(blkiolat->rqos.disk->queue);
- 		blkiolat->enabled = enabled;
--		blk_mq_unfreeze_queue(blkiolat->rqos.q);
-+		blk_mq_unfreeze_queue(blkiolat->rqos.disk->queue);
- 	}
+-	iolat = kzalloc_node(sizeof(*iolat), gfp, q->node);
++	iolat = kzalloc_node(sizeof(*iolat), gfp, disk->node_id);
+ 	if (!iolat)
+ 		return NULL;
+ 	iolat->stats = __alloc_percpu_gfp(sizeof(struct latency_stat),
+diff --git a/block/blk-ioprio.c b/block/blk-ioprio.c
+index 8194826cc824bc..055529b9b92bab 100644
+--- a/block/blk-ioprio.c
++++ b/block/blk-ioprio.c
+@@ -116,7 +116,7 @@ static ssize_t ioprio_set_prio_policy(struct kernfs_open_file *of, char *buf,
  }
  
-diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-index bd942341b6382f..b01818f8e216e3 100644
---- a/block/blk-mq-debugfs.c
-+++ b/block/blk-mq-debugfs.c
-@@ -813,9 +813,9 @@ static const char *rq_qos_id_to_name(enum rq_qos_id id)
- 
- void blk_mq_debugfs_unregister_rqos(struct rq_qos *rqos)
+ static struct blkg_policy_data *
+-ioprio_alloc_pd(gfp_t gfp, struct request_queue *q, struct blkcg *blkcg)
++ioprio_alloc_pd(struct gendisk *disk, struct blkcg *blkcg, gfp_t gfp)
  {
--	lockdep_assert_held(&rqos->q->debugfs_mutex);
-+	lockdep_assert_held(&rqos->disk->queue->debugfs_mutex);
+ 	struct ioprio_blkg *ioprio_blkg;
  
--	if (!rqos->q->debugfs_dir)
-+	if (!rqos->disk->queue->debugfs_dir)
- 		return;
- 	debugfs_remove_recursive(rqos->debugfs_dir);
- 	rqos->debugfs_dir = NULL;
-@@ -823,7 +823,7 @@ void blk_mq_debugfs_unregister_rqos(struct rq_qos *rqos)
- 
- void blk_mq_debugfs_register_rqos(struct rq_qos *rqos)
- {
--	struct request_queue *q = rqos->q;
-+	struct request_queue *q = rqos->disk->queue;
- 	const char *dir_name = rq_qos_id_to_name(rqos->id);
- 
- 	lockdep_assert_held(&q->debugfs_mutex);
-@@ -835,9 +835,7 @@ void blk_mq_debugfs_register_rqos(struct rq_qos *rqos)
- 		q->rqos_debugfs_dir = debugfs_create_dir("rqos",
- 							 q->debugfs_dir);
- 
--	rqos->debugfs_dir = debugfs_create_dir(dir_name,
--					       rqos->q->rqos_debugfs_dir);
--
-+	rqos->debugfs_dir = debugfs_create_dir(dir_name, q->rqos_debugfs_dir);
- 	debugfs_create_files(rqos->debugfs_dir, rqos, rqos->ops->debugfs_attrs);
+diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+index efc0a9092c6942..74bb1e753ea09d 100644
+--- a/block/blk-throttle.c
++++ b/block/blk-throttle.c
+@@ -335,14 +335,13 @@ static void throtl_service_queue_init(struct throtl_service_queue *sq)
+ 	timer_setup(&sq->pending_timer, throtl_pending_timer_fn, 0);
  }
  
-diff --git a/block/blk-rq-qos.c b/block/blk-rq-qos.c
-index 8e83734cfe8dbc..d8cc820a365e3a 100644
---- a/block/blk-rq-qos.c
-+++ b/block/blk-rq-qos.c
-@@ -300,7 +300,7 @@ int rq_qos_add(struct rq_qos *rqos, struct gendisk *disk, enum rq_qos_id id,
+-static struct blkg_policy_data *throtl_pd_alloc(gfp_t gfp,
+-						struct request_queue *q,
+-						struct blkcg *blkcg)
++static struct blkg_policy_data *throtl_pd_alloc(struct gendisk *disk,
++		struct blkcg *blkcg, gfp_t gfp)
  {
- 	struct request_queue *q = disk->queue;
+ 	struct throtl_grp *tg;
+ 	int rw;
  
--	rqos->q = q;
-+	rqos->disk = disk;
- 	rqos->id = id;
- 	rqos->ops = ops;
+-	tg = kzalloc_node(sizeof(*tg), gfp, q->node);
++	tg = kzalloc_node(sizeof(*tg), gfp, disk->node_id);
+ 	if (!tg)
+ 		return NULL;
  
-@@ -337,7 +337,7 @@ int rq_qos_add(struct rq_qos *rqos, struct gendisk *disk, enum rq_qos_id id,
- 
- void rq_qos_del(struct rq_qos *rqos)
- {
--	struct request_queue *q = rqos->q;
-+	struct request_queue *q = rqos->disk->queue;
- 	struct rq_qos **cur;
- 
- 	/*
-diff --git a/block/blk-rq-qos.h b/block/blk-rq-qos.h
-index 2b7b668479f71a..b02a1a3d33a89e 100644
---- a/block/blk-rq-qos.h
-+++ b/block/blk-rq-qos.h
-@@ -26,7 +26,7 @@ struct rq_wait {
- 
- struct rq_qos {
- 	const struct rq_qos_ops *ops;
--	struct request_queue *q;
-+	struct gendisk *disk;
- 	enum rq_qos_id id;
- 	struct rq_qos *next;
- #ifdef CONFIG_BLK_DEBUG_FS
-diff --git a/block/blk-wbt.c b/block/blk-wbt.c
-index 1a78d54c8152b0..e49a4868453276 100644
---- a/block/blk-wbt.c
-+++ b/block/blk-wbt.c
-@@ -165,7 +165,7 @@ static void wb_timestamp(struct rq_wb *rwb, unsigned long *var)
-  */
- static bool wb_recent_wait(struct rq_wb *rwb)
- {
--	struct bdi_writeback *wb = &rwb->rqos.q->disk->bdi->wb;
-+	struct bdi_writeback *wb = &rwb->rqos.disk->bdi->wb;
- 
- 	return time_before(jiffies, wb->dirty_sleep + HZ);
- }
-@@ -312,7 +312,7 @@ enum {
- 
- static int latency_exceeded(struct rq_wb *rwb, struct blk_rq_stat *stat)
- {
--	struct backing_dev_info *bdi = rwb->rqos.q->disk->bdi;
-+	struct backing_dev_info *bdi = rwb->rqos.disk->bdi;
- 	struct rq_depth *rqd = &rwb->rq_depth;
- 	u64 thislat;
- 
-@@ -365,7 +365,7 @@ static int latency_exceeded(struct rq_wb *rwb, struct blk_rq_stat *stat)
- 
- static void rwb_trace_step(struct rq_wb *rwb, const char *msg)
- {
--	struct backing_dev_info *bdi = rwb->rqos.q->disk->bdi;
-+	struct backing_dev_info *bdi = rwb->rqos.disk->bdi;
- 	struct rq_depth *rqd = &rwb->rq_depth;
- 
- 	trace_wbt_step(bdi, msg, rqd->scale_step, rwb->cur_win_nsec,
-@@ -435,13 +435,12 @@ static void wb_timer_fn(struct blk_stat_callback *cb)
- 	unsigned int inflight = wbt_inflight(rwb);
- 	int status;
- 
--	if (!rwb->rqos.q->disk)
-+	if (!rwb->rqos.disk)
- 		return;
- 
- 	status = latency_exceeded(rwb, cb->stat);
- 
--	trace_wbt_timer(rwb->rqos.q->disk->bdi, status, rqd->scale_step,
--			inflight);
-+	trace_wbt_timer(rwb->rqos.disk->bdi, status, rqd->scale_step, inflight);
- 
- 	/*
- 	 * If we exceeded the latency target, step down. If we did not,
-@@ -779,16 +778,15 @@ static int wbt_data_dir(const struct request *rq)
- 
- static void wbt_queue_depth_changed(struct rq_qos *rqos)
- {
--	RQWB(rqos)->rq_depth.queue_depth = blk_queue_depth(rqos->q);
-+	RQWB(rqos)->rq_depth.queue_depth = blk_queue_depth(rqos->disk->queue);
- 	wbt_update_limits(RQWB(rqos));
- }
- 
- static void wbt_exit(struct rq_qos *rqos)
- {
- 	struct rq_wb *rwb = RQWB(rqos);
--	struct request_queue *q = rqos->q;
- 
--	blk_stat_remove_callback(q, rwb->cb);
-+	blk_stat_remove_callback(rqos->disk->queue, rwb->cb);
- 	blk_stat_free_callback(rwb->cb);
- 	kfree(rwb);
- }
 -- 
 2.39.0
 
