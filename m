@@ -2,106 +2,199 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84D48C38142
-	for <linux-block@archiver.kernel.org>; Wed,  1 Feb 2023 08:19:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DD0AAC38142
+	for <linux-block@archiver.kernel.org>; Wed,  1 Feb 2023 09:08:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231923AbjBAIT0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 1 Feb 2023 03:19:26 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35502 "EHLO
+        id S231755AbjBAJIc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 1 Feb 2023 04:08:32 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33910 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232147AbjBAITO (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 1 Feb 2023 03:19:14 -0500
-Received: from mail-yb1-xb2b.google.com (mail-yb1-xb2b.google.com [IPv6:2607:f8b0:4864:20::b2b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D28EC5EFA0
-        for <linux-block@vger.kernel.org>; Wed,  1 Feb 2023 00:19:11 -0800 (PST)
-Received: by mail-yb1-xb2b.google.com with SMTP id 123so21312031ybv.6
-        for <linux-block@vger.kernel.org>; Wed, 01 Feb 2023 00:19:11 -0800 (PST)
+        with ESMTP id S231790AbjBAJIY (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 1 Feb 2023 04:08:24 -0500
+Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC19562252;
+        Wed,  1 Feb 2023 01:07:53 -0800 (PST)
+Received: by mail-pj1-x1032.google.com with SMTP id ha3-20020a17090af3c300b00230222051a6so1343180pjb.2;
+        Wed, 01 Feb 2023 01:07:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=+64qMYUS/9LKQSKQXuUu9URV5MQO5mnEzXLsozGZuwc=;
-        b=XWbG/S1RDk8VgXptly9M72Hq2lxAP50GMzcjVoG9FOZ8AqmNbrUJCuW5f1ItVXcIBw
-         j2FC21FSIrrLVyH5456kkpx9rEdoI25uwO+JZylNko+P7/OdsX28fFky+udGd6VkSKlW
-         Bt5oah17IhBpncHnF7EgKyQHW6ciCOD0t3r+jYIaW0hDNNVQURQcdP1qCLefZ5d5Fh+j
-         F4zRZp7D0tviaWavSBQI46Qxr8CKJJePIwGBrtVDDOhKQKKwWfnfBW2TWN4+zXJ4j1AP
-         v37J/N1pcwyuCw7XWr/INe+eq8HMIwcr4adE0Wq6V39tMymR4kxiOy0VQKQNXTTrj8Oi
-         7UgQ==
+        d=gmail.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=VyDJoRO+eavlOXGc4Q5SqoZUyZeya7RZ/BUKNVX/+dM=;
+        b=n2kJU8RU6IvD/ch8vvXg1MhGLeamnUTDDdUpFRbfmE/2i6Ns4J1BaSL67JvbV163yV
+         WLDUX8LreB1zUVzjU5huvP/DhUdx0OlMmaXyLeIqjQ20kONQkXYsh0nT6objM+1J9L9p
+         TsXk8BbhOP4NR7MvpmjdH/b7f/HZLcE3nSk5xD196RrOLQcd9SoYhGIZQQ/PRx6gdqv+
+         0JYWD1DjJul12kanXB2l9mLvaSkxRdWlMHuy6g5+8EfbeVNCEJVz9KpaScfTG6zbLTd+
+         J8xEigI1i6MGnIcts/aAzTCezN5DIBtI1pbH7OcvOgofhi3tK4yNrr6W0Gh1TYgnTjTu
+         WB+w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=+64qMYUS/9LKQSKQXuUu9URV5MQO5mnEzXLsozGZuwc=;
-        b=TE8jmGTrWhXk62LA/P3yDE3rB096QPz6jQOdN45u8/AW7ueLMqhHvkMi6xZF+B+54o
-         XNUWvcqXsACS5MjokIiQWsJkokL7DjeBq/Om6M2x0Vo1FCj0JLYZ9SOkvP3xjM/ICRWv
-         0rpQ7Sunj/jkdZMUMdFZ+ClETskcxB6G0MOjeeupRLTwZVEK7ixUqXnj/0G4ap4kDwB0
-         eoJLQrkXPO0QwjEnE8yd/K+LejxUvQcIKcKvz99ah4J1xqeUwvYmv0TWCx0zzPcyNIEj
-         EnmRmNpOjJZJreco+5cXFXLfLley6ywtuU76qaNWZWWWeSll8cGmvBfdfZNfvFZ4R2Qz
-         NAuQ==
-X-Gm-Message-State: AO0yUKWPwfIueAZ5eRHvU88jc4IGaB2wNPlLqxafAMBxsmoeYrIgs/y7
-        ZRKntDQQ3gkEQ7Jl/Nlg8mD9WxOAO78SEg+vKf3OYQ==
-X-Google-Smtp-Source: AK7set+DH3RZ68yOI7vMHe9szOffDyqgQ7KDz6Pee0wFzmgvjgQSDjzKmzZWDta15XaKVJWTZWtO8SBTvQDCjdVJqyk=
-X-Received: by 2002:a25:9191:0:b0:7c0:acd2:6300 with SMTP id
- w17-20020a259191000000b007c0acd26300mr189458ybl.520.1675239551079; Wed, 01
- Feb 2023 00:19:11 -0800 (PST)
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=VyDJoRO+eavlOXGc4Q5SqoZUyZeya7RZ/BUKNVX/+dM=;
+        b=u+dL6zkycS5Vtt+rObBfs1ezkJeLTlyR/n8scL+kEwWZknsRzhKZkp01wHBMgYjCUI
+         kB1wTy+R1QpYG3OdVVtuoa/W5spai2tS94/S35xZ3E7BuWUDrdRz28NNwdiEAiK5xhB8
+         LDoYjlIqgVG3hOFiXpLGFnIyLPcVJvi1atn9YfG3BKDZJ34bedl9iouVOJMGlDMtkz23
+         dq+sAkDbD81ojmHe/wh6sNjBNr0r8AHwNkzJ7e++XoYmA+kqSuvVIJ4vP1CMN6SsU92M
+         JBLzWlYLNVT6sHhcvss4ZtK7XVHqw+U77LoGgUPJMpJ8biG+pRTY6CEXBAyKqNRdlwvY
+         Dbig==
+X-Gm-Message-State: AO0yUKU1NDSW6dMtSlcQEmW1eW1tj5qlbEBIE3YCPaVZXGI51uTSpHnX
+        POEFrxGvNWNXoQpx083IKhI=
+X-Google-Smtp-Source: AK7set9sYNzoDhM3lbLZDZLS4ZpRhW4FYff6fKjTlS1Ej2P5it/rfKiNfSxJmx6GlLRjg3DcvPuFyQ==
+X-Received: by 2002:a17:90b:3812:b0:22c:24c0:7106 with SMTP id mq18-20020a17090b381200b0022c24c07106mr1447738pjb.21.1675242472898;
+        Wed, 01 Feb 2023 01:07:52 -0800 (PST)
+Received: from debian.me (subs02-180-214-232-18.three.co.id. [180.214.232.18])
+        by smtp.gmail.com with ESMTPSA id e16-20020a633710000000b004efe1f24522sm1050777pga.23.2023.02.01.01.07.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 01 Feb 2023 01:07:52 -0800 (PST)
+Received: by debian.me (Postfix, from userid 1000)
+        id BEAED104F9E; Wed,  1 Feb 2023 16:07:48 +0700 (WIB)
+Date:   Wed, 1 Feb 2023 16:07:48 +0700
+From:   Bagas Sanjaya <bagasdotme@gmail.com>
+To:     Hou Tao <houtao@huaweicloud.com>, linux-block@vger.kernel.org
+Cc:     Bart Van Assche <bvanassche@acm.org>, Jan Kara <jack@suse.cz>,
+        Jens Axboe <axboe@kernel.dk>, cgroups@vger.kernel.org,
+        Tejun Heo <tj@kernel.org>, Zefan Li <lizefan.x@bytedance.com>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        Jonathan Corbet <corbet@lwn.net>, linux-kernel@vger.kernel.org,
+        linux-doc@vger.kernel.org, houtao1@huawei.com
+Subject: Re: [PATCH] blk-ioprio: Introduce promote-to-rt policy
+Message-ID: <Y9or5PkdXj/D94fR@debian.me>
+References: <20230201045227.2203123-1-houtao@huaweicloud.com>
 MIME-Version: 1.0
-References: <20230131084742.1038135-1-linus.walleij@linaro.org>
- <Y9jY2zsNbSCWluZG@infradead.org> <CACRpkda3mk8wkdxWQFev9PrK6bPsxR6qLJo_gXnK+_jaTCFfjg@mail.gmail.com>
- <Y9kVrh9VEz4/T76f@infradead.org> <CACRpkdbd73PEAaNYr2cz=pmw7guHK0-hiPCYXgpgQfy-d9TTTQ@mail.gmail.com>
- <Y9kvh42/T9rdqDH9@infradead.org>
-In-Reply-To: <Y9kvh42/T9rdqDH9@infradead.org>
-From:   Linus Walleij <linus.walleij@linaro.org>
-Date:   Wed, 1 Feb 2023 09:18:59 +0100
-Message-ID: <CACRpkdZ-r_toj3FWuxffSzmO=cDq2Og79R2t48-oAoCE0bT1sw@mail.gmail.com>
-Subject: Re: [PATCH] mmc: core: Imply IOSCHED_BFQ
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     linux-mmc@vger.kernel.org, Ulf Hansson <ulf.hansson@linaro.org>,
-        linux-block@vger.kernel.org,
-        Paolo Valente <paolo.valente@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha512;
+        protocol="application/pgp-signature"; boundary="OS7Ho6/EPKDu6yfb"
+Content-Disposition: inline
+In-Reply-To: <20230201045227.2203123-1-houtao@huaweicloud.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jan 31, 2023 at 4:11 PM Christoph Hellwig <hch@infradead.org> wrote:
-> On Tue, Jan 31, 2023 at 03:05:20PM +0100, Linus Walleij wrote:
-> > To be clear, "works better" in this context means, solving a problem
-> > for the interactive user, preventing random freezing of the UI on
-> > resource-limited (memory, disk throughput) systems under high
-> > I/O load.
->
-> Which already has nothing to do with the mmc driver.  And the rest
-> of your mail makes this even more clear.  You want bfq for interactive
-> systems with little resources and really shitty storage device, which
-> just happen to use mmc in your use case.
 
-First time it helped me it was rotating rust actually, but yeah MMC/SD
-is one of those.
+--OS7Ho6/EPKDu6yfb
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> My use case for sd cards OTOH is extremely resource constrained systems
-> where I absolutely do not want a bloated I/O scheduler.  In fact I'd
-> love to be able to even compile the infrastructure for them away.
+On Wed, Feb 01, 2023 at 12:52:27PM +0800, Hou Tao wrote:
+>  The following numerical values are associated with the I/O priority poli=
+cies:
+> =20
+> -+-------------+---+
+> -| no-change   | 0 |
+> -+-------------+---+
+> -| none-to-rt  | 1 |
+> -+-------------+---+
+> -| rt-to-be    | 2 |
+> -+-------------+---+
+> -| all-to-idle | 3 |
+> -+-------------+---+
+> +
+> ++---------------+---------+-----+
+> +| policy        | inst    | num |
+> ++---------------+---------+-----+
+> +| no-change     | demote  | 0   |
+> ++---------------+---------+-----+
+> +| none-to-rt    | demote  | 1   |
+> ++---------------+---------+-----+
+> +| rt-to-be      | demote  | 2   |
+> ++---------------+---------+-----+
+> +| idle          | demote  | 3   |
+> ++---------------+---------+-----+
+> +| promote-to-rt | promote | 1   |
+> ++---------------+---------+-----+
+> =20
 
-Hm I think you're mixing up different resource constraints here (that
-your storage is slow does not mean your CPU is weak or that you have
-little RAM) but I see your point.
+The first row should have been header row:
 
-What I think a lot of the debate is about is "abundance of resources"
-systems vs "constrained resources" systems. Some are hard to keep
-busy (such as MQ devices) other are hard to get access through
-because of constant overload (such as MMC/SD-cards).
+---- >8 ----
+diff --git a/Documentation/admin-guide/cgroup-v2.rst b/Documentation/admin-=
+guide/cgroup-v2.rst
+index e0b9f73ef62a9e..55f9b579716564 100644
+--- a/Documentation/admin-guide/cgroup-v2.rst
++++ b/Documentation/admin-guide/cgroup-v2.rst
+@@ -2048,7 +2048,7 @@ The following numerical values are associated with th=
+e I/O priority policies:
+=20
+ +---------------+---------+-----+
+ | policy        | inst    | num |
+-+---------------+---------+-----+
+++=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D+=3D=3D=3D=3D=3D=3D=3D=3D=3D=
++=3D=3D=3D=3D=3D+
+ | no-change     | demote  | 0   |
+ +---------------+---------+-----+
+ | none-to-rt    | demote  | 1   |
 
-> In other words:  you want distro policy to use bfq for your use case,
-> but that has no business being in the Kconfig.
+> @@ -2064,9 +2074,13 @@ The numerical value that corresponds to each I/O p=
+riority class is as follows:
+> =20
+>  The algorithm to set the I/O priority class for a request is as follows:
+> =20
+> -- Translate the I/O priority class policy into a number.
+> -- Change the request I/O priority class into the maximum of the I/O prio=
+rity
+> -  class policy number and the numerical I/O priority class.
+> +-- Translate the I/O priority class policy into an instruction and a num=
+ber
+> +-- If the instruction is demotion, change the request I/O priority class
+> +-  into the maximum of the I/O priority class policy number and the nume=
+rical
+> +-  I/O priority class.
+> +-- If the instruction is promotion, change the request I/O priority class
+> +-  into the minimum of the I/O priority class policy number and the nume=
+rical
+> +-  I/O priority class.
+> =20
 
-Well *using* it is still the matter of a udev rule for an ordinary distro
-as we have no mechanism to instruct the kernel to use any specific
-scheduler with some subsystem. (I think we should have some hint
-for that, for slow single channel devices for example.)
+Remove the excessive bullet list marker or the list above become paragraph
+instead:
 
-The Kconfig change is mainly about making it available for use,
-for systems with MMC/SD-card drivers.
+---- >8 ----
+diff --git a/Documentation/admin-guide/cgroup-v2.rst b/Documentation/admin-=
+guide/cgroup-v2.rst
+index 55f9b579716564..c3f16386c47bdf 100644
+--- a/Documentation/admin-guide/cgroup-v2.rst
++++ b/Documentation/admin-guide/cgroup-v2.rst
+@@ -2074,12 +2074,12 @@ The numerical value that corresponds to each I/O pr=
+iority class is as follows:
+=20
+ The algorithm to set the I/O priority class for a request is as follows:
+=20
+--- Translate the I/O priority class policy into an instruction and a number
+--- If the instruction is demotion, change the request I/O priority class
+--  into the maximum of the I/O priority class policy number and the numeri=
+cal
+--  I/O priority class.
+--- If the instruction is promotion, change the request I/O priority class
+--  into the minimum of the I/O priority class policy number and the numeri=
+cal
++- Translate the I/O priority class policy into an instruction-number pair.
++- If the instruction is demotion, change the request I/O priority class
++  into the maximum of the I/O priority class policy number and the numeric=
+al
++  I/O priority class.
++- If the instruction is promotion, change the request I/O priority class
++  into the minimum of the I/O priority class policy number and the numeric=
+al
+ -  I/O priority class.
+=20
+ PID
 
-Yours,
-Linus Walleij
+Thanks.
+
+--=20
+An old man doll... just what I always wanted! - Clara
+
+--OS7Ho6/EPKDu6yfb
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCY9or3wAKCRD2uYlJVVFO
+o58vAQD9CxSaIpA4AdTyvw0fuMNPOIuLSy4uqbVbnlwCHskJ8AD+IKwJnyzxD6Z5
+kesBn69iDFNMECytC+QbcW0GkzPXZw0=
+=iRGq
+-----END PGP SIGNATURE-----
+
+--OS7Ho6/EPKDu6yfb--
