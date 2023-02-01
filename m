@@ -2,199 +2,236 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DD0AAC38142
-	for <linux-block@archiver.kernel.org>; Wed,  1 Feb 2023 09:08:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 15F1AC636D3
+	for <linux-block@archiver.kernel.org>; Wed,  1 Feb 2023 11:10:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231755AbjBAJIc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 1 Feb 2023 04:08:32 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33910 "EHLO
+        id S232026AbjBALKA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 1 Feb 2023 06:10:00 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35032 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231790AbjBAJIY (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 1 Feb 2023 04:08:24 -0500
-Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC19562252;
-        Wed,  1 Feb 2023 01:07:53 -0800 (PST)
-Received: by mail-pj1-x1032.google.com with SMTP id ha3-20020a17090af3c300b00230222051a6so1343180pjb.2;
-        Wed, 01 Feb 2023 01:07:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=VyDJoRO+eavlOXGc4Q5SqoZUyZeya7RZ/BUKNVX/+dM=;
-        b=n2kJU8RU6IvD/ch8vvXg1MhGLeamnUTDDdUpFRbfmE/2i6Ns4J1BaSL67JvbV163yV
-         WLDUX8LreB1zUVzjU5huvP/DhUdx0OlMmaXyLeIqjQ20kONQkXYsh0nT6objM+1J9L9p
-         TsXk8BbhOP4NR7MvpmjdH/b7f/HZLcE3nSk5xD196RrOLQcd9SoYhGIZQQ/PRx6gdqv+
-         0JYWD1DjJul12kanXB2l9mLvaSkxRdWlMHuy6g5+8EfbeVNCEJVz9KpaScfTG6zbLTd+
-         J8xEigI1i6MGnIcts/aAzTCezN5DIBtI1pbH7OcvOgofhi3tK4yNrr6W0Gh1TYgnTjTu
-         WB+w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=VyDJoRO+eavlOXGc4Q5SqoZUyZeya7RZ/BUKNVX/+dM=;
-        b=u+dL6zkycS5Vtt+rObBfs1ezkJeLTlyR/n8scL+kEwWZknsRzhKZkp01wHBMgYjCUI
-         kB1wTy+R1QpYG3OdVVtuoa/W5spai2tS94/S35xZ3E7BuWUDrdRz28NNwdiEAiK5xhB8
-         LDoYjlIqgVG3hOFiXpLGFnIyLPcVJvi1atn9YfG3BKDZJ34bedl9iouVOJMGlDMtkz23
-         dq+sAkDbD81ojmHe/wh6sNjBNr0r8AHwNkzJ7e++XoYmA+kqSuvVIJ4vP1CMN6SsU92M
-         JBLzWlYLNVT6sHhcvss4ZtK7XVHqw+U77LoGgUPJMpJ8biG+pRTY6CEXBAyKqNRdlwvY
-         Dbig==
-X-Gm-Message-State: AO0yUKU1NDSW6dMtSlcQEmW1eW1tj5qlbEBIE3YCPaVZXGI51uTSpHnX
-        POEFrxGvNWNXoQpx083IKhI=
-X-Google-Smtp-Source: AK7set9sYNzoDhM3lbLZDZLS4ZpRhW4FYff6fKjTlS1Ej2P5it/rfKiNfSxJmx6GlLRjg3DcvPuFyQ==
-X-Received: by 2002:a17:90b:3812:b0:22c:24c0:7106 with SMTP id mq18-20020a17090b381200b0022c24c07106mr1447738pjb.21.1675242472898;
-        Wed, 01 Feb 2023 01:07:52 -0800 (PST)
-Received: from debian.me (subs02-180-214-232-18.three.co.id. [180.214.232.18])
-        by smtp.gmail.com with ESMTPSA id e16-20020a633710000000b004efe1f24522sm1050777pga.23.2023.02.01.01.07.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 01 Feb 2023 01:07:52 -0800 (PST)
-Received: by debian.me (Postfix, from userid 1000)
-        id BEAED104F9E; Wed,  1 Feb 2023 16:07:48 +0700 (WIB)
-Date:   Wed, 1 Feb 2023 16:07:48 +0700
-From:   Bagas Sanjaya <bagasdotme@gmail.com>
-To:     Hou Tao <houtao@huaweicloud.com>, linux-block@vger.kernel.org
-Cc:     Bart Van Assche <bvanassche@acm.org>, Jan Kara <jack@suse.cz>,
-        Jens Axboe <axboe@kernel.dk>, cgroups@vger.kernel.org,
-        Tejun Heo <tj@kernel.org>, Zefan Li <lizefan.x@bytedance.com>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        Jonathan Corbet <corbet@lwn.net>, linux-kernel@vger.kernel.org,
-        linux-doc@vger.kernel.org, houtao1@huawei.com
-Subject: Re: [PATCH] blk-ioprio: Introduce promote-to-rt policy
-Message-ID: <Y9or5PkdXj/D94fR@debian.me>
-References: <20230201045227.2203123-1-houtao@huaweicloud.com>
+        with ESMTP id S232017AbjBALJ7 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 1 Feb 2023 06:09:59 -0500
+Received: from smtp.tiscali.it (michael-notr.mail.tiscali.it [213.205.33.216])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 0647044BFA
+        for <linux-block@vger.kernel.org>; Wed,  1 Feb 2023 03:09:56 -0800 (PST)
+Received: from [192.168.178.50] ([79.16.97.72])
+        by michael.mail.tiscali.it with 
+        id Fn9j2903F1ZhrJf01n9lci; Wed, 01 Feb 2023 11:09:53 +0000
+x-auth-user: fantonifabio@tiscali.it
+Message-ID: <d16bba68-f470-62a0-baa9-03be2882047d@tiscali.it>
+Date:   Wed, 1 Feb 2023 12:09:40 +0100
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="OS7Ho6/EPKDu6yfb"
-Content-Disposition: inline
-In-Reply-To: <20230201045227.2203123-1-houtao@huaweicloud.com>
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.6.1
+Reply-To: fantonifabio@tiscali.it
+Subject: Re: [PATCH v2 02/21] block, blkfilter: Block Device Filtering
+ Mechanism
+To:     Mike Snitzer <snitzer@kernel.org>,
+        Sergei Shtepa <sergei.shtepa@veeam.com>
+Cc:     axboe@kernel.dk, corbet@lwn.net, linux-block@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        dm-devel@redhat.com
+References: <20221209142331.26395-1-sergei.shtepa@veeam.com>
+ <20221209142331.26395-3-sergei.shtepa@veeam.com>
+ <Y9mrJJDFnMNWR7Vn@redhat.com>
+From:   Fabio Fantoni <fantonifabio@tiscali.it>
+In-Reply-To: <Y9mrJJDFnMNWR7Vn@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Antivirus: Avast (VPS 230131-14, 31/1/2023), Outbound message
+X-Antivirus-Status: Clean
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tiscali.it; s=smtp;
+        t=1675249793; bh=LQObqF2Wtm61LjOqnqVe5XmyFxSqQ68OZlRKTllaPUI=;
+        h=Date:Reply-To:Subject:To:Cc:References:From:In-Reply-To;
+        b=ByEPtDn7FeFehZ/a+IjdPIeEm0NNxSMQIfzRfrHdtFf7vD+odoEX1suL91kBphP1n
+         vmSWJYcI6hcR8BwIdtyONdGlP5VCQWyi6VSSqynXBThU87Y2zQ4RMq96w+IR1JcTVo
+         kbQak+3gE0qGXvgLkg4r3fE0wdVFFS+WkEwKasgk=
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
---OS7Ho6/EPKDu6yfb
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Wed, Feb 01, 2023 at 12:52:27PM +0800, Hou Tao wrote:
->  The following numerical values are associated with the I/O priority poli=
-cies:
-> =20
-> -+-------------+---+
-> -| no-change   | 0 |
-> -+-------------+---+
-> -| none-to-rt  | 1 |
-> -+-------------+---+
-> -| rt-to-be    | 2 |
-> -+-------------+---+
-> -| all-to-idle | 3 |
-> -+-------------+---+
-> +
-> ++---------------+---------+-----+
-> +| policy        | inst    | num |
-> ++---------------+---------+-----+
-> +| no-change     | demote  | 0   |
-> ++---------------+---------+-----+
-> +| none-to-rt    | demote  | 1   |
-> ++---------------+---------+-----+
-> +| rt-to-be      | demote  | 2   |
-> ++---------------+---------+-----+
-> +| idle          | demote  | 3   |
-> ++---------------+---------+-----+
-> +| promote-to-rt | promote | 1   |
-> ++---------------+---------+-----+
-> =20
-
-The first row should have been header row:
-
----- >8 ----
-diff --git a/Documentation/admin-guide/cgroup-v2.rst b/Documentation/admin-=
-guide/cgroup-v2.rst
-index e0b9f73ef62a9e..55f9b579716564 100644
---- a/Documentation/admin-guide/cgroup-v2.rst
-+++ b/Documentation/admin-guide/cgroup-v2.rst
-@@ -2048,7 +2048,7 @@ The following numerical values are associated with th=
-e I/O priority policies:
-=20
- +---------------+---------+-----+
- | policy        | inst    | num |
--+---------------+---------+-----+
-++=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D+=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-+=3D=3D=3D=3D=3D+
- | no-change     | demote  | 0   |
- +---------------+---------+-----+
- | none-to-rt    | demote  | 1   |
-
-> @@ -2064,9 +2074,13 @@ The numerical value that corresponds to each I/O p=
-riority class is as follows:
-> =20
->  The algorithm to set the I/O priority class for a request is as follows:
-> =20
-> -- Translate the I/O priority class policy into a number.
-> -- Change the request I/O priority class into the maximum of the I/O prio=
-rity
-> -  class policy number and the numerical I/O priority class.
-> +-- Translate the I/O priority class policy into an instruction and a num=
-ber
-> +-- If the instruction is demotion, change the request I/O priority class
-> +-  into the maximum of the I/O priority class policy number and the nume=
-rical
-> +-  I/O priority class.
-> +-- If the instruction is promotion, change the request I/O priority class
-> +-  into the minimum of the I/O priority class policy number and the nume=
-rical
-> +-  I/O priority class.
-> =20
-
-Remove the excessive bullet list marker or the list above become paragraph
-instead:
-
----- >8 ----
-diff --git a/Documentation/admin-guide/cgroup-v2.rst b/Documentation/admin-=
-guide/cgroup-v2.rst
-index 55f9b579716564..c3f16386c47bdf 100644
---- a/Documentation/admin-guide/cgroup-v2.rst
-+++ b/Documentation/admin-guide/cgroup-v2.rst
-@@ -2074,12 +2074,12 @@ The numerical value that corresponds to each I/O pr=
-iority class is as follows:
-=20
- The algorithm to set the I/O priority class for a request is as follows:
-=20
---- Translate the I/O priority class policy into an instruction and a number
---- If the instruction is demotion, change the request I/O priority class
---  into the maximum of the I/O priority class policy number and the numeri=
-cal
---  I/O priority class.
---- If the instruction is promotion, change the request I/O priority class
---  into the minimum of the I/O priority class policy number and the numeri=
-cal
-+- Translate the I/O priority class policy into an instruction-number pair.
-+- If the instruction is demotion, change the request I/O priority class
-+  into the maximum of the I/O priority class policy number and the numeric=
-al
-+  I/O priority class.
-+- If the instruction is promotion, change the request I/O priority class
-+  into the minimum of the I/O priority class policy number and the numeric=
-al
- -  I/O priority class.
-=20
- PID
-
-Thanks.
-
---=20
-An old man doll... just what I always wanted! - Clara
-
---OS7Ho6/EPKDu6yfb
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCY9or3wAKCRD2uYlJVVFO
-o58vAQD9CxSaIpA4AdTyvw0fuMNPOIuLSy4uqbVbnlwCHskJ8AD+IKwJnyzxD6Z5
-kesBn69iDFNMECytC+QbcW0GkzPXZw0=
-=iRGq
------END PGP SIGNATURE-----
-
---OS7Ho6/EPKDu6yfb--
+Il 01/02/2023 00:58, Mike Snitzer ha scritto:
+> On Fri, Dec 09 2022 at  9:23P -0500,
+> Sergei Shtepa <sergei.shtepa@veeam.com> wrote:
+>
+>> Allows to attach block device filters to the block devices. Kernel
+>> modules can use this functionality to extend the capabilities of the
+>> block layer.
+>>
+>> Signed-off-by: Sergei Shtepa <sergei.shtepa@veeam.com>
+>> ---
+>>   block/bdev.c              | 70 ++++++++++++++++++++++++++++++++++++++
+>>   block/blk-core.c          | 19 +++++++++--
+>>   include/linux/blk_types.h |  2 ++
+>>   include/linux/blkdev.h    | 71 +++++++++++++++++++++++++++++++++++++++
+>>   4 files changed, 160 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/block/bdev.c b/block/bdev.c
+>> index d699ecdb3260..b820178824b2 100644
+>> --- a/block/bdev.c
+>> +++ b/block/bdev.c
+>> @@ -427,6 +427,7 @@ static void init_once(void *data)
+>>   
+>>   static void bdev_evict_inode(struct inode *inode)
+>>   {
+>> +	bdev_filter_detach(I_BDEV(inode));
+>>   	truncate_inode_pages_final(&inode->i_data);
+>>   	invalidate_inode_buffers(inode); /* is it needed here? */
+>>   	clear_inode(inode);
+>> @@ -502,6 +503,7 @@ struct block_device *bdev_alloc(struct gendisk *disk, u8 partno)
+>>   		return NULL;
+>>   	}
+>>   	bdev->bd_disk = disk;
+>> +	bdev->bd_filter = NULL;
+>>   	return bdev;
+>>   }
+>>   
+>> @@ -1092,3 +1094,71 @@ void bdev_statx_dioalign(struct inode *inode, struct kstat *stat)
+>>   
+>>   	blkdev_put_no_open(bdev);
+>>   }
+>> +
+>> +/**
+>> + * bdev_filter_attach - Attach the filter to the original block device.
+>> + * @bdev:
+>> + *	Block device.
+>> + * @flt:
+>> + *	Filter that needs to be attached to the block device.
+>> + *
+>> + * Before adding a filter, it is necessary to initialize &struct bdev_filter
+>> + * using a bdev_filter_init() function.
+>> + *
+>> + * The bdev_filter_detach() function allows to detach the filter from the block
+>> + * device.
+>> + *
+>> + * Return: 0 if succeeded, or -EALREADY if the filter already exists.
+>> + */
+>> +int bdev_filter_attach(struct block_device *bdev,
+>> +				     struct bdev_filter *flt)
+>> +{
+>> +	int ret = 0;
+>> +
+>> +	blk_mq_freeze_queue(bdev->bd_queue);
+>> +	blk_mq_quiesce_queue(bdev->bd_queue);
+>> +
+>> +	if (bdev->bd_filter)
+>> +		ret = -EALREADY;
+>> +	else
+>> +		bdev->bd_filter = flt;
+>> +
+>> +	blk_mq_unquiesce_queue(bdev->bd_queue);
+>> +	blk_mq_unfreeze_queue(bdev->bd_queue);
+>> +
+>> +	return ret;
+>> +}
+>> +EXPORT_SYMBOL(bdev_filter_attach);
+>> +
+>> +/**
+>> + * bdev_filter_detach - Detach the filter from the block device.
+>> + * @bdev:
+>> + *	Block device.
+>> + *
+>> + * The filter should be added using the bdev_filter_attach() function.
+>> + *
+>> + * Return: 0 if succeeded, or -ENOENT if the filter was not found.
+>> + */
+>> +int bdev_filter_detach(struct block_device *bdev)
+>> +{
+>> +	int ret = 0;
+>> +	struct bdev_filter *flt = NULL;
+>> +
+>> +	blk_mq_freeze_queue(bdev->bd_queue);
+>> +	blk_mq_quiesce_queue(bdev->bd_queue);
+>> +
+>> +	flt = bdev->bd_filter;
+>> +	if (flt)
+>> +		bdev->bd_filter = NULL;
+>> +	else
+>> +		ret = -ENOENT;
+>> +
+>> +	blk_mq_unquiesce_queue(bdev->bd_queue);
+>> +	blk_mq_unfreeze_queue(bdev->bd_queue);
+>> +
+>> +	if (flt)
+>> +		bdev_filter_put(flt);
+>> +
+>> +	return ret;
+>> +}
+>> +EXPORT_SYMBOL(bdev_filter_detach);
+> What about bio-based devices? (DM, MD, etc)
+>
+> DM uses freeze_bdev() and thaw_bdev(), seems like you're missing some
+> work here.
+>
+>> diff --git a/block/blk-core.c b/block/blk-core.c
+>> index 5487912befe8..284b295a7b23 100644
+>> --- a/block/blk-core.c
+>> +++ b/block/blk-core.c
+>> @@ -678,9 +678,24 @@ void submit_bio_noacct_nocheck(struct bio *bio)
+>>   	 * to collect a list of requests submited by a ->submit_bio method while
+>>   	 * it is active, and then process them after it returned.
+>>   	 */
+>> -	if (current->bio_list)
+>> +	if (current->bio_list) {
+>>   		bio_list_add(&current->bio_list[0], bio);
+>> -	else if (!bio->bi_bdev->bd_disk->fops->submit_bio)
+>> +		return;
+>> +	}
+>> +
+>> +	if (bio->bi_bdev->bd_filter && !bio_flagged(bio, BIO_FILTERED)) {
+> Shouldn't this be: if (unlikely(...))?
+>
+> But that obviously assumes a fair amount about the only consumer
+> (temporary filter that lasts as long as it takes to do a backup).
+>
+>> +		bool pass;
+>> +
+>> +		pass = bio->bi_bdev->bd_filter->fops->submit_bio_cb(bio);
+>> +		bio_set_flag(bio, BIO_FILTERED);
+>> +		if (!pass) {
+>> +			bio->bi_status = BLK_STS_OK;
+>> +			bio_endio(bio);
+>> +			return;
+>> +		}
+>> +	}
+>> +
+>> +	if (!bio->bi_bdev->bd_disk->fops->submit_bio)
+>>   		__submit_bio_noacct_mq(bio);
+>>   	else
+>>   		__submit_bio_noacct(bio);
+> And you currently don't allow for blkfilter to be involved if a bio
+> recurses (which is how bio splitting works now).  Not sure it
+> matters, just mentioning it...
+Hi, thanks for review this project that I think is very useful and I 
+hope it will be able to reach a very good quality, that will be 
+integrated into the kernel and that more backup solutions will use it 
+improving backups on linux in several cases.
+In the last month Sergei made big changes, applying Christoph Hellwig 
+changes and working following the received replies, the new version of 
+the patch is not ready yet but the many changes done for now are 
+available here: https://github.com/SergeiShtepa/linux/commits/blksnap-master
+I suppose that full review now of v2 when many things was already 
+changed for next version can risk to waste time. I hope I've helped with 
+this, if I haven't, sorry to have bother you.
+>
+> But taking a step back, in the hopes of stepping out of your way:
+>
+> Myself and others on the DM team (past and present) have always hoped
+> all block devices could have the flexibility of DM. It was that hope
+> that caused my frustration when I first saw your blkfilter approach.
+>
+> But I was too idealistic that a byproduct of your efforts
+> (blk-interposer before and blkfilter now) would usher in _all_ block
+> devices being able to comprehensively change their identity (and IO
+> processing) like DM enjoys.
+>
+> DM showcases all the extra code needed to achieve its extreme IO
+> remapping and stacking flexibilty -- I don't yet see a way to distill
+> the essence of what DM achieves without imposing too much on all block
+> core.
+>
+> So I do think blkfilter is a pragmatic way to achieve your goals.
+>
+> Mike
+>
+>
