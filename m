@@ -2,59 +2,137 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F00FC636CD
-	for <linux-block@archiver.kernel.org>; Wed,  1 Feb 2023 13:08:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4987BC05027
+	for <linux-block@archiver.kernel.org>; Wed,  1 Feb 2023 13:10:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232119AbjBANIV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 1 Feb 2023 08:08:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40100 "EHLO
+        id S230295AbjBANKx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 1 Feb 2023 08:10:53 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40638 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229935AbjBANIU (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 1 Feb 2023 08:08:20 -0500
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 54EA0AD24;
-        Wed,  1 Feb 2023 05:08:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=0DJ+fu1TOVGN/olgRLBTEaoZLBQeRlRCNJVimqqXr6g=; b=fKrz6P6uzRfZvE1T0iBKvtvueE
-        Tjt7XVZ1EGmjLQMUViQaY9asMLuVzvRB6lDU6Gc6r4cKFKRbWKnhem3vgSzUtLpIgdqJ7b/oXNkoj
-        c+PwrHPH0+gtVUjSMAGVBOKc9jjdln2DYbhkwuVolyMeL8weu2l3nDczv8W4f4gDGtMZH3++9V0zr
-        P4xodfgulDPj3mZCfWwJGmaAg8ayfE6Iy6XpcFN2uYbmuOBOrE8VCEyizg/e4FvBY5MBrRN2ekz5U
-        QwzR8umEKSQfoewbVp+Zl7C/EX/nVNFf/Om+wKfAdsp6UN8VftHdt/MCf5vdWEDkqbVioXhwLCG4e
-        FnCknPjw==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1pNCqY-00BxMx-PB; Wed, 01 Feb 2023 13:08:18 +0000
-Date:   Wed, 1 Feb 2023 05:08:18 -0800
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Linus Walleij <linus.walleij@linaro.org>
-Cc:     Christoph Hellwig <hch@infradead.org>, linux-mmc@vger.kernel.org,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        linux-block@vger.kernel.org,
-        Paolo Valente <paolo.valente@linaro.org>
-Subject: Re: [PATCH] mmc: core: Imply IOSCHED_BFQ
-Message-ID: <Y9pkQth3x9DQb9Kx@infradead.org>
-References: <20230131084742.1038135-1-linus.walleij@linaro.org>
- <Y9jY2zsNbSCWluZG@infradead.org>
- <CACRpkda3mk8wkdxWQFev9PrK6bPsxR6qLJo_gXnK+_jaTCFfjg@mail.gmail.com>
- <Y9kVrh9VEz4/T76f@infradead.org>
- <CACRpkdbd73PEAaNYr2cz=pmw7guHK0-hiPCYXgpgQfy-d9TTTQ@mail.gmail.com>
- <Y9kvh42/T9rdqDH9@infradead.org>
- <CACRpkdZ-r_toj3FWuxffSzmO=cDq2Og79R2t48-oAoCE0bT1sw@mail.gmail.com>
+        with ESMTP id S229935AbjBANKw (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 1 Feb 2023 08:10:52 -0500
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 296A66385D;
+        Wed,  1 Feb 2023 05:10:40 -0800 (PST)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id BBEE933D47;
+        Wed,  1 Feb 2023 13:10:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1675257038; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=NzbdF6heQ5asZimrlSzjKZo88jnGGEYXcxUXe4U6tuA=;
+        b=OLfOB/26/HWZepeWF+ilZLQxTv+AD9XtkXb+2fdv+zfJVfH233aj9w9lU9sEe9tw3cQtOP
+        +a/fjIr6RDPgonnP8VGhXqYqf3V9vp9kx7/7/HeGuZ+NXuRt8xYr8pP8xwShMgQRB4bXpy
+        aDakemW5PIfXdqMdccM7CWU5YdFSvro=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1675257038;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=NzbdF6heQ5asZimrlSzjKZo88jnGGEYXcxUXe4U6tuA=;
+        b=5EHP9kSrF6DRKqWvNURrkd/cSjoqxbjdL+iDIpDwkQ9M7YrJms3/yGmLtab5gFZsDdaAfm
+        pmt/bPP8nuv4yDAg==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id ACAC913A10;
+        Wed,  1 Feb 2023 13:10:38 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id /GAbKs5k2mM9TwAAMHmgww
+        (envelope-from <jack@suse.cz>); Wed, 01 Feb 2023 13:10:38 +0000
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+        id E3C04A06D4; Wed,  1 Feb 2023 14:10:37 +0100 (CET)
+Date:   Wed, 1 Feb 2023 14:10:37 +0100
+From:   Jan Kara <jack@suse.cz>
+To:     Yu Kuai <yukuai1@huaweicloud.com>
+Cc:     jack@suse.cz, tj@kernel.org, josef@toxicpanda.com, axboe@kernel.dk,
+        paolo.valente@linaro.org, cgroups@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yukuai3@huawei.com, yi.zhang@huawei.com, yangerkun@huawei.com
+Subject: Re: [PATCH -next] block, bfq: cleanup 'bfqg->online'
+Message-ID: <20230201131037.6frw2kpc54k4sx7a@quack3>
+References: <20230201120609.4151432-1-yukuai1@huaweicloud.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CACRpkdZ-r_toj3FWuxffSzmO=cDq2Og79R2t48-oAoCE0bT1sw@mail.gmail.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20230201120609.4151432-1-yukuai1@huaweicloud.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Feb 01, 2023 at 09:18:59AM +0100, Linus Walleij wrote:
-> The Kconfig change is mainly about making it available for use,
-> for systems with MMC/SD-card drivers.
+On Wed 01-02-23 20:06:09, Yu Kuai wrote:
+> From: Yu Kuai <yukuai3@huawei.com>
+> 
+> After commit dfd6200a0954 ("blk-cgroup: support to track if policy is
+> online"), there is no need to do this again in bfq.
+> 
+> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
 
-But that's really not the job of Kconfig.  If you want an I/O schedule
-enable it.  I thas absolutely no technical connection to the specific
-block driver used.
+So I agree this is nice to do but it isn't so simple. BFQ relies on the
+fact that 'online' is cleared under bfqd->lock so we cannot associate bio
+in bfq_bio_bfqg() with a bfqg that has already its bfq_pd_offline()
+function run.
+
+Maybe if you set 'online' to false before calling ->pd_offline() things
+would work fine for BFQ.
+
+								Honza
+> ---
+>  block/bfq-cgroup.c  | 4 +---
+>  block/bfq-iosched.h | 2 --
+>  2 files changed, 1 insertion(+), 5 deletions(-)
+> 
+> diff --git a/block/bfq-cgroup.c b/block/bfq-cgroup.c
+> index b42956ab5550..a35136dae713 100644
+> --- a/block/bfq-cgroup.c
+> +++ b/block/bfq-cgroup.c
+> @@ -551,7 +551,6 @@ static void bfq_pd_init(struct blkg_policy_data *pd)
+>  	bfqg->bfqd = bfqd;
+>  	bfqg->active_entities = 0;
+>  	bfqg->num_queues_with_pending_reqs = 0;
+> -	bfqg->online = true;
+>  	bfqg->rq_pos_tree = RB_ROOT;
+>  }
+>  
+> @@ -614,7 +613,7 @@ struct bfq_group *bfq_bio_bfqg(struct bfq_data *bfqd, struct bio *bio)
+>  			continue;
+>  		}
+>  		bfqg = blkg_to_bfqg(blkg);
+> -		if (bfqg->online) {
+> +		if (bfqg->pd.online) {
+>  			bio_associate_blkg_from_css(bio, &blkg->blkcg->css);
+>  			return bfqg;
+>  		}
+> @@ -985,7 +984,6 @@ static void bfq_pd_offline(struct blkg_policy_data *pd)
+>  
+>  put_async_queues:
+>  	bfq_put_async_queues(bfqd, bfqg);
+> -	bfqg->online = false;
+>  
+>  	spin_unlock_irqrestore(&bfqd->lock, flags);
+>  	/*
+> diff --git a/block/bfq-iosched.h b/block/bfq-iosched.h
+> index 75cc6a324267..69aaee52285a 100644
+> --- a/block/bfq-iosched.h
+> +++ b/block/bfq-iosched.h
+> @@ -1009,8 +1009,6 @@ struct bfq_group {
+>  
+>  	/* reference counter (see comments in bfq_bic_update_cgroup) */
+>  	refcount_t ref;
+> -	/* Is bfq_group still online? */
+> -	bool online;
+>  
+>  	struct bfq_entity entity;
+>  	struct bfq_sched_data sched_data;
+> -- 
+> 2.31.1
+> 
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
