@@ -2,116 +2,147 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C36EC636D3
-	for <linux-block@archiver.kernel.org>; Wed,  1 Feb 2023 23:50:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AFB50C636D3
+	for <linux-block@archiver.kernel.org>; Wed,  1 Feb 2023 23:50:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230208AbjBAXuf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 1 Feb 2023 18:50:35 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32960 "EHLO
+        id S229991AbjBAXuo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 1 Feb 2023 18:50:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33230 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229630AbjBAXue (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 1 Feb 2023 18:50:34 -0500
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 13B3566019;
-        Wed,  1 Feb 2023 15:50:32 -0800 (PST)
-Received: by linux.microsoft.com (Postfix, from userid 1052)
-        id BDF7320B74F7; Wed,  1 Feb 2023 15:50:31 -0800 (PST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com BDF7320B74F7
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-        s=default; t=1675295431;
-        bh=6yV0Cqoz9tn6IGL+ncMwaFz1B8gSu5804ZHGEFQr3s8=;
+        with ESMTP id S231330AbjBAXun (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 1 Feb 2023 18:50:43 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2FAF668129;
+        Wed,  1 Feb 2023 15:50:41 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id C686A619B0;
+        Wed,  1 Feb 2023 23:50:40 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E61FDC433EF;
+        Wed,  1 Feb 2023 23:50:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1675295440;
+        bh=LmczEOBgk7OncV5TDDBkm5FFb4gbq8qK7GD107BbFtQ=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=S+HHLvneBOs983jxPXwKxG8Ph2gbl7utcF2Ufz7EqEkyzRxi0uNZ2Uhi2TPlunsH7
-         1ieS+micucycavE6sDwdVEvun7q+gYVslSwV+HeWCv03Dt8ExY773zBQ3H5YxsIWJw
-         7P7Hi30gEWl27nR9L6yS+TK4iPeuqcoOsLLO0oLU=
-Date:   Wed, 1 Feb 2023 15:50:31 -0800
-From:   Fan Wu <wufan@linux.microsoft.com>
-To:     Roberto Sassu <roberto.sassu@huaweicloud.com>
-Cc:     corbet@lwn.net, zohar@linux.ibm.com, jmorris@namei.org,
-        serge@hallyn.com, tytso@mit.edu, ebiggers@kernel.org,
-        axboe@kernel.dk, agk@redhat.com, snitzer@kernel.org,
-        eparis@redhat.com, paul@paul-moore.com, linux-doc@vger.kernel.org,
-        linux-integrity@vger.kernel.org,
-        linux-security-module@vger.kernel.org,
-        linux-fscrypt@vger.kernel.org, linux-block@vger.kernel.org,
-        dm-devel@redhat.com, linux-audit@redhat.com,
-        roberto.sassu@huawei.com, linux-kernel@vger.kernel.org,
-        Deven Bowers <deven.desai@linux.microsoft.com>
-Subject: Re: [RFC PATCH v9 13/16] ipe: enable support for fs-verity as a
- trust provider
-Message-ID: <20230201235031.GC9075@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
-References: <1675119451-23180-1-git-send-email-wufan@linux.microsoft.com>
- <1675119451-23180-14-git-send-email-wufan@linux.microsoft.com>
- <d62907da62b5e0b25c9d7bd4b3119a3d1827bd29.camel@huaweicloud.com>
+        b=fqxHU18ByfQAlONUAHa1XbooOD5Z8xb3KYpuvLh7UGYcX1HTUEeMKKzzPoBL0gJH6
+         CIzkAGKw9Li3Gt9Jo7kr2g5aJZlHTvHrZ+MfufUSXt3gEEnfhfb/tw51cMtxMK1P2g
+         WWde83ohA1DY7rbUKc/GfK9hpv+EAZwA1mLf0oxELRNtKrfsTIa6sqy/27yKRXWw52
+         uhrGFxjAPTcL2rV9cltb9NyTPfKzik+VmtHihRBoOZZTQN3+Tb7Nc727jok+zN5aoA
+         7nG+9Wl6flTUlLv/SACCC38mCTElmt+86YeEQU4Xl6sn+/GJYgPuxVXIZuYBbxPFIb
+         GQoSsHpMM5Hug==
+Date:   Wed, 1 Feb 2023 15:50:38 -0800
+From:   Luis Chamberlain <mcgrof@kernel.org>
+To:     Bart Van Assche <bvanassche@acm.org>,
+        Pankaj Raghav <p.raghav@samsung.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        linux-scsi@vger.kernel.org, Jaegeuk Kim <jaegeuk@kernel.org>,
+        Avri Altman <avri.altman@wdc.com>,
+        Adrian Hunter <adrian.hunter@intel.com>,
+        Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>,
+        Keith Busch <kbusch@kernel.org>
+Subject: Re: [PATCH v4 2/7] block: Support configuring limits below the page
+ size
+Message-ID: <20230201235038.nnayavxpadq5yj34@garbanzo>
+References: <20230130212656.876311-1-bvanassche@acm.org>
+ <20230130212656.876311-3-bvanassche@acm.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <d62907da62b5e0b25c9d7bd4b3119a3d1827bd29.camel@huaweicloud.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+In-Reply-To: <20230130212656.876311-3-bvanassche@acm.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jan 31, 2023 at 03:00:08PM +0100, Roberto Sassu wrote:
-> On Mon, 2023-01-30 at 14:57 -0800, Fan Wu wrote:
-> > +/**
-> > + * evaluate_fsv_sig_false - Analyze @ctx against a fsv sig false property.
-> > + * @ctx: Supplies a pointer to the context being evaluated.
-> > + * @p: Supplies a pointer to the property being evaluated.
-> > + *
-> > + * Return:
-> > + * * true	- The current @ctx match the @p
-> > + * * false	- The current @ctx doesn't match the @p
-> > + */
-> > +static bool evaluate_fsv_sig_false(const struct ipe_eval_ctx *const ctx,
-> > +				   struct ipe_prop *p)
-> > +{
-> > +	return !ctx->ino ||
-> > +	       !IS_VERITY(ctx->ino) ||
-> > +	       !ctx->ipe_inode ||
-> > +	       !ctx->ipe_inode->fs_verity_signed;
-> > +}
-> > +
-> > +/**
-> > + * evaluate_fsv_sig_true - Analyze @ctx against a fsv sig true property.
-> > + * @ctx: Supplies a pointer to the context being evaluated.
-> > + * @p: Supplies a pointer to the property being evaluated.
-> > + *
-> > + * Return:
-> > + * * true - The current @ctx match the @p
-> > + * * false - The current @ctx doesn't match the @p
-> > + */
-> > +static bool evaluate_fsv_sig_true(const struct ipe_eval_ctx *const ctx,
-> > +				  struct ipe_prop *p)
-> > +{
-> > +	return ctx->ino &&
-> > +	       IS_VERITY(ctx->ino) &&
-> > +	       ctx->ipe_inode &&
-> > +	       ctx->ipe_inode->fs_verity_signed;
-> > +}
+On Mon, Jan 30, 2023 at 01:26:51PM -0800, Bart Van Assche wrote:
+> Allow block drivers to configure the following:
+> * Maximum number of hardware sectors values smaller than
+>   PAGE_SIZE >> SECTOR_SHIFT. With PAGE_SIZE = 4096 this means that values
+>   below 8 are supported.
+> * A maximum segment size below the page size. This is most useful
+>   for page sizes above 4096 bytes.
 > 
-> Isn't better to just define one function and prepend a ! in
-> evaluate_property()?
-Yes that's a better way to do it, I will take this idea.
+> The blk_sub_page_segments static branch will be used in later patches to
+> prevent that performance of block drivers that support segments >=
+> PAGE_SIZE and max_hw_sectors >= PAGE_SIZE >> SECTOR_SHIFT would be affected.
 
-> 
-> Not sure about the usefulness of the fsverity_signature= property as it
-> is. I would at minimum allow to specify which keyring signatures are
-> verified against, and ensure that the keyring has a restriction.
-> 
-> And maybe I would call fsverity_verify_signature() directly, after
-> extending it to pass the desired keyring.
-> 
-Thanks for the suggestion.
-For the initial version we only have the fsverity_signature property
-to enable the policy can make decision based on the existence of the
-signature. In the future we plan to add more properties to leverage
-the remaining signature information so we can have the restrictions
-you mentioned.
+This commit log seems to not make it clear if there is a functional
+change or not.
 
--Fan
+> @@ -100,6 +106,55 @@ void blk_queue_bounce_limit(struct request_queue *q, enum blk_bounce bounce)
+>  }
+>  EXPORT_SYMBOL(blk_queue_bounce_limit);
+>  
+> +/* For debugfs. */
+> +int blk_sub_page_limit_queues_get(void *data, u64 *val)
+> +{
+> +	*val = READ_ONCE(blk_nr_sub_page_limit_queues);
+> +
+> +	return 0;
+> +}
+> +
+> +/**
+> + * blk_enable_sub_page_limits - enable support for max_segment_size values smaller than PAGE_SIZE and for max_hw_sectors values below PAGE_SIZE >> SECTOR_SHIFT
 
-> I would also split this patch in two, one for fsverity_digest= and one
-> for fsverity_signature=.
-> 
-> Roberto
+That's a really long line for kdoc, can't we just trim it?
+
+And why not update the docs to reflect the change?
+
+> @@ -122,12 +177,17 @@ EXPORT_SYMBOL(blk_queue_bounce_limit);
+>  void blk_queue_max_hw_sectors(struct request_queue *q, unsigned int max_hw_sectors)
+>  {
+>  	struct queue_limits *limits = &q->limits;
+> +	unsigned int min_max_hw_sectors = PAGE_SIZE >> SECTOR_SHIFT;
+>  	unsigned int max_sectors;
+>  
+> -	if ((max_hw_sectors << 9) < PAGE_SIZE) {
+> -		max_hw_sectors = 1 << (PAGE_SHIFT - 9);
+> -		printk(KERN_INFO "%s: set to minimum %d\n",
+> -		       __func__, max_hw_sectors);
+> +	if (max_hw_sectors < min_max_hw_sectors) {
+> +		blk_enable_sub_page_limits(limits);
+> +		min_max_hw_sectors = 1;
+> +	}
+
+Up to this part this a non-functional update, and so why not a
+separate patch to clarify that.
+
+> +
+> +	if (max_hw_sectors < min_max_hw_sectors) {
+> +		max_hw_sectors = min_max_hw_sectors;
+> +		pr_info("%s: set to minimum %u\n", __func__, max_hw_sectors);
+
+But if I understand correctly here we're now changing
+max_hw_sectors from 1 to whatever the driver set on
+blk_queue_max_hw_sectors() if its smaller than PAGE_SIZE.
+
+To determine if this is a functional change it begs the
+question as to how many block drivers have a max hw sector
+smaller than the equivalent PAGE_SIZE and wonder if that
+could regress.
+
+>  	}
+>  
+>  	max_hw_sectors = round_down(max_hw_sectors,
+> @@ -282,10 +342,16 @@ EXPORT_SYMBOL_GPL(blk_queue_max_discard_segments);
+>   **/
+>  void blk_queue_max_segment_size(struct request_queue *q, unsigned int max_size)
+>  {
+> -	if (max_size < PAGE_SIZE) {
+> -		max_size = PAGE_SIZE;
+> -		printk(KERN_INFO "%s: set to minimum %d\n",
+> -		       __func__, max_size);
+> +	unsigned int min_max_segment_size = PAGE_SIZE;
+> +
+> +	if (max_size < min_max_segment_size) {
+> +		blk_enable_sub_page_limits(&q->limits);
+> +		min_max_segment_size = SECTOR_SIZE;
+> +	}
+> +
+> +	if (max_size < min_max_segment_size) {
+> +		max_size = min_max_segment_size;
+> +		pr_info("%s: set to minimum %u\n", __func__, max_size);
+
+And similar thing here.
+
+  Luis
