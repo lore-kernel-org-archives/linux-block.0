@@ -2,95 +2,103 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B1EFC05027
-	for <linux-block@archiver.kernel.org>; Thu,  2 Feb 2023 18:03:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 90DD8C61DA4
+	for <linux-block@archiver.kernel.org>; Thu,  2 Feb 2023 18:04:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232252AbjBBSDO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 2 Feb 2023 13:03:14 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45748 "EHLO
+        id S231679AbjBBSER (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 2 Feb 2023 13:04:17 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46642 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231679AbjBBSDN (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Feb 2023 13:03:13 -0500
+        with ESMTP id S229711AbjBBSEP (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Feb 2023 13:04:15 -0500
 Received: from mail-il1-x12d.google.com (mail-il1-x12d.google.com [IPv6:2607:f8b0:4864:20::12d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5997976419
-        for <linux-block@vger.kernel.org>; Thu,  2 Feb 2023 10:02:52 -0800 (PST)
-Received: by mail-il1-x12d.google.com with SMTP id i17so1076965ils.11
-        for <linux-block@vger.kernel.org>; Thu, 02 Feb 2023 10:02:52 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8040A1D920
+        for <linux-block@vger.kernel.org>; Thu,  2 Feb 2023 10:04:07 -0800 (PST)
+Received: by mail-il1-x12d.google.com with SMTP id u8so1072742ilq.13
+        for <linux-block@vger.kernel.org>; Thu, 02 Feb 2023 10:04:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20210112.gappssmtp.com; s=20210112;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=61Py2E5UozwXVn3n6QEUGPWLXlAH1Uh9+fZqJDGOGlY=;
-        b=7SNY7ay4YrvT8Is9sIQlCa+8sXeYX2dSBODoUv+ho7Z4IfxsR7rRarm9bv/vTFMxDk
-         h9FcaF1dxOhFQhR0gvnCF98yPkw5abfHzuDUW8n2QS7JxZsaUy8GgQGz2vG9c/k+t/7E
-         VmFBMI2nALH2Hdt+xmde5E+2i65mZ5Qoxf+7MZr9Q67+rxedlKOlovhzjiP1jM+dWsc5
-         sWGnqPfvKsn37BLReQEqAXuFEpUs6nuI56XGytGICVsIK8FOZfTy59isrRIjV1lEpEXz
-         NyIgoXHdx7p+jQX+qLzRHku4bDz8Oy+tkT1miSDXrhQMYbfH5BkupzmGvRYSo3aZC5qc
-         cZnw==
+        bh=z7mJPXdAyQaNMenfmKVPe1FNvGsSeoHs0bYtrg1AgZQ=;
+        b=FehBfZo++g5qKEFE///0kNP14j2r+akWBT6YHaxhdz8T6i311HvoXAa2keCg1sqSrl
+         S/jig4aI1QTvXkHXAG7LMzr/XRbbu9a90wCfuDq/Pi1nuPNG3lTPn+XQ4GiLRhv9YUXR
+         8nZHGZwpQnllXb6WT6RbTjkUrxe/irjrNXGZcbXmfcSvReAmX8204wMS2EiLOXIxYqqR
+         bLe9GDlKqiuMyU2nY5HZXIBIOMBI0OVICz1D1dZqUjr4g8RuAKZU5PbBBublZpGkMCwd
+         1vJqO+JwinLzY2KvKYXJna8TFromRW32wIVdiwHxibxTc+yA72OwtUnelAPKbNvdu35W
+         apwQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=61Py2E5UozwXVn3n6QEUGPWLXlAH1Uh9+fZqJDGOGlY=;
-        b=MtwBIm8eas1OMl4p5Td3848v+TChBSRQ4EOVimG+7g21Mw+2OTd38fWfFrPttjbKLt
-         KQeXG0mm2ev/pgmf7mXNOZ+qtqMxJNRia63w8ZIwOp1n1Du/LjL2FS3/hoBfHvsSq2bK
-         ihK/WBo9gixwrxRRVz+m36DTL3YMYxXTMh/7BKR8qaVhNFHQ//TI9ttxrvX2a3tk7ccO
-         ev4nvLReVC544ulnbn7MQqJvUR2Qk/7ZgGEfL/jy9GdoNdR0MmxujuS+p5oAFbhbUI0B
-         uG/pfyPs4lh1biaqhDNsvgdl6lMTRpplhq7qo5GoS2YCSsnCUu2uIJE+jHVd7nmpDhVV
-         aBjw==
-X-Gm-Message-State: AO0yUKWW1TDwNq76orPgwuN+PRgzdTE4iqKodGun1xa4Px/fKwVqpYjL
-        vlwBFKCIEbHRAg/x6aAAfSd3PPeq4WBM6vYO
-X-Google-Smtp-Source: AK7set/yfIhv/Oi6OxFfVBHz2pDNxC9HPzPif0jzoxB8LofSxgmdNCc/mer0rLYxwbswollEKKAC/Q==
-X-Received: by 2002:a05:6e02:152:b0:310:cc70:a152 with SMTP id j18-20020a056e02015200b00310cc70a152mr4740179ilr.2.1675360971573;
-        Thu, 02 Feb 2023 10:02:51 -0800 (PST)
+        bh=z7mJPXdAyQaNMenfmKVPe1FNvGsSeoHs0bYtrg1AgZQ=;
+        b=eT8KWsIVQIpH96nvbusI27ovk25PIvQVf1fZveNE0XYUieoL1fl23Wrmymk6g9O72o
+         O9bvATIWfn9lQs6kXoyhrsbW3Rn82L2QzK4WksIGCgLIpAlynSffSux+4rK9o7fKn/fq
+         d7FQtHgiqEESJIfd0bUw7amnhiuF4dXE4OBB2qiZAZezgm/huC2ooQ/kLMIxeJSM+VRq
+         RuLYYEyoOAguShBktuT2bCpc7sHt9LcfrXL36rj54fmB+0rPkyH4uNpH4sAhP7qW4o7L
+         wCxE/XzEYH6ASba5dQmhZAIgnEtrHUicOfbzdOiBUNxo91ZaPPR/7oIMCPDhJvUYpdEf
+         VBUg==
+X-Gm-Message-State: AO0yUKWj5TD9fA37s9Cu2H/nMLNoYN3W3SB6+HYzvBJugeK0pAZ2E5WZ
+        WmIi9DR38q3/+jL61q0RfQw/ew==
+X-Google-Smtp-Source: AK7set9KkDQIRAlOPw79OCZq9pMNaSE3B1kSx9yJIeCefckSXSJYplWQ5ZJvYh3SpPmp9udsI/GS2g==
+X-Received: by 2002:a92:d150:0:b0:311:1949:dd99 with SMTP id t16-20020a92d150000000b003111949dd99mr4130561ilg.3.1675361046771;
+        Thu, 02 Feb 2023 10:04:06 -0800 (PST)
 Received: from [192.168.1.94] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id q8-20020a056e02106800b00310a599fd43sm91722ilj.46.2023.02.02.10.02.50
+        by smtp.gmail.com with ESMTPSA id g14-20020a05663811ce00b003b77432cc37sm111272jas.106.2023.02.02.10.04.05
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 02 Feb 2023 10:02:51 -0800 (PST)
-Message-ID: <7607afd6-b26e-a2be-81c2-2d6ee20cc555@kernel.dk>
-Date:   Thu, 2 Feb 2023 11:02:50 -0700
+        Thu, 02 Feb 2023 10:04:06 -0800 (PST)
+Message-ID: <98014ebd-7e57-0fc3-9ab0-49f4b727150d@kernel.dk>
+Date:   Thu, 2 Feb 2023 11:04:05 -0700
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
  Thunderbird/102.7.1
-Subject: Re: [GIT PULL] nvme fixes for Linux 6.2
+Subject: Re: [PATCH] mmc: core: Imply IOSCHED_BFQ
 Content-Language: en-US
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
-References: <Y9vVXvMeTgA4bC2R@infradead.org>
+To:     Ulf Hansson <ulf.hansson@linaro.org>,
+        Linus Walleij <linus.walleij@linaro.org>
+Cc:     linux-mmc@vger.kernel.org, linux-block@vger.kernel.org,
+        Paolo Valente <paolo.valente@linaro.org>
+References: <20230131084742.1038135-1-linus.walleij@linaro.org>
+ <CAPDyKFrLetcCcFueJzZeWa-SVbsJcspwZ+nXWUDCGRXawxNhdg@mail.gmail.com>
 From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <Y9vVXvMeTgA4bC2R@infradead.org>
+In-Reply-To: <CAPDyKFrLetcCcFueJzZeWa-SVbsJcspwZ+nXWUDCGRXawxNhdg@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2/2/23 8:23 AM, Christoph Hellwig wrote:
-> The following changes since commit 81ea42b9c3d61ea34d82d900ed93f4b4851f13b0:
+On 2/2/23 8:22 AM, Ulf Hansson wrote:
+> On Tue, 31 Jan 2023 at 09:47, Linus Walleij <linus.walleij@linaro.org> wrote:
+>>
+>> If we enable the MMC/SD block layer, use Kconfig to imply the BFQ
+>> I/O scheduler.
+>>
+>> As all MMC/SD devices are single-queue, this is the scheduler that
+>> users want so let's be helpful and make sure it gets
+>> default-selected into a manual kernel configuration. It will still
+>> need to be enabled at runtime (usually with udev scripts).
+>>
+>> Cc: linux-block@vger.kernel.org
+>> Cc: Paolo Valente <paolo.valente@linaro.org>
+>> Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
 > 
->   block: Fix the blk_mq_destroy_queue() documentation (2023-01-31 11:46:15 -0700)
+> I have taken the various arguments (for and against), but I think
+> $subject patch makes sense to me. In the end, this is about moving
+> towards a more sensible default kernel configuration and the "imply"
+> approach works fine for me.
 > 
-> are available in the Git repository at:
+> More importantly, $subject patch doesn't really hurt anything, as it's
+> still perfectly fine to build MMC without I/O schedulers and BFQ, for
+> those configurations that need this.
 > 
->   git://git.infradead.org/nvme.git tags/nvme-6.2-2023-02-02
-> 
-> for you to fetch changes up to bd97a59da6a866e3dee5d2a2d582ec71dbbc84cd:
-> 
->   nvme-auth: use workqueue dedicated to authentication (2023-02-01 16:11:20 +0100)
-> 
-> ----------------------------------------------------------------
-> nvme fixes for Linux 6.2
-> 
->  - fix a missing queue put in nvmet_fc_ls_create_association (Amit Engel)
->  - clear queue pointers on tag_set initialization failure
->    (Maurizio Lombardi)
->  - use workqueue dedicated to authentication (Shin'ichiro Kawasaki)
+> That said, applied for next, thanks!
 
-Pulled, thanks.
+It doesn't make sense, for all the reasons that Christoph applied.
+But you guys seemed to already have your mind made up and ignoring
+valid feedback, so...
 
 -- 
 Jens Axboe
