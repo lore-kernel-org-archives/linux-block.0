@@ -2,109 +2,79 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E01FCC05027
-	for <linux-block@archiver.kernel.org>; Thu,  2 Feb 2023 15:23:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F6CEC61DA4
+	for <linux-block@archiver.kernel.org>; Thu,  2 Feb 2023 15:23:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232533AbjBBPXI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 2 Feb 2023 10:23:08 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39358 "EHLO
+        id S232530AbjBBPXf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 2 Feb 2023 10:23:35 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40686 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232808AbjBBPW6 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Feb 2023 10:22:58 -0500
-Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0AD8443452
-        for <linux-block@vger.kernel.org>; Thu,  2 Feb 2023 07:22:56 -0800 (PST)
-Received: by mail-pf1-x434.google.com with SMTP id g9so1414899pfk.13
-        for <linux-block@vger.kernel.org>; Thu, 02 Feb 2023 07:22:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=WGfX55LDKwIhxgBD6Pv/9qAlZ3kdQLWrx019H3iLqUE=;
-        b=ONA1iCVjl6ZCooezOTJ98NRlsioy+aiVMj5YJWlPqGzjMDIi5qv7wZqy24ONbuk09z
-         Iw+5Jj0L+rY2oGlYQV0kyJgG7gvGo84Dk2U7A02eGT9NEPH0xBjjExQqyO2EkyCU53DP
-         GBOqWdZxe7/lCbaIoyd69etDe3Yg7/DGIFEpyKkouCxc+oJlZPwOrDFHWjrue3zwt0TU
-         1Cz9mHeITH4l5XvYH+7gkPswY7/DrvBwP3DJylQcizgRTv8bsnCFwSVBUj93N+ixaAbd
-         oM3g/AvNvLNUClbsuqpHb2hP4Mo3UMAq/idqYCBafXXzQQQoisPwYj9bPUGj2udz6OBP
-         2kEA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=WGfX55LDKwIhxgBD6Pv/9qAlZ3kdQLWrx019H3iLqUE=;
-        b=CUZmhn1VB01aJsI9chI8JCoGxQscvBtJoTmTOUXb5SIv6hkpEvbwh0rknKt3KmMdOx
-         ZakWUK9kCT8aTBuifzAbrwcVIXGXXP6XJVlPMYcBNijqhOAOOOb/4Ci4sCtz9R13vNUi
-         nP4n5B3sjIm7DNHUiYIUrtBzVFI8t9JuBimMoeLDUV9qNkKKcyPe2UOD+lIU2DJEk3Aw
-         meRe46p6TVxe0t3CNg/jQa0YHOiiMAKFCrw+zmIcdG44hTrWrjrXWzz7Y81mSY6/hyS6
-         Tu7SMEV9o9grD8OhXy8kgbNOUO5gyAedaWlH8cKcJoV0nE745X4k91kNJOl2DdR22Pr/
-         0G4A==
-X-Gm-Message-State: AO0yUKVraKiD/t7P+Sx717EIvxbPIfDtkiK4zIXAKoN5VrzgvLsu5Reu
-        zZY1Nq80pwdZbhDYADWoqIIUoU5qW7gByo9agvGO7A==
-X-Google-Smtp-Source: AK7set9VTZrVkIkP+oXz1cIB38TwGV2QakBKlVcyQMqSQScI/aUsUDrbvgbFafGagD4V5IxkNsy0q5FuD/dlWZBacRA=
-X-Received: by 2002:aa7:96ab:0:b0:592:5ac8:156f with SMTP id
- g11-20020aa796ab000000b005925ac8156fmr1599752pfk.39.1675351375537; Thu, 02
- Feb 2023 07:22:55 -0800 (PST)
+        with ESMTP id S232014AbjBBPXX (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Feb 2023 10:23:23 -0500
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3647D16303
+        for <linux-block@vger.kernel.org>; Thu,  2 Feb 2023 07:23:18 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Content-Type:MIME-Version:Message-ID:
+        Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+        Content-Description:In-Reply-To:References;
+        bh=xhTmDKWbL2Q+ADomHwmZKFLODShjxozhC5a0dwbcc4k=; b=gfG5LPW7ErRL1mDW8RGmRuRXe8
+        j0ruYEl+cQBBot0usXF5NtKl6CIBeYfJjx/aB8Vji8En8Wdu0BLgTKL8YsxQaiylJ9aOkwkK31VCZ
+        tcFsBSAX6WyJgra8T9Hkf+SwFdWlJyHZNx7LDe/4fxsoUXoHkENUZ5HFMJGkJwzUxeKO2UArwqfmi
+        Ga7CJexX1dw0/m6dhdLWe/o6bXgBzVZCeKQ77+TO0zuDkS+yxuSi1Dev5tMYOtWDH8LK4aIhbVf35
+        2ThTs49dU+WQL9ZWthjxZOYTIOOy2QITAYcHqRwVHJUY0tCGqOgDzIFl773KGzLmvs7VMu28BBUBO
+        KiLgAnmw==;
+Received: from [2001:4bb8:19a:272a:3196:5eba:213b:e6aa] (helo=localhost)
+        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1pNbQe-00GK9B-QC; Thu, 02 Feb 2023 15:23:13 +0000
+Date:   Thu, 2 Feb 2023 16:23:10 +0100
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
+Subject: [GIT PULL] nvme fixes for Linux 6.2
+Message-ID: <Y9vVXvMeTgA4bC2R@infradead.org>
 MIME-Version: 1.0
-References: <20230131085220.1038241-1-linus.walleij@linaro.org>
-In-Reply-To: <20230131085220.1038241-1-linus.walleij@linaro.org>
-From:   Ulf Hansson <ulf.hansson@linaro.org>
-Date:   Thu, 2 Feb 2023 16:22:19 +0100
-Message-ID: <CAPDyKFqCMZLOte6Fd6oJgTMXaMYMTiRsZKSJu-YJE+nWYTpQ6g@mail.gmail.com>
-Subject: Re: [PATCH] memstick: core: Imply IOSCHED_BFQ
-To:     Linus Walleij <linus.walleij@linaro.org>
-Cc:     linux-mmc@vger.kernel.org, linux-block@vger.kernel.org,
-        Paolo Valente <paolo.valente@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, 31 Jan 2023 at 09:52, Linus Walleij <linus.walleij@linaro.org> wrote:
->
-> If we enable the memory stick block layer, use Kconfig to imply
-> the BFQ I/O scheduler.
->
-> As all memstick devices are single-queue, this is the scheduler that
-> users want so let's be helpful and make sure it gets
-> default-selected into a manual kernel configuration. It will still
-> need to be enabled at runtime (usually with udev scripts).
->
-> Cc: linux-block@vger.kernel.org
-> Cc: Paolo Valente <paolo.valente@linaro.org>
-> Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
+The following changes since commit 81ea42b9c3d61ea34d82d900ed93f4b4851f13b0:
 
-For the similar reasons to why I applied the MMC patch, applied for
-next, thanks!
+  block: Fix the blk_mq_destroy_queue() documentation (2023-01-31 11:46:15 -0700)
 
-Kind regards
-Uffe
+are available in the Git repository at:
 
+  git://git.infradead.org/nvme.git tags/nvme-6.2-2023-02-02
 
-> ---
->  drivers/memstick/core/Kconfig | 2 ++
->  1 file changed, 2 insertions(+)
->
-> diff --git a/drivers/memstick/core/Kconfig b/drivers/memstick/core/Kconfig
-> index 08192fd70eb4..50fa0711da9d 100644
-> --- a/drivers/memstick/core/Kconfig
-> +++ b/drivers/memstick/core/Kconfig
-> @@ -20,6 +20,7 @@ config MEMSTICK_UNSAFE_RESUME
->  config MSPRO_BLOCK
->         tristate "MemoryStick Pro block device driver"
->         depends on BLOCK
-> +       imply IOSCHED_BFQ
->         help
->           Say Y here to enable the MemoryStick Pro block device driver
->           support. This provides a block device driver, which you can use
-> @@ -29,6 +30,7 @@ config MSPRO_BLOCK
->  config MS_BLOCK
->         tristate "MemoryStick Standard device driver"
->         depends on BLOCK
-> +       imply IOSCHED_BFQ
->         help
->           Say Y here to enable the MemoryStick Standard device driver
->           support. This provides a block device driver, which you can use
-> --
-> 2.34.1
->
+for you to fetch changes up to bd97a59da6a866e3dee5d2a2d582ec71dbbc84cd:
+
+  nvme-auth: use workqueue dedicated to authentication (2023-02-01 16:11:20 +0100)
+
+----------------------------------------------------------------
+nvme fixes for Linux 6.2
+
+ - fix a missing queue put in nvmet_fc_ls_create_association (Amit Engel)
+ - clear queue pointers on tag_set initialization failure
+   (Maurizio Lombardi)
+ - use workqueue dedicated to authentication (Shin'ichiro Kawasaki)
+
+----------------------------------------------------------------
+Amit Engel (1):
+      nvme-fc: fix a missing queue put in nvmet_fc_ls_create_association
+
+Maurizio Lombardi (2):
+      nvme: clear the request_queue pointers on failure in nvme_alloc_admin_tag_set
+      nvme: clear the request_queue pointers on failure in nvme_alloc_io_tag_set
+
+Shin'ichiro Kawasaki (1):
+      nvme-auth: use workqueue dedicated to authentication
+
+ drivers/nvme/host/auth.c | 14 ++++++++++++--
+ drivers/nvme/host/core.c |  5 ++++-
+ drivers/nvme/target/fc.c |  4 +++-
+ 3 files changed, 19 insertions(+), 4 deletions(-)
