@@ -2,138 +2,158 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1AA18C63797
-	for <linux-block@archiver.kernel.org>; Thu,  2 Feb 2023 09:52:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21297C61DA4
+	for <linux-block@archiver.kernel.org>; Thu,  2 Feb 2023 11:07:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229935AbjBBJwt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 2 Feb 2023 04:52:49 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33912 "EHLO
+        id S230048AbjBBLHN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 2 Feb 2023 06:07:13 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36330 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229595AbjBBJws (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Feb 2023 04:52:48 -0500
-Received: from frasgout12.his.huawei.com (frasgout12.his.huawei.com [14.137.139.154])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F23AE6;
-        Thu,  2 Feb 2023 01:52:46 -0800 (PST)
-Received: from mail02.huawei.com (unknown [172.18.147.228])
-        by frasgout12.his.huawei.com (SkyGuard) with ESMTP id 4P6v542HL0z9xGYW;
-        Thu,  2 Feb 2023 17:44:24 +0800 (CST)
-Received: from roberto-ThinkStation-P620 (unknown [10.204.63.22])
-        by APP1 (Coremail) with SMTP id LxC2BwDXVwPJh9tj+jnpAA--.15060S2;
-        Thu, 02 Feb 2023 10:52:21 +0100 (CET)
-Message-ID: <6ddfa7344d01b21a93d3909af9dac0ae5e2a79ee.camel@huaweicloud.com>
-Subject: Re: [RFC PATCH v9 13/16] ipe: enable support for fs-verity as a
- trust provider
-From:   Roberto Sassu <roberto.sassu@huaweicloud.com>
-To:     Fan Wu <wufan@linux.microsoft.com>
-Cc:     corbet@lwn.net, zohar@linux.ibm.com, jmorris@namei.org,
-        serge@hallyn.com, tytso@mit.edu, ebiggers@kernel.org,
-        axboe@kernel.dk, agk@redhat.com, snitzer@kernel.org,
-        eparis@redhat.com, paul@paul-moore.com, linux-doc@vger.kernel.org,
-        linux-integrity@vger.kernel.org,
-        linux-security-module@vger.kernel.org,
-        linux-fscrypt@vger.kernel.org, linux-block@vger.kernel.org,
-        dm-devel@redhat.com, linux-audit@redhat.com,
-        roberto.sassu@huawei.com, linux-kernel@vger.kernel.org,
-        Deven Bowers <deven.desai@linux.microsoft.com>
-Date:   Thu, 02 Feb 2023 10:51:56 +0100
-In-Reply-To: <20230201235031.GC9075@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
-References: <1675119451-23180-1-git-send-email-wufan@linux.microsoft.com>
-         <1675119451-23180-14-git-send-email-wufan@linux.microsoft.com>
-         <d62907da62b5e0b25c9d7bd4b3119a3d1827bd29.camel@huaweicloud.com>
-         <20230201235031.GC9075@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5-0ubuntu1 
+        with ESMTP id S229935AbjBBLHM (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Feb 2023 06:07:12 -0500
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4AAFF19F2F;
+        Thu,  2 Feb 2023 03:06:40 -0800 (PST)
+Received: from mail02.huawei.com (unknown [172.30.67.143])
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4P6wXx17xLz4f3kKj;
+        Thu,  2 Feb 2023 18:50:09 +0800 (CST)
+Received: from [10.174.176.117] (unknown [10.174.176.117])
+        by APP2 (Coremail) with SMTP id Syh0CgBXSOZfldtjVrZKCw--.49617S2;
+        Thu, 02 Feb 2023 18:50:11 +0800 (CST)
+Subject: Re: [PATCH] blk-ioprio: Introduce promote-to-rt policy
+To:     Bagas Sanjaya <bagasdotme@gmail.com>, linux-block@vger.kernel.org
+Cc:     Bart Van Assche <bvanassche@acm.org>, Jan Kara <jack@suse.cz>,
+        Jens Axboe <axboe@kernel.dk>, cgroups@vger.kernel.org,
+        Tejun Heo <tj@kernel.org>, Zefan Li <lizefan.x@bytedance.com>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        Jonathan Corbet <corbet@lwn.net>, linux-kernel@vger.kernel.org,
+        linux-doc@vger.kernel.org, houtao1@huawei.com
+References: <20230201045227.2203123-1-houtao@huaweicloud.com>
+ <Y9or5PkdXj/D94fR@debian.me>
+From:   Hou Tao <houtao@huaweicloud.com>
+Message-ID: <336ed542-6b73-0f69-a4ee-4119e73ddb1d@huaweicloud.com>
+Date:   Thu, 2 Feb 2023 18:50:07 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.6.0
 MIME-Version: 1.0
+In-Reply-To: <Y9or5PkdXj/D94fR@debian.me>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-X-CM-TRANSID: LxC2BwDXVwPJh9tj+jnpAA--.15060S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7ZF1Dtry3CFyxuFWkCr4fAFb_yoW5JryfpF
-        WFkF48KrZ0qF17KF10y3W8Xw1akrWxKay7urn8uwn7Was5Zr9rtr1IyFWUWFn8CFy8ZryY
-        qF42yF15Z3s8AFJanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUkjb4IE77IF4wAFF20E14v26ryj6rWUM7CY07I20VC2zVCF04k2
+Content-Language: en-US
+X-CM-TRANSID: Syh0CgBXSOZfldtjVrZKCw--.49617S2
+X-Coremail-Antispam: 1UD129KBjvJXoWxWw1fCry3XFWxGFWxKw17ZFb_yoWrGw1UpF
+        s3AFWxW3Z7Xr15Kr17Jw4qqryxt34rKw47tFsrKFy09w1DAr1DXr1UXr18WFyxArW8Xw45
+        XrZIyr1kCr1jvr7anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUvIb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
         6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-        vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Jr0_JF4l84ACjcxK6xIIjxv20xvEc7Cj
-        xVAFwI0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8JVWxJwA2z4x0Y4vEx4A2jsIEc7CjxV
-        AFwI0_Gr0_Gr1UM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40E
-        x7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x
-        0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lFIxGxcIEc7CjxVA2Y2ka0xkIwI1l42xK82IYc2Ij
-        64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x
-        8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r4a6rW5MIIYrxkI7VAKI48JMIIF0xvE
-        2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42
-        xK8VAvwI8IcIk0rVWrZr1j6s0DMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIE
-        c7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x07UZ18PUUUUU=
-X-CM-SenderInfo: purev21wro2thvvxqx5xdzvxpfor3voofrz/1tbiAQAQBF1jj4hv0wAAsQ
+        vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7Cj
+        xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
+        0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
+        6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
+        Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JM4IIrI8v6xkF7I0E8cxan2IY04v7Mxk0xIA0c2IE
+        e2xFo4CEbIxvr21l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxV
+        Aqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q
+        6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6x
+        kF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWrZr1j6s0DMIIF0xvEx4A2jsIE
+        14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf
+        9x07UWE__UUUUU=
+X-CM-SenderInfo: xkrx3t3r6k3tpzhluzxrxghudrp/
 X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, 2023-02-01 at 15:50 -0800, Fan Wu wrote:
-> On Tue, Jan 31, 2023 at 03:00:08PM +0100, Roberto Sassu wrote:
-> > On Mon, 2023-01-30 at 14:57 -0800, Fan Wu wrote:
-> > > +/**
-> > > + * evaluate_fsv_sig_false - Analyze @ctx against a fsv sig false property.
-> > > + * @ctx: Supplies a pointer to the context being evaluated.
-> > > + * @p: Supplies a pointer to the property being evaluated.
-> > > + *
-> > > + * Return:
-> > > + * * true	- The current @ctx match the @p
-> > > + * * false	- The current @ctx doesn't match the @p
-> > > + */
-> > > +static bool evaluate_fsv_sig_false(const struct ipe_eval_ctx *const ctx,
-> > > +				   struct ipe_prop *p)
-> > > +{
-> > > +	return !ctx->ino ||
-> > > +	       !IS_VERITY(ctx->ino) ||
-> > > +	       !ctx->ipe_inode ||
-> > > +	       !ctx->ipe_inode->fs_verity_signed;
-> > > +}
-> > > +
-> > > +/**
-> > > + * evaluate_fsv_sig_true - Analyze @ctx against a fsv sig true property.
-> > > + * @ctx: Supplies a pointer to the context being evaluated.
-> > > + * @p: Supplies a pointer to the property being evaluated.
-> > > + *
-> > > + * Return:
-> > > + * * true - The current @ctx match the @p
-> > > + * * false - The current @ctx doesn't match the @p
-> > > + */
-> > > +static bool evaluate_fsv_sig_true(const struct ipe_eval_ctx *const ctx,
-> > > +				  struct ipe_prop *p)
-> > > +{
-> > > +	return ctx->ino &&
-> > > +	       IS_VERITY(ctx->ino) &&
-> > > +	       ctx->ipe_inode &&
-> > > +	       ctx->ipe_inode->fs_verity_signed;
-> > > +}
-> > 
-> > Isn't better to just define one function and prepend a ! in
-> > evaluate_property()?
-> Yes that's a better way to do it, I will take this idea.
-> 
-> > Not sure about the usefulness of the fsverity_signature= property as it
-> > is. I would at minimum allow to specify which keyring signatures are
-> > verified against, and ensure that the keyring has a restriction.
-> > 
-> > And maybe I would call fsverity_verify_signature() directly, after
-> > extending it to pass the desired keyring.
-> > 
-> Thanks for the suggestion.
-> For the initial version we only have the fsverity_signature property
-> to enable the policy can make decision based on the existence of the
-> signature. In the future we plan to add more properties to leverage
-> the remaining signature information so we can have the restrictions
-> you mentioned.
+Hi,
 
-Uhm, these boolean properties feel like something is missing. In my
-opinion, one cannot accept just any signature, but should be able to
-specify the approved signers.
-
-Roberto
-
-> -Fan
-> 
-> > I would also split this patch in two, one for fsverity_digest= and one
-> > for fsverity_signature=.
-> > 
-> > Roberto
+On 2/1/2023 5:07 PM, Bagas Sanjaya wrote:
+> On Wed, Feb 01, 2023 at 12:52:27PM +0800, Hou Tao wrote:
+>>  The following numerical values are associated with the I/O priority policies:
+>>  
+>> -+-------------+---+
+>> -| no-change   | 0 |
+>> -+-------------+---+
+>> -| none-to-rt  | 1 |
+>> -+-------------+---+
+>> -| rt-to-be    | 2 |
+>> -+-------------+---+
+>> -| all-to-idle | 3 |
+>> -+-------------+---+
+>> +
+>> ++---------------+---------+-----+
+>> +| policy        | inst    | num |
+>> ++---------------+---------+-----+
+>> +| no-change     | demote  | 0   |
+>> ++---------------+---------+-----+
+>> +| none-to-rt    | demote  | 1   |
+>> ++---------------+---------+-----+
+>> +| rt-to-be      | demote  | 2   |
+>> ++---------------+---------+-----+
+>> +| idle          | demote  | 3   |
+>> ++---------------+---------+-----+
+>> +| promote-to-rt | promote | 1   |
+>> ++---------------+---------+-----+
+>>  
+> The first row should have been header row:
+>
+> ---- >8 ----
+> diff --git a/Documentation/admin-guide/cgroup-v2.rst b/Documentation/admin-guide/cgroup-v2.rst
+> index e0b9f73ef62a9e..55f9b579716564 100644
+> --- a/Documentation/admin-guide/cgroup-v2.rst
+> +++ b/Documentation/admin-guide/cgroup-v2.rst
+> @@ -2048,7 +2048,7 @@ The following numerical values are associated with the I/O priority policies:
+>  
+>  +---------------+---------+-----+
+>  | policy        | inst    | num |
+> -+---------------+---------+-----+
+> ++===============+=========+=====+
+>  | no-change     | demote  | 0   |
+>  +---------------+---------+-----+
+>  | none-to-rt    | demote  | 1   |
+>
+>> @@ -2064,9 +2074,13 @@ The numerical value that corresponds to each I/O priority class is as follows:
+>>  
+>>  The algorithm to set the I/O priority class for a request is as follows:
+>>  
+>> -- Translate the I/O priority class policy into a number.
+>> -- Change the request I/O priority class into the maximum of the I/O priority
+>> -  class policy number and the numerical I/O priority class.
+>> +-- Translate the I/O priority class policy into an instruction and a number
+>> +-- If the instruction is demotion, change the request I/O priority class
+>> +-  into the maximum of the I/O priority class policy number and the numerical
+>> +-  I/O priority class.
+>> +-- If the instruction is promotion, change the request I/O priority class
+>> +-  into the minimum of the I/O priority class policy number and the numerical
+>> +-  I/O priority class.
+>>  
+> Remove the excessive bullet list marker or the list above become paragraph
+> instead:
+>
+> ---- >8 ----
+> diff --git a/Documentation/admin-guide/cgroup-v2.rst b/Documentation/admin-guide/cgroup-v2.rst
+> index 55f9b579716564..c3f16386c47bdf 100644
+> --- a/Documentation/admin-guide/cgroup-v2.rst
+> +++ b/Documentation/admin-guide/cgroup-v2.rst
+> @@ -2074,12 +2074,12 @@ The numerical value that corresponds to each I/O priority class is as follows:
+>  
+>  The algorithm to set the I/O priority class for a request is as follows:
+>  
+> --- Translate the I/O priority class policy into an instruction and a number
+> --- If the instruction is demotion, change the request I/O priority class
+> --  into the maximum of the I/O priority class policy number and the numerical
+> --  I/O priority class.
+> --- If the instruction is promotion, change the request I/O priority class
+> --  into the minimum of the I/O priority class policy number and the numerical
+> +- Translate the I/O priority class policy into an instruction-number pair.
+> +- If the instruction is demotion, change the request I/O priority class
+> +  into the maximum of the I/O priority class policy number and the numerical
+> +  I/O priority class.
+> +- If the instruction is promotion, change the request I/O priority class
+> +  into the minimum of the I/O priority class policy number and the numerical
+>  -  I/O priority class.
+>  
+>  PID
+>
+> Thanks.
+Thanks for your comments. Will fix in v2.
+>
 
