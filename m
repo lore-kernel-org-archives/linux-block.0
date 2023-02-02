@@ -2,100 +2,99 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25583C64EC3
-	for <linux-block@archiver.kernel.org>; Thu,  2 Feb 2023 08:22:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 83362C61DA4
+	for <linux-block@archiver.kernel.org>; Thu,  2 Feb 2023 08:51:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231733AbjBBIWS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 2 Feb 2023 03:22:18 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39540 "EHLO
+        id S229609AbjBBIvF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 2 Feb 2023 03:51:05 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33274 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231665AbjBBIWR (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Feb 2023 03:22:17 -0500
-Received: from frasgout12.his.huawei.com (frasgout12.his.huawei.com [14.137.139.154])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B0DE834BB;
-        Thu,  2 Feb 2023 00:22:13 -0800 (PST)
-Received: from mail02.huawei.com (unknown [172.18.147.229])
-        by frasgout12.his.huawei.com (SkyGuard) with ESMTP id 4P6s4b6HpTz9xFrR;
-        Thu,  2 Feb 2023 16:13:51 +0800 (CST)
-Received: from roberto-ThinkStation-P620 (unknown [10.204.63.22])
-        by APP2 (Coremail) with SMTP id GxC2BwBHE1qQcttjhtrmAA--.14473S2;
-        Thu, 02 Feb 2023 09:21:48 +0100 (CET)
-Message-ID: <903062f7b2e2709ae0e4416545ffadd91c132676.camel@huaweicloud.com>
-Subject: Re: [RFC PATCH v9 10/16] dm-verity: consume root hash digest and
- signature data via LSM hook
-From:   Roberto Sassu <roberto.sassu@huaweicloud.com>
-To:     Fan Wu <wufan@linux.microsoft.com>
-Cc:     corbet@lwn.net, zohar@linux.ibm.com, jmorris@namei.org,
-        serge@hallyn.com, tytso@mit.edu, ebiggers@kernel.org,
-        axboe@kernel.dk, agk@redhat.com, snitzer@kernel.org,
-        eparis@redhat.com, paul@paul-moore.com, linux-doc@vger.kernel.org,
-        linux-integrity@vger.kernel.org,
-        linux-security-module@vger.kernel.org,
-        linux-fscrypt@vger.kernel.org, linux-block@vger.kernel.org,
-        dm-devel@redhat.com, linux-audit@redhat.com,
-        roberto.sassu@huawei.com, linux-kernel@vger.kernel.org,
-        Deven Bowers <deven.desai@linux.microsoft.com>
-Date:   Thu, 02 Feb 2023 09:21:24 +0100
-In-Reply-To: <20230201232639.GB9075@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
-References: <1675119451-23180-1-git-send-email-wufan@linux.microsoft.com>
-         <1675119451-23180-11-git-send-email-wufan@linux.microsoft.com>
-         <4f029a41d80d883d9b4729cbc85211955c9efe8e.camel@huaweicloud.com>
-         <20230201232639.GB9075@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5-0ubuntu1 
+        with ESMTP id S231964AbjBBIu7 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Feb 2023 03:50:59 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7504788F21
+        for <linux-block@vger.kernel.org>; Thu,  2 Feb 2023 00:50:09 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1675327808;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=n1QlRKAukJgDjMO08bU68h0Vi7CwNCYlj1Nlf3B4zLA=;
+        b=NDeiVRbR/b/tGJnGzbqfsqyzsHomQWBh0uoiF4k9HnrDRfbNTRGax68OJEvQjyAboTs/GE
+        vml1sOPCW+VEEsNwnPbetGB/xZc3Bedj9TU9egMdWgId7ZJC9KFzfnrI32BlTmYQRVVmoa
+        MmsHefKfKlYLIR/f/Ne0rdDr1LcA9sM=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-78-Q90M3oNbNKegs7nS29kSyg-1; Thu, 02 Feb 2023 03:50:04 -0500
+X-MC-Unique: Q90M3oNbNKegs7nS29kSyg-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 0D9AA1C05AFB;
+        Thu,  2 Feb 2023 08:50:04 +0000 (UTC)
+Received: from T590 (ovpn-8-25.pek2.redhat.com [10.72.8.25])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id EBD14404BEC0;
+        Thu,  2 Feb 2023 08:49:59 +0000 (UTC)
+Date:   Thu, 2 Feb 2023 16:49:54 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Demi Marie Obenour <demi@invisiblethingslab.com>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        Marek =?iso-8859-1?Q?Marczykowski-G=F3recki?= 
+        <marmarek@invisiblethingslab.com>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH 1/7] block: Support creating a struct file from a
+ block device
+Message-ID: <Y9t5MtE2Xg53u07O@T590>
+References: <20230126033358.1880-1-demi@invisiblethingslab.com>
+ <20230126033358.1880-2-demi@invisiblethingslab.com>
+ <Y9d692WEX/ZvBhXI@infradead.org>
+ <Y9gZAJGgdjFtsm9I@itl-email>
+ <Y9jW73uAtE3HdCou@infradead.org>
+ <Y9lBlKD3U/jMug9j@itl-email>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-CM-TRANSID: GxC2BwBHE1qQcttjhtrmAA--.14473S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7Kw4ftFW5tw1fXF4DKr4xtFb_yoW8JF4xpF
-        1UWayYgrn5KasrGrnaya1fArWIkrWYv343Xr15Xw18CF98ur1IvF1FkFW5Za9F9r95C3WF
-        vFW0qa47Zwn8A3DanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUkjb4IE77IF4wAFF20E14v26ryj6rWUM7CY07I20VC2zVCF04k2
-        6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-        vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Jr0_JF4l84ACjcxK6xIIjxv20xvEc7Cj
-        xVAFwI0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8JVWxJwA2z4x0Y4vEx4A2jsIEc7CjxV
-        AFwI0_Gr0_Gr1UM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40E
-        x7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x
-        0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lFIxGxcIEc7CjxVA2Y2ka0xkIwI1l42xK82IYc2Ij
-        64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x
-        8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r4a6rW5MIIYrxkI7VAKI48JMIIF0xvE
-        2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42
-        xK8VAvwI8IcIk0rVWrZr1j6s0DMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIE
-        c7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x07UZ18PUUUUU=
-X-CM-SenderInfo: purev21wro2thvvxqx5xdzvxpfor3voofrz/1tbiAQAQBF1jj4huJgABsl
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <Y9lBlKD3U/jMug9j@itl-email>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.1
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, 2023-02-01 at 15:26 -0800, Fan Wu wrote:
-> On Tue, Jan 31, 2023 at 02:22:01PM +0100, Roberto Sassu wrote:
-> > On Mon, 2023-01-30 at 14:57 -0800, Fan Wu wrote:
-> > > From: Deven Bowers <deven.desai@linux.microsoft.com>
-> > > 
-> > > dm-verity provides a strong guarantee of a block device's integrity. As
-> > > a generic way to check the integrity of a block device, it provides
-> > > those integrity guarantees to its higher layers, including the filesystem
-> > > level.
+On Tue, Jan 31, 2023 at 11:27:59AM -0500, Demi Marie Obenour wrote:
+> On Tue, Jan 31, 2023 at 12:53:03AM -0800, Christoph Hellwig wrote:
+> > On Mon, Jan 30, 2023 at 02:22:39PM -0500, Demi Marie Obenour wrote:
+> > > What do you recommend instead?  This solves a real problem for
+> > > device-mapper users and I am not aware of a better solution.
 > > 
-> > I think you could reuse most of is_trusted_verity_target(), in
-> > particular dm_verity_get_root_digest().
-> > 
-> > And probably, the previous patch is not necessary.
-> > 
-> > Roberto
-> > 
-> Thanks for the info. This function seems could be used to get the roothash
-> but for saving the signature we still need the hook function in the previous
-> patch.
+> > You could start with explaining the problem and what other methods
+> > you tried that failed.  In the end it's not my job to fix your problem.
+> 
+> I’m working on a “block not-script” (Xen block device hotplug script
+> written in C) for Qubes OS.  The current hotplug script is a shell
+> script that takes a global lock, which serializes all invocations and
+> significantly slows down VM creation and destruction.  My C program
+> avoids this problem.
+> 
+> One of the goals of the not-script is to never leak resources, even if
+> it dies with SIGKILL or is never called with the “remove” argument to
 
-Uhm, look at the LoadPin case. It does not need to temporarily store
-the root digest in a security blob. It evaluates it directly.
+If it dies, you still can restart one new instance for handling the device
+leak by running one simple daemon to monitor if not-script is live.
 
-Well, ok, dm_verity_loadpin_is_bdev_trusted() looks for trusted digests
-in the dm_verity_loadpin_trusted_root_digests list. So, something
-equivalent needs to be made for IPE (or you just get the digest).
-However, I find not introducing new hooks and evaluating the
-information directly more efficient.
+> destroy the devices it created.  Therefore, whenever possible, it relies
+> on automatic destruction of devices that are no longer used.  I have
 
-Roberto
+This automatic destruction of devices is supposed to be done in
+userspace, cause only userspace knows when device is needed, when
+it is needed.
+
+So not sure this kind of work should be involved in kernel.
+
+
+Thanks, 
+Ming
 
