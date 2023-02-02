@@ -2,210 +2,132 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A004CC05027
-	for <linux-block@archiver.kernel.org>; Thu,  2 Feb 2023 20:58:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 05530C05027
+	for <linux-block@archiver.kernel.org>; Thu,  2 Feb 2023 22:14:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231575AbjBBU6I (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 2 Feb 2023 15:58:08 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52062 "EHLO
+        id S230432AbjBBWOQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 2 Feb 2023 17:14:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40032 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229881AbjBBU6H (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Feb 2023 15:58:07 -0500
-Received: from wout2-smtp.messagingengine.com (wout2-smtp.messagingengine.com [64.147.123.25])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 082FF7EF7;
-        Thu,  2 Feb 2023 12:58:05 -0800 (PST)
-Received: from compute1.internal (compute1.nyi.internal [10.202.2.41])
-        by mailout.west.internal (Postfix) with ESMTP id DA6AD320092B;
-        Thu,  2 Feb 2023 15:58:03 -0500 (EST)
-Received: from mailfrontend2 ([10.202.2.163])
-  by compute1.internal (MEProxy); Thu, 02 Feb 2023 15:58:04 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        invisiblethingslab.com; h=cc:cc:content-type:date:date:from:from
-        :in-reply-to:in-reply-to:message-id:mime-version:references
-        :reply-to:sender:subject:subject:to:to; s=fm3; t=1675371483; x=
-        1675457883; bh=dzgq76cYFXWqr386VYF7ubjMYy/4D3tzRP84ABBYvhg=; b=s
-        yCLlVbTqQbtyOeBRMnG9EpqbCx6GzKG4Hg76/luZQ/eT+Nq9KviKBIiPk+EkLyHN
-        wY8o1LK4fkCBtVnIJpyFq/3uMePbmk18mOBTu1FtZlnea8hsTT+V0ADGIDWRhH0Y
-        HmaXYjlOubsbx0jyYW+w6UkKGWiAPzRLX01mPJLTxzP3CbDw+xuj6CZsMzdaJHwy
-        zz7n0TZRUFqXaB+xy6f9WcjAeq2n1OrDxGcXKRnyc5jxfA50PCEqMf1Dv4h+Ilys
-        +0pQMVtNOlgCmknLyqvAUXce5gpbqq8qhAlozlmsIsTboWSZ0IaKavHetQepNQ+N
-        Vf4qnei6SmJnjdUl3+Y8Q==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:cc:content-type:date:date:feedback-id
-        :feedback-id:from:from:in-reply-to:in-reply-to:message-id
-        :mime-version:references:reply-to:sender:subject:subject:to:to
-        :x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
-        fm3; t=1675371483; x=1675457883; bh=dzgq76cYFXWqr386VYF7ubjMYy/4
-        D3tzRP84ABBYvhg=; b=d478ZEMjTvlRbXKOPtpHsd8vraJQZ8JvpW/VI0IyDbKa
-        ub8yalBozVWUnGc6bPbOpDNSOTg8Lm0AVtkKHHYIBiEZB4EQsN/G6zRvWYh/SO77
-        oqaoIBNpljYZmw0CZVXXQPbpSe7AT/+1VmKYR2NkuJyf5+DLFBJG7RDslYanVOWi
-        xDu6yLmqiurqTapj3VST8SSDjPqEIvq3uDPEHgeQB1moyddyusGd+OZGX/EaVbmr
-        qJd5lvChm0484XwC1n1MJ0Pb6H2CISyZtIB2oCMiRoBfs7hjL3BCjlrH/zHRCN/O
-        swy3q63rmHwpD4B13y5JUcNG3YJJTV7ZSCiIo5S80g==
-X-ME-Sender: <xms:2yPcY7tcw21RPig7naYjpZ6H6dwpquQnrG9dyYCCsC_SO_OrElL9tw>
-    <xme:2yPcY8eZ2C_sdhpFPhKUBAGGjp7cEYKEExpHOBXe12q6JcbAonrRs4vlap4ncRPyE
-    rzOyfPCyxHOsp8>
-X-ME-Received: <xmr:2yPcY-ybNkb6KIwG6AijR8J_KlnElmfdmJgF3stTvxmSv21P77BvI7VYu1I>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvhedrudefkedgudegtdcutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
-    necuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
-    enucfjughrpeffhffvvefukfhfgggtuggjsehgtderredttdejnecuhfhrohhmpeffvghm
-    ihcuofgrrhhivgcuqfgsvghnohhurhcuoeguvghmihesihhnvhhishhisghlvghthhhinh
-    hgshhlrggsrdgtohhmqeenucggtffrrghtthgvrhhnpedvjeetgeekhfetudfhgfetffeg
-    fffguddvgffhffeifeeikeektdehgeetheffleenucevlhhushhtvghrufhiiigvpedtne
-    curfgrrhgrmhepmhgrihhlfhhrohhmpeguvghmihesihhnvhhishhisghlvghthhhinhhg
-    shhlrggsrdgtohhm
-X-ME-Proxy: <xmx:2yPcY6PXyZ-XxC3SkpbI8K-CuaRtc4uGfh6p8bDVxakleZoHXx3h5w>
-    <xmx:2yPcY78GNcH9dYC5p5jT_OkOQJUe0tG5IGP3yjLdVptSBUrOtLpdMw>
-    <xmx:2yPcY6UVnkK9xEhPiWHjp90EY8gUVooRfy67Mbs9Q-MqOueT7KlUnA>
-    <xmx:2yPcY8MjyBeI6TP0-uGTzOPpMY64H6ftI7SGGQ-hEU3jV0fGd_QJVA>
-Feedback-ID: iac594737:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
- 2 Feb 2023 15:58:02 -0500 (EST)
-Date:   Thu, 2 Feb 2023 15:57:55 -0500
-From:   Demi Marie Obenour <demi@invisiblethingslab.com>
-To:     Mike Snitzer <snitzer@kernel.org>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        Roger Pau =?utf-8?B?TW9ubsOp?= <roger.pau@citrix.com>,
-        Alasdair Kergon <agk@redhat.com>,
-        Marek =?utf-8?Q?Marczykowski-G=C3=B3recki?= 
-        <marmarek@invisiblethingslab.com>, Juergen Gross <jgross@suse.com>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        xen-devel@lists.xenproject.org, dm-devel@redhat.com
-Subject: Re: [RFC PATCH 0/7] Allow race-free block device handling
-Message-ID: <Y9wj2MpEXI/P2/6/@itl-email>
-References: <20230126033358.1880-1-demi@invisiblethingslab.com>
- <Y9vp3XDEQAl7TLND@redhat.com>
- <Y9wEF3rWfpiCKc2i@itl-email>
- <Y9wVcskXyOk3bbzC@redhat.com>
+        with ESMTP id S229974AbjBBWOP (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Feb 2023 17:14:15 -0500
+Received: from mail-yb1-xb34.google.com (mail-yb1-xb34.google.com [IPv6:2607:f8b0:4864:20::b34])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9062B13D68
+        for <linux-block@vger.kernel.org>; Thu,  2 Feb 2023 14:14:12 -0800 (PST)
+Received: by mail-yb1-xb34.google.com with SMTP id m199so4129232ybm.4
+        for <linux-block@vger.kernel.org>; Thu, 02 Feb 2023 14:14:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Md74lIzR0o7460ORkMXn7KayL0aVbPKupRPBeuDbbTI=;
+        b=HRlsCWSs2dlebCLDmMtYuLDdArqtkMee6iQwte/VlkN1bbSWSHpDHWT/4je9mWPJp7
+         XgWSFXL3rw72a77sKpV5fXDQZyitEG5D7aUJKvATOj8z6s5XuDQ6k8YpAK86Q9+qcKe5
+         Cjfa7U0G5JCOuCU29CFkM6xInxzM9rWSDf9NivVjuXnS26g3GnzTfzlvJrStborIXI+7
+         phOG4nm/iHnXPn2lp5Vd40MAenaY08OtlvQtal4K/dIRzdMZvG6sEpdbIdSpRh3kXMvp
+         VfBKmyVJaEyu+t3DYYd5h9FD927ZiMrD4zKOeOOc+ANuYw68CRwq40W23G8F3FIdE52B
+         qSYw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Md74lIzR0o7460ORkMXn7KayL0aVbPKupRPBeuDbbTI=;
+        b=Vtv+kHlZyODzyXBydw2MrXvF3zbHqCzrStO0vInz8R+NIzA61yf+SjsAz7pHP6G9N5
+         omUn7y0tY5Zw7ugIOThFsLj8/wYrhdh+V+BGhqGwRO5K/dIYKoURHkb4onBtu0xz2ygT
+         LofPmaEtd2PRhd5M8vQS/z1emKMvqKdUI04SOQx1A36fT2QKIXU3YcIzi7zfpE4zOCIN
+         LX2b2pXz1QSjjW4t877FrZV4Vfs/3OBtQe8j/sYKDagytNDpkwxtb3tSawt8XijoFOdo
+         LeEE8qKxQyvEyqovgdhFfQH/CqPqPbeCYQN6Y6PB0MDuPlkFOiYIflmseltWFvKfQlJZ
+         Ti5w==
+X-Gm-Message-State: AO0yUKXSTS/xgOK+kld9OpmswuSTPEWNtQFEPQVeLV00SwXpF3NqwM9O
+        jmqNBI8N66CU1Vq7DuIJpr9g7g2DjKe2U0kGMSHt0Q==
+X-Google-Smtp-Source: AK7set8Ww53okW+GPRByKcLI9t2DJ87/pgwZwaQZjPnrIW92KM4QAuzw/T3WwMXedMTepXLt1YwySXkRQL98LHIhZws=
+X-Received: by 2002:a25:aa0b:0:b0:80b:c9d0:c676 with SMTP id
+ s11-20020a25aa0b000000b0080bc9d0c676mr1107062ybi.341.1675376051809; Thu, 02
+ Feb 2023 14:14:11 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="cgmN2P5oJuiMWNP7"
-Content-Disposition: inline
-In-Reply-To: <Y9wVcskXyOk3bbzC@redhat.com>
+References: <20230131084742.1038135-1-linus.walleij@linaro.org>
+ <CAPDyKFrLetcCcFueJzZeWa-SVbsJcspwZ+nXWUDCGRXawxNhdg@mail.gmail.com> <98014ebd-7e57-0fc3-9ab0-49f4b727150d@kernel.dk>
+In-Reply-To: <98014ebd-7e57-0fc3-9ab0-49f4b727150d@kernel.dk>
+From:   Linus Walleij <linus.walleij@linaro.org>
+Date:   Thu, 2 Feb 2023 23:14:00 +0100
+Message-ID: <CACRpkdacMR8wLX0O5qNAbeGxpJTo99F7XXCiZ+tUCuOO8=GcaQ@mail.gmail.com>
+Subject: Re: [PATCH] mmc: core: Imply IOSCHED_BFQ
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Ulf Hansson <ulf.hansson@linaro.org>, linux-mmc@vger.kernel.org,
+        linux-block@vger.kernel.org,
+        Paolo Valente <paolo.valente@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Thu, Feb 2, 2023 at 7:04 PM Jens Axboe <axboe@kernel.dk> wrote:
+> On 2/2/23 8:22=E2=80=AFAM, Ulf Hansson wrote:
+> > On Tue, 31 Jan 2023 at 09:47, Linus Walleij <linus.walleij@linaro.org> =
+wrote:
+> >>
+> >> If we enable the MMC/SD block layer, use Kconfig to imply the BFQ
+> >> I/O scheduler.
+> >>
+> >> As all MMC/SD devices are single-queue, this is the scheduler that
+> >> users want so let's be helpful and make sure it gets
+> >> default-selected into a manual kernel configuration. It will still
+> >> need to be enabled at runtime (usually with udev scripts).
+> >>
+> >> Cc: linux-block@vger.kernel.org
+> >> Cc: Paolo Valente <paolo.valente@linaro.org>
+> >> Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
+> >
+> > I have taken the various arguments (for and against), but I think
+> > $subject patch makes sense to me. In the end, this is about moving
+> > towards a more sensible default kernel configuration and the "imply"
+> > approach works fine for me.
+> >
+> > More importantly, $subject patch doesn't really hurt anything, as it's
+> > still perfectly fine to build MMC without I/O schedulers and BFQ, for
+> > those configurations that need this.
+> >
+> > That said, applied for next, thanks!
+>
+> It doesn't make sense, for all the reasons that Christoph applied.
+> But you guys seemed to already have your mind made up and ignoring
+> valid feedback, so...
 
---cgmN2P5oJuiMWNP7
-Content-Type: text/plain; protected-headers=v1; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 2 Feb 2023 15:57:55 -0500
-From: Demi Marie Obenour <demi@invisiblethingslab.com>
-To: Mike Snitzer <snitzer@kernel.org>
-Cc: Jens Axboe <axboe@kernel.dk>,
-	Roger Pau =?utf-8?B?TW9ubsOp?= <roger.pau@citrix.com>,
-	Alasdair Kergon <agk@redhat.com>,
-	Marek =?utf-8?Q?Marczykowski-G=C3=B3recki?= <marmarek@invisiblethingslab.com>,
-	Juergen Gross <jgross@suse.com>, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, xen-devel@lists.xenproject.org,
-	dm-devel@redhat.com
-Subject: Re: [RFC PATCH 0/7] Allow race-free block device handling
+The history leading us here as I see it:
 
-On Thu, Feb 02, 2023 at 02:56:34PM -0500, Mike Snitzer wrote:
-> On Thu, Feb 02 2023 at  1:41P -0500,
-> Demi Marie Obenour <demi@invisiblethingslab.com> wrote:
->=20
-> > On Thu, Feb 02, 2023 at 11:50:37AM -0500, Mike Snitzer wrote:
-> > > On Wed, Jan 25 2023 at 10:33P -0500,
-> > > Demi Marie Obenour <demi@invisiblethingslab.com> wrote:
-> > >=20
-> > > > This work aims to allow userspace to create and destroy block devic=
-es
-> > > > in a race-free and leak-free way,
-> > >=20
-> > > "race-free and leak-free way" implies there both races and leaks in
-> > > existing code. You're making claims that are likely very specific to
-> > > your Xen use-case.  Please explain more carefully.
-> >=20
-> > Will do in v2.
-> >=20
-> > > > and to allow them to be exposed to
-> > > > other Xen VMs via blkback without leaks or races.  It=E2=80=99s mar=
-ked as RFC
-> > > > for a few reasons:
-> > > >=20
-> > > > - The code has been only lightly tested.  It might be unstable or
-> > > >   insecure.
-> > > >=20
-> > > > - The DM_DEV_CREATE ioctl gains a new flag.  Unknown flags were
-> > > >   previously ignored, so this could theoretically break buggy users=
-pace
-> > > >   tools.
-> > >=20
-> > > Not seeing a reason that type of DM change is needed. If you feel
-> > > strongly about it send a separate patch and we can discuss it.
-> >=20
-> > Patch 2/7 is the diskseq change.  v2 will contain a revised and tested
-> > version with a greatly expanded commit message.
->=20
-> I'm aware that 2/7 is where you make the DM change to disallow unknown
-> flags, what I'm saying is I don't see a reason for that change.
+In 2017 or if it was 2016 I think Paolo and Ulf started to look into
+BFQ for improving the user experience with MMC on embedded
+devices such as phones, tablets etc. I.e all systems using it.
 
-Thanks for the clarification.
+As BFQ was not accepted for the old block layer it was adopted
+for the MQ rewrite, as I understood a bit as "the new CFQ" for
+slow single-queued devices.
 
-> Certainly doesn't look to be a requirement for everything else in that
-> patch.
+Then, the MMC subsystem was consequently
+rewritten to use MQ to be able to take advantage of BFQ.
+It's why we pushed the conversion to MQ. To the point of creating
+social conflicts I might add. Not everyone loved converting MMC
+to MQ.
 
-Indeed it is not.  I will make it a separate patch.
+Those changes are direct causes and effects, one to one.
 
-> So send a separate patch, but I'm inclined to _not_ accept it because
-> it does potentially break some userspace.
+And now today all that work has made it possible for the MMC
+subsystem to perform as we wanted it to.
 
-Is it okay to add DM_FILE_DESCRIPTOR_FLAG (with the same meaning as in
-2/7) _without_ rejecting unknown flags?  The same patch would bump the
-minor version number, so userspace would still be able to tell if the
-kernel supported DM_FILE_DESCRIPTOR_FLAG.  If you wanted, I could ignore
-DM_FILE_DESCRIPTOR_FLAG unless the minor number passed by userspace is
-sufficiently recent.
+Most MMC systems are interactive human operator-facing
+devices where interactivity matters. Any other MMC storage
+is secondary, uncommon and unimportant. It is called
+MultiMedia Card for a reason.
 
-Another option would be to make userspace opt-in to strict parameter
-checking by passing 5 as the major version instead of 4.  Userspace
-programs that passed 4 would get the old behavior, while userspace
-programs that passed 5 would get strict parameter checking and be able
-to use new features such as DM_FILE_DESCRIPTOR_FLAG.
+So for MMC BFQ is a sensible default as an interactivity
+boosting scheduler. The kernel should provide sensible
+defaults.
 
-> > > > - I have no idea if I got the block device reference counting and
-> > > >   locking correct.
-> > >=20
-> > > Your headers and justifcation for this line of work are really way too
-> > > terse. Please take the time to clearly make the case for your changes
-> > > in both the patch headers and code.
-> >=20
-> > I will expand the commit message in v2, but I am not sure what you want
-> > me to add to the code comments.  Would you mind explaining?
->=20
-> Nothing specific about code, was just a general reminder (based on how
-> terse the 2/7 header was).
->=20
-> Mike
+I do not see why it is not a sensible default for systems with
+MMC.
 
-Thanks for the feedback!
---=20
-Sincerely,
-Demi Marie Obenour (she/her/hers)
-Invisible Things Lab
-
---cgmN2P5oJuiMWNP7
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCgAdFiEEdodNnxM2uiJZBxxxsoi1X/+cIsEFAmPcI9YACgkQsoi1X/+c
-IsF28hAAhImjjtlWhG/0QL5ADEU4goFI++sArqOlA2RYmyVjye52flwl4Fzd+px3
-qEsA6mLllD0x2SxfycOirT3D5d0Gsa8BVPs+WiaWed5Rc+LececX+YGQ6HgEUZBM
-Ig69iNxrCcA5CARoNWd/RsHZSuxSE9ltgzo00ghW+LNRKVyYAn0nuAWddWLqYrvr
-wVdonaDhI5IC15GPQ4CK4T21JTO16NsUjld1A03pgr0ubzV+UpwWGNycwjSpz2KB
-WzHAq5NTLvda6dLUmt1o/z7dJR04gPA8ICyF/zKXzkjuOgeTvQOTY25iv5O3xQYv
-1WHAJJqxb8twWMw+bU92sjoUJy4jdqr5DQ7n+ga5eEG0YAPBkRwcPuKdJdotbUFF
-8VP90nUdWDGlmc+w20GlNzziVOyxLFbVgxFO1evJ0Kq023gzvcgs69RqV1mLfP44
-hD18hdcC2ytp8TwhNrERzmBxWjEtD1MphgGXAiJQ0qQEyYlKAYNUyolM8lTnTQR9
-Xccwj6ow7pMDIV+DkNuD4Ebiu7dx4WhjyTc4jx9NHSUUDeuff0v4PzFCiXr/x/dN
-0Sml2ojt43HPUfLXaepFNwLCqL54zGNNa2gsH0gyl0iwAFMAgNbMcUAx10lCOmDj
-d7i37cInvPYgsSr2WUgz7mbiLlQN3Eh8tf5ut+q+OOOq+cRPKCs=
-=P5Xt
------END PGP SIGNATURE-----
-
---cgmN2P5oJuiMWNP7--
+Yours,
+Linus Walleij
