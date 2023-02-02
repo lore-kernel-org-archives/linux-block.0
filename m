@@ -2,84 +2,85 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A5FC7C636CD
-	for <linux-block@archiver.kernel.org>; Thu,  2 Feb 2023 01:06:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 35212C636CD
+	for <linux-block@archiver.kernel.org>; Thu,  2 Feb 2023 01:17:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229608AbjBBBG1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 1 Feb 2023 20:06:27 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53586 "EHLO
+        id S230094AbjBBBQ7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 1 Feb 2023 20:16:59 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32994 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229548AbjBBBG0 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 1 Feb 2023 20:06:26 -0500
-Received: from mail-pj1-f52.google.com (mail-pj1-f52.google.com [209.85.216.52])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE81B6A69;
-        Wed,  1 Feb 2023 17:06:25 -0800 (PST)
-Received: by mail-pj1-f52.google.com with SMTP id nm12-20020a17090b19cc00b0022c2155cc0bso322965pjb.4;
-        Wed, 01 Feb 2023 17:06:25 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=7U/ZC/7mH3sydJX/MVCCCZAUEhdYO6ljg7mvo+RSKFs=;
-        b=ZrlrVEZ8NRyped347qBbu3c/ejYT83nqUe6fmqnbNA+gLDphPU6HP7Mx3eiuVDxake
-         L12fJxSLSUnnMgs1DUkrtwlEtyhXluG4kJleW7IGT8CeHqSf+qen5cRVoZBwFCdPR96X
-         EuocOW8s1bWpJR49M/Lzz2lpO9MzG1oYK+X4A5aFK8Z+5Z8BVy2fMzNz1Ej7AbRFVJcf
-         utOzQILsf7mqRhKELwpIbzTashWOWi7PVetlsqD9YzDW5kwUt7k6TEXYJ0oBD2cdiHoF
-         K4cLpOWN9VexRsppPOYcfwpJAaMDos8iLZRedZEHIKpfZc6FdTYHCxM8KDv3PCVGGntU
-         hDsg==
-X-Gm-Message-State: AO0yUKVDzgiZrD+nMEmFOArHn3Q+cF+KT3V0b1Jlslz8xlpqbKgVoZoI
-        bh0ep+J65Xbc0QIJaWxQP3U=
-X-Google-Smtp-Source: AK7set91PfOxWXp7jnbumlVGRvclUWAHYMaUebcWZSbJrB6WUkYdkaumobI/3Ix1684OntcP+cof9A==
-X-Received: by 2002:a17:90a:5:b0:230:2052:1c2 with SMTP id 5-20020a17090a000500b00230205201c2mr4582885pja.42.1675299985093;
-        Wed, 01 Feb 2023 17:06:25 -0800 (PST)
-Received: from ?IPV6:2620:15c:211:201:f3cf:17ca:687:af15? ([2620:15c:211:201:f3cf:17ca:687:af15])
-        by smtp.gmail.com with ESMTPSA id bt21-20020a17090af01500b0021904307a53sm1964023pjb.19.2023.02.01.17.06.23
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 01 Feb 2023 17:06:24 -0800 (PST)
-Message-ID: <ea0eff5f-5c05-ebca-58a4-1e772a6fa739@acm.org>
-Date:   Wed, 1 Feb 2023 17:06:22 -0800
+        with ESMTP id S229662AbjBBBQ6 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 1 Feb 2023 20:16:58 -0500
+Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1F9AEB468;
+        Wed,  1 Feb 2023 17:16:57 -0800 (PST)
+Received: from mail02.huawei.com (unknown [172.30.67.143])
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4P6gqS19g3z4f3p1C;
+        Thu,  2 Feb 2023 09:16:52 +0800 (CST)
+Received: from [10.174.176.73] (unknown [10.174.176.73])
+        by APP3 (Coremail) with SMTP id _Ch0CgCnUyEED9tjk3haCg--.4548S3;
+        Thu, 02 Feb 2023 09:16:54 +0800 (CST)
+Subject: Re: [PATCH -next] block, bfq: cleanup 'bfqg->online'
+To:     Jan Kara <jack@suse.cz>, Yu Kuai <yukuai1@huaweicloud.com>
+Cc:     tj@kernel.org, josef@toxicpanda.com, axboe@kernel.dk,
+        paolo.valente@linaro.org, cgroups@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yi.zhang@huawei.com, yangerkun@huawei.com,
+        "yukuai (C)" <yukuai3@huawei.com>
+References: <20230201120609.4151432-1-yukuai1@huaweicloud.com>
+ <20230201131037.6frw2kpc54k4sx7a@quack3>
+From:   Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <76f00d0a-b8d9-ab04-329c-3ba33d12d884@huaweicloud.com>
+Date:   Thu, 2 Feb 2023 09:16:52 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.0
-Subject: Re: [PATCH v4 1/7] block: Introduce blk_mq_debugfs_init()
-Content-Language: en-US
-To:     Luis Chamberlain <mcgrof@kernel.org>
-Cc:     Pankaj Raghav <p.raghav@samsung.com>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        Avri Altman <avri.altman@wdc.com>,
-        Adrian Hunter <adrian.hunter@intel.com>,
-        Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>,
-        Keith Busch <kbusch@kernel.org>
-References: <20230130212656.876311-1-bvanassche@acm.org>
- <20230130212656.876311-2-bvanassche@acm.org>
- <20230201205800.t3gpx7w3aw2ozab7@garbanzo>
- <20230201212332.p3mdb5ab3qisuo2x@garbanzo>
- <4c9b87dc-aeeb-43b6-0c18-4d04495683da@acm.org>
- <20230201235919.q5rhglvgw7uduexy@garbanzo>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20230201235919.q5rhglvgw7uduexy@garbanzo>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <20230201131037.6frw2kpc54k4sx7a@quack3>
+Content-Type: text/plain; charset=gbk; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: _Ch0CgCnUyEED9tjk3haCg--.4548S3
+X-Coremail-Antispam: 1UD129KBjvdXoWrur4kCF4xWw15AF1UZrW5Wrg_yoWxuwcEkF
+        ZF9Fnayw13Ga1xZws8JF1YqFWkuw4agrZIgFWYg348Z3W8Xa92yFnrKF97Ar4fWFs7Gr1Y
+        yay7uFW8tr13XjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+        9fnUUIcSsGvfJTRUUUb3AFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
+        6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
+        A2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j
+        6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
+        Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
+        I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
+        4UM4x0Y48IcVAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2kI
+        c2xKxwCYjI0SjxkI62AI1cAE67vIY487MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4
+        AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE
+        17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMI
+        IF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_WFyUJVCq
+        3wCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCT
+        nIWIevJa73UjIFyTuYvjfUoOJ5UUUUU
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2/1/23 15:59, Luis Chamberlain wrote:
-> My point was commit 85e0cbbb8a made blk_debugfs_root non-null always now
-> when debugfs is enabled for both request-based block drivers and for
-> make_request block drivers (multiqueue). My reading is that with your
-> patch blk_debugfs_root will not be created for request-based block
-> drivers.
+Hi, Jan!
 
-Hi Luis,
+ÔÚ 2023/02/01 21:10, Jan Kara Ð´µÀ:
+> On Wed 01-02-23 20:06:09, Yu Kuai wrote:
+>> From: Yu Kuai <yukuai3@huawei.com>
+>>
+>> After commit dfd6200a0954 ("blk-cgroup: support to track if policy is
+>> online"), there is no need to do this again in bfq.
+>>
+>> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+> 
+> So I agree this is nice to do but it isn't so simple. BFQ relies on the
+> fact that 'online' is cleared under bfqd->lock so we cannot associate bio
+> in bfq_bio_bfqg() with a bfqg that has already its bfq_pd_offline()
+> function run.
+> 
+> Maybe if you set 'online' to false before calling ->pd_offline() things
+> would work fine for BFQ.
 
-The empty version of blk_mq_debugfs_init() in my patch is only selected 
-if  CONFIG_BLK_DEBUG_FS=n. I think that my patch preserves the behavior 
-that /sys/kernel/debug/block/ is created independent of the type of 
-request queues that is created. Am I perhaps misunderstanding your feedback?
+Yes, you're right. Thanks for the explanation.
 
-Thanks,
+Kuai
 
-Bart.
