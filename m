@@ -2,56 +2,56 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C39DEC61DA4
-	for <linux-block@archiver.kernel.org>; Thu,  2 Feb 2023 15:23:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E01FCC05027
+	for <linux-block@archiver.kernel.org>; Thu,  2 Feb 2023 15:23:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232611AbjBBPXC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 2 Feb 2023 10:23:02 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39682 "EHLO
+        id S232533AbjBBPXI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 2 Feb 2023 10:23:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39358 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232736AbjBBPWz (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Feb 2023 10:22:55 -0500
-Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 825AD1ABC1
-        for <linux-block@vger.kernel.org>; Thu,  2 Feb 2023 07:22:52 -0800 (PST)
-Received: by mail-pl1-x630.google.com with SMTP id jh15so2131866plb.8
-        for <linux-block@vger.kernel.org>; Thu, 02 Feb 2023 07:22:52 -0800 (PST)
+        with ESMTP id S232808AbjBBPW6 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Feb 2023 10:22:58 -0500
+Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0AD8443452
+        for <linux-block@vger.kernel.org>; Thu,  2 Feb 2023 07:22:56 -0800 (PST)
+Received: by mail-pf1-x434.google.com with SMTP id g9so1414899pfk.13
+        for <linux-block@vger.kernel.org>; Thu, 02 Feb 2023 07:22:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=RDprxbolKOWdwwbIHMkRMigRdw+EGw2x6+hQir7JvSA=;
-        b=doQlECiin+IZHhqzYYBAGmG7ruHwjSzhZrT63tI0qaxrLqoCRt1F6MC0t09QD/nDRT
-         qSuJ5JdN672y3v5s81n3vaM1ZsRwnMcZ77rgWkAEuzW/FFQ//L6IRTdP8L1DkTKQYw64
-         o/NgLjAIM5f21e1RK6cv79FOSjj0PDlhytOWysU/jnj5OkZFhWEwAEeGRDvHWDpw3Fhc
-         2FOlPRmv8n7Asfb0qMnTDsgUmCmzjU4gQMdCas6sPEjWyfJvzEmlZ6pn/WENmrL8Snmz
-         OCR4N94EGcLG/ieyVTtMfy2YLdWlh/2sDOk0PkviZWyQjk2Bmigt+1bFBjANliUXJC5n
-         0fRA==
+        bh=WGfX55LDKwIhxgBD6Pv/9qAlZ3kdQLWrx019H3iLqUE=;
+        b=ONA1iCVjl6ZCooezOTJ98NRlsioy+aiVMj5YJWlPqGzjMDIi5qv7wZqy24ONbuk09z
+         Iw+5Jj0L+rY2oGlYQV0kyJgG7gvGo84Dk2U7A02eGT9NEPH0xBjjExQqyO2EkyCU53DP
+         GBOqWdZxe7/lCbaIoyd69etDe3Yg7/DGIFEpyKkouCxc+oJlZPwOrDFHWjrue3zwt0TU
+         1Cz9mHeITH4l5XvYH+7gkPswY7/DrvBwP3DJylQcizgRTv8bsnCFwSVBUj93N+ixaAbd
+         oM3g/AvNvLNUClbsuqpHb2hP4Mo3UMAq/idqYCBafXXzQQQoisPwYj9bPUGj2udz6OBP
+         2kEA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=RDprxbolKOWdwwbIHMkRMigRdw+EGw2x6+hQir7JvSA=;
-        b=QHn7uI/nRamfhfZSkj7PAUf5WCgXDSay7eXHN4u+ZSjybOKox3ZDY2sB9gnNpkhYFm
-         C2qEUEumRb1CNwHGVSpwUz9lcJ0MZJSD+9wHmUsMIFvFIARVNQglhqlnhofGf1obSWVE
-         6UllcDmJb4r4Vjh3fZTZPtR+QDDnG3IBCkAGxbM6Xwu4EgiAanA6/7PsmZcAi+z4ohXL
-         cJXBDs2t5MM29pl4irZqKqusP7NEmWVGkTiyzZcIm0sIhloWDMQK6lVC5kCGTlcA1HuL
-         nDGKkEqb0+bKLHqMvWQHtj/4kk+VUXSLH9LUTSxgEm8hjlUtm2TtClukFsdnzytTBbT9
-         dTrA==
-X-Gm-Message-State: AO0yUKWPgJL58hztmOotLX4NgUSudQIAO3AdQDn2zoAwcLdQVbPd6IOM
-        WnMvYZ1Fdb/YBWzZm/6eZ7MYJufWVYbDCtLXcQC5XA==
-X-Google-Smtp-Source: AK7set98New9iXm3ve35FJg7oNZjOErzLseWUSRPRNXVwcE7LzG/FJWndHiXjjUOs11lfhzwYHgb+c0FtlQ/B3QsQgc=
-X-Received: by 2002:a17:903:11c7:b0:196:1462:3279 with SMTP id
- q7-20020a17090311c700b0019614623279mr1676619plh.17.1675351372019; Thu, 02 Feb
- 2023 07:22:52 -0800 (PST)
+        bh=WGfX55LDKwIhxgBD6Pv/9qAlZ3kdQLWrx019H3iLqUE=;
+        b=CUZmhn1VB01aJsI9chI8JCoGxQscvBtJoTmTOUXb5SIv6hkpEvbwh0rknKt3KmMdOx
+         ZakWUK9kCT8aTBuifzAbrwcVIXGXXP6XJVlPMYcBNijqhOAOOOb/4Ci4sCtz9R13vNUi
+         nP4n5B3sjIm7DNHUiYIUrtBzVFI8t9JuBimMoeLDUV9qNkKKcyPe2UOD+lIU2DJEk3Aw
+         meRe46p6TVxe0t3CNg/jQa0YHOiiMAKFCrw+zmIcdG44hTrWrjrXWzz7Y81mSY6/hyS6
+         Tu7SMEV9o9grD8OhXy8kgbNOUO5gyAedaWlH8cKcJoV0nE745X4k91kNJOl2DdR22Pr/
+         0G4A==
+X-Gm-Message-State: AO0yUKVraKiD/t7P+Sx717EIvxbPIfDtkiK4zIXAKoN5VrzgvLsu5Reu
+        zZY1Nq80pwdZbhDYADWoqIIUoU5qW7gByo9agvGO7A==
+X-Google-Smtp-Source: AK7set9VTZrVkIkP+oXz1cIB38TwGV2QakBKlVcyQMqSQScI/aUsUDrbvgbFafGagD4V5IxkNsy0q5FuD/dlWZBacRA=
+X-Received: by 2002:aa7:96ab:0:b0:592:5ac8:156f with SMTP id
+ g11-20020aa796ab000000b005925ac8156fmr1599752pfk.39.1675351375537; Thu, 02
+ Feb 2023 07:22:55 -0800 (PST)
 MIME-Version: 1.0
-References: <20230131084742.1038135-1-linus.walleij@linaro.org>
-In-Reply-To: <20230131084742.1038135-1-linus.walleij@linaro.org>
+References: <20230131085220.1038241-1-linus.walleij@linaro.org>
+In-Reply-To: <20230131085220.1038241-1-linus.walleij@linaro.org>
 From:   Ulf Hansson <ulf.hansson@linaro.org>
-Date:   Thu, 2 Feb 2023 16:22:15 +0100
-Message-ID: <CAPDyKFrLetcCcFueJzZeWa-SVbsJcspwZ+nXWUDCGRXawxNhdg@mail.gmail.com>
-Subject: Re: [PATCH] mmc: core: Imply IOSCHED_BFQ
+Date:   Thu, 2 Feb 2023 16:22:19 +0100
+Message-ID: <CAPDyKFqCMZLOte6Fd6oJgTMXaMYMTiRsZKSJu-YJE+nWYTpQ6g@mail.gmail.com>
+Subject: Re: [PATCH] memstick: core: Imply IOSCHED_BFQ
 To:     Linus Walleij <linus.walleij@linaro.org>
 Cc:     linux-mmc@vger.kernel.org, linux-block@vger.kernel.org,
         Paolo Valente <paolo.valente@linaro.org>
@@ -60,12 +60,12 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, 31 Jan 2023 at 09:47, Linus Walleij <linus.walleij@linaro.org> wrote:
+On Tue, 31 Jan 2023 at 09:52, Linus Walleij <linus.walleij@linaro.org> wrote:
 >
-> If we enable the MMC/SD block layer, use Kconfig to imply the BFQ
-> I/O scheduler.
+> If we enable the memory stick block layer, use Kconfig to imply
+> the BFQ I/O scheduler.
 >
-> As all MMC/SD devices are single-queue, this is the scheduler that
+> As all memstick devices are single-queue, this is the scheduler that
 > users want so let's be helpful and make sure it gets
 > default-selected into a manual kernel configuration. It will still
 > need to be enabled at runtime (usually with udev scripts).
@@ -74,37 +74,37 @@ On Tue, 31 Jan 2023 at 09:47, Linus Walleij <linus.walleij@linaro.org> wrote:
 > Cc: Paolo Valente <paolo.valente@linaro.org>
 > Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
 
-I have taken the various arguments (for and against), but I think
-$subject patch makes sense to me. In the end, this is about moving
-towards a more sensible default kernel configuration and the "imply"
-approach works fine for me.
-
-More importantly, $subject patch doesn't really hurt anything, as it's
-still perfectly fine to build MMC without I/O schedulers and BFQ, for
-those configurations that need this.
-
-That said, applied for next, thanks!
+For the similar reasons to why I applied the MMC patch, applied for
+next, thanks!
 
 Kind regards
 Uffe
 
 
 > ---
->  drivers/mmc/core/Kconfig | 1 +
->  1 file changed, 1 insertion(+)
+>  drivers/memstick/core/Kconfig | 2 ++
+>  1 file changed, 2 insertions(+)
 >
-> diff --git a/drivers/mmc/core/Kconfig b/drivers/mmc/core/Kconfig
-> index 6f25c34e4fec..52fe9d7c21cc 100644
-> --- a/drivers/mmc/core/Kconfig
-> +++ b/drivers/mmc/core/Kconfig
-> @@ -37,6 +37,7 @@ config PWRSEQ_SIMPLE
->  config MMC_BLOCK
->         tristate "MMC block device driver"
+> diff --git a/drivers/memstick/core/Kconfig b/drivers/memstick/core/Kconfig
+> index 08192fd70eb4..50fa0711da9d 100644
+> --- a/drivers/memstick/core/Kconfig
+> +++ b/drivers/memstick/core/Kconfig
+> @@ -20,6 +20,7 @@ config MEMSTICK_UNSAFE_RESUME
+>  config MSPRO_BLOCK
+>         tristate "MemoryStick Pro block device driver"
 >         depends on BLOCK
 > +       imply IOSCHED_BFQ
->         default y
 >         help
->           Say Y here to enable the MMC block device driver support.
+>           Say Y here to enable the MemoryStick Pro block device driver
+>           support. This provides a block device driver, which you can use
+> @@ -29,6 +30,7 @@ config MSPRO_BLOCK
+>  config MS_BLOCK
+>         tristate "MemoryStick Standard device driver"
+>         depends on BLOCK
+> +       imply IOSCHED_BFQ
+>         help
+>           Say Y here to enable the MemoryStick Standard device driver
+>           support. This provides a block device driver, which you can use
 > --
 > 2.34.1
 >
