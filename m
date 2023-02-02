@@ -2,79 +2,92 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F6CEC61DA4
-	for <linux-block@archiver.kernel.org>; Thu,  2 Feb 2023 15:23:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB2D8C05027
+	for <linux-block@archiver.kernel.org>; Thu,  2 Feb 2023 16:51:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232530AbjBBPXf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 2 Feb 2023 10:23:35 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40686 "EHLO
+        id S232361AbjBBQv1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 2 Feb 2023 11:51:27 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57240 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232014AbjBBPXX (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Feb 2023 10:23:23 -0500
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3647D16303
-        for <linux-block@vger.kernel.org>; Thu,  2 Feb 2023 07:23:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Content-Type:MIME-Version:Message-ID:
-        Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-        Content-Description:In-Reply-To:References;
-        bh=xhTmDKWbL2Q+ADomHwmZKFLODShjxozhC5a0dwbcc4k=; b=gfG5LPW7ErRL1mDW8RGmRuRXe8
-        j0ruYEl+cQBBot0usXF5NtKl6CIBeYfJjx/aB8Vji8En8Wdu0BLgTKL8YsxQaiylJ9aOkwkK31VCZ
-        tcFsBSAX6WyJgra8T9Hkf+SwFdWlJyHZNx7LDe/4fxsoUXoHkENUZ5HFMJGkJwzUxeKO2UArwqfmi
-        Ga7CJexX1dw0/m6dhdLWe/o6bXgBzVZCeKQ77+TO0zuDkS+yxuSi1Dev5tMYOtWDH8LK4aIhbVf35
-        2ThTs49dU+WQL9ZWthjxZOYTIOOy2QITAYcHqRwVHJUY0tCGqOgDzIFl773KGzLmvs7VMu28BBUBO
-        KiLgAnmw==;
-Received: from [2001:4bb8:19a:272a:3196:5eba:213b:e6aa] (helo=localhost)
-        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1pNbQe-00GK9B-QC; Thu, 02 Feb 2023 15:23:13 +0000
-Date:   Thu, 2 Feb 2023 16:23:10 +0100
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
-Subject: [GIT PULL] nvme fixes for Linux 6.2
-Message-ID: <Y9vVXvMeTgA4bC2R@infradead.org>
+        with ESMTP id S232356AbjBBQv0 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Feb 2023 11:51:26 -0500
+Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 01F846D5D7
+        for <linux-block@vger.kernel.org>; Thu,  2 Feb 2023 08:50:40 -0800 (PST)
+Received: by mail-qt1-f181.google.com with SMTP id m26so2503350qtp.9
+        for <linux-block@vger.kernel.org>; Thu, 02 Feb 2023 08:50:39 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=1tztcBchRZ+ahQ+Rv8slGEZ3rlEReGoboay+wBElNpk=;
+        b=V65m8bLeKyomRle8R1oVGJUm8ix6KUU1yFpdYC/oIP9+vA8K/rtDRq3erNqvoaiz1P
+         uxVx6NrlDCldHPpzSBUC3nvoU4LH2+qtB+JN1sBEyn0yIG0C+pgCY+Od7Yg/bdcmubz8
+         8nTJeq/o7YinhTl4qYJ0B0U2LGji7Tw29dT2ObC/Lamg3x1ZFnp7s8CZpNiXpiwLptP3
+         gP3MmhWXkN5ObLxoo03DRY57B/5w8VTPTxS1CbtlPZGAvbukGV2XaeUF2gAw/cuD5MWd
+         GxwWBPM0y5a9RMMQ25Jg3tLE0dtW1BqGdEVjTcewazcPV59oIW2LdZwA9iwaJwSX6+4u
+         PQgQ==
+X-Gm-Message-State: AO0yUKUW0zuP98HDwCLuu2vEgk3hE8Q47kTFYIJIdmqovzwAFxvQlgHs
+        c9yDk+tY/XBUFxxbxpNZmJwn
+X-Google-Smtp-Source: AK7set+4Pyeb5ompgmUg0JYUv54bCb2ceknHgU0XW/UAy594tQAOCFstY5279x2+bA/W3Ae7xhvLGQ==
+X-Received: by 2002:a05:622a:1788:b0:3b8:2ea9:a093 with SMTP id s8-20020a05622a178800b003b82ea9a093mr13141578qtk.1.1675356639078;
+        Thu, 02 Feb 2023 08:50:39 -0800 (PST)
+Received: from localhost (pool-68-160-166-30.bstnma.fios.verizon.net. [68.160.166.30])
+        by smtp.gmail.com with ESMTPSA id t9-20020a05620a034900b0071eddd3bebbsm31687qkm.81.2023.02.02.08.50.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 02 Feb 2023 08:50:38 -0800 (PST)
+Date:   Thu, 2 Feb 2023 11:50:37 -0500
+From:   Mike Snitzer <snitzer@kernel.org>
+To:     Demi Marie Obenour <demi@invisiblethingslab.com>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        Roger Pau =?iso-8859-1?Q?Monn=E9?= <roger.pau@citrix.com>,
+        Alasdair Kergon <agk@redhat.com>,
+        Marek =?iso-8859-1?Q?Marczykowski-G=F3recki?= 
+        <marmarek@invisiblethingslab.com>, Juergen Gross <jgross@suse.com>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        xen-devel@lists.xenproject.org, dm-devel@redhat.com
+Subject: Re: [RFC PATCH 0/7] Allow race-free block device handling
+Message-ID: <Y9vp3XDEQAl7TLND@redhat.com>
+References: <20230126033358.1880-1-demi@invisiblethingslab.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20230126033358.1880-1-demi@invisiblethingslab.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The following changes since commit 81ea42b9c3d61ea34d82d900ed93f4b4851f13b0:
+On Wed, Jan 25 2023 at 10:33P -0500,
+Demi Marie Obenour <demi@invisiblethingslab.com> wrote:
 
-  block: Fix the blk_mq_destroy_queue() documentation (2023-01-31 11:46:15 -0700)
+> This work aims to allow userspace to create and destroy block devices
+> in a race-free and leak-free way,
 
-are available in the Git repository at:
+"race-free and leak-free way" implies there both races and leaks in
+existing code. You're making claims that are likely very specific to
+your Xen use-case.  Please explain more carefully.
 
-  git://git.infradead.org/nvme.git tags/nvme-6.2-2023-02-02
+> and to allow them to be exposed to
+> other Xen VMs via blkback without leaks or races.  It’s marked as RFC
+> for a few reasons:
+> 
+> - The code has been only lightly tested.  It might be unstable or
+>   insecure.
+> 
+> - The DM_DEV_CREATE ioctl gains a new flag.  Unknown flags were
+>   previously ignored, so this could theoretically break buggy userspace
+>   tools.
 
-for you to fetch changes up to bd97a59da6a866e3dee5d2a2d582ec71dbbc84cd:
+Not seeing a reason that type of DM change is needed. If you feel
+strongly about it send a separate patch and we can discuss it.
 
-  nvme-auth: use workqueue dedicated to authentication (2023-02-01 16:11:20 +0100)
+> - I have no idea if I got the block device reference counting and
+>   locking correct.
 
-----------------------------------------------------------------
-nvme fixes for Linux 6.2
+Your headers and justifcation for this line of work are really way too
+terse. Please take the time to clearly make the case for your changes
+in both the patch headers and code.
 
- - fix a missing queue put in nvmet_fc_ls_create_association (Amit Engel)
- - clear queue pointers on tag_set initialization failure
-   (Maurizio Lombardi)
- - use workqueue dedicated to authentication (Shin'ichiro Kawasaki)
-
-----------------------------------------------------------------
-Amit Engel (1):
-      nvme-fc: fix a missing queue put in nvmet_fc_ls_create_association
-
-Maurizio Lombardi (2):
-      nvme: clear the request_queue pointers on failure in nvme_alloc_admin_tag_set
-      nvme: clear the request_queue pointers on failure in nvme_alloc_io_tag_set
-
-Shin'ichiro Kawasaki (1):
-      nvme-auth: use workqueue dedicated to authentication
-
- drivers/nvme/host/auth.c | 14 ++++++++++++--
- drivers/nvme/host/core.c |  5 ++++-
- drivers/nvme/target/fc.c |  4 +++-
- 3 files changed, 19 insertions(+), 4 deletions(-)
+Mike
