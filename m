@@ -2,113 +2,133 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B249C05027
-	for <linux-block@archiver.kernel.org>; Thu,  2 Feb 2023 11:10:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DCF7DC636D6
+	for <linux-block@archiver.kernel.org>; Thu,  2 Feb 2023 11:12:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231755AbjBBLKO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 2 Feb 2023 06:10:14 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39960 "EHLO
+        id S231722AbjBBLMd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 2 Feb 2023 06:12:33 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42800 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232396AbjBBLKA (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Feb 2023 06:10:00 -0500
-Received: from dggsgout12.his.huawei.com (unknown [45.249.212.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 494591631D;
-        Thu,  2 Feb 2023 03:09:32 -0800 (PST)
-Received: from mail02.huawei.com (unknown [172.30.67.169])
-        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4P6wzB22gGz4f3kp4;
-        Thu,  2 Feb 2023 19:09:26 +0800 (CST)
-Received: from [10.174.176.117] (unknown [10.174.176.117])
-        by APP4 (Coremail) with SMTP id gCh0CgDHd6vkmdtjMDR2Cw--.56257S2;
-        Thu, 02 Feb 2023 19:09:28 +0800 (CST)
-Subject: Re: [PATCH] blk-ioprio: Introduce promote-to-rt policy
-To:     Bart Van Assche <bvanassche@acm.org>, linux-block@vger.kernel.org
-Cc:     Jan Kara <jack@suse.cz>, Jens Axboe <axboe@kernel.dk>,
-        cgroups@vger.kernel.org, Tejun Heo <tj@kernel.org>,
-        Zefan Li <lizefan.x@bytedance.com>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        Jonathan Corbet <corbet@lwn.net>, linux-kernel@vger.kernel.org,
-        linux-doc@vger.kernel.org, houtao1@huawei.com
-References: <20230201045227.2203123-1-houtao@huaweicloud.com>
- <8c068af3-7199-11cf-5c69-a523c7c22d9a@acm.org>
-From:   Hou Tao <houtao@huaweicloud.com>
-Message-ID: <4f7dcb3e-2d5a-cae3-0e1c-a82bcc3d2217@huaweicloud.com>
-Date:   Thu, 2 Feb 2023 19:09:24 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.0
+        with ESMTP id S231737AbjBBLM2 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Feb 2023 06:12:28 -0500
+Received: from frasgout11.his.huawei.com (frasgout11.his.huawei.com [14.137.139.23])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5D4879634;
+        Thu,  2 Feb 2023 03:12:24 -0800 (PST)
+Received: from mail02.huawei.com (unknown [172.18.147.227])
+        by frasgout11.his.huawei.com (SkyGuard) with ESMTP id 4P6wLH1s6Xz9xHw6;
+        Thu,  2 Feb 2023 18:40:55 +0800 (CST)
+Received: from roberto-ThinkStation-P620 (unknown [10.204.63.22])
+        by APP2 (Coremail) with SMTP id GxC2BwBnNl3+lNtjGVTnAA--.14834S2;
+        Thu, 02 Feb 2023 11:48:42 +0100 (CET)
+Message-ID: <7dc9963c563d0b55bb35109be012e355eef13882.camel@huaweicloud.com>
+Subject: Re: [RFC PATCH v9 00/16] Integrity Policy Enforcement LSM (IPE)
+From:   Roberto Sassu <roberto.sassu@huaweicloud.com>
+To:     Fan Wu <wufan@linux.microsoft.com>
+Cc:     corbet@lwn.net, zohar@linux.ibm.com, jmorris@namei.org,
+        serge@hallyn.com, tytso@mit.edu, ebiggers@kernel.org,
+        axboe@kernel.dk, agk@redhat.com, snitzer@kernel.org,
+        eparis@redhat.com, paul@paul-moore.com, linux-doc@vger.kernel.org,
+        linux-integrity@vger.kernel.org,
+        linux-security-module@vger.kernel.org,
+        linux-fscrypt@vger.kernel.org, linux-block@vger.kernel.org,
+        dm-devel@redhat.com, linux-audit@redhat.com,
+        roberto.sassu@huawei.com, linux-kernel@vger.kernel.org
+Date:   Thu, 02 Feb 2023 11:48:18 +0100
+In-Reply-To: <20230201004852.GB30104@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+References: <1675119451-23180-1-git-send-email-wufan@linux.microsoft.com>
+         <033335b26f6becdc3dc0325ef926efd94fcc4dda.camel@huaweicloud.com>
+         <20230201004852.GB30104@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5-0ubuntu1 
 MIME-Version: 1.0
-In-Reply-To: <8c068af3-7199-11cf-5c69-a523c7c22d9a@acm.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-CM-TRANSID: gCh0CgDHd6vkmdtjMDR2Cw--.56257S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7Cr47Kr4DAFWrKFW8AFy8Grg_yoW8uFy3pF
-        48CFykJrZYqFy8Jr1kXa18GrWUA3y3J3WUJF1FqF98uw48Kw10gw4FqFn2gFyfGa1kXrn8
-        Jw4DJrWUua45Aw7anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUvab4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
+Content-Transfer-Encoding: 7bit
+X-CM-TRANSID: GxC2BwBnNl3+lNtjGVTnAA--.14834S2
+X-Coremail-Antispam: 1UD129KBjvJXoWxGw4rWw4DXFWxCryUCF1xXwb_yoW5CFW8pF
+        WagayYkr1DKFs2yw1vy3WSqayYv395Ja1UJr98tryUAa15ur1UZF43Ka4Y93W7ur1kZ34Y
+        vF42vr9rAF1UCaDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUk0b4IE77IF4wAFF20E14v26ryj6rWUM7CY07I20VC2zVCF04k2
         6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-        vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7Cj
-        xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
-        0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
-        6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
-        Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JM4IIrI8v6xkF7I0E8cxan2IY04v7Mxk0xIA0c2IE
-        e2xFo4CEbIxvr21l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxV
-        Aqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q
-        6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6x
-        kF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWrJr0_WFyUJwCI42IY6I8E87Iv
-        67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyT
-        uYvjxUrR6zUUUUU
-X-CM-SenderInfo: xkrx3t3r6k3tpzhluzxrxghudrp/
+        vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Jr0_JF4l84ACjcxK6xIIjxv20xvEc7Cj
+        xVAFwI0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8JVWxJwA2z4x0Y4vEx4A2jsIEc7CjxV
+        AFwI0_Gr0_Gr1UM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40E
+        x7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x
+        0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lFIxGxcIEc7CjxVA2Y2ka0xkIwI1l42xK82IYc2Ij
+        64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x
+        8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r4a6rW5MIIYrxkI7VAKI48JMIIF0xvE
+        2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42
+        xK8VAvwI8IcIk0rVWrJr0_WFyUJwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv
+        6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUFDGOUUUUU
+X-CM-SenderInfo: purev21wro2thvvxqx5xdzvxpfor3voofrz/1tbiAgAQBF1jj4RztQAEsh
 X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
+On Tue, 2023-01-31 at 16:48 -0800, Fan Wu wrote:
+> On Tue, Jan 31, 2023 at 03:22:05PM +0100, Roberto Sassu wrote:
+> > On Mon, 2023-01-30 at 14:57 -0800, Fan Wu wrote:
+> > > IPE has two known gaps:
+> > > 
+> > > 1. IPE cannot verify the integrity of anonymous executable memory, such as
+> > >   the trampolines created by gcc closures and libffi (<3.4.2), or JIT'd code.
+> > >   Unfortunately, as this is dynamically generated code, there is no way
+> > >   for IPE to ensure the integrity of this code to form a trust basis. In all
+> > >   cases, the return result for these operations will be whatever the admin
+> > >   configures the DEFAULT action for "EXECUTE".
+> > 
+> > I think it would be useful to handle special cases, for example you
+> > could allow a process that created a file with memfd to use it, at the
+> > condition that nobody else writes it.
+> > 
+> > This would be required during the boot, otherwise services could fail
+> > to start (depending on the policy).
+> > 
+> Thanks for the suggestion. I agree with your opinion and I think supporting
+> memfd is possible but restricting read/write needs more hooks. We would like
+> to avoid adding more complexity to this initial posting as necessary. 
+> We will consider this as a future work and will post follow-on patches
+> in the future.
 
-On 2/2/2023 1:33 AM, Bart Van Assche wrote:
-> On 1/31/23 20:52, Hou Tao wrote:
->>   /**
->>    * enum prio_policy - I/O priority class policy.
->>    * @POLICY_NO_CHANGE: (default) do not modify the I/O priority class.
->> @@ -27,21 +34,30 @@
->>    * @POLICY_RESTRICT_TO_BE: modify IOPRIO_CLASS_NONE and IOPRIO_CLASS_RT into
->>    *        IOPRIO_CLASS_BE.
->>    * @POLICY_ALL_TO_IDLE: change the I/O priority class into IOPRIO_CLASS_IDLE.
->> - *
->> + * @POLICY_PROMOTE_TO_RT: modify IOPRIO_CLASS_NONE and IOPRIO_CLASS_BE into
->> + *         IOPRIO_CLASS_RT.
->>    * See also <linux/ioprio.h>.
->>    */
->>   enum prio_policy {
->> -    POLICY_NO_CHANGE    = 0,
->> -    POLICY_NONE_TO_RT    = 1,
->> -    POLICY_RESTRICT_TO_BE    = 2,
->> -    POLICY_ALL_TO_IDLE    = 3,
->> +    POLICY_NO_CHANGE    = IOPRIO_CLASS_NONE,
->> +    POLICY_NONE_TO_RT    = IOPRIO_CLASS_RT,
->> +    POLICY_RESTRICT_TO_BE    = IOPRIO_CLASS_BE,
->> +    POLICY_ALL_TO_IDLE    = IOPRIO_CLASS_IDLE,
->> +    POLICY_PROMOTE_TO_RT    = IOPRIO_CLASS_RT | IOPRIO_POL_PROMOTION,
->> +};
->
-> The above change complicates the ioprio code. Additionally, I'm concerned that
-> it makes the ioprio code slower. Has it been considered to keep the numerical
-> values for the existing policies, to assign the number 4 to
-> POLICY_PROMOTE_TO_RT and to use a lookup-array in blkcg_set_ioprio() to
-> convert the policy number into an IOPRIO_CLASS value?
-For the slowness, do you meaning the extra dereference of blkcg->ioprio->policy
-when policy is no-change or the handle of IOPRIO_POL_PROMOTION in
-blkcg_set_ioprio()? It seems other functions (e.g., ioprio_show_prio_policy()
-and ioprio_set_prio_policy()) are not on the hot path. Using a lookup array in
-blkcg_set_ioprio() to do the conversion will also be OK, although it will
-introduce an extra lookup each time when policy is not no-change. I don't have
-strong preference. If you are OK with lookup array in blkcg_set_ioprio(), will
-do it in v2.
->
-> Thanks,
->
-> Bart.
->
->
-> .
+Ok, maybe it is necessary to specify better the scope of IPE, why the
+current implementation can be considered as complete.
+
+If we say, IPE can only allow/deny operations on system components with
+immutable security properties, clearly memfd as a component cannot
+fullfill this goal due to the non-immutability. This would apply to any
+component allowing modifications.
+
+How to address this? What is the immutable property then?
+
+In the case of memfd, intuitively, a useful property for integrity
+could be for example that the content can be accessed/modified by only
+one process. No other (possibly malicious) processes can tamper with
+that file.
+
+So, it is true, to make this property immutable more hooks are needed.
+But should it be something that IPE does? Or it should be done by an
+external component (another LSM) that does the enforcement and reports
+to IPE that the property is true? Theoretically (with a proper policy),
+existing LSMs could be used for that purpose too.
+
+I would say more the second, it should not be IPE job, so that IPE can
+exclusively focus on evaluating properties, not making sure that the
+properties are immutable.
+
+Roberto
+
+> -Fan
+> 
+> > > 2. IPE cannot verify the integrity of interpreted languages' programs when
+> > >   these scripts invoked via ``<interpreter> <file>``. This is because the
+> > >   way interpreters execute these files, the scripts themselves are not
+> > >   evaluated as executable code through one of IPE's hooks. Interpreters
+> > >   can be enlightened to the usage of IPE by trying to mmap a file into
+> > >   executable memory (+X), after opening the file and responding to the
+> > >   error code appropriately. This also applies to included files, or high
+> > >   value files, such as configuration files of critical system components.
+> > 
+> > Ok, it is a well known issue. Hopefully, it will be fixed soon.
+> > 
+> > Roberto
+> > 
 
