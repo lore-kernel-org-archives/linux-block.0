@@ -2,118 +2,82 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF13DC61DA4
-	for <linux-block@archiver.kernel.org>; Fri,  3 Feb 2023 03:17:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C6A1C61DA4
+	for <linux-block@archiver.kernel.org>; Fri,  3 Feb 2023 07:50:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230121AbjBCDRi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 2 Feb 2023 22:17:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45624 "EHLO
+        id S232113AbjBCHuR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 3 Feb 2023 02:50:17 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35452 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229575AbjBCDRi (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Feb 2023 22:17:38 -0500
-Received: from mail-qv1-f50.google.com (mail-qv1-f50.google.com [209.85.219.50])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 886A718B0E
-        for <linux-block@vger.kernel.org>; Thu,  2 Feb 2023 19:16:55 -0800 (PST)
-Received: by mail-qv1-f50.google.com with SMTP id q10so2206734qvt.10
-        for <linux-block@vger.kernel.org>; Thu, 02 Feb 2023 19:16:55 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=chy9YyvhK7mXtGQ0tGQeB7OCTzTRKLRhbvbjGLVTm2I=;
-        b=ugm+qdJGM5vvZAG3rVEeVA9bvnwOgeFAOdtwXbhMVzGOplueR3rQT5dWAPUb1CuY5c
-         OBrJj2n10ol2YVU7WyosQVa/4wj5RmDa7lgzANQ7wx9X6YiCnHTF8Muj/OwFXTlJMiY6
-         E0eoCNaru7XTLTnRClBvb7T99T68eZF3mVY7Wr1Y1z8fPfQna2SlZBgeBxshM13fgTiD
-         hbWRQ8jEnO9+gUnNn47RNuZg1XqjU90Uownj5sh6y5nq92F5FbqFyD4Bm3EQNvdfNiFT
-         lJKniPQRM9U9RTfmbqfzKjyn5v/WUqwOKE9Gt+uFoEpZVSlZmJeYYPYTW9ZrMUC1SsXm
-         KXBw==
-X-Gm-Message-State: AO0yUKWaUAc779EXm0FsCpvNUdutQebapdBvPGxQn+Z13XwnfmMjzi8R
-        OZGLbu/cipTknpXyNhNHWDl4
-X-Google-Smtp-Source: AK7set/2v3K4VImtWp4wHlaBIXTCJSzpiCix8tANg3EljgK7D+Bw6KwYPu2AFz6rnlkQQv5scx+9Zg==
-X-Received: by 2002:a0c:e9c9:0:b0:537:6f8c:2c2c with SMTP id q9-20020a0ce9c9000000b005376f8c2c2cmr12293368qvo.41.1675394214581;
-        Thu, 02 Feb 2023 19:16:54 -0800 (PST)
-Received: from localhost (pool-68-160-166-30.bstnma.fios.verizon.net. [68.160.166.30])
-        by smtp.gmail.com with ESMTPSA id ea7-20020a05620a488700b007290be5557bsm1000464qkb.38.2023.02.02.19.16.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 Feb 2023 19:16:54 -0800 (PST)
-Date:   Thu, 2 Feb 2023 22:16:53 -0500
-From:   Mike Snitzer <snitzer@kernel.org>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
-        linux-raid@vger.kernel.org, dm-devel@redhat.com
-Subject: Re: block: remove submit_bio_noacct
-Message-ID: <Y9x8pagVnO7Xtnbn@redhat.com>
-References: <20230202181423.2910619-1-hch@lst.de>
- <Y9xqvF6nTptzHwpv@redhat.com>
+        with ESMTP id S232455AbjBCHuL (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 3 Feb 2023 02:50:11 -0500
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F0FE393ADE;
+        Thu,  2 Feb 2023 23:50:08 -0800 (PST)
+Received: from mail02.huawei.com (unknown [172.30.67.143])
+        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4P7SVc4f1rz4f3lbQ;
+        Fri,  3 Feb 2023 15:50:00 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.175.127.227])
+        by APP3 (Coremail) with SMTP id _Ch0CgBH9CGpvNxjE1+jCg--.46576S4;
+        Fri, 03 Feb 2023 15:50:02 +0800 (CST)
+From:   Yu Kuai <yukuai1@huaweicloud.com>
+To:     tj@kernel.org, oleksandr@natalenko.name, axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yukuai3@huawei.com, yukuai1@huaweicloud.com, yi.zhang@huawei.com,
+        yangerkun@huawei.com
+Subject: [PATCH -next] block: Revert "block: increase BLKCG_MAX_POLS"
+Date:   Fri,  3 Feb 2023 16:13:57 +0800
+Message-Id: <20230203081357.1385168-1-yukuai1@huaweicloud.com>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Y9xqvF6nTptzHwpv@redhat.com>
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: _Ch0CgBH9CGpvNxjE1+jCg--.46576S4
+X-Coremail-Antispam: 1UD129KBjvdXoWrKrW8ur1UKrykKrW8Wr1fCrg_yoWfGFc_C3
+        WxuFZ7Wr18JF1xZw1UtF4aqF4jgw4fJFsrZFyrJrWIq3Z8Ga1rGw4xJrykZF47WanrWryr
+        AF1fXrZaqr1aqjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+        9fnUUIcSsGvfJTRUUUbz8FF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
+        6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
+        A2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j
+        6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
+        Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
+        I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
+        4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwCF04k20xvY0x0EwIxG
+        rwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4
+        vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IY
+        x2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04k26c
+        xKx2IYs7xG6rW3Jr0E3s1lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x02
+        67AKxVWUJVW8JbIYCTnIWIevJa73UjIFyTuYvjfUoOJ5UUUUU
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Feb 02 2023 at  9:00P -0500,
-Mike Snitzer <snitzer@kernel.org> wrote:
+From: Yu Kuai <yukuai3@huawei.com>
 
-> On Thu, Feb 02 2023 at  1:14P -0500,
-> Christoph Hellwig <hch@lst.de> wrote:
-> 
-> > The current usage of submit_bio vs submit_bio_noacct which skips the
-> > VM events and task account is a bit unclear.  It seems to be mostly
-> > intended for sending on bios received by stacking drivers, but also
-> > seems to be used for stacking drivers newly generated metadata
-> > sometimes.
-> 
-> Your lack of confidence conveyed in the above shook me a little bit
-> considering so much of this code is attributed to you -- I mostly got
-> past that, but I am a bit concerned about one aspect of the
-> submit_bio() change (2nd to last comment inlined below).
-> 
-> > Remove the separate API and just skip the accounting if submit_bio
-> > is called recursively.  This gets us an accounting behavior that
-> > is very similar (but not quite identical) to the current one, while
-> > simplifying the API and code base.
-> 
-> Can you elaborate on the "but not quite identical"? This patch is
-> pretty mechanical, just folding code and renaming.. but you obviously
-> saw subtle differences.  Likely worth callign those out precisely.
-> 
-> How have you tested this patch?  Seems like I should throw all the lvm
-> and DM tests at it.
-> 
+This reverts commit ec645dc96699ea6c37b6de86c84d7288ea9a4ddf.
 
-...
+This can save some memory, because after commit 0f7839955114 ("Revert
+"block/mq-deadline: Add cgroup support""), there are total 5 policies.
 
-> > @@ -716,6 +712,27 @@ void submit_bio_noacct(struct bio *bio)
-> >  
-> >  	might_sleep();
-> >  
-> > +	/*
-> > +	 * We only want one ->submit_bio to be active at a time, else stack
-> > +	 * usage with stacked devices could be a problem.  Use current->bio_list
-> > +	 * to collect a list of requests submited by a ->submit_bio method while
-> > +	 * it is active, and then process them after it returned.
-> > +	 */
-> > +	if (current->bio_list) {
-> > +		bio_list_add(&current->bio_list[0], bio);
-> > +		return;
-> > +	}
-> 
-> It seems pretty aggressive to queue the bio to current->bio_list so
-> early. Before this patch, that didn't happen until the very end
-> (meaning all the negative checks of submit_bio_noacct were done before
-> doing the bio_list_add() due to recursion). This is my primary concern
-> with this patch. Is that the biggest aspect of your "not quite
-> identical" comment in the patch header?
-> 
-> In practice this will manifest as delaying the negative checks, until
-> returning from active submit_bio, but they will still happen.
+Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+---
+ include/linux/blkdev.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Actually, I don't think those checks are done at all now.
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 41a41561b773..c6861c7fdad9 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -54,7 +54,7 @@ extern struct class block_class;
+  * Maximum number of blkcg policies allowed to be registered concurrently.
+  * Defined here to simplify include dependency.
+  */
+-#define BLKCG_MAX_POLS		6
++#define BLKCG_MAX_POLS		5
+ 
+ #define DISK_MAX_PARTS			256
+ #define DISK_NAME_LEN			32
+-- 
+2.31.1
 
-Unless I'm missing something, this seems like it needs proper
-justification and a lot of review and testing.
-
-So why do this change?
