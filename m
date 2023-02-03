@@ -2,107 +2,148 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87CFFC636D3
-	for <linux-block@archiver.kernel.org>; Thu,  2 Feb 2023 22:35:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F28F2C61DA4
+	for <linux-block@archiver.kernel.org>; Fri,  3 Feb 2023 00:05:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232424AbjBBWfP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 2 Feb 2023 17:35:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50466 "EHLO
+        id S233448AbjBCAFR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 2 Feb 2023 19:05:17 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43792 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232371AbjBBWfO (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Feb 2023 17:35:14 -0500
-Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2249369514;
-        Thu,  2 Feb 2023 14:35:11 -0800 (PST)
-Received: by mail-pj1-x1032.google.com with SMTP id n20-20020a17090aab9400b00229ca6a4636so7096532pjq.0;
-        Thu, 02 Feb 2023 14:35:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=I/vBtaUtvuAYUBDEagef+6G4CYpgzu4YV3aIy4NBUrk=;
-        b=oq3M/1+tIFcjv9hjEaGa28A24jGTHUseAgRYiuLI/10z8o5Lu4Qv1oa6JxbgQXY8G/
-         NWn04KLhk0SYfQ9EGUP/PUl6RXvmhYklHrGecdQSjHvDeGxa+23/5lw2SZDNNpP2G6Ex
-         bXiRpKzgO0zlaxeKzE62bplLdiPUyA0NiWPWk6rqquMKzN/+0G1MZJ1g/HBunRJ7Vjpy
-         2aF/039Mt6/+eZW5dumlEg3q8OiNbRBwGXKUfUiktWBQpxBo85aRZwaGVCyNPfa7N4HN
-         VPiDYCFWuMcfQ64NEL+osMeaqbfpL7BPZy8kkFiWtYnvWtQKN7ZwtotoQmnj8jQ5Dquc
-         +NNQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=I/vBtaUtvuAYUBDEagef+6G4CYpgzu4YV3aIy4NBUrk=;
-        b=7AbRFQFwI8ryhSTt4ZOW0Opnp233g3WJPvHIBfixAUdJnrdSNJpaYNkkyrcgjTRr5O
-         9M9L310TazReD9GJZctocFEvROJ5k1SWm1PZ6DXofB/8dWCDhSqMRaN1KHYtujYe67th
-         r3wtIVdVpP4cEHtNC86Yv4KTL+Gr2l+lB/DjGjoQTXthniDr3zxXjiOZXizmL3YSCwpZ
-         MUTPUL/jZ3LRSR8cUM31pYJHnnUDrtm3ebIL4A7xYnj0yvxa9d4eoIaRA9xkxDK+JlrM
-         pag7qfv1UCu2EcHCNQ6spPaPyIEPOPkx8+iUznrk+pP8OtlcxFmn7QFy9mCX55IDP92I
-         jwEg==
-X-Gm-Message-State: AO0yUKWCEFD0U/t9EeBubOaLZL0cePAlrkx1AIdJSDSUTCxfCDQgFSIk
-        5AvqcrWM/0jI34EU49BpCF0=
-X-Google-Smtp-Source: AK7set9XeB2H6rlbYMld72Gb37KpJdEba3Et0ayGI0PwA1/E2XqT3/jRo8CMiqVfdd0b8evxuSZeJA==
-X-Received: by 2002:a17:903:2341:b0:196:6398:97ad with SMTP id c1-20020a170903234100b00196639897admr7987227plh.40.1675377310453;
-        Thu, 02 Feb 2023 14:35:10 -0800 (PST)
-Received: from localhost ([2620:10d:c090:400::5:48a9])
-        by smtp.gmail.com with ESMTPSA id f5-20020a170902684500b00192820d00d0sm176309pln.120.2023.02.02.14.35.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 Feb 2023 14:35:10 -0800 (PST)
-Sender: Tejun Heo <htejun@gmail.com>
-Date:   Thu, 2 Feb 2023 12:35:08 -1000
-From:   Tejun Heo <tj@kernel.org>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Waiman Long <longman@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-        Josef Bacik <josef@toxicpanda.com>,
-        Zefan Li <lizefan.x@bytedance.com>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>,
-        "Dennis Zhou (Facebook)" <dennisszhou@gmail.com>
-Subject: Re: [PATCH v4 2/2] blk-cgroup: Flush stats at blkgs destruction path
-Message-ID: <Y9w6nDJoekdCYZXr@slm.duckdns.org>
-References: <20221215033132.230023-1-longman@redhat.com>
- <20221215033132.230023-3-longman@redhat.com>
- <Y9s4+Nop1eluWmJ4@T590>
+        with ESMTP id S233461AbjBCAFF (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Feb 2023 19:05:05 -0500
+Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 25D6D3E094
+        for <linux-block@vger.kernel.org>; Thu,  2 Feb 2023 16:05:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1675382702; x=1706918702;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=/c9lzXaWxw9RKQ4jSykKMadp9jZMJoYdMNi7r0moUWs=;
+  b=ITFaAzynQU/glqVZOQJrnHl4knfVZ7dHez5QW1CFrHd+QECXGKwGGlVs
+   gCCwy+ADJ6mtFX/xChYSUzIvbicsWs4zz2+aQAyTo8gE4Ypvgl49ETcZA
+   MCjJ1dyZuoGY6ndsE1aLLPn3gf3h83axsKnmU7CcqYXUky1wUW8uazJ8C
+   +U7PdOd8V/ScO0oRfpbPwf6m2o0vTunVUpAvmJ8uMfpeQpt5mS+FsOKUi
+   dhD3AmVxakC/mTLx0mC+9OxGB7Vbqme0fn+GKM59O10SdHnIlwIUosZdj
+   0Bakx1uMxMZxQUYJA94z1RngMAFgZ5x9DnfkeAsJWmgwFvbV4fQFWuTKb
+   w==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10609"; a="326306400"
+X-IronPort-AV: E=Sophos;i="5.97,268,1669104000"; 
+   d="scan'208";a="326306400"
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Feb 2023 16:05:01 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10609"; a="994298055"
+X-IronPort-AV: E=Sophos;i="5.97,268,1669104000"; 
+   d="scan'208";a="994298055"
+Received: from lkp-server01.sh.intel.com (HELO ffa7f14d1d0f) ([10.239.97.150])
+  by fmsmga005.fm.intel.com with ESMTP; 02 Feb 2023 16:04:57 -0800
+Received: from kbuild by ffa7f14d1d0f with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1pNjZY-0006yO-0v;
+        Fri, 03 Feb 2023 00:04:56 +0000
+Date:   Fri, 3 Feb 2023 08:04:52 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Juhyung Park <qkrwngud825@gmail.com>, linux-block@vger.kernel.org
+Cc:     oe-kbuild-all@lists.linux.dev, axboe@kernel.dk,
+        Juhyung Park <qkrwngud825@gmail.com>
+Subject: Re: [PATCH] block: remove more NULL checks after bdev_get_queue()
+Message-ID: <202302030733.TVNhMvP4-lkp@intel.com>
+References: <20230202091151.855784-1-qkrwngud825@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <Y9s4+Nop1eluWmJ4@T590>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20230202091151.855784-1-qkrwngud825@gmail.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Feb 02, 2023 at 12:15:52PM +0800, Ming Lei wrote:
-> > @@ -1093,6 +1095,20 @@ static void blkcg_destroy_blkgs(struct blkcg *blkcg)
-> >  
-> >  	might_sleep();
-> >  
-> > +	/*
-> > +	 * Flush all the non-empty percpu lockless lists to release the
-> > +	 * blkg references held by those lists which, in turn, will
-> > +	 * allow those blkgs to be freed and release their references to
-> > +	 * blkcg. Otherwise, they may not be freed at all becase of this
-> > +	 * circular dependency resulting in memory leak.
-> > +	 */
-> > +	for_each_possible_cpu(cpu) {
-> > +		struct llist_head *lhead = per_cpu_ptr(blkcg->lhead, cpu);
-> > +
-> > +		if (!llist_empty(lhead))
-> > +			cgroup_rstat_css_cpu_flush(&blkcg->css, cpu);
-> > +	}
-> 
-> I guess it is possible for new iostat_cpu to be added just after the
-> llist_empty() check.
+Hi Juhyung,
 
-Ah, good point. Maybe:
+Thank you for the patch! Perhaps something to improve:
 
-* Move flush below the blkg kill loop.
+[auto build test WARNING on axboe-block/for-next]
+[also build test WARNING on linus/master v6.2-rc6 next-20230202]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-* In blk_cgroup_bio_start(), use percpu_ref_tryget() to decide whether to
-  add to llist or not.
+url:    https://github.com/intel-lab-lkp/linux/commits/Juhyung-Park/block-remove-more-NULL-checks-after-bdev_get_queue/20230202-171443
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git for-next
+patch link:    https://lore.kernel.org/r/20230202091151.855784-1-qkrwngud825%40gmail.com
+patch subject: [PATCH] block: remove more NULL checks after bdev_get_queue()
+config: x86_64-rhel-8.3-func (https://download.01.org/0day-ci/archive/20230203/202302030733.TVNhMvP4-lkp@intel.com/config)
+compiler: gcc-11 (Debian 11.3.0-8) 11.3.0
+reproduce (this is a W=1 build):
+        # https://github.com/intel-lab-lkp/linux/commit/f62253701c6bf771227300ca8c572c778c2670bb
+        git remote add linux-review https://github.com/intel-lab-lkp/linux
+        git fetch --no-tags linux-review Juhyung-Park/block-remove-more-NULL-checks-after-bdev_get_queue/20230202-171443
+        git checkout f62253701c6bf771227300ca8c572c778c2670bb
+        # save the config file
+        mkdir build_dir && cp config build_dir/.config
+        make W=1 O=build_dir ARCH=x86_64 olddefconfig
+        make W=1 O=build_dir ARCH=x86_64 SHELL=/bin/bash
+
+If you fix the issue, kindly add following tag where applicable
+| Reported-by: kernel test robot <lkp@intel.com>
+
+All warnings (new ones prefixed by >>):
+
+   block/blk-zoned.c: In function 'blkdev_report_zones_ioctl':
+>> block/blk-zoned.c:337:31: warning: variable 'q' set but not used [-Wunused-but-set-variable]
+     337 |         struct request_queue *q;
+         |                               ^
+   block/blk-zoned.c: In function 'blkdev_zone_mgmt_ioctl':
+   block/blk-zoned.c:392:31: warning: variable 'q' set but not used [-Wunused-but-set-variable]
+     392 |         struct request_queue *q;
+         |                               ^
+
+
+vim +/q +337 block/blk-zoned.c
+
+d41003513e61dd Christoph Hellwig 2019-11-11  327  
+56c4bddb970658 Bart Van Assche   2018-03-08  328  /*
+3ed05a987e0f63 Shaun Tancheff    2016-10-18  329   * BLKREPORTZONE ioctl processing.
+3ed05a987e0f63 Shaun Tancheff    2016-10-18  330   * Called from blkdev_ioctl.
+3ed05a987e0f63 Shaun Tancheff    2016-10-18  331   */
+3ed05a987e0f63 Shaun Tancheff    2016-10-18  332  int blkdev_report_zones_ioctl(struct block_device *bdev, fmode_t mode,
+3ed05a987e0f63 Shaun Tancheff    2016-10-18  333  			      unsigned int cmd, unsigned long arg)
+3ed05a987e0f63 Shaun Tancheff    2016-10-18  334  {
+3ed05a987e0f63 Shaun Tancheff    2016-10-18  335  	void __user *argp = (void __user *)arg;
+d41003513e61dd Christoph Hellwig 2019-11-11  336  	struct zone_report_args args;
+3ed05a987e0f63 Shaun Tancheff    2016-10-18 @337  	struct request_queue *q;
+3ed05a987e0f63 Shaun Tancheff    2016-10-18  338  	struct blk_zone_report rep;
+3ed05a987e0f63 Shaun Tancheff    2016-10-18  339  	int ret;
+3ed05a987e0f63 Shaun Tancheff    2016-10-18  340  
+3ed05a987e0f63 Shaun Tancheff    2016-10-18  341  	if (!argp)
+3ed05a987e0f63 Shaun Tancheff    2016-10-18  342  		return -EINVAL;
+3ed05a987e0f63 Shaun Tancheff    2016-10-18  343  
+3ed05a987e0f63 Shaun Tancheff    2016-10-18  344  	q = bdev_get_queue(bdev);
+3ed05a987e0f63 Shaun Tancheff    2016-10-18  345  
+edd1dbc83b1de3 Christoph Hellwig 2022-07-06  346  	if (!bdev_is_zoned(bdev))
+3ed05a987e0f63 Shaun Tancheff    2016-10-18  347  		return -ENOTTY;
+3ed05a987e0f63 Shaun Tancheff    2016-10-18  348  
+3ed05a987e0f63 Shaun Tancheff    2016-10-18  349  	if (copy_from_user(&rep, argp, sizeof(struct blk_zone_report)))
+3ed05a987e0f63 Shaun Tancheff    2016-10-18  350  		return -EFAULT;
+3ed05a987e0f63 Shaun Tancheff    2016-10-18  351  
+3ed05a987e0f63 Shaun Tancheff    2016-10-18  352  	if (!rep.nr_zones)
+3ed05a987e0f63 Shaun Tancheff    2016-10-18  353  		return -EINVAL;
+3ed05a987e0f63 Shaun Tancheff    2016-10-18  354  
+d41003513e61dd Christoph Hellwig 2019-11-11  355  	args.zones = argp + sizeof(struct blk_zone_report);
+d41003513e61dd Christoph Hellwig 2019-11-11  356  	ret = blkdev_report_zones(bdev, rep.sector, rep.nr_zones,
+d41003513e61dd Christoph Hellwig 2019-11-11  357  				  blkdev_copy_zone_to_user, &args);
+d41003513e61dd Christoph Hellwig 2019-11-11  358  	if (ret < 0)
+3ed05a987e0f63 Shaun Tancheff    2016-10-18  359  		return ret;
+d41003513e61dd Christoph Hellwig 2019-11-11  360  
+d41003513e61dd Christoph Hellwig 2019-11-11  361  	rep.nr_zones = ret;
+82394db7383d33 Matias Bjørling   2020-06-29  362  	rep.flags = BLK_ZONE_REP_CAPACITY;
+d41003513e61dd Christoph Hellwig 2019-11-11  363  	if (copy_to_user(argp, &rep, sizeof(struct blk_zone_report)))
+d41003513e61dd Christoph Hellwig 2019-11-11  364  		return -EFAULT;
+d41003513e61dd Christoph Hellwig 2019-11-11  365  	return 0;
+3ed05a987e0f63 Shaun Tancheff    2016-10-18  366  }
+3ed05a987e0f63 Shaun Tancheff    2016-10-18  367  
 
 -- 
-tejun
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests
