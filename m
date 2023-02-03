@@ -2,109 +2,187 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CCAD9C05027
-	for <linux-block@archiver.kernel.org>; Fri,  3 Feb 2023 15:12:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 483CDC61DA4
+	for <linux-block@archiver.kernel.org>; Fri,  3 Feb 2023 16:40:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234160AbjBCPMM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 3 Feb 2023 10:12:12 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48140 "EHLO
+        id S232701AbjBCQkY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 3 Feb 2023 11:40:24 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34354 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234158AbjBCPL7 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 3 Feb 2023 10:11:59 -0500
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 48A2CA841A;
-        Fri,  3 Feb 2023 07:09:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
-        :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=h+lHe/qj9+NLcJnalyqirfAInpcSjbUKRj83r5gu0OY=; b=opeqTYIsDd5ySHkM8/Z17yOBYI
-        EYj/TALLVbPcdK9L0xzB5abV1zpI5xqkO2L2YF6MxMZvyva0gUzw7pgM34AaCSLiLPIiDfg6ywwlE
-        p/uz0Hp+FcwrBScWBZ4n4X2ams8XcFdxqkklIPUnlIp6crcuB/NPS5dJIyr64dZwb44pwvjVg1Idr
-        gjtWxsXOoyGZV1XK5Kjfjy+OQZ/3a8RJDFtiI3W/17L8wvNj+WCY1iJfsOS/RvmqrXRrNn9ZnCGQY
-        VbPrXwoOPchaeJVVKF+sqRUov+yXi3gGw6ZN19Dh+G7on2Pg9/Hv3nMZoM1b+AA1D0a86INXiHkNn
-        kOEksMvg==;
-Received: from [2001:4bb8:19a:272a:910:bb67:7287:f956] (helo=localhost)
-        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1pNxfB-002bFh-IR; Fri, 03 Feb 2023 15:07:42 +0000
-From:   Christoph Hellwig <hch@lst.de>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Ilya Dryomov <idryomov@gmail.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Minchan Kim <minchan@kernel.org>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>,
-        Keith Busch <kbusch@kernel.org>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        David Howells <dhowells@redhat.com>,
-        Marc Dionne <marc.dionne@auristor.com>,
-        Xiubo Li <xiubli@redhat.com>, Steve French <sfrench@samba.org>,
-        Trond Myklebust <trond.myklebust@hammerspace.com>,
-        Anna Schumaker <anna@kernel.org>,
-        Mike Marshall <hubcap@omnibond.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Chuck Lever <chuck.lever@oracle.com>,
-        linux-block@vger.kernel.org, ceph-devel@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org,
-        target-devel@vger.kernel.org, kvm@vger.kernel.org,
-        netdev@vger.kernel.org, linux-afs@lists.infradead.org,
-        linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
-        linux-fsdevel@vger.kernel.org, linux-nfs@vger.kernel.org,
-        devel@lists.orangefs.org, io-uring@vger.kernel.org,
-        linux-mm@kvack.org
-Subject: [PATCH 19/23] swap: use bvec_set_page to initialize bvecs
-Date:   Fri,  3 Feb 2023 16:06:30 +0100
-Message-Id: <20230203150634.3199647-20-hch@lst.de>
-X-Mailer: git-send-email 2.39.0
-In-Reply-To: <20230203150634.3199647-1-hch@lst.de>
-References: <20230203150634.3199647-1-hch@lst.de>
+        with ESMTP id S231240AbjBCQkV (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 3 Feb 2023 11:40:21 -0500
+Received: from mail-qt1-f174.google.com (mail-qt1-f174.google.com [209.85.160.174])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 047F3193E1
+        for <linux-block@vger.kernel.org>; Fri,  3 Feb 2023 08:39:39 -0800 (PST)
+Received: by mail-qt1-f174.google.com with SMTP id g18so3762591qtb.6
+        for <linux-block@vger.kernel.org>; Fri, 03 Feb 2023 08:39:38 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7unWJupLeIDjrGZl3VZgizWn6+wr+P4lFU0CB+KM2WM=;
+        b=ItrouB3AnURQGc986KiJqd9jOLHg56fr/pqGOB2wnvroqyzVW+wBwqkowimeiNQL4p
+         qaVTcc6/Bjgj+jMyyBcBW4f7z7JPV0LdlwCXFRKzku+Wzl27vj3i0GRIAz9p+GfBdQTe
+         UUNG9MKexoEIcgq/euEIDSpym/SBXhA/6vFMbn/+2AYgfghVPvjUeo0vVuC0xYZ1fTqm
+         dqhfz+Q2mqKWtZ5vh1jSb7RDo3VJ4Xiad0/Lc0KFZVhePmXljhSOTZJAM9C3F8XtseEr
+         HgDTWfoUyWO0mPwG0xEX7p/O6E9ezIjtYpLqSE0TVFDbYq4V7guFNgROEf1aI+AyI7Av
+         uajA==
+X-Gm-Message-State: AO0yUKU+ivEPlBzv3hQbQ20T+x6fZAAA7BdHX3GdIiMs3pVgzEd1aiLl
+        zStLuMwDsjzwGoumUrAJjzKl
+X-Google-Smtp-Source: AK7set8OFXsF0AA97fa7d3weiTcI91kTVTafm0mjUfja5YF8VkQYV4bUyeR8C+B4Abew/VjJFXvb2Q==
+X-Received: by 2002:a05:622a:14d4:b0:3b8:41f4:94e7 with SMTP id u20-20020a05622a14d400b003b841f494e7mr20101341qtx.17.1675442378102;
+        Fri, 03 Feb 2023 08:39:38 -0800 (PST)
+Received: from localhost (pool-68-160-166-30.bstnma.fios.verizon.net. [68.160.166.30])
+        by smtp.gmail.com with ESMTPSA id s16-20020a05622a179000b003b8391b7736sm1914669qtk.25.2023.02.03.08.39.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 03 Feb 2023 08:39:37 -0800 (PST)
+Date:   Fri, 3 Feb 2023 11:39:36 -0500
+From:   Mike Snitzer <snitzer@kernel.org>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     axboe@kernel.dk, linux-block@vger.kernel.org, dm-devel@redhat.com,
+        linux-raid@vger.kernel.org, bmarzins@redhat.com
+Subject: Re: block: remove submit_bio_noacct
+Message-ID: <Y904yA+mS9go9XKP@redhat.com>
+References: <20230202181423.2910619-1-hch@lst.de>
+ <Y9xqvF6nTptzHwpv@redhat.com>
+ <Y9x8pagVnO7Xtnbn@redhat.com>
+ <20230203150053.GA28516@lst.de>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230203150053.GA28516@lst.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Use the bvec_set_page helper to initialize bvecs.
+On Fri, Feb 03 2023 at 10:00P -0500,
+Christoph Hellwig <hch@lst.de> wrote:
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- mm/page_io.c | 8 ++------
- 1 file changed, 2 insertions(+), 6 deletions(-)
+> On Thu, Feb 02, 2023 at 10:16:53PM -0500, Mike Snitzer wrote:
+> > > > The current usage of submit_bio vs submit_bio_noacct which skips the
+> > > > VM events and task account is a bit unclear.  It seems to be mostly
+> > > > intended for sending on bios received by stacking drivers, but also
+> > > > seems to be used for stacking drivers newly generated metadata
+> > > > sometimes.
+> > > 
+> > > Your lack of confidence conveyed in the above shook me a little bit
+> > > considering so much of this code is attributed to you -- I mostly got
+> > > past that, but I am a bit concerned about one aspect of the
+> > > submit_bio() change (2nd to last comment inlined below).
+> 
+> The confidence is about how it is used.  And that's up to the driver
+> authors, not helped by them not having any guidelines.  And while
+> I've touched this code a lot, the split between the two levels of API
+> long predates me.
+> 
+> > > > Remove the separate API and just skip the accounting if submit_bio
+> > > > is called recursively.  This gets us an accounting behavior that
+> > > > is very similar (but not quite identical) to the current one, while
+> > > > simplifying the API and code base.
+> > > 
+> > > Can you elaborate on the "but not quite identical"? This patch is
+> > > pretty mechanical, just folding code and renaming.. but you obviously
+> > > saw subtle differences.  Likely worth callign those out precisely.
+> 
+> The explanation was supposed to be in the Lines above.  Now accounting
+> is skipped if in a ->submit_bio recursion.  Before that it dependent
+> on drivers calling either submit_bio or submit_bio_noacct, for which
+> there was no clear guideline and drivers have been a bit sloppy about.
 
-diff --git a/mm/page_io.c b/mm/page_io.c
-index 3a5f921b932e82..233f6e6eb1c508 100644
---- a/mm/page_io.c
-+++ b/mm/page_io.c
-@@ -318,9 +318,7 @@ static int swap_writepage_fs(struct page *page, struct writeback_control *wbc)
- 		sio->pages = 0;
- 		sio->len = 0;
- 	}
--	sio->bvec[sio->pages].bv_page = page;
--	sio->bvec[sio->pages].bv_len = thp_size(page);
--	sio->bvec[sio->pages].bv_offset = 0;
-+	bvec_set_page(&sio->bvec[sio->pages], page, thp_size(page), 0);
- 	sio->len += thp_size(page);
- 	sio->pages += 1;
- 	if (sio->pages == ARRAY_SIZE(sio->bvec) || !wbc->swap_plug) {
-@@ -432,9 +430,7 @@ static void swap_readpage_fs(struct page *page,
- 		sio->pages = 0;
- 		sio->len = 0;
- 	}
--	sio->bvec[sio->pages].bv_page = page;
--	sio->bvec[sio->pages].bv_len = thp_size(page);
--	sio->bvec[sio->pages].bv_offset = 0;
-+	bvec_set_page(&sio->bvec[sio->pages], page, thp_size(page), 0);
- 	sio->len += thp_size(page);
- 	sio->pages += 1;
- 	if (sio->pages == ARRAY_SIZE(sio->bvec) || !plug) {
--- 
-2.39.0
+OK, but afaict the code is identical after your refactoring.
+Side-effect is drivers that were double accounting will now be fixed.
+ 
+> > > 
+> > > How have you tested this patch?  Seems like I should throw all the lvm
+> > > and DM tests at it.
+> 
+> blktests and the mdadm tests (at least as far as they got upstream, md
+> or it's tests always seem somewhat broken).  dmtests is something
+> I've never managed to get to actually run due it's insistence on
+> using not packaged ruby stuff.
 
+Yeah, device-mapper-test-suite (dmts) is a PITA due to ruby dep. And
+the tests have gotten a bit stale relative to recent kernels. I'm
+aware of this and also about how others would like to see more DM
+coverage in blktests. We'll be looking to improve DM testing but it
+does always tend to get put on back-burner (but I'll be getting some
+help from Ben Marzinski to assess what tests we do have, see where we
+have gaps and also put effort to making DM testing part of blktests).
+
+I'm actually now pretty interested to see which (if any) DM tests
+would have caught the missing bio checks issue in your initial patch.
+ 
+> > > In practice this will manifest as delaying the negative checks, until
+> > > returning from active submit_bio, but they will still happen.
+> > 
+> > Actually, I don't think those checks are done at all now.
+> 
+> Yes, the branch needs to be later as in this version below.
+
+Thanks.
+
+> > Unless I'm missing something, this seems like it needs proper
+> > justification and a lot of review and testing.
+> > 
+> > So why do this change?
+> 
+> Because I once again got a question from an auther of a driver that
+> is planned to be upstreamed on which one to use.  And the answer
+> was it's complicated, and you really should not have to think about
+> it, let me dig out my old patch so that driver authors don't have
+> to care.
+
+That's fair, and as I tried to say in my first reply: I agree it does
+clear up that confusion nicely.
+
+Please fold this incremental patch in, with that you can add:
+
+Reviewed-by: Mike Snitzer <snitzer@kernel.org>
+Signed-off-by: Mike Snitzer <snitzer@kernel.org>
+
+(not sure if my Signed-off-by needed but there you have it if so).
+
+diff --git a/block/bio.c b/block/bio.c
+index ea143fd825d7..aa0586012b0d 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -475,7 +475,7 @@ static struct bio *bio_alloc_percpu_cache(struct block_device *bdev,
+  *
+  * Note that when running under submit_bio() (i.e. any block driver),
+  * bios are not submitted until after you return - see the code in
+- * submit_bio() that converts recursion into iteration, to prevent
++ * submit_bio_nocheck() that converts recursion into iteration, to prevent
+  * stack overflows.
+  *
+  * This would normally mean allocating multiple bios under submit_bio()
+diff --git a/block/blk-core.c b/block/blk-core.c
+index f755ac1a2931..c41f086cb183 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -687,7 +687,7 @@ void submit_bio_nocheck(struct bio *bio)
+ 	/*
+ 	 * We only want one ->submit_bio to be active at a time, else stack
+ 	 * usage with stacked devices could be a problem.  Use current->bio_list
+-	 * to collect a list of requests submited by a ->submit_bio method while
++	 * to collect a list of requests submitted by a ->submit_bio method while
+ 	 * it is active, and then process them after it returned.
+ 	 */
+ 	if (current->bio_list)
+@@ -720,13 +720,13 @@ void submit_bio(struct bio *bio)
+ 
+ 	might_sleep();
+ 
+-	if (blkcg_punt_bio_submit(bio))
+-		return;
+-
+ 	/*
+ 	 * Do not double account bios that are remapped and resubmitted.
+ 	 */
+ 	if (!current->bio_list) {
++		if (blkcg_punt_bio_submit(bio))
++			return;
++
+ 		if (bio_op(bio) == REQ_OP_READ) {
+ 			task_io_account_read(bio->bi_iter.bi_size);
+ 			count_vm_events(PGPGIN, bio_sectors(bio));
