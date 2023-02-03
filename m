@@ -2,31 +2,31 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 04D12C64EC4
-	for <linux-block@archiver.kernel.org>; Fri,  3 Feb 2023 15:08:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 289CDC636D7
+	for <linux-block@archiver.kernel.org>; Fri,  3 Feb 2023 15:09:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234071AbjBCPI0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 3 Feb 2023 10:08:26 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48128 "EHLO
+        id S234129AbjBCPI5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 3 Feb 2023 10:08:57 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48760 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233915AbjBCPHx (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 3 Feb 2023 10:07:53 -0500
+        with ESMTP id S234038AbjBCPIP (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 3 Feb 2023 10:08:15 -0500
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A0D738D62A;
-        Fri,  3 Feb 2023 07:07:51 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A65345BAE;
+        Fri,  3 Feb 2023 07:08:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
         :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=2ivuZdJU66fGeGNrDCSX2XtHVJq8+h1pLMvYDbA6wQ8=; b=QSfgGBAh+EXZxzz/Xx6bibyovx
-        8Nrgb07oWFXF7SI+3wqJ/enmvP8hFHc6hUi3sA6GWv5A6dP7fcYPg732hEG/Jv2/jgoMcNgX6QddE
-        Klux6y3fIgLzUgx2tQwUDLRbjwR42AzjGvRy3d+zXy8gseAM9WJfDA8waCftfZvGrqDwKbb421JO+
-        A7KmM+t82WMvPJd60uQmgjS17we9cGNrkQfjYtCxBhWbUJkld5d206L4xTBajgBh6O8m/iXqiwdQ5
-        Cvd+cDQIEMDIlKCNI2qXlOITbs0hvvqOAEaly0PMreLcEnepGH9pQ2ba/Ud+fBJ4c0tY614+rY/Gv
-        8MQKv9iw==;
+        bh=kORmqO/9LhO3glrNFnQu4Hg9yMGINb4dC3Y3cN2SyCY=; b=41bYhxy4j/IlMzxFEoHx+Uxb/Q
+        AoA7/uGEehM9h47lmjn1p7wMCxt9YN2chQRTwM9T0U2R33+6P5uw3dFU034X2phyy1FaKZr6D6uZm
+        Iyou7KFZCyjd3dhhg9p+jbvkL4Nxb6yurGLVKQNvr7SNXOMsbnNpwH65HvZRyfpPA1+nugxrw2oX8
+        3pBDdo50wrWXKZ0GhYhG/bn2vy2Q2l9fNSxBr73HSlVDIWqwtCuv2e6F0W3sVOzyMhe3c85OjeDqi
+        nGFDVsH+onY5nUtibJnC/vm3UzB7E89Fvv+DR2t9yt7brPMGQYvg04XXc1+uC6uVfGrrzMou4bMyC
+        6VNrGmvQ==;
 Received: from [2001:4bb8:19a:272a:910:bb67:7287:f956] (helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1pNxef-002ar9-Df; Fri, 03 Feb 2023 15:07:10 +0000
+        id 1pNxf1-002b5b-7k; Fri, 03 Feb 2023 15:07:31 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     Ilya Dryomov <idryomov@gmail.com>,
@@ -58,10 +58,10 @@ Cc:     Ilya Dryomov <idryomov@gmail.com>,
         linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
         linux-fsdevel@vger.kernel.org, linux-nfs@vger.kernel.org,
         devel@lists.orangefs.org, io-uring@vger.kernel.org,
-        linux-mm@kvack.org, Johannes Thumshirn <johannes.thumshirn@wdc.com>
-Subject: [PATCH 10/23] zram: use bvec_set_page to initialize bvecs
-Date:   Fri,  3 Feb 2023 16:06:21 +0100
-Message-Id: <20230203150634.3199647-11-hch@lst.de>
+        linux-mm@kvack.org
+Subject: [PATCH 16/23] orangefs: use bvec_set_{page,folio} to initialize bvecs
+Date:   Fri,  3 Feb 2023 16:06:27 +0100
+Message-Id: <20230203150634.3199647-17-hch@lst.de>
 X-Mailer: git-send-email 2.39.0
 In-Reply-To: <20230203150634.3199647-1-hch@lst.de>
 References: <20230203150634.3199647-1-hch@lst.de>
@@ -72,56 +72,61 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Use the bvec_set_page helper to initialize bvecs.
+Use the bvec_set_page and bvec_set_folio helpers to initialize bvecs.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Sergey Senozhatsky <senozhatsky@chromium.org>
-Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
 ---
- drivers/block/zram/zram_drv.c | 15 ++++-----------
- 1 file changed, 4 insertions(+), 11 deletions(-)
+ fs/orangefs/inode.c | 22 +++++++---------------
+ 1 file changed, 7 insertions(+), 15 deletions(-)
 
-diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
-index e290d6d970474e..bd8ae4822dc3ef 100644
---- a/drivers/block/zram/zram_drv.c
-+++ b/drivers/block/zram/zram_drv.c
-@@ -703,9 +703,7 @@ static ssize_t writeback_store(struct device *dev,
- 	for (; nr_pages != 0; index++, nr_pages--) {
- 		struct bio_vec bvec;
+diff --git a/fs/orangefs/inode.c b/fs/orangefs/inode.c
+index 4df56089438664..215f6cb3dc4129 100644
+--- a/fs/orangefs/inode.c
++++ b/fs/orangefs/inode.c
+@@ -49,10 +49,8 @@ static int orangefs_writepage_locked(struct page *page,
+ 	/* Should've been handled in orangefs_invalidate_folio. */
+ 	WARN_ON(off == len || off + wlen > len);
  
--		bvec.bv_page = page;
--		bvec.bv_len = PAGE_SIZE;
--		bvec.bv_offset = 0;
-+		bvec_set_page(&bvec, page, PAGE_SIZE, 0);
+-	bv.bv_page = page;
+-	bv.bv_len = wlen;
+-	bv.bv_offset = off % PAGE_SIZE;
+ 	WARN_ON(wlen == 0);
++	bvec_set_page(&bv, page, wlen, off % PAGE_SIZE);
+ 	iov_iter_bvec(&iter, ITER_SOURCE, &bv, 1, wlen);
  
- 		spin_lock(&zram->wb_limit_lock);
- 		if (zram->wb_limit_enable && !zram->bd_wb_limit) {
-@@ -1380,12 +1378,9 @@ static void zram_free_page(struct zram *zram, size_t index)
- static int zram_bvec_read_from_bdev(struct zram *zram, struct page *page,
- 				    u32 index, struct bio *bio, bool partial_io)
- {
--	struct bio_vec bvec = {
--		.bv_page = page,
--		.bv_len = PAGE_SIZE,
--		.bv_offset = 0,
--	};
-+	struct bio_vec bvec;
+ 	ret = wait_for_direct_io(ORANGEFS_IO_WRITE, inode, &off, &iter, wlen,
+@@ -102,15 +100,11 @@ static int orangefs_writepages_work(struct orangefs_writepages *ow,
  
-+	bvec_set_page(&bvec, page, PAGE_SIZE, 0);
- 	return read_from_bdev(zram, &bvec, zram_get_element(zram, index), bio,
- 			      partial_io);
- }
-@@ -1652,9 +1647,7 @@ static int zram_bvec_write(struct zram *zram, struct bio_vec *bvec,
- 		memcpy_from_bvec(dst + offset, bvec);
- 		kunmap_atomic(dst);
- 
--		vec.bv_page = page;
--		vec.bv_len = PAGE_SIZE;
--		vec.bv_offset = 0;
-+		bvec_set_page(&vec, page, PAGE_SIZE, 0);
+ 	for (i = 0; i < ow->npages; i++) {
+ 		set_page_writeback(ow->pages[i]);
+-		ow->bv[i].bv_page = ow->pages[i];
+-		ow->bv[i].bv_len = min(page_offset(ow->pages[i]) + PAGE_SIZE,
+-		    ow->off + ow->len) -
+-		    max(ow->off, page_offset(ow->pages[i]));
+-		if (i == 0)
+-			ow->bv[i].bv_offset = ow->off -
+-			    page_offset(ow->pages[i]);
+-		else
+-			ow->bv[i].bv_offset = 0;
++		bvec_set_page(&ow->bv[i], ow->pages[i],
++			      min(page_offset(ow->pages[i]) + PAGE_SIZE,
++			          ow->off + ow->len) -
++			      max(ow->off, page_offset(ow->pages[i])),
++			      i == 0 ? ow->off - page_offset(ow->pages[i]) : 0);
  	}
+ 	iov_iter_bvec(&iter, ITER_SOURCE, ow->bv, ow->npages, ow->len);
  
- 	ret = __zram_bvec_write(zram, &vec, index, bio);
+@@ -300,9 +294,7 @@ static int orangefs_read_folio(struct file *file, struct folio *folio)
+ 		orangefs_launder_folio(folio);
+ 
+ 	off = folio_pos(folio);
+-	bv.bv_page = &folio->page;
+-	bv.bv_len = folio_size(folio);
+-	bv.bv_offset = 0;
++	bvec_set_folio(&bv, folio, folio_size(folio), 0);
+ 	iov_iter_bvec(&iter, ITER_DEST, &bv, 1, folio_size(folio));
+ 
+ 	ret = wait_for_direct_io(ORANGEFS_IO_READ, inode, &off, &iter,
 -- 
 2.39.0
 
