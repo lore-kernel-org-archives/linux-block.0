@@ -2,198 +2,118 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3786DC636D3
-	for <linux-block@archiver.kernel.org>; Fri,  3 Feb 2023 02:45:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF13DC61DA4
+	for <linux-block@archiver.kernel.org>; Fri,  3 Feb 2023 03:17:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229662AbjBCCp1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 2 Feb 2023 21:45:27 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52668 "EHLO
+        id S230121AbjBCDRi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 2 Feb 2023 22:17:38 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45624 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231545AbjBCCp0 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Feb 2023 21:45:26 -0500
-Received: from mail-ej1-x634.google.com (mail-ej1-x634.google.com [IPv6:2a00:1450:4864:20::634])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D5658418D
-        for <linux-block@vger.kernel.org>; Thu,  2 Feb 2023 18:45:24 -0800 (PST)
-Received: by mail-ej1-x634.google.com with SMTP id lu11so11739650ejb.3
-        for <linux-block@vger.kernel.org>; Thu, 02 Feb 2023 18:45:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=UWbXociyFkdQ7/TUxBgecQAZf00rOpeT9CPa5wmxf04=;
-        b=YaKGyvJ6Rm9T6pGi9CEGpXW8/tz30eEJqTdZ5sDBSsYzk0uAWrcUii7GJ0X3HEcc99
-         JU1KRKAuGsXkOPQQphxpo6Tqeuzfdnk1jed90PonrOQ2wqgxcNrim/zs9/T5faCpph6W
-         eLdGzuoOIMPE7pbjD9jYVMehoHu6j3mjwcer0t4Q+queq4DbnOEnDMQoeJ8N+2QZ5+BA
-         MK2JZjfSVzN5EDq3Yrjq8k/Fw1RTaGe2NT6wJPNN1xItRRRBTZGAkQWCQqH6eMuZjvhd
-         /HIKTBZY9uP6Cuw5zPQKi25pV5dKG1xmRrdH3ft0oOECgs7usfZLRZ+sEU6vLm7V9yOp
-         Q8ug==
+        with ESMTP id S229575AbjBCDRi (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Feb 2023 22:17:38 -0500
+Received: from mail-qv1-f50.google.com (mail-qv1-f50.google.com [209.85.219.50])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 886A718B0E
+        for <linux-block@vger.kernel.org>; Thu,  2 Feb 2023 19:16:55 -0800 (PST)
+Received: by mail-qv1-f50.google.com with SMTP id q10so2206734qvt.10
+        for <linux-block@vger.kernel.org>; Thu, 02 Feb 2023 19:16:55 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=UWbXociyFkdQ7/TUxBgecQAZf00rOpeT9CPa5wmxf04=;
-        b=kv3TDaxuDghaX6hMw5YrJUEcdrH0oUaRTKkwTUGVt+klczIvQmvrNZGjb8QLZlRpn0
-         Axb9Cc3iwrdAwe8Lj00rHzKVxe7QHysJp7BL4xApHVvwxmiLEpkjmzxWSRwBhKsBGoln
-         2E3nAfZsM1o6WzqAS7JtE/dkHcOKQuq0R8LKAgWqkk+XfOR+1WhzWff4GGSr+BJIgaOX
-         VlQJ6UoSzK/bZ8B9H8xMW1iRd/Zicq7AlcmIuQ+ADkS+PIfbvX7x9aEC5hlShXJ4U92n
-         An/9aUbCgYvMtcnprlUl8muSeo0baVQXzMlxzRHBZ+xwZ7bgDlV06+SmfJulDL3r3jCr
-         9gag==
-X-Gm-Message-State: AO0yUKUq+Rw3/nbK7bzO4etHHd+4DI5MLJ6WDj0roqkzJi3y8iMhKuqR
-        qXo1ZKyWnXPFrFyc2p0qtv+PAsuIyF0rgZMBuT8=
-X-Google-Smtp-Source: AK7set94ceSpo/h1dUWbNI7qOd4aKf2weBp3h6HWl4TainLpBjMrdODUPEhcqOWYRNW+xnRXWSJ3FFHDrIf5QS/+xgk=
-X-Received: by 2002:a17:906:eca:b0:883:5f37:5aea with SMTP id
- u10-20020a1709060eca00b008835f375aeamr2482984eji.10.1675392322931; Thu, 02
- Feb 2023 18:45:22 -0800 (PST)
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=chy9YyvhK7mXtGQ0tGQeB7OCTzTRKLRhbvbjGLVTm2I=;
+        b=ugm+qdJGM5vvZAG3rVEeVA9bvnwOgeFAOdtwXbhMVzGOplueR3rQT5dWAPUb1CuY5c
+         OBrJj2n10ol2YVU7WyosQVa/4wj5RmDa7lgzANQ7wx9X6YiCnHTF8Muj/OwFXTlJMiY6
+         E0eoCNaru7XTLTnRClBvb7T99T68eZF3mVY7Wr1Y1z8fPfQna2SlZBgeBxshM13fgTiD
+         hbWRQ8jEnO9+gUnNn47RNuZg1XqjU90Uownj5sh6y5nq92F5FbqFyD4Bm3EQNvdfNiFT
+         lJKniPQRM9U9RTfmbqfzKjyn5v/WUqwOKE9Gt+uFoEpZVSlZmJeYYPYTW9ZrMUC1SsXm
+         KXBw==
+X-Gm-Message-State: AO0yUKWaUAc779EXm0FsCpvNUdutQebapdBvPGxQn+Z13XwnfmMjzi8R
+        OZGLbu/cipTknpXyNhNHWDl4
+X-Google-Smtp-Source: AK7set/2v3K4VImtWp4wHlaBIXTCJSzpiCix8tANg3EljgK7D+Bw6KwYPu2AFz6rnlkQQv5scx+9Zg==
+X-Received: by 2002:a0c:e9c9:0:b0:537:6f8c:2c2c with SMTP id q9-20020a0ce9c9000000b005376f8c2c2cmr12293368qvo.41.1675394214581;
+        Thu, 02 Feb 2023 19:16:54 -0800 (PST)
+Received: from localhost (pool-68-160-166-30.bstnma.fios.verizon.net. [68.160.166.30])
+        by smtp.gmail.com with ESMTPSA id ea7-20020a05620a488700b007290be5557bsm1000464qkb.38.2023.02.02.19.16.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 02 Feb 2023 19:16:54 -0800 (PST)
+Date:   Thu, 2 Feb 2023 22:16:53 -0500
+From:   Mike Snitzer <snitzer@kernel.org>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
+        linux-raid@vger.kernel.org, dm-devel@redhat.com
+Subject: Re: block: remove submit_bio_noacct
+Message-ID: <Y9x8pagVnO7Xtnbn@redhat.com>
+References: <20230202181423.2910619-1-hch@lst.de>
+ <Y9xqvF6nTptzHwpv@redhat.com>
 MIME-Version: 1.0
-References: <20230202091151.855784-1-qkrwngud825@gmail.com> <202302030733.TVNhMvP4-lkp@intel.com>
-In-Reply-To: <202302030733.TVNhMvP4-lkp@intel.com>
-From:   Juhyung Park <qkrwngud825@gmail.com>
-Date:   Fri, 3 Feb 2023 11:45:09 +0900
-Message-ID: <CAD14+f2d2ggvTMO9oXF_6yhQYOsLjQKFd0hbCrBT2Whn3ad0kA@mail.gmail.com>
-Subject: Re: [PATCH] block: remove more NULL checks after bdev_get_queue()
-To:     kernel test robot <lkp@intel.com>
-Cc:     linux-block@vger.kernel.org, oe-kbuild-all@lists.linux.dev,
-        axboe@kernel.dk, johannes.thumshirn@wdc.com, p.raghav@samsung.com,
-        kch@nvidia.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Y9xqvF6nTptzHwpv@redhat.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Welp, didn't have it build-tested with W=3D1 and it somehow didn't warn
-me without it.
+On Thu, Feb 02 2023 at  9:00P -0500,
+Mike Snitzer <snitzer@kernel.org> wrote:
 
-Just posted v2:
-https://lore.kernel.org/all/20230203024029.48260-1-qkrwngud825@gmail.com/T/=
-#u
+> On Thu, Feb 02 2023 at  1:14P -0500,
+> Christoph Hellwig <hch@lst.de> wrote:
+> 
+> > The current usage of submit_bio vs submit_bio_noacct which skips the
+> > VM events and task account is a bit unclear.  It seems to be mostly
+> > intended for sending on bios received by stacking drivers, but also
+> > seems to be used for stacking drivers newly generated metadata
+> > sometimes.
+> 
+> Your lack of confidence conveyed in the above shook me a little bit
+> considering so much of this code is attributed to you -- I mostly got
+> past that, but I am a bit concerned about one aspect of the
+> submit_bio() change (2nd to last comment inlined below).
+> 
+> > Remove the separate API and just skip the accounting if submit_bio
+> > is called recursively.  This gets us an accounting behavior that
+> > is very similar (but not quite identical) to the current one, while
+> > simplifying the API and code base.
+> 
+> Can you elaborate on the "but not quite identical"? This patch is
+> pretty mechanical, just folding code and renaming.. but you obviously
+> saw subtle differences.  Likely worth callign those out precisely.
+> 
+> How have you tested this patch?  Seems like I should throw all the lvm
+> and DM tests at it.
+> 
 
-Sorry for the inconvenience!
-Thanks,
+...
 
-On Fri, Feb 3, 2023 at 9:05 AM kernel test robot <lkp@intel.com> wrote:
->
-> Hi Juhyung,
->
-> Thank you for the patch! Perhaps something to improve:
->
-> [auto build test WARNING on axboe-block/for-next]
-> [also build test WARNING on linus/master v6.2-rc6 next-20230202]
-> [If your patch is applied to the wrong git tree, kindly drop us a note.
-> And when submitting patch, we suggest to use '--base' as documented in
-> https://git-scm.com/docs/git-format-patch#_base_tree_information]
->
-> url:    https://github.com/intel-lab-lkp/linux/commits/Juhyung-Park/block=
--remove-more-NULL-checks-after-bdev_get_queue/20230202-171443
-> base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block=
-.git for-next
-> patch link:    https://lore.kernel.org/r/20230202091151.855784-1-qkrwngud=
-825%40gmail.com
-> patch subject: [PATCH] block: remove more NULL checks after bdev_get_queu=
-e()
-> config: x86_64-rhel-8.3-func (https://download.01.org/0day-ci/archive/202=
-30203/202302030733.TVNhMvP4-lkp@intel.com/config)
-> compiler: gcc-11 (Debian 11.3.0-8) 11.3.0
-> reproduce (this is a W=3D1 build):
->         # https://github.com/intel-lab-lkp/linux/commit/f62253701c6bf7712=
-27300ca8c572c778c2670bb
->         git remote add linux-review https://github.com/intel-lab-lkp/linu=
-x
->         git fetch --no-tags linux-review Juhyung-Park/block-remove-more-N=
-ULL-checks-after-bdev_get_queue/20230202-171443
->         git checkout f62253701c6bf771227300ca8c572c778c2670bb
->         # save the config file
->         mkdir build_dir && cp config build_dir/.config
->         make W=3D1 O=3Dbuild_dir ARCH=3Dx86_64 olddefconfig
->         make W=3D1 O=3Dbuild_dir ARCH=3Dx86_64 SHELL=3D/bin/bash
->
-> If you fix the issue, kindly add following tag where applicable
-> | Reported-by: kernel test robot <lkp@intel.com>
->
-> All warnings (new ones prefixed by >>):
->
->    block/blk-zoned.c: In function 'blkdev_report_zones_ioctl':
-> >> block/blk-zoned.c:337:31: warning: variable 'q' set but not used [-Wun=
-used-but-set-variable]
->      337 |         struct request_queue *q;
->          |                               ^
->    block/blk-zoned.c: In function 'blkdev_zone_mgmt_ioctl':
->    block/blk-zoned.c:392:31: warning: variable 'q' set but not used [-Wun=
-used-but-set-variable]
->      392 |         struct request_queue *q;
->          |                               ^
->
->
-> vim +/q +337 block/blk-zoned.c
->
-> d41003513e61dd Christoph Hellwig 2019-11-11  327
-> 56c4bddb970658 Bart Van Assche   2018-03-08  328  /*
-> 3ed05a987e0f63 Shaun Tancheff    2016-10-18  329   * BLKREPORTZONE ioctl =
-processing.
-> 3ed05a987e0f63 Shaun Tancheff    2016-10-18  330   * Called from blkdev_i=
-octl.
-> 3ed05a987e0f63 Shaun Tancheff    2016-10-18  331   */
-> 3ed05a987e0f63 Shaun Tancheff    2016-10-18  332  int blkdev_report_zones=
-_ioctl(struct block_device *bdev, fmode_t mode,
-> 3ed05a987e0f63 Shaun Tancheff    2016-10-18  333                         =
-     unsigned int cmd, unsigned long arg)
-> 3ed05a987e0f63 Shaun Tancheff    2016-10-18  334  {
-> 3ed05a987e0f63 Shaun Tancheff    2016-10-18  335        void __user *argp=
- =3D (void __user *)arg;
-> d41003513e61dd Christoph Hellwig 2019-11-11  336        struct zone_repor=
-t_args args;
-> 3ed05a987e0f63 Shaun Tancheff    2016-10-18 @337        struct request_qu=
-eue *q;
-> 3ed05a987e0f63 Shaun Tancheff    2016-10-18  338        struct blk_zone_r=
-eport rep;
-> 3ed05a987e0f63 Shaun Tancheff    2016-10-18  339        int ret;
-> 3ed05a987e0f63 Shaun Tancheff    2016-10-18  340
-> 3ed05a987e0f63 Shaun Tancheff    2016-10-18  341        if (!argp)
-> 3ed05a987e0f63 Shaun Tancheff    2016-10-18  342                return -E=
-INVAL;
-> 3ed05a987e0f63 Shaun Tancheff    2016-10-18  343
-> 3ed05a987e0f63 Shaun Tancheff    2016-10-18  344        q =3D bdev_get_qu=
-eue(bdev);
-> 3ed05a987e0f63 Shaun Tancheff    2016-10-18  345
-> edd1dbc83b1de3 Christoph Hellwig 2022-07-06  346        if (!bdev_is_zone=
-d(bdev))
-> 3ed05a987e0f63 Shaun Tancheff    2016-10-18  347                return -E=
-NOTTY;
-> 3ed05a987e0f63 Shaun Tancheff    2016-10-18  348
-> 3ed05a987e0f63 Shaun Tancheff    2016-10-18  349        if (copy_from_use=
-r(&rep, argp, sizeof(struct blk_zone_report)))
-> 3ed05a987e0f63 Shaun Tancheff    2016-10-18  350                return -E=
-FAULT;
-> 3ed05a987e0f63 Shaun Tancheff    2016-10-18  351
-> 3ed05a987e0f63 Shaun Tancheff    2016-10-18  352        if (!rep.nr_zones=
-)
-> 3ed05a987e0f63 Shaun Tancheff    2016-10-18  353                return -E=
-INVAL;
-> 3ed05a987e0f63 Shaun Tancheff    2016-10-18  354
-> d41003513e61dd Christoph Hellwig 2019-11-11  355        args.zones =3D ar=
-gp + sizeof(struct blk_zone_report);
-> d41003513e61dd Christoph Hellwig 2019-11-11  356        ret =3D blkdev_re=
-port_zones(bdev, rep.sector, rep.nr_zones,
-> d41003513e61dd Christoph Hellwig 2019-11-11  357                         =
-         blkdev_copy_zone_to_user, &args);
-> d41003513e61dd Christoph Hellwig 2019-11-11  358        if (ret < 0)
-> 3ed05a987e0f63 Shaun Tancheff    2016-10-18  359                return re=
-t;
-> d41003513e61dd Christoph Hellwig 2019-11-11  360
-> d41003513e61dd Christoph Hellwig 2019-11-11  361        rep.nr_zones =3D =
-ret;
-> 82394db7383d33 Matias Bj=C3=B8rling   2020-06-29  362        rep.flags =
-=3D BLK_ZONE_REP_CAPACITY;
-> d41003513e61dd Christoph Hellwig 2019-11-11  363        if (copy_to_user(=
-argp, &rep, sizeof(struct blk_zone_report)))
-> d41003513e61dd Christoph Hellwig 2019-11-11  364                return -E=
-FAULT;
-> d41003513e61dd Christoph Hellwig 2019-11-11  365        return 0;
-> 3ed05a987e0f63 Shaun Tancheff    2016-10-18  366  }
-> 3ed05a987e0f63 Shaun Tancheff    2016-10-18  367
->
-> --
-> 0-DAY CI Kernel Test Service
-> https://github.com/intel/lkp-tests
+> > @@ -716,6 +712,27 @@ void submit_bio_noacct(struct bio *bio)
+> >  
+> >  	might_sleep();
+> >  
+> > +	/*
+> > +	 * We only want one ->submit_bio to be active at a time, else stack
+> > +	 * usage with stacked devices could be a problem.  Use current->bio_list
+> > +	 * to collect a list of requests submited by a ->submit_bio method while
+> > +	 * it is active, and then process them after it returned.
+> > +	 */
+> > +	if (current->bio_list) {
+> > +		bio_list_add(&current->bio_list[0], bio);
+> > +		return;
+> > +	}
+> 
+> It seems pretty aggressive to queue the bio to current->bio_list so
+> early. Before this patch, that didn't happen until the very end
+> (meaning all the negative checks of submit_bio_noacct were done before
+> doing the bio_list_add() due to recursion). This is my primary concern
+> with this patch. Is that the biggest aspect of your "not quite
+> identical" comment in the patch header?
+> 
+> In practice this will manifest as delaying the negative checks, until
+> returning from active submit_bio, but they will still happen.
+
+Actually, I don't think those checks are done at all now.
+
+Unless I'm missing something, this seems like it needs proper
+justification and a lot of review and testing.
+
+So why do this change?
