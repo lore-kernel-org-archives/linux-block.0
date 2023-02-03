@@ -2,163 +2,67 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93E86C636D6
-	for <linux-block@archiver.kernel.org>; Fri,  3 Feb 2023 17:18:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 65D4AC61DA4
+	for <linux-block@archiver.kernel.org>; Fri,  3 Feb 2023 18:01:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231593AbjBCRSP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 3 Feb 2023 12:18:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60716 "EHLO
+        id S233070AbjBCSBH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 3 Feb 2023 13:01:07 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39876 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232222AbjBCRSO (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 3 Feb 2023 12:18:14 -0500
-Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D9C71F5C5
-        for <linux-block@vger.kernel.org>; Fri,  3 Feb 2023 09:18:12 -0800 (PST)
-Received: by mail-pj1-x1033.google.com with SMTP id f16-20020a17090a9b1000b0023058bbd7b2so4945765pjp.0
-        for <linux-block@vger.kernel.org>; Fri, 03 Feb 2023 09:18:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=K70GwBbxm76u0ZHh9QualBnSNVhMmwCaA4xLAgTOsU4=;
-        b=R00Jv7r0nGI0Ztnp5TNHhM+FfJ5zmFRR/yKaJPFf48QgjKh7tXSwGMmQnOoqu8Xid4
-         wge7CmaLgfoEKprgizb7/sm8rwZ8EQ9OCoyJKMGvTA4kiktJCR4NV/cva7qvSGWATdmE
-         /2uT8roACaKsn4YLwQl6hQkgbKX7IYcNLKQL5KVRHggoW1I8XImpl9s6MfEiMUSpHo9Y
-         S5fkZix1iQi2f9FmnThOmhtEMaBrJr9ePfucBJOf0enZnaK+aBn2RScZgWLk6sLYtLKJ
-         6yN94xDkDiQ62CShnA6PepLuiQAIJ+UkyAdk860JzMBR19PnaXvBFKHmerQBvkix95On
-         9+yQ==
+        with ESMTP id S232616AbjBCSBG (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 3 Feb 2023 13:01:06 -0500
+Received: from mail-pj1-f49.google.com (mail-pj1-f49.google.com [209.85.216.49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 178C72A16C
+        for <linux-block@vger.kernel.org>; Fri,  3 Feb 2023 10:01:06 -0800 (PST)
+Received: by mail-pj1-f49.google.com with SMTP id d2so2110908pjd.5
+        for <linux-block@vger.kernel.org>; Fri, 03 Feb 2023 10:01:06 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=K70GwBbxm76u0ZHh9QualBnSNVhMmwCaA4xLAgTOsU4=;
-        b=DYYZp02ZpeSgFOoM/E2+lMMLJDV7fVznip4Usah1BgGYJyIUSb3y9qnK8wJ1x66q40
-         w0qJCZTJ+tOPP9UWmNflX1EI+i6EroZyPRwx+0klReejZgLmnkKUHFOFcWCDSUEf8A7T
-         C3Mjs45SnKhXZxE+W8iR781T687AEfD4Gfk/MI0BvJcmSi2BNV1d0Our2El4ire/gCQZ
-         pEf9chfTJz5mRF9mFstN+a9bzXfegK6mVIRCuBTNzNCNqFDLiawU+fB8TAtcIiAKzOn1
-         vo2jIUUL+JkA6rLRzA+w9nJCYecqvTRpl/HBMeJ2ws0WWE6a8Nm2eLUbDh2LnYKtx10j
-         7lMA==
-X-Gm-Message-State: AO0yUKUUKPvVfI3E1HaV2WVoDVAdt3vQ8jIOpv2P2t874y3xSCc3DAMZ
-        NvAMW9ivhQxpGxacDEdQFhefkQ==
-X-Google-Smtp-Source: AK7set/8QyEeOBS5HCdwVVv3pX8pLqYaYDC09KN7ZX0YiSUh3tCWtH5sa+Lu+Eay2bGB3phfSCaeYw==
-X-Received: by 2002:a17:90a:3c83:b0:22b:afef:9228 with SMTP id g3-20020a17090a3c8300b0022bafef9228mr8980675pjc.4.1675444691816;
-        Fri, 03 Feb 2023 09:18:11 -0800 (PST)
-Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id s1-20020a17090a6e4100b0021900ba8eeesm5189271pjm.2.2023.02.03.09.18.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 03 Feb 2023 09:18:11 -0800 (PST)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Ilya Dryomov <idryomov@gmail.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Minchan Kim <minchan@kernel.org>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>,
-        Keith Busch <kbusch@kernel.org>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        David Howells <dhowells@redhat.com>,
-        Marc Dionne <marc.dionne@auristor.com>,
-        Xiubo Li <xiubli@redhat.com>, Steve French <sfrench@samba.org>,
-        Trond Myklebust <trond.myklebust@hammerspace.com>,
-        Anna Schumaker <anna@kernel.org>,
-        Mike Marshall <hubcap@omnibond.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Chuck Lever <chuck.lever@oracle.com>,
-        linux-block@vger.kernel.org, ceph-devel@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org,
-        target-devel@vger.kernel.org, kvm@vger.kernel.org,
-        netdev@vger.kernel.org, linux-afs@lists.infradead.org,
-        linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
-        linux-fsdevel@vger.kernel.org, linux-nfs@vger.kernel.org,
-        devel@lists.orangefs.org, io-uring@vger.kernel.org,
-        linux-mm@kvack.org
-In-Reply-To: <20230203150634.3199647-1-hch@lst.de>
-References: <20230203150634.3199647-1-hch@lst.de>
-Subject: Re: add bvec initialization helpers v2
-Message-Id: <167544468926.66559.8388961280734694655.b4-ty@kernel.dk>
-Date:   Fri, 03 Feb 2023 10:18:09 -0700
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=aOlXCfgXIzcD6djWuvVKMsZ0ZeVutGV7OHPUHXItt9U=;
+        b=Jlt1Cd+JiaS2YnO6etkc6bYVULfJrvKnbAf7CggiIwSUobnS9Gy3b36cbuaMuJWvRp
+         3Wr8kfiF+/z5nOYSQDGssTcUdBIGg/kSLt0AgTC+Xgs33F32+FjBFm7FOwGuDphrPrGD
+         F5dXlTNOYvzU0k235at5JruapfmubEZJ0sHhFtMfWffh44MSw45Fw4T3BXV5CV6qRfE4
+         ckK+g5wPUOLo5mt5bX0CUNqwWJAXEX25Yh4yKT8wER6lguA9PQxlKE62anNvB0dMsNjP
+         5DzbCbTVgSM1h2RVyelIYWwI6ZkY8AafprGouXY04nNSiX3yWXlJi3dNbG39I2mBA4se
+         WbTw==
+X-Gm-Message-State: AO0yUKXvwj128Mvp8pSkIkj3/Z3xD902ZVrj/JMrDyHrtxmC7N7hegnT
+        I7XxQSZZgqbNPY0zWDEYddb9feEH1YjJFg==
+X-Google-Smtp-Source: AK7set83GPBWrjqBGcFl+X489UJvUgATJuVphzWtmbDHujgTlmtUMOPbVGMGw/iI2Lfi+h2q2p0J1g==
+X-Received: by 2002:a05:6a20:5485:b0:bd:1058:29b2 with SMTP id i5-20020a056a20548500b000bd105829b2mr14126092pzk.58.1675447265469;
+        Fri, 03 Feb 2023 10:01:05 -0800 (PST)
+Received: from ?IPV6:2620:15c:211:201:b752:5d03:ec5e:7be5? ([2620:15c:211:201:b752:5d03:ec5e:7be5])
+        by smtp.gmail.com with ESMTPSA id x8-20020a63b348000000b004efd4393c1csm1684619pgt.84.2023.02.03.10.01.04
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 03 Feb 2023 10:01:04 -0800 (PST)
+Message-ID: <135496cc-48c6-c0f7-8191-352639493479@acm.org>
+Date:   Fri, 3 Feb 2023 10:01:03 -0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.6.0
+Subject: Re: [PATCH] block: stub out and deprecated the capability attribute
+ on the gendisk
+Content-Language: en-US
+To:     Christoph Hellwig <hch@lst.de>, axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org
+References: <20230203150209.3199115-1-hch@lst.de>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20230203150209.3199115-1-hch@lst.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.12.0
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
-On Fri, 03 Feb 2023 16:06:11 +0100, Christoph Hellwig wrote:
-> this series adds the helpers to initalize a bvec.  These remove open coding of
-> bvec internals and help with experimenting with other representations like
-> a phys_addr_t instead of page + offset.
+On 2/3/23 07:02, Christoph Hellwig wrote:
+> The capability attribute was added in 2017 to expose the kernel internal
+> GENHD_FL_MEDIA_CHANGE_NOTIFY to userspace without ever adding a value to
+> an UAPI header, and without ever setting it in any driver until it was
+> finally removed in Linux 5.7.
 > 
-> Changes since v1:
->  - fix a typo
->  - simplify the code in ceph's __iter_get_bvecs a little bit further
->  - fix two subject prefixes
-> 
-> [...]
+> Deprecate the file and always return 0 instead of exposing the other
+> internal and frequently renumbered other gendisk flags.
 
-Applied, thanks!
-
-[01/23] block: factor out a bvec_set_page helper
-        commit: d58cdfae6a22e5079656c487aad669597a0635c8
-[02/23] block: add a bvec_set_folio helper
-        commit: 26db5ee158510108c819aa7be6eb8c75accf85d7
-[03/23] block: add a bvec_set_virt helper
-        commit: 666e6550cb74e3a7206b5699409c9f31e123887e
-[04/23] sd: factor out a sd_set_special_bvec helper
-        commit: f1e117cbb01a38f764db2f292174b93eab7c2db2
-[05/23] target: use bvec_set_page to initialize bvecs
-        commit: 3c7ebe952fefb646c56b60f1c3e3388f3b938cc7
-[06/23] nvmet: use bvec_set_page to initialize bvecs
-        commit: fc41c97a3a7b08131e6998bc7692f95729f9d359
-[07/23] nvme: use bvec_set_virt to initialize special_vec
-        commit: 4bee16daf13225d6b109bb95d613fd691b04a757
-[08/23] rbd: use bvec_set_page to initialize the copy up bvec
-        commit: 7df2af0bb4912cf360045d065f88fe4ed2f702ca
-[09/23] virtio_blk: use bvec_set_virt to initialize special_vec
-        commit: b831f3a1031664ae2443bab63d35c416ed30c91d
-[10/23] zram: use bvec_set_page to initialize bvecs
-        commit: 13ae4db0c05107814db4e774856aa83e72e8bf04
-[11/23] afs: use bvec_set_folio to initialize a bvec
-        commit: a8173be1863e57393edb5c158860ec43a1f21ed7
-[12/23] ceph: use bvec_set_page to initialize a bvec
-        commit: 5c6542b6612f635eaa001c54af22018f1e996418
-[13/23] cifs: use bvec_set_page to initialize bvecs
-        commit: 220ae4a5c2ba10333b3b01fbf3dea0d759e77a76
-[14/23] coredump: use bvec_set_page to initialize a bvec
-        commit: cd598003206839ed1354902805b52c3a4f6ead2e
-[15/23] nfs: use bvec_set_page to initialize bvecs
-        commit: 8bb7cd842c44b299586bfed6aadde8863c48b415
-[16/23] orangefs: use bvec_set_{page,folio} to initialize bvecs
-        commit: 8ead80b2c5f8c59d6ca18cd7fb582a3ffc7ea5b7
-[17/23] splice: use bvec_set_page to initialize a bvec
-        commit: 664e40789abaad892737a696102052dae199a029
-[18/23] io_uring: use bvec_set_page to initialize a bvec
-        commit: cc342a21930f0e3862c5fd0871cd5a65c5b59e27
-[19/23] swap: use bvec_set_page to initialize bvecs
-        commit: 8976fa6d79d70502181fa16b5e023645c0f44ec4
-[20/23] rxrpc: use bvec_set_page to initialize a bvec
-        commit: efde918ac66958c568926120841e7692b1e9bd9d
-[21/23] sunrpc: use bvec_set_page to initialize bvecs
-        commit: 9088151f1bfe670ae9e28b77095f974196bb2343
-[22/23] vringh: use bvec_set_page to initialize a bvec
-        commit: 58dfe14073846e416d5b3595314a4f37e1a89c50
-[23/23] libceph: use bvec_set_page to initialize bvecs
-        commit: 1eb9cd15004fa91b6d1911af9fbaff299d8e9e45
-
-Best regards,
--- 
-Jens Axboe
-
-
-
+Reviewed-by: Bart Van Assche <bvanassche@acm.org>
