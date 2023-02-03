@@ -2,31 +2,31 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B7326C677F1
-	for <linux-block@archiver.kernel.org>; Fri,  3 Feb 2023 15:07:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9DD4C6FD18
+	for <linux-block@archiver.kernel.org>; Fri,  3 Feb 2023 15:07:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233830AbjBCPHi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 3 Feb 2023 10:07:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47896 "EHLO
+        id S233776AbjBCPHs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 3 Feb 2023 10:07:48 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47916 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233749AbjBCPHc (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 3 Feb 2023 10:07:32 -0500
+        with ESMTP id S233857AbjBCPHl (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 3 Feb 2023 10:07:41 -0500
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27E3BA2A4B;
-        Fri,  3 Feb 2023 07:07:31 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2FBCAA2A51;
+        Fri,  3 Feb 2023 07:07:37 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
         :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=i8uz5/Cr3yI4AKad2Qe+HNOvXzb51PMMHxDJaU9rAgw=; b=s4yrPDzVMBpi6l0+EETwcbHIFv
-        2xwcbaenQAG3iI5OovZK8STydd1dXIrGWK8akwiQeQc2RIPwmHAQ3tB2YwFvPQAvHmMaIfIucx7Zp
-        ajCj3SDxghdOlCv370eNnsuOoiH8YZgL2rB/Cifv8UVmXFYQH6UlD0uleebs0+/Lp4g3yoat0NQTP
-        3i4Ky2rvVCEbWtE/DFAD0kzDmDDcPhmnQe69wiJFwjPi1Kk71QZJfJKGcGt7gJuRlLjYYYrRMvnfN
-        FFYd2dyKm+M7lYhIqCJrAgzbIeZRKknEymVkn8XFqgs4xeMmPgxEo3i4PzL6eEbspvJoriHHKn7qw
-        v2H1dBXw==;
+        bh=qOELs8Cf+3DRHH4YZ5i8Y7BY08du3RSg74OTiYB5sHQ=; b=aF5Qbqrg1yclOtyaI4gTKBWydF
+        RggQAyGRBco620c8Fi869LlPO2pe8evEIqDoV1ozOXdNfytn1MRinE/6QYY5k2oPlPJhB01no6VtD
+        eldvco5iwWgUqJuF6Ln9UEwZNa6v1GVbT/6Kwoxq6v6E47EA3+X0x/5UWmfkwWrsPlCary6PtwIur
+        8CI+Wl9GP1YyGgxKum6MPQS4lap8xnIx1Ov95K0LpqVrUkLoMLragJkM0cWq7Yw5U2U5JFh4+zQgw
+        adzFS91VzTwjl1q4AJys+nyWOqDq0dqD/Ug/qOVE9Xw8ZapK+WSEj6v0Tc7w/kwwgNzmawXYW/9S4
+        JiaBbcyQ==;
 Received: from [2001:4bb8:19a:272a:910:bb67:7287:f956] (helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1pNxeH-002aen-LR; Fri, 03 Feb 2023 15:06:46 +0000
+        id 1pNxeR-002aju-IY; Fri, 03 Feb 2023 15:06:56 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     Ilya Dryomov <idryomov@gmail.com>,
@@ -59,9 +59,9 @@ Cc:     Ilya Dryomov <idryomov@gmail.com>,
         linux-fsdevel@vger.kernel.org, linux-nfs@vger.kernel.org,
         devel@lists.orangefs.org, io-uring@vger.kernel.org,
         linux-mm@kvack.org, Johannes Thumshirn <johannes.thumshirn@wdc.com>
-Subject: [PATCH 03/23] block: add a bvec_set_virt helper
-Date:   Fri,  3 Feb 2023 16:06:14 +0100
-Message-Id: <20230203150634.3199647-4-hch@lst.de>
+Subject: [PATCH 06/23] nvmet: use bvec_set_page to initialize bvecs
+Date:   Fri,  3 Feb 2023 16:06:17 +0100
+Message-Id: <20230203150634.3199647-7-hch@lst.de>
 X-Mailer: git-send-email 2.39.0
 In-Reply-To: <20230203150634.3199647-1-hch@lst.de>
 References: <20230203150634.3199647-1-hch@lst.de>
@@ -72,39 +72,60 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-A small wrapper around bvec_set_page for callers that have a virtual
-address.
+Use the bvec_set_page helper to initialize bvecs.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 Reviewed-by: Chaitanya Kulkarni <kch@nvidia.com>
 Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
 ---
- include/linux/bvec.h | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+ drivers/nvme/target/io-cmd-file.c | 10 ++--------
+ drivers/nvme/target/tcp.c         |  5 ++---
+ 2 files changed, 4 insertions(+), 11 deletions(-)
 
-diff --git a/include/linux/bvec.h b/include/linux/bvec.h
-index 2bae1134499e7f..f2d22931f3030a 100644
---- a/include/linux/bvec.h
-+++ b/include/linux/bvec.h
-@@ -63,6 +63,18 @@ static inline void bvec_set_folio(struct bio_vec *bv, struct folio *folio,
- 	bvec_set_page(bv, &folio->page, len, offset);
+diff --git a/drivers/nvme/target/io-cmd-file.c b/drivers/nvme/target/io-cmd-file.c
+index 871c4f32f443f5..2d068439b129c5 100644
+--- a/drivers/nvme/target/io-cmd-file.c
++++ b/drivers/nvme/target/io-cmd-file.c
+@@ -73,13 +73,6 @@ int nvmet_file_ns_enable(struct nvmet_ns *ns)
+ 	return ret;
  }
  
-+/**
-+ * bvec_set_virt - initialize a bvec based on a virtual address
-+ * @bv:		bvec to initialize
-+ * @vaddr:	virtual address to set the bvec to
-+ * @len:	length of the bvec
-+ */
-+static inline void bvec_set_virt(struct bio_vec *bv, void *vaddr,
-+		unsigned int len)
-+{
-+	bvec_set_page(bv, virt_to_page(vaddr), len, offset_in_page(vaddr));
-+}
-+
- struct bvec_iter {
- 	sector_t		bi_sector;	/* device address in 512 byte
- 						   sectors */
+-static void nvmet_file_init_bvec(struct bio_vec *bv, struct scatterlist *sg)
+-{
+-	bv->bv_page = sg_page(sg);
+-	bv->bv_offset = sg->offset;
+-	bv->bv_len = sg->length;
+-}
+-
+ static ssize_t nvmet_file_submit_bvec(struct nvmet_req *req, loff_t pos,
+ 		unsigned long nr_segs, size_t count, int ki_flags)
+ {
+@@ -146,7 +139,8 @@ static bool nvmet_file_execute_io(struct nvmet_req *req, int ki_flags)
+ 
+ 	memset(&req->f.iocb, 0, sizeof(struct kiocb));
+ 	for_each_sg(req->sg, sg, req->sg_cnt, i) {
+-		nvmet_file_init_bvec(&req->f.bvec[bv_cnt], sg);
++		bvec_set_page(&req->f.bvec[bv_cnt], sg_page(sg), sg->length,
++			      sg->offset);
+ 		len += req->f.bvec[bv_cnt].bv_len;
+ 		total_len += req->f.bvec[bv_cnt].bv_len;
+ 		bv_cnt++;
+diff --git a/drivers/nvme/target/tcp.c b/drivers/nvme/target/tcp.c
+index cc05c094de221d..c5759eb503d004 100644
+--- a/drivers/nvme/target/tcp.c
++++ b/drivers/nvme/target/tcp.c
+@@ -321,9 +321,8 @@ static void nvmet_tcp_build_pdu_iovec(struct nvmet_tcp_cmd *cmd)
+ 	while (length) {
+ 		u32 iov_len = min_t(u32, length, sg->length - sg_offset);
+ 
+-		iov->bv_page = sg_page(sg);
+-		iov->bv_len = sg->length;
+-		iov->bv_offset = sg->offset + sg_offset;
++		bvec_set_page(iov, sg_page(sg), sg->length,
++				sg->offset + sg_offset);
+ 
+ 		length -= iov_len;
+ 		sg = sg_next(sg);
 -- 
 2.39.0
 
