@@ -2,42 +2,69 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D407BC05027
-	for <linux-block@archiver.kernel.org>; Fri,  3 Feb 2023 15:07:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F7BEC636D6
+	for <linux-block@archiver.kernel.org>; Fri,  3 Feb 2023 15:07:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233362AbjBCPGq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 3 Feb 2023 10:06:46 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45290 "EHLO
+        id S233719AbjBCPHb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 3 Feb 2023 10:07:31 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47868 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233639AbjBCPEq (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 3 Feb 2023 10:04:46 -0500
+        with ESMTP id S232498AbjBCPHa (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 3 Feb 2023 10:07:30 -0500
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 146F9A56CC;
-        Fri,  3 Feb 2023 07:04:42 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF714A2A5E;
+        Fri,  3 Feb 2023 07:07:28 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
         :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=dueVlTMBYMpU6WhcVEk2hjJcCiKSsyRkz1adFsMrdaI=; b=SyYJJQO5gZWmnrdw9pEuZOssZp
-        X2kKoQvA70cOOjINeHRQOtnTdb0zhgWY5joVEmXYYZTpJxkN6Rq3sUpN8bsjhT6SkpHYY/d345Amj
-        +BxIUvW3zt05MFCRt8Go1Xumr40ZOgMSbiHzMBzCnNKaMT42tH0m5oGHHC2QbOfh0hpEGEG3u4cQP
-        jW/drz399Vx2rp5RHRfAdpXSddaJS7WR84pSiI/l5QblXoFQdjxOhUyWAh6oy0mN/b3geUDYKEexg
-        KJVlrMIxPeU/saeRkYH6aqTL/h0ojeF4fp3lvchQbhz8Lprbtf37p72HJD1BxQDlJ6o5WRHPMsr86
-        KeW5G2jA==;
+        bh=CiyB48vb6mrmTaEOVbqLR4u5Ie+kSkIibxGdt/yEGrQ=; b=D+S3e79rKed63zGKQODZ2ajajk
+        tY9PTZKFAa2fY7TmJOLLnb65WB73dEl4Jgj/gOugeSqMbkmLbXohy1C6IwWfuiZo77jdisGjM3yt4
+        9xvdaWC7YH4+evg/huO/wnallnWJ+vAfbAy+KZ1lxMwOxypC9YvrMMgminhOcGcxNYLxnvCObX1OD
+        yOODt3y4LRWDt6sPzQe9gbo91x07bQX4zJYyv+FuFp5RkEeW42m5CZNG2NJ+PmXd8QRNdkVwaLx8u
+        Ed4Ftp13pBU7ExNTD2TCUOM24LHzJnSBzaVBjKWd5mYX39pRy/ZbN9BsCfck6fVftE+tsT0WOITG1
+        xZXpO+3Q==;
 Received: from [2001:4bb8:19a:272a:910:bb67:7287:f956] (helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1pNxcG-002aBZ-AQ; Fri, 03 Feb 2023 15:04:40 +0000
+        id 1pNxeE-002adJ-Pc; Fri, 03 Feb 2023 15:06:43 +0000
 From:   Christoph Hellwig <hch@lst.de>
-To:     Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
-        Josef Bacik <josef@toxicpanda.com>
-Cc:     linux-block@vger.kernel.org, cgroups@vger.kernel.org,
-        Andreas Herrmann <aherrmann@suse.de>
-Subject: [PATCH 11/19] blk-wbt: open code wbt_queue_depth_changed in wbt_init
-Date:   Fri,  3 Feb 2023 16:03:52 +0100
-Message-Id: <20230203150400.3199230-12-hch@lst.de>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Ilya Dryomov <idryomov@gmail.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Minchan Kim <minchan@kernel.org>,
+        Sergey Senozhatsky <senozhatsky@chromium.org>,
+        Keith Busch <kbusch@kernel.org>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        David Howells <dhowells@redhat.com>,
+        Marc Dionne <marc.dionne@auristor.com>,
+        Xiubo Li <xiubli@redhat.com>, Steve French <sfrench@samba.org>,
+        Trond Myklebust <trond.myklebust@hammerspace.com>,
+        Anna Schumaker <anna@kernel.org>,
+        Mike Marshall <hubcap@omnibond.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Chuck Lever <chuck.lever@oracle.com>,
+        linux-block@vger.kernel.org, ceph-devel@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org,
+        target-devel@vger.kernel.org, kvm@vger.kernel.org,
+        netdev@vger.kernel.org, linux-afs@lists.infradead.org,
+        linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+        linux-fsdevel@vger.kernel.org, linux-nfs@vger.kernel.org,
+        devel@lists.orangefs.org, io-uring@vger.kernel.org,
+        linux-mm@kvack.org, Johannes Thumshirn <johannes.thumshirn@wdc.com>
+Subject: [PATCH 02/23] block: add a bvec_set_folio helper
+Date:   Fri,  3 Feb 2023 16:06:13 +0100
+Message-Id: <20230203150634.3199647-3-hch@lst.de>
 X-Mailer: git-send-email 2.39.0
-In-Reply-To: <20230203150400.3199230-1-hch@lst.de>
-References: <20230203150400.3199230-1-hch@lst.de>
+In-Reply-To: <20230203150634.3199647-1-hch@lst.de>
+References: <20230203150634.3199647-1-hch@lst.de>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
@@ -45,33 +72,41 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-wbt_queue_depth_changed just updates a field and calls another function.
-Open code it in wbt_init, so that the local queue variable can be used
-instead of the one stored in the rq_qos.  This will allow delaying that
-rq_qos->queue assignment in a subsequent patch.
+A smaller wrapper around bvec_set_page that takes a folio instead.
+There are only two potential users for this in the tree, but the number
+will grow in the future.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Andreas Herrmann <aherrmann@suse.de>
-Acked-by: Tejun Heo <tj@kernel.org>
+Reviewed-by: Chaitanya Kulkarni <kch@nvidia.com>
+Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
 ---
- block/blk-wbt.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ include/linux/bvec.h | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
-diff --git a/block/blk-wbt.c b/block/blk-wbt.c
-index 58f41a98fda911..119a43671089ea 100644
---- a/block/blk-wbt.c
-+++ b/block/blk-wbt.c
-@@ -941,8 +941,8 @@ int wbt_init(struct gendisk *disk)
- 	rwb->wc = test_bit(QUEUE_FLAG_WC, &q->queue_flags);
- 	rwb->rq_depth.default_depth = RWB_DEF_DEPTH;
- 	rwb->min_lat_nsec = wbt_default_latency_nsec(q);
--
--	wbt_queue_depth_changed(&rwb->rqos);
-+	rwb->rq_depth.queue_depth = blk_queue_depth(q);
-+	wbt_update_limits(rwb);
+diff --git a/include/linux/bvec.h b/include/linux/bvec.h
+index 9e3dac51eb26b6..2bae1134499e7f 100644
+--- a/include/linux/bvec.h
++++ b/include/linux/bvec.h
+@@ -50,6 +50,19 @@ static inline void bvec_set_page(struct bio_vec *bv, struct page *page,
+ 	bv->bv_offset = offset;
+ }
  
- 	/*
- 	 * Assign rwb and add the stats callback.
++/**
++ * bvec_set_folio - initialize a bvec based off a struct folio
++ * @bv:		bvec to initialize
++ * @folio:	folio the bvec should point to
++ * @len:	length of the bvec
++ * @offset:	offset into the folio
++ */
++static inline void bvec_set_folio(struct bio_vec *bv, struct folio *folio,
++		unsigned int len, unsigned int offset)
++{
++	bvec_set_page(bv, &folio->page, len, offset);
++}
++
+ struct bvec_iter {
+ 	sector_t		bi_sector;	/* device address in 512 byte
+ 						   sectors */
 -- 
 2.39.0
 
