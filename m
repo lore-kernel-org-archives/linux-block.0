@@ -2,141 +2,145 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C686C05027
-	for <linux-block@archiver.kernel.org>; Fri,  3 Feb 2023 19:30:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A42ACC61DA4
+	for <linux-block@archiver.kernel.org>; Fri,  3 Feb 2023 19:45:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231183AbjBCTav (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 3 Feb 2023 14:30:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36362 "EHLO
+        id S233073AbjBCTpi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 3 Feb 2023 14:45:38 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43654 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233663AbjBCTat (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 3 Feb 2023 14:30:49 -0500
-Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE1B91C7CA
-        for <linux-block@vger.kernel.org>; Fri,  3 Feb 2023 11:30:26 -0800 (PST)
-Received: by mail-pl1-x631.google.com with SMTP id r8so6293533pls.2
-        for <linux-block@vger.kernel.org>; Fri, 03 Feb 2023 11:30:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Wwncs/90hqDkN2LA3y1rv9cis6YegI7u/19Uv9sNq/k=;
-        b=Z7XOoMMHemcM0BGEckRAYZ3H5aAUc7jOeXDqNbqgw9UpyzmnFr8si62bJp/wgPOTCE
-         Lzl/Vs4T9zjo9aQ4b9mvGBm3fXRO6ZIKWJ1fD0r/Vj7xYQfUZ/DTJNhmupxeXFTE+iOV
-         23ImO7E0QFBTw1pT6cJt0SVWyl/gvRwRhdYQbHUlcFIxZMwjKMunLCqh2w31yUm+VI7o
-         Zp7uWgPZcwDiOiJJ7vqnWWr4GzQ0mP31jhx+ELptMSuLpQd/9Cm2PpyQ02ZEvoGV1m3P
-         SsGUveBna5M1msNXacd5+hcWY7FpYOlw1W7Qk/oby+1vyffGz3xkdbE09zIIe4lhFMJg
-         3fVA==
+        with ESMTP id S229853AbjBCTph (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 3 Feb 2023 14:45:37 -0500
+Received: from mail-pj1-f49.google.com (mail-pj1-f49.google.com [209.85.216.49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 51C5C9DCB3;
+        Fri,  3 Feb 2023 11:45:36 -0800 (PST)
+Received: by mail-pj1-f49.google.com with SMTP id f16-20020a17090a9b1000b0023058bbd7b2so5302550pjp.0;
+        Fri, 03 Feb 2023 11:45:36 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=Wwncs/90hqDkN2LA3y1rv9cis6YegI7u/19Uv9sNq/k=;
-        b=SW2Jv/RfwfJZSGLOO2k9vQ6qDi7LrttXvrZkXdht58cOLl6sr6N3YTA9Hm6iVS7kPD
-         FnGB8UQx3rn6PF1nuFWavZhG8CTc3epyh+doN3IND1Mc4s+I9DA5k62ReBpv6h5UP5DK
-         cbcrrlhTogGLoQFtN3++nwhV7NPWxt8LI0w3EN61cqwNYnRedKBX16eQ6jUAdck7mRY3
-         6NaaNd0rvTIs1hu/8W/PQFJbgHygXF3mtDWBE5JvPKYNz11eZ7Jo30SGtdS2i1e0qPsM
-         vmkhRcwykYU5eb8CiSGJxiMjbLUwLpugDvQaoQBqGByQ2SdUeAysRfnICzITXiD/2hhs
-         6NYw==
-X-Gm-Message-State: AO0yUKXIz1XYhlvnW984yZ7jQ3prw+SiVUiY/2VHxCoIZXcss3PsyJJi
-        24P1wJHHy/CYErwStboaHBxrsCG41L396QP3
-X-Google-Smtp-Source: AK7set+Ylfv0N1Jsofc7krHzUx4QYrrV9kPlcUwTFFbGDSBVUiAG8tZ9nnuVg4CaUh2utUeOC00eIw==
-X-Received: by 2002:a05:6a20:931f:b0:bc:b98c:a8c5 with SMTP id r31-20020a056a20931f00b000bcb98ca8c5mr10488890pzh.2.1675452626054;
-        Fri, 03 Feb 2023 11:30:26 -0800 (PST)
-Received: from [192.168.1.136] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id b10-20020a17090acc0a00b00219186abd7csm2028517pju.16.2023.02.03.11.30.25
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Xj5Tu5E7CoXMz7arwXQAyRVyy8gsxIDydTYsQXxz6MI=;
+        b=eRHLknci8CkKlOiAS1V3rJd+h+Gz+LMf9htRD2ZP0/ZqKxX66hOUxl1nUHFDa48K5D
+         OdmegWpOsMDi6mdUh+HBIo0IDSVre4xyZ8Z1nNtmzxq9WUhXxh6pumRaeF60QEt03vCU
+         Iu7moFogf2F3oBfL7R4mFljX/L+nMUf6ggsiUAW69FANv4M/xBjFGJc+pYNUjDb7TRi1
+         qDgokkLDS4/fi4LBu61bndIHSJkaa6OlVOc0irOz5QfLsDb9MEuUHVfVI8q80MTsSxTb
+         yLEIbfHV2nhqisrCjz38tZIYxn2kE7ZyHpWpMBJwBHohDu7HMLKZPyPi7gZCSIermwuF
+         tTYw==
+X-Gm-Message-State: AO0yUKXVZShTuZhvh1pa0l8YvNpUeJMlCERhWyO8oRBBpgMfsVgoaRQI
+        NN62Ga7yZbdMa5ZXYUZZVeen+ZwSLIY=
+X-Google-Smtp-Source: AK7set8nM63+1pdXNGI6Lh0b+Jhps5kT2dzVbEI+pm1NCG1DTXT02+dcEWAhm+o+/xxoiYvyp3PF6A==
+X-Received: by 2002:a05:6a20:d906:b0:bc:e64b:e79b with SMTP id jd6-20020a056a20d90600b000bce64be79bmr7074418pzb.1.1675453535679;
+        Fri, 03 Feb 2023 11:45:35 -0800 (PST)
+Received: from ?IPV6:2620:15c:211:201:b752:5d03:ec5e:7be5? ([2620:15c:211:201:b752:5d03:ec5e:7be5])
+        by smtp.gmail.com with ESMTPSA id g20-20020aa796b4000000b0058bb0fb6295sm2219377pfk.26.2023.02.03.11.45.33
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 03 Feb 2023 11:30:25 -0800 (PST)
-Message-ID: <0914e4ad-7922-4ac7-b3bf-be5db7075236@kernel.dk>
-Date:   Fri, 3 Feb 2023 12:30:24 -0700
+        Fri, 03 Feb 2023 11:45:34 -0800 (PST)
+Message-ID: <aedc240d-7c9e-248a-52d2-c9775f3e8ca1@acm.org>
+Date:   Fri, 3 Feb 2023 11:45:32 -0800
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.1
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.6.0
+Subject: Re: [PATCH] blk-ioprio: Introduce promote-to-rt policy
 Content-Language: en-US
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From:   Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Block fixes for 6.2-rc7
-Content-Type: text/plain; charset=UTF-8
+To:     Hou Tao <houtao@huaweicloud.com>, linux-block@vger.kernel.org
+Cc:     Jan Kara <jack@suse.cz>, Jens Axboe <axboe@kernel.dk>,
+        cgroups@vger.kernel.org, Tejun Heo <tj@kernel.org>,
+        Zefan Li <lizefan.x@bytedance.com>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        Jonathan Corbet <corbet@lwn.net>, linux-kernel@vger.kernel.org,
+        linux-doc@vger.kernel.org, houtao1@huawei.com
+References: <20230201045227.2203123-1-houtao@huaweicloud.com>
+ <8c068af3-7199-11cf-5c69-a523c7c22d9a@acm.org>
+ <4f7dcb3e-2d5a-cae3-0e1c-a82bcc3d2217@huaweicloud.com>
+ <b6b3c498-e90b-7d1f-6ad5-a31334e433ae@acm.org>
+ <beb7782e-72a4-c350-3750-23a767c88753@huaweicloud.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <beb7782e-72a4-c350-3750-23a767c88753@huaweicloud.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Linus,
+On 2/2/23 17:48, Hou Tao wrote:
+> I don't get it on how to remove IOPRIO_POL_PROMOTION when calculating the final
+> ioprio for bio. IOPRIO_POL_PROMOTION is not used for IOPRIO_CLASS values but
+> used to determinate on how to calculate the final ioprio for bio: choosing the
+> maximum or minimum between blkcg ioprio and original bio bi_ioprio.
 
-Set of fixes that should go into this release. A bit bigger than I'd
-like at this point, but mostly a bunch of little fixes. In detail:
+Do the block layer code changes shown below implement the functionality that you
+need?
 
-- NVMe pull request via Christoph
-	- Fix a missing queue put in nvmet_fc_ls_create_association
-	  (Amit Engel)
-	- Clear queue pointers on tag_set initialization failure
-	  (Maurizio Lombardi)
-	- Use workqueue dedicated to authentication (Shin'ichiro Kawasaki)
+Thanks,
 
-- Fix for an overflow in ublk (Liu)
-
-- Fix for leaking a queue reference in block cgroups (Ming)
-
-- Fix for a use-after-free in BFQ (Yu)
-
-Please pull!
+Bart.
 
 
-The following changes since commit db3ba974c2bc895ba39689a364cb7a49c0fe779f:
 
-  Merge tag 'nvme-6.2-2023-01-26' of git://git.infradead.org/nvme into block-6.2 (2023-01-26 11:43:33 -0700)
+diff --git a/block/blk-ioprio.c b/block/blk-ioprio.c
+index 8bb6b8eba4ce..4a56da95168e 100644
+--- a/block/blk-ioprio.c
++++ b/block/blk-ioprio.c
+@@ -27,6 +27,8 @@
+   * @POLICY_RESTRICT_TO_BE: modify IOPRIO_CLASS_NONE and IOPRIO_CLASS_RT into
+   *		IOPRIO_CLASS_BE.
+   * @POLICY_ALL_TO_IDLE: change the I/O priority class into IOPRIO_CLASS_IDLE.
++ * @POLICY_PROMOTE_TO_RT: modify IOPRIO_CLASS_NONE and IOPRIO_CLASS_BE into
++ * 		IOPRIO_CLASS_RT.
+   *
+   * See also <linux/ioprio.h>.
+   */
+@@ -35,6 +37,7 @@ enum prio_policy {
+  	POLICY_NONE_TO_RT	= 1,
+  	POLICY_RESTRICT_TO_BE	= 2,
+  	POLICY_ALL_TO_IDLE	= 3,
++	POLICY_PROMOTE_TO_RT,
+  };
 
-are available in the Git repository at:
+  static const char *policy_name[] = {
+@@ -42,6 +45,7 @@ static const char *policy_name[] = {
+  	[POLICY_NONE_TO_RT]	= "none-to-rt",
+  	[POLICY_RESTRICT_TO_BE]	= "restrict-to-be",
+  	[POLICY_ALL_TO_IDLE]	= "idle",
++	[POLICY_PROMOTE_TO_RT]	= "promote-to-rt",
+  };
 
-  git://git.kernel.dk/linux.git tags/block-6.2-2023-02-03
+  static struct blkcg_policy ioprio_policy;
+@@ -189,17 +193,23 @@ void blkcg_set_ioprio(struct bio *bio)
+  	if (!blkcg || blkcg->prio_policy == POLICY_NO_CHANGE)
+  		return;
 
-for you to fetch changes up to e02bbac74cdde25f71a80978f5daa1d8a0aa6fc3:
+-	/*
+-	 * Except for IOPRIO_CLASS_NONE, higher I/O priority numbers
+-	 * correspond to a lower priority. Hence, the max_t() below selects
+-	 * the lower priority of bi_ioprio and the cgroup I/O priority class.
+-	 * If the bio I/O priority equals IOPRIO_CLASS_NONE, the cgroup I/O
+-	 * priority is assigned to the bio.
+-	 */
+-	prio = max_t(u16, bio->bi_ioprio,
+-			IOPRIO_PRIO_VALUE(blkcg->prio_policy, 0));
+-	if (prio > bio->bi_ioprio)
+-		bio->bi_ioprio = prio;
++	if (blkcg->prio_policy == PROMOTE_TO_RT) {
++		if (IOPRIO_PRIO_CLASS(bio->bi_ioprio) != IOPRIO_CLASS_RT)
++			bio->bi_ioprio = IOPRIO_CLASS_RT;
++	} else {
++		/*
++		 * Except for IOPRIO_CLASS_NONE, higher I/O priority numbers
++		 * correspond to a lower priority. Hence, the max_t() below
++		 * selects the lower priority of bi_ioprio and the cgroup I/O
++		 * priority class.  If the bio I/O priority equals
++		 * IOPRIO_CLASS_NONE, the cgroup I/O priority is assigned to the
++		 * bio.
++		 */
++		prio = max_t(u16, bio->bi_ioprio,
++			     IOPRIO_PRIO_VALUE(blkcg->prio_policy, 0));
++		if (prio > bio->bi_ioprio)
++			bio->bi_ioprio = prio;
++	}
+  }
 
-  Merge tag 'nvme-6.2-2023-02-02' of git://git.infradead.org/nvme into block-6.2 (2023-02-02 11:02:12 -0700)
-
-----------------------------------------------------------------
-block-6.2-2023-02-03
-
-----------------------------------------------------------------
-Amit Engel (1):
-      nvme-fc: fix a missing queue put in nvmet_fc_ls_create_association
-
-Bart Van Assche (1):
-      block: Fix the blk_mq_destroy_queue() documentation
-
-Jens Axboe (1):
-      Merge tag 'nvme-6.2-2023-02-02' of git://git.infradead.org/nvme into block-6.2
-
-Liu Xiaodong (1):
-      block: ublk: extending queue_size to fix overflow
-
-Maurizio Lombardi (2):
-      nvme: clear the request_queue pointers on failure in nvme_alloc_admin_tag_set
-      nvme: clear the request_queue pointers on failure in nvme_alloc_io_tag_set
-
-Ming Lei (1):
-      blk-cgroup: don't update io stat for root cgroup
-
-Shin'ichiro Kawasaki (1):
-      nvme-auth: use workqueue dedicated to authentication
-
-Yu Kuai (1):
-      block, bfq: fix uaf for bfqq in bic_set_bfqq()
-
- block/bfq-cgroup.c       |  2 +-
- block/bfq-iosched.c      |  4 +++-
- block/blk-cgroup.c       |  4 ++++
- block/blk-mq.c           |  5 +++--
- drivers/block/ublk_drv.c |  2 +-
- drivers/nvme/host/auth.c | 14 ++++++++++++--
- drivers/nvme/host/core.c |  5 ++++-
- drivers/nvme/target/fc.c |  4 +++-
- 8 files changed, 31 insertions(+), 9 deletions(-)
-
--- 
-Jens Axboe
+  void blk_ioprio_exit(struct gendisk *disk)
 
