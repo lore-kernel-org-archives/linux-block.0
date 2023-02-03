@@ -2,37 +2,38 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A47CC61DA4
-	for <linux-block@archiver.kernel.org>; Fri,  3 Feb 2023 15:02:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B03CC05027
+	for <linux-block@archiver.kernel.org>; Fri,  3 Feb 2023 15:04:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231261AbjBCPCP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 3 Feb 2023 10:02:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43196 "EHLO
+        id S232166AbjBCPEH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 3 Feb 2023 10:04:07 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44556 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232491AbjBCPCO (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 3 Feb 2023 10:02:14 -0500
+        with ESMTP id S231663AbjBCPEH (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 3 Feb 2023 10:04:07 -0500
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 65CB8A0014
-        for <linux-block@vger.kernel.org>; Fri,  3 Feb 2023 07:02:13 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3CB2517CD8;
+        Fri,  3 Feb 2023 07:04:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
         MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
         Content-ID:Content-Description:In-Reply-To:References;
-        bh=B1vW15NVsDYkOW+hLKUEtNXh9hHRNpIWYc+VEKOiTp4=; b=N2IWMcx+JN+UqFVdmYrP8hlbdX
-        37YTzgoTjxlWomv8SBbLIJIDczaBUeoj/fwOhfV/Qfpkpfk8tMp2vEinNcgBwV19hiyf1b4xW8WLG
-        6AIXY/bReSZgUX+ZlXGD32GsvvgiLJK9JUB4cNzGWLqtY0QVz9n+d7XjrD0iMXZ/5wflyeUUV4tf1
-        AnVIbZeNBCo+q+X4cpys3tJPrbEXfLwg3OEciej/XyW8lOqf1DAq5JjHs+1zRFBl27qoVa3TV+VMI
-        bwn2Osb8cwNmnV5YLK+xKGMuLgfT6l0wDDTEXFicO3+kwHbvJOEquPmnsFrAjJAvxSxrVvgQ1S5mh
-        mLs/iR3g==;
+        bh=mminnm7Nr11b4VHn58XXKI5xl/BZGhF2dEh0O7fu8M8=; b=PGfJKCNhB+nwOyGYxmlamKykAz
+        J19TyRZWzX70L9sJLrDXeNOLjS/9ZtE67Dy6IpuY8HPZGV1kk+GgYaxAwfnqyrw9SKM4VIIrKe4Wz
+        Z0q9T99VaJrl6C3yromHYYh6IrCgdM8NZygVODQ0UyhITtV1jWjId1VZZPjIfPBV9cvL8uTlBC80K
+        AhWCXfpcZAZ9F0qdzAdcInkjhZslyFdTJWg2fsBxLKBrLJV/AtdlgXVSCh8mOiLYq2GUgsP3GG/9S
+        dYyGi/vLSvoafHrXSU0Udqbd8kuuAHpymElu/4/8ySls0IwQx8asen7B1MYPqjtiP/oDaJVb0WQym
+        OHcsrCPA==;
 Received: from [2001:4bb8:19a:272a:910:bb67:7287:f956] (helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1pNxZs-002ZeI-4T; Fri, 03 Feb 2023 15:02:12 +0000
+        id 1pNxbe-002Zy1-AF; Fri, 03 Feb 2023 15:04:02 +0000
 From:   Christoph Hellwig <hch@lst.de>
-To:     axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org
-Subject: [PATCH] block: stub out and deprecated the capability attribute on the gendisk
-Date:   Fri,  3 Feb 2023 16:02:09 +0100
-Message-Id: <20230203150209.3199115-1-hch@lst.de>
+To:     Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
+        Josef Bacik <josef@toxicpanda.com>
+Cc:     linux-block@vger.kernel.org, cgroups@vger.kernel.org
+Subject: switch blk-cgroup to work on gendisk v4
+Date:   Fri,  3 Feb 2023 16:03:41 +0100
+Message-Id: <20230203150400.3199230-1-hch@lst.de>
 X-Mailer: git-send-email 2.39.0
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -41,66 +42,51 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The capability attribute was added in 2017 to expose the kernel internal
-GENHD_FL_MEDIA_CHANGE_NOTIFY to userspace without ever adding a value to
-an UAPI header, and without ever setting it in any driver until it was
-finally removed in Linux 5.7.
+Hi all,
 
-Deprecate the file and always return 0 instead of exposing the other
-internal and frequently renumbered other gendisk flags.
+blk-cgroup works on only on live disks and "file system" I/O from bios.
+This all the information should be in the gendisk, and not the
+request_queue that also exists for pure passthrough request based
+devices.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- Documentation/block/capability.rst | 10 ----------
- Documentation/block/index.rst      |  1 -
- block/genhd.c                      |  5 ++---
- 3 files changed, 2 insertions(+), 14 deletions(-)
- delete mode 100644 Documentation/block/capability.rst
+Changes since v3:
+ - improve a commit log
+ - drop a change to not acquire a pointless disk reference
 
-diff --git a/Documentation/block/capability.rst b/Documentation/block/capability.rst
-deleted file mode 100644
-index 2ae7f064736ad3..00000000000000
---- a/Documentation/block/capability.rst
-+++ /dev/null
-@@ -1,10 +0,0 @@
--===============================
--Generic Block Device Capability
--===============================
--
--This file documents the sysfs file ``block/<disk>/capability``.
--
--``capability`` is a bitfield, printed in hexadecimal, indicating which
--capabilities a specific block device supports:
--
--.. kernel-doc:: include/linux/blkdev.h
-diff --git a/Documentation/block/index.rst b/Documentation/block/index.rst
-index c4c73db748a81f..102953166429bf 100644
---- a/Documentation/block/index.rst
-+++ b/Documentation/block/index.rst
-@@ -10,7 +10,6 @@ Block
-    bfq-iosched
-    biovecs
-    blk-mq
--   capability
-    cmdline-partition
-    data-integrity
-    deadline-iosched
-diff --git a/block/genhd.c b/block/genhd.c
-index 23cf83b3331cde..093ef292e98f7f 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -1016,9 +1016,8 @@ ssize_t part_inflight_show(struct device *dev, struct device_attribute *attr,
- static ssize_t disk_capability_show(struct device *dev,
- 				    struct device_attribute *attr, char *buf)
- {
--	struct gendisk *disk = dev_to_disk(dev);
--
--	return sprintf(buf, "%x\n", disk->flags);
-+	dev_warn_once(dev, "the capability attribute has been deprecated.\n");
-+	return sprintf(buf, "0\n");
- }
- 
- static ssize_t disk_alignment_offset_show(struct device *dev,
--- 
-2.39.0
+Changes since v2:
+ - drop the patch to revert the async blkg freeing
+ - simplify error unwinding when failing to allocate a blkg
+ - add back the dead queue/disk check in blkg_alloc
+ - split two patches to better document the changes
+ - add another blk-wbt cleanup patch
+ - rewrite a commit log
+ - another typo fix
 
+Changes since v1:
+ - use the local disk variable in wbt_init instead of q->disk
+ - various spelling fixes
+
+Diffstat:
+ block/bfq-cgroup.c        |   18 +--
+ block/bfq-iosched.c       |    6 -
+ block/blk-cgroup-rwstat.c |    2 
+ block/blk-cgroup.c        |  226 +++++++++++++++++++++-------------------------
+ block/blk-cgroup.h        |   38 +++----
+ block/blk-iocost.c        |   40 +++-----
+ block/blk-iolatency.c     |   41 +++-----
+ block/blk-ioprio.c        |    6 -
+ block/blk-mq-debugfs.c    |   10 --
+ block/blk-rq-qos.c        |   67 +++++++++++++
+ block/blk-rq-qos.h        |   66 +------------
+ block/blk-settings.c      |    1 
+ block/blk-stat.c          |    3 
+ block/blk-sysfs.c         |    5 -
+ block/blk-throttle.c      |   31 +++---
+ block/blk-wbt.c           |  116 +++++++++++++++++++----
+ block/blk-wbt.h           |   98 +------------------
+ block/genhd.c             |   17 +--
+ include/linux/blkdev.h    |   12 +-
+ include/linux/sched.h     |    2 
+ kernel/fork.c             |    2 
+ mm/swapfile.c             |    2 
+ 22 files changed, 391 insertions(+), 418 deletions(-)
