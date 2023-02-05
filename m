@@ -2,94 +2,156 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D72A8C636CC
-	for <linux-block@archiver.kernel.org>; Sat,  4 Feb 2023 23:17:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C3D6C63797
+	for <linux-block@archiver.kernel.org>; Sun,  5 Feb 2023 07:04:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229685AbjBDXRJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 4 Feb 2023 18:17:09 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33252 "EHLO
+        id S229477AbjBEHEa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 5 Feb 2023 02:04:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52188 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229547AbjBDXRI (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sat, 4 Feb 2023 18:17:08 -0500
-Received: from mail-pj1-f52.google.com (mail-pj1-f52.google.com [209.85.216.52])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 89DBC19F16;
-        Sat,  4 Feb 2023 15:17:07 -0800 (PST)
-Received: by mail-pj1-f52.google.com with SMTP id t12-20020a17090aae0c00b00229f4cff534so10498042pjq.1;
-        Sat, 04 Feb 2023 15:17:07 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=YCjib6YGp7oCe4br7XrH4tA0fTB0xh2BzncxrSSXIus=;
-        b=Tq8L01qXQl2Y0sLgGBw49V2beSkReHvJSIj/L/TWWpLNLcOvtK7iuDRCUOxogCKyW9
-         +EqFz7TOPpzgW2smELjgWqKNxGUVVMr1Ms8EMUoM7ytCyAFDaMxc4BlPBkv/kCOjKg96
-         m1sG4jswYR6xB9no3xGptckzLF8IQUYZtxOebSxM8MM2HUugi0x5UEVxutLJQ4juZ1TC
-         9WQt2jUmaMYzRmPVN3uSeszK2kS/TApkZQlu1N1g3CRbI3W+yN3kQl90nQ9lixigRHCu
-         NXRcHP/FE6avumoEfd00IIyedDpWoLsokTTm5mFg2goBJwCc/OAWz/UfQBcQrM0Yd397
-         Ec7Q==
-X-Gm-Message-State: AO0yUKXloNLx7LmxBlF1UUWpBNapVkhLt6gdTh02FvC37S/6/itRouoW
-        Q1s3esbP4+yXb0rNQ1x7obc=
-X-Google-Smtp-Source: AK7set+1FvYxFJNsmodSe7ia7v6qf3RFt43H8C2JcL56/7ekAK7EZyR0rrWQUao+vJHlsv+vm3gn3g==
-X-Received: by 2002:a05:6a20:3a96:b0:bf:ae32:5ea8 with SMTP id d22-20020a056a203a9600b000bfae325ea8mr9372685pzh.11.1675552626837;
-        Sat, 04 Feb 2023 15:17:06 -0800 (PST)
-Received: from [192.168.3.219] ([98.51.102.78])
-        by smtp.gmail.com with ESMTPSA id u12-20020a17090a1d4c00b0022c90b7e3efsm6963281pju.50.2023.02.04.15.17.05
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 04 Feb 2023 15:17:05 -0800 (PST)
-Message-ID: <3ad1c3b3-f54d-4b0e-2441-ab348d099f3f@acm.org>
-Date:   Sat, 4 Feb 2023 15:17:04 -0800
+        with ESMTP id S229448AbjBEHE3 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 5 Feb 2023 02:04:29 -0500
+Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2489722DFC;
+        Sat,  4 Feb 2023 23:04:27 -0800 (PST)
+Received: from mail02.huawei.com (unknown [172.30.67.143])
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4P8gNz3DH7z4f3k6H;
+        Sun,  5 Feb 2023 15:04:19 +0800 (CST)
+Received: from [10.174.176.117] (unknown [10.174.176.117])
+        by APP2 (Coremail) with SMTP id Syh0CgC3zuzxVN9jlGf6Cw--.32719S2;
+        Sun, 05 Feb 2023 15:04:21 +0800 (CST)
+Subject: Re: [PATCH] blk-ioprio: Introduce promote-to-rt policy
+To:     Bart Van Assche <bvanassche@acm.org>, linux-block@vger.kernel.org
+Cc:     Jan Kara <jack@suse.cz>, Jens Axboe <axboe@kernel.dk>,
+        cgroups@vger.kernel.org, Tejun Heo <tj@kernel.org>,
+        Zefan Li <lizefan.x@bytedance.com>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        Jonathan Corbet <corbet@lwn.net>, linux-kernel@vger.kernel.org,
+        linux-doc@vger.kernel.org, houtao1@huawei.com
+References: <20230201045227.2203123-1-houtao@huaweicloud.com>
+ <8c068af3-7199-11cf-5c69-a523c7c22d9a@acm.org>
+ <4f7dcb3e-2d5a-cae3-0e1c-a82bcc3d2217@huaweicloud.com>
+ <b6b3c498-e90b-7d1f-6ad5-a31334e433ae@acm.org>
+ <beb7782e-72a4-c350-3750-23a767c88753@huaweicloud.com>
+ <aedc240d-7c9e-248a-52d2-c9775f3e8ca1@acm.org>
+From:   Hou Tao <houtao@huaweicloud.com>
+Message-ID: <ffcf2d84-7f0a-21b7-8840-433227bc6afb@huaweicloud.com>
+Date:   Sun, 5 Feb 2023 15:04:17 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.6.0
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.1
-Subject: Re: [PATCH] trace/blktrace: fix memory leak with using
- debugfs_lookup()
+In-Reply-To: <aedc240d-7c9e-248a-52d2-c9775f3e8ca1@acm.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
 Content-Language: en-US
-To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        linux-trace-kernel@vger.kernel.org
-Cc:     Jens Axboe <axboe@kernel.dk>, Steven Rostedt <rostedt@goodmis.org>,
-        Masami Hiramatsu <mhiramat@kernel.org>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20230202141956.2299521-1-gregkh@linuxfoundation.org>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20230202141956.2299521-1-gregkh@linuxfoundation.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-CM-TRANSID: Syh0CgC3zuzxVN9jlGf6Cw--.32719S2
+X-Coremail-Antispam: 1UD129KBjvJXoWxWryfur1UZF48Jw1Dtw1UZFb_yoWrJFWrpF
+        18JF98AryFqF1xJr1UX3W8Jry8t347J3WUJF1rXFy5Wr1Utr1jgw1jqF92gF1fJr4kXrsx
+        Jw1UJrW8uFW5ArUanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUv2b4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
+        6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+        vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7Cj
+        xVAFwI0_Cr0_Gr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I
+        0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40E
+        x7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x
+        0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7I2V7IY0VAS
+        07AlzVAYIcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c
+        02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_
+        GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7
+        CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6rW3Jr0E3s1lIxAIcVC2z280aVAF
+        wI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa
+        7IU1zuWJUUUUU==
+X-CM-SenderInfo: xkrx3t3r6k3tpzhluzxrxghudrp/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2/2/23 06:19, Greg Kroah-Hartman wrote:
-> When calling debugfs_lookup() the result must have dput() called on it,
-> otherwise the memory will leak over time.  To make things simpler, just
-> call debugfs_lookup_and_remove() instead which handles all of the logic
-> at once.
-> 
-> Cc: Jens Axboe <axboe@kernel.dk>
-> Cc: Steven Rostedt <rostedt@goodmis.org>
-> Cc: Masami Hiramatsu <mhiramat@kernel.org>
-> Cc: linux-block@vger.kernel.org
-> Cc: linux-kernel@vger.kernel.org
-> Cc: linux-trace-kernel@vger.kernel.org
-> Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> ---
->   kernel/trace/blktrace.c | 4 ++--
->   1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
-> index 918a7d12df8f..5743be559415 100644
-> --- a/kernel/trace/blktrace.c
-> +++ b/kernel/trace/blktrace.c
-> @@ -320,8 +320,8 @@ static void blk_trace_free(struct request_queue *q, struct blk_trace *bt)
->   	 * under 'q->debugfs_dir', thus lookup and remove them.
->   	 */
->   	if (!bt->dir) {
-> -		debugfs_remove(debugfs_lookup("dropped", q->debugfs_dir));
-> -		debugfs_remove(debugfs_lookup("msg", q->debugfs_dir));
-> +		debugfs_lookup_and_remove("dropped", q->debugfs_dir);
-> +		debugfs_lookup_and_remove("msg", q->debugfs_dir);
->   	} else {
->   		debugfs_remove(bt->dir);
->   	}
+Hi,
 
-Reviewed-by: Bart Van Assche <bvanassche@acm.org>
+On 2/4/2023 3:45 AM, Bart Van Assche wrote:
+> On 2/2/23 17:48, Hou Tao wrote:
+>> I don't get it on how to remove IOPRIO_POL_PROMOTION when calculating the final
+>> ioprio for bio. IOPRIO_POL_PROMOTION is not used for IOPRIO_CLASS values but
+>> used to determinate on how to calculate the final ioprio for bio: choosing the
+>> maximum or minimum between blkcg ioprio and original bio bi_ioprio.
+>
+> Do the block layer code changes shown below implement the functionality that you
+> need?
+Yes, something like that. The reason for introducing IOPRIO_POL_PROMOTION is to
+support other promotion policy (e.g., promote-to-be), but now I think the
+possibility of adding other promotion policies is low, so the code below is fine
+to me.
+>
+> Thanks,
+>
+> Bart.
+>
+>
+>
+> diff --git a/block/blk-ioprio.c b/block/blk-ioprio.c
+> index 8bb6b8eba4ce..4a56da95168e 100644
+> --- a/block/blk-ioprio.c
+> +++ b/block/blk-ioprio.c
+> @@ -27,6 +27,8 @@
+>   * @POLICY_RESTRICT_TO_BE: modify IOPRIO_CLASS_NONE and IOPRIO_CLASS_RT into
+>   *        IOPRIO_CLASS_BE.
+>   * @POLICY_ALL_TO_IDLE: change the I/O priority class into IOPRIO_CLASS_IDLE.
+> + * @POLICY_PROMOTE_TO_RT: modify IOPRIO_CLASS_NONE and IOPRIO_CLASS_BE into
+> + *         IOPRIO_CLASS_RT.
+>   *
+>   * See also <linux/ioprio.h>.
+>   */
+> @@ -35,6 +37,7 @@ enum prio_policy {
+>      POLICY_NONE_TO_RT    = 1,
+>      POLICY_RESTRICT_TO_BE    = 2,
+>      POLICY_ALL_TO_IDLE    = 3,
+> +    POLICY_PROMOTE_TO_RT,
+>  };
+>
+>  static const char *policy_name[] = {
+> @@ -42,6 +45,7 @@ static const char *policy_name[] = {
+>      [POLICY_NONE_TO_RT]    = "none-to-rt",
+>      [POLICY_RESTRICT_TO_BE]    = "restrict-to-be",
+>      [POLICY_ALL_TO_IDLE]    = "idle",
+> +    [POLICY_PROMOTE_TO_RT]    = "promote-to-rt",
+>  };
+>
+>  static struct blkcg_policy ioprio_policy;
+> @@ -189,17 +193,23 @@ void blkcg_set_ioprio(struct bio *bio)
+>      if (!blkcg || blkcg->prio_policy == POLICY_NO_CHANGE)
+>          return;
+>
+> -    /*
+> -     * Except for IOPRIO_CLASS_NONE, higher I/O priority numbers
+> -     * correspond to a lower priority. Hence, the max_t() below selects
+> -     * the lower priority of bi_ioprio and the cgroup I/O priority class.
+> -     * If the bio I/O priority equals IOPRIO_CLASS_NONE, the cgroup I/O
+> -     * priority is assigned to the bio.
+> -     */
+> -    prio = max_t(u16, bio->bi_ioprio,
+> -            IOPRIO_PRIO_VALUE(blkcg->prio_policy, 0));
+> -    if (prio > bio->bi_ioprio)
+> -        bio->bi_ioprio = prio;
+> +    if (blkcg->prio_policy == PROMOTE_TO_RT) {
+> +        if (IOPRIO_PRIO_CLASS(bio->bi_ioprio) != IOPRIO_CLASS_RT)
+> +            bio->bi_ioprio = IOPRIO_CLASS_RT;
+> +    } else {
+> +        /*
+> +         * Except for IOPRIO_CLASS_NONE, higher I/O priority numbers
+> +         * correspond to a lower priority. Hence, the max_t() below
+> +         * selects the lower priority of bi_ioprio and the cgroup I/O
+> +         * priority class.  If the bio I/O priority equals
+> +         * IOPRIO_CLASS_NONE, the cgroup I/O priority is assigned to the
+> +         * bio.
+> +         */
+> +        prio = max_t(u16, bio->bi_ioprio,
+> +                 IOPRIO_PRIO_VALUE(blkcg->prio_policy, 0));
+> +        if (prio > bio->bi_ioprio)
+> +            bio->bi_ioprio = prio;
+> +    }
+>  }
+>
+>  void blk_ioprio_exit(struct gendisk *disk)
+>
+
