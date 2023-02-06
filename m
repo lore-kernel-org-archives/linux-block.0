@@ -2,94 +2,106 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 228E0C636CC
-	for <linux-block@archiver.kernel.org>; Sun,  5 Feb 2023 19:13:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C1FAC636CD
+	for <linux-block@archiver.kernel.org>; Mon,  6 Feb 2023 01:05:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229502AbjBETNw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 5 Feb 2023 14:13:52 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58378 "EHLO
+        id S229448AbjBFBFs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 5 Feb 2023 20:05:48 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54222 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229379AbjBETNv (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 5 Feb 2023 14:13:51 -0500
-Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 12CD8FF35;
-        Sun,  5 Feb 2023 11:13:50 -0800 (PST)
-Received: from [192.168.1.103] (178.176.73.145) by msexch01.omp.ru
- (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.986.14; Sun, 5 Feb 2023
- 22:13:39 +0300
-Subject: Re: [PATCH] pata_parport: Fix ida_alloc return value error check
-To:     Ondrej Zary <linux@zary.sk>,
-        Damien Le Moal <damien.lemoal@opensource.wdc.com>
-CC:     Dan Carpenter <error27@gmail.com>, Christoph Hellwig <hch@lst.de>,
-        Jens Axboe <axboe@kernel.dk>, Tim Waugh <tim@cyberelk.net>,
-        <linux-block@vger.kernel.org>, <linux-parport@lists.infradead.org>,
-        <linux-ide@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-References: <Y9uwqRothHhaOeDO@kili> <20230204205527.16716-1-linux@zary.sk>
-From:   Sergey Shtylyov <s.shtylyov@omp.ru>
-Organization: Open Mobile Platform
-Message-ID: <ae089777-e219-c3e1-4fd8-3ce3e8f0fb8a@omp.ru>
-Date:   Sun, 5 Feb 2023 22:13:38 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+        with ESMTP id S229517AbjBFBFs (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 5 Feb 2023 20:05:48 -0500
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC7E51A954;
+        Sun,  5 Feb 2023 17:05:42 -0800 (PST)
+Received: from mail02.huawei.com (unknown [172.30.67.143])
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4P97Nd3xdcz4f3tps;
+        Mon,  6 Feb 2023 09:05:37 +0800 (CST)
+Received: from [10.174.178.129] (unknown [10.174.178.129])
+        by APP3 (Coremail) with SMTP id _Ch0CgCHfhxWUuBjlEg_Cw--.10457S2;
+        Mon, 06 Feb 2023 09:05:39 +0800 (CST)
+Subject: Re: [PATCH v4 12/14] blk-mq: remove set of bd->last when get driver
+ tag for next request fails
+From:   Kemeng Shi <shikemeng@huaweicloud.com>
+Cc:     ming.lei@redhat.com, Christoph Hellwig <hch@lst.de>,
+        axboe@kernel.dk, dwagner@suse.de, hare@suse.de,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        john.garry@huawei.com, jack@suse.cz
+References: <20230118093726.3939160-1-shikemeng@huaweicloud.com>
+ <20230118093726.3939160-12-shikemeng@huaweicloud.com>
+ <20230118174208.GH12399@lst.de>
+ <1f116b9b-8194-54c8-eedb-7f2c9cd493c6@huaweicloud.com>
+ <0526b518-0894-10f6-e428-c03644d39c02@huaweicloud.com>
+Message-ID: <119aeade-151b-e375-f89b-20956bd9f3fb@huaweicloud.com>
+Date:   Mon, 6 Feb 2023 09:05:25 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.5.0
 MIME-Version: 1.0
-In-Reply-To: <20230204205527.16716-1-linux@zary.sk>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
+In-Reply-To: <0526b518-0894-10f6-e428-c03644d39c02@huaweicloud.com>
+Content-Type: text/plain; charset=gbk
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [178.176.73.145]
-X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
- (10.188.4.12)
-X-KSE-ServerInfo: msexch01.omp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 5.9.59, Database issued on: 02/05/2023 18:53:15
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 59
-X-KSE-AntiSpam-Info: Lua profiles 175261 [Feb 05 2023]
-X-KSE-AntiSpam-Info: Version: 5.9.59.0
-X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
-X-KSE-AntiSpam-Info: LuaCore: 502 502 69dee8ef46717dd3cb3eeb129cb7cc8dab9e30f6
-X-KSE-AntiSpam-Info: {rep_avail}
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info: {relay has no DNS name}
-X-KSE-AntiSpam-Info: {SMTP from is not routable}
-X-KSE-AntiSpam-Info: {Found in DNSBL: 178.176.73.145 in (user)
- b.barracudacentral.org}
-X-KSE-AntiSpam-Info: {Found in DNSBL: 178.176.73.145 in (user)
- dbl.spamhaus.org}
-X-KSE-AntiSpam-Info: 127.0.0.199:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;178.176.73.145:7.4.1,7.7.3;omp.ru:7.1.1
-X-KSE-AntiSpam-Info: {iprep_blacklist}
-X-KSE-AntiSpam-Info: ApMailHostAddress: 178.176.73.145
-X-KSE-AntiSpam-Info: {DNS response errors}
-X-KSE-AntiSpam-Info: Rate: 59
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
- smtp.mailfrom=omp.ru;dkim=none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Heuristic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 02/05/2023 18:55:00
-X-KSE-AttachmentFiltering-Interceptor-Info: protection disabled
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 2/5/2023 3:54:00 PM
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
+X-CM-TRANSID: _Ch0CgCHfhxWUuBjlEg_Cw--.10457S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7tr47Ww4xurWUGw4fZw43Jrb_yoW8XFWxpF
+        WfJayjkF45tFsFyrn2ywsFgFy8t3y3XrW3Xrn8ZryrXws8ur13Kr95KrW29asFyr4xGa12
+        9w4jgasYvw18Za7anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUyEb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
+        6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+        vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7Cj
+        xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
+        0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
+        6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
+        Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JMxk0xIA0c2IEe2xFo4CEbIxvr21l42xK82IYc2Ij
+        64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x
+        8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE
+        2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42
+        xK8VAvwI8IcIk0rVWrZr1j6s0DMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIE
+        c7CjxVAFwI0_Jr0_GrUvcSsGvfC2KfnxnUUI43ZEXa7IU1zuWJUUUUU==
+X-CM-SenderInfo: 5vklyvpphqwq5kxd4v5lfo033gof0z/
+X-CFilter-Loop: Reflected
+To:     unlisted-recipients:; (no To-header on input)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello!
 
-On 2/4/23 11:55 PM, Ondrej Zary wrote:
-
-> pi->dev.id is unsigned so error checking of ida_alloc return value does
-> not work. Fix it.
+on 1/28/2023 10:03 AM, Kemeng Shi wrote:
 > 
-> Signed-off-by: Ondrej Zary <linux@zary.sk>
+> 
+> on 1/19/2023 9:45 AM, Kemeng Shi wrote:
+>>
+>>
+>> on 1/19/2023 1:42 AM, Christoph Hellwig wrote:
+>>> On Wed, Jan 18, 2023 at 05:37:24PM +0800, Kemeng Shi wrote:
+>>>> Commit 113285b473824 ("blk-mq: ensure that bd->last is always set
+>>>> correctly") will set last if we failed to get driver tag for next
+>>>> request to avoid flush miss as we break the list walk and will not
+>>>> send the last request in the list which will be sent with last set
+>>>> normally.
+>>>> This code seems stale now becase the flush introduced is always
+>>>> redundant as:
+>>>> For case tag is really out, we will send a extra flush if we find
+>>>> list is not empty after list walk.
+>>>> For case some tag is freed before retry in blk_mq_prep_dispatch_rq for
+>>>> next, then we can get a tag for next request in retry and flush notified
+>>>> already is not necessary.
+>>>
+>>> I think Ming will know this code better than me, but aren't we
+>>> losing the blk_mq_get_driver_tag call entirely here now.  Where
+>>> is getting the driver tag covered now?
+>>>
+>> We will get driver tag in blk_mq_prep_dispatch_rq at beginning of dispatch
+>> loop, so it's fine to remove blk_mq_get_driver_tag here. Thanks.
+>>
+> 
+> Hi Ming and everyone familiar with code invovled, could you help with
+> reviewing this patch and patch "[PATCH v4 04/14] blk-mq: Fix potential
+> io hung for shared sbitmap per tagset" in the same patchset.
+> Thanks.
+> 
+Could anyone please help review the last two patches without reviewed-by.
+Thanks.
 
-Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
+-- 
+Best wishes
+Kemeng Shi
 
-[...]
-
-MBR, Sergey
