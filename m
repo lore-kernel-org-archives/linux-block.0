@@ -2,110 +2,111 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ADA18C636D6
-	for <linux-block@archiver.kernel.org>; Mon,  6 Feb 2023 13:06:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94AD7C05027
+	for <linux-block@archiver.kernel.org>; Mon,  6 Feb 2023 14:34:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230256AbjBFNG2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 6 Feb 2023 08:06:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46234 "EHLO
+        id S229758AbjBFOeY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 6 Feb 2023 09:34:24 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52114 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230258AbjBFNG1 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 6 Feb 2023 08:06:27 -0500
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9510D14E87;
-        Mon,  6 Feb 2023 05:06:14 -0800 (PST)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 8DDD320E3D;
-        Mon,  6 Feb 2023 13:06:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1675688772; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=3EUStM2ZP71mnbwFMm9R/cUFwku39s3k3WtvXCNYdsA=;
-        b=OjGgWEiPi5+jwk2Y4wkY24vQnRlcERtZLvEFQTIg4HxULpfUmwzOGBw/t1YAoznuLSkX/k
-        RRU9m09zRNdJjU15lglPqosVBksjfDDNSFQBmD+KIFgiPbVGY5YNAGle5gdr+tXgf7L1ln
-        p7te4YY9c4KeNa+XiSI5tzyhjGvvHd8=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1675688772;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=3EUStM2ZP71mnbwFMm9R/cUFwku39s3k3WtvXCNYdsA=;
-        b=6KPFoXY3ZQQviUuPrNk/1dlOPkbNBJU5Ir+CRnLv1ofCUPzagJUDibMJ/pCpANBrCOmTSN
-        ai8KFIfrym50IFBg==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 80C8F138E8;
-        Mon,  6 Feb 2023 13:06:12 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id xzDcHkT74GNoHAAAMHmgww
-        (envelope-from <hare@suse.de>); Mon, 06 Feb 2023 13:06:12 +0000
-Message-ID: <855bd863-270f-b69d-0aca-319773af35a8@suse.de>
-Date:   Mon, 6 Feb 2023 14:06:12 +0100
+        with ESMTP id S229590AbjBFOeX (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 6 Feb 2023 09:34:23 -0500
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91DCC23C49;
+        Mon,  6 Feb 2023 06:34:16 -0800 (PST)
+Received: from kwepemm600002.china.huawei.com (unknown [172.30.72.56])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4P9TGx5f68zRrrC;
+        Mon,  6 Feb 2023 22:31:53 +0800 (CST)
+Received: from localhost.localdomain (10.175.127.227) by
+ kwepemm600002.china.huawei.com (7.193.23.29) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.34; Mon, 6 Feb 2023 22:34:13 +0800
+From:   Zhong Jinghua <zhongjinghua@huawei.com>
+To:     <josef@toxicpanda.com>, <axboe@kernel.dk>
+CC:     <linux-block@vger.kernel.org>, <nbd@other.debian.org>,
+        <linux-kernel@vger.kernel.org>, <zhongjinghua@huawei.com>,
+        <yi.zhang@huawei.com>, <yukuai3@huawei.com>, <houtao1@huawei.com>,
+        <yangerkun@huawei.com>
+Subject: [PATCH-next] nbd: fix incomplete validation of ioctl arg
+Date:   Mon, 6 Feb 2023 22:58:05 +0800
+Message-ID: <20230206145805.2645671-1-zhongjinghua@huawei.com>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.1
-Subject: Re: blktests failures with v6.1
-Content-Language: en-US
-To:     Chaitanya Kulkarni <chaitanyak@nvidia.com>,
-        Hannes Reinecke <hare@suse.com>
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>
-References: <20221223045041.dl6ivxgo25eiwy33@shindev>
- <Y6VXjztUUz7GFmAW@infradead.org>
- <aaf09ea1-9cf0-0620-2c52-7298bb3409fe@nvidia.com>
-From:   Hannes Reinecke <hare@suse.de>
-In-Reply-To: <aaf09ea1-9cf0-0620-2c52-7298bb3409fe@nvidia.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.175.127.227]
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ kwepemm600002.china.huawei.com (7.193.23.29)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2/6/23 08:14, Chaitanya Kulkarni wrote:
-> Hannes,
-> 
->>> #3: nvme/002
->>> #4: nvme/016
->>> #5: nvme/017
->>>
->>>      The test cases fail with similar messages below. Reported in June [3].
->>>      Fixes in the test cases are expected.
->>
->> I think this is related to the current NQN that Hannes added.
->> Hannes, can you look into this?
->>
-> 
-> These testcases are still failing on latest nvme-6.3 HEAD:-
-> 
-> commit baff6491448b487e920faaa117e432989cbafa89 (HEAD -> nvme-6.3,
-> origin/nvme-6.3)
-> Author: Keith Busch <kbusch@kernel.org>
-> Date:   Fri Jan 27 08:56:20 2023 -0800
-> 
->       nvme: mask CSE effects for security receive
-> 
-> can you please look into these ?
-> 
-Indeed, these _are_ the current NQN changes; but they do work as 
-designed (main change was to add an entry for the discovery subsystem in 
-the discovery log page).
-And as we're checking the out of the discovery log we found that things 
-changed; which they have.
-I'll be sending a patch for blktests.
+We tested and found an alarm caused by nbd_ioctl arg without verification.
+The UBSAN warning calltrace like below:
 
-Cheers,
+UBSAN: Undefined behaviour in fs/buffer.c:1709:35
+signed integer overflow:
+-9223372036854775808 - 1 cannot be represented in type 'long long int'
+CPU: 3 PID: 2523 Comm: syz-executor.0 Not tainted 4.19.90 #1
+Hardware name: linux,dummy-virt (DT)
+Call trace:
+ dump_backtrace+0x0/0x3f0 arch/arm64/kernel/time.c:78
+ show_stack+0x28/0x38 arch/arm64/kernel/traps.c:158
+ __dump_stack lib/dump_stack.c:77 [inline]
+ dump_stack+0x170/0x1dc lib/dump_stack.c:118
+ ubsan_epilogue+0x18/0xb4 lib/ubsan.c:161
+ handle_overflow+0x188/0x1dc lib/ubsan.c:192
+ __ubsan_handle_sub_overflow+0x34/0x44 lib/ubsan.c:206
+ __block_write_full_page+0x94c/0xa20 fs/buffer.c:1709
+ block_write_full_page+0x1f0/0x280 fs/buffer.c:2934
+ blkdev_writepage+0x34/0x40 fs/block_dev.c:607
+ __writepage+0x68/0xe8 mm/page-writeback.c:2305
+ write_cache_pages+0x44c/0xc70 mm/page-writeback.c:2240
+ generic_writepages+0xdc/0x148 mm/page-writeback.c:2329
+ blkdev_writepages+0x2c/0x38 fs/block_dev.c:2114
+ do_writepages+0xd4/0x250 mm/page-writeback.c:2344
 
-Hannes
+The reason for triggering this warning is __block_write_full_page()
+-> i_size_read(inode) - 1 overflow.
+inode->i_size is assigned in __nbd_ioctl() -> nbd_set_size() -> bytesize.
+We think it is necessary to limit the size of arg to prevent errors.
+
+Moreover, __nbd_ioctl() -> nbd_add_socket(), arg will be cast to int.
+Assuming the value of arg is 0x80000000000000001) (on a 64-bit machine),
+it will become 1 after the coercion, which will return unexpected results.
+
+Fix it by adding checks to prevent passing in too large numbers.
+
+Signed-off-by: Zhong Jinghua <zhongjinghua@huawei.com>
+---
+ drivers/block/nbd.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+index 592cfa8b765a..e1c954094b6c 100644
+--- a/drivers/block/nbd.c
++++ b/drivers/block/nbd.c
+@@ -325,6 +325,9 @@ static int nbd_set_size(struct nbd_device *nbd, loff_t bytesize,
+ 	if (blk_validate_block_size(blksize))
+ 		return -EINVAL;
+ 
++	if (bytesize < 0)
++		return -EINVAL;
++
+ 	nbd->config->bytesize = bytesize;
+ 	nbd->config->blksize_bits = __ffs(blksize);
+ 
+@@ -1111,6 +1114,9 @@ static int nbd_add_socket(struct nbd_device *nbd, unsigned long arg,
+ 	struct nbd_sock *nsock;
+ 	int err;
+ 
++	/* Arg will be cast to int, check it to avoid overflow */
++	if (arg > INT_MAX)
++		return -EINVAL;
+ 	sock = nbd_get_socket(nbd, arg, &err);
+ 	if (!sock)
+ 		return err;
+-- 
+2.31.1
 
