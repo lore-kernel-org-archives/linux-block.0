@@ -2,116 +2,133 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BFA62C636D6
-	for <linux-block@archiver.kernel.org>; Mon,  6 Feb 2023 11:58:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C64FC05027
+	for <linux-block@archiver.kernel.org>; Mon,  6 Feb 2023 12:50:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229987AbjBFL6t (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 6 Feb 2023 06:58:49 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37646 "EHLO
+        id S229708AbjBFMu3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 6 Feb 2023 07:50:29 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37970 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229841AbjBFL6s (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 6 Feb 2023 06:58:48 -0500
-Received: from mail-ed1-x529.google.com (mail-ed1-x529.google.com [IPv6:2a00:1450:4864:20::529])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB50E12F28;
-        Mon,  6 Feb 2023 03:58:46 -0800 (PST)
-Received: by mail-ed1-x529.google.com with SMTP id r3so1654445edq.13;
-        Mon, 06 Feb 2023 03:58:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=ppxjTfPrt+fO380TECKEc+9j8f0qNsSPRjIV/2FlqhQ=;
-        b=aDm4q22FFAJMiLL7psWLsdmiCHHEWeaqe9df4Cj2D05wF/rp53Il86syfJA1cqw67v
-         HUOvdu1YcgM4SPClp8Dd2doiCfEznIjnrbzAqn82morUSGeNbGooGE9blGu0FeFs+gEE
-         7C3zyIBGTzIdj2oEZWCS/ncOj6bKDeXn6VU6W4JdYX/vP6w3pMnjyLdXUV0DCklJxq2i
-         mLc3nyKE4ZwMaVsPqIPEcEldIKluga7OBFj21jfHwkzJJFOYhCl41bMQTcJbpPYdRfsY
-         +otpM+3upWgko7msDXMRnG/EHjeNvmzBNYgrT8P5Z/2kPKEpdDUJZBmNn9TP3swBwqI0
-         yovA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ppxjTfPrt+fO380TECKEc+9j8f0qNsSPRjIV/2FlqhQ=;
-        b=ukBcN+91KNb46B82Emjl3KNpUG8g4QRMIM2rGZKAhn1X3KB/BJbIUwaPqTaLqbtznS
-         2Hi9eQyX2o19kAGKN/m2mUDSCvgo+mvz4TwARFR2SCaAREnMKZQbKcaLSi/fYGfwoJsj
-         gMfIwo7dloZUBOnUNmYbV0Y3t3rYZolN8ukrFi+ZtUlYxu7ZfMjyUuGLHl+L2fSPVpfU
-         2xkSoedXqrqP5Z+hhjJgqNUeqoQ3hHiugSZpF4ogvVOK8z5HSKYjzU+xirqGRo2PLrTa
-         vh/v3GIai+FM9ziTD6V2/3LHYU5g4QBX721jXikdi5SEDONgvmM8R0DEugYIWpqfI+Z6
-         ZTLQ==
-X-Gm-Message-State: AO0yUKVPQ0AAPqtmJkzAtPmtorTw2fbOdz5s+1V/mDu7uEBHq2X+ZX4B
-        MhkhCXHuXI95ol7tijfPGoAvSZem/H8hcSWCFOFrZcAyj/o=
-X-Google-Smtp-Source: AK7set8dT1GLWLBBhtdwxzc0ZvOt+xNblBgmSsJtrdZ2/k4U93LHXST34508M3qaGnCip1/HHUWhGEzFRzwQ5P5nDX0=
-X-Received: by 2002:a50:d71b:0:b0:4aa:ab5b:99e7 with SMTP id
- t27-20020a50d71b000000b004aaab5b99e7mr10418edi.0.1675684725237; Mon, 06 Feb
- 2023 03:58:45 -0800 (PST)
+        with ESMTP id S230006AbjBFMu2 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 6 Feb 2023 07:50:28 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8902214EB1
+        for <linux-block@vger.kernel.org>; Mon,  6 Feb 2023 04:49:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1675687780;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=Jk0y7BA+7miaISi1F3RwWtTfcOTP55cCdTb+1/IBgtw=;
+        b=gE3F8nGP8wP3HspE3hCZuF5iD6hC0+RgID5pzSQYBM4kcq1RJ6Tvj1On4qEUdoaiL3jIgH
+        mAaatEhbqnKkyJuxJ3B+AeGIfbD8bMYjNzHk7PzDVLVsAlODwGQ4fBByOZCNsFk/6B/wBt
+        5udraAxi2jjY+ni8Jd82x/tgH7PGwIE=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-614-ko0CGw3qN7ST7PEdDotYgA-1; Mon, 06 Feb 2023 07:49:32 -0500
+X-MC-Unique: ko0CGw3qN7ST7PEdDotYgA-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id D76643C14841;
+        Mon,  6 Feb 2023 12:49:31 +0000 (UTC)
+Received: from T590 (ovpn-8-17.pek2.redhat.com [10.72.8.17])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 354A3492C3C;
+        Mon,  6 Feb 2023 12:49:21 +0000 (UTC)
+Date:   Mon, 6 Feb 2023 20:49:15 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Hans Holmberg <Hans.Holmberg@wdc.com>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Matias =?iso-8859-1?Q?Bj=F8rling?= <Matias.Bjorling@wdc.com>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>,
+        Dennis Maisenbacher <dennis.maisenbacher@wdc.com>,
+        Ajay Joshi <Ajay.Joshi@wdc.com>,
+        =?iso-8859-1?Q?J=F8rgen?= Hansen <Jorgen.Hansen@wdc.com>,
+        "andreas@metaspace.dk" <andreas@metaspace.dk>,
+        "javier@javigon.com" <javier@javigon.com>,
+        "slava@dubeyko.com" <slava@dubeyko.com>,
+        "kbusch@kernel.org" <kbusch@kernel.org>,
+        "hans@owltronix.com" <hans@owltronix.com>,
+        "mcgrof@kernel.org" <mcgrof@kernel.org>,
+        "guokuankuan@bytedance.com" <guokuankuan@bytedance.com>,
+        "viacheslav.dubeyko@bytedance.com" <viacheslav.dubeyko@bytedance.com>,
+        "hch@lst.de" <hch@lst.de>, ming.lei@redhat.com
+Subject: Re: [LSF/MM/BPF BoF]: A host FTL for zoned block devices using UBLK
+Message-ID: <Y+D3Sy8v3taelXvF@T590>
+References: <20230206100019.GA6704@gsv>
 MIME-Version: 1.0
-References: <20230203141515.125205-1-n.petrova@fintech.ru>
-In-Reply-To: <20230203141515.125205-1-n.petrova@fintech.ru>
-From:   Ilya Dryomov <idryomov@gmail.com>
-Date:   Mon, 6 Feb 2023 12:58:33 +0100
-Message-ID: <CAOi1vP_7Oaw8O-p2X1xymzym1Xf_RZeN0u=SeE4Zbc2y+AfgYA@mail.gmail.com>
-Subject: Re: [PATCH] rbd: avoid double free memory on error path in rbd_dev_create()
-To:     Natalia Petrova <n.petrova@fintech.ru>
-Cc:     Dongsheng Yang <dongsheng.yang@easystack.cn>,
-        Jens Axboe <axboe@kernel.dk>, ceph-devel@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        lvc-project@linuxtesting.org,
-        Alexey Khoroshilov <khoroshilov@ispras.ru>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230206100019.GA6704@gsv>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Feb 3, 2023 at 3:15 PM Natalia Petrova <n.petrova@fintech.ru> wrote:
->
-> If rbd_dev_create() fails after assignment 'opts' to 'rbd_dev->opts',
-> double free of 'rbd_options' happens:
-> one is in rbd_dev_free() and another one is in do_rbd_add().
->
-> Found by Linux Verification Center (linuxtesting.org) with SVACE.
->
-> Fixes: 1643dfa4c2c8 ("rbd: introduce a per-device ordered workqueue")
-> Signed-off-by: Natalia Petrova <n.petrova@fintech.ru>
-> Signed-off-by: Alexey Khoroshilov <khoroshilov@ispras.ru>
-> ---
->  drivers/block/rbd.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/drivers/block/rbd.c b/drivers/block/rbd.c
-> index 04453f4a319c..ab6bfc352cde 100644
-> --- a/drivers/block/rbd.c
-> +++ b/drivers/block/rbd.c
-> @@ -5357,7 +5357,6 @@ static struct rbd_device *rbd_dev_create(struct rbd_client *rbdc,
->         if (!rbd_dev)
->                 return NULL;
->
-> -       rbd_dev->opts = opts;
->
->         /* get an id and fill in device name */
->         rbd_dev->dev_id = ida_simple_get(&rbd_dev_id_ida, 0,
-> @@ -5372,6 +5371,7 @@ static struct rbd_device *rbd_dev_create(struct rbd_client *rbdc,
->         if (!rbd_dev->task_wq)
->                 goto fail_dev_id;
->
-> +       rbd_dev->opts = opts;
->         /* we have a ref from do_rbd_add() */
->         __module_get(THIS_MODULE);
->
-> --
-> 2.34.1
->
+On Mon, Feb 06, 2023 at 10:00:20AM +0000, Hans Holmberg wrote:
+> I think we're missing a flexible way of routing random-ish
+> write workloads on to zoned storage devices. Implementing a UBLK
+> target for this would be a great way to provide zoned storage
+> benefits to a range of use cases. Creating UBLK target would
+> enable us experiment and move fast, and when we arrive
+> at a common, reasonably stable, solution we could move this into
+> the kernel.
 
-Hi Natalia,
+Yeah, UBLK provides one easy way for fast prototype.
 
-It seems like a similar issue is affecting rbd_dev->rbd_client and
-rbd_dev->spec.  Unlike rbd_dev->opts, they are ref-counted and I'm
-guessing that the verification tool doesn't go that deep.
+> 
+> We do have dm-zoned [3]in the kernel, but it requires a bounce
+> on conventional zones for non-sequential writes, resulting in a write
+> amplification of 2x (which is not optimal for flash).
+> 
+> Fully random workloads make little sense to store on ZBDs as a
+> host FTL could not be expected to do better than what conventional block
+> devices do today. Fully sequential writes are also well taken care of
+> by conventional block devices.
+> 
+> The interesting stuff is what lies in between those extremes.
+> 
+> I would like to discuss how we could use UBLK to implement a
+> common FTL with the right knobs to cater for a wide range of workloads
+> that utilize raw block devices. We had some knobs in  the now-dead pblk,
+> a FTL for open channel devices, but I think we could do way better than that.
+> 
+> Pblk did not require bouncing writes and had knobs for over-provisioning and
+> workload isolation which could be implemented. We could also add options
+> for different garbage collection policies. In userspace it would also 
+> be easy to support default block indirection sizes, reducing logical-physical
+> translation table memory overhead.
+> 
+> Use cases for such an FTL includes SSD caching stores such as Apache
+> traffic server [1] and CacheLib[2]. CacheLib's block cache and the apache
+> traffic server storage workloads are *almost* zone block device compatible
+> and would need little translation overhead to perform very well on e.g.
+> ZNS SSDs.
+> 
+> There are probably more use cases that would benefit.
+> 
+> It would also be a great research vehicle for academia. We've used dm-zap
+> for this [4] purpose the last couple of years, but that is not production-ready
+> and cumbersome to improve and maintain as it is implemented as a out-of-tree
+> device mapper.
 
-I'd prefer all three to be addressed in the same change, since it's the
-same error path.  Would you be willing to look into that and post a new
-revision or should I treat just this patch as a bug report?
+Maybe it is one beginning for generic open-source userspace SSD FTL,
+which could be useful for people curious in SSD internal. I have
+google several times for such toolkit to see if it can be ported to
+UBLK easily. SSD simulator isn't great, which isn't disk and can't handle
+real data & workloads. With such project, SSD simulator could be less
+useful, IMO.
 
+> 
+> ublk adds a bit of latency overhead, but I think this is acceptable at least
+> until we have a great, proven solution, which could be turned into
+> an in-kernel FTL.
+
+We will keep improving ublk io path, and I am working on ublk
+copy. Once it is done, big chunk IO latency could be reduced a lot.
+
+ 
 Thanks,
+Ming
 
-                Ilya
