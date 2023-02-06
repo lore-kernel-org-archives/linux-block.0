@@ -2,69 +2,101 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 29450C05027
-	for <linux-block@archiver.kernel.org>; Mon,  6 Feb 2023 15:02:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 29BA9C05027
+	for <linux-block@archiver.kernel.org>; Mon,  6 Feb 2023 15:10:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230045AbjBFPCO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 6 Feb 2023 10:02:14 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44916 "EHLO
+        id S230246AbjBFPKg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 6 Feb 2023 10:10:36 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49344 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230163AbjBFPCL (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 6 Feb 2023 10:02:11 -0500
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3AC93E388
-        for <linux-block@vger.kernel.org>; Mon,  6 Feb 2023 07:02:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
-        Content-ID:Content-Description:In-Reply-To:References;
-        bh=1mpOS7kK0Leu4UoX1ccOBGu/Ea+13sJFmxBkt8wK0Sk=; b=s0YBQDUClc24L0BeTRyiRPPPsn
-        0MQdO56GLNq/hbjAHdGh3tP0LM1gXkw34fREY9Hagcyxi5wOkj7K1rIdDo6PHhJhgHKAm6tjnU8jt
-        Il0MTOd1KSvdkcixdWjXZPZ22s3igOiLZSgi9Z4nxUOqU2jHXm4N8V60nL+T06nGhsItYuYJTozEm
-        ShShrYhoimQB38B0v1M009xhBhzY8nfyh1u6eLbX7C0l47o79+FvZ75yJqIovu+hI3ZyitTtSjuKO
-        4N0JawN/ZQGkT9LGCc766ujebrkjo7w+DpLIPBT9OkCpf1DfBrRz26QCu3sYXnn/FJEcZhs/ypXCB
-        5Cz1cdxQ==;
-Received: from [2001:4bb8:182:9f5b:1056:7df9:ac43:37d0] (helo=localhost)
-        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1pP30O-008qtO-AB; Mon, 06 Feb 2023 15:02:04 +0000
-From:   Christoph Hellwig <hch@lst.de>
-To:     axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org, Yi Zhang <yi.zhang@redhat.com>
-Subject: [PATCH] blk-cgroup: fix freeing NULL blkg in blkg_create
-Date:   Mon,  6 Feb 2023 16:02:01 +0100
-Message-Id: <20230206150201.3438972-1-hch@lst.de>
-X-Mailer: git-send-email 2.39.1
+        with ESMTP id S230196AbjBFPKf (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 6 Feb 2023 10:10:35 -0500
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 67F0F8A56;
+        Mon,  6 Feb 2023 07:10:34 -0800 (PST)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 1CAA5605F9;
+        Mon,  6 Feb 2023 15:10:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+        t=1675696233; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=sd5nDRHXJk++5A7W1c8QOz1iQG/3lZICXPVElgOmb6Y=;
+        b=ThcOtschhlpEv1GvXgf49lGKS1ihus3Qw82rT2rJff2mbZ0TtKu1oxMV3OVvBaZBvjqWzU
+        otCZwlDmUyqwx4FPNSP6bA2xRMz0PlsZXQQzMPIKQg2O1UqclWhVr+KStARpiwPvBq94v3
+        ltYSws6YThw4EeL7+pbVF24NHIzvVz8=
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id E98DF138E8;
+        Mon,  6 Feb 2023 15:10:32 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id 8hIhOGgY4WMXYgAAMHmgww
+        (envelope-from <mkoutny@suse.com>); Mon, 06 Feb 2023 15:10:32 +0000
+Date:   Mon, 6 Feb 2023 16:10:31 +0100
+From:   Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>
+To:     "yukuai (C)" <yukuai3@huawei.com>
+Cc:     Tejun Heo <tj@kernel.org>, axboe@kernel.dk,
+        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, yi.zhang@huawei.com
+Subject: Re: [PATCH -next] blk-throttle: enable io throttle for root in
+ cgroup v2
+Message-ID: <20230206151031.GB21332@blackbody.suse.cz>
+References: <20220114093000.3323470-1-yukuai3@huawei.com>
+ <YfGE9L4i7DtNTo08@slm.duckdns.org>
+ <235b0757-d322-2b6e-3ab6-ecc8c82f8f1e@huawei.com>
+ <Yflr4FzUTWsiLTC/@slm.duckdns.org>
+ <32b6949d-60b1-82ce-ae44-1cf089a78276@huawei.com>
+ <YgK7J8TFyFvp/rv1@slm.duckdns.org>
+ <34ae7d06-4f6b-73f7-7299-65cb8859aad8@huawei.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="mojUlQ0s9EVzWg2t"
+Content-Disposition: inline
+In-Reply-To: <34ae7d06-4f6b-73f7-7299-65cb8859aad8@huawei.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-new_blkg can be NULL if the caller didn't pass in a pre-allocated blkg.
-Don't try to free it in that case.
 
-Fixes: 27b642b07a4a ("blk-cgroup: simplify blkg freeing from initialization failure paths")
-Reported-by: Yi Zhang <yi.zhang@redhat.com>
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- block/blk-cgroup.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+--mojUlQ0s9EVzWg2t
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-index 8faeca6022bea0..c46778d1f3c27d 100644
---- a/block/blk-cgroup.c
-+++ b/block/blk-cgroup.c
-@@ -383,7 +383,8 @@ static struct blkcg_gq *blkg_create(struct blkcg *blkcg, struct gendisk *disk,
- err_put_css:
- 	css_put(&blkcg->css);
- err_free_blkg:
--	blkg_free(new_blkg);
-+	if (new_blkg)
-+		blkg_free(new_blkg);
- 	return ERR_PTR(ret);
- }
- 
--- 
-2.39.1
+Hello Kuai.
 
+On Wed, Feb 09, 2022 at 09:22:30AM +0800, "yukuai (C)" <yukuai3@huawei.com> wrote:
+> Do you agree that the server can't control how many io it can receives
+> from one client if we limit from server? I think the difference is that
+> limit from client can control it...
+
+(Perhaps it depends on the protocol used for the IO but) eventually
+client requests would be noticably lost/dropped and that's how the
+server propagates the requested control onto the clients without relying
+on the clients throttling themselves.
+
+(Maybe better place to implement this would be a "testing" device mapper
+target akin to the 'delay' one.)
+
+Regards,
+Michal
+
+--mojUlQ0s9EVzWg2t
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: Digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEARYIAB0WIQTrXXag4J0QvXXBmkMkDQmsBEOquQUCY+EYZQAKCRAkDQmsBEOq
+uYmjAPsG5BcOsvviZP85LUOSIeXHZpkSx9/T2c2MgnKfcze59AD6A67gBQWTt2pC
+/s80tllQKtomn3NTxSWL5rdz+oehegI=
+=d/38
+-----END PGP SIGNATURE-----
+
+--mojUlQ0s9EVzWg2t--
