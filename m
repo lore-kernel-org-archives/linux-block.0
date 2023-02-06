@@ -2,136 +2,123 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7ABF5C05027
-	for <linux-block@archiver.kernel.org>; Mon,  6 Feb 2023 16:11:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A9F56C05027
+	for <linux-block@archiver.kernel.org>; Mon,  6 Feb 2023 16:22:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231487AbjBFQLC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 6 Feb 2023 11:11:02 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47870 "EHLO
+        id S229590AbjBFQWo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 6 Feb 2023 11:22:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34758 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231718AbjBFQKz (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 6 Feb 2023 11:10:55 -0500
-Received: from mailout2.w1.samsung.com (mailout2.w1.samsung.com [210.118.77.12])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D8196252BB
-        for <linux-block@vger.kernel.org>; Mon,  6 Feb 2023 08:10:33 -0800 (PST)
-Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
-        by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id 20230206161029euoutp0299a40c15c26deb66505b4bb4ae9118a4~BSB3ewj5k2289522895euoutp02m
-        for <linux-block@vger.kernel.org>; Mon,  6 Feb 2023 16:10:29 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w1.samsung.com 20230206161029euoutp0299a40c15c26deb66505b4bb4ae9118a4~BSB3ewj5k2289522895euoutp02m
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1675699829;
-        bh=KwqIfnaMCdcPNNA877/cf4Jb1KTTKgjFLq02LqKcLLs=;
-        h=Date:Subject:To:CC:From:In-Reply-To:References:From;
-        b=loKuK9g09c1RVKd+cUfTh8QOKGOzPKziugSN5E6ZkZh8eVPTelm7RqkGt8h5lZyyU
-         Rr1PJs5Ohl/aTk/uwZrJ9d6kCENUuDK+lsZ73W/Z1CD2O2ChArmFUj3ZijChbbiH/n
-         VcujQju+bAez80biH6+3wiTiJsWS8e6dcgKsbGMo=
-Received: from eusmges2new.samsung.com (unknown [203.254.199.244]) by
-        eucas1p1.samsung.com (KnoxPortal) with ESMTP id
-        20230206161028eucas1p183b87b561bb7b75e3ca4b5683f79b1de~BSB2X_sho0830308303eucas1p12;
-        Mon,  6 Feb 2023 16:10:28 +0000 (GMT)
-Received: from eucas1p1.samsung.com ( [182.198.249.206]) by
-        eusmges2new.samsung.com (EUCPMTA) with SMTP id 81.FE.13597.47621E36; Mon,  6
-        Feb 2023 16:10:28 +0000 (GMT)
-Received: from eusmtrp2.samsung.com (unknown [182.198.249.139]) by
-        eucas1p2.samsung.com (KnoxPortal) with ESMTPA id
-        20230206161027eucas1p2fb014bbe7b69f3bf4ec1ff4b9edc64ba~BSB2EAUIb0105301053eucas1p20;
-        Mon,  6 Feb 2023 16:10:27 +0000 (GMT)
-Received: from eusmgms1.samsung.com (unknown [182.198.249.179]) by
-        eusmtrp2.samsung.com (KnoxPortal) with ESMTP id
-        20230206161027eusmtrp28b1854f87e136fe15fb2a0ac52a21237~BSB2BO0rV0805208052eusmtrp2H;
-        Mon,  6 Feb 2023 16:10:27 +0000 (GMT)
-X-AuditID: cbfec7f4-207ff7000000351d-7d-63e126741118
-Received: from eusmtip2.samsung.com ( [203.254.199.222]) by
-        eusmgms1.samsung.com (EUCPMTA) with SMTP id 15.9E.02722.37621E36; Mon,  6
-        Feb 2023 16:10:27 +0000 (GMT)
-Received: from CAMSVWEXC02.scsc.local (unknown [106.1.227.72]) by
-        eusmtip2.samsung.com (KnoxPortal) with ESMTPA id
-        20230206161027eusmtip2524d03efdec77f9169817980fbfa4ec4~BSB14n0PX2791827918eusmtip20;
-        Mon,  6 Feb 2023 16:10:27 +0000 (GMT)
-Received: from [192.168.1.19] (106.210.248.242) by CAMSVWEXC02.scsc.local
-        (2002:6a01:e348::6a01:e348) with Microsoft SMTP Server (TLS) id 15.0.1497.2;
-        Mon, 6 Feb 2023 16:10:25 +0000
-Message-ID: <62f6beda-a946-638b-950a-444a5705dcce@samsung.com>
-Date:   Mon, 6 Feb 2023 21:40:23 +0530
+        with ESMTP id S229548AbjBFQWn (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 6 Feb 2023 11:22:43 -0500
+Received: from mail-il1-x135.google.com (mail-il1-x135.google.com [IPv6:2607:f8b0:4864:20::135])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 51587170C
+        for <linux-block@vger.kernel.org>; Mon,  6 Feb 2023 08:22:42 -0800 (PST)
+Received: by mail-il1-x135.google.com with SMTP id n2so1429289ili.11
+        for <linux-block@vger.kernel.org>; Mon, 06 Feb 2023 08:22:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Q2C5DB0DT3DMLvYn9ipFWXLklAkx9iRL+ziwmHL1NmU=;
+        b=l46PwS5w/HydIlvsf09Pe09XCzvVhobWtcTYS/5AQ9DMU3ca8ngjBILswut8tEJmf5
+         f7xUAET+afbV7EJyEsiaxX7nSVXWSCI8RHkLsuKAuRzgicFnFp/grKk1JP57GzWAiDI/
+         iJKq1uJKkfoTLrMSHe/K8WDL11ssu3moSvj4+kN69UHAXiIkcv038nd9hIhAkAbBaHp4
+         9A3nw3vPP1rvsG2fLG8lKmF6W0qaiOCrtxClA70Tnh3Q5/BpgSzEhkWy2wGgjzXQZLRw
+         kM0vx/SP4MzDx3VY0AME2QagV6DDCKAQvf7yNgS2QlxW1Aex0/d6CWvFeyKukRzD8kaX
+         rJBA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Q2C5DB0DT3DMLvYn9ipFWXLklAkx9iRL+ziwmHL1NmU=;
+        b=MYHHEDdW4YYTpmYW9IiaULjZbEvq3+Wl0uPj7dlYE6lCFlquTXHKc1bDeXdhtsYQBb
+         qbvAmQGekUVVMD6Z+wcvaY+9KeCSuzR8IszbVGlgJ2LHNdMEZcxdC/IOpH7Z7PDQh51d
+         lRvRxVRNtZFKAmxeqT6g3Dud7nPSaILtJIsyMs/9hmtxt8iL7nhHjiQxopHEQ06lxrQB
+         9LOgRfzDXxgsIcmMCUUVUH8MmMKzoqi9SrKe0dUMfu0I+0L3kwTXEq2Inz1EtgRHtlaz
+         LF4w6m/2Ln01SA47JaSa8S+TRlIk6urfnTFNcGykxeYv6vKsiDUo6WiBz9SpyRxgsCYO
+         1qbw==
+X-Gm-Message-State: AO0yUKWT2kmSXbbwiFxDTDR146jEpN+/FIAgFeMr67kwvbZ+yXaprX+Y
+        qaUHaMUfYXJVd8UiAIxMETUjPPTS4BW8cKIR
+X-Google-Smtp-Source: AK7set8pWSRiHHFGPKVc5ARuURtlyO/9eZ+z4L8uNlTWyuliPeOlgpPof8idQJW68AjFLF42SbH4/A==
+X-Received: by 2002:a92:ce06:0:b0:310:8c56:d7de with SMTP id b6-20020a92ce06000000b003108c56d7demr11216852ilo.0.1675700561561;
+        Mon, 06 Feb 2023 08:22:41 -0800 (PST)
+Received: from [127.0.0.1] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id z27-20020a05663822bb00b003afe5e747d6sm3650419jas.126.2023.02.06.08.22.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 06 Feb 2023 08:22:40 -0800 (PST)
+From:   Jens Axboe <axboe@kernel.dk>
+To:     hch@lst.de, dwagner@suse.de, hare@suse.de, ming.lei@redhat.com,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Kemeng Shi <shikemeng@huaweicloud.com>
+Cc:     john.garry@huawei.com, jack@suse.cz
+In-Reply-To: <20230118093726.3939160-1-shikemeng@huaweicloud.com>
+References: <20230118093726.3939160-1-shikemeng@huaweicloud.com>
+Subject: Re: [PATCH v4 01/14] blk-mq: avoid sleep in
+ blk_mq_alloc_request_hctx
+Message-Id: <167570056052.23119.7411390353642727169.b4-ty@kernel.dk>
+Date:   Mon, 06 Feb 2023 09:22:40 -0700
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
-        Thunderbird/102.4.2
-Subject: Re: [PATCH] brd: improve performance with blk-mq
-Content-Language: en-US
-To:     Christoph Hellwig <hch@lst.de>
-CC:     <axboe@kernel.dk>, <mcgrof@kernel.org>, <gost.dev@samsung.com>,
-        <linux-block@vger.kernel.org>
-From:   Pankaj Raghav <p.raghav@samsung.com>
-In-Reply-To: <20230206155048.GA13392@lst.de>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [106.210.248.242]
-X-ClientProxiedBy: CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347) To
-        CAMSVWEXC02.scsc.local (2002:6a01:e348::6a01:e348)
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFmpjleLIzCtJLcpLzFFi42LZduznOd0StYfJBp+O81usvtvPZrFy9VEm
-        i723tC1uTHjK6MDicflsqcemVZ1sHrtvNrB5fN4kF8ASxWWTkpqTWZZapG+XwJXx6fIdpoIP
-        HBXvZn1mbGDsYO9i5OSQEDCRmLfwMQuILSSwglHixeLCLkYuIPsLo8SDs8tYIJzPjBJTdp1m
-        gum49PYEG0THckaJRzs84Io+b+tnhHB2MkrMadzPCFLFK2AncfvAOWYQm0VAReLssbcsEHFB
-        iZMzn4DZogJREk0XfoLZwgKWEouOHgWrZxYQl7j1ZD7YZhEBJYmnr84yQsSTJZ6/vwF0BQcH
-        m4CWRGMn2DucAjoSu1q/skCUaEq0bv/NDmHLS2x/O4cZ4gFliS+f3kDZtRKnttxiArlZQuAO
-        h8TGp0uZQWZKCLhI3HutDlEjLPHq+BZocMlI/N85HxoQ1RJPb/xmhuhtYZTo37meDaLXWqLv
-        TA6E6SjRsU0bwuSTuPFWEOIaPolJ26YzT2BUnYUUDrOQ/DsLyQOzkDywgJFlFaN4amlxbnpq
-        sVFearlecWJucWleul5yfu4mRmBSOf3v+JcdjMtffdQ7xMjEwXiIUYKDWUmE1/TAg2Qh3pTE
-        yqrUovz4otKc1OJDjNIcLErivNq2J5OFBNITS1KzU1MLUotgskwcnFINTHHnWlvV/U7lT1jN
-        diyn4Idd6gr96pcNr49X7Jf8Pv1SteGb2mrx+9tcz01eb1DF5RCRH9h8OviqdIq1iezU2Re6
-        sqq2P6vu9z94J1O+KFTX6eL9quU9b24uZl9k8/JWS2N/4jGrXfGz5Rb+XD7F/Br7Z+9lYirF
-        cS4HtX6bsz/9/PP1EXbWlvMFij9aHhUGn79hxsGwXXs68/5rKpJZfWqH+I6eu3Q8P3xh8T7n
-        0iOZD196TT6/R/uZ+b2DHi8/TpZc29Iq+3Opps+P/EcXmHuMyjRWLOxItuh7aLxGTqrr6odj
-        HmuXcZkrNtxVFmwX0dPME4o53nV7jvCRzOmZiTGzZk1zj1CPPduttWzWLSWW4oxEQy3mouJE
-        ANYpBK6ZAwAA
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFtrHIsWRmVeSWpSXmKPExsVy+t/xe7rFag+TDe5fNbVYfbefzWLl6qNM
-        FntvaVvcmPCU0YHF4/LZUo9NqzrZPHbfbGDz+LxJLoAlSs+mKL+0JFUhI7+4xFYp2tDCSM/Q
-        0kLPyMRSz9DYPNbKyFRJ384mJTUnsyy1SN8uQS/j0+U7TAUfOCrezfrM2MDYwd7FyMkhIWAi
-        centCbYuRi4OIYGljBKfb15ihkjISHy68hGqSFjiz7UuNhBbSOAjo8S3+1kQDTsZJaYuvMwI
-        kuAVsJO4feAcWDOLgIrE2WNvWSDighInZz4Bs0UFoiRunn/IBGILC1hKLDp6FKyeWUBc4taT
-        +WBxEQEliaevzjJCxJMlnr+/AXXdXUaJq78XABVxcLAJaEk0doIdxymgI7Gr9SsLRL2mROv2
-        3+wQtrzE9rdzoJ5Rlvjy6Q2UXSvx+e8zxgmMorOQnDcLyRmzkIyahWTUAkaWVYwiqaXFuem5
-        xYZ6xYm5xaV56XrJ+bmbGIERue3Yz807GOe9+qh3iJGJg/EQowQHs5IIr+mBB8lCvCmJlVWp
-        RfnxRaU5qcWHGE2BYTSRWUo0OR+YEvJK4g3NDEwNTcwsDUwtzYyVxHk9CzoShQTSE0tSs1NT
-        C1KLYPqYODilGpicVwVtu7nWbmKFmbv2ypM33umGM7uXrOGPC1g35cNWm8tFs1KYjPObOGUa
-        WQ5Hbf7dd4L7rfGyX2z/DrF1v5zyw/6Sz9TnqmpNNeUF5f+f+n9+xjs5Zffi+YUdt5IObe0U
-        n+V+52D//vW+F3cabP8SZbh9Y+l9D97jFTaCmg0nFvsc6btV+33djnb/lpdz+wr1BRZ2ylWU
-        Zro/fzrzWbezHmuvbu7ENU2sEeZKjFOiIzts9tmc+x3fJ5m1uHHSa9XlemzGs213OHc/Stmc
-        bnYtLtvi99dN8RK6exMeOnqnu8qExtYX8Kke27jPrfDTwyDO72o7Ls9/Y76D5U7An32fG3ur
-        jtxrurP/+aWlcuVKLMUZiYZazEXFiQBb9laqUQMAAA==
-X-CMS-MailID: 20230206161027eucas1p2fb014bbe7b69f3bf4ec1ff4b9edc64ba
-X-Msg-Generator: CA
-X-RootMTR: 20230203103127eucas1p293a9fa97366fc89c62f18053be6aca1f
-X-EPHeader: CA
-CMS-TYPE: 201P
-X-CMS-RootMailID: 20230203103127eucas1p293a9fa97366fc89c62f18053be6aca1f
-References: <20230203103005.31290-1-p.raghav@samsung.com>
-        <CGME20230203103127eucas1p293a9fa97366fc89c62f18053be6aca1f@eucas1p2.samsung.com>
-        <20230203103005.31290-2-p.raghav@samsung.com>
-        <20230206155048.GA13392@lst.de>
+X-Mailer: b4 0.12.0
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2023-02-06 21:20, Christoph Hellwig wrote:
-> On Fri, Feb 03, 2023 at 04:00:06PM +0530, Pankaj Raghav wrote:
->> move to blk-mq based request processing as brd is one of the few drivers
->> that still uses submit_bio interface. The changes are pretty trivial
->> to start using blk-mq. The performance increases up to 125% for direct IO
->> read workloads. There is a slight dip in performance for direct IO write
->> workload but considering the general performance gain with blk-mq
->> support, it is not a lot.
-> 
-> Can you find out why writes regress, and what improves for reads?
-> 
-Definitely. I tried to do similar experiments in null blk with submit_bio
-& blk-mq backend and noticed a similar pattern in performance. I will look
-into it next week as I am OOO rest of the week.
 
-> In general blk-mq is doing a lot more work for better batching, but much
-> of that batching should not matter for a simple ramdisk.  So the results
-> look a little odd to me, and extra numbers and explanations would
-> really help.
+On Wed, 18 Jan 2023 17:37:13 +0800, Kemeng Shi wrote:
+> Commit 1f5bd336b9150 ("blk-mq: add blk_mq_alloc_request_hctx") add
+> blk_mq_alloc_request_hctx to send commands to a specific queue. If
+> BLK_MQ_REQ_NOWAIT is not set in tag allocation, we may change to different
+> hctx after sleep and get tag from unexpected hctx. So BLK_MQ_REQ_NOWAIT
+> must be set in flags for blk_mq_alloc_request_hctx.
+> After commit 600c3b0cea784 ("blk-mq: open code __blk_mq_alloc_request in
+> blk_mq_alloc_request_hctx"), blk_mq_alloc_request_hctx return -EINVAL
+> if both BLK_MQ_REQ_NOWAIT and BLK_MQ_REQ_RESERVED are not set instead of
+> if BLK_MQ_REQ_NOWAIT is not set. So if BLK_MQ_REQ_NOWAIT is not set and
+> BLK_MQ_REQ_RESERVED is set, blk_mq_alloc_request_hctx could alloc tag
+> from unexpected hctx. I guess what we need here is that return -EINVAL
+> if either BLK_MQ_REQ_NOWAIT or BLK_MQ_REQ_RESERVED is not set.
+> 
+> [...]
 
-Let me know if you think I am missing something in the code that can cause
-this behavior! Thanks.
+Applied, thanks!
+
+[01/14] blk-mq: avoid sleep in blk_mq_alloc_request_hctx
+        commit: 6ee858a3d3270a68902d66bb47c151a83622535c
+[02/14] blk-mq: remove stale comment for blk_mq_sched_mark_restart_hctx
+        commit: c31e76bcc379182fe67a82c618493b7b8868c672
+[03/14] blk-mq: wait on correct sbitmap_queue in blk_mq_mark_tag_wait
+        commit: 98b99e9412d0cde8c7b442bf5efb09528a2ede8b
+[04/14] blk-mq: Fix potential io hung for shared sbitmap per tagset
+        commit: 47df9ce95cd568d3f84218c4f65e9fbd4dfeda55
+[05/14] blk-mq: remove unnecessary list_empty check in blk_mq_try_issue_list_directly
+        commit: 08e3599e7401a7eae5e68f5e2601cc4a4e53951b
+[06/14] blk-mq: remove unncessary from_schedule parameter in blk_mq_plug_issue_direct
+        commit: 3e368fb023ffab83404f628d02789550d79eca9c
+[07/14] blk-mq: make blk_mq_commit_rqs a general function for all commits
+        commit: 34c9f547402f11c0241a44800574ec4fa38cccb8
+[08/14] blk-mq: remove unncessary error count and commit in blk_mq_plug_issue_direct
+        commit: 0d617a83e8d4d3149d76cc074d9779a3b0ee7baf
+[09/14] blk-mq: use blk_mq_commit_rqs helper in blk_mq_try_issue_list_directly
+        commit: 984ce0a7d75b577fd84f2cc7a83e6e2d2503f90e
+[10/14] blk-mq: simplify flush check in blk_mq_dispatch_rq_list
+        commit: e4ef2e05e0020db0d61b2cf451ef38a2bba33910
+[11/14] blk-mq: remove unnecessary error count and check in blk_mq_dispatch_rq_list
+        commit: 4ea58fe456c21bb259a7cbf8498946f86e9b84aa
+[12/14] blk-mq: remove set of bd->last when get driver tag for next request fails
+        commit: f1ce99f7098d9e7a322caf48eb8af05be7999827
+[13/14] blk-mq: use switch/case to improve readability in blk_mq_try_issue_list_directly
+        commit: 27e8b2bb149aff7b7b673b46c7206f4f37c30093
+[14/14] blk-mq: correct stale comment of .get_budget
+        commit: 01542f651a9f58a9b176c3d3dc3eefbacee53b78
+
+Best regards,
+-- 
+Jens Axboe
+
+
+
