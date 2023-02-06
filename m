@@ -2,82 +2,110 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 02A56C61DA4
-	for <linux-block@archiver.kernel.org>; Mon,  6 Feb 2023 12:55:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ADA18C636D6
+	for <linux-block@archiver.kernel.org>; Mon,  6 Feb 2023 13:06:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229571AbjBFMzq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 6 Feb 2023 07:55:46 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40668 "EHLO
+        id S230256AbjBFNG2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 6 Feb 2023 08:06:28 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46234 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229488AbjBFMzp (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 6 Feb 2023 07:55:45 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D890214495
-        for <linux-block@vger.kernel.org>; Mon,  6 Feb 2023 04:54:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1675688097;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=K+jg2MDQ8zFuVv8INM8zR3Tx9pHjShGutK4vDD9pYLM=;
-        b=a+K3fJegy86XT5dEO5ViTN0O5F4GdmKnB/v21VF9AMdaIp3J+c97H/N6N/S8hHtFyJBzGi
-        YcOg4dTj6jTCTILbshthECmF+cYm6Cwk82tdw0cH7t7tjUueAxJurnd11AS399UaglCfdT
-        /GeUIiHidxkbW170uEDf7BRys79wpC4=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-298-CNqVLlHoPmGo8-5twErLYw-1; Mon, 06 Feb 2023 07:54:51 -0500
-X-MC-Unique: CNqVLlHoPmGo8-5twErLYw-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        with ESMTP id S230258AbjBFNG1 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 6 Feb 2023 08:06:27 -0500
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9510D14E87;
+        Mon,  6 Feb 2023 05:06:14 -0800 (PST)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B99218027EB;
-        Mon,  6 Feb 2023 12:54:50 +0000 (UTC)
-Received: from T590 (ovpn-8-17.pek2.redhat.com [10.72.8.17])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id DEA39C15BA0;
-        Mon,  6 Feb 2023 12:54:41 +0000 (UTC)
-Date:   Mon, 6 Feb 2023 20:54:36 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Hans Holmberg <Hans.Holmberg@wdc.com>
-Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Matias =?iso-8859-1?Q?Bj=F8rling?= <Matias.Bjorling@wdc.com>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>,
-        Dennis Maisenbacher <dennis.maisenbacher@wdc.com>,
-        Ajay Joshi <Ajay.Joshi@wdc.com>,
-        =?iso-8859-1?Q?J=F8rgen?= Hansen <Jorgen.Hansen@wdc.com>,
-        "andreas@metaspace.dk" <andreas@metaspace.dk>,
-        "javier@javigon.com" <javier@javigon.com>,
-        "slava@dubeyko.com" <slava@dubeyko.com>,
-        "kbusch@kernel.org" <kbusch@kernel.org>,
-        "hans@owltronix.com" <hans@owltronix.com>,
-        "mcgrof@kernel.org" <mcgrof@kernel.org>,
-        "guokuankuan@bytedance.com" <guokuankuan@bytedance.com>,
-        "viacheslav.dubeyko@bytedance.com" <viacheslav.dubeyko@bytedance.com>,
-        "hch@lst.de" <hch@lst.de>
-Subject: Re: [LSF/MM/BPF BoF]: A host FTL for zoned block devices using UBLK
-Message-ID: <Y+D4jImmZ2r3Wazg@T590>
-References: <20230206100019.GA6704@gsv>
- <Y+D3Sy8v3taelXvF@T590>
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 8DDD320E3D;
+        Mon,  6 Feb 2023 13:06:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1675688772; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=3EUStM2ZP71mnbwFMm9R/cUFwku39s3k3WtvXCNYdsA=;
+        b=OjGgWEiPi5+jwk2Y4wkY24vQnRlcERtZLvEFQTIg4HxULpfUmwzOGBw/t1YAoznuLSkX/k
+        RRU9m09zRNdJjU15lglPqosVBksjfDDNSFQBmD+KIFgiPbVGY5YNAGle5gdr+tXgf7L1ln
+        p7te4YY9c4KeNa+XiSI5tzyhjGvvHd8=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1675688772;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=3EUStM2ZP71mnbwFMm9R/cUFwku39s3k3WtvXCNYdsA=;
+        b=6KPFoXY3ZQQviUuPrNk/1dlOPkbNBJU5Ir+CRnLv1ofCUPzagJUDibMJ/pCpANBrCOmTSN
+        ai8KFIfrym50IFBg==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 80C8F138E8;
+        Mon,  6 Feb 2023 13:06:12 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id xzDcHkT74GNoHAAAMHmgww
+        (envelope-from <hare@suse.de>); Mon, 06 Feb 2023 13:06:12 +0000
+Message-ID: <855bd863-270f-b69d-0aca-319773af35a8@suse.de>
+Date:   Mon, 6 Feb 2023 14:06:12 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Y+D3Sy8v3taelXvF@T590>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.6.1
+Subject: Re: blktests failures with v6.1
+Content-Language: en-US
+To:     Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+        Hannes Reinecke <hare@suse.com>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>
+References: <20221223045041.dl6ivxgo25eiwy33@shindev>
+ <Y6VXjztUUz7GFmAW@infradead.org>
+ <aaf09ea1-9cf0-0620-2c52-7298bb3409fe@nvidia.com>
+From:   Hannes Reinecke <hare@suse.de>
+In-Reply-To: <aaf09ea1-9cf0-0620-2c52-7298bb3409fe@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Feb 06, 2023 at 08:49:15PM +0800, Ming Lei wrote:
-> > ublk adds a bit of latency overhead, but I think this is acceptable at least
-> > until we have a great, proven solution, which could be turned into
-> > an in-kernel FTL.
+On 2/6/23 08:14, Chaitanya Kulkarni wrote:
+> Hannes,
 > 
-> We will keep improving ublk io path, and I am working on ublk
-> copy. Once it is done, big chunk IO latency could be reduced a lot.
+>>> #3: nvme/002
+>>> #4: nvme/016
+>>> #5: nvme/017
+>>>
+>>>      The test cases fail with similar messages below. Reported in June [3].
+>>>      Fixes in the test cases are expected.
+>>
+>> I think this is related to the current NQN that Hannes added.
+>> Hannes, can you look into this?
+>>
+> 
+> These testcases are still failing on latest nvme-6.3 HEAD:-
+> 
+> commit baff6491448b487e920faaa117e432989cbafa89 (HEAD -> nvme-6.3,
+> origin/nvme-6.3)
+> Author: Keith Busch <kbusch@kernel.org>
+> Date:   Fri Jan 27 08:56:20 2023 -0800
+> 
+>       nvme: mask CSE effects for security receive
+> 
+> can you please look into these ?
+> 
+Indeed, these _are_ the current NQN changes; but they do work as 
+designed (main change was to add an entry for the discovery subsystem in 
+the discovery log page).
+And as we're checking the out of the discovery log we found that things 
+changed; which they have.
+I'll be sending a patch for blktests.
 
-s/copy/zero copy
+Cheers,
 
-
-Thanks,
-Ming
+Hannes
 
