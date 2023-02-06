@@ -2,133 +2,161 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 47A14C61DA4
-	for <linux-block@archiver.kernel.org>; Mon,  6 Feb 2023 04:43:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D015BC05027
+	for <linux-block@archiver.kernel.org>; Mon,  6 Feb 2023 05:23:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229489AbjBFEnW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 5 Feb 2023 23:43:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33868 "EHLO
+        id S229460AbjBFFXb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 6 Feb 2023 00:23:31 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43788 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229447AbjBFEnV (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 5 Feb 2023 23:43:21 -0500
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2040.outbound.protection.outlook.com [40.107.244.40])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 235F115543
-        for <linux-block@vger.kernel.org>; Sun,  5 Feb 2023 20:43:20 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=e1tlglc75rczgGjHoIgqel9BSldEHIug74j7QgShJkvRFkCcgvfeq2R0MuWPKtgfoc9N/MDxXlhUBa34d/AlcpzBA2EeMKN8RCli8I83B+AgiIK9tLW9z81cZYsD59nu3HiuCTgJ/cFVDpTqgg+nJO1GKhvsVkv76edUDvSVDZ3mTzna8vwpM9TZKtLCyAHbovmYwRtt+eyZCuGTn4itDhrnAEuWnvF7sg2fci7p8aH339t5PUeOvXY90wH9xJuoBoksh+V1rOWyouuiiJ3RDu49TS1Xm6TXuxgGvtphVIHXi2TLaMtMjQPWd73XSUO1n55qngiXHDUBTDVfpqjJgQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=CBJ39CKJNtFSJAcTVrS9Eo9SJ92WJd57fQHb5hy5O+o=;
- b=THZL87Jv/LT67LwotTvpjRvbFHJOliNnfDdeIec2MD7wkbn8oMJtu/ly8dSXUQkiQKZPisdMVndPMtsTWhDwKJiOcZCuVXgEG15238MKwNGUMiHC4qNSzO8hCUUzdEq/yhzwri+mY9lDqEUuzeSy231TbyAo6oClSjWqbwmBb/DG36UwEmhrzO+txBuXOAE7PzxFZgt9/ZuPGdpJSqgJKyC3iKfe1RRHKb4TgT+K3CF2q5Bb0r1bQEXHbrlPWs/EC89Pm26cVwBdaQeU9ZCHJezxodJv+HWYraXhAAD+OVup4xpYi/4OKCd5NBel3nEOhCKwb3v8lCcd9K/9awjX1Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=CBJ39CKJNtFSJAcTVrS9Eo9SJ92WJd57fQHb5hy5O+o=;
- b=JGBdz7X0lhJbQu90nLlw/VeXFzNJ8/cwOyIljauTP9fNdk8+HiDoV1+kdY/uTFxbLMIbdp+Nb994bKIdojo+4+5VRqWcVh2CQnTy5KbQYxcTyt9h5yLh8Htu8oZNc4gLMDBMik+FjMr+7nVgQ2zi6J5/OFhpdymwRcC5v8WjLAAyi3OXCIHt9aO9ieIIr+OSYkqb66ZtyVojicqCr82vLzs6V8dgA/5hp8XJnUXBdzsMeVW8zUAXutC30ytcsg1CWwZ9WRbl1nFrQAjzzSKqBNJT3wUuxm7AYKAojgDWqU+yuza87gnPS1ICf6lxKJt3Ww07MSnfJkI6WEHo6RsV9Q==
-Received: from MW2PR12MB4667.namprd12.prod.outlook.com (2603:10b6:302:12::28)
- by CH0PR12MB5091.namprd12.prod.outlook.com (2603:10b6:610:be::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6064.34; Mon, 6 Feb
- 2023 04:43:16 +0000
-Received: from MW2PR12MB4667.namprd12.prod.outlook.com
- ([fe80::4aaa:495:78b4:1d7c]) by MW2PR12MB4667.namprd12.prod.outlook.com
- ([fe80::4aaa:495:78b4:1d7c%3]) with mapi id 15.20.6064.032; Mon, 6 Feb 2023
- 04:43:16 +0000
-From:   Chaitanya Kulkarni <chaitanyak@nvidia.com>
-To:     Christoph Hellwig <hch@lst.de>, "axboe@kernel.dk" <axboe@kernel.dk>
-CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: Re: [PATCH] block: stub out and deprecated the capability attribute
- on the gendisk
-Thread-Topic: [PATCH] block: stub out and deprecated the capability attribute
- on the gendisk
-Thread-Index: AQHZN+CeQ8iuT3PIOkKLtbE48xaHRa7BW0uA
-Date:   Mon, 6 Feb 2023 04:43:16 +0000
-Message-ID: <43bd8e91-27d0-5063-d367-0433ebf72c2b@nvidia.com>
-References: <20230203150209.3199115-1-hch@lst.de>
-In-Reply-To: <20230203150209.3199115-1-hch@lst.de>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-user-agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.9.0
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: MW2PR12MB4667:EE_|CH0PR12MB5091:EE_
-x-ms-office365-filtering-correlation-id: 9beca95d-7a70-4628-7285-08db07fca995
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 5GqKnUwns3TjJ57y7OoMwTuRas21geGOpe+owBdA/KRwiTk08m4eNJHDOL2fka7p+gksLrxAP3dQ3T43UB7wMH2gamvTfLi+l81LtjDPKRo7dvkuUbj8V/33YjRu9yKMzOJ5eQ9mVKuaoAS1a1UbNlt+cJ1LYxVdDQjYjvihqbJVooJ4DNUt/iX3VzbyK+tJovZGvjPzaATxLZa5e3PYPpSVV5Lz6OJugKtGRuu3ldG2QwnSSQBu/wdtTVRSljAggpx470q/KX+N4GIJL5yvx3MTazAnJxZelCaon8xLlR37JoKe7y43FMI4uIB/lZcVh5+qLFK4I3zykvfGaS3blq8HPlzlF3b+RXaMgfowAy7ugFIBVKJA/kEdaEIMXJ+jbqVIV6XyR4yBbAgTsTsAgWj/e3EJJ9VYI/AZptfW/UDynlqId0230EOyqWrR/gVt0a/xLvUx/rSa3NY6xs9DkowebYoUfRco0mCeD3K5xAernrpZDw19vQnFJwOHeNQwVkTIhM3bM6gbaCBH6g0c+++f9LYdlL0SJJKEc7lFbaDq+VUiwV+61z6G4FgE7D1mNpMFJ2EECHmktFD3VOlzoheGEadLlPrf1EZtESZbcxpofmNgZ+3hCsAQacs+yb6ImF7jDPfVgaINYER7p1PSXYpEaaedOf4A5KozPr9jCqDKB8x5q+VHxgyd4p/I68S3acoBp0fYKdwzdmNZxaz2R6JhbCS9EL3pBe1ZpN07sv34Zk7fZHmOZJ5+Alio2sSH7U6t182sP4nAuR1qz/g25A==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW2PR12MB4667.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(4636009)(396003)(136003)(346002)(39860400002)(366004)(376002)(451199018)(316002)(110136005)(6512007)(26005)(31696002)(86362001)(71200400001)(36756003)(31686004)(186003)(66946007)(66476007)(64756008)(2906002)(4744005)(8936002)(66556008)(4326008)(8676002)(5660300002)(41300700001)(2616005)(6506007)(6486002)(53546011)(478600001)(66446008)(38100700002)(76116006)(38070700005)(91956017)(122000001)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?RStPZHo4WE5rdnVtay80eVFGVEtqNVArQ3YrVGNyTEhpNVc0UkZsN1JqdzM3?=
- =?utf-8?B?ZWN0MDBhYS81Tm5DYi9kODNpdjl1clhtWGFzeWpTaW93QUppZDMrTnFocmVI?=
- =?utf-8?B?cTRTNW1NUVFDUURxMk44UnowUkJkSVhWdnpacWhuRGZZWkd3RmlrU3ZESFg4?=
- =?utf-8?B?ZGpSenQyeE9KNW5TSkxUcFBhMEREVWpGdEw1bHNXWWVneDF5MjFEVDUweWNu?=
- =?utf-8?B?bDB3OGNtcWJLNCtyK3dvdHZNL1FhWGhWMEZIa0ljcTZsUyt1SzJXMEdLWG1z?=
- =?utf-8?B?MHJncVM4OS9rNTJSUys3NXd5VnU2a2YzTkVETnQrbS9pcjJEUzU4WmF0UTk4?=
- =?utf-8?B?emhlVFJ0dWRRUms2dGZGVVZ4TWZqamVYcDNHdXd1Z1hjd3puNWpYZ3hwbE5G?=
- =?utf-8?B?dGV3U2pKQlZFdFRlNGlWUzA4bVpVSGhtY1JRTlBqaktKVS9mQnlERHhxaGFu?=
- =?utf-8?B?RWF3aVRpRENLNStFM1VmV3Y4OE5tMzIySG5oaWl4NUJaeVFDbHBORFNlTVFM?=
- =?utf-8?B?UFBMenFCc2RiSWZCT1l5Nk52SzhrempodHJiVlhWRFJhYld0OXZLd2h2NHJY?=
- =?utf-8?B?ZzZPbzc2NHU0andOaTBiNEhUNXQ5b3R0bzdPWHdDcmJudVdCQUNpcDJLWUd1?=
- =?utf-8?B?NnlQeTMyREJEeDRmeHBsbHZ0cW15SGpKVWFNUHd4cElURTc3cG9mS3JkYWZD?=
- =?utf-8?B?ZmY2czBTaUcvSjNsMVQ3aU9WOTJWMWE2cWw2ZDNjSm9rcjR1QVpTWUVrNjlq?=
- =?utf-8?B?cVVwY0poUGlyOVVXSHltN0lDSFYrb2pWS3ZQQnRROFplUWpOb3hPUWRVK0Ix?=
- =?utf-8?B?bGpSbnZ1ekpxcTFRRnFCNFltcDl5ME9PNnhNNXpwNi9IWmlWYkZJV3lyeXBk?=
- =?utf-8?B?NnIvUU9XZkovT0pCSG5obmJMTnhYWU9IYk5qSncyU2JaZVpTWm1iWkt1d3k4?=
- =?utf-8?B?Um5wMzdzZUI2MFY1Y1UvazhrK1hjd1FyRWtEc2NkZ1VEd0FxZlNDOUlua1BW?=
- =?utf-8?B?bVllcjkweU9GbEZ4SllXc2FkUnpnVFVYdmVQQUs1SGx6Vjhvczd0Q29HenF1?=
- =?utf-8?B?cDBVeVptRW9ZWmZYcWsrNGRuaXg3R0lTRWVQcXQxajdMaVNjdDh3d1I4Ri9x?=
- =?utf-8?B?cHU2enMyQUVWM2UySXE0R3VUdXdsL3MybVE0Qm5Nc3RSazNQTXFNb3dqbXox?=
- =?utf-8?B?M1hLZHVsWmhFaG0yRDdBYmtVOHN3VlltTWpvaUlreE5CL0prZFNKdkJuY0JW?=
- =?utf-8?B?aTlsbllYdmdUVHhKL2hiZTlJYnNQSTEwdnIyZE43bnF4SXRld0xUMGh1ZE16?=
- =?utf-8?B?dTljdWNvVVErTkl4ZmJycUZ1dlZnNG4wMXcrbFVhNjgzSjUzZ2VOeCs5OVQy?=
- =?utf-8?B?dkkwdXVNWTd3dEJEMDlyVm96WmFvV0UwWmh2ZnF2cFhuU3BRMCtwalF5bTdK?=
- =?utf-8?B?aTdudHRFdFI4YmlxaDdGSElqVmU3aVliMTZzMGl6WURSQzQrZUdpd05kaHVB?=
- =?utf-8?B?bllEZEJ3Sy9aWDJuVGhtT0RkYkpPa0tSWDcxTkFjY3BKRE8ydXQzTVBjak1S?=
- =?utf-8?B?VGxkWlJGZ2JPQ3BVUUMrTSsxTkttclpqT0Z4YjZ6VVd3VjdFNzZZMUJPcXdJ?=
- =?utf-8?B?MkFPZjJZNWJudzNGWHZBVk5CNnBIWHJFMDlSeHZMeTZJWjBQRjRHdnNxWWc2?=
- =?utf-8?B?SWpCWTBkZWpwMWJjSm11ZzQwN1dRMnZtVGtCNk5OYmdmRnVjV1dtVXFnZ0dP?=
- =?utf-8?B?L3JRZnRCN2dwbTZmM1poamZQR3lrUEZVODhBTFN3MG1PQ2FybGxUZ1pGcXVu?=
- =?utf-8?B?UEVSaGlDSGZUVHcrVm83bGdmQ0ZpZ3JiV1BucExlNXhxdlNvbll3eFN1S0pY?=
- =?utf-8?B?WGk0M0ZlVUQ0SWpKRU02aC9QTkExNis4MFB2Q0hkWmNpT0dMNkEvZ0hqZXM5?=
- =?utf-8?B?Umt5K3FKZGoyYy82b1YvdkdpQktPbTB3SmVVcWw0ZG03cE1sbUZ1a0hoZHlR?=
- =?utf-8?B?VDBob1hzZEpZQ1luOUNDak1xay9pTVJkNitWNWI3Mkw5bmc0aEdObFFRb1U1?=
- =?utf-8?B?K01DcENmaVZSNGJ1S3JyZExIbHRVd1dJV3BtTFY5TTVuTm5PV3MwZWFjRHgz?=
- =?utf-8?Q?ZE/81NAKqaYoVMkbPGsmgL/34?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <3AD77C49E717CF48B6871E346546BA48@namprd12.prod.outlook.com>
-Content-Transfer-Encoding: base64
+        with ESMTP id S229448AbjBFFX3 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 6 Feb 2023 00:23:29 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F084196B0
+        for <linux-block@vger.kernel.org>; Sun,  5 Feb 2023 21:22:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1675660959;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+        bh=ypoIFRZSrzpCBMl09Rd/nBKur9+RYfjLZaM8S5BJK+8=;
+        b=KuHZ3PSLxMiOOjIbPSpwlbLNUv+otb6WhT7hxUXXLcN/8DKrkb5uALkOY/FmRjjX8vnvya
+        y/WFuWHqpXM17gb6QVEhL73CIFz+WLuyU71AOQCC3dGIOtnlTM165B8I7a9WFGxvygOhEv
+        54IirDpgPA/+xQ6Iv7WjkoWMMveltQM=
+Received: from mail-pl1-f198.google.com (mail-pl1-f198.google.com
+ [209.85.214.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-439-1OTe_SqTPYeHCWI26-B6cQ-1; Mon, 06 Feb 2023 00:22:38 -0500
+X-MC-Unique: 1OTe_SqTPYeHCWI26-B6cQ-1
+Received: by mail-pl1-f198.google.com with SMTP id jk21-20020a170903331500b00198d701ad9cso4638811plb.20
+        for <linux-block@vger.kernel.org>; Sun, 05 Feb 2023 21:22:37 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ypoIFRZSrzpCBMl09Rd/nBKur9+RYfjLZaM8S5BJK+8=;
+        b=XD5A6l+sbt57BQZj40mFpkyouTycUSF+wQfAjx+IFMCA6WZkr9rk6/vXWxwKN2YUwy
+         e48nkI3NY27qDilwY1CheowrKmVJabM9f7yR797I+wRgsXgruwMajvoyG2/Q3WTKrPiN
+         eh2yPaRfv1z+p8TA4BBCv8EWNu8w24L2JM+CFYUyysDqydHfjQKRNNoq0GfSrz9LpwFp
+         3r3/Vrk8cLH6neL8tn447EJ4rCiWBLws4O9n76YFXVrlp4aVommsMdyP/fkvMpA/7mVH
+         aKwC01QcmlBEGes29Vsrzg9OfNNImh21JXk250rCsSCiE+RjevXvBBneZpkIiK+F6qw5
+         NSsg==
+X-Gm-Message-State: AO0yUKUEbqiBLii+Nhkx5ABkURxbT9oCHTe4n5JXefoB58mSNcKvND22
+        T4jimKvCjQ8zpo7LITXyMigEzgNvFVVZ3ek8SkJvH2ahG478+xle1uzPlJWWGR0ocX/c9WdVTbG
+        lVw1L+Og65F/tQFup5g1AnM1Ocx+B0eQDPA61ltk=
+X-Received: by 2002:a17:90a:3484:b0:230:8977:efba with SMTP id p4-20020a17090a348400b002308977efbamr1259120pjb.145.1675660955882;
+        Sun, 05 Feb 2023 21:22:35 -0800 (PST)
+X-Google-Smtp-Source: AK7set/Zk20Jv5tYQzvNpNL8myN9EcSgssvSo8YlUuBQyKOB2qvu9wBSS30jEm9I0OGrfnHoAUNiemO4c+ExUoJfhsQ=
+X-Received: by 2002:a17:90a:3484:b0:230:8977:efba with SMTP id
+ p4-20020a17090a348400b002308977efbamr1259118pjb.145.1675660955429; Sun, 05
+ Feb 2023 21:22:35 -0800 (PST)
 MIME-Version: 1.0
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: MW2PR12MB4667.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9beca95d-7a70-4628-7285-08db07fca995
-X-MS-Exchange-CrossTenant-originalarrivaltime: 06 Feb 2023 04:43:16.0728
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: EjDGg2Kz6+qAfxTNC+UcZ8EcktjmvXUFJbuZLfLujjknrVdOLLmjHCUyPQ+/W0hjbUw2Ccq7BE8Q1wAQcJAb6g==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR12MB5091
+From:   Yi Zhang <yi.zhang@redhat.com>
+Date:   Mon, 6 Feb 2023 13:22:23 +0800
+Message-ID: <CAHj4cs-ZvyXKU9iAVKSkh2NfN5238rh-OaU8_uDBHVFtJb2ASQ@mail.gmail.com>
+Subject: [bug report] RIP: 0010:blkg_free+0xa/0xe0 observed on latest linux-block/for-next
+To:     linux-block <linux-block@vger.kernel.org>
+Cc:     Christoph Hellwig <hch@lst.de>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-T24gMi8zLzIzIDA3OjAyLCBDaHJpc3RvcGggSGVsbHdpZyB3cm90ZToNCj4gVGhlIGNhcGFiaWxp
-dHkgYXR0cmlidXRlIHdhcyBhZGRlZCBpbiAyMDE3IHRvIGV4cG9zZSB0aGUga2VybmVsIGludGVy
-bmFsDQo+IEdFTkhEX0ZMX01FRElBX0NIQU5HRV9OT1RJRlkgdG8gdXNlcnNwYWNlIHdpdGhvdXQg
-ZXZlciBhZGRpbmcgYSB2YWx1ZSB0bw0KPiBhbiBVQVBJIGhlYWRlciwgYW5kIHdpdGhvdXQgZXZl
-ciBzZXR0aW5nIGl0IGluIGFueSBkcml2ZXIgdW50aWwgaXQgd2FzDQo+IGZpbmFsbHkgcmVtb3Zl
-ZCBpbiBMaW51eCA1LjcuDQo+IA0KPiBEZXByZWNhdGUgdGhlIGZpbGUgYW5kIGFsd2F5cyByZXR1
-cm4gMCBpbnN0ZWFkIG9mIGV4cG9zaW5nIHRoZSBvdGhlcg0KPiBpbnRlcm5hbCBhbmQgZnJlcXVl
-bnRseSByZW51bWJlcmVkIG90aGVyIGdlbmRpc2sgZmxhZ3MuDQo+IA0KPiBTaWduZWQtb2ZmLWJ5
-OiBDaHJpc3RvcGggSGVsbHdpZyA8aGNoQGxzdC5kZT4NCg0KUmV2aWV3ZWQtYnk6IENoYWl0YW55
-YSBLdWxrYXJuaSA8a2NoQG52aWRpYS5jb20+DQoNCi1jaw0KDQoNCg0K
+Hello
+CKI reported one new issue with the latest linux-block/for-next, pls
+help check it, thanks.
+
+linux-block.git@for-next
+commit: 99bd489eac97
+
+[ 4407.784047] Running test [R:13334567 T:10 - Storage - block -
+storage fio numa - Kernel: 6.2.0-rc6]
+[ 4509.133240] BUG: kernel NULL pointer dereference, address: 0000000000000000
+[ 4509.133654] #PF: supervisor read access in kernel mode
+[ 4509.133930] #PF: error_code(0x0000) - not-present page
+[ 4509.134206] PGD 0 P4D 0
+[ 4509.134373] Oops: 0000 [#1] PREEMPT SMP PTI
+[ 4509.134579] CPU: 2 PID: 965 Comm: auditd Tainted: G          I
+  6.2.0-rc6 #1
+[ 4509.135384] Hardware name: HP ProLiant DL360p Gen8, BIOS P71 05/24/2019
+[ 4509.135758] RIP: 0010:blkg_free+0xa/0xe0
+[ 4509.135983] Code: cc cc cc 66 66 2e 0f 1f 84 00 00 00 00 00 66 90
+90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 0f 1f 44 00 00 55 48
+89 fd 53 <48> 8b 07 31 db 48 8d b8 b8 02 00 00 e8 b5 de 7e 00 48 8b bc
+1d d0
+[ 4509.137791] RSP: 0018:ffffb5a64507bad0 EFLAGS: 00010002
+[ 4509.138107] RAX: 0000000000000003 RBX: 0000000000000000 RCX: 0000000000000000
+[ 4509.139024] RDX: ffff9e298c71d100 RSI: ffff9e2cc3028800 RDI: 0000000000000000
+[ 4509.139893] RBP: 0000000000000000 R08: ffff9e2cf282fb88 R09: ffff9e2cd2f252d0
+[ 4509.140709] R10: 0000000000000000 R11: 0000000000000000 R12: ffff9e2cc3028800
+[ 4509.141591] R13: ffff9e2cc7712a00 R14: ffff9e2cc4f66800 R15: ffff9e2cc3028800
+[ 4509.142382] FS:  00007f39005656c0(0000) GS:ffff9e2caf680000(0000)
+knlGS:0000000000000000
+[ 4509.142687] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[ 4509.143718] CR2: 0000000000000000 CR3: 000000010fcda005 CR4: 00000000000606e0
+[ 4509.144551] Call Trace:
+[ 4509.144739]  <TASK>
+[ 4509.145286]  blkg_create+0x2d/0x350
+[ 4509.145873]  bio_associate_blkg_from_css+0x1fc/0x330
+[ 4509.146168]  iomap_do_writepage+0x346/0x800
+[ 4509.146424]  ? _raw_spin_unlock_irqrestore+0x23/0x40
+[ 4509.146708]  write_cache_pages+0x172/0x4a0
+[ 4509.146929]  ? __pfx_iomap_do_writepage+0x10/0x10
+[ 4509.147565]  iomap_writepages+0x1c/0x40
+[ 4509.147825]  xfs_vm_writepages+0x6b/0xa0 [xfs]
+[ 4509.148851]  do_writepages+0xb0/0x1b0
+[ 4509.149077]  ? _raw_spin_unlock+0x15/0x30
+[ 4509.149330]  ? inode_prepare_wbs_switch+0x6c/0x90
+[ 4509.150004]  filemap_fdatawrite_wbc+0x5f/0x80
+[ 4509.150788]  __filemap_fdatawrite_range+0x4a/0x60
+[ 4509.151558]  file_write_and_wait_range+0x46/0xb0
+[ 4509.152268]  xfs_file_fsync+0x4c/0x220 [xfs]
+[ 4509.153315]  ? syscall_trace_enter.isra.0+0x13f/0x1c0
+[ 4509.153622]  __x64_sys_fsync+0x37/0x60
+[ 4509.153844]  do_syscall_64+0x5b/0x80
+[ 4509.154059]  ? do_syscall_64+0x67/0x80
+[ 4509.154296]  ? __irq_e[ 4509.242631]
+entry_SYSCALL_64_after_hwframe+0x72/0xdc
+[ 4509.254719] RIP: 0033:0x7f3900bcffac
+[ 4509.254976] Code: 0f 05 48 3d 00 f0 ff ff 77 3c c3 0f 1f 00 55 48
+89 e5 48 83 ec 10 89 7d fc e8 30 0e f8 ff 8b 7d fc 89 c2 b8 4a 00 00
+00 0f 05 <48> 3d 00 f0 ff ff 77 2c 89 d7 89 45 fc e8 92 0e f8 ff 8b 45
+fc c9
+[ 4509.256302] RSP: 002b:00007f3900564cc0 EFLAGS: 00000293 ORIG_RAX:
+000000000000004a
+[ 4509.257080] RAX: ffffffffffffffda RBX: 0000562496b76120 RCX: 00007f3900bcffac
+[ 4509.257880] RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000005
+[ 4509.258653] RBP: 00007f3900564cd0 R08: 0000000000000000 R09: 0000562496b76108
+[ 4509.259411] R10: 0000000000000000 R11: 0000000000000293 R12: 0000562496b760e0
+[ 4509.260171] R13: ffffffffffffff88 R14: 0000000000000002 R15: 00007ffcfba66bb0
+[ 4509.260964]  </TASK>
+[ 4509.261107] Modules linked in: rfkill intel_rapl_msr
+intel_rapl_common sb_edac sunrpc x86_pkg_temp_thermal
+intel_powercleter dca fuse loop zram xfs crct10dif_pclmul crc32_pclmul
+crc32c_intel polyval_c2_ssse3 serio_raw hpsa mgag200 hpwdt
+scsi_transport_sas [last unloaded: scsi_debug]
+[ 4509.763301] CR2: 0000000000000000
+[ 4509.763858] ---[ end trace 0000000000000000 ]---
+[ 4509.765833] pstore: backend (erst) writing error (-28)
+[ 4509.766151] RIP: 0010:blkg_free+0xa/0xe0
+[ 4509.766382] Code: cc cc cc 66 66 2e 0f 1f 84 00 00 00 00 00 66 90
+90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 0f 1f 44 00 00 55 48
+89 fd 53 <48> 8b 07 31 db 48 8d b8 b8 02 00 00 e8 b5 de 7e 00 48 8b bc
+1d d0
+[ 4509.767698] RSP: 0018:ffffb5a64507bad0 EFLAGS: 00010002
+[ 4509.767985] RAX: 0000000000000003 RBX: 0000000000000000 RCX: 0000000000000000
+[ 4509.768759] RDX: ffff9e298c71d100 RSI: ffff9e2cc3028800 RDI: 0000000000000000
+[ 4509.769509] RBP: 0000000000000000 R08: ffff9e2cf282fb88 R09: ffff9e2cd2f252d0
+[ 4509.770283] R10: 0000000000000000 R11: 0000000000000000 R12: ffff9e2cc3028800
+[ 4509.771041] R13: ffff9e2cc7712a00 R14: ffff9e2cc4f66800 R15: ffff9e2cc3028800
+[ 4509.771840] FS:  00007f39005656c0(0000) GS:ffff9e2caf680000(0000)
+knlGS:0000000000000000
+[ 4509.772348] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[ 4509.773045] CR2: 0000000000000000 CR3: 000000010fcda005 CR4: 00000000000606e0
+[ 4509.773820] Kernel panic - not syncing: Fatal exception
+[ 4509.776266] Kernel Offset: 0x37000000 from 0xffffffff81000000 (relocation r
+
+
+-- 
+Best Regards,
+  Yi Zhang
+
