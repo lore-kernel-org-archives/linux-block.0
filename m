@@ -2,141 +2,244 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C851C05027
-	for <linux-block@archiver.kernel.org>; Mon,  6 Feb 2023 18:58:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9006BC636D3
+	for <linux-block@archiver.kernel.org>; Mon,  6 Feb 2023 20:28:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229617AbjBFS6I (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 6 Feb 2023 13:58:08 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34584 "EHLO
+        id S229548AbjBFU2F (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 6 Feb 2023 15:28:05 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34338 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229523AbjBFS6H (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 6 Feb 2023 13:58:07 -0500
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E6D4110EF
-        for <linux-block@vger.kernel.org>; Mon,  6 Feb 2023 10:58:06 -0800 (PST)
-Received: by mail-pl1-f176.google.com with SMTP id z1so13159935plg.6
-        for <linux-block@vger.kernel.org>; Mon, 06 Feb 2023 10:58:06 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=wAQn+0YZ14IRJqdTSbIsPNqPQd/HMTT0JjeJ3ETDy9Q=;
-        b=HdMemkq1szVmBsF52FKrLJwEyLIGASJrHaKt3t2iXrRXRKMr6Y0DLY5tZ4J51hDhzT
-         20m46PURa0uU9Xck6iAFi4brEwVU1bZq0VRwoNHjJ8XvqnnND9G5hAn4nsDMoSv/bxQf
-         5qRk/7jcSzMknokCCH3gYEVZ63C0ylgjUVybnIlxPBvuZ0VvwcAP6pMLbL01hAeJO7RQ
-         arqstjtIEpmEUGPopHjywKUIAYSnSWdsJEdubqMGDDY9nyr/FnL79t7sGvgBflEBZzpA
-         8K0Azc0e9Tcha0iOJXqVDamCkQVGZbXesXfZluz1gyzkQIY60G3GLUf2k4P2wBPGfTCu
-         iE1w==
-X-Gm-Message-State: AO0yUKW162CRxTQNoznCwDLMyS1bCdyyXo23mfevB30gw778+GVhoExZ
-        Z22h6vDUI3l7VX5f0MbDpt4=
-X-Google-Smtp-Source: AK7set+GyZO+b0cCcDn5XPP+KLR6IVMxlWfDT/otQpcSauZ0sR7CWL8GGHqGe1E9T8cAUJhyrnnMEw==
-X-Received: by 2002:a17:90a:bf0f:b0:230:86c1:62dd with SMTP id c15-20020a17090abf0f00b0023086c162ddmr729472pjs.24.1675709886230;
-        Mon, 06 Feb 2023 10:58:06 -0800 (PST)
-Received: from ?IPV6:2620:15c:211:201:546b:df58:66df:fe23? ([2620:15c:211:201:546b:df58:66df:fe23])
-        by smtp.gmail.com with ESMTPSA id u5-20020a17090a400500b00230b8431323sm2363111pjc.30.2023.02.06.10.58.04
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 06 Feb 2023 10:58:05 -0800 (PST)
-Message-ID: <639ba3a3-4b6d-b540-02fd-0e68afd00ac6@acm.org>
-Date:   Mon, 6 Feb 2023 10:58:03 -0800
+        with ESMTP id S229519AbjBFU2E (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 6 Feb 2023 15:28:04 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06EDF1EBCB
+        for <linux-block@vger.kernel.org>; Mon,  6 Feb 2023 12:27:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1675715237;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=21MdfgLU4MDJKkLed4d5FtEI3hBnyD7/nVTv+YdAiEk=;
+        b=fEQ/Ocs79nJfBGgBqtCVH6NOiywWaVrJUHJqX2Vy00MQNlBrjakcBtg0sqJ4Swx0bCQOBN
+        wO5cP39As1Nhv1iQC7qfWPcUHkO6V2OtyiKS/6uFlrRTVzeXBc7BAUPfnmrqk6pxZH9SWF
+        /RSnapscYsfUL1hf2eRKFAXVRxzW45c=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-207-EsZkLU69MrurOnxdt9j3Gw-1; Mon, 06 Feb 2023 15:27:13 -0500
+X-MC-Unique: EsZkLU69MrurOnxdt9j3Gw-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id ECE55811E9C;
+        Mon,  6 Feb 2023 20:27:11 +0000 (UTC)
+Received: from localhost (unknown [10.39.192.96])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 293302166B29;
+        Mon,  6 Feb 2023 20:27:10 +0000 (UTC)
+Date:   Mon, 6 Feb 2023 15:27:09 -0500
+From:   Stefan Hajnoczi <stefanha@redhat.com>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     linux-block@vger.kernel.org, lsf-pc@lists.linux-foundation.org,
+        Liu Xiaodong <xiaodong.liu@intel.com>,
+        Jim Harris <james.r.harris@intel.com>,
+        Hans Holmberg <Hans.Holmberg@wdc.com>,
+        Matias =?iso-8859-1?Q?Bj=F8rling?= <Matias.Bjorling@wdc.com>,
+        "hch@lst.de" <hch@lst.de>,
+        ZiyangZhang <ZiyangZhang@linux.alibaba.com>
+Subject: Re: [LSF/MM/BPF BoF]: extend UBLK to cover real storage hardware
+Message-ID: <Y+Finej8521IDwzV@fedora>
+References: <Y+EWCwqSisu3l0Sz@T590>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.0
-Subject: Re: [LSF/MM/BPF BoF]: A host FTL for zoned block devices using UBLK
-Content-Language: en-US
-To:     Hans Holmberg <Hans.Holmberg@wdc.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Cc:     "ming.lei@redhat.com" <ming.lei@redhat.com>,
-        =?UTF-8?Q?Matias_Bj=c3=b8rling?= <Matias.Bjorling@wdc.com>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>,
-        Dennis Maisenbacher <dennis.maisenbacher@wdc.com>,
-        Ajay Joshi <Ajay.Joshi@wdc.com>,
-        =?UTF-8?Q?J=c3=b8rgen_Hansen?= <Jorgen.Hansen@wdc.com>,
-        "andreas@metaspace.dk" <andreas@metaspace.dk>,
-        "javier@javigon.com" <javier@javigon.com>,
-        "slava@dubeyko.com" <slava@dubeyko.com>,
-        "kbusch@kernel.org" <kbusch@kernel.org>,
-        "hans@owltronix.com" <hans@owltronix.com>,
-        "mcgrof@kernel.org" <mcgrof@kernel.org>,
-        "guokuankuan@bytedance.com" <guokuankuan@bytedance.com>,
-        "viacheslav.dubeyko@bytedance.com" <viacheslav.dubeyko@bytedance.com>,
-        "hch@lst.de" <hch@lst.de>
-References: <20230206100019.GA6704@gsv>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20230206100019.GA6704@gsv>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="WzfuwvhnYEVCI/tz"
+Content-Disposition: inline
+In-Reply-To: <Y+EWCwqSisu3l0Sz@T590>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2/6/23 02:00, Hans Holmberg wrote:
-> I think we're missing a flexible way of routing random-ish
-> write workloads on to zoned storage devices. Implementing a UBLK
-> target for this would be a great way to provide zoned storage
-> benefits to a range of use cases. Creating UBLK target would
-> enable us experiment and move fast, and when we arrive
-> at a common, reasonably stable, solution we could move this into
-> the kernel.
-> 
-> We do have dm-zoned [3]in the kernel, but it requires a bounce
-> on conventional zones for non-sequential writes, resulting in a write
-> amplification of 2x (which is not optimal for flash).
-> 
-> Fully random workloads make little sense to store on ZBDs as a
-> host FTL could not be expected to do better than what conventional block
-> devices do today. Fully sequential writes are also well taken care of
-> by conventional block devices.
-> 
-> The interesting stuff is what lies in between those extremes.
-> 
-> I would like to discuss how we could use UBLK to implement a
-> common FTL with the right knobs to cater for a wide range of workloads
-> that utilize raw block devices. We had some knobs in  the now-dead pblk,
-> a FTL for open channel devices, but I think we could do way better than that.
-> 
-> Pblk did not require bouncing writes and had knobs for over-provisioning and
-> workload isolation which could be implemented. We could also add options
-> for different garbage collection policies. In userspace it would also
-> be easy to support default block indirection sizes, reducing logical-physical
-> translation table memory overhead.
-> 
-> Use cases for such an FTL includes SSD caching stores such as Apache
-> traffic server [1] and CacheLib[2]. CacheLib's block cache and the apache
-> traffic server storage workloads are *almost* zone block device compatible
-> and would need little translation overhead to perform very well on e.g.
-> ZNS SSDs.
-> 
-> There are probably more use cases that would benefit.
-> 
-> It would also be a great research vehicle for academia. We've used dm-zap
-> for this [4] purpose the last couple of years, but that is not production-ready
-> and cumbersome to improve and maintain as it is implemented as a out-of-tree
-> device mapper.
-> 
-> ublk adds a bit of latency overhead, but I think this is acceptable at least
-> until we have a great, proven solution, which could be turned into
-> an in-kernel FTL.
-> 
-> If there is interest in the community for a project like this, let's talk!
-> 
-> cc:ing the folks who participated in the discussions at ALPSS 2021 and last
-> years' plumbers on this subject.
-> 
-> Thanks,
-> Hans
-> 
-> [1] https://trafficserver.apache.org/
-> [2] https://cachelib.org/
-> [3] https://docs.kernel.org/admin-guide/device-mapper/dm-zoned.html
-> [4] https://github.com/westerndigitalcorporation/dm-zap
 
-Hi Hans,
+--WzfuwvhnYEVCI/tz
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Which functionality would such a user space target provide that is not 
-yet provided by BTRFS, F2FS or any other log-structured filesystem that 
-supports zoned block devices?
+On Mon, Feb 06, 2023 at 11:00:27PM +0800, Ming Lei wrote:
+> Hello,
+>=20
+> So far UBLK is only used for implementing virtual block device from
+> userspace, such as loop, nbd, qcow2, ...[1].
 
-Thanks,
+I won't be at LSF/MM so here are my thoughts:
 
-Bart.
+>=20
+> It could be useful for UBLK to cover real storage hardware too:
+>=20
+> - for fast prototype or performance evaluation
+>=20
+> - some network storages are attached to host, such as iscsi and nvme-tcp,
+> the current UBLK interface doesn't support such devices, since it needs
+> all LUNs/Namespaces to share host resources(such as tag)
+
+Can you explain this in more detail? It seems like an iSCSI or
+NVMe-over-TCP initiator could be implemented as a ublk server today.
+What am I missing?
+
+>=20
+> - SPDK has supported user space driver for real hardware
+
+I think this could already be implemented today. There will be extra
+memory copies because SPDK won't have access to the application's memory
+pages.
+
+>=20
+> So propose to extend UBLK for supporting real hardware device:
+>=20
+> 1) extend UBLK ABI interface to support disks attached to host, such
+> as SCSI Luns/NVME Namespaces
+>=20
+> 2) the followings are related with operating hardware from userspace,
+> so userspace driver has to be trusted, and root is required, and
+> can't support unprivileged UBLK device
+
+Linux VFIO provides a safe userspace API for userspace device drivers.
+That means memory and interrupts are isolated. Neither userspace nor the
+hardware device can access memory or interrupts that the userspace
+process is not allowed to access.
+
+I think there are still limitations like all memory pages exposed to the
+device need to be pinned. So effectively you might still need privileges
+to get the mlock resource limits.
+
+But overall I think what you're saying about root and unprivileged ublk
+devices is not true. Hardware support should be developed with the goal
+of supporting unprivileged userspace ublk servers.
+
+Those unprivileged userspace ublk servers cannot claim any PCI device
+they want. The user/admin will need to give them permission to open a
+network card, SCSI HBA, etc.
+
+>=20
+> 3) how to operating hardware memory space
+> - unbind kernel driver and rebind with uio/vfio
+> - map PCI BAR into userspace[2], then userspace can operate hardware
+> with mapped user address via MMIO
+>
+> 4) DMA
+> - DMA requires physical memory address, UBLK driver actually has
+> block request pages, so can we export request SG list(each segment
+> physical address, offset, len) into userspace? If the max_segments
+> limit is not too big(<=3D64), the needed buffer for holding SG list
+> can be small enough.
+
+DMA with an IOMMU requires an I/O Virtual Address, not a CPU physical
+address. The IOVA space is defined by the IOMMU page tables. Userspace
+controls the IOMMU page tables via Linux VFIO ioctls.
+
+For example, <linux/vfio.h> struct vfio_iommu_type1_dma_map defines the
+IOMMU mapping that makes a range of userspace virtual addresses
+available at a given IOVA.
+
+Mapping and unmapping operations are not free. Similar to mmap(2), the
+program will be slow if it does this frequently.
+
+I think it's effectively the same problem as ublk zero-copy. We want to
+give the ublk server access to just the I/O buffers that it currently
+needs, but doing so would be expensive :(.
+
+I think Linux has strategies for avoiding the expense like
+iommu.strict=3D0 and swiotlb. The drawback is that in our case userspace
+and/or the hardware device controller by userspace would still have
+access to the memory pages after I/O has completed. This reduces memory
+isolation :(.
+
+DPDK/SPDK and QEMU use long-lived Linux VFIO DMA mappings.
+
+What I'm trying to get at is that either memory isolation is compromised
+or performance is reduced. It's hard to have good performance together
+with memory isolation.
+
+I think ublk should follow the VFIO philosophy of being a safe
+kernel/userspace interface. If userspace is malicious or buggy, the
+kernel's and other process' memory should not be corrupted.
+
+>=20
+> - small amount of physical memory for using as DMA descriptor can be
+> pre-allocated from userspace, and ask kernel to pin pages, then still
+> return physical address to userspace for programming DMA
+
+I think this is possible today. The ublk server owns the I/O buffers. It
+can mlock them and DMA map them via VFIO. ublk doesn't need to know
+anything about this.
+
+> - this way is still zero copy
+
+True zero-copy would be when an application does O_DIRECT I/O and the
+hardware device DMAs to/from the application's memory pages. ublk
+doesn't do that today and when combined with VFIO it doesn't get any
+easier. I don't think it's possible because you cannot allow userspace
+to control a hardware device and grant DMA access to pages that
+userspace isn't allowed to access. A malicious userspace will program
+the device to access those pages :).
+
+>=20
+> 5) notification from hardware: interrupt or polling
+> - SPDK applies userspace polling, this way is doable, but
+> eat CPU, so it is only one choice
+>=20
+> - io_uring command has been proved as very efficient, if io_uring
+> command is applied(similar way with UBLK for forwarding blk io
+> command from kernel to userspace) to uio/vfio for delivering interrupt,
+> which should be efficient too, given batching processes are done after
+> the io_uring command is completed
+
+I wonder how much difference there is between the new io_uring command
+for receiving VFIO irqs that you are suggesting compared to the existing
+io_uring approach IORING_OP_READ eventfd.
+
+> - or it could be flexible by hybrid interrupt & polling, given
+> userspace single pthread/queue implementation can retrieve all
+> kinds of inflight IO info in very cheap way, and maybe it is likely
+> to apply some ML model to learn & predict when IO will be completed
+
+Stefano Garzarella and I have discussed but not yet attempted to add a
+userspace memory polling command to io_uring. IORING_OP_POLL_MEMORY
+would be useful together with IORING_SETUP_IOPOLL. That way kernel
+polling can be combined with userspace polling on a single CPU.
+
+I'm not sure it's useful for ublk because you may not have any reason to
+use IORING_SETUP_IOPOLL. But applications that have an Linux NVMe block
+device open with IORING_SETUP_IOPOLL could use the new
+IORING_OP_POLL_MEMORY command to also watch for activity on a VIRTIO or
+VFIO PCI device or maybe just to get kicked by another userspace thread.
+
+> 6) others?
+>=20
+>=20
+>=20
+> [1] https://github.com/ming1/ubdsrv
+> [2] https://spdk.io/doc/userspace.html
+> =20
+>=20
+> Thanks,=20
+> Ming
+>=20
+
+--WzfuwvhnYEVCI/tz
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmPhYp0ACgkQnKSrs4Gr
+c8gsTwgAwkNH6oEvSpGOdx9DnNNdFvNT7YZ57LsDO9P37rvPheUGTEkhVCx9TJjy
+F2krnbkmKSeq+SdD9FUXxNKqOHb9Y3DOl30X8fbhWgr0rzXALzInY4J1LWltad16
+9rdpi+T3ZKklfuTCOtEh248XLM2e0FFr2glGJhCS24ud5mYwtvFS/AXP7Fz6VZkp
+JvnZfvLothsIx5iBt/nMKwgJqTyTp7TA424D2HkeU9UAz3K4l/QlN+W1UdKotV0s
+pjgkcRSp0wvnilJpCLkYIAzk3lnnrWscNowZhsO+pqqlstF0/gZ+WlMa9lAHhID+
+3KM0WEK6uRbwNtckViFJAArcuXsyjQ==
+=Bjad
+-----END PGP SIGNATURE-----
+
+--WzfuwvhnYEVCI/tz--
+
