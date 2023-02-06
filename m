@@ -2,123 +2,69 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F23A9C61DA4
-	for <linux-block@archiver.kernel.org>; Mon,  6 Feb 2023 15:01:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 29450C05027
+	for <linux-block@archiver.kernel.org>; Mon,  6 Feb 2023 15:02:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229571AbjBFPBX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 6 Feb 2023 10:01:23 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43932 "EHLO
+        id S230045AbjBFPCO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 6 Feb 2023 10:02:14 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44916 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229500AbjBFPBW (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 6 Feb 2023 10:01:22 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 425319028
-        for <linux-block@vger.kernel.org>; Mon,  6 Feb 2023 07:00:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1675695642;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-        bh=qK3PL2eMHXfoJF4n/7DCM00nVZATvdF8jVGVH/IRTY8=;
-        b=SRSWKUmttmoUZ/2Y2Bv6L2ybNDMykHzFkUieSWQbvVerNrijRVVrsMwqzHX+4mtJ8W78GU
-        7FSTK/plMqEQICezdrii2DrHpoz2hGlB8ZwYqT0vH1WoJKjDakyZ2R71PhCm+1gfpdAldE
-        x7Ua3KqeUSEiibSnTqb3zaMI8DGtZrM=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-500-0Cvi_m73MSyaWH1f80IG2A-1; Mon, 06 Feb 2023 10:00:40 -0500
-X-MC-Unique: 0Cvi_m73MSyaWH1f80IG2A-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E16EE857A8E;
-        Mon,  6 Feb 2023 15:00:39 +0000 (UTC)
-Received: from T590 (ovpn-8-17.pek2.redhat.com [10.72.8.17])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id CE53E40B42D4;
-        Mon,  6 Feb 2023 15:00:33 +0000 (UTC)
-Date:   Mon, 6 Feb 2023 23:00:27 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     linux-block@vger.kernel.org, lsf-pc@lists.linux-foundation.org
-Cc:     ming.lei@redhat.com, Liu Xiaodong <xiaodong.liu@intel.com>,
-        Jim Harris <james.r.harris@intel.com>,
-        Hans Holmberg <Hans.Holmberg@wdc.com>,
-        Matias =?iso-8859-1?Q?Bj=F8rling?= <Matias.Bjorling@wdc.com>,
-        "hch@lst.de" <hch@lst.de>, Stefan Hajnoczi <stefanha@redhat.com>,
-        ZiyangZhang <ZiyangZhang@linux.alibaba.com>
-Subject: [LSF/MM/BPF BoF]: extend UBLK to cover real storage hardware
-Message-ID: <Y+EWCwqSisu3l0Sz@T590>
+        with ESMTP id S230163AbjBFPCL (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 6 Feb 2023 10:02:11 -0500
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3AC93E388
+        for <linux-block@vger.kernel.org>; Mon,  6 Feb 2023 07:02:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+        Content-ID:Content-Description:In-Reply-To:References;
+        bh=1mpOS7kK0Leu4UoX1ccOBGu/Ea+13sJFmxBkt8wK0Sk=; b=s0YBQDUClc24L0BeTRyiRPPPsn
+        0MQdO56GLNq/hbjAHdGh3tP0LM1gXkw34fREY9Hagcyxi5wOkj7K1rIdDo6PHhJhgHKAm6tjnU8jt
+        Il0MTOd1KSvdkcixdWjXZPZ22s3igOiLZSgi9Z4nxUOqU2jHXm4N8V60nL+T06nGhsItYuYJTozEm
+        ShShrYhoimQB38B0v1M009xhBhzY8nfyh1u6eLbX7C0l47o79+FvZ75yJqIovu+hI3ZyitTtSjuKO
+        4N0JawN/ZQGkT9LGCc766ujebrkjo7w+DpLIPBT9OkCpf1DfBrRz26QCu3sYXnn/FJEcZhs/ypXCB
+        5Cz1cdxQ==;
+Received: from [2001:4bb8:182:9f5b:1056:7df9:ac43:37d0] (helo=localhost)
+        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1pP30O-008qtO-AB; Mon, 06 Feb 2023 15:02:04 +0000
+From:   Christoph Hellwig <hch@lst.de>
+To:     axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org, Yi Zhang <yi.zhang@redhat.com>
+Subject: [PATCH] blk-cgroup: fix freeing NULL blkg in blkg_create
+Date:   Mon,  6 Feb 2023 16:02:01 +0100
+Message-Id: <20230206150201.3438972-1-hch@lst.de>
+X-Mailer: git-send-email 2.39.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.1
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
+new_blkg can be NULL if the caller didn't pass in a pre-allocated blkg.
+Don't try to free it in that case.
 
-So far UBLK is only used for implementing virtual block device from
-userspace, such as loop, nbd, qcow2, ...[1].
+Fixes: 27b642b07a4a ("blk-cgroup: simplify blkg freeing from initialization failure paths")
+Reported-by: Yi Zhang <yi.zhang@redhat.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ block/blk-cgroup.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-It could be useful for UBLK to cover real storage hardware too:
-
-- for fast prototype or performance evaluation
-
-- some network storages are attached to host, such as iscsi and nvme-tcp,
-the current UBLK interface doesn't support such devices, since it needs
-all LUNs/Namespaces to share host resources(such as tag)
-
-- SPDK has supported user space driver for real hardware
-
-So propose to extend UBLK for supporting real hardware device:
-
-1) extend UBLK ABI interface to support disks attached to host, such
-as SCSI Luns/NVME Namespaces
-
-2) the followings are related with operating hardware from userspace,
-so userspace driver has to be trusted, and root is required, and
-can't support unprivileged UBLK device
-
-3) how to operating hardware memory space
-- unbind kernel driver and rebind with uio/vfio
-- map PCI BAR into userspace[2], then userspace can operate hardware
-with mapped user address via MMIO
-
-4) DMA
-- DMA requires physical memory address, UBLK driver actually has
-block request pages, so can we export request SG list(each segment
-physical address, offset, len) into userspace? If the max_segments
-limit is not too big(<=64), the needed buffer for holding SG list
-can be small enough.
-
-- small amount of physical memory for using as DMA descriptor can be
-pre-allocated from userspace, and ask kernel to pin pages, then still
-return physical address to userspace for programming DMA
-
-- this way is still zero copy
-
-5) notification from hardware: interrupt or polling
-- SPDK applies userspace polling, this way is doable, but
-eat CPU, so it is only one choice
-
-- io_uring command has been proved as very efficient, if io_uring
-command is applied(similar way with UBLK for forwarding blk io
-command from kernel to userspace) to uio/vfio for delivering interrupt,
-which should be efficient too, given batching processes are done after
-the io_uring command is completed
-
-- or it could be flexible by hybrid interrupt & polling, given
-userspace single pthread/queue implementation can retrieve all
-kinds of inflight IO info in very cheap way, and maybe it is likely
-to apply some ML model to learn & predict when IO will be completed
-
-6) others?
-
-
-
-[1] https://github.com/ming1/ubdsrv
-[2] https://spdk.io/doc/userspace.html
+diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+index 8faeca6022bea0..c46778d1f3c27d 100644
+--- a/block/blk-cgroup.c
++++ b/block/blk-cgroup.c
+@@ -383,7 +383,8 @@ static struct blkcg_gq *blkg_create(struct blkcg *blkcg, struct gendisk *disk,
+ err_put_css:
+ 	css_put(&blkcg->css);
+ err_free_blkg:
+-	blkg_free(new_blkg);
++	if (new_blkg)
++		blkg_free(new_blkg);
+ 	return ERR_PTR(ret);
+ }
  
-
-Thanks, 
-Ming
+-- 
+2.39.1
 
