@@ -2,91 +2,113 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E0F2BC636CC
-	for <linux-block@archiver.kernel.org>; Mon,  6 Feb 2023 03:02:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B090C61DA4
+	for <linux-block@archiver.kernel.org>; Mon,  6 Feb 2023 03:19:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229502AbjBFDCh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 5 Feb 2023 22:02:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60004 "EHLO
+        id S229559AbjBFDTc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 5 Feb 2023 22:19:32 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36622 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229457AbjBFDCh (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 5 Feb 2023 22:02:37 -0500
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30FE319F24;
-        Sun,  5 Feb 2023 19:02:36 -0800 (PST)
-Received: from dggpeml500025.china.huawei.com (unknown [172.30.72.53])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4P99xf417szJsFS;
-        Mon,  6 Feb 2023 11:00:54 +0800 (CST)
-Received: from [10.174.176.117] (10.174.176.117) by
- dggpeml500025.china.huawei.com (7.185.36.35) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.34; Mon, 6 Feb 2023 11:02:33 +0800
+        with ESMTP id S229570AbjBFDTb (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 5 Feb 2023 22:19:31 -0500
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70FCD1ABF5;
+        Sun,  5 Feb 2023 19:19:28 -0800 (PST)
+Received: from mail02.huawei.com (unknown [172.30.67.143])
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4P9BLy4ZwBz4f3k67;
+        Mon,  6 Feb 2023 11:19:22 +0800 (CST)
+Received: from [10.174.176.73] (unknown [10.174.176.73])
+        by APP3 (Coremail) with SMTP id _Ch0CgDn4R+7ceBjzshECw--.31350S3;
+        Mon, 06 Feb 2023 11:19:24 +0800 (CST)
 Subject: Re: [PATCH-next v2] loop: loop_set_status_from_info() check before
  assignment
-From:   Hou Tao <houtao1@huawei.com>
-To:     Zhong Jinghua <zhongjinghua@huawei.com>, <axboe@kernel.dk>
-CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <yi.zhang@huawei.com>, <yukuai3@huawei.com>, <yangerkun@huawei.com>
+To:     Zhong Jinghua <zhongjinghua@huawei.com>, axboe@kernel.dk,
+        code@siddh.me, Matthew Wilcox <willy@infradead.org>,
+        Christoph Hellwig <hch@lst.de>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yi.zhang@huawei.com, houtao1@huawei.com, yangerkun@huawei.com,
+        "yukuai (C)" <yukuai3@huawei.com>
 References: <20230206020716.2036-1-zhongjinghua@huawei.com>
- <d9486c88-33b1-3dc1-d58c-89de73679e50@huawei.com>
-Message-ID: <34b13dab-d364-9ff6-a771-aed0b01c5897@huawei.com>
-Date:   Mon, 6 Feb 2023 11:02:33 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.0
+From:   Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <32179e8a-a3ca-9412-1977-fdaa7f065691@huaweicloud.com>
+Date:   Mon, 6 Feb 2023 11:19:22 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <d9486c88-33b1-3dc1-d58c-89de73679e50@huawei.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-Originating-IP: [10.174.176.117]
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- dggpeml500025.china.huawei.com (7.185.36.35)
+In-Reply-To: <20230206020716.2036-1-zhongjinghua@huawei.com>
+Content-Type: text/plain; charset=gbk; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: _Ch0CgDn4R+7ceBjzshECw--.31350S3
+X-Coremail-Antispam: 1UD129KBjvJXoW7KFWDGFWUWr43Xr1xGw13CFg_yoW8Xw48pF
+        srWFyUAa1rKF4fKF4Dt348XFW5G3W7Gry3uFy7tay8AryIvFn2gr9rG3y5urZ7JrykurWF
+        gF15JFykZF1UGrJanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUvIb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
+        6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+        vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7Cj
+        xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
+        0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
+        6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
+        Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JM4IIrI8v6xkF7I0E8cxan2IY04v7Mxk0xIA0c2IE
+        e2xFo4CEbIxvr21l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxV
+        Aqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q
+        6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6x
+        kF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWrZr1j6s0DMIIF0xvEx4A2jsIE
+        14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf
+        9x07UWE__UUUUU=
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Please disregard my reply. I did not notice it is not an internal email between
-our team members.
+Hi,
 
-On 2/6/2023 10:55 AM, Hou Tao wrote:
->
-> On 2/6/2023 10:07 AM, Zhong Jinghua wrote:
->> In loop_set_status_from_info(), lo->lo_offset and lo->lo_sizelimit should
->> be checked before reassignment, because if an overflow error occurs, the
->> original correct value will be changed to the wrong value, and it will not
->> be changed back.
->>
->> Modifying to the wrong value logic is always not quiet right, we hope to
->> optimize this.
->>
->> Signed-off-by: Zhong Jinghua <zhongjinghua@huawei.com>
-> LGTM
->> ---
->>  v1->v2: Modify note: overflowing -> overflow 
->>  drivers/block/loop.c | 8 ++++----
->>  1 file changed, 4 insertions(+), 4 deletions(-)
->>
->> diff --git a/drivers/block/loop.c b/drivers/block/loop.c
->> index 1518a6423279..1b35cbd029c7 100644
->> --- a/drivers/block/loop.c
->> +++ b/drivers/block/loop.c
->> @@ -977,13 +977,13 @@ loop_set_status_from_info(struct loop_device *lo,
->>  		return -EINVAL;
->>  	}
->>  
->> +	/* Avoid assigning overflow values */
->> +	if (info->lo_offset > LLONG_MAX || info->lo_sizelimit > LLONG_MAX)
->> +		return -EOVERFLOW;
->> +
->>  	lo->lo_offset = info->lo_offset;
->>  	lo->lo_sizelimit = info->lo_sizelimit;
->>  
->> -	/* loff_t vars have been assigned __u64 */
->> -	if (lo->lo_offset < 0 || lo->lo_sizelimit < 0)
->> -		return -EOVERFLOW;
->> -
->>  	memcpy(lo->lo_file_name, info->lo_file_name, LO_NAME_SIZE);
->>  	lo->lo_file_name[LO_NAME_SIZE-1] = 0;
->>  	lo->lo_flags = info->lo_flags;
+ÔÚ 2023/02/06 10:07, Zhong Jinghua Ð´µÀ:
+> In loop_set_status_from_info(), lo->lo_offset and lo->lo_sizelimit should
+> be checked before reassignment, because if an overflow error occurs, the
+> original correct value will be changed to the wrong value, and it will not
+> be changed back.
+> 
+> Modifying to the wrong value logic is always not quiet right, we hope to
+> optimize this.
+> 
+
+Please add a fix tag and cc stable:
+
+Fixes: c490a0b5a4f3 ("loop: Check for overflow while configuring loop")
+
+This commit doesn't fix the problem it described in commit message.
+
+Thanks,
+Kuai
+
+> Signed-off-by: Zhong Jinghua <zhongjinghua@huawei.com>
+> ---
+>   v1->v2: Modify note: overflowing -> overflow
+>   drivers/block/loop.c | 8 ++++----
+>   1 file changed, 4 insertions(+), 4 deletions(-)
+> 
+> diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+> index 1518a6423279..1b35cbd029c7 100644
+> --- a/drivers/block/loop.c
+> +++ b/drivers/block/loop.c
+> @@ -977,13 +977,13 @@ loop_set_status_from_info(struct loop_device *lo,
+>   		return -EINVAL;
+>   	}
+>   
+> +	/* Avoid assigning overflow values */
+> +	if (info->lo_offset > LLONG_MAX || info->lo_sizelimit > LLONG_MAX)
+> +		return -EOVERFLOW;
+> +
+>   	lo->lo_offset = info->lo_offset;
+>   	lo->lo_sizelimit = info->lo_sizelimit;
+>   
+> -	/* loff_t vars have been assigned __u64 */
+> -	if (lo->lo_offset < 0 || lo->lo_sizelimit < 0)
+> -		return -EOVERFLOW;
+> -
+>   	memcpy(lo->lo_file_name, info->lo_file_name, LO_NAME_SIZE);
+>   	lo->lo_file_name[LO_NAME_SIZE-1] = 0;
+>   	lo->lo_flags = info->lo_flags;
+> 
 
