@@ -2,93 +2,138 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 09922C636CD
-	for <linux-block@archiver.kernel.org>; Tue,  7 Feb 2023 14:33:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36403C636CD
+	for <linux-block@archiver.kernel.org>; Tue,  7 Feb 2023 14:43:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232776AbjBGOdl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 7 Feb 2023 09:33:41 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45620 "EHLO
+        id S231465AbjBGOnS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 7 Feb 2023 09:43:18 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56850 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232308AbjBGOcz (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 7 Feb 2023 09:32:55 -0500
-Received: from mail-pg1-x532.google.com (mail-pg1-x532.google.com [IPv6:2607:f8b0:4864:20::532])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B841B3A87A
-        for <linux-block@vger.kernel.org>; Tue,  7 Feb 2023 06:30:09 -0800 (PST)
-Received: by mail-pg1-x532.google.com with SMTP id 78so10530537pgb.8
-        for <linux-block@vger.kernel.org>; Tue, 07 Feb 2023 06:30:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=TCoGFFPpMbOza9FdCyyz4Zw1S0IHVLItXuTN6BD2F0E=;
-        b=NAFAFkZzNFYY6iP/bIFblEQaqKIpHmf1oMNAOirUnWbLeHBw4ZbvCX0Ob9vkQJ2QNU
-         cPOua6c5tx0QrTPSHJX9ZrhRhu4HuB/8yyJLly5cplgSprl6x5sadjHFQJaODAZ2xT3D
-         +1R/LCFwziNu/mUP+FNT/jdyhGqKcnYh6NPtXYb/kw9Wawxm1wfK9orvb29YpZpfL9Gd
-         PJFHwpoDvx+t4DkxijicPQ0MQRVDaaUz7Ytku0ECDo8ZkHYub0UMUTkZbJ2Bp2ruiwx0
-         PlIPdl2kWBh6YHsjm2PCNvLvBf7UHFSkl+r9lI86/uWTKx4IgxUkXXl7EdFzNs6Emejq
-         pafw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=TCoGFFPpMbOza9FdCyyz4Zw1S0IHVLItXuTN6BD2F0E=;
-        b=YRiciNdnoPKl2QKqiepQ645w8uesU4ntduGdMcG8iRWVIQ9Y/nFL8TV+0Ej6xjYV2p
-         nGJIid+umFgKbvZaTPlOrEMWQ8C43AB6Wfn+8Z9ST6CNO9LQJYBPU9kSbjvjFPPU5Rnz
-         r0lBLYCzdM/Gk63a+mGgELqTm/E8W47t8FA0MSbV1I5WoSLSzA1pD+oZ+wZE8P1U0Ybi
-         ZFT6n9dbBFy5/Xjf+cIhrzzFbjthQtAQkIjDmnxDoBzEIEbyXXdqk1AIBGfKWvBe69hN
-         5shEBBHsyyVfolBfCuWjfDVRmoW084Cn0VqGJh0IzWiFC0S8ZI59TRU8cVN8R/0fDgPU
-         nOTQ==
-X-Gm-Message-State: AO0yUKVVTUy6KVqwA48RpYAC6G3dp1fXUtVoHq/V50e10/wx0dGdrNuI
-        9JYOcNGrtXqv5/AsS0OLUEPAlg==
-X-Google-Smtp-Source: AK7set8Ar8Nl3tSE07P4Yp6yz07hhOu687ZD4iO2wfG9LIbz068ml6BrS7sKxkHLG4MyszWAW+79Qw==
-X-Received: by 2002:a62:cd84:0:b0:593:dc7c:98b1 with SMTP id o126-20020a62cd84000000b00593dc7c98b1mr3180405pfg.3.1675780209081;
-        Tue, 07 Feb 2023 06:30:09 -0800 (PST)
-Received: from [192.168.1.136] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id m20-20020aa78a14000000b005a77b030b5csm1700377pfa.88.2023.02.07.06.30.07
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 07 Feb 2023 06:30:08 -0800 (PST)
-Message-ID: <d9247209-bca2-4650-b1c7-72e77990411d@kernel.dk>
-Date:   Tue, 7 Feb 2023 07:30:07 -0700
+        with ESMTP id S231565AbjBGOm6 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 7 Feb 2023 09:42:58 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B0E4D50E
+        for <linux-block@vger.kernel.org>; Tue,  7 Feb 2023 06:40:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1675780849;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=/kPBdJL3Ml9b2utJGfG1ftdTv2qoNngUd6jMK67nj/w=;
+        b=EVCARjHbLYeohS+qSwZfSUsDl0dAx10dWIvwkgulXCZuhfC+meqbcv4N8gUfO18kA2V+GF
+        gRWHganBkMt1lUXQzTd6x36ZzWghMpiQjlzffL7Z2vi53R/CMz3gyLhq6kBDiYJcDN5GRi
+        cCR7lrc+O/VliSeEHjwnYRfb9KlQnOI=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-500-cjY--gzkN0adQwBT385trg-1; Tue, 07 Feb 2023 09:40:43 -0500
+X-MC-Unique: cjY--gzkN0adQwBT385trg-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 8B9BB18E0A60;
+        Tue,  7 Feb 2023 14:40:42 +0000 (UTC)
+Received: from T590 (ovpn-8-19.pek2.redhat.com [10.72.8.19])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 5A93718EC2;
+        Tue,  7 Feb 2023 14:40:36 +0000 (UTC)
+Date:   Tue, 7 Feb 2023 22:40:32 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
+        Josef Bacik <josef@toxicpanda.com>,
+        linux-block@vger.kernel.org, cgroups@vger.kernel.org,
+        Andreas Herrmann <aherrmann@suse.de>, ming.lei@redhat.com
+Subject: Re: [PATCH 02/19] blk-cgroup: delay blk-cgroup initialization until
+ add_disk
+Message-ID: <Y+Ji4NL/WkTR8vml@T590>
+References: <20230201134123.2656505-1-hch@lst.de>
+ <20230201134123.2656505-3-hch@lst.de>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.1
-Subject: Re: [PATCH 0/2] iomap, splice: Fix DIO/splice_read race memory
- corruptor and kill off ITER_PIPE
-Content-Language: en-US
-To:     David Howells <dhowells@redhat.com>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Christoph Hellwig <hch@infradead.org>
-Cc:     Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>,
-        Jeff Layton <jlayton@kernel.org>,
-        David Hildenbrand <david@redhat.com>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        Hillf Danton <hdanton@sina.com>, linux-fsdevel@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org
-References: <20230207133916.3109147-1-dhowells@redhat.com>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20230207133916.3109147-1-dhowells@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230201134123.2656505-3-hch@lst.de>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.5
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2/7/23 6:39?AM, David Howells wrote:
-> [!] Jens: Note that there's a window in the linux-block/for-next branch
->     with a memory corruptor bug that someone bisecting might hit.  These
->     two patches would be better pushed to the front of my iov-extract
->     branch to eliminate the window.  Would it be possible for you to
->     replace my branch in your for-next branch at this point?
+On Wed, Feb 01, 2023 at 02:41:06PM +0100, Christoph Hellwig wrote:
+> There is no need to initialize the cgroup code before the disk is marked
+> live.  Moving the cgroup initialization earlier will help to have a
+> fully initialized struct device in the gendisk for the cgroup code to
+> use in the future.  Similarly tear the cgroup information down in
+> del_gendisk to be symmetric and because none of the cgroup tracking is
+> needed once non-passthrough I/O stops.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> Reviewed-by: Andreas Herrmann <aherrmann@suse.de>
+> ---
+>  block/genhd.c | 17 +++++++++--------
+>  1 file changed, 9 insertions(+), 8 deletions(-)
+> 
+> diff --git a/block/genhd.c b/block/genhd.c
+> index 23cf83b3331cde..705dec0800d62e 100644
+> --- a/block/genhd.c
+> +++ b/block/genhd.c
+> @@ -466,10 +466,14 @@ int __must_check device_add_disk(struct device *parent, struct gendisk *disk,
+>  	 */
+>  	pm_runtime_set_memalloc_noio(ddev, true);
+>  
+> -	ret = blk_integrity_add(disk);
+> +	ret = blkcg_init_disk(disk);
+>  	if (ret)
+>  		goto out_del_block_link;
+>  
+> +	ret = blk_integrity_add(disk);
+> +	if (ret)
+> +		goto out_blkcg_exit;
+> +
+>  	disk->part0->bd_holder_dir =
+>  		kobject_create_and_add("holders", &ddev->kobj);
+>  	if (!disk->part0->bd_holder_dir) {
+> @@ -534,6 +538,8 @@ int __must_check device_add_disk(struct device *parent, struct gendisk *disk,
+>  	kobject_put(disk->part0->bd_holder_dir);
+>  out_del_integrity:
+>  	blk_integrity_del(disk);
+> +out_blkcg_exit:
+> +	blkcg_exit_disk(disk);
+>  out_del_block_link:
+>  	if (!sysfs_deprecated)
+>  		sysfs_remove_link(block_depr, dev_name(ddev));
+> @@ -662,6 +668,8 @@ void del_gendisk(struct gendisk *disk)
+>  	rq_qos_exit(q);
+>  	blk_mq_unquiesce_queue(q);
+>  
+> +	blkcg_exit_disk(disk);
 
-I'll check in on these two patches later today, but just wanted to say
-that we can definitely just toss the existing branch, and setup a new
-one based on -rc7 that adds these two first, then pulls in the other
-branch on top to avoid this. Not a big deal, and warranted in this case.
+This patch causes kernel panic:
 
--- 
-Jens Axboe
+[  581.975121]  bio_associate_blkg+0x28/0x60
+[  581.975798]  bio_init+0x6d/0xc0
+[  581.976364]  blkdev_issue_flush+0x21/0x40
+[  581.977021]  ? _raw_write_unlock+0x12/0x30
+[  581.977686]  ? jbd2_journal_start_commit+0x4b/0x80
+[  581.978418]  ext4_sync_fs+0x1c6/0x1d0
+[  581.979062]  sync_filesystem+0x77/0x90
+[  581.979883]  generic_shutdown_super+0x22/0x130
+[  581.980773]  kill_block_super+0x21/0x50
+[  581.981622]  deactivate_locked_super+0x2c/0xa0
+[  581.982306]  cleanup_mnt+0xbd/0x150
+
+because disk->root_blkg is freed & set as NULL in del_gendisk().
+
+by the following script:
+
+	modprobe -r scsi_debug
+	modprobe scsi_debug dev_size_mb=1024
+	
+	mkfs.xfs -f /dev/sdc	#suppose sdc is the scsi debug disk
+	mount /dev/sdc /mnt
+	echo 1 > /sys/block/sdc/device/delete
+	sleep 1
+	umount /mnt
+
+
+Thanks, 
+Ming
 
