@@ -2,138 +2,129 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 36403C636CD
-	for <linux-block@archiver.kernel.org>; Tue,  7 Feb 2023 14:43:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9E3BC636CC
+	for <linux-block@archiver.kernel.org>; Tue,  7 Feb 2023 15:08:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231465AbjBGOnS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 7 Feb 2023 09:43:18 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56850 "EHLO
+        id S231709AbjBGPIF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 7 Feb 2023 10:08:05 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49764 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231565AbjBGOm6 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 7 Feb 2023 09:42:58 -0500
+        with ESMTP id S231258AbjBGPIF (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 7 Feb 2023 10:08:05 -0500
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B0E4D50E
-        for <linux-block@vger.kernel.org>; Tue,  7 Feb 2023 06:40:49 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CFD033C1F
+        for <linux-block@vger.kernel.org>; Tue,  7 Feb 2023 07:07:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1675780849;
+        s=mimecast20190719; t=1675782436;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=/kPBdJL3Ml9b2utJGfG1ftdTv2qoNngUd6jMK67nj/w=;
-        b=EVCARjHbLYeohS+qSwZfSUsDl0dAx10dWIvwkgulXCZuhfC+meqbcv4N8gUfO18kA2V+GF
-        gRWHganBkMt1lUXQzTd6x36ZzWghMpiQjlzffL7Z2vi53R/CMz3gyLhq6kBDiYJcDN5GRi
-        cCR7lrc+O/VliSeEHjwnYRfb9KlQnOI=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=yCsy72Lhaq3zU8TqDsFrJMTmRrA3i9fAMdz+8ZX+okA=;
+        b=SV2exPS713YsuXaHrbLjSvd5/y1AKoJ5P9eGNxTB87DymJ3QhLMQ7F4U605Mq1ijh4xZAG
+        lHOD6xfkypWGCGmYGbec38hi6TLmDkTNiIAr8IkDtfYcEMi1dTxvlx1baAIjW0gVQctQL0
+        ONfanEAFqmuZ5DbOHWz9yZYDrb/xB0g=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-500-cjY--gzkN0adQwBT385trg-1; Tue, 07 Feb 2023 09:40:43 -0500
-X-MC-Unique: cjY--gzkN0adQwBT385trg-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
+ us-mta-658-PieQk4upOTa3TvTspm5vjw-1; Tue, 07 Feb 2023 10:07:07 -0500
+X-MC-Unique: PieQk4upOTa3TvTspm5vjw-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 8B9BB18E0A60;
-        Tue,  7 Feb 2023 14:40:42 +0000 (UTC)
-Received: from T590 (ovpn-8-19.pek2.redhat.com [10.72.8.19])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 5A93718EC2;
-        Tue,  7 Feb 2023 14:40:36 +0000 (UTC)
-Date:   Tue, 7 Feb 2023 22:40:32 +0800
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 96B9C2A59569;
+        Tue,  7 Feb 2023 15:07:07 +0000 (UTC)
+Received: from localhost (ovpn-8-19.pek2.redhat.com [10.72.8.19])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id B9FC8140EBF4;
+        Tue,  7 Feb 2023 15:07:06 +0000 (UTC)
 From:   Ming Lei <ming.lei@redhat.com>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
-        Josef Bacik <josef@toxicpanda.com>,
-        linux-block@vger.kernel.org, cgroups@vger.kernel.org,
-        Andreas Herrmann <aherrmann@suse.de>, ming.lei@redhat.com
-Subject: Re: [PATCH 02/19] blk-cgroup: delay blk-cgroup initialization until
- add_disk
-Message-ID: <Y+Ji4NL/WkTR8vml@T590>
-References: <20230201134123.2656505-1-hch@lst.de>
- <20230201134123.2656505-3-hch@lst.de>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
+        Nadav Amit <nadav.amit@gmail.com>
+Subject: [PATCH] block: ublk: improve handling device deletion
+Date:   Tue,  7 Feb 2023 23:07:00 +0800
+Message-Id: <20230207150700.545530-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230201134123.2656505-3-hch@lst.de>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.5
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.7
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Feb 01, 2023 at 02:41:06PM +0100, Christoph Hellwig wrote:
-> There is no need to initialize the cgroup code before the disk is marked
-> live.  Moving the cgroup initialization earlier will help to have a
-> fully initialized struct device in the gendisk for the cgroup code to
-> use in the future.  Similarly tear the cgroup information down in
-> del_gendisk to be symmetric and because none of the cgroup tracking is
-> needed once non-passthrough I/O stops.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> Reviewed-by: Andreas Herrmann <aherrmann@suse.de>
-> ---
->  block/genhd.c | 17 +++++++++--------
->  1 file changed, 9 insertions(+), 8 deletions(-)
-> 
-> diff --git a/block/genhd.c b/block/genhd.c
-> index 23cf83b3331cde..705dec0800d62e 100644
-> --- a/block/genhd.c
-> +++ b/block/genhd.c
-> @@ -466,10 +466,14 @@ int __must_check device_add_disk(struct device *parent, struct gendisk *disk,
->  	 */
->  	pm_runtime_set_memalloc_noio(ddev, true);
->  
-> -	ret = blk_integrity_add(disk);
-> +	ret = blkcg_init_disk(disk);
->  	if (ret)
->  		goto out_del_block_link;
->  
-> +	ret = blk_integrity_add(disk);
-> +	if (ret)
-> +		goto out_blkcg_exit;
-> +
->  	disk->part0->bd_holder_dir =
->  		kobject_create_and_add("holders", &ddev->kobj);
->  	if (!disk->part0->bd_holder_dir) {
-> @@ -534,6 +538,8 @@ int __must_check device_add_disk(struct device *parent, struct gendisk *disk,
->  	kobject_put(disk->part0->bd_holder_dir);
->  out_del_integrity:
->  	blk_integrity_del(disk);
-> +out_blkcg_exit:
-> +	blkcg_exit_disk(disk);
->  out_del_block_link:
->  	if (!sysfs_deprecated)
->  		sysfs_remove_link(block_depr, dev_name(ddev));
-> @@ -662,6 +668,8 @@ void del_gendisk(struct gendisk *disk)
->  	rq_qos_exit(q);
->  	blk_mq_unquiesce_queue(q);
->  
-> +	blkcg_exit_disk(disk);
+Inside ublk_ctrl_del_dev(), when the device is removed, we wait
+until the device number is freed with holding global lock of
+ublk_ctl_mutex, this way isn't friendly from user viewpoint:
 
-This patch causes kernel panic:
+1) if device is in-use, the current delete command hangs in
+ublk_ctrl_del_dev(), and user can't break from the handling
+because wait_event() is used
 
-[  581.975121]  bio_associate_blkg+0x28/0x60
-[  581.975798]  bio_init+0x6d/0xc0
-[  581.976364]  blkdev_issue_flush+0x21/0x40
-[  581.977021]  ? _raw_write_unlock+0x12/0x30
-[  581.977686]  ? jbd2_journal_start_commit+0x4b/0x80
-[  581.978418]  ext4_sync_fs+0x1c6/0x1d0
-[  581.979062]  sync_filesystem+0x77/0x90
-[  581.979883]  generic_shutdown_super+0x22/0x130
-[  581.980773]  kill_block_super+0x21/0x50
-[  581.981622]  deactivate_locked_super+0x2c/0xa0
-[  581.982306]  cleanup_mnt+0xbd/0x150
+2) global lock is held, so any new device can't be added and
+other old devices can't be removed.
 
-because disk->root_blkg is freed & set as NULL in del_gendisk().
+Improve the deleting handling by the following way, suggested by
+Nadav:
 
-by the following script:
+1) wait without holding the global lock
 
-	modprobe -r scsi_debug
-	modprobe scsi_debug dev_size_mb=1024
-	
-	mkfs.xfs -f /dev/sdc	#suppose sdc is the scsi debug disk
-	mount /dev/sdc /mnt
-	echo 1 > /sys/block/sdc/device/delete
-	sleep 1
-	umount /mnt
+2) replace wait_event() with wait_event_interruptible()
 
+Reported-by: Nadav Amit <nadav.amit@gmail.com>
+Suggested-by: Nadav Amit <nadav.amit@gmail.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ drivers/block/ublk_drv.c | 22 ++++++++++++++++++----
+ 1 file changed, 18 insertions(+), 4 deletions(-)
 
-Thanks, 
-Ming
+diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+index d83fe2c2b3ba..e6eceee44366 100644
+--- a/drivers/block/ublk_drv.c
++++ b/drivers/block/ublk_drv.c
+@@ -150,6 +150,7 @@ struct ublk_device {
+ 
+ #define UB_STATE_OPEN		0
+ #define UB_STATE_USED		1
++#define UB_STATE_DELETED	2
+ 	unsigned long		state;
+ 	int			ub_number;
+ 
+@@ -1804,20 +1805,33 @@ static int ublk_ctrl_del_dev(struct ublk_device **p_ub)
+ 	if (ret)
+ 		return ret;
+ 
+-	ublk_remove(ub);
++	if (!test_bit(UB_STATE_DELETED, &ub->state)) {
++		ublk_remove(ub);
++		set_bit(UB_STATE_DELETED, &ub->state);
++	}
+ 
+ 	/* Mark the reference as consumed */
+ 	*p_ub = NULL;
+ 	ublk_put_device(ub);
++	mutex_unlock(&ublk_ctl_mutex);
+ 
+ 	/*
+ 	 * Wait until the idr is removed, then it can be reused after
+ 	 * DEL_DEV command is returned.
++	 *
++	 * If we returns because of user interrupt, future delete command
++	 * may come:
++	 *
++	 * - the device number isn't freed, this device won't or needn't
++	 *   be deleted again, since UB_STATE_DELETED is set, and device
++	 *   will be released after the last reference is dropped
++	 *
++	 * - the device number is freed already, we will not find this
++	 *   device via ublk_get_device_from_id()
+ 	 */
+-	wait_event(ublk_idr_wq, ublk_idr_freed(idx));
+-	mutex_unlock(&ublk_ctl_mutex);
++	wait_event_interruptible(ublk_idr_wq, ublk_idr_freed(idx));
+ 
+-	return ret;
++	return 0;
+ }
+ 
+ static inline void ublk_ctrl_cmd_dump(struct io_uring_cmd *cmd)
+-- 
+2.38.1
 
