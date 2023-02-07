@@ -2,40 +2,41 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67684C636D3
-	for <linux-block@archiver.kernel.org>; Tue,  7 Feb 2023 17:14:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 641A9C636D4
+	for <linux-block@archiver.kernel.org>; Tue,  7 Feb 2023 17:14:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231736AbjBGROE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 7 Feb 2023 12:14:04 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50052 "EHLO
+        id S232390AbjBGROy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 7 Feb 2023 12:14:54 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50296 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231634AbjBGROA (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 7 Feb 2023 12:14:00 -0500
+        with ESMTP id S230284AbjBGROh (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 7 Feb 2023 12:14:37 -0500
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 253718A47
-        for <linux-block@vger.kernel.org>; Tue,  7 Feb 2023 09:13:17 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A250FCDD3
+        for <linux-block@vger.kernel.org>; Tue,  7 Feb 2023 09:13:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1675789996;
+        s=mimecast20190719; t=1675790001;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=dlH82MTyZ9mEwQh0gAgGnq4n7zKaA3lADhykYJfgTYc=;
-        b=RCdeVaqec2s6QAZQFi13orb8/oHLhmLrxqytcPOKU8yHWM8bYdfxrTbdEiwGEIIA11GuaF
-        4ST2PP81S/De3ZsFntXRKYx4+BBVCoTP6vvhjNaRwoXTzV74a6FRpEwtJkO0WwIYr4r4Bf
-        Z57vlNfymIkX2ps0/w+xLEg6WPXTaaM=
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=xFVviEeM/Y2ryR7/CsF3R75V4MP5Ms/KHe9gpS0qdO0=;
+        b=E4EJ7wechQqGTZ0+Gq//jsn0hYPlCUZIFyuS1emIp4/oKDVyYglMPg8wLnZ0WXteEUQ/4T
+        Rn1QVlynQcb3jTOnxsc1xwWXDADr2IFbSNSruoIRW5nq0IYw6eJG+wcZoK0R6BQdPeunSd
+        xUiIP8Y15fpg0Meb0WmwjpImB7j+gu4=
 Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
  [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-102-500ECHMmOyWoNXxaItq69w-1; Tue, 07 Feb 2023 12:13:12 -0500
-X-MC-Unique: 500ECHMmOyWoNXxaItq69w-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
+ us-mta-416-kWMnHRCvOEeM67leXLQ-Hw-1; Tue, 07 Feb 2023 12:13:18 -0500
+X-MC-Unique: kWMnHRCvOEeM67leXLQ-Hw-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 2EBEC8027FD;
-        Tue,  7 Feb 2023 17:13:12 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id AECCE811E9C;
+        Tue,  7 Feb 2023 17:13:17 +0000 (UTC)
 Received: from warthog.procyon.org.uk.com (unknown [10.33.36.97])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 29BC618EC5;
-        Tue,  7 Feb 2023 17:13:10 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 8C6ED2166B29;
+        Tue,  7 Feb 2023 17:13:15 +0000 (UTC)
 From:   David Howells <dhowells@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>, Al Viro <viro@zeniv.linux.org.uk>,
         Christoph Hellwig <hch@infradead.org>
@@ -47,210 +48,713 @@ Cc:     David Howells <dhowells@redhat.com>,
         Logan Gunthorpe <logang@deltatee.com>,
         Hillf Danton <hdanton@sina.com>, linux-fsdevel@vger.kernel.org,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org
-Subject: [PATCH v12 00/10] iov_iter: Improve page extraction (pin or just list)
-Date:   Tue,  7 Feb 2023 17:12:55 +0000
-Message-Id: <20230207171305.3716974-1-dhowells@redhat.com>
+        linux-mm@kvack.org, Christoph Hellwig <hch@lst.de>,
+        John Hubbard <jhubbard@nvidia.com>
+Subject: [PATCH v12 02/10] iov_iter: Kill ITER_PIPE
+Date:   Tue,  7 Feb 2023 17:12:57 +0000
+Message-Id: <20230207171305.3716974-3-dhowells@redhat.com>
+In-Reply-To: <20230207171305.3716974-1-dhowells@redhat.com>
+References: <20230207171305.3716974-1-dhowells@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.5
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Jens, Al, Christoph,
+The ITER_PIPE-type iterator was only used for generic_file_splice_read(),
+but that has now been switched to using ITER_BVEC instead, leaving
+ITER_PIPE unused - so get rid of it.
 
-Here are patches to provide support for extracting pages from an iov_iter
-and to use this in the extraction functions in the block layer bio code.
+Signed-off-by: David Howells <dhowells@redhat.com>
+cc: Jens Axboe <axboe@kernel.dk>
+cc: Christoph Hellwig <hch@lst.de>
+cc: Al Viro <viro@zeniv.linux.org.uk>
+cc: David Hildenbrand <david@redhat.com>
+cc: John Hubbard <jhubbard@nvidia.com>
+cc: linux-mm@kvack.org
+cc: linux-block@vger.kernel.org
+cc: linux-fsdevel@vger.kernel.org
+---
+ fs/cifs/file.c      |   8 +-
+ include/linux/uio.h |  14 --
+ lib/iov_iter.c      | 435 +-------------------------------------------
+ mm/filemap.c        |   3 -
+ 4 files changed, 4 insertions(+), 456 deletions(-)
 
-The patches make the following changes:
-
- (1) Change generic_file_splice_read() to load up an ITER_BVEC iterator
-     with sufficient pages and use that rather than using an ITER_PIPE.
-     This avoids a problem[2] when __iomap_dio_rw() calls iov_iter_revert()
-     to shorten an iterator when it races with truncation.  The reversion
-     causes the pipe iterator to prematurely release the pages it was
-     retaining - despite the read still being in progress.  This caused
-     memory corruption.
-
- (2) Remove ITER_PIPE and its paraphernalia as generic_file_splice_read()
-     was the only user.
-
- (3) Add a function, iov_iter_extract_pages() to replace
-     iov_iter_get_pages*() that gets refs, pins or just lists the pages as
-     appropriate to the iterator type.
-
-     Add a function, iov_iter_extract_will_pin() that will indicate from
-     the iterator type how the cleanup is to be performed, returning true
-     if the pages will need unpinning, false otherwise.
-
- (4) Make the bio struct carry a pair of flags to indicate the cleanup
-     mode.  BIO_NO_PAGE_REF is replaced with BIO_PAGE_REFFED (indicating
-     FOLL_GET was used) and BIO_PAGE_PINNED (indicating FOLL_PIN was used)
-     is added.
-
-     BIO_PAGE_REFFED will go away, but at the moment fs/direct-io.c sets it
-     and this series does not fully address that file.
-
- (5) Add a function, bio_release_page(), to release a page appropriately to
-     the cleanup mode indicated by the BIO_PAGE_* flags.
-
- (6) Make the iter-to-bio code use iov_iter_extract_pages() to retain the
-     pages appropriately and clean them up later.
-
- (7) Fix bio_flagged() so that it doesn't prevent a gcc optimisation.
-
-I've pushed the patches here also:
-
-	https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/log/?h=iov-extract
-
-and tagged it with
-
-	iov-extract-20230207
-
-David
-
-Changes:
-========
-ver #12)
- - Added the missing __bitwise on the iov_iter_extraction_t typedef.
- - Rebased on -rc7.
- - Don't specify FOLL_PIN to pin_user_pages_fast().
- - Inserted patch at front to fix race between DIO read and truncation that
-   caused memory corruption when iov_iter_revert() got called on an
-   ITER_PIPE iterator[2].
- - Inserted a patch after that to remove the now-unused ITER_PIPE and its
-   helper functions.
- - Removed the ITER_PIPE bits from iov_iter_extract_pages().
-
-ver #11)
- - Fix iov_iter_extract_kvec_pages() to include the offset into the page in
-   the returned starting offset.
- - Use __bitwise for the extraction flags
-
-ver #10)
- - Fix use of i->kvec in iov_iter_extract_bvec_pages() to be i->bvec.
- - Drop bio_set_cleanup_mode(), open coding it instead.
-
-ver #9)
- - It's now not permitted to use FOLL_PIN outside of mm/, so:
- - Change iov_iter_extract_mode() into iov_iter_extract_will_pin() and
-   return true/false instead of FOLL_PIN/0.
- - Drop of folio_put_unpin() and page_put_unpin() and instead call
-   unpin_user_page() (and put_page()) directly as necessary.
- - Make __bio_release_pages() call bio_release_page() instead of
-   unpin_user_page() as there's no BIO_* -> FOLL_* translation to do.
- - Drop the FOLL_* renumbering patch.
- - Change extract_flags to extraction_flags.
-
-ver #8)
- - Import Christoph Hellwig's changes.
-   - Split the conversion-to-extraction patch.
-   - Drop the extract_flags arg from iov_iter_extract_mode().
-   - Don't default bios to BIO_PAGE_REFFED, but set explicitly.
- - Switch FOLL_PIN and FOLL_GET when renumbering so PIN is at bit 0.
- - Switch BIO_PAGE_PINNED and BIO_PAGE_REFFED so PINNED is at bit 0.
- - We should always be using FOLL_PIN (not FOLL_GET) for DIO, so adjust the
-   patches for that.
-
-ver #7)
- - For now, drop the parts to pass the I/O direction to iov_iter_*pages*()
-   as it turned out to be a lot more complicated, with places not setting
-   IOCB_WRITE when they should, for example.
- - Drop all the patches that changed things other then the block layer's
-   bio handling.  The netfslib and cifs changes can go into a separate
-   patchset.
- - Add support for extracting pages from KVEC-type iterators.
- - When extracting from BVEC/KVEC, skip over empty vecs at the front.
-
-ver #6)
- - Fix write() syscall and co. not setting IOCB_WRITE.
- - Added iocb_is_read() and iocb_is_write() to check IOCB_WRITE.
- - Use op_is_write() in bio_copy_user_iov().
- - Drop the iterator direction checks from smbd_recv().
- - Define FOLL_SOURCE_BUF and FOLL_DEST_BUF and pass them in as part of
-   gup_flags to iov_iter_get/extract_pages*().
- - Replace iov_iter_get_pages*2() with iov_iter_get_pages*() and remove.
- - Add back the function to indicate the cleanup mode.
- - Drop the cleanup_mode return arg to iov_iter_extract_pages().
- - Provide a helper to clean up a page.
- - Renumbered FOLL_GET and FOLL_PIN and made BIO_PAGE_REFFED/PINNED have
-   the same numerical values, enforced with an assertion.
- - Converted AF_ALG, SCSI vhost, generic DIO, FUSE, splice to pipe, 9P and
-   NFS.
- - Added in the patches to make CIFS do top-to-bottom iterators and use
-   various of the added extraction functions.
- - Added a pair of work-in-progess patches to make sk_buff fragments store
-   FOLL_GET and FOLL_PIN.
-
-ver #5)
- - Replace BIO_NO_PAGE_REF with BIO_PAGE_REFFED and split into own patch.
- - Transcribe FOLL_GET/PIN into BIO_PAGE_REFFED/PINNED flags.
- - Add patch to allow bio_flagged() to be combined by gcc.
-
-ver #4)
- - Drop the patch to move the FOLL_* flags to linux/mm_types.h as they're
-   no longer referenced by linux/uio.h.
- - Add ITER_SOURCE/DEST cleanup patches.
- - Make iov_iter/netfslib iter extraction patches use ITER_SOURCE/DEST.
- - Allow additional gup_flags to be passed into iov_iter_extract_pages().
- - Add struct bio patch.
-
-ver #3)
- - Switch to using EXPORT_SYMBOL_GPL to prevent indirect 3rd-party access
-   to get/pin_user_pages_fast()[1].
-
-ver #2)
- - Rolled the extraction cleanup mode query function into the extraction
-   function, returning the indication through the argument list.
- - Fixed patch 4 (extract to scatterlist) to actually use the new
-   extraction API.
-
-Link: https://lore.kernel.org/r/Y3zFzdWnWlEJ8X8/@infradead.org/ [1]
-Link: https://lore.kernel.org/r/000000000000b0b3c005f3a09383@google.com/ [2]
-Link: https://lore.kernel.org/r/166697254399.61150.1256557652599252121.stgit@warthog.procyon.org.uk/ # rfc
-Link: https://lore.kernel.org/r/166722777223.2555743.162508599131141451.stgit@warthog.procyon.org.uk/ # rfc
-Link: https://lore.kernel.org/r/166732024173.3186319.18204305072070871546.stgit@warthog.procyon.org.uk/ # rfc
-Link: https://lore.kernel.org/r/166869687556.3723671.10061142538708346995.stgit@warthog.procyon.org.uk/ # rfc
-Link: https://lore.kernel.org/r/166920902005.1461876.2786264600108839814.stgit@warthog.procyon.org.uk/ # v2
-Link: https://lore.kernel.org/r/166997419665.9475.15014699817597102032.stgit@warthog.procyon.org.uk/ # v3
-Link: https://lore.kernel.org/r/167305160937.1521586.133299343565358971.stgit@warthog.procyon.org.uk/ # v4
-Link: https://lore.kernel.org/r/167344725490.2425628.13771289553670112965.stgit@warthog.procyon.org.uk/ # v5
-Link: https://lore.kernel.org/r/167391047703.2311931.8115712773222260073.stgit@warthog.procyon.org.uk/ # v6
-Link: https://lore.kernel.org/r/20230120175556.3556978-1-dhowells@redhat.com/ # v7
-Link: https://lore.kernel.org/r/20230123173007.325544-1-dhowells@redhat.com/ # v8
-Link: https://lore.kernel.org/r/20230124170108.1070389-1-dhowells@redhat.com/ # v9
-Link: https://lore.kernel.org/r/20230125210657.2335748-1-dhowells@redhat.com/ # v10
-Link: https://lore.kernel.org/r/20230126141626.2809643-1-dhowells@redhat.com/ # v11
-
-Christoph Hellwig (1):
-  block: Replace BIO_NO_PAGE_REF with BIO_PAGE_REFFED with inverted
-    logic
-
-David Howells (9):
-  vfs, iomap: Fix generic_file_splice_read() to avoid reversion of
-    ITER_PIPE
-  iov_iter: Kill ITER_PIPE
-  iov_iter: Define flags to qualify page extraction.
-  iov_iter: Add a function to extract a page list from an iterator
-  iomap: Don't get an reference on ZERO_PAGE for direct I/O block
-    zeroing
-  block: Fix bio_flagged() so that gcc can better optimise it
-  block: Add BIO_PAGE_PINNED and associated infrastructure
-  block: Convert bio_iov_iter_get_pages to use iov_iter_extract_pages
-  block: convert bio_map_user_iov to use iov_iter_extract_pages
-
- block/bio.c               |  33 +-
- block/blk-map.c           |  26 +-
- block/blk.h               |  12 +
- fs/cifs/file.c            |   8 +-
- fs/direct-io.c            |   2 +
- fs/iomap/direct-io.c      |   1 -
- fs/splice.c               |  76 +++-
- include/linux/bio.h       |   5 +-
- include/linux/blk_types.h |   3 +-
- include/linux/uio.h       |  49 ++-
- lib/iov_iter.c            | 713 +++++++++++++++-----------------------
- mm/filemap.c              |   3 -
- 12 files changed, 426 insertions(+), 505 deletions(-)
+diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+index 22dfc1f8b4f1..57ca4eea69dd 100644
+--- a/fs/cifs/file.c
++++ b/fs/cifs/file.c
+@@ -3806,13 +3806,7 @@ cifs_readdata_to_iov(struct cifs_readdata *rdata, struct iov_iter *iter)
+ 		size_t copy = min_t(size_t, remaining, PAGE_SIZE);
+ 		size_t written;
+ 
+-		if (unlikely(iov_iter_is_pipe(iter))) {
+-			void *addr = kmap_atomic(page);
+-
+-			written = copy_to_iter(addr, copy, iter);
+-			kunmap_atomic(addr);
+-		} else
+-			written = copy_page_to_iter(page, 0, copy, iter);
++		written = copy_page_to_iter(page, 0, copy, iter);
+ 		remaining -= written;
+ 		if (written < copy && iov_iter_count(iter) > 0)
+ 			break;
+diff --git a/include/linux/uio.h b/include/linux/uio.h
+index 9f158238edba..dcc0ca5ef491 100644
+--- a/include/linux/uio.h
++++ b/include/linux/uio.h
+@@ -11,7 +11,6 @@
+ #include <uapi/linux/uio.h>
+ 
+ struct page;
+-struct pipe_inode_info;
+ 
+ struct kvec {
+ 	void *iov_base; /* and that should *never* hold a userland pointer */
+@@ -23,7 +22,6 @@ enum iter_type {
+ 	ITER_IOVEC,
+ 	ITER_KVEC,
+ 	ITER_BVEC,
+-	ITER_PIPE,
+ 	ITER_XARRAY,
+ 	ITER_DISCARD,
+ 	ITER_UBUF,
+@@ -53,15 +51,10 @@ struct iov_iter {
+ 		const struct kvec *kvec;
+ 		const struct bio_vec *bvec;
+ 		struct xarray *xarray;
+-		struct pipe_inode_info *pipe;
+ 		void __user *ubuf;
+ 	};
+ 	union {
+ 		unsigned long nr_segs;
+-		struct {
+-			unsigned int head;
+-			unsigned int start_head;
+-		};
+ 		loff_t xarray_start;
+ 	};
+ };
+@@ -99,11 +92,6 @@ static inline bool iov_iter_is_bvec(const struct iov_iter *i)
+ 	return iov_iter_type(i) == ITER_BVEC;
+ }
+ 
+-static inline bool iov_iter_is_pipe(const struct iov_iter *i)
+-{
+-	return iov_iter_type(i) == ITER_PIPE;
+-}
+-
+ static inline bool iov_iter_is_discard(const struct iov_iter *i)
+ {
+ 	return iov_iter_type(i) == ITER_DISCARD;
+@@ -245,8 +233,6 @@ void iov_iter_kvec(struct iov_iter *i, unsigned int direction, const struct kvec
+ 			unsigned long nr_segs, size_t count);
+ void iov_iter_bvec(struct iov_iter *i, unsigned int direction, const struct bio_vec *bvec,
+ 			unsigned long nr_segs, size_t count);
+-void iov_iter_pipe(struct iov_iter *i, unsigned int direction, struct pipe_inode_info *pipe,
+-			size_t count);
+ void iov_iter_discard(struct iov_iter *i, unsigned int direction, size_t count);
+ void iov_iter_xarray(struct iov_iter *i, unsigned int direction, struct xarray *xarray,
+ 		     loff_t start, size_t count);
+diff --git a/lib/iov_iter.c b/lib/iov_iter.c
+index f9a3ff37ecd1..adc5e8aa8ae8 100644
+--- a/lib/iov_iter.c
++++ b/lib/iov_iter.c
+@@ -14,8 +14,6 @@
+ #include <linux/scatterlist.h>
+ #include <linux/instrumented.h>
+ 
+-#define PIPE_PARANOIA /* for now */
+-
+ /* covers ubuf and kbuf alike */
+ #define iterate_buf(i, n, base, len, off, __p, STEP) {		\
+ 	size_t __maybe_unused off = 0;				\
+@@ -186,156 +184,6 @@ static int copyin(void *to, const void __user *from, size_t n)
+ 	return res;
+ }
+ 
+-static inline struct pipe_buffer *pipe_buf(const struct pipe_inode_info *pipe,
+-					   unsigned int slot)
+-{
+-	return &pipe->bufs[slot & (pipe->ring_size - 1)];
+-}
+-
+-#ifdef PIPE_PARANOIA
+-static bool sanity(const struct iov_iter *i)
+-{
+-	struct pipe_inode_info *pipe = i->pipe;
+-	unsigned int p_head = pipe->head;
+-	unsigned int p_tail = pipe->tail;
+-	unsigned int p_occupancy = pipe_occupancy(p_head, p_tail);
+-	unsigned int i_head = i->head;
+-	unsigned int idx;
+-
+-	if (i->last_offset) {
+-		struct pipe_buffer *p;
+-		if (unlikely(p_occupancy == 0))
+-			goto Bad;	// pipe must be non-empty
+-		if (unlikely(i_head != p_head - 1))
+-			goto Bad;	// must be at the last buffer...
+-
+-		p = pipe_buf(pipe, i_head);
+-		if (unlikely(p->offset + p->len != abs(i->last_offset)))
+-			goto Bad;	// ... at the end of segment
+-	} else {
+-		if (i_head != p_head)
+-			goto Bad;	// must be right after the last buffer
+-	}
+-	return true;
+-Bad:
+-	printk(KERN_ERR "idx = %d, offset = %d\n", i_head, i->last_offset);
+-	printk(KERN_ERR "head = %d, tail = %d, buffers = %d\n",
+-			p_head, p_tail, pipe->ring_size);
+-	for (idx = 0; idx < pipe->ring_size; idx++)
+-		printk(KERN_ERR "[%p %p %d %d]\n",
+-			pipe->bufs[idx].ops,
+-			pipe->bufs[idx].page,
+-			pipe->bufs[idx].offset,
+-			pipe->bufs[idx].len);
+-	WARN_ON(1);
+-	return false;
+-}
+-#else
+-#define sanity(i) true
+-#endif
+-
+-static struct page *push_anon(struct pipe_inode_info *pipe, unsigned size)
+-{
+-	struct page *page = alloc_page(GFP_USER);
+-	if (page) {
+-		struct pipe_buffer *buf = pipe_buf(pipe, pipe->head++);
+-		*buf = (struct pipe_buffer) {
+-			.ops = &default_pipe_buf_ops,
+-			.page = page,
+-			.offset = 0,
+-			.len = size
+-		};
+-	}
+-	return page;
+-}
+-
+-static void push_page(struct pipe_inode_info *pipe, struct page *page,
+-			unsigned int offset, unsigned int size)
+-{
+-	struct pipe_buffer *buf = pipe_buf(pipe, pipe->head++);
+-	*buf = (struct pipe_buffer) {
+-		.ops = &page_cache_pipe_buf_ops,
+-		.page = page,
+-		.offset = offset,
+-		.len = size
+-	};
+-	get_page(page);
+-}
+-
+-static inline int last_offset(const struct pipe_buffer *buf)
+-{
+-	if (buf->ops == &default_pipe_buf_ops)
+-		return buf->len;	// buf->offset is 0 for those
+-	else
+-		return -(buf->offset + buf->len);
+-}
+-
+-static struct page *append_pipe(struct iov_iter *i, size_t size,
+-				unsigned int *off)
+-{
+-	struct pipe_inode_info *pipe = i->pipe;
+-	int offset = i->last_offset;
+-	struct pipe_buffer *buf;
+-	struct page *page;
+-
+-	if (offset > 0 && offset < PAGE_SIZE) {
+-		// some space in the last buffer; add to it
+-		buf = pipe_buf(pipe, pipe->head - 1);
+-		size = min_t(size_t, size, PAGE_SIZE - offset);
+-		buf->len += size;
+-		i->last_offset += size;
+-		i->count -= size;
+-		*off = offset;
+-		return buf->page;
+-	}
+-	// OK, we need a new buffer
+-	*off = 0;
+-	size = min_t(size_t, size, PAGE_SIZE);
+-	if (pipe_full(pipe->head, pipe->tail, pipe->max_usage))
+-		return NULL;
+-	page = push_anon(pipe, size);
+-	if (!page)
+-		return NULL;
+-	i->head = pipe->head - 1;
+-	i->last_offset = size;
+-	i->count -= size;
+-	return page;
+-}
+-
+-static size_t copy_page_to_iter_pipe(struct page *page, size_t offset, size_t bytes,
+-			 struct iov_iter *i)
+-{
+-	struct pipe_inode_info *pipe = i->pipe;
+-	unsigned int head = pipe->head;
+-
+-	if (unlikely(bytes > i->count))
+-		bytes = i->count;
+-
+-	if (unlikely(!bytes))
+-		return 0;
+-
+-	if (!sanity(i))
+-		return 0;
+-
+-	if (offset && i->last_offset == -offset) { // could we merge it?
+-		struct pipe_buffer *buf = pipe_buf(pipe, head - 1);
+-		if (buf->page == page) {
+-			buf->len += bytes;
+-			i->last_offset -= bytes;
+-			i->count -= bytes;
+-			return bytes;
+-		}
+-	}
+-	if (pipe_full(pipe->head, pipe->tail, pipe->max_usage))
+-		return 0;
+-
+-	push_page(pipe, page, offset, bytes);
+-	i->last_offset = -(offset + bytes);
+-	i->head = head;
+-	i->count -= bytes;
+-	return bytes;
+-}
+-
+ /*
+  * fault_in_iov_iter_readable - fault in iov iterator for reading
+  * @i: iterator
+@@ -439,46 +287,6 @@ void iov_iter_init(struct iov_iter *i, unsigned int direction,
+ }
+ EXPORT_SYMBOL(iov_iter_init);
+ 
+-// returns the offset in partial buffer (if any)
+-static inline unsigned int pipe_npages(const struct iov_iter *i, int *npages)
+-{
+-	struct pipe_inode_info *pipe = i->pipe;
+-	int used = pipe->head - pipe->tail;
+-	int off = i->last_offset;
+-
+-	*npages = max((int)pipe->max_usage - used, 0);
+-
+-	if (off > 0 && off < PAGE_SIZE) { // anon and not full
+-		(*npages)++;
+-		return off;
+-	}
+-	return 0;
+-}
+-
+-static size_t copy_pipe_to_iter(const void *addr, size_t bytes,
+-				struct iov_iter *i)
+-{
+-	unsigned int off, chunk;
+-
+-	if (unlikely(bytes > i->count))
+-		bytes = i->count;
+-	if (unlikely(!bytes))
+-		return 0;
+-
+-	if (!sanity(i))
+-		return 0;
+-
+-	for (size_t n = bytes; n; n -= chunk) {
+-		struct page *page = append_pipe(i, n, &off);
+-		chunk = min_t(size_t, n, PAGE_SIZE - off);
+-		if (!page)
+-			return bytes - n;
+-		memcpy_to_page(page, off, addr, chunk);
+-		addr += chunk;
+-	}
+-	return bytes;
+-}
+-
+ static __wsum csum_and_memcpy(void *to, const void *from, size_t len,
+ 			      __wsum sum, size_t off)
+ {
+@@ -486,44 +294,10 @@ static __wsum csum_and_memcpy(void *to, const void *from, size_t len,
+ 	return csum_block_add(sum, next, off);
+ }
+ 
+-static size_t csum_and_copy_to_pipe_iter(const void *addr, size_t bytes,
+-					 struct iov_iter *i, __wsum *sump)
+-{
+-	__wsum sum = *sump;
+-	size_t off = 0;
+-	unsigned int chunk, r;
+-
+-	if (unlikely(bytes > i->count))
+-		bytes = i->count;
+-	if (unlikely(!bytes))
+-		return 0;
+-
+-	if (!sanity(i))
+-		return 0;
+-
+-	while (bytes) {
+-		struct page *page = append_pipe(i, bytes, &r);
+-		char *p;
+-
+-		if (!page)
+-			break;
+-		chunk = min_t(size_t, bytes, PAGE_SIZE - r);
+-		p = kmap_local_page(page);
+-		sum = csum_and_memcpy(p + r, addr + off, chunk, sum, off);
+-		kunmap_local(p);
+-		off += chunk;
+-		bytes -= chunk;
+-	}
+-	*sump = sum;
+-	return off;
+-}
+-
+ size_t _copy_to_iter(const void *addr, size_t bytes, struct iov_iter *i)
+ {
+ 	if (WARN_ON_ONCE(i->data_source))
+ 		return 0;
+-	if (unlikely(iov_iter_is_pipe(i)))
+-		return copy_pipe_to_iter(addr, bytes, i);
+ 	if (user_backed_iter(i))
+ 		might_fault();
+ 	iterate_and_advance(i, bytes, base, len, off,
+@@ -545,42 +319,6 @@ static int copyout_mc(void __user *to, const void *from, size_t n)
+ 	return n;
+ }
+ 
+-static size_t copy_mc_pipe_to_iter(const void *addr, size_t bytes,
+-				struct iov_iter *i)
+-{
+-	size_t xfer = 0;
+-	unsigned int off, chunk;
+-
+-	if (unlikely(bytes > i->count))
+-		bytes = i->count;
+-	if (unlikely(!bytes))
+-		return 0;
+-
+-	if (!sanity(i))
+-		return 0;
+-
+-	while (bytes) {
+-		struct page *page = append_pipe(i, bytes, &off);
+-		unsigned long rem;
+-		char *p;
+-
+-		if (!page)
+-			break;
+-		chunk = min_t(size_t, bytes, PAGE_SIZE - off);
+-		p = kmap_local_page(page);
+-		rem = copy_mc_to_kernel(p + off, addr + xfer, chunk);
+-		chunk -= rem;
+-		kunmap_local(p);
+-		xfer += chunk;
+-		bytes -= chunk;
+-		if (rem) {
+-			iov_iter_revert(i, rem);
+-			break;
+-		}
+-	}
+-	return xfer;
+-}
+-
+ /**
+  * _copy_mc_to_iter - copy to iter with source memory error exception handling
+  * @addr: source kernel address
+@@ -600,9 +338,8 @@ static size_t copy_mc_pipe_to_iter(const void *addr, size_t bytes,
+  *   alignment and poison alignment assumptions to avoid re-triggering
+  *   hardware exceptions.
+  *
+- * * ITER_KVEC, ITER_PIPE, and ITER_BVEC can return short copies.
+- *   Compare to copy_to_iter() where only ITER_IOVEC attempts might return
+- *   a short copy.
++ * * ITER_KVEC and ITER_BVEC can return short copies.  Compare to
++ *   copy_to_iter() where only ITER_IOVEC attempts might return a short copy.
+  *
+  * Return: number of bytes copied (may be %0)
+  */
+@@ -610,8 +347,6 @@ size_t _copy_mc_to_iter(const void *addr, size_t bytes, struct iov_iter *i)
+ {
+ 	if (WARN_ON_ONCE(i->data_source))
+ 		return 0;
+-	if (unlikely(iov_iter_is_pipe(i)))
+-		return copy_mc_pipe_to_iter(addr, bytes, i);
+ 	if (user_backed_iter(i))
+ 		might_fault();
+ 	__iterate_and_advance(i, bytes, base, len, off,
+@@ -717,8 +452,6 @@ size_t copy_page_to_iter(struct page *page, size_t offset, size_t bytes,
+ 		return 0;
+ 	if (WARN_ON_ONCE(i->data_source))
+ 		return 0;
+-	if (unlikely(iov_iter_is_pipe(i)))
+-		return copy_page_to_iter_pipe(page, offset, bytes, i);
+ 	page += offset / PAGE_SIZE; // first subpage
+ 	offset %= PAGE_SIZE;
+ 	while (1) {
+@@ -767,36 +500,8 @@ size_t copy_page_from_iter(struct page *page, size_t offset, size_t bytes,
+ }
+ EXPORT_SYMBOL(copy_page_from_iter);
+ 
+-static size_t pipe_zero(size_t bytes, struct iov_iter *i)
+-{
+-	unsigned int chunk, off;
+-
+-	if (unlikely(bytes > i->count))
+-		bytes = i->count;
+-	if (unlikely(!bytes))
+-		return 0;
+-
+-	if (!sanity(i))
+-		return 0;
+-
+-	for (size_t n = bytes; n; n -= chunk) {
+-		struct page *page = append_pipe(i, n, &off);
+-		char *p;
+-
+-		if (!page)
+-			return bytes - n;
+-		chunk = min_t(size_t, n, PAGE_SIZE - off);
+-		p = kmap_local_page(page);
+-		memset(p + off, 0, chunk);
+-		kunmap_local(p);
+-	}
+-	return bytes;
+-}
+-
+ size_t iov_iter_zero(size_t bytes, struct iov_iter *i)
+ {
+-	if (unlikely(iov_iter_is_pipe(i)))
+-		return pipe_zero(bytes, i);
+ 	iterate_and_advance(i, bytes, base, len, count,
+ 		clear_user(base, len),
+ 		memset(base, 0, len)
+@@ -827,32 +532,6 @@ size_t copy_page_from_iter_atomic(struct page *page, unsigned offset, size_t byt
+ }
+ EXPORT_SYMBOL(copy_page_from_iter_atomic);
+ 
+-static void pipe_advance(struct iov_iter *i, size_t size)
+-{
+-	struct pipe_inode_info *pipe = i->pipe;
+-	int off = i->last_offset;
+-
+-	if (!off && !size) {
+-		pipe_discard_from(pipe, i->start_head); // discard everything
+-		return;
+-	}
+-	i->count -= size;
+-	while (1) {
+-		struct pipe_buffer *buf = pipe_buf(pipe, i->head);
+-		if (off) /* make it relative to the beginning of buffer */
+-			size += abs(off) - buf->offset;
+-		if (size <= buf->len) {
+-			buf->len = size;
+-			i->last_offset = last_offset(buf);
+-			break;
+-		}
+-		size -= buf->len;
+-		i->head++;
+-		off = 0;
+-	}
+-	pipe_discard_from(pipe, i->head + 1); // discard everything past this one
+-}
+-
+ static void iov_iter_bvec_advance(struct iov_iter *i, size_t size)
+ {
+ 	const struct bio_vec *bvec, *end;
+@@ -904,8 +583,6 @@ void iov_iter_advance(struct iov_iter *i, size_t size)
+ 		iov_iter_iovec_advance(i, size);
+ 	} else if (iov_iter_is_bvec(i)) {
+ 		iov_iter_bvec_advance(i, size);
+-	} else if (iov_iter_is_pipe(i)) {
+-		pipe_advance(i, size);
+ 	} else if (iov_iter_is_discard(i)) {
+ 		i->count -= size;
+ 	}
+@@ -919,26 +596,6 @@ void iov_iter_revert(struct iov_iter *i, size_t unroll)
+ 	if (WARN_ON(unroll > MAX_RW_COUNT))
+ 		return;
+ 	i->count += unroll;
+-	if (unlikely(iov_iter_is_pipe(i))) {
+-		struct pipe_inode_info *pipe = i->pipe;
+-		unsigned int head = pipe->head;
+-
+-		while (head > i->start_head) {
+-			struct pipe_buffer *b = pipe_buf(pipe, --head);
+-			if (unroll < b->len) {
+-				b->len -= unroll;
+-				i->last_offset = last_offset(b);
+-				i->head = head;
+-				return;
+-			}
+-			unroll -= b->len;
+-			pipe_buf_release(pipe, b);
+-			pipe->head--;
+-		}
+-		i->last_offset = 0;
+-		i->head = head;
+-		return;
+-	}
+ 	if (unlikely(iov_iter_is_discard(i)))
+ 		return;
+ 	if (unroll <= i->iov_offset) {
+@@ -1026,24 +683,6 @@ void iov_iter_bvec(struct iov_iter *i, unsigned int direction,
+ }
+ EXPORT_SYMBOL(iov_iter_bvec);
+ 
+-void iov_iter_pipe(struct iov_iter *i, unsigned int direction,
+-			struct pipe_inode_info *pipe,
+-			size_t count)
+-{
+-	BUG_ON(direction != READ);
+-	WARN_ON(pipe_full(pipe->head, pipe->tail, pipe->ring_size));
+-	*i = (struct iov_iter){
+-		.iter_type = ITER_PIPE,
+-		.data_source = false,
+-		.pipe = pipe,
+-		.head = pipe->head,
+-		.start_head = pipe->head,
+-		.last_offset = 0,
+-		.count = count
+-	};
+-}
+-EXPORT_SYMBOL(iov_iter_pipe);
+-
+ /**
+  * iov_iter_xarray - Initialise an I/O iterator to use the pages in an xarray
+  * @i: The iterator to initialise.
+@@ -1168,19 +807,6 @@ bool iov_iter_is_aligned(const struct iov_iter *i, unsigned addr_mask,
+ 	if (iov_iter_is_bvec(i))
+ 		return iov_iter_aligned_bvec(i, addr_mask, len_mask);
+ 
+-	if (iov_iter_is_pipe(i)) {
+-		size_t size = i->count;
+-
+-		if (size & len_mask)
+-			return false;
+-		if (size && i->last_offset > 0) {
+-			if (i->last_offset & addr_mask)
+-				return false;
+-		}
+-
+-		return true;
+-	}
+-
+ 	if (iov_iter_is_xarray(i)) {
+ 		if (i->count & len_mask)
+ 			return false;
+@@ -1250,14 +876,6 @@ unsigned long iov_iter_alignment(const struct iov_iter *i)
+ 	if (iov_iter_is_bvec(i))
+ 		return iov_iter_alignment_bvec(i);
+ 
+-	if (iov_iter_is_pipe(i)) {
+-		size_t size = i->count;
+-
+-		if (size && i->last_offset > 0)
+-			return size | i->last_offset;
+-		return size;
+-	}
+-
+ 	if (iov_iter_is_xarray(i))
+ 		return (i->xarray_start + i->iov_offset) | i->count;
+ 
+@@ -1309,36 +927,6 @@ static int want_pages_array(struct page ***res, size_t size,
+ 	return count;
+ }
+ 
+-static ssize_t pipe_get_pages(struct iov_iter *i,
+-		   struct page ***pages, size_t maxsize, unsigned maxpages,
+-		   size_t *start)
+-{
+-	unsigned int npages, count, off, chunk;
+-	struct page **p;
+-	size_t left;
+-
+-	if (!sanity(i))
+-		return -EFAULT;
+-
+-	*start = off = pipe_npages(i, &npages);
+-	if (!npages)
+-		return -EFAULT;
+-	count = want_pages_array(pages, maxsize, off, min(npages, maxpages));
+-	if (!count)
+-		return -ENOMEM;
+-	p = *pages;
+-	for (npages = 0, left = maxsize ; npages < count; npages++, left -= chunk) {
+-		struct page *page = append_pipe(i, left, &off);
+-		if (!page)
+-			break;
+-		chunk = min_t(size_t, left, PAGE_SIZE - off);
+-		get_page(*p++ = page);
+-	}
+-	if (!npages)
+-		return -EFAULT;
+-	return maxsize - left;
+-}
+-
+ static ssize_t iter_xarray_populate_pages(struct page **pages, struct xarray *xa,
+ 					  pgoff_t index, unsigned int nr_pages)
+ {
+@@ -1486,8 +1074,6 @@ static ssize_t __iov_iter_get_pages_alloc(struct iov_iter *i,
+ 		}
+ 		return maxsize;
+ 	}
+-	if (iov_iter_is_pipe(i))
+-		return pipe_get_pages(i, pages, maxsize, maxpages, start);
+ 	if (iov_iter_is_xarray(i))
+ 		return iter_xarray_get_pages(i, pages, maxsize, maxpages, start);
+ 	return -EFAULT;
+@@ -1577,9 +1163,7 @@ size_t csum_and_copy_to_iter(const void *addr, size_t bytes, void *_csstate,
+ 	}
+ 
+ 	sum = csum_shift(csstate->csum, csstate->off);
+-	if (unlikely(iov_iter_is_pipe(i)))
+-		bytes = csum_and_copy_to_pipe_iter(addr, bytes, i, &sum);
+-	else iterate_and_advance(i, bytes, base, len, off, ({
++	iterate_and_advance(i, bytes, base, len, off, ({
+ 		next = csum_and_copy_to_user(addr + off, base, len);
+ 		sum = csum_block_add(sum, next, off);
+ 		next ? 0 : len;
+@@ -1664,15 +1248,6 @@ int iov_iter_npages(const struct iov_iter *i, int maxpages)
+ 		return iov_npages(i, maxpages);
+ 	if (iov_iter_is_bvec(i))
+ 		return bvec_npages(i, maxpages);
+-	if (iov_iter_is_pipe(i)) {
+-		int npages;
+-
+-		if (!sanity(i))
+-			return 0;
+-
+-		pipe_npages(i, &npages);
+-		return min(npages, maxpages);
+-	}
+ 	if (iov_iter_is_xarray(i)) {
+ 		unsigned offset = (i->xarray_start + i->iov_offset) % PAGE_SIZE;
+ 		int npages = DIV_ROUND_UP(offset + i->count, PAGE_SIZE);
+@@ -1685,10 +1260,6 @@ EXPORT_SYMBOL(iov_iter_npages);
+ const void *dup_iter(struct iov_iter *new, struct iov_iter *old, gfp_t flags)
+ {
+ 	*new = *old;
+-	if (unlikely(iov_iter_is_pipe(new))) {
+-		WARN_ON(1);
+-		return NULL;
+-	}
+ 	if (iov_iter_is_bvec(new))
+ 		return new->bvec = kmemdup(new->bvec,
+ 				    new->nr_segs * sizeof(struct bio_vec),
+diff --git a/mm/filemap.c b/mm/filemap.c
+index c4d4ace9cc70..f72e4875bfcb 100644
+--- a/mm/filemap.c
++++ b/mm/filemap.c
+@@ -2446,9 +2446,6 @@ static bool filemap_range_uptodate(struct address_space *mapping,
+ 
+ 	if (folio_test_uptodate(folio))
+ 		return true;
+-	/* pipes can't handle partially uptodate pages */
+-	if (iov_iter_is_pipe(iter))
+-		return false;
+ 	if (!mapping->a_ops->is_partially_uptodate)
+ 		return false;
+ 	if (mapping->host->i_blkbits >= folio_shift(folio))
 
