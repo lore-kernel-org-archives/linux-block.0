@@ -2,93 +2,116 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 344E3C636CC
-	for <linux-block@archiver.kernel.org>; Tue,  7 Feb 2023 15:23:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 69BDBC636D6
+	for <linux-block@archiver.kernel.org>; Tue,  7 Feb 2023 16:15:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232489AbjBGPXU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 7 Feb 2023 10:23:20 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33692 "EHLO
+        id S232132AbjBGQPj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 7 Feb 2023 11:15:39 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38578 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230503AbjBGPXL (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 7 Feb 2023 10:23:11 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C3042E06C
-        for <linux-block@vger.kernel.org>; Tue,  7 Feb 2023 07:22:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1675783331;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=l+MitBe2EyJwjQSROuNpetHX6JtYUVSt9jGRlkcNJ9A=;
-        b=WblU9YGVGb7p6GPuUHWyJRM724C1rNr/qIkD9WahlVF06yzNmaFn/SutWTNWXHCy5odwrV
-        sSeX13u/8ziXdLaKjt82U9cY5WgCJKbTWox6JTGYQDppe8vEyfJhJywje/1VjoSgra5xKQ
-        Ezieu5f9YgBMMw+TH6HnMfGErZE5AYE=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-645-Lfrk-Rt4O2m45zEoYlywPg-1; Tue, 07 Feb 2023 10:22:07 -0500
-X-MC-Unique: Lfrk-Rt4O2m45zEoYlywPg-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 49E9F101B44E;
-        Tue,  7 Feb 2023 15:22:05 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.33.36.97])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 78412492B21;
-        Tue,  7 Feb 2023 15:22:03 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <20230207133916.3109147-1-dhowells@redhat.com>
-References: <20230207133916.3109147-1-dhowells@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     dhowells@redhat.com, Al Viro <viro@zeniv.linux.org.uk>,
-        Christoph Hellwig <hch@infradead.org>,
-        Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>,
-        Jeff Layton <jlayton@kernel.org>,
-        David Hildenbrand <david@redhat.com>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        Hillf Danton <hdanton@sina.com>, linux-fsdevel@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org
-Subject: Re: [PATCH 0/2] iomap, splice: Fix DIO/splice_read race memory corruptor and kill off ITER_PIPE
+        with ESMTP id S231952AbjBGQP2 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 7 Feb 2023 11:15:28 -0500
+Received: from mail-ed1-x534.google.com (mail-ed1-x534.google.com [IPv6:2a00:1450:4864:20::534])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5CE486193
+        for <linux-block@vger.kernel.org>; Tue,  7 Feb 2023 08:15:24 -0800 (PST)
+Received: by mail-ed1-x534.google.com with SMTP id u21so16336540edv.3
+        for <linux-block@vger.kernel.org>; Tue, 07 Feb 2023 08:15:24 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linux-foundation.org; s=google;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=4RM6pXDqOiFHeAx0WMmnhom/Qz888Ih/TPZU+Y9eyTk=;
+        b=NsNlyZdX9FntXMmjVZZquGBbjRgyatHH8Ma3nbcSD5cdovFSmwk5DDBQ2fWraFPrwc
+         yEbD3pAldW0OWp9nFmXL3+41yWEaP4WAJsgLpL/66YPcHbCxz4tea6LTrE8ieMPZUjLt
+         m4B76mBx3QUIutr78aW0ASxIjNPwfvFPpHMSE=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=4RM6pXDqOiFHeAx0WMmnhom/Qz888Ih/TPZU+Y9eyTk=;
+        b=5b/TBh1U5LjOIq9odzRYKg/DEXjYbM4uMem/3XcrGMXPVt0to9bP5LAhe17WAixfw+
+         eqATt284Yfdbm131Sn4bWb3jeL662GG6sSGNsOHgvqOGEVRHCv7n5U7XmR1UBCWCOMOX
+         kb9Toqveo+rhZDNpXtSPjYCeYB6m85r0V8fW+5DFbgZ04UU/nb0l/ysPokip83zqwWBI
+         FneVg/BpKxqhJrVinTt6WhMAqvJjvxI3XaNrAM9RRhAvgrQ36rOQCsrsj1w31/jgudit
+         dwzC3OCFzUKzN5B2kFaiCHKooH4PN89YNx0Jkl/1OjxyK9Pa2eLR/XmeoZtR5P2kXqJ1
+         3bsQ==
+X-Gm-Message-State: AO0yUKUDTb1JqcU5TlFwlEwf3VhSRAZwZ9I9vSxX+IdaVhiSD3ERVEPb
+        gRvAdY2UkH+XZFLaE8Rhkw/mBXXx4tZ4wnlbJinV8Q==
+X-Google-Smtp-Source: AK7set8pSlAWUfsc3KPZx1iv1mK7O7DImniMR6fJvIhtFYB1EdIdK20+sxqudyF4ueEbihg4dxpcFQ==
+X-Received: by 2002:a17:906:8d06:b0:8a9:d68f:da2 with SMTP id rv6-20020a1709068d0600b008a9d68f0da2mr2455866ejc.28.1675786522572;
+        Tue, 07 Feb 2023 08:15:22 -0800 (PST)
+Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com. [209.85.208.50])
+        by smtp.gmail.com with ESMTPSA id qx18-20020a170906fcd200b0087b3d555d2esm7027249ejb.33.2023.02.07.08.15.21
+        for <linux-block@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 07 Feb 2023 08:15:21 -0800 (PST)
+Received: by mail-ed1-f50.google.com with SMTP id x9so8288869eds.12
+        for <linux-block@vger.kernel.org>; Tue, 07 Feb 2023 08:15:21 -0800 (PST)
+X-Received: by 2002:a17:906:4e46:b0:87a:7098:ca09 with SMTP id
+ g6-20020a1709064e4600b0087a7098ca09mr874420ejw.78.1675786520751; Tue, 07 Feb
+ 2023 08:15:20 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <3417264.1675783322.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date:   Tue, 07 Feb 2023 15:22:02 +0000
-Message-ID: <3417265.1675783322@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.10
+References: <20230129060452.7380-1-zhanghongchen@loongson.cn>
+ <CAHk-=wjw-rrT59k6VdeLu4qUarQOzicsZPFGAO5J8TKM=oukUw@mail.gmail.com>
+ <Y+EjmnRqpLuBFPX1@bombadil.infradead.org> <4ffbb0c8-c5d0-73b3-7a4e-2da9a7b03669@inria.fr>
+ <Y+Ja5SRs886CEz7a@kadam>
+In-Reply-To: <Y+Ja5SRs886CEz7a@kadam>
+From:   Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Tue, 7 Feb 2023 08:15:04 -0800
+X-Gmail-Original-Message-ID: <CAHk-=wg6ohuyrmLJYTfEpDbp2Jwnef54gkcpZ3-BYgy4C6UxRQ@mail.gmail.com>
+Message-ID: <CAHk-=wg6ohuyrmLJYTfEpDbp2Jwnef54gkcpZ3-BYgy4C6UxRQ@mail.gmail.com>
+Subject: Re: block: sleeping in atomic warnings
+To:     Dan Carpenter <error27@gmail.com>,
+        Eric Biggers <ebiggers@kernel.org>
+Cc:     linux-block@vger.kernel.org, Julia Lawall <julia.lawall@inria.fr>,
+        Luis Chamberlain <mcgrof@kernel.org>,
+        Hongchen Zhang <zhanghongchen@loongson.cn>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        "Christian Brauner (Microsoft)" <brauner@kernel.org>,
+        David Howells <dhowells@redhat.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Eric Dumazet <edumazet@google.com>,
+        "Fabio M. De Francesco" <fmdefrancesco@gmail.com>,
+        Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+        maobibo <maobibo@loongson.cn>,
+        Matthew Wilcox <willy@infradead.org>,
+        Sedat Dilek <sedat.dilek@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Jens,
+On Tue, Feb 7, 2023 at 6:06 AM Dan Carpenter <error27@gmail.com> wrote:
+>
+> block/blk-crypto-profile.c:382 __blk_crypto_evict_key() warn: sleeping in atomic context
+> block/blk-crypto-profile.c:390 __blk_crypto_evict_key() warn: sleeping in atomic context
 
-> [!] Jens: Note that there's a window in the linux-block/for-next branch
->     with a memory corruptor bug that someone bisecting might hit.  These
->     two patches would be better pushed to the front of my iov-extract
->     branch to eliminate the window.  Would it be possible for you to
->     replace my branch in your for-next branch at this point?
+Yeah, that looks very real, but doesn't really seem to be a block bug.
 
-In case you would prefer to do this, I've updated my iov-extract[*] branch=
- to
-put these two patches at the bottom and pushed the other patches back on t=
-op
-of it, dropping the pipe extraction bits from the iov_iter_extract_pages()
-patch in case you want to use that.
+__put_super() has a big comment that it's called under the sb_lock
+spinlock, so it's all in atomic context, but then:
 
-I've also removed the FOLL_PIN that was in that patch as it's implied by
-calling pin_user_pages_fast() and is being made private to mm/.
+> -> __put_super()
+>    -> fscrypt_destroy_keyring()
+>       -> fscrypt_put_master_key_activeref()
+>          -> fscrypt_destroy_prepared_key()
+>             -> fscrypt_destroy_inline_crypt_key()
+>                -> blk_crypto_evict_key()
 
-I can also repost the full set of patches if that would be useful.
+and we have a comment in __blk_crypto_evict_key() that it must be
+called in "process context".
 
-David
+However, the *normal* unmount sequence does all the cleanup *before*
+it gets sb_lock, and calls fscrypt_destroy_keyring() in process
+context, which is probably why it never triggers in practice, because
+the "last put" is normally there, not in __put_super.
 
-[*] https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/=
-log/?h=3Diov-extract
+Eric? Al?
 
+It smells like __put_super() may need to do some parts delayed, not
+under sb_lock.
+
+              Linus
