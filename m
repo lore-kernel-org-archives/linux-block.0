@@ -2,99 +2,93 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC161C636CD
-	for <linux-block@archiver.kernel.org>; Tue,  7 Feb 2023 14:23:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09922C636CD
+	for <linux-block@archiver.kernel.org>; Tue,  7 Feb 2023 14:33:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232391AbjBGOX4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 7 Feb 2023 09:23:56 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36972 "EHLO
+        id S232776AbjBGOdl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 7 Feb 2023 09:33:41 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45620 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232372AbjBGOXz (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 7 Feb 2023 09:23:55 -0500
-Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E8ABA1420F
-        for <linux-block@vger.kernel.org>; Tue,  7 Feb 2023 06:23:48 -0800 (PST)
-Received: by mail-pl1-x62a.google.com with SMTP id v23so15804268plo.1
-        for <linux-block@vger.kernel.org>; Tue, 07 Feb 2023 06:23:48 -0800 (PST)
+        with ESMTP id S232308AbjBGOcz (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 7 Feb 2023 09:32:55 -0500
+Received: from mail-pg1-x532.google.com (mail-pg1-x532.google.com [IPv6:2607:f8b0:4864:20::532])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B841B3A87A
+        for <linux-block@vger.kernel.org>; Tue,  7 Feb 2023 06:30:09 -0800 (PST)
+Received: by mail-pg1-x532.google.com with SMTP id 78so10530537pgb.8
+        for <linux-block@vger.kernel.org>; Tue, 07 Feb 2023 06:30:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20210112.gappssmtp.com; s=20210112;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=wP4KJ+sUVy984XavI9TlLdBqFbJPagaCXgo+4pa+BK0=;
-        b=dOzq7fmhkX0C94KaiqP3PAxTwWZeiv0eDwIEB9yzreSN75EPMu9zZdWxvT4siUoRk/
-         jLyf+gWgipAEvrh5KV9dBzDcg6o2BiMHSb1vs3S3kX1LszcohTbKPNdhCH/tXhiXqWT1
-         4Hq748sI/E4vpWz/2VI6E6X7yAm2V+HDawN6woX8bAMvb0AOj1CLsAGnLA7Z6SoFFBRl
-         J5QMh5L+kfm9kVMmbZG9zDCed82YtXY1A88oS2r6u2jniV12hGnzd2DxpXn943O+MC03
-         zrdL+dPHoNzzS4zg7QVM1QdCwfgkatXP8+NFdukB1/lQZAztG3sk9S98Iozlv8wEXWVL
-         DP3A==
+        bh=TCoGFFPpMbOza9FdCyyz4Zw1S0IHVLItXuTN6BD2F0E=;
+        b=NAFAFkZzNFYY6iP/bIFblEQaqKIpHmf1oMNAOirUnWbLeHBw4ZbvCX0Ob9vkQJ2QNU
+         cPOua6c5tx0QrTPSHJX9ZrhRhu4HuB/8yyJLly5cplgSprl6x5sadjHFQJaODAZ2xT3D
+         +1R/LCFwziNu/mUP+FNT/jdyhGqKcnYh6NPtXYb/kw9Wawxm1wfK9orvb29YpZpfL9Gd
+         PJFHwpoDvx+t4DkxijicPQ0MQRVDaaUz7Ytku0ECDo8ZkHYub0UMUTkZbJ2Bp2ruiwx0
+         PlIPdl2kWBh6YHsjm2PCNvLvBf7UHFSkl+r9lI86/uWTKx4IgxUkXXl7EdFzNs6Emejq
+         pafw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=wP4KJ+sUVy984XavI9TlLdBqFbJPagaCXgo+4pa+BK0=;
-        b=F9XjOHAWQpqEVettIuC6GC51FY+hJUjsXVdP18zMcsQjHxWVFAh97oJ6ALjBaUU3WY
-         09ol9SQ9R5I9UVB41Otn6h0NrOJfQV0uwy78xxYe1RBXN7/CXcC1Ud79xcGTmtUjcCdq
-         Nnc+NnArgB7au4El0j985orCBDVKmWrI05XhN5shJioEdkjkznR21il7xohWiitFADkf
-         GHJTQjxjUSZUPJM/J66H8XjCQO6STChSApybWJOWxTjUigREWWEIIcgIjRmrv24MvCBd
-         szrPr83/NdQqbS11WNu4DzHledLYTEvUfov/VErMF7JIORn64hcqCE6VURd4pHKayDUe
-         B98A==
-X-Gm-Message-State: AO0yUKVBTQFI2CUpjEKzFsGq0m6uHVC0c4gJjVRPhno0AkMcu/+E4xL+
-        Tp51x05H7rGn9r+9JIegYg/UZ2suflP2lP/A
-X-Google-Smtp-Source: AK7set/LK2NJA8P7Ldh16A3GC7dgJXnpinpBlMVgFhhnYWxbKN2ji0deVq9tc0pA87XfR9cSIuMhrQ==
-X-Received: by 2002:a05:6a20:690c:b0:be:9fff:48e3 with SMTP id q12-20020a056a20690c00b000be9fff48e3mr4174015pzj.5.1675779828395;
-        Tue, 07 Feb 2023 06:23:48 -0800 (PST)
+        bh=TCoGFFPpMbOza9FdCyyz4Zw1S0IHVLItXuTN6BD2F0E=;
+        b=YRiciNdnoPKl2QKqiepQ645w8uesU4ntduGdMcG8iRWVIQ9Y/nFL8TV+0Ej6xjYV2p
+         nGJIid+umFgKbvZaTPlOrEMWQ8C43AB6Wfn+8Z9ST6CNO9LQJYBPU9kSbjvjFPPU5Rnz
+         r0lBLYCzdM/Gk63a+mGgELqTm/E8W47t8FA0MSbV1I5WoSLSzA1pD+oZ+wZE8P1U0Ybi
+         ZFT6n9dbBFy5/Xjf+cIhrzzFbjthQtAQkIjDmnxDoBzEIEbyXXdqk1AIBGfKWvBe69hN
+         5shEBBHsyyVfolBfCuWjfDVRmoW084Cn0VqGJh0IzWiFC0S8ZI59TRU8cVN8R/0fDgPU
+         nOTQ==
+X-Gm-Message-State: AO0yUKVVTUy6KVqwA48RpYAC6G3dp1fXUtVoHq/V50e10/wx0dGdrNuI
+        9JYOcNGrtXqv5/AsS0OLUEPAlg==
+X-Google-Smtp-Source: AK7set8Ar8Nl3tSE07P4Yp6yz07hhOu687ZD4iO2wfG9LIbz068ml6BrS7sKxkHLG4MyszWAW+79Qw==
+X-Received: by 2002:a62:cd84:0:b0:593:dc7c:98b1 with SMTP id o126-20020a62cd84000000b00593dc7c98b1mr3180405pfg.3.1675780209081;
+        Tue, 07 Feb 2023 06:30:09 -0800 (PST)
 Received: from [192.168.1.136] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id e15-20020a63ae4f000000b004f06ccd76bcsm8047588pgp.70.2023.02.07.06.23.47
+        by smtp.gmail.com with ESMTPSA id m20-20020aa78a14000000b005a77b030b5csm1700377pfa.88.2023.02.07.06.30.07
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 07 Feb 2023 06:23:47 -0800 (PST)
-Message-ID: <115b0b15-98de-3615-064e-3de15b40895a@kernel.dk>
-Date:   Tue, 7 Feb 2023 07:23:46 -0700
+        Tue, 07 Feb 2023 06:30:08 -0800 (PST)
+Message-ID: <d9247209-bca2-4650-b1c7-72e77990411d@kernel.dk>
+Date:   Tue, 7 Feb 2023 07:30:07 -0700
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
  Thunderbird/102.7.1
-Subject: Re: [GIT PULL] nvme updates for Linux 6.3
+Subject: Re: [PATCH 0/2] iomap, splice: Fix DIO/splice_read race memory
+ corruptor and kill off ITER_PIPE
 Content-Language: en-US
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
-References: <Y+Hsk7eOObSafEkz@infradead.org>
+To:     David Howells <dhowells@redhat.com>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Christoph Hellwig <hch@infradead.org>
+Cc:     Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>,
+        Jeff Layton <jlayton@kernel.org>,
+        David Hildenbrand <david@redhat.com>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Logan Gunthorpe <logang@deltatee.com>,
+        Hillf Danton <hdanton@sina.com>, linux-fsdevel@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org
+References: <20230207133916.3109147-1-dhowells@redhat.com>
 From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <Y+Hsk7eOObSafEkz@infradead.org>
+In-Reply-To: <20230207133916.3109147-1-dhowells@redhat.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2/6/23 11:15 PM, Christoph Hellwig wrote:
-> The following changes since commit 2d97930d74b12467fd5f48d8560e48c1cf5edcb1:
-> 
->   block: Remove mm.h from bvec.h (2023-01-31 09:21:50 -0700)
-> 
-> are available in the Git repository at:
-> 
->   git://git.infradead.org/nvme.git tags/nvme-6.3-2023-02-07
-> 
-> for you to fetch changes up to baff6491448b487e920faaa117e432989cbafa89:
-> 
->   nvme: mask CSE effects for security receive (2023-02-01 16:10:10 +0100)
-> 
-> ----------------------------------------------------------------
-> nvme updates for Linux 6.3
-> 
->  - small improvements to the logging functionality (Amit Engel)
->  - authentication cleanups (Hannes Reinecke)
->  - cleanup and optimize the DMA mapping cod in the PCIe driver
->    (Keith Busch)
->  - work around the command effects for Format NVM (Keith Busch)
->  - misc cleanups (Keith Busch, Christoph Hellwig)
+On 2/7/23 6:39?AM, David Howells wrote:
+> [!] Jens: Note that there's a window in the linux-block/for-next branch
+>     with a memory corruptor bug that someone bisecting might hit.  These
+>     two patches would be better pushed to the front of my iov-extract
+>     branch to eliminate the window.  Would it be possible for you to
+>     replace my branch in your for-next branch at this point?
 
-Pulled, thanks.
+I'll check in on these two patches later today, but just wanted to say
+that we can definitely just toss the existing branch, and setup a new
+one based on -rc7 that adds these two first, then pulls in the other
+branch on top to avoid this. Not a big deal, and warranted in this case.
 
 -- 
 Jens Axboe
-
 
