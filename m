@@ -2,38 +2,68 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 69E7BC636D3
-	for <linux-block@archiver.kernel.org>; Tue,  7 Feb 2023 17:53:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DDDEC636D3
+	for <linux-block@archiver.kernel.org>; Tue,  7 Feb 2023 18:25:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231717AbjBGRxm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 7 Feb 2023 12:53:42 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53054 "EHLO
+        id S232257AbjBGSZx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 7 Feb 2023 13:25:53 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47612 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232185AbjBGRx2 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 7 Feb 2023 12:53:28 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A35611716D;
-        Tue,  7 Feb 2023 09:53:18 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 4938860F92;
-        Tue,  7 Feb 2023 17:53:18 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 69AD5C433EF;
-        Tue,  7 Feb 2023 17:53:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1675792397;
-        bh=TDCxXpt5lc6BmBbmRUDOI07W1g4bR6Z7/dko3THjFnA=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=ZbLCCNIZOXyee6tMO7uwU0TwdaRe0I2KFVDaFPRv3q/ERNdTV0fqsi8yWeD3JiARj
-         jfNbeHLOnHyqFiUV83OrLBKxUCrc+sz1XQG4bGz4UWUNa0oYcqH9tdSynO8pNmkO3b
-         UaYF5A87GqgoRTInMSdlVfXQDk2yIu4jBwkD6TID7NNWGc7S9x39QZ1lOuKqGVoGLa
-         iwROdr/nLNEJKUM9or/reu1MEfA3VQSbdkS+8v8KqHW5XW1B3Ry+B676CAfTEB+X1j
-         0T3Tt+elQzlc0erHPJnWy2NCULKSkqAwD6h+GlL2LjRq/EUSkvw6bXeSlrf793o5ja
-         l75fMqzzKfiBw==
-Date:   Tue, 7 Feb 2023 17:53:01 +0000
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Linus Torvalds <torvalds@linux-foundation.org>
+        with ESMTP id S232269AbjBGSZk (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 7 Feb 2023 13:25:40 -0500
+Received: from mail-ej1-x630.google.com (mail-ej1-x630.google.com [IPv6:2a00:1450:4864:20::630])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BCE2265A6
+        for <linux-block@vger.kernel.org>; Tue,  7 Feb 2023 10:25:08 -0800 (PST)
+Received: by mail-ej1-x630.google.com with SMTP id p26so44797068ejx.13
+        for <linux-block@vger.kernel.org>; Tue, 07 Feb 2023 10:25:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linux-foundation.org; s=google;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=pizbVdzIu8iuBwFy6mvT//fygI8uGhRT/vJXKJ1LaVY=;
+        b=Cbdf46oletXuJOCJFIQa/rXoWMh2VweqM3WV0BdriyXCVvt01UIAIUTfYvqvj42FI2
+         dGIfD10JkRckky68XPz+miwRmw315N2EVOwurVjhjAEG1ALANVLXtxKLg2HenyvlPIf3
+         BQ+5TFXwBlTTO9jEL5tKFIsun1OjHvxjw507I=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=pizbVdzIu8iuBwFy6mvT//fygI8uGhRT/vJXKJ1LaVY=;
+        b=sOJoPHhpYRR/mL39k4C18YNRDLdt2YU9jr8HhvDxh45U+LZJDPFCqxsm0JMDejIpj3
+         g2rbU2/D1Rr5Y97ggL0dhvvNTAtVkW0VF2CSOZ6/r6GbaQIoGZ9OhWtQbt2CI74nPQHo
+         IBBmxaQ67kPbxrsY4O40Je8PryPSeha4p+5tvCwewMXXbYcRQ8hi49d0DdO+kiVmYUyq
+         SMWjRCtGAeIKrVKQMm4cqMhcWlAaoKxqWixvEda44WZM2OneP3i+iNnrUnX1Cf318qD0
+         CY0OOyCKeJRHQ1LqPCQkOO2ln17NJJwUuwXmoKNt1iK3SXuWU5Zep9kNSHiLGy4jaJ0I
+         n4Vw==
+X-Gm-Message-State: AO0yUKW6Vi2OXmm4i/MzssE+tmDu6j9znbnByYJtc3DGN85XfGJO5Bi9
+        zPfh+BTLBZlmVh7OvbNFXLOycEmkmoqvxQ9IFJeA6w==
+X-Google-Smtp-Source: AK7set8Cy2XARWhbNPC1Qf9lCt7YnvJ7ThEl/BSWby5NcWNS9fvFgTeME69E+SEa5r/h1Vu9onU5fw==
+X-Received: by 2002:a17:906:da1b:b0:86d:7c2d:f65b with SMTP id fi27-20020a170906da1b00b0086d7c2df65bmr4355732ejb.27.1675794304730;
+        Tue, 07 Feb 2023 10:25:04 -0800 (PST)
+Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com. [209.85.218.41])
+        by smtp.gmail.com with ESMTPSA id v21-20020a170906339500b008838b040454sm7217551eja.95.2023.02.07.10.25.02
+        for <linux-block@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 07 Feb 2023 10:25:02 -0800 (PST)
+Received: by mail-ej1-f41.google.com with SMTP id ml19so45074405ejb.0
+        for <linux-block@vger.kernel.org>; Tue, 07 Feb 2023 10:25:02 -0800 (PST)
+X-Received: by 2002:a17:906:4e46:b0:87a:7098:ca09 with SMTP id
+ g6-20020a1709064e4600b0087a7098ca09mr970336ejw.78.1675794302170; Tue, 07 Feb
+ 2023 10:25:02 -0800 (PST)
+MIME-Version: 1.0
+References: <20230129060452.7380-1-zhanghongchen@loongson.cn>
+ <CAHk-=wjw-rrT59k6VdeLu4qUarQOzicsZPFGAO5J8TKM=oukUw@mail.gmail.com>
+ <Y+EjmnRqpLuBFPX1@bombadil.infradead.org> <4ffbb0c8-c5d0-73b3-7a4e-2da9a7b03669@inria.fr>
+ <Y+Ja5SRs886CEz7a@kadam> <CAHk-=wg6ohuyrmLJYTfEpDbp2Jwnef54gkcpZ3-BYgy4C6UxRQ@mail.gmail.com>
+ <Y+KP/fAQjawSofL1@gmail.com>
+In-Reply-To: <Y+KP/fAQjawSofL1@gmail.com>
+From:   Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Tue, 7 Feb 2023 10:24:45 -0800
+X-Gmail-Original-Message-ID: <CAHk-=wgmZDqCOynfiH4NFoL50f4+yUjxjp0sCaWS=xUmy731CQ@mail.gmail.com>
+Message-ID: <CAHk-=wgmZDqCOynfiH4NFoL50f4+yUjxjp0sCaWS=xUmy731CQ@mail.gmail.com>
+Subject: Re: block: sleeping in atomic warnings
+To:     Eric Biggers <ebiggers@kernel.org>
 Cc:     Dan Carpenter <error27@gmail.com>, linux-block@vger.kernel.org,
         Julia Lawall <julia.lawall@inria.fr>,
         Luis Chamberlain <mcgrof@kernel.org>,
@@ -50,59 +80,32 @@ Cc:     Dan Carpenter <error27@gmail.com>, linux-block@vger.kernel.org,
         maobibo <maobibo@loongson.cn>,
         Matthew Wilcox <willy@infradead.org>,
         Sedat Dilek <sedat.dilek@gmail.com>
-Subject: Re: block: sleeping in atomic warnings
-Message-ID: <Y+KP/fAQjawSofL1@gmail.com>
-References: <20230129060452.7380-1-zhanghongchen@loongson.cn>
- <CAHk-=wjw-rrT59k6VdeLu4qUarQOzicsZPFGAO5J8TKM=oukUw@mail.gmail.com>
- <Y+EjmnRqpLuBFPX1@bombadil.infradead.org>
- <4ffbb0c8-c5d0-73b3-7a4e-2da9a7b03669@inria.fr>
- <Y+Ja5SRs886CEz7a@kadam>
- <CAHk-=wg6ohuyrmLJYTfEpDbp2Jwnef54gkcpZ3-BYgy4C6UxRQ@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAHk-=wg6ohuyrmLJYTfEpDbp2Jwnef54gkcpZ3-BYgy4C6UxRQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Feb 07, 2023 at 08:15:04AM -0800, Linus Torvalds wrote:
-> On Tue, Feb 7, 2023 at 6:06 AM Dan Carpenter <error27@gmail.com> wrote:
-> >
-> > block/blk-crypto-profile.c:382 __blk_crypto_evict_key() warn: sleeping in atomic context
-> > block/blk-crypto-profile.c:390 __blk_crypto_evict_key() warn: sleeping in atomic context
-> 
-> Yeah, that looks very real, but doesn't really seem to be a block bug.
-> 
-> __put_super() has a big comment that it's called under the sb_lock
-> spinlock, so it's all in atomic context, but then:
-> 
-> > -> __put_super()
-> >    -> fscrypt_destroy_keyring()
-> >       -> fscrypt_put_master_key_activeref()
-> >          -> fscrypt_destroy_prepared_key()
-> >             -> fscrypt_destroy_inline_crypt_key()
-> >                -> blk_crypto_evict_key()
-> 
-> and we have a comment in __blk_crypto_evict_key() that it must be
-> called in "process context".
-> 
-> However, the *normal* unmount sequence does all the cleanup *before*
-> it gets sb_lock, and calls fscrypt_destroy_keyring() in process
-> context, which is probably why it never triggers in practice, because
-> the "last put" is normally there, not in __put_super.
-> 
-> Eric? Al?
-> 
-> It smells like __put_super() may need to do some parts delayed, not
-> under sb_lock.
-> 
+On Tue, Feb 7, 2023 at 9:53 AM Eric Biggers <ebiggers@kernel.org> wrote:
+>
+> It's a false positive.  See the comment above fscrypt_destroy_keyring()
 
-It's a false positive.  See the comment above fscrypt_destroy_keyring(), which
-is meant to explain this, though I can update the comment to be clearer.  If the
-filesystem has been mounted, then fscrypt_destroy_keyring() is called from
-generic_shutdown_super(), which can sleep, and the call from __put_super() is a
-no-op.  If the filesystem has not been mounted, then the call from __put_super()
-is needed, but blk_crypto_evict_key() can never be executed in that case.
+Hmm. Ok. Unfortunate.
 
-- Eric
+>  If the filesystem has not been mounted, then the call from __put_super()
+> is needed, but blk_crypto_evict_key() can never be executed in that case.
+
+It's not all that clear that some *other* error might not have
+happened to keep the mount from actually succeeding, but after the
+keys have been instantiated?
+
+IOW, what's the thing that makes "blk_crypto_evict_key() can never be
+executed in that case" be obvious?
+
+I think _that_ is what might want a comment, about how we always call
+generic_shutdown_super() before the last put_super() happens.
+
+It does seem like Dan's automated checks could be useful, but if
+there's no sane way to avoid the false positives, it's always going to
+be a lot of noise ;(
+
+           Linus
