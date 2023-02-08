@@ -2,68 +2,103 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 57353C05027
-	for <linux-block@archiver.kernel.org>; Wed,  8 Feb 2023 17:22:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D3092C636D3
+	for <linux-block@archiver.kernel.org>; Wed,  8 Feb 2023 17:53:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231740AbjBHRWF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 8 Feb 2023 12:22:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53406 "EHLO
+        id S230446AbjBHRxq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 8 Feb 2023 12:53:46 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60816 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231844AbjBHRV4 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Feb 2023 12:21:56 -0500
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C442AD3D;
-        Wed,  8 Feb 2023 09:21:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=hW5i73pe8pnUfUYDL1bt63KL1qTJ5SbNKkdlGg3uo4g=; b=tSIp+M+Dh97ieUihW36Xe3Tg1N
-        czULo45mLjiF0C6oMWsgo7vv2TYg6wM7AtlLz3Y8XwQRHFzA2AIPQXD5NniJDOYcPWmDHyzVxuFQo
-        Ux0ioFgtU7MetMymkrkZ7y9pXX3vb2wXN+QZlAcy1a4ybiaOZfQsqSKj5/2K077o/Wx4j8Q06alP2
-        UWsNMf6LWKGpw/esuaGwaOx69uVMTn6CNA6WbXTY2wYLw2HjTIpDuoqqr0hBqlwnTmZz266TRcPak
-        sEML8oQe5uhLP2bymeBTf776sY4Ev/QyK3Y/r0g4Wt0+ByW1qjuaxYjSQCsoJy6/hNo/sX3RWbzeU
-        nm4gXSJw==;
-Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1pPo8O-001PQr-0w; Wed, 08 Feb 2023 17:21:28 +0000
-Date:   Wed, 8 Feb 2023 17:21:27 +0000
-From:   Matthew Wilcox <willy@infradead.org>
-To:     David Howells <dhowells@redhat.com>
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        Al Viro <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>,
-        Jeff Layton <jlayton@kernel.org>,
-        David Hildenbrand <david@redhat.com>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        Hillf Danton <hdanton@sina.com>, linux-fsdevel@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org,
-        syzbot+a440341a59e3b7142895@syzkaller.appspotmail.com,
-        Christoph Hellwig <hch@lst.de>,
-        John Hubbard <jhubbard@nvidia.com>
-Subject: Re: [PATCH v12 01/10] vfs, iomap: Fix generic_file_splice_read() to
- avoid reversion of ITER_PIPE
-Message-ID: <Y+PaF7q10xSoqynj@casper.infradead.org>
-References: <Y+MydH2HZ7ihITli@infradead.org>
- <20230207171305.3716974-1-dhowells@redhat.com>
- <20230207171305.3716974-2-dhowells@redhat.com>
- <176199.1675872591@warthog.procyon.org.uk>
+        with ESMTP id S231182AbjBHRxp (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Feb 2023 12:53:45 -0500
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2BAB59E2;
+        Wed,  8 Feb 2023 09:53:44 -0800 (PST)
+Received: by mail-pl1-f182.google.com with SMTP id k13so20227761plg.0;
+        Wed, 08 Feb 2023 09:53:44 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=UHYPrSiTkVKIlfo8HfMdMKbV5juD4qgKqM8oSnLweE8=;
+        b=sQwEsm+G5eaUbb7aY1mSz7DJb8FYCFum2/YVoB4IJIWjliqWRFDlUam0z9NiKPYfl8
+         1tx0ZjD+WdqUjwWbtzjxx7ER0S2E5GXcsunYeS4CrkWjR9XYMWLqDJ4nEvPJCSNqIvKb
+         gfN6bySy569/MsWsXFEAkVF4qIQST4IGSFtaJH+fsb9We1LUyqwXmJ3fpzv1DjUV6AIa
+         PSgDdeytsXpAHk5wZ2tP94Rpr4UZo8amFj1z7QqvKjnOUKQEtRiAwf74C3i1O99Tgher
+         6dsKD1+ZmRXMW33Qm45LSgQRcu6PLgAZi8GhupiKbkeyVEY76bLEapaRwoODq13AOYgW
+         mzMw==
+X-Gm-Message-State: AO0yUKVCqbh/42wON6JxA3liBwlzgya8lCkqcJMjXdGNC+g/UpnwRqxD
+        1plw+3ptQzc+rGEA/FGB//Y=
+X-Google-Smtp-Source: AK7set/GrvVfRVcZ26t5iBnwWqMEPtJBrPM9dsurSPWoOG+E6492+ASW9DmosYVxi30oZtwSF3UQFQ==
+X-Received: by 2002:a17:902:e1c4:b0:195:e92e:c4d3 with SMTP id t4-20020a170902e1c400b00195e92ec4d3mr5589893pla.46.1675878824157;
+        Wed, 08 Feb 2023 09:53:44 -0800 (PST)
+Received: from ?IPV6:2620:15c:211:201:869f:66a2:40c:445d? ([2620:15c:211:201:869f:66a2:40c:445d])
+        by smtp.gmail.com with ESMTPSA id u2-20020a170902a60200b001962858f990sm11370358plq.164.2023.02.08.09.53.42
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 08 Feb 2023 09:53:43 -0800 (PST)
+Message-ID: <7fcd4c38-ccbe-6411-e424-a57595ad9c0b@acm.org>
+Date:   Wed, 8 Feb 2023 09:53:41 -0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <176199.1675872591@warthog.procyon.org.uk>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.6.0
+Subject: Re: [PATCH] blk-ioprio: Introduce promote-to-rt policy
+Content-Language: en-US
+To:     Jan Kara <jack@suse.cz>
+Cc:     Hou Tao <houtao@huaweicloud.com>, linux-block@vger.kernel.org,
+        Jens Axboe <axboe@kernel.dk>, cgroups@vger.kernel.org,
+        Tejun Heo <tj@kernel.org>, Zefan Li <lizefan.x@bytedance.com>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        Jonathan Corbet <corbet@lwn.net>, linux-kernel@vger.kernel.org,
+        linux-doc@vger.kernel.org, houtao1@huawei.com
+References: <20230201045227.2203123-1-houtao@huaweicloud.com>
+ <8c068af3-7199-11cf-5c69-a523c7c22d9a@acm.org>
+ <4f7dcb3e-2d5a-cae3-0e1c-a82bcc3d2217@huaweicloud.com>
+ <b6b3c498-e90b-7d1f-6ad5-a31334e433ae@acm.org>
+ <beb7782e-72a4-c350-3750-23a767c88753@huaweicloud.com>
+ <aedc240d-7c9e-248a-52d2-c9775f3e8ca1@acm.org>
+ <20230208134345.77bdep3kzp52haxu@quack3>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20230208134345.77bdep3kzp52haxu@quack3>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Feb 08, 2023 at 04:09:51PM +0000, David Howells wrote:
-> @@ -2688,7 +2689,7 @@ ssize_t filemap_read(struct kiocb *iocb, struct iov_iter *iter,
->  		if (unlikely(iocb->ki_pos >= i_size_read(inode)))
->  			break;
->  
-> -		error = filemap_get_pages(iocb, iter, &fbatch);
-> +		error = filemap_get_pages(iocb, iov_iter_count(iter), &fbatch);
+On 2/8/23 05:43, Jan Kara wrote:
+> On Fri 03-02-23 11:45:32, Bart Van Assche wrote:
+>> On 2/2/23 17:48, Hou Tao wrote:
+>>> I don't get it on how to remove IOPRIO_POL_PROMOTION when calculating the final
+>>> ioprio for bio. IOPRIO_POL_PROMOTION is not used for IOPRIO_CLASS values but
+>>> used to determinate on how to calculate the final ioprio for bio: choosing the
+>>> maximum or minimum between blkcg ioprio and original bio bi_ioprio.
+>>
+>> Do the block layer code changes shown below implement the functionality
+>> that you need?
+> 
+> Just one question guys: So with my a78418e6a04c ("block: Always initialize
+> bio IO priority on submit") none-to-rt policy became effectively a noop as
+> Hou properly noticed. Are we aware of any users that were broken by this?
+> Shouldn't we rather fix the code so that none-to-rt starts to operate
+> correctly again? Or maybe change the none-to-rt meaning to be actually
+> promote-to-rt?
+> 
+> I have to admit I'm wondering a bit what was the intended usecase behind
+> the introduction of none-to-rt policy. Can someone elaborate? promote-to-rt
+> makes some sense to me - we have a priviledged cgroup we want to provide
+> low latency access to IO but none-to-rt just does not make much sense to
+> me...
 
-What's the point in iov_iter_count() anyway?  It's more characters
-than iter->count, so why not use it directly?
+Hi Jan,
+
+The test results I shared some time ago show that IOPRIO_CLASS_NONE was 
+the default I/O priority two years ago (see also 
+https://lore.kernel.org/linux-block/20210927220328.1410161-5-bvanassche@acm.org/). 
+The none-to-rt policy increases the priority of bio's that have not been 
+assigned an I/O priority to RT. Does this answer your question?
+
+Thanks,
+
+Bart.
+
