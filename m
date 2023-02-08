@@ -2,98 +2,110 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CFCC4C636CC
-	for <linux-block@archiver.kernel.org>; Wed,  8 Feb 2023 03:15:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 40AE4C636CD
+	for <linux-block@archiver.kernel.org>; Wed,  8 Feb 2023 03:24:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230351AbjBHDPd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 7 Feb 2023 22:15:33 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40766 "EHLO
+        id S230236AbjBHDYX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 7 Feb 2023 22:24:23 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43544 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230196AbjBHDPd (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 7 Feb 2023 22:15:33 -0500
+        with ESMTP id S229573AbjBHDYW (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 7 Feb 2023 22:24:22 -0500
 Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85C9843453;
-        Tue,  7 Feb 2023 19:15:30 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F29E43587;
+        Tue,  7 Feb 2023 19:24:20 -0800 (PST)
 Received: from mail02.huawei.com (unknown [172.30.67.143])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4PBQ9T1Sfgz4f3pGD;
-        Wed,  8 Feb 2023 11:15:25 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-        by APP3 (Coremail) with SMTP id _Ch0CgCnUyHNE+NjSOS3Cw--.37934S3;
-        Wed, 08 Feb 2023 11:15:27 +0800 (CST)
-Subject: Re: block: sleeping in atomic warnings
-To:     Jens Axboe <axboe@kernel.dk>, Dan Carpenter <error27@gmail.com>,
-        linux-block@vger.kernel.org
-Cc:     Julia Lawall <julia.lawall@inria.fr>,
-        Luis Chamberlain <mcgrof@kernel.org>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Hongchen Zhang <zhanghongchen@loongson.cn>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        "Christian Brauner (Microsoft)" <brauner@kernel.org>,
-        David Howells <dhowells@redhat.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Eric Dumazet <edumazet@google.com>,
-        "Fabio M. De Francesco" <fmdefrancesco@gmail.com>,
-        Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-        maobibo <maobibo@loongson.cn>,
-        Matthew Wilcox <willy@infradead.org>,
-        Sedat Dilek <sedat.dilek@gmail.com>,
-        "yukuai (C)" <yukuai3@huawei.com>
-References: <20230129060452.7380-1-zhanghongchen@loongson.cn>
- <CAHk-=wjw-rrT59k6VdeLu4qUarQOzicsZPFGAO5J8TKM=oukUw@mail.gmail.com>
- <Y+EjmnRqpLuBFPX1@bombadil.infradead.org>
- <4ffbb0c8-c5d0-73b3-7a4e-2da9a7b03669@inria.fr> <Y+Ja5SRs886CEz7a@kadam>
- <4321724d-9a24-926c-5d2d-5d5d902bda72@kernel.dk>
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4PBQMh1fySz4f3tpX;
+        Wed,  8 Feb 2023 11:24:16 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.175.127.227])
+        by APP3 (Coremail) with SMTP id _Ch0CgDX0R_dFeNj8Tu4Cw--.19123S4;
+        Wed, 08 Feb 2023 11:24:14 +0800 (CST)
 From:   Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <339bf113-3ac1-7e62-3cca-45bb8b53d291@huaweicloud.com>
-Date:   Wed, 8 Feb 2023 11:15:24 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+To:     tj@kernel.org, josef@toxicpanda.com, axboe@kernel.dk
+Cc:     cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, yukuai3@huawei.com,
+        yukuai1@huaweicloud.com, yi.zhang@huawei.com, yangerkun@huawei.com
+Subject: [PATCH -next] blk-iocost: fix sleeping in atomic warning for wbt_enable_default()
+Date:   Wed,  8 Feb 2023 11:48:03 +0800
+Message-Id: <20230208034803.2818155-1-yukuai1@huaweicloud.com>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-In-Reply-To: <4321724d-9a24-926c-5d2d-5d5d902bda72@kernel.dk>
-Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: _Ch0CgCnUyHNE+NjSOS3Cw--.37934S3
-X-Coremail-Antispam: 1UD129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7v73
-        VFW2AGmfu7bjvjm3AaLaJ3UjIYCTnIWjp_UUUYI7kC6x804xWl14x267AKxVW5JVWrJwAF
-        c2x0x2IEx4CE42xK8VAvwI8IcIk0rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII
-        0Yj41l84x0c7CEw4AK67xGY2AK021l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xv
-        wVC0I7IYx2IY6xkF7I0E14v26r4UJVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4
-        x0Y4vEx4A2jsIEc7CjxVAFwI0_GcCE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG
-        64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r
-        1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvEwIxGrwACI402YVCY1x02628vn2kI
-        c2xKxwCYjI0SjxkI62AI1cAE67vIY487MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4
-        AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE
-        17CEb7AF67AKxVW8ZVWrXwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMI
-        IF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_WFyUJVCq
-        3wCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCT
-        nIWIevJa73UjIFyTuYvjxUFDGOUUUUU
+X-CM-TRANSID: _Ch0CgDX0R_dFeNj8Tu4Cw--.19123S4
+X-Coremail-Antispam: 1UD129KBjvJXoW7Zw1fXr1xuw43ZFy5tFyDAwb_yoW8Cry5pF
+        W3GrnFya4IqFZ7Zr47JanFqw15GaykGryxCw1fG34aqw1ak3s2qa1vkry09F1kZFZ3AF45
+        XF48KF4UZa1vv3DanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUvF14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+        1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+        JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+        CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+        2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+        W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2
+        Y2ka0xkIwI1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4
+        xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43
+        MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I
+        0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWrJr0_WFyUJwCI42IY6I8E87Iv67AK
+        xVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvj
+        fUoOJ5UUUUU
 X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
+From: Yu Kuai <yukuai3@huawei.com>
 
-在 2023/02/08 2:31, Jens Axboe 写道:
+There are following smatch warning:
 
->> block/blk-wbt.c:843 wbt_init() warn: sleeping in atomic context
->> ioc_qos_write() <- disables preempt
->> -> wbt_enable_default()
->>     -> wbt_init()
-> 
-> Also definitely a bug.
-> 
+block/blk-wbt.c:843 wbt_init() warn: sleeping in atomic context
+ioc_qos_write() <- disables preempt
+-> wbt_enable_default()
+   -> wbt_init()
 
-This won't happen currently, wbt_init() will be called while
-initializing device, and later wbt_enable_devault() from iocost won't
-call wbt_init().
+wbt_init() will be called from wbt_enable_default() if wbt is not
+initialized, currently wbt is initialized in blk_register_queue(), hence
+wbt_init() will never be called from iocost and this warning is false
+positive.
 
-However, we might support rq_qos destruction dynamically in the
-future, I'll fix this warning.
+However, we might support rq_qos destruction dynamically in the future,
+and it's better to prevent that, hence move wbt_enable_default() outside
+'ioc->lock'. This is safe because queue is still freezed.
 
-Thanks,
-Kuai
+Reported-by: Dan Carpenter <error27@gmail.com>
+Link: https://lore.kernel.org/lkml/Y+Ja5SRs886CEz7a@kadam/
+Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+---
+ block/blk-iocost.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/block/blk-iocost.c b/block/blk-iocost.c
+index 7a2dc9dc8e3b..03bfe1dda07c 100644
+--- a/block/blk-iocost.c
++++ b/block/blk-iocost.c
+@@ -3279,11 +3279,9 @@ static ssize_t ioc_qos_write(struct kernfs_open_file *of, char *input,
+ 		blk_stat_enable_accounting(disk->queue);
+ 		blk_queue_flag_set(QUEUE_FLAG_RQ_ALLOC_TIME, disk->queue);
+ 		ioc->enabled = true;
+-		wbt_disable_default(disk);
+ 	} else {
+ 		blk_queue_flag_clear(QUEUE_FLAG_RQ_ALLOC_TIME, disk->queue);
+ 		ioc->enabled = false;
+-		wbt_enable_default(disk);
+ 	}
+ 
+ 	if (user) {
+@@ -3296,6 +3294,10 @@ static ssize_t ioc_qos_write(struct kernfs_open_file *of, char *input,
+ 	ioc_refresh_params(ioc, true);
+ 	spin_unlock_irq(&ioc->lock);
+ 
++	if (enable)
++		wbt_disable_default(disk);
++	else
++		wbt_enable_default(disk);
+ 	blk_mq_unquiesce_queue(disk->queue);
+ 	blk_mq_unfreeze_queue(disk->queue);
+ 
+-- 
+2.31.1
 
