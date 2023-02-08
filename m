@@ -2,102 +2,118 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AA822C6379F
-	for <linux-block@archiver.kernel.org>; Wed,  8 Feb 2023 13:45:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 62F11C636CC
+	for <linux-block@archiver.kernel.org>; Wed,  8 Feb 2023 14:13:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229512AbjBHNoe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 8 Feb 2023 08:44:34 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43970 "EHLO
+        id S231484AbjBHONV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 8 Feb 2023 09:13:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32824 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229539AbjBHNoB (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Feb 2023 08:44:01 -0500
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF9CB3E0BC;
-        Wed,  8 Feb 2023 05:43:47 -0800 (PST)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 670021F8B4;
-        Wed,  8 Feb 2023 13:43:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1675863826; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=WXjM/s4PhtaTVW4aiVsTAUAHDUvK2wieBkKbPD6AkWk=;
-        b=2D010aeo1gILwXKexBL/H6YeET0ts/vT4M7BCnWuKvynMFw5ep7OJ0Xa25MaH/hW5tWE1+
-        xa+9zp/k13p2fvffFznXRS+HNe8kUteOBo0xNsodoVXkiaeo4cU3FYezFAf/GWmkQtOF8Z
-        UIhQ36DDm0ysHsF12At4bZ6c/bpL/hI=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1675863826;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=WXjM/s4PhtaTVW4aiVsTAUAHDUvK2wieBkKbPD6AkWk=;
-        b=HYuwSpnsyaTUN5uRxgrezcT+Rs0EYLoKxKybHs0UMdQxjwcVFJPGjarxi1zBkQ9ciulsX7
-        2Ek8luOYzvi3URBQ==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 56F441358A;
-        Wed,  8 Feb 2023 13:43:46 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id Jq0bFRKn42OaDgAAMHmgww
-        (envelope-from <jack@suse.cz>); Wed, 08 Feb 2023 13:43:46 +0000
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-        id A287EA06D5; Wed,  8 Feb 2023 14:43:45 +0100 (CET)
-Date:   Wed, 8 Feb 2023 14:43:45 +0100
-From:   Jan Kara <jack@suse.cz>
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     Hou Tao <houtao@huaweicloud.com>, linux-block@vger.kernel.org,
-        Jan Kara <jack@suse.cz>, Jens Axboe <axboe@kernel.dk>,
-        cgroups@vger.kernel.org, Tejun Heo <tj@kernel.org>,
-        Zefan Li <lizefan.x@bytedance.com>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        Jonathan Corbet <corbet@lwn.net>, linux-kernel@vger.kernel.org,
-        linux-doc@vger.kernel.org, houtao1@huawei.com
-Subject: Re: [PATCH] blk-ioprio: Introduce promote-to-rt policy
-Message-ID: <20230208134345.77bdep3kzp52haxu@quack3>
-References: <20230201045227.2203123-1-houtao@huaweicloud.com>
- <8c068af3-7199-11cf-5c69-a523c7c22d9a@acm.org>
- <4f7dcb3e-2d5a-cae3-0e1c-a82bcc3d2217@huaweicloud.com>
- <b6b3c498-e90b-7d1f-6ad5-a31334e433ae@acm.org>
- <beb7782e-72a4-c350-3750-23a767c88753@huaweicloud.com>
- <aedc240d-7c9e-248a-52d2-c9775f3e8ca1@acm.org>
+        with ESMTP id S231354AbjBHONK (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Feb 2023 09:13:10 -0500
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9F7B4616A
+        for <linux-block@vger.kernel.org>; Wed,  8 Feb 2023 06:13:08 -0800 (PST)
+Received: from mail02.huawei.com (unknown [172.30.67.143])
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4PBhmG0qWHz4f3jMK
+        for <linux-block@vger.kernel.org>; Wed,  8 Feb 2023 22:13:02 +0800 (CST)
+Received: from [10.174.176.73] (unknown [10.174.176.73])
+        by APP3 (Coremail) with SMTP id _Ch0CgA35CHureNjbODRCw--.955S3;
+        Wed, 08 Feb 2023 22:13:04 +0800 (CST)
+Subject: Re: [PATCH] block: Do not reread partition table on exclusively open
+ device
+To:     Jan Kara <jack@suse.cz>, Yu Kuai <yukuai1@huaweicloud.com>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        "yukuai (C)" <yukuai3@huawei.com>
+References: <20221130175653.24299-1-jack@suse.cz>
+ <ada13b1b-dd2a-8be0-3b12-3470a086bbf6@huaweicloud.com>
+ <Y9kiltmuPSbRRLsO@infradead.org>
+ <92d53d6b-f83d-0767-4f6a-1b897b33b227@huaweicloud.com>
+ <Y9oFHssFz2obv83W@infradead.org>
+ <1901c3f0-da34-1df1-2443-3426282a6ecb@huaweicloud.com>
+ <1b5d3502-353d-8674-cd5d-79283fa8905d@huaweicloud.com>
+ <20230208120258.64yhqho252gaydmu@quack3>
+From:   Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <02e769f7-9a41-80bc-4e47-fa87c18a36b2@huaweicloud.com>
+Date:   Wed, 8 Feb 2023 22:13:02 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aedc240d-7c9e-248a-52d2-c9775f3e8ca1@acm.org>
+In-Reply-To: <20230208120258.64yhqho252gaydmu@quack3>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: _Ch0CgA35CHureNjbODRCw--.955S3
+X-Coremail-Antispam: 1UD129KBjvJXoW7ZFW7uw4fKFWfZryUCry3Jwb_yoW8AFWUpa
+        yrXFW3JFWDWryfuayUJ3WxGw15CrsrZry8JF1rG34Iyws8X395KF1Skaykua48W3ykW3y7
+        XF4Uua4vgF1rZrDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUkC14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+        1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4j
+        6r4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
+        Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
+        I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
+        4UM4x0Y48IcVAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwCYjI0SjxkI62AI1cAE67vI
+        Y487MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI
+        0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUAVWUtwCIc40Y
+        0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxV
+        WUJVW8JwCI42IY6xAIw20EY4v20xvaj40_WFyUJVCq3wCI42IY6I8E87Iv67AKxVWUJVW8
+        JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfUoOJ5UU
+        UUU
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri 03-02-23 11:45:32, Bart Van Assche wrote:
-> On 2/2/23 17:48, Hou Tao wrote:
-> > I don't get it on how to remove IOPRIO_POL_PROMOTION when calculating the final
-> > ioprio for bio. IOPRIO_POL_PROMOTION is not used for IOPRIO_CLASS values but
-> > used to determinate on how to calculate the final ioprio for bio: choosing the
-> > maximum or minimum between blkcg ioprio and original bio bi_ioprio.
+Hi,
+
+在 2023/02/08 20:02, Jan Kara 写道:
 > 
-> Do the block layer code changes shown below implement the functionality
-> that you need?
+> After some thought I don't like opencoding blkdev_get_by_dev() in disk_scan
+> partitions. But I agree Christoph's approach with blkdev_get_whole() does
+> not quite work either. We could propagate holder/owner into
+> blkdev_get_whole() to fix Christoph's check but still we are left with a
+> question what to do with GD_NEED_PART_SCAN set bit when we get into
+> blkdev_get_whole() and find out we are not elligible to rescan partitions.
+> Because then some exclusive opener later might be caught by surprise when
+> the partition rescan happens due to this bit being set from the past failed
+> attempt to rescan.
+> 
+> So what we could do is play a similar trick as we do in the loop device and
+> do in disk_scan_partitions():
+> 
+> 	/*
+> 	 * If we don't hold exclusive handle for the device, upgrade to it
+> 	 * here to avoid changing partitions under exclusive owner.
+> 	 */
+> 	if (!(mode & FMODE_EXCL)) {
+This is not necessary, all the caller make sure FMODE_EXCL is not set.
 
-Just one question guys: So with my a78418e6a04c ("block: Always initialize
-bio IO priority on submit") none-to-rt policy became effectively a noop as
-Hou properly noticed. Are we aware of any users that were broken by this?
-Shouldn't we rather fix the code so that none-to-rt starts to operate
-correctly again? Or maybe change the none-to-rt meaning to be actually
-promote-to-rt?
+> 		error = bd_prepare_to_claim(disk->part0, disk_scan_partitions);
+> 		if (error)
+> 			return error;
+> 	}
+ From what I see, if thread open device excl first, and then call ioctl()
+to reread partition, this will cause this ioctl() to fail?
 
-I have to admit I'm wondering a bit what was the intended usecase behind
-the introduction of none-to-rt policy. Can someone elaborate? promote-to-rt 
-makes some sense to me - we have a priviledged cgroup we want to provide
-low latency access to IO but none-to-rt just does not make much sense to
-me...
+> 	set_bit(GD_NEED_PART_SCAN, &disk->state);
+> 	bdev = blkdev_get_by_dev(disk_devt(disk), mode & ~FMODE_EXCL, NULL);
+> 	if (IS_ERR(bdev)) {
+> 		error = PTR_ERR(bdev);
+> 		goto abort;
+> 	}
+> 	blkdev_put(bdev, mode & ~FMODE_EXCL);
+> 	error = 0;
+> abort:
+> 	if (!(mode & FMODE_EXCL))
+> 		bd_abort_claiming(disk->part0, disk_scan_partitions);
+> 	return error;
+> 
+> So esentially we'll temporarily block any exlusive openers by claiming the
+> bdev while we set the GD_NEED_PART_SCAN and force partition rescan. What do
+> you think?
+> 
+> 								Honza
+> 
 
-								Honza
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
