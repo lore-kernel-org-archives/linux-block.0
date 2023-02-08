@@ -2,37 +2,36 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 089BEC636CC
-	for <linux-block@archiver.kernel.org>; Wed,  8 Feb 2023 16:20:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57353C05027
+	for <linux-block@archiver.kernel.org>; Wed,  8 Feb 2023 17:22:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229822AbjBHQUO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 8 Feb 2023 11:20:14 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35802 "EHLO
+        id S231740AbjBHRWF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 8 Feb 2023 12:22:05 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53406 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229508AbjBHQUN (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Feb 2023 11:20:13 -0500
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A520C10EC;
-        Wed,  8 Feb 2023 08:20:11 -0800 (PST)
+        with ESMTP id S231844AbjBHRV4 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Feb 2023 12:21:56 -0500
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C442AD3D;
+        Wed,  8 Feb 2023 09:21:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=LdWmKE8iSIX1JlD2STqVG0cGUOnOBTQ2AvkgJAV1Ucw=; b=mzpUA3HNhoAPzog8HOG696touj
-        O4bPToePR6BJZyqSoKQZwpXI3Sr/Aa/CM+ph4rCpAdCGtSo/xwCaX3Uv+A7K/BqUmm1J9kiW9vYLv
-        5vkbTBCBhEbhqkIBAW3P5qFZ1qioHcDKFj4IxB02xSbP0r41dIndR94DuXY43KOnM5ztcmz3+a1oz
-        xeA1ETJl8rK5BGdIbdtE7fs2iIBY0YOiQD6QoRArx69tYSAdfUTli5YiIP5HNZrZ2pDOJqgSh+nPY
-        wnbdumaj4MLlobdcYTMAHbGVXdZzwvuKoB6dBKSBiBh9EMoJragF8nZxpQ4zFqKW4tR0wOpMBCLgV
-        /EnT95QQ==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1pPnAq-00GEkU-2z; Wed, 08 Feb 2023 16:19:56 +0000
-Date:   Wed, 8 Feb 2023 08:19:56 -0800
-From:   Christoph Hellwig <hch@infradead.org>
+        bh=hW5i73pe8pnUfUYDL1bt63KL1qTJ5SbNKkdlGg3uo4g=; b=tSIp+M+Dh97ieUihW36Xe3Tg1N
+        czULo45mLjiF0C6oMWsgo7vv2TYg6wM7AtlLz3Y8XwQRHFzA2AIPQXD5NniJDOYcPWmDHyzVxuFQo
+        Ux0ioFgtU7MetMymkrkZ7y9pXX3vb2wXN+QZlAcy1a4ybiaOZfQsqSKj5/2K077o/Wx4j8Q06alP2
+        UWsNMf6LWKGpw/esuaGwaOx69uVMTn6CNA6WbXTY2wYLw2HjTIpDuoqqr0hBqlwnTmZz266TRcPak
+        sEML8oQe5uhLP2bymeBTf776sY4Ev/QyK3Y/r0g4Wt0+ByW1qjuaxYjSQCsoJy6/hNo/sX3RWbzeU
+        nm4gXSJw==;
+Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1pPo8O-001PQr-0w; Wed, 08 Feb 2023 17:21:28 +0000
+Date:   Wed, 8 Feb 2023 17:21:27 +0000
+From:   Matthew Wilcox <willy@infradead.org>
 To:     David Howells <dhowells@redhat.com>
 Cc:     Christoph Hellwig <hch@infradead.org>,
         Jens Axboe <axboe@kernel.dk>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>,
+        Al Viro <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>,
         Jeff Layton <jlayton@kernel.org>,
         David Hildenbrand <david@redhat.com>,
         Jason Gunthorpe <jgg@nvidia.com>,
@@ -45,7 +44,7 @@ Cc:     Christoph Hellwig <hch@infradead.org>,
         John Hubbard <jhubbard@nvidia.com>
 Subject: Re: [PATCH v12 01/10] vfs, iomap: Fix generic_file_splice_read() to
  avoid reversion of ITER_PIPE
-Message-ID: <Y+PLrOM05FMCiTIg@infradead.org>
+Message-ID: <Y+PaF7q10xSoqynj@casper.infradead.org>
 References: <Y+MydH2HZ7ihITli@infradead.org>
  <20230207171305.3716974-1-dhowells@redhat.com>
  <20230207171305.3716974-2-dhowells@redhat.com>
@@ -54,31 +53,17 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <176199.1675872591@warthog.procyon.org.uk>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 On Wed, Feb 08, 2023 at 04:09:51PM +0000, David Howells wrote:
-> How about one of two different solutions?
-> 
->  (1) Repurpose the function I proposed for generic_file_splice_read() but only
->      for splicing from O_DIRECT files; reading from non-O_DIRECT files would
->      use an ITER_PIPE as upstream.
+> @@ -2688,7 +2689,7 @@ ssize_t filemap_read(struct kiocb *iocb, struct iov_iter *iter,
+>  		if (unlikely(iocb->ki_pos >= i_size_read(inode)))
+>  			break;
+>  
+> -		error = filemap_get_pages(iocb, iter, &fbatch);
+> +		error = filemap_get_pages(iocb, iov_iter_count(iter), &fbatch);
 
-Given the amounts of problems we had with O_DIRECT vs splice, and the
-fact that even doing this is a bit pointless that seems sensible to me.
-
->      for splicing from O_DIRECT files, as (1), but also replace the splice
->      from a buffered file with something like the patch below.  This uses
->      filemap_get_pages() to do the reading and to get a bunch of folios from
->      the pagecache that we can then splice into the pipe directly.
-
-I defintively like the idea of killing ITER_PIPE.  Isn't the 16
-folios in a folio tree often much less than what we could fit into
-a single pipe buf?  Unless you have a file system that can use
-huge folios for buffered I/O and actually does this might significantly
-limit performance.
-
-With that in mind I'll try to find some time to review your actual
-patch, but I'm a little busy at the moment.
+What's the point in iov_iter_count() anyway?  It's more characters
+than iter->count, so why not use it directly?
