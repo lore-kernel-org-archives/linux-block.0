@@ -2,178 +2,82 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A22A7C636CC
-	for <linux-block@archiver.kernel.org>; Wed,  8 Feb 2023 04:01:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2EB1FC636D3
+	for <linux-block@archiver.kernel.org>; Wed,  8 Feb 2023 05:26:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229508AbjBHEBk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 7 Feb 2023 23:01:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57948 "EHLO
+        id S229450AbjBHF0o (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 8 Feb 2023 00:26:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54134 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229910AbjBHEBe (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 7 Feb 2023 23:01:34 -0500
-Received: from todd.t-8ch.de (todd.t-8ch.de [IPv6:2a01:4f8:c010:41de::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6DEE727D47;
-        Tue,  7 Feb 2023 20:01:33 -0800 (PST)
-From:   =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=weissschuh.net;
-        s=mail; t=1675828891;
-        bh=z6gdQRd22b6rFVmZcQycIuiVt7AJMHofVc+WstYPDkY=;
-        h=From:Date:Subject:To:Cc:From;
-        b=SMVGqKkWvYKLqdYThJODx9Ce/DLrtV6ktdvSre1o7xD9bhKGqyWKFPTkAiN/afXd0
-         tbzWMrhC7kGMsX/klu+Qx9DVg+TPnHNxnM7S7lPvIoazKiAkuuOLI7Z17vJASoWihB
-         TFA/eJgCAkfQMB2iG6um5M5TQAuH+LKMcjLfwAxY=
-Date:   Wed, 08 Feb 2023 04:01:22 +0000
-Subject: [PATCH] block: make kobj_type structures constant
+        with ESMTP id S229559AbjBHF0n (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Feb 2023 00:26:43 -0500
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8AB9019F31;
+        Tue,  7 Feb 2023 21:26:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=ARUk2d+sCZWHwDfzIfVXqPEuRg8EkLiwolIcbG+SXl8=; b=dGBxZ03m2u5KOBfx4zSZmaWzCu
+        QnYmO5ClWXP9xHv1kOW0PfgPS08zK9C2Mn2bDiYwzV6CxcVPImWxf0QGCxmUFoPTmGZi2Tp6kyQCF
+        I0qaDRpYccC/RTV8kgZyTmRsfA2bA8XyNibSBOIEG5YqSLlTitmjCQU/rajwpGNSlyHCkEjhIjHLJ
+        j6wHZuzTx+DkFrfO5cSuSrG+WRvpnlmOAYhu2kl+nFTter83HvV0jGP8B0DOlV7NWcrhUIIfQBY6N
+        gpUpImp5sAyneCLq3jYTLKNq42YiMiMZKYaNXe0A/gOpX4CyoUCZDnRQYuDjCB+dvwjIqWHxUSK5P
+        +CCciz5g==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1pPcyC-00E6v3-2u; Wed, 08 Feb 2023 05:26:12 +0000
+Date:   Tue, 7 Feb 2023 21:26:12 -0800
+From:   Christoph Hellwig <hch@infradead.org>
+To:     David Howells <dhowells@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, Al Viro <viro@zeniv.linux.org.uk>,
+        Christoph Hellwig <hch@infradead.org>,
+        Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>,
+        Jeff Layton <jlayton@kernel.org>,
+        David Hildenbrand <david@redhat.com>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Logan Gunthorpe <logang@deltatee.com>,
+        Hillf Danton <hdanton@sina.com>, linux-fsdevel@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org,
+        syzbot+a440341a59e3b7142895@syzkaller.appspotmail.com,
+        Christoph Hellwig <hch@lst.de>,
+        John Hubbard <jhubbard@nvidia.com>
+Subject: Re: [PATCH v12 01/10] vfs, iomap: Fix generic_file_splice_read() to
+ avoid reversion of ITER_PIPE
+Message-ID: <Y+MydH2HZ7ihITli@infradead.org>
+References: <20230207171305.3716974-1-dhowells@redhat.com>
+ <20230207171305.3716974-2-dhowells@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Message-Id: <20230208-kobj_type-block-v1-1-0b3eafd7d983@weissschuh.net>
-X-B4-Tracking: v=1; b=H4sIAJEe42MC/x2N2wqDMBAFf0X22UBcEUp/pYjksqlbQyKJLYr47
- y59nDkM54RKhanCszmh0I8r5yTQtQ242aQ3KfbCgBp7jfqhlmw/03aspGzMblEBnR96GwjRg1T
- WVJmKSW6WLn1jFLkWCrz/b17jdd3ntZ9wdgAAAA==
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>
-X-Mailer: b4 0.12.1
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1675828885; l=4439;
- i=linux@weissschuh.net; s=20221212; h=from:subject:message-id;
- bh=z6gdQRd22b6rFVmZcQycIuiVt7AJMHofVc+WstYPDkY=;
- b=OVn8wDUodWZsOG2PyBY402xLem4m3t9KJb6qTlDz0+R5mYqphg8I64SVMuj9ctspuU5cGhm44
- DJOqv01D7rmDtbNFTLJ/4wWHAqrtoZEDs+dZkmMRgFeVmx350hiDpZJ
-X-Developer-Key: i=linux@weissschuh.net; a=ed25519;
- pk=KcycQgFPX2wGR5azS7RhpBqedglOZVgRPfdFSPB1LNw=
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230207171305.3716974-2-dhowells@redhat.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Since commit ee6d3dd4ed48 ("driver core: make kobj_type constant.")
-the driver core allows the usage of const struct kobj_type.
+Subject nitpick:  this does not ouch iomap at all.
 
-Take advantage of this to constify the structure definitions to prevent
-modification at runtime.
+> Fix this by replacing the use of an ITER_PIPE iterator with an ITER_BVEC
+> iterator for which reversion won't free the buffers.  Bulk allocate all the
+> buffers we think we're going to use in advance, do the read synchronously
+> and only then trim the buffer down.  The pages we did use get pushed into
+> the pipe.
+> 
+> This is more efficient by virtue of doing a bulk page allocation, but
+> slightly less efficient by ignoring any partial page in the pipe.
 
-Signed-off-by: Thomas Weißschuh <linux@weissschuh.net>
----
- block/blk-crypto-sysfs.c | 2 +-
- block/blk-ia-ranges.c    | 4 ++--
- block/blk-integrity.c    | 2 +-
- block/blk-mq-sysfs.c     | 6 +++---
- block/blk-sysfs.c        | 2 +-
- block/elevator.c         | 4 ++--
- 6 files changed, 10 insertions(+), 10 deletions(-)
+For the usual case of a buffered read into the iter, this completely
+changes the semantics:
 
-diff --git a/block/blk-crypto-sysfs.c b/block/blk-crypto-sysfs.c
-index 55268edc0625..a304434489ba 100644
---- a/block/blk-crypto-sysfs.c
-+++ b/block/blk-crypto-sysfs.c
-@@ -116,7 +116,7 @@ static void blk_crypto_release(struct kobject *kobj)
- 	kfree(container_of(kobj, struct blk_crypto_kobj, kobj));
- }
- 
--static struct kobj_type blk_crypto_ktype = {
-+static const struct kobj_type blk_crypto_ktype = {
- 	.default_groups = blk_crypto_attr_groups,
- 	.sysfs_ops	= &blk_crypto_attr_ops,
- 	.release	= blk_crypto_release,
-diff --git a/block/blk-ia-ranges.c b/block/blk-ia-ranges.c
-index 2141931ddd37..c9eb4241e048 100644
---- a/block/blk-ia-ranges.c
-+++ b/block/blk-ia-ranges.c
-@@ -75,7 +75,7 @@ static void blk_ia_range_sysfs_nop_release(struct kobject *kobj)
- {
- }
- 
--static struct kobj_type blk_ia_range_ktype = {
-+static const struct kobj_type blk_ia_range_ktype = {
- 	.sysfs_ops	= &blk_ia_range_sysfs_ops,
- 	.default_groups	= blk_ia_range_groups,
- 	.release	= blk_ia_range_sysfs_nop_release,
-@@ -94,7 +94,7 @@ static void blk_ia_ranges_sysfs_release(struct kobject *kobj)
- 	kfree(iars);
- }
- 
--static struct kobj_type blk_ia_ranges_ktype = {
-+static const struct kobj_type blk_ia_ranges_ktype = {
- 	.release	= blk_ia_ranges_sysfs_release,
- };
- 
-diff --git a/block/blk-integrity.c b/block/blk-integrity.c
-index 69eed260a823..8f01d786f5cb 100644
---- a/block/blk-integrity.c
-+++ b/block/blk-integrity.c
-@@ -356,7 +356,7 @@ static const struct sysfs_ops integrity_ops = {
- 	.store	= &integrity_attr_store,
- };
- 
--static struct kobj_type integrity_ktype = {
-+static const struct kobj_type integrity_ktype = {
- 	.default_groups = integrity_groups,
- 	.sysfs_ops	= &integrity_ops,
- };
-diff --git a/block/blk-mq-sysfs.c b/block/blk-mq-sysfs.c
-index 4515288fbe35..a8f4accb6646 100644
---- a/block/blk-mq-sysfs.c
-+++ b/block/blk-mq-sysfs.c
-@@ -153,15 +153,15 @@ static const struct sysfs_ops blk_mq_hw_sysfs_ops = {
- 	.store	= blk_mq_hw_sysfs_store,
- };
- 
--static struct kobj_type blk_mq_ktype = {
-+static const struct kobj_type blk_mq_ktype = {
- 	.release	= blk_mq_sysfs_release,
- };
- 
--static struct kobj_type blk_mq_ctx_ktype = {
-+static const struct kobj_type blk_mq_ctx_ktype = {
- 	.release	= blk_mq_ctx_sysfs_release,
- };
- 
--static struct kobj_type blk_mq_hw_ktype = {
-+static const struct kobj_type blk_mq_hw_ktype = {
- 	.sysfs_ops	= &blk_mq_hw_sysfs_ops,
- 	.default_groups = default_hw_ctx_groups,
- 	.release	= blk_mq_hw_sysfs_release,
-diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index 93d9e9c9a6ea..0f5798883776 100644
---- a/block/blk-sysfs.c
-+++ b/block/blk-sysfs.c
-@@ -755,7 +755,7 @@ static void blk_queue_release(struct kobject *kobj)
- 	/* nothing to do here, all data is associated with the parent gendisk */
- }
- 
--static struct kobj_type blk_queue_ktype = {
-+static const struct kobj_type blk_queue_ktype = {
- 	.default_groups = blk_queue_attr_groups,
- 	.sysfs_ops	= &queue_sysfs_ops,
- 	.release	= blk_queue_release,
-diff --git a/block/elevator.c b/block/elevator.c
-index adee58e48e2d..24909069f872 100644
---- a/block/elevator.c
-+++ b/block/elevator.c
-@@ -126,7 +126,7 @@ static struct elevator_type *elevator_find_get(struct request_queue *q,
- 	return e;
- }
- 
--static struct kobj_type elv_ktype;
-+static const struct kobj_type elv_ktype;
- 
- struct elevator_queue *elevator_alloc(struct request_queue *q,
- 				  struct elevator_type *e)
-@@ -455,7 +455,7 @@ static const struct sysfs_ops elv_sysfs_ops = {
- 	.store	= elv_attr_store,
- };
- 
--static struct kobj_type elv_ktype = {
-+static const struct kobj_type elv_ktype = {
- 	.sysfs_ops	= &elv_sysfs_ops,
- 	.release	= elevator_release,
- };
+ - before the pagecache pages just grew a new reference and were
+   added to the pipe buffer, and I/O was done without an extra
+   copy
+ - with this patch you always allocate an extra set of pages for
+   the pipe and copy to it
 
----
-base-commit: 0983f6bf2bfc0789b51ddf7315f644ff4da50acb
-change-id: 20230208-kobj_type-block-f2cd53bfe22d
+So I very much doubt this makes anything more efficient, and I don't
+think we can just do it.
 
-Best regards,
--- 
-Thomas Weißschuh <linux@weissschuh.net>
-
+We'll have to fix reverting of pipe buffers, just as I already pointed
+out in your cifs series that tries to play the same game.
