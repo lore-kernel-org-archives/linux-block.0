@@ -2,79 +2,114 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DCFFC636D3
-	for <linux-block@archiver.kernel.org>; Wed,  8 Feb 2023 18:15:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30415C05027
+	for <linux-block@archiver.kernel.org>; Wed,  8 Feb 2023 19:06:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230152AbjBHSPx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 8 Feb 2023 13:15:53 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52848 "EHLO
+        id S231616AbjBHTGG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 8 Feb 2023 14:06:06 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58982 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229509AbjBHSPw (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Feb 2023 13:15:52 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42C2B23119
-        for <linux-block@vger.kernel.org>; Wed,  8 Feb 2023 10:15:08 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1675880107;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=PTjtXDgu2q/FuBRhvL58Zww1kvuwz26nkJJzavvqz6o=;
-        b=Zw3PCxNenyNPAeBiUqHerIYUjObmCqglLILwL5MFOqeh5jPFxrOYPLH5O0HiOX/Eq0BucP
-        HPg600LT0RF8epOV9jKB+2+0JrNbfD7m7It+KeR8JqVRT1r6rwlb1ZBWWJBhApJ4Xj8xrL
-        cZt2543kO87kQ0RH9oqmIV2/15sRMHQ=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-586-fst53555NBqSVP3pMESD2g-1; Wed, 08 Feb 2023 13:15:06 -0500
-X-MC-Unique: fst53555NBqSVP3pMESD2g-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 3FB95857A89;
-        Wed,  8 Feb 2023 18:15:05 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.33.36.24])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 2155735454;
-        Wed,  8 Feb 2023 18:15:03 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <Y+PaF7q10xSoqynj@casper.infradead.org>
-References: <Y+PaF7q10xSoqynj@casper.infradead.org> <Y+MydH2HZ7ihITli@infradead.org> <20230207171305.3716974-1-dhowells@redhat.com> <20230207171305.3716974-2-dhowells@redhat.com> <176199.1675872591@warthog.procyon.org.uk>
-To:     Matthew Wilcox <willy@infradead.org>
-Cc:     dhowells@redhat.com, Christoph Hellwig <hch@infradead.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        Al Viro <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>,
-        Jeff Layton <jlayton@kernel.org>,
-        David Hildenbrand <david@redhat.com>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        Hillf Danton <hdanton@sina.com>, linux-fsdevel@vger.kernel.org,
+        with ESMTP id S231598AbjBHTGF (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Feb 2023 14:06:05 -0500
+Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E4004DBF4;
+        Wed,  8 Feb 2023 11:06:05 -0800 (PST)
+Received: by mail-pj1-x1032.google.com with SMTP id gj9-20020a17090b108900b0023114156d36so3104227pjb.4;
+        Wed, 08 Feb 2023 11:06:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=rRaVZ9/X0IStuyPV6O60UspWE6lsQv03L6mbYwCmPI4=;
+        b=BKzuUbCjDPwgJnJ3Jej0RMuyANAxCWK3m/MfztEgheROrMlQXQbl+C0fQhEkSkQqWM
+         c+HcZfCGMr21T2mRkK7wW4uDJnEQBxHIPFq0tSGFdthcOzh1UC8pBjM+Od5pI5gMRtVV
+         aXY/rHgTTfG4hQRP3m7twkNWPu5U+H/a2z8fp4O/sIsbzWmnyl5E+JvlzmsYNheFsLvZ
+         jRXzjQaAKD6mPamQd4kc0HJwzrQr2fbQYrwsKQPbfBu827q+sqPQcZ+64i3pa8BxTRTA
+         xDDri/kpY/8FtEBfumEf24xMYUdguB9wz/Ut02XU0lmFnpost9Ebhe1m/+3Bz+zhmNlT
+         9kbg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=rRaVZ9/X0IStuyPV6O60UspWE6lsQv03L6mbYwCmPI4=;
+        b=mBfs0ifxiPRlgsTHQDNTR1GCS5WsPbW4zne9pbNd8SVki/2iGkLbbOUYM2fJyA/IA3
+         zUHO1Qt6JeQk7jKwY2R7QKT0kSciQscNFTwV0U3BEw4IOENTxk9DWNMY46yzmVXxc/6P
+         TRRcjhJi+vmmHbcle/R6Q+HH8/8DUfkmMeACcNowQqXx2gj6wEfa8V30zy94eRoGE2Cr
+         RdsRuqHYpHsd7S369KQDhMEeBD88pO4bx5cmBbEbNtJj2E514lnXrz5sFPh/0jlcYXnX
+         fRJAqS/c2JoMpDH01ypJPZXADpZ3b2ez6nYgHONBMiXRN8sPIHDFo7oA4vJW083bpfPv
+         96Dg==
+X-Gm-Message-State: AO0yUKU3OJVgWOdI8Wfw3jTbbcI4j0VDYSGVpIViXGxfwS8E4BxlPR5o
+        A9u6LOrKdHNCt6sx4kapn3k=
+X-Google-Smtp-Source: AK7set/6Uklb/nCkvatjdOjFUff61kTIGa4nGNF3u5sSoYa4fLj8enWqLcwUPSyR5xEjIS8gCc54vw==
+X-Received: by 2002:a17:902:ced2:b0:199:fc6:9a9b with SMTP id d18-20020a170902ced200b001990fc69a9bmr10118044plg.17.1675883164447;
+        Wed, 08 Feb 2023 11:06:04 -0800 (PST)
+Received: from localhost (2603-800c-1a02-1bae-a7fa-157f-969a-4cde.res6.spectrum.com. [2603:800c:1a02:1bae:a7fa:157f:969a:4cde])
+        by smtp.gmail.com with ESMTPSA id iz17-20020a170902ef9100b001898ee9f723sm6469456plb.2.2023.02.08.11.06.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 08 Feb 2023 11:06:03 -0800 (PST)
+Sender: Tejun Heo <htejun@gmail.com>
+Date:   Wed, 8 Feb 2023 09:06:01 -1000
+From:   Tejun Heo <tj@kernel.org>
+To:     Yu Kuai <yukuai1@huaweicloud.com>
+Cc:     josef@toxicpanda.com, axboe@kernel.dk, cgroups@vger.kernel.org,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org,
-        syzbot+a440341a59e3b7142895@syzkaller.appspotmail.com,
-        Christoph Hellwig <hch@lst.de>,
-        John Hubbard <jhubbard@nvidia.com>
-Subject: Re: [PATCH v12 01/10] vfs, iomap: Fix generic_file_splice_read() to avoid reversion of ITER_PIPE
+        yukuai3@huawei.com, yi.zhang@huawei.com, yangerkun@huawei.com
+Subject: Re: [PATCH -next] blk-iocost: fix sleeping in atomic warning for
+ wbt_enable_default()
+Message-ID: <Y+PymbdtPVONbQAq@slm.duckdns.org>
+References: <20230208034803.2818155-1-yukuai1@huaweicloud.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <180258.1675880102.1@warthog.procyon.org.uk>
-Date:   Wed, 08 Feb 2023 18:15:02 +0000
-Message-ID: <180259.1675880102@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.5
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230208034803.2818155-1-yukuai1@huaweicloud.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Matthew Wilcox <willy@infradead.org> wrote:
+On Wed, Feb 08, 2023 at 11:48:03AM +0800, Yu Kuai wrote:
+> diff --git a/block/blk-iocost.c b/block/blk-iocost.c
+> index 7a2dc9dc8e3b..03bfe1dda07c 100644
+> --- a/block/blk-iocost.c
+> +++ b/block/blk-iocost.c
+> @@ -3279,11 +3279,9 @@ static ssize_t ioc_qos_write(struct kernfs_open_file *of, char *input,
+>  		blk_stat_enable_accounting(disk->queue);
+>  		blk_queue_flag_set(QUEUE_FLAG_RQ_ALLOC_TIME, disk->queue);
+>  		ioc->enabled = true;
+> -		wbt_disable_default(disk);
+>  	} else {
+>  		blk_queue_flag_clear(QUEUE_FLAG_RQ_ALLOC_TIME, disk->queue);
+>  		ioc->enabled = false;
+> -		wbt_enable_default(disk);
+>  	}
+>  
+>  	if (user) {
+> @@ -3296,6 +3294,10 @@ static ssize_t ioc_qos_write(struct kernfs_open_file *of, char *input,
+>  	ioc_refresh_params(ioc, true);
+>  	spin_unlock_irq(&ioc->lock);
+>  
+> +	if (enable)
+> +		wbt_disable_default(disk);
+> +	else
+> +		wbt_enable_default(disk);
 
-> What's the point in iov_iter_count() anyway?  It's more characters
-> than iter->count, so why not use it directly?
+Wouldn't this allow two competiting config attempts to race each other and
+leave wbt in an unexpected state?
 
-I presume it got added for a reason and should be used in preference to direct
-access.
+	task1				task2
 
-David
+	ioc_qos_write()			ioc_qos_write()
+	lock()
+	enable
+	unlock()
+					lock()
+					disable
+					unlock()
+					wbt_enable_default()
+	wbt_disable_default()
 
+Thanks.
+
+-- 
+tejun
