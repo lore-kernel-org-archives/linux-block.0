@@ -2,115 +2,106 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66A5AC6379F
-	for <linux-block@archiver.kernel.org>; Wed,  8 Feb 2023 00:31:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 12362C636CD
+	for <linux-block@archiver.kernel.org>; Wed,  8 Feb 2023 00:57:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229909AbjBHAbG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 7 Feb 2023 19:31:06 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54428 "EHLO
+        id S229910AbjBHA5M (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 7 Feb 2023 19:57:12 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34184 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229563AbjBHAbF (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 7 Feb 2023 19:31:05 -0500
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 2CFC93AAC;
-        Tue,  7 Feb 2023 16:31:04 -0800 (PST)
-Received: by linux.microsoft.com (Postfix, from userid 1052)
-        id 91E3120C7E38; Tue,  7 Feb 2023 16:31:03 -0800 (PST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 91E3120C7E38
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-        s=default; t=1675816263;
-        bh=LeJteH6AJ9Cbyv23AKIZT9Zr5jPTl5CR5NBjrB7jEH0=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=bs+VMgppVphlNRwXazqjLvcderqyiIoxWf+J92+m0ALQDuvgh/o/nhk1BNWcBQsPh
-         gz0C3u2HuwTEnY5P1iqMjO1CzkD/+HiRK+CfRh+GX6szjyKALHkQS/5Vqjg1EHw7/2
-         kMQ7Bn9LNIzaQRwZ/K5EZ4sZYQKeFDqpGmC9IVrc=
-Date:   Tue, 7 Feb 2023 16:31:03 -0800
-From:   Fan Wu <wufan@linux.microsoft.com>
-To:     Roberto Sassu <roberto.sassu@huaweicloud.com>
-Cc:     corbet@lwn.net, zohar@linux.ibm.com, jmorris@namei.org,
-        serge@hallyn.com, tytso@mit.edu, ebiggers@kernel.org,
-        axboe@kernel.dk, agk@redhat.com, snitzer@kernel.org,
-        eparis@redhat.com, paul@paul-moore.com, linux-doc@vger.kernel.org,
-        linux-integrity@vger.kernel.org,
-        linux-security-module@vger.kernel.org,
-        linux-fscrypt@vger.kernel.org, linux-block@vger.kernel.org,
-        dm-devel@redhat.com, linux-audit@redhat.com,
-        roberto.sassu@huawei.com, linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH v9 00/16] Integrity Policy Enforcement LSM (IPE)
-Message-ID: <20230208003103.GC5107@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
-References: <1675119451-23180-1-git-send-email-wufan@linux.microsoft.com>
- <033335b26f6becdc3dc0325ef926efd94fcc4dda.camel@huaweicloud.com>
- <20230201004852.GB30104@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
- <7dc9963c563d0b55bb35109be012e355eef13882.camel@huaweicloud.com>
+        with ESMTP id S230011AbjBHA5L (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 7 Feb 2023 19:57:11 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F73829E24
+        for <linux-block@vger.kernel.org>; Tue,  7 Feb 2023 16:56:24 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1675817783;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=xYq+Lw1Wy98i0RuFf6M51EWWTL/VyytNfJSwN0PYmyQ=;
+        b=e4DZqIWKSNm8KKcdn5U4Vt8ojduLnYS/RavjcLFjyaKyM0jAbugwjn9VjWEc6HfsmCVEPN
+        TwV5IMb/BvtVJtvC9yFGLAkPh3y6hAOlQX3Zg0EjLX9v38H3TX9cNFJUlyoN9OtNxzDFU1
+        8Htm7LfaNop+048LYWrn4PzFlm1e3Jc=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-225-RkHotW56P2aABjaR9wMVTQ-1; Tue, 07 Feb 2023 19:56:20 -0500
+X-MC-Unique: RkHotW56P2aABjaR9wMVTQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id A2888801779;
+        Wed,  8 Feb 2023 00:56:19 +0000 (UTC)
+Received: from localhost (ovpn-8-16.pek2.redhat.com [10.72.8.16])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id CAE282026D37;
+        Wed,  8 Feb 2023 00:56:18 +0000 (UTC)
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Cc:     linux-block@vger.kernel.org, Ming Lei <tom.leiming@gmail.com>
+Subject: [PATCH] blktests: add test to cover umount one deleted disk
+Date:   Wed,  8 Feb 2023 08:56:03 +0800
+Message-Id: <20230208005603.552648-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <7dc9963c563d0b55bb35109be012e355eef13882.camel@huaweicloud.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Feb 02, 2023 at 11:48:18AM +0100, Roberto Sassu wrote:
-> On Tue, 2023-01-31 at 16:48 -0800, Fan Wu wrote:
-> > On Tue, Jan 31, 2023 at 03:22:05PM +0100, Roberto Sassu wrote:
-> > > On Mon, 2023-01-30 at 14:57 -0800, Fan Wu wrote:
-> > > > IPE has two known gaps:
-> > > > 
-> > > > 1. IPE cannot verify the integrity of anonymous executable memory, such as
-> > > >   the trampolines created by gcc closures and libffi (<3.4.2), or JIT'd code.
-> > > >   Unfortunately, as this is dynamically generated code, there is no way
-> > > >   for IPE to ensure the integrity of this code to form a trust basis. In all
-> > > >   cases, the return result for these operations will be whatever the admin
-> > > >   configures the DEFAULT action for "EXECUTE".
-> > > 
-> > > I think it would be useful to handle special cases, for example you
-> > > could allow a process that created a file with memfd to use it, at the
-> > > condition that nobody else writes it.
-> > > 
-> > > This would be required during the boot, otherwise services could fail
-> > > to start (depending on the policy).
-> > > 
-> > Thanks for the suggestion. I agree with your opinion and I think supporting
-> > memfd is possible but restricting read/write needs more hooks. We would like
-> > to avoid adding more complexity to this initial posting as necessary. 
-> > We will consider this as a future work and will post follow-on patches
-> > in the future.
-> 
-> Ok, maybe it is necessary to specify better the scope of IPE, why the
-> current implementation can be considered as complete.
-> 
-> If we say, IPE can only allow/deny operations on system components with
-> immutable security properties, clearly memfd as a component cannot
-> fullfill this goal due to the non-immutability. This would apply to any
-> component allowing modifications.
-> 
-> How to address this? What is the immutable property then?
-> 
-> In the case of memfd, intuitively, a useful property for integrity
-> could be for example that the content can be accessed/modified by only
-> one process. No other (possibly malicious) processes can tamper with
-> that file.
-> 
-> So, it is true, to make this property immutable more hooks are needed.
-> But should it be something that IPE does? Or it should be done by an
-> external component (another LSM) that does the enforcement and reports
-> to IPE that the property is true? Theoretically (with a proper policy),
-> existing LSMs could be used for that purpose too.
-> 
-> I would say more the second, it should not be IPE job, so that IPE can
-> exclusively focus on evaluating properties, not making sure that the
-> properties are immutable.
-> 
-> Roberto
-> 
-I think the issue here is not about the scope of IPE but the use cases
-of IPE. 
+From: Ming Lei <tom.leiming@gmail.com>
 
-We use IPE on fixed-function devices, which are completely locked down.
-In our system, IPE denies all anonymous memory execution so memfd will
-not work on our system.
+disk can be disappear any time because of error handling, when
+it is usually being mounted. Make sure umount can be done successfully
+after disk deleting is done from error handling.
 
-Therefore, to make memfd useable with IPE we must add more properties.
+Signed-off-by: Ming Lei <tom.leiming@gmail.com>
+---
+ tests/block/032 | 35 +++++++++++++++++++++++++++++++++++
+ 1 file changed, 35 insertions(+)
+ create mode 100755 tests/block/032
 
--Fan
+diff --git a/tests/block/032 b/tests/block/032
+new file mode 100755
+index 0000000..b07b7ab
+--- /dev/null
++++ b/tests/block/032
+@@ -0,0 +1,35 @@
++#!/bin/bash
++# SPDX-License-Identifier: GPL-3.0+
++# Copyright (C) 2023 Ming Lei
++#
++# Test umount after deleting disk. Removes a device while the disk
++# is still mounted.
++
++. tests/block/rc
++. common/xfs
++. common/scsi_debug
++
++DESCRIPTION="remove one mounted device"
++QUICK=1
++
++requires() {
++	_have_xfs && _have_scsi_debug
++}
++
++test() {
++	echo "Running ${TEST_NAME}"
++
++	if ! _init_scsi_debug dev_size_mb=300; then
++		return 1
++	fi
++
++	mkdir -p "${TMPDIR}/mnt"
++	_xfs_mkfs_and_mount "/dev/${SCSI_DEBUG_DEVICES[0]}" "${TMPDIR}/mnt" > /dev/null 2>&1
++	echo 1 > "/sys/block/${SCSI_DEBUG_DEVICES[0]}/device/delete"
++	sleep 2
++	umount "${TMPDIR}/mnt"
++
++	_exit_scsi_debug
++
++	echo "Test complete"
++}
+-- 
+2.38.1
+
