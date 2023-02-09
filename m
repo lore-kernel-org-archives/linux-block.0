@@ -2,41 +2,41 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37D1DC636D7
-	for <linux-block@archiver.kernel.org>; Thu,  9 Feb 2023 10:32:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 02EDBC61DA4
+	for <linux-block@archiver.kernel.org>; Thu,  9 Feb 2023 10:32:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229871AbjBIKcC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 9 Feb 2023 05:32:02 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50974 "EHLO
+        id S229765AbjBIKcI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 9 Feb 2023 05:32:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50932 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230096AbjBIKbh (ORCPT
+        with ESMTP id S230104AbjBIKbh (ORCPT
         <rfc822;linux-block@vger.kernel.org>); Thu, 9 Feb 2023 05:31:37 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 252E322A0C
-        for <linux-block@vger.kernel.org>; Thu,  9 Feb 2023 02:30:28 -0800 (PST)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7472D1ABDE
+        for <linux-block@vger.kernel.org>; Thu,  9 Feb 2023 02:30:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1675938627;
+        s=mimecast20190719; t=1675938624;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=9PNg3WPaFWzxoLjSof2qU8psox3R+qpqOMDOMyjiLi8=;
-        b=Tbbc1PoHGxkF3GCeCubs0Dpupx/xEhfrPFzcMmU2Q05Ec9NyFyfhDphGOZK4PHao1QaxzQ
-        1g+tvCeXfWj4zXCAMVzRVZ16kG74H9mQ+as+EqweocM8DHxYXStpSBvKpkng8AAq4zgRlk
-        zZUvBB6JPJhBwFMxIQ8Dt3N4GveM4Kk=
+        bh=gZh4MABlkpe6ltIe1JtsGk3eMjQ687XGJ1n+AAo3k5s=;
+        b=P9mEUDzSQ3G+NoMLpTNK00H0ZK0MUwQVnK+gUFiNNuiX+T5pKH0ybuPVoBA4WentwDTCHf
+        t2Hn1tmRAhc+zImwSI4yYIoFJ0F5Ke4mC7IGlj6uF114aZC06eGKgMK/aJv+hleU6/NpTM
+        LIrX/fxNX9IAqDHQOGZVveoKPJkOcOM=
 Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
  [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-557-B72h0Av4Pby1SBTw9mI3sg-1; Thu, 09 Feb 2023 05:30:23 -0500
-X-MC-Unique: B72h0Av4Pby1SBTw9mI3sg-1
+ us-mta-528-mHs8wxQ_M9q60lEOpooSWQ-1; Thu, 09 Feb 2023 05:30:19 -0500
+X-MC-Unique: mHs8wxQ_M9q60lEOpooSWQ-1
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 2ACFD832E70;
-        Thu,  9 Feb 2023 10:30:20 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id BFC1D100F83C;
+        Thu,  9 Feb 2023 10:30:06 +0000 (UTC)
 Received: from warthog.procyon.org.uk (unknown [10.33.36.24])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 3DD82C16022;
-        Thu,  9 Feb 2023 10:30:18 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id CC3E7C16022;
+        Thu,  9 Feb 2023 10:30:04 +0000 (UTC)
 From:   David Howells <dhowells@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>, Al Viro <viro@zeniv.linux.org.uk>,
         Christoph Hellwig <hch@infradead.org>
@@ -50,9 +50,9 @@ Cc:     David Howells <dhowells@redhat.com>,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-mm@kvack.org, Christoph Hellwig <hch@lst.de>,
         John Hubbard <jhubbard@nvidia.com>
-Subject: [PATCH v13 08/12] block: Fix bio_flagged() so that gcc can better optimise it
-Date:   Thu,  9 Feb 2023 10:29:50 +0000
-Message-Id: <20230209102954.528942-9-dhowells@redhat.com>
+Subject: [PATCH v13 03/12] splice: Do splice read from a buffered file without using ITER_PIPE
+Date:   Thu,  9 Feb 2023 10:29:45 +0000
+Message-Id: <20230209102954.528942-4-dhowells@redhat.com>
 In-Reply-To: <20230209102954.528942-1-dhowells@redhat.com>
 References: <20230209102954.528942-1-dhowells@redhat.com>
 MIME-Version: 1.0
@@ -62,64 +62,219 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Fix bio_flagged() so that multiple instances of it, such as:
+Provide a function to do splice read from a buffered file, pulling the
+folios out of the pagecache directly by calling filemap_get_pages() to do
+any required reading and then pasting the returned folios into the pipe.
 
-	if (bio_flagged(bio, BIO_PAGE_REFFED) ||
-	    bio_flagged(bio, BIO_PAGE_PINNED))
+A helper function is provided to do the actual folio pasting and will
+handle multipage folios by splicing as many of the relevant subpages as
+will fit into the pipe.
 
-can be combined by the gcc optimiser into a single test in assembly
-(arguably, this is a compiler optimisation issue[1]).
+The ITER_BVEC-based splicing previously added is then only used for
+splicing from O_DIRECT files.
 
-The missed optimisation stems from bio_flagged() comparing the result of
-the bitwise-AND to zero.  This results in an out-of-line bio_release_page()
-being compiled to something like:
+The code is loosely based on filemap_read() and might belong in
+mm/filemap.c with that as it needs to use filemap_get_pages().
 
-   <+0>:     mov    0x14(%rdi),%eax
-   <+3>:     test   $0x1,%al
-   <+5>:     jne    0xffffffff816dac53 <bio_release_pages+11>
-   <+7>:     test   $0x2,%al
-   <+9>:     je     0xffffffff816dac5c <bio_release_pages+20>
-   <+11>:    movzbl %sil,%esi
-   <+15>:    jmp    0xffffffff816daba1 <__bio_release_pages>
-   <+20>:    jmp    0xffffffff81d0b800 <__x86_return_thunk>
-
-However, the test is superfluous as the return type is bool.  Removing it
-results in:
-
-   <+0>:     testb  $0x3,0x14(%rdi)
-   <+4>:     je     0xffffffff816e4af4 <bio_release_pages+15>
-   <+6>:     movzbl %sil,%esi
-   <+10>:    jmp    0xffffffff816dab7c <__bio_release_pages>
-   <+15>:    jmp    0xffffffff81d0b7c0 <__x86_return_thunk>
-
-instead.
-
-Also, the MOVZBL instruction looks unnecessary[2] - I think it's just
-'re-booling' the mark_dirty parameter.
+With this, ITER_PIPE is no longer used.
 
 Signed-off-by: David Howells <dhowells@redhat.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: John Hubbard <jhubbard@nvidia.com>
 cc: Jens Axboe <axboe@kernel.dk>
+cc: Christoph Hellwig <hch@lst.de>
+cc: Al Viro <viro@zeniv.linux.org.uk>
+cc: David Hildenbrand <david@redhat.com>
+cc: John Hubbard <jhubbard@nvidia.com>
+cc: linux-mm@kvack.org
 cc: linux-block@vger.kernel.org
-Link: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=108370 [1]
-Link: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=108371 [2]
-Link: https://lore.kernel.org/r/167391056756.2311931.356007731815807265.stgit@warthog.procyon.org.uk/ # v6
+cc: linux-fsdevel@vger.kernel.org
 ---
- include/linux/bio.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ fs/splice.c | 159 ++++++++++++++++++++++++++++++++++++++++++++--------
+ 1 file changed, 135 insertions(+), 24 deletions(-)
 
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index c1da63f6c808..10366b8bdb13 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -227,7 +227,7 @@ static inline void bio_cnt_set(struct bio *bio, unsigned int count)
- 
- static inline bool bio_flagged(struct bio *bio, unsigned int bit)
- {
--	return (bio->bi_flags & (1U << bit)) != 0;
-+	return bio->bi_flags & (1U << bit);
+diff --git a/fs/splice.c b/fs/splice.c
+index b4be6fc314a1..963cbf20abc8 100644
+--- a/fs/splice.c
++++ b/fs/splice.c
+@@ -22,6 +22,7 @@
+ #include <linux/fs.h>
+ #include <linux/file.h>
+ #include <linux/pagemap.h>
++#include <linux/pagevec.h>
+ #include <linux/splice.h>
+ #include <linux/memcontrol.h>
+ #include <linux/mm_inline.h>
+@@ -375,6 +376,135 @@ static ssize_t generic_file_direct_splice_read(struct file *in, loff_t *ppos,
+ 	return ret;
  }
  
- static inline void bio_set_flag(struct bio *bio, unsigned int bit)
++/*
++ * Splice subpages from a folio into a pipe.
++ */
++static size_t splice_folio_into_pipe(struct pipe_inode_info *pipe,
++				     struct folio *folio,
++				     loff_t fpos, size_t size)
++{
++	struct page *page;
++	size_t spliced = 0, offset = offset_in_folio(folio, fpos);
++
++	page = folio_page(folio, offset / PAGE_SIZE);
++	size = min(size, folio_size(folio) - offset);
++	offset %= PAGE_SIZE;
++
++	while (spliced < size &&
++	       !pipe_full(pipe->head, pipe->tail, pipe->max_usage)) {
++		struct pipe_buffer *buf = &pipe->bufs[pipe->head & (pipe->ring_size - 1)];
++		size_t part = min_t(size_t, PAGE_SIZE - offset, size - spliced);
++
++		*buf = (struct pipe_buffer) {
++			.ops	= &page_cache_pipe_buf_ops,
++			.page	= page,
++			.offset	= offset,
++			.len	= part,
++		};
++		folio_get(folio);
++		pipe->head++;
++		page++;
++		spliced += part;
++		offset = 0;
++	}
++
++	return spliced;
++}
++
++/*
++ * Splice folios from the pagecache of a buffered (ie. non-O_DIRECT) file into
++ * a pipe.
++ */
++static ssize_t generic_file_buffered_splice_read(struct file *in, loff_t *ppos,
++						 struct pipe_inode_info *pipe,
++						 size_t len,
++						 unsigned int flags)
++{
++	struct folio_batch fbatch;
++	size_t total_spliced = 0, used, npages;
++	loff_t isize, end_offset;
++	bool writably_mapped;
++	int i, error = 0;
++
++	struct kiocb iocb = {
++		.ki_filp	= in,
++		.ki_pos		= *ppos,
++	};
++
++	/* Work out how much data we can actually add into the pipe */
++	used = pipe_occupancy(pipe->head, pipe->tail);
++	npages = max_t(ssize_t, pipe->max_usage - used, 0);
++	len = min_t(size_t, len, npages * PAGE_SIZE);
++
++	folio_batch_init(&fbatch);
++
++	do {
++		cond_resched();
++
++		if (*ppos >= i_size_read(file_inode(in)))
++			break;
++
++		iocb.ki_pos = *ppos;
++		error = filemap_get_pages(&iocb, len, &fbatch, true);
++		if (error < 0)
++			break;
++
++		/*
++		 * i_size must be checked after we know the pages are Uptodate.
++		 *
++		 * Checking i_size after the check allows us to calculate
++		 * the correct value for "nr", which means the zero-filled
++		 * part of the page is not copied back to userspace (unless
++		 * another truncate extends the file - this is desired though).
++		 */
++		isize = i_size_read(file_inode(in));
++		if (unlikely(*ppos >= isize))
++			break;
++		end_offset = min_t(loff_t, isize, *ppos + len);
++
++		/*
++		 * Once we start copying data, we don't want to be touching any
++		 * cachelines that might be contended:
++		 */
++		writably_mapped = mapping_writably_mapped(in->f_mapping);
++
++		for (i = 0; i < folio_batch_count(&fbatch); i++) {
++			struct folio *folio = fbatch.folios[i];
++			size_t n;
++
++			if (folio_pos(folio) >= end_offset)
++				goto out;
++			folio_mark_accessed(folio);
++
++			/*
++			 * If users can be writing to this folio using arbitrary
++			 * virtual addresses, take care of potential aliasing
++			 * before reading the folio on the kernel side.
++			 */
++			if (writably_mapped)
++				flush_dcache_folio(folio);
++
++			n = splice_folio_into_pipe(pipe, folio, *ppos, len);
++			if (!n)
++				goto out;
++			len -= n;
++			total_spliced += n;
++			*ppos += n;
++			in->f_ra.prev_pos = *ppos;
++			if (pipe_full(pipe->head, pipe->tail, pipe->max_usage))
++				goto out;
++		}
++
++		folio_batch_release(&fbatch);
++	} while (len);
++
++out:
++	folio_batch_release(&fbatch);
++	file_accessed(in);
++
++	return total_spliced ? total_spliced : error;
++}
++
+ /**
+  * generic_file_splice_read - splice data from file to a pipe
+  * @in:		file to splice from
+@@ -392,32 +522,13 @@ ssize_t generic_file_splice_read(struct file *in, loff_t *ppos,
+ 				 struct pipe_inode_info *pipe, size_t len,
+ 				 unsigned int flags)
+ {
+-	struct iov_iter to;
+-	struct kiocb kiocb;
+-	int ret;
+-
++	if (unlikely(*ppos >= file_inode(in)->i_sb->s_maxbytes))
++		return 0;
++	if (unlikely(!len))
++		return 0;
+ 	if (in->f_flags & O_DIRECT)
+ 		return generic_file_direct_splice_read(in, ppos, pipe, len, flags);
+-
+-	iov_iter_pipe(&to, ITER_DEST, pipe, len);
+-	init_sync_kiocb(&kiocb, in);
+-	kiocb.ki_pos = *ppos;
+-	ret = call_read_iter(in, &kiocb, &to);
+-	if (ret > 0) {
+-		*ppos = kiocb.ki_pos;
+-		file_accessed(in);
+-	} else if (ret < 0) {
+-		/* free what was emitted */
+-		pipe_discard_from(pipe, to.start_head);
+-		/*
+-		 * callers of ->splice_read() expect -EAGAIN on
+-		 * "can't put anything in there", rather than -EFAULT.
+-		 */
+-		if (ret == -EFAULT)
+-			ret = -EAGAIN;
+-	}
+-
+-	return ret;
++	return generic_file_buffered_splice_read(in, ppos, pipe, len, flags);
+ }
+ EXPORT_SYMBOL(generic_file_splice_read);
+ 
 
