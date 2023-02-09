@@ -2,162 +2,163 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2EAABC05027
-	for <linux-block@archiver.kernel.org>; Thu,  9 Feb 2023 12:56:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 100CCC61DA4
+	for <linux-block@archiver.kernel.org>; Thu,  9 Feb 2023 13:43:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229535AbjBIM40 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 9 Feb 2023 07:56:26 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58372 "EHLO
+        id S230025AbjBINn4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 9 Feb 2023 08:43:56 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45760 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229526AbjBIM4Z (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 9 Feb 2023 07:56:25 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80E1BE387
-        for <linux-block@vger.kernel.org>; Thu,  9 Feb 2023 04:55:38 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1675947337;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=CM/sfV6oyjxgc/nsENOBqYgNwXyA5JtEoGtl95uTz0w=;
-        b=KMN+B2+syOGD5CVwgzhIkPFU7TotvLjLe7TbEqwNLgi7f84s71CG4MnmgOUmETAdUKm0yz
-        qKZL7Wpe7fM6QhDijWgBJUY8So0HP0+otMJnINo377mOLJFi5hTNJ64Jem+ivUj6+6RY13
-        ACMdzyCWkfuZAbRwL8ya8i9NxtneeyQ=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-587-eCKB3U0BNMWtCGj7Bs6KzQ-1; Thu, 09 Feb 2023 07:55:36 -0500
-X-MC-Unique: eCKB3U0BNMWtCGj7Bs6KzQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        with ESMTP id S230239AbjBINnx (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 9 Feb 2023 08:43:53 -0500
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE1A54EF7;
+        Thu,  9 Feb 2023 05:43:51 -0800 (PST)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 0E3B4802314;
-        Thu,  9 Feb 2023 12:55:36 +0000 (UTC)
-Received: from localhost (ovpn-8-17.pek2.redhat.com [10.72.8.17])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 397462026D4B;
-        Thu,  9 Feb 2023 12:55:34 +0000 (UTC)
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
-        Tejun Heo <tj@kernel.org>
-Subject: [PATCH] block: sync mixed merged request's failfast with 1st bio's
-Date:   Thu,  9 Feb 2023 20:55:27 +0800
-Message-Id: <20230209125527.667004-1-ming.lei@redhat.com>
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 50C1837520;
+        Thu,  9 Feb 2023 13:43:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1675950230; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=YFbQcVJyIgmubWJ3BH8e+P9uwLq7imStPXckAJa3rJ0=;
+        b=lobpFbm1ZUT1T7CHLid4x0nju3D2+FzMftrIXDUIaY4LEQqmXqtFwPj9XJiAglFDK599LX
+        YOaZfGb+E9csvzELAQfoAo7yyALrJdnpqocD+vSQ/KQfAajyYbBEM9Z6LrVeZbT4WcvDfT
+        vJtILaY17eFeSClwVb6/ukszJvBvtng=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1675950230;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=YFbQcVJyIgmubWJ3BH8e+P9uwLq7imStPXckAJa3rJ0=;
+        b=u3qgcAbJZ1IgCHtwHPCOmQZrQeopvl2qa/aP/B3MHnrTuj+RIZMWecg5lycfjSigHsBHIx
+        q/Er6C2iq4K/6OCQ==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 4314F1339E;
+        Thu,  9 Feb 2023 13:43:50 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id bdpaEJb45GO2eQAAMHmgww
+        (envelope-from <jack@suse.cz>); Thu, 09 Feb 2023 13:43:50 +0000
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+        id C725AA06D8; Thu,  9 Feb 2023 14:43:49 +0100 (CET)
+Date:   Thu, 9 Feb 2023 14:43:49 +0100
+From:   Jan Kara <jack@suse.cz>
+To:     Kemeng Shi <shikemeng@huaweicloud.com>
+Cc:     axboe@kernel.dk, hch@lst.de, jack@suse.cz,
+        andriy.shevchenko@linux.intel.com, qiulaibin@huawei.com,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/7] blk-mq: sync wake_batch update and users number
+ change
+Message-ID: <20230209134349.vspcytw7drt7sqnn@quack3>
+References: <20230209201116.579809-1-shikemeng@huaweicloud.com>
+ <20230209201116.579809-2-shikemeng@huaweicloud.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230209201116.579809-2-shikemeng@huaweicloud.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-We support mixed merge for requests/bios with different fastfail
-settings. When request fails, each time we only handle the portion
-with same failfast setting, then bios with failfast can be failed
-immediately, and bios without failfast can be retried.
+On Fri 10-02-23 04:11:10, Kemeng Shi wrote:
+> Commit 180dccb0dba4f ("blk-mq: fix tag_get wait task can't be awakened")
+> added recalculation of wake_batch when active_queues changes to avoid io
+> hung.
+> Function blk_mq_tag_idle and blk_mq_tag_busy can be called concurrently,
+> then wake_batch maybe updated with old users number. For example, if
+> tag alloctions for two shared queue happen concurrently, blk_mq_tag_busy
+> maybe executed as following:
+> thread1  			thread2
+> atomic_inc_return
+> 				atomic_inc_return
+> 				blk_mq_update_wake_batch
+> blk_mq_update_wake_batch
+> 
+> 1.Thread1 adds active_queues from zero to one.
+> 2.Thread2 adds active_queues from one to two.
+> 3.Thread2 calculates wake_batch with latest active_queues number two.
+> 4.Thread1 calculates wake_batch with stale active_queues number one.
+> Then wake_batch is inconsistent with actual active_queues. If wake_batch
+> is calculated with active_queues number smaller than actual active_queues
+> number, wake_batch will be greater than it supposed to be and cause io
+> hung.
+> 
+> Sync wake_batch update and users number change to keep wake_batch
+> consistent with active_queues to fix this.
+> 
+> Fixes: 180dccb0dba4 ("blk-mq: fix tag_get wait task can't be awakened")
+> Signed-off-by: Kemeng Shi <shikemeng@huaweicloud.com>
 
-The idea is pretty good, but the current implementation has several
-defects:
+OK, luckily this extra spin_lock happens only when adding and removing a
+busy queue which should be reasonably rare. So looks good to me. Feel free
+to add:
 
-1) initially RA bio doesn't set failfast, however bio merge code
-doesn't consider this point, and just check its failfast setting for
-deciding if mixed merge is required. Fix this issue by adding helper
-of bio_failfast().
+Reviewed-by: Jan Kara <jack@suse.cz>
 
-2) when merging bio to request front, if this request is mixed
-merged, we have to sync request's faifast setting with 1st bio's
-failfast. Fix it by calling blk_update_mixed_merge().
+								Honza
 
-3) when merging bio to request back, if this request is mixed
-merged, we have to mark the bio as failfast, because blk_update_request
-simply updates request failfast with 1st bio's failfast. Fix
-it by calling blk_update_mixed_merge().
-
-Fixes one normal EXT4 READ IO failure issue, because it is observed
-that the normal READ IO is merged with RA IO, and the mixed merged
-request has different failfast setting with 1st bio's, so finally
-the normal READ IO doesn't get retried.
-
-Cc: Tejun Heo <tj@kernel.org>
-Fixes: 80a761fd33cf ("block: implement mixed merge of different failfast requests")
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-merge.c | 35 +++++++++++++++++++++++++++++++++--
- 1 file changed, 33 insertions(+), 2 deletions(-)
-
-diff --git a/block/blk-merge.c b/block/blk-merge.c
-index b7c193d67185..30e4a99c2276 100644
---- a/block/blk-merge.c
-+++ b/block/blk-merge.c
-@@ -757,6 +757,33 @@ void blk_rq_set_mixed_merge(struct request *rq)
- 	rq->rq_flags |= RQF_MIXED_MERGE;
- }
- 
-+static inline unsigned int bio_failfast(const struct bio *bio)
-+{
-+	if (bio->bi_opf & REQ_RAHEAD)
-+		return REQ_FAILFAST_MASK;
-+
-+	return bio->bi_opf & REQ_FAILFAST_MASK;
-+}
-+
-+/*
-+ * After we are marked as MIXED_MERGE, any new RA bio has to be updated
-+ * as failfast, and request's failfast has to be updated in case of
-+ * front merge.
-+ */
-+static inline void blk_update_mixed_merge(struct request *req,
-+		struct bio *bio, bool front_merge)
-+{
-+	if (req->rq_flags & RQF_MIXED_MERGE) {
-+		if (bio->bi_opf & REQ_RAHEAD)
-+			bio->bi_opf |= REQ_FAILFAST_MASK;
-+
-+		if (front_merge) {
-+			req->cmd_flags &= ~REQ_FAILFAST_MASK;
-+			req->cmd_flags |= bio->bi_opf & REQ_FAILFAST_MASK;
-+		}
-+	}
-+}
-+
- static void blk_account_io_merge_request(struct request *req)
- {
- 	if (blk_do_io_stat(req)) {
-@@ -954,7 +981,7 @@ enum bio_merge_status {
- static enum bio_merge_status bio_attempt_back_merge(struct request *req,
- 		struct bio *bio, unsigned int nr_segs)
- {
--	const blk_opf_t ff = bio->bi_opf & REQ_FAILFAST_MASK;
-+	const blk_opf_t ff = bio_failfast(bio);
- 
- 	if (!ll_back_merge_fn(req, bio, nr_segs))
- 		return BIO_MERGE_FAILED;
-@@ -965,6 +992,8 @@ static enum bio_merge_status bio_attempt_back_merge(struct request *req,
- 	if ((req->cmd_flags & REQ_FAILFAST_MASK) != ff)
- 		blk_rq_set_mixed_merge(req);
- 
-+	blk_update_mixed_merge(req, bio, false);
-+
- 	req->biotail->bi_next = bio;
- 	req->biotail = bio;
- 	req->__data_len += bio->bi_iter.bi_size;
-@@ -978,7 +1007,7 @@ static enum bio_merge_status bio_attempt_back_merge(struct request *req,
- static enum bio_merge_status bio_attempt_front_merge(struct request *req,
- 		struct bio *bio, unsigned int nr_segs)
- {
--	const blk_opf_t ff = bio->bi_opf & REQ_FAILFAST_MASK;
-+	const blk_opf_t ff = bio_failfast(bio);
- 
- 	if (!ll_front_merge_fn(req, bio, nr_segs))
- 		return BIO_MERGE_FAILED;
-@@ -989,6 +1018,8 @@ static enum bio_merge_status bio_attempt_front_merge(struct request *req,
- 	if ((req->cmd_flags & REQ_FAILFAST_MASK) != ff)
- 		blk_rq_set_mixed_merge(req);
- 
-+	blk_update_mixed_merge(req, bio, true);
-+
- 	bio->bi_next = req->bio;
- 	req->bio = bio;
- 
+> ---
+>  block/blk-mq-tag.c | 11 +++++++++--
+>  1 file changed, 9 insertions(+), 2 deletions(-)
+> 
+> diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
+> index 9eb968e14d31..1d3135acfc98 100644
+> --- a/block/blk-mq-tag.c
+> +++ b/block/blk-mq-tag.c
+> @@ -39,7 +39,9 @@ static void blk_mq_update_wake_batch(struct blk_mq_tags *tags,
+>   */
+>  void __blk_mq_tag_busy(struct blk_mq_hw_ctx *hctx)
+>  {
+> +	struct blk_mq_tags *tags = hctx->tags;
+>  	unsigned int users;
+> +	unsigned long flags;
+>  
+>  	if (blk_mq_is_shared_tags(hctx->flags)) {
+>  		struct request_queue *q = hctx->queue;
+> @@ -53,9 +55,11 @@ void __blk_mq_tag_busy(struct blk_mq_hw_ctx *hctx)
+>  		set_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state);
+>  	}
+>  
+> -	users = atomic_inc_return(&hctx->tags->active_queues);
+> +	spin_lock_irqsave(&tags->lock, flags);
+> +	users = atomic_inc_return(&tags->active_queues);
+>  
+> -	blk_mq_update_wake_batch(hctx->tags, users);
+> +	blk_mq_update_wake_batch(tags, users);
+> +	spin_unlock_irqrestore(&tags->lock, flags);
+>  }
+>  
+>  /*
+> @@ -76,6 +80,7 @@ void __blk_mq_tag_idle(struct blk_mq_hw_ctx *hctx)
+>  {
+>  	struct blk_mq_tags *tags = hctx->tags;
+>  	unsigned int users;
+> +	unsigned long flags;
+>  
+>  	if (blk_mq_is_shared_tags(hctx->flags)) {
+>  		struct request_queue *q = hctx->queue;
+> @@ -88,9 +93,11 @@ void __blk_mq_tag_idle(struct blk_mq_hw_ctx *hctx)
+>  			return;
+>  	}
+>  
+> +	spin_lock_irqsave(&tags->lock, flags);
+>  	users = atomic_dec_return(&tags->active_queues);
+>  
+>  	blk_mq_update_wake_batch(tags, users);
+> +	spin_unlock_irqrestore(&tags->lock, flags);
+>  
+>  	blk_mq_tag_wakeup_all(tags, false);
+>  }
+> -- 
+> 2.30.0
+> 
 -- 
-2.31.1
-
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
