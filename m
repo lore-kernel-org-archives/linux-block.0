@@ -2,95 +2,95 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 68DA2C636D6
-	for <linux-block@archiver.kernel.org>; Thu,  9 Feb 2023 15:07:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01EA3C64EC4
+	for <linux-block@archiver.kernel.org>; Thu,  9 Feb 2023 15:12:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230136AbjBIPHu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 9 Feb 2023 10:07:50 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49150 "EHLO
+        id S231239AbjBIPMd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 9 Feb 2023 10:12:33 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52624 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229707AbjBIPHs (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 9 Feb 2023 10:07:48 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC5C45ACF4
-        for <linux-block@vger.kernel.org>; Thu,  9 Feb 2023 07:07:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1675955231;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=2bykY5ltudiFVwAjrX3Al4RUFY4iK7RUW76wSPYzOKs=;
-        b=e49mOixrr0oy7rOkevC0QOROcabqU4jpUTClnVhJ7LX60oHBUcIeWc7SKmTRM47TQh85Aq
-        X6wcrKoe/RxqkHH1t1Eshmq6XjDvjr1EGBhaejo7oNVmpPdg8QPbD7ogRVZGp1066XA5da
-        AsP2F7vG0T80mZ/FPWNYSvm1DrS/8Nc=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-194-sQ-OEzM-NNunWl4RcBiL1A-1; Thu, 09 Feb 2023 10:07:05 -0500
-X-MC-Unique: sQ-OEzM-NNunWl4RcBiL1A-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id D3429857D07;
-        Thu,  9 Feb 2023 15:07:03 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.33.36.24])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 6E2F1140EBF6;
-        Thu,  9 Feb 2023 15:07:00 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <Y+UJAdnllBw+uxK+@casper.infradead.org>
-References: <Y+UJAdnllBw+uxK+@casper.infradead.org> <20230209102954.528942-1-dhowells@redhat.com> <20230209102954.528942-2-dhowells@redhat.com>
-To:     Matthew Wilcox <willy@infradead.org>
-Cc:     dhowells@redhat.com, Jens Axboe <axboe@kernel.dk>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Christoph Hellwig <hch@infradead.org>, Jan Kara <jack@suse.cz>,
-        Jeff Layton <jlayton@kernel.org>,
-        David Hildenbrand <david@redhat.com>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        Hillf Danton <hdanton@sina.com>, linux-fsdevel@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org,
-        syzbot+a440341a59e3b7142895@syzkaller.appspotmail.com,
-        Christoph Hellwig <hch@lst.de>,
-        John Hubbard <jhubbard@nvidia.com>
-Subject: Re: [PATCH v13 01/12] splice: Fix O_DIRECT file read splice to avoid reversion of ITER_PIPE
+        with ESMTP id S231229AbjBIPMc (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 9 Feb 2023 10:12:32 -0500
+Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7664F32523
+        for <linux-block@vger.kernel.org>; Thu,  9 Feb 2023 07:12:30 -0800 (PST)
+Received: by mail-pl1-x635.google.com with SMTP id k13so3183552plg.0
+        for <linux-block@vger.kernel.org>; Thu, 09 Feb 2023 07:12:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=7PDb/mD0FNcuvevCtgRwjkKj+UfK+Lh+rlPz9oXE0/s=;
+        b=vLNKvMiy5n65JggsJYN5SAT5Mnwr2BIypMeL0NGLQkhSzBiL5FT37klJ85/bdysSYq
+         8FBwnhmn6VF/Qjrf0v8i7zoC0U/DXfWvz+HwV+7lZySswUYZynnSsiWYOKr+cnMcH7iO
+         BiSEQjvwvHYAVc/sQMJ1cQlBXmlqLPdFgxoYv9lV6pFF4PZXK3j+8g60qVIYNDO0cKZ/
+         PPO+MJl71h/JgzU8AxTEkFguunRkIkiTQ/zhMUZ/JVpvGl0nxZFPvPahDagXs2k0vodU
+         gBfh3AW2GHZiRcIZ30JYrofz5teupArrO8v5Y/eQENUprngvIV9ZbO/hYQ0B96UGacfQ
+         br4g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=7PDb/mD0FNcuvevCtgRwjkKj+UfK+Lh+rlPz9oXE0/s=;
+        b=qOIFuf4mharswB0RmjU2yYQJ2s5xFH08V7kI0HY8q3pN4N0/pYB0QRmGkrEHm2M9d9
+         gv1fTaCg8GL2VgNgThFKiuVQW4rJNufYsjPRjuc0CJlNHHiRqp2OOlISIK1eJ+6Owewa
+         KxWqsBdh84IBGYNQAQ1fnHI4LDMt6aXGCu5bVYb1kwGOk9sUm/eELBl+xMoD0CoE6yCI
+         9dbjL2Ys7lPIGtSfCh0OWe2f6R2qzAw3wNkxWJ6fu76n3DPhzu+Iwdy3gPcZwf68k/aJ
+         QNo+VWnD/5UUrh+7FA2Vs/+8HwYPMECbqooLtAQDsy5Wpp/TiCX8PilnK1vQcd3PopfM
+         qD2Q==
+X-Gm-Message-State: AO0yUKVsXGRl5Qo3QXnqjZR0REylK7W+d4rQKvmMzVpFKfUcsl2hV4vF
+        ONIu2nZXoc7Ufzn0sVH9OIrDmA==
+X-Google-Smtp-Source: AK7set/Hp3peKbU9cWTP3s475Gtd1sd1IlOQINVNvjhBZ08vSzPAfn4wRTyIrfsIK67VvLsCOx9V4g==
+X-Received: by 2002:a17:902:680b:b0:199:3f82:ef62 with SMTP id h11-20020a170902680b00b001993f82ef62mr7912671plk.5.1675955549810;
+        Thu, 09 Feb 2023 07:12:29 -0800 (PST)
+Received: from [192.168.1.136] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id a10-20020a170902b58a00b001991e4e0bdcsm1593336pls.233.2023.02.09.07.12.28
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 09 Feb 2023 07:12:29 -0800 (PST)
+Message-ID: <d3529d65-f505-a76a-7f3c-db1d8d2578a3@kernel.dk>
+Date:   Thu, 9 Feb 2023 08:12:28 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <757357.1675955219.1@warthog.procyon.org.uk>
-Date:   Thu, 09 Feb 2023 15:06:59 +0000
-Message-ID: <757358.1675955219@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.7
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
+ Thunderbird/102.7.1
+Subject: Re: [GIT PULL] nvme fixes for Linux 6.2
+Content-Language: en-US
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
+References: <Y+SAN97vxJtL/l4G@infradead.org>
+From:   Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <Y+SAN97vxJtL/l4G@infradead.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Matthew Wilcox <willy@infradead.org> wrote:
-
-> On Thu, Feb 09, 2023 at 10:29:43AM +0000, David Howells wrote:
-> > +	npages = alloc_pages_bulk_list(GFP_USER, npages, &pages);
+On 2/8/23 10:10 PM, Christoph Hellwig wrote:
+> The following changes since commit e02bbac74cdde25f71a80978f5daa1d8a0aa6fc3:
 > 
-> Please don't use alloc_pages_bulk_list().  If nobody uses it, it can go
-> away again soon.  Does alloc_pages_bulk_array() work for you?  It's
-> faster.
-
-Sure.
-
-> > +	/* Free any pages that didn't get touched at all. */
-> > +	for (; reclaim >= PAGE_SIZE; reclaim -= PAGE_SIZE)
-> > +		__free_page(bv[--npages].bv_page);
+>   Merge tag 'nvme-6.2-2023-02-02' of git://git.infradead.org/nvme into block-6.2 (2023-02-02 11:02:12 -0700)
 > 
-> If you have that array, you can then use release_pages() to free
-> them, which will be faster.
+> are available in the Git repository at:
+> 
+>   git://git.infradead.org/nvme.git tags/nvme-6.2-2023-02-09
+> 
+> for you to fetch changes up to 70daa5c8f001e351af174c40ac21eb0a25600483:
+> 
+>   nvme-auth: mark nvme_auth_wq static (2023-02-08 07:28:16 +0100)
+> 
+> ----------------------------------------------------------------
+> nvme fixes for Linux 6.2
+> 
+>  - fix a static checker warning for a variable introduces in the last
+>    pull request (Tom Rix)
 
-Um.  I would normally overlay the array on end of the bvec[] so that I could
-save on an allocation (I have to fill in the bvec[] anyway) - which means I
-wouldn't still have the array at release time.  But in this case I can make an
-exception, though I would've thought that the expectation would be that all
-the requested data would be fetched.
+Pulled, thanks.
 
-David
+-- 
+Jens Axboe
+
 
