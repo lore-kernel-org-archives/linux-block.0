@@ -2,68 +2,110 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 476E0C05027
-	for <linux-block@archiver.kernel.org>; Thu,  9 Feb 2023 05:10:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89A3AC05027
+	for <linux-block@archiver.kernel.org>; Thu,  9 Feb 2023 05:35:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230049AbjBIFKr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 9 Feb 2023 00:10:47 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56200 "EHLO
+        id S229505AbjBIFf2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 9 Feb 2023 00:35:28 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37984 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229787AbjBIFKn (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 9 Feb 2023 00:10:43 -0500
+        with ESMTP id S229473AbjBIFf1 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 9 Feb 2023 00:35:27 -0500
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4EF282B2A6
-        for <linux-block@vger.kernel.org>; Wed,  8 Feb 2023 21:10:31 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D8AF0303F2
+        for <linux-block@vger.kernel.org>; Wed,  8 Feb 2023 21:35:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Content-Type:MIME-Version:Message-ID:
-        Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-        Content-Description:In-Reply-To:References;
-        bh=iBtAheEM6wnZRltncAb4YD4CDLILeplXzPceme4va8E=; b=Lrg/w3DKkynU3iy7W4KH9bNOow
-        cIkYDdQDtku0f/6foOh3dFEzo3Yf6I7PY5qHrKZNRzeIb9BGUZ7HqLeKGlBEfpKpM4kcuRAfiixkI
-        YV4u9xFV+KunYrHxJFKnBClbNp7a/cGTAK6qLIHtqx7dj/VqxrxEGZu6/UQbPeZw1DWp1Y1Sf1QVv
-        /dI8WfBTBr+jSh90TD+31ylnwW8Pwi8iUgGADf5COpyepCUBpKe3eNA3mmBkDGC6w8GcLqEofhnEB
-        7/V2zDrhbgDU5txfR6rWENqDbBQxQzs1XnfOfYDnopqkj3KmUzNbZywi4xzxXQRIhSCQGF9IxGsEa
-        2sIaZpXQ==;
+        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+        Content-ID:Content-Description:In-Reply-To:References;
+        bh=6xkg7wCJfrkIZGacEqi5Aow/jy7gFYR4w7i6+ZHEZ3c=; b=h1AbxNFDyTVCxxkAcaplu76o2T
+        3vYVrC5DpagVOV3vmk82mAyJupxtfDHlk/XWD+ZQjGCUwgSYzW1YqVB6C02H5R6FSUzYPru6hAfs6
+        QnNWGSftoKO9g2TOrLboslLnVrYt8QdKA8uDQQfDRKLYFRwFhBxlZmHlwEj9rZOeOPB+vadONWmqK
+        XD9hL+88/f2YD5de0nkaX/eDUSgBNcyFGwG74dsvuVBYI5iREV6ITImk///LYUGh2KI+M8NQrMZ3W
+        DcsY2uCdcl74vC1QUxAS64MUDDOJn1qJdjyNx1+lfl98i7aZxnk0A+mmuYR6OdN2tcm6iWyMCPTHu
+        XLu6f5uA==;
 Received: from [2001:4bb8:182:9f5b:acdc:d3c1:a8cd:f858] (helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1pPzCM-000BYu-4R; Thu, 09 Feb 2023 05:10:18 +0000
-Date:   Thu, 9 Feb 2023 06:10:15 +0100
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
-Subject: [GIT PULL] nvme fixes for Linux 6.2
-Message-ID: <Y+SAN97vxJtL/l4G@infradead.org>
+        id 1pPzaf-000DUd-Eu; Thu, 09 Feb 2023 05:35:25 +0000
+From:   Christoph Hellwig <hch@lst.de>
+To:     axboe@kernel.dk
+Cc:     error27@gmail.com, linux-block@vger.kernel.org
+Subject: [PATCH] Revert "blk-cgroup: simplify blkg freeing from initialization failure paths"
+Date:   Thu,  9 Feb 2023 06:35:23 +0100
+Message-Id: <20230209053523.437927-1-hch@lst.de>
+X-Mailer: git-send-email 2.39.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The following changes since commit e02bbac74cdde25f71a80978f5daa1d8a0aa6fc3:
+It turns out this was too soon.  blkg_conf_prep does to funky locking games
+with the queue lock for this to work properly.
 
-  Merge tag 'nvme-6.2-2023-02-02' of git://git.infradead.org/nvme into block-6.2 (2023-02-02 11:02:12 -0700)
+This reverts commit 27b642b07a4a5eb44dffa94a5171ce468bdc46f9.
 
-are available in the Git repository at:
+Reported-by: Dan Carpenter <error27@gmail.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ block/blk-cgroup.c | 27 ++++++++++++++++++++-------
+ 1 file changed, 20 insertions(+), 7 deletions(-)
 
-  git://git.infradead.org/nvme.git tags/nvme-6.2-2023-02-09
+diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+index d8fe607138b96d..935028912e7abf 100644
+--- a/block/blk-cgroup.c
++++ b/block/blk-cgroup.c
+@@ -114,8 +114,10 @@ static bool blkcg_policy_enabled(struct gendisk *disk,
+ 	return pol && test_bit(pol->plid, disk->blkcg_pols);
+ }
+ 
+-static void blkg_free(struct blkcg_gq *blkg)
++static void blkg_free_workfn(struct work_struct *work)
+ {
++	struct blkcg_gq *blkg = container_of(work, struct blkcg_gq,
++					     free_work);
+ 	int i;
+ 
+ 	/*
+@@ -140,9 +142,23 @@ static void blkg_free(struct blkcg_gq *blkg)
+ 	kfree(blkg);
+ }
+ 
+-static void blkg_free_workfn(struct work_struct *work)
++/**
++ * blkg_free - free a blkg
++ * @blkg: blkg to free
++ *
++ * Free @blkg which may be partially allocated.
++ */
++static void blkg_free(struct blkcg_gq *blkg)
+ {
+-	blkg_free(container_of(work, struct blkcg_gq, free_work));
++	if (!blkg)
++		return;
++
++	/*
++	 * Both ->pd_free_fn() and request queue's release handler may
++	 * sleep, so free us by scheduling one work func
++	 */
++	INIT_WORK(&blkg->free_work, blkg_free_workfn);
++	schedule_work(&blkg->free_work);
+ }
+ 
+ static void __blkg_release(struct rcu_head *rcu)
+@@ -153,10 +169,7 @@ static void __blkg_release(struct rcu_head *rcu)
+ 
+ 	/* release the blkcg and parent blkg refs this blkg has been holding */
+ 	css_put(&blkg->blkcg->css);
+-
+-	/* ->pd_free_fn() may sleep, so free from a work queue */
+-	INIT_WORK(&blkg->free_work, blkg_free_workfn);
+-	schedule_work(&blkg->free_work);
++	blkg_free(blkg);
+ }
+ 
+ /*
+-- 
+2.39.1
 
-for you to fetch changes up to 70daa5c8f001e351af174c40ac21eb0a25600483:
-
-  nvme-auth: mark nvme_auth_wq static (2023-02-08 07:28:16 +0100)
-
-----------------------------------------------------------------
-nvme fixes for Linux 6.2
-
- - fix a static checker warning for a variable introduces in the last
-   pull request (Tom Rix)
-
-----------------------------------------------------------------
-Tom Rix (1):
-      nvme-auth: mark nvme_auth_wq static
-
- drivers/nvme/host/auth.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
