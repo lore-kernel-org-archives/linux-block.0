@@ -2,110 +2,70 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89A3AC05027
-	for <linux-block@archiver.kernel.org>; Thu,  9 Feb 2023 05:35:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24647C64EC5
+	for <linux-block@archiver.kernel.org>; Thu,  9 Feb 2023 07:14:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229505AbjBIFf2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 9 Feb 2023 00:35:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37984 "EHLO
+        id S229733AbjBIHOL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 9 Feb 2023 02:14:11 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48698 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229473AbjBIFf1 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 9 Feb 2023 00:35:27 -0500
+        with ESMTP id S229460AbjBIHOK (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 9 Feb 2023 02:14:10 -0500
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D8AF0303F2
-        for <linux-block@vger.kernel.org>; Wed,  8 Feb 2023 21:35:26 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 31BA76EBE;
+        Wed,  8 Feb 2023 23:14:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
-        Content-ID:Content-Description:In-Reply-To:References;
-        bh=6xkg7wCJfrkIZGacEqi5Aow/jy7gFYR4w7i6+ZHEZ3c=; b=h1AbxNFDyTVCxxkAcaplu76o2T
-        3vYVrC5DpagVOV3vmk82mAyJupxtfDHlk/XWD+ZQjGCUwgSYzW1YqVB6C02H5R6FSUzYPru6hAfs6
-        QnNWGSftoKO9g2TOrLboslLnVrYt8QdKA8uDQQfDRKLYFRwFhBxlZmHlwEj9rZOeOPB+vadONWmqK
-        XD9hL+88/f2YD5de0nkaX/eDUSgBNcyFGwG74dsvuVBYI5iREV6ITImk///LYUGh2KI+M8NQrMZ3W
-        DcsY2uCdcl74vC1QUxAS64MUDDOJn1qJdjyNx1+lfl98i7aZxnk0A+mmuYR6OdN2tcm6iWyMCPTHu
-        XLu6f5uA==;
-Received: from [2001:4bb8:182:9f5b:acdc:d3c1:a8cd:f858] (helo=localhost)
+        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
+        :Reply-To:Content-Type:Content-ID:Content-Description;
+        bh=ov9sgtmaVVk76Nnibt+EsTt5whBz9yioDNjhR8t7vzM=; b=sotlfO2ckkITNtMuLW72f3/Oed
+        FkjR9N20VHrFzd0sN42rLRcMpV/kIlKfI7aYuhMY7tXgpIVnQ6hdzvPwNPttm4M7zr3y/vDiCVjaM
+        aUk3sUJttR686//8ozmIXp/BAnOuzbxBxMNfjSNfkmN8CTU6ypH4nt5lFmR1uq2Zyrhu7ijerAtYh
+        U4ZfEqYxWoRi4sxIRcaZ+Irg7DPwrf94IEucLhOzwRDftx1vSqObd/F6yHlFEyrak+lFZrdhjNOVW
+        V/3lZhi6gNF0ImlLJC6G1bydJSvVb4iEET4L4i3PfMEwuldWgDhm3dNNGF0zX0Koa1gmkr7PgwoRp
+        Xzk41sTQ==;
+Received: from [2601:1c2:980:9ec0::df2f] (helo=bombadil.infradead.org)
         by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1pPzaf-000DUd-Eu; Thu, 09 Feb 2023 05:35:25 +0000
-From:   Christoph Hellwig <hch@lst.de>
-To:     axboe@kernel.dk
-Cc:     error27@gmail.com, linux-block@vger.kernel.org
-Subject: [PATCH] Revert "blk-cgroup: simplify blkg freeing from initialization failure paths"
-Date:   Thu,  9 Feb 2023 06:35:23 +0100
-Message-Id: <20230209053523.437927-1-hch@lst.de>
+        id 1pQ189-000LPt-Tq; Thu, 09 Feb 2023 07:14:06 +0000
+From:   Randy Dunlap <rdunlap@infradead.org>
+To:     linux-kernel@vger.kernel.org
+Cc:     Randy Dunlap <rdunlap@infradead.org>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>,
+        linux-doc@vger.kernel.org, Mukesh Ojha <quic_mojha@quicinc.com>
+Subject: [PATCH 02/24] Documentation: block: correct spelling
+Date:   Wed,  8 Feb 2023 23:13:38 -0800
+Message-Id: <20230209071400.31476-3-rdunlap@infradead.org>
 X-Mailer: git-send-email 2.39.1
+In-Reply-To: <20230209071400.31476-1-rdunlap@infradead.org>
+References: <20230209071400.31476-1-rdunlap@infradead.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-It turns out this was too soon.  blkg_conf_prep does to funky locking games
-with the queue lock for this to work properly.
+Correct spelling problems for Documentation/block/ as reported
+by codespell.
 
-This reverts commit 27b642b07a4a5eb44dffa94a5171ce468bdc46f9.
-
-Reported-by: Dan Carpenter <error27@gmail.com>
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+Cc: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org
+Cc: Jonathan Corbet <corbet@lwn.net>
+Cc: linux-doc@vger.kernel.org
+Reviewed-by: Mukesh Ojha <quic_mojha@quicinc.com>
 ---
- block/blk-cgroup.c | 27 ++++++++++++++++++++-------
- 1 file changed, 20 insertions(+), 7 deletions(-)
+ Documentation/block/data-integrity.rst |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-index d8fe607138b96d..935028912e7abf 100644
---- a/block/blk-cgroup.c
-+++ b/block/blk-cgroup.c
-@@ -114,8 +114,10 @@ static bool blkcg_policy_enabled(struct gendisk *disk,
- 	return pol && test_bit(pol->plid, disk->blkcg_pols);
- }
+diff -- a/Documentation/block/data-integrity.rst b/Documentation/block/data-integrity.rst
+--- a/Documentation/block/data-integrity.rst
++++ b/Documentation/block/data-integrity.rst
+@@ -209,7 +209,7 @@ will require extra work due to the appli
+       sector must be set, and the bio should have all data pages
+       added.  It is up to the caller to ensure that the bio does not
+       change while I/O is in progress.
+-      Complete bio with error if prepare failed for some reson.
++      Complete bio with error if prepare failed for some reason.
  
--static void blkg_free(struct blkcg_gq *blkg)
-+static void blkg_free_workfn(struct work_struct *work)
- {
-+	struct blkcg_gq *blkg = container_of(work, struct blkcg_gq,
-+					     free_work);
- 	int i;
  
- 	/*
-@@ -140,9 +142,23 @@ static void blkg_free(struct blkcg_gq *blkg)
- 	kfree(blkg);
- }
- 
--static void blkg_free_workfn(struct work_struct *work)
-+/**
-+ * blkg_free - free a blkg
-+ * @blkg: blkg to free
-+ *
-+ * Free @blkg which may be partially allocated.
-+ */
-+static void blkg_free(struct blkcg_gq *blkg)
- {
--	blkg_free(container_of(work, struct blkcg_gq, free_work));
-+	if (!blkg)
-+		return;
-+
-+	/*
-+	 * Both ->pd_free_fn() and request queue's release handler may
-+	 * sleep, so free us by scheduling one work func
-+	 */
-+	INIT_WORK(&blkg->free_work, blkg_free_workfn);
-+	schedule_work(&blkg->free_work);
- }
- 
- static void __blkg_release(struct rcu_head *rcu)
-@@ -153,10 +169,7 @@ static void __blkg_release(struct rcu_head *rcu)
- 
- 	/* release the blkcg and parent blkg refs this blkg has been holding */
- 	css_put(&blkg->blkcg->css);
--
--	/* ->pd_free_fn() may sleep, so free from a work queue */
--	INIT_WORK(&blkg->free_work, blkg_free_workfn);
--	schedule_work(&blkg->free_work);
-+	blkg_free(blkg);
- }
- 
- /*
--- 
-2.39.1
-
+ 5.3 Passing Existing Integrity Metadata
