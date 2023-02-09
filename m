@@ -2,133 +2,271 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B863C61DA4
-	for <linux-block@archiver.kernel.org>; Thu,  9 Feb 2023 09:57:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5AE75C636D4
+	for <linux-block@archiver.kernel.org>; Thu,  9 Feb 2023 10:31:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229518AbjBIJ5c (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 9 Feb 2023 04:57:32 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59872 "EHLO
+        id S230022AbjBIKbD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 9 Feb 2023 05:31:03 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50632 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229511AbjBIJ5c (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 9 Feb 2023 04:57:32 -0500
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3844612F1E
-        for <linux-block@vger.kernel.org>; Thu,  9 Feb 2023 01:57:31 -0800 (PST)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        with ESMTP id S229696AbjBIKay (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 9 Feb 2023 05:30:54 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4AC593A84
+        for <linux-block@vger.kernel.org>; Thu,  9 Feb 2023 02:30:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1675938603;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=4vEba/OySlTdZtDzfMG6AafJ/oXIhw8IMMkEOxChx5k=;
+        b=fiGAb1zESqLPLipEGSPkU2KPQPL8T0Qdt0Gmc1PtaKiOFdl7snYg26JNGyGplsl38CsZKm
+        tdZI4UZnE7QkyO0xoHXlOnWbmB+TXxxWzgvW70aEyCms8+0CuG4q/WTMQq2dORH185ye9+
+        01c9oBLW9Dg49eCiM1OO4yJjyK1DjMs=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-373-xHjHRdNPOaW_fhnnvVrgtw-1; Thu, 09 Feb 2023 05:29:59 -0500
+X-MC-Unique: xHjHRdNPOaW_fhnnvVrgtw-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id D7DFE35209;
-        Thu,  9 Feb 2023 09:57:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1675936649; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Z88GobQKtv5ZCXutB8csrkWAJRSymXsgbw1e09nhEC0=;
-        b=k7HjgAqlIgNg7fKlXEpXvQmLi1NiSdu34Rp6xcXwdeITzK0kP7yGqGpvz9IfUJDqm3wYoK
-        e6yuO+68rhPstZ/AcSept4y/7kkiqDLFl3N8ZtYzSQm3mORWONCgJrK9Ju9yBu9857MRcQ
-        pxMwU3NH2rXYRXrwdXuNVJaeojOMAxM=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1675936649;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Z88GobQKtv5ZCXutB8csrkWAJRSymXsgbw1e09nhEC0=;
-        b=rQXCRId6ILoFS19fcqS+vnYH2xLhC1DQyG9bqEy+D4Ih8yJrBc+T5a4DK7TdY3IHBQXRlS
-        J6MZkfifst1dOvBA==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id C622D138E4;
-        Thu,  9 Feb 2023 09:57:29 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id awtVMInD5GO8FQAAMHmgww
-        (envelope-from <jack@suse.cz>); Thu, 09 Feb 2023 09:57:29 +0000
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-        id 33A68A06D8; Thu,  9 Feb 2023 10:57:29 +0100 (CET)
-Date:   Thu, 9 Feb 2023 10:57:29 +0100
-From:   Jan Kara <jack@suse.cz>
-To:     Yu Kuai <yukuai1@huaweicloud.com>
-Cc:     Jan Kara <jack@suse.cz>, Christoph Hellwig <hch@infradead.org>,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        "yukuai (C)" <yukuai3@huawei.com>
-Subject: Re: [PATCH] block: Do not reread partition table on exclusively open
- device
-Message-ID: <20230209095729.igkpj23afj6nbxxi@quack3>
-References: <ada13b1b-dd2a-8be0-3b12-3470a086bbf6@huaweicloud.com>
- <Y9kiltmuPSbRRLsO@infradead.org>
- <92d53d6b-f83d-0767-4f6a-1b897b33b227@huaweicloud.com>
- <Y9oFHssFz2obv83W@infradead.org>
- <1901c3f0-da34-1df1-2443-3426282a6ecb@huaweicloud.com>
- <1b5d3502-353d-8674-cd5d-79283fa8905d@huaweicloud.com>
- <20230208120258.64yhqho252gaydmu@quack3>
- <02e769f7-9a41-80bc-4e47-fa87c18a36b2@huaweicloud.com>
- <20230209090439.w2k37tufbbhk6qq3@quack3>
- <1bf91d5c-6130-43de-7995-af09045d4b98@huaweicloud.com>
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E13353C10233;
+        Thu,  9 Feb 2023 10:29:58 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.33.36.24])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id ECAE61410F36;
+        Thu,  9 Feb 2023 10:29:56 +0000 (UTC)
+From:   David Howells <dhowells@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>, Al Viro <viro@zeniv.linux.org.uk>,
+        Christoph Hellwig <hch@infradead.org>
+Cc:     David Howells <dhowells@redhat.com>,
+        Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>,
+        Jeff Layton <jlayton@kernel.org>,
+        David Hildenbrand <david@redhat.com>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Logan Gunthorpe <logang@deltatee.com>,
+        Hillf Danton <hdanton@sina.com>, linux-fsdevel@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org
+Subject: [PATCH v13 00/12] iov_iter: Improve page extraction (pin or just list)
+Date:   Thu,  9 Feb 2023 10:29:42 +0000
+Message-Id: <20230209102954.528942-1-dhowells@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <1bf91d5c-6130-43de-7995-af09045d4b98@huaweicloud.com>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.7
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu 09-02-23 17:32:45, Yu Kuai wrote:
-> 在 2023/02/09 17:04, Jan Kara 写道:
-> > On Wed 08-02-23 22:13:02, Yu Kuai wrote:
-> > > Hi,
-> > > 
-> > > 在 2023/02/08 20:02, Jan Kara 写道:
-> > > > 
-> > > > After some thought I don't like opencoding blkdev_get_by_dev() in disk_scan
-> > > > partitions. But I agree Christoph's approach with blkdev_get_whole() does
-> > > > not quite work either. We could propagate holder/owner into
-> > > > blkdev_get_whole() to fix Christoph's check but still we are left with a
-> > > > question what to do with GD_NEED_PART_SCAN set bit when we get into
-> > > > blkdev_get_whole() and find out we are not elligible to rescan partitions.
-> > > > Because then some exclusive opener later might be caught by surprise when
-> > > > the partition rescan happens due to this bit being set from the past failed
-> > > > attempt to rescan.
-> > > > 
-> > > > So what we could do is play a similar trick as we do in the loop device and
-> > > > do in disk_scan_partitions():
-> > > > 
-> > > > 	/*
-> > > > 	 * If we don't hold exclusive handle for the device, upgrade to it
-> > > > 	 * here to avoid changing partitions under exclusive owner.
-> > > > 	 */
-> > > > 	if (!(mode & FMODE_EXCL)) {
-> > > This is not necessary, all the caller make sure FMODE_EXCL is not set.
-> > 
-> > Yes, but we need to propagate it correctly from blkdev_common_ioctl() now,
-> > exactly so that ioctl does not fail if you exclusively opened the device as
-> > you realized below :)
-> 
-> Ok, I get it that you want to pass in FMODE_EXCL from ioctl(). But I'm
-> not sure let others fail to open device extl is a good idea.
+Hi Jens, Al, Christoph,
 
-Other exclusive openers will not fail. They will block until we call
-bd_abort_claiming() after the partitions have been reread.
+Here are patches to provide support for extracting pages from an iov_iter
+and to use this in the extraction functions in the block layer bio code.
 
-> I still prefer to open code blkdev_get_by_dev(), because many operations
-> is not necessary here. And this way, we can clear GD_NEED_PART_SCAN
-> inside open_mutex if rescan failed.
+The patches make the following changes:
 
-I understand many operations are not needed there but this is not a hot
-path and leaking of bdev internal details into genhd.c is not a good
-practice either (e.g. you'd have to make blkdev_get_whole() extern).
+ (1) Change generic_file_splice_read() to no longer use ITER_PIPE for doing
+     a read from an O_DIRECT file fd, but rather load up an ITER_BVEC
+     iterator with sufficient pages and use that rather than using an
+     ITER_PIPE.  This avoids a problem[2] when __iomap_dio_rw() calls
+     iov_iter_revert() to shorten an iterator when it races with
+     truncation.  The reversion causes the pipe iterator to prematurely
+     release the pages it was retaining - despite the read still being in
+     progress.  This caused memory corruption.
 
-We could create a special helper for partition rescan in block/bdev.c to
-hide the details but think that bd_start_claiming() - bd_abort_claiming()
-trick is the simplest solution to temporarily grab exclusive ownership if
-we don't have it.
+ (2) Change generic_file_splice_read() to no longer use ITER_PIPE for doing
+     a read from a buffered file fd, but rather get pages directly from the
+     pagecache using filemap_get_pages() do all the readahead, reading,
+     waiting and extraction, and then feed the pages directly into the
+     pipe.
 
-								Honza
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+ (3) filemap_get_pages() is altered so that it doesn't take an iterator
+     (which we don't have in (2)), but rather the count and a flag
+     indicating if we can handle partially uptodate pages are passed in and
+     down to its subsidiary functions.
+
+ (4) Remove ITER_PIPE and its paraphernalia as generic_file_splice_read()
+     was the only user.
+
+ (5) Add a function, iov_iter_extract_pages() to replace
+     iov_iter_get_pages*() that gets refs, pins or just lists the pages as
+     appropriate to the iterator type.
+
+     Add a function, iov_iter_extract_will_pin() that will indicate from
+     the iterator type how the cleanup is to be performed, returning true
+     if the pages will need unpinning, false otherwise.
+
+ (6) Make the bio struct carry a pair of flags to indicate the cleanup
+     mode.  BIO_NO_PAGE_REF is replaced with BIO_PAGE_REFFED (indicating
+     FOLL_GET was used) and BIO_PAGE_PINNED (indicating FOLL_PIN was used)
+     is added.
+
+     BIO_PAGE_REFFED will go away, but at the moment fs/direct-io.c sets it
+     and this series does not fully address that file.
+
+ (7) Add a function, bio_release_page(), to release a page appropriately to
+     the cleanup mode indicated by the BIO_PAGE_* flags.
+
+ (8) Make the iter-to-bio code use iov_iter_extract_pages() to retain the
+     pages appropriately and clean them up later.
+
+ (9) Fix bio_flagged() so that it doesn't prevent a gcc optimisation.
+
+I've pushed the patches here also:
+
+	https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/log/?h=iov-extract
+
+David
+
+Changes:
+========
+ver #13)
+ - Only use allocation in advance and ITER_BVEC for DIO read-splice.
+ - Make buffered read-splice get pages directly from the pagecache.
+ - Alter filemap_get_pages() & co. so that it doesn't need an iterator.
+
+ver #12)
+ - Added the missing __bitwise on the iov_iter_extraction_t typedef.
+ - Rebased on -rc7.
+ - Don't specify FOLL_PIN to pin_user_pages_fast().
+ - Inserted patch at front to fix race between DIO read and truncation that
+   caused memory corruption when iov_iter_revert() got called on an
+   ITER_PIPE iterator[2].
+ - Inserted a patch after that to remove the now-unused ITER_PIPE and its
+   helper functions.
+ - Removed the ITER_PIPE bits from iov_iter_extract_pages().
+
+ver #11)
+ - Fix iov_iter_extract_kvec_pages() to include the offset into the page in
+   the returned starting offset.
+ - Use __bitwise for the extraction flags
+
+ver #10)
+ - Fix use of i->kvec in iov_iter_extract_bvec_pages() to be i->bvec.
+ - Drop bio_set_cleanup_mode(), open coding it instead.
+
+ver #9)
+ - It's now not permitted to use FOLL_PIN outside of mm/, so:
+ - Change iov_iter_extract_mode() into iov_iter_extract_will_pin() and
+   return true/false instead of FOLL_PIN/0.
+ - Drop of folio_put_unpin() and page_put_unpin() and instead call
+   unpin_user_page() (and put_page()) directly as necessary.
+ - Make __bio_release_pages() call bio_release_page() instead of
+   unpin_user_page() as there's no BIO_* -> FOLL_* translation to do.
+ - Drop the FOLL_* renumbering patch.
+ - Change extract_flags to extraction_flags.
+
+ver #8)
+ - Import Christoph Hellwig's changes.
+   - Split the conversion-to-extraction patch.
+   - Drop the extract_flags arg from iov_iter_extract_mode().
+   - Don't default bios to BIO_PAGE_REFFED, but set explicitly.
+ - Switch FOLL_PIN and FOLL_GET when renumbering so PIN is at bit 0.
+ - Switch BIO_PAGE_PINNED and BIO_PAGE_REFFED so PINNED is at bit 0.
+ - We should always be using FOLL_PIN (not FOLL_GET) for DIO, so adjust the
+   patches for that.
+
+ver #7)
+ - For now, drop the parts to pass the I/O direction to iov_iter_*pages*()
+   as it turned out to be a lot more complicated, with places not setting
+   IOCB_WRITE when they should, for example.
+ - Drop all the patches that changed things other then the block layer's
+   bio handling.  The netfslib and cifs changes can go into a separate
+   patchset.
+ - Add support for extracting pages from KVEC-type iterators.
+ - When extracting from BVEC/KVEC, skip over empty vecs at the front.
+
+ver #6)
+ - Fix write() syscall and co. not setting IOCB_WRITE.
+ - Added iocb_is_read() and iocb_is_write() to check IOCB_WRITE.
+ - Use op_is_write() in bio_copy_user_iov().
+ - Drop the iterator direction checks from smbd_recv().
+ - Define FOLL_SOURCE_BUF and FOLL_DEST_BUF and pass them in as part of
+   gup_flags to iov_iter_get/extract_pages*().
+ - Replace iov_iter_get_pages*2() with iov_iter_get_pages*() and remove.
+ - Add back the function to indicate the cleanup mode.
+ - Drop the cleanup_mode return arg to iov_iter_extract_pages().
+ - Provide a helper to clean up a page.
+ - Renumbered FOLL_GET and FOLL_PIN and made BIO_PAGE_REFFED/PINNED have
+   the same numerical values, enforced with an assertion.
+ - Converted AF_ALG, SCSI vhost, generic DIO, FUSE, splice to pipe, 9P and
+   NFS.
+ - Added in the patches to make CIFS do top-to-bottom iterators and use
+   various of the added extraction functions.
+ - Added a pair of work-in-progess patches to make sk_buff fragments store
+   FOLL_GET and FOLL_PIN.
+
+ver #5)
+ - Replace BIO_NO_PAGE_REF with BIO_PAGE_REFFED and split into own patch.
+ - Transcribe FOLL_GET/PIN into BIO_PAGE_REFFED/PINNED flags.
+ - Add patch to allow bio_flagged() to be combined by gcc.
+
+ver #4)
+ - Drop the patch to move the FOLL_* flags to linux/mm_types.h as they're
+   no longer referenced by linux/uio.h.
+ - Add ITER_SOURCE/DEST cleanup patches.
+ - Make iov_iter/netfslib iter extraction patches use ITER_SOURCE/DEST.
+ - Allow additional gup_flags to be passed into iov_iter_extract_pages().
+ - Add struct bio patch.
+
+ver #3)
+ - Switch to using EXPORT_SYMBOL_GPL to prevent indirect 3rd-party access
+   to get/pin_user_pages_fast()[1].
+
+ver #2)
+ - Rolled the extraction cleanup mode query function into the extraction
+   function, returning the indication through the argument list.
+ - Fixed patch 4 (extract to scatterlist) to actually use the new
+   extraction API.
+
+Link: https://lore.kernel.org/r/Y3zFzdWnWlEJ8X8/@infradead.org/ [1]
+Link: https://lore.kernel.org/r/000000000000b0b3c005f3a09383@google.com/ [2]
+Link: https://lore.kernel.org/r/166697254399.61150.1256557652599252121.stgit@warthog.procyon.org.uk/ # rfc
+Link: https://lore.kernel.org/r/166722777223.2555743.162508599131141451.stgit@warthog.procyon.org.uk/ # rfc
+Link: https://lore.kernel.org/r/166732024173.3186319.18204305072070871546.stgit@warthog.procyon.org.uk/ # rfc
+Link: https://lore.kernel.org/r/166869687556.3723671.10061142538708346995.stgit@warthog.procyon.org.uk/ # rfc
+Link: https://lore.kernel.org/r/166920902005.1461876.2786264600108839814.stgit@warthog.procyon.org.uk/ # v2
+Link: https://lore.kernel.org/r/166997419665.9475.15014699817597102032.stgit@warthog.procyon.org.uk/ # v3
+Link: https://lore.kernel.org/r/167305160937.1521586.133299343565358971.stgit@warthog.procyon.org.uk/ # v4
+Link: https://lore.kernel.org/r/167344725490.2425628.13771289553670112965.stgit@warthog.procyon.org.uk/ # v5
+Link: https://lore.kernel.org/r/167391047703.2311931.8115712773222260073.stgit@warthog.procyon.org.uk/ # v6
+Link: https://lore.kernel.org/r/20230120175556.3556978-1-dhowells@redhat.com/ # v7
+Link: https://lore.kernel.org/r/20230123173007.325544-1-dhowells@redhat.com/ # v8
+Link: https://lore.kernel.org/r/20230124170108.1070389-1-dhowells@redhat.com/ # v9
+Link: https://lore.kernel.org/r/20230125210657.2335748-1-dhowells@redhat.com/ # v10
+Link: https://lore.kernel.org/r/20230126141626.2809643-1-dhowells@redhat.com/ # v11
+Link: https://lore.kernel.org/r/20230207171305.3716974-1-dhowells@redhat.com/ # v12
+
+Christoph Hellwig (1):
+  block: Replace BIO_NO_PAGE_REF with BIO_PAGE_REFFED with inverted
+    logic
+
+David Howells (11):
+  splice: Fix O_DIRECT file read splice to avoid reversion of ITER_PIPE
+  mm: Pass info, not iter, into filemap_get_pages() and unstatic it
+  splice: Do splice read from a buffered file without using ITER_PIPE
+  iov_iter: Kill ITER_PIPE
+  iov_iter: Define flags to qualify page extraction.
+  iov_iter: Add a function to extract a page list from an iterator
+  iomap: Don't get an reference on ZERO_PAGE for direct I/O block
+    zeroing
+  block: Fix bio_flagged() so that gcc can better optimise it
+  block: Add BIO_PAGE_PINNED and associated infrastructure
+  block: Convert bio_iov_iter_get_pages to use iov_iter_extract_pages
+  block: convert bio_map_user_iov to use iov_iter_extract_pages
+
+ block/bio.c               |  33 +-
+ block/blk-map.c           |  26 +-
+ block/blk.h               |  12 +
+ fs/cifs/file.c            |   8 +-
+ fs/direct-io.c            |   2 +
+ fs/iomap/direct-io.c      |   1 -
+ fs/splice.c               | 245 ++++++++++++-
+ include/linux/bio.h       |   5 +-
+ include/linux/blk_types.h |   3 +-
+ include/linux/pagemap.h   |   2 +
+ include/linux/uio.h       |  49 ++-
+ lib/iov_iter.c            | 713 +++++++++++++++-----------------------
+ mm/filemap.c              |  30 +-
+ 13 files changed, 603 insertions(+), 526 deletions(-)
+
