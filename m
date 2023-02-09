@@ -2,88 +2,115 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CFD32C636D7
-	for <linux-block@archiver.kernel.org>; Thu,  9 Feb 2023 16:39:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A422C61DA4
+	for <linux-block@archiver.kernel.org>; Thu,  9 Feb 2023 19:09:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229662AbjBIQjE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 9 Feb 2023 11:39:04 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47184 "EHLO
+        id S229457AbjBITJk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 9 Feb 2023 14:09:40 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42072 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229649AbjBIQjE (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 9 Feb 2023 11:39:04 -0500
-Received: from mail-il1-x12d.google.com (mail-il1-x12d.google.com [IPv6:2607:f8b0:4864:20::12d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C62675D1D8
-        for <linux-block@vger.kernel.org>; Thu,  9 Feb 2023 08:39:02 -0800 (PST)
-Received: by mail-il1-x12d.google.com with SMTP id y8so979573ilp.1
-        for <linux-block@vger.kernel.org>; Thu, 09 Feb 2023 08:39:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=t4uXFLudCXK7C83Silz2odK5j98HOY4Dq7T/WA9bw5M=;
-        b=HoRdJeK5sN7GFDv8wEVbw+d6CEM95J8tc43GxgbTprthhHtotMaqB8/Twfo1BxWtfw
-         zReDXESEisZsWJYicS55+W2TmsmiEwZCr+Gnrn227943/FMms8ciH5OPBtUdj4Zt/QRr
-         ZvOk+sg7BUXX4Iu0X7M1EEBB8DPl+w64c7XD+7PjIdXs5DAogPkspC1BcPeh3AWWi1ZO
-         TrAhEEGOClaashUbpOAwJ5ELdPp1i/PeI04C/L6PLeUTw2TmIJDMsvPXT2EXTifFie/L
-         SUOs9nS5Sc70nTrOyHY2Kwe3UIUalqz+tMjlZUGU1mNlQvNChHi9bioONDDmqXA4JNaq
-         wyoA==
+        with ESMTP id S229483AbjBITJj (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 9 Feb 2023 14:09:39 -0500
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27F79658F6;
+        Thu,  9 Feb 2023 11:09:37 -0800 (PST)
+Received: by mail-pl1-f180.google.com with SMTP id u9so3936943plr.9;
+        Thu, 09 Feb 2023 11:09:37 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=t4uXFLudCXK7C83Silz2odK5j98HOY4Dq7T/WA9bw5M=;
-        b=Jis+ukJ2k7OOX4j/qmc5OViuMbsD/6kmQVxI8vmgXnY1/xiruMGq9fYn6xcdD/30aT
-         6QWRw3i6NnDqyybgc5vej8r7yyvTptrw6hQ6kLrCGknlVp5Ku/qgWLKxAJaXEfKt3+AM
-         wHaGHBw9Wq+1cGTCd6SN0u0hiEOk/L4WUKieogK/zptCXM5ooywPs5inH7punq53UWsH
-         jJ6j1+SKo8BBcOQ8BqekMFErax0wFSFAI/IARmwg++lGyKZueZbOtZA4zNyrcFSks++O
-         OXCIv3f6lKaUvlcU/froKZox37Gds9l7F9x5/Vs7mz65s3cMRLVcx5AI93Ai+VYQSfmB
-         oKZg==
-X-Gm-Message-State: AO0yUKVq/osnf5a3C08CzXXdYKvw3MoEWVNT9g+VeutY9YRbyANfANSr
-        1Qm9pvZmObut1pz6nVZmGGVEOQ==
-X-Google-Smtp-Source: AK7set/PpaCBvpqzAGe5GZPxAD3bxg9ZiVka+e9eDCRuGuf8vxnA9H6o3KHW4CbnEQWWjIsN+8jNcQ==
-X-Received: by 2002:a05:6e02:1b88:b0:313:c5a4:9888 with SMTP id h8-20020a056e021b8800b00313c5a49888mr10935544ili.0.1675960742109;
-        Thu, 09 Feb 2023 08:39:02 -0800 (PST)
-Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id d7-20020a056e02214700b00313fd0afb40sm573207ilv.58.2023.02.09.08.39.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Feb 2023 08:39:01 -0800 (PST)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-In-Reply-To: <20230208-kobj_type-block-v1-1-0b3eafd7d983@weissschuh.net>
-References: <20230208-kobj_type-block-v1-1-0b3eafd7d983@weissschuh.net>
-Subject: Re: [PATCH] block: make kobj_type structures constant
-Message-Id: <167596074152.332757.13679917606663797604.b4-ty@kernel.dk>
-Date:   Thu, 09 Feb 2023 09:39:01 -0700
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=03jnNn8D8Zd31Z8vK5q3T/UQbdP/Vod7or8RrPZ1S6g=;
+        b=xRROc2r07tsoL1eDQm7RaIOlFyYGNocmlEK1pie6GJxSFOAzT+HG/vTghej6w8HuMn
+         G1JJ6BVUdhU3CqClALRwxmQiS4LK/3BdOfmpM5fRStOBqiaJpK5ubL0X5oXHz5mMLmjP
+         SndGYYzVPlzW4M3MrpzaDqk2Vw1kXIZIE9QH98AfVGkxD9T1bY+L9npL/ebNcv9ntZ4k
+         AjHjHX4nJofhJ/dEWmO07tUVdzx4vxYZmn0bnY8qKKaaA6+YANtA3JzlUn+skL1PrCW1
+         lPruQ+Fqhh8K59I6vazK+C6TYdZPrDDKSoWYDT+mm5fxonZ3DhTXMy8gKjXJMbRu84WF
+         k2EA==
+X-Gm-Message-State: AO0yUKUalmO9lv3wTRCdCJG2izYSsmuAsb8GnOKE2x7bWEMzlGspPcjr
+        Qzs89fN9yjrNWQ080vpmHMCKreVLrhM=
+X-Google-Smtp-Source: AK7set9V8EYWT/iJLRXzBb9vqHUdZJNLRLMQ+tsi+3G8JKvcD91PpjY19v5/M1blxF+vYQ5PeyuYcw==
+X-Received: by 2002:a05:6a21:6716:b0:bc:6e88:7f58 with SMTP id wh22-20020a056a21671600b000bc6e887f58mr9158372pzb.51.1675969776553;
+        Thu, 09 Feb 2023 11:09:36 -0800 (PST)
+Received: from ?IPV6:2620:15c:211:201:15f5:48f5:6861:f3f6? ([2620:15c:211:201:15f5:48f5:6861:f3f6])
+        by smtp.gmail.com with ESMTPSA id g9-20020a633749000000b004db367c10b0sm1614705pgn.46.2023.02.09.11.09.34
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 09 Feb 2023 11:09:35 -0800 (PST)
+Message-ID: <55a065e7-7d86-d58f-15ba-c631a427843e@acm.org>
+Date:   Thu, 9 Feb 2023 11:09:33 -0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-Mailer: b4 0.12.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.6.0
+Subject: Re: [PATCH] blk-ioprio: Introduce promote-to-rt policy
+Content-Language: en-US
+To:     Jan Kara <jack@suse.cz>
+Cc:     Hou Tao <houtao@huaweicloud.com>, linux-block@vger.kernel.org,
+        Jens Axboe <axboe@kernel.dk>, cgroups@vger.kernel.org,
+        Tejun Heo <tj@kernel.org>, Zefan Li <lizefan.x@bytedance.com>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        Jonathan Corbet <corbet@lwn.net>, linux-kernel@vger.kernel.org,
+        linux-doc@vger.kernel.org, houtao1@huawei.com
+References: <20230201045227.2203123-1-houtao@huaweicloud.com>
+ <8c068af3-7199-11cf-5c69-a523c7c22d9a@acm.org>
+ <4f7dcb3e-2d5a-cae3-0e1c-a82bcc3d2217@huaweicloud.com>
+ <b6b3c498-e90b-7d1f-6ad5-a31334e433ae@acm.org>
+ <beb7782e-72a4-c350-3750-23a767c88753@huaweicloud.com>
+ <aedc240d-7c9e-248a-52d2-c9775f3e8ca1@acm.org>
+ <20230208134345.77bdep3kzp52haxu@quack3>
+ <7fcd4c38-ccbe-6411-e424-a57595ad9c0b@acm.org>
+ <20230209085603.dzqfcc3pp4hacqlz@quack3>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20230209085603.dzqfcc3pp4hacqlz@quack3>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
-On Wed, 08 Feb 2023 04:01:22 +0000, Thomas Weißschuh wrote:
-> Since commit ee6d3dd4ed48 ("driver core: make kobj_type constant.")
-> the driver core allows the usage of const struct kobj_type.
+On 2/9/23 00:56, Jan Kara wrote:
+> On Wed 08-02-23 09:53:41, Bart Van Assche wrote:
+>> The test results I shared some time ago show that IOPRIO_CLASS_NONE was the
+>> default I/O priority two years ago (see also https://lore.kernel.org/linux-block/20210927220328.1410161-5-bvanassche@acm.org/).
+>> The none-to-rt policy increases the priority of bio's that have not been
+>> assigned an I/O priority to RT. Does this answer your question?
 > 
-> Take advantage of this to constify the structure definitions to prevent
-> modification at runtime.
+> Not quite. I know that historically we didn't set bio I/O priority in some
+> paths (but we did set it in other paths such as some (but not all) direct
+> IO implementations). But that was exactly a mess because how none-to-rt
+> actually behaved depended on the exact details of the kernel internal IO
+> path.  So my question is: Was none-to-rt actually just a misnomer and the
+> intended behavior was "always override to RT"? Or what was exactly the
+> expectation around when IO priority is not set and should be overridden?
 > 
+> How should it interact with AIO submissions with IOCB_FLAG_IOPRIO? How
+> should it interact with task having its IO priority modified with
+> ioprio_set(2)? And what if task has its normal scheduling priority modified
+> but that translates into different IO priority (which happens in
+> __get_task_ioprio())?
 > 
-> [...]
+> So I think that none-to-rt is just poorly defined and if we can just get
+> rid of it (or redefine to promote-to-rt), that would be good. But maybe I'm
+> missing some intended usecase...
 
-Applied, thanks!
+Hi Jan,
 
-[1/1] block: make kobj_type structures constant
-      commit: 5f6224175fbe4c2b91e303c17af4d4eb5e3a60a7
+We have no plans to use the ioprio_set() system call since it only 
+affects foreground I/O and not page cache writeback.
 
-Best regards,
--- 
-Jens Axboe
+While Android supports io_uring, there are no plans to support libaio in 
+the Android C library (Bionic).
 
+Regarding __get_task_ioprio(), I haven't found any code in that function 
+that derives an I/O priority from the scheduling priority. Did I perhaps 
+overlook something?
 
+Until recently "none-to-rt" meant "if no I/O priority has been assigned 
+to a task, use IOPRIO_CLASS_RT". Promoting the I/O priority to 
+IOPRIO_CLASS_RT works for us. I'm fine with changing the meaning of 
+"none-to-rt" into promoting the I/O priority class to RT. Introducing 
+"promote-to-rt" as a synonym of "none-to-rt" is also fine with me.
 
+Thanks,
+
+Bart.
