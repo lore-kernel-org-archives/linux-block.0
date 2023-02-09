@@ -2,127 +2,74 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A446C64EC4
-	for <linux-block@archiver.kernel.org>; Thu,  9 Feb 2023 22:43:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 27C6EC05027
+	for <linux-block@archiver.kernel.org>; Thu,  9 Feb 2023 23:01:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230420AbjBIWnW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 9 Feb 2023 17:43:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44342 "EHLO
+        id S230242AbjBIXBq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 9 Feb 2023 18:01:46 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55144 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230503AbjBIWnF (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 9 Feb 2023 17:43:05 -0500
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 802076A58;
-        Thu,  9 Feb 2023 14:42:44 -0800 (PST)
-Received: by linux.microsoft.com (Postfix, from userid 1052)
-        id F1D2D20C8AF3; Thu,  9 Feb 2023 14:42:43 -0800 (PST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com F1D2D20C8AF3
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-        s=default; t=1675982564;
-        bh=twQrcBPkL//FHJ6DuWZAJcdyzb2KtmPBGq3WDULJ5IA=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=KS6NUOHT53V1toIWOzZ/B95ebJ5eY0gLTk1eC5rRL0tSXiDlIiuJVvP7SoqvF8jFO
-         XYpL69kk1pddbeXiBgrVMfd1Tcxz6KAoUp3onHgeS92LxxFjYFWnPciIXEya1X+2in
-         W8cVKwaTHJS1LF3ACYcFE1JjThrIw4QRvKhAwv1w=
-Date:   Thu, 9 Feb 2023 14:42:43 -0800
-From:   Fan Wu <wufan@linux.microsoft.com>
-To:     Roberto Sassu <roberto.sassu@huaweicloud.com>
-Cc:     corbet@lwn.net, zohar@linux.ibm.com, jmorris@namei.org,
-        serge@hallyn.com, tytso@mit.edu, ebiggers@kernel.org,
-        axboe@kernel.dk, agk@redhat.com, snitzer@kernel.org,
-        eparis@redhat.com, paul@paul-moore.com, linux-doc@vger.kernel.org,
-        linux-integrity@vger.kernel.org,
-        linux-security-module@vger.kernel.org,
-        linux-fscrypt@vger.kernel.org, linux-block@vger.kernel.org,
-        dm-devel@redhat.com, linux-audit@redhat.com,
-        roberto.sassu@huawei.com, linux-kernel@vger.kernel.org,
-        Deven Bowers <deven.desai@linux.microsoft.com>
-Subject: Re: [RFC PATCH v9 06/16] ipe: add LSM hooks on execution and kernel
- read
-Message-ID: <20230209224243.GA9462@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
-References: <1675119451-23180-1-git-send-email-wufan@linux.microsoft.com>
- <1675119451-23180-7-git-send-email-wufan@linux.microsoft.com>
- <412da9a9da2e75e896911f01bfd735dd4b5789f4.camel@huaweicloud.com>
+        with ESMTP id S229964AbjBIXBo (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 9 Feb 2023 18:01:44 -0500
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE2557EEE
+        for <linux-block@vger.kernel.org>; Thu,  9 Feb 2023 15:01:43 -0800 (PST)
+Received: by mail-pl1-f169.google.com with SMTP id u9so4609641plr.9
+        for <linux-block@vger.kernel.org>; Thu, 09 Feb 2023 15:01:43 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=SsoJBcPOtEbVblkphgVRBPSm8oYIqlJ0jiZODV70ln4=;
+        b=Hj6nN5oSIqiJLMp9E95DPudSBAm2j5wNH1OuqLezEMSnfAksg6LuOdBsDRWvuYxKtZ
+         LGCk2g12Q4UrUDdrf97Zw6xnAkLKmonEut26R1cXNZBvcwCa7DxPGNiTu/xvZZI4I0mb
+         4eIZx0teLeRPw+3oxww69ZFUF4SoNQaQnrSxgqCvbucBOFHJtFdtFzagSBIwxqiI6LG+
+         cDMNFFVFszsqa968Pb3J4CCwucfYAyP7JN508djmEwxGAStnoCp2Z/Av+RakBinlUqXy
+         orhO4c49xSGnL8NcK6gI/3K9eFWhthx4oY2Fhy9l2tUZXmVw4QpwvWE9FfvvQFHxOnQW
+         QrWw==
+X-Gm-Message-State: AO0yUKXeXYR0V+SawAizfB3AgtOHfaKDiJzZ4QeuztjTQtoWD7mK8yDn
+        lAfFJxKcPM/ampGp8lAWNXU=
+X-Google-Smtp-Source: AK7set8+TJJklmFv/N0iXgDNB+Crqz/ld4eKa2EI+J19kImtO2ZFsOxvUM3zZk8GHjPpWJUwHNZQRQ==
+X-Received: by 2002:a17:90b:4b07:b0:22b:efa5:d05 with SMTP id lx7-20020a17090b4b0700b0022befa50d05mr14357821pjb.40.1675983703324;
+        Thu, 09 Feb 2023 15:01:43 -0800 (PST)
+Received: from bvanassche-linux.mtv.corp.google.com ([2620:15c:211:201:15f5:48f5:6861:f3f6])
+        by smtp.gmail.com with ESMTPSA id k14-20020a17090a39ce00b00231156a7da1sm1639758pjf.4.2023.02.09.15.01.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 09 Feb 2023 15:01:42 -0800 (PST)
+From:   Bart Van Assche <bvanassche@acm.org>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Bart Van Assche <bvanassche@acm.org>,
+        Pavel Begunkov <asml.silence@gmail.com>
+Subject: [PATCH] block: Remove the ALLOC_CACHE_SLACK constant
+Date:   Thu,  9 Feb 2023 15:01:35 -0800
+Message-Id: <20230209230135.3475829-1-bvanassche@acm.org>
+X-Mailer: git-send-email 2.39.1.581.gbfd45094c4-goog
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <412da9a9da2e75e896911f01bfd735dd4b5789f4.camel@huaweicloud.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jan 31, 2023 at 01:51:39PM +0100, Roberto Sassu wrote:
-> On Mon, 2023-01-30 at 14:57 -0800, Fan Wu wrote:
-> > +
-> > +/**
-> > + * ipe_mmap_file - ipe security hook function for mmap check.
-> > + * @f: File being mmap'd. Can be NULL in the case of anonymous memory.
-> > + * @reqprot: The requested protection on the mmap, passed from usermode.
-> > + * @prot: The effective protection on the mmap, resolved from reqprot and
-> > + *	  system configuration.
-> > + * @flags: Unused.
-> > + *
-> > + * This hook is called when a file is loaded through the mmap
-> > + * family of system calls.
-> > + *
-> > + * Return:
-> > + * * 0	- OK
-> > + * * !0	- Error
-> > + */
-> > +int ipe_mmap_file(struct file *f, unsigned long reqprot, unsigned long prot,
-> > +		  unsigned long flags)
-> > +{
-> > +	struct ipe_eval_ctx ctx = { 0 };
-> > +
-> > +	if (prot & PROT_EXEC || reqprot & PROT_EXEC) {
-> 
-> Since the kernel only adds flags and doesn't clear them, isn't safe to
-> just consider prot? Oh, you mentioned it in the changelog, maybe just
-> for ipe_file_mprotect().
-> 
+Commit b99182c501c3 ("bio: add pcpu caching for non-polling bio_put")
+removed the code that uses this constant. Hence also remove the constant
+itself.
 
-Thanks for pointing that out, yes reqprot it indeed unnecessary, I will remove
-this part in the next version. 
+Cc: Pavel Begunkov <asml.silence@gmail.com>
+Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+---
+ block/bio.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-> > +		build_eval_ctx(&ctx, f, ipe_op_exec);
-> > +		return ipe_evaluate_event(&ctx);
-> > +	}
-> 
-> Uhm, I think some considerations that IMA does for mmap() are relevant
-> also for IPE.
-> 
-> For example, look at mmap_violation_check(). It checks if there are
-> writable mappings, and if yes, it denies the access.
-> 
-> Similarly for mprotect(), is adding PROT_EXEC safe?
-> 
-
-Yes, writable mapping might need to treat differently. But for the current version
-I think it is safe because currently we only support dmverity and fsverity,
-they are inherently read-only.
-
-But if in the future if there is a feature can support writable mapping, IPE might
-better provide user the flexibility to allow or deny execute writable mappings,
-for example, adding a new property like file_writable=TRUE. Then user can deploy
-a rule like op=EXECUTE file_writable=TRUE action=DENY to deny execute a writable
-mapping.
-
-> >  
-> > @@ -12,6 +13,11 @@ static struct lsm_blob_sizes ipe_blobs __lsm_ro_after_init = {
-> >  
-> >  static struct security_hook_list ipe_hooks[] __lsm_ro_after_init = {
-> >  	LSM_HOOK_INIT(sb_free_security, ipe_sb_free_security),
-> > +	LSM_HOOK_INIT(bprm_check_security, ipe_bprm_check_security),
-> > +	LSM_HOOK_INIT(mmap_file, ipe_mmap_file),
-> > +	LSM_HOOK_INIT(file_mprotect, ipe_file_mprotect),
-> > +	LSM_HOOK_INIT(kernel_read_file, ipe_kernel_read_file),
-> > +	LSM_HOOK_INIT(kernel_load_data, ipe_kernel_load_data),
-> >  };
-> 
-> Uhm, maybe I would incorporate patch 1 with this.
-> 
-> Roberto
-
-This might not be possible because this patch has some dependencies on the previous patches.
--Fan
+diff --git a/block/bio.c b/block/bio.c
+index 7447302141b7..88cd3f67a3af 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -26,7 +26,6 @@
+ #include "blk-cgroup.h"
+ 
+ #define ALLOC_CACHE_THRESHOLD	16
+-#define ALLOC_CACHE_SLACK	64
+ #define ALLOC_CACHE_MAX		256
+ 
+ struct bio_alloc_cache {
