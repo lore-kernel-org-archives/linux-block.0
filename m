@@ -2,121 +2,110 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D0F4C636D7
-	for <linux-block@archiver.kernel.org>; Thu,  9 Feb 2023 12:11:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1899CC05027
+	for <linux-block@archiver.kernel.org>; Thu,  9 Feb 2023 12:32:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229483AbjBIMLp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 9 Feb 2023 07:11:45 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49692 "EHLO
+        id S229518AbjBIMc0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 9 Feb 2023 07:32:26 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43096 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229798AbjBIMLS (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 9 Feb 2023 07:11:18 -0500
-Received: from exchange.fintech.ru (exchange.fintech.ru [195.54.195.159])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 50E4161B4;
-        Thu,  9 Feb 2023 04:09:29 -0800 (PST)
-Received: from Ex16-01.fintech.ru (10.0.10.18) by exchange.fintech.ru
- (195.54.195.169) with Microsoft SMTP Server (TLS) id 14.3.498.0; Thu, 9 Feb
- 2023 15:09:26 +0300
-Received: from KANASHIN1.fintech.ru (10.0.253.125) by Ex16-01.fintech.ru
- (10.0.10.18) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2242.4; Thu, 9 Feb 2023
- 15:09:25 +0300
-From:   Natalia Petrova <n.petrova@fintech.ru>
-To:     Ilya Dryomov <idryomov@gmail.com>
-CC:     Natalia Petrova <n.petrova@fintech.ru>,
-        Dongsheng Yang <dongsheng.yang@easystack.cn>,
-        Jens Axboe <axboe@kernel.dk>, <ceph-devel@vger.kernel.org>,
-        <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <lvc-project@linuxtesting.org>,
-        "Alexey Khoroshilov" <khoroshilov@ispras.ru>,
-        Nikita Zhandarovich <n.zhandarovich@fintech.ru>
-Subject: [PATCH v2] rbd: fix freeing memory of 'rbd_dev->opts', 'rbd_dev->spec', 'rbd_dev->rbd_client'
-Date:   Thu, 9 Feb 2023 15:09:23 +0300
-Message-ID: <20230209120923.331111-1-n.petrova@fintech.ru>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <06f51bab-42e1-975a-ad4f-6815c2063adb@redhat.com>
-References: 
+        with ESMTP id S230150AbjBIMcM (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 9 Feb 2023 07:32:12 -0500
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 644302A16F;
+        Thu,  9 Feb 2023 04:32:10 -0800 (PST)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id BC86C37476;
+        Thu,  9 Feb 2023 12:32:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1675945928; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Y67/jfZcaQ1t6XqJfCmKWgTl2+zDLO5vmdBow0/F1TM=;
+        b=pcl1MoPjJrqtKQ7VmePmRZ7GSAV/t0ZTMCVMmqRZCJ85r+TM8FrAlpGX/+nAs3me2AXnYb
+        +oke6O/NQry6pTkbUjFbiVswTcGKk9ZQFYdh4OHfafnnrpGnZ1pej1bEf6SbTjy7BfGODI
+        svinGNwGJ7TU+ao9NGN2AirHgWvY8zk=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1675945928;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Y67/jfZcaQ1t6XqJfCmKWgTl2+zDLO5vmdBow0/F1TM=;
+        b=PDjlgzwzWa9eJisya0ohOe7XJZPKSBlvylyTL+RO3mNo9e0ewsIVxbK1yEk9GtbxNYZrsO
+        2/GoNszJEVhzIVDQ==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id AF77E138E4;
+        Thu,  9 Feb 2023 12:32:08 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id YAcqKsjn5GO4WQAAMHmgww
+        (envelope-from <jack@suse.cz>); Thu, 09 Feb 2023 12:32:08 +0000
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+        id 86927A06E2; Thu,  9 Feb 2023 13:32:06 +0100 (CET)
+From:   Jan Kara <jack@suse.cz>
+To:     <linux-fsdevel@vger.kernel.org>
+Cc:     <linux-block@vger.kernel.org>, <linux-mm@kvack.org>,
+        John Hubbard <jhubbard@nvidia.com>,
+        David Howells <dhowells@redhat.com>,
+        David Hildenbrand <david@redhat.com>, Jan Kara <jack@suse.cz>
+Subject: [PATCH 2/5] ext4: Drop workaround for mm reclaiming fs private page data
+Date:   Thu,  9 Feb 2023 13:31:54 +0100
+Message-Id: <20230209123206.3548-2-jack@suse.cz>
+X-Mailer: git-send-email 2.35.3
+In-Reply-To: <20230209121046.25360-1-jack@suse.cz>
+References: <20230209121046.25360-1-jack@suse.cz>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.0.253.125]
-X-ClientProxiedBy: Ex16-01.fintech.ru (10.0.10.18) To Ex16-01.fintech.ru
- (10.0.10.18)
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1260; i=jack@suse.cz; h=from:subject; bh=h6csu2b8ZDggoYb6LWh5Isk6fkPmNiQSaSJRB+AFypk=; b=owGbwMvMwME4Z+4qdvsUh5uMp9WSGJKfPN911EVb7Lxqrw/bhdnTl4YmLDJx6uvdmPG5OEUtKpjn 1MIbnYzGLAyMHAyyYoosqyMval+bZ9S1NVRDBmYQKxPIFAYuTgGYyF9z9p+My7lNKjr+msd0J2bUzV h/9LhvRJ1jtImdb/yynSvc5vnoCr18rjdflL2vn/Mp7+Udld06EQ1v1+9nL6zZ/Mxgf5/4idOvs24r 2yrlKHs/PvMyhlf74w9l2b73W8L8Pl3s+G+y886HMN7rqfNkjD+ltn/LWf26t07ENUBt760Vjqq2Md dqbRhe62mpCqnuqrvqIW6ukLn9psn9tJ2/eARvBzQ6TmvRtNhlys2eIdOxxXNKsQxH8WL5T31OUS2L PivPPbkmnj/N4vtW9uhH7QoFz241XCjfOO3l34TDv0Qi5na15usteDHlky9XVoy80GlfqUeMLH0f/B QC22VLkxRdNq4oPX29ybHkxLY5AA==
+X-Developer-Key: i=jack@suse.cz; a=openpgp; fpr=93C6099A142276A28BBE35D815BC833443038D8C
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-If the rbd_dev_create() fails after assignment 'opts' to 'rbd_dev->opts',
-double free of 'rbd_options' happens:
-one is in rbd_dev_free() and another one is in do_rbd_add().
+Drop workaround in ext4 writeback code to handle a situation when MM
+reclaims fs-private page data from a page that is (or becomes) dirty.
+After the previous commit this should not happen anymore.
 
-If the rbd_dev_create() fails, for 'spec' it will be freed in
-rbd_dev_create()->rbd_spec_put() first and then in do_rbd_add()
-it will call rbd_spec_put() again. The same for 'rbd_client'.
-Unlike 'rbd_dev->opts', 'rbd_dev->spec' and 'rbd_dev->rbd_client'
-are ref-counted, that's why the ref-count underflow warning
-should be generated in rbd_spec_put() and rbd_put_client()
-to handle the return values of kref_put().
-
-Found by Linux Verification Center (linuxtesting.org) with SVACE.
-
-Fixes: 1643dfa4c2c8 ("rbd: introduce a per-device ordered workqueue")
-Signed-off-by: Natalia Petrova <n.petrova@fintech.ru>
-Signed-off-by: Alexey Khoroshilov <khoroshilov@ispras.ru>
-Signed-off-by: Nikita Zhandarovich <n.zhandarovich@fintech.ru>
+Signed-off-by: Jan Kara <jack@suse.cz>
 ---
-v2: Remarks on the processing of 'rbd_dev->spec' and 'rbd_dev->rbd_client' 
-by Ilya Dryomov <idryomov@gmail.com> and Xiubo Li <xiubli@redhat.com> 
-were taken into account.
- drivers/block/rbd.c | 14 +++++++++-----
- 1 file changed, 9 insertions(+), 5 deletions(-)
+ fs/ext4/inode.c | 16 ----------------
+ 1 file changed, 16 deletions(-)
 
-diff --git a/drivers/block/rbd.c b/drivers/block/rbd.c
-index 04453f4a319c..f3f253febe0f 100644
---- a/drivers/block/rbd.c
-+++ b/drivers/block/rbd.c
-@@ -889,8 +889,10 @@ static void rbd_client_release(struct kref *kref)
-  */
- static void rbd_put_client(struct rbd_client *rbdc)
- {
--	if (rbdc)
--		kref_put(&rbdc->kref, rbd_client_release);
-+	if (rbdc) {
-+		if (!kref_put(&rbdc->kref, rbd_client_release))
-+			pr_warn("The reference count underflow\n");
-+	}
- }
+diff --git a/fs/ext4/inode.c b/fs/ext4/inode.c
+index 9d9f414f99fe..46078651ce32 100644
+--- a/fs/ext4/inode.c
++++ b/fs/ext4/inode.c
+@@ -2657,22 +2657,6 @@ static int mpage_prepare_extent_to_map(struct mpage_da_data *mpd)
+ 			wait_on_page_writeback(page);
+ 			BUG_ON(PageWriteback(page));
  
- /*
-@@ -5225,8 +5227,10 @@ static struct rbd_spec *rbd_spec_get(struct rbd_spec *spec)
- static void rbd_spec_free(struct kref *kref);
- static void rbd_spec_put(struct rbd_spec *spec)
- {
--	if (spec)
--		kref_put(&spec->kref, rbd_spec_free);
-+	if (spec) {
-+		if (!kref_put(&spec->kref, rbd_spec_free))
-+			pr_warn("The reference count underflow\n");
-+	}
- }
- 
- static struct rbd_spec *rbd_spec_alloc(void)
-@@ -5357,7 +5361,6 @@ static struct rbd_device *rbd_dev_create(struct rbd_client *rbdc,
- 	if (!rbd_dev)
- 		return NULL;
- 
--	rbd_dev->opts = opts;
- 
- 	/* get an id and fill in device name */
- 	rbd_dev->dev_id = ida_simple_get(&rbd_dev_id_ida, 0,
-@@ -5372,6 +5375,7 @@ static struct rbd_device *rbd_dev_create(struct rbd_client *rbdc,
- 	if (!rbd_dev->task_wq)
- 		goto fail_dev_id;
- 
-+	rbd_dev->opts = opts;
- 	/* we have a ref from do_rbd_add() */
- 	__module_get(THIS_MODULE);
- 
+-			/*
+-			 * Should never happen but for buggy code in
+-			 * other subsystems that call
+-			 * set_page_dirty() without properly warning
+-			 * the file system first.  See [1] for more
+-			 * information.
+-			 *
+-			 * [1] https://lore.kernel.org/linux-mm/20180103100430.GE4911@quack2.suse.cz
+-			 */
+-			if (!page_has_buffers(page)) {
+-				ext4_warning_inode(mpd->inode, "page %lu does not have buffers attached", page->index);
+-				ClearPageDirty(page);
+-				unlock_page(page);
+-				continue;
+-			}
+-
+ 			if (mpd->map.m_len == 0)
+ 				mpd->first_page = page->index;
+ 			mpd->next_page = page->index + 1;
 -- 
-2.34.1
+2.35.3
 
