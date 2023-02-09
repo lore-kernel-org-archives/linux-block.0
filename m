@@ -2,76 +2,118 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A734C61DA4
-	for <linux-block@archiver.kernel.org>; Thu,  9 Feb 2023 08:57:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 554CFC05027
+	for <linux-block@archiver.kernel.org>; Thu,  9 Feb 2023 09:04:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229850AbjBII51 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 9 Feb 2023 03:57:27 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33848 "EHLO
+        id S229516AbjBIJEn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 9 Feb 2023 04:04:43 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40846 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229843AbjBII5Z (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 9 Feb 2023 03:57:25 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 31AA155295
-        for <linux-block@vger.kernel.org>; Thu,  9 Feb 2023 00:56:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1675932991;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=wEhNc7UlMIZjrolnLzoJH4JHn7TfQ3/f2PGK0ibhGO8=;
-        b=EDgVtmbpNjoq6Bn03UVAEaYowhuY/kvVdBF9f+LLYFP0M3Jo4orEUnFoW4sdW8lTwhVxsh
-        Ye07bGpxWkfQdzdm8EN5FQCMv8v6HNp+hLwcmvXmYT7KCZSFyqQbj7nf6tVZsql47Z44Yu
-        RiPCk2Eq6h6p9JuZilrarBsEIz0W/+k=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-85-IufnZA1DN-C-o0HmmcbLKw-1; Thu, 09 Feb 2023 03:56:28 -0500
-X-MC-Unique: IufnZA1DN-C-o0HmmcbLKw-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        with ESMTP id S229476AbjBIJEm (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 9 Feb 2023 04:04:42 -0500
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 472401717F
+        for <linux-block@vger.kernel.org>; Thu,  9 Feb 2023 01:04:41 -0800 (PST)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 8B9E085A588;
-        Thu,  9 Feb 2023 08:56:27 +0000 (UTC)
-Received: from T590 (ovpn-8-17.pek2.redhat.com [10.72.8.17])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 8D67418EC1;
-        Thu,  9 Feb 2023 08:56:23 +0000 (UTC)
-Date:   Thu, 9 Feb 2023 16:56:18 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     axboe@kernel.dk, linux-block@vger.kernel.org
-Subject: Re: [PATCH] blk-cgroup: delay calling blkcg_exit_disk until
- disk_release
-Message-ID: <Y+S1Mhzd3fPLqute@T590>
-References: <20230208063514.171485-1-hch@lst.de>
- <Y+NRgI+99Gz33BvQ@T590>
- <20230208151231.GA16018@lst.de>
- <Y+Q0mp1cV3Ca6bAf@T590>
- <20230209050401.GA8235@lst.de>
+        by smtp-out1.suse.de (Postfix) with ESMTPS id ED7D3350F4;
+        Thu,  9 Feb 2023 09:04:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1675933479; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=7xiUrjiXGVRMwQYotXmHqdKQibgsTFcZek+b4y3OfyU=;
+        b=AjHQJ83/5VeYYIlljkn+NHaQcwvzCGrxVGEiEgxm6APUwUzfcuUKvT0XKHuF5VMhH/M3kC
+        +DWzkCODzBxicwGLH/Um2M9rkeMnPKWRRCzmy4VeI06Zjnx23hMgi8l7e3pHyMOz23IK/F
+        zJZb3t6K97Qv5R2yA21Jz9vhKTkAVtc=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1675933479;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=7xiUrjiXGVRMwQYotXmHqdKQibgsTFcZek+b4y3OfyU=;
+        b=A4DzsCrNE8JZXIh0Dr72NUnjFmg5RRmBBx/o6XFeqoQvwJRVOGZhKbVx8v250S6Vt3J7Rt
+        1Gdep/28DNuO5zDQ==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id E0D171339E;
+        Thu,  9 Feb 2023 09:04:39 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id EB7QNie35GPIIQAAMHmgww
+        (envelope-from <jack@suse.cz>); Thu, 09 Feb 2023 09:04:39 +0000
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+        id 7A955A06D8; Thu,  9 Feb 2023 10:04:39 +0100 (CET)
+Date:   Thu, 9 Feb 2023 10:04:39 +0100
+From:   Jan Kara <jack@suse.cz>
+To:     Yu Kuai <yukuai1@huaweicloud.com>
+Cc:     Jan Kara <jack@suse.cz>, Christoph Hellwig <hch@infradead.org>,
+        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        "yukuai (C)" <yukuai3@huawei.com>
+Subject: Re: [PATCH] block: Do not reread partition table on exclusively open
+ device
+Message-ID: <20230209090439.w2k37tufbbhk6qq3@quack3>
+References: <20221130175653.24299-1-jack@suse.cz>
+ <ada13b1b-dd2a-8be0-3b12-3470a086bbf6@huaweicloud.com>
+ <Y9kiltmuPSbRRLsO@infradead.org>
+ <92d53d6b-f83d-0767-4f6a-1b897b33b227@huaweicloud.com>
+ <Y9oFHssFz2obv83W@infradead.org>
+ <1901c3f0-da34-1df1-2443-3426282a6ecb@huaweicloud.com>
+ <1b5d3502-353d-8674-cd5d-79283fa8905d@huaweicloud.com>
+ <20230208120258.64yhqho252gaydmu@quack3>
+ <02e769f7-9a41-80bc-4e47-fa87c18a36b2@huaweicloud.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20230209050401.GA8235@lst.de>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.5
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <02e769f7-9a41-80bc-4e47-fa87c18a36b2@huaweicloud.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Feb 09, 2023 at 06:04:01AM +0100, Christoph Hellwig wrote:
-> On Thu, Feb 09, 2023 at 07:47:38AM +0800, Ming Lei wrote:
-> > Another thing is that blkcg_init_disk() and blkcg_exit_disk() becomes
-> > asymmetrical with this patch. So alloc_disk() & add_disk(), del_disk() & put_disk()
-> > have to be done together. If it may be documented, this patch looks
-> > fine.
+On Wed 08-02-23 22:13:02, Yu Kuai wrote:
+> Hi,
 > 
-> As in no add_disk is allowed after del_gendisk on the same disk?
-> It's been like that since basically forever.  I agree that documenting
-> it probably doesn't hurt though - but that's separate from this fix.
+> 在 2023/02/08 20:02, Jan Kara 写道:
+> > 
+> > After some thought I don't like opencoding blkdev_get_by_dev() in disk_scan
+> > partitions. But I agree Christoph's approach with blkdev_get_whole() does
+> > not quite work either. We could propagate holder/owner into
+> > blkdev_get_whole() to fix Christoph's check but still we are left with a
+> > question what to do with GD_NEED_PART_SCAN set bit when we get into
+> > blkdev_get_whole() and find out we are not elligible to rescan partitions.
+> > Because then some exclusive opener later might be caught by surprise when
+> > the partition rescan happens due to this bit being set from the past failed
+> > attempt to rescan.
+> > 
+> > So what we could do is play a similar trick as we do in the loop device and
+> > do in disk_scan_partitions():
+> > 
+> > 	/*
+> > 	 * If we don't hold exclusive handle for the device, upgrade to it
+> > 	 * here to avoid changing partitions under exclusive owner.
+> > 	 */
+> > 	if (!(mode & FMODE_EXCL)) {
+> This is not necessary, all the caller make sure FMODE_EXCL is not set.
 
-OK, fair enough,
+Yes, but we need to propagate it correctly from blkdev_common_ioctl() now,
+exactly so that ioctl does not fail if you exclusively opened the device as
+you realized below :)
 
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
+> > 		error = bd_prepare_to_claim(disk->part0, disk_scan_partitions);
+> > 		if (error)
+> > 			return error;
+> > 	}
+> From what I see, if thread open device excl first, and then call ioctl()
+> to reread partition, this will cause this ioctl() to fail?
 
-Thanks,
-Ming
-
+								Honza
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
