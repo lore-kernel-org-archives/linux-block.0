@@ -2,122 +2,189 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2CC7C61DA4
-	for <linux-block@archiver.kernel.org>; Thu,  9 Feb 2023 09:33:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 137D7C05027
+	for <linux-block@archiver.kernel.org>; Thu,  9 Feb 2023 09:46:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230121AbjBIJdL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 9 Feb 2023 04:33:11 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40118 "EHLO
+        id S229665AbjBIJqo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 9 Feb 2023 04:46:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48220 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229663AbjBIJdJ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 9 Feb 2023 04:33:09 -0500
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 62F32611FF
-        for <linux-block@vger.kernel.org>; Thu,  9 Feb 2023 01:32:50 -0800 (PST)
-Received: from mail02.huawei.com (unknown [172.30.67.143])
-        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4PCBVN5Vcqz4f3jHV
-        for <linux-block@vger.kernel.org>; Thu,  9 Feb 2023 17:32:44 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-        by APP3 (Coremail) with SMTP id _Ch0CgDHcyG9veRjgHUADA--.19673S3;
-        Thu, 09 Feb 2023 17:32:47 +0800 (CST)
-Subject: Re: [PATCH] block: Do not reread partition table on exclusively open
- device
-To:     Jan Kara <jack@suse.cz>, Yu Kuai <yukuai1@huaweicloud.com>
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        "yukuai (C)" <yukuai3@huawei.com>
-References: <20221130175653.24299-1-jack@suse.cz>
- <ada13b1b-dd2a-8be0-3b12-3470a086bbf6@huaweicloud.com>
- <Y9kiltmuPSbRRLsO@infradead.org>
- <92d53d6b-f83d-0767-4f6a-1b897b33b227@huaweicloud.com>
- <Y9oFHssFz2obv83W@infradead.org>
- <1901c3f0-da34-1df1-2443-3426282a6ecb@huaweicloud.com>
- <1b5d3502-353d-8674-cd5d-79283fa8905d@huaweicloud.com>
- <20230208120258.64yhqho252gaydmu@quack3>
- <02e769f7-9a41-80bc-4e47-fa87c18a36b2@huaweicloud.com>
- <20230209090439.w2k37tufbbhk6qq3@quack3>
-From:   Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <1bf91d5c-6130-43de-7995-af09045d4b98@huaweicloud.com>
-Date:   Thu, 9 Feb 2023 17:32:45 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        with ESMTP id S229738AbjBIJqn (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 9 Feb 2023 04:46:43 -0500
+Received: from mailout4.samsung.com (mailout4.samsung.com [203.254.224.34])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8DC466185F
+        for <linux-block@vger.kernel.org>; Thu,  9 Feb 2023 01:46:41 -0800 (PST)
+Received: from epcas5p1.samsung.com (unknown [182.195.41.39])
+        by mailout4.samsung.com (KnoxPortal) with ESMTP id 20230209094637epoutp047f395973ebcbba6f374956070125c716~CHujyWqSU3016130161epoutp04a
+        for <linux-block@vger.kernel.org>; Thu,  9 Feb 2023 09:46:37 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout4.samsung.com 20230209094637epoutp047f395973ebcbba6f374956070125c716~CHujyWqSU3016130161epoutp04a
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1675935997;
+        bh=UXtRwDphID/Ql8XT+1xkKeabHjao2p9LV348IWYUnm0=;
+        h=From:To:Cc:Subject:Date:References:From;
+        b=iPS+AjZQorlYfxunJY2wIMkMe/NX0gieroLpFLp4v2xDxvE1aQZkp0dGXYJinw68H
+         nlvO0m0jYIyxVDSbM65DCd7Uq0LCF9aR4wt9BbFqZMu1gV/sdcfoaPXPTdTHHvYRqQ
+         0XjOhFhMu4Rrm41ZQpQa0dz5vQg0UD6rbAG3MzgQ=
+Received: from epsnrtp3.localdomain (unknown [182.195.42.164]) by
+        epcas5p4.samsung.com (KnoxPortal) with ESMTP id
+        20230209094636epcas5p4900245f58cc64f82e76a7613e95a9524~CHujdM3v61483014830epcas5p4I;
+        Thu,  9 Feb 2023 09:46:36 +0000 (GMT)
+Received: from epsmges5p1new.samsung.com (unknown [182.195.38.176]) by
+        epsnrtp3.localdomain (Postfix) with ESMTP id 4PCBpM40Jvz4x9QF; Thu,  9 Feb
+        2023 09:46:35 +0000 (GMT)
+Received: from epcas5p3.samsung.com ( [182.195.41.41]) by
+        epsmges5p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        DA.AC.10528.7F0C4E36; Thu,  9 Feb 2023 18:46:31 +0900 (KST)
+Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
+        epcas5p4.samsung.com (KnoxPortal) with ESMTPA id
+        20230209094631epcas5p436d4f54caa91ff6d258928bba76206de~CHueJKDwx1483014830epcas5p45;
+        Thu,  9 Feb 2023 09:46:31 +0000 (GMT)
+Received: from epsmgms1p2.samsung.com (unknown [182.195.42.42]) by
+        epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
+        20230209094631epsmtrp2019e6139681194d91451061a8c0c6e90~CHueIfHZk0061800618epsmtrp2n;
+        Thu,  9 Feb 2023 09:46:31 +0000 (GMT)
+X-AuditID: b6c32a49-c17ff70000012920-74-63e4c0f7058c
+Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
+        epsmgms1p2.samsung.com (Symantec Messaging Gateway) with SMTP id
+        4B.7F.17995.7F0C4E36; Thu,  9 Feb 2023 18:46:31 +0900 (KST)
+Received: from localhost.localdomain (unknown [107.110.206.5]) by
+        epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
+        20230209094630epsmtip17ea651030a5b735f4dcb21cb2f8c1742~CHudLjiDR0523905239epsmtip1e;
+        Thu,  9 Feb 2023 09:46:29 +0000 (GMT)
+From:   Kanchan Joshi <joshi.k@samsung.com>
+To:     shinichiro.kawasaki@wdc.com
+Cc:     hch@lst.de, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org, Kanchan Joshi <joshi.k@samsung.com>
+Subject: [PATCH blktests] nvme/046: add test for unprivileged passthrough
+Date:   Thu,  9 Feb 2023 15:15:41 +0530
+Message-Id: <20230209094541.248729-1-joshi.k@samsung.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-In-Reply-To: <20230209090439.w2k37tufbbhk6qq3@quack3>
-Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: _Ch0CgDHcyG9veRjgHUADA--.19673S3
-X-Coremail-Antispam: 1UD129KBjvJXoW7ZFW7XryxArW7ZrWDKFW3Jrb_yoW8CFWfp3
-        y0gFW3tFWDW34Ik348tw1DG34rtrsFyr4xJr1rCr10k3s5Xr9IkF1fKa98ua4UWFWkCa1U
-        Xr4UWa4fX3WrAaDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUkC14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-        1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-        JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-        CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-        2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-        W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lc7I2V7IY0VAS07AlzVAY
-        IcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14
-        v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_JF0_Jw1lIxkG
-        c2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI
-        0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6rW3Jr0E3s1lIxAIcVC2z280aVAFwI0_Jr0_
-        Gr1lIxAIcVC2z280aVCY1x0267AKxVWUJVW8JbIYCTnIWIevJa73UjIFyTuYvjfUoOJ5UU
-        UUU
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrBKsWRmVeSWpSXmKPExsWy7bCmpu73A0+SDS6tV7RYufook8XR/2/Z
+        LPbe0raYv+wpu8W+WZ4OrB6bl9R77L7ZwObRt2UVo8fnTXIe7Qe6mQJYo7JtMlITU1KLFFLz
+        kvNTMvPSbZW8g+Od403NDAx1DS0tzJUU8hJzU22VXHwCdN0yc4A2KymUJeaUAoUCEouLlfTt
+        bIryS0tSFTLyi0tslVILUnIKTAr0ihNzi0vz0vXyUkusDA0MjEyBChOyM7YcPche0CVYse/t
+        C+YGxke8XYycHBICJhITbj1n62Lk4hAS2M0oca19NzOE84lRYtWZn0wQzmdGiUk/PzDBtNxa
+        sRaqZRejxN+/L5nhqi5tOA6U4eBgE9CUuDC5FKRBREBeYuXsZlYQm1mgSGLG53YwW1jAU2Ll
+        1XnsIDaLgKrE3KevmEBaeQUsJbZsLYbYJS8x89J3sBJeAUGJkzOfsECMkZdo3jobbK2EwD52
+        icavvxkhGlwkOnoaWCBsYYlXx7ewQ9hSEp/f7WWDsJMlLs08B/VMicTjPQehbHuJ1lP9zCA3
+        MAOdv36XPsQuPone30/ATpMQ4JXoaBOCqFaUuDfpKSuELS7xcMYSKNtDoq/lF9g1QgKxEj8P
+        tLNMYJSbheSDWUg+mIWwbAEj8ypGydSC4tz01GLTAsO81HJ4VCbn525iBCc5Lc8djHcffNA7
+        xMjEwXiIUYKDWUmE9/vEx8lCvCmJlVWpRfnxRaU5qcWHGE2BoTqRWUo0OR+YZvNK4g1NLA1M
+        zMzMTCyNzQyVxHnVbU8mCwmkJ5akZqemFqQWwfQxcXBKNTAtPnOy9MoZI/+zk87Gfduadiyo
+        YZMc599bKX/fHPV/9cx2X2dORmDzAkGZ9QkaVwMaYhb/THmrbOnz8rz7v+qb1Q8Nzkyeu/sW
+        ++SIeQIVbOzc5zvu7Odve1zzzj/m02qnVbfEy8rav0XsOFB47fNRtu0h2w8sfB6qI3f575KS
+        jbJMJzVjXhdyfljm52Cea1Kz6n1H/+e3EdECVWFpQld4dOK6Sm6d/X5g+9lKi8s/BbdNDIyq
+        ltv5T+5Ze82RJwFZalbuxSIX+7RKNj9cwHp4d72a+XuTRlEh1U0N27XTHOSDIk7JzFY+9tlT
+        Pz6dS1lz0pxtLSqWkcq26+u8rv4Itg75eLB0d/mVaxMzZQOUWIozEg21mIuKEwFVObbR+wMA
+        AA==
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFlrALMWRmVeSWpSXmKPExsWy7bCSnO73A0+SDRbPZbFYufook8XR/2/Z
+        LPbe0raYv+wpu8W+WZ4OrB6bl9R77L7ZwObRt2UVo8fnTXIe7Qe6mQJYo7hsUlJzMstSi/Tt
+        Ergythw9yF7QJVix7+0L5gbGR7xdjJwcEgImErdWrGXrYuTiEBLYwShxc0E3C0RCXKL52g92
+        CFtYYuW/5+wQRR8ZJea3vGDsYuTgYBPQlLgwuRSkRkRAXmLl7GZWEJtZoEzi+MUlYHOEBTwl
+        Vl6dBzaHRUBVYu7TV0wgrbwClhJbthZDjJeXmHnpO1gJr4CgxMmZT1ggxshLNG+dzTyBkW8W
+        ktQsJKkFjEyrGCVTC4pz03OLDQuM8lLL9YoTc4tL89L1kvNzNzGCA1FLawfjnlUf9A4xMnEw
+        HmKU4GBWEuH9PvFxshBvSmJlVWpRfnxRaU5q8SFGaQ4WJXHeC10n44UE0hNLUrNTUwtSi2Cy
+        TBycUg1MLtzL5xzhCVh05eWUjWd1PlpOtf9wVD3lw5OaXcX7yt0YnY5yxRX+kOy+r3dxeVPv
+        voPvp+2rDHJ7bLzY0v6J+999/1Tk1xxlMvx+6Hlp7Ga+/kN+c5O3RE/dGMbdsHTzk8jzvYwb
+        nR7vvmPs8eWJsOAugyKTW8GXHplUGO9e+FOi9nHa/r0C5h/0OIrjtiftZn6rbR4eLW1q+i2B
+        w4+v/TeXDGOt3p/Yadeldxx6tdXiSe4HjZpjd/yP5Cw1u77X+uHmCdYJVn3W08y9m8779ZYI
+        bRHSF/3ElVoSaef1wyJu29ttJ07de7yRJyz6buinU01+j76Jbf93Lk6u/qF0f/gir5JJBxd8
+        ujS1aIb9dSWW4oxEQy3mouJEALkohUqzAgAA
+X-CMS-MailID: 20230209094631epcas5p436d4f54caa91ff6d258928bba76206de
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+CMS-TYPE: 105P
+DLP-Filter: Pass
 X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20230209094631epcas5p436d4f54caa91ff6d258928bba76206de
+References: <CGME20230209094631epcas5p436d4f54caa91ff6d258928bba76206de@epcas5p4.samsung.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
+Ths creates a non-root user "blktest46", alters permissions for
+char-device node (/dev/ngX) and runs few passthrough commands.
+At the end of the test, user is deleted and permissions are reverted.
 
-在 2023/02/09 17:04, Jan Kara 写道:
-> On Wed 08-02-23 22:13:02, Yu Kuai wrote:
->> Hi,
->>
->> 在 2023/02/08 20:02, Jan Kara 写道:
->>>
->>> After some thought I don't like opencoding blkdev_get_by_dev() in disk_scan
->>> partitions. But I agree Christoph's approach with blkdev_get_whole() does
->>> not quite work either. We could propagate holder/owner into
->>> blkdev_get_whole() to fix Christoph's check but still we are left with a
->>> question what to do with GD_NEED_PART_SCAN set bit when we get into
->>> blkdev_get_whole() and find out we are not elligible to rescan partitions.
->>> Because then some exclusive opener later might be caught by surprise when
->>> the partition rescan happens due to this bit being set from the past failed
->>> attempt to rescan.
->>>
->>> So what we could do is play a similar trick as we do in the loop device and
->>> do in disk_scan_partitions():
->>>
->>> 	/*
->>> 	 * If we don't hold exclusive handle for the device, upgrade to it
->>> 	 * here to avoid changing partitions under exclusive owner.
->>> 	 */
->>> 	if (!(mode & FMODE_EXCL)) {
->> This is not necessary, all the caller make sure FMODE_EXCL is not set.
-> 
-> Yes, but we need to propagate it correctly from blkdev_common_ioctl() now,
-> exactly so that ioctl does not fail if you exclusively opened the device as
-> you realized below :)
+Signed-off-by: Kanchan Joshi <joshi.k@samsung.com>
+---
+ tests/nvme/046     | 55 ++++++++++++++++++++++++++++++++++++++++++++++
+ tests/nvme/046.out |  2 ++
+ 2 files changed, 57 insertions(+)
+ create mode 100644 tests/nvme/046
+ create mode 100644 tests/nvme/046.out
 
-Ok, I get it that you want to pass in FMODE_EXCL from ioctl(). But I'm
-not sure let others fail to open device extl is a good idea.
-
-I still prefer to open code blkdev_get_by_dev(), because many operations
-is not necessary here. And this way, we can clear GD_NEED_PART_SCAN
-inside open_mutex if rescan failed.
-
-Thanks,
-Kuai
-
-> 
->>> 		error = bd_prepare_to_claim(disk->part0, disk_scan_partitions);
->>> 		if (error)
->>> 			return error;
->>> 	}
->>  From what I see, if thread open device excl first, and then call ioctl()
->> to reread partition, this will cause this ioctl() to fail?
-> 
-> 								Honza
-> 
+diff --git a/tests/nvme/046 b/tests/nvme/046
+new file mode 100644
+index 0000000..40bda62
+--- /dev/null
++++ b/tests/nvme/046
+@@ -0,0 +1,55 @@
++#!/bin/bash
++# SPDX-License-Identifier: GPL-3.0+
++# Copyright (C) 2023 Kanchan Joshi, Samsung Electronics
++# Test for unprivileged passthrough
++
++. tests/nvme/rc
++
++DESCRIPTION="basic test for unprivileged passthrough on /dev/ngX"
++QUICK=1
++
++requires() {
++	_nvme_requires
++	_have_fio
++}
++
++device_requires() {
++	_require_test_dev_is_nvme
++}
++
++test_device() {
++	echo "Running ${TEST_NAME}"
++	local ngdev=${TEST_DEV/nvme/ng}
++	local usr="blktest46"
++	local perm=$(stat -c "%a" $ngdev)
++	local nsid=$(_test_dev_nvme_nsid)
++
++	useradd -m $usr
++	chmod g+r,o+r "$ngdev"
++
++	if ! su $usr -c "nvme io-passthru ${ngdev} -o 2 -l 4096 \
++		-n $nsid -r" >> "${FULL}" 2>&1; then
++		echo "Error: io-passthru read failed"
++	fi
++
++	if su $usr -c "echo hello | nvme io-passthru ${ngdev} -o 1 -l 4096 \
++		-n $nsid -r" >> "${FULL}" 2>&1; then
++		echo "Error: io-passthru write passed (unexpected)"
++	fi
++
++	if ! su $usr -c "nvme id-ns ${ngdev}" >> "${FULL}" 2>&1; then
++		echo "Error: id-ns failed"
++	fi
++
++	if ! su $usr -c "nvme id-ctrl ${ngdev}" >> "${FULL}" 2>&1; then
++		echo "Error: id-ctrl failed"
++	fi
++
++	if su $usr -c "nvme ns-descs ${ngdev}" >> "${FULL}" 2>&1; then
++		echo "Error: ns-descs passed (unexpected)"
++	fi
++
++	echo "Test complete"
++	chmod  $perm "$ngdev"
++	userdel -r  $usr >> "${FULL}" 2>&1
++}
+diff --git a/tests/nvme/046.out b/tests/nvme/046.out
+new file mode 100644
+index 0000000..2b5fa6a
+--- /dev/null
++++ b/tests/nvme/046.out
+@@ -0,0 +1,2 @@
++Running nvme/046
++Test complete
+-- 
+2.25.1
 
