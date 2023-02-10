@@ -2,74 +2,105 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 27C6EC05027
-	for <linux-block@archiver.kernel.org>; Thu,  9 Feb 2023 23:01:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3533CC05027
+	for <linux-block@archiver.kernel.org>; Fri, 10 Feb 2023 00:03:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230242AbjBIXBq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 9 Feb 2023 18:01:46 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55144 "EHLO
+        id S230295AbjBJADI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 9 Feb 2023 19:03:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40054 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229964AbjBIXBo (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 9 Feb 2023 18:01:44 -0500
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE2557EEE
-        for <linux-block@vger.kernel.org>; Thu,  9 Feb 2023 15:01:43 -0800 (PST)
-Received: by mail-pl1-f169.google.com with SMTP id u9so4609641plr.9
-        for <linux-block@vger.kernel.org>; Thu, 09 Feb 2023 15:01:43 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=SsoJBcPOtEbVblkphgVRBPSm8oYIqlJ0jiZODV70ln4=;
-        b=Hj6nN5oSIqiJLMp9E95DPudSBAm2j5wNH1OuqLezEMSnfAksg6LuOdBsDRWvuYxKtZ
-         LGCk2g12Q4UrUDdrf97Zw6xnAkLKmonEut26R1cXNZBvcwCa7DxPGNiTu/xvZZI4I0mb
-         4eIZx0teLeRPw+3oxww69ZFUF4SoNQaQnrSxgqCvbucBOFHJtFdtFzagSBIwxqiI6LG+
-         cDMNFFVFszsqa968Pb3J4CCwucfYAyP7JN508djmEwxGAStnoCp2Z/Av+RakBinlUqXy
-         orhO4c49xSGnL8NcK6gI/3K9eFWhthx4oY2Fhy9l2tUZXmVw4QpwvWE9FfvvQFHxOnQW
-         QrWw==
-X-Gm-Message-State: AO0yUKXeXYR0V+SawAizfB3AgtOHfaKDiJzZ4QeuztjTQtoWD7mK8yDn
-        lAfFJxKcPM/ampGp8lAWNXU=
-X-Google-Smtp-Source: AK7set8+TJJklmFv/N0iXgDNB+Crqz/ld4eKa2EI+J19kImtO2ZFsOxvUM3zZk8GHjPpWJUwHNZQRQ==
-X-Received: by 2002:a17:90b:4b07:b0:22b:efa5:d05 with SMTP id lx7-20020a17090b4b0700b0022befa50d05mr14357821pjb.40.1675983703324;
-        Thu, 09 Feb 2023 15:01:43 -0800 (PST)
-Received: from bvanassche-linux.mtv.corp.google.com ([2620:15c:211:201:15f5:48f5:6861:f3f6])
-        by smtp.gmail.com with ESMTPSA id k14-20020a17090a39ce00b00231156a7da1sm1639758pjf.4.2023.02.09.15.01.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Feb 2023 15:01:42 -0800 (PST)
-From:   Bart Van Assche <bvanassche@acm.org>
+        with ESMTP id S229518AbjBJADG (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 9 Feb 2023 19:03:06 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40E605894D;
+        Thu,  9 Feb 2023 16:03:05 -0800 (PST)
+Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 319Nmg0c015499;
+        Fri, 10 Feb 2023 00:03:00 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=lkivhzuZ2/nxSycOSxdvWo5K37J7dkSGlFvRUcFJMtg=;
+ b=bd6Dv9ewcijYEv/+1PikiRm5FGW2CvWv7P0co6mozDYHFNnLNjZ0z2cVfLzg/K1F6Yk1
+ XRePrAJzTw98Tkf9wat6z1pKgdIhpouJo3XAE7Q9SXx1jlvyumvwb7aPD69bF9kMChun
+ ULq8NrQj3pD7nRHHw5iM8caCHjAr2FvU5sGdaVS89qFh7ri34PEZmmfaebqrdm2uBciP
+ Fu5fpIvjOadMy24yk7m3M/aOUSR/FTYb/vUMHDNrj2oGzss8amExD5buXnx7mxskeOS0
+ nLhlN0rkcG4GmsJgTufOTCv3ScV6/KpKhUmNo5F/pqms3ugFj+RxaGquyuJT8gWcG03D vg== 
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3nnau4g8kk-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 10 Feb 2023 00:03:00 +0000
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 319DN6qX001926;
+        Fri, 10 Feb 2023 00:02:57 GMT
+Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
+        by ppma03ams.nl.ibm.com (PPS) with ESMTPS id 3nhf06ps6f-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 10 Feb 2023 00:02:57 +0000
+Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
+        by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 31A02sVU24052152
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 10 Feb 2023 00:02:54 GMT
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 33EC420043;
+        Fri, 10 Feb 2023 00:02:54 +0000 (GMT)
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 23E6D20040;
+        Fri, 10 Feb 2023 00:02:54 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
+        by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+        Fri, 10 Feb 2023 00:02:54 +0000 (GMT)
+Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 20191)
+        id CD737E08E3; Fri, 10 Feb 2023 01:02:53 +0100 (CET)
+From:   Stefan Haberland <sth@linux.ibm.com>
 To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Bart Van Assche <bvanassche@acm.org>,
-        Pavel Begunkov <asml.silence@gmail.com>
-Subject: [PATCH] block: Remove the ALLOC_CACHE_SLACK constant
-Date:   Thu,  9 Feb 2023 15:01:35 -0800
-Message-Id: <20230209230135.3475829-1-bvanassche@acm.org>
-X-Mailer: git-send-email 2.39.1.581.gbfd45094c4-goog
+Cc:     linux-block@vger.kernel.org, Jan Hoeppner <hoeppner@linux.ibm.com>,
+        linux-s390@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Qiheng Lin <linqiheng@huawei.com>
+Subject: [PATCH 0/2] s390/dasd: patches
+Date:   Fri, 10 Feb 2023 01:02:51 +0100
+Message-Id: <20230210000253.1644903-1-sth@linux.ibm.com>
+X-Mailer: git-send-email 2.37.2
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: 19-jo3MYj8WI2m-kpFFowE5U1WpmibEy
+X-Proofpoint-GUID: 19-jo3MYj8WI2m-kpFFowE5U1WpmibEy
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.170.22
+ definitions=2023-02-09_16,2023-02-09_03,2023-02-09_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999 mlxscore=0
+ priorityscore=1501 phishscore=0 lowpriorityscore=0 bulkscore=0
+ adultscore=0 malwarescore=0 impostorscore=0 spamscore=0 clxscore=1011
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2212070000 definitions=main-2302090217
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Commit b99182c501c3 ("bio: add pcpu caching for non-polling bio_put")
-removed the code that uses this constant. Hence also remove the constant
-itself.
+Hi Jens,
 
-Cc: Pavel Begunkov <asml.silence@gmail.com>
-Signed-off-by: Bart Van Assche <bvanassche@acm.org>
----
- block/bio.c | 1 -
- 1 file changed, 1 deletion(-)
+please apply the following patches for the next merge window that:
+ - sort out physical and virtual pointers
+ - fix a potential memleak in dasd_eckd_init
 
-diff --git a/block/bio.c b/block/bio.c
-index 7447302141b7..88cd3f67a3af 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -26,7 +26,6 @@
- #include "blk-cgroup.h"
- 
- #define ALLOC_CACHE_THRESHOLD	16
--#define ALLOC_CACHE_SLACK	64
- #define ALLOC_CACHE_MAX		256
- 
- struct bio_alloc_cache {
+Thanks.
+
+Alexander Gordeev (1):
+  s390/dasd: sort out physical vs virtual pointers usage
+
+Qiheng Lin (1):
+  s390/dasd: Fix potential memleak in dasd_eckd_init()
+
+ drivers/s390/block/dasd.c          |   5 +-
+ drivers/s390/block/dasd_3990_erp.c |  10 +--
+ drivers/s390/block/dasd_alias.c    |   6 +-
+ drivers/s390/block/dasd_eckd.c     | 104 ++++++++++++++---------------
+ drivers/s390/block/dasd_eer.c      |   2 +-
+ drivers/s390/block/dasd_fba.c      |  14 ++--
+ 6 files changed, 70 insertions(+), 71 deletions(-)
+
+-- 
+2.37.2
+
