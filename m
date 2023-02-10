@@ -2,62 +2,65 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 02F49C61DA4
-	for <linux-block@archiver.kernel.org>; Fri, 10 Feb 2023 00:06:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4AAE1C636D6
+	for <linux-block@archiver.kernel.org>; Fri, 10 Feb 2023 00:06:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229692AbjBJAF6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 9 Feb 2023 19:05:58 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40824 "EHLO
+        id S229554AbjBJAGA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 9 Feb 2023 19:06:00 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40834 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229554AbjBJAF5 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 9 Feb 2023 19:05:57 -0500
-Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09DB630B3F
-        for <linux-block@vger.kernel.org>; Thu,  9 Feb 2023 16:05:57 -0800 (PST)
-Received: by mail-pl1-x631.google.com with SMTP id m2so4776518plg.4
-        for <linux-block@vger.kernel.org>; Thu, 09 Feb 2023 16:05:57 -0800 (PST)
+        with ESMTP id S229760AbjBJAF6 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 9 Feb 2023 19:05:58 -0500
+Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 58E3A30B3F
+        for <linux-block@vger.kernel.org>; Thu,  9 Feb 2023 16:05:58 -0800 (PST)
+Received: by mail-pj1-x1035.google.com with SMTP id f15-20020a17090ac28f00b00230a32f0c9eso3921573pjt.4
+        for <linux-block@vger.kernel.org>; Thu, 09 Feb 2023 16:05:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112; t=1675987556;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=NxQJQURhixOkBgSh/tkHoWjD9dcrSRHKTOYFtLbPpRs=;
-        b=Hb0Y3GUWKWTN8WIEcKiiGv4jrVfrBVr2shKlI71ARKxzVo+z3SRhp41zMqWliKlb+b
-         rfETef/ALIpk8DDbJ6n1pA1lpA0J9qc5kMi3YphLxlLFdaqP2b0ALT3mi5aFWUTBLufK
-         Hnnq/9VFhp3ilOe7ESfRXkyVkin3SHbe25Au1eqn/8Q49aR9CWZF4SB8DfeKQBEkyi1U
-         LqK2bF1Qg/2mTzKFX2reolxJY9W2XzlfRw8FQJ/CsIDGW1IAtZHBmsMirCmUtutuE+i3
-         nBR7I8RGXmi3JDGp2239+adLfMHYAxlLHDWEtjjduA7pZ1GUxf6sNuB42QyCgxiFhNeT
-         6v8Q==
+        bh=hra9M/6sDrSMfRhctOu8H0bjjFmaSFx3pmX7jU8q+uU=;
+        b=fJMNnbI9NOEX5Xh9S450ocdu8n4Wwc0ODspPLKhRENbn0dKn41KH1Tr90q1eODe52G
+         KWtr7OYjSy7cVKa7vnqXlRlwXvapqykIuX/5uJl/uwJlsrZEhK/clSn8Fa1nW/znYI3U
+         wutXLhkNwhn9PSvVAYd2J9pWlFukWhiQDoR+DNfcKxs/igbABQAk0WMpB//ld0i/etcb
+         kXxGIKvpM81YRmGGqw7eOmFrbpBCq9bfc5BRzLV+nknT/2kFz5JDuIhyE7YdCSrZmVOr
+         nHRq56N28l3aioVRDsdbEDrSmNh6J2v7hoxuS6t9+PPsYcYyLfrOUHQv+SvxXXCXhrRQ
+         1QaA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1675987556;
+        d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=NxQJQURhixOkBgSh/tkHoWjD9dcrSRHKTOYFtLbPpRs=;
-        b=Uhu46Ytt2p16cmOtAgeaJCXvBMzAoaFaOAbdQg0yX7bO0muiIs1l2qB/nY1NcL4U/b
-         IStyksq1cuEFLZsZcnHpcFtOHS2n1+Qq5lpiqfhfGjEmkptRRXzNgF/PYLRHT5jtzB+8
-         cvT5WBIAevWkobRlFQINWpAH3ckmTxPZ+ej8EIZM5vInuiCuevlF6qjJCiN54MaUj+z1
-         xdKBpU37XNO/ECYjaO++cltYP8XY1HB5nvHV3FnTHo6W20OjPzr19ymlF2+KJse85bVh
-         528HrJ3m/8FGNMPJTEEQfs60/VGEtnURJrMaUb2rORwqISBRTMWYnM4VQQUEvhiPeyPW
-         eu0w==
-X-Gm-Message-State: AO0yUKWmVIQ1f4yniLMOpJTvHTfC6VGpouXUMT2IOhIkl5jpWlBvrAR2
-        +rUWVqfFzaJZ80td3TQ+G0whOxVPfINzSdb8
-X-Google-Smtp-Source: AK7set+rnr+rBnaK1GV7cExTby6Ix+sKYXmtem07g+6+gerh/mFb4ZZLhdkfGlBlYBs2DcUAsu0B9Q==
-X-Received: by 2002:a05:6a20:42a1:b0:bc:f665:8656 with SMTP id o33-20020a056a2042a100b000bcf6658656mr15448353pzj.6.1675987556432;
-        Thu, 09 Feb 2023 16:05:56 -0800 (PST)
+        bh=hra9M/6sDrSMfRhctOu8H0bjjFmaSFx3pmX7jU8q+uU=;
+        b=Q6vzys+pTySGdf/DHMBfDhewoj+gxbwJKnFgZ5aPLmH6MkiGx45vtHS17qoQNr/DDX
+         p6ANyy1tQQohVsajJvY+piopK1DRwR/1ZRAHAfcK7feJqlllT/cxfkpYzZ2r4ttnyEde
+         NT1Om0KTCNj6KoaLK2Oa468OGTLWm0zBAS1Ptm07V7IeLMHqvKVqMKqPDoGmEmqdwvc6
+         Qh06wgs27uJjBgZH3SXfUqWsGdC/7VC9Led8P3bYAVAQh4S1Mp2S06UA4UDmP56aY1tC
+         K+PvyM6PG0CgIPknB4v23WBs2Gy/q/9iYi9rKMA6wAvXPaxzqgi9dHexVdJEknXwzC3n
+         xf1Q==
+X-Gm-Message-State: AO0yUKV/Izm+i+GehoT8OB/kreqdBoprQ6TqA4ctVTi2Tr/Ae9VLYuDX
+        xQ9q9jzVnG2TSIvTX2D9eQF+OjlK+XnX8yu9
+X-Google-Smtp-Source: AK7set/HOfDwnBGVxxKKGuL4oK62TB0VJw//XjZXmW/7z00Nuh/KuM+Cd3aPDucEoWnDAcOynPVmqA==
+X-Received: by 2002:a17:903:2286:b0:19a:723a:8405 with SMTP id b6-20020a170903228600b0019a723a8405mr208701plh.6.1675987557756;
+        Thu, 09 Feb 2023 16:05:57 -0800 (PST)
 Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id s1-20020a63af41000000b004f1e73b073bsm1831517pgo.26.2023.02.09.16.05.55
+        by smtp.gmail.com with ESMTPSA id s1-20020a63af41000000b004f1e73b073bsm1831517pgo.26.2023.02.09.16.05.56
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Feb 2023 16:05:55 -0800 (PST)
+        Thu, 09 Feb 2023 16:05:57 -0800 (PST)
 From:   Jens Axboe <axboe@kernel.dk>
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     linux-block@vger.kernel.org,
-        Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <20230209230135.3475829-1-bvanassche@acm.org>
-References: <20230209230135.3475829-1-bvanassche@acm.org>
-Subject: Re: [PATCH] block: Remove the ALLOC_CACHE_SLACK constant
-Message-Id: <167598755566.7194.11114446893901944534.b4-ty@kernel.dk>
-Date:   Thu, 09 Feb 2023 17:05:55 -0700
+To:     Stefan Haberland <sth@linux.ibm.com>
+Cc:     linux-block@vger.kernel.org, Jan Hoeppner <hoeppner@linux.ibm.com>,
+        linux-s390@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Qiheng Lin <linqiheng@huawei.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>
+In-Reply-To: <20230210000253.1644903-1-sth@linux.ibm.com>
+References: <20230210000253.1644903-1-sth@linux.ibm.com>
+Subject: Re: [PATCH 0/2] s390/dasd: patches
+Message-Id: <167598755656.7194.16272906680345697326.b4-ty@kernel.dk>
+Date:   Thu, 09 Feb 2023 17:05:56 -0700
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
@@ -67,17 +70,24 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 
-On Thu, 09 Feb 2023 15:01:35 -0800, Bart Van Assche wrote:
-> Commit b99182c501c3 ("bio: add pcpu caching for non-polling bio_put")
-> removed the code that uses this constant. Hence also remove the constant
-> itself.
+On Fri, 10 Feb 2023 01:02:51 +0100, Stefan Haberland wrote:
+> please apply the following patches for the next merge window that:
+>  - sort out physical and virtual pointers
+>  - fix a potential memleak in dasd_eckd_init
 > 
+> Thanks.
 > 
+> Alexander Gordeev (1):
+>   s390/dasd: sort out physical vs virtual pointers usage
+> 
+> [...]
 
 Applied, thanks!
 
-[1/1] block: Remove the ALLOC_CACHE_SLACK constant
-      commit: 9af9935494e4b86ec3c44ec42779f08c4ba79ffe
+[1/2] s390/dasd: sort out physical vs virtual pointers usage
+      commit: b87c52e431adfe2dfe8634216b317b4a952aa9fc
+[2/2] s390/dasd: Fix potential memleak in dasd_eckd_init()
+      commit: 460e9bed82e49db1b823dcb4e421783854d86c40
 
 Best regards,
 -- 
