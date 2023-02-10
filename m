@@ -2,139 +2,104 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B663C636CD
-	for <linux-block@archiver.kernel.org>; Fri, 10 Feb 2023 10:12:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D162C636CD
+	for <linux-block@archiver.kernel.org>; Fri, 10 Feb 2023 10:31:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231429AbjBJKMs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 10 Feb 2023 05:12:48 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34696 "EHLO
+        id S232064AbjBJKb0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 10 Feb 2023 05:31:26 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46364 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229537AbjBJKMr (ORCPT
+        with ESMTP id S232076AbjBJKbY (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 10 Feb 2023 05:12:47 -0500
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26C6060303;
-        Fri, 10 Feb 2023 02:12:46 -0800 (PST)
+        Fri, 10 Feb 2023 05:31:24 -0500
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6A686D605
+        for <linux-block@vger.kernel.org>; Fri, 10 Feb 2023 02:31:19 -0800 (PST)
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id D20E95FA5E;
-        Fri, 10 Feb 2023 10:12:44 +0000 (UTC)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 4BA483F757;
+        Fri, 10 Feb 2023 10:31:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1676023964; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+        t=1676025078; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=1QLhQop7MVEJVqH+irAiadIwt7myVpzIBP9m/xziqnA=;
-        b=VQtbc9tEJLFJF0Pw5PjECmBuPAKFt4AvPORe5P6oZ2MzadE81h99ZIUb7KFajj63MWUyMW
-        m5UgmHAg/UuvODkXLNiw9dIF1tepZSsyV+Ichh0V1iaRREj6quFohULxLUWN2gg5dMVrYA
-        lEdDwq+fhNH/qSTQkitEKwWN3/sfAaA=
+        bh=3H4+hbX36seFFCpOOkvahd7HC7rXrDBAYOrEO4jZ7T8=;
+        b=MrV9LpdpVJ3TZQg2eOg7sz2hdaReOPMgJPpzcRvL8sId+NO+CZcTQYe6K8qrpQ7Fr4aBSa
+        9B5Cm9JnVL/L5N8Q5U36MdHUngdvtHXgfB7yvUpJc+mepqUl7BTR1xHvD9zwPY0hdy6NL3
+        myr6fCeYWpHS3HIif0hgx2685AMD9jk=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1676023964;
+        s=susede2_ed25519; t=1676025078;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=1QLhQop7MVEJVqH+irAiadIwt7myVpzIBP9m/xziqnA=;
-        b=tUf6mwNmwxBFmfkwRwvlGR/TSOGT0glc5CsHdFA2Mg008Z7jSMcUsJAZvc1DufM4+PFeXg
-        6/fgtb2lJwC5aBAg==
+        bh=3H4+hbX36seFFCpOOkvahd7HC7rXrDBAYOrEO4jZ7T8=;
+        b=uxdpUg5GQOFV53QxlQG1r2NFB/eSurGZCky6dCozxNzUEh+0B0+WqpZerYfLZv4EXmKrI9
+        Eb2kzIME7xsvN8AQ==
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id BD7F913206;
-        Fri, 10 Feb 2023 10:12:44 +0000 (UTC)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 3D7191325E;
+        Fri, 10 Feb 2023 10:31:18 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id vIo4LpwY5mPgQQAAMHmgww
-        (envelope-from <jack@suse.cz>); Fri, 10 Feb 2023 10:12:44 +0000
+        id k474DvYc5mMpTAAAMHmgww
+        (envelope-from <jack@suse.cz>); Fri, 10 Feb 2023 10:31:18 +0000
 Received: by quack3.suse.cz (Postfix, from userid 1000)
-        id 30E0DA06D8; Fri, 10 Feb 2023 11:12:44 +0100 (CET)
-Date:   Fri, 10 Feb 2023 11:12:44 +0100
+        id B054CA06D8; Fri, 10 Feb 2023 11:31:17 +0100 (CET)
+Date:   Fri, 10 Feb 2023 11:31:17 +0100
 From:   Jan Kara <jack@suse.cz>
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     Jan Kara <jack@suse.cz>, Hou Tao <houtao@huaweicloud.com>,
-        linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        cgroups@vger.kernel.org, Tejun Heo <tj@kernel.org>,
-        Zefan Li <lizefan.x@bytedance.com>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        Jonathan Corbet <corbet@lwn.net>, linux-kernel@vger.kernel.org,
-        linux-doc@vger.kernel.org, houtao1@huawei.com
-Subject: Re: [PATCH] blk-ioprio: Introduce promote-to-rt policy
-Message-ID: <20230210101244.zsmtmsoo4xjx7suj@quack3>
-References: <20230201045227.2203123-1-houtao@huaweicloud.com>
- <8c068af3-7199-11cf-5c69-a523c7c22d9a@acm.org>
- <4f7dcb3e-2d5a-cae3-0e1c-a82bcc3d2217@huaweicloud.com>
- <b6b3c498-e90b-7d1f-6ad5-a31334e433ae@acm.org>
- <beb7782e-72a4-c350-3750-23a767c88753@huaweicloud.com>
- <aedc240d-7c9e-248a-52d2-c9775f3e8ca1@acm.org>
- <20230208134345.77bdep3kzp52haxu@quack3>
- <7fcd4c38-ccbe-6411-e424-a57595ad9c0b@acm.org>
- <20230209085603.dzqfcc3pp4hacqlz@quack3>
- <55a065e7-7d86-d58f-15ba-c631a427843e@acm.org>
+To:     Yu Kuai <yukuai1@huaweicloud.com>
+Cc:     Jan Kara <jack@suse.cz>, Christoph Hellwig <hch@infradead.org>,
+        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        "yukuai (C)" <yukuai3@huawei.com>
+Subject: Re: [PATCH] block: Do not reread partition table on exclusively open
+ device
+Message-ID: <20230210103117.hpmeqz6373smvchd@quack3>
+References: <1901c3f0-da34-1df1-2443-3426282a6ecb@huaweicloud.com>
+ <1b5d3502-353d-8674-cd5d-79283fa8905d@huaweicloud.com>
+ <20230208120258.64yhqho252gaydmu@quack3>
+ <02e769f7-9a41-80bc-4e47-fa87c18a36b2@huaweicloud.com>
+ <20230209090439.w2k37tufbbhk6qq3@quack3>
+ <1bf91d5c-6130-43de-7995-af09045d4b98@huaweicloud.com>
+ <20230209095729.igkpj23afj6nbxxi@quack3>
+ <8ca26a55-f48b-5043-7890-03ccbf541ead@huaweicloud.com>
+ <20230209135830.a2lhdhnwzbu7uexe@quack3>
+ <668bc362-263d-d9bc-a462-d8b851062ebc@huaweicloud.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <55a065e7-7d86-d58f-15ba-c631a427843e@acm.org>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <668bc362-263d-d9bc-a462-d8b851062ebc@huaweicloud.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu 09-02-23 11:09:33, Bart Van Assche wrote:
-> On 2/9/23 00:56, Jan Kara wrote:
-> > On Wed 08-02-23 09:53:41, Bart Van Assche wrote:
-> > > The test results I shared some time ago show that IOPRIO_CLASS_NONE was the
-> > > default I/O priority two years ago (see also https://lore.kernel.org/linux-block/20210927220328.1410161-5-bvanassche@acm.org/).
-> > > The none-to-rt policy increases the priority of bio's that have not been
-> > > assigned an I/O priority to RT. Does this answer your question?
-> > 
-> > Not quite. I know that historically we didn't set bio I/O priority in some
-> > paths (but we did set it in other paths such as some (but not all) direct
-> > IO implementations). But that was exactly a mess because how none-to-rt
-> > actually behaved depended on the exact details of the kernel internal IO
-> > path.  So my question is: Was none-to-rt actually just a misnomer and the
-> > intended behavior was "always override to RT"? Or what was exactly the
-> > expectation around when IO priority is not set and should be overridden?
-> > 
-> > How should it interact with AIO submissions with IOCB_FLAG_IOPRIO? How
-> > should it interact with task having its IO priority modified with
-> > ioprio_set(2)? And what if task has its normal scheduling priority modified
-> > but that translates into different IO priority (which happens in
-> > __get_task_ioprio())?
-> > 
-> > So I think that none-to-rt is just poorly defined and if we can just get
-> > rid of it (or redefine to promote-to-rt), that would be good. But maybe I'm
-> > missing some intended usecase...
+On Fri 10-02-23 09:58:36, Yu Kuai wrote:
+> Hi,
 > 
-> Hi Jan,
+> 在 2023/02/09 21:58, Jan Kara 写道:
 > 
-> We have no plans to use the ioprio_set() system call since it only affects
-> foreground I/O and not page cache writeback.
+> > Sorry, I'm not sure what your are asking about here :) Can you please
+> > elaborate more?
 > 
-> While Android supports io_uring, there are no plans to support libaio in the
-> Android C library (Bionic).
 > 
-> Regarding __get_task_ioprio(), I haven't found any code in that function
-> that derives an I/O priority from the scheduling priority. Did I perhaps
-> overlook something?
+> It's another artificail race that will cause part scan fail in
+> device_add_disk().
+> 
+> bdev_add() -> user can open the device now
+> 
+> disk_scan_partitions -> will fail is the device is already opened
+> exclusively
+> 
+> I'm thinking about set disk state before bdev_add()...
 
-This condition in __get_task_ioprio():
-
-        if (IOPRIO_PRIO_CLASS(prio) == IOPRIO_CLASS_NONE)
-                prio = IOPRIO_PRIO_VALUE(task_nice_ioclass(p),
-                                         task_nice_ioprio(p));
-
-sets task's IO priority based on scheduling priority.
-
-> Until recently "none-to-rt" meant "if no I/O priority has been assigned to a
-> task, use IOPRIO_CLASS_RT". Promoting the I/O priority to IOPRIO_CLASS_RT
-> works for us. I'm fine with changing the meaning of "none-to-rt" into
-> promoting the I/O priority class to RT. Introducing "promote-to-rt" as a
-> synonym of "none-to-rt" is also fine with me.
-
-OK, so it seems we are all in agreement here that "none-to-rt" behavior is
-not really needed. Hou, can you perhaps update your patches and the
-documentation to make "none-to-rt" just an alias for "promote-to-rt"?
-Thanks!
+Oh, right. Yes, that should be a good fix to set GD_NEED_PART_SCAN before
+calling bdev_add().
 
 								Honza
 -- 
