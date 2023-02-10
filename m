@@ -2,122 +2,152 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 085D0C05027
-	for <linux-block@archiver.kernel.org>; Fri, 10 Feb 2023 10:54:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CC97C05027
+	for <linux-block@archiver.kernel.org>; Fri, 10 Feb 2023 11:13:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231628AbjBJKyV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 10 Feb 2023 05:54:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37966 "EHLO
+        id S231618AbjBJLN5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 10 Feb 2023 06:13:57 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54116 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232144AbjBJKyR (ORCPT
+        with ESMTP id S231613AbjBJLN4 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 10 Feb 2023 05:54:17 -0500
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 56E3C3757E;
-        Fri, 10 Feb 2023 02:54:16 -0800 (PST)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 03F6967420;
-        Fri, 10 Feb 2023 10:54:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1676026455; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=Qd6hI//mXrSje7KDJTNwEI85+thpTgK/G3BL+ZFCWbs=;
-        b=Zqabz1HaHQVUoOIoseWWANEs+FKK/VZy9pUuPg2oUsL0sv8/3d1eb6I4Lf9ro8NzMc1WFq
-        0l94AmTWWi3vD+XSZNQALO4YuSaVCZk4GUpk5PA3+PPFkzFpnAaZARgcnPcZgX98m2/Fbl
-        gazc+VmS2NAFXgNtj2Uir9vyYz3ex7o=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1676026455;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=Qd6hI//mXrSje7KDJTNwEI85+thpTgK/G3BL+ZFCWbs=;
-        b=Z6lP7/fqHBmxR1Pci8Tz+uMVl1pQCRUOn2xngg/7G1sN+nHVslHxmtA9NwCRuxEQ+n/e4D
-        f5QQ17inYS2EQWBg==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id E921C1325E;
-        Fri, 10 Feb 2023 10:54:14 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id r6XgOFYi5mPqVwAAMHmgww
-        (envelope-from <jack@suse.cz>); Fri, 10 Feb 2023 10:54:14 +0000
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-        id 60349A06D8; Fri, 10 Feb 2023 11:54:12 +0100 (CET)
-Date:   Fri, 10 Feb 2023 11:54:12 +0100
-From:   Jan Kara <jack@suse.cz>
-To:     John Hubbard <jhubbard@nvidia.com>
-Cc:     Jan Kara <jack@suse.cz>, linux-fsdevel@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-mm@kvack.org,
-        David Howells <dhowells@redhat.com>,
-        David Hildenbrand <david@redhat.com>
-Subject: Re: [PATCH 3/5] mm: Do not try to write pinned folio during memory
- cleaning writeback
-Message-ID: <20230210105412.7xobajl2p7ulhclr@quack3>
-References: <20230209121046.25360-1-jack@suse.cz>
- <20230209123206.3548-3-jack@suse.cz>
- <4961eb2d-c36b-d6a5-6a43-0c35d24606c0@nvidia.com>
+        Fri, 10 Feb 2023 06:13:56 -0500
+Received: from mailout1.samsung.com (mailout1.samsung.com [203.254.224.24])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42F2E72DDA
+        for <linux-block@vger.kernel.org>; Fri, 10 Feb 2023 03:13:20 -0800 (PST)
+Received: from epcas5p3.samsung.com (unknown [182.195.41.41])
+        by mailout1.samsung.com (KnoxPortal) with ESMTP id 20230210111245epoutp01005e2e7242f112aaf914722bb27e8f22~CcjC-y5jk2119621196epoutp01h
+        for <linux-block@vger.kernel.org>; Fri, 10 Feb 2023 11:12:45 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.samsung.com 20230210111245epoutp01005e2e7242f112aaf914722bb27e8f22~CcjC-y5jk2119621196epoutp01h
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1676027565;
+        bh=t6bvHlN4nbiLV9YJIWp/6zdRxLV7CVNUvL+00278CqU=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=rNAF+UmchDxqmFiiZfCCWppXRdxFg0sy2JLQfaQh78D0jp6rINrcasIwMwIbe4Qob
+         1rEp2oEI8ygos2BaB0TX91exakUqMYIplbKGmLUyUOOmKq+GEbs/cV1NYYfd/9FxPH
+         zTne1CjvsATXRitEtyPdAMna3L4oNCwQ3o9LeY2M=
+Received: from epsnrtp3.localdomain (unknown [182.195.42.164]) by
+        epcas5p2.samsung.com (KnoxPortal) with ESMTP id
+        20230210111244epcas5p20db5468dcc1f9e2a3d7a4c675232c573~CcjCLrcMP3180031800epcas5p2m;
+        Fri, 10 Feb 2023 11:12:44 +0000 (GMT)
+Received: from epsmges5p2new.samsung.com (unknown [182.195.38.176]) by
+        epsnrtp3.localdomain (Postfix) with ESMTP id 4PCrgG46b6z4x9Pr; Fri, 10 Feb
+        2023 11:12:42 +0000 (GMT)
+Received: from epcas5p1.samsung.com ( [182.195.41.39]) by
+        epsmges5p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        37.7D.55678.AA626E36; Fri, 10 Feb 2023 20:12:42 +0900 (KST)
+Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
+        epcas5p4.samsung.com (KnoxPortal) with ESMTPA id
+        20230210111242epcas5p4093904df8eca07029b7fa66bd3787d18~CcjANDHlH0200802008epcas5p4J;
+        Fri, 10 Feb 2023 11:12:42 +0000 (GMT)
+Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
+        epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
+        20230210111242epsmtrp203325759ec30575367a52658eb4370bf~CcjAMcUVS2647926479epsmtrp2a;
+        Fri, 10 Feb 2023 11:12:42 +0000 (GMT)
+X-AuditID: b6c32a4a-6a3ff7000000d97e-f0-63e626aa93d9
+Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
+        epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        EB.FA.05839.9A626E36; Fri, 10 Feb 2023 20:12:41 +0900 (KST)
+Received: from green5 (unknown [107.110.206.5]) by epsmtip2.samsung.com
+        (KnoxPortal) with ESMTPA id
+        20230210111241epsmtip2788fdbb8dc9b81b5fb9c30c51009a2e8~Cci-aOHjP2975629756epsmtip2i;
+        Fri, 10 Feb 2023 11:12:41 +0000 (GMT)
+Date:   Fri, 10 Feb 2023 16:42:12 +0530
+From:   Kanchan Joshi <joshi.k@samsung.com>
+To:     Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Cc:     "hch@lst.de" <hch@lst.de>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: Re: [PATCH blktests] nvme/046: add test for unprivileged
+ passthrough
+Message-ID: <20230210111212.GA17396@green5>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4961eb2d-c36b-d6a5-6a43-0c35d24606c0@nvidia.com>
+In-Reply-To: <20230210020114.zzmazatkxeomowxq@shindev>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrOKsWRmVeSWpSXmKPExsWy7bCmuu4qtWfJBj8nylmsXH2UyWLvLW2L
+        +cueslvsm+XpwOKxeUm9x+6bDWwenzfJebQf6GYKYInKtslITUxJLVJIzUvOT8nMS7dV8g6O
+        d443NTMw1DW0tDBXUshLzE21VXLxCdB1y8wB2qekUJaYUwoUCkgsLlbSt7Mpyi8tSVXIyC8u
+        sVVKLUjJKTAp0CtOzC0uzUvXy0stsTI0MDAyBSpMyM74/XEyS8FPvoq5h0UaGPfwdDFycEgI
+        mEhcOKPZxcjFISSwm1Hi+eoWFgjnE6PEm4WbWSGcb4wSrZsWM3YxcoJ1HNx1ghkisZdRYu33
+        x1AtTxgl1tzqZgKpYhFQlZjx8TI7yA42AU2JC5NLQcIiAqYST7ZsYQKpZxZYyCgxa9oUVpCE
+        sIC/xNJLO9hAbF4BbYm+g/dZIGxBiZMzn4DZnAJmEq+W/GAHsUUFlCUObDsONkhC4Bq7xI55
+        L1khznORuDrrBjuELSzx6vgWKFtK4vO7vWwQdrLEpZnnmCDsEonHew5C2fYSraf6mUFsZoEM
+        iQd/trFC2HwSvb+fMEECjFeio00IolxR4t6kp1BrxSUezlgCZXtI9LX8YoQEyk5GiYn7frBN
+        YJSbheSfWUhWQNhWEp0fmoBsDiBbWmL5Pw4IU1Ni/S79BYysqxglUwuKc9NTi00LjPJSy+Fx
+        nJyfu4kRnAK1vHYwPnzwQe8QIxMH4yFGCQ5mJRHe8rtPk4V4UxIrq1KL8uOLSnNSiw8xmgLj
+        ZyKzlGhyPjAJ55XEG5pYGpiYmZmZWBqbGSqJ86rbnkwWEkhPLEnNTk0tSC2C6WPi4JRqYJq+
+        6l7BwWWWFXxHF9hnLkhq7lipetyz6OXW23nHzrzg9GE58u2SvWG/hN0BheJfc63em0xZER+q
+        IyGxLSP+xf6wjPfqP4243ypct7oguHqpzzrGkxaC+hwbeZp10nLjgsoa13L9ezTxsfrJGLP1
+        uw+55d15/VvM7I7mgai/wcli54XWrHplMeOR2OXtGdKPzL+3OTF9Yj94bOux/UfMK1xPufh1
+        l72/vjffPLq8QzTm+IF9gjNb/6+cvGVzz+SJ0uvWzfyf2uTTrr2FXz7r5KtHSy+dfid9ep2b
+        GpPTb/WJn0vKZ7EeT/GMSXl3JSD92q8nzWyqPHvlP0VdP3Cv3rLiU+qtX8nuj5tkfKJtmPYo
+        sRRnJBpqMRcVJwIAs5CJ2woEAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrCLMWRmVeSWpSXmKPExsWy7bCSvO5KtWfJBptXWVusXH2UyWLvLW2L
+        +cueslvsm+XpwOKxeUm9x+6bDWwenzfJebQf6GYKYInisklJzcksSy3St0vgyth9Wa5gNU/F
+        8lfZDYwdXF2MnBwSAiYSB3edYAaxhQR2M0qs7E6AiItLNF/7wQ5hC0us/PccyOYCqnnEKNFx
+        ZDkLSIJFQFVixsfLQAkODjYBTYkLk0tBwiICphJPtmxhAqlnFljIKPHn+mE2kISwgK/Ej84L
+        jCA2r4C2RN/B+ywQQ3cySvzuWAaVEJQ4OfMJ2AJmATOJeZsfMoMsYBaQllj+jwMkzAkUfrUE
+        4jhRAWWJA9uOM01gFJyFpHsWku5ZCN0LGJlXMUqmFhTnpucWGxYY5qWW6xUn5haX5qXrJefn
+        bmIEB7SW5g7G7as+6B1iZOJgPMQowcGsJMJbfvdpshBvSmJlVWpRfnxRaU5q8SFGaQ4WJXHe
+        C10n44UE0hNLUrNTUwtSi2CyTBycUg1MyxWeciad+Lfo26+M8ynLmjde22BULPdDdn+3b4Fp
+        85MFiVWh79ojKy90TtbQn78zvCEqu7w/WHiCStAsjUP85mdvPv7ak2/D4vk6lWejVM/PGblx
+        eyZPsFNs/ehYsDNuU4obi4H22/rMFY53I5yq7vZ9F0z0aG7ce+KM+XaFKobtFxN+bhHZdD8k
+        Sd8mk7UrwOhZ+I4fWrkh5dYO/dw3/tk5xpvtO3bnq4Rb9bRrc2b2pV82S4g4NfXl559bsmeG
+        Zs7e+CLuZ8zKZbeLMiQPsH9c+sHO9z7X6c2Ff9wnbbn5VL/l7xe9aUr7vkbdVRL/7OFh1TE9
+        7+Byxcd/ZCaVPLOtEOg677U3i+OhVamWEktxRqKhFnNRcSIAwadm49cCAAA=
+X-CMS-MailID: 20230210111242epcas5p4093904df8eca07029b7fa66bd3787d18
+X-Msg-Generator: CA
+Content-Type: multipart/mixed;
+        boundary="----KU2CxbTk4.ftA7vvsvzLW4bt.-m_7jRTbTuK1k18jgDVn8pS=_53b04_"
+CMS-TYPE: 105P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20230209094631epcas5p436d4f54caa91ff6d258928bba76206de
+References: <CGME20230209094631epcas5p436d4f54caa91ff6d258928bba76206de@epcas5p4.samsung.com>
+        <20230209094541.248729-1-joshi.k@samsung.com>
+        <20230210020114.zzmazatkxeomowxq@shindev>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu 09-02-23 17:54:14, John Hubbard wrote:
-> On 2/9/23 04:31, Jan Kara wrote:
-> > When a folio is pinned, there is no point in trying to write it during
-> > memory cleaning writeback. We cannot reclaim the folio until it is
-> > unpinned anyway and we cannot even be sure the folio is really clean.
-> > On top of that writeback of such folio may be problematic as the data
-> > can change while the writeback is running thus causing checksum or
-> > DIF/DIX failures. So just don't bother doing memory cleaning writeback
-> > for pinned folios.
-> > 
-> > Signed-off-by: Jan Kara <jack@suse.cz>
-> > ---
-> >   fs/9p/vfs_addr.c            |  2 +-
-> >   fs/afs/file.c               |  2 +-
-> >   fs/afs/write.c              |  6 +++---
-> >   fs/btrfs/extent_io.c        | 14 +++++++-------
-> >   fs/btrfs/free-space-cache.c |  2 +-
-> >   fs/btrfs/inode.c            |  2 +-
-> >   fs/btrfs/subpage.c          |  2 +-
-> 
-> Hi Jan!
-> 
-> Just a quick note that this breaks the btrfs build in subpage.c.
-> Because, unfortunately, btrfs creates 6 sets of functions via calls to a
-> macro: IMPLEMENT_BTRFS_PAGE_OPS(). And that expects only one argument to
-> the clear_page_func, and thus to clear_page_dirty_for_io().
-> 
-> It seems infeasible (right?) to add another argument to the other
-> clear_page_func functions, which include:
-> 
->    ClearPageUptodate
->    ClearPageError
->    end_page_writeback
->    ClearPageOrdered
->    ClearPageChecked
-> 
-> , so I expect IMPLEMENT_BTRFS_PAGE_OPS() may need to be partially
-> unrolled, in order to pass in the new writeback control arg to
-> clear_page_dirty_for_io().
+------KU2CxbTk4.ftA7vvsvzLW4bt.-m_7jRTbTuK1k18jgDVn8pS=_53b04_
+Content-Type: text/plain; charset="utf-8"; format="flowed"
+Content-Disposition: inline
 
-Aha, thanks for catching this. So it is easy to fix this to make things
-compile (just a wrapper around clear_page_dirty_for_io() - done now). It
-will be a bit more challenging to propagate wbc into there for proper
-decision - that will probably need these functions not to be defined by the
-macros.
+On Fri, Feb 10, 2023 at 02:01:14AM +0000, Shinichiro Kawasaki wrote:
+>On Feb 09, 2023 / 15:15, Kanchan Joshi wrote:
+>> Ths creates a non-root user "blktest46", alters permissions for
+>> char-device node (/dev/ngX) and runs few passthrough commands.
+>> At the end of the test, user is deleted and permissions are reverted.
+>>
+>> Signed-off-by: Kanchan Joshi <joshi.k@samsung.com>
+>
+>Thanks for the patch. I guess this test case exercises nvme_cmd_allowed() in
+>drivers/nvme/host/ioctl.c.
 
-								Honza
+Yes. Thanks for review.
+>The test contents look valid and good.
+>
+>This test case adds and deletes a user. For every test case run, it creates and
+>removes the user home directory and touches /etc files. It does not sound right
+>for me. It changes system set up, and sudden test case stop will leave the user.
+>
+>I suggest to ask blktests users to prepare the normal user and specify it to a
+>config file variable (it can be named NORMAL_USER or something). I also suggest
+>to add two new helper functions: _require_user() will check that the specified
+>user is valid, and _run_user() will wrap the "su $NORMAL_USER -c" command line.
 
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+I was trying to make this automatic for blktests users.
+Script attempts cleanup always (regardless of test-failure).
+But yes, if any command gets stuck, cleanup won't happen.
+So what you mentioned - sounds fine to me.
+
+>If you don't mind, I can create another patch for further discussion based on
+>the suggestion above, and modify your patch to use the new helper functions.
+Sure. Please remove "_have_fio" line also in v2.
+
+------KU2CxbTk4.ftA7vvsvzLW4bt.-m_7jRTbTuK1k18jgDVn8pS=_53b04_
+Content-Type: text/plain; charset="utf-8"
+
+
+------KU2CxbTk4.ftA7vvsvzLW4bt.-m_7jRTbTuK1k18jgDVn8pS=_53b04_--
