@@ -2,68 +2,153 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BA3AAC636CD
-	for <linux-block@archiver.kernel.org>; Fri, 10 Feb 2023 17:53:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 398D6C05027
+	for <linux-block@archiver.kernel.org>; Fri, 10 Feb 2023 18:02:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231889AbjBJRxM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 10 Feb 2023 12:53:12 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55576 "EHLO
+        id S232661AbjBJSCf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 10 Feb 2023 13:02:35 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60846 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232895AbjBJRw7 (ORCPT
+        with ESMTP id S232163AbjBJSCf (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 10 Feb 2023 12:52:59 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A695774046
-        for <linux-block@vger.kernel.org>; Fri, 10 Feb 2023 09:52:58 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 43B8061E79
-        for <linux-block@vger.kernel.org>; Fri, 10 Feb 2023 17:52:58 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id AD61FC433D2;
-        Fri, 10 Feb 2023 17:52:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1676051577;
-        bh=VSYSe9LipJ6BJ9SdtPd5sSWTWVeQUZYtHKuxSxMCd0E=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=pU7jWJWbf+q1vG5zQtQ1ScVHrRCBedNic+s9jLcQh7dQ6EJ4vvycrulpq/DQxVXUC
-         hZ6vB73PlQ+x89jGHtWCknVisZk03PwVb36eK42if/e7tgG4/qa+UG6iquUWpbtkT9
-         kNMf8tAUE/tz2iKVRKY7S5LG6V41sF7vv4ARqKOIrwF3i/Aja/CW2iDbbOCoCUZFk+
-         9AsL88NOS/pNkuiP1wMPjQllO7nhny+LSCuk95rW1ZReASrywCJ+h2OtoVEhI2JxLQ
-         WYih01XwGLax3B6Kp61rwP1aXRcWVb+idRQ/3MYG2/HdvfleZkufh5/kiwstHLh/97
-         zwhDfDuuSRJ5Q==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 9D53CE55EFD;
-        Fri, 10 Feb 2023 17:52:57 +0000 (UTC)
-Subject: Re: [GIT PULL] Block fix for 6.2-rc8
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <0834a42a-fc2c-6847-4f4d-4125d41e60ba@kernel.dk>
-References: <0834a42a-fc2c-6847-4f4d-4125d41e60ba@kernel.dk>
-X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
-X-PR-Tracked-Message-Id: <0834a42a-fc2c-6847-4f4d-4125d41e60ba@kernel.dk>
-X-PR-Tracked-Remote: git://git.kernel.dk/linux.git tags/block-6.2-2023-02-10
-X-PR-Tracked-Commit-Id: 38c33ece232019c5b18b4d5ec0254807cac06b7c
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 29716680adbb221a5cd1604e11e81c6f2938e06f
-Message-Id: <167605157763.13061.10795667905701820039.pr-tracker-bot@kernel.org>
-Date:   Fri, 10 Feb 2023 17:52:57 +0000
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+        Fri, 10 Feb 2023 13:02:35 -0500
+Received: from mailout1.samsung.com (mailout1.samsung.com [203.254.224.24])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9600F5EBCF
+        for <linux-block@vger.kernel.org>; Fri, 10 Feb 2023 10:02:32 -0800 (PST)
+Received: from epcas5p3.samsung.com (unknown [182.195.41.41])
+        by mailout1.samsung.com (KnoxPortal) with ESMTP id 20230210180228epoutp017d58023cf6b06aa0cbbe03c8cdac69ee~CiIyfhObi1489814898epoutp01f
+        for <linux-block@vger.kernel.org>; Fri, 10 Feb 2023 18:02:28 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.samsung.com 20230210180228epoutp017d58023cf6b06aa0cbbe03c8cdac69ee~CiIyfhObi1489814898epoutp01f
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1676052148;
+        bh=F8sxz/DFBmvj9dEHvGBa6OIR8k68L/lCnvOr2bzeAWk=;
+        h=From:To:Cc:Subject:Date:References:From;
+        b=qytfOB27VIxcPQne3c2uBaXsJ1heP7gea0dOnu53xqnmjKGifOHuNVGONETH47jmW
+         RJ/mdfNd8pee7BqZSN7uzJz4H3gukMGSBAW7boynScnzPjzGT9L018Z6i0TTYgPbv6
+         h4jZC1WlHaFFy/akROJhFj8kjTHzzHHPuPMAqQsE=
+Received: from epsnrtp2.localdomain (unknown [182.195.42.163]) by
+        epcas5p2.samsung.com (KnoxPortal) with ESMTP id
+        20230210180228epcas5p229f259e43e883b56e3f354d7cbb2f58e~CiIx__8Fo0745107451epcas5p2U;
+        Fri, 10 Feb 2023 18:02:28 +0000 (GMT)
+Received: from epsmges5p2new.samsung.com (unknown [182.195.38.177]) by
+        epsnrtp2.localdomain (Postfix) with ESMTP id 4PD1m24DPHz4x9Pt; Fri, 10 Feb
+        2023 18:02:26 +0000 (GMT)
+Received: from epcas5p1.samsung.com ( [182.195.41.39]) by
+        epsmges5p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        ED.BB.55678.2B686E36; Sat, 11 Feb 2023 03:02:26 +0900 (KST)
+Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
+        epcas5p1.samsung.com (KnoxPortal) with ESMTPA id
+        20230210180226epcas5p1bd2e1150de067f8af61de2bbf571594d~CiIwABZH_1487214872epcas5p12;
+        Fri, 10 Feb 2023 18:02:26 +0000 (GMT)
+Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
+        epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
+        20230210180226epsmtrp2275bcf6dc658d13c0b572e6d296630b5~CiIv-UX6u0770607706epsmtrp25;
+        Fri, 10 Feb 2023 18:02:26 +0000 (GMT)
+X-AuditID: b6c32a4a-909fc7000000d97e-41-63e686b21beb
+Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
+        epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        F6.58.05839.2B686E36; Sat, 11 Feb 2023 03:02:26 +0900 (KST)
+Received: from localhost.localdomain (unknown [107.110.206.5]) by
+        epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
+        20230210180224epsmtip1ad2e07de90dfb2af216925f3260f223c~CiIuqVOBK2565325653epsmtip1N;
+        Fri, 10 Feb 2023 18:02:24 +0000 (GMT)
+From:   Kanchan Joshi <joshi.k@samsung.com>
+To:     lsf-pc@lists.linux-foundation.org
+Cc:     linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+        io-uring@vger.kernel.org, axboe@kernel.dk, hch@lst.de,
+        kbusch@kernel.org, ming.lei@redhat.com,
+        Kanchan Joshi <joshi.k@samsung.com>
+Subject: [LSF/MM/BPF ATTEND][LSF/MM/BPF Topic] Non-block IO
+Date:   Fri, 10 Feb 2023 23:30:33 +0530
+Message-Id: <20230210180033.321377-1-joshi.k@samsung.com>
+X-Mailer: git-send-email 2.25.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFuplk+LIzCtJLcpLzFFi42LZdlhTXXdT27Nkg3Xn5SxW3+1ns1i5+iiT
+        xbvWcywWR/+/ZbOYdOgao8XeW9oW85c9ZbfY93ovs8Whyc1MDpwel8+Wemxa1cnmsXlJvcfk
+        G8sZPXbfbGDzeL/vKptH35ZVjB6fN8kFcERl22SkJqakFimk5iXnp2TmpdsqeQfHO8ebmhkY
+        6hpaWpgrKeQl5qbaKrn4BOi6ZeYAHaekUJaYUwoUCkgsLlbSt7Mpyi8tSVXIyC8usVVKLUjJ
+        KTAp0CtOzC0uzUvXy0stsTI0MDAyBSpMyM74tmklc8Fd/op197ezNzA+4eli5OSQEDCROH72
+        KmsXIxeHkMBuRon//XOYIJxPjBKHp+1mhHC+MUpMP3ySFaZlzvW5LBCJvYwSm7YeZIZwPjNK
+        zP3yEcjh4GAT0JS4MLkUpEFEQFXi7/ojYA3MAscZJRbOvMQMkhAWsJZ4c/wcO4jNAlR0/9RE
+        JhCbV8BS4lvPBCaIbfISMy99Z4eIC0qcnPmEBcRmBoo3b50NtlhC4Cu7xNlpK9kgGlwkfrye
+        C2ULS7w6voUdwpaS+PxuL1Q8WeLSzHNQC0okHu85CGXbS7Se6gd7gBnogfW79CF28Un0/n7C
+        BBKWEOCV6GgTgqhWlLg36Sk0UMQlHs5YAmV7SLzc+wBsk5BArMSX9h3MExjlZiH5YBaSD2Yh
+        LFvAyLyKUTK1oDg3PbXYtMAoL7UcHpnJ+bmbGMHpUstrB+PDBx/0DjEycTAeYpTgYFYS4a20
+        eZYsxJuSWFmVWpQfX1Sak1p8iNEUGKwTmaVEk/OBCTuvJN7QxNLAxMzMzMTS2MxQSZxX3fZk
+        spBAemJJanZqakFqEUwfEwenVANT9qXjJjfetZp6/3FNqFaSmueVvO95YPxtcy/bXq3GipfG
+        cfvYVt1u+H2Yj//uum26k+X9t7m+9laR2fft2Da78BvFE+QWdJiavDmsdspwR4ZhzEptI4np
+        1zs/presmWJgL/I7k18n9UrNg96Te0UjwjQ5hZL3iJ5h9IperhGYnRg2zTTa8dyH3kf+RooJ
+        V9Z+D7uke2xXTf+LLWnbvsueYO4+uiJi5cYrHx5qTotPbnfbramw1djr7Nu6pnUB3NMMNd//
+        EF3KOCHzcuvE2Amt0ksL2rnL5+7Y/cFGJEbo1PZu0Q2fnxr1XhLxWxq7jMttqZsL++q7k9Jm
+        +5cGm/72XXFZTeO70fcmBddFhrpKLMUZiYZazEXFiQAXBT3cIAQAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrKLMWRmVeSWpSXmKPExsWy7bCSnO6mtmfJBh/XsVqsvtvPZrFy9VEm
+        i3et51gsjv5/y2Yx6dA1Rou9t7Qt5i97ym6x7/VeZotDk5uZHDg9Lp8t9di0qpPNY/OSeo/J
+        N5Yzeuy+2cDm8X7fVTaPvi2rGD0+b5IL4IjisklJzcksSy3St0vgyvi2aSVzwV3+inX3t7M3
+        MD7h6WLk5JAQMJGYc30uSxcjF4eQwG5GiR+TNrBBJMQlmq/9YIewhSVW/nvODlH0kVHi8f/b
+        rF2MHBxsApoSFyaXgtSICKhK/F1/BGwQs8BFRolNq06DNQsLWEu8OX4OzGYBKrp/aiITiM0r
+        YCnxrWcCE8QCeYmZl76zQ8QFJU7OfMICYjMDxZu3zmaewMg3C0lqFpLUAkamVYySqQXFuem5
+        xYYFhnmp5XrFibnFpXnpesn5uZsYwSGtpbmDcfuqD3qHGJk4GA8xSnAwK4nwVto8SxbiTUms
+        rEotyo8vKs1JLT7EKM3BoiTOe6HrZLyQQHpiSWp2ampBahFMlomDU6qBKWvLtzMbH/A6XlzV
+        39B3fcvVW+q3D+06s/Zg1auUGfx8m++3FWSJzZ6UWuky+8tSD/vdl7YyOG3fEBIiwbavm6PP
+        M4P3hqnPbQuF5VcErAO3WFw22OAxuevi8TJj75Ko08JuBkfesXgXVzEd+aN4q2adr/S8t2wf
+        Skz/1j0uvPBoybIidellp9p1+PxeznHytjqrHvqxzLdz+af3bBqzE+LuyR27PfXxxZe79k3a
+        92vnoWubuu5st1HnCj3eoX+7YelTN627yWd2qtaHSs677vPJrDlar2S6VsakvPUy1rayfBu3
+        xFwIDLgj1NbF28d8lOdSbOS0CpaZ115d+H3VR3ClwMtDK3TaFee1yb69/UCJpTgj0VCLuag4
+        EQDC8v5d2AIAAA==
+X-CMS-MailID: 20230210180226epcas5p1bd2e1150de067f8af61de2bbf571594d
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+CMS-TYPE: 105P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20230210180226epcas5p1bd2e1150de067f8af61de2bbf571594d
+References: <CGME20230210180226epcas5p1bd2e1150de067f8af61de2bbf571594d@epcas5p1.samsung.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The pull request you sent on Fri, 10 Feb 2023 09:11:25 -0700:
+is getting more common than it used to be.
+NVMe is no longer tied to block storage. Command sets in NVMe 2.0 spec
+opened an excellent way to present non-block interfaces to the Host. ZNS
+and KV came along with it, and some new command sets are emerging.
 
-> git://git.kernel.dk/linux.git tags/block-6.2-2023-02-10
+OTOH, Kernel IO advances historically centered around the block IO path.
+Passthrough IO path existed, but it stayed far from all the advances, be
+it new features or performance.
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/29716680adbb221a5cd1604e11e81c6f2938e06f
+Current state & discussion points:
+---------------------------------
+Status-quo changed in the recent past with the new passthrough path (ng
+char interface + io_uring command). Feature parity does not exist, but
+performance parity does.
+Adoption draws asks. I propose a session covering a few voices and
+finding a path-forward for some ideas too.
 
-Thank you!
+1. Command cancellation: while NVMe mandatorily supports the abort
+command, we do not have a way to trigger that from user-space. There
+are ways to go about it (with or without the uring-cancel interface) but
+not without certain tradeoffs. It will be good to discuss the choices in
+person.
 
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+2. Cgroups: works for only block dev at the moment. Are there outright
+objections to extending this to char-interface IO?
+
+3. DMA cost: is high in presence of IOMMU. Keith posted the work[1],
+with block IO path, last year. I imagine plumbing to get a bit simpler
+with passthrough-only support. But what are the other things that must
+be sorted out to have progress on moving DMA cost out of the fast path?
+
+4. Direct NVMe queues - will there be interest in having io_uring
+managed NVMe queues?  Sort of a new ring, for which I/O is destaged from
+io_uring SQE to NVMe SQE without having to go through intermediate
+constructs (i.e., bio/request). Hopefully,that can further amp up the
+efficiency of IO.
+
+5. <anything else that might be of interest to folks>
+
+I hope to send some code/PoC to discuss the stuff better.
+
+[1]https://lore.kernel.org/linux-nvme/20220805162444.3985535-1-kbusch@fb.com/
+
+
