@@ -2,93 +2,99 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CA523C05027
-	for <linux-block@archiver.kernel.org>; Fri, 10 Feb 2023 22:31:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B35F8C636D7
+	for <linux-block@archiver.kernel.org>; Fri, 10 Feb 2023 23:21:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233519AbjBJWbX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 10 Feb 2023 17:31:23 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56894 "EHLO
+        id S229667AbjBJXV5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 10 Feb 2023 18:21:57 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33390 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233600AbjBJWbX (ORCPT
+        with ESMTP id S229668AbjBJXVz (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 10 Feb 2023 17:31:23 -0500
-Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C04167FEE5
-        for <linux-block@vger.kernel.org>; Fri, 10 Feb 2023 14:31:21 -0800 (PST)
-Received: by mail-pf1-x42f.google.com with SMTP id r17so4443618pff.9
-        for <linux-block@vger.kernel.org>; Fri, 10 Feb 2023 14:31:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112; t=1676068281;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=aakxc4GOV3A+tpqp5NT+fjFwCBvuUL/gF53A5SHyoUM=;
-        b=HBH4bzAOC+oGh0kd3NDtdX8oHQ3DvT4RC4HcqvIizHcpV3n2xpZ/i1ygDv66g0a0sz
-         fFmff/ydUHcr/+X2vhiNoX77AcEuuGESI7j171BtOjbkWmpMD2QfCuA7NdgR/VhtVKwT
-         959h2p2pCsk5upGFRWYhsUCl1xERt5f2ImVJMAbxm8vJkVPoFxvHGobgGpIC1ybTOr1B
-         i+fSVnx3B+YtsCrjnAxxvCy+a0eCqMxootp6C/nLWjjOkhIUlwlQEX+GZMBKjdJp4LW/
-         7mbD5YtOeKlIGfXKM9Lsh+r8K+Gycd3zKi2QOVLeyS/3775+KxgyKXzpAs/0kWCOQLdJ
-         Ce/w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1676068281;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=aakxc4GOV3A+tpqp5NT+fjFwCBvuUL/gF53A5SHyoUM=;
-        b=LPs9RhKUDg6SrjuF8DoS25gZeefno8OYcvfQ3ZN19wT3VZKSuN+l2AWcNO982lEfK0
-         xO8c+Fd6laUCYKTuXrTHWulK0WDpcFc4vMmzdFJLcVsuoxHhuGcVVjd4YCpNV/K6SXXL
-         1uWzg6c+DELIWDDC/UPS3I16sLvPT9xzMn0eq/+Edyuaqmi5NYUc31zT5ymLdXW+wLcs
-         AWB821zYZ9bVgahUjpl+l5FvUSk4Uni3c7XcKvSmejDkV798bmBoOLoyLdWpRyi8+Nqk
-         CG/Ad6pi7ZooD3B8XCt1z5tWW2cIvRsI2LtitSkCPdphIXktKBJhqbBmSgN2FIH/uTHH
-         ATAQ==
-X-Gm-Message-State: AO0yUKWKs8oLbjA9FTjHfqyEYSRzr41jVnHGxt0dEtV+CiJPHVc9t1Am
-        r587BaZCdFuucj1WQ/KsxBV9Zw==
-X-Google-Smtp-Source: AK7set9JzFtLT/BkCdAXDmaqIpgx7y6Q9b2lrPWOatxAvPOrDATXsIJKYQICCZAwhqj/4NCuYVdPag==
-X-Received: by 2002:a62:d115:0:b0:5a8:1637:1f03 with SMTP id z21-20020a62d115000000b005a816371f03mr11992803pfg.1.1676068281172;
-        Fri, 10 Feb 2023 14:31:21 -0800 (PST)
-Received: from [192.168.1.136] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id d15-20020aa7814f000000b00593ce7ebbaasm3710342pfn.184.2023.02.10.14.31.19
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 10 Feb 2023 14:31:20 -0800 (PST)
-Message-ID: <bee8b687-df78-baf8-495c-099d44f39275@kernel.dk>
-Date:   Fri, 10 Feb 2023 15:31:19 -0700
+        Fri, 10 Feb 2023 18:21:55 -0500
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id C8860193D0;
+        Fri, 10 Feb 2023 15:21:54 -0800 (PST)
+Received: by linux.microsoft.com (Postfix, from userid 1052)
+        id 0D21520C8B19; Fri, 10 Feb 2023 15:21:54 -0800 (PST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 0D21520C8B19
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+        s=default; t=1676071314;
+        bh=i2lp2ziiFIPNiUwou6ICbYjzt9rpgm+8uoeH+6Tjq14=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=g710bbkpK51xjvJHJGmow+Fo5edKRRAgTo+QwsHzaank4bxcVSAeeGsqdn1oWpbTo
+         7DVryIkmJ5VTN9TLjgGnxqj0i1Uq+gUjsnTDRaf7H8xwci0S7dOJwYkfBIwdMKw7H4
+         KofNpLaIUBMktQ5IplKE8C7Gi/LqrPF8KHBKGhCA=
+Date:   Fri, 10 Feb 2023 15:21:54 -0800
+From:   Fan Wu <wufan@linux.microsoft.com>
+To:     Roberto Sassu <roberto.sassu@huaweicloud.com>
+Cc:     corbet@lwn.net, zohar@linux.ibm.com, jmorris@namei.org,
+        serge@hallyn.com, tytso@mit.edu, ebiggers@kernel.org,
+        axboe@kernel.dk, agk@redhat.com, snitzer@kernel.org,
+        eparis@redhat.com, paul@paul-moore.com, linux-doc@vger.kernel.org,
+        linux-integrity@vger.kernel.org,
+        linux-security-module@vger.kernel.org,
+        linux-fscrypt@vger.kernel.org, linux-block@vger.kernel.org,
+        dm-devel@redhat.com, linux-audit@redhat.com,
+        roberto.sassu@huawei.com, linux-kernel@vger.kernel.org,
+        Deven Bowers <deven.desai@linux.microsoft.com>
+Subject: Re: [RFC PATCH v9 03/16] ipe: add evaluation loop and introduce
+ 'boot_verified' as a trust provider
+Message-ID: <20230210232154.GA17962@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+References: <1675119451-23180-1-git-send-email-wufan@linux.microsoft.com>
+ <1675119451-23180-4-git-send-email-wufan@linux.microsoft.com>
+ <061df661004a06ef1e8790d48157c7ba4ecfc009.camel@huaweicloud.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.1
-Subject: Re: [PATCH v13 00/12] iov_iter: Improve page extraction (pin or just
- list)
-Content-Language: en-US
-To:     David Howells <dhowells@redhat.com>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Christoph Hellwig <hch@infradead.org>
-Cc:     Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>,
-        Jeff Layton <jlayton@kernel.org>,
-        David Hildenbrand <david@redhat.com>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        Hillf Danton <hdanton@sina.com>, linux-fsdevel@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org
-References: <20230209102954.528942-1-dhowells@redhat.com>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20230209102954.528942-1-dhowells@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <061df661004a06ef1e8790d48157c7ba4ecfc009.camel@huaweicloud.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2/9/23 3:29?AM, David Howells wrote:
-> Hi Jens, Al, Christoph,
+On Tue, Jan 31, 2023 at 04:49:44PM +0100, Roberto Sassu wrote:
+> On Mon, 2023-01-30 at 14:57 -0800, Fan Wu wrote:
+> > From: Deven Bowers <deven.desai@linux.microsoft.com>
+> > 
+> > IPE must have a centralized function to evaluate incoming callers
+> > against IPE's policy. This iteration of the policy against the rules
+> > for that specific caller is known as the evaluation loop.
 > 
-> Here are patches to provide support for extracting pages from an iov_iter
-> and to use this in the extraction functions in the block layer bio code.
+> Not sure if you check the properties at every access.
+> 
+> >From my previous comments (also for previous versions of the patches)
+> you could evaluate the property once, by calling the respective
+> functions in the other subsystems.
+> 
+> Then, you reserve space in the security blob for inodes and superblocks
+> to cache the decision. The format could be a policy sequence number, to
+> ensure that the cache is valid only for the current policy, and a bit
+> for every hook you enforce.
 
-[snip]
+Thanks for raising this idea. I agree that if the property evaluation
+leads to a performance issue, it will be better to cache the evaluation
+result. But for this version, all the property evaluations are simple,
+so it is just as fast as accessing a cache. Also, for the initial
+version we prefer to keep the patch as minimal as possible. 
 
-I updated the branch to v13, just as a heads-up. Still in
-for-6.3/iov-extract as before.
+If the policy evolved to be super complex and the evaluation becomes
+a bottleneck, cache support will absolutely be the right way we will go.
+-Fan
 
--- 
-Jens Axboe
-
+> 
+> Also, currently you rely on the fact that the properties you defined
+> are immutable and the immutability is guaranteed by the other
+> subsystems, so no write can occur.
+> 
+> But if you remove this limitation, the immutability is not guaranteed
+> anymore by the other subsystems (for example if a file is in an ext4
+> filesystem), the LSM needs to take extra care to ensure that the
+> properties are still verified. This would be required for example if
+> IPE is used in conjuction with DIGLIM.
+> 
+> In my opinion, IPE value would increase if the generic enforcement
+> mechanism is property-agnostic.
+> 
+> Roberto
+> 
