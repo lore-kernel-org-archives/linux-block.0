@@ -2,115 +2,111 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DED21C05027
-	for <linux-block@archiver.kernel.org>; Fri, 10 Feb 2023 14:15:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28CF3C636D7
+	for <linux-block@archiver.kernel.org>; Fri, 10 Feb 2023 15:33:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231881AbjBJOPC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 10 Feb 2023 09:15:02 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54510 "EHLO
+        id S232761AbjBJPdb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 10 Feb 2023 10:33:31 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33512 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231954AbjBJOPA (ORCPT
+        with ESMTP id S232707AbjBJPda (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 10 Feb 2023 09:15:00 -0500
-Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7BEF51E299;
-        Fri, 10 Feb 2023 06:14:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1676038499; x=1707574499;
-  h=from:to:cc:subject:date:message-id;
-  bh=/qvMeQ9j2X2HaFmNEFykOjD3cjxN0Sct0rI+Lc/meY0=;
-  b=gmM5wZKpQjWqGbgD2IsO3C/10qbkll30/aIiKvusVBPNafsuovR1Oe+8
-   DouYH/oSYchmiJzwVV0O8AJCUNVFOi9iwT1ZIYdhMiLhGv0resDcUZ/3m
-   qTPPWz55WUO5WcC7aqc/XpxlcfZKLUj+cI9MHQdy6cxLtIn0/QsQBxTmB
-   xswO60uS5tlKMBzcjRLyrgKH+VAWUocjofuuiD9Pi4SWkG/Ua8jCQUoPg
-   fL2lZg/5DmnQCrg4ow+bTrjqmfMz8JZg4QozzDoWOM2E1Z/x/OgPaVJg8
-   ScbO0KxGxLYNSeRs/aGQlHNXZRZJTpvPedGjcIuGGt767LvqalV2A7TIY
-   Q==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10617"; a="395034337"
-X-IronPort-AV: E=Sophos;i="5.97,287,1669104000"; 
-   d="scan'208";a="395034337"
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Feb 2023 06:14:58 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10617"; a="776939961"
-X-IronPort-AV: E=Sophos;i="5.97,287,1669104000"; 
-   d="scan'208";a="776939961"
-Received: from storage2.sh.intel.com (HELO localhost) ([10.67.111.9])
-  by fmsmga002.fm.intel.com with ESMTP; 10 Feb 2023 06:14:56 -0800
-From:   Liu Xiaodong <xiaodong.liu@intel.com>
-To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Jim Harris <james.r.harris@intel.com>,
-        Liu Xiaodong <xiaodong.liu@intel.com>
-Subject: [PATCH] block: ublk: check IO buffer based on flag need_get_data
-Date:   Fri, 10 Feb 2023 09:13:56 -0500
-Message-Id: <20230210141356.112321-1-xiaodong.liu@intel.com>
-X-Mailer: git-send-email 2.14.5
+        Fri, 10 Feb 2023 10:33:30 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 31B0A28231
+        for <linux-block@vger.kernel.org>; Fri, 10 Feb 2023 07:32:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1676043161;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=BylpAHJhBQbW5HRA2ArLH6MZWqyqiWhscbiNJfHnoXw=;
+        b=JvNsGlQvB9GxGfnSfiethkqLZVkZ/mx14+mO008FpDwN9CBoJklKVcVfRm+8Hyillt9jFn
+        T+OX/CUS7rXmXXqYP77TmwgTSNumoola0hRvSI0xoyW6Yw9vEMgg6EAtMeCuP0Y1byO5e5
+        hvciujgA9THnETJljeKQKwtlONSx3iA=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-515-379S1MqcNjaH-3Al0vMLJA-1; Fri, 10 Feb 2023 10:32:38 -0500
+X-MC-Unique: 379S1MqcNjaH-3Al0vMLJA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 735FE857F45;
+        Fri, 10 Feb 2023 15:32:36 +0000 (UTC)
+Received: from localhost (ovpn-8-17.pek2.redhat.com [10.72.8.17])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 007492166B29;
+        Fri, 10 Feb 2023 15:32:34 +0000 (UTC)
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        Alexander Viro <viro@zeniv.linux.org.uk>
+Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
+        Miklos Szeredi <mszeredi@redhat.com>,
+        Bernd Schubert <bschubert@ddn.com>,
+        Nitesh Shetty <nj.shetty@samsung.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Ziyang Zhang <ZiyangZhang@linux.alibaba.com>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH 0/4] io_uring: add IORING_OP_READ[WRITE]_SPLICE_BUF
+Date:   Fri, 10 Feb 2023 23:32:08 +0800
+Message-Id: <20230210153212.733006-1-ming.lei@redhat.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Currently, uring_cmd with UBLK_IO_FETCH_REQ or
-UBLK_IO_COMMIT_AND_FETCH_REQ is always checked whether
-userspace server has provided IO buffer even flag
-UBLK_F_NEED_GET_DATA is configured.
+Hello,
 
-This is a excessive check. If UBLK_F_NEED_GET_DATA is
-configured, FETCH_RQ doesn't need to provide IO buffer;
-COMMIT_AND_FETCH_REQ also doesn't need to do that if
-the IO type is not READ.
+Add two OPs which buffer is retrieved via kernel splice for supporting
+fuse/ublk zero copy.
 
-Check ub_cmd->addr together with ublk_need_get_data()
-and IO type in ublk_ch_uring_cmd().
+The 1st patch enhances direct pipe & splice for moving pages in kernel,
+so that the two added OPs won't be misused, and avoid potential security
+hole.
 
-With this fix, userspace server doesn't need to preserve
-buffers for every ublk_io when flag UBLK_F_NEED_GET_DATA
-is configured, in order to save memory.
+The 2nd patch allows splice_direct_to_actor() caller to ignore signal
+if the actor won't block and can be done in bound time.
 
-Signed-off-by: Liu Xiaodong <xiaodong.liu@intel.com>
----
- drivers/block/ublk_drv.c | 13 +++++++++----
- 1 file changed, 9 insertions(+), 4 deletions(-)
+The 3rd patch add the two OPs.
 
-diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-index e54693204630..609137791667 100644
---- a/drivers/block/ublk_drv.c
-+++ b/drivers/block/ublk_drv.c
-@@ -1203,6 +1203,7 @@ static int ublk_ch_uring_cmd(struct io_uring_cmd *cmd, unsigned int issue_flags)
- 	u32 cmd_op = cmd->cmd_op;
- 	unsigned tag = ub_cmd->tag;
- 	int ret = -EINVAL;
-+	struct request *req;
+The 4th patch implements ublk's ->splice_read() for supporting
+zero copy.
+
+ublksrv(userspace):
+
+https://github.com/ming1/ubdsrv/commits/io_uring_splice_buf
+    
+So far, only loop/null target implements zero copy in above branch:
+    
+	ublk add -t loop -f $file -z
+	ublk add -t none -z
+
+Basic FS/IO function is verified, mount/kernel building & fio
+works fine, and big chunk IO(BS: 64k/512k) performance gets improved
+obviously.
  
- 	pr_devel("%s: received: cmd op %d queue %d tag %d result %d\n",
- 			__func__, cmd->cmd_op, ub_cmd->q_id, tag,
-@@ -1253,8 +1254,8 @@ static int ublk_ch_uring_cmd(struct io_uring_cmd *cmd, unsigned int issue_flags)
- 		 */
- 		if (io->flags & UBLK_IO_FLAG_OWNED_BY_SRV)
- 			goto out;
--		/* FETCH_RQ has to provide IO buffer */
--		if (!ub_cmd->addr)
-+		/* FETCH_RQ has to provide IO buffer if NEED GET DATA is not enabled */
-+		if (!ub_cmd->addr && !ublk_need_get_data(ubq))
- 			goto out;
- 		io->cmd = cmd;
- 		io->flags |= UBLK_IO_FLAG_ACTIVE;
-@@ -1263,8 +1264,12 @@ static int ublk_ch_uring_cmd(struct io_uring_cmd *cmd, unsigned int issue_flags)
- 		ublk_mark_io_ready(ub, ubq);
- 		break;
- 	case UBLK_IO_COMMIT_AND_FETCH_REQ:
--		/* FETCH_RQ has to provide IO buffer */
--		if (!ub_cmd->addr)
-+		req = blk_mq_tag_to_rq(ub->tag_set.tags[ub_cmd->q_id], tag);
-+		/*
-+		 * COMMIT_AND_FETCH_REQ has to provide IO buffer if NEED GET DATA is
-+		 * not enabled or it is Read IO.
-+		 */
-+		if (!ub_cmd->addr && (!ublk_need_get_data(ubq) || req_op(req) == REQ_OP_READ))
- 			goto out;
- 		if (!(io->flags & UBLK_IO_FLAG_OWNED_BY_SRV))
- 			goto out;
+Any comment is welcome!
+
+Ming Lei (4):
+  fs/splice: enhance direct pipe & splice for moving pages in kernel
+  fs/splice: allow to ignore signal in __splice_from_pipe
+  io_uring: add IORING_OP_READ[WRITE]_SPLICE_BUF
+  ublk_drv: support splice based read/write zero copy
+
+ drivers/block/ublk_drv.c      | 169 +++++++++++++++++++++++++++++++--
+ fs/splice.c                   |  19 +++-
+ include/linux/pipe_fs_i.h     |  10 ++
+ include/linux/splice.h        |  23 +++++
+ include/uapi/linux/io_uring.h |   2 +
+ include/uapi/linux/ublk_cmd.h |  31 +++++-
+ io_uring/opdef.c              |  37 ++++++++
+ io_uring/rw.c                 | 174 +++++++++++++++++++++++++++++++++-
+ io_uring/rw.h                 |   1 +
+ 9 files changed, 456 insertions(+), 10 deletions(-)
+
 -- 
-2.14.5
+2.31.1
 
