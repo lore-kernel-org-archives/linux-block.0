@@ -2,404 +2,101 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A5C43C05027
-	for <linux-block@archiver.kernel.org>; Fri, 10 Feb 2023 15:34:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4EC1EC05027
+	for <linux-block@archiver.kernel.org>; Fri, 10 Feb 2023 16:11:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232790AbjBJPeI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 10 Feb 2023 10:34:08 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33970 "EHLO
+        id S232110AbjBJQLn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 10 Feb 2023 11:11:43 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34882 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232798AbjBJPd7 (ORCPT
+        with ESMTP id S232392AbjBJQLa (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 10 Feb 2023 10:33:59 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 526885C495
-        for <linux-block@vger.kernel.org>; Fri, 10 Feb 2023 07:33:08 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1676043187;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=aCWDoQu05GM/FfiJ8Y58UcEN/SbMA9nhBOhrfHvxOXw=;
-        b=DVTfqEm4sLuoYQgeQNepuFDYgNATuVyeYlW2/iJo+z9crgbTJk9fBDuFW68NfQDI0JGK2B
-        C/65piW9JFCfad9Jo+9fmhXZhECv2qmULu3m3rcoqGTcSeL3DBaYVghMYqxclIVZc1T2h9
-        zO4yc0h8BdPvFY9nltPuQBEopNiJtIM=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-669-kTcJ1TSmNEaEyceEKSLqGQ-1; Fri, 10 Feb 2023 10:33:04 -0500
-X-MC-Unique: kTcJ1TSmNEaEyceEKSLqGQ-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E781B858F09;
-        Fri, 10 Feb 2023 15:33:03 +0000 (UTC)
-Received: from localhost (ovpn-8-17.pek2.redhat.com [10.72.8.17])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id ADD9A492B00;
-        Fri, 10 Feb 2023 15:33:02 +0000 (UTC)
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        Alexander Viro <viro@zeniv.linux.org.uk>
-Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
-        Miklos Szeredi <mszeredi@redhat.com>,
-        Bernd Schubert <bschubert@ddn.com>,
-        Nitesh Shetty <nj.shetty@samsung.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Ziyang Zhang <ZiyangZhang@linux.alibaba.com>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH 4/4] ublk_drv: support splice based read/write zero copy
-Date:   Fri, 10 Feb 2023 23:32:12 +0800
-Message-Id: <20230210153212.733006-5-ming.lei@redhat.com>
-In-Reply-To: <20230210153212.733006-1-ming.lei@redhat.com>
-References: <20230210153212.733006-1-ming.lei@redhat.com>
+        Fri, 10 Feb 2023 11:11:30 -0500
+Received: from mail-io1-xd31.google.com (mail-io1-xd31.google.com [IPv6:2607:f8b0:4864:20::d31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1DB047358F
+        for <linux-block@vger.kernel.org>; Fri, 10 Feb 2023 08:11:28 -0800 (PST)
+Received: by mail-io1-xd31.google.com with SMTP id l128so2117423iof.2
+        for <linux-block@vger.kernel.org>; Fri, 10 Feb 2023 08:11:28 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112; t=1676045487;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=sgvOi4wUeIc8H2OD1Ykj3zEVvhTX0r8aiiFA5QEsxd8=;
+        b=HnyMHosOW/PVJrJE+YS7uA1KuHrS/j6QOzUenA5SrhXceiHSBLG/Y5piNyUNPShnCe
+         +FYdOy0TyuQTRO6Z6swCMYYP5tTcdcyPhdBraOAlnjLBal56bWLq1Oo7Pm3z0bwJ3g6y
+         JZTdAa1C+wciQ8MeyTeBhft/ZmhmDSQEXZiMB6GjJ6aJx/15/Jfj/lg3Djw4Bvoq70tD
+         FhBU9oXmwAw8ffTBuW1vISV//rYucjDs97n2dePz+blbRP+SJx189UmcPAgnDixhZnxR
+         kZg00CdnM87Nmg0ZfMKLAirQ6OStSX0dmKowJ0vCmOZV2j3P9XDeg5i0rs4/3PBY+ldc
+         g4qA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1676045487;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=sgvOi4wUeIc8H2OD1Ykj3zEVvhTX0r8aiiFA5QEsxd8=;
+        b=B6jelWZxY7kdpPAyeku2MGJyyag4F7YPJjDlwT7Kikg+4dv7edX7yDvDVGwbAHCggX
+         /1tf2PkB7XpT+0sM5p0/q2b7O+XWgwinRuqeCzcKdo+OLBgg9ZTmM1u9HwPb7a93MAB0
+         0HYRugLLuibXFwJ33C2g3+f0rJ2keR5BQG4OhNq3hzgEmY6UeSbVmLRlTMdTHb/qvT1V
+         sMKHp++vgqKYz7G9j1kaLLFeaxZyEtVmpaXrPGVaSY9ogMgDeq05H14b3t83bTzRZmJT
+         VJsrRiofygo3AgizsPtlOabNhcVRzbGONE2kV/0i9b9XBYocaOimzPSEJ75MeTsFOsef
+         Jfsg==
+X-Gm-Message-State: AO0yUKWyTUi+z+BhdVRYMnOsjckMsq5t9OyaR7OPkJPQ/s9BjpXQMDjo
+        qi/2uLjWfMCjcoP+j/jhfvSAf3S49m7d9qNT
+X-Google-Smtp-Source: AK7set9m1JDI0Y/deGx1IsSh1c7GseERWtg5ePIwTURX+n0fJC0cbukUJfQ+jOZbU1RGirmLzbI/bw==
+X-Received: by 2002:a05:6602:1581:b0:73a:397b:e311 with SMTP id e1-20020a056602158100b0073a397be311mr6827496iow.0.1676045487348;
+        Fri, 10 Feb 2023 08:11:27 -0800 (PST)
+Received: from [192.168.1.94] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id n17-20020a056638121100b003a9515b47ebsm1499920jas.68.2023.02.10.08.11.26
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 10 Feb 2023 08:11:26 -0800 (PST)
+Message-ID: <0834a42a-fc2c-6847-4f4d-4125d41e60ba@kernel.dk>
+Date:   Fri, 10 Feb 2023 09:11:25 -0700
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.10
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
+ Thunderbird/102.7.1
+Content-Language: en-US
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From:   Jens Axboe <axboe@kernel.dk>
+Subject: [GIT PULL] Block fix for 6.2-rc8
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The initial idea of using splice for zero copy is from Miklos and Stefan.
+Hi Linus,
 
-Now io_uring supports IORING_OP_READ[WRITE]_SPLICE_BUF, and ublk can
-pass request pages via direct/kernel private pipe to backend io_uring
-read/write handling code.
+Just a single fix for a smatch regression introduced in this merge
+window. Please pull!
 
-This zero copy implementation improves sequential IO performance
-obviously.
 
-ublksrv code:
+The following changes since commit e02bbac74cdde25f71a80978f5daa1d8a0aa6fc3:
 
-https://github.com/ming1/ubdsrv/commits/io_uring_splice_buf
+  Merge tag 'nvme-6.2-2023-02-02' of git://git.infradead.org/nvme into block-6.2 (2023-02-02 11:02:12 -0700)
 
-So far, only loop/null target supports zero copy:
+are available in the Git repository at:
 
-	ublk add -t loop -f $file -z
-	ublk add -t none -z
+  git://git.kernel.dk/linux.git tags/block-6.2-2023-02-10
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- drivers/block/ublk_drv.c      | 169 ++++++++++++++++++++++++++++++++--
- include/uapi/linux/ublk_cmd.h |  31 ++++++-
- 2 files changed, 193 insertions(+), 7 deletions(-)
+for you to fetch changes up to 38c33ece232019c5b18b4d5ec0254807cac06b7c:
 
-diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-index e6eceee44366..5ef5f2ccb0d5 100644
---- a/drivers/block/ublk_drv.c
-+++ b/drivers/block/ublk_drv.c
-@@ -43,6 +43,8 @@
- #include <asm/page.h>
- #include <linux/task_work.h>
- #include <linux/namei.h>
-+#include <linux/pipe_fs_i.h>
-+#include <linux/splice.h>
- #include <uapi/linux/ublk_cmd.h>
- 
- #define UBLK_MINORS		(1U << MINORBITS)
-@@ -154,6 +156,8 @@ struct ublk_device {
- 	unsigned long		state;
- 	int			ub_number;
- 
-+	struct srcu_struct	srcu;
-+
- 	struct mutex		mutex;
- 
- 	spinlock_t		mm_lock;
-@@ -537,6 +541,9 @@ static int ublk_map_io(const struct ublk_queue *ubq, const struct request *req,
- 	if (req_op(req) != REQ_OP_WRITE && req_op(req) != REQ_OP_FLUSH)
- 		return rq_bytes;
- 
-+	if (ubq->flags & UBLK_F_SUPPORT_ZERO_COPY)
-+		return rq_bytes;
-+
- 	if (ublk_rq_has_data(req)) {
- 		struct ublk_map_data data = {
- 			.ubq	=	ubq,
-@@ -558,6 +565,9 @@ static int ublk_unmap_io(const struct ublk_queue *ubq,
- {
- 	const unsigned int rq_bytes = blk_rq_bytes(req);
- 
-+	if (ubq->flags & UBLK_F_SUPPORT_ZERO_COPY)
-+		return rq_bytes;
-+
- 	if (req_op(req) == REQ_OP_READ && ublk_rq_has_data(req)) {
- 		struct ublk_map_data data = {
- 			.ubq	=	ubq,
-@@ -1221,6 +1231,7 @@ static void ublk_stop_dev(struct ublk_device *ub)
- 	del_gendisk(ub->ub_disk);
- 	ub->dev_info.state = UBLK_S_DEV_DEAD;
- 	ub->dev_info.ublksrv_pid = -1;
-+	synchronize_srcu(&ub->srcu);
- 	put_disk(ub->ub_disk);
- 	ub->ub_disk = NULL;
-  unlock:
-@@ -1355,13 +1366,155 @@ static int ublk_ch_uring_cmd(struct io_uring_cmd *cmd, unsigned int issue_flags)
- 	return -EIOCBQUEUED;
- }
- 
-+static void ublk_pipe_buf_release(struct pipe_inode_info *pipe,
-+			      struct pipe_buffer *buf)
-+{
-+}
-+
-+static const struct pipe_buf_operations ublk_pipe_buf_ops = {
-+        .release        = ublk_pipe_buf_release,
-+};
-+
-+static inline bool ublk_check_splice_rw(const struct request *req,
-+		unsigned int flags)
-+{
-+	flags &= (SPLICE_F_KERN_FOR_READ | SPLICE_F_KERN_FOR_WRITE);
-+
-+	if (req_op(req) == REQ_OP_READ && flags == SPLICE_F_KERN_FOR_READ)
-+		return true;
-+
-+	if (req_op(req) == REQ_OP_WRITE && flags == SPLICE_F_KERN_FOR_WRITE)
-+		return true;
-+
-+	return false;
-+}
-+
-+static ssize_t ublk_splice_read(struct file *in, loff_t *ppos,
-+		struct pipe_inode_info *pipe,
-+		size_t len, unsigned int flags)
-+{
-+	struct ublk_device *ub = in->private_data;
-+	struct req_iterator rq_iter;
-+	struct bio_vec bv;
-+	struct request *req;
-+	struct ublk_queue *ubq;
-+	u16 tag, q_id;
-+	unsigned int done;
-+	int ret, buf_offset, srcu_idx;
-+
-+	if (!ub)
-+		return -EPERM;
-+
-+	/* only support direct pipe and we do need confirm */
-+	if (pipe != current->splice_pipe || !(flags &
-+				SPLICE_F_KERN_NEED_CONFIRM))
-+		return -EACCES;
-+
-+	ret = -EINVAL;
-+
-+	/* protect request queue & disk removed */
-+	srcu_idx = srcu_read_lock(&ub->srcu);
-+
-+	if (ub->dev_info.state == UBLK_S_DEV_DEAD)
-+		goto exit;
-+
-+	tag = ublk_pos_to_tag(*ppos);
-+	q_id = ublk_pos_to_hwq(*ppos);
-+	buf_offset = ublk_pos_to_buf_offset(*ppos);
-+
-+	if (q_id >= ub->dev_info.nr_hw_queues)
-+		goto exit;
-+
-+	ubq = ublk_get_queue(ub, q_id);
-+	if (!ubq)
-+		goto exit;
-+
-+	if (!(ubq->flags & UBLK_F_SUPPORT_ZERO_COPY))
-+		goto exit;
-+
-+	/*
-+	 * So far just support splice read buffer from ubq daemon context
-+	 * because request may be gone in ->splice_read() if the splice
-+	 * is called from other context.
-+	 *
-+	 * TODO: add request protection and relax the following limit.
-+	 */
-+	if (ubq->ubq_daemon != current)
-+		goto exit;
-+
-+	if (tag >= ubq->q_depth)
-+		goto exit;
-+
-+	req = blk_mq_tag_to_rq(ub->tag_set.tags[q_id], tag);
-+	if (!req || !blk_mq_request_started(req))
-+		goto exit;
-+
-+	pr_devel("%s: qid %d tag %u offset %x, request bytes %u, len %llu flags %x\n",
-+			__func__, tag, q_id, buf_offset, blk_rq_bytes(req),
-+			(unsigned long long)len, flags);
-+
-+	if (!ublk_check_splice_rw(req, flags))
-+		goto exit;
-+
-+	if (!ublk_rq_has_data(req) || !len)
-+		goto exit;
-+
-+	if (buf_offset + len > blk_rq_bytes(req))
-+		goto exit;
-+
-+	done = ret = 0;
-+	rq_for_each_bvec(bv, req, rq_iter) {
-+		struct pipe_buffer buf = {
-+			.ops = &ublk_pipe_buf_ops,
-+			.flags = 0,
-+			.page = bv.bv_page,
-+			.offset = bv.bv_offset,
-+			.len = bv.bv_len,
-+		};
-+
-+		if (buf_offset > 0) {
-+			if (buf_offset >= bv.bv_len) {
-+				buf_offset -= bv.bv_len;
-+				continue;
-+			} else {
-+				buf.offset += buf_offset;
-+				buf.len -= buf_offset;
-+				buf_offset = 0;
-+			}
-+		}
-+
-+		if (done + buf.len > len)
-+			buf.len = len - done;
-+		done += buf.len;
-+
-+		ret = add_to_pipe(pipe, &buf);
-+		if (unlikely(ret < 0)) {
-+			done -= buf.len;
-+			break;
-+		}
-+		if (done >= len)
-+			break;
-+	}
-+
-+	if (done) {
-+		*ppos += done;
-+		ret = done;
-+
-+		pipe_ack_page_consume(pipe);
-+	}
-+exit:
-+	srcu_read_unlock(&ub->srcu, srcu_idx);
-+	return ret;
-+}
-+
- static const struct file_operations ublk_ch_fops = {
- 	.owner = THIS_MODULE,
- 	.open = ublk_ch_open,
- 	.release = ublk_ch_release,
--	.llseek = no_llseek,
-+	.llseek = noop_llseek,
- 	.uring_cmd = ublk_ch_uring_cmd,
- 	.mmap = ublk_ch_mmap,
-+	.splice_read = ublk_splice_read,
- };
- 
- static void ublk_deinit_queue(struct ublk_device *ub, int q_id)
-@@ -1472,6 +1625,7 @@ static void ublk_cdev_rel(struct device *dev)
- 	ublk_deinit_queues(ub);
- 	ublk_free_dev_number(ub);
- 	mutex_destroy(&ub->mutex);
-+	cleanup_srcu_struct(&ub->srcu);
- 	kfree(ub);
- }
- 
-@@ -1600,17 +1754,18 @@ static int ublk_ctrl_start_dev(struct ublk_device *ub, struct io_uring_cmd *cmd)
- 		set_bit(GD_SUPPRESS_PART_SCAN, &disk->state);
- 
- 	get_device(&ub->cdev_dev);
-+	ub->dev_info.state = UBLK_S_DEV_LIVE;
- 	ret = add_disk(disk);
- 	if (ret) {
- 		/*
- 		 * Has to drop the reference since ->free_disk won't be
- 		 * called in case of add_disk failure.
- 		 */
-+		ub->dev_info.state = UBLK_S_DEV_DEAD;
- 		ublk_put_device(ub);
- 		goto out_put_disk;
- 	}
- 	set_bit(UB_STATE_USED, &ub->state);
--	ub->dev_info.state = UBLK_S_DEV_LIVE;
- out_put_disk:
- 	if (ret)
- 		put_disk(disk);
-@@ -1718,6 +1873,9 @@ static int ublk_ctrl_add_dev(struct io_uring_cmd *cmd)
- 	ub = kzalloc(sizeof(*ub), GFP_KERNEL);
- 	if (!ub)
- 		goto out_unlock;
-+	ret = init_srcu_struct(&ub->srcu);
-+	if (ret)
-+		goto out_free_ub;
- 	mutex_init(&ub->mutex);
- 	spin_lock_init(&ub->mm_lock);
- 	INIT_WORK(&ub->quiesce_work, ublk_quiesce_work_fn);
-@@ -1726,7 +1884,7 @@ static int ublk_ctrl_add_dev(struct io_uring_cmd *cmd)
- 
- 	ret = ublk_alloc_dev_number(ub, header->dev_id);
- 	if (ret < 0)
--		goto out_free_ub;
-+		goto out_clean_srcu;
- 
- 	memcpy(&ub->dev_info, &info, sizeof(info));
- 
-@@ -1744,9 +1902,6 @@ static int ublk_ctrl_add_dev(struct io_uring_cmd *cmd)
- 	if (!IS_BUILTIN(CONFIG_BLK_DEV_UBLK))
- 		ub->dev_info.flags |= UBLK_F_URING_CMD_COMP_IN_TASK;
- 
--	/* We are not ready to support zero copy */
--	ub->dev_info.flags &= ~UBLK_F_SUPPORT_ZERO_COPY;
--
- 	ub->dev_info.nr_hw_queues = min_t(unsigned int,
- 			ub->dev_info.nr_hw_queues, nr_cpu_ids);
- 	ublk_align_max_io_size(ub);
-@@ -1776,6 +1931,8 @@ static int ublk_ctrl_add_dev(struct io_uring_cmd *cmd)
- 	ublk_deinit_queues(ub);
- out_free_dev_number:
- 	ublk_free_dev_number(ub);
-+out_clean_srcu:
-+	cleanup_srcu_struct(&ub->srcu);
- out_free_ub:
- 	mutex_destroy(&ub->mutex);
- 	kfree(ub);
-diff --git a/include/uapi/linux/ublk_cmd.h b/include/uapi/linux/ublk_cmd.h
-index f6238ccc7800..a2f6748ee4ca 100644
---- a/include/uapi/linux/ublk_cmd.h
-+++ b/include/uapi/linux/ublk_cmd.h
-@@ -54,7 +54,36 @@
- #define UBLKSRV_IO_BUF_OFFSET	0x80000000
- 
- /* tag bit is 12bit, so at most 4096 IOs for each queue */
--#define UBLK_MAX_QUEUE_DEPTH	4096
-+#define UBLK_TAG_BITS		12
-+#define UBLK_MAX_QUEUE_DEPTH	(1U << UBLK_TAG_BITS)
-+
-+/* used in ->splice_read for supporting zero-copy */
-+#define UBLK_BUFS_SIZE_BITS	42
-+#define UBLK_BUFS_SIZE_MASK    ((1ULL << UBLK_BUFS_SIZE_BITS) - 1)
-+#define UBLK_BUF_SIZE_BITS     (UBLK_BUFS_SIZE_BITS - UBLK_TAG_BITS)
-+#define UBLK_BUF_MAX_SIZE      (1ULL << UBLK_BUF_SIZE_BITS)
-+
-+static inline __u16 ublk_pos_to_hwq(__u64 pos)
-+{
-+	return pos >> UBLK_BUFS_SIZE_BITS;
-+}
-+
-+static inline __u32 ublk_pos_to_buf_offset(__u64 pos)
-+{
-+	return (pos & UBLK_BUFS_SIZE_MASK) & (UBLK_BUF_MAX_SIZE - 1);
-+}
-+
-+static inline __u16 ublk_pos_to_tag(__u64 pos)
-+{
-+	return (pos & UBLK_BUFS_SIZE_MASK) >> UBLK_BUF_SIZE_BITS;
-+}
-+
-+/* offset of single buffer, which has to be < UBLK_BUX_MAX_SIZE */
-+static inline __u64 ublk_pos(__u16 q_id, __u16 tag, __u32 offset)
-+{
-+	return (((__u64)q_id) << UBLK_BUFS_SIZE_BITS) |
-+		((((__u64)tag) << UBLK_BUF_SIZE_BITS) + offset);
-+}
- 
- /*
-  * zero copy requires 4k block size, and can remap ublk driver's io
+  Merge tag 'nvme-6.2-2023-02-09' of git://git.infradead.org/nvme into block-6.2 (2023-02-09 08:12:06 -0700)
+
+----------------------------------------------------------------
+block-6.2-2023-02-10
+
+----------------------------------------------------------------
+Jens Axboe (1):
+      Merge tag 'nvme-6.2-2023-02-09' of git://git.infradead.org/nvme into block-6.2
+
+Tom Rix (1):
+      nvme-auth: mark nvme_auth_wq static
+
+ drivers/nvme/host/auth.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
 -- 
-2.31.1
+Jens Axboe
 
