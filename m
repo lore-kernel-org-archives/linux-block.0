@@ -2,24 +2,24 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B977BC636D7
-	for <linux-block@archiver.kernel.org>; Sat, 11 Feb 2023 14:42:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 539D4C64EC4
+	for <linux-block@archiver.kernel.org>; Sat, 11 Feb 2023 14:42:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229735AbjBKOmy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S229779AbjBKOmy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Sat, 11 Feb 2023 09:42:54 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42794 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42796 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229457AbjBKOmx (ORCPT
+        with ESMTP id S229553AbjBKOmx (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Sat, 11 Feb 2023 09:42:53 -0500
 Received: from hosting.gsystem.sk (hosting.gsystem.sk [212.5.213.30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id EC38E1F499;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id EC49F1F49D;
         Sat, 11 Feb 2023 06:42:50 -0800 (PST)
 Received: from gsql.ggedos.sk (off-20.infotel.telecom.sk [212.5.213.20])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by hosting.gsystem.sk (Postfix) with ESMTPSA id 3F28C7A05AB;
-        Sat, 11 Feb 2023 15:42:49 +0100 (CET)
+        by hosting.gsystem.sk (Postfix) with ESMTPSA id 005CD7A038E;
+        Sat, 11 Feb 2023 15:42:48 +0100 (CET)
 From:   Ondrej Zary <linux@zary.sk>
 To:     Damien Le Moal <damien.lemoal@opensource.wdc.com>
 Cc:     Christoph Hellwig <hch@lst.de>,
@@ -27,9 +27,9 @@ Cc:     Christoph Hellwig <hch@lst.de>,
         Jens Axboe <axboe@kernel.dk>, Tim Waugh <tim@cyberelk.net>,
         linux-block@vger.kernel.org, linux-parport@lists.infradead.org,
         linux-ide@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 03/12] pata_parport: remove devtype from struct pi_adapter
-Date:   Sat, 11 Feb 2023 15:42:23 +0100
-Message-Id: <20230211144232.15138-4-linux@zary.sk>
+Subject: [PATCH 01/12] pata_parport: Remove pi_swab16 and pi_swab32
+Date:   Sat, 11 Feb 2023 15:42:21 +0100
+Message-Id: <20230211144232.15138-2-linux@zary.sk>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20230211144232.15138-1-linux@zary.sk>
 References: <20230211144232.15138-1-linux@zary.sk>
@@ -39,48 +39,89 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Only bpck driver uses devtype but it never gets set in pata_parport.
-Remove it.
+Convert comm and kbic drivers to use standard swab16.
+Remove pi_swab16 and pi_swab32.
+
+The funny thing: pi_swab32 was not swab32
 
 Signed-off-by: Ondrej Zary <linux@zary.sk>
 ---
- drivers/ata/pata_parport/bpck.c | 2 +-
- include/linux/pata_parport.h    | 3 ---
- 2 files changed, 1 insertion(+), 4 deletions(-)
+ drivers/ata/pata_parport/comm.c |  7 +++++--
+ drivers/ata/pata_parport/kbic.c |  7 +++++--
+ include/linux/pata_parport.h    | 17 -----------------
+ 3 files changed, 10 insertions(+), 21 deletions(-)
 
-diff --git a/drivers/ata/pata_parport/bpck.c b/drivers/ata/pata_parport/bpck.c
-index b9174cf8863c..451a068fe28a 100644
---- a/drivers/ata/pata_parport/bpck.c
-+++ b/drivers/ata/pata_parport/bpck.c
-@@ -241,7 +241,7 @@ static void bpck_connect ( PIA *pi  )
+diff --git a/drivers/ata/pata_parport/comm.c b/drivers/ata/pata_parport/comm.c
+index 1775e7ed9336..11ed9fb57744 100644
+--- a/drivers/ata/pata_parport/comm.c
++++ b/drivers/ata/pata_parport/comm.c
+@@ -165,11 +165,14 @@ static void comm_write_block( PIA *pi, char * buf, int count )
+                 break;
  
- 	WR(5,8);
+         case 3: w3(0x48); (void)r1();
+-                for (k=0;k<count/2;k++) w4w(pi_swab16(buf,k));
++		for (k = 0; k < count / 2; k++)
++			w4w(swab16(((u16 *)buf)[k]));
+                 break;
  
--	if (pi->devtype == PI_PCD) {
-+	if (1 /*pi->devtype == PI_PCD*/) {	/* FIXME */
- 		WR(0x46,0x10);		/* fiddle with ESS logic ??? */
- 		WR(0x4c,0x38);
- 		WR(0x4d,0x88);
+         case 4: w3(0x48); (void)r1();
+-                for (k=0;k<count/4;k++) w4l(pi_swab32(buf,k));
++		for (k = 0; k < count / 4; k++)
++			w4l(swab16(((u16 *)buf)[2 * k]) |
++			    swab16(((u16 *)buf)[2 * k + 1]) << 16);
+                 break;
+ 
+ 
+diff --git a/drivers/ata/pata_parport/kbic.c b/drivers/ata/pata_parport/kbic.c
+index f0960eb68635..93430ca32a52 100644
+--- a/drivers/ata/pata_parport/kbic.c
++++ b/drivers/ata/pata_parport/kbic.c
+@@ -213,12 +213,15 @@ static void kbic_write_block( PIA *pi, char * buf, int count )
+ 		break;
+ 
+ 	case 4: w0(0xa0); w2(4); w2(6); w2(4); w3(0);
+-                for(k=0;k<count/2;k++) w4w(pi_swab16(buf,k));
++		for (k = 0; k < count / 2; k++)
++			w4w(swab16(((u16 *)buf)[k]));
+                 w2(4); w2(0); w2(4);
+                 break;
+ 
+         case 5: w0(0xa0); w2(4); w2(6); w2(4); w3(0);
+-                for(k=0;k<count/4;k++) w4l(pi_swab32(buf,k));
++		for (k = 0; k < count / 4; k++)
++			w4l(swab16(((u16 *)buf)[2 * k]) |
++			    swab16(((u16 *)buf)[2 * k + 1]) << 16);
+                 w2(4); w2(0); w2(4);
+                 break;
+ 
 diff --git a/include/linux/pata_parport.h b/include/linux/pata_parport.h
-index 9614ce53470a..3fc6b002c7c8 100644
+index 58781846f282..458544fe5e6c 100644
 --- a/include/linux/pata_parport.h
 +++ b/include/linux/pata_parport.h
-@@ -11,15 +11,12 @@
+@@ -54,23 +54,6 @@ typedef struct pi_adapter PIA;	/* for paride protocol modules */
+ #define r4w()			(delay_p, inw(pi->port + 4))
+ #define r4l()			(delay_p, inl(pi->port + 4))
  
- #include <linux/libata.h>
- 
--#define PI_PCD	1	/* dummy for paride protocol modules */
+-static inline u16 pi_swab16(char *b, int k)
+-{
+-	union { u16 u; char t[2]; } r;
 -
- struct pi_adapter {
- 	struct device dev;
- 	struct pi_protocol *proto;	/* adapter protocol */
- 	int port;			/* base address of parallel port */
- 	int mode;			/* transfer mode in use */
- 	int delay;			/* adapter delay setting */
--	int devtype;			/* dummy for paride protocol modules */
- 	char *device;			/* dummy for paride protocol modules */
- 	int unit;			/* unit number for chained adapters */
- 	int saved_r0;			/* saved port state */
+-	r.t[0] = b[2 * k + 1]; r.t[1] = b[2 * k];
+-	return r.u;
+-}
+-
+-static inline u32 pi_swab32(char *b, int k)
+-{
+-	union { u32 u; char f[4]; } r;
+-
+-	r.f[0] = b[4 * k + 1]; r.f[1] = b[4 * k];
+-	r.f[2] = b[4 * k + 3]; r.f[3] = b[4 * k + 2];
+-	return r.u;
+-}
+-
+ struct pi_protocol {
+ 	char name[8];
+ 
 -- 
 Ondrej Zary
 
