@@ -2,102 +2,94 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B5FF0C636CC
-	for <linux-block@archiver.kernel.org>; Sat, 11 Feb 2023 18:57:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 75854C636CC
+	for <linux-block@archiver.kernel.org>; Sat, 11 Feb 2023 19:01:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229488AbjBKS5b (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 11 Feb 2023 13:57:31 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44880 "EHLO
+        id S229564AbjBKTB3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 11 Feb 2023 14:01:29 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46278 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229499AbjBKS5a (ORCPT
+        with ESMTP id S229461AbjBKTB2 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 11 Feb 2023 13:57:30 -0500
-Received: from mail-ed1-x536.google.com (mail-ed1-x536.google.com [IPv6:2a00:1450:4864:20::536])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A15F199E5
-        for <linux-block@vger.kernel.org>; Sat, 11 Feb 2023 10:57:28 -0800 (PST)
-Received: by mail-ed1-x536.google.com with SMTP id r3so8111690edq.13
-        for <linux-block@vger.kernel.org>; Sat, 11 Feb 2023 10:57:28 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=3PcKjkZEscdfAV5ya0phdN14wwNaXoRb40kNT9Dczeo=;
-        b=YHVu5kUXNJwub6fL2bFRhFub6fqpPJshyUtgnUVxZxBIopwouTR/KgSkKN4JSR5uve
-         Wkfn8LbbiLtb+QLkrXegG9Ji77YU2cy+xueHjxfB9bGAjhzAGT4k9x0ToEiwbgOMILfW
-         LyuiuxNGORWZQC9nxgiaZUsmJDUDBv4eCG8b8=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=3PcKjkZEscdfAV5ya0phdN14wwNaXoRb40kNT9Dczeo=;
-        b=suH0WPUGnC+gNTrR/yvM7BWUuzp3IfZnluEUNXPZB8FCvc4EC5Rt4njPAUb5wjF0mT
-         84EmIoRbHWcwfs+lGCxntBj5bTKhKn/U25IsJbv/U4YtLuPPU3Lh6w6HYfGRZc9LDnhG
-         HP5i0WXsnb/+SKsREeBoJM45GIbUb03dFeoTJwxGVkRp5N4NbQt9IflSPPgNk/a8R7Tg
-         PhG1JYbpWirVQx8voZdOciTP4oYdyl2/9Rcj1CSu0RTt9zoOqbSh1TjwIHdMkKRrgGJE
-         a0V6LlfI8JGfRjIwvf7+sI7DqHvwVON6aFQAfO+Dwe4sRkXeAwY03q1wPcxfLr9Ve9Nl
-         /HGQ==
-X-Gm-Message-State: AO0yUKUfWLGheKfbTRhlobLbI7mUy9N9vLeX1fEsA7cxAmEDt7AoMg10
-        fbxAGcCzmXmZTGY1B/JY+hTqO3mbVSK8Y+4PZHM=
-X-Google-Smtp-Source: AK7set+R8h1xG8wr2YT949bNZK6Rw2y8Cx4UJDNbS92645xYjwA2h58V3ensSciif8Q4zxBcplm2DA==
-X-Received: by 2002:a50:9f69:0:b0:4ac:b32d:3dab with SMTP id b96-20020a509f69000000b004acb32d3dabmr4264028edf.29.1676141846457;
-        Sat, 11 Feb 2023 10:57:26 -0800 (PST)
-Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com. [209.85.208.47])
-        by smtp.gmail.com with ESMTPSA id j16-20020a508a90000000b004ab4ba814a0sm2695556edj.47.2023.02.11.10.57.24
-        for <linux-block@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 11 Feb 2023 10:57:25 -0800 (PST)
-Received: by mail-ed1-f47.google.com with SMTP id bt8so2359761edb.12
-        for <linux-block@vger.kernel.org>; Sat, 11 Feb 2023 10:57:24 -0800 (PST)
-X-Received: by 2002:a50:c353:0:b0:4ac:b616:4ba9 with SMTP id
- q19-20020a50c353000000b004acb6164ba9mr1152399edb.5.1676141844693; Sat, 11 Feb
- 2023 10:57:24 -0800 (PST)
+        Sat, 11 Feb 2023 14:01:28 -0500
+Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5CD79199E0;
+        Sat, 11 Feb 2023 11:01:27 -0800 (PST)
+Received: from [192.168.1.103] (31.173.83.74) by msexch01.omp.ru (10.188.4.12)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.986.14; Sat, 11 Feb
+ 2023 22:01:16 +0300
+Subject: Re: [PATCH 01/12] pata_parport: Remove pi_swab16 and pi_swab32
+To:     Ondrej Zary <linux@zary.sk>,
+        Damien Le Moal <damien.lemoal@opensource.wdc.com>
+CC:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        Tim Waugh <tim@cyberelk.net>, <linux-block@vger.kernel.org>,
+        <linux-parport@lists.infradead.org>, <linux-ide@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
+References: <20230211144232.15138-1-linux@zary.sk>
+ <20230211144232.15138-2-linux@zary.sk>
+From:   Sergey Shtylyov <s.shtylyov@omp.ru>
+Organization: Open Mobile Platform
+Message-ID: <3cccb6ef-3873-fe7f-0921-349aed46813a@omp.ru>
+Date:   Sat, 11 Feb 2023 22:01:15 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 MIME-Version: 1.0
-References: <20230210153212.733006-1-ming.lei@redhat.com> <20230210153212.733006-2-ming.lei@redhat.com>
- <Y+e3b+Myg/30hlYk@T590>
-In-Reply-To: <Y+e3b+Myg/30hlYk@T590>
-From:   Linus Torvalds <torvalds@linux-foundation.org>
-Date:   Sat, 11 Feb 2023 10:57:08 -0800
-X-Gmail-Original-Message-ID: <CAHk-=wgTzLjvhzx-XGkgEQmXH6t=8OTFdQyhDgafGdC2n5gOfg@mail.gmail.com>
-Message-ID: <CAHk-=wgTzLjvhzx-XGkgEQmXH6t=8OTFdQyhDgafGdC2n5gOfg@mail.gmail.com>
-Subject: Re: [PATCH 1/4] fs/splice: enhance direct pipe & splice for moving
- pages in kernel
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Miklos Szeredi <mszeredi@redhat.com>,
-        Bernd Schubert <bschubert@ddn.com>,
-        Nitesh Shetty <nj.shetty@samsung.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Ziyang Zhang <ZiyangZhang@linux.alibaba.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20230211144232.15138-2-linux@zary.sk>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [31.173.83.74]
+X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
+ (10.188.4.12)
+X-KSE-ServerInfo: msexch01.omp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 5.9.59, Database issued on: 02/11/2023 18:42:39
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 59
+X-KSE-AntiSpam-Info: Lua profiles 175451 [Feb 10 2023]
+X-KSE-AntiSpam-Info: Version: 5.9.59.0
+X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
+X-KSE-AntiSpam-Info: LuaCore: 502 502 69dee8ef46717dd3cb3eeb129cb7cc8dab9e30f6
+X-KSE-AntiSpam-Info: {rep_avail}
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info: {relay has no DNS name}
+X-KSE-AntiSpam-Info: {SMTP from is not routable}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 31.173.83.74 in (user)
+ b.barracudacentral.org}
+X-KSE-AntiSpam-Info: d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;31.173.83.74:7.7.3,7.1.2,7.4.1;omp.ru:7.1.1;127.0.0.199:7.1.2
+X-KSE-AntiSpam-Info: {iprep_blacklist}
+X-KSE-AntiSpam-Info: ApMailHostAddress: 31.173.83.74
+X-KSE-AntiSpam-Info: {DNS response errors}
+X-KSE-AntiSpam-Info: Rate: 59
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
+ smtp.mailfrom=omp.ru;dkim=none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Heuristic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 02/11/2023 18:45:00
+X-KSE-AttachmentFiltering-Interceptor-Info: protection disabled
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 2/11/2023 2:00:00 PM
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, Feb 11, 2023 at 7:42 AM Ming Lei <ming.lei@redhat.com> wrote:
->
-> +/*
-> + * Used by source/sink end only, don't touch them in generic
-> + * splice/pipe code. Set in source side, and check in sink
-> + * side
-> + */
-> +#define PIPE_BUF_PRIV_FLAG_MAY_READ    0x1000 /* sink can read from page */
-> +#define PIPE_BUF_PRIV_FLAG_MAY_WRITE   0x2000 /* sink can write to page */
-> +
+On 2/11/23 5:42 PM, Ondrej Zary wrote:
 
-So this sounds much more sane and understandable, but I have two worries:
+> Convert comm and kbic drivers to use standard swab16.
+> Remove pi_swab16 and pi_swab32.
+> 
+> The funny thing: pi_swab32 was not swab32
+> 
+> Signed-off-by: Ondrej Zary <linux@zary.sk>
 
- (a) what's the point of MAY_READ? A non-readable page sounds insane
-and wrong. All sinks expect to be able to read.
+Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
 
- (b) what about 'tee()' which duplicates a pipe buffer that has
-MAY_WRITE? Particularly one that may already have been *partially*
-given to something that thinks it can write to it?
+[...]
 
-So at a minimum I think the tee code then needs to clear that flag.
-And I think MAY_READ is nonsense.
-
-          Linus
+MBR, Sergey
