@@ -2,168 +2,114 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C8439C61DA4
-	for <linux-block@archiver.kernel.org>; Sat, 11 Feb 2023 09:41:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C73DC61DA4
+	for <linux-block@archiver.kernel.org>; Sat, 11 Feb 2023 12:06:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229837AbjBKJlF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 11 Feb 2023 04:41:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36982 "EHLO
+        id S229502AbjBKMGn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 11 Feb 2023 07:06:43 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43348 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229477AbjBKJlE (ORCPT
+        with ESMTP id S229473AbjBKMGn (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 11 Feb 2023 04:41:04 -0500
-Received: from mail-ej1-x636.google.com (mail-ej1-x636.google.com [IPv6:2a00:1450:4864:20::636])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 799453C29D;
-        Sat, 11 Feb 2023 01:41:03 -0800 (PST)
-Received: by mail-ej1-x636.google.com with SMTP id sa10so21319386ejc.9;
-        Sat, 11 Feb 2023 01:41:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=PKTTB4KrCAiL8SRqB2lSSGDnA1+HoHmmXJxC0p1EX7w=;
-        b=n8shbWQqvG5ZrwU7/06sMCBiVo+lHWO2xDR2rSNdC5TUWcTDu8JVVL3+jAYNL0h2oF
-         dHDftU1DzWK75WDjq1INxacyNDYK0Q/iDQdcP4uvGVWN3tW6ARxtvCql/MW+MsrA3NpY
-         C6rBX/bGjAl4tvi0Bhri6EhDob/XEI3wooouNTEm/4+8N8fFj7QgNT05RKDZNbal34Go
-         7T8JWXXlbikvuyCW2EN6iQi9cIsQYoOUfq4EgarUHco5jG0Eqfl2DmxfMVNLxgJmpt9n
-         Gi5Ew4Z/2/tAosrbLjGItjvz3OIrHwmIoZcutnRcEg7K0OD8KT/E3fH/epyHsbcPOUTH
-         W+2Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=PKTTB4KrCAiL8SRqB2lSSGDnA1+HoHmmXJxC0p1EX7w=;
-        b=Xjyv+4XtyO7GaJMEhB0zgTOxBqXsF4A11YJYpPZl4Ewm0yny8c4m8twgvmu6mIfwMK
-         o0HcnkjADB6RknRZP1DVTq0xuQ13rjHFGfuz1rrlbC50CUyPiZZsb9Jgc94XCK/wAO4N
-         R7OXKzLkZmjfG2HAfVfv6BlV2xsG6Gel4e+h+KVTnnE8MudBQgi+HNuLscQAi/CKtS/2
-         pdMkaJh0U26zKbLFr3N2YJ70tTdD/ilLlk7UYKUy7x3bn76zWUgYbeNGjSxVkzgJWcm8
-         E91KKVm0ixsufoek+7iqrbsvNIDWEAJe0JXLk6WC6wSvDKcHjGUIstqGUZVaGyz+pon2
-         AU5w==
-X-Gm-Message-State: AO0yUKX4pZPQ7mPQNclPfFVjUgzX7FCjV8PcxNXkn44SS9INYnzD+P36
-        hi3tdtLboxRi0sZ2K0hY6qgtc345GPRzvGBfKTucEnHsiqs=
-X-Google-Smtp-Source: AK7set86j/BnrX9H2DMZ1YIqefpYkzcgEtuGz0ePMJhYcApjmjxiU6GJLRZcJYPTlsHhKm/FMBWKAnGW8e0DQsc/CKU=
-X-Received: by 2002:a17:907:20b3:b0:87b:d79f:9953 with SMTP id
- pw19-20020a17090720b300b0087bd79f9953mr2041563ejb.11.1676108461930; Sat, 11
- Feb 2023 01:41:01 -0800 (PST)
+        Sat, 11 Feb 2023 07:06:43 -0500
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 04E282FCFF;
+        Sat, 11 Feb 2023 04:06:42 -0800 (PST)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id B07645D511;
+        Sat, 11 Feb 2023 12:06:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1676117200; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=KP5yy1ZpwWkRzlaqj8fbu7lqqI4sZIjJJyvGJl92ICE=;
+        b=NJPGzvbYh3oTdV5a6oBqeiHxCosJwJPz9/mOLIfh18z09End4DbwW5SJdouu0ILz5CJV12
+        clfQzgJHB6QG0h+X0c7VwXUqKaT1FeHEcBxJjHK+m42AgkXm110NqKkNzzevLfv3zhrpi7
+        W4EwKeBQCj9rn2Dn50cTai7hGgAqgVw=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1676117200;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=KP5yy1ZpwWkRzlaqj8fbu7lqqI4sZIjJJyvGJl92ICE=;
+        b=U0NL6JPqPuTL8hiRN3SVVvrSEy29wDuJ6zC9OqCxAMM9pZILZX+zx0SGsplJx5RSrfyPU4
+        SiNrEqQDW86yApBg==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 70E3313A10;
+        Sat, 11 Feb 2023 12:06:40 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id HYO/GtCE52OoXAAAMHmgww
+        (envelope-from <hare@suse.de>); Sat, 11 Feb 2023 12:06:40 +0000
+Message-ID: <87bd6050-d7df-94f6-bfc1-6ddac79d6d65@suse.de>
+Date:   Sat, 11 Feb 2023 13:06:39 +0100
 MIME-Version: 1.0
-References: <06f51bab-42e1-975a-ad4f-6815c2063adb@redhat.com> <20230209120923.331111-1-n.petrova@fintech.ru>
-In-Reply-To: <20230209120923.331111-1-n.petrova@fintech.ru>
-From:   Ilya Dryomov <idryomov@gmail.com>
-Date:   Sat, 11 Feb 2023 10:40:50 +0100
-Message-ID: <CAOi1vP9Wuzsx81O+yu_w5P-W=GHdXNv-LfL1dD6O0NxkdedCMw@mail.gmail.com>
-Subject: Re: [PATCH v2] rbd: fix freeing memory of 'rbd_dev->opts',
- 'rbd_dev->spec', 'rbd_dev->rbd_client'
-To:     Natalia Petrova <n.petrova@fintech.ru>
-Cc:     Dongsheng Yang <dongsheng.yang@easystack.cn>,
-        Jens Axboe <axboe@kernel.dk>, ceph-devel@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        lvc-project@linuxtesting.org,
-        Alexey Khoroshilov <khoroshilov@ispras.ru>,
-        Nikita Zhandarovich <n.zhandarovich@fintech.ru>
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.6.1
+Subject: Re: [LSF/MM/BPF ATTEND][LSF/MM/BPF Topic] Non-block IO
+Content-Language: en-US
+To:     Kanchan Joshi <joshi.k@samsung.com>,
+        lsf-pc@lists.linux-foundation.org
+Cc:     linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+        io-uring@vger.kernel.org, axboe@kernel.dk, hch@lst.de,
+        kbusch@kernel.org, ming.lei@redhat.com
+References: <CGME20230210180226epcas5p1bd2e1150de067f8af61de2bbf571594d@epcas5p1.samsung.com>
+ <20230210180033.321377-1-joshi.k@samsung.com>
+From:   Hannes Reinecke <hare@suse.de>
+In-Reply-To: <20230210180033.321377-1-joshi.k@samsung.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Feb 9, 2023 at 1:09 PM Natalia Petrova <n.petrova@fintech.ru> wrote:
->
-> If the rbd_dev_create() fails after assignment 'opts' to 'rbd_dev->opts',
-> double free of 'rbd_options' happens:
-> one is in rbd_dev_free() and another one is in do_rbd_add().
->
-> If the rbd_dev_create() fails, for 'spec' it will be freed in
-> rbd_dev_create()->rbd_spec_put() first and then in do_rbd_add()
-> it will call rbd_spec_put() again. The same for 'rbd_client'.
-> Unlike 'rbd_dev->opts', 'rbd_dev->spec' and 'rbd_dev->rbd_client'
-> are ref-counted, that's why the ref-count underflow warning
-> should be generated in rbd_spec_put() and rbd_put_client()
-> to handle the return values of kref_put().
+On 2/10/23 19:00, Kanchan Joshi wrote:
+> is getting more common than it used to be.
+> NVMe is no longer tied to block storage. Command sets in NVMe 2.0 spec
+> opened an excellent way to present non-block interfaces to the Host. ZNS
+> and KV came along with it, and some new command sets are emerging.
+> 
+> OTOH, Kernel IO advances historically centered around the block IO path.
+> Passthrough IO path existed, but it stayed far from all the advances, be
+> it new features or performance.
+> 
+> Current state & discussion points:
+> ---------------------------------
+> Status-quo changed in the recent past with the new passthrough path (ng
+> char interface + io_uring command). Feature parity does not exist, but
+> performance parity does.
+> Adoption draws asks. I propose a session covering a few voices and
+> finding a path-forward for some ideas too.
+> 
+> 1. Command cancellation: while NVMe mandatorily supports the abort
+> command, we do not have a way to trigger that from user-space. There
+> are ways to go about it (with or without the uring-cancel interface) but
+> not without certain tradeoffs. It will be good to discuss the choices in
+> person.
+> 
+I would love to have this discussion; that's something which has been on 
+my personal to-do list for a long time, and io_uring might finally be a 
+solution to it.
 
-Hi Natalia,
+Or, alternatively, looking at CDL for NVMe; that would be an alternative 
+approach.
+Maybe it's even worthwhile to schedule a separate meeting for it.
 
-I think you misinterpreted Xiubo.  The underflow warning would be
-printed by kref_put() (if one is lucky and the freed memory doesn't get
-immediately reallocated and overwritten in which case straight memory
-corruption would occur).  There is no need to attempt to print another
-warning here.
+Cheers,
 
-The problem is potential use-after-free on struct rbd_spec and struct
-rbd_client (which is what the warning is for).  This use-after-free is
-very similar in nature to what the tool that you are using found for
-struct rbd_options (the same bug on the same error path) except that
-reference counting is involved: instead of kfree() being called
-directly, it's called indirectly from rbd_spec_free() and
-rbd_client_release() through rbd_spec_put() and rbd_put_client()
-respectively.  Both of these structs have a refcount of 1 here which
-means that the first rbd_spec_free() or rbd_client_release() call is
-equivalent to kfree() and, when either of them is called again from
-do_rbd_add(), use-after-free would occur.
+Hannes
+-- 
+Dr. Hannes Reinecke                Kernel Storage Architect
+hare@suse.de                              +49 911 74053 688
+SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
+HRB 36809 (AG Nürnberg), Geschäftsführer: Ivo Totev, Andrew
+Myers, Andrew McDonald, Martje Boudien Moerman
 
-Hope this helps,
-
-                Ilya
-
->
-> Found by Linux Verification Center (linuxtesting.org) with SVACE.
->
-> Fixes: 1643dfa4c2c8 ("rbd: introduce a per-device ordered workqueue")
-> Signed-off-by: Natalia Petrova <n.petrova@fintech.ru>
-> Signed-off-by: Alexey Khoroshilov <khoroshilov@ispras.ru>
-> Signed-off-by: Nikita Zhandarovich <n.zhandarovich@fintech.ru>
-> ---
-> v2: Remarks on the processing of 'rbd_dev->spec' and 'rbd_dev->rbd_client'
-> by Ilya Dryomov <idryomov@gmail.com> and Xiubo Li <xiubli@redhat.com>
-> were taken into account.
->  drivers/block/rbd.c | 14 +++++++++-----
->  1 file changed, 9 insertions(+), 5 deletions(-)
->
-> diff --git a/drivers/block/rbd.c b/drivers/block/rbd.c
-> index 04453f4a319c..f3f253febe0f 100644
-> --- a/drivers/block/rbd.c
-> +++ b/drivers/block/rbd.c
-> @@ -889,8 +889,10 @@ static void rbd_client_release(struct kref *kref)
->   */
->  static void rbd_put_client(struct rbd_client *rbdc)
->  {
-> -       if (rbdc)
-> -               kref_put(&rbdc->kref, rbd_client_release);
-> +       if (rbdc) {
-> +               if (!kref_put(&rbdc->kref, rbd_client_release))
-> +                       pr_warn("The reference count underflow\n");
-> +       }
->  }
->
->  /*
-> @@ -5225,8 +5227,10 @@ static struct rbd_spec *rbd_spec_get(struct rbd_spec *spec)
->  static void rbd_spec_free(struct kref *kref);
->  static void rbd_spec_put(struct rbd_spec *spec)
->  {
-> -       if (spec)
-> -               kref_put(&spec->kref, rbd_spec_free);
-> +       if (spec) {
-> +               if (!kref_put(&spec->kref, rbd_spec_free))
-> +                       pr_warn("The reference count underflow\n");
-> +       }
->  }
->
->  static struct rbd_spec *rbd_spec_alloc(void)
-> @@ -5357,7 +5361,6 @@ static struct rbd_device *rbd_dev_create(struct rbd_client *rbdc,
->         if (!rbd_dev)
->                 return NULL;
->
-> -       rbd_dev->opts = opts;
->
->         /* get an id and fill in device name */
->         rbd_dev->dev_id = ida_simple_get(&rbd_dev_id_ida, 0,
-> @@ -5372,6 +5375,7 @@ static struct rbd_device *rbd_dev_create(struct rbd_client *rbdc,
->         if (!rbd_dev->task_wq)
->                 goto fail_dev_id;
->
-> +       rbd_dev->opts = opts;
->         /* we have a ref from do_rbd_add() */
->         __module_get(THIS_MODULE);
->
-> --
-> 2.34.1
->
