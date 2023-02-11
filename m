@@ -2,296 +2,266 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7ECE0C636CC
-	for <linux-block@archiver.kernel.org>; Sat, 11 Feb 2023 14:43:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D246C61DA4
+	for <linux-block@archiver.kernel.org>; Sat, 11 Feb 2023 15:43:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229968AbjBKOnQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 11 Feb 2023 09:43:16 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43040 "EHLO
+        id S229534AbjBKPnr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 11 Feb 2023 10:43:47 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40364 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229837AbjBKOm7 (ORCPT
+        with ESMTP id S229517AbjBKPnp (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 11 Feb 2023 09:42:59 -0500
-Received: from hosting.gsystem.sk (hosting.gsystem.sk [212.5.213.30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 9FC262D177;
-        Sat, 11 Feb 2023 06:42:55 -0800 (PST)
-Received: from gsql.ggedos.sk (off-20.infotel.telecom.sk [212.5.213.20])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        Sat, 11 Feb 2023 10:43:45 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 23EA11C7FE
+        for <linux-block@vger.kernel.org>; Sat, 11 Feb 2023 07:42:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1676130176;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=8U4buABgszycRdED4BVp3vwkQcDbX/tjVIxmfJwq8SM=;
+        b=fgKg/5vdpawRgplYO0AeQXTE1TG/ZuUwqEtzsBxit1wO4hklUnTsYz7UoGk08d1vJ79Ke/
+        rxWR50GjFwKG0nNXCVH7vHnTbVWqBUFzs2tIqZ+4iC5lZs+aNqK3LwVQmzA03beGkgU9zQ
+        S6ecac2pdLDqzad1L3NCC7NsALLDsVU=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-663-SfFr5-p8NTC0BsBpvpIOpQ-1; Sat, 11 Feb 2023 10:42:53 -0500
+X-MC-Unique: SfFr5-p8NTC0BsBpvpIOpQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by hosting.gsystem.sk (Postfix) with ESMTPSA id 5F5367A0708;
-        Sat, 11 Feb 2023 15:42:50 +0100 (CET)
-From:   Ondrej Zary <linux@zary.sk>
-To:     Damien Le Moal <damien.lemoal@opensource.wdc.com>
-Cc:     Christoph Hellwig <hch@lst.de>,
-        Sergey Shtylyov <s.shtylyov@omp.ru>,
-        Jens Axboe <axboe@kernel.dk>, Tim Waugh <tim@cyberelk.net>,
-        linux-block@vger.kernel.org, linux-parport@lists.infradead.org,
-        linux-ide@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 12/12] pata_parport: move pata_parport.h to drivers/ata/pata_parport
-Date:   Sat, 11 Feb 2023 15:42:32 +0100
-Message-Id: <20230211144232.15138-13-linux@zary.sk>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20230211144232.15138-1-linux@zary.sk>
-References: <20230211144232.15138-1-linux@zary.sk>
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 93CD9101A521;
+        Sat, 11 Feb 2023 15:42:52 +0000 (UTC)
+Received: from T590 (ovpn-8-18.pek2.redhat.com [10.72.8.18])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 1A8FB1121315;
+        Sat, 11 Feb 2023 15:42:44 +0000 (UTC)
+Date:   Sat, 11 Feb 2023 23:42:39 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        Alexander Viro <viro@zeniv.linux.org.uk>
+Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
+        Miklos Szeredi <mszeredi@redhat.com>,
+        Bernd Schubert <bschubert@ddn.com>,
+        Nitesh Shetty <nj.shetty@samsung.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Ziyang Zhang <ZiyangZhang@linux.alibaba.com>,
+        Linus Torvalds <torvalds@linux-foundation.org>
+Subject: Re: [PATCH 1/4] fs/splice: enhance direct pipe & splice for moving
+ pages in kernel
+Message-ID: <Y+e3b+Myg/30hlYk@T590>
+References: <20230210153212.733006-1-ming.lei@redhat.com>
+ <20230210153212.733006-2-ming.lei@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230210153212.733006-2-ming.lei@redhat.com>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Now that paride is gone, pata_parport.h does not need to be in
-include/linux. Move it to drivers/ata/pata_parport.
+On Fri, Feb 10, 2023 at 11:32:09PM +0800, Ming Lei wrote:
+> Per-task direct pipe can transfer page between two files or one
+> file and other kernel components, especially by splice_direct_to_actor
+> and __splice_from_pipe().
+> 
+> This way is helpful for fuse/ublk to implement zero copy by transferring
+> pages from device to file or socket. However, when device's ->splice_read()
+> produces pages, the kernel consumer may read from or write to these pages,
+> and from device viewpoint, there could be unexpected read or write on
+> pages.
+> 
+> Enhance the limit by the following approach:
+> 
+> 1) add kernel splice flags of SPLICE_F_KERN_FOR_[READ|WRITE] which is
+>    passed to device's ->read_splice(), then device can check if this
+>    READ or WRITE is expected on pages filled to pipe together with
+>    information from ppos & len
+> 
+> 2) add kernel splice flag of SPLICE_F_KERN_NEED_CONFIRM which is passed
+>    to device's ->read_splice() for asking device to confirm if it
+>    really supports this kind of usage of feeding pages by ->read_splice().
+>    If device does support, pipe->ack_page_consuming is set. This way
+>    can avoid misuse.
+> 
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> ---
+>  fs/splice.c               | 15 +++++++++++++++
+>  include/linux/pipe_fs_i.h | 10 ++++++++++
+>  include/linux/splice.h    | 22 ++++++++++++++++++++++
+>  3 files changed, 47 insertions(+)
+> 
+> diff --git a/fs/splice.c b/fs/splice.c
+> index 87d9b19349de..c4770e1644cc 100644
+> --- a/fs/splice.c
+> +++ b/fs/splice.c
+> @@ -792,6 +792,14 @@ static long do_splice_to(struct file *in, loff_t *ppos,
+>  	return in->f_op->splice_read(in, ppos, pipe, len, flags);
+>  }
+>  
+> +static inline bool slice_read_acked(const struct pipe_inode_info *pipe,
+> +			       int flags)
+> +{
+> +	if (flags & SPLICE_F_KERN_NEED_CONFIRM)
+> +		return pipe->ack_page_consuming;
+> +	return true;
+> +}
+> +
+>  /**
+>   * splice_direct_to_actor - splices data directly between two non-pipes
+>   * @in:		file to splice from
+> @@ -861,10 +869,17 @@ ssize_t splice_direct_to_actor(struct file *in, struct splice_desc *sd,
+>  		size_t read_len;
+>  		loff_t pos = sd->pos, prev_pos = pos;
+>  
+> +		pipe->ack_page_consuming = false;
+>  		ret = do_splice_to(in, &pos, pipe, len, flags);
+>  		if (unlikely(ret <= 0))
+>  			goto out_release;
+>  
+> +		if (!slice_read_acked(pipe, flags)) {
+> +			bytes = 0;
+> +			ret = -EACCES;
+> +			goto out_release;
+> +		}
+> +
+>  		read_len = ret;
+>  		sd->total_len = read_len;
+>  
+> diff --git a/include/linux/pipe_fs_i.h b/include/linux/pipe_fs_i.h
+> index 6cb65df3e3ba..09ee1a9380ec 100644
+> --- a/include/linux/pipe_fs_i.h
+> +++ b/include/linux/pipe_fs_i.h
+> @@ -72,6 +72,7 @@ struct pipe_inode_info {
+>  	unsigned int r_counter;
+>  	unsigned int w_counter;
+>  	bool poll_usage;
+> +	bool ack_page_consuming;	/* only for direct pipe */
+>  	struct page *tmp_page;
+>  	struct fasync_struct *fasync_readers;
+>  	struct fasync_struct *fasync_writers;
+> @@ -218,6 +219,15 @@ static inline void pipe_discard_from(struct pipe_inode_info *pipe,
+>  		pipe_buf_release(pipe, &pipe->bufs[--pipe->head & mask]);
+>  }
+>  
+> +/*
+> + * Called in ->splice_read() for confirming the READ/WRITE page is allowed
+> + */
+> +static inline void pipe_ack_page_consume(struct pipe_inode_info *pipe)
+> +{
+> +	if (!WARN_ON_ONCE(current->splice_pipe != pipe))
+> +		pipe->ack_page_consuming = true;
+> +}
+> +
+>  /* Differs from PIPE_BUF in that PIPE_SIZE is the length of the actual
+>     memory allocation, whereas PIPE_BUF makes atomicity guarantees.  */
+>  #define PIPE_SIZE		PAGE_SIZE
+> diff --git a/include/linux/splice.h b/include/linux/splice.h
+> index a55179fd60fc..98c471fd918d 100644
+> --- a/include/linux/splice.h
+> +++ b/include/linux/splice.h
+> @@ -23,6 +23,28 @@
+>  
+>  #define SPLICE_F_ALL (SPLICE_F_MOVE|SPLICE_F_NONBLOCK|SPLICE_F_MORE|SPLICE_F_GIFT)
+>  
+> +/*
+> + * Flags used for kernel internal page move from ->splice_read()
+> + * by internal direct pipe, and user pipe can't touch these
+> + * flags.
+> + *
+> + * Pages filled from ->splice_read() are usually moved/copied to
+> + * ->splice_write(). Here address fuse/ublk zero copy by transferring
+> + * page from device to file/socket for either READ or WRITE. So we
+> + * need ->splice_read() to confirm if this READ/WRITE is allowed on
+> + * pages filled in ->splice_read().
+> + */
+> +/* The page consumer is for READ from pages moved from direct pipe */
+> +#define SPLICE_F_KERN_FOR_READ	(0x100)
+> +/* The page consumer is for WRITE to pages moved from direct pipe */
+> +#define SPLICE_F_KERN_FOR_WRITE	(0x200)
+> +/*
+> + * ->splice_read() has to confirm if consumer's READ/WRITE on pages
+> + * is allow. If yes, ->splice_read() has to set pipe->ack_page_consuming,
+> + * otherwise pipe->ack_page_consuming has to be cleared.
+> + */
+> +#define SPLICE_F_KERN_NEED_CONFIRM	(0x400)
+> +
 
-Signed-off-by: Ondrej Zary <linux@zary.sk>
+As Linus commented in another thread, this patch is really ugly.
+
+I'd suggest to change to the following one, any comment is welcome!
+
+
+From fb9340ce72a1c58c9428d2af7cb00b55fa4ba799 Mon Sep 17 00:00:00 2001
+From: Ming Lei <ming.lei@redhat.com>
+Date: Fri, 10 Feb 2023 09:16:46 +0000
+Subject: [PATCH 2/4] fs/splice: add private flags for cross-check in two ends
+
+Pages are transferred via pipe/splice between different subsystems.
+
+The source subsystem may know if spliced pages are readable or
+writable. The sink subsystem may know if spliced pages need to
+write to or read from.
+
+Add two pair of private flags, so that the source subsystem and
+sink subsystem can run cross-check about page use correctness,
+and they are supposed to be used in case of communicating over
+direct pipe only. Generic splice and pipe code is supposed to
+not touch the two pair of private flags.
+
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/ata/pata_parport/aten.c                            | 3 +--
- drivers/ata/pata_parport/bpck.c                            | 3 +--
- drivers/ata/pata_parport/bpck6.c                           | 3 +--
- drivers/ata/pata_parport/comm.c                            | 3 +--
- drivers/ata/pata_parport/dstr.c                            | 3 +--
- drivers/ata/pata_parport/epat.c                            | 3 +--
- drivers/ata/pata_parport/epia.c                            | 3 +--
- drivers/ata/pata_parport/fit2.c                            | 3 +--
- drivers/ata/pata_parport/fit3.c                            | 3 +--
- drivers/ata/pata_parport/friq.c                            | 3 +--
- drivers/ata/pata_parport/frpw.c                            | 3 +--
- drivers/ata/pata_parport/kbic.c                            | 3 +--
- drivers/ata/pata_parport/ktti.c                            | 3 +--
- drivers/ata/pata_parport/on20.c                            | 3 +--
- drivers/ata/pata_parport/on26.c                            | 3 +--
- drivers/ata/pata_parport/pata_parport.c                    | 2 +-
- {include/linux => drivers/ata/pata_parport}/pata_parport.h | 0
- 17 files changed, 16 insertions(+), 31 deletions(-)
- rename {include/linux => drivers/ata/pata_parport}/pata_parport.h (100%)
+ include/linux/pipe_fs_i.h | 8 ++++++++
+ include/linux/splice.h    | 9 +++++++++
+ 2 files changed, 17 insertions(+)
 
-diff --git a/drivers/ata/pata_parport/aten.c b/drivers/ata/pata_parport/aten.c
-index 6559670b6120..2a542a06866e 100644
---- a/drivers/ata/pata_parport/aten.c
-+++ b/drivers/ata/pata_parport/aten.c
-@@ -16,8 +16,7 @@
- #include <linux/wait.h>
- #include <linux/types.h>
- #include <asm/io.h>
--
--#include <linux/pata_parport.h>
-+#include "pata_parport.h"
+diff --git a/include/linux/pipe_fs_i.h b/include/linux/pipe_fs_i.h
+index 6cb65df3e3ba..959c8b9287f4 100644
+--- a/include/linux/pipe_fs_i.h
++++ b/include/linux/pipe_fs_i.h
+@@ -14,6 +14,14 @@
+ #define PIPE_BUF_FLAG_LOSS	0x40	/* Message loss happened after this buffer */
+ #endif
  
- #define j44(a,b)                ((((a>>4)&0x0f)|(b&0xf0))^0x88)
++/*
++ * Used by source/sink end only, don't touch them in generic
++ * splice/pipe code. Set in source side, and check in sink
++ * side
++ */
++#define PIPE_BUF_PRIV_FLAG_MAY_READ	0x1000 /* sink can read from page */
++#define PIPE_BUF_PRIV_FLAG_MAY_WRITE	0x2000 /* sink can write to page */
++
+ /**
+  *	struct pipe_buffer - a linux kernel pipe buffer
+  *	@page: the page containing the data for the pipe buffer
+diff --git a/include/linux/splice.h b/include/linux/splice.h
+index a55179fd60fc..90d1d2b5327d 100644
+--- a/include/linux/splice.h
++++ b/include/linux/splice.h
+@@ -23,6 +23,15 @@
  
-diff --git a/drivers/ata/pata_parport/bpck.c b/drivers/ata/pata_parport/bpck.c
-index 7f7927172b0b..0bb72e02cc96 100644
---- a/drivers/ata/pata_parport/bpck.c
-+++ b/drivers/ata/pata_parport/bpck.c
-@@ -14,8 +14,7 @@
- #include <linux/types.h>
- #include <linux/wait.h>
- #include <asm/io.h>
--
--#include <linux/pata_parport.h>
-+#include "pata_parport.h"
+ #define SPLICE_F_ALL (SPLICE_F_MOVE|SPLICE_F_NONBLOCK|SPLICE_F_MORE|SPLICE_F_GIFT)
  
- #undef r2
- #undef w2
-diff --git a/drivers/ata/pata_parport/bpck6.c b/drivers/ata/pata_parport/bpck6.c
-index 0679a04f5541..2709245590d9 100644
---- a/drivers/ata/pata_parport/bpck6.c
-+++ b/drivers/ata/pata_parport/bpck6.c
-@@ -18,9 +18,8 @@
- #include <linux/types.h>
- #include <asm/io.h>
- #include <linux/parport.h>
--
- #include "ppc6lnx.c"
--#include <linux/pata_parport.h>
-+#include "pata_parport.h"
- 
- #define PPCSTRUCT(pi) ((Interface *)(pi->private))
- 
-diff --git a/drivers/ata/pata_parport/comm.c b/drivers/ata/pata_parport/comm.c
-index be11a681c039..d3083d535292 100644
---- a/drivers/ata/pata_parport/comm.c
-+++ b/drivers/ata/pata_parport/comm.c
-@@ -15,8 +15,7 @@
- #include <linux/types.h>
- #include <linux/wait.h>
- #include <asm/io.h>
--
--#include <linux/pata_parport.h>
-+#include "pata_parport.h"
- 
- /* mode codes:  0  nybble reads, 8-bit writes
-                 1  8-bit reads and writes
-diff --git a/drivers/ata/pata_parport/dstr.c b/drivers/ata/pata_parport/dstr.c
-index 8eed094f57f6..6b2a99d8abbf 100644
---- a/drivers/ata/pata_parport/dstr.c
-+++ b/drivers/ata/pata_parport/dstr.c
-@@ -14,8 +14,7 @@
- #include <linux/types.h>
- #include <linux/wait.h>
- #include <asm/io.h>
--
--#include <linux/pata_parport.h>
-+#include "pata_parport.h"
- 
- /* mode codes:  0  nybble reads, 8-bit writes
-                 1  8-bit reads and writes
-diff --git a/drivers/ata/pata_parport/epat.c b/drivers/ata/pata_parport/epat.c
-index 5180e3fccfdc..ca687789cb6e 100644
---- a/drivers/ata/pata_parport/epat.c
-+++ b/drivers/ata/pata_parport/epat.c
-@@ -16,8 +16,7 @@
- #include <linux/types.h>
- #include <linux/wait.h>
- #include <asm/io.h>
--
--#include <linux/pata_parport.h>
-+#include "pata_parport.h"
- 
- #define j44(a,b)		(((a>>4)&0x0f)+(b&0xf0))
- #define j53(a,b)		(((a>>3)&0x1f)+((b<<4)&0xe0))
-diff --git a/drivers/ata/pata_parport/epia.c b/drivers/ata/pata_parport/epia.c
-index 3171dc1eb5d1..3abecabdb5a4 100644
---- a/drivers/ata/pata_parport/epia.c
-+++ b/drivers/ata/pata_parport/epia.c
-@@ -17,8 +17,7 @@
- #include <linux/types.h>
- #include <linux/wait.h>
- #include <asm/io.h>
--
--#include <linux/pata_parport.h>
-+#include "pata_parport.h"
- 
- /* mode codes:  0  nybble reads on port 1, 8-bit writes
-                 1  5/3 reads on ports 1 & 2, 8-bit writes
-diff --git a/drivers/ata/pata_parport/fit2.c b/drivers/ata/pata_parport/fit2.c
-index a32250c9d042..eeb2c385731d 100644
---- a/drivers/ata/pata_parport/fit2.c
-+++ b/drivers/ata/pata_parport/fit2.c
-@@ -20,8 +20,7 @@
- #include <linux/types.h>
- #include <linux/wait.h>
- #include <asm/io.h>
--
--#include <linux/pata_parport.h>
-+#include "pata_parport.h"
- 
- #define j44(a,b)                (((a>>4)&0x0f)|(b&0xf0))
- 
-diff --git a/drivers/ata/pata_parport/fit3.c b/drivers/ata/pata_parport/fit3.c
-index cb2771de7c32..d50a0c30f9da 100644
---- a/drivers/ata/pata_parport/fit3.c
-+++ b/drivers/ata/pata_parport/fit3.c
-@@ -24,8 +24,7 @@
- #include <linux/types.h>
- #include <linux/wait.h>
- #include <asm/io.h>
--
--#include <linux/pata_parport.h>
-+#include "pata_parport.h"
- 
- #define j44(a,b)                (((a>>3)&0x0f)|((b<<1)&0xf0))
- 
-diff --git a/drivers/ata/pata_parport/friq.c b/drivers/ata/pata_parport/friq.c
-index 4feaca2582a3..d94857d1a978 100644
---- a/drivers/ata/pata_parport/friq.c
-+++ b/drivers/ata/pata_parport/friq.c
-@@ -27,8 +27,7 @@
- #include <linux/types.h>
- #include <linux/wait.h>
- #include <asm/io.h>
--
--#include <linux/pata_parport.h>
-+#include "pata_parport.h"
- 
- #define CMD(x)		w2(4);w0(0xff);w0(0xff);w0(0x73);w0(0x73);\
- 			w0(0xc9);w0(0xc9);w0(0x26);w0(0x26);w0(x);w0(x);
-diff --git a/drivers/ata/pata_parport/frpw.c b/drivers/ata/pata_parport/frpw.c
-index 2bd82d7c60f3..8b9a176fce17 100644
---- a/drivers/ata/pata_parport/frpw.c
-+++ b/drivers/ata/pata_parport/frpw.c
-@@ -20,8 +20,7 @@
- #include <linux/types.h>
- #include <linux/wait.h>
- #include <asm/io.h>
--
--#include <linux/pata_parport.h>
-+#include "pata_parport.h"
- 
- #define cec4		w2(0xc);w2(0xe);w2(0xe);w2(0xc);w2(4);w2(4);w2(4);
- #define j44(l,h)	(((l>>4)&0x0f)|(h&0xf0))
-diff --git a/drivers/ata/pata_parport/kbic.c b/drivers/ata/pata_parport/kbic.c
-index 18f3641a9a8d..d0f10f84413b 100644
---- a/drivers/ata/pata_parport/kbic.c
-+++ b/drivers/ata/pata_parport/kbic.c
-@@ -19,8 +19,7 @@
- #include <linux/types.h>
- #include <linux/wait.h>
- #include <asm/io.h>
--
--#include <linux/pata_parport.h>
-+#include "pata_parport.h"
- 
- #define r12w()			(delay_p,inw(pi->port+1)&0xffff) 
- 
-diff --git a/drivers/ata/pata_parport/ktti.c b/drivers/ata/pata_parport/ktti.c
-index 5fd4d797720c..89a1e8b23bf4 100644
---- a/drivers/ata/pata_parport/ktti.c
-+++ b/drivers/ata/pata_parport/ktti.c
-@@ -16,8 +16,7 @@
- #include <linux/types.h>
- #include <linux/wait.h>
- #include <asm/io.h>
--
--#include <linux/pata_parport.h>
-+#include "pata_parport.h"
- 
- #define j44(a,b)                (((a>>4)&0x0f)|(b&0xf0))
- 
-diff --git a/drivers/ata/pata_parport/on20.c b/drivers/ata/pata_parport/on20.c
-index 8e1d49914aa7..e08395be87da 100644
---- a/drivers/ata/pata_parport/on20.c
-+++ b/drivers/ata/pata_parport/on20.c
-@@ -13,8 +13,7 @@
- #include <linux/types.h>
- #include <linux/wait.h>
- #include <asm/io.h>
--
--#include <linux/pata_parport.h>
-+#include "pata_parport.h"
- 
- #define op(f)	w2(4);w0(f);w2(5);w2(0xd);w2(5);w2(0xd);w2(5);w2(4);
- #define vl(v)	w2(4);w0(v);w2(5);w2(7);w2(5);w2(4);
-diff --git a/drivers/ata/pata_parport/on26.c b/drivers/ata/pata_parport/on26.c
-index cea1e6311e6b..440325081bc5 100644
---- a/drivers/ata/pata_parport/on26.c
-+++ b/drivers/ata/pata_parport/on26.c
-@@ -14,8 +14,7 @@
- #include <linux/types.h>
- #include <linux/wait.h>
- #include <asm/io.h>
--
--#include <linux/pata_parport.h>
-+#include "pata_parport.h"
- 
- /* mode codes:  0  nybble reads, 8-bit writes
-                 1  8-bit reads and writes
-diff --git a/drivers/ata/pata_parport/pata_parport.c b/drivers/ata/pata_parport/pata_parport.c
-index 45dacb2de9c5..601c086b75ee 100644
---- a/drivers/ata/pata_parport/pata_parport.c
-+++ b/drivers/ata/pata_parport/pata_parport.c
-@@ -6,7 +6,7 @@
- #include <linux/kernel.h>
- #include <linux/module.h>
- #include <linux/parport.h>
--#include <linux/pata_parport.h>
-+#include "pata_parport.h"
- 
- #define DRV_NAME "pata_parport"
- 
-diff --git a/include/linux/pata_parport.h b/drivers/ata/pata_parport/pata_parport.h
-similarity index 100%
-rename from include/linux/pata_parport.h
-rename to drivers/ata/pata_parport/pata_parport.h
++/*
++ * Use for source/sink side only, don't touch them in generic splice/pipe
++ * code. Pass from sink side, and check in source side.
++ *
++ * So far, it is only for communicating over direct pipe.
++ */
++#define SPLICE_F_PRIV_FOR_READ	(0x100)	/* sink side will read from page */
++#define SPLICE_F_PRIV_FOR_WRITE	(0x200) /* sink side will write page */
++
+ /*
+  * Passed to the actors
+  */
 -- 
-Ondrej Zary
+2.38.1
+
+
+
+Thanks,
+Ming
 
