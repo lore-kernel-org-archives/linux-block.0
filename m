@@ -2,110 +2,113 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30FD0C636D7
-	for <linux-block@archiver.kernel.org>; Sat, 11 Feb 2023 00:30:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ACFC7C61DA4
+	for <linux-block@archiver.kernel.org>; Sat, 11 Feb 2023 03:35:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229517AbjBKAaZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 10 Feb 2023 19:30:25 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52614 "EHLO
+        id S229554AbjBKDfC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 10 Feb 2023 22:35:02 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48286 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229473AbjBKAaY (ORCPT
+        with ESMTP id S229450AbjBKDfB (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 10 Feb 2023 19:30:24 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30284FB;
-        Fri, 10 Feb 2023 16:30:23 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        Fri, 10 Feb 2023 22:35:01 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 723216A30D
+        for <linux-block@vger.kernel.org>; Fri, 10 Feb 2023 19:33:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1676086399;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=PurHXbJRnHGbSagoMpDJx9A09qf7W54g6forVImCpXk=;
+        b=HTSC1rVOFrGUd0qftHsKcrl9ty9PrnzAAJl41X3S0p9yJ7HJj3zv98BDAbHpankYoeiZNM
+        AqZfRq1IL+EmED4b1rsGgst6HNVzHG74R/3gE6ehPAE1sbAW3e0UKt5OT/aXskK5fxLIFI
+        Jk58oU+GVWrxYIT+pt+bZHW6nPhP1iA=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-340-aDWqqMpUOYWrKotzjDrxww-1; Fri, 10 Feb 2023 22:33:15 -0500
+X-MC-Unique: aDWqqMpUOYWrKotzjDrxww-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id DA162B82654;
-        Sat, 11 Feb 2023 00:30:21 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id A2D29C4339C;
-        Sat, 11 Feb 2023 00:30:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1676075420;
-        bh=XEnPFOJ4CxMJH7vgfkFyQKY4s2/0EUC8Eknfpc5jk+s=;
-        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=ax5Fd5J1UIn8ED+GyB4f+E8hJ9LztVDn7UWC4mXnOgmf1KRe9qg37VcP6B98kKnsO
-         LZzZNA4MyyMSEIeG7mqIPLuzuz9GmmbPPuWcsDH0Kn9CG/IJyeHa00w9d6VJpmGmI4
-         NXRL4d9rj/vrxhHmcYkuvvsfAImKsX22nRKpEN6IZm/ArT43ezp69CpPKFWLzONl7c
-         8gCOQZrkyi8vqNwPvy5MhnCJYm+ujIZHdOmgGLEGxaUbIkSFrVEqOIZ1FTpVoog4RF
-         TTYadPmdXwwh9e6QDAyw5jGTuEaFaEB2cc1S76SGjrhSDxS3EsrNV3ZLEUNm5ahnDy
-         xyu+Hg0HqKq8Q==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 740A6E21EC7;
-        Sat, 11 Feb 2023 00:30:20 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 0509229A9D3B;
+        Sat, 11 Feb 2023 03:33:15 +0000 (UTC)
+Received: from T590 (ovpn-8-18.pek2.redhat.com [10.72.8.18])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 7A5442026D4B;
+        Sat, 11 Feb 2023 03:33:08 +0000 (UTC)
+Date:   Sat, 11 Feb 2023 11:33:04 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Kanchan Joshi <joshi.k@samsung.com>
+Cc:     lsf-pc@lists.linux-foundation.org, linux-block@vger.kernel.org,
+        linux-nvme@lists.infradead.org, io-uring@vger.kernel.org,
+        axboe@kernel.dk, hch@lst.de, kbusch@kernel.org, ming.lei@redhat.com
+Subject: Re: [LSF/MM/BPF ATTEND][LSF/MM/BPF Topic] Non-block IO
+Message-ID: <Y+cMcE8D9+fDVe+A@T590>
+References: <CGME20230210180226epcas5p1bd2e1150de067f8af61de2bbf571594d@epcas5p1.samsung.com>
+ <20230210180033.321377-1-joshi.k@samsung.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH 00/24 v2] Documentation: correct lots of spelling errors
- (series 1)
-From:   patchwork-bot+netdevbpf@kernel.org
-Message-Id: <167607542046.32477.11523239261636548840.git-patchwork-notify@kernel.org>
-Date:   Sat, 11 Feb 2023 00:30:20 +0000
-References: <20230209071400.31476-1-rdunlap@infradead.org>
-In-Reply-To: <20230209071400.31476-1-rdunlap@infradead.org>
-To:     Randy Dunlap <rdunlap@infradead.org>
-Cc:     linux-kernel@vger.kernel.org, corbet@lwn.net,
-        linux@armlinux.org.uk, axboe@kernel.dk, olteanv@gmail.com,
-        steffen.klassert@secunet.com, daniel.m.jordan@oracle.com,
-        akinobu.mita@gmail.com, deller@gmx.de, dmitry.torokhov@gmail.com,
-        rydberg@bitmath.org, isdn@linux-pingi.de, jikos@kernel.org,
-        mbenes@suse.cz, pmladek@suse.com, jpoimboe@kernel.org,
-        peterz@infradead.org, mingo@redhat.com, will@kernel.org,
-        jglisse@redhat.com, naoya.horiguchi@nec.com, linmiaohe@huawei.com,
-        jonas@southpole.se, stefan.kristiansson@saunalahti.fi,
-        shorne@gmail.com, bhelgaas@google.com, lpieralisi@kernel.org,
-        maz@kernel.org, mpe@ellerman.id.au, hca@linux.ibm.com,
-        gor@linux.ibm.com, agordeev@linux.ibm.com, juri.lelli@redhat.com,
-        vincent.guittot@linaro.org, dhowells@redhat.com, jarkko@kernel.org,
-        paul@paul-moore.com, jmorris@namei.org, serge@hallyn.com,
-        bristot@kernel.org, rostedt@goodmis.org, mhiramat@kernel.org,
-        mathieu.poirier@linaro.org, suzuki.poulose@arm.com,
-        zbr@ioremap.net, fenghua.yu@intel.com, reinette.chatre@intel.com,
-        tglx@linutronix.de, bp@alien8.de, chris@zankel.net,
-        jcmvbkbc@gmail.com, coresight@lists.linaro.org,
-        dri-devel@lists.freedesktop.org, keyrings@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-fbdev@vger.kernel.org,
-        linux-input@vger.kernel.org, linux-pci@vger.kernel.org,
-        linux-s390@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-sgx@vger.kernel.org, linux-trace-devel@vger.kernel.org,
-        linux-trace-kernel@vger.kernel.org, live-patching@vger.kernel.org,
-        linux-security-module@vger.kernel.org, linux-usb@vger.kernel.org,
-        netdev@vger.kernel.org, linux-mm@kvack.org,
-        openrisc@lists.librecores.org,
-        linux-arm-kernel@lists.infradead.org,
-        linux-xtensa@linux-xtensa.org, linuxppc-dev@lists.ozlabs.org,
-        x86@kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230210180033.321377-1-joshi.k@samsung.com>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello:
-
-This series was applied to netdev/net-next.git (master)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Wed,  8 Feb 2023 23:13:36 -0800 you wrote:
-> Correct many spelling errors in Documentation/ as reported by codespell.
+On Fri, Feb 10, 2023 at 11:30:33PM +0530, Kanchan Joshi wrote:
+> is getting more common than it used to be.
+> NVMe is no longer tied to block storage. Command sets in NVMe 2.0 spec
+> opened an excellent way to present non-block interfaces to the Host. ZNS
+> and KV came along with it, and some new command sets are emerging.
 > 
-> Maintainers of specific kernel subsystems are only Cc-ed on their
-> respective patches, not the entire series.
+> OTOH, Kernel IO advances historically centered around the block IO path.
+> Passthrough IO path existed, but it stayed far from all the advances, be
+> it new features or performance.
 > 
-> These patches are based on linux-next-20230209.
+> Current state & discussion points:
+> ---------------------------------
+> Status-quo changed in the recent past with the new passthrough path (ng
+> char interface + io_uring command). Feature parity does not exist, but
+> performance parity does.
+> Adoption draws asks. I propose a session covering a few voices and
+> finding a path-forward for some ideas too.
 > 
-> [...]
+> 1. Command cancellation: while NVMe mandatorily supports the abort
+> command, we do not have a way to trigger that from user-space. There
+> are ways to go about it (with or without the uring-cancel interface) but
+> not without certain tradeoffs. It will be good to discuss the choices in
+> person.
+> 
+> 2. Cgroups: works for only block dev at the moment. Are there outright
+> objections to extending this to char-interface IO?
 
-Here is the summary with links:
-  - [03/24] Documentation: core-api: correct spelling
-    (no matching commit)
-  - [08/24] Documentation: isdn: correct spelling
-    https://git.kernel.org/netdev/net-next/c/d12f9ad02806
+But recently the blk-cgroup change towards to associate with disk only,
+which may become far away from supporting cgroup for pt IO.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Another thing is io scheduler, I guess it isn't important for nvme any
+more?
 
+Also IO accounting.
+
+> 
+> 3. DMA cost: is high in presence of IOMMU. Keith posted the work[1],
+> with block IO path, last year. I imagine plumbing to get a bit simpler
+> with passthrough-only support. But what are the other things that must
+> be sorted out to have progress on moving DMA cost out of the fast path?
+> 
+> 4. Direct NVMe queues - will there be interest in having io_uring
+> managed NVMe queues?  Sort of a new ring, for which I/O is destaged from
+> io_uring SQE to NVMe SQE without having to go through intermediate
+> constructs (i.e., bio/request). Hopefully,that can further amp up the
+> efficiency of IO.
+
+Interesting!
+
+There hasn't bio for nvme io_uring command pt, but request is still
+here. If SQE can provide unique ID, request may reuse it as tag.
+
+
+Thanks,
+Ming
 
