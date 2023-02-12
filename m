@@ -2,138 +2,108 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F5CBC05027
-	for <linux-block@archiver.kernel.org>; Sun, 12 Feb 2023 03:55:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DE4DC636D3
+	for <linux-block@archiver.kernel.org>; Sun, 12 Feb 2023 09:03:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229632AbjBLDzb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 11 Feb 2023 22:55:31 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53720 "EHLO
+        id S229540AbjBLJDG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 12 Feb 2023 04:03:06 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39176 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229473AbjBLDza (ORCPT
+        with ESMTP id S229493AbjBLJDG (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 11 Feb 2023 22:55:30 -0500
-Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75F0011E99
-        for <linux-block@vger.kernel.org>; Sat, 11 Feb 2023 19:55:26 -0800 (PST)
-Received: by mail-pj1-x102e.google.com with SMTP id w20-20020a17090a8a1400b00233d7314c1cso1310586pjn.5
-        for <linux-block@vger.kernel.org>; Sat, 11 Feb 2023 19:55:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=EhWxFB4ODTurP+Bbh4zJn7gAxthxpyL6UKX+g4y+ZjQ=;
-        b=4oXWD6WwwvKtE7IE7ek3e8RvqRagQZ8C8ZrVALBgqtBxdRjm/aG7oxpBqUnFwwM4DJ
-         ek/S+kJ9IUeThE7HJuw7gpf7HnWARkN688eLl24wK0jaNeXhgDkFMWm0NfKMMJn1y6SE
-         h4EA/zeco7f8KQFXqBOXxVOPDf13kk+VjrfQQ7bZyHvYFEvs9qdQjwn1PPKGX+s5ShQ5
-         tKUPaXqT5Cu/VF3Afq8HKMWuhPcNDkMsOmtEgIMUaSFUcO5ihZ/plT4S3Rx6zU8mFNOH
-         g5Zee/a2NpptVNbnAIkNNH6nT3tQKF4AxjMi81qPNsjzLk52oa+VmL15tBMLA11JguiU
-         zNKQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=EhWxFB4ODTurP+Bbh4zJn7gAxthxpyL6UKX+g4y+ZjQ=;
-        b=BNclecLNp1lnt2K10Lq57O1YzwLM0uyI1eRaTlB1eFJvJsodfq6DnVsdwgcPYtv4Gw
-         J7GfD3e9jOeX1jzK/fyi2WYzEYip3U70lqVilS3Toc7DcojXY/fRPObOfRmqfCKMjeyF
-         aekaDhAJaPlkOJu6BPRPKwLcFM9U1dxOV3std6Z3Icgw+ws41IgPyS2YKstQXZjaKaCv
-         lB6cDPQtX/amh7N2Wr3TtqlVY5U7lvvGDR2I0EJn2CBcSPDsEw+jhDMOJK4wn8kYpnP9
-         bc5x53IGE7Zr68DHU5l5Z5ZBl3/IwUQ/iVFC3wiwzbzlqAPx/bGiRzhxnP1R86bA4dTH
-         qlwQ==
-X-Gm-Message-State: AO0yUKWlBAbzAZpuJyXHBxrSV8TkJrE7QEwbyybbAcbTv+/d5hYZndfC
-        OkZ/m324VDeDUoj1X0Jn/yYmlg==
-X-Google-Smtp-Source: AK7set9jwghXObjJgAAtgV3PvPOahGO37nT0OGYuWJMwgbbwncNytT3Wwxr2VE0SCOTnwxETr7ru1w==
-X-Received: by 2002:a17:903:182:b0:198:a5d9:f2fd with SMTP id z2-20020a170903018200b00198a5d9f2fdmr21711336plg.6.1676174125887;
-        Sat, 11 Feb 2023 19:55:25 -0800 (PST)
-Received: from [192.168.1.136] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id a10-20020a170902ee8a00b001992e74d058sm975727pld.7.2023.02.11.19.55.24
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 11 Feb 2023 19:55:25 -0800 (PST)
-Message-ID: <44355d28-776a-0134-b087-c11cf4e82f34@kernel.dk>
-Date:   Sat, 11 Feb 2023 20:55:23 -0700
+        Sun, 12 Feb 2023 04:03:06 -0500
+Received: from dggsgout12.his.huawei.com (unknown [45.249.212.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 049A312863;
+        Sun, 12 Feb 2023 01:03:02 -0800 (PST)
+Received: from mail02.huawei.com (unknown [172.30.67.143])
+        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4PF1hd398cz4f3l6n;
+        Sun, 12 Feb 2023 17:02:57 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.175.127.227])
+        by APP3 (Coremail) with SMTP id _Ch0CgCHgR9Bq+hjpfqtDA--.47546S6;
+        Sun, 12 Feb 2023 17:02:59 +0800 (CST)
+From:   Yu Kuai <yukuai1@huaweicloud.com>
+To:     hch@infradead.org, jack@suse.cz, axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yukuai3@huawei.com, yukuai1@huaweicloud.com, yi.zhang@huawei.com,
+        yangerkun@huawei.com
+Subject: [PATCH -next RFC 2/3] block: factor out the setting of GD_NEED_PART_SCAN
+Date:   Sun, 12 Feb 2023 17:26:40 +0800
+Message-Id: <20230212092641.2394146-3-yukuai1@huaweicloud.com>
+X-Mailer: git-send-email 2.31.1
+In-Reply-To: <20230212092641.2394146-1-yukuai1@huaweicloud.com>
+References: <20230212092641.2394146-1-yukuai1@huaweicloud.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.2
-Subject: Re: [PATCH 3/4] io_uring: add IORING_OP_READ[WRITE]_SPLICE_BUF
-Content-Language: en-US
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     io-uring@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Miklos Szeredi <mszeredi@redhat.com>,
-        Bernd Schubert <bschubert@ddn.com>,
-        Nitesh Shetty <nj.shetty@samsung.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Ziyang Zhang <ZiyangZhang@linux.alibaba.com>
-References: <20230210153212.733006-1-ming.lei@redhat.com>
- <20230210153212.733006-4-ming.lei@redhat.com>
- <a487261c-cc0e-134b-cd8e-26460fe7cf59@kernel.dk> <Y+e+i5BXQHcqdDGo@T590>
- <22772531-bf55-f610-be93-3d53c9ce1c6d@kernel.dk> <Y+hbggDCm9wViPAv@T590>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <Y+hbggDCm9wViPAv@T590>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: _Ch0CgCHgR9Bq+hjpfqtDA--.47546S6
+X-Coremail-Antispam: 1UD129KBjvJXoW7Zw18CrWUKry7Cw45CFyDWrg_yoW8AFyfpr
+        WDXFZ0yFWjgr13uFWjv3Z7W3yjkanFyrWIyrW7Gw10v3sxZrsIyF9ak3yDAr10yrZ3GrZ8
+        Wr45XFyFqFy8CFUanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUU9v14x267AKxVWrJVCq3wAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2048vs2IY020E87I2jVAFwI0_Jryl82xGYIkIc2
+        x26xkF7I0E14v26r4j6ryUM28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8wA2z4x0
+        Y4vE2Ix0cI8IcVAFwI0_Xr0_Ar1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Cr0_Gr1UM2
+        8EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s0DM2AI
+        xVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20x
+        vE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xv
+        r2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7MxAIw28IcxkI7VAKI48JMxC20s
+        026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_
+        JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14
+        v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xva
+        j40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JV
+        W8JrUvcSsGvfC2KfnxnUUI43ZEXa7VUjYiiDUUUUU==
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2/11/23 8:22?PM, Ming Lei wrote:
->>>> Also seems like this should be separately testable. We can't add new
->>>> opcodes that don't have a feature test at least, and should also have
->>>> various corner case tests. A bit of commenting outside of this below.
->>>
->>> OK, I will write/add one very simple ublk userspace to liburing for
->>> test purpose.
->>
->> Thanks!
-> 
-> Thinking of further, if we use ublk for liburing test purpose, root is
-> often needed, even though we support un-privileged mode, which needs
-> administrator to grant access, so is it still good to do so?
+From: Yu Kuai <yukuai3@huawei.com>
 
-That's fine, some tests already depend on root for certain things, like
-passthrough. When I run the tests, I do a pass as both a regular user
-and as root. The important bit is just that the tests skip when they are
-not root rather than fail.
+In order to prevent scan partition for a device that is opened
+exclusively by someone else, new conditions will be added to
+disk_scan_partitions() in the next patch. Hence if device is opened
+exclusively between bdev_add() and disk_scan_partitions(), the first
+partition scan will fail unexpected. This patch factor out the setting
+of GD_NEED_PART_SCAN to prevent the problem.
 
-> It could be easier to add ->splice_read() on /dev/zero for test
-> purpose, just allocate zeroed pages in ->splice_read(), and add
-> them to pipe like ublk->splice_read(), and sink side can read
-> from or write to these pages, but zero's read_iter_zero() won't
-> be affected. And normal splice/tee won't connect to zero too
-> because we only allow it from kernel use.
+Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+---
+ block/genhd.c | 2 +-
+ block/ioctl.c | 1 +
+ 2 files changed, 2 insertions(+), 1 deletion(-)
 
-Arguably /dev/zero should still support splice_read() as a regression
-fix as I argued to Linus, so I'd just add that as a prep patch.
-
->>>> Seems like this should check for SPLICE_F_FD_IN_FIXED, and also use
->>>> io_file_get_normal() for the non-fixed case in case someone passed in an
->>>> io_uring fd.
->>>
->>> SPLICE_F_FD_IN_FIXED needs one extra word for holding splice flags, if
->>> we can use sqe->addr3, I think it is doable.
->>
->> I haven't checked the rest, but you can't just use ->splice_flags for
->> this?
-> 
-> ->splice_flags shares memory with rwflags, so can't be used.
-> 
-> I think it is fine to use ->addr3, given io_getxattr()/io_setxattr()/
-> io_msg_ring() has used that.
-
-This is part of the confusion, as you treat it basically like a
-read/write internally, but the opcode names indicate differently. Why
-not just have a separate prep helper for these and then use a layout
-that makes more sense, surely rwflags aren't applicable for these
-anyway? I think that'd make it a lot cleaner.
-
-Yeah, addr3 could easily be used, but it's makes for a really confusing
-command structure when the command is kinda-read but also kinda-splice.
-And it arguable makes more sense to treat it as the latter, as it takes
-the two fds like splice.
-
+diff --git a/block/genhd.c b/block/genhd.c
+index 075d8da284f5..c0d1220bd798 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -367,7 +367,6 @@ int disk_scan_partitions(struct gendisk *disk, fmode_t mode)
+ 	if (disk->open_partitions)
+ 		return -EBUSY;
+ 
+-	set_bit(GD_NEED_PART_SCAN, &disk->state);
+ 	bdev = blkdev_get_by_dev(disk_devt(disk), mode, NULL);
+ 	if (IS_ERR(bdev))
+ 		return PTR_ERR(bdev);
+@@ -493,6 +492,7 @@ int __must_check device_add_disk(struct device *parent, struct gendisk *disk,
+ 		if (ret)
+ 			goto out_unregister_bdi;
+ 
++		set_bit(GD_NEED_PART_SCAN, &disk->state);
+ 		bdev_add(disk->part0, ddev->devt);
+ 		if (get_capacity(disk))
+ 			disk_scan_partitions(disk, FMODE_READ);
+diff --git a/block/ioctl.c b/block/ioctl.c
+index 6dd49d877584..0eefcdb936a0 100644
+--- a/block/ioctl.c
++++ b/block/ioctl.c
+@@ -528,6 +528,7 @@ static int blkdev_common_ioctl(struct block_device *bdev, fmode_t mode,
+ 			return -EACCES;
+ 		if (bdev_is_partition(bdev))
+ 			return -EINVAL;
++		set_bit(GD_NEED_PART_SCAN, &bdev->bd_disk->state);
+ 		return disk_scan_partitions(bdev->bd_disk, mode & ~FMODE_EXCL);
+ 	case BLKTRACESTART:
+ 	case BLKTRACESTOP:
 -- 
-Jens Axboe
+2.31.1
 
