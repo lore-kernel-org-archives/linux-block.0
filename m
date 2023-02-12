@@ -2,25 +2,26 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D6D6C636D4
-	for <linux-block@archiver.kernel.org>; Sun, 12 Feb 2023 12:19:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E09BC636D4
+	for <linux-block@archiver.kernel.org>; Sun, 12 Feb 2023 17:15:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229552AbjBLMTl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 12 Feb 2023 07:19:41 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36440 "EHLO
+        id S229489AbjBLRPH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 12 Feb 2023 12:15:07 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34426 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229499AbjBLMTl (ORCPT
+        with ESMTP id S229472AbjBLRPF (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 12 Feb 2023 07:19:41 -0500
+        Sun, 12 Feb 2023 12:15:05 -0500
 Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 942431AD;
-        Sun, 12 Feb 2023 04:19:39 -0800 (PST)
-Received: from [192.168.1.103] (31.173.85.253) by msexch01.omp.ru
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A2365259;
+        Sun, 12 Feb 2023 09:15:04 -0800 (PST)
+Received: from [192.168.1.103] (178.176.72.94) by msexch01.omp.ru
  (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.986.14; Sun, 12 Feb
- 2023 15:19:29 +0300
-Subject: Re: [PATCH 02/12] pata_parport: Introduce module_pata_parport_driver
- macro
+ 2023 20:14:55 +0300
+From:   Sergey Shtylyov <s.shtylyov@omp.ru>
+Subject: Re: [PATCH 07/12] pata_parport: remove scratch parameter from
+ log_adapter()
 To:     Ondrej Zary <linux@zary.sk>,
         Damien Le Moal <damien.lemoal@opensource.wdc.com>
 CC:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
@@ -28,24 +29,23 @@ CC:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
         <linux-parport@lists.infradead.org>, <linux-ide@vger.kernel.org>,
         <linux-kernel@vger.kernel.org>
 References: <20230211144232.15138-1-linux@zary.sk>
- <20230211144232.15138-3-linux@zary.sk>
-From:   Sergey Shtylyov <s.shtylyov@omp.ru>
+ <20230211144232.15138-8-linux@zary.sk>
 Organization: Open Mobile Platform
-Message-ID: <2e8b5e5b-6e7d-471c-74aa-1c7debebef0f@omp.ru>
-Date:   Sun, 12 Feb 2023 15:19:28 +0300
+Message-ID: <8222aa5b-f58a-41f2-6588-6b3f9aa4de63@omp.ru>
+Date:   Sun, 12 Feb 2023 20:14:55 +0300
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.10.1
 MIME-Version: 1.0
-In-Reply-To: <20230211144232.15138-3-linux@zary.sk>
+In-Reply-To: <20230211144232.15138-8-linux@zary.sk>
 Content-Type: text/plain; charset="utf-8"
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [31.173.85.253]
+X-Originating-IP: [178.176.72.94]
 X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
  (10.188.4.12)
 X-KSE-ServerInfo: msexch01.omp.ru, 9
 X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 5.9.59, Database issued on: 02/12/2023 11:56:24
+X-KSE-AntiSpam-Version: 5.9.59, Database issued on: 02/12/2023 16:48:07
 X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
 X-KSE-AntiSpam-Method: none
 X-KSE-AntiSpam-Rate: 59
@@ -57,10 +57,10 @@ X-KSE-AntiSpam-Info: {rep_avail}
 X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
 X-KSE-AntiSpam-Info: {relay has no DNS name}
 X-KSE-AntiSpam-Info: {SMTP from is not routable}
-X-KSE-AntiSpam-Info: {Found in DNSBL: 31.173.85.253 in (user)
- b.barracudacentral.org}
-X-KSE-AntiSpam-Info: d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2;omp.ru:7.1.1
-X-KSE-AntiSpam-Info: ApMailHostAddress: 31.173.85.253
+X-KSE-AntiSpam-Info: {Found in DNSBL: 178.176.72.94 in (user)
+ dbl.spamhaus.org}
+X-KSE-AntiSpam-Info: omp.ru:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;178.176.72.94:7.1.2;127.0.0.199:7.1.2
+X-KSE-AntiSpam-Info: ApMailHostAddress: 178.176.72.94
 X-KSE-AntiSpam-Info: {DNS response errors}
 X-KSE-AntiSpam-Info: Rate: 59
 X-KSE-AntiSpam-Info: Status: not_detected
@@ -70,10 +70,10 @@ X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
 X-KSE-Antiphishing-Info: Clean
 X-KSE-Antiphishing-ScanningType: Heuristic
 X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 02/12/2023 11:58:00
+X-KSE-Antiphishing-Bases: 02/12/2023 16:50:00
 X-KSE-AttachmentFiltering-Interceptor-Info: protection disabled
 X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 2/12/2023 9:38:00 AM
+X-KSE-Antivirus-Info: Clean, bases: 2/12/2023 1:40:00 PM
 X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
@@ -81,45 +81,13 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 On 2/11/23 5:42 PM, Ondrej Zary wrote:
 
-> Introduce module_pata_parport_driver macro and use it in protocol
-> drivers to reduce boilerplate code. Remove paride_(un)register
-> compatibility defines.
+> scratch parameter of log_adapter() is only used by bpck driver.
+> Remove it.
 > 
 > Signed-off-by: Ondrej Zary <linux@zary.sk>
-[...]
 
-> diff --git a/drivers/ata/pata_parport/bpck6.c b/drivers/ata/pata_parport/bpck6.c
-> index d897e2a28efe..3c358e66db25 100644
-> --- a/drivers/ata/pata_parport/bpck6.c
-> +++ b/drivers/ata/pata_parport/bpck6.c
-> @@ -245,23 +245,8 @@ static struct pi_protocol bpck6 = {
->  	.release_proto	= bpck6_release_proto,
->  };
->  
-> -static int __init bpck6_init(void)
-> -{
-> -	printk(KERN_INFO "bpck6: BACKPACK Protocol Driver V"BACKPACK_VERSION"\n");
-> -	printk(KERN_INFO "bpck6: Copyright 2001 by Micro Solutions, Inc., DeKalb IL. USA\n");
-> -	if(verbose)
-> -		printk(KERN_DEBUG "bpck6: verbose debug enabled.\n");
+Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
 
-   Hm, perhaps should've been removed in a separate patch?
-
-[...]
-> diff --git a/drivers/ata/pata_parport/epat.c b/drivers/ata/pata_parport/epat.c
-> index 6ce2dee7657f..eb72bcd0c8da 100644
-> --- a/drivers/ata/pata_parport/epat.c
-> +++ b/drivers/ata/pata_parport/epat.c
-> @@ -327,12 +327,12 @@ static int __init epat_init(void)
->  #ifdef CONFIG_PARIDE_EPATC8
-
-   Hm, this is now called PATA_PARPORT_EPATC8, no?
-
->  	epatc8 = 1;
-
-   Seems like a dead code?
-
->  #endif
 [...]
 
 MBR, Sergey
