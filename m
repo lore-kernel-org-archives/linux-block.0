@@ -2,83 +2,138 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC6A5C64ED6
-	for <linux-block@archiver.kernel.org>; Mon, 13 Feb 2023 11:17:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D2F2C636D7
+	for <linux-block@archiver.kernel.org>; Mon, 13 Feb 2023 11:54:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231159AbjBMLRD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 13 Feb 2023 06:17:03 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57614 "EHLO
+        id S229664AbjBMLys (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 13 Feb 2023 06:54:48 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33686 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230495AbjBMLRC (ORCPT
+        with ESMTP id S229632AbjBMLyr (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 13 Feb 2023 06:17:02 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 41EDF1817C
-        for <linux-block@vger.kernel.org>; Mon, 13 Feb 2023 03:15:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1676286946;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=I9EmbCIQfylwGelzNLd9AZZbwXGcom6ymeHxaQr8/bA=;
-        b=SvJhygRC7j2T7hbO9aXX2M4sa7C+7X0NYmYyEltzB0y2JXbHpkx6Evm0qDGhC5IB75nBtA
-        k/GU28dM6XsThLWNgw45oE1S/aRJGJF7RFJYhl+1rJGOcmiL2WRKd4cTe+DWocW4K916co
-        pyryY3BT4FTf3TftZdtONOmAVXl7riE=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-175--PrZZsNwMnSPcZWbh6Nu3Q-1; Mon, 13 Feb 2023 06:15:41 -0500
-X-MC-Unique: -PrZZsNwMnSPcZWbh6Nu3Q-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id AB65185CCE0;
-        Mon, 13 Feb 2023 11:15:40 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.33.36.24])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 94145492B03;
-        Mon, 13 Feb 2023 11:15:38 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <Y+oOa3bbJZallKtl@infradead.org>
-References: <Y+oOa3bbJZallKtl@infradead.org> <Y+n0n2UE8BQa/OwW@infradead.org> <20230209102954.528942-1-dhowells@redhat.com> <20230209102954.528942-4-dhowells@redhat.com> <1753989.1676283061@warthog.procyon.org.uk>
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     dhowells@redhat.com, Jens Axboe <axboe@kernel.dk>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>,
-        Jeff Layton <jlayton@kernel.org>,
-        David Hildenbrand <david@redhat.com>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        Hillf Danton <hdanton@sina.com>, linux-fsdevel@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, Christoph Hellwig <hch@lst.de>,
-        John Hubbard <jhubbard@nvidia.com>
-Subject: Re: [PATCH v13 03/12] splice: Do splice read from a buffered file without using ITER_PIPE
+        Mon, 13 Feb 2023 06:54:47 -0500
+Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 477051353E;
+        Mon, 13 Feb 2023 03:54:46 -0800 (PST)
+Received: by mail-wr1-f52.google.com with SMTP id k3so4268881wrv.5;
+        Mon, 13 Feb 2023 03:54:46 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1676289285;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=/CPeRKp2equzjPoiyGuI+L6sOY6qqv2wALvdLjuhPQM=;
+        b=EwFemcQDQCZlfLyVdosZqzCrGeshvRHluvCpG9ZDm4V35gQF9HnKHX/r+kahtPvCe0
+         cKJPSIXWCYOaSVmKY0qgWROGASkqFoVNM0RtKkOkzgvKPShkgdUyGix2nQlnOguzXIRu
+         YmQoTRz2mUaYjpbe/HQCzBfRdJ1jt2hRLj5IjeeoNmMfY/W6Sbm0DDsA5j7/66FbHYgx
+         eHDFxG/I2bUR8tWJTNnF8dYtyHYB87hB5MgrXjhlbRcSVWAHW/QVDn/5EZu+aMK8+ehy
+         hChYhQqXDXkqjjmFe0vEIn40NLZrmWjM1QuniMrRMGoNAwOBBcHfJvlZuGeHljmFddfr
+         aVtg==
+X-Gm-Message-State: AO0yUKUZ7PYJXFzCsf7KXswoEmW750/NhEFr42o6O155j6aBktO5hIw2
+        rqYLbdYShWQtyc5WtM4+GyQ=
+X-Google-Smtp-Source: AK7set+RjIvySbOj6M2sEO16NGkt3ThmcXKJoOTiWW3+yJEoE8M86yMRqBLAjsl4Qf9scHKo75kd8w==
+X-Received: by 2002:a5d:5151:0:b0:2c5:5b85:3b43 with SMTP id u17-20020a5d5151000000b002c55b853b43mr1001809wrt.7.1676289284693;
+        Mon, 13 Feb 2023 03:54:44 -0800 (PST)
+Received: from [192.168.64.80] (bzq-219-42-90.isdn.bezeqint.net. [62.219.42.90])
+        by smtp.gmail.com with ESMTPSA id f5-20020adff445000000b002c53f5b13f9sm10035471wrp.0.2023.02.13.03.54.43
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 13 Feb 2023 03:54:44 -0800 (PST)
+Message-ID: <79c1f876-d054-a8ed-8826-e3ad4f9903eb@grimberg.me>
+Date:   Mon, 13 Feb 2023 13:54:42 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <1830952.1676286937.1@warthog.procyon.org.uk>
-Date:   Mon, 13 Feb 2023 11:15:37 +0000
-Message-ID: <1830953.1676286937@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.7.1
+Subject: Re: [LSF/MM/BPF ATTEND][LSF/MM/BPF Topic] Non-block IO
+Content-Language: en-US
+To:     Jens Axboe <axboe@kernel.dk>, Kanchan Joshi <joshi.k@samsung.com>,
+        lsf-pc@lists.linux-foundation.org
+Cc:     linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+        io-uring@vger.kernel.org, hch@lst.de, kbusch@kernel.org,
+        ming.lei@redhat.com
+References: <CGME20230210180226epcas5p1bd2e1150de067f8af61de2bbf571594d@epcas5p1.samsung.com>
+ <20230210180033.321377-1-joshi.k@samsung.com>
+ <39a543d7-658c-0309-7a68-f07ffe850d0e@kernel.dk>
+From:   Sagi Grimberg <sagi@grimberg.me>
+In-Reply-To: <39a543d7-658c-0309-7a68-f07ffe850d0e@kernel.dk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Christoph Hellwig <hch@infradead.org> wrote:
 
-> > > Also why doesn't this use init_sync_kiocb?
-> > 
-> > I'm not sure I want ki_flags.
+
+On 2/10/23 21:53, Jens Axboe wrote:
+> On 2/10/23 11:00?AM, Kanchan Joshi wrote:
+>> is getting more common than it used to be.
+>> NVMe is no longer tied to block storage. Command sets in NVMe 2.0 spec
+>> opened an excellent way to present non-block interfaces to the Host. ZNS
+>> and KV came along with it, and some new command sets are emerging.
+>>
+>> OTOH, Kernel IO advances historically centered around the block IO path.
+>> Passthrough IO path existed, but it stayed far from all the advances, be
+>> it new features or performance.
+>>
+>> Current state & discussion points:
+>> ---------------------------------
+>> Status-quo changed in the recent past with the new passthrough path (ng
+>> char interface + io_uring command). Feature parity does not exist, but
+>> performance parity does.
+>> Adoption draws asks. I propose a session covering a few voices and
+>> finding a path-forward for some ideas too.
+>>
+>> 1. Command cancellation: while NVMe mandatorily supports the abort
+>> command, we do not have a way to trigger that from user-space. There
+>> are ways to go about it (with or without the uring-cancel interface) but
+>> not without certain tradeoffs. It will be good to discuss the choices in
+>> person.
+
+This would require some rework of how the driver handles aborts today.
+I'm unsure what the cancellation guarantees that io_uring provides, but
+need to understand if it fits with the guarantees that nvme provides.
+
+It is also unclear to me how this would work if different namespaces
+are handed to different users, and have them all submit aborts on
+the admin queue. How do you even differentiate which user sent which
+command?
+
+>>
+>> 2. Cgroups: works for only block dev at the moment. Are there outright
+>> objections to extending this to char-interface IO?
+>>
+>> 3. DMA cost: is high in presence of IOMMU. Keith posted the work[1],
+>> with block IO path, last year. I imagine plumbing to get a bit simpler
+>> with passthrough-only support. But what are the other things that must
+>> be sorted out to have progress on moving DMA cost out of the fast path?
 > 
-> Why?
+> Yeah, this one is still pending... Would be nice to make some progress
+> there at some point.
+> 
+>> 4. Direct NVMe queues - will there be interest in having io_uring
+>> managed NVMe queues?  Sort of a new ring, for which I/O is destaged from
+>> io_uring SQE to NVMe SQE without having to go through intermediate
+>> constructs (i.e., bio/request). Hopefully,that can further amp up the
+>> efficiency of IO.
+> 
+> This is interesting, and I've pondered something like that before too. I
+> think it's worth investigating and hacking up a prototype. I recently
+> had one user of IOPOLL assume that setting up a ring with IOPOLL would
+> automatically create a polled queue on the driver side and that is what
+> would be used for IO. And while that's not how it currently works, it
+> definitely does make sense and we could make some things faster like
+> that.
 
-I'm not sure I want ki_flags setting from f_iocb_flags I should've said.  I'm
-not sure how the IOCB_* flags that I import from there will affect the
-operation of the synchronous read splice.  IOCB_NOWAIT, for example, or, for
-that matter, IOCB_APPEND.
+I also think it can makes sense, I'd use it if it was available.
+Though io_uring may need to abstract the fact that the device may be
+limited on the number of queues it supports, also this would need to be
+an interface needed from the driver that would need to understand how to
+coordinate controller reset/teardown in the presence of "alien" queues.
 
-David
+  It would also potentially easier enable cancelation referenced in
+> #1 above, if it's restricted to the queue(s) that the ring "owns".
+> 
 
+That could be a potential enforcement, correlating the command with
+the dedicated queue. Still feels dangerous because if admin abort(s)
+time out the driver really needs to reset the entire controller...
+So it is not really "isolated" when it comes to aborts/cancellations.
