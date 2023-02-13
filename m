@@ -2,42 +2,42 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 51650C636CC
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BF848C6379F
 	for <linux-block@archiver.kernel.org>; Mon, 13 Feb 2023 13:48:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230338AbjBMNsD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 13 Feb 2023 08:48:03 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49368 "EHLO
+        id S229603AbjBMNsE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 13 Feb 2023 08:48:04 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49356 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229603AbjBMNsB (ORCPT
+        with ESMTP id S230280AbjBMNsB (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Mon, 13 Feb 2023 08:48:01 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 731391ADEF
-        for <linux-block@vger.kernel.org>; Mon, 13 Feb 2023 05:46:36 -0800 (PST)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 46D111ADD9
+        for <linux-block@vger.kernel.org>; Mon, 13 Feb 2023 05:46:33 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1676295995;
+        s=mimecast20190719; t=1676295992;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=v3dWdulFMkC02AM2jYIVI6FYFE9HkcrX92HlV1c4tO4=;
-        b=bRdSMT15+IY00qlUBiFg5kcXCheLN2+gYlrnH/Cv8fI0hcelZXsA96fOeL/qua7lSab/PF
-        lqkQdOBYn3QQueE1b7JAL2ek2drotmd59fvOIgDl/UcUBr5sbyqC3IonXB0B5HP/GYUjJ4
-        nLH0YqQS3dhxDFNRIkInamQvvVWt5nk=
+        bh=Nvl8+FROX68UViRruMCdGgXgWsaTBkOPXdZwOet0pQY=;
+        b=aCgPqUc8cO2iel1mn9sznB0epdXZxv6FMa98KT7yVPkmqEDDe2aBIuUQnKbVww6BhDjI2Y
+        mx7vO4MBdyUnveiI6XoMTPjtgLlr/rywivoYFNiGGfF4tlZ6IJJ1IAGk1mAkqPSOyW5LaQ
+        jGOzT98gJbXwuqZ5s8BMpad4MsFeoEc=
 Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
  [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-510-H46sO8NjN5-GuV9-iHBZng-1; Mon, 13 Feb 2023 08:46:34 -0500
-X-MC-Unique: H46sO8NjN5-GuV9-iHBZng-1
+ us-mta-447-Qzx4kRCYOYyoMJ2DNcD_ow-1; Mon, 13 Feb 2023 08:46:29 -0500
+X-MC-Unique: Qzx4kRCYOYyoMJ2DNcD_ow-1
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id D32F1885620;
-        Mon, 13 Feb 2023 13:46:33 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id A0EAF857AA4;
+        Mon, 13 Feb 2023 13:46:28 +0000 (UTC)
 Received: from warthog.procyon.org.uk (unknown [10.33.36.24])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id E0CB7C16022;
-        Mon, 13 Feb 2023 13:46:31 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id A5926C16022;
+        Mon, 13 Feb 2023 13:46:26 +0000 (UTC)
 From:   David Howells <dhowells@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>, Al Viro <viro@zeniv.linux.org.uk>,
         Christoph Hellwig <hch@infradead.org>
@@ -51,9 +51,9 @@ Cc:     David Howells <dhowells@redhat.com>,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-mm@kvack.org, Christoph Hellwig <hch@lst.de>,
         John Hubbard <jhubbard@nvidia.com>
-Subject: [PATCH 4/4] splice: Move filemap_read_splice() to mm/filemap.c
-Date:   Mon, 13 Feb 2023 13:46:19 +0000
-Message-Id: <20230213134619.2198965-5-dhowells@redhat.com>
+Subject: [PATCH 2/4] splice: Provide pipe_head_buf() helper
+Date:   Mon, 13 Feb 2023 13:46:17 +0000
+Message-Id: <20230213134619.2198965-3-dhowells@redhat.com>
 In-Reply-To: <20230213134619.2198965-1-dhowells@redhat.com>
 References: <20230213134619.2198965-1-dhowells@redhat.com>
 MIME-Version: 1.0
@@ -63,8 +63,9 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Move filemap_read_splice() to mm/filemap.c and make filemap_get_pages()
-static again.
+Provide a helper, pipe_head_buf(), to get the current head buffer from a
+pipe.  Implement this as a wrapper around a more general function,
+pipe_buf(), that gets a specified buffer.
 
 Requested-by: Christoph Hellwig <hch@lst.de>
 Signed-off-by: David Howells <dhowells@redhat.com>
@@ -78,340 +79,83 @@ cc: linux-block@vger.kernel.org
 cc: linux-fsdevel@vger.kernel.org
 cc: linux-mm@kvack.org
 ---
- fs/splice.c             | 128 -------------------------------------
- include/linux/pagemap.h |   2 -
- include/linux/splice.h  |   4 ++
- mm/filemap.c            | 138 ++++++++++++++++++++++++++++++++++++++--
- 4 files changed, 136 insertions(+), 136 deletions(-)
+ fs/splice.c               |  9 +++------
+ include/linux/pipe_fs_i.h | 20 ++++++++++++++++++++
+ 2 files changed, 23 insertions(+), 6 deletions(-)
 
 diff --git a/fs/splice.c b/fs/splice.c
-index 8b2a9d963bc4..341cd8fb47a8 100644
+index 91b9e2cb9e03..7c0ff187f87a 100644
 --- a/fs/splice.c
 +++ b/fs/splice.c
-@@ -375,134 +375,6 @@ static ssize_t direct_splice_read(struct file *in, loff_t *ppos,
- 	return ret;
- }
+@@ -295,7 +295,6 @@ static ssize_t direct_splice_read(struct file *in, loff_t *ppos,
+ 	struct bio_vec *bv;
+ 	struct kiocb kiocb;
+ 	struct page **pages;
+-	unsigned int head;
+ 	ssize_t ret;
+ 	size_t used, npages, chunk, remain, reclaim;
+ 	int i;
+@@ -358,9 +357,8 @@ static ssize_t direct_splice_read(struct file *in, loff_t *ppos,
+ 	}
  
--/*
-- * Splice subpages from a folio into a pipe.
-- */
--static size_t splice_folio_into_pipe(struct pipe_inode_info *pipe,
--				     struct folio *folio,
--				     loff_t fpos, size_t size)
--{
--	struct page *page;
--	size_t spliced = 0, offset = offset_in_folio(folio, fpos);
--
--	page = folio_page(folio, offset / PAGE_SIZE);
--	size = min(size, folio_size(folio) - offset);
--	offset %= PAGE_SIZE;
--
--	while (spliced < size &&
--	       !pipe_full(pipe->head, pipe->tail, pipe->max_usage)) {
--		struct pipe_buffer *buf = pipe_head_buf(pipe);
--		size_t part = min_t(size_t, PAGE_SIZE - offset, size - spliced);
--
--		*buf = (struct pipe_buffer) {
--			.ops	= &page_cache_pipe_buf_ops,
--			.page	= page,
--			.offset	= offset,
--			.len	= part,
--		};
--		folio_get(folio);
--		pipe->head++;
--		page++;
--		spliced += part;
--		offset = 0;
--	}
--
--	return spliced;
--}
--
--/*
-- * Splice folios from the pagecache of a buffered (ie. non-O_DIRECT) file into
-- * a pipe.
-- */
--static ssize_t filemap_splice_read(struct file *in, loff_t *ppos,
--				   struct pipe_inode_info *pipe,
--				   size_t len, unsigned int flags)
--{
--	struct folio_batch fbatch;
--	struct kiocb iocb;
--	size_t total_spliced = 0, used, npages;
--	loff_t isize, end_offset;
--	bool writably_mapped;
--	int i, error = 0;
--
--	init_sync_kiocb(&iocb, in);
--	iocb.ki_pos = *ppos;
--	iocb.ki_flags &= IOCB_NOWAIT;
--
--	/* Work out how much data we can actually add into the pipe */
--	used = pipe_occupancy(pipe->head, pipe->tail);
--	npages = max_t(ssize_t, pipe->max_usage - used, 0);
--	len = min_t(size_t, len, npages * PAGE_SIZE);
--
--	folio_batch_init(&fbatch);
--
--	do {
--		cond_resched();
--
--		if (*ppos >= i_size_read(file_inode(in)))
--			break;
--
--		iocb.ki_pos = *ppos;
--		error = filemap_get_pages(&iocb, len, &fbatch, true);
--		if (error < 0)
--			break;
--
--		/*
--		 * i_size must be checked after we know the pages are Uptodate.
--		 *
--		 * Checking i_size after the check allows us to calculate
--		 * the correct value for "nr", which means the zero-filled
--		 * part of the page is not copied back to userspace (unless
--		 * another truncate extends the file - this is desired though).
--		 */
--		isize = i_size_read(file_inode(in));
--		if (unlikely(*ppos >= isize))
--			break;
--		end_offset = min_t(loff_t, isize, *ppos + len);
--
--		/*
--		 * Once we start copying data, we don't want to be touching any
--		 * cachelines that might be contended:
--		 */
--		writably_mapped = mapping_writably_mapped(in->f_mapping);
--
--		for (i = 0; i < folio_batch_count(&fbatch); i++) {
--			struct folio *folio = fbatch.folios[i];
--			size_t n;
--
--			if (folio_pos(folio) >= end_offset)
--				goto out;
--			folio_mark_accessed(folio);
--
--			/*
--			 * If users can be writing to this folio using arbitrary
--			 * virtual addresses, take care of potential aliasing
--			 * before reading the folio on the kernel side.
--			 */
--			if (writably_mapped)
--				flush_dcache_folio(folio);
--
--			n = splice_folio_into_pipe(pipe, folio, *ppos, len);
--			if (!n)
--				goto out;
--			len -= n;
--			total_spliced += n;
--			*ppos += n;
--			in->f_ra.prev_pos = *ppos;
--			if (pipe_full(pipe->head, pipe->tail, pipe->max_usage))
--				goto out;
--		}
--
--		folio_batch_release(&fbatch);
--	} while (len);
--
--out:
--	folio_batch_release(&fbatch);
--	file_accessed(in);
--
--	return total_spliced ? total_spliced : error;
--}
--
- /**
-  * generic_file_splice_read - splice data from file to a pipe
-  * @in:		file to splice from
-diff --git a/include/linux/pagemap.h b/include/linux/pagemap.h
-index 3a7bdb35acff..29e1f9e76eb6 100644
---- a/include/linux/pagemap.h
-+++ b/include/linux/pagemap.h
-@@ -748,8 +748,6 @@ struct page *read_cache_page(struct address_space *, pgoff_t index,
- 		filler_t *filler, struct file *file);
- extern struct page * read_cache_page_gfp(struct address_space *mapping,
- 				pgoff_t index, gfp_t gfp_mask);
--int filemap_get_pages(struct kiocb *iocb, size_t count,
--		      struct folio_batch *fbatch, bool need_uptodate);
- 
- static inline struct page *read_mapping_page(struct address_space *mapping,
- 				pgoff_t index, struct file *file)
-diff --git a/include/linux/splice.h b/include/linux/splice.h
-index a55179fd60fc..691c44ef5c0b 100644
---- a/include/linux/splice.h
-+++ b/include/linux/splice.h
-@@ -67,6 +67,10 @@ typedef int (splice_actor)(struct pipe_inode_info *, struct pipe_buffer *,
- typedef int (splice_direct_actor)(struct pipe_inode_info *,
- 				  struct splice_desc *);
- 
-+ssize_t filemap_splice_read(struct file *in, loff_t *ppos,
-+			    struct pipe_inode_info *pipe,
-+			    size_t len, unsigned int flags);
-+
- extern ssize_t splice_from_pipe(struct pipe_inode_info *, struct file *,
- 				loff_t *, size_t, unsigned int,
- 				splice_actor *);
-diff --git a/mm/filemap.c b/mm/filemap.c
-index 6970be64a3e0..963602671fee 100644
---- a/mm/filemap.c
-+++ b/mm/filemap.c
-@@ -42,6 +42,8 @@
- #include <linux/ramfs.h>
- #include <linux/page_idle.h>
- #include <linux/migrate.h>
-+#include <linux/pipe_fs_i.h>
-+#include <linux/splice.h>
- #include <asm/pgalloc.h>
- #include <asm/tlbflush.h>
- #include "internal.h"
-@@ -2576,12 +2578,8 @@ static int filemap_readahead(struct kiocb *iocb, struct file *file,
- 	return 0;
- }
- 
--/*
-- * Extract some folios from the pagecache of a file, reading those pages from
-- * the backing store if necessary and waiting for them.
-- */
--int filemap_get_pages(struct kiocb *iocb, size_t count,
--		      struct folio_batch *fbatch, bool need_uptodate)
-+static int filemap_get_pages(struct kiocb *iocb, size_t count,
-+		struct folio_batch *fbatch, bool need_uptodate)
- {
- 	struct file *filp = iocb->ki_filp;
- 	struct address_space *mapping = filp->f_mapping;
-@@ -2845,6 +2843,134 @@ generic_file_read_iter(struct kiocb *iocb, struct iov_iter *iter)
- }
- EXPORT_SYMBOL(generic_file_read_iter);
- 
-+/*
-+ * Splice subpages from a folio into a pipe.
-+ */
-+static size_t splice_folio_into_pipe(struct pipe_inode_info *pipe,
-+				     struct folio *folio,
-+				     loff_t fpos, size_t size)
-+{
-+	struct page *page;
-+	size_t spliced = 0, offset = offset_in_folio(folio, fpos);
-+
-+	page = folio_page(folio, offset / PAGE_SIZE);
-+	size = min(size, folio_size(folio) - offset);
-+	offset %= PAGE_SIZE;
-+
-+	while (spliced < size &&
-+	       !pipe_full(pipe->head, pipe->tail, pipe->max_usage)) {
+ 	/* Push the remaining pages into the pipe. */
+-	head = pipe->head;
+ 	for (i = 0; i < npages; i++) {
+-		struct pipe_buffer *buf = &pipe->bufs[head & (pipe->ring_size - 1)];
 +		struct pipe_buffer *buf = pipe_head_buf(pipe);
-+		size_t part = min_t(size_t, PAGE_SIZE - offset, size - spliced);
-+
-+		*buf = (struct pipe_buffer) {
-+			.ops	= &page_cache_pipe_buf_ops,
-+			.page	= page,
-+			.offset	= offset,
-+			.len	= part,
-+		};
-+		folio_get(folio);
+ 
+ 		chunk = min_t(size_t, remain, PAGE_SIZE);
+ 		*buf = (struct pipe_buffer) {
+@@ -369,10 +367,9 @@ static ssize_t direct_splice_read(struct file *in, loff_t *ppos,
+ 			.offset	= 0,
+ 			.len	= chunk,
+ 		};
+-		head++;
 +		pipe->head++;
-+		page++;
-+		spliced += part;
-+		offset = 0;
-+	}
-+
-+	return spliced;
-+}
-+
-+/*
-+ * Splice folios from the pagecache of a buffered (ie. non-O_DIRECT) file into
-+ * a pipe.
+ 		remain -= chunk;
+ 	}
+-	pipe->head = head;
+ 
+ 	kfree(bv);
+ 	return ret;
+@@ -394,7 +391,7 @@ static size_t splice_folio_into_pipe(struct pipe_inode_info *pipe,
+ 
+ 	while (spliced < size &&
+ 	       !pipe_full(pipe->head, pipe->tail, pipe->max_usage)) {
+-		struct pipe_buffer *buf = &pipe->bufs[pipe->head & (pipe->ring_size - 1)];
++		struct pipe_buffer *buf = pipe_head_buf(pipe);
+ 		size_t part = min_t(size_t, PAGE_SIZE - offset, size - spliced);
+ 
+ 		*buf = (struct pipe_buffer) {
+diff --git a/include/linux/pipe_fs_i.h b/include/linux/pipe_fs_i.h
+index 6cb65df3e3ba..d2c3f16cf6b1 100644
+--- a/include/linux/pipe_fs_i.h
++++ b/include/linux/pipe_fs_i.h
+@@ -156,6 +156,26 @@ static inline bool pipe_full(unsigned int head, unsigned int tail,
+ 	return pipe_occupancy(head, tail) >= limit;
+ }
+ 
++/**
++ * pipe_buf - Return the pipe buffer for the specified slot in the pipe ring
++ * @pipe: The pipe to access
++ * @slot: The slot of interest
 + */
-+ssize_t filemap_splice_read(struct file *in, loff_t *ppos,
-+			    struct pipe_inode_info *pipe,
-+			    size_t len, unsigned int flags)
++static inline struct pipe_buffer *pipe_buf(const struct pipe_inode_info *pipe,
++					   unsigned int slot)
 +{
-+	struct folio_batch fbatch;
-+	struct kiocb iocb;
-+	size_t total_spliced = 0, used, npages;
-+	loff_t isize, end_offset;
-+	bool writably_mapped;
-+	int i, error = 0;
-+
-+	init_sync_kiocb(&iocb, in);
-+	iocb.ki_pos = *ppos;
-+	iocb.ki_flags &= IOCB_NOWAIT;
-+
-+	/* Work out how much data we can actually add into the pipe */
-+	used = pipe_occupancy(pipe->head, pipe->tail);
-+	npages = max_t(ssize_t, pipe->max_usage - used, 0);
-+	len = min_t(size_t, len, npages * PAGE_SIZE);
-+
-+	folio_batch_init(&fbatch);
-+
-+	do {
-+		cond_resched();
-+
-+		if (*ppos >= i_size_read(file_inode(in)))
-+			break;
-+
-+		iocb.ki_pos = *ppos;
-+		error = filemap_get_pages(&iocb, len, &fbatch, true);
-+		if (error < 0)
-+			break;
-+
-+		/*
-+		 * i_size must be checked after we know the pages are Uptodate.
-+		 *
-+		 * Checking i_size after the check allows us to calculate
-+		 * the correct value for "nr", which means the zero-filled
-+		 * part of the page is not copied back to userspace (unless
-+		 * another truncate extends the file - this is desired though).
-+		 */
-+		isize = i_size_read(file_inode(in));
-+		if (unlikely(*ppos >= isize))
-+			break;
-+		end_offset = min_t(loff_t, isize, *ppos + len);
-+
-+		/*
-+		 * Once we start copying data, we don't want to be touching any
-+		 * cachelines that might be contended:
-+		 */
-+		writably_mapped = mapping_writably_mapped(in->f_mapping);
-+
-+		for (i = 0; i < folio_batch_count(&fbatch); i++) {
-+			struct folio *folio = fbatch.folios[i];
-+			size_t n;
-+
-+			if (folio_pos(folio) >= end_offset)
-+				goto out;
-+			folio_mark_accessed(folio);
-+
-+			/*
-+			 * If users can be writing to this folio using arbitrary
-+			 * virtual addresses, take care of potential aliasing
-+			 * before reading the folio on the kernel side.
-+			 */
-+			if (writably_mapped)
-+				flush_dcache_folio(folio);
-+
-+			n = splice_folio_into_pipe(pipe, folio, *ppos, len);
-+			if (!n)
-+				goto out;
-+			len -= n;
-+			total_spliced += n;
-+			*ppos += n;
-+			in->f_ra.prev_pos = *ppos;
-+			if (pipe_full(pipe->head, pipe->tail, pipe->max_usage))
-+				goto out;
-+		}
-+
-+		folio_batch_release(&fbatch);
-+	} while (len);
-+
-+out:
-+	folio_batch_release(&fbatch);
-+	file_accessed(in);
-+
-+	return total_spliced ? total_spliced : error;
++	return &pipe->bufs[slot & (pipe->ring_size - 1)];
 +}
 +
- static inline loff_t folio_seek_hole_data(struct xa_state *xas,
- 		struct address_space *mapping, struct folio *folio,
- 		loff_t start, loff_t end, bool seek_data)
++/**
++ * pipe_head_buf - Return the pipe buffer at the head of the pipe ring
++ * @pipe: The pipe to access
++ */
++static inline struct pipe_buffer *pipe_head_buf(const struct pipe_inode_info *pipe)
++{
++	return pipe_buf(pipe, pipe->head);
++}
++
+ /**
+  * pipe_buf_get - get a reference to a pipe_buffer
+  * @pipe:	the pipe that the buffer belongs to
 
