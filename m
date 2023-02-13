@@ -2,154 +2,89 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 88677C64EC7
-	for <linux-block@archiver.kernel.org>; Mon, 13 Feb 2023 20:09:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EACFEC6379F
+	for <linux-block@archiver.kernel.org>; Mon, 13 Feb 2023 20:25:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229815AbjBMUJB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 13 Feb 2023 15:09:01 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45114 "EHLO
+        id S231289AbjBMUZG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 13 Feb 2023 15:25:06 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57644 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229615AbjBMUJA (ORCPT
+        with ESMTP id S230047AbjBMUZB (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 13 Feb 2023 15:09:00 -0500
-Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B60A1CF65;
-        Mon, 13 Feb 2023 12:08:58 -0800 (PST)
-Received: from [192.168.1.103] (178.176.72.240) by msexch01.omp.ru
- (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.986.14; Mon, 13 Feb
- 2023 23:08:48 +0300
-Subject: Re: [PATCH 05/12] pata_parport: remove typedef struct PIA
-To:     Ondrej Zary <linux@zary.sk>,
-        Damien Le Moal <damien.lemoal@opensource.wdc.com>
-CC:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        Tim Waugh <tim@cyberelk.net>, <linux-block@vger.kernel.org>,
-        <linux-parport@lists.infradead.org>, <linux-ide@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>
-References: <20230211144232.15138-1-linux@zary.sk>
- <20230211144232.15138-6-linux@zary.sk>
-From:   Sergey Shtylyov <s.shtylyov@omp.ru>
-Organization: Open Mobile Platform
-Message-ID: <cab6cec4-1a3a-ed15-ddd1-8b51def4f53e@omp.ru>
-Date:   Mon, 13 Feb 2023 23:08:48 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+        Mon, 13 Feb 2023 15:25:01 -0500
+Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com [209.85.216.53])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3B304498;
+        Mon, 13 Feb 2023 12:24:56 -0800 (PST)
+Received: by mail-pj1-f53.google.com with SMTP id f16-20020a17090a9b1000b0023058bbd7b2so13426822pjp.0;
+        Mon, 13 Feb 2023 12:24:56 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=jeoNHRdTi75bvN7yIK3qjR8vRNZkI9OKUG3gsroE1Cs=;
+        b=hkb8X/KKUQWDyAtgfI6n53B503K0lTcuG+H2qWInkGzWs0p5pn9seTKLSLI4ich8Ac
+         wEleidfsl0o+jsfD7TGbOaf3PHj6PekXkQgf8CCOwWCATP7mvKD1kPDGgZUiP1r4ClJF
+         9pTGdZa5kCUtgAEoGgkZDUaAYOOIFZjLlSZ4CYud74OicCGXqjpodnn0eRvX2vm0TQZM
+         hpqOYFfTO4VmWnTekv3oFtnUKP66Y5eGBKjS9YHT7/yDo6+WQ1J24T4y+/UaqDttLZGS
+         EK0r2f1UlD1maOeI1FnZvm6a+6SzDvyNG5FqgoFv+SigvnOWXVAEneu9pEMJvfnJhrfx
+         i9cw==
+X-Gm-Message-State: AO0yUKUElpQ3mWeF2cjvqhD87xe++IfneStUCDSq/SIGIkO3BSGEEE3y
+        CbX71BWXlP2kYnzrheQQJrM=
+X-Google-Smtp-Source: AK7set8spO+RK9kUMn3B8mnPoUYkvSz0i20QutEqmbE0WX0LAzgs+gTQ6F8WD1wPrvXw2DamckMIhA==
+X-Received: by 2002:a17:903:32c6:b0:19a:9686:ea87 with SMTP id i6-20020a17090332c600b0019a9686ea87mr115904plr.55.1676319895980;
+        Mon, 13 Feb 2023 12:24:55 -0800 (PST)
+Received: from ?IPV6:2620:15c:211:201:dc5c:7c61:93f2:3d3d? ([2620:15c:211:201:dc5c:7c61:93f2:3d3d])
+        by smtp.gmail.com with ESMTPSA id c3-20020a170902d48300b0018544ad1e8esm8663247plg.238.2023.02.13.12.24.54
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 13 Feb 2023 12:24:54 -0800 (PST)
+Message-ID: <d69f0203-2eff-e2c2-0a6c-ed341bdb1896@acm.org>
+Date:   Mon, 13 Feb 2023 12:24:53 -0800
 MIME-Version: 1.0
-In-Reply-To: <20230211144232.15138-6-linux@zary.sk>
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.6.0
+Subject: Re: [LSF/MM/BPF ATTEND][LSF/MM/BPF Topic] Non-block IO
 Content-Language: en-US
+To:     Kanchan Joshi <joshi.k@samsung.com>
+Cc:     lsf-pc@lists.linux-foundation.org, linux-block@vger.kernel.org,
+        linux-nvme@lists.infradead.org, io-uring@vger.kernel.org,
+        axboe@kernel.dk, hch@lst.de, kbusch@kernel.org, ming.lei@redhat.com
+References: <CGME20230210180226epcas5p1bd2e1150de067f8af61de2bbf571594d@epcas5p1.samsung.com>
+ <20230210180033.321377-1-joshi.k@samsung.com>
+ <69443f85-5e16-e3db-23e9-caf915881c92@acm.org> <20230210193459.GA9184@green5>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20230210193459.GA9184@green5>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [178.176.72.240]
-X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
- (10.188.4.12)
-X-KSE-ServerInfo: msexch01.omp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 5.9.59, Database issued on: 02/13/2023 19:50:32
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 59
-X-KSE-AntiSpam-Info: Lua profiles 175483 [Feb 13 2023]
-X-KSE-AntiSpam-Info: Version: 5.9.59.0
-X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
-X-KSE-AntiSpam-Info: LuaCore: 504 504 dc137e1f9c062eb6c0671e7d509ab442ae395562
-X-KSE-AntiSpam-Info: {rep_avail}
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info: {relay has no DNS name}
-X-KSE-AntiSpam-Info: {SMTP from is not routable}
-X-KSE-AntiSpam-Info: {Found in DNSBL: 178.176.72.240 in (user)
- b.barracudacentral.org}
-X-KSE-AntiSpam-Info: {Found in DNSBL: 178.176.72.240 in (user)
- dbl.spamhaus.org}
-X-KSE-AntiSpam-Info: 127.0.0.199:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;omp.ru:7.1.1
-X-KSE-AntiSpam-Info: ApMailHostAddress: 178.176.72.240
-X-KSE-AntiSpam-Info: {DNS response errors}
-X-KSE-AntiSpam-Info: Rate: 59
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
- smtp.mailfrom=omp.ru;dkim=none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Heuristic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 02/13/2023 19:52:00
-X-KSE-AttachmentFiltering-Interceptor-Info: protection disabled
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 2/13/2023 6:59:00 PM
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2/11/23 5:42 PM, Ondrej Zary wrote:
+On 2/10/23 11:34, Kanchan Joshi wrote:
+> On Fri, Feb 10, 2023 at 10:18:08AM -0800, Bart Van Assche wrote:
+>> On 2/10/23 10:00, Kanchan Joshi wrote:
+>>> 3. DMA cost: is high in presence of IOMMU. Keith posted the work[1],
+>>> with block IO path, last year. I imagine plumbing to get a bit simpler
+>>> with passthrough-only support. But what are the other things that must
+>>> be sorted out to have progress on moving DMA cost out of the fast path?
+>>
+>> Are performance numbers available?
+> 
+> Around 55% decline when I checked last (6.1-rcX kernel).
+> 512b randread IOPS with optane, on AMD ryzen 9 box -
+> when iommu is set to lazy (default config)= 3.1M
+> when iommmu is disabled or in passthrough mode = 4.9M
 
-> Remove typedef struct PIA and use struct pi_adapter directly.
+Hi Kanchan,
 
-   Prolly worth mentioning that you drop the spaces in the parameter lists
-while at it...
+Thank you for having shared these numbers. More information would be 
+welcome, e.g. the latency impact on a QD=1 test of the IOMMU, the queue 
+depth of the test results mentioned above and also how much additional 
+CPU time is needed with the IOMMU enabled. I'm wondering whether the 
+IOMMU cost is dominated by the IOMMU hardware or by software bottlenecks 
+(e.g. spinlocks).
 
-> Signed-off-by: Ondrej Zary <linux@zary.sk>
+Thanks,
 
-Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
+Bart.
 
-   Had some comments tho...
-
-[...]
-> diff --git a/drivers/ata/pata_parport/fit2.c b/drivers/ata/pata_parport/fit2.c
-> index 28de8e4e41c3..020c93dea362 100644
-> --- a/drivers/ata/pata_parport/fit2.c
-> +++ b/drivers/ata/pata_parport/fit2.c
-> @@ -37,13 +37,13 @@ devices.
->  
->  */
->  
-> -static void  fit2_write_regr( PIA *pi, int cont, int regr, int val)
-> +static void  fit2_write_regr(struct pi_adapter *pi, int cont, int regr, int val)
-
-   Could also kill an extra space after *void*...
-
-[...]
-> diff --git a/drivers/ata/pata_parport/fit3.c b/drivers/ata/pata_parport/fit3.c
-> index 0366f3123508..03f314ad5ee7 100644
-> --- a/drivers/ata/pata_parport/fit3.c
-> +++ b/drivers/ata/pata_parport/fit3.c
-> @@ -39,7 +39,7 @@
->  
->  */
->  
-> -static void  fit3_write_regr( PIA *pi, int cont, int regr, int val)
-> +static void  fit3_write_regr(struct pi_adapter *pi, int cont, int regr, int val)
-
-   Here as well...
-
-[...]
-> diff --git a/drivers/ata/pata_parport/kbic.c b/drivers/ata/pata_parport/kbic.c
-> index 9a99b9e35d41..e065f8367716 100644
-> --- a/drivers/ata/pata_parport/kbic.c
-> +++ b/drivers/ata/pata_parport/kbic.c
-[...]
-> @@ -72,7 +72,7 @@ static int kbic_read_regr( PIA *pi, int cont, int regr )
->  	return -1;
->  }       
->  
-> -static void  kbic_write_regr( PIA *pi, int cont, int regr, int val)
-> +static void  kbic_write_regr(struct pi_adapter *pi, int cont, int regr, int val)
-
-   And here...
-
-[...]
-> diff --git a/drivers/ata/pata_parport/ktti.c b/drivers/ata/pata_parport/ktti.c
-> index d87eb3c139bc..bddd13b4801f 100644
-> --- a/drivers/ata/pata_parport/ktti.c
-> +++ b/drivers/ata/pata_parport/ktti.c
-> @@ -29,7 +29,7 @@
->  
->  static int  cont_map[2] = { 0x10, 0x08 };
->  
-> -static void  ktti_write_regr( PIA *pi, int cont, int regr, int val)
-> +static void  ktti_write_regr(struct pi_adapter *pi, int cont, int regr, int val)
-
-   And here...
-
-[...] 
-
-MBR, Sergey
