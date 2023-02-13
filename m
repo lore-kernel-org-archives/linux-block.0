@@ -2,125 +2,85 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A7C35C636D4
-	for <linux-block@archiver.kernel.org>; Mon, 13 Feb 2023 17:05:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 642FDC636CC
+	for <linux-block@archiver.kernel.org>; Mon, 13 Feb 2023 17:10:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229999AbjBMRFB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 13 Feb 2023 12:05:01 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55976 "EHLO
+        id S230236AbjBMRKd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 13 Feb 2023 12:10:33 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60156 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229918AbjBMRE6 (ORCPT
+        with ESMTP id S229802AbjBMRKc (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 13 Feb 2023 12:04:58 -0500
-Received: from mail-il1-x131.google.com (mail-il1-x131.google.com [IPv6:2607:f8b0:4864:20::131])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85C741E9F0
-        for <linux-block@vger.kernel.org>; Mon, 13 Feb 2023 09:04:56 -0800 (PST)
-Received: by mail-il1-x131.google.com with SMTP id n2so5433110ili.11
-        for <linux-block@vger.kernel.org>; Mon, 13 Feb 2023 09:04:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=/vgCGFkrQwcp/7jPx+PdVEy8B0KpHLcBmVE/3aSXGL0=;
-        b=0Up9q+rtS4ekW744Yp+SKLSPhEYbbmzoeNX7HtHa6nB/W3vmkqNHtEjDtXJnxq268p
-         WwPoBNu0h/3N7pYDeeiy5Rgw91FcAzGMhvGRuJVzbf54Hoo81DtAyDQWk1TfI6YA3Tnv
-         CGAF8rkvn3JdTC4ugT0/wu1gifN8sOG9SlmYwbA+UNj0MsrHkP25N3/Vw7/SZkI3Wwau
-         vETaQjDeorwX5qhpWyGB9iLf0CGF3n66W9/RbGTlzHoLulQhZV3beSSR/r0juaCcqhBz
-         Q/RRTm8NcqdnG2+EVjBu2QDVXbDqyxXvckxMl5aWKTnf7jVx/n/sGkDaRWKOqLIb5zez
-         uOLg==
+        Mon, 13 Feb 2023 12:10:32 -0500
+Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68ABF6E98;
+        Mon, 13 Feb 2023 09:10:31 -0800 (PST)
+Received: by mail-pj1-f44.google.com with SMTP id oa11-20020a17090b1bcb00b002341a2656e5so1345255pjb.1;
+        Mon, 13 Feb 2023 09:10:31 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=/vgCGFkrQwcp/7jPx+PdVEy8B0KpHLcBmVE/3aSXGL0=;
-        b=pey9cOerYISPKEBls5QuKL5pdRlpkwEOdpzu3tM6GyW/Il90VdnJ/BkDwSHZB66mjm
-         AmOInznbQCKWhnYOeFfZx1SqGMJ7Yz+A5sSyxvQSX+eusKxhov/e4YQH+C7afEupr7lq
-         SyIW9b3ieX5ECQQjPqxR9+0CBOlmtCO0meRzFfDBr+Lz+uBWx3bUCdzY5yGv7zW6C1OD
-         FJn9qDBkjzxi8emQmwx4ktoExd9Wbv3JxNR1brAzq0mSQ8ntzkX0rZ+wMuZqy1VG9w8B
-         ZABSF/x3ADyzZeFDnqpb34IHYPX6EpsqpProy1wK+Ktpa4ZeyqPf8TVU3LEVsAn376CX
-         wmIQ==
-X-Gm-Message-State: AO0yUKUtb2qzbEkL4aI/v/+xotqMGEZkT2pslc1wwXhslwa/t6Di7X7R
-        yPxeBGdbFROm3iMIRIIt9ksDhroksC1zxU9L
-X-Google-Smtp-Source: AK7set9Hc8PI/3Vz78e4+P2zWBzi6x265jfVpLGfmkLl7P2VS/PPl73lyILaUovAKnyd2uibp/VWOw==
-X-Received: by 2002:a05:6e02:1d84:b0:315:39ce:abd2 with SMTP id h4-20020a056e021d8400b0031539ceabd2mr4774352ila.3.1676307895839;
-        Mon, 13 Feb 2023 09:04:55 -0800 (PST)
-Received: from [192.168.1.94] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id y13-20020a056e02118d00b0031537da6ba3sm1530437ili.87.2023.02.13.09.04.54
+        bh=43md4euKyTy5iM8nPRowlVg2uoHP+Bxebjf5efS9qUI=;
+        b=g0YJA9Z6OLwaKXxkv9+jL0OzyhsRtI2CVlbEs+v18X4z0riyWkYjEGQKV/SMQRyyQK
+         YO+vtEUYJlU/E6Tqn9CO/ybdaWoPe1GfK+FmU23NNZgExUJZHSMIt2rtt7NePZSv2uNr
+         CawNBHoi50oEwm/PrnyUNzKws4vGY/GHpEQAB4TfjFJ6g2xEJOS/2/eSuLZiLkjdQTbM
+         8RJvBTKi+7iNjwYENDG1Yd6vASupmORGUEH3xD1U/pySY9WIwZMk9ZOo/lTq8i82U3a4
+         4WHzdAeiHpuo1dYQm8h4fLsYd5zmBaX/bgGVLY8FYULUSMuseXnsCreMSGOSZP/ylcdA
+         D41A==
+X-Gm-Message-State: AO0yUKUc0x0z2kJTiVaTCBYWsGa8aIOscG4YYVY/qKxsbGm9LU6I8MSY
+        LDsIRIgjpumV5sK/A/7OIyo=
+X-Google-Smtp-Source: AK7set/KgUpWGxPJNFJMKEcCvMQP9cXnNVjtmIdg3Yj20tnXZ+glv0aNSL8qHN0HGIOemEANUP74Yg==
+X-Received: by 2002:a17:90b:d87:b0:234:1fa8:6589 with SMTP id bg7-20020a17090b0d8700b002341fa86589mr1103583pjb.6.1676308230508;
+        Mon, 13 Feb 2023 09:10:30 -0800 (PST)
+Received: from ?IPV6:2620:15c:211:201:dc5c:7c61:93f2:3d3d? ([2620:15c:211:201:dc5c:7c61:93f2:3d3d])
+        by smtp.gmail.com with ESMTPSA id p9-20020a17090a2d8900b00233bab35b57sm4956951pjd.29.2023.02.13.09.10.28
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 13 Feb 2023 09:04:54 -0800 (PST)
-Message-ID: <1f716ecb-3f27-af5f-66b4-ac4dae52cf23@kernel.dk>
-Date:   Mon, 13 Feb 2023 10:04:52 -0700
+        Mon, 13 Feb 2023 09:10:29 -0800 (PST)
+Message-ID: <0290f608-6ddf-ecb7-4c05-55b0f7dbfbea@acm.org>
+Date:   Mon, 13 Feb 2023 09:10:26 -0800
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.2
-Subject: Re: [PATCH v2 0/4] iov_iter: Adjust styling/location of new splice
- functions
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.6.0
+Subject: Re: [PATCH] blk-ioprio: Introduce promote-to-rt policy
 Content-Language: en-US
-To:     David Howells <dhowells@redhat.com>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Christoph Hellwig <hch@infradead.org>
-Cc:     Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>,
-        Jeff Layton <jlayton@kernel.org>,
-        David Hildenbrand <david@redhat.com>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        Hillf Danton <hdanton@sina.com>, linux-fsdevel@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org
-References: <20230213153301.2338806-1-dhowells@redhat.com>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20230213153301.2338806-1-dhowells@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+To:     Hou Tao <houtao@huaweicloud.com>, Jan Kara <jack@suse.cz>
+Cc:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        cgroups@vger.kernel.org, Tejun Heo <tj@kernel.org>,
+        Zefan Li <lizefan.x@bytedance.com>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        Jonathan Corbet <corbet@lwn.net>, linux-kernel@vger.kernel.org,
+        linux-doc@vger.kernel.org, houtao1@huawei.com
+References: <20230201045227.2203123-1-houtao@huaweicloud.com>
+ <8c068af3-7199-11cf-5c69-a523c7c22d9a@acm.org>
+ <4f7dcb3e-2d5a-cae3-0e1c-a82bcc3d2217@huaweicloud.com>
+ <b6b3c498-e90b-7d1f-6ad5-a31334e433ae@acm.org>
+ <beb7782e-72a4-c350-3750-23a767c88753@huaweicloud.com>
+ <aedc240d-7c9e-248a-52d2-c9775f3e8ca1@acm.org>
+ <20230208134345.77bdep3kzp52haxu@quack3>
+ <7fcd4c38-ccbe-6411-e424-a57595ad9c0b@acm.org>
+ <20230209085603.dzqfcc3pp4hacqlz@quack3>
+ <55a065e7-7d86-d58f-15ba-c631a427843e@acm.org>
+ <20230210101244.zsmtmsoo4xjx7suj@quack3>
+ <48620099-0311-e752-ba3b-cbb4351cf81e@huaweicloud.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <48620099-0311-e752-ba3b-cbb4351cf81e@huaweicloud.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2/13/23 8:32 AM, David Howells wrote:
-> Hi Jens, Al, Christoph,
-> 
-> Here are patches to make some changes that Christoph requested[1] to the
-> new generic file splice functions that I implemented[2].  Apart from one
-> functional change, they just altering the styling and move one of the
-> functions to a different file:
-> 
->  (1) Rename the main functions:
-> 
-> 	generic_file_buffered_splice_read() -> filemap_splice_read()
-> 	generic_file_direct_splice_read()   -> direct_splice_read()
-> 
->  (2) Abstract out the calculation of the location of the head pipe buffer
->      into a helper function in linux/pipe_fs_i.h.
-> 
->  (3) Use init_sync_kiocb() in filemap_splice_read().
-> 
->      This is where the functional change is.  Some kiocb fields are then
->      filled in where they were set to 0 before, including setting ki_flags
->      from f_iocb_flags.  I've filtered out IOCB_NOWAIT as the function is
->      supposed to be synchronous.
-> 
->  (4) Move filemap_splice_read() to mm/filemap.c.  filemap_get_pages() can
->      then be made static again.
-> 
-> I've pushed the patches here also:
-> 
-> 	https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/log/?h=iov-extract-3
-> 
-> I've also updated worked the changes into the commits on my iov-extract
-> branch if that would be preferable, though that means Jens would need to
-> update his for-6.3/iov-extract again.
+On 2/13/23 04:51, Hou Tao wrote:
+> Should I keep "none-to-rt" and make it work just like "promote-to-rt" or should
+> I just remove "none-to-rt" and add "promote-to-rt" ? I think the latter will be
+> more appropriate.
 
-Honestly, it's getting tight on timing at this point, and there's also
-a crash report from today:
+Removing none-to-rt would break existing systems that use this policy. I 
+prefer the former solution.
 
-https://lore.kernel.org/linux-block/Y+pdHFFTk1TTEBsO@makrotopia.org/
+Thanks,
 
-I think we'd be better off folding in this series and then potentially
-pushing this series to 6.4 rather than 6.3.
-
--- 
-Jens Axboe
-
+Bart.
 
