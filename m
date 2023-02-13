@@ -2,36 +2,47 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33F38C636CC
-	for <linux-block@archiver.kernel.org>; Mon, 13 Feb 2023 15:25:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DFAF6C6379F
+	for <linux-block@archiver.kernel.org>; Mon, 13 Feb 2023 15:34:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230334AbjBMPZ0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 13 Feb 2023 10:25:26 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38876 "EHLO
+        id S230451AbjBMPeD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 13 Feb 2023 10:34:03 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47358 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230098AbjBMPZT (ORCPT
+        with ESMTP id S229629AbjBMPd7 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 13 Feb 2023 10:25:19 -0500
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7012558E;
-        Mon, 13 Feb 2023 07:25:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=is2NWtV2VTNxnUCu5cWYDtgITYpFKETTOtG4XpHoOLE=; b=j+65y77VNVY+M53FFuWII8CE4C
-        DGghunoeQbW1eo7fDwF07WCCdeeNhsTZRhelfjn7o9kkrXUi2WRvBK38IN/YIvgHjlNGvTFkSTkTd
-        ADv9oo1MZ2P5HXu5rab6FYWS+ILR6JjQ5s/AWhw3hLuC4fNmX+bsoYIJwX832i+Vu8cxLMWCdCQrW
-        wsaVBIFYKl7DwNTvKSeifxwOF3svaLT5rBnPbOouSsLcZaGhmUAKHnvuJZkdxFYZcrm+fQ04JWhMS
-        S30idVBg+xaoUvVr8YCB9NbLtZI42Ge2WoPf/zsrranEiQGvRMYl1odRMM07aYzSP8CILWXJi5tJw
-        a9EbcAfw==;
-Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1pRahL-005seU-PI; Mon, 13 Feb 2023 15:24:55 +0000
-Date:   Mon, 13 Feb 2023 15:24:55 +0000
-From:   Matthew Wilcox <willy@infradead.org>
-To:     David Howells <dhowells@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, Al Viro <viro@zeniv.linux.org.uk>,
-        Christoph Hellwig <hch@infradead.org>, Jan Kara <jack@suse.cz>,
+        Mon, 13 Feb 2023 10:33:59 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC14214238
+        for <linux-block@vger.kernel.org>; Mon, 13 Feb 2023 07:33:18 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1676302397;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=+b2VMeGpZTyrheqYPKTaHyxDIQ3yZeSE4YqjD4ZyLaI=;
+        b=LCXljtFU8pF8v4hMKsY/fTCO+HaYC5FoMBMqnKZsHEi6fGmvnot46CWirw2fnlgcjfR/uU
+        OOboKBzULitAjYHeRis33yLIg4YKzq7MGg33HwAcwnNXP262Zu5VPqgROSmgBkRWLGQR21
+        HR2txFra5p9wY8ws4o1wNtjedMNClPM=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-256-1ODbYshqMwmxxNEz7syx6g-1; Mon, 13 Feb 2023 10:33:12 -0500
+X-MC-Unique: 1ODbYshqMwmxxNEz7syx6g-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id ACFD985A588;
+        Mon, 13 Feb 2023 15:33:11 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.33.36.24])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id BCD6240B40C9;
+        Mon, 13 Feb 2023 15:33:09 +0000 (UTC)
+From:   David Howells <dhowells@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>, Al Viro <viro@zeniv.linux.org.uk>,
+        Christoph Hellwig <hch@infradead.org>
+Cc:     David Howells <dhowells@redhat.com>,
+        Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>,
         Jeff Layton <jlayton@kernel.org>,
         David Hildenbrand <david@redhat.com>,
         Jason Gunthorpe <jgg@nvidia.com>,
@@ -40,27 +51,111 @@ Cc:     Jens Axboe <axboe@kernel.dk>, Al Viro <viro@zeniv.linux.org.uk>,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-mm@kvack.org, Christoph Hellwig <hch@lst.de>,
         John Hubbard <jhubbard@nvidia.com>
-Subject: Re: [PATCH 3/4] splice: Use init_sync_kiocb() in
- filemap_splice_read()
-Message-ID: <Y+pWRx2ly/qdFq9k@casper.infradead.org>
-References: <20230213134619.2198965-1-dhowells@redhat.com>
- <20230213134619.2198965-4-dhowells@redhat.com>
+Subject: [PATCH v2 2/4] splice: Provide pipe_head_buf() helper
+Date:   Mon, 13 Feb 2023 15:32:59 +0000
+Message-Id: <20230213153301.2338806-3-dhowells@redhat.com>
+In-Reply-To: <20230213153301.2338806-1-dhowells@redhat.com>
+References: <20230213153301.2338806-1-dhowells@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230213134619.2198965-4-dhowells@redhat.com>
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.1
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Feb 13, 2023 at 01:46:18PM +0000, David Howells wrote:
-> Use init_sync_kiocb() in filemap_splice_read() rather than open coding it
-> and filter out IOCB_NOWAIT since the splice is synchronous.
+Provide a helper, pipe_head_buf(), to get the current head buffer from a
+pipe.  Implement this as a wrapper around a more general function,
+pipe_buf(), that gets a specified buffer.
 
-If the user has asked for NOWAIT and the splice is going to be
-synchronous, shouldn't we rather return -EWOULDBLOCK here?  Or
-does this not block?
+Requested-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: David Howells <dhowells@redhat.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+cc: Jens Axboe <axboe@kernel.dk>
+cc: Al Viro <viro@zeniv.linux.org.uk>
+cc: John Hubbard <jhubbard@nvidia.com>
+cc: David Hildenbrand <david@redhat.com>
+cc: Matthew Wilcox <willy@infradead.org>
+cc: linux-block@vger.kernel.org
+cc: linux-fsdevel@vger.kernel.org
+cc: linux-mm@kvack.org
+---
+ fs/splice.c               |  9 +++------
+ include/linux/pipe_fs_i.h | 20 ++++++++++++++++++++
+ 2 files changed, 23 insertions(+), 6 deletions(-)
 
-IOW, this either does the wrong thing, or it does something that's
-irrelevant.
+diff --git a/fs/splice.c b/fs/splice.c
+index 91b9e2cb9e03..7c0ff187f87a 100644
+--- a/fs/splice.c
++++ b/fs/splice.c
+@@ -295,7 +295,6 @@ static ssize_t direct_splice_read(struct file *in, loff_t *ppos,
+ 	struct bio_vec *bv;
+ 	struct kiocb kiocb;
+ 	struct page **pages;
+-	unsigned int head;
+ 	ssize_t ret;
+ 	size_t used, npages, chunk, remain, reclaim;
+ 	int i;
+@@ -358,9 +357,8 @@ static ssize_t direct_splice_read(struct file *in, loff_t *ppos,
+ 	}
+ 
+ 	/* Push the remaining pages into the pipe. */
+-	head = pipe->head;
+ 	for (i = 0; i < npages; i++) {
+-		struct pipe_buffer *buf = &pipe->bufs[head & (pipe->ring_size - 1)];
++		struct pipe_buffer *buf = pipe_head_buf(pipe);
+ 
+ 		chunk = min_t(size_t, remain, PAGE_SIZE);
+ 		*buf = (struct pipe_buffer) {
+@@ -369,10 +367,9 @@ static ssize_t direct_splice_read(struct file *in, loff_t *ppos,
+ 			.offset	= 0,
+ 			.len	= chunk,
+ 		};
+-		head++;
++		pipe->head++;
+ 		remain -= chunk;
+ 	}
+-	pipe->head = head;
+ 
+ 	kfree(bv);
+ 	return ret;
+@@ -394,7 +391,7 @@ static size_t splice_folio_into_pipe(struct pipe_inode_info *pipe,
+ 
+ 	while (spliced < size &&
+ 	       !pipe_full(pipe->head, pipe->tail, pipe->max_usage)) {
+-		struct pipe_buffer *buf = &pipe->bufs[pipe->head & (pipe->ring_size - 1)];
++		struct pipe_buffer *buf = pipe_head_buf(pipe);
+ 		size_t part = min_t(size_t, PAGE_SIZE - offset, size - spliced);
+ 
+ 		*buf = (struct pipe_buffer) {
+diff --git a/include/linux/pipe_fs_i.h b/include/linux/pipe_fs_i.h
+index 6cb65df3e3ba..d2c3f16cf6b1 100644
+--- a/include/linux/pipe_fs_i.h
++++ b/include/linux/pipe_fs_i.h
+@@ -156,6 +156,26 @@ static inline bool pipe_full(unsigned int head, unsigned int tail,
+ 	return pipe_occupancy(head, tail) >= limit;
+ }
+ 
++/**
++ * pipe_buf - Return the pipe buffer for the specified slot in the pipe ring
++ * @pipe: The pipe to access
++ * @slot: The slot of interest
++ */
++static inline struct pipe_buffer *pipe_buf(const struct pipe_inode_info *pipe,
++					   unsigned int slot)
++{
++	return &pipe->bufs[slot & (pipe->ring_size - 1)];
++}
++
++/**
++ * pipe_head_buf - Return the pipe buffer at the head of the pipe ring
++ * @pipe: The pipe to access
++ */
++static inline struct pipe_buffer *pipe_head_buf(const struct pipe_inode_info *pipe)
++{
++	return pipe_buf(pipe, pipe->head);
++}
++
+ /**
+  * pipe_buf_get - get a reference to a pipe_buffer
+  * @pipe:	the pipe that the buffer belongs to
 
