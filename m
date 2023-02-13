@@ -2,67 +2,57 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1AD03C636CC
-	for <linux-block@archiver.kernel.org>; Mon, 13 Feb 2023 10:19:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FF8FC636D4
+	for <linux-block@archiver.kernel.org>; Mon, 13 Feb 2023 10:41:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230490AbjBMKTG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 13 Feb 2023 05:19:06 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54380 "EHLO
+        id S229576AbjBMKlt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 13 Feb 2023 05:41:49 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48248 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231133AbjBMKTF (ORCPT
+        with ESMTP id S229484AbjBMKls (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 13 Feb 2023 05:19:05 -0500
+        Mon, 13 Feb 2023 05:41:48 -0500
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 651831714D;
-        Mon, 13 Feb 2023 02:18:49 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1268F126C3;
+        Mon, 13 Feb 2023 02:41:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=szHm+HvGboe4zElnYyIS9I3M5ezn3gwosKJMm81UK2o=; b=4raiYwiGmbF9QTaprA787JVha+
-        ukzcXidyJqobihaG/aamGI8SdzEgpBKzI/9gN/rpadv+v6tiT8tIG5Xf8uy0yZjcIemuSJdtSww81
-        VXerBX49HpFpDZGzSKhOiuKuBhmIppBB9Qn68/e5+Wj+u1wzKRu68uSz2VD8wkUwRyvAwZ/V9hrgN
-        l8vf+RbafdbnIOiIcLmjV2BpEKg8U7/xKx+VfpZ3Qjwq09lGXGBNsLCuMP6V1V48I8xnznuaOgd+K
-        mmF4NKBzOxh4rDqsoLngtbV4HWWmf3ivQW08PNJOEMdwo6zVNbxrPQjU8HyldQyrMhMK2rb7LfaAe
-        g0C5HWPg==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1pRVue-00E5Ci-0Q; Mon, 13 Feb 2023 10:18:20 +0000
-Date:   Mon, 13 Feb 2023 02:18:19 -0800
-From:   Christoph Hellwig <hch@infradead.org>
-To:     David Howells <dhowells@redhat.com>
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>,
-        Jeff Layton <jlayton@kernel.org>,
-        David Hildenbrand <david@redhat.com>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        Hillf Danton <hdanton@sina.com>, linux-fsdevel@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, Christoph Hellwig <hch@lst.de>,
-        John Hubbard <jhubbard@nvidia.com>
-Subject: Re: [PATCH v13 03/12] splice: Do splice read from a buffered file
- without using ITER_PIPE
-Message-ID: <Y+oOa3bbJZallKtl@infradead.org>
-References: <Y+n0n2UE8BQa/OwW@infradead.org>
- <20230209102954.528942-1-dhowells@redhat.com>
- <20230209102954.528942-4-dhowells@redhat.com>
- <1753989.1676283061@warthog.procyon.org.uk>
+        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+        Content-ID:Content-Description:In-Reply-To:References;
+        bh=QFZ+a29GeVUTeCrKA7f2ruTlAoD7iMuLbB/uIVPnxW0=; b=rMSPJdjGCN8rptqoedEr8hCkvc
+        VjM2QSg+CneSLRfeKsGg6vl/T4GO5mQ/PUlb5AjqRH61rdqLpjL4l94ToR+lK5OytBh2g20AMNnl7
+        RRP5mfvMPEhufK2vYM2L2GM9TAoj9eTTEca6p8a8YzHmB1gQYubUbhTyCpwgiB362SFH99d8cFf3n
+        tGZ/+y+qgbAOzDxjygjZ6a05xuOrKxYeNho7mtp1Z7EF8d1NS8irPDQ/90MTPMfBp2sSLgWtBNOlu
+        SWA1qChSFjh9My1Xf+gWOD/TH0zSc7DARAEPuo1mMURewDrq0harT5Dl4m5v3kRg1lHnTbFCSE1+S
+        dIld38bw==;
+Received: from [2001:4bb8:181:6771:cbc2:a0cd:a935:7961] (helo=localhost)
+        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1pRWHF-00E99A-Er; Mon, 13 Feb 2023 10:41:43 +0000
+From:   Christoph Hellwig <hch@lst.de>
+To:     Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
+        Josef Bacik <josef@toxicpanda.com>
+Cc:     Ming Lei <ming.lei@redhat.com>, cgroups@vger.kernel.org,
+        linux-block@vger.kernel.org
+Subject: fix circular disk reference in blk-cgroup
+Date:   Mon, 13 Feb 2023 11:41:31 +0100
+Message-Id: <20230213104134.475204-1-hch@lst.de>
+X-Mailer: git-send-email 2.39.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1753989.1676283061@warthog.procyon.org.uk>
+Content-Transfer-Encoding: 8bit
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Feb 13, 2023 at 10:11:01AM +0000, David Howells wrote:
-> Christoph Hellwig <hch@infradead.org> wrote:
-> 
-> > Also why doesn't this use init_sync_kiocb?
-> 
-> I'm not sure I want ki_flags.
+Hi all,
 
-Why?
+the third patch fixes a problem in haivng a circular disk reference
+for blkgs.  The first two patches clean up blk-throttle to avoid
+queue->disk refernece that get torn down in disk_release but could
+in theory be used in the pd_free handler.
+
+Diffstat:
+ block/blk-cgroup.c     |   12 +++++++++---
+ block/blk-throttle.c   |   39 ++++++++++++++++-----------------------
+ include/linux/blkdev.h |    8 +++-----
+ 3 files changed, 28 insertions(+), 31 deletions(-)
