@@ -2,124 +2,154 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E6AFC636D4
-	for <linux-block@archiver.kernel.org>; Mon, 13 Feb 2023 20:04:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 88677C64EC7
+	for <linux-block@archiver.kernel.org>; Mon, 13 Feb 2023 20:09:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229806AbjBMUEt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 13 Feb 2023 15:04:49 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40058 "EHLO
+        id S229815AbjBMUJB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 13 Feb 2023 15:09:01 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45114 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229773AbjBMUEs (ORCPT
+        with ESMTP id S229615AbjBMUJA (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 13 Feb 2023 15:04:48 -0500
-Received: from mail-ed1-x535.google.com (mail-ed1-x535.google.com [IPv6:2a00:1450:4864:20::535])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 544562726
-        for <linux-block@vger.kernel.org>; Mon, 13 Feb 2023 12:04:47 -0800 (PST)
-Received: by mail-ed1-x535.google.com with SMTP id s11so6831735edd.10
-        for <linux-block@vger.kernel.org>; Mon, 13 Feb 2023 12:04:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=3VQLY//5P39OuXGOEpzf1Glp5VE7sIcldzWZWkHVBtk=;
-        b=TsAcvf6Rib9TA7nd5ff4vkYnkiTo2vkqF7CbonXHIwalzDwl0C+xPzUQngvguvBhYW
-         lfrD3pWDukUSl79bN71gu/WciycmYWabbXLrlXuPTtajVxjnp+EjdrsnaaWimERVUikg
-         BZJmYQInM/dGBkTYdpAbao9PfJ1lR4MxklY+k=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=3VQLY//5P39OuXGOEpzf1Glp5VE7sIcldzWZWkHVBtk=;
-        b=Y0j/BtFD9obG/zL8W8IsLnukwKz9a4KZsoIYnEdYdlQ05wr94DjOq0MUZlRVDprJWE
-         mOV/0FS7v5V42U4moh9E4mQJ2kNGDPQMf/EJNeh2GpcQIYw5ZWnYtSMZ6m5AwKVjYsyW
-         Thc3w/XGez3ybNBlLjVkif9zKQ0o8uDxHmxOJJShmFcBYxqXWOdSGMvT0VJxGV8O9QoB
-         r4YioQ83wT2zydLXXZfkG/QwrlVFabOnwYsc31RSFU5MEP9/FesHDxdRRtd3XiMB5YSp
-         JFXashWs58lZi9lEQz09rvbhJgvzhtgVz44j/KwOE7ClJZk+RTDuWEvwK7sVRvQTJQ6G
-         yygw==
-X-Gm-Message-State: AO0yUKX4/7tvjwb0kQkhAp0ZHCMXejH18h7qYkskeh0SRjdXDDMxdL+S
-        37LjlbUCe1zqfhSv3ziZy7IM5VcLGhX4wMMeVBY=
-X-Google-Smtp-Source: AK7set/v9cTI1iF06qxnD/RVlSRKCEwb6H/pvmI9stZjnpXg6j4hTxtNCrEZWpmZYrGLiDXDfs9YJg==
-X-Received: by 2002:a50:998b:0:b0:4a2:5652:d8ba with SMTP id m11-20020a50998b000000b004a25652d8bamr7974744edb.18.1676318685474;
-        Mon, 13 Feb 2023 12:04:45 -0800 (PST)
-Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com. [209.85.218.45])
-        by smtp.gmail.com with ESMTPSA id ee55-20020a056402293700b004acbde59e64sm3479261edb.8.2023.02.13.12.04.44
-        for <linux-block@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 13 Feb 2023 12:04:44 -0800 (PST)
-Received: by mail-ej1-f45.google.com with SMTP id jg8so34712651ejc.6
-        for <linux-block@vger.kernel.org>; Mon, 13 Feb 2023 12:04:44 -0800 (PST)
-X-Received: by 2002:a17:907:366:b0:88d:ba79:4310 with SMTP id
- rs6-20020a170907036600b0088dba794310mr5996890ejb.0.1676318684223; Mon, 13 Feb
- 2023 12:04:44 -0800 (PST)
+        Mon, 13 Feb 2023 15:09:00 -0500
+Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B60A1CF65;
+        Mon, 13 Feb 2023 12:08:58 -0800 (PST)
+Received: from [192.168.1.103] (178.176.72.240) by msexch01.omp.ru
+ (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.986.14; Mon, 13 Feb
+ 2023 23:08:48 +0300
+Subject: Re: [PATCH 05/12] pata_parport: remove typedef struct PIA
+To:     Ondrej Zary <linux@zary.sk>,
+        Damien Le Moal <damien.lemoal@opensource.wdc.com>
+CC:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        Tim Waugh <tim@cyberelk.net>, <linux-block@vger.kernel.org>,
+        <linux-parport@lists.infradead.org>, <linux-ide@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
+References: <20230211144232.15138-1-linux@zary.sk>
+ <20230211144232.15138-6-linux@zary.sk>
+From:   Sergey Shtylyov <s.shtylyov@omp.ru>
+Organization: Open Mobile Platform
+Message-ID: <cab6cec4-1a3a-ed15-ddd1-8b51def4f53e@omp.ru>
+Date:   Mon, 13 Feb 2023 23:08:48 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 MIME-Version: 1.0
-References: <20230210153212.733006-1-ming.lei@redhat.com> <20230210153212.733006-2-ming.lei@redhat.com>
- <Y+e3b+Myg/30hlYk@T590> <CAHk-=wgTzLjvhzx-XGkgEQmXH6t=8OTFdQyhDgafGdC2n5gOfg@mail.gmail.com>
- <Y+hDQ1vL6AMFri1E@T590>
-In-Reply-To: <Y+hDQ1vL6AMFri1E@T590>
-From:   Linus Torvalds <torvalds@linux-foundation.org>
-Date:   Mon, 13 Feb 2023 12:04:27 -0800
-X-Gmail-Original-Message-ID: <CAHk-=wgJsi7t7YYpuo6ewXGnHz2nmj67iWR6KPGoz5TBu34mWQ@mail.gmail.com>
-Message-ID: <CAHk-=wgJsi7t7YYpuo6ewXGnHz2nmj67iWR6KPGoz5TBu34mWQ@mail.gmail.com>
-Subject: Re: [PATCH 1/4] fs/splice: enhance direct pipe & splice for moving
- pages in kernel
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Miklos Szeredi <mszeredi@redhat.com>,
-        Bernd Schubert <bschubert@ddn.com>,
-        Nitesh Shetty <nj.shetty@samsung.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Ziyang Zhang <ZiyangZhang@linux.alibaba.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20230211144232.15138-6-linux@zary.sk>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [178.176.72.240]
+X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
+ (10.188.4.12)
+X-KSE-ServerInfo: msexch01.omp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 5.9.59, Database issued on: 02/13/2023 19:50:32
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 59
+X-KSE-AntiSpam-Info: Lua profiles 175483 [Feb 13 2023]
+X-KSE-AntiSpam-Info: Version: 5.9.59.0
+X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
+X-KSE-AntiSpam-Info: LuaCore: 504 504 dc137e1f9c062eb6c0671e7d509ab442ae395562
+X-KSE-AntiSpam-Info: {rep_avail}
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info: {relay has no DNS name}
+X-KSE-AntiSpam-Info: {SMTP from is not routable}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 178.176.72.240 in (user)
+ b.barracudacentral.org}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 178.176.72.240 in (user)
+ dbl.spamhaus.org}
+X-KSE-AntiSpam-Info: 127.0.0.199:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;omp.ru:7.1.1
+X-KSE-AntiSpam-Info: ApMailHostAddress: 178.176.72.240
+X-KSE-AntiSpam-Info: {DNS response errors}
+X-KSE-AntiSpam-Info: Rate: 59
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
+ smtp.mailfrom=omp.ru;dkim=none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Heuristic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 02/13/2023 19:52:00
+X-KSE-AttachmentFiltering-Interceptor-Info: protection disabled
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 2/13/2023 6:59:00 PM
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, Feb 11, 2023 at 5:39 PM Ming Lei <ming.lei@redhat.com> wrote:
->
-> >
-> >  (a) what's the point of MAY_READ? A non-readable page sounds insane
-> > and wrong. All sinks expect to be able to read.
->
-> For example, it is one page which needs sink end to fill data, so
-> we needn't to zero it in source end every time, just for avoiding
-> leak kernel data if (unexpected)sink end simply tried to read from
-> the spliced page instead of writing data to page.
+On 2/11/23 5:42 PM, Ondrej Zary wrote:
 
-I still don't understand.
+> Remove typedef struct PIA and use struct pi_adapter directly.
 
-A sink *reads* the data. It doesn't write the data.
+   Prolly worth mentioning that you drop the spaces in the parameter lists
+while at it...
 
-There's no point trying to deal with "if unexpectedly doing crazy
-things". If a sink writes the data, the sinkm is so unbelievably buggy
-that it's not even funny.
+> Signed-off-by: Ondrej Zary <linux@zary.sk>
 
-And having two flags that you then say "have to be used together" is pointless.
+Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
 
-It's not two different flags if you can't use them separately!
+   Had some comments tho...
 
-So I think your explanations are anything *but* explaining what you
-want. They are just strange and not sensible.
+[...]
+> diff --git a/drivers/ata/pata_parport/fit2.c b/drivers/ata/pata_parport/fit2.c
+> index 28de8e4e41c3..020c93dea362 100644
+> --- a/drivers/ata/pata_parport/fit2.c
+> +++ b/drivers/ata/pata_parport/fit2.c
+> @@ -37,13 +37,13 @@ devices.
+>  
+>  */
+>  
+> -static void  fit2_write_regr( PIA *pi, int cont, int regr, int val)
+> +static void  fit2_write_regr(struct pi_adapter *pi, int cont, int regr, int val)
 
-Please explain to me in small words and simple sentences what it is
-you want. And no, if the explanation is "the sink wants to write to
-the buffer", then that's not an explanation, it's just insanity.
+   Could also kill an extra space after *void*...
 
-We *used* to have the concept of "gifting" the buffer explicitly to
-the sink, so that the sink could - instead of reading from it - decide
-to just use the whole buffer as-is long term. The idea was that tthe
-buffer woudl literally be moved from the source to the destination,
-ownership and all.
+[...]
+> diff --git a/drivers/ata/pata_parport/fit3.c b/drivers/ata/pata_parport/fit3.c
+> index 0366f3123508..03f314ad5ee7 100644
+> --- a/drivers/ata/pata_parport/fit3.c
+> +++ b/drivers/ata/pata_parport/fit3.c
+> @@ -39,7 +39,7 @@
+>  
+>  */
+>  
+> -static void  fit3_write_regr( PIA *pi, int cont, int regr, int val)
+> +static void  fit3_write_regr(struct pi_adapter *pi, int cont, int regr, int val)
 
-But if that's what you want, then it's not about "sink writes". It's
-literally about the splice() wanting to move not just the data, but
-the whole ownership of the buffer.
+   Here as well...
 
-Anyway, I will NAK this as long as the explanations for what the
-semantics are and what you want to do don't make sense. Right now they
-don't.
+[...]
+> diff --git a/drivers/ata/pata_parport/kbic.c b/drivers/ata/pata_parport/kbic.c
+> index 9a99b9e35d41..e065f8367716 100644
+> --- a/drivers/ata/pata_parport/kbic.c
+> +++ b/drivers/ata/pata_parport/kbic.c
+[...]
+> @@ -72,7 +72,7 @@ static int kbic_read_regr( PIA *pi, int cont, int regr )
+>  	return -1;
+>  }       
+>  
+> -static void  kbic_write_regr( PIA *pi, int cont, int regr, int val)
+> +static void  kbic_write_regr(struct pi_adapter *pi, int cont, int regr, int val)
 
-              Linus
+   And here...
+
+[...]
+> diff --git a/drivers/ata/pata_parport/ktti.c b/drivers/ata/pata_parport/ktti.c
+> index d87eb3c139bc..bddd13b4801f 100644
+> --- a/drivers/ata/pata_parport/ktti.c
+> +++ b/drivers/ata/pata_parport/ktti.c
+> @@ -29,7 +29,7 @@
+>  
+>  static int  cont_map[2] = { 0x10, 0x08 };
+>  
+> -static void  ktti_write_regr( PIA *pi, int cont, int regr, int val)
+> +static void  ktti_write_regr(struct pi_adapter *pi, int cont, int regr, int val)
+
+   And here...
+
+[...] 
+
+MBR, Sergey
