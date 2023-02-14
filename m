@@ -2,71 +2,210 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CE25AC6379F
-	for <linux-block@archiver.kernel.org>; Tue, 14 Feb 2023 18:44:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7078EC05027
+	for <linux-block@archiver.kernel.org>; Tue, 14 Feb 2023 19:02:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231710AbjBNSoB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 14 Feb 2023 13:44:01 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38876 "EHLO
+        id S229881AbjBNTCi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 14 Feb 2023 14:02:38 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52600 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232171AbjBNSoA (ORCPT
+        with ESMTP id S229870AbjBNTCh (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 14 Feb 2023 13:44:00 -0500
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C8CB725B98;
-        Tue, 14 Feb 2023 10:43:52 -0800 (PST)
-Received: by mail-pl1-f182.google.com with SMTP id e17so9089739plg.12;
-        Tue, 14 Feb 2023 10:43:52 -0800 (PST)
+        Tue, 14 Feb 2023 14:02:37 -0500
+Received: from mail-il1-x133.google.com (mail-il1-x133.google.com [IPv6:2607:f8b0:4864:20::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 92503FC;
+        Tue, 14 Feb 2023 11:02:36 -0800 (PST)
+Received: by mail-il1-x133.google.com with SMTP id i26so265363ila.11;
+        Tue, 14 Feb 2023 11:02:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=GNEAe1B6QgPjY6KaGYE9TiQHnNZykCg1bt+o/OnSHKg=;
+        b=OGLrK81J+2LjfQNVnutus7Q4J7/1zgWBOqe0VSpoa3V1bpzMWIY+GMehuO5fx2unow
+         cGmcHW2gSSr1M362yrY368fhH559sjPkV6wGLL4O5mAQwnUfAqj9yF2lnHitiQOUPiJ8
+         OTEGLUtBgC4XFw68OgS9Io93dPWJK4yrEd1KeeTMhXcwJ5/fQRhSVLqJ4KmjtIoQYL49
+         aAj+/Xe8pO27ieMO8T0RLEDDf8UWdcSvPoFrsGk7i7bjJkbewlqHUeJ1q2IrM1XohIh5
+         tHTeoMYjzuLwDF1cH22PpdsO36vCYsbOOm8k2NsKOWidsVwXgEcn2IJGpNjgScvgkb2U
+         6oCw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Vipa2lJ5FT7JsHiDDZpGRZNIifAiXJtbYAtHZhQihSw=;
-        b=6xxHqDqMX5DX7UPVxa/HqCCRQ+k7mr8R7yH9X1ybF44p04Km/5Ry6LEXSWY1qdWsbF
-         RsjpBkG1UtizLe01nOkeEWlDdbXzsW26VrwIbe+O+STD2HE/8tSQhMulkqf8DjW90mI5
-         e0ExSjM1wI78KNCX9QkX69fUIjTmzJB8HFEH4b+QWwuISSGz9b8xaV4Vqv6u98XLaiCV
-         tvNfFVwJ87DkDrndBquJSzvSlLgKNS6idU84ERKTy7a+vvZCAIHiLlgcDwFVz5dsdsbS
-         iewjdRBKlB2oTMniknFOYIA1HjnDmMFznLeurS32YY3l0Qx6n2u5uVdUBG8BuJRGvyds
-         rZug==
-X-Gm-Message-State: AO0yUKXNGTHeCfK/YqxPfB5776YnTnR7lTkjcR+Z+5Jz7ZisFW1nhJMT
-        Tscm7vzcelBxOm48LEMx5aYAJuG9KG8=
-X-Google-Smtp-Source: AK7set8I5Edv9zXPABxlpNhkDJUw47owri0Uzj636u60oH5e0qN99rPmX/VE5dj9mF41tt9dUYeV8w==
-X-Received: by 2002:a17:90b:1b09:b0:233:d3ac:5dc2 with SMTP id nu9-20020a17090b1b0900b00233d3ac5dc2mr3591827pjb.18.1676400232022;
-        Tue, 14 Feb 2023 10:43:52 -0800 (PST)
-Received: from ?IPV6:2620:15c:211:201:bba:95f6:e675:40bc? ([2620:15c:211:201:bba:95f6:e675:40bc])
-        by smtp.gmail.com with ESMTPSA id gt1-20020a17090af2c100b00233c727510csm6036780pjb.40.2023.02.14.10.43.50
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 14 Feb 2023 10:43:51 -0800 (PST)
-Message-ID: <f4079ecb-f483-34f9-0074-b77a9bd36cb6@acm.org>
-Date:   Tue, 14 Feb 2023 10:43:49 -0800
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=GNEAe1B6QgPjY6KaGYE9TiQHnNZykCg1bt+o/OnSHKg=;
+        b=K3ZnyqxojOs3b3FLErIeDGODpq874IA9Y4tgA7YrZt8huQYnpP0G0DXOMyeFsvsDN1
+         SzMk9OS2nSc15LYVdx20AqxItLJbveg9x3FYMOoASuJ4yAXZ2Tzts+wizgel40V7TrL8
+         olLqtZ2gRRUO946dY1f5lG4m7l3KaBFt7RdsoFbv1OJaB1KAUX9u7dQL/s0rqe0fp4FI
+         86SlGSsXXkNkjjg0cKnwJrGSV1nfenI1J93N7B0NQJIhSuCGuTlu0oEJWyVBnBy+81+B
+         bq7Tj5euxnAH6I2dWu1MitDOaF8z698QvkthfWkjehMr/4PI0yvhWXJL6k8Z4fHUBWFS
+         nU4g==
+X-Gm-Message-State: AO0yUKVJTsGxKtsdE0p9XalheAF0949hCA39DEvswGDcHgbNqk2YnfoB
+        u99Z7I0MU4zhFjGnhxnbAcsrd7AFNuHg5Q==
+X-Google-Smtp-Source: AK7set/zW0EPl9LzsbivR8TPrW170enXOL+jrEbHAwLfuAFAOh0JpMeGXUm427Nk8n+1LDAQTKlEnw==
+X-Received: by 2002:a05:6e02:1d19:b0:315:2992:8049 with SMTP id i25-20020a056e021d1900b0031529928049mr3487297ila.27.1676401355789;
+        Tue, 14 Feb 2023 11:02:35 -0800 (PST)
+Received: from localhost.localdomain (c-67-174-241-145.hsd1.ca.comcast.net. [67.174.241.145])
+        by smtp.gmail.com with ESMTPSA id r11-20020a056e0219cb00b0030c27c9eea4sm3608770ill.33.2023.02.14.11.02.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 14 Feb 2023 11:02:35 -0800 (PST)
+From:   Yang Shi <shy828301@gmail.com>
+To:     mgorman@techsingularity.net, agk@redhat.com, snitzer@kernel.org,
+        dm-devel@redhat.com, akpm@linux-foundation.org
+Cc:     linux-mm@kvack.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [v2 PATCH 0/5] Introduce mempool pages bulk allocator and use it in dm-crypt
+Date:   Tue, 14 Feb 2023 11:02:16 -0800
+Message-Id: <20230214190221.1156876-1-shy828301@gmail.com>
+X-Mailer: git-send-email 2.39.0
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.0
-Subject: Re: [bug report] WARNING at fs/proc/generic.c:376
- proc_register+0x131/0x1c0 observed with blktests scsi
-Content-Language: en-US
-To:     Yi Zhang <yi.zhang@redhat.com>,
-        linux-scsi <linux-scsi@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>
-References: <CAHj4cs-jef8f4zxJQxjKirAWyZkTREycFdNPvQaGbgS-1r_Lcg@mail.gmail.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <CAHj4cs-jef8f4zxJQxjKirAWyZkTREycFdNPvQaGbgS-1r_Lcg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2/5/23 23:30, Yi Zhang wrote:
-> blktests scsi/ failed on the latest linux-block/for-next, pls help
-> check it, thanks.
 
-Please help with testing and/or reviewing the candidate fix that I 
-posted 
-(https://lore.kernel.org/linux-scsi/20230210205200.36973-1-bvanassche@acm.org/).
+Changelog:
+RFC -> v2:
+  * Added callback variant for page bulk allocator and mempool bulk allocator
+    per Mel Gorman.
+  * Used the callback version in dm-crypt driver.
+  * Some code cleanup and refactor to reduce duplicate code.
 
-Thanks,
+rfc: https://lore.kernel.org/linux-mm/20221005180341.1738796-1-shy828301@gmail.com/
 
-Bart.
+
+We have full disk encryption enabled, profiling shows page allocations may
+incur a noticeable overhead when writing.  The dm-crypt creates an "out"
+bio for writing.  And fill the "out" bio with the same amount of pages
+as "in" bio.  But the driver allocates one page at a time in a loop.  For
+1M bio it means the driver has to call page allocator 256 times.  It seems
+not that efficient.
+
+Since v5.13 we have page bulk allocator supported, so dm-crypt could use
+it to do page allocations more efficiently.
+
+I could just call the page bulk allocator in dm-crypt driver before the
+mempool allocator, but it seems ad-hoc and the quick search shows some
+others do the similar thing, for example, f2fs compress, block bounce,
+g2fs, ufs, etc.  So it seems more neat to implement a general bulk allocation
+API for mempool.
+
+Currently the bulk allocator just supported list and array to consume the
+pages.  But neither is the best fit to dm-crypt ussecase.  So introduce
+a new bulk allocator API, callback, per the suggestion from Mel Gorman.
+It consumes the pages by calling a callback with a parameter.
+
+So introduce the mempool page bulk allocator.
+The below APIs are introduced:
+    - mempool_init_pages_bulk()
+    - mempool_create_pages_bulk()
+    They initialize the mempool for page bulk allocator.  The pool is filled
+    by alloc_page() in a loop.
+    
+    - mempool_alloc_pages_bulk_cb()
+    - mempool_alloc_pages_bulk_array()
+    They do bulk allocation from mempool.  The list version is not implemented
+    since there is no user for list version bulk allocator so far and it may
+    be gong soon.
+
+    They do the below conceptually:
+      1. Call bulk page allocator
+      2. If the allocation is fulfilled then return otherwise try to
+         allocate the remaining pages from the mempool
+      3. If it is fulfilled then return otherwise retry from #1 with sleepable
+         gfp
+      4. If it is still failed, sleep for a while to wait for the mempool is
+         refilled, then retry from #1
+    The populated pages will stay on array until the callers consume them or
+    free them, or will be consumed by the callback.
+    Since mempool allocator is guaranteed to success in the sleepable context,
+    so the two APIs return true for success or false for fail.  It is the
+    caller's responsibility to handle failure case (partial allocation), just
+    like the page bulk allocator.
+    
+The mempool typically is an object agnostic allocator, but bulk allocation
+is only supported by pages, so the mempool bulk allocator is for page
+allocation only as well.
+
+With the mempool bulk allocator the IOPS of dm-crypt with 1M I/O would get
+improved by approxiamately 6%.  The test is done on a machine with 80 CPU and
+128GB memory with an encrypted ram device (the impact from storage hardware
+could be minimized so that we could benchmark the dm-crypt layer more
+accurately).
+
+Before the patch:
+Jobs: 1 (f=1): [w(1)][100.0%][w=1301MiB/s][w=1301 IOPS][eta 00m:00s]
+crypt: (groupid=0, jobs=1): err= 0: pid=48512: Wed Feb  1 18:11:30 2023
+  write: IOPS=1300, BW=1301MiB/s (1364MB/s)(76.2GiB/60001msec); 0 zone resets
+    slat (usec): min=724, max=867, avg=765.71, stdev=19.27
+    clat (usec): min=4, max=196297, avg=195688.86, stdev=6450.50
+     lat (usec): min=801, max=197064, avg=196454.90, stdev=6450.35
+    clat percentiles (msec):
+     |  1.00th=[  197],  5.00th=[  197], 10.00th=[  197], 20.00th=[  197],
+     | 30.00th=[  197], 40.00th=[  197], 50.00th=[  197], 60.00th=[  197],
+     | 70.00th=[  197], 80.00th=[  197], 90.00th=[  197], 95.00th=[  197],
+     | 99.00th=[  197], 99.50th=[  197], 99.90th=[  197], 99.95th=[  197],
+     | 99.99th=[  197]
+   bw (  MiB/s): min=  800, max= 1308, per=99.69%, avg=1296.94, stdev=46.02, samples=119
+   iops        : min=  800, max= 1308, avg=1296.94, stdev=46.02, samples=119
+  lat (usec)   : 10=0.01%, 1000=0.01%
+  lat (msec)   : 2=0.01%, 4=0.01%, 10=0.01%, 20=0.02%, 50=0.05%
+  lat (msec)   : 100=0.08%, 250=99.83%
+  cpu          : usr=3.88%, sys=96.02%, ctx=69, majf=1, minf=9
+  IO depths    : 1=0.1%, 2=0.1%, 4=0.1%, 8=0.1%, 16=0.1%, 32=0.1%, >=64=99.9%
+     submit    : 0=0.0%, 4=100.0%, 8=0.0%, 16=0.0%, 32=0.0%, 64=0.0%, >=64=0.0%
+     complete  : 0=0.0%, 4=100.0%, 8=0.0%, 16=0.0%, 32=0.0%, 64=0.0%, >=64=0.1%
+     issued rwts: total=0,78060,0,0 short=0,0,0,0 dropped=0,0,0,0
+     latency   : target=0, window=0, percentile=100.00%, depth=256
+
+Run status group 0 (all jobs):
+  WRITE: bw=1301MiB/s (1364MB/s), 1301MiB/s-1301MiB/s (1364MB/s-1364MB/s), io=76.2GiB (81.9GB), run=60001-60001msec
+
+After the patch:
+Jobs: 1 (f=1): [w(1)][100.0%][w=1401MiB/s][w=1401 IOPS][eta 00m:00s]
+crypt: (groupid=0, jobs=1): err= 0: pid=2171: Wed Feb  1 21:08:16 2023
+  write: IOPS=1401, BW=1402MiB/s (1470MB/s)(82.1GiB/60001msec); 0 zone resets
+    slat (usec): min=685, max=815, avg=710.77, stdev=13.24
+    clat (usec): min=4, max=182206, avg=181658.31, stdev=5810.58
+     lat (usec): min=709, max=182913, avg=182369.36, stdev=5810.67
+    clat percentiles (msec):
+     |  1.00th=[  182],  5.00th=[  182], 10.00th=[  182], 20.00th=[  182],
+     | 30.00th=[  182], 40.00th=[  182], 50.00th=[  182], 60.00th=[  182],
+     | 70.00th=[  182], 80.00th=[  182], 90.00th=[  182], 95.00th=[  182],
+     | 99.00th=[  182], 99.50th=[  182], 99.90th=[  182], 99.95th=[  182],
+     | 99.99th=[  182]
+   bw (  MiB/s): min=  900, max= 1408, per=99.71%, avg=1397.60, stdev=46.04, samples=119
+   iops        : min=  900, max= 1408, avg=1397.60, stdev=46.04, samples=119
+  lat (usec)   : 10=0.01%, 750=0.01%
+  lat (msec)   : 2=0.01%, 4=0.01%, 10=0.01%, 20=0.02%, 50=0.05%
+  lat (msec)   : 100=0.08%, 250=99.83%
+  cpu          : usr=3.66%, sys=96.23%, ctx=76, majf=1, minf=9
+  IO depths    : 1=0.1%, 2=0.1%, 4=0.1%, 8=0.1%, 16=0.1%, 32=0.1%, >=64=99.9%
+     submit    : 0=0.0%, 4=100.0%, 8=0.0%, 16=0.0%, 32=0.0%, 64=0.0%, >=64=0.0%
+     complete  : 0=0.0%, 4=100.0%, 8=0.0%, 16=0.0%, 32=0.0%, 64=0.0%, >=64=0.1%
+     issued rwts: total=0,84098,0,0 short=0,0,0,0 dropped=0,0,0,0
+     latency   : target=0, window=0, percentile=100.00%, depth=256
+
+Run status group 0 (all jobs):
+  WRITE: bw=1402MiB/s (1470MB/s), 1402MiB/s-1402MiB/s (1470MB/s-1470MB/s), io=82.1GiB (88.2GB), run=60001-60001msec
+
+And the benchmark with 4K size I/O doesn't show measurable regression.
+
+
+Yang Shi (5):
+      mm: page_alloc: add API for bulk allocator with callback
+      mm: mempool: extract the common initialization and alloc code
+      mm: mempool: introduce page bulk allocator
+      md: dm-crypt: move crypt_free_buffer_pages ahead
+      md: dm-crypt: use mempool page bulk allocator
+
+ drivers/md/dm-crypt.c   |  95 ++++++++++++++++++++++++++++++---------------------
+ include/linux/gfp.h     |  21 +++++++++---
+ include/linux/mempool.h |  21 ++++++++++++
+ mm/mempolicy.c          |  12 ++++---
+ mm/mempool.c            | 248 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-----------------------
+ mm/page_alloc.c         |  21 ++++++++----
+ 6 files changed, 323 insertions(+), 95 deletions(-)
+
 
