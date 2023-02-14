@@ -2,327 +2,71 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D3273C61DA4
-	for <linux-block@archiver.kernel.org>; Tue, 14 Feb 2023 18:33:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CE25AC6379F
+	for <linux-block@archiver.kernel.org>; Tue, 14 Feb 2023 18:44:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230414AbjBNSdu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 14 Feb 2023 13:33:50 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33328 "EHLO
+        id S231710AbjBNSoB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 14 Feb 2023 13:44:01 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38876 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232491AbjBNSdt (ORCPT
+        with ESMTP id S232171AbjBNSoA (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 14 Feb 2023 13:33:49 -0500
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AECDB10F7;
-        Tue, 14 Feb 2023 10:33:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
-        :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=aTpopcfEDXefND8njwDJgTxCfdO9jKFEwpwhqayI8UA=; b=Erds57+KCjbJ5Vg0whQpEPEtH/
-        4J5NNkCx2dwd2QvqmrOfFRIAKbaIol7qmcyTUqbqE4nqLxLXBOF4tKR7VFrXOsKSLPgHTwRZdsbDJ
-        ajLnBPZ39PrPKCkI25CzfEQeAXohf+vpRahQvaHf0l6HmE0skSMOeItwJAGOXDsXubIDM0PyGwe8o
-        I2Lo7n13RUQVrZEhA07qQI/6WvsWywOlDiPdmmYLSkZE2X0jdwcYECF5Yiaqujsu7N2NTUQjE8wxS
-        tZajFRmBtyXXrsjIAegshAHAzCdloYeXU5O7Y6ORFzBvYLnVExlvihs48/QZjmYeXmCf6a9n2LAdj
-        fd9M3TOg==;
-Received: from [2001:4bb8:181:6771:29b8:d178:cc31:6d8f] (helo=localhost)
-        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1pS07d-003BgR-Kd; Tue, 14 Feb 2023 18:33:46 +0000
-From:   Christoph Hellwig <hch@lst.de>
-To:     Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
-        Josef Bacik <josef@toxicpanda.com>
-Cc:     Ming Lei <ming.lei@redhat.com>, cgroups@vger.kernel.org,
-        linux-block@vger.kernel.org
-Subject: [PATCH 5/5] Revert "blk-cgroup: pin the gendisk in struct blkcg_gq"
-Date:   Tue, 14 Feb 2023 19:33:08 +0100
-Message-Id: <20230214183308.1658775-6-hch@lst.de>
-X-Mailer: git-send-email 2.39.1
-In-Reply-To: <20230214183308.1658775-1-hch@lst.de>
-References: <20230214183308.1658775-1-hch@lst.de>
+        Tue, 14 Feb 2023 13:44:00 -0500
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C8CB725B98;
+        Tue, 14 Feb 2023 10:43:52 -0800 (PST)
+Received: by mail-pl1-f182.google.com with SMTP id e17so9089739plg.12;
+        Tue, 14 Feb 2023 10:43:52 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Vipa2lJ5FT7JsHiDDZpGRZNIifAiXJtbYAtHZhQihSw=;
+        b=6xxHqDqMX5DX7UPVxa/HqCCRQ+k7mr8R7yH9X1ybF44p04Km/5Ry6LEXSWY1qdWsbF
+         RsjpBkG1UtizLe01nOkeEWlDdbXzsW26VrwIbe+O+STD2HE/8tSQhMulkqf8DjW90mI5
+         e0ExSjM1wI78KNCX9QkX69fUIjTmzJB8HFEH4b+QWwuISSGz9b8xaV4Vqv6u98XLaiCV
+         tvNfFVwJ87DkDrndBquJSzvSlLgKNS6idU84ERKTy7a+vvZCAIHiLlgcDwFVz5dsdsbS
+         iewjdRBKlB2oTMniknFOYIA1HjnDmMFznLeurS32YY3l0Qx6n2u5uVdUBG8BuJRGvyds
+         rZug==
+X-Gm-Message-State: AO0yUKXNGTHeCfK/YqxPfB5776YnTnR7lTkjcR+Z+5Jz7ZisFW1nhJMT
+        Tscm7vzcelBxOm48LEMx5aYAJuG9KG8=
+X-Google-Smtp-Source: AK7set8I5Edv9zXPABxlpNhkDJUw47owri0Uzj636u60oH5e0qN99rPmX/VE5dj9mF41tt9dUYeV8w==
+X-Received: by 2002:a17:90b:1b09:b0:233:d3ac:5dc2 with SMTP id nu9-20020a17090b1b0900b00233d3ac5dc2mr3591827pjb.18.1676400232022;
+        Tue, 14 Feb 2023 10:43:52 -0800 (PST)
+Received: from ?IPV6:2620:15c:211:201:bba:95f6:e675:40bc? ([2620:15c:211:201:bba:95f6:e675:40bc])
+        by smtp.gmail.com with ESMTPSA id gt1-20020a17090af2c100b00233c727510csm6036780pjb.40.2023.02.14.10.43.50
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 14 Feb 2023 10:43:51 -0800 (PST)
+Message-ID: <f4079ecb-f483-34f9-0074-b77a9bd36cb6@acm.org>
+Date:   Tue, 14 Feb 2023 10:43:49 -0800
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.6.0
+Subject: Re: [bug report] WARNING at fs/proc/generic.c:376
+ proc_register+0x131/0x1c0 observed with blktests scsi
+Content-Language: en-US
+To:     Yi Zhang <yi.zhang@redhat.com>,
+        linux-scsi <linux-scsi@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>
+References: <CAHj4cs-jef8f4zxJQxjKirAWyZkTREycFdNPvQaGbgS-1r_Lcg@mail.gmail.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <CAHj4cs-jef8f4zxJQxjKirAWyZkTREycFdNPvQaGbgS-1r_Lcg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This reverts commit 84d7d462b16dd5f0bf7c7ca9254bf81db2c952a2.
+On 2/5/23 23:30, Yi Zhang wrote:
+> blktests scsi/ failed on the latest linux-block/for-next, pls help
+> check it, thanks.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- block/bfq-cgroup.c        |  6 +++---
- block/blk-cgroup-rwstat.c |  2 +-
- block/blk-cgroup.c        | 35 ++++++++++++++++++-----------------
- block/blk-cgroup.h        | 11 ++++++-----
- block/blk-iocost.c        |  2 +-
- block/blk-iolatency.c     |  4 ++--
- block/blk-throttle.c      |  4 ++--
- 7 files changed, 33 insertions(+), 31 deletions(-)
+Please help with testing and/or reviewing the candidate fix that I 
+posted 
+(https://lore.kernel.org/linux-scsi/20230210205200.36973-1-bvanassche@acm.org/).
 
-diff --git a/block/bfq-cgroup.c b/block/bfq-cgroup.c
-index 935a497b5dedb3..ea3638e06e04b4 100644
---- a/block/bfq-cgroup.c
-+++ b/block/bfq-cgroup.c
-@@ -405,7 +405,7 @@ static void bfqg_stats_xfer_dead(struct bfq_group *bfqg)
- 
- 	parent = bfqg_parent(bfqg);
- 
--	lockdep_assert_held(&bfqg_to_blkg(bfqg)->disk->queue->queue_lock);
-+	lockdep_assert_held(&bfqg_to_blkg(bfqg)->q->queue_lock);
- 
- 	if (unlikely(!parent))
- 		return;
-@@ -536,7 +536,7 @@ static void bfq_pd_init(struct blkg_policy_data *pd)
- {
- 	struct blkcg_gq *blkg = pd_to_blkg(pd);
- 	struct bfq_group *bfqg = blkg_to_bfqg(blkg);
--	struct bfq_data *bfqd = blkg->disk->queue->elevator->elevator_data;
-+	struct bfq_data *bfqd = blkg->q->elevator->elevator_data;
- 	struct bfq_entity *entity = &bfqg->entity;
- 	struct bfq_group_data *d = blkcg_to_bfqgd(blkg->blkcg);
- 
-@@ -1199,7 +1199,7 @@ static u64 bfqg_prfill_stat_recursive(struct seq_file *sf,
- 	struct cgroup_subsys_state *pos_css;
- 	u64 sum = 0;
- 
--	lockdep_assert_held(&blkg->disk->queue->queue_lock);
-+	lockdep_assert_held(&blkg->q->queue_lock);
- 
- 	rcu_read_lock();
- 	blkg_for_each_descendant_pre(pos_blkg, pos_css, blkg) {
-diff --git a/block/blk-cgroup-rwstat.c b/block/blk-cgroup-rwstat.c
-index b8b8c82e667a3b..3304e841df7ce9 100644
---- a/block/blk-cgroup-rwstat.c
-+++ b/block/blk-cgroup-rwstat.c
-@@ -107,7 +107,7 @@ void blkg_rwstat_recursive_sum(struct blkcg_gq *blkg, struct blkcg_policy *pol,
- 	struct cgroup_subsys_state *pos_css;
- 	unsigned int i;
- 
--	lockdep_assert_held(&blkg->disk->queue->queue_lock);
-+	lockdep_assert_held(&blkg->q->queue_lock);
- 
- 	memset(sum, 0, sizeof(*sum));
- 	rcu_read_lock();
-diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-index 1574566321245e..981ebe003b1c63 100644
---- a/block/blk-cgroup.c
-+++ b/block/blk-cgroup.c
-@@ -118,6 +118,7 @@ static void blkg_free_workfn(struct work_struct *work)
- {
- 	struct blkcg_gq *blkg = container_of(work, struct blkcg_gq,
- 					     free_work);
-+	struct request_queue *q = blkg->q;
- 	int i;
- 
- 	/*
-@@ -127,16 +128,16 @@ static void blkg_free_workfn(struct work_struct *work)
- 	 * blkcg_mutex is used to synchronize blkg_free_workfn() and
- 	 * blkcg_deactivate_policy().
- 	 */
--	mutex_lock(&blkg->disk->queue->blkcg_mutex);
-+	mutex_lock(&q->blkcg_mutex);
- 	for (i = 0; i < BLKCG_MAX_POLS; i++)
- 		if (blkg->pd[i])
- 			blkcg_policy[i]->pd_free_fn(blkg->pd[i]);
- 	if (blkg->parent)
- 		blkg_put(blkg->parent);
- 	list_del_init(&blkg->q_node);
--	mutex_unlock(&blkg->disk->queue->blkcg_mutex);
-+	mutex_unlock(&q->blkcg_mutex);
- 
--	put_disk(blkg->disk);
-+	blk_put_queue(q);
- 	free_percpu(blkg->iostat_cpu);
- 	percpu_ref_exit(&blkg->refcnt);
- 	kfree(blkg);
-@@ -263,12 +264,10 @@ static struct blkcg_gq *blkg_alloc(struct blkcg *blkcg, struct gendisk *disk,
- 	blkg->iostat_cpu = alloc_percpu_gfp(struct blkg_iostat_set, gfp_mask);
- 	if (!blkg->iostat_cpu)
- 		goto out_exit_refcnt;
--
--	if (test_bit(GD_DEAD, &disk->state))
-+	if (!blk_get_queue(disk->queue))
- 		goto out_free_iostat;
--	get_device(disk_to_dev(disk));
--	blkg->disk = disk;
- 
-+	blkg->q = disk->queue;
- 	INIT_LIST_HEAD(&blkg->q_node);
- 	spin_lock_init(&blkg->async_bio_lock);
- 	bio_list_init(&blkg->async_bios);
-@@ -304,7 +303,7 @@ static struct blkcg_gq *blkg_alloc(struct blkcg *blkcg, struct gendisk *disk,
- 	while (--i >= 0)
- 		if (blkg->pd[i])
- 			blkcg_policy[i]->pd_free_fn(blkg->pd[i]);
--	put_disk(blkg->disk);
-+	blk_put_queue(disk->queue);
- out_free_iostat:
- 	free_percpu(blkg->iostat_cpu);
- out_exit_refcnt:
-@@ -476,7 +475,7 @@ static void blkg_destroy(struct blkcg_gq *blkg)
- 	struct blkcg *blkcg = blkg->blkcg;
- 	int i;
- 
--	lockdep_assert_held(&blkg->disk->queue->queue_lock);
-+	lockdep_assert_held(&blkg->q->queue_lock);
- 	lockdep_assert_held(&blkcg->lock);
- 
- 	/*
-@@ -500,7 +499,7 @@ static void blkg_destroy(struct blkcg_gq *blkg)
- 
- 	blkg->online = false;
- 
--	radix_tree_delete(&blkcg->blkg_tree, blkg->disk->queue->id);
-+	radix_tree_delete(&blkcg->blkg_tree, blkg->q->id);
- 	hlist_del_init_rcu(&blkg->blkcg_node);
- 
- 	/*
-@@ -587,7 +586,9 @@ static int blkcg_reset_stats(struct cgroup_subsys_state *css,
- 
- const char *blkg_dev_name(struct blkcg_gq *blkg)
- {
--	return bdi_dev_name(blkg->disk->bdi);
-+	if (!blkg->q->disk)
-+		return NULL;
-+	return bdi_dev_name(blkg->q->disk->bdi);
- }
- 
- /**
-@@ -619,10 +620,10 @@ void blkcg_print_blkgs(struct seq_file *sf, struct blkcg *blkcg,
- 
- 	rcu_read_lock();
- 	hlist_for_each_entry_rcu(blkg, &blkcg->blkg_list, blkcg_node) {
--		spin_lock_irq(&blkg->disk->queue->queue_lock);
--		if (blkcg_policy_enabled(blkg->disk->queue, pol))
-+		spin_lock_irq(&blkg->q->queue_lock);
-+		if (blkcg_policy_enabled(blkg->q, pol))
- 			total += prfill(sf, blkg->pd[pol->plid], data);
--		spin_unlock_irq(&blkg->disk->queue->queue_lock);
-+		spin_unlock_irq(&blkg->q->queue_lock);
- 	}
- 	rcu_read_unlock();
- 
-@@ -1046,9 +1047,9 @@ static int blkcg_print_stat(struct seq_file *sf, void *v)
- 
- 	rcu_read_lock();
- 	hlist_for_each_entry_rcu(blkg, &blkcg->blkg_list, blkcg_node) {
--		spin_lock_irq(&blkg->disk->queue->queue_lock);
-+		spin_lock_irq(&blkg->q->queue_lock);
- 		blkcg_print_one_stat(blkg, sf);
--		spin_unlock_irq(&blkg->disk->queue->queue_lock);
-+		spin_unlock_irq(&blkg->q->queue_lock);
- 	}
- 	rcu_read_unlock();
- 	return 0;
-@@ -1118,7 +1119,7 @@ static void blkcg_destroy_blkgs(struct blkcg *blkcg)
- 	while (!hlist_empty(&blkcg->blkg_list)) {
- 		struct blkcg_gq *blkg = hlist_entry(blkcg->blkg_list.first,
- 						struct blkcg_gq, blkcg_node);
--		struct request_queue *q = blkg->disk->queue;
-+		struct request_queue *q = blkg->q;
- 
- 		if (need_resched() || !spin_trylock(&q->queue_lock)) {
- 			/*
-diff --git a/block/blk-cgroup.h b/block/blk-cgroup.h
-index 3d9e42c519db86..9c5078755e5e19 100644
---- a/block/blk-cgroup.h
-+++ b/block/blk-cgroup.h
-@@ -53,7 +53,8 @@ struct blkg_iostat_set {
- 
- /* association between a blk cgroup and a request queue */
- struct blkcg_gq {
--	struct gendisk			*disk;
-+	/* Pointer to the associated request_queue */
-+	struct request_queue		*q;
- 	struct list_head		q_node;
- 	struct hlist_node		blkcg_node;
- 	struct blkcg			*blkcg;
-@@ -253,11 +254,11 @@ static inline struct blkcg_gq *blkg_lookup(struct blkcg *blkcg,
- 		return q->root_blkg;
- 
- 	blkg = rcu_dereference(blkcg->blkg_hint);
--	if (blkg && blkg->disk->queue == q)
-+	if (blkg && blkg->q == q)
- 		return blkg;
- 
- 	blkg = radix_tree_lookup(&blkcg->blkg_tree, q->id);
--	if (blkg && blkg->disk->queue != q)
-+	if (blkg && blkg->q != q)
- 		blkg = NULL;
- 	return blkg;
- }
-@@ -357,7 +358,7 @@ static inline void blkg_put(struct blkcg_gq *blkg)
- #define blkg_for_each_descendant_pre(d_blkg, pos_css, p_blkg)		\
- 	css_for_each_descendant_pre((pos_css), &(p_blkg)->blkcg->css)	\
- 		if (((d_blkg) = blkg_lookup(css_to_blkcg(pos_css),	\
--					    (p_blkg)->disk->queue)))
-+					    (p_blkg)->q)))
- 
- /**
-  * blkg_for_each_descendant_post - post-order walk of a blkg's descendants
-@@ -372,7 +373,7 @@ static inline void blkg_put(struct blkcg_gq *blkg)
- #define blkg_for_each_descendant_post(d_blkg, pos_css, p_blkg)		\
- 	css_for_each_descendant_post((pos_css), &(p_blkg)->blkcg->css)	\
- 		if (((d_blkg) = blkg_lookup(css_to_blkcg(pos_css),	\
--					    (p_blkg)->disk->queue)))
-+					    (p_blkg)->q)))
- 
- bool __blkcg_punt_bio_submit(struct bio *bio);
- 
-diff --git a/block/blk-iocost.c b/block/blk-iocost.c
-index 7a2dc9dc8e3ba0..ff534e9d92dca2 100644
---- a/block/blk-iocost.c
-+++ b/block/blk-iocost.c
-@@ -2947,7 +2947,7 @@ static void ioc_pd_init(struct blkg_policy_data *pd)
- {
- 	struct ioc_gq *iocg = pd_to_iocg(pd);
- 	struct blkcg_gq *blkg = pd_to_blkg(&iocg->pd);
--	struct ioc *ioc = q_to_ioc(blkg->disk->queue);
-+	struct ioc *ioc = q_to_ioc(blkg->q);
- 	struct ioc_now now;
- 	struct blkcg_gq *tblkg;
- 	unsigned long flags;
-diff --git a/block/blk-iolatency.c b/block/blk-iolatency.c
-index bc0d217f5c1723..0dc910568b3145 100644
---- a/block/blk-iolatency.c
-+++ b/block/blk-iolatency.c
-@@ -967,12 +967,12 @@ static void iolatency_pd_init(struct blkg_policy_data *pd)
- {
- 	struct iolatency_grp *iolat = pd_to_lat(pd);
- 	struct blkcg_gq *blkg = lat_to_blkg(iolat);
--	struct rq_qos *rqos = blkcg_rq_qos(blkg->disk->queue);
-+	struct rq_qos *rqos = blkcg_rq_qos(blkg->q);
- 	struct blk_iolatency *blkiolat = BLKIOLATENCY(rqos);
- 	u64 now = ktime_to_ns(ktime_get());
- 	int cpu;
- 
--	if (blk_queue_nonrot(blkg->disk->queue))
-+	if (blk_queue_nonrot(blkg->q))
- 		iolat->ssd = true;
- 	else
- 		iolat->ssd = false;
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index 74bb1e753ea09d..47e9d8be68f300 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -387,7 +387,7 @@ static void throtl_pd_init(struct blkg_policy_data *pd)
- {
- 	struct throtl_grp *tg = pd_to_tg(pd);
- 	struct blkcg_gq *blkg = tg_to_blkg(tg);
--	struct throtl_data *td = blkg->disk->queue->td;
-+	struct throtl_data *td = blkg->q->td;
- 	struct throtl_service_queue *sq = &tg->service_queue;
- 
- 	/*
-@@ -1174,7 +1174,7 @@ static void throtl_pending_timer_fn(struct timer_list *t)
- 
- 	/* throtl_data may be gone, so figure out request queue by blkg */
- 	if (tg)
--		q = tg->pd.blkg->disk->queue;
-+		q = tg->pd.blkg->q;
- 	else
- 		q = td->queue;
- 
--- 
-2.39.1
+Thanks,
+
+Bart.
 
