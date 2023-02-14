@@ -2,23 +2,23 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E4DD6C677F1
-	for <linux-block@archiver.kernel.org>; Tue, 14 Feb 2023 23:01:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1AC72C05027
+	for <linux-block@archiver.kernel.org>; Tue, 14 Feb 2023 23:01:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232972AbjBNXA6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 14 Feb 2023 18:00:58 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33454 "EHLO
+        id S232983AbjBNXA7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 14 Feb 2023 18:00:59 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32974 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232598AbjBNXAg (ORCPT
+        with ESMTP id S232654AbjBNXAj (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 14 Feb 2023 18:00:36 -0500
+        Tue, 14 Feb 2023 18:00:39 -0500
 Received: from hosting.gsystem.sk (hosting.gsystem.sk [212.5.213.30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id E5C7F2F79E;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id E6CA6305C6;
         Tue, 14 Feb 2023 15:00:28 -0800 (PST)
 Received: from gsql.ggedos.sk (off-20.infotel.telecom.sk [212.5.213.20])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by hosting.gsystem.sk (Postfix) with ESMTPSA id B3FE87A0728;
+        by hosting.gsystem.sk (Postfix) with ESMTPSA id EA6777A0731;
         Wed, 15 Feb 2023 00:00:20 +0100 (CET)
 From:   Ondrej Zary <linux@zary.sk>
 To:     Damien Le Moal <damien.lemoal@opensource.wdc.com>
@@ -27,9 +27,9 @@ Cc:     Christoph Hellwig <hch@lst.de>,
         Jens Axboe <axboe@kernel.dk>, Tim Waugh <tim@cyberelk.net>,
         linux-block@vger.kernel.org, linux-parport@lists.infradead.org,
         linux-ide@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 15/18] pata_parport: remove verbose parameter from test_proto()
-Date:   Wed, 15 Feb 2023 00:00:07 +0100
-Message-Id: <20230214230010.20318-16-linux@zary.sk>
+Subject: [PATCH 17/18] pata_parport: remove obsolete changelogs
+Date:   Wed, 15 Feb 2023 00:00:09 +0100
+Message-Id: <20230214230010.20318-18-linux@zary.sk>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20230214230010.20318-1-linux@zary.sk>
 References: <20230214230010.20318-1-linux@zary.sk>
@@ -39,110 +39,239 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-verbose parameter of test_proto() is now unused, remove it.
+Remove obsolete changelogs from protocol drivers.
 
 Signed-off-by: Ondrej Zary <linux@zary.sk>
 ---
- drivers/ata/pata_parport/bpck.c         | 2 +-
- drivers/ata/pata_parport/epat.c         | 2 +-
- drivers/ata/pata_parport/epia.c         | 2 +-
- drivers/ata/pata_parport/friq.c         | 2 +-
- drivers/ata/pata_parport/frpw.c         | 2 +-
- drivers/ata/pata_parport/pata_parport.c | 2 +-
- include/linux/pata_parport.h            | 2 +-
- 7 files changed, 7 insertions(+), 7 deletions(-)
+ drivers/ata/pata_parport/aten.c  |  6 ------
+ drivers/ata/pata_parport/bpck.c  |  7 -------
+ drivers/ata/pata_parport/bpck6.c |  8 --------
+ drivers/ata/pata_parport/comm.c  |  6 ------
+ drivers/ata/pata_parport/dstr.c  |  6 ------
+ drivers/ata/pata_parport/epat.c  |  7 -------
+ drivers/ata/pata_parport/epia.c  |  7 -------
+ drivers/ata/pata_parport/friq.c  |  5 -----
+ drivers/ata/pata_parport/frpw.c  | 10 ----------
+ drivers/ata/pata_parport/kbic.c  |  6 ------
+ drivers/ata/pata_parport/on20.c  |  6 ------
+ drivers/ata/pata_parport/on26.c  |  9 ---------
+ 12 files changed, 83 deletions(-)
 
-diff --git a/drivers/ata/pata_parport/bpck.c b/drivers/ata/pata_parport/bpck.c
-index 793ef2c7849e..2072e291fd16 100644
---- a/drivers/ata/pata_parport/bpck.c
-+++ b/drivers/ata/pata_parport/bpck.c
-@@ -274,7 +274,7 @@ static void bpck_force_spp(struct pi_adapter *pi)
+diff --git a/drivers/ata/pata_parport/aten.c b/drivers/ata/pata_parport/aten.c
+index 8995a4a08b76..f0d63b8513e0 100644
+--- a/drivers/ata/pata_parport/aten.c
++++ b/drivers/ata/pata_parport/aten.c
+@@ -9,12 +9,6 @@
  
- #define TEST_LEN  16
- 
--static int bpck_test_proto(struct pi_adapter *pi, char *scratch, int verbose)
-+static int bpck_test_proto(struct pi_adapter *pi, char *scratch)
- 
- {	int i, e, l, h, om;
- 	char buf[TEST_LEN];
-diff --git a/drivers/ata/pata_parport/epat.c b/drivers/ata/pata_parport/epat.c
-index da63fe3b7182..da3398941f81 100644
---- a/drivers/ata/pata_parport/epat.c
-+++ b/drivers/ata/pata_parport/epat.c
-@@ -246,7 +246,7 @@ static void epat_disconnect(struct pi_adapter *pi)
- 	w2(pi->saved_r2);
- }
- 
--static int epat_test_proto(struct pi_adapter *pi, char *scratch, int verbose)
-+static int epat_test_proto(struct pi_adapter *pi, char *scratch)
- 
- {       int     k, j, f, cc;
- 	int	e[2] = {0,0};
-diff --git a/drivers/ata/pata_parport/epia.c b/drivers/ata/pata_parport/epia.c
-index 778ebd033ff9..a83685ed9dde 100644
---- a/drivers/ata/pata_parport/epia.c
-+++ b/drivers/ata/pata_parport/epia.c
-@@ -232,7 +232,7 @@ static void epia_write_block(struct pi_adapter *pi, char *buf, int count)
- 
- }
- 
--static int epia_test_proto(struct pi_adapter *pi, char *scratch, int verbose)
-+static int epia_test_proto(struct pi_adapter *pi, char *scratch)
- 
- {       int     j, k, f;
- 	int	e[2] = {0,0};
-diff --git a/drivers/ata/pata_parport/friq.c b/drivers/ata/pata_parport/friq.c
-index 422146f614d6..7ace1f7eea34 100644
---- a/drivers/ata/pata_parport/friq.c
-+++ b/drivers/ata/pata_parport/friq.c
-@@ -178,7 +178,7 @@ static void friq_disconnect(struct pi_adapter *pi)
-         w2(pi->saved_r2);
- } 
- 
--static int friq_test_proto(struct pi_adapter *pi, char *scratch, int verbose)
-+static int friq_test_proto(struct pi_adapter *pi, char *scratch)
- 
- {       int     j, k, r;
- 	int	e[2] = {0,0};
-diff --git a/drivers/ata/pata_parport/frpw.c b/drivers/ata/pata_parport/frpw.c
-index 068db960861e..d04a11889066 100644
---- a/drivers/ata/pata_parport/frpw.c
-+++ b/drivers/ata/pata_parport/frpw.c
-@@ -219,7 +219,7 @@ static int frpw_test_pnp(struct pi_adapter *pi)
-    a hack :-(
  */
  
--static int frpw_test_proto(struct pi_adapter *pi, char *scratch, int verbose)
-+static int frpw_test_proto(struct pi_adapter *pi, char *scratch)
+-/* Changes:
+-
+-	1.01	GRG 1998.05.05	init_proto, release_proto
+-
+-*/
+-
+ #include <linux/module.h>
+ #include <linux/init.h>
+ #include <linux/delay.h>
+diff --git a/drivers/ata/pata_parport/bpck.c b/drivers/ata/pata_parport/bpck.c
+index ecb98bf0e6de..472029a21d59 100644
+--- a/drivers/ata/pata_parport/bpck.c
++++ b/drivers/ata/pata_parport/bpck.c
+@@ -7,13 +7,6 @@
  
- {       int     j, k, r;
- 	int	e[2] = {0,0};
-diff --git a/drivers/ata/pata_parport/pata_parport.c b/drivers/ata/pata_parport/pata_parport.c
-index f42a2cafc382..27aa2419af02 100644
---- a/drivers/ata/pata_parport/pata_parport.c
-+++ b/drivers/ata/pata_parport/pata_parport.c
-@@ -306,7 +306,7 @@ static int pi_test_proto(struct pi_adapter *pi, char *scratch)
+ */
  
- 	parport_claim_or_block(pi->pardev);
- 	if (pi->proto->test_proto)
--		res = pi->proto->test_proto(pi, scratch, 1);
-+		res = pi->proto->test_proto(pi, scratch);
- 	else
- 		res = default_test_proto(pi, scratch);
- 	parport_release(pi->pardev);
-diff --git a/include/linux/pata_parport.h b/include/linux/pata_parport.h
-index c44d30b3e886..e45bb1896003 100644
---- a/include/linux/pata_parport.h
-+++ b/include/linux/pata_parport.h
-@@ -67,7 +67,7 @@ struct pi_protocol {
+-/* Changes:
+-
+-	1.01	GRG 1998.05.05 init_proto, release_proto, pi->delay 
+-	1.02    GRG 1998.08.15 default pi->delay returned to 4
+-
+-*/
+-
+ #include <linux/module.h>
+ #include <linux/init.h>
+ #include <linux/delay.h>
+diff --git a/drivers/ata/pata_parport/bpck6.c b/drivers/ata/pata_parport/bpck6.c
+index f0ab30fa739a..683a11131acd 100644
+--- a/drivers/ata/pata_parport/bpck6.c
++++ b/drivers/ata/pata_parport/bpck6.c
+@@ -11,14 +11,6 @@
  
- 	int (*test_port)(struct pi_adapter *pi);
- 	int (*probe_unit)(struct pi_adapter *pi);
--	int (*test_proto)(struct pi_adapter *pi, char *scratch, int verbose);
-+	int (*test_proto)(struct pi_adapter *pi, char *scratch);
- 	void (*log_adapter)(struct pi_adapter *pi);
+ */
  
- 	int (*init_proto)(struct pi_adapter *pi);
+-/*
+-   This is Ken's linux wrapper for the PPC library
+-   Version 1.0.0 is the backpack driver for which source is not available
+-   Version 2.0.0 is the first to have source released 
+-   Version 2.0.1 is the "Cox-ified" source code 
+-   Version 2.0.2 - fixed version string usage, and made ppc functions static 
+-*/
+-
+ #include <linux/module.h>
+ #include <linux/init.h>
+ #include <linux/kernel.h>
+diff --git a/drivers/ata/pata_parport/comm.c b/drivers/ata/pata_parport/comm.c
+index 6e05b50c322c..0483caa80544 100644
+--- a/drivers/ata/pata_parport/comm.c
++++ b/drivers/ata/pata_parport/comm.c
+@@ -8,12 +8,6 @@
+ 	use this adapter.
+ */
+ 
+-/* Changes:
+-
+-	1.01	GRG 1998.05.05  init_proto, release_proto
+-
+-*/
+-
+ #include <linux/module.h>
+ #include <linux/init.h>
+ #include <linux/delay.h>
+diff --git a/drivers/ata/pata_parport/dstr.c b/drivers/ata/pata_parport/dstr.c
+index 64e45eed9588..c5af7a5fa636 100644
+--- a/drivers/ata/pata_parport/dstr.c
++++ b/drivers/ata/pata_parport/dstr.c
+@@ -7,12 +7,6 @@
+ 
+ */
+ 
+-/* Changes:
+-
+-        1.01    GRG 1998.05.06 init_proto, release_proto
+-
+-*/
+-
+ #include <linux/module.h>
+ #include <linux/init.h>
+ #include <linux/delay.h>
+diff --git a/drivers/ata/pata_parport/epat.c b/drivers/ata/pata_parport/epat.c
+index 26d1b6d438bc..b7085a448301 100644
+--- a/drivers/ata/pata_parport/epat.c
++++ b/drivers/ata/pata_parport/epat.c
+@@ -9,13 +9,6 @@
+ 	
+ */
+ 
+-/* Changes:
+-
+-        1.01    GRG 1998.05.06 init_proto, release_proto
+-        1.02    Joshua b. Jore CPP(renamed), epat_connect, epat_disconnect
+-
+-*/
+-
+ #include <linux/module.h>
+ #include <linux/init.h>
+ #include <linux/delay.h>
+diff --git a/drivers/ata/pata_parport/epia.c b/drivers/ata/pata_parport/epia.c
+index 101a0d9f1aa6..63e74c1facba 100644
+--- a/drivers/ata/pata_parport/epia.c
++++ b/drivers/ata/pata_parport/epia.c
+@@ -10,13 +10,6 @@
+ 
+ */
+ 
+-/* Changes:
+-
+-        1.01    GRG 1998.05.06 init_proto, release_proto
+-	1.02    GRG 1998.06.17 support older versions of EPIA
+-
+-*/
+-
+ #include <linux/module.h>
+ #include <linux/init.h>
+ #include <linux/delay.h>
+diff --git a/drivers/ata/pata_parport/friq.c b/drivers/ata/pata_parport/friq.c
+index 9c4a6487b2a9..ce605f665ab1 100644
+--- a/drivers/ata/pata_parport/friq.c
++++ b/drivers/ata/pata_parport/friq.c
+@@ -20,11 +20,6 @@
+ 
+ */
+ 
+-/* Changes:
+-
+-	1.01	GRG 1998.12.20	 Added support for soft power switch
+-*/
+-
+ #include <linux/module.h>
+ #include <linux/init.h>
+ #include <linux/delay.h>
+diff --git a/drivers/ata/pata_parport/frpw.c b/drivers/ata/pata_parport/frpw.c
+index 024b5c0737e0..257ad13dec09 100644
+--- a/drivers/ata/pata_parport/frpw.c
++++ b/drivers/ata/pata_parport/frpw.c
+@@ -13,16 +13,6 @@
+ 
+ */
+ 
+-/* Changes:
+-
+-        1.01    GRG 1998.05.06 init_proto, release_proto
+-			       fix chip detect
+-			       added EPP-16 and EPP-32
+-	1.02    GRG 1998.09.23 added hard reset to initialisation process
+-	1.03    GRG 1998.12.14 made hard reset conditional
+-
+-*/
+-
+ #include <linux/module.h>
+ #include <linux/init.h>
+ #include <linux/delay.h>
+diff --git a/drivers/ata/pata_parport/kbic.c b/drivers/ata/pata_parport/kbic.c
+index 3fab7a896e79..29f4f1e14d21 100644
+--- a/drivers/ata/pata_parport/kbic.c
++++ b/drivers/ata/pata_parport/kbic.c
+@@ -12,12 +12,6 @@
+ 
+ */
+ 
+-/* Changes:
+-
+-        1.01    GRG 1998.05.06 init_proto, release_proto
+-
+-*/
+-
+ #include <linux/module.h>
+ #include <linux/init.h>
+ #include <linux/delay.h>
+diff --git a/drivers/ata/pata_parport/on20.c b/drivers/ata/pata_parport/on20.c
+index 9cc8be9fa562..6956b91efb47 100644
+--- a/drivers/ata/pata_parport/on20.c
++++ b/drivers/ata/pata_parport/on20.c
+@@ -6,12 +6,6 @@
+         Onspec 90c20 parallel to IDE adapter. 
+ */
+ 
+-/* Changes:
+-
+-        1.01    GRG 1998.05.06 init_proto, release_proto
+-
+-*/
+-
+ #include <linux/module.h>
+ #include <linux/init.h>
+ #include <linux/delay.h>
+diff --git a/drivers/ata/pata_parport/on26.c b/drivers/ata/pata_parport/on26.c
+index e37f69db5f76..1d90eb9b541e 100644
+--- a/drivers/ata/pata_parport/on26.c
++++ b/drivers/ata/pata_parport/on26.c
+@@ -7,15 +7,6 @@
+ 
+ */
+ 
+-/* Changes:
+-
+-        1.01    GRG 1998.05.06 init_proto, release_proto
+-	1.02    GRG 1998.09.23 updates for the -E rev chip
+-	1.03    GRG 1998.12.14 fix for slave drives
+-	1.04    GRG 1998.12.20 yet another bug fix
+-
+-*/
+-
+ #include <linux/module.h>
+ #include <linux/init.h>
+ #include <linux/delay.h>
 -- 
 Ondrej Zary
 
