@@ -2,99 +2,146 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23B5CC61DA4
-	for <linux-block@archiver.kernel.org>; Tue, 14 Feb 2023 15:06:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 002A0C6379F
+	for <linux-block@archiver.kernel.org>; Tue, 14 Feb 2023 15:36:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232490AbjBNPGh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 14 Feb 2023 10:06:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59102 "EHLO
+        id S232176AbjBNPge (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 14 Feb 2023 10:36:34 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55026 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232348AbjBNPGf (ORCPT
+        with ESMTP id S232426AbjBNPgd (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 14 Feb 2023 10:06:35 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E766EF92
-        for <linux-block@vger.kernel.org>; Tue, 14 Feb 2023 07:05:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1676387149;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=YOYQQDP/bQ++BsAgx83j4BSl7EYN5IbXWPqjeqlaItI=;
-        b=jHeJoo124sOClQAJlROc5ov5A1y07HU1dJ/kKjkgGWaLLwrY4LzFGuyqf5us8gegLcmV3o
-        M/iGzHLp5J022O39qQEnIvTm35FZFhXrERdqk3+PD671Jk9vJO84gtaIYNpysWbfX/0T09
-        BZNCL4r/6Nr9dRMK3gCG4v4DE3BZvbA=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-634-NCWLeWzjP9K8yuD-7y7Psw-1; Tue, 14 Feb 2023 10:05:38 -0500
-X-MC-Unique: NCWLeWzjP9K8yuD-7y7Psw-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 1488418E6C42;
-        Tue, 14 Feb 2023 15:05:38 +0000 (UTC)
-Received: from T590 (ovpn-8-22.pek2.redhat.com [10.72.8.22])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 10F9AC15BA0;
-        Tue, 14 Feb 2023 15:05:34 +0000 (UTC)
-Date:   Tue, 14 Feb 2023 23:05:29 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Tejun Heo <tj@kernel.org>,
-        ming.lei@redhat.com
-Subject: Re: [PATCH] block: sync mixed merged request's failfast with 1st
- bio's
-Message-ID: <Y+ujOTfaesHzErb7@T590>
-References: <20230209125527.667004-1-ming.lei@redhat.com>
+        Tue, 14 Feb 2023 10:36:33 -0500
+Received: from mail-io1-xd29.google.com (mail-io1-xd29.google.com [IPv6:2607:f8b0:4864:20::d29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC77459E7
+        for <linux-block@vger.kernel.org>; Tue, 14 Feb 2023 07:36:31 -0800 (PST)
+Received: by mail-io1-xd29.google.com with SMTP id d16so5972528ioz.12
+        for <linux-block@vger.kernel.org>; Tue, 14 Feb 2023 07:36:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112; t=1676388991;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Y0T2UJE2bMCBLwJStDfFX+eI9IUgxEljeFPQRg6MREQ=;
+        b=3CwmEVnFjLIj2M7AESv5Ufvhjj5LMYX0FPahCxQHOYCUcX921x3nAR9l6A+ke3073r
+         nG3fPdc1R8o3Uzw4l1+NFLMJqtExZc+iH1FlLz7xemEFHu7HWQTwCuQs2HPN/1z7IpU6
+         1n6sjsIVDnb/L66aSmmOWhu3Z19HhWzhE/5DGgDdcJU+I6EbqxE4YZaAhqIibCpUW1Tl
+         PrrrQrpJhKuO29MrCUVjLaw6taogwwofsySJfqFxUzeSc5uvn8FQY8O8waMf3pPGdejB
+         8vqb8X+ZX5YJd7rOhi2ZDMZVUClmIZ36jvehoVgGCM1U5Xh8KLi/W1yhsy16HSty/iJF
+         0FJg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1676388991;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Y0T2UJE2bMCBLwJStDfFX+eI9IUgxEljeFPQRg6MREQ=;
+        b=MZLTpcnt20pFCUN7wrQl9fUKwY2aZCjnQG//DkGdT+yAESycUyWKoHoBZesOFp81yt
+         u90KFgXaiMn+Q78zMB472FZxZHj2G/swRUjLVhDO3ZPjMc2o+HUBFlYJpqjZ6wFNAnVX
+         SNkGstfwWbg/MFpgYRHjiJGx2p2gJnoCgefDa68qz6UFRWQSnNINM+c+t5feoS7KAolz
+         sSCct9XJVONLkLZqE5D0xBEiPOaX244qm4ZKAuW08/NMSVXa2968vL6Xic3U7DMxJR0g
+         0Wt0IEEOJ/YFGW0UHp6+vMk5VKFlrwjgEgJjuDHokSuk8JgzIUDzME+1OWZYBrLMpHdx
+         SZFw==
+X-Gm-Message-State: AO0yUKUL15vKbokBf84YY+i3cnoHNK64khlIJXWpVQb+xyGDB44LRFTP
+        y6UgKC7jfnEgof8SygvPbBZCmQ==
+X-Google-Smtp-Source: AK7set+bvRjsHoUhyxFQhAxs5vunmvxeTg9ZtRFdfIR8WeD4EnyOp3kOo3s2n6ZojHpUHdTM2CUNOA==
+X-Received: by 2002:a5d:8183:0:b0:719:6a2:99d8 with SMTP id u3-20020a5d8183000000b0071906a299d8mr1741407ion.0.1676388991145;
+        Tue, 14 Feb 2023 07:36:31 -0800 (PST)
+Received: from [192.168.1.94] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id y74-20020a6bc84d000000b0073fd8ca79c6sm1515790iof.9.2023.02.14.07.36.29
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 14 Feb 2023 07:36:30 -0800 (PST)
+Message-ID: <9dd98aed-0d9a-eb3e-790c-0dd744be8ccb@kernel.dk>
+Date:   Tue, 14 Feb 2023 08:36:29 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230209125527.667004-1-ming.lei@redhat.com>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
+ Thunderbird/102.7.2
+Subject: Re: [PATCH v3 0/5] iov_iter: Adjust styling/location of new splice
+ functions
+Content-Language: en-US
+To:     David Hildenbrand <david@redhat.com>,
+        David Howells <dhowells@redhat.com>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Christoph Hellwig <hch@infradead.org>
+Cc:     Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>,
+        Jeff Layton <jlayton@kernel.org>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Logan Gunthorpe <logang@deltatee.com>,
+        Hillf Danton <hdanton@sina.com>, linux-fsdevel@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org
+References: <20230214083710.2547248-1-dhowells@redhat.com>
+ <75d74adc-7f18-d0df-e092-10bca4f05f2a@redhat.com>
+From:   Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <75d74adc-7f18-d0df-e092-10bca4f05f2a@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Feb 09, 2023 at 08:55:27PM +0800, Ming Lei wrote:
-> We support mixed merge for requests/bios with different fastfail
-> settings. When request fails, each time we only handle the portion
-> with same failfast setting, then bios with failfast can be failed
-> immediately, and bios without failfast can be retried.
+On 2/14/23 2:07?AM, David Hildenbrand wrote:
+> On 14.02.23 09:37, David Howells wrote:
+>> Hi Jens, Al, Christoph,
+>>
+>> Here are patches to make some changes that Christoph requested[1] to the
+>> new generic file splice functions that I implemented[2].  Apart from one
+>> functional change, they just altering the styling and move one of the
+>> functions to a different file:
+>>
+>>   (1) Rename the main functions:
+>>
+>>     generic_file_buffered_splice_read() -> filemap_splice_read()
+>>     generic_file_direct_splice_read()   -> direct_splice_read()
+>>
+>>   (2) Abstract out the calculation of the location of the head pipe buffer
+>>       into a helper function in linux/pipe_fs_i.h.
+>>
+>>   (3) Use init_sync_kiocb() in filemap_splice_read().
+>>
+>>       This is where the functional change is.  Some kiocb fields are then
+>>       filled in where they were set to 0 before, including setting ki_flags
+>>       from f_iocb_flags.
+>>
+>>   (4) Move filemap_splice_read() to mm/filemap.c.  filemap_get_pages() can
+>>       then be made static again.
+>>
+>>   (5) Fix splice-read for a number of filesystems that don't provide a
+>>       ->read_folio() op and for which filemap_get_pages() cannot be used.
+>>
+>> I've pushed the patches here also:
+>>
+>>     https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/log/?h=iov-extract-3
+>>
+>> I've also updated worked the changes into the commits on my iov-extract
+>> branch if that would be preferable, though that means Jens would need to
+>> update his for-6.3/iov-extract again.
+>>
+>> David
+>>
+>> Link: https://lore.kernel.org/r/Y+n0n2UE8BQa/OwW@infradead.org/ [1]
+>> Link: https://lore.kernel.org/r/20230207171305.3716974-1-dhowells@redhat.com/ [2]
+>>
+>> Changes
+>> =======
+>> ver #3)
+>>   - Fix filesystems/drivers that don't have ->read_folio().
+>>
+>> ver #2)
+>>   - Don't attempt to filter IOCB_* flags in filemap_splice_read().
+>>
+>> Link: https://lore.kernel.org/r/20230213134619.2198965-1-dhowells@redhat.com/ # v1
+>>
 > 
-> The idea is pretty good, but the current implementation has several
-> defects:
+> You ignored my RB's :(
 > 
-> 1) initially RA bio doesn't set failfast, however bio merge code
-> doesn't consider this point, and just check its failfast setting for
-> deciding if mixed merge is required. Fix this issue by adding helper
-> of bio_failfast().
-> 
-> 2) when merging bio to request front, if this request is mixed
-> merged, we have to sync request's faifast setting with 1st bio's
-> failfast. Fix it by calling blk_update_mixed_merge().
-> 
-> 3) when merging bio to request back, if this request is mixed
-> merged, we have to mark the bio as failfast, because blk_update_request
-> simply updates request failfast with 1st bio's failfast. Fix
-> it by calling blk_update_mixed_merge().
-> 
-> Fixes one normal EXT4 READ IO failure issue, because it is observed
-> that the normal READ IO is merged with RA IO, and the mixed merged
-> request has different failfast setting with 1st bio's, so finally
-> the normal READ IO doesn't get retried.
-> 
-> Cc: Tejun Heo <tj@kernel.org>
-> Fixes: 80a761fd33cf ("block: implement mixed merge of different failfast requests")
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> ---
->  block/blk-merge.c | 35 +++++++++++++++++++++++++++++++++--
->  1 file changed, 33 insertions(+), 2 deletions(-)
+> .. but unrelated, what's the plan with this now? As Jens mentioned, it
+> might be better to wait for 6.4 for the full series, in which case
+> folding this series into the other series would be better.
 
-Hi Tejun, Jens and Guys,
+That is indeed the question, and unanswered so far... Let's turn it into
+one clean series, and get it stuffed into for-next and most likely
+target 6.4 for inclusion at this point.
 
-Any chance to take a look? The patch addresses one RH customer issue.
-
-
-Thanks, 
-Ming
+-- 
+Jens Axboe
 
