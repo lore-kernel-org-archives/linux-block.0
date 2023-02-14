@@ -2,304 +2,459 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 38EB7C64ED6
-	for <linux-block@archiver.kernel.org>; Tue, 14 Feb 2023 19:02:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FC00C05027
+	for <linux-block@archiver.kernel.org>; Tue, 14 Feb 2023 19:02:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231557AbjBNTCu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 14 Feb 2023 14:02:50 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52952 "EHLO
+        id S233157AbjBNTCt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 14 Feb 2023 14:02:49 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52950 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232748AbjBNTCq (ORCPT
+        with ESMTP id S232740AbjBNTCq (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Tue, 14 Feb 2023 14:02:46 -0500
-Received: from mail-il1-x133.google.com (mail-il1-x133.google.com [IPv6:2607:f8b0:4864:20::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59A4126CDF;
-        Tue, 14 Feb 2023 11:02:42 -0800 (PST)
-Received: by mail-il1-x133.google.com with SMTP id i26so265512ila.11;
-        Tue, 14 Feb 2023 11:02:42 -0800 (PST)
+Received: from mail-il1-x12b.google.com (mail-il1-x12b.google.com [IPv6:2607:f8b0:4864:20::12b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C9D225E1D;
+        Tue, 14 Feb 2023 11:02:40 -0800 (PST)
+Received: by mail-il1-x12b.google.com with SMTP id t7so4983541ilq.2;
+        Tue, 14 Feb 2023 11:02:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=adXFc2bAE5N2Ax60+7xcwGTH5KneoPqPES/UhE90xOw=;
-        b=MdRoFbtDdjDktt43Tl7ma1gEq45TyJ9GZrVi0bN312z/k6DkErJ75noKidLixwJ8AK
-         ATrDw9nEf0YS/1j64xu7oxhF8oAf91RGwTaeYBgkgJoong5DASQHrwepoju3D1HSvHKV
-         tYeylvvoxUG4y48XbDBOWtpm0MNpoyMI6t6izegp37E2hEdE2HEHB3HHpiuQ7mJoVd5j
-         6I14up127L40XGG8IlaJrd6EHG+3foQXQCtJE3GoZr24iekZTofq1Vant0J2b92EHByi
-         OAORaS9DQT4UxbLW1dhEO07k/MQXkZ55K5nHJdWD/MXBxr6z5CIvsqUvvERbdbVs9ic1
-         lSsQ==
+        bh=XqvEeGV6oh0EWfoDksrWyy2/Blf2fwRqNf/jz7ukuRw=;
+        b=XJb3P1GciLVeQG93r4o0mynAwuHd7u3qjuhxyiL0TEqMUd8vqu1fsRZ4Zfzb/k3DPU
+         prTNpeY9UpiQ7F6VxxBag9eRJ2onavUHA2hM/fNVsfsis5vV0zbZXsKHxWFnJiZsPyMC
+         ZtUy/4hdmnwt8HEoY2D8x/GuOhbx+p7zKivIYO4haVkzb/hKCf2QaUOAFbVw023mInPA
+         Kwi1C/2Po0TUXCgEWVJjEw4GkHjc2JmuiT+ZYhNrIyZK+KxZy2OkNyEB4o+KpwFq9rpt
+         LWvmGDrYIktQWZlXFNI9xbwzh7koFfoyxSmZ9Oksm6wdlIBi63AppQtvOcOJJN6gQ+8F
+         +GkQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=adXFc2bAE5N2Ax60+7xcwGTH5KneoPqPES/UhE90xOw=;
-        b=D7M3RWIHH9cmPYNVxn+mL1JbOjoa2AMoxy+9sg5vKm6juR9oF04vEgNH3ct0o0AuIF
-         o/mWI3z9PNuioPCJ01kqiQOakE7fGWRWRzvBrtRwIU9/SFz1Y38B0Zh0bG3A8/oNhCJl
-         JE1o34wYYAM4AJWJKQdQ+dKFe97BDit4gPnn69pqTf3a4v/y2/McyE+25S0LPbA7sDmS
-         YUvFqYIBciyJdHCYIbRQd2ORoxmzZ2pdWCnm+uq6Xn1wXsZa6pHtNfuuxU50wahb3FTS
-         /FLCLbTy7078lhgk2J3zuy7zfXPOLWl4dzABVkueDm1PT4GOvCclqjJZGncGqRPPcM9W
-         dYLw==
-X-Gm-Message-State: AO0yUKWHHgcZpYgQfN/ZtQ9CS7TT/J5A9djH9roZ0QKbhtFY5YeZWqgs
-        VYjApH6SDijW5nSL+pPqVGI=
-X-Google-Smtp-Source: AK7set8iFAYLcyI+QfN4YO8vq9jpVvyppFH1CxRcIdDBG4+l1xKvf1nsBaCarjrOf2vHopjy3DPMbA==
-X-Received: by 2002:a05:6e02:1a66:b0:313:bab3:2f3a with SMTP id w6-20020a056e021a6600b00313bab32f3amr3292517ilv.22.1676401361981;
-        Tue, 14 Feb 2023 11:02:41 -0800 (PST)
+        bh=XqvEeGV6oh0EWfoDksrWyy2/Blf2fwRqNf/jz7ukuRw=;
+        b=LAk/hRgl8NkVZ6asM7wUQwQtGAxK6oUALz5wq3ZnEbkxIGquv5LJsZ/YT2Kx+DhSmf
+         T9yoJEqkxlEHHIafbrUwXNsFgPAGQ7LeqzR+cxniywo2OZPtzUXuHrVaaU98ehhO27nO
+         Vf9T5UdZxTkevq8OqNq06WdgCR7JX6UsgbbDWxilAD6yHNPj3Zsf5Yy45h37ZW0N+ahv
+         nfSSXUZQxEp6HkXXdyWpdw27MDSvNnRQxxKW7gAAA4PLHXVaPD1VaYVh6dDeUMKKt0YG
+         b5VnWGUAaMu3z0XDJsK2kk4xuBqqao8FjiI7kwisM3qS0CGa5K3Zu5YTNMzJrnh8oRWe
+         VVGg==
+X-Gm-Message-State: AO0yUKVOTMDg+dirgrjqz+lBkqix497cb9rGnwXbEHYUIA/0k9oseChG
+        6Qjyr2VHYV+6GIXuXiCLVQg=
+X-Google-Smtp-Source: AK7set9w7As1PUAlwdFW1t3QYCy1I6uoqWw2i5qBHiV+D4qRRjOPuzWXvnCCj9OvgR5i77kopvWOXg==
+X-Received: by 2002:a05:6e02:1a43:b0:310:ae72:32a0 with SMTP id u3-20020a056e021a4300b00310ae7232a0mr4441998ilv.21.1676401359609;
+        Tue, 14 Feb 2023 11:02:39 -0800 (PST)
 Received: from localhost.localdomain (c-67-174-241-145.hsd1.ca.comcast.net. [67.174.241.145])
-        by smtp.gmail.com with ESMTPSA id r11-20020a056e0219cb00b0030c27c9eea4sm3608770ill.33.2023.02.14.11.02.40
+        by smtp.gmail.com with ESMTPSA id r11-20020a056e0219cb00b0030c27c9eea4sm3608770ill.33.2023.02.14.11.02.38
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 14 Feb 2023 11:02:41 -0800 (PST)
+        Tue, 14 Feb 2023 11:02:39 -0800 (PST)
 From:   Yang Shi <shy828301@gmail.com>
 To:     mgorman@techsingularity.net, agk@redhat.com, snitzer@kernel.org,
         dm-devel@redhat.com, akpm@linux-foundation.org
 Cc:     linux-mm@kvack.org, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [v2 PATCH 5/5] md: dm-crypt: use mempool page bulk allocator
-Date:   Tue, 14 Feb 2023 11:02:21 -0800
-Message-Id: <20230214190221.1156876-6-shy828301@gmail.com>
+Subject: [v2 PATCH 3/5] mm: mempool: introduce page bulk allocator
+Date:   Tue, 14 Feb 2023 11:02:19 -0800
+Message-Id: <20230214190221.1156876-4-shy828301@gmail.com>
 X-Mailer: git-send-email 2.39.0
 In-Reply-To: <20230214190221.1156876-1-shy828301@gmail.com>
 References: <20230214190221.1156876-1-shy828301@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-When using dm-crypt for full disk encryption, dm-crypt would allocate
-an out bio and allocate the same amount of pages as in bio for
-encryption.  It currently allocates one page at a time in a loop.  This
-is not efficient.  So using mempool page bulk allocator instead of
-allocating one page at a time.
+Since v5.13 the page bulk allocator was introduced to allocate order-0
+pages in bulk.  There are a few mempool allocator callers which does
+order-0 page allocation in a loop, for example, dm-crypt, f2fs compress,
+etc.  A mempool page bulk allocator seems useful.  So introduce the
+mempool page bulk allocator.
 
-The mempool page bulk allocator would improve the IOPS with 1M I/O
-by approxiamately 6%.  The test is done on a machine with 80 vCPU and
-128GB memory with an encrypted ram device (the impact from storage
-hardware could be minimized so that we could benchmark the dm-crypt
-layer more accurately).
+It introduces the below APIs:
+  - mempool_init_pages_bulk()
+  - mempool_create_pages_bulk()
+They initialize the mempool for page bulk allocator.  The pool is filled
+by alloc_page() in a loop.
 
-Before the patch:
-Jobs: 1 (f=1): [w(1)][100.0%][w=1301MiB/s][w=1301 IOPS][eta 00m:00s]
-crypt: (groupid=0, jobs=1): err= 0: pid=48512: Wed Feb  1 18:11:30 2023
-  write: IOPS=1300, BW=1301MiB/s (1364MB/s)(76.2GiB/60001msec); 0 zone resets
-    slat (usec): min=724, max=867, avg=765.71, stdev=19.27
-    clat (usec): min=4, max=196297, avg=195688.86, stdev=6450.50
-     lat (usec): min=801, max=197064, avg=196454.90, stdev=6450.35
-    clat percentiles (msec):
-     |  1.00th=[  197],  5.00th=[  197], 10.00th=[  197], 20.00th=[  197],
-     | 30.00th=[  197], 40.00th=[  197], 50.00th=[  197], 60.00th=[  197],
-     | 70.00th=[  197], 80.00th=[  197], 90.00th=[  197], 95.00th=[  197],
-     | 99.00th=[  197], 99.50th=[  197], 99.90th=[  197], 99.95th=[  197],
-     | 99.99th=[  197]
-   bw (  MiB/s): min=  800, max= 1308, per=99.69%, avg=1296.94, stdev=46.02, samples=119
-   iops        : min=  800, max= 1308, avg=1296.94, stdev=46.02, samples=119
-  lat (usec)   : 10=0.01%, 1000=0.01%
-  lat (msec)   : 2=0.01%, 4=0.01%, 10=0.01%, 20=0.02%, 50=0.05%
-  lat (msec)   : 100=0.08%, 250=99.83%
-  cpu          : usr=3.88%, sys=96.02%, ctx=69, majf=1, minf=9
-  IO depths    : 1=0.1%, 2=0.1%, 4=0.1%, 8=0.1%, 16=0.1%, 32=0.1%, >=64=99.9%
-     submit    : 0=0.0%, 4=100.0%, 8=0.0%, 16=0.0%, 32=0.0%, 64=0.0%, >=64=0.0%
-     complete  : 0=0.0%, 4=100.0%, 8=0.0%, 16=0.0%, 32=0.0%, 64=0.0%, >=64=0.1%
-     issued rwts: total=0,78060,0,0 short=0,0,0,0 dropped=0,0,0,0
-     latency   : target=0, window=0, percentile=100.00%, depth=256
+  - mempool_alloc_pages_bulk_array()
+  - mempool_alloc_pages_bulk_cb()
+They do bulk allocation from mempool.
+They do the below conceptually:
+  1. Call bulk page allocator
+  2. If the allocation is fulfilled then return otherwise try to
+     allocate the remaining pages from the mempool
+  3. If it is fulfilled then return otherwise retry from #1 with sleepable
+     gfp
+  4. If it is still failed, sleep for a while to wait for the mempool is
+     refilled, then retry from #1
+The populated pages will stay on the array until the callers consume them
+or free them, or are consumed by the callback immediately.
 
-Run status group 0 (all jobs):
-  WRITE: bw=1301MiB/s (1364MB/s), 1301MiB/s-1301MiB/s (1364MB/s-1364MB/s), io=76.2GiB (81.9GB), run=60001-60001msec
+Since mempool allocator is guaranteed to success in the sleepable context,
+so the two APIs return true for success or false for fail.  It is the
+caller's responsibility to handle failure case (partial allocation), just
+like the page bulk allocator.
 
-After the patch:
-Jobs: 1 (f=1): [w(1)][100.0%][w=1401MiB/s][w=1401 IOPS][eta 00m:00s]
-crypt: (groupid=0, jobs=1): err= 0: pid=2171: Wed Feb  1 21:08:16 2023
-  write: IOPS=1401, BW=1402MiB/s (1470MB/s)(82.1GiB/60001msec); 0 zone resets
-    slat (usec): min=685, max=815, avg=710.77, stdev=13.24
-    clat (usec): min=4, max=182206, avg=181658.31, stdev=5810.58
-     lat (usec): min=709, max=182913, avg=182369.36, stdev=5810.67
-    clat percentiles (msec):
-     |  1.00th=[  182],  5.00th=[  182], 10.00th=[  182], 20.00th=[  182],
-     | 30.00th=[  182], 40.00th=[  182], 50.00th=[  182], 60.00th=[  182],
-     | 70.00th=[  182], 80.00th=[  182], 90.00th=[  182], 95.00th=[  182],
-     | 99.00th=[  182], 99.50th=[  182], 99.90th=[  182], 99.95th=[  182],
-     | 99.99th=[  182]
-   bw (  MiB/s): min=  900, max= 1408, per=99.71%, avg=1397.60, stdev=46.04, samples=119
-   iops        : min=  900, max= 1408, avg=1397.60, stdev=46.04, samples=119
-  lat (usec)   : 10=0.01%, 750=0.01%
-  lat (msec)   : 2=0.01%, 4=0.01%, 10=0.01%, 20=0.02%, 50=0.05%
-  lat (msec)   : 100=0.08%, 250=99.83%
-  cpu          : usr=3.66%, sys=96.23%, ctx=76, majf=1, minf=9
-  IO depths    : 1=0.1%, 2=0.1%, 4=0.1%, 8=0.1%, 16=0.1%, 32=0.1%, >=64=99.9%
-     submit    : 0=0.0%, 4=100.0%, 8=0.0%, 16=0.0%, 32=0.0%, 64=0.0%, >=64=0.0%
-     complete  : 0=0.0%, 4=100.0%, 8=0.0%, 16=0.0%, 32=0.0%, 64=0.0%, >=64=0.1%
-     issued rwts: total=0,84098,0,0 short=0,0,0,0 dropped=0,0,0,0
-     latency   : target=0, window=0, percentile=100.00%, depth=256
-
-Run status group 0 (all jobs):
-  WRITE: bw=1402MiB/s (1470MB/s), 1402MiB/s-1402MiB/s (1470MB/s-1470MB/s), io=82.1GiB (88.2GB), run=60001-60001msec
-
-The function tracing also shows the time consumed by page allocations is
-reduced significantly.  The test allocated 1M (256 pages) bio in the same
-environment.
-
-Before the patch:
-It took approximately 600us by excluding the bio_add_page() calls.
-2720.630754 |   56)  xfs_io-38859  |   2.571 us    |    mempool_alloc();
-2720.630757 |   56)  xfs_io-38859  |   0.937 us    |    bio_add_page();
- 2720.630758 |   56)  xfs_io-38859  |   1.772 us    |    mempool_alloc();
- 2720.630760 |   56)  xfs_io-38859  |   0.852 us    |    bio_add_page();
-….
-2720.631559 |   56)  xfs_io-38859  |   2.058 us    |    mempool_alloc();
- 2720.631561 |   56)  xfs_io-38859  |   0.717 us    |    bio_add_page();
- 2720.631562 |   56)  xfs_io-38859  |   2.014 us    |    mempool_alloc();
- 2720.631564 |   56)  xfs_io-38859  |   0.620 us    |    bio_add_page();
-
-After the patch:
-It took approxiamately 30us.
-11564.266385 |   22) xfs_io-136183  | + 30.551 us   |    __alloc_pages_bulk();
-
-Page allocations overhead is around 6% (600us/9853us) in dm-crypt layer shown by
-function trace.  The data also matches the IOPS data shown by fio.
-
-And the benchmark with 4K size I/O doesn't show measurable regression.
+The mempool typically is an object agnostic allocator, but bulk allocation
+is only supported by pages, so the mempool bulk allocator is for page
+allocation only as well.
 
 Signed-off-by: Yang Shi <shy828301@gmail.com>
 ---
- drivers/md/dm-crypt.c | 72 +++++++++++++++++++++++++++----------------
- 1 file changed, 46 insertions(+), 26 deletions(-)
+ include/linux/mempool.h |  21 +++++
+ mm/mempool.c            | 177 ++++++++++++++++++++++++++++++++++++----
+ 2 files changed, 181 insertions(+), 17 deletions(-)
 
-diff --git a/drivers/md/dm-crypt.c b/drivers/md/dm-crypt.c
-index 73069f200cc5..30268ba07fd6 100644
---- a/drivers/md/dm-crypt.c
-+++ b/drivers/md/dm-crypt.c
-@@ -1651,6 +1651,21 @@ static void crypt_free_buffer_pages(struct crypt_config *cc, struct bio *clone)
- 	}
- }
+diff --git a/include/linux/mempool.h b/include/linux/mempool.h
+index 4aae6c06c5f2..1907395b2ef5 100644
+--- a/include/linux/mempool.h
++++ b/include/linux/mempool.h
+@@ -13,6 +13,12 @@ struct kmem_cache;
+ typedef void * (mempool_alloc_t)(gfp_t gfp_mask, void *pool_data);
+ typedef void (mempool_free_t)(void *element, void *pool_data);
  
-+struct crypt_bulk_cb_data {
-+	struct bio *bio;
-+	unsigned int size;
-+};
++typedef unsigned int (mempool_alloc_pages_bulk_t)(gfp_t gfp_mask,
++					unsigned int nr, void *pool_data,
++					struct page **page_array,
++					void (*cb)(struct page *, void *),
++					void *data);
 +
-+static void crypt_bulk_alloc_cb(struct page *page, void *data)
-+{
-+	unsigned int len;
-+	struct crypt_bulk_cb_data *b_data = (struct crypt_bulk_cb_data *)data;
-+
-+	len = (b_data->size > PAGE_SIZE) ? PAGE_SIZE : b_data->size;
-+	bio_add_page(b_data->bio, page, len, 0);
-+	b_data->size -= len;
-+}
+ typedef struct mempool_s {
+ 	spinlock_t lock;
+ 	int min_nr;		/* nr of elements at *elements */
+@@ -22,6 +28,7 @@ typedef struct mempool_s {
+ 	void *pool_data;
+ 	mempool_alloc_t *alloc;
+ 	mempool_free_t *free;
++	mempool_alloc_pages_bulk_t *alloc_pages_bulk;
+ 	wait_queue_head_t wait;
+ } mempool_t;
+ 
+@@ -41,18 +48,32 @@ int mempool_init_node(mempool_t *pool, int min_nr, mempool_alloc_t *alloc_fn,
+ 		      gfp_t gfp_mask, int node_id);
+ int mempool_init(mempool_t *pool, int min_nr, mempool_alloc_t *alloc_fn,
+ 		 mempool_free_t *free_fn, void *pool_data);
++int mempool_init_pages_bulk(mempool_t *pool, int min_nr,
++			    mempool_alloc_pages_bulk_t *alloc_pages_bulk_fn,
++			    mempool_free_t *free_fn, void *pool_data);
+ 
+ extern mempool_t *mempool_create(int min_nr, mempool_alloc_t *alloc_fn,
+ 			mempool_free_t *free_fn, void *pool_data);
+ extern mempool_t *mempool_create_node(int min_nr, mempool_alloc_t *alloc_fn,
+ 			mempool_free_t *free_fn, void *pool_data,
+ 			gfp_t gfp_mask, int nid);
++extern mempool_t *mempool_create_pages_bulk(int min_nr,
++			mempool_alloc_pages_bulk_t *alloc_pages_bulk_fn,
++			mempool_free_t *free_fn, void *pool_data);
+ 
+ extern int mempool_resize(mempool_t *pool, int new_min_nr);
+ extern void mempool_destroy(mempool_t *pool);
+ extern void *mempool_alloc(mempool_t *pool, gfp_t gfp_mask) __malloc;
+ extern void mempool_free(void *element, mempool_t *pool);
+ 
++extern bool mempool_alloc_pages_bulk_array(mempool_t *pool, gfp_t gfp_mask,
++					   unsigned int nr,
++					   struct page **page_array);
++extern bool mempool_alloc_pages_bulk_cb(mempool_t *pool, gfp_t gfp_mask,
++					unsigned int nr,
++					void (*cb)(struct page *, void *),
++					void *data);
 +
  /*
-  * Generate a new unfragmented bio with the given size
-  * This should never violate the device limitations (but only because
-@@ -1674,8 +1689,7 @@ static struct bio *crypt_alloc_buffer(struct dm_crypt_io *io, unsigned size)
- 	struct bio *clone;
- 	unsigned int nr_iovecs = (size + PAGE_SIZE - 1) >> PAGE_SHIFT;
- 	gfp_t gfp_mask = GFP_NOWAIT | __GFP_HIGHMEM;
--	unsigned i, len, remaining_size;
--	struct page *page;
-+	struct crypt_bulk_cb_data data;
+  * A mempool_alloc_t and mempool_free_t that get the memory from
+  * a slab cache that is passed in through pool_data.
+diff --git a/mm/mempool.c b/mm/mempool.c
+index 975c9d1491b6..dddcd847d765 100644
+--- a/mm/mempool.c
++++ b/mm/mempool.c
+@@ -183,6 +183,7 @@ void mempool_destroy(mempool_t *pool)
+ EXPORT_SYMBOL(mempool_destroy);
  
- retry:
- 	if (unlikely(gfp_mask & __GFP_DIRECT_RECLAIM))
-@@ -1686,22 +1700,17 @@ static struct bio *crypt_alloc_buffer(struct dm_crypt_io *io, unsigned size)
- 	clone->bi_private = io;
- 	clone->bi_end_io = crypt_endio;
+ static inline int __mempool_init(mempool_t *pool, int min_nr,
++				 mempool_alloc_pages_bulk_t *alloc_pages_bulk_fn,
+ 				 mempool_alloc_t *alloc_fn,
+ 				 mempool_free_t *free_fn, void *pool_data,
+ 				 gfp_t gfp_mask, int node_id)
+@@ -192,8 +193,11 @@ static inline int __mempool_init(mempool_t *pool, int min_nr,
+ 	pool->pool_data = pool_data;
+ 	pool->alloc	= alloc_fn;
+ 	pool->free	= free_fn;
++	pool->alloc_pages_bulk = alloc_pages_bulk_fn;
+ 	init_waitqueue_head(&pool->wait);
  
--	remaining_size = size;
--
--	for (i = 0; i < nr_iovecs; i++) {
--		page = mempool_alloc(&cc->page_pool, gfp_mask);
--		if (!page) {
--			crypt_free_buffer_pages(cc, clone);
--			bio_put(clone);
--			gfp_mask |= __GFP_DIRECT_RECLAIM;
--			goto retry;
--		}
--
--		len = (remaining_size > PAGE_SIZE) ? PAGE_SIZE : remaining_size;
--
--		bio_add_page(clone, page, len, 0);
-+	data.bio = clone;
-+	data.size = size;
++	WARN_ON_ONCE(alloc_pages_bulk_fn && alloc_fn);
++
+ 	pool->elements = kmalloc_array_node(min_nr, sizeof(void *),
+ 					    gfp_mask, node_id);
+ 	if (!pool->elements)
+@@ -205,7 +209,10 @@ static inline int __mempool_init(mempool_t *pool, int min_nr,
+ 	while (pool->curr_nr < pool->min_nr) {
+ 		void *element;
  
--		remaining_size -= len;
-+	if (!mempool_alloc_pages_bulk_cb(&cc->page_pool, gfp_mask, nr_iovecs,
-+					crypt_bulk_alloc_cb, &data)) {
-+		crypt_free_buffer_pages(cc, clone);
-+		bio_put(clone);
-+		data.bio = NULL;
-+		data.size = 0;
-+		gfp_mask |= __GFP_DIRECT_RECLAIM;
-+		goto retry;
+-		element = pool->alloc(gfp_mask, pool->pool_data);
++		if (pool->alloc_pages_bulk)
++			element = alloc_page(gfp_mask);
++		else
++			element = pool->alloc(gfp_mask, pool->pool_data);
+ 		if (unlikely(!element)) {
+ 			mempool_exit(pool);
+ 			return -ENOMEM;
+@@ -220,7 +227,7 @@ int mempool_init_node(mempool_t *pool, int min_nr, mempool_alloc_t *alloc_fn,
+ 		      mempool_free_t *free_fn, void *pool_data,
+ 		      gfp_t gfp_mask, int node_id)
+ {
+-	return __mempool_init(pool, min_nr, alloc_fn, free_fn, pool_data,
++	return __mempool_init(pool, min_nr, NULL, alloc_fn, free_fn, pool_data,
+ 			      gfp_mask, node_id);
+ }
+ EXPORT_SYMBOL(mempool_init_node);
+@@ -242,14 +249,39 @@ EXPORT_SYMBOL(mempool_init_node);
+ int mempool_init(mempool_t *pool, int min_nr, mempool_alloc_t *alloc_fn,
+ 		 mempool_free_t *free_fn, void *pool_data)
+ {
+-	return __mempool_init(pool, min_nr, alloc_fn, free_fn,
++	return __mempool_init(pool, min_nr, NULL, alloc_fn, free_fn,
+ 			      pool_data, GFP_KERNEL, NUMA_NO_NODE);
+ }
+ EXPORT_SYMBOL(mempool_init);
+ 
+-static mempool_t *__mempool_create(int min_nr, mempool_alloc_t *alloc_fn,
+-				   mempool_free_t *free_fn, void *pool_data,
+-				   gfp_t gfp_mask, int node_id)
++/**
++ * mempool_init_pages_bulk - initialize a pages pool for bulk allocator
++ * @pool: pointer to the memory pool that should be initialized
++ * @min_nr: the minimum number of elements guaranteed to be
++ *          allocated for this pool.
++ * @alloc_pages_bulk_fn: user-defined pages bulk allocation function.
++ * @free_fn: user-defined element-freeing function.
++ * @pool_data: optional private data available to the user-defined functions.
++ *
++ * Like mempool_create(), but initializes the pool in (i.e. embedded in another
++ * structure).
++ *
++ * Return: %0 on success, negative error code otherwise.
++ */
++int mempool_init_pages_bulk(mempool_t *pool, int min_nr,
++			    mempool_alloc_pages_bulk_t *alloc_pages_bulk_fn,
++			    mempool_free_t *free_fn, void *pool_data)
++{
++	return __mempool_init(pool, min_nr, alloc_pages_bulk_fn, NULL,
++			      free_fn, pool_data, GFP_KERNEL, NUMA_NO_NODE);
++}
++EXPORT_SYMBOL(mempool_init_pages_bulk);
++
++static mempool_t *__mempool_create(int min_nr,
++			mempool_alloc_pages_bulk_t *alloc_pages_bulk_fn,
++			mempool_alloc_t *alloc_fn,
++			mempool_free_t *free_fn, void *pool_data,
++			gfp_t gfp_mask, int node_id)
+ {
+ 	mempool_t *pool;
+ 
+@@ -257,8 +289,8 @@ static mempool_t *__mempool_create(int min_nr, mempool_alloc_t *alloc_fn,
+ 	if (!pool)
+ 		return NULL;
+ 
+-	if (__mempool_init(pool, min_nr, alloc_fn, free_fn, pool_data,
+-			   gfp_mask, node_id)) {
++	if (__mempool_init(pool, min_nr, alloc_pages_bulk_fn, alloc_fn,
++			   free_fn, pool_data, gfp_mask, node_id)) {
+ 		kfree(pool);
+ 		return NULL;
+ 	}
+@@ -285,7 +317,7 @@ static mempool_t *__mempool_create(int min_nr, mempool_alloc_t *alloc_fn,
+ mempool_t *mempool_create(int min_nr, mempool_alloc_t *alloc_fn,
+ 				mempool_free_t *free_fn, void *pool_data)
+ {
+-	return __mempool_create(min_nr, alloc_fn, free_fn, pool_data,
++	return __mempool_create(min_nr, NULL, alloc_fn, free_fn, pool_data,
+ 				GFP_KERNEL, NUMA_NO_NODE);
+ }
+ EXPORT_SYMBOL(mempool_create);
+@@ -294,11 +326,21 @@ mempool_t *mempool_create_node(int min_nr, mempool_alloc_t *alloc_fn,
+ 			       mempool_free_t *free_fn, void *pool_data,
+ 			       gfp_t gfp_mask, int node_id)
+ {
+-	return __mempool_create(min_nr, alloc_fn, free_fn, pool_data,
++	return __mempool_create(min_nr, NULL, alloc_fn, free_fn, pool_data,
+ 				gfp_mask, node_id);
+ }
+ EXPORT_SYMBOL(mempool_create_node);
+ 
++mempool_t* mempool_create_pages_bulk(int min_nr,
++			mempool_alloc_pages_bulk_t *alloc_pages_bulk_fn,
++			mempool_free_t *free_fn, void *pool_data)
++{
++	return __mempool_create(min_nr, alloc_pages_bulk_fn, NULL,
++				free_fn, pool_data, GFP_KERNEL,
++				NUMA_NO_NODE);
++}
++EXPORT_SYMBOL(mempool_create_pages_bulk);
++
+ /**
+  * mempool_resize - resize an existing memory pool
+  * @pool:       pointer to the memory pool which was allocated via
+@@ -379,12 +421,23 @@ int mempool_resize(mempool_t *pool, int new_min_nr)
+ }
+ EXPORT_SYMBOL(mempool_resize);
+ 
+-static void *__mempool_alloc(mempool_t *pool, gfp_t gfp_mask)
++#define MEMPOOL_BULK_SUCCESS_PTR	((void *)16)
++
++static void * __mempool_alloc(mempool_t *pool, gfp_t gfp_mask, unsigned int nr,
++			      struct page **page_array,
++			      void (*cb)(struct page *, void *),
++			      void *data)
+ {
+ 	void *element;
+ 	unsigned long flags;
+ 	wait_queue_entry_t wait;
+ 	gfp_t gfp_temp;
++	int i;
++	unsigned int ret, nr_remaining;
++	struct page *page;
++	bool bulk_page_alloc = true;
++
++	ret = nr_remaining = 0;
+ 
+ 	VM_WARN_ON_ONCE(gfp_mask & __GFP_ZERO);
+ 	might_alloc(gfp_mask);
+@@ -395,14 +448,27 @@ static void *__mempool_alloc(mempool_t *pool, gfp_t gfp_mask)
+ 
+ 	gfp_temp = gfp_mask & ~(__GFP_DIRECT_RECLAIM|__GFP_IO);
+ 
++	if ((nr == 1) && (!page_array && !cb && !data))
++		bulk_page_alloc = false;
++
+ repeat_alloc:
++	i = 0;
++
++	if (bulk_page_alloc) {
++		ret = pool->alloc_pages_bulk(gfp_temp, nr, pool->pool_data,
++					     page_array, cb, data);
++		if (ret == nr)
++			return MEMPOOL_BULK_SUCCESS_PTR;
++	} else {
++		element = pool->alloc(gfp_temp, pool->pool_data);
++		if (likely(element != NULL))
++			return element;
++	}
+ 
+-	element = pool->alloc(gfp_temp, pool->pool_data);
+-	if (likely(element != NULL))
+-		return element;
++	nr_remaining = nr - ret;
+ 
+ 	spin_lock_irqsave(&pool->lock, flags);
+-	if (likely(pool->curr_nr)) {
++	while (pool->curr_nr && (nr_remaining > 0)) {
+ 		element = remove_element(pool);
+ 		spin_unlock_irqrestore(&pool->lock, flags);
+ 		/* paired with rmb in mempool_free(), read comment there */
+@@ -412,9 +478,34 @@ static void *__mempool_alloc(mempool_t *pool, gfp_t gfp_mask)
+ 		 * for debugging.
+ 		 */
+ 		kmemleak_update_trace(element);
+-		return element;
++
++		if (!bulk_page_alloc)
++			return element;
++
++		page = (struct page *)element;
++		if (page_array)
++			page_array[ret + i] = page;
++		else
++			cb(page, data);
++
++		i++;
++		nr_remaining--;
++
++		spin_lock_irqsave(&pool->lock, flags);
++	}
++
++	if (bulk_page_alloc && !nr_remaining) {
++		spin_unlock_irqrestore(&pool->lock, flags);
++		return MEMPOOL_BULK_SUCCESS_PTR;
  	}
  
- 	/* Allocate space for integrity tags */
-@@ -2655,10 +2664,14 @@ static void crypt_calculate_pages_per_client(void)
- 	dm_crypt_pages_per_client = pages;
- }
- 
--static void *crypt_page_alloc(gfp_t gfp_mask, void *pool_data)
-+static unsigned int crypt_alloc_pages_bulk(gfp_t gfp_mask, unsigned int nr,
-+					   void *pool_data,
-+					   struct page **page_array,
-+					   void (*cb)(struct page *, void *),
-+					   void *data)
- {
- 	struct crypt_config *cc = pool_data;
--	struct page *page;
-+	unsigned int ret;
- 
- 	/*
- 	 * Note, percpu_counter_read_positive() may over (and under) estimate
-@@ -2667,13 +2680,13 @@ static void *crypt_page_alloc(gfp_t gfp_mask, void *pool_data)
- 	 */
- 	if (unlikely(percpu_counter_read_positive(&cc->n_allocated_pages) >= dm_crypt_pages_per_client) &&
- 	    likely(gfp_mask & __GFP_NORETRY))
--		return NULL;
-+		return 0;
- 
--	page = alloc_page(gfp_mask);
--	if (likely(page != NULL))
--		percpu_counter_add(&cc->n_allocated_pages, 1);
-+	ret = alloc_pages_bulk_cb(gfp_mask, nr, cb, data);
- 
--	return page;
-+	percpu_counter_add(&cc->n_allocated_pages, ret);
-+
-+	return ret;
- }
- 
- static void crypt_page_free(void *page, void *pool_data)
-@@ -2705,11 +2718,16 @@ static void crypt_dtr(struct dm_target *ti)
- 
- 	bioset_exit(&cc->bs);
- 
 +	/*
-+	 * With mempool bulk allocator the pages in the pool are not
-+	 * counted in n_allocated_pages.
++	 * The bulk allocator counts in the populated pages for array,
++	 * but don't do it for the callback version.
 +	 */
-+	WARN_ON(percpu_counter_sum(&cc->n_allocated_pages) != 0);
++	if (bulk_page_alloc && !page_array)
++		nr = nr_remaining;
 +
- 	mempool_exit(&cc->page_pool);
- 	mempool_exit(&cc->req_pool);
- 	mempool_exit(&cc->tag_pool);
+ 	/*
+ 	 * We use gfp mask w/o direct reclaim or IO for the first round.  If
+ 	 * alloc failed with that and @pool was empty, retry immediately.
+@@ -463,10 +554,62 @@ static void *__mempool_alloc(mempool_t *pool, gfp_t gfp_mask)
+  */
+ void *mempool_alloc(mempool_t *pool, gfp_t gfp_mask)
+ {
+-	return __mempool_alloc(pool, gfp_mask);
++	return __mempool_alloc(pool, gfp_mask, 1, NULL, NULL, NULL);
+ }
+ EXPORT_SYMBOL(mempool_alloc);
  
--	WARN_ON(percpu_counter_sum(&cc->n_allocated_pages) != 0);
- 	percpu_counter_destroy(&cc->n_allocated_pages);
- 
- 	if (cc->iv_gen_ops && cc->iv_gen_ops->dtr)
-@@ -3251,7 +3269,9 @@ static int crypt_ctr(struct dm_target *ti, unsigned int argc, char **argv)
- 		ALIGN(sizeof(struct dm_crypt_io) + cc->dmreq_start + additional_req_size,
- 		      ARCH_KMALLOC_MINALIGN);
- 
--	ret = mempool_init(&cc->page_pool, BIO_MAX_VECS, crypt_page_alloc, crypt_page_free, cc);
-+	ret = mempool_init_pages_bulk(&cc->page_pool, BIO_MAX_VECS,
-+				      crypt_alloc_pages_bulk, crypt_page_free,
-+				      cc);
- 	if (ret) {
- 		ti->error = "Cannot allocate page mempool";
- 		goto bad;
++/**
++ * mempool_alloc_pages_bulk - allocate a bulk of pagesfrom a specific
++ *                           memory pool
++ * @pool:       pointer to the memory pool which was allocated via
++ *              mempool_create().
++ * @gfp_mask:   the usual allocation bitmask.
++ * @nr:         the number of requested pages.
++ * @page_array: the array the pages will be added to.
++ * @cb:		the callback function that will handle the page.
++ * @data:	the parameter used by the callback
++ *
++ * this function only sleeps if the alloc_pages_bulk_fn() function sleeps
++ * or the allocation can not be satisfied even though the mempool is depleted.
++ * Note that due to preallocation, this function *never* fails when called
++ * from process contexts. (it might fail if called from an IRQ context.)
++ * Note: using __GFP_ZERO is not supported.  And the caller should not pass
++ * in both valid page_array and callback.
++ *
++ * Return: true when nr pages are allocated or false if not.  It is the
++ *         caller's responsibility to free the partial allocated pages.
++ */
++static bool mempool_alloc_pages_bulk(mempool_t *pool, gfp_t gfp_mask,
++				     unsigned int nr,
++				     struct page **page_array,
++				     void (*cb)(struct page *, void *),
++				     void *data)
++{
++	if(!__mempool_alloc(pool, gfp_mask, nr, page_array, cb, data))
++		return false;
++
++	return true;
++}
++
++bool mempool_alloc_pages_bulk_array(mempool_t *pool, gfp_t gfp_mask,
++				    unsigned int nr,
++				    struct page **page_array)
++{
++	return mempool_alloc_pages_bulk(pool, gfp_mask, nr, page_array,
++					NULL, NULL);
++}
++EXPORT_SYMBOL(mempool_alloc_pages_bulk_array);
++
++bool mempool_alloc_pages_bulk_cb(mempool_t *pool, gfp_t gfp_mask,
++				 unsigned int nr,
++				 void (*cb)(struct page *, void *),
++				 void *data)
++{
++	return mempool_alloc_pages_bulk(pool, gfp_mask, nr, NULL,
++					cb, data);
++}
++EXPORT_SYMBOL(mempool_alloc_pages_bulk_cb);
++
+ /**
+  * mempool_free - return an element to the pool.
+  * @element:   pool element pointer.
 -- 
 2.39.0
 
