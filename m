@@ -2,24 +2,24 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AAF77C64ED6
-	for <linux-block@archiver.kernel.org>; Tue, 14 Feb 2023 23:00:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6EE3BC64EC7
+	for <linux-block@archiver.kernel.org>; Tue, 14 Feb 2023 23:00:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232265AbjBNXA0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 14 Feb 2023 18:00:26 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32918 "EHLO
+        id S232221AbjBNXAZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 14 Feb 2023 18:00:25 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32914 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231689AbjBNXAY (ORCPT
+        with ESMTP id S231220AbjBNXAY (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Tue, 14 Feb 2023 18:00:24 -0500
 Received: from hosting.gsystem.sk (hosting.gsystem.sk [212.5.213.30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id C236A29400;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id C22F029173;
         Tue, 14 Feb 2023 15:00:21 -0800 (PST)
 Received: from gsql.ggedos.sk (off-20.infotel.telecom.sk [212.5.213.20])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by hosting.gsystem.sk (Postfix) with ESMTPSA id B567D7A0308;
-        Wed, 15 Feb 2023 00:00:18 +0100 (CET)
+        by hosting.gsystem.sk (Postfix) with ESMTPSA id 13F397A0533;
+        Wed, 15 Feb 2023 00:00:19 +0100 (CET)
 From:   Ondrej Zary <linux@zary.sk>
 To:     Damien Le Moal <damien.lemoal@opensource.wdc.com>
 Cc:     Christoph Hellwig <hch@lst.de>,
@@ -27,42 +27,50 @@ Cc:     Christoph Hellwig <hch@lst.de>,
         Jens Axboe <axboe@kernel.dk>, Tim Waugh <tim@cyberelk.net>,
         linux-block@vger.kernel.org, linux-parport@lists.infradead.org,
         linux-ide@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v2 0/18] pata_parport: protocol drivers fixes and cleanups
-Date:   Tue, 14 Feb 2023 23:59:52 +0100
-Message-Id: <20230214230010.20318-1-linux@zary.sk>
+Subject: [PATCH 02/18] pata_parport: probe all units automatically
+Date:   Tue, 14 Feb 2023 23:59:54 +0100
+Message-Id: <20230214230010.20318-3-linux@zary.sk>
 X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20230214230010.20318-1-linux@zary.sk>
+References: <20230214230010.20318-1-linux@zary.sk>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This patch series fixes two bugs and cleans up pata_parport protocol drivers,
-making the code simpler with no changes in behavior (except logged messages).
+Only unit 0 is probed after registering a protocol driver or attaching
+a new parport. This causes bpck and bpck6 devices to be not detected
+automatically.
+Probe all units just like in manual device creation (using sysfs).
 
 Signed-off-by: Ondrej Zary <linux@zary.sk>
 ---
-Changes in v2:
- - added two bugfixes (first two patches)
- - addressed Sergey's comments (mostly split patches)
+ drivers/ata/pata_parport/pata_parport.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
- drivers/ata/pata_parport/aten.c                            |  45 ++++----------
- drivers/ata/pata_parport/bpck.c                            |  86 ++++++++------------------
- drivers/ata/pata_parport/bpck6.c                           | 107 ++++++++-------------------------
- drivers/ata/pata_parport/comm.c                            |  52 +++++-----------
- drivers/ata/pata_parport/dstr.c                            |  45 ++++----------
- drivers/ata/pata_parport/epat.c                            |  48 ++++++---------
- drivers/ata/pata_parport/epia.c                            |  55 +++++------------
- drivers/ata/pata_parport/fit2.c                            |  37 ++++--------
- drivers/ata/pata_parport/fit3.c                            |  39 ++++--------
- drivers/ata/pata_parport/friq.c                            |  56 ++++++-----------
- drivers/ata/pata_parport/frpw.c                            |  71 ++++++----------------
- drivers/ata/pata_parport/kbic.c                            |  66 +++++++++-----------
- drivers/ata/pata_parport/ktti.c                            |  38 ++++--------
- drivers/ata/pata_parport/on20.c                            |  45 ++++----------
- drivers/ata/pata_parport/on26.c                            |  52 ++++------------
- drivers/ata/pata_parport/pata_parport.c                    |  31 +++++-----
- {include/linux => drivers/ata/pata_parport}/pata_parport.h |  41 ++++---------
- 17 files changed, 271 insertions(+), 643 deletions(-)
-
+diff --git a/drivers/ata/pata_parport/pata_parport.c b/drivers/ata/pata_parport/pata_parport.c
+index 294a266a0dda..49e99c9465fd 100644
+--- a/drivers/ata/pata_parport/pata_parport.c
++++ b/drivers/ata/pata_parport/pata_parport.c
+@@ -530,7 +530,7 @@ int pata_parport_register_driver(struct pi_protocol *pr)
+ 	if (probe) {
+ 		/* probe all parports using this protocol */
+ 		idr_for_each_entry(&parport_list, parport, port_num)
+-			pi_init_one(parport, pr, -1, 0, -1);
++			pi_init_one(parport, pr, -1, -1, -1);
+ 	}
+ 	mutex_unlock(&pi_mutex);
+ 
+@@ -665,7 +665,7 @@ static void pata_parport_attach(struct parport *port)
+ 	if (probe) {
+ 		/* probe this port using all protocols */
+ 		idr_for_each_entry(&protocols, pr, pr_num)
+-			pi_init_one(port, pr, -1, 0, -1);
++			pi_init_one(port, pr, -1, -1, -1);
+ 	}
+ 	mutex_unlock(&pi_mutex);
+ }
+-- 
+Ondrej Zary
 
