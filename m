@@ -2,138 +2,146 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20605C6379F
-	for <linux-block@archiver.kernel.org>; Tue, 14 Feb 2023 15:50:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 680D4C05027
+	for <linux-block@archiver.kernel.org>; Tue, 14 Feb 2023 16:37:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233243AbjBNPu0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 14 Feb 2023 10:50:26 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36468 "EHLO
+        id S231889AbjBNQhO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 14 Feb 2023 11:37:14 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52498 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232990AbjBNPuY (ORCPT
+        with ESMTP id S231891AbjBNQhM (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 14 Feb 2023 10:50:24 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8360D10F6
-        for <linux-block@vger.kernel.org>; Tue, 14 Feb 2023 07:49:37 -0800 (PST)
+        Tue, 14 Feb 2023 11:37:12 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0D72928855
+        for <linux-block@vger.kernel.org>; Tue, 14 Feb 2023 08:36:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1676389776;
+        s=mimecast20190719; t=1676392577;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=9N7LtIUCs1c3MxbwmYpiSal++u4MCEt1aDdzCRdbS6c=;
-        b=imKFnwWLugFkedn6ORr36dmq7mofiDKlwK9/7QY1pcajk+BQzq7U8qqM7iMUpmud2Zq84e
-        6yH4zklOquUzeNuH9P1ux5boPaoKa2iPtNJ3f2aOBLJWLrltO9/4WOpHYxwRthCYevw4x2
-        xqZdcQJBv/+rMm4syp45I/JtkbQzm8A=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=eFid/HUqcCzTbg7tAocvaeTvEcVaWGtwlBvvmtIKZvo=;
+        b=YjGp56h3V8WjQxh8qd6o+Ren6k6BfieI+ZqLuZCoyEZ8zZrFOVB6SeS7XrpBagQefu1s+E
+        54r021kZfHDU9KozG02Wsqobvpfx466U4pZtEsec2wS/sYe8+ynJPOKGj4hveq3ZXncc36
+        Mn4OK7E+CJ09LrygmnG5QnVbaQ0dECk=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-625-Qze0Dd2KNe6BqSZdcFdeGg-1; Tue, 14 Feb 2023 10:49:33 -0500
-X-MC-Unique: Qze0Dd2KNe6BqSZdcFdeGg-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
+ us-mta-64-4P__78GPMs2nE1uirjVMyw-1; Tue, 14 Feb 2023 11:36:13 -0500
+X-MC-Unique: 4P__78GPMs2nE1uirjVMyw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 4E85C3C0E204;
-        Tue, 14 Feb 2023 15:49:32 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.33.36.24])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 5E76B140EBF6;
-        Tue, 14 Feb 2023 15:49:30 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <9dd98aed-0d9a-eb3e-790c-0dd744be8ccb@kernel.dk>
-References: <9dd98aed-0d9a-eb3e-790c-0dd744be8ccb@kernel.dk> <20230214083710.2547248-1-dhowells@redhat.com> <75d74adc-7f18-d0df-e092-10bca4f05f2a@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     dhowells@redhat.com, David Hildenbrand <david@redhat.com>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Christoph Hellwig <hch@infradead.org>,
-        Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>,
-        Jeff Layton <jlayton@kernel.org>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        Hillf Danton <hdanton@sina.com>, linux-fsdevel@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org
-Subject: Re: [PATCH v3 0/5] iov_iter: Adjust styling/location of new splice functions
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 19CDF85D065;
+        Tue, 14 Feb 2023 16:36:12 +0000 (UTC)
+Received: from localhost (unknown [10.39.193.169])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 7E4D340ED76C;
+        Tue, 14 Feb 2023 16:36:11 +0000 (UTC)
+Date:   Tue, 14 Feb 2023 11:36:09 -0500
+From:   Stefan Hajnoczi <stefanha@redhat.com>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Miklos Szeredi <mszeredi@redhat.com>,
+        Bernd Schubert <bschubert@ddn.com>,
+        Nitesh Shetty <nj.shetty@samsung.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Ziyang Zhang <ZiyangZhang@linux.alibaba.com>
+Subject: Re: [PATCH 0/4] io_uring: add IORING_OP_READ[WRITE]_SPLICE_BUF
+Message-ID: <Y+u4ee5b0Dn518Av@fedora>
+References: <20230210153212.733006-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <2677037.1676389769.1@warthog.procyon.org.uk>
-Date:   Tue, 14 Feb 2023 15:49:29 +0000
-Message-ID: <2677038.1676389769@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.7
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="aKR+678H52Jj1vwi"
+Content-Disposition: inline
+In-Reply-To: <20230210153212.733006-1-ming.lei@redhat.com>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Jens Axboe <axboe@kernel.dk> wrote:
 
-> That is indeed the question, and unanswered so far... Let's turn it into
-> one clean series, and get it stuffed into for-next and most likely
-> target 6.4 for inclusion at this point.
+--aKR+678H52Jj1vwi
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-I was waiting to see if the patch worked for Daniel (which it does) and
-Guenter (no answer yet) before answering.  It appears to fix shmem - I've
-tested it with:
+On Fri, Feb 10, 2023 at 11:32:08PM +0800, Ming Lei wrote:
+> Hello,
+>=20
+> Add two OPs which buffer is retrieved via kernel splice for supporting
+> fuse/ublk zero copy.
+>=20
+> The 1st patch enhances direct pipe & splice for moving pages in kernel,
+> so that the two added OPs won't be misused, and avoid potential security
+> hole.
+>=20
+> The 2nd patch allows splice_direct_to_actor() caller to ignore signal
+> if the actor won't block and can be done in bound time.
+>=20
+> The 3rd patch add the two OPs.
+>=20
+> The 4th patch implements ublk's ->splice_read() for supporting
+> zero copy.
+>=20
+> ublksrv(userspace):
+>=20
+> https://github.com/ming1/ubdsrv/commits/io_uring_splice_buf
+>    =20
+> So far, only loop/null target implements zero copy in above branch:
+>    =20
+> 	ublk add -t loop -f $file -z
+> 	ublk add -t none -z
+>=20
+> Basic FS/IO function is verified, mount/kernel building & fio
+> works fine, and big chunk IO(BS: 64k/512k) performance gets improved
+> obviously.
+> =20
+> Any comment is welcome!
 
-	dd if=/dev/zero of=/tmp/sparse count=1 seek=401 bs=4096
-	just-splice /tmp/sparse 11234000 | sha1sum
+I'm not familiar enough with the splice implementation to review these
+patches, but the performance numbers you posted look great. This could
+be very nice for ublk and FUSE servers!
 
-where just-splice.c is attached (note that piping the output into another
-program is important to make the splice work).
+Thanks,
+Stefan
 
-Meanwhile, I'm working on working the changes into my patchset at appropriate
-points.
+> Ming Lei (4):
+>   fs/splice: enhance direct pipe & splice for moving pages in kernel
+>   fs/splice: allow to ignore signal in __splice_from_pipe
+>   io_uring: add IORING_OP_READ[WRITE]_SPLICE_BUF
+>   ublk_drv: support splice based read/write zero copy
+>=20
+>  drivers/block/ublk_drv.c      | 169 +++++++++++++++++++++++++++++++--
+>  fs/splice.c                   |  19 +++-
+>  include/linux/pipe_fs_i.h     |  10 ++
+>  include/linux/splice.h        |  23 +++++
+>  include/uapi/linux/io_uring.h |   2 +
+>  include/uapi/linux/ublk_cmd.h |  31 +++++-
+>  io_uring/opdef.c              |  37 ++++++++
+>  io_uring/rw.c                 | 174 +++++++++++++++++++++++++++++++++-
+>  io_uring/rw.h                 |   1 +
+>  9 files changed, 456 insertions(+), 10 deletions(-)
+>=20
+> --=20
+> 2.31.1
+>=20
 
-David
----
-#define _GNU_SOURCE 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-#include <fcntl.h>
-#include <sys/sendfile.h>
-#include <sys/wait.h>
+--aKR+678H52Jj1vwi
+Content-Type: application/pgp-signature; name="signature.asc"
 
-static char *prog;
+-----BEGIN PGP SIGNATURE-----
 
-int main(int argc, char *argv[])
-{
-        unsigned int iflags = 0;
-        ssize_t spliced, remain;
-        int in, out;
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmPruHkACgkQnKSrs4Gr
+c8hoygf/TxmJ6tYvVhdKWk0lr2xIi3rNSAqFHVsyVI5RCeG5vt1rOh2j8Bfx3HpT
+xgxK9fTBY3ZJQahLnEpnzxpWovoCAiIEY+fl13LZDplfKvpDcywDamiDbIz1bVOv
+b+WnrCPCQReBrj6YmmZWifW9szuWha4CtzhlVqmv0AQlsziKlaMT/6BrDnvaHecL
+E9wsK0RrIS0Fhb/FfpmngtAmPu4EoNzRlR2MbbswQwD5PORr/nx+mbSHlNMdJIIC
+r0Z89L/s8h+vsUeoaxqSw12UogY4e7YajYfoZbDRNH91f+zGNo7+VTckO9JnU2+G
+4ay3KYY7b9hn04w3sa1WpblmLRG8KQ==
+=ZOgV
+-----END PGP SIGNATURE-----
 
-        prog = argv[0];
-        if (argc > 1 && strcmp(argv[1], "-d") == 0) {
-                iflags |= O_DIRECT;
-                argv++;
-                argc--;
-        }
-
-        if (argc != 3 || !argv[1][0] || !argv[2][0]) {
-                fprintf(stderr, "Usage: %s <file> <amount>\n", prog);
-                exit(2);
-        }
-
-        in = open(argv[1], O_RDONLY | O_NOFOLLOW | iflags);
-        if (in < 0) {
-                perror("open");
-                exit(1);
-        }
-
-        remain = strtoul(argv[2], NULL, 0);
-        while (remain > 0) {
-                spliced = splice(in, NULL, 1, NULL, remain, 0);
-                if (spliced < 0) {
-                        perror("splice");
-                        exit(1);
-                }
-                if (spliced == 0)
-                        break;
-                remain -= spliced;
-        }
-
-        exit(0);
-}
+--aKR+678H52Jj1vwi--
 
