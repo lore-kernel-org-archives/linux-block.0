@@ -2,46 +2,59 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BE760C61DA4
-	for <linux-block@archiver.kernel.org>; Tue, 14 Feb 2023 17:16:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EBE3C64ED8
+	for <linux-block@archiver.kernel.org>; Tue, 14 Feb 2023 18:04:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229578AbjBNRQi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 14 Feb 2023 12:16:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42080 "EHLO
+        id S232033AbjBNSEz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 14 Feb 2023 13:04:55 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34852 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232065AbjBNRPe (ORCPT
+        with ESMTP id S232478AbjBNSEn (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 14 Feb 2023 12:15:34 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 096B02ED6B
-        for <linux-block@vger.kernel.org>; Tue, 14 Feb 2023 09:14:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1676394879;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=7RYncx3d2QCFno76YxQ26A3gARIW2WsBk/g5n5z32ew=;
-        b=OIXCW4Dj6rkWJjA0YcFVFOBBGYLYZaaqZV98tlLSg96qVtqovST9p2t943pER/VYezgR2F
-        EnEYLhhnCMbPZXv2hUOQMuxTZB+bk21OaJfYFVEZERbtLKTDdBHWBdvoVgI1PnHPaJPp3d
-        CzAneYMRiDWvdMBrcPh1Ubf7Fw16SvY=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-528-53yWEtX-Pm2chQYNZopvZA-1; Tue, 14 Feb 2023 12:14:33 -0500
-X-MC-Unique: 53yWEtX-Pm2chQYNZopvZA-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C77ED38123AE;
-        Tue, 14 Feb 2023 17:14:32 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.33.36.24])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id D47AE18EC2;
-        Tue, 14 Feb 2023 17:14:30 +0000 (UTC)
-From:   David Howells <dhowells@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>, Al Viro <viro@zeniv.linux.org.uk>,
-        Christoph Hellwig <hch@infradead.org>
-Cc:     David Howells <dhowells@redhat.com>,
+        Tue, 14 Feb 2023 13:04:43 -0500
+Received: from mail-qt1-x829.google.com (mail-qt1-x829.google.com [IPv6:2607:f8b0:4864:20::829])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B422D2B2A4
+        for <linux-block@vger.kernel.org>; Tue, 14 Feb 2023 10:04:32 -0800 (PST)
+Received: by mail-qt1-x829.google.com with SMTP id g18so18482424qtb.6
+        for <linux-block@vger.kernel.org>; Tue, 14 Feb 2023 10:04:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cs.cmu.edu; s=google-2021;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Z+RfWT82grRH2yp1+kvd7+qFvAWPLOfM6Uu0gZ6cTAM=;
+        b=Ln45vBZO59pu7SCdRQDTnrH5JI49m22gg9Iw5nS8G1OytCBUQAa/PPJ6CJSRLIKP3+
+         Ete2z9K+Wm3eHwhoGtsAFCh9phgnyG6yYdbPTck3fzzialpi0qtypazpwULGSrPF+WM/
+         zsYEB/dDXQAXtsn8h+2p2i2kC+MIVbcsaa3HMsG9WOs5iWLLHN7D3NiVXSw/ejzP17TE
+         u64Zo1uSlebWrDFdcT3bHKs3eQY5Q3UffPxwjLrAWeCqBsEDdwrS9lP+d9v5iBe7yjsJ
+         jANs/yFtaz2RhvqlutN7zSqbZLgf+xWR6Yp7KKok7CJkJypVa2gQtZG1fEX4B7zl8MJ1
+         x2UQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Z+RfWT82grRH2yp1+kvd7+qFvAWPLOfM6Uu0gZ6cTAM=;
+        b=1PyyUa0pryynhcKkRpB1yb3WxGvIUFKb69dQ+r6W2xUrX8gt0OEpBvzsleZyT31O03
+         Q0taXywS67ooqxrmOp4C8Q1ao4EyKnN5DfvITsompX8eDF3gKrbHlOfR84KFRwqCFpHH
+         e5FelmeBgFmfui6VcYhvuFO6uexMeyehVw6yHuqXtnrfw7PlLe8rscPjoGRS9G/3aHNE
+         cxnkn5xUZbBZuntYB6SZdw+AJPFDwxHY6XggFEnwmYAwBntDESFfviidAkNo/ppfbfl+
+         foN+s7FJ2w+zKyOhfFZTd8waIoRctRnlSyS4WD9Kj3kxWjy3Dk2mn7S+ESotO6IH2P02
+         7MAQ==
+X-Gm-Message-State: AO0yUKVIcAJ7W5gherUEoMOZUsLabC/ZwJtgvPdLigUKH6KNaRqc/NDt
+        xHgzU2tqyU94DLzCj29BeXXuCQ==
+X-Google-Smtp-Source: AK7set+HUg0X5HtHNByMB4FKO6BoBVyKHOm7rQNL5MfU8paF1RWmVoOYq5KgxBs19P0Uaq1exxK3Dg==
+X-Received: by 2002:ac8:5dd2:0:b0:3b6:9817:18e4 with SMTP id e18-20020ac85dd2000000b003b6981718e4mr5283147qtx.49.1676397871740;
+        Tue, 14 Feb 2023 10:04:31 -0800 (PST)
+Received: from cs.cmu.edu (tunnel29655-pt.tunnel.tserv13.ash1.ipv6.he.net. [2001:470:7:582::2])
+        by smtp.gmail.com with ESMTPSA id e5-20020a05620a014500b006fcb77f3bd6sm12300242qkn.98.2023.02.14.10.04.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 14 Feb 2023 10:04:31 -0800 (PST)
+Date:   Tue, 14 Feb 2023 13:04:28 -0500
+From:   Jan Harkes <jaharkes@cs.cmu.edu>
+To:     David Howells <dhowells@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, Al Viro <viro@zeniv.linux.org.uk>,
+        Christoph Hellwig <hch@infradead.org>,
         Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>,
         Jeff Layton <jlayton@kernel.org>,
         David Hildenbrand <david@redhat.com>,
@@ -50,110 +63,52 @@ Cc:     David Howells <dhowells@redhat.com>,
         Hillf Danton <hdanton@sina.com>, linux-fsdevel@vger.kernel.org,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-mm@kvack.org, Christoph Hellwig <hch@lst.de>,
-        John Hubbard <jhubbard@nvidia.com>
-Subject: [PATCH v14 17/17] block: convert bio_map_user_iov to use iov_iter_extract_pages
-Date:   Tue, 14 Feb 2023 17:13:30 +0000
-Message-Id: <20230214171330.2722188-18-dhowells@redhat.com>
-In-Reply-To: <20230214171330.2722188-1-dhowells@redhat.com>
+        John Hubbard <jhubbard@nvidia.com>,
+        linux-unionfs@vger.kernel.org
+Subject: Re: [PATCH v14 06/17] coda: Implement splice-read
+Message-ID: <20230214180428.asqulrek773hae23@cs.cmu.edu>
+Mail-Followup-To: David Howells <dhowells@redhat.com>,
+        Jens Axboe <axboe@kernel.dk>, Al Viro <viro@zeniv.linux.org.uk>,
+        Christoph Hellwig <hch@infradead.org>,
+        Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>,
+        Jeff Layton <jlayton@kernel.org>,
+        David Hildenbrand <david@redhat.com>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Logan Gunthorpe <logang@deltatee.com>,
+        Hillf Danton <hdanton@sina.com>, linux-fsdevel@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, Christoph Hellwig <hch@lst.de>,
+        John Hubbard <jhubbard@nvidia.com>, linux-unionfs@vger.kernel.org
 References: <20230214171330.2722188-1-dhowells@redhat.com>
+ <20230214171330.2722188-7-dhowells@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.5
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230214171330.2722188-7-dhowells@redhat.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This will pin pages or leave them unaltered rather than getting a ref on
-them as appropriate to the iterator.
+On Tue, Feb 14, 2023 at 05:13:19PM +0000, David Howells wrote:
+> Implement splice-read for coda by passing the request down a layer rather
+> than going through generic_file_splice_read() which is going to be changed
+> to assume that ->read_folio() is present on buffered files.
+> 
+> Signed-off-by: David Howells <dhowells@redhat.com>
+> cc: Christoph Hellwig <hch@lst.de>
+> cc: Jens Axboe <axboe@kernel.dk>
+> cc: Al Viro <viro@zeniv.linux.org.uk>
+> cc: John Hubbard <jhubbard@nvidia.com>
+> cc: David Hildenbrand <david@redhat.com>
+> cc: Matthew Wilcox <willy@infradead.org>
+> cc: Jan Harkes <jaharkes@cs.cmu.edu>
+> cc: coda@cs.cmu.edu
+> cc: codalist@coda.cs.cmu.edu
+> cc: linux-unionfs@vger.kernel.org
+> cc: linux-block@vger.kernel.org
+> cc: linux-fsdevel@vger.kernel.org
+> cc: linux-mm@kvack.org
+> ---
 
-The pages need to be pinned for DIO rather than having refs taken on them
-to prevent VM copy-on-write from malfunctioning during a concurrent fork()
-(the result of the I/O could otherwise end up being visible to/affected by
-the child process).
-
-Signed-off-by: David Howells <dhowells@redhat.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: John Hubbard <jhubbard@nvidia.com>
-cc: Al Viro <viro@zeniv.linux.org.uk>
-cc: Jens Axboe <axboe@kernel.dk>
-cc: Jan Kara <jack@suse.cz>
-cc: Matthew Wilcox <willy@infradead.org>
-cc: Logan Gunthorpe <logang@deltatee.com>
-cc: linux-block@vger.kernel.org
----
-
-Notes:
-    ver #10)
-     - Drop bio_set_cleanup_mode(), open coding it instead.
-    
-    ver #8)
-     - Split the patch up a bit [hch].
-     - We should only be using pinned/non-pinned pages and not ref'd pages,
-       so adjust the comments appropriately.
-    
-    ver #7)
-     - Don't treat BIO_PAGE_REFFED/PINNED as being the same as FOLL_GET/PIN.
-    
-    ver #5)
-     - Transcribe the FOLL_* flags returned by iov_iter_extract_pages() to
-       BIO_* flags and got rid of bi_cleanup_mode.
-     - Replaced BIO_NO_PAGE_REF to BIO_PAGE_REFFED in the preceding patch.
-
- block/blk-map.c | 23 +++++++++++------------
- 1 file changed, 11 insertions(+), 12 deletions(-)
-
-diff --git a/block/blk-map.c b/block/blk-map.c
-index f1f70b50388d..0f1593e144da 100644
---- a/block/blk-map.c
-+++ b/block/blk-map.c
-@@ -281,22 +281,21 @@ static int bio_map_user_iov(struct request *rq, struct iov_iter *iter,
- 
- 	if (blk_queue_pci_p2pdma(rq->q))
- 		extraction_flags |= ITER_ALLOW_P2PDMA;
-+	if (iov_iter_extract_will_pin(iter))
-+		bio_set_flag(bio, BIO_PAGE_PINNED);
- 
--	bio_set_flag(bio, BIO_PAGE_REFFED);
- 	while (iov_iter_count(iter)) {
--		struct page **pages, *stack_pages[UIO_FASTIOV];
-+		struct page *stack_pages[UIO_FASTIOV];
-+		struct page **pages = stack_pages;
- 		ssize_t bytes;
- 		size_t offs;
- 		int npages;
- 
--		if (nr_vecs <= ARRAY_SIZE(stack_pages)) {
--			pages = stack_pages;
--			bytes = iov_iter_get_pages(iter, pages, LONG_MAX,
--						   nr_vecs, &offs, extraction_flags);
--		} else {
--			bytes = iov_iter_get_pages_alloc(iter, &pages,
--						LONG_MAX, &offs, extraction_flags);
--		}
-+		if (nr_vecs > ARRAY_SIZE(stack_pages))
-+			pages = NULL;
-+
-+		bytes = iov_iter_extract_pages(iter, &pages, LONG_MAX,
-+					       nr_vecs, extraction_flags, &offs);
- 		if (unlikely(bytes <= 0)) {
- 			ret = bytes ? bytes : -EFAULT;
- 			goto out_unmap;
-@@ -318,7 +317,7 @@ static int bio_map_user_iov(struct request *rq, struct iov_iter *iter,
- 				if (!bio_add_hw_page(rq->q, bio, page, n, offs,
- 						     max_sectors, &same_page)) {
- 					if (same_page)
--						put_page(page);
-+						bio_release_page(bio, page);
- 					break;
- 				}
- 
-@@ -330,7 +329,7 @@ static int bio_map_user_iov(struct request *rq, struct iov_iter *iter,
- 		 * release the pages we didn't map into the bio, if any
- 		 */
- 		while (j < npages)
--			put_page(pages[j++]);
-+			bio_release_page(bio, pages[j++]);
- 		if (pages != stack_pages)
- 			kvfree(pages);
- 		/* couldn't stuff something into bio? */
+Acked-by: Jan Harkes <jaharkes@cs.cmu.edu>
 
