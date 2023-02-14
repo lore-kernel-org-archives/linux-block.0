@@ -2,100 +2,141 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 81955C05027
-	for <linux-block@archiver.kernel.org>; Tue, 14 Feb 2023 11:04:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A750C6379F
+	for <linux-block@archiver.kernel.org>; Tue, 14 Feb 2023 13:00:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232660AbjBNLEE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 14 Feb 2023 06:04:04 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43122 "EHLO
+        id S231972AbjBNNAI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 14 Feb 2023 08:00:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44380 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231721AbjBNLD7 (ORCPT
+        with ESMTP id S232512AbjBNNAG (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 14 Feb 2023 06:03:59 -0500
-Received: from mail-ej1-x629.google.com (mail-ej1-x629.google.com [IPv6:2a00:1450:4864:20::629])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 64F4023326
-        for <linux-block@vger.kernel.org>; Tue, 14 Feb 2023 03:03:56 -0800 (PST)
-Received: by mail-ej1-x629.google.com with SMTP id sa10so39028603ejc.9
-        for <linux-block@vger.kernel.org>; Tue, 14 Feb 2023 03:03:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=szeredi.hu; s=google;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=GdzfPCmVHJGyNX+E3E8axbyUX3GtR1Oh2TgImoToI7E=;
-        b=ednkJZYRJrS0R2qMp7dMjiY5/E295iRlaB31w9ihVtnIAMOV0PYjYJ0bUgl+fdCYDB
-         0nySuoMmVkCUk2nnTQRCQ9UurtE2OAzUShT4WRpDW3XDeL23fyrQchl2nNAer2OPMcch
-         za6ywzuZT4iuSPB7pBWcIogfKh9Pxx+ltjH5A=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=GdzfPCmVHJGyNX+E3E8axbyUX3GtR1Oh2TgImoToI7E=;
-        b=RgUxW3jl94PElA3VzcccDtEdX0OGUhG0sEDeLlkZws9ssbk9oTGADZQDfepzmH8TN0
-         EVXQTrJR8qm0+N21Zp4YxVktOD/N8M+3bnVMtd08Lek1sHq3Wr/vHSl+0cSJs56iCilq
-         +cUogyt4sIiHo7H4CS0E6kXa8fKeOfC8pwzeqhPchkgvbC/eszayErVAuDceGMyXR4YK
-         xH2G5Lj9uBqAfcT1T3v7iBNZvsQ0/B7cFuNR5OATru6PAILYwHbOpTUGlVsF4vBNBE9S
-         wyhAqHznKmAwLpI6iG+dZquGmxPCjQDPMdZdMkc15GK17F4QdBe9l5HHBQHff695e55A
-         g5ag==
-X-Gm-Message-State: AO0yUKXI2C8DNxGRKYsORxCX2BxW7GPNRjZi6S7ycbHpkXXxKptsEycp
-        5H0IsjGyIi7FXzif8WR7aWtEZ1u/RR1Y+Cys5WIv2w==
-X-Google-Smtp-Source: AK7set+WvUcFXeRoTtYGMf94EhUoMJevx+ByBygwMUIuKnc04+TQ6ZndZqpuUbrMuhp2ugN16oem+2f4IsHNxbEVu5A=
-X-Received: by 2002:a17:906:8591:b0:8af:43c6:10bb with SMTP id
- v17-20020a170906859100b008af43c610bbmr1006905ejx.14.1676372634939; Tue, 14
- Feb 2023 03:03:54 -0800 (PST)
+        Tue, 14 Feb 2023 08:00:06 -0500
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C269F273A;
+        Tue, 14 Feb 2023 05:00:02 -0800 (PST)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 65BD81F37F;
+        Tue, 14 Feb 2023 13:00:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1676379601; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=gz+b6Xt8mJ3ak48xss4fFkdb+QBvNTstPHhtjW5QbEw=;
+        b=AZmiSRVQDfTJgkiUJSdU0mEi40Pv39uPOe93WKQbinXAnR11U4sFoMSpVveB2j5ui8LioA
+        TJKFRMhop3IfGy7gjALJ7MOKmk5A7MK5vJQwZGISDT2b41WFfo1BrTFI6nl6BzobuQH1iq
+        ps1fL1TLqalfcPs30O5TTVnGXX/SLZE=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1676379601;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=gz+b6Xt8mJ3ak48xss4fFkdb+QBvNTstPHhtjW5QbEw=;
+        b=YpBWRY9ZWWcMyQOKgAtNfVetBte+Wt4r+HM2bZe9L88SY5sib75nPRyO3s2u8o89tIZ94H
+        tnarVEyxu2ImUODg==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 570B6138E3;
+        Tue, 14 Feb 2023 13:00:01 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id HVgcFdGF62NBKQAAMHmgww
+        (envelope-from <jack@suse.cz>); Tue, 14 Feb 2023 13:00:01 +0000
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+        id 14F89A06D8; Tue, 14 Feb 2023 14:00:00 +0100 (CET)
+Date:   Tue, 14 Feb 2023 14:00:00 +0100
+From:   Jan Kara <jack@suse.cz>
+To:     David Hildenbrand <david@redhat.com>
+Cc:     Jan Kara <jack@suse.cz>, linux-fsdevel@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-mm@kvack.org,
+        John Hubbard <jhubbard@nvidia.com>,
+        David Howells <dhowells@redhat.com>
+Subject: Re: [PATCH 1/5] mm: Do not reclaim private data from pinned page
+Message-ID: <20230214130000.s5kynjhjiyrpvzxx@quack3>
+References: <20230209121046.25360-1-jack@suse.cz>
+ <20230209123206.3548-1-jack@suse.cz>
+ <df6e150f-9d5c-6f68-f234-3e1ef419f464@redhat.com>
 MIME-Version: 1.0
-References: <20230210153212.733006-1-ming.lei@redhat.com> <20230210153212.733006-2-ming.lei@redhat.com>
- <Y+e3b+Myg/30hlYk@T590> <CAHk-=wgTzLjvhzx-XGkgEQmXH6t=8OTFdQyhDgafGdC2n5gOfg@mail.gmail.com>
- <Y+hDQ1vL6AMFri1E@T590> <CAHk-=wgJsi7t7YYpuo6ewXGnHz2nmj67iWR6KPGoz5TBu34mWQ@mail.gmail.com>
-In-Reply-To: <CAHk-=wgJsi7t7YYpuo6ewXGnHz2nmj67iWR6KPGoz5TBu34mWQ@mail.gmail.com>
-From:   Miklos Szeredi <miklos@szeredi.hu>
-Date:   Tue, 14 Feb 2023 12:03:44 +0100
-Message-ID: <CAJfpegtOetw46DvR1PeuX5L9-fe7Qk75mq5L4tGwpS_wuEz=1g@mail.gmail.com>
-Subject: Re: [PATCH 1/4] fs/splice: enhance direct pipe & splice for moving
- pages in kernel
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-        io-uring@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Miklos Szeredi <mszeredi@redhat.com>,
-        Bernd Schubert <bschubert@ddn.com>,
-        Nitesh Shetty <nj.shetty@samsung.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Ziyang Zhang <ZiyangZhang@linux.alibaba.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <df6e150f-9d5c-6f68-f234-3e1ef419f464@redhat.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, 13 Feb 2023 at 21:04, Linus Torvalds
-<torvalds@linux-foundation.org> wrote:
->
-> On Sat, Feb 11, 2023 at 5:39 PM Ming Lei <ming.lei@redhat.com> wrote:
-> >
-> > >
-> > >  (a) what's the point of MAY_READ? A non-readable page sounds insane
-> > > and wrong. All sinks expect to be able to read.
-> >
-> > For example, it is one page which needs sink end to fill data, so
-> > we needn't to zero it in source end every time, just for avoiding
-> > leak kernel data if (unexpected)sink end simply tried to read from
-> > the spliced page instead of writing data to page.
->
-> I still don't understand.
->
-> A sink *reads* the data. It doesn't write the data.
+On Mon 13-02-23 10:01:35, David Hildenbrand wrote:
+> On 09.02.23 13:31, Jan Kara wrote:
+> > If the page is pinned, there's no point in trying to reclaim it.
+> > Furthermore if the page is from the page cache we don't want to reclaim
+> > fs-private data from the page because the pinning process may be writing
+> > to the page at any time and reclaiming fs private info on a dirty page
+> > can upset the filesystem (see link below).
+> > 
+> > Link: https://lore.kernel.org/linux-mm/20180103100430.GE4911@quack2.suse.cz
+> > Signed-off-by: Jan Kara <jack@suse.cz>
+> > ---
+> >   mm/vmscan.c | 10 ++++++++++
+> >   1 file changed, 10 insertions(+)
+> > 
+> > diff --git a/mm/vmscan.c b/mm/vmscan.c
+> > index bf3eedf0209c..ab3911a8b116 100644
+> > --- a/mm/vmscan.c
+> > +++ b/mm/vmscan.c
+> > @@ -1901,6 +1901,16 @@ static unsigned int shrink_folio_list(struct list_head *folio_list,
+> >   			}
+> >   		}
+> > +		/*
+> > +		 * Folio is unmapped now so it cannot be newly pinned anymore.
+> > +		 * No point in trying to reclaim folio if it is pinned.
+> > +		 * Furthermore we don't want to reclaim underlying fs metadata
+> > +		 * if the folio is pinned and thus potentially modified by the
+> > +		 * pinning process is that may upset the filesystem.
+> > +		 */
+> > +		if (folio_maybe_dma_pinned(folio))
+> > +			goto activate_locked;
+> > +
+> >   		mapping = folio_mapping(folio);
+> >   		if (folio_test_dirty(folio)) {
+> >   			/*
+> 
+> At this point, we made sure that the folio is completely unmapped. However,
+> we specify "TTU_BATCH_FLUSH", so rmap code might defer a TLB flush and
+> consequently defer an IPI sync.
+> 
+> I remember that this check here is fine regarding GUP-fast: even if
+> concurrent GUP-fast pins the page after our check here, it should observe
+> the changed PTE and unpin it again.
+>  
+> Checking after unmapping makes sense: we reduce the likelyhood of false
+> positives when a file-backed page is mapped many times (>= 1024). OTOH, we
+> might unmap pinned pages because we cannot really detect it early.
+> 
+> For anon pages, we have an early (racy) check, which turned out "ok" in
+> practice, because we don't frequently have that many anon pages that are
+> shared by that many processes. I assume we don't want something similar for
+> pagecache pages, because having a single page mapped by many processes can
+> happen easily and would prevent reclaim.
 
-I think Ming is trying to generalize splice to allow flowing data in
-the opposite direction.  So yes, sink would be writing to the buffer.
-And it MUST NOT be reading the data since the buffer may be
-uninitialized.
+Yeah, I think pagecache pages shared by many processes are more likely.
+Furthermore I think pinned pagecache pages are rather rare so unmapping
+them before checking seems fine to me. Obviously we can reconsider if
+reality would prove me wrong ;).
 
-The problem is how to tell the original source that the buffer is
-ready?  PG_uptodate comes to mind, but pipe buffers allow partial
-pages to be passed around, and there's no mechanism to describe a
-partially uptodate buffer.
+> I once had a patch lying around that documented for the existing
+> folio_maybe_dma_pinned() for anon pages exactly that (racy+false positives
+> with many mappings).
+> 
+> Long story short, I assume this change is fine.
 
-Thanks,
-Miklos
+Thanks for the throughout verification :)
+
+								Honza
+
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
