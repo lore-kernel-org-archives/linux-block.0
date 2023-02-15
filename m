@@ -2,35 +2,50 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 32529C636D4
-	for <linux-block@archiver.kernel.org>; Wed, 15 Feb 2023 14:38:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33736C636D4
+	for <linux-block@archiver.kernel.org>; Wed, 15 Feb 2023 15:04:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229783AbjBOOix (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 15 Feb 2023 09:38:53 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36622 "EHLO
+        id S229966AbjBOPEw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 15 Feb 2023 10:04:52 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34892 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229642AbjBOOiw (ORCPT
+        with ESMTP id S229822AbjBOPEn (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 15 Feb 2023 09:38:52 -0500
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C45C38EA1;
-        Wed, 15 Feb 2023 06:38:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=mdhw8NJg/mGm2rLRE7K+YYjG5J4d7EGwj+3NTs6BCts=; b=FBURCH8CW2lpvly8/2QdT+a6WV
-        8kzR47TjYHTSwwUdjoNefF/biBJnI843/SYOdF9WhFk6YPc8FNsubW+U8DJT0tlh5mwFegiYsggNX
-        CvMUd1vbNflSjvqp34VuqGoGL+c6eQtb+5GkMwiqHPtFYx9Y9Hx7VTJabL3kb3yqI62qlSJR+6B12
-        HS7hqLH8DHAAlZjYIFOWrSK+sIRx+bteZTUKK9q19qN3zJM7Poblsyji+P1QLxVTmLD0ygjDkm5H/
-        +wsNaJonOuGpUK9TZxJs6AgHOVMaE4xmHntz1dgZSomtuLr2JhY45zRhlZ2u0rWFpzvA8apaXZtmI
-        ts5QcFJw==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1pSIvR-006ERC-Jq; Wed, 15 Feb 2023 14:38:25 +0000
-Date:   Wed, 15 Feb 2023 06:38:25 -0800
-From:   Christoph Hellwig <hch@infradead.org>
-To:     David Howells <dhowells@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, smfrench@gmail.com,
+        Wed, 15 Feb 2023 10:04:43 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C763B72A7
+        for <linux-block@vger.kernel.org>; Wed, 15 Feb 2023 07:03:59 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1676473439;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=AA0HfJf0ghZRpE+IyHbKXXgsU5oTF5v1rWycRLY8ctI=;
+        b=LHgJj6TfIyl9vaJ4HZybPhvex51lvjDznD8Yv4zrO2yTdbXXQx30C/dez60hZ3rtXReHGD
+        Z4N/eQvhVvgcFDy3sXA0s72vhnKUB5PxO4zpbTDemXkLHDq9C6JrGahhjWBqeU0tj7F+eH
+        c7/5+ei2mC+GPWXEJkX1KEAMGZ3CJwI=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-353-waR7bzIWP4Swo5jl6ha6hw-1; Wed, 15 Feb 2023 10:03:55 -0500
+X-MC-Unique: waR7bzIWP4Swo5jl6ha6hw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id F21C719705B7;
+        Wed, 15 Feb 2023 15:03:34 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.33.36.24])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 32E6F40CF8EA;
+        Wed, 15 Feb 2023 15:03:31 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <CAJfpegshWgUYZLc5v-Vwf6g3ZGmfnHsT_t9JLwxFoV8wPrvBnA@mail.gmail.com>
+References: <CAJfpegshWgUYZLc5v-Vwf6g3ZGmfnHsT_t9JLwxFoV8wPrvBnA@mail.gmail.com> <20230214171330.2722188-1-dhowells@redhat.com> <20230214171330.2722188-6-dhowells@redhat.com>
+To:     Miklos Szeredi <miklos@szeredi.hu>
+Cc:     dhowells@redhat.com, Jens Axboe <axboe@kernel.dk>,
         Al Viro <viro@zeniv.linux.org.uk>,
         Christoph Hellwig <hch@infradead.org>,
         Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>,
@@ -40,23 +55,32 @@ Cc:     Jens Axboe <axboe@kernel.dk>, smfrench@gmail.com,
         Logan Gunthorpe <logang@deltatee.com>,
         Hillf Danton <hdanton@sina.com>, linux-fsdevel@vger.kernel.org,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org
-Subject: Re: [PATCH v14 00/17] iov_iter: Improve page extraction (pin or just
- list)
-Message-ID: <Y+zuYWK1ggcor8jJ@infradead.org>
-References: <867e1e3e-681b-843b-1704-effed736e13d@kernel.dk>
- <20230214171330.2722188-1-dhowells@redhat.com>
- <2877092.1676415412@warthog.procyon.org.uk>
- <2895995.1676448478@warthog.procyon.org.uk>
- <Y+zqy7kyWWo9v/Wt@infradead.org>
+        linux-mm@kvack.org, Christoph Hellwig <hch@lst.de>,
+        John Hubbard <jhubbard@nvidia.com>,
+        linux-unionfs@vger.kernel.org
+Subject: Re: [PATCH v14 05/17] overlayfs: Implement splice-read
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Y+zqy7kyWWo9v/Wt@infradead.org>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <3367218.1676473410.1@warthog.procyon.org.uk>
+Date:   Wed, 15 Feb 2023 15:03:30 +0000
+Message-ID: <3367219.1676473410@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.1
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-And who is using filemap_splice_read directly anyway?  I can't find a
-modular user in any of the branches.
+Miklos Szeredi <miklos@szeredi.hu> wrote:
+
+> > +       ret = -EINVAL;
+> > +       if (in->f_flags & O_DIRECT &&
+> > +           !(real.file->f_mode & FMODE_CAN_ODIRECT))
+> > +               goto out_fdput;
+> 
+> This is unnecessary, as it was already done in ovl_real_fdget() ->
+> ovl_real_fdget_meta() -> ovl_change_flags().
+
+Does that mean ovl_read_iter() and ovl_write_iter() shouldn't be doing it,
+then?
+
+David
+
