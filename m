@@ -2,99 +2,76 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AEE09C636D7
-	for <linux-block@archiver.kernel.org>; Wed, 15 Feb 2023 17:19:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D819C636CC
+	for <linux-block@archiver.kernel.org>; Wed, 15 Feb 2023 18:15:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229675AbjBORTb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 15 Feb 2023 12:19:31 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55608 "EHLO
+        id S229570AbjBOSPC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 15 Feb 2023 13:15:02 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39458 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229631AbjBORT3 (ORCPT
+        with ESMTP id S229538AbjBOSPB (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 15 Feb 2023 12:19:29 -0500
-Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5043298F1;
-        Wed, 15 Feb 2023 09:19:28 -0800 (PST)
-Received: from [192.168.1.103] (31.173.83.250) by msexch01.omp.ru
- (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.986.14; Wed, 15 Feb
- 2023 20:19:21 +0300
-Subject: Re: [PATCH 01/18] pata_parport: fix EPAT C7/C8 Kconfig
-To:     Ondrej Zary <linux@zary.sk>,
-        Damien Le Moal <damien.lemoal@opensource.wdc.com>
-CC:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        Tim Waugh <tim@cyberelk.net>, <linux-block@vger.kernel.org>,
-        <linux-parport@lists.infradead.org>, <linux-ide@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>
-References: <20230214230010.20318-1-linux@zary.sk>
- <20230214230010.20318-2-linux@zary.sk>
-From:   Sergey Shtylyov <s.shtylyov@omp.ru>
-Organization: Open Mobile Platform
-Message-ID: <d26c2776-57bd-b0b8-7f64-1f6a572ffbba@omp.ru>
-Date:   Wed, 15 Feb 2023 20:19:20 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+        Wed, 15 Feb 2023 13:15:01 -0500
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 07DA93B66B
+        for <linux-block@vger.kernel.org>; Wed, 15 Feb 2023 10:15:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Content-Type:MIME-Version:Message-ID:
+        Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+        Content-Description:In-Reply-To:References;
+        bh=JQDo9eSogJXBMc9CSfG/vB0RLOaVwYu0XKME5Qid7hM=; b=KeEyPqXshJ3hQRaCt0l7F27nor
+        iit6ghh7LK19xsliUMZDYM1bUHVdxiPol6ghJ5SHC5QYWvb6f/fvoE4ZXf9U126+tYXJ1jlVk/6Ri
+        T/AlCVLNg76PM7Me05OvJZS25lWCzNKKiMqrf+R6zFd0CQ5fgWRsdw6rbiuKBau+2/KEbmllOn7km
+        PNpa/JesjyP+qgMTwNGgej/Z0pR0I+ka031OOmF/OddARTclF4/cTXUM9CM5hMLq/7x7oUJj+wEMy
+        lqh3Zt/Qfr6dbwTzFnzr3QEMyszLh/GwHTJZ9SUIaeh20VIDDUhuV0RRj36sjDwHQ/mEpC2y2e67h
+        wLSDP6yA==;
+Received: from [2001:4bb8:181:6771:d204:2f73:7b8d:611c] (helo=localhost)
+        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1pSMIy-006oc2-9s; Wed, 15 Feb 2023 18:14:56 +0000
+Date:   Wed, 15 Feb 2023 19:14:51 +0100
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
+Subject: [GIT PULL] nvme fixes for Linux 6.2
+Message-ID: <Y+0hG6t1gTse7yfo@infradead.org>
 MIME-Version: 1.0
-In-Reply-To: <20230214230010.20318-2-linux@zary.sk>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [31.173.83.250]
-X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
- (10.188.4.12)
-X-KSE-ServerInfo: msexch01.omp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 5.9.59, Database issued on: 02/15/2023 16:59:41
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 59
-X-KSE-AntiSpam-Info: Lua profiles 175554 [Feb 15 2023]
-X-KSE-AntiSpam-Info: Version: 5.9.59.0
-X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
-X-KSE-AntiSpam-Info: LuaCore: 504 504 dc137e1f9c062eb6c0671e7d509ab442ae395562
-X-KSE-AntiSpam-Info: {rep_avail}
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info: {relay has no DNS name}
-X-KSE-AntiSpam-Info: {SMTP from is not routable}
-X-KSE-AntiSpam-Info: {Found in DNSBL: 31.173.83.250 in (user)
- b.barracudacentral.org}
-X-KSE-AntiSpam-Info: {Found in DNSBL: 31.173.83.250 in (user)
- dbl.spamhaus.org}
-X-KSE-AntiSpam-Info: 127.0.0.199:7.1.2;omp.ru:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1
-X-KSE-AntiSpam-Info: ApMailHostAddress: 31.173.83.250
-X-KSE-AntiSpam-Info: {DNS response errors}
-X-KSE-AntiSpam-Info: Rate: 59
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
- smtp.mailfrom=omp.ru;dkim=none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Heuristic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 02/15/2023 17:03:00
-X-KSE-AttachmentFiltering-Interceptor-Info: protection disabled
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 2/15/2023 2:45:00 PM
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2/15/23 1:59 AM, Ondrej Zary wrote:
+The following changes since commit 38c33ece232019c5b18b4d5ec0254807cac06b7c:
 
-> CONFIG_PARIDE_EPATC8 was renamed to CONFIG_PATA_PARPORT_EPATC8 but
-> epat.c was not updated to reflect that. Update it.
-> 
-> Signed-off-by: Ondrej Zary <linux@zary.sk>
+  Merge tag 'nvme-6.2-2023-02-09' of git://git.infradead.org/nvme into block-6.2 (2023-02-09 08:12:06 -0700)
 
-   Does the below tag apply here?
+are available in the Git repository at:
 
-Reported-by: Sergey Shtylyov <s.shtylyov@omp.ru>
+  git://git.infradead.org/nvme.git tags/nvme-6.2-2023-02-15
 
-   And here's the usual one:
+for you to fetch changes up to dc785d69d753a3894c93afc23b91404652382ead:
 
-Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
+  nvme-pci: always return an ERR_PTR from nvme_pci_alloc_dev (2023-02-14 06:39:02 +0100)
 
-[...]
+----------------------------------------------------------------
+nvme fixes for Linux 6.2
 
-MBR, Sergey
+ - always return an ERR_PTR from nvme_pci_alloc_dev (Irvin Cote)
+ - add bogus ID quirk for ADATA SX6000PNP (Daniel Wagner)
+ - set the DMA mask earlier (Christoph Hellwig)
+
+----------------------------------------------------------------
+Christoph Hellwig (1):
+      nvme-pci: set the DMA mask earlier
+
+Daniel Wagner (1):
+      nvme-pci: add bogus ID quirk for ADATA SX6000PNP
+
+Irvin Cote (1):
+      nvme-pci: always return an ERR_PTR from nvme_pci_alloc_dev
+
+ drivers/nvme/host/pci.c | 20 ++++++++++----------
+ 1 file changed, 10 insertions(+), 10 deletions(-)
