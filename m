@@ -2,24 +2,24 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F060AC64ED8
-	for <linux-block@archiver.kernel.org>; Wed, 15 Feb 2023 19:46:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71C87C64ED9
+	for <linux-block@archiver.kernel.org>; Wed, 15 Feb 2023 19:47:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229830AbjBOTqz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 15 Feb 2023 14:46:55 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41410 "EHLO
+        id S229960AbjBOTq7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 15 Feb 2023 14:46:59 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41440 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229805AbjBOTq0 (ORCPT
+        with ESMTP id S229538AbjBOTqe (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 15 Feb 2023 14:46:26 -0500
+        Wed, 15 Feb 2023 14:46:34 -0500
 Received: from hosting.gsystem.sk (hosting.gsystem.sk [212.5.213.30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id D9A37410A3;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 0F10C3E62F;
         Wed, 15 Feb 2023 11:46:16 -0800 (PST)
 Received: from gsql.ggedos.sk (off-20.infotel.telecom.sk [212.5.213.20])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by hosting.gsystem.sk (Postfix) with ESMTPSA id E7F947A071E;
-        Wed, 15 Feb 2023 20:46:05 +0100 (CET)
+        by hosting.gsystem.sk (Postfix) with ESMTPSA id 3F8307A0741;
+        Wed, 15 Feb 2023 20:46:06 +0100 (CET)
 From:   Ondrej Zary <linux@zary.sk>
 To:     Damien Le Moal <damien.lemoal@opensource.wdc.com>
 Cc:     Christoph Hellwig <hch@lst.de>,
@@ -27,9 +27,9 @@ Cc:     Christoph Hellwig <hch@lst.de>,
         Jens Axboe <axboe@kernel.dk>, Tim Waugh <tim@cyberelk.net>,
         linux-block@vger.kernel.org, linux-parport@lists.infradead.org,
         linux-ide@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 15/18] pata_parport: remove verbose parameter from test_proto()
-Date:   Wed, 15 Feb 2023 20:45:51 +0100
-Message-Id: <20230215194554.25632-16-linux@zary.sk>
+Subject: [PATCH 18/18] pata_parport: move pata_parport.h to drivers/ata/pata_parport
+Date:   Wed, 15 Feb 2023 20:45:54 +0100
+Message-Id: <20230215194554.25632-19-linux@zary.sk>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20230215194554.25632-1-linux@zary.sk>
 References: <20230215194554.25632-1-linux@zary.sk>
@@ -39,111 +39,260 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-verbose parameter of test_proto() is now unused, remove it.
+Now that paride is gone, pata_parport.h does not need to be in
+include/linux. Move it to drivers/ata/pata_parport.
 
 Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
 Signed-off-by: Ondrej Zary <linux@zary.sk>
 ---
- drivers/ata/pata_parport/bpck.c         | 2 +-
- drivers/ata/pata_parport/epat.c         | 2 +-
- drivers/ata/pata_parport/epia.c         | 2 +-
- drivers/ata/pata_parport/friq.c         | 2 +-
- drivers/ata/pata_parport/frpw.c         | 2 +-
- drivers/ata/pata_parport/pata_parport.c | 2 +-
- include/linux/pata_parport.h            | 2 +-
- 7 files changed, 7 insertions(+), 7 deletions(-)
+ drivers/ata/pata_parport/aten.c                            | 3 +--
+ drivers/ata/pata_parport/bpck.c                            | 3 +--
+ drivers/ata/pata_parport/bpck6.c                           | 3 +--
+ drivers/ata/pata_parport/comm.c                            | 3 +--
+ drivers/ata/pata_parport/dstr.c                            | 3 +--
+ drivers/ata/pata_parport/epat.c                            | 3 +--
+ drivers/ata/pata_parport/epia.c                            | 3 +--
+ drivers/ata/pata_parport/fit2.c                            | 3 +--
+ drivers/ata/pata_parport/fit3.c                            | 3 +--
+ drivers/ata/pata_parport/friq.c                            | 3 +--
+ drivers/ata/pata_parport/frpw.c                            | 3 +--
+ drivers/ata/pata_parport/kbic.c                            | 3 +--
+ drivers/ata/pata_parport/ktti.c                            | 3 +--
+ drivers/ata/pata_parport/on20.c                            | 3 +--
+ drivers/ata/pata_parport/on26.c                            | 3 +--
+ drivers/ata/pata_parport/pata_parport.c                    | 2 +-
+ {include/linux => drivers/ata/pata_parport}/pata_parport.h | 0
+ 17 files changed, 16 insertions(+), 31 deletions(-)
+ rename {include/linux => drivers/ata/pata_parport}/pata_parport.h (100%)
 
+diff --git a/drivers/ata/pata_parport/aten.c b/drivers/ata/pata_parport/aten.c
+index f0d63b8513e0..1bd248c42f8b 100644
+--- a/drivers/ata/pata_parport/aten.c
++++ b/drivers/ata/pata_parport/aten.c
+@@ -16,8 +16,7 @@
+ #include <linux/wait.h>
+ #include <linux/types.h>
+ #include <asm/io.h>
+-
+-#include <linux/pata_parport.h>
++#include "pata_parport.h"
+ 
+ #define j44(a,b)                ((((a>>4)&0x0f)|(b&0xf0))^0x88)
+ 
 diff --git a/drivers/ata/pata_parport/bpck.c b/drivers/ata/pata_parport/bpck.c
-index 793ef2c7849e..2072e291fd16 100644
+index 472029a21d59..1c5035a09554 100644
 --- a/drivers/ata/pata_parport/bpck.c
 +++ b/drivers/ata/pata_parport/bpck.c
-@@ -274,7 +274,7 @@ static void bpck_force_spp(struct pi_adapter *pi)
+@@ -14,8 +14,7 @@
+ #include <linux/types.h>
+ #include <linux/wait.h>
+ #include <asm/io.h>
+-
+-#include <linux/pata_parport.h>
++#include "pata_parport.h"
  
- #define TEST_LEN  16
+ #undef r2
+ #undef w2
+diff --git a/drivers/ata/pata_parport/bpck6.c b/drivers/ata/pata_parport/bpck6.c
+index 683a11131acd..964bc688e280 100644
+--- a/drivers/ata/pata_parport/bpck6.c
++++ b/drivers/ata/pata_parport/bpck6.c
+@@ -18,9 +18,8 @@
+ #include <linux/types.h>
+ #include <asm/io.h>
+ #include <linux/parport.h>
+-
+ #include "ppc6lnx.c"
+-#include <linux/pata_parport.h>
++#include "pata_parport.h"
  
--static int bpck_test_proto(struct pi_adapter *pi, char *scratch, int verbose)
-+static int bpck_test_proto(struct pi_adapter *pi, char *scratch)
+ #define PPCSTRUCT(pi) ((Interface *)(pi->private))
  
- {	int i, e, l, h, om;
- 	char buf[TEST_LEN];
+diff --git a/drivers/ata/pata_parport/comm.c b/drivers/ata/pata_parport/comm.c
+index 0483caa80544..4c2f9ad60ad8 100644
+--- a/drivers/ata/pata_parport/comm.c
++++ b/drivers/ata/pata_parport/comm.c
+@@ -15,8 +15,7 @@
+ #include <linux/types.h>
+ #include <linux/wait.h>
+ #include <asm/io.h>
+-
+-#include <linux/pata_parport.h>
++#include "pata_parport.h"
+ 
+ /* mode codes:  0  nybble reads, 8-bit writes
+                 1  8-bit reads and writes
+diff --git a/drivers/ata/pata_parport/dstr.c b/drivers/ata/pata_parport/dstr.c
+index c5af7a5fa636..2524684be206 100644
+--- a/drivers/ata/pata_parport/dstr.c
++++ b/drivers/ata/pata_parport/dstr.c
+@@ -14,8 +14,7 @@
+ #include <linux/types.h>
+ #include <linux/wait.h>
+ #include <asm/io.h>
+-
+-#include <linux/pata_parport.h>
++#include "pata_parport.h"
+ 
+ /* mode codes:  0  nybble reads, 8-bit writes
+                 1  8-bit reads and writes
 diff --git a/drivers/ata/pata_parport/epat.c b/drivers/ata/pata_parport/epat.c
-index da63fe3b7182..da3398941f81 100644
+index b7085a448301..0e4369dbe48e 100644
 --- a/drivers/ata/pata_parport/epat.c
 +++ b/drivers/ata/pata_parport/epat.c
-@@ -246,7 +246,7 @@ static void epat_disconnect(struct pi_adapter *pi)
- 	w2(pi->saved_r2);
- }
+@@ -16,8 +16,7 @@
+ #include <linux/types.h>
+ #include <linux/wait.h>
+ #include <asm/io.h>
+-
+-#include <linux/pata_parport.h>
++#include "pata_parport.h"
  
--static int epat_test_proto(struct pi_adapter *pi, char *scratch, int verbose)
-+static int epat_test_proto(struct pi_adapter *pi, char *scratch)
- 
- {       int     k, j, f, cc;
- 	int	e[2] = {0,0};
+ #define j44(a,b)		(((a>>4)&0x0f)+(b&0xf0))
+ #define j53(a,b)		(((a>>3)&0x1f)+((b<<4)&0xe0))
 diff --git a/drivers/ata/pata_parport/epia.c b/drivers/ata/pata_parport/epia.c
-index 778ebd033ff9..a83685ed9dde 100644
+index 63e74c1facba..7821e363b143 100644
 --- a/drivers/ata/pata_parport/epia.c
 +++ b/drivers/ata/pata_parport/epia.c
-@@ -232,7 +232,7 @@ static void epia_write_block(struct pi_adapter *pi, char *buf, int count)
+@@ -17,8 +17,7 @@
+ #include <linux/types.h>
+ #include <linux/wait.h>
+ #include <asm/io.h>
+-
+-#include <linux/pata_parport.h>
++#include "pata_parport.h"
  
- }
+ /* mode codes:  0  nybble reads on port 1, 8-bit writes
+                 1  5/3 reads on ports 1 & 2, 8-bit writes
+diff --git a/drivers/ata/pata_parport/fit2.c b/drivers/ata/pata_parport/fit2.c
+index 3536d8c07955..fd3b2ce426a5 100644
+--- a/drivers/ata/pata_parport/fit2.c
++++ b/drivers/ata/pata_parport/fit2.c
+@@ -20,8 +20,7 @@
+ #include <linux/types.h>
+ #include <linux/wait.h>
+ #include <asm/io.h>
+-
+-#include <linux/pata_parport.h>
++#include "pata_parport.h"
  
--static int epia_test_proto(struct pi_adapter *pi, char *scratch, int verbose)
-+static int epia_test_proto(struct pi_adapter *pi, char *scratch)
+ #define j44(a,b)                (((a>>4)&0x0f)|(b&0xf0))
  
- {       int     j, k, f;
- 	int	e[2] = {0,0};
+diff --git a/drivers/ata/pata_parport/fit3.c b/drivers/ata/pata_parport/fit3.c
+index 9f5320c750e2..75df656ac472 100644
+--- a/drivers/ata/pata_parport/fit3.c
++++ b/drivers/ata/pata_parport/fit3.c
+@@ -24,8 +24,7 @@
+ #include <linux/types.h>
+ #include <linux/wait.h>
+ #include <asm/io.h>
+-
+-#include <linux/pata_parport.h>
++#include "pata_parport.h"
+ 
+ #define j44(a,b)                (((a>>3)&0x0f)|((b<<1)&0xf0))
+ 
 diff --git a/drivers/ata/pata_parport/friq.c b/drivers/ata/pata_parport/friq.c
-index 422146f614d6..7ace1f7eea34 100644
+index ce605f665ab1..b48bfabd1759 100644
 --- a/drivers/ata/pata_parport/friq.c
 +++ b/drivers/ata/pata_parport/friq.c
-@@ -178,7 +178,7 @@ static void friq_disconnect(struct pi_adapter *pi)
-         w2(pi->saved_r2);
- } 
+@@ -27,8 +27,7 @@
+ #include <linux/types.h>
+ #include <linux/wait.h>
+ #include <asm/io.h>
+-
+-#include <linux/pata_parport.h>
++#include "pata_parport.h"
  
--static int friq_test_proto(struct pi_adapter *pi, char *scratch, int verbose)
-+static int friq_test_proto(struct pi_adapter *pi, char *scratch)
- 
- {       int     j, k, r;
- 	int	e[2] = {0,0};
+ #define CMD(x)		w2(4);w0(0xff);w0(0xff);w0(0x73);w0(0x73);\
+ 			w0(0xc9);w0(0xc9);w0(0x26);w0(0x26);w0(x);w0(x);
 diff --git a/drivers/ata/pata_parport/frpw.c b/drivers/ata/pata_parport/frpw.c
-index 068db960861e..d04a11889066 100644
+index 257ad13dec09..5d4bba371b8e 100644
 --- a/drivers/ata/pata_parport/frpw.c
 +++ b/drivers/ata/pata_parport/frpw.c
-@@ -219,7 +219,7 @@ static int frpw_test_pnp(struct pi_adapter *pi)
-    a hack :-(
- */
+@@ -20,8 +20,7 @@
+ #include <linux/types.h>
+ #include <linux/wait.h>
+ #include <asm/io.h>
+-
+-#include <linux/pata_parport.h>
++#include "pata_parport.h"
  
--static int frpw_test_proto(struct pi_adapter *pi, char *scratch, int verbose)
-+static int frpw_test_proto(struct pi_adapter *pi, char *scratch)
+ #define cec4		w2(0xc);w2(0xe);w2(0xe);w2(0xc);w2(4);w2(4);w2(4);
+ #define j44(l,h)	(((l>>4)&0x0f)|(h&0xf0))
+diff --git a/drivers/ata/pata_parport/kbic.c b/drivers/ata/pata_parport/kbic.c
+index 29f4f1e14d21..8213e62f8f00 100644
+--- a/drivers/ata/pata_parport/kbic.c
++++ b/drivers/ata/pata_parport/kbic.c
+@@ -19,8 +19,7 @@
+ #include <linux/types.h>
+ #include <linux/wait.h>
+ #include <asm/io.h>
+-
+-#include <linux/pata_parport.h>
++#include "pata_parport.h"
  
- {       int     j, k, r;
- 	int	e[2] = {0,0};
+ #define r12w()			(delay_p,inw(pi->port+1)&0xffff) 
+ 
+diff --git a/drivers/ata/pata_parport/ktti.c b/drivers/ata/pata_parport/ktti.c
+index 742051f6ea10..4890b1f12348 100644
+--- a/drivers/ata/pata_parport/ktti.c
++++ b/drivers/ata/pata_parport/ktti.c
+@@ -16,8 +16,7 @@
+ #include <linux/types.h>
+ #include <linux/wait.h>
+ #include <asm/io.h>
+-
+-#include <linux/pata_parport.h>
++#include "pata_parport.h"
+ 
+ #define j44(a,b)                (((a>>4)&0x0f)|(b&0xf0))
+ 
+diff --git a/drivers/ata/pata_parport/on20.c b/drivers/ata/pata_parport/on20.c
+index 6956b91efb47..276ace12d490 100644
+--- a/drivers/ata/pata_parport/on20.c
++++ b/drivers/ata/pata_parport/on20.c
+@@ -13,8 +13,7 @@
+ #include <linux/types.h>
+ #include <linux/wait.h>
+ #include <asm/io.h>
+-
+-#include <linux/pata_parport.h>
++#include "pata_parport.h"
+ 
+ #define op(f)	w2(4);w0(f);w2(5);w2(0xd);w2(5);w2(0xd);w2(5);w2(4);
+ #define vl(v)	w2(4);w0(v);w2(5);w2(7);w2(5);w2(4);
+diff --git a/drivers/ata/pata_parport/on26.c b/drivers/ata/pata_parport/on26.c
+index 1d90eb9b541e..dc47a54b121f 100644
+--- a/drivers/ata/pata_parport/on26.c
++++ b/drivers/ata/pata_parport/on26.c
+@@ -14,8 +14,7 @@
+ #include <linux/types.h>
+ #include <linux/wait.h>
+ #include <asm/io.h>
+-
+-#include <linux/pata_parport.h>
++#include "pata_parport.h"
+ 
+ /* mode codes:  0  nybble reads, 8-bit writes
+                 1  8-bit reads and writes
 diff --git a/drivers/ata/pata_parport/pata_parport.c b/drivers/ata/pata_parport/pata_parport.c
-index f42a2cafc382..27aa2419af02 100644
+index 77a3e5a3f062..a1dc639665dc 100644
 --- a/drivers/ata/pata_parport/pata_parport.c
 +++ b/drivers/ata/pata_parport/pata_parport.c
-@@ -306,7 +306,7 @@ static int pi_test_proto(struct pi_adapter *pi, char *scratch)
+@@ -6,7 +6,7 @@
+ #include <linux/kernel.h>
+ #include <linux/module.h>
+ #include <linux/parport.h>
+-#include <linux/pata_parport.h>
++#include "pata_parport.h"
  
- 	parport_claim_or_block(pi->pardev);
- 	if (pi->proto->test_proto)
--		res = pi->proto->test_proto(pi, scratch, 1);
-+		res = pi->proto->test_proto(pi, scratch);
- 	else
- 		res = default_test_proto(pi, scratch);
- 	parport_release(pi->pardev);
-diff --git a/include/linux/pata_parport.h b/include/linux/pata_parport.h
-index c44d30b3e886..e45bb1896003 100644
---- a/include/linux/pata_parport.h
-+++ b/include/linux/pata_parport.h
-@@ -67,7 +67,7 @@ struct pi_protocol {
+ #define DRV_NAME "pata_parport"
  
- 	int (*test_port)(struct pi_adapter *pi);
- 	int (*probe_unit)(struct pi_adapter *pi);
--	int (*test_proto)(struct pi_adapter *pi, char *scratch, int verbose);
-+	int (*test_proto)(struct pi_adapter *pi, char *scratch);
- 	void (*log_adapter)(struct pi_adapter *pi);
- 
- 	int (*init_proto)(struct pi_adapter *pi);
+diff --git a/include/linux/pata_parport.h b/drivers/ata/pata_parport/pata_parport.h
+similarity index 100%
+rename from include/linux/pata_parport.h
+rename to drivers/ata/pata_parport/pata_parport.h
 -- 
 Ondrej Zary
 
