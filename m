@@ -2,251 +2,111 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C69B8C636CC
-	for <linux-block@archiver.kernel.org>; Wed, 15 Feb 2023 19:47:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A93E8C636D4
+	for <linux-block@archiver.kernel.org>; Wed, 15 Feb 2023 20:00:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229974AbjBOTrB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 15 Feb 2023 14:47:01 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42408 "EHLO
+        id S229461AbjBOUAY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 15 Feb 2023 15:00:24 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58132 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229728AbjBOTqe (ORCPT
+        with ESMTP id S229485AbjBOUAX (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 15 Feb 2023 14:46:34 -0500
-Received: from hosting.gsystem.sk (hosting.gsystem.sk [212.5.213.30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 51AC841B56;
-        Wed, 15 Feb 2023 11:46:16 -0800 (PST)
-Received: from gsql.ggedos.sk (off-20.infotel.telecom.sk [212.5.213.20])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by hosting.gsystem.sk (Postfix) with ESMTPSA id 0A4927A0728;
-        Wed, 15 Feb 2023 20:46:06 +0100 (CET)
-From:   Ondrej Zary <linux@zary.sk>
-To:     Damien Le Moal <damien.lemoal@opensource.wdc.com>
-Cc:     Christoph Hellwig <hch@lst.de>,
-        Sergey Shtylyov <s.shtylyov@omp.ru>,
-        Jens Axboe <axboe@kernel.dk>, Tim Waugh <tim@cyberelk.net>,
-        linux-block@vger.kernel.org, linux-parport@lists.infradead.org,
-        linux-ide@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 16/18] pata_parport: remove scratch parameter from test_proto()
-Date:   Wed, 15 Feb 2023 20:45:52 +0100
-Message-Id: <20230215194554.25632-17-linux@zary.sk>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20230215194554.25632-1-linux@zary.sk>
-References: <20230215194554.25632-1-linux@zary.sk>
+        Wed, 15 Feb 2023 15:00:23 -0500
+Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85A4C86B9;
+        Wed, 15 Feb 2023 12:00:21 -0800 (PST)
+Received: by mail-pl1-x62b.google.com with SMTP id i18so12956689pli.3;
+        Wed, 15 Feb 2023 12:00:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=dFrWO0f7yzYN0JfWwtvFw3Ysd86ppP1HxQirWGWfkGU=;
+        b=p55ohjy+62umt3tJQxO+jZD1wSAGGC1zVE4GCTWFu2joi/QjhhkDv0s3/fCrg5VFN5
+         QcxAg7oipjf+NRNLaE0ob2xPdq7t/4ipZRNYr95kx6JjeiwHOuSYEaN66tJ8OZ0I7klY
+         S9qoBUcQdsFD/5/xuXph/R3/A5uKfqPT2bcztxpFvXK75E2jaIiwKhPpliPm7eHaZDVh
+         XfvZ9jD6/9Y9RhnhdQM6HrnYkuVU76OGSjg7fJGuICBujK70clz6WPPmDgSaTefGwhI3
+         jB8R5jGN5+hfmvFgpzL+M0BDt1UxQkavMgXP5PWx0d45nwMjKRrOYPML9EHc7NlLj5Bm
+         0srw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=dFrWO0f7yzYN0JfWwtvFw3Ysd86ppP1HxQirWGWfkGU=;
+        b=dyK2t1rjpJydq+A2vv6QeAi/g48VwpvbYN81Ts9bnQJr39C+FT9eeV9KYMJjvdU6VY
+         SYSQiBGeBnPfMqJdD0NBMAKoGW/gBPSEGRelg/TWVmhZnkilFigC2Uo5Vr9A8kZfbbyM
+         Mp5okP54XUq/dUiRGDpTDy7M6RvQKdxzTSdEH5THxVBx+Hu3ekEREDBrxNQxdvjeabkp
+         EsptNQnysD5f419tm1snA7CQAyh6STWVGd3M2jiOgs+IzV8Q8OMMiRyEYsYhTGanxU3z
+         b0vPQ5v9Ck2QL5f2vBLPU6+IizNmri3LXxANFWdsoKRkZHDe7+4p5P9IwzsemOH/PXiY
+         9OYw==
+X-Gm-Message-State: AO0yUKVpFxc7D67ojXq+XnWoYuOjZYb6GI8dpQ1I+bC3bWIonQWc5sxO
+        u9HoWwfsnntouDUAi8Xbu1n0SUy6oqjlEdW9SN8=
+X-Google-Smtp-Source: AK7set9bs5Zg8Yirc4qUbLHYhiamHtAx2jf0H+f1/8yBTmxsP26MbB8uiOOGpaGbls5Iz91VFs683r7GA3VbOXJNbLQ=
+X-Received: by 2002:a17:90b:1e4c:b0:230:b973:a726 with SMTP id
+ pi12-20020a17090b1e4c00b00230b973a726mr138046pjb.23.1676491221040; Wed, 15
+ Feb 2023 12:00:21 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20230214190221.1156876-1-shy828301@gmail.com> <alpine.LRH.2.21.2302150716120.5940@file01.intranet.prod.int.rdu2.redhat.com>
+In-Reply-To: <alpine.LRH.2.21.2302150716120.5940@file01.intranet.prod.int.rdu2.redhat.com>
+From:   Yang Shi <shy828301@gmail.com>
+Date:   Wed, 15 Feb 2023 12:00:09 -0800
+Message-ID: <CAHbLzkr4RrKpR1pGZxs7JdB=R539SiNgO2+Fr7X-rVKcBh5tQQ@mail.gmail.com>
+Subject: Re: [dm-devel] [v2 PATCH 0/5] Introduce mempool pages bulk allocator
+ and use it in dm-crypt
+To:     Mikulas Patocka <mpatocka@redhat.com>
+Cc:     mgorman@techsingularity.net, agk@redhat.com, snitzer@kernel.org,
+        dm-devel@redhat.com, akpm@linux-foundation.org,
+        linux-block@vger.kernel.org, linux-mm@kvack.org,
+        linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Don't pass around a pointer to scratch buffer. Use local buffers in
-protocols that need it.
+On Wed, Feb 15, 2023 at 4:23 AM Mikulas Patocka <mpatocka@redhat.com> wrote:
+>
+>
+>
+> On Tue, 14 Feb 2023, Yang Shi wrote:
+>
+> >
+> > Changelog:
+> > RFC -> v2:
+> >   * Added callback variant for page bulk allocator and mempool bulk allocator
+> >     per Mel Gorman.
+> >   * Used the callback version in dm-crypt driver.
+> >   * Some code cleanup and refactor to reduce duplicate code.
+> >
+> > rfc: https://lore.kernel.org/linux-mm/20221005180341.1738796-1-shy828301@gmail.com/
+>
+> Hi
+>
+> This seems like unneeded complication to me. We have alloc_pages(), it can
+> allocate multiple pages efficiently, so why not use it?
 
-Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
-Signed-off-by: Ondrej Zary <linux@zary.sk>
----
- drivers/ata/pata_parport/bpck.c         |  2 +-
- drivers/ata/pata_parport/epat.c         |  3 ++-
- drivers/ata/pata_parport/epia.c         |  3 ++-
- drivers/ata/pata_parport/friq.c         |  3 ++-
- drivers/ata/pata_parport/frpw.c         |  3 ++-
- drivers/ata/pata_parport/pata_parport.c | 23 +++++++++++------------
- include/linux/pata_parport.h            |  2 +-
- 7 files changed, 21 insertions(+), 18 deletions(-)
+The alloc_pages() allocates *contiguous* pages, but dm-crypt doesn't
+need contiguous pages at all. This may incur unnecessary compaction
+overhead to the dm-crypt layer when memory is fragmented. The bulk
+allocator is a good fit to this usecase, which allocates multiple
+order-0 pages.
 
-diff --git a/drivers/ata/pata_parport/bpck.c b/drivers/ata/pata_parport/bpck.c
-index 2072e291fd16..ecb98bf0e6de 100644
---- a/drivers/ata/pata_parport/bpck.c
-+++ b/drivers/ata/pata_parport/bpck.c
-@@ -274,7 +274,7 @@ static void bpck_force_spp(struct pi_adapter *pi)
- 
- #define TEST_LEN  16
- 
--static int bpck_test_proto(struct pi_adapter *pi, char *scratch)
-+static int bpck_test_proto(struct pi_adapter *pi)
- 
- {	int i, e, l, h, om;
- 	char buf[TEST_LEN];
-diff --git a/drivers/ata/pata_parport/epat.c b/drivers/ata/pata_parport/epat.c
-index da3398941f81..26d1b6d438bc 100644
---- a/drivers/ata/pata_parport/epat.c
-+++ b/drivers/ata/pata_parport/epat.c
-@@ -246,10 +246,11 @@ static void epat_disconnect(struct pi_adapter *pi)
- 	w2(pi->saved_r2);
- }
- 
--static int epat_test_proto(struct pi_adapter *pi, char *scratch)
-+static int epat_test_proto(struct pi_adapter *pi)
- 
- {       int     k, j, f, cc;
- 	int	e[2] = {0,0};
-+	char scratch[512];
- 
-         epat_connect(pi);
- 	cc = RR(0xd);
-diff --git a/drivers/ata/pata_parport/epia.c b/drivers/ata/pata_parport/epia.c
-index a83685ed9dde..101a0d9f1aa6 100644
---- a/drivers/ata/pata_parport/epia.c
-+++ b/drivers/ata/pata_parport/epia.c
-@@ -232,10 +232,11 @@ static void epia_write_block(struct pi_adapter *pi, char *buf, int count)
- 
- }
- 
--static int epia_test_proto(struct pi_adapter *pi, char *scratch)
-+static int epia_test_proto(struct pi_adapter *pi)
- 
- {       int     j, k, f;
- 	int	e[2] = {0,0};
-+	char scratch[512];
- 
-         epia_connect(pi);
-         for (j=0;j<2;j++) {
-diff --git a/drivers/ata/pata_parport/friq.c b/drivers/ata/pata_parport/friq.c
-index 7ace1f7eea34..9c4a6487b2a9 100644
---- a/drivers/ata/pata_parport/friq.c
-+++ b/drivers/ata/pata_parport/friq.c
-@@ -178,10 +178,11 @@ static void friq_disconnect(struct pi_adapter *pi)
-         w2(pi->saved_r2);
- } 
- 
--static int friq_test_proto(struct pi_adapter *pi, char *scratch)
-+static int friq_test_proto(struct pi_adapter *pi)
- 
- {       int     j, k, r;
- 	int	e[2] = {0,0};
-+	char scratch[512];
- 
- 	pi->saved_r0 = r0();	
- 	w0(0xff); udelay(20); CMD(0x3d); /* turn the power on */
-diff --git a/drivers/ata/pata_parport/frpw.c b/drivers/ata/pata_parport/frpw.c
-index d04a11889066..024b5c0737e0 100644
---- a/drivers/ata/pata_parport/frpw.c
-+++ b/drivers/ata/pata_parport/frpw.c
-@@ -219,10 +219,11 @@ static int frpw_test_pnp(struct pi_adapter *pi)
-    a hack :-(
- */
- 
--static int frpw_test_proto(struct pi_adapter *pi, char *scratch)
-+static int frpw_test_proto(struct pi_adapter *pi)
- 
- {       int     j, k, r;
- 	int	e[2] = {0,0};
-+	char scratch[512];
- 
- 	if ((pi->private>>1) != pi->port)
- 	   pi->private = frpw_test_pnp(pi) + 2*pi->port;
-diff --git a/drivers/ata/pata_parport/pata_parport.c b/drivers/ata/pata_parport/pata_parport.c
-index 27aa2419af02..77a3e5a3f062 100644
---- a/drivers/ata/pata_parport/pata_parport.c
-+++ b/drivers/ata/pata_parport/pata_parport.c
-@@ -276,7 +276,7 @@ static void pi_release(struct pi_adapter *pi)
- 	module_put(pi->proto->owner);
- }
- 
--static int default_test_proto(struct pi_adapter *pi, char *scratch)
-+static int default_test_proto(struct pi_adapter *pi)
- {
- 	int j, k;
- 	int e[2] = { 0, 0 };
-@@ -300,21 +300,21 @@ static int default_test_proto(struct pi_adapter *pi, char *scratch)
- 	return e[0] && e[1];	/* not here if both > 0 */
- }
- 
--static int pi_test_proto(struct pi_adapter *pi, char *scratch)
-+static int pi_test_proto(struct pi_adapter *pi)
- {
- 	int res;
- 
- 	parport_claim_or_block(pi->pardev);
- 	if (pi->proto->test_proto)
--		res = pi->proto->test_proto(pi, scratch);
-+		res = pi->proto->test_proto(pi);
- 	else
--		res = default_test_proto(pi, scratch);
-+		res = default_test_proto(pi);
- 	parport_release(pi->pardev);
- 
- 	return res;
- }
- 
--static bool pi_probe_mode(struct pi_adapter *pi, int max, char *scratch)
-+static bool pi_probe_mode(struct pi_adapter *pi, int max)
- {
- 	int best, range;
- 
-@@ -326,7 +326,7 @@ static bool pi_probe_mode(struct pi_adapter *pi, int max, char *scratch)
- 			range = 8;
- 		if (range == 8 && pi->port % 8)
- 			return false;
--		return !pi_test_proto(pi, scratch);
-+		return !pi_test_proto(pi);
- 	}
- 	best = -1;
- 	for (pi->mode = 0; pi->mode < max; pi->mode++) {
-@@ -335,14 +335,14 @@ static bool pi_probe_mode(struct pi_adapter *pi, int max, char *scratch)
- 			range = 8;
- 		if (range == 8 && pi->port % 8)
- 			break;
--		if (!pi_test_proto(pi, scratch))
-+		if (!pi_test_proto(pi))
- 			best = pi->mode;
- 	}
- 	pi->mode = best;
- 	return best > -1;
- }
- 
--static bool pi_probe_unit(struct pi_adapter *pi, int unit, char *scratch)
-+static bool pi_probe_unit(struct pi_adapter *pi, int unit)
- {
- 	int max, s, e;
- 
-@@ -367,14 +367,14 @@ static bool pi_probe_unit(struct pi_adapter *pi, int unit, char *scratch)
- 		for (pi->unit = s; pi->unit < e; pi->unit++) {
- 			if (pi->proto->probe_unit(pi)) {
- 				parport_release(pi->pardev);
--				return pi_probe_mode(pi, max, scratch);
-+				return pi_probe_mode(pi, max);
- 			}
- 		}
- 		parport_release(pi->pardev);
- 		return false;
- 	}
- 
--	return pi_probe_mode(pi, max, scratch);
-+	return pi_probe_mode(pi, max);
- }
- 
- static void pata_parport_dev_release(struct device *dev)
-@@ -419,7 +419,6 @@ static struct pi_adapter *pi_init_one(struct parport *parport,
- 			struct pi_protocol *pr, int mode, int unit, int delay)
- {
- 	struct pardev_cb par_cb = { };
--	char scratch[512];
- 	const struct ata_port_info *ppi[] = { &pata_parport_port_info };
- 	struct ata_host *host;
- 	struct pi_adapter *pi;
-@@ -469,7 +468,7 @@ static struct pi_adapter *pi_init_one(struct parport *parport,
- 	if (!pi->pardev)
- 		goto out_module_put;
- 
--	if (!pi_probe_unit(pi, unit, scratch)) {
-+	if (!pi_probe_unit(pi, unit)) {
- 		dev_info(&pi->dev, "Adapter not found\n");
- 		goto out_unreg_parport;
- 	}
-diff --git a/include/linux/pata_parport.h b/include/linux/pata_parport.h
-index e45bb1896003..bbfa4e63ee85 100644
---- a/include/linux/pata_parport.h
-+++ b/include/linux/pata_parport.h
-@@ -67,7 +67,7 @@ struct pi_protocol {
- 
- 	int (*test_port)(struct pi_adapter *pi);
- 	int (*probe_unit)(struct pi_adapter *pi);
--	int (*test_proto)(struct pi_adapter *pi, char *scratch);
-+	int (*test_proto)(struct pi_adapter *pi);
- 	void (*log_adapter)(struct pi_adapter *pi);
- 
- 	int (*init_proto)(struct pi_adapter *pi);
--- 
-Ondrej Zary
+In addition, filesystem writeback doesn't guarantee power-of-2 pages
+every time IIUC. But alloc_pages() just can allocate power-of-2 pages.
 
+>
+> I suggest to modify crypt_alloc_buffer() to use alloc_pages() and if
+> alloc_pages() fails (either because the system is low on memory or because
+> memory is too fragmented), fall back to the existing code that does
+> mempool_alloc().
+
+My PoC patches just did this way, but called bulk allocator. There may
+be other potential mepool users as I listed in this cover letter,
+which may get benefits from bulk allocator. So introducing a new bulk
+mempool API seems better for long run although we just have one user
+for now. And it makes other uses easier to gain the benefit by just
+calling the new API.
+
+>
+> Mikulas
+>
