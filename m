@@ -2,89 +2,109 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D75ECC636D7
-	for <linux-block@archiver.kernel.org>; Wed, 15 Feb 2023 16:40:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC585C636D7
+	for <linux-block@archiver.kernel.org>; Wed, 15 Feb 2023 17:15:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229625AbjBOQkS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 15 Feb 2023 11:40:18 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49580 "EHLO
+        id S229550AbjBORPE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 15 Feb 2023 12:15:04 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51540 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229556AbjBOQkR (ORCPT
+        with ESMTP id S229545AbjBORPD (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 15 Feb 2023 11:40:17 -0500
-Received: from mail-ed1-x536.google.com (mail-ed1-x536.google.com [IPv6:2a00:1450:4864:20::536])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5CF4A40E1
-        for <linux-block@vger.kernel.org>; Wed, 15 Feb 2023 08:40:16 -0800 (PST)
-Received: by mail-ed1-x536.google.com with SMTP id fi26so23076968edb.7
-        for <linux-block@vger.kernel.org>; Wed, 15 Feb 2023 08:40:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=szeredi.hu; s=google;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=uRPFQs3djXckE7Oktaa+X2AruZRRb1EX46zdXuL2aNA=;
-        b=O1Sb/PuAScpXjzzcEcRfdw765yckWsrlp60Zyj2Buh5pRD57qJFkPGXYlYGCSzbLKZ
-         0OZJxcmxT4DRgg7vRAKUywcu+0OCNVsBpF50NrQuVlyfYQKR1YKZkGKhonllv6EdWSWj
-         S4d4opyn+39fcS7g6apBLJVuIfqAPFopssH38=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=uRPFQs3djXckE7Oktaa+X2AruZRRb1EX46zdXuL2aNA=;
-        b=yUwkFs7AI6lbqt9hQBnKFgPPqU9WvzSe6xArM5etinaMAAgvZCDCpHglxaSZiH35wN
-         kSwbaGIUykfQu7az9iPR/e1MDX67VhzgyPsWvvrnM/zjoUkob3+hpPJ7bszsnPF4jZHG
-         2RTCobV60maeX1Fz4CmQRVojAkL5eetJyxQzvutiY3f8U4NmIhv/qqITq9cacg4XmBQ2
-         UVMf2RbicpIwHYXg1WuPxSxtN9i2JPvQZfNRK5+jWynGwqiwEZHfhjwuL236YFYTI2OP
-         /KIVM3dJM5aXO0g6zmsZd2+4xbywLRKxFFnIoXqLEtxzLVv0Yr7Id9ODQSWqCVJgFXjx
-         zYmw==
-X-Gm-Message-State: AO0yUKVqXdkZLBD16gI9NL0i8/KwGtcPu6LgUZToq3WlCOWIw7gjcTFm
-        Y/X92jajzuTuu36r3sCeXWLSNcLI9L/M9tr+hpJSDw==
-X-Google-Smtp-Source: AK7set/iPBXeldwcN/CINqXYZtP94LHe3RbLgypUPLbVvQFOUAvYldPBfIvqSUN53v/EVz7QuOACKnzaFEzlWm2AvNQ=
-X-Received: by 2002:a17:906:8604:b0:878:790b:b7fd with SMTP id
- o4-20020a170906860400b00878790bb7fdmr1331614ejx.14.1676479214862; Wed, 15 Feb
- 2023 08:40:14 -0800 (PST)
+        Wed, 15 Feb 2023 12:15:03 -0500
+Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA3A41A677;
+        Wed, 15 Feb 2023 09:15:01 -0800 (PST)
+Received: from [192.168.1.103] (31.173.83.250) by msexch01.omp.ru
+ (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.986.14; Wed, 15 Feb
+ 2023 20:14:52 +0300
+Subject: Re: [PATCH v2 0/18] pata_parport: protocol drivers fixes and cleanups
+To:     Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+        Ondrej Zary <linux@zary.sk>
+CC:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        Tim Waugh <tim@cyberelk.net>, <linux-block@vger.kernel.org>,
+        <linux-parport@lists.infradead.org>, <linux-ide@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
+References: <20230214230010.20318-1-linux@zary.sk>
+ <6ce57b8c-7f0c-f3d1-6938-c87fa4ab650d@opensource.wdc.com>
+From:   Sergey Shtylyov <s.shtylyov@omp.ru>
+Organization: Open Mobile Platform
+Message-ID: <8a0bd9fb-c667-8871-1955-3e4eb880f43d@omp.ru>
+Date:   Wed, 15 Feb 2023 20:14:51 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 MIME-Version: 1.0
-References: <20230214171330.2722188-1-dhowells@redhat.com> <20230214171330.2722188-6-dhowells@redhat.com>
- <CAJfpegshWgUYZLc5v-Vwf6g3ZGmfnHsT_t9JLwxFoV8wPrvBnA@mail.gmail.com>
- <3370085.1676475658@warthog.procyon.org.uk> <CAJfpegt5OurEve+TvzaXRVZSCv0in8_7whMYGsMDdDd2EjiBNQ@mail.gmail.com>
- <Y+z/85HqpEceq66f@casper.infradead.org>
-In-Reply-To: <Y+z/85HqpEceq66f@casper.infradead.org>
-From:   Miklos Szeredi <miklos@szeredi.hu>
-Date:   Wed, 15 Feb 2023 17:40:04 +0100
-Message-ID: <CAJfpegsuDWqVYa2n2tmQP0EfkcWtRjxFwU1EbG0On-XfQ8ZhFg@mail.gmail.com>
-Subject: Re: [PATCH v15 05/17] overlayfs: Implement splice-read
-To:     Matthew Wilcox <willy@infradead.org>
-Cc:     David Howells <dhowells@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Christoph Hellwig <hch@infradead.org>, Jan Kara <jack@suse.cz>,
-        Jeff Layton <jlayton@kernel.org>,
-        David Hildenbrand <david@redhat.com>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        Hillf Danton <hdanton@sina.com>, linux-fsdevel@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, Christoph Hellwig <hch@lst.de>,
-        John Hubbard <jhubbard@nvidia.com>,
-        linux-unionfs@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <6ce57b8c-7f0c-f3d1-6938-c87fa4ab650d@opensource.wdc.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [31.173.83.250]
+X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
+ (10.188.4.12)
+X-KSE-ServerInfo: msexch01.omp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 5.9.59, Database issued on: 02/15/2023 16:49:39
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 59
+X-KSE-AntiSpam-Info: Lua profiles 175554 [Feb 15 2023]
+X-KSE-AntiSpam-Info: Version: 5.9.59.0
+X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
+X-KSE-AntiSpam-Info: LuaCore: 504 504 dc137e1f9c062eb6c0671e7d509ab442ae395562
+X-KSE-AntiSpam-Info: {rep_avail}
+X-KSE-AntiSpam-Info: {Tracking_arrow_text}
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info: {relay has no DNS name}
+X-KSE-AntiSpam-Info: {SMTP from is not routable}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 31.173.83.250 in (user)
+ b.barracudacentral.org}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 31.173.83.250 in (user)
+ dbl.spamhaus.org}
+X-KSE-AntiSpam-Info: omp.ru:7.1.1;127.0.0.199:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1
+X-KSE-AntiSpam-Info: ApMailHostAddress: 31.173.83.250
+X-KSE-AntiSpam-Info: {DNS response errors}
+X-KSE-AntiSpam-Info: Rate: 59
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
+ smtp.mailfrom=omp.ru;dkim=none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Heuristic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 02/15/2023 16:53:00
+X-KSE-AttachmentFiltering-Interceptor-Info: protection disabled
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 2/15/2023 2:45:00 PM
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, 15 Feb 2023 at 16:53, Matthew Wilcox <willy@infradead.org> wrote:
->
-> On Wed, Feb 15, 2023 at 04:50:04PM +0100, Miklos Szeredi wrote:
-> > Looks good.  One more suggestion: add a vfs_splice() helper and use
-> > that from do_splice_to() as well.
->
-> I really hate call_read_iter() etc.  Please don't perpetuate that
-> pattern.
+On 2/15/23 2:50 AM, Damien Le Moal wrote:
+[...]
+>> This patch series fixes two bugs and cleans up pata_parport protocol drivers,
+>> making the code simpler with no changes in behavior (except logged messages).
+>>
+>> Signed-off-by: Ondrej Zary <linux@zary.sk>
+> 
+> Sergey did send you some reviewed-by tags for some of the patches. But I
+> do not see any in this v2. Did you forget to add the tags to the reviewed
+> patches ? That is nice to do so that I do not have to keep track of
+> reviews across series versions...
 
-I didn't suggest call_splice_read().  vfs_splice_read() would have the
-rw_verify_area() as well as the check for non-null ->splice_read().
+   Yes, it would also simplify my further reviews (I have low bandwidth currently
+due to being somewhat overload at work)...
 
-Doing it that way from the start would have prevented two of the bugs
-that David introduced in the first version.
+>> ---
+>> Changes in v2:
+>>  - added two bugfixes (first two patches)
+>>  - addressed Sergey's comments (mostly split patches)
 
-Thanks,
-Miklos
+   Well, you're supposed to be more detailed about what you really
+did to the series, preferably listing the changes in each patch (usually
+after the --- tearline)...
+
+[...]
+
+MBR, Sergey
