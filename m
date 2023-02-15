@@ -2,24 +2,24 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C1A0FC636D4
-	for <linux-block@archiver.kernel.org>; Wed, 15 Feb 2023 19:46:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C84BC64ED9
+	for <linux-block@archiver.kernel.org>; Wed, 15 Feb 2023 19:46:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229802AbjBOTqZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 15 Feb 2023 14:46:25 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41408 "EHLO
+        id S229824AbjBOTq1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 15 Feb 2023 14:46:27 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41410 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229744AbjBOTqS (ORCPT
+        with ESMTP id S229728AbjBOTqT (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 15 Feb 2023 14:46:18 -0500
+        Wed, 15 Feb 2023 14:46:19 -0500
 Received: from hosting.gsystem.sk (hosting.gsystem.sk [212.5.213.30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 65C8C3C7A7;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 1C98F4109F;
         Wed, 15 Feb 2023 11:46:11 -0800 (PST)
 Received: from gsql.ggedos.sk (off-20.infotel.telecom.sk [212.5.213.20])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by hosting.gsystem.sk (Postfix) with ESMTPSA id 23CB57A05F1;
-        Wed, 15 Feb 2023 20:46:04 +0100 (CET)
+        by hosting.gsystem.sk (Postfix) with ESMTPSA id 9F2357A0708;
+        Wed, 15 Feb 2023 20:46:05 +0100 (CET)
 From:   Ondrej Zary <linux@zary.sk>
 To:     Damien Le Moal <damien.lemoal@opensource.wdc.com>
 Cc:     Christoph Hellwig <hch@lst.de>,
@@ -27,9 +27,9 @@ Cc:     Christoph Hellwig <hch@lst.de>,
         Jens Axboe <axboe@kernel.dk>, Tim Waugh <tim@cyberelk.net>,
         linux-block@vger.kernel.org, linux-parport@lists.infradead.org,
         linux-ide@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 05/18] pata_parport: Introduce module_pata_parport_driver macro
-Date:   Wed, 15 Feb 2023 20:45:41 +0100
-Message-Id: <20230215194554.25632-6-linux@zary.sk>
+Subject: [PATCH 12/18] pata_parport: use print_hex_*
+Date:   Wed, 15 Feb 2023 20:45:48 +0100
+Message-Id: <20230215194554.25632-13-linux@zary.sk>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20230215194554.25632-1-linux@zary.sk>
 References: <20230215194554.25632-1-linux@zary.sk>
@@ -39,391 +39,111 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Introduce module_pata_parport_driver macro and use it in protocol
-drivers to reduce boilerplate code. Remove paride_(un)register
-compatibility defines.
+Use print_hex_* for debug dumps.
 
 Signed-off-by: Ondrej Zary <linux@zary.sk>
 ---
- drivers/ata/pata_parport/aten.c  | 13 +------------
- drivers/ata/pata_parport/bpck.c  | 13 +------------
- drivers/ata/pata_parport/bpck6.c | 13 +------------
- drivers/ata/pata_parport/comm.c  | 13 +------------
- drivers/ata/pata_parport/dstr.c  | 13 +------------
- drivers/ata/pata_parport/epat.c  |  4 ++--
- drivers/ata/pata_parport/epia.c  | 13 +------------
- drivers/ata/pata_parport/fit2.c  | 13 +------------
- drivers/ata/pata_parport/fit3.c  | 13 +------------
- drivers/ata/pata_parport/friq.c  | 13 +------------
- drivers/ata/pata_parport/frpw.c  | 13 +------------
- drivers/ata/pata_parport/kbic.c  | 10 +++++-----
- drivers/ata/pata_parport/ktti.c  | 13 +------------
- drivers/ata/pata_parport/on20.c  | 13 +------------
- drivers/ata/pata_parport/on26.c  | 13 +------------
- include/linux/pata_parport.h     | 14 +++++++++++---
- 16 files changed, 31 insertions(+), 166 deletions(-)
+ drivers/ata/pata_parport/bpck.c | 22 ++++------------------
+ drivers/ata/pata_parport/epat.c |  2 +-
+ drivers/ata/pata_parport/epia.c |  2 +-
+ drivers/ata/pata_parport/friq.c |  2 +-
+ drivers/ata/pata_parport/frpw.c |  2 +-
+ 5 files changed, 8 insertions(+), 22 deletions(-)
 
-diff --git a/drivers/ata/pata_parport/aten.c b/drivers/ata/pata_parport/aten.c
-index b66508bedbd0..9e6098f90162 100644
---- a/drivers/ata/pata_parport/aten.c
-+++ b/drivers/ata/pata_parport/aten.c
-@@ -147,16 +147,5 @@ static struct pi_protocol aten = {
- 	.log_adapter	= aten_log_adapter,
- };
- 
--static int __init aten_init(void)
--{
--	return paride_register(&aten);
--}
--
--static void __exit aten_exit(void)
--{
--	paride_unregister( &aten );
--}
--
- MODULE_LICENSE("GPL");
--module_init(aten_init)
--module_exit(aten_exit)
-+module_pata_parport_driver(aten);
 diff --git a/drivers/ata/pata_parport/bpck.c b/drivers/ata/pata_parport/bpck.c
-index 5fb3cf9ba11d..b9174cf8863c 100644
+index 1cba098b4b82..dec24983d140 100644
 --- a/drivers/ata/pata_parport/bpck.c
 +++ b/drivers/ata/pata_parport/bpck.c
-@@ -462,16 +462,5 @@ static struct pi_protocol bpck = {
- 	.log_adapter	= bpck_log_adapter,
- };
+@@ -334,12 +334,9 @@ static int bpck_test_proto(struct pi_adapter *pi, char *scratch, int verbose)
  
--static int __init bpck_init(void)
--{
--	return paride_register(&bpck);
--}
--
--static void __exit bpck_exit(void)
--{
--	paride_unregister(&bpck);
--}
--
- MODULE_LICENSE("GPL");
--module_init(bpck_init)
--module_exit(bpck_exit)
-+module_pata_parport_driver(bpck);
-diff --git a/drivers/ata/pata_parport/bpck6.c b/drivers/ata/pata_parport/bpck6.c
-index 3b3a40e48b21..3c358e66db25 100644
---- a/drivers/ata/pata_parport/bpck6.c
-+++ b/drivers/ata/pata_parport/bpck6.c
-@@ -245,19 +245,8 @@ static struct pi_protocol bpck6 = {
- 	.release_proto	= bpck6_release_proto,
- };
+ 	}
  
--static int __init bpck6_init(void)
--{
--	return paride_register(&bpck6);
--}
--
--static void __exit bpck6_exit(void)
--{
--	paride_unregister(&bpck6);
--}
--
- MODULE_LICENSE("GPL");
- MODULE_AUTHOR("Micro Solutions Inc.");
- MODULE_DESCRIPTION("BACKPACK Protocol module, compatible with PARIDE");
- module_param(verbose, bool, 0644);
--module_init(bpck6_init)
--module_exit(bpck6_exit)
-+module_pata_parport_driver(bpck6);
-diff --git a/drivers/ata/pata_parport/comm.c b/drivers/ata/pata_parport/comm.c
-index 11ed9fb57744..47f0fbccc3aa 100644
---- a/drivers/ata/pata_parport/comm.c
-+++ b/drivers/ata/pata_parport/comm.c
-@@ -206,16 +206,5 @@ static struct pi_protocol comm = {
- 	.log_adapter	= comm_log_adapter,
- };
+-	if (verbose) {
+-		printk("bpck: 0x%x unit %d mode %d: ",
+-		       pi->port, pi->unit, pi->mode);
+-	    for (i=0;i<TEST_LEN;i++) printk("%3d",buf[i]);
+-	    printk("\n");
+-	}
++	dev_dbg(&pi->dev, "bpck: 0x%x unit %d mode %d: ",
++		pi->port, pi->unit, pi->mode);
++	print_hex_dump_debug("bpck: ", DUMP_PREFIX_NONE, TEST_LEN, 1, buf, TEST_LEN, false);
  
--static int __init comm_init(void)
--{
--	return paride_register(&comm);
--}
--
--static void __exit comm_exit(void)
--{
--	paride_unregister(&comm);
--}
--
- MODULE_LICENSE("GPL");
--module_init(comm_init)
--module_exit(comm_exit)
-+module_pata_parport_driver(comm);
-diff --git a/drivers/ata/pata_parport/dstr.c b/drivers/ata/pata_parport/dstr.c
-index edf414d186a6..e733a2512e17 100644
---- a/drivers/ata/pata_parport/dstr.c
-+++ b/drivers/ata/pata_parport/dstr.c
-@@ -218,16 +218,5 @@ static struct pi_protocol dstr = {
- 	.log_adapter	= dstr_log_adapter,
- };
+ 	e = 0;
+ 	for (i=0;i<TEST_LEN;i++) if (buf[i] != (i+1)) e++;
+@@ -421,20 +418,9 @@ static void bpck_log_adapter(struct pi_adapter *pi)
+ {	char	*mode_string[5] = { "4-bit","8-bit","EPP-8",
+ 				    "EPP-16","EPP-32" };
+ 	char scratch[128];
+-#ifdef DUMP_EEPROM
+-	int i;
+-#endif
  
--static int __init dstr_init(void)
--{
--	return paride_register(&dstr);
--}
+ 	bpck_read_eeprom(pi,scratch);
 -
--static void __exit dstr_exit(void)
--{
--	paride_unregister(&dstr);
--}
+-#ifdef DUMP_EEPROM
+-	   for(i=0;i<128;i++)
+-		if ((scratch[i] < ' ') || (scratch[i] > '~'))
+-		    scratch[i] = '.';
+-	   printk("bpck EEPROM: %64.64s\n", scratch);
+-	   printk("             %64.64s\n", &scratch[64]);
+-#endif
 -
- MODULE_LICENSE("GPL");
--module_init(dstr_init)
--module_exit(dstr_exit)
-+module_pata_parport_driver(dstr);
++	print_hex_dump_bytes("bpck EEPROM: ", DUMP_PREFIX_NONE, scratch, 128);
+ 	dev_info(&pi->dev, "bpck %s, backpack %8.8s unit %d",
+ 		BPCK_VERSION, &scratch[110], pi->unit);
+ 	dev_info(&pi->dev, " at 0x%x, mode %d (%s), delay %d\n", pi->port,
 diff --git a/drivers/ata/pata_parport/epat.c b/drivers/ata/pata_parport/epat.c
-index 93ee91d9338b..7583d07083a8 100644
+index 389faa6ae49d..b08ed2f86668 100644
 --- a/drivers/ata/pata_parport/epat.c
 +++ b/drivers/ata/pata_parport/epat.c
-@@ -327,12 +327,12 @@ static int __init epat_init(void)
- #ifdef CONFIG_PATA_PARPORT_EPATC8
- 	epatc8 = 1;
- #endif
--	return paride_register(&epat);
-+	return pata_parport_register_driver(&epat);
- }
+@@ -280,7 +280,7 @@ static int epat_test_proto(struct pi_adapter *pi, char *scratch, int verbose)
+         epat_disconnect(pi);
  
- static void __exit epat_exit(void)
- {
--	paride_unregister(&epat);
-+	pata_parport_unregister_driver(&epat);
+ 	dev_dbg(&pi->dev, "epat: port 0x%x, mode %d, ccr %x, test=(%d,%d,%d)\n",
+-	       pi->port, pi->mode, cc, e[0], e[1], f);
++		pi->port, pi->mode, cc, e[0], e[1], f);
+ 	
+         return (e[0] && e[1]) || f;
  }
- 
- MODULE_LICENSE("GPL");
 diff --git a/drivers/ata/pata_parport/epia.c b/drivers/ata/pata_parport/epia.c
-index 417d5a3c7f72..2bcb18a6845a 100644
+index 48d12f56c501..32bec3449338 100644
 --- a/drivers/ata/pata_parport/epia.c
 +++ b/drivers/ata/pata_parport/epia.c
-@@ -301,16 +301,5 @@ static struct pi_protocol epia = {
- 	.log_adapter	= epia_log_adapter,
- };
+@@ -263,7 +263,7 @@ static int epia_test_proto(struct pi_adapter *pi, char *scratch, int verbose)
+         epia_disconnect(pi);
  
--static int __init epia_init(void)
--{
--	return paride_register(&epia);
--}
--
--static void __exit epia_exit(void)
--{
--	paride_unregister(&epia);
--}
--
- MODULE_LICENSE("GPL");
--module_init(epia_init)
--module_exit(epia_exit)
-+module_pata_parport_driver(epia);
-diff --git a/drivers/ata/pata_parport/fit2.c b/drivers/ata/pata_parport/fit2.c
-index 3c7a1069b026..c63f0cd2ea52 100644
---- a/drivers/ata/pata_parport/fit2.c
-+++ b/drivers/ata/pata_parport/fit2.c
-@@ -136,16 +136,5 @@ static struct pi_protocol fit2 = {
- 	.log_adapter	= fit2_log_adapter,
- };
+ 	dev_dbg(&pi->dev, "epia: port 0x%x, mode %d, test=(%d,%d,%d)\n",
+-	       pi->port, pi->mode, e[0], e[1], f);
++		pi->port, pi->mode, e[0], e[1], f);
+         
+         return (e[0] && e[1]) || f;
  
--static int __init fit2_init(void)
--{
--	return paride_register(&fit2);
--}
--
--static void __exit fit2_exit(void)
--{
--	paride_unregister(&fit2);
--}
--
- MODULE_LICENSE("GPL");
--module_init(fit2_init)
--module_exit(fit2_exit)
-+module_pata_parport_driver(fit2);
-diff --git a/drivers/ata/pata_parport/fit3.c b/drivers/ata/pata_parport/fit3.c
-index cd95f4f0edc2..adbef142c88f 100644
---- a/drivers/ata/pata_parport/fit3.c
-+++ b/drivers/ata/pata_parport/fit3.c
-@@ -196,16 +196,5 @@ static struct pi_protocol fit3 = {
- 	.log_adapter	= fit3_log_adapter,
- };
- 
--static int __init fit3_init(void)
--{
--	return paride_register(&fit3);
--}
--
--static void __exit fit3_exit(void)
--{
--	paride_unregister(&fit3);
--}
--
- MODULE_LICENSE("GPL");
--module_init(fit3_init)
--module_exit(fit3_exit)
-+module_pata_parport_driver(fit3);
 diff --git a/drivers/ata/pata_parport/friq.c b/drivers/ata/pata_parport/friq.c
-index da1d0cb016d6..e740fe933e20 100644
+index ec564e7cb930..9e3ec64896f2 100644
 --- a/drivers/ata/pata_parport/friq.c
 +++ b/drivers/ata/pata_parport/friq.c
-@@ -261,16 +261,5 @@ static struct pi_protocol friq = {
- 	.release_proto	= friq_release_proto,
- };
+@@ -208,7 +208,7 @@ static int friq_test_proto(struct pi_adapter *pi, char *scratch, int verbose)
+ 	friq_disconnect(pi);
  
--static int __init friq_init(void)
--{
--	return paride_register(&friq);
--}
--
--static void __exit friq_exit(void)
--{
--	paride_unregister(&friq);
--}
--
- MODULE_LICENSE("GPL");
--module_init(friq_init)
--module_exit(friq_exit)
-+module_pata_parport_driver(friq);
+ 	dev_dbg(&pi->dev, "friq: port 0x%x, mode %d, test=(%d,%d,%d)\n",
+-	       pi->port, pi->mode, e[0], e[1], r);
++		pi->port, pi->mode, e[0], e[1], r);
+ 
+         return (r || (e[0] && e[1]));
+ }
 diff --git a/drivers/ata/pata_parport/frpw.c b/drivers/ata/pata_parport/frpw.c
-index 7bc8fa16d5d8..8c8681812bed 100644
+index 5ea16a247257..c12c8aa9707c 100644
 --- a/drivers/ata/pata_parport/frpw.c
 +++ b/drivers/ata/pata_parport/frpw.c
-@@ -298,16 +298,5 @@ static struct pi_protocol frpw = {
- 	.log_adapter	= frpw_log_adapter,
- };
+@@ -257,7 +257,7 @@ static int frpw_test_proto(struct pi_adapter *pi, char *scratch, int verbose)
+ 	frpw_disconnect(pi);
  
--static int __init frpw_init(void)
--{
--	return paride_register(&frpw);
--}
--
--static void __exit frpw_exit(void)
--{
--	paride_unregister(&frpw);
--}
--
- MODULE_LICENSE("GPL");
--module_init(frpw_init)
--module_exit(frpw_exit)
-+module_pata_parport_driver(frpw);
-diff --git a/drivers/ata/pata_parport/kbic.c b/drivers/ata/pata_parport/kbic.c
-index 93430ca32a52..b120597043cc 100644
---- a/drivers/ata/pata_parport/kbic.c
-+++ b/drivers/ata/pata_parport/kbic.c
-@@ -288,19 +288,19 @@ static int __init kbic_init(void)
- {
- 	int rv;
+ 	dev_dbg(&pi->dev, "frpw: port 0x%x, chip %ld, mode %d, test=(%d,%d,%d)\n",
+-	       pi->port, (pi->private%2), pi->mode, e[0], e[1], r);
++		pi->port, (pi->private%2), pi->mode, e[0], e[1], r);
  
--	rv = paride_register(&k951);
-+	rv = pata_parport_register_driver(&k951);
- 	if (rv < 0)
- 		return rv;
--	rv = paride_register(&k971);
-+	rv = pata_parport_register_driver(&k971);
- 	if (rv < 0)
--		paride_unregister(&k951);
-+		pata_parport_unregister_driver(&k951);
- 	return rv;
+         return (r || (e[0] && e[1]));
  }
- 
- static void __exit kbic_exit(void)
- {
--	paride_unregister(&k951);
--	paride_unregister(&k971);
-+	pata_parport_unregister_driver(&k951);
-+	pata_parport_unregister_driver(&k971);
- }
- 
- MODULE_LICENSE("GPL");
-diff --git a/drivers/ata/pata_parport/ktti.c b/drivers/ata/pata_parport/ktti.c
-index fc4f707fed1f..15463cd18968 100644
---- a/drivers/ata/pata_parport/ktti.c
-+++ b/drivers/ata/pata_parport/ktti.c
-@@ -113,16 +113,5 @@ static struct pi_protocol ktti = {
- 	.log_adapter	= ktti_log_adapter,
- };
- 
--static int __init ktti_init(void)
--{
--	return paride_register(&ktti);
--}
--
--static void __exit ktti_exit(void)
--{
--	paride_unregister(&ktti);
--}
--
- MODULE_LICENSE("GPL");
--module_init(ktti_init)
--module_exit(ktti_exit)
-+module_pata_parport_driver(ktti);
-diff --git a/drivers/ata/pata_parport/on20.c b/drivers/ata/pata_parport/on20.c
-index 995fc41e3122..f2a601e77842 100644
---- a/drivers/ata/pata_parport/on20.c
-+++ b/drivers/ata/pata_parport/on20.c
-@@ -138,16 +138,5 @@ static struct pi_protocol on20 = {
- 	.log_adapter	= on20_log_adapter,
- };
- 
--static int __init on20_init(void)
--{
--	return paride_register(&on20);
--}
--
--static void __exit on20_exit(void)
--{
--	paride_unregister(&on20);
--}
--
- MODULE_LICENSE("GPL");
--module_init(on20_init)
--module_exit(on20_exit)
-+module_pata_parport_driver(on20);
-diff --git a/drivers/ata/pata_parport/on26.c b/drivers/ata/pata_parport/on26.c
-index 35f1c481a782..66f04015f19a 100644
---- a/drivers/ata/pata_parport/on26.c
-+++ b/drivers/ata/pata_parport/on26.c
-@@ -304,16 +304,5 @@ static struct pi_protocol on26 = {
- 	.log_adapter	= on26_log_adapter,
- };
- 
--static int __init on26_init(void)
--{
--	return paride_register(&on26);
--}
--
--static void __exit on26_exit(void)
--{
--	paride_unregister(&on26);
--}
--
- MODULE_LICENSE("GPL");
--module_init(on26_init)
--module_exit(on26_exit)
-+module_pata_parport_driver(on26);
-diff --git a/include/linux/pata_parport.h b/include/linux/pata_parport.h
-index 458544fe5e6c..9614ce53470a 100644
---- a/include/linux/pata_parport.h
-+++ b/include/linux/pata_parport.h
-@@ -87,8 +87,16 @@ struct pi_protocol {
- 
- int pata_parport_register_driver(struct pi_protocol *pr);
- void pata_parport_unregister_driver(struct pi_protocol *pr);
--/* defines for old paride protocol modules */
--#define paride_register pata_parport_register_driver
--#define paride_unregister pata_parport_unregister_driver
-+
-+/**
-+ * module_pata_parport_driver() - Helper macro for registering a pata_parport driver
-+ * @__pi_protocol: pi_protocol struct
-+ *
-+ * Helper macro for pata_parport drivers which do not do anything special in module
-+ * init/exit. This eliminates a lot of boilerplate. Each module may only
-+ * use this macro once, and calling it replaces module_init() and module_exit()
-+ */
-+#define module_pata_parport_driver(__pi_protocol) \
-+	module_driver(__pi_protocol, pata_parport_register_driver, pata_parport_unregister_driver)
- 
- #endif /* LINUX_PATA_PARPORT_H */
 -- 
 Ondrej Zary
 
