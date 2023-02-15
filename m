@@ -2,24 +2,24 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53B49C636D7
-	for <linux-block@archiver.kernel.org>; Wed, 15 Feb 2023 19:46:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C0D8C64ED8
+	for <linux-block@archiver.kernel.org>; Wed, 15 Feb 2023 19:46:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229578AbjBOTqL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 15 Feb 2023 14:46:11 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41256 "EHLO
+        id S229695AbjBOTqM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 15 Feb 2023 14:46:12 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41262 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229550AbjBOTqK (ORCPT
+        with ESMTP id S229584AbjBOTqK (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Wed, 15 Feb 2023 14:46:10 -0500
 Received: from hosting.gsystem.sk (hosting.gsystem.sk [212.5.213.30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 7933B3C7A7;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 18058410B0;
         Wed, 15 Feb 2023 11:46:04 -0800 (PST)
 Received: from gsql.ggedos.sk (off-20.infotel.telecom.sk [212.5.213.20])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by hosting.gsystem.sk (Postfix) with ESMTPSA id 9F2167A0347;
-        Wed, 15 Feb 2023 20:46:03 +0100 (CET)
+        by hosting.gsystem.sk (Postfix) with ESMTPSA id 0EB237A0596;
+        Wed, 15 Feb 2023 20:46:04 +0100 (CET)
 From:   Ondrej Zary <linux@zary.sk>
 To:     Damien Le Moal <damien.lemoal@opensource.wdc.com>
 Cc:     Christoph Hellwig <hch@lst.de>,
@@ -27,48 +27,40 @@ Cc:     Christoph Hellwig <hch@lst.de>,
         Jens Axboe <axboe@kernel.dk>, Tim Waugh <tim@cyberelk.net>,
         linux-block@vger.kernel.org, linux-parport@lists.infradead.org,
         linux-ide@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v3 0/18] pata_parport: protocol drivers fixes and cleanups
-Date:   Wed, 15 Feb 2023 20:45:36 +0100
-Message-Id: <20230215194554.25632-1-linux@zary.sk>
+Subject: [PATCH 04/18] pata_parport: remove useless printks at module_init of bpck6
+Date:   Wed, 15 Feb 2023 20:45:40 +0100
+Message-Id: <20230215194554.25632-5-linux@zary.sk>
 X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20230215194554.25632-1-linux@zary.sk>
+References: <20230215194554.25632-1-linux@zary.sk>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This patch series fixes two bugs and cleans up pata_parport protocol drivers,
-making the code simpler with no changes in behavior (except logged messages).
+bpck6 prints some useless messages on module_init. Remove them.
 
 Signed-off-by: Ondrej Zary <linux@zary.sk>
 ---
-Changes in v3:
- - added missing reviewed-by tags
- - added more detailed changelog:
-   - patches 04-05 are split from v1 patch 02/12
-   - patch 06: comment-out instead of if(1)
-   - patches 11-14 are split from v1 patch 08/12
-Changes in v2:
- - added two bugfixes (first two patches)
- - addressed Sergey's comments (mostly split patches)
+ drivers/ata/pata_parport/bpck6.c | 4 ----
+ 1 file changed, 4 deletions(-)
 
- drivers/ata/pata_parport/aten.c                            |  45 ++++----------
- drivers/ata/pata_parport/bpck.c                            |  86 ++++++++------------------
- drivers/ata/pata_parport/bpck6.c                           | 107 ++++++++-------------------------
- drivers/ata/pata_parport/comm.c                            |  52 +++++-----------
- drivers/ata/pata_parport/dstr.c                            |  45 ++++----------
- drivers/ata/pata_parport/epat.c                            |  48 ++++++---------
- drivers/ata/pata_parport/epia.c                            |  55 +++++------------
- drivers/ata/pata_parport/fit2.c                            |  37 ++++--------
- drivers/ata/pata_parport/fit3.c                            |  39 ++++--------
- drivers/ata/pata_parport/friq.c                            |  56 ++++++-----------
- drivers/ata/pata_parport/frpw.c                            |  71 ++++++----------------
- drivers/ata/pata_parport/kbic.c                            |  66 +++++++++-----------
- drivers/ata/pata_parport/ktti.c                            |  38 ++++--------
- drivers/ata/pata_parport/on20.c                            |  45 ++++----------
- drivers/ata/pata_parport/on26.c                            |  52 ++++------------
- drivers/ata/pata_parport/pata_parport.c                    |  31 +++++-----
- {include/linux => drivers/ata/pata_parport}/pata_parport.h |  41 ++++---------
- 17 files changed, 271 insertions(+), 643 deletions(-)
-
+diff --git a/drivers/ata/pata_parport/bpck6.c b/drivers/ata/pata_parport/bpck6.c
+index d897e2a28efe..3b3a40e48b21 100644
+--- a/drivers/ata/pata_parport/bpck6.c
++++ b/drivers/ata/pata_parport/bpck6.c
+@@ -247,10 +247,6 @@ static struct pi_protocol bpck6 = {
+ 
+ static int __init bpck6_init(void)
+ {
+-	printk(KERN_INFO "bpck6: BACKPACK Protocol Driver V"BACKPACK_VERSION"\n");
+-	printk(KERN_INFO "bpck6: Copyright 2001 by Micro Solutions, Inc., DeKalb IL. USA\n");
+-	if(verbose)
+-		printk(KERN_DEBUG "bpck6: verbose debug enabled.\n");
+ 	return paride_register(&bpck6);
+ }
+ 
+-- 
+Ondrej Zary
 
