@@ -2,110 +2,92 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D4BA6C64EC7
-	for <linux-block@archiver.kernel.org>; Wed, 15 Feb 2023 10:36:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 32316C636CC
+	for <linux-block@archiver.kernel.org>; Wed, 15 Feb 2023 12:24:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234092AbjBOKgv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 15 Feb 2023 05:36:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56716 "EHLO
+        id S233527AbjBOMYa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 15 Feb 2023 07:24:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45256 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234084AbjBOKgu (ORCPT
+        with ESMTP id S230197AbjBOMY3 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 15 Feb 2023 05:36:50 -0500
-Received: from mail-ej1-x635.google.com (mail-ej1-x635.google.com [IPv6:2a00:1450:4864:20::635])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0906C37F08
-        for <linux-block@vger.kernel.org>; Wed, 15 Feb 2023 02:36:45 -0800 (PST)
-Received: by mail-ej1-x635.google.com with SMTP id qw12so47116860ejc.2
-        for <linux-block@vger.kernel.org>; Wed, 15 Feb 2023 02:36:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=szeredi.hu; s=google;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=jM0FwoIIzEHG4m8zeaDUaO7Uvam61BltMptR0QqQfi8=;
-        b=g10NP693SvvFXcmWRF8jugEf1fd0P1pWVWUmXSW+QT1vi5rZmh/Tp5whmTtenWD1ub
-         xxUGAKnzhAefLbyB7PoHddpwNA1phJRDGS7cNxVnesT8/czbcfvwChVMOQEifqixnehd
-         VYkM0S7GFtXgP2ob/07Hcxzpl7RUPcQtJwal4=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=jM0FwoIIzEHG4m8zeaDUaO7Uvam61BltMptR0QqQfi8=;
-        b=TBlsf8mqY1mr8W/JYZ/9cYxQZVAsETr4osK2GGACF/wJHRysf5HulXZb11HA4MUysq
-         Xb8GPjFCcYp4F8l/KHnk5yT4mQr/TIO1DA4cUEWn8e2tLbwKVI9q9XjpIIwJZiIxQEe5
-         ThUXX4aV/EVt4n9f67lkCJtXPm1lfw0QXeCFM2eEYyK1l4QhcW7FdVbUb5RA45cStm4d
-         0bh1cghyx4a2XehbHihSEM9pVI8hv7TxcpBBTGcExerX8VnOHkReP26djoRyLU96G6iB
-         1tYJr2O5ksZZUUs3tO9Ku3NU9tPD2VderqqNbgfsy6n5QGn4JlgQQaUjXl0STcfT8xRv
-         gL9w==
-X-Gm-Message-State: AO0yUKUXu9QZCLvk4wlAYmGdt/AIy09GNQhaSTSyqHhzHyqo0eP6wm6F
-        m45YgdDBAtx2we8KI7d/Vtaqp2cMFOqK5xDoFDfyFg==
-X-Google-Smtp-Source: AK7set/bkHc0a756f/QlIvbRZtodwoFCU9VO07Oo08HkoJlbe19L4o3xLqNtmV85jzZ4Rw1THkuOEpBXU7a08gF46f8=
-X-Received: by 2002:a17:906:e219:b0:8af:2e89:83df with SMTP id
- gf25-20020a170906e21900b008af2e8983dfmr1079578ejb.6.1676457403411; Wed, 15
- Feb 2023 02:36:43 -0800 (PST)
+        Wed, 15 Feb 2023 07:24:29 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 76AFB34306
+        for <linux-block@vger.kernel.org>; Wed, 15 Feb 2023 04:23:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1676463822;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=l3Cz4qPfh6SVniqMxzACvEnXSN4Vm6rhHNCN0GEcnwU=;
+        b=ihu1TWGI9o+N9LDiEQ9TO6/wDV28Y3/PygGcUW4HXDMDYFZma/2vno+ag/hI5Si2hxoh8B
+        67ct821kq/qk++Mkg55uy5C+6xT9heATru0lhtpouoLwJWfO7jck38Bnk/z8AG77wyV5Lo
+        csVDq724KVXMOchIeR3pOeVYdUgovS0=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-655-VLzuZdXQN8OcPjdgrnXQkg-1; Wed, 15 Feb 2023 07:23:39 -0500
+X-MC-Unique: VLzuZdXQN8OcPjdgrnXQkg-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 71C503847980;
+        Wed, 15 Feb 2023 12:23:38 +0000 (UTC)
+Received: from file01.intranet.prod.int.rdu2.redhat.com (file01.intranet.prod.int.rdu2.redhat.com [10.11.5.7])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 4E0C7492B0E;
+        Wed, 15 Feb 2023 12:23:38 +0000 (UTC)
+Received: from file01.intranet.prod.int.rdu2.redhat.com (localhost [127.0.0.1])
+        by file01.intranet.prod.int.rdu2.redhat.com (8.14.4/8.14.4) with ESMTP id 31FCNcAQ007819;
+        Wed, 15 Feb 2023 07:23:38 -0500
+Received: from localhost (mpatocka@localhost)
+        by file01.intranet.prod.int.rdu2.redhat.com (8.14.4/8.14.4/Submit) with ESMTP id 31FCNbeX007815;
+        Wed, 15 Feb 2023 07:23:37 -0500
+X-Authentication-Warning: file01.intranet.prod.int.rdu2.redhat.com: mpatocka owned process doing -bs
+Date:   Wed, 15 Feb 2023 07:23:37 -0500 (EST)
+From:   Mikulas Patocka <mpatocka@redhat.com>
+X-X-Sender: mpatocka@file01.intranet.prod.int.rdu2.redhat.com
+To:     Yang Shi <shy828301@gmail.com>
+cc:     mgorman@techsingularity.net, agk@redhat.com, snitzer@kernel.org,
+        dm-devel@redhat.com, akpm@linux-foundation.org,
+        linux-block@vger.kernel.org, linux-mm@kvack.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [dm-devel] [v2 PATCH 0/5] Introduce mempool pages bulk allocator
+ and use it in dm-crypt
+In-Reply-To: <20230214190221.1156876-1-shy828301@gmail.com>
+Message-ID: <alpine.LRH.2.21.2302150716120.5940@file01.intranet.prod.int.rdu2.redhat.com>
+References: <20230214190221.1156876-1-shy828301@gmail.com>
+User-Agent: Alpine 2.21 (LRH 202 2017-01-01)
 MIME-Version: 1.0
-References: <20230210153212.733006-1-ming.lei@redhat.com> <20230210153212.733006-2-ming.lei@redhat.com>
- <Y+e3b+Myg/30hlYk@T590> <CAHk-=wgTzLjvhzx-XGkgEQmXH6t=8OTFdQyhDgafGdC2n5gOfg@mail.gmail.com>
- <Y+hDQ1vL6AMFri1E@T590> <CAHk-=wgJsi7t7YYpuo6ewXGnHz2nmj67iWR6KPGoz5TBu34mWQ@mail.gmail.com>
- <CAJfpegtOetw46DvR1PeuX5L9-fe7Qk75mq5L4tGwpS_wuEz=1g@mail.gmail.com>
- <Y+ucLFG/ap8uqwPG@T590> <CAJfpeguGayE2fS2m9U7=Up4Eqa_89oTeR4xW-WbcfjJBRaYqHA@mail.gmail.com>
- <Y+wjGZO6rVw5W35T@T590>
-In-Reply-To: <Y+wjGZO6rVw5W35T@T590>
-From:   Miklos Szeredi <miklos@szeredi.hu>
-Date:   Wed, 15 Feb 2023 11:36:32 +0100
-Message-ID: <CAJfpeguQ3xn2-6svkkVXJ88tiVfcDd-eKi1evzzfvu305fMoyw@mail.gmail.com>
-Subject: Re: [PATCH 1/4] fs/splice: enhance direct pipe & splice for moving
- pages in kernel
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Miklos Szeredi <mszeredi@redhat.com>,
-        Bernd Schubert <bschubert@ddn.com>,
-        Nitesh Shetty <nj.shetty@samsung.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Ziyang Zhang <ZiyangZhang@linux.alibaba.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, 15 Feb 2023 at 01:11, Ming Lei <ming.lei@redhat.com> wrote:
->
-> On Tue, Feb 14, 2023 at 04:39:01PM +0100, Miklos Szeredi wrote:
-> > On Tue, 14 Feb 2023 at 15:35, Ming Lei <ming.lei@redhat.com> wrote:
-> >
-> > > I understand it isn't one issue from block device driver viewpoint at
-> > > least, since the WRITE to buffer in sink end can be thought as DMA
-> > > to buffer from device, and it is the upper layer(FS)'s responsibility
-> > > for updating page flag. And block driver needn't to handle page
-> > > status update.
-> >
-> > The block device still needs to know when the DMA is finished, right?
->
-> Yeah, for normal in-kernel device driver, the completion is triggered by
-> interrupt or io polling.
->
-> For ublk, io handling is done by userspace, here we use io_uring to
-> handle the IO in aio style. When the aio is completed, the userspace
-> gets notified of the completion.
 
-I think it might be better if the write completion was directly
-signaled to the original pipe buffer.  There are several advantages:
 
- - the kernel can guarantee (modulo bugs) that the buffer was
-initialized, this is important if the userspace server is unprivileged
+On Tue, 14 Feb 2023, Yang Shi wrote:
 
- - the server process does not need to be woken up on I/O completion
+> 
+> Changelog:
+> RFC -> v2:
+>   * Added callback variant for page bulk allocator and mempool bulk allocator
+>     per Mel Gorman.
+>   * Used the callback version in dm-crypt driver.
+>   * Some code cleanup and refactor to reduce duplicate code.
+> 
+> rfc: https://lore.kernel.org/linux-mm/20221005180341.1738796-1-shy828301@gmail.com/
 
- - there could be a chain of splices involving various entities, yet
-the original pipe buffer should always get the completion
+Hi
 
-I'm not sure what a good implementation would look like.  When a pipe
-buffer is split, things get complicated.  Maybe just disallow
-splitting on such buffers...
+This seems like unneeded complication to me. We have alloc_pages(), it can 
+allocate multiple pages efficiently, so why not use it?
 
-Thanks,
-Miklos
+I suggest to modify crypt_alloc_buffer() to use alloc_pages() and if 
+alloc_pages() fails (either because the system is low on memory or because 
+memory is too fragmented), fall back to the existing code that does 
+mempool_alloc().
+
+Mikulas
+
