@@ -2,49 +2,49 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F30DC636D4
-	for <linux-block@archiver.kernel.org>; Wed, 15 Feb 2023 08:09:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D2F87C636CC
+	for <linux-block@archiver.kernel.org>; Wed, 15 Feb 2023 08:21:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233550AbjBOIJF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 15 Feb 2023 03:09:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46778 "EHLO
+        id S233173AbjBOIV2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 15 Feb 2023 03:21:28 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53550 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233677AbjBOII6 (ORCPT
+        with ESMTP id S232248AbjBOIV2 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 15 Feb 2023 03:08:58 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 76ADE366BA
-        for <linux-block@vger.kernel.org>; Wed, 15 Feb 2023 00:08:07 -0800 (PST)
+        Wed, 15 Feb 2023 03:21:28 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 611263644F
+        for <linux-block@vger.kernel.org>; Wed, 15 Feb 2023 00:20:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1676448486;
+        s=mimecast20190719; t=1676449241;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=9u9d4+mSA10ut2q7fk3wCmoZCnOirUoOM8gzSFKLCaI=;
-        b=BwPqbDV8YGLf0X6/kGnr1n8srm6yWVSbFMfsyD9blBOhGQ15b9+gr6zwjp5RlJ1XklJb+F
-        9AQTOFrWhHM26748JeggPZUSxbEEHbdLrZsXncK6Pv/dZv0NsaRGrZ7LlBYVpagEAg+DU6
-        1BWjnELTpEQxLwEmLwkVqrixwB/K9G4=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=NTjdr0URf8+k0aGqfa33f30fcKRePSx8UOTbP633TXM=;
+        b=OLp11JWSZ4eVLsL17jMwQTCZ+M2GWyKPWjuTsEfrWKpJzSX7k/pDct3EBL5KIVtUv497uA
+        xRcIgj2FchLmpi3dXpB+ANNQD3sw5M1plDdoD74tcVRj+ZZlkRulc3OnDyR6DioO7QhzGa
+        RXoEdvygGp11cebUDzCHmLCDJwi00YI=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-639-QV-m0oUcNiaSK3dKwtDYaw-1; Wed, 15 Feb 2023 03:08:02 -0500
-X-MC-Unique: QV-m0oUcNiaSK3dKwtDYaw-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
+ us-mta-326-KTsdpRjMNNiRuCFWP3CJew-1; Wed, 15 Feb 2023 03:20:31 -0500
+X-MC-Unique: KTsdpRjMNNiRuCFWP3CJew-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 8F46729AA2D5;
-        Wed, 15 Feb 2023 08:08:01 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 7CE1A877CA0;
+        Wed, 15 Feb 2023 08:20:30 +0000 (UTC)
 Received: from warthog.procyon.org.uk (unknown [10.33.36.24])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id D1FF6140EBF6;
-        Wed, 15 Feb 2023 08:07:58 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 3E0412026D4B;
+        Wed, 15 Feb 2023 08:20:28 +0000 (UTC)
 Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
         Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
         Kingdom.
         Registered in England and Wales under Company Registration No. 3798903
 From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <867e1e3e-681b-843b-1704-effed736e13d@kernel.dk>
-References: <867e1e3e-681b-843b-1704-effed736e13d@kernel.dk> <20230214171330.2722188-1-dhowells@redhat.com> <2877092.1676415412@warthog.procyon.org.uk>
+In-Reply-To: <2895995.1676448478@warthog.procyon.org.uk>
+References: <2895995.1676448478@warthog.procyon.org.uk> <867e1e3e-681b-843b-1704-effed736e13d@kernel.dk> <20230214171330.2722188-1-dhowells@redhat.com> <2877092.1676415412@warthog.procyon.org.uk>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     dhowells@redhat.com, smfrench@gmail.com,
         Al Viro <viro@zeniv.linux.org.uk>,
@@ -60,72 +60,29 @@ Cc:     dhowells@redhat.com, smfrench@gmail.com,
 Subject: Re: [PATCH v14 00/17] iov_iter: Improve page extraction (pin or just list)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
-Content-ID: <2895994.1676448478.1@warthog.procyon.org.uk>
+Content-ID: <2905909.1676449227.1@warthog.procyon.org.uk>
 Content-Transfer-Encoding: quoted-printable
-Date:   Wed, 15 Feb 2023 08:07:58 +0000
-Message-ID: <2895995.1676448478@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.7
+Date:   Wed, 15 Feb 2023 08:20:27 +0000
+Message-ID: <2905910.1676449227@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Jens Axboe <axboe@kernel.dk> wrote:
+David Howells <dhowells@redhat.com> wrote:
 
-> Let's update the branch and see how it goes... If there's more fallout, =
-then
-> let's make a fallback plan for the first few.
+> Jens Axboe <axboe@kernel.dk> wrote:
+> =
 
-I forgot to export the new functions, as Steve found out.  Fix attached.
+> > Let's update the branch and see how it goes... If there's more fallout=
+, then
+> > let's make a fallback plan for the first few.
+> =
+
+> I forgot to export the new functions, as Steve found out.  Fix attached.
+
+That said, nothing in your tree that calls these functions directly can be
+built as a module, so this can be left to the cifs tree for now.
 
 David
----
-splice: Export filemap/direct_splice_read()
-
-filemap_splice_read() and direct_splice_read() should be exported.
-
-Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Steve French <sfrench@samba.org>
-cc: Jens Axboe <axboe@kernel.dk>
-cc: Christoph Hellwig <hch@lst.de>
-cc: Al Viro <viro@zeniv.linux.org.uk>
-cc: David Hildenbrand <david@redhat.com>
-cc: John Hubbard <jhubbard@nvidia.com>
-cc: linux-cifs@vger.kernel.org
-cc: linux-mm@kvack.org
-cc: linux-block@vger.kernel.org
-cc: linux-fsdevel@vger.kernel.org
----
- fs/splice.c  |    1 +
- mm/filemap.c |    1 +
- 2 files changed, 2 insertions(+)
-
-diff --git a/fs/splice.c b/fs/splice.c
-index 4c6332854b63..928c7be2f318 100644
---- a/fs/splice.c
-+++ b/fs/splice.c
-@@ -373,6 +373,7 @@ ssize_t direct_splice_read(struct file *in, loff_t *pp=
-os,
- 	kfree(bv);
- 	return ret;
- }
-+EXPORT_SYMBOL(direct_splice_read);
- =
-
- /**
-  * generic_file_splice_read - splice data from file to a pipe
-diff --git a/mm/filemap.c b/mm/filemap.c
-index 8c7b135c8e23..570f86578f7c 100644
---- a/mm/filemap.c
-+++ b/mm/filemap.c
-@@ -2969,6 +2969,7 @@ ssize_t filemap_splice_read(struct file *in, loff_t =
-*ppos,
- =
-
- 	return total_spliced ? total_spliced : error;
- }
-+EXPORT_SYMBOL(filemap_splice_read);
- =
-
- static inline loff_t folio_seek_hole_data(struct xa_state *xas,
- 		struct address_space *mapping, struct folio *folio,
 
