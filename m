@@ -2,162 +2,285 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0FAEC636CC
-	for <linux-block@archiver.kernel.org>; Thu, 16 Feb 2023 08:35:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D7028C636CC
+	for <linux-block@archiver.kernel.org>; Thu, 16 Feb 2023 08:59:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229523AbjBPIf1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 16 Feb 2023 03:35:27 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56986 "EHLO
+        id S229570AbjBPI7H (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 16 Feb 2023 03:59:07 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45052 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229490AbjBPIfZ (ORCPT
+        with ESMTP id S229737AbjBPI7C (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 16 Feb 2023 03:35:25 -0500
-Received: from esa4.hgst.iphmx.com (esa4.hgst.iphmx.com [216.71.154.42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2CAB034C01
-        for <linux-block@vger.kernel.org>; Thu, 16 Feb 2023 00:35:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1676536524; x=1708072524;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=nUgAFL+VlD3S5NmOg+K4d2cMNx+QZylUr1K1yRqv0Vg=;
-  b=qiqV1eP2BfdG/MniEtaAjkGh6w9P3t2uHXP4wTimeHztwatpYS2Mskst
-   O5IyzVnQt4ejgiuDQbKaDLIP7ZYhwB/031vUzR9k630D1C8IUZ+aVlngG
-   Khfhek0CTDkrDUhYfya2te7kk+WNmgPPjrf9Tam1Y4zPxIBt5cF+YU9f0
-   3Tqf2qxMiMnUjVX650OviKYboaW+xVi84DPQ4bKeVpiIGFhKmO/n/g1qc
-   8cCxkLmU7TUbwXkz9V0dBIHZtUlZNoMgqlmO6ZkZpyRk1piOg3p6j8qZ8
-   qNINuuZuqcqD6nz+3jkkeQdZIPepdc32HEEKh1Lj0G0kq0HLTqyyC5Igf
-   g==;
-X-IronPort-AV: E=Sophos;i="5.97,301,1669046400"; 
-   d="scan'208";a="221739029"
-Received: from mail-bn8nam11lp2168.outbound.protection.outlook.com (HELO NAM11-BN8-obe.outbound.protection.outlook.com) ([104.47.58.168])
-  by ob1.hgst.iphmx.com with ESMTP; 16 Feb 2023 16:35:22 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=j8c5qe0epzsSKv4N0PpV9/zvtG4sVMiZQaZ430dTKQzLb7fpzSCHU5ZlOJc+xH57jrJHM4MUkFlK+p5eYCIxIvm/lZOB3RFBsTuk0i4FrBFx9zprsTSZ4gmDbepgpGxhxHfrYoYDTFNh/ZGhO70wZTSH22iFaZlnqpd1GZ+Sv55UQynL2D4+azjOPTkaEEbzkz/nKajouhF81Gk8ovecDEwxRTQBjyAmaVra0S4pxSKeEiGKee3CUG6zkImSn+WOCv3Lg8VPRIVIZyBf/DO+JVp5M/w2tBmOnZDjrhd4sqKl2RvPs8EUHi9VPGUhUAh6fqEH7rfNlGmlO0RoXGG17w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=u/Hpvib/ZMaBtaVRGfjBSoIdQaO8jQYyCbLgCLAleJM=;
- b=Hm+ZT5PKdMdOukSQMNHVSMhFKNFX4iC8VjTKd/r8GgMGPdVgEUiTqETSz5iOuIrhF8B8mqzmPyN2GACIe2EmW/wXAkvJwwHi3AXIpfUzWKHTpaOCjPTNxpXR6E5k7DNZRXWUe3Yk2gkkRCLbtp/bJEomcnDan7JepPGoIiSMe9oRzFFlqAoTIfiHrKlAmxnuU0h72NcoA1duSdamE3aYqD+Snr/g5h8UY6vIkJtVR2cTzoc3pOasMuw0QALQ2XOYAydx0hAUUGVdqtbDvxAxJpUnWn3r7MOGSqS9jbfkJ4zPeEIbqiMU6DFrGzbNqeATNlxIMPYedsA97O7dTGBqNw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=u/Hpvib/ZMaBtaVRGfjBSoIdQaO8jQYyCbLgCLAleJM=;
- b=I58mEwuYnMLXUU3t+N9UTrHWjJva7FLdLMvaJXZnslcjYuVzoE830XP5tO/qIY/nf2qU7snApwe7PrTpJmfnIzRHXvDkIrG8+YTk/gaXMViVERO30JeZMZ595EhNHcZcY11tWfJMMXcejK/Ig6XbtgZFCE32qZBdcQ8bMMhoDjU=
-Received: from DM8PR04MB8037.namprd04.prod.outlook.com (2603:10b6:8:f::6) by
- DS0PR04MB8761.namprd04.prod.outlook.com (2603:10b6:8:127::14) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6086.26; Thu, 16 Feb 2023 08:35:20 +0000
-Received: from DM8PR04MB8037.namprd04.prod.outlook.com
- ([fe80::f2ed:2204:b02f:9bfa]) by DM8PR04MB8037.namprd04.prod.outlook.com
- ([fe80::f2ed:2204:b02f:9bfa%5]) with mapi id 15.20.6086.026; Thu, 16 Feb 2023
- 08:35:20 +0000
-From:   Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-To:     Ming Lei <ming.lei@redhat.com>
-CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: Re: [PATCH 0/2] blktests: add mini ublk source and blktests/033
-Thread-Topic: [PATCH 0/2] blktests: add mini ublk source and blktests/033
-Thread-Index: AQHZQbMs1PpE0aKL80CsCpPjuVYIqK7RP82A
-Date:   Thu, 16 Feb 2023 08:35:20 +0000
-Message-ID: <20230216083519.w362iawzqweilzes@shindev>
+        Thu, 16 Feb 2023 03:59:02 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7093D3E08B
+        for <linux-block@vger.kernel.org>; Thu, 16 Feb 2023 00:58:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1676537894;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=8oDp1wiF/TeUnnSAMJgHSLhTNA+6BBM+fmVT610sGqA=;
+        b=fgmtrxafFQ/J/LKAkxMjjsTqM18/1zYR8LMwZfVneCMiJ+Sab7AQ7m/cOCk3QQBeHB3bxx
+        u2f1e5E8DzyRnW+wwMcf/NAMNXnFDf2U3km0FT0g4inVifhMO/oCZfpu2YDjzvf+qX43dz
+        FdQg3AJPPw3NbQdJfsaenzzsURf0oEQ=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-60-_PWNsmfPNj2-yC95Y621jw-1; Thu, 16 Feb 2023 03:58:10 -0500
+X-MC-Unique: _PWNsmfPNj2-yC95Y621jw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 8F3C6101A55E;
+        Thu, 16 Feb 2023 08:58:10 +0000 (UTC)
+Received: from T590 (ovpn-8-29.pek2.redhat.com [10.72.8.29])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 2AA212026D68;
+        Thu, 16 Feb 2023 08:58:06 +0000 (UTC)
+Date:   Thu, 16 Feb 2023 16:58:00 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        ming.lei@redhat.com
+Subject: Re: [PATCH 1/2] blktests/src: add mini ublk source code
+Message-ID: <Y+3wGE9IiHIEECvO@T590>
 References: <20230216030134.1368607-1-ming.lei@redhat.com>
-In-Reply-To: <20230216030134.1368607-1-ming.lei@redhat.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=wdc.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DM8PR04MB8037:EE_|DS0PR04MB8761:EE_
-x-ms-office365-filtering-correlation-id: 6084c0c1-0512-45fc-262e-08db0ff8bd67
-wdcipoutbound: EOP-TRUE
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: WiM9OcoYUD5phTTPmHNGVFR0rnUtbQzAwhv92BiWFCUz//q+QBVVjaMqxEDcavd+1CeVQtuSSQrm+mW0SK/cryYoJoqnLdJAmG0KOfdEno94TaDnJoLyLxcOHbYY5bkBRaAOxtjZtWMvDPbz3X0KjmDLTuN7EXEqkjhTwVfhEcqO/pwtXNXXzeSf0286qWTQNdYPZxl+mF/ykGsmZO+1tGgeonJVGxT2GVvEuPLAw0IqtguEMSa6zfi2x+QeZxWGnnf2BAPEn0rA0ltgx1d1u+vGwF8x4ODZDj3Xpj5isQJmqT0ozifbOhyraf92U8ns0iQeJ14IU697Qqb7c59razEKV/gje0xA3osQrbb2OFV40gWUYxMMVfCzA5qIe3kAsObKKLvFXAVCYmq8yZX1xX7N2+Fn3ZYoKqQiQ4lF0E/Qlt8XikCN9lMaZ3mmaDQXqRiTbG3xKCmEic9AWfQWJF1lvZiSescWnhV0RnNnc4Bz8RhalCrKlXndd0ZMeMLzFfKADcxpxYq4Xc6s3dmTSwj3ckEdY3MXl3xtL9hN/8a558A+q4rsHCH5KN0oyLsR7I9IP2Xd6z5yWS3spl2BuUDmhkVwZi/64esVJJenHNoV3bCwXxf59XBOtVrGq74x1YCujobHGYlbRBkxE1VeKea/fCWFdtD6wURRLH4/FEbwVNyzUUTZNFPAsXVUw7auZMFVUqzkTD3KYgzO7giVwA==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR04MB8037.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(4636009)(7916004)(39860400002)(346002)(396003)(376002)(136003)(366004)(451199018)(26005)(186003)(71200400001)(2906002)(83380400001)(91956017)(38070700005)(9686003)(6512007)(316002)(6486002)(8936002)(86362001)(38100700002)(33716001)(6916009)(122000001)(5660300002)(8676002)(76116006)(82960400001)(44832011)(4326008)(66476007)(64756008)(66446008)(66556008)(66946007)(41300700001)(4744005)(478600001)(1076003)(6506007);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?vbNuzXE/IINpjnQpv3wu/pUieEUfUaPhsESePd7vuLOXs3NfIlXvPnpyq6yq?=
- =?us-ascii?Q?drvOejKNYt6g3B+caT9k5Qy35zxRr+mhh9SCkqRjZHVtADKH0mkqz75tn4mk?=
- =?us-ascii?Q?eFNkr8XGQMBFTIQJnYOKP1EYi1j4bE/n6ASlS0ozW/M60HfAuB6xCrE54DaL?=
- =?us-ascii?Q?CciO291wJ5nNURZ46kmqpbpH92YhupOv7QufDVZjAAgJwDeBrLWHfcHHMkYO?=
- =?us-ascii?Q?DrHTUvRt0hoZklB0HKFJhKY996Wtusli0CvqH61/ib4cbnl5Y/E9WsmnmsJd?=
- =?us-ascii?Q?xwOP1jttMF5LVFduaxQ9NBZigcEXue2rCHaYK+IHiYn/DF12Xe27DM5XwFXa?=
- =?us-ascii?Q?g+9gE94zjELaRQWpDyuXqshyTiOvJh7m5pGfbogDCBnHCw2cTTrW6Yp20QAK?=
- =?us-ascii?Q?COsQaNaspjpN6G8ZDrtSCQ4jcBkHRB97FK5ZV4dv3cWtAlGYjYhP7VyH6Drk?=
- =?us-ascii?Q?ExiMXWIPzi1qyJEFYq9mqVyqUvObgTRgWxj3VLLjhda+IdVwfhGSzmZ3MsUd?=
- =?us-ascii?Q?FKhHgVtHbMa8t9qLDP3EZkDDO36Pn4jrQXjiKZwZ3qc3M6ALJYVdM7VqzjHY?=
- =?us-ascii?Q?VawW4426OrDQBqO5Jc5l/q0MGSlmWV6PVYraePNgOf8DVVM7Y70lQi8A46yn?=
- =?us-ascii?Q?dMaTpaGQOfZuwSD3rnIQ2sTQYeRph/Fj9KsIRXj0R7rHN26ucp8KJE+8t5qT?=
- =?us-ascii?Q?9HZIyXoWe79dEjxXE06aH5OdlrGp81oiLDHrcVUufmI2GEIRqnXeFhKScKWi?=
- =?us-ascii?Q?A1dYgFg4TfRl8CQk0fs/VSkymYjePeqUukdjqQiJaYoCL/NJhY94o4GxTYbZ?=
- =?us-ascii?Q?LlebyiQZ1t3K3A5iXPCuJQ09rwxhrTluxGltBKVkyW4GNNPV40OPjGNaTYw7?=
- =?us-ascii?Q?tg6erv1t/xDGZf2kADvPasEhKlZ/aH6ApWbGO55X0oD17xR/x8zF5NDHe70O?=
- =?us-ascii?Q?CC/zj/zRkR3XNmfqtZMQcbwLRqxnxPY0wBoQ7vdJ65A8yQ2mjKFb0tl5hzka?=
- =?us-ascii?Q?sEL4ZCPdh0HLF3/RF0MpTPg/CC0mhz9xkB9+5O/cTF8SLsF7RLgVGtpY1KTB?=
- =?us-ascii?Q?RY51LZfAPsYtS/WBTFWEaCepnCY/He1dX3vVRB8EJxDQdMahGnSiwRcfLB8R?=
- =?us-ascii?Q?lpB4nOpFRgj9ktN1rTTCtYuWxZtLkiMb242iOMznhcXdz01wJCElTi2UWEVC?=
- =?us-ascii?Q?ECy/n1aEIVBdG5K/hqG1OUWu4e5VYD/h0L8So5UquvkeVZVKf5Roq8SChO9a?=
- =?us-ascii?Q?TkcngwipqwC2/oHB3dRF4ntA7jgcjBFViRzXE6gntd9va7jrnmAR31CkwNYR?=
- =?us-ascii?Q?KF/R2dr/dIiAQmPB5LAU1H0YGBxj6JHVZ5+tUtNRcHxiFwIwLlbVUiribtZq?=
- =?us-ascii?Q?dWmEk2ke97+CeG1uGz9yi4TxgjYWNkVTDSUCmoiy05XXHicE40uhp+UKFHNW?=
- =?us-ascii?Q?sXaBRVg59CXobj3U2SW8jHaXdRZr2Xu8sVaaShQd4fmKVLAxsj13cTuJWzh0?=
- =?us-ascii?Q?Zmv22t2Fzenm9oJ+VhPEAjzpGNZH4SE1GYoJbjMcd24w9GrXxM0a+shmC1Dw?=
- =?us-ascii?Q?WJ2kGsx2liOs8Lnk/zxJ7iCT8G9PHBWWuSHQOTFNXAv76FDq+eMeBWTJUpQo?=
- =?us-ascii?Q?eEZVaedG+RPyGiNtwrLh9do=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <7C97DDB724F7274289A9355C32DBF180@namprd04.prod.outlook.com>
-Content-Transfer-Encoding: quoted-printable
+ <20230216030134.1368607-2-ming.lei@redhat.com>
+ <20230216081938.oyc6ys5zo3bayrqw@shindev>
 MIME-Version: 1.0
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: FsUFVnRiAgD31/cWg1Ut50JctTMxsMr3KSD71PpKaNzukzIK5pE63YgIEZs+kHZmEcS6uOnJZBchi1+unLzDTWIPtSyZ3YtoNppTMBMP+Pd1zSKNhuAqs6/zhic8TXdTD+vremvg/VbiiphsBfOOc8Q6wIRpw4QuxVLq1myMf/Op0ECtmsXYp8K/bM7VdiLCc9OEXrpJcn7DILtPjS+8PNqN1vRIPYTzEDFBO+GX9/s+8H1ooIZMvQD8fHwxdvuPVGd7SmDWVZJLTp2LcvgI6hIV8kGWG2BzbKf636l1qpXSW+ObNJZAvG+oHOX7u8/l9aTOECNmXaO74ziGO+SVN3WcvjRfpeobJe3wpRU1zoykVFIrRdnqccnyvX9AzqEhwuQlP6vNB+25eUzGZifvlB0Z5ZoclfLb6bwt57+FXTyIrman08w7Rab+pulMQ3BU6Ue1fBXcNNvPrqDKop/y7QrDInGnyXtOsHJVBrxXwHywqKLQNe6bC23PctHpq7lDq+ndMEvu3JEXujnJoOW5UX3HsfT+vBSeqByvpdITNkAb/hvqFo3ImuTp2pn1gSkn9XSjR8FYFTQ+Yc8gwySXHVFbKBI2gvOwmS8pSYCNa7tCoHmKAy+9gB+vEpmxzZ1eUFoyHGJVC33kubEov90/apMzC1FOfrI4uPEldjs8EaF0HnAqzZ6IWyjW0Fk1RApd6HmVU6cvmyzTXXHkYcozlftTNyewzgd9KRAnCX6h7xlQdJ35fUaWmF1IL8KrMsSN/BWSstX/FEL5Dv8ZxDBObiSwSXyE+DOewadVbWf/xSS6cZV1TBgM3+QmZmtAJgdU
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DM8PR04MB8037.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6084c0c1-0512-45fc-262e-08db0ff8bd67
-X-MS-Exchange-CrossTenant-originalarrivaltime: 16 Feb 2023 08:35:20.6704
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: +Q0FAfx0gQant+HKUonE2xGHGQUMf8gtbs+ty2DlvBoPAK4DUUgJb3b5i/mMKtCvW+QSOj81Cvrqn4k9RD/lESvKfdLVaavVs/0KYJ2mpNY=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR04MB8761
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230216081938.oyc6ys5zo3bayrqw@shindev>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Feb 16, 2023 / 11:01, Ming Lei wrote:
-> Hello,
->=20
-> The 1st patch adds one mini ublk program, which only supports null &
-> loop targets.
->=20
-> The 2nd patch add blktests/033 for covering gendisk leak issue.
->=20
-> Ming Lei (2):
->   blktests/src: add mini ublk source code
->   blktests/033: add test to cover gendisk leak
+Hi Shinichiro,
 
-Hi Ming, thanks for the patches. Please find my comments on them.
-Also, could you run "make check" for the blktests patches? Shellcheck repor=
-ted
-some warnings in the changes.
+Thanks for the review!
 
-$ make check
-shellcheck -x -e "" -f gcc check new common/* \
-        tests/*/rc tests/*/[0-9]*[0-9]
-common/ublk:19:52: warning: args is referenced but not assigned. [SC2154]
-tests/block/033:27:8: warning: Declare and assign separately to avoid maski=
-ng return values. [SC2155]
-tests/block/033:27:17: note: Use $(...) notation instead of legacy backtick=
-s `...`. [SC2006]
-tests/block/033:28:24: note: Double quote to prevent globbing and word spli=
-tting. [SC2086]
+On Thu, Feb 16, 2023 at 08:19:39AM +0000, Shinichiro Kawasaki wrote:
+> Hi Ming, thanks for the patches. It sounds a good idea to extend blktests
+> coverage to ublk.
+> 
+> Regarding the commit title, I suggest this:
+> 
+>    src: add mini ublk source codes
+> 
+> The word "blktests" can be placed after the word "PATCH" as follows:
+> 
+>    [PATCH blktests] src: add mini ublk source codes
+> 
+> Please try --subject-prefix="PATCH blktests" option for git format-patch.
 
---=20
-Shin'ichiro Kawasaki=
+OK.
+
+> 
+> On Feb 16, 2023 / 11:01, Ming Lei wrote:
+> > Prepare for adding ublk related test:
+> > 
+> > 1) ublk delete is sync removal, this way is convenient to
+> >    blkg/queue/disk instance leak issue
+> > 
+> > 2) mini ublk has two builtin target(null, loop), and loop IO is
+> > handled by io_uring, so we can use ublk to cover part of io_uring
+> > workloads
+> > 
+> > 3) not like loop/nbd, ublk won't pre-allocate/add disk, and always
+> > add/delete disk dynamically, this way may cover disk plug & unplug
+> > tests
+> > 
+> > 4) ublk specific test given people starts to use it, so better to
+> > let blktest cover ublk related tests
+> > 
+> > Add mini ublk source for test purpose only, which is easy to use:
+> > 
+> > ./miniublk add -t {null|loop} [-q nr_queues] [-d depth] [-n dev_id]
+> > 	 default: nr_queues=2(max 4), depth=128(max 128), dev_id=-1(auto allocation)
+> > 	 -t loop -f backing_file
+> > 	 -t null
+> > ./miniublk del [-n dev_id] [--disk/-d disk_path ] -a
+> > 	 -a delete all devices, -n delete specified device
+> > ./miniublk list [-n dev_id] -a
+> > 	 -a list all devices, -n list specified device, default -a
+> > 
+> > ublk depends on liburing 2.2, so allow to ignore ublk build failure
+> > in case of missing liburing, and we will check if ublk program exits
+> > inside test.
+> > 
+> > Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> > ---
+> >  Makefile            |    2 +-
+> >  src/Makefile        |   13 +-
+> >  src/ublk/miniublk.c | 1385 +++++++++++++++++++++++++++++++++++++++++++
+> >  src/ublk/ublk_cmd.h |  278 +++++++++
+> >  4 files changed, 1674 insertions(+), 4 deletions(-)
+> >  create mode 100644 src/ublk/miniublk.c
+> >  create mode 100644 src/ublk/ublk_cmd.h
+> > 
+> > diff --git a/Makefile b/Makefile
+> > index 5a04479..b9bbade 100644
+> > --- a/Makefile
+> > +++ b/Makefile
+> > @@ -2,7 +2,7 @@ prefix ?= /usr/local
+> >  dest = $(DESTDIR)$(prefix)/blktests
+> >  
+> >  all:
+> > -	$(MAKE) -C src all
+> > +	$(MAKE) -i -C src all
+> 
+> This -i option to ignore errors is applied to all build targets, so it will hide
+> errors. Instead os ignoring the error, how about checking the liburing version
+> with pkg-config command? I roughly implemented it as the patch below on top of
+> your patch. It looks working.
+> 
+> diff --git a/src/Makefile b/src/Makefile
+> index 9bb8da6..c600099 100644
+> --- a/src/Makefile
+> +++ b/src/Makefile
+> @@ -2,6 +2,11 @@ HAVE_C_HEADER = $(shell if echo "\#include <$(1)>" |		\
+>  		$(CC) -E - > /dev/null 2>&1; then echo "$(2)";	\
+>  		else echo "$(3)"; fi)
+>  
+> +HAVE_PACKAGE_VER = $(shell if pkg-config --atleast-version="$(2)" "$(1)"; \
+> +			then echo 1; else echo 0; fi)
+> +
+> +HAVE_LIBURING := $(call HAVE_PACKAGE_VER,liburing,2.2)
+
+I tried this way, and it fails in case that liburing is built
+against source tree directly. And liburing2.2 is still a bit new, and even
+some distributions doesn't package it. I will think about other way
+for the check.
+
+> +
+>  C_TARGETS := \
+>  	loblksize \
+>  	loop_change_fd \
+> @@ -18,8 +23,11 @@ C_MINIUBLK := ublk/miniublk
+>  CXX_TARGETS := \
+>  	discontiguous-io
+>  
+> +ifeq ($(HAVE_LIBURING), 1)
+> +TARGETS := $(C_TARGETS) $(CXX_TARGETS) $(C_MINIUBLK)
+> +else
+>  TARGETS := $(C_TARGETS) $(CXX_TARGETS)
+> -ALL_TARGETS := $(TARGETS) $(C_MINIUBLK)
+> +endif
+>  
+>  CONFIG_DEFS := $(call HAVE_C_HEADER,linux/blkzoned.h,-DHAVE_LINUX_BLKZONED_H)
+>  
+> @@ -28,12 +36,12 @@ override CXXFLAGS := -O2 -std=c++11 -Wall -Wextra -Wshadow -Wno-sign-compare \
+>  		     -Werror $(CXXFLAGS) $(CONFIG_DEFS)
+>  MINIUBLK_FLAGS :=  -D_GNU_SOURCE -lpthread -luring -Iublk
+>  
+> -all: $(ALL_TARGETS)
+> +all: $(TARGETS)
+>  
+>  clean:
+> -	rm -f $(ALL_TARGETS)
+> +	rm -f $(TARGETS)
+>  
+> -install: $(ALL_TARGETS)
+> +install: $(TARGETS)
+>  	install -m755 -d $(dest)
+>  	install $(TARGETS) $(dest)
+>  
+> 
+> 
+> >  
+> >  clean:
+> >  	$(MAKE) -C src clean
+> > diff --git a/src/Makefile b/src/Makefile
+> > index 3b587f6..83e8a62 100644
+> > --- a/src/Makefile
+> > +++ b/src/Makefile
+> > @@ -13,23 +13,27 @@ C_TARGETS := \
+> >  	sg/syzkaller1 \
+> >  	zbdioctl
+> >  
+> > +C_MINIUBLK := ublk/miniublk
+> > +
+> >  CXX_TARGETS := \
+> >  	discontiguous-io
+> >  
+> >  TARGETS := $(C_TARGETS) $(CXX_TARGETS)
+> > +ALL_TARGETS := $(TARGETS) $(C_MINIUBLK)
+> >  
+> >  CONFIG_DEFS := $(call HAVE_C_HEADER,linux/blkzoned.h,-DHAVE_LINUX_BLKZONED_H)
+> >  
+> >  override CFLAGS   := -O2 -Wall -Wshadow $(CFLAGS) $(CONFIG_DEFS)
+> >  override CXXFLAGS := -O2 -std=c++11 -Wall -Wextra -Wshadow -Wno-sign-compare \
+> >  		     -Werror $(CXXFLAGS) $(CONFIG_DEFS)
+> > +MINIUBLK_FLAGS :=  -D_GNU_SOURCE -lpthread -luring
+> 
+> In my envronemen, -Iublk was required also to avoid a build error.
+
+Yeah, I just triggered it in my another VM.
+
+> 
+> >  
+> > -all: $(TARGETS)
+> > +all: $(ALL_TARGETS)
+> >  
+> >  clean:
+> > -	rm -f $(TARGETS)
+> > +	rm -f $(ALL_TARGETS)
+> >  
+> > -install: $(TARGETS)
+> > +install: $(ALL_TARGETS)
+> >  	install -m755 -d $(dest)
+> >  	install $(TARGETS) $(dest)
+> >  
+> > @@ -39,4 +43,7 @@ $(C_TARGETS): %: %.c
+> >  $(CXX_TARGETS): %: %.cpp
+> >  	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -o $@ $^
+> >  
+> > +$(C_MINIUBLK): %: ublk/miniublk.c
+> > +	$(CC) $(CFLAGS) $(MINIUBLK_FLAGS) -o $@ ublk/miniublk.c
+> > +
+> >  .PHONY: all clean install
+> > diff --git a/src/ublk/miniublk.c b/src/ublk/miniublk.c
+> > new file mode 100644
+> > index 0000000..dc80246
+> > --- /dev/null
+> > +++ b/src/ublk/miniublk.c
+> > @@ -0,0 +1,1385 @@
+> > +// SPDX-License-Identifier: GPL-2.0+
+> 
+> Many of the blktests files have the license GPL-3.0+. GPL-2.0+ should be fine,
+> but is there reasoning to have GPL-2.0+?
+
+Looks it is one copy & paste, will change to 3.0+ in V2.
+
+> 
+> > +// Copyright (C) 2023 Ming Lei
+> > +
+> > +/*
+> > + * io_uring based mini ublk implementation with null/loop target,
+> > + * for test purpose only.
+> > + *
+> > + * So please keep it simple & reliable.
+> > + */
+> [...]
+> 
+> > diff --git a/src/ublk/ublk_cmd.h b/src/ublk/ublk_cmd.h
+> > new file mode 100644
+> > index 0000000..f6238cc
+> > --- /dev/null
+> > +++ b/src/ublk/ublk_cmd.h
+> > @@ -0,0 +1,278 @@
+> > +/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
+> 
+> This license is new to blktests. Do we need this license to this header file?
+> Ah, is this file copied from linux kernel source tree? If so, I would like to
+> avoid the copy and the duplication.
+
+It is one kernel uapi header file.
+
+OK, then looks we can take the way for figuring out linux/blkzoned.h.
+
+
+Thanks, 
+Ming
+
