@@ -2,84 +2,71 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 003F6C636CC
-	for <linux-block@archiver.kernel.org>; Thu, 16 Feb 2023 14:49:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78A55C61DA4
+	for <linux-block@archiver.kernel.org>; Thu, 16 Feb 2023 15:19:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229865AbjBPOtB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 16 Feb 2023 09:49:01 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56212 "EHLO
+        id S230006AbjBPPTZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 16 Feb 2023 10:19:25 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52648 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229719AbjBPOtB (ORCPT
+        with ESMTP id S229960AbjBPPTY (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 16 Feb 2023 09:49:01 -0500
-Received: from mail-il1-x131.google.com (mail-il1-x131.google.com [IPv6:2607:f8b0:4864:20::131])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA321C7
-        for <linux-block@vger.kernel.org>; Thu, 16 Feb 2023 06:48:59 -0800 (PST)
-Received: by mail-il1-x131.google.com with SMTP id h7so355334ila.7
-        for <linux-block@vger.kernel.org>; Thu, 16 Feb 2023 06:48:59 -0800 (PST)
+        Thu, 16 Feb 2023 10:19:24 -0500
+Received: from mail-io1-xd33.google.com (mail-io1-xd33.google.com [IPv6:2607:f8b0:4864:20::d33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 359B1C660
+        for <linux-block@vger.kernel.org>; Thu, 16 Feb 2023 07:19:22 -0800 (PST)
+Received: by mail-io1-xd33.google.com with SMTP id j4so754506iog.8
+        for <linux-block@vger.kernel.org>; Thu, 16 Feb 2023 07:19:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=UqpB3W8m7bzx+nLnNjVHKa816QwWIjPm/lNBINF2UJ0=;
-        b=cuPTlZbIMR+OHRIYNCuWRgwIsoY/DzGF4tFhD/+J6EINqfmCgaP8HX6YK0pxrhcSPj
-         Fur0md8pPdMHWkaM/hx6+04GDuVxNVtmMOW6POC5aUXe7J5jt2h+YOcxWLVubA3SzP4P
-         AjEME1fm9SHs8o9WauSpbQnaqNntSSv6kLMLLEQVtr+jYz8E/jZDBPQNL2bVoDYqyNVa
-         Uf1xIW+p2rVax4qssKabJdWDFZTs2mcLr9LLhiIctiJx/y2YJjSO19n0duAM5RmLFFy4
-         cQ4Zrm6LUCaaEXt2nHX88QCUWTt2zubttu2yplKx7W0Idphqciqnr6l77WvoVIe/Dcvc
-         qWew==
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=117JSzhkmlfdsoukHnoW9sXQoMG/9LAmqMYJYCnZSbY=;
+        b=59hsNga9RXtV23zHRVyeQGnDxijDul9wg24JUhU1fXKawgJQjy3WJ6DFPufC5oY1rJ
+         iv/r86GcE8wkbB9RgXS9ZDgiA92a2A+hiRJRKg87Mb7Ccebu0dHQ/5qKn6kQOzPKEYCH
+         npZAEC5ARpe3BgCBfGvTy9oKkwqfbJXyYHu5PJ9lY5Lnuy4CwWDHLbKPpgtj7h/2zCY4
+         fMyvorvl/U8QgVuMFCpIoXC34/lxOsxwaq1yJ8/WUSPgcNefOVsGI+GMMtTExRkfcnJR
+         H/Ek2cUV51px0+kftEMCaHHkaJIitWbejJbojGNd16ls/2B/o/2G77vJGnACie4uP07R
+         I8PQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=UqpB3W8m7bzx+nLnNjVHKa816QwWIjPm/lNBINF2UJ0=;
-        b=IwB6LOYXENAIeOFZWuvOaA5LY7JXwgAs6BxAl6DWs36WfVxSNNzVpDTuczTG2viWTH
-         nG2kMRX4gNrPwO+7hKgNZbEk7CtAWcH7TtRyFfRPT4d+pFrQatnDXvGzhFYat0GWNoMg
-         WYS3Hv7szJuk+H8+DN2DcnyfPRWvkvpiBJD2Mr4YjTzK5bt9Om2sTMnhhqXydylrodjX
-         Ob/2n0i7QBT14wD9lVmMvjEXuoKEwVoUwgFfpUUAu4bxG+VbynN7oAVJKJPaktVssq3T
-         BIgVDBg6EXVtdQZiKBmWkQpVi/KdRz1l5L3PNQ8WuVv/e/TOq3eRMt5W9BVlGj3ixRAY
-         mOww==
-X-Gm-Message-State: AO0yUKU+3FeBFtFQapPaiWuQWz6eTguOPXyfTspRX8PMZMQEfcEqgG45
-        A4nXf2bJSHivK//rMqmVJb3+Vx2SSoJErw8Q
-X-Google-Smtp-Source: AK7set/JaSBC9THKPhDAFn6P+iwzPpOWypAuBwgGakPa7dFEWCiR4HY32EuH5IT8obxlmiR+7VYAZA==
-X-Received: by 2002:a05:6e02:1e05:b0:315:579c:9b77 with SMTP id g5-20020a056e021e0500b00315579c9b77mr5220110ila.1.1676558939096;
-        Thu, 16 Feb 2023 06:48:59 -0800 (PST)
-Received: from [192.168.1.94] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id n19-20020a056638121300b003b4a1b58572sm572896jas.152.2023.02.16.06.48.58
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 16 Feb 2023 06:48:58 -0800 (PST)
-Message-ID: <c2cc7926-05b8-867c-de07-8e7d8b85a240@kernel.dk>
-Date:   Thu, 16 Feb 2023 07:48:57 -0700
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.2
-Subject: Re: [PATCH] brd: mark as nowait compatible
-Content-Language: en-US
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-References: <776a5fa2-818c-de42-2ac3-a4588df218ca@kernel.dk>
- <Y+3IUcJLNK8WAkov@infradead.org>
- <9a9adcce-81db-580f-843f-ebff7177464c@kernel.dk>
- <Y+5AVIhMRRD8ks7X@infradead.org>
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=117JSzhkmlfdsoukHnoW9sXQoMG/9LAmqMYJYCnZSbY=;
+        b=sUEILfTmxD9TmrXx4VrDp/zKLLkY6iILNPd32MDtO1kXioPnvWBeB4TTmrCJdYXFx0
+         oom1FKNiOo8NDnoROn7h0fVc0eE8k2NujfCdr2m3H/JVidW/ccakTiegtA+Y/V/S4ihG
+         nN3aJ80JOaxzTpkPpfc6TlUL9m+QtVVTkCKdfa0/owZbsDVqeuxf8D+YRA0RsrwsXi+a
+         aj/IOvhkake58ih6xMfESTY6NScvEdNFuuc5qEbM2yp2ZgnndMWfk1P7UkvN3ZDPK6HQ
+         3M6c/2ypSMnF88eGE6qHESJWo14InT9q9rUceKEwUeY2hp9hdXcRXVucvSe6LTjWDqUy
+         1ubA==
+X-Gm-Message-State: AO0yUKUE2OBP5EGhBM6A0GQ15AGyjyVxsyv69LwBrV6jXc6N0ey1Xi7b
+        4NOGTG+1H5+yR8eEhraJyKq/qGJdm6XPPMdm
+X-Google-Smtp-Source: AK7set96moDt68gR/d8a/XZ8n5rKRhuvBPVZrGVt+4ivwZIVctc7GeQA7Caj3Ql1TJJA05nAiM3/QQ==
+X-Received: by 2002:a05:6602:2ac8:b0:740:7d21:d96f with SMTP id m8-20020a0566022ac800b007407d21d96fmr4855093iov.1.1676560761232;
+        Thu, 16 Feb 2023 07:19:21 -0800 (PST)
+Received: from localhost.localdomain ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id p10-20020a0566022b0a00b006e2f2369d3csm561600iov.50.2023.02.16.07.19.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 16 Feb 2023 07:19:20 -0800 (PST)
 From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <Y+5AVIhMRRD8ks7X@infradead.org>
-Content-Type: text/plain; charset=UTF-8
+To:     linux-block@vger.kernel.org
+Cc:     hch@infradead.org
+Subject: [PATCH 0/4] Support REQ_NWOAIT in brd
+Date:   Thu, 16 Feb 2023 08:19:14 -0700
+Message-Id: <20230216151918.319585-1-axboe@kernel.dk>
+X-Mailer: git-send-email 2.39.1
+MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2/16/23 7:40 AM, Christoph Hellwig wrote:
-> On Thu, Feb 16, 2023 at 06:11:41AM -0700, Jens Axboe wrote:
->> I did consider that, but we do allocations almost everywhere and
-> 
-> Do we?  All the code I've touched for nowait goes to great length
-> to avoid blocking allocations.
+Hi,
 
-It is prudent, I'm not disagreeing. I've got a v2, will send it
-out shortly.
+Support non-blocking request issue for brd. Patches 1..3 are just prep
+work and cleanups in propagating the gfp mask correctly and dealing with
+errors that can happen, patch 4 enables nowait on the queue.
 
 -- 
 Jens Axboe
