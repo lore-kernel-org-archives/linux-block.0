@@ -2,109 +2,139 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F8B7C636CC
-	for <linux-block@archiver.kernel.org>; Thu, 16 Feb 2023 20:57:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 879E4C61DA4
+	for <linux-block@archiver.kernel.org>; Thu, 16 Feb 2023 21:20:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229726AbjBPU53 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 16 Feb 2023 15:57:29 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34832 "EHLO
+        id S229538AbjBPVUV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 16 Feb 2023 16:20:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49446 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229658AbjBPU52 (ORCPT
+        with ESMTP id S229448AbjBPVUU (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 16 Feb 2023 15:57:28 -0500
-Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 045A44CCBA
-        for <linux-block@vger.kernel.org>; Thu, 16 Feb 2023 12:57:27 -0800 (PST)
-Received: by mail-qt1-f171.google.com with SMTP id w3so3586288qts.7
-        for <linux-block@vger.kernel.org>; Thu, 16 Feb 2023 12:57:26 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=CzSraNHal0QwWiBz7ixtga3AF0evBVtXKNCBRPNfcU8=;
-        b=yHWKrh6L+A/LEv4avnrpHYYZs5jM1YaEXQ9aIE0ePDSmBY9JkccH/5q8CoKzEwYvQ4
-         t4UWOqDrSjGXYimbH30ZC4ZSMAQAcHs9d57hAVBa8eK1gpxez0aGCkEysePxOqC8hs86
-         TPulnCIDnA4jrYZL0UNdKHQu9YBxlTKqvWtMelhmESbfKQteC7p8odDmMwr0jGVfrPXQ
-         2jDH+D5xEiNgZZaH+wHDPaVYJ9uZxWMXlLi8YmG0sutKDz6xAEXxt5A6wV5qWRz/q0tP
-         H3RTdeFpystzohjR+zxqQz+grwn63oPH3r7NhIRsFbUmMySkXubLbpYRVaPfJj21G4DI
-         flUg==
-X-Gm-Message-State: AO0yUKXmtrpvlNwAwXb9cgsPZTfRiRU+v/2L6QCMlalwzXSuWnb46UL2
-        9EPN8AQrB8SB/cThTZbrhvZF5g9OGobXmg==
-X-Google-Smtp-Source: AK7set99SqIBuKkYxmikXi1RG0NBViBcSUtJ47i+FMetYV7dI0cYkkCsgjicGwRgTiogX2Y4XRrIqQ==
-X-Received: by 2002:ac8:5f88:0:b0:3b8:6b23:4fc2 with SMTP id j8-20020ac85f88000000b003b86b234fc2mr10941490qta.15.1676581045796;
-        Thu, 16 Feb 2023 12:57:25 -0800 (PST)
-Received: from mail-yb1-f175.google.com (mail-yb1-f175.google.com. [209.85.219.175])
-        by smtp.gmail.com with ESMTPSA id m5-20020a375805000000b006fa22f0494bsm1836526qkb.117.2023.02.16.12.57.25
-        for <linux-block@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 16 Feb 2023 12:57:25 -0800 (PST)
-Received: by mail-yb1-f175.google.com with SMTP id i137so3726401ybg.4
-        for <linux-block@vger.kernel.org>; Thu, 16 Feb 2023 12:57:25 -0800 (PST)
-X-Received: by 2002:a5b:e:0:b0:951:12c7:5836 with SMTP id a14-20020a5b000e000000b0095112c75836mr344539ybp.163.1676581044900;
- Thu, 16 Feb 2023 12:57:24 -0800 (PST)
+        Thu, 16 Feb 2023 16:20:20 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 883D74E5E5
+        for <linux-block@vger.kernel.org>; Thu, 16 Feb 2023 13:19:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1676582379;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=iQS7fLcdFYItcBczHsW9796GCBjG+HT4QQb65rs3R5g=;
+        b=HJqi8+URK2FaKnsjmSsFGlW8Ik754hdNZb1w5k0S4CQWLSvKtX3L/xUr0hHLzvYiO1xSXC
+        W0j90MHl2Bc/kFxqHv5EN/w5QCI0syjvGBYBaX+8qql0Do+uvZ1jgDvbEdUB+FqdWURR01
+        2O7ZxEgDFRGQz1yM92GDv6RbGwZB/tY=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-316-bnaSfYcBPw-w36P2GfwC8g-1; Thu, 16 Feb 2023 16:19:34 -0500
+X-MC-Unique: bnaSfYcBPw-w36P2GfwC8g-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 7864A1C05AF0;
+        Thu, 16 Feb 2023 21:19:33 +0000 (UTC)
+Received: from file01.intranet.prod.int.rdu2.redhat.com (file01.intranet.prod.int.rdu2.redhat.com [10.11.5.7])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 4649E40C10FA;
+        Thu, 16 Feb 2023 21:19:33 +0000 (UTC)
+Received: from file01.intranet.prod.int.rdu2.redhat.com (localhost [127.0.0.1])
+        by file01.intranet.prod.int.rdu2.redhat.com (8.14.4/8.14.4) with ESMTP id 31GLJXo0007124;
+        Thu, 16 Feb 2023 16:19:33 -0500
+Received: from localhost (mpatocka@localhost)
+        by file01.intranet.prod.int.rdu2.redhat.com (8.14.4/8.14.4/Submit) with ESMTP id 31GLJWwh007120;
+        Thu, 16 Feb 2023 16:19:32 -0500
+X-Authentication-Warning: file01.intranet.prod.int.rdu2.redhat.com: mpatocka owned process doing -bs
+Date:   Thu, 16 Feb 2023 16:19:32 -0500 (EST)
+From:   Mikulas Patocka <mpatocka@redhat.com>
+X-X-Sender: mpatocka@file01.intranet.prod.int.rdu2.redhat.com
+To:     Matthew Wilcox <willy@infradead.org>
+cc:     snitzer@kernel.org, Yang Shi <shy828301@gmail.com>,
+        mgorman@techsingularity.net, agk@redhat.com, dm-devel@redhat.com,
+        akpm@linux-foundation.org, linux-block@vger.kernel.org,
+        linux-mm@kvack.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] dm-crypt: allocate compound pages if possible
+In-Reply-To: <Y+5+OKbeTO2d9TsH@casper.infradead.org>
+Message-ID: <alpine.LRH.2.21.2302161614540.5436@file01.intranet.prod.int.rdu2.redhat.com>
+References: <alpine.LRH.2.21.2302161245210.18393@file01.intranet.prod.int.rdu2.redhat.com> <Y+5+OKbeTO2d9TsH@casper.infradead.org>
+User-Agent: Alpine 2.21 (LRH 202 2017-01-01)
 MIME-Version: 1.0
-References: <20230210010612.28729-1-luca.boccassi@gmail.com>
-In-Reply-To: <20230210010612.28729-1-luca.boccassi@gmail.com>
-From:   Luca Boccassi <bluca@debian.org>
-Date:   Thu, 16 Feb 2023 20:57:13 +0000
-X-Gmail-Original-Message-ID: <CAMw=ZnQUOLXiQf195tufdMo-8UCw=QgqFwewkSTDzSaKidYF2w@mail.gmail.com>
-Message-ID: <CAMw=ZnQUOLXiQf195tufdMo-8UCw=QgqFwewkSTDzSaKidYF2w@mail.gmail.com>
-Subject: Re: [PATCH] sed-opal: add support flag for SUM in status ioctl
-To:     linux-block@vger.kernel.org
-Cc:     jonathan.derrick@linux.dev, Jens Axboe <axboe@kernel.dk>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, 10 Feb 2023 at 01:06, <luca.boccassi@gmail.com> wrote:
->
-> From: Luca Boccassi <bluca@debian.org>
->
-> Not every OPAL drive supports SUM (Single User Mode), so report this
-> information to userspace via the get-status ioctl so that we can adjust
-> the formatting options accordingly.
-> Tested on a kingston drive (which supports it) and a samsung one
-> (which does not).
->
-> Signed-off-by: Luca Boccassi <bluca@debian.org>
-> ---
->  block/sed-opal.c              | 2 ++
->  include/uapi/linux/sed-opal.h | 1 +
->  2 files changed, 3 insertions(+)
->
-> diff --git a/block/sed-opal.c b/block/sed-opal.c
-> index 463873f61e01..c320093c14f1 100644
-> --- a/block/sed-opal.c
-> +++ b/block/sed-opal.c
-> @@ -487,6 +487,8 @@ static int opal_discovery0_end(struct opal_dev *dev)
->                         break;
->                 case FC_SINGLEUSER:
->                         single_user = check_sum(body->features);
-> +                       if (single_user)
-> +                               dev->flags |= OPAL_FL_SUM_SUPPORTED;
->                         break;
->                 case FC_GEOMETRY:
->                         check_geometry(dev, body);
-> diff --git a/include/uapi/linux/sed-opal.h b/include/uapi/linux/sed-opal.h
-> index 1fed3c9294fc..d7a1524023db 100644
-> --- a/include/uapi/linux/sed-opal.h
-> +++ b/include/uapi/linux/sed-opal.h
-> @@ -144,6 +144,7 @@ struct opal_read_write_table {
->  #define OPAL_FL_LOCKED                 0x00000008
->  #define OPAL_FL_MBR_ENABLED            0x00000010
->  #define OPAL_FL_MBR_DONE               0x00000020
-> +#define OPAL_FL_SUM_SUPPORTED          0x00000040
->
->  struct opal_status {
->         __u32 flags;
 
-Hi,
 
-Any chance for a quick review, please? Would have loved to have this
-for the 6.3 merge window, it's a super simple change.
-Thanks!
+On Thu, 16 Feb 2023, Matthew Wilcox wrote:
 
-Kind regards,
-Luca Boccassi
+> > -		len = (remaining_size > PAGE_SIZE) ? PAGE_SIZE : remaining_size;
+> > -
+> > -		bio_add_page(clone, page, len, 0);
+> > +have_pages:
+> > +		page->compound_order = order;
+> 
+> No.  You'll corrupt the next page if page is order-0, which it is if it
+> came from the mempool.  Also we've deleted page->compound_order in -next
+> so you can't make this mistake.  Using __GFP_COMP will set this field
+> for you, so you can just drop this line.
+
+OK
+
+> > -		remaining_size -= len;
+> > +		for (o = 0; o < 1U << order; o++) {
+> > +			unsigned len = min((unsigned)PAGE_SIZE, remaining_size);
+> > +			bio_add_page(clone, page, len, 0);
+> > +			remaining_size -= len;
+> > +			page++;
+> 
+> You can add multiple pages at once, whether they're compound or not.  So
+> replace this entire loop with:
+> 
+> 		bio_add_page(clone, page, remaining_size, 0);
+
+This should be min((unsigned)PAGE_SIZE << order, remaining_size), because 
+we may allocate less than remaining_size.
+
+> > @@ -1711,10 +1732,23 @@ static void crypt_free_buffer_pages(stru
+> >  {
+> >  	struct bio_vec *bv;
+> >  	struct bvec_iter_all iter_all;
+> > +	unsigned skip_entries = 0;
+> >  
+> >  	bio_for_each_segment_all(bv, clone, iter_all) {
+> > -		BUG_ON(!bv->bv_page);
+> > -		mempool_free(bv->bv_page, &cc->page_pool);
+> > +		unsigned order;
+> > +		struct page *page = bv->bv_page;
+> > +		BUG_ON(!page);
+> > +		if (skip_entries) {
+> > +			skip_entries--;
+> > +			continue;
+> > +		}
+> > +		order = page->compound_order;
+> > +		if (order) {
+> > +			__free_pages(page, order);
+> > +			skip_entries = (1U << order) - 1;
+> > +		} else {
+> > +			mempool_free(page, &cc->page_pool);
+> > +		}
+> 
+> You can simplify this by using the folio code.
+> 
+> 	struct folio_iter fi;
+> 
+> 	bio_for_each_folio_all(fi, bio) {
+> 		if (folio_test_large(folio))
+> 			folio_put(folio);
+> 		else
+> 			mempool_free(&folio->page, &cc->page_pool);
+> 	}
+
+OK. I'm sending version 2 of the patch.
+
+> (further work would actually convert this driver to use folios instead
+> of pages)
+
+Mikulas
+
