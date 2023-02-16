@@ -2,132 +2,99 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0723BC61DA4
-	for <linux-block@archiver.kernel.org>; Thu, 16 Feb 2023 13:17:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E45EC61DA4
+	for <linux-block@archiver.kernel.org>; Thu, 16 Feb 2023 13:18:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229524AbjBPNRv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 16 Feb 2023 08:17:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60396 "EHLO
+        id S229721AbjBPNSQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 16 Feb 2023 08:18:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60134 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229704AbjBPNRt (ORCPT
+        with ESMTP id S229813AbjBPNSO (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 16 Feb 2023 08:17:49 -0500
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1BE4C521C1;
-        Thu, 16 Feb 2023 05:17:27 -0800 (PST)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id C03F8223A0;
-        Thu, 16 Feb 2023 13:17:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1676553445; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
+        Thu, 16 Feb 2023 08:18:14 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4791985F4E
+        for <linux-block@vger.kernel.org>; Thu, 16 Feb 2023 05:17:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1676553424;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=3XK/Pa5mX9UF56usF4qKvRVKxkUMbrm0p0QzsUuwpf8=;
-        b=1qW0tPQwbvNc7ArfR0GOw+UQ2E3eZeS0NUi/tkgm9nADW6l6pUEVKwVWSYVMUbTyJRpz4p
-        p8MEBKgqZXNuWvHMSiA7PccdCbdukUEm9P/VhCCuwXgOll/XkTq8yLjhVvgEeSo9VjAvDn
-        faUPO+ZRGtEbyls3JDTdxFfAnFquz7U=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1676553445;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=3XK/Pa5mX9UF56usF4qKvRVKxkUMbrm0p0QzsUuwpf8=;
-        b=160pCWlCnDeBkzFOP8tHSiotqv3dphAw5FuXcwJ50kcT95PdSfRECnbEsb98GjT6o/BaTM
-        HtS1izVdeGbeymCQ==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id AB92F13438;
-        Thu, 16 Feb 2023 13:17:25 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id TRrcKeUs7mMRWAAAMHmgww
-        (envelope-from <jack@suse.cz>); Thu, 16 Feb 2023 13:17:25 +0000
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-        id 2DC2DA06E1; Thu, 16 Feb 2023 14:17:25 +0100 (CET)
-Date:   Thu, 16 Feb 2023 14:17:25 +0100
-From:   Jan Kara <jack@suse.cz>
-To:     Yu Kuai <yukuai1@huaweicloud.com>
-Cc:     hch@infradead.org, jack@suse.cz, axboe@kernel.dk,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        yukuai3@huawei.com, yi.zhang@huawei.com, yangerkun@huawei.com
-Subject: Re: [PATCH -next RFC 2/3] block: factor out the setting of
- GD_NEED_PART_SCAN
-Message-ID: <20230216131725.oddv27a7fhz6hx7x@quack3>
-References: <20230212092641.2394146-1-yukuai1@huaweicloud.com>
- <20230212092641.2394146-3-yukuai1@huaweicloud.com>
+        bh=MdGJFHZv/2Zv+Ysvuyq4SlJgM+0STJ7hRrwb8iOEyeY=;
+        b=BlU874d0bQMvCAQUosBeUKDOSaIWINO1uUxkN1vNpXIGFIwizELP9xPMtFF6AtbKpCpaAx
+        9k6ZGAi8ocGA/XQCC2OXfH+2KAvNHLCGSdL9RTzeV+mkOpJhS/aqWC/ViCKFDRfOnKegbM
+        dRzeI3hlx32B+2M8n6/MxB+5eJYAhP8=
+Received: from mail-pl1-f199.google.com (mail-pl1-f199.google.com
+ [209.85.214.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-253-S3QnbgsxOoeeBaD94lxjzg-1; Thu, 16 Feb 2023 08:17:02 -0500
+X-MC-Unique: S3QnbgsxOoeeBaD94lxjzg-1
+Received: by mail-pl1-f199.google.com with SMTP id jb7-20020a170903258700b0019af23e69dcso796538plb.19
+        for <linux-block@vger.kernel.org>; Thu, 16 Feb 2023 05:17:02 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=MdGJFHZv/2Zv+Ysvuyq4SlJgM+0STJ7hRrwb8iOEyeY=;
+        b=ebeKd0eCpfaQwdVIWC7P0TlOFkZsBm2cyscsPHq9nGCq0CKk9znlL7LXiTbpc4xwXK
+         ZTvljKj+eof2eGnnpY3NQXv679zqQ6Rb4jUR7Eyl8S3lh2e1GpL/SNXbOQps9pxQZZvK
+         GXkZxUY7aN6mFpmVXSLITezHxUXKO8hIgbXOWUUNsr8i0v3LFqLz1EPvbcV2UCCbZqQQ
+         vtDWEiMmaGfsIv/P35LQ93eL/AjNwJOC744we36n7FYAp6gYu3H1ny/Fppn4Cty3TsU2
+         MorlGWoNYo0egdkZCQ+MdYbUE7/N1VthPtVKYr/S7GJJkFeHHznCipd3kkHQDH+3dkal
+         P3JA==
+X-Gm-Message-State: AO0yUKUENyjN0ktS4nra6VaQD7qTTDQq4vZrD3P3vIUvvvQslxHogprO
+        5TfFyMG+K7XMmA30O8I6a5WkIip2UaIbe0thY8rdqMMYkfaXdnaiYtA8vPg2hY03q/9pW7OQQet
+        8J0ftH7oo4bMzVQPEHjBlNoq51Mva1OQXu8To5WMsrLUX59Vfjw==
+X-Received: by 2002:a17:90b:17d2:b0:231:1364:4103 with SMTP id me18-20020a17090b17d200b0023113644103mr526607pjb.145.1676553421450;
+        Thu, 16 Feb 2023 05:17:01 -0800 (PST)
+X-Google-Smtp-Source: AK7set8OW6dHAP0HJaL/mr5kVLmWOT0BI1KzJZKOvZNe90BHNqSv+r18CcHwXHwbOm0nzZ0urvOJTWjxQt6N+tVCw/4=
+X-Received: by 2002:a17:90b:17d2:b0:231:1364:4103 with SMTP id
+ me18-20020a17090b17d200b0023113644103mr526602pjb.145.1676553421197; Thu, 16
+ Feb 2023 05:17:01 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230212092641.2394146-3-yukuai1@huaweicloud.com>
+References: <CAHj4cs-jef8f4zxJQxjKirAWyZkTREycFdNPvQaGbgS-1r_Lcg@mail.gmail.com>
+ <f4079ecb-f483-34f9-0074-b77a9bd36cb6@acm.org>
+In-Reply-To: <f4079ecb-f483-34f9-0074-b77a9bd36cb6@acm.org>
+From:   Yi Zhang <yi.zhang@redhat.com>
+Date:   Thu, 16 Feb 2023 21:16:49 +0800
+Message-ID: <CAHj4cs8WpKQbL-Yb3pRJk_n2B-QaTMmaCtBTcQGQYNnCWkan8g@mail.gmail.com>
+Subject: Re: [bug report] WARNING at fs/proc/generic.c:376 proc_register+0x131/0x1c0
+ observed with blktests scsi
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     linux-scsi <linux-scsi@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sun 12-02-23 17:26:40, Yu Kuai wrote:
-> From: Yu Kuai <yukuai3@huawei.com>
-> 
-> In order to prevent scan partition for a device that is opened
-> exclusively by someone else, new conditions will be added to
-> disk_scan_partitions() in the next patch. Hence if device is opened
-> exclusively between bdev_add() and disk_scan_partitions(), the first
-> partition scan will fail unexpected. This patch factor out the setting
-> of GD_NEED_PART_SCAN to prevent the problem.
-> 
-> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+Hi Bart
+The original reproduced commit doesn't exists now, seems it was
+changed due to the linux-block/for-next rebase.
+I also tried the blktests scsi/ with the latest linux-block/for-next,
+6.2.0-rc6 and 6.2.0-rc7 today, but with no luck to reproduce the issue
+now
 
-I'd rather leave the setting of GD_NEED_PART_SCAN in disk_scan_partitions()
-to keep it self-contained. On top of that we can set GD_NEED_PART_SCAN in
-device_add_disk() to ensure initial partition scan but we should probably
-also make sure flags like GD_SUPPRESS_PART_SCAN or GENHD_FL_NO_PART are not
-set to avoid unwanted partition scanning.
+Thanks
+Yi
+On Wed, Feb 15, 2023 at 2:43 AM Bart Van Assche <bvanassche@acm.org> wrote:
+>
+> On 2/5/23 23:30, Yi Zhang wrote:
+> > blktests scsi/ failed on the latest linux-block/for-next, pls help
+> > check it, thanks.
+>
+> Please help with testing and/or reviewing the candidate fix that I
+> posted
+> (https://lore.kernel.org/linux-scsi/20230210205200.36973-1-bvanassche@acm.org/).
+>
+> Thanks,
+>
+> Bart.
+>
 
-								Honza
 
-> ---
->  block/genhd.c | 2 +-
->  block/ioctl.c | 1 +
->  2 files changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/block/genhd.c b/block/genhd.c
-> index 075d8da284f5..c0d1220bd798 100644
-> --- a/block/genhd.c
-> +++ b/block/genhd.c
-> @@ -367,7 +367,6 @@ int disk_scan_partitions(struct gendisk *disk, fmode_t mode)
->  	if (disk->open_partitions)
->  		return -EBUSY;
->  
-> -	set_bit(GD_NEED_PART_SCAN, &disk->state);
->  	bdev = blkdev_get_by_dev(disk_devt(disk), mode, NULL);
->  	if (IS_ERR(bdev))
->  		return PTR_ERR(bdev);
-> @@ -493,6 +492,7 @@ int __must_check device_add_disk(struct device *parent, struct gendisk *disk,
->  		if (ret)
->  			goto out_unregister_bdi;
->  
-> +		set_bit(GD_NEED_PART_SCAN, &disk->state);
->  		bdev_add(disk->part0, ddev->devt);
->  		if (get_capacity(disk))
->  			disk_scan_partitions(disk, FMODE_READ);
-> diff --git a/block/ioctl.c b/block/ioctl.c
-> index 6dd49d877584..0eefcdb936a0 100644
-> --- a/block/ioctl.c
-> +++ b/block/ioctl.c
-> @@ -528,6 +528,7 @@ static int blkdev_common_ioctl(struct block_device *bdev, fmode_t mode,
->  			return -EACCES;
->  		if (bdev_is_partition(bdev))
->  			return -EINVAL;
-> +		set_bit(GD_NEED_PART_SCAN, &bdev->bd_disk->state);
->  		return disk_scan_partitions(bdev->bd_disk, mode & ~FMODE_EXCL);
->  	case BLKTRACESTART:
->  	case BLKTRACESTOP:
-> -- 
-> 2.31.1
-> 
 -- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+Best Regards,
+  Yi Zhang
+
