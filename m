@@ -2,149 +2,114 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B8F4CC636CC
-	for <linux-block@archiver.kernel.org>; Thu, 16 Feb 2023 19:10:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 26447C636D7
+	for <linux-block@archiver.kernel.org>; Thu, 16 Feb 2023 19:26:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229516AbjBPTKj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 16 Feb 2023 14:10:39 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35602 "EHLO
+        id S229493AbjBPT0w (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 16 Feb 2023 14:26:52 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42124 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229450AbjBPTKi (ORCPT
+        with ESMTP id S229482AbjBPT0w (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 16 Feb 2023 14:10:38 -0500
-Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83EB02A6D7;
-        Thu, 16 Feb 2023 11:10:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1676574637; x=1708110637;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=RG6FE89xEMZ8fRCJpypPavShNTygUNbwQaaGLRFV/uI=;
-  b=Bq3LOZohyPrb/npHssKp7OL1HmPrkET98//tn3fb0uwejotZmqCUuseK
-   Juq4nj6EcW/NdDP1mZgHWU/8TL++4oFgJkrIAlSKKsv1x3jkU5WVsIZX5
-   LJi3soB2vEuxBcAQNI7CP8lkp+AOTjs81PvffLuecP++1BAf0NGpv6QLo
-   ri+itLAS4ZJu/zOQp76NYrTV8K69lYsx+EbeIH33kcYdlcD8xZPfYCuHL
-   HmLQ4Nw70LSYKv7c5Gdv71+cX+HlsPbfi3SaHXaFIOFighcmvbzlOOvW6
-   +YOAndS/FXRp2B3CAyYWaxoALFzGSQc5BnnIiMyF3ZhHPLUGyBDHsBX9s
-   A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10623"; a="331812023"
-X-IronPort-AV: E=Sophos;i="5.97,302,1669104000"; 
-   d="scan'208";a="331812023"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Feb 2023 11:10:37 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10623"; a="734022099"
-X-IronPort-AV: E=Sophos;i="5.97,302,1669104000"; 
-   d="scan'208";a="734022099"
-Received: from lkp-server01.sh.intel.com (HELO 4455601a8d94) ([10.239.97.150])
-  by fmsmga008.fm.intel.com with ESMTP; 16 Feb 2023 11:10:35 -0800
-Received: from kbuild by 4455601a8d94 with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1pSjeM-000AS9-2d;
-        Thu, 16 Feb 2023 19:10:34 +0000
-Date:   Fri, 17 Feb 2023 03:09:36 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-Cc:     oe-kbuild-all@lists.linux.dev, hch@infradead.org,
-        Jens Axboe <axboe@kernel.dk>, stable@vger.kernel.org
-Subject: Re: [PATCH 3/4] brd: only preload radix tree if we're using a
- blocking gfp mask
-Message-ID: <202302170236.SynZo1Bx-lkp@intel.com>
-References: <20230216151918.319585-4-axboe@kernel.dk>
+        Thu, 16 Feb 2023 14:26:52 -0500
+Received: from mail-il1-x12a.google.com (mail-il1-x12a.google.com [IPv6:2607:f8b0:4864:20::12a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 48CBC4AFEF
+        for <linux-block@vger.kernel.org>; Thu, 16 Feb 2023 11:26:51 -0800 (PST)
+Received: by mail-il1-x12a.google.com with SMTP id t7so1170151ilq.2
+        for <linux-block@vger.kernel.org>; Thu, 16 Feb 2023 11:26:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=eF7xqkWEGWXYZ5g/WDBloEO27/L1B1BR0M13863IeCU=;
+        b=mPKe24OBohhhKZTNI6NqsyjUTaxiIyHQSBYt4YQhMBKEIgE753RMPtdN543fPBEND1
+         rlDlXJb8/VpOH6woEYTkoGKVnbdvdwXJek2kPB7gzUL4UKE4QINCRQWD/L86Yu3bghSE
+         LICBPlbXcCXXA0VlGd8tiNJiRNf5O06dIvl/G33osJ8yp5+A0rNO1wpBpM1oEBOJ3R67
+         EF5pLqiavKlvhzPlObh42CpbWluP5PShj0NNBTnoKMqwpTiehZxFSYhljb0LqS030187
+         vsaPvY7FPJx6tqkGyTWTfI51BNvCP+IW4H5Ghxd1USsp7hkIKNbSr68piQUpYMwU9cgR
+         jQMQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=eF7xqkWEGWXYZ5g/WDBloEO27/L1B1BR0M13863IeCU=;
+        b=ULKfv72FdTeot3wU5TWY28Q2g0P3MDQWSDedMCFMdatyaP1TrO9/xlLSm5uXrQdfjR
+         zX1a7f88+tU6jyfWbj3IfXqLLQdklRLeeO8bMjp4mxIZZRjvV/s8aSxXbM9zpdpXrEY2
+         KgygxKrgm1kbGm1I/2bCNc9N/0JpbdobcgssAZXwC4flYuSU+qznqlMOADPyhZlfKTp4
+         FeJBMviDxh9nls1osDPhFmI9/DyUSt971veHOcnaxv2wEFOrujNnr014Rj/OnSWtfX50
+         rfWkW2089Bd8mwof0PsYwGmJyrkJ+RaZue780/D5Lzf+uT7zj4iKzNB7I3h2FinjGcjM
+         zBSA==
+X-Gm-Message-State: AO0yUKXtxU1Wx/VsyLbh2urkDAQC1EEWJk7sbgjdcJ6KTOt2fOptU2DK
+        pz63gYamJzZeXB/wF6Ilmx+zfaqfeVu6tOKA
+X-Google-Smtp-Source: AK7set+yJ1uFtOTCeeZ1yUv020QTImWK9/nBG/6Y56w887Nn0Gtqw2AfFcwbUirpfvDMxv2D3i66NA==
+X-Received: by 2002:a05:6e02:180a:b0:314:1579:be2c with SMTP id a10-20020a056e02180a00b003141579be2cmr5936846ilv.0.1676575610542;
+        Thu, 16 Feb 2023 11:26:50 -0800 (PST)
+Received: from [192.168.1.94] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id t3-20020a92ca83000000b00315972e90a2sm176836ilo.64.2023.02.16.11.26.49
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 16 Feb 2023 11:26:49 -0800 (PST)
+Message-ID: <16738d14-6c97-c344-e096-50f4f6cce0e7@kernel.dk>
+Date:   Thu, 16 Feb 2023 12:26:48 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230216151918.319585-4-axboe@kernel.dk>
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
+ Thunderbird/102.7.2
+Content-Language: en-US
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From:   Jens Axboe <axboe@kernel.dk>
+Subject: [GIT PULL] Block fix for 6.2-final
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Jens,
+Hi Linus,
 
-I love your patch! Perhaps something to improve:
+Just a few NVMe fixes that should go into the 6.2 release, adding a
+quirk and fixing two issues introduced in this release:
 
-[auto build test WARNING on v6.2-rc8]
-[also build test WARNING on linus/master next-20230216]
-[cannot apply to axboe-block/for-next]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+- NVMe pull request via Christoph:
+	- Always return an ERR_PTR from nvme_pci_alloc_dev (Irvin Cote)
+	- Add bogus ID quirk for ADATA SX6000PNP (Daniel Wagner)
+	- Set the DMA mask earlier (Christoph Hellwig)
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Jens-Axboe/brd-return-0-error-from-brd_insert_page/20230216-234430
-patch link:    https://lore.kernel.org/r/20230216151918.319585-4-axboe%40kernel.dk
-patch subject: [PATCH 3/4] brd: only preload radix tree if we're using a blocking gfp mask
-config: m68k-allyesconfig (https://download.01.org/0day-ci/archive/20230217/202302170236.SynZo1Bx-lkp@intel.com/config)
-compiler: m68k-linux-gcc (GCC) 12.1.0
-reproduce (this is a W=1 build):
-        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
-        chmod +x ~/bin/make.cross
-        # https://github.com/intel-lab-lkp/linux/commit/237074d417b50a21f2bed5585ceebe8398535b1a
-        git remote add linux-review https://github.com/intel-lab-lkp/linux
-        git fetch --no-tags linux-review Jens-Axboe/brd-return-0-error-from-brd_insert_page/20230216-234430
-        git checkout 237074d417b50a21f2bed5585ceebe8398535b1a
-        # save the config file
-        mkdir build_dir && cp config build_dir/.config
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.1.0 make.cross W=1 O=build_dir ARCH=m68k olddefconfig
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.1.0 make.cross W=1 O=build_dir ARCH=m68k SHELL=/bin/bash drivers/block/
-
-If you fix the issue, kindly add following tag where applicable
-| Reported-by: kernel test robot <lkp@intel.com>
-| Link: https://lore.kernel.org/oe-kbuild-all/202302170236.SynZo1Bx-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
-   drivers/block/brd.c: In function 'brd_insert_page':
->> drivers/block/brd.c:87:13: warning: variable 'ret' set but not used [-Wunused-but-set-variable]
-      87 |         int ret = 0;
-         |             ^~~
+Please pull!
 
 
-vim +/ret +87 drivers/block/brd.c
+The following changes since commit 38c33ece232019c5b18b4d5ec0254807cac06b7c:
 
-    79	
-    80	/*
-    81	 * Insert a new page for a given sector, if one does not already exist.
-    82	 */
-    83	static int brd_insert_page(struct brd_device *brd, sector_t sector, gfp_t gfp)
-    84	{
-    85		pgoff_t idx;
-    86		struct page *page;
-  > 87		int ret = 0;
-    88	
-    89		page = brd_lookup_page(brd, sector);
-    90		if (page)
-    91			return 0;
-    92	
-    93		page = alloc_page(gfp | __GFP_ZERO | __GFP_HIGHMEM);
-    94		if (!page)
-    95			return -ENOMEM;
-    96	
-    97		if (gfpflags_allow_blocking(gfp) && radix_tree_preload(gfp)) {
-    98			__free_page(page);
-    99			return -ENOMEM;
-   100		}
-   101	
-   102		spin_lock(&brd->brd_lock);
-   103		idx = sector >> PAGE_SECTORS_SHIFT;
-   104		page->index = idx;
-   105		if (radix_tree_insert(&brd->brd_pages, idx, page)) {
-   106			__free_page(page);
-   107			page = radix_tree_lookup(&brd->brd_pages, idx);
-   108			if (!page)
-   109				ret = -ENOMEM;
-   110			else if (page->index != idx)
-   111				ret = -EIO;
-   112		} else {
-   113			brd->brd_nr_pages++;
-   114		}
-   115		spin_unlock(&brd->brd_lock);
-   116	
-   117		radix_tree_preload_end();
-   118		return 0;
-   119	}
-   120	
+  Merge tag 'nvme-6.2-2023-02-09' of git://git.infradead.org/nvme into block-6.2 (2023-02-09 08:12:06 -0700)
+
+are available in the Git repository at:
+
+  git://git.kernel.dk/linux.git tags/block-6.2-2023-02-16
+
+for you to fetch changes up to 9a28b92cc21e8445c25b18e46f41634539938a91:
+
+  Merge tag 'nvme-6.2-2023-02-15' of git://git.infradead.org/nvme into block-6.2 (2023-02-15 13:47:27 -0700)
+
+----------------------------------------------------------------
+block-6.2-2023-02-16
+
+----------------------------------------------------------------
+Christoph Hellwig (1):
+      nvme-pci: set the DMA mask earlier
+
+Daniel Wagner (1):
+      nvme-pci: add bogus ID quirk for ADATA SX6000PNP
+
+Irvin Cote (1):
+      nvme-pci: always return an ERR_PTR from nvme_pci_alloc_dev
+
+Jens Axboe (1):
+      Merge tag 'nvme-6.2-2023-02-15' of git://git.infradead.org/nvme into block-6.2
+
+ drivers/nvme/host/pci.c | 20 ++++++++++----------
+ 1 file changed, 10 insertions(+), 10 deletions(-)
 
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests
+Jens Axboe
+
