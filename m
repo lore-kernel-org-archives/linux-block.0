@@ -2,95 +2,56 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C690C61DA4
-	for <linux-block@archiver.kernel.org>; Thu, 16 Feb 2023 03:25:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A03EC61DA4
+	for <linux-block@archiver.kernel.org>; Thu, 16 Feb 2023 06:05:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229605AbjBPDZ6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 15 Feb 2023 22:25:58 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40798 "EHLO
+        id S229528AbjBPGF3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 16 Feb 2023 01:05:29 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52750 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229512AbjBPDZ5 (ORCPT
+        with ESMTP id S229556AbjBPGF2 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 15 Feb 2023 22:25:57 -0500
-Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9DA3540DC
-        for <linux-block@vger.kernel.org>; Wed, 15 Feb 2023 19:25:56 -0800 (PST)
-Received: by mail-pj1-x102c.google.com with SMTP id v6-20020a17090ad58600b00229eec90a7fso5221766pju.0
-        for <linux-block@vger.kernel.org>; Wed, 15 Feb 2023 19:25:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=R1kOUaE0EiKmZk9jWga/4Ri5+1QBKa/W13AHkjPQiM4=;
-        b=wpu1digYWAfQFn4RXL4rbyNWKLk5iDpnEC/V582dT91O6cGU1C7O/EV3CznVhlScQH
-         rD8PetDj6R8zuCuBAsV7DQcBAxsR6ur/Ug5JclsSeH7ULIg66kD5ZrA2bxmZeSPdhIKr
-         jKlVLgFMvCXo7s+o+G2zcz1ts8vlOCAfcQ4ylIw6wkya8q1u/5Y+v1M23b6eSjQFCoLF
-         rihGDjrMNIzKb+NMqkVJOccMNnlh6aBkvT1X4JnS0Y1I3jCB0DnDydEBvv/cy387hYdA
-         kjyGDn7FFncYmN6O9ZvnToUSDxi8/E6vuGr+cnuQinxfuDTzDObz7p4or1jg5l9FCUhZ
-         MnZg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=R1kOUaE0EiKmZk9jWga/4Ri5+1QBKa/W13AHkjPQiM4=;
-        b=cJzTpDpEfJUqJjM5Tv08SoJwcEacMmOkCoAwFSu0+0NKFT6HVgDrhw4t8bxi7c455M
-         SgfWSCW03flp1mH+FPRUNPA6jOdyWDXtIHtp5TMmAufQGT7DquIYPmffNVTa6OLO4Ghx
-         1aE7CERJAlw6FmKIKUhgOwx8BBb6rxxWKCG4C0BSowI6CSYp/Oy5dg/1I/adOScskmvY
-         ETGj8ofwTfByyVVmu6ZVkO5ywD1k0RhjGSxlQwBD1Bf8HHGQrGOCMAStgWLoDGy8CK/N
-         VCTB30b2+Hci7RHdMNgsJLZD0IOKo3CpClDQJZv7mgHQH1nUXMzYN+gY5b+DxtyhZEmC
-         wMvQ==
-X-Gm-Message-State: AO0yUKUBzoNc6pc40Dfk6a/a3IbRttGd6p0HDFNwEhY5V5vhvxniZuYh
-        S5JbRtWL9oh54Pg21bsl5HbKbg==
-X-Google-Smtp-Source: AK7set8GbKfFb7nuzK8sp8QOC27EkkD3yZHaUl5JQdqnBciQX4jwm80ekOPBQ5uUtY06rN/LBr3NPA==
-X-Received: by 2002:a05:6a21:7891:b0:be:adc8:96c8 with SMTP id bf17-20020a056a21789100b000beadc896c8mr5227369pzc.3.1676517955979;
-        Wed, 15 Feb 2023 19:25:55 -0800 (PST)
-Received: from [192.168.1.136] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id c130-20020a633588000000b004fb26a80875sm146674pga.22.2023.02.15.19.25.54
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 15 Feb 2023 19:25:55 -0800 (PST)
-Message-ID: <efffdb82-85f4-af8c-6866-a643a7a16ad4@kernel.dk>
-Date:   Wed, 15 Feb 2023 20:25:54 -0700
+        Thu, 16 Feb 2023 01:05:28 -0500
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C928736FCD
+        for <linux-block@vger.kernel.org>; Wed, 15 Feb 2023 22:05:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=ibOnLORQjcn1FdWDW86sZIua0lYA+LAhsi21f/xAJuY=; b=QCRbV34RRTz08qGsJT28wC02Mh
+        6+HCdvpIjMuA7vOfsNt3bpuQhIqYJPGNi2In4SA5kimlG3+0ol+qgXvB5qAPW0duy4VvVpd0XK8k3
+        WVl0Iv9PZr0/7enPAnGNDNsXTjW3sD8SbPJh8CYQ+54il9sD+81+Csc4S8w5cPflQDqiS7+5PjLxK
+        IUgC/65/GsR/ixaQG3j5W9jh0XhEHEuIyE7DoG6rQj8P2FJyTcWGi4kOWWG/MxK/yTSfSgTSYvx/c
+        ixiSnmncroMPP/v2fUZkiQcEjZte4kPLpNu5+PMQEWJ+y9bEkwKuZGvJoJHMVsZam0ZQrzgon1oZK
+        ktiMnBnQ==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1pSXOY-008e4D-8F; Thu, 16 Feb 2023 06:05:26 +0000
+Date:   Wed, 15 Feb 2023 22:05:26 -0800
+From:   Christoph Hellwig <hch@infradead.org>
+To:     "Martin K. Petersen" <martin.petersen@oracle.com>
+Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
+        Saurav Kashyap <skashyap@marvell.com>
+Subject: Re: [PATCH] block: bio-integrity: Copy flags when
+ bio_integrity_payload is cloned
+Message-ID: <Y+3Hphbq5NIyXDwf@infradead.org>
+References: <20230215171801.21062-1-martin.petersen@oracle.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.2
-Subject: Re: [GIT PULL] nvme fixes for Linux 6.3
-Content-Language: en-US
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
-References: <Y+0hqoUKkv1fMMzk@infradead.org>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <Y+0hqoUKkv1fMMzk@infradead.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230215171801.21062-1-martin.petersen@oracle.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2/15/23 11:17 AM, Christoph Hellwig wrote:
-> The following changes since commit 2f1e07dda1e1310873647abc40bbc49eaf3b10e3:
-> 
->   block: ublk: check IO buffer based on flag need_get_data (2023-02-13 08:36:23 -0700)
-> 
-> are available in the Git repository at:
-> 
->   git://git.infradead.org/nvme.git tags/nvme-6.3-2023-02-15
-> 
-> for you to fetch changes up to b6c0c237bea191fb99b6c2de093262402b0159a6:
-> 
->   nvme-pci: remove iod use_sgls (2023-02-14 06:40:57 +0100)
-> 
-> ----------------------------------------------------------------
-> nvme fixes for Linux 6.3
-> 
->  - fix and cleanup freeing single sgl (Keith Busch)
+On Wed, Feb 15, 2023 at 12:18:01PM -0500, Martin K. Petersen wrote:
+> Make sure to copy the flags when a bio_integrity_payload is cloned.
+> Otherwise per-I/O properties such as IP checksum flag will not be
+> passed down to the HBA driver. Since the integrity buffer is owned by
+> the original bio, the BIP_BLOCK_INTEGRITY flag needs to be masked off
+> to avoid a double free in the completion path.
 
-Pulled, thanks.
+Looks good:
 
--- 
-Jens Axboe
-
-
+Reviewed-by: Christoph Hellwig <hch@lst.de>
