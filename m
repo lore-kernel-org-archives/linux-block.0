@@ -2,42 +2,42 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BFF2C636CC
-	for <linux-block@archiver.kernel.org>; Thu, 16 Feb 2023 21:50:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B0E12C64ED9
+	for <linux-block@archiver.kernel.org>; Thu, 16 Feb 2023 21:50:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230365AbjBPVuU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 16 Feb 2023 16:50:20 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36928 "EHLO
+        id S230290AbjBPVuq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 16 Feb 2023 16:50:46 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36284 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230249AbjBPVt4 (ORCPT
+        with ESMTP id S230295AbjBPVuM (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 16 Feb 2023 16:49:56 -0500
+        Thu, 16 Feb 2023 16:50:12 -0500
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D569843442
-        for <linux-block@vger.kernel.org>; Thu, 16 Feb 2023 13:48:40 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A32C53800
+        for <linux-block@vger.kernel.org>; Thu, 16 Feb 2023 13:48:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1676584120;
+        s=mimecast20190719; t=1676584127;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=e8eQEU7H5KI+mR6DaJwt19VwGfbirTBzTPLMp2PHuNY=;
-        b=MuQSObscLAEYIdrfjEAFAReBrfVghpOQrJyJMnpa2iPTTf+l4+Ya0ZHb7xNX85KJNSXxOE
-        gvi5y9DOJEyeBGJ/F88E0qF+LYZzMgssnhsxIePVyyfoTdgAfQss+N5eLmOStOqMASm1n/
-        KTCytLWm8bq1hcNEQbJPvpcpFoS3kmw=
+        bh=ZbR1ERx60swPmHLlvc4O0e0pHhwkZikBmUg0OVIfTvo=;
+        b=UQ5q/TTO/xk7WWehvahW6vpMttAH2jFOy8p9ZwR8I1WTwvKxM4dFYpFvDVXriK3qJKN0p4
+        6oTZ6zlRmq8+v/U8JpQVzGPBa241oaqV1OwQZjjzWR3x+j6pTwrhRQAYVUz9DHlQQqzhjH
+        xjG2kEDbZuVDmHhyd4q41kCul1wa1Us=
 Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
  [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-671-9yLGMC7UPNqociWeikV9Bw-1; Thu, 16 Feb 2023 16:48:36 -0500
-X-MC-Unique: 9yLGMC7UPNqociWeikV9Bw-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
+ us-mta-515-O-HRLX8QP9akrW_MwZnTmA-1; Thu, 16 Feb 2023 16:48:44 -0500
+X-MC-Unique: O-HRLX8QP9akrW_MwZnTmA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 9E522800B24;
-        Thu, 16 Feb 2023 21:48:35 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 6773985A5B1;
+        Thu, 16 Feb 2023 21:48:43 +0000 (UTC)
 Received: from warthog.procyon.org.uk (unknown [10.33.36.24])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 99D1EC15BA0;
-        Thu, 16 Feb 2023 21:48:33 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 7979251FF;
+        Thu, 16 Feb 2023 21:48:41 +0000 (UTC)
 From:   David Howells <dhowells@redhat.com>
 To:     Steve French <smfrench@gmail.com>
 Cc:     David Howells <dhowells@redhat.com>, Jens Axboe <axboe@kernel.dk>,
@@ -51,269 +51,77 @@ Cc:     David Howells <dhowells@redhat.com>, Jens Axboe <axboe@kernel.dk>,
         Jeff Layton <jlayton@kernel.org>, linux-cifs@vger.kernel.org,
         linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
         linux-mm@kvack.org, linux-kernel@vger.kernel.org,
-        Steve French <sfrench@samba.org>, linux-rdma@vger.kernel.org
-Subject: [PATCH 10/17] cifs: Add a function to build an RDMA SGE list from an iterator
-Date:   Thu, 16 Feb 2023 21:47:38 +0000
-Message-Id: <20230216214745.3985496-11-dhowells@redhat.com>
+        Steve French <sfrench@samba.org>
+Subject: [PATCH 13/17] cifs: Add a function to read into an iter from a socket
+Date:   Thu, 16 Feb 2023 21:47:41 +0000
+Message-Id: <20230216214745.3985496-14-dhowells@redhat.com>
 In-Reply-To: <20230216214745.3985496-1-dhowells@redhat.com>
 References: <20230216214745.3985496-1-dhowells@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.5
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Add a function to add elements onto an RDMA SGE list representing page
-fragments extracted from a BVEC-, KVEC- or XARRAY-type iterator and DMA
-mapped until the maximum number of elements is reached.
-
-Nothing is done to make sure the pages remain present - that must be done
-by the caller.
+Add a helper function to read data from a socket into the given iterator.
 
 Signed-off-by: David Howells <dhowells@redhat.com>
 cc: Steve French <sfrench@samba.org>
 cc: Shyam Prasad N <nspmangalore@gmail.com>
 cc: Rohith Surabattula <rohiths.msft@gmail.com>
-cc: Tom Talpey <tom@talpey.com>
 cc: Jeff Layton <jlayton@kernel.org>
 cc: linux-cifs@vger.kernel.org
-cc: linux-fsdevel@vger.kernel.org
-cc: linux-rdma@vger.kernel.org
 
-Link: https://lore.kernel.org/r/166697256704.61150.17388516338310645808.stgit@warthog.procyon.org.uk/ # rfc
-Link: https://lore.kernel.org/r/166732028840.3186319.8512284239779728860.stgit@warthog.procyon.org.uk/ # rfc
+Link: https://lore.kernel.org/r/164928617874.457102.10021662143234315566.stgit@warthog.procyon.org.uk/ # v1
+Link: https://lore.kernel.org/r/165211419563.3154751.18431990381145195050.stgit@warthog.procyon.org.uk/ # v1
+Link: https://lore.kernel.org/r/165348879662.2106726.16881134187242702351.stgit@warthog.procyon.org.uk/ # v1
+Link: https://lore.kernel.org/r/165364826398.3334034.12541600783145647319.stgit@warthog.procyon.org.uk/ # v3
+Link: https://lore.kernel.org/r/166126395495.708021.12328677373159554478.stgit@warthog.procyon.org.uk/ # v1
+Link: https://lore.kernel.org/r/166697258876.61150.3530237818849429372.stgit@warthog.procyon.org.uk/ # rfc
+Link: https://lore.kernel.org/r/166732031039.3186319.10691316510079412635.stgit@warthog.procyon.org.uk/ # rfc
 ---
- fs/cifs/smbdirect.c | 214 ++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 214 insertions(+)
+ fs/cifs/cifsproto.h |  3 +++
+ fs/cifs/connect.c   | 14 ++++++++++++++
+ 2 files changed, 17 insertions(+)
 
-diff --git a/fs/cifs/smbdirect.c b/fs/cifs/smbdirect.c
-index 8c816b25ce7c..3e0aacddc291 100644
---- a/fs/cifs/smbdirect.c
-+++ b/fs/cifs/smbdirect.c
-@@ -44,6 +44,17 @@ static int smbd_post_send_page(struct smbd_connection *info,
- static void destroy_mr_list(struct smbd_connection *info);
- static int allocate_mr_list(struct smbd_connection *info);
- 
-+struct smb_extract_to_rdma {
-+	struct ib_sge		*sge;
-+	unsigned int		nr_sge;
-+	unsigned int		max_sge;
-+	struct ib_device	*device;
-+	u32			local_dma_lkey;
-+	enum dma_data_direction	direction;
-+};
-+static ssize_t smb_extract_iter_to_rdma(struct iov_iter *iter, size_t len,
-+					struct smb_extract_to_rdma *rdma);
-+
- /* SMBD version number */
- #define SMBD_V1	0x0100
- 
-@@ -2490,3 +2501,206 @@ int smbd_deregister_mr(struct smbd_mr *smbdirect_mr)
- 
- 	return rc;
+diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
+index 1207b39686fb..cb7a3fe89278 100644
+--- a/fs/cifs/cifsproto.h
++++ b/fs/cifs/cifsproto.h
+@@ -244,6 +244,9 @@ extern int cifs_read_page_from_socket(struct TCP_Server_Info *server,
+ 					struct page *page,
+ 					unsigned int page_offset,
+ 					unsigned int to_read);
++int cifs_read_iter_from_socket(struct TCP_Server_Info *server,
++			       struct iov_iter *iter,
++			       unsigned int to_read);
+ extern int cifs_setup_cifs_sb(struct cifs_sb_info *cifs_sb);
+ void cifs_mount_put_conns(struct cifs_mount_ctx *mnt_ctx);
+ int cifs_mount_get_session(struct cifs_mount_ctx *mnt_ctx);
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index b2a04b4e89a5..152b457b849f 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -765,6 +765,20 @@ cifs_read_page_from_socket(struct TCP_Server_Info *server, struct page *page,
+ 	return cifs_readv_from_socket(server, &smb_msg);
  }
-+
-+static bool smb_set_sge(struct smb_extract_to_rdma *rdma,
-+			struct page *lowest_page, size_t off, size_t len)
+ 
++int
++cifs_read_iter_from_socket(struct TCP_Server_Info *server, struct iov_iter *iter,
++			   unsigned int to_read)
 +{
-+	struct ib_sge *sge = &rdma->sge[rdma->nr_sge];
-+	u64 addr;
++	struct msghdr smb_msg = { .msg_iter = *iter };
++	int ret;
 +
-+	addr = ib_dma_map_page(rdma->device, lowest_page,
-+			       off, len, rdma->direction);
-+	if (ib_dma_mapping_error(rdma->device, addr))
-+		return false;
-+
-+	sge->addr   = addr;
-+	sge->length = len;
-+	sge->lkey   = rdma->local_dma_lkey;
-+	rdma->nr_sge++;
-+	return true;
-+}
-+
-+/*
-+ * Extract page fragments from a BVEC-class iterator and add them to an RDMA
-+ * element list.  The pages are not pinned.
-+ */
-+static ssize_t smb_extract_bvec_to_rdma(struct iov_iter *iter,
-+					struct smb_extract_to_rdma *rdma,
-+					ssize_t maxsize)
-+{
-+	const struct bio_vec *bv = iter->bvec;
-+	unsigned long start = iter->iov_offset;
-+	unsigned int i;
-+	ssize_t ret = 0;
-+
-+	for (i = 0; i < iter->nr_segs; i++) {
-+		size_t off, len;
-+
-+		len = bv[i].bv_len;
-+		if (start >= len) {
-+			start -= len;
-+			continue;
-+		}
-+
-+		len = min_t(size_t, maxsize, len - start);
-+		off = bv[i].bv_offset + start;
-+
-+		if (!smb_set_sge(rdma, bv[i].bv_page, off, len))
-+			return -EIO;
-+
-+		ret += len;
-+		maxsize -= len;
-+		if (rdma->nr_sge >= rdma->max_sge || maxsize <= 0)
-+			break;
-+		start = 0;
-+	}
-+
-+	return ret;
-+}
-+
-+/*
-+ * Extract fragments from a KVEC-class iterator and add them to an RDMA list.
-+ * This can deal with vmalloc'd buffers as well as kmalloc'd or static buffers.
-+ * The pages are not pinned.
-+ */
-+static ssize_t smb_extract_kvec_to_rdma(struct iov_iter *iter,
-+					struct smb_extract_to_rdma *rdma,
-+					ssize_t maxsize)
-+{
-+	const struct kvec *kv = iter->kvec;
-+	unsigned long start = iter->iov_offset;
-+	unsigned int i;
-+	ssize_t ret = 0;
-+
-+	for (i = 0; i < iter->nr_segs; i++) {
-+		struct page *page;
-+		unsigned long kaddr;
-+		size_t off, len, seg;
-+
-+		len = kv[i].iov_len;
-+		if (start >= len) {
-+			start -= len;
-+			continue;
-+		}
-+
-+		kaddr = (unsigned long)kv[i].iov_base + start;
-+		off = kaddr & ~PAGE_MASK;
-+		len = min_t(size_t, maxsize, len - start);
-+		kaddr &= PAGE_MASK;
-+
-+		maxsize -= len;
-+		do {
-+			seg = min_t(size_t, len, PAGE_SIZE - off);
-+
-+			if (is_vmalloc_or_module_addr((void *)kaddr))
-+				page = vmalloc_to_page((void *)kaddr);
-+			else
-+				page = virt_to_page(kaddr);
-+
-+			if (!smb_set_sge(rdma, page, off, seg))
-+				return -EIO;
-+
-+			ret += seg;
-+			len -= seg;
-+			kaddr += PAGE_SIZE;
-+			off = 0;
-+		} while (len > 0 && rdma->nr_sge < rdma->max_sge);
-+
-+		if (rdma->nr_sge >= rdma->max_sge || maxsize <= 0)
-+			break;
-+		start = 0;
-+	}
-+
-+	return ret;
-+}
-+
-+/*
-+ * Extract folio fragments from an XARRAY-class iterator and add them to an
-+ * RDMA list.  The folios are not pinned.
-+ */
-+static ssize_t smb_extract_xarray_to_rdma(struct iov_iter *iter,
-+					  struct smb_extract_to_rdma *rdma,
-+					  ssize_t maxsize)
-+{
-+	struct xarray *xa = iter->xarray;
-+	struct folio *folio;
-+	loff_t start = iter->xarray_start + iter->iov_offset;
-+	pgoff_t index = start / PAGE_SIZE;
-+	ssize_t ret = 0;
-+	size_t off, len;
-+	XA_STATE(xas, xa, index);
-+
-+	rcu_read_lock();
-+
-+	xas_for_each(&xas, folio, ULONG_MAX) {
-+		if (xas_retry(&xas, folio))
-+			continue;
-+		if (WARN_ON(xa_is_value(folio)))
-+			break;
-+		if (WARN_ON(folio_test_hugetlb(folio)))
-+			break;
-+
-+		off = offset_in_folio(folio, start);
-+		len = min_t(size_t, maxsize, folio_size(folio) - off);
-+
-+		if (!smb_set_sge(rdma, folio_page(folio, 0), off, len)) {
-+			rcu_read_lock();
-+			return -EIO;
-+		}
-+
-+		maxsize -= len;
-+		ret += len;
-+		if (rdma->nr_sge >= rdma->max_sge || maxsize <= 0)
-+			break;
-+	}
-+
-+	rcu_read_unlock();
-+	return ret;
-+}
-+
-+/*
-+ * Extract page fragments from up to the given amount of the source iterator
-+ * and build up an RDMA list that refers to all of those bits.  The RDMA list
-+ * is appended to, up to the maximum number of elements set in the parameter
-+ * block.
-+ *
-+ * The extracted page fragments are not pinned or ref'd in any way; if an
-+ * IOVEC/UBUF-type iterator is to be used, it should be converted to a
-+ * BVEC-type iterator and the pages pinned, ref'd or otherwise held in some
-+ * way.
-+ */
-+static ssize_t smb_extract_iter_to_rdma(struct iov_iter *iter, size_t len,
-+					struct smb_extract_to_rdma *rdma)
-+{
-+	ssize_t ret;
-+	int before = rdma->nr_sge;
-+
-+	switch (iov_iter_type(iter)) {
-+	case ITER_BVEC:
-+		ret = smb_extract_bvec_to_rdma(iter, rdma, len);
-+		break;
-+	case ITER_KVEC:
-+		ret = smb_extract_kvec_to_rdma(iter, rdma, len);
-+		break;
-+	case ITER_XARRAY:
-+		ret = smb_extract_xarray_to_rdma(iter, rdma, len);
-+		break;
-+	default:
-+		WARN_ON_ONCE(1);
-+		return -EIO;
-+	}
-+
-+	if (ret > 0) {
++	iov_iter_truncate(&smb_msg.msg_iter, to_read);
++	ret = cifs_readv_from_socket(server, &smb_msg);
++	if (ret > 0)
 +		iov_iter_advance(iter, ret);
-+	} else if (ret < 0) {
-+		while (rdma->nr_sge > before) {
-+			struct ib_sge *sge = &rdma->sge[rdma->nr_sge--];
-+
-+			ib_dma_unmap_single(rdma->device, sge->addr, sge->length,
-+					    rdma->direction);
-+			sge->addr = 0;
-+		}
-+	}
-+
 +	return ret;
 +}
++
+ static bool
+ is_smb_response(struct TCP_Server_Info *server, unsigned char type)
+ {
 
