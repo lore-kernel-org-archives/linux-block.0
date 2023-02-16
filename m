@@ -2,68 +2,109 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CFD8C636CC
-	for <linux-block@archiver.kernel.org>; Thu, 16 Feb 2023 20:23:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F8B7C636CC
+	for <linux-block@archiver.kernel.org>; Thu, 16 Feb 2023 20:57:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229932AbjBPUXi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 16 Feb 2023 15:23:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42172 "EHLO
+        id S229726AbjBPU53 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 16 Feb 2023 15:57:29 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34832 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229901AbjBPUXg (ORCPT
+        with ESMTP id S229658AbjBPU52 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 16 Feb 2023 15:23:36 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1752F39BBC
-        for <linux-block@vger.kernel.org>; Thu, 16 Feb 2023 12:23:36 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id AD93DB829A5
-        for <linux-block@vger.kernel.org>; Thu, 16 Feb 2023 20:23:35 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 69B5CC433EF;
-        Thu, 16 Feb 2023 20:23:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1676579014;
-        bh=rvQwcttV74HOlXA0JvIqJumUdgq1qaqv20x+WTPRL40=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=qi/BWSvsiW7VtZKy3Udhe6HC6SOqOoZP4cuUnopvvn227EM8bqVIN5tZNos4Vkcqw
-         k+6rZo+veN5P5r3igUDzJ07k51ps00GBOlYmXcnQXlBg4H8HZoUZkCGzofIi4lXlg8
-         FLIGuYdRTPThPgHb+/LDz1OpCn1M50RRTgui7CZLB+v+JcAyCscUOySOZtriFZSU6q
-         jed7721m/BEGfL01fKk7D68F7LJWkOTC+Z/gth/+oZZE9jJQf1Qbtt2eKOLXglzuBD
-         O4R3+JacK7UCoVfWkKQEPTOHd5KTVx/Gih89nQ9SsBfD3wgDr/fo/Qun0Nm7LRO9QB
-         e7dWLLWZ0YkWQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 56BE5E21ED0;
-        Thu, 16 Feb 2023 20:23:34 +0000 (UTC)
-Subject: Re: [GIT PULL] Block fix for 6.2-final
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <16738d14-6c97-c344-e096-50f4f6cce0e7@kernel.dk>
-References: <16738d14-6c97-c344-e096-50f4f6cce0e7@kernel.dk>
-X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
-X-PR-Tracked-Message-Id: <16738d14-6c97-c344-e096-50f4f6cce0e7@kernel.dk>
-X-PR-Tracked-Remote: git://git.kernel.dk/linux.git tags/block-6.2-2023-02-16
-X-PR-Tracked-Commit-Id: 9a28b92cc21e8445c25b18e46f41634539938a91
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: d3d6f0eb086d3d68960ded479e846e7dcfcec2bb
-Message-Id: <167657901434.10840.8639985546717090318.pr-tracker-bot@kernel.org>
-Date:   Thu, 16 Feb 2023 20:23:34 +0000
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+        Thu, 16 Feb 2023 15:57:28 -0500
+Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 045A44CCBA
+        for <linux-block@vger.kernel.org>; Thu, 16 Feb 2023 12:57:27 -0800 (PST)
+Received: by mail-qt1-f171.google.com with SMTP id w3so3586288qts.7
+        for <linux-block@vger.kernel.org>; Thu, 16 Feb 2023 12:57:26 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=CzSraNHal0QwWiBz7ixtga3AF0evBVtXKNCBRPNfcU8=;
+        b=yHWKrh6L+A/LEv4avnrpHYYZs5jM1YaEXQ9aIE0ePDSmBY9JkccH/5q8CoKzEwYvQ4
+         t4UWOqDrSjGXYimbH30ZC4ZSMAQAcHs9d57hAVBa8eK1gpxez0aGCkEysePxOqC8hs86
+         TPulnCIDnA4jrYZL0UNdKHQu9YBxlTKqvWtMelhmESbfKQteC7p8odDmMwr0jGVfrPXQ
+         2jDH+D5xEiNgZZaH+wHDPaVYJ9uZxWMXlLi8YmG0sutKDz6xAEXxt5A6wV5qWRz/q0tP
+         H3RTdeFpystzohjR+zxqQz+grwn63oPH3r7NhIRsFbUmMySkXubLbpYRVaPfJj21G4DI
+         flUg==
+X-Gm-Message-State: AO0yUKXmtrpvlNwAwXb9cgsPZTfRiRU+v/2L6QCMlalwzXSuWnb46UL2
+        9EPN8AQrB8SB/cThTZbrhvZF5g9OGobXmg==
+X-Google-Smtp-Source: AK7set99SqIBuKkYxmikXi1RG0NBViBcSUtJ47i+FMetYV7dI0cYkkCsgjicGwRgTiogX2Y4XRrIqQ==
+X-Received: by 2002:ac8:5f88:0:b0:3b8:6b23:4fc2 with SMTP id j8-20020ac85f88000000b003b86b234fc2mr10941490qta.15.1676581045796;
+        Thu, 16 Feb 2023 12:57:25 -0800 (PST)
+Received: from mail-yb1-f175.google.com (mail-yb1-f175.google.com. [209.85.219.175])
+        by smtp.gmail.com with ESMTPSA id m5-20020a375805000000b006fa22f0494bsm1836526qkb.117.2023.02.16.12.57.25
+        for <linux-block@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 16 Feb 2023 12:57:25 -0800 (PST)
+Received: by mail-yb1-f175.google.com with SMTP id i137so3726401ybg.4
+        for <linux-block@vger.kernel.org>; Thu, 16 Feb 2023 12:57:25 -0800 (PST)
+X-Received: by 2002:a5b:e:0:b0:951:12c7:5836 with SMTP id a14-20020a5b000e000000b0095112c75836mr344539ybp.163.1676581044900;
+ Thu, 16 Feb 2023 12:57:24 -0800 (PST)
+MIME-Version: 1.0
+References: <20230210010612.28729-1-luca.boccassi@gmail.com>
+In-Reply-To: <20230210010612.28729-1-luca.boccassi@gmail.com>
+From:   Luca Boccassi <bluca@debian.org>
+Date:   Thu, 16 Feb 2023 20:57:13 +0000
+X-Gmail-Original-Message-ID: <CAMw=ZnQUOLXiQf195tufdMo-8UCw=QgqFwewkSTDzSaKidYF2w@mail.gmail.com>
+Message-ID: <CAMw=ZnQUOLXiQf195tufdMo-8UCw=QgqFwewkSTDzSaKidYF2w@mail.gmail.com>
+Subject: Re: [PATCH] sed-opal: add support flag for SUM in status ioctl
+To:     linux-block@vger.kernel.org
+Cc:     jonathan.derrick@linux.dev, Jens Axboe <axboe@kernel.dk>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The pull request you sent on Thu, 16 Feb 2023 12:26:48 -0700:
+On Fri, 10 Feb 2023 at 01:06, <luca.boccassi@gmail.com> wrote:
+>
+> From: Luca Boccassi <bluca@debian.org>
+>
+> Not every OPAL drive supports SUM (Single User Mode), so report this
+> information to userspace via the get-status ioctl so that we can adjust
+> the formatting options accordingly.
+> Tested on a kingston drive (which supports it) and a samsung one
+> (which does not).
+>
+> Signed-off-by: Luca Boccassi <bluca@debian.org>
+> ---
+>  block/sed-opal.c              | 2 ++
+>  include/uapi/linux/sed-opal.h | 1 +
+>  2 files changed, 3 insertions(+)
+>
+> diff --git a/block/sed-opal.c b/block/sed-opal.c
+> index 463873f61e01..c320093c14f1 100644
+> --- a/block/sed-opal.c
+> +++ b/block/sed-opal.c
+> @@ -487,6 +487,8 @@ static int opal_discovery0_end(struct opal_dev *dev)
+>                         break;
+>                 case FC_SINGLEUSER:
+>                         single_user = check_sum(body->features);
+> +                       if (single_user)
+> +                               dev->flags |= OPAL_FL_SUM_SUPPORTED;
+>                         break;
+>                 case FC_GEOMETRY:
+>                         check_geometry(dev, body);
+> diff --git a/include/uapi/linux/sed-opal.h b/include/uapi/linux/sed-opal.h
+> index 1fed3c9294fc..d7a1524023db 100644
+> --- a/include/uapi/linux/sed-opal.h
+> +++ b/include/uapi/linux/sed-opal.h
+> @@ -144,6 +144,7 @@ struct opal_read_write_table {
+>  #define OPAL_FL_LOCKED                 0x00000008
+>  #define OPAL_FL_MBR_ENABLED            0x00000010
+>  #define OPAL_FL_MBR_DONE               0x00000020
+> +#define OPAL_FL_SUM_SUPPORTED          0x00000040
+>
+>  struct opal_status {
+>         __u32 flags;
 
-> git://git.kernel.dk/linux.git tags/block-6.2-2023-02-16
+Hi,
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/d3d6f0eb086d3d68960ded479e846e7dcfcec2bb
+Any chance for a quick review, please? Would have loved to have this
+for the 6.3 merge window, it's a super simple change.
+Thanks!
 
-Thank you!
-
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+Kind regards,
+Luca Boccassi
