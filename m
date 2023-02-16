@@ -2,98 +2,81 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D7FCC61DA4
-	for <linux-block@archiver.kernel.org>; Thu, 16 Feb 2023 16:17:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB554C636D7
+	for <linux-block@archiver.kernel.org>; Thu, 16 Feb 2023 16:40:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229496AbjBPQRA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 16 Feb 2023 11:17:00 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45530 "EHLO
+        id S229888AbjBPQkw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 16 Feb 2023 11:40:52 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38940 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229482AbjBPQQ7 (ORCPT
+        with ESMTP id S229745AbjBPQkw (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 16 Feb 2023 11:16:59 -0500
-Received: from mail-il1-x133.google.com (mail-il1-x133.google.com [IPv6:2607:f8b0:4864:20::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 552845264
-        for <linux-block@vger.kernel.org>; Thu, 16 Feb 2023 08:16:55 -0800 (PST)
-Received: by mail-il1-x133.google.com with SMTP id g14so917316ild.8
-        for <linux-block@vger.kernel.org>; Thu, 16 Feb 2023 08:16:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=3NiHnpNhZP7BIDUTVtGU23j1cQmK5RDYI1duz3OgctY=;
-        b=Y/CXA+g/EXskLmDruYLuYFsVoEretHSkp2p5oh1Hcl/Ls7rIN2vkDnP8kkjzWjRqtA
-         M3wOn+HRlTrjkstnFEtvOklb8B2Zp26mqxUWyj3QHXBIedVP+YvFkT44RRVt6qBuxMou
-         W7JhyIDKv4JswBF4HKo1MpMoMev/8E04tPS/pDF+GDiyFqZzUfhd67nKvf4LZyia4V5H
-         8hpX+5pXiWKlm4pEy+U4X2svO4dSkz3V8ifBK/jPjfLvSsdUiMrNotr2aWVpS08bpCbg
-         QLnmOfOTXBMMhergFEdmjRl8J0srxgjE/HChj4zQZXrzG1izgSvlbShyqGjxP5PfO3JB
-         ungw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=3NiHnpNhZP7BIDUTVtGU23j1cQmK5RDYI1duz3OgctY=;
-        b=bFZXHUpOKzSo9c1NZVachpOwbLIoir0G0EmlJDiRMpD8J7iNn6403DYOB8jE+GBQZ6
-         rSmYy/RUC9yOqwwEPkLf4LsU1y9Vnj98BdFWICdWOfy61/Az0IWVeyHj9932m5gBNUk4
-         /Mhr1n2J3nyJOSnujmg4zHtgkXGCaAa/U8YUgNdzGkyxOCukEwqxCAwuSpJWfLwZ9rZY
-         WZB9zZUI/tFu345mxH2KvKPsHeBv2r3LZfjcMeCvt4A5kZwnZwyCPs0OQUP4Jsk4eTwH
-         S3mvZOxk8rk9VNtBxTi0qcU+DKeTGXgQacQ4uCfTEMjn/ILgIaCalIBPhwicyC6wVvUu
-         pSAA==
-X-Gm-Message-State: AO0yUKUWwo8DOHH857xpDhnuZQ9hT+BROktZF5UqMPsv0tiUzJqKdtIa
-        wSDdER6qeA49f5aEj+c4dTjrdw==
-X-Google-Smtp-Source: AK7set/ZPT7bRG6m1ScviXOPT189h+FyLgYwCq/Tc08eaupOTCQpi/OlYawBCa/NtWMNrTW1EJOfFg==
-X-Received: by 2002:a92:d98f:0:b0:314:1121:dd85 with SMTP id r15-20020a92d98f000000b003141121dd85mr4135516iln.1.1676564214656;
-        Thu, 16 Feb 2023 08:16:54 -0800 (PST)
-Received: from [192.168.1.94] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id i15-20020a056e02152f00b0031537da6ba3sm521124ilu.87.2023.02.16.08.16.54
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 16 Feb 2023 08:16:54 -0800 (PST)
-Message-ID: <ebc08e60-4be3-e517-90c9-09a9a5ccd7a1@kernel.dk>
-Date:   Thu, 16 Feb 2023 09:16:53 -0700
+        Thu, 16 Feb 2023 11:40:52 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8874C4CC98;
+        Thu, 16 Feb 2023 08:40:50 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 3904DB828EE;
+        Thu, 16 Feb 2023 16:40:49 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 887BFC433D2;
+        Thu, 16 Feb 2023 16:40:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1676565648;
+        bh=dz/6alTdHn2I5NxkOALw1FekhE9x9x60dVTsdIVdiPw=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=q1nyyh/s7tIzVQFmn/zl0zA46VYXIWOypnfsu+zwr3BvRZp/0/g/gRqT/gZ9bqyEI
+         QVJilOJYrkWCLQe6tio/d+NK7zAj/TSPjzgaSlkpASbESMsBM/R8XpkxKpY68+wctX
+         xS6oqbb4ZfzdYb+tI1baW7z6M2w8Vspfnhn6fF8Gf+taQWisNOFHUvmLhruFlJocYi
+         0msbM17Qx/GmJD8g7PcxWs20AAqyNphMFZu3ityMMsiTdgzBcUOYFwzdQyzcmPMcn5
+         MyJnHKZa+snTJVQIa3JUQl2cK6oH9HQPQgVzNCsuEL1kEbIKuXTUGPneD6XHeebv96
+         FcDMqQUUdj2Ug==
+Date:   Thu, 16 Feb 2023 09:40:44 -0700
+From:   Keith Busch <kbusch@kernel.org>
+To:     Hannes Reinecke <hare@suse.de>
+Cc:     "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        lsf-pc@lists.linuxfoundation.org
+Subject: Re: [LSF/MM/BPF BOF] Userspace command abouts
+Message-ID: <Y+5cjPBE6h/IW9VH@kbusch-mbp>
+References: <3d3369f1-7ebe-b3b8-804c-ff2b97ec679d@suse.de>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.2
-Subject: Re: [PATCH 1/4] brd: return 0/-error from brd_insert_page()
-Content-Language: en-US
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     linux-block@vger.kernel.org, stable@vger.kernel.org
-References: <20230216151918.319585-1-axboe@kernel.dk>
- <20230216151918.319585-2-axboe@kernel.dk> <Y+5UYrUgp9lg8zRD@infradead.org>
- <e4fb52d3-25da-4796-2f79-d9630b7168d6@kernel.dk>
- <Y+5WgmTEbGP5oz8P@infradead.org>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <Y+5WgmTEbGP5oz8P@infradead.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <3d3369f1-7ebe-b3b8-804c-ff2b97ec679d@suse.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2/16/23 9:14 AM, Christoph Hellwig wrote:
-> On Thu, Feb 16, 2023 at 09:12:33AM -0700, Jens Axboe wrote:
->> On 2/16/23 9:05 AM, Christoph Hellwig wrote:
->>> Looks good:
->>>
->>> Reviewed-by: Christoph Hellwig <hch@lst.de>
->>>
->>>> Cc: stable@vger.kernel.org # 5.10+
->>>
->>> But why is this a stable candidate?
->>
->> Only because the other patches depend on it.
+On Thu, Feb 16, 2023 at 12:50:03PM +0100, Hannes Reinecke wrote:
+> Hi all,
 > 
-> But none of those is stable material either as I can tell.  It's
-> a fairly simple and nice to have enhancement, but not really a
-> grave bug or regression fix.
+> it has come up in other threads, so it might be worthwhile to have its own
+> topic:
+> 
+> Userspace command aborts
+> 
+> As it stands we cannot abort I/O commands from userspace.
+> This is hitting us when running in a virtual machine:
+> The VM sets a timeout when submitting a command, but that
+> information can't be transmitted to the VM host. The VM host
+> then issues a different command (with another timeout), and
+> again that timeout can't be transmitted to the attached devices.
+> So when the VM detects a timeout, it will try to issue an abort,
+> but that goes nowhere as the VM host has no way to abort commands
+> from userspace.
+> So in the end the VM has to wait for the command to complete, causing
+> stalls in the VM if the host had to undergo error recovery or something.
 
-It causes a big perf regression when swapping between IO backends,
-and even caused confusion for that initial reporter. So while it's
-not a very important crash fix, I do think shoving into stable is
-prudent.
+Aborts are racy. A lot of hardware implements these as a no-op, too.
+ 
+> With io_uring or CDL we now have some mechanism which look as if they
+> would allow us to implement command aborts.
 
--- 
-Jens Axboe
+CDL on the other hand sounds more promising.
 
-
+> So this BoF will be around discussions on how aborts from userspace could be
+> implemented, whether any of the above methods are suitable, or whether there
+> are other ideas on how that could be done.
