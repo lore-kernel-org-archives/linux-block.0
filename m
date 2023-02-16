@@ -2,164 +2,115 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B580C636CC
-	for <linux-block@archiver.kernel.org>; Thu, 16 Feb 2023 21:23:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78535C61DA4
+	for <linux-block@archiver.kernel.org>; Thu, 16 Feb 2023 21:31:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229571AbjBPVXj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 16 Feb 2023 16:23:39 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50784 "EHLO
+        id S230079AbjBPVbP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 16 Feb 2023 16:31:15 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54724 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229492AbjBPVXi (ORCPT
+        with ESMTP id S230044AbjBPVbL (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 16 Feb 2023 16:23:38 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 178C583C3
-        for <linux-block@vger.kernel.org>; Thu, 16 Feb 2023 13:22:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1676582570;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-        bh=Wf4v/tNzjT2VRs1P16c/6f29cG3mDdqrWzEZUinry/Q=;
-        b=H3ffhRKbEv9NxCVemuMfad3ORalTBN2YvkSV8QVTTxduvIK4axPKvBQS/wkZAbvNBEVMRP
-        Trpf95fdwUnLDzWEOdaK4S9BFpqWn4k45Mt0FqsKgjDKBNRNczucWTxE9hSGCNlZ86oI74
-        NadOmbcYRPD9cwsw3yR67LvbvVybxeQ=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-643-zENzyEZKM0KIUmysLL-VZA-1; Thu, 16 Feb 2023 16:22:47 -0500
-X-MC-Unique: zENzyEZKM0KIUmysLL-VZA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 952611C0758A;
-        Thu, 16 Feb 2023 21:22:46 +0000 (UTC)
-Received: from file01.intranet.prod.int.rdu2.redhat.com (file01.intranet.prod.int.rdu2.redhat.com [10.11.5.7])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 86A0440CF8E4;
-        Thu, 16 Feb 2023 21:22:46 +0000 (UTC)
-Received: from file01.intranet.prod.int.rdu2.redhat.com (localhost [127.0.0.1])
-        by file01.intranet.prod.int.rdu2.redhat.com (8.14.4/8.14.4) with ESMTP id 31GLMkxg007334;
-        Thu, 16 Feb 2023 16:22:46 -0500
-Received: from localhost (mpatocka@localhost)
-        by file01.intranet.prod.int.rdu2.redhat.com (8.14.4/8.14.4/Submit) with ESMTP id 31GLMksq007330;
-        Thu, 16 Feb 2023 16:22:46 -0500
-X-Authentication-Warning: file01.intranet.prod.int.rdu2.redhat.com: mpatocka owned process doing -bs
-Date:   Thu, 16 Feb 2023 16:22:46 -0500 (EST)
-From:   Mikulas Patocka <mpatocka@redhat.com>
-X-X-Sender: mpatocka@file01.intranet.prod.int.rdu2.redhat.com
-To:     Matthew Wilcox <willy@infradead.org>
-cc:     snitzer@kernel.org, Yang Shi <shy828301@gmail.com>,
-        mgorman@techsingularity.net, agk@redhat.com, dm-devel@redhat.com,
-        akpm@linux-foundation.org, linux-block@vger.kernel.org,
-        linux-mm@kvack.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v2] dm-crypt: allocate compound pages if possible
-Message-ID: <alpine.LRH.2.21.2302161619430.5436@file01.intranet.prod.int.rdu2.redhat.com>
-User-Agent: Alpine 2.21 (LRH 202 2017-01-01)
+        Thu, 16 Feb 2023 16:31:11 -0500
+Received: from mail-qv1-f52.google.com (mail-qv1-f52.google.com [209.85.219.52])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 762BA46B0
+        for <linux-block@vger.kernel.org>; Thu, 16 Feb 2023 13:31:08 -0800 (PST)
+Received: by mail-qv1-f52.google.com with SMTP id s17so1409730qvq.12
+        for <linux-block@vger.kernel.org>; Thu, 16 Feb 2023 13:31:08 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=gO6r7SGbt4F/ovnWsWl2cTXvsSI+IcObCRtChS/zGts=;
+        b=SXAT5sdO5txHxyEYx+B0e8z5wYZ4j/x5InfGVGHklSDzeX28Hm2DSBhTWTPD2/hzkJ
+         2bGbrLGlnJb13U8DaibRQ1ZAmUbeXnKgioIHAIEEopGlA5PBa5UikxzXdTYm0VGK9oyE
+         y9dxR7RURlIlJe5TwBBBbxXrtNjBl3FeEFoCawSD3s+Zbdq5nDcTIsRy3Xjej4UAbQoB
+         ZtjMjiGZx4BtFsxGfkZySEf/HawsYzLQyi4NuyzrG5gQ84p0TFAc8BeEICJ6d/IiFCD3
+         rP2Pg80K8w7BEnTS9fuHTnO908mh+mP0cuI1C4UbXhpeFfcFBCw3rXxbU4syZhFS+cQg
+         dKdA==
+X-Gm-Message-State: AO0yUKXNmRSitSffvBlCXTFauNNTM7sVR76ewJpkqF/vtJYc8P6zaCY4
+        4SUIwUI5WFsr2OP3rYLJAOXdcyCKSzvdMA==
+X-Google-Smtp-Source: AK7set9tKOQnEOqTuYdb+74O6KxDxDemDjHU2ofjS9cMPz5jSwG1i3RW6R5IuK4tKiXe/zp7eRpfHw==
+X-Received: by 2002:ad4:5d43:0:b0:537:9e59:3997 with SMTP id jk3-20020ad45d43000000b005379e593997mr16040314qvb.51.1676583067337;
+        Thu, 16 Feb 2023 13:31:07 -0800 (PST)
+Received: from mail-yb1-f177.google.com (mail-yb1-f177.google.com. [209.85.219.177])
+        by smtp.gmail.com with ESMTPSA id b83-20020ae9eb56000000b0073ba44fd6a2sm743911qkg.1.2023.02.16.13.31.06
+        for <linux-block@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 16 Feb 2023 13:31:06 -0800 (PST)
+Received: by mail-yb1-f177.google.com with SMTP id s203so3783655ybc.11
+        for <linux-block@vger.kernel.org>; Thu, 16 Feb 2023 13:31:06 -0800 (PST)
+X-Received: by 2002:a5b:f4d:0:b0:8e6:2e51:57ff with SMTP id
+ y13-20020a5b0f4d000000b008e62e5157ffmr733316ybr.349.1676583066500; Thu, 16
+ Feb 2023 13:31:06 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.1
+References: <20230210010612.28729-1-luca.boccassi@gmail.com> <CAMw=ZnQUOLXiQf195tufdMo-8UCw=QgqFwewkSTDzSaKidYF2w@mail.gmail.com>
+In-Reply-To: <CAMw=ZnQUOLXiQf195tufdMo-8UCw=QgqFwewkSTDzSaKidYF2w@mail.gmail.com>
+From:   Luca Boccassi <bluca@debian.org>
+Date:   Thu, 16 Feb 2023 21:30:55 +0000
+X-Gmail-Original-Message-ID: <CAMw=ZnTd+LfDcC=Z9tQUQJdVOukv0wVU+mj8jH1L8_5dhM+8yg@mail.gmail.com>
+Message-ID: <CAMw=ZnTd+LfDcC=Z9tQUQJdVOukv0wVU+mj8jH1L8_5dhM+8yg@mail.gmail.com>
+Subject: Re: [PATCH] sed-opal: add support flag for SUM in status ioctl
+To:     linux-block@vger.kernel.org
+Cc:     Christian Brauner <brauner@kernel.org>,
+        Christoph Hellwig <hch@infradead.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-It was reported that allocating pages for the write buffer in dm-crypt
-causes measurable overhead [1].
+On Thu, 16 Feb 2023 at 20:57, Luca Boccassi <bluca@debian.org> wrote:
+>
+> On Fri, 10 Feb 2023 at 01:06, <luca.boccassi@gmail.com> wrote:
+> >
+> > From: Luca Boccassi <bluca@debian.org>
+> >
+> > Not every OPAL drive supports SUM (Single User Mode), so report this
+> > information to userspace via the get-status ioctl so that we can adjust
+> > the formatting options accordingly.
+> > Tested on a kingston drive (which supports it) and a samsung one
+> > (which does not).
+> >
+> > Signed-off-by: Luca Boccassi <bluca@debian.org>
+> > ---
+> >  block/sed-opal.c              | 2 ++
+> >  include/uapi/linux/sed-opal.h | 1 +
+> >  2 files changed, 3 insertions(+)
+> >
+> > diff --git a/block/sed-opal.c b/block/sed-opal.c
+> > index 463873f61e01..c320093c14f1 100644
+> > --- a/block/sed-opal.c
+> > +++ b/block/sed-opal.c
+> > @@ -487,6 +487,8 @@ static int opal_discovery0_end(struct opal_dev *dev)
+> >                         break;
+> >                 case FC_SINGLEUSER:
+> >                         single_user = check_sum(body->features);
+> > +                       if (single_user)
+> > +                               dev->flags |= OPAL_FL_SUM_SUPPORTED;
+> >                         break;
+> >                 case FC_GEOMETRY:
+> >                         check_geometry(dev, body);
+> > diff --git a/include/uapi/linux/sed-opal.h b/include/uapi/linux/sed-opal.h
+> > index 1fed3c9294fc..d7a1524023db 100644
+> > --- a/include/uapi/linux/sed-opal.h
+> > +++ b/include/uapi/linux/sed-opal.h
+> > @@ -144,6 +144,7 @@ struct opal_read_write_table {
+> >  #define OPAL_FL_LOCKED                 0x00000008
+> >  #define OPAL_FL_MBR_ENABLED            0x00000010
+> >  #define OPAL_FL_MBR_DONE               0x00000020
+> > +#define OPAL_FL_SUM_SUPPORTED          0x00000040
+> >
+> >  struct opal_status {
+> >         __u32 flags;
+>
+> Hi,
+>
+> Any chance for a quick review, please? Would have loved to have this
+> for the 6.3 merge window, it's a super simple change.
+> Thanks!
 
-This patch changes dm-crypt to allocate compound pages if they are
-available. If not, we fall back to the mempool.
+CC'ed couple more reviewers as suggested by Christian
 
-[1] https://listman.redhat.com/archives/dm-devel/2023-February/053284.html
-
-Signed-off-by: Mikulas Patocka <mpatocka@redhat.com>
-
----
- drivers/md/dm-crypt.c |   48 +++++++++++++++++++++++++++++++++---------------
- 1 file changed, 33 insertions(+), 15 deletions(-)
-
-Index: linux-2.6/drivers/md/dm-crypt.c
-===================================================================
---- linux-2.6.orig/drivers/md/dm-crypt.c	2023-02-16 20:40:15.000000000 +0100
-+++ linux-2.6/drivers/md/dm-crypt.c	2023-02-16 21:56:34.000000000 +0100
-@@ -1657,6 +1657,9 @@ static void crypt_free_buffer_pages(stru
-  * In order to not degrade performance with excessive locking, we try
-  * non-blocking allocations without a mutex first but on failure we fallback
-  * to blocking allocations with a mutex.
-+ *
-+ * In order to reduce allocation overhead, we try to allocate compound pages in
-+ * the first pass. If they are not available, we fall back to the mempool.
-  */
- static struct bio *crypt_alloc_buffer(struct dm_crypt_io *io, unsigned size)
- {
-@@ -1664,8 +1667,8 @@ static struct bio *crypt_alloc_buffer(st
- 	struct bio *clone;
- 	unsigned int nr_iovecs = (size + PAGE_SIZE - 1) >> PAGE_SHIFT;
- 	gfp_t gfp_mask = GFP_NOWAIT | __GFP_HIGHMEM;
--	unsigned i, len, remaining_size;
--	struct page *page;
-+	unsigned remaining_size;
-+	unsigned order = MAX_ORDER - 1;
- 
- retry:
- 	if (unlikely(gfp_mask & __GFP_DIRECT_RECLAIM))
-@@ -1678,20 +1681,34 @@ retry:
- 
- 	remaining_size = size;
- 
--	for (i = 0; i < nr_iovecs; i++) {
--		page = mempool_alloc(&cc->page_pool, gfp_mask);
--		if (!page) {
-+	while (remaining_size) {
-+		struct page *pages;
-+		unsigned size_to_add;
-+		unsigned remaining_order = __fls((remaining_size + PAGE_SIZE - 1) >> PAGE_SHIFT);
-+		order = min(order, remaining_order);
-+
-+		while (order > 0) {
-+			pages = alloc_pages(gfp_mask
-+				| __GFP_NOMEMALLOC | __GFP_NORETRY | __GFP_NOWARN | __GFP_COMP,
-+				order);
-+			if (likely(pages != NULL))
-+				goto have_pages;
-+			order--;
-+		}
-+
-+		pages = mempool_alloc(&cc->page_pool, gfp_mask);
-+		if (!pages) {
- 			crypt_free_buffer_pages(cc, clone);
- 			bio_put(clone);
- 			gfp_mask |= __GFP_DIRECT_RECLAIM;
-+			order = 0;
- 			goto retry;
- 		}
- 
--		len = (remaining_size > PAGE_SIZE) ? PAGE_SIZE : remaining_size;
--
--		bio_add_page(clone, page, len, 0);
--
--		remaining_size -= len;
-+have_pages:
-+		size_to_add = min((unsigned)PAGE_SIZE << order, remaining_size);
-+		bio_add_page(clone, pages, size_to_add, 0);
-+		remaining_size -= size_to_add;
- 	}
- 
- 	/* Allocate space for integrity tags */
-@@ -1709,12 +1726,13 @@ retry:
- 
- static void crypt_free_buffer_pages(struct crypt_config *cc, struct bio *clone)
- {
--	struct bio_vec *bv;
--	struct bvec_iter_all iter_all;
-+	struct folio_iter fi;
- 
--	bio_for_each_segment_all(bv, clone, iter_all) {
--		BUG_ON(!bv->bv_page);
--		mempool_free(bv->bv_page, &cc->page_pool);
-+	bio_for_each_folio_all(fi, clone) {
-+		if (folio_test_large(fi.folio))
-+			folio_put(fi.folio);
-+		else
-+			mempool_free(&fi.folio->page, &cc->page_pool);
- 	}
- }
- 
-
+Kind regards,
+Luca Boccassi
