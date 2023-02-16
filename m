@@ -2,42 +2,42 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D97A2C6FA9D
-	for <linux-block@archiver.kernel.org>; Thu, 16 Feb 2023 21:50:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 34F87C61DA4
+	for <linux-block@archiver.kernel.org>; Thu, 16 Feb 2023 21:50:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230347AbjBPVut (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 16 Feb 2023 16:50:49 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37316 "EHLO
+        id S230436AbjBPVuu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 16 Feb 2023 16:50:50 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36590 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230348AbjBPVuQ (ORCPT
+        with ESMTP id S230215AbjBPVte (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 16 Feb 2023 16:50:16 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4769C52CFB
-        for <linux-block@vger.kernel.org>; Thu, 16 Feb 2023 13:48:53 -0800 (PST)
+        Thu, 16 Feb 2023 16:49:34 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A4C92367EC
+        for <linux-block@vger.kernel.org>; Thu, 16 Feb 2023 13:48:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1676584133;
+        s=mimecast20190719; t=1676584113;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=G8bLco6RK/TV/x/zhGZ3kDinA9d0Eqcu5AZrfy3jfiY=;
-        b=YgcXyLvfAQcgKcJxyBMqlaxHCy1cdrzVfWx+Q3ER4ilsarAf/cMROrwAOORYr7VQmqLoJd
-        Jm+FxiwByjMcsv9DxDvCnkIj+/zxtmq2IPTJCvEbGHtV4lNWxpEDD8BvhAA2wEI97z6Trw
-        Rxys7doYT4eFRazoK4qqef091mI4EL8=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=3Y4j0lnR/W/3vRUqeGPawzcVqSHyHS0pEsYo/MQFDo8=;
+        b=HT+wlWVrIDrKBHqRSSzADvGA0kqBTOKFBbKB2rwy5ne7K1bOZhxhFCOjbWt3rWVYcEiuw7
+        p2ikwWJGmI5jgvZmVDZ207GA3irArpEQQGh0ZlFO9jcU1+rfXti71ysBBLN5sOSMhON2rA
+        L/FBeErvukIcv9np2nc67jx8U0bPwm0=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-654-RayOGYqxP7eYvFXjA8177w-1; Thu, 16 Feb 2023 16:48:50 -0500
-X-MC-Unique: RayOGYqxP7eYvFXjA8177w-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
+ us-mta-573-hZ6PAfdZNkyg85S-HML7Vw-1; Thu, 16 Feb 2023 16:48:31 -0500
+X-MC-Unique: hZ6PAfdZNkyg85S-HML7Vw-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 2D97085A5A3;
-        Thu, 16 Feb 2023 21:48:49 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 409912800498;
+        Thu, 16 Feb 2023 21:48:30 +0000 (UTC)
 Received: from warthog.procyon.org.uk (unknown [10.33.36.24])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 1A5F2492B17;
-        Thu, 16 Feb 2023 21:48:47 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 237522166B31;
+        Thu, 16 Feb 2023 21:48:28 +0000 (UTC)
 From:   David Howells <dhowells@redhat.com>
 To:     Steve French <smfrench@gmail.com>
 Cc:     David Howells <dhowells@redhat.com>, Jens Axboe <axboe@kernel.dk>,
@@ -51,336 +51,199 @@ Cc:     David Howells <dhowells@redhat.com>, Jens Axboe <axboe@kernel.dk>,
         Jeff Layton <jlayton@kernel.org>, linux-cifs@vger.kernel.org,
         linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
         linux-mm@kvack.org, linux-kernel@vger.kernel.org,
-        Steve French <sfrench@samba.org>, linux-rdma@vger.kernel.org
-Subject: [PATCH 15/17] cifs: Build the RDMA SGE list directly from an iterator
-Date:   Thu, 16 Feb 2023 21:47:43 +0000
-Message-Id: <20230216214745.3985496-16-dhowells@redhat.com>
+        Steve French <sfrench@samba.org>, linux-cachefs@redhat.com
+Subject: [PATCH 08/17] netfs: Add a function to extract a UBUF or IOVEC into a BVEC iterator
+Date:   Thu, 16 Feb 2023 21:47:36 +0000
+Message-Id: <20230216214745.3985496-9-dhowells@redhat.com>
 In-Reply-To: <20230216214745.3985496-1-dhowells@redhat.com>
 References: <20230216214745.3985496-1-dhowells@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.10
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-In the depths of the cifs RDMA code, extract part of an iov iterator
-directly into an SGE list without going through an intermediate
-scatterlist.
+Add a function to extract the pages from a user-space supplied iterator
+(UBUF- or IOVEC-type) into a BVEC-type iterator, retaining the pages by
+getting a pin on them (as FOLL_PIN) as we go.
 
-Note that this doesn't support extraction from an IOBUF- or UBUF-type
-iterator (ie. user-supplied buffer).  The assumption is that the higher
-layers will extract those to a BVEC-type iterator first and do whatever is
-required to stop the pages from going away.
+This is useful in three situations:
+
+ (1) A userspace thread may have a sibling that unmaps or remaps the
+     process's VM during the operation, changing the assignment of the
+     pages and potentially causing an error.  Retaining the pages keeps
+     some pages around, even if this occurs; futher, we find out at the
+     point of extraction if EFAULT is going to be incurred.
+
+ (2) Pages might get swapped out/discarded if not retained, so we want to
+     retain them to avoid the reload causing a deadlock due to a DIO
+     from/to an mmapped region on the same file.
+
+ (3) The iterator may get passed to sendmsg() by the filesystem.  If a
+     fault occurs, we may get a short write to a TCP stream that's then
+     tricky to recover from.
+
+We don't deal with other types of iterator here, leaving it to other
+mechanisms to retain the pages (eg. PG_locked, PG_writeback and the pipe
+lock).
 
 Signed-off-by: David Howells <dhowells@redhat.com>
+cc: Jeff Layton <jlayton@kernel.org>
 cc: Steve French <sfrench@samba.org>
 cc: Shyam Prasad N <nspmangalore@gmail.com>
 cc: Rohith Surabattula <rohiths.msft@gmail.com>
-cc: Tom Talpey <tom@talpey.com>
-cc: Jeff Layton <jlayton@kernel.org>
+cc: linux-cachefs@redhat.com
 cc: linux-cifs@vger.kernel.org
-cc: linux-rdma@vger.kernel.org
-
-Link: https://lore.kernel.org/r/166697260361.61150.5064013393408112197.stgit@warthog.procyon.org.uk/ # rfc
-Link: https://lore.kernel.org/r/166732032518.3186319.1859601819981624629.stgit@warthog.procyon.org.uk/ # rfc
+cc: linux-fsdevel@vger.kernel.org
 ---
- fs/cifs/smbdirect.c | 153 ++++++++++++++++++--------------------------
- fs/cifs/smbdirect.h |   3 +-
- 2 files changed, 63 insertions(+), 93 deletions(-)
+ fs/netfs/Makefile     |   1 +
+ fs/netfs/iterator.c   | 103 ++++++++++++++++++++++++++++++++++++++++++
+ include/linux/netfs.h |   4 ++
+ 3 files changed, 108 insertions(+)
+ create mode 100644 fs/netfs/iterator.c
 
-diff --git a/fs/cifs/smbdirect.c b/fs/cifs/smbdirect.c
-index 0eb32bbfc467..31c4dc8212c3 100644
---- a/fs/cifs/smbdirect.c
-+++ b/fs/cifs/smbdirect.c
-@@ -828,16 +828,16 @@ static int smbd_post_send(struct smbd_connection *info,
- 	return rc;
- }
+diff --git a/fs/netfs/Makefile b/fs/netfs/Makefile
+index f684c0cd1ec5..386d6fb92793 100644
+--- a/fs/netfs/Makefile
++++ b/fs/netfs/Makefile
+@@ -3,6 +3,7 @@
+ netfs-y := \
+ 	buffered_read.o \
+ 	io.o \
++	iterator.o \
+ 	main.o \
+ 	objects.o
  
--static int smbd_post_send_sgl(struct smbd_connection *info,
--	struct scatterlist *sgl, int data_length, int remaining_data_length)
-+static int smbd_post_send_iter(struct smbd_connection *info,
-+			       struct iov_iter *iter,
-+			       int *_remaining_data_length)
- {
--	int num_sgs;
- 	int i, rc;
- 	int header_length;
-+	int data_length;
- 	struct smbd_request *request;
- 	struct smbd_data_transfer *packet;
- 	int new_credits;
--	struct scatterlist *sg;
- 
- wait_credit:
- 	/* Wait for send credits. A SMBD packet needs one credit */
-@@ -881,6 +881,30 @@ static int smbd_post_send_sgl(struct smbd_connection *info,
- 	}
- 
- 	request->info = info;
-+	memset(request->sge, 0, sizeof(request->sge));
+diff --git a/fs/netfs/iterator.c b/fs/netfs/iterator.c
+new file mode 100644
+index 000000000000..6f0d79080abc
+--- /dev/null
++++ b/fs/netfs/iterator.c
+@@ -0,0 +1,103 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
++/* Iterator helpers.
++ *
++ * Copyright (C) 2022 Red Hat, Inc. All Rights Reserved.
++ * Written by David Howells (dhowells@redhat.com)
++ */
 +
-+	/* Fill in the data payload to find out how much data we can add */
-+	if (iter) {
-+		struct smb_extract_to_rdma extract = {
-+			.nr_sge		= 1,
-+			.max_sge	= SMBDIRECT_MAX_SEND_SGE,
-+			.sge		= request->sge,
-+			.device		= info->id->device,
-+			.local_dma_lkey	= info->pd->local_dma_lkey,
-+			.direction	= DMA_TO_DEVICE,
-+		};
++#include <linux/export.h>
++#include <linux/slab.h>
++#include <linux/uio.h>
++#include <linux/netfs.h>
++#include "internal.h"
 +
-+		rc = smb_extract_iter_to_rdma(iter, *_remaining_data_length,
-+					      &extract);
-+		if (rc < 0)
-+			goto err_dma;
-+		data_length = rc;
-+		request->num_sge = extract.nr_sge;
-+		*_remaining_data_length -= data_length;
-+	} else {
-+		data_length = 0;
-+		request->num_sge = 1;
++/**
++ * netfs_extract_user_iter - Extract the pages from a user iterator into a bvec
++ * @orig: The original iterator
++ * @orig_len: The amount of iterator to copy
++ * @new: The iterator to be set up
++ * @extraction_flags: Flags to qualify the request
++ *
++ * Extract the page fragments from the given amount of the source iterator and
++ * build up a second iterator that refers to all of those bits.  This allows
++ * the original iterator to disposed of.
++ *
++ * @extraction_flags can have ITER_ALLOW_P2PDMA set to request peer-to-peer DMA be
++ * allowed on the pages extracted.
++ *
++ * On success, the number of elements in the bvec is returned, the original
++ * iterator will have been advanced by the amount extracted.
++ *
++ * The iov_iter_extract_mode() function should be used to query how cleanup
++ * should be performed.
++ */
++ssize_t netfs_extract_user_iter(struct iov_iter *orig, size_t orig_len,
++				struct iov_iter *new,
++				iov_iter_extraction_t extraction_flags)
++{
++	struct bio_vec *bv = NULL;
++	struct page **pages;
++	unsigned int cur_npages;
++	unsigned int max_pages;
++	unsigned int npages = 0;
++	unsigned int i;
++	ssize_t ret;
++	size_t count = orig_len, offset, len;
++	size_t bv_size, pg_size;
++
++	if (WARN_ON_ONCE(!iter_is_ubuf(orig) && !iter_is_iovec(orig)))
++		return -EIO;
++
++	max_pages = iov_iter_npages(orig, INT_MAX);
++	bv_size = array_size(max_pages, sizeof(*bv));
++	bv = kvmalloc(bv_size, GFP_KERNEL);
++	if (!bv)
++		return -ENOMEM;
++
++	/* Put the page list at the end of the bvec list storage.  bvec
++	 * elements are larger than page pointers, so as long as we work
++	 * 0->last, we should be fine.
++	 */
++	pg_size = array_size(max_pages, sizeof(*pages));
++	pages = (void *)bv + bv_size - pg_size;
++
++	while (count && npages < max_pages) {
++		ret = iov_iter_extract_pages(orig, &pages, count,
++					     max_pages - npages, extraction_flags,
++					     &offset);
++		if (ret < 0) {
++			pr_err("Couldn't get user pages (rc=%zd)\n", ret);
++			break;
++		}
++
++		if (ret > count) {
++			pr_err("get_pages rc=%zd more than %zu\n", ret, count);
++			break;
++		}
++
++		count -= ret;
++		ret += offset;
++		cur_npages = DIV_ROUND_UP(ret, PAGE_SIZE);
++
++		if (npages + cur_npages > max_pages) {
++			pr_err("Out of bvec array capacity (%u vs %u)\n",
++			       npages + cur_npages, max_pages);
++			break;
++		}
++
++		for (i = 0; i < cur_npages; i++) {
++			len = ret > PAGE_SIZE ? PAGE_SIZE : ret;
++			bv[npages + i].bv_page	 = *pages++;
++			bv[npages + i].bv_offset = offset;
++			bv[npages + i].bv_len	 = len - offset;
++			ret -= len;
++			offset = 0;
++		}
++
++		npages += cur_npages;
 +	}
- 
- 	/* Fill in the packet header */
- 	packet = smbd_request_payload(request);
-@@ -902,7 +926,7 @@ static int smbd_post_send_sgl(struct smbd_connection *info,
- 	else
- 		packet->data_offset = cpu_to_le32(24);
- 	packet->data_length = cpu_to_le32(data_length);
--	packet->remaining_data_length = cpu_to_le32(remaining_data_length);
-+	packet->remaining_data_length = cpu_to_le32(*_remaining_data_length);
- 	packet->padding = 0;
- 
- 	log_outgoing(INFO, "credits_requested=%d credits_granted=%d data_offset=%d data_length=%d remaining_data_length=%d\n",
-@@ -918,7 +942,6 @@ static int smbd_post_send_sgl(struct smbd_connection *info,
- 	if (!data_length)
- 		header_length = offsetof(struct smbd_data_transfer, padding);
- 
--	request->num_sge = 1;
- 	request->sge[0].addr = ib_dma_map_single(info->id->device,
- 						 (void *)packet,
- 						 header_length,
-@@ -932,23 +955,6 @@ static int smbd_post_send_sgl(struct smbd_connection *info,
- 	request->sge[0].length = header_length;
- 	request->sge[0].lkey = info->pd->local_dma_lkey;
- 
--	/* Fill in the packet data payload */
--	num_sgs = sgl ? sg_nents(sgl) : 0;
--	for_each_sg(sgl, sg, num_sgs, i) {
--		request->sge[i+1].addr =
--			ib_dma_map_page(info->id->device, sg_page(sg),
--			       sg->offset, sg->length, DMA_TO_DEVICE);
--		if (ib_dma_mapping_error(
--				info->id->device, request->sge[i+1].addr)) {
--			rc = -EIO;
--			request->sge[i+1].addr = 0;
--			goto err_dma;
--		}
--		request->sge[i+1].length = sg->length;
--		request->sge[i+1].lkey = info->pd->local_dma_lkey;
--		request->num_sge++;
--	}
--
- 	rc = smbd_post_send(info, request);
- 	if (!rc)
- 		return 0;
-@@ -987,8 +993,10 @@ static int smbd_post_send_sgl(struct smbd_connection *info,
-  */
- static int smbd_post_send_empty(struct smbd_connection *info)
- {
-+	int remaining_data_length = 0;
 +
- 	info->count_send_empty++;
--	return smbd_post_send_sgl(info, NULL, 0, 0);
-+	return smbd_post_send_iter(info, NULL, &remaining_data_length);
- }
++	iov_iter_bvec(new, orig->data_source, bv, npages, orig_len - count);
++	return npages;
++}
++EXPORT_SYMBOL_GPL(netfs_extract_user_iter);
+diff --git a/include/linux/netfs.h b/include/linux/netfs.h
+index 4c76ddfb6a67..b11a84f6c32b 100644
+--- a/include/linux/netfs.h
++++ b/include/linux/netfs.h
+@@ -17,6 +17,7 @@
+ #include <linux/workqueue.h>
+ #include <linux/fs.h>
+ #include <linux/pagemap.h>
++#include <linux/uio.h>
  
- /*
-@@ -1933,42 +1941,6 @@ int smbd_recv(struct smbd_connection *info, struct msghdr *msg)
- 	return rc;
- }
+ enum netfs_sreq_ref_trace;
  
--/*
-- * Send the contents of an iterator
-- * @iter: The iterator to send
-- * @_remaining_data_length: remaining data to send in this payload
-- */
--static int smbd_post_send_iter(struct smbd_connection *info,
--			       struct iov_iter *iter,
--			       int *_remaining_data_length)
--{
--	struct scatterlist sgl[SMBDIRECT_MAX_SEND_SGE - 1];
--	unsigned int max_payload = info->max_send_size - sizeof(struct smbd_data_transfer);
--	ssize_t rc;
--
--	/* We're not expecting a user-backed iter */
--	WARN_ON(iov_iter_extract_will_pin(iter));
--
--	do {
--		struct sg_table sgtable = { .sgl = sgl };
--		size_t maxlen = min_t(size_t, *_remaining_data_length, max_payload);
--
--		sg_init_table(sgtable.sgl, ARRAY_SIZE(sgl));
--		rc = netfs_extract_iter_to_sg(iter, maxlen,
--					      &sgtable, ARRAY_SIZE(sgl), 0);
--		if (rc < 0)
--			break;
--		if (WARN_ON_ONCE(sgtable.nents == 0))
--			return -EIO;
--
--		sg_mark_end(&sgl[sgtable.nents - 1]);
--		*_remaining_data_length -= rc;
--		rc = smbd_post_send_sgl(info, sgl, rc, *_remaining_data_length);
--	} while (rc == 0 && iov_iter_count(iter) > 0);
--
--	return rc;
--}
--
- /*
-  * Send data to transport
-  * Each rqst is transported as a SMBDirect payload
-@@ -2129,10 +2101,10 @@ static void destroy_mr_list(struct smbd_connection *info)
- 	cancel_work_sync(&info->mr_recovery_work);
- 	list_for_each_entry_safe(mr, tmp, &info->mr_list, list) {
- 		if (mr->state == MR_INVALIDATED)
--			ib_dma_unmap_sg(info->id->device, mr->sgl,
--				mr->sgl_count, mr->dir);
-+			ib_dma_unmap_sg(info->id->device, mr->sgt.sgl,
-+				mr->sgt.nents, mr->dir);
- 		ib_dereg_mr(mr->mr);
--		kfree(mr->sgl);
-+		kfree(mr->sgt.sgl);
- 		kfree(mr);
- 	}
- }
-@@ -2167,11 +2139,10 @@ static int allocate_mr_list(struct smbd_connection *info)
- 				    info->mr_type, info->max_frmr_depth);
- 			goto out;
- 		}
--		smbdirect_mr->sgl = kcalloc(
--					info->max_frmr_depth,
--					sizeof(struct scatterlist),
--					GFP_KERNEL);
--		if (!smbdirect_mr->sgl) {
-+		smbdirect_mr->sgt.sgl = kcalloc(info->max_frmr_depth,
-+						sizeof(struct scatterlist),
-+						GFP_KERNEL);
-+		if (!smbdirect_mr->sgt.sgl) {
- 			log_rdma_mr(ERR, "failed to allocate sgl\n");
- 			ib_dereg_mr(smbdirect_mr->mr);
- 			goto out;
-@@ -2190,7 +2161,7 @@ static int allocate_mr_list(struct smbd_connection *info)
+@@ -296,6 +297,9 @@ void netfs_get_subrequest(struct netfs_io_subrequest *subreq,
+ void netfs_put_subrequest(struct netfs_io_subrequest *subreq,
+ 			  bool was_async, enum netfs_sreq_ref_trace what);
+ void netfs_stats_show(struct seq_file *);
++ssize_t netfs_extract_user_iter(struct iov_iter *orig, size_t orig_len,
++				struct iov_iter *new,
++				iov_iter_extraction_t extraction_flags);
  
- 	list_for_each_entry_safe(smbdirect_mr, tmp, &info->mr_list, list) {
- 		ib_dereg_mr(smbdirect_mr->mr);
--		kfree(smbdirect_mr->sgl);
-+		kfree(smbdirect_mr->sgt.sgl);
- 		kfree(smbdirect_mr);
- 	}
- 	return -ENOMEM;
-@@ -2244,22 +2215,20 @@ static struct smbd_mr *get_mr(struct smbd_connection *info)
- 
- /*
-  * Transcribe the pages from an iterator into an MR scatterlist.
-- * @iter: The iterator to transcribe
-- * @_remaining_data_length: remaining data to send in this payload
-  */
- static int smbd_iter_to_mr(struct smbd_connection *info,
- 			   struct iov_iter *iter,
--			   struct scatterlist *sgl,
--			   unsigned int num_pages)
-+			   struct sg_table *sgt,
-+			   unsigned int max_sg)
- {
--	struct sg_table sgtable = { .sgl = sgl };
- 	int ret;
- 
--	sg_init_table(sgl, num_pages);
-+	memset(sgt->sgl, 0, max_sg * sizeof(struct scatterlist));
- 
--	ret = netfs_extract_iter_to_sg(iter, iov_iter_count(iter),
--				       &sgtable, num_pages, 0);
-+	ret = netfs_extract_iter_to_sg(iter, iov_iter_count(iter), sgt, max_sg, 0);
- 	WARN_ON(ret < 0);
-+	if (sgt->nents > 0)
-+		sg_mark_end(&sgt->sgl[sgt->nents - 1]);
- 	return ret;
- }
- 
-@@ -2296,25 +2265,27 @@ struct smbd_mr *smbd_register_mr(struct smbd_connection *info,
- 	dir = writing ? DMA_FROM_DEVICE : DMA_TO_DEVICE;
- 	smbdirect_mr->dir = dir;
- 	smbdirect_mr->need_invalidate = need_invalidate;
--	smbdirect_mr->sgl_count = num_pages;
-+	smbdirect_mr->sgt.nents = 0;
-+	smbdirect_mr->sgt.orig_nents = 0;
- 
--	log_rdma_mr(INFO, "num_pages=0x%x count=0x%zx\n",
--		    num_pages, iov_iter_count(iter));
--	smbd_iter_to_mr(info, iter, smbdirect_mr->sgl, num_pages);
-+	log_rdma_mr(INFO, "num_pages=0x%x count=0x%zx depth=%u\n",
-+		    num_pages, iov_iter_count(iter), info->max_frmr_depth);
-+	smbd_iter_to_mr(info, iter, &smbdirect_mr->sgt, info->max_frmr_depth);
- 
--	rc = ib_dma_map_sg(info->id->device, smbdirect_mr->sgl, num_pages, dir);
-+	rc = ib_dma_map_sg(info->id->device, smbdirect_mr->sgt.sgl,
-+			   smbdirect_mr->sgt.nents, dir);
- 	if (!rc) {
- 		log_rdma_mr(ERR, "ib_dma_map_sg num_pages=%x dir=%x rc=%x\n",
- 			num_pages, dir, rc);
- 		goto dma_map_error;
- 	}
- 
--	rc = ib_map_mr_sg(smbdirect_mr->mr, smbdirect_mr->sgl, num_pages,
--		NULL, PAGE_SIZE);
--	if (rc != num_pages) {
-+	rc = ib_map_mr_sg(smbdirect_mr->mr, smbdirect_mr->sgt.sgl,
-+			  smbdirect_mr->sgt.nents, NULL, PAGE_SIZE);
-+	if (rc != smbdirect_mr->sgt.nents) {
- 		log_rdma_mr(ERR,
--			"ib_map_mr_sg failed rc = %d num_pages = %x\n",
--			rc, num_pages);
-+			"ib_map_mr_sg failed rc = %d nents = %x\n",
-+			rc, smbdirect_mr->sgt.nents);
- 		goto map_mr_error;
- 	}
- 
-@@ -2346,8 +2317,8 @@ struct smbd_mr *smbd_register_mr(struct smbd_connection *info,
- 
- 	/* If all failed, attempt to recover this MR by setting it MR_ERROR*/
- map_mr_error:
--	ib_dma_unmap_sg(info->id->device, smbdirect_mr->sgl,
--		smbdirect_mr->sgl_count, smbdirect_mr->dir);
-+	ib_dma_unmap_sg(info->id->device, smbdirect_mr->sgt.sgl,
-+			smbdirect_mr->sgt.nents, smbdirect_mr->dir);
- 
- dma_map_error:
- 	smbdirect_mr->state = MR_ERROR;
-@@ -2414,8 +2385,8 @@ int smbd_deregister_mr(struct smbd_mr *smbdirect_mr)
- 
- 	if (smbdirect_mr->state == MR_INVALIDATED) {
- 		ib_dma_unmap_sg(
--			info->id->device, smbdirect_mr->sgl,
--			smbdirect_mr->sgl_count,
-+			info->id->device, smbdirect_mr->sgt.sgl,
-+			smbdirect_mr->sgt.nents,
- 			smbdirect_mr->dir);
- 		smbdirect_mr->state = MR_READY;
- 		if (atomic_inc_return(&info->mr_ready_count) == 1)
-diff --git a/fs/cifs/smbdirect.h b/fs/cifs/smbdirect.h
-index be2cf18b7fec..83f239f376f0 100644
---- a/fs/cifs/smbdirect.h
-+++ b/fs/cifs/smbdirect.h
-@@ -288,8 +288,7 @@ struct smbd_mr {
- 	struct list_head	list;
- 	enum mr_state		state;
- 	struct ib_mr		*mr;
--	struct scatterlist	*sgl;
--	int			sgl_count;
-+	struct sg_table		sgt;
- 	enum dma_data_direction	dir;
- 	union {
- 		struct ib_reg_wr	wr;
+ /**
+  * netfs_inode - Get the netfs inode context from the inode
 
