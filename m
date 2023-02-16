@@ -2,122 +2,149 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DC2BBC636CC
-	for <linux-block@archiver.kernel.org>; Thu, 16 Feb 2023 19:04:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B8F4CC636CC
+	for <linux-block@archiver.kernel.org>; Thu, 16 Feb 2023 19:10:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229592AbjBPTEj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 16 Feb 2023 14:04:39 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59358 "EHLO
+        id S229516AbjBPTKj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 16 Feb 2023 14:10:39 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35602 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229507AbjBPTEi (ORCPT
+        with ESMTP id S229450AbjBPTKi (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 16 Feb 2023 14:04:38 -0500
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3BF825036C;
-        Thu, 16 Feb 2023 11:04:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=Yawla20fuhgFU+ZM3/0+0yPtywAw64xLIG63jDmyTgk=; b=WJ5DhKnMSiKnsiY5Co43FPaRqa
-        rM3DttQzJiela82Afuc+NxA9x76rhFPUEDEvauyhgRZVOYh/36ZefNavqhAMXeEJLnC8w1LsV9ZJz
-        wnuQpdz3Ox4d6nWawtAb/YGlYdRYrZeLtv8SHw3odjH0WXM1SqTfnXyVx8+ZdAXMB69xSJxE/hWCq
-        tosiooAHynOPpDiriNLCJ32QnxlOF6cYpYT22+DYUMaMjtlJUn4hoLKkn/Q+urGyU18zVThHpN2l7
-        EJxmwN3IPgEtPxeyhuCmNjVaOTtU9EseAv3bdUV0KMtWtDcgrBRm5IhK8PGsq6o1l/8WhSy41dWt5
-        pQmdTPsA==;
-Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1pSjYO-008e70-Gb; Thu, 16 Feb 2023 19:04:24 +0000
-Date:   Thu, 16 Feb 2023 19:04:24 +0000
-From:   Matthew Wilcox <willy@infradead.org>
-To:     Mikulas Patocka <mpatocka@redhat.com>
-Cc:     snitzer@kernel.org, Yang Shi <shy828301@gmail.com>,
-        mgorman@techsingularity.net, agk@redhat.com, dm-devel@redhat.com,
-        akpm@linux-foundation.org, linux-block@vger.kernel.org,
-        linux-mm@kvack.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] dm-crypt: allocate compound pages if possible
-Message-ID: <Y+5+OKbeTO2d9TsH@casper.infradead.org>
-References: <alpine.LRH.2.21.2302161245210.18393@file01.intranet.prod.int.rdu2.redhat.com>
+        Thu, 16 Feb 2023 14:10:38 -0500
+Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83EB02A6D7;
+        Thu, 16 Feb 2023 11:10:37 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1676574637; x=1708110637;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=RG6FE89xEMZ8fRCJpypPavShNTygUNbwQaaGLRFV/uI=;
+  b=Bq3LOZohyPrb/npHssKp7OL1HmPrkET98//tn3fb0uwejotZmqCUuseK
+   Juq4nj6EcW/NdDP1mZgHWU/8TL++4oFgJkrIAlSKKsv1x3jkU5WVsIZX5
+   LJi3soB2vEuxBcAQNI7CP8lkp+AOTjs81PvffLuecP++1BAf0NGpv6QLo
+   ri+itLAS4ZJu/zOQp76NYrTV8K69lYsx+EbeIH33kcYdlcD8xZPfYCuHL
+   HmLQ4Nw70LSYKv7c5Gdv71+cX+HlsPbfi3SaHXaFIOFighcmvbzlOOvW6
+   +YOAndS/FXRp2B3CAyYWaxoALFzGSQc5BnnIiMyF3ZhHPLUGyBDHsBX9s
+   A==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10623"; a="331812023"
+X-IronPort-AV: E=Sophos;i="5.97,302,1669104000"; 
+   d="scan'208";a="331812023"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Feb 2023 11:10:37 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10623"; a="734022099"
+X-IronPort-AV: E=Sophos;i="5.97,302,1669104000"; 
+   d="scan'208";a="734022099"
+Received: from lkp-server01.sh.intel.com (HELO 4455601a8d94) ([10.239.97.150])
+  by fmsmga008.fm.intel.com with ESMTP; 16 Feb 2023 11:10:35 -0800
+Received: from kbuild by 4455601a8d94 with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1pSjeM-000AS9-2d;
+        Thu, 16 Feb 2023 19:10:34 +0000
+Date:   Fri, 17 Feb 2023 03:09:36 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
+Cc:     oe-kbuild-all@lists.linux.dev, hch@infradead.org,
+        Jens Axboe <axboe@kernel.dk>, stable@vger.kernel.org
+Subject: Re: [PATCH 3/4] brd: only preload radix tree if we're using a
+ blocking gfp mask
+Message-ID: <202302170236.SynZo1Bx-lkp@intel.com>
+References: <20230216151918.319585-4-axboe@kernel.dk>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <alpine.LRH.2.21.2302161245210.18393@file01.intranet.prod.int.rdu2.redhat.com>
+In-Reply-To: <20230216151918.319585-4-axboe@kernel.dk>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Feb 16, 2023 at 12:47:08PM -0500, Mikulas Patocka wrote:
-> +		while (order > 0) {
-> +			page = alloc_pages(gfp_mask
-> +				| __GFP_NOMEMALLOC | __GFP_NORETRY | __GFP_NOWARN, order);
+Hi Jens,
 
-... | __GFP_COMP
+I love your patch! Perhaps something to improve:
 
->  		page = mempool_alloc(&cc->page_pool, gfp_mask);
->  		if (!page) {
->  			crypt_free_buffer_pages(cc, clone);
->  			bio_put(clone);
->  			gfp_mask |= __GFP_DIRECT_RECLAIM;
-> +			order = 0;
->  			goto retry;
->  		}
->  
-> -		len = (remaining_size > PAGE_SIZE) ? PAGE_SIZE : remaining_size;
-> -
-> -		bio_add_page(clone, page, len, 0);
-> +have_pages:
-> +		page->compound_order = order;
+[auto build test WARNING on v6.2-rc8]
+[also build test WARNING on linus/master next-20230216]
+[cannot apply to axboe-block/for-next]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-No.  You'll corrupt the next page if page is order-0, which it is if it
-came from the mempool.  Also we've deleted page->compound_order in -next
-so you can't make this mistake.  Using __GFP_COMP will set this field
-for you, so you can just drop this line.
+url:    https://github.com/intel-lab-lkp/linux/commits/Jens-Axboe/brd-return-0-error-from-brd_insert_page/20230216-234430
+patch link:    https://lore.kernel.org/r/20230216151918.319585-4-axboe%40kernel.dk
+patch subject: [PATCH 3/4] brd: only preload radix tree if we're using a blocking gfp mask
+config: m68k-allyesconfig (https://download.01.org/0day-ci/archive/20230217/202302170236.SynZo1Bx-lkp@intel.com/config)
+compiler: m68k-linux-gcc (GCC) 12.1.0
+reproduce (this is a W=1 build):
+        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+        chmod +x ~/bin/make.cross
+        # https://github.com/intel-lab-lkp/linux/commit/237074d417b50a21f2bed5585ceebe8398535b1a
+        git remote add linux-review https://github.com/intel-lab-lkp/linux
+        git fetch --no-tags linux-review Jens-Axboe/brd-return-0-error-from-brd_insert_page/20230216-234430
+        git checkout 237074d417b50a21f2bed5585ceebe8398535b1a
+        # save the config file
+        mkdir build_dir && cp config build_dir/.config
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.1.0 make.cross W=1 O=build_dir ARCH=m68k olddefconfig
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.1.0 make.cross W=1 O=build_dir ARCH=m68k SHELL=/bin/bash drivers/block/
 
-> -		remaining_size -= len;
-> +		for (o = 0; o < 1U << order; o++) {
-> +			unsigned len = min((unsigned)PAGE_SIZE, remaining_size);
-> +			bio_add_page(clone, page, len, 0);
-> +			remaining_size -= len;
-> +			page++;
+If you fix the issue, kindly add following tag where applicable
+| Reported-by: kernel test robot <lkp@intel.com>
+| Link: https://lore.kernel.org/oe-kbuild-all/202302170236.SynZo1Bx-lkp@intel.com/
 
-You can add multiple pages at once, whether they're compound or not.  So
-replace this entire loop with:
+All warnings (new ones prefixed by >>):
 
-		bio_add_page(clone, page, remaining_size, 0);
+   drivers/block/brd.c: In function 'brd_insert_page':
+>> drivers/block/brd.c:87:13: warning: variable 'ret' set but not used [-Wunused-but-set-variable]
+      87 |         int ret = 0;
+         |             ^~~
 
-> @@ -1711,10 +1732,23 @@ static void crypt_free_buffer_pages(stru
->  {
->  	struct bio_vec *bv;
->  	struct bvec_iter_all iter_all;
-> +	unsigned skip_entries = 0;
->  
->  	bio_for_each_segment_all(bv, clone, iter_all) {
-> -		BUG_ON(!bv->bv_page);
-> -		mempool_free(bv->bv_page, &cc->page_pool);
-> +		unsigned order;
-> +		struct page *page = bv->bv_page;
-> +		BUG_ON(!page);
-> +		if (skip_entries) {
-> +			skip_entries--;
-> +			continue;
-> +		}
-> +		order = page->compound_order;
-> +		if (order) {
-> +			__free_pages(page, order);
-> +			skip_entries = (1U << order) - 1;
-> +		} else {
-> +			mempool_free(page, &cc->page_pool);
-> +		}
 
-You can simplify this by using the folio code.
+vim +/ret +87 drivers/block/brd.c
 
-	struct folio_iter fi;
+    79	
+    80	/*
+    81	 * Insert a new page for a given sector, if one does not already exist.
+    82	 */
+    83	static int brd_insert_page(struct brd_device *brd, sector_t sector, gfp_t gfp)
+    84	{
+    85		pgoff_t idx;
+    86		struct page *page;
+  > 87		int ret = 0;
+    88	
+    89		page = brd_lookup_page(brd, sector);
+    90		if (page)
+    91			return 0;
+    92	
+    93		page = alloc_page(gfp | __GFP_ZERO | __GFP_HIGHMEM);
+    94		if (!page)
+    95			return -ENOMEM;
+    96	
+    97		if (gfpflags_allow_blocking(gfp) && radix_tree_preload(gfp)) {
+    98			__free_page(page);
+    99			return -ENOMEM;
+   100		}
+   101	
+   102		spin_lock(&brd->brd_lock);
+   103		idx = sector >> PAGE_SECTORS_SHIFT;
+   104		page->index = idx;
+   105		if (radix_tree_insert(&brd->brd_pages, idx, page)) {
+   106			__free_page(page);
+   107			page = radix_tree_lookup(&brd->brd_pages, idx);
+   108			if (!page)
+   109				ret = -ENOMEM;
+   110			else if (page->index != idx)
+   111				ret = -EIO;
+   112		} else {
+   113			brd->brd_nr_pages++;
+   114		}
+   115		spin_unlock(&brd->brd_lock);
+   116	
+   117		radix_tree_preload_end();
+   118		return 0;
+   119	}
+   120	
 
-	bio_for_each_folio_all(fi, bio) {
-		if (folio_test_large(folio))
-			folio_put(folio);
-		else
-			mempool_free(&folio->page, &cc->page_pool);
-	}
-
-(further work would actually convert this driver to use folios instead
-of pages)
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests
