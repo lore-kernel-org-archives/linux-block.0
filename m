@@ -2,214 +2,173 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77959C636CC
-	for <linux-block@archiver.kernel.org>; Thu, 16 Feb 2023 11:11:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 901B9C636CC
+	for <linux-block@archiver.kernel.org>; Thu, 16 Feb 2023 11:26:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229667AbjBPLL2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 16 Feb 2023 06:11:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35552 "EHLO
+        id S229582AbjBPL0r (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 16 Feb 2023 06:26:47 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47448 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229595AbjBPLL1 (ORCPT
+        with ESMTP id S229812AbjBPL0q (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 16 Feb 2023 06:11:27 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C9ED37736
-        for <linux-block@vger.kernel.org>; Thu, 16 Feb 2023 03:10:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1676545830;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=SJhAWHr2nEDSYk8AbF0GzJo0wn08EehHZ5PTcw3V4KU=;
-        b=Mdn+ERiUjjCzBZTNmKCS54/KAm+6EaRz3PM7HjfFC5P/qIjHO5p+0ShVTGCdfZNjwqG8h/
-        wRdXZc0lWGi0N7gEzGd82wUdPJOqpeYtEQwlAYWjrOjGVjv4TB4DPkfa7IX+66/zn5F2OT
-        sX2J4kGqqAbbpDuebz1HIFymKimALrw=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-487-p6N9Ol8tO7ivXDcDIlAp1A-1; Thu, 16 Feb 2023 06:10:28 -0500
-X-MC-Unique: p6N9Ol8tO7ivXDcDIlAp1A-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 8EB692999B39;
-        Thu, 16 Feb 2023 11:10:28 +0000 (UTC)
-Received: from T590 (ovpn-8-16.pek2.redhat.com [10.72.8.16])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id CC1C62166B30;
-        Thu, 16 Feb 2023 11:10:25 +0000 (UTC)
-Date:   Thu, 16 Feb 2023 19:10:20 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: Re: [PATCH 1/2] blktests/src: add mini ublk source code
-Message-ID: <Y+4PHBqOfAJwSKcZ@T590>
-References: <20230216030134.1368607-1-ming.lei@redhat.com>
- <20230216030134.1368607-2-ming.lei@redhat.com>
- <20230216081938.oyc6ys5zo3bayrqw@shindev>
- <Y+3wGE9IiHIEECvO@T590>
+        Thu, 16 Feb 2023 06:26:46 -0500
+Received: from mail-wm1-x331.google.com (mail-wm1-x331.google.com [IPv6:2a00:1450:4864:20::331])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6E6F115546
+        for <linux-block@vger.kernel.org>; Thu, 16 Feb 2023 03:26:45 -0800 (PST)
+Received: by mail-wm1-x331.google.com with SMTP id he5so1309224wmb.3
+        for <linux-block@vger.kernel.org>; Thu, 16 Feb 2023 03:26:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=metaspace-dk.20210112.gappssmtp.com; s=20210112;
+        h=mime-version:message-id:in-reply-to:date:subject:cc:to:from
+         :user-agent:references:from:to:cc:subject:date:message-id:reply-to;
+        bh=2YC56It+6c6cuIQlqyCwu+Mv01RIdVHCg8Jq7MqNrEY=;
+        b=zf0NZ5hVF7V5ziGN0v+GovqEmV5NNS1D/l6yQx0Nw1OhQlfUWF1a1gMOYyus5uH0IY
+         +FEHzfxv6BYcPI6FRgmc8QPTD+kc8IJW4GlwdVNyoKt/zKZA7bHESuEFVkYz7tHNqOSz
+         fkI3haZaUz9WwmV0Mb1gsaPSClVQ0pF1HUSVkCCOFilt3PSwmtkrHiWbUPHdZAfqEr54
+         58XoXtVzCOrrQVTs3l7FWPfYpwh8UDniLT5i9aQ2mmc5bJPDzsEmdjh5ytXnTN6yMNh9
+         3YwtESby//OZET0JEPxr1j+7K13iMaeEscKsJQcXVrgnv6ePxeATDAZ18nL0Hk8T8a6W
+         05rQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=mime-version:message-id:in-reply-to:date:subject:cc:to:from
+         :user-agent:references:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=2YC56It+6c6cuIQlqyCwu+Mv01RIdVHCg8Jq7MqNrEY=;
+        b=5bxJ7UClSF9fqvu2XkToTsFHfsjbp6TsyrFw/8S3qmvE9K2JU7NXzOqFPTFekauexo
+         ia29QCyX2PRpyhOF9FgFIW0a+5mST+mXFMmVIf3035MArZg7koxyeShVLF02PTMDJoo3
+         8NhruDLOwN6xjk9UFXoPv6YslWFq6/+fxkVvEXCkf9VGoPAkEAWwjyTKX9sTxHIq8mb6
+         fM6UP6zAd9L8UOV7Iv4GrQsd+RLbcjb39qFXabpoNoDK54uMB4o3h0Ude+BThGlV8JWb
+         WrKL7mhDjw4P5+0HrM1L4J6scIPdBqXT9L9RJjXa7NpuvCg7NAnpEh9uCi3OkGzeiD9i
+         OhMg==
+X-Gm-Message-State: AO0yUKXMjcLraxibnL3c4V5hw5L8i1dXFcRSKMYSuHtS+V8pfvP7r0vC
+        yiMdYtIwc1aR8OBZ60XChUP97w==
+X-Google-Smtp-Source: AK7set83WlDMhLzxvqXV33kCqS6qKAERIiNXs9puX/8ebu+HpZGOfvrTjwzUG9tpvt2iM7ghGLb/kg==
+X-Received: by 2002:a05:600c:a287:b0:3e2:180f:382a with SMTP id hu7-20020a05600ca28700b003e2180f382amr401053wmb.1.1676546803943;
+        Thu, 16 Feb 2023 03:26:43 -0800 (PST)
+Received: from localhost ([194.62.217.2])
+        by smtp.gmail.com with ESMTPSA id l2-20020a1c7902000000b003dd1bd66e0dsm1431083wme.3.2023.02.16.03.26.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 16 Feb 2023 03:26:43 -0800 (PST)
+References: <Y+EWCwqSisu3l0Sz@T590> <Y+Finej8521IDwzV@fedora>
+ <Y+MFAzt0Cx9aetf2@T590> <Y+OSxh2K0/Lf0SAk@fedora> <Y+my03K5MbSSRvQq@T590>
+ <Y+qL9z7rtApszoBf@fedora> <Y+wsj2QqX+HMUJTI@T590>
+ <87bkltrj9x.fsf@metaspace.dk> <Y+4JVgd338R0x1m4@T590>
+User-agent: mu4e 1.9.18; emacs 28.2.50
+From:   Andreas Hindborg <nmi@metaspace.dk>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Stefan Hajnoczi <stefanha@redhat.com>, linux-block@vger.kernel.org,
+        lsf-pc@lists.linux-foundation.org,
+        Liu Xiaodong <xiaodong.liu@intel.com>,
+        Jim Harris <james.r.harris@intel.com>,
+        Hans Holmberg <Hans.Holmberg@wdc.com>,
+        Matias =?utf-8?Q?Bj=C3=B8rling?= <Matias.Bjorling@wdc.com>,
+        "hch@lst.de" <hch@lst.de>,
+        ZiyangZhang <ZiyangZhang@linux.alibaba.com>
+Subject: Re: [LSF/MM/BPF BoF]: extend UBLK to cover real storage hardware
+Date:   Thu, 16 Feb 2023 12:21:32 +0100
+In-reply-to: <Y+4JVgd338R0x1m4@T590>
+Message-ID: <877cwhrgul.fsf@metaspace.dk>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Y+3wGE9IiHIEECvO@T590>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Feb 16, 2023 at 04:58:00PM +0800, Ming Lei wrote:
-> Hi Shinichiro,
-> 
-> Thanks for the review!
-> 
-> On Thu, Feb 16, 2023 at 08:19:39AM +0000, Shinichiro Kawasaki wrote:
-> > Hi Ming, thanks for the patches. It sounds a good idea to extend blktests
-> > coverage to ublk.
-> > 
-> > Regarding the commit title, I suggest this:
-> > 
-> >    src: add mini ublk source codes
-> > 
-> > The word "blktests" can be placed after the word "PATCH" as follows:
-> > 
-> >    [PATCH blktests] src: add mini ublk source codes
-> > 
-> > Please try --subject-prefix="PATCH blktests" option for git format-patch.
-> 
-> OK.
-> 
-> > 
-> > On Feb 16, 2023 / 11:01, Ming Lei wrote:
-> > > Prepare for adding ublk related test:
-> > > 
-> > > 1) ublk delete is sync removal, this way is convenient to
-> > >    blkg/queue/disk instance leak issue
-> > > 
-> > > 2) mini ublk has two builtin target(null, loop), and loop IO is
-> > > handled by io_uring, so we can use ublk to cover part of io_uring
-> > > workloads
-> > > 
-> > > 3) not like loop/nbd, ublk won't pre-allocate/add disk, and always
-> > > add/delete disk dynamically, this way may cover disk plug & unplug
-> > > tests
-> > > 
-> > > 4) ublk specific test given people starts to use it, so better to
-> > > let blktest cover ublk related tests
-> > > 
-> > > Add mini ublk source for test purpose only, which is easy to use:
-> > > 
-> > > ./miniublk add -t {null|loop} [-q nr_queues] [-d depth] [-n dev_id]
-> > > 	 default: nr_queues=2(max 4), depth=128(max 128), dev_id=-1(auto allocation)
-> > > 	 -t loop -f backing_file
-> > > 	 -t null
-> > > ./miniublk del [-n dev_id] [--disk/-d disk_path ] -a
-> > > 	 -a delete all devices, -n delete specified device
-> > > ./miniublk list [-n dev_id] -a
-> > > 	 -a list all devices, -n list specified device, default -a
-> > > 
-> > > ublk depends on liburing 2.2, so allow to ignore ublk build failure
-> > > in case of missing liburing, and we will check if ublk program exits
-> > > inside test.
-> > > 
-> > > Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> > > ---
-> > >  Makefile            |    2 +-
-> > >  src/Makefile        |   13 +-
-> > >  src/ublk/miniublk.c | 1385 +++++++++++++++++++++++++++++++++++++++++++
-> > >  src/ublk/ublk_cmd.h |  278 +++++++++
-> > >  4 files changed, 1674 insertions(+), 4 deletions(-)
-> > >  create mode 100644 src/ublk/miniublk.c
-> > >  create mode 100644 src/ublk/ublk_cmd.h
-> > > 
-> > > diff --git a/Makefile b/Makefile
-> > > index 5a04479..b9bbade 100644
-> > > --- a/Makefile
-> > > +++ b/Makefile
-> > > @@ -2,7 +2,7 @@ prefix ?= /usr/local
-> > >  dest = $(DESTDIR)$(prefix)/blktests
-> > >  
-> > >  all:
-> > > -	$(MAKE) -C src all
-> > > +	$(MAKE) -i -C src all
-> > 
-> > This -i option to ignore errors is applied to all build targets, so it will hide
-> > errors. Instead os ignoring the error, how about checking the liburing version
-> > with pkg-config command? I roughly implemented it as the patch below on top of
-> > your patch. It looks working.
-> > 
-> > diff --git a/src/Makefile b/src/Makefile
-> > index 9bb8da6..c600099 100644
-> > --- a/src/Makefile
-> > +++ b/src/Makefile
-> > @@ -2,6 +2,11 @@ HAVE_C_HEADER = $(shell if echo "\#include <$(1)>" |		\
-> >  		$(CC) -E - > /dev/null 2>&1; then echo "$(2)";	\
-> >  		else echo "$(3)"; fi)
-> >  
-> > +HAVE_PACKAGE_VER = $(shell if pkg-config --atleast-version="$(2)" "$(1)"; \
-> > +			then echo 1; else echo 0; fi)
-> > +
-> > +HAVE_LIBURING := $(call HAVE_PACKAGE_VER,liburing,2.2)
-> 
-> I tried this way, and it fails in case that liburing is built
-> against source tree directly. And liburing2.2 is still a bit new, and even
-> some distributions doesn't package it. I will think about other way
-> for the check.
 
-Looks the following way works:
+Ming Lei <ming.lei@redhat.com> writes:
 
+> On Thu, Feb 16, 2023 at 10:44:02AM +0100, Andreas Hindborg wrote:
+>> 
+>> Hi Ming,
+>> 
+>> Ming Lei <ming.lei@redhat.com> writes:
+>> 
+>> > On Mon, Feb 13, 2023 at 02:13:59PM -0500, Stefan Hajnoczi wrote:
+>> >> On Mon, Feb 13, 2023 at 11:47:31AM +0800, Ming Lei wrote:
+>> >> > On Wed, Feb 08, 2023 at 07:17:10AM -0500, Stefan Hajnoczi wrote:
+>> >> > > On Wed, Feb 08, 2023 at 10:12:19AM +0800, Ming Lei wrote:
+>> >> > > > On Mon, Feb 06, 2023 at 03:27:09PM -0500, Stefan Hajnoczi wrote:
+>> >> > > > > On Mon, Feb 06, 2023 at 11:00:27PM +0800, Ming Lei wrote:
+>> >> > > > > > Hello,
+>> >> > > > > > 
+>> >> > > > > > So far UBLK is only used for implementing virtual block device from
+>> >> > > > > > userspace, such as loop, nbd, qcow2, ...[1].
+>> >> > > > > 
+>> >> > > > > I won't be at LSF/MM so here are my thoughts:
+>> >> > > > 
+>> >> > > > Thanks for the thoughts, :-)
+>> >> > > > 
+>> >> > > > > 
+>> >> > > > > > 
+>> >> > > > > > It could be useful for UBLK to cover real storage hardware too:
+>> >> > > > > > 
+>> >> > > > > > - for fast prototype or performance evaluation
+>> >> > > > > > 
+>> >> > > > > > - some network storages are attached to host, such as iscsi and nvme-tcp,
+>> >> > > > > > the current UBLK interface doesn't support such devices, since it needs
+>> >> > > > > > all LUNs/Namespaces to share host resources(such as tag)
+>> >> > > > > 
+>> >> > > > > Can you explain this in more detail? It seems like an iSCSI or
+>> >> > > > > NVMe-over-TCP initiator could be implemented as a ublk server today.
+>> >> > > > > What am I missing?
+>> >> > > > 
+>> >> > > > The current ublk can't do that yet, because the interface doesn't
+>> >> > > > support multiple ublk disks sharing single host, which is exactly
+>> >> > > > the case of scsi and nvme.
+>> >> > > 
+>> >> > > Can you give an example that shows exactly where a problem is hit?
+>> >> > > 
+>> >> > > I took a quick look at the ublk source code and didn't spot a place
+>> >> > > where it prevents a single ublk server process from handling multiple
+>> >> > > devices.
+>> >> > > 
+>> >> > > Regarding "host resources(such as tag)", can the ublk server deal with
+>> >> > > that in userspace? The Linux block layer doesn't have the concept of a
+>> >> > > "host", that would come in at the SCSI/NVMe level that's implemented in
+>> >> > > userspace.
+>> >> > > 
+>> >> > > I don't understand yet...
+>> >> > 
+>> >> > blk_mq_tag_set is embedded into driver host structure, and referred by queue
+>> >> > via q->tag_set, both scsi and nvme allocates tag in host/queue wide,
+>> >> > that said all LUNs/NSs share host/queue tags, current every ublk
+>> >> > device is independent, and can't shard tags.
+>> >> 
+>> >> Does this actually prevent ublk servers with multiple ublk devices or is
+>> >> it just sub-optimal?
+>> >
+>> > It is former, ublk can't support multiple devices which share single host
+>> > because duplicated tag can be seen in host side, then io is failed.
+>> >
+>> 
+>> I have trouble following this discussion. Why can we not handle multiple
+>> block devices in a single ublk user space process?
+>> 
+>> From this conversation it seems that the limiting factor is allocation
+>> of the tag set of the virtual device in the kernel? But as far as I can
+>> tell, the tag sets are allocated per virtual block device in
+>> `ublk_ctrl_add_dev()`?
+>> 
+>> It seems to me that a single ublk user space process shuld be able to
+>> connect to multiple storage devices (for instance nvme-of) and then
+>> create a ublk device for each namespace, all from a single ublk process.
+>> 
+>> Could you elaborate on why this is not possible?
+>
+> If the multiple storages devices are independent, the current ublk can
+> handle them just fine.
+>
+> But if these storage devices(such as luns in iscsi, or NSs in nvme-tcp)
+> share single host, and use host-wide tagset, the current interface can't
+> work as expected, because tags is shared among all these devices. The
+> current ublk interface needs to be extended for covering this case.
 
-diff --git a/src/Makefile b/src/Makefile
-index 83e8a62..adfd27a 100644
---- a/src/Makefile
-+++ b/src/Makefile
-@@ -2,6 +2,10 @@ HAVE_C_HEADER = $(shell if echo "\#include <$(1)>" |		\
- 		$(CC) -E - > /dev/null 2>&1; then echo "$(2)";	\
- 		else echo "$(3)"; fi)
- 
-+HAVE_C_MACRO = $(shell if echo "#include <$(1)>" | \
-+		$(CC) -E - | grep $(2) > /dev/null 2>&1; then echo 1;	\
-+		else echo 0; fi)
-+
- C_TARGETS := \
- 	loblksize \
- 	loop_change_fd \
-@@ -15,25 +19,30 @@ C_TARGETS := \
- 
- C_MINIUBLK := ublk/miniublk
- 
-+HAVE_LIBURING := $(call HAVE_C_MACRO,liburing.h,IORING_OP_URING_CMD)
-+
- CXX_TARGETS := \
- 	discontiguous-io
- 
-+ifeq ($(HAVE_LIBURING), 1)
-+TARGETS := $(C_TARGETS) $(CXX_TARGETS) $(C_MINIUBLK)
-+else
- TARGETS := $(C_TARGETS) $(CXX_TARGETS)
--ALL_TARGETS := $(TARGETS) $(C_MINIUBLK)
-+endif
- 
- CONFIG_DEFS := $(call HAVE_C_HEADER,linux/blkzoned.h,-DHAVE_LINUX_BLKZONED_H)
- 
- override CFLAGS   := -O2 -Wall -Wshadow $(CFLAGS) $(CONFIG_DEFS)
- override CXXFLAGS := -O2 -std=c++11 -Wall -Wextra -Wshadow -Wno-sign-compare \
- 		     -Werror $(CXXFLAGS) $(CONFIG_DEFS)
--MINIUBLK_FLAGS :=  -D_GNU_SOURCE -lpthread -luring
-+MINIUBLK_FLAGS :=  -D_GNU_SOURCE -lpthread -luring -Iublk
- 
--all: $(ALL_TARGETS)
-+all: $(TARGETS)
- 
- clean:
--	rm -f $(ALL_TARGETS)
-+	rm -f $(TARGETS)
- 
--install: $(ALL_TARGETS)
-+install: $(TARGETS)
- 	install -m755 -d $(dest)
- 	install $(TARGETS) $(dest)
- 
+Thanks for clarifying, that is very helpful.
 
+Follow up question: What would the implications be if one tried to
+expose (through ublk) each nvme namespace of an nvme-of controller with
+an independent tag set? What are the benefits of sharing a tagset across
+all namespaces of a controller?
 
-Thanks, 
-Ming
-
+Best regards,
+Andreas
