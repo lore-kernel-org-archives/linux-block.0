@@ -2,114 +2,100 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26447C636D7
-	for <linux-block@archiver.kernel.org>; Thu, 16 Feb 2023 19:26:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C986C636CC
+	for <linux-block@archiver.kernel.org>; Thu, 16 Feb 2023 19:27:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229493AbjBPT0w (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 16 Feb 2023 14:26:52 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42124 "EHLO
+        id S229650AbjBPT1L (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 16 Feb 2023 14:27:11 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42482 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229482AbjBPT0w (ORCPT
+        with ESMTP id S229475AbjBPT1K (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 16 Feb 2023 14:26:52 -0500
-Received: from mail-il1-x12a.google.com (mail-il1-x12a.google.com [IPv6:2607:f8b0:4864:20::12a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 48CBC4AFEF
-        for <linux-block@vger.kernel.org>; Thu, 16 Feb 2023 11:26:51 -0800 (PST)
-Received: by mail-il1-x12a.google.com with SMTP id t7so1170151ilq.2
-        for <linux-block@vger.kernel.org>; Thu, 16 Feb 2023 11:26:51 -0800 (PST)
+        Thu, 16 Feb 2023 14:27:10 -0500
+Received: from mail-pj1-x1064.google.com (mail-pj1-x1064.google.com [IPv6:2607:f8b0:4864:20::1064])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 12D264DE04
+        for <linux-block@vger.kernel.org>; Thu, 16 Feb 2023 11:27:04 -0800 (PST)
+Received: by mail-pj1-x1064.google.com with SMTP id w20-20020a17090a8a1400b00233d7314c1cso6899395pjn.5
+        for <linux-block@vger.kernel.org>; Thu, 16 Feb 2023 11:27:04 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=eF7xqkWEGWXYZ5g/WDBloEO27/L1B1BR0M13863IeCU=;
-        b=mPKe24OBohhhKZTNI6NqsyjUTaxiIyHQSBYt4YQhMBKEIgE753RMPtdN543fPBEND1
-         rlDlXJb8/VpOH6woEYTkoGKVnbdvdwXJek2kPB7gzUL4UKE4QINCRQWD/L86Yu3bghSE
-         LICBPlbXcCXXA0VlGd8tiNJiRNf5O06dIvl/G33osJ8yp5+A0rNO1wpBpM1oEBOJ3R67
-         EF5pLqiavKlvhzPlObh42CpbWluP5PShj0NNBTnoKMqwpTiehZxFSYhljb0LqS030187
-         vsaPvY7FPJx6tqkGyTWTfI51BNvCP+IW4H5Ghxd1USsp7hkIKNbSr68piQUpYMwU9cgR
-         jQMQ==
+        d=purestorage.com; s=google2022;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ghxJBe9F/gi1ztZfAp08sB8NNLqrampvOT1lwb1dYDw=;
+        b=RRnk5JV7NbvRDKiksh3LzOVGvGQf5jSLCUXimP0xasVFvQBbt+dYIPlwiYDALj62sR
+         b7oJFU9wJ+aIwhKEoJbV7d368R2ybG1Ga+U3tk1V8EkhxhT7Otrl6DTe23NtIhIhUQd1
+         NzDwH2Dv7FkU+ckgJ1T8+pB7WXGh6TaKpEdooDcQeVbhn56B3jIvAitHd1WP/FyVRFe3
+         5hBqUq46vCEIqrHPd0w2IRW5fgdHaZYke8+FBZw4g3aGold5mk8O+WL6xVu5pjgNHIxx
+         s3Rft6Aao4BpQ6Zp32AxraypZ0Xi54fzO9bfssbHnBW/TEZUje7PtOWuVvAx4Jsb0n2H
+         oskA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=eF7xqkWEGWXYZ5g/WDBloEO27/L1B1BR0M13863IeCU=;
-        b=ULKfv72FdTeot3wU5TWY28Q2g0P3MDQWSDedMCFMdatyaP1TrO9/xlLSm5uXrQdfjR
-         zX1a7f88+tU6jyfWbj3IfXqLLQdklRLeeO8bMjp4mxIZZRjvV/s8aSxXbM9zpdpXrEY2
-         KgygxKrgm1kbGm1I/2bCNc9N/0JpbdobcgssAZXwC4flYuSU+qznqlMOADPyhZlfKTp4
-         FeJBMviDxh9nls1osDPhFmI9/DyUSt971veHOcnaxv2wEFOrujNnr014Rj/OnSWtfX50
-         rfWkW2089Bd8mwof0PsYwGmJyrkJ+RaZue780/D5Lzf+uT7zj4iKzNB7I3h2FinjGcjM
-         zBSA==
-X-Gm-Message-State: AO0yUKXtxU1Wx/VsyLbh2urkDAQC1EEWJk7sbgjdcJ6KTOt2fOptU2DK
-        pz63gYamJzZeXB/wF6Ilmx+zfaqfeVu6tOKA
-X-Google-Smtp-Source: AK7set+yJ1uFtOTCeeZ1yUv020QTImWK9/nBG/6Y56w887Nn0Gtqw2AfFcwbUirpfvDMxv2D3i66NA==
-X-Received: by 2002:a05:6e02:180a:b0:314:1579:be2c with SMTP id a10-20020a056e02180a00b003141579be2cmr5936846ilv.0.1676575610542;
-        Thu, 16 Feb 2023 11:26:50 -0800 (PST)
-Received: from [192.168.1.94] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id t3-20020a92ca83000000b00315972e90a2sm176836ilo.64.2023.02.16.11.26.49
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 16 Feb 2023 11:26:49 -0800 (PST)
-Message-ID: <16738d14-6c97-c344-e096-50f4f6cce0e7@kernel.dk>
-Date:   Thu, 16 Feb 2023 12:26:48 -0700
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ghxJBe9F/gi1ztZfAp08sB8NNLqrampvOT1lwb1dYDw=;
+        b=1ogL8Qou9LAOfqhX6fArH0mDLTo7YT+9EGVRWRiskNjb8xZmY79Pw7faG+ye1FNXGm
+         adH7PiF1qlCEsm7jOymV4Ba8dN2gQUrZHg3Eqr+cP7x78LMGj9OIxQ8LbLSoJ1OJ9IcK
+         9rgOh1zPGSMN9TTVR3x9wtu7Gw0H0yzK8OUkTJukW1IN+3eQvDinHdeFapVGq70TMrk1
+         t6JuydKpQwkrtSA0Rs2rfYWlGaNcjJSCeymOjnAfTdZKTkJvWJio1kK2jJqM8TPa17j+
+         lphutSdDO1T4j8QBtxGjXVTwa3WIvZyYGmmlcz8hDUir555PVhRxDaqIcP428x5L1tUL
+         2HOw==
+X-Gm-Message-State: AO0yUKX/fc1FtndC6P1CSeQQzvDZ7fWFkyDGUFBBYS6xW+K63QoZqr2h
+        dUea2yaS7JnnguLPkZ8A6Q+FJsFmgUvKEEjHj5ixDReaiRfQTo834jsiyNDYsHIBRQ==
+X-Google-Smtp-Source: AK7set/tXZ+EgPepRguZedA3khzI9tJlpcxsA1zsmkTgODhTRA/fB376DbygzXK1LBiY2RLtW5OmcNuoVz5S
+X-Received: by 2002:a17:90b:1e49:b0:233:f7a5:9942 with SMTP id pi9-20020a17090b1e4900b00233f7a59942mr7965483pjb.30.1676575623337;
+        Thu, 16 Feb 2023 11:27:03 -0800 (PST)
+Received: from c7-smtp.dev.purestorage.com ([2620:125:9007:320:7:32:106:0])
+        by smtp-relay.gmail.com with ESMTPS id l4-20020a17090aaa8400b0023413f68b7esm123360pjq.7.2023.02.16.11.27.03
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 16 Feb 2023 11:27:03 -0800 (PST)
+X-Relaying-Domain: purestorage.com
+Received: from dev-ushankar.dev.purestorage.com (dev-ushankar.dev.purestorage.com [10.7.70.36])
+        by c7-smtp.dev.purestorage.com (Postfix) with ESMTP id 7857C220FA;
+        Thu, 16 Feb 2023 12:27:02 -0700 (MST)
+Received: by dev-ushankar.dev.purestorage.com (Postfix, from userid 1557716368)
+        id 734D2E4068D; Thu, 16 Feb 2023 12:27:02 -0700 (MST)
+Date:   Thu, 16 Feb 2023 12:27:02 -0700
+From:   Uday Shankar <ushankar@purestorage.com>
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Jens Axboe <axboe@kernel.dk>, Alasdair Kergon <agk@redhat.com>,
+        Mike Snitzer <snitzer@kernel.org>, linux-block@vger.kernel.org,
+        dm-devel@redhat.com
+Subject: Re: [PATCH] blk-mq: enforce op-specific segment limits in
+ blk_insert_cloned_request
+Message-ID: <20230216192702.GA801590@dev-ushankar.dev.purestorage.com>
+References: <20230215201507.494152-1-ushankar@purestorage.com>
+ <Y+3IoOd02iFGNLnC@infradead.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.2
-Content-Language: en-US
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From:   Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Block fix for 6.2-final
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Y+3IoOd02iFGNLnC@infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Linus,
+On Wed, Feb 15, 2023 at 10:09:36PM -0800, Christoph Hellwig wrote:
+> I'd just remove the debug check entirely
 
-Just a few NVMe fixes that should go into the 6.2 release, adding a
-quirk and fixing two issues introduced in this release:
+Older kernels have these checks in a separate function called
+blk_cloned_rq_check_limits, which carries the following comment:
 
-- NVMe pull request via Christoph:
-	- Always return an ERR_PTR from nvme_pci_alloc_dev (Irvin Cote)
-	- Add bogus ID quirk for ADATA SX6000PNP (Daniel Wagner)
-	- Set the DMA mask earlier (Christoph Hellwig)
+/**
+ * blk_cloned_rq_check_limits - Helper function to check a cloned request
+ *                              for the new queue limits
+ * @q:  the queue
+ * @rq: the request being checked
+ *
+ * Description:
+ *    @rq may have been made based on weaker limitations of upper-level queues
+ *    in request stacking drivers, and it may violate the limitation of @q.
+ *    Since the block layer and the underlying device driver trust @rq
+ *    after it is inserted to @q, it should be checked against @q before
+ *    the insertion using this generic function.
+ *
+ *    Request stacking drivers like request-based dm may change the queue
+ *    limits when retrying requests on other queues. Those requests need
+ *    to be checked against the new queue limits again during dispatch.
+ */.
 
-Please pull!
-
-
-The following changes since commit 38c33ece232019c5b18b4d5ec0254807cac06b7c:
-
-  Merge tag 'nvme-6.2-2023-02-09' of git://git.infradead.org/nvme into block-6.2 (2023-02-09 08:12:06 -0700)
-
-are available in the Git repository at:
-
-  git://git.kernel.dk/linux.git tags/block-6.2-2023-02-16
-
-for you to fetch changes up to 9a28b92cc21e8445c25b18e46f41634539938a91:
-
-  Merge tag 'nvme-6.2-2023-02-15' of git://git.infradead.org/nvme into block-6.2 (2023-02-15 13:47:27 -0700)
-
-----------------------------------------------------------------
-block-6.2-2023-02-16
-
-----------------------------------------------------------------
-Christoph Hellwig (1):
-      nvme-pci: set the DMA mask earlier
-
-Daniel Wagner (1):
-      nvme-pci: add bogus ID quirk for ADATA SX6000PNP
-
-Irvin Cote (1):
-      nvme-pci: always return an ERR_PTR from nvme_pci_alloc_dev
-
-Jens Axboe (1):
-      Merge tag 'nvme-6.2-2023-02-15' of git://git.infradead.org/nvme into block-6.2
-
- drivers/nvme/host/pci.c | 20 ++++++++++----------
- 1 file changed, 10 insertions(+), 10 deletions(-)
-
--- 
-Jens Axboe
-
+Is this concern no longer relevant?
