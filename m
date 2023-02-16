@@ -2,261 +2,472 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D39B5C61DA4
-	for <linux-block@archiver.kernel.org>; Thu, 16 Feb 2023 08:29:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9760DC61DA4
+	for <linux-block@archiver.kernel.org>; Thu, 16 Feb 2023 08:29:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229593AbjBPI3e (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 16 Feb 2023 03:29:34 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53156 "EHLO
+        id S229602AbjBPI35 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 16 Feb 2023 03:29:57 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53082 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229462AbjBPI3d (ORCPT
+        with ESMTP id S229462AbjBPI34 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 16 Feb 2023 03:29:33 -0500
-Received: from esa3.hgst.iphmx.com (esa3.hgst.iphmx.com [216.71.153.141])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D36C42CC45
-        for <linux-block@vger.kernel.org>; Thu, 16 Feb 2023 00:29:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1676536171; x=1708072171;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=GRyAssY8/wFdb0Us0H9JB5fCatGQC6Wuvw3WWM6/7W8=;
-  b=pMzU8OVFHpKPJ70wiXIQmMFPo4WvjC6PYhPDsyBiCbZh+QqZ3xb3y/l6
-   L3cYAxx+B0ShfKAHT88o+teiLLFBe5uBxnk1W05PFBqKSPFOQAypELj0t
-   n/B2L/Ilamq8q/2IUAx+MHNCGYgKGM5zBj8gOK+H4sXwx+ZmRy+tghBKT
-   XeA7iCEm+fyaCNBXUr0w8J14c3GHwmLimSKKNnlGlxKkpcRS56yEib77s
-   U3OtC9ERAxvXJO76buhFLVQJWugzFpyW4r/edxBG3j4kmsIclUHwSfqA7
-   dBm5mD6D3JirZAJfFv8+5uEpoFVtRAuvNxXfKSWMZYlOB4EF6qQLoJ7k6
-   w==;
-X-IronPort-AV: E=Sophos;i="5.97,301,1669046400"; 
-   d="scan'208";a="228417190"
-Received: from mail-mw2nam12lp2048.outbound.protection.outlook.com (HELO NAM12-MW2-obe.outbound.protection.outlook.com) ([104.47.66.48])
-  by ob1.hgst.iphmx.com with ESMTP; 16 Feb 2023 16:29:31 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=VsoQxbndct10A1rvzIUsOV/JOJnp6ByqaCDNUvXwkP5WD8mLuyBIoul3tJqGzDKzeNHK1SwRL3s9i4C9994aw/kpL5Abw6iLrkWREHcSJRbV7S3BQ+p1wd9xKPdkUtMyqtrl6hte9Xfr0NGjOK1CcHlTkc2+jVYz9tfZbae9M4aQVmtEozqSQdsqYCPjMmd4UEBk+cmtEbazbiXiFSrU7waFWfZ2AIP9/WBu0AXHKySo/XpvEHPWpIRDFtG4a6YBqTx6Lql8PY9HW3QhmViatWLUYOGMc/FKyFm9/0h4zBqabXGZS9rb1a9jXuKb0/9TZdsqyYBCVWeKya4Uf1AWQw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=W1CkdzHrATJAbg3HeG2aa9G6yyig8Ym14kshY/t0Grw=;
- b=mXhAIkLInL5yCpj/Okn8j02Sclrb6XHtSv+Kxfcxe80CApS67ZMiAFFupzTYcMAmrLw0EiCb0730oCkXhhsxM7iQpm1TKXPkfZeTLDY9KEs4y+qMTv5iHMm++o3J+IDjQjJY1bmRAhVghawmmnxKNoFZn4RhmQLIIzqs3F6hDNjctihLPxzIf5Bl45ypsQ0lUrx6KwcMnNTqXb8qrprgSF2aQ4Ctoj4dML8ZNMMi66RDvJ/G8Hup/ya/0nJQUH48ERTRXdwEN0Jfi1mqHWiGI9oApJO0VyqNMXcJT0VRWvU+JAWgXPVdwkXLBz7BjAk894AZOL3rFsnldX50zp6nuQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=W1CkdzHrATJAbg3HeG2aa9G6yyig8Ym14kshY/t0Grw=;
- b=MNqnktGXg/7VHgqRzemi31o7YILSGChDlMML5dDUqEgzbt05sZugjnPFS39lYTJx5vMzEudv+bNZXrM2OjcZEgvaHdh8sB6UZ3+QT2YSo6XoQvHroW6MZ1xq+p/g6lkNnSsCe/SPA1K10k41R/1OMfttRyS276uK9kpeSq+clfI=
-Received: from DM8PR04MB8037.namprd04.prod.outlook.com (2603:10b6:8:f::6) by
- DS0PR04MB8761.namprd04.prod.outlook.com (2603:10b6:8:127::14) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6086.26; Thu, 16 Feb 2023 08:29:30 +0000
-Received: from DM8PR04MB8037.namprd04.prod.outlook.com
- ([fe80::f2ed:2204:b02f:9bfa]) by DM8PR04MB8037.namprd04.prod.outlook.com
- ([fe80::f2ed:2204:b02f:9bfa%5]) with mapi id 15.20.6086.026; Thu, 16 Feb 2023
- 08:29:29 +0000
-From:   Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-To:     Ming Lei <ming.lei@redhat.com>
-CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: Re: [PATCH 2/2] blktests/033: add test to cover gendisk leak
-Thread-Topic: [PATCH 2/2] blktests/033: add test to cover gendisk leak
-Thread-Index: AQHZQbM1cXNzlNcSd0ylVLViFm1ow67RPiyA
-Date:   Thu, 16 Feb 2023 08:29:29 +0000
-Message-ID: <20230216082929.j4wgi27cu2rtkp5a@shindev>
-References: <20230216030134.1368607-1-ming.lei@redhat.com>
- <20230216030134.1368607-3-ming.lei@redhat.com>
-In-Reply-To: <20230216030134.1368607-3-ming.lei@redhat.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=wdc.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DM8PR04MB8037:EE_|DS0PR04MB8761:EE_
-x-ms-office365-filtering-correlation-id: e13b59e6-fbb8-4e0d-34f8-08db0ff7ec3f
-wdcipoutbound: EOP-TRUE
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: /gVRgT08NtMmh+QZjC0FzLZ6YFkdBRYNqmRSznzRaNFjTpPwZAEnBqXUJpYVHqzQ2vjjyWBaMo3y9j4qAqvjqS55HjTNQvFRNmDNS0JmY0gZ2Y5aCzfqVP/eRN8reLGrphsHwIVPZZnoQV4NxkCIXnhS7f32GSZYmcWpXLWKz/f8kL99U2BwtJig3qRdvhMkq0Y0eYbpTiHYST4v0KFzzg/71DKlVCGBKSmZcWZdznjX31GwQxx7ZxhLAgEObeyBbwJcn9EhJYxVHbMlgizHrBVM7DZr1oKswgLs4XWUa8veFydO1Lq+S5Cj3TKSCzCndMBXAHwfJxmPdQYbT5flDkK/0iq5fIyXwztpcw7bjtjpbTfikyyy/ldB6/hPJIy+OMkn3ESbyNWm6EvE3klLuaBHiqxnIU73tSF59rzgoeXVxEvFg3mQnQQVCWmoCo5V4UtoZU4DFR5R9690FIPdkuexatXAoh/dzXedDGcKgc46YimF5W6UrkzcHyFB0ZXbtyyw6rCvoDIAYSQb3QtJLy/kRMuQytfCZqING9mf+Z7Jidx37xYDMrrLfuYAYE4uZomdg1ilfaT/MuUEqMPEUlChOCBHMw/vFZ2VqQphob+8IPlAkVFHJkYAtZZQ+hrUuziG1UgyuiABB2cquVE5HXIor7iR5dQicovCIEjWJQcKzxUH9kakMfSxZY9zgSiQbvai8cBD1R1oTVP6AzfH8A==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR04MB8037.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(4636009)(7916004)(39860400002)(346002)(396003)(376002)(136003)(366004)(451199018)(26005)(186003)(71200400001)(2906002)(83380400001)(91956017)(38070700005)(9686003)(6512007)(316002)(6486002)(8936002)(86362001)(38100700002)(33716001)(6916009)(122000001)(5660300002)(8676002)(76116006)(82960400001)(44832011)(4326008)(66476007)(64756008)(66446008)(66556008)(66946007)(41300700001)(478600001)(1076003)(6506007);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?8C3A8HstJhPO1EWJnQeBwqT5ukoOaW1sM192ER4L2Ey7oRgFLOO54GTWv2Hm?=
- =?us-ascii?Q?slIbH2cAw7Nf4qUYAqq2Fr/BSNekMKZpCBYLxbIbJ7tXi59TNGWWcUoz0e01?=
- =?us-ascii?Q?QSCIDUwgseH8BhzTaxkXPapGWjy7I+SMQ+VSwi8tRLNEk4D84gufNFjZ/IZx?=
- =?us-ascii?Q?pVUYBZgyyOadK4Hl7gcz7it5w6TxpSTzKT5OoYXXprnydWOZZTnfvmUpeqKh?=
- =?us-ascii?Q?KF/Y6hSgAp62HjdJDPYzib3yKMo0KnE9Gs6fQf/3fAwdslJ2kkleLAty4S8p?=
- =?us-ascii?Q?szVbRyzEnEPdewVHA7wB+XdyC2bPd1B5cb83wYShMlxM+ruDvrNXyzjP8oSd?=
- =?us-ascii?Q?Usqpj/QVMwoE48+uJuoTeiVoQyHeQIcu1swpHgiZJNpbpJOqlXyMUEJSV4cZ?=
- =?us-ascii?Q?pXDppvHcLrxC1LI5swnvYzHZP7MYyuk38LWs5+BLSUA85PdoRn/oDcL5WM4q?=
- =?us-ascii?Q?V+yee5yjePI1Kks299q5B33fXh6zdPp0ghKJgy/58BO+GdlseMJZ3AM1NGmC?=
- =?us-ascii?Q?ZVxzqoBTQyJbYHDit0ZCkMFDYttg3N3ByiNdC13Rj8phVLAWn5pQiT47za+1?=
- =?us-ascii?Q?UAX1Ts3OQyR9+Zhtn6QQuwY/AHy8ujGmxuHGDJq4PxPNqMk5WX76+lywGVVO?=
- =?us-ascii?Q?JLhZZxSZhTQWkmqQTn3AkDdszpAyvkuXQoMK7eVznM//Dcb5fxS4RzZ4cEZS?=
- =?us-ascii?Q?BCWfylMh/H9WaLJ4E62exGboh8i37g1kLS0k0l33cItsDVO/wDDiiQXZMNIg?=
- =?us-ascii?Q?zjH/EZ4UioXWKUgvJ6Lvg/MCvP80/Gj1fPE3x0w7QkL3wBIvqsLeSb3Q1d+X?=
- =?us-ascii?Q?T3FSZL+9ubOua8/zkk9XSAnj5FDycrUdE7gmwcsYt6FOJMkJW0lRpexjrqnt?=
- =?us-ascii?Q?repwTH//4v1pjeAfgO0hfdIRJbcX7QItt5ILqZHB3aoZAIIbWqadJQl9OTcd?=
- =?us-ascii?Q?QurjdOuqMlHchdwkm4c7wJHlPhVYvZlEuHFrk5fsXx6XxV6DQwbeABFLVN4f?=
- =?us-ascii?Q?0z9I8AGXQOC2EKNZQKCIS4eIdTxqvxlQb9wAoE4GEYJgq/hp4ZCrMCQ04yOJ?=
- =?us-ascii?Q?A+N/Lh8UwWbz5FT49c3lC4ZUrHl7HsxB9P2oEOmkm2iNxqXTPBIrDFez/Z3t?=
- =?us-ascii?Q?lWGY8XIaCSHzL4lRhcAWfp05Bge0HH/z4LSRqLm2wvwjerSTkmiTWKmkrR87?=
- =?us-ascii?Q?9+hJarhZ65bVp4EtP4rYIlcleFpohzF50kY9dSVFd28mJ4K1MMCXnxF1djbw?=
- =?us-ascii?Q?m2lqEWT/g++VjFNUfN83DHRFuh46JR66vsM20OFfKYwELKApsW3WmyQDmH+3?=
- =?us-ascii?Q?sqx4CA7GKT8J/9PP+C+Hc10d4FdW9pBNZCwLqsMV/Bh03xkLKw1pcU7HBM+v?=
- =?us-ascii?Q?nToIrzM6s0ijy1lneAGqLmctnBLueLmmwr8R1vUV/XWFtFLMFyYT8yXXGeJI?=
- =?us-ascii?Q?BENVAc2A5m9C9KpGQ2vOYCwsZm+LEZ/7oZQ5UntkqKD44JH9mTynT2NejhQ8?=
- =?us-ascii?Q?NJU6iyfBEEzhwhC60zYCGlp/tKiCBGuaIE//wjq18mE+otvYefwIF2jMtZtM?=
- =?us-ascii?Q?n2fcG8mSMbYH0p9oIbCZDTdvwNj2SowOKvh6LtMkrOcDLGmZQIRY2RTJOkUz?=
- =?us-ascii?Q?oxfqDD2PN+6AUl7n2JCRD/M=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <0935724EBBAEEA4CA295478B476862D2@namprd04.prod.outlook.com>
-Content-Transfer-Encoding: quoted-printable
+        Thu, 16 Feb 2023 03:29:56 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0721A2CC71
+        for <linux-block@vger.kernel.org>; Thu, 16 Feb 2023 00:29:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1676536153;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=yWe59C3zukH1hXHPi3xSqXe+d3YhK+Sr2LV3xpxp7IE=;
+        b=Cirb51TkmxbffUv7nbdjJzvFc+/gNeroyKbGIdR/CoDyrYrHtBkIH6xNrJi5jgvV2sEp8n
+        VewpyvNDMFpRt+gb1F66qWXGY3jFcxPbvZadErMFJy4SD/0MXPwFWZHXLD+JNlGVovTdK4
+        o3+CysbNCz8ETtejVFqXnXxbHsOwRDw=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-599-DIT4l3xaOwSOJBH_dl76lQ-1; Thu, 16 Feb 2023 03:29:08 -0500
+X-MC-Unique: DIT4l3xaOwSOJBH_dl76lQ-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 22D833C10EDA;
+        Thu, 16 Feb 2023 08:29:08 +0000 (UTC)
+Received: from T590 (ovpn-8-29.pek2.redhat.com [10.72.8.29])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 9988D40CF8E4;
+        Thu, 16 Feb 2023 08:29:01 +0000 (UTC)
+Date:   Thu, 16 Feb 2023 16:28:55 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>
+Cc:     linux-block@vger.kernel.org, io-uring@vger.kernel.org,
+        bpf@vger.kernel.org, axboe@kernel.dk, asml.silence@gmail.com,
+        ZiyangZhang@linux.alibaba.com, ming.lei@redhat.com
+Subject: Re: [UBLKSRV] Add ebpf support.
+Message-ID: <Y+3pR991R9nrdg5Y@T590>
+References: <20230215004122.28917-1-xiaoguang.wang@linux.alibaba.com>
+ <20230215004618.35503-1-xiaoguang.wang@linux.alibaba.com>
 MIME-Version: 1.0
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: hFKbxnnLbGXjaKMJ5pnAMIQCFJBZRorpHSv8XEp/7I9MxPar3AKFn2iBwesIqWRPA5IDiGjsk8BfdHh98tvPAwJfPqLTY4ADI4JVzxEplXknPPK1o37E3eqDMXzCQmCzsrvP17P+cuEf0YOpP7uGFlA5VkjmSQF6oSB5DnuBVYDIFLL3L8+vcruLpAQjLhAb/GyUJ8cqzBVgc0qLBkd15YWiWFUV+s0qExhuT/3ITodfqEz+Q78RTm0w7n4gU6qXVLQvMwAHPzZS1Q0ELpuNQdNBDSl6P9Tw1XTDuBz4CRRnhyi+Chyrz8Q1kqQDu3jamGG2mD5s4UHeQOyWyPxukoI38li7ThcyJeb+GfSEaVPW9DxR83XuXzifCrWK4bCuOoZ0crU9Eyll1N4LRBsUx+97ApdKUQq38jB7KjZmGCQYISxbgtobf8NSVObVNpknF+dYvbD4ziv/GD23x9h30UfyecqMupWoBSztJi92Y8BRVXjubUWLK1pKhyq48DIkQ8Nd2J+7/NshBN9LzDt0VDxhN6IpZScGJ+eeAj6f8hhUaD+0wyzRXMLa62+1IpTH93lOtSA5rVsVieKwp2B+pXYrsUpSwRBy620bwGWQg04PTHmaFo2v7OLDaVGE1paEemegb1r76WLA+JxpqJMtQXmK0ffVWKOCwVGObMUt6h1tH77U4fe5tn3ko5hgzZQECe+Ggx5G6m54l/VOGSmILCEAmBtI1ehrsrvRm5IS7ZgVeYfU3GU6ClgmQ3XJgihS5TkBcvpaRU41NMGDNBv+GZyEzf7bnx5BtpeD/O0PNBUgFC1LWmYGl6h9X8LLvl6Z
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DM8PR04MB8037.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e13b59e6-fbb8-4e0d-34f8-08db0ff7ec3f
-X-MS-Exchange-CrossTenant-originalarrivaltime: 16 Feb 2023 08:29:29.7961
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: FI9Kiqqg1nRl9Ws2HpMExBDkGGNz11klPYYbnrxSKeoO2jFduU5x0aAFqCv1dxCaVSlhF3S178W4HrSneJqatg5lRm56XIj34Rhos2NuBnc=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR04MB8761
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230215004618.35503-1-xiaoguang.wang@linux.alibaba.com>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.1
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
-
-
-I suggest the commit title:
-
-    block/033: add test to cover gendisk leak
-
-On Feb 16, 2023 / 11:01, Ming Lei wrote:
-> So far only sync ublk removal is supported, and the device's
-> last reference is dropped in gendisk's ->free_disk(), so it
-> can be used to test gendisk leak issue.
->=20
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+On Wed, Feb 15, 2023 at 08:46:18AM +0800, Xiaoguang Wang wrote:
+> Signed-off-by: Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>
 > ---
->  common/ublk         | 32 ++++++++++++++++++++++++++++++++
->  tests/block/033     | 33 +++++++++++++++++++++++++++++++++
->  tests/block/033.out |  2 ++
->  3 files changed, 67 insertions(+)
->  create mode 100644 common/ublk
->  create mode 100755 tests/block/033
->  create mode 100644 tests/block/033.out
->=20
-> diff --git a/common/ublk b/common/ublk
+>  bpf/ublk.bpf.c         | 168 +++++++++++++++++++++++++++++++++++++++++
+>  include/ublk_cmd.h     |   2 +
+>  include/ublksrv.h      |   8 ++
+>  include/ublksrv_priv.h |   1 +
+>  include/ublksrv_tgt.h  |   1 +
+>  lib/ublksrv.c          |   4 +
+>  lib/ublksrv_cmd.c      |  21 ++++++
+>  tgt_loop.cpp           |  31 +++++++-
+>  ublksrv_tgt.cpp        |  33 ++++++++
+>  9 files changed, 268 insertions(+), 1 deletion(-)
+>  create mode 100644 bpf/ublk.bpf.c
+> 
+> diff --git a/bpf/ublk.bpf.c b/bpf/ublk.bpf.c
 > new file mode 100644
-> index 0000000..66b3a58
+> index 0000000..80e79de
 > --- /dev/null
-> +++ b/common/ublk
-> @@ -0,0 +1,32 @@
-> +#!/bin/bash
-> +# SPDX-License-Identifier: GPL-3.0+
-> +# Copyright (C) 2023 Ming Lei
-> +#
-> +# null_blk helper functions.
+> +++ b/bpf/ublk.bpf.c
+> @@ -0,0 +1,168 @@
+> +#include "vmlinux.h"
 
-I think you meant s/null_blk/ublk/
+Where is vmlinux.h?
 
+> +#include <bpf/bpf_helpers.h>
+> +#include <bpf/bpf_core_read.h>
 > +
-> +. common/shellcheck
 > +
-> +_have_ublk() {
-> +	_have_driver ublk_drv
-
-The _init_ublk() below looks assuming the ublk_drv modules is loadable. If =
-so,
-the live above should be:
-
-    _have_module ublk_drv
-
-Of note is that some of the blkteste users run tests with all drivers as
-built-in modules. So it is the better that the new test case can run with
-built-in ublk_drv, if possible. (Or it can be a left work.)
-
-> +	_have_src_program ublk/miniublk
+> +static long (*bpf_ublk_queue_sqe)(void *ctx, struct io_uring_sqe *sqe,
+> +		u32 sqe_len, u32 fd) = (void *) 212;
+> +
+> +int target_fd = -1;
+> +
+> +struct sqe_key {
+> +	u16 q_id;
+> +	u16 tag;
+> +	u32 res;
+> +	u64 offset;
+> +};
+> +
+> +struct sqe_data {
+> +	char data[128];
+> +};
+> +
+> +struct {
+> +	__uint(type, BPF_MAP_TYPE_HASH);
+> +	__uint(max_entries, 8192);
+> +	__type(key, struct sqe_key);
+> +	__type(value, struct sqe_data);
+> +} sqes_map SEC(".maps");
+> +
+> +struct {
+> +	__uint(type, BPF_MAP_TYPE_ARRAY);
+> +	__uint(max_entries, 128);
+> +	__type(key, int);
+> +	__type(value, int);
+> +} uring_fd_map SEC(".maps");
+> +
+> +static inline void io_uring_prep_rw(__u8 op, struct io_uring_sqe *sqe, int fd,
+> +				    const void *addr, unsigned len,
+> +				    __u64 offset)
+> +{
+> +	sqe->opcode = op;
+> +	sqe->flags = 0;
+> +	sqe->ioprio = 0;
+> +	sqe->fd = fd;
+> +	sqe->off = offset;
+> +	sqe->addr = (unsigned long) addr;
+> +	sqe->len = len;
+> +	sqe->fsync_flags = 0;
+> +	sqe->buf_index = 0;
+> +	sqe->personality = 0;
+> +	sqe->splice_fd_in = 0;
+> +	sqe->addr3 = 0;
+> +	sqe->__pad2[0] = 0;
 > +}
 > +
-> +_remove_ublk_devices() {
-> +	src/ublk/miniublk del -a
+> +static inline void io_uring_prep_nop(struct io_uring_sqe *sqe)
+> +{
+> +	io_uring_prep_rw(IORING_OP_NOP, sqe, -1, 0, 0, 0);
 > +}
 > +
-> +_init_ublk() {
-> +	if ! modprobe -r ublk_drv || ! modprobe ublk_drv "${args[@]}" ; then
-> +		SKIP_REASONS+=3D("requires modular ublk_drv")
-> +		return 1
-> +	fi
-> +
-> +	udevadm settle
-> +	return 0
+> +static inline void io_uring_prep_read(struct io_uring_sqe *sqe, int fd,
+> +			void *buf, unsigned nbytes, off_t offset)
+> +{
+> +	io_uring_prep_rw(IORING_OP_READ, sqe, fd, buf, nbytes, offset);
 > +}
 > +
-> +_exit_ublk() {
-> +	_remove_ublk_devices
-> +	udevadm settle
-> +	modprobe -r -q ublk_drv
-> +}
-> diff --git a/tests/block/033 b/tests/block/033
-> new file mode 100755
-> index 0000000..342ccf3
-> --- /dev/null
-> +++ b/tests/block/033
-> @@ -0,0 +1,33 @@
-> +#!/bin/bash
-> +# SPDX-License-Identifier: GPL-3.0+
-> +# Copyright (C) 2023 Ming Lei
-> +#
-> +# Test if gendisk is leaked, and regression in the following commit
-> +# c43332fe028c ("blk-cgroup: delay calling blkcg_exit_disk until disk_re=
-lease")
-> +# can be covered
-> +
-> +. tests/block/rc
-> +. common/ublk
-> +
-> +DESCRIPTION=3D"add & delete ublk device and test if gendisk is leaked"
-> +QUICK=3D1
-> +
-> +requires() {
-> +	_have_ublk
+> +static inline void io_uring_prep_write(struct io_uring_sqe *sqe, int fd,
+> +	const void *buf, unsigned nbytes, off_t offset)
+> +{
+> +	io_uring_prep_rw(IORING_OP_WRITE, sqe, fd, buf, nbytes, offset);
 > +}
 > +
-> +test() {
-> +	local ublk_prog=3D"src/ublk/miniublk"
-> +	echo "Running ${TEST_NAME}"
+> +/*
+> +static u64 submit_sqe(struct bpf_map *map, void *key, void *value, void *data)
+> +{
+> +	struct io_uring_sqe *sqe = (struct io_uring_sqe *)value;
+> +	struct ublk_bpf_ctx *ctx = ((struct callback_ctx *)data)->ctx;
+> +	struct sqe_key *skey = (struct sqe_key *)key;
+> +	char fmt[] ="submit sqe for req[qid:%u tag:%u]\n";
+> +	char fmt2[] ="submit sqe test prep\n";
+> +	u16 qid, tag;
+> +	int q_id = skey->q_id, *ring_fd;
 > +
-> +	if ! _init_ublk; then
-> +		return 1
-> +	fi
-> +
-> +	local ublk_dev=3D`$ublk_prog add -t null --quiet`
-> +	$ublk_prog del --disk=3D$ublk_dev > /dev/null 2>&1
-> +
-> +	_exit_ublk
-> +
-> +	echo "Test complete"
+> +	bpf_trace_printk(fmt2, sizeof(fmt2));
+> +	ring_fd = bpf_map_lookup_elem(&uring_fd_map, &q_id);
+> +	if (ring_fd) {
+> +		bpf_trace_printk(fmt, sizeof(fmt), qid, skey->tag);
+> +		bpf_ublk_queue_sqe(ctx, sqe, 128, *ring_fd);
+> +		bpf_map_delete_elem(map, key);
+> +	}
+> +	return 0;
 > +}
-> diff --git a/tests/block/033.out b/tests/block/033.out
-> new file mode 100644
-> index 0000000..067846a
-> --- /dev/null
-> +++ b/tests/block/033.out
-> @@ -0,0 +1,2 @@
-> +Running block/033
-> +Test complete
-> --=20
-> 2.31.1
->=20
+> +*/
+> +
+> +static inline __u64 build_user_data(unsigned tag, unsigned op,
+> +			unsigned tgt_data, unsigned is_target_io,
+> +			unsigned is_bpf_io)
+> +{
+> +	return tag | (op << 16) | (tgt_data << 24) | (__u64)is_target_io << 63 |
+> +		(__u64)is_bpf_io << 60;
+> +}
+> +
+> +SEC("ublk.s/")
+> +int ublk_io_prep_prog(struct ublk_bpf_ctx *ctx)
+> +{
+> +	struct io_uring_sqe *sqe;
+> +	struct sqe_data sd = {0};
+> +	struct sqe_key key;
+> +	u16 q_id = ctx->q_id;
+> +	u8 op; // = ctx->op;
+> +	u32 nr_sectors = ctx->nr_sectors;
+> +	u64 start_sector = ctx->start_sector;
+> +	char fmt_1[] ="ublk_io_prep_prog %d %d\n";
+> +
+> +	key.q_id = ctx->q_id;
+> +	key.tag = ctx->tag;
+> +	key.offset = 0;
+> +	key.res = 0;
+> +
+> +	bpf_probe_read_kernel(&op, 1, &ctx->op);
+> +	bpf_trace_printk(fmt_1, sizeof(fmt_1), q_id, op);
+> +	sqe = (struct io_uring_sqe *)&sd;
+> +	if (op == REQ_OP_READ) {
+> +		char fmt[] ="add read sae\n";
+> +
+> +		bpf_trace_printk(fmt, sizeof(fmt));
+> +		io_uring_prep_read(sqe, target_fd, 0, nr_sectors << 9,
+> +				   start_sector << 9);
+> +		sqe->user_data = build_user_data(ctx->tag, op, 0, 1, 1);
+> +		bpf_map_update_elem(&sqes_map, &key, &sd, BPF_NOEXIST);
+> +	} else if (op == REQ_OP_WRITE) {
+> +		char fmt[] ="add write sae\n";
+> +
+> +		bpf_trace_printk(fmt, sizeof(fmt));
+> +
+> +		io_uring_prep_write(sqe, target_fd, 0, nr_sectors << 9,
+> +				    start_sector << 9);
+> +		sqe->user_data = build_user_data(ctx->tag, op, 0, 1, 1);
+> +		bpf_map_update_elem(&sqes_map, &key, &sd, BPF_NOEXIST);
+> +	} else {
+> +		;
+> +	}
+> +	return 0;
+> +}
+> +
+> +SEC("ublk.s/")
+> +int ublk_io_submit_prog(struct ublk_bpf_ctx *ctx)
+> +{
+> +	struct io_uring_sqe *sqe;
+> +	char fmt[] ="submit sqe for req[qid:%u tag:%u]\n";
+> +	int q_id = ctx->q_id, *ring_fd;
+> +	struct sqe_key key;
+> +
+> +	key.q_id = ctx->q_id;
+> +	key.tag = ctx->tag;
+> +	key.offset = 0;
+> +	key.res = 0;
+> +
+> +	sqe = bpf_map_lookup_elem(&sqes_map, &key);
+> +	ring_fd = bpf_map_lookup_elem(&uring_fd_map, &q_id);
+> +	if (ring_fd) {
+> +		bpf_trace_printk(fmt, sizeof(fmt), key.q_id, key.tag);
+> +		bpf_ublk_queue_sqe(ctx, sqe, 128, *ring_fd);
+> +		bpf_map_delete_elem(&sqes_map, &key);
+> +	}
+> +	return 0;
+> +}
+> +
+> +char LICENSE[] SEC("license") = "GPL";
+> diff --git a/include/ublk_cmd.h b/include/ublk_cmd.h
+> index f6238cc..893ba8c 100644
+> --- a/include/ublk_cmd.h
+> +++ b/include/ublk_cmd.h
+> @@ -17,6 +17,8 @@
+>  #define	UBLK_CMD_STOP_DEV	0x07
+>  #define	UBLK_CMD_SET_PARAMS	0x08
+>  #define	UBLK_CMD_GET_PARAMS	0x09
+> +#define UBLK_CMD_REG_BPF_PROG		0x0a
+> +#define UBLK_CMD_UNREG_BPF_PROG		0x0b
+>  #define	UBLK_CMD_START_USER_RECOVERY	0x10
+>  #define	UBLK_CMD_END_USER_RECOVERY	0x11
+>  #define	UBLK_CMD_GET_DEV_INFO2		0x12
+> diff --git a/include/ublksrv.h b/include/ublksrv.h
+> index d38bd46..f5deddb 100644
+> --- a/include/ublksrv.h
+> +++ b/include/ublksrv.h
+> @@ -106,6 +106,7 @@ struct ublksrv_tgt_info {
+>  	unsigned int nr_fds;
+>  	int fds[UBLKSRV_TGT_MAX_FDS];
+>  	void *tgt_data;
+> +	void *tgt_bpf_obj;
+>  
+>  	/*
+>  	 * Extra IO slots for each queue, target code can reserve some
+> @@ -263,6 +264,8 @@ struct ublksrv_tgt_type {
+>  	int (*init_queue)(const struct ublksrv_queue *, void **queue_data_ptr);
+>  	void (*deinit_queue)(const struct ublksrv_queue *);
+>  
+> +	int (*init_queue_bpf)(const struct ublksrv_dev *dev, const struct ublksrv_queue *q);
+> +
+>  	unsigned long reserved[5];
+>  };
+>  
+> @@ -318,6 +321,11 @@ extern void ublksrv_ctrl_prep_recovery(struct ublksrv_ctrl_dev *dev,
+>  		const char *recovery_jbuf);
+>  extern const char *ublksrv_ctrl_get_recovery_jbuf(const struct ublksrv_ctrl_dev *dev);
+>  
+> +extern void ublksrv_ctrl_set_bpf_obj_info(struct ublksrv_ctrl_dev *dev,
+> +					  void *obj);
+> +extern int ublksrv_ctrl_reg_bpf_prog(struct ublksrv_ctrl_dev *dev,
+> +				     int io_prep_fd, int io_submit_fd);
+> +
+>  /* ublksrv device ("/dev/ublkcN") level APIs */
+>  extern const struct ublksrv_dev *ublksrv_dev_init(const struct ublksrv_ctrl_dev *
+>  		ctrl_dev);
+> diff --git a/include/ublksrv_priv.h b/include/ublksrv_priv.h
+> index 2996baa..8da8866 100644
+> --- a/include/ublksrv_priv.h
+> +++ b/include/ublksrv_priv.h
+> @@ -42,6 +42,7 @@ struct ublksrv_ctrl_dev {
+>  
+>  	const char *tgt_type;
+>  	const struct ublksrv_tgt_type *tgt_ops;
+> +	void *bpf_obj;
+>  
+>  	/*
+>  	 * default is UBLKSRV_RUN_DIR but can be specified via command line,
+> diff --git a/include/ublksrv_tgt.h b/include/ublksrv_tgt.h
+> index 234d31e..e0db7d9 100644
+> --- a/include/ublksrv_tgt.h
+> +++ b/include/ublksrv_tgt.h
+> @@ -9,6 +9,7 @@
+>  #include <getopt.h>
+>  #include <string.h>
+>  #include <stdarg.h>
+> +#include <limits.h>
+>  #include <sys/types.h>
+>  #include <sys/stat.h>
+>  #include <sys/ioctl.h>
+> diff --git a/lib/ublksrv.c b/lib/ublksrv.c
+> index 96bed95..110ccb3 100644
+> --- a/lib/ublksrv.c
+> +++ b/lib/ublksrv.c
+> @@ -603,6 +603,9 @@ skip_alloc_buf:
+>  		goto fail;
+>  	}
+>  
+> +	if (dev->tgt.ops->init_queue_bpf)
+> +		dev->tgt.ops->init_queue_bpf(tdev, local_to_tq(q));
+> +
+>  	ublksrv_dev_init_io_cmds(dev, q);
+>  
+>  	/*
+> @@ -723,6 +726,7 @@ const struct ublksrv_dev *ublksrv_dev_init(const struct ublksrv_ctrl_dev *ctrl_d
+>  	}
+>  
+>  	tgt->fds[0] = dev->cdev_fd;
+> +	tgt->tgt_bpf_obj = ctrl_dev->bpf_obj;
+>  
+>  	ret = ublksrv_tgt_init(dev, ctrl_dev->tgt_type, ctrl_dev->tgt_ops,
+>  			ctrl_dev->tgt_argc, ctrl_dev->tgt_argv);
+> diff --git a/lib/ublksrv_cmd.c b/lib/ublksrv_cmd.c
+> index 0d7265d..0101cb9 100644
+> --- a/lib/ublksrv_cmd.c
+> +++ b/lib/ublksrv_cmd.c
+> @@ -502,6 +502,27 @@ int ublksrv_ctrl_end_recovery(struct ublksrv_ctrl_dev *dev, int daemon_pid)
+>  	return ret;
+>  }
+>  
+> +int ublksrv_ctrl_reg_bpf_prog(struct ublksrv_ctrl_dev *dev,
+> +			      int io_prep_fd, int io_submit_fd)
+> +{
+> +	struct ublksrv_ctrl_cmd_data data = {
+> +		.cmd_op = UBLK_CMD_REG_BPF_PROG,
+> +		.flags = CTRL_CMD_HAS_DATA,
+> +	};
+> +	int ret;
+> +
+> +	data.data[0] = io_prep_fd;
+> +	data.data[1] = io_submit_fd;
+> +
+> +	ret = __ublksrv_ctrl_cmd(dev, &data);
+> +	return ret;
+> +}
+> +
+> +void ublksrv_ctrl_set_bpf_obj_info(struct ublksrv_ctrl_dev *dev,  void *obj)
+> +{
+> +	dev->bpf_obj = obj;
+> +}
+> +
+>  const struct ublksrv_ctrl_dev_info *ublksrv_ctrl_get_dev_info(
+>  		const struct ublksrv_ctrl_dev *dev)
+>  {
+> diff --git a/tgt_loop.cpp b/tgt_loop.cpp
+> index 79a65d3..b1568fe 100644
+> --- a/tgt_loop.cpp
+> +++ b/tgt_loop.cpp
+> @@ -4,7 +4,11 @@
+>  
+>  #include <poll.h>
+>  #include <sys/epoll.h>
+> +#include <linux/bpf.h>
+> +#include <bpf/bpf.h>
+> +#include <bpf/libbpf.h>
+>  #include "ublksrv_tgt.h"
+> +#include "bpf/.tmp/ublk.skel.h"
 
---=20
-Shin'ichiro Kawasaki=
+Where is bpf/.tmp/ublk.skel.h?
+
+>  
+>  static bool backing_supports_discard(char *name)
+>  {
+> @@ -88,6 +92,20 @@ static int loop_recovery_tgt(struct ublksrv_dev *dev, int type)
+>  	return 0;
+>  }
+>  
+> +static int loop_init_queue_bpf(const struct ublksrv_dev *dev,
+> +			       const struct ublksrv_queue *q)
+> +{
+> +	int ret, q_id, ring_fd;
+> +	const struct ublksrv_tgt_info *tgt = &dev->tgt;
+> +	struct ublk_bpf *obj = (struct ublk_bpf*)tgt->tgt_bpf_obj;
+> +
+> +	q_id = q->q_id;
+> +	ring_fd = q->ring_ptr->ring_fd;
+> +	ret = bpf_map_update_elem(bpf_map__fd(obj->maps.uring_fd_map), &q_id,
+> +				  &ring_fd,  0);
+> +	return ret;
+> +}
+> +
+>  static int loop_init_tgt(struct ublksrv_dev *dev, int type, int argc, char
+>  		*argv[])
+>  {
+> @@ -125,6 +143,7 @@ static int loop_init_tgt(struct ublksrv_dev *dev, int type, int argc, char
+>  		},
+>  	};
+>  	bool can_discard = false;
+> +	struct ublk_bpf *bpf_obj;
+>  
+>  	strcpy(tgt_json.name, "loop");
+>  
+> @@ -218,6 +237,10 @@ static int loop_init_tgt(struct ublksrv_dev *dev, int type, int argc, char
+>  			jbuf = ublksrv_tgt_realloc_json_buf(dev, &jbuf_size);
+>  	} while (ret < 0);
+>  
+> +	if (tgt->tgt_bpf_obj) {
+> +		bpf_obj = (struct ublk_bpf *)tgt->tgt_bpf_obj;
+> +		bpf_obj->data->target_fd = tgt->fds[1];
+> +	}
+>  	return 0;
+>  }
+>  
+> @@ -252,9 +275,14 @@ static int loop_queue_tgt_io(const struct ublksrv_queue *q,
+>  		const struct ublk_io_data *data, int tag)
+>  {
+>  	const struct ublksrv_io_desc *iod = data->iod;
+> -	struct io_uring_sqe *sqe = io_uring_get_sqe(q->ring_ptr);
+> +	struct io_uring_sqe *sqe;
+>  	unsigned ublk_op = ublksrv_get_op(iod);
+>  
+> +	/* ebpf prog wil handle read/write requests. */
+> +	if ((ublk_op == UBLK_IO_OP_READ) || (ublk_op == UBLK_IO_OP_WRITE))
+> +		return 1;
+> +
+> +	sqe = io_uring_get_sqe(q->ring_ptr);
+>  	if (!sqe)
+>  		return 0;
+>  
+> @@ -374,6 +402,7 @@ struct ublksrv_tgt_type  loop_tgt_type = {
+>  	.type	= UBLKSRV_TGT_TYPE_LOOP,
+>  	.name	=  "loop",
+>  	.recovery_tgt = loop_recovery_tgt,
+> +	.init_queue_bpf = loop_init_queue_bpf,
+>  };
+>  
+>  static void tgt_loop_init() __attribute__((constructor));
+> diff --git a/ublksrv_tgt.cpp b/ublksrv_tgt.cpp
+> index 5ed328d..d3796cf 100644
+> --- a/ublksrv_tgt.cpp
+> +++ b/ublksrv_tgt.cpp
+> @@ -2,6 +2,7 @@
+>  
+>  #include "config.h"
+>  #include "ublksrv_tgt.h"
+> +#include "bpf/.tmp/ublk.skel.h"
+
+Same with above
+
+
+Thanks, 
+Ming
+
