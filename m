@@ -2,134 +2,197 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C04DCC636D6
-	for <linux-block@archiver.kernel.org>; Thu, 16 Feb 2023 11:56:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 262EDC636D6
+	for <linux-block@archiver.kernel.org>; Thu, 16 Feb 2023 12:12:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229803AbjBPL4P (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 16 Feb 2023 06:56:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43556 "EHLO
+        id S229571AbjBPMM0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 16 Feb 2023 07:12:26 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54240 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229512AbjBPL4O (ORCPT
+        with ESMTP id S229502AbjBPMMZ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 16 Feb 2023 06:56:14 -0500
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B1ADD53574;
-        Thu, 16 Feb 2023 03:56:13 -0800 (PST)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 595FA1FE07;
-        Thu, 16 Feb 2023 11:56:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1676548572; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=ULeOsmeRWlu2iwQvL7JPfZ/4t11CdcUZPAn+Hh+0Z9Q=;
-        b=m4oUtuDwrM7EElnSEku7NyUtsy0MA2HvUdwMQDdT9wxpp2CfILhHqTYAR7GuphyhcfFzDf
-        DiraWxNJrSXL+Q5IWysB+sx5mefAiyK6myr5en9DhVAiY2y4jSt3DkY3BT4tNPshuFRYhV
-        UAGTqxEMGr59vi6gbLkwfy0SwCEwBXc=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1676548572;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=ULeOsmeRWlu2iwQvL7JPfZ/4t11CdcUZPAn+Hh+0Z9Q=;
-        b=eh8edWArsKrgZ72r9dQcSP6FX7aEzxbJlgzyPvRWJAi+K/kzirphimpjeRb9upVhSPR26B
-        xAmBB0b9a2H7SbAg==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 48175131FD;
-        Thu, 16 Feb 2023 11:56:12 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id miOTEdwZ7mMEMwAAMHmgww
-        (envelope-from <jack@suse.cz>); Thu, 16 Feb 2023 11:56:12 +0000
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-        id B24AAA06E1; Thu, 16 Feb 2023 12:56:11 +0100 (CET)
-Date:   Thu, 16 Feb 2023 12:56:11 +0100
-From:   Jan Kara <jack@suse.cz>
-To:     John Hubbard <jhubbard@nvidia.com>
-Cc:     Jan Kara <jack@suse.cz>, Christoph Hellwig <hch@infradead.org>,
-        Matthew Wilcox <willy@infradead.org>,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-mm@kvack.org, David Howells <dhowells@redhat.com>,
-        David Hildenbrand <david@redhat.com>
-Subject: Re: [PATCH 1/5] mm: Do not reclaim private data from pinned page
-Message-ID: <20230216115611.lauxr34lqigrc73n@quack3>
-References: <20230209121046.25360-1-jack@suse.cz>
- <20230209123206.3548-1-jack@suse.cz>
- <Y+Ucq8A+WMT0ZUnd@casper.infradead.org>
- <20230210112954.3yzlyi4hjgci36yn@quack3>
- <Y+oI+AYsADUZsB7m@infradead.org>
- <20230214130629.hcnvwpgqzhc3ulgg@quack3>
- <406c3480-ab59-5263-b7bf-d47df0f6267c@nvidia.com>
+        Thu, 16 Feb 2023 07:12:25 -0500
+Received: from out30-111.freemail.mail.aliyun.com (out30-111.freemail.mail.aliyun.com [115.124.30.111])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DEBAF56483;
+        Thu, 16 Feb 2023 04:12:22 -0800 (PST)
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R101e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046059;MF=xiaoguang.wang@linux.alibaba.com;NM=1;PH=DS;RN=7;SR=0;TI=SMTPD_---0Vbof6OJ_1676549539;
+Received: from 30.221.150.53(mailfrom:xiaoguang.wang@linux.alibaba.com fp:SMTPD_---0Vbof6OJ_1676549539)
+          by smtp.aliyun-inc.com;
+          Thu, 16 Feb 2023 20:12:20 +0800
+Message-ID: <54043113-e524-6ca2-ce77-08d45099aff2@linux.alibaba.com>
+Date:   Thu, 16 Feb 2023 20:12:18 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <406c3480-ab59-5263-b7bf-d47df0f6267c@nvidia.com>
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.6.1
+Subject: Re: [RFC 3/3] ublk_drv: add ebpf support
+Content-Language: en-US
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     linux-block@vger.kernel.org, io-uring@vger.kernel.org,
+        bpf@vger.kernel.org, axboe@kernel.dk, asml.silence@gmail.com,
+        ZiyangZhang@linux.alibaba.com
+References: <20230215004122.28917-1-xiaoguang.wang@linux.alibaba.com>
+ <20230215004122.28917-4-xiaoguang.wang@linux.alibaba.com>
+ <Y+3lOn04pdFtdGbr@T590>
+From:   Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>
+In-Reply-To: <Y+3lOn04pdFtdGbr@T590>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue 14-02-23 13:40:17, John Hubbard wrote:
-> On 2/14/23 05:06, Jan Kara wrote:
-> > On Mon 13-02-23 01:55:04, Christoph Hellwig wrote:
-> >> I think we need to distinguish between short- and long terms pins.
-> >> For short term pins like direct I/O it doesn't make sense to take them
-> >> off the lru, or to do any other special action.  Writeback will simplify
-> >> have to wait for the short term pin.
-> >>
-> >> Long-term pins absolutely would make sense to be taken off the LRU list.
-> > 
-> > Yeah, I agree distinguishing these two would be nice as we could treat them
-> > differently then. The trouble is a bit with always-crowded struct page. But
-> > now it occurred to me that if we are going to take these long-term pinned
-> > pages out from the LRU, we could overload the space for LRU pointers with
-> > the counter (which is what I think John originally did). So yes, possibly
-> > we could track separately long-term and short-term pins. John, what do you
-> > think? Maybe time to revive your patches from 2018 in a bit different form?
-> > ;)
-> > 
-> 
-> Oh wow, I really love this idea. We kept running into problems because
-> long- and short-term pins were mixed up together (except during
-> creation), and this, at long last, separates them. Very nice. I'd almost
-> forgotten about the 2018 page.lru adventures, too. ha :)
-> 
-> One objection might be that pinning is now going to be taking a lot of
-> space in struct page / folio, but I think it's warranted, based on the
-> long-standing, difficult problems that it would solve.
+hello,
 
-Well, it doesn't need to consume more space in the struct page than it
-already does currently AFAICS. We could just mark the folio as unevictable
-and make sure folio_evictable() returns false for such pages. Then we
-should be safe to use space of lru pointers for whatever we need.
+> On Wed, Feb 15, 2023 at 08:41:22AM +0800, Xiaoguang Wang wrote:
+>> Currenly only one bpf_ublk_queue_sqe() ebpf is added, ublksrv target
+>> can use this helper to write ebpf prog to support ublk kernel & usersapce
+>> zero copy, please see ublksrv test codes for more info.
+>>
+>>  	 */
+>> +	if ((req_op(req) == REQ_OP_WRITE) && ub->io_prep_prog)
+>> +		return rq_bytes;
+> Can you explain a bit why READ isn't supported? Because WRITE zero
+> copy is supposed to be supported easily with splice based approach,
+> and I am more interested in READ zc actually.
+No special reason, READ op can also be supported. I'll
+add this support in patch set v2.
+For this RFC patch set, I just tried to show the idea, so
+I must admit that current codes are not mature enough :)
 
-> We could even leave most of these patches, and David Howells' patches,
-> intact, by using an approach similar to the mm_users and mm_count
-> technique: maintain a long-term pin count in one of the folio->lru
-> fields, and any non-zero count there creates a single count in
-> folio->_pincount.
+>
+>> +
+>>  	if (req_op(req) != REQ_OP_WRITE && req_op(req) != REQ_OP_FLUSH)
+>>  		return rq_bytes;
+>>  
+>> @@ -860,6 +921,89 @@ static void ublk_queue_cmd(struct ublk_queue *ubq, struct request *rq)
+>>  	}
+>>  }
+>>  
+>>
+>> +	kbuf->bvec = bvec;
+>> +	rq_for_each_bvec(tmp, rq, rq_iter) {
+>> +		*bvec = tmp;
+>> +		bvec++;
+>> +	}
+>> +
+>> +	kbuf->count = blk_rq_bytes(rq);
+>> +	kbuf->nr_bvecs = nr_bvec;
+>> +	data->kbuf = kbuf;
+>> +	return 0;
+> bio/req bvec table is immutable, so here you can pass its reference
+> to kbuf directly.
+Yeah, thanks.
 
-Oh, you mean that the first longterm pin would take one short-term pin?
-Yes, that should be possible but I'm not sure that would be a huge win. I
-can imagine users can care about distinguishing these states:
+>
+>> +}
+>> +
+>> +static int ublk_run_bpf_prog(struct ublk_queue *ubq, struct request *rq)
+>> +{
+>> +	int err;
+>> +	struct ublk_device *ub = ubq->dev;
+>> +	struct bpf_prog *prog = ub->io_prep_prog;
+>> +	struct ublk_io_bpf_ctx *bpf_ctx;
+>> +
+>> +	if (!prog)
+>> +		return 0;
+>> +
+>> +	bpf_ctx = kmalloc(sizeof(struct ublk_io_bpf_ctx), GFP_NOIO);
+>> +	if (!bpf_ctx)
+>> +		return -EIO;
+>> +
+>> +	err = ublk_init_uring_kbuf(rq);
+>> +	if (err < 0) {
+>> +		kfree(bpf_ctx);
+>> +		return -EIO;
+>> +	}
+>> +	bpf_ctx->ub = ub;
+>> +	bpf_ctx->ctx.q_id = ubq->q_id;
+>> +	bpf_ctx->ctx.tag = rq->tag;
+>> +	bpf_ctx->ctx.op = req_op(rq);
+>> +	bpf_ctx->ctx.nr_sectors = blk_rq_sectors(rq);
+>> +	bpf_ctx->ctx.start_sector = blk_rq_pos(rq);
+> The above is for setting up target io parameter, which is supposed
+> to be from userspace, cause it is result of user space logic. If
+> these parameters are from kernel, the whole logic has to be done
+> in io_prep_prog.
+Yeah, it's designed that io_prep_prog implements user space
+io logic.
 
-1) unpinned
-2) has any pin
-3) has only short term pins
+>
+>> +	bpf_prog_run_pin_on_cpu(prog, bpf_ctx);
+>> +
+>> +	init_task_work(&bpf_ctx->work, ublk_bpf_io_submit_fn);
+>> +	if (task_work_add(ubq->ubq_daemon, &bpf_ctx->work, TWA_SIGNAL_NO_IPI))
+>> +		kfree(bpf_ctx);
+> task_work_add() is only available in case of ublk builtin.
+Yeah, I'm thinking how to work around it.
 
-Now distinguishing between 1 and 2+3 would still be done by
-folio_maybe_dma_pinned(). Your change will allow us to not look at lru
-pointers in folio_maybe_dma_pinned() so that's some simplification and
-perhaps performance optimization (potentially is can save us a need to pull
-in another cacheline but mostly _refcount and lru will be in the same
-cacheline anyway) so maybe it's worth it in the end.
+>
+>> +	return 0;
+>> +}
+>> +
+>>  static blk_status_t ublk_queue_rq(struct blk_mq_hw_ctx *hctx,
+>>  		const struct blk_mq_queue_data *bd)
+>>  {
+>> @@ -872,6 +1016,9 @@ static blk_status_t ublk_queue_rq(struct blk_mq_hw_ctx *hctx,
+>>  	if (unlikely(res != BLK_STS_OK))
+>>  		return BLK_STS_IOERR;
+>>  
+>> +	/* Currently just for test. */
+>> +	ublk_run_bpf_prog(ubq, rq);
+> Can you explain the above comment a bit? When is the io_prep_prog called
+> in the non-test version? Or can you post the non-test version in list
+> for review.
+Forgot to delete stale comments, sorry. I'm writing v2 patch set,
 
-								Honza
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+> Here it is the key for understanding the whole idea, especially when
+> is io_prep_prog called finally? How to pass parameters to io_prep_prog?
+Let me explain more about the design:
+io_prep_prog has two types of parameters:
+1) its call argument: struct ublk_bpf_ctx, see ublk.bpf.c.
+ublk_bpf_ctx will describe one kernel io requests about
+its op, qid, sectors info. io_prep_prog uses these info to
+map target io.
+2) ebpf map structure, user space daemon can use map
+structure to pass much information from user space to
+io_prep_prog, which will help it to initialize target io if necessary.
+
+io_prep_prog is called when ublk_queue_rq() is called, this bpf
+prog will initialize one or more sqes according to user logic, and
+io_prep_prog will put these sqes in an ebpf map structure, then
+execute a task_work_add() to notify ubq_daemon to execute
+io_submit_prog. Note, we can not call io_uring_submit_sqe()
+in task context that calls ublk_queue_rq(), that context does not
+have io_uring instance owned by ubq_daemon.
+Later ubq_daemon will call io_submit_prog to submit sqes.
+
+>
+> Given it is ebpf prog, I don't think any userspace parameter can be
+> passed to io_prep_prog when submitting IO, that means all user logic has
+> to be done inside io_prep_prog? If yes, not sure if it is one good way,
+> cause ebpf prog is very limited programming environment, but the user
+> logic could be as complicated as using btree to map io, or communicating
+> with remote machine for figuring out the mapping. Loop is just the
+> simplest direct mapping.
+Currently, we can use ebpf map structure to pass user space
+parameter to io_prep_prog. Also I agree with you that complicated
+logic maybe hard to be implemented in ebpf prog, hope ebpf
+community will improve this situation gradually.
+
+For userspace target implementations I met so far, they just use
+userspace block device solutions to visit distributed filesystem,
+involves socket programming and have simple map io logic. We
+can prepare socket fd in ebpf map structure, and these map io
+logic should be easily implemented in ebpf prog, though I don't
+apply this ebpf method to our internal business yet.
+
+Thanks for review.
+
+Regards,
+Xiaoguang Wang
+
+>
+>
+> Thanks, 
+> Ming
+
