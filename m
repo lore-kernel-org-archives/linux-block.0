@@ -2,117 +2,53 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 806BBC61DA4
-	for <linux-block@archiver.kernel.org>; Thu, 16 Feb 2023 13:19:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 583FBC636CC
+	for <linux-block@archiver.kernel.org>; Thu, 16 Feb 2023 14:40:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229911AbjBPNTk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 16 Feb 2023 08:19:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34436 "EHLO
+        id S229675AbjBPOkX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 16 Feb 2023 09:40:23 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48060 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229919AbjBPNTi (ORCPT
+        with ESMTP id S229512AbjBPOkW (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 16 Feb 2023 08:19:38 -0500
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 38A82AD1B;
-        Thu, 16 Feb 2023 05:19:36 -0800 (PST)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id DD55A21ACA;
-        Thu, 16 Feb 2023 13:19:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1676553574; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=8JSQOK0REu8vNGDg2yRfylXo2+2rlKENAEHD70Ll0Vs=;
-        b=xOuNgQapuHcWiL8S8zQuVgjruAkNeNEcHhp9TZU4S7MSOUMr28Hk97taKpo6sQvS+e7AHT
-        W2wsKeXJgc5GKTx7BOXf9US6MWr0qTg784x2HdFLIU8aTVwKwDuSbGuxmhosXJRTeREHSh
-        ASTt55OYiwxDbDQhIIFxWKWinwS1+OY=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1676553574;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=8JSQOK0REu8vNGDg2yRfylXo2+2rlKENAEHD70Ll0Vs=;
-        b=BsUwxjtbRhedud23nb3Llz4wQgoYcSMlV6wtz/7jfHXVGFMMhqv8s4aqEk+1tae7VleRNL
-        CQrX9HXhYeiew9AQ==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id CFECE13438;
-        Thu, 16 Feb 2023 13:19:34 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id zTa8MmYt7mPvWAAAMHmgww
-        (envelope-from <jack@suse.cz>); Thu, 16 Feb 2023 13:19:34 +0000
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-        id 6D543A06E1; Thu, 16 Feb 2023 14:19:34 +0100 (CET)
-Date:   Thu, 16 Feb 2023 14:19:34 +0100
-From:   Jan Kara <jack@suse.cz>
-To:     Yu Kuai <yukuai1@huaweicloud.com>
-Cc:     hch@infradead.org, jack@suse.cz, axboe@kernel.dk,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        yukuai3@huawei.com, yi.zhang@huawei.com, yangerkun@huawei.com
-Subject: Re: [PATCH -next RFC 3/3] block: fix scan partition for exclusively
- open device again
-Message-ID: <20230216131934.f6swfwyqqd6xzpm6@quack3>
-References: <20230212092641.2394146-1-yukuai1@huaweicloud.com>
- <20230212092641.2394146-4-yukuai1@huaweicloud.com>
+        Thu, 16 Feb 2023 09:40:22 -0500
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DDB77311C3
+        for <linux-block@vger.kernel.org>; Thu, 16 Feb 2023 06:40:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=PaHvrs3iBsQcNhnMYeNKKFX/2Pob4S55+YkVPxadmnk=; b=KSgP3DkEhnGnup50lRxVxWa0M/
+        yrmoF8wzGo9otypYITvDdLwDb2W1I6pTaSy4reXjUFqGjOt+d8929hJYVokATHpnydMNlRGuLaD9O
+        oVh5MBwKIIQyN70arMuhFG/KGFiI9scd/20FJEABsOzZjVUwzbtJZ/l1cXli8eetFKiTtY/PkLQzd
+        WtDfN7pPxWwUy15CnBV6BM5mY/m6EUN4oxp9RY01kYfIr1xGbSJrJt/3V6zf8PZ7PGtIfo3b1BdJP
+        7BeAX9HZ+38sBDQcfTYCNBqasc2ZPtMTuZxB/cnkoYTt9Ey/MQvinemeovdu26oIQul+oHJmisR13
+        MI9DujJQ==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1pSfQq-00AhmE-56; Thu, 16 Feb 2023 14:40:20 +0000
+Date:   Thu, 16 Feb 2023 06:40:20 -0800
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: Re: [PATCH] brd: mark as nowait compatible
+Message-ID: <Y+5AVIhMRRD8ks7X@infradead.org>
+References: <776a5fa2-818c-de42-2ac3-a4588df218ca@kernel.dk>
+ <Y+3IUcJLNK8WAkov@infradead.org>
+ <9a9adcce-81db-580f-843f-ebff7177464c@kernel.dk>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230212092641.2394146-4-yukuai1@huaweicloud.com>
+In-Reply-To: <9a9adcce-81db-580f-843f-ebff7177464c@kernel.dk>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sun 12-02-23 17:26:41, Yu Kuai wrote:
-> From: Yu Kuai <yukuai3@huawei.com>
-> 
-> As explained in commit 36369f46e917 ("block: Do not reread partition table
-> on exclusively open device"), reread partition on the device that is
-> exclusively opened by someone else is problematic.
-> 
-> This patch will make sure partition scan will only be proceed if current
-> thread open the device exclusively, or the device is not opened
-> exclusively, and in the later case, other scanners and exclusive openers
-> will be blocked temporarily until partition scan is done.
-> 
-> Fixes: 10c70d95c0f2 ("block: remove the bd_openers checks in blk_drop_partitions")
-> Cc: <stable@vger.kernel.org>
-> Suggested-by: Jan Kara <jack@suse.cz>
-> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+On Thu, Feb 16, 2023 at 06:11:41AM -0700, Jens Axboe wrote:
+> I did consider that, but we do allocations almost everywhere and
 
-Just one nit below.
+Do we?  All the code I've touched for nowait goes to great length
+to avoid blocking allocations.
 
-> diff --git a/block/genhd.c b/block/genhd.c
-> index c0d1220bd798..6ec10ffeb9cc 100644
-> --- a/block/genhd.c
-> +++ b/block/genhd.c
-> @@ -359,6 +359,7 @@ EXPORT_SYMBOL_GPL(disk_uevent);
->  int disk_scan_partitions(struct gendisk *disk, fmode_t mode)
->  {
->  	struct block_device *bdev;
-> +	int ret = 0;
->  
->  	if (disk->flags & (GENHD_FL_NO_PART | GENHD_FL_HIDDEN))
->  		return -EINVAL;
-> @@ -367,11 +368,29 @@ int disk_scan_partitions(struct gendisk *disk, fmode_t mode)
->  	if (disk->open_partitions)
->  		return -EBUSY;
->  
-> -	bdev = blkdev_get_by_dev(disk_devt(disk), mode, NULL);
-> -	if (IS_ERR(bdev))
-> -		return PTR_ERR(bdev);
-> +	/*
-> +	 * If the device is opened exclusively by current thread already, it's
-> +	 * safe to scan partitons, otherwise, use bd_prepare_to_claim() to
-> +	 * synchronize with other exclusivet openers and other partition
-				  ^^^ typo here
-
-								Honza
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
