@@ -2,115 +2,216 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 78535C61DA4
-	for <linux-block@archiver.kernel.org>; Thu, 16 Feb 2023 21:31:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0AC46C636CC
+	for <linux-block@archiver.kernel.org>; Thu, 16 Feb 2023 21:44:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230079AbjBPVbP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 16 Feb 2023 16:31:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54724 "EHLO
+        id S229739AbjBPVoo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 16 Feb 2023 16:44:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60052 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230044AbjBPVbL (ORCPT
+        with ESMTP id S229525AbjBPVon (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 16 Feb 2023 16:31:11 -0500
-Received: from mail-qv1-f52.google.com (mail-qv1-f52.google.com [209.85.219.52])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 762BA46B0
-        for <linux-block@vger.kernel.org>; Thu, 16 Feb 2023 13:31:08 -0800 (PST)
-Received: by mail-qv1-f52.google.com with SMTP id s17so1409730qvq.12
-        for <linux-block@vger.kernel.org>; Thu, 16 Feb 2023 13:31:08 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=gO6r7SGbt4F/ovnWsWl2cTXvsSI+IcObCRtChS/zGts=;
-        b=SXAT5sdO5txHxyEYx+B0e8z5wYZ4j/x5InfGVGHklSDzeX28Hm2DSBhTWTPD2/hzkJ
-         2bGbrLGlnJb13U8DaibRQ1ZAmUbeXnKgioIHAIEEopGlA5PBa5UikxzXdTYm0VGK9oyE
-         y9dxR7RURlIlJe5TwBBBbxXrtNjBl3FeEFoCawSD3s+Zbdq5nDcTIsRy3Xjej4UAbQoB
-         ZtjMjiGZx4BtFsxGfkZySEf/HawsYzLQyi4NuyzrG5gQ84p0TFAc8BeEICJ6d/IiFCD3
-         rP2Pg80K8w7BEnTS9fuHTnO908mh+mP0cuI1C4UbXhpeFfcFBCw3rXxbU4syZhFS+cQg
-         dKdA==
-X-Gm-Message-State: AO0yUKXNmRSitSffvBlCXTFauNNTM7sVR76ewJpkqF/vtJYc8P6zaCY4
-        4SUIwUI5WFsr2OP3rYLJAOXdcyCKSzvdMA==
-X-Google-Smtp-Source: AK7set9tKOQnEOqTuYdb+74O6KxDxDemDjHU2ofjS9cMPz5jSwG1i3RW6R5IuK4tKiXe/zp7eRpfHw==
-X-Received: by 2002:ad4:5d43:0:b0:537:9e59:3997 with SMTP id jk3-20020ad45d43000000b005379e593997mr16040314qvb.51.1676583067337;
-        Thu, 16 Feb 2023 13:31:07 -0800 (PST)
-Received: from mail-yb1-f177.google.com (mail-yb1-f177.google.com. [209.85.219.177])
-        by smtp.gmail.com with ESMTPSA id b83-20020ae9eb56000000b0073ba44fd6a2sm743911qkg.1.2023.02.16.13.31.06
-        for <linux-block@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 16 Feb 2023 13:31:06 -0800 (PST)
-Received: by mail-yb1-f177.google.com with SMTP id s203so3783655ybc.11
-        for <linux-block@vger.kernel.org>; Thu, 16 Feb 2023 13:31:06 -0800 (PST)
-X-Received: by 2002:a5b:f4d:0:b0:8e6:2e51:57ff with SMTP id
- y13-20020a5b0f4d000000b008e62e5157ffmr733316ybr.349.1676583066500; Thu, 16
- Feb 2023 13:31:06 -0800 (PST)
+        Thu, 16 Feb 2023 16:44:43 -0500
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2053.outbound.protection.outlook.com [40.107.220.53])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C8742528BD;
+        Thu, 16 Feb 2023 13:44:36 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=CF8D4NB+z2ulgyRXyENetmAi79bmBZX7E4+dEZPVoUfzMlbGRxon3riz1hnIEKPR6O0Wb3+2VcKoAJgMvjpZP0NRPsic5TSBdI2mb7Cym2GVdgP8XLe3+OLmxaGNTxANb0ggXZztaiyEouUVsQ4Eh76u9m4UCNUNfdOlLHiYikk6Wl7LCxoQu6o1HFBhRSyxGd2wXbgi5p9CT5MKE5BuCWUaWsKBQGuLKU70lyRnsawFrHvYtL9EQ5VCfiC8qAINFaCthcImFbyF/UGRVfeyPDTKfLe24QnPuLj3DpZOCFtwVTuM9j6LYlsHo6ZwgWowte8MB2wbMYD2ryDVjgidtQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=3RKI4B4peM8M4LPcDSPFvy7vUj5rWzLiyAh/iirVd/g=;
+ b=FZ7Kz0VreAaLxgxmRxW1zG5cBA/3nL8FRPCGIqb3kXhGxy760YMgay4PtkkXqm9d96g5YC7W8UEIWVNOcFS8bVMCOzuBrNOWj4JADlCWnJiqqwYyHsTvM036sjSwORudxJCLhHhxaI+EHrUNBBfLBszkQiNOfvbI9E8JA0TUw/pCGrN3Mc1HoGHjJDWuUs9/t9g6JYblg6VUvfX7SDKvwlEMfwIDEePQtqObTR7U9JVBCo9gZNmg65E2EQ7F+gxoVQGZdJkxnicv8BneA5VfpIQ1epTuFeA6hh5gi1DRXaE8BZBdaGUSeRqkhyK72UH9z2OLDrtg0zBJwTCsOSvGgw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=knights.ucf.edu; dmarc=pass action=none
+ header.from=knights.ucf.edu; dkim=pass header.d=knights.ucf.edu; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=knightsucfedu39751.onmicrosoft.com;
+ s=selector2-knightsucfedu39751-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=3RKI4B4peM8M4LPcDSPFvy7vUj5rWzLiyAh/iirVd/g=;
+ b=VrNCzWRVprAEamb0bvUHy26XkqSTWsRYfX3PaTgKnoh0ZvRYU7637zZgbLh4zy7ZEZ8gzU3OmO7gmEmm94js6TzWIEuXf0ECo35coulV1xvAJIvIhDAYaLp6uKvkMlK47wiyviEMmac5acYqEX/f4POXER6EOIiLqJpTPyeKsvE=
+Received: from IA1PR07MB9830.namprd07.prod.outlook.com (2603:10b6:208:44b::14)
+ by PH0PR07MB8717.namprd07.prod.outlook.com (2603:10b6:510:86::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6111.13; Thu, 16 Feb
+ 2023 21:44:34 +0000
+Received: from IA1PR07MB9830.namprd07.prod.outlook.com
+ ([fe80::d883:f078:37f:dace]) by IA1PR07MB9830.namprd07.prod.outlook.com
+ ([fe80::d883:f078:37f:dace%6]) with mapi id 15.20.6086.026; Thu, 16 Feb 2023
+ 21:44:34 +0000
+From:   Sanan Hasanov <sanan.hasanov@Knights.ucf.edu>
+To:     "tj@kernel.org" <tj@kernel.org>,
+        "josef@toxicpanda.com" <josef@toxicpanda.com>,
+        "axboe@kernel.dk" <axboe@kernel.dk>,
+        "cgroups@vger.kernel.org" <cgroups@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+CC:     "syzkaller@googlegroups.com" <syzkaller@googlegroups.com>,
+        "contact@pgazz.com" <contact@pgazz.com>
+Subject: general protection fault in blkg_destroy_all
+Thread-Topic: general protection fault in blkg_destroy_all
+Thread-Index: AQHZQkzQG+qnG8+3Oki/SPFOHFO4AQ==
+Date:   Thu, 16 Feb 2023 21:44:34 +0000
+Message-ID: <IA1PR07MB98303634E615F4051D13A5F3ABA09@IA1PR07MB9830.namprd07.prod.outlook.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+msip_labels: 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=Knights.ucf.edu;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: IA1PR07MB9830:EE_|PH0PR07MB8717:EE_
+x-ms-office365-filtering-correlation-id: 2634d35b-82f2-4ca8-9ac2-08db1066fe91
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: u+2v4NVk8GhB8dJCHz0WPhCC46FiFbYcxAld0A4WxO7TQuYINOKsM8Ep7Vt5rjkI9keFNi0+o36JsdRJYiX8vXAjXcgrIEGkSPmsW/aSwlttgB4Z0FvWeQ+RnPd/WhBrtzWvKjj+z6CtbuiJpxADwzHZUvIZr+RclD/QM0aszYhEaOYfW/w0PC/JoXp2hhdizsXdybgIV+4yCl5FvsEnZAPumVgWCXtqGo+ShZqeUmEoV7Kc6qHleHnXcH0ANMjHhZTRb8TPW5HW251/lrD7pzHs5jZaKzHR0pcSTWnVzCBXGKjsy0gfCX/msDz55ibssBcQyUsAEiAv1eSdQkVcXU7ZBsCCxmcEo9cCCrlR6yxr0Wk1zEBGUVqKp3SNDknJ5mcu8gEEKAyBA4250xVyP7xkSWIhIzriGkf8dl76hb73nVJ3gxy5oEwOPo3um5Fi8syvWf83jg4cE8XJjC2M3mSlLoQJkWMHj00zmAeHvvkKHoVz6rgU/wWHnrLoPoxsKTsIKS/Sb0jpnT9ZMVKjDUAoisBe7ttcgLmZHuTbTQYjlJqUJZQmg9moTHzyeQoPmG26PqHMfoq/2JzzL2V/pmiod651GeMA0bKl86aX2PlpYkcALTAWUCf28o7kAZfzhFQIeOGatRcTZZtJpVYfuFS7tbMpJLpd5YOMRkDP6//Y69ZSczQ5ivhsvXezWJqo/c+xkCUIdf9kxg6Bs9wFx5RIJPam7NWulGApDFTuQhk=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA1PR07MB9830.namprd07.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(4636009)(39860400002)(346002)(396003)(366004)(376002)(136003)(451199018)(5930299012)(966005)(55016003)(83380400001)(86362001)(2906002)(44832011)(45080400002)(478600001)(33656002)(7696005)(71200400001)(6506007)(186003)(26005)(9686003)(122000001)(38070700005)(75432002)(38100700002)(66446008)(8936002)(41300700001)(4326008)(5660300002)(52536014)(41320700001)(8676002)(786003)(66476007)(66556008)(64756008)(66946007)(76116006)(316002)(54906003)(110136005);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?iso-8859-1?Q?z3u3xLN2BgxfBPMSABEvUChO+rI1i8thxj6WBd38u20WcUetFOfVBhjdIY?=
+ =?iso-8859-1?Q?fKkC7C1vSr3UQpBWkmJ7dbmSx3tNYDEixcAmp5/ea3Dta9Tw58sbNMm/hd?=
+ =?iso-8859-1?Q?IGv0vVs3zoYBo+rrX4FHRvwUtlEQJpancNHnWifvnlB+oNbA8C+biA+vS7?=
+ =?iso-8859-1?Q?yqFna1Nj67VlePBKniXRwH9nQi0Yyga+JMmdBxWQUbTJiz0uaemxeTPMUH?=
+ =?iso-8859-1?Q?J3/gLggixvXVVhCfEcOUjToHl3syA8IPhqxBSz4yA2w6pkgTrO2f6BPqE5?=
+ =?iso-8859-1?Q?pXGoU5k66LgP8wOfBKvYbWK2Ou2KVZMq/7xNixXHrBkpg0PU7BjCVsP15y?=
+ =?iso-8859-1?Q?ew45+njXac0KvMqNUj378phVaOZtp+lsIGufr7kZqGbUKn4t5L45WTa10C?=
+ =?iso-8859-1?Q?tR9lpA1Gm3xNNx35Kw87l3dGqhJa6ux5GhI/UAYxQ+FUyX/olZgFzmGgHF?=
+ =?iso-8859-1?Q?oykyI0WQ+0ddE+8Ld+HYDqkaXJtxC7021rakQodl45NlBvCqGht+F5AIJ8?=
+ =?iso-8859-1?Q?OIWXuLRrBdI+SR+vl5lDcyiGmkqN9oi8zxqq1IXA7CFIsT6xbUxipr9nsr?=
+ =?iso-8859-1?Q?bMzK8roqgq0wG9JwVSiH8crO/VHQBdDoEdp5uNdEf7Wm47gjKv5KWv0QGB?=
+ =?iso-8859-1?Q?Os7Ck1gVOcpHvjNqnWK3I1demMaj5eF99G5A4cNvPSKudv7Ed/M3R7vDjB?=
+ =?iso-8859-1?Q?8Hy9D7hefBbxBxZZ01pesWVF9THH4QUvO06as7SKTpnCb0oa4z9odrZRCl?=
+ =?iso-8859-1?Q?InSN9CSbRW3YlHMzGNhHnXXf25l946p1jBVcDxGJ016afKneahJuheePut?=
+ =?iso-8859-1?Q?m8hE2MEGIRVk1Ajl/Cy+czeRXm8I4hUTOTBuJHGZg5tQQauEHPWu/mSvcB?=
+ =?iso-8859-1?Q?ltbCi3mouWBO0vMUlj4Cxmmf5Zh4K4PCP3hxpAsLQLOJptd8rPLeJ8txqK?=
+ =?iso-8859-1?Q?5Gu2Ufzm4u6CPmofxZd+YE723aEMUrtmWgyuQR0aoalg8uqEg+zJJNZaWS?=
+ =?iso-8859-1?Q?E25Ai8OSk6ydo6D5M0CeMuS9KP2L6tRI0vGkT0ImUYHGvOZR6Gks+usKkx?=
+ =?iso-8859-1?Q?cvQl+JX4sCqhSdlvF9QqLm4Op+fsHfHEQOpMCZEgkwD1BhHQZvjuTMWkP0?=
+ =?iso-8859-1?Q?/Lj3ndXl5ZTSo3vY5hv6CDByqt5GBtfBdXnADKc9mYGyxwJRHlyLvkR9iF?=
+ =?iso-8859-1?Q?1s+IZstxduDFliJ/C/EsmkrHM3Y0YeLCZg0Nm/Dow6u4AljSeUovzadgaZ?=
+ =?iso-8859-1?Q?0SbQ7ReVRa9Uww9eEyhXdJcnHjbBIjXuW091ThtxHhYMnD62cYk1BM7nMB?=
+ =?iso-8859-1?Q?/dpuZSSpV/kFw+/o6Ji9aejhAedZfpqlU8y6/kSxZcNCIxRJny8YG6W0yH?=
+ =?iso-8859-1?Q?Sg4GbmtyxtzRY77H1wrGqwQ1difXm55mwQbuZGLJpWYOGDAopWjOywYyDh?=
+ =?iso-8859-1?Q?bJ2/vpPshTHgN477GT/+q9NvLtMtsaFA4oZaNNhGdUHvsnzfToVsMoab1f?=
+ =?iso-8859-1?Q?xeT3nkMMv4PGDjfnBxoUmIfX07U6z+rcqYcmtlJUQ2BJrqLCk4sk2a8GpQ?=
+ =?iso-8859-1?Q?h0UYk4SZFVw+3k5x4WaFddLrx6WCvy8S2/KkJx+KOCo7CDu/cxt8jb1FRw?=
+ =?iso-8859-1?Q?1li+8RU1vXkZkZzArrfV+wNPVG2h4NQeuo9F0TGm1qOsc7hVnf5sPu4g?=
+ =?iso-8859-1?Q?=3D=3D?=
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-References: <20230210010612.28729-1-luca.boccassi@gmail.com> <CAMw=ZnQUOLXiQf195tufdMo-8UCw=QgqFwewkSTDzSaKidYF2w@mail.gmail.com>
-In-Reply-To: <CAMw=ZnQUOLXiQf195tufdMo-8UCw=QgqFwewkSTDzSaKidYF2w@mail.gmail.com>
-From:   Luca Boccassi <bluca@debian.org>
-Date:   Thu, 16 Feb 2023 21:30:55 +0000
-X-Gmail-Original-Message-ID: <CAMw=ZnTd+LfDcC=Z9tQUQJdVOukv0wVU+mj8jH1L8_5dhM+8yg@mail.gmail.com>
-Message-ID: <CAMw=ZnTd+LfDcC=Z9tQUQJdVOukv0wVU+mj8jH1L8_5dhM+8yg@mail.gmail.com>
-Subject: Re: [PATCH] sed-opal: add support flag for SUM in status ioctl
-To:     linux-block@vger.kernel.org
-Cc:     Christian Brauner <brauner@kernel.org>,
-        Christoph Hellwig <hch@infradead.org>
-Content-Type: text/plain; charset="UTF-8"
+X-OriginatorOrg: knights.ucf.edu
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: IA1PR07MB9830.namprd07.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2634d35b-82f2-4ca8-9ac2-08db1066fe91
+X-MS-Exchange-CrossTenant-originalarrivaltime: 16 Feb 2023 21:44:34.6564
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 5b16e182-78b3-412c-9196-68342689eeb7
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: RD6BmvNtcESxHtA9EZ6m1tFeUVNJcXQslaPgrnG/sybFVvoEUTRkBSBGNYP7Kq+OX4aHh341sE52Wqe16noRtqHahKg6CJ8CFgw92uERjN4=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR07MB8717
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, 16 Feb 2023 at 20:57, Luca Boccassi <bluca@debian.org> wrote:
->
-> On Fri, 10 Feb 2023 at 01:06, <luca.boccassi@gmail.com> wrote:
-> >
-> > From: Luca Boccassi <bluca@debian.org>
-> >
-> > Not every OPAL drive supports SUM (Single User Mode), so report this
-> > information to userspace via the get-status ioctl so that we can adjust
-> > the formatting options accordingly.
-> > Tested on a kingston drive (which supports it) and a samsung one
-> > (which does not).
-> >
-> > Signed-off-by: Luca Boccassi <bluca@debian.org>
-> > ---
-> >  block/sed-opal.c              | 2 ++
-> >  include/uapi/linux/sed-opal.h | 1 +
-> >  2 files changed, 3 insertions(+)
-> >
-> > diff --git a/block/sed-opal.c b/block/sed-opal.c
-> > index 463873f61e01..c320093c14f1 100644
-> > --- a/block/sed-opal.c
-> > +++ b/block/sed-opal.c
-> > @@ -487,6 +487,8 @@ static int opal_discovery0_end(struct opal_dev *dev)
-> >                         break;
-> >                 case FC_SINGLEUSER:
-> >                         single_user = check_sum(body->features);
-> > +                       if (single_user)
-> > +                               dev->flags |= OPAL_FL_SUM_SUPPORTED;
-> >                         break;
-> >                 case FC_GEOMETRY:
-> >                         check_geometry(dev, body);
-> > diff --git a/include/uapi/linux/sed-opal.h b/include/uapi/linux/sed-opal.h
-> > index 1fed3c9294fc..d7a1524023db 100644
-> > --- a/include/uapi/linux/sed-opal.h
-> > +++ b/include/uapi/linux/sed-opal.h
-> > @@ -144,6 +144,7 @@ struct opal_read_write_table {
-> >  #define OPAL_FL_LOCKED                 0x00000008
-> >  #define OPAL_FL_MBR_ENABLED            0x00000010
-> >  #define OPAL_FL_MBR_DONE               0x00000020
-> > +#define OPAL_FL_SUM_SUPPORTED          0x00000040
-> >
-> >  struct opal_status {
-> >         __u32 flags;
->
-> Hi,
->
-> Any chance for a quick review, please? Would have loved to have this
-> for the 6.3 merge window, it's a super simple change.
-> Thanks!
-
-CC'ed couple more reviewers as suggested by Christian
-
-Kind regards,
-Luca Boccassi
+Good day, dear maintainers,=0A=
+=0A=
+We found a bug using a modified kernel configuration file used by syzbot.=
+=0A=
+=0A=
+We enhanced the coverage of the configuration file using our tool, klocaliz=
+er.=0A=
+=0A=
+Kernel Branch: 6.2.0-rc7-next-20230213=0A=
+Kernel config:=A0https://drive.google.com/file/d/1yVvlPL4-MMdjARqrwJ0QoKuPv=
+_3lFQIR/view?usp=3Dshare_link=0A=
+Unfortunately, we do not have a reproducer yet.=0A=
+=0A=
+Thank you!=0A=
+=0A=
+Best regards,=0A=
+Sanan Hasanov=0A=
+=0A=
+general protection fault, probably for non-canonical address 0xdffffc000000=
+0000: 0000 [#1] PREEMPT SMP KASAN=0A=
+KASAN: null-ptr-deref in range [0x0000000000000000-0x0000000000000007]=0A=
+CPU: 1 PID: 10907 Comm: syz-executor.3 Not tainted 6.2.0-rc7-next-20230213+=
+ #1=0A=
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1 04/01/=
+2014=0A=
+RIP: 0010:blkg_destroy_all+0xa5/0x260=0A=
+Code: 7d c0 e8 7e 65 27 06 48 8b 45 b8 80 38 00 0f 85 a8 01 00 00 48 8b 45 =
+c8 48 8b 98 80 05 00 00 4c 8d 63 f8 48 89 d8 48 c1 e8 03 <42> 80 3c 28 00 0=
+f 85 7a 01 00 00 48 8b 03 48 39 5d d0 4c 8d 78 f8=0A=
+RSP: 0018:ffffc9001ca5fcb8 EFLAGS: 00010056=0A=
+=0A=
+RAX: 0000000000000000 RBX: 0000000000000000 RCX: ffffffff8168f15d=0A=
+RDX: 1ffff11021b6cc29 RSI: 0000000000000004 RDI: ffffc9001ca5fc18=0A=
+RBP: ffffc9001ca5fd08 R08: 0000000000000001 R09: 0000000000000003=0A=
+R10: fffff5200394bf83 R11: 0000000000000001 R12: fffffffffffffff8=0A=
+R13: dffffc0000000000 R14: ffffffff8ae21700 R15: ffff888080ff1090=0A=
+FS:  00007f21d3837700(0000) GS:ffff88811a080000(0000) knlGS:000000000000000=
+0=0A=
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033=0A=
+CR2: 00007fb7b4ffcbd8 CR3: 00000001118c3000 CR4: 0000000000350ee0=0A=
+Call Trace:=0A=
+ <TASK>=0A=
+ blkcg_exit_disk+0x1a/0x60=0A=
+ disk_release+0xec/0x4a0=0A=
+ device_release+0xae/0x250=0A=
+ kobject_put+0x1d8/0x2c0=0A=
+ put_device+0x24/0x30=0A=
+ put_disk+0x49/0x60=0A=
+ loop_add+0x91f/0xb20=0A=
+ loop_control_ioctl+0x13d/0x690=0A=
+ __x64_sys_ioctl+0x1a9/0x220=0A=
+ do_syscall_64+0x39/0x80=0A=
+ entry_SYSCALL_64_after_hwframe+0x63/0xcd=0A=
+RIP: 0033:0x7f21d268edcd=0A=
+Code: 02 b8 ff ff ff ff c3 66 0f 1f 44 00 00 f3 0f 1e fa 48 89 f8 48 89 f7 =
+48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff f=
+f 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48=0A=
+RSP: 002b:00007f21d3836bf8 EFLAGS: 00000246 ORIG_RAX: 0000000000000010=0A=
+RAX: ffffffffffffffda RBX: 00007f21d27bbf80 RCX: 00007f21d268edcd=0A=
+RDX: 0000000000000000 RSI: 0000000000004c80 RDI: 0000000000000004=0A=
+RBP: 00007f21d26fc59c R08: 0000000000000000 R09: 0000000000000000=0A=
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000=0A=
+R13: 00007ffc7837a81f R14: 00007ffc7837a9c0 R15: 00007f21d3836d80=0A=
+ </TASK>=0A=
+Modules linked in:=0A=
+---[ end trace 0000000000000000 ]---=0A=
+RIP: 0010:blkg_destroy_all+0xa5/0x260=0A=
+Code: 7d c0 e8 7e 65 27 06 48 8b 45 b8 80 38 00 0f 85 a8 01 00 00 48 8b 45 =
+c8 48 8b 98 80 05 00 00 4c 8d 63 f8 48 89 d8 48 c1 e8 03 <42> 80 3c 28 00 0=
+f 85 7a 01 00 00 48 8b 03 48 39 5d d0 4c 8d 78 f8=0A=
+RSP: 0018:ffffc9001ca5fcb8 EFLAGS: 00010056=0A=
+RAX: 0000000000000000 RBX: 0000000000000000 RCX: ffffffff8168f15d=0A=
+RDX: 1ffff11021b6cc29 RSI: 0000000000000004 RDI: ffffc9001ca5fc18=0A=
+RBP: ffffc9001ca5fd08 R08: 0000000000000001 R09: 0000000000000003=0A=
+R10: fffff5200394bf83 R11: 0000000000000001 R12: fffffffffffffff8=0A=
+R13: dffffc0000000000 R14: ffffffff8ae21700 R15: ffff888080ff1090=0A=
+FS:  00007f21d3837700(0000) GS:ffff88811a080000(0000) knlGS:000000000000000=
+0=0A=
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033=0A=
+CR2: 00007fb7b4ffcbd8 CR3: 00000001118c3000 CR4: 0000000000350ee0=0A=
+----------------=0A=
+Code disassembly (best guess):=0A=
+   0:	7d c0                	jge    0xffffffc2=0A=
+   2:	e8 7e 65 27 06       	call   0x6276585=0A=
+   7:	48 8b 45 b8          	mov    -0x48(%rbp),%rax=0A=
+   b:	80 38 00             	cmpb   $0x0,(%rax)=0A=
+   e:	0f 85 a8 01 00 00    	jne    0x1bc=0A=
+  14:	48 8b 45 c8          	mov    -0x38(%rbp),%rax=0A=
+  18:	48 8b 98 80 05 00 00 	mov    0x580(%rax),%rbx=0A=
+  1f:	4c 8d 63 f8          	lea    -0x8(%rbx),%r12=0A=
+  23:	48 89 d8             	mov    %rbx,%rax=0A=
+  26:	48 c1 e8 03          	shr    $0x3,%rax=0A=
+* 2a:	42 80 3c 28 00       	cmpb   $0x0,(%rax,%r13,1) <-- trapping instruct=
+ion=0A=
+  2f:	0f 85 7a 01 00 00    	jne    0x1af=0A=
+  35:	48 8b 03             	mov    (%rbx),%rax=0A=
+  38:	48 39 5d d0          	cmp    %rbx,-0x30(%rbp)=0A=
+  3c:	4c 8d 78 f8          	lea    -0x8(%rax),%r15=0A=
