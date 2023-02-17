@@ -2,88 +2,111 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 04BBEC05027
-	for <linux-block@archiver.kernel.org>; Fri, 17 Feb 2023 16:44:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A0D70C636D7
+	for <linux-block@archiver.kernel.org>; Fri, 17 Feb 2023 17:48:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229508AbjBQQof (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 17 Feb 2023 11:44:35 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57826 "EHLO
+        id S229593AbjBQRso (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 17 Feb 2023 12:48:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48504 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229570AbjBQQoe (ORCPT
+        with ESMTP id S229502AbjBQRsn (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 17 Feb 2023 11:44:34 -0500
-Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8774C10AA3
-        for <linux-block@vger.kernel.org>; Fri, 17 Feb 2023 08:43:37 -0800 (PST)
-Received: by mail-qt1-f181.google.com with SMTP id t8so1183539qtp.9
-        for <linux-block@vger.kernel.org>; Fri, 17 Feb 2023 08:43:37 -0800 (PST)
+        Fri, 17 Feb 2023 12:48:43 -0500
+Received: from mail-lf1-x12d.google.com (mail-lf1-x12d.google.com [IPv6:2a00:1450:4864:20::12d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 412854FCBD;
+        Fri, 17 Feb 2023 09:48:42 -0800 (PST)
+Received: by mail-lf1-x12d.google.com with SMTP id bi36so2414239lfb.6;
+        Fri, 17 Feb 2023 09:48:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=W82mtufaxCxYaCrOwsWwXEqkQ8P4m8alQaSwlsBKCQE=;
+        b=RimT2oCov4P2FJhzEMVzK6vAiZ1gzLQ+s2iyY+NBElRkyquEhBySqKaTrFiClN3Q5L
+         tc4BrLdaY/OzDcL8amvmaZWPWdQ29gctSOMhZYz00WwaVG+tKgqs9a0ZOrPBcQdOZauU
+         4eHv8uCS2ezA6q1tCzEtShJ0lcitKPXVnXs6b4z+J2wS0/IRMtfn/yjH0SSTaPK9A/J5
+         2ELTVzNKbzdyrKU0wEKbfPTf629znz/I3HfzV0bSoeErirN2hQn6zDbQJwkEZSod+M5s
+         2XzWNrgf/6UxcM1LExMCpG3ohyVuDIhCxkEmyopQDxfD7YU5yQXzh/3R+DznDDXV4yjr
+         Yz5g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=h3uS6l7R4NN6xpTILsvB1VqvWC13/kbkjpwhQ4oxzsc=;
-        b=bzNQI1lTX91qau6JA46+Mz6ULw7qBr1UtdLDROjsPDqk8E/nb38hRM60dOP98yM/lf
-         w+d6zTZqk30S+IHNqhwYujkgJsOVDRsmeTIlKGbEkUMDpzD01aHn/X1carPh+kLI67l1
-         7ZoA66FPmmhhg533a8J07VtujtNdOkBhweLXvZP50a7IdwhsTlsWeOSOA+a33sZHgH9x
-         Q7KQYjxa1fU5ZbRpYmzyiIRf1A+4tb1PIAcZbb9UYfaV8Yua5JBTwLwAg71ui3gxo3z4
-         JcGg81Q7I2Ipp34stELXBFKHkVB4UT50NLd4fPgcrGhDo44W/iq2oDPBDXraaecbsKKA
-         sDCg==
-X-Gm-Message-State: AO0yUKUKeToxqGQFVqSn7enragkwUjT7wLtO27+gqSYVcCHcxiyIZ5rN
-        LPXRFQn0YwXofD5jOtPEANKt
-X-Google-Smtp-Source: AK7set9gWGn6W9xaTLmOYlMZhybnyp39F0bJY6EI6xONfoBZQJ+IZm4+inBu0UdqBkTMUHpdf4x7bw==
-X-Received: by 2002:a05:622a:81:b0:3b9:bc8c:c20c with SMTP id o1-20020a05622a008100b003b9bc8cc20cmr9573603qtw.23.1676652216569;
-        Fri, 17 Feb 2023 08:43:36 -0800 (PST)
-Received: from localhost (pool-68-160-166-30.bstnma.fios.verizon.net. [68.160.166.30])
-        by smtp.gmail.com with ESMTPSA id i129-20020a37b887000000b007068b49b8absm3482600qkf.62.2023.02.17.08.43.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 17 Feb 2023 08:43:36 -0800 (PST)
-Date:   Fri, 17 Feb 2023 11:43:34 -0500
-From:   Mike Snitzer <snitzer@kernel.org>
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     Uday Shankar <ushankar@purestorage.com>,
-        Jens Axboe <axboe@kernel.dk>, Alasdair Kergon <agk@redhat.com>,
-        linux-block@vger.kernel.org, dm-devel@redhat.com
-Subject: Re: blk-mq: enforce op-specific segment limits in
- blk_insert_cloned_request
-Message-ID: <Y++utrkJXuUsD0K4@redhat.com>
-References: <20230215201507.494152-1-ushankar@purestorage.com>
- <Y+3IoOd02iFGNLnC@infradead.org>
- <20230216192702.GA801590@dev-ushankar.dev.purestorage.com>
- <Y++oTz0ck9OGE4Se@infradead.org>
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=W82mtufaxCxYaCrOwsWwXEqkQ8P4m8alQaSwlsBKCQE=;
+        b=Q0fGN7ApykI008wSYWbeAIuOAEtDywXpMjpU7ET1aPyznALkWYnb4/g+L5Wmm5A7s3
+         nh+khoGnoAfIDYtyPn8N0vF2/Vf1hH2XUrDvLzHgmeKtvVaYji+EUrLi06qq+NQrs5GL
+         18No2Dqt6gRzuMSHZV+P3d9+i6bbg+XVI7wlfPr98x+IxU86qlo0GrsDqke7oDILXAIY
+         LLSZnTZIh5spCRgObRha9Bu1VwEX+57rix1ibUBMmkbxwAhO6ghPA+n4YWhkVFVz1MlH
+         gsa8OYoxfVuUOvr4eVDSoeYaOn9UsceCigLHTRFMx99ykk2cE5HhBGapIQ1FSuN+D7yr
+         w8dQ==
+X-Gm-Message-State: AO0yUKWROb3peoP3KSMITkZVNo05SyoZAMQPAFH8adBq83wB71IuodXr
+        IyUAxDUxDy4RLldrKKO2+cG8haXifGuNrS3lX40=
+X-Google-Smtp-Source: AK7set86i6m3Q4viJu7w21vbC25QAPfZIb1xUe2TG6mkfmZTyneWDww3gkbjTM2kzGZ0bcI9FudMJJy97KppSFxu5AQ=
+X-Received: by 2002:a05:6512:501:b0:4d5:ca32:7bc3 with SMTP id
+ o1-20020a056512050100b004d5ca327bc3mr646949lfb.10.1676656120238; Fri, 17 Feb
+ 2023 09:48:40 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Y++oTz0ck9OGE4Se@infradead.org>
+References: <20230216214745.3985496-1-dhowells@redhat.com> <20230216214745.3985496-15-dhowells@redhat.com>
+ <CAH2r5msNJTdt7295xt=NVY7wUaWFycKMb_=7d9LySsGGwBTnjQ@mail.gmail.com> <4008035.1676621321@warthog.procyon.org.uk>
+In-Reply-To: <4008035.1676621321@warthog.procyon.org.uk>
+From:   Steve French <smfrench@gmail.com>
+Date:   Fri, 17 Feb 2023 11:48:28 -0600
+Message-ID: <CAH2r5ms1u7OPYhzYHLD2vddK6FHxOR3q+O_n80JmbJeo_mbUMQ@mail.gmail.com>
+Subject: Re: [PATCH 14/17] cifs: Change the I/O paths to use an iterator
+ rather than a page list
+To:     David Howells <dhowells@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, Al Viro <viro@zeniv.linux.org.uk>,
+        Shyam Prasad N <nspmangalore@gmail.com>,
+        Rohith Surabattula <rohiths.msft@gmail.com>,
+        Tom Talpey <tom@talpey.com>,
+        Stefan Metzmacher <metze@samba.org>,
+        Christoph Hellwig <hch@infradead.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        Jeff Layton <jlayton@kernel.org>, linux-cifs@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-mm@kvack.org, linux-kernel@vger.kernel.org,
+        Steve French <sfrench@samba.org>, Paulo Alcantara <pc@cjr.nz>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Feb 17 2023 at 11:16P -0500,
-Christoph Hellwig <hch@infradead.org> wrote:
+I don't think that those are particular important to clean up - but a
+couple of the other checkpatch warnings were
 
-> On Thu, Feb 16, 2023 at 12:27:02PM -0700, Uday Shankar wrote:
-> >  * Description:
-> >  *    @rq may have been made based on weaker limitations of upper-level queues
-> >  *    in request stacking drivers, and it may violate the limitation of @q.
-> >  *    Since the block layer and the underlying device driver trust @rq
-> >  *    after it is inserted to @q, it should be checked against @q before
-> >  *    the insertion using this generic function.
-> >  *
-> >  *    Request stacking drivers like request-based dm may change the queue
-> >  *    limits when retrying requests on other queues. Those requests need
-> >  *    to be checked against the new queue limits again during dispatch.
-> >  */.
-> > 
-> > Is this concern no longer relevant?
-> 
-> The concern is still valid, but it does not refer to the debug check.
-> It refers to recalculating nr_phys_segments using
-> blk_recalc_rq_segments, and the fact that any driver using this
-> interface needs to stack its limits properly.
+On Fri, Feb 17, 2023 at 2:08 AM David Howells <dhowells@redhat.com> wrote:
+>
+> Steve French <smfrench@gmail.com> wrote:
+>
+> > WARNING: Consider removing the code enclosed by this #if 0 and its #endif
+> > #627: FILE: fs/cifs/file.c:2609:
+> > +#if 0 // TODO: Remove for iov_iter support
+> > ...
+> > WARNING: Consider removing the code enclosed by this #if 0 and its #endif
+> > #1040: FILE: fs/cifs/file.c:3512:
+> > +#if 0 // TODO: Remove for iov_iter support
+> >
+> > WARNING: Consider removing the code enclosed by this #if 0 and its #endif
+> > #1067: FILE: fs/cifs/file.c:3587:
+> > +#if 0 // TODO: Remove for iov_iter support
+> >
+> > WARNING: Consider removing the code enclosed by this #if 0 and its #endif
+> > #1530: FILE: fs/cifs/file.c:4217:
+> > +#if 0 // TODO: Remove for iov_iter support
+> >
+> > WARNING: Consider removing the code enclosed by this #if 0 and its #endif
+> > #1837: FILE: fs/cifs/file.c:4903:
+> > +#if 0 // TODO: Remove for iov_iter support
+>
+> These chunks of code are removed in patch 16.  I did it this way to reduce the
+> size of patch 14.  I can merge 16 into 14 if you like.
+>
+> David
+>
 
-It is a negative check that you're calling a debug check.
 
-Much easier to address a bug in a driver when seeing this message than
-figuring it out after more elaborate hunting. Not seeing the downside
-of preserving/fixing given it is a quick limit check. *shrug*
+-- 
+Thanks,
+
+Steve
