@@ -2,147 +2,459 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 07E62C636D6
-	for <linux-block@archiver.kernel.org>; Fri, 17 Feb 2023 18:54:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 698DBC636D6
+	for <linux-block@archiver.kernel.org>; Fri, 17 Feb 2023 19:23:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229539AbjBQSyx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 17 Feb 2023 13:54:53 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55168 "EHLO
+        id S229460AbjBQTXz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 17 Feb 2023 14:23:55 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45712 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229461AbjBQSyw (ORCPT
+        with ESMTP id S229436AbjBQTXy (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 17 Feb 2023 13:54:52 -0500
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2058.outbound.protection.outlook.com [40.107.237.58])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35A3B1423B;
-        Fri, 17 Feb 2023 10:54:11 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=NT1a4a822bJ4ARDiWLva4y1R5S/Tel+00XKpGlZ76fr1kDVPDz6vKw/ofMB601Wp3/fSr9FO15a3xXwclKrrk0M+xLCWb8g/8ybfI0ytdiC4UXkgpsjX+uBneFgXREi0IorE06A6+nYqeEv9Su6Icff5UHb5dvvwS9AVgwWY4mx688xbd/AbyXfv1rCb69w2JrSqUZnH2b4kuT5jxmVJjl75oOYNYqeJE200CzdU5p86V6A11PwYIp9L4U4XLd4bclCHN4xuidgPr/vNFUZF0VuaEq1hW3qG/BvZWn1rqqr/Z0C0zQzc+57pZCsDoKKD46jLg2J6vf1yhKoSILRzyA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=vcqElFx74R0zdCwNGwmd8tgK+H/QkX5K5QPgLWRqF7k=;
- b=c4FbHjksJt+l8bHfa1v3JKDqA3ZRrozn+81qbrbyYqGj+OUsM8yFuzjJLnY8VGFm33H/wtPNvcPvAZP2J3y6T2iT3vR3y3USZB74tiKgNGoRHQqC2GZ0JvrpuoGRdQmsStveYbGSDS6ab/YZtI4aVhH/JFLcvKyymGK1RPIK153R+E6AdZD5c/jbGTm40v9MajJ4VIggFw2Fd/q5cQRe51X8Xv2DKL86gqocBN3HU4av3cB33Cqk1XoKYQyO6rMCfWIT/DJV+BXhN8ZSGr/eSf9xqTX7jkwxfZI8YWtIGn7frsE0MnFN/tToX41VMVQn9U2n57oeD12S9zhiNR2/2w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=vcqElFx74R0zdCwNGwmd8tgK+H/QkX5K5QPgLWRqF7k=;
- b=Xyk5bi00IRx0einzVZs/rML/c+e4p+a91r21FwKcdppkIwlRlgQEC0bpZ4NU7CvXuP5KC1FbzgiQbagqbL6MknLoUvP0Sua6eDyWOZhe+OEfuTwB7kEMkFINUKiFj1uxbBb67gtL9xJxtGa4aoskMl5Bea4KoS4YW+2scODpeaxtiA5nm+TzuNH/ncLZ4ZWonA0mrfT+Nean0nx+klHu4x9hw0YKYm8tUZFEaaJJckd7xW4pwvStTV9ZpDq3HaMlNFRzbKBfT6iybZqJlgphj9aOzQQxYflirjJKUDz478G1nA7mWUnccDnyeNO8PRwBRWtOQ8gSs8Owj09Wr6xLhg==
-Received: from MW2PR12MB4667.namprd12.prod.outlook.com (2603:10b6:302:12::28)
- by CH3PR12MB8659.namprd12.prod.outlook.com (2603:10b6:610:17c::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6086.26; Fri, 17 Feb
- 2023 18:53:54 +0000
-Received: from MW2PR12MB4667.namprd12.prod.outlook.com
- ([fe80::4aaa:495:78b4:1d7c]) by MW2PR12MB4667.namprd12.prod.outlook.com
- ([fe80::4aaa:495:78b4:1d7c%3]) with mapi id 15.20.6086.024; Fri, 17 Feb 2023
- 18:53:54 +0000
-From:   Chaitanya Kulkarni <chaitanyak@nvidia.com>
-To:     Keith Busch <kbusch@kernel.org>, Hannes Reinecke <hare@suse.de>
-CC:     "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "lsf-pc@lists.linuxfoundation.org" <lsf-pc@lists.linuxfoundation.org>
-Subject: Re: [LSF/MM/BPF BOF] Userspace command abouts
-Thread-Topic: [LSF/MM/BPF BOF] Userspace command abouts
-Thread-Index: AQHZQfzSsG6TxGrAL0SqQW/HeL2g2K7RxtkAgAG3iYA=
-Date:   Fri, 17 Feb 2023 18:53:53 +0000
-Message-ID: <e7b781d8-d5a7-cf7f-f681-c116fbadfd01@nvidia.com>
-References: <3d3369f1-7ebe-b3b8-804c-ff2b97ec679d@suse.de>
- <Y+5cjPBE6h/IW9VH@kbusch-mbp>
-In-Reply-To: <Y+5cjPBE6h/IW9VH@kbusch-mbp>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-user-agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.9.0
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: MW2PR12MB4667:EE_|CH3PR12MB8659:EE_
-x-ms-office365-filtering-correlation-id: 82911de6-652c-4675-ec89-08db1118510e
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 4FLX+PLyJ7rB6zUoIBhBpS6jSDPBYviW2C0+DZWHJH2kCMlkhdk8F1qerYhhp7wijJMRfztSWGCw8p2lw7yxztVyWi6bMl6WuniCoOqnxJ179hl3WdEb13Xv9uXI6XryCMEehxAqEnurYiQOxuKlHQOkN4Srfd/mlpbtUyHmRZVYRMl1C0pUqjwPk8oiqx0QK+a3rS5CUri2JReew7vRaf5lM5QABZSiahZmAmXKritOCYpFSArcjO+ZhZxpiA8pmP9oxdMamSll8F2kzqLSDxUZ9CZJsEfvY+7tmETbHptXlDbR/98ADU17H5aoiC3yCg109ghZV5GIp2WNt2gedjW344zsuxY31BI56L/s6vGjlNXzArvC4+1hyH0B62VSaPCx6AiYQy4g06BaCkbYkjvCKk/XbLWxt7FygEBw3T4QJqqik5M5LXnDnyfLUHVRbVL7SrD1pgVLVkgJB9y22fKT946/s+kZuvLGgwfi+gV/3TwKCooQixEal6nMq60KcJYR7TT/yJDx1RYF2LXWjFX8vbuEMmBIgKewU2XlYta8WyKWyJyLlMAgWLL5AZyqcth12iheEZclaCgbK2AjmN8vU4V8NG/LjuctsbfSSgFP+GaQI80e7pViGLSkUx8v54DMkKlUclEx97JmY0sRNfzh5/k/e49CJq2TeTIe0ZpWD/gNycwzjKhWwM1DR6FWjtGqNE3wzeTloDxMGcuJIjE0mx+jeQ5oGaLfPEIQFfUGF5vWmD5j0k9SzwNy9VJcX/k221CjnrcrWeFFoETALw==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW2PR12MB4667.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(4636009)(396003)(39860400002)(136003)(346002)(376002)(366004)(451199018)(31686004)(71200400001)(38070700005)(86362001)(38100700002)(66476007)(122000001)(4326008)(6512007)(36756003)(53546011)(6486002)(2616005)(6506007)(478600001)(64756008)(31696002)(83380400001)(186003)(91956017)(54906003)(8676002)(66946007)(5660300002)(316002)(76116006)(66556008)(110136005)(2906002)(66446008)(41300700001)(8936002)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?WC82UkNmZWlZRmFzOXlzdWR0dnlmRGlxbENoRXRoelNpVWYvWHZpVlFBTzRV?=
- =?utf-8?B?ZVlqb1RFUmg3S092ZjdKaTY1Uk1kSlhuRTNkZzlMNUlBejl5a29xNHZ2dFlL?=
- =?utf-8?B?aVA4QzNLVFMyekhSQ0pDVTdsbGlFT1pKOHA2VE9SbU80Y1ZOWCswSHc0aFRk?=
- =?utf-8?B?RW8xZ2dNZlI2THVVa3puTFc2TFA5c1ROL0ZzaVdkTGMvS001NVdTNzIxMTVG?=
- =?utf-8?B?QkdkbDlNRnF5RlBpU1kxbWd6RlBrMFdEc0srZHpReE1DMERYM0JlVW5kb3Ew?=
- =?utf-8?B?K28yYkJ4blZaYWxwWGlIcVMzbkNsci94MlBrZS9WeEI5ZSs2cmNnRFBKdXE2?=
- =?utf-8?B?T1RtSm5UdlNmNm1DVjRob1p6bnQ1aGcrN1RGcHplUkxZTzk3WElvOHRPVEhw?=
- =?utf-8?B?VEpPczJBbGMyNE1SNGpZenVVZGNCbVJWblVYVThwREIwcXpwaXdUbkd6RUNk?=
- =?utf-8?B?UjZySXpoS2d5b0hSU1F3b0hweTdHbU12d2IxWXlMWXlUcEQrRTNOMzVoZm9a?=
- =?utf-8?B?Qm9WNFVmU29CRHVQSE1MNFJiL0RXaDlxU2ZMa01Cb3V5TkFWNWdvaXovQnhU?=
- =?utf-8?B?TGJOTXVtL0xyVlRtWTBxeGhxRmNHc082NU5PSlZjU3pvK3NyT21mMGRQeC9l?=
- =?utf-8?B?bnc2WDJFUTMyS1dwY2UzUGdodnBwMWdoUUNnWmovbUVscENaNyt5TkxGTFB2?=
- =?utf-8?B?bHVmUHRpMzM4eUtId2JCcC9HNXdnblRibm4xbElJRzZGYU5DZm1RWmZmaVBO?=
- =?utf-8?B?QlIxeTRibmhVZm9hdFpSSkNubjZySElhb3IzU3FIekdRWGx5dFhPYXhEMVVa?=
- =?utf-8?B?VWdSZ1NpQlJKcEVSY2hnZ0w1MFdjamh2U3Nyek5PaWJBVjQ1ZkROVCsyN2hm?=
- =?utf-8?B?NmZYWG9Sb1dRWFlPNmVxRnBKdHBYQVA4STFHWEIzZ2pZcGF4eDd4Z0Fkd3lx?=
- =?utf-8?B?K1JpWE1ES2JKLzF3TFBvU1lyRm1PU2UrN0x5eGJUc1Vhb3pLYkhRK1k2ZXNU?=
- =?utf-8?B?cGYvaGt6YzNBd1FVTVFITlovaWxBQmJ1RlBlOTVJQXJXZkNJVGk0dzM5Qi9l?=
- =?utf-8?B?TlpXSHJBT2pCTlZpYjdFcGdwZ1ljei9lbHhuTk9yem5CZ3BCWUhEZnIvNXlB?=
- =?utf-8?B?a01LSVVHazhlcWRjNnJFQ2ZXbW8yV09GNDRRbnBra0hhNGxROVBTMktIYUhX?=
- =?utf-8?B?akg1VWM1UXR1RTZqYmpYc1RLUXNOTmpkUDlrRlZPb0IyV0RTTmxSbFlSR2hz?=
- =?utf-8?B?WWxkSW4vcUk2ZWdRaER5RXR2bnlhNnlONk9NWWMwSFhXY1hlVXpZbC9DbVhq?=
- =?utf-8?B?RzRJc3AzMWk0aDFUTkhMQzNRWGpwMVFQb3YvWnFra2N5T29tcVE1RkNYTlQz?=
- =?utf-8?B?TmFwKytIZndHU0ZUNkViYmhNRE4ycHNsdFgwUmRndERnV3UyOHhtN2hjeWRy?=
- =?utf-8?B?d3lmZzh4aFZ1bkRwYkRWTC9BLzRLSUJhSUtTeDluaG9MVzVrUy9CUlR0bklt?=
- =?utf-8?B?TkdkUkZ0TVM3UFRUZzhKQkIyeSs2aE1NdlVyb2x0NE9HMXJJTXJXRzh0UWF1?=
- =?utf-8?B?S0FKSlBuc3V3NHZacWRyM0tmdDloZEk3Z240TlhJSC9OQ2d3YnVXeEwzKzBP?=
- =?utf-8?B?ME04YjNnZjBtTUtRYWJUY3BUTGJlN1lvamxmUitPS2tFa25mZWcrb1FzTlUv?=
- =?utf-8?B?S2RyZ243RUhzZm85SUdxdkVjcW5HdTllU3JBaVQ3VXdRZjJFZFRuTlgveDd6?=
- =?utf-8?B?TEthbmV0bm1IcXY3dURSK1FaWm5LQkdDUXdtSDdUODZKRTQwZ1loQStrcURq?=
- =?utf-8?B?Nng5TTNCZXZ2QjFPdkptV2hwMXozTW9FV2JVNVVaRWZ2R0oyZVJVeWpXU1Y3?=
- =?utf-8?B?eVFjVVZqRXZzWGlXNi9oRnh4OUxoYXlrWDYwMVk0VHN4MXA5RTR5WDQrTWxu?=
- =?utf-8?B?aFZHbGxiYW53MER3WGhkZDNBL1htdWJQbDlTMkZ3QjE5d2J6NXVxZk5qNmRn?=
- =?utf-8?B?L1Mra2M4V1JRVHJTYjNBYXl2QlhDVUFIc0dsdk42OGNOOXVtVUl4cis5SUdI?=
- =?utf-8?B?eU56bFFvdUVPeWJvWkk5OVh6RCtodWVORHEwY05wUStSalBxcTVjVTBoYW13?=
- =?utf-8?B?T0tHdi83MnpEeGdxSmJRczBmRVU1L21YUTBXSTR0Z0JxN0xzc0ZWYnplQXho?=
- =?utf-8?B?Ymc9PQ==?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <0002BFF67B19554FA608DE5912C92C04@namprd12.prod.outlook.com>
-Content-Transfer-Encoding: base64
+        Fri, 17 Feb 2023 14:23:54 -0500
+Received: from mail-il1-x12b.google.com (mail-il1-x12b.google.com [IPv6:2607:f8b0:4864:20::12b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 964B953ECD
+        for <linux-block@vger.kernel.org>; Fri, 17 Feb 2023 11:23:50 -0800 (PST)
+Received: by mail-il1-x12b.google.com with SMTP id j11so690781ilf.0
+        for <linux-block@vger.kernel.org>; Fri, 17 Feb 2023 11:23:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112; t=1676661830;
+        h=content-transfer-encoding:in-reply-to:references:cc:to:from
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=zzT9Ir16lC6A7ZWhTOen7OUvsMOPDEJ52EfSyH3Ck7I=;
+        b=vfwwG3gpfcFkXDX9w7ibINz9lDLWXoHuUKeAt1tD2SWhAEWYuen6rCbhBl1QNUC3gl
+         5D18PknEVBd+skyJx8mmXwj2uNbOfh/VTifJXvwD0uV3GQAWpv6KJxckHdfQngAnVUWM
+         +CcXpUdSVbIIm0JoWvjhCKyv5BahoMmYSlmzaNqBqe22RTpMxhqbe0Ns/Xb/uGlC1qwN
+         63mxSkb+K4kGJTXBVrfTO7FkxxVYB1dkPvRFykZFyFVgZlpAlRRkEFeehQZzKPqexr6P
+         SSUe76Huer1XtrH8t19AHOYgZqU3FGr1iuZFgsmHzmwRDyV8tKA6ImfJvhSTc1usyuah
+         W8Pg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1676661830;
+        h=content-transfer-encoding:in-reply-to:references:cc:to:from
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=zzT9Ir16lC6A7ZWhTOen7OUvsMOPDEJ52EfSyH3Ck7I=;
+        b=OYkdpdSI9AVLd7Du7cGbzBT4UlAqdhgSK/xJsXJW4DzLDO9EUKghyn9ZvGGGO+5fqs
+         T3E+5ufChB9yrYnOsl53s6FJFinoFenNH/9kOfiYAb0ASDlQaFOAHaD6ytM5zaggGXnw
+         otgNYD9TJk6nOphLVittzP0g/HPK0SAtHQ50V7cn5zWe2xTg46gF7ARCYGlz32ThSR7B
+         WcCmApmnj2bcrjRPv45RrG2bBMOUdYw0Hxs82MIQVJAzQLKDI7WqkimH4LirXs+VUrwB
+         mZvzvz5awFmGDlw5qWCvJZHVz0UeJnMhOu3KUZ9Ef1i2nA9do0tvdUInJjlHyHTt6xjq
+         8qfg==
+X-Gm-Message-State: AO0yUKUUAJZ8TH0LrEPpQh5at+iS+/r2jeqL783upfm7bae71ZpREnKy
+        kWMViMf+Wacb4bf9ndx9BUkuCFQRzPOUy9+y
+X-Google-Smtp-Source: AK7set+aHrgPkPEgb55aTPY2zRf1iUVE4eapsGj7R49A8NEb61IsEDyykHSh8pG4N9MMlUXqFPM5Qw==
+X-Received: by 2002:a05:6e02:c89:b0:314:9f2b:f63b with SMTP id b9-20020a056e020c8900b003149f2bf63bmr1353337ile.2.1676661829728;
+        Fri, 17 Feb 2023 11:23:49 -0800 (PST)
+Received: from [192.168.1.94] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id j17-20020a056e02125100b00313dc7a0520sm1569924ilq.45.2023.02.17.11.23.48
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 17 Feb 2023 11:23:49 -0800 (PST)
+Message-ID: <fbba0347-784e-6b08-2a23-d59c2f1c8e2b@kernel.dk>
+Date:   Fri, 17 Feb 2023 12:23:48 -0700
 MIME-Version: 1.0
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: MW2PR12MB4667.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 82911de6-652c-4675-ec89-08db1118510e
-X-MS-Exchange-CrossTenant-originalarrivaltime: 17 Feb 2023 18:53:53.9408
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 4F7sAn1C8dBKGHFYDyNtfjIhUKAaMUW0sHEqm9YMXG4GlBK/2dbwaqmhDaC/o61LBCHi3ZRcdN16VGuPfsUnjw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB8659
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
+ Thunderbird/102.7.2
+Subject: Re: [GIT PULL for-6.3] Block updates for 6.3
+Content-Language: en-US
+From:   Jens Axboe <axboe@kernel.dk>
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+References: <5afa0795-775d-f710-7989-4c8e1cd7b56f@kernel.dk>
+In-Reply-To: <5afa0795-775d-f710-7989-4c8e1cd7b56f@kernel.dk>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-T24gMi8xNi8yMyAwODo0MCwgS2VpdGggQnVzY2ggd3JvdGU6DQo+IE9uIFRodSwgRmViIDE2LCAy
-MDIzIGF0IDEyOjUwOjAzUE0gKzAxMDAsIEhhbm5lcyBSZWluZWNrZSB3cm90ZToNCj4+IEhpIGFs
-bCwNCj4+DQo+PiBpdCBoYXMgY29tZSB1cCBpbiBvdGhlciB0aHJlYWRzLCBzbyBpdCBtaWdodCBi
-ZSB3b3J0aHdoaWxlIHRvIGhhdmUgaXRzIG93bg0KPj4gdG9waWM6DQo+Pg0KPj4gVXNlcnNwYWNl
-IGNvbW1hbmQgYWJvcnRzDQo+Pg0KPj4gQXMgaXQgc3RhbmRzIHdlIGNhbm5vdCBhYm9ydCBJL08g
-Y29tbWFuZHMgZnJvbSB1c2Vyc3BhY2UuDQo+PiBUaGlzIGlzIGhpdHRpbmcgdXMgd2hlbiBydW5u
-aW5nIGluIGEgdmlydHVhbCBtYWNoaW5lOg0KPj4gVGhlIFZNIHNldHMgYSB0aW1lb3V0IHdoZW4g
-c3VibWl0dGluZyBhIGNvbW1hbmQsIGJ1dCB0aGF0DQo+PiBpbmZvcm1hdGlvbiBjYW4ndCBiZSB0
-cmFuc21pdHRlZCB0byB0aGUgVk0gaG9zdC4gVGhlIFZNIGhvc3QNCj4+IHRoZW4gaXNzdWVzIGEg
-ZGlmZmVyZW50IGNvbW1hbmQgKHdpdGggYW5vdGhlciB0aW1lb3V0KSwgYW5kDQo+PiBhZ2FpbiB0
-aGF0IHRpbWVvdXQgY2FuJ3QgYmUgdHJhbnNtaXR0ZWQgdG8gdGhlIGF0dGFjaGVkIGRldmljZXMu
-DQo+PiBTbyB3aGVuIHRoZSBWTSBkZXRlY3RzIGEgdGltZW91dCwgaXQgd2lsbCB0cnkgdG8gaXNz
-dWUgYW4gYWJvcnQsDQo+PiBidXQgdGhhdCBnb2VzIG5vd2hlcmUgYXMgdGhlIFZNIGhvc3QgaGFz
-IG5vIHdheSB0byBhYm9ydCBjb21tYW5kcw0KPj4gZnJvbSB1c2Vyc3BhY2UuDQo+PiBTbyBpbiB0
-aGUgZW5kIHRoZSBWTSBoYXMgdG8gd2FpdCBmb3IgdGhlIGNvbW1hbmQgdG8gY29tcGxldGUsIGNh
-dXNpbmcNCj4+IHN0YWxscyBpbiB0aGUgVk0gaWYgdGhlIGhvc3QgaGFkIHRvIHVuZGVyZ28gZXJy
-b3IgcmVjb3Zlcnkgb3Igc29tZXRoaW5nLg0KPiANCj4gQWJvcnRzIGFyZSByYWN5LiBBIGxvdCBv
-ZiBoYXJkd2FyZSBpbXBsZW1lbnRzIHRoZXNlIGFzIGEgbm8tb3AsIHRvby4NCj4gICANCg0KSSdk
-IGF2b2lkIGltcGxlbWVudGluZyB1c2Vyc3BhY2UgYWJvcnRzIGFuZCBmaXggdGhpbmdzIGluIHNw
-ZWMgZmlyc3QuDQoNCi1jaw0KDQo=
+On 2/16/23 7:54?PM, Jens Axboe wrote:
+> Hi Linus,
+> 
+> Here are the main block updates for the 6.3 merge window. Note that this
+> will throw a trivial merge conflict due to a late fix for BFQ in the 6.2
+> release, both are trivial to resolve and just in case there are
+> questions, I've pushed a merged branch here:
+> 
+> https://git.kernel.dk/cgit/linux-block/log/?h=for-6.3/block-merged
+> 
+> which resolves those two as-of your git tree today.
+
+A late fix came in that should go with this batch, so I updated the tag
+to include that. Here's the updated request-pull output:
+
+Please pull!
+
+
+The following changes since commit 6d796c50f84ca79f1722bb131799e5a5710c4700:
+
+  Linux 6.2-rc6 (2023-01-29 13:59:43 -0800)
+
+are available in the Git repository at:
+
+  git://git.kernel.dk/linux.git tags/for-6.3/block-2023-02-16
+
+for you to fetch changes up to 0aa2988e4fd23c0c8b33999d7b47dfbc5e6bf24b:
+
+  brd: use radix_tree_maybe_preload instead of radix_tree_preload (2023-02-17 06:15:53 -0700)
+
+----------------------------------------------------------------
+for-6.3/block-2023-02-16
+
+----------------------------------------------------------------
+Alexander Gordeev (1):
+      s390/dasd: sort out physical vs virtual pointers usage
+
+Amit Engel (3):
+      nvme: add nvme_opcode_str function for all nvme cmd types
+      nvme-tcp: add additional info for nvme_tcp_timeout log
+      nvmet: for nvme admin set_features cmd, call nvmet_check_data_len_lte()
+
+Andreas Gruenbacher (1):
+      drbd: drbd_insert_interval(): Clarify comment
+
+Anuj Gupta (2):
+      nvme: set REQ_ALLOC_CACHE for uring-passthru request
+      block: extend bio-cache for non-polled requests
+
+Arnd Bergmann (1):
+      blk-iocost: avoid 64-bit division in ioc_timer_fn
+
+Bart Van Assche (2):
+      loop: Improve the hw_queue_depth kernel module parameter implementation
+      block: Remove the ALLOC_CACHE_SLACK constant
+
+Christoph Böhmwalder (8):
+      drbd: split off drbd_buildtag into separate file
+      drbd: drop API_VERSION define
+      drbd: split off drbd_config into separate file
+      drbd: adjust drbd_limits license header
+      drbd: make limits unsigned
+      drbd: remove unnecessary assignment in vli_encode_bits
+      drbd: remove macros using require_context
+      MAINTAINERS: add drbd headers
+
+Christoph Hellwig (54):
+      ps3vram: remove bio splitting
+      s390/dcssblk:: don't call bio_split_to_limits
+      nvme: remove nvme_execute_passthru_rq
+      block: don't call blk_throtl_stat_add for non-READ/WRITE commands
+      blk-cgroup: delay blk-cgroup initialization until add_disk
+      blk-cgroup: improve error unwinding in blkg_alloc
+      blk-cgroup: simplify blkg freeing from initialization failure paths
+      blk-cgroup: remove the !bdi->dev check in blkg_dev_name
+      blk-cgroup: pin the gendisk in struct blkcg_gq
+      blk-cgroup: store a gendisk to throttle in struct task_struct
+      blk-wbt: pass a gendisk to wbt_{enable,disable}_default
+      blk-wbt: pass a gendisk to wbt_init
+      blk-wbt: move private information from blk-wbt.h to blk-wbt.c
+      blk-wbt: open code wbt_queue_depth_changed in wbt_init
+      blk-rq-qos: move rq_qos_add and rq_qos_del out of line
+      blk-rq-qos: make rq_qos_add and rq_qos_del more useful
+      blk-rq-qos: constify rq_qos_ops
+      blk-rq-qos: store a gendisk instead of request_queue in struct rq_qos
+      blk-cgroup: pass a gendisk to blkcg_{de,}activate_policy
+      blk-cgroup: pass a gendisk to pd_alloc_fn
+      blk-cgroup: pass a gendisk to blkg_lookup
+      blk-cgroup: move the cgroup information to struct gendisk
+      block: factor out a bvec_set_page helper
+      block: add a bvec_set_folio helper
+      block: add a bvec_set_virt helper
+      sd: factor out a sd_set_special_bvec helper
+      target: use bvec_set_page to initialize bvecs
+      nvmet: use bvec_set_page to initialize bvecs
+      nvme: use bvec_set_virt to initialize special_vec
+      rbd: use bvec_set_page to initialize the copy up bvec
+      virtio_blk: use bvec_set_virt to initialize special_vec
+      zram: use bvec_set_page to initialize bvecs
+      afs: use bvec_set_folio to initialize a bvec
+      ceph: use bvec_set_page to initialize a bvec
+      cifs: use bvec_set_page to initialize bvecs
+      coredump: use bvec_set_page to initialize a bvec
+      nfs: use bvec_set_page to initialize bvecs
+      orangefs: use bvec_set_{page,folio} to initialize bvecs
+      splice: use bvec_set_page to initialize a bvec
+      io_uring: use bvec_set_page to initialize a bvec
+      swap: use bvec_set_page to initialize bvecs
+      rxrpc: use bvec_set_page to initialize a bvec
+      sunrpc: use bvec_set_page to initialize bvecs
+      vringh: use bvec_set_page to initialize a bvec
+      libceph: use bvec_set_page to initialize bvecs
+      blk-cgroup: fix freeing NULL blkg in blkg_create
+      block: stub out and deprecated the capability attribute on the gendisk
+      blk-cgroup: delay calling blkcg_exit_disk until disk_release
+      Revert "blk-cgroup: simplify blkg freeing from initialization failure paths"
+      Revert "blk-cgroup: move the cgroup information to struct gendisk"
+      Revert "blk-cgroup: delay calling blkcg_exit_disk until disk_release"
+      Revert "blk-cgroup: delay blk-cgroup initialization until add_disk"
+      Revert "blk-cgroup: pass a gendisk to blkg_lookup"
+      Revert "blk-cgroup: pin the gendisk in struct blkcg_gq"
+
+Davide Zini (3):
+      block, bfq: split also async bfq_queues on a per-actuator basis
+      block, bfq: inject I/O to underutilized actuators
+      block, bfq: balance I/O injection among underutilized actuators
+
+Federico Gavioli (1):
+      block, bfq: retrieve independent access ranges from request queue
+
+Greg Kroah-Hartman (1):
+      trace/blktrace: fix memory leak with using debugfs_lookup()
+
+Hannes Reinecke (2):
+      nvme-fabrics: clarify AUTHREQ result handling
+      nvme-auth: don't use NVMe status codes
+
+Hou Tao (2):
+      md: don't update recovery_cp when curr_resync is ACTIVE
+      md: use MD_RESYNC_* whenever possible
+
+Jens Axboe (11):
+      block: add a BUILD_BUG_ON() for adding more bio flags than we have space
+      block: don't allow multiple bios for IOCB_NOWAIT issue
+      block: treat poll queue enter similarly to timeouts
+      Merge branch 'md-next' of https://git.kernel.org/pub/scm/linux/kernel/git/song/md into for-6.3/block
+      Merge tag 'nvme-6.3-2023-02-07' of git://git.infradead.org/nvme into for-6.3/block
+      Merge branch 'md-next' of https://git.kernel.org/pub/scm/linux/kernel/git/song/md into for-6.3/block
+      Merge tag 'nvme-6.3-2023-02-15' of git://git.infradead.org/nvme into for-6.3/block
+      brd: return 0/-error from brd_insert_page()
+      brd: check for REQ_NOWAIT and set correct page allocation mask
+      brd: mark as nowait compatible
+      block: use proper return value from bio_failfast()
+
+Jinke Han (1):
+      block: Fix io statistics for cgroup in throttle path
+
+Keith Busch (9):
+      block: make BLK_DEF_MAX_SECTORS unsigned
+      block: save user max_sectors limit
+      nvme-pci: remove SGL segment descriptors
+      nvme-pci: use mapped entries for sgl decision
+      nvme-pci: place descriptor addresses in iod
+      nvme: always initialize known command effects
+      nvme: mask CSE effects for security receive
+      nvme-pci: fix freeing single sgl
+      nvme-pci: remove iod use_sgls
+
+Kemeng Shi (27):
+      sbitmap: remove unnecessary calculation of alloc_hint in __sbitmap_get_shallow
+      sbitmap: remove redundant check in __sbitmap_queue_get_batch
+      sbitmap: rewrite sbitmap_find_bit_in_index to reduce repeat code
+      sbitmap: add sbitmap_find_bit to remove repeat code in __sbitmap_get/__sbitmap_get_shallow
+      sbitmap: correct wake_batch recalculation to avoid potential IO hung
+      block, bfq: correctly raise inject limit in bfq_choose_bfqq_for_injection
+      block, bfq: remove unsed parameter reason in bfq_bfqq_is_slow
+      block, bfq: initialize bfqq->decrease_time_jif correctly
+      block, bfq: use helper macro RQ_BFQQ to get bfqq of request
+      block, bfq: remove unnecessary dereference to get async_bfqq
+      block, bfq: remove redundant check in bfq_put_cooperator
+      block, bfq: remove unnecessary goto tag in bfq_dispatch_rq_from_bfqq
+      block, bfq: remove unused bfq_wr_max_time in struct bfq_data
+      blk-mq: avoid sleep in blk_mq_alloc_request_hctx
+      blk-mq: remove stale comment for blk_mq_sched_mark_restart_hctx
+      blk-mq: wait on correct sbitmap_queue in blk_mq_mark_tag_wait
+      blk-mq: Fix potential io hung for shared sbitmap per tagset
+      blk-mq: remove unnecessary list_empty check in blk_mq_try_issue_list_directly
+      blk-mq: remove unncessary from_schedule parameter in blk_mq_plug_issue_direct
+      blk-mq: make blk_mq_commit_rqs a general function for all commits
+      blk-mq: remove unncessary error count and commit in blk_mq_plug_issue_direct
+      blk-mq: use blk_mq_commit_rqs helper in blk_mq_try_issue_list_directly
+      blk-mq: simplify flush check in blk_mq_dispatch_rq_list
+      blk-mq: remove unnecessary error count and check in blk_mq_dispatch_rq_list
+      blk-mq: remove set of bd->last when get driver tag for next request fails
+      blk-mq: use switch/case to improve readability in blk_mq_try_issue_list_directly
+      blk-mq: correct stale comment of .get_budget
+
+Lars Ellenberg (1):
+      drbd: interval tree: make removing an "empty" interval a no-op
+
+Li Nan (2):
+      blk-iocost: fix divide by 0 error in calc_lcoefs()
+      blk-iocost: change div64_u64 to DIV64_U64_ROUND_UP in ioc_refresh_params()
+
+Liu Xiaodong (1):
+      block: ublk: check IO buffer based on flag need_get_data
+
+Martin K. Petersen (1):
+      block: bio-integrity: Copy flags when bio_integrity_payload is cloned
+
+Matthew Wilcox (1):
+      block: Remove mm.h from bvec.h
+
+Ming Lei (10):
+      ublk_drv: remove nr_aborted_queues from ublk_device
+      ublk_drv: don't probe partitions if the ubq daemon isn't trusted
+      ublk_drv: move ublk_get_device_from_id into ublk_ctrl_uring_cmd
+      ublk_drv: add device parameter UBLK_PARAM_TYPE_DEVT
+      ublk_drv: add module parameter of ublks_max for limiting max allowed ublk dev
+      ublk_drv: add mechanism for supporting unprivileged ublk device
+      block: ublk: fix doc build warning
+      ublk_drv: only allow owner to open unprivileged disk
+      block: ublk: improve handling device deletion
+      block: sync mixed merged request's failfast with 1st bio's
+
+Pankaj Raghav (4):
+      block: remove superfluous check for request queue in bdev_is_zoned()
+      block: add a new helper bdev_{is_zone_start, offset_from_zone_start}
+      block: introduce bdev_zone_no helper
+      brd: use radix_tree_maybe_preload instead of radix_tree_preload
+
+Paolo Valente (4):
+      block, bfq: split sync bfq_queues on a per-actuator basis
+      block, bfq: forbid stable merging of queues associated with different actuators
+      block, bfq: move io_cq-persistent bfqq data into a dedicated struct
+      block, bfq: turn bfqq_data into an array in bfq_io_cq
+
+Qiheng Lin (1):
+      s390/dasd: Fix potential memleak in dasd_eckd_init()
+
+Robert Altnoeder (1):
+      drbd: fix DRBD_VOLUME_MAX 65535 -> 65534
+
+Thomas Weißschuh (1):
+      block: make kobj_type structures constant
+
+Ulf Hansson (1):
+      block: Default to use cgroup support for BFQ
+
+Xiao Ni (5):
+      md: Factor out is_md_suspended helper
+      md: Change active_io to percpu
+      md: Free writes_pending in md_stop
+      md: account io_acct_set usage with active_io
+      block: Merge bio before checking ->cached_rq
+
+Yu Kuai (7):
+      blk-iocost: check return value of match_u64()
+      blk-iocost: don't allow to configure bio based device
+      blk-iocost: read params inside lock in sysfs apis
+      blk-cgroup: dropping parent refcount after pd_free_fn() is done
+      blk-cgroup: support to track if policy is online
+      blk-cgroup: synchronize pd_free_fn() from blkg_free_workfn() and blkcg_deactivate_policy()
+      block, bfq: cleanup 'bfqg->online'
+
+Zhong Jinghua (1):
+      blk-mq: cleanup unused methods: blk_mq_hw_sysfs_store
+
+Ziyang Zhang (3):
+      ublk: remove unnecessary NULL check in ublk_rq_has_data()
+      ublk: mention WRITE_ZEROES in comment of ublk_complete_rq()
+      ublk: pass NULL to blk_mq_alloc_disk() as queuedata
+
+ Documentation/ABI/stable/sysfs-block |   3 +-
+ Documentation/block/capability.rst   |  10 -
+ Documentation/block/index.rst        |   1 -
+ Documentation/block/ublk.rst         |  55 ++-
+ MAINTAINERS                          |   1 +
+ block/Kconfig.iosched                |   1 +
+ block/bfq-cgroup.c                   | 105 +++---
+ block/bfq-iosched.c                  | 629 +++++++++++++++++++++++------------
+ block/bfq-iosched.h                  | 146 ++++++--
+ block/bfq-wf2q.c                     |   2 +-
+ block/bio-integrity.c                |   8 +-
+ block/bio.c                          |  15 +-
+ block/blk-cgroup.c                   | 150 +++++----
+ block/blk-cgroup.h                   |  14 +-
+ block/blk-core.c                     |  36 +-
+ block/blk-crypto-sysfs.c             |   2 +-
+ block/blk-ia-ranges.c                |   4 +-
+ block/blk-integrity.c                |   2 +-
+ block/blk-iocost.c                   |  78 +++--
+ block/blk-iolatency.c                |  37 +--
+ block/blk-ioprio.c                   |   6 +-
+ block/blk-map.c                      |   6 +-
+ block/blk-merge.c                    |  35 +-
+ block/blk-mq-debugfs.c               |  10 +-
+ block/blk-mq-sched.c                 |   7 +-
+ block/blk-mq-sysfs.c                 |  30 +-
+ block/blk-mq.c                       | 152 ++++-----
+ block/blk-rq-qos.c                   |  67 ++++
+ block/blk-rq-qos.h                   |  66 +---
+ block/blk-settings.c                 |  10 +-
+ block/blk-stat.c                     |   3 +-
+ block/blk-sysfs.c                    |  28 +-
+ block/blk-throttle.c                 |  11 +-
+ block/blk-wbt.c                      | 116 +++++--
+ block/blk-wbt.h                      |  98 +-----
+ block/blk-zoned.c                    |   4 +-
+ block/elevator.c                     |   4 +-
+ block/fops.c                         |  21 +-
+ block/genhd.c                        |   5 +-
+ drivers/block/brd.c                  |  67 ++--
+ drivers/block/drbd/Makefile          |   2 +-
+ drivers/block/drbd/drbd_buildtag.c   |  22 ++
+ drivers/block/drbd/drbd_debugfs.c    |   2 +-
+ drivers/block/drbd/drbd_int.h        |  13 +-
+ drivers/block/drbd/drbd_interval.c   |   6 +-
+ drivers/block/drbd/drbd_main.c       |  20 +-
+ drivers/block/drbd/drbd_proc.c       |   2 +-
+ drivers/block/drbd/drbd_vli.h        |   2 +-
+ drivers/block/loop.c                 |  14 +-
+ drivers/block/null_blk/main.c        |   3 +-
+ drivers/block/ps3vram.c              |   7 -
+ drivers/block/rbd.c                  |   7 +-
+ drivers/block/ublk_drv.c             | 405 ++++++++++++++++------
+ drivers/block/virtio_blk.c           |   4 +-
+ drivers/block/zram/zram_drv.c        |  15 +-
+ drivers/md/md.c                      |  65 ++--
+ drivers/md/md.h                      |   9 +-
+ drivers/nvme/host/auth.c             |  30 +-
+ drivers/nvme/host/constants.c        |  16 +
+ drivers/nvme/host/core.c             | 123 +++----
+ drivers/nvme/host/fabrics.c          |  19 +-
+ drivers/nvme/host/ioctl.c            |   9 +-
+ drivers/nvme/host/nvme.h             |  16 +-
+ drivers/nvme/host/pci.c              | 104 ++----
+ drivers/nvme/host/tcp.c              |   7 +-
+ drivers/nvme/target/admin-cmd.c      |   2 +-
+ drivers/nvme/target/io-cmd-file.c    |  10 +-
+ drivers/nvme/target/passthru.c       |   5 +-
+ drivers/nvme/target/tcp.c            |   5 +-
+ drivers/nvme/target/zns.c            |   3 +-
+ drivers/s390/block/dasd.c            |   5 +-
+ drivers/s390/block/dasd_3990_erp.c   |  10 +-
+ drivers/s390/block/dasd_alias.c      |   6 +-
+ drivers/s390/block/dasd_eckd.c       | 104 +++---
+ drivers/s390/block/dasd_eer.c        |   2 +-
+ drivers/s390/block/dasd_fba.c        |  14 +-
+ drivers/s390/block/dcssblk.c         |   4 -
+ drivers/scsi/sd.c                    |  36 +-
+ drivers/target/target_core_file.c    |  18 +-
+ drivers/vhost/vringh.c               |   5 +-
+ fs/afs/write.c                       |   8 +-
+ fs/ceph/file.c                       |  12 +-
+ fs/cifs/connect.c                    |   5 +-
+ fs/cifs/fscache.c                    |  16 +-
+ fs/cifs/misc.c                       |   5 +-
+ fs/cifs/smb2ops.c                    |   6 +-
+ fs/coredump.c                        |   7 +-
+ fs/nfs/fscache.c                     |  16 +-
+ fs/orangefs/inode.c                  |  22 +-
+ fs/splice.c                          |   5 +-
+ include/linux/blkdev.h               |  27 +-
+ include/linux/bvec.h                 |  41 ++-
+ include/linux/drbd.h                 |   7 -
+ include/linux/drbd_config.h          |  16 +
+ include/linux/drbd_genl_api.h        |   2 +-
+ include/linux/drbd_limits.h          | 204 ++++++------
+ include/linux/sched.h                |   2 +-
+ include/uapi/linux/ublk_cmd.h        |  49 ++-
+ io_uring/rsrc.c                      |   4 +-
+ kernel/fork.c                        |   2 +-
+ kernel/trace/blktrace.c              |   4 +-
+ lib/sbitmap.c                        | 102 +++---
+ mm/page_io.c                         |   8 +-
+ mm/swapfile.c                        |   2 +-
+ net/ceph/messenger_v1.c              |   7 +-
+ net/ceph/messenger_v2.c              |  28 +-
+ net/rxrpc/rxperf.c                   |   8 +-
+ net/sunrpc/svcsock.c                 |   7 +-
+ net/sunrpc/xdr.c                     |   5 +-
+ 109 files changed, 2224 insertions(+), 1599 deletions(-)
+ delete mode 100644 Documentation/block/capability.rst
+ create mode 100644 drivers/block/drbd/drbd_buildtag.c
+ create mode 100644 include/linux/drbd_config.h
+
+-- 
+Jens Axboe
+
