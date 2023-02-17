@@ -2,51 +2,96 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B6F3FC05027
-	for <linux-block@archiver.kernel.org>; Fri, 17 Feb 2023 07:29:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13C90C636D4
+	for <linux-block@archiver.kernel.org>; Fri, 17 Feb 2023 08:09:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229705AbjBQH30 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 17 Feb 2023 02:29:26 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47428 "EHLO
+        id S229585AbjBQIJz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 17 Feb 2023 03:09:55 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45912 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229710AbjBQH3W (ORCPT
+        with ESMTP id S229676AbjBQIJh (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 17 Feb 2023 02:29:22 -0500
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B33365DE1F;
-        Thu, 16 Feb 2023 23:29:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=M7NmYC/Iylm9myghHwqILim55SAUt9QrM+UZYk0eJlw=; b=jPCL0xvF5/xruXCRkp8+6rnew3
-        4lTg4WMfAXMlDugq0h18nHlfhAedjabsLGu+FnUccy6s9yTkr7Hm50vd0gVSonVReIgotrXwiNmcE
-        dNET5voXPf8gItJQZbuEUIFR22Vcw/itRQeR8fDNgXXAfHDo8E/uGDfeSTnLBFuLgyE+dDLqV/SMf
-        z09e4V53LUOgL4mmdD++fXUTFRRNDju7R40rlC5vjGEl9olGHltmmwonhBp4K+I/OuIRsp4tDDdMX
-        NAF7m5PD5pmRw/2JcP18QRBzCrUuzv+d+FXewt9cVvt4Crge5M33kmlEWeNh4lkkNhNtgQE7oNNyv
-        YUy2XbBA==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1pSvB4-00D5tD-AL; Fri, 17 Feb 2023 07:29:06 +0000
-Date:   Thu, 16 Feb 2023 23:29:06 -0800
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Yu Kuai <yukuai1@huaweicloud.com>
-Cc:     jack@suse.cz, hare@suse.de, hch@infradead.org, axboe@kernel.dk,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        yukuai3@huawei.com, yi.zhang@huawei.com, yangerkun@huawei.com
-Subject: Re: [PATCH -next 2/2] block: fix scan partition for exclusively open
- device again
-Message-ID: <Y+8swobhPT7VgMHC@infradead.org>
-References: <20230217022200.3092987-1-yukuai1@huaweicloud.com>
- <20230217022200.3092987-3-yukuai1@huaweicloud.com>
+        Fri, 17 Feb 2023 03:09:37 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 338F355B3
+        for <linux-block@vger.kernel.org>; Fri, 17 Feb 2023 00:08:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1676621329;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=oj3qHyJXPrt95ESZEYz+HIUZYia6cHmkbLgbrVa/onk=;
+        b=JiRxoOmnnw0QSa53kYso6bxItggrGBuWVv/6dpTKTYi9yYnUzypmMHEUhvH8FyyWOu+0Rm
+        N0z9AUbaQyvpwXvnJq2TBd8uM0LvLTrx0whXPEZKbp8XvoHqoViQJ1YbD8a6s0zHz9J+XC
+        FoXIHNF+qLahMyvy0Xkw0MZTLgXoZ60=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-17-QBH5zj9SMgCu1xXomTCUeQ-1; Fri, 17 Feb 2023 03:08:45 -0500
+X-MC-Unique: QBH5zj9SMgCu1xXomTCUeQ-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C0B0E800B24;
+        Fri, 17 Feb 2023 08:08:44 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.33.36.24])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 889A4492C14;
+        Fri, 17 Feb 2023 08:08:42 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <CAH2r5msNJTdt7295xt=NVY7wUaWFycKMb_=7d9LySsGGwBTnjQ@mail.gmail.com>
+References: <CAH2r5msNJTdt7295xt=NVY7wUaWFycKMb_=7d9LySsGGwBTnjQ@mail.gmail.com> <20230216214745.3985496-1-dhowells@redhat.com> <20230216214745.3985496-15-dhowells@redhat.com>
+To:     Steve French <smfrench@gmail.com>
+Cc:     dhowells@redhat.com, Jens Axboe <axboe@kernel.dk>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Shyam Prasad N <nspmangalore@gmail.com>,
+        Rohith Surabattula <rohiths.msft@gmail.com>,
+        Tom Talpey <tom@talpey.com>,
+        Stefan Metzmacher <metze@samba.org>,
+        Christoph Hellwig <hch@infradead.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        Jeff Layton <jlayton@kernel.org>, linux-cifs@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-mm@kvack.org, linux-kernel@vger.kernel.org,
+        Steve French <sfrench@samba.org>, Paulo Alcantara <pc@cjr.nz>
+Subject: Re: [PATCH 14/17] cifs: Change the I/O paths to use an iterator rather than a page list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230217022200.3092987-3-yukuai1@huaweicloud.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <4008034.1676621321.1@warthog.procyon.org.uk>
+Date:   Fri, 17 Feb 2023 08:08:41 +0000
+Message-ID: <4008035.1676621321@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Looks good:
+Steve French <smfrench@gmail.com> wrote:
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+> WARNING: Consider removing the code enclosed by this #if 0 and its #endif
+> #627: FILE: fs/cifs/file.c:2609:
+> +#if 0 // TODO: Remove for iov_iter support
+> ...
+> WARNING: Consider removing the code enclosed by this #if 0 and its #endif
+> #1040: FILE: fs/cifs/file.c:3512:
+> +#if 0 // TODO: Remove for iov_iter support
+> 
+> WARNING: Consider removing the code enclosed by this #if 0 and its #endif
+> #1067: FILE: fs/cifs/file.c:3587:
+> +#if 0 // TODO: Remove for iov_iter support
+> 
+> WARNING: Consider removing the code enclosed by this #if 0 and its #endif
+> #1530: FILE: fs/cifs/file.c:4217:
+> +#if 0 // TODO: Remove for iov_iter support
+> 
+> WARNING: Consider removing the code enclosed by this #if 0 and its #endif
+> #1837: FILE: fs/cifs/file.c:4903:
+> +#if 0 // TODO: Remove for iov_iter support
+
+These chunks of code are removed in patch 16.  I did it this way to reduce the
+size of patch 14.  I can merge 16 into 14 if you like.
+
+David
+
