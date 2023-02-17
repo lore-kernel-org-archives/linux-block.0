@@ -2,155 +2,142 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 522E3C636D4
-	for <linux-block@archiver.kernel.org>; Fri, 17 Feb 2023 09:19:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9AD8C636D4
+	for <linux-block@archiver.kernel.org>; Fri, 17 Feb 2023 09:29:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230023AbjBQJTH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 17 Feb 2023 04:19:07 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48560 "EHLO
+        id S229563AbjBQJ3U (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 17 Feb 2023 04:29:20 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55778 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229508AbjBQJTH (ORCPT
+        with ESMTP id S230073AbjBQJ3T (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 17 Feb 2023 04:19:07 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BBEE212F37
-        for <linux-block@vger.kernel.org>; Fri, 17 Feb 2023 01:18:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1676625500;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=JSjyZXclMQ8QT9phi3XaRxJO/pegb5ftImQVRxiePjc=;
-        b=f9PrTRSgJ0SJCGyAHEn2MD2CSbe4ADhPKLqxSF6YuJZNrzro8A+Vn+wgy4ZY87wZNNTcre
-        +G4rtVrXTWFCTE9cDnjYN59inozvaflE34fs7R+r85swNQF69Zy9jokUspabJQURoLL2qY
-        Tk+21/JfrMlI3vtl52/VAkcEzGeNCf4=
-Received: from mail-ua1-f72.google.com (mail-ua1-f72.google.com
- [209.85.222.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-653-A_NbPFYuP-aeyoM_aW9duw-1; Fri, 17 Feb 2023 04:18:18 -0500
-X-MC-Unique: A_NbPFYuP-aeyoM_aW9duw-1
-Received: by mail-ua1-f72.google.com with SMTP id c30-20020ab04861000000b00419afefbe3eso1764359uad.4
-        for <linux-block@vger.kernel.org>; Fri, 17 Feb 2023 01:18:18 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1676625498;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=JSjyZXclMQ8QT9phi3XaRxJO/pegb5ftImQVRxiePjc=;
-        b=ItMZyo+McUTN/klXqXLgvEJj2bjqzoWoCbMVyXsm7hC1ISBoNY9+EZ6RBUTOVr22M7
-         3ALsg8chfTdUORQ5I82i0aWPbcg865jGhvdkYgZGCJ3ke+fDW09QR3jUHqJ3CLax7cvO
-         TBeWN7L3b2L1h5kPz7jBBgMend/JoF4Xzst6zNk1JnfHjr3hNMmaRXM+NgRQa8xAq+gS
-         ef82w6d++gfcJ6SH89bwRuZA00yXDJLRjENhMWgH1TtSOBxQgxS6pWOUkabMfFIJxnsl
-         579ZOHzIXPcOuAMtOK2jddLt8H1TApzVVqXRWHqvR5bHjgaEKjZCQ0GWy+uGr2TmPU2A
-         IfQA==
-X-Gm-Message-State: AO0yUKUZrdF3tu+On1QfXNwGmIQn0eSLWR6QUkffQxFcFuGnWrExmmrd
-        +w5MFsicmnDYPeRxZn37keTEZcAo0B/sKptJJ1Cuq8mollGlV/F8+wQOLaqU/OGYKMfu33rj6C1
-        iwJqrC0GPYOsB0veOuX4G6P77uYhP8V7hOJkTM2M=
-X-Received: by 2002:a05:6102:3b0b:b0:414:13c7:f583 with SMTP id x11-20020a0561023b0b00b0041413c7f583mr714104vsu.78.1676625498194;
-        Fri, 17 Feb 2023 01:18:18 -0800 (PST)
-X-Google-Smtp-Source: AK7set+lIxm58KEM1AennY2XsrLAcbikGNILzL6qgYViYa+ApoQ4BacvYccgWrTzqtVkNDIoILRdGOjWEC3MmtgRAVo=
-X-Received: by 2002:a05:6102:3b0b:b0:414:13c7:f583 with SMTP id
- x11-20020a0561023b0b00b0041413c7f583mr714101vsu.78.1676625497977; Fri, 17 Feb
- 2023 01:18:17 -0800 (PST)
+        Fri, 17 Feb 2023 04:29:19 -0500
+Received: from smtp.smtpout.orange.fr (smtp-11.smtpout.orange.fr [80.12.242.11])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6C2D5EC8B
+        for <linux-block@vger.kernel.org>; Fri, 17 Feb 2023 01:29:17 -0800 (PST)
+Received: from pop-os.home ([86.243.2.178])
+        by smtp.orange.fr with ESMTPA
+        id Sx3Lp87Ho71C0Sx3LpPVzN; Fri, 17 Feb 2023 10:29:15 +0100
+X-ME-Helo: pop-os.home
+X-ME-Auth: Y2hyaXN0b3BoZS5qYWlsbGV0QHdhbmFkb28uZnI=
+X-ME-Date: Fri, 17 Feb 2023 10:29:15 +0100
+X-ME-IP: 86.243.2.178
+From:   Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org,
+        Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+        linux-block@vger.kernel.org
+Subject: [PATCH] blk-mq: Reorder fields in 'struct blk_mq_tag_set'
+Date:   Fri, 17 Feb 2023 10:29:10 +0100
+Message-Id: <6f249f9b02a3490283ef0278096556de41aa0cf0.1676626130.git.christophe.jaillet@wanadoo.fr>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-References: <20230214171330.2722188-1-dhowells@redhat.com> <20230214171330.2722188-9-dhowells@redhat.com>
- <Y+85Ni9CH/7ajQga@T590>
-In-Reply-To: <Y+85Ni9CH/7ajQga@T590>
-From:   Ming Lei <ming.lei@redhat.com>
-Date:   Fri, 17 Feb 2023 17:18:06 +0800
-Message-ID: <CAFj5m9KEMm29+yZ2sVUhNYHDy_9UNTQPpXbVp7NwfsueqdKKkA@mail.gmail.com>
-Subject: Re: [PATCH v14 08/17] splice: Do splice read from a file without
- using ITER_PIPE
-To:     David Howells <dhowells@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, Al Viro <viro@zeniv.linux.org.uk>,
-        Christoph Hellwig <hch@infradead.org>,
-        Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>,
-        Jeff Layton <jlayton@kernel.org>,
-        David Hildenbrand <david@redhat.com>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        Hillf Danton <hdanton@sina.com>, linux-fsdevel@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, Christoph Hellwig <hch@lst.de>,
-        John Hubbard <jhubbard@nvidia.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Feb 17, 2023 at 4:22 PM Ming Lei <ming.lei@redhat.com> wrote:
->
-> On Tue, Feb 14, 2023 at 05:13:21PM +0000, David Howells wrote:
-> > Make generic_file_splice_read() use filemap_splice_read() and
-> > direct_splice_read() rather than using an ITER_PIPE and call_read_iter().
-> >
-> > With this, ITER_PIPE is no longer used.
-> >
-> > Signed-off-by: David Howells <dhowells@redhat.com>
-> > cc: Jens Axboe <axboe@kernel.dk>
-> > cc: Christoph Hellwig <hch@lst.de>
-> > cc: Al Viro <viro@zeniv.linux.org.uk>
-> > cc: David Hildenbrand <david@redhat.com>
-> > cc: John Hubbard <jhubbard@nvidia.com>
-> > cc: linux-mm@kvack.org
-> > cc: linux-block@vger.kernel.org
-> > cc: linux-fsdevel@vger.kernel.org
-> > ---
-> >
-> > Notes:
-> >     ver #14)
-> >     - Split out filemap_splice_read() into a separate patch.
-> >
-> >  fs/splice.c | 30 +++++++-----------------------
-> >  1 file changed, 7 insertions(+), 23 deletions(-)
-> >
-> > diff --git a/fs/splice.c b/fs/splice.c
-> > index 4c6332854b63..a93478338cec 100644
-> > --- a/fs/splice.c
-> > +++ b/fs/splice.c
-> > @@ -391,29 +391,13 @@ ssize_t generic_file_splice_read(struct file *in, loff_t *ppos,
-> >                                struct pipe_inode_info *pipe, size_t len,
-> >                                unsigned int flags)
-> >  {
-> > -     struct iov_iter to;
-> > -     struct kiocb kiocb;
-> > -     int ret;
-> > -
-> > -     iov_iter_pipe(&to, ITER_DEST, pipe, len);
-> > -     init_sync_kiocb(&kiocb, in);
-> > -     kiocb.ki_pos = *ppos;
-> > -     ret = call_read_iter(in, &kiocb, &to);
-> > -     if (ret > 0) {
-> > -             *ppos = kiocb.ki_pos;
-> > -             file_accessed(in);
-> > -     } else if (ret < 0) {
-> > -             /* free what was emitted */
-> > -             pipe_discard_from(pipe, to.start_head);
-> > -             /*
-> > -              * callers of ->splice_read() expect -EAGAIN on
-> > -              * "can't put anything in there", rather than -EFAULT.
-> > -              */
-> > -             if (ret == -EFAULT)
-> > -                     ret = -EAGAIN;
-> > -     }
-> > -
-> > -     return ret;
-> > +     if (unlikely(*ppos >= file_inode(in)->i_sb->s_maxbytes))
-> > +             return 0;
-> > +     if (unlikely(!len))
-> > +             return 0;
-> > +     if (in->f_flags & O_DIRECT)
-> > +             return direct_splice_read(in, ppos, pipe, len, flags);
->
-> Hello David,
->
-> I have one question, for dio, pages need to map to userspace
-> memory, but direct_splice_read() just allocates pages and not
-> see when the user mapping is setup, can you give one hint?
+Group some variables based on their sizes to reduce hole and avoid padding.
+On x86_64, this shrinks the size of 'struct blk_mq_tag_set'
+from 304 to 296 bytes.
 
-oops, it is ->splice_read,  not ->read_iter, and pipe buffer isn't
-user-backed, sorry for the noise.
+Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+---
+Using pahole
 
-Thanks,
-Ming
+Before:
+======
+struct blk_mq_tag_set {
+	struct blk_mq_queue_map    map[3];               /*     0    48 */
+	unsigned int               nr_maps;              /*    48     4 */
+
+	/* XXX 4 bytes hole, try to pack */
+
+	const struct blk_mq_ops  * ops;                  /*    56     8 */
+	/* --- cacheline 1 boundary (64 bytes) --- */
+	unsigned int               nr_hw_queues;         /*    64     4 */
+	unsigned int               queue_depth;          /*    68     4 */
+	unsigned int               reserved_tags;        /*    72     4 */
+	unsigned int               cmd_size;             /*    76     4 */
+	int                        numa_node;            /*    80     4 */
+	unsigned int               timeout;              /*    84     4 */
+	unsigned int               flags;                /*    88     4 */
+
+	/* XXX 4 bytes hole, try to pack */
+
+	void *                     driver_data;          /*    96     8 */
+	struct blk_mq_tags * *     tags;                 /*   104     8 */
+	struct blk_mq_tags *       shared_tags;          /*   112     8 */
+	struct mutex               tag_list_lock;        /*   120   160 */
+	/* --- cacheline 4 boundary (256 bytes) was 24 bytes ago --- */
+	struct list_head           tag_list;             /*   280    16 */
+	struct srcu_struct *       srcu;                 /*   296     8 */
+
+	/* size: 304, cachelines: 5, members: 16 */
+	/* sum members: 296, holes: 2, sum holes: 8 */
+	/* last cacheline: 48 bytes */
+};
+
+After:
+=====
+struct blk_mq_tag_set {
+	const struct blk_mq_ops  * ops;                  /*     0     8 */
+	struct blk_mq_queue_map    map[3];               /*     8    48 */
+	unsigned int               nr_maps;              /*    56     4 */
+	unsigned int               nr_hw_queues;         /*    60     4 */
+	/* --- cacheline 1 boundary (64 bytes) --- */
+	unsigned int               queue_depth;          /*    64     4 */
+	unsigned int               reserved_tags;        /*    68     4 */
+	unsigned int               cmd_size;             /*    72     4 */
+	int                        numa_node;            /*    76     4 */
+	unsigned int               timeout;              /*    80     4 */
+	unsigned int               flags;                /*    84     4 */
+	void *                     driver_data;          /*    88     8 */
+	struct blk_mq_tags * *     tags;                 /*    96     8 */
+	struct blk_mq_tags *       shared_tags;          /*   104     8 */
+	struct mutex               tag_list_lock;        /*   112   160 */
+	/* --- cacheline 4 boundary (256 bytes) was 16 bytes ago --- */
+	struct list_head           tag_list;             /*   272    16 */
+	struct srcu_struct *       srcu;                 /*   288     8 */
+
+	/* size: 296, cachelines: 5, members: 16 */
+	/* last cacheline: 40 bytes */
+};
+---
+ include/linux/blk-mq.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index 779fba613bd0..dd5ce1137f04 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -473,6 +473,7 @@ enum hctx_type {
+ 
+ /**
+  * struct blk_mq_tag_set - tag set that can be shared between request queues
++ * @ops:	   Pointers to functions that implement block driver behavior.
+  * @map:	   One or more ctx -> hctx mappings. One map exists for each
+  *		   hardware queue type (enum hctx_type) that the driver wishes
+  *		   to support. There are no restrictions on maps being of the
+@@ -480,7 +481,6 @@ enum hctx_type {
+  *		   types.
+  * @nr_maps:	   Number of elements in the @map array. A number in the range
+  *		   [1, HCTX_MAX_TYPES].
+- * @ops:	   Pointers to functions that implement block driver behavior.
+  * @nr_hw_queues:  Number of hardware queues supported by the block driver that
+  *		   owns this data structure.
+  * @queue_depth:   Number of tags per hardware queue, reserved tags included.
+@@ -505,9 +505,9 @@ enum hctx_type {
+  *		   (BLK_MQ_F_BLOCKING).
+  */
+ struct blk_mq_tag_set {
++	const struct blk_mq_ops	*ops;
+ 	struct blk_mq_queue_map	map[HCTX_MAX_TYPES];
+ 	unsigned int		nr_maps;
+-	const struct blk_mq_ops	*ops;
+ 	unsigned int		nr_hw_queues;
+ 	unsigned int		queue_depth;
+ 	unsigned int		reserved_tags;
+-- 
+2.34.1
 
