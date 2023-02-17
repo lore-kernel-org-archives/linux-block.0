@@ -2,115 +2,133 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20E66C636CC
-	for <linux-block@archiver.kernel.org>; Fri, 17 Feb 2023 01:43:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E300C636CC
+	for <linux-block@archiver.kernel.org>; Fri, 17 Feb 2023 01:44:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229523AbjBQBnW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 16 Feb 2023 20:43:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52734 "EHLO
+        id S229799AbjBQBoQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 16 Feb 2023 20:44:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54424 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229764AbjBQBnV (ORCPT
+        with ESMTP id S229768AbjBQBoP (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 16 Feb 2023 20:43:21 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 372983A85D
-        for <linux-block@vger.kernel.org>; Thu, 16 Feb 2023 17:42:33 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1676598152;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=mU+9SXlG5Jl91PwrW4h4Qqlm/SOd8UB56sX30xkB9vg=;
-        b=E/YPdU/S8czOsy01aiJ7irQiTb+dw3AHpijLkBGRJYNVv2xgQh3WM70nKjzeDTuCZZwtP2
-        QeOlIKbUbaRuwF1sUN3HIWPQ8CBJO57RoTweaRUDixnIo2vFq+YNY9npuN9gAKM9pazPTE
-        7djdkg6CdNVcZLPT9HjipCBP1rBVWls=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-508-wHtU6MahPwOsNDBGKeyHSQ-1; Thu, 16 Feb 2023 20:42:31 -0500
-X-MC-Unique: wHtU6MahPwOsNDBGKeyHSQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 8A09285A588;
-        Fri, 17 Feb 2023 01:42:30 +0000 (UTC)
-Received: from T590 (ovpn-8-19.pek2.redhat.com [10.72.8.19])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 18AF3140EBF6;
-        Fri, 17 Feb 2023 01:42:27 +0000 (UTC)
-Date:   Fri, 17 Feb 2023 09:42:22 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Cc:     linux-block@vger.kernel.org
-Subject: Re: [PATCH blktests v2 1/2] src: add mini ublk source code
-Message-ID: <Y+7bfuybBEOB1qtN@T590>
-References: <20230217013851.1402864-1-ming.lei@redhat.com>
- <20230217013851.1402864-2-ming.lei@redhat.com>
+        Thu, 16 Feb 2023 20:44:15 -0500
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D5E913A85D;
+        Thu, 16 Feb 2023 17:44:13 -0800 (PST)
+Received: from mail02.huawei.com (unknown [172.30.67.143])
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4PHvk12FWgz4f3nV1;
+        Fri, 17 Feb 2023 09:44:09 +0800 (CST)
+Received: from [10.174.176.73] (unknown [10.174.176.73])
+        by APP3 (Coremail) with SMTP id _Ch0CgDn4R_p2+5jBHnBDQ--.61176S3;
+        Fri, 17 Feb 2023 09:44:11 +0800 (CST)
+Subject: Re: [PATCH -next RFC 2/3] block: factor out the setting of
+ GD_NEED_PART_SCAN
+To:     Jan Kara <jack@suse.cz>, Yu Kuai <yukuai1@huaweicloud.com>
+Cc:     hch@infradead.org, axboe@kernel.dk, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, yi.zhang@huawei.com,
+        yangerkun@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
+References: <20230212092641.2394146-1-yukuai1@huaweicloud.com>
+ <20230212092641.2394146-3-yukuai1@huaweicloud.com>
+ <20230216131725.oddv27a7fhz6hx7x@quack3>
+From:   Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <0b7d6c92-e07f-c9c1-9afd-e5cea5e3aac0@huaweicloud.com>
+Date:   Fri, 17 Feb 2023 09:44:09 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230217013851.1402864-2-ming.lei@redhat.com>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.7
+In-Reply-To: <20230216131725.oddv27a7fhz6hx7x@quack3>
+Content-Type: text/plain; charset=gbk; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: _Ch0CgDn4R_p2+5jBHnBDQ--.61176S3
+X-Coremail-Antispam: 1UD129KBjvJXoW7urWfuryfKrW3WFWkZFyUtrb_yoW5JrWfpr
+        WkXFWYyFWjgr13uFy0q3ZrCw4YkanFyrWxC3y7Gw10v3sxXrnIkFyvk3yUCw109rZ3GrZ5
+        WF45XFyFqFy8CFUanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUkC14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+        1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+        JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+        CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+        2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+        W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lc7I2V7IY0VAS07AlzVAY
+        IcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14
+        v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkG
+        c2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI
+        0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6rW3Jr0E3s1lIxAIcVC2z280aVAFwI0_Jr0_
+        Gr1lIxAIcVC2z280aVCY1x0267AKxVWUJVW8JbIYCTnIWIevJa73UjIFyTuYvjfUoOJ5UU
+        UUU
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Feb 17, 2023 at 09:38:50AM +0800, Ming Lei wrote:
-> Prepare for adding ublk related test:
-> 
-> 1) ublk delete is sync removal, this way is convenient to
->    blkg/queue/disk instance leak issue
-> 
-> 2) mini ublk has two builtin target(null, loop), and loop IO is
-> handled by io_uring, so we can use ublk to cover part of io_uring
-> workloads
-> 
-> 3) not like loop/nbd, ublk won't pre-allocate/add disk, and always
-> add/delete disk dynamically, this way may cover disk plug & unplug
-> tests
-> 
-> 4) ublk specific test given people starts to use it, so better to
-> let blktest cover ublk related tests
-> 
-> Add mini ublk source for test purpose only, which is easy to use:
-> 
-> ./miniublk add -t {null|loop} [-q nr_queues] [-d depth] [-n dev_id]
-> 	 default: nr_queues=2(max 4), depth=128(max 128), dev_id=-1(auto allocation)
-> 	 -t loop -f backing_file
-> 	 -t null
-> ./miniublk del [-n dev_id] [--disk/-d disk_path ] -a
-> 	 -a delete all devices, -d delete device by disk path,
-> 	 -n delete specified device
-> ./miniublk list [-n dev_id] -a
-> 	 -a list all devices, -n list specified device, default -a
-> 
-> ublk depends on liburing 2.2, so allow to ignore ublk build failure
-> in case of missing liburing, and we will check if ublk program exits
-> inside test. Also v6.0 is the 1st linux kernel release with ublk.
-> 
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> ---
->  Makefile            |    2 +-
->  src/Makefile        |   18 +
->  src/ublk/miniublk.c | 1376 +++++++++++++++++++++++++++++++++++++++++++
->  3 files changed, 1395 insertions(+), 1 deletion(-)
->  create mode 100644 src/ublk/miniublk.c
-> 
-> diff --git a/Makefile b/Makefile
-> index 5a04479..b9bbade 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -2,7 +2,7 @@ prefix ?= /usr/local
->  dest = $(DESTDIR)$(prefix)/blktests
->  
->  all:
-> -	$(MAKE) -C src all
-> +	$(MAKE) -i -C src all
+Hi, jan!
 
-oops, the above change needs to be removed.
+ÔÚ 2023/02/16 21:17, Jan Kara Ð´µÀ:
+> On Sun 12-02-23 17:26:40, Yu Kuai wrote:
+>> From: Yu Kuai <yukuai3@huawei.com>
+>>
+>> In order to prevent scan partition for a device that is opened
+>> exclusively by someone else, new conditions will be added to
+>> disk_scan_partitions() in the next patch. Hence if device is opened
+>> exclusively between bdev_add() and disk_scan_partitions(), the first
+>> partition scan will fail unexpected. This patch factor out the setting
+>> of GD_NEED_PART_SCAN to prevent the problem.
+>>
+>> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+> 
+> I'd rather leave the setting of GD_NEED_PART_SCAN in disk_scan_partitions()
+> to keep it self-contained. On top of that we can set GD_NEED_PART_SCAN in
+> device_add_disk() to ensure initial partition scan but we should probably
+> also make sure flags like GD_SUPPRESS_PART_SCAN or GENHD_FL_NO_PART are not
+> set to avoid unwanted partition scanning.
 
-Shin'ichiro, I will kill it in V3 if it is needed, otherwise
-please drop the above change when you merge the patch.
+Thanks for the suggestion, I'll remove this patch and do that in patch 3
+in the next version.
 
 Thanks,
-Ming
+Kuai
+> 
+> 								Honza
+> 
+>> ---
+>>   block/genhd.c | 2 +-
+>>   block/ioctl.c | 1 +
+>>   2 files changed, 2 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/block/genhd.c b/block/genhd.c
+>> index 075d8da284f5..c0d1220bd798 100644
+>> --- a/block/genhd.c
+>> +++ b/block/genhd.c
+>> @@ -367,7 +367,6 @@ int disk_scan_partitions(struct gendisk *disk, fmode_t mode)
+>>   	if (disk->open_partitions)
+>>   		return -EBUSY;
+>>   
+>> -	set_bit(GD_NEED_PART_SCAN, &disk->state);
+>>   	bdev = blkdev_get_by_dev(disk_devt(disk), mode, NULL);
+>>   	if (IS_ERR(bdev))
+>>   		return PTR_ERR(bdev);
+>> @@ -493,6 +492,7 @@ int __must_check device_add_disk(struct device *parent, struct gendisk *disk,
+>>   		if (ret)
+>>   			goto out_unregister_bdi;
+>>   
+>> +		set_bit(GD_NEED_PART_SCAN, &disk->state);
+>>   		bdev_add(disk->part0, ddev->devt);
+>>   		if (get_capacity(disk))
+>>   			disk_scan_partitions(disk, FMODE_READ);
+>> diff --git a/block/ioctl.c b/block/ioctl.c
+>> index 6dd49d877584..0eefcdb936a0 100644
+>> --- a/block/ioctl.c
+>> +++ b/block/ioctl.c
+>> @@ -528,6 +528,7 @@ static int blkdev_common_ioctl(struct block_device *bdev, fmode_t mode,
+>>   			return -EACCES;
+>>   		if (bdev_is_partition(bdev))
+>>   			return -EINVAL;
+>> +		set_bit(GD_NEED_PART_SCAN, &bdev->bd_disk->state);
+>>   		return disk_scan_partitions(bdev->bd_disk, mode & ~FMODE_EXCL);
+>>   	case BLKTRACESTART:
+>>   	case BLKTRACESTOP:
+>> -- 
+>> 2.31.1
+>>
 
