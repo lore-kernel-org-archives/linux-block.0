@@ -2,192 +2,150 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42B22C05027
-	for <linux-block@archiver.kernel.org>; Fri, 17 Feb 2023 11:01:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2AB6FC05027
+	for <linux-block@archiver.kernel.org>; Fri, 17 Feb 2023 11:06:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229502AbjBQLBV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 17 Feb 2023 06:01:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38738 "EHLO
+        id S229998AbjBQLGI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 17 Feb 2023 06:06:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44532 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229802AbjBQLBK (ORCPT
+        with ESMTP id S229956AbjBQLGB (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 17 Feb 2023 06:01:10 -0500
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0697E635B9;
-        Fri, 17 Feb 2023 03:01:04 -0800 (PST)
+        Fri, 17 Feb 2023 06:06:01 -0500
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85006642C0;
+        Fri, 17 Feb 2023 03:05:32 -0800 (PST)
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id ACAB23376D;
-        Fri, 17 Feb 2023 11:01:02 +0000 (UTC)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 8AB871FE6D;
+        Fri, 17 Feb 2023 11:05:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1676631662; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+        t=1676631918; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=vYuwxqTnfVCAW7cW6pnYZZcwYDRarjxb/3Ds5tm/d58=;
-        b=jW56H0V0c1zN+PO4LYen1+losVtQvYbubjRy4BENiMyI/3mgFLRGxnGZXCcGafrGgF6sHT
-        +ea4IAXKM+kAm4VRZQcRR5lrv0udClt11k8L1QDR2l5ReUj4BcfDfdC4kKrAoJRzK8q/2y
-        8TFNADawIApVSrzHI0yTCDXCJ48aOhA=
+        bh=cdOtg0/SYltH36IBrBWZH6fCciTMyCPOS7VoVpQYu8k=;
+        b=uffJtjc/q6yp2J9Zfv2rYKycBOdqYvGpImgpIDcm2M0DouTE1iVLQtH2byGa7Dcmj3UHyJ
+        T8KSULHBHEs8i+5gvxzq4ejzNp7DtrSQjTPT0vCki+I4Sok+3YZ0l2vhU5UGin5sHm5ETA
+        v8/8ry6l7Jno4oOWMDkOqLHdfxw1alw=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1676631662;
+        s=susede2_ed25519; t=1676631918;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=vYuwxqTnfVCAW7cW6pnYZZcwYDRarjxb/3Ds5tm/d58=;
-        b=gOd8yjsBz//UEPPiesH7EW1qLUvimrFS3lhd7rRtwr5Sfx03v5NmS2kvgYbBOvGBmJTkkK
-        3Vgu9Yg7dCYVH3Bg==
+        bh=cdOtg0/SYltH36IBrBWZH6fCciTMyCPOS7VoVpQYu8k=;
+        b=jpDFdf88HaRyhV5YkQFx+EwWCLcDCQjFnPwnOG4t/a9NTpCRrkbaXJsPff7ov5sIHeQ6ZS
+        E3klHogDJfytvTAw==
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 9E4D2138E3;
-        Fri, 17 Feb 2023 11:01:02 +0000 (UTC)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 78413138E3;
+        Fri, 17 Feb 2023 11:05:18 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id F56ZJm5e72MNPgAAMHmgww
-        (envelope-from <jack@suse.cz>); Fri, 17 Feb 2023 11:01:02 +0000
+        id BrNYHW5f72NwQAAAMHmgww
+        (envelope-from <jack@suse.cz>); Fri, 17 Feb 2023 11:05:18 +0000
 Received: by quack3.suse.cz (Postfix, from userid 1000)
-        id 2BC8BA06E1; Fri, 17 Feb 2023 12:01:02 +0100 (CET)
-Date:   Fri, 17 Feb 2023 12:01:02 +0100
+        id EAEADA06E1; Fri, 17 Feb 2023 12:05:17 +0100 (CET)
+Date:   Fri, 17 Feb 2023 12:05:17 +0100
 From:   Jan Kara <jack@suse.cz>
 To:     Yu Kuai <yukuai1@huaweicloud.com>
 Cc:     jack@suse.cz, hare@suse.de, hch@infradead.org, axboe@kernel.dk,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         yukuai3@huawei.com, yi.zhang@huawei.com, yangerkun@huawei.com
-Subject: Re: [PATCH -next 1/2] block: Revert "block: Do not reread partition
- table on exclusively open device"
-Message-ID: <20230217110102.la3w7c6pck4pfilo@quack3>
+Subject: Re: [PATCH -next 2/2] block: fix scan partition for exclusively open
+ device again
+Message-ID: <20230217110517.hagxj47e2m4xbmkd@quack3>
 References: <20230217022200.3092987-1-yukuai1@huaweicloud.com>
- <20230217022200.3092987-2-yukuai1@huaweicloud.com>
+ <20230217022200.3092987-3-yukuai1@huaweicloud.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230217022200.3092987-2-yukuai1@huaweicloud.com>
+In-Reply-To: <20230217022200.3092987-3-yukuai1@huaweicloud.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri 17-02-23 10:21:59, Yu Kuai wrote:
+On Fri 17-02-23 10:22:00, Yu Kuai wrote:
 > From: Yu Kuai <yukuai3@huawei.com>
 > 
-> This reverts commit 36369f46e91785688a5f39d7a5590e3f07981316.
+> As explained in commit 36369f46e917 ("block: Do not reread partition table
+> on exclusively open device"), reread partition on the device that is
+> exclusively opened by someone else is problematic.
 > 
-> This patch can't fix the problem in a corner case that device can be
-> opened exclusively after the checking and before blkdev_get_by_dev().
-> We'll use a new solution to fix the problem in the next patch, and
-> the new solution doesn't need to change apis.
+> This patch will make sure partition scan will only be proceed if current
+> thread open the device exclusively, or the device is not opened
+> exclusively, and in the later case, other scanners and exclusive openers
+> will be blocked temporarily until partition scan is done.
 > 
+> Fixes: 10c70d95c0f2 ("block: remove the bd_openers checks in blk_drop_partitions")
+> Cc: <stable@vger.kernel.org>
+> Suggested-by: Jan Kara <jack@suse.cz>
 > Signed-off-by: Yu Kuai <yukuai3@huawei.com>
 
-Sure. Feel free to add:
+Looks good to me, just two minor comments below:
 
-Acked-by: Jan Kara <jack@suse.cz>
-
-or Reviewed-by... whatever for the revert :)
-
-								Honza
-
-> ---
->  block/blk.h   |  2 +-
->  block/genhd.c |  7 ++-----
->  block/ioctl.c | 13 ++++++-------
->  3 files changed, 9 insertions(+), 13 deletions(-)
-> 
-> diff --git a/block/blk.h b/block/blk.h
-> index f02381405311..4a166f847ffd 100644
-> --- a/block/blk.h
-> +++ b/block/blk.h
-> @@ -439,7 +439,7 @@ static inline void bio_release_page(struct bio *bio, struct page *page)
->  
->  struct request_queue *blk_alloc_queue(int node_id);
->  
-> -int disk_scan_partitions(struct gendisk *disk, fmode_t mode, void *owner);
-> +int disk_scan_partitions(struct gendisk *disk, fmode_t mode);
->  
->  int disk_alloc_events(struct gendisk *disk);
->  void disk_add_events(struct gendisk *disk);
 > diff --git a/block/genhd.c b/block/genhd.c
-> index d09d775c222a..b30d5538710c 100644
+> index b30d5538710c..3ee5577e1586 100644
 > --- a/block/genhd.c
 > +++ b/block/genhd.c
-> @@ -356,7 +356,7 @@ void disk_uevent(struct gendisk *disk, enum kobject_action action)
->  }
->  EXPORT_SYMBOL_GPL(disk_uevent);
->  
-> -int disk_scan_partitions(struct gendisk *disk, fmode_t mode, void *owner)
-> +int disk_scan_partitions(struct gendisk *disk, fmode_t mode)
+> @@ -359,6 +359,7 @@ EXPORT_SYMBOL_GPL(disk_uevent);
+>  int disk_scan_partitions(struct gendisk *disk, fmode_t mode)
 >  {
 >  	struct block_device *bdev;
+> +	int ret = 0;
 >  
-> @@ -366,9 +366,6 @@ int disk_scan_partitions(struct gendisk *disk, fmode_t mode, void *owner)
+>  	if (disk->flags & (GENHD_FL_NO_PART | GENHD_FL_HIDDEN))
 >  		return -EINVAL;
->  	if (disk->open_partitions)
+> @@ -368,11 +369,27 @@ int disk_scan_partitions(struct gendisk *disk, fmode_t mode)
 >  		return -EBUSY;
-> -	/* Someone else has bdev exclusively open? */
-> -	if (disk->part0->bd_holder && disk->part0->bd_holder != owner)
-> -		return -EBUSY;
 >  
 >  	set_bit(GD_NEED_PART_SCAN, &disk->state);
->  	bdev = blkdev_get_by_dev(disk_devt(disk), mode, NULL);
-> @@ -499,7 +496,7 @@ int __must_check device_add_disk(struct device *parent, struct gendisk *disk,
+
+I'd move the set_bit() after we are sure we have exclusive access to the
+bdev. Otherwise we could set GD_NEED_PART_SCAN on a device exclusively open
+by someone else and if we race with open in an unfortunate way, we could
+trigger unexpected partition scan...
+
+> -	bdev = blkdev_get_by_dev(disk_devt(disk), mode, NULL);
+> +	/*
+> +	 * If the device is opened exclusively by current thread already, it's
+> +	 * safe to scan partitons, otherwise, use bd_prepare_to_claim() to
+> +	 * synchronize with other exclusive openers and other partition
+> +	 * scanners.
+> +	 */
+> +	if (!(mode & FMODE_EXCL)) {
+> +		ret = bd_prepare_to_claim(disk->part0, disk_scan_partitions);
+> +		if (ret)
+> +			return ret;
+> +	}
+> +
+> +	bdev = blkdev_get_by_dev(disk_devt(disk), mode & ~FMODE_EXCL, NULL);
+>  	if (IS_ERR(bdev))
+> -		return PTR_ERR(bdev);
+> -	blkdev_put(bdev, mode);
+> -	return 0;
+> +		ret =  PTR_ERR(bdev);
+> +	else
+> +		blkdev_put(bdev, mode);
+> +
+> +	if (!(mode & FMODE_EXCL))
+> +		bd_abort_claiming(disk->part0, disk_scan_partitions);
+> +	return ret;
+>  }
 >  
->  		bdev_add(disk->part0, ddev->devt);
->  		if (get_capacity(disk))
-> -			disk_scan_partitions(disk, FMODE_READ, NULL);
-> +			disk_scan_partitions(disk, FMODE_READ);
+>  /**
+> @@ -494,6 +511,11 @@ int __must_check device_add_disk(struct device *parent, struct gendisk *disk,
+>  		if (ret)
+>  			goto out_unregister_bdi;
 >  
->  		/*
->  		 * Announce the disk and partitions after all partitions are
-> diff --git a/block/ioctl.c b/block/ioctl.c
-> index 96617512982e..6dd49d877584 100644
-> --- a/block/ioctl.c
-> +++ b/block/ioctl.c
-> @@ -467,10 +467,10 @@ static int blkdev_bszset(struct block_device *bdev, fmode_t mode,
->   * user space. Note the separate arg/argp parameters that are needed
->   * to deal with the compat_ptr() conversion.
->   */
-> -static int blkdev_common_ioctl(struct file *file, fmode_t mode, unsigned cmd,
-> -			       unsigned long arg, void __user *argp)
-> +static int blkdev_common_ioctl(struct block_device *bdev, fmode_t mode,
-> +			       unsigned int cmd, unsigned long arg,
-> +			       void __user *argp)
->  {
-> -	struct block_device *bdev = I_BDEV(file->f_mapping->host);
->  	unsigned int max_sectors;
->  
->  	switch (cmd) {
-> @@ -528,8 +528,7 @@ static int blkdev_common_ioctl(struct file *file, fmode_t mode, unsigned cmd,
->  			return -EACCES;
->  		if (bdev_is_partition(bdev))
->  			return -EINVAL;
-> -		return disk_scan_partitions(bdev->bd_disk, mode & ~FMODE_EXCL,
-> -					    file);
-> +		return disk_scan_partitions(bdev->bd_disk, mode & ~FMODE_EXCL);
->  	case BLKTRACESTART:
->  	case BLKTRACESTOP:
->  	case BLKTRACETEARDOWN:
-> @@ -607,7 +606,7 @@ long blkdev_ioctl(struct file *file, unsigned cmd, unsigned long arg)
->  		break;
->  	}
->  
-> -	ret = blkdev_common_ioctl(file, mode, cmd, arg, argp);
-> +	ret = blkdev_common_ioctl(bdev, mode, cmd, arg, argp);
->  	if (ret != -ENOIOCTLCMD)
->  		return ret;
->  
-> @@ -676,7 +675,7 @@ long compat_blkdev_ioctl(struct file *file, unsigned cmd, unsigned long arg)
->  		break;
->  	}
->  
-> -	ret = blkdev_common_ioctl(file, mode, cmd, arg, argp);
-> +	ret = blkdev_common_ioctl(bdev, mode, cmd, arg, argp);
->  	if (ret == -ENOIOCTLCMD && disk->fops->compat_ioctl)
->  		ret = disk->fops->compat_ioctl(bdev, mode, cmd, arg);
->  
-> -- 
-> 2.31.1
-> 
+> +		/* Make sure the first partition scan will be proceed */
+							   ^^^^^^ "will happen"
+probably makes more sense here.
+
+								Honza
 -- 
 Jan Kara <jack@suse.com>
 SUSE Labs, CR
