@@ -2,135 +2,153 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CA7EC05027
-	for <linux-block@archiver.kernel.org>; Fri, 17 Feb 2023 14:41:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EBF2BC64ED8
+	for <linux-block@archiver.kernel.org>; Fri, 17 Feb 2023 14:52:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229622AbjBQOlA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 17 Feb 2023 09:41:00 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38130 "EHLO
+        id S229869AbjBQOw4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 17 Feb 2023 09:52:56 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44674 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229811AbjBQOk7 (ORCPT
+        with ESMTP id S229908AbjBQOwy (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 17 Feb 2023 09:40:59 -0500
-Received: from mail-il1-x129.google.com (mail-il1-x129.google.com [IPv6:2607:f8b0:4864:20::129])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5503C6D7B9
-        for <linux-block@vger.kernel.org>; Fri, 17 Feb 2023 06:40:57 -0800 (PST)
-Received: by mail-il1-x129.google.com with SMTP id m16so220875ilq.10
-        for <linux-block@vger.kernel.org>; Fri, 17 Feb 2023 06:40:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=N8N0BgXi69CCe+Y5lZOJFkw+jt9TQTak6Z986E1XVXE=;
-        b=05dVsJ/gi0XtRFL6hAJq01GLXtNNUTdITF20218DCLloA17i+cLyttQEXEDofnB6My
-         LNZ8cwG0X3LZQUz8LYUzugqKAZnPGwOQyhj7zBVJeu4VOhyBYezxJa2EK33jVnVOzrx3
-         KTeMgMga8RFBWlmVkZAvAEoGPetaQNfJ507h4agdXQeampJlbcN1VxIAt8EqsraEGjRS
-         xVO9A2778A+kJH/IBwvTs6UDUCi7ctA90mirOOGE+auVZPAJZsx1cCEYF1W/v6mTRqiQ
-         IIc8wX4uw3Sda3wPqpbKFdImgaKdKuzWLxXOQ3CSwcpozzrKhTenTpR3j4C4IRim965j
-         k26w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=N8N0BgXi69CCe+Y5lZOJFkw+jt9TQTak6Z986E1XVXE=;
-        b=N1TnrOZdzEMaMoNG2CXERmva/0uQfKsFERHCDlPj95xE/1qzUpDxuhy/eLRs62+ZSp
-         6pp/fv5wqIWxZISj1pzTL94Tf7tiSBjhg8CzsyPj6NM2sdQFGEueKxfNDbRXxjQfto7X
-         o0QT6OETh+ZOBGw5ZS0iG/zx69mKX1RQ+BTS8UOcJelGXSEwIxX6Vd8582ueViw8UYPj
-         ojtWefYqyld9amViKrdp7SOgHc41Jp0djXN9KT70vfPOVHjHRsDlOgOEvYlJZYTwPX7m
-         XrxLiruj0nWwnM28MAqn5jW8pHizUM6z6jEHAYzIflsXA+PfYBN6YVceItfN8yYYe0ZY
-         zhtw==
-X-Gm-Message-State: AO0yUKX6pl6qXNJLPRLyBjkfCGu9X8YRZ3O/Hz/c4gAnqa8uVEQcCM8u
-        iSk2FV6oD0TNaeAAXiBLSr9YrA==
-X-Google-Smtp-Source: AK7set8dPbCpjbJeAl887oD+ZZ5YkCOZTfthPXYEf06tGQmBAdEkECjNX/g2i6dQOvcwVhhvBUo1eA==
-X-Received: by 2002:a05:6e02:e03:b0:314:1121:dd85 with SMTP id a3-20020a056e020e0300b003141121dd85mr805145ilk.1.1676644856285;
-        Fri, 17 Feb 2023 06:40:56 -0800 (PST)
-Received: from [192.168.1.94] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id e3-20020a056638020300b003a96f9940ddsm1513482jaq.102.2023.02.17.06.40.55
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 17 Feb 2023 06:40:55 -0800 (PST)
-Message-ID: <db1d7cd7-6c89-7d6b-3fe5-3778bb3cb5e9@kernel.dk>
-Date:   Fri, 17 Feb 2023 07:40:54 -0700
+        Fri, 17 Feb 2023 09:52:54 -0500
+Received: from mailout2.w1.samsung.com (mailout2.w1.samsung.com [210.118.77.12])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C0AF6D79E
+        for <linux-block@vger.kernel.org>; Fri, 17 Feb 2023 06:52:24 -0800 (PST)
+Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
+        by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id 20230217145222euoutp022868fd276342effd63b416bd1fc82101~EpDzJRZFs1360213602euoutp02Y
+        for <linux-block@vger.kernel.org>; Fri, 17 Feb 2023 14:52:22 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w1.samsung.com 20230217145222euoutp022868fd276342effd63b416bd1fc82101~EpDzJRZFs1360213602euoutp02Y
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1676645542;
+        bh=wVzL2zCs4/gQdKWThWeloX5TKQuVBfGEA69H9e8jahs=;
+        h=Date:From:Subject:To:CC:In-Reply-To:References:From;
+        b=kWOSs4nnEerZoDwuv7w2EIAB6yZTxILdsg5ZsIFRwfuwPpZXr9tZl9GvKQJFJbAfm
+         Avlq3fvfpuJeOgxFOKIMOAiL4rnYP26+atEDOzBsJhUTDkoY4zrRolwWhWaVvAy+41
+         O43qTv+Np+DIOekPoyXt6gRu/de/KK71FO/iNDsM=
+Received: from eusmges3new.samsung.com (unknown [203.254.199.245]) by
+        eucas1p1.samsung.com (KnoxPortal) with ESMTP id
+        20230217145221eucas1p1f15974505c3b86c9277bbe29fc38abe3~EpDydyXzI1886418864eucas1p1c;
+        Fri, 17 Feb 2023 14:52:21 +0000 (GMT)
+Received: from eucas1p2.samsung.com ( [182.198.249.207]) by
+        eusmges3new.samsung.com (EUCPMTA) with SMTP id 56.F0.61197.5A49FE36; Fri, 17
+        Feb 2023 14:52:21 +0000 (GMT)
+Received: from eusmtrp2.samsung.com (unknown [182.198.249.139]) by
+        eucas1p2.samsung.com (KnoxPortal) with ESMTPA id
+        20230217145221eucas1p2e040979f83cd8f2223fde78136f9bc9e~EpDyC9wlb1283112831eucas1p2m;
+        Fri, 17 Feb 2023 14:52:21 +0000 (GMT)
+Received: from eusmgms1.samsung.com (unknown [182.198.249.179]) by
+        eusmtrp2.samsung.com (KnoxPortal) with ESMTP id
+        20230217145221eusmtrp2cf19b04b1282843973c0c43cbae4d3da~EpDyCUk3f3174631746eusmtrp2n;
+        Fri, 17 Feb 2023 14:52:21 +0000 (GMT)
+X-AuditID: cbfec7f5-7c5ff7000000ef0d-d8-63ef94a50100
+Received: from eusmtip1.samsung.com ( [203.254.199.221]) by
+        eusmgms1.samsung.com (EUCPMTA) with SMTP id 30.D9.02722.4A49FE36; Fri, 17
+        Feb 2023 14:52:21 +0000 (GMT)
+Received: from CAMSVWEXC02.scsc.local (unknown [106.1.227.72]) by
+        eusmtip1.samsung.com (KnoxPortal) with ESMTPA id
+        20230217145220eusmtip176b23b5db213dc8b3e6ebf0ec524ec26~EpDx6Eyny1348613486eusmtip1C;
+        Fri, 17 Feb 2023 14:52:20 +0000 (GMT)
+Received: from [192.168.1.19] (106.210.248.118) by CAMSVWEXC02.scsc.local
+        (2002:6a01:e348::6a01:e348) with Microsoft SMTP Server (TLS) id 15.0.1497.2;
+        Fri, 17 Feb 2023 14:52:18 +0000
+Message-ID: <a10f11a5-2646-6db9-ab25-f2bb41190cc8@samsung.com>
+Date:   Fri, 17 Feb 2023 20:22:15 +0530
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.2
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+        Thunderbird/102.7.1
+From:   Pankaj Raghav <p.raghav@samsung.com>
 Subject: Re: [PATCH 0/1] improve brd performance with blk-mq
+To:     Jens Axboe <axboe@kernel.dk>
+CC:     <hch@lst.de>, <mcgrof@kernel.org>, <gost.dev@samsung.com>,
+        <linux-block@vger.kernel.org>, Ming Lei <ming.lei@redhat.com>
 Content-Language: en-US
-To:     Pankaj Raghav <p.raghav@samsung.com>
-Cc:     hch@lst.de, mcgrof@kernel.org, gost.dev@samsung.com,
-        linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>
+In-Reply-To: <db1d7cd7-6c89-7d6b-3fe5-3778bb3cb5e9@kernel.dk>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [106.210.248.118]
+X-ClientProxiedBy: CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347) To
+        CAMSVWEXC02.scsc.local (2002:6a01:e348::6a01:e348)
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprEKsWRmVeSWpSXmKPExsWy7djP87pLp7xPNrixVdZi9d1+NouVq48y
+        Wey9pW1xY8JTRotDk5uZHFg9Lp8t9di0qpPNY/fNBjaP9/uusnl83iQXwBrFZZOSmpNZllqk
+        b5fAlTHxx3zWgqdcFR8eHmBqYPzN3sXIySEhYCKx4+5Gli5GLg4hgRWMEv2/+9khnC+MEnde
+        NTJCOJ8ZJZauWs8E03Kt4wIziC0ksJxR4sE3PbiiJfcnsUIkdjFKLF4iAWLzCthJXFg6iwXE
+        ZhFQlXjafZAZIi4ocXLmE7C4qECUxKmfr4EWcHCwCWhJNHaCnScsYCOxbs4+sHIRAQWJnt8r
+        2UBsZoE6if6mNmYIW1zi1pP5YLdxCthKrOtaxQ4R15Ro3f4bypaX2P52DjPE/coSp548YIWw
+        ayVObbnFBHK/hMALDokXH2Hh4iJx9tdlqAZhiVfHt0DFZST+75wPDYhqiac3fjNDNLcAw27n
+        ejaQByQErCX6zuRA1DhKNJ57wgoR5pO48VYQ4h4+iUnbpjNPYFSdhRQSs5C8MwvJC7OQvLCA
+        kWUVo3hqaXFuemqxcV5quV5xYm5xaV66XnJ+7iZGYLI5/e/41x2MK1591DvEyMTBeIhRgoNZ
+        SYR30803yUK8KYmVValF+fFFpTmpxYcYpTlYlMR5tW1PJgsJpCeWpGanphakFsFkmTg4pRqY
+        qsrP2146YrX/N9c/ftafz3yNy6qv81xbIK+7mOtvr+/eptK1gkFL12hzrsnOn773o3No+Rfj
+        /QcnPa95PW3fND25jOqXBx+GsUQnpKTzXdtbkrXvl+Oua2/mXFvFdfDSy/Xp3yKEjp7/fXLK
+        C/1Vd67Nv7VOW9GxZ0Jy1qfKDV8L+IWKjsf/szv25cTkngV+0eKeFfNaN891knhR9Ofv0WMC
+        Nd8/S55+dCOUn1d4i1lWi9WRQwtEyrZ/eXxcOszqdpf/rx+xCUKC8vO5jypZyWtqdK5aZLog
+        y+6QYqZ6R3vBnOxEvTjbu9rhF/9H+e7kfbhkweGlv3IX5/BZ3/K/V+lRmCeee17uNO+kDVZv
+        hZRYijMSDbWYi4oTAY12SIulAwAA
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrJIsWRmVeSWpSXmKPExsVy+t/xu7pLp7xPNvj0msli9d1+NouVq48y
+        Wey9pW1xY8JTRotDk5uZHFg9Lp8t9di0qpPNY/fNBjaP9/uusnl83iQXwBqlZ1OUX1qSqpCR
+        X1xiqxRtaGGkZ2hpoWdkYqlnaGwea2VkqqRvZ5OSmpNZllqkb5eglzHxx3zWgqdcFR8eHmBq
+        YPzN3sXIySEhYCJxreMCcxcjF4eQwFJGiePv7jNDJGQkPl35CFUkLPHnWhcbRNFHRommvxNZ
+        IZxdjBLr9l5iA6niFbCTuLB0FguIzSKgKvG0+yAzRFxQ4uTMJ2BxUYEoidMr1wFN5eBgE9CS
+        aOwEWyAsYCOxbs4+sHIRAQWJnt8rwUYyC9RJ9De1QV13iFniyfYHTBAJcYlbT+aD2ZwCthLr
+        ulaxQ8Q1JVq3/4ay5SW2v50D9Y2yxKknD1gh7FqJz3+fMU5gFJ2F5LxZSMbOQjJqFpJRCxhZ
+        VjGKpJYW56bnFhvqFSfmFpfmpesl5+duYgTG6bZjPzfvYJz36qPeIUYmDsZDjBIczEoivJtu
+        vkkW4k1JrKxKLcqPLyrNSS0+xGgKDKOJzFKiyfnARJFXEm9oZmBqaGJmaWBqaWasJM7rWdCR
+        KCSQnliSmp2aWpBaBNPHxMEp1cC0pbBFhiV5lgF71OrzQT9ex1a015zl+HLyV+jahwmqfLdF
+        2f+/OJbz4uEpYT8R/Vuidsr/evtdu/e1rsj/6DdFXjKRreDvhru/A9gnreXXiLbjPZYYnXGs
+        co1RvOulNcsi3C6qrVUNOasurbJB61nYqQlv9/OZsfl6/9zn5u9YuFiGJ1b8d2zIlgk1BdfX
+        1mS3v/iT7D8pbL6GGfvOyNKG2Xx7eG3/dDI94mxZHc0VvGb576/18k23jSZG+d3zbcj6suiC
+        RM/6Uw22alfTI7/c3zTT0zjyiZ/AqV22q17k8544ty5Q7MJ3jhSBhWeTpqU6Zx/usbRV6pll
+        JWl7VPFfyPbUGKkivc23Z3CyuymxFGckGmoxFxUnAgDHlCUrXAMAAA==
+X-CMS-MailID: 20230217145221eucas1p2e040979f83cd8f2223fde78136f9bc9e
+X-Msg-Generator: CA
+X-RootMTR: 20230203103122eucas1p161c0f0b674d26e23cf38466d5415420e
+X-EPHeader: CA
+CMS-TYPE: 201P
+X-CMS-RootMailID: 20230203103122eucas1p161c0f0b674d26e23cf38466d5415420e
 References: <CGME20230203103122eucas1p161c0f0b674d26e23cf38466d5415420e@eucas1p1.samsung.com>
- <20230203103005.31290-1-p.raghav@samsung.com> <Y+Gsu0PiXBIf8fFU@T590>
- <6035da22-5667-93d5-fe00-62b988425cb5@samsung.com> <Y+nwh7V5xehxMWDR@T590>
- <95506a88-c89c-0f41-3ab4-eb5741410c02@samsung.com>
- <7c28caf6-931e-0a7a-a3c0-e4a430f860ff@kernel.dk>
- <8cc2659b-b7f9-eb8a-e73b-3056b82f159b@samsung.com>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <8cc2659b-b7f9-eb8a-e73b-3056b82f159b@samsung.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+        <20230203103005.31290-1-p.raghav@samsung.com> <Y+Gsu0PiXBIf8fFU@T590>
+        <6035da22-5667-93d5-fe00-62b988425cb5@samsung.com> <Y+nwh7V5xehxMWDR@T590>
+        <95506a88-c89c-0f41-3ab4-eb5741410c02@samsung.com>
+        <7c28caf6-931e-0a7a-a3c0-e4a430f860ff@kernel.dk>
+        <8cc2659b-b7f9-eb8a-e73b-3056b82f159b@samsung.com>
+        <db1d7cd7-6c89-7d6b-3fe5-3778bb3cb5e9@kernel.dk>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2/17/23 7:27 AM, Pankaj Raghav wrote:
-> Hi Jens,
-> 
-> On 2023-02-16 05:08, Jens Axboe wrote:
-> 
->> I think your numbers are skewed because brd isn't flagg nowait, can you
->> try with this?
+>> +-----------+-----------+--------+--------+
+>> | io_uring  | bio(base) | blk-mq | delta  |
+>> +-----------+-----------+--------+--------+
+>> |   read    |    577    |  446   | -22.7  |
+>> | randread  |    504    |  416   | -17.46 |
+>> |   write   |    554    |  424   | -23.47 |
+>> | randwrite |    484    |  381   | -21.28 |
+>> +-----------+-----------+--------+--------+
 >>
->> I ran some quick testing here, using the current tree:
->>
->> 		without patch		with patch
->> io_uring	~430K IOPS		~3.4M IOPS
->> libaio		~895K IOPS		~895K IOPS
->>
->> which is a pretty substantial difference...
->>
+>> +-----------+-----------+--------+--------+
+>> |  libaio   | bio(base) | blk-mq | delta  |
+>> +-----------+-----------+--------+--------+
+>> |   read    |    412    |  341   | -17.23 |
+>> | randread  |    389    |  335   | -13.88 |
+>> |   write   |    401    |  329   | -17.96 |
+>> | randwrite |    351    |  304   | -13.39 |
+>> +-----------+-----------+--------+--------+
 > 
-> I rebased my blk-mq changes on top of your nowait patches, but still I see a
-> regression with blk-mq. When I tried to trace and run perf, nothing odd
-> stood out, except for the normal blk-mq overhead.
-> 
-> Could you try it in your setup and see if you are noticing a similar trend?
-> Because based on the numbers you shared yesterday, I didn't see this regression.
-> 
-> fio script I run to benchmark:
-> 
-> $ fio --name=<workload>  --rw=<workload>  --ramp_time=5s --size=1G
-> --io_size=10G --loop=4 --cpus_allowed=1 --filename=/dev/ram0 --direct=1
-> --iodepth=128 --ioengine=<engine>
-> 
-> +-----------+-----------+--------+--------+
-> | io_uring  | bio(base) | blk-mq | delta  |
-> +-----------+-----------+--------+--------+
-> |   read    |    577    |  446   | -22.7  |
-> | randread  |    504    |  416   | -17.46 |
-> |   write   |    554    |  424   | -23.47 |
-> | randwrite |    484    |  381   | -21.28 |
-> +-----------+-----------+--------+--------+
-> 
-> +-----------+-----------+--------+--------+
-> |  libaio   | bio(base) | blk-mq | delta  |
-> +-----------+-----------+--------+--------+
-> |   read    |    412    |  341   | -17.23 |
-> | randread  |    389    |  335   | -13.88 |
-> |   write   |    401    |  329   | -17.96 |
-> | randwrite |    351    |  304   | -13.39 |
-> +-----------+-----------+--------+--------+
+> This is pretty much expected, as blk-mq adds a bunch of things that
+> brd doesn't really care about. One example of such would be tag
+> management.
 
-This is pretty much expected, as blk-mq adds a bunch of things that
-brd doesn't really care about. One example of such would be tag
-management.
+Got it. That was my conclusion as well.
 
-My reaction to your initial report wasn't a surprise that blk-mq
-would be slower than bio based for this use case, rather that
-io_uring was slower than libaio.
+> My reaction to your initial report wasn't a surprise that blk-mq
+> would be slower than bio based for this use case, rather that
+> io_uring was slower than libaio.
+> 
 
--- 
-Jens Axboe
+Yeah! So with nowait option, that isn't the case anymore.
 
+I will park this effort as blk-mq doesn't improve the performance for brd,
+and we can retain the submit_bio interface.
 
+Thanks for the input Jens, Christoph and Ming!
