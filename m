@@ -2,89 +2,85 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F58EC636CC
-	for <linux-block@archiver.kernel.org>; Fri, 17 Feb 2023 00:14:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 563BCC61DA4
+	for <linux-block@archiver.kernel.org>; Fri, 17 Feb 2023 01:39:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229678AbjBQAOl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 16 Feb 2023 19:14:41 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41364 "EHLO
+        id S229460AbjBQBjz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 16 Feb 2023 20:39:55 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51618 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229505AbjBQAOk (ORCPT
+        with ESMTP id S229490AbjBQBjy (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 16 Feb 2023 19:14:40 -0500
-Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0D113234FA
-        for <linux-block@vger.kernel.org>; Thu, 16 Feb 2023 16:13:54 -0800 (PST)
-Received: by mail-qt1-f175.google.com with SMTP id f10so4036537qtv.1
-        for <linux-block@vger.kernel.org>; Thu, 16 Feb 2023 16:13:54 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6kImKyTnUFlrsbZ3cxw052u3lsceBXaXeoQEmfLR09Q=;
-        b=cjo2AHCbwPMfZ0b+ufm2xue4qk2YfNIrAkDkfg7soI3RmFZT/+FkzoKxLHgs0TS9Q8
-         jTE4qi8sDNhljRvW27V0PPfnxhJvZR2OHK49mHO3W7HkOswhEBujot7/TNCAENRKYKix
-         MLAsE04T+T57e9hb17YBrrqPleExNB/LRjY5cYXIHL8G2uvMb6v+j3tPiO03g4b/v5ud
-         viSRmm5WU4cqE4pTd3AMF+u/OZMQjoZDLQz3sK452V1kcCzzenuRF2tH2xI+thUdTo4Z
-         b4/Gj6LsBC4QEZOuVhGl5Oq90v1kF393PriAQJiR4zmZwoFlIcqtUAnImOT/ukuGy77h
-         FM3w==
-X-Gm-Message-State: AO0yUKU7kk/i1fyXMcJOMYVoywx2AMbZgSvsN6Jm4SnOqFFr/0qA3K3I
-        aEQyCmMBgYYIHhKjtuGyxj61
-X-Google-Smtp-Source: AK7set8j9cfHfcZl/vzGU/yVM8ih72maPo/h2Vl1C+ebpdpF9rGGVgryO/199T+35W3ZyOZr6LNmWA==
-X-Received: by 2002:ac8:5f4a:0:b0:3b9:bc8c:c1f8 with SMTP id y10-20020ac85f4a000000b003b9bc8cc1f8mr8029510qta.3.1676592833020;
-        Thu, 16 Feb 2023 16:13:53 -0800 (PST)
-Received: from localhost ([87.249.138.162])
-        by smtp.gmail.com with ESMTPSA id 18-20020a370312000000b0071b1fe18746sm2260140qkd.63.2023.02.16.16.13.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 16 Feb 2023 16:13:52 -0800 (PST)
-Date:   Thu, 16 Feb 2023 19:13:51 -0500
-From:   Mike Snitzer <snitzer@kernel.org>
-To:     Uday Shankar <ushankar@purestorage.com>
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        dm-devel@redhat.com, Alasdair Kergon <agk@redhat.com>
-Subject: Re: blk-mq: enforce op-specific segment limits in
- blk_insert_cloned_request
-Message-ID: <Y+7Gv84lxIR0OsWc@redhat.com>
-References: <20230215201507.494152-1-ushankar@purestorage.com>
- <Y+3IoOd02iFGNLnC@infradead.org>
- <20230216192702.GA801590@dev-ushankar.dev.purestorage.com>
+        Thu, 16 Feb 2023 20:39:54 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A87C43A0A1
+        for <linux-block@vger.kernel.org>; Thu, 16 Feb 2023 17:39:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1676597946;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=ST15Vr5tlQxxpUbLwRiBnw4DD44/toSDhcuBqnheUag=;
+        b=PKxMN/in4IMyC9CZR79/8kpk1Nztd1Suv+ARtPwBiNmndhgwSvjYqfTrj1L/nGcVQXXzEW
+        VI6V+YfDUJbFKqsVfZX5a5qXuF2qaGHi5+ffZkWn1sYXEl/a+ACN57/2eQFQ5CJ1ob++yq
+        JIQVAjPzY5JhmFh+rOo+7BVStnj9iBs=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-142-IRHkcwr9P3aXx5w9b7CP9g-1; Thu, 16 Feb 2023 20:39:03 -0500
+X-MC-Unique: IRHkcwr9P3aXx5w9b7CP9g-1
+Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id EEF0D101A55E;
+        Fri, 17 Feb 2023 01:39:02 +0000 (UTC)
+Received: from localhost (ovpn-8-19.pek2.redhat.com [10.72.8.19])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id D74E4492B17;
+        Fri, 17 Feb 2023 01:39:01 +0000 (UTC)
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH blktests v2 0/2] blktests: add mini ublk source and blktests/033
+Date:   Fri, 17 Feb 2023 09:38:49 +0800
+Message-Id: <20230217013851.1402864-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230216192702.GA801590@dev-ushankar.dev.purestorage.com>
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.10
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Feb 16 2023 at  2:27P -0500,
-Uday Shankar <ushankar@purestorage.com> wrote:
+Hello,
 
-> On Wed, Feb 15, 2023 at 10:09:36PM -0800, Christoph Hellwig wrote:
-> > I'd just remove the debug check entirely
-> 
-> Older kernels have these checks in a separate function called
-> blk_cloned_rq_check_limits, which carries the following comment:
-> 
-> /**
->  * blk_cloned_rq_check_limits - Helper function to check a cloned request
->  *                              for the new queue limits
->  * @q:  the queue
->  * @rq: the request being checked
->  *
->  * Description:
->  *    @rq may have been made based on weaker limitations of upper-level queues
->  *    in request stacking drivers, and it may violate the limitation of @q.
->  *    Since the block layer and the underlying device driver trust @rq
->  *    after it is inserted to @q, it should be checked against @q before
->  *    the insertion using this generic function.
->  *
->  *    Request stacking drivers like request-based dm may change the queue
->  *    limits when retrying requests on other queues. Those requests need
->  *    to be checked against the new queue limits again during dispatch.
->  */.
-> 
-> Is this concern no longer relevant?
+The 1st patch adds one mini ublk program, which only supports null &
+loop targets.
 
-Still relevant.
+The 2nd patch add blktests/033 for covering gendisk leak issue.
+
+v2:
+	- cleanup & bugfix on miniublk.c
+	- avoid ignoring build warning just for addressing missed liburing
+	  or ublk kernel header
+	- patch style fix
+	- make 'make check' happy
+
+
+Ming Lei (2):
+  src: add mini ublk source code
+  block/033: add test to cover gendisk leak
+
+ Makefile            |    2 +-
+ common/ublk         |   34 ++
+ src/Makefile        |   18 +
+ src/ublk/miniublk.c | 1376 +++++++++++++++++++++++++++++++++++++++++++
+ tests/block/033     |   40 ++
+ tests/block/033.out |    2 +
+ 6 files changed, 1471 insertions(+), 1 deletion(-)
+ create mode 100644 common/ublk
+ create mode 100644 src/ublk/miniublk.c
+ create mode 100755 tests/block/033
+ create mode 100644 tests/block/033.out
+
+-- 
+2.31.1
+
