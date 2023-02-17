@@ -2,89 +2,142 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BA61C636D7
-	for <linux-block@archiver.kernel.org>; Fri, 17 Feb 2023 21:48:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EAD87C636D6
+	for <linux-block@archiver.kernel.org>; Fri, 17 Feb 2023 21:50:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229962AbjBQVst (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 17 Feb 2023 16:48:49 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56264 "EHLO
+        id S229874AbjBQVud (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 17 Feb 2023 16:50:33 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58104 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229640AbjBQVsp (ORCPT
+        with ESMTP id S229615AbjBQVud (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 17 Feb 2023 16:48:45 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 55E49EF9A
-        for <linux-block@vger.kernel.org>; Fri, 17 Feb 2023 13:47:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1676670473;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=if/tW06TDxxLKgUq7/Etw5p2PggjEQkfj1fwjUBcfbU=;
-        b=LxbQaXJVmrDug8DgtDlSA/MvWZs3+dR161aR4BHsWMhsPv9liCKBO8AteJXTsurtVRXwmO
-        NJSff7iXnVkhMeux+Z2Lqkxz/1DaqNf4cFTt9CdUE6inskrRBFJld+xpFFIPMGm6yKph0c
-        CWW1U0cNdWtleGgnKAlaXXoHZ/v2yAA=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-655-80wKAcFcPWuJ9_HZUpt2Bw-1; Fri, 17 Feb 2023 16:47:47 -0500
-X-MC-Unique: 80wKAcFcPWuJ9_HZUpt2Bw-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 631B23815F7B;
-        Fri, 17 Feb 2023 21:47:46 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.33.36.24])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 1328F492C3E;
-        Fri, 17 Feb 2023 21:47:43 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <87a61ckowk.fsf@oc8242746057.ibm.com>
-References: <87a61ckowk.fsf@oc8242746057.ibm.com>
-To:     Alexander Egorenkov <egorenar@linux.ibm.com>
-Cc:     dhowells@redhat.com, axboe@kernel.dk, david@redhat.com,
-        hch@infradead.org, hch@lst.de, hdanton@sina.com, jack@suse.cz,
-        jgg@nvidia.com, jhubbard@nvidia.com, jlayton@kernel.org,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        logang@deltatee.com, viro@zeniv.linux.org.uk, willy@infradead.org,
-        Marc Hartmayer <mhartmay@linux.ibm.com>
-Subject: Re: [PATCH v14 08/17] splice: Do splice read from a file without using ITER_PIPE
+        Fri, 17 Feb 2023 16:50:33 -0500
+Received: from mail-vk1-xa33.google.com (mail-vk1-xa33.google.com [IPv6:2607:f8b0:4864:20::a33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA82639B81
+        for <linux-block@vger.kernel.org>; Fri, 17 Feb 2023 13:50:31 -0800 (PST)
+Received: by mail-vk1-xa33.google.com with SMTP id u4so545544vkf.11
+        for <linux-block@vger.kernel.org>; Fri, 17 Feb 2023 13:50:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=Jc7+X1cqzOxQsAFytQZ25BlL34wPn1vkCpcwaRRD9oc=;
+        b=aG0ph1GtjLSjPnNsZT6Zujg2e+f0b8Rfl6R+FvDstE7ptRAuNh9BTny2PJscjWz/Kq
+         e8SYVASadRZ2q/DPe+33qofP2a+oI1iF6upND23LGE8QWBSMR0yXOkgRJPB87ViqMGap
+         xOj2TYMNbelNY0h5TrnyyvdlBe0JyCXTeil9fFm7VUZsh5CBcFIryCa+/hH9Njhm6KMl
+         y2gwk5OTqShm+f52wWM97o1gXi/luJRo08RIdZZhZFDZ9drAnGFru/F1RPKxY6zDZRNb
+         tBjyZ7aTUqAo2tRTenuJl4gUH9CAaOY/6BKxjFcUll7Z7D9RbJaY/Mf7oTS3DwjgXPes
+         SdjA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Jc7+X1cqzOxQsAFytQZ25BlL34wPn1vkCpcwaRRD9oc=;
+        b=nG/imhlQ4WtFxc7CO8f6FrBe9RJ84YEgJOFdDKRPazz+3dyCnPUYvfjB4Yrh7BK36N
+         0s8R3qX5MborVc+AAhDB3CP/N9ju5/rNRsvl84jdLguhAuwzEkMbsBfayYUrtn4CgMJr
+         GaNSjpN0fTUaIwcHWItMHQV2uIeBgHnsWiVwsX35MO3ztCk7kCScJr/DjQtL4OjbVELK
+         NY5USF0B1aLXvXjZbuIYfV0nvz3jjUPHuHRb1Gyv+eQ2nET+dUSk/dBijWFXUib2Y8Ya
+         Ip9Bt/F1G+zv3gtVX7ol6iM6uSwLR+sGgynyWxgRKxEICw0zPTRGIAPLG2+iNWpBu58v
+         yHPA==
+X-Gm-Message-State: AO0yUKUvJTdb9anouZlcg3JYhtYDNsZk/LoYUHnsTa8JNfoadkYoFL7U
+        qINl8iGIWINpZMOHbufEgzYWrkc5uuJlovDlLWpsfQ==
+X-Google-Smtp-Source: AK7set9XHUeLlPkt1gJ12stZFbCMRTkQQ9HrB3LYSIhi3/ZaG+e0VMAG8RtOJDpNATWJTqwo2mfMUsx0Pw5ZKygJeZ8=
+X-Received: by 2002:a1f:2693:0:b0:401:6440:787e with SMTP id
+ m141-20020a1f2693000000b004016440787emr122162vkm.32.1676670630833; Fri, 17
+ Feb 2023 13:50:30 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <732890.1676670463.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date:   Fri, 17 Feb 2023 21:47:43 +0000
-Message-ID: <732891.1676670463@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.10
+References: <CAJs=3_C+K0iumqYyKhphYLp=Qd7i6-Y6aDUgmYyY_rdnN1NAag@mail.gmail.com>
+ <CAPR809uYp6vGvCk4ugWOjbmd13WTm8fRg0f2Mdq3pxj6=d1McQ@mail.gmail.com> <a9cbed84-330f-472e-0cd7-90c6623bb5b5@nvidia.com>
+In-Reply-To: <a9cbed84-330f-472e-0cd7-90c6623bb5b5@nvidia.com>
+From:   Enrico Granata <egranata@google.com>
+Date:   Fri, 17 Feb 2023 14:50:19 -0700
+Message-ID: <CAPR809u0DLwHgV5w5QhWj_a53OcreZP1Qxxcom_Vbwzg0jgsog@mail.gmail.com>
+Subject: Re: Virtio-blk extended lifetime feature
+To:     Chaitanya Kulkarni <chaitanyak@nvidia.com>
+Cc:     Alvaro Karsz <alvaro.karsz@solid-run.com>,
+        Jahdiel Alvarez <jahdiel@google.com>,
+        virtualization <virtualization@lists.linux-foundation.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "dm-devel@redhat.com" <dm-devel@redhat.com>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Christoph Hellwig <hch@infradead.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Does the attached fix the problem for you?  The data being written into th=
-e
-pipe needs to be limited to the size of the file.
+On Wed, Jan 18, 2023 at 12:46 PM Chaitanya Kulkarni
+<chaitanyak@nvidia.com> wrote:
+>
+> On 1/17/23 14:30, Enrico Granata wrote:
+> > Hi,
+> > I am going to add +Jahdiel Alvarez who is also looking into a similar
+> > issue, and also I would like to hear thoughts of people who may have
+> > worked with (embedded or otherwise) storage more recently than I have
+> >
+> > One thought that Jahdiel and myself were pondering is whether we need
+> > "type_a" and "type_b" fields at all, or if there should simply be a
+> > "wear estimate" field, which for eMMC, it could be max(typ_a, typ_b)
+> > but it could generalize to any number of cell or other algorithm, as
+> > long as it produces one unique estimate of wear
+> >
+> > Thanks,
+> > - Enrico
+> >
+> > Thanks,
+> > - Enrico
+> >
+> >
+> > On Sun, Jan 15, 2023 at 12:56 AM Alvaro Karsz
+> > <alvaro.karsz@solid-run.com> wrote:
+> >>
+> >> Hi guys,
+> >>
+> >> While trying to upstream the implementation of VIRTIO_BLK_F_LIFETIME
+> >> feature, many developers suggested that this feature should be
+> >> extended to include more cell types, since its current implementation
+> >> in virtio spec is relevant for MMC and UFS devices only.
+> >>
+> >> The VIRTIO_BLK_F_LIFETIME defines the following fields:
+> >>
+> >> - pre_eol_info:  the percentage of reserved blocks that are consumed.
+> >> - device_lifetime_est_typ_a: wear of SLC cells.
+> >> - device_lifetime_est_typ_b: wear of MLC cells.
+>
+> For immediate comments :-
+>
+> It needs to cover all the flash cell types.
+>
+> Using names like type_a/type_b in the spec and in the implementation
+> adds unnecessary confusion and requires extra documentation in the
+> code that needs to be changed.
 
-David
+What do you think about my proposal to have a single "wear estimate"
+field and allow each flash type to calculate it as required by its own
+internal logic?
+The migration for eMMC and existing drivers would be to expose the
+maximum of type_A, type_B wear, but other cell types would be able to
+provide whatever logic they need as long as it meaningfully exposes
+the "wear"
 
-diff --git a/mm/filemap.c b/mm/filemap.c
-index c01bbcb9fa92..6362ac697a70 100644
---- a/mm/filemap.c
-+++ b/mm/filemap.c
-@@ -2948,7 +2948,8 @@ ssize_t filemap_splice_read(struct file *in, loff_t =
-*ppos,
- 			if (writably_mapped)
- 				flush_dcache_folio(folio);
- =
-
--			n =3D splice_folio_into_pipe(pipe, folio, *ppos, len);
-+			n =3D min_t(loff_t, len, isize - *ppos);
-+			n =3D splice_folio_into_pipe(pipe, folio, *ppos, n);
- 			if (!n)
- 				goto out;
- 			len -=3D n;
-
+>
+> >>
+> >> (https://docs.oasis-open.org/virtio/virtio/v1.2/virtio-v1.2.html)
+> >>
+> >> Following Michael's suggestion, I'd like to add to the virtio spec
+> >> with a new, extended lifetime command.
+> >> Since I'm more familiar with embedded type storage devices, I'd like
+> >> to ask you guys what fields you think should be included in the
+> >> extended command.
+> >>
+> >> Thanks,
+> >>
+> >> Alvaro
+>
+> -ck
