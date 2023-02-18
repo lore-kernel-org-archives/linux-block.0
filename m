@@ -2,23 +2,23 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8C83C636CC
-	for <linux-block@archiver.kernel.org>; Sat, 18 Feb 2023 22:02:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 26F69C64ED9
+	for <linux-block@archiver.kernel.org>; Sat, 18 Feb 2023 22:02:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229673AbjBRWCI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 18 Feb 2023 17:02:08 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51668 "EHLO
+        id S229780AbjBRWCJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 18 Feb 2023 17:02:09 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51674 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229523AbjBRWCH (ORCPT
+        with ESMTP id S229608AbjBRWCH (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Sat, 18 Feb 2023 17:02:07 -0500
 Received: from hosting.gsystem.sk (hosting.gsystem.sk [212.5.213.30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 6E08B1285E;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 7435B12877;
         Sat, 18 Feb 2023 14:02:04 -0800 (PST)
 Received: from gsql.ggedos.sk (off-20.infotel.telecom.sk [212.5.213.20])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by hosting.gsystem.sk (Postfix) with ESMTPSA id 693037A0507;
+        by hosting.gsystem.sk (Postfix) with ESMTPSA id 9EC057A0596;
         Sat, 18 Feb 2023 23:02:02 +0100 (CET)
 From:   Ondrej Zary <linux@zary.sk>
 To:     Damien Le Moal <damien.lemoal@opensource.wdc.com>
@@ -27,9 +27,9 @@ Cc:     Christoph Hellwig <hch@lst.de>,
         Jens Axboe <axboe@kernel.dk>, Tim Waugh <tim@cyberelk.net>,
         linux-block@vger.kernel.org, linux-parport@lists.infradead.org,
         linux-ide@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 02/18] pata_parport: probe all units automatically
-Date:   Sat, 18 Feb 2023 23:01:22 +0100
-Message-Id: <20230218220138.5692-3-linux@zary.sk>
+Subject: [PATCH 04/18] pata_parport: remove useless printks at module_init of bpck6
+Date:   Sat, 18 Feb 2023 23:01:24 +0100
+Message-Id: <20230218220138.5692-5-linux@zary.sk>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20230218220138.5692-1-linux@zary.sk>
 References: <20230218220138.5692-1-linux@zary.sk>
@@ -39,39 +39,29 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Only unit 0 is probed after registering a protocol driver or attaching
-a new parport. This causes bpck and bpck6 devices to be not detected
-automatically.
-Probe all units just like in manual device creation (using sysfs).
+bpck6 prints some useless messages on module_init. Remove them.
 
 Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
 Signed-off-by: Ondrej Zary <linux@zary.sk>
 ---
- drivers/ata/pata_parport/pata_parport.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ drivers/ata/pata_parport/bpck6.c | 4 ----
+ 1 file changed, 4 deletions(-)
 
-diff --git a/drivers/ata/pata_parport/pata_parport.c b/drivers/ata/pata_parport/pata_parport.c
-index 294a266a0dda..49e99c9465fd 100644
---- a/drivers/ata/pata_parport/pata_parport.c
-+++ b/drivers/ata/pata_parport/pata_parport.c
-@@ -530,7 +530,7 @@ int pata_parport_register_driver(struct pi_protocol *pr)
- 	if (probe) {
- 		/* probe all parports using this protocol */
- 		idr_for_each_entry(&parport_list, parport, port_num)
--			pi_init_one(parport, pr, -1, 0, -1);
-+			pi_init_one(parport, pr, -1, -1, -1);
- 	}
- 	mutex_unlock(&pi_mutex);
+diff --git a/drivers/ata/pata_parport/bpck6.c b/drivers/ata/pata_parport/bpck6.c
+index d897e2a28efe..3b3a40e48b21 100644
+--- a/drivers/ata/pata_parport/bpck6.c
++++ b/drivers/ata/pata_parport/bpck6.c
+@@ -247,10 +247,6 @@ static struct pi_protocol bpck6 = {
  
-@@ -665,7 +665,7 @@ static void pata_parport_attach(struct parport *port)
- 	if (probe) {
- 		/* probe this port using all protocols */
- 		idr_for_each_entry(&protocols, pr, pr_num)
--			pi_init_one(port, pr, -1, 0, -1);
-+			pi_init_one(port, pr, -1, -1, -1);
- 	}
- 	mutex_unlock(&pi_mutex);
+ static int __init bpck6_init(void)
+ {
+-	printk(KERN_INFO "bpck6: BACKPACK Protocol Driver V"BACKPACK_VERSION"\n");
+-	printk(KERN_INFO "bpck6: Copyright 2001 by Micro Solutions, Inc., DeKalb IL. USA\n");
+-	if(verbose)
+-		printk(KERN_DEBUG "bpck6: verbose debug enabled.\n");
+ 	return paride_register(&bpck6);
  }
+ 
 -- 
 Ondrej Zary
 
