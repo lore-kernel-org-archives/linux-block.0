@@ -2,23 +2,23 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 08E39C678DB
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51FD1C61DA4
 	for <linux-block@archiver.kernel.org>; Sat, 18 Feb 2023 22:02:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229959AbjBRWCK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 18 Feb 2023 17:02:10 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51672 "EHLO
+        id S230022AbjBRWCL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 18 Feb 2023 17:02:11 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51676 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229624AbjBRWCH (ORCPT
+        with ESMTP id S229632AbjBRWCI (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 18 Feb 2023 17:02:07 -0500
+        Sat, 18 Feb 2023 17:02:08 -0500
 Received: from hosting.gsystem.sk (hosting.gsystem.sk [212.5.213.30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 6E26D12874;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 65F7912854;
         Sat, 18 Feb 2023 14:02:04 -0800 (PST)
 Received: from gsql.ggedos.sk (off-20.infotel.telecom.sk [212.5.213.20])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by hosting.gsystem.sk (Postfix) with ESMTPSA id 4FFBB7A0400;
+        by hosting.gsystem.sk (Postfix) with ESMTPSA id 1CB167A021C;
         Sat, 18 Feb 2023 23:02:02 +0100 (CET)
 From:   Ondrej Zary <linux@zary.sk>
 To:     Damien Le Moal <damien.lemoal@opensource.wdc.com>
@@ -27,41 +27,50 @@ Cc:     Christoph Hellwig <hch@lst.de>,
         Jens Axboe <axboe@kernel.dk>, Tim Waugh <tim@cyberelk.net>,
         linux-block@vger.kernel.org, linux-parport@lists.infradead.org,
         linux-ide@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 01/18] pata_parport: fix EPAT C7/C8 Kconfig
-Date:   Sat, 18 Feb 2023 23:01:21 +0100
-Message-Id: <20230218220138.5692-2-linux@zary.sk>
+Subject: [PATCH v4 0/18] pata_parport: protocol drivers fixes and cleanups
+Date:   Sat, 18 Feb 2023 23:01:20 +0100
+Message-Id: <20230218220138.5692-1-linux@zary.sk>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20230218220138.5692-1-linux@zary.sk>
-References: <20230218220138.5692-1-linux@zary.sk>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-CONFIG_PARIDE_EPATC8 was renamed to CONFIG_PATA_PARPORT_EPATC8 but
-epat.c was not updated to reflect that. Update it.
+This patch series fixes two bugs and cleans up pata_parport protocol drivers,
+making the code simpler with no changes in behavior (except logged messages).
 
-Reported-by: Sergey Shtylyov <s.shtylyov@omp.ru>
-Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
 Signed-off-by: Ondrej Zary <linux@zary.sk>
 ---
- drivers/ata/pata_parport/epat.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Changes in v4:
+ - dropped whitespace changes from patch 12/18
+Changes in v3:
+ - added missing reviewed-by tags
+ - added more detailed changelog:
+   - patches 04-05 are split from v1 patch 02/12
+   - patch 06: comment-out instead of if(1)
+   - patches 11-14 are split from v1 patch 08/12
+Changes in v2:
+ - added two bugfixes (first two patches)
+ - addressed Sergey's comments (mostly split patches)
 
-diff --git a/drivers/ata/pata_parport/epat.c b/drivers/ata/pata_parport/epat.c
-index 6ce2dee7657f..93ee91d9338b 100644
---- a/drivers/ata/pata_parport/epat.c
-+++ b/drivers/ata/pata_parport/epat.c
-@@ -324,7 +324,7 @@ static struct pi_protocol epat = {
- 
- static int __init epat_init(void)
- {
--#ifdef CONFIG_PARIDE_EPATC8
-+#ifdef CONFIG_PATA_PARPORT_EPATC8
- 	epatc8 = 1;
- #endif
- 	return paride_register(&epat);
--- 
-Ondrej Zary
+ drivers/ata/pata_parport/aten.c                            |  45 ++++----------
+ drivers/ata/pata_parport/bpck.c                            |  86 ++++++++------------------
+ drivers/ata/pata_parport/bpck6.c                           | 107 ++++++++-------------------------
+ drivers/ata/pata_parport/comm.c                            |  52 +++++-----------
+ drivers/ata/pata_parport/dstr.c                            |  45 ++++----------
+ drivers/ata/pata_parport/epat.c                            |  48 ++++++---------
+ drivers/ata/pata_parport/epia.c                            |  55 +++++------------
+ drivers/ata/pata_parport/fit2.c                            |  37 ++++--------
+ drivers/ata/pata_parport/fit3.c                            |  39 ++++--------
+ drivers/ata/pata_parport/friq.c                            |  56 ++++++-----------
+ drivers/ata/pata_parport/frpw.c                            |  71 ++++++----------------
+ drivers/ata/pata_parport/kbic.c                            |  66 +++++++++-----------
+ drivers/ata/pata_parport/ktti.c                            |  38 ++++--------
+ drivers/ata/pata_parport/on20.c                            |  45 ++++----------
+ drivers/ata/pata_parport/on26.c                            |  52 ++++------------
+ drivers/ata/pata_parport/pata_parport.c                    |  31 +++++-----
+ {include/linux => drivers/ata/pata_parport}/pata_parport.h |  41 ++++---------
+ 17 files changed, 271 insertions(+), 643 deletions(-)
+
 
