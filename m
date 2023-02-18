@@ -2,24 +2,24 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D87FC6379F
-	for <linux-block@archiver.kernel.org>; Sat, 18 Feb 2023 22:02:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4EDD6C64ED8
+	for <linux-block@archiver.kernel.org>; Sat, 18 Feb 2023 22:02:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230156AbjBRWC1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 18 Feb 2023 17:02:27 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52134 "EHLO
+        id S229708AbjBRWCY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 18 Feb 2023 17:02:24 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52054 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230138AbjBRWCS (ORCPT
+        with ESMTP id S230105AbjBRWCR (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 18 Feb 2023 17:02:18 -0500
+        Sat, 18 Feb 2023 17:02:17 -0500
 Received: from hosting.gsystem.sk (hosting.gsystem.sk [212.5.213.30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 546EF12BE1;
-        Sat, 18 Feb 2023 14:02:11 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 1462212877;
+        Sat, 18 Feb 2023 14:02:08 -0800 (PST)
 Received: from gsql.ggedos.sk (off-20.infotel.telecom.sk [212.5.213.20])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by hosting.gsystem.sk (Postfix) with ESMTPSA id 03CFA7A072D;
-        Sat, 18 Feb 2023 23:02:04 +0100 (CET)
+        by hosting.gsystem.sk (Postfix) with ESMTPSA id 844937A0708;
+        Sat, 18 Feb 2023 23:02:03 +0100 (CET)
 From:   Ondrej Zary <linux@zary.sk>
 To:     Damien Le Moal <damien.lemoal@opensource.wdc.com>
 Cc:     Christoph Hellwig <hch@lst.de>,
@@ -27,9 +27,9 @@ Cc:     Christoph Hellwig <hch@lst.de>,
         Jens Axboe <axboe@kernel.dk>, Tim Waugh <tim@cyberelk.net>,
         linux-block@vger.kernel.org, linux-parport@lists.infradead.org,
         linux-ide@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 17/18] pata_parport: remove obsolete changelogs
-Date:   Sat, 18 Feb 2023 23:01:37 +0100
-Message-Id: <20230218220138.5692-18-linux@zary.sk>
+Subject: [PATCH 12/18] pata_parport: use print_hex_*
+Date:   Sat, 18 Feb 2023 23:01:32 +0100
+Message-Id: <20230218220138.5692-13-linux@zary.sk>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20230218220138.5692-1-linux@zary.sk>
 References: <20230218220138.5692-1-linux@zary.sk>
@@ -39,240 +39,55 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Remove obsolete changelogs from protocol drivers.
+Use print_hex_* for debug dumps.
 
-Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
 Signed-off-by: Ondrej Zary <linux@zary.sk>
 ---
- drivers/ata/pata_parport/aten.c  |  6 ------
- drivers/ata/pata_parport/bpck.c  |  7 -------
- drivers/ata/pata_parport/bpck6.c |  8 --------
- drivers/ata/pata_parport/comm.c  |  6 ------
- drivers/ata/pata_parport/dstr.c  |  6 ------
- drivers/ata/pata_parport/epat.c  |  7 -------
- drivers/ata/pata_parport/epia.c  |  7 -------
- drivers/ata/pata_parport/friq.c  |  5 -----
- drivers/ata/pata_parport/frpw.c  | 10 ----------
- drivers/ata/pata_parport/kbic.c  |  6 ------
- drivers/ata/pata_parport/on20.c  |  6 ------
- drivers/ata/pata_parport/on26.c  |  9 ---------
- 12 files changed, 83 deletions(-)
+ drivers/ata/pata_parport/bpck.c | 22 ++++------------------
+ 1 file changed, 4 insertions(+), 18 deletions(-)
 
-diff --git a/drivers/ata/pata_parport/aten.c b/drivers/ata/pata_parport/aten.c
-index 8995a4a08b76..f0d63b8513e0 100644
---- a/drivers/ata/pata_parport/aten.c
-+++ b/drivers/ata/pata_parport/aten.c
-@@ -9,12 +9,6 @@
- 
- */
- 
--/* Changes:
--
--	1.01	GRG 1998.05.05	init_proto, release_proto
--
--*/
--
- #include <linux/module.h>
- #include <linux/init.h>
- #include <linux/delay.h>
 diff --git a/drivers/ata/pata_parport/bpck.c b/drivers/ata/pata_parport/bpck.c
-index ecb98bf0e6de..472029a21d59 100644
+index 1cba098b4b82..dec24983d140 100644
 --- a/drivers/ata/pata_parport/bpck.c
 +++ b/drivers/ata/pata_parport/bpck.c
-@@ -7,13 +7,6 @@
+@@ -334,12 +334,9 @@ static int bpck_test_proto(struct pi_adapter *pi, char *scratch, int verbose)
  
- */
+ 	}
  
--/* Changes:
--
--	1.01	GRG 1998.05.05 init_proto, release_proto, pi->delay 
--	1.02    GRG 1998.08.15 default pi->delay returned to 4
--
--*/
--
- #include <linux/module.h>
- #include <linux/init.h>
- #include <linux/delay.h>
-diff --git a/drivers/ata/pata_parport/bpck6.c b/drivers/ata/pata_parport/bpck6.c
-index f0ab30fa739a..683a11131acd 100644
---- a/drivers/ata/pata_parport/bpck6.c
-+++ b/drivers/ata/pata_parport/bpck6.c
-@@ -11,14 +11,6 @@
+-	if (verbose) {
+-		printk("bpck: 0x%x unit %d mode %d: ",
+-		       pi->port, pi->unit, pi->mode);
+-	    for (i=0;i<TEST_LEN;i++) printk("%3d",buf[i]);
+-	    printk("\n");
+-	}
++	dev_dbg(&pi->dev, "bpck: 0x%x unit %d mode %d: ",
++		pi->port, pi->unit, pi->mode);
++	print_hex_dump_debug("bpck: ", DUMP_PREFIX_NONE, TEST_LEN, 1, buf, TEST_LEN, false);
  
- */
+ 	e = 0;
+ 	for (i=0;i<TEST_LEN;i++) if (buf[i] != (i+1)) e++;
+@@ -421,20 +418,9 @@ static void bpck_log_adapter(struct pi_adapter *pi)
+ {	char	*mode_string[5] = { "4-bit","8-bit","EPP-8",
+ 				    "EPP-16","EPP-32" };
+ 	char scratch[128];
+-#ifdef DUMP_EEPROM
+-	int i;
+-#endif
  
--/*
--   This is Ken's linux wrapper for the PPC library
--   Version 1.0.0 is the backpack driver for which source is not available
--   Version 2.0.0 is the first to have source released 
--   Version 2.0.1 is the "Cox-ified" source code 
--   Version 2.0.2 - fixed version string usage, and made ppc functions static 
--*/
+ 	bpck_read_eeprom(pi,scratch);
 -
- #include <linux/module.h>
- #include <linux/init.h>
- #include <linux/kernel.h>
-diff --git a/drivers/ata/pata_parport/comm.c b/drivers/ata/pata_parport/comm.c
-index 6e05b50c322c..0483caa80544 100644
---- a/drivers/ata/pata_parport/comm.c
-+++ b/drivers/ata/pata_parport/comm.c
-@@ -8,12 +8,6 @@
- 	use this adapter.
- */
- 
--/* Changes:
+-#ifdef DUMP_EEPROM
+-	   for(i=0;i<128;i++)
+-		if ((scratch[i] < ' ') || (scratch[i] > '~'))
+-		    scratch[i] = '.';
+-	   printk("bpck EEPROM: %64.64s\n", scratch);
+-	   printk("             %64.64s\n", &scratch[64]);
+-#endif
 -
--	1.01	GRG 1998.05.05  init_proto, release_proto
--
--*/
--
- #include <linux/module.h>
- #include <linux/init.h>
- #include <linux/delay.h>
-diff --git a/drivers/ata/pata_parport/dstr.c b/drivers/ata/pata_parport/dstr.c
-index 64e45eed9588..c5af7a5fa636 100644
---- a/drivers/ata/pata_parport/dstr.c
-+++ b/drivers/ata/pata_parport/dstr.c
-@@ -7,12 +7,6 @@
- 
- */
- 
--/* Changes:
--
--        1.01    GRG 1998.05.06 init_proto, release_proto
--
--*/
--
- #include <linux/module.h>
- #include <linux/init.h>
- #include <linux/delay.h>
-diff --git a/drivers/ata/pata_parport/epat.c b/drivers/ata/pata_parport/epat.c
-index 609614b2c69e..0315f98326f8 100644
---- a/drivers/ata/pata_parport/epat.c
-+++ b/drivers/ata/pata_parport/epat.c
-@@ -9,13 +9,6 @@
- 	
- */
- 
--/* Changes:
--
--        1.01    GRG 1998.05.06 init_proto, release_proto
--        1.02    Joshua b. Jore CPP(renamed), epat_connect, epat_disconnect
--
--*/
--
- #include <linux/module.h>
- #include <linux/init.h>
- #include <linux/delay.h>
-diff --git a/drivers/ata/pata_parport/epia.c b/drivers/ata/pata_parport/epia.c
-index 970532619aeb..77869639773d 100644
---- a/drivers/ata/pata_parport/epia.c
-+++ b/drivers/ata/pata_parport/epia.c
-@@ -10,13 +10,6 @@
- 
- */
- 
--/* Changes:
--
--        1.01    GRG 1998.05.06 init_proto, release_proto
--	1.02    GRG 1998.06.17 support older versions of EPIA
--
--*/
--
- #include <linux/module.h>
- #include <linux/init.h>
- #include <linux/delay.h>
-diff --git a/drivers/ata/pata_parport/friq.c b/drivers/ata/pata_parport/friq.c
-index 1888e8bcb884..8883b3c509cc 100644
---- a/drivers/ata/pata_parport/friq.c
-+++ b/drivers/ata/pata_parport/friq.c
-@@ -20,11 +20,6 @@
- 
- */
- 
--/* Changes:
--
--	1.01	GRG 1998.12.20	 Added support for soft power switch
--*/
--
- #include <linux/module.h>
- #include <linux/init.h>
- #include <linux/delay.h>
-diff --git a/drivers/ata/pata_parport/frpw.c b/drivers/ata/pata_parport/frpw.c
-index 484b5b9d31eb..1ef8be79d793 100644
---- a/drivers/ata/pata_parport/frpw.c
-+++ b/drivers/ata/pata_parport/frpw.c
-@@ -13,16 +13,6 @@
- 
- */
- 
--/* Changes:
--
--        1.01    GRG 1998.05.06 init_proto, release_proto
--			       fix chip detect
--			       added EPP-16 and EPP-32
--	1.02    GRG 1998.09.23 added hard reset to initialisation process
--	1.03    GRG 1998.12.14 made hard reset conditional
--
--*/
--
- #include <linux/module.h>
- #include <linux/init.h>
- #include <linux/delay.h>
-diff --git a/drivers/ata/pata_parport/kbic.c b/drivers/ata/pata_parport/kbic.c
-index 3fab7a896e79..29f4f1e14d21 100644
---- a/drivers/ata/pata_parport/kbic.c
-+++ b/drivers/ata/pata_parport/kbic.c
-@@ -12,12 +12,6 @@
- 
- */
- 
--/* Changes:
--
--        1.01    GRG 1998.05.06 init_proto, release_proto
--
--*/
--
- #include <linux/module.h>
- #include <linux/init.h>
- #include <linux/delay.h>
-diff --git a/drivers/ata/pata_parport/on20.c b/drivers/ata/pata_parport/on20.c
-index 9cc8be9fa562..6956b91efb47 100644
---- a/drivers/ata/pata_parport/on20.c
-+++ b/drivers/ata/pata_parport/on20.c
-@@ -6,12 +6,6 @@
-         Onspec 90c20 parallel to IDE adapter. 
- */
- 
--/* Changes:
--
--        1.01    GRG 1998.05.06 init_proto, release_proto
--
--*/
--
- #include <linux/module.h>
- #include <linux/init.h>
- #include <linux/delay.h>
-diff --git a/drivers/ata/pata_parport/on26.c b/drivers/ata/pata_parport/on26.c
-index e37f69db5f76..1d90eb9b541e 100644
---- a/drivers/ata/pata_parport/on26.c
-+++ b/drivers/ata/pata_parport/on26.c
-@@ -7,15 +7,6 @@
- 
- */
- 
--/* Changes:
--
--        1.01    GRG 1998.05.06 init_proto, release_proto
--	1.02    GRG 1998.09.23 updates for the -E rev chip
--	1.03    GRG 1998.12.14 fix for slave drives
--	1.04    GRG 1998.12.20 yet another bug fix
--
--*/
--
- #include <linux/module.h>
- #include <linux/init.h>
- #include <linux/delay.h>
++	print_hex_dump_bytes("bpck EEPROM: ", DUMP_PREFIX_NONE, scratch, 128);
+ 	dev_info(&pi->dev, "bpck %s, backpack %8.8s unit %d",
+ 		BPCK_VERSION, &scratch[110], pi->unit);
+ 	dev_info(&pi->dev, " at 0x%x, mode %d (%s), delay %d\n", pi->port,
 -- 
 Ondrej Zary
 
