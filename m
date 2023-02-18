@@ -2,24 +2,24 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F377C6FD1F
-	for <linux-block@archiver.kernel.org>; Sat, 18 Feb 2023 22:02:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 224F4C6FD18
+	for <linux-block@archiver.kernel.org>; Sat, 18 Feb 2023 22:02:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230300AbjBRWCZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 18 Feb 2023 17:02:25 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52042 "EHLO
+        id S230165AbjBRWC3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 18 Feb 2023 17:02:29 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52072 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230102AbjBRWCR (ORCPT
+        with ESMTP id S230149AbjBRWCT (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 18 Feb 2023 17:02:17 -0500
+        Sat, 18 Feb 2023 17:02:19 -0500
 Received: from hosting.gsystem.sk (hosting.gsystem.sk [212.5.213.30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A5B3A12854;
-        Sat, 18 Feb 2023 14:02:08 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 0552212BDD;
+        Sat, 18 Feb 2023 14:02:10 -0800 (PST)
 Received: from gsql.ggedos.sk (off-20.infotel.telecom.sk [212.5.213.20])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by hosting.gsystem.sk (Postfix) with ESMTPSA id 6839F7A06FE;
-        Sat, 18 Feb 2023 23:02:03 +0100 (CET)
+        by hosting.gsystem.sk (Postfix) with ESMTPSA id 230B57A0731;
+        Sat, 18 Feb 2023 23:02:04 +0100 (CET)
 From:   Ondrej Zary <linux@zary.sk>
 To:     Damien Le Moal <damien.lemoal@opensource.wdc.com>
 Cc:     Christoph Hellwig <hch@lst.de>,
@@ -27,9 +27,9 @@ Cc:     Christoph Hellwig <hch@lst.de>,
         Jens Axboe <axboe@kernel.dk>, Tim Waugh <tim@cyberelk.net>,
         linux-block@vger.kernel.org, linux-parport@lists.infradead.org,
         linux-ide@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 11/18] pata_parport: use dev_* instead of printk
-Date:   Sat, 18 Feb 2023 23:01:31 +0100
-Message-Id: <20230218220138.5692-12-linux@zary.sk>
+Subject: [PATCH 18/18] pata_parport: move pata_parport.h to drivers/ata/pata_parport
+Date:   Sat, 18 Feb 2023 23:01:38 +0100
+Message-Id: <20230218220138.5692-19-linux@zary.sk>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20230218220138.5692-1-linux@zary.sk>
 References: <20230218220138.5692-1-linux@zary.sk>
@@ -39,420 +39,260 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Use dev_info/dev_err/dev_dbg instead of printk.
+Now that paride is gone, pata_parport.h does not need to be in
+include/linux. Move it to drivers/ata/pata_parport.
 
 Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
 Signed-off-by: Ondrej Zary <linux@zary.sk>
 ---
- drivers/ata/pata_parport/aten.c  |  4 +--
- drivers/ata/pata_parport/bpck.c  |  4 +--
- drivers/ata/pata_parport/bpck6.c | 45 +++++++++-----------------------
- drivers/ata/pata_parport/comm.c  |  4 +--
- drivers/ata/pata_parport/dstr.c  |  4 +--
- drivers/ata/pata_parport/epat.c  | 10 +++----
- drivers/ata/pata_parport/epia.c  | 10 +++----
- drivers/ata/pata_parport/fit2.c  |  2 +-
- drivers/ata/pata_parport/fit3.c  |  2 +-
- drivers/ata/pata_parport/friq.c  | 10 +++----
- drivers/ata/pata_parport/frpw.c  | 16 +++++-------
- drivers/ata/pata_parport/kbic.c  |  4 +--
- drivers/ata/pata_parport/ktti.c  |  2 +-
- drivers/ata/pata_parport/on20.c  |  4 +--
- drivers/ata/pata_parport/on26.c  |  6 ++---
- 15 files changed, 48 insertions(+), 79 deletions(-)
+ drivers/ata/pata_parport/aten.c                            | 3 +--
+ drivers/ata/pata_parport/bpck.c                            | 3 +--
+ drivers/ata/pata_parport/bpck6.c                           | 3 +--
+ drivers/ata/pata_parport/comm.c                            | 3 +--
+ drivers/ata/pata_parport/dstr.c                            | 3 +--
+ drivers/ata/pata_parport/epat.c                            | 3 +--
+ drivers/ata/pata_parport/epia.c                            | 3 +--
+ drivers/ata/pata_parport/fit2.c                            | 3 +--
+ drivers/ata/pata_parport/fit3.c                            | 3 +--
+ drivers/ata/pata_parport/friq.c                            | 3 +--
+ drivers/ata/pata_parport/frpw.c                            | 3 +--
+ drivers/ata/pata_parport/kbic.c                            | 3 +--
+ drivers/ata/pata_parport/ktti.c                            | 3 +--
+ drivers/ata/pata_parport/on20.c                            | 3 +--
+ drivers/ata/pata_parport/on26.c                            | 3 +--
+ drivers/ata/pata_parport/pata_parport.c                    | 2 +-
+ {include/linux => drivers/ata/pata_parport}/pata_parport.h | 0
+ 17 files changed, 16 insertions(+), 31 deletions(-)
+ rename {include/linux => drivers/ata/pata_parport}/pata_parport.h (100%)
 
 diff --git a/drivers/ata/pata_parport/aten.c b/drivers/ata/pata_parport/aten.c
-index 3f5c50c2c43a..ccbba14ccab1 100644
+index f0d63b8513e0..1bd248c42f8b 100644
 --- a/drivers/ata/pata_parport/aten.c
 +++ b/drivers/ata/pata_parport/aten.c
-@@ -124,8 +124,8 @@ static void aten_log_adapter(struct pi_adapter *pi)
+@@ -16,8 +16,7 @@
+ #include <linux/wait.h>
+ #include <linux/types.h>
+ #include <asm/io.h>
+-
+-#include <linux/pata_parport.h>
++#include "pata_parport.h"
  
- {       char    *mode_string[2] = {"4-bit","8-bit"};
+ #define j44(a,b)                ((((a>>4)&0x0f)|(b&0xf0))^0x88)
  
--	printk("aten %s, ATEN EH-100 at 0x%x, ", ATEN_VERSION, pi->port);
--        printk("mode %d (%s), delay %d\n",pi->mode,
-+	dev_info(&pi->dev, "aten %s, ATEN EH-100 at 0x%x, ", ATEN_VERSION, pi->port);
-+	dev_info(&pi->dev, "mode %d (%s), delay %d\n", pi->mode,
- 		mode_string[pi->mode],pi->delay);
- 
- }
 diff --git a/drivers/ata/pata_parport/bpck.c b/drivers/ata/pata_parport/bpck.c
-index f475a25769f0..1cba098b4b82 100644
+index 472029a21d59..1c5035a09554 100644
 --- a/drivers/ata/pata_parport/bpck.c
 +++ b/drivers/ata/pata_parport/bpck.c
-@@ -435,9 +435,9 @@ static void bpck_log_adapter(struct pi_adapter *pi)
- 	   printk("             %64.64s\n", &scratch[64]);
- #endif
+@@ -14,8 +14,7 @@
+ #include <linux/types.h>
+ #include <linux/wait.h>
+ #include <asm/io.h>
+-
+-#include <linux/pata_parport.h>
++#include "pata_parport.h"
  
--	printk("bpck %s, backpack %8.8s unit %d",
-+	dev_info(&pi->dev, "bpck %s, backpack %8.8s unit %d",
- 		BPCK_VERSION, &scratch[110], pi->unit);
--	printk(" at 0x%x, mode %d (%s), delay %d\n",pi->port,
-+	dev_info(&pi->dev, " at 0x%x, mode %d (%s), delay %d\n", pi->port,
- 		pi->mode,mode_string[pi->mode],pi->delay);
- }
- 
+ #undef r2
+ #undef w2
 diff --git a/drivers/ata/pata_parport/bpck6.c b/drivers/ata/pata_parport/bpck6.c
-index 41395a97d77c..4770e29bfdeb 100644
+index 683a11131acd..964bc688e280 100644
 --- a/drivers/ata/pata_parport/bpck6.c
 +++ b/drivers/ata/pata_parport/bpck6.c
-@@ -90,10 +90,7 @@ static void bpck6_read_block(struct pi_adapter *pi, char *buf, int len)
+@@ -18,9 +18,8 @@
+ #include <linux/types.h>
+ #include <asm/io.h>
+ #include <linux/parport.h>
+-
+ #include "ppc6lnx.c"
+-#include <linux/pata_parport.h>
++#include "pata_parport.h"
  
- static void bpck6_connect(struct pi_adapter *pi)
- {
--	if(verbose)
--	{
--		printk(KERN_DEBUG "connect\n");
--	}
-+	dev_dbg(&pi->dev, "connect\n");
- 
- 	if(pi->mode >=2)
-   	{
-@@ -114,22 +111,16 @@ static void bpck6_connect(struct pi_adapter *pi)
- 
- static void bpck6_disconnect(struct pi_adapter *pi)
- {
--	if(verbose)
--	{
--		printk("disconnect\n");
--	}
-+	dev_dbg(&pi->dev, "disconnect\n");
- 	ppc6_wr_extout(PPCSTRUCT(pi),0x0);
- 	ppc6_close(PPCSTRUCT(pi));
- }
- 
- static int bpck6_test_port(struct pi_adapter *pi)   /* check for 8-bit port */
- {
--	if(verbose)
--	{
--		printk(KERN_DEBUG "PARPORT indicates modes=%x for lp=0x%lx\n",
--               		((struct pardevice*)(pi->pardev))->port->modes,
--			((struct pardevice *)(pi->pardev))->port->base); 
--	}
-+	dev_dbg(&pi->dev, "PARPORT indicates modes=%x for lp=0x%lx\n",
-+		((struct pardevice *)(pi->pardev))->port->modes,
-+		((struct pardevice *)(pi->pardev))->port->base);
- 
- 	/*copy over duplicate stuff.. initialize state info*/
- 	PPCSTRUCT(pi)->ppc_id=pi->unit;
-@@ -158,10 +149,7 @@ static int bpck6_probe_unit(struct pi_adapter *pi)
- {
- 	int out;
- 
--	if(verbose)
--	{
--		printk(KERN_DEBUG "PROBE UNIT %x on port:%x\n",pi->unit,pi->port);
--	}
-+	dev_dbg(&pi->dev, "PROBE UNIT %x on port:%x\n", pi->unit, pi->port);
- 
- 	/*SET PPC UNIT NUMBER*/
- 	PPCSTRUCT(pi)->ppc_id=pi->unit;
-@@ -171,26 +159,17 @@ static int bpck6_probe_unit(struct pi_adapter *pi)
- 
- 	out=ppc6_open(PPCSTRUCT(pi));
- 
--	if(verbose)
--	{
--		printk(KERN_DEBUG "ppc_open returned %2x\n",out);
--	}
-+	dev_dbg(&pi->dev, "ppc_open returned %2x\n", out);
- 
-   	if(out)
-  	{
- 		ppc6_close(PPCSTRUCT(pi));
--		if(verbose)
--		{
--			printk(KERN_DEBUG "leaving probe\n");
--		}
-+		dev_dbg(&pi->dev, "leaving probe\n");
-                return(1);
- 	}
-   	else
-   	{
--		if(verbose)
--		{
--			printk(KERN_DEBUG "Failed open\n");
--		}
-+		dev_dbg(&pi->dev, "Failed open\n");
-     		return(0);
-   	}
- }
-@@ -200,9 +179,9 @@ static void bpck6_log_adapter(struct pi_adapter *pi)
- 	char *mode_string[5]=
- 		{"4-bit","8-bit","EPP-8","EPP-16","EPP-32"};
- 
--	printk("BACKPACK %s, Micro Solutions BACKPACK Drive at 0x%x\n",
-+	dev_info(&pi->dev, "BACKPACK %s, Micro Solutions BACKPACK Drive at 0x%x\n",
- 		BACKPACK_VERSION, pi->port);
--	printk("Unit: %d Mode:%d (%s) Delay %d\n",
-+	dev_info(&pi->dev, "Unit: %d Mode:%d (%s) Delay %d\n",
- 		pi->unit,pi->mode,mode_string[pi->mode],pi->delay);
- }
- 
-@@ -215,7 +194,7 @@ static int bpck6_init_proto(struct pi_adapter *pi)
- 		return 0;
- 	}
- 
--	printk(KERN_ERR "ERROR COULDN'T ALLOCATE MEMORY\n");
-+	dev_err(&pi->dev, "ERROR COULDN'T ALLOCATE MEMORY\n");
- 	return -1;
- }
+ #define PPCSTRUCT(pi) ((Interface *)(pi->private))
  
 diff --git a/drivers/ata/pata_parport/comm.c b/drivers/ata/pata_parport/comm.c
-index 88476072b708..7b59eca52185 100644
+index 0483caa80544..4c2f9ad60ad8 100644
 --- a/drivers/ata/pata_parport/comm.c
 +++ b/drivers/ata/pata_parport/comm.c
-@@ -183,8 +183,8 @@ static void comm_log_adapter(struct pi_adapter *pi)
+@@ -15,8 +15,7 @@
+ #include <linux/types.h>
+ #include <linux/wait.h>
+ #include <asm/io.h>
+-
+-#include <linux/pata_parport.h>
++#include "pata_parport.h"
  
- {       char    *mode_string[5] = {"4-bit","8-bit","EPP-8","EPP-16","EPP-32"};
- 
--	printk("comm %s, DataStor Commuter at 0x%x, ", COMM_VERSION, pi->port);
--        printk("mode %d (%s), delay %d\n",pi->mode,
-+	dev_info(&pi->dev, "comm %s, DataStor Commuter at 0x%x, ", COMM_VERSION, pi->port);
-+	dev_info(&pi->dev, "mode %d (%s), delay %d\n", pi->mode,
- 		mode_string[pi->mode],pi->delay);
- 
- }
+ /* mode codes:  0  nybble reads, 8-bit writes
+                 1  8-bit reads and writes
 diff --git a/drivers/ata/pata_parport/dstr.c b/drivers/ata/pata_parport/dstr.c
-index a8b238828061..eb6ddceaeb83 100644
+index c5af7a5fa636..2524684be206 100644
 --- a/drivers/ata/pata_parport/dstr.c
 +++ b/drivers/ata/pata_parport/dstr.c
-@@ -195,8 +195,8 @@ static void dstr_log_adapter(struct pi_adapter *pi)
- {       char    *mode_string[5] = {"4-bit","8-bit","EPP-8",
- 				   "EPP-16","EPP-32"};
+@@ -14,8 +14,7 @@
+ #include <linux/types.h>
+ #include <linux/wait.h>
+ #include <asm/io.h>
+-
+-#include <linux/pata_parport.h>
++#include "pata_parport.h"
  
--	printk("dstr %s, DataStor EP2000 at 0x%x, ", DSTR_VERSION, pi->port);
--        printk("mode %d (%s), delay %d\n",pi->mode,
-+	dev_info(&pi->dev, "dstr %s, DataStor EP2000 at 0x%x, ", DSTR_VERSION, pi->port);
-+	dev_info(&pi->dev, "mode %d (%s), delay %d\n", pi->mode,
- 		mode_string[pi->mode],pi->delay);
- 
- }
+ /* mode codes:  0  nybble reads, 8-bit writes
+                 1  8-bit reads and writes
 diff --git a/drivers/ata/pata_parport/epat.c b/drivers/ata/pata_parport/epat.c
-index a30313a2c3d7..389faa6ae49d 100644
+index 0315f98326f8..b146999368ae 100644
 --- a/drivers/ata/pata_parport/epat.c
 +++ b/drivers/ata/pata_parport/epat.c
-@@ -279,10 +279,8 @@ static int epat_test_proto(struct pi_adapter *pi, char *scratch, int verbose)
-         }
-         epat_disconnect(pi);
+@@ -16,8 +16,7 @@
+ #include <linux/types.h>
+ #include <linux/wait.h>
+ #include <asm/io.h>
+-
+-#include <linux/pata_parport.h>
++#include "pata_parport.h"
  
--        if (verbose)  {
--		printk("epat: port 0x%x, mode %d, ccr %x, test=(%d,%d,%d)\n",
--		       pi->port, pi->mode, cc, e[0], e[1], f);
--	}
-+	dev_dbg(&pi->dev, "epat: port 0x%x, mode %d, ccr %x, test=(%d,%d,%d)\n",
-+	       pi->port, pi->mode, cc, e[0], e[1], f);
- 	
-         return (e[0] && e[1]) || f;
- }
-@@ -298,9 +296,9 @@ static void epat_log_adapter(struct pi_adapter *pi)
-         ver = RR(0xb);
-         epat_disconnect(pi);
- 
--	printk("epat %s, Shuttle EPAT chip %x at 0x%x, ",
-+	dev_info(&pi->dev, "epat %s, Shuttle EPAT chip %x at 0x%x, ",
- 		EPAT_VERSION, ver, pi->port);
--	printk("mode %d (%s), delay %d\n",pi->mode,
-+	dev_info(&pi->dev, "mode %d (%s), delay %d\n", pi->mode,
- 		mode_string[pi->mode],pi->delay);
- 
- }
+ #define j44(a,b)		(((a>>4)&0x0f)+(b&0xf0))
+ #define j53(a,b)		(((a>>3)&0x1f)+((b<<4)&0xe0))
 diff --git a/drivers/ata/pata_parport/epia.c b/drivers/ata/pata_parport/epia.c
-index ece7862dc058..48d12f56c501 100644
+index 77869639773d..f6db2f79fe99 100644
 --- a/drivers/ata/pata_parport/epia.c
 +++ b/drivers/ata/pata_parport/epia.c
-@@ -262,10 +262,8 @@ static int epia_test_proto(struct pi_adapter *pi, char *scratch, int verbose)
-         WR(0x84,0);
-         epia_disconnect(pi);
+@@ -17,8 +17,7 @@
+ #include <linux/types.h>
+ #include <linux/wait.h>
+ #include <asm/io.h>
+-
+-#include <linux/pata_parport.h>
++#include "pata_parport.h"
  
--        if (verbose)  {
--		printk("epia: port 0x%x, mode %d, test=(%d,%d,%d)\n",
--		       pi->port, pi->mode, e[0], e[1], f);
--        }
-+	dev_dbg(&pi->dev, "epia: port 0x%x, mode %d, test=(%d,%d,%d)\n",
-+	       pi->port, pi->mode, e[0], e[1], f);
-         
-         return (e[0] && e[1]) || f;
- 
-@@ -277,8 +275,8 @@ static void epia_log_adapter(struct pi_adapter *pi)
- {       char    *mode_string[6] = {"4-bit","5/3","8-bit",
- 				   "EPP-8","EPP-16","EPP-32"};
- 
--	printk("epia %s, Shuttle EPIA at 0x%x, ", EPIA_VERSION, pi->port);
--        printk("mode %d (%s), delay %d\n",pi->mode,
-+	dev_info(&pi->dev, "epia %s, Shuttle EPIA at 0x%x, ", EPIA_VERSION, pi->port);
-+	dev_info(&pi->dev, "mode %d (%s), delay %d\n", pi->mode,
- 		mode_string[pi->mode],pi->delay);
- 
- }
+ /* mode codes:  0  nybble reads on port 1, 8-bit writes
+                 1  5/3 reads on ports 1 & 2, 8-bit writes
 diff --git a/drivers/ata/pata_parport/fit2.c b/drivers/ata/pata_parport/fit2.c
-index 056e92d8e015..d0a781f04411 100644
+index 3536d8c07955..fd3b2ce426a5 100644
 --- a/drivers/ata/pata_parport/fit2.c
 +++ b/drivers/ata/pata_parport/fit2.c
-@@ -116,7 +116,7 @@ static void fit2_disconnect(struct pi_adapter *pi)
- static void fit2_log_adapter(struct pi_adapter *pi)
+@@ -20,8 +20,7 @@
+ #include <linux/types.h>
+ #include <linux/wait.h>
+ #include <asm/io.h>
+-
+-#include <linux/pata_parport.h>
++#include "pata_parport.h"
  
- {
--	printk("fit2 %s, FIT 2000 adapter at 0x%x, delay %d\n",
-+	dev_info(&pi->dev, "fit2 %s, FIT 2000 adapter at 0x%x, delay %d\n",
- 		FIT2_VERSION, pi->port, pi->delay);
+ #define j44(a,b)                (((a>>4)&0x0f)|(b&0xf0))
  
- }
 diff --git a/drivers/ata/pata_parport/fit3.c b/drivers/ata/pata_parport/fit3.c
-index fa37f7f17fb2..f86da2d478cb 100644
+index 9f5320c750e2..75df656ac472 100644
 --- a/drivers/ata/pata_parport/fit3.c
 +++ b/drivers/ata/pata_parport/fit3.c
-@@ -173,7 +173,7 @@ static void fit3_log_adapter(struct pi_adapter *pi)
+@@ -24,8 +24,7 @@
+ #include <linux/types.h>
+ #include <linux/wait.h>
+ #include <asm/io.h>
+-
+-#include <linux/pata_parport.h>
++#include "pata_parport.h"
  
- {       char    *mode_string[3] = {"4-bit","8-bit","EPP"};
+ #define j44(a,b)                (((a>>3)&0x0f)|((b<<1)&0xf0))
  
--	printk("fit3 %s, FIT 3000 adapter at 0x%x, "
-+	dev_info(&pi->dev, "fit3 %s, FIT 3000 adapter at 0x%x, "
- 	       "mode %d (%s), delay %d\n",
- 		FIT3_VERSION, pi->port,
- 		pi->mode,mode_string[pi->mode],pi->delay);
 diff --git a/drivers/ata/pata_parport/friq.c b/drivers/ata/pata_parport/friq.c
-index bf597ee520b7..ec564e7cb930 100644
+index 8883b3c509cc..1647264cd9a8 100644
 --- a/drivers/ata/pata_parport/friq.c
 +++ b/drivers/ata/pata_parport/friq.c
-@@ -207,10 +207,8 @@ static int friq_test_proto(struct pi_adapter *pi, char *scratch, int verbose)
-         for (k=0;k<128;k++) if (scratch[k] != k) r++;
- 	friq_disconnect(pi);
+@@ -27,8 +27,7 @@
+ #include <linux/types.h>
+ #include <linux/wait.h>
+ #include <asm/io.h>
+-
+-#include <linux/pata_parport.h>
++#include "pata_parport.h"
  
--        if (verbose)  {
--		printk("friq: port 0x%x, mode %d, test=(%d,%d,%d)\n",
--		       pi->port, pi->mode, e[0], e[1], r);
--        }
-+	dev_dbg(&pi->dev, "friq: port 0x%x, mode %d, test=(%d,%d,%d)\n",
-+	       pi->port, pi->mode, e[0], e[1], r);
- 
-         return (r || (e[0] && e[1]));
- }
-@@ -221,9 +219,9 @@ static void friq_log_adapter(struct pi_adapter *pi)
- {       char    *mode_string[6] = {"4-bit","8-bit",
- 				   "EPP-8","EPP-16","EPP-32"};
- 
--	printk("friq %s, Freecom IQ ASIC-2 adapter at 0x%x, ",
-+	dev_info(&pi->dev, "friq %s, Freecom IQ ASIC-2 adapter at 0x%x, ",
- 		FRIQ_VERSION,pi->port);
--        printk("mode %d (%s), delay %d\n",pi->mode,
-+	dev_info(&pi->dev, "mode %d (%s), delay %d\n", pi->mode,
- 		mode_string[pi->mode],pi->delay);
- 
- 	pi->private = 1;
+ #define CMD(x)		w2(4);w0(0xff);w0(0xff);w0(0x73);w0(0x73);\
+ 			w0(0xc9);w0(0xc9);w0(0x26);w0(0x26);w0(x);w0(x);
 diff --git a/drivers/ata/pata_parport/frpw.c b/drivers/ata/pata_parport/frpw.c
-index 9b8db1122154..5ea16a247257 100644
+index 1ef8be79d793..3ec0abf16fa6 100644
 --- a/drivers/ata/pata_parport/frpw.c
 +++ b/drivers/ata/pata_parport/frpw.c
-@@ -230,14 +230,12 @@ static int frpw_test_proto(struct pi_adapter *pi, char *scratch, int verbose)
- 	   pi->private = frpw_test_pnp(pi) + 2*pi->port;
+@@ -20,8 +20,7 @@
+ #include <linux/types.h>
+ #include <linux/wait.h>
+ #include <asm/io.h>
+-
+-#include <linux/pata_parport.h>
++#include "pata_parport.h"
  
- 	if (((pi->private%2) == 0) && (pi->mode > 2)) {
--	   if (verbose) 
--		printk("frpw: Xilinx does not support mode %d\n", pi->mode);
-+		dev_dbg(&pi->dev, "frpw: Xilinx does not support mode %d\n", pi->mode);
- 	   return 1;
- 	}
- 
- 	if (((pi->private%2) == 1) && (pi->mode == 2)) {
--	   if (verbose)
--		printk("frpw: ASIC does not support mode 2\n");
-+		dev_dbg(&pi->dev, "frpw: ASIC does not support mode 2\n");
- 	   return 1;
- 	}
- 
-@@ -258,10 +256,8 @@ static int frpw_test_proto(struct pi_adapter *pi, char *scratch, int verbose)
-         for (k=0;k<128;k++) if (scratch[k] != k) r++;
- 	frpw_disconnect(pi);
- 
--        if (verbose)  {
--		printk("frpw: port 0x%x, chip %ld, mode %d, test=(%d,%d,%d)\n",
--		       pi->port, (pi->private%2), pi->mode, e[0], e[1], r);
--        }
-+	dev_dbg(&pi->dev, "frpw: port 0x%x, chip %ld, mode %d, test=(%d,%d,%d)\n",
-+	       pi->port, (pi->private%2), pi->mode, e[0], e[1], r);
- 
-         return (r || (e[0] && e[1]));
- }
-@@ -272,9 +268,9 @@ static void frpw_log_adapter(struct pi_adapter *pi)
- {       char    *mode_string[6] = {"4-bit","8-bit","EPP",
- 				   "EPP-8","EPP-16","EPP-32"};
- 
--	printk("frpw %s, Freecom (%s) adapter at 0x%x, ",
-+	dev_info(&pi->dev, "frpw %s, Freecom (%s) adapter at 0x%x, ",
- 		FRPW_VERSION,((pi->private%2) == 0)?"Xilinx":"ASIC",pi->port);
--        printk("mode %d (%s), delay %d\n",pi->mode,
-+	dev_info(&pi->dev, "mode %d (%s), delay %d\n", pi->mode,
- 		mode_string[pi->mode],pi->delay);
- 
- }
+ #define cec4		w2(0xc);w2(0xe);w2(0xe);w2(0xc);w2(4);w2(4);w2(4);
+ #define j44(l,h)	(((l>>4)&0x0f)|(h&0xf0))
 diff --git a/drivers/ata/pata_parport/kbic.c b/drivers/ata/pata_parport/kbic.c
-index b23632c1da39..ea1b931ce20d 100644
+index 29f4f1e14d21..8213e62f8f00 100644
 --- a/drivers/ata/pata_parport/kbic.c
 +++ b/drivers/ata/pata_parport/kbic.c
-@@ -234,8 +234,8 @@ static void kbic_log_adapter(struct pi_adapter *pi, char *chip)
- {       char    *mode_string[6] = {"4-bit","5/3","8-bit",
- 				   "EPP-8","EPP_16","EPP-32"};
+@@ -19,8 +19,7 @@
+ #include <linux/types.h>
+ #include <linux/wait.h>
+ #include <asm/io.h>
+-
+-#include <linux/pata_parport.h>
++#include "pata_parport.h"
  
--	printk("kbic %s, KingByte %s at 0x%x, ", KBIC_VERSION, chip, pi->port);
--        printk("mode %d (%s), delay %d\n",pi->mode,
-+	dev_info(&pi->dev, "kbic %s, KingByte %s at 0x%x, ", KBIC_VERSION, chip, pi->port);
-+	dev_info(&pi->dev, "mode %d (%s), delay %d\n", pi->mode,
- 		mode_string[pi->mode],pi->delay);
+ #define r12w()			(delay_p,inw(pi->port+1)&0xffff) 
  
- }
 diff --git a/drivers/ata/pata_parport/ktti.c b/drivers/ata/pata_parport/ktti.c
-index 62b0692d1b94..b22c283709de 100644
+index 742051f6ea10..4890b1f12348 100644
 --- a/drivers/ata/pata_parport/ktti.c
 +++ b/drivers/ata/pata_parport/ktti.c
-@@ -93,7 +93,7 @@ static void ktti_disconnect(struct pi_adapter *pi)
- static void ktti_log_adapter(struct pi_adapter *pi)
+@@ -16,8 +16,7 @@
+ #include <linux/types.h>
+ #include <linux/wait.h>
+ #include <asm/io.h>
+-
+-#include <linux/pata_parport.h>
++#include "pata_parport.h"
  
- {
--	printk("ktti %s, KT adapter at 0x%x, delay %d\n",
-+	dev_info(&pi->dev, "ktti %s, KT adapter at 0x%x, delay %d\n",
- 		KTTI_VERSION, pi->port, pi->delay);
+ #define j44(a,b)                (((a>>4)&0x0f)|(b&0xf0))
  
- }
 diff --git a/drivers/ata/pata_parport/on20.c b/drivers/ata/pata_parport/on20.c
-index a3b0708aed71..c76d4fb84c61 100644
+index 6956b91efb47..276ace12d490 100644
 --- a/drivers/ata/pata_parport/on20.c
 +++ b/drivers/ata/pata_parport/on20.c
-@@ -115,8 +115,8 @@ static void on20_log_adapter(struct pi_adapter *pi)
+@@ -13,8 +13,7 @@
+ #include <linux/types.h>
+ #include <linux/wait.h>
+ #include <asm/io.h>
+-
+-#include <linux/pata_parport.h>
++#include "pata_parport.h"
  
- {       char    *mode_string[2] = {"4-bit","8-bit"};
- 
--	printk("on20 %s, OnSpec 90c20 at 0x%x, ", ON20_VERSION, pi->port);
--        printk("mode %d (%s), delay %d\n",pi->mode,
-+	dev_info(&pi->dev, "on20 %s, OnSpec 90c20 at 0x%x, ", ON20_VERSION, pi->port);
-+	dev_info(&pi->dev, "mode %d (%s), delay %d\n", pi->mode,
- 		mode_string[pi->mode],pi->delay);
- 
- }
+ #define op(f)	w2(4);w0(f);w2(5);w2(0xd);w2(5);w2(0xd);w2(5);w2(4);
+ #define vl(v)	w2(4);w0(v);w2(5);w2(7);w2(5);w2(4);
 diff --git a/drivers/ata/pata_parport/on26.c b/drivers/ata/pata_parport/on26.c
-index 8dc8296d50e6..5406e76ea727 100644
+index 1d90eb9b541e..dc47a54b121f 100644
 --- a/drivers/ata/pata_parport/on26.c
 +++ b/drivers/ata/pata_parport/on26.c
-@@ -167,7 +167,7 @@ static int on26_test_port(struct pi_adapter *pi)  /* hard reset */
-             }
+@@ -14,8 +14,7 @@
+ #include <linux/types.h>
+ #include <linux/wait.h>
+ #include <asm/io.h>
+-
+-#include <linux/pata_parport.h>
++#include "pata_parport.h"
  
- 	    if (i == RESET_WAIT) 
--		printk("on26: Device reset failed (%x,%x)\n",x,y);
-+		dev_err(&pi->dev, "on26: Device reset failed (%x,%x)\n", x, y);
+ /* mode codes:  0  nybble reads, 8-bit writes
+                 1  8-bit reads and writes
+diff --git a/drivers/ata/pata_parport/pata_parport.c b/drivers/ata/pata_parport/pata_parport.c
+index 77a3e5a3f062..a1dc639665dc 100644
+--- a/drivers/ata/pata_parport/pata_parport.c
++++ b/drivers/ata/pata_parport/pata_parport.c
+@@ -6,7 +6,7 @@
+ #include <linux/kernel.h>
+ #include <linux/module.h>
+ #include <linux/parport.h>
+-#include <linux/pata_parport.h>
++#include "pata_parport.h"
  
-             w0(4); P1; w0(4); P1;
-         }
-@@ -280,8 +280,8 @@ static void on26_log_adapter(struct pi_adapter *pi)
- {       char    *mode_string[5] = {"4-bit","8-bit","EPP-8",
- 				   "EPP-16","EPP-32"};
+ #define DRV_NAME "pata_parport"
  
--	printk("on26 %s, OnSpec 90c26 at 0x%x, ", ON26_VERSION, pi->port);
--        printk("mode %d (%s), delay %d\n",pi->mode,
-+	dev_info(&pi->dev, "on26 %s, OnSpec 90c26 at 0x%x, ", ON26_VERSION, pi->port);
-+	dev_info(&pi->dev, "mode %d (%s), delay %d\n", pi->mode,
- 		mode_string[pi->mode],pi->delay);
- 
- }
+diff --git a/include/linux/pata_parport.h b/drivers/ata/pata_parport/pata_parport.h
+similarity index 100%
+rename from include/linux/pata_parport.h
+rename to drivers/ata/pata_parport/pata_parport.h
 -- 
 Ondrej Zary
 
