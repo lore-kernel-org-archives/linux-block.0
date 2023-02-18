@@ -2,142 +2,107 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EAD87C636D6
-	for <linux-block@archiver.kernel.org>; Fri, 17 Feb 2023 21:50:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F4B6C05027
+	for <linux-block@archiver.kernel.org>; Sat, 18 Feb 2023 02:32:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229874AbjBQVud (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 17 Feb 2023 16:50:33 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58104 "EHLO
+        id S229460AbjBRCcw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 17 Feb 2023 21:32:52 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40738 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229615AbjBQVud (ORCPT
+        with ESMTP id S229481AbjBRCcw (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 17 Feb 2023 16:50:33 -0500
-Received: from mail-vk1-xa33.google.com (mail-vk1-xa33.google.com [IPv6:2607:f8b0:4864:20::a33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA82639B81
-        for <linux-block@vger.kernel.org>; Fri, 17 Feb 2023 13:50:31 -0800 (PST)
-Received: by mail-vk1-xa33.google.com with SMTP id u4so545544vkf.11
-        for <linux-block@vger.kernel.org>; Fri, 17 Feb 2023 13:50:31 -0800 (PST)
+        Fri, 17 Feb 2023 21:32:52 -0500
+Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 378395B2FA
+        for <linux-block@vger.kernel.org>; Fri, 17 Feb 2023 18:32:47 -0800 (PST)
+Received: by mail-pj1-x1031.google.com with SMTP id dw24so472995pjb.1
+        for <linux-block@vger.kernel.org>; Fri, 17 Feb 2023 18:32:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=Jc7+X1cqzOxQsAFytQZ25BlL34wPn1vkCpcwaRRD9oc=;
-        b=aG0ph1GtjLSjPnNsZT6Zujg2e+f0b8Rfl6R+FvDstE7ptRAuNh9BTny2PJscjWz/Kq
-         e8SYVASadRZ2q/DPe+33qofP2a+oI1iF6upND23LGE8QWBSMR0yXOkgRJPB87ViqMGap
-         xOj2TYMNbelNY0h5TrnyyvdlBe0JyCXTeil9fFm7VUZsh5CBcFIryCa+/hH9Njhm6KMl
-         y2gwk5OTqShm+f52wWM97o1gXi/luJRo08RIdZZhZFDZ9drAnGFru/F1RPKxY6zDZRNb
-         tBjyZ7aTUqAo2tRTenuJl4gUH9CAaOY/6BKxjFcUll7Z7D9RbJaY/Mf7oTS3DwjgXPes
-         SdjA==
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112; t=1676687566;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=t0OgKm01cbWznSga28mZ1JVfLaRBsGBtmtDOiNDsu3U=;
+        b=Q3qP9yjsehkxhspO32RhswiHb5QKunc8ZARDBrCnVb+4ANTH7BrAPD+GCtXvf+MhU9
+         yM/ByZjRzie+Okx2lcKJ3gIeaDQ5HVILoY+pzMFXYeockpzOdxagTHhVQk9R5G/Hb7ud
+         KU6DXQwXZXZk5hqTak2rP60RMge3yjcNVfc+IJssB9Xb1CZl6NN7ckYMJV+aR7qICdka
+         Cnz5tQRonyc5jTXUtMcseg6VrlT46pASpm3wqChIxZR2QxSdYUns/xX1H1w0Z7Qt2/a6
+         Uzjx5zyd6Sesfqab4en+avnETQmKnVuhm9dsNNOEURqQTxO5Alc187vVhT9vQbDvVa94
+         y0lg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Jc7+X1cqzOxQsAFytQZ25BlL34wPn1vkCpcwaRRD9oc=;
-        b=nG/imhlQ4WtFxc7CO8f6FrBe9RJ84YEgJOFdDKRPazz+3dyCnPUYvfjB4Yrh7BK36N
-         0s8R3qX5MborVc+AAhDB3CP/N9ju5/rNRsvl84jdLguhAuwzEkMbsBfayYUrtn4CgMJr
-         GaNSjpN0fTUaIwcHWItMHQV2uIeBgHnsWiVwsX35MO3ztCk7kCScJr/DjQtL4OjbVELK
-         NY5USF0B1aLXvXjZbuIYfV0nvz3jjUPHuHRb1Gyv+eQ2nET+dUSk/dBijWFXUib2Y8Ya
-         Ip9Bt/F1G+zv3gtVX7ol6iM6uSwLR+sGgynyWxgRKxEICw0zPTRGIAPLG2+iNWpBu58v
-         yHPA==
-X-Gm-Message-State: AO0yUKUvJTdb9anouZlcg3JYhtYDNsZk/LoYUHnsTa8JNfoadkYoFL7U
-        qINl8iGIWINpZMOHbufEgzYWrkc5uuJlovDlLWpsfQ==
-X-Google-Smtp-Source: AK7set9XHUeLlPkt1gJ12stZFbCMRTkQQ9HrB3LYSIhi3/ZaG+e0VMAG8RtOJDpNATWJTqwo2mfMUsx0Pw5ZKygJeZ8=
-X-Received: by 2002:a1f:2693:0:b0:401:6440:787e with SMTP id
- m141-20020a1f2693000000b004016440787emr122162vkm.32.1676670630833; Fri, 17
- Feb 2023 13:50:30 -0800 (PST)
+        d=1e100.net; s=20210112; t=1676687566;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=t0OgKm01cbWznSga28mZ1JVfLaRBsGBtmtDOiNDsu3U=;
+        b=h5zYV8+XEfaqv6KzEgLHzZHJeI9kYp5yX2wmgKgT3EBvMbpcfPqNt4qUiD8zT/LS12
+         4dzESggVdsZqhjteB1YN4aoxq9h7qkQ0hYAGTLtzVlWqY9n9I/Xca1X/EhJCLVZt/VYH
+         haU1rus96PC1tf1PczMhjcCL/BoPXyzS45cu3qLz/7XIFD8tZkQFAJxi9RXdWCs1BjHZ
+         NHz5njPJl6gDIXeUVkzS+yfLhrolxKtFndVlyYm3J/TTbKeiuJeedoO9QYXQnYZNtQ3u
+         kX4QT7ZJ/uXfXu/AdROJVeiuxyy9pMacWynRsRwvkE2efGOCJJLQlkiF9SPBJ1mshU+W
+         qKCA==
+X-Gm-Message-State: AO0yUKVTcZoSKt2Ja/dZ1odVskHcejJviV8cWKlLHAdfecuHSsiedBOj
+        BI0uHeayVN7vJ+i8YR359jZ96VgPRZSmpYCH
+X-Google-Smtp-Source: AK7set8i+OiqXSGRH6tWjtQM0CJhOq/JnYSS/dPSbFWsxXsjY3OcXI3lCaZHVMrOyyNFek7rO/SF7w==
+X-Received: by 2002:a17:902:da8e:b0:19b:f5b:4ca3 with SMTP id j14-20020a170902da8e00b0019b0f5b4ca3mr220985plx.3.1676687566428;
+        Fri, 17 Feb 2023 18:32:46 -0800 (PST)
+Received: from [192.168.1.136] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id t7-20020a1709027fc700b0019a74841c9bsm3710574plb.192.2023.02.17.18.32.44
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 17 Feb 2023 18:32:45 -0800 (PST)
+Message-ID: <58231104-74e0-c1df-5a47-9027ed0241c6@kernel.dk>
+Date:   Fri, 17 Feb 2023 19:32:44 -0700
 MIME-Version: 1.0
-References: <CAJs=3_C+K0iumqYyKhphYLp=Qd7i6-Y6aDUgmYyY_rdnN1NAag@mail.gmail.com>
- <CAPR809uYp6vGvCk4ugWOjbmd13WTm8fRg0f2Mdq3pxj6=d1McQ@mail.gmail.com> <a9cbed84-330f-472e-0cd7-90c6623bb5b5@nvidia.com>
-In-Reply-To: <a9cbed84-330f-472e-0cd7-90c6623bb5b5@nvidia.com>
-From:   Enrico Granata <egranata@google.com>
-Date:   Fri, 17 Feb 2023 14:50:19 -0700
-Message-ID: <CAPR809u0DLwHgV5w5QhWj_a53OcreZP1Qxxcom_Vbwzg0jgsog@mail.gmail.com>
-Subject: Re: Virtio-blk extended lifetime feature
-To:     Chaitanya Kulkarni <chaitanyak@nvidia.com>
-Cc:     Alvaro Karsz <alvaro.karsz@solid-run.com>,
-        Jahdiel Alvarez <jahdiel@google.com>,
-        virtualization <virtualization@lists.linux-foundation.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "dm-devel@redhat.com" <dm-devel@redhat.com>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Christoph Hellwig <hch@infradead.org>
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
+ Thunderbird/102.7.2
+Content-Language: en-US
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From:   Jens Axboe <axboe@kernel.dk>
+Subject: [GIT PULL] Followup block fix for 6.2-final
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jan 18, 2023 at 12:46 PM Chaitanya Kulkarni
-<chaitanyak@nvidia.com> wrote:
->
-> On 1/17/23 14:30, Enrico Granata wrote:
-> > Hi,
-> > I am going to add +Jahdiel Alvarez who is also looking into a similar
-> > issue, and also I would like to hear thoughts of people who may have
-> > worked with (embedded or otherwise) storage more recently than I have
-> >
-> > One thought that Jahdiel and myself were pondering is whether we need
-> > "type_a" and "type_b" fields at all, or if there should simply be a
-> > "wear estimate" field, which for eMMC, it could be max(typ_a, typ_b)
-> > but it could generalize to any number of cell or other algorithm, as
-> > long as it produces one unique estimate of wear
-> >
-> > Thanks,
-> > - Enrico
-> >
-> > Thanks,
-> > - Enrico
-> >
-> >
-> > On Sun, Jan 15, 2023 at 12:56 AM Alvaro Karsz
-> > <alvaro.karsz@solid-run.com> wrote:
-> >>
-> >> Hi guys,
-> >>
-> >> While trying to upstream the implementation of VIRTIO_BLK_F_LIFETIME
-> >> feature, many developers suggested that this feature should be
-> >> extended to include more cell types, since its current implementation
-> >> in virtio spec is relevant for MMC and UFS devices only.
-> >>
-> >> The VIRTIO_BLK_F_LIFETIME defines the following fields:
-> >>
-> >> - pre_eol_info:  the percentage of reserved blocks that are consumed.
-> >> - device_lifetime_est_typ_a: wear of SLC cells.
-> >> - device_lifetime_est_typ_b: wear of MLC cells.
->
-> For immediate comments :-
->
-> It needs to cover all the flash cell types.
->
-> Using names like type_a/type_b in the spec and in the implementation
-> adds unnecessary confusion and requires extra documentation in the
-> code that needs to be changed.
+Hi Linus,
 
-What do you think about my proposal to have a single "wear estimate"
-field and allow each flash type to calculate it as required by its own
-internal logic?
-The migration for eMMC and existing drivers would be to expose the
-maximum of type_A, type_B wear, but other cell types would be able to
-provide whatever logic they need as long as it meaningfully exposes
-the "wear"
+I guess this is what can happen when you prep things early for going
+away, something else comes in last minute. This one fixes another
+regression in 6.2 for NVMe, from this release, and hence we should
+probably get it submitted for 6.2. Still waiting for the original
+reporter (see bugzilla linked in the commit) to test this, but Keith
+managed to setup and recreate the issue and tested the patch that way.
 
->
-> >>
-> >> (https://docs.oasis-open.org/virtio/virtio/v1.2/virtio-v1.2.html)
-> >>
-> >> Following Michael's suggestion, I'd like to add to the virtio spec
-> >> with a new, extended lifetime command.
-> >> Since I'm more familiar with embedded type storage devices, I'd like
-> >> to ask you guys what fields you think should be included in the
-> >> extended command.
-> >>
-> >> Thanks,
-> >>
-> >> Alvaro
->
-> -ck
+Please pull!
+
+
+The following changes since commit 9a28b92cc21e8445c25b18e46f41634539938a91:
+
+  Merge tag 'nvme-6.2-2023-02-15' of git://git.infradead.org/nvme into block-6.2 (2023-02-15 13:47:27 -0700)
+
+are available in the Git repository at:
+
+  git://git.kernel.dk/linux.git tags/block-6.2-2023-02-17
+
+for you to fetch changes up to 1250421697312a7f2f13213a71b430402f2ae8f1:
+
+  Merge tag 'nvme-6.2-2022-02-17' of git://git.infradead.org/nvme into block-6.2 (2023-02-17 09:07:00 -0700)
+
+----------------------------------------------------------------
+block-6.2-2023-02-17
+
+----------------------------------------------------------------
+Jens Axboe (1):
+      Merge tag 'nvme-6.2-2022-02-17' of git://git.infradead.org/nvme into block-6.2
+
+Keith Busch (1):
+      nvme-pci: refresh visible attrs for cmb attributes
+
+ drivers/nvme/host/pci.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+-- 
+Jens Axboe
+
