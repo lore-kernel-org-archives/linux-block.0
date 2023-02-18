@@ -2,24 +2,25 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D807AC636CC
-	for <linux-block@archiver.kernel.org>; Sat, 18 Feb 2023 17:39:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C727C636D7
+	for <linux-block@archiver.kernel.org>; Sat, 18 Feb 2023 17:40:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229553AbjBRRjL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 18 Feb 2023 12:39:11 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51050 "EHLO
+        id S229558AbjBRRkZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 18 Feb 2023 12:40:25 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51698 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229540AbjBRRjK (ORCPT
+        with ESMTP id S229540AbjBRRkY (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 18 Feb 2023 12:39:10 -0500
+        Sat, 18 Feb 2023 12:40:24 -0500
 Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4EF9313D72;
-        Sat, 18 Feb 2023 09:39:08 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3FA2F13D79;
+        Sat, 18 Feb 2023 09:40:23 -0800 (PST)
 Received: from [192.168.1.103] (31.173.84.74) by msexch01.omp.ru (10.188.4.12)
  with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.986.14; Sat, 18 Feb
- 2023 20:38:59 +0300
-Subject: Re: [PATCH 14/18] pata_parport: remove bpck6 verbose parameter
+ 2023 20:40:15 +0300
+Subject: Re: [PATCH 15/18] pata_parport: remove verbose parameter from
+ test_proto()
 To:     Ondrej Zary <linux@zary.sk>,
         Damien Le Moal <damien.lemoal@opensource.wdc.com>
 CC:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
@@ -27,15 +28,15 @@ CC:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
         <linux-parport@lists.infradead.org>, <linux-ide@vger.kernel.org>,
         <linux-kernel@vger.kernel.org>
 References: <20230215194554.25632-1-linux@zary.sk>
- <20230215194554.25632-15-linux@zary.sk>
+ <20230215194554.25632-16-linux@zary.sk>
 From:   Sergey Shtylyov <s.shtylyov@omp.ru>
 Organization: Open Mobile Platform
-Message-ID: <cf30edbc-1cfb-3404-7f5f-5bc6f154825a@omp.ru>
-Date:   Sat, 18 Feb 2023 20:38:59 +0300
+Message-ID: <118b9ecc-099e-2ec8-2875-f6c48db1e890@omp.ru>
+Date:   Sat, 18 Feb 2023 20:40:15 +0300
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.10.1
 MIME-Version: 1.0
-In-Reply-To: <20230215194554.25632-15-linux@zary.sk>
+In-Reply-To: <20230215194554.25632-16-linux@zary.sk>
 Content-Type: text/plain; charset="utf-8"
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -58,6 +59,7 @@ X-KSE-AntiSpam-Info: {relay has no DNS name}
 X-KSE-AntiSpam-Info: {SMTP from is not routable}
 X-KSE-AntiSpam-Info: {Found in DNSBL: 31.173.84.74 in (user)
  b.barracudacentral.org}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 31.173.84.74 in (user) dbl.spamhaus.org}
 X-KSE-AntiSpam-Info: d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;omp.ru:7.1.1;127.0.0.199:7.1.2
 X-KSE-AntiSpam-Info: ApMailHostAddress: 31.173.84.74
 X-KSE-AntiSpam-Info: {DNS response errors}
@@ -80,8 +82,9 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 On 2/15/23 10:45 PM, Ondrej Zary wrote:
 
-> Remove now useless verbose parameter of bpck6 module.
+> verbose parameter of test_proto() is now unused, remove it.
 > 
+> Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
 > Signed-off-by: Ondrej Zary <linux@zary.sk>
 
 Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
