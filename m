@@ -2,93 +2,68 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C727C636D7
-	for <linux-block@archiver.kernel.org>; Sat, 18 Feb 2023 17:40:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 15915C61DA4
+	for <linux-block@archiver.kernel.org>; Sat, 18 Feb 2023 19:16:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229558AbjBRRkZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 18 Feb 2023 12:40:25 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51698 "EHLO
+        id S229512AbjBRTQ3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 18 Feb 2023 14:16:29 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55118 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229540AbjBRRkY (ORCPT
+        with ESMTP id S229472AbjBRTQ2 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 18 Feb 2023 12:40:24 -0500
-Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3FA2F13D79;
-        Sat, 18 Feb 2023 09:40:23 -0800 (PST)
-Received: from [192.168.1.103] (31.173.84.74) by msexch01.omp.ru (10.188.4.12)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.986.14; Sat, 18 Feb
- 2023 20:40:15 +0300
-Subject: Re: [PATCH 15/18] pata_parport: remove verbose parameter from
- test_proto()
-To:     Ondrej Zary <linux@zary.sk>,
-        Damien Le Moal <damien.lemoal@opensource.wdc.com>
-CC:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        Tim Waugh <tim@cyberelk.net>, <linux-block@vger.kernel.org>,
-        <linux-parport@lists.infradead.org>, <linux-ide@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>
-References: <20230215194554.25632-1-linux@zary.sk>
- <20230215194554.25632-16-linux@zary.sk>
-From:   Sergey Shtylyov <s.shtylyov@omp.ru>
-Organization: Open Mobile Platform
-Message-ID: <118b9ecc-099e-2ec8-2875-f6c48db1e890@omp.ru>
-Date:   Sat, 18 Feb 2023 20:40:15 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
-MIME-Version: 1.0
-In-Reply-To: <20230215194554.25632-16-linux@zary.sk>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [31.173.84.74]
-X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
- (10.188.4.12)
-X-KSE-ServerInfo: msexch01.omp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 5.9.59, Database issued on: 02/18/2023 17:22:38
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 59
-X-KSE-AntiSpam-Info: Lua profiles 175606 [Feb 17 2023]
-X-KSE-AntiSpam-Info: Version: 5.9.59.0
-X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
-X-KSE-AntiSpam-Info: LuaCore: 504 504 dc137e1f9c062eb6c0671e7d509ab442ae395562
-X-KSE-AntiSpam-Info: {rep_avail}
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info: {relay has no DNS name}
-X-KSE-AntiSpam-Info: {SMTP from is not routable}
-X-KSE-AntiSpam-Info: {Found in DNSBL: 31.173.84.74 in (user)
- b.barracudacentral.org}
-X-KSE-AntiSpam-Info: {Found in DNSBL: 31.173.84.74 in (user) dbl.spamhaus.org}
-X-KSE-AntiSpam-Info: d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;omp.ru:7.1.1;127.0.0.199:7.1.2
-X-KSE-AntiSpam-Info: ApMailHostAddress: 31.173.84.74
-X-KSE-AntiSpam-Info: {DNS response errors}
-X-KSE-AntiSpam-Info: Rate: 59
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
- smtp.mailfrom=omp.ru;dkim=none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Heuristic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 02/18/2023 17:26:00
-X-KSE-AttachmentFiltering-Interceptor-Info: protection disabled
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 2/18/2023 2:00:00 PM
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
+        Sat, 18 Feb 2023 14:16:28 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9604515547
+        for <linux-block@vger.kernel.org>; Sat, 18 Feb 2023 11:16:14 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 329C160BC2
+        for <linux-block@vger.kernel.org>; Sat, 18 Feb 2023 19:16:14 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 937E5C433EF;
+        Sat, 18 Feb 2023 19:16:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1676747773;
+        bh=f65O8Ofw7WDe0mbvtTy5xoVATO+IYdgemJ5Rg040+nc=;
+        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+        b=aKwfnV23FFsVqnauxlMf547PlXqofRy20qU31Q7FiWXe9rnAsOdNTlA0R+xDYxnau
+         g/E+h5ULmcDjZ5ZTZPnJqVlkyn5HDG/gyok9F+x1OU+teXNGO8JIXvHBvo95DTkZ0s
+         +qr81LIeDDJZayIr32zWKM3j2xno4Nl7LDwNyNeFvGiWXjtyJp2/9gLi3F+bDQi8cV
+         YcFKsVKuj9mufoHiJh2JPft2SIsFlytaX6zVHFhvslUY/DFGGGEUmSvEqbgF+Gz1Hn
+         nOyfhDXLqGKLfudjjAI3mnjN68YWcgZZlAmh8HW/I5p1zyiPtYEJOkjm+aXcSppCqz
+         YZi5zrpTD3nTA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 81359C41676;
+        Sat, 18 Feb 2023 19:16:13 +0000 (UTC)
+Subject: Re: [GIT PULL] Followup block fix for 6.2-final
+From:   pr-tracker-bot@kernel.org
+In-Reply-To: <58231104-74e0-c1df-5a47-9027ed0241c6@kernel.dk>
+References: <58231104-74e0-c1df-5a47-9027ed0241c6@kernel.dk>
+X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
+X-PR-Tracked-Message-Id: <58231104-74e0-c1df-5a47-9027ed0241c6@kernel.dk>
+X-PR-Tracked-Remote: git://git.kernel.dk/linux.git tags/block-6.2-2023-02-17
+X-PR-Tracked-Commit-Id: 1250421697312a7f2f13213a71b430402f2ae8f1
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 0e9fd589e61dace0dcc9848fbf6eb38f16d25f08
+Message-Id: <167674777352.30281.4646705800836571169.pr-tracker-bot@kernel.org>
+Date:   Sat, 18 Feb 2023 19:16:13 +0000
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2/15/23 10:45 PM, Ondrej Zary wrote:
+The pull request you sent on Fri, 17 Feb 2023 19:32:44 -0700:
 
-> verbose parameter of test_proto() is now unused, remove it.
-> 
-> Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
-> Signed-off-by: Ondrej Zary <linux@zary.sk>
+> git://git.kernel.dk/linux.git tags/block-6.2-2023-02-17
 
-Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/0e9fd589e61dace0dcc9848fbf6eb38f16d25f08
 
-[...]
+Thank you!
 
-MBR, Sergey
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
