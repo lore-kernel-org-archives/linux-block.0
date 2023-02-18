@@ -2,68 +2,76 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15915C61DA4
-	for <linux-block@archiver.kernel.org>; Sat, 18 Feb 2023 19:16:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E8C83C636CC
+	for <linux-block@archiver.kernel.org>; Sat, 18 Feb 2023 22:02:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229512AbjBRTQ3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 18 Feb 2023 14:16:29 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55118 "EHLO
+        id S229673AbjBRWCI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 18 Feb 2023 17:02:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51668 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229472AbjBRTQ2 (ORCPT
+        with ESMTP id S229523AbjBRWCH (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 18 Feb 2023 14:16:28 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9604515547
-        for <linux-block@vger.kernel.org>; Sat, 18 Feb 2023 11:16:14 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        Sat, 18 Feb 2023 17:02:07 -0500
+Received: from hosting.gsystem.sk (hosting.gsystem.sk [212.5.213.30])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 6E08B1285E;
+        Sat, 18 Feb 2023 14:02:04 -0800 (PST)
+Received: from gsql.ggedos.sk (off-20.infotel.telecom.sk [212.5.213.20])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 329C160BC2
-        for <linux-block@vger.kernel.org>; Sat, 18 Feb 2023 19:16:14 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 937E5C433EF;
-        Sat, 18 Feb 2023 19:16:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1676747773;
-        bh=f65O8Ofw7WDe0mbvtTy5xoVATO+IYdgemJ5Rg040+nc=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=aKwfnV23FFsVqnauxlMf547PlXqofRy20qU31Q7FiWXe9rnAsOdNTlA0R+xDYxnau
-         g/E+h5ULmcDjZ5ZTZPnJqVlkyn5HDG/gyok9F+x1OU+teXNGO8JIXvHBvo95DTkZ0s
-         +qr81LIeDDJZayIr32zWKM3j2xno4Nl7LDwNyNeFvGiWXjtyJp2/9gLi3F+bDQi8cV
-         YcFKsVKuj9mufoHiJh2JPft2SIsFlytaX6zVHFhvslUY/DFGGGEUmSvEqbgF+Gz1Hn
-         nOyfhDXLqGKLfudjjAI3mnjN68YWcgZZlAmh8HW/I5p1zyiPtYEJOkjm+aXcSppCqz
-         YZi5zrpTD3nTA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 81359C41676;
-        Sat, 18 Feb 2023 19:16:13 +0000 (UTC)
-Subject: Re: [GIT PULL] Followup block fix for 6.2-final
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <58231104-74e0-c1df-5a47-9027ed0241c6@kernel.dk>
-References: <58231104-74e0-c1df-5a47-9027ed0241c6@kernel.dk>
-X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
-X-PR-Tracked-Message-Id: <58231104-74e0-c1df-5a47-9027ed0241c6@kernel.dk>
-X-PR-Tracked-Remote: git://git.kernel.dk/linux.git tags/block-6.2-2023-02-17
-X-PR-Tracked-Commit-Id: 1250421697312a7f2f13213a71b430402f2ae8f1
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 0e9fd589e61dace0dcc9848fbf6eb38f16d25f08
-Message-Id: <167674777352.30281.4646705800836571169.pr-tracker-bot@kernel.org>
-Date:   Sat, 18 Feb 2023 19:16:13 +0000
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+        by hosting.gsystem.sk (Postfix) with ESMTPSA id 693037A0507;
+        Sat, 18 Feb 2023 23:02:02 +0100 (CET)
+From:   Ondrej Zary <linux@zary.sk>
+To:     Damien Le Moal <damien.lemoal@opensource.wdc.com>
+Cc:     Christoph Hellwig <hch@lst.de>,
+        Sergey Shtylyov <s.shtylyov@omp.ru>,
+        Jens Axboe <axboe@kernel.dk>, Tim Waugh <tim@cyberelk.net>,
+        linux-block@vger.kernel.org, linux-parport@lists.infradead.org,
+        linux-ide@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH 02/18] pata_parport: probe all units automatically
+Date:   Sat, 18 Feb 2023 23:01:22 +0100
+Message-Id: <20230218220138.5692-3-linux@zary.sk>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20230218220138.5692-1-linux@zary.sk>
+References: <20230218220138.5692-1-linux@zary.sk>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The pull request you sent on Fri, 17 Feb 2023 19:32:44 -0700:
+Only unit 0 is probed after registering a protocol driver or attaching
+a new parport. This causes bpck and bpck6 devices to be not detected
+automatically.
+Probe all units just like in manual device creation (using sysfs).
 
-> git://git.kernel.dk/linux.git tags/block-6.2-2023-02-17
+Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
+Signed-off-by: Ondrej Zary <linux@zary.sk>
+---
+ drivers/ata/pata_parport/pata_parport.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/0e9fd589e61dace0dcc9848fbf6eb38f16d25f08
-
-Thank you!
-
+diff --git a/drivers/ata/pata_parport/pata_parport.c b/drivers/ata/pata_parport/pata_parport.c
+index 294a266a0dda..49e99c9465fd 100644
+--- a/drivers/ata/pata_parport/pata_parport.c
++++ b/drivers/ata/pata_parport/pata_parport.c
+@@ -530,7 +530,7 @@ int pata_parport_register_driver(struct pi_protocol *pr)
+ 	if (probe) {
+ 		/* probe all parports using this protocol */
+ 		idr_for_each_entry(&parport_list, parport, port_num)
+-			pi_init_one(parport, pr, -1, 0, -1);
++			pi_init_one(parport, pr, -1, -1, -1);
+ 	}
+ 	mutex_unlock(&pi_mutex);
+ 
+@@ -665,7 +665,7 @@ static void pata_parport_attach(struct parport *port)
+ 	if (probe) {
+ 		/* probe this port using all protocols */
+ 		idr_for_each_entry(&protocols, pr, pr_num)
+-			pi_init_one(port, pr, -1, 0, -1);
++			pi_init_one(port, pr, -1, -1, -1);
+ 	}
+ 	mutex_unlock(&pi_mutex);
+ }
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+Ondrej Zary
+
