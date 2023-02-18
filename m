@@ -2,25 +2,24 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ED911C636CC
-	for <linux-block@archiver.kernel.org>; Sat, 18 Feb 2023 16:08:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DA49C636CC
+	for <linux-block@archiver.kernel.org>; Sat, 18 Feb 2023 16:16:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229441AbjBRQIE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 18 Feb 2023 11:08:04 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44610 "EHLO
+        id S229637AbjBRQQN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 18 Feb 2023 11:16:13 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49158 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229821AbjBRQHo (ORCPT
+        with ESMTP id S229436AbjBRQQN (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 18 Feb 2023 11:07:44 -0500
+        Sat, 18 Feb 2023 11:16:13 -0500
 Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77FCF17CC8;
-        Sat, 18 Feb 2023 08:07:40 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF04DEFAB;
+        Sat, 18 Feb 2023 08:16:10 -0800 (PST)
 Received: from [192.168.1.103] (31.173.84.74) by msexch01.omp.ru (10.188.4.12)
  with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.986.14; Sat, 18 Feb
- 2023 19:07:33 +0300
-Subject: Re: [PATCH 05/18] pata_parport: Introduce module_pata_parport_driver
- macro
+ 2023 19:16:03 +0300
+Subject: Re: [PATCH 06/18] pata_parport: remove devtype from struct pi_adapter
 To:     Ondrej Zary <linux@zary.sk>,
         Damien Le Moal <damien.lemoal@opensource.wdc.com>
 CC:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
@@ -28,15 +27,15 @@ CC:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
         <linux-parport@lists.infradead.org>, <linux-ide@vger.kernel.org>,
         <linux-kernel@vger.kernel.org>
 References: <20230215194554.25632-1-linux@zary.sk>
- <20230215194554.25632-6-linux@zary.sk>
+ <20230215194554.25632-7-linux@zary.sk>
 From:   Sergey Shtylyov <s.shtylyov@omp.ru>
 Organization: Open Mobile Platform
-Message-ID: <384f15ab-c697-6f7f-cd95-b3c82235b9d1@omp.ru>
-Date:   Sat, 18 Feb 2023 19:07:32 +0300
+Message-ID: <e965c234-517f-007d-6839-a6afa5f054ad@omp.ru>
+Date:   Sat, 18 Feb 2023 19:16:03 +0300
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.10.1
 MIME-Version: 1.0
-In-Reply-To: <20230215194554.25632-6-linux@zary.sk>
+In-Reply-To: <20230215194554.25632-7-linux@zary.sk>
 Content-Type: text/plain; charset="utf-8"
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -82,13 +81,37 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 On 2/15/23 10:45 PM, Ondrej Zary wrote:
 
-> Introduce module_pata_parport_driver macro and use it in protocol
-> drivers to reduce boilerplate code. Remove paride_(un)register
-> compatibility defines.
+> Only bpck driver uses devtype but it never gets set in pata_parport.
+> Remove it.
+> As most bpck devices are CD-ROMs, always run the code that depends
+> on devtype == PI_PCD.
 > 
 > Signed-off-by: Ondrej Zary <linux@zary.sk>
 
 Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
+
+[...]
+
+> diff --git a/drivers/ata/pata_parport/bpck.c b/drivers/ata/pata_parport/bpck.c
+> index b9174cf8863c..96386a10c22f 100644
+> --- a/drivers/ata/pata_parport/bpck.c
+> +++ b/drivers/ata/pata_parport/bpck.c
+> @@ -241,14 +241,14 @@ static void bpck_connect ( PIA *pi  )
+>  
+>  	WR(5,8);
+>  
+> -	if (pi->devtype == PI_PCD) {
+> +/*	if (pi->devtype == PI_PCD) {	possibly wrong, purpose unknown */
+>  		WR(0x46,0x10);		/* fiddle with ESS logic ??? */
+>  		WR(0x4c,0x38);
+>  		WR(0x4d,0x88);
+>  		WR(0x46,0xa0);
+>  		WR(0x41,0);
+>  		WR(0x4e,8);
+> -		}
+> +/*	}*/
+
+   You could have used // here, scripts/checkpatch.pl has nothing against it now...
 
 [...]
 
