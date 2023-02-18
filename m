@@ -2,200 +2,123 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 88B19C636D6
-	for <linux-block@archiver.kernel.org>; Sat, 18 Feb 2023 02:43:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B1762C636D7
+	for <linux-block@archiver.kernel.org>; Sat, 18 Feb 2023 08:29:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229530AbjBRCnB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 17 Feb 2023 21:43:01 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43872 "EHLO
+        id S229606AbjBRI3m (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 18 Feb 2023 03:29:42 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59658 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229481AbjBRCnA (ORCPT
+        with ESMTP id S229460AbjBRI3l (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 17 Feb 2023 21:43:00 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C521353EF3
-        for <linux-block@vger.kernel.org>; Fri, 17 Feb 2023 18:42:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1676688131;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=PWOvznM2L9QyDWoJX6erFzsz89hT+rHvd14btB9G+Ac=;
-        b=UJ1lp4m9UOU31wAWh/6IGrM8h1y/OobbBTCAwGB51yxtu63875Nrgutv7jhUMf7sPoZ8OU
-        xj1LKM+ez424HO8ZFVsCh/FDtzY5Qu3S/z2w9ZzkK9xtSgo5h11QuVLNmajUTfJhAxkMsr
-        0kQ2D8jcu+mTnRT7gW8qqoB2nfun+xA=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-124-9bYswzT2PVWZCNa2oCU2DA-1; Fri, 17 Feb 2023 21:42:06 -0500
-X-MC-Unique: 9bYswzT2PVWZCNa2oCU2DA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 61C4129AA38E;
-        Sat, 18 Feb 2023 02:42:05 +0000 (UTC)
-Received: from T590 (ovpn-8-16.pek2.redhat.com [10.72.8.16])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 618CD2026D4B;
-        Sat, 18 Feb 2023 02:41:54 +0000 (UTC)
-Date:   Sat, 18 Feb 2023 10:41:49 +0800
-From:   Ming Lei <ming.lei@redhat.com>
+        Sat, 18 Feb 2023 03:29:41 -0500
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74E653B218;
+        Sat, 18 Feb 2023 00:29:40 -0800 (PST)
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 31I7l15E013923;
+        Sat, 18 Feb 2023 08:29:17 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : cc :
+ subject : in-reply-to : in-reply-to : references : date : message-id :
+ mime-version : content-type; s=pp1;
+ bh=/B1KfengwjDqZ4DY5Ku7JHkRAZJEEkM50wW+rCq75yY=;
+ b=Cakpu6X/2DFnNf7hvDmOCSoX2Kk6LqT5fkJ1gBgrfR6dSu/EyEDeg0nrRQRmY5zXowjf
+ EUYChvgTxdpk13pk4KIH6k0bLRuhQXqKw3UFXjHf+7qNE+se6mvOmNeuzKL/aj1VPOj3
+ VmXP1HjZ09uAua4DFs8nHqH4mnsmcrdILsOeChK6gDkmI5+DnhGX1G42xh+1yFaTcHpi
+ 1d2YfBWbeL9nmfhrNY0/E+HJq0t2IRCLStTGCrxYevz4Nu40FdyW3+Z5h3WpaTw7kHO8
+ w4QYPg2tpauSeyfZxENO/1XfXfHWwaoat59kY/fi6+kXRqDRn5/2dXGLIcoKh+fW8h72 AA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3nttkc8gy4-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Sat, 18 Feb 2023 08:29:16 +0000
+Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 31I8S2rV002930;
+        Sat, 18 Feb 2023 08:29:16 GMT
+Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3nttkc8gxr-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Sat, 18 Feb 2023 08:29:16 +0000
+Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
+        by ppma01fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 31I2t4nT031088;
+        Sat, 18 Feb 2023 08:29:14 GMT
+Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
+        by ppma01fra.de.ibm.com (PPS) with ESMTPS id 3ntpa68611-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Sat, 18 Feb 2023 08:29:14 +0000
+Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
+        by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 31I8TBxs50004352
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Sat, 18 Feb 2023 08:29:11 GMT
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C3BCA2004D;
+        Sat, 18 Feb 2023 08:29:11 +0000 (GMT)
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 9C45620040;
+        Sat, 18 Feb 2023 08:29:11 +0000 (GMT)
+Received: from localhost (unknown [9.171.4.125])
+        by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Sat, 18 Feb 2023 08:29:11 +0000 (GMT)
+From:   Alexander Egorenkov <egorenar@linux.ibm.com>
 To:     David Howells <dhowells@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, Al Viro <viro@zeniv.linux.org.uk>,
-        Christoph Hellwig <hch@infradead.org>,
-        Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>,
-        Jeff Layton <jlayton@kernel.org>,
-        David Hildenbrand <david@redhat.com>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        Hillf Danton <hdanton@sina.com>, linux-fsdevel@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, Christoph Hellwig <hch@lst.de>,
-        John Hubbard <jhubbard@nvidia.com>, ming.lei@redhat.com
-Subject: Re: [PATCH v14 02/17] splice: Add a func to do a splice from a
- buffered file without ITER_PIPE
-Message-ID: <Y/A67a6LovSYHhHz@T590>
-References: <20230214171330.2722188-1-dhowells@redhat.com>
- <20230214171330.2722188-3-dhowells@redhat.com>
+Cc:     dhowells@redhat.com, axboe@kernel.dk, david@redhat.com,
+        hch@infradead.org, hch@lst.de, hdanton@sina.com, jack@suse.cz,
+        jgg@nvidia.com, jhubbard@nvidia.com, jlayton@kernel.org,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        logang@deltatee.com, viro@zeniv.linux.org.uk, willy@infradead.org,
+        Marc Hartmayer <mhartmay@linux.ibm.com>
+Subject: Re: [PATCH v14 08/17] splice: Do splice read from a file without
+ using ITER_PIPE
+In-Reply-To: <732891.1676670463@warthog.procyon.org.uk>
+In-Reply-To: 
+References: <87a61ckowk.fsf@oc8242746057.ibm.com>
+ <732891.1676670463@warthog.procyon.org.uk>
+Date:   Sat, 18 Feb 2023 09:29:11 +0100
+Message-ID: <87a61b9y20.fsf@oc8242746057.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230214171330.2722188-3-dhowells@redhat.com>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
+Content-Type: text/plain
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: 6U8DH4_SJ9EcGSWRq94cisg3kdYaZ3TG
+X-Proofpoint-GUID: j-cDcyU2EI6447zlfftD4sjkH6r12ZRB
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.170.22
+ definitions=2023-02-18_03,2023-02-17_01,2023-02-09_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ suspectscore=0 bulkscore=0 phishscore=0 priorityscore=1501 mlxscore=0
+ mlxlogscore=999 impostorscore=0 adultscore=0 malwarescore=0 spamscore=0
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2212070000 definitions=main-2302180070
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Feb 14, 2023 at 05:13:15PM +0000, David Howells wrote:
-> Provide a function to do splice read from a buffered file, pulling the
-> folios out of the pagecache directly by calling filemap_get_pages() to do
-> any required reading and then pasting the returned folios into the pipe.
-> 
-> A helper function is provided to do the actual folio pasting and will
-> handle multipage folios by splicing as many of the relevant subpages as
-> will fit into the pipe.
-> 
-> The code is loosely based on filemap_read() and might belong in
-> mm/filemap.c with that as it needs to use filemap_get_pages().
-> 
-> Signed-off-by: David Howells <dhowells@redhat.com>
-> cc: Jens Axboe <axboe@kernel.dk>
-> cc: Christoph Hellwig <hch@lst.de>
-> cc: Al Viro <viro@zeniv.linux.org.uk>
-> cc: David Hildenbrand <david@redhat.com>
-> cc: John Hubbard <jhubbard@nvidia.com>
-> cc: linux-mm@kvack.org
-> cc: linux-block@vger.kernel.org
-> cc: linux-fsdevel@vger.kernel.org
-> ---
-> 
-> Notes:
->     ver #14)
->      - Rename to filemap_splice_read().
->      - Create a helper, pipe_head_buf(), to get the head buffer.
->      - Use init_sync_kiocb().
->      - Move to mm/filemap.c.
->      - Split the implementation of filemap_splice_read() from the patch to
->        make generic_file_splice_read() use it and direct_splice_read().
-> 
->  include/linux/fs.h |   3 ++
->  mm/filemap.c       | 128 +++++++++++++++++++++++++++++++++++++++++++++
->  mm/internal.h      |   6 +++
->  3 files changed, 137 insertions(+)
-> 
-> diff --git a/include/linux/fs.h b/include/linux/fs.h
-> index c1769a2c5d70..28743e38df91 100644
-> --- a/include/linux/fs.h
-> +++ b/include/linux/fs.h
-> @@ -3163,6 +3163,9 @@ ssize_t vfs_iocb_iter_write(struct file *file, struct kiocb *iocb,
->  			    struct iov_iter *iter);
->  
->  /* fs/splice.c */
-> +ssize_t filemap_splice_read(struct file *in, loff_t *ppos,
-> +			    struct pipe_inode_info *pipe,
-> +			    size_t len, unsigned int flags);
->  extern ssize_t generic_file_splice_read(struct file *, loff_t *,
->  		struct pipe_inode_info *, size_t, unsigned int);
->  extern ssize_t iter_file_splice_write(struct pipe_inode_info *,
+Hi David,
+
+
+David Howells <dhowells@redhat.com> writes:
+
+> Does the attached fix the problem for you?  The data being written into the
+> pipe needs to be limited to the size of the file.
+>
+> David
+>
 > diff --git a/mm/filemap.c b/mm/filemap.c
-> index 876e77278d2a..8c7b135c8e23 100644
+> index c01bbcb9fa92..6362ac697a70 100644
 > --- a/mm/filemap.c
 > +++ b/mm/filemap.c
-> @@ -42,6 +42,8 @@
->  #include <linux/ramfs.h>
->  #include <linux/page_idle.h>
->  #include <linux/migrate.h>
-> +#include <linux/pipe_fs_i.h>
-> +#include <linux/splice.h>
->  #include <asm/pgalloc.h>
->  #include <asm/tlbflush.h>
->  #include "internal.h"
-> @@ -2842,6 +2844,132 @@ generic_file_read_iter(struct kiocb *iocb, struct iov_iter *iter)
->  }
->  EXPORT_SYMBOL(generic_file_read_iter);
+> @@ -2948,7 +2948,8 @@ ssize_t filemap_splice_read(struct file *in, loff_t *ppos,
+>  			if (writably_mapped)
+>  				flush_dcache_folio(folio);
 >  
-> +/*
-> + * Splice subpages from a folio into a pipe.
-> + */
-> +size_t splice_folio_into_pipe(struct pipe_inode_info *pipe,
-> +			      struct folio *folio, loff_t fpos, size_t size)
-> +{
-> +	struct page *page;
-> +	size_t spliced = 0, offset = offset_in_folio(folio, fpos);
-> +
-> +	page = folio_page(folio, offset / PAGE_SIZE);
-> +	size = min(size, folio_size(folio) - offset);
-> +	offset %= PAGE_SIZE;
-> +
-> +	while (spliced < size &&
-> +	       !pipe_full(pipe->head, pipe->tail, pipe->max_usage)) {
-> +		struct pipe_buffer *buf = pipe_head_buf(pipe);
-> +		size_t part = min_t(size_t, PAGE_SIZE - offset, size - spliced);
-> +
-> +		*buf = (struct pipe_buffer) {
-> +			.ops	= &page_cache_pipe_buf_ops,
-> +			.page	= page,
-> +			.offset	= offset,
-> +			.len	= part,
-> +		};
-> +		folio_get(folio);
-> +		pipe->head++;
-> +		page++;
-> +		spliced += part;
-> +		offset = 0;
+> -			n = splice_folio_into_pipe(pipe, folio, *ppos, len);
+> +			n = min_t(loff_t, len, isize - *ppos);
+> +			n = splice_folio_into_pipe(pipe, folio, *ppos, n);
+>  			if (!n)
+>  				goto out;
+>  			len -= n;
 
-It should be better to replace above with add_to_pipe().
+Yes, this change fixed the problem.
 
-> +	}
-> +
-> +	return spliced;
-> +}
-> +
-> +/*
-> + * Splice folios from the pagecache of a buffered (ie. non-O_DIRECT) file into
-> + * a pipe.
-> + */
-> +ssize_t filemap_splice_read(struct file *in, loff_t *ppos,
-> +			    struct pipe_inode_info *pipe,
-> +			    size_t len, unsigned int flags)
-> +{
-> +	struct folio_batch fbatch;
-> +	struct kiocb iocb;
-> +	size_t total_spliced = 0, used, npages;
-> +	loff_t isize, end_offset;
-> +	bool writably_mapped;
-> +	int i, error = 0;
-> +
-> +	init_sync_kiocb(&iocb, in);
-> +	iocb.ki_pos = *ppos;
-> +
-> +	/* Work out how much data we can actually add into the pipe */
-> +	used = pipe_occupancy(pipe->head, pipe->tail);
-> +	npages = max_t(ssize_t, pipe->max_usage - used, 0);
-> +	len = min_t(size_t, len, npages * PAGE_SIZE);
-
-Do we need to consider offset in 1st page here?
-
-
-thanks, 
-Ming
-
+Thanks
+Regards
+Alex
