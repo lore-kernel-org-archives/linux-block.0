@@ -2,42 +2,42 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E75FC64ED6
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F9D3C636D7
 	for <linux-block@archiver.kernel.org>; Sun, 19 Feb 2023 02:41:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229702AbjBSClf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 18 Feb 2023 21:41:35 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42306 "EHLO
+        id S229506AbjBSClg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 18 Feb 2023 21:41:36 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42324 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229632AbjBSCl3 (ORCPT
+        with ESMTP id S229648AbjBSCla (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 18 Feb 2023 21:41:29 -0500
+        Sat, 18 Feb 2023 21:41:30 -0500
 Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1935511EB2;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6AFE12043;
         Sat, 18 Feb 2023 18:41:29 -0800 (PST)
 Received: from mail02.huawei.com (unknown [172.30.67.143])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4PK8v84Blqz4f3nTp;
-        Sun, 19 Feb 2023 10:41:24 +0800 (CST)
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4PK8v911Lsz4f3pBV;
+        Sun, 19 Feb 2023 10:41:25 +0800 (CST)
 Received: from huaweicloud.com (unknown [10.175.124.27])
-        by APP2 (Coremail) with SMTP id Syh0CgBH7utQjPFjPmleDw--.7604S16;
-        Sun, 19 Feb 2023 10:41:26 +0800 (CST)
+        by APP2 (Coremail) with SMTP id Syh0CgBH7utQjPFjPmleDw--.7604S18;
+        Sun, 19 Feb 2023 10:41:27 +0800 (CST)
 From:   Kemeng Shi <shikemeng@huaweicloud.com>
 To:     paolo.valente@linaro.org, axboe@kernel.dk, jack@suse.cz
 Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         shikemeng@huaweicloud.com
-Subject: [PATCH 14/17] block, bfq: remove redundant oom_bfqq check for bfqq from bfq_find_close_cooperator
-Date:   Sun, 19 Feb 2023 18:43:06 +0800
-Message-Id: <20230219104309.1511562-15-shikemeng@huaweicloud.com>
+Subject: [PATCH 16/17] block, bfq: remove unnecessary goto tag in __bfq_weights_tree_remove
+Date:   Sun, 19 Feb 2023 18:43:08 +0800
+Message-Id: <20230219104309.1511562-17-shikemeng@huaweicloud.com>
 X-Mailer: git-send-email 2.30.0
 In-Reply-To: <20230219104309.1511562-1-shikemeng@huaweicloud.com>
 References: <20230219104309.1511562-1-shikemeng@huaweicloud.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: Syh0CgBH7utQjPFjPmleDw--.7604S16
-X-Coremail-Antispam: 1UD129KBjvdXoW7GrWUCw4Utr4DCr4UXFy7Wrg_yoWfCrg_Aw
-        4vgrZrJFW8JFW5tw4akr4jyF4YyFW3Xw1DXryFqr13G3W3JFn5C3srKrZxZFZ8CayIya43
-        Ja1qqr4UJw1xCjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-        9fnUUIcSsGvfJTRUUUbDAFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k26cxKx2IYs7xG
+X-CM-TRANSID: Syh0CgBH7utQjPFjPmleDw--.7604S18
+X-Coremail-Antispam: 1UD129KBjvdXoWrtw4UCw15KryUJw17Kw13twb_yoWDWrg_C3
+        WvvrykKr4DC398Cr4xtrWaqw1DA393ZFy8GFsxGF1fuw17JasIk3s2qrZ8Jan5Xan2gFZx
+        GrZ5tw13ZF1jkjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+        9fnUUIcSsGvfJTRUUUbqxFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k26cxKx2IYs7xG
         6rWj6s0DM7CIcVAFz4kK6r1j6r18M280x2IEY4vEnII2IxkI6r1a6r45M28IrcIa0xkI8V
         A2jI8067AKxVWUAVCq3wA2048vs2IY020Ec7CjxVAFwI0_Xr0E3s1l8cAvFVAK0II2c7xJ
         M28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVW7JVWDJwA2z4x0Y4vE2I
@@ -48,38 +48,45 @@ X-Coremail-Antispam: 1UD129KBjvdXoW7GrWUCw4Utr4DCr4UXFy7Wrg_yoWfCrg_Aw
         AGYxC7MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAF
         wI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUAVWUtwCIc4
         0Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r4j6ryUMIIF0xvE2Ix0cI8IcVCY1x0267AK
-        xVWxJVW8Jr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r4j6F
-        4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0pRvJPtU
-        UUUU=
+        xVW8Jr0_Cr1UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVW8JV
+        WxJwCI42IY6I8E87Iv6xkF7I0E14v26r4UJVWxJrUvcSsGvfC2KfnxnUUI43ZEXa7sRiVb
+        yDUUUUU==
 X-CM-SenderInfo: 5vklyvpphqwq5kxd4v5lfo033gof0z/
 X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The oom_bfqq is never added to tree in bfq_pos_tree_add_move, so bfqq
-returned from bfq_find_close_cooperator is no need to be checked if it's
-oom_bfqq.
+Do free work if num_active == 0 and remove unnecessary tag
+reset_entity_pointer.
 
 Signed-off-by: Kemeng Shi <shikemeng@huaweicloud.com>
 ---
- block/bfq-iosched.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ block/bfq-iosched.c | 10 ++++------
+ 1 file changed, 4 insertions(+), 6 deletions(-)
 
 diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index 6a8ea9a451cc..ee02c7502394 100644
+index 6ba096e9aec6..2705a24ab146 100644
 --- a/block/bfq-iosched.c
 +++ b/block/bfq-iosched.c
-@@ -3038,8 +3038,7 @@ bfq_setup_cooperator(struct bfq_data *bfqd, struct bfq_queue *bfqq,
- 	new_bfqq = bfq_find_close_cooperator(bfqd, bfqq,
- 			bfq_io_struct_pos(io_struct, request));
+@@ -976,13 +976,11 @@ void bfq_weights_tree_remove(struct bfq_queue *bfqq)
  
--	if (new_bfqq && likely(new_bfqq != &bfqd->oom_bfqq) &&
--	    bfq_may_be_close_cooperator(bfqq, new_bfqq))
-+	if (new_bfqq && bfq_may_be_close_cooperator(bfqq, new_bfqq))
- 		return bfq_setup_merge(bfqq, new_bfqq);
+ 	root = &bfqq->bfqd->queue_weights_tree;
+ 	bfqq->weight_counter->num_active--;
+-	if (bfqq->weight_counter->num_active > 0)
+-		goto reset_entity_pointer;
+-
+-	rb_erase_cached(&bfqq->weight_counter->weights_node, root);
+-	kfree(bfqq->weight_counter);
++	if (bfqq->weight_counter->num_active == 0) {
++		rb_erase_cached(&bfqq->weight_counter->weights_node, root);
++		kfree(bfqq->weight_counter);
++	}
  
- 	return NULL;
+-reset_entity_pointer:
+ 	bfqq->weight_counter = NULL;
+ 	bfq_put_queue(bfqq);
+ }
 -- 
 2.30.0
 
