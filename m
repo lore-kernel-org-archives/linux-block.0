@@ -2,42 +2,42 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E05EC677F1
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24AF8C64ED6
 	for <linux-block@archiver.kernel.org>; Sun, 19 Feb 2023 02:41:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229441AbjBSClc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 18 Feb 2023 21:41:32 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42288 "EHLO
+        id S229674AbjBSCld (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 18 Feb 2023 21:41:33 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42290 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229597AbjBSCl2 (ORCPT
+        with ESMTP id S229599AbjBSCl2 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Sat, 18 Feb 2023 21:41:28 -0500
 Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 079E912057;
-        Sat, 18 Feb 2023 18:41:26 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F95512863;
+        Sat, 18 Feb 2023 18:41:27 -0800 (PST)
 Received: from mail02.huawei.com (unknown [172.30.67.143])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4PK8v635HWz4f3p1D;
-        Sun, 19 Feb 2023 10:41:22 +0800 (CST)
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4PK8v70DGSz4f3pBv;
+        Sun, 19 Feb 2023 10:41:23 +0800 (CST)
 Received: from huaweicloud.com (unknown [10.175.124.27])
-        by APP2 (Coremail) with SMTP id Syh0CgBH7utQjPFjPmleDw--.7604S9;
-        Sun, 19 Feb 2023 10:41:24 +0800 (CST)
+        by APP2 (Coremail) with SMTP id Syh0CgBH7utQjPFjPmleDw--.7604S11;
+        Sun, 19 Feb 2023 10:41:25 +0800 (CST)
 From:   Kemeng Shi <shikemeng@huaweicloud.com>
 To:     paolo.valente@linaro.org, axboe@kernel.dk, jack@suse.cz
 Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         shikemeng@huaweicloud.com
-Subject: [PATCH 07/17] block, bfq: correct interactive weight-raise check in bfq_set_budget_timeout
-Date:   Sun, 19 Feb 2023 18:42:59 +0800
-Message-Id: <20230219104309.1511562-8-shikemeng@huaweicloud.com>
+Subject: [PATCH 09/17] block, bfq: stop to detect queue as waker queue if it already is now
+Date:   Sun, 19 Feb 2023 18:43:01 +0800
+Message-Id: <20230219104309.1511562-10-shikemeng@huaweicloud.com>
 X-Mailer: git-send-email 2.30.0
 In-Reply-To: <20230219104309.1511562-1-shikemeng@huaweicloud.com>
 References: <20230219104309.1511562-1-shikemeng@huaweicloud.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: Syh0CgBH7utQjPFjPmleDw--.7604S9
-X-Coremail-Antispam: 1UD129KBjvdXoWrtF17AF1UJFyUZF47AFW3trb_yoWkWFb_C3
-        Z5tr1rJF1kGr93CFsrt34rAryDKw18J3WkC34xKrnFgr42yFs2k34qgr90yFZ8Za9F9Fy3
-        JFsYqF1UJrsrZjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-        9fnUUIcSsGvfJTRUUUbDkFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k26cxKx2IYs7xG
+X-CM-TRANSID: Syh0CgBH7utQjPFjPmleDw--.7604S11
+X-Coremail-Antispam: 1UD129KBjvdXoW7Xry5Ar18Gw13Cr1fJF4kXrb_yoWfXrbEya
+        yFgr18Aan8Jay5Cr1YvryUtwnrua18Xw1kJFs8tFnrWFn8J3Z5C3sFqrW3AFs8WayxWFya
+        yrsaq3Z8tr4IyjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+        9fnUUIcSsGvfJTRUUUbDAFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k26cxKx2IYs7xG
         6rWj6s0DM7CIcVAFz4kK6r1j6r18M280x2IEY4vEnII2IxkI6r1a6r45M28IrcIa0xkI8V
         A2jI8067AKxVWUAVCq3wA2048vs2IY020Ec7CjxVAFwI0_Xr0E3s1l8cAvFVAK0II2c7xJ
         M28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVW7JVWDJwA2z4x0Y4vE2I
@@ -48,22 +48,18 @@ X-Coremail-Antispam: 1UD129KBjvdXoWrtF17AF1UJFyUZF47AFW3trb_yoWkWFb_C3
         AGYxC7MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAF
         wI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUAVWUtwCIc4
         0Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1I6r4UMIIF0xvE2Ix0cI8IcVCY1x0267AK
-        xVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr
-        1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7sRiVbyDUU
-        UUU==
+        xVWxJVW8Jr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r
+        4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0pRvJPtU
+        UUUU=
 X-CM-SenderInfo: 5vklyvpphqwq5kxd4v5lfo033gof0z/
 X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-After weight-raise finished, bfqq->wr_coeff is reset to 1 while
-bfqq->wr_cur_max_time may not be reset. For example,
-Function bfq_update_bfqq_wr_on_rq_arrival will only reset wr_coeff to 1 if
-bfqq is created in burst creation. Function bfq_set_budget_timeout will be
-called when bfqq is selected while it's wr_cur_max_time is set and wr_coeff
-is 1. Fix this by check wr_coeff > 1 along with check wr_cur_max_time
-check like other code do.
+If last_completed_rq_bfqq is the current waker queue of bfqq, it's no
+meaning to execute the detection logic as nothing will change whether
+detection successes or fails.
 
 Signed-off-by: Kemeng Shi <shikemeng@huaweicloud.com>
 ---
@@ -71,19 +67,19 @@ Signed-off-by: Kemeng Shi <shikemeng@huaweicloud.com>
  1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index b32bae5259d5..5610a7dcacdf 100644
+index 7a0283f08aed..0a11a381ee7d 100644
 --- a/block/bfq-iosched.c
 +++ b/block/bfq-iosched.c
-@@ -3297,7 +3297,8 @@ static void bfq_set_budget_timeout(struct bfq_data *bfqd,
- {
- 	unsigned int timeout_coeff;
+@@ -2147,7 +2147,8 @@ static void bfq_check_waker(struct bfq_data *bfqd, struct bfq_queue *bfqq,
+ 	    bfq_bfqq_has_short_ttime(bfqq) ||
+ 	    now_ns - bfqd->last_completion >= 4 * NSEC_PER_MSEC ||
+ 	    bfqd->last_completed_rq_bfqq == &bfqd->oom_bfqq ||
+-	    bfqq == &bfqd->oom_bfqq)
++	    bfqq == &bfqd->oom_bfqq ||
++	    bfqd->last_completed_rq_bfqq == bfqq->waker_bfqq)
+ 		return;
  
--	if (bfqq->wr_cur_max_time == bfqd->bfq_wr_rt_max_time)
-+	if (bfqq->wr_coeff > 1 &&
-+	    bfqq->wr_cur_max_time == bfqd->bfq_wr_rt_max_time)
- 		timeout_coeff = 1;
- 	else
- 		timeout_coeff = bfqq->entity.weight / bfqq->entity.orig_weight;
+ 	/*
 -- 
 2.30.0
 
