@@ -2,188 +2,94 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F7D9C6FA99
-	for <linux-block@archiver.kernel.org>; Sun, 19 Feb 2023 02:41:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 138FFC61DA4
+	for <linux-block@archiver.kernel.org>; Sun, 19 Feb 2023 02:41:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229693AbjBSClf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 18 Feb 2023 21:41:35 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42304 "EHLO
+        id S229725AbjBSClh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 18 Feb 2023 21:41:37 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42326 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229630AbjBSCl3 (ORCPT
+        with ESMTP id S229656AbjBSCla (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 18 Feb 2023 21:41:29 -0500
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 887BA11EA1;
-        Sat, 18 Feb 2023 18:41:28 -0800 (PST)
+        Sat, 18 Feb 2023 21:41:30 -0500
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 14A2611EB2;
+        Sat, 18 Feb 2023 18:41:30 -0800 (PST)
 Received: from mail02.huawei.com (unknown [172.30.67.143])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4PK8v76Vpwz4f3pC9;
-        Sun, 19 Feb 2023 10:41:23 +0800 (CST)
-Received: from huaweicloud.com (unknown [10.175.124.27])
-        by APP2 (Coremail) with SMTP id Syh0CgBH7utQjPFjPmleDw--.7604S14;
+        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4PK8v92Pnxz4f3jHn;
         Sun, 19 Feb 2023 10:41:25 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.175.124.27])
+        by APP2 (Coremail) with SMTP id Syh0CgBH7utQjPFjPmleDw--.7604S19;
+        Sun, 19 Feb 2023 10:41:27 +0800 (CST)
 From:   Kemeng Shi <shikemeng@huaweicloud.com>
 To:     paolo.valente@linaro.org, axboe@kernel.dk, jack@suse.cz
 Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         shikemeng@huaweicloud.com
-Subject: [PATCH 12/17] block, bfq: define and use soft_rt, in_burst and wr_or_deserves_wr only low_latency is enable
-Date:   Sun, 19 Feb 2023 18:43:04 +0800
-Message-Id: <20230219104309.1511562-13-shikemeng@huaweicloud.com>
+Subject: [PATCH 17/17] block, bfq: remove unnecessary local variable __bfqq in bfq_setup_merge
+Date:   Sun, 19 Feb 2023 18:43:09 +0800
+Message-Id: <20230219104309.1511562-18-shikemeng@huaweicloud.com>
 X-Mailer: git-send-email 2.30.0
 In-Reply-To: <20230219104309.1511562-1-shikemeng@huaweicloud.com>
 References: <20230219104309.1511562-1-shikemeng@huaweicloud.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: Syh0CgBH7utQjPFjPmleDw--.7604S14
-X-Coremail-Antispam: 1UD129KBjvJXoW3WrW7CFW7Cw18ZF4DWry8Krg_yoW7XrWDpF
-        WagFy3tr43JF4fZrW3Kw48Xr1Sv3WfGFWIkFZ0q34kAF1UCrn2qFyqyr1Fvas7ur9xCr43
-        XrWqqa97CF1kAF7anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUPF14x267AKxVWrJVCq3wAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2jI8I6cxK62vIxIIY0VWUZVW8XwA2048vs2IY02
-        0E87I2jVAFwI0_JF0E3s1l82xGYIkIc2x26xkF7I0E14v26ryj6s0DM28lY4IEw2IIxxk0
-        rwA2F7IY1VAKz4vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6x
-        IIjxv20xvEc7CjxVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xv
-        wVC2z280aVCY1x0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFc
-        xC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_
-        Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2
-        IErcIFxwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E
-        14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_JF0_Jw1lIx
-        kGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVW8JVW5JwCI42IY6xIIjxv20xvEc7CjxVAF
-        wI0_Cr0_Gr1UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVW8JV
-        WxJwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjTRKfOw
-        UUUUU
+X-CM-TRANSID: Syh0CgBH7utQjPFjPmleDw--.7604S19
+X-Coremail-Antispam: 1UD129KBjvdXoW7GFykWr4fKFyruF1xXF47Arb_yoWkGrb_tF
+        ykKa4xtr4UGry5Xw1Yyr4xJ3ZxJFW8XF18ZF4qg34DJF17XFn5CasFgrs0yFZ8Ga1IkFy3
+        G397Wwn8GF1kWjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+        9fnUUIcSsGvfJTRUUUbqxFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k26cxKx2IYs7xG
+        6rWj6s0DM7CIcVAFz4kK6r1j6r18M280x2IEY4vEnII2IxkI6r1a6r45M28IrcIa0xkI8V
+        A2jI8067AKxVWUAVCq3wA2048vs2IY020Ec7CjxVAFwI0_Xr0E3s1l8cAvFVAK0II2c7xJ
+        M28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVW7JVWDJwA2z4x0Y4vE2I
+        x0cI8IcVCY1x0267AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK
+        6I8E87Iv6xkF7I0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4
+        xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8
+        JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20V
+        AGYxC7MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAF
+        wI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUAVWUtwCIc4
+        0Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r4j6ryUMIIF0xvE2Ix0cI8IcVCY1x0267AK
+        xVW8Jr0_Cr1UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVW8JV
+        WxJwCI42IY6I8E87Iv6xkF7I0E14v26r4UJVWxJrUvcSsGvfC2KfnxnUUI43ZEXa7sRiVb
+        yDUUUUU==
 X-CM-SenderInfo: 5vklyvpphqwq5kxd4v5lfo033gof0z/
 X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The soft_rt, in_burst and wr_or_deserves_wr are only used when low_latency
-is enable. Currently, these variables are computed even low_latency is
-disable. Define these variables in successful branch of bfqd->low_latency
-check and compute them if needed to remove redundant computation and
-improve readability.
-The interactive parameter will be used only if low_latency is enabled
-outside bfq_bfqq_handle_idle_busy_switch, so it's safe to move
-interactive assignment inside branch where low_latency is true.
+We could traversal bfqq->new_bfqq list without a local variable easily and
+intuitively. So remove unnecessary local variable __bfqq.
 
 Signed-off-by: Kemeng Shi <shikemeng@huaweicloud.com>
 ---
- block/bfq-iosched.c | 81 +++++++++++++++++++++++----------------------
- 1 file changed, 42 insertions(+), 39 deletions(-)
+ block/bfq-iosched.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
 
 diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index a8cb0a0d36f3..eda6669d0571 100644
+index 2705a24ab146..037f73a25567 100644
 --- a/block/bfq-iosched.c
 +++ b/block/bfq-iosched.c
-@@ -1828,8 +1828,7 @@ static void bfq_bfqq_handle_idle_busy_switch(struct bfq_data *bfqd,
- 					     struct request *rq,
- 					     bool *interactive)
+@@ -2752,7 +2752,6 @@ static struct bfq_queue *
+ bfq_setup_merge(struct bfq_queue *bfqq, struct bfq_queue *new_bfqq)
  {
--	bool soft_rt, in_burst,	wr_or_deserves_wr,
--		bfqq_wants_to_preempt,
-+	bool bfqq_wants_to_preempt,
- 		idle_for_long_time = bfq_bfqq_idle_for_long_time(bfqd, bfqq),
- 		/*
- 		 * See the comments on
-@@ -1840,43 +1839,6 @@ static void bfq_bfqq_handle_idle_busy_switch(struct bfq_data *bfqd,
- 			bfqq->ttime.last_end_request +
- 			bfqd->bfq_slice_idle * 3;
- 	unsigned int act_idx = bfq_actuator_index(bfqd, rq->bio);
--	bool bfqq_non_merged_or_stably_merged =
--		bfqq->bic || RQ_BIC(rq)->bfqq_data[act_idx].stably_merged;
--
--	/*
--	 * bfqq deserves to be weight-raised if:
--	 * - it is sync,
--	 * - it does not belong to a large burst,
--	 * - it has been idle for enough time or is soft real-time,
--	 * - is linked to a bfq_io_cq (it is not shared in any sense),
--	 * - has a default weight (otherwise we assume the user wanted
--	 *   to control its weight explicitly)
--	 */
--	in_burst = bfq_bfqq_in_large_burst(bfqq);
--	soft_rt = bfqd->bfq_wr_max_softrt_rate > 0 &&
--		!BFQQ_TOTALLY_SEEKY(bfqq) &&
--		!in_burst &&
--		time_is_before_jiffies(bfqq->soft_rt_next_start) &&
--		bfqq->dispatched == 0 &&
--		bfqq->entity.new_weight == 40;
--	*interactive = !in_burst && idle_for_long_time &&
--		bfqq->entity.new_weight == 40;
--	/*
--	 * Merged bfq_queues are kept out of weight-raising
--	 * (low-latency) mechanisms. The reason is that these queues
--	 * are usually created for non-interactive and
--	 * non-soft-real-time tasks. Yet this is not the case for
--	 * stably-merged queues. These queues are merged just because
--	 * they are created shortly after each other. So they may
--	 * easily serve the I/O of an interactive or soft-real time
--	 * application, if the application happens to spawn multiple
--	 * processes. So let also stably-merged queued enjoy weight
--	 * raising.
--	 */
--	wr_or_deserves_wr = bfqd->low_latency &&
--		(bfqq->wr_coeff > 1 ||
--		 (bfq_bfqq_sync(bfqq) && bfqq_non_merged_or_stably_merged &&
--		  (*interactive || soft_rt)));
+ 	int process_refs, new_process_refs;
+-	struct bfq_queue *__bfqq;
  
  	/*
- 	 * Using the last flag, update budget and check whether bfqq
-@@ -1911,6 +1873,24 @@ static void bfq_bfqq_handle_idle_busy_switch(struct bfq_data *bfqd,
- 	bfq_clear_bfqq_just_created(bfqq);
+ 	 * If there are no process references on the new_bfqq, then it is
+@@ -2764,10 +2763,9 @@ bfq_setup_merge(struct bfq_queue *bfqq, struct bfq_queue *new_bfqq)
+ 		return NULL;
  
- 	if (bfqd->low_latency) {
-+		bool soft_rt, in_burst,	wr_or_deserves_wr;
-+		bool bfqq_non_merged_or_stably_merged =
-+			bfqq->bic ||
-+			RQ_BIC(rq)->bfqq_data[act_idx].stably_merged;
-+
-+		/*
-+		 * bfqq deserves to be weight-raised if:
-+		 * - it is sync,
-+		 * - it does not belong to a large burst,
-+		 * - it has been idle for enough time or is soft real-time,
-+		 * - is linked to a bfq_io_cq (it is not shared in any sense),
-+		 * - has a default weight (otherwise we assume the user wanted
-+		 *   to control its weight explicitly)
-+		 */
-+		in_burst = bfq_bfqq_in_large_burst(bfqq);
-+		*interactive = !in_burst && idle_for_long_time &&
-+			bfqq->entity.new_weight == 40;
-+
- 		if (unlikely(time_is_after_jiffies(bfqq->split_time)))
- 			/* wraparound */
- 			bfqq->split_time =
-@@ -1918,6 +1898,29 @@ static void bfq_bfqq_handle_idle_busy_switch(struct bfq_data *bfqd,
+ 	/* Avoid a circular list and skip interim queue merges. */
+-	while ((__bfqq = new_bfqq->new_bfqq)) {
+-		if (__bfqq == bfqq)
++	while ((new_bfqq = new_bfqq->new_bfqq)) {
++		if (new_bfqq == bfqq)
+ 			return NULL;
+-		new_bfqq = __bfqq;
+ 	}
  
- 		if (time_is_before_jiffies(bfqq->split_time +
- 					   bfqd->bfq_wr_min_idle_time)) {
-+			soft_rt = bfqd->bfq_wr_max_softrt_rate > 0 &&
-+				!BFQQ_TOTALLY_SEEKY(bfqq) &&
-+				!in_burst &&
-+				time_is_before_jiffies(bfqq->soft_rt_next_start) &&
-+				bfqq->dispatched == 0 &&
-+				bfqq->entity.new_weight == 40;
-+			/*
-+			 * Merged bfq_queues are kept out of weight-raising
-+			 * (low-latency) mechanisms. The reason is that these queues
-+			 * are usually created for non-interactive and
-+			 * non-soft-real-time tasks. Yet this is not the case for
-+			 * stably-merged queues. These queues are merged just because
-+			 * they are created shortly after each other. So they may
-+			 * easily serve the I/O of an interactive or soft-real time
-+			 * application, if the application happens to spawn multiple
-+			 * processes. So let also stably-merged queued enjoy weight
-+			 * raising.
-+			 */
-+			wr_or_deserves_wr = (bfqq->wr_coeff > 1 ||
-+				(bfq_bfqq_sync(bfqq) &&
-+				bfqq_non_merged_or_stably_merged &&
-+				(*interactive || soft_rt)));
-+
- 			bfq_update_bfqq_wr_on_rq_arrival(bfqd, bfqq,
- 							 old_wr_coeff,
- 							 wr_or_deserves_wr,
+ 	process_refs = bfqq_process_refs(bfqq);
 -- 
 2.30.0
 
