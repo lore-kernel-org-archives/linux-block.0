@@ -2,131 +2,91 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5597DC61DA3
-	for <linux-block@archiver.kernel.org>; Mon, 20 Feb 2023 21:57:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F3EFC636D6
+	for <linux-block@archiver.kernel.org>; Mon, 20 Feb 2023 22:21:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231970AbjBTV5k (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 20 Feb 2023 16:57:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52636 "EHLO
+        id S232422AbjBTWVh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 20 Feb 2023 17:21:37 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38286 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229738AbjBTV5j (ORCPT
+        with ESMTP id S231993AbjBTWVg (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 20 Feb 2023 16:57:39 -0500
-Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 47B3D16AF9;
-        Mon, 20 Feb 2023 13:57:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1676930257; x=1708466257;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=lFNJ4xZ2jtjUGX9TOVIKdIbazyFjXPKRgiWY4LvKm+s=;
-  b=J9VtzsXO5z72fIfBtXyWpgDkpiaPEsGQEP6YhSUimTHWTECgbc7dBysa
-   dxfJaMaSnxyB3ypV85sqBeUxUr32aAimFlVBLwjvPrwHdC9J1Mi45xWlY
-   BSsqCA6debstm5vpHl8m5IekpyoL36M5kAEzGK7q1DNAu/P58EZskffLT
-   oYuh0dzEw8W0wLAEvUqAQfE5nZS44hnOQ9e4SwrbV+Je8tzNRxJzgWz7o
-   AlwQMHuCbd95j3FdbZg6uWHCdzHBFJhp49/+p9DlOu8wDOA5T/7GyOoZh
-   m69N4WH3JYtMwo2hlLRf4rQWX69HaMls3RW9BTQMkOV1v7yH/UYdBIwHG
-   w==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10627"; a="320621922"
-X-IronPort-AV: E=Sophos;i="5.97,313,1669104000"; 
-   d="scan'208";a="320621922"
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Feb 2023 13:57:36 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10627"; a="845438006"
-X-IronPort-AV: E=Sophos;i="5.97,313,1669104000"; 
-   d="scan'208";a="845438006"
-Received: from lkp-server01.sh.intel.com (HELO 4455601a8d94) ([10.239.97.150])
-  by orsmga005.jf.intel.com with ESMTP; 20 Feb 2023 13:57:31 -0800
-Received: from kbuild by 4455601a8d94 with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1pUEA6-000ECb-1f;
-        Mon, 20 Feb 2023 21:57:30 +0000
-Date:   Tue, 21 Feb 2023 05:56:58 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Nitesh Shetty <nj.shetty@samsung.com>,
-        Jens Axboe <axboe@kernel.dk>, Alasdair Kergon <agk@redhat.com>,
-        Mike Snitzer <snitzer@kernel.org>, dm-devel@redhat.com,
-        Keith Busch <kbusch@kernel.org>,
-        Christoph Hellwig <hch@lst.de>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        James Smart <james.smart@broadcom.com>,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        Alexander Viro <viro@zeniv.linux.org.uk>
-Cc:     oe-kbuild-all@lists.linux.dev, bvanassche@acm.org, hare@suse.de,
-        ming.lei@redhat.com, damien.lemoal@opensource.wdc.com,
-        anuj20.g@samsung.com, joshi.k@samsung.com, nitheshshetty@gmail.com,
-        gost.dev@samsung.com, Nitesh Shetty <nj.shetty@samsung.com>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org
-Subject: Re: [PATCH v7 4/8] fs, block: copy_file_range for def_blk_ops for
- direct block device.
-Message-ID: <202302210520.EIfbuJLy-lkp@intel.com>
-References: <20230220105336.3810-5-nj.shetty@samsung.com>
+        Mon, 20 Feb 2023 17:21:36 -0500
+Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 724481C329
+        for <linux-block@vger.kernel.org>; Mon, 20 Feb 2023 14:20:49 -0800 (PST)
+Received: by mail-qt1-f172.google.com with SMTP id w42so2964630qtc.2
+        for <linux-block@vger.kernel.org>; Mon, 20 Feb 2023 14:20:49 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=o/GkL4roSHCjRncSIk+Dw09K8EUHNxrM4m4i32VKjbs=;
+        b=XDyoxKf5CkcWF5VtaFMG3kq1cMpRcYbLfhscCBw43JHr/vnW2HtXVdX3C12efAql22
+         4aqLjwUGcsVRZXZNpq9htJqWX6bD0pLr6EaPTwe5FEoSD66LOSK4LYjvNVAkKtOy10HI
+         /o3iPrJJwF6EDmSYzviHwjlcaXDkqCgiUqHtw6XQuSj2K+kwiZIctIhr12RfrZmfBN4w
+         7biUELEzWWhOn5T4gmQ//xFRUTk4Bi1wg5Hjh1N6hNLnGOyJzGoRqDwr/93vGhWYrnC3
+         0iDzgSLCHkDRNwZSa6vOGwGUsU3jdPRUTkCZxI7QuBkA66fsG175uw1CI0r1KmDPU6qD
+         OSqg==
+X-Gm-Message-State: AO0yUKXw1L2mk12JoZ03qiRbMpHkg/lYxyfTLnM06bYqWV/gapnr4m9I
+        dluwk8RZ80pg/fMDyRnTjAUH
+X-Google-Smtp-Source: AK7set+evaFySCYbSrwieLb6flOyB5fBQlkRJ9eCz3NiKxnOc+WOsFmrkfzVrqv1kjmp1x00Glq8Uw==
+X-Received: by 2002:a05:622a:1456:b0:3b9:c0e8:610c with SMTP id v22-20020a05622a145600b003b9c0e8610cmr4839450qtx.60.1676931648593;
+        Mon, 20 Feb 2023 14:20:48 -0800 (PST)
+Received: from localhost (pool-68-160-166-30.bstnma.fios.verizon.net. [68.160.166.30])
+        by smtp.gmail.com with ESMTPSA id b18-20020ac87fd2000000b003b80a69d353sm917343qtk.49.2023.02.20.14.20.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 20 Feb 2023 14:20:48 -0800 (PST)
+Date:   Mon, 20 Feb 2023 17:20:46 -0500
+From:   Mike Snitzer <snitzer@kernel.org>
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     dm-devel@redhat.com, linux-block@vger.kernel.org,
+        Alasdair G Kergon <agk@redhat.com>,
+        Benjamin Marzinski <bmarzins@redhat.com>,
+        Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+        Heinz Mauelshagen <heinzm@redhat.com>,
+        Hou Tao <houtao1@huawei.com>,
+        Jiapeng Chong <jiapeng.chong@linux.alibaba.com>,
+        Joe Thornber <ejt@redhat.com>,
+        Mikulas Patocka <mpatocka@redhat.com>,
+        Nathan Huckleberry <nhuck@google.com>,
+        Pingfan Liu <piliu@redhat.com>,
+        Sergey Shtylyov <s.shtylyov@omp.ru>,
+        Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>,
+        Thomas =?iso-8859-1?Q?Wei=DFschuh?= <linux@weissschuh.net>,
+        XU pengfei <xupengfei@nfschina.com>,
+        Yu Zhe <yuzhe@nfschina.com>
+Subject: Re: [git pull] device mapper changes for 6.3
+Message-ID: <Y/PyPrY39QLTHtW4@redhat.com>
+References: <Y/OueIbrfUBZRw5J@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230220105336.3810-5-nj.shetty@samsung.com>
+In-Reply-To: <Y/OueIbrfUBZRw5J@redhat.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Nitesh,
+On Mon, Feb 20 2023 at 12:31P -0500,
+Mike Snitzer <snitzer@kernel.org> wrote:
 
-Thank you for the patch! Yet something to improve:
+> Hi Linus,
+> 
+> The following changes since commit 4a6a7bc21d4726c5772e47525e6039852555b391:
+> 
+>   block: Default to use cgroup support for BFQ (2023-01-30 09:42:42 -0700)
+> 
+> are available in the Git repository at:
+> 
+>   git://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git tags/for-6.3/dm-changes
+> 
+> for you to fetch changes up to d695e44157c8da8d298295d1905428fb2495bc8b:
+> 
+>   dm: remove unnecessary (void*) conversion in event_callback() (2023-02-20 11:52:49 -0500)
+> 
+> Please pull, thanks.
+> Mike
 
-[auto build test ERROR on device-mapper-dm/for-next]
-[also build test ERROR on linus/master v6.2 next-20230220]
-[cannot apply to axboe-block/for-next]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Nitesh-Shetty/block-Add-copy-offload-support-infrastructure/20230220-205057
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git for-next
-patch link:    https://lore.kernel.org/r/20230220105336.3810-5-nj.shetty%40samsung.com
-patch subject: [PATCH v7 4/8] fs, block: copy_file_range for def_blk_ops for direct block device.
-config: riscv-randconfig-r042-20230219 (https://download.01.org/0day-ci/archive/20230221/202302210520.EIfbuJLy-lkp@intel.com/config)
-compiler: riscv64-linux-gcc (GCC) 12.1.0
-reproduce (this is a W=1 build):
-        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
-        chmod +x ~/bin/make.cross
-        # https://github.com/intel-lab-lkp/linux/commit/0f95ad2cb727ac6ac8406a01ff216d9237b403b7
-        git remote add linux-review https://github.com/intel-lab-lkp/linux
-        git fetch --no-tags linux-review Nitesh-Shetty/block-Add-copy-offload-support-infrastructure/20230220-205057
-        git checkout 0f95ad2cb727ac6ac8406a01ff216d9237b403b7
-        # save the config file
-        mkdir build_dir && cp config build_dir/.config
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.1.0 make.cross W=1 O=build_dir ARCH=riscv olddefconfig
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.1.0 make.cross W=1 O=build_dir ARCH=riscv SHELL=/bin/bash
-
-If you fix the issue, kindly add following tag where applicable
-| Reported-by: kernel test robot <lkp@intel.com>
-| Link: https://lore.kernel.org/oe-kbuild-all/202302210520.EIfbuJLy-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
-   riscv64-linux-ld: fs/read_write.o: in function `__do_compat_sys_preadv2':
->> fs/read_write.c:1134: undefined reference to `I_BDEV'
-
-
-vim +1134 fs/read_write.c
-
-3ebfd81f7fb3e8 H.J. Lu           2016-07-14  1128  
-f17d8b35452cab Milosz Tanski     2016-03-03  1129  COMPAT_SYSCALL_DEFINE6(preadv2, compat_ulong_t, fd,
-3523a9d4547898 Christoph Hellwig 2020-09-25  1130  		const struct iovec __user *, vec,
-f17d8b35452cab Milosz Tanski     2016-03-03  1131  		compat_ulong_t, vlen, u32, pos_low, u32, pos_high,
-ddef7ed2b5cbaf Christoph Hellwig 2017-07-06  1132  		rwf_t, flags)
-f17d8b35452cab Milosz Tanski     2016-03-03  1133  {
-f17d8b35452cab Milosz Tanski     2016-03-03 @1134  	loff_t pos = ((loff_t)pos_high << 32) | pos_low;
-f17d8b35452cab Milosz Tanski     2016-03-03  1135  
-f17d8b35452cab Milosz Tanski     2016-03-03  1136  	if (pos == -1)
-3523a9d4547898 Christoph Hellwig 2020-09-25  1137  		return do_readv(fd, vec, vlen, flags);
-3523a9d4547898 Christoph Hellwig 2020-09-25  1138  	return do_preadv(fd, vec, vlen, pos, flags);
-72ec35163f9f72 Al Viro           2013-03-20  1139  }
-72ec35163f9f72 Al Viro           2013-03-20  1140  
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests
+I should have mentioned: these DM changes are based on the "Block
+updates for 6.3" from Jens.
