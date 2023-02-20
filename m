@@ -2,115 +2,95 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CA827C6379F
-	for <linux-block@archiver.kernel.org>; Mon, 20 Feb 2023 22:28:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F6C5C677F1
+	for <linux-block@archiver.kernel.org>; Mon, 20 Feb 2023 22:52:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232708AbjBTW2j (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 20 Feb 2023 17:28:39 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42554 "EHLO
+        id S232345AbjBTWwh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 20 Feb 2023 17:52:37 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56352 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232704AbjBTW2i (ORCPT
+        with ESMTP id S232747AbjBTWwg (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 20 Feb 2023 17:28:38 -0500
-Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8002A9760;
-        Mon, 20 Feb 2023 14:28:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1676932117; x=1708468117;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=8CyRqK9unM1U4i0jxwB2716Bm1W5ji2sGyvGsvYwTOA=;
-  b=ngh7t0B953KvbBbeyCRIOzUrou2syhcnKdHIq2gRKFWXY47d4oAPCsk/
-   Vzh8DSeggDAA6nJoXWYSJJIcjib/lYkxEmUc7bE6Ggkx80NeUnOodrOqo
-   cdsCJ+28VK4+yLdpIN/lDw17iRE0f6Bb7NfA0DbBsPqeIYZow46ac2+uW
-   2g0o2aX1bGH2wPkS75E1/CibFj31hamut37wKLrJT/86d3AOcvoVtMQCr
-   mnHewM52YPIcjeXxTu6RFfDRDcLnvtSsTBqxB9u2kXUalOKF5sxD2/gJy
-   mHQ6JMnxTrBGXPDd79MSiRQkEmc5K/RMSrNO/FIVvEcM3UEaBB1GosX82
-   A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10627"; a="312131188"
-X-IronPort-AV: E=Sophos;i="5.97,313,1669104000"; 
-   d="scan'208";a="312131188"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Feb 2023 14:28:37 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10627"; a="703823737"
-X-IronPort-AV: E=Sophos;i="5.97,313,1669104000"; 
-   d="scan'208";a="703823737"
-Received: from lkp-server01.sh.intel.com (HELO 4455601a8d94) ([10.239.97.150])
-  by orsmga001.jf.intel.com with ESMTP; 20 Feb 2023 14:28:31 -0800
-Received: from kbuild by 4455601a8d94 with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1pUEe7-000EDN-0O;
-        Mon, 20 Feb 2023 22:28:31 +0000
-Date:   Tue, 21 Feb 2023 06:27:36 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Nitesh Shetty <nj.shetty@samsung.com>,
-        Jens Axboe <axboe@kernel.dk>, Alasdair Kergon <agk@redhat.com>,
-        Mike Snitzer <snitzer@kernel.org>, dm-devel@redhat.com,
-        Keith Busch <kbusch@kernel.org>,
-        Christoph Hellwig <hch@lst.de>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        James Smart <james.smart@broadcom.com>,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        Alexander Viro <viro@zeniv.linux.org.uk>
-Cc:     oe-kbuild-all@lists.linux.dev, bvanassche@acm.org, hare@suse.de,
-        ming.lei@redhat.com, damien.lemoal@opensource.wdc.com,
-        anuj20.g@samsung.com, joshi.k@samsung.com, nitheshshetty@gmail.com,
-        gost.dev@samsung.com, Nitesh Shetty <nj.shetty@samsung.com>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org
-Subject: Re: [PATCH v7 4/8] fs, block: copy_file_range for def_blk_ops for
- direct block device.
-Message-ID: <202302210631.4JSFH2VI-lkp@intel.com>
-References: <20230220105336.3810-5-nj.shetty@samsung.com>
+        Mon, 20 Feb 2023 17:52:36 -0500
+Received: from mail-ed1-x535.google.com (mail-ed1-x535.google.com [IPv6:2a00:1450:4864:20::535])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B889222D3
+        for <linux-block@vger.kernel.org>; Mon, 20 Feb 2023 14:52:31 -0800 (PST)
+Received: by mail-ed1-x535.google.com with SMTP id ec43so9629921edb.8
+        for <linux-block@vger.kernel.org>; Mon, 20 Feb 2023 14:52:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linux-foundation.org; s=google;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=pSE7wovrJ+19+kaPmt+dDnKGunQwppXMgjPl6shrdyA=;
+        b=Ungmk6R4CKTKX8tUx0vh1FtsymRIy8ovuaAmUX4SPe5ucxvs4SyjXPCi3iyGDLGAER
+         6cPzEWUngH836lmdR2EwTp5OQUb2Q7BCBfLnt6cKtrvIs38epGLHp3kDH79hDYSTG8R7
+         ttYuzfeloL3Vr1BZrR6cSO3JR9nYeAWGgIrQw=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=pSE7wovrJ+19+kaPmt+dDnKGunQwppXMgjPl6shrdyA=;
+        b=uI0vn59u6XIeyKNpoaO7bakW3lZ5c1HYcj/nC51uaszMv3WzmkMUPiPlFa0VyV5lyx
+         JS3K9zCiS7kI0YLe1JzOJ9Nm+pV5R9M7v90ql75PBYhP8wdGm8MArKJB0AjbC1IF4U7e
+         0rpoKCejf5KI43Iu9lrgeNGxD6msjRTXOV9ViKUxrj53N/qlCQvnLnoq0WRwJxoRZU3m
+         3ZbMlQLqMxhChpRTR1fgK0gBFmXa0iIC8t2HwZdrWHpzHBKTNsTonq5AREj0Bn57o+S8
+         iv4rz69bkEKOeEGqEdyM1ZmtH2qVE4pcnoKQKSkNH2HkDnR8v83/uedJe0w/tdZMLtGH
+         Vs5A==
+X-Gm-Message-State: AO0yUKUUBRsel0dXGBSwaOM/2eyDyswfg1rDVOHRQMf6ZXXBwo89oHsS
+        +JJoYy2LCb0h7H+CuP1BUE2qr9v80TUiyl8Voi4=
+X-Google-Smtp-Source: AK7set+ed3jBnOiHpawCcEbgU+Lx5BTDBVQjbxQGJiwjFqjIVZF4JdOGgUwsSI1Sd9udtPwY5ZnZng==
+X-Received: by 2002:aa7:d88f:0:b0:4ac:cb71:42c with SMTP id u15-20020aa7d88f000000b004accb71042cmr3730921edq.37.1676933549313;
+        Mon, 20 Feb 2023 14:52:29 -0800 (PST)
+Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com. [209.85.208.43])
+        by smtp.gmail.com with ESMTPSA id c14-20020a50d64e000000b004a249a97d84sm1580934edj.23.2023.02.20.14.52.28
+        for <linux-block@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 20 Feb 2023 14:52:28 -0800 (PST)
+Received: by mail-ed1-f43.google.com with SMTP id da10so11364510edb.3
+        for <linux-block@vger.kernel.org>; Mon, 20 Feb 2023 14:52:28 -0800 (PST)
+X-Received: by 2002:a17:906:9499:b0:8b1:79ef:6923 with SMTP id
+ t25-20020a170906949900b008b179ef6923mr5925873ejx.15.1676933548452; Mon, 20
+ Feb 2023 14:52:28 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230220105336.3810-5-nj.shetty@samsung.com>
+References: <5afa0795-775d-f710-7989-4c8e1cd7b56f@kernel.dk>
+In-Reply-To: <5afa0795-775d-f710-7989-4c8e1cd7b56f@kernel.dk>
+From:   Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Mon, 20 Feb 2023 14:52:11 -0800
+X-Gmail-Original-Message-ID: <CAHk-=wiLu7VRyPUpthiV6qMJp1eN3n_wD+vAroDsnDZq05QsLA@mail.gmail.com>
+Message-ID: <CAHk-=wiLu7VRyPUpthiV6qMJp1eN3n_wD+vAroDsnDZq05QsLA@mail.gmail.com>
+Subject: Re: [GIT PULL for-6.3] Block updates for 6.3
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Nitesh,
+On Thu, Feb 16, 2023 at 6:54 PM Jens Axboe <axboe@kernel.dk> wrote:
+>
+> I've pushed a merged branch here:
+>
+> https://git.kernel.dk/cgit/linux-block/log/?h=for-6.3/block-merged
 
-Thank you for the patch! Yet something to improve:
+Hmm. I do verify against suggested merges after doing my own (even
+when your suggested merge was then made stale by another later
+addition), and I think your merge was wrong wrt bfq_sync_bfqq_move(),
+which in your version does the bfq_release_process_ref() before doing
+the bic_set_bfqq().
 
-[auto build test ERROR on device-mapper-dm/for-next]
-[also build test ERROR on linus/master v6.2 next-20230220]
-[cannot apply to axboe-block/for-next]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+IOW, I think your merge essentially dropped one of the fixes in commit
+b600de2d7d3a ("block, bfq: fix uaf for bfqq in bic_set_bfqq()").
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Nitesh-Shetty/block-Add-copy-offload-support-infrastructure/20230220-205057
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git for-next
-patch link:    https://lore.kernel.org/r/20230220105336.3810-5-nj.shetty%40samsung.com
-patch subject: [PATCH v7 4/8] fs, block: copy_file_range for def_blk_ops for direct block device.
-config: arm-randconfig-r046-20230220 (https://download.01.org/0day-ci/archive/20230221/202302210631.4JSFH2VI-lkp@intel.com/config)
-compiler: arm-linux-gnueabi-gcc (GCC) 12.1.0
-reproduce (this is a W=1 build):
-        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
-        chmod +x ~/bin/make.cross
-        # https://github.com/intel-lab-lkp/linux/commit/0f95ad2cb727ac6ac8406a01ff216d9237b403b7
-        git remote add linux-review https://github.com/intel-lab-lkp/linux
-        git fetch --no-tags linux-review Nitesh-Shetty/block-Add-copy-offload-support-infrastructure/20230220-205057
-        git checkout 0f95ad2cb727ac6ac8406a01ff216d9237b403b7
-        # save the config file
-        mkdir build_dir && cp config build_dir/.config
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.1.0 make.cross W=1 O=build_dir ARCH=arm olddefconfig
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.1.0 make.cross W=1 O=build_dir ARCH=arm SHELL=/bin/bash
+Maybe there were reasons why that ordering wasn't required any more,
+but it looks funky (and you appear to have correctly merged the other
+case in bfq_check_ioprio_change()).
 
-If you fix the issue, kindly add following tag where applicable
-| Reported-by: kernel test robot <lkp@intel.com>
-| Link: https://lore.kernel.org/oe-kbuild-all/202302210631.4JSFH2VI-lkp@intel.com/
+Anyway, this is just a nit-picky email saying that I'm pretty sure
+I've done the merge right, but since it doesn't match what you did, I
+thought I'd mention it.
 
-All errors (new ones prefixed by >>):
+Worth double-checking this, in other words. I realize you're mostly
+afk this week, so whenever you're back.
 
-   arm-linux-gnueabi-ld: arm-linux-gnueabi-ld: DWARF error: could not find abbrev number 19
-   fs/read_write.o: in function `generic_copy_file_checks':
->> read_write.c:(.text+0x8980): undefined reference to `I_BDEV'
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests
+                Linus
