@@ -2,109 +2,74 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59FD7C64EC4
-	for <linux-block@archiver.kernel.org>; Tue, 21 Feb 2023 20:51:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C1295C61DA3
+	for <linux-block@archiver.kernel.org>; Tue, 21 Feb 2023 21:59:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229844AbjBUUvY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 21 Feb 2023 15:51:24 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57264 "EHLO
+        id S229579AbjBUV7V (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 21 Feb 2023 16:59:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58750 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229724AbjBUUvX (ORCPT
+        with ESMTP id S229532AbjBUV7V (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 21 Feb 2023 15:51:23 -0500
-Received: from bedivere.hansenpartnership.com (bedivere.hansenpartnership.com [IPv6:2607:fcd0:100:8a00::2])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 31223302B3;
-        Tue, 21 Feb 2023 12:51:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-        d=hansenpartnership.com; s=20151216; t=1677012674;
-        bh=N4w7g7bbMneGm4ZhMjhv9CTYknNcabj3wGfoOlMb5Zc=;
-        h=Message-ID:Subject:From:To:Date:In-Reply-To:References:From;
-        b=kI+wXcMR6hXsTn+QR8f5sR1/1794Q6+xrneS7a5obWK88/qcS8iCO1S+SXD3kGmEn
-         6jOuy/SIcFdvUXVdQgt2lVkdwszP8Ou9ICNcAE9xhTYhgpnq2ajQz5hDvkNYMCoRUT
-         xPRfO+T5GS3icv0g1/j0HFG9Zw+KNbsgwkns8THE=
-Received: from localhost (localhost [127.0.0.1])
-        by bedivere.hansenpartnership.com (Postfix) with ESMTP id ADA661285D81;
-        Tue, 21 Feb 2023 15:51:14 -0500 (EST)
-Received: from bedivere.hansenpartnership.com ([127.0.0.1])
-        by localhost (bedivere.hansenpartnership.com [127.0.0.1]) (amavisd-new, port 10024)
-        with ESMTP id FGjkMet321rv; Tue, 21 Feb 2023 15:51:14 -0500 (EST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-        d=hansenpartnership.com; s=20151216; t=1677012672;
-        bh=N4w7g7bbMneGm4ZhMjhv9CTYknNcabj3wGfoOlMb5Zc=;
-        h=Message-ID:Subject:From:To:Date:In-Reply-To:References:From;
-        b=ZI5rqcDpS+lxbOVqMrJXvhLWNx9advzwHK26ZLIrowuMjNn9YlbmAe31HnoDSe7H1
-         AJmanRWkZ9B1Y+WmfTm08FjN1z+FoTmBFxdj+Cu6BGbMOkEo9EqRtohuo4rh043DR5
-         BY3Fx6d44jyvbExWeZQ6rlhjCYVuGRDl6I4OaoOM=
-Received: from lingrow.int.hansenpartnership.com (unknown [IPv6:2601:5c4:4302:c21::c14])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (prime256v1) server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (Client did not present a certificate)
-        by bedivere.hansenpartnership.com (Postfix) with ESMTPSA id 6110E1281F11;
-        Tue, 21 Feb 2023 15:51:12 -0500 (EST)
-Message-ID: <96463a32a97dc40bc30c47ddcdf19a5803de32d8.camel@HansenPartnership.com>
-Subject: Re: [LSF/MM/BPF TOPIC] Linux Security Summit cross-over?
-From:   James Bottomley <James.Bottomley@HansenPartnership.com>
-To:     David Howells <dhowells@redhat.com>,
-        lsf-pc@lists.linux-foundation.org, linux-block@vger.kernel.org,
-        dm-devel@redhat.com
-Cc:     linux-fsdevel@vger.kernel.org, Chuck Lever <chuck.lever@oracle.com>
-Date:   Tue, 21 Feb 2023 15:51:11 -0500
-In-Reply-To: <2896937.1676998541@warthog.procyon.org.uk>
-References: <2896937.1676998541@warthog.procyon.org.uk>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.42.4 
+        Tue, 21 Feb 2023 16:59:21 -0500
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E3B828D0D
+        for <linux-block@vger.kernel.org>; Tue, 21 Feb 2023 13:59:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
+        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=OJ0UCI1COb+qd/Mec8MGsIjB7CuyFTJ96U+rJGd9LV4=; b=bxD0+fh68SGFl/u6agZD2LzaDk
+        PHkd0UnLN57BDamZE+1T3LlObkkzsH/+VZlqvB6Sm8ok6UYyicGU78zG575uoPhcz6L+HieTf567l
+        /DxGr1J5zORE7aWViQW0W3Ei1+8TliTGKr39bbpum0+cuf0Mq3Fw4sc7FuB4dIqriZGNvi5ZausMa
+        FhhEAd9PPM6Lm+CQJe2IUzJKR4dnzsLUiVRm9pxsDRs3/heM11qOAOOxEV1UArMvxjx+LqMG/guO4
+        AWdaICzXy9PeEkav2iGoJPLgb+C3ainHcsQnHfRHEc7ZVLmC8v3wZV7CWJM54uNisIgJJuF6GnYTJ
+        LD6e5+Eg==;
+Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1pUafL-009tzj-MI; Tue, 21 Feb 2023 21:59:15 +0000
+Date:   Tue, 21 Feb 2023 13:59:15 -0800
+From:   Luis Chamberlain <mcgrof@kernel.org>
+To:     Pankaj Raghav <p.raghav@samsung.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, hch@lst.de, gost.dev@samsung.com,
+        linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>
+Subject: Re: [PATCH 0/1] improve brd performance with blk-mq
+Message-ID: <Y/U+sxv6s09s/AyX@bombadil.infradead.org>
+References: <CGME20230203103122eucas1p161c0f0b674d26e23cf38466d5415420e@eucas1p1.samsung.com>
+ <20230203103005.31290-1-p.raghav@samsung.com>
+ <Y+Gsu0PiXBIf8fFU@T590>
+ <6035da22-5667-93d5-fe00-62b988425cb5@samsung.com>
+ <Y+nwh7V5xehxMWDR@T590>
+ <95506a88-c89c-0f41-3ab4-eb5741410c02@samsung.com>
+ <7c28caf6-931e-0a7a-a3c0-e4a430f860ff@kernel.dk>
+ <8cc2659b-b7f9-eb8a-e73b-3056b82f159b@samsung.com>
+ <db1d7cd7-6c89-7d6b-3fe5-3778bb3cb5e9@kernel.dk>
+ <a10f11a5-2646-6db9-ab25-f2bb41190cc8@samsung.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <a10f11a5-2646-6db9-ab25-f2bb41190cc8@samsung.com>
+Sender: Luis Chamberlain <mcgrof@infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, 2023-02-21 at 16:55 +0000, David Howells wrote:
-> 
-> Since the first day of the LSS is the same as the final day of LSF
-> and in the same venue, are there any filesystem + security subjects
-> that would merit a common session?
+On Fri, Feb 17, 2023 at 08:22:15PM +0530, Pankaj Raghav wrote:
+> I will park this effort as blk-mq doesn't improve the performance for brd,
+> and we can retain the submit_bio interface.
 
+I am not sure if the feedback was intended to suggest we shouldn't do
+the blk-mq conversion, but rather explain why in some workloads it
+may not be as good as the old submit_bio() interface. Probably low
+hanging fruit, if we *really* wanted to provide parity for the odd
+workloads.
 
-I've got one:  Cryptographic material handling.
+If we *mostly*  we see better performance with blk-mq it would seem
+likely reasonable to merge. Dozens of drivers were converted to blk-mq
+and *most* without *any* performance justification on them. I think
+ming's was the commit log that had the most elaborate performacne
+metrics and I think it also showed some *minor* slowdown on some
+workloads, but the dramatic gains made it worthwhile.
 
-Subtitle could be: making keyrings more usable.
+Most of the conversions to blk-mq didn't even have *any* metrics posted.
 
-The broad problem is that the use of encryption within the kernel is
-growing (from the old dm-crypt to the newer fscrypt and beyond) yet
-pretty much all of our cryptographic key material handling violates the
-principle of least privilege.  The latest one (which I happened to
-notice being interested in TPMs) is the systemd tpm2 cryptenroll.  The
-specific violation is that key unwrapping should occur as close as
-possible to use: when the kernel uses a key, it should be the kernel
-unwrapping it not unwrapping in user space and handing the unwrapped
-key down to the kernel because that gives a way.  We got here because
-in most of the old uses, the key is derived from a passphrase and the
-kernel can't prompt the user, so pieces of user space have to gather
-the precursor cryptographic material anyway.  However, we're moving
-towards using cryptographic devices (like the TPM, key fobs and the
-like) to store keys we really should be passing the wrapped key into
-the kernel and letting it do the unwrap to preserve least privilege. 
-dm-crypt has some support for using kernel based TPM keys (the trusted
-key subsystem), but this isn't propagated into systemd-cryptenroll and
-pretty much none of the other encryption systems make any attempt to
-use keyrings for unwrap handling, even if they use keyrings to store
-cryptographic material.
-
-Part of the reason seems to be that the keyrings subsystem itself is
-hard to use as a generic "unwrapper" since the consumer of the keys has
-to know exactly the key type to consume the protected payload.  We
-could possibly fix this by adding a payload accessor function so the
-keyring consumer could access a payload from any key type and thus
-benefit from in-kernel unwrapping, but there are likely a host of other
-issues that need to be solved.  So what I'd really like to discuss is:
-
-Given the security need for a generic in-kernel unwrapper, should we
-make keyrings do this and if so, how?
-
-Regards,
-
-James
-
-
-
+  Luis
