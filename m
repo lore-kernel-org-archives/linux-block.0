@@ -2,134 +2,104 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DAFEC61DA3
-	for <linux-block@archiver.kernel.org>; Tue, 21 Feb 2023 09:14:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 556CEC61DA3
+	for <linux-block@archiver.kernel.org>; Tue, 21 Feb 2023 09:19:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233870AbjBUJOf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 21 Feb 2023 04:14:35 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54396 "EHLO
+        id S232946AbjBUJTS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 21 Feb 2023 04:19:18 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58644 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233871AbjBUJOd (ORCPT
+        with ESMTP id S233551AbjBUJTR (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 21 Feb 2023 04:14:33 -0500
-Received: from esa5.hgst.iphmx.com (esa5.hgst.iphmx.com [216.71.153.144])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5409F14498
-        for <linux-block@vger.kernel.org>; Tue, 21 Feb 2023 01:14:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1676970858; x=1708506858;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=k9SZeacDb9eLNQtlyjp/+pCtwgcI4xgvzkphSJgUW10=;
-  b=Hk7aX0++6NRqdqfv0G4Bjfw6HP81ru2+qvNWRnmp0v76luct00vwJoCL
-   2ROXOXyR6UfX9JoNu532oIppuyjEoM0+5WKYoTz8mViRYdlcdNtPI2N2A
-   rlvRq3NSYFx2XHRVSCUZ2diFn+UqCPyPEomCOHwRl+mHGsDqv77vnT4e6
-   YrEg/3GnEwYcMXqRHjejQqY08tkZY+r1na26uOl3HYeXDrRqzqHU7yaVN
-   rcxPNGfWgpQaKFl0rWAyc1oBEk0T4meqgiULSQeYJ7JgzgC80lm/jhOS6
-   /NuoKXg94Ap/QhiXi+vSTsQoGQ4nZuq6na5rRaSS/EMys1fWIwWaTXm2n
-   A==;
-X-IronPort-AV: E=Sophos;i="5.97,315,1669046400"; 
-   d="scan'208";a="223586682"
-Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 21 Feb 2023 17:14:17 +0800
-IronPort-SDR: utv13ji6P0UXzmsEEZKUtULwvaoDSBcnRb8FQ9FjtyIloMi5gGq1/Au71IaK596P6oIHYE5qCJ
- Ekc2ACmPVAAIMN9PlEL4DezG+bpgGOIa7ueiSaEqusMNZIxU+MHEfOQVoPFf2NMHrj7qvELhkP
- HGJ10KMDXKFvBz7MySQxaJ9CL0TdV0xUN7RONJRtSybKVf+W8JkESBcLs66FoPafO1PauJeKVo
- 6w6x7ZKIovxqLw/0cLaY8XU+tSi3UpJgtCyW0VVA5RXFkpel6TJwSAxXY/k6XYI1Bv6fQ86WFE
- gnY=
-Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 21 Feb 2023 00:31:17 -0800
-IronPort-SDR: M6uF6hUwMhsnFfEAsiGLzzlKQOdVA4bu7AifSbx+b4S+pMDSYfP0Wel4KH7zkJkQrY1EB85dbu
- zCE04Fnu5i6KBNQEYf9c7LZb5mE4oZe9PAUbhpENu/RUO3OXDT9Z4IdwJyTdr1BipdHHYCuhNL
- pl3JguLfdwaafS0cKjcifaZ3ZfB1Qw2JzN0kqtXiHcjhSJYpadrQR8dAwkZVNetyVoaU2jbNP/
- g0KYRUwtav9V+n/D7CkfBu8sUym0WqNhTA3i9ZUHGdUVxQIHgHBq6gT+B3s499k5Wx+r5FHtNt
- nJQ=
-WDCIronportException: Internal
-Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
-  by uls-op-cesaip02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 21 Feb 2023 01:14:18 -0800
-Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4PLYWX6ldPz1RvTp
-        for <linux-block@vger.kernel.org>; Tue, 21 Feb 2023 01:14:16 -0800 (PST)
-Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
-        reason="pass (just generated, assumed good)"
-        header.d=opensource.wdc.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
-        opensource.wdc.com; h=content-transfer-encoding:content-type
-        :in-reply-to:organization:from:references:to:content-language
-        :subject:user-agent:mime-version:date:message-id; s=dkim; t=
-        1676970856; x=1679562857; bh=k9SZeacDb9eLNQtlyjp/+pCtwgcI4xgvzkp
-        hSJgUW10=; b=JhbgQ9zXWY9tYKN8PkATIpy0RHGxkF+ar2L2TUqe9mTezP8EJ8C
-        +KagVt5hpC1LzaUt9bNY5PsV+JpZ1XjJ7Rcqiv7RT+1gQTbkWRECEqL0hJTVGYUD
-        7UJxTked0An24GFaKUI9wyhurblEnw0WP+UkYvo8IKFc+nRBBdZkJOiNqVkUW6r3
-        AWf9ydGe2seLyIgDVvRqvx50Wiet0eKv0iRPj3/1kaXyQjfWQ1MrPDS3ielIyuLz
-        Qv05xlc8lRly0isLB5zf7OsBQsnBbCl9ADQodAigf30BTdmG6/xHerRrMJ2RyCcv
-        n2O5GWpNE4gDhP38r0R/z+uUn9VQ6c3WMtg==
-X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
-Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
-        by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id Q_d_5foaXshI for <linux-block@vger.kernel.org>;
-        Tue, 21 Feb 2023 01:14:16 -0800 (PST)
-Received: from [10.225.163.9] (unknown [10.225.163.9])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4PLYWW1N5Tz1RvLy;
-        Tue, 21 Feb 2023 01:14:15 -0800 (PST)
-Message-ID: <78830e38-e7a4-24e5-277e-f8e5022c59ef@opensource.wdc.com>
-Date:   Tue, 21 Feb 2023 18:14:14 +0900
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.2
-Subject: Re: [PATCH] block, bfq: free 'sync_bfqq' after bic_set_bfqq() in
- bfq_sync_bfqq_move()
-Content-Language: en-US
-To:     Yu Kuai <yukuai1@huaweicloud.com>, jack@suse.cz, axboe@kernel.dk,
-        paolo.valente@linaro.org
+        Tue, 21 Feb 2023 04:19:17 -0500
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75B1BB777;
+        Tue, 21 Feb 2023 01:19:16 -0800 (PST)
+Received: from mail02.huawei.com (unknown [172.30.67.143])
+        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4PLYdC3Qs1z4f3jHr;
+        Tue, 21 Feb 2023 17:19:11 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.175.127.227])
+        by APP3 (Coremail) with SMTP id _Ch0CgBnFCKPjPRj+jbADg--.57503S4;
+        Tue, 21 Feb 2023 17:19:13 +0800 (CST)
+From:   Zhong Jinghua <zhongjinghua@huaweicloud.com>
+To:     axboe@kernel.dk, code@siddh.me, willy@infradead.org
 Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        yukuai3@huawei.com, yi.zhang@huawei.com, yangerkun@huawei.com
-References: <e2071a24-cd25-e5bd-9166-a3b575b7bf4a@huaweicloud.com>
- <20230221082905.3389012-1-yukuai1@huaweicloud.com>
-From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
-Organization: Western Digital Research
-In-Reply-To: <20230221082905.3389012-1-yukuai1@huaweicloud.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+        zhongjinghua@huawei.com, yi.zhang@huawei.com, yukuai3@huawei.com,
+        houtao1@huawei.com
+Subject: [PATCH-next v3] loop: loop_set_status_from_info() check before assignment
+Date:   Tue, 21 Feb 2023 17:42:44 +0800
+Message-Id: <20230221094244.3631986-1-zhongjinghua@huaweicloud.com>
+X-Mailer: git-send-email 2.31.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: _Ch0CgBnFCKPjPRj+jbADg--.57503S4
+X-Coremail-Antispam: 1UD129KBjvJXoW7Cr1Dtw4xtw18Wr45JFW3trb_yoW8Xw4DpF
+        sxWFyUC3yFgF4xKF4qv34kXay5G3ZrGry3CFW7KayrZryI9FnI9r9rGa45urZ5JrWxuFWY
+        gFn8JFykZF1UWr7anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUgKb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
+        6cxKx2IYs7xG6r1S6rWUM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+        vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7Cj
+        xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
+        0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
+        6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
+        Cjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JMxAIw28IcxkI7VAKI48JMxC20s026xCaFVCj
+        c4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4
+        CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1x
+        MIIF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw20EY4v20xvaj40_WFyUJV
+        Cq3wCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r1j6r4UYxBI
+        daVFxhVjvjDU0xZFpf9x07UWE__UUUUU=
+X-CM-SenderInfo: x2kr0wpmlqwxtxd6x35dzhxuhorxvhhfrp/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2/21/23 17:29, Yu Kuai wrote:
-> From: Yu Kuai <yukuai3@huawei.com>
-> 
-> As explained in commit b600de2d7d3a ("block, bfq: fix uaf for bfqq in
-> bic_set_bfqq()"), bfqq should not be freed before bic_set_bfqq().
-> However, this is broken while merging commit 9778369a2d6c ("block, bfq:
-> split sync bfq_queues on a per-actuator basis") from branch
-> for-6.3/block.
+From: Zhong Jinghua <zhongjinghua@huawei.com>
 
-The patch looks OK to me, but the commit message is not super clear. What is
-broken exactly ?
+In loop_set_status_from_info(), lo->lo_offset and lo->lo_sizelimit should
+be checked before reassignment, because if an overflow error occurs, the
+original correct value will be changed to the wrong value, and it will not
+be changed back.
 
-> 
-> Fixes: 9778369a2d6c ("block, bfq: split sync bfq_queues on a per-actuator basis")
-> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
-> ---
->  block/bfq-cgroup.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/block/bfq-cgroup.c b/block/bfq-cgroup.c
-> index ea3638e06e04..89ffb3aa992c 100644
-> --- a/block/bfq-cgroup.c
-> +++ b/block/bfq-cgroup.c
-> @@ -746,8 +746,8 @@ static void bfq_sync_bfqq_move(struct bfq_data *bfqd,
->  		 * old cgroup.
->  		 */
->  		bfq_put_cooperator(sync_bfqq);
-> -		bfq_release_process_ref(bfqd, sync_bfqq);
->  		bic_set_bfqq(bic, NULL, true, act_idx);
-> +		bfq_release_process_ref(bfqd, sync_bfqq);
->  	}
->  }
->  
+Modifying to the wrong value logic is always not quiet right, we hope to
+optimize this.
 
+loop_handle_cmd
+ do_req_filebacked
+  loff_t pos = ((loff_t) blk_rq_pos(rq) << 9) + lo->lo_offset;
+  lo_rw_aio
+   cmd->iocb.ki_pos = pos
+
+Fixes: c490a0b5a4f3 ("loop: Check for overflow while configuring loop")
+Signed-off-by: Zhong Jinghua <zhongjinghua@huawei.com>
+---
+ v2: Modify note: overflowing -> overflow
+ v3: Modify commit message
+ drivers/block/loop.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index 1518a6423279..1b35cbd029c7 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -977,13 +977,13 @@ loop_set_status_from_info(struct loop_device *lo,
+ 		return -EINVAL;
+ 	}
+ 
++	/* Avoid assigning overflow values */
++	if (info->lo_offset > LLONG_MAX || info->lo_sizelimit > LLONG_MAX)
++		return -EOVERFLOW;
++
+ 	lo->lo_offset = info->lo_offset;
+ 	lo->lo_sizelimit = info->lo_sizelimit;
+ 
+-	/* loff_t vars have been assigned __u64 */
+-	if (lo->lo_offset < 0 || lo->lo_sizelimit < 0)
+-		return -EOVERFLOW;
+-
+ 	memcpy(lo->lo_file_name, info->lo_file_name, LO_NAME_SIZE);
+ 	lo->lo_file_name[LO_NAME_SIZE-1] = 0;
+ 	lo->lo_flags = info->lo_flags;
 -- 
-Damien Le Moal
-Western Digital Research
+2.31.1
 
