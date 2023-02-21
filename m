@@ -2,99 +2,134 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B5FBDC6379F
-	for <linux-block@archiver.kernel.org>; Tue, 21 Feb 2023 09:01:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DAFEC61DA3
+	for <linux-block@archiver.kernel.org>; Tue, 21 Feb 2023 09:14:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233614AbjBUJBP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 21 Feb 2023 04:01:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45592 "EHLO
+        id S233870AbjBUJOf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 21 Feb 2023 04:14:35 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54396 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231546AbjBUJBO (ORCPT
+        with ESMTP id S233871AbjBUJOd (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 21 Feb 2023 04:01:14 -0500
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C07D123C76;
-        Tue, 21 Feb 2023 01:01:10 -0800 (PST)
-Received: from mail02.huawei.com (unknown [172.30.67.143])
-        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4PLYDJ14nTz4f3jHb;
-        Tue, 21 Feb 2023 17:01:04 +0800 (CST)
-Received: from huaweicloud.com (unknown [10.175.127.227])
-        by APP3 (Coremail) with SMTP id _Ch0CgBH9CFQiPRjJHy_Dg--.58311S4;
-        Tue, 21 Feb 2023 17:01:06 +0800 (CST)
-From:   Yu Kuai <yukuai1@huaweicloud.com>
-To:     hch@lst.de, ming.lei@redhat.com, axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        yukuai3@huawei.com, yukuai1@huaweicloud.com, yi.zhang@huawei.com,
-        yangerkun@huawei.com
-Subject: [PATCH] blk-mq: quiesce queue while reallocating hctxs
-Date:   Tue, 21 Feb 2023 17:24:36 +0800
-Message-Id: <20230221092436.3570192-1-yukuai1@huaweicloud.com>
-X-Mailer: git-send-email 2.31.1
+        Tue, 21 Feb 2023 04:14:33 -0500
+Received: from esa5.hgst.iphmx.com (esa5.hgst.iphmx.com [216.71.153.144])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5409F14498
+        for <linux-block@vger.kernel.org>; Tue, 21 Feb 2023 01:14:18 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1676970858; x=1708506858;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=k9SZeacDb9eLNQtlyjp/+pCtwgcI4xgvzkphSJgUW10=;
+  b=Hk7aX0++6NRqdqfv0G4Bjfw6HP81ru2+qvNWRnmp0v76luct00vwJoCL
+   2ROXOXyR6UfX9JoNu532oIppuyjEoM0+5WKYoTz8mViRYdlcdNtPI2N2A
+   rlvRq3NSYFx2XHRVSCUZ2diFn+UqCPyPEomCOHwRl+mHGsDqv77vnT4e6
+   YrEg/3GnEwYcMXqRHjejQqY08tkZY+r1na26uOl3HYeXDrRqzqHU7yaVN
+   rcxPNGfWgpQaKFl0rWAyc1oBEk0T4meqgiULSQeYJ7JgzgC80lm/jhOS6
+   /NuoKXg94Ap/QhiXi+vSTsQoGQ4nZuq6na5rRaSS/EMys1fWIwWaTXm2n
+   A==;
+X-IronPort-AV: E=Sophos;i="5.97,315,1669046400"; 
+   d="scan'208";a="223586682"
+Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
+  by ob1.hgst.iphmx.com with ESMTP; 21 Feb 2023 17:14:17 +0800
+IronPort-SDR: utv13ji6P0UXzmsEEZKUtULwvaoDSBcnRb8FQ9FjtyIloMi5gGq1/Au71IaK596P6oIHYE5qCJ
+ Ekc2ACmPVAAIMN9PlEL4DezG+bpgGOIa7ueiSaEqusMNZIxU+MHEfOQVoPFf2NMHrj7qvELhkP
+ HGJ10KMDXKFvBz7MySQxaJ9CL0TdV0xUN7RONJRtSybKVf+W8JkESBcLs66FoPafO1PauJeKVo
+ 6w6x7ZKIovxqLw/0cLaY8XU+tSi3UpJgtCyW0VVA5RXFkpel6TJwSAxXY/k6XYI1Bv6fQ86WFE
+ gnY=
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 21 Feb 2023 00:31:17 -0800
+IronPort-SDR: M6uF6hUwMhsnFfEAsiGLzzlKQOdVA4bu7AifSbx+b4S+pMDSYfP0Wel4KH7zkJkQrY1EB85dbu
+ zCE04Fnu5i6KBNQEYf9c7LZb5mE4oZe9PAUbhpENu/RUO3OXDT9Z4IdwJyTdr1BipdHHYCuhNL
+ pl3JguLfdwaafS0cKjcifaZ3ZfB1Qw2JzN0kqtXiHcjhSJYpadrQR8dAwkZVNetyVoaU2jbNP/
+ g0KYRUwtav9V+n/D7CkfBu8sUym0WqNhTA3i9ZUHGdUVxQIHgHBq6gT+B3s499k5Wx+r5FHtNt
+ nJQ=
+WDCIronportException: Internal
+Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
+  by uls-op-cesaip02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 21 Feb 2023 01:14:18 -0800
+Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4PLYWX6ldPz1RvTp
+        for <linux-block@vger.kernel.org>; Tue, 21 Feb 2023 01:14:16 -0800 (PST)
+Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
+        reason="pass (just generated, assumed good)"
+        header.d=opensource.wdc.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
+        opensource.wdc.com; h=content-transfer-encoding:content-type
+        :in-reply-to:organization:from:references:to:content-language
+        :subject:user-agent:mime-version:date:message-id; s=dkim; t=
+        1676970856; x=1679562857; bh=k9SZeacDb9eLNQtlyjp/+pCtwgcI4xgvzkp
+        hSJgUW10=; b=JhbgQ9zXWY9tYKN8PkATIpy0RHGxkF+ar2L2TUqe9mTezP8EJ8C
+        +KagVt5hpC1LzaUt9bNY5PsV+JpZ1XjJ7Rcqiv7RT+1gQTbkWRECEqL0hJTVGYUD
+        7UJxTked0An24GFaKUI9wyhurblEnw0WP+UkYvo8IKFc+nRBBdZkJOiNqVkUW6r3
+        AWf9ydGe2seLyIgDVvRqvx50Wiet0eKv0iRPj3/1kaXyQjfWQ1MrPDS3ielIyuLz
+        Qv05xlc8lRly0isLB5zf7OsBQsnBbCl9ADQodAigf30BTdmG6/xHerRrMJ2RyCcv
+        n2O5GWpNE4gDhP38r0R/z+uUn9VQ6c3WMtg==
+X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
+Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
+        by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
+        with ESMTP id Q_d_5foaXshI for <linux-block@vger.kernel.org>;
+        Tue, 21 Feb 2023 01:14:16 -0800 (PST)
+Received: from [10.225.163.9] (unknown [10.225.163.9])
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4PLYWW1N5Tz1RvLy;
+        Tue, 21 Feb 2023 01:14:15 -0800 (PST)
+Message-ID: <78830e38-e7a4-24e5-277e-f8e5022c59ef@opensource.wdc.com>
+Date:   Tue, 21 Feb 2023 18:14:14 +0900
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: _Ch0CgBH9CFQiPRjJHy_Dg--.58311S4
-X-Coremail-Antispam: 1UD129KBjvJXoW7tFW3Aw48Gryktr15KF4kWFg_yoW8WF4UpF
-        W5CanrKw1IvF18Z34jvan3WFy5JFs5Wr1a9r4ag34Ykr1jkrs2qr18Jr42vrW8ArZ5Arsx
-        KrWDJrWkZF4DArDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUyK14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-        1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-        JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-        CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-        2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-        W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1l42xK82IYc2Ij64vI
-        r41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8Gjc
-        xK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0
-        cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42xK8V
-        AvwI8IcIk0rVWrJr0_WFyUJwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF
-        7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfUoOJ5UUUUU
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
-X-CFilter-Loop: Reflected
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.7.2
+Subject: Re: [PATCH] block, bfq: free 'sync_bfqq' after bic_set_bfqq() in
+ bfq_sync_bfqq_move()
+Content-Language: en-US
+To:     Yu Kuai <yukuai1@huaweicloud.com>, jack@suse.cz, axboe@kernel.dk,
+        paolo.valente@linaro.org
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yukuai3@huawei.com, yi.zhang@huawei.com, yangerkun@huawei.com
+References: <e2071a24-cd25-e5bd-9166-a3b575b7bf4a@huaweicloud.com>
+ <20230221082905.3389012-1-yukuai1@huaweicloud.com>
+From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
+Organization: Western Digital Research
+In-Reply-To: <20230221082905.3389012-1-yukuai1@huaweicloud.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Yu Kuai <yukuai3@huawei.com>
+On 2/21/23 17:29, Yu Kuai wrote:
+> From: Yu Kuai <yukuai3@huawei.com>
+> 
+> As explained in commit b600de2d7d3a ("block, bfq: fix uaf for bfqq in
+> bic_set_bfqq()"), bfqq should not be freed before bic_set_bfqq().
+> However, this is broken while merging commit 9778369a2d6c ("block, bfq:
+> split sync bfq_queues on a per-actuator basis") from branch
+> for-6.3/block.
 
-commit 8237c01f1696 ("blk-mq: use quiesced elevator switch when
-reinitializing queues") add quiesce queue while switching elevator,
-however, if old elevator is none, queue is still not quiesced. Hence
-reallocating hctxs can concurrent with run queue. Fix it by also
-quiesce queue in the beginning of __blk_mq_update_nr_hw_queues().
+The patch looks OK to me, but the commit message is not super clear. What is
+broken exactly ?
 
-Signed-off-by: Yu Kuai <yukuai3@huawei.com>
----
- block/blk-mq.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+> 
+> Fixes: 9778369a2d6c ("block, bfq: split sync bfq_queues on a per-actuator basis")
+> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+> ---
+>  block/bfq-cgroup.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/block/bfq-cgroup.c b/block/bfq-cgroup.c
+> index ea3638e06e04..89ffb3aa992c 100644
+> --- a/block/bfq-cgroup.c
+> +++ b/block/bfq-cgroup.c
+> @@ -746,8 +746,8 @@ static void bfq_sync_bfqq_move(struct bfq_data *bfqd,
+>  		 * old cgroup.
+>  		 */
+>  		bfq_put_cooperator(sync_bfqq);
+> -		bfq_release_process_ref(bfqd, sync_bfqq);
+>  		bic_set_bfqq(bic, NULL, true, act_idx);
+> +		bfq_release_process_ref(bfqd, sync_bfqq);
+>  	}
+>  }
+>  
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index d3494a796ba8..fb44ef0dff8a 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -4691,8 +4691,10 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
- 	if (set->nr_maps == 1 && nr_hw_queues == set->nr_hw_queues)
- 		return;
- 
--	list_for_each_entry(q, &set->tag_list, tag_set_list)
-+	list_for_each_entry(q, &set->tag_list, tag_set_list) {
- 		blk_mq_freeze_queue(q);
-+		blk_mq_quiesce_queue(q);
-+	}
- 	/*
- 	 * Switch IO scheduler to 'none', cleaning up the data associated
- 	 * with the previous scheduler. We will switch back once we are done
-@@ -4741,8 +4743,10 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
- 	list_for_each_entry(q, &set->tag_list, tag_set_list)
- 		blk_mq_elv_switch_back(&head, q);
- 
--	list_for_each_entry(q, &set->tag_list, tag_set_list)
-+	list_for_each_entry(q, &set->tag_list, tag_set_list) {
-+		blk_mq_unquiesce_queue(q);
- 		blk_mq_unfreeze_queue(q);
-+	}
- }
- 
- void blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set, int nr_hw_queues)
 -- 
-2.31.1
+Damien Le Moal
+Western Digital Research
 
