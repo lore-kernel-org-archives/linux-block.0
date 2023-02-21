@@ -2,74 +2,66 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 38392C64ED6
-	for <linux-block@archiver.kernel.org>; Tue, 21 Feb 2023 16:58:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EE96FC61DA3
+	for <linux-block@archiver.kernel.org>; Tue, 21 Feb 2023 17:27:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234236AbjBUQ6u (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 21 Feb 2023 11:58:50 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59572 "EHLO
+        id S235065AbjBUR10 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 21 Feb 2023 12:27:26 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42878 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234226AbjBUQ6p (ORCPT
+        with ESMTP id S234430AbjBUR1X (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 21 Feb 2023 11:58:45 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2897FAD20
-        for <linux-block@vger.kernel.org>; Tue, 21 Feb 2023 08:57:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1676998670;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=UBi/Vc+mRROdrEC455aN+NdpNW+dE+GmksUXJel4JK4=;
-        b=KpqOe78vPy4pyBBuo/a2gJSYXWe9TMc7WBe1fT6oGO390p15Uk619wfE1kVjElSF4T2KGn
-        G3iRGsFito/TXyPlRIHmU23rCGuOXdEjHi8ReerQyGzYp7pc1mL+pxASlkGlFAQeMJ1do6
-        862UxTge2TH3jrEzQMo/0AZEDIsqjqc=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-561-OLf3luQ8M36JB5-LMaE-cg-1; Tue, 21 Feb 2023 11:57:46 -0500
-X-MC-Unique: OLf3luQ8M36JB5-LMaE-cg-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 29062100F90A;
-        Tue, 21 Feb 2023 16:57:45 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.33.36.18])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 13F98492B05;
-        Tue, 21 Feb 2023 16:57:43 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <Y9KtCc+4n5uANB2f@casper.infradead.org>
-References: <Y9KtCc+4n5uANB2f@casper.infradead.org>
-To:     Matthew Wilcox <willy@infradead.org>
-Cc:     dhowells@redhat.com, lsf-pc@lists.linux-foundation.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        linux-block@vger.kernel.org, linux-ide@vger.kernel.org,
-        linux-scsi@vger.kernel.org, linux-nvme@lists.infradead.org,
-        bpf@vger.kernel.org
-Subject: Re: [LSF/MM/BPF TOPIC] State Of The Page
+        Tue, 21 Feb 2023 12:27:23 -0500
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 595C82F783;
+        Tue, 21 Feb 2023 09:27:14 -0800 (PST)
+Received: by mail-pl1-f182.google.com with SMTP id bh1so5832983plb.11;
+        Tue, 21 Feb 2023 09:27:14 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=0s3W4yEjy/qMzlPpLjsQNo1D3zcbdTGIukQ9oB3kUhw=;
+        b=BXT007ou1rCMWPFabIKurFPeRgGL8DGjQ9jUKn2cdhJRx1Vq4VpPEf3qk6lPQINo6m
+         Ld8Dy7cNjFU8tEj060kU7cuusu2IMzNBGqPCnyim07d4lzAP61bkG/g5R5SdoHSHtKA7
+         EUVjLFEEEB8Y3BWwsbyxsQoxCJPQky5Czs3DfvS5P9+GaZisqmsU4jefF+W04QJl4gOp
+         L3cB0bciSWh4j7G6mPGuNZpVXH0xWUwVHf8lkDdpU2bQGMYLRv4hwIk8FDfEWVj45JyK
+         PKdwm4zpidqHAwaNxz6bDfeNtzbu+tAVbUPS2/R5zSFR69SJOAZKJn5Q7IQdmkxV/MsK
+         ddbg==
+X-Gm-Message-State: AO0yUKXTPhADGP/1xThWxEecWvUfxTNK6TG2uZZqJ72bIWAHDWJJhKvd
+        XoExCPtPGcPEMNX2vH7yQgV/kXMfcPM=
+X-Google-Smtp-Source: AK7set/KbW3QmbPYt/aN+FB9IwVtksBA1hObQbi6EK0KaeukmqU0ynwIYXwcxu1uvWtgX3t0Azwz5A==
+X-Received: by 2002:a17:902:e84b:b0:19a:84db:76ed with SMTP id t11-20020a170902e84b00b0019a84db76edmr9283784plg.15.1677000433499;
+        Tue, 21 Feb 2023 09:27:13 -0800 (PST)
+Received: from ?IPV6:2620:0:1000:2514:6f67:63f5:599a:2f4c? ([2620:0:1000:2514:6f67:63f5:599a:2f4c])
+        by smtp.gmail.com with ESMTPSA id u2-20020a170902bf4200b00199136ded1dsm10165292pls.112.2023.02.21.09.27.11
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 21 Feb 2023 09:27:12 -0800 (PST)
+Message-ID: <dfb154c1-ab01-ef67-f23d-bd840ff0c2fe@acm.org>
+Date:   Tue, 21 Feb 2023 09:27:09 -0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <2897037.1676998663.1@warthog.procyon.org.uk>
-Date:   Tue, 21 Feb 2023 16:57:43 +0000
-Message-ID: <2897038.1676998663@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.6.0
+Subject: Re: [PATCH v2] blk-ioprio: Introduce promote-to-rt policy
+Content-Language: en-US
+To:     Hou Tao <houtao@huaweicloud.com>, linux-block@vger.kernel.org
+Cc:     Jan Kara <jack@suse.cz>, Bagas Sanjaya <bagasdotme@gmail.com>,
+        Jens Axboe <axboe@kernel.dk>, cgroups@vger.kernel.org,
+        Tejun Heo <tj@kernel.org>, Zefan Li <lizefan.x@bytedance.com>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        Jonathan Corbet <corbet@lwn.net>, linux-kernel@vger.kernel.org,
+        linux-doc@vger.kernel.org, houtao1@huawei.com
+References: <20230220135428.2632906-1-houtao@huaweicloud.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20230220135428.2632906-1-houtao@huaweicloud.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Matthew Wilcox <willy@infradead.org> wrote:
+On 2/20/23 05:54, Hou Tao wrote:
+> From: Hou Tao <houtao1@huawei.com>
 
-> I'd like to do another session on how the struct page dismemberment
-> is going and what remains to be done.  Given how widely struct page is
-> used, I think there will be interest from more than just MM, so I'd
-> suggest a plenary session.
-
-I'd certainly be interested in that.  I've recently been looking into
-improving folio support in various places, including now splice and pipes.
-
-David
-
+Reviewed-by: Bart Van Assche <bvanassche@acm.org>
