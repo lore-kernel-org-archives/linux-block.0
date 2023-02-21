@@ -2,56 +2,52 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DB72C61DA3
-	for <linux-block@archiver.kernel.org>; Tue, 21 Feb 2023 08:05:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B5FBDC6379F
+	for <linux-block@archiver.kernel.org>; Tue, 21 Feb 2023 09:01:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233179AbjBUIFk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 21 Feb 2023 03:05:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53854 "EHLO
+        id S233614AbjBUJBP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 21 Feb 2023 04:01:15 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45592 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232813AbjBUIFj (ORCPT
+        with ESMTP id S231546AbjBUJBO (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 21 Feb 2023 03:05:39 -0500
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 183FB1E1D0;
-        Tue, 21 Feb 2023 00:05:38 -0800 (PST)
+        Tue, 21 Feb 2023 04:01:14 -0500
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C07D123C76;
+        Tue, 21 Feb 2023 01:01:10 -0800 (PST)
 Received: from mail02.huawei.com (unknown [172.30.67.143])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4PLX0F05xDz4f3vf1;
-        Tue, 21 Feb 2023 16:05:33 +0800 (CST)
+        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4PLYDJ14nTz4f3jHb;
+        Tue, 21 Feb 2023 17:01:04 +0800 (CST)
 Received: from huaweicloud.com (unknown [10.175.127.227])
-        by APP3 (Coremail) with SMTP id _Ch0CgCHgR9Ne_RjCzK9Dg--.13531S4;
-        Tue, 21 Feb 2023 16:05:34 +0800 (CST)
+        by APP3 (Coremail) with SMTP id _Ch0CgBH9CFQiPRjJHy_Dg--.58311S4;
+        Tue, 21 Feb 2023 17:01:06 +0800 (CST)
 From:   Yu Kuai <yukuai1@huaweicloud.com>
-To:     jack@suse.cz, axboe@kernel.dk, paolo.valente@linaro.org,
-        damien.lemoal@opensource.wdc.com
+To:     hch@lst.de, ming.lei@redhat.com, axboe@kernel.dk
 Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         yukuai3@huawei.com, yukuai1@huaweicloud.com, yi.zhang@huawei.com,
         yangerkun@huawei.com
-Subject: [PATCH] block, bfq: free 'sync_bfqq' after bic_set_bfqq() in bfq_sync_bfqq_move()
-Date:   Tue, 21 Feb 2023 16:29:05 +0800
-Message-Id: <20230221082905.3389012-1-yukuai1@huaweicloud.com>
+Subject: [PATCH] blk-mq: quiesce queue while reallocating hctxs
+Date:   Tue, 21 Feb 2023 17:24:36 +0800
+Message-Id: <20230221092436.3570192-1-yukuai1@huaweicloud.com>
 X-Mailer: git-send-email 2.31.1
-In-Reply-To: <e2071a24-cd25-e5bd-9166-a3b575b7bf4a@huaweicloud.com>
-References: <e2071a24-cd25-e5bd-9166-a3b575b7bf4a@huaweicloud.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: _Ch0CgCHgR9Ne_RjCzK9Dg--.13531S4
-X-Coremail-Antispam: 1UD129KBjvdXoWrKr1xtw1xJFyUJF1DCr1kAFb_yoWDGFX_t3
-        WkGrn7tr48Cas0kF1jyFn0yFW5K3y8Xws8XFnYgF9xZa45JFn8C3s3trn7Can5ZFW7K343
-        Xw1fWry7AFsYyjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-        9fnUUIcSsGvfJTRUUUbxkFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
-        6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
-        A2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j
-        6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
-        Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
-        I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
-        4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628v
-        n2kIc2xKxwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F4
-        0E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFyl
-        IxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxV
-        AFwI0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6rW3Jr0E3s1lIxAIcVC2z280aVAFwI0_
-        Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7VUb
-        XdbUUUUUU==
+X-CM-TRANSID: _Ch0CgBH9CFQiPRjJHy_Dg--.58311S4
+X-Coremail-Antispam: 1UD129KBjvJXoW7tFW3Aw48Gryktr15KF4kWFg_yoW8WF4UpF
+        W5CanrKw1IvF18Z34jvan3WFy5JFs5Wr1a9r4ag34Ykr1jkrs2qr18Jr42vrW8ArZ5Arsx
+        KrWDJrWkZF4DArDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUyK14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+        1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+        JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+        CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+        2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+        W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1l42xK82IYc2Ij64vI
+        r41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8Gjc
+        xK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0
+        cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42xK8V
+        AvwI8IcIk0rVWrJr0_WFyUJwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF
+        7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfUoOJ5UUUUU
 X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 X-CFilter-Loop: Reflected
 Precedence: bulk
@@ -60,32 +56,45 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Yu Kuai <yukuai3@huawei.com>
 
-As explained in commit b600de2d7d3a ("block, bfq: fix uaf for bfqq in
-bic_set_bfqq()"), bfqq should not be freed before bic_set_bfqq().
-However, this is broken while merging commit 9778369a2d6c ("block, bfq:
-split sync bfq_queues on a per-actuator basis") from branch
-for-6.3/block.
+commit 8237c01f1696 ("blk-mq: use quiesced elevator switch when
+reinitializing queues") add quiesce queue while switching elevator,
+however, if old elevator is none, queue is still not quiesced. Hence
+reallocating hctxs can concurrent with run queue. Fix it by also
+quiesce queue in the beginning of __blk_mq_update_nr_hw_queues().
 
-Fixes: 9778369a2d6c ("block, bfq: split sync bfq_queues on a per-actuator basis")
 Signed-off-by: Yu Kuai <yukuai3@huawei.com>
 ---
- block/bfq-cgroup.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ block/blk-mq.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
-diff --git a/block/bfq-cgroup.c b/block/bfq-cgroup.c
-index ea3638e06e04..89ffb3aa992c 100644
---- a/block/bfq-cgroup.c
-+++ b/block/bfq-cgroup.c
-@@ -746,8 +746,8 @@ static void bfq_sync_bfqq_move(struct bfq_data *bfqd,
- 		 * old cgroup.
- 		 */
- 		bfq_put_cooperator(sync_bfqq);
--		bfq_release_process_ref(bfqd, sync_bfqq);
- 		bic_set_bfqq(bic, NULL, true, act_idx);
-+		bfq_release_process_ref(bfqd, sync_bfqq);
- 	}
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index d3494a796ba8..fb44ef0dff8a 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -4691,8 +4691,10 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
+ 	if (set->nr_maps == 1 && nr_hw_queues == set->nr_hw_queues)
+ 		return;
+ 
+-	list_for_each_entry(q, &set->tag_list, tag_set_list)
++	list_for_each_entry(q, &set->tag_list, tag_set_list) {
+ 		blk_mq_freeze_queue(q);
++		blk_mq_quiesce_queue(q);
++	}
+ 	/*
+ 	 * Switch IO scheduler to 'none', cleaning up the data associated
+ 	 * with the previous scheduler. We will switch back once we are done
+@@ -4741,8 +4743,10 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
+ 	list_for_each_entry(q, &set->tag_list, tag_set_list)
+ 		blk_mq_elv_switch_back(&head, q);
+ 
+-	list_for_each_entry(q, &set->tag_list, tag_set_list)
++	list_for_each_entry(q, &set->tag_list, tag_set_list) {
++		blk_mq_unquiesce_queue(q);
+ 		blk_mq_unfreeze_queue(q);
++	}
  }
  
+ void blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set, int nr_hw_queues)
 -- 
 2.31.1
 
