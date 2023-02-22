@@ -2,116 +2,151 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 779F5C61DA4
-	for <linux-block@archiver.kernel.org>; Wed, 22 Feb 2023 03:48:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CA35C61DA4
+	for <linux-block@archiver.kernel.org>; Wed, 22 Feb 2023 07:38:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231441AbjBVDsg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 21 Feb 2023 22:48:36 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39788 "EHLO
+        id S230507AbjBVHiJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 22 Feb 2023 02:38:09 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59654 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231334AbjBVDsf (ORCPT
+        with ESMTP id S229581AbjBVHiJ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 21 Feb 2023 22:48:35 -0500
-Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 735A8C149
-        for <linux-block@vger.kernel.org>; Tue, 21 Feb 2023 19:48:33 -0800 (PST)
-Received: by mail-pl1-x62d.google.com with SMTP id bh1so7356563plb.11
-        for <linux-block@vger.kernel.org>; Tue, 21 Feb 2023 19:48:33 -0800 (PST)
+        Wed, 22 Feb 2023 02:38:09 -0500
+Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC8F031E1D;
+        Tue, 21 Feb 2023 23:38:07 -0800 (PST)
+Received: by mail-pj1-x1031.google.com with SMTP id nt5-20020a17090b248500b00237161e33f4so5487305pjb.4;
+        Tue, 21 Feb 2023 23:38:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112; t=1677037713;
+        d=gmail.com; s=20210112;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=Jr6aPM8WoqO9M0U1wWroCFGHljbEXUos5CEjfVWF7b4=;
-        b=q3fHkTGKuXrK/WhnT8D/LYL/zrYnVUWi59OMUv+Vf6LD3FZz3K936yZM4xrfF6DZRn
-         MDAszdYeSfvasFG9zlkYXWwNDbhTn9xNewXWzChHExxgaam/P3iinA6/spziIRh5GeZB
-         4X8Nyv0YqQ9RVT8DTKRPsin6Oo6didyVEyjcYtPNQcRGm+81mp4y0cSzAnXTFi1cgNRd
-         nBQtGkkw59kIHHtuNplHB8BdVS2GeuJdxVWg26FBH3ehQRSWa5iQwotFa0S0dB9sTY2A
-         cL/iZwYuTTHLEhE4ZxqmocvramzgaD3VvbwrNXiUR1zHEh1xww2ulpY1sgeh9vojt0h2
-         dMVA==
+        bh=tQnhk4w+A1CZuSiFNzZYnpV69X8Dsuspy9qsHPKjTI0=;
+        b=kgMH6/tfuXU3Gt2XMp21OuwvVA7LLi2oGBFlBP4ahaNQCsd817zZxxjh4mmlcyGvAj
+         74AoHp4DwwrMqH84r7BaW1B5YjzjPwgl5Lqc5kp3BY+TJMmpy22BB1GiBDCLUoW0DLaD
+         lH0rIPkmqTCJ8UVbVqQrNVrQvnT9soVkZ9Wol5REsAUZesfvlxpnMO/cY1oAAGHLRkTS
+         6ixharSxG0r0hXm7NVnsOZLiF+2X/nH7PYpG+RemZ7+HrHLZIwvVxop0E1tSlEDDa8UI
+         cGCbTsjy4lmO8cPMpSI3iN+CTPnPugV5b2m03N3L/ujetT9wDtOE6OTtlhDG5NoGtav6
+         yZKw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1677037713;
+        d=1e100.net; s=20210112;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Jr6aPM8WoqO9M0U1wWroCFGHljbEXUos5CEjfVWF7b4=;
-        b=l6DpzDnwN8SIzKM/NMWRoVlVAMcqgfqW0Vd0eRj599AgRU3WPIakucI+r+R/X4Mau3
-         kMQLtBO4HVNkIm//6Sth/0KoCSpCDgdsEG4zk+HCEils93urk6eGzquiYYs0dSCBFtCN
-         Fnhey3/ajByFcuowaV3h4sQ6mD9y+82jH/2PdIn2zZWrpZfUqAkPOMQ32D1Jaxl5m5xQ
-         YrEge9STtNyMHzEd/PhNU8SV1EUArHtXzIMbYL+GpuKPbzJ9viPd/ZiPiqNvFR6oRWRb
-         8jSBvOeK4PhxS3s7is7P9rpesnUK+4bpwM5rySadIIQi/tIM+ypapcfysJMl0U6mjiXu
-         bJbA==
-X-Gm-Message-State: AO0yUKXKX/5l8nwLlD+VU9Qb0Ta3dh8vSnAk7yM4zADzEtmBH65GOroj
-        BXctjHXYz1biJRUkFkL1EnlYiBahEO4vlHwG
-X-Google-Smtp-Source: AK7set9CdaKlTB5s/hfjY3MZRZ6DrHZvSvNYjsWeeCfE1hVu6pNetjXpTYMLvoV9hMSbGNnW7oYW5w==
-X-Received: by 2002:a17:90b:148a:b0:233:6d76:27b7 with SMTP id js10-20020a17090b148a00b002336d7627b7mr6137879pjb.3.1677037712773;
-        Tue, 21 Feb 2023 19:48:32 -0800 (PST)
-Received: from [192.168.1.136] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id q15-20020a17090a178f00b00213202d77d9sm3882724pja.43.2023.02.21.19.48.32
+        bh=tQnhk4w+A1CZuSiFNzZYnpV69X8Dsuspy9qsHPKjTI0=;
+        b=teMmgQEtBHR35ppLNdZgCroI71RLLqe3l6qgVOHVlP1EIcQ7QIbDOYVJpxJNP9RAnc
+         BRE61D4Ve8Y23znqlJN6axh8ZN3CJYpklzaG8Al+qCb21EMFxYrLHVEsgmCPes3g5zMc
+         JvoSR7W49dlxJycxBZWoFELqTXC5lXZSk3hYcqLy0GKKkRn2X4tu3RcuCaqZM4zwL7jZ
+         8OixL8T4+ZpOCuHEaRVMnUO+j/Fz50u7akB/ZvV+ra3zL/B2OBv0ga+/FlISZujD3axM
+         x3G2r/Uqu6bYRW1bnYH9Z4yF5dMQVQHsKdbOPa17KMw59i/51u8ZAWI8XpRu0XvNhCd2
+         0Jog==
+X-Gm-Message-State: AO0yUKVRUlMx3mfXu8wkMOAyuG60zV2UnqR8rgPWYbXETJjlgczb2Y2k
+        GGPewTHPP2NjEW2py5RxROc=
+X-Google-Smtp-Source: AK7set9BPJiiiPA0ZWH3kfJoeUKXA2xqAuB/5VgGXoQcSKWcONnqYOqfJi5snvsOHG7lUNiCqyEK0A==
+X-Received: by 2002:a17:902:eccc:b0:19a:fdc9:7983 with SMTP id a12-20020a170902eccc00b0019afdc97983mr7640085plh.63.1677051487089;
+        Tue, 21 Feb 2023 23:38:07 -0800 (PST)
+Received: from [192.168.43.80] (subs02-180-214-232-84.three.co.id. [180.214.232.84])
+        by smtp.gmail.com with ESMTPSA id g12-20020a1709026b4c00b001992b8cf89bsm1182987plt.16.2023.02.21.23.38.03
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 21 Feb 2023 19:48:32 -0800 (PST)
-Message-ID: <02bde1b9-daa0-132d-605c-62793382ece6@kernel.dk>
-Date:   Tue, 21 Feb 2023 20:48:31 -0700
+        Tue, 21 Feb 2023 23:38:06 -0800 (PST)
+Message-ID: <5ff2b68a-a8fb-7901-2c38-1056a2c59f70@gmail.com>
+Date:   Wed, 22 Feb 2023 14:38:01 +0700
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.2
-Subject: Re: [GIT PULL for-6.3] Block updates for 6.3
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.8.0
+Subject: Re: [PATCH v2] blk-ioprio: Introduce promote-to-rt policy
 Content-Language: en-US
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Paolo Valente <paolo.valente@linaro.org>
-References: <5afa0795-775d-f710-7989-4c8e1cd7b56f@kernel.dk>
- <CAHk-=wiLu7VRyPUpthiV6qMJp1eN3n_wD+vAroDsnDZq05QsLA@mail.gmail.com>
- <9a048f21-1938-084d-b328-8a345bd20263@kernel.dk>
- <CAHk-=wimXoc_vsdfzVKAu6cHd_M1U3d5Dxtib1U4JdXMNUxLoQ@mail.gmail.com>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <CAHk-=wimXoc_vsdfzVKAu6cHd_M1U3d5Dxtib1U4JdXMNUxLoQ@mail.gmail.com>
+To:     Hou Tao <houtao@huaweicloud.com>, linux-block@vger.kernel.org
+Cc:     Bart Van Assche <bvanassche@acm.org>, Jan Kara <jack@suse.cz>,
+        Jens Axboe <axboe@kernel.dk>, cgroups@vger.kernel.org,
+        Tejun Heo <tj@kernel.org>, Zefan Li <lizefan.x@bytedance.com>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        Jonathan Corbet <corbet@lwn.net>, linux-kernel@vger.kernel.org,
+        linux-doc@vger.kernel.org, houtao1@huawei.com
+References: <20230220135428.2632906-1-houtao@huaweicloud.com>
+From:   Bagas Sanjaya <bagasdotme@gmail.com>
+In-Reply-To: <20230220135428.2632906-1-houtao@huaweicloud.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2/21/23 6:07?PM, Linus Torvalds wrote:
-> On Tue, Feb 21, 2023 at 4:03 PM Jens Axboe <axboe@kernel.dk> wrote:
->>
->> I'll double check it. The merge doesn't end up touching any of
->> bfq_sync_bfqq_move()
-> 
-> It absolutely does.
-> 
-> Or rather - your merge doesn't end up touching it, and I claim that's
-> exactly the problem.
-> 
-> My merge *does* touch it, and I think my merge is the right thing to do..
-> 
->> just conflicting with:
->>
->> bfq_check_ioprio_change(), where the release ordering should be upheld,
-> 
-> That's the trivial case.
-> 
-> But:
-> 
->> __bfq_bic_change_cgroup(), where it's still done after assigning the
->> async_bfqq.
-> 
-> No.
-> 
-> That's where bfq_sync_bfqq_move() *comes* from. See commit
-> 9778369a2d6c ("block, bfq: split sync bfq_queues on a per-actuator
-> basis").
-> 
-> The whole bfq_sync_bfqq_move() function didn't exist at all in the
-> tree that fixed the bfq_release_process_ref() ordering.
-> 
-> It was split out of the __bfq_bic_change_cgroup() code, so the change
-> to __bfq_bic_change_cgroup() needed to now instead be done in that
-> bfq_sync_bfqq_move() code.
+On 2/20/23 20:54, Hou Tao wrote:
+> diff --git a/Documentation/admin-guide/cgroup-v2.rst b/Documentation/admin-guide/cgroup-v2.rst
+> index 74cec76be9f2..ccfb9fdfbc16 100644
+> --- a/Documentation/admin-guide/cgroup-v2.rst
+> +++ b/Documentation/admin-guide/cgroup-v2.rst
+> @@ -2021,31 +2021,33 @@ that attribute:
+>    no-change
+>  	Do not modify the I/O priority class.
+>  
+> -  none-to-rt
+> -	For requests that do not have an I/O priority class (NONE),
+> -	change the I/O priority class into RT. Do not modify
+> -	the I/O priority class of other requests.
+> +  promote-to-rt
+> +	For requests that have a no-RT I/O priority class, change it into RT.
+"non-RT" maybe? Or the original wording is better?
+> +	Also change the priority level of these requests to 4. Do not modify
+> +	the I/O priority of requests that have priority class RT.>  
+>    restrict-to-be
+>  	For requests that do not have an I/O priority class or that have I/O
+> -	priority class RT, change it into BE. Do not modify the I/O priority
+> -	class of requests that have priority class IDLE.
+> +	priority class RT, change it into BE. Also change the priority level
+> +	of these requests to 0. Do not modify the I/O priority class of
+> +	requests that have priority class IDLE.
+>  
+>    idle
+>  	Change the I/O priority class of all requests into IDLE, the lowest
+>  	I/O priority class.
+>  
+> +  none-to-rt
+> +	Deprecated. Just an alias for promote-to-rt.
+> +
+>  The following numerical values are associated with the I/O priority policies:
+>  
+> -+-------------+---+
+> -| no-change   | 0 |
+> -+-------------+---+
+> -| none-to-rt  | 1 |
+> -+-------------+---+
+> -| rt-to-be    | 2 |
+> -+-------------+---+
+> -| all-to-idle | 3 |
+> -+-------------+---+
+> ++----------------+---+
+> +| no-change      | 0 |
+> ++----------------+---+
+> +| rt-to-be       | 2 |
+> ++----------------+---+
+> +| all-to-idle    | 3 |
+> ++----------------+---+
+>  
+>  The numerical value that corresponds to each I/O priority class is as follows:
+>  
+> @@ -2061,9 +2063,13 @@ The numerical value that corresponds to each I/O priority class is as follows:
+>  
+>  The algorithm to set the I/O priority class for a request is as follows:
+>  
+> -- Translate the I/O priority class policy into a number.
+> -- Change the request I/O priority class into the maximum of the I/O priority
+> -  class policy number and the numerical I/O priority class.
+> +- If I/O priority class policy is promote-to-rt, change the request I/O
+> +  priority class to IOPRIO_CLASS_RT and change the request I/O priority
+> +  level to 4.
+> +- If I/O priorityt class is not promote-to-rt, translate the I/O priority
+> +  class policy into a number, then change the request I/O priority class
+> +  into the maximum of the I/O priority class policy number and the numerical
+> +  I/O priority class.
+>  
+>  PID
+>  ---
 
-Yep I'm being dense, you're totally right and your merge is the right
-one.
+The rest is LGTM.
 
 -- 
-Jens Axboe
+An old man doll... just what I always wanted! - Clara
 
