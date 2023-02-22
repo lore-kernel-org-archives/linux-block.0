@@ -2,31 +2,31 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C4F4C6FA9D
-	for <linux-block@archiver.kernel.org>; Wed, 22 Feb 2023 13:26:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A9CCC677F1
+	for <linux-block@archiver.kernel.org>; Wed, 22 Feb 2023 13:26:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231726AbjBVN0O (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 22 Feb 2023 08:26:14 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44100 "EHLO
+        id S231602AbjBVN0R (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 22 Feb 2023 08:26:17 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44158 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231479AbjBVN0N (ORCPT
+        with ESMTP id S231185AbjBVN0P (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 22 Feb 2023 08:26:13 -0500
-Received: from out30-119.freemail.mail.aliyun.com (out30-119.freemail.mail.aliyun.com [115.124.30.119])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63FFB3B3C3;
-        Wed, 22 Feb 2023 05:25:42 -0800 (PST)
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R601e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045170;MF=xiaoguang.wang@linux.alibaba.com;NM=1;PH=DS;RN=7;SR=0;TI=SMTPD_---0VcH77h-_1677072336;
-Received: from localhost(mailfrom:xiaoguang.wang@linux.alibaba.com fp:SMTPD_---0VcH77h-_1677072336)
+        Wed, 22 Feb 2023 08:26:15 -0500
+Received: from out30-131.freemail.mail.aliyun.com (out30-131.freemail.mail.aliyun.com [115.124.30.131])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C8FE13B0E4;
+        Wed, 22 Feb 2023 05:25:46 -0800 (PST)
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R131e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046056;MF=xiaoguang.wang@linux.alibaba.com;NM=1;PH=DS;RN=7;SR=0;TI=SMTPD_---0VcH06.._1677072337;
+Received: from localhost(mailfrom:xiaoguang.wang@linux.alibaba.com fp:SMTPD_---0VcH06.._1677072337)
           by smtp.aliyun-inc.com;
-          Wed, 22 Feb 2023 21:25:36 +0800
+          Wed, 22 Feb 2023 21:25:38 +0800
 From:   Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>
 To:     linux-block@vger.kernel.org, io-uring@vger.kernel.org,
         bpf@vger.kernel.org
 Cc:     ming.lei@redhat.com, axboe@kernel.dk, asml.silence@gmail.com,
         ZiyangZhang@linux.alibaba.com
-Subject: [RFC v2 2/4] io_uring: enable io_uring to submit sqes located in kernel
-Date:   Wed, 22 Feb 2023 21:25:32 +0800
-Message-Id: <20230222132534.114574-3-xiaoguang.wang@linux.alibaba.com>
+Subject: [RFC v2 4/4] ublk_drv: add ebpf support
+Date:   Wed, 22 Feb 2023 21:25:34 +0800
+Message-Id: <20230222132534.114574-5-xiaoguang.wang@linux.alibaba.com>
 X-Mailer: git-send-email 2.37.1
 In-Reply-To: <20230222132534.114574-1-xiaoguang.wang@linux.alibaba.com>
 References: <20230222132534.114574-1-xiaoguang.wang@linux.alibaba.com>
@@ -36,263 +36,519 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Currently this feature can be used by userspace block device to reduce
-kernel & userspace memory copy overhead. With this feature, userspace
-block device driver can submit and complete io requests using kernel
-block layer io requests's memory data, and further, by using ebpf, we
-can customize how sqe is initialized, how io is submitted and completed.
+Currenly only one bpf_ublk_queue_sqe() ebpf is added, ublksrv target
+can use this helper to write ebpf prog to support ublk kernel & usersapce
+zero copy, please see ublksrv test codes for more info.
 
 Signed-off-by: Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>
 ---
- include/linux/io_uring.h       | 12 +++++++
- include/linux/io_uring_types.h |  8 ++++-
- io_uring/io_uring.c            | 59 ++++++++++++++++++++++++++++++++--
- io_uring/rsrc.c                | 18 +++++++++++
- io_uring/rsrc.h                |  4 +++
- io_uring/rw.c                  |  7 ++++
- 6 files changed, 104 insertions(+), 4 deletions(-)
+ drivers/block/ublk_drv.c       | 263 +++++++++++++++++++++++++++++++--
+ include/uapi/linux/bpf.h       |   1 +
+ include/uapi/linux/ublk_cmd.h  |  18 +++
+ kernel/bpf/verifier.c          |   3 +-
+ scripts/bpf_doc.py             |   4 +
+ tools/include/uapi/linux/bpf.h |   9 ++
+ 6 files changed, 286 insertions(+), 12 deletions(-)
 
-diff --git a/include/linux/io_uring.h b/include/linux/io_uring.h
-index 934e5dd4ccc0..b6816de8e31d 100644
---- a/include/linux/io_uring.h
-+++ b/include/linux/io_uring.h
-@@ -4,6 +4,7 @@
+diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+index b628e9eaefa6..d17ddb6fc27f 100644
+--- a/drivers/block/ublk_drv.c
++++ b/drivers/block/ublk_drv.c
+@@ -105,6 +105,12 @@ struct ublk_uring_cmd_pdu {
+  */
+ #define UBLK_IO_FLAG_NEED_GET_DATA 0x08
  
- #include <linux/sched.h>
- #include <linux/xarray.h>
-+#include <linux/uio.h>
- #include <uapi/linux/io_uring.h>
- 
- enum io_uring_cmd_flags {
-@@ -36,6 +37,10 @@ struct io_uring_cmd {
- 	u8		pdu[32]; /* available inline for free use */
++/*
++ * UBLK_IO_FLAG_BPF is set if IO command has be handled by ebpf prog instead
++ * of user space daemon.
++ */
++#define UBLK_IO_FLAG_BPF	0x10
++
+ struct ublk_io {
+ 	/* userspace buffer address from io cmd */
+ 	__u64	addr;
+@@ -114,6 +120,11 @@ struct ublk_io {
+ 	struct io_uring_cmd *cmd;
  };
  
-+struct io_fixed_iter {
-+	struct iov_iter iter;
++struct ublk_req_iter {
++	struct io_fixed_iter fixed_iter;
++	struct bio_vec *bvec;
 +};
 +
- #if defined(CONFIG_IO_URING)
- int io_uring_cmd_import_fixed(u64 ubuf, unsigned long len, int rw,
- 			      struct iov_iter *iter, void *ioucmd);
-@@ -65,6 +70,8 @@ static inline void io_uring_free(struct task_struct *tsk)
- 	if (tsk->io_uring)
- 		__io_uring_free(tsk);
- }
-+int io_uring_submit_sqe(int fd, const struct io_uring_sqe *sqe, u32 sqe_len,
-+			const struct io_fixed_iter *iter);
- #else
- static inline int io_uring_cmd_import_fixed(u64 ubuf, unsigned long len, int rw,
- 			      struct iov_iter *iter, void *ioucmd)
-@@ -96,6 +103,11 @@ static inline const char *io_uring_get_opcode(u8 opcode)
- {
- 	return "";
- }
-+int io_uring_submit_sqe(int fd, const struct io_uring_sqe *sqe, u32 sqe_len,
-+			const struct io_fixed_iter *iter)
+ struct ublk_queue {
+ 	int q_id;
+ 	int q_depth;
+@@ -163,6 +174,9 @@ struct ublk_device {
+ 	unsigned int		nr_queues_ready;
+ 	atomic_t		nr_aborted_queues;
+ 
++	struct bpf_prog		*io_bpf_prog;
++	struct ublk_req_iter	*iter_table;
++
+ 	/*
+ 	 * Our ubq->daemon may be killed without any notification, so
+ 	 * monitor each queue's daemon periodically
+@@ -189,10 +203,48 @@ static DEFINE_MUTEX(ublk_ctl_mutex);
+ 
+ static struct miscdevice ublk_misc;
+ 
++struct ublk_io_bpf_ctx {
++	struct ublk_bpf_ctx ctx;
++	struct ublk_device *ub;
++};
++
++static inline struct ublk_req_iter *ublk_get_req_iter(struct ublk_device *ub,
++					int qid, int tag)
 +{
-+	return 0;
++	return &(ub->iter_table[qid * ub->dev_info.queue_depth + tag]);
 +}
- #endif
- 
- #endif
-diff --git a/include/linux/io_uring_types.h b/include/linux/io_uring_types.h
-index 128a67a40065..07c14854dc21 100644
---- a/include/linux/io_uring_types.h
-+++ b/include/linux/io_uring_types.h
-@@ -398,6 +398,7 @@ enum {
- 	/* keep async read/write and isreg together and in order */
- 	REQ_F_SUPPORT_NOWAIT_BIT,
- 	REQ_F_ISREG_BIT,
-+	REQ_F_ITER_BIT,
- 
- 	/* not a real bit, just to check we're not overflowing the space */
- 	__REQ_F_LAST_BIT,
-@@ -467,6 +468,8 @@ enum {
- 	REQ_F_CLEAR_POLLIN	= BIT(REQ_F_CLEAR_POLLIN_BIT),
- 	/* hashed into ->cancel_hash_locked, protected by ->uring_lock */
- 	REQ_F_HASH_LOCKED	= BIT(REQ_F_HASH_LOCKED_BIT),
-+	/* buffer comes from fixed iter */
-+	REQ_F_ITER		= BIT(REQ_F_ITER_BIT),
- };
- 
- typedef void (*io_req_tw_func_t)(struct io_kiocb *req, bool *locked);
-@@ -527,7 +530,7 @@ struct io_kiocb {
- 	 * and after selection it points to the buffer ID itself.
- 	 */
- 	u16				buf_index;
--	unsigned int			flags;
-+	u64				flags;
- 
- 	struct io_cqe			cqe;
- 
-@@ -540,6 +543,9 @@ struct io_kiocb {
- 		/* store used ubuf, so we can prevent reloading */
- 		struct io_mapped_ubuf	*imu;
- 
-+		/* store fixed iter */
-+		const struct io_fixed_iter	*iter;
 +
- 		/* stores selected buf, valid IFF REQ_F_BUFFER_SELECTED is set */
- 		struct io_buffer	*kbuf;
- 
-diff --git a/io_uring/io_uring.c b/io_uring/io_uring.c
-index db623b3185c8..880b913d6d35 100644
---- a/io_uring/io_uring.c
-+++ b/io_uring/io_uring.c
-@@ -2232,7 +2232,8 @@ static __cold int io_submit_fail_init(const struct io_uring_sqe *sqe,
- }
- 
- static inline int io_submit_sqe(struct io_ring_ctx *ctx, struct io_kiocb *req,
--			 const struct io_uring_sqe *sqe)
-+			 const struct io_uring_sqe *sqe,
-+			 const struct io_fixed_iter *iter)
- 	__must_hold(&ctx->uring_lock)
- {
- 	struct io_submit_link *link = &ctx->submit_state.link;
-@@ -2241,6 +2242,10 @@ static inline int io_submit_sqe(struct io_ring_ctx *ctx, struct io_kiocb *req,
- 	ret = io_init_req(ctx, req, sqe);
- 	if (unlikely(ret))
- 		return io_submit_fail_init(sqe, req, ret);
-+	if (unlikely(iter)) {
-+		req->iter = iter;
-+		req->flags |= REQ_F_ITER;
-+	}
- 
- 	/* don't need @sqe from now on */
- 	trace_io_uring_submit_sqe(req, true);
-@@ -2392,7 +2397,7 @@ int io_submit_sqes(struct io_ring_ctx *ctx, unsigned int nr)
- 		 * Continue submitting even for sqe failure if the
- 		 * ring was setup with IORING_SETUP_SUBMIT_ALL
- 		 */
--		if (unlikely(io_submit_sqe(ctx, req, sqe)) &&
-+		if (unlikely(io_submit_sqe(ctx, req, sqe, NULL)) &&
- 		    !(ctx->flags & IORING_SETUP_SUBMIT_ALL)) {
- 			left--;
- 			break;
-@@ -3272,6 +3277,54 @@ static int io_get_ext_arg(unsigned flags, const void __user *argp, size_t *argsz
- 	return 0;
- }
- 
-+int io_uring_submit_sqe(int fd, const struct io_uring_sqe *sqe, u32 sqe_len,
-+			const struct io_fixed_iter *iter)
++BPF_CALL_4(bpf_ublk_queue_sqe, struct ublk_io_bpf_ctx *, bpf_ctx,
++	   struct io_uring_sqe *, sqe, u32, sqe_len, u32, fd)
 +{
-+	struct io_kiocb *req;
-+	struct fd f;
-+	int ret;
-+	struct io_ring_ctx *ctx;
++	struct ublk_req_iter *req_iter;
++	u16 q_id = bpf_ctx->ctx.q_id;
++	u16 tag = bpf_ctx->ctx.tag;
 +
-+	f = fdget(fd);
-+	if (unlikely(!f.file))
-+		return -EBADF;
-+
-+	ret = -EOPNOTSUPP;
-+	if (unlikely(!io_is_uring_fops(f.file))) {
-+		ret = -EBADF;
-+		goto out;
-+	}
-+	ctx = f.file->private_data;
-+
-+	mutex_lock(&ctx->uring_lock);
-+	if (unlikely(!io_alloc_req_refill(ctx)))
-+		goto out;
-+	req = io_alloc_req(ctx);
-+	if (unlikely(!req)) {
-+		ret = -ENOMEM;
-+		goto out;
-+	}
-+	if (!percpu_ref_tryget_many(&ctx->refs, 1)) {
-+		kmem_cache_free(req_cachep, req);
-+		ret = -EAGAIN;
-+		goto out;
-+	}
-+	percpu_counter_add(&current->io_uring->inflight, 1);
-+	refcount_add(1, &current->usage);
-+
-+	/* returns number of submitted SQEs or an error */
-+	ret = !io_submit_sqe(ctx, req, sqe, iter);
-+	mutex_unlock(&ctx->uring_lock);
-+	fdput(f);
-+	return ret;
-+
-+out:
-+	mutex_unlock(&ctx->uring_lock);
-+	fdput(f);
-+	return ret;
-+}
-+EXPORT_SYMBOL(io_uring_submit_sqe);
-+
- SYSCALL_DEFINE6(io_uring_enter, unsigned int, fd, u32, to_submit,
- 		u32, min_complete, u32, flags, const void __user *, argp,
- 		size_t, argsz)
-@@ -4270,7 +4323,7 @@ static int __init io_uring_init(void)
- 	BUILD_BUG_ON(SQE_COMMON_FLAGS >= (1 << 8));
- 	BUILD_BUG_ON((SQE_VALID_FLAGS | SQE_COMMON_FLAGS) != SQE_VALID_FLAGS);
- 
--	BUILD_BUG_ON(__REQ_F_LAST_BIT > 8 * sizeof(int));
-+	BUILD_BUG_ON(__REQ_F_LAST_BIT > 8 * sizeof(u64));
- 
- 	BUILD_BUG_ON(sizeof(atomic_t) != sizeof(u32));
- 
-diff --git a/io_uring/rsrc.c b/io_uring/rsrc.c
-index 18de10c68a15..cf1e53ba69b7 100644
---- a/io_uring/rsrc.c
-+++ b/io_uring/rsrc.c
-@@ -1380,3 +1380,21 @@ int io_import_fixed(int ddir, struct iov_iter *iter,
- 
- 	return 0;
- }
-+
-+int io_import_iter(int ddir, struct iov_iter *iter,
-+		   const struct io_fixed_iter *fixed_iter,
-+		   u64 offset, size_t len)
-+{
-+	size_t count;
-+
-+	if (WARN_ON_ONCE(!fixed_iter))
-+		return -EFAULT;
-+
-+	count = iov_iter_count(&(fixed_iter->iter));
-+	if (offset >= count || (offset + len) > count)
-+		return -EFAULT;
-+
-+	*iter = fixed_iter->iter;
++	req_iter = ublk_get_req_iter(bpf_ctx->ub, q_id, tag);
++	io_uring_submit_sqe(fd, sqe, sqe_len, &(req_iter->fixed_iter));
 +	return 0;
 +}
 +
-diff --git a/io_uring/rsrc.h b/io_uring/rsrc.h
-index 2b8743645efc..823001dbdcd0 100644
---- a/io_uring/rsrc.h
-+++ b/io_uring/rsrc.h
-@@ -69,6 +69,10 @@ int io_import_fixed(int ddir, struct iov_iter *iter,
- 			   struct io_mapped_ubuf *imu,
- 			   u64 buf_addr, size_t len);
- 
-+int io_import_iter(int ddir, struct iov_iter *iter,
-+		   const struct io_fixed_iter *fixed_iter,
-+		   u64 buf_addr, size_t len);
++const struct bpf_func_proto ublk_bpf_queue_sqe_proto = {
++	.func = bpf_ublk_queue_sqe,
++	.gpl_only = false,
++	.ret_type = RET_INTEGER,
++	.arg1_type = ARG_ANYTHING,
++	.arg2_type = ARG_ANYTHING,
++	.arg3_type = ARG_ANYTHING,
++	.arg4_type = ARG_ANYTHING,
++};
 +
- void __io_sqe_buffers_unregister(struct io_ring_ctx *ctx);
- int io_sqe_buffers_unregister(struct io_ring_ctx *ctx);
- int io_sqe_buffers_register(struct io_ring_ctx *ctx, void __user *arg,
-diff --git a/io_uring/rw.c b/io_uring/rw.c
-index 9c3ddd46a1ad..74079bcd7d6c 100644
---- a/io_uring/rw.c
-+++ b/io_uring/rw.c
-@@ -378,6 +378,13 @@ static struct iovec *__io_import_iovec(int ddir, struct io_kiocb *req,
- 		return NULL;
+ static const struct bpf_func_proto *
+ ublk_bpf_func_proto(enum bpf_func_id func_id, const struct bpf_prog *prog)
+ {
+-	return bpf_base_func_proto(func_id);
++	switch (func_id) {
++	case BPF_FUNC_ublk_queue_sqe:
++		return &ublk_bpf_queue_sqe_proto;
++	default:
++		return bpf_base_func_proto(func_id);
++	}
+ }
+ 
+ static bool ublk_bpf_is_valid_access(int off, int size,
+@@ -200,6 +252,23 @@ static bool ublk_bpf_is_valid_access(int off, int size,
+ 			const struct bpf_prog *prog,
+ 			struct bpf_insn_access_aux *info)
+ {
++	if (off < 0 || off >= sizeof(struct ublk_bpf_ctx))
++		return false;
++	if (off % size != 0)
++		return false;
++
++	switch (off) {
++	case offsetof(struct ublk_bpf_ctx, q_id):
++		return size == sizeof_field(struct ublk_bpf_ctx, q_id);
++	case offsetof(struct ublk_bpf_ctx, tag):
++		return size == sizeof_field(struct ublk_bpf_ctx, tag);
++	case offsetof(struct ublk_bpf_ctx, op):
++		return size == sizeof_field(struct ublk_bpf_ctx, op);
++	case offsetof(struct ublk_bpf_ctx, nr_sectors):
++		return size == sizeof_field(struct ublk_bpf_ctx, nr_sectors);
++	case offsetof(struct ublk_bpf_ctx, start_sector):
++		return size == sizeof_field(struct ublk_bpf_ctx, start_sector);
++	}
+ 	return false;
+ }
+ 
+@@ -324,7 +393,7 @@ static void ublk_put_device(struct ublk_device *ub)
+ static inline struct ublk_queue *ublk_get_queue(struct ublk_device *dev,
+ 		int qid)
+ {
+-       return (struct ublk_queue *)&(dev->__queues[qid * dev->queue_size]);
++	return (struct ublk_queue *)&(dev->__queues[qid * dev->queue_size]);
+ }
+ 
+ static inline bool ublk_rq_has_data(const struct request *rq)
+@@ -618,7 +687,6 @@ static void ublk_complete_rq(struct request *req)
+ {
+ 	struct ublk_queue *ubq = req->mq_hctx->driver_data;
+ 	struct ublk_io *io = &ubq->ios[req->tag];
+-	unsigned int unmapped_bytes;
+ 
+ 	/* failed read IO if nothing is read */
+ 	if (!io->res && req_op(req) == REQ_OP_READ)
+@@ -641,15 +709,19 @@ static void ublk_complete_rq(struct request *req)
  	}
  
-+	if (unlikely(req->flags & REQ_F_ITER)) {
-+		ret = io_import_iter(ddir, iter, req->iter, rw->addr, rw->len);
-+		if (ret)
-+			return ERR_PTR(ret);
-+		return NULL;
+ 	/* for READ request, writing data in iod->addr to rq buffers */
+-	unmapped_bytes = ublk_unmap_io(ubq, req, io);
++	if (likely(!(io->flags & UBLK_IO_FLAG_BPF))) {
++		unsigned int unmapped_bytes;
+ 
+-	/*
+-	 * Extremely impossible since we got data filled in just before
+-	 *
+-	 * Re-read simply for this unlikely case.
+-	 */
+-	if (unlikely(unmapped_bytes < io->res))
+-		io->res = unmapped_bytes;
++		unmapped_bytes = ublk_unmap_io(ubq, req, io);
++
++		/*
++		 * Extremely impossible since we got data filled in just before
++		 *
++		 * Re-read simply for this unlikely case.
++		 */
++		if (unlikely(unmapped_bytes < io->res))
++			io->res = unmapped_bytes;
++	}
+ 
+ 	if (blk_update_request(req, BLK_STS_OK, io->res))
+ 		blk_mq_requeue_request(req, true);
+@@ -708,12 +780,92 @@ static inline void __ublk_abort_rq(struct ublk_queue *ubq,
+ 	mod_delayed_work(system_wq, &ubq->dev->monitor_work, 0);
+ }
+ 
++static int ublk_init_uring_fixed_iter(struct ublk_queue *ubq, struct request *rq)
++{
++	struct ublk_device *ub = ubq->dev;
++	struct bio *bio = rq->bio;
++	struct bio_vec *bvec;
++	struct req_iterator rq_iter;
++	struct bio_vec tmp;
++	int nr_bvec = 0;
++	struct ublk_req_iter *req_iter;
++	unsigned int rw, offset;
++
++	req_iter = ublk_get_req_iter(ub, ubq->q_id, rq->tag);
++	if (req_op(rq) == REQ_OP_READ)
++		rw = ITER_DEST;
++	else
++		rw = ITER_SOURCE;
++
++	rq_for_each_bvec(tmp, rq, rq_iter)
++		nr_bvec++;
++	if (rq->bio != rq->biotail) {
++		bvec = kmalloc_array(nr_bvec, sizeof(struct bio_vec), GFP_NOIO);
++		if (!bvec)
++			return -EIO;
++		req_iter->bvec = bvec;
++
++		/*
++		 * The bios of the request may be started from the middle of
++		 * the 'bvec' because of bio splitting, so we can't directly
++		 * copy bio->bi_iov_vec to new bvec. The rq_for_each_bvec
++		 * API will take care of all details for us.
++		 */
++		rq_for_each_bvec(tmp, rq, rq_iter) {
++			*bvec = tmp;
++			bvec++;
++		}
++		bvec = req_iter->bvec;
++		offset = 0;
++	} else {
++		/*
++		 * Same here, this bio may be started from the middle of the
++		 * 'bvec' because of bio splitting, so offset from the bvec
++		 * must be passed to iov iterator
++		 */
++		offset = bio->bi_iter.bi_bvec_done;
++		bvec = __bvec_iter_bvec(bio->bi_io_vec, bio->bi_iter);
++		req_iter->bvec = NULL;
 +	}
 +
- 	buf = u64_to_user_ptr(rw->addr);
- 	sqe_len = rw->len;
++	iov_iter_bvec(&(req_iter->fixed_iter.iter), rw, bvec, nr_bvec, blk_rq_bytes(rq));
++	req_iter->fixed_iter.iter.iov_offset = offset;
++	return 0;
++}
++
++static int ublk_run_bpf_prog(struct ublk_queue *ubq, struct request *rq)
++{
++	int ret;
++	struct ublk_device *ub = ubq->dev;
++	struct ublk_io_bpf_ctx bpf_ctx;
++	u32 bpf_act;
++
++	if (!ub->io_bpf_prog)
++		return 0;
++
++	ret = ublk_init_uring_fixed_iter(ubq, rq);
++	if (ret < 0)
++		return UBLK_BPF_IO_ABORTED;
++
++	bpf_ctx.ub = ub;
++	bpf_ctx.ctx.q_id = ubq->q_id;
++	bpf_ctx.ctx.tag = rq->tag;
++	bpf_ctx.ctx.op = req_op(rq);
++	bpf_ctx.ctx.nr_sectors = blk_rq_sectors(rq);
++	bpf_ctx.ctx.start_sector = blk_rq_pos(rq);
++	bpf_act = bpf_prog_run_pin_on_cpu(ub->io_bpf_prog, &bpf_ctx);
++	return bpf_act;
++}
++
+ static inline void __ublk_rq_task_work(struct request *req)
+ {
+ 	struct ublk_queue *ubq = req->mq_hctx->driver_data;
++	struct ublk_device *ub = ubq->dev;
+ 	int tag = req->tag;
+ 	struct ublk_io *io = &ubq->ios[tag];
+ 	unsigned int mapped_bytes;
++	u32 bpf_act;
++	bool io_done = false;
  
+ 	pr_devel("%s: complete: op %d, qid %d tag %d io_flags %x addr %llx\n",
+ 			__func__, io->cmd->cmd_op, ubq->q_id, req->tag, io->flags,
+@@ -762,6 +914,10 @@ static inline void __ublk_rq_task_work(struct request *req)
+ 				ublk_get_iod(ubq, req->tag)->addr);
+ 	}
+ 
++	if (unlikely(ub->io_bpf_prog))
++		goto call_ebpf;
++
++normal_path:
+ 	mapped_bytes = ublk_map_io(ubq, req, io);
+ 
+ 	/* partially mapped, update io descriptor */
+@@ -784,7 +940,21 @@ static inline void __ublk_rq_task_work(struct request *req)
+ 			mapped_bytes >> 9;
+ 	}
+ 
++	if (!io_done)
++		ubq_complete_io_cmd(io, UBLK_IO_RES_OK);
++	return;
++
++call_ebpf:
+ 	ubq_complete_io_cmd(io, UBLK_IO_RES_OK);
++	bpf_act = ublk_run_bpf_prog(ubq, req);
++	switch (bpf_act) {
++	case UBLK_BPF_IO_ABORTED:
++	case UBLK_BPF_IO_DROP:
++	case UBLK_BPF_IO_PASS:
++		io_done = true;
++		goto normal_path;
++	}
++	io->flags |= UBLK_IO_FLAG_BPF;
+ }
+ 
+ static inline void ublk_forward_io_cmds(struct ublk_queue *ubq)
+@@ -1231,6 +1401,10 @@ static int ublk_ch_uring_cmd(struct io_uring_cmd *cmd, unsigned int issue_flags)
+ 			__func__, cmd->cmd_op, ub_cmd->q_id, tag,
+ 			ub_cmd->result);
+ 
++	/* To workaround task_work_add is not exported. */
++	if (unlikely(ub->io_bpf_prog && !(cmd->flags & IORING_URING_CMD_UNLOCK)))
++		goto out;
++
+ 	if (!(issue_flags & IO_URING_F_SQE128))
+ 		goto out;
+ 
+@@ -1295,6 +1469,14 @@ static int ublk_ch_uring_cmd(struct io_uring_cmd *cmd, unsigned int issue_flags)
+ 		io->flags |= UBLK_IO_FLAG_ACTIVE;
+ 		io->cmd = cmd;
+ 		ublk_commit_completion(ub, ub_cmd);
++		if (io->flags & UBLK_IO_FLAG_BPF) {
++			struct ublk_req_iter *req_iter;
++
++			req_iter = ublk_get_req_iter(ub, ubq->q_id, tag);
++			io->flags &= ~UBLK_IO_FLAG_BPF;
++			kfree(req_iter->bvec);
++			req_iter->bvec = NULL;
++		}
+ 		break;
+ 	case UBLK_IO_NEED_GET_DATA:
+ 		if (!(io->flags & UBLK_IO_FLAG_OWNED_BY_SRV))
+@@ -2009,6 +2191,59 @@ static int ublk_ctrl_end_recovery(struct io_uring_cmd *cmd)
+ 	return ret;
+ }
+ 
++static int ublk_ctrl_reg_bpf_prog(struct io_uring_cmd *cmd)
++{
++	struct ublksrv_ctrl_cmd *header = (struct ublksrv_ctrl_cmd *)cmd->cmd;
++	struct ublk_device *ub;
++	struct bpf_prog *prog;
++	int ret = 0, nr_queues, depth;
++
++	ub = ublk_get_device_from_id(header->dev_id);
++	if (!ub)
++		return -EINVAL;
++
++	mutex_lock(&ub->mutex);
++	nr_queues = ub->dev_info.nr_hw_queues;
++	depth = ub->dev_info.queue_depth;
++	ub->iter_table = kzalloc(sizeof(struct ublk_req_iter) * depth * nr_queues,
++				 GFP_KERNEL);
++	if (!ub->iter_table) {
++		ret =  -ENOMEM;
++		goto out_unlock;
++	}
++
++	prog = bpf_prog_get_type(header->data[0], BPF_PROG_TYPE_UBLK);
++	if (IS_ERR(prog)) {
++		kfree(ub->iter_table);
++		ret = PTR_ERR(prog);
++		goto out_unlock;
++	}
++	ub->io_bpf_prog = prog;
++
++out_unlock:
++	mutex_unlock(&ub->mutex);
++	ublk_put_device(ub);
++	return ret;
++}
++
++static int ublk_ctrl_unreg_bpf_prog(struct io_uring_cmd *cmd)
++{
++	struct ublksrv_ctrl_cmd *header = (struct ublksrv_ctrl_cmd *)cmd->cmd;
++	struct ublk_device *ub;
++
++	ub = ublk_get_device_from_id(header->dev_id);
++	if (!ub)
++		return -EINVAL;
++
++	mutex_lock(&ub->mutex);
++	bpf_prog_put(ub->io_bpf_prog);
++	ub->io_bpf_prog = NULL;
++	kfree(ub->iter_table);
++	ub->iter_table = NULL;
++	mutex_unlock(&ub->mutex);
++	ublk_put_device(ub);
++	return 0;
++}
+ static int ublk_ctrl_uring_cmd(struct io_uring_cmd *cmd,
+ 		unsigned int issue_flags)
+ {
+@@ -2059,6 +2294,12 @@ static int ublk_ctrl_uring_cmd(struct io_uring_cmd *cmd,
+ 	case UBLK_CMD_END_USER_RECOVERY:
+ 		ret = ublk_ctrl_end_recovery(cmd);
+ 		break;
++	case UBLK_CMD_REG_BPF_PROG:
++		ret = ublk_ctrl_reg_bpf_prog(cmd);
++		break;
++	case UBLK_CMD_UNREG_BPF_PROG:
++		ret = ublk_ctrl_unreg_bpf_prog(cmd);
++		break;
+ 	default:
+ 		break;
+ 	}
+diff --git a/include/uapi/linux/bpf.h b/include/uapi/linux/bpf.h
+index 515b7b995b3a..578d65e9f30e 100644
+--- a/include/uapi/linux/bpf.h
++++ b/include/uapi/linux/bpf.h
+@@ -5699,6 +5699,7 @@ union bpf_attr {
+ 	FN(user_ringbuf_drain, 209, ##ctx)		\
+ 	FN(cgrp_storage_get, 210, ##ctx)		\
+ 	FN(cgrp_storage_delete, 211, ##ctx)		\
++	FN(ublk_queue_sqe, 212, ##ctx)			\
+ 	/* */
+ 
+ /* backwards-compatibility macros for users of __BPF_FUNC_MAPPER that don't
+diff --git a/include/uapi/linux/ublk_cmd.h b/include/uapi/linux/ublk_cmd.h
+index 8f88e3a29998..fbfe5145221e 100644
+--- a/include/uapi/linux/ublk_cmd.h
++++ b/include/uapi/linux/ublk_cmd.h
+@@ -17,6 +17,8 @@
+ #define	UBLK_CMD_STOP_DEV	0x07
+ #define	UBLK_CMD_SET_PARAMS	0x08
+ #define	UBLK_CMD_GET_PARAMS	0x09
++#define UBLK_CMD_REG_BPF_PROG		0x0a
++#define UBLK_CMD_UNREG_BPF_PROG		0x0b
+ #define	UBLK_CMD_START_USER_RECOVERY	0x10
+ #define	UBLK_CMD_END_USER_RECOVERY	0x11
+ /*
+@@ -230,4 +232,20 @@ struct ublk_params {
+ 	struct ublk_param_discard	discard;
+ };
+ 
++struct ublk_bpf_ctx {
++	__u32   t_val;
++	__u16   q_id;
++	__u16   tag;
++	__u8    op;
++	__u32   nr_sectors;
++	__u64   start_sector;
++};
++
++enum {
++	UBLK_BPF_IO_ABORTED = 0,
++	UBLK_BPF_IO_DROP,
++	UBLK_BPF_IO_PASS,
++	UBLK_BPF_IO_REDIRECT,
++};
++
+ #endif
+diff --git a/kernel/bpf/verifier.c b/kernel/bpf/verifier.c
+index 1e5bc89aea36..b1645a3d93a2 100644
+--- a/kernel/bpf/verifier.c
++++ b/kernel/bpf/verifier.c
+@@ -24,6 +24,7 @@
+ #include <linux/bpf_lsm.h>
+ #include <linux/btf_ids.h>
+ #include <linux/poison.h>
++#include <linux/ublk_cmd.h>
+ 
+ #include "disasm.h"
+ 
+@@ -12236,7 +12237,7 @@ static int check_return_code(struct bpf_verifier_env *env)
+ 		break;
+ 
+ 	case BPF_PROG_TYPE_UBLK:
+-		range = tnum_const(0);
++		range = tnum_range(UBLK_BPF_IO_ABORTED, UBLK_BPF_IO_REDIRECT);
+ 		break;
+ 
+ 	case BPF_PROG_TYPE_EXT:
+diff --git a/scripts/bpf_doc.py b/scripts/bpf_doc.py
+index e8d90829f23e..f8672294e145 100755
+--- a/scripts/bpf_doc.py
++++ b/scripts/bpf_doc.py
+@@ -700,6 +700,8 @@ class PrinterHelpers(Printer):
+             'struct bpf_dynptr',
+             'struct iphdr',
+             'struct ipv6hdr',
++            'struct ublk_io_bpf_ctx',
++            'struct io_uring_sqe',
+     ]
+     known_types = {
+             '...',
+@@ -755,6 +757,8 @@ class PrinterHelpers(Printer):
+             'const struct bpf_dynptr',
+             'struct iphdr',
+             'struct ipv6hdr',
++            'struct ublk_io_bpf_ctx',
++            'struct io_uring_sqe',
+     }
+     mapped_types = {
+             'u8': '__u8',
+diff --git a/tools/include/uapi/linux/bpf.h b/tools/include/uapi/linux/bpf.h
+index 515b7b995b3a..e3a81e576ec1 100644
+--- a/tools/include/uapi/linux/bpf.h
++++ b/tools/include/uapi/linux/bpf.h
+@@ -5485,6 +5485,14 @@ union bpf_attr {
+  *		0 on success.
+  *
+  *		**-ENOENT** if the bpf_local_storage cannot be found.
++ *
++ *
++ * u64 bpf_ublk_queue_sqe(struct ublk_io_bpf_ctx *ctx, struct io_uring_sqe *sqe, u32 offset, u32 len)
++ *	Description
++ *		Submit ublk io requests.
++ *	Return
++ *		0 on success.
++ *
+  */
+ #define ___BPF_FUNC_MAPPER(FN, ctx...)			\
+ 	FN(unspec, 0, ##ctx)				\
+@@ -5699,6 +5707,7 @@ union bpf_attr {
+ 	FN(user_ringbuf_drain, 209, ##ctx)		\
+ 	FN(cgrp_storage_get, 210, ##ctx)		\
+ 	FN(cgrp_storage_delete, 211, ##ctx)		\
++	FN(ublk_queue_sqe, 212, ##ctx)			\
+ 	/* */
+ 
+ /* backwards-compatibility macros for users of __BPF_FUNC_MAPPER that don't
 -- 
 2.31.1
 
