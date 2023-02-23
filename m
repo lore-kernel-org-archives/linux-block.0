@@ -2,120 +2,200 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B64BDC61DA4
-	for <linux-block@archiver.kernel.org>; Thu, 23 Feb 2023 07:49:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C843C61DA4
+	for <linux-block@archiver.kernel.org>; Thu, 23 Feb 2023 08:49:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233044AbjBWHta (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 23 Feb 2023 02:49:30 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50316 "EHLO
+        id S233218AbjBWItF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 23 Feb 2023 03:49:05 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46598 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229453AbjBWHt3 (ORCPT
+        with ESMTP id S232644AbjBWItE (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 23 Feb 2023 02:49:29 -0500
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09A644BEA9;
-        Wed, 22 Feb 2023 23:49:27 -0800 (PST)
-Received: from mail02.huawei.com (unknown [172.30.67.153])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4PMlXg035tz4f3jLS;
-        Thu, 23 Feb 2023 15:49:23 +0800 (CST)
-Received: from huaweicloud.com (unknown [10.175.103.91])
-        by APP4 (Coremail) with SMTP id gCh0CgBXwLODGvdjJROgEA--.43840S4;
-        Thu, 23 Feb 2023 15:49:24 +0800 (CST)
-From:   Xiongfeng Wang <wangxiongfeng@huaweicloud.com>
-To:     axboe@kernel.dk, hch@lst.de
+        Thu, 23 Feb 2023 03:49:04 -0500
+Received: from dggsgout12.his.huawei.com (unknown [45.249.212.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ACEA837F1C;
+        Thu, 23 Feb 2023 00:49:02 -0800 (PST)
+Received: from mail02.huawei.com (unknown [172.30.67.143])
+        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4PMmsP1D3Qz4f3l7D;
+        Thu, 23 Feb 2023 16:48:57 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.175.127.227])
+        by APP3 (Coremail) with SMTP id _Ch0CgBH9CF5KPdjdmo0Dw--.40730S4;
+        Thu, 23 Feb 2023 16:48:59 +0800 (CST)
+From:   Yu Kuai <yukuai1@huaweicloud.com>
+To:     axboe@kernel.dk, agk@redhat.com, snitzer@kernel.org,
+        dm-devel@redhat.com, kbusch@kernel.org, hch@lst.de,
+        sagi@grimberg.me, guz.fnst@cn.fujitsu.com
 Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        wangxiongfeng2@huawei.com, wangxiongfeng@huaweicloud.com,
-        liwei391@huawei.com, wangkefeng.wang@huawei.com
-Subject: [RFC PATCH] blk-mq: avoid housekeeping CPUs scheduling a worker on a non-housekeeping CPU
-Date:   Thu, 23 Feb 2023 15:48:26 +0800
-Message-Id: <20230223074826.3782643-1-wangxiongfeng@huaweicloud.com>
-X-Mailer: git-send-email 2.25.1
+        linux-nvme@lists.infradead.org, yukuai3@huawei.com,
+        yukuai1@huaweicloud.com, yi.zhang@huawei.com, yangerkun@huawei.com
+Subject: [PATCH -next RFC] block: count 'ios' and 'sectors' when io is done for bio-based device
+Date:   Thu, 23 Feb 2023 17:12:26 +0800
+Message-Id: <20230223091226.1135678-1-yukuai1@huaweicloud.com>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgBXwLODGvdjJROgEA--.43840S4
-X-Coremail-Antispam: 1UD129KBjvJXoW7AFyktr4rGw1fKFWrWFyrXrb_yoW8tFWrpF
-        Z8uay3GrsrXF1jk3WfZwsrAFy5WFs5Gr1ktr93Wws8Z342gr1DWrWvkF9xKF95ArZ7Cr47
-        Z3y5trWfCw4DZ3DanT9S1TB71UUUUUDqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUyG14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+X-CM-TRANSID: _Ch0CgBH9CF5KPdjdmo0Dw--.40730S4
+X-Coremail-Antispam: 1UD129KBjvJXoW3Wr1fXr43Gr1DGr4UXr4rGrg_yoW7AF1fpF
+        48W3WrCrZrXwnYg3yUAayDuF1rKa10q347AFW7J345Zw4ktryvvF10y3Wqyr15Ca97uFW7
+        Aa48AF9rur42k37anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUvY14x267AKxVW5JVWrJwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
         rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-        1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+        1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
         JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
         CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-        2Ix0cI8IcVAFwI0_Jrv_JF1lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-        W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1l42xK82IYc2Ij64vI
-        r41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8Gjc
-        xK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0
-        cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8V
-        AvwI8IcIk0rVW3JVWrJr1lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x02
-        67AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7VUbE_M3UUUUU==
-X-CM-SenderInfo: pzdqw5plrqwwhhqjqx5xdzvxpfor3voofrz/
+        2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r4j6F4UMcvjeVCFs4IE7xkEbVWUJV
+        W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2
+        Y2ka0xkIwI1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4
+        xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43
+        MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I
+        0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWrZr1j6s0DMIIF0xvEx4A2jsIE14v2
+        6r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0J
+        U6c_fUUUUU=
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Xiongfeng Wang <wangxiongfeng2@huawei.com>
+From: Yu Kuai <yukuai3@huawei.com>
 
-When NOHZ_FULL is enabled, such as in HPC situation, CPUs are divided
-into housekeeping CPUs and non-housekeeping CPUs. Non-housekeeping CPUs
-are NOHZ_FULL CPUs and are often monopolized by the userspace process,
-such HPC application process. Any sort of interruption is not expected.
+While using iostat for raid, I observed very strange 'await'
+occasionally, and turns out it's due to that 'ios' and 'sectors' is
+counted in bdev_start_io_acct(), while 'nsecs' is counted in
+bdev_end_io_acct(). I'm not sure why they are ccounted like that
+but I think this behaviour is obviously wrong because user will get
+wrong disk stats.
 
-blk_mq_hctx_next_cpu() selects each cpu in 'hctx->cpumask' alternately
-to schedule the work thread blk_mq_run_work_fn(). When 'hctx->cpumask'
-contains housekeeping CPU and non-housekeeping CPU at the same time, a
-housekeeping CPU, which want to request a IO, may schedule a worker on a
-non-housekeeping CPU. This may affect the performance of the userspace
-application running on non-housekeeping CPUs.
+Fix the problem by counting 'ios' and 'sectors' when io is done, like
+what rq-based device does.
 
-So let's just schedule the worker thread on the current CPU when the
-current CPU is housekeeping CPU.
-
-Signed-off-by: Xiongfeng Wang <wangxiongfeng2@huawei.com>
+Fixes: 394ffa503bc4 ("blk: introduce generic io stat accounting help function")
+Signed-off-by: Yu Kuai <yukuai3@huawei.com>
 ---
- block/blk-mq.c | 15 ++++++++++++++-
- 1 file changed, 14 insertions(+), 1 deletion(-)
+ block/blk-core.c              | 16 ++++++----------
+ drivers/md/dm.c               |  6 +++---
+ drivers/nvme/host/multipath.c |  8 ++++----
+ include/linux/blkdev.h        |  5 ++---
+ 4 files changed, 15 insertions(+), 20 deletions(-)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index d3494a796ba8..1e84d393cce3 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -21,6 +21,7 @@
- #include <linux/llist.h>
- #include <linux/cpu.h>
- #include <linux/cache.h>
-+#include <linux/sched/isolation.h>
- #include <linux/sched/sysctl.h>
- #include <linux/sched/topology.h>
- #include <linux/sched/signal.h>
-@@ -2245,6 +2246,8 @@ static int blk_mq_hctx_next_cpu(struct blk_mq_hw_ctx *hctx)
- static void __blk_mq_delay_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async,
- 					unsigned long msecs)
- {
-+	int work_cpu;
-+
- 	if (unlikely(blk_mq_hctx_stopped(hctx)))
- 		return;
- 
-@@ -2255,7 +2258,17 @@ static void __blk_mq_delay_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async,
- 		}
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 82b5b2c53f1e..fe1d320f5f07 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -953,16 +953,11 @@ void update_io_ticks(struct block_device *part, unsigned long now, bool end)
  	}
- 
--	kblockd_mod_delayed_work_on(blk_mq_hctx_next_cpu(hctx), &hctx->run_work,
-+	/*
-+	 * Avoid housekeeping CPUs scheduling a worker on a non-housekeeping
-+	 * CPU
-+	 */
-+	if (tick_nohz_full_enabled() && housekeeping_cpu(smp_processor_id(),
-+							 HK_TYPE_WQ))
-+		work_cpu = smp_processor_id();
-+	else
-+		work_cpu = blk_mq_hctx_next_cpu(hctx);
-+
-+	kblockd_mod_delayed_work_on(work_cpu, &hctx->run_work,
- 				    msecs_to_jiffies(msecs));
  }
  
+-unsigned long bdev_start_io_acct(struct block_device *bdev,
+-				 unsigned int sectors, enum req_op op,
++unsigned long bdev_start_io_acct(struct block_device *bdev, enum req_op op,
+ 				 unsigned long start_time)
+ {
+-	const int sgrp = op_stat_group(op);
+-
+ 	part_stat_lock();
+ 	update_io_ticks(bdev, start_time, false);
+-	part_stat_inc(bdev, ios[sgrp]);
+-	part_stat_add(bdev, sectors[sgrp], sectors);
+ 	part_stat_local_inc(bdev, in_flight[op_is_write(op)]);
+ 	part_stat_unlock();
+ 
+@@ -978,13 +973,12 @@ EXPORT_SYMBOL(bdev_start_io_acct);
+  */
+ unsigned long bio_start_io_acct(struct bio *bio)
+ {
+-	return bdev_start_io_acct(bio->bi_bdev, bio_sectors(bio),
+-				  bio_op(bio), jiffies);
++	return bdev_start_io_acct(bio->bi_bdev, bio_op(bio), jiffies);
+ }
+ EXPORT_SYMBOL_GPL(bio_start_io_acct);
+ 
+ void bdev_end_io_acct(struct block_device *bdev, enum req_op op,
+-		      unsigned long start_time)
++		      unsigned int sectors, unsigned long start_time)
+ {
+ 	const int sgrp = op_stat_group(op);
+ 	unsigned long now = READ_ONCE(jiffies);
+@@ -992,6 +986,8 @@ void bdev_end_io_acct(struct block_device *bdev, enum req_op op,
+ 
+ 	part_stat_lock();
+ 	update_io_ticks(bdev, now, true);
++	part_stat_inc(bdev, ios[sgrp]);
++	part_stat_add(bdev, sectors[sgrp], sectors);
+ 	part_stat_add(bdev, nsecs[sgrp], jiffies_to_nsecs(duration));
+ 	part_stat_local_dec(bdev, in_flight[op_is_write(op)]);
+ 	part_stat_unlock();
+@@ -1001,7 +997,7 @@ EXPORT_SYMBOL(bdev_end_io_acct);
+ void bio_end_io_acct_remapped(struct bio *bio, unsigned long start_time,
+ 			      struct block_device *orig_bdev)
+ {
+-	bdev_end_io_acct(orig_bdev, bio_op(bio), start_time);
++	bdev_end_io_acct(orig_bdev, bio_op(bio), bio_sectors(bio), start_time);
+ }
+ EXPORT_SYMBOL_GPL(bio_end_io_acct_remapped);
+ 
+diff --git a/drivers/md/dm.c b/drivers/md/dm.c
+index eace45a18d45..f5cc330bb549 100644
+--- a/drivers/md/dm.c
++++ b/drivers/md/dm.c
+@@ -512,10 +512,10 @@ static void dm_io_acct(struct dm_io *io, bool end)
+ 		sectors = io->sectors;
+ 
+ 	if (!end)
+-		bdev_start_io_acct(bio->bi_bdev, sectors, bio_op(bio),
+-				   start_time);
++		bdev_start_io_acct(bio->bi_bdev, bio_op(bio), start_time);
+ 	else
+-		bdev_end_io_acct(bio->bi_bdev, bio_op(bio), start_time);
++		bdev_end_io_acct(bio->bi_bdev, bio_op(bio), sectors,
++				 start_time);
+ 
+ 	if (static_branch_unlikely(&stats_enabled) &&
+ 	    unlikely(dm_stats_used(&md->stats))) {
+diff --git a/drivers/nvme/host/multipath.c b/drivers/nvme/host/multipath.c
+index fc39d01e7b63..9171452e2f6d 100644
+--- a/drivers/nvme/host/multipath.c
++++ b/drivers/nvme/host/multipath.c
+@@ -123,9 +123,8 @@ void nvme_mpath_start_request(struct request *rq)
+ 		return;
+ 
+ 	nvme_req(rq)->flags |= NVME_MPATH_IO_STATS;
+-	nvme_req(rq)->start_time = bdev_start_io_acct(disk->part0,
+-					blk_rq_bytes(rq) >> SECTOR_SHIFT,
+-					req_op(rq), jiffies);
++	nvme_req(rq)->start_time = bdev_start_io_acct(disk->part0, req_op(rq),
++						      jiffies);
+ }
+ EXPORT_SYMBOL_GPL(nvme_mpath_start_request);
+ 
+@@ -136,7 +135,8 @@ void nvme_mpath_end_request(struct request *rq)
+ 	if (!(nvme_req(rq)->flags & NVME_MPATH_IO_STATS))
+ 		return;
+ 	bdev_end_io_acct(ns->head->disk->part0, req_op(rq),
+-		nvme_req(rq)->start_time);
++			 blk_rq_bytes(rq) >> SECTOR_SHIFT,
++			 nvme_req(rq)->start_time);
+ }
+ 
+ void nvme_kick_requeue_lists(struct nvme_ctrl *ctrl)
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index d1aee08f8c18..941304f17492 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -1446,11 +1446,10 @@ static inline void blk_wake_io_task(struct task_struct *waiter)
+ 		wake_up_process(waiter);
+ }
+ 
+-unsigned long bdev_start_io_acct(struct block_device *bdev,
+-				 unsigned int sectors, enum req_op op,
++unsigned long bdev_start_io_acct(struct block_device *bdev, enum req_op op,
+ 				 unsigned long start_time);
+ void bdev_end_io_acct(struct block_device *bdev, enum req_op op,
+-		unsigned long start_time);
++		      unsigned int sectors, unsigned long start_time);
+ 
+ unsigned long bio_start_io_acct(struct bio *bio);
+ void bio_end_io_acct_remapped(struct bio *bio, unsigned long start_time,
 -- 
-2.25.1
+2.31.1
 
