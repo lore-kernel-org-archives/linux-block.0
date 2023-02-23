@@ -2,313 +2,120 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A51CDC6379F
-	for <linux-block@archiver.kernel.org>; Thu, 23 Feb 2023 07:33:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B64BDC61DA4
+	for <linux-block@archiver.kernel.org>; Thu, 23 Feb 2023 07:49:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233226AbjBWHdg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 23 Feb 2023 02:33:36 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41598 "EHLO
+        id S233044AbjBWHta (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 23 Feb 2023 02:49:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50316 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229453AbjBWHdf (ORCPT
+        with ESMTP id S229453AbjBWHt3 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 23 Feb 2023 02:33:35 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F1DB3ABC;
-        Wed, 22 Feb 2023 23:33:33 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id B84DA61486;
-        Thu, 23 Feb 2023 07:33:33 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 01211C433D2;
-        Thu, 23 Feb 2023 07:33:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1677137612;
-        bh=YLGNpiKGKeQXS7cWFQgkghK8DLlHfbcET0IszUJPvQM=;
-        h=From:To:Cc:Subject:Date:From;
-        b=pP9fXt/tXJ1degBWfaPBvR4/7EIlfuAoEEitMXtixJh/D8a85c3sNDhf4CWUfxgDt
-         1N3fLUncs1mzcXLhI3hU511eZAEbztQrX1k3TXomdFn0JMcBTjYvDJv3WxaCaMxGF2
-         zuQSnrGO/xqMgXbj0w9EkefmQFYTEwsjsFC/9wQg=
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     linux-kernel@vger.kernel.org
-Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Jonathan Corbet <corbet@lwn.net>, Jens Axboe <axboe@kernel.dk>,
-        "Rafael J. Wysocki" <rafael@kernel.org>,
-        linux-block@vger.kernel.org, linux-doc@vger.kernel.org
-Subject: [PATCH] driver core: remove CONFIG_SYSFS_DEPRECATED and CONFIG_SYSFS_DEPRECATED_V2
-Date:   Thu, 23 Feb 2023 08:33:26 +0100
-Message-Id: <20230223073326.2073220-1-gregkh@linuxfoundation.org>
-X-Mailer: git-send-email 2.39.2
+        Thu, 23 Feb 2023 02:49:29 -0500
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09A644BEA9;
+        Wed, 22 Feb 2023 23:49:27 -0800 (PST)
+Received: from mail02.huawei.com (unknown [172.30.67.153])
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4PMlXg035tz4f3jLS;
+        Thu, 23 Feb 2023 15:49:23 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.175.103.91])
+        by APP4 (Coremail) with SMTP id gCh0CgBXwLODGvdjJROgEA--.43840S4;
+        Thu, 23 Feb 2023 15:49:24 +0800 (CST)
+From:   Xiongfeng Wang <wangxiongfeng@huaweicloud.com>
+To:     axboe@kernel.dk, hch@lst.de
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        wangxiongfeng2@huawei.com, wangxiongfeng@huaweicloud.com,
+        liwei391@huawei.com, wangkefeng.wang@huawei.com
+Subject: [RFC PATCH] blk-mq: avoid housekeeping CPUs scheduling a worker on a non-housekeeping CPU
+Date:   Thu, 23 Feb 2023 15:48:26 +0800
+Message-Id: <20230223074826.3782643-1-wangxiongfeng@huaweicloud.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=9765; i=gregkh@linuxfoundation.org; h=from:subject; bh=YLGNpiKGKeQXS7cWFQgkghK8DLlHfbcET0IszUJPvQM=; b=owGbwMvMwCRo6H6F97bub03G02pJDMnfxY7m7OyeIFhcc88tQj9uu4u9cu8yjpCnQi9ZnoV9nb2t bcPSjlgWBkEmBlkxRZYv23iO7q84pOhlaHsaZg4rE8gQBi5OAZjIHUWGBTvnJ0ZP5zlZE553m50tNP SfotS1JwxzZQUbXj9ev3LelF/2cfwRUgvNjjBdAgA=
-X-Developer-Key: i=gregkh@linuxfoundation.org; a=openpgp; fpr=F4B60CC5BF78C2214A313DCB3147D40DDB2DFB29
 Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: gCh0CgBXwLODGvdjJROgEA--.43840S4
+X-Coremail-Antispam: 1UD129KBjvJXoW7AFyktr4rGw1fKFWrWFyrXrb_yoW8tFWrpF
+        Z8uay3GrsrXF1jk3WfZwsrAFy5WFs5Gr1ktr93Wws8Z342gr1DWrWvkF9xKF95ArZ7Cr47
+        Z3y5trWfCw4DZ3DanT9S1TB71UUUUUDqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUyG14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+        1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+        JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+        CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+        2Ix0cI8IcVAFwI0_Jrv_JF1lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+        W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1l42xK82IYc2Ij64vI
+        r41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8Gjc
+        xK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0
+        cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8V
+        AvwI8IcIk0rVW3JVWrJr1lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x02
+        67AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7VUbE_M3UUUUU==
+X-CM-SenderInfo: pzdqw5plrqwwhhqjqx5xdzvxpfor3voofrz/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-CONFIG_SYSFS_DEPRECATED was added in commit 88a22c985e35
-("CONFIG_SYSFS_DEPRECATED") in 2006 to allow systems with older versions
-of some tools (i.e. Fedora 3's version of udev) to boot properly.  Four
-years later, in 2010, the option was attempted to be removed as most of
-userspace should have been fixed up properly by then, but some kernel
-developers clung to those old systems and refused to update, so we added
-CONFIG_SYSFS_DEPRECATED_V2 in commit e52eec13cd6b ("SYSFS: Allow boot
-time switching between deprecated and modern sysfs layout") to allow
-them to continue to boot properly, and we allowed a boot time parameter
-to be used to switch back to the old format if needed.
+From: Xiongfeng Wang <wangxiongfeng2@huawei.com>
 
-Over time, the logic that was covered under these config options was
-slowly removed from individual driver subsystems successfully, removed,
-and the only thing that is now left in the kernel are some changes in
-the block layer's representation in sysfs where real directories are
-used instead of symlinks like normal.
+When NOHZ_FULL is enabled, such as in HPC situation, CPUs are divided
+into housekeeping CPUs and non-housekeeping CPUs. Non-housekeeping CPUs
+are NOHZ_FULL CPUs and are often monopolized by the userspace process,
+such HPC application process. Any sort of interruption is not expected.
 
-Because the original changes were done to userspace tools in 2006, and
-all distros that use those tools are long end-of-life, and older
-non-udev-based systems do not care about the block layer's sysfs
-representation, it is time to finally remove this old logic and the
-config entries from the kernel.
+blk_mq_hctx_next_cpu() selects each cpu in 'hctx->cpumask' alternately
+to schedule the work thread blk_mq_run_work_fn(). When 'hctx->cpumask'
+contains housekeeping CPU and non-housekeeping CPU at the same time, a
+housekeeping CPU, which want to request a IO, may schedule a worker on a
+non-housekeeping CPU. This may affect the performance of the userspace
+application running on non-housekeeping CPUs.
 
-Cc: Jonathan Corbet <corbet@lwn.net>
-Cc: Jens Axboe <axboe@kernel.dk>
-Cc: "Rafael J. Wysocki" <rafael@kernel.org>
-Cc: linux-block@vger.kernel.org
-Cc: linux-doc@vger.kernel.org
-Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+So let's just schedule the worker thread on the current CPU when the
+current CPU is housekeeping CPU.
+
+Signed-off-by: Xiongfeng Wang <wangxiongfeng2@huawei.com>
 ---
- .../admin-guide/kernel-parameters.txt         |  9 -----
- block/genhd.c                                 | 19 ++++------
- drivers/base/class.c                          |  2 +-
- drivers/base/core.c                           | 37 ------------------
- include/linux/device.h                        |  6 ---
- init/Kconfig                                  | 38 -------------------
- 6 files changed, 8 insertions(+), 103 deletions(-)
+ block/blk-mq.c | 15 ++++++++++++++-
+ 1 file changed, 14 insertions(+), 1 deletion(-)
 
-diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
-index 6cfa6e3996cf..65a741732b04 100644
---- a/Documentation/admin-guide/kernel-parameters.txt
-+++ b/Documentation/admin-guide/kernel-parameters.txt
-@@ -6101,15 +6101,6 @@
- 			later by a loaded module cannot be set this way.
- 			Example: sysctl.vm.swappiness=40
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index d3494a796ba8..1e84d393cce3 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -21,6 +21,7 @@
+ #include <linux/llist.h>
+ #include <linux/cpu.h>
+ #include <linux/cache.h>
++#include <linux/sched/isolation.h>
+ #include <linux/sched/sysctl.h>
+ #include <linux/sched/topology.h>
+ #include <linux/sched/signal.h>
+@@ -2245,6 +2246,8 @@ static int blk_mq_hctx_next_cpu(struct blk_mq_hw_ctx *hctx)
+ static void __blk_mq_delay_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async,
+ 					unsigned long msecs)
+ {
++	int work_cpu;
++
+ 	if (unlikely(blk_mq_hctx_stopped(hctx)))
+ 		return;
  
--	sysfs.deprecated=0|1 [KNL]
--			Enable/disable old style sysfs layout for old udev
--			on older distributions. When this option is enabled
--			very new udev will not work anymore. When this option
--			is disabled (or CONFIG_SYSFS_DEPRECATED not compiled)
--			in older udev will not work anymore.
--			Default depends on CONFIG_SYSFS_DEPRECATED_V2 set in
--			the kernel configuration.
--
- 	sysrq_always_enabled
- 			[KNL]
- 			Ignore sysrq setting - this boot parameter will
-diff --git a/block/genhd.c b/block/genhd.c
-index 09f2ac548832..45b9a81d2de2 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -452,12 +452,10 @@ int __must_check device_add_disk(struct device *parent, struct gendisk *disk,
- 	if (ret)
- 		goto out_device_del;
- 
--	if (!sysfs_deprecated) {
--		ret = sysfs_create_link(block_depr, &ddev->kobj,
--					kobject_name(&ddev->kobj));
--		if (ret)
--			goto out_device_del;
--	}
-+	ret = sysfs_create_link(block_depr, &ddev->kobj,
-+				kobject_name(&ddev->kobj));
-+	if (ret)
-+		goto out_device_del;
- 
- 	/*
- 	 * avoid probable deadlock caused by allocating memory with
-@@ -535,8 +533,7 @@ int __must_check device_add_disk(struct device *parent, struct gendisk *disk,
- out_del_integrity:
- 	blk_integrity_del(disk);
- out_del_block_link:
--	if (!sysfs_deprecated)
--		sysfs_remove_link(block_depr, dev_name(ddev));
-+	sysfs_remove_link(block_depr, dev_name(ddev));
- out_device_del:
- 	device_del(ddev);
- out_free_ext_minor:
-@@ -638,8 +635,7 @@ void del_gendisk(struct gendisk *disk)
- 
- 	part_stat_set_all(disk->part0, 0);
- 	disk->part0->bd_stamp = 0;
--	if (!sysfs_deprecated)
--		sysfs_remove_link(block_depr, dev_name(disk_to_dev(disk)));
-+	sysfs_remove_link(block_depr, dev_name(disk_to_dev(disk)));
- 	pm_runtime_set_memalloc_noio(disk_to_dev(disk), false);
- 	device_del(disk_to_dev(disk));
- 
-@@ -893,8 +889,7 @@ static int __init genhd_device_init(void)
- 	register_blkdev(BLOCK_EXT_MAJOR, "blkext");
- 
- 	/* create top-level block dir */
--	if (!sysfs_deprecated)
--		block_depr = kobject_create_and_add("block", NULL);
-+	block_depr = kobject_create_and_add("block", NULL);
- 	return 0;
- }
- 
-diff --git a/drivers/base/class.c b/drivers/base/class.c
-index 2373b3e210d8..fb8f2a1e1c19 100644
---- a/drivers/base/class.c
-+++ b/drivers/base/class.c
-@@ -180,7 +180,7 @@ int __class_register(struct class *cls, struct lock_class_key *key)
- 
- #if defined(CONFIG_BLOCK)
- 	/* let the block class directory show up in the root of sysfs */
--	if (!sysfs_deprecated || cls != &block_class)
-+	if (cls != &block_class)
- 		cp->subsys.kobj.kset = class_kset;
- #else
- 	cp->subsys.kobj.kset = class_kset;
-diff --git a/drivers/base/core.c b/drivers/base/core.c
-index f9297c68214a..64b9fd960342 100644
---- a/drivers/base/core.c
-+++ b/drivers/base/core.c
-@@ -36,19 +36,6 @@
- #include "physical_location.h"
- #include "power/power.h"
- 
--#ifdef CONFIG_SYSFS_DEPRECATED
--#ifdef CONFIG_SYSFS_DEPRECATED_V2
--long sysfs_deprecated = 1;
--#else
--long sysfs_deprecated = 0;
--#endif
--static int __init sysfs_deprecated_setup(char *arg)
--{
--	return kstrtol(arg, 10, &sysfs_deprecated);
--}
--early_param("sysfs.deprecated", sysfs_deprecated_setup);
--#endif
--
- /* Device links support. */
- static LIST_HEAD(deferred_sync);
- static unsigned int defer_sync_state_count = 1;
-@@ -3179,15 +3166,6 @@ static struct kobject *get_device_parent(struct device *dev,
- 		struct kobject *parent_kobj;
- 		struct kobject *k;
- 
--#ifdef CONFIG_BLOCK
--		/* block disks show up in /sys/block */
--		if (sysfs_deprecated && dev->class == &block_class) {
--			if (parent && parent->class == &block_class)
--				return &parent->kobj;
--			return &block_class.p->subsys.kobj;
--		}
--#endif
--
- 		/*
- 		 * If we have no parent, we live in "virtual".
- 		 * Class-devices with a non class-device as parent, live
-@@ -3366,12 +3344,6 @@ static int device_add_class_symlinks(struct device *dev)
- 			goto out_subsys;
+@@ -2255,7 +2258,17 @@ static void __blk_mq_delay_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async,
+ 		}
  	}
  
--#ifdef CONFIG_BLOCK
--	/* /sys/block has directories and does not need symlinks */
--	if (sysfs_deprecated && dev->class == &block_class)
--		return 0;
--#endif
--
- 	/* link in the class directory pointing to the device */
- 	error = sysfs_create_link(&dev->class->p->subsys.kobj,
- 				  &dev->kobj, dev_name(dev));
-@@ -3401,10 +3373,6 @@ static void device_remove_class_symlinks(struct device *dev)
- 	if (dev->parent && device_is_not_partition(dev))
- 		sysfs_remove_link(&dev->kobj, "device");
- 	sysfs_remove_link(&dev->kobj, "subsystem");
--#ifdef CONFIG_BLOCK
--	if (sysfs_deprecated && dev->class == &block_class)
--		return;
--#endif
- 	sysfs_delete_link(&dev->class->p->subsys.kobj, &dev->kobj, dev_name(dev));
+-	kblockd_mod_delayed_work_on(blk_mq_hctx_next_cpu(hctx), &hctx->run_work,
++	/*
++	 * Avoid housekeeping CPUs scheduling a worker on a non-housekeeping
++	 * CPU
++	 */
++	if (tick_nohz_full_enabled() && housekeeping_cpu(smp_processor_id(),
++							 HK_TYPE_WQ))
++		work_cpu = smp_processor_id();
++	else
++		work_cpu = blk_mq_hctx_next_cpu(hctx);
++
++	kblockd_mod_delayed_work_on(work_cpu, &hctx->run_work,
+ 				    msecs_to_jiffies(msecs));
  }
  
-@@ -4694,11 +4662,6 @@ int device_change_owner(struct device *dev, kuid_t kuid, kgid_t kgid)
- 	if (error)
- 		goto out;
- 
--#ifdef CONFIG_BLOCK
--	if (sysfs_deprecated && dev->class == &block_class)
--		goto out;
--#endif
--
- 	/*
- 	 * Change the owner of the symlink located in the class directory of
- 	 * the device class associated with @dev which points to the actual
-diff --git a/include/linux/device.h b/include/linux/device.h
-index 1508e637bb26..19b6ba478fbf 100644
---- a/include/linux/device.h
-+++ b/include/linux/device.h
-@@ -1092,10 +1092,4 @@ int dev_err_probe(const struct device *dev, int err, const char *fmt, ...);
- #define MODULE_ALIAS_CHARDEV_MAJOR(major) \
- 	MODULE_ALIAS("char-major-" __stringify(major) "-*")
- 
--#ifdef CONFIG_SYSFS_DEPRECATED
--extern long sysfs_deprecated;
--#else
--#define sysfs_deprecated 0
--#endif
--
- #endif /* _DEVICE_H_ */
-diff --git a/init/Kconfig b/init/Kconfig
-index 44e90b28a30f..28be8621381e 100644
---- a/init/Kconfig
-+++ b/init/Kconfig
-@@ -1297,44 +1297,6 @@ config SCHED_AUTOGROUP
- 	  desktop applications.  Task group autogeneration is currently based
- 	  upon task session.
- 
--config SYSFS_DEPRECATED
--	bool "Enable deprecated sysfs features to support old userspace tools"
--	depends on SYSFS
--	default n
--	help
--	  This option adds code that switches the layout of the "block" class
--	  devices, to not show up in /sys/class/block/, but only in
--	  /sys/block/.
--
--	  This switch is only active when the sysfs.deprecated=1 boot option is
--	  passed or the SYSFS_DEPRECATED_V2 option is set.
--
--	  This option allows new kernels to run on old distributions and tools,
--	  which might get confused by /sys/class/block/. Since 2007/2008 all
--	  major distributions and tools handle this just fine.
--
--	  Recent distributions and userspace tools after 2009/2010 depend on
--	  the existence of /sys/class/block/, and will not work with this
--	  option enabled.
--
--	  Only if you are using a new kernel on an old distribution, you might
--	  need to say Y here.
--
--config SYSFS_DEPRECATED_V2
--	bool "Enable deprecated sysfs features by default"
--	default n
--	depends on SYSFS
--	depends on SYSFS_DEPRECATED
--	help
--	  Enable deprecated sysfs by default.
--
--	  See the CONFIG_SYSFS_DEPRECATED option for more details about this
--	  option.
--
--	  Only if you are using a new kernel on an old distribution, you might
--	  need to say Y here. Even then, odds are you would not need it
--	  enabled, you can always pass the boot option if absolutely necessary.
--
- config RELAY
- 	bool "Kernel->user space relay support (formerly relayfs)"
- 	select IRQ_WORK
 -- 
-2.39.2
+2.25.1
 
