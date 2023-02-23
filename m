@@ -2,103 +2,94 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D0C0EC61DA4
-	for <linux-block@archiver.kernel.org>; Thu, 23 Feb 2023 16:04:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3261DC636D6
+	for <linux-block@archiver.kernel.org>; Thu, 23 Feb 2023 19:34:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233328AbjBWQEh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 23 Feb 2023 11:04:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42832 "EHLO
+        id S229572AbjBWTeu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 23 Feb 2023 14:34:50 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57416 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229808AbjBWQEg (ORCPT
+        with ESMTP id S232338AbjBWTet (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 23 Feb 2023 11:04:36 -0500
-Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C4BA4E5E7
-        for <linux-block@vger.kernel.org>; Thu, 23 Feb 2023 08:04:35 -0800 (PST)
-Received: by mail-pl1-x62d.google.com with SMTP id z2so13614054plf.12
-        for <linux-block@vger.kernel.org>; Thu, 23 Feb 2023 08:04:35 -0800 (PST)
+        Thu, 23 Feb 2023 14:34:49 -0500
+Received: from mail-oa1-x64.google.com (mail-oa1-x64.google.com [IPv6:2001:4860:4864:20::64])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 369945192F
+        for <linux-block@vger.kernel.org>; Thu, 23 Feb 2023 11:34:48 -0800 (PST)
+Received: by mail-oa1-x64.google.com with SMTP id 586e51a60fabf-17227cba608so14169556fac.3
+        for <linux-block@vger.kernel.org>; Thu, 23 Feb 2023 11:34:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=SWBJJpfLbxHJ1BO+V07dvblOffLSc664lqCbo/zUG3o=;
-        b=nb+OVzwomSctOUhThvUmOR2NlmDGFcwq8cza1TWz8E3LfhcMPPxcdw1NNU9rZ0aSmb
-         m01LIL+Rz+e8c2LDjGr4FOLqp1jEDJjuuqycCfdOawPUgM2TK39nOj5d3hT4BTUBRFmX
-         SkCEFiY5lyteAKcVFm09fTDfZCiCpRtjAW81OAAHUdO98fUIVP2xRqMCVlnmyemTONvO
-         nbz4QlPKW+HYaE8OD4XZw37IPJcPt3DqzjE7prqAEcqPXZ5o0xS1mBU70Y5M3Ajrudej
-         fxMZghivVYhEBjyZie4GYaz2cCcgdYytjSjAwYWZiVH3/fvGl0G95KFjnf2iUe0MLPK/
-         PKXA==
+        d=purestorage.com; s=google2022;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=b+c2IfHe67RI0XefnY3u42o+VPQ002zoityzko4BWLI=;
+        b=A5Qap+J+qWCH04ogi8psUOwMo7Gk8HSTKonJwwVKQ93HUYla4mSQONJLz2UpeviQqp
+         aT2qV7JuZPAE6UWEnxYxso75MxL0OkiZPZHNpZuxEJnx9tZqMB6blENHMnbNGv1P31Dv
+         Riq8jtcmvHfQ8C6NFICLcaHCalhb9qxZzA9BPJ3ZOT0k4n+jvIYMaAxvNh+VxhPM7n/5
+         l/NKZmvV/Exbs+IIozLq+sIrX5OtjmvRQNCbxlui5yKIipiVHFNgilPP+A7W4S5wa2sp
+         h450AhG47BXV4sLQpruzvnX7sZOp76fl3aDcw6RgCyljanS9pJoKvpWgHth3JnWKfTWt
+         M5hQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=SWBJJpfLbxHJ1BO+V07dvblOffLSc664lqCbo/zUG3o=;
-        b=feS/kELft5WzxZ3B8F0oTucVsDla4wmqEkHAztqkwuhW6lg/9aFfC7OlsT24JY39IH
-         rqScwDbIsdUEgwdYzh8Wp1hrYh2yVSX4voiNS/pE7PhHNN7/OvPttBlMizLd9xLUVS56
-         hROmESqxpcuN2mHuS8suIjKp3iabMPgzVhNwI4bfr9q4W91JscNqv10u25ox6tM/xq1f
-         VbwA+TqN2Lexg7wSgfs3YJtO08bmsl26qZDDcKUmbdz787dlQsVevx2qUX9MZrNZ4+CL
-         eGrBXX2d1wHA2zj3QgJL6DD1pKPphJ7SjYBk0ItVn2JfgjU/kW5N5aCjdSp/tDDRu+Sf
-         eK5g==
-X-Gm-Message-State: AO0yUKXQF20s6/hhiDuXKKaR5RgklTYjjtvUO7UwlsGjlqrlnpmnBcE7
-        cDKNHgkR45cfEonOdXowpWLO57lRJsa5XVEz
-X-Google-Smtp-Source: AK7set8FUWAzS0RHvJ6iPvjFW5jpiDSUmBL6pJlKnGaoF9JksZsQhiJmEwf042gy9Zi9Rf2tS/pF3w==
-X-Received: by 2002:a05:6a20:6918:b0:cb:7cc4:3ddb with SMTP id q24-20020a056a20691800b000cb7cc43ddbmr11699984pzj.3.1677168274239;
-        Thu, 23 Feb 2023 08:04:34 -0800 (PST)
-Received: from [192.168.1.136] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id k184-20020a6384c1000000b004fb26a80875sm4931360pgd.22.2023.02.23.08.04.33
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 23 Feb 2023 08:04:33 -0800 (PST)
-Message-ID: <36c3acf2-dd51-f8a5-47d0-043848639cf0@kernel.dk>
-Date:   Thu, 23 Feb 2023 09:04:32 -0700
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=b+c2IfHe67RI0XefnY3u42o+VPQ002zoityzko4BWLI=;
+        b=ftlHKzO4FoN0k0Bf6KPs6PvZOih5Ms4/Y5ZxBVv0mvp6IyQemaxMxyJJvsaYjrzn5P
+         VBEPEdaMfeC+/humnCRpE1KvdtblXEpY4PcIGsDKfTJoFlMDcBGwP8mH26nGf60oGH6Z
+         wnIhaBOC8R3QLejpvJBumsxShifMw9xkoHHdKIwvosX3B2ibClHJilH84hX0VuHR96S3
+         OtJ+EsWlfriCMIeREH9PW/gvVPEHcFKM8cQdTukMp4xLeGfy1IThyZCLRfa/h6KuHkTK
+         nxwGngzAs94DTwdx7Mriy6a9mkX7ZrjLnEGx8mrUP3nW79OUTbs4SS7xbuFATH6Pm4Vs
+         P7Ww==
+X-Gm-Message-State: AO0yUKXGZOFptAaui5nugnkVFzchTyu8yKM8t/WC4e6mKd6LQaw8KWOM
+        NaxHmsfD1mqxBKQqifVRXkLA0mUf57jzO8xy9MaFZdUEs6oG0ov6r9UvRfki3rB/cw==
+X-Google-Smtp-Source: AK7set9PnjCf3GmfWDCQz9R/1hGHmAu9w8Sm4q1irgE0/9e5vH/L0rOTLxgVJMt8XfRFT85U1rogPS2Hiyi7
+X-Received: by 2002:a05:6871:10f:b0:169:bcbb:77b0 with SMTP id y15-20020a056871010f00b00169bcbb77b0mr9828238oab.25.1677180887488;
+        Thu, 23 Feb 2023 11:34:47 -0800 (PST)
+Received: from c7-smtp.dev.purestorage.com ([2620:125:9007:320:7:32:106:0])
+        by smtp-relay.gmail.com with ESMTPS id w21-20020a056870a2d500b0017280f7d61asm253278oak.18.2023.02.23.11.34.47
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 23 Feb 2023 11:34:47 -0800 (PST)
+X-Relaying-Domain: purestorage.com
+Received: from dev-ushankar.dev.purestorage.com (dev-ushankar.dev.purestorage.com [IPv6:2620:125:9007:640:7:70:36:0])
+        by c7-smtp.dev.purestorage.com (Postfix) with ESMTP id CF3F020B59;
+        Thu, 23 Feb 2023 12:34:46 -0700 (MST)
+Received: by dev-ushankar.dev.purestorage.com (Postfix, from userid 1557716368)
+        id CB2FCE41429; Thu, 23 Feb 2023 12:34:46 -0700 (MST)
+Date:   Thu, 23 Feb 2023 12:34:46 -0700
+From:   Uday Shankar <ushankar@purestorage.com>
+To:     Keith Busch <kbusch@kernel.org>
+Cc:     Jens Axboe <axboe@kernel.dk>, Alasdair Kergon <agk@redhat.com>,
+        Mike Snitzer <snitzer@kernel.org>,
+        Christoph Hellwig <hch@infradead.org>,
+        linux-block@vger.kernel.org, dm-devel@redhat.com,
+        kernel test robot <lkp@intel.com>
+Subject: Re: [PATCH v2] blk-mq: enforce op-specific segment limits in
+ blk_insert_cloned_request
+Message-ID: <20230223193446.GA2719882@dev-ushankar.dev.purestorage.com>
+References: <20230222185224.2484590-1-ushankar@purestorage.com>
+ <Y/Zp8lb3yUiPUNBv@kbusch-mbp.dhcp.thefacebook.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.2
-Subject: Re: [PATCH] driver core: remove CONFIG_SYSFS_DEPRECATED and
- CONFIG_SYSFS_DEPRECATED_V2
-Content-Language: en-US
-To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        linux-kernel@vger.kernel.org
-Cc:     Jonathan Corbet <corbet@lwn.net>,
-        "Rafael J. Wysocki" <rafael@kernel.org>,
-        linux-block@vger.kernel.org, linux-doc@vger.kernel.org
-References: <20230223073326.2073220-1-gregkh@linuxfoundation.org>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20230223073326.2073220-1-gregkh@linuxfoundation.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Y/Zp8lb3yUiPUNBv@kbusch-mbp.dhcp.thefacebook.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2/23/23 12:33 AM, Greg Kroah-Hartman wrote:
-> CONFIG_SYSFS_DEPRECATED was added in commit 88a22c985e35
-> ("CONFIG_SYSFS_DEPRECATED") in 2006 to allow systems with older versions
-> of some tools (i.e. Fedora 3's version of udev) to boot properly.  Four
-> years later, in 2010, the option was attempted to be removed as most of
-> userspace should have been fixed up properly by then, but some kernel
-> developers clung to those old systems and refused to update, so we added
-> CONFIG_SYSFS_DEPRECATED_V2 in commit e52eec13cd6b ("SYSFS: Allow boot
-> time switching between deprecated and modern sysfs layout") to allow
-> them to continue to boot properly, and we allowed a boot time parameter
-> to be used to switch back to the old format if needed.
+On Wed, Feb 22, 2023 at 12:16:02PM -0700, Keith Busch wrote:
+> On Wed, Feb 22, 2023 at 11:52:25AM -0700, Uday Shankar wrote:
+> >  static inline unsigned int blk_rq_get_max_segments(struct request *rq)
+> >  {
+> > -	if (req_op(rq) == REQ_OP_DISCARD)
+> > -		return queue_max_discard_segments(rq->q);
+> > -	return queue_max_segments(rq->q);
+> > +	return blk_queue_get_max_segments(rq->q, req_op(rq));
+> >  }
 > 
-> Over time, the logic that was covered under these config options was
-> slowly removed from individual driver subsystems successfully, removed,
-> and the only thing that is now left in the kernel are some changes in
-> the block layer's representation in sysfs where real directories are
-> used instead of symlinks like normal.
-> 
-> Because the original changes were done to userspace tools in 2006, and
-> all distros that use those tools are long end-of-life, and older
-> non-udev-based systems do not care about the block layer's sysfs
-> representation, it is time to finally remove this old logic and the
-> config entries from the kernel.
+> I think you should just move this function to blk.h instead of
+> introducing a new one.
 
-Acked-by: Jens Axboe <axboe@kernel.dk>
-
--- 
-Jens Axboe
-
-
+I chose to add blk_queue_get_max_segments as a public function because
+it parallels blk_queue_get_max_sectors. If you don't want two functions,
+I could manually inline the (2) uses of blk_rq_get_max_segments(rq),
+converting them to blk_queue_get_max_segments(rq->q, req_op(rq)).
