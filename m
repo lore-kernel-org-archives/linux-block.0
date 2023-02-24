@@ -2,181 +2,145 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1B2DC7EE23
-	for <linux-block@archiver.kernel.org>; Fri, 24 Feb 2023 18:19:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D6721C6FA8E
+	for <linux-block@archiver.kernel.org>; Fri, 24 Feb 2023 18:25:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229656AbjBXSTH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 24 Feb 2023 13:19:07 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45588 "EHLO
+        id S229626AbjBXSZg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 24 Feb 2023 13:25:36 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52456 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229577AbjBXSTG (ORCPT
+        with ESMTP id S229492AbjBXSZg (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 24 Feb 2023 13:19:06 -0500
-Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35AB215CA9;
-        Fri, 24 Feb 2023 10:19:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1677262745; x=1708798745;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=BNDdmrZdwBU8SRPX2vwNZc9jJnIBU5bmE3T6Ywe/qKQ=;
-  b=MSsp7/UMUpXoWsnYLYhkuH/GW+7p77TADUUoovwovvLxXiDPbeJlWQX/
-   +OVhymq8q2Ci7ocG+BpxtEtOEwbH6rBeZbbA41CfkwgpFfxsJ8CZvPLhA
-   UHE11Ey83UlORSInB2o3milUXhDwiU9ahYEIivNsTbm0YGj7jTBcQNoAF
-   jybAomsMfAD+G+G++vtJCD8nxH69uxnN9UA6wYDNNtdwlZKaNGkvLm3mu
-   AQw2jpVo8F6271LBVhwnBx8rymg5apI+Q1B3E5LMhtZpcYmJN2Z6JiuVz
-   Qm9xhf85DcTpUm4dCSkjM2xNwFraTp/ntI8PICCh0zRN97mOG11HB0dam
-   w==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10631"; a="313935954"
-X-IronPort-AV: E=Sophos;i="5.97,325,1669104000"; 
-   d="scan'208";a="313935954"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Feb 2023 10:19:04 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10631"; a="666240737"
-X-IronPort-AV: E=Sophos;i="5.97,325,1669104000"; 
-   d="scan'208";a="666240737"
-Received: from lkp-server01.sh.intel.com (HELO 3895f5c55ead) ([10.239.97.150])
-  by orsmga007.jf.intel.com with ESMTP; 24 Feb 2023 10:19:02 -0800
-Received: from kbuild by 3895f5c55ead with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1pVcer-0002bi-0I;
-        Fri, 24 Feb 2023 18:19:01 +0000
-Date:   Sat, 25 Feb 2023 02:18:38 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Andreas Hindborg <nmi@metaspace.dk>, linux-block@vger.kernel.org
-Cc:     oe-kbuild-all@lists.linux.dev, Andreas Hindborg <nmi@metaspace.dk>,
-        Hans Holmberg <Hans.Holmberg@wdc.com>,
-        Matias Bjorling <Matias.Bjorling@wdc.com>,
-        Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] block: ublk: enable zoned storage support
-Message-ID: <202302250222.XOrw9j6z-lkp@intel.com>
+        Fri, 24 Feb 2023 13:25:36 -0500
+Received: from mail-ed1-x52c.google.com (mail-ed1-x52c.google.com [IPv6:2a00:1450:4864:20::52c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9EB073A849
+        for <linux-block@vger.kernel.org>; Fri, 24 Feb 2023 10:25:15 -0800 (PST)
+Received: by mail-ed1-x52c.google.com with SMTP id da10so854224edb.3
+        for <linux-block@vger.kernel.org>; Fri, 24 Feb 2023 10:25:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=metaspace-dk.20210112.gappssmtp.com; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:in-reply-to:date
+         :subject:cc:to:from:user-agent:references:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=GyWIOFkNkOsI6c/mdG3GOw56CloR0iy8yfGzZUhpBaU=;
+        b=whAYIbB5kRU1oPfGv0iqc/PMQl7BZVJHKetXDOskXfsD1gEH4TW5FVtGYVCaKLHpJg
+         izbw48FjNsGBiGuSpLVUB54oubBB035/1GLCLluNHXWfvY7zZ5OWWfpIRDvMOG0fkv+z
+         RPxp4dQ1xEk7YJeuB/qnCwaNmxHy45EtOHbTPc4kJWz1uwF7/KVwNXThgV0LMrfQqYMh
+         tRERC/xXbw40ebP35onFaBFvK3PLdpkORB0BlzupcDyFNjH2EHUaJshfv1yh+lMG1k4e
+         0FhmjN7jmrc7/t6ikrYHJHSQbNN/vrVW8DQfE8wHI39eyIKSLFjh4cmxFkRu41Ycack8
+         bqvg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:in-reply-to:date
+         :subject:cc:to:from:user-agent:references:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=GyWIOFkNkOsI6c/mdG3GOw56CloR0iy8yfGzZUhpBaU=;
+        b=K3TGWrn1FOX6S7Et/hBAKrLFB4vAHa4aFxpMNZ2g/6W7O/OVW6b6v+1t3IgO9QRlzA
+         RZgsBlyXpneoPp9twJoqGKhImG88MV6IuRtTzfnhQmncm6PWO90Uh2O318mobOPIW/wX
+         QpK0W8w6WJCHZF8++sn5eNCbDsxNIKK7Jnrc+Ba2KCbgesBO/80hIoWpeDCCi4LpfNAh
+         YPB6eLzDTemNljoG44IniNJUrxzT95d5+prLNQLvuIU2gcTtawQ2lQgya+pvsuQK2y2x
+         v5zBlvGwPPnOvheK3PhchFJQc6kxhx00WWqI2LsKwLa+KqsQYk9zj0lKeQ/NWC/2zTq/
+         6jcw==
+X-Gm-Message-State: AO0yUKXd+i8a00vDM2HZq4w3+WCpagbxtlex1A0919EhCKgBk7yrpQpr
+        6myVp42aXsVdM5kWebSrquNw2w==
+X-Google-Smtp-Source: AK7set+wxFCdSh4J/yfn3u8xFPRm3OStLNQUL6UKLo/N9MSs7Ff/LQmnO+VZAUE0FWaN8hiir16xOQ==
+X-Received: by 2002:a05:6402:5158:b0:4aa:a4f1:3edb with SMTP id n24-20020a056402515800b004aaa4f13edbmr15135062edd.29.1677263113882;
+        Fri, 24 Feb 2023 10:25:13 -0800 (PST)
+Received: from localhost ([79.142.230.49])
+        by smtp.gmail.com with ESMTPSA id by17-20020a0564021b1100b004aef48a8af7sm5970136edb.50.2023.02.24.10.25.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 24 Feb 2023 10:25:13 -0800 (PST)
 References: <20230224125950.214779-1-nmi@metaspace.dk>
+ <Y/jdkCR4ug7iZZ+L@x1-carbon> <Y/jfpKyntm9KSBVo@x1-carbon>
+User-agent: mu4e 1.9.18; emacs 28.2.50
+From:   Andreas Hindborg <nmi@metaspace.dk>
+To:     Niklas Cassel <Niklas.Cassel@wdc.com>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Hans Holmberg <Hans.Holmberg@wdc.com>,
+        Matias =?utf-8?Q?Bj=C3=B8rling?= <Matias.Bjorling@wdc.com>,
+        Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+        open list <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] block: ublk: enable zoned storage support
+Date:   Fri, 24 Feb 2023 19:20:03 +0100
+In-reply-to: <Y/jfpKyntm9KSBVo@x1-carbon>
+Message-ID: <87edqec453.fsf@metaspace.dk>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230224125950.214779-1-nmi@metaspace.dk>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Andreas,
 
-Thank you for the patch! Yet something to improve:
+Niklas Cassel <Niklas.Cassel@wdc.com> writes:
 
-[auto build test ERROR on v6.2]
-[cannot apply to axboe-block/for-next linus/master next-20230224]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+> On Fri, Feb 24, 2023 at 04:53:52PM +0100, Niklas Cassel wrote:
+>> Hello Andreas,
+>>=20
+>> On Fri, Feb 24, 2023 at 01:59:50PM +0100, Andreas Hindborg wrote:
+>> > Add zoned storage support to ublk: report_zones and operations:
+>> >  - REQ_OP_ZONE_OPEN
+>> >  - REQ_OP_ZONE_CLOSE
+>> >  - REQ_OP_ZONE_FINISH
+>> >  - REQ_OP_ZONE_RESET
+>> >=20
+>> > This allows implementation of zoned storage devices in user space. An
+>> > example user space implementation based on ubdsrv is available [1].
+>> >=20
+>> > [1] https://github.com/metaspace/ubdsrv/commit/14a2b708f74f70cfecb076d=
+92e680dc718cc1f6d
+>> >=20
+>> > Signed-off-by: Andreas Hindborg <a.hindborg@samsung.com>
+>> > ---
+>>=20
+>> Did you try to build this patch with CONFIG_BLK_DEV_ZONED disabled?
+>>=20
+>> I got the following build errors when building it on top of vanilla v6.2
+>> when CONFIG_BLK_DEV_ZONED is disabled:
+>>=20
+>> drivers/block/ublk_drv.c: In function =E2=80=98ublk_dev_param_basic_appl=
+y=E2=80=99:
+>> drivers/block/ublk_drv.c:221:28: error: =E2=80=98struct gendisk=E2=80=99=
+ has no member named =E2=80=98nr_zones=E2=80=99
+>>   221 |                 ub->ub_disk->nr_zones =3D p->dev_sectors / p->ch=
+unk_sectors;
+>>       |                            ^~
+>> drivers/block/ublk_drv.c: In function =E2=80=98ublk_dev_param_zoned_appl=
+y=E2=80=99:
+>> drivers/block/ublk_drv.c:244:17: error: implicit declaration of function=
+ =E2=80=98disk_set_max_active_zones=E2=80=99; did you mean =E2=80=98bdev_ma=
+x_active_zones=E2=80=99? [-Werror=3Dimplicit-function-declaration]
+>>   244 |                 disk_set_max_active_zones(ub->ub_disk, p->max_ac=
+tive_zones);
+>>       |                 ^~~~~~~~~~~~~~~~~~~~~~~~~
+>>       |                 bdev_max_active_zones
+>> drivers/block/ublk_drv.c:245:17: error: implicit declaration of function=
+ =E2=80=98disk_set_max_open_zones=E2=80=99; did you mean =E2=80=98bdev_max_=
+open_zones=E2=80=99? [-Werror=3Dimplicit-function-declaration]
+>>   245 |                 disk_set_max_open_zones(ub->ub_disk, p->max_open=
+_zones);
+>>=20
+>
+> The problem here is probably that blkdev.h does not have dummy functions =
+for
+> disk_set_max_active_zones() and disk_set_max_open_zones()
+>
+> in the:
+> #else /* CONFIG_BLK_DEV_ZONED */
+> case.
+>
+> I do see dummy functions in blkdev.h for disk_nr_zones(), disk_zone_is_se=
+q()
+> and disk_zone_no() when CONFIG_BLK_DEV_ZONED is not set.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Andreas-Hindborg/block-ublk-enable-zoned-storage-support/20230224-210205
-patch link:    https://lore.kernel.org/r/20230224125950.214779-1-nmi%40metaspace.dk
-patch subject: [PATCH] block: ublk: enable zoned storage support
-config: ia64-buildonly-randconfig-r006-20230222 (https://download.01.org/0day-ci/archive/20230225/202302250222.XOrw9j6z-lkp@intel.com/config)
-compiler: ia64-linux-gcc (GCC) 12.1.0
-reproduce (this is a W=1 build):
-        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
-        chmod +x ~/bin/make.cross
-        # https://github.com/intel-lab-lkp/linux/commit/6d088fc1b115a63e8888b12fa47aabd45be97460
-        git remote add linux-review https://github.com/intel-lab-lkp/linux
-        git fetch --no-tags linux-review Andreas-Hindborg/block-ublk-enable-zoned-storage-support/20230224-210205
-        git checkout 6d088fc1b115a63e8888b12fa47aabd45be97460
-        # save the config file
-        mkdir build_dir && cp config build_dir/.config
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.1.0 make.cross W=1 O=build_dir ARCH=ia64 olddefconfig
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.1.0 make.cross W=1 O=build_dir ARCH=ia64 SHELL=/bin/bash drivers/
+Thanks for the comments Niklas :)
 
-If you fix the issue, kindly add following tag where applicable
-| Reported-by: kernel test robot <lkp@intel.com>
-| Link: https://lore.kernel.org/oe-kbuild-all/202302250222.XOrw9j6z-lkp@intel.com/
+I completely forgot to test without CONFIG_BLK_DEV_ZONED =F0=9F=A4=A6 What =
+is the
+preferred resolution here? Conditionally remove the lines with #ifdef
+rather than use if(IS_ENABLED(...))? Dummy functions would resolve lines
+244 and 245, but would not help with assignment of nr_zones at 221 as
+that will not exist when CONFIG_BLK_DEV_ZONED is disabled.
 
-All errors (new ones prefixed by >>):
+BR Andreas
 
-   drivers/block/ublk_drv.c: In function 'ublk_dev_param_basic_apply':
->> drivers/block/ublk_drv.c:221:28: error: 'struct gendisk' has no member named 'nr_zones'
-     221 |                 ub->ub_disk->nr_zones = p->dev_sectors / p->chunk_sectors;
-         |                            ^~
-   drivers/block/ublk_drv.c: In function 'ublk_dev_param_zoned_apply':
->> drivers/block/ublk_drv.c:244:17: error: implicit declaration of function 'disk_set_max_active_zones'; did you mean 'bdev_max_active_zones'? [-Werror=implicit-function-declaration]
-     244 |                 disk_set_max_active_zones(ub->ub_disk, p->max_active_zones);
-         |                 ^~~~~~~~~~~~~~~~~~~~~~~~~
-         |                 bdev_max_active_zones
->> drivers/block/ublk_drv.c:245:17: error: implicit declaration of function 'disk_set_max_open_zones'; did you mean 'bdev_max_open_zones'? [-Werror=implicit-function-declaration]
-     245 |                 disk_set_max_open_zones(ub->ub_disk, p->max_open_zones);
-         |                 ^~~~~~~~~~~~~~~~~~~~~~~
-         |                 bdev_max_open_zones
-   drivers/block/ublk_drv.c: In function 'ublk_ctrl_start_dev':
->> drivers/block/ublk_drv.c:1663:23: error: implicit declaration of function 'blk_revalidate_disk_zones' [-Werror=implicit-function-declaration]
-    1663 |                 ret = blk_revalidate_disk_zones(disk, NULL);
-         |                       ^~~~~~~~~~~~~~~~~~~~~~~~~
-   cc1: some warnings being treated as errors
-
-
-vim +221 drivers/block/ublk_drv.c
-
-   192	
-   193	static void ublk_dev_param_basic_apply(struct ublk_device *ub)
-   194	{
-   195		struct request_queue *q = ub->ub_disk->queue;
-   196		const struct ublk_param_basic *p = &ub->params.basic;
-   197	
-   198		blk_queue_logical_block_size(q, 1 << p->logical_bs_shift);
-   199		blk_queue_physical_block_size(q, 1 << p->physical_bs_shift);
-   200		blk_queue_io_min(q, 1 << p->io_min_shift);
-   201		blk_queue_io_opt(q, 1 << p->io_opt_shift);
-   202	
-   203		blk_queue_write_cache(q, p->attrs & UBLK_ATTR_VOLATILE_CACHE,
-   204				p->attrs & UBLK_ATTR_FUA);
-   205		if (p->attrs & UBLK_ATTR_ROTATIONAL)
-   206			blk_queue_flag_clear(QUEUE_FLAG_NONROT, q);
-   207		else
-   208			blk_queue_flag_set(QUEUE_FLAG_NONROT, q);
-   209	
-   210		blk_queue_max_hw_sectors(q, p->max_sectors);
-   211		blk_queue_chunk_sectors(q, p->chunk_sectors);
-   212		blk_queue_virt_boundary(q, p->virt_boundary_mask);
-   213	
-   214		if (p->attrs & UBLK_ATTR_READ_ONLY)
-   215			set_disk_ro(ub->ub_disk, true);
-   216	
-   217		set_capacity(ub->ub_disk, p->dev_sectors);
-   218	
-   219		if (IS_ENABLED(CONFIG_BLK_DEV_ZONED) &&
-   220		    ub->dev_info.flags & UBLK_F_ZONED && p->chunk_sectors) {
- > 221			ub->ub_disk->nr_zones = p->dev_sectors / p->chunk_sectors;
-   222		}
-   223	}
-   224	
-   225	static void ublk_dev_param_discard_apply(struct ublk_device *ub)
-   226	{
-   227		struct request_queue *q = ub->ub_disk->queue;
-   228		const struct ublk_param_discard *p = &ub->params.discard;
-   229	
-   230		q->limits.discard_alignment = p->discard_alignment;
-   231		q->limits.discard_granularity = p->discard_granularity;
-   232		blk_queue_max_discard_sectors(q, p->max_discard_sectors);
-   233		blk_queue_max_write_zeroes_sectors(q,
-   234				p->max_write_zeroes_sectors);
-   235		blk_queue_max_discard_segments(q, p->max_discard_segments);
-   236	}
-   237	
-   238	static void ublk_dev_param_zoned_apply(struct ublk_device *ub)
-   239	{
-   240		const struct ublk_param_zoned *p = &ub->params.zoned;
-   241	
-   242		if (IS_ENABLED(CONFIG_BLK_DEV_ZONED) &&
-   243		    ub->dev_info.flags & UBLK_F_ZONED) {
- > 244			disk_set_max_active_zones(ub->ub_disk, p->max_active_zones);
- > 245			disk_set_max_open_zones(ub->ub_disk, p->max_open_zones);
-   246			/* We do not support zone append yet */
-   247			//blk_queue_max_zone_append_sectors(q, zone_size);
-   248		}
-   249	}
-   250	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests
