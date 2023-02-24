@@ -2,145 +2,116 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D6721C6FA8E
-	for <linux-block@archiver.kernel.org>; Fri, 24 Feb 2023 18:25:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 81516C6FA8E
+	for <linux-block@archiver.kernel.org>; Fri, 24 Feb 2023 18:51:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229626AbjBXSZg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 24 Feb 2023 13:25:36 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52456 "EHLO
+        id S229740AbjBXSvg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 24 Feb 2023 13:51:36 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48204 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229492AbjBXSZg (ORCPT
+        with ESMTP id S229635AbjBXSvg (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 24 Feb 2023 13:25:36 -0500
-Received: from mail-ed1-x52c.google.com (mail-ed1-x52c.google.com [IPv6:2a00:1450:4864:20::52c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9EB073A849
-        for <linux-block@vger.kernel.org>; Fri, 24 Feb 2023 10:25:15 -0800 (PST)
-Received: by mail-ed1-x52c.google.com with SMTP id da10so854224edb.3
-        for <linux-block@vger.kernel.org>; Fri, 24 Feb 2023 10:25:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=metaspace-dk.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:in-reply-to:date
-         :subject:cc:to:from:user-agent:references:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=GyWIOFkNkOsI6c/mdG3GOw56CloR0iy8yfGzZUhpBaU=;
-        b=whAYIbB5kRU1oPfGv0iqc/PMQl7BZVJHKetXDOskXfsD1gEH4TW5FVtGYVCaKLHpJg
-         izbw48FjNsGBiGuSpLVUB54oubBB035/1GLCLluNHXWfvY7zZ5OWWfpIRDvMOG0fkv+z
-         RPxp4dQ1xEk7YJeuB/qnCwaNmxHy45EtOHbTPc4kJWz1uwF7/KVwNXThgV0LMrfQqYMh
-         tRERC/xXbw40ebP35onFaBFvK3PLdpkORB0BlzupcDyFNjH2EHUaJshfv1yh+lMG1k4e
-         0FhmjN7jmrc7/t6ikrYHJHSQbNN/vrVW8DQfE8wHI39eyIKSLFjh4cmxFkRu41Ycack8
-         bqvg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:in-reply-to:date
-         :subject:cc:to:from:user-agent:references:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=GyWIOFkNkOsI6c/mdG3GOw56CloR0iy8yfGzZUhpBaU=;
-        b=K3TGWrn1FOX6S7Et/hBAKrLFB4vAHa4aFxpMNZ2g/6W7O/OVW6b6v+1t3IgO9QRlzA
-         RZgsBlyXpneoPp9twJoqGKhImG88MV6IuRtTzfnhQmncm6PWO90Uh2O318mobOPIW/wX
-         QpK0W8w6WJCHZF8++sn5eNCbDsxNIKK7Jnrc+Ba2KCbgesBO/80hIoWpeDCCi4LpfNAh
-         YPB6eLzDTemNljoG44IniNJUrxzT95d5+prLNQLvuIU2gcTtawQ2lQgya+pvsuQK2y2x
-         v5zBlvGwPPnOvheK3PhchFJQc6kxhx00WWqI2LsKwLa+KqsQYk9zj0lKeQ/NWC/2zTq/
-         6jcw==
-X-Gm-Message-State: AO0yUKXd+i8a00vDM2HZq4w3+WCpagbxtlex1A0919EhCKgBk7yrpQpr
-        6myVp42aXsVdM5kWebSrquNw2w==
-X-Google-Smtp-Source: AK7set+wxFCdSh4J/yfn3u8xFPRm3OStLNQUL6UKLo/N9MSs7Ff/LQmnO+VZAUE0FWaN8hiir16xOQ==
-X-Received: by 2002:a05:6402:5158:b0:4aa:a4f1:3edb with SMTP id n24-20020a056402515800b004aaa4f13edbmr15135062edd.29.1677263113882;
-        Fri, 24 Feb 2023 10:25:13 -0800 (PST)
-Received: from localhost ([79.142.230.49])
-        by smtp.gmail.com with ESMTPSA id by17-20020a0564021b1100b004aef48a8af7sm5970136edb.50.2023.02.24.10.25.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 24 Feb 2023 10:25:13 -0800 (PST)
-References: <20230224125950.214779-1-nmi@metaspace.dk>
- <Y/jdkCR4ug7iZZ+L@x1-carbon> <Y/jfpKyntm9KSBVo@x1-carbon>
-User-agent: mu4e 1.9.18; emacs 28.2.50
-From:   Andreas Hindborg <nmi@metaspace.dk>
-To:     Niklas Cassel <Niklas.Cassel@wdc.com>
-Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Hans Holmberg <Hans.Holmberg@wdc.com>,
-        Matias =?utf-8?Q?Bj=C3=B8rling?= <Matias.Bjorling@wdc.com>,
-        Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-        open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] block: ublk: enable zoned storage support
-Date:   Fri, 24 Feb 2023 19:20:03 +0100
-In-reply-to: <Y/jfpKyntm9KSBVo@x1-carbon>
-Message-ID: <87edqec453.fsf@metaspace.dk>
+        Fri, 24 Feb 2023 13:51:36 -0500
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20CCF6A7A6;
+        Fri, 24 Feb 2023 10:51:34 -0800 (PST)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 17F1A6084F;
+        Fri, 24 Feb 2023 18:51:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+        t=1677264693; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=gXQvhEuj9SoWq4xHpYapHJn0TS7BQOaz7ZvYAaP4S+A=;
+        b=dEYBd4cfzxjGTUmflHKaPPcrCa5DIXUW5PXOlZp25Ohjug6EGBHiNxCC4c2PxqyS/2Ey4z
+        mhwRMO46LgnpEdxuUAGUYrz8/3/ZV12IG2ECnZBLqPvbjZV4TozoHBZaimvafQ/+J2k4U7
+        SSFL+6vupQbD8c5MFDRjWifxKXfR0+0=
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id C5DEE13246;
+        Fri, 24 Feb 2023 18:51:32 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id V8z9LjQH+WOvdAAAMHmgww
+        (envelope-from <mkoutny@suse.com>); Fri, 24 Feb 2023 18:51:32 +0000
+Date:   Fri, 24 Feb 2023 19:51:26 +0100
+From:   Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>
+To:     Breno Leitao <leitao@debian.org>
+Cc:     axboe@kernel.dk, tj@kernel.org, josef@toxicpanda.com,
+        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        aherrmann@suse.de, linux-kernel@vger.kernel.org, hch@lst.de,
+        leit@fb.com
+Subject: Re: [PATCH] blk-iocost: initialize rqos before accessing it
+Message-ID: <20230224185126.bxkreilofbp2t4on@blackpad>
+References: <20230224160714.172884-1-leitao@debian.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: multipart/signed; micalg=pgp-sha512;
+        protocol="application/pgp-signature"; boundary="6m3yodbwxciinozt"
+Content-Disposition: inline
+In-Reply-To: <20230224160714.172884-1-leitao@debian.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 
-Niklas Cassel <Niklas.Cassel@wdc.com> writes:
+--6m3yodbwxciinozt
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> On Fri, Feb 24, 2023 at 04:53:52PM +0100, Niklas Cassel wrote:
->> Hello Andreas,
->>=20
->> On Fri, Feb 24, 2023 at 01:59:50PM +0100, Andreas Hindborg wrote:
->> > Add zoned storage support to ublk: report_zones and operations:
->> >  - REQ_OP_ZONE_OPEN
->> >  - REQ_OP_ZONE_CLOSE
->> >  - REQ_OP_ZONE_FINISH
->> >  - REQ_OP_ZONE_RESET
->> >=20
->> > This allows implementation of zoned storage devices in user space. An
->> > example user space implementation based on ubdsrv is available [1].
->> >=20
->> > [1] https://github.com/metaspace/ubdsrv/commit/14a2b708f74f70cfecb076d=
-92e680dc718cc1f6d
->> >=20
->> > Signed-off-by: Andreas Hindborg <a.hindborg@samsung.com>
->> > ---
->>=20
->> Did you try to build this patch with CONFIG_BLK_DEV_ZONED disabled?
->>=20
->> I got the following build errors when building it on top of vanilla v6.2
->> when CONFIG_BLK_DEV_ZONED is disabled:
->>=20
->> drivers/block/ublk_drv.c: In function =E2=80=98ublk_dev_param_basic_appl=
-y=E2=80=99:
->> drivers/block/ublk_drv.c:221:28: error: =E2=80=98struct gendisk=E2=80=99=
- has no member named =E2=80=98nr_zones=E2=80=99
->>   221 |                 ub->ub_disk->nr_zones =3D p->dev_sectors / p->ch=
-unk_sectors;
->>       |                            ^~
->> drivers/block/ublk_drv.c: In function =E2=80=98ublk_dev_param_zoned_appl=
-y=E2=80=99:
->> drivers/block/ublk_drv.c:244:17: error: implicit declaration of function=
- =E2=80=98disk_set_max_active_zones=E2=80=99; did you mean =E2=80=98bdev_ma=
-x_active_zones=E2=80=99? [-Werror=3Dimplicit-function-declaration]
->>   244 |                 disk_set_max_active_zones(ub->ub_disk, p->max_ac=
-tive_zones);
->>       |                 ^~~~~~~~~~~~~~~~~~~~~~~~~
->>       |                 bdev_max_active_zones
->> drivers/block/ublk_drv.c:245:17: error: implicit declaration of function=
- =E2=80=98disk_set_max_open_zones=E2=80=99; did you mean =E2=80=98bdev_max_=
-open_zones=E2=80=99? [-Werror=3Dimplicit-function-declaration]
->>   245 |                 disk_set_max_open_zones(ub->ub_disk, p->max_open=
-_zones);
->>=20
->
-> The problem here is probably that blkdev.h does not have dummy functions =
-for
-> disk_set_max_active_zones() and disk_set_max_open_zones()
->
-> in the:
-> #else /* CONFIG_BLK_DEV_ZONED */
-> case.
->
-> I do see dummy functions in blkdev.h for disk_nr_zones(), disk_zone_is_se=
-q()
-> and disk_zone_no() when CONFIG_BLK_DEV_ZONED is not set.
+On Fri, Feb 24, 2023 at 08:07:14AM -0800, Breno Leitao <leitao@debian.org> =
+wrote:
+> ---
+>  block/blk-iocost.c | 10 +++++-----
+>  1 file changed, 5 insertions(+), 5 deletions(-)
 
-Thanks for the comments Niklas :)
+Well done.
 
-I completely forgot to test without CONFIG_BLK_DEV_ZONED =F0=9F=A4=A6 What =
-is the
-preferred resolution here? Conditionally remove the lines with #ifdef
-rather than use if(IS_ENABLED(...))? Dummy functions would resolve lines
-244 and 245, but would not help with assignment of nr_zones at 221 as
-that will not exist when CONFIG_BLK_DEV_ZONED is disabled.
+Reviewed-by: Michal Koutn=FD <mkoutny@suse.com>
 
-BR Andreas
 
+[...]
+> 	blk_iocost_init (include/asm-generic/qspinlock.h:128
+> 			 include/linux/spinlock.h:203
+> 			 include/linux/spinlock_api_smp.h:158
+> 			 include/linux/spinlock.h:400
+> 			 block/blk-iocost.c:2884)
+> 	ioc_qos_write (block/blk-iocost.c:3198)
+> 	? kretprobe_perf_func (kernel/trace/trace_kprobe.c:1566)
+> 	? kernfs_fop_write_iter (include/linux/slab.h:584 fs/kernfs/file.c:311)
+> 	? __kmem_cache_alloc_node (mm/slab.h:? mm/slub.c:3452 mm/slub.c:3491)
+> 	? _copy_from_iter (arch/x86/include/asm/uaccess_64.h:46
+> 			   arch/x86/include/asm/uaccess_64.h:52
+> 			   lib/iov_iter.c:183 lib/iov_iter.c:628)
+> 	? kretprobe_dispatcher (kernel/trace/trace_kprobe.c:1693)
+> 	cgroup_file_write (kernel/cgroup/cgroup.c:4061)
+> 	kernfs_fop_write_iter (fs/kernfs/file.c:334)
+> 	vfs_write (include/linux/fs.h:1849 fs/read_write.c:491
+> 		   fs/read_write.c:584)
+> 	ksys_write (fs/read_write.c:637)
+> 	do_syscall_64 (arch/x86/entry/common.c:50 arch/x86/entry/common.c:80)
+> 	entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:120)
+
+BTW, out of curiosity what tool did you use to list stack with line
+numbers?
+
+Thanks,
+Michal
+
+--6m3yodbwxciinozt
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQTrXXag4J0QvXXBmkMkDQmsBEOquQUCY/kHFAAKCRAkDQmsBEOq
+uZA8APwKEgRDcDxvVYqITHL+eSPHCCTuTseSO6af4mz3xtDDPAD9F5C04O0o8i2A
+Cy6l5UzdFQQ+hamXG1WXrD52wGyWbQI=
+=Ko1G
+-----END PGP SIGNATURE-----
+
+--6m3yodbwxciinozt--
