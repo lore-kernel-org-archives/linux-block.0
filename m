@@ -2,132 +2,89 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 73F71C7EE2F
-	for <linux-block@archiver.kernel.org>; Fri, 24 Feb 2023 21:05:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B5475C6FA8E
+	for <linux-block@archiver.kernel.org>; Fri, 24 Feb 2023 23:10:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229708AbjBXVFQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 24 Feb 2023 16:05:16 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50872 "EHLO
+        id S229699AbjBXXKb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 24 Feb 2023 18:10:31 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44180 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229479AbjBXVFQ (ORCPT
+        with ESMTP id S229549AbjBXXKa (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 24 Feb 2023 16:05:16 -0500
-Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C3428688F5;
-        Fri, 24 Feb 2023 13:05:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1677272714; x=1708808714;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=QvJkybVoarogho5PoChkW7G6wkAPhofhMcqMsdG5it4=;
-  b=UmpSaOcnmnzaUqvyiYcEgNYn/RXi4+y1DrbahFqFMQA2SB7GaLaLzzy2
-   PDDHvVYySe6QCuiPxiJjyGOXHnyv1JgyS2gU4MGckYpOKzIM8dTfpK2sc
-   BS86XQ2r4XCADBs4FwRCAX92XsYqPKKyz6NpKi3OWJtINmxPsCt1BBvrB
-   x2+QC3rzwXx0RqNxPsbcGDJrF6n6HGLrHg8O2/CJ6OmsYXJfEY9NPxM9a
-   OgC97oHRwUS8NFJ3GiYqhRzsOm4tP7fdqnRmqXcHu/W4mNynYmQQ1ZRK+
-   g927bnKs7mYxO0TbvcqhZJ3z+qXuZjbCYXCZ69tOT30rm9QiyyQiG970u
-   A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10631"; a="419813029"
-X-IronPort-AV: E=Sophos;i="5.97,325,1669104000"; 
-   d="scan'208";a="419813029"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Feb 2023 13:05:12 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10631"; a="666285820"
-X-IronPort-AV: E=Sophos;i="5.97,325,1669104000"; 
-   d="scan'208";a="666285820"
-Received: from lkp-server01.sh.intel.com (HELO 3895f5c55ead) ([10.239.97.150])
-  by orsmga007.jf.intel.com with ESMTP; 24 Feb 2023 13:05:08 -0800
-Received: from kbuild by 3895f5c55ead with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1pVfFb-0002j9-1U;
-        Fri, 24 Feb 2023 21:05:07 +0000
-Date:   Sat, 25 Feb 2023 05:04:09 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Mike Christie <michael.christie@oracle.com>, bvanassche@acm.org,
-        hch@lst.de, martin.petersen@oracle.com, linux-scsi@vger.kernel.org,
-        james.bottomley@hansenpartnership.com, linux-block@vger.kernel.org,
-        dm-devel@redhat.com, snitzer@kernel.org, axboe@kernel.dk,
-        linux-nvme@lists.infradead.org, chaitanyak@nvidia.com,
-        kbusch@kernel.org, target-devel@vger.kernel.org
-Cc:     oe-kbuild-all@lists.linux.dev,
-        Mike Christie <michael.christie@oracle.com>
-Subject: Re: [PATCH v4 13/18] nvme: Add pr_ops read_reservation support
-Message-ID: <202302250448.cEVYdC1I-lkp@intel.com>
-References: <20230224174502.321490-14-michael.christie@oracle.com>
+        Fri, 24 Feb 2023 18:10:30 -0500
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 291921630B;
+        Fri, 24 Feb 2023 15:10:28 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Sender:Content-Type:MIME-Version:
+        Message-ID:Subject:Cc:To:From:Date:Reply-To:Content-Transfer-Encoding:
+        Content-ID:Content-Description:In-Reply-To:References;
+        bh=PWlxtCRdEYf+JZg4eqY+Ghwyo/skTEHHEw79y59hqkA=; b=0/Tor7OOrFQUrrKwtxamtltx11
+        nKDIVjdsIQ0gcNotQUCZhG8ECjAKhIBhvT3EStnMoaGsUPNqn0mgb4ZNh4qc3MVSt4HlxYcMVbJHV
+        FcAL4x6XaOSHfXi5IZ4txQCLonRG2UoF/uOzi56GM1rKkuVPtqF6bCvWpDcLpEijZLuBmRmIkYKV8
+        f2ZaohLjFfmyuZqV2HlL5q0ikn01WleytaBoP378s41z0gdnmms6oecbmKLlSaZ2tW5Q3SM+/NiLA
+        FCRZyB/gPI/aj6PCnv6VCkCFC5QANTD0gbbPFijxoT9SCGDpTQDPAuRJ1OJLAOoya6ui+gjUOU3GL
+        ud7yYcYw==;
+Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1pVhCs-004G7y-Iv; Fri, 24 Feb 2023 23:10:26 +0000
+Date:   Fri, 24 Feb 2023 15:10:26 -0800
+From:   Luis Chamberlain <mcgrof@kernel.org>
+To:     linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-cxl@vger.kernel.org, linux-nfs@vger.kernel.org,
+        linux-kselftest@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org, mcgrof@kernel.org
+Subject: [ANN]: kdevops v6.2 released devices
+Message-ID: <Y/lD4kVcPqUppMwm@bombadil.infradead.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230224174502.321490-14-michael.christie@oracle.com>
+Sender: Luis Chamberlain <mcgrof@infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Mike,
+I'd like to announce the release of kdevops v6.2 [0] [1]. I had already written
+about most of the new features on the v6.2-rc1 release in the December 2022
+notes [2], but since a new features cannot regress we've seen a few more new
+features sneak in since then. I'll re-iterate a few of the newest major
+features added since our last release (v5.0.2):
 
-I love your patch! Perhaps something to improve:
+  * ZNS
+  * CXL
+  * NFS
+  * Initial Kernel selftests suport: firmware, sysctl, kmod
+  * OCI cloud support
+  * libvirt use 9p now for local builds
+  * PCI-passthrough support including a new dynamic kconfig interface for it
+  * Building qemu for you
+  * 12 btrfs profiles to test
+  * Results for tests are now archived see workflows/fstests/results/
+    for an example namespace
 
-[auto build test WARNING on mkp-scsi/for-next]
-[also build test WARNING on jejb-scsi/for-next axboe-block/for-next linus/master v6.2 next-20230224]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+For more details of release notes you can refer to the v6.2-rc1 [3] and
+v6.2 [4] git tags.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Mike-Christie/block-Rename-BLK_STS_NEXUS-to-BLK_STS_RESV_CONFLICT/20230225-024505
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/mkp/scsi.git for-next
-patch link:    https://lore.kernel.org/r/20230224174502.321490-14-michael.christie%40oracle.com
-patch subject: [PATCH v4 13/18] nvme: Add pr_ops read_reservation support
-config: sparc-allyesconfig (https://download.01.org/0day-ci/archive/20230225/202302250448.cEVYdC1I-lkp@intel.com/config)
-compiler: sparc64-linux-gcc (GCC) 12.1.0
-reproduce (this is a W=1 build):
-        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
-        chmod +x ~/bin/make.cross
-        # https://github.com/intel-lab-lkp/linux/commit/f66174eef73e332bdca3a158541875a4c2e617d1
-        git remote add linux-review https://github.com/intel-lab-lkp/linux
-        git fetch --no-tags linux-review Mike-Christie/block-Rename-BLK_STS_NEXUS-to-BLK_STS_RESV_CONFLICT/20230225-024505
-        git checkout f66174eef73e332bdca3a158541875a4c2e617d1
-        # save the config file
-        mkdir build_dir && cp config build_dir/.config
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.1.0 make.cross W=1 O=build_dir ARCH=sparc olddefconfig
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.1.0 make.cross W=1 O=build_dir ARCH=sparc SHELL=/bin/bash drivers/nvme/host/
+Thanks a lot to the developers who have contributed:
 
-If you fix the issue, kindly add following tag where applicable
-| Reported-by: kernel test robot <lkp@intel.com>
-| Link: https://lore.kernel.org/oe-kbuild-all/202302250448.cEVYdC1I-lkp@intel.com/
+  Adam Manzanares
+  Amir Goldstein
+  Chandan Babu R
+  Jeff Layton
+  Joel Granados
+  Josef Bacik
+  Luis Chamberlain
+  Pankaj Raghav
 
-All warnings (new ones prefixed by >>):
+*If* it makes sense, we may set up a stable brach for v6.2.y releases so
+which could fixate on the vagrant setup, so that folks using libvirt
+can get fixes. If we do that it would make sense to just merge fixes
+to the master branch first before the stable branch as well just as we
+do in upstream linux / stable branches.
 
-   drivers/nvme/host/pr.c: In function 'block_pr_type_from_nvme':
->> drivers/nvme/host/pr.c:43:24: warning: implicit conversion from 'enum nvme_pr_type' to 'enum pr_type' [-Wenum-conversion]
-      43 |                 return NVME_PR_EXCLUSIVE_ACCESS_ALL_REGS;
-         |                        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  Luis
 
-
-vim +43 drivers/nvme/host/pr.c
-
-    28	
-    29	static enum pr_type block_pr_type_from_nvme(enum nvme_pr_type type)
-    30	{
-    31		switch (type) {
-    32		case NVME_PR_WRITE_EXCLUSIVE:
-    33			return PR_WRITE_EXCLUSIVE;
-    34		case NVME_PR_EXCLUSIVE_ACCESS:
-    35			return PR_EXCLUSIVE_ACCESS;
-    36		case NVME_PR_WRITE_EXCLUSIVE_REG_ONLY:
-    37			return PR_WRITE_EXCLUSIVE_REG_ONLY;
-    38		case NVME_PR_EXCLUSIVE_ACCESS_REG_ONLY:
-    39			return PR_EXCLUSIVE_ACCESS_REG_ONLY;
-    40		case NVME_PR_WRITE_EXCLUSIVE_ALL_REGS:
-    41			return PR_WRITE_EXCLUSIVE_ALL_REGS;
-    42		case NVME_PR_EXCLUSIVE_ACCESS_ALL_REGS:
-  > 43			return NVME_PR_EXCLUSIVE_ACCESS_ALL_REGS;
-    44		}
-    45	
-    46		return 0;
-    47	}
-    48	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests
+[0] https://github.com/linux-kdevops/kdevops
+[1] https://gitlab.com/linux-kdevops/kdevops
+[2] https://people.kernel.org/mcgrof/kdevops-v6-2-rc1-released
+[3] https://github.com/linux-kdevops/kdevops/releases/tag/v6.2-rc1
+[4] https://github.com/linux-kdevops/kdevops/releases/tag/v6.2
