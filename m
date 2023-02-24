@@ -2,337 +2,181 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FC5AC7EE2D
-	for <linux-block@archiver.kernel.org>; Fri, 24 Feb 2023 17:48:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1B2DC7EE23
+	for <linux-block@archiver.kernel.org>; Fri, 24 Feb 2023 18:19:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229813AbjBXRsT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 24 Feb 2023 12:48:19 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44282 "EHLO
+        id S229656AbjBXSTH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 24 Feb 2023 13:19:07 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45588 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229811AbjBXRsH (ORCPT
+        with ESMTP id S229577AbjBXSTG (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 24 Feb 2023 12:48:07 -0500
-Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 44D3A10FC;
-        Fri, 24 Feb 2023 09:48:03 -0800 (PST)
-Received: from pps.filterd (m0246627.ppops.net [127.0.0.1])
-        by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 31OHibd3003680;
-        Fri, 24 Feb 2023 17:45:34 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references :
- content-transfer-encoding : content-type : mime-version; s=corp-2022-7-12;
- bh=jqyMXML+H40wHoEoi1XBTZ7vCB2WLL5i5Oy0Tx0j6vk=;
- b=1aO6JGgPSQAgNRPd0QPaaHyYMtOFCDNfIuzARvwrhtCO3R18/SZhkv2cWui5P6jq/kXO
- inJ39WxwNVGxO22cY81hY5cLGIOTK8TBzO+Z2GykUzNDQJZYoNccdyRcVvpYxISqAcuh
- S/x9PW4SOvwmBB2XAvZ2R/XWfl4uCHZNFKh8095EVQKZhKbvYtR9SfKb/+jz8YuOXco6
- I8lSdApuIjGu8du7hV5TxFjY0iKQMZDgwJ5piX6u16OVXk8P5qvMqzWilVoUEGCl6inI
- era4wyMZufGprbwRRDfipbFuKjpI03PXYCplvnACV/kA7jXgiKiBrGHusuLZidINIDS2 8g== 
-Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.appoci.oracle.com [130.35.100.223])
-        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3ntn90wq35-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 24 Feb 2023 17:45:33 +0000
-Received: from pps.filterd (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-        by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.5/8.17.1.5) with ESMTP id 31OGXw1d001935;
-        Fri, 24 Feb 2023 17:45:32 GMT
-Received: from nam10-dm6-obe.outbound.protection.outlook.com (mail-dm6nam10lp2108.outbound.protection.outlook.com [104.47.58.108])
-        by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3nxsb4kufb-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 24 Feb 2023 17:45:32 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=EbM4FpfyqT3ZeDO1+XAp+SZiXOogCDBMRVB8QhSaMIJeXpm3EZi9lxiJLcleLG7LmzqJ+T86kuKehcJUzll4wObGGqv7mFRmkFDzLzAwSusl0dHQ8kMjSB6zXktUTi/19Qu49OffsFsjbn1oOkzOHXaq89rYqHi7TjmeFEE1cWNQGOdFVCxy7BVNyKTMtetbPMB0PhOu3+VyLxyUswU5r55TGZBTfabAHFOo3r6i+VtMtxeEk+dPj8OhB4zBHxdezQK25tDisCvuA7+2A+3RwBaQTyKc7sOdwp9uuC5XKpGUkpA1I9ztTtZtScAHVHZJKWjxjxJQ+YXEz+GoLNbyEw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=jqyMXML+H40wHoEoi1XBTZ7vCB2WLL5i5Oy0Tx0j6vk=;
- b=U24agicXQC4K/Es+pG/wr/dne6jI0RnVm0HZppAYNvVoLS8HuGYz0VPruApNOhOvstMverlYuSaa/hhRSCq4mf3NuxwXOHDC9TGKbZPv/VzPO8+c0Z3uKRzMMOQu/2Qf+EaQPWsC2CPJeflrcuQscFaTSUd0J+6pv49RaFV6v0z4lyl2vr7lDHspQhA6od2nUjJTzl+WBitdXFTPoZE9lw+q0OV1lR1/O+Cl48gMruWyTanSvffy7vWKvdgCnvlTadFIq06+bed+PuldsV7N3MhglVed8wmZs/TQG3Ib/TJSB6c6Xi9+M2h9R2eeogWi0pCQzeEvkD0C/HRcgOj8kw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=jqyMXML+H40wHoEoi1XBTZ7vCB2WLL5i5Oy0Tx0j6vk=;
- b=ZR25m+hGVLjp6w+U8y16zuKJ7oCyrYjDOWfsOeD7kmAoL7ubse7fFWhhr+9f8z1inG6WEJhzoXbpcEtdJT2fxQAnT0c30sn2GubQITrryJhPCZjTCyh2y6iTSdvLLnxBeKToteMyt2W9aBmhS48V/VLCMT+KGuUBwY+Xq5RIDfM=
-Received: from DM5PR10MB1466.namprd10.prod.outlook.com (2603:10b6:3:b::7) by
- DS0PR10MB6245.namprd10.prod.outlook.com (2603:10b6:8:d3::8) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6134.16; Fri, 24 Feb 2023 17:45:29 +0000
-Received: from DM5PR10MB1466.namprd10.prod.outlook.com
- ([fe80::7dd7:8d22:104:8d64]) by DM5PR10MB1466.namprd10.prod.outlook.com
- ([fe80::7dd7:8d22:104:8d64%7]) with mapi id 15.20.6156.007; Fri, 24 Feb 2023
- 17:45:29 +0000
-From:   Mike Christie <michael.christie@oracle.com>
-To:     bvanassche@acm.org, hch@lst.de, martin.petersen@oracle.com,
-        linux-scsi@vger.kernel.org, james.bottomley@hansenpartnership.com,
-        linux-block@vger.kernel.org, dm-devel@redhat.com,
-        snitzer@kernel.org, axboe@kernel.dk,
-        linux-nvme@lists.infradead.org, chaitanyak@nvidia.com,
-        kbusch@kernel.org, target-devel@vger.kernel.org
-Cc:     Mike Christie <michael.christie@oracle.com>
-Subject: [PATCH v4 17/18] scsi: target: Report and detect unsupported PR commands
-Date:   Fri, 24 Feb 2023 11:45:01 -0600
-Message-Id: <20230224174502.321490-18-michael.christie@oracle.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20230224174502.321490-1-michael.christie@oracle.com>
-References: <20230224174502.321490-1-michael.christie@oracle.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: DS7PR05CA0050.namprd05.prod.outlook.com (2603:10b6:8:2f::9)
- To DM5PR10MB1466.namprd10.prod.outlook.com (2603:10b6:3:b::7)
+        Fri, 24 Feb 2023 13:19:06 -0500
+Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35AB215CA9;
+        Fri, 24 Feb 2023 10:19:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1677262745; x=1708798745;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=BNDdmrZdwBU8SRPX2vwNZc9jJnIBU5bmE3T6Ywe/qKQ=;
+  b=MSsp7/UMUpXoWsnYLYhkuH/GW+7p77TADUUoovwovvLxXiDPbeJlWQX/
+   +OVhymq8q2Ci7ocG+BpxtEtOEwbH6rBeZbbA41CfkwgpFfxsJ8CZvPLhA
+   UHE11Ey83UlORSInB2o3milUXhDwiU9ahYEIivNsTbm0YGj7jTBcQNoAF
+   jybAomsMfAD+G+G++vtJCD8nxH69uxnN9UA6wYDNNtdwlZKaNGkvLm3mu
+   AQw2jpVo8F6271LBVhwnBx8rymg5apI+Q1B3E5LMhtZpcYmJN2Z6JiuVz
+   Qm9xhf85DcTpUm4dCSkjM2xNwFraTp/ntI8PICCh0zRN97mOG11HB0dam
+   w==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10631"; a="313935954"
+X-IronPort-AV: E=Sophos;i="5.97,325,1669104000"; 
+   d="scan'208";a="313935954"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Feb 2023 10:19:04 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10631"; a="666240737"
+X-IronPort-AV: E=Sophos;i="5.97,325,1669104000"; 
+   d="scan'208";a="666240737"
+Received: from lkp-server01.sh.intel.com (HELO 3895f5c55ead) ([10.239.97.150])
+  by orsmga007.jf.intel.com with ESMTP; 24 Feb 2023 10:19:02 -0800
+Received: from kbuild by 3895f5c55ead with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1pVcer-0002bi-0I;
+        Fri, 24 Feb 2023 18:19:01 +0000
+Date:   Sat, 25 Feb 2023 02:18:38 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Andreas Hindborg <nmi@metaspace.dk>, linux-block@vger.kernel.org
+Cc:     oe-kbuild-all@lists.linux.dev, Andreas Hindborg <nmi@metaspace.dk>,
+        Hans Holmberg <Hans.Holmberg@wdc.com>,
+        Matias Bjorling <Matias.Bjorling@wdc.com>,
+        Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] block: ublk: enable zoned storage support
+Message-ID: <202302250222.XOrw9j6z-lkp@intel.com>
+References: <20230224125950.214779-1-nmi@metaspace.dk>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM5PR10MB1466:EE_|DS0PR10MB6245:EE_
-X-MS-Office365-Filtering-Correlation-Id: 3ce0a786-e26b-4106-0292-08db168eeb9b
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: c8G5jEqPkMnRJsZoHasDDv9oYJ6pGInCaomqBsIMbGXVvdpHyPjEYtWM1h0woZL+MdrJtGw2wKd8hCMs4ZfafTQiLe67gE/1ypVjgB8QrNYftRbSyh2e6x3QP/b+n5B3ZwhN+Tm1teKWrhydOTLfuO6wcNuuEPnDLLHFJIY8xY/DwueHV/ooAVgvUJ7kNcM9oRJTBKePaaqWoAp8Dp7ZW+wI5MNKGYP7/rrDCNnNq5O7KWzvNMJf4qI6iX4WWVD/1cb1CCp8uEMuj2yM4MeQlTmvu815yKZ+qJVRS0D9qXaM/Lsy+Xpd49wCELmz7CAf7SV+EFkzqVvyUYJPP8VgnKbPU1i+nK+eK8QD+DoOHHabwD12eRY/4ZcOgL1A0uUyfIjL4jWsk8x/yy9dDhtKZZssSC3jGEkwjJrokuF18MCGiQkHL43V6rykqNSGSqywveUymv9lzyTzKhgYe3GEbkQdV4fvaz1+HvTTiMJISdCNsk1bgbh9t0WmMxv9MhfAlRuSrgovytG7bSk9hxqJOwWrgz6i9svGf6yUJTalxyrLStll5OHsANXhjj9j+rnQNc4ujcD1xMRMroNA82x/5kdndQU7N0y22ajORz+a81wd7ngP5IkmMM1hvXf+waSuI1TFM9js9DLjzP6dpeR1xSm76qhauvTmYbRCzBzR2JCkFRfacvWsGwegAR5AMjEr
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM5PR10MB1466.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(366004)(39860400002)(376002)(396003)(136003)(346002)(451199018)(6512007)(36756003)(26005)(2906002)(186003)(921005)(107886003)(6666004)(6506007)(1076003)(6486002)(38100700002)(478600001)(66946007)(8936002)(66476007)(4326008)(8676002)(41300700001)(7416002)(86362001)(5660300002)(66556008)(83380400001)(316002)(2616005);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?gjUO20SJ+fKDT3mHpZgqjG+VbTntN2zlBaujU+IBdcLlI9ttxULvVOTEZCuP?=
- =?us-ascii?Q?4QoGq3fRnfTM6sVGUPXhCbIR3wd7Q+zVdHDvQPr/BR4kmCsIVAY7XynOr9PJ?=
- =?us-ascii?Q?z5/4MDOuIXlY+Af2X6R9BAQDW9GrECC9FrLZsv6Lj1vDmV+TgXnQ+8VFGcOi?=
- =?us-ascii?Q?pb4vFOJ8ZCFhqvRLE0OK0G6+UTiXlOIwWNyPsHrFAasOBD2VjyxOG6gmqhfh?=
- =?us-ascii?Q?M4o3BtQ60bu6mEF46OO7HxTFE7Rmiu/b8X2BnxVqFPupgY6mb0WzCjqtWMV3?=
- =?us-ascii?Q?d70vzKxkAQXJrNuGbDhQglyu/rDbeo3S8vl3+jRgNCv8g0Yk2d1I5qYOQFg6?=
- =?us-ascii?Q?ATKzZG3fdJZbwQ41/cXOLDzAbpGopmvtzzu+xY+nbDg8PgveM8wcRWInzac+?=
- =?us-ascii?Q?c9qpiJXvTPnsEgWL8xtTfH0l6UiH7YYuSk7888clN9O57ctU3KVXboqf/Q39?=
- =?us-ascii?Q?I9q6bXlQLs6g/BJeQApWXeR/ZzvDWVaRSaxEiKS6I3vfV0lemUxWman7s3w2?=
- =?us-ascii?Q?MByip5q++WFbwdaGo7OunMzg+xlrgPx80AN2xU9kS7i2SWAHFBhWrrJW2F8P?=
- =?us-ascii?Q?9YlsuqauvtShQnO21hKDE36eM8Bf4PQHzMv3bJUPzcvKtbBPE6wCVE3O1208?=
- =?us-ascii?Q?1Wcu5VcIALOe8k6Z5vlcLQbErFGIi/Q5yLnZRd050r6NRCYK5RWe/5Q2F/tC?=
- =?us-ascii?Q?2Oj+VmuWjFV684W8tqZJ0GSDs4JapnK6fVXPK9XOy/sXOjzHSDom3E9jHb6k?=
- =?us-ascii?Q?itabepN1DjEmZJPJOHaBX+sXVTwAg3oJyI5wF7W5NRCQeaCmM+DDxgkmwf5J?=
- =?us-ascii?Q?1eLkTkqcmavrcrZKxDsZOM3VxrvVonzkiVLQiwU4LFpxszR14Id8VkhWytxc?=
- =?us-ascii?Q?i3E6a+EWM54IlCyXwme4+Lg6mDrg3QcMPGJgl6bU28+5dtgaHTvQIqmJY7fQ?=
- =?us-ascii?Q?FcnxCc9+2yOrpid8F8J0Jfam8dJ5n9Xa0m5NbKq56vf6WIO8ISJrIPgCsnei?=
- =?us-ascii?Q?mbIHbHYUX72N0uSfy9x9V91KY9w2BYr5DclCQ9NRXIzcs6ier1v+nWx+Mqf3?=
- =?us-ascii?Q?/wCeNVvPrF6b4bD8vTPwWcHAztSABVoEsYCXS4C6hODM5XlX6oZO+U0RjpCw?=
- =?us-ascii?Q?d6HGnj4d3DUar9nXO3+urt4VMdnuxWyt63qOLSqQF2zehb3MNhdAkokqTAv+?=
- =?us-ascii?Q?G+a7B0zNnc4xzKxt8MiJT11LQaOTX6pTAh5w/Cn89QOn8Ier9VJnu5pArHGJ?=
- =?us-ascii?Q?KLPR94FTHrRDOodCa7hhBfgXMDigFTiomSmVV89qkFkZXaWNEEUqfd2zIBi9?=
- =?us-ascii?Q?SNAiujJDwUOwo7D7a2AorkZQXaTVRZ5e2qxnJrDAB4CRMPNrhpfMNt7jFmJz?=
- =?us-ascii?Q?Fa3RJ/EJpxKej4Mgb2SssViFUU66Hi1DZsdI/cL0UVc+2ZqjqQckuU8Clmag?=
- =?us-ascii?Q?kNWCvfpYdkT3Q/Qio2BO9XRVYQerxzOf1dijBcweqrdatlogZiuEWu7Ui5sp?=
- =?us-ascii?Q?zUJqcoG85UN7OxtdWRhRFwFzQUITEZAWcjyjHpNQ4FhYNDMwdmdYYC6AlE1w?=
- =?us-ascii?Q?PuYxNqK+6GNZUZgID+402IjJi1LSyu1pQse2xB9pJ1r5yWR6LXLrTZr/SzKC?=
- =?us-ascii?Q?0g=3D=3D?=
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: =?us-ascii?Q?ef9xnQPYFB/NNfhJTQBhZL/SnW4ZAGDJ2YbawrS6HCiR2zJFhkwMQakEH5bH?=
- =?us-ascii?Q?V24O+gmdRbPujfGOAiciYBfGen01O3711G35e9BcFEQuZIDTOvb7AZLg9q8K?=
- =?us-ascii?Q?IpuJB1Il8Ez/a/dVvKouDlflRHiN7vRQdqbggpk23e6Uo1f3EcgkifpDUAYO?=
- =?us-ascii?Q?VIFpuQFPRcXCj427HS05OqFsRkOik63GW79KFPYf4nHAIu+Ro1Q7IZxFCTFT?=
- =?us-ascii?Q?Bn+/1J6ouk09mV7PQrrJ5zNicB0zrwblUiy90sZaXQB6HNZSbs62L0WGzSO8?=
- =?us-ascii?Q?zQALUCgqktHzNeDqI0tFfhmOBQGKEjrqnL4TyrD1Y1tc1hXmNBiD4d2Z8nBg?=
- =?us-ascii?Q?cAargQ2P9+0e5A8vw+tO6gkiHccMFFTMaRRuqgwUfGyFk3ykuumHHVtrvjds?=
- =?us-ascii?Q?iSjfOlO662yW6+ZwV70KzmbKZomj8THz+TChJuA0rtzvfzzOdAZWONUvLy7a?=
- =?us-ascii?Q?Ttqh08X8cei2OPdQTGHVT5s1xEAUmjOm5H/sjwt/f7r9afTLWOvDNmTh7/C9?=
- =?us-ascii?Q?h3ttkpw47rtITk9+lB33tALSFnodJV+LmH+HEON8r4grnmU2GsjE9S1PvR3x?=
- =?us-ascii?Q?cZP6y9EM52HRMP5z/XDv+DmKYvK52W0YuiNm47FOOterMx/hBVnaKcAhE0BU?=
- =?us-ascii?Q?prub9Fafqzm4/XYDBHOVou/gqCKTUb2bx/wztrirdyBwSTWhYZ0ZyQFrceMD?=
- =?us-ascii?Q?qrHkyUmkkS5hm66cN0ROUd9C5pzW7wT3l86oHfLLETSSG3aYf4cS3a7Yi3ZA?=
- =?us-ascii?Q?dOMrEuZ3l6OFJnssJVofsZ7AJA6cLFgcpZVQOB4+gnrsA6/fJLBk7CdcDOHJ?=
- =?us-ascii?Q?qFhfUkcp/b0hM2AAhinYqnHwJfRQjh04kTCqxTMe3E0J27CiqnAvcOS+p2D/?=
- =?us-ascii?Q?VDIu+Nvmvz5DDqKuRfndJl5YHc6I5fIdyfnKVw+1OnTtRKvyg6+ezl7lgPvZ?=
- =?us-ascii?Q?jIDahrBU9BbJ3EihAepiFrFqsxk9OYYLiLlRWobaprEB4kXKLF8gegxzhmQU?=
- =?us-ascii?Q?aoEkM5wigp6xgJucelprKgJLJg=3D=3D?=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3ce0a786-e26b-4106-0292-08db168eeb9b
-X-MS-Exchange-CrossTenant-AuthSource: DM5PR10MB1466.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Feb 2023 17:45:29.8747
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: eXP7FyXZLSz/jxUNtisb5b1Bn4/X0vdPT91vIYfyCUJt90suznEeA8h8VPtiJMUqbYXG6klvP28qIaCtxVaMRuLBEdKDLLy+t8bHGbDouac=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR10MB6245
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.170.22
- definitions=2023-02-24_12,2023-02-24_01,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 mlxscore=0 spamscore=0
- malwarescore=0 adultscore=0 suspectscore=0 mlxlogscore=999 phishscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2212070000
- definitions=main-2302240139
-X-Proofpoint-ORIG-GUID: aqVyD0EP9Y7usLEW4nRT_heT55as6_L7
-X-Proofpoint-GUID: aqVyD0EP9Y7usLEW4nRT_heT55as6_L7
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230224125950.214779-1-nmi@metaspace.dk>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The backend modules don't know about ports and I_T nexuses and the pr_ops
-callouts the modules will use don't support the old RESERVE/RELEASE
-commands. This patch has us report we don't support those types of
-commands and fail them.
+Hi Andreas,
 
-Signed-off-by: Mike Christie <michael.christie@oracle.com>
----
- drivers/target/target_core_pr.c  | 17 ++++++++
- drivers/target/target_core_spc.c | 75 +++++++++++++++++++++++---------
- 2 files changed, 72 insertions(+), 20 deletions(-)
+Thank you for the patch! Yet something to improve:
 
-diff --git a/drivers/target/target_core_pr.c b/drivers/target/target_core_pr.c
-index e16ef7d676af..7a3f07979a02 100644
---- a/drivers/target/target_core_pr.c
-+++ b/drivers/target/target_core_pr.c
-@@ -3554,6 +3554,18 @@ target_try_pr_out_pt(struct se_cmd *cmd, u8 sa, u64 res_key, u64 sa_res_key,
- 		return TCM_UNSUPPORTED_SCSI_OPCODE;
- 	}
- 
-+	switch (sa) {
-+	case PRO_REGISTER_AND_MOVE:
-+	case PRO_REPLACE_LOST_RESERVATION:
-+		pr_err("SPC-3 PR: PRO_REGISTER_AND_MOVE and PRO_REPLACE_LOST_RESERVATION are not supported by PR passthrough.\n");
-+		return TCM_UNSUPPORTED_SCSI_OPCODE;
-+	}
-+
-+	if (spec_i_pt || all_tg_pt) {
-+		pr_err("SPC-3 PR: SPEC_I_PT and ALL_TG_PT are not supported by PR passthrough.\n");
-+		return TCM_UNSUPPORTED_SCSI_OPCODE;
-+	}
-+
- 	return ops->execute_pr_out(cmd, sa, res_key, sa_res_key, type, aptpl);
- }
- 
-@@ -4082,6 +4094,11 @@ static sense_reason_t target_try_pr_in_pt(struct se_cmd *cmd, u8 sa)
- 		return TCM_UNSUPPORTED_SCSI_OPCODE;
- 	}
- 
-+	if (sa == PRI_READ_FULL_STATUS) {
-+		pr_err("SPC-3 PR: PRI_READ_FULL_STATUS is not supported by PR passthrough.\n");
-+		return TCM_UNSUPPORTED_SCSI_OPCODE;
-+	}
-+
- 	buf = transport_kmap_data_sg(cmd);
- 	if (!buf)
- 		return TCM_LOGICAL_UNIT_COMMUNICATION_FAILURE;
-diff --git a/drivers/target/target_core_spc.c b/drivers/target/target_core_spc.c
-index caf8d1325007..053bd2eea0e6 100644
---- a/drivers/target/target_core_spc.c
-+++ b/drivers/target/target_core_spc.c
-@@ -1672,7 +1672,41 @@ static bool tcm_is_pr_enabled(struct target_opcode_descriptor *descr,
- {
- 	struct se_device *dev = cmd->se_dev;
- 
--	return dev->dev_attrib.emulate_pr;
-+	if (!dev->dev_attrib.emulate_pr)
-+		return false;
-+
-+	if (!(dev->transport_flags & TRANSPORT_FLAG_PASSTHROUGH_PGR))
-+		return true;
-+
-+	switch (descr->opcode) {
-+	case RESERVE:
-+	case RESERVE_10:
-+	case RELEASE:
-+	case RELEASE_10:
-+		/*
-+		 * The pr_ops which are used by the backend modules don't
-+		 * support these commands.
-+		 */
-+		return false;
-+	case PERSISTENT_RESERVE_OUT:
-+		switch (descr->service_action) {
-+		case PRO_REGISTER_AND_MOVE:
-+		case PRO_REPLACE_LOST_RESERVATION:
-+			/*
-+			 * The backend modules don't have access to ports and
-+			 * I_T nexuses so they can't handle these type of
-+			 * requests.
-+			 */
-+			return false;
-+		}
-+		break;
-+	case PERSISTENT_RESERVE_IN:
-+		if (descr->service_action == PRI_READ_FULL_STATUS)
-+			return false;
-+		break;
-+	}
-+
-+	return true;
- }
- 
- static struct target_opcode_descriptor tcm_opcode_pri_read_caps = {
-@@ -1797,22 +1831,13 @@ static struct target_opcode_descriptor tcm_opcode_pro_register_move = {
- 	.enabled = tcm_is_pr_enabled,
- };
- 
--static bool
--tcm_is_scsi2_reservations_enabled(struct target_opcode_descriptor *descr,
--				  struct se_cmd *cmd)
--{
--	struct se_device *dev = cmd->se_dev;
--
--	return dev->dev_attrib.emulate_pr;
--}
--
- static struct target_opcode_descriptor tcm_opcode_release = {
- 	.support = SCSI_SUPPORT_FULL,
- 	.opcode = RELEASE,
- 	.cdb_size = 6,
- 	.usage_bits = {RELEASE, 0x00, 0x00, 0x00,
- 		       0x00, SCSI_CONTROL_MASK},
--	.enabled = tcm_is_scsi2_reservations_enabled,
-+	.enabled = tcm_is_pr_enabled,
- };
- 
- static struct target_opcode_descriptor tcm_opcode_release10 = {
-@@ -1822,7 +1847,7 @@ static struct target_opcode_descriptor tcm_opcode_release10 = {
- 	.usage_bits = {RELEASE_10, 0x00, 0x00, 0x00,
- 		       0x00, 0x00, 0x00, 0xff,
- 		       0xff, SCSI_CONTROL_MASK},
--	.enabled = tcm_is_scsi2_reservations_enabled,
-+	.enabled = tcm_is_pr_enabled,
- };
- 
- static struct target_opcode_descriptor tcm_opcode_reserve = {
-@@ -1831,7 +1856,7 @@ static struct target_opcode_descriptor tcm_opcode_reserve = {
- 	.cdb_size = 6,
- 	.usage_bits = {RESERVE, 0x00, 0x00, 0x00,
- 		       0x00, SCSI_CONTROL_MASK},
--	.enabled = tcm_is_scsi2_reservations_enabled,
-+	.enabled = tcm_is_pr_enabled,
- };
- 
- static struct target_opcode_descriptor tcm_opcode_reserve10 = {
-@@ -1841,7 +1866,7 @@ static struct target_opcode_descriptor tcm_opcode_reserve10 = {
- 	.usage_bits = {RESERVE_10, 0x00, 0x00, 0x00,
- 		       0x00, 0x00, 0x00, 0xff,
- 		       0xff, SCSI_CONTROL_MASK},
--	.enabled = tcm_is_scsi2_reservations_enabled,
-+	.enabled = tcm_is_pr_enabled,
- };
- 
- static struct target_opcode_descriptor tcm_opcode_request_sense = {
-@@ -2246,12 +2271,22 @@ spc_parse_cdb(struct se_cmd *cmd, unsigned int *size)
- 	struct se_device *dev = cmd->se_dev;
- 	unsigned char *cdb = cmd->t_task_cdb;
- 
--	if (!dev->dev_attrib.emulate_pr &&
--	    ((cdb[0] == PERSISTENT_RESERVE_IN) ||
--	     (cdb[0] == PERSISTENT_RESERVE_OUT) ||
--	     (cdb[0] == RELEASE || cdb[0] == RELEASE_10) ||
--	     (cdb[0] == RESERVE || cdb[0] == RESERVE_10))) {
--		return TCM_UNSUPPORTED_SCSI_OPCODE;
-+	switch (cdb[0]) {
-+	case RESERVE:
-+	case RESERVE_10:
-+	case RELEASE:
-+	case RELEASE_10:
-+		if (!dev->dev_attrib.emulate_pr)
-+			return TCM_UNSUPPORTED_SCSI_OPCODE;
-+
-+		if (dev->transport_flags & TRANSPORT_FLAG_PASSTHROUGH_PGR)
-+			return TCM_UNSUPPORTED_SCSI_OPCODE;
-+		break;
-+	case PERSISTENT_RESERVE_IN:
-+	case PERSISTENT_RESERVE_OUT:
-+		if (!dev->dev_attrib.emulate_pr)
-+			return TCM_UNSUPPORTED_SCSI_OPCODE;
-+		break;
- 	}
- 
- 	switch (cdb[0]) {
+[auto build test ERROR on v6.2]
+[cannot apply to axboe-block/for-next linus/master next-20230224]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Andreas-Hindborg/block-ublk-enable-zoned-storage-support/20230224-210205
+patch link:    https://lore.kernel.org/r/20230224125950.214779-1-nmi%40metaspace.dk
+patch subject: [PATCH] block: ublk: enable zoned storage support
+config: ia64-buildonly-randconfig-r006-20230222 (https://download.01.org/0day-ci/archive/20230225/202302250222.XOrw9j6z-lkp@intel.com/config)
+compiler: ia64-linux-gcc (GCC) 12.1.0
+reproduce (this is a W=1 build):
+        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+        chmod +x ~/bin/make.cross
+        # https://github.com/intel-lab-lkp/linux/commit/6d088fc1b115a63e8888b12fa47aabd45be97460
+        git remote add linux-review https://github.com/intel-lab-lkp/linux
+        git fetch --no-tags linux-review Andreas-Hindborg/block-ublk-enable-zoned-storage-support/20230224-210205
+        git checkout 6d088fc1b115a63e8888b12fa47aabd45be97460
+        # save the config file
+        mkdir build_dir && cp config build_dir/.config
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.1.0 make.cross W=1 O=build_dir ARCH=ia64 olddefconfig
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.1.0 make.cross W=1 O=build_dir ARCH=ia64 SHELL=/bin/bash drivers/
+
+If you fix the issue, kindly add following tag where applicable
+| Reported-by: kernel test robot <lkp@intel.com>
+| Link: https://lore.kernel.org/oe-kbuild-all/202302250222.XOrw9j6z-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   drivers/block/ublk_drv.c: In function 'ublk_dev_param_basic_apply':
+>> drivers/block/ublk_drv.c:221:28: error: 'struct gendisk' has no member named 'nr_zones'
+     221 |                 ub->ub_disk->nr_zones = p->dev_sectors / p->chunk_sectors;
+         |                            ^~
+   drivers/block/ublk_drv.c: In function 'ublk_dev_param_zoned_apply':
+>> drivers/block/ublk_drv.c:244:17: error: implicit declaration of function 'disk_set_max_active_zones'; did you mean 'bdev_max_active_zones'? [-Werror=implicit-function-declaration]
+     244 |                 disk_set_max_active_zones(ub->ub_disk, p->max_active_zones);
+         |                 ^~~~~~~~~~~~~~~~~~~~~~~~~
+         |                 bdev_max_active_zones
+>> drivers/block/ublk_drv.c:245:17: error: implicit declaration of function 'disk_set_max_open_zones'; did you mean 'bdev_max_open_zones'? [-Werror=implicit-function-declaration]
+     245 |                 disk_set_max_open_zones(ub->ub_disk, p->max_open_zones);
+         |                 ^~~~~~~~~~~~~~~~~~~~~~~
+         |                 bdev_max_open_zones
+   drivers/block/ublk_drv.c: In function 'ublk_ctrl_start_dev':
+>> drivers/block/ublk_drv.c:1663:23: error: implicit declaration of function 'blk_revalidate_disk_zones' [-Werror=implicit-function-declaration]
+    1663 |                 ret = blk_revalidate_disk_zones(disk, NULL);
+         |                       ^~~~~~~~~~~~~~~~~~~~~~~~~
+   cc1: some warnings being treated as errors
+
+
+vim +221 drivers/block/ublk_drv.c
+
+   192	
+   193	static void ublk_dev_param_basic_apply(struct ublk_device *ub)
+   194	{
+   195		struct request_queue *q = ub->ub_disk->queue;
+   196		const struct ublk_param_basic *p = &ub->params.basic;
+   197	
+   198		blk_queue_logical_block_size(q, 1 << p->logical_bs_shift);
+   199		blk_queue_physical_block_size(q, 1 << p->physical_bs_shift);
+   200		blk_queue_io_min(q, 1 << p->io_min_shift);
+   201		blk_queue_io_opt(q, 1 << p->io_opt_shift);
+   202	
+   203		blk_queue_write_cache(q, p->attrs & UBLK_ATTR_VOLATILE_CACHE,
+   204				p->attrs & UBLK_ATTR_FUA);
+   205		if (p->attrs & UBLK_ATTR_ROTATIONAL)
+   206			blk_queue_flag_clear(QUEUE_FLAG_NONROT, q);
+   207		else
+   208			blk_queue_flag_set(QUEUE_FLAG_NONROT, q);
+   209	
+   210		blk_queue_max_hw_sectors(q, p->max_sectors);
+   211		blk_queue_chunk_sectors(q, p->chunk_sectors);
+   212		blk_queue_virt_boundary(q, p->virt_boundary_mask);
+   213	
+   214		if (p->attrs & UBLK_ATTR_READ_ONLY)
+   215			set_disk_ro(ub->ub_disk, true);
+   216	
+   217		set_capacity(ub->ub_disk, p->dev_sectors);
+   218	
+   219		if (IS_ENABLED(CONFIG_BLK_DEV_ZONED) &&
+   220		    ub->dev_info.flags & UBLK_F_ZONED && p->chunk_sectors) {
+ > 221			ub->ub_disk->nr_zones = p->dev_sectors / p->chunk_sectors;
+   222		}
+   223	}
+   224	
+   225	static void ublk_dev_param_discard_apply(struct ublk_device *ub)
+   226	{
+   227		struct request_queue *q = ub->ub_disk->queue;
+   228		const struct ublk_param_discard *p = &ub->params.discard;
+   229	
+   230		q->limits.discard_alignment = p->discard_alignment;
+   231		q->limits.discard_granularity = p->discard_granularity;
+   232		blk_queue_max_discard_sectors(q, p->max_discard_sectors);
+   233		blk_queue_max_write_zeroes_sectors(q,
+   234				p->max_write_zeroes_sectors);
+   235		blk_queue_max_discard_segments(q, p->max_discard_segments);
+   236	}
+   237	
+   238	static void ublk_dev_param_zoned_apply(struct ublk_device *ub)
+   239	{
+   240		const struct ublk_param_zoned *p = &ub->params.zoned;
+   241	
+   242		if (IS_ENABLED(CONFIG_BLK_DEV_ZONED) &&
+   243		    ub->dev_info.flags & UBLK_F_ZONED) {
+ > 244			disk_set_max_active_zones(ub->ub_disk, p->max_active_zones);
+ > 245			disk_set_max_open_zones(ub->ub_disk, p->max_open_zones);
+   246			/* We do not support zone append yet */
+   247			//blk_queue_max_zone_append_sectors(q, zone_size);
+   248		}
+   249	}
+   250	
+
 -- 
-2.25.1
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests
