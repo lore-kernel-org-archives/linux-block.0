@@ -2,116 +2,119 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 81516C6FA8E
-	for <linux-block@archiver.kernel.org>; Fri, 24 Feb 2023 18:51:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B44DC6FA8E
+	for <linux-block@archiver.kernel.org>; Fri, 24 Feb 2023 20:05:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229740AbjBXSvg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 24 Feb 2023 13:51:36 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48204 "EHLO
+        id S229562AbjBXUFO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 24 Feb 2023 15:05:14 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59902 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229635AbjBXSvg (ORCPT
+        with ESMTP id S229488AbjBXUFM (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 24 Feb 2023 13:51:36 -0500
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20CCF6A7A6;
-        Fri, 24 Feb 2023 10:51:34 -0800 (PST)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 17F1A6084F;
-        Fri, 24 Feb 2023 18:51:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-        t=1677264693; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=gXQvhEuj9SoWq4xHpYapHJn0TS7BQOaz7ZvYAaP4S+A=;
-        b=dEYBd4cfzxjGTUmflHKaPPcrCa5DIXUW5PXOlZp25Ohjug6EGBHiNxCC4c2PxqyS/2Ey4z
-        mhwRMO46LgnpEdxuUAGUYrz8/3/ZV12IG2ECnZBLqPvbjZV4TozoHBZaimvafQ/+J2k4U7
-        SSFL+6vupQbD8c5MFDRjWifxKXfR0+0=
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id C5DEE13246;
-        Fri, 24 Feb 2023 18:51:32 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id V8z9LjQH+WOvdAAAMHmgww
-        (envelope-from <mkoutny@suse.com>); Fri, 24 Feb 2023 18:51:32 +0000
-Date:   Fri, 24 Feb 2023 19:51:26 +0100
-From:   Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>
-To:     Breno Leitao <leitao@debian.org>
-Cc:     axboe@kernel.dk, tj@kernel.org, josef@toxicpanda.com,
-        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-        aherrmann@suse.de, linux-kernel@vger.kernel.org, hch@lst.de,
-        leit@fb.com
-Subject: Re: [PATCH] blk-iocost: initialize rqos before accessing it
-Message-ID: <20230224185126.bxkreilofbp2t4on@blackpad>
-References: <20230224160714.172884-1-leitao@debian.org>
+        Fri, 24 Feb 2023 15:05:12 -0500
+Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E285CB76A;
+        Fri, 24 Feb 2023 12:04:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1677269072; x=1708805072;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=yK0OLOKHTBjVer7SFMeFOCUouvvyebPi2V/Mk1R/2rk=;
+  b=f3Nn2m+zWtGyVfYECGOi9Z7KSIrFxFPY5HkB7H/299clAaWvjwu839dN
+   uS+m3bRYX8utWtQgMlq27zZ7c+gKdNrkR5B4E8SBgggfEfs4XoYlDiGQd
+   YGdm3uEKXKUMUazkKwW5kECSC0hYlq9LZcJDRW5rgUux8ccxCLZj0PD+J
+   IzXLHfANkL2f9m3A3NJGBH0iSHu7pIVL6FSjQBd6KDq+qtkricJQWWTJR
+   Nxn0Vv3eiCAG9ZWa/5rjOu6/JtarQCP58z+vySvslEawtYe/EdofyEdlk
+   JOOm3VyGE8n4SwRXuwZrcbp9DwOUdgAvKDbeY/hC0MEDXW/FCY4nHm21o
+   g==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10631"; a="321771024"
+X-IronPort-AV: E=Sophos;i="5.97,325,1669104000"; 
+   d="scan'208";a="321771024"
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Feb 2023 12:03:09 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10631"; a="741764528"
+X-IronPort-AV: E=Sophos;i="5.97,325,1669104000"; 
+   d="scan'208";a="741764528"
+Received: from lkp-server01.sh.intel.com (HELO 3895f5c55ead) ([10.239.97.150])
+  by fmsmga004.fm.intel.com with ESMTP; 24 Feb 2023 12:03:07 -0800
+Received: from kbuild by 3895f5c55ead with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1pVeHa-0002hb-0z;
+        Fri, 24 Feb 2023 20:03:06 +0000
+Date:   Sat, 25 Feb 2023 04:02:11 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Andreas Hindborg <nmi@metaspace.dk>, linux-block@vger.kernel.org
+Cc:     oe-kbuild-all@lists.linux.dev, Andreas Hindborg <nmi@metaspace.dk>,
+        Hans Holmberg <Hans.Holmberg@wdc.com>,
+        Matias Bjorling <Matias.Bjorling@wdc.com>,
+        Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] block: ublk: enable zoned storage support
+Message-ID: <202302250349.1eKfsTvO-lkp@intel.com>
+References: <20230224125950.214779-1-nmi@metaspace.dk>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="6m3yodbwxciinozt"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230224160714.172884-1-leitao@debian.org>
+In-Reply-To: <20230224125950.214779-1-nmi@metaspace.dk>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Hi Andreas,
 
---6m3yodbwxciinozt
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Thank you for the patch! Yet something to improve:
 
-On Fri, Feb 24, 2023 at 08:07:14AM -0800, Breno Leitao <leitao@debian.org> =
-wrote:
-> ---
->  block/blk-iocost.c | 10 +++++-----
->  1 file changed, 5 insertions(+), 5 deletions(-)
+[auto build test ERROR on v6.2]
+[cannot apply to axboe-block/for-next linus/master next-20230224]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-Well done.
+url:    https://github.com/intel-lab-lkp/linux/commits/Andreas-Hindborg/block-ublk-enable-zoned-storage-support/20230224-210205
+patch link:    https://lore.kernel.org/r/20230224125950.214779-1-nmi%40metaspace.dk
+patch subject: [PATCH] block: ublk: enable zoned storage support
+config: mips-allyesconfig (https://download.01.org/0day-ci/archive/20230225/202302250349.1eKfsTvO-lkp@intel.com/config)
+compiler: mips-linux-gcc (GCC) 12.1.0
+reproduce (this is a W=1 build):
+        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+        chmod +x ~/bin/make.cross
+        # https://github.com/intel-lab-lkp/linux/commit/6d088fc1b115a63e8888b12fa47aabd45be97460
+        git remote add linux-review https://github.com/intel-lab-lkp/linux
+        git fetch --no-tags linux-review Andreas-Hindborg/block-ublk-enable-zoned-storage-support/20230224-210205
+        git checkout 6d088fc1b115a63e8888b12fa47aabd45be97460
+        # save the config file
+        mkdir build_dir && cp config build_dir/.config
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.1.0 make.cross W=1 O=build_dir ARCH=mips olddefconfig
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.1.0 make.cross W=1 O=build_dir ARCH=mips SHELL=/bin/bash
 
-Reviewed-by: Michal Koutn=FD <mkoutny@suse.com>
+If you fix the issue, kindly add following tag where applicable
+| Reported-by: kernel test robot <lkp@intel.com>
+| Link: https://lore.kernel.org/oe-kbuild-all/202302250349.1eKfsTvO-lkp@intel.com/
 
+All errors (new ones prefixed by >>):
 
-[...]
-> 	blk_iocost_init (include/asm-generic/qspinlock.h:128
-> 			 include/linux/spinlock.h:203
-> 			 include/linux/spinlock_api_smp.h:158
-> 			 include/linux/spinlock.h:400
-> 			 block/blk-iocost.c:2884)
-> 	ioc_qos_write (block/blk-iocost.c:3198)
-> 	? kretprobe_perf_func (kernel/trace/trace_kprobe.c:1566)
-> 	? kernfs_fop_write_iter (include/linux/slab.h:584 fs/kernfs/file.c:311)
-> 	? __kmem_cache_alloc_node (mm/slab.h:? mm/slub.c:3452 mm/slub.c:3491)
-> 	? _copy_from_iter (arch/x86/include/asm/uaccess_64.h:46
-> 			   arch/x86/include/asm/uaccess_64.h:52
-> 			   lib/iov_iter.c:183 lib/iov_iter.c:628)
-> 	? kretprobe_dispatcher (kernel/trace/trace_kprobe.c:1693)
-> 	cgroup_file_write (kernel/cgroup/cgroup.c:4061)
-> 	kernfs_fop_write_iter (fs/kernfs/file.c:334)
-> 	vfs_write (include/linux/fs.h:1849 fs/read_write.c:491
-> 		   fs/read_write.c:584)
-> 	ksys_write (fs/read_write.c:637)
-> 	do_syscall_64 (arch/x86/entry/common.c:50 arch/x86/entry/common.c:80)
-> 	entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:120)
+   arch/mips/kernel/head.o: in function `kernel_entry':
+   (.ref.text+0xac): relocation truncated to fit: R_MIPS_26 against `start_kernel'
+   init/main.o: in function `set_reset_devices':
+   main.c:(.init.text+0x20): relocation truncated to fit: R_MIPS_26 against `_mcount'
+   main.c:(.init.text+0x30): relocation truncated to fit: R_MIPS_26 against `__sanitizer_cov_trace_pc'
+   init/main.o: in function `debug_kernel':
+   main.c:(.init.text+0xa4): relocation truncated to fit: R_MIPS_26 against `_mcount'
+   main.c:(.init.text+0xb4): relocation truncated to fit: R_MIPS_26 against `__sanitizer_cov_trace_pc'
+   init/main.o: in function `quiet_kernel':
+   main.c:(.init.text+0x128): relocation truncated to fit: R_MIPS_26 against `_mcount'
+   main.c:(.init.text+0x138): relocation truncated to fit: R_MIPS_26 against `__sanitizer_cov_trace_pc'
+   init/main.o: in function `warn_bootconfig':
+   main.c:(.init.text+0x1ac): relocation truncated to fit: R_MIPS_26 against `_mcount'
+   main.c:(.init.text+0x1bc): relocation truncated to fit: R_MIPS_26 against `__sanitizer_cov_trace_pc'
+   init/main.o: in function `init_setup':
+   main.c:(.init.text+0x234): relocation truncated to fit: R_MIPS_26 against `_mcount'
+   main.c:(.init.text+0x254): additional relocation overflows omitted from the output
+   mips-linux-ld: drivers/block/ublk_drv.o: in function `ublk_dev_param_basic_apply':
+>> ublk_drv.c:(.text.ublk_dev_param_basic_apply+0x2d8): undefined reference to `__udivdi3'
 
-BTW, out of curiosity what tool did you use to list stack with line
-numbers?
-
-Thanks,
-Michal
-
---6m3yodbwxciinozt
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQTrXXag4J0QvXXBmkMkDQmsBEOquQUCY/kHFAAKCRAkDQmsBEOq
-uZA8APwKEgRDcDxvVYqITHL+eSPHCCTuTseSO6af4mz3xtDDPAD9F5C04O0o8i2A
-Cy6l5UzdFQQ+hamXG1WXrD52wGyWbQI=
-=Ko1G
------END PGP SIGNATURE-----
-
---6m3yodbwxciinozt--
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests
