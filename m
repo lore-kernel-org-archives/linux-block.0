@@ -2,48 +2,48 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7193DC7EE2F
-	for <linux-block@archiver.kernel.org>; Sun, 26 Feb 2023 03:56:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DEC5C7EE23
+	for <linux-block@archiver.kernel.org>; Sun, 26 Feb 2023 04:08:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230153AbjBZDz7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 25 Feb 2023 22:55:59 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47606 "EHLO
+        id S229585AbjBZEIk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 25 Feb 2023 23:08:40 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36932 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230221AbjBZDzl (ORCPT
+        with ESMTP id S229486AbjBZEIj (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 25 Feb 2023 22:55:41 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B3B71714E;
-        Sat, 25 Feb 2023 19:55:11 -0800 (PST)
+        Sat, 25 Feb 2023 23:08:39 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 67EBF6A57;
+        Sat, 25 Feb 2023 20:08:38 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id EE416B80956;
-        Sun, 26 Feb 2023 03:44:14 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AC7FDC433D2;
-        Sun, 26 Feb 2023 03:44:12 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 4FF3CB80B8A;
+        Sun, 26 Feb 2023 03:44:05 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1A2BFC433EF;
+        Sun, 26 Feb 2023 03:44:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1677383053;
-        bh=LE6Cuxh0N4Eej+KJKmepjRL+51JfrcQnW1JJGA9cAOk=;
+        s=k20201202; t=1677383044;
+        bh=nXU1mIcE80gCuXpTLG5b3uYjUUQu4yGjMNHvMqJDQyc=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=PM0CfhWT1wXNddcyFftkUKX74V3kaxax7cb5ZeGtCyCxwAZo27ZmSia3L6Ogj3SEV
-         bPv31BxBvVRzwlIGuvs7+/oBLsogrVJIDm43gnFM+qwiZBKMg8/YZCLEWfVGvmdJoN
-         95yYXAZRQDhv3mL82x5U6V0BTwYVGlf2uf4fSwo5X7RiRNsDigN17Dgh2Qk97miLLl
-         WwwHa5CU7qjymp7BpCuPvJLUAoq7Elf3Gdw//WA6rgNz1FpPEsovoREwk25mPXbELX
-         nZWy32sDIYfKlHvZr8y/X7OvxFiYA8xLu0Bzi2A3Ctqy8akLj4ky66SURfEyUo5SLZ
-         2XX6FnTq1qz9Q==
+        b=LGLVJjQjHJJRYqoX55ITpKdOqnF+zVdiSt8GSHaCwhO1eV4eyXZm6Shoze2WBzocW
+         G4Z9LtZ9+GFNxwFwBh30sV9nYiWb7CgRXlVsnFwkzUr8BLuIOuaWF68m7Rn3ZkQXDj
+         C8c+8eeZs9moAiJVyihSMDJ+P8z0g3xC7EJw5mMNEcdIrbTNa1/PR1BW1gzSDi/ztf
+         akFw3V4mm/BB9fdP6n5fH/QubIfJT+jlerW21kMDpizmfmHrziLHGtPxjWKXmxEaqQ
+         Y+JuXGi3tqjfmFfdiAquEc86U5KrwdW4NTXckjo59kbqUKO22KWq8Ecs/FUcM+K/D0
+         6Fh7qfhm/5+xA==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Li Nan <linan122@huawei.com>, Yu Kuai <yukuai3@huawei.com>,
         Tejun Heo <tj@kernel.org>, Jens Axboe <axboe@kernel.dk>,
         Sasha Levin <sashal@kernel.org>, josef@toxicpanda.com,
         cgroups@vger.kernel.org, linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.10 3/5] blk-iocost: fix divide by 0 error in calc_lcoefs()
-Date:   Sat, 25 Feb 2023 22:44:06 -0500
-Message-Id: <20230226034408.774670-3-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.15 3/6] blk-iocost: fix divide by 0 error in calc_lcoefs()
+Date:   Sat, 25 Feb 2023 22:43:55 -0500
+Message-Id: <20230226034359.773806-3-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.0
-In-Reply-To: <20230226034408.774670-1-sashal@kernel.org>
-References: <20230226034408.774670-1-sashal@kernel.org>
+In-Reply-To: <20230226034359.773806-1-sashal@kernel.org>
+References: <20230226034359.773806-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -93,10 +93,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 8 insertions(+), 3 deletions(-)
 
 diff --git a/block/blk-iocost.c b/block/blk-iocost.c
-index fb8f959a7f327..9255b642d6adb 100644
+index 069193dee95b0..bd7e9ffa5d401 100644
 --- a/block/blk-iocost.c
 +++ b/block/blk-iocost.c
-@@ -872,9 +872,14 @@ static void calc_lcoefs(u64 bps, u64 seqiops, u64 randiops,
+@@ -870,9 +870,14 @@ static void calc_lcoefs(u64 bps, u64 seqiops, u64 randiops,
  
  	*page = *seqio = *randio = 0;
  
