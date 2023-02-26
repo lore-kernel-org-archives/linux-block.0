@@ -2,118 +2,79 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DEC5C7EE23
-	for <linux-block@archiver.kernel.org>; Sun, 26 Feb 2023 04:08:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF058C64ED6
+	for <linux-block@archiver.kernel.org>; Sun, 26 Feb 2023 04:31:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229585AbjBZEIk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 25 Feb 2023 23:08:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36932 "EHLO
+        id S229593AbjBZEbA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 25 Feb 2023 23:31:00 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55134 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229486AbjBZEIj (ORCPT
+        with ESMTP id S229445AbjBZEa7 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 25 Feb 2023 23:08:39 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 67EBF6A57;
-        Sat, 25 Feb 2023 20:08:38 -0800 (PST)
+        Sat, 25 Feb 2023 23:30:59 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 214052739;
+        Sat, 25 Feb 2023 20:30:58 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 4FF3CB80B8A;
-        Sun, 26 Feb 2023 03:44:05 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1A2BFC433EF;
-        Sun, 26 Feb 2023 03:44:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1677383044;
-        bh=nXU1mIcE80gCuXpTLG5b3uYjUUQu4yGjMNHvMqJDQyc=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=LGLVJjQjHJJRYqoX55ITpKdOqnF+zVdiSt8GSHaCwhO1eV4eyXZm6Shoze2WBzocW
-         G4Z9LtZ9+GFNxwFwBh30sV9nYiWb7CgRXlVsnFwkzUr8BLuIOuaWF68m7Rn3ZkQXDj
-         C8c+8eeZs9moAiJVyihSMDJ+P8z0g3xC7EJw5mMNEcdIrbTNa1/PR1BW1gzSDi/ztf
-         akFw3V4mm/BB9fdP6n5fH/QubIfJT+jlerW21kMDpizmfmHrziLHGtPxjWKXmxEaqQ
-         Y+JuXGi3tqjfmFfdiAquEc86U5KrwdW4NTXckjo59kbqUKO22KWq8Ecs/FUcM+K/D0
-         6Fh7qfhm/5+xA==
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Li Nan <linan122@huawei.com>, Yu Kuai <yukuai3@huawei.com>,
-        Tejun Heo <tj@kernel.org>, Jens Axboe <axboe@kernel.dk>,
-        Sasha Levin <sashal@kernel.org>, josef@toxicpanda.com,
-        cgroups@vger.kernel.org, linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.15 3/6] blk-iocost: fix divide by 0 error in calc_lcoefs()
-Date:   Sat, 25 Feb 2023 22:43:55 -0500
-Message-Id: <20230226034359.773806-3-sashal@kernel.org>
-X-Mailer: git-send-email 2.39.0
-In-Reply-To: <20230226034359.773806-1-sashal@kernel.org>
-References: <20230226034359.773806-1-sashal@kernel.org>
-MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
+        by ams.source.kernel.org (Postfix) with ESMTPS id C3D57B80B6F;
+        Sun, 26 Feb 2023 04:30:56 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3EC66C433EF;
+        Sun, 26 Feb 2023 04:30:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linux-foundation.org;
+        s=korg; t=1677385855;
+        bh=3AVpRW1qfx5u4fWuk1ExehO1c3toNqap5A2JD2mWud8=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=Z2x2VghRbdvldniWzOgtOOVwyu0YcNwIgHAUww07sKBomB2aMml+GfGgFSjEm34ag
+         ddby0Tqvtv0krNdAwmEmS6JKUrXdexhqg2T4oUOk/1zi+L62ZyPkqtmmpwSZxUnsct
+         ix3PxjxK9VDp5LSf9VE+OX9MObQbT1hGdLTE7JBs=
+Date:   Sat, 25 Feb 2023 20:30:52 -0800
+From:   Andrew Morton <akpm@linux-foundation.org>
+To:     Geert Uytterhoeven <geert+renesas@glider.be>
+Cc:     Minchan Kim <minchan@kernel.org>,
+        Sergey Senozhatsky <senozhatsky@chromium.org>,
+        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] zram: Use atomic_long_read() to read atomic_long_t
+Message-Id: <20230225203052.0fd823a1ccf0619e89b315d8@linux-foundation.org>
+In-Reply-To: <20230225121523.3288544-1-geert+renesas@glider.be>
+References: <20230225121523.3288544-1-geert+renesas@glider.be>
+X-Mailer: Sylpheed 3.7.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Li Nan <linan122@huawei.com>
+On Sat, 25 Feb 2023 13:15:23 +0100 Geert Uytterhoeven <geert+renesas@glider.be> wrote:
 
-[ Upstream commit 984af1e66b4126cf145153661cc24c213e2ec231 ]
+> On 32-bit:
+> 
+>     drivers/block/zram/zram_drv.c: In function ‘mm_stat_show’:
+>     drivers/block/zram/zram_drv.c:1234:23: error: passing argument 1 of ‘atomic64_read’ from incompatible pointer type [-Werror=incompatible-pointer-types]
+>      1234 |    (u64)atomic64_read(&pool_stats.objs_moved));
+> 	  |                       ^~~~~~~~~~~~~~~~~~~~~~
+> 	  |                       |
+> 	  |                       atomic_long_t * {aka struct <anonymous> *}
+>     In file included from ./include/linux/atomic.h:82,
+> 		     from ./include/linux/mm_types_task.h:13,
+> 		     from ./include/linux/mm_types.h:5,
+> 		     from ./include/linux/buildid.h:5,
+> 		     from ./include/linux/module.h:14,
+> 		     from drivers/block/zram/zram_drv.c:18:
+>     ./include/linux/atomic/atomic-instrumented.h:644:33: note: expected ‘const atomic64_t *’ {aka ‘const struct <anonymous> *’} but argument is of type ‘atomic_long_t *’ {aka ‘struct <anonymous> *’}
+>       644 | atomic64_read(const atomic64_t *v)
+> 	  |               ~~~~~~~~~~~~~~~~~~^
+> 
+> Fix this by using atomic_long_read() instead.
+> 
+> Reported-by; noreply@ellerman.id.au
 
-echo max of u64 to cost.model can cause divide by 0 error.
+That's an interesting one.  Was this mpe@?
 
-  # echo 8:0 rbps=18446744073709551615 > /sys/fs/cgroup/io.cost.model
+I like it when a Reported-by: is followed by a Link: to the report, so
+I can go hunt down such things.
 
-  divide error: 0000 [#1] PREEMPT SMP
-  RIP: 0010:calc_lcoefs+0x4c/0xc0
-  Call Trace:
-   <TASK>
-   ioc_refresh_params+0x2b3/0x4f0
-   ioc_cost_model_write+0x3cb/0x4c0
-   ? _copy_from_iter+0x6d/0x6c0
-   ? kernfs_fop_write_iter+0xfc/0x270
-   cgroup_file_write+0xa0/0x200
-   kernfs_fop_write_iter+0x17d/0x270
-   vfs_write+0x414/0x620
-   ksys_write+0x73/0x160
-   __x64_sys_write+0x1e/0x30
-   do_syscall_64+0x35/0x80
-   entry_SYSCALL_64_after_hwframe+0x63/0xcd
-
-calc_lcoefs() uses the input value of cost.model in DIV_ROUND_UP_ULL,
-overflow would happen if bps plus IOC_PAGE_SIZE is greater than
-ULLONG_MAX, it can cause divide by 0 error.
-
-Fix the problem by setting basecost
-
-Signed-off-by: Li Nan <linan122@huawei.com>
-Signed-off-by: Yu Kuai <yukuai3@huawei.com>
-Acked-by: Tejun Heo <tj@kernel.org>
-Link: https://lore.kernel.org/r/20230117070806.3857142-5-yukuai1@huaweicloud.com
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- block/blk-iocost.c | 11 ++++++++---
- 1 file changed, 8 insertions(+), 3 deletions(-)
-
-diff --git a/block/blk-iocost.c b/block/blk-iocost.c
-index 069193dee95b0..bd7e9ffa5d401 100644
---- a/block/blk-iocost.c
-+++ b/block/blk-iocost.c
-@@ -870,9 +870,14 @@ static void calc_lcoefs(u64 bps, u64 seqiops, u64 randiops,
- 
- 	*page = *seqio = *randio = 0;
- 
--	if (bps)
--		*page = DIV64_U64_ROUND_UP(VTIME_PER_SEC,
--					   DIV_ROUND_UP_ULL(bps, IOC_PAGE_SIZE));
-+	if (bps) {
-+		u64 bps_pages = DIV_ROUND_UP_ULL(bps, IOC_PAGE_SIZE);
-+
-+		if (bps_pages)
-+			*page = DIV64_U64_ROUND_UP(VTIME_PER_SEC, bps_pages);
-+		else
-+			*page = 1;
-+	}
- 
- 	if (seqiops) {
- 		v = DIV64_U64_ROUND_UP(VTIME_PER_SEC, seqiops);
--- 
-2.39.0
 
