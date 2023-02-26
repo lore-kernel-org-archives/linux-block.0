@@ -2,48 +2,45 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 507BAC7EE33
-	for <linux-block@archiver.kernel.org>; Sun, 26 Feb 2023 03:44:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 29985C64ED6
+	for <linux-block@archiver.kernel.org>; Sun, 26 Feb 2023 03:45:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229819AbjBZDoU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 25 Feb 2023 22:44:20 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54538 "EHLO
+        id S229989AbjBZDpQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 25 Feb 2023 22:45:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54964 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229814AbjBZDoA (ORCPT
+        with ESMTP id S230006AbjBZDor (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 25 Feb 2023 22:44:00 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17D6DE047;
-        Sat, 25 Feb 2023 19:43:33 -0800 (PST)
+        Sat, 25 Feb 2023 22:44:47 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88C5718158;
+        Sat, 25 Feb 2023 19:44:12 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 6695360C03;
-        Sun, 26 Feb 2023 03:43:17 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BF120C433D2;
-        Sun, 26 Feb 2023 03:43:15 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id EB54760C04;
+        Sun, 26 Feb 2023 03:43:12 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6BE63C4339B;
+        Sun, 26 Feb 2023 03:43:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1677382996;
-        bh=y/Ex1sxIzzWjeXoa6IJWdQKmOciITNkCMP2aYr8j90s=;
+        s=k20201202; t=1677382992;
+        bh=/KPj3m1KPxfGMtW8xapjQpJ0dfmXm9YDZiWr49pG+no=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=XzbZ87oVng9QpgYNS9or6abErJKDqqwStTlaM0WeboYi+sCeuKTv11jvCoF2GZ/07
-         CnzYuJ422rFTe/Jp86omZ13rz+QTiD/KSNP104eFnaLtxXo47vunuwiRAnjVUJXTY4
-         xxwa7+Ddbdf/24zJ42j0rzaquUKNPOvtmzEwB4A8aYi+RmGrJ/CupJNwoKfTufnkej
-         htO8bNc5X2L54E0/8G4El0qJX1QRiWV5iNHZV397T/jnLyzI1OhuEYi22Q7omUvLMW
-         kXyU7fmqzNPq7gfUOGAnCXNI/SGB93IK0GP8IJ9dQCkysAorJPCUB/rr3ultxshrUS
-         tIOQTRbZ6JbDQ==
+        b=bMPZFALqkV6ZOdd6vlFbSfOv5okMdZ7SS49sB+FcoXVYn8VgLikORNC2yO79yWfuh
+         LAdHOQgW/gqJapk11eR+c0pWJoyZA1oZOGdxOdkRNSsep4D8+wu7FKKxVGxDVdiCMp
+         fVfLjRyeUSH+ggloBG29KNTEHcLKvjU5Id1MOAlrQ9XA0Ati2LDVGSwirfhByt/ej9
+         4g9q4MHKUSUjAHMsekx+Z0fXiMCsgHl35SmaxAHvi2z18l3DGfZ2kt31U9lYAT6a6g
+         k21i2ws6huTdCa5eboc0Y/TfOCM6YaW4hJ17k7MbAKLQLbnmZnjU0KzbQXV4VnRHmB
+         EfMdXsZHjN7RQ==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        Masami Hiramatsu <mhiramat@kernel.org>,
-        linux-block@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
-        Bart Van Assche <bvanassche@acm.org>,
-        Sasha Levin <sashal@kernel.org>
-Subject: [PATCH AUTOSEL 6.1 11/21] trace/blktrace: fix memory leak with using debugfs_lookup()
-Date:   Sat, 25 Feb 2023 22:42:46 -0500
-Message-Id: <20230226034256.771769-11-sashal@kernel.org>
+Cc:     Li Nan <linan122@huawei.com>, Yu Kuai <yukuai3@huawei.com>,
+        Tejun Heo <tj@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+        Sasha Levin <sashal@kernel.org>, josef@toxicpanda.com,
+        cgroups@vger.kernel.org, linux-block@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.1 08/21] blk-iocost: fix divide by 0 error in calc_lcoefs()
+Date:   Sat, 25 Feb 2023 22:42:43 -0500
+Message-Id: <20230226034256.771769-8-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.0
 In-Reply-To: <20230226034256.771769-1-sashal@kernel.org>
 References: <20230226034256.771769-1-sashal@kernel.org>
@@ -55,45 +52,68 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+From: Li Nan <linan122@huawei.com>
 
-[ Upstream commit 83e8864fee26f63a7435e941b7c36a20fd6fe93e ]
+[ Upstream commit 984af1e66b4126cf145153661cc24c213e2ec231 ]
 
-When calling debugfs_lookup() the result must have dput() called on it,
-otherwise the memory will leak over time.  To make things simpler, just
-call debugfs_lookup_and_remove() instead which handles all of the logic
-at once.
+echo max of u64 to cost.model can cause divide by 0 error.
 
-Cc: Jens Axboe <axboe@kernel.dk>
-Cc: Steven Rostedt <rostedt@goodmis.org>
-Cc: Masami Hiramatsu <mhiramat@kernel.org>
-Cc: linux-block@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
-Cc: linux-trace-kernel@vger.kernel.org
-Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Reviewed-by: Bart Van Assche <bvanassche@acm.org>
-Link: https://lore.kernel.org/r/20230202141956.2299521-1-gregkh@linuxfoundation.org
+  # echo 8:0 rbps=18446744073709551615 > /sys/fs/cgroup/io.cost.model
+
+  divide error: 0000 [#1] PREEMPT SMP
+  RIP: 0010:calc_lcoefs+0x4c/0xc0
+  Call Trace:
+   <TASK>
+   ioc_refresh_params+0x2b3/0x4f0
+   ioc_cost_model_write+0x3cb/0x4c0
+   ? _copy_from_iter+0x6d/0x6c0
+   ? kernfs_fop_write_iter+0xfc/0x270
+   cgroup_file_write+0xa0/0x200
+   kernfs_fop_write_iter+0x17d/0x270
+   vfs_write+0x414/0x620
+   ksys_write+0x73/0x160
+   __x64_sys_write+0x1e/0x30
+   do_syscall_64+0x35/0x80
+   entry_SYSCALL_64_after_hwframe+0x63/0xcd
+
+calc_lcoefs() uses the input value of cost.model in DIV_ROUND_UP_ULL,
+overflow would happen if bps plus IOC_PAGE_SIZE is greater than
+ULLONG_MAX, it can cause divide by 0 error.
+
+Fix the problem by setting basecost
+
+Signed-off-by: Li Nan <linan122@huawei.com>
+Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+Acked-by: Tejun Heo <tj@kernel.org>
+Link: https://lore.kernel.org/r/20230117070806.3857142-5-yukuai1@huaweicloud.com
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- kernel/trace/blktrace.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ block/blk-iocost.c | 11 ++++++++---
+ 1 file changed, 8 insertions(+), 3 deletions(-)
 
-diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
-index a66cff5a18579..a5b35bcfb0602 100644
---- a/kernel/trace/blktrace.c
-+++ b/kernel/trace/blktrace.c
-@@ -320,8 +320,8 @@ static void blk_trace_free(struct request_queue *q, struct blk_trace *bt)
- 	 * under 'q->debugfs_dir', thus lookup and remove them.
- 	 */
- 	if (!bt->dir) {
--		debugfs_remove(debugfs_lookup("dropped", q->debugfs_dir));
--		debugfs_remove(debugfs_lookup("msg", q->debugfs_dir));
-+		debugfs_lookup_and_remove("dropped", q->debugfs_dir);
-+		debugfs_lookup_and_remove("msg", q->debugfs_dir);
- 	} else {
- 		debugfs_remove(bt->dir);
- 	}
+diff --git a/block/blk-iocost.c b/block/blk-iocost.c
+index 495396425bade..bfc33fa9a063c 100644
+--- a/block/blk-iocost.c
++++ b/block/blk-iocost.c
+@@ -865,9 +865,14 @@ static void calc_lcoefs(u64 bps, u64 seqiops, u64 randiops,
+ 
+ 	*page = *seqio = *randio = 0;
+ 
+-	if (bps)
+-		*page = DIV64_U64_ROUND_UP(VTIME_PER_SEC,
+-					   DIV_ROUND_UP_ULL(bps, IOC_PAGE_SIZE));
++	if (bps) {
++		u64 bps_pages = DIV_ROUND_UP_ULL(bps, IOC_PAGE_SIZE);
++
++		if (bps_pages)
++			*page = DIV64_U64_ROUND_UP(VTIME_PER_SEC, bps_pages);
++		else
++			*page = 1;
++	}
+ 
+ 	if (seqiops) {
+ 		v = DIV64_U64_ROUND_UP(VTIME_PER_SEC, seqiops);
 -- 
 2.39.0
 
