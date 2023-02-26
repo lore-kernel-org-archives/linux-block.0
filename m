@@ -2,171 +2,91 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 352F7C7EE2D
-	for <linux-block@archiver.kernel.org>; Sun, 26 Feb 2023 20:04:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 14251C7EE2D
+	for <linux-block@archiver.kernel.org>; Sun, 26 Feb 2023 20:18:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229780AbjBZUE2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 26 Feb 2023 15:04:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53426 "EHLO
+        id S229799AbjBZUST (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 26 Feb 2023 15:18:19 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60820 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229379AbjBZUE2 (ORCPT
+        with ESMTP id S229379AbjBZUSS (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 26 Feb 2023 15:04:28 -0500
-Received: from mail-ed1-x533.google.com (mail-ed1-x533.google.com [IPv6:2a00:1450:4864:20::533])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A122012589;
-        Sun, 26 Feb 2023 12:04:26 -0800 (PST)
-Received: by mail-ed1-x533.google.com with SMTP id eg37so17585483edb.12;
-        Sun, 26 Feb 2023 12:04:26 -0800 (PST)
+        Sun, 26 Feb 2023 15:18:18 -0500
+Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9B4FCE
+        for <linux-block@vger.kernel.org>; Sun, 26 Feb 2023 12:18:13 -0800 (PST)
+Received: by mail-pl1-x633.google.com with SMTP id z2so4684871plf.12
+        for <linux-block@vger.kernel.org>; Sun, 26 Feb 2023 12:18:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=pqXbRQsxAunV9kKD7VAp1m3i0kKOYXyDIa3h180hvjw=;
-        b=MM/VxVgdn+iGLw/Fl/UP4OYazmPGOqYXCaSWStw5HV+g7nlIIlFevlWZhxYBryBRiz
-         RD0D2eu56d+2woFNVMxi+IjzFOXVx4ep+GZATIL69a/tOTxvSIcMCRskNKCds+io7OJo
-         ph5j0lz3n4C8doU7u781YU6UlKRylwXK+6xTQbkHgkGIjS/s4vguGsyhtxXzhOWUz8pb
-         wj0/HMJ5+8t61UZnGPEQnARF+st0hWO8igRTi82O1WBhgY1QTCal/+qsMtN4qdnElOoc
-         saJUUtIToY6L//L4TgWchl/amjbn8FkYMqtjMb32RAn8LfrZ9qpGliRCUQt/9X2h43KP
-         Jp2A==
+        bh=TycbyvH4hoRUp82zuYMHneygBALggpe+yy/y2XkSW+k=;
+        b=y7EMRhNnxrODvQIIQapGaXGGVUFVhimKVzRv3nzmTFNHrmZ/lCtDOdtAjhWEZWsGhO
+         T9Mtom41ApCTh3kgxshWwaBncqlr1K3XGOkKuRZPVdsvWg1mM7zS80ZSGXtrJ22QLHnV
+         i6vLBHuw0kX5aQJHrmCGwX/E3hJ/C/Rdjp/sKyIGM+P/vo+PYVyw945FDDnrpEf97VzV
+         XzvySTN/wr3T4mwbcMHh83umRapfM3vikuVKPg2yr0jFvrVe6qbp82tE3u5aTRB8nL+i
+         FwjpEvpZaIQa0iZBzNvutcgexlftNlVzbLaTr7Mi97JEFtW2CWLY3hsOGSNxnxpQ4J+a
+         127g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=pqXbRQsxAunV9kKD7VAp1m3i0kKOYXyDIa3h180hvjw=;
-        b=VK7ZlJBhxYbPC+FiJc2DN8ZjnLmtMZi2DLrMqk3/PV3kdlB1JQyLNNypLWVT64MGW8
-         Aj+hrMCsGLY8xfTisObmKvE8CQYuQOXuVJELV0ydyb/6fNYhlT0hZ7rdo2WeyS66ADM4
-         OD+OppUWBe12R6usueVS93yye1CHlSo8UbQx/KWmz2DBz5Jnr9QzIjJHKyZ3wiF8xPQM
-         cdR7ITnoWMXLrcr20taPhd2Yv3GG70gYpqYl8G2Ec1APHOz0IbDy8zNomuiCiA6vNPsa
-         eW4DciDtmJbBxM0U9pitvftOXGCKScAjqW6YPAuzQHthiT1ITKFgpHQD+5zk1X25e++R
-         +sCQ==
-X-Gm-Message-State: AO0yUKW9m6UcA4utsWSutT8UVU02BhZnKjM9/0L3JOsoDJT9z4jzjO44
-        ivFxIjn/gcNdTQ4bI3BrwtSxI6Ra+qFpW5VaNEqQOElmu2U=
-X-Google-Smtp-Source: AK7set82LZYeVvl8qTq463aYHdrBUQHU6zlmKXM9bz9UDwrcLGlBMlvuwutsk9r1untw2j3S4Hmg6uqNQ3qz9SawP1M=
-X-Received: by 2002:a17:906:939a:b0:8b1:7569:b526 with SMTP id
- l26-20020a170906939a00b008b17569b526mr15079550ejx.11.1677441865092; Sun, 26
- Feb 2023 12:04:25 -0800 (PST)
+        bh=TycbyvH4hoRUp82zuYMHneygBALggpe+yy/y2XkSW+k=;
+        b=4EP0BhbDAO2QjyvqX2qL2SObZzW56py2LWbUSg6nAe3NXQGaiVl9U/f3SDYdnMP2Uk
+         L1jD/UhEhNJC+dwlq7UwfbWB3dVqeGUolu3ABCISY9eW9Ui4ZtnI7MqnCB3px/cRPz+D
+         16p40YJ/NUPmr8rUP9iJf0v/oRD/JevrqRktXUUy05QNCFTxhAX7kuJ3g66RUBZs4I2M
+         pcw5G0bnP8FD/D4t/jsHcqj49vox8ix586GgKN/yL6elpuaTZ91ayK59S/wGEdCfgxnT
+         1BypzZTof1j8Y8JiGUrdo+SB1xNfOnfHdMWN+NtIbZktdqS0ftjfMoJALdNORj39le9s
+         jAig==
+X-Gm-Message-State: AO0yUKWQ0TjYCulSKqrtcNbj0cH1DNyazmUlinAyBPR7MV4KGSPFthSS
+        TxMe1+RyHjGMMN8ytXsx3v0h4g==
+X-Google-Smtp-Source: AK7set+ah+evDY725yvPhWa/W1z916LeantDZgaw+BwKM0D25u1Cww03NnG+h+G9vImmOpvnyAI5Ww==
+X-Received: by 2002:a17:903:2291:b0:19a:8202:2dad with SMTP id b17-20020a170903229100b0019a82022dadmr24003543plh.2.1677442693302;
+        Sun, 26 Feb 2023 12:18:13 -0800 (PST)
+Received: from [127.0.0.1] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id p12-20020a170902eacc00b0019a6cce2060sm3013823pld.57.2023.02.26.12.18.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 26 Feb 2023 12:18:12 -0800 (PST)
+From:   Jens Axboe <axboe@kernel.dk>
+To:     tj@kernel.org, josef@toxicpanda.com, cgroups@vger.kernel.org,
+        linux-block@vger.kernel.org, Breno Leitao <leitao@debian.org>
+Cc:     aherrmann@suse.de, linux-kernel@vger.kernel.org, hch@lst.de,
+        leit@fb.com
+In-Reply-To: <20230224160714.172884-1-leitao@debian.org>
+References: <20230224160714.172884-1-leitao@debian.org>
+Subject: Re: [PATCH] blk-iocost: initialize rqos before accessing it
+Message-Id: <167744269225.13527.9868779562423182386.b4-ty@kernel.dk>
+Date:   Sun, 26 Feb 2023 13:18:12 -0700
 MIME-Version: 1.0
-References: <20230226195227.185393-1-idryomov@gmail.com>
-In-Reply-To: <20230226195227.185393-1-idryomov@gmail.com>
-From:   Ilya Dryomov <idryomov@gmail.com>
-Date:   Sun, 26 Feb 2023 21:04:13 +0100
-Message-ID: <CAOi1vP9S_y_vWk8jt=cV-TExEwa+vfM3tSPhYdULZhjrFVY3tw@mail.gmail.com>
-Subject: Re: [PATCH] rbd: avoid use-after-free in do_rbd_add() when
- rbd_dev_create() fails
-To:     ceph-devel@vger.kernel.org
-Cc:     Natalia Petrova <n.petrova@fintech.ru>,
-        Dongsheng Yang <dongsheng.yang@easystack.cn>,
-        Alexey Khoroshilov <khoroshilov@ispras.ru>,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, lvc-project@linuxtesting.org,
-        Nikita Zhandarovich <n.zhandarovich@fintech.ru>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.13-dev-ada30
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sun, Feb 26, 2023 at 8:52=E2=80=AFPM Ilya Dryomov <idryomov@gmail.com> w=
-rote:
->
-> If getting an ID or setting up a work queue in rbd_dev_create() fails,
-> use-after-free on rbd_dev->rbd_client, rbd_dev->spec and rbd_dev->opts
-> is triggered in do_rbd_add().  The root cause is that the ownership of
-> these structures is transfered to rbd_dev prematurely and they all end
-> up getting freed when rbd_dev_create() calls rbd_dev_free() prior to
-> returning to do_rbd_add().
->
-> Found by Linux Verification Center (linuxtesting.org) with SVACE, an
-> incomplete patch submitted by Natalia Petrova <n.petrova@fintech.ru>.
->
-> Cc: stable@vger.kernel.org
-> Fixes: 1643dfa4c2c8 ("rbd: introduce a per-device ordered workqueue")
-> Signed-off-by: Ilya Dryomov <idryomov@gmail.com>
-> ---
->  drivers/block/rbd.c | 20 +++++++++-----------
->  1 file changed, 9 insertions(+), 11 deletions(-)
->
-> diff --git a/drivers/block/rbd.c b/drivers/block/rbd.c
-> index 04453f4a319c..60aed196a2e5 100644
-> --- a/drivers/block/rbd.c
-> +++ b/drivers/block/rbd.c
-> @@ -5292,8 +5292,7 @@ static void rbd_dev_release(struct device *dev)
->                 module_put(THIS_MODULE);
->  }
->
-> -static struct rbd_device *__rbd_dev_create(struct rbd_client *rbdc,
-> -                                          struct rbd_spec *spec)
-> +static struct rbd_device *__rbd_dev_create(struct rbd_spec *spec)
->  {
->         struct rbd_device *rbd_dev;
->
-> @@ -5338,9 +5337,6 @@ static struct rbd_device *__rbd_dev_create(struct r=
-bd_client *rbdc,
->         rbd_dev->dev.parent =3D &rbd_root_dev;
->         device_initialize(&rbd_dev->dev);
->
-> -       rbd_dev->rbd_client =3D rbdc;
-> -       rbd_dev->spec =3D spec;
-> -
->         return rbd_dev;
->  }
->
-> @@ -5353,12 +5349,10 @@ static struct rbd_device *rbd_dev_create(struct r=
-bd_client *rbdc,
->  {
->         struct rbd_device *rbd_dev;
->
-> -       rbd_dev =3D __rbd_dev_create(rbdc, spec);
-> +       rbd_dev =3D __rbd_dev_create(spec);
->         if (!rbd_dev)
->                 return NULL;
->
-> -       rbd_dev->opts =3D opts;
-> -
->         /* get an id and fill in device name */
->         rbd_dev->dev_id =3D ida_simple_get(&rbd_dev_id_ida, 0,
->                                          minor_to_rbd_dev_id(1 << MINORBI=
-TS),
-> @@ -5375,6 +5369,10 @@ static struct rbd_device *rbd_dev_create(struct rb=
-d_client *rbdc,
->         /* we have a ref from do_rbd_add() */
->         __module_get(THIS_MODULE);
->
-> +       rbd_dev->rbd_client =3D rbdc;
-> +       rbd_dev->spec =3D spec;
-> +       rbd_dev->opts =3D opts;
-> +
->         dout("%s rbd_dev %p dev_id %d\n", __func__, rbd_dev, rbd_dev->dev=
-_id);
->         return rbd_dev;
->
-> @@ -6736,7 +6734,7 @@ static int rbd_dev_probe_parent(struct rbd_device *=
-rbd_dev, int depth)
->                 goto out_err;
->         }
->
-> -       parent =3D __rbd_dev_create(rbd_dev->rbd_client, rbd_dev->parent_=
-spec);
-> +       parent =3D __rbd_dev_create(rbd_dev->parent_spec);
->         if (!parent) {
->                 ret =3D -ENOMEM;
->                 goto out_err;
-> @@ -6746,8 +6744,8 @@ static int rbd_dev_probe_parent(struct rbd_device *=
-rbd_dev, int depth)
->          * Images related by parent/child relationships always share
->          * rbd_client and spec/parent_spec, so bump their refcounts.
->          */
-> -       __rbd_get_client(rbd_dev->rbd_client);
-> -       rbd_spec_get(rbd_dev->parent_spec);
-> +       parent->rbd_client =3D __rbd_get_client(rbd_dev->rbd_client);
-> +       parent->spec =3D rbd_spec_get(rbd_dev->parent_spec);
->
->         __set_bit(RBD_DEV_FLAG_READONLY, &parent->flags);
->
-> --
-> 2.39.1
->
 
-CCing everyone on the previous thread...
+On Fri, 24 Feb 2023 08:07:14 -0800, Breno Leitao wrote:
+> Current kernel (d2980d8d826554fa6981d621e569a453787472f8) crashes
+> when blk_iocost_init for `nvme1` disk.
+> 
+> 	BUG: kernel NULL pointer dereference, address: 0000000000000050
+> 	#PF: supervisor read access in kernel mode
+> 	#PF: error_code(0x0000) - not-present page
+> 
+> [...]
+
+Applied, thanks!
+
+[1/1] blk-iocost: initialize rqos before accessing it
+      commit: efbb51a0aae5fcecda266ac254146e36fff41e16
+
+Best regards,
+-- 
+Jens Axboe
+
+
+
