@@ -2,45 +2,48 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5270CC7EE32
-	for <linux-block@archiver.kernel.org>; Sun, 26 Feb 2023 03:44:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 507BAC7EE33
+	for <linux-block@archiver.kernel.org>; Sun, 26 Feb 2023 03:44:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229863AbjBZDoT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 25 Feb 2023 22:44:19 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55030 "EHLO
+        id S229819AbjBZDoU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 25 Feb 2023 22:44:20 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54538 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229864AbjBZDoA (ORCPT
+        with ESMTP id S229814AbjBZDoA (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Sat, 25 Feb 2023 22:44:00 -0500
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 16C14BDE9;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17D6DE047;
         Sat, 25 Feb 2023 19:43:33 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 6419F60BF9;
-        Sun, 26 Feb 2023 03:43:14 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C7E1EC433D2;
-        Sun, 26 Feb 2023 03:43:12 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 6695360C03;
+        Sun, 26 Feb 2023 03:43:17 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BF120C433D2;
+        Sun, 26 Feb 2023 03:43:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1677382993;
-        bh=zdvOAvwFca4f73LDzTiibTcU1h56oLJ1662QZieik10=;
+        s=k20201202; t=1677382996;
+        bh=y/Ex1sxIzzWjeXoa6IJWdQKmOciITNkCMP2aYr8j90s=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=qAlV7kWe1ma3LvoVvDVslriO9lR8cSTLBDwinZNqkc3zCWSx8R/nkE5yjTkZ0bWAf
-         PnDS1w5hurTHRi67X5kpFgV0PxqRurK8GqtCL4sXffCxdJmUsC3Gx4L1hwegyHW85L
-         JFDu2/r27DYg8HDeCHbmJxp5N6I8b1Bbx9VPmjKhGwdYA8FeMSTzU6YFoPlzwoPpoT
-         r8LGkaacmqrpktD5UNd2BmzYjy7geHyPANlUMkASCCUH61tJdHU5eoQtEs7o6oDGgU
-         RoKqIKIAajWo98Y7A60yf8AGEH8eQVSseq5WViKsdBh7gxplXzu9QmCO9pZ4yCCTT3
-         EXUN9rwltmKyQ==
+        b=XzbZ87oVng9QpgYNS9or6abErJKDqqwStTlaM0WeboYi+sCeuKTv11jvCoF2GZ/07
+         CnzYuJ422rFTe/Jp86omZ13rz+QTiD/KSNP104eFnaLtxXo47vunuwiRAnjVUJXTY4
+         xxwa7+Ddbdf/24zJ42j0rzaquUKNPOvtmzEwB4A8aYi+RmGrJ/CupJNwoKfTufnkej
+         htO8bNc5X2L54E0/8G4El0qJX1QRiWV5iNHZV397T/jnLyzI1OhuEYi22Q7omUvLMW
+         kXyU7fmqzNPq7gfUOGAnCXNI/SGB93IK0GP8IJ9dQCkysAorJPCUB/rr3ultxshrUS
+         tIOQTRbZ6JbDQ==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Yu Kuai <yukuai3@huawei.com>, Tejun Heo <tj@kernel.org>,
-        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        Sasha Levin <sashal@kernel.org>, josef@toxicpanda.com,
-        cgroups@vger.kernel.org, linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.1 09/21] blk-cgroup: dropping parent refcount after pd_free_fn() is done
-Date:   Sat, 25 Feb 2023 22:42:44 -0500
-Message-Id: <20230226034256.771769-9-sashal@kernel.org>
+Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Masami Hiramatsu <mhiramat@kernel.org>,
+        linux-block@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
+        Bart Van Assche <bvanassche@acm.org>,
+        Sasha Levin <sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.1 11/21] trace/blktrace: fix memory leak with using debugfs_lookup()
+Date:   Sat, 25 Feb 2023 22:42:46 -0500
+Message-Id: <20230226034256.771769-11-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.0
 In-Reply-To: <20230226034256.771769-1-sashal@kernel.org>
 References: <20230226034256.771769-1-sashal@kernel.org>
@@ -52,58 +55,45 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Yu Kuai <yukuai3@huawei.com>
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 
-[ Upstream commit c7241babf0855d8a6180cd1743ff0ec34de40b4e ]
+[ Upstream commit 83e8864fee26f63a7435e941b7c36a20fd6fe93e ]
 
-Some cgroup policies will access parent pd through child pd even
-after pd_offline_fn() is done. If pd_free_fn() for parent is called
-before child, then UAF can be triggered. Hence it's better to guarantee
-the order of pd_free_fn().
+When calling debugfs_lookup() the result must have dput() called on it,
+otherwise the memory will leak over time.  To make things simpler, just
+call debugfs_lookup_and_remove() instead which handles all of the logic
+at once.
 
-Currently refcount of parent blkg is dropped in __blkg_release(), which
-is before pd_free_fn() is called in blkg_free_work_fn() while
-blkg_free_work_fn() is called asynchronously.
-
-This patch make sure pd_free_fn() called from removing cgroup is ordered
-by delaying dropping parent refcount after calling pd_free_fn() for
-child.
-
-BTW, pd_free_fn() will also be called from blkcg_deactivate_policy()
-from deleting device, and following patches will guarantee the order.
-
-Signed-off-by: Yu Kuai <yukuai3@huawei.com>
-Acked-by: Tejun Heo <tj@kernel.org>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Link: https://lore.kernel.org/r/20230119110350.2287325-2-yukuai1@huaweicloud.com
+Cc: Jens Axboe <axboe@kernel.dk>
+Cc: Steven Rostedt <rostedt@goodmis.org>
+Cc: Masami Hiramatsu <mhiramat@kernel.org>
+Cc: linux-block@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Cc: linux-trace-kernel@vger.kernel.org
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Reviewed-by: Bart Van Assche <bvanassche@acm.org>
+Link: https://lore.kernel.org/r/20230202141956.2299521-1-gregkh@linuxfoundation.org
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- block/blk-cgroup.c | 4 ++--
+ kernel/trace/blktrace.c | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-index 7c91d9195da8d..8d1b7757f1e4f 100644
---- a/block/blk-cgroup.c
-+++ b/block/blk-cgroup.c
-@@ -93,6 +93,8 @@ static void blkg_free_workfn(struct work_struct *work)
- 		if (blkg->pd[i])
- 			blkcg_policy[i]->pd_free_fn(blkg->pd[i]);
- 
-+	if (blkg->parent)
-+		blkg_put(blkg->parent);
- 	if (blkg->q)
- 		blk_put_queue(blkg->q);
- 	free_percpu(blkg->iostat_cpu);
-@@ -127,8 +129,6 @@ static void __blkg_release(struct rcu_head *rcu)
- 
- 	/* release the blkcg and parent blkg refs this blkg has been holding */
- 	css_put(&blkg->blkcg->css);
--	if (blkg->parent)
--		blkg_put(blkg->parent);
- 	blkg_free(blkg);
- }
- 
+diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
+index a66cff5a18579..a5b35bcfb0602 100644
+--- a/kernel/trace/blktrace.c
++++ b/kernel/trace/blktrace.c
+@@ -320,8 +320,8 @@ static void blk_trace_free(struct request_queue *q, struct blk_trace *bt)
+ 	 * under 'q->debugfs_dir', thus lookup and remove them.
+ 	 */
+ 	if (!bt->dir) {
+-		debugfs_remove(debugfs_lookup("dropped", q->debugfs_dir));
+-		debugfs_remove(debugfs_lookup("msg", q->debugfs_dir));
++		debugfs_lookup_and_remove("dropped", q->debugfs_dir);
++		debugfs_lookup_and_remove("msg", q->debugfs_dir);
+ 	} else {
+ 		debugfs_remove(bt->dir);
+ 	}
 -- 
 2.39.0
 
