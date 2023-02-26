@@ -2,92 +2,118 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C756DC64ED6
-	for <linux-block@archiver.kernel.org>; Sun, 26 Feb 2023 03:38:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A622C7EE2D
+	for <linux-block@archiver.kernel.org>; Sun, 26 Feb 2023 03:42:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229592AbjBZDiP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 25 Feb 2023 22:38:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48854 "EHLO
+        id S229742AbjBZDmY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 25 Feb 2023 22:42:24 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51104 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229587AbjBZDiO (ORCPT
+        with ESMTP id S229723AbjBZDmM (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 25 Feb 2023 22:38:14 -0500
-Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 928A383EE
-        for <linux-block@vger.kernel.org>; Sat, 25 Feb 2023 19:38:13 -0800 (PST)
-Received: by mail-pl1-x633.google.com with SMTP id p20so2273374plw.13
-        for <linux-block@vger.kernel.org>; Sat, 25 Feb 2023 19:38:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=w5Rg6I1cmXAeRDJOuxnp8t4y5fBQt8rslGX6AycVTYk=;
-        b=obvxZQfuGGnnl0eWnSNpRy8gi2zG6/icUwEZTew7bdim4vM02+Fg6mJccssdsiDCWI
-         63zm2EG8p7Z6jWDA/0NrSMWHmtqZWOwEYzJ08Tn0UbGmQl+EcZNQEUlBf47n9bw1CQvt
-         IVfL9pJ8jl8m2Yy0Z8+D/DjGMnhYt7hZoHf14=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=w5Rg6I1cmXAeRDJOuxnp8t4y5fBQt8rslGX6AycVTYk=;
-        b=NPhgrsQjWBYRidb8nTqC/LAczrHNvkAtoAZKlXNR19L5Ro8oDyZuMRhwJmMKvxgK8t
-         v4G/qEwhO1zxJNgsKCiCfxpiD+5PCSn4ruU4S4dykmsJo2r5D4S3JPCoS2OqtmxT6DtM
-         PEbpVU3tNJ8pAj+0AXncbLieGZYTi4StmWzuvyzPvTp8YQAGxDTl7c/ODjXVONOm+Atr
-         8d8EgbxIKudSEqLz9F6oZHO8IEylersFpP7oMO3j54PWozgPjl7EwQ3NncBuuuNDfn7Z
-         0oSPbwac1aiKac2sqLvweUqtCjWXqwMK+m090D5c5bOPGGDTBExT3LhESLbTYEh7qp0B
-         wLqw==
-X-Gm-Message-State: AO0yUKWwvUPkcHWNrZRJMsrj5QxNY3VUz0NVt9SPqKqCxqnRMkpulDXq
-        y6WLHtxD+Pvl36UvuNoWQQSasA==
-X-Google-Smtp-Source: AK7set9j6WCf61CgO8Sw1yGGWG+IoM9Cunn4SttlHzt4ea/KDHgO9cUcUw7eLdT15DrEniMbPKl4Lg==
-X-Received: by 2002:a17:902:7292:b0:196:56ae:ed1d with SMTP id d18-20020a170902729200b0019656aeed1dmr15761934pll.69.1677382693024;
-        Sat, 25 Feb 2023 19:38:13 -0800 (PST)
-Received: from google.com (KD124209188001.ppp-bb.dion.ne.jp. [124.209.188.1])
-        by smtp.gmail.com with ESMTPSA id g3-20020a1709026b4300b00198e346c35dsm1937190plt.9.2023.02.25.19.38.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 25 Feb 2023 19:38:12 -0800 (PST)
-Date:   Sun, 26 Feb 2023 12:38:08 +0900
-From:   Sergey Senozhatsky <senozhatsky@chromium.org>
-To:     Geert Uytterhoeven <geert+renesas@glider.be>
-Cc:     Minchan Kim <minchan@kernel.org>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] zram: Use atomic_long_read() to read atomic_long_t
-Message-ID: <Y/rUIF9Tc97GC6Ue@google.com>
-References: <20230225121523.3288544-1-geert+renesas@glider.be>
+        Sat, 25 Feb 2023 22:42:12 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D013A14496;
+        Sat, 25 Feb 2023 19:42:08 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 9C65960B9E;
+        Sun, 26 Feb 2023 03:42:07 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1E2EEC4339E;
+        Sun, 26 Feb 2023 03:42:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1677382927;
+        bh=WLuOMG/bVQNKvU7Hd47X8E8GsihxLPJ5GN0xQ8TUlW4=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=A6HaYCgARqZOOLOvYisiJvsLqOOP/N+iKtMjMTJtUnl26hyou2hlHcVh55ciDHzfd
+         q7AQ7KatSYCjTRyNLjayujZmlz8RHL4L7xGiKt7Z7dxBcveENalHIgfZWb5fTsFsaf
+         vAY5UJoYrJi2CUxP0cQEvYbo9PRo0uouJHCSN7I2IrphCoochrMTp2wLFzE8a1JsZ+
+         LSZO96QZ355teyTpQ/Tv8w/FFH1W8C6nSIqbGcasayObo5hLnUiJLZPpCkFSNdMe5l
+         cLuGxg1k2pkq3vDs0+08EfFx7O0r3//fFdNUPLut1YXT/mrrq7QDGgfp86zMQVi1iL
+         mOUdAvyGMfUPQ==
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Li Nan <linan122@huawei.com>, Yu Kuai <yukuai3@huawei.com>,
+        Tejun Heo <tj@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+        Sasha Levin <sashal@kernel.org>, josef@toxicpanda.com,
+        cgroups@vger.kernel.org, linux-block@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.2 08/21] blk-iocost: fix divide by 0 error in calc_lcoefs()
+Date:   Sat, 25 Feb 2023 22:41:37 -0500
+Message-Id: <20230226034150.771411-8-sashal@kernel.org>
+X-Mailer: git-send-email 2.39.0
+In-Reply-To: <20230226034150.771411-1-sashal@kernel.org>
+References: <20230226034150.771411-1-sashal@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+X-stable: review
+X-Patchwork-Hint: Ignore
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20230225121523.3288544-1-geert+renesas@glider.be>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On (23/02/25 13:15), Geert Uytterhoeven wrote:
-> On 32-bit:
-> 
->     drivers/block/zram/zram_drv.c: In function ‘mm_stat_show’:
->     drivers/block/zram/zram_drv.c:1234:23: error: passing argument 1 of ‘atomic64_read’ from incompatible pointer type [-Werror=incompatible-pointer-types]
->      1234 |    (u64)atomic64_read(&pool_stats.objs_moved));
-> 	  |                       ^~~~~~~~~~~~~~~~~~~~~~
-> 	  |                       |
-> 	  |                       atomic_long_t * {aka struct <anonymous> *}
->     In file included from ./include/linux/atomic.h:82,
-> 		     from ./include/linux/mm_types_task.h:13,
-> 		     from ./include/linux/mm_types.h:5,
-> 		     from ./include/linux/buildid.h:5,
-> 		     from ./include/linux/module.h:14,
-> 		     from drivers/block/zram/zram_drv.c:18:
->     ./include/linux/atomic/atomic-instrumented.h:644:33: note: expected ‘const atomic64_t *’ {aka ‘const struct <anonymous> *’} but argument is of type ‘atomic_long_t *’ {aka ‘struct <anonymous> *’}
->       644 | atomic64_read(const atomic64_t *v)
-> 	  |               ~~~~~~~~~~~~~~~~~~^
-> 
-> Fix this by using atomic_long_read() instead.
+From: Li Nan <linan122@huawei.com>
 
-Hi Geert,
-The patch that cause the warning probably will be droppped from
-the series in v3.
+[ Upstream commit 984af1e66b4126cf145153661cc24c213e2ec231 ]
+
+echo max of u64 to cost.model can cause divide by 0 error.
+
+  # echo 8:0 rbps=18446744073709551615 > /sys/fs/cgroup/io.cost.model
+
+  divide error: 0000 [#1] PREEMPT SMP
+  RIP: 0010:calc_lcoefs+0x4c/0xc0
+  Call Trace:
+   <TASK>
+   ioc_refresh_params+0x2b3/0x4f0
+   ioc_cost_model_write+0x3cb/0x4c0
+   ? _copy_from_iter+0x6d/0x6c0
+   ? kernfs_fop_write_iter+0xfc/0x270
+   cgroup_file_write+0xa0/0x200
+   kernfs_fop_write_iter+0x17d/0x270
+   vfs_write+0x414/0x620
+   ksys_write+0x73/0x160
+   __x64_sys_write+0x1e/0x30
+   do_syscall_64+0x35/0x80
+   entry_SYSCALL_64_after_hwframe+0x63/0xcd
+
+calc_lcoefs() uses the input value of cost.model in DIV_ROUND_UP_ULL,
+overflow would happen if bps plus IOC_PAGE_SIZE is greater than
+ULLONG_MAX, it can cause divide by 0 error.
+
+Fix the problem by setting basecost
+
+Signed-off-by: Li Nan <linan122@huawei.com>
+Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+Acked-by: Tejun Heo <tj@kernel.org>
+Link: https://lore.kernel.org/r/20230117070806.3857142-5-yukuai1@huaweicloud.com
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ block/blk-iocost.c | 11 ++++++++---
+ 1 file changed, 8 insertions(+), 3 deletions(-)
+
+diff --git a/block/blk-iocost.c b/block/blk-iocost.c
+index 6955605629e4f..ec7219caea165 100644
+--- a/block/blk-iocost.c
++++ b/block/blk-iocost.c
+@@ -866,9 +866,14 @@ static void calc_lcoefs(u64 bps, u64 seqiops, u64 randiops,
+ 
+ 	*page = *seqio = *randio = 0;
+ 
+-	if (bps)
+-		*page = DIV64_U64_ROUND_UP(VTIME_PER_SEC,
+-					   DIV_ROUND_UP_ULL(bps, IOC_PAGE_SIZE));
++	if (bps) {
++		u64 bps_pages = DIV_ROUND_UP_ULL(bps, IOC_PAGE_SIZE);
++
++		if (bps_pages)
++			*page = DIV64_U64_ROUND_UP(VTIME_PER_SEC, bps_pages);
++		else
++			*page = 1;
++	}
+ 
+ 	if (seqiops) {
+ 		v = DIV64_U64_ROUND_UP(VTIME_PER_SEC, seqiops);
+-- 
+2.39.0
+
