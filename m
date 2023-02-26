@@ -2,97 +2,133 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 434D2C6FA8E
-	for <linux-block@archiver.kernel.org>; Sun, 26 Feb 2023 07:59:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A7431C6FA8E
+	for <linux-block@archiver.kernel.org>; Sun, 26 Feb 2023 09:46:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229520AbjBZH7y (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 26 Feb 2023 02:59:54 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40390 "EHLO
+        id S229520AbjBZJp7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 26 Feb 2023 04:45:59 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57300 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229445AbjBZH7y (ORCPT
+        with ESMTP id S229504AbjBZJp6 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 26 Feb 2023 02:59:54 -0500
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A62E2C65C;
-        Sat, 25 Feb 2023 23:59:51 -0800 (PST)
-Received: by mail-wm1-f46.google.com with SMTP id o11-20020a05600c4fcb00b003eb33ea29a8so1537864wmq.1;
-        Sat, 25 Feb 2023 23:59:51 -0800 (PST)
+        Sun, 26 Feb 2023 04:45:58 -0500
+Received: from mail-qt1-f180.google.com (mail-qt1-f180.google.com [209.85.160.180])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 804541352D;
+        Sun, 26 Feb 2023 01:45:56 -0800 (PST)
+Received: by mail-qt1-f180.google.com with SMTP id h19so3822194qtk.7;
+        Sun, 26 Feb 2023 01:45:56 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=DGCngb9cE5yE6M3a4MEomrCzATYJDSH8ymK+LBwgxOM=;
-        b=ONF4gXqPLX71AvJCCqRoiH0k1+wIcJTtekmSM4T92mrL6mjklpVgtJUAyWAF3BU5c+
-         ktbMVgqoj/p3AX4JXOr7UXHQA+b6NTeuk8+oOL9eLrb9SzznMdnjogCTWAylHXejtQlq
-         QJKDE45bGYm/N2l+wWmBZuHqp/0nhUBIU/sc/js09GHfDca/7isJM3osKgS5+M69gty6
-         C/6oDp1492+mxUISZqL85nh8Y4i8AtczEHJ+Yr5lL9hD/fFu4jAxGBYoxuhfOUVIOALF
-         HllvKQjwcHa/GEg8Iopsv9gz/Uy1P4gh7m5iDKJyf1eFawwzfQi1fwmZPdFv5hfW5yki
-         2c8w==
-X-Gm-Message-State: AO0yUKWr7j14CrfI55WyqvGZMxTZ0Sn42eXG+H9P5koU2TBmvZ9x73q8
-        td0bE+VDrPj8eMQHCwdisfU=
-X-Google-Smtp-Source: AK7set9unaczVbzdJ61bhZUDAp9ZSY4c0yfMIwvnYMtDVvtvVCPDBk6Sw9xH6RsTakaisDcD5DxDww==
-X-Received: by 2002:a05:600c:1895:b0:3e2:f80:3df1 with SMTP id x21-20020a05600c189500b003e20f803df1mr15890132wmp.19.1677398389950;
-        Sat, 25 Feb 2023 23:59:49 -0800 (PST)
-Received: from [10.1.0.47] ([87.224.71.110])
-        by smtp.gmail.com with ESMTPSA id l4-20020a05600c4f0400b003df7b40f99fsm9261670wmq.11.2023.02.25.23.59.49
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=iDxhZAFqdoRCuyb8oRhrVi/sFN15zqpxYYgqeqQ31+A=;
+        b=EFS29tu6qJAvSqtD7DEXa56teJh1gLs3/nKOc+Bci6Tv6izKI5qN/dZVh/PNznX3j3
+         qmwnjhwC0CV8K5SyFWaN/5+ApehSoD7XnljE0gSDxhyh8wRC7gKEBJhhekH0b2uS6X8j
+         UFrFXLifPR8UzRuh2jwr+icoveA/EHec6favMkcEnG/zQYmLlfBQoTCyd+hp0UwQzluy
+         A2uuEE4ckH/DnxP7YxWbkWn3UhQ5EC725Rv8RorMbKeNWCRJ/fbdHBxXdRFi0ap4+NPt
+         SJZTjxASctDsjgZOJa2eeJAnOGP5A2mTURFbdYm/RTBkSsQwORO3XUYbJmgjyAWfAK6S
+         CuJQ==
+X-Gm-Message-State: AO0yUKVT/2CkNRUYAO2x2juuoJ8cnBpS4O7leHuLEBedlgljqZzsxVhb
+        mKXWJljykoy352XSGvbC319YtRhNoHI0tA==
+X-Google-Smtp-Source: AK7set/FCeMksqTqFg2svfYGUVNl26KNGtKHN/eNL/1NcSe4U9Wwff4zy19/doD0ZTQuKQcf7oTgUg==
+X-Received: by 2002:a05:622a:552:b0:3bf:c83d:5d4c with SMTP id m18-20020a05622a055200b003bfc83d5d4cmr6819811qtx.64.1677404755057;
+        Sun, 26 Feb 2023 01:45:55 -0800 (PST)
+Received: from mail-yw1-f175.google.com (mail-yw1-f175.google.com. [209.85.128.175])
+        by smtp.gmail.com with ESMTPSA id z22-20020ac87f96000000b003b63dfad2b4sm2799983qtj.0.2023.02.26.01.45.54
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 25 Feb 2023 23:59:49 -0800 (PST)
-Message-ID: <3130cb3e-eaca-04c2-ad97-b32ffddad397@debian.org>
-Date:   Sun, 26 Feb 2023 07:59:48 +0000
+        Sun, 26 Feb 2023 01:45:54 -0800 (PST)
+Received: by mail-yw1-f175.google.com with SMTP id 00721157ae682-536c02eea4dso99547877b3.4;
+        Sun, 26 Feb 2023 01:45:54 -0800 (PST)
+X-Received: by 2002:a5b:d46:0:b0:a67:c976:c910 with SMTP id
+ f6-20020a5b0d46000000b00a67c976c910mr1348469ybr.7.1677404754091; Sun, 26 Feb
+ 2023 01:45:54 -0800 (PST)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.2
-Subject: Re: [PATCH] blk-iocost: initialize rqos before accessing it
-To:     =?UTF-8?Q?Michal_Koutn=c3=bd?= <mkoutny@suse.com>
-Cc:     axboe@kernel.dk, tj@kernel.org, josef@toxicpanda.com,
-        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-        aherrmann@suse.de, linux-kernel@vger.kernel.org, hch@lst.de,
-        leit@fb.com
-References: <20230224160714.172884-1-leitao@debian.org>
- <20230224185126.bxkreilofbp2t4on@blackpad>
-Content-Language: en-US
-From:   Breno Leitao <leitao@debian.org>
-In-Reply-To: <20230224185126.bxkreilofbp2t4on@blackpad>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+References: <20230225121523.3288544-1-geert+renesas@glider.be>
+ <20230225203052.0fd823a1ccf0619e89b315d8@linux-foundation.org> <20230225205749.2effb5f902dee8919704f3cd@linux-foundation.org>
+In-Reply-To: <20230225205749.2effb5f902dee8919704f3cd@linux-foundation.org>
+From:   Geert Uytterhoeven <geert@linux-m68k.org>
+Date:   Sun, 26 Feb 2023 10:45:40 +0100
+X-Gmail-Original-Message-ID: <CAMuHMdXuP2f78t4ykRP37xNGSOZxEizd3ZvqOyedbLaHhfE1iw@mail.gmail.com>
+Message-ID: <CAMuHMdXuP2f78t4ykRP37xNGSOZxEizd3ZvqOyedbLaHhfE1iw@mail.gmail.com>
+Subject: Re: [PATCH] zram: Use atomic_long_read() to read atomic_long_t
+To:     Andrew Morton <akpm@linux-foundation.org>
+Cc:     Geert Uytterhoeven <geert+renesas@glider.be>,
+        Minchan Kim <minchan@kernel.org>,
+        Sergey Senozhatsky <senozhatsky@chromium.org>,
+        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello Michal,
+Hi Andrew,
 
-On 2/24/23 18:51, Michal Koutný wrote:
->> 	blk_iocost_init (include/asm-generic/qspinlock.h:128
->> 			 include/linux/spinlock.h:203
->> 			 include/linux/spinlock_api_smp.h:158
->> 			 include/linux/spinlock.h:400
->> 			 block/blk-iocost.c:2884)
->> 	ioc_qos_write (block/blk-iocost.c:3198)
->> 	? kretprobe_perf_func (kernel/trace/trace_kprobe.c:1566)
->> 	? kernfs_fop_write_iter (include/linux/slab.h:584 fs/kernfs/file.c:311)
->> 	? __kmem_cache_alloc_node (mm/slab.h:? mm/slub.c:3452 mm/slub.c:3491)
->> 	? _copy_from_iter (arch/x86/include/asm/uaccess_64.h:46
->> 			   arch/x86/include/asm/uaccess_64.h:52
->> 			   lib/iov_iter.c:183 lib/iov_iter.c:628)
->> 	? kretprobe_dispatcher (kernel/trace/trace_kprobe.c:1693)
->> 	cgroup_file_write (kernel/cgroup/cgroup.c:4061)
->> 	kernfs_fop_write_iter (fs/kernfs/file.c:334)
->> 	vfs_write (include/linux/fs.h:1849 fs/read_write.c:491
->> 		   fs/read_write.c:584)
->> 	ksys_write (fs/read_write.c:637)
->> 	do_syscall_64 (arch/x86/entry/common.c:50 arch/x86/entry/common.c:80)
->> 	entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:120)
-> 
-> BTW, out of curiosity what tool did you use to list stack with line
-> numbers?
+On Sun, Feb 26, 2023 at 5:57 AM Andrew Morton <akpm@linux-foundation.org> wrote:
+> On Sat, 25 Feb 2023 20:30:52 -0800 Andrew Morton <akpm@linux-foundation.org> wrote:
+> > > Fix this by using atomic_long_read() instead.
+> > >
+> > > Reported-by; noreply@ellerman.id.au
+> >
+> > That's an interesting one.  Was this mpe@?
 
-I use the decode_stacktrace.sh from kernel's scripts directory. You 
-basically
-pipe the stack to it, and call it passing the vmlinux file. It is 
-incredible handy.
+No, from the kisskb build bot, which sends private emails to the
+architecture maintainers when one of their builds fail:
 
-https://elixir.bootlin.com/linux/latest/source/scripts/decode_stacktrace.sh
+----8<-------------------------------------------------------------------------------------------
+Subject: kisskb: FAILED linux-next/m68k-defconfig/m68k-gcc8 Sat Feb 25, 14:34
+From: noreply@ellerman.id.au
+To: geert@linux-m68k.org
+Date: Sat, 25 Feb 2023 03:35:59 -0000
+Message-ID: <20230225033559.1.93322@37da20578230>
 
-Thanks for the review,
-Breno
+FAILED linux-next/m68k-defconfig/m68k-gcc8 Sat Feb 25, 14:34
+
+http://kisskb.ellerman.id.au/kisskb/buildresult/14885627/
+
+Commit:   Add linux-next specific files for 20230225
+          8232539f864ca60474e38eb42d451f5c26415856
+Compiler: m68k-linux-gcc (GCC) 8.5.0 / GNU ld (GNU Binutils) 2.36.1
+
+Possible errors
+---------------
+
+drivers/block/zram/zram_drv.c:1234:23: error: passing argument 1 of
+'atomic64_read' from incompatible pointer type
+[-Werror=incompatible-pointer-types]
+cc1: some warnings being treated as errors
+make[5]: *** [scripts/Makefile.build:252: drivers/block/zram/zram_drv.o] Error 1
+make[4]: *** [scripts/Makefile.build:494: drivers/block/zram] Error 2
+make[3]: *** [scripts/Makefile.build:494: drivers/block] Error 2
+make[2]: *** [scripts/Makefile.build:494: drivers] Error 2
+make[1]: *** [Makefile:2028: .] Error 2
+make: *** [Makefile:226: __sub-make] Error 2
+
+Possible warnings (1)
+----------------------
+
+include/linux/list.h:74:12: warning: 'seed_devices' may be used
+uninitialized in this function [-Wmaybe-uninitialized]
+------------------------------------------------------------------------------------------>8-----
+
+> > I like it when a Reported-by: is followed by a Link: to the report, so
+> > I can go hunt down such things.
+>
+> I found this, and added it to the changelog:
+>
+> Reported-by: kernel test robot <lkp@intel.com>
+>   Link: https://lore.kernel.org/oe-kbuild-all/202302241840.nwdXqE5r-lkp@intel.com/
+
+That's a different bot ;-)
+
+Gr{oetje,eeting}s,
+
+                        Geert
+
+-- 
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
