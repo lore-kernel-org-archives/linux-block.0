@@ -2,79 +2,67 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CF058C64ED6
-	for <linux-block@archiver.kernel.org>; Sun, 26 Feb 2023 04:31:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AAFABC6FA8E
+	for <linux-block@archiver.kernel.org>; Sun, 26 Feb 2023 04:57:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229593AbjBZEbA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 25 Feb 2023 23:31:00 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55134 "EHLO
+        id S229489AbjBZE5x (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 25 Feb 2023 23:57:53 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37342 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229445AbjBZEa7 (ORCPT
+        with ESMTP id S229445AbjBZE5w (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 25 Feb 2023 23:30:59 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 214052739;
-        Sat, 25 Feb 2023 20:30:58 -0800 (PST)
+        Sat, 25 Feb 2023 23:57:52 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E593E271F;
+        Sat, 25 Feb 2023 20:57:51 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id C3D57B80B6F;
-        Sun, 26 Feb 2023 04:30:56 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3EC66C433EF;
-        Sun, 26 Feb 2023 04:30:55 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 8268160BFB;
+        Sun, 26 Feb 2023 04:57:51 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 900B6C433EF;
+        Sun, 26 Feb 2023 04:57:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linux-foundation.org;
-        s=korg; t=1677385855;
-        bh=3AVpRW1qfx5u4fWuk1ExehO1c3toNqap5A2JD2mWud8=;
+        s=korg; t=1677387470;
+        bh=405WBKAPcyTV3KmeBm8hWZpyKdTRGGvvR81EzEUChcA=;
         h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=Z2x2VghRbdvldniWzOgtOOVwyu0YcNwIgHAUww07sKBomB2aMml+GfGgFSjEm34ag
-         ddby0Tqvtv0krNdAwmEmS6JKUrXdexhqg2T4oUOk/1zi+L62ZyPkqtmmpwSZxUnsct
-         ix3PxjxK9VDp5LSf9VE+OX9MObQbT1hGdLTE7JBs=
-Date:   Sat, 25 Feb 2023 20:30:52 -0800
+        b=W2LLIGsJ16LyT818xRep54ODU1OqUY0Q4Xt9DtzjExBfo5OtWwKKrknKVb5T8izwy
+         Rdj6Skda0d3ijZ7e0doUthn6OXtfYO1nq3srCYc/cIuYP7M4pm7jn5PnivlPmC4seh
+         0w4yYSoD1UAv55Z4r7xANXeDJaf2BG6gV/FKYzD0=
+Date:   Sat, 25 Feb 2023 20:57:49 -0800
 From:   Andrew Morton <akpm@linux-foundation.org>
-To:     Geert Uytterhoeven <geert+renesas@glider.be>
-Cc:     Minchan Kim <minchan@kernel.org>,
+To:     Andrew Morton <akpm@linux-foundation.org>
+Cc:     Geert Uytterhoeven <geert+renesas@glider.be>,
+        Minchan Kim <minchan@kernel.org>,
         Sergey Senozhatsky <senozhatsky@chromium.org>,
         Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org
 Subject: Re: [PATCH] zram: Use atomic_long_read() to read atomic_long_t
-Message-Id: <20230225203052.0fd823a1ccf0619e89b315d8@linux-foundation.org>
-In-Reply-To: <20230225121523.3288544-1-geert+renesas@glider.be>
+Message-Id: <20230225205749.2effb5f902dee8919704f3cd@linux-foundation.org>
+In-Reply-To: <20230225203052.0fd823a1ccf0619e89b315d8@linux-foundation.org>
 References: <20230225121523.3288544-1-geert+renesas@glider.be>
+        <20230225203052.0fd823a1ccf0619e89b315d8@linux-foundation.org>
 X-Mailer: Sylpheed 3.7.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, 25 Feb 2023 13:15:23 +0100 Geert Uytterhoeven <geert+renesas@glider.be> wrote:
+On Sat, 25 Feb 2023 20:30:52 -0800 Andrew Morton <akpm@linux-foundation.org> wrote:
 
-> On 32-bit:
+> > Fix this by using atomic_long_read() instead.
+> > 
+> > Reported-by; noreply@ellerman.id.au
 > 
->     drivers/block/zram/zram_drv.c: In function ‘mm_stat_show’:
->     drivers/block/zram/zram_drv.c:1234:23: error: passing argument 1 of ‘atomic64_read’ from incompatible pointer type [-Werror=incompatible-pointer-types]
->      1234 |    (u64)atomic64_read(&pool_stats.objs_moved));
-> 	  |                       ^~~~~~~~~~~~~~~~~~~~~~
-> 	  |                       |
-> 	  |                       atomic_long_t * {aka struct <anonymous> *}
->     In file included from ./include/linux/atomic.h:82,
-> 		     from ./include/linux/mm_types_task.h:13,
-> 		     from ./include/linux/mm_types.h:5,
-> 		     from ./include/linux/buildid.h:5,
-> 		     from ./include/linux/module.h:14,
-> 		     from drivers/block/zram/zram_drv.c:18:
->     ./include/linux/atomic/atomic-instrumented.h:644:33: note: expected ‘const atomic64_t *’ {aka ‘const struct <anonymous> *’} but argument is of type ‘atomic_long_t *’ {aka ‘struct <anonymous> *’}
->       644 | atomic64_read(const atomic64_t *v)
-> 	  |               ~~~~~~~~~~~~~~~~~~^
+> That's an interesting one.  Was this mpe@?
 > 
-> Fix this by using atomic_long_read() instead.
-> 
-> Reported-by; noreply@ellerman.id.au
+> I like it when a Reported-by: is followed by a Link: to the report, so
+> I can go hunt down such things.
 
-That's an interesting one.  Was this mpe@?
+I found this, and added it to the changelog:
 
-I like it when a Reported-by: is followed by a Link: to the report, so
-I can go hunt down such things.
-
+Reported-by: kernel test robot <lkp@intel.com>
+  Link: https://lore.kernel.org/oe-kbuild-all/202302241840.nwdXqE5r-lkp@intel.com/
 
