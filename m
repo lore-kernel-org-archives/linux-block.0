@@ -2,177 +2,43 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67746C64ED6
-	for <linux-block@archiver.kernel.org>; Mon, 27 Feb 2023 13:59:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 79CAAC7EE2F
+	for <linux-block@archiver.kernel.org>; Mon, 27 Feb 2023 14:09:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229661AbjB0N7T (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 27 Feb 2023 08:59:19 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46560 "EHLO
+        id S230228AbjB0OJA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 27 Feb 2023 09:09:00 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54154 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229535AbjB0N7S (ORCPT
+        with ESMTP id S230227AbjB0OI7 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 27 Feb 2023 08:59:18 -0500
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D7B5E86B7;
-        Mon, 27 Feb 2023 05:59:15 -0800 (PST)
-Received: by mail-wm1-f41.google.com with SMTP id fm20-20020a05600c0c1400b003ead37e6588so7208958wmb.5;
-        Mon, 27 Feb 2023 05:59:15 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=01vdwOPhnCC3qxNKYSax3Iv0n2lLnfqxMKTZz/Dv3X8=;
-        b=vtxuwgF6GF3tBN/dpnSn9PteSnTcKO0J26e9zPSAGRc0euIM4GMD86ns7omZxtse2r
-         QPLfa6t8xaLLaZXVfDgvNnyp1DwRRqtor12rqwDlc5znSPVle9fFJ2I3m1kzu4ljBurF
-         9hIkVzk8lnYOrMNbMMUvFfgjgstFamoeUvf8pxKp6dvon05CbSo/dJenowCvWTslnLBE
-         hV1q9PLk/FrMYv1mV9TH0gYZZukrG7OMLiLMwKwsd+w9VNLFtHqT6ZhfZJOiwvUeqose
-         1X3wXfrSRgVIXSyJzmbE6vG+zSHZ7vFJwHBzqRUrXrNfN0KEIZPtmUEJFKY2S2OIwB6o
-         CESQ==
-X-Gm-Message-State: AO0yUKVzI45+mwKNkKYsujjU3UogSGEbWKPDswzZNJYebVHog01ML8DP
-        C+LUveQNx0lPw/E3H//r5LY=
-X-Google-Smtp-Source: AK7set9FALw06c5ZOVwEnrXx5yRQRi1uB4uutUrdbpwVDPrIHiHm962pbaXpHwwgqo/rXzJCMI2/pQ==
-X-Received: by 2002:a05:600c:6023:b0:3e7:cee4:f8a with SMTP id az35-20020a05600c602300b003e7cee40f8amr19586526wmb.29.1677506354223;
-        Mon, 27 Feb 2023 05:59:14 -0800 (PST)
-Received: from localhost (fwdproxy-cln-004.fbsv.net. [2a03:2880:31ff:4::face:b00c])
-        by smtp.gmail.com with ESMTPSA id l1-20020a1c7901000000b003e2058a7109sm12674194wme.14.2023.02.27.05.59.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 Feb 2023 05:59:13 -0800 (PST)
-From:   Breno Leitao <leitao@debian.org>
-To:     axboe@kernel.dk, tj@kernel.org, josef@toxicpanda.com,
-        cgroups@vger.kernel.org, linux-block@vger.kernel.org
-Cc:     aherrmann@suse.de, mkoutny@suse.com, linux-kernel@vger.kernel.org,
+        Mon, 27 Feb 2023 09:08:59 -0500
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EEFEB975F;
+        Mon, 27 Feb 2023 06:08:51 -0800 (PST)
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id E8E5667373; Mon, 27 Feb 2023 15:08:47 +0100 (CET)
+Date:   Mon, 27 Feb 2023 15:08:47 +0100
+From:   Christoph Hellwig <hch@lst.de>
+To:     Breno Leitao <leitao@debian.org>
+Cc:     axboe@kernel.dk, tj@kernel.org, josef@toxicpanda.com,
+        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        aherrmann@suse.de, mkoutny@suse.com, linux-kernel@vger.kernel.org,
         hch@lst.de, leit@fb.com
-Subject: [PATCH v2] blk-iocost: Pass disk queue to ioc_refresh_params
-Date:   Mon, 27 Feb 2023 05:56:10 -0800
-Message-Id: <20230227135610.501884-1-leitao@debian.org>
-X-Mailer: git-send-email 2.30.2
+Subject: Re: [PATCH v2] blk-iocost: Pass disk queue to ioc_refresh_params
+Message-ID: <20230227140847.GA18644@lst.de>
+References: <20230227135610.501884-1-leitao@debian.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230227135610.501884-1-leitao@debian.org>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Current kernel (d2980d8d826554fa6981d621e569a453787472f8) crashes
-when blk_iocost_init for `nvme1` disk.
+Hi Breno,
 
-	BUG: kernel NULL pointer dereference, address: 0000000000000050
-	#PF: supervisor read access in kernel mode
-	#PF: error_code(0x0000) - not-present page
-
-	blk_iocost_init (include/asm-generic/qspinlock.h:128
-			 include/linux/spinlock.h:203
-			 include/linux/spinlock_api_smp.h:158
-			 include/linux/spinlock.h:400
-			 block/blk-iocost.c:2884)
-	ioc_qos_write (block/blk-iocost.c:3198)
-	? kretprobe_perf_func (kernel/trace/trace_kprobe.c:1566)
-	? kernfs_fop_write_iter (include/linux/slab.h:584 fs/kernfs/file.c:311)
-	? __kmem_cache_alloc_node (mm/slab.h:? mm/slub.c:3452 mm/slub.c:3491)
-	? _copy_from_iter (arch/x86/include/asm/uaccess_64.h:46
-			   arch/x86/include/asm/uaccess_64.h:52
-			   lib/iov_iter.c:183 lib/iov_iter.c:628)
-	? kretprobe_dispatcher (kernel/trace/trace_kprobe.c:1693)
-	cgroup_file_write (kernel/cgroup/cgroup.c:4061)
-	kernfs_fop_write_iter (fs/kernfs/file.c:334)
-	vfs_write (include/linux/fs.h:1849 fs/read_write.c:491
-		   fs/read_write.c:584)
-	ksys_write (fs/read_write.c:637)
-	do_syscall_64 (arch/x86/entry/common.c:50 arch/x86/entry/common.c:80)
-	entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:120)
-
-This happens because ioc_refresh_params() is being called without
-a properly initialized ioc->rqos, which is happening later in the callee
-side.
-
-ioc_refresh_params() -> ioc_autop_idx() tries to access
-ioc->rqos.disk->queue but ioc->rqos.disk is NULL, causing the BUG above.
-
-Create a function that is similar to ioc_refresh_params() but where the
-"struct request_queue" could be passed as an explicit argument. This
-function will be called when ioc->rqos.disk->queue could not be trusted.
-
-Fixes: ce57b558604e ("blk-rq-qos: make rq_qos_add and rq_qos_del more useful")
-
-Signed-off-by: Breno Leitao <leitao@debian.org>
----
- block/blk-iocost.c | 22 ++++++++++++++++------
- 1 file changed, 16 insertions(+), 6 deletions(-)
-
----
-Changes in v2:
-- Pass the struct request_queue explictly to ioc_refresh_params()
-
-diff --git a/block/blk-iocost.c b/block/blk-iocost.c
-index ff534e9d92dc..28f9b802241d 100644
---- a/block/blk-iocost.c
-+++ b/block/blk-iocost.c
-@@ -800,7 +800,7 @@ static void ioc_refresh_period_us(struct ioc *ioc)
- 	ioc_refresh_margins(ioc);
- }
- 
--static int ioc_autop_idx(struct ioc *ioc)
-+static int ioc_autop_idx(struct ioc *ioc, struct request_queue *queue)
- {
- 	int idx = ioc->autop_idx;
- 	const struct ioc_params *p = &autop[idx];
-@@ -808,11 +808,11 @@ static int ioc_autop_idx(struct ioc *ioc)
- 	u64 now_ns;
- 
- 	/* rotational? */
--	if (!blk_queue_nonrot(ioc->rqos.disk->queue))
-+	if (!blk_queue_nonrot(queue))
- 		return AUTOP_HDD;
- 
- 	/* handle SATA SSDs w/ broken NCQ */
--	if (blk_queue_depth(ioc->rqos.disk->queue) == 1)
-+	if (blk_queue_depth(queue) == 1)
- 		return AUTOP_SSD_QD1;
- 
- 	/* use one of the normal ssd sets */
-@@ -901,14 +901,19 @@ static void ioc_refresh_lcoefs(struct ioc *ioc)
- 		    &c[LCOEF_WPAGE], &c[LCOEF_WSEQIO], &c[LCOEF_WRANDIO]);
- }
- 
--static bool ioc_refresh_params(struct ioc *ioc, bool force)
-+/*
-+ * struct request_queue is required as an argument because ioc->rqos.disk->queue
-+ * might not be properly initialized
-+ */
-+static bool _ioc_refresh_params(struct ioc *ioc, bool force,
-+				struct request_queue *queue)
- {
- 	const struct ioc_params *p;
- 	int idx;
- 
- 	lockdep_assert_held(&ioc->lock);
- 
--	idx = ioc_autop_idx(ioc);
-+	idx = ioc_autop_idx(ioc, queue);
- 	p = &autop[idx];
- 
- 	if (idx == ioc->autop_idx && !force)
-@@ -939,6 +944,11 @@ static bool ioc_refresh_params(struct ioc *ioc, bool force)
- 	return true;
- }
- 
-+static bool ioc_refresh_params(struct ioc *ioc, bool force)
-+{
-+	return _ioc_refresh_params(ioc, force, ioc->rqos.disk->queue);
-+}
-+
- /*
-  * When an iocg accumulates too much vtime or gets deactivated, we throw away
-  * some vtime, which lowers the overall device utilization. As the exact amount
-@@ -2880,7 +2890,7 @@ static int blk_iocost_init(struct gendisk *disk)
- 
- 	spin_lock_irq(&ioc->lock);
- 	ioc->autop_idx = AUTOP_INVALID;
--	ioc_refresh_params(ioc, true);
-+	_ioc_refresh_params(ioc, true, disk->queue);
- 	spin_unlock_irq(&ioc->lock);
- 
- 	/*
--- 
-2.30.2
-
+and sorry for the late reply.  This looks correct to me, but I'd
+be much happier if the disk was passed in instead of the request_queue
+as that's where we're generally heading.  If you don't have time to
+respin I could live with this version for a fix, though.
