@@ -2,75 +2,127 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A60C9C64ED8
-	for <linux-block@archiver.kernel.org>; Mon, 27 Feb 2023 14:52:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33A6EC64ED8
+	for <linux-block@archiver.kernel.org>; Mon, 27 Feb 2023 15:02:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229574AbjB0OwW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 27 Feb 2023 09:52:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32778 "EHLO
+        id S229794AbjB0PC2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 27 Feb 2023 10:02:28 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46192 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229657AbjB0OwV (ORCPT
+        with ESMTP id S229657AbjB0PC1 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 27 Feb 2023 09:52:21 -0500
-Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C4AE02202C;
-        Mon, 27 Feb 2023 06:52:19 -0800 (PST)
-Received: by mail-wr1-f41.google.com with SMTP id l25so6528144wrb.3;
-        Mon, 27 Feb 2023 06:52:19 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:to:subject:cc
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=Ig4nk3MPcVVXmPaI5r91h49D/cIs37xSeKPwjDDQdOY=;
-        b=sYUD3oOmJTSqgfeF17KXwqzFpAkgQ0+n7xYj08RVLQ7K1HZoIasTJnaFkdW6iOmHKL
-         xcB52jWN+ZUBaZ7cu18qG4+n43jSRjYDVqhuRyauGdJfp2xZRultfqbjaM0RCC+fLe3M
-         6CgFAYc5cg0fZKtWpF7oy5adWDWhxgqtWtfXIy+lVUMNfNnMybjSAtoEwxqQamjIEH/Y
-         D1VtXArTD3+gkgIOmuDuXtAUyIgqGFyGJ79uwZKqdnuKY/tqSHaQz3fk92gKmsdBoiZl
-         bXc0q7PbtRCbEDWO3s+vKGjFSGpwPMCgin2NHwC7O89zajQvmHG9tJsW+LHCZEJ1ZVl2
-         k7aQ==
-X-Gm-Message-State: AO0yUKUmIq/oMDI6cGegqR4WfcTwMollSsxpKtSyJrtgMAkteG3bhw1g
-        2j1mGcYI6+MPTIAvrBw6NNs=
-X-Google-Smtp-Source: AK7set8vnaLOnleLv10OV+Ul8uVDdYp+NJiQ5huJjqDq6AiKz12FrbsCZnQjMTw3QRb3OOR6627K9g==
-X-Received: by 2002:a5d:570e:0:b0:2bf:d940:29b6 with SMTP id a14-20020a5d570e000000b002bfd94029b6mr21925697wrv.54.1677509537875;
-        Mon, 27 Feb 2023 06:52:17 -0800 (PST)
-Received: from ?IPV6:2620:10d:c0c3:1136:1486:5f6c:3f1:4b78? ([2620:10d:c092:400::5:e15])
-        by smtp.gmail.com with ESMTPSA id d10-20020a05600c3aca00b003eb369abd92sm8415664wms.2.2023.02.27.06.52.16
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 27 Feb 2023 06:52:17 -0800 (PST)
-Message-ID: <2e8c8937-b027-8b20-a16b-3dfed8217ad2@debian.org>
-Date:   Mon, 27 Feb 2023 14:52:15 +0000
+        Mon, 27 Feb 2023 10:02:27 -0500
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0458555BE;
+        Mon, 27 Feb 2023 07:02:25 -0800 (PST)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 7AA48219FB;
+        Mon, 27 Feb 2023 15:02:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1677510144; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=gQdlZOcHYNl5XRcWKHNMj/kCNmWBN/fJPu/xDdRs1kc=;
+        b=MuOFW8HlHEK8azDxmhRDJhV5hwinNYrmK4nKpsf9WVDIZzds9W9IQn/s3uHbfRbvyKHbrH
+        V9X/4BR4XycqMMXkIe/QJ7cXYM+KlE8/KyncZlvdIgwIrZkp75iDVcaG/aK1zBQDKV8C/z
+        c2XEWUo5OCpZnLqG3aSu1U4cBY2takw=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1677510144;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=gQdlZOcHYNl5XRcWKHNMj/kCNmWBN/fJPu/xDdRs1kc=;
+        b=+5JdXbctffs1QjnpI1Z5DvF5Nfr5Hb27YR2JhzIncsyffP9hNKgiYRyB/X6OuBsp75Ch6I
+        MZUNPq4bphQuz9Ag==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 6404D13A43;
+        Mon, 27 Feb 2023 15:02:24 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id JvRPGADG/GNyGwAAMHmgww
+        (envelope-from <jack@suse.cz>); Mon, 27 Feb 2023 15:02:24 +0000
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+        id BE2B8A06F2; Mon, 27 Feb 2023 16:02:23 +0100 (CET)
+Date:   Mon, 27 Feb 2023 16:02:23 +0100
+From:   Jan Kara <jack@suse.cz>
+To:     Hou Tao <houtao@huaweicloud.com>
+Cc:     Jan Kara <jack@suse.cz>, linux-block@vger.kernel.org,
+        Bart Van Assche <bvanassche@acm.org>,
+        Bagas Sanjaya <bagasdotme@gmail.com>,
+        Jens Axboe <axboe@kernel.dk>, cgroups@vger.kernel.org,
+        Tejun Heo <tj@kernel.org>, Zefan Li <lizefan.x@bytedance.com>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        Jonathan Corbet <corbet@lwn.net>, linux-kernel@vger.kernel.org,
+        linux-doc@vger.kernel.org, houtao1@huawei.com
+Subject: Re: [PATCH v2] blk-ioprio: Introduce promote-to-rt policy
+Message-ID: <20230227150223.vvjvhiesgnbfea5z@quack3>
+References: <20230220135428.2632906-1-houtao@huaweicloud.com>
+ <20230227130305.2idxwmz2kdnacolc@quack3>
+ <05eafc4f-2d60-b7e6-1d5d-9a08709916e8@huaweicloud.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.7.2
-Cc:     leit@meta.com, axboe@kernel.dk, tj@kernel.org,
-        josef@toxicpanda.com, cgroups@vger.kernel.org,
-        linux-block@vger.kernel.org, aherrmann@suse.de, mkoutny@suse.com,
-        linux-kernel@vger.kernel.org, leit@fb.com
-Subject: Re: [PATCH v2] blk-iocost: Pass disk queue to ioc_refresh_params
-To:     Christoph Hellwig <hch@lst.de>
-References: <20230227135610.501884-1-leitao@debian.org>
- <20230227140847.GA18644@lst.de>
-From:   Breno Leitao <leitao@debian.org>
-In-Reply-To: <20230227140847.GA18644@lst.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <05eafc4f-2d60-b7e6-1d5d-9a08709916e8@huaweicloud.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello Christoph,
-
-On 27/02/2023 14:08, Christoph Hellwig wrote:
-> Hi Breno,
+On Mon 27-02-23 21:56:25, Hou Tao wrote:
+> Hi
 > 
-> and sorry for the late reply.  This looks correct to me, but I'd
-> be much happier if the disk was passed in instead of the request_queue
-> as that's where we're generally heading.  If you don't have time to
-> respin I could live with this version for a fix, though.
+> On 2/27/2023 9:03 PM, Jan Kara wrote:
+> > On Mon 20-02-23 21:54:28, Hou Tao wrote:
+> >> From: Hou Tao <houtao1@huawei.com>
+> >>
+> >> Since commit a78418e6a04c ("block: Always initialize bio IO priority on
+> >> submit"), bio->bi_ioprio will never be IOPRIO_CLASS_NONE when calling
+> >> blkcg_set_ioprio(), so there will be no way to promote the io-priority
+> >> of one cgroup to IOPRIO_CLASS_RT, because bi_ioprio will always be
+> >> greater than or equals to IOPRIO_CLASS_RT.
+> >>
+> >> It seems possible to call blkcg_set_ioprio() first then try to
+> >> initialize bi_ioprio later in bio_set_ioprio(), but this doesn't work
+> >> for bio in which bi_ioprio is already initialized (e.g., direct-io), so
+> >> introduce a new ioprio policy to promote the iopriority of bio to
+> >> IOPRIO_CLASS_RT if the ioprio is not already RT.
+> >>
+> >> So introduce a new promote-to-rt policy to achieve this. For none-to-rt
+> >> policy, although it doesn't work now, but considering that its purpose
+> >> was also to override the io-priority to RT and allow for a smoother
+> >> transition, just keep it and treat it as an alias of the promote-to-rt
+> >> policy.
+> >>
+> >> Signed-off-by: Hou Tao <houtao1@huawei.com>
+> > Looks good to me. Feel free to add:
+> >
+> > Reviewed-by: Jan Kara <jack@suse.cz>
+> Thanks for the review.
+> >
+> > Just one question regarding doc below:
+> >
+> >> ++----------------+---+
+> >> +| no-change      | 0 |
+> >> ++----------------+---+
+> >> +| rt-to-be       | 2 |
+> >> ++----------------+---+
+> >> +| all-to-idle    | 3 |
+> >> ++----------------+---+
+> > Shouldn't there be preempt-to-rt somewhere in this table as well? Or why
+> > this this in the doc at all? I'd consider the numbers to be kernel internal
+> > thing?
+> These numbers are used in the algorithm paragraph below to explain how the final
+> ioprio is calculated. For prompt-to-rt policy, the algorithm is different and
+> the number is unnecessary.
 
-No worries, I can definitely do a respin passing the disk instead of
-request_queue.
+I see, thanks for explanation.
 
-I hope to send a v3 in the next few hours.
-
+								Honza
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
