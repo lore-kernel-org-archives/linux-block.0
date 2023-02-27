@@ -2,88 +2,122 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F7F2C64ED6
-	for <linux-block@archiver.kernel.org>; Mon, 27 Feb 2023 17:45:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63372C64ED6
+	for <linux-block@archiver.kernel.org>; Mon, 27 Feb 2023 18:27:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229657AbjB0Rp0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 27 Feb 2023 12:45:26 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34654 "EHLO
+        id S229598AbjB0S1Z (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 27 Feb 2023 13:27:25 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33326 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229754AbjB0RpZ (ORCPT
+        with ESMTP id S229558AbjB0S1Y (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 27 Feb 2023 12:45:25 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4A7A241E6;
-        Mon, 27 Feb 2023 09:45:07 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id A232C60EE2;
-        Mon, 27 Feb 2023 17:44:55 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 27632C433EF;
-        Mon, 27 Feb 2023 17:44:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1677519895;
-        bh=/SOVKtkDSxDxmC89ievuT6HH6QX3NhvtmNmaObVIk6w=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=jl/ZvmRNcuW9+rhUypdYi2dd6xgmzzP8r0oObXLU2Q1eoo7mwD99uKgALcAAA4Tun
-         Fk/PDUeywnsaN8TPspId/XjmpLG/58C0sJDU+dK7+BkkmMiyZ+i44ADEyb0jECmntA
-         3OoHn3Fq2GFb8E+Mn0e+rPx+MDJF/6k7RRLtUyY+K6h4IcVeHQubyAgubUUZ8of773
-         fd796yjYxhBxia1AV4TL0MAYDaqg0eF8A2Kxbv6f8MPpagrTAXCKiGZOqCAtJgEkFR
-         UUFAg+ElDgXuSxAcV+n9azzcUCItmLn8lPlzcJ3iT68A68AQlcqYpg4RMxYAhihhxi
-         bIB6CF9CB0Z+Q==
-Date:   Mon, 27 Feb 2023 10:44:51 -0700
-From:   Keith Busch <kbusch@kernel.org>
-To:     Hannes Reinecke <hare@suse.de>
-Cc:     Sagi Grimberg <sagi@grimberg.me>,
-        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
-        "hch@lst.de" <hch@lst.de>,
-        "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
-        "dgilbert@interlog.com" <dgilbert@interlog.com>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "lsf-pc@lists.linuxfoundation.org" <lsf-pc@lists.linuxfoundation.org>
-Subject: Re: [LSF/MM/BPF BOF] Userspace command abouts
-Message-ID: <Y/zsE9i7012Ivwe1@kbusch-mbp.dhcp.thefacebook.com>
-References: <ad837a26-948a-c690-cd9e-4dfffb5f990d@grimberg.me>
- <57d8dff9-2fdb-8198-6cdc-7265797a704a@interlog.com>
- <23526cf9-d912-59a7-4742-6003d6ccfd45@grimberg.me>
- <Y/Yscr82hqdKl1Hw@kbusch-mbp.dhcp.thefacebook.com>
- <561afa67-04d0-c675-6bbb-048313da152b@grimberg.me>
- <73b4dd39-9ce8-9b55-8a1d-06865f3bde32@nvidia.com>
- <Y/lpmrwuehnsWmmR@kbusch-mbp.dhcp.thefacebook.com>
- <0fe59301-65e6-d8a9-033e-0243ad59c56b@opensource.wdc.com>
- <316431ed-1727-7e80-2090-84ac5b334f74@grimberg.me>
- <3ea301b1-c808-ce08-8ec8-3a631b385fb9@suse.de>
+        Mon, 27 Feb 2023 13:27:24 -0500
+Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E8C2ACDFE;
+        Mon, 27 Feb 2023 10:27:23 -0800 (PST)
+Received: by mail-pj1-x1036.google.com with SMTP id kb15so7139225pjb.1;
+        Mon, 27 Feb 2023 10:27:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=mGr1oL/pZpPll19+c3ioRmhLkSsTJHby1AuhBJm//pc=;
+        b=AXLk46Xo38NfyHxtx8zulMsDJlEFXxboaZ7CcFKXsR8lysmnKJevshrI8i8WK3fJTF
+         uWR4w1WfELt0Mq+azcWdHPKbNrLZ4SbbMF+Dkc5RflxcjT1jViFzgFaN1/07tFwvLGFX
+         NcxpDm+af0Io/ke056P3+ooazUZqZtyEcVpRp3fNMnNcS71FCcdqPYfKgzryOUsxSAj1
+         7fUCo5vF3vh8qRZlYEh/4zoRmerPgXNLa9QB4SRDNimzCG6/nMmNK209HnPte1nf7Wu5
+         VnR2Yv9PRATCOS9AS8FmpBZfQeJ7dumwjV4T5CKMSSKlVeffBA9uLpS0wEJocpilftqF
+         uOYQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=mGr1oL/pZpPll19+c3ioRmhLkSsTJHby1AuhBJm//pc=;
+        b=P7mFT0FoBjxFqVzBHEcteI840CgVoPfdT/CsDUFvkgd+/BRQtJgkdjl4sBbkXYvlvt
+         1nn5GuuC1fIz2JnR/yJVYHAkmhhsaaKuqS+UtQ/UaKBfuXUk/DwVTmXwLNS9qD3KAEgy
+         F5Q/fI2gAEO0o4U9wao7wTSy7qw0Wrvw81VJXByRD82ULej5h+fes9PzBBZA7SE199q6
+         AOJVAxYvZCETHgaE11FG5Iw+NyPaY8xsQ8wxhuUxfkY6LymBn/ZMJ+kcREVZ22Jpp+M6
+         AD/Pbnm5mTeWovky6DfpcddjAF4WRJTkDysOyj+rsDe7JVc5nHHAzHnpfIsxTS4+7PiS
+         8CjQ==
+X-Gm-Message-State: AO0yUKVLCtkVpYAly6nlTLFhQphbvQacTcmfuvqDl2aDnreV8TZcaUm7
+        pSwREWWRZQ7sJUYmWNvpT7w=
+X-Google-Smtp-Source: AK7set/TfJvvSIOtVjF7wj4W9M7274mKsz1GltNZ8tgBx1SdHt58gDyLIXoAp9A8vaqeH0TueFgGeA==
+X-Received: by 2002:a17:902:cf50:b0:19c:d796:9abb with SMTP id e16-20020a170902cf5000b0019cd7969abbmr10124190plg.41.1677522442998;
+        Mon, 27 Feb 2023 10:27:22 -0800 (PST)
+Received: from localhost (2603-800c-1a02-1bae-a7fa-157f-969a-4cde.res6.spectrum.com. [2603:800c:1a02:1bae:a7fa:157f:969a:4cde])
+        by smtp.gmail.com with ESMTPSA id u9-20020a17090282c900b001991f07f41dsm4916163plz.297.2023.02.27.10.27.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 27 Feb 2023 10:27:21 -0800 (PST)
+Sender: Tejun Heo <htejun@gmail.com>
+Date:   Mon, 27 Feb 2023 08:27:19 -1000
+From:   Tejun Heo <tj@kernel.org>
+To:     Breno Leitao <leitao@debian.org>
+Cc:     axboe@kernel.dk, cgroups@vger.kernel.org,
+        linux-block@vger.kernel.org, hch@lst.de, josef@toxicpanda.com,
+        aherrmann@suse.de, mkoutny@suse.com, linux-kernel@vger.kernel.org,
+        leit@fb.com
+Subject: Re: [PATCH v3] blk-iocost: Pass gendisk to ioc_refresh_params
+Message-ID: <Y/z2B+153X0PYpjO@slm.duckdns.org>
+References: <20230227151252.1411499-1-leitao@debian.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <3ea301b1-c808-ce08-8ec8-3a631b385fb9@suse.de>
+In-Reply-To: <20230227151252.1411499-1-leitao@debian.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Feb 27, 2023 at 06:28:41PM +0100, Hannes Reinecke wrote:
-> On 2/27/23 17:33, Sagi Grimberg wrote:
-> > 
-> > I'm not up to speed on how CDL is defined, but I'm unclear how CDL at
-> > the queue level would cause the host to open more queues?
+Hello,
 
-Because each CDL class would need its own submission queue in that scheme. They
-can all share a single completion queue, so this scheme doesn't necassarily
-increase the number of interrupt vectors.
+A couple minor nitpicks:
 
-> > Another question, does CDL have any relationship with NVMe "Time Limited
-> > Error Recovery"? where the host can set a feature for timeout and
-> > indicate if the controller should respect it per command?
-> > 
-> > While this is not a full-blown every queue/command has its own timeout,
-> > it could address the original use-case given by Hannes. And it's already
-> > there.
-> I guess that is the NVMe version of CDLs; can you give me a reference for
-> it?
+Can you please add a short comment here too saying that @ioc->rqos.disk
+isn't initialized yet when this function is called from the init path?
 
-They're not the same. TLER starts timing after a command experiences a
-recoverable error, where CDL is an end-to-end timing for all commands.
+> +static int ioc_autop_idx(struct ioc *ioc, struct gendisk *disk)
+>  {
+>  	int idx = ioc->autop_idx;
+>  	const struct ioc_params *p = &autop[idx];
+> @@ -808,11 +808,11 @@ static int ioc_autop_idx(struct ioc *ioc)
+>  	u64 now_ns;
+>  
+>  	/* rotational? */
+> -	if (!blk_queue_nonrot(ioc->rqos.disk->queue))
+> +	if (!blk_queue_nonrot(disk->queue))
+>  		return AUTOP_HDD;
+>  
+>  	/* handle SATA SSDs w/ broken NCQ */
+> -	if (blk_queue_depth(ioc->rqos.disk->queue) == 1)
+> +	if (blk_queue_depth(disk->queue) == 1)
+>  		return AUTOP_SSD_QD1;
+>  
+>  	/* use one of the normal ssd sets */
+> @@ -901,14 +901,19 @@ static void ioc_refresh_lcoefs(struct ioc *ioc)
+>  		    &c[LCOEF_WPAGE], &c[LCOEF_WSEQIO], &c[LCOEF_WRANDIO]);
+>  }
+>  
+> -static bool ioc_refresh_params(struct ioc *ioc, bool force)
+> +/*
+> + * struct gendisk is required as an argument because ioc->rqos.disk
+> + * might not be properly initialized
+> + */
+
+Here too, let's explicitly say when it's not initialized.
+
+> +static bool _ioc_refresh_params(struct ioc *ioc, bool force,
+> +				struct gendisk *disk)
+
+Given that __ are about an order of magnitude more common in the kernel,
+would you mind renaming it to __ioc_refresh_params() or e.g.
+ioc_refresh_params_disk()?
+
+Please feel free to add
+
+ Acked-by: Tejun Heo <tj@kernel.org>
+
+Thanks.
+
+-- 
+tejun
