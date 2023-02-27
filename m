@@ -2,67 +2,114 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C58A1C64ED8
-	for <linux-block@archiver.kernel.org>; Mon, 27 Feb 2023 13:37:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA87DC64ED6
+	for <linux-block@archiver.kernel.org>; Mon, 27 Feb 2023 13:56:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229607AbjB0NhU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 27 Feb 2023 08:37:20 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51816 "EHLO
+        id S229738AbjB0N4g (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 27 Feb 2023 08:56:36 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44732 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230101AbjB0NhD (ORCPT
+        with ESMTP id S229753AbjB0N4f (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 27 Feb 2023 08:37:03 -0500
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D8C1B20555;
-        Mon, 27 Feb 2023 05:36:07 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=ePxJvQ0KvUvm6Gs3BEG2jGn/1JJyaeylcAdC0Se4Ji0=; b=U2/4vAGppTQb5yg/PqcAw3t8X7
-        ftdPHbVBPAiuG4E/LOiPNZoOvf6l0815AuKYdGC3QmWjWGctvptLtAsv2S9RxouqY7uFQoPX2ipY7
-        iXseEHajV+FeRSf+3M8mejeyW8eZFiMzhVwoILXXaf8WskHNWkx2fNnP3LHxEA2sjJK1j2jtbzoai
-        ro1gFu0qDUTlNe1u2bnUc4fEaQgq+F4GkN/LzmKRUUdGC3doMBcKNKbSu/SA/GMvtr4qB/tlTIxKt
-        vbOevMLT8VxCtN5I3i/ID3HNnbUAE5OdL8EwS65BgOqIcfqg2vEOGIWzH/AVz6GJzDBLzIObNY0eV
-        l6AexNzA==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1pWdfg-009mhW-Ep; Mon, 27 Feb 2023 13:36:04 +0000
-Date:   Mon, 27 Feb 2023 05:36:04 -0800
-From:   Christoph Hellwig <hch@infradead.org>
+        Mon, 27 Feb 2023 08:56:35 -0500
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00AD11F4B2;
+        Mon, 27 Feb 2023 05:56:33 -0800 (PST)
+Received: from mail02.huawei.com (unknown [172.30.67.143])
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4PQMVL6W5Yz4f3l81;
+        Mon, 27 Feb 2023 21:56:26 +0800 (CST)
+Received: from [10.174.176.117] (unknown [10.174.176.117])
+        by APP2 (Coremail) with SMTP id Syh0CgAXB+WJtvxjUNV0EQ--.30054S2;
+        Mon, 27 Feb 2023 21:56:28 +0800 (CST)
+From:   Hou Tao <houtao@huaweicloud.com>
+Subject: Re: [PATCH v2] blk-ioprio: Introduce promote-to-rt policy
 To:     Jan Kara <jack@suse.cz>
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        Dave Chinner <david@fromorbit.com>,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-mm@kvack.org, John Hubbard <jhubbard@nvidia.com>,
-        David Howells <dhowells@redhat.com>,
-        David Hildenbrand <david@redhat.com>
-Subject: Re: [PATCH 4/5] block: Add support for bouncing pinned pages
-Message-ID: <Y/yxxCwGJcPSuA+6@infradead.org>
-References: <20230209121046.25360-1-jack@suse.cz>
- <20230209123206.3548-4-jack@suse.cz>
- <Y+oKAB/epmJNyDbQ@infradead.org>
- <20230214135604.s5bygnthq7an5eoo@quack3>
- <20230215045952.GF2825702@dread.disaster.area>
- <Y+x6oQkLex8PbfgL@infradead.org>
- <20230216123316.vkmtucazg33vidzg@quack3>
- <Y/MRqLbA2g7I0xgp@infradead.org>
- <20230227113926.jr7wuhmiul7346as@quack3>
+Cc:     linux-block@vger.kernel.org, Bart Van Assche <bvanassche@acm.org>,
+        Bagas Sanjaya <bagasdotme@gmail.com>,
+        Jens Axboe <axboe@kernel.dk>, cgroups@vger.kernel.org,
+        Tejun Heo <tj@kernel.org>, Zefan Li <lizefan.x@bytedance.com>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        Jonathan Corbet <corbet@lwn.net>, linux-kernel@vger.kernel.org,
+        linux-doc@vger.kernel.org, houtao1@huawei.com
+References: <20230220135428.2632906-1-houtao@huaweicloud.com>
+ <20230227130305.2idxwmz2kdnacolc@quack3>
+Message-ID: <05eafc4f-2d60-b7e6-1d5d-9a08709916e8@huaweicloud.com>
+Date:   Mon, 27 Feb 2023 21:56:25 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.6.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230227113926.jr7wuhmiul7346as@quack3>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20230227130305.2idxwmz2kdnacolc@quack3>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-CM-TRANSID: Syh0CgAXB+WJtvxjUNV0EQ--.30054S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7tw4kJF1UAF4UGryrKrykZrb_yoW8CrW5pF
+        4fWas3WryktF4fCF1DXF48AFW8t397Jw1UJr1YqrWru3y3Ar9xKw12gayfXFW5CrWkGr4Y
+        q3W5ZrWvkF4UZ3DanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUv2b4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
+        6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+        vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7Cj
+        xVAFwI0_Cr0_Gr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I
+        0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40E
+        x7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x
+        0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7I2V7IY0VAS
+        07AlzVAYIcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c
+        02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_
+        GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7
+        CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6rW3Jr0E3s1lIxAIcVC2z280aVAF
+        wI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa
+        7IU1zuWJUUUUU==
+X-CM-SenderInfo: xkrx3t3r6k3tpzhluzxrxghudrp/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Feb 27, 2023 at 12:39:26PM +0100, Jan Kara wrote:
-> Do you mean to copy these pages on fsync(2) to newly allocated buffer and
-> then submit it via direct IO? That looks sensible to me. We could then make
-> writeback path just completely ignore these long term pinned pages and just
-> add this copying logic into filemap_fdatawrite() or something like that.
+Hi
 
-I don't think we'd even have to copy them on fsync.  Just do an in-kernel
-ITER_BVEC direct I/O on them.  The only hard part would be to come up
-with a way to skip the pagecache invalidation and writeout for these
-I/Os.
+On 2/27/2023 9:03 PM, Jan Kara wrote:
+> On Mon 20-02-23 21:54:28, Hou Tao wrote:
+>> From: Hou Tao <houtao1@huawei.com>
+>>
+>> Since commit a78418e6a04c ("block: Always initialize bio IO priority on
+>> submit"), bio->bi_ioprio will never be IOPRIO_CLASS_NONE when calling
+>> blkcg_set_ioprio(), so there will be no way to promote the io-priority
+>> of one cgroup to IOPRIO_CLASS_RT, because bi_ioprio will always be
+>> greater than or equals to IOPRIO_CLASS_RT.
+>>
+>> It seems possible to call blkcg_set_ioprio() first then try to
+>> initialize bi_ioprio later in bio_set_ioprio(), but this doesn't work
+>> for bio in which bi_ioprio is already initialized (e.g., direct-io), so
+>> introduce a new ioprio policy to promote the iopriority of bio to
+>> IOPRIO_CLASS_RT if the ioprio is not already RT.
+>>
+>> So introduce a new promote-to-rt policy to achieve this. For none-to-rt
+>> policy, although it doesn't work now, but considering that its purpose
+>> was also to override the io-priority to RT and allow for a smoother
+>> transition, just keep it and treat it as an alias of the promote-to-rt
+>> policy.
+>>
+>> Signed-off-by: Hou Tao <houtao1@huawei.com>
+> Looks good to me. Feel free to add:
+>
+> Reviewed-by: Jan Kara <jack@suse.cz>
+Thanks for the review.
+>
+> Just one question regarding doc below:
+>
+>> ++----------------+---+
+>> +| no-change      | 0 |
+>> ++----------------+---+
+>> +| rt-to-be       | 2 |
+>> ++----------------+---+
+>> +| all-to-idle    | 3 |
+>> ++----------------+---+
+> Shouldn't there be preempt-to-rt somewhere in this table as well? Or why
+> this this in the doc at all? I'd consider the numbers to be kernel internal
+> thing?
+These numbers are used in the algorithm paragraph below to explain how the final
+ioprio is calculated. For prompt-to-rt policy, the algorithm is different and
+the number is unnecessary.
+
+> 								Honza
+
