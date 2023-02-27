@@ -2,77 +2,76 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3C08C64ED6
-	for <linux-block@archiver.kernel.org>; Mon, 27 Feb 2023 10:20:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49070C64ED8
+	for <linux-block@archiver.kernel.org>; Mon, 27 Feb 2023 11:24:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229470AbjB0KUP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 27 Feb 2023 05:20:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60588 "EHLO
+        id S229557AbjB0LYf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 27 Feb 2023 06:24:35 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56356 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229676AbjB0KUP (ORCPT
+        with ESMTP id S229568AbjB0LYd (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 27 Feb 2023 05:20:15 -0500
-Received: from esa4.hgst.iphmx.com (esa4.hgst.iphmx.com [216.71.154.42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8241A8A50;
-        Mon, 27 Feb 2023 02:20:13 -0800 (PST)
+        Mon, 27 Feb 2023 06:24:33 -0500
+Received: from esa2.hgst.iphmx.com (esa2.hgst.iphmx.com [68.232.143.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E4FB71E5D1
+        for <linux-block@vger.kernel.org>; Mon, 27 Feb 2023 03:24:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1677493213; x=1709029213;
+  t=1677497072; x=1709033072;
   h=from:to:cc:subject:date:message-id:references:
    in-reply-to:content-id:content-transfer-encoding:
    mime-version;
-  bh=4hNMS5p2nzXmTGgd/7JvpJVC3yURXtuB/cICXnHg3EU=;
-  b=ojLM49TT3SpIOtZEvrPoHXufq/qC2g9kExG1j1S6m1ug24Rify1prsqq
-   FEEBZI5rO8YByaQy3Z32m7Hje9BP+6BLwYQnrjU7Y7Obwlk7R4fkyKLrX
-   dlYMvRNeb5Zuef2MDkFzbMxOZGV1xY10O7h8/9xKrwls+TUnhMvkq3T4/
-   JZ5V2rZUM5QqJRLLXXBEsr9ITM8qr+8CqBoVMI0AuTyg+ACaEbXtTBwk/
-   efcTWUvkQpRQiIdXnwnDoRNBNKUbN5RWrv6z5ogUwxyH0A8pM4qvDcyAJ
-   PA7ET9/k0m6syU5wy1sFYxkwUPRFCd5L8z3+lBj4+Z+VMwg5YHytrT3or
-   w==;
+  bh=lXVoS3wS8iBj4FfzCMZcchm4gs8ntyangeQV6JOF7k0=;
+  b=E0Q7Zc+ZFN6l1DT3MVYKDesBXaJnBVAzjQt9hwFC3fqb6u/0OePe5llm
+   GmOO4PQbq2kVnRQqcJT4BpQR0NQJ1+9KLUEWazYQDFXObbGCyHMhDeeL4
+   wHT6k12RVB1EBZhyhc3wLf4VA/pg1Q6rZn362V+EhdTIknaSzHX69p2PP
+   gg0BzpAM7TOx3M3jvQ1mLiZDkcgVzm3YcyRyIz1WSnT6iR5QbwYqjpOfl
+   G/78ZGRJ80yzG/+vdjBiNmIIC+XSnAG9XIIUyU8gDc3+Ng65X8HqGx00Y
+   wjMpOiS1NuiDVKAhUukNh0V/vh1vxousPUIxwhxUxJ+Zgb7r779pKvPFR
+   g==;
 X-IronPort-AV: E=Sophos;i="5.97,331,1669046400"; 
-   d="scan'208";a="222599773"
-Received: from mail-bn7nam10lp2107.outbound.protection.outlook.com (HELO NAM10-BN7-obe.outbound.protection.outlook.com) ([104.47.70.107])
-  by ob1.hgst.iphmx.com with ESMTP; 27 Feb 2023 18:20:11 +0800
+   d="scan'208";a="328629726"
+Received: from mail-dm6nam12lp2173.outbound.protection.outlook.com (HELO NAM12-DM6-obe.outbound.protection.outlook.com) ([104.47.59.173])
+  by ob1.hgst.iphmx.com with ESMTP; 27 Feb 2023 19:24:31 +0800
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=S7xUgv4tfwl5n0WCp2kFP9Wb/usLcK+H5iakK8FjL16xHk4v/eJgHZxDTC3FOuNb6SVnO509/Hx/gQeQ5/TRIedL4GA3R7FC98O6kyfaGL4Md7019qAGuqXM+aQUKvIjhXFruS+qF/FItFRbBfBZjq7JuskHbIFhi68z7g0h+iODrz2VIW12I590wZtEWnQZoNNDIVo3QwmM93CsZ+igW0/3jmeQ7qhVvjnCfBS40sBIroJbKCwNnwBj1lr1m4IMI6xIxhDy5vzvdknWOYUZ5FB2ogTd4yXpE5edDNiv2S7m2q+saZgLeGsl1JO3am5ZmbCaueE8jJPXDNfxvA5mIQ==
+ b=Ovyk2lK/xsatxS92gSrutSrD41/7y2QM0PwaO74Uu5xv1xxUpKaA2/0X2YVyCzO3sKfjj+s/RuXJvGrZEL4kL7yfdibWhA7jRbxNQ2/uAGfFYXy+xKSiQv5fzNE2ejWfekxVpFrrj95olPp40ooHzX/PE5wmELa0CBVo30uKY//UHZ3olApcGeGOovyJrrDgMtYWhWwZdUi1F3tm0G7iCRYSfkjG9dAOpJd5etXQSPEAYbPDwayK5glflLUxRnwMNVPa+hmeHmtPGZZ8Nirhn85qXRTCFBzo26pmPzy4fEL3Fl16w/sIit0mXt33Pd/+OOnvELWmN/5P6hptuOQkFA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ql7qqdEI9A+7q+zESf8rpVVws6sMwdE1bMsH0B30+Os=;
- b=beOCjcIi6h5Pfokuuuv2hcpznr10uLAiOSKK9AoajjswZ7h2FKrCaunlk89gp8JL73yhTMBkEcBi65gtCPv/+fHNEaTikRcAHgWSsj+eR4MO3H/t8iqFBdy6MR5bHTBdHLg7v5jsaAmAqo4r2fKSowc+cn2jmAxv/rUuHiRLS8kMRzhzV97YqNuhwbd0a6I8THwTaCgGgCncZeWgoZ5iFC8DN8xzdK5MUUfPW8Hm42dgxqss+nHP+TioV2R9i8zfrANCG+ECAAWyHJHUuZFnv7z/dirCN0O2ZCR2lbUaXpWjb8BCG5hhtjTqrXP8E17HN2+tWGbYNIKOuJlhFF587A==
+ bh=56TVo5PzbO3nndLEvh3Nv1raLybtXGSFdywTtqwYG5Y=;
+ b=L2CWIvxDp0+1j0QYt7Wr8111EK7eezNNq9l8MiITsZ0g6Jm9sMjAZWMY1ldPx9LV8wxb9a4ruQsyfqi0MVSrNM+t9PdKHKjEqC6HLVLZuYUleyfZ2caXJOafJg3Vu7YIeEW104VuGgXI9cIbM//GIMY+XhQ/bmvnCicxkm30gveN0TwVEJ3LjjPMR61zwR5/jetbi0EFGHkxr0/7PBLCmjhW+sXJr7W5p9HLMitOYV5T1HnYnpz+Xd64AkEfC9Y/jCzysh/q+9y3KSCNK2bNNBBBxJ2aa6BwaArwdxVaqeh4PP1vuts2d6Soaea4DtpZjr7zfdZC9eacrdzi3SPubQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
  header.d=wdc.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ql7qqdEI9A+7q+zESf8rpVVws6sMwdE1bMsH0B30+Os=;
- b=XomGv+ESLZB28Yfa2xzkHWWVs/hKaZf2GZ8ucIZQLHpkJ5DBS6AlWV79TnQRSBSB/6ppvyT/sdj1sxc5c5a3j5nO7KPo/EdQPWjojkdpl6LWzzGgKwu0Z1GRwnQR5TR7L4NijiaXRkZXrYRnUQwbgMaw4hSCA/ARNNquzV3D6Vw=
-Received: from MN2PR04MB6272.namprd04.prod.outlook.com (2603:10b6:208:e0::27)
- by PH0PR04MB7802.namprd04.prod.outlook.com (2603:10b6:510:e1::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6134.29; Mon, 27 Feb
- 2023 10:20:07 +0000
-Received: from MN2PR04MB6272.namprd04.prod.outlook.com
- ([fe80::4fcf:ae46:b9c4:127a]) by MN2PR04MB6272.namprd04.prod.outlook.com
- ([fe80::4fcf:ae46:b9c4:127a%7]) with mapi id 15.20.6134.024; Mon, 27 Feb 2023
- 10:20:07 +0000
-From:   Niklas Cassel <Niklas.Cassel@wdc.com>
-To:     Andreas Hindborg <nmi@metaspace.dk>
+ bh=56TVo5PzbO3nndLEvh3Nv1raLybtXGSFdywTtqwYG5Y=;
+ b=awZqX3hDJUreo1A1sFCwimaLBcs6gECfAyTMQaZ8xwS6ZUw1FaWF/Ijxeb6DnBS+Xfs8D6B8muJf5sIV7zkn4XxNeCUVGikfP47W3AMfjSGonh9iQZVwX/MGNDy9jDF5P66r3Wn/J+T2tlxD+nUyVOnKYSqjciAK3AxVDp7NU1Y=
+Received: from DM8PR04MB8037.namprd04.prod.outlook.com (2603:10b6:8:f::6) by
+ MN2PR04MB6158.namprd04.prod.outlook.com (2603:10b6:208:d9::14) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6134.25; Mon, 27 Feb 2023 11:24:04 +0000
+Received: from DM8PR04MB8037.namprd04.prod.outlook.com
+ ([fe80::1b90:14dd:1cae:8529]) by DM8PR04MB8037.namprd04.prod.outlook.com
+ ([fe80::1b90:14dd:1cae:8529%7]) with mapi id 15.20.6134.029; Mon, 27 Feb 2023
+ 11:24:04 +0000
+From:   Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+To:     Kanchan Joshi <joshi.k@samsung.com>
 CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Andreas Hindborg <a.hindborg@samsung.com>,
-        Hans Holmberg <Hans.Holmberg@wdc.com>,
-        =?iso-8859-1?Q?Matias_Bj=F8rling?= <Matias.Bjorling@wdc.com>,
-        kernel test robot <lkp@intel.com>,
-        Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-        open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v2] block: ublk: enable zoned storage support
-Thread-Topic: [PATCH v2] block: ublk: enable zoned storage support
-Thread-Index: AQHZSItvYj2fUTtyhkmoNbHcKTvJAa7imQeA
-Date:   Mon, 27 Feb 2023 10:20:07 +0000
-Message-ID: <Y/yD1WMJ5zc7KkBz@x1-carbon>
-References: <20230224200502.391570-1-nmi@metaspace.dk>
-In-Reply-To: <20230224200502.391570-1-nmi@metaspace.dk>
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH blktests v2 0/2] nvme: add test for unprivileged
+ passthrough
+Thread-Topic: [PATCH blktests v2 0/2] nvme: add test for unprivileged
+ passthrough
+Thread-Index: AQHZQC95ye+eMiEgFUKCkwYKThw3f67iYrKAgABY7QA=
+Date:   Mon, 27 Feb 2023 11:24:04 +0000
+Message-ID: <20230227112404.gzvugrzc7drqhomz@shindev>
+References: <CGME20230214044749epcas5p4ac6bf441e046e3642b1633fd9cf7a72b@epcas5p4.samsung.com>
+ <20230214044739.1903364-1-shinichiro.kawasaki@wdc.com>
+ <20230227060547.GA25049@green5>
+In-Reply-To: <20230227060547.GA25049@green5>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
@@ -80,262 +79,112 @@ X-MS-TNEF-Correlator:
 authentication-results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=wdc.com;
 x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: MN2PR04MB6272:EE_|PH0PR04MB7802:EE_
-x-ms-office365-filtering-correlation-id: 3d287230-1aca-4962-7ec5-08db18ac330c
+x-ms-traffictypediagnostic: DM8PR04MB8037:EE_|MN2PR04MB6158:EE_
+x-ms-office365-filtering-correlation-id: 4d7dc20a-8e25-4ca2-5282-08db18b52264
 wdcipoutbound: EOP-TRUE
 x-ms-exchange-senderadcheck: 1
 x-ms-exchange-antispam-relay: 0
 x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: IcAUBPYrE7l33Vt72idryjHo3aUxnUBLrFUL0zRM8EFaObS78/P79wAw4O8fFRwP8fSHgSv6nOYpgX9UpmWRs4B3RBRiff8k2sgyS1sDExzEcblAQVZHEpetk6OvJ1+HmLZAs/w2KLIkj2kdm0NNOcZVIbX62CzJuhhYaCu6t1NaU2t+mMv4MOYyYH/4CpnIUtp8LOrTLRa/Q3sqay7pzevYz+8Y97tfZAvMbtsNmqQ1HD/lksugvzfbebtahbyVuO5LpxOtD7Z0BRlesRa5m8JHvW/ORBntA//v8nWTisuFt/kBLwdcbdztOPqdZZzlKantXGR7SMT2+ypN5OlnhWuLbDIHo9UAMCoZUy2kWbdRoL+1DtXVwcCTlY/kuC/Duygy6vuA+691cFkqrKqdTeg/wK4eMY2I8Q3I2u0/PM9mhlM6MwLXkHMpLPIpsQmtZvSFfSLVqDgZmCwGRAx0Dww7T62asCPxUngxqGiD4uThUHzqEBucpvijEs/L5okAS9bEjY8AflBZ74OVbzgS009KNAMgiUiNkcK3EfOBgBKQjllrtBYrvpJ90UXn3YqF5Scz5LDLxLjy9FQtbUB3kFNWhOBSb9aanh9q8SnTAUvQdjWsKXq9RmaCoXk7ZxoKfyvGY0D9C0YYVot6Kjw7mLoYixWnltJLFvcWsX12Yaq8Qcwz2GMw0wJ1QFAUyErnTx0feDKIt1yfqcPLM03luHk2as19/14t0BTAGAQV8xU=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR04MB6272.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(4636009)(7916004)(136003)(346002)(366004)(376002)(396003)(39860400002)(451199018)(54906003)(316002)(86362001)(38100700002)(122000001)(82960400001)(6506007)(83380400001)(38070700005)(26005)(9686003)(186003)(33716001)(6512007)(5660300002)(8936002)(2906002)(71200400001)(966005)(6486002)(478600001)(6916009)(4326008)(41300700001)(91956017)(8676002)(66476007)(76116006)(64756008)(66946007)(66556008)(66446008);DIR:OUT;SFP:1102;
+x-microsoft-antispam-message-info: kbp18j/uW4OCZLTQMN9Z/yRuLzKlouSTf5LwRmqWLKpGnmdY7OWUlNzLfKBlg7IXywqa3S4aUfqWN8LAhlSQx9YrW3EPm73oZ6i13anEkNjE7dXVS4jLuAvF3taq66RyNxsw4MOwz1JNNsDJdv554SShSo50aw6f/48Uv6EN1D08uAalfzmqhF20M+3M5Eb+gDD8c5/GemYZ2WqiyrvwDBbBZvUi3aA9Q/SlKqEafwZLR8TxP461qXpgJ9geOCGX9LEu+Q9seWiJiPP4UwjjfO5xZtvZFjUe53PAd9RkK+cpSSF813tt+Nv2uEFxw4gCjV8QxNPXGNYDpzIfwS/SiFsPGs/smNoACLUCKe8rOTN2m92KIWyT6ziIRYTvXeOk/0mz4Xr4dUgQuhPApOkv2BsQ5J2tSkSUgrpqVewvLsUWHDRIy9dMeDaJ4WYXCz8Abc3ZfXl2Pc1UoOxOoyK64VLfjXnaW7pYotTjkni/kxsffo0hDhcdZqP+nlI1VMuJmpirKAJKlEfC8CA6qqGgVaZEYUBMHqqR2A+A8rARKKOLHcbp4tRDo7l9rs7K5cEGQwIW93RY5xBEQLx2mjW56UTeFdEaFAg6AUJOwh9skDER8P7EQMI1pnkc7mvXMzGMtW62b3VvlIdhrnTaQGLJSUFE9ETfAZwJ13YA4oEvOCykCdqC906s/SymdRxRb9coyESX24BjvZYinqAENgGbHA==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR04MB8037.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(7916004)(4636009)(346002)(366004)(136003)(376002)(39860400002)(396003)(451199018)(316002)(54906003)(83380400001)(33716001)(86362001)(6486002)(9686003)(2906002)(478600001)(5660300002)(6916009)(66446008)(41300700001)(66946007)(4326008)(6512007)(66556008)(8676002)(76116006)(8936002)(6506007)(186003)(64756008)(26005)(71200400001)(66476007)(1076003)(44832011)(38100700002)(91956017)(82960400001)(38070700005)(122000001);DIR:OUT;SFP:1102;
 x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?iso-8859-1?Q?/AERb3BxU1NnHfpRJEXaYC8MN0thn/nwh/mVT47ibMH/DH3S/tk+2p6O75?=
- =?iso-8859-1?Q?F+H+Ws9lbD0LohsYer/Q3zF7PEkZ/RZgRD25G/25NnJXKYc7EZ7/A7c6le?=
- =?iso-8859-1?Q?+2lGViXVSwjbuhndPvLwtXUy1AM4a7TGU3QQZH2Xygt6aDbyIKKwHicx/K?=
- =?iso-8859-1?Q?+3goQ5PEIMAJMkRQpk7CutMG99SdWue3U0GuCQj/jM0NMWm8jPDYozaYpU?=
- =?iso-8859-1?Q?bMvoIhlKvq5wcIyZLrY1F745NTi1WVaJyzi3W+e0Xmh7GTl1yCK494Kg4W?=
- =?iso-8859-1?Q?ZfejpW6qJurXKt1bxQkm734aQjTmLwoyNiR21/F9AxkrUFAizLPNDGxSci?=
- =?iso-8859-1?Q?5+5fjzdq4k686Q/J3AQu1+TTvgqkXrsC1NFmbl6SkMGImw3rxWgCSnjxJ3?=
- =?iso-8859-1?Q?9PCN2XuY+18G/cANdvQgD0AIFwMZqcYmE8UtHcEpkcfe1PttKY6w3t7GWT?=
- =?iso-8859-1?Q?wq591wfA1AVabiuzqR9USMJBGSKFd6fOv/g+sVQTMifL9JusxxwhVnVx4T?=
- =?iso-8859-1?Q?tzWR4FyGGlgR+nCWPLKtZoDX6f1Qnsh/ERdKYEE3evRcmPomKr7Ht1wtrp?=
- =?iso-8859-1?Q?FD0Aenw3/KNMCvLPr8AjE1WXLUo9BoS5ARrvIa6Saa8Y8srA//dycHi4Eo?=
- =?iso-8859-1?Q?GjyXXm45tM7AEQiiEmM91K4IXgnrXlLZba7aOB/952ggks8+qSZ8V8YdCX?=
- =?iso-8859-1?Q?FZjCpRqkTzYjJgoomK6aOctwHS6lieiW9E/hVfuQtu4K+9mCMMdo+Yjgfh?=
- =?iso-8859-1?Q?pxUN2EgObraYcdPsRvAgyvOPyiMLXLcJs4MKrtJJ+BDgeQLAdhOIuBlU2p?=
- =?iso-8859-1?Q?TFYOVLfxRv4lJsYbWUSZ6z5D+p3fr1l6DM4dGoQy7VOc32TIPtg4gXOKgS?=
- =?iso-8859-1?Q?eJfa1qUXSDNgxejglCGZSb3dZLaHt4ILL55MjDr1R9ba6iKnq73gcvJsfY?=
- =?iso-8859-1?Q?Bb8cUXNwdUKz92hhGRsZ2d/uKqscoy+xcYSCdCLSY+wmObPp9Qgclp48Hm?=
- =?iso-8859-1?Q?S4tx40JmwX6DrwCoBdXhXvBwIFQiQiJRV2ZgA1ZmfIWdmf3hWsRSSc3nXD?=
- =?iso-8859-1?Q?T2I5kkWD/2NVSLrQ1JUSY4sYwAo0wnHkgoIT6cyfop+Uka3qfu5PVoTpaI?=
- =?iso-8859-1?Q?QFuVt3WB0HrbpHC6s19twcbE0oZEEje8GU9TzDYEPlPQv9Aqim+OvG056l?=
- =?iso-8859-1?Q?BelHomB/k/+vb2ugXg0JPyaSHu+NfdkILhNLc3PZjN/xGiP+hoW5BBPcBt?=
- =?iso-8859-1?Q?otgRSJnFjXqQKWcCcZUm3yD+Sc5MyNZtyxmg5LhBR46Kv/SaiiCjLOGl5M?=
- =?iso-8859-1?Q?snQBihQWoF1hpra1HSqX1A9Nv8g8hQfOWk0B3tLPK3Ah/X8zkmOooEfytG?=
- =?iso-8859-1?Q?InNqQGgglvyCYLQyUbLwKsRr5dul+hmub5CfWBsNDYRi/B9E2g9/DVicpv?=
- =?iso-8859-1?Q?SeesjWl3j83MTse8JEX867lJhoaTWr+/AlierW+um3kv72XOzDJbU3zVGV?=
- =?iso-8859-1?Q?i0729xIHvwUU4Lorp0gGb9txPc7HXkVYQUohoaowH7nYYCgsvdGj5q05m3?=
- =?iso-8859-1?Q?gx6kY4bVvEVImERVr5+73QLwch6yGPX65Qaxzm/HpIG8Y2j0LVebVycpWg?=
- =?iso-8859-1?Q?jv1KAs73j3KdkAPnAjUFiLTQwbph8UEa3qtwLhwAywD+O3PkPA4jmFBg?=
- =?iso-8859-1?Q?=3D=3D?=
-Content-Type: text/plain; charset="iso-8859-1"
-Content-ID: <3CD3D650C2B4914398CAC97ECCEFE37E@namprd04.prod.outlook.com>
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?8iqA7xcEEVwiXKsaeaF72aALGNdizh19fV/0af5YrviuTR0bNlTG5T9mblK9?=
+ =?us-ascii?Q?Yd2o29v/KP4idXFDuWftxhJ4J+gEKn1K8OzpEhJeuAEOM10ie+FHi/NukbyJ?=
+ =?us-ascii?Q?oOw1JQygnM3cndPaBro1XECY1ifWFOqmMmU2OlTCS5N9KgeFkcHBOWW6Hr/I?=
+ =?us-ascii?Q?4B3ATKQG0wIqbexBuWad/zzOo1t0gxjvLAgYYmCPM5Ag8q7ZeE+ltHXYd3mz?=
+ =?us-ascii?Q?PFK9Kjt+78LpW47UppYMLTd1T0suMNgd042vcoPVvPLX8wyvWhOBNDE8xUZa?=
+ =?us-ascii?Q?rJQOpnNjgqIzs1DuBN3vORDX7h8cV2GAcvIqW/cldq2iGgyfPVOH9mPimqHs?=
+ =?us-ascii?Q?FpEC6nXRFIrQXqVLmIverDbwnVq6Tw2mXTACqZyhf91/MgFIvAjcaoVBjumF?=
+ =?us-ascii?Q?oRlYKtilvFbMaGKiZII+G+o5sHn8AaeHdMrj3OXPesTLm6lNBGjuRE4v8O5Y?=
+ =?us-ascii?Q?8WOuMyu6oMU96KjGxNQgG9svc31uxC0NVeV7S71E0rnP6qbW2c8DGoyKm2/n?=
+ =?us-ascii?Q?Qh3gyCG0cNqp2EhbtqdPRWZqknWOwA+pDoFMEezaV8yuIdNRgWEauBBSnvoj?=
+ =?us-ascii?Q?kO6LeknvKJqZIZLmwh5xelWvJisTAT6nDZoSHAv0ztDInj0MGj65tZxhflKf?=
+ =?us-ascii?Q?OzgPnHgXwoXUUElPwpLIFiW9tdJ3/WaRSwvum4xlO4tKLDGHG28pqruFw/hq?=
+ =?us-ascii?Q?7TygJhlCc18zWZOcbRHRCadN0s8xlAuMbIxQXDGUEeD/HGBSy2YQ27h3cl8r?=
+ =?us-ascii?Q?o0IKmNurxzaPhsUIlqDDcJLknF37O24OjnBIvDAYyah9FKMcsEC+uIS7z+Xh?=
+ =?us-ascii?Q?GeheZKKW2rSiR/8SmHR7UfgTxKaaQFGHhCdwipwzishVY6enApMlsU7+AWOD?=
+ =?us-ascii?Q?zJTRtxJRm1K2f8/DIllavZzem6QEPPD+bLGu6uiUZYdUW+pJwnn9dj8ETKVC?=
+ =?us-ascii?Q?Ej2q9lTau8h24J725CnYgKhnvAVq/o/ez+O5NODPddMJ0yBKm3RDfBztGVbG?=
+ =?us-ascii?Q?V/4WxzjB0D/BO1PIhZFoH2qmYndPbNcdIp815Hyel6pQl0xiW+QBXm45vy9i?=
+ =?us-ascii?Q?UCq1V+p8LNabxUTejEI24tWe07A8+cgX1HCQbvSgZiUbCP1wsHgvIh2eXixP?=
+ =?us-ascii?Q?6yXK1fh6YN6AZt0Mj0wOpnBPFvXlPWKiPOL5hH90Xw8IWyd3ogmRFD+uZVNi?=
+ =?us-ascii?Q?h00Pkd6+SPDAcFH9Ltkue5x7CXMtuPXbUrAgcDCuyzh/qXHDkyzdWgvi6E+G?=
+ =?us-ascii?Q?myTe4uZkuaV2IrjqVrnOelquDL813DemOUNLLelK+BzCXp1dTIlAT2wxqCj1?=
+ =?us-ascii?Q?5QUeE+CVMEO4UCDWaP03kPVWmozNSQYQ6AD+x3Xhk+nvMruWK/F9rYoGdvqa?=
+ =?us-ascii?Q?Do9BP+9KUwt061xWjz9z5OUg/9lp/PIHHNueg0H4NNXDfX61JhGmPue0AF2S?=
+ =?us-ascii?Q?Rsb+pecQw1j9vW/oiOYZUaMhZJZh2QWZEFI2R2uHIgDMHm3lFjCHVojzMLv3?=
+ =?us-ascii?Q?6cA2ILuveO0JMpQZUYxX7hRl9DgnXIdPIgMKcm/eIqo+wHkV/MZ/KusaJm+d?=
+ =?us-ascii?Q?Erc+DEHpyAeL7aV+fwu+c25SL35PrhvbikHc18Nb15QttswKgXblZJTiWkot?=
+ =?us-ascii?Q?6EqQVEBo5lxWp0AVUHtWo+8=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <2BD1CD407D76EF48A093A69F2C9341DF@namprd04.prod.outlook.com>
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
 X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: =?iso-8859-1?Q?ZQvoWGhmiBn2sKQ2KXOwt9zboFRrx1p48npSDwIuAXZ1GLVZ6ZboGWgfW3?=
- =?iso-8859-1?Q?ZTwgqgeszIIyANtfk5Rs0C/wbKdB5rLOtJoFqCbBppZS+l4v2bcMDpylAU?=
- =?iso-8859-1?Q?DXpcprA4s4UK2pFTWbQ2h/JEax/KNi+0a++ROr0jZ/iLr97ZGWE7Nbgz+9?=
- =?iso-8859-1?Q?GvZyl9cEvfy4LevNGSS/GJse/Cppw+V0VZng+8aHejcIG2OuQe1LaSeerI?=
- =?iso-8859-1?Q?yV4MUNORlsbgHXR1OHdnhzJuSa7q0rMLoZziQrxPiYqJVhfOjszHVlk30+?=
- =?iso-8859-1?Q?NRpdP0xN2bDu45CBK4SMeHsknfW24DhA6aWnhbZlCDWaITjifGNxArm3VJ?=
- =?iso-8859-1?Q?gzZq1n9Zs/bcZyXtjJQrtoq7+WjTjfXlHQnrLcqxn6BqjY/QonRvvKgMoP?=
- =?iso-8859-1?Q?vmtDhuZGTnjJUxQznH2dfXsVBczvCn1q6okv5nGo6Hf4tn/LMjur4sY3CM?=
- =?iso-8859-1?Q?XjvQUJTqgCMrIE6YRmMjwFTMd2B1+JFqnU4vwsHb0JlKURBELKPyoPRuzD?=
- =?iso-8859-1?Q?OAeKBVzLiOGsN2hi1rwkkWbDsGgOdxsqse5IhdmAu47BIc8SPph2+PiTvJ?=
- =?iso-8859-1?Q?4V00I4++F3x+RP8wJn5vsOD0rTOo+X6H6VY5cJG16wGiJssn6EAbNigh+2?=
- =?iso-8859-1?Q?vwkE9F5Ce2UY530yjsdBWztxTwioMRbf8yjoMIi9gL/GY0V6MVhSlYKyxS?=
- =?iso-8859-1?Q?7On4QZryzRY8uenvD286PnyzqW1ufGRXVm3uAwjcKXqGV8WJdZZHmutF+r?=
- =?iso-8859-1?Q?xMV0JmCK/brNdMMiVpwJWd/qrD/XQ96SjP9/+e5YVu00S1qRCtoPOnYD8b?=
- =?iso-8859-1?Q?h/4q6RQLHhnEqvrwlafAI1fvNVLFm7qX43nkiM3smZoOOxhjBlYy9+CeOW?=
- =?iso-8859-1?Q?mDT+fA17t7JqRrMyWLQ+LJ1+YbdtbqcyibRFal/ggkxktyPWMuoIIWfEh8?=
- =?iso-8859-1?Q?G9e9HuEHoHfsPD3nCJxC+qEuo6XfdexG?=
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: dmKXqTMhTG1jjeOrnzUNVwq/W+STi3ENk5d2nPR4Y2A2v18VL9PO+sFrxSmoD4iNmlTMPMUTAf0ZfTqfpxD2LXourPJmkrcikCzUXxDLtOoLvtdUUlOkLnEd3oGhw9e0WCTvuJdIDowqpM8/iTGFWd7XprnwZXzUIwHtZqJjMHm0Poz2upOKUKD0Ka42c6eV94NZ/jpVP8BCgBKP3NWgJwtpZlD5IDFhauKDnTdwbApLh7je4cuvqSc+vhS3kMtWxR94dxl5e6Wc8Ydiq78ap6kr1pcxU7dTLZoYwPxUYxcft4Ttv1nnrCP5T49Yqc869ygeIKWiPKr9Aux3xIv2Ow3W6k9r6O6JbcANTJerSlPigmQ+YV3RrQUZi44XGvwHY881SeBxrh8NfijgeQYoU721SqAbZfOPa0yBYKbTfEy19CpKzblMhtPqaux5vRj0WZAjS0nMbLU9PUBV+p4lJUP7vj6vRxhzqPhgLihaAbvMNF06fUIr+hSei0WVgIuN9REcQvZ2wPgQzyijNgP6SL8z2NEW2I8dESfd3xsuMArqGR3GhTvyMdMOOG5BvW0g3xnG4PZ7COQYUJP3Tss1g//8Hp0kRwpOtjMZjUrHTolvryKBtcc7vPnFE3m9cm//CNNxesJUPOPQQ9jluZd6xBtM6tuiRHA3EzhZHadsPhJFh9jBvEO+I8BiwkigKsKtok8AQj1Dgo2dlsmKv2LoB2bJAovXQfxcanRR3av6S0v7BVgBh53NgFZoZvzLCkwI2yJOcOkQ1jSe2ers5qCH2EYqZGNalcn9lccdCfGOspXan9r/xrxMC+r/ipuOhKcfOsKcB2b56H/RrsVZrR6YjvwfDndpSgG216BfDNV4jOxF2G2iqKoapJh5y7UUP6dJ
 X-OriginatorOrg: wdc.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: MN2PR04MB6272.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3d287230-1aca-4962-7ec5-08db18ac330c
-X-MS-Exchange-CrossTenant-originalarrivaltime: 27 Feb 2023 10:20:07.2486
+X-MS-Exchange-CrossTenant-AuthSource: DM8PR04MB8037.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4d7dc20a-8e25-4ca2-5282-08db18b52264
+X-MS-Exchange-CrossTenant-originalarrivaltime: 27 Feb 2023 11:24:04.8048
  (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
 X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 0LN2wQcrSSWAM/Z12pyGZJ2GBogFrjJ4TwMSXbu8QTC/BP4ajuitHr4Odqo18stmXYbHNKo+VVfYMWeEbRlvDw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR04MB7802
+X-MS-Exchange-CrossTenant-userprincipalname: EtBHxIiudP9B8ADcTu+LQwwaqLIRZnsXEJXmcBRAotCO4N4LDyPrCCy4NeqOP0H+EaF9AIzf4v2+gcgG+PD4/GLg3X5TBhBPqNYFsD+L2zg=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR04MB6158
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Feb 24, 2023 at 09:05:01PM +0100, Andreas Hindborg wrote:
-> Add zoned storage support to ublk: report_zones and operations:
->  - REQ_OP_ZONE_OPEN
->  - REQ_OP_ZONE_CLOSE
->  - REQ_OP_ZONE_FINISH
->  - REQ_OP_ZONE_RESET
+On Feb 27, 2023 / 11:35, Kanchan Joshi wrote:
+> On Tue, Feb 14, 2023 at 01:47:37PM +0900, Shin'ichiro Kawasaki wrote:
+> > Per suggestion by Kanchan, add a new test case to test unprivileged pas=
+sthrough
+> > of NVME character devices. The first patch adds a feature to run comman=
+ds with
+> > normal user privilege. The second patch adds the test case using the fe=
+ature.
+> >=20
+> > Changes from v2:
+> > * Added the first patch to add normal user privilege support to blktest=
+s
+> > * Adjusted the test case to the functions for normal user privilege sup=
+port
 >=20
-> This allows implementation of zoned storage devices in user space. An
-> example user space implementation based on ubdsrv is available [1].
->=20
-> [1] https://github.com/metaspace/ubdsrv/commit/14a2b708f74f70cfecb076d92e=
-680dc718cc1f6d
->=20
-> Signed-off-by: Andreas Hindborg <a.hindborg@samsung.com>
-> ---
-> Changes since v1:
->  - Fixed conditional compilation bug
->  - Refactored to collect conditional code additions together
->  - Fixed style errors
->  - Zero stack allocated value used for zone report
->=20
-> Reported-by: Niklas Cassel <Niklas.Cassel@wdc.com>
-> Reported-by: kernel test robot <lkp@intel.com>
-> Link: https://lore.kernel.org/oe-kbuild-all/202302250222.XOrw9j6z-lkp@int=
-el.com/
-> v1: https://lore.kernel.org/linux-block/20230224125950.214779-1-nmi@metas=
-pace.dk/
->=20
->  drivers/block/ublk_drv.c      | 150 ++++++++++++++++++++++++++++++++--
->  include/uapi/linux/ublk_cmd.h |  18 ++++
->  2 files changed, 162 insertions(+), 6 deletions(-)
->=20
-> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-> index 6368b56eacf1..37e516903867 100644
-> --- a/drivers/block/ublk_drv.c
-> +++ b/drivers/block/ublk_drv.c
-> @@ -20,6 +20,7 @@
->  #include <linux/major.h>
->  #include <linux/wait.h>
->  #include <linux/blkdev.h>
-> +#include <linux/blkzoned.h>
->  #include <linux/init.h>
->  #include <linux/swap.h>
->  #include <linux/slab.h>
-> @@ -51,10 +52,12 @@
->  		| UBLK_F_URING_CMD_COMP_IN_TASK \
->  		| UBLK_F_NEED_GET_DATA \
->  		| UBLK_F_USER_RECOVERY \
-> -		| UBLK_F_USER_RECOVERY_REISSUE)
-> +		| UBLK_F_USER_RECOVERY_REISSUE \
-> +		| UBLK_F_ZONED)
-> =20
->  /* All UBLK_PARAM_TYPE_* should be included here */
-> -#define UBLK_PARAM_TYPE_ALL (UBLK_PARAM_TYPE_BASIC | UBLK_PARAM_TYPE_DIS=
-CARD)
-> +#define UBLK_PARAM_TYPE_ALL (UBLK_PARAM_TYPE_BASIC | UBLK_PARAM_TYPE_DIS=
-CARD \
-> +			     | UBLK_PARAM_TYPE_ZONED)
-> =20
->  struct ublk_rq_data {
->  	struct llist_node node;
-> @@ -187,6 +190,98 @@ static DEFINE_MUTEX(ublk_ctl_mutex);
-> =20
->  static struct miscdevice ublk_misc;
-> =20
-> +#ifdef CONFIG_BLK_DEV_ZONED
-> +static void ublk_set_nr_zones(struct ublk_device *ub)
-> +{
-> +	const struct ublk_param_basic *p =3D &ub->params.basic;
-> +
-> +	if (ub->dev_info.flags & UBLK_F_ZONED && p->chunk_sectors)
-> +		ub->ub_disk->nr_zones =3D p->dev_sectors / p->chunk_sectors;
-> +}
-> +
-> +static void ublk_dev_param_zoned_apply(struct ublk_device *ub)
-> +{
-> +	const struct ublk_param_zoned *p =3D &ub->params.zoned;
-> +
-> +	if (ub->dev_info.flags & UBLK_F_ZONED) {
-> +		disk_set_max_active_zones(ub->ub_disk, p->max_active_zones);
-> +		disk_set_max_open_zones(ub->ub_disk, p->max_open_zones);
-> +	}
-> +}
-> +
-> +static int ublk_revalidate_disk_zones(struct gendisk *disk)
-> +{
-> +	return blk_revalidate_disk_zones(disk, NULL);
-> +}
-> +
-> +static int ublk_report_zones(struct gendisk *disk, sector_t sector,
-> +			     unsigned int nr_zones, report_zones_cb cb,
-> +			     void *data)
-> +{
-> +	struct ublk_device *ub;
-> +	unsigned int zone_size;
-> +	unsigned int first_zone;
-> +	int ret =3D 0;
-> +
-> +	ub =3D disk->private_data;
-> +
-> +	if (!(ub->dev_info.flags & UBLK_F_ZONED))
-> +		return -EINVAL;
-> +
-> +	zone_size =3D disk->queue->limits.chunk_sectors;
-> +	first_zone =3D sector >> ilog2(zone_size);
-> +	nr_zones =3D min(ub->ub_disk->nr_zones - first_zone, nr_zones);
-> +
-> +	for (unsigned int i =3D 0; i < nr_zones; i++) {
-> +		struct request *req;
-> +		blk_status_t status;
-> +		struct blk_zone info =3D {0};
-> +
-> +		req =3D blk_mq_alloc_request(disk->queue, REQ_OP_DRV_IN, 0);
-> +
-> +		if (IS_ERR(req)) {
-> +			ret =3D PTR_ERR(req);
-> +			goto out;
-> +		}
-> +
-> +		req->__sector =3D sector;
-> +
-> +		ret =3D blk_rq_map_kern(disk->queue, req, &info, sizeof(info),
-> +				      GFP_KERNEL);
-> +
-> +		if (ret)
-> +			goto out;
-> +
-> +		status =3D blk_execute_rq(req, 0);
-> +		ret =3D blk_status_to_errno(status);
-> +		if (ret)
-> +			goto out;
-> +
-> +		blk_mq_free_request(req);
-> +
-> +		ret =3D cb(&info, i, data);
-> +		if (ret)
-> +			goto out;
-> +
-> +		/* A zero length zone means don't ask for more zones */
-> +		if (!info.len) {
-> +			nr_zones =3D i;
-> +			break;
-> +		}
-> +
-> +		sector +=3D zone_size;
-> +	}
-> +	ret =3D nr_zones;
-> +
-> + out:
-> +	return ret;
-> +}
-> +#else
-> +void ublk_set_nr_zones(struct ublk_device *ub);
-> +void ublk_dev_param_zoned_apply(struct ublk_device *ub);
-> +int ublk_revalidate_disk_zones(struct gendisk *disk);
+> Thanks, this looks way better. And works fine in my setup.
+> If required,
+> Tested-by: Kanchan Joshi <joshi.k@samsung.com>
 
-These are declarations, shouldn't they be dummy definitions instead?
+Thanks for the confirmation. Sounds good.
 
-e.g.
-static int ublk_revalidate_disk_zones(struct gendisk *disk) { return -EOPNO=
-TSUPP; };
+I found two more minor points to improve:
+
+1) tests/nvme/046 does not have executable mode bit. I will add it when I a=
+pply
+   the patch.
+
+2) I ran the test case with kernel version v6.1 and it failed. Does the tes=
+t
+   case require kernel version 6.2 or higher? If that is the case, one more=
+ line
+   change will be required as follows. If you are ok with the change, I can=
+ fold
+   this change in when I apply the patches.
+
+diff --git a/tests/nvme/046 b/tests/nvme/046
+index 5689a2b..b37b9e9 100644
+--- a/tests/nvme/046
++++ b/tests/nvme/046
+@@ -11,6 +11,7 @@ QUICK=3D1
+ requires() {
+ 	_nvme_requires
+ 	_require_normal_user
++	_have_kver 6 2
+ }
+=20
+ test_device() {
 
 
-It would be nice if they could be avoided altogether.
-
-Looking how e.g. null-blk and btrfs has solved this:
-https://github.com/torvalds/linux/blob/v6.2/fs/btrfs/Makefile#L39
-https://github.com/torvalds/linux/blob/v6.2/drivers/block/null_blk/Makefile=
-#L11
-
-They have put the zoned stuff in a separate C file that is only compiled
-when CONFIG_BLK_DEV_ZONED is set.
-
-I'm not sure if a similar design is desired for ublk or not.
-
-However, if a similar design pattern was used, it could probably avoid
-some of these unpleasant dummy definitions altogether.
-
-
-Kind regards,
-Niklas
-
-> +#endif
-> +=
+--=20
+Shin'ichiro Kawasaki=
