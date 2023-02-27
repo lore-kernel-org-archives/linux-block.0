@@ -2,156 +2,108 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 129ECC64ED6
-	for <linux-block@archiver.kernel.org>; Mon, 27 Feb 2023 15:39:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9EDA4C7EE23
+	for <linux-block@archiver.kernel.org>; Mon, 27 Feb 2023 16:34:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229766AbjB0Pjc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 27 Feb 2023 10:39:32 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53326 "EHLO
+        id S229907AbjB0QeI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 27 Feb 2023 11:34:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46560 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229644AbjB0Pjb (ORCPT
+        with ESMTP id S230117AbjB0QeF (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 27 Feb 2023 10:39:31 -0500
-Received: from mail-ed1-x52f.google.com (mail-ed1-x52f.google.com [IPv6:2a00:1450:4864:20::52f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B44C918AB5
-        for <linux-block@vger.kernel.org>; Mon, 27 Feb 2023 07:39:26 -0800 (PST)
-Received: by mail-ed1-x52f.google.com with SMTP id o12so27474601edb.9
-        for <linux-block@vger.kernel.org>; Mon, 27 Feb 2023 07:39:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=metaspace-dk.20210112.gappssmtp.com; s=20210112;
-        h=mime-version:message-id:in-reply-to:date:subject:cc:to:from
-         :user-agent:references:from:to:cc:subject:date:message-id:reply-to;
-        bh=rJXB+iEam6DW138ELfP7qcmmpR4Y/Uxd0mnWuUGBS30=;
-        b=QK2uT+9EbblWEV1f/7DsHEsS5gtxZBG7/6IeI5NzEyhRJHS8OfYacsvQzq/JTeQ9m9
-         Ze9UUkQgx2b3SKq4WOcRLKZ8L03yoVs2k0CV4OsSihxCLcXbypv7uX29Ib0JVX/ekqQU
-         1Uh6a4pYkCHeexzbuHkPuhArNDzWD28yatc60oZ/gV0a/NmQCdmB0ho30dmJnFQY+A/5
-         foU0t3Oan12SF1dIDb03xbKLin7eg9yWGXmFdGwpUBAJgNN0aV2tHkJA+duGC+iqw/2X
-         97q5Kf+A/Mrqzzi/6zRiu/lmhg2j7B9zZIaLZqTBcJw2bM6qzBCyXYNldqNuPRsbWjWU
-         kEpw==
+        Mon, 27 Feb 2023 11:34:05 -0500
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0901D9ECF;
+        Mon, 27 Feb 2023 08:34:01 -0800 (PST)
+Received: by mail-wm1-f44.google.com with SMTP id p23-20020a05600c1d9700b003ead4835046so4309417wms.0;
+        Mon, 27 Feb 2023 08:34:00 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=mime-version:message-id:in-reply-to:date:subject:cc:to:from
-         :user-agent:references:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rJXB+iEam6DW138ELfP7qcmmpR4Y/Uxd0mnWuUGBS30=;
-        b=bhYu7sNglPgA7k4XJZWNm+fLT4DMk+eFUlgdsBLXlyegKakcJB7Bf1D15fKqBukP0n
-         iNeMlynYqWYBmv2TBTUHOWS9XcntMmUAHCN8wv08ww88SRGmhHrSUaFbTRA6whwOFc+t
-         Z3zZCnO0Pb+YBtUSkDgbvDsU3wYFaZ4aR7+i58neiohkvnsL1NPCwaHDOvjA4JYhfa19
-         HBBDOoFZyvB+jrGpIsed9UFpNPZfR3K1wF2XCwjcz2iAVsDEhsynvfNStuedttOD90iR
-         7RFlQmdFy6gKIcJlobXaQlephOXVDDP333ZmimBwxwEOrGZgptC4Cd4OU7nfkNZqMkxd
-         VYFw==
-X-Gm-Message-State: AO0yUKWAi4jhXZepmuJVP9D/DY8YXWS0fPZ+APoWOveEFu2VauLC77kl
-        sccKa8bzEZUMKgS1Sl8OHW/Sxw==
-X-Google-Smtp-Source: AK7set/Gmh6PCn5iZtjvDOdCbd5sn0yjN5JRBObxoLJxNyLI85wyrGw/Kw3riG+LciljWDq6SM0RBw==
-X-Received: by 2002:a17:906:d90:b0:7d3:c516:6ef4 with SMTP id m16-20020a1709060d9000b007d3c5166ef4mr33269330eji.20.1677512365237;
-        Mon, 27 Feb 2023 07:39:25 -0800 (PST)
-Received: from localhost ([194.62.217.2])
-        by smtp.gmail.com with ESMTPSA id h14-20020a17090619ce00b008f14cc5f2e4sm3357822ejd.68.2023.02.27.07.39.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 Feb 2023 07:39:24 -0800 (PST)
-References: <20230224200502.391570-1-nmi@metaspace.dk>
- <Y/zKQx6IRirQpoIf@minwoo-desktop>
-User-agent: mu4e 1.9.18; emacs 28.2.50
-From:   Andreas Hindborg <nmi@metaspace.dk>
-To:     Minwoo Im <minwoo.im.dev@gmail.com>
-Cc:     linux-block@vger.kernel.org, Hans Holmberg <Hans.Holmberg@wdc.com>,
-        Matias Bjorling <Matias.Bjorling@wdc.com>,
-        Niklas Cassel <Niklas.Cassel@wdc.com>,
-        kernel test robot <lkp@intel.com>,
-        Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-        open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v2] block: ublk: enable zoned storage support
-Date:   Mon, 27 Feb 2023 16:36:15 +0100
-In-reply-to: <Y/zKQx6IRirQpoIf@minwoo-desktop>
-Message-ID: <87wn4386dw.fsf@metaspace.dk>
+        d=1e100.net; s=20210112; t=1677515639;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=uHr+Co8eEabIuNx5JmGIl5utnyG6aUsC6+tq4HIs5mY=;
+        b=zAIKBEfgHW7tG52RWFEMuEnXHVzmN01m5IFXZGQ2mi4h6JEhEr5/5NLrBXUqutcvre
+         10GZHFcD0RYo4lbzZZUq/AjeEMgaO7SutENP5wXsp1iazGJXugrtGVF4QooVdaBHLsbQ
+         95VQ7z2fz5PV6UooPZB1042c00fs3VRfyMkxaes+p9VCz+Qk+VdpNfJCZdFFWVpjXoXe
+         UCdpJlXtw9N0mRYnEVe0FizlxD7S6Nh5+a8iXNB3bPUja5Z8LC4DhyFa+lkQY98ipWXl
+         5WdCIM8v88IQc6gX9k3hxNJ0jbkphv+3mtKm0YvhIOUAae1n5OJSVfBQ4aQB8NF02mz9
+         0PcA==
+X-Gm-Message-State: AO0yUKWVy0l8dXGP3bxrjOFJL+Qx/rZceCQobxTnwdTr3zpNQ6TZ6zpc
+        mXVGDR/voM95ql7/DASu6SE=
+X-Google-Smtp-Source: AK7set9XuktCuCbfaEM6UQv1TXQCJUOCI6+5jRpfNuq7BuGAtwnkJnGreI3Ovudm509y4Apw8vnHDw==
+X-Received: by 2002:a05:600c:3b94:b0:3e7:534a:694e with SMTP id n20-20020a05600c3b9400b003e7534a694emr17518116wms.3.1677515639042;
+        Mon, 27 Feb 2023 08:33:59 -0800 (PST)
+Received: from [192.168.64.80] (bzq-219-42-90.isdn.bezeqint.net. [62.219.42.90])
+        by smtp.gmail.com with ESMTPSA id g14-20020a7bc4ce000000b003eb20d4d4a8sm9305724wmk.44.2023.02.27.08.33.57
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 27 Feb 2023 08:33:58 -0800 (PST)
+Message-ID: <316431ed-1727-7e80-2090-84ac5b334f74@grimberg.me>
+Date:   Mon, 27 Feb 2023 18:33:57 +0200
 MIME-Version: 1.0
-Content-Type: text/plain
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.7.1
+Subject: Re: [LSF/MM/BPF BOF] Userspace command abouts
+Content-Language: en-US
+To:     Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+        Keith Busch <kbusch@kernel.org>,
+        Chaitanya Kulkarni <chaitanyak@nvidia.com>
+Cc:     "hch@lst.de" <hch@lst.de>,
+        "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
+        "dgilbert@interlog.com" <dgilbert@interlog.com>,
+        Hannes Reinecke <hare@suse.de>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "lsf-pc@lists.linuxfoundation.org" <lsf-pc@lists.linuxfoundation.org>
+References: <3d3369f1-7ebe-b3b8-804c-ff2b97ec679d@suse.de>
+ <Y+5cjPBE6h/IW9VH@kbusch-mbp>
+ <ad837a26-948a-c690-cd9e-4dfffb5f990d@grimberg.me>
+ <57d8dff9-2fdb-8198-6cdc-7265797a704a@interlog.com>
+ <23526cf9-d912-59a7-4742-6003d6ccfd45@grimberg.me>
+ <Y/Yscr82hqdKl1Hw@kbusch-mbp.dhcp.thefacebook.com>
+ <561afa67-04d0-c675-6bbb-048313da152b@grimberg.me>
+ <73b4dd39-9ce8-9b55-8a1d-06865f3bde32@nvidia.com>
+ <Y/lpmrwuehnsWmmR@kbusch-mbp.dhcp.thefacebook.com>
+ <0fe59301-65e6-d8a9-033e-0243ad59c56b@opensource.wdc.com>
+From:   Sagi Grimberg <sagi@grimberg.me>
+In-Reply-To: <0fe59301-65e6-d8a9-033e-0243ad59c56b@opensource.wdc.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 
-Minwoo Im <minwoo.im.dev@gmail.com> writes:
+>> On Fri, Feb 24, 2023 at 11:54:39PM +0000, Chaitanya Kulkarni wrote:
+>>> I do think that we should work on CDL for NVMe as it will solve some of
+>>> the timeout related problems effectively than using aborts or any other
+>>> mechanism.
+>>
+>> That proposal exists in NVMe TWG, but doesn't appear to have recent activity.
+>> The last I heard, one point of contention was where the duration limit property
+>> exists: within the command, or the queue. From my perspective, if it's not at
+>> the queue level, the limit becomes meaningless, but hey, it's not up to me.
+> 
+> Limit attached to the command makes things more flexible and easier for the
+> host, so personally, I prefer that. But this has an impact on the controller:
+> the device needs to pull in *all* commands to be able to know the limits and do
+> scheduling/aborts appropriately. That is not something that the device designers
+> like, for obvious reasons (device internal resources...).
+> 
+> On the other hand, limits attached to queues could lead to either a serious
+> increase in the number of queues (PCI space & number of IRQ vectors limits), or,
+> loss of performance as a particular queue with the desired limit would be
+> accessed from multiple CPUs on the host (lock contention). Tricky problem I
+> think with lots of compromises.
 
-> On 23-02-24 21:05:01, Andreas Hindborg wrote:
->> +static int ublk_report_zones(struct gendisk *disk, sector_t sector,
->> +			     unsigned int nr_zones, report_zones_cb cb,
->> +			     void *data)
->> +{
->> +	struct ublk_device *ub;
->> +	unsigned int zone_size;
->> +	unsigned int first_zone;
->> +	int ret = 0;
->> +
->> +	ub = disk->private_data;
->> +
->> +	if (!(ub->dev_info.flags & UBLK_F_ZONED))
->> +		return -EINVAL;
->> +
->> +	zone_size = disk->queue->limits.chunk_sectors;
->> +	first_zone = sector >> ilog2(zone_size);
->> +	nr_zones = min(ub->ub_disk->nr_zones - first_zone, nr_zones);
->> +
->> +	for (unsigned int i = 0; i < nr_zones; i++) {
->> +		struct request *req;
->> +		blk_status_t status;
->> +		struct blk_zone info = {0};
->> +
->> +		req = blk_mq_alloc_request(disk->queue, REQ_OP_DRV_IN, 0);
->> +
->> +		if (IS_ERR(req)) {
->> +			ret = PTR_ERR(req);
->> +			goto out;
->> +		}
->
-> Can we just return directly just like above (-EINVAL)?
->
-> if (IS_ERR(req))
-> 	return PTR_ERR(req);
+I'm not up to speed on how CDL is defined, but I'm unclear how CDL at
+the queue level would cause the host to open more queues?
 
-Yes, I agree.
+Another question, does CDL have any relationship with NVMe "Time Limited
+Error Recovery"? where the host can set a feature for timeout and
+indicate if the controller should respect it per command?
 
->
->> +
->> +		req->__sector = sector;
->> +
->> +		ret = blk_rq_map_kern(disk->queue, req, &info, sizeof(info),
->> +				      GFP_KERNEL);
->> +
->> +		if (ret)
->> +			goto out;
->
-> If we really have to use goto here, then I think we have choices:
-> put blk_mq_free_request(req); here or put it to the out: area.
-
-Lets free here and drop the goto.
-
-Thanks,
-Andreas
-
->> +
->> +		status = blk_execute_rq(req, 0);
->> +		ret = blk_status_to_errno(status);
->> +		if (ret)
->> +			goto out;
->> +
->> +		blk_mq_free_request(req);
->> +
->> +		ret = cb(&info, i, data);
->> +		if (ret)
->> +			goto out;
->> +
->> +		/* A zero length zone means don't ask for more zones */
->> +		if (!info.len) {
->> +			nr_zones = i;
->> +			break;
->> +		}
->> +
->> +		sector += zone_size;
->> +	}
->> +	ret = nr_zones;
->> +
->> + out:
->> +	return ret;
->> +}
-
+While this is not a full-blown every queue/command has its own timeout,
+it could address the original use-case given by Hannes. And it's already
+there.
