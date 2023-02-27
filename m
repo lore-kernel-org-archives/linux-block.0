@@ -2,131 +2,149 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1AC05C7EE2E
-	for <linux-block@archiver.kernel.org>; Mon, 27 Feb 2023 06:07:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7314C64ED6
+	for <linux-block@archiver.kernel.org>; Mon, 27 Feb 2023 06:10:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229451AbjB0GHD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 27 Feb 2023 01:07:03 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52422 "EHLO
+        id S229689AbjB0GKG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 27 Feb 2023 01:10:06 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54724 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229841AbjB0GGy (ORCPT
+        with ESMTP id S229657AbjB0GKF (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 27 Feb 2023 01:06:54 -0500
-Received: from mailout4.samsung.com (mailout4.samsung.com [203.254.224.34])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8DF7714215
-        for <linux-block@vger.kernel.org>; Sun, 26 Feb 2023 22:06:26 -0800 (PST)
-Received: from epcas5p3.samsung.com (unknown [182.195.41.41])
-        by mailout4.samsung.com (KnoxPortal) with ESMTP id 20230227060623epoutp04c802796e8c8ab5efd852faa2319010ed~HmVasCqyy3038230382epoutp04Q
-        for <linux-block@vger.kernel.org>; Mon, 27 Feb 2023 06:06:23 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout4.samsung.com 20230227060623epoutp04c802796e8c8ab5efd852faa2319010ed~HmVasCqyy3038230382epoutp04Q
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1677477983;
-        bh=vIoz29UZVyH0q7ZSAtP9vZs7cGKZNreKhiGp8UZo6hM=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=GhRV2WLjaCJRdiKftdh3RlYyMptcYW2jIEgdZfpx1XNuVnaIuUyDTbCFRg2dsVx7+
-         WBTh2Q3w9c4ca/wVMY6m4jM2m4RSaxhfyY051vD9/dPnN0ujDAlN4vP3a08z994r9t
-         aumYsmXauBMLawStgVvaVBYb+C9YPn99oDiogcoY=
-Received: from epsnrtp1.localdomain (unknown [182.195.42.162]) by
-        epcas5p2.samsung.com (KnoxPortal) with ESMTP id
-        20230227060623epcas5p259b5a0842fd8074438b6a0ca34249f5f~HmVadMCvb1714017140epcas5p2h;
-        Mon, 27 Feb 2023 06:06:23 +0000 (GMT)
-Received: from epsmges5p3new.samsung.com (unknown [182.195.38.180]) by
-        epsnrtp1.localdomain (Postfix) with ESMTP id 4PQ93x40k4z4x9Ps; Mon, 27 Feb
-        2023 06:06:21 +0000 (GMT)
-Received: from epcas5p4.samsung.com ( [182.195.41.42]) by
-        epsmges5p3new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        91.64.06765.D584CF36; Mon, 27 Feb 2023 15:06:21 +0900 (KST)
-Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
-        epcas5p4.samsung.com (KnoxPortal) with ESMTPA id
-        20230227060620epcas5p4af89e04919e22f1997abc1acf204f456~HmVXnYCZu2710627106epcas5p4L;
-        Mon, 27 Feb 2023 06:06:20 +0000 (GMT)
-Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
-        epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
-        20230227060620epsmtrp20bc61ed09fb99febc1a8d220cd1e8d16~HmVXmtwce2994029940epsmtrp2V;
-        Mon, 27 Feb 2023 06:06:20 +0000 (GMT)
-X-AuditID: b6c32a4b-20fff70000011a6d-db-63fc485decab
-Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
-        epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        83.05.05839.C584CF36; Mon, 27 Feb 2023 15:06:20 +0900 (KST)
-Received: from green5 (unknown [107.110.206.5]) by epsmtip2.samsung.com
-        (KnoxPortal) with ESMTPA id
-        20230227060619epsmtip20d126896680ea8685c2cb8cc4f86d2e7~HmVW5-EfW0143701437epsmtip2i;
-        Mon, 27 Feb 2023 06:06:19 +0000 (GMT)
-Date:   Mon, 27 Feb 2023 11:35:47 +0530
-From:   Kanchan Joshi <joshi.k@samsung.com>
-To:     Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Cc:     linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
-        Christoph Hellwig <hch@lst.de>
-Subject: Re: [PATCH blktests v2 0/2] nvme: add test for unprivileged
- passthrough
-Message-ID: <20230227060547.GA25049@green5>
+        Mon, 27 Feb 2023 01:10:05 -0500
+Received: from out30-119.freemail.mail.aliyun.com (out30-119.freemail.mail.aliyun.com [115.124.30.119])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EFF24E05A
+        for <linux-block@vger.kernel.org>; Sun, 26 Feb 2023 22:10:03 -0800 (PST)
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R191e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045170;MF=ziyangzhang@linux.alibaba.com;NM=1;PH=DS;RN=3;SR=0;TI=SMTPD_---0VcX.IGf_1677478201;
+Received: from 30.97.56.173(mailfrom:ZiyangZhang@linux.alibaba.com fp:SMTPD_---0VcX.IGf_1677478201)
+          by smtp.aliyun-inc.com;
+          Mon, 27 Feb 2023 14:10:01 +0800
+Message-ID: <cfccc895-5a9b-f45b-5851-74c94219d743@linux.alibaba.com>
+Date:   Mon, 27 Feb 2023 14:10:00 +0800
 MIME-Version: 1.0
-In-Reply-To: <20230214044739.1903364-1-shinichiro.kawasaki@wdc.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrKKsWRmVeSWpSXmKPExsWy7bCmlm6sx59kg7VLZSxWrj7KZLH3lrbF
-        /GVP2S32zfJ0YPHYvKTeY/fNBjaPz5vkPNoPdDMFsERl22SkJqakFimk5iXnp2TmpdsqeQfH
-        O8ebmhkY6hpaWpgrKeQl5qbaKrn4BOi6ZeYA7VNSKEvMKQUKBSQWFyvp29kU5ZeWpCpk5BeX
-        2CqlFqTkFJgU6BUn5haX5qXr5aWWWBkaGBiZAhUmZGcsnHKSvWAze8WEQ31sDYyr2LoYOTkk
-        BEwkVj89zN7FyMUhJLCbUWLXtRNMEM4nRolla09BOd8YJTqOLWOGaWl9MB+qZS+jxIfXB6Gc
-        J4wSax6uYgKpYhFQlTi39QeQzcHBJqApcWFyKUhYRMBM4sqxN+wgYWaBRIlL9x1BwsICQRKr
-        /00G6+QV0JY4tHA3M4QtKHFy5hMWEJtTwFli3+1LYHFRAWWJA9uOM0Hcc4td4tyeEAjbReL9
-        2ivsELawxKvjW6BsKYnP7/ZCvZwscWnmOajeEonHew5C2fYSraf6weYzC2RI/F3/mwnC5pPo
-        /f0E7BMJAV6JjjYhiHJFiXuTnrJC2OISD2csYYUo8ZBY+94EEiDTGCVeND1gncAoNwvJN7OQ
-        bICwrSQ6PzSxzgIHirTE8n8cEKamxPpd+gsYWVcxSqYWFOempxabFhjnpZbDYzg5P3cTIzj9
-        aXnvYHz04IPeIUYmDsZDjBIczEoivHdO/kgW4k1JrKxKLcqPLyrNSS0+xGgKjJuJzFKiyfnA
-        BJxXEm9oYmlgYmZmZmJpbGaoJM6rbnsyWUggPbEkNTs1tSC1CKaPiYNTqoGJUVA57SDHI43I
-        efsDQzeziRd/yWhjqvSV/fepsmPNV1m93sV5NTeMp25v9z/rXz5pn8FmT5Wz59g5fMxTSiKq
-        K/sSTp7Qs2pga/Mpy76vns/KqJqyPz31cfCr2S075Z7P73BhibHnzqkx5djZ6lote3BX57Oo
-        4gcmjH+PLzy4qXW9Vp/ihoJdHh8PxhX8OHvm7Y3O6ed4LPXO3psTOC1RKf7m81uppioNF003
-        2Ur9vbRLdkrcu2ut/5WPMO83P+ymJuKhqv/f48bEfkcj/kD2NsMdZxamLhXh03PTfmsRKmT5
-        zm79mjSJiQtdb044YHqx79zPD8Kvt7yqZRHPVZkV+1pX9N3RjcXTsyt7vJRYijMSDbWYi4oT
-        AYGsYPkIBAAA
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrGLMWRmVeSWpSXmKPExsWy7bCSvG6Mx59kg8X7xCxWrj7KZLH3lrbF
-        /GVP2S32zfJ0YPHYvKTeY/fNBjaPz5vkPNoPdDMFsERx2aSk5mSWpRbp2yVwZUx9vpGt4ClL
-        xZ3NR5gbGL8xdzFyckgImEi0PpjP3sXIxSEksJtR4uv1T6wQCXGJ5ms/2CFsYYmV/55DFT1i
-        lFiwZhUbSIJFQFXi3NYfTF2MHBxsApoSFyaXgoRFBMwkrhx7A9bLLJAocfDPc7CZwgJBEqv/
-        TWYCsXkFtCUOLdzNDDFzGqPEzM9vGSESghInZz5hgWg2k5i3+SEzyHxmAWmJ5f84QMKcAs4S
-        +25fAntAVEBZ4sC240wTGAVnIemehaR7FkL3AkbmVYySqQXFuem5xYYFhnmp5XrFibnFpXnp
-        esn5uZsYwUGtpbmDcfuqD3qHGJk4GA8xSnAwK4nw3jn5I1mINyWxsiq1KD++qDQntfgQozQH
-        i5I474Wuk/FCAumJJanZqakFqUUwWSYOTqkGJqYd6Vb/i+5PW/WRNdUzyXH57bxFi8Vm5ji0
-        PTi+SnOiovKz45wcTxmb2Utm9YpcPqCxLHhPS0yqe/HbYB/TNjEP7t1GS57cylmvsC4+2Nsq
-        d71Is+EKxXmJuYf53ncv2KtyO7vPqUhBdOYWLvOdd+M0W8y9JhjvDwnqOL760qZ2A9Y+XyeF
-        /qxQub3vtZe/XPHjvLDpyifeOqJrneYmT1rm/OA8p5tjpG6mP3vFg2juwsWtiRu+GTje0Y3a
-        vHPmxvbFHzlErvGdvKLNYLvqztf5brwdW3fxvDF6fWn164zz0mJ1M1YmbJ5V/kTl1tK4ZYLr
-        bD+/1N904R/TrJnVLty9czXcJ6xS44621JF9r8RSnJFoqMVcVJwIABEkAqzZAgAA
-X-CMS-MailID: 20230227060620epcas5p4af89e04919e22f1997abc1acf204f456
-X-Msg-Generator: CA
-Content-Type: multipart/mixed;
-        boundary="----IPzR0Zmv7eUACe1AcPM4bhPiN.NxXwyEj5sj1OQa2HLEVOb4=_9769f_"
-CMS-TYPE: 105P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20230214044749epcas5p4ac6bf441e046e3642b1633fd9cf7a72b
-References: <CGME20230214044749epcas5p4ac6bf441e046e3642b1633fd9cf7a72b@epcas5p4.samsung.com>
-        <20230214044739.1903364-1-shinichiro.kawasaki@wdc.com>
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.6.1
+Subject: Re: [PATCH blktests v3 1/2] src: add mini ublk source code
+Content-Language: en-US
+To:     Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Cc:     Ming Lei <ming.lei@redhat.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+References: <20230220034649.1522978-1-ming.lei@redhat.com>
+ <20230220034649.1522978-2-ming.lei@redhat.com>
+ <a20a449a-73c1-c7dd-b100-89e346c35828@linux.alibaba.com>
+ <Y/h1LQbf+brRw1mo@T590> <20230224114156.yxul4qb323pswteq@shindev>
+ <f20ad4c4-fc74-0bea-a07d-8f6c8a028754@linux.alibaba.com>
+ <20230227054130.eygpm5e22yejug6t@shindev>
+From:   Ziyang Zhang <ZiyangZhang@linux.alibaba.com>
+In-Reply-To: <20230227054130.eygpm5e22yejug6t@shindev>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-------IPzR0Zmv7eUACe1AcPM4bhPiN.NxXwyEj5sj1OQa2HLEVOb4=_9769f_
-Content-Type: text/plain; charset="utf-8"; format="flowed"
-Content-Disposition: inline
+On 2023/2/27 13:41, Shinichiro Kawasaki wrote:
+> On Feb 27, 2023 / 10:57, Ziyang Zhang wrote:
+>> On 2023/2/24 19:41, Shinichiro Kawasaki wrote:
+>>> On Feb 24, 2023 / 16:28, Ming Lei wrote:
+>>>> On Fri, Feb 24, 2023 at 03:52:28PM +0800, Ziyang Zhang wrote:
+>>>>> On 2023/2/20 11:46, Ming Lei wrote:
+>>>>>
+>>>>> [...]
+>>>>>
+>>>>>>
+>>>>>> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+>>>>>> ---
+>>>>>>  src/.gitignore |    1 +
+>>>>>>  src/Makefile   |   18 +
+>>>>>>  src/miniublk.c | 1376 ++++++++++++++++++++++++++++++++++++++++++++++++
+>>>>>>  3 files changed, 1395 insertions(+)
+>>>>>>  create mode 100644 src/miniublk.c
+>>>>>>
+>>>>>> diff --git a/src/.gitignore b/src/.gitignore
+>>>>>> index 355bed3..df7aff5 100644
+>>>>>> --- a/src/.gitignore
+>>>>>> +++ b/src/.gitignore
+>>>>>> @@ -8,3 +8,4 @@
+>>>>>>  /sg/dxfer-from-dev
+>>>>>>  /sg/syzkaller1
+>>>>>>  /zbdioctl
+>>>>>> +/miniublk
+>>>>>> diff --git a/src/Makefile b/src/Makefile
+>>>>>> index 3b587f6..81c6541 100644
+>>>>>> --- a/src/Makefile
+>>>>>> +++ b/src/Makefile
+>>>>>> @@ -2,6 +2,10 @@ HAVE_C_HEADER = $(shell if echo "\#include <$(1)>" |		\
+>>>>>>  		$(CC) -E - > /dev/null 2>&1; then echo "$(2)";	\
+>>>>>>  		else echo "$(3)"; fi)
+>>>>>>  
+>>>>>> +HAVE_C_MACRO = $(shell if echo "#include <$(1)>" |	\
+>>>>> Hi Ming,
+>>>>>
+>>>>> It should be "\#include", not "#include". You miss a "\".
+>>>>
+>>>> "\#include" won't work for checking the macro of IORING_OP_URING_CMD.
+>>>>
+>>>> [root@ktest-36 linux]# echo "\#include <liburing.h>" | gcc -E -
+>>>> # 0 "<stdin>"
+>>>> # 0 "<built-in>"
+>>>> # 0 "<command-line>"
+>>>> # 1 "/usr/include/stdc-predef.h" 1 3 4
+>>>> # 0 "<command-line>" 2
+>>>> # 1 "<stdin>"
+>>>> \#include <liburing.h>
+>>>
+>>> I also tried and observed the same symptom. HAVE_C_MACRO works well without the
+>>> backslash. Adding the backslash, it fails.
+>>>
+>>> I think Ziyang made the comment because HAVE_C_HEADER has the backslash. (Thanks
+>>> for catching the difference between HAVA_C_HEADER and HAVE_C_MACRO.) I think
+>>> another fix is needed to remove that backslash from HAVE_C_HEADER.  I've create
+>>> a one liner fix patch quickly [1]. It looks ok for blktests CI. I will revisit
+>>> it after Ming's patches get settled.
+>>>
+>>> [1] https://github.com/osandov/blktests/pull/112/commits/dd5852e69abc3247d7b0ec4faf916a395378362d
+>>>
+>>
+>> Hello,
+>>
+>> Sorry, I am not familiar with shell script. But **without** the backslash,
+>> I get this error:
+>>
+>> $ make
+>> make -C src all
+>> make[1]: Entering directory '/home/alinux/workspace/blktests/src'
+>> Makefile:5: *** unterminated call to function 'shell': missing ')'.  Stop.
+>> make[1]: Leaving directory '/home/alinux/workspace/blktests/src'
+>> make: *** [Makefile:5: all] Error 2
+> 
+> I see... I googled and learned that make version 4.3 introduced this '# inside
+> macro' handling difference [2]. I guess your make has version older than 4.3,
+> isn't it?
+> 
+> [2] https://lwn.net/Articles/810071/
+> 
+> Per the the LWN article [2], the fix should be as follows. It works as expected
+> on my system with make version 4.3. Could you try it on your system?
+> 
+> diff --git a/src/Makefile b/src/Makefile
+> index 81c6541..322eb1c 100644
+> --- a/src/Makefile
+> +++ b/src/Makefile
+> @@ -1,8 +1,10 @@
+> -HAVE_C_HEADER = $(shell if echo "\#include <$(1)>" |		\
+> +H := \#
+> +
+> +HAVE_C_HEADER = $(shell if echo "$(H)include <$(1)>" |		\
+>  		$(CC) -E - > /dev/null 2>&1; then echo "$(2)";	\
+>  		else echo "$(3)"; fi)
+>  
+> -HAVE_C_MACRO = $(shell if echo "#include <$(1)>" |	\
+> +HAVE_C_MACRO = $(shell if echo -e "$(H)include <$(1)>" |	\
+>  		$(CC) -E - 2>&1 /dev/null | grep $(2) > /dev/null 2>&1; \
+>  		then echo 1;else echo 0; fi)
 
-On Tue, Feb 14, 2023 at 01:47:37PM +0900, Shin'ichiro Kawasaki wrote:
->Per suggestion by Kanchan, add a new test case to test unprivileged passthrough
->of NVME character devices. The first patch adds a feature to run commands with
->normal user privilege. The second patch adds the test case using the feature.
->
->Changes from v2:
->* Added the first patch to add normal user privilege support to blktests
->* Adjusted the test case to the functions for normal user privilege support
+My make version is 4.2.1, and your fix works! Thanks, Shinichiro.
 
-Thanks, this looks way better. And works fine in my setup.
-If required,
-Tested-by: Kanchan Joshi <joshi.k@samsung.com>
-
-------IPzR0Zmv7eUACe1AcPM4bhPiN.NxXwyEj5sj1OQa2HLEVOb4=_9769f_
-Content-Type: text/plain; charset="utf-8"
-
-
-------IPzR0Zmv7eUACe1AcPM4bhPiN.NxXwyEj5sj1OQa2HLEVOb4=_9769f_--
+Regards,
+Zhang
