@@ -2,122 +2,72 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 63372C64ED6
-	for <linux-block@archiver.kernel.org>; Mon, 27 Feb 2023 18:27:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C417BC64ED9
+	for <linux-block@archiver.kernel.org>; Mon, 27 Feb 2023 20:55:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229598AbjB0S1Z (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 27 Feb 2023 13:27:25 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33326 "EHLO
+        id S229703AbjB0UzY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 27 Feb 2023 15:55:24 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35332 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229558AbjB0S1Y (ORCPT
+        with ESMTP id S229598AbjB0UzX (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 27 Feb 2023 13:27:24 -0500
-Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E8C2ACDFE;
-        Mon, 27 Feb 2023 10:27:23 -0800 (PST)
-Received: by mail-pj1-x1036.google.com with SMTP id kb15so7139225pjb.1;
-        Mon, 27 Feb 2023 10:27:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=mGr1oL/pZpPll19+c3ioRmhLkSsTJHby1AuhBJm//pc=;
-        b=AXLk46Xo38NfyHxtx8zulMsDJlEFXxboaZ7CcFKXsR8lysmnKJevshrI8i8WK3fJTF
-         uWR4w1WfELt0Mq+azcWdHPKbNrLZ4SbbMF+Dkc5RflxcjT1jViFzgFaN1/07tFwvLGFX
-         NcxpDm+af0Io/ke056P3+ooazUZqZtyEcVpRp3fNMnNcS71FCcdqPYfKgzryOUsxSAj1
-         7fUCo5vF3vh8qRZlYEh/4zoRmerPgXNLa9QB4SRDNimzCG6/nMmNK209HnPte1nf7Wu5
-         VnR2Yv9PRATCOS9AS8FmpBZfQeJ7dumwjV4T5CKMSSKlVeffBA9uLpS0wEJocpilftqF
-         uOYQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=mGr1oL/pZpPll19+c3ioRmhLkSsTJHby1AuhBJm//pc=;
-        b=P7mFT0FoBjxFqVzBHEcteI840CgVoPfdT/CsDUFvkgd+/BRQtJgkdjl4sBbkXYvlvt
-         1nn5GuuC1fIz2JnR/yJVYHAkmhhsaaKuqS+UtQ/UaKBfuXUk/DwVTmXwLNS9qD3KAEgy
-         F5Q/fI2gAEO0o4U9wao7wTSy7qw0Wrvw81VJXByRD82ULej5h+fes9PzBBZA7SE199q6
-         AOJVAxYvZCETHgaE11FG5Iw+NyPaY8xsQ8wxhuUxfkY6LymBn/ZMJ+kcREVZ22Jpp+M6
-         AD/Pbnm5mTeWovky6DfpcddjAF4WRJTkDysOyj+rsDe7JVc5nHHAzHnpfIsxTS4+7PiS
-         8CjQ==
-X-Gm-Message-State: AO0yUKVLCtkVpYAly6nlTLFhQphbvQacTcmfuvqDl2aDnreV8TZcaUm7
-        pSwREWWRZQ7sJUYmWNvpT7w=
-X-Google-Smtp-Source: AK7set/TfJvvSIOtVjF7wj4W9M7274mKsz1GltNZ8tgBx1SdHt58gDyLIXoAp9A8vaqeH0TueFgGeA==
-X-Received: by 2002:a17:902:cf50:b0:19c:d796:9abb with SMTP id e16-20020a170902cf5000b0019cd7969abbmr10124190plg.41.1677522442998;
-        Mon, 27 Feb 2023 10:27:22 -0800 (PST)
-Received: from localhost (2603-800c-1a02-1bae-a7fa-157f-969a-4cde.res6.spectrum.com. [2603:800c:1a02:1bae:a7fa:157f:969a:4cde])
-        by smtp.gmail.com with ESMTPSA id u9-20020a17090282c900b001991f07f41dsm4916163plz.297.2023.02.27.10.27.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 Feb 2023 10:27:21 -0800 (PST)
-Sender: Tejun Heo <htejun@gmail.com>
-Date:   Mon, 27 Feb 2023 08:27:19 -1000
-From:   Tejun Heo <tj@kernel.org>
-To:     Breno Leitao <leitao@debian.org>
-Cc:     axboe@kernel.dk, cgroups@vger.kernel.org,
-        linux-block@vger.kernel.org, hch@lst.de, josef@toxicpanda.com,
-        aherrmann@suse.de, mkoutny@suse.com, linux-kernel@vger.kernel.org,
-        leit@fb.com
-Subject: Re: [PATCH v3] blk-iocost: Pass gendisk to ioc_refresh_params
-Message-ID: <Y/z2B+153X0PYpjO@slm.duckdns.org>
-References: <20230227151252.1411499-1-leitao@debian.org>
+        Mon, 27 Feb 2023 15:55:23 -0500
+Received: from todd.t-8ch.de (todd.t-8ch.de [159.69.126.157])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 158F125971
+        for <linux-block@vger.kernel.org>; Mon, 27 Feb 2023 12:55:21 -0800 (PST)
+Date:   Mon, 27 Feb 2023 20:55:17 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=weissschuh.net;
+        s=mail; t=1677531320;
+        bh=+KvjAxNh/K4RplByoVPV+tkiQERMjKP+jk/W8kiNVJg=;
+        h=Date:From:To:Subject:References:In-Reply-To:From;
+        b=nPao+mb6vGX3lrWAnEUU0zErSc5oa8PbJcJX8ePg3Iag2Yjl3W7bXTsBwNlLs6dCx
+         ZoXrvoADhY1crB1d5Eygc4iQXUWZt1vpz89lBfmks1ekrZNxwad4AwjokudlrHBI4I
+         YeEi17AFqOcxV6oOlzYbhfH17W/noWdhLdXALKek=
+From:   Thomas =?utf-8?Q?Wei=C3=9Fschuh?= <linux@weissschuh.net>
+To:     Josef Bacik <josef@toxicpanda.com>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org, nbd@other.debian.org
+Subject: Re: [PATCH] nbd: automatically load module on genl access
+Message-ID: <c8512a6d-804a-4d64-a263-dad7942f9462@t-8ch.de>
+References: <20221110052438.2188-1-linux@weissschuh.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20230227151252.1411499-1-leitao@debian.org>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20221110052438.2188-1-linux@weissschuh.net>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
+Hi Josef, Jens,
 
-A couple minor nitpicks:
+could you take a look at this patch?
 
-Can you please add a short comment here too saying that @ioc->rqos.disk
-isn't initialized yet when this function is called from the init path?
+Thanks,
+Thomas
 
-> +static int ioc_autop_idx(struct ioc *ioc, struct gendisk *disk)
+On Thu, Nov 10, 2022 at 06:24:38AM +0100, Thomas Weißschuh wrote:
+> Instead of forcing the user to manually load the module do it
+> automatically.
+> 
+> Signed-off-by: Thomas Weißschuh <linux@weissschuh.net>
+> ---
+>  drivers/block/nbd.c | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+> index 5cffd96ef2d7..1c38a7ea9531 100644
+> --- a/drivers/block/nbd.c
+> +++ b/drivers/block/nbd.c
+> @@ -2328,6 +2328,7 @@ static struct genl_family nbd_genl_family __ro_after_init = {
+>  	.mcgrps		= nbd_mcast_grps,
+>  	.n_mcgrps	= ARRAY_SIZE(nbd_mcast_grps),
+>  };
+> +MODULE_ALIAS_GENL_FAMILY(NBD_GENL_FAMILY_NAME);
+>  
+>  static int populate_nbd_status(struct nbd_device *nbd, struct sk_buff *reply)
 >  {
->  	int idx = ioc->autop_idx;
->  	const struct ioc_params *p = &autop[idx];
-> @@ -808,11 +808,11 @@ static int ioc_autop_idx(struct ioc *ioc)
->  	u64 now_ns;
->  
->  	/* rotational? */
-> -	if (!blk_queue_nonrot(ioc->rqos.disk->queue))
-> +	if (!blk_queue_nonrot(disk->queue))
->  		return AUTOP_HDD;
->  
->  	/* handle SATA SSDs w/ broken NCQ */
-> -	if (blk_queue_depth(ioc->rqos.disk->queue) == 1)
-> +	if (blk_queue_depth(disk->queue) == 1)
->  		return AUTOP_SSD_QD1;
->  
->  	/* use one of the normal ssd sets */
-> @@ -901,14 +901,19 @@ static void ioc_refresh_lcoefs(struct ioc *ioc)
->  		    &c[LCOEF_WPAGE], &c[LCOEF_WSEQIO], &c[LCOEF_WRANDIO]);
->  }
->  
-> -static bool ioc_refresh_params(struct ioc *ioc, bool force)
-> +/*
-> + * struct gendisk is required as an argument because ioc->rqos.disk
-> + * might not be properly initialized
-> + */
-
-Here too, let's explicitly say when it's not initialized.
-
-> +static bool _ioc_refresh_params(struct ioc *ioc, bool force,
-> +				struct gendisk *disk)
-
-Given that __ are about an order of magnitude more common in the kernel,
-would you mind renaming it to __ioc_refresh_params() or e.g.
-ioc_refresh_params_disk()?
-
-Please feel free to add
-
- Acked-by: Tejun Heo <tj@kernel.org>
-
-Thanks.
-
--- 
-tejun
+> 
+> base-commit: f67dd6ce0723ad013395f20a3f79d8a437d3f455
+> -- 
+> 2.38.1
+> 
