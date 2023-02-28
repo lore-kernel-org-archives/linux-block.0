@@ -2,91 +2,81 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BA51C64EC7
-	for <linux-block@archiver.kernel.org>; Tue, 28 Feb 2023 12:51:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BEA1CC64EC7
+	for <linux-block@archiver.kernel.org>; Tue, 28 Feb 2023 16:05:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231477AbjB1Mv5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 28 Feb 2023 07:51:57 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34712 "EHLO
+        id S230193AbjB1QF6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 28 Feb 2023 11:05:58 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59106 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229493AbjB1Mv4 (ORCPT
+        with ESMTP id S230223AbjB1QF6 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 28 Feb 2023 07:51:56 -0500
-Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A5222BF3B
-        for <linux-block@vger.kernel.org>; Tue, 28 Feb 2023 04:51:55 -0800 (PST)
-Received: by mail-pj1-x102a.google.com with SMTP id kb15so9712478pjb.1
-        for <linux-block@vger.kernel.org>; Tue, 28 Feb 2023 04:51:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112; t=1677588715;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=F6bVcZFE0HqAVo8qfWn/M3ByKpGU6+Lc1KXSuspx5lo=;
-        b=uBP8y0KEudDm9buTiNU2aHEUByfTEd7uJJX36ri4HmxFFsoYkiHFJzReJ3mx75gVYV
-         WTPbKyBnhRr2eJ8Rt0vUlSvHSnJ+Di21agCQTonnedhxrLQGKyMLs9xl7sNWrQKwhW8F
-         147/0/iHd9r1v6l5igLC90stz9n9ezHoTzvRO5fGOnF/OyfR0EsRFFWbhvbH5HtzyREf
-         WU9x2yz4/qD86Mxh1f29lyE6PMayDvH9RaIkuWfMilM6pr/VMfYWKQ6dOSLtK3k4Ghzz
-         gxnFm8gFw2dm1rsgeMyd3C5HpfmZ2JmWheE3g8p34giU36F/QsznGLcYKIkjj5Q1JlAn
-         CKoA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1677588715;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=F6bVcZFE0HqAVo8qfWn/M3ByKpGU6+Lc1KXSuspx5lo=;
-        b=AlAu7LqjKuMBwdEjG1V9SQ6Fmrm7amgKABOqXO21j6odf3e4H7T6kby92KkT/WXGbd
-         mt5XBiwqoevprjH8r8T6l4QZV6WMPIWMAC713cap0jG7XlxpTP6eSt4IEXaz0Krg3+Vd
-         XIYj//3MvYbQrsbN8iaypg9rNT80k7+MKM5XfE5odoCZL+As7l2s9nWiDhWc2rxO6dol
-         EVB/+B63oElz/4tEYKk2zcWP5n1bEXtiP2OHssYJ/QgjrzJNwa5K/e1LWSgXDo4hHqpj
-         +254cT3QcZFD3Tx1zoNZo2ztH8mgPMwjzEa2k39q2eUyEG8+VdXyU/wRQGsCYY6gv31m
-         UgVw==
-X-Gm-Message-State: AO0yUKW8sWt7OebZiKbuLM6rwWo5r2CvgOJoXuo2cnusf6p0O3m5oQ1E
-        J8RkAYysXdm+iRaIBIORLUCT7g==
-X-Google-Smtp-Source: AK7set/xsX6KTOkXV5tn/4bDglX2Xm+IGdT2/LnSExXMtV/Q2AL5gxeZWwAyHV0xvvCRT8fmWCOUsQ==
-X-Received: by 2002:a17:902:e74e:b0:19a:a815:2864 with SMTP id p14-20020a170902e74e00b0019aa8152864mr2879368plf.4.1677588714985;
-        Tue, 28 Feb 2023 04:51:54 -0800 (PST)
-Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id d19-20020a170902b71300b00198e397994bsm6486540pls.136.2023.02.28.04.51.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 Feb 2023 04:51:54 -0800 (PST)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     tj@kernel.org, josef@toxicpanda.com, cgroups@vger.kernel.org,
-        linux-block@vger.kernel.org, Breno Leitao <leitao@debian.org>
-Cc:     aherrmann@suse.de, linux-kernel@vger.kernel.org, hch@lst.de,
-        leit@fb.com
-In-Reply-To: <20230228111654.1778120-1-leitao@debian.org>
-References: <20230228111654.1778120-1-leitao@debian.org>
-Subject: Re: [PATCH v4] blk-iocost: Pass gendisk to ioc_refresh_params
-Message-Id: <167758871388.8785.9077411400332712392.b4-ty@kernel.dk>
-Date:   Tue, 28 Feb 2023 05:51:53 -0700
+        Tue, 28 Feb 2023 11:05:58 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC03A222DB
+        for <linux-block@vger.kernel.org>; Tue, 28 Feb 2023 08:05:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1677600313;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=D/FPL9KWoan+aGF0+Fj8Ts+VkGVEiVbizSsqsZXIaWA=;
+        b=LHEpBsaQnNKCzP7IgDo1Sh2Ow442lpuc0YRFZpEullpnyWemXb1FUqE7ongHmDh4KqSq00
+        7StH55aN9Ty966kSUn8M6JgqtiwZeN4x6Djkaw9weCtH9LJKwHji48t89OE2KIIlNxH4CB
+        KiTQELh4855CaUyK4V3mgQUJ0aO3xMY=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-564-pqYcYWV1O6iGT5cUqPJIAw-1; Tue, 28 Feb 2023 11:05:09 -0500
+X-MC-Unique: pqYcYWV1O6iGT5cUqPJIAw-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 527A22817220;
+        Tue, 28 Feb 2023 16:05:08 +0000 (UTC)
+Received: from [10.22.8.29] (unknown [10.22.8.29])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 84188492B0F;
+        Tue, 28 Feb 2023 16:05:07 +0000 (UTC)
+Message-ID: <d72e3ef4-f607-9a63-9f6d-b03084a8edf6@redhat.com>
+Date:   Tue, 28 Feb 2023 11:05:07 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.7.1
+Subject: Re: [LSF/MM/BPF ATTEND][LSF/MM/BPF Topic] Non-block IO
+Content-Language: en-US
+To:     Kanchan Joshi <joshi.k@samsung.com>,
+        lsf-pc@lists.linux-foundation.org
+Cc:     linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+        io-uring@vger.kernel.org, axboe@kernel.dk, hch@lst.de,
+        kbusch@kernel.org, ming.lei@redhat.com
+References: <CGME20230210180226epcas5p1bd2e1150de067f8af61de2bbf571594d@epcas5p1.samsung.com>
+ <20230210180033.321377-1-joshi.k@samsung.com>
+From:   John Meneghini <jmeneghi@redhat.com>
+Organization: RHEL Core Storge Team
+In-Reply-To: <20230210180033.321377-1-joshi.k@samsung.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.13-dev-ebd05
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On 2/10/23 13:00, Kanchan Joshi wrote:
+> 1. Command cancellation: while NVMe mandatorily supports the abort
+> command, we do not have a way to trigger that from user-space. There
+> are ways to go about it (with or without the uring-cancel interface) but
+> not without certain tradeoffs. It will be good to discuss the choices in
+> person.
 
-On Tue, 28 Feb 2023 03:16:54 -0800, Breno Leitao wrote:
-> Current kernel (d2980d8d826554fa6981d621e569a453787472f8) crashes
-> when blk_iocost_init for `nvme1` disk.
-> 
-> 	BUG: kernel NULL pointer dereference, address: 0000000000000050
-> 	#PF: supervisor read access in kernel mode
-> 	#PF: error_code(0x0000) - not-present page
-> 
-> [...]
+As one of the principle authors of TP4097a and the author of the one NVMe controller implementation that supports the NVMe 
+Cancel command I would like to attend LSF/MM this year and talk about this.
 
-Applied, thanks!
+See my SDC presentation where I describe all of the problems with the NVMe Abort command and demonstrates a Linux host sending 
+NVMe Abort and Cancel command to an IO controller:
 
-[1/1] blk-iocost: Pass gendisk to ioc_refresh_params
-      commit: e33b93650fc5364f773985a3e961e24349330d97
-
-Best regards,
--- 
-Jens Axboe
+https://www.youtube.com/watch?v=vRrAD1U0IRw
 
 
+/John
 
