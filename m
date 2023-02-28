@@ -2,66 +2,122 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 80BB5C6FA8E
-	for <linux-block@archiver.kernel.org>; Tue, 28 Feb 2023 18:58:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 240F3C7EE33
+	for <linux-block@archiver.kernel.org>; Tue, 28 Feb 2023 20:59:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229544AbjB1S6c (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 28 Feb 2023 13:58:32 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58780 "EHLO
+        id S229672AbjB1U75 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 28 Feb 2023 15:59:57 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46746 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229525AbjB1S6b (ORCPT
+        with ESMTP id S229740AbjB1U7z (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 28 Feb 2023 13:58:31 -0500
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 36DD91E9DB;
-        Tue, 28 Feb 2023 10:58:30 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
-        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=ODWpsUYOiXhTNb085YfE8+7niJYCkg4/3V/Dygz4pW4=; b=f7U74J/t4GKsjYf9Pdpm7xB30A
-        zd+MKYYlyIA84bT/Cq/lzP7GTJmN5YGwraY/HTUvWRJ5S44vx9p7Ody/2+3pl2Vfgxw6ZvyRDQ71X
-        SQjPIptHglbVjnGdimS57MDHAyQFHmgwn8V7U3E6FdnU9DtSLUJwiUTAANO6lifYngrvmBK6rm/LM
-        Bcc87QEqrOkAEGR2PHaN+kR70FS5wmDqYCmDXx6lOBRnC7BXG2EWAcLUwjeNZixT24nIz/jaRu565
-        AQg6QszZIb6hpaV9L7w3+4uqrQ3fZNpBIXBQSoDlVj0S0xYi0Iv2PZ7SDncVrZ6wLto7DyLlKApUJ
-        UCl0D+og==;
-Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1pX5BD-00E21Q-VG; Tue, 28 Feb 2023 18:58:27 +0000
-Date:   Tue, 28 Feb 2023 10:58:27 -0800
-From:   Luis Chamberlain <mcgrof@kernel.org>
-To:     linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-cxl@vger.kernel.org
-Cc:     Christian Brauner <brauner@kernel.org>, code@tyhicks.com,
-        sfrench@samba.org, jlayton@kernel.org, chandan.babu@oracle.com,
-        josef@toxicpanda.com, amir73il@gmail.com, palmer@dabbelt.com,
-        dave@stgolabs.net, a.manzanares@samsung.com, fan.ni@samsung.com
-Subject: Re: kdevops live demo zoom & Q&A
-Message-ID: <Y/5O0yItfBwNKdXm@bombadil.infradead.org>
-References: <Y/1KnN/ER8pnhbaa@bombadil.infradead.org>
+        Tue, 28 Feb 2023 15:59:55 -0500
+Received: from mail-yw1-x1129.google.com (mail-yw1-x1129.google.com [IPv6:2607:f8b0:4864:20::1129])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99682136EA
+        for <linux-block@vger.kernel.org>; Tue, 28 Feb 2023 12:59:53 -0800 (PST)
+Received: by mail-yw1-x1129.google.com with SMTP id 00721157ae682-536be69eadfso310776247b3.1
+        for <linux-block@vger.kernel.org>; Tue, 28 Feb 2023 12:59:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=H15Wgrg45uphokJUqJE+ge3DLPSULLnvrd4PVO7cLLc=;
+        b=fF7yR1zieU4gkviG5qrWrdfSWhtKPGGWlvtMBXv4KHBDu0aJ3gWsucs0SnY/VXu9xI
+         98ilQKazhvCJdc/WBewUB+5SWcdhorii7J1pOeAzos6f/dQqHZdg02M4AtOUfeTq8eOO
+         f09htTPMG/pkdx7lHQGqeX5kSZIxN5OkkPfc77FKJnyPHYn11vG35NdgnRPHPkAFKcea
+         XgImIWOsGyc18s8CqlKSzyo64N6r/4hd/TI5CyRtFIgPb+s+gMlpDT8KVNO9m7c21yRW
+         SoYMoaCOLdsdFi4o18FJKo606Yo0hMRNZOz6SykPjzCGVDwzVDiSukBxaNiAwswCzVE4
+         k7xA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=H15Wgrg45uphokJUqJE+ge3DLPSULLnvrd4PVO7cLLc=;
+        b=W7yK4eTC68f2DwlAf7k/L2+14DOqx2Bcf3VtrPWW97HohJgoKVSNQx/706TbiSYOpS
+         Re3y/3PNzjoEYVsc/ggwxu4FUc6xc2Yx2npibvb6JyZXWw/3GMJ25zSXLjA0cCKRURsP
+         jefq4HJvrNWo+dFoaiPU1TVN89MdpcS2UDXMl80H7ftltIS9ka9nKkFRxzZ8psb4pl7d
+         ZSnAPE0OXdpokauB7XAAkKRSyAgKn9RVjkapz1pxU+6hh+AWw4MYJEagL/iHjAJJ2Iwo
+         ESZ4yJD1Hvkw0rtdRywhBeW2UWvphmiKmdrD71JQluVMxM2vL2Bwh3MUWj1q54bEUwAW
+         D2bQ==
+X-Gm-Message-State: AO0yUKVb/z3RaCo9WrVvYxEUhPzCQQkkyPn4LcBcpiFOG7Zky2E66j+H
+        jJURe3+GfTjxJXgP00QO+aAhUqcOLgMJX1YHqfGsYg==
+X-Google-Smtp-Source: AK7set+d6vs4ymgWzsVBho7zIKcb2AoIn1quNMhQ7GG855RnJ+2d+gNas87Vdn9aekeC5XgvBudues+ObsH6EIGw7ZY=
+X-Received: by 2002:a5b:8b:0:b0:90d:af77:9ca6 with SMTP id b11-20020a5b008b000000b0090daf779ca6mr2178238ybp.7.1677617992660;
+ Tue, 28 Feb 2023 12:59:52 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Y/1KnN/ER8pnhbaa@bombadil.infradead.org>
-Sender: Luis Chamberlain <mcgrof@infradead.org>
+References: <Y8v+qVZ8OmodOCQ9@nvidia.com>
+In-Reply-To: <Y8v+qVZ8OmodOCQ9@nvidia.com>
+From:   "T.J. Mercier" <tjmercier@google.com>
+Date:   Tue, 28 Feb 2023 12:59:41 -0800
+Message-ID: <CABdmKX3kJZKsOQSi=4+RE8D3AF=-823B9WV11sC4WH67hjzqSQ@mail.gmail.com>
+Subject: Re: [LSF/MM/BPF proposal]: Physr discussion
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     lsf-pc@lists.linuxfoundation.org, linux-mm@kvack.org,
+        iommu@lists.linux.dev, linux-rdma@vger.kernel.org,
+        Matthew Wilcox <willy@infradead.org>,
+        Christoph Hellwig <hch@lst.de>,
+        Joao Martins <joao.m.martins@oracle.com>,
+        John Hubbard <jhubbard@nvidia.com>,
+        Logan Gunthorpe <logang@deltatee.com>,
+        Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org,
+        netdev@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        nvdimm@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Feb 27, 2023 at 04:28:12PM -0800, Luis Chamberlain wrote:
-> To start off with let me propose a few dates for this zoom demo (all
-> are Wednesdays as its my most flexible day):
-> 
->   * March 8  1pm PST
->   * March 15 1pm PST
->   * March 29 1pm PST
+On Sat, Jan 21, 2023 at 7:03 AM Jason Gunthorpe <jgg@nvidia.com> wrote:
+>
+> I would like to have a session at LSF to talk about Matthew's
+> physr discussion starter:
+>
+>  https://lore.kernel.org/linux-mm/YdyKWeU0HTv8m7wD@casper.infradead.org/
+>
+> I have become interested in this with some immediacy because of
+> IOMMUFD and this other discussion with Christoph:
+>
+>  https://lore.kernel.org/kvm/4-v2-472615b3877e+28f7-vfio_dma_buf_jgg@nvidia.com/
+>
+> Which results in, more or less, we have no way to do P2P DMA
+> operations without struct page - and from the RDMA side solving this
+> well at the DMA API means advancing at least some part of the physr
+> idea.
+>
+> So - my objective is to enable to DMA API to "DMA map" something that
+> is not a scatterlist, may or may not contain struct pages, but can
+> still contain P2P DMA data. From there I would move RDMA MR's to use
+> this new API, modify DMABUF to export it, complete the above VFIO
+> series, and finally, use all of this to add back P2P support to VFIO
+> when working with IOMMUFD by allowing IOMMUFD to obtain a safe
+> reference to the VFIO memory using DMABUF. From there we'd want to see
+> pin_user_pages optimized, and that also will need some discussion how
+> best to structure it.
+>
+> I also have several ideas on how something like physr can optimize the
+> iommu driver ops when working with dma-iommu.c and IOMMUFD.
+>
+> I've been working on an implementation and hope to have something
+> draft to show on the lists in a few weeks. It is pretty clear there
+> are several interesting decisions to make that I think will benefit
+> from a live discussion.
+>
+> Providing a kernel-wide alternative to scatterlist is something that
+> has general interest across all the driver subsystems. I've started to
+> view the general problem rather like xarray where the main focus is to
+> create the appropriate abstraction and then go about transforming
+> users to take advatange of the cleaner abstraction. scatterlist
+> suffers here because it has an incredibly leaky API, a huge number of
+> (often sketchy driver) users, and has historically been very difficult
+> to improve.
+>
+> The session would quickly go over the current state of whatever the
+> mailing list discussion evolves into and an open discussion around the
+> different ideas.
+>
+> Thanks,
+> Jason
+>
 
-Based on feedback to at least to get some EU folks I'll change this to 9am PST.
-I know one person can't attend March 8th so the following dates are
-remaining:
-
-* March 15 9am PST
-* March 29 9am PST
-
-Let me know if this works for those who had expressed interest.
-
-  Luis
+Hi, I'm interested in participating in this discussion!
