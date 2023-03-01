@@ -2,118 +2,78 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4943DC7EE23
-	for <linux-block@archiver.kernel.org>; Wed,  1 Mar 2023 03:49:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C9BC3C7EE23
+	for <linux-block@archiver.kernel.org>; Wed,  1 Mar 2023 03:52:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229493AbjCADtA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 28 Feb 2023 22:49:00 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53632 "EHLO
+        id S229520AbjCADw3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 28 Feb 2023 22:52:29 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57056 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229761AbjCADs4 (ORCPT
+        with ESMTP id S229453AbjCADw3 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 28 Feb 2023 22:48:56 -0500
-Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C3D8173E;
-        Tue, 28 Feb 2023 19:48:48 -0800 (PST)
-Received: from kwepemm600002.china.huawei.com (unknown [172.30.72.56])
-        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4PRKpW30wTzKmTh;
-        Wed,  1 Mar 2023 11:43:47 +0800 (CST)
-Received: from [10.174.178.159] (10.174.178.159) by
- kwepemm600002.china.huawei.com (7.193.23.29) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.21; Wed, 1 Mar 2023 11:48:45 +0800
-Message-ID: <9ddd30ab-164b-21c8-2f68-4ed13377bf68@huawei.com>
-Date:   Wed, 1 Mar 2023 11:48:44 +0800
+        Tue, 28 Feb 2023 22:52:29 -0500
+Received: from outgoing.mit.edu (outgoing-auth-1.mit.edu [18.9.28.11])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F09BB366BC
+        for <linux-block@vger.kernel.org>; Tue, 28 Feb 2023 19:52:27 -0800 (PST)
+Received: from cwcc.thunk.org (pool-173-48-120-46.bstnma.fios.verizon.net [173.48.120.46])
+        (authenticated bits=0)
+        (User authenticated as tytso@ATHENA.MIT.EDU)
+        by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 3213qF9v017148
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 28 Feb 2023 22:52:17 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mit.edu; s=outgoing;
+        t=1677642738; bh=ZA1nW/swc2lOnU8SSLD4xZ2BivJ0oOyDYTicwUJAQBQ=;
+        h=Date:From:To:Cc:Subject;
+        b=CtSfW2AfVJuETan9DkrTe7BgH27KA+kstH6kyzBn0b36djJ81Du/Ryk5Xc312MM2C
+         g8MZsNEXsDOBxtkV59JNATEo9BGCesvXmsNLySNwnghbGEPmW5lmlioxIwtGld7ZL6
+         kVGnIFwBiCfmcf74Zo1CZf7YTBHYQW35KJpHriFjUquq+fnFt9YgOpA3g6gHUDAdEd
+         VNVM87qlLYgXxmuLqhJcOXSnN74aD0q0qBiUAu5L6WaSiduHIQf78e1vWkzuLvq2iZ
+         ZTB2hXG5mfwgaekXGtYFrbMwpb57q7hxEMPTEsYfTw/vGjQgYZf8mGw4nfd4Oy+NMw
+         r61njsrh6z8UA==
+Received: by cwcc.thunk.org (Postfix, from userid 15806)
+        id C522D15C3593; Tue, 28 Feb 2023 22:52:15 -0500 (EST)
+Date:   Tue, 28 Feb 2023 22:52:15 -0500
+From:   "Theodore Ts'o" <tytso@mit.edu>
+To:     lsf-pc@lists.linux-foundation.org
+Cc:     linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        linux-block@vger.kernel.org
+Subject: [LSF/MM/BPF TOPIC] Cloud storage optimizations
+Message-ID: <Y/7L74P6jSWwOvWt@mit.edu>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.1
-Subject: Re: [PATCH-next] nbd: fix incomplete validation of ioctl arg
-To:     <josef@toxicpanda.com>, <axboe@kernel.dk>
-CC:     <linux-block@vger.kernel.org>, <nbd@other.debian.org>,
-        <linux-kernel@vger.kernel.org>, <yi.zhang@huawei.com>,
-        <yukuai3@huawei.com>, <houtao1@huawei.com>, <yangerkun@huawei.com>
-References: <20230206145805.2645671-1-zhongjinghua@huawei.com>
-From:   zhongjinghua <zhongjinghua@huawei.com>
-In-Reply-To: <20230206145805.2645671-1-zhongjinghua@huawei.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.174.178.159]
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- kwepemm600002.china.huawei.com (7.193.23.29)
-X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-ping...
+Emulated block devices offered by cloud VM’s can provide functionality
+to guest kernels and applications that traditionally have not been
+available to users of consumer-grade HDD and SSD’s.  For example,
+today it’s possible to create a block device in Google’s Persistent
+Disk with a 16k physical sector size, which promises that aligned 16k
+writes will be atomically.  With NVMe, it is possible for a storage
+device to promise this without requiring read-modify-write updates for
+sub-16k writes.  All that is necessary are some changes in the block
+layer so that the kernel does not inadvertently tear a write request
+when splitting a bio because it is too large (perhaps because it got
+merged with some other request, and then it gets split at an
+inconvenient boundary).
 
-Hello，
+There are also more interesting, advanced optimizations that might be
+possible.  For example, Jens had observed the passing hints that
+journaling writes (either from file systems or databases) could be
+potentially useful.  Unfortunately most common storage devices have
+not supported write hints, and support for write hints were ripped out
+last year.  That can be easily reversed, but there are some other
+interesting related subjects that are very much suited for LSF/MM.
 
-Anyone looking this？
-
-在 2023/2/6 22:58, Zhong Jinghua 写道:
-> We tested and found an alarm caused by nbd_ioctl arg without verification.
-> The UBSAN warning calltrace like below:
->
-> UBSAN: Undefined behaviour in fs/buffer.c:1709:35
-> signed integer overflow:
-> -9223372036854775808 - 1 cannot be represented in type 'long long int'
-> CPU: 3 PID: 2523 Comm: syz-executor.0 Not tainted 4.19.90 #1
-> Hardware name: linux,dummy-virt (DT)
-> Call trace:
->   dump_backtrace+0x0/0x3f0 arch/arm64/kernel/time.c:78
->   show_stack+0x28/0x38 arch/arm64/kernel/traps.c:158
->   __dump_stack lib/dump_stack.c:77 [inline]
->   dump_stack+0x170/0x1dc lib/dump_stack.c:118
->   ubsan_epilogue+0x18/0xb4 lib/ubsan.c:161
->   handle_overflow+0x188/0x1dc lib/ubsan.c:192
->   __ubsan_handle_sub_overflow+0x34/0x44 lib/ubsan.c:206
->   __block_write_full_page+0x94c/0xa20 fs/buffer.c:1709
->   block_write_full_page+0x1f0/0x280 fs/buffer.c:2934
->   blkdev_writepage+0x34/0x40 fs/block_dev.c:607
->   __writepage+0x68/0xe8 mm/page-writeback.c:2305
->   write_cache_pages+0x44c/0xc70 mm/page-writeback.c:2240
->   generic_writepages+0xdc/0x148 mm/page-writeback.c:2329
->   blkdev_writepages+0x2c/0x38 fs/block_dev.c:2114
->   do_writepages+0xd4/0x250 mm/page-writeback.c:2344
->
-> The reason for triggering this warning is __block_write_full_page()
-> -> i_size_read(inode) - 1 overflow.
-> inode->i_size is assigned in __nbd_ioctl() -> nbd_set_size() -> bytesize.
-> We think it is necessary to limit the size of arg to prevent errors.
->
-> Moreover, __nbd_ioctl() -> nbd_add_socket(), arg will be cast to int.
-> Assuming the value of arg is 0x80000000000000001) (on a 64-bit machine),
-> it will become 1 after the coercion, which will return unexpected results.
->
-> Fix it by adding checks to prevent passing in too large numbers.
->
-> Signed-off-by: Zhong Jinghua <zhongjinghua@huawei.com>
-> ---
->   drivers/block/nbd.c | 6 ++++++
->   1 file changed, 6 insertions(+)
->
-> diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-> index 592cfa8b765a..e1c954094b6c 100644
-> --- a/drivers/block/nbd.c
-> +++ b/drivers/block/nbd.c
-> @@ -325,6 +325,9 @@ static int nbd_set_size(struct nbd_device *nbd, loff_t bytesize,
->   	if (blk_validate_block_size(blksize))
->   		return -EINVAL;
->   
-> +	if (bytesize < 0)
-> +		return -EINVAL;
-> +
->   	nbd->config->bytesize = bytesize;
->   	nbd->config->blksize_bits = __ffs(blksize);
->   
-> @@ -1111,6 +1114,9 @@ static int nbd_add_socket(struct nbd_device *nbd, unsigned long arg,
->   	struct nbd_sock *nsock;
->   	int err;
->   
-> +	/* Arg will be cast to int, check it to avoid overflow */
-> +	if (arg > INT_MAX)
-> +		return -EINVAL;
->   	sock = nbd_get_socket(nbd, arg, &err);
->   	if (!sock)
->   		return err;
+For example, most cloud storage devices are doing read-ahead to try to
+anticipate read requests from the VM.  This can interfere with the
+read-ahead being done by the guest kernel.  So being able to tell
+cloud storage device whether a particular read request is stemming
+from a read-ahead or not.  At the moment, as Matthew Wilcox has
+pointed out, we currently use the read-ahead code path for synchronous
+buffered reads.  So plumbing this information so it can passed through
+multiple levels of the mm, fs, and block layers will probably be
+needed.
