@@ -2,41 +2,41 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DA8FC64ED6
-	for <linux-block@archiver.kernel.org>; Wed,  1 Mar 2023 14:09:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41A90C7EE43
+	for <linux-block@archiver.kernel.org>; Wed,  1 Mar 2023 14:09:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229905AbjCAOJU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S229923AbjCAOJU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Wed, 1 Mar 2023 09:09:20 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56742 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56680 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229940AbjCAOJO (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 1 Mar 2023 09:09:14 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0997122DDB
-        for <linux-block@vger.kernel.org>; Wed,  1 Mar 2023 06:08:13 -0800 (PST)
+        with ESMTP id S229695AbjCAOJN (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 1 Mar 2023 09:09:13 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73807206B1
+        for <linux-block@vger.kernel.org>; Wed,  1 Mar 2023 06:08:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1677679693;
+        s=mimecast20190719; t=1677679688;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=Vhpj5XHtWAuet7CTecEivCEMI579/oqA0+hHiaLE9Qw=;
-        b=UMHszW4Ho9eHpJzyboJweET5olD7OlcJ244Eyeb5Ht4uLOzmpyu25XS13WjDcYUguXHhwM
-        SWMz38tNR2NwsYhXWbZIzRWTp7xTCQ8oS9ifxQOuTKEUMBeAmsCO4I8mManey7Ntuwc8sH
-        r32qi2Y9o9v621hd++IeA7UJbATFka8=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=4743F7Qm1JF9Z8MoytAhj/h+tT8J4FaPqlcsGjHKeC4=;
+        b=BEV+GZE08iF+/PVxcZ09F8dNTY7ZQwMe4r7fpX63yio669tH7QnTu2eQOx2jFRVsaTeXxT
+        T+5U+5UDtbX07HdBCEgQA3kz6WSOOjy1dCGS8FcYUw0FKZd9MWX4v20oloYeIj69CRjBZ3
+        FTDimOy4CGQLOFfAQrihWF5NCD197WE=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-90-0fP1R0LHOai5xC-gLFinCA-1; Wed, 01 Mar 2023 09:08:11 -0500
-X-MC-Unique: 0fP1R0LHOai5xC-gLFinCA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
+ us-mta-151-0gcjTk4UOnKMQavsQ6UFQA-1; Wed, 01 Mar 2023 09:08:06 -0500
+X-MC-Unique: 0gcjTk4UOnKMQavsQ6UFQA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id D5AA63C0F240;
-        Wed,  1 Mar 2023 14:07:06 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 2620F8DBA77;
+        Wed,  1 Mar 2023 14:06:35 +0000 (UTC)
 Received: from localhost (ovpn-8-22.pek2.redhat.com [10.72.8.22])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 1B9D32026D68;
-        Wed,  1 Mar 2023 14:07:05 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 4B8FC40B40DF;
+        Wed,  1 Mar 2023 14:06:33 +0000 (UTC)
 From:   Ming Lei <ming.lei@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org
 Cc:     linux-block@vger.kernel.org, Miklos Szeredi <mszeredi@redhat.com>,
@@ -44,71 +44,72 @@ Cc:     linux-block@vger.kernel.org, Miklos Szeredi <mszeredi@redhat.com>,
         Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>,
         Bernd Schubert <bschubert@ddn.com>,
         Ming Lei <ming.lei@redhat.com>
-Subject: [RFC PATCH 11/12] block: ublk_drv: add common exit handling
-Date:   Wed,  1 Mar 2023 22:06:10 +0800
-Message-Id: <20230301140611.163055-12-ming.lei@redhat.com>
+Subject: [RFC PATCH 03/12] io_uring: extend io_mapped_ubuf to cover external bvec table
+Date:   Wed,  1 Mar 2023 22:06:02 +0800
+Message-Id: <20230301140611.163055-4-ming.lei@redhat.com>
 In-Reply-To: <20230301140611.163055-1-ming.lei@redhat.com>
 References: <20230301140611.163055-1-ming.lei@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.1
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Simplify exit handling a bit, and prepare for supporting fused command.
+Extend io_mapped_ubuf to cover external bvec table for supporting
+fused command kbuf, in which the bvec table could be from one IO
+request.
 
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/block/ublk_drv.c | 15 +++++++++------
- 1 file changed, 9 insertions(+), 6 deletions(-)
+ io_uring/rsrc.c | 5 +++--
+ io_uring/rsrc.h | 3 ++-
+ 2 files changed, 5 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-index 2497b91b48ba..b9e38ebabca7 100644
---- a/drivers/block/ublk_drv.c
-+++ b/drivers/block/ublk_drv.c
-@@ -655,14 +655,15 @@ static void ublk_complete_rq(struct request *req)
- 	struct ublk_queue *ubq = req->mq_hctx->driver_data;
- 	struct ublk_io *io = &ubq->ios[req->tag];
- 	unsigned int unmapped_bytes;
-+	int res = BLK_STS_OK;
- 
- 	/* failed read IO if nothing is read */
- 	if (!io->res && req_op(req) == REQ_OP_READ)
- 		io->res = -EIO;
- 
- 	if (io->res < 0) {
--		blk_mq_end_request(req, errno_to_blk_status(io->res));
--		return;
-+		res = errno_to_blk_status(io->res);
-+		goto exit;
+diff --git a/io_uring/rsrc.c b/io_uring/rsrc.c
+index a59fc02de598..c41edd197b0a 100644
+--- a/io_uring/rsrc.c
++++ b/io_uring/rsrc.c
+@@ -1221,7 +1221,7 @@ static int io_sqe_buffer_register(struct io_ring_ctx *ctx, struct iovec *iov,
+ 		goto done;
  	}
  
- 	/*
-@@ -671,10 +672,8 @@ static void ublk_complete_rq(struct request *req)
- 	 *
- 	 * Both the two needn't unmap.
- 	 */
--	if (req_op(req) != REQ_OP_READ && req_op(req) != REQ_OP_WRITE) {
--		blk_mq_end_request(req, BLK_STS_OK);
--		return;
--	}
-+	if (req_op(req) != REQ_OP_READ && req_op(req) != REQ_OP_WRITE)
-+		goto exit;
+-	imu = kvmalloc(struct_size(imu, bvec, nr_pages), GFP_KERNEL);
++	imu = kvmalloc(struct_size(imu, __bvec, nr_pages), GFP_KERNEL);
+ 	if (!imu)
+ 		goto done;
  
- 	/* for READ request, writing data in iod->addr to rq buffers */
- 	unmapped_bytes = ublk_unmap_io(ubq, req, io);
-@@ -691,6 +690,10 @@ static void ublk_complete_rq(struct request *req)
- 		blk_mq_requeue_request(req, true);
- 	else
- 		__blk_mq_end_request(req, BLK_STS_OK);
-+
-+	return;
-+exit:
-+	blk_mq_end_request(req, res);
- }
+@@ -1237,7 +1237,7 @@ static int io_sqe_buffer_register(struct io_ring_ctx *ctx, struct iovec *iov,
+ 		size_t vec_len;
  
- /*
+ 		vec_len = min_t(size_t, size, PAGE_SIZE - off);
+-		bvec_set_page(&imu->bvec[i], pages[i], vec_len, off);
++		bvec_set_page(&imu->__bvec[i], pages[i], vec_len, off);
+ 		off = 0;
+ 		size -= vec_len;
+ 	}
+@@ -1245,6 +1245,7 @@ static int io_sqe_buffer_register(struct io_ring_ctx *ctx, struct iovec *iov,
+ 	imu->ubuf = (unsigned long) iov->iov_base;
+ 	imu->ubuf_end = imu->ubuf + iov->iov_len;
+ 	imu->nr_bvecs = nr_pages;
++	imu->bvec = imu->__bvec;
+ 	*pimu = imu;
+ 	ret = 0;
+ done:
+diff --git a/io_uring/rsrc.h b/io_uring/rsrc.h
+index 774aca20326c..24329eca49ef 100644
+--- a/io_uring/rsrc.h
++++ b/io_uring/rsrc.h
+@@ -50,7 +50,8 @@ struct io_mapped_ubuf {
+ 	u64		ubuf_end;
+ 	unsigned int	nr_bvecs;
+ 	unsigned int	acct_pages;
+-	struct bio_vec	bvec[];
++	struct bio_vec	*bvec;
++	struct bio_vec	__bvec[];
+ };
+ 
+ void io_rsrc_put_tw(struct callback_head *cb);
 -- 
 2.31.1
 
