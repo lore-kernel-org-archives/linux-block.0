@@ -2,65 +2,60 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FBA8C678D4
-	for <linux-block@archiver.kernel.org>; Thu,  2 Mar 2023 09:15:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BD79C678D4
+	for <linux-block@archiver.kernel.org>; Thu,  2 Mar 2023 10:35:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229762AbjCBJPS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 2 Mar 2023 04:15:18 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49730 "EHLO
+        id S229723AbjCBKfQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 2 Mar 2023 05:35:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51430 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229496AbjCBJPR (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Mar 2023 04:15:17 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1C3F136F2
-        for <linux-block@vger.kernel.org>; Thu,  2 Mar 2023 01:14:30 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1677748470;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Gn95fNZsWohda/Gt3RBIsmBf9yhGLuJiMqSDf2HskJM=;
-        b=J7KpUdE8EK4IH/BFn7aFsNVrgoAHJibVqEi+fw/YcJd22mpDP8M0gKnZwmIpkO7tbFvh13
-        3E7vRjoWnprXLxyY3LfVoHDuV4UStcFlljy6djDIMPwrRxk6mxHhmDHk4QWNdQqaSSrOlu
-        cK0hmPXSIOZhhmDxL6MS92Shl3bXIOc=
-Received: from mail-vs1-f71.google.com (mail-vs1-f71.google.com
- [209.85.217.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-148-plMmQZdbNTOogBfHVPli7A-1; Thu, 02 Mar 2023 04:14:26 -0500
-X-MC-Unique: plMmQZdbNTOogBfHVPli7A-1
-Received: by mail-vs1-f71.google.com with SMTP id df27-20020a056102441b00b004216a8c8b91so5780279vsb.17
-        for <linux-block@vger.kernel.org>; Thu, 02 Mar 2023 01:14:26 -0800 (PST)
+        with ESMTP id S229534AbjCBKfP (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Mar 2023 05:35:15 -0500
+Received: from mail-wr1-x42c.google.com (mail-wr1-x42c.google.com [IPv6:2a00:1450:4864:20::42c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C75052DE6A
+        for <linux-block@vger.kernel.org>; Thu,  2 Mar 2023 02:35:13 -0800 (PST)
+Received: by mail-wr1-x42c.google.com with SMTP id r18so16044494wrx.1
+        for <linux-block@vger.kernel.org>; Thu, 02 Mar 2023 02:35:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=metaspace-dk.20210112.gappssmtp.com; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:in-reply-to:date
+         :subject:cc:to:from:user-agent:references:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=C52m1tVljJD1+vZ8f1h3Rfg+EcUxCxDMLMwQrEVeskg=;
+        b=Y4uGA2YtfxC/k4u+qAD3ZoxcQBK4FrMcGo8flvdcH8rOao2YVEz+Cwg6D0vYcIJfzH
+         GyC6r/kvfqUYWXNAn3c+En32gETcOv/1pqo7w9pysC6LjcOfkPtBW+QsbdEadZe2OUsw
+         tV4XisRy7HsMC/O5VVRaUDeto5Ul5aV3FkU7k/xLMhtWlpiyPltMCNyDz/DXMOvDaoBQ
+         2xAJFOK2e5Ru2Grpdf4wmjiufWmWYWMWeK+zATAmWyb7QBD7AWyaW1w2WHok8AyDruOK
+         zc9SYdG110FZnQXTkJWXAme8hVl7LFAU3h8bdmqfqsctAykwLBSZJKa9myYvcKLZInLQ
+         kdCQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1677748465;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Gn95fNZsWohda/Gt3RBIsmBf9yhGLuJiMqSDf2HskJM=;
-        b=L+GIKJaNBnSZx+tUq7tmldxOb9F2IODLhyHJgRqRlC4Uellg5+fcJdqIypLVwKagVB
-         n2uNy+ssC623/vpsxX4YmK7di9Ui75kx6ojeor8c48Y93TUNWpXyhlkZBHjQ/yFXTnMs
-         io2kFTEeqcWLeCr8Lyvq7QxuReKLJfsrSwyWmoWBR6UXVMgR+XxpVZFu4W49Di1e+bmw
-         SgpjXojxplP5FPWPln1kKZ8d9J/KxrDv4NLQL+iVj/1UhXg4xC2Vl7S+5a8z4i+3/zKh
-         DdP034OuZ7g//oM8LSKot76gye3jfJg4+XCqmxTTppeGvHDdjk3QToCxKgr3y85WSIFo
-         HWMQ==
-X-Gm-Message-State: AO0yUKUA9JGsYMRN7JJN58I9woCBshgz1cNArsq693+rV2nqD1zfT4J2
-        3/wjtiQByKXgAEWo2aYMFiRtjZjNLGP1bOi0b4++QwYblR5Uv3xD6u6r1HC8+NgBaQRR8sFT3jZ
-        etq6RO1qqZVMhbF8wuJtTbdL0ilh38KmyH9d6B3M=
-X-Received: by 2002:a67:b910:0:b0:412:364c:68be with SMTP id q16-20020a67b910000000b00412364c68bemr6074227vsn.7.1677748465726;
-        Thu, 02 Mar 2023 01:14:25 -0800 (PST)
-X-Google-Smtp-Source: AK7set9yW7PU8Zj8MjrA77EC8H0DigRUOzdN0Dz8qC8KWJKL3ib/eNM3P5KnWHbX3gi8isXs+lAWQfcMSDapi1ZlXxs=
-X-Received: by 2002:a67:b910:0:b0:412:364c:68be with SMTP id
- q16-20020a67b910000000b00412364c68bemr6074220vsn.7.1677748465514; Thu, 02 Mar
- 2023 01:14:25 -0800 (PST)
-MIME-Version: 1.0
-References: <20230224200502.391570-1-nmi@metaspace.dk> <ZAAPBFfqP671N4ue@T590>
- <87o7pblhi1.fsf@metaspace.dk> <ZABfFW+28Jlxq+Ew@T590> <ZABmAR6Du1tUVEa7@T590>
-In-Reply-To: <ZABmAR6Du1tUVEa7@T590>
-From:   Ming Lei <ming.lei@redhat.com>
-Date:   Thu, 2 Mar 2023 17:14:13 +0800
-Message-ID: <CAFj5m9+o4yNA5rNDA+EXWZthMtB+dOLOW0O788i77=Qn1eJ0qQ@mail.gmail.com>
-Subject: Re: [PATCH v2] block: ublk: enable zoned storage support
-To:     Andreas Hindborg <nmi@metaspace.dk>
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:in-reply-to:date
+         :subject:cc:to:from:user-agent:references:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=C52m1tVljJD1+vZ8f1h3Rfg+EcUxCxDMLMwQrEVeskg=;
+        b=bw0oIY5ASxFeLW7WH4NmgpUnJ37SpBXdEb5umpvFII+TZSiFal8SE1YUIjCuZUGphn
+         qodhFCCSFwzpxuybh3IsnCaTcBH3WToSUWIoIOu9ZEPN6SAwR8jif5yPooZ4aNpgh0pe
+         cJp15dRJK8gd7Kq+6CzmvSBwL8o/n1dEeNQeylmTwrFwdGOKlQrPRMzPiH6FSjbFFefF
+         jVjmE/iqfyrAId7Mq89Ye33fFbe2dui1Asxfs4eUkImMcy6/xh6BERmeFemcW2ClCJqA
+         +NfmjRhtE5FowLWTHwC7KUAtKCQc9VdFfNOLg52V4/iePS70DSK2gC46vtUV8+njrTW6
+         NXkw==
+X-Gm-Message-State: AO0yUKVJJ4U1ZBnpc963esVeOaYNPn59iWeUY+pQDJ62rWE8EI9Lrwnd
+        Xn1Xo5TOgN5rLH2uRy35b50dUA==
+X-Google-Smtp-Source: AK7set8TgU9pB6ImsSse7I0wmVLMeTLVWQIMctXtF6Tm7YmwMYVIjoe1hdG/Rszo0Ql6qKWL9efJUQ==
+X-Received: by 2002:a5d:6084:0:b0:2ca:e856:5a4 with SMTP id w4-20020a5d6084000000b002cae85605a4mr1112818wrt.26.1677753312359;
+        Thu, 02 Mar 2023 02:35:12 -0800 (PST)
+Received: from localhost ([165.225.194.195])
+        by smtp.gmail.com with ESMTPSA id s2-20020a5d6a82000000b002c53cc7504csm15329231wru.78.2023.03.02.02.35.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 02 Mar 2023 02:35:11 -0800 (PST)
+References: <20230224200502.391570-1-nmi@metaspace.dk>
+ <ZAAPBFfqP671N4ue@T590> <87o7pblhi1.fsf@metaspace.dk>
+ <ZABfFW+28Jlxq+Ew@T590> <ZABmAR6Du1tUVEa7@T590>
+ <CAFj5m9+o4yNA5rNDA+EXWZthMtB+dOLOW0O788i77=Qn1eJ0qQ@mail.gmail.com>
+User-agent: mu4e 1.9.18; emacs 28.2.50
+From:   Andreas Hindborg <nmi@metaspace.dk>
+To:     Ming Lei <ming.lei@redhat.com>
 Cc:     linux-block@vger.kernel.org, Hans Holmberg <Hans.Holmberg@wdc.com>,
         Matias Bjorling <Matias.Bjorling@wdc.com>,
         Niklas Cassel <Niklas.Cassel@wdc.com>,
@@ -68,40 +63,52 @@ Cc:     linux-block@vger.kernel.org, Hans Holmberg <Hans.Holmberg@wdc.com>,
         Jens Axboe <axboe@kernel.dk>,
         open list <linux-kernel@vger.kernel.org>,
         Damien Le Moal <damien.lemoal@opensource.wdc.com>
-Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [PATCH v2] block: ublk: enable zoned storage support
+Date:   Thu, 02 Mar 2023 11:07:15 +0100
+In-reply-to: <CAFj5m9+o4yNA5rNDA+EXWZthMtB+dOLOW0O788i77=Qn1eJ0qQ@mail.gmail.com>
+Message-ID: <87h6v3l9up.fsf@metaspace.dk>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Mar 2, 2023 at 5:02=E2=80=AFPM Ming Lei <ming.lei@redhat.com> wrote=
-:
->
-> On Thu, Mar 02, 2023 at 04:32:21PM +0800, Ming Lei wrote:
-> > On Thu, Mar 02, 2023 at 08:31:07AM +0100, Andreas Hindborg wrote:
-> > >
->
-> ...
->
-> > >
-> > > I agree about fetching more zones. However, it is no good to fetch up=
- to
-> > > a max, since the requested zone report may less than max. I was
-> >
-> > Short read should always be supported, so the interface may need to
-> > return how many zones in single command, please refer to nvme_ns_report=
-_zones().
->
-> blk_zone is part of uapi, maybe the short read can be figured out by
-> one all-zeroed 'blk_zone'?  then no extra uapi data is needed for
-> reporting zones.
 
-oops, we have blk_zone_report data for reporting zones to userspace already=
-,
-see blkdev_report_zones_ioctl(), then this way can be re-used for getting z=
-one
-report from ublk server too, right?
+Ming Lei <ming.lei@redhat.com> writes:
 
-Thanks,
-Ming
+> On Thu, Mar 2, 2023 at 5:02=E2=80=AFPM Ming Lei <ming.lei@redhat.com> wro=
+te:
+>>
+>> On Thu, Mar 02, 2023 at 04:32:21PM +0800, Ming Lei wrote:
+>> > On Thu, Mar 02, 2023 at 08:31:07AM +0100, Andreas Hindborg wrote:
+>> > >
+>>
+>> ...
+>>
+>> > >
+>> > > I agree about fetching more zones. However, it is no good to fetch u=
+p to
+>> > > a max, since the requested zone report may less than max. I was
+>> >
+>> > Short read should always be supported, so the interface may need to
+>> > return how many zones in single command, please refer to nvme_ns_repor=
+t_zones().
+>>
+>> blk_zone is part of uapi, maybe the short read can be figured out by
+>> one all-zeroed 'blk_zone'?  then no extra uapi data is needed for
+>> reporting zones.
+>
+> oops, we have blk_zone_report data for reporting zones to userspace alrea=
+dy,
+> see blkdev_report_zones_ioctl(), then this way can be re-used for getting=
+ zone
+> report from ublk server too, right?
 
+Yes that would be nice. But I did the report_zone command like a read
+operation, so we are not currently copying any buffers to user space
+when issuing the command, we just rely on the iod. I think it would be
+better to use the start_sectors and nr_sectors of the iod instead. Then
+we don't have to copy the blk_zone_report. What do you think?
+
+BR Andreas
