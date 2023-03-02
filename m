@@ -2,70 +2,262 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24A68C7EE30
-	for <linux-block@archiver.kernel.org>; Thu,  2 Mar 2023 20:32:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 03F7CC7EE30
+	for <linux-block@archiver.kernel.org>; Thu,  2 Mar 2023 22:28:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230280AbjCBUc1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 2 Mar 2023 15:32:27 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58238 "EHLO
+        id S230075AbjCBW2s (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 2 Mar 2023 17:28:48 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46604 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230248AbjCBUcO (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Mar 2023 15:32:14 -0500
-Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 498F759401;
-        Thu,  2 Mar 2023 12:31:14 -0800 (PST)
-Received: by mail-pj1-f51.google.com with SMTP id 6-20020a17090a190600b00237c5b6ecd7so3991325pjg.4;
-        Thu, 02 Mar 2023 12:31:14 -0800 (PST)
+        with ESMTP id S230071AbjCBW2r (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Mar 2023 17:28:47 -0500
+Received: from mail-wm1-x32e.google.com (mail-wm1-x32e.google.com [IPv6:2a00:1450:4864:20::32e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 92F4446AD
+        for <linux-block@vger.kernel.org>; Thu,  2 Mar 2023 14:28:45 -0800 (PST)
+Received: by mail-wm1-x32e.google.com with SMTP id t25-20020a1c7719000000b003eb052cc5ccso2803683wmi.4
+        for <linux-block@vger.kernel.org>; Thu, 02 Mar 2023 14:28:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112; t=1677796124;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=4Vj3n17J4UgdgxdunAMrzoJFevXXkcwx5YlIl5ZnJ9Y=;
+        b=hPeceQkjhxoONPAmn50T52d0isnq2oM5FHnMniCmafyx09keh8bwHTtc0DXPSf9ND0
+         Enw4Z3Re3sZ71ajskh1HeAblgir/N44DTLJWJoVScXmhPG8NARglRsl4XBlpNxwV65fF
+         dVZ/MNpcPVC5knCRr9A4XGlioKzxTv+P9q8KqxQq/0wnvJ9aynvSV38VsnVSvqlPvVVZ
+         b6Iz/221kK3a13zLCdKMZ92qwUycU19azHksH2x47ijbdzDRRuiDwY8tMEWQu0GX1NH3
+         uVr1aJan8+nHfYnHfS32sdqMQIsNSWRl7ClyWulY3YnaVfqyFH/dzmFwUhrjWt14Rp4S
+         fq9g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=wWCN7inZP0TRGmA/GhTlkv0mfyiqej/kk0d66K5ZY/U=;
-        b=PfBNcboDPymSnSduvPacoCQBnLM5OptMgGdqXuOgTC+qCv2n5cadssPthdwKmRx8sI
-         OIMDgBlBBFKdtZdVAIAf8fnfAGzEwPmlKqRmy1zBkFx9Mc1Qy2IJfe2BKFjh/h0Yz+0N
-         PYAgmXU0fbjvBa7Tpg2in4T1fSdFImlge8k/wbnq7KDeJBT4nG2eebBN8Mm0h4OwiU+P
-         JkQIo0whL9p5Db7dX5fBhMFprRlA/OOyWxR0w2po0evT+0RxzViZcjUskBY399TH7D0y
-         wtiO2W64zQMTgDIa0+kaHXOsygYnIwte7NfME4u4ALi01p3fIGLm9QeXwdaT7symJX6F
-         E5jg==
-X-Gm-Message-State: AO0yUKXiaCvCJUIpV4L+TQEABUqYdIZxwJOi1F48GXPF/nykUtTK3XM8
-        yn92zc1unh75fssfFZuC3EE=
-X-Google-Smtp-Source: AK7set/dzwMgUfMZCmT4k38vnVXEQEHngPvINzs7z28UQPic1vLaGzHuZP18iMftRf0DEt05tt9bzA==
-X-Received: by 2002:a05:6a21:7881:b0:bf:8a97:6e48 with SMTP id bf1-20020a056a21788100b000bf8a976e48mr13727498pzc.37.1677789051377;
-        Thu, 02 Mar 2023 12:30:51 -0800 (PST)
-Received: from ?IPV6:2620:15c:211:201:30f3:595a:48e5:cb41? ([2620:15c:211:201:30f3:595a:48e5:cb41])
-        by smtp.gmail.com with ESMTPSA id h18-20020aa786d2000000b005e00086250asm100939pfo.125.2023.03.02.12.30.49
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 02 Mar 2023 12:30:50 -0800 (PST)
-Message-ID: <cd00d1bc-3646-a465-920a-110b80cb887c@acm.org>
-Date:   Thu, 2 Mar 2023 12:30:47 -0800
+        d=1e100.net; s=20210112; t=1677796124;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=4Vj3n17J4UgdgxdunAMrzoJFevXXkcwx5YlIl5ZnJ9Y=;
+        b=gthe3qI+Ivnqykj0NTCNF+DG2Sk9fw/40bxsbaELQK0xEWCH7qxzls0SFUq7/gjo6S
+         +gTw29v257Vd1mOCaXU87G+wFx7pzcGeF2LinrMVFhuaqcmzVOPSOcZVxl8bArTFImFj
+         I0srWtUu0LrtOOudFwuR0ubNw8BDbQv1NRfdhikdaW2frZGb0aVsp7YlqNagJKOZgLvU
+         /Ms+6+QqxDNkuW6hXklj8cPQvONA1nFOY23pA5P70icaDE47ftaxtvo1tbLJLBJL8x1L
+         pE/P44U8lReZADYVTbg6m4L0AwppaFBE6zdNVEhVkhJ2H9otXHY+J2zbipU4yk9XWMfE
+         XaxA==
+X-Gm-Message-State: AO0yUKV1oG9zSgusUUNzO2GVrTurqWODsSBS2hL6A/iMKflukBAP1yQn
+        +1DEAw7HwnWg+/6qUgkLxycoIP05kkFIZK5E1C/WuA==
+X-Google-Smtp-Source: AK7set9AK8tEjRaK45N3D28GJWdddaSrpNHG9WlN2hjy/6tNB9GLpHORVy0vGU9zd0OeZjGlYT8zF2XeiVpozat2OeA=
+X-Received: by 2002:a05:600c:1f06:b0:3eb:5a1e:d52c with SMTP id
+ bd6-20020a05600c1f0600b003eb5a1ed52cmr2111323wmb.2.1677796123880; Thu, 02 Mar
+ 2023 14:28:43 -0800 (PST)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.1
-Subject: Re: [LSF/MM/BPF TOPIC] Cloud storage optimizations
-Content-Language: en-US
-To:     Theodore Ts'o <tytso@mit.edu>, lsf-pc@lists.linux-foundation.org
-Cc:     linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        linux-block@vger.kernel.org
-References: <Y/7L74P6jSWwOvWt@mit.edu>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <Y/7L74P6jSWwOvWt@mit.edu>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20230226203816.207449-1-ebiggers@kernel.org>
+In-Reply-To: <20230226203816.207449-1-ebiggers@kernel.org>
+From:   Nathan Huckleberry <nhuck@google.com>
+Date:   Thu, 2 Mar 2023 14:28:00 -0800
+Message-ID: <CAJkfWY4UOmizG=gm4+Zob7PhwMcmDe7mEviTb-hULT7ByCuqew@mail.gmail.com>
+Subject: Re: [PATCH] blk-crypto: make blk_crypto_evict_key() always try to evict
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        linux-fscrypt@vger.kernel.org, stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2/28/23 19:52, Theodore Ts'o wrote:
-> Unfortunately most common storage devices have
-> not supported write hints, and support for write hints were ripped out
-> last year.
+Hey Eric,
 
-Work is ongoing in T10 to add write hint support to SBC. We plan to 
-propose to restore write hint support after there is agreement in T10 
-about the approach. See also "Constrained SBC-5 Streams" 
-(http://www.t10.org/cgi-bin/ac.pl?t=d&f=23-024r0.pdf). This proposal has 
-been uploaded yesterday.
+On Sun, Feb 26, 2023 at 12:43=E2=80=AFPM Eric Biggers <ebiggers@kernel.org>=
+ wrote:
+>
+> From: Eric Biggers <ebiggers@google.com>
+>
+> Once all I/O using a blk_crypto_key has completed, filesystems can call
+> blk_crypto_evict_key().  However, the block layer doesn't call
+> blk_crypto_put_keyslot() until the request is being cleaned up, which
+> happens after upper layers have been told (via bio_endio()) the I/O has
+> completed.  This causes a race condition where blk_crypto_evict_key()
+> can see 'slot_refs > 0' without there being an actual bug.
+>
+> This makes __blk_crypto_evict_key() hit the
+> 'WARN_ON_ONCE(atomic_read(&slot->slot_refs) !=3D 0)' and return without
+> doing anything, eventually causing a use-after-free in
+> blk_crypto_reprogram_all_keys().  (This is a very rare bug and has only
+> been seen when per-file keys are being used with fscrypt.)
+>
+> There are two options to fix this: either release the keyslot in
+> blk_update_request() just before bio_endio() is called on the request's
+> last bio, or just make __blk_crypto_evict_key() ignore slot_refs.  Let's
+> go with the latter solution for now, since it avoids adding overhead to
+> the loop in blk_update_request().  (It does have the disadvantage that
+> hypothetical bugs where a key is evicted while still in-use become
+> harder to detect.  But so far there haven't been any such bugs anyway.)
 
-Bart.
+I disagree with the proposal to ignore the race condition in
+blk_crypto_evict_key(). As you said, ignoring the error could lead to
+undetected bugs in the future. Instead, I think we should focus on
+fixing the function ordering so that blk_crypto_put_keyslot() is
+called before blk_crypto_evict_key().
 
+I think the overhead is a necessary trade-off to ensure correctness.
+
+Thanks,
+Huck
+
+>
+> A related issue with __blk_crypto_evict_key() is that ->keyslot_evict
+> failing would cause the same use-after-free as well.  Fix this by always
+> removing the key from the keyslot management structures.
+>
+> Update the function documentation to properly document the semantics.
+>
+> Fixes: 1b2628397058 ("block: Keyslot Manager for Inline Encryption")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Eric Biggers <ebiggers@google.com>
+> ---
+>  block/blk-crypto-profile.c | 52 +++++++++++++++-----------------------
+>  block/blk-crypto.c         | 24 +++++++++++-------
+>  2 files changed, 36 insertions(+), 40 deletions(-)
+>
+> diff --git a/block/blk-crypto-profile.c b/block/blk-crypto-profile.c
+> index 0307fb0d95d3..29b4148cc50d 100644
+> --- a/block/blk-crypto-profile.c
+> +++ b/block/blk-crypto-profile.c
+> @@ -354,22 +354,11 @@ bool __blk_crypto_cfg_supported(struct blk_crypto_p=
+rofile *profile,
+>         return true;
+>  }
+>
+> -/**
+> - * __blk_crypto_evict_key() - Evict a key from a device.
+> - * @profile: the crypto profile of the device
+> - * @key: the key to evict.  It must not still be used in any I/O.
+> - *
+> - * If the device has keyslots, this finds the keyslot (if any) that cont=
+ains the
+> - * specified key and calls the driver's keyslot_evict function to evict =
+it.
+> - *
+> - * Otherwise, this just calls the driver's keyslot_evict function if it =
+is
+> - * implemented, passing just the key (without any particular keyslot).  =
+This
+> - * allows layered devices to evict the key from their underlying devices=
+.
+> - *
+> - * Context: Process context. Takes and releases profile->lock.
+> - * Return: 0 on success or if there's no keyslot with the specified key,=
+ -EBUSY
+> - *        if the keyslot is still in use, or another -errno value on oth=
+er
+> - *        error.
+> +/*
+> + * This is an internal function that evicts a key from an inline encrypt=
+ion
+> + * device that can be either a real device or the blk-crypto-fallback "d=
+evice".
+> + * It is used only for blk_crypto_evict_key().  For details on what this=
+ does,
+> + * see the documentation for blk_crypto_evict_key().
+>   */
+>  int __blk_crypto_evict_key(struct blk_crypto_profile *profile,
+>                            const struct blk_crypto_key *key)
+> @@ -389,22 +378,23 @@ int __blk_crypto_evict_key(struct blk_crypto_profil=
+e *profile,
+>
+>         blk_crypto_hw_enter(profile);
+>         slot =3D blk_crypto_find_keyslot(profile, key);
+> -       if (!slot)
+> -               goto out_unlock;
+> -
+> -       if (WARN_ON_ONCE(atomic_read(&slot->slot_refs) !=3D 0)) {
+> -               err =3D -EBUSY;
+> -               goto out_unlock;
+> +       if (slot) {
+> +               /*
+> +                * Note: it is a bug if the key is still in use by I/O he=
+re.
+> +                * But 'slot_refs > 0' can't be used to detect such bugs =
+here,
+> +                * since the keyslot isn't released until after upper lay=
+ers
+> +                * have already been told the I/O is complete.
+> +                */
+> +               err =3D profile->ll_ops.keyslot_evict(
+> +                               profile, key, blk_crypto_keyslot_index(sl=
+ot));
+> +               /*
+> +                * Even on ->keyslot_evict failure, we must remove the
+> +                * blk_crypto_key from the keyslot management structures,=
+ since
+> +                * the caller is allowed to free it regardless.
+> +                */
+> +               hlist_del(&slot->hash_node);
+> +               slot->key =3D NULL;
+>         }
+> -       err =3D profile->ll_ops.keyslot_evict(profile, key,
+> -                                           blk_crypto_keyslot_index(slot=
+));
+> -       if (err)
+> -               goto out_unlock;
+> -
+> -       hlist_del(&slot->hash_node);
+> -       slot->key =3D NULL;
+> -       err =3D 0;
+> -out_unlock:
+>         blk_crypto_hw_exit(profile);
+>         return err;
+>  }
+> diff --git a/block/blk-crypto.c b/block/blk-crypto.c
+> index 45378586151f..3dcbe578beb2 100644
+> --- a/block/blk-crypto.c
+> +++ b/block/blk-crypto.c
+> @@ -399,17 +399,23 @@ int blk_crypto_start_using_key(struct block_device =
+*bdev,
+>  }
+>
+>  /**
+> - * blk_crypto_evict_key() - Evict a key from any inline encryption hardw=
+are
+> - *                         it may have been programmed into
+> - * @bdev: The block_device who's associated inline encryption hardware t=
+his key
+> - *     might have been programmed into
+> - * @key: The key to evict
+> + * blk_crypto_evict_key() - Evict a blk_crypto_key from a block_device
+> + * @bdev: a block_device on which I/O using the key may have been done
+> + * @key: the key to evict
+>   *
+> - * Upper layers (filesystems) must call this function to ensure that a k=
+ey is
+> - * evicted from any hardware that it might have been programmed into.  T=
+he key
+> - * must not be in use by any in-flight IO when this function is called.
+> + * For a given block_device, this function removes the given blk_crypto_=
+key from
+> + * the keyslot management structures and evicts it from any underlying h=
+ardware
+> + * or fallback keyslot(s) it may have been programmed into.
+>   *
+> - * Return: 0 on success or if the key wasn't in any keyslot; -errno on e=
+rror.
+> + * Upper layers must call this before freeing the blk_crypto_key.  It mu=
+st be
+> + * called for every block_device the key may have been used on.  The key=
+ must no
+> + * longer be in use by any I/O when this function is called.
+> + *
+> + * Context: May sleep.
+> + * Return: 0 on success or if the key wasn't in any keyslot; -errno if t=
+he key
+> + *        failed to be evicted from a hardware keyslot.  Even in the -er=
+rno
+> + *        case, the key is removed from the keyslot management structure=
+s and
+> + *        the caller is allowed (and expected) to free the blk_crypto_ke=
+y.
+>   */
+>  int blk_crypto_evict_key(struct block_device *bdev,
+>                          const struct blk_crypto_key *key)
+>
+> base-commit: 489fa31ea873282b41046d412ec741f93946fc2d
+> --
+> 2.39.2
+>
