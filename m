@@ -2,92 +2,70 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5F66C6FA8E
-	for <linux-block@archiver.kernel.org>; Thu,  2 Mar 2023 19:46:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24A68C7EE30
+	for <linux-block@archiver.kernel.org>; Thu,  2 Mar 2023 20:32:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229901AbjCBTp7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 2 Mar 2023 14:45:59 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44740 "EHLO
+        id S230280AbjCBUc1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 2 Mar 2023 15:32:27 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58238 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229480AbjCBTp6 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Mar 2023 14:45:58 -0500
-Received: from mail-ed1-x530.google.com (mail-ed1-x530.google.com [IPv6:2a00:1450:4864:20::530])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C7D3B34F64
-        for <linux-block@vger.kernel.org>; Thu,  2 Mar 2023 11:45:13 -0800 (PST)
-Received: by mail-ed1-x530.google.com with SMTP id d30so1549487eda.4
-        for <linux-block@vger.kernel.org>; Thu, 02 Mar 2023 11:45:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=metaspace-dk.20210112.gappssmtp.com; s=20210112; t=1677786303;
-        h=mime-version:message-id:date:subject:cc:to:from:user-agent:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=hMPUGO9bDxR3ZV4lTc+t0jrVQ6Tcc5fKSmMJgPft4t4=;
-        b=lva7OhAuhi+6ocqi+qiewCfZB/jftB2NGWBFplSOsbHsAg8/oH+GAtCdOz4ms4qxpv
-         aBxjOigQyv4XgcZn5iP2fz4Qf9BsktG5FMsj/Vhev7oX6vN1JkJvKwKUBRhww1bZiBOY
-         sqOFY48VTKFUTBOF8bvZaLiKrZxd9ARghaAcmmPikgJHp6R5RnPfbT9FjVpTPCXviUWU
-         vF4ScarkGiNq9xKJr/10BO85Il952RxnmyX4WSdax6DL3FeaZO4UXXMhVFRO9/fem4/F
-         HMinPH8Inx8jO8I8b8XIwszX63P9Z6LXj0YjoX0LFXswaXZS3d07RVnnZ0lTdLg8k/rN
-         aANA==
+        with ESMTP id S230248AbjCBUcO (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Mar 2023 15:32:14 -0500
+Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 498F759401;
+        Thu,  2 Mar 2023 12:31:14 -0800 (PST)
+Received: by mail-pj1-f51.google.com with SMTP id 6-20020a17090a190600b00237c5b6ecd7so3991325pjg.4;
+        Thu, 02 Mar 2023 12:31:14 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1677786303;
-        h=mime-version:message-id:date:subject:cc:to:from:user-agent
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=hMPUGO9bDxR3ZV4lTc+t0jrVQ6Tcc5fKSmMJgPft4t4=;
-        b=D279c56PeubRhkFMZdQ81INWY4xQzlpGfH+lJdUN5DQa2gffGqbr6tNbi3xRJCPmD5
-         Pf+99fqC9rnDADLBtaLxCHid/2VBla6Jz6HmlZP9Ao/z0mdhJr2UwGPgGRmsEAay7pJs
-         Iod0tapMpQHtaMYXFUPw6chT7VO2CWLQDuh9CLUD4fnR8yhUfbC6SkwG0Ht+BgJMDqjZ
-         PORxqO2xcRYTNTEF2kXMlwyTaH6Ig5/RsJt74HfbNAdoMLcd4TeVcoveZpqKQM3dj/e8
-         dzQyAFjhHw1sjr382ntQybEgdzd3YgES8pFGpcuFfkLIqVfuVqoY3N7dzufOZ2KqRrIE
-         75Fg==
-X-Gm-Message-State: AO0yUKUm9OfN6cpG8V06Rn73tTiwPI2qwFfB9kZXRImVHjTo0QeorzT5
-        PrwGUFiciLeoVx5JJJrHXk0b9g==
-X-Google-Smtp-Source: AK7set/QhNM1zWmxOZXLJBtaeFefta7aoKQkKivNbhvxvSmloedS08PvjFKZNkbKSN8znFN8AdIDhw==
-X-Received: by 2002:a17:907:9687:b0:8b1:75a0:57fa with SMTP id hd7-20020a170907968700b008b175a057famr15439048ejc.43.1677786303629;
-        Thu, 02 Mar 2023 11:45:03 -0800 (PST)
-Received: from localhost ([79.142.230.49])
-        by smtp.gmail.com with ESMTPSA id u9-20020a50d509000000b004af70dcce7esm267179edi.40.2023.03.02.11.45.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 Mar 2023 11:45:03 -0800 (PST)
-User-agent: mu4e 1.9.18; emacs 28.2.50
-From:   Andreas Hindborg <nmi@metaspace.dk>
-To:     lsf-pc@lists.linux-foundation.org
-Cc:     linux-block@vger.kernel.org, Jens Axboe <axboe@fb.com>,
-        Christoph Hellwig <hch@lst.de>, Hannes Reinecke <hare@suse.de>,
-        Keith Busch <kbusch@kernel.org>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>,
-        Andreas Hindborg <a.hindborg@samsung.com>
-Subject: [LSF/MM/BPF TOPIC] blk_mq rust bindings
-Date:   Thu, 02 Mar 2023 20:37:04 +0100
-Message-ID: <87y1ofj5tt.fsf@metaspace.dk>
+        bh=wWCN7inZP0TRGmA/GhTlkv0mfyiqej/kk0d66K5ZY/U=;
+        b=PfBNcboDPymSnSduvPacoCQBnLM5OptMgGdqXuOgTC+qCv2n5cadssPthdwKmRx8sI
+         OIMDgBlBBFKdtZdVAIAf8fnfAGzEwPmlKqRmy1zBkFx9Mc1Qy2IJfe2BKFjh/h0Yz+0N
+         PYAgmXU0fbjvBa7Tpg2in4T1fSdFImlge8k/wbnq7KDeJBT4nG2eebBN8Mm0h4OwiU+P
+         JkQIo0whL9p5Db7dX5fBhMFprRlA/OOyWxR0w2po0evT+0RxzViZcjUskBY399TH7D0y
+         wtiO2W64zQMTgDIa0+kaHXOsygYnIwte7NfME4u4ALi01p3fIGLm9QeXwdaT7symJX6F
+         E5jg==
+X-Gm-Message-State: AO0yUKXiaCvCJUIpV4L+TQEABUqYdIZxwJOi1F48GXPF/nykUtTK3XM8
+        yn92zc1unh75fssfFZuC3EE=
+X-Google-Smtp-Source: AK7set/dzwMgUfMZCmT4k38vnVXEQEHngPvINzs7z28UQPic1vLaGzHuZP18iMftRf0DEt05tt9bzA==
+X-Received: by 2002:a05:6a21:7881:b0:bf:8a97:6e48 with SMTP id bf1-20020a056a21788100b000bf8a976e48mr13727498pzc.37.1677789051377;
+        Thu, 02 Mar 2023 12:30:51 -0800 (PST)
+Received: from ?IPV6:2620:15c:211:201:30f3:595a:48e5:cb41? ([2620:15c:211:201:30f3:595a:48e5:cb41])
+        by smtp.gmail.com with ESMTPSA id h18-20020aa786d2000000b005e00086250asm100939pfo.125.2023.03.02.12.30.49
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 02 Mar 2023 12:30:50 -0800 (PST)
+Message-ID: <cd00d1bc-3646-a465-920a-110b80cb887c@acm.org>
+Date:   Thu, 2 Mar 2023 12:30:47 -0800
 MIME-Version: 1.0
-Content-Type: text/plain
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.7.1
+Subject: Re: [LSF/MM/BPF TOPIC] Cloud storage optimizations
+Content-Language: en-US
+To:     Theodore Ts'o <tytso@mit.edu>, lsf-pc@lists.linux-foundation.org
+Cc:     linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        linux-block@vger.kernel.org
+References: <Y/7L74P6jSWwOvWt@mit.edu>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <Y/7L74P6jSWwOvWt@mit.edu>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
+On 2/28/23 19:52, Theodore Ts'o wrote:
+> Unfortunately most common storage devices have
+> not supported write hints, and support for write hints were ripped out
+> last year.
 
-I would like to suggest a session on the application of Rust in blk-mq drivers.
+Work is ongoing in T10 to add write hint support to SBC. We plan to 
+propose to restore write hint support after there is agreement in T10 
+about the approach. See also "Constrained SBC-5 Streams" 
+(http://www.t10.org/cgi-bin/ac.pl?t=d&f=23-024r0.pdf). This proposal has 
+been uploaded yesterday.
 
-At LPC I presented work on an NVMe driver for Linux written in Rust. The purpose
-of the driver is to help shape Rust abstractions of kernel APIs and to verify
-feasibility of safe Rust for high performance drivers. One suggestion from the
-audience was to look into null_blk, as this would eliminate hardware related
-overhead in benchmark results.
+Bart.
 
-I did an analysis of all the commits in the null_blk driver (currently 256
-exluding merge commits). 27% (68) of these commits are bug fixes. Out of these
-27%, 41% (28) are fixes for memory safety issues. These are issues that would be
-avoided in a Rust based implementation.
-
-I am working on an implementation of a null_blk in Rust. I plan to send a patch
-set before LSF to serve as a base of discussion.
-
-Suggested discussion points:
-============================
-
- - Feasibility in terms of performance for Rust based Linux kernel drivers
- - Importance of memory safety in the Linux Kernel and how Rust can help
- - How to maintain Rust bindings for blk-mq
-
-Best regards,
-Andreas Hindborg
