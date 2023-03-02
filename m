@@ -2,142 +2,133 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20DF6C678D4
-	for <linux-block@archiver.kernel.org>; Thu,  2 Mar 2023 13:30:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72EF5C678D4
+	for <linux-block@archiver.kernel.org>; Thu,  2 Mar 2023 14:43:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229612AbjCBNaQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 2 Mar 2023 08:30:16 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58666 "EHLO
+        id S229790AbjCBOnn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 2 Mar 2023 09:43:43 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34786 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229520AbjCBNaP (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Mar 2023 08:30:15 -0500
-Received: from mail-wr1-x42d.google.com (mail-wr1-x42d.google.com [IPv6:2a00:1450:4864:20::42d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61BBA3B3C0
-        for <linux-block@vger.kernel.org>; Thu,  2 Mar 2023 05:30:14 -0800 (PST)
-Received: by mail-wr1-x42d.google.com with SMTP id h14so16532028wru.4
-        for <linux-block@vger.kernel.org>; Thu, 02 Mar 2023 05:30:14 -0800 (PST)
+        with ESMTP id S229492AbjCBOnm (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Mar 2023 09:43:42 -0500
+Received: from mail-lj1-x231.google.com (mail-lj1-x231.google.com [IPv6:2a00:1450:4864:20::231])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C1B038037
+        for <linux-block@vger.kernel.org>; Thu,  2 Mar 2023 06:43:39 -0800 (PST)
+Received: by mail-lj1-x231.google.com with SMTP id z5so17840597ljc.8
+        for <linux-block@vger.kernel.org>; Thu, 02 Mar 2023 06:43:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=metaspace-dk.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:in-reply-to:date
-         :subject:cc:to:from:user-agent:references:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=YyJzHuLKs+zr/cuVKBWD3Qz/nQMZpEHffUi+K+l+1QU=;
-        b=Vc2Pf73L1VCdRibbTZ7bMQcFCG6AF1mApr0/+mlHaJSBJLAw+khTFC7jWoGpOkJ63m
-         reSKbpM5T8a+7snDwCdVBOgxKDkRfIVz6Yxvx6fHWe2A3t/yamsT28hniJhm2XPD0Sj9
-         k9DXKxpxBzLIVg0gSYBA38zoLUAPJg9JWiJFr3AAE3QSLzbbpvVfailTSkWDObn2c/2u
-         gpwwprROZEKQIHZ3z596Xe8qDaqjSmz+yuC4LJN66x1+WLdTwLbPSLIzVwWlkNoRB7xq
-         6Kj6B/v8gvzUbnNAjPP0kPaRFE/3LW8uB+W24jJz66hTaA9PPt5CkHlrgvnhJchqaFFN
-         sx4A==
+        d=linaro.org; s=google;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=+NuIrQyu9sctpk8pQFgxNkYy00s89JzuKjWNu0rz86k=;
+        b=SXXi6eB+umI9ANFEoFGqSrifMaE0poWztgSMyQ22TTInkNboO5fBzmLJu8AVy9bLju
+         M6kRnEzSFF0tIKScNEJKtwGknd9HA8jIlBSeNTpA9OQ0f9rWBw0Ac3o87OdBq5qpWH6L
+         Hp9grmmptCV5jVYnuggL0wtHznofM7v2nu7ZWEw049NOOS9E5JjcztTeVp7gPUE4C+L7
+         W9KHKjq1tugzlmCOetH33O/q2pd/nVAr1GvLh4ynoV7NG6AHClJbXB+UVxoFI1aYc4Cl
+         LGS6rl1Q9iruf4NB+fghiDV8qU5Rqb4VK4VKXOSyITorbvahOUZuOjakf6L33nu6LEu7
+         yeHA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:in-reply-to:date
-         :subject:cc:to:from:user-agent:references:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=YyJzHuLKs+zr/cuVKBWD3Qz/nQMZpEHffUi+K+l+1QU=;
-        b=QOxQng+PGg6jztMzbwEIgJcO1jiSOAfr/wuxHdh7hgP96gSfsuZwmcWGFfwq8V64eH
-         Avv3WispuE++3LVyGZ9NLJTXuBxDxuD+Cl6jjEcB383benX7dJkG4yEuNLTEgtynIfo7
-         rYkf+NCIqFvn5XiZ1Dt8KnQyQmCZM8vv9CPqKOR2/dIPWDD1HcSk632DY/GVpqjDOYT1
-         pY9jHhhfJwGAHUsY/yBES0I4hSQNwe424AgGbxNTKXAs0I/JnHnh/psr4+O7GlPqjDOY
-         2s60Jxu8Bd2GtpJqLygLHBHAoo/cZ8LKh7QvVapf3geeEeVk7GYGEFzFK8YsdlDtCoj5
-         8W6A==
-X-Gm-Message-State: AO0yUKVSGbttmUMCxMAdGwrvgdYtgWuEETxpkIuhsKJ+K3+7ccIEiqyo
-        hasRX+n/D6Z96v0ymd4yFd8nUQ==
-X-Google-Smtp-Source: AK7set99EhUVwt6NFx97KT++nJGpHjdKwN3zuTgRTWITeq9YaOOXLCpMSiEfB6wd19z0oAYnyHIo0A==
-X-Received: by 2002:a5d:62c6:0:b0:2c5:4c9c:e15d with SMTP id o6-20020a5d62c6000000b002c54c9ce15dmr7904802wrv.17.1677763812805;
-        Thu, 02 Mar 2023 05:30:12 -0800 (PST)
-Received: from localhost ([194.62.217.4])
-        by smtp.gmail.com with ESMTPSA id f12-20020adffccc000000b002c705058773sm15214427wrs.74.2023.03.02.05.30.12
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=+NuIrQyu9sctpk8pQFgxNkYy00s89JzuKjWNu0rz86k=;
+        b=E6e/ESEmbMa0juDDdWEWwQwN3uX5OveYIU95K1JFd2v5MlGf7oi6x6/HQihtwJ6Mrr
+         UnlWfggDVyK5YrP6nNSl6IPb5Q5qNrhWGlZVTNEBJKZGcmWEhpeIoj12lwOxhGm0sWbn
+         yg55AUdjVS/5ZX/ZZsstaiEYjpHiXhzsxPa2dIThDLHNUH4kn0mQEF0W6WDPIW5qa8wl
+         DPfdK8Mgu0Qo8u40u56eahfawLm9DD5ffHu8VjinSZI2BV2TE2d6j1oVPiRykPpdJ+1T
+         rC4elVJgkBEvv6uCJTSLY4NdX3kXjtyS3oo6RIH6rnU+XF0Vg6c7JQzO7NZNZzVgzyWe
+         GbMg==
+X-Gm-Message-State: AO0yUKUMvMV3GC2IjRla5aGaI32bxFAfQoOt6qjyii6wprlTn4vE3dWP
+        j1NPnZC+uF63blDs00k2xMrKDQ==
+X-Google-Smtp-Source: AK7set9G/UyUxQKn0i1rnrYbqkFSeGhuf1tIk4E+t5lr32TMrrq16Jkgq8TWOo69tqns9sf6xocjZA==
+X-Received: by 2002:a2e:b98c:0:b0:295:a446:cd08 with SMTP id p12-20020a2eb98c000000b00295a446cd08mr2838122ljp.6.1677768217230;
+        Thu, 02 Mar 2023 06:43:37 -0800 (PST)
+Received: from uffe-XPS13.. (h-94-254-63-18.NA.cust.bahnhof.se. [94.254.63.18])
+        by smtp.gmail.com with ESMTPSA id n15-20020a2e86cf000000b0029597ebacd0sm2070791ljj.64.2023.03.02.06.43.36
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 Mar 2023 05:30:12 -0800 (PST)
-References: <20230224200502.391570-1-nmi@metaspace.dk>
- <ZAAPBFfqP671N4ue@T590> <87o7pblhi1.fsf@metaspace.dk>
- <ZABfFW+28Jlxq+Ew@T590> <ZABmAR6Du1tUVEa7@T590>
- <CAFj5m9+o4yNA5rNDA+EXWZthMtB+dOLOW0O788i77=Qn1eJ0qQ@mail.gmail.com>
- <87h6v3l9up.fsf@metaspace.dk> <ZAChttVoCHsnXmvF@T590>
-User-agent: mu4e 1.9.18; emacs 28.2.50
-From:   Andreas Hindborg <nmi@metaspace.dk>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     linux-block@vger.kernel.org, Hans Holmberg <Hans.Holmberg@wdc.com>,
-        Matias Bjorling <Matias.Bjorling@wdc.com>,
-        Niklas Cassel <Niklas.Cassel@wdc.com>,
-        kernel test robot <lkp@intel.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        open list <linux-kernel@vger.kernel.org>,
-        Damien Le Moal <damien.lemoal@opensource.wdc.com>
-Subject: Re: [PATCH v2] block: ublk: enable zoned storage support
-Date:   Thu, 02 Mar 2023 14:28:33 +0100
-In-reply-to: <ZAChttVoCHsnXmvF@T590>
-Message-ID: <875ybjl1r0.fsf@metaspace.dk>
+        Thu, 02 Mar 2023 06:43:36 -0800 (PST)
+From:   Ulf Hansson <ulf.hansson@linaro.org>
+To:     linux-mmc@vger.kernel.org, Ulf Hansson <ulf.hansson@linaro.org>,
+        Jens Axboe <axboe@kernel.dk>
+Cc:     Wenchao Chen <wenchao.chen666@gmail.com>,
+        Adrian Hunter <adrian.hunter@intel.com>,
+        Avri Altman <avri.altman@wdc.com>,
+        Christian Lohle <cloehle@hyperstone.com>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [RFC PATCH] mmc: core: Disable REQ_FUA if the eMMC supports an internal cache
+Date:   Thu,  2 Mar 2023 15:43:30 +0100
+Message-Id: <20230302144330.274947-1-ulf.hansson@linaro.org>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+REQ_FUA is in general supported for eMMC cards, which translates into so
+called "reliable writes". To support these write operations, the CMD23
+(MMC_CAP_CMD23), needs to be supported by the mmc host too, which is common
+but not always the case.
 
-Ming Lei <ming.lei@redhat.com> writes:
+For some eMMC devices, it has been reported that reliable writes are quite
+costly, leading to performance degradations.
 
-> On Thu, Mar 02, 2023 at 11:07:15AM +0100, Andreas Hindborg wrote:
->>=20
->> Ming Lei <ming.lei@redhat.com> writes:
->>=20
->> > On Thu, Mar 2, 2023 at 5:02=E2=80=AFPM Ming Lei <ming.lei@redhat.com> =
-wrote:
->> >>
->> >> On Thu, Mar 02, 2023 at 04:32:21PM +0800, Ming Lei wrote:
->> >> > On Thu, Mar 02, 2023 at 08:31:07AM +0100, Andreas Hindborg wrote:
->> >> > >
->> >>
->> >> ...
->> >>
->> >> > >
->> >> > > I agree about fetching more zones. However, it is no good to fetc=
-h up to
->> >> > > a max, since the requested zone report may less than max. I was
->> >> >
->> >> > Short read should always be supported, so the interface may need to
->> >> > return how many zones in single command, please refer to nvme_ns_re=
-port_zones().
->> >>
->> >> blk_zone is part of uapi, maybe the short read can be figured out by
->> >> one all-zeroed 'blk_zone'?  then no extra uapi data is needed for
->> >> reporting zones.
->> >
->> > oops, we have blk_zone_report data for reporting zones to userspace al=
-ready,
->> > see blkdev_report_zones_ioctl(), then this way can be re-used for gett=
-ing zone
->> > report from ublk server too, right?
->>=20
->> Yes that would be nice. But I did the report_zone command like a read
->> operation, so we are not currently copying any buffers to user space
->> when issuing the command, we just rely on the iod.
->
-> What I meant is to reuse the format of blk_zone_report for returning
-> multiple 'blk_zone' info in single command.
->
-> The only change is that you need to allocate one bigger kernel buffer
-> to hold more 'blk_zone' in single report zone request.
->
->> I think it would be
->> better to use the start_sectors and nr_sectors of the iod instead. Then
->> we don't have to copy the blk_zone_report. What do you think?
->
-> For IN parameter of report zone command, you still can reuse
-> blk_zone_report:
->
-> struct blk_zone_report {
->         __u64           sector;
->         __u32           nr_zones;
->         __u32           flags;
-> };
->
-> Just by using the 1st two 64b words of iod for holding 'blk_zone_report',=
- and
-> keep the iod->addr field not touched.
+In a way to improve the situation, let's avoid announcing REQ_FUA support
+if the eMMC supports an internal cache, as that allows us to rely solely on
+flush-requests (REQ_OP_FLUSH) instead, which seems to be a lot cheaper.
+Note that, those mmc hosts that lacks CMD23 support are already using this
+type of configuration, whatever that could mean.
 
-I see. Would you make the first part of `struct ublksrv_io_desc` a union
-for this, or would you just cast it at the use site?
+Reported-by: Wenchao Chen <wenchao.chen666@gmail.com>
+Signed-off-by: Ulf Hansson <ulf.hansson@linaro.org>
+---
 
-BR Andreas
+Note that, I haven't been able to test this patch myself, but are relying on
+Wenchao and others to help out. Sharing some performance number before and
+after the patch, would be nice.
+
+Moreover, what is not clear to me (hence the RFC), is whether relying solely on
+flush requests are sufficient and as such if it's a good idea after all.
+Comments are highly appreciated in this regards.
+
+Kind regards
+Ulf Hansson
+
+---
+ drivers/mmc/core/block.c | 15 ++++++++++-----
+ 1 file changed, 10 insertions(+), 5 deletions(-)
+
+diff --git a/drivers/mmc/core/block.c b/drivers/mmc/core/block.c
+index 672ab90c4b2d..2a49531bf023 100644
+--- a/drivers/mmc/core/block.c
++++ b/drivers/mmc/core/block.c
+@@ -2490,15 +2490,20 @@ static struct mmc_blk_data *mmc_blk_alloc_req(struct mmc_card *card,
+ 			md->flags |= MMC_BLK_CMD23;
+ 	}
+ 
+-	if (md->flags & MMC_BLK_CMD23 &&
+-	    ((card->ext_csd.rel_param & EXT_CSD_WR_REL_PARAM_EN) ||
+-	     card->ext_csd.rel_sectors)) {
++	/*
++	 * REQ_FUA is supported through eMMC reliable writes, which has been
++	 * reported to be quite costly for some eMMCs. Therefore, let's rely
++	 * on flush requests (REQ_OP_FLUSH), if an internal cache is supported.
++	 */
++	if (mmc_cache_enabled(card->host)) {
++		cache_enabled  = true;
++	} else if (md->flags & MMC_BLK_CMD23 &&
++		  (card->ext_csd.rel_param & EXT_CSD_WR_REL_PARAM_EN ||
++		   card->ext_csd.rel_sectors)) {
+ 		md->flags |= MMC_BLK_REL_WR;
+ 		fua_enabled = true;
+ 		cache_enabled = true;
+ 	}
+-	if (mmc_cache_enabled(card->host))
+-		cache_enabled  = true;
+ 
+ 	blk_queue_write_cache(md->queue.queue, cache_enabled, fua_enabled);
+ 
+-- 
+2.34.1
+
