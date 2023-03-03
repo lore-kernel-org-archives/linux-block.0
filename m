@@ -2,192 +2,141 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DF5C6C6FA8E
-	for <linux-block@archiver.kernel.org>; Fri,  3 Mar 2023 02:55:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CC0EFC678D4
+	for <linux-block@archiver.kernel.org>; Fri,  3 Mar 2023 03:00:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229513AbjCCCzS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 2 Mar 2023 21:55:18 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45926 "EHLO
+        id S229468AbjCCDAH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 2 Mar 2023 22:00:07 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49436 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229455AbjCCCzQ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Mar 2023 21:55:16 -0500
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B813B1A674;
-        Thu,  2 Mar 2023 18:55:15 -0800 (PST)
-Received: from pps.filterd (m0333520.ppops.net [127.0.0.1])
-        by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 322K45dd008824;
-        Fri, 3 Mar 2023 02:55:07 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=to : cc : subject :
- from : message-id : references : date : in-reply-to : content-type :
- mime-version; s=corp-2022-7-12;
- bh=9PkLui8kU1OSB8iH5RRJPzxM12JoWCIptIXPCVznQZ4=;
- b=HHkvmefLFGW6X4m3K/PF5KlBIg8/00tN4Yj2OTtpqpMAbuPW6JS5joaOZ3m9M65e9I5b
- keeipzjG21oqNTgw0ppCpGUGqwDLqHgK6O5UFpmk/rI1kTFe1BhAR8kGlm5sDM861Kzq
- orllAUpz0hP5yJ/jbecWjf0ccpKYhFkg105I8/2B7v7cMcXG5QkZz8b4E+2PnLZqge9C
- es70Nr6aCqEEisrIW3gosYkGo5cjzIyPrUtTKpy4JXBHHh3iPX6oD94tcSxvLP+tApFn
- itGsv2RFYCstPWgsFzY557DdlGO3xfsTBB1+8YU4NOLkUKtOtKX09jhu6C76hX/TmWbr 5A== 
-Received: from iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta02.appoci.oracle.com [147.154.18.20])
-        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3nyba2dgpd-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 03 Mar 2023 02:55:06 +0000
-Received: from pps.filterd (iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-        by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.5/8.17.1.5) with ESMTP id 32312NUu031278;
-        Fri, 3 Mar 2023 02:55:06 GMT
-Received: from nam11-dm6-obe.outbound.protection.outlook.com (mail-dm6nam11lp2168.outbound.protection.outlook.com [104.47.57.168])
-        by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3ny8shrb2b-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 03 Mar 2023 02:55:06 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=d2eSviZ3waBMSfTqkY3hhDL9cgfM3IRX4tkunILTWFOmaAc4z/LiyyORm9eSvRpu9yiugvsdGI3Q6k7V+32JoQDMOag9cldPyIpHoaMAOloCNBEXOg4KXjfZp1qgA6+ZvIPIEtslK3DDWxNeMNuyKziu4y+hhkWMF/M0XCTtCZUfNC7aOcw3S9rHs7GrmBLRvMI4IrKgostsX7AEIyVOe0nvxftZzYMiOeQTBTzXmIUCJKAeuIhr0Q2PqGiA25MH5IDFXNZDqko6W8yyPpkk2dEBaQHhJTVK91Ac4q2PRFi9UhuEC60wTSbTnUIldS/sNg/EXaOei238QFj/36Lz7A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=9PkLui8kU1OSB8iH5RRJPzxM12JoWCIptIXPCVznQZ4=;
- b=ZWADsO2PAgySwHNX0d0L1R4tQKqQa3lpctB/1n9isqYbJ14RozZMo8QMldw9hn+Qfup1puEW5VnWEeRBsrUPDTtmiF831irntIVMuv3QR4sNwN/Ipcni3PkLDctpVaEY4+gMCeTSOFDA1EOxgEW/GLYWNgPlsOxbm5LsWG6JyiKiSJPVPvSkRThp5GpdZvfvA4ev+cS4hke0FyZX7eJ21xcZtyzysS9hBiskXSBkDMl5vPczkEBQWktQkWrg75gOTyEN5MNVUduWff3Y8s1TnqrPCoSh8z6Atojx4q1/c8pQdbfIajbTAZsd1uGjbYR7C0jlj59jhQGVd+wZ7fmS2A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=9PkLui8kU1OSB8iH5RRJPzxM12JoWCIptIXPCVznQZ4=;
- b=fo2vxaATu2eYMheMYkgbmj5UILp4mmrNrMJTX5MmqbAEPcalcJo/wpPd/8P6YRCLit33fURdo6ZZOpeVGWmTDZ7xSeKaeTCmPq8BCesIA25ptM+1j3QUFEHy6aUv96zAir6cRLoWKFS1WTXJoNxDjp69HgppDEIkI9RQwgZ9Ukg=
-Received: from PH0PR10MB4759.namprd10.prod.outlook.com (2603:10b6:510:3d::12)
- by SA1PR10MB6391.namprd10.prod.outlook.com (2603:10b6:806:257::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6156.16; Fri, 3 Mar
- 2023 02:55:02 +0000
-Received: from PH0PR10MB4759.namprd10.prod.outlook.com
- ([fe80::8ef9:5939:13aa:d6a2]) by PH0PR10MB4759.namprd10.prod.outlook.com
- ([fe80::8ef9:5939:13aa:d6a2%8]) with mapi id 15.20.6156.021; Fri, 3 Mar 2023
- 02:55:02 +0000
-To:     "Theodore Ts'o" <tytso@mit.edu>
-Cc:     lsf-pc@lists.linux-foundation.org, linux-fsdevel@vger.kernel.org,
-        linux-mm@kvack.org, linux-block@vger.kernel.org
-Subject: Re: [LSF/MM/BPF TOPIC] Cloud storage optimizations
-From:   "Martin K. Petersen" <martin.petersen@oracle.com>
-Organization: Oracle Corporation
-Message-ID: <yq1356mh925.fsf@ca-mkp.ca.oracle.com>
-References: <Y/7L74P6jSWwOvWt@mit.edu>
-Date:   Thu, 02 Mar 2023 21:54:59 -0500
-In-Reply-To: <Y/7L74P6jSWwOvWt@mit.edu> (Theodore Ts'o's message of "Tue, 28
-        Feb 2023 22:52:15 -0500")
-Content-Type: text/plain
-X-ClientProxiedBy: BL1P223CA0011.NAMP223.PROD.OUTLOOK.COM
- (2603:10b6:208:2c4::16) To PH0PR10MB4759.namprd10.prod.outlook.com
- (2603:10b6:510:3d::12)
+        with ESMTP id S229461AbjCCDAG (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Mar 2023 22:00:06 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 53FC317CD8
+        for <linux-block@vger.kernel.org>; Thu,  2 Mar 2023 18:59:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1677812362;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=ml1Mi4USLtb96dzjtzwKcD2jz6nSxexHok5ovftQxq8=;
+        b=ClckraTjqg7kMczhoucmU4ZnIHNBCPcTkOibgwwa00fbz34VM86SNxapdQiVtbj9/B39j8
+        +T3DIkMitNC6EbmWF1kkE3mzYTWmbXyfMsGf3Z/HJ7hzdnNFBCECDUJvov+zrAaix7z42C
+        Tyhbymdf5eb/2UlsU+VFYPBUci9qrpo=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-201-aL_l_Ez1OIy6a5h4oBYbWg-1; Thu, 02 Mar 2023 21:59:17 -0500
+X-MC-Unique: aL_l_Ez1OIy6a5h4oBYbWg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id BB817800B23;
+        Fri,  3 Mar 2023 02:59:16 +0000 (UTC)
+Received: from T590 (ovpn-8-16.pek2.redhat.com [10.72.8.16])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id EE9932026D4B;
+        Fri,  3 Mar 2023 02:59:10 +0000 (UTC)
+Date:   Fri, 3 Mar 2023 10:59:05 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Andreas Hindborg <nmi@metaspace.dk>
+Cc:     linux-block@vger.kernel.org, Hans Holmberg <Hans.Holmberg@wdc.com>,
+        Matias Bjorling <Matias.Bjorling@wdc.com>,
+        Niklas Cassel <Niklas.Cassel@wdc.com>,
+        kernel test robot <lkp@intel.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        open list <linux-kernel@vger.kernel.org>,
+        Damien Le Moal <damien.lemoal@opensource.wdc.com>
+Subject: Re: [PATCH v2] block: ublk: enable zoned storage support
+Message-ID: <ZAFieW9PZ2LNQYHa@T590>
+References: <20230224200502.391570-1-nmi@metaspace.dk>
+ <ZAAPBFfqP671N4ue@T590>
+ <87o7pblhi1.fsf@metaspace.dk>
+ <ZABfFW+28Jlxq+Ew@T590>
+ <ZABmAR6Du1tUVEa7@T590>
+ <CAFj5m9+o4yNA5rNDA+EXWZthMtB+dOLOW0O788i77=Qn1eJ0qQ@mail.gmail.com>
+ <87h6v3l9up.fsf@metaspace.dk>
+ <ZAChttVoCHsnXmvF@T590>
+ <875ybjl1r0.fsf@metaspace.dk>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR10MB4759:EE_|SA1PR10MB6391:EE_
-X-MS-Office365-Filtering-Correlation-Id: fe3ba49c-b328-4e0a-8640-08db1b92af6f
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: prUzrPjWxJjGxQCAP4COz9yQlRKHQ5aUG6BsnEoTy3eeABGL3+yO489qY1Lt4eqB0rGXALlulC/GqN+YtGwaOsTsJF7q4244m/yI9BFI4Ux6pizucxfJht8IU0f90MWy1wY5mp2GncLXq/mBkWf/Ct3QxbMWP2UXsXeVKzzdw9dVK0tAPCmiGXvPpKS/dy4rni9osWPYLJUqljr4dXPI7Oos1LZh3/urlQ9g2oLl0jHqdxnA9xZHXDO4jneu7Kae4Fck1Zz4YrnbnXSpAW0/UShjdtP4i8xuIRGa2FYG8RT3T8N29+VigAZOEDpekChDG6lkM1GCh6iGHUZ8DuP+8mrb0XQjeZNa8qZL61WOMvHRuxchIdYocYpRhSJzOTrrzN5NGLoXd703nG94DQrYcKaqWOVymZU7tGJK6bMeikBSjp32XboaGRoCU76gJ66wL9W+40rqMaCclsm9M9+/1KeNZ7fXy+T06kC0502ykxC6A7WQt7fHVmo73qmOj36tv5TVid+FtYi3Dbw3ytk0M2LvewvzN8IqfdnsSX6zakqa2sUOJjxuJg9oodAUm1VJsx7HKS0Uvw97OiHMLUbIc/ZxtlsNl6oieSVCM4xcUECS/7CHZ2oO3QUDL1I0GPEXXe6L5e0P1/cmKjUmAchP3Q==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR10MB4759.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(376002)(396003)(136003)(346002)(366004)(39860400002)(451199018)(26005)(6506007)(6512007)(83380400001)(186003)(6666004)(316002)(36916002)(41300700001)(2906002)(86362001)(6486002)(38100700002)(8936002)(6916009)(4326008)(8676002)(66946007)(66476007)(5660300002)(66556008)(478600001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?AhwlOnsNfbYQ9avuKaOaieMBhnVEWk+8q4kIuA4et6CX5odsOFrgitiBk+U4?=
- =?us-ascii?Q?aM0zk2yb4QRS5G+ei9J5KzlEoxY1ghRAkfk0ffu61t7ETQ2ZWxb0MQMK0Dha?=
- =?us-ascii?Q?tb+WhLvzubHNC7PupTsKfz+KOznyjidnp5jpSufzgO/C4uIlBe7px62mE7BX?=
- =?us-ascii?Q?PyEJ6kNWfDfQpd8IMsvZy4c4jtFBcIw/oIvjl3pUIPHrnRW34oDT0wG68oNd?=
- =?us-ascii?Q?at9hk2pwUxmvypD3Ss2UWkxWeTnkMghpYaI+rgrVY+dAG4hf/6OBLnMJPqg3?=
- =?us-ascii?Q?cCwDB+ijVeB9mK+UxsYqdgqnoHBgReIQkSFUZXqI+C/ubXzZYnhyCutCYn4P?=
- =?us-ascii?Q?ROzv5VrCGUnC0xbXSxiJbvNTbpsjCU8wbKmAKer1sz5AzDbAvXHyDAjdGGF1?=
- =?us-ascii?Q?nYN2FsapNTBAg98R26yC/SOhaoSPicKG63eD6yFiYJw2nDaN/b4xqq4xAvtn?=
- =?us-ascii?Q?80joYbuJJ2ELyUUhtAHJYqRzzHSlSypg2HgQQVzvfiQKu5xh+HPcL2IyEgR6?=
- =?us-ascii?Q?jge2HPfL4MFX5FifvBZqdze/kaXDyQFzet0C64I194ZM2XNjXm4Y7PffHB6f?=
- =?us-ascii?Q?mBYgyoJ6AdjrPR7gI9l4eJ2PYPjtXmxNlOuqr0kTbVRodQveu+Bfsmed707Q?=
- =?us-ascii?Q?qv9TkAGuv7EzVaO/irUbBS0CMOQGmLFGSvWtZMEYQjCE0H4AN9xvLTeG1vDn?=
- =?us-ascii?Q?FZ24Yf3vnRauou/rYYa8JK2u7ayJxYDnladnHf7J+DQAkvkWhw2SFO8jrFjb?=
- =?us-ascii?Q?RRgl8MCBkCDNvS/QVKkr7rjcojbkC10BJaUWMOVOJwoVzuTtcZiGVak6+fRn?=
- =?us-ascii?Q?JeqA0b2hxPl1+ux507QwVxG4ItxvSDxkPx9vjBu7afXVvd4HkIqjDz4p3lKx?=
- =?us-ascii?Q?kkHL/PVqBjYOS7qOQ90qmXGsG4XKrmkuhu8w5dtIoeNZ4IGpZXwubgu97GuJ?=
- =?us-ascii?Q?EOLeoNrzu2aHumhsk2jZD2S/gO40CTIbYY8FuhR4GF3Gqy8uc/1QeK7yIIJS?=
- =?us-ascii?Q?IXhzfxDCxQu6efooqaNJ++zDV/1TVQ3lrMWIutMqEtkd+V7JmVwr6xIKREvd?=
- =?us-ascii?Q?JYo5UNGhTQIAHZQEJyX97LexHl3jbInpTTTudguoECV6h25wl9EAsu66ljhI?=
- =?us-ascii?Q?yPO18EPXMn8TKUHSCT5ls5ngNgZg94FAVJe4O6fepoLQqR3XjHpnJY9b7t3F?=
- =?us-ascii?Q?8xO8hI7kwhzmlfc8Y5nCffqvBagBbg2odlvlSANCyJLltgvQ2/mtmHFcGkQv?=
- =?us-ascii?Q?n4LaLHQCBFD/8kcnElLcwbUOLG4k4H9wG9Jym4veGr5l1ww0PoTGSXQMWaLy?=
- =?us-ascii?Q?zTw4bp+wcGL1lyxQAwOFVkXc+hbia2BYDFfBkUCAw9Kj5LKXpLZgTRuzD4hQ?=
- =?us-ascii?Q?gyG+RuZ7xQvmypzP76cCfaCGybTWXQZvZg35QQMY5z0KKiMBfXrcBAQnhdQR?=
- =?us-ascii?Q?iHSP0WeJomdNqoipIFECZxQf+kX+Tfv/dWN61zdvkKM2RybU2/NOCTcgrZ/u?=
- =?us-ascii?Q?/Xk5eLGb/J3IYaevTrWVxFtEg0r6PFOuruSfBxk9BeH6NwEQ7B94uRBQTFGt?=
- =?us-ascii?Q?MfbuHNycrlaXn63fb39NGUJOD2waWwT5Dz1N5YSLZ+p4PH1umEMTMUNWlpKm?=
- =?us-ascii?Q?qA=3D=3D?=
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: HG1xU3FVhdJ33nGT/MzVs8YN4Ns2FUfJngaycbHGE8wXOl+d821IrYlRrWHzPlzv4FiEG6A2EUZWVSH1eOoNn6ONVFyHTrF5HvNxoAE/7XfjF1jpo2dyKtRXSeTJNBag/YqmKl/Ti2UjJviy5ES35gpugJy0qBnewSjwQ3EvNypK/x1fmLs/fZVC06n+Q1TgqQUoABGC2se22ntsQyIZYvJE+9cWUPQt/uLDv8UIxxeK2LKRFX3/MmTfOGNLCwznz7XnMnvHbJ2rgNXLOI6N/xubcA+5LvmnQ9F6N6Y1BmiVIJMuRK3dmPYaIsB/96rgiN4DchBbUy1MvNNAsv1jKDRz0k52tczUC9BUOP/tc2L6L6/LgU2VVmyk2tQUpd4+Wl6G74KyAravxi6UBP9QcXv791HKZIi5aJYANQwrrkkiec8oeExe8GH3yb6qeJRyZsn7u3InoqD8srNPx4Xt7jDYgv/qnhAZOlsV6AS9B06h7DbuYFECcnU6b3+UrPiN0/sNFSkjlH/Y6El3FPLE9Tz9QnU5AtnJjnzxC7zJsDt69AMU/6yosBM1Yf3Eyb2IF6EQtcDa7wqAmKAXm0llCjhRpHGjMRFYqcUbNdocrBenpY36fmuVj51QLmczbRwU8lv5ZGLnguYprDiek6FD7SjCy5wE2s3qWkeMImiypZOV7ZUBsCcHc8dKkgSN+bYmllX1cySq93aMn8wuxemusNnlEUeGQ/hKRKRJK3fbll2FrR9OMC+9ZCmNIjavk2yXJ0KYcZM6NK3Zl+ne92MvrNoy0Wia9t6Pvb3LvnOjOrd0BV7iRsdUQUrDtneQuRHoTEKGWU/DtVri/TSziEUKtGd/Vclvfcoi64MM4qLr6Tf7B5+T8/1gz4f3pMjaScl0
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: fe3ba49c-b328-4e0a-8640-08db1b92af6f
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR10MB4759.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Mar 2023 02:55:02.7116
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: xkPSpCb3L0JW48EnO7vKuFItZ0O0F+/6V7W/vwd6Plemml9AbPeOoxGcg91ygfylXwrHoBQolOfq9oznWaEYtGpDMgnsOwxhr7X2MVmRRhU=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR10MB6391
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
- definitions=2023-03-03_01,2023-03-02_02,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 mlxlogscore=687 mlxscore=0
- adultscore=0 bulkscore=0 malwarescore=0 phishscore=0 suspectscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2212070000
- definitions=main-2303030023
-X-Proofpoint-GUID: fp8JgGzPrElqtgO4HIQG5k1RyOQMPx7m
-X-Proofpoint-ORIG-GUID: fp8JgGzPrElqtgO4HIQG5k1RyOQMPx7m
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <875ybjl1r0.fsf@metaspace.dk>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Thu, Mar 02, 2023 at 02:28:33PM +0100, Andreas Hindborg wrote:
+> 
+> Ming Lei <ming.lei@redhat.com> writes:
+> 
+> > On Thu, Mar 02, 2023 at 11:07:15AM +0100, Andreas Hindborg wrote:
+> >> 
+> >> Ming Lei <ming.lei@redhat.com> writes:
+> >> 
+> >> > On Thu, Mar 2, 2023 at 5:02 PM Ming Lei <ming.lei@redhat.com> wrote:
+> >> >>
+> >> >> On Thu, Mar 02, 2023 at 04:32:21PM +0800, Ming Lei wrote:
+> >> >> > On Thu, Mar 02, 2023 at 08:31:07AM +0100, Andreas Hindborg wrote:
+> >> >> > >
+> >> >>
+> >> >> ...
+> >> >>
+> >> >> > >
+> >> >> > > I agree about fetching more zones. However, it is no good to fetch up to
+> >> >> > > a max, since the requested zone report may less than max. I was
+> >> >> >
+> >> >> > Short read should always be supported, so the interface may need to
+> >> >> > return how many zones in single command, please refer to nvme_ns_report_zones().
+> >> >>
+> >> >> blk_zone is part of uapi, maybe the short read can be figured out by
+> >> >> one all-zeroed 'blk_zone'?  then no extra uapi data is needed for
+> >> >> reporting zones.
+> >> >
+> >> > oops, we have blk_zone_report data for reporting zones to userspace already,
+> >> > see blkdev_report_zones_ioctl(), then this way can be re-used for getting zone
+> >> > report from ublk server too, right?
+> >> 
+> >> Yes that would be nice. But I did the report_zone command like a read
+> >> operation, so we are not currently copying any buffers to user space
+> >> when issuing the command, we just rely on the iod.
+> >
+> > What I meant is to reuse the format of blk_zone_report for returning
+> > multiple 'blk_zone' info in single command.
+> >
+> > The only change is that you need to allocate one bigger kernel buffer
+> > to hold more 'blk_zone' in single report zone request.
+> >
+> >> I think it would be
+> >> better to use the start_sectors and nr_sectors of the iod instead. Then
+> >> we don't have to copy the blk_zone_report. What do you think?
+> >
+> > For IN parameter of report zone command, you still can reuse
+> > blk_zone_report:
+> >
+> > struct blk_zone_report {
+> >         __u64           sector;
+> >         __u32           nr_zones;
+> >         __u32           flags;
+> > };
+> >
+> > Just by using the 1st two 64b words of iod for holding 'blk_zone_report', and
+> > keep the iod->addr field not touched.
+> 
+> I see. Would you make the first part of `struct ublksrv_io_desc` a union
+> for this, or would you just cast it at the use site?
 
-Hi Ted!
+oops, you still need iod->op_flags for recognizing the io op, so just
+start_sector and nr_sectors can be used.
 
-> With NVMe, it is possible for a storage device to promise this without
-> requiring read-modify-write updates for sub-16k writes.  All that is
-> necessary are some changes in the block layer so that the kernel does
-> not inadvertently tear a write request when splitting a bio because it
-> is too large (perhaps because it got merged with some other request,
-> and then it gets split at an inconvenient boundary).
+However, this way isn't good too, cause UBLK_IO_OP_DRV_IN is just mapped
+to 'report zone' command in your implementation, what if new pt request
+is required in future?
 
-We have been working on support for atomic writes and it is not a simple
-as it sounds. Atomic operations in SCSI and NVMe have semantic
-differences which are challenging to reconcile. On top of that, both the
-SCSI and NVMe specs are buggy in the atomics department. We are working
-to get things fixed in both standards and aim to discuss our
-implementation at LSF/MM.
+We need to think about how to support ublk pt request in generic way.
 
-> There are also more interesting, advanced optimizations that might be
-> possible.  For example, Jens had observed the passing hints that
-> journaling writes (either from file systems or databases) could be
-> potentially useful.
+Thanks,
+Ming
 
-Yep. We got very impressive results identifying journal writes and the
-kernel implementation was completely trivial, but...
-
-> Unfortunately most common storage devices have not supported write
-> hints, and support for write hints were ripped out last year.  That
-> can be easily reversed, but there are some other interesting related
-> subjects that are very much suited for LSF/MM.
-
-Hinting didn't see widespread adoption because we in Linux, as well as
-the various interested databases, preferred hints to be per-I/O
-properties. Whereas $OTHER_OS insisted that hints should be statically
-assigned to LBA ranges on media. This left vendors having to choose
-between two very different approaches and consequently they chose not to
-support any of them.
-
-However, hints are coming back in various forms for non-enterprise and
-cloud storage devices so it's good to revive this discussion.
-
-> For example, most cloud storage devices are doing read-ahead to try to
-> anticipate read requests from the VM.  This can interfere with the
-> read-ahead being done by the guest kernel.  So being able to tell
-> cloud storage device whether a particular read request is stemming
-> from a read-ahead or not.
-
-Indeed. In our experience the hints that work best are the ones which
-convey to the storage device why the I/O is being performed.
-
--- 
-Martin K. Petersen	Oracle Linux Engineering
