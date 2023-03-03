@@ -2,125 +2,142 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 764A4C678D4
-	for <linux-block@archiver.kernel.org>; Fri,  3 Mar 2023 04:20:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 233FFC7EE2F
+	for <linux-block@archiver.kernel.org>; Fri,  3 Mar 2023 06:57:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229471AbjCCEUl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 2 Mar 2023 23:20:41 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47384 "EHLO
+        id S229616AbjCCG5h (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 3 Mar 2023 01:57:37 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33466 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229447AbjCCEUj (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Mar 2023 23:20:39 -0500
-Received: from outgoing.mit.edu (outgoing-auth-1.mit.edu [18.9.28.11])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2246B15149
-        for <linux-block@vger.kernel.org>; Thu,  2 Mar 2023 20:20:36 -0800 (PST)
-Received: from cwcc.thunk.org (pool-173-48-120-46.bstnma.fios.verizon.net [173.48.120.46])
-        (authenticated bits=0)
-        (User authenticated as tytso@ATHENA.MIT.EDU)
-        by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 3234KQlt012375
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 2 Mar 2023 23:20:27 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mit.edu; s=outgoing;
-        t=1677817228; bh=UnVn9SQXj+xQGHz65tda2oIv7yPINQJtjR6aYPfdJQU=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To;
-        b=WgYhcgiqsg+8sSl2tOb2NDrxj/5T0ISlbi0RcKr2x0kBTqiWGBlYNE8QE4Q27lPsp
-         eyw+YObQY+obW56PQZApKtdg8b4zNsReYomY6W+n4rHtS+WOooAfcd5n5sB9looxwN
-         28b983j4GY13CIWhaYkHbORFZVjEiwJXUoxA+07f1cb50w9r8iv2pUyHt0o4DKudq3
-         YSC36+1NK2qlCdl/icP9DtI7UF+/Vplf729UHt3KGaEGJbAAPwtsK0ZifbrD5vpFYm
-         hfaMjP4NyPIOOT2nZqqGFH9/LuDLgd6t+nwvxv+14MR+qa2LnlkhXHeTLd/53WfhYp
-         a2kfSYlsg5piw==
-Received: by cwcc.thunk.org (Postfix, from userid 15806)
-        id 3C34215C3593; Thu,  2 Mar 2023 23:20:26 -0500 (EST)
-Date:   Thu, 2 Mar 2023 23:20:26 -0500
-From:   "Theodore Ts'o" <tytso@mit.edu>
-To:     "Martin K. Petersen" <martin.petersen@oracle.com>
-Cc:     lsf-pc@lists.linux-foundation.org, linux-fsdevel@vger.kernel.org,
-        linux-mm@kvack.org, linux-block@vger.kernel.org
-Subject: Re: [LSF/MM/BPF TOPIC] Cloud storage optimizations
-Message-ID: <ZAF1iuaXTJEvOe5c@mit.edu>
-References: <Y/7L74P6jSWwOvWt@mit.edu>
- <yq1356mh925.fsf@ca-mkp.ca.oracle.com>
+        with ESMTP id S229636AbjCCG5e (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 3 Mar 2023 01:57:34 -0500
+Received: from esa1.hgst.iphmx.com (esa1.hgst.iphmx.com [68.232.141.245])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1867A29E00
+        for <linux-block@vger.kernel.org>; Thu,  2 Mar 2023 22:57:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1677826652; x=1709362652;
+  h=message-id:date:mime-version:subject:to:references:from:
+   in-reply-to:content-transfer-encoding;
+  bh=h6o+qH748RiJrnvZ5x1FcoTbX18JCtSOtr2uOHizk7c=;
+  b=caQ4Xkz/2Rdt+1nRlSla1N8IgZe3aHMSazrPmv5bGsdjhmpF4NLHVl1H
+   nuvJslMph5yD4oBXWha/RXswyVrcg90Eo4Qyd2HO/MERZJ6XEoqY9UBl9
+   8RHlPoHB71+GmMRdF8lwxUUrxV0qv1SNBSssJ+mx09acekrT56rb6Xn8k
+   PzytF2ERjHW0rwO4z5zYyJ+QuoF7vtc9b4URIHgZyVb6T8Y4FyW9E4ttJ
+   /A4WTGPykZNaupMpZ9jZ1fkW9DKYoZw3ihUzdrtLTLNLH4Y46qBo45oZC
+   RoCC6QQng4AMtBzpniCWwAAHgSVIJBdjAs83/nJ/BjoTsGTT7zKphuY+7
+   A==;
+X-IronPort-AV: E=Sophos;i="5.98,229,1673884800"; 
+   d="scan'208";a="336685899"
+Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
+  by ob1.hgst.iphmx.com with ESMTP; 03 Mar 2023 14:57:32 +0800
+IronPort-SDR: VEOckvpx8n8vg+zu5Ov1kNt0UJNaCMtuVOSTz9c4ykgiP2hIRjMxkf9MbVbMy8W1OnJ+lv8mCX
+ Mz6ti9k2LWMwLLEoLNxS0OJzYDtBFPvWUc11+GEtFWqzpAOHsho0IFZ04Xv1es4mEaezQ3tJ8S
+ BxXGL3Y2oPJgdPzQ0ala2m/X5ad1ECgrkFkE30brLgzR955/o8REeoccMMCNbB9IPQt3ix+p+8
+ uu/5EPKBxizE2Z0nSTPkeSKmo4U6BdE+Q9kFxXbNifK9E6giCOlyn52h3U6RyrHVsfv1IUo4FV
+ FCY=
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 02 Mar 2023 22:14:20 -0800
+IronPort-SDR: i7YudilCZ7OZUQqXtFcX4a/zUL+Uc8ydCqqdJedxz80VMBP+DoXIVD1x3aXY1ORFzcsgtaDuYn
+ 4WM6hjvbjznmUvc/QqN+tocFiegMRLEalCPYzRDy5Gpm7lA4d6XjASgUqBu42cM4FxaEb/iNMW
+ pvP69g2wclZcaHKWCaUZFp09RpglF9LgZxl1gr+6WBj/muUXD46NDPSpXtWCesfoJHOqySh9pj
+ IfC/9h0TrT8XlLOSd+jRtuXB7F+RX8cXX2qWYvBOGkq08bFeq0h8gG9GvrVLrS79HAxh4n7O7+
+ ieg=
+WDCIronportException: Internal
+Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
+  by uls-op-cesaip02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 02 Mar 2023 22:57:32 -0800
+Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4PSf180J9Jz1RvTr
+        for <linux-block@vger.kernel.org>; Thu,  2 Mar 2023 22:57:32 -0800 (PST)
+Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
+        reason="pass (just generated, assumed good)"
+        header.d=opensource.wdc.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
+        opensource.wdc.com; h=content-transfer-encoding:content-type
+        :in-reply-to:organization:from:references:to:content-language
+        :subject:user-agent:mime-version:date:message-id; s=dkim; t=
+        1677826650; x=1680418651; bh=h6o+qH748RiJrnvZ5x1FcoTbX18JCtSOtr2
+        uOHizk7c=; b=TZIy31DeOx4uii6oGm2q46ruHwzfh8G2pVGWgb8zweKTkNavoT6
+        HMn63pzLT/6qRGUheQVtsg77aqPorn9pht9SdaVwCYDQ+RMc75FIu5vAPES7NP+Z
+        +z7xpRLhmCH1UQVxGWuCjg/M6NT1SObpFsJYprg0ixEhFUIz80s0a7u/H5B+5Fri
+        ZarB0kgZRHtetbhOwLuTaHEiuH1upDpxSHWl/2yJv1Eqaqou5QQXmEwKq3dkmGbC
+        CzQ9+aJCmzKySv8n/QqABKSUMsVyfdVqd4vtvce/NeAC1yrWZdx5KdautEkQXGrh
+        NSHg63Ada4fZwjiLqjaYiDL6d5WlRNh3cag==
+X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
+Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
+        by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
+        with ESMTP id 19gI5lExixnJ for <linux-block@vger.kernel.org>;
+        Thu,  2 Mar 2023 22:57:30 -0800 (PST)
+Received: from [10.225.163.47] (unknown [10.225.163.47])
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4PSf1555s3z1RvLy;
+        Thu,  2 Mar 2023 22:57:29 -0800 (PST)
+Message-ID: <821d9c72-5d19-4099-cb65-f3056f6a46c5@opensource.wdc.com>
+Date:   Fri, 3 Mar 2023 15:57:28 +0900
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <yq1356mh925.fsf@ca-mkp.ca.oracle.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.8.0
+Subject: Re: [LSF/MM/BPF TOPIC] Hybrid SMR HDDs / Zone Domains & Realms
+Content-Language: en-US
+To:     Bart Van Assche <bvanassche@acm.org>,
+        Khazhy Kumykov <khazhy@chromium.org>,
+        lsf-pc@lists.linux-foundation.org, linux-block@vger.kernel.org,
+        linux-scsi@vger.kernel.org
+References: <CACGdZYKXqNe08VqcUrrAU8pJ=f88W08V==K6uZxRgynxi0Hyhg@mail.gmail.com>
+ <ad8b054a-26a5-ea60-9c66-4a6b63ca27ef@acm.org>
+ <54fb85ac-7c45-f77f-11d7-9cb072f702fb@opensource.wdc.com>
+ <569dc9d2-3e6c-0efc-560c-bfcacfbfbda7@acm.org>
+ <8e3643a5-80bd-8c02-8e83-a2c1341babcc@opensource.wdc.com>
+ <c719261e-203e-18f2-b72a-de0c64011efe@acm.org>
+From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
+Organization: Western Digital Research
+In-Reply-To: <c719261e-203e-18f2-b72a-de0c64011efe@acm.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Mar 02, 2023 at 09:54:59PM -0500, Martin K. Petersen wrote:
+On 3/3/23 03:26, Bart Van Assche wrote:
+> On 3/1/23 18:03, Damien Le Moal wrote:
+>> But that is the issue: zones in the middle of each domain can be
+>> activated/deactivated dynamically using zone activate command. So there is
+>> always the possibility of ending up with a swiss cheese lun, full of hole of
+>> unusable LBAs because the other domains (other LUN) activated some zones which
+>> deactivate the equivalent zone(s) in the other domain.
+>>
+>> With your idea, the 2 luns would not be independent as they both would be using
+>> LBAs are mapped against a single set of physical blocks. Zone activate command
+>> allows controlling which domains has the mapping active. So activating a zone in
+>> one domains results in the zone[s] using the same mapping in the other domain to
+>> be deactivated.
 > 
-> Hi Ted!
+> Hi Damien,
 > 
-> > With NVMe, it is possible for a storage device to promise this without
-> > requiring read-modify-write updates for sub-16k writes.  All that is
-> > necessary are some changes in the block layer so that the kernel does
-> > not inadvertently tear a write request when splitting a bio because it
-> > is too large (perhaps because it got merged with some other request,
-> > and then it gets split at an inconvenient boundary).
+> Your reply made me realize that I should have provided more information. 
+> What I'm proposing is the following:
+> * Do not use any of the domains & realms features from ZBC-2.
+> * Do not make any zones visible to the host before configuration of the 
+> logical units has finished. Only make the logical units visible to the 
+> host after configuration of the logical units has finished. Do not 
+> support reconfiguration of the logical units while these are in use by 
+> the host.
+> * Only support active zones. Do not support inactive zones.
+> * Introduce a new mechanism for configuring the logical units.
+
+That is not how the zone domains/zone realms feature is defined. Matching this
+would require specifications changes. But an even bigger problem is that this
+would not work for ATA drives (ZAC-2) as the concept of LUNs does not exist.
+
 > 
-> We have been working on support for atomic writes and it is not a simple
-> as it sounds. Atomic operations in SCSI and NVMe have semantic
-> differences which are challenging to reconcile. On top of that, both the
-> SCSI and NVMe specs are buggy in the atomics department. We are working
-> to get things fixed in both standards and aim to discuss our
-> implementation at LSF/MM.
+> This is not a new idea. The approach described above is already 
+> supported since considerable time by UFS devices. The provisioning 
+> mechanism supported by UFS devices is defined in the UFS standard and is 
+> not based on SCSI commands.
+> 
+> Bart.
+> 
 
-I'd be very interested to learn more about what you've found.  I know
-more than one cloud provider is thinking about how to use the NVMe
-spec to send information about how their emulated block device work.
-This has come up at our weekly ext4 video conference, and given that I
-gave a talk about it in 2018[1], there's quite a lot of similarity of
-what folks are thinking about.  Basically, MySQL and Postgres use 16k
-database pages, and if we can avoid their special doublewrite
-techniques to avoid torn writes, because they can depend on their
-Cloud Block Devices Working A Certain Way, it can make for very
-noticeable performance improvements.
+-- 
+Damien Le Moal
+Western Digital Research
 
-[1] https://www.youtube.com/watch?v=gIeuiGg-_iw
-
-So while the standards might allow standards-compliant physical
-devices to do some really wierd sh*t, it might be that if all cloud
-vendors do things in the same way, I could see various cloud workloads
-starting to depending on extra-standard behaviour, much like a lot of
-sysadmins assume that low-numbered LBA's are on the outer diamenter of
-the HDD and are much more performant than sectors on the i.d. of the
-HDD.  This is completely not guaranteed by the standard specs, but
-it's become a defacto standard.
-
-That's not a great place to be, and it would be great if can find ways
-that are much more reliable in terms of querying a standards-compliant
-storage device and knowing whether we can depend on a certain behavior
---- but I also know how slowly storage standards bodies move.  :-(
-
-> Hinting didn't see widespread adoption because we in Linux, as well as
-> the various interested databases, preferred hints to be per-I/O
-> properties. Whereas $OTHER_OS insisted that hints should be statically
-> assigned to LBA ranges on media. This left vendors having to choose
-> between two very different approaches and consequently they chose not to
-> support any of them.
-
-I wasn't aware of that history.  Thanks for filling that bit in.
-
-Fortunately, in 2023, it appears that for many cloud vendors, the
-teams involved care a lot more about Linux than $OTHER_OS.  So
-hopefully we'll have a lot more success in getting write hints
-generally available to hyperscale cloud customers.
-
-From an industry-wide perspective, it would be useful if the write
-hints used by Hyperscale Cloud Vendor #1 are very similar to what
-write hints are supported by Hyperscale Cloud Vendor #2.  Standards
-committees aren't the only way that companies can collaborate in an
-anti-trust compliant way.  Open source is another way; and especially
-if we can show that a set of hints work well for the Linux kernel and
-Linux applications ---- then what we ship in the Linux kernel can help
-shape the set of "write hints" that cloud storage devices will
-support.
-
-					- Ted
-
-P.S.  From a LSF/MM program perspective, I suspect we may want to have
-more than one session; one that is focused on standards and atomic
-writes, and another that is focused on write hints.  The first might
-be mostly block and fs focused, and the second would probably be of
-interest to mm folks as well.
