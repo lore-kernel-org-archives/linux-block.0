@@ -2,191 +2,129 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26084C64EC4
-	for <linux-block@archiver.kernel.org>; Fri,  3 Mar 2023 11:48:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89307C7EE2F
+	for <linux-block@archiver.kernel.org>; Fri,  3 Mar 2023 11:57:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229896AbjCCLsn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 3 Mar 2023 06:48:43 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38684 "EHLO
+        id S230353AbjCCL5h (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 3 Mar 2023 06:57:37 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46388 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229820AbjCCLsn (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 3 Mar 2023 06:48:43 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C6E219EE5
-        for <linux-block@vger.kernel.org>; Fri,  3 Mar 2023 03:47:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1677844078;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+        with ESMTP id S230388AbjCCL5g (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 3 Mar 2023 06:57:36 -0500
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6EC95F530;
+        Fri,  3 Mar 2023 03:57:34 -0800 (PST)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 7EA3422BC1;
+        Fri,  3 Mar 2023 11:57:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1677844653; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
+         mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=GKSjKJl1pXB3VlI79sKpQ8uqGGzbCBbmcPQmQEYw5z8=;
-        b=FP8vrluQHjLKvtrpCezVPp8Gd6oqMLSVjLGvTJFIun2uNqhePpICTczHMvzhxRbXJgkN7m
-        L42wvvGdcCEEfPIbR0BOfS2GDRqTbz3h0c8bH6KnW0DKECvJtegp6Bq8JCDJzs21NLqgMq
-        ibE3xRKjc2ccthVh8aUPEp1oC89bw0g=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-665-8Q0shVz8OlS3ZCThyl6NJw-1; Fri, 03 Mar 2023 06:47:51 -0500
-X-MC-Unique: 8Q0shVz8OlS3ZCThyl6NJw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        bh=Sozm/IwmKR0C29DUlDCVF+X1VjNCqo59wsCuS1B6kvo=;
+        b=MthVVnKy/GK0q6fUYcI3HliqGvfc2edn81Qeu/j2/8BIzChSL1ghnQ7BPtjDXOUmLCWtiW
+        sCI9iTftK6rmHPtbA/Y/BdcwiCbXf1e7Nb/ts73prYD+AFRzpIV4XjxdjfGMkT847uTbs4
+        O2Z4r5D7wGEwS2I7WwPDVk7AduCWGWU=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1677844653;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Sozm/IwmKR0C29DUlDCVF+X1VjNCqo59wsCuS1B6kvo=;
+        b=LNXVWAa3LJTDvx7zERGbViw99t0BNNo768r+emFj52z9WtNbKlKrE1KkcBk7jAFdpzZAFd
+        hNq2uI+IRIq/DEDw==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 438391C05157;
-        Fri,  3 Mar 2023 11:47:51 +0000 (UTC)
-Received: from ovpn-8-18.pek2.redhat.com (ovpn-8-18.pek2.redhat.com [10.72.8.18])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id BF80E4010E86;
-        Fri,  3 Mar 2023 11:47:45 +0000 (UTC)
-Date:   Fri, 3 Mar 2023 19:47:38 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Andreas Hindborg <nmi@metaspace.dk>
-Cc:     linux-block@vger.kernel.org, Hans Holmberg <Hans.Holmberg@wdc.com>,
-        Matias Bjorling <Matias.Bjorling@wdc.com>,
-        Niklas Cassel <Niklas.Cassel@wdc.com>,
-        kernel test robot <lkp@intel.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        open list <linux-kernel@vger.kernel.org>,
-        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-        ming.lei@redhat.com
-Subject: Re: [PATCH v2] block: ublk: enable zoned storage support
-Message-ID: <ZAHeWieKXtgYUbvz@ovpn-8-18.pek2.redhat.com>
-References: <ZAAPBFfqP671N4ue@T590>
- <87o7pblhi1.fsf@metaspace.dk>
- <ZABfFW+28Jlxq+Ew@T590>
- <ZABmAR6Du1tUVEa7@T590>
- <CAFj5m9+o4yNA5rNDA+EXWZthMtB+dOLOW0O788i77=Qn1eJ0qQ@mail.gmail.com>
- <87h6v3l9up.fsf@metaspace.dk>
- <ZAChttVoCHsnXmvF@T590>
- <875ybjl1r0.fsf@metaspace.dk>
- <ZAFieW9PZ2LNQYHa@T590>
- <87wn3yfd36.fsf@metaspace.dk>
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 6A0CC1329E;
+        Fri,  3 Mar 2023 11:57:33 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id /8aBGa3gAWSYQQAAMHmgww
+        (envelope-from <hare@suse.de>); Fri, 03 Mar 2023 11:57:33 +0000
+Message-ID: <ba286c08-af18-ae46-c6b1-969fc369b0df@suse.de>
+Date:   Fri, 3 Mar 2023 12:57:33 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.8.0
+To:     Bart Van Assche <bvanassche@acm.org>,
+        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+        Khazhy Kumykov <khazhy@chromium.org>,
+        lsf-pc@lists.linux-foundation.org, linux-block@vger.kernel.org,
+        linux-scsi@vger.kernel.org
+References: <CACGdZYKXqNe08VqcUrrAU8pJ=f88W08V==K6uZxRgynxi0Hyhg@mail.gmail.com>
+ <ad8b054a-26a5-ea60-9c66-4a6b63ca27ef@acm.org>
+ <54fb85ac-7c45-f77f-11d7-9cb072f702fb@opensource.wdc.com>
+ <569dc9d2-3e6c-0efc-560c-bfcacfbfbda7@acm.org>
+ <8e3643a5-80bd-8c02-8e83-a2c1341babcc@opensource.wdc.com>
+ <c719261e-203e-18f2-b72a-de0c64011efe@acm.org>
+Content-Language: en-US
+From:   Hannes Reinecke <hare@suse.de>
+Subject: Re: [LSF/MM/BPF TOPIC] Hybrid SMR HDDs / Zone Domains & Realms
+In-Reply-To: <c719261e-203e-18f2-b72a-de0c64011efe@acm.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <87wn3yfd36.fsf@metaspace.dk>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.1
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Mar 03, 2023 at 09:27:58AM +0100, Andreas Hindborg wrote:
+On 3/2/23 19:26, Bart Van Assche wrote:
+> On 3/1/23 18:03, Damien Le Moal wrote:
+>> But that is the issue: zones in the middle of each domain can be
+>> activated/deactivated dynamically using zone activate command. So 
+>> there is
+>> always the possibility of ending up with a swiss cheese lun, full of 
+>> hole of
+>> unusable LBAs because the other domains (other LUN) activated some 
+>> zones which
+>> deactivate the equivalent zone(s) in the other domain.
+>>
+>> With your idea, the 2 luns would not be independent as they both would 
+>> be using
+>> LBAs are mapped against a single set of physical blocks. Zone activate 
+>> command
+>> allows controlling which domains has the mapping active. So activating 
+>> a zone in
+>> one domains results in the zone[s] using the same mapping in the other 
+>> domain to
+>> be deactivated.
 > 
-> Ming Lei <ming.lei@redhat.com> writes:
+> Hi Damien,
 > 
-> > On Thu, Mar 02, 2023 at 02:28:33PM +0100, Andreas Hindborg wrote:
-> >> 
-> >> Ming Lei <ming.lei@redhat.com> writes:
-> >> 
-> >> > On Thu, Mar 02, 2023 at 11:07:15AM +0100, Andreas Hindborg wrote:
-> >> >> 
-> >> >> Ming Lei <ming.lei@redhat.com> writes:
-> >> >> 
-> >> >> > On Thu, Mar 2, 2023 at 5:02 PM Ming Lei <ming.lei@redhat.com> wrote:
-> >> >> >>
-> >> >> >> On Thu, Mar 02, 2023 at 04:32:21PM +0800, Ming Lei wrote:
-> >> >> >> > On Thu, Mar 02, 2023 at 08:31:07AM +0100, Andreas Hindborg wrote:
-> >> >> >> > >
-> >> >> >>
-> >> >> >> ...
-> >> >> >>
-> >> >> >> > >
-> >> >> >> > > I agree about fetching more zones. However, it is no good to fetch up to
-> >> >> >> > > a max, since the requested zone report may less than max. I was
-> >> >> >> >
-> >> >> >> > Short read should always be supported, so the interface may need to
-> >> >> >> > return how many zones in single command, please refer to nvme_ns_report_zones().
-> >> >> >>
-> >> >> >> blk_zone is part of uapi, maybe the short read can be figured out by
-> >> >> >> one all-zeroed 'blk_zone'?  then no extra uapi data is needed for
-> >> >> >> reporting zones.
-> >> >> >
-> >> >> > oops, we have blk_zone_report data for reporting zones to userspace already,
-> >> >> > see blkdev_report_zones_ioctl(), then this way can be re-used for getting zone
-> >> >> > report from ublk server too, right?
-> >> >> 
-> >> >> Yes that would be nice. But I did the report_zone command like a read
-> >> >> operation, so we are not currently copying any buffers to user space
-> >> >> when issuing the command, we just rely on the iod.
-> >> >
-> >> > What I meant is to reuse the format of blk_zone_report for returning
-> >> > multiple 'blk_zone' info in single command.
-> >> >
-> >> > The only change is that you need to allocate one bigger kernel buffer
-> >> > to hold more 'blk_zone' in single report zone request.
-> >> >
-> >> >> I think it would be
-> >> >> better to use the start_sectors and nr_sectors of the iod instead. Then
-> >> >> we don't have to copy the blk_zone_report. What do you think?
-> >> >
-> >> > For IN parameter of report zone command, you still can reuse
-> >> > blk_zone_report:
-> >> >
-> >> > struct blk_zone_report {
-> >> >         __u64           sector;
-> >> >         __u32           nr_zones;
-> >> >         __u32           flags;
-> >> > };
-> >> >
-> >> > Just by using the 1st two 64b words of iod for holding 'blk_zone_report', and
-> >> > keep the iod->addr field not touched.
-> >> 
-> >> I see. Would you make the first part of `struct ublksrv_io_desc` a union
-> >> for this, or would you just cast it at the use site?
-> >
-> > oops, you still need iod->op_flags for recognizing the io op, so just
-> > start_sector and nr_sectors can be used.
+> Your reply made me realize that I should have provided more information. 
+> What I'm proposing is the following:
+> * Do not use any of the domains & realms features from ZBC-2.
+> * Do not make any zones visible to the host before configuration of the 
+> logical units has finished. Only make the logical units visible to the 
+> host after configuration of the logical units has finished. Do not 
+> support reconfiguration of the logical units while these are in use by 
+> the host.
+> * Only support active zones. Do not support inactive zones.
+> * Introduce a new mechanism for configuring the logical units.
 > 
-> We do not actually need to pass the flags to user space, or back from
-> user space to kernel for ublk zone report. They are currently used to
-> tell user space if the zone report contains capacity field. We could
-> exclude them from the ublk kabi since the zone report will always
-> contain capacity? But it might be good to have a flags field or future
-> things.
+> This is not a new idea. The approach described above is already 
+> supported since considerable time by UFS devices. The provisioning 
+> mechanism supported by UFS devices is defined in the UFS standard and is 
+> not based on SCSI commands.
 > 
-> > However, this way isn't good too, cause UBLK_IO_OP_DRV_IN is just mapped
-> > to 'report zone' command in your implementation, what if new pt request
-> > is required in future?
-> 
-> We are currently mapping REQ_OP_* 1:1 to  UBLK_OP_OP_*. If we relax
-> this, we can have a UBLK_IO_OP_REPORT_ZONES.
+That really cries out for a device-mapper target.
+Providing several LUNs only make sense if the hardware supports it; 
+we've learned that lesson when developing support for Multi-actuator 
+HDDs. If you want to have several logical disks without hardware support 
+for it device-mapper is the way to go.
 
-The op takes 8 bits, and enough to cover all normal block layer OPs and
-driver specific OPs, so I'd suggest this way, and ublk device
-specific OP can be started from 32, prefixed with
+Cheers,
 
-	UBLK_IO_OP_DRV_IN				//[32, 96)
-or
-	UBLK_IO_OP_DRV_OUT				//[96, 160)
-
-such as, report zones can be defined as
-
-	enum {
-		__UBLK_IO_OP_DRV_IN_START = 32,
-		UBLK_IO_OP_DRV_IN_REPORT_ZONES = __UBLK_IO_OP_DRV_IN_START,
-		__UBLK_IO_OP_DRV_IN_END = 96,
-
-		__UBLK_IO_OP_DRV_OUT_START = __UBLK_IO_OP_DRV_IN_END,
-		__UBLK_IO_OP_DRV_OUT_END = 160,
-	};
-
-For any DRV OPs, iod header(not include ->addr) and buffer format can be re-defined
-as uapi structure.
-
-What do you think of this way?
-
-> 
-> >
-> > We need to think about how to support ublk pt request in generic way.
-> 
-> Another option is to allow REQ_OP_DRV_IN to pass a buffer to user space.
-> Instead of being similar to a read operation, it could be a combination of
-> a read and a write operation.
-
-That might be more flexible, but could add driver & userspace's
-complexity, so I'd suggest to try to avoid bidirectional buffer asap,
-but we still reserve support for it via UBLK_IO_OP_DRV_IN_OUT*.
-
-Thanks,
-Ming
+Hannes
+-- 
+Dr. Hannes Reinecke		           Kernel Storage Architect
+hare@suse.de			                  +49 911 74053 688
+SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 Nürnberg
+HRB 36809 (AG Nürnberg), GF: Felix Imendörffer
 
