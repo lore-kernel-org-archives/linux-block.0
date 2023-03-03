@@ -2,98 +2,191 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 35D4CC678D4
-	for <linux-block@archiver.kernel.org>; Fri,  3 Mar 2023 11:40:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 26084C64EC4
+	for <linux-block@archiver.kernel.org>; Fri,  3 Mar 2023 11:48:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229618AbjCCLk2 convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 3 Mar 2023 06:40:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59870 "EHLO
+        id S229896AbjCCLsn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 3 Mar 2023 06:48:43 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38684 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229697AbjCCLk1 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 3 Mar 2023 06:40:27 -0500
-Received: from mail6.swissbit.com (mail5.swissbit.com [148.251.244.252])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 02181521D3;
-        Fri,  3 Mar 2023 03:40:25 -0800 (PST)
-Received: from mail6.swissbit.com (localhost [127.0.0.1])
-        by DDEI (Postfix) with ESMTP id 492FF221761;
-        Fri,  3 Mar 2023 11:40:24 +0000 (UTC)
-Received: from mail6.swissbit.com (localhost [127.0.0.1])
-        by DDEI (Postfix) with ESMTP id 3DFB5220859;
-        Fri,  3 Mar 2023 11:40:24 +0000 (UTC)
-X-TM-AS-ERS: 10.181.10.103-127.5.254.253
-X-TM-AS-SMTP: 1.0 bXgxLmRtei5zd2lzc2JpdC5jb20= Y2xvZWhsZUBoeXBlcnN0b25lLmNvb
-        Q==
-X-DDEI-TLS-USAGE: Used
-Received: from mx1.dmz.swissbit.com (mx1.dmz.swissbit.com [10.181.10.103])
-        by mail6.swissbit.com (Postfix) with ESMTPS;
-        Fri,  3 Mar 2023 11:40:24 +0000 (UTC)
-From:   =?iso-8859-1?Q?Christian_L=F6hle?= <CLoehle@hyperstone.com>
-To:     Ulf Hansson <ulf.hansson@linaro.org>,
-        "linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>,
-        Jens Axboe <axboe@kernel.dk>
-CC:     Wenchao Chen <wenchao.chen666@gmail.com>,
-        Adrian Hunter <adrian.hunter@intel.com>,
-        Avri Altman <avri.altman@wdc.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: RE: [RFC PATCH] mmc: core: Disable REQ_FUA if the eMMC supports an
- internal cache
-Thread-Topic: [RFC PATCH] mmc: core: Disable REQ_FUA if the eMMC supports an
- internal cache
-Thread-Index: AQHZTRVhGw7IamWdbkW+N3YLAv3UBK7nlDEQgAFYhgA=
-Date:   Fri, 3 Mar 2023 11:40:23 +0000
-Message-ID: <a35f3d45cab0442b9491c0b120e3fb47@hyperstone.com>
-References: <20230302144330.274947-1-ulf.hansson@linaro.org>
- <5712c69ae37447c5b576d87b247f5756@hyperstone.com>
-In-Reply-To: <5712c69ae37447c5b576d87b247f5756@hyperstone.com>
-Accept-Language: en-US, de-DE
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-Content-Type: text/plain;
-        charset="iso-8859-1"
-Content-Transfer-Encoding: 8BIT
+        with ESMTP id S229820AbjCCLsn (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 3 Mar 2023 06:48:43 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C6E219EE5
+        for <linux-block@vger.kernel.org>; Fri,  3 Mar 2023 03:47:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1677844078;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=GKSjKJl1pXB3VlI79sKpQ8uqGGzbCBbmcPQmQEYw5z8=;
+        b=FP8vrluQHjLKvtrpCezVPp8Gd6oqMLSVjLGvTJFIun2uNqhePpICTczHMvzhxRbXJgkN7m
+        L42wvvGdcCEEfPIbR0BOfS2GDRqTbz3h0c8bH6KnW0DKECvJtegp6Bq8JCDJzs21NLqgMq
+        ibE3xRKjc2ccthVh8aUPEp1oC89bw0g=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-665-8Q0shVz8OlS3ZCThyl6NJw-1; Fri, 03 Mar 2023 06:47:51 -0500
+X-MC-Unique: 8Q0shVz8OlS3ZCThyl6NJw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 438391C05157;
+        Fri,  3 Mar 2023 11:47:51 +0000 (UTC)
+Received: from ovpn-8-18.pek2.redhat.com (ovpn-8-18.pek2.redhat.com [10.72.8.18])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id BF80E4010E86;
+        Fri,  3 Mar 2023 11:47:45 +0000 (UTC)
+Date:   Fri, 3 Mar 2023 19:47:38 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Andreas Hindborg <nmi@metaspace.dk>
+Cc:     linux-block@vger.kernel.org, Hans Holmberg <Hans.Holmberg@wdc.com>,
+        Matias Bjorling <Matias.Bjorling@wdc.com>,
+        Niklas Cassel <Niklas.Cassel@wdc.com>,
+        kernel test robot <lkp@intel.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        open list <linux-kernel@vger.kernel.org>,
+        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+        ming.lei@redhat.com
+Subject: Re: [PATCH v2] block: ublk: enable zoned storage support
+Message-ID: <ZAHeWieKXtgYUbvz@ovpn-8-18.pek2.redhat.com>
+References: <ZAAPBFfqP671N4ue@T590>
+ <87o7pblhi1.fsf@metaspace.dk>
+ <ZABfFW+28Jlxq+Ew@T590>
+ <ZABmAR6Du1tUVEa7@T590>
+ <CAFj5m9+o4yNA5rNDA+EXWZthMtB+dOLOW0O788i77=Qn1eJ0qQ@mail.gmail.com>
+ <87h6v3l9up.fsf@metaspace.dk>
+ <ZAChttVoCHsnXmvF@T590>
+ <875ybjl1r0.fsf@metaspace.dk>
+ <ZAFieW9PZ2LNQYHa@T590>
+ <87wn3yfd36.fsf@metaspace.dk>
 MIME-Version: 1.0
-X-TMASE-Version: DDEI-5.1-9.0.1002-27480.007
-X-TMASE-Result: 10--1.097400-10.000000
-X-TMASE-MatchedRID: dwNgap4H9hjUL3YCMmnG4vHkpkyUphL9pIm7+t7/ErssTMNBTJAZWem5
-        73tusZjQtAooHLFhogVeWwXKQGp3JHh1rPkUeh+7upDIC9422DplH44U2Ru12mdAe5NczV1Ve8w
-        NVrnxqoN1trix3E1eFJ/NKWBrHFmLBXdkbv140jU1yhbbA7We06wfObg093CkJUvol+PHbEyqLr
-        Si9+cPfTvtgB+lCbJUb3JmPdq59vloMCLywE0ygbq9UFRTJ0kKxEHRux+uk8h+ICquNi0WJLxXM
-        1hseCqOlJuZJgT8RltlDYN/ce5s3vVHDCDtM7pWftwZ3X11IV0=
-X-TMASE-SNAP-Result: 1.821001.0001-0-1-22:0,33:0,34:0-0
-X-TMASE-INERTIA: 0-0;;;;
-X-TMASE-XGENCLOUD: 7600cef7-30f3-4b32-8fd4-694eeb41f124-0-0-200-0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <87wn3yfd36.fsf@metaspace.dk>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.1
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
->> 
->> REQ_FUA is in general supported for eMMC cards, which translates into so called "reliable writes". To support these write operations, the CMD23 (MMC_CAP_CMD23), needs to be supported by the mmc host too, which is common but not always the case.
->> 
->> For some eMMC devices, it has been reported that reliable writes are quite costly, leading to performance degradations.
->> 
->> In a way to improve the situation, let's avoid announcing REQ_FUA support if the eMMC supports an internal cache, as that allows us to rely solely on flush-requests (REQ_OP_FLUSH) instead, which seems to be a lot cheaper.
->> Note that, those mmc hosts that lacks CMD23 support are already using this type of configuration, whatever that could mean.
+On Fri, Mar 03, 2023 at 09:27:58AM +0100, Andreas Hindborg wrote:
 > 
-> Just note that reliable write is strictly weaker than turning cache off/flushing, if card loses power during cache off/flush programming / busy, sector-wise atomicity is not mandated by the spec.
-> (And that is assuming cache off/flush is actually respected by the card as intended by the spec, should some cards be checked?) Maybe some FS people can also chime in?
+> Ming Lei <ming.lei@redhat.com> writes:
+> 
+> > On Thu, Mar 02, 2023 at 02:28:33PM +0100, Andreas Hindborg wrote:
+> >> 
+> >> Ming Lei <ming.lei@redhat.com> writes:
+> >> 
+> >> > On Thu, Mar 02, 2023 at 11:07:15AM +0100, Andreas Hindborg wrote:
+> >> >> 
+> >> >> Ming Lei <ming.lei@redhat.com> writes:
+> >> >> 
+> >> >> > On Thu, Mar 2, 2023 at 5:02 PM Ming Lei <ming.lei@redhat.com> wrote:
+> >> >> >>
+> >> >> >> On Thu, Mar 02, 2023 at 04:32:21PM +0800, Ming Lei wrote:
+> >> >> >> > On Thu, Mar 02, 2023 at 08:31:07AM +0100, Andreas Hindborg wrote:
+> >> >> >> > >
+> >> >> >>
+> >> >> >> ...
+> >> >> >>
+> >> >> >> > >
+> >> >> >> > > I agree about fetching more zones. However, it is no good to fetch up to
+> >> >> >> > > a max, since the requested zone report may less than max. I was
+> >> >> >> >
+> >> >> >> > Short read should always be supported, so the interface may need to
+> >> >> >> > return how many zones in single command, please refer to nvme_ns_report_zones().
+> >> >> >>
+> >> >> >> blk_zone is part of uapi, maybe the short read can be figured out by
+> >> >> >> one all-zeroed 'blk_zone'?  then no extra uapi data is needed for
+> >> >> >> reporting zones.
+> >> >> >
+> >> >> > oops, we have blk_zone_report data for reporting zones to userspace already,
+> >> >> > see blkdev_report_zones_ioctl(), then this way can be re-used for getting zone
+> >> >> > report from ublk server too, right?
+> >> >> 
+> >> >> Yes that would be nice. But I did the report_zone command like a read
+> >> >> operation, so we are not currently copying any buffers to user space
+> >> >> when issuing the command, we just rely on the iod.
+> >> >
+> >> > What I meant is to reuse the format of blk_zone_report for returning
+> >> > multiple 'blk_zone' info in single command.
+> >> >
+> >> > The only change is that you need to allocate one bigger kernel buffer
+> >> > to hold more 'blk_zone' in single report zone request.
+> >> >
+> >> >> I think it would be
+> >> >> better to use the start_sectors and nr_sectors of the iod instead. Then
+> >> >> we don't have to copy the blk_zone_report. What do you think?
+> >> >
+> >> > For IN parameter of report zone command, you still can reuse
+> >> > blk_zone_report:
+> >> >
+> >> > struct blk_zone_report {
+> >> >         __u64           sector;
+> >> >         __u32           nr_zones;
+> >> >         __u32           flags;
+> >> > };
+> >> >
+> >> > Just by using the 1st two 64b words of iod for holding 'blk_zone_report', and
+> >> > keep the iod->addr field not touched.
+> >> 
+> >> I see. Would you make the first part of `struct ublksrv_io_desc` a union
+> >> for this, or would you just cast it at the use site?
+> >
+> > oops, you still need iod->op_flags for recognizing the io op, so just
+> > start_sector and nr_sectors can be used.
+> 
+> We do not actually need to pass the flags to user space, or back from
+> user space to kernel for ublk zone report. They are currently used to
+> tell user space if the zone report contains capacity field. We could
+> exclude them from the ublk kabi since the zone report will always
+> contain capacity? But it might be good to have a flags field or future
+> things.
+> 
+> > However, this way isn't good too, cause UBLK_IO_OP_DRV_IN is just mapped
+> > to 'report zone' command in your implementation, what if new pt request
+> > is required in future?
+> 
+> We are currently mapping REQ_OP_* 1:1 to  UBLK_OP_OP_*. If we relax
+> this, we can have a UBLK_IO_OP_REPORT_ZONES.
 
-Nevermind, the sector-wise atomicity should not matter on 5.1 cards or if the block length isn't being played with, which it isn't in our case.
-If reliable write is implemented only according to spec, I don't see why the cache flushing should be less expensive, which would only make sense if
-a) < sector chunks are committed to flash
-b) reliable write is implemented much stricter than the spec, ensuring atomicity for the entire write.
+The op takes 8 bits, and enough to cover all normal block layer OPs and
+driver specific OPs, so I'd suggest this way, and ublk device
+specific OP can be started from 32, prefixed with
 
-I guess the cards which increase performance do b)? Or something else?
-Anyway regarding FUA i don't have any concerns regarding reliability with cache flush.
-I can add some performance comparisons with some eMMCs I have around though.
+	UBLK_IO_OP_DRV_IN				//[32, 96)
+or
+	UBLK_IO_OP_DRV_OUT				//[96, 160)
 
-Regards,
-Christian
+such as, report zones can be defined as
 
-Hyperstone GmbH | Reichenaustr. 39a  | 78467 Konstanz
-Managing Director: Dr. Jan Peter Berns.
-Commercial register of local courts: Freiburg HRB381782
+	enum {
+		__UBLK_IO_OP_DRV_IN_START = 32,
+		UBLK_IO_OP_DRV_IN_REPORT_ZONES = __UBLK_IO_OP_DRV_IN_START,
+		__UBLK_IO_OP_DRV_IN_END = 96,
+
+		__UBLK_IO_OP_DRV_OUT_START = __UBLK_IO_OP_DRV_IN_END,
+		__UBLK_IO_OP_DRV_OUT_END = 160,
+	};
+
+For any DRV OPs, iod header(not include ->addr) and buffer format can be re-defined
+as uapi structure.
+
+What do you think of this way?
+
+> 
+> >
+> > We need to think about how to support ublk pt request in generic way.
+> 
+> Another option is to allow REQ_OP_DRV_IN to pass a buffer to user space.
+> Instead of being similar to a read operation, it could be a combination of
+> a read and a write operation.
+
+That might be more flexible, but could add driver & userspace's
+complexity, so I'd suggest to try to avoid bidirectional buffer asap,
+but we still reserve support for it via UBLK_IO_OP_DRV_IN_OUT*.
+
+Thanks,
+Ming
 
