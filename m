@@ -2,61 +2,77 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FECEC6FA8E
-	for <linux-block@archiver.kernel.org>; Fri,  3 Mar 2023 01:24:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B80DC6FA8E
+	for <linux-block@archiver.kernel.org>; Fri,  3 Mar 2023 01:59:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229633AbjCCBY1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 2 Mar 2023 20:24:27 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32880 "EHLO
+        id S229538AbjCCB7G (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 2 Mar 2023 20:59:06 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38336 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229437AbjCCBY0 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Mar 2023 20:24:26 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F2B11557C;
-        Thu,  2 Mar 2023 17:24:26 -0800 (PST)
+        with ESMTP id S229463AbjCCB7F (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Mar 2023 20:59:05 -0500
+Received: from sin.source.kernel.org (sin.source.kernel.org [IPv6:2604:1380:40e1:4800::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8722516AE4;
+        Thu,  2 Mar 2023 17:59:04 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 971E7616CA;
-        Fri,  3 Mar 2023 01:24:25 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4A644C433D2;
-        Fri,  3 Mar 2023 01:24:24 +0000 (UTC)
+        by sin.source.kernel.org (Postfix) with ESMTPS id EC310CE2021;
+        Fri,  3 Mar 2023 01:59:02 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A2059C433D2;
+        Fri,  3 Mar 2023 01:59:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1677806665;
-        bh=Lcl+ON/n2tfB00oe/DNX6nE8UIFnf+CyFVbbzShggPY=;
+        s=k20201202; t=1677808741;
+        bh=wWK0TKtrXgkBt+vb5U8Z0HtNKqKXOfcAjYxIxt05B5Q=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=B4SSwe/VEOuHUs08IN2lCHh6lAGJekITYyAVHZBN3waqQPxT37eoGELMc5MCfKCVx
-         okRRbO73SjuW/xnBRIIuFWiud8kDRPP9KWFEjGZbuug4Mt8bMRANkhHmOkCf/eA9hF
-         tRiyfrlQlAHpJD6wWVlXjUUB1aMV33XiXFNqqVHY9Zs9nZ2FUB3fpWSyaf8fECu70q
-         XJ2H74i/GOa/j20L7PA5nP/uckoiwXRRTDKMzCcYukDmBdPIJMhwbwiZvXSKL7mIqK
-         bLmdVgbRtlTok8WSyyq9IZMZ1j3oIJDkKMfPSXIYTrPJ7/iNvWwKILky5s9teEMTXg
-         KGuNTGZoN0agw==
-Date:   Thu, 2 Mar 2023 18:24:21 -0700
+        b=M4iWUGhO7pAc7f2BcIx9ymL2rpZiYt4cEkOBPC2iYi8hTEXRZyWxa/dQVXKoFYFMo
+         hP0Jp8MBFg1JyKYc7J+/ood93fuB78xi4LyDek+yiYQCZOPgZmAias3x+F0hT826d/
+         LTO68YZk7TcvaFNMs8t6war/kvntEvGjXC3tkP9oM7S/QgTKeRh68KNDhHu6JGT1EX
+         Tsn3ZxLgYIVS/hWpWkNvEJkM7/JQ0aWBiH8G7gMeuhqMHCHvpM+uVjI8o5NB1C6Pbu
+         7bMhXY9n0BSIjoxXSuvxHZXyX6NGaIiR9hpQxMZmgnK/vfqdzBawnRuoulR8/gkpvC
+         QYOdJVZiQWlDA==
+Date:   Thu, 2 Mar 2023 18:58:58 -0700
 From:   Keith Busch <kbusch@kernel.org>
-To:     Yu Kuai <yukuai1@huaweicloud.com>
-Cc:     hch@lst.de, ming.lei@redhat.com, axboe@kernel.dk,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        yukuai3@huawei.com, yi.zhang@huawei.com, yangerkun@huawei.com
-Subject: Re: [PATCH] blk-mq: quiesce queue while reallocating hctxs
-Message-ID: <ZAFMRUo9fdcJh/JD@kbusch-mbp.dhcp.thefacebook.com>
-References: <20230221092436.3570192-1-yukuai1@huaweicloud.com>
+To:     Theodore Ts'o <tytso@mit.edu>
+Cc:     lsf-pc@lists.linux-foundation.org, linux-fsdevel@vger.kernel.org,
+        linux-mm@kvack.org, linux-block@vger.kernel.org
+Subject: Re: [LSF/MM/BPF TOPIC] Cloud storage optimizations
+Message-ID: <ZAFUYqAcPmRPLjET@kbusch-mbp.dhcp.thefacebook.com>
+References: <Y/7L74P6jSWwOvWt@mit.edu>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20230221092436.3570192-1-yukuai1@huaweicloud.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <Y/7L74P6jSWwOvWt@mit.edu>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Feb 21, 2023 at 05:24:36PM +0800, Yu Kuai wrote:
-> From: Yu Kuai <yukuai3@huawei.com>
-> 
-> commit 8237c01f1696 ("blk-mq: use quiesced elevator switch when
-> reinitializing queues") add quiesce queue while switching elevator,
-> however, if old elevator is none, queue is still not quiesced. Hence
-> reallocating hctxs can concurrent with run queue. Fix it by also
-> quiesce queue in the beginning of __blk_mq_update_nr_hw_queues().
+On Tue, Feb 28, 2023 at 10:52:15PM -0500, Theodore Ts'o wrote:
+> Emulated block devices offered by cloud VM’s can provide functionality
+> to guest kernels and applications that traditionally have not been
+> available to users of consumer-grade HDD and SSD’s.  For example,
+> today it’s possible to create a block device in Google’s Persistent
+> Disk with a 16k physical sector size, which promises that aligned 16k
+> writes will be atomically.  With NVMe, it is possible for a storage
+> device to promise this without requiring read-modify-write updates for
+> sub-16k writes. 
 
-Is this actually fixing anything? The quiesced elevator switch was to prevent
-use-after-free from an elevator being torn down, but if you are not switching
-elevators, then what resource does quiescing protect?
+I'm not sure it does. NVMe spec doesn't say AWUN writes are never a RMW
+operation. NVMe suggests aligning to NPWA is the best way to avoid RMW, but
+doesn't guarantee that, nor does it require this limit aligns to atomic
+boundaries. NVMe provides a lot of hints, but stops short of promises. Vendors
+can promise whatever they want, but that's outside spec.
+
+> All that is necessary are some changes in the block
+> layer so that the kernel does not inadvertently tear a write request
+> when splitting a bio because it is too large (perhaps because it got
+> merged with some other request, and then it gets split at an
+> inconvenient boundary).
+
+All the limits needed to optimally split on phyiscal boundaries exist, so I
+hope we're using them correctly via get_max_io_size().
+
+That said, I was hoping you were going to suggest supporting 16k logical block
+sizes. Not a problem on some arch's, but still problematic when PAGE_SIZE is
+4k. :)
