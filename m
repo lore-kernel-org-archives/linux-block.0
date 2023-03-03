@@ -2,94 +2,125 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E98EC678D4
-	for <linux-block@archiver.kernel.org>; Fri,  3 Mar 2023 04:00:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 764A4C678D4
+	for <linux-block@archiver.kernel.org>; Fri,  3 Mar 2023 04:20:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229463AbjCCEAt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 2 Mar 2023 23:00:49 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34354 "EHLO
+        id S229471AbjCCEUl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 2 Mar 2023 23:20:41 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47384 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229437AbjCCEAs (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Mar 2023 23:00:48 -0500
-Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1A7930EB5
-        for <linux-block@vger.kernel.org>; Thu,  2 Mar 2023 20:00:47 -0800 (PST)
-Received: by mail-pj1-x102c.google.com with SMTP id h17-20020a17090aea9100b0023739b10792so1070275pjz.1
-        for <linux-block@vger.kernel.org>; Thu, 02 Mar 2023 20:00:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112; t=1677816047;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=VO74g2mNwHzYzU/yV1CgDrAplD3wm5JXJvrOGFj1g+g=;
-        b=Q0HB6OhEUr/Ky/FMXyw9StC+oN+s1rWS3xgRvmCnXM0u/BFQakixnYF7Bj28gwKJgn
-         oFl9Ov3u7xyynlDVXgDbDnz6tiUrQtzgHLf2idOLJn81cNKeDaxA9aDArLBeiP9SCgQx
-         Ctk9xKat1JjCfVf3mb7Z756+x8n/6fqZDOfgUgyw57dvoNgvKXeJtTLG+o8zSmvviKpg
-         Y4c3x498wQkTAdgBQ4c/fnKz7GqWBUvpDI3pdGwLkajwdPRxMjx+NAD021ZrUf2tJXP0
-         sZA9Z2rMkUEl9UsrI/DmxN6mgt3Wb77iJlwhngcTfZn+oS9Wu6onpRxy7Fe5WQZvg6gQ
-         t8YA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1677816047;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=VO74g2mNwHzYzU/yV1CgDrAplD3wm5JXJvrOGFj1g+g=;
-        b=i/nLMutmxJFauXWaj+EVbqBwq5hX+HfIFDo2I67xEirxM1QZSdnTSUCwQzbsyzmhS9
-         ySNJm+A4+MKDwNe2zrW9cc7xcjQpxwGS7TiQM+hpUKb7scsKVMccoDyVtqER2j0ynxwn
-         RWzWnqCg/0LGQJRF3kQVbA2Jfaewh9v76ulcoqXvlh063aZnK8zgyCI+BIVCYloYVSGU
-         7GYiv2kuCR2+o9+AFaKKPCjPaj9g6nnhD3C7REoR346ulFG/j/vkGODBn4K+26YNOoTs
-         yHrlKnAZJaBVbGcy+MI+A0sJKmP2E+OuLQHxR3b7anBeRglwWdgwbIRVdSnXxAQGQE9V
-         kj8Q==
-X-Gm-Message-State: AO0yUKXsLUh6PmABR5wUIC8pmrZ1vcpakMTXb4Dd6zn6HdAV1GDdEUTA
-        hgrBYXigL8ImXNmCNFmWKgUg1GF9QGNZzovv
-X-Google-Smtp-Source: AK7set/uNWyGtRPehTwL47DKKom5XL9HpMg9zcRF+pvE9PUmTVBtVsOF2bq8/Jsgp1lT4Xv1v2+SPA==
-X-Received: by 2002:a17:902:d4d0:b0:19a:8202:2dad with SMTP id o16-20020a170902d4d000b0019a82022dadmr776157plg.2.1677816046820;
-        Thu, 02 Mar 2023 20:00:46 -0800 (PST)
-Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id b20-20020a170902d31400b0019a7363e752sm396753plc.276.2023.03.02.20.00.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 Mar 2023 20:00:46 -0800 (PST)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     Alasdair Kergon <agk@redhat.com>,
-        Mike Snitzer <snitzer@kernel.org>,
-        Christoph Hellwig <hch@infradead.org>,
-        Keith Busch <kbusch@kernel.org>,
-        Uday Shankar <ushankar@purestorage.com>
-Cc:     linux-block@vger.kernel.org, dm-devel@redhat.com,
-        kernel test robot <lkp@intel.com>
-In-Reply-To: <20230301000655.48112-1-ushankar@purestorage.com>
-References: <20230301000655.48112-1-ushankar@purestorage.com>
-Subject: Re: [PATCH v3] blk-mq: enforce op-specific segment limits in
- blk_insert_cloned_request
-Message-Id: <167781604577.209443.3783406495581654903.b4-ty@kernel.dk>
-Date:   Thu, 02 Mar 2023 21:00:45 -0700
+        with ESMTP id S229447AbjCCEUj (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Mar 2023 23:20:39 -0500
+Received: from outgoing.mit.edu (outgoing-auth-1.mit.edu [18.9.28.11])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2246B15149
+        for <linux-block@vger.kernel.org>; Thu,  2 Mar 2023 20:20:36 -0800 (PST)
+Received: from cwcc.thunk.org (pool-173-48-120-46.bstnma.fios.verizon.net [173.48.120.46])
+        (authenticated bits=0)
+        (User authenticated as tytso@ATHENA.MIT.EDU)
+        by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 3234KQlt012375
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 2 Mar 2023 23:20:27 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mit.edu; s=outgoing;
+        t=1677817228; bh=UnVn9SQXj+xQGHz65tda2oIv7yPINQJtjR6aYPfdJQU=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To;
+        b=WgYhcgiqsg+8sSl2tOb2NDrxj/5T0ISlbi0RcKr2x0kBTqiWGBlYNE8QE4Q27lPsp
+         eyw+YObQY+obW56PQZApKtdg8b4zNsReYomY6W+n4rHtS+WOooAfcd5n5sB9looxwN
+         28b983j4GY13CIWhaYkHbORFZVjEiwJXUoxA+07f1cb50w9r8iv2pUyHt0o4DKudq3
+         YSC36+1NK2qlCdl/icP9DtI7UF+/Vplf729UHt3KGaEGJbAAPwtsK0ZifbrD5vpFYm
+         hfaMjP4NyPIOOT2nZqqGFH9/LuDLgd6t+nwvxv+14MR+qa2LnlkhXHeTLd/53WfhYp
+         a2kfSYlsg5piw==
+Received: by cwcc.thunk.org (Postfix, from userid 15806)
+        id 3C34215C3593; Thu,  2 Mar 2023 23:20:26 -0500 (EST)
+Date:   Thu, 2 Mar 2023 23:20:26 -0500
+From:   "Theodore Ts'o" <tytso@mit.edu>
+To:     "Martin K. Petersen" <martin.petersen@oracle.com>
+Cc:     lsf-pc@lists.linux-foundation.org, linux-fsdevel@vger.kernel.org,
+        linux-mm@kvack.org, linux-block@vger.kernel.org
+Subject: Re: [LSF/MM/BPF TOPIC] Cloud storage optimizations
+Message-ID: <ZAF1iuaXTJEvOe5c@mit.edu>
+References: <Y/7L74P6jSWwOvWt@mit.edu>
+ <yq1356mh925.fsf@ca-mkp.ca.oracle.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.13-dev-ebd05
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <yq1356mh925.fsf@ca-mkp.ca.oracle.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
-On Tue, 28 Feb 2023 17:06:55 -0700, Uday Shankar wrote:
-> The block layer might merge together discard requests up until the
-> max_discard_segments limit is hit, but blk_insert_cloned_request checks
-> the segment count against max_segments regardless of the req op. This
-> can result in errors like the following when discards are issued through
-> a DM device and max_discard_segments exceeds max_segments for the queue
-> of the chosen underlying device.
+On Thu, Mar 02, 2023 at 09:54:59PM -0500, Martin K. Petersen wrote:
 > 
-> [...]
+> Hi Ted!
+> 
+> > With NVMe, it is possible for a storage device to promise this without
+> > requiring read-modify-write updates for sub-16k writes.  All that is
+> > necessary are some changes in the block layer so that the kernel does
+> > not inadvertently tear a write request when splitting a bio because it
+> > is too large (perhaps because it got merged with some other request,
+> > and then it gets split at an inconvenient boundary).
+> 
+> We have been working on support for atomic writes and it is not a simple
+> as it sounds. Atomic operations in SCSI and NVMe have semantic
+> differences which are challenging to reconcile. On top of that, both the
+> SCSI and NVMe specs are buggy in the atomics department. We are working
+> to get things fixed in both standards and aim to discuss our
+> implementation at LSF/MM.
 
-Applied, thanks!
+I'd be very interested to learn more about what you've found.  I know
+more than one cloud provider is thinking about how to use the NVMe
+spec to send information about how their emulated block device work.
+This has come up at our weekly ext4 video conference, and given that I
+gave a talk about it in 2018[1], there's quite a lot of similarity of
+what folks are thinking about.  Basically, MySQL and Postgres use 16k
+database pages, and if we can avoid their special doublewrite
+techniques to avoid torn writes, because they can depend on their
+Cloud Block Devices Working A Certain Way, it can make for very
+noticeable performance improvements.
 
-[1/1] blk-mq: enforce op-specific segment limits in blk_insert_cloned_request
-      commit: 49d24398327e32265eccdeec4baeb5a6a609c0bd
+[1] https://www.youtube.com/watch?v=gIeuiGg-_iw
 
-Best regards,
--- 
-Jens Axboe
+So while the standards might allow standards-compliant physical
+devices to do some really wierd sh*t, it might be that if all cloud
+vendors do things in the same way, I could see various cloud workloads
+starting to depending on extra-standard behaviour, much like a lot of
+sysadmins assume that low-numbered LBA's are on the outer diamenter of
+the HDD and are much more performant than sectors on the i.d. of the
+HDD.  This is completely not guaranteed by the standard specs, but
+it's become a defacto standard.
 
+That's not a great place to be, and it would be great if can find ways
+that are much more reliable in terms of querying a standards-compliant
+storage device and knowing whether we can depend on a certain behavior
+--- but I also know how slowly storage standards bodies move.  :-(
 
+> Hinting didn't see widespread adoption because we in Linux, as well as
+> the various interested databases, preferred hints to be per-I/O
+> properties. Whereas $OTHER_OS insisted that hints should be statically
+> assigned to LBA ranges on media. This left vendors having to choose
+> between two very different approaches and consequently they chose not to
+> support any of them.
 
+I wasn't aware of that history.  Thanks for filling that bit in.
+
+Fortunately, in 2023, it appears that for many cloud vendors, the
+teams involved care a lot more about Linux than $OTHER_OS.  So
+hopefully we'll have a lot more success in getting write hints
+generally available to hyperscale cloud customers.
+
+From an industry-wide perspective, it would be useful if the write
+hints used by Hyperscale Cloud Vendor #1 are very similar to what
+write hints are supported by Hyperscale Cloud Vendor #2.  Standards
+committees aren't the only way that companies can collaborate in an
+anti-trust compliant way.  Open source is another way; and especially
+if we can show that a set of hints work well for the Linux kernel and
+Linux applications ---- then what we ship in the Linux kernel can help
+shape the set of "write hints" that cloud storage devices will
+support.
+
+					- Ted
+
+P.S.  From a LSF/MM program perspective, I suspect we may want to have
+more than one session; one that is focused on standards and atomic
+writes, and another that is focused on write hints.  The first might
+be mostly block and fs focused, and the second would probably be of
+interest to mm folks as well.
