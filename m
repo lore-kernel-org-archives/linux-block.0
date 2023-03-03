@@ -2,70 +2,116 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B6C8CC678D4
-	for <linux-block@archiver.kernel.org>; Fri,  3 Mar 2023 07:23:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D91DC7EE36
+	for <linux-block@archiver.kernel.org>; Fri,  3 Mar 2023 07:23:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229716AbjCCHXb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 3 Mar 2023 02:23:31 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54982 "EHLO
+        id S229819AbjCCHXg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 3 Mar 2023 02:23:36 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55078 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229706AbjCCHXa (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 3 Mar 2023 02:23:30 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F3301352D;
-        Thu,  2 Mar 2023 23:23:29 -0800 (PST)
+        with ESMTP id S229736AbjCCHXd (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 3 Mar 2023 02:23:33 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0945015C86;
+        Thu,  2 Mar 2023 23:23:32 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 09C306176B;
+        by ams.source.kernel.org (Postfix) with ESMTPS id AE12EB816A1;
+        Fri,  3 Mar 2023 07:23:30 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3756FC4339C;
         Fri,  3 Mar 2023 07:23:29 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4785EC433D2;
-        Fri,  3 Mar 2023 07:23:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1677828208;
-        bh=H0vgaS3qOJJopQo5ihGBje3nOX8FoYe6iwbI5I5QK/I=;
-        h=From:To:Cc:Subject:Date:From;
-        b=Ka5VvvopH4WuH4cUTg9PmDffE8YF3jAyVNvGnhNF9HV1YwKkaXvrBTK5vhIVxeL7S
-         /D+bToOAH3NDxj7LOgR+EXIA1XoB43RvZDwNBgi/w7ysKpNeL+Bed2l868I9MaQrR8
-         9/aWUjNctoAdDzmj0fzBDjhydtvnlGwTqT0eHBX7MOhny3yeLmhScRr4UF7TacUp3Z
-         V4reXT70bB3R7/6hdqj+ClyCK5dLf+YFRkZOaEO51WMVMP8SLjqny/syzMS+aIhxBP
-         yOdnEa7/k28X+74d6v9i6hhK7zUJIlgGgHPqp/NPqFOr8UtZxLlKRmrvjD3whR9dck
-         nuIw+4h9H2Tyw==
+        s=k20201202; t=1677828209;
+        bh=S96iUPLNp4rT3Ve3r72wqD24rjqGWLopbjKW6pRn4zU=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=McQVsF3pfbbSMz/bG0gkWr+ikJD06/SPczhUfwC9RM/sYz8cVjp9caqrRE8/yKsPA
+         bYJqU4aJ/oLzEkLkHiDz6q9dpuI9PQvH2aI0DUa7HyzGmTlddjwBwk1T8Yu3mWt8qd
+         8xmVreTDatA4LOzATgUK23G7DKYb05sC2+rQ5q+9ja5PXzN8W2NC/MGoFLIK+7PqRf
+         ET3BdGc9JeYbJHKi9GoH1Wdwhi1hPyVpfxhogsQhVwMkLXvDGv7u/DeSq8Q13iF53M
+         Kju8By7EaS9mJ6b7N9YVKo9348bMOGqiX1hRzhhk+j9eAFavRzKSxKHyfEwrxZvBmS
+         NdI276eODSPTA==
 From:   Eric Biggers <ebiggers@kernel.org>
 To:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
 Cc:     linux-fscrypt@vger.kernel.org,
         Nathan Huckleberry <nhuck@google.com>
-Subject: [PATCH 0/3] Fix blk-crypto keyslot race condition
-Date:   Thu,  2 Mar 2023 23:19:56 -0800
-Message-Id: <20230303071959.144604-1-ebiggers@kernel.org>
+Subject: [PATCH 3/3] blk-crypto: remove blk_crypto_insert_cloned_request()
+Date:   Thu,  2 Mar 2023 23:19:59 -0800
+Message-Id: <20230303071959.144604-4-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20230303071959.144604-1-ebiggers@kernel.org>
+References: <20230303071959.144604-1-ebiggers@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This series fixes a race condition in blk-crypto keyslot management and
-makes some related cleanups.  It replaces
-"[PATCH] blk-crypto: make blk_crypto_evict_key() always try to evict"
-(https://lore.kernel.org/r/20230226203816.207449-1-ebiggers@kernel.org),
-which was a simpler fix but didn't fix the keyslot reference counting to
-work as expected.
+From: Eric Biggers <ebiggers@google.com>
 
-Eric Biggers (3):
-  blk-mq: release crypto keyslot before reporting I/O complete
-  blk-crypto: make blk_crypto_evict_key() more robust
-  blk-crypto: remove blk_crypto_insert_cloned_request()
+blk_crypto_insert_cloned_request() is the same as
+blk_crypto_rq_get_keyslot(), so just use that directly.
 
- Documentation/block/inline-encryption.rst |  3 +-
- block/blk-crypto-internal.h               | 28 +++++--------
- block/blk-crypto-profile.c                | 50 +++++++++--------------
- block/blk-crypto.c                        | 47 +++++++++++----------
- block/blk-mq.c                            | 17 +++++++-
- 5 files changed, 71 insertions(+), 74 deletions(-)
+Signed-off-by: Eric Biggers <ebiggers@google.com>
+---
+ Documentation/block/inline-encryption.rst |  3 +--
+ block/blk-crypto-internal.h               | 15 ---------------
+ block/blk-mq.c                            |  2 +-
+ 3 files changed, 2 insertions(+), 18 deletions(-)
 
-
-base-commit: 2eb29d59ddf02e39774abfb60b2030b0b7e27c1f
+diff --git a/Documentation/block/inline-encryption.rst b/Documentation/block/inline-encryption.rst
+index f9bf18ea65093..90b733422ed46 100644
+--- a/Documentation/block/inline-encryption.rst
++++ b/Documentation/block/inline-encryption.rst
+@@ -270,8 +270,7 @@ Request queue based layered devices like dm-rq that wish to support inline
+ encryption need to create their own blk_crypto_profile for their request_queue,
+ and expose whatever functionality they choose. When a layered device wants to
+ pass a clone of that request to another request_queue, blk-crypto will
+-initialize and prepare the clone as necessary; see
+-``blk_crypto_insert_cloned_request()``.
++initialize and prepare the clone as necessary.
+ 
+ Interaction between inline encryption and blk integrity
+ =======================================================
+diff --git a/block/blk-crypto-internal.h b/block/blk-crypto-internal.h
+index 73609902349b6..0f55e5b4bbbf2 100644
+--- a/block/blk-crypto-internal.h
++++ b/block/blk-crypto-internal.h
+@@ -195,21 +195,6 @@ static inline int blk_crypto_rq_bio_prep(struct request *rq, struct bio *bio,
+ 	return 0;
+ }
+ 
+-/**
+- * blk_crypto_insert_cloned_request - Prepare a cloned request to be inserted
+- *				      into a request queue.
+- * @rq: the request being queued
+- *
+- * Return: BLK_STS_OK on success, nonzero on error.
+- */
+-static inline blk_status_t blk_crypto_insert_cloned_request(struct request *rq)
+-{
+-
+-	if (blk_crypto_rq_is_encrypted(rq))
+-		return blk_crypto_rq_get_keyslot(rq);
+-	return BLK_STS_OK;
+-}
+-
+ #ifdef CONFIG_BLK_INLINE_ENCRYPTION_FALLBACK
+ 
+ int blk_crypto_fallback_start_using_mode(enum blk_crypto_mode_num mode_num);
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 738e81f518227..61ed699e89d53 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -3048,7 +3048,7 @@ blk_status_t blk_insert_cloned_request(struct request *rq)
+ 	if (q->disk && should_fail_request(q->disk->part0, blk_rq_bytes(rq)))
+ 		return BLK_STS_IOERR;
+ 
+-	if (blk_crypto_insert_cloned_request(rq))
++	if (blk_crypto_rq_get_keyslot(rq))
+ 		return BLK_STS_IOERR;
+ 
+ 	blk_account_io_start(rq);
 -- 
 2.39.2
 
