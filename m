@@ -2,77 +2,49 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B80DC6FA8E
-	for <linux-block@archiver.kernel.org>; Fri,  3 Mar 2023 01:59:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B1056C7EE33
+	for <linux-block@archiver.kernel.org>; Fri,  3 Mar 2023 02:16:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229538AbjCCB7G (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 2 Mar 2023 20:59:06 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38336 "EHLO
+        id S229540AbjCCCQA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 2 Mar 2023 21:16:00 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48116 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229463AbjCCB7F (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Mar 2023 20:59:05 -0500
-Received: from sin.source.kernel.org (sin.source.kernel.org [IPv6:2604:1380:40e1:4800::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8722516AE4;
-        Thu,  2 Mar 2023 17:59:04 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by sin.source.kernel.org (Postfix) with ESMTPS id EC310CE2021;
-        Fri,  3 Mar 2023 01:59:02 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A2059C433D2;
-        Fri,  3 Mar 2023 01:59:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1677808741;
-        bh=wWK0TKtrXgkBt+vb5U8Z0HtNKqKXOfcAjYxIxt05B5Q=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=M4iWUGhO7pAc7f2BcIx9ymL2rpZiYt4cEkOBPC2iYi8hTEXRZyWxa/dQVXKoFYFMo
-         hP0Jp8MBFg1JyKYc7J+/ood93fuB78xi4LyDek+yiYQCZOPgZmAias3x+F0hT826d/
-         LTO68YZk7TcvaFNMs8t6war/kvntEvGjXC3tkP9oM7S/QgTKeRh68KNDhHu6JGT1EX
-         Tsn3ZxLgYIVS/hWpWkNvEJkM7/JQ0aWBiH8G7gMeuhqMHCHvpM+uVjI8o5NB1C6Pbu
-         7bMhXY9n0BSIjoxXSuvxHZXyX6NGaIiR9hpQxMZmgnK/vfqdzBawnRuoulR8/gkpvC
-         QYOdJVZiQWlDA==
-Date:   Thu, 2 Mar 2023 18:58:58 -0700
-From:   Keith Busch <kbusch@kernel.org>
-To:     Theodore Ts'o <tytso@mit.edu>
-Cc:     lsf-pc@lists.linux-foundation.org, linux-fsdevel@vger.kernel.org,
-        linux-mm@kvack.org, linux-block@vger.kernel.org
-Subject: Re: [LSF/MM/BPF TOPIC] Cloud storage optimizations
-Message-ID: <ZAFUYqAcPmRPLjET@kbusch-mbp.dhcp.thefacebook.com>
-References: <Y/7L74P6jSWwOvWt@mit.edu>
+        with ESMTP id S229447AbjCCCP7 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Mar 2023 21:15:59 -0500
+Received: from out30-99.freemail.mail.aliyun.com (out30-99.freemail.mail.aliyun.com [115.124.30.99])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B65DB39BBD;
+        Thu,  2 Mar 2023 18:15:57 -0800 (PST)
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R641e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046060;MF=ziyangzhang@linux.alibaba.com;NM=1;PH=DS;RN=7;SR=0;TI=SMTPD_---0Vcz9Fdt_1677809754;
+Received: from 30.97.56.172(mailfrom:ZiyangZhang@linux.alibaba.com fp:SMTPD_---0Vcz9Fdt_1677809754)
+          by smtp.aliyun-inc.com;
+          Fri, 03 Mar 2023 10:15:55 +0800
+Message-ID: <0a585f38-b115-4c4b-ac1e-14322774a177@linux.alibaba.com>
+Date:   Fri, 3 Mar 2023 10:15:54 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <Y/7L74P6jSWwOvWt@mit.edu>
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.6.1
+Subject: Re: [RFC PATCH 11/12] block: ublk_drv: add common exit handling
+Content-Language: en-US
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     linux-block@vger.kernel.org, Miklos Szeredi <mszeredi@redhat.com>,
+        io-uring@vger.kernel.org,
+        Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>,
+        Bernd Schubert <bschubert@ddn.com>,
+        Jens Axboe <axboe@kernel.dk>
+References: <20230301140611.163055-1-ming.lei@redhat.com>
+ <20230301140611.163055-12-ming.lei@redhat.com>
+From:   Ziyang Zhang <ZiyangZhang@linux.alibaba.com>
+In-Reply-To: <20230301140611.163055-12-ming.lei@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Feb 28, 2023 at 10:52:15PM -0500, Theodore Ts'o wrote:
-> Emulated block devices offered by cloud VM’s can provide functionality
-> to guest kernels and applications that traditionally have not been
-> available to users of consumer-grade HDD and SSD’s.  For example,
-> today it’s possible to create a block device in Google’s Persistent
-> Disk with a 16k physical sector size, which promises that aligned 16k
-> writes will be atomically.  With NVMe, it is possible for a storage
-> device to promise this without requiring read-modify-write updates for
-> sub-16k writes. 
+On 2023/3/1 22:06, Ming Lei wrote:
+> Simplify exit handling a bit, and prepare for supporting fused command.
+> 
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> ---
 
-I'm not sure it does. NVMe spec doesn't say AWUN writes are never a RMW
-operation. NVMe suggests aligning to NPWA is the best way to avoid RMW, but
-doesn't guarantee that, nor does it require this limit aligns to atomic
-boundaries. NVMe provides a lot of hints, but stops short of promises. Vendors
-can promise whatever they want, but that's outside spec.
-
-> All that is necessary are some changes in the block
-> layer so that the kernel does not inadvertently tear a write request
-> when splitting a bio because it is too large (perhaps because it got
-> merged with some other request, and then it gets split at an
-> inconvenient boundary).
-
-All the limits needed to optimally split on phyiscal boundaries exist, so I
-hope we're using them correctly via get_max_io_size().
-
-That said, I was hoping you were going to suggest supporting 16k logical block
-sizes. Not a problem on some arch's, but still problematic when PAGE_SIZE is
-4k. :)
+Reviewed-by: Ziyang Zhang <ZiyangZhang@linux.alibaba.com>
