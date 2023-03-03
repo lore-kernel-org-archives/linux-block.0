@@ -2,183 +2,175 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 62604C7EE3A
-	for <linux-block@archiver.kernel.org>; Fri,  3 Mar 2023 07:23:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC84BC678D4
+	for <linux-block@archiver.kernel.org>; Fri,  3 Mar 2023 08:34:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229736AbjCCHXh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 3 Mar 2023 02:23:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55106 "EHLO
+        id S229890AbjCCIeK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 3 Mar 2023 03:34:10 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57912 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229752AbjCCHXe (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 3 Mar 2023 02:23:34 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3076D14495;
-        Thu,  2 Mar 2023 23:23:30 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 9AE8261771;
-        Fri,  3 Mar 2023 07:23:29 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DDE9FC4339E;
-        Fri,  3 Mar 2023 07:23:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1677828209;
-        bh=sa61M2+pFizpLQ61APorBId7JMTf9Cn6cm1le+eyI7k=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=Y9Tq4WzY25FFuUee2wup+AW8On32w89kSRu4Us7HKJxhGAmGgpPuciTD8i2tcW86G
-         j7/VDzk8WKY6SWchE5EAf9QnMZK4uloutSnr7ZD2qUh0w3wv/wVX0OIWga51+kixTo
-         fx9vw1s6EL093cKPDZFvBgWz2NCdixyuuIRcJ+ase2TAXI18kPb9g+PaNC6bbUY6gs
-         hjdhDmKfakqCPlMqowi5rpRycLXD3Ai0ZeBR6UgUs10YT4Ueah/KZrVnyTJeGCR/Q4
-         dLBUzK2y26oAmUz7ef25+H4QWZOhQCZwU4qt7Hns7ZpiIlMjq3Dqdy2Wu3XoCVM9pi
-         J+g6vGef0shCw==
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
-Cc:     linux-fscrypt@vger.kernel.org,
-        Nathan Huckleberry <nhuck@google.com>, stable@vger.kernel.org
-Subject: [PATCH 2/3] blk-crypto: make blk_crypto_evict_key() more robust
-Date:   Thu,  2 Mar 2023 23:19:58 -0800
-Message-Id: <20230303071959.144604-3-ebiggers@kernel.org>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20230303071959.144604-1-ebiggers@kernel.org>
-References: <20230303071959.144604-1-ebiggers@kernel.org>
+        with ESMTP id S229888AbjCCIeK (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 3 Mar 2023 03:34:10 -0500
+Received: from mail-ed1-x52e.google.com (mail-ed1-x52e.google.com [IPv6:2a00:1450:4864:20::52e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 372B31352D
+        for <linux-block@vger.kernel.org>; Fri,  3 Mar 2023 00:34:08 -0800 (PST)
+Received: by mail-ed1-x52e.google.com with SMTP id o12so7181156edb.9
+        for <linux-block@vger.kernel.org>; Fri, 03 Mar 2023 00:34:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=metaspace-dk.20210112.gappssmtp.com; s=20210112; t=1677832446;
+        h=content-transfer-encoding:mime-version:message-id:in-reply-to:date
+         :subject:cc:to:from:user-agent:references:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=QX/s24fyXps09GmRUXN6+YF0kQsZjEttAdLoVe9JJU8=;
+        b=KE8kJDfmZXlNopgtYY4tozghvbSzrDPir+aOJyvz4M9lULysiFooq0W9opwHCbAgXM
+         sUokj7MEEiZj0N0IlDYeNWxFcRvLwDeZp+KeuEQfjunuJ/CuLAdXO4JuCss+Ed1ook8C
+         LEPdrpsr4+ThxrdGwOtVsjvc1a/3K3g/X+3CNDsUW9HjKj8CRnLfNgwzTX5pIKoz+ixT
+         2JQ2VPzFZyTvtD3NYd8WQKJmU51lkNbPS1GVRLFoUA7o4GLnIp2OwY02RlSH9kyrltR7
+         oMy1TccoGb2eZ6n1NLq6ehvPWnGMaGiwyyifIcSwIoCBrof6ABWlJwUvBDIJ46zfuxIN
+         iORQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1677832446;
+        h=content-transfer-encoding:mime-version:message-id:in-reply-to:date
+         :subject:cc:to:from:user-agent:references:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=QX/s24fyXps09GmRUXN6+YF0kQsZjEttAdLoVe9JJU8=;
+        b=53LR6KVmaxKBUhyfJJjbzthQaJFbaMryyELJEyINdcgvduH0tX0l2H2fRb/1i7k9FX
+         IYrEAEbrzKInSPyyriaSRI72jwQ5M6R36oFMiJW9olXvA1zC9hpjlsW1efifHohf7uEg
+         WpnhnlS7+H5rPpEQPYFm+Z8fRIW6FH4ygFfQht+AP2mmNuUWLkNBG5acuTppVLRWM4eh
+         7tY5j09wvEnawiVOeFtUjjfrF1JTE4saZvtneg4xvJnG0oJ7Cxz4D/neTuM8Mjgj1MtG
+         gY/qJn+MOV6t+bWqGmRfLg87BvkK4lpT8nZcqet9LJ/HQxSw+ypRXNp+uoZEpMh9LEKO
+         LBYQ==
+X-Gm-Message-State: AO0yUKU4Tft+WiLj3/GcrSVNqPVfldAgkPRVK/VMY84A5C+6kT/pFbY7
+        4fTaw2qZKyKpU1mRwDVUDipd6V6x3GVP7eOb
+X-Google-Smtp-Source: AK7set+gReERjem/pLhjTAwaodgJwetDff7PtxIZhYQEiDj2UkwqZN3tOQ/Ey6fVvCjcGCGStfPDZA==
+X-Received: by 2002:aa7:cfcb:0:b0:4af:6c25:ed9a with SMTP id r11-20020aa7cfcb000000b004af6c25ed9amr1235797edy.29.1677832446739;
+        Fri, 03 Mar 2023 00:34:06 -0800 (PST)
+Received: from localhost ([194.62.217.3])
+        by smtp.gmail.com with ESMTPSA id t30-20020a50ab5e000000b004ad601533a3sm872101edc.55.2023.03.03.00.34.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 03 Mar 2023 00:34:06 -0800 (PST)
+References: <20230224200502.391570-1-nmi@metaspace.dk>
+ <ZAAPBFfqP671N4ue@T590> <87o7pblhi1.fsf@metaspace.dk>
+ <ZABfFW+28Jlxq+Ew@T590> <ZABmAR6Du1tUVEa7@T590>
+ <CAFj5m9+o4yNA5rNDA+EXWZthMtB+dOLOW0O788i77=Qn1eJ0qQ@mail.gmail.com>
+ <87h6v3l9up.fsf@metaspace.dk> <ZAChttVoCHsnXmvF@T590>
+ <875ybjl1r0.fsf@metaspace.dk> <ZAFieW9PZ2LNQYHa@T590>
+User-agent: mu4e 1.9.18; emacs 28.2.50
+From:   Andreas Hindborg <nmi@metaspace.dk>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     linux-block@vger.kernel.org, Hans Holmberg <Hans.Holmberg@wdc.com>,
+        Matias Bjorling <Matias.Bjorling@wdc.com>,
+        Niklas Cassel <Niklas.Cassel@wdc.com>,
+        kernel test robot <lkp@intel.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        open list <linux-kernel@vger.kernel.org>,
+        Damien Le Moal <damien.lemoal@opensource.wdc.com>
+Subject: Re: [PATCH v2] block: ublk: enable zoned storage support
+Date:   Fri, 03 Mar 2023 09:27:58 +0100
+In-reply-to: <ZAFieW9PZ2LNQYHa@T590>
+Message-ID: <87wn3yfd36.fsf@metaspace.dk>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Eric Biggers <ebiggers@google.com>
 
-If blk_crypto_evict_key() sees that the key is still in-use (due to a
-bug) or that ->keyslot_evict failed, it currently just returns an error
-while leaving the key linked into the keyslot management structures.
+Ming Lei <ming.lei@redhat.com> writes:
 
-However, blk_crypto_evict_key() is only called in contexts such as inode
-eviction where failure is not an option.  So actually the caller
-proceeds with freeing the blk_crypto_key regardless of the return value
-of blk_crypto_evict_key().
+> On Thu, Mar 02, 2023 at 02:28:33PM +0100, Andreas Hindborg wrote:
+>>=20
+>> Ming Lei <ming.lei@redhat.com> writes:
+>>=20
+>> > On Thu, Mar 02, 2023 at 11:07:15AM +0100, Andreas Hindborg wrote:
+>> >>=20
+>> >> Ming Lei <ming.lei@redhat.com> writes:
+>> >>=20
+>> >> > On Thu, Mar 2, 2023 at 5:02=E2=80=AFPM Ming Lei <ming.lei@redhat.co=
+m> wrote:
+>> >> >>
+>> >> >> On Thu, Mar 02, 2023 at 04:32:21PM +0800, Ming Lei wrote:
+>> >> >> > On Thu, Mar 02, 2023 at 08:31:07AM +0100, Andreas Hindborg wrote:
+>> >> >> > >
+>> >> >>
+>> >> >> ...
+>> >> >>
+>> >> >> > >
+>> >> >> > > I agree about fetching more zones. However, it is no good to f=
+etch up to
+>> >> >> > > a max, since the requested zone report may less than max. I was
+>> >> >> >
+>> >> >> > Short read should always be supported, so the interface may need=
+ to
+>> >> >> > return how many zones in single command, please refer to nvme_ns=
+_report_zones().
+>> >> >>
+>> >> >> blk_zone is part of uapi, maybe the short read can be figured out =
+by
+>> >> >> one all-zeroed 'blk_zone'?  then no extra uapi data is needed for
+>> >> >> reporting zones.
+>> >> >
+>> >> > oops, we have blk_zone_report data for reporting zones to userspace=
+ already,
+>> >> > see blkdev_report_zones_ioctl(), then this way can be re-used for g=
+etting zone
+>> >> > report from ublk server too, right?
+>> >>=20
+>> >> Yes that would be nice. But I did the report_zone command like a read
+>> >> operation, so we are not currently copying any buffers to user space
+>> >> when issuing the command, we just rely on the iod.
+>> >
+>> > What I meant is to reuse the format of blk_zone_report for returning
+>> > multiple 'blk_zone' info in single command.
+>> >
+>> > The only change is that you need to allocate one bigger kernel buffer
+>> > to hold more 'blk_zone' in single report zone request.
+>> >
+>> >> I think it would be
+>> >> better to use the start_sectors and nr_sectors of the iod instead. Th=
+en
+>> >> we don't have to copy the blk_zone_report. What do you think?
+>> >
+>> > For IN parameter of report zone command, you still can reuse
+>> > blk_zone_report:
+>> >
+>> > struct blk_zone_report {
+>> >         __u64           sector;
+>> >         __u32           nr_zones;
+>> >         __u32           flags;
+>> > };
+>> >
+>> > Just by using the 1st two 64b words of iod for holding 'blk_zone_repor=
+t', and
+>> > keep the iod->addr field not touched.
+>>=20
+>> I see. Would you make the first part of `struct ublksrv_io_desc` a union
+>> for this, or would you just cast it at the use site?
+>
+> oops, you still need iod->op_flags for recognizing the io op, so just
+> start_sector and nr_sectors can be used.
 
-These two assumptions don't match, and the result is that there can be a
-use-after-free in blk_crypto_reprogram_all_keys() after one of these
-errors occurs.  (Note, these errors *shouldn't* happen; we're just
-talking about what happens if they do anyway.)
+We do not actually need to pass the flags to user space, or back from
+user space to kernel for ublk zone report. They are currently used to
+tell user space if the zone report contains capacity field. We could
+exclude them from the ublk kabi since the zone report will always
+contain capacity? But it might be good to have a flags field or future
+things.
 
-Fix this by making blk_crypto_evict_key() unlink the key from the
-keyslot management structures even on failure.
+> However, this way isn't good too, cause UBLK_IO_OP_DRV_IN is just mapped
+> to 'report zone' command in your implementation, what if new pt request
+> is required in future?
 
-Fixes: 1b2628397058 ("block: Keyslot Manager for Inline Encryption")
-Cc: stable@vger.kernel.org
-Signed-off-by: Eric Biggers <ebiggers@google.com>
----
- block/blk-crypto-profile.c | 50 +++++++++++++++-----------------------
- block/blk-crypto.c         | 23 +++++++++++-------
- 2 files changed, 33 insertions(+), 40 deletions(-)
+We are currently mapping REQ_OP_* 1:1 to  UBLK_OP_OP_*. If we relax
+this, we can have a UBLK_IO_OP_REPORT_ZONES.
 
-diff --git a/block/blk-crypto-profile.c b/block/blk-crypto-profile.c
-index 0307fb0d95d34..1b20ead59f39b 100644
---- a/block/blk-crypto-profile.c
-+++ b/block/blk-crypto-profile.c
-@@ -354,22 +354,10 @@ bool __blk_crypto_cfg_supported(struct blk_crypto_profile *profile,
- 	return true;
- }
- 
--/**
-- * __blk_crypto_evict_key() - Evict a key from a device.
-- * @profile: the crypto profile of the device
-- * @key: the key to evict.  It must not still be used in any I/O.
-- *
-- * If the device has keyslots, this finds the keyslot (if any) that contains the
-- * specified key and calls the driver's keyslot_evict function to evict it.
-- *
-- * Otherwise, this just calls the driver's keyslot_evict function if it is
-- * implemented, passing just the key (without any particular keyslot).  This
-- * allows layered devices to evict the key from their underlying devices.
-- *
-- * Context: Process context. Takes and releases profile->lock.
-- * Return: 0 on success or if there's no keyslot with the specified key, -EBUSY
-- *	   if the keyslot is still in use, or another -errno value on other
-- *	   error.
-+/*
-+ * This is an internal function that evicts a key from an inline encryption
-+ * device that can be either a real device or the blk-crypto-fallback "device".
-+ * It is used only by blk_crypto_evict_key(); see that function for details.
-  */
- int __blk_crypto_evict_key(struct blk_crypto_profile *profile,
- 			   const struct blk_crypto_key *key)
-@@ -389,22 +377,22 @@ int __blk_crypto_evict_key(struct blk_crypto_profile *profile,
- 
- 	blk_crypto_hw_enter(profile);
- 	slot = blk_crypto_find_keyslot(profile, key);
--	if (!slot)
--		goto out_unlock;
--
--	if (WARN_ON_ONCE(atomic_read(&slot->slot_refs) != 0)) {
--		err = -EBUSY;
--		goto out_unlock;
-+	if (slot) {
-+		if (WARN_ON_ONCE(atomic_read(&slot->slot_refs) != 0)) {
-+			/* BUG: key is still in use by I/O */
-+			err = -EBUSY;
-+		} else {
-+			err = profile->ll_ops.keyslot_evict(
-+					profile, key,
-+					blk_crypto_keyslot_index(slot));
-+		}
-+		/*
-+		 * Callers may free the key even on error, so unlink the key
-+		 * from the hash table and clear slot->key even on error.
-+		 */
-+		hlist_del(&slot->hash_node);
-+		slot->key = NULL;
- 	}
--	err = profile->ll_ops.keyslot_evict(profile, key,
--					    blk_crypto_keyslot_index(slot));
--	if (err)
--		goto out_unlock;
--
--	hlist_del(&slot->hash_node);
--	slot->key = NULL;
--	err = 0;
--out_unlock:
- 	blk_crypto_hw_exit(profile);
- 	return err;
- }
-diff --git a/block/blk-crypto.c b/block/blk-crypto.c
-index 8e5612364c48c..caa86a210cb6c 100644
---- a/block/blk-crypto.c
-+++ b/block/blk-crypto.c
-@@ -399,17 +399,22 @@ int blk_crypto_start_using_key(struct block_device *bdev,
- }
- 
- /**
-- * blk_crypto_evict_key() - Evict a key from any inline encryption hardware
-- *			    it may have been programmed into
-- * @bdev: The block_device who's associated inline encryption hardware this key
-- *     might have been programmed into
-- * @key: The key to evict
-+ * blk_crypto_evict_key() - Evict a blk_crypto_key from a block_device
-+ * @bdev: a block_device on which I/O using the key may have been done
-+ * @key: the key to evict
-  *
-- * Upper layers (filesystems) must call this function to ensure that a key is
-- * evicted from any hardware that it might have been programmed into.  The key
-- * must not be in use by any in-flight IO when this function is called.
-+ * For a given block_device, this function removes the given blk_crypto_key from
-+ * the keyslot management structures and evicts it from any underlying hardware
-+ * keyslot(s) or blk-crypto-fallback keyslot it may have been programmed into.
-  *
-- * Return: 0 on success or if the key wasn't in any keyslot; -errno on error.
-+ * Upper layers must call this before freeing the blk_crypto_key.  It must be
-+ * called for every block_device the key may have been used on.  The key must no
-+ * longer be in use by any I/O when this function is called.
-+ *
-+ * Context: May sleep.
-+ * Return: 0 on success or if the key wasn't in any keyslot; -errno if the key
-+ *	   failed to be evicted from a keyslot or is still in-use.  Even on
-+ *	   "failure", the key is removed from the keyslot management structures.
-  */
- int blk_crypto_evict_key(struct block_device *bdev,
- 			 const struct blk_crypto_key *key)
--- 
-2.39.2
+>
+> We need to think about how to support ublk pt request in generic way.
+
+Another option is to allow REQ_OP_DRV_IN to pass a buffer to user space.
+Instead of being similar to a read operation, it could be a combination of
+a read and a write operation.
+
+BR Andreas
 
