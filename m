@@ -2,191 +2,94 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 613F3C64EC4
-	for <linux-block@archiver.kernel.org>; Fri,  3 Mar 2023 12:45:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AEF8AC7EE2F
+	for <linux-block@archiver.kernel.org>; Fri,  3 Mar 2023 13:12:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229698AbjCCMpe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 3 Mar 2023 07:45:34 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58164 "EHLO
+        id S229618AbjCCNL7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 3 Mar 2023 08:11:59 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51116 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229634AbjCCMpd (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 3 Mar 2023 07:45:33 -0500
-Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5C723C78A
-        for <linux-block@vger.kernel.org>; Fri,  3 Mar 2023 04:45:32 -0800 (PST)
-Received: by mail-pj1-x1033.google.com with SMTP id m8-20020a17090a4d8800b002377bced051so6066405pjh.0
-        for <linux-block@vger.kernel.org>; Fri, 03 Mar 2023 04:45:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112; t=1677847532;
-        h=content-transfer-encoding:content-language:cc:to:subject:from
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jU/Hvt7FnuivZ2l75ZXtgMZKggIuIEzPGAn5M5WqgXo=;
-        b=FOsP1v38LT5hDlQBQagfvV0APvGwCDWivKLTAi5olUpmoTkAVRQfqgdrA8+lRRW+S2
-         llBRfX1XMMCR4yn4sYKjhJsMHrtAHVUwCLuq0cNFIOgkDlHLtb76BHI4gZ/HiaD/zx5A
-         GDtM//mWv/99ZdHnkOtSTFRQRhzbkS3jGZ1G0hcplXonL1bU28lALKQXcq4PXiOFjCbq
-         6iEcKBWreaQ3Vh37nyN2518sQZsTIMtLL2Cd36NdJoXoIAjJ6xtVnw3GfFmthlzpPdz7
-         H/4wlxS4/g7u04q+HlITSLh1JAQxz6epDj8tuz0dH1WFW2v8uYZKkM3FEMYs+ZOTsFof
-         5qcA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1677847532;
-        h=content-transfer-encoding:content-language:cc:to:subject:from
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=jU/Hvt7FnuivZ2l75ZXtgMZKggIuIEzPGAn5M5WqgXo=;
-        b=nu+DTen7oPyiuejm+35I5Eah4N6aoAt+Ph1Bkt6QK+w1fcS3b+U2jyJgY9OKpOqEXV
-         Q0DDEFoKpJHQnDUZONPduW4j8WKOwRkTaocJChJ7Am4i02r9NVtJvuExkgZpZNtSOzOW
-         0BLVuyLgdZrSfuYQZX1Sv7T9wVQ+zyY6OsaH77sMb+nOfMElOeIZn5fpElgOh3SkbI9Y
-         nj5ELR0Jf3Ro1LGt0IwaEF+GDHl7JogBCceEswUiWwIPIR5p/X/fJszYyZC4Bfg8Tn7C
-         kt5xbGj9elq9JxiH4YEnm1BXnvQGSuI62Xeh35crAJ8tc+TbMxaKikcF+HTS/K8ai+0g
-         9xZA==
-X-Gm-Message-State: AO0yUKW4Ia0aJjwvsLUcjMAob5WphAj6ul4GzmUpEfwdiFzg/ynefxSM
-        n846gNgzDNdbXo5Zwo4C0Ixy9iYBLygbPozW
-X-Google-Smtp-Source: AK7set+jLENOHpbzx23sT9VLHfS5DB4cLYvBu6nTFpv/6W/XhMEFoDhqWyL/tsaiagB+N2tLSIxnbg==
-X-Received: by 2002:a17:903:32ca:b0:19a:723a:8405 with SMTP id i10-20020a17090332ca00b0019a723a8405mr2133541plr.6.1677847531986;
-        Fri, 03 Mar 2023 04:45:31 -0800 (PST)
-Received: from [192.168.1.136] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id kp3-20020a170903280300b00198ef76ce8dsm1443677plb.72.2023.03.03.04.45.31
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 03 Mar 2023 04:45:31 -0800 (PST)
-Message-ID: <9d8fd1ba-c96c-667b-daf6-9971958b955a@kernel.dk>
-Date:   Fri, 3 Mar 2023 05:45:30 -0700
+        with ESMTP id S229563AbjCCNL6 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 3 Mar 2023 08:11:58 -0500
+Received: from bedivere.hansenpartnership.com (bedivere.hansenpartnership.com [IPv6:2607:fcd0:100:8a00::2])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B99A93F7;
+        Fri,  3 Mar 2023 05:11:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+        d=hansenpartnership.com; s=20151216; t=1677849112;
+        bh=hr2srA7lr1NS/bcOuwoy15lE9j7MbrTWwn/RCZPWv0o=;
+        h=Message-ID:Subject:From:To:Date:In-Reply-To:References:From;
+        b=f1Pdx1vzcijeNa0004rr3e9cC1SjXfOWCFM+NrWJGrr/TWHQ+3B49wbGzwv6Udf40
+         CxF6io8nWu/84nFNe/89vnDHQreJehCaxJd/gvEzK2WXET7NW/0JH4ZjuSs9eIrzyf
+         aYqH9XtLmM1PUmqrdGYZfaFLzEDHpHFUHYcdGvtc=
+Received: from localhost (localhost [127.0.0.1])
+        by bedivere.hansenpartnership.com (Postfix) with ESMTP id EFFB212860A2;
+        Fri,  3 Mar 2023 08:11:52 -0500 (EST)
+Received: from bedivere.hansenpartnership.com ([127.0.0.1])
+        by localhost (bedivere.hansenpartnership.com [127.0.0.1]) (amavisd-new, port 10024)
+        with ESMTP id h_qcRum7Wm9d; Fri,  3 Mar 2023 08:11:52 -0500 (EST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+        d=hansenpartnership.com; s=20151216; t=1677849111;
+        bh=hr2srA7lr1NS/bcOuwoy15lE9j7MbrTWwn/RCZPWv0o=;
+        h=Message-ID:Subject:From:To:Date:In-Reply-To:References:From;
+        b=Gr1jV7AuEfHPRgmsMNt1lw07RRz25rhs0sLbhYiOU/KoJypM3unmCLMeCNKkqWgXJ
+         elpVW6j/eU4OARWHw58u709qNvR+D8RPFahxs06foKJ/0HWQENbFBrv7gB20K9vze9
+         WUj6f27ybv5mwJs+1Z2/LCXn1vHuKWU9VatnZlu8=
+Received: from lingrow.int.hansenpartnership.com (unknown [IPv6:2601:5c4:4302:c21::a774])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (prime256v1) server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (Client did not present a certificate)
+        by bedivere.hansenpartnership.com (Postfix) with ESMTPSA id D8DB31285ED5;
+        Fri,  3 Mar 2023 08:11:50 -0500 (EST)
+Message-ID: <f68905c5785b355b621847974d620fb59f021a41.camel@HansenPartnership.com>
+Subject: Re: [LSF/MM/BPF TOPIC] Cloud storage optimizations
+From:   James Bottomley <James.Bottomley@HansenPartnership.com>
+To:     Matthew Wilcox <willy@infradead.org>,
+        Keith Busch <kbusch@kernel.org>
+Cc:     Luis Chamberlain <mcgrof@kernel.org>,
+        Theodore Ts'o <tytso@mit.edu>,
+        lsf-pc@lists.linux-foundation.org, linux-fsdevel@vger.kernel.org,
+        linux-mm@kvack.org, linux-block@vger.kernel.org
+Date:   Fri, 03 Mar 2023 08:11:47 -0500
+In-Reply-To: <ZAFuSSZ5vZN7/UAa@casper.infradead.org>
+References: <Y/7L74P6jSWwOvWt@mit.edu>
+         <ZAFUYqAcPmRPLjET@kbusch-mbp.dhcp.thefacebook.com>
+         <ZAFuSSZ5vZN7/UAa@casper.infradead.org>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.42.4 
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
- Thunderbird/102.8.0
-From:   Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Followup block fixes/changes for 6.3-rc1
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Linus,
+On Fri, 2023-03-03 at 03:49 +0000, Matthew Wilcox wrote:
+> On Thu, Mar 02, 2023 at 06:58:58PM -0700, Keith Busch wrote:
+> > That said, I was hoping you were going to suggest supporting 16k
+> > logical block sizes. Not a problem on some arch's, but still
+> > problematic when PAGE_SIZE is 4k. :)
+> 
+> I was hoping Luis was going to propose a session on LBA size >
+> PAGE_SIZE. Funnily, while the pressure is coming from the storage
+> vendors, I don't think there's any work to be done in the storage
+> layers.  It's purely a FS+MM problem.
 
-Set of block fixes that should go into 6.3-rc1:
+Heh, I can do the fools rush in bit, especially if what we're
+interested in the minimum it would take to support this ...
 
-- NVMe pull request via Christoph:
-	- Don't access released socket during error recovery
-	  (Akinobu Mita)
-	- Bring back auto-removal of deleted namespaces during
-	  sequential scan (Christoph Hellwig)
-	- Fix an error code in nvme_auth_process_dhchap_challenge
-	  (Dan Carpenter)
-	- Show well known discovery name (Daniel Wagner)
-	- Add a missing endianess conversion in effects masking
-	  (Keith Busch)
+The FS problem could be solved simply by saying FS block size must
+equal device block size, then it becomes purely a MM issue.  The MM
+issue could be solved by adding a page order attribute to struct
+address_space and insisting that pagecache/filemap functions in
+mm/filemap.c all have to operate on objects that are an integer
+multiple of the address space order.  The base allocator is
+filemap_alloc_folio, which already has an apparently always zero order
+parameter (hmmm...) and it always seems to be called from sites that
+have the address_space, so it could simply be modified to always
+operate at the address_space order.
 
-- Fix for a regression introduced in blk-rq-qos during init in this
-  merge window (Breno)
+The above would be a bit suboptimal in that blocks are always mapped to
+physically contiguous pages, but it should be enough to get the concept
+working.
 
-- Reorder a few fields in struct blk_mq_tag_set, eliminating a few holes
-  and shrinking it (Christophe)
-
-- Remove redundant bdev_get_queue() NULL checks (Juhyung)
-
-- Add sed-opal single user mode support flag (Luca)
-
-- Remove SQE128 check in ublk as it isn't needed, saving some memory
-  (Ming)
-
-- Op specific segment checking for cloned requests (Uday)
-
-- Exclusive open partition scan fixes (Yu)
-
-- Loop offset/size checking before assigning them in the device (Zhong)
-
-- Bio polling fixes (me)
-
-Please pull!
-
-
-The following changes since commit 0aa2988e4fd23c0c8b33999d7b47dfbc5e6bf24b:
-
-  brd: use radix_tree_maybe_preload instead of radix_tree_preload (2023-02-17 06:15:53 -0700)
-
-are available in the Git repository at:
-
-  git://git.kernel.dk/linux.git tags/block-6.3-2023-03-03
-
-for you to fetch changes up to 49d24398327e32265eccdeec4baeb5a6a609c0bd:
-
-  blk-mq: enforce op-specific segment limits in blk_insert_cloned_request (2023-03-02 21:00:20 -0700)
-
-----------------------------------------------------------------
-block-6.3-2023-03-03
-
-----------------------------------------------------------------
-Akinobu Mita (1):
-      nvme-tcp: don't access released socket during error recovery
-
-Breno Leitao (1):
-      blk-iocost: Pass gendisk to ioc_refresh_params
-
-Christoph Hellwig (1):
-      nvme: bring back auto-removal of deleted namespaces during sequential scan
-
-Christophe JAILLET (1):
-      blk-mq: Reorder fields in 'struct blk_mq_tag_set'
-
-Dan Carpenter (1):
-      nvme-auth: fix an error code in nvme_auth_process_dhchap_challenge()
-
-Daniel Wagner (1):
-      nvme-fabrics: show well known discovery name
-
-Jens Axboe (3):
-      block: clear bio->bi_bdev when putting a bio back in the cache
-      block: be a bit more careful in checking for NULL bdev while polling
-      Merge tag 'nvme-6.3-2022-03-01' of git://git.infradead.org/nvme into for-6.3/block
-
-Juhyung Park (1):
-      block: remove more NULL checks after bdev_get_queue()
-
-Keith Busch (1):
-      nvme: fix sparse warning on effects masking
-
-Luca Boccassi (1):
-      sed-opal: add support flag for SUM in status ioctl
-
-Ming Lei (1):
-      ublk: remove check IO_URING_F_SQE128 in ublk_ch_uring_cmd
-
-Uday Shankar (1):
-      blk-mq: enforce op-specific segment limits in blk_insert_cloned_request
-
-Yu Kuai (2):
-      block: Revert "block: Do not reread partition table on exclusively open device"
-      block: fix scan partition for exclusively open device again
-
-Zhong Jinghua (1):
-      loop: loop_set_status_from_info() check before assignment
-
- block/bio.c                   |  1 +
- block/blk-core.c              | 10 ++++++++--
- block/blk-iocost.c            | 26 ++++++++++++++++++++------
- block/blk-merge.c             |  7 -------
- block/blk-mq.c                |  7 ++++---
- block/blk-zoned.c             | 10 ----------
- block/blk.h                   |  9 ++++++++-
- block/genhd.c                 | 37 ++++++++++++++++++++++++++++---------
- block/ioctl.c                 | 13 ++++++-------
- block/sed-opal.c              |  2 ++
- drivers/block/loop.c          |  8 ++++----
- drivers/block/ublk_drv.c      |  3 ---
- drivers/nvme/host/auth.c      |  2 +-
- drivers/nvme/host/core.c      | 37 +++++++++++++++++++------------------
- drivers/nvme/host/fabrics.h   |  3 ++-
- drivers/nvme/host/tcp.c       |  6 ++++++
- include/linux/blk-mq.h        |  4 ++--
- include/linux/blkdev.h        |  7 +------
- include/uapi/linux/sed-opal.h |  1 +
- kernel/trace/blktrace.c       |  6 +-----
- 20 files changed, 114 insertions(+), 85 deletions(-)
-
--- 
-Jens Axboe
+James
 
