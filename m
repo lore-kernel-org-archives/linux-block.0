@@ -2,46 +2,67 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1797C7EE2F
-	for <linux-block@archiver.kernel.org>; Fri,  3 Mar 2023 02:52:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BCA0EC6FA8E
+	for <linux-block@archiver.kernel.org>; Fri,  3 Mar 2023 02:55:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229437AbjCCCwF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 2 Mar 2023 21:52:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44460 "EHLO
+        id S229510AbjCCCzB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 2 Mar 2023 21:55:01 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45382 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229482AbjCCCwF (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Mar 2023 21:52:05 -0500
-Received: from out30-100.freemail.mail.aliyun.com (out30-100.freemail.mail.aliyun.com [115.124.30.100])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7F894ECDB;
-        Thu,  2 Mar 2023 18:52:03 -0800 (PST)
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R171e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045168;MF=ziyangzhang@linux.alibaba.com;NM=1;PH=DS;RN=3;SR=0;TI=SMTPD_---0VczFXIW_1677811920;
-Received: from 30.97.56.172(mailfrom:ZiyangZhang@linux.alibaba.com fp:SMTPD_---0VczFXIW_1677811920)
-          by smtp.aliyun-inc.com;
-          Fri, 03 Mar 2023 10:52:01 +0800
-Message-ID: <7c787a9f-3cd9-cc76-8194-d861b5674334@linux.alibaba.com>
-Date:   Fri, 3 Mar 2023 10:52:00 +0800
+        with ESMTP id S229455AbjCCCzB (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Mar 2023 21:55:01 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0799213510
+        for <linux-block@vger.kernel.org>; Thu,  2 Mar 2023 18:54:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1677812055;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=On0X7jfu4Kkz5jhhXkidOS2W/o76f20Fry218Xber/4=;
+        b=WdhGo6ZPaHNq5b0dQc+vyqBrFLja8nUPF2iFJirVSf0oGL7vIWIbwGoILdDNvS1fQU1TZi
+        W5qwoG/8+jPHZjbuwSVYY6i4hHq3ZgSKAOhACB8aOzGBjTTznTK+GkAlMZfKkKqEHGey3i
+        FQ9O2LtbhXuPmHawy5F81rNU28X5dIY=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-371-ilq3GhXiNH6bbuyY-Sy4nQ-1; Thu, 02 Mar 2023 21:54:10 -0500
+X-MC-Unique: ilq3GhXiNH6bbuyY-Sy4nQ-1
+Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 91D523811F20;
+        Fri,  3 Mar 2023 02:54:09 +0000 (UTC)
+Received: from T590 (ovpn-8-16.pek2.redhat.com [10.72.8.16])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 4E7A6492C3E;
+        Fri,  3 Mar 2023 02:54:03 +0000 (UTC)
+Date:   Fri, 3 Mar 2023 10:53:58 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Xiao Ni <xni@redhat.com>
+Cc:     Christoph Hellwig <hch@infradead.org>, Song Liu <song@kernel.org>,
+        linux-raid <linux-raid@vger.kernel.org>,
+        linux-block@vger.kernel.org, Nigel Croxon <ncroxon@redhat.com>
+Subject: Re: The gendisk of raid can't be released
+Message-ID: <ZAFhRj8YVpiO3b5g@T590>
+References: <CALTww28pEdW+f1SaXrG7Umf8uA6fAc9io-WKb_W8mVxEzW8EzA@mail.gmail.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.6.1
-Subject: Re: [RFC PATCH 00/12] io_uring: add IORING_OP_FUSED_CMD
-Content-Language: en-US
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     linux-block@vger.kernel.org, io-uring@vger.kernel.org
-References: <20230301140611.163055-1-ming.lei@redhat.com>
-From:   Ziyang Zhang <ZiyangZhang@linux.alibaba.com>
-In-Reply-To: <20230301140611.163055-1-ming.lei@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CALTww28pEdW+f1SaXrG7Umf8uA6fAc9io-WKb_W8mVxEzW8EzA@mail.gmail.com>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.10
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Ming,
+On Thu, Mar 02, 2023 at 11:51:59PM +0800, Xiao Ni wrote:
+> Hi Christoph
+> 
+> There is a regression problem which is introduced by 84d7d462b16d
+> (blk-cgroup: pin the gendisk in struct blkcg_gq).
 
-I tried this patchset but there are some conflicts while applying.
-Could please tell me the base branch? I have tried both io_uring
-and block.
+The above commit has been reverted, can you test the latest linus tree?
 
-Regards,
-Zhang
+
+Thanks,
+Ming
 
