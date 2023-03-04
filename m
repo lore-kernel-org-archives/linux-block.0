@@ -2,131 +2,139 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1337BC6FD19
-	for <linux-block@archiver.kernel.org>; Sat,  4 Mar 2023 08:17:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E08ADC678DB
+	for <linux-block@archiver.kernel.org>; Sat,  4 Mar 2023 10:23:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229620AbjCDIRq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 4 Mar 2023 03:17:46 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37836 "EHLO
+        id S229590AbjCDKXz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 4 Mar 2023 05:23:55 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59394 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229601AbjCDIRo (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sat, 4 Mar 2023 03:17:44 -0500
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 419CD4B804;
-        Sat,  4 Mar 2023 00:17:42 -0800 (PST)
-Received: from mail02.huawei.com (unknown [172.30.67.169])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4PTHl52Xgtz4f3jMQ;
-        Sat,  4 Mar 2023 16:17:37 +0800 (CST)
-Received: from huaweicloud.com (unknown [10.175.127.227])
-        by APP3 (Coremail) with SMTP id _Ch0CgDHcyGg_gJkXTNDEQ--.38480S6;
-        Sat, 04 Mar 2023 16:17:39 +0800 (CST)
-From:   Yu Kuai <yukuai1@huaweicloud.com>
-To:     hch@lst.de, axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        yukuai3@huawei.com, yukuai1@huaweicloud.com, yi.zhang@huawei.com,
-        yangerkun@huawei.com
-Subject: [PATCH -next 2/3] blk-wbt: freeze queue in wbt_enable/disable_default
-Date:   Sat,  4 Mar 2023 16:40:52 +0800
-Message-Id: <20230304084053.2822411-3-yukuai1@huaweicloud.com>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20230304084053.2822411-1-yukuai1@huaweicloud.com>
-References: <20230304084053.2822411-1-yukuai1@huaweicloud.com>
+        with ESMTP id S229457AbjCDKXz (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sat, 4 Mar 2023 05:23:55 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD402C660
+        for <linux-block@vger.kernel.org>; Sat,  4 Mar 2023 02:23:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1677925384;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=9A0w+OdpoRYxnV0rF0kJS5zDj5JrmFLVzkcGnyJoS6Q=;
+        b=hR1Sx0qFYB4bVq81TOBl+KgQM2FGIxbFvIeafQ0VjyJ4T+Y9FLhvwXPbJXxAO3c+ZQvjnF
+        pdMrM81l0KtnEJhUpn8+zE6sI5CZBHQbLLj19ZMdrN04dVd7Zw/urxHCHhpWTlLjfUaaFu
+        meZjizBEVJc+KZ4+kbeQ9s1sNS7CH5g=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-224-v_Rc9NIhNoiDutOsdneNfg-1; Sat, 04 Mar 2023 05:23:01 -0500
+X-MC-Unique: v_Rc9NIhNoiDutOsdneNfg-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 8D28A800050;
+        Sat,  4 Mar 2023 10:23:00 +0000 (UTC)
+Received: from ovpn-8-18.pek2.redhat.com (ovpn-8-16.pek2.redhat.com [10.72.8.16])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 662F52166B2B;
+        Sat,  4 Mar 2023 10:22:55 +0000 (UTC)
+Date:   Sat, 4 Mar 2023 18:22:51 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Hannes Reinecke <hare@suse.de>
+Cc:     Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
+        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+        ming.lei@redhat.com
+Subject: Re: [PATCH] nvme: fix handling single range discard request
+Message-ID: <ZAMb+x/hKPjoFHS5@ovpn-8-18.pek2.redhat.com>
+References: <20230303231345.119652-1-ming.lei@redhat.com>
+ <80db29ee-70c7-5dad-cd5e-d2348d6d789d@suse.de>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: _Ch0CgDHcyGg_gJkXTNDEQ--.38480S6
-X-Coremail-Antispam: 1UD129KBjvJXoW7AFyrur17Wr45Xw1fAry7Jrb_yoW8urW7pF
-        4rG3yfKwnFqr4I93WxXw47XF13CFs5Wr1xCrWxC34S93WYkw40qa10ka4ruF40qFWkAF43
-        Zw45tFWUCFW8ArDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUU9v14x267AKxVWrJVCq3wAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2048vs2IY020E87I2jVAFwI0_Jryl82xGYIkIc2
-        x26xkF7I0E14v26r4j6ryUM28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8wA2z4x0
-        Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Cr0_Gr1UM2
-        8EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s0DM2AI
-        xVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20x
-        vE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xv
-        r2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7MxAIw28IcxkI7VAKI48JMxC20s
-        026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_
-        JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14
-        v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xva
-        j40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JV
-        W8JrUvcSsGvfC2KfnxnUUI43ZEXa7VUjYiiDUUUUU==
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <80db29ee-70c7-5dad-cd5e-d2348d6d789d@suse.de>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Yu Kuai <yukuai3@huawei.com>
+On Sat, Mar 04, 2023 at 09:00:28AM +0100, Hannes Reinecke wrote:
+> On 3/4/23 00:13, Ming Lei wrote:
+> > When investigating one customer report on warning in nvme_setup_discard,
+> > we observed the controller(nvme/tcp) actually exposes
+> > queue_max_discard_segments(req->q) == 1.
+> > 
+> > Obviously the current code can't handle this situation, since contiguity
+> > merge like normal RW request is taken.
+> > 
+> > Fix the issue by building range from request sector/nr_sectors directly.
+> > 
+> > Fixes: b35ba01ea697 ("nvme: support ranged discard requests")
+> > Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> > ---
+> >   drivers/nvme/host/core.c | 28 +++++++++++++++++++---------
+> >   1 file changed, 19 insertions(+), 9 deletions(-)
+> > 
+> > diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+> > index c2730b116dc6..d4be525f8100 100644
+> > --- a/drivers/nvme/host/core.c
+> > +++ b/drivers/nvme/host/core.c
+> > @@ -781,16 +781,26 @@ static blk_status_t nvme_setup_discard(struct nvme_ns *ns, struct request *req,
+> >   		range = page_address(ns->ctrl->discard_page);
+> >   	}
+> > -	__rq_for_each_bio(bio, req) {
+> > -		u64 slba = nvme_sect_to_lba(ns, bio->bi_iter.bi_sector);
+> > -		u32 nlb = bio->bi_iter.bi_size >> ns->lba_shift;
+> > -
+> > -		if (n < segments) {
+> > -			range[n].cattr = cpu_to_le32(0);
+> > -			range[n].nlb = cpu_to_le32(nlb);
+> > -			range[n].slba = cpu_to_le64(slba);
+> > +	if (queue_max_discard_segments(req->q) == 1) {
+> > +		u64 slba = nvme_sect_to_lba(ns, blk_rq_pos(req));
+> > +		u32 nlb = blk_rq_sectors(req) >> (ns->lba_shift - 9);
+> > +
+> > +		range[0].cattr = cpu_to_le32(0);
+> > +		range[0].nlb = cpu_to_le32(nlb);
+> > +		range[0].slba = cpu_to_le64(slba);
+> > +		n = 1;
+> > +	} else { > +		__rq_for_each_bio(bio, req) {
+> > +			u64 slba = nvme_sect_to_lba(ns, bio->bi_iter.bi_sector);
+> > +			u32 nlb = bio->bi_iter.bi_size >> ns->lba_shift;
+> > +
+> > +			if (n < segments) {
+> > +				range[n].cattr = cpu_to_le32(0);
+> > +				range[n].nlb = cpu_to_le32(nlb);
+> > +				range[n].slba = cpu_to_le64(slba);
+> > +			}
+> > +			n++;
+> >   		}
+> > -		n++;
+> >   	}
+> >   	if (WARN_ON_ONCE(n != segments)) {
+> Now _that_ is odd.
+> Looks like 'req' is not formatted according to the 'max_discard_sectors'
+> setting.
+> But if that's the case, then this 'fix' would fail whenever
+> 'max_discard_sectors' < 'max_hw_sectors', right?
 
-All the caller of wbt_enable/disable_default() ensures that queue is
-freezed and quiesced, and it's not a good idea to enable or disable wbt
-while io is inflight because this will make implementation complex and
-easy to leak wbt inflight counter, which will cause io hang.
+No, it isn't the case.
 
-This patch just freeze queue in wbt explicitly, there are no functional
-changes.
+> Shouldn't we rather modify the merge algorithm to check for
+> max_discard_sectors for DISCARD requests, such that we never _have_
+> mis-matched requests and this patch would be pointless?
 
-Signed-off-by: Yu Kuai <yukuai3@huawei.com>
----
- block/blk-wbt.c | 22 ++++++++++++++++++----
- 1 file changed, 18 insertions(+), 4 deletions(-)
+But it is related with discard merge.
 
-diff --git a/block/blk-wbt.c b/block/blk-wbt.c
-index b5edf44499ab..2d5a2f4ee8bc 100644
---- a/block/blk-wbt.c
-+++ b/block/blk-wbt.c
-@@ -729,24 +729,32 @@ void wbt_enable_default(struct gendisk *disk)
- {
- 	struct request_queue *q = disk->queue;
- 	struct rq_qos *rqos;
--	bool disable_flag = q->elevator &&
--		    test_bit(ELEVATOR_FLAG_DISABLE_WBT, &q->elevator->flags);
-+	bool disable_flag;
- 
-+	blk_mq_freeze_queue(q);
-+	blk_mq_quiesce_queue(q);
-+
-+	disable_flag = q->elevator && test_bit(ELEVATOR_FLAG_DISABLE_WBT,
-+					       &q->elevator->flags);
- 	/* Throttling already enabled? */
- 	rqos = wbt_rq_qos(q);
- 	if (rqos) {
- 		if (!disable_flag &&
- 		    RQWB(rqos)->enable_state == WBT_STATE_OFF_DEFAULT)
- 			RQWB(rqos)->enable_state = WBT_STATE_ON_DEFAULT;
--		return;
-+		goto out;
- 	}
- 
- 	/* Queue not registered? Maybe shutting down... */
- 	if (!blk_queue_registered(q))
--		return;
-+		goto out;
- 
- 	if (queue_is_mq(q) && !disable_flag)
- 		wbt_init(disk);
-+
-+out:
-+	blk_mq_unquiesce_queue(q);
-+	blk_mq_unfreeze_queue(q);
- }
- EXPORT_SYMBOL_GPL(wbt_enable_default);
- 
-@@ -801,8 +809,14 @@ void wbt_disable_default(struct gendisk *disk)
- 		return;
- 	rwb = RQWB(rqos);
- 	if (rwb->enable_state == WBT_STATE_ON_DEFAULT) {
-+		blk_mq_freeze_queue(disk->queue);
-+		blk_mq_quiesce_queue(disk->queue);
-+
- 		blk_stat_deactivate(rwb->cb);
- 		rwb->enable_state = WBT_STATE_OFF_DEFAULT;
-+
-+		blk_mq_unquiesce_queue(disk->queue);
-+		blk_mq_unfreeze_queue(disk->queue);
- 	}
- }
- EXPORT_SYMBOL_GPL(wbt_disable_default);
--- 
-2.31.1
+If queue_max_discard_segments() is 1, block layer merges discard
+request/bios just like normal RW IO.
+
+However, if queue_max_discard_segments() is > 1, block layer simply
+'merges' all bios into one request, no matter if the LBA is adjacent
+or not, and treat each bio as one discard segment, that is called
+multi range discard too.
+
+That is the reason why we have to treat queue_max_discard_segments() == 1
+specially, and you can see same handling in virtio_blk.
+
+
+Thanks,
+Ming
 
