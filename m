@@ -2,112 +2,156 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A1F7C6FA8E
-	for <linux-block@archiver.kernel.org>; Sun,  5 Mar 2023 05:03:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49D44C678DB
+	for <linux-block@archiver.kernel.org>; Sun,  5 Mar 2023 11:22:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229437AbjCEFDA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 5 Mar 2023 00:03:00 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56980 "EHLO
+        id S229636AbjCELWV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 5 Mar 2023 06:22:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36968 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229379AbjCEFDA (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 5 Mar 2023 00:03:00 -0500
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99537213A;
-        Sat,  4 Mar 2023 21:02:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=MYWBC0WOMIDYRhY6uikE3pHTCOX53fIXE4SZZXI8vwI=; b=sBPaYm/n2Dc6Etsx9Ww560hGO4
-        OWlFc1zCTcv8loJ8ST34qAl6MLaEJYurxh1yXvL9Jn6M5sYIcu/BDjmWOQM8k0CRNtFdWzhfITW+S
-        m9YkL7yDZcajdzBZ5br+HDk43PM0+d6naiQU6/qSOz0klu4bXO/VWI779iB9PsmfZkax0iw1B8kR5
-        ZX7vuT8+BXm1cIVyOXWFYtpKSxwyWjx6zf8GKQYVkkNRZnDbyRQn+ZfxnRw2rFBqcIGu0tg/hB2PW
-        wHO4pDInBlylBEyRG4Gsoby04Iq43ZP5ctGumc4bwT+Zg7MYG/u2oIGrVraGMn/4AttFWJYBXrcWR
-        TMX3YJCA==;
-Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1pYgWB-004FVh-Ee; Sun, 05 Mar 2023 05:02:43 +0000
-Date:   Sun, 5 Mar 2023 05:02:43 +0000
-From:   Matthew Wilcox <willy@infradead.org>
-To:     Luis Chamberlain <mcgrof@kernel.org>
-Cc:     James Bottomley <James.Bottomley@hansenpartnership.com>,
+        with ESMTP id S229555AbjCELWV (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 5 Mar 2023 06:22:21 -0500
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E0F58A5F4;
+        Sun,  5 Mar 2023 03:22:17 -0800 (PST)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 84B8D1FD7C;
+        Sun,  5 Mar 2023 11:22:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1678015336; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=AT2Kt/wYAneV6Cu1tgTYC07zTeFUojM/srzHygHKBtU=;
+        b=WRXL6GpifPqmw4W8ELX7M424mNrEcN04dA8F7Qusm6xPxGWWB1phA7oIsLgeWA69iG8G2P
+        OgF8cbg/5i1Eo0g7Cqr9arZ+YUEmQXfSq1dF0De5dSl75BtelmXZ51n++mVidOekQb9R5j
+        nE58/h8IYoCwlvUF8t/HW+gKq0RQg74=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1678015336;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=AT2Kt/wYAneV6Cu1tgTYC07zTeFUojM/srzHygHKBtU=;
+        b=qvdLGlsSkSEZaROxqIHvRBGHmNxo0U7YNlfGJASUf/g/JEFqphjw9rHlEp2OM2iNkqUJjF
+        2/+v+CVYCJG48SAg==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 1B4091339E;
+        Sun,  5 Mar 2023 11:22:16 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id iMgXBmh7BGTZYAAAMHmgww
+        (envelope-from <hare@suse.de>); Sun, 05 Mar 2023 11:22:16 +0000
+Message-ID: <0b70deae-9fc7-ca33-5737-85d7532b3d33@suse.de>
+Date:   Sun, 5 Mar 2023 12:22:15 +0100
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.6.1
+Subject: Re: [LSF/MM/BPF TOPIC] Cloud storage optimizations
+Content-Language: en-US
+To:     Matthew Wilcox <willy@infradead.org>
+Cc:     Luis Chamberlain <mcgrof@kernel.org>,
         Keith Busch <kbusch@kernel.org>, Theodore Ts'o <tytso@mit.edu>,
+        Pankaj Raghav <p.raghav@samsung.com>,
+        Daniel Gomez <da.gomez@samsung.com>,
+        =?UTF-8?Q?Javier_Gonz=c3=a1lez?= <javier.gonz@samsung.com>,
         lsf-pc@lists.linux-foundation.org, linux-fsdevel@vger.kernel.org,
         linux-mm@kvack.org, linux-block@vger.kernel.org
-Subject: Re: [LSF/MM/BPF TOPIC] Cloud storage optimizations
-Message-ID: <ZAQicyYR0kZgrzIr@casper.infradead.org>
 References: <Y/7L74P6jSWwOvWt@mit.edu>
  <ZAFUYqAcPmRPLjET@kbusch-mbp.dhcp.thefacebook.com>
  <ZAFuSSZ5vZN7/UAa@casper.infradead.org>
- <f68905c5785b355b621847974d620fb59f021a41.camel@HansenPartnership.com>
- <ZAL0ifa66TfMinCh@casper.infradead.org>
- <2600732b9ed0ddabfda5831aff22fd7e4270e3be.camel@HansenPartnership.com>
- <ZAN0JkklyCRIXVo6@casper.infradead.org>
- <ZAQXduwAcAtIZHkB@bombadil.infradead.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZAQXduwAcAtIZHkB@bombadil.infradead.org>
+ <ZAJqjM6qLrraFrrn@bombadil.infradead.org>
+ <c9f6544d-1731-4a73-a926-0e85ae9da9df@suse.de>
+ <ZAN2HYXDI+hIsf6W@casper.infradead.org>
+ <edac909b-98e5-cb6d-bb80-2f6a20a15029@suse.de>
+ <ZAOF3p+vqA6pd7px@casper.infradead.org>
+From:   Hannes Reinecke <hare@suse.de>
+In-Reply-To: <ZAOF3p+vqA6pd7px@casper.infradead.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, Mar 04, 2023 at 08:15:50PM -0800, Luis Chamberlain wrote:
-> On Sat, Mar 04, 2023 at 04:39:02PM +0000, Matthew Wilcox wrote:
-> > I'm getting more and more
-> > comfortable with the idea that "Linux doesn't support block sizes >
-> > PAGE_SIZE on 32-bit machines" is an acceptable answer.
+On 3/4/23 18:54, Matthew Wilcox wrote:
+> On Sat, Mar 04, 2023 at 06:17:35PM +0100, Hannes Reinecke wrote:
+>> On 3/4/23 17:47, Matthew Wilcox wrote:
+>>> On Sat, Mar 04, 2023 at 12:08:36PM +0100, Hannes Reinecke wrote:
+>>>> We could implement a (virtual) zoned device, and expose each zone as a
+>>>> block. That gives us the required large block characteristics, and with
+>>>> a bit of luck we might be able to dial up to really large block sizes
+>>>> like the 256M sizes on current SMR drives.
+>>>> ublk might be a good starting point.
+>>>
+>>> Ummmm.  Is supporting 256MB block sizes really a desired goal?  I suggest
+>>> that is far past the knee of the curve; if we can only write 256MB chunks
+>>> as a single entity, we're looking more at a filesystem redesign than we
+>>> are at making filesystems and the MM support 256MB size blocks.
+>>>
+>> Naa, not really. It _would_ be cool as we could get rid of all the cludges
+>> which have nowadays re sequential writes.
+>> And, remember, 256M is just a number someone thought to be a good
+>> compromise. If we end up with a lower number (16M?) we might be able
+>> to convince the powers that be to change their zone size.
+>> Heck, with 16M block size there wouldn't be a _need_ for zones in
+>> the first place.
+>>
+>> But yeah, 256M is excessive. Initially I would shoot for something
+>> like 2M.
 > 
-> First of all filesystems would need to add support for a larger block
-> sizes > PAGE_SIZE, and that takes effort. It is also a support question
-> too.
+> I think we're talking about different things (probably different storage
+> vendors want different things, or even different people at the same
+> storage vendor want different things).
 > 
-> I think garnering consensus from filesystem developers we don't want
-> to support block sizes > PAGE_SIZE on 32-bit systems would be a good
-> thing to review at LSFMM or even on this list. I hightly doubt anyone
-> is interested in that support.
-
-Agreed.
-
-> > XFS already works with arbitrary-order folios. 
+> Luis and I are talking about larger LBA sizes.  That is, the minimum
+> read/write size from the block device is 16kB or 64kB or whatever.
+> In this scenario, the minimum amount of space occupied by a file goes
+> up from 512 bytes or 4kB to 64kB.  That's doable, even if somewhat
+> suboptimal.
 > 
-> But block sizes > PAGE_SIZE is work which is still not merged. It
-> *can* be with time. That would allow one to muck with larger block
-> sizes than 4k on x86-64 for instance. Without this, you can't play
-> ball.
+And so do I. One can view zones as really large LBAs.
 
-Do you mean that XFS is checking that fs block size <= PAGE_SIZE and
-that check needs to be dropped?  If so, I don't see where that happens.
+Indeed it might be suboptimal from the OS point of view.
+But from the device point of view it won't.
+And, in fact, with devices becoming faster and faster the question is
+whether sticking with relatively small sectors won't become a limiting 
+factor eventually.
 
-Or do you mean that the blockdev "filesystem" needs to be enhanced to
-support large folios?  That's going to be kind of a pain because it
-uses buffer_heads.  And ext4 depends on it using buffer_heads.  So,
-yup, more work needed than I remembered (but as I said, it's FS side,
-not block layer or driver work).
-
-Or were you referring to the NVMe PAGE_SIZE sanity check that Keith
-mentioned upthread?
-
-> > The only needed piece is
-> > specifying to the VFS that there's a minimum order for this particular
-> > inode, and having the VFS honour that everywhere.
+> Your concern seems to be more around shingled devices (or their equivalent
+> in SSD terms) where there are large zones which are append-only, but
+> you can still random-read 512 byte LBAs.  I think there are different
+> solutions to these problems, and people are working on both of these
+> problems.
 > 
-> Other than the above too, don't we still also need to figure out what
-> fs APIs would incur larger order folios? And then what about corner cases
-> with the page cache?
-> 
-> I was hoping some of these nooks and crannies could be explored with tmpfs.
+My point being that zones are just there because the I/O stack can only 
+deal with sectors up to 4k. If the I/O stack would be capable of dealing
+with larger LBAs one could identify a zone with an LBA, and the entire 
+issue of append-only and sequential writes would be moot.
+Even the entire concept of zones becomes irrelevant as the OS would 
+trivially only write entire zones.
 
-I think we're exploring all those with XFS.  Or at least, many of
-them.  A lot of the folio conversion patches you see flowing past
-are pure efficiency gains -- no need to convert between pages and
-folios implicitly; do the explicit conversions and save instructions.
-Most of the correctness issues were found & fixed a long time ago when
-PMD support was added to tmpfs.  One notable exception would be the
-writeback path since tmpfs doesn't writeback, it has that special thing
-it does with swap.
+> But if storage vendors are really pushing for 256MB LBAs, then that's
+> going to need a third kind of solution, and I'm not aware of anyone
+> working on that.
 
-tmpfs is a rather special case as far as its use of the filesystem APIs
-go, but I suspect I've done most of the needed work to have it work with
-arbitrary order folios instead of just PTE and PMD sizes.  There's
-probably some left-over assumptions that I didn't find yet.  Maybe in
-the swap path, for example ;-)
+What I was saying is that 256M is not set in stone. It's just a 
+compromise vendors used. Even if in the course of development we arrive
+at a lower number of max LBA we can handle (say, 2MB) I am pretty
+sure vendors will be quite interested in that.
+
+Cheers,
+
+Hannes
+-- 
+Dr. Hannes Reinecke                Kernel Storage Architect
+hare@suse.de                              +49 911 74053 688
+SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
+HRB 36809 (AG Nürnberg), Geschäftsführer: Ivo Totev, Andrew
+Myers, Andrew McDonald, Martje Boudien Moerman
+
