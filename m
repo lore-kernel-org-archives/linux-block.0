@@ -2,458 +2,101 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB969C64EC4
-	for <linux-block@archiver.kernel.org>; Mon,  6 Mar 2023 17:56:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C95FC64EC4
+	for <linux-block@archiver.kernel.org>; Mon,  6 Mar 2023 18:02:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231151AbjCFR4X (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 6 Mar 2023 12:56:23 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50952 "EHLO
+        id S230015AbjCFSCb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 6 Mar 2023 13:02:31 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33774 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230495AbjCFRzs (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 6 Mar 2023 12:55:48 -0500
-Received: from hosting.gsystem.sk (hosting.gsystem.sk [212.5.213.30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 268503B208;
-        Mon,  6 Mar 2023 09:55:20 -0800 (PST)
-Received: from gsql.ggedos.sk (off-20.infotel.telecom.sk [212.5.213.20])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        with ESMTP id S230374AbjCFSC2 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 6 Mar 2023 13:02:28 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 674856C8A4
+        for <linux-block@vger.kernel.org>; Mon,  6 Mar 2023 10:02:00 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by hosting.gsystem.sk (Postfix) with ESMTPSA id 969477A0709;
-        Mon,  6 Mar 2023 18:28:29 +0100 (CET)
-From:   Ondrej Zary <linux@zary.sk>
-To:     Damien Le Moal <damien.lemoal@opensource.wdc.com>
-Cc:     Christoph Hellwig <hch@lst.de>,
-        Sergey Shtylyov <s.shtylyov@omp.ru>,
-        Jens Axboe <axboe@kernel.dk>, Tim Waugh <tim@cyberelk.net>,
-        linux-block@vger.kernel.org, linux-parport@lists.infradead.org,
-        linux-ide@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 13/18] pata_parport: simplify log_adapter prints, remove VERSION defines
-Date:   Mon,  6 Mar 2023 18:27:47 +0100
-Message-Id: <20230306172752.7727-14-linux@zary.sk>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20230306172752.7727-1-linux@zary.sk>
-References: <20230306172752.7727-1-linux@zary.sk>
+        by ams.source.kernel.org (Postfix) with ESMTPS id E8EABB81061
+        for <linux-block@vger.kernel.org>; Mon,  6 Mar 2023 18:01:21 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 255ADC433D2;
+        Mon,  6 Mar 2023 18:01:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1678125680;
+        bh=8+fX0DQF7AxWUzkAE7WOfShZIM9RFn5tL/qhNPkcHOs=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=fIwlz33RQfCI3MpSLUONo434fr2B/bgKX+x8s2H24pDXYTXGlwTQzbqTEaMDrCam3
+         gaX1hxFWn6DzvE83Aui9k2b975FVUplwi9/RbAixgoqWMSce1ljaSUbO4VaWUN1UuY
+         yVjGiGUNQux8WlvdjPGJ28szrKV2Un+CC+Hja5GE/WmVZu5hRG/5EusuQc9pHbTKRo
+         iM5cg3ZcSSIbPAklXa1KqmsRLTmRYoErshqDfWPWncmlmGG04L++thYqS/l8lBzWBF
+         cWOWE1qzEgJVL4Yk/yGC/IAprqiObsdnN1OX/z7rX2G4JAt8toBQDhlcgTadSU9YNO
+         6QCxEbx/DHd9A==
+Date:   Mon, 6 Mar 2023 11:01:17 -0700
+From:   Keith Busch <kbusch@kernel.org>
+To:     Hannes Reinecke <hare@suse.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Matthew Wilcox <willy@infradead.org>,
+        Luis Chamberlain <mcgrof@kernel.org>
+Subject: Re: [PATCH 4/5] brd: limit maximal block size to 32M
+Message-ID: <ZAYqbUEdGAD6rsp4@kbusch-mbp.dhcp.thefacebook.com>
+References: <20230306120127.21375-1-hare@suse.de>
+ <20230306120127.21375-5-hare@suse.de>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230306120127.21375-5-hare@suse.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Merge log_adapter prints to single one, remove version print and
-meaningless VERSION defines.
+On Mon, Mar 06, 2023 at 01:01:26PM +0100, Hannes Reinecke wrote:
+> Use an arbitrary limit of 32M for the maximal blocksize so as not
+> to overflow the page cache.
+> 
+> Signed-off-by: Hannes Reinecke <hare@suse.de>
+> ---
+>  drivers/block/brd.c | 16 ++++++++--------
+>  1 file changed, 8 insertions(+), 8 deletions(-)
+> 
+> diff --git a/drivers/block/brd.c b/drivers/block/brd.c
+> index 11bac3c3f1b6..1ed114cd5cb0 100644
+> --- a/drivers/block/brd.c
+> +++ b/drivers/block/brd.c
+> @@ -348,6 +348,7 @@ static int max_part = 1;
+>  module_param(max_part, int, 0444);
+>  MODULE_PARM_DESC(max_part, "Num Minors to reserve between devices");
+>  
+> +#define RD_MAX_SECTOR_SIZE 65536
+>  static unsigned int rd_blksize = PAGE_SIZE;
+>  module_param(rd_blksize, uint, 0444);
+>  MODULE_PARM_DESC(rd_blksize, "Blocksize of each RAM disk in bytes.");
+> @@ -410,15 +411,14 @@ static int brd_alloc(int i)
+>  	disk->private_data	= brd;
+>  	strscpy(disk->disk_name, buf, DISK_NAME_LEN);
+>  	set_capacity(disk, rd_size * 2);
+> -	
+> -	/*
+> -	 * This is so fdisk will align partitions on 4k, because of
+> -	 * direct_access API needing 4k alignment, returning a PFN
+> -	 * (This is only a problem on very small devices <= 4M,
+> -	 *  otherwise fdisk will align on 1M. Regardless this call
+> -	 *  is harmless)
+> -	 */
+> +
+> +	if (rd_blksize > RD_MAX_SECTOR_SIZE) {
 
-Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
-Signed-off-by: Ondrej Zary <linux@zary.sk>
----
- drivers/ata/pata_parport/aten.c  |  8 ++------
- drivers/ata/pata_parport/bpck.c  |  9 +++------
- drivers/ata/pata_parport/bpck6.c |  9 ++-------
- drivers/ata/pata_parport/comm.c  |  8 ++------
- drivers/ata/pata_parport/dstr.c  |  8 ++------
- drivers/ata/pata_parport/epat.c  |  9 ++-------
- drivers/ata/pata_parport/epia.c  |  8 ++------
- drivers/ata/pata_parport/fit2.c  |  6 ++----
- drivers/ata/pata_parport/fit3.c  |  9 ++-------
- drivers/ata/pata_parport/friq.c  |  8 ++------
- drivers/ata/pata_parport/frpw.c  | 10 +++-------
- drivers/ata/pata_parport/kbic.c  |  8 ++------
- drivers/ata/pata_parport/ktti.c  |  7 ++-----
- drivers/ata/pata_parport/on20.c  |  8 ++------
- drivers/ata/pata_parport/on26.c  |  8 ++------
- 15 files changed, 32 insertions(+), 91 deletions(-)
+rd_blkside is in bytes, but the above is ccomapring it to something in units of
+SECTOR_SIZE.
 
-diff --git a/drivers/ata/pata_parport/aten.c b/drivers/ata/pata_parport/aten.c
-index ccbba14ccab1..8995a4a08b76 100644
---- a/drivers/ata/pata_parport/aten.c
-+++ b/drivers/ata/pata_parport/aten.c
-@@ -15,8 +15,6 @@
- 
- */
- 
--#define ATEN_VERSION      "1.01"
--
- #include <linux/module.h>
- #include <linux/init.h>
- #include <linux/delay.h>
-@@ -124,10 +122,8 @@ static void aten_log_adapter(struct pi_adapter *pi)
- 
- {       char    *mode_string[2] = {"4-bit","8-bit"};
- 
--	dev_info(&pi->dev, "aten %s, ATEN EH-100 at 0x%x, ", ATEN_VERSION, pi->port);
--	dev_info(&pi->dev, "mode %d (%s), delay %d\n", pi->mode,
--		mode_string[pi->mode],pi->delay);
--
-+	dev_info(&pi->dev, "ATEN EH-100 at 0x%x, mode %d (%s), delay %d\n",
-+		pi->port, pi->mode, mode_string[pi->mode], pi->delay);
- }
- 
- static struct pi_protocol aten = {
-diff --git a/drivers/ata/pata_parport/bpck.c b/drivers/ata/pata_parport/bpck.c
-index dec24983d140..793ef2c7849e 100644
---- a/drivers/ata/pata_parport/bpck.c
-+++ b/drivers/ata/pata_parport/bpck.c
-@@ -14,8 +14,6 @@
- 
- */
- 
--#define	BPCK_VERSION	"1.02" 
--
- #include <linux/module.h>
- #include <linux/init.h>
- #include <linux/delay.h>
-@@ -421,10 +419,9 @@ static void bpck_log_adapter(struct pi_adapter *pi)
- 
- 	bpck_read_eeprom(pi,scratch);
- 	print_hex_dump_bytes("bpck EEPROM: ", DUMP_PREFIX_NONE, scratch, 128);
--	dev_info(&pi->dev, "bpck %s, backpack %8.8s unit %d",
--		BPCK_VERSION, &scratch[110], pi->unit);
--	dev_info(&pi->dev, " at 0x%x, mode %d (%s), delay %d\n", pi->port,
--		pi->mode,mode_string[pi->mode],pi->delay);
-+	dev_info(&pi->dev, "backpack %8.8s unit %d at 0x%x, mode %d (%s), delay %d\n",
-+		 &scratch[110], pi->unit, pi->port, pi->mode,
-+		 mode_string[pi->mode], pi->delay);
- }
- 
- static struct pi_protocol bpck = {
-diff --git a/drivers/ata/pata_parport/bpck6.c b/drivers/ata/pata_parport/bpck6.c
-index 4770e29bfdeb..f144e1b3cacb 100644
---- a/drivers/ata/pata_parport/bpck6.c
-+++ b/drivers/ata/pata_parport/bpck6.c
-@@ -19,9 +19,6 @@
-    Version 2.0.2 - fixed version string usage, and made ppc functions static 
- */
- 
--
--#define BACKPACK_VERSION "2.0.2"
--
- #include <linux/module.h>
- #include <linux/init.h>
- #include <linux/kernel.h>
-@@ -179,10 +176,8 @@ static void bpck6_log_adapter(struct pi_adapter *pi)
- 	char *mode_string[5]=
- 		{"4-bit","8-bit","EPP-8","EPP-16","EPP-32"};
- 
--	dev_info(&pi->dev, "BACKPACK %s, Micro Solutions BACKPACK Drive at 0x%x\n",
--		BACKPACK_VERSION, pi->port);
--	dev_info(&pi->dev, "Unit: %d Mode:%d (%s) Delay %d\n",
--		pi->unit,pi->mode,mode_string[pi->mode],pi->delay);
-+	dev_info(&pi->dev, "Micro Solutions BACKPACK Drive unit %d at 0x%x, mode:%d (%s), delay %d\n",
-+		pi->unit, pi->port, pi->mode, mode_string[pi->mode], pi->delay);
- }
- 
- static int bpck6_init_proto(struct pi_adapter *pi)
-diff --git a/drivers/ata/pata_parport/comm.c b/drivers/ata/pata_parport/comm.c
-index 7b59eca52185..6e05b50c322c 100644
---- a/drivers/ata/pata_parport/comm.c
-+++ b/drivers/ata/pata_parport/comm.c
-@@ -14,8 +14,6 @@
- 
- */
- 
--#define COMM_VERSION      "1.01"
--
- #include <linux/module.h>
- #include <linux/init.h>
- #include <linux/delay.h>
-@@ -183,10 +181,8 @@ static void comm_log_adapter(struct pi_adapter *pi)
- 
- {       char    *mode_string[5] = {"4-bit","8-bit","EPP-8","EPP-16","EPP-32"};
- 
--	dev_info(&pi->dev, "comm %s, DataStor Commuter at 0x%x, ", COMM_VERSION, pi->port);
--	dev_info(&pi->dev, "mode %d (%s), delay %d\n", pi->mode,
--		mode_string[pi->mode],pi->delay);
--
-+	dev_info(&pi->dev, "DataStor Commuter at 0x%x, mode %d (%s), delay %d\n",
-+		pi->port, pi->mode, mode_string[pi->mode], pi->delay);
- }
- 
- static struct pi_protocol comm = {
-diff --git a/drivers/ata/pata_parport/dstr.c b/drivers/ata/pata_parport/dstr.c
-index eb6ddceaeb83..64e45eed9588 100644
---- a/drivers/ata/pata_parport/dstr.c
-+++ b/drivers/ata/pata_parport/dstr.c
-@@ -13,8 +13,6 @@
- 
- */
- 
--#define DSTR_VERSION      "1.01"
--
- #include <linux/module.h>
- #include <linux/init.h>
- #include <linux/delay.h>
-@@ -195,10 +193,8 @@ static void dstr_log_adapter(struct pi_adapter *pi)
- {       char    *mode_string[5] = {"4-bit","8-bit","EPP-8",
- 				   "EPP-16","EPP-32"};
- 
--	dev_info(&pi->dev, "dstr %s, DataStor EP2000 at 0x%x, ", DSTR_VERSION, pi->port);
--	dev_info(&pi->dev, "mode %d (%s), delay %d\n", pi->mode,
--		mode_string[pi->mode],pi->delay);
--
-+	dev_info(&pi->dev, "DataStor EP2000 at 0x%x, mode %d (%s), delay %d\n",
-+		pi->port, pi->mode, mode_string[pi->mode], pi->delay);
- }
- 
- static struct pi_protocol dstr = {
-diff --git a/drivers/ata/pata_parport/epat.c b/drivers/ata/pata_parport/epat.c
-index 389faa6ae49d..12dd53a06dd0 100644
---- a/drivers/ata/pata_parport/epat.c
-+++ b/drivers/ata/pata_parport/epat.c
-@@ -16,8 +16,6 @@
- 
- */
- 
--#define EPAT_VERSION      "1.02"
--
- #include <linux/module.h>
- #include <linux/init.h>
- #include <linux/delay.h>
-@@ -296,11 +294,8 @@ static void epat_log_adapter(struct pi_adapter *pi)
-         ver = RR(0xb);
-         epat_disconnect(pi);
- 
--	dev_info(&pi->dev, "epat %s, Shuttle EPAT chip %x at 0x%x, ",
--		EPAT_VERSION, ver, pi->port);
--	dev_info(&pi->dev, "mode %d (%s), delay %d\n", pi->mode,
--		mode_string[pi->mode],pi->delay);
--
-+	dev_info(&pi->dev, "Shuttle EPAT chip %x at 0x%x, mode %d (%s), delay %d\n",
-+		 ver, pi->port, pi->mode, mode_string[pi->mode], pi->delay);
- }
- 
- static struct pi_protocol epat = {
-diff --git a/drivers/ata/pata_parport/epia.c b/drivers/ata/pata_parport/epia.c
-index 48d12f56c501..1216763d0c6d 100644
---- a/drivers/ata/pata_parport/epia.c
-+++ b/drivers/ata/pata_parport/epia.c
-@@ -17,8 +17,6 @@
- 
- */
- 
--#define EPIA_VERSION      "1.02"
--
- #include <linux/module.h>
- #include <linux/init.h>
- #include <linux/delay.h>
-@@ -275,10 +273,8 @@ static void epia_log_adapter(struct pi_adapter *pi)
- {       char    *mode_string[6] = {"4-bit","5/3","8-bit",
- 				   "EPP-8","EPP-16","EPP-32"};
- 
--	dev_info(&pi->dev, "epia %s, Shuttle EPIA at 0x%x, ", EPIA_VERSION, pi->port);
--	dev_info(&pi->dev, "mode %d (%s), delay %d\n", pi->mode,
--		mode_string[pi->mode],pi->delay);
--
-+	dev_info(&pi->dev, "Shuttle EPIA at 0x%x, mode %d (%s), delay %d\n",
-+		pi->port, pi->mode, mode_string[pi->mode], pi->delay);
- }
- 
- static struct pi_protocol epia = {
-diff --git a/drivers/ata/pata_parport/fit2.c b/drivers/ata/pata_parport/fit2.c
-index d0a781f04411..3536d8c07955 100644
---- a/drivers/ata/pata_parport/fit2.c
-+++ b/drivers/ata/pata_parport/fit2.c
-@@ -13,8 +13,6 @@
- 
- */
- 
--#define FIT2_VERSION      "1.0"
--
- #include <linux/module.h>
- #include <linux/init.h>
- #include <linux/delay.h>
-@@ -116,8 +114,8 @@ static void fit2_disconnect(struct pi_adapter *pi)
- static void fit2_log_adapter(struct pi_adapter *pi)
- 
- {
--	dev_info(&pi->dev, "fit2 %s, FIT 2000 adapter at 0x%x, delay %d\n",
--		FIT2_VERSION, pi->port, pi->delay);
-+	dev_info(&pi->dev, "FIT 2000 adapter at 0x%x, delay %d\n",
-+		pi->port, pi->delay);
- 
- }
- 
-diff --git a/drivers/ata/pata_parport/fit3.c b/drivers/ata/pata_parport/fit3.c
-index f86da2d478cb..9f5320c750e2 100644
---- a/drivers/ata/pata_parport/fit3.c
-+++ b/drivers/ata/pata_parport/fit3.c
-@@ -17,8 +17,6 @@
- 
- */
- 
--#define FIT3_VERSION      "1.0"
--
- #include <linux/module.h>
- #include <linux/init.h>
- #include <linux/delay.h>
-@@ -173,11 +171,8 @@ static void fit3_log_adapter(struct pi_adapter *pi)
- 
- {       char    *mode_string[3] = {"4-bit","8-bit","EPP"};
- 
--	dev_info(&pi->dev, "fit3 %s, FIT 3000 adapter at 0x%x, "
--	       "mode %d (%s), delay %d\n",
--		FIT3_VERSION, pi->port,
--		pi->mode,mode_string[pi->mode],pi->delay);
--
-+	dev_info(&pi->dev, "FIT 3000 adapter at 0x%x, mode %d (%s), delay %d\n",
-+		pi->port, pi->mode, mode_string[pi->mode], pi->delay);
- }
- 
- static struct pi_protocol fit3 = {
-diff --git a/drivers/ata/pata_parport/friq.c b/drivers/ata/pata_parport/friq.c
-index ec564e7cb930..ed05e6503147 100644
---- a/drivers/ata/pata_parport/friq.c
-+++ b/drivers/ata/pata_parport/friq.c
-@@ -25,8 +25,6 @@
- 	1.01	GRG 1998.12.20	 Added support for soft power switch
- */
- 
--#define	FRIQ_VERSION	"1.01" 
--
- #include <linux/module.h>
- #include <linux/init.h>
- #include <linux/delay.h>
-@@ -219,10 +217,8 @@ static void friq_log_adapter(struct pi_adapter *pi)
- {       char    *mode_string[6] = {"4-bit","8-bit",
- 				   "EPP-8","EPP-16","EPP-32"};
- 
--	dev_info(&pi->dev, "friq %s, Freecom IQ ASIC-2 adapter at 0x%x, ",
--		FRIQ_VERSION,pi->port);
--	dev_info(&pi->dev, "mode %d (%s), delay %d\n", pi->mode,
--		mode_string[pi->mode],pi->delay);
-+	dev_info(&pi->dev, "Freecom IQ ASIC-2 adapter at 0x%x, mode %d (%s), delay %d\n",
-+		pi->port, pi->mode, mode_string[pi->mode], pi->delay);
- 
- 	pi->private = 1;
- 	friq_connect(pi);
-diff --git a/drivers/ata/pata_parport/frpw.c b/drivers/ata/pata_parport/frpw.c
-index 5ea16a247257..c0d50e2ed57d 100644
---- a/drivers/ata/pata_parport/frpw.c
-+++ b/drivers/ata/pata_parport/frpw.c
-@@ -23,8 +23,6 @@
- 
- */
- 
--#define	FRPW_VERSION	"1.03" 
--
- #include <linux/module.h>
- #include <linux/init.h>
- #include <linux/delay.h>
-@@ -268,11 +266,9 @@ static void frpw_log_adapter(struct pi_adapter *pi)
- {       char    *mode_string[6] = {"4-bit","8-bit","EPP",
- 				   "EPP-8","EPP-16","EPP-32"};
- 
--	dev_info(&pi->dev, "frpw %s, Freecom (%s) adapter at 0x%x, ",
--		FRPW_VERSION,((pi->private%2) == 0)?"Xilinx":"ASIC",pi->port);
--	dev_info(&pi->dev, "mode %d (%s), delay %d\n", pi->mode,
--		mode_string[pi->mode],pi->delay);
--
-+	dev_info(&pi->dev, "Freecom (%s) adapter at 0x%x, mode %d (%s), delay %d\n",
-+		((pi->private % 2) == 0) ? "Xilinx" : "ASIC",
-+		pi->port, pi->mode, mode_string[pi->mode], pi->delay);
- }
- 
- static struct pi_protocol frpw = {
-diff --git a/drivers/ata/pata_parport/kbic.c b/drivers/ata/pata_parport/kbic.c
-index ea1b931ce20d..3fab7a896e79 100644
---- a/drivers/ata/pata_parport/kbic.c
-+++ b/drivers/ata/pata_parport/kbic.c
-@@ -18,8 +18,6 @@
- 
- */
- 
--#define KBIC_VERSION      "1.01"
--
- #include <linux/module.h>
- #include <linux/init.h>
- #include <linux/delay.h>
-@@ -234,10 +232,8 @@ static void kbic_log_adapter(struct pi_adapter *pi, char *chip)
- {       char    *mode_string[6] = {"4-bit","5/3","8-bit",
- 				   "EPP-8","EPP_16","EPP-32"};
- 
--	dev_info(&pi->dev, "kbic %s, KingByte %s at 0x%x, ", KBIC_VERSION, chip, pi->port);
--	dev_info(&pi->dev, "mode %d (%s), delay %d\n", pi->mode,
--		mode_string[pi->mode],pi->delay);
--
-+	dev_info(&pi->dev, "KingByte %s at 0x%x, mode %d (%s), delay %d\n",
-+		 chip, pi->port, pi->mode, mode_string[pi->mode], pi->delay);
- }
- 
- static void k951_log_adapter(struct pi_adapter *pi)
-diff --git a/drivers/ata/pata_parport/ktti.c b/drivers/ata/pata_parport/ktti.c
-index b22c283709de..742051f6ea10 100644
---- a/drivers/ata/pata_parport/ktti.c
-+++ b/drivers/ata/pata_parport/ktti.c
-@@ -9,8 +9,6 @@
- 
- */
- 
--#define KTTI_VERSION      "1.0"
--
- #include <linux/module.h>
- #include <linux/init.h>
- #include <linux/delay.h>
-@@ -93,9 +91,8 @@ static void ktti_disconnect(struct pi_adapter *pi)
- static void ktti_log_adapter(struct pi_adapter *pi)
- 
- {
--	dev_info(&pi->dev, "ktti %s, KT adapter at 0x%x, delay %d\n",
--		KTTI_VERSION, pi->port, pi->delay);
--
-+	dev_info(&pi->dev, "KT adapter at 0x%x, delay %d\n",
-+		pi->port, pi->delay);
- }
- 
- static struct pi_protocol ktti = {
-diff --git a/drivers/ata/pata_parport/on20.c b/drivers/ata/pata_parport/on20.c
-index c76d4fb84c61..9cc8be9fa562 100644
---- a/drivers/ata/pata_parport/on20.c
-+++ b/drivers/ata/pata_parport/on20.c
-@@ -12,8 +12,6 @@
- 
- */
- 
--#define	ON20_VERSION	"1.01"
--
- #include <linux/module.h>
- #include <linux/init.h>
- #include <linux/delay.h>
-@@ -115,10 +113,8 @@ static void on20_log_adapter(struct pi_adapter *pi)
- 
- {       char    *mode_string[2] = {"4-bit","8-bit"};
- 
--	dev_info(&pi->dev, "on20 %s, OnSpec 90c20 at 0x%x, ", ON20_VERSION, pi->port);
--	dev_info(&pi->dev, "mode %d (%s), delay %d\n", pi->mode,
--		mode_string[pi->mode],pi->delay);
--
-+	dev_info(&pi->dev, "OnSpec 90c20 at 0x%x, mode %d (%s), delay %d\n",
-+		pi->port, pi->mode, mode_string[pi->mode], pi->delay);
- }
- 
- static struct pi_protocol on20 = {
-diff --git a/drivers/ata/pata_parport/on26.c b/drivers/ata/pata_parport/on26.c
-index 5406e76ea727..e37f69db5f76 100644
---- a/drivers/ata/pata_parport/on26.c
-+++ b/drivers/ata/pata_parport/on26.c
-@@ -16,8 +16,6 @@
- 
- */
- 
--#define ON26_VERSION      "1.04"
--
- #include <linux/module.h>
- #include <linux/init.h>
- #include <linux/delay.h>
-@@ -280,10 +278,8 @@ static void on26_log_adapter(struct pi_adapter *pi)
- {       char    *mode_string[5] = {"4-bit","8-bit","EPP-8",
- 				   "EPP-16","EPP-32"};
- 
--	dev_info(&pi->dev, "on26 %s, OnSpec 90c26 at 0x%x, ", ON26_VERSION, pi->port);
--	dev_info(&pi->dev, "mode %d (%s), delay %d\n", pi->mode,
--		mode_string[pi->mode],pi->delay);
--
-+	dev_info(&pi->dev, "OnSpec 90c26 at 0x%x, mode %d (%s), delay %d\n",
-+		pi->port, pi->mode, mode_string[pi->mode], pi->delay);
- }
- 
- static struct pi_protocol on26 = {
--- 
-Ondrej Zary
+> +		/* Arbitrary limit maximum block size to 32M */
+> +		err = -EINVAL;
+> +		goto out_cleanup_disk;
+> +	}
 
+rd_blksize also needs to be >= 512, and a power of 2.
+
+>  	blk_queue_physical_block_size(disk->queue, rd_blksize);
+> +	blk_queue_max_hw_sectors(disk->queue, RD_MAX_SECTOR_SIZE);
+>  
+>  	/* Tell the block layer that this is not a rotational device */
+>  	blk_queue_flag_set(QUEUE_FLAG_NONROT, disk->queue);
