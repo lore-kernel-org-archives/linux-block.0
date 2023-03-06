@@ -2,102 +2,58 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83F2EC6FD19
-	for <linux-block@archiver.kernel.org>; Mon,  6 Mar 2023 08:23:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB08DC678D4
+	for <linux-block@archiver.kernel.org>; Mon,  6 Mar 2023 09:20:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229877AbjCFIXT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 6 Mar 2023 03:23:19 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53144 "EHLO
+        id S229746AbjCFJUc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 6 Mar 2023 04:20:32 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58302 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229570AbjCFIXR (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 6 Mar 2023 03:23:17 -0500
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 22886976D;
-        Mon,  6 Mar 2023 00:23:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=De7UoAg6L10EIApbR8j9lQJmaBA4wNwgXFUakJ10PZM=; b=o9lm7UJZKoGq2QDs2J0BgyJo60
-        qStPvdSQvgqFd3M2doU48cXMWoMaqUkc/4KyMHX+IbL2OlgQ/hLM/gWWkNAh3Jywn8QdlNMImTGK2
-        kaA5qf0tybsarAnhtqUwNDDz0WoIhyP66MKZOlniWauNzOKYZWnmFQb48cn6+oz9JNMl53I3cY022
-        zVmQLlueeHNOXPplS/4ph23nGo9acTbaVnHdvGTnWz8Ky001pwvfXnltp72eI2TE/bhPRfz7soAPN
-        AFfkBfnvkEFIBc1EPSiSSLNuQcN9fgJyYfj8h7excWAVMi08xqzkK8/ghq70NG/zOFHMof5jj5u6a
-        mfu0uI0A==;
-Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1pZ67Y-005AKn-9z; Mon, 06 Mar 2023 08:23:00 +0000
-Date:   Mon, 6 Mar 2023 08:23:00 +0000
-From:   Matthew Wilcox <willy@infradead.org>
-To:     Hannes Reinecke <hare@suse.de>
-Cc:     Luis Chamberlain <mcgrof@kernel.org>,
-        Keith Busch <kbusch@kernel.org>, Theodore Ts'o <tytso@mit.edu>,
-        Pankaj Raghav <p.raghav@samsung.com>,
-        Daniel Gomez <da.gomez@samsung.com>,
-        Javier =?iso-8859-1?Q?Gonz=E1lez?= <javier.gonz@samsung.com>,
-        lsf-pc@lists.linux-foundation.org, linux-fsdevel@vger.kernel.org,
-        linux-mm@kvack.org, linux-block@vger.kernel.org
-Subject: Re: [LSF/MM/BPF TOPIC] Cloud storage optimizations
-Message-ID: <ZAWi5KwrsYL+0Uru@casper.infradead.org>
-References: <Y/7L74P6jSWwOvWt@mit.edu>
- <ZAFUYqAcPmRPLjET@kbusch-mbp.dhcp.thefacebook.com>
- <ZAFuSSZ5vZN7/UAa@casper.infradead.org>
- <ZAJqjM6qLrraFrrn@bombadil.infradead.org>
- <c9f6544d-1731-4a73-a926-0e85ae9da9df@suse.de>
- <ZAN2HYXDI+hIsf6W@casper.infradead.org>
- <edac909b-98e5-cb6d-bb80-2f6a20a15029@suse.de>
- <ZAOF3p+vqA6pd7px@casper.infradead.org>
- <0b70deae-9fc7-ca33-5737-85d7532b3d33@suse.de>
+        with ESMTP id S229870AbjCFJUa (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 6 Mar 2023 04:20:30 -0500
+X-Greylist: delayed 1057 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 06 Mar 2023 01:20:29 PST
+Received: from mail.ettrick.pl (mail.ettrick.pl [141.94.21.111])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79D0D1E1C2
+        for <linux-block@vger.kernel.org>; Mon,  6 Mar 2023 01:20:29 -0800 (PST)
+Received: by mail.ettrick.pl (Postfix, from userid 1002)
+        id B92C2A5755; Mon,  6 Mar 2023 09:01:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ettrick.pl; s=mail;
+        t=1678093323; bh=KHux3km3Civcx5ChslOYQZwQRBjoJa4kWJfGcMIuN6w=;
+        h=Date:From:To:Subject:From;
+        b=fY3R1pPR+427oigMb8a3j3lP0dlS2C1LBCsqiowr6eX59o3S3+Ixp40diwT2TenMj
+         Jkdl8gZ2QPpFLmdGQW+EEpXWMzIyKLXa8Rg4QvWMZueCensVRczOJCEbxGHs4VBYxi
+         NSsSqc0nq7ArzzMpXzTMxch7EM/mvd+ggW976ySI2T0eMEHqNtYLsaU8uHqs+AOqXX
+         dQAkrU8C0Fw/DKUz52TgAxkxNHX5UyEqsO7JMJZtqTTC/HBb2BX8r7hbSmQ79RrteR
+         u9tyeulQUzCXscl2CNlG+3ksAPbPigIA5MKUpREtFITkRi9S8WC72v++8T6ZbnsPn/
+         8ubVGDaZj2vxA==
+Received: by mail.ettrick.pl for <linux-block@vger.kernel.org>; Mon,  6 Mar 2023 09:00:53 GMT
+Message-ID: <20230306074500-0.1.97.36yty.0.zfdrnjhkme@ettrick.pl>
+Date:   Mon,  6 Mar 2023 09:00:53 GMT
+From:   "Norbert Karecki" <norbert.karecki@ettrick.pl>
+To:     <linux-block@vger.kernel.org>
+Subject: Fotowoltaika - nowe warunki
+X-Mailer: mail.ettrick.pl
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <0b70deae-9fc7-ca33-5737-85d7532b3d33@suse.de>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sun, Mar 05, 2023 at 12:22:15PM +0100, Hannes Reinecke wrote:
-> On 3/4/23 18:54, Matthew Wilcox wrote:
-> > I think we're talking about different things (probably different storage
-> > vendors want different things, or even different people at the same
-> > storage vendor want different things).
-> > 
-> > Luis and I are talking about larger LBA sizes.  That is, the minimum
-> > read/write size from the block device is 16kB or 64kB or whatever.
-> > In this scenario, the minimum amount of space occupied by a file goes
-> > up from 512 bytes or 4kB to 64kB.  That's doable, even if somewhat
-> > suboptimal.
-> > 
-> And so do I. One can view zones as really large LBAs.
-> 
-> Indeed it might be suboptimal from the OS point of view.
-> But from the device point of view it won't.
-> And, in fact, with devices becoming faster and faster the question is
-> whether sticking with relatively small sectors won't become a limiting
-> factor eventually.
-> 
-> > Your concern seems to be more around shingled devices (or their equivalent
-> > in SSD terms) where there are large zones which are append-only, but
-> > you can still random-read 512 byte LBAs.  I think there are different
-> > solutions to these problems, and people are working on both of these
-> > problems.
-> > 
-> My point being that zones are just there because the I/O stack can only deal
-> with sectors up to 4k. If the I/O stack would be capable of dealing
-> with larger LBAs one could identify a zone with an LBA, and the entire issue
-> of append-only and sequential writes would be moot.
-> Even the entire concept of zones becomes irrelevant as the OS would
-> trivially only write entire zones.
+Dzie=C5=84 dobry,
 
-All current filesystems that I'm aware of require their fs block size
-to be >= LBA size.  That is, you can't take a 512-byte blocksize ext2
-filesystem and put it on a 4kB LBA storage device.
+chcia=C5=82bym poinformowa=C4=87, i=C5=BC mog=C4=85 Pa=C5=84stwo uzyska=C4=
+=87 dofinansowanie na systemy fotowoltaiczne w ramach nowej edycji progra=
+mu M=C3=B3j Pr=C4=85d.
 
-That means that files can only grow/shrink in 256MB increments.  I
-don't think that amount of wasted space is going to be acceptable.
-So if we're serious about going down this path, we need to tell
-filesystem people to start working out how to support fs block
-size < LBA size.
+Program zapewnia 6000 z=C5=82 dofinansowania na instalacj=C4=99 paneli i =
+16 000 z=C5=82 na magazyn energii, ni=C5=BCsze cen pr=C4=85du i mo=C5=BCl=
+iwo=C5=9B=C4=87 odliczenia koszt=C3=B3w zwi=C4=85zanych z instalacj=C4=85=
+ fotowoltaiki w ramach rozliczenia PIT (tzw. ulga termomodernizacyjna).
 
-That's a big ask, so let's be sure storage vendors actually want
-this.  Both supporting zoned devices & suporting 16k/64k block
-sizes are easier asks.
+Czy s=C4=85 Pa=C5=84stwo otwarci na wst=C4=99pn=C4=85 rozmow=C4=99 w tym =
+temacie?
+
+
+Pozdrawiam,
+Norbert Karecki
