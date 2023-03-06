@@ -2,177 +2,110 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E7140C64EC4
-	for <linux-block@archiver.kernel.org>; Mon,  6 Mar 2023 16:12:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B3D58C61DA4
+	for <linux-block@archiver.kernel.org>; Mon,  6 Mar 2023 16:17:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229579AbjCFQMM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 6 Mar 2023 11:12:12 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56270 "EHLO
+        id S230271AbjCFQRw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 6 Mar 2023 11:17:52 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39200 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231510AbjCFQJu (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 6 Mar 2023 11:09:50 -0500
-Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A746D3CE38
-        for <linux-block@vger.kernel.org>; Mon,  6 Mar 2023 08:05:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1678118747; x=1709654747;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=PCa9V1N75id5GSrVTMlEG2cvhZe7atD9OfJGwcHX1j0=;
-  b=mZs6MwjH3Y9/S4cLWn/vNXNsMjpyFDuSu8HzMV2fZgSw6/UjTML/F0ke
-   IskImfwlVkML3Mj47Cs+fFqb3U2397sN+dDhcVYxO3ilLR/tf0UppOrd+
-   9bqPkWxp33Cyqu9Ev+pi9o722A7voR9oW21vXyLJXcaA12BM8ahn7dDMh
-   HtuZdILa8Vk97iffHAoO/N3JIOnVETgSk9FGqIh8Nvu5Fghq/CWvMObJJ
-   W/uQ3Hox48kDkgqoYG7fEVMCL6DthX4l5ArZgI6x6ad+O/JAnH1QwAqDt
-   H1LzJg5rXVZHSTNQtfd4ctx/ZsHXTLv+OixfDdjQSfiVUak3IZlCiCfK1
-   A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10641"; a="337110137"
-X-IronPort-AV: E=Sophos;i="5.98,238,1673942400"; 
-   d="scan'208";a="337110137"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Mar 2023 08:04:28 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10641"; a="765269433"
-X-IronPort-AV: E=Sophos;i="5.98,238,1673942400"; 
-   d="scan'208";a="765269433"
-Received: from lkp-server01.sh.intel.com (HELO b613635ddfff) ([10.239.97.150])
-  by FMSMGA003.fm.intel.com with ESMTP; 06 Mar 2023 08:04:26 -0800
-Received: from kbuild by b613635ddfff with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1pZDK5-0000Rv-2b;
-        Mon, 06 Mar 2023 16:04:25 +0000
-Date:   Tue, 7 Mar 2023 00:04:21 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Hannes Reinecke <hare@suse.de>, Jens Axboe <axboe@kernel.dk>
-Cc:     llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-        linux-block@vger.kernel.org, Matthew Wilcox <willy@infradead.org>,
+        with ESMTP id S230119AbjCFQRf (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 6 Mar 2023 11:17:35 -0500
+Received: from outgoing.mit.edu (outgoing-auth-1.mit.edu [18.9.28.11])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8DBE85F50B
+        for <linux-block@vger.kernel.org>; Mon,  6 Mar 2023 08:14:13 -0800 (PST)
+Received: from cwcc.thunk.org (pool-173-48-120-46.bstnma.fios.verizon.net [173.48.120.46])
+        (authenticated bits=0)
+        (User authenticated as tytso@ATHENA.MIT.EDU)
+        by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 326GCEQa019871
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 6 Mar 2023 11:12:16 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mit.edu; s=outgoing;
+        t=1678119138; bh=xNCYCjbNcx4GryX+Nljoml3TBmyYXYge/KdLA85oJbw=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To;
+        b=BT3xMq1wn8LiY2rpGYSEmAn7d5Mym1ZiyMWPanTegjuE2fVi0AAUvwPIB9SEl18N5
+         9U795pn6zor9z/uGM4+uLahEXJXrNYgmDPKFh7ciOodnhNlPH75Gfafe+IwQjFH3sL
+         jX6ODjLybKgwuXonsqQqZJylsmLv4E0ApI4wncgk9ReFFqAMeEW0xVjQHxHSZYUY5k
+         nCbjCKjpEFmp9AJc7Z1h5sLNjojsYNTlDhjnfJHn9pNBDeCu8bTqdC8toB+WSCMSJT
+         Lw32wb+kA02nUc/y/xhb2vXeszGwcL7VCsauWTl+o++ji+DuCxG5pABUX5FrcSHe8J
+         j2CN6SWFRWMKw==
+Received: by cwcc.thunk.org (Postfix, from userid 15806)
+        id 3A83015C33A8; Mon,  6 Mar 2023 11:12:14 -0500 (EST)
+Date:   Mon, 6 Mar 2023 11:12:14 -0500
+From:   "Theodore Ts'o" <tytso@mit.edu>
+To:     Matthew Wilcox <willy@infradead.org>
+Cc:     Hannes Reinecke <hare@suse.de>,
         Luis Chamberlain <mcgrof@kernel.org>,
-        Keith Busch <kbusch@kernel.org>, Hannes Reinecke <hare@suse.de>
-Subject: Re: [PATCH 1/5] brd: convert to folios
-Message-ID: <202303062339.fe53AMz1-lkp@intel.com>
-References: <20230306120127.21375-2-hare@suse.de>
+        Keith Busch <kbusch@kernel.org>,
+        Pankaj Raghav <p.raghav@samsung.com>,
+        Daniel Gomez <da.gomez@samsung.com>,
+        Javier =?iso-8859-1?Q?Gonz=E1lez?= <javier.gonz@samsung.com>,
+        lsf-pc@lists.linux-foundation.org, linux-fsdevel@vger.kernel.org,
+        linux-mm@kvack.org, linux-block@vger.kernel.org
+Subject: Re: [LSF/MM/BPF TOPIC] Cloud storage optimizations
+Message-ID: <20230306161214.GB959362@mit.edu>
+References: <Y/7L74P6jSWwOvWt@mit.edu>
+ <ZAFUYqAcPmRPLjET@kbusch-mbp.dhcp.thefacebook.com>
+ <ZAFuSSZ5vZN7/UAa@casper.infradead.org>
+ <ZAJqjM6qLrraFrrn@bombadil.infradead.org>
+ <c9f6544d-1731-4a73-a926-0e85ae9da9df@suse.de>
+ <ZAN2HYXDI+hIsf6W@casper.infradead.org>
+ <edac909b-98e5-cb6d-bb80-2f6a20a15029@suse.de>
+ <ZAOF3p+vqA6pd7px@casper.infradead.org>
+ <0b70deae-9fc7-ca33-5737-85d7532b3d33@suse.de>
+ <ZAWi5KwrsYL+0Uru@casper.infradead.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230306120127.21375-2-hare@suse.de>
+In-Reply-To: <ZAWi5KwrsYL+0Uru@casper.infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Hannes,
+On Mon, Mar 06, 2023 at 08:23:00AM +0000, Matthew Wilcox wrote:
+> 
+> All current filesystems that I'm aware of require their fs block size
+> to be >= LBA size.  That is, you can't take a 512-byte blocksize ext2
+> filesystem and put it on a 4kB LBA storage device.
+> 
+> That means that files can only grow/shrink in 256MB increments.  I
+> don't think that amount of wasted space is going to be acceptable.
+> So if we're serious about going down this path, we need to tell
+> filesystem people to start working out how to support fs block
+> size < LBA size.
+> 
+> That's a big ask, so let's be sure storage vendors actually want
+> this.  Both supporting zoned devices & suporting 16k/64k block
+> sizes are easier asks.
 
-I love your patch! Yet something to improve:
+What HDD vendors want is to be able to have 32k or even 64k *physical*
+sector sizes.  This allows for much more efficient erasure codes, so
+it will increase their byte capacity now that it's no longer easier to
+get capacity boosts by squeezing the tracks closer and closer, and
+their have been various engineering tradeoffs with SMR, HAMR, and
+MAMR.  HDD vendors have been asking for this at LSF/MM, and in other
+venues for ***years***.
 
-[auto build test ERROR on axboe-block/for-next]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+This doesn't necessarily mean that the *logical* sector size needs to
+be larger.  What I could imagine that HDD vendors could do is to
+create HDD disks with, say, a 4k logical block size and a 32k physical
+sector size.  This means that 4k random writes will require
+read/modify/write cycles, which isn't great from a performance
+performance.  However, for those customers who are using raw block
+devices for their cluster file system, and for those customers who are
+willing to, say, use ext4 with a 4k block size and a 32k cluster size
+(using the bigalloc feature), all of the data blocks would be 32k
+aligned, and this would work without any modifications.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Hannes-Reinecke/brd-convert-to-folios/20230306-200223
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git for-next
-patch link:    https://lore.kernel.org/r/20230306120127.21375-2-hare%40suse.de
-patch subject: [PATCH 1/5] brd: convert to folios
-config: hexagon-randconfig-r045-20230306 (https://download.01.org/0day-ci/archive/20230306/202303062339.fe53AMz1-lkp@intel.com/config)
-compiler: clang version 17.0.0 (https://github.com/llvm/llvm-project 67409911353323ca5edf2049ef0df54132fa1ca7)
-reproduce (this is a W=1 build):
-        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
-        chmod +x ~/bin/make.cross
-        # https://github.com/intel-lab-lkp/linux/commit/b29fb9873ddbb2efb157e5d6548abf3c88b3458c
-        git remote add linux-review https://github.com/intel-lab-lkp/linux
-        git fetch --no-tags linux-review Hannes-Reinecke/brd-convert-to-folios/20230306-200223
-        git checkout b29fb9873ddbb2efb157e5d6548abf3c88b3458c
-        # save the config file
-        mkdir build_dir && cp config build_dir/.config
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross W=1 O=build_dir ARCH=hexagon olddefconfig
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross W=1 O=build_dir ARCH=hexagon SHELL=/bin/bash drivers/block/
+I suspect that if these drives were made available, this would allow
+for a gradual transition to support larger block sizes.  The file
+system level changes aren't *that* hard.  There is a chicken and egg
+situation here; until these drives are generally available, the
+incentive to do the work is minimal.  But with a 4k logical, 32k or
+64k physical sector size, we can gradually improve our support for
+these file systems with block size > page size, with cluster size >
+page size being an intermediate step that would work today.
 
-If you fix the issue, kindly add following tag where applicable
-| Reported-by: kernel test robot <lkp@intel.com>
-| Link: https://lore.kernel.org/oe-kbuild-all/202303062339.fe53AMz1-lkp@intel.com/
+Cheers,
 
-All errors (new ones prefixed by >>):
-
-   In file included from drivers/block/brd.c:17:
-   In file included from include/linux/blkdev.h:9:
-   In file included from include/linux/blk_types.h:10:
-   In file included from include/linux/bvec.h:10:
-   In file included from include/linux/highmem.h:12:
-   In file included from include/linux/hardirq.h:11:
-   In file included from ./arch/hexagon/include/generated/asm/hardirq.h:1:
-   In file included from include/asm-generic/hardirq.h:17:
-   In file included from include/linux/irq.h:20:
-   In file included from include/linux/io.h:13:
-   In file included from arch/hexagon/include/asm/io.h:334:
-   include/asm-generic/io.h:547:31: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-           val = __raw_readb(PCI_IOBASE + addr);
-                             ~~~~~~~~~~ ^
-   include/asm-generic/io.h:560:61: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-           val = __le16_to_cpu((__le16 __force)__raw_readw(PCI_IOBASE + addr));
-                                                           ~~~~~~~~~~ ^
-   include/uapi/linux/byteorder/little_endian.h:37:51: note: expanded from macro '__le16_to_cpu'
-   #define __le16_to_cpu(x) ((__force __u16)(__le16)(x))
-                                                     ^
-   In file included from drivers/block/brd.c:17:
-   In file included from include/linux/blkdev.h:9:
-   In file included from include/linux/blk_types.h:10:
-   In file included from include/linux/bvec.h:10:
-   In file included from include/linux/highmem.h:12:
-   In file included from include/linux/hardirq.h:11:
-   In file included from ./arch/hexagon/include/generated/asm/hardirq.h:1:
-   In file included from include/asm-generic/hardirq.h:17:
-   In file included from include/linux/irq.h:20:
-   In file included from include/linux/io.h:13:
-   In file included from arch/hexagon/include/asm/io.h:334:
-   include/asm-generic/io.h:573:61: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-           val = __le32_to_cpu((__le32 __force)__raw_readl(PCI_IOBASE + addr));
-                                                           ~~~~~~~~~~ ^
-   include/uapi/linux/byteorder/little_endian.h:35:51: note: expanded from macro '__le32_to_cpu'
-   #define __le32_to_cpu(x) ((__force __u32)(__le32)(x))
-                                                     ^
-   In file included from drivers/block/brd.c:17:
-   In file included from include/linux/blkdev.h:9:
-   In file included from include/linux/blk_types.h:10:
-   In file included from include/linux/bvec.h:10:
-   In file included from include/linux/highmem.h:12:
-   In file included from include/linux/hardirq.h:11:
-   In file included from ./arch/hexagon/include/generated/asm/hardirq.h:1:
-   In file included from include/asm-generic/hardirq.h:17:
-   In file included from include/linux/irq.h:20:
-   In file included from include/linux/io.h:13:
-   In file included from arch/hexagon/include/asm/io.h:334:
-   include/asm-generic/io.h:584:33: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-           __raw_writeb(value, PCI_IOBASE + addr);
-                               ~~~~~~~~~~ ^
-   include/asm-generic/io.h:594:59: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-           __raw_writew((u16 __force)cpu_to_le16(value), PCI_IOBASE + addr);
-                                                         ~~~~~~~~~~ ^
-   include/asm-generic/io.h:604:59: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-           __raw_writel((u32 __force)cpu_to_le32(value), PCI_IOBASE + addr);
-                                                         ~~~~~~~~~~ ^
->> drivers/block/brd.c:325:8: error: call to undeclared function 'brd_do_bvec'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
-           err = brd_do_bvec(brd, page, PAGE_SIZE, 0, op, sector);
-                 ^
-   6 warnings and 1 error generated.
-
-
-vim +/brd_do_bvec +325 drivers/block/brd.c
-
-9db5579be4bb53 Nicholas Piggin 2008-02-08  316  
-a72132c31d5809 Matthew Wilcox  2014-06-04  317  static int brd_rw_page(struct block_device *bdev, sector_t sector,
-86947df3a92364 Bart Van Assche 2022-07-14  318  		       struct page *page, enum req_op op)
-a72132c31d5809 Matthew Wilcox  2014-06-04  319  {
-a72132c31d5809 Matthew Wilcox  2014-06-04  320  	struct brd_device *brd = bdev->bd_disk->private_data;
-98cc093cba1e92 Huang Ying      2017-09-06  321  	int err;
-98cc093cba1e92 Huang Ying      2017-09-06  322  
-98cc093cba1e92 Huang Ying      2017-09-06  323  	if (PageTransHuge(page))
-98cc093cba1e92 Huang Ying      2017-09-06  324  		return -ENOTSUPP;
-3f289dcb4b2654 Tejun Heo       2018-07-18 @325  	err = brd_do_bvec(brd, page, PAGE_SIZE, 0, op, sector);
-3f289dcb4b2654 Tejun Heo       2018-07-18  326  	page_endio(page, op_is_write(op), err);
-a72132c31d5809 Matthew Wilcox  2014-06-04  327  	return err;
-a72132c31d5809 Matthew Wilcox  2014-06-04  328  }
-a72132c31d5809 Matthew Wilcox  2014-06-04  329  
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests
+					- Ted
