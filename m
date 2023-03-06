@@ -2,101 +2,147 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C95FC64EC4
-	for <linux-block@archiver.kernel.org>; Mon,  6 Mar 2023 18:02:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D443C64EC4
+	for <linux-block@archiver.kernel.org>; Mon,  6 Mar 2023 18:24:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230015AbjCFSCb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 6 Mar 2023 13:02:31 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33774 "EHLO
+        id S229950AbjCFSYQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 6 Mar 2023 13:24:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44046 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230374AbjCFSC2 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 6 Mar 2023 13:02:28 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 674856C8A4
-        for <linux-block@vger.kernel.org>; Mon,  6 Mar 2023 10:02:00 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        with ESMTP id S229819AbjCFSYQ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 6 Mar 2023 13:24:16 -0500
+Received: from hosting.gsystem.sk (hosting.gsystem.sk [212.5.213.30])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 0B4B93B0C2;
+        Mon,  6 Mar 2023 10:23:59 -0800 (PST)
+Received: from gsql.ggedos.sk (off-20.infotel.telecom.sk [212.5.213.20])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id E8EABB81061
-        for <linux-block@vger.kernel.org>; Mon,  6 Mar 2023 18:01:21 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 255ADC433D2;
-        Mon,  6 Mar 2023 18:01:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1678125680;
-        bh=8+fX0DQF7AxWUzkAE7WOfShZIM9RFn5tL/qhNPkcHOs=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=fIwlz33RQfCI3MpSLUONo434fr2B/bgKX+x8s2H24pDXYTXGlwTQzbqTEaMDrCam3
-         gaX1hxFWn6DzvE83Aui9k2b975FVUplwi9/RbAixgoqWMSce1ljaSUbO4VaWUN1UuY
-         yVjGiGUNQux8WlvdjPGJ28szrKV2Un+CC+Hja5GE/WmVZu5hRG/5EusuQc9pHbTKRo
-         iM5cg3ZcSSIbPAklXa1KqmsRLTmRYoErshqDfWPWncmlmGG04L++thYqS/l8lBzWBF
-         cWOWE1qzEgJVL4Yk/yGC/IAprqiObsdnN1OX/z7rX2G4JAt8toBQDhlcgTadSU9YNO
-         6QCxEbx/DHd9A==
-Date:   Mon, 6 Mar 2023 11:01:17 -0700
-From:   Keith Busch <kbusch@kernel.org>
-To:     Hannes Reinecke <hare@suse.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Matthew Wilcox <willy@infradead.org>,
-        Luis Chamberlain <mcgrof@kernel.org>
-Subject: Re: [PATCH 4/5] brd: limit maximal block size to 32M
-Message-ID: <ZAYqbUEdGAD6rsp4@kbusch-mbp.dhcp.thefacebook.com>
-References: <20230306120127.21375-1-hare@suse.de>
- <20230306120127.21375-5-hare@suse.de>
+        by hosting.gsystem.sk (Postfix) with ESMTPSA id D5F7A7A0728;
+        Mon,  6 Mar 2023 18:28:29 +0100 (CET)
+From:   Ondrej Zary <linux@zary.sk>
+To:     Damien Le Moal <damien.lemoal@opensource.wdc.com>
+Cc:     Christoph Hellwig <hch@lst.de>,
+        Sergey Shtylyov <s.shtylyov@omp.ru>,
+        Jens Axboe <axboe@kernel.dk>, Tim Waugh <tim@cyberelk.net>,
+        linux-block@vger.kernel.org, linux-parport@lists.infradead.org,
+        linux-ide@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH 15/18] pata_parport: remove verbose parameter from test_proto()
+Date:   Mon,  6 Mar 2023 18:27:49 +0100
+Message-Id: <20230306172752.7727-16-linux@zary.sk>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20230306172752.7727-1-linux@zary.sk>
+References: <20230306172752.7727-1-linux@zary.sk>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230306120127.21375-5-hare@suse.de>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Mar 06, 2023 at 01:01:26PM +0100, Hannes Reinecke wrote:
-> Use an arbitrary limit of 32M for the maximal blocksize so as not
-> to overflow the page cache.
-> 
-> Signed-off-by: Hannes Reinecke <hare@suse.de>
-> ---
->  drivers/block/brd.c | 16 ++++++++--------
->  1 file changed, 8 insertions(+), 8 deletions(-)
-> 
-> diff --git a/drivers/block/brd.c b/drivers/block/brd.c
-> index 11bac3c3f1b6..1ed114cd5cb0 100644
-> --- a/drivers/block/brd.c
-> +++ b/drivers/block/brd.c
-> @@ -348,6 +348,7 @@ static int max_part = 1;
->  module_param(max_part, int, 0444);
->  MODULE_PARM_DESC(max_part, "Num Minors to reserve between devices");
->  
-> +#define RD_MAX_SECTOR_SIZE 65536
->  static unsigned int rd_blksize = PAGE_SIZE;
->  module_param(rd_blksize, uint, 0444);
->  MODULE_PARM_DESC(rd_blksize, "Blocksize of each RAM disk in bytes.");
-> @@ -410,15 +411,14 @@ static int brd_alloc(int i)
->  	disk->private_data	= brd;
->  	strscpy(disk->disk_name, buf, DISK_NAME_LEN);
->  	set_capacity(disk, rd_size * 2);
-> -	
-> -	/*
-> -	 * This is so fdisk will align partitions on 4k, because of
-> -	 * direct_access API needing 4k alignment, returning a PFN
-> -	 * (This is only a problem on very small devices <= 4M,
-> -	 *  otherwise fdisk will align on 1M. Regardless this call
-> -	 *  is harmless)
-> -	 */
-> +
-> +	if (rd_blksize > RD_MAX_SECTOR_SIZE) {
+verbose parameter of test_proto() is now unused, remove it.
 
-rd_blkside is in bytes, but the above is ccomapring it to something in units of
-SECTOR_SIZE.
+Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
+Signed-off-by: Ondrej Zary <linux@zary.sk>
+---
+ drivers/ata/pata_parport/bpck.c         | 2 +-
+ drivers/ata/pata_parport/epat.c         | 2 +-
+ drivers/ata/pata_parport/epia.c         | 2 +-
+ drivers/ata/pata_parport/friq.c         | 2 +-
+ drivers/ata/pata_parport/frpw.c         | 2 +-
+ drivers/ata/pata_parport/pata_parport.c | 2 +-
+ include/linux/pata_parport.h            | 2 +-
+ 7 files changed, 7 insertions(+), 7 deletions(-)
 
-> +		/* Arbitrary limit maximum block size to 32M */
-> +		err = -EINVAL;
-> +		goto out_cleanup_disk;
-> +	}
+diff --git a/drivers/ata/pata_parport/bpck.c b/drivers/ata/pata_parport/bpck.c
+index 793ef2c7849e..2072e291fd16 100644
+--- a/drivers/ata/pata_parport/bpck.c
++++ b/drivers/ata/pata_parport/bpck.c
+@@ -274,7 +274,7 @@ static void bpck_force_spp(struct pi_adapter *pi)
+ 
+ #define TEST_LEN  16
+ 
+-static int bpck_test_proto(struct pi_adapter *pi, char *scratch, int verbose)
++static int bpck_test_proto(struct pi_adapter *pi, char *scratch)
+ 
+ {	int i, e, l, h, om;
+ 	char buf[TEST_LEN];
+diff --git a/drivers/ata/pata_parport/epat.c b/drivers/ata/pata_parport/epat.c
+index 12dd53a06dd0..4877b39ed04c 100644
+--- a/drivers/ata/pata_parport/epat.c
++++ b/drivers/ata/pata_parport/epat.c
+@@ -246,7 +246,7 @@ static void epat_disconnect(struct pi_adapter *pi)
+ 	w2(pi->saved_r2);
+ }
+ 
+-static int epat_test_proto(struct pi_adapter *pi, char *scratch, int verbose)
++static int epat_test_proto(struct pi_adapter *pi, char *scratch)
+ 
+ {       int     k, j, f, cc;
+ 	int	e[2] = {0,0};
+diff --git a/drivers/ata/pata_parport/epia.c b/drivers/ata/pata_parport/epia.c
+index 1216763d0c6d..e7401351463a 100644
+--- a/drivers/ata/pata_parport/epia.c
++++ b/drivers/ata/pata_parport/epia.c
+@@ -232,7 +232,7 @@ static void epia_write_block(struct pi_adapter *pi, char *buf, int count)
+ 
+ }
+ 
+-static int epia_test_proto(struct pi_adapter *pi, char *scratch, int verbose)
++static int epia_test_proto(struct pi_adapter *pi, char *scratch)
+ 
+ {       int     j, k, f;
+ 	int	e[2] = {0,0};
+diff --git a/drivers/ata/pata_parport/friq.c b/drivers/ata/pata_parport/friq.c
+index ed05e6503147..df15b210f355 100644
+--- a/drivers/ata/pata_parport/friq.c
++++ b/drivers/ata/pata_parport/friq.c
+@@ -178,7 +178,7 @@ static void friq_disconnect(struct pi_adapter *pi)
+         w2(pi->saved_r2);
+ } 
+ 
+-static int friq_test_proto(struct pi_adapter *pi, char *scratch, int verbose)
++static int friq_test_proto(struct pi_adapter *pi, char *scratch)
+ 
+ {       int     j, k, r;
+ 	int	e[2] = {0,0};
+diff --git a/drivers/ata/pata_parport/frpw.c b/drivers/ata/pata_parport/frpw.c
+index c0d50e2ed57d..0d4e84806350 100644
+--- a/drivers/ata/pata_parport/frpw.c
++++ b/drivers/ata/pata_parport/frpw.c
+@@ -219,7 +219,7 @@ static int frpw_test_pnp(struct pi_adapter *pi)
+    a hack :-(
+ */
+ 
+-static int frpw_test_proto(struct pi_adapter *pi, char *scratch, int verbose)
++static int frpw_test_proto(struct pi_adapter *pi, char *scratch)
+ 
+ {       int     j, k, r;
+ 	int	e[2] = {0,0};
+diff --git a/drivers/ata/pata_parport/pata_parport.c b/drivers/ata/pata_parport/pata_parport.c
+index f42a2cafc382..27aa2419af02 100644
+--- a/drivers/ata/pata_parport/pata_parport.c
++++ b/drivers/ata/pata_parport/pata_parport.c
+@@ -306,7 +306,7 @@ static int pi_test_proto(struct pi_adapter *pi, char *scratch)
+ 
+ 	parport_claim_or_block(pi->pardev);
+ 	if (pi->proto->test_proto)
+-		res = pi->proto->test_proto(pi, scratch, 1);
++		res = pi->proto->test_proto(pi, scratch);
+ 	else
+ 		res = default_test_proto(pi, scratch);
+ 	parport_release(pi->pardev);
+diff --git a/include/linux/pata_parport.h b/include/linux/pata_parport.h
+index c44d30b3e886..e45bb1896003 100644
+--- a/include/linux/pata_parport.h
++++ b/include/linux/pata_parport.h
+@@ -67,7 +67,7 @@ struct pi_protocol {
+ 
+ 	int (*test_port)(struct pi_adapter *pi);
+ 	int (*probe_unit)(struct pi_adapter *pi);
+-	int (*test_proto)(struct pi_adapter *pi, char *scratch, int verbose);
++	int (*test_proto)(struct pi_adapter *pi, char *scratch);
+ 	void (*log_adapter)(struct pi_adapter *pi);
+ 
+ 	int (*init_proto)(struct pi_adapter *pi);
+-- 
+Ondrej Zary
 
-rd_blksize also needs to be >= 512, and a power of 2.
-
->  	blk_queue_physical_block_size(disk->queue, rd_blksize);
-> +	blk_queue_max_hw_sectors(disk->queue, RD_MAX_SECTOR_SIZE);
->  
->  	/* Tell the block layer that this is not a rotational device */
->  	blk_queue_flag_set(QUEUE_FLAG_NONROT, disk->queue);
