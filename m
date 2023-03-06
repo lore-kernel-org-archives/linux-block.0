@@ -2,176 +2,118 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7500C61DA4
-	for <linux-block@archiver.kernel.org>; Mon,  6 Mar 2023 12:01:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 950CEC6FD1B
+	for <linux-block@archiver.kernel.org>; Mon,  6 Mar 2023 12:04:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230196AbjCFMBv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 6 Mar 2023 07:01:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52558 "EHLO
+        id S230096AbjCFMEN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 6 Mar 2023 07:04:13 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55208 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230079AbjCFMBp (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 6 Mar 2023 07:01:45 -0500
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6BFBE298F5
-        for <linux-block@vger.kernel.org>; Mon,  6 Mar 2023 04:01:41 -0800 (PST)
-Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-        by smtp-out1.suse.de (Postfix) with ESMTP id 60D7A22027;
-        Mon,  6 Mar 2023 12:01:39 +0000 (UTC)
+        with ESMTP id S230154AbjCFMEI (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 6 Mar 2023 07:04:08 -0500
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5EC4F22000;
+        Mon,  6 Mar 2023 04:04:03 -0800 (PST)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 144651FE65;
+        Mon,  6 Mar 2023 12:04:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1678104099; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:
+        t=1678104242; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=UwuiA4ikQa/M46+bw1EkkXbFkC8gprTE2kfTQZ73XFw=;
-        b=yquJMVlt4CzxTKrVf99x2sKeNpSD9Y+InO+7DTBmKXnDQYZPul69F+7e4R+qp+7zQ/hU3L
-        5PCF/a3hNbsu1ls3j2ETms+pVvtyoRd5avbR3yJ76JXYDn28gQUMTLbUyDvFzh0qWcW4BD
-        L0PBYOeQbXoGRb6BER/oYKL6LXYAksc=
+        bh=vLNDYnpl5Xel5rnk0bBhZ9HfM1ScJkIYMJK4yAfABqI=;
+        b=yvivUIiDTsVyhHd/0L1pRMpDzoB/MiI4w//DZvw3XaQAnjNopd96nix0GFWS1wimijtrv2
+        PQ/5m7AqEhNxv98Lfs24nNPQqmNOBtqfsZMGlpZHlxd6QXNIRJ9NSL+9xlsNh4mstUFELD
+        A3y885Uz0pJJnV9SpkvYtkL3Imr06Gc=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1678104099;
+        s=susede2_ed25519; t=1678104242;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:
+         mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=UwuiA4ikQa/M46+bw1EkkXbFkC8gprTE2kfTQZ73XFw=;
-        b=WsMuE6ROSyi71alF8Z1Vl+zxJIesnuGxsNbqudo1NyoQJKJxHXMVO4Dz2UL9/+ScAAaOvZ
-        v6AZsbZXHMlsq2DA==
-Received: from adalid.arch.suse.de (adalid.arch.suse.de [10.161.8.13])
-        by relay2.suse.de (Postfix) with ESMTP id 50B2A2C149;
-        Mon,  6 Mar 2023 12:01:39 +0000 (UTC)
-Received: by adalid.arch.suse.de (Postfix, from userid 16045)
-        id 4607B51BE38D; Mon,  6 Mar 2023 13:01:39 +0100 (CET)
-From:   Hannes Reinecke <hare@suse.de>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Matthew Wilcox <willy@infradead.org>,
-        Luis Chamberlain <mcgrof@kernel.org>,
-        Keith Busch <kbusch@kernel.org>, Hannes Reinecke <hare@suse.de>
-Subject: [PATCH 3/5] brd: make sector size configurable
-Date:   Mon,  6 Mar 2023 13:01:25 +0100
-Message-Id: <20230306120127.21375-4-hare@suse.de>
-X-Mailer: git-send-email 2.35.3
-In-Reply-To: <20230306120127.21375-1-hare@suse.de>
-References: <20230306120127.21375-1-hare@suse.de>
+        bh=vLNDYnpl5Xel5rnk0bBhZ9HfM1ScJkIYMJK4yAfABqI=;
+        b=X2K10tSZduj/mpNTfYMhnDz5eGDj2NQ2uEXvBz0xEZhoWHD8x/jNDOdUxjRqMSpKkP989u
+        nNW0FZUWttCw34CQ==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 0388713A66;
+        Mon,  6 Mar 2023 12:04:02 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id TuQfALLWBWTkLwAAMHmgww
+        (envelope-from <hare@suse.de>); Mon, 06 Mar 2023 12:04:02 +0000
+Message-ID: <d3e359f6-8c23-c624-688b-5dc1b40b6ee1@suse.de>
+Date:   Mon, 6 Mar 2023 13:04:01 +0100
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.7.1
+Subject: Re: [LSF/MM/BPF TOPIC] Cloud storage optimizations
+Content-Language: en-US
+To:     Luis Chamberlain <mcgrof@kernel.org>,
+        Matthew Wilcox <willy@infradead.org>
+Cc:     James Bottomley <James.Bottomley@hansenpartnership.com>,
+        Keith Busch <kbusch@kernel.org>, Theodore Ts'o <tytso@mit.edu>,
+        lsf-pc@lists.linux-foundation.org, linux-fsdevel@vger.kernel.org,
+        linux-mm@kvack.org, linux-block@vger.kernel.org
+References: <Y/7L74P6jSWwOvWt@mit.edu>
+ <ZAFUYqAcPmRPLjET@kbusch-mbp.dhcp.thefacebook.com>
+ <ZAFuSSZ5vZN7/UAa@casper.infradead.org>
+ <f68905c5785b355b621847974d620fb59f021a41.camel@HansenPartnership.com>
+ <ZAL0ifa66TfMinCh@casper.infradead.org>
+ <2600732b9ed0ddabfda5831aff22fd7e4270e3be.camel@HansenPartnership.com>
+ <ZAN0JkklyCRIXVo6@casper.infradead.org>
+ <ZAQXduwAcAtIZHkB@bombadil.infradead.org>
+From:   Hannes Reinecke <hare@suse.de>
+In-Reply-To: <ZAQXduwAcAtIZHkB@bombadil.infradead.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Add a module option 'rd_blksize' to allow the user to change
-the sector size of the RAM disks.
+On 3/5/23 05:15, Luis Chamberlain wrote:
+> On Sat, Mar 04, 2023 at 04:39:02PM +0000, Matthew Wilcox wrote:
+>> I'm getting more and more
+>> comfortable with the idea that "Linux doesn't support block sizes >
+>> PAGE_SIZE on 32-bit machines" is an acceptable answer.
+> 
+> First of all filesystems would need to add support for a larger block
+> sizes > PAGE_SIZE, and that takes effort. It is also a support question
+> too.
+> 
+> I think garnering consensus from filesystem developers we don't want
+> to support block sizes > PAGE_SIZE on 32-bit systems would be a good
+> thing to review at LSFMM or even on this list. I hightly doubt anyone
+> is interested in that support.
+> 
+>> XFS already works with arbitrary-order folios.
+> 
+> But block sizes > PAGE_SIZE is work which is still not merged. It
+> *can* be with time. That would allow one to muck with larger block
+> sizes than 4k on x86-64 for instance. Without this, you can't play
+> ball.
+> 
+>> The only needed piece is
+>> specifying to the VFS that there's a minimum order for this particular
+>> inode, and having the VFS honour that everywhere.
+> 
+> Other than the above too, don't we still also need to figure out what
+> fs APIs would incur larger order folios? And then what about corner cases
+> with the page cache?
+> 
+> I was hoping some of these nooks and crannies could be explored with tmpfs.
+> 
+I have just posted patchset for 'brd' to linux-block for supporting 
+arbitrary block sizes, both physical and logical. That should be giving 
+us a good starting point for experimenting.
 
-Signed-off-by: Hannes Reinecke <hare@suse.de>
----
- drivers/block/brd.c | 30 +++++++++++++++++++-----------
- 1 file changed, 19 insertions(+), 11 deletions(-)
+Cheers,
 
-diff --git a/drivers/block/brd.c b/drivers/block/brd.c
-index fc41ea641dfb..11bac3c3f1b6 100644
---- a/drivers/block/brd.c
-+++ b/drivers/block/brd.c
-@@ -30,7 +30,7 @@
- /*
-  * Each block ramdisk device has a radix_tree brd_folios of folios that stores
-  * the folios containing the block device's contents. A brd folio's ->index is
-- * its offset in PAGE_SIZE units. This is similar to, but in no way connected
-+ * its offset in brd_blksize units. This is similar to, but in no way connected
-  * with, the kernel's pagecache or buffer cache (which sit above our block
-  * device).
-  */
-@@ -46,6 +46,8 @@ struct brd_device {
- 	spinlock_t		brd_lock;
- 	struct radix_tree_root	brd_folios;
- 	u64			brd_nr_folios;
-+	unsigned int		brd_sector_shift;
-+	unsigned int		brd_sector_size;
- };
- 
- /*
-@@ -55,7 +57,7 @@ static struct folio *brd_lookup_folio(struct brd_device *brd, sector_t sector)
- {
- 	pgoff_t idx;
- 	struct folio *folio;
--	unsigned int rd_sector_shift = PAGE_SHIFT - SECTOR_SHIFT;
-+	unsigned int rd_sector_shift = brd->brd_sector_shift - SECTOR_SHIFT;
- 
- 	/*
- 	 * The folio lifetime is protected by the fact that we have opened the
-@@ -85,8 +87,8 @@ static int brd_insert_folio(struct brd_device *brd, sector_t sector, gfp_t gfp)
- {
- 	pgoff_t idx;
- 	struct folio *folio;
--	unsigned int rd_sector_shift = PAGE_SHIFT - SECTOR_SHIFT;
--	unsigned int rd_sector_order = get_order(PAGE_SIZE);
-+	unsigned int rd_sector_shift = brd->brd_sector_shift - SECTOR_SHIFT;
-+	unsigned int rd_sector_order = get_order(brd->brd_sector_size);
- 	int ret = 0;
- 
- 	folio = brd_lookup_folio(brd, sector);
-@@ -170,9 +172,9 @@ static void brd_free_folios(struct brd_device *brd)
- static int copy_to_brd_setup(struct brd_device *brd, sector_t sector, size_t n,
- 			     gfp_t gfp)
- {
--	unsigned int rd_sectors_shift = PAGE_SHIFT - SECTOR_SHIFT;
-+	unsigned int rd_sectors_shift = brd->brd_sector_shift - SECTOR_SHIFT;
- 	unsigned int rd_sectors = 1 << rd_sectors_shift;
--	unsigned int rd_sector_size = PAGE_SIZE;
-+	unsigned int rd_sector_size = brd->brd_sector_size;
- 	unsigned int offset = (sector & (rd_sectors - 1)) << SECTOR_SHIFT;
- 	size_t copy;
- 	int ret;
-@@ -196,9 +198,9 @@ static void copy_to_brd(struct brd_device *brd, const void *src,
- {
- 	struct folio *folio;
- 	void *dst;
--	unsigned int rd_sectors_shift = PAGE_SHIFT - SECTOR_SHIFT;
-+	unsigned int rd_sectors_shift = brd->brd_sector_shift - SECTOR_SHIFT;
- 	unsigned int rd_sectors = 1 << rd_sectors_shift;
--	unsigned int rd_sector_size = PAGE_SIZE;
-+	unsigned int rd_sector_size = brd->brd_sector_size;
- 	unsigned int offset = (sector & (rd_sectors - 1)) << SECTOR_SHIFT;
- 	size_t copy;
- 
-@@ -231,9 +233,9 @@ static void copy_from_brd(void *dst, struct brd_device *brd,
- {
- 	struct folio *folio;
- 	void *src;
--	unsigned int rd_sectors_shift = PAGE_SHIFT - SECTOR_SHIFT;
-+	unsigned int rd_sectors_shift = brd->brd_sector_shift - SECTOR_SHIFT;
- 	unsigned int rd_sectors = 1 << rd_sectors_shift;
--	unsigned int rd_sector_size = PAGE_SIZE;
-+	unsigned int rd_sector_size = brd->brd_sector_size;
- 	unsigned int offset = (sector & (rd_sectors - 1)) << SECTOR_SHIFT;
- 	size_t copy;
- 
-@@ -346,6 +348,10 @@ static int max_part = 1;
- module_param(max_part, int, 0444);
- MODULE_PARM_DESC(max_part, "Num Minors to reserve between devices");
- 
-+static unsigned int rd_blksize = PAGE_SIZE;
-+module_param(rd_blksize, uint, 0444);
-+MODULE_PARM_DESC(rd_blksize, "Blocksize of each RAM disk in bytes.");
-+
- MODULE_LICENSE("GPL");
- MODULE_ALIAS_BLOCKDEV_MAJOR(RAMDISK_MAJOR);
- MODULE_ALIAS("rd");
-@@ -382,6 +388,8 @@ static int brd_alloc(int i)
- 		return -ENOMEM;
- 	brd->brd_number		= i;
- 	list_add_tail(&brd->brd_list, &brd_devices);
-+	brd->brd_sector_shift = ilog2(rd_blksize);
-+	brd->brd_sector_size = rd_blksize;
- 
- 	spin_lock_init(&brd->brd_lock);
- 	INIT_RADIX_TREE(&brd->brd_folios, GFP_ATOMIC);
-@@ -410,7 +418,7 @@ static int brd_alloc(int i)
- 	 *  otherwise fdisk will align on 1M. Regardless this call
- 	 *  is harmless)
- 	 */
--	blk_queue_physical_block_size(disk->queue, PAGE_SIZE);
-+	blk_queue_physical_block_size(disk->queue, rd_blksize);
- 
- 	/* Tell the block layer that this is not a rotational device */
- 	blk_queue_flag_set(QUEUE_FLAG_NONROT, disk->queue);
--- 
-2.35.3
+Hannes
 
