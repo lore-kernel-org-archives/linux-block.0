@@ -2,118 +2,120 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 950CEC6FD1B
-	for <linux-block@archiver.kernel.org>; Mon,  6 Mar 2023 12:04:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E96F1C678D4
+	for <linux-block@archiver.kernel.org>; Mon,  6 Mar 2023 14:39:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230096AbjCFMEN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 6 Mar 2023 07:04:13 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55208 "EHLO
+        id S229614AbjCFOjW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 6 Mar 2023 09:39:22 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34482 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230154AbjCFMEI (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 6 Mar 2023 07:04:08 -0500
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5EC4F22000;
-        Mon,  6 Mar 2023 04:04:03 -0800 (PST)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 144651FE65;
-        Mon,  6 Mar 2023 12:04:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1678104242; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=vLNDYnpl5Xel5rnk0bBhZ9HfM1ScJkIYMJK4yAfABqI=;
-        b=yvivUIiDTsVyhHd/0L1pRMpDzoB/MiI4w//DZvw3XaQAnjNopd96nix0GFWS1wimijtrv2
-        PQ/5m7AqEhNxv98Lfs24nNPQqmNOBtqfsZMGlpZHlxd6QXNIRJ9NSL+9xlsNh4mstUFELD
-        A3y885Uz0pJJnV9SpkvYtkL3Imr06Gc=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1678104242;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=vLNDYnpl5Xel5rnk0bBhZ9HfM1ScJkIYMJK4yAfABqI=;
-        b=X2K10tSZduj/mpNTfYMhnDz5eGDj2NQ2uEXvBz0xEZhoWHD8x/jNDOdUxjRqMSpKkP989u
-        nNW0FZUWttCw34CQ==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 0388713A66;
-        Mon,  6 Mar 2023 12:04:02 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id TuQfALLWBWTkLwAAMHmgww
-        (envelope-from <hare@suse.de>); Mon, 06 Mar 2023 12:04:02 +0000
-Message-ID: <d3e359f6-8c23-c624-688b-5dc1b40b6ee1@suse.de>
-Date:   Mon, 6 Mar 2023 13:04:01 +0100
+        with ESMTP id S230526AbjCFOjO (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 6 Mar 2023 09:39:14 -0500
+Received: from mail-lf1-x134.google.com (mail-lf1-x134.google.com [IPv6:2a00:1450:4864:20::134])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 704F6F950
+        for <linux-block@vger.kernel.org>; Mon,  6 Mar 2023 06:38:46 -0800 (PST)
+Received: by mail-lf1-x134.google.com with SMTP id n2so12943368lfb.12
+        for <linux-block@vger.kernel.org>; Mon, 06 Mar 2023 06:38:46 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1678113188;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=y4O7nglR7O8YYBFJO+aAK2WOTd497QXA4VvGjiZbUAY=;
+        b=Eu/fsOwBuUR35YPlEGO9BKtHeQW/U8LeCEqhlu2Fn/DKp9Cinsi4wl76lrhhHsJ1Ak
+         cWgSSXky2hlxE+bOUBFnmFCluSTjgTNFq/L2+u0PFQU3BCH94TMNQELnQrSushJc26hz
+         DjFYVdBdD/PYURpkvKT4sIBikdHr7XrAcX/MemXFptq8QWvDxPhE0RB9p5OGJdjkAHJh
+         N001G5DaKjJeTBCblw4TBXTWcjVzXIR76Q5fpeTlMDq/U/42VT858aMdE8PYRaL3TaIj
+         cyX2NODyNE6dLQQGBtapV3AZ9zvRsZWEnyrxYosBVoc1z7lrSHrCZPnG4Z0YKr6+tWod
+         03FQ==
+X-Gm-Message-State: AO0yUKXNWq8Tk9G1NNHaBF+nNgAwjv799Oks3fDHmLgNtNqrRaZueGRD
+        7L5F3GQ00HX0hSPRgFotnjArZMctelU=
+X-Google-Smtp-Source: AK7set/hn+mj3DDuFDNC/fWfNafv2COZcQffLjEGX7e+CXLf0owq1LjHuTVi4n/D6GblZiruBgdlXg==
+X-Received: by 2002:adf:e60b:0:b0:2c7:1c72:699f with SMTP id p11-20020adfe60b000000b002c71c72699fmr6945230wrm.4.1678112469957;
+        Mon, 06 Mar 2023 06:21:09 -0800 (PST)
+Received: from [192.168.64.80] (bzq-219-42-90.isdn.bezeqint.net. [62.219.42.90])
+        by smtp.gmail.com with ESMTPSA id o13-20020a5d670d000000b002c8476dde7asm10010667wru.114.2023.03.06.06.21.09
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 06 Mar 2023 06:21:09 -0800 (PST)
+Message-ID: <125e291a-5225-6565-e800-e6bdb6be35f3@grimberg.me>
+Date:   Mon, 6 Mar 2023 16:21:08 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.7.1
-Subject: Re: [LSF/MM/BPF TOPIC] Cloud storage optimizations
+Subject: Re: [PATCH] nvme: fix handling single range discard request
 Content-Language: en-US
-To:     Luis Chamberlain <mcgrof@kernel.org>,
-        Matthew Wilcox <willy@infradead.org>
-Cc:     James Bottomley <James.Bottomley@hansenpartnership.com>,
-        Keith Busch <kbusch@kernel.org>, Theodore Ts'o <tytso@mit.edu>,
-        lsf-pc@lists.linux-foundation.org, linux-fsdevel@vger.kernel.org,
-        linux-mm@kvack.org, linux-block@vger.kernel.org
-References: <Y/7L74P6jSWwOvWt@mit.edu>
- <ZAFUYqAcPmRPLjET@kbusch-mbp.dhcp.thefacebook.com>
- <ZAFuSSZ5vZN7/UAa@casper.infradead.org>
- <f68905c5785b355b621847974d620fb59f021a41.camel@HansenPartnership.com>
- <ZAL0ifa66TfMinCh@casper.infradead.org>
- <2600732b9ed0ddabfda5831aff22fd7e4270e3be.camel@HansenPartnership.com>
- <ZAN0JkklyCRIXVo6@casper.infradead.org>
- <ZAQXduwAcAtIZHkB@bombadil.infradead.org>
-From:   Hannes Reinecke <hare@suse.de>
-In-Reply-To: <ZAQXduwAcAtIZHkB@bombadil.infradead.org>
+To:     Ming Lei <ming.lei@redhat.com>, Christoph Hellwig <hch@lst.de>,
+        linux-nvme@lists.infradead.org
+Cc:     linux-block@vger.kernel.org
+References: <20230303231345.119652-1-ming.lei@redhat.com>
+From:   Sagi Grimberg <sagi@grimberg.me>
+In-Reply-To: <20230303231345.119652-1-ming.lei@redhat.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/5/23 05:15, Luis Chamberlain wrote:
-> On Sat, Mar 04, 2023 at 04:39:02PM +0000, Matthew Wilcox wrote:
->> I'm getting more and more
->> comfortable with the idea that "Linux doesn't support block sizes >
->> PAGE_SIZE on 32-bit machines" is an acceptable answer.
-> 
-> First of all filesystems would need to add support for a larger block
-> sizes > PAGE_SIZE, and that takes effort. It is also a support question
-> too.
-> 
-> I think garnering consensus from filesystem developers we don't want
-> to support block sizes > PAGE_SIZE on 32-bit systems would be a good
-> thing to review at LSFMM or even on this list. I hightly doubt anyone
-> is interested in that support.
-> 
->> XFS already works with arbitrary-order folios.
-> 
-> But block sizes > PAGE_SIZE is work which is still not merged. It
-> *can* be with time. That would allow one to muck with larger block
-> sizes than 4k on x86-64 for instance. Without this, you can't play
-> ball.
-> 
->> The only needed piece is
->> specifying to the VFS that there's a minimum order for this particular
->> inode, and having the VFS honour that everywhere.
-> 
-> Other than the above too, don't we still also need to figure out what
-> fs APIs would incur larger order folios? And then what about corner cases
-> with the page cache?
-> 
-> I was hoping some of these nooks and crannies could be explored with tmpfs.
-> 
-I have just posted patchset for 'brd' to linux-block for supporting 
-arbitrary block sizes, both physical and logical. That should be giving 
-us a good starting point for experimenting.
 
-Cheers,
 
-Hannes
+On 3/4/23 01:13, Ming Lei wrote:
+> When investigating one customer report on warning in nvme_setup_discard,
+> we observed the controller(nvme/tcp) actually exposes
+> queue_max_discard_segments(req->q) == 1.
+> 
+> Obviously the current code can't handle this situation, since contiguity
+> merge like normal RW request is taken.
+> 
+> Fix the issue by building range from request sector/nr_sectors directly.
+> 
+> Fixes: b35ba01ea697 ("nvme: support ranged discard requests")
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> ---
+>   drivers/nvme/host/core.c | 28 +++++++++++++++++++---------
+>   1 file changed, 19 insertions(+), 9 deletions(-)
+> 
+> diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+> index c2730b116dc6..d4be525f8100 100644
+> --- a/drivers/nvme/host/core.c
+> +++ b/drivers/nvme/host/core.c
+> @@ -781,16 +781,26 @@ static blk_status_t nvme_setup_discard(struct nvme_ns *ns, struct request *req,
+>   		range = page_address(ns->ctrl->discard_page);
+>   	}
+>   
+> -	__rq_for_each_bio(bio, req) {
+> -		u64 slba = nvme_sect_to_lba(ns, bio->bi_iter.bi_sector);
+> -		u32 nlb = bio->bi_iter.bi_size >> ns->lba_shift;
+> -
+> -		if (n < segments) {
+> -			range[n].cattr = cpu_to_le32(0);
+> -			range[n].nlb = cpu_to_le32(nlb);
+> -			range[n].slba = cpu_to_le64(slba);
+> +	if (queue_max_discard_segments(req->q) == 1) {
+> +		u64 slba = nvme_sect_to_lba(ns, blk_rq_pos(req));
+> +		u32 nlb = blk_rq_sectors(req) >> (ns->lba_shift - 9);
+> +
+> +		range[0].cattr = cpu_to_le32(0);
+> +		range[0].nlb = cpu_to_le32(nlb);
+> +		range[0].slba = cpu_to_le64(slba);
+> +		n = 1;
+> +	} else {
+> +		__rq_for_each_bio(bio, req) {
+> +			u64 slba = nvme_sect_to_lba(ns, bio->bi_iter.bi_sector);
+> +			u32 nlb = bio->bi_iter.bi_size >> ns->lba_shift;
+> +
+> +			if (n < segments) {
+> +				range[n].cattr = cpu_to_le32(0);
+> +				range[n].nlb = cpu_to_le32(nlb);
+> +				range[n].slba = cpu_to_le64(slba);
+> +			}
+> +			n++;
+>   		}
+> -		n++;
+>   	}
+>   
+>   	if (WARN_ON_ONCE(n != segments)) {
 
+
+Maybe just set segments to min(blk_rq_nr_discard_segments(req), 
+queue_max_discard_segments(req->q)) and let the existing code do
+its thing?
