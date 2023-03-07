@@ -2,114 +2,214 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1AB7CC678D4
-	for <linux-block@archiver.kernel.org>; Tue,  7 Mar 2023 13:15:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B2AA7C6FA99
+	for <linux-block@archiver.kernel.org>; Tue,  7 Mar 2023 13:18:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229780AbjCGNPj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 7 Mar 2023 08:15:39 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50302 "EHLO
+        id S230462AbjCGNSD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 7 Mar 2023 08:18:03 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58996 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230107AbjCGNOu (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 7 Mar 2023 08:14:50 -0500
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27A0C3BDA8;
-        Tue,  7 Mar 2023 05:13:26 -0800 (PST)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 15A8B21A12;
-        Tue,  7 Mar 2023 13:12:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1678194751; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=1Ox8W2bMVJMfVIfzcRaMQ49l6YJW5Si9u8QMjb81tfM=;
-        b=OgOwA5L2YJkUt/23w3k0WCQiImWZek6v1Zz5pBhEGJndnqwbDNrHC9ZM9rappBdTSzSSlq
-        PoKXiFC8WiDDgy2d2sPjmMApkNqStBEowoWw0URfFvo7XLp60vF0xoruQwPF9TZleZrJME
-        EfI40CnWlEPG6u36oEyRJ5w7RMGs7Jo=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1678194751;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=1Ox8W2bMVJMfVIfzcRaMQ49l6YJW5Si9u8QMjb81tfM=;
-        b=v+GZIhnwN1fd4iA1iiqfHrRKHmDws8yOTTqE+5P4/QXTXE5mLQifOfY5fuHivmWDwU2dV9
-        vYwZBHiGTlAvRrBQ==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 07D2313440;
-        Tue,  7 Mar 2023 13:12:31 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id O7DdAT84B2SZSwAAMHmgww
-        (envelope-from <jack@suse.cz>); Tue, 07 Mar 2023 13:12:31 +0000
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-        id 7E37DA06F3; Tue,  7 Mar 2023 14:12:30 +0100 (CET)
-Date:   Tue, 7 Mar 2023 14:12:30 +0100
-From:   Jan Kara <jack@suse.cz>
-To:     Yu Kuai <yukuai1@huaweicloud.com>
-Cc:     hch@lst.de, jack@suse.cz, julianr@linux.ibm.com, axboe@kernel.dk,
-        yukuai3@huawei.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, yi.zhang@huawei.com,
-        yangerkun@huawei.com
-Subject: Re: [PATCH] block: fix wrong mode for blkdev_put() from
- disk_scan_partitions()
-Message-ID: <20230307131230.ucqnxpoagdisjss7@quack3>
-References: <a3a4351375d51aa5e93e06bba212ba3637665885.camel@linux.ibm.com>
- <20230307105552.1560439-1-yukuai1@huaweicloud.com>
+        with ESMTP id S229927AbjCGNRj (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 7 Mar 2023 08:17:39 -0500
+Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C07FE23852;
+        Tue,  7 Mar 2023 05:16:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1678194999; x=1709730999;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=FB4sA1fq+0MTOLbrLzQkQ9+3JaYHjdTbqcWfzpw1jw4=;
+  b=eQecOMzHtcUa3DJ7vldF1nuUW5GO50ZbPwBg0kBgpVIDjgflj+Vx5Lx6
+   LgdKzzJT2tGzRh7KCkhw2xvDFTegq+407cwwdtde/HK87Vb5dXeuYQZ+L
+   LRkSDnIlx//ghC9fUh3pMJud/5CPxOAEHRW5DPZnjkqCo/W5kuqV9x7jj
+   WITxsJTXGE8NunFE4TpNNMNO4uJlmd3ouFAlR+fR9Hc4+H93CFEdbZsLk
+   gTpzCE21LuO0Ryrt0G1j8k2DDUJC7UbhfmJ2qtqqxFR7jOWk0MmupXvlr
+   ghXkaNaFN6HxJxrOFc0bdWTknnyNbl1RtJAbSe2FX0Uc60KX/w/nmn2Op
+   w==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10641"; a="324151290"
+X-IronPort-AV: E=Sophos;i="5.98,241,1673942400"; 
+   d="scan'208";a="324151290"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Mar 2023 05:15:58 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10641"; a="765638198"
+X-IronPort-AV: E=Sophos;i="5.98,241,1673942400"; 
+   d="scan'208";a="765638198"
+Received: from ahunter6-mobl1.ger.corp.intel.com (HELO [10.0.2.15]) ([10.251.218.236])
+  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Mar 2023 05:15:55 -0800
+Message-ID: <fe407f8f-6676-12b8-3e45-2511219bfe28@intel.com>
+Date:   Tue, 7 Mar 2023 15:15:50 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230307105552.1560439-1-yukuai1@huaweicloud.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Firefox/102.0 Thunderbird/102.8.0
+Subject: Re: [RFC PATCH] mmc: core: Disable REQ_FUA if the eMMC supports an
+ internal cache
+Content-Language: en-US
+To:     Ulf Hansson <ulf.hansson@linaro.org>
+Cc:     "linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        Wenchao Chen <wenchao.chen666@gmail.com>,
+        Avri Altman <avri.altman@wdc.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        =?UTF-8?Q?Christian_L=c3=b6hle?= <CLoehle@hyperstone.com>,
+        Bean Huo <huobean@gmail.com>
+References: <20230302144330.274947-1-ulf.hansson@linaro.org>
+ <5712c69ae37447c5b576d87b247f5756@hyperstone.com>
+ <a35f3d45cab0442b9491c0b120e3fb47@hyperstone.com>
+ <CAPDyKFpv3hHvg5X8WNpQEnnsNdGCBMybT-32EGPNYtBtSgK9Fw@mail.gmail.com>
+ <5d7d48ff-b007-e339-8177-d0a7b7b8adc4@intel.com>
+ <CAPDyKFrW61y6B3xg9tyht505-mSHw=hAP4bGcUs68-zu7-=F7w@mail.gmail.com>
+From:   Adrian Hunter <adrian.hunter@intel.com>
+Organization: Intel Finland Oy, Registered Address: PL 281, 00181 Helsinki,
+ Business Identity Code: 0357606 - 4, Domiciled in Helsinki
+In-Reply-To: <CAPDyKFrW61y6B3xg9tyht505-mSHw=hAP4bGcUs68-zu7-=F7w@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue 07-03-23 18:55:52, Yu Kuai wrote:
-> From: Yu Kuai <yukuai3@huawei.com>
+On 6/03/23 18:09, Ulf Hansson wrote:
+> On Fri, 3 Mar 2023 at 15:41, Adrian Hunter <adrian.hunter@intel.com> wrote:
+>>
+>> On 3/03/23 14:01, Ulf Hansson wrote:
+>>> On Fri, 3 Mar 2023 at 12:40, Christian Löhle <CLoehle@hyperstone.com> wrote:
+>>>>
+>>>>
+>>>>>>
+>>>>>> REQ_FUA is in general supported for eMMC cards, which translates into so called "reliable writes". To support these write operations, the CMD23 (MMC_CAP_CMD23), needs to be supported by the mmc host too, which is common but not always the case.
+>>>>>>
+>>>>>> For some eMMC devices, it has been reported that reliable writes are quite costly, leading to performance degradations.
+>>>>>>
+>>>>>> In a way to improve the situation, let's avoid announcing REQ_FUA support if the eMMC supports an internal cache, as that allows us to rely solely on flush-requests (REQ_OP_FLUSH) instead, which seems to be a lot cheaper.
+>>>>>> Note that, those mmc hosts that lacks CMD23 support are already using this type of configuration, whatever that could mean.
+>>>>>
+>>>>> Just note that reliable write is strictly weaker than turning cache off/flushing, if card loses power during cache off/flush programming / busy, sector-wise atomicity is not mandated by the spec.
+>>>>> (And that is assuming cache off/flush is actually respected by the card as intended by the spec, should some cards be checked?) Maybe some FS people can also chime in?
+>>>>
+>>>> Nevermind, the sector-wise atomicity should not matter on 5.1 cards or if the block length isn't being played with, which it isn't in our case.
+>>>> If reliable write is implemented only according to spec, I don't see why the cache flushing should be less expensive, which would only make sense if
+>>>> a) < sector chunks are committed to flash
+>>>> b) reliable write is implemented much stricter than the spec, ensuring atomicity for the entire write.
+>>>
+>>> Right, I agree!
+>>>
+>>> Note 1) Reliable write was introduced way before cache management in
+>>> the eMMC spec. So, if the support for reliable write would have a
+>>> stricter implementation than needed, I would not be surprised.
+>>
+>> I am not sure when you say stricter than needed.  Historically
+>> file systems assumed that sectors are updated atomically i.e.
+>> there is never a sector with a mixture of old and new data.
+>> The eMMC spec does not guarantee that, except for reliable
+>> write.
 > 
-> If disk_scan_partitions() is called with 'FMODE_EXCL',
-> blkdev_get_by_dev() will be called without 'FMODE_EXCL', however, follow
-> blkdev_put() is still called with 'FMODE_EXCL', which will cause
-> 'bd_holders' counter to leak.
+> Yes, I agree. With stricker, I was merely thinking of whether the eMMC
+> makes the entire write request (multiple sectors) being atomic, or the
+> guarantee is only per sector basis.
 > 
-> Fix the problem by using the right mode for blkdev_put().
+> According to the eMMC spec, that seems to be implementation specific.
+> One option could be heavier than the other, I guess.
 > 
-> Reported-by: syzbot+2bcc0d79e548c4f62a59@syzkaller.appspotmail.com
-> Link: https://lore.kernel.org/lkml/f9649d501bc8c3444769418f6c26263555d9d3be.camel@linux.ibm.com/T/
-> Tested-by: Julian Ruess <julianr@linux.ibm.com>
-> Fixes: e5cfefa97bcc ("block: fix scan partition for exclusively open device again")
-> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+>>
+>> File systems may use REQ_FUA for important information, like the
+>> superblock or a journal commit record, so using reliable write
+>> for REQ_FUA would seem to give better protection against file system
+>> corruption than a cache flush which could leave a sector
+>> half-written.
+> 
+> Yes, I agree. If we should fully conform to what is stated in the eMMC
+> spec, we should probably keep the current path to support REQ_FUA.
+> 
+>>
+>> On the other hand, sudden power loss is probably rare in battery
+>> powered systems because they are designed to monitor the battery
+>> power and shutdown when it gets too low.
+>>
+>> And file systems can use checksums to detect half-written updates.
+>>
+>> And there is anyway no protection for other (non REQ_FUA) writes a
+>> file system might do and expect not to tear sectors.
+>>
+>> And you are more likely to smash the screen than bounce the battery
+>> out and cause an unrecoverable file system error.
+> 
+> Right, these are good arguments to why $subject patch perhaps makes
+> sense to move forward with anyway.
 
-Thanks for fixing this! Feel free to add:
+Yes
 
-Reviewed-by: Jan Kara <jack@suse.cz>
-
-								Honza
-
-> ---
->  block/genhd.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> diff --git a/block/genhd.c b/block/genhd.c
-> index 3ee5577e1586..02d9cfb9e077 100644
-> --- a/block/genhd.c
-> +++ b/block/genhd.c
-> @@ -385,7 +385,7 @@ int disk_scan_partitions(struct gendisk *disk, fmode_t mode)
->  	if (IS_ERR(bdev))
->  		ret =  PTR_ERR(bdev);
->  	else
-> -		blkdev_put(bdev, mode);
-> +		blkdev_put(bdev, mode & ~FMODE_EXCL);
->  
->  	if (!(mode & FMODE_EXCL))
->  		bd_abort_claiming(disk->part0, disk_scan_partitions);
-> -- 
-> 2.31.1
+> Moreover, it seems like some eMMC vendors don't really have any
+> concerns with us moving away from reliable writes, to instead use only
+> "cache flushing". I guess it can indicate that the regular writes may
+> already be treated in an atomic kind of way, but who knows.
+
+Indeed
+
 > 
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+>>
+>> Nevertheless, the commit message of this patch reads like the change
+>> is an optimization, whereas it seems more like a policy change.
+>> The commit message should perhaps say something like:
+>> "The consensus is that the benefit of improved performance by not
+>> using reliable-write for REQ_FUA is much greater than any potential
+>> benefit that reliable-write might provide to avoid file system
+>> corruption in the event of sudden power loss."
+> 
+> I agree. I will improve it along the lines of what you suggest.
+> 
+>>
+>> As for allowing for the policy to be overridden, perhaps an mmc_core
+>> module option?
+> 
+> Even if I am not very fond of module parameters, this seems like a
+> reasonable thing to use for this case.
+> 
+> I was also looking at using a card quirk.
+
+Yes that makes sense
+
+> 
+>>
+>>>
+>>> Note 2) In the eMMC v5.1 spec, the cache flushing support has been
+>>> extended to allow an explicit barrier operation. Perhaps, we should
+>>> let that option take precedence over a regular flush+barrier, for
+>>> REQ_OP_FLUSH!?
+>>>
+>>>>
+>>>> I guess the cards which increase performance do b)? Or something else?
+>>>
+>>> That's the tricky part to know, as it's the internals of the eMMC.
+>>
+>> It is the natural conclusion though.  The eMMC probably does not
+>> update mapping information with every write, instead if power is
+>> lost, it scans the updated areas at the next initialization. (The
+>> power-off notify feature would commit the mapping information to
+>> media to avoid that).  So a reliable write might have to:
+>> 1. write information to record that the old mapping
+>> should be used, not what might be discovered by scanning
+>> 2. do the actual write
+>> 3. write mapping information to record the new mapping
+> 
+> Yes. And depending on the eMMC device, some may be more clever than
+> others for how to actually deal with this.
+> 
+>>
+>>>
+>>> Although, it seems like both Avri (WDC) and Bean (Micron) would be
+>>> happy to proceed with $subject patch, which makes me more comfortable
+>>> to move forward.
+>>>
+>>>> Anyway regarding FUA i don't have any concerns regarding reliability with cache flush.
+>>>> I can add some performance comparisons with some eMMCs I have around though.
+>>>
+>>> That would be great, thanks a lot for helping out with testing!
+>>>
+> 
+> Kind regards
+> Uffe
+
