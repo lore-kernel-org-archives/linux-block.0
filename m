@@ -2,223 +2,137 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C8CFC678D5
-	for <linux-block@archiver.kernel.org>; Tue,  7 Mar 2023 10:45:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5994FC678D5
+	for <linux-block@archiver.kernel.org>; Tue,  7 Mar 2023 11:10:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230497AbjCGKpf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 7 Mar 2023 05:45:35 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59322 "EHLO
+        id S230013AbjCGLKt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 7 Mar 2023 06:10:49 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59512 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231254AbjCGKpC (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 7 Mar 2023 05:45:02 -0500
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F27BD5F229;
-        Tue,  7 Mar 2023 02:44:52 -0800 (PST)
-Received: from mail02.huawei.com (unknown [172.30.67.169])
-        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4PWBsX2YVRz4f3l7B;
-        Tue,  7 Mar 2023 18:44:48 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-        by APP3 (Coremail) with SMTP id _Ch0CgCnUiChFQdkhMH6EQ--.23182S3;
-        Tue, 07 Mar 2023 18:44:50 +0800 (CST)
-Subject: Re: [PATCH -next RFC] block: count 'ios' and 'sectors' when io is
- done for bio-based device
-To:     Yu Kuai <yukuai1@huaweicloud.com>, axboe@kernel.dk, agk@redhat.com,
-        snitzer@kernel.org, dm-devel@redhat.com, kbusch@kernel.org,
-        hch@lst.de, sagi@grimberg.me, guz.fnst@cn.fujitsu.com
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-nvme@lists.infradead.org, yi.zhang@huawei.com,
-        yangerkun@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
-References: <20230223091226.1135678-1-yukuai1@huaweicloud.com>
- <05bbc421-100c-c18d-4261-e5669cfdfb94@huaweicloud.com>
-From:   Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <a4d8f6b5-cc8e-204e-1039-5f2b98042bdd@huaweicloud.com>
-Date:   Tue, 7 Mar 2023 18:44:49 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        with ESMTP id S230432AbjCGLKT (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 7 Mar 2023 06:10:19 -0500
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A9FD023671
+        for <linux-block@vger.kernel.org>; Tue,  7 Mar 2023 03:06:49 -0800 (PST)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 604811FE18;
+        Tue,  7 Mar 2023 11:06:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1678187208; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=9YbUtisnxxUYD+kIO60HlRHhgexicd7fyRCIkBL6Ifw=;
+        b=kiDnFnMGC9M8kCXT69Kl85+8UhvSlBE/oQMlGtN2I2g9AVYIngyVEDNAJ1sjuLfyrTCWPS
+        9zBAjqLRMn6pcnCaho5W5tuUTmqqTbI5fniLdifRWl9ikUUkFXa6E69j9AAqJo+N3nc/Hv
+        yJ0FDd6BCPhv+PlCJqvgRr1IdStvS3c=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1678187208;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=9YbUtisnxxUYD+kIO60HlRHhgexicd7fyRCIkBL6Ifw=;
+        b=/vgMr5NwuXtiqEs4l1Wy1uU1X5Gbrc93Jtq93nVSwHba8p9p7PllaYVjKYeCMRBpnAAtXp
+        mpWsj6XGEGVSK0CA==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 47F8713440;
+        Tue,  7 Mar 2023 11:06:48 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id IeglEcgaB2RUegAAMHmgww
+        (envelope-from <hare@suse.de>); Tue, 07 Mar 2023 11:06:48 +0000
+Message-ID: <be09233d-022b-61f0-200c-a5c72a22352b@suse.de>
+Date:   Tue, 7 Mar 2023 12:06:47 +0100
 MIME-Version: 1.0
-In-Reply-To: <05bbc421-100c-c18d-4261-e5669cfdfb94@huaweicloud.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.8.0
+Subject: Re: [PATCH 5/5] brd: make logical sector size configurable
+To:     Pankaj Raghav <p.raghav@samsung.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Matthew Wilcox <willy@infradead.org>,
+        Luis Chamberlain <mcgrof@kernel.org>,
+        Keith Busch <kbusch@kernel.org>
+References: <20230306120127.21375-1-hare@suse.de>
+ <20230306120127.21375-6-hare@suse.de>
+ <CGME20230307090934eucas1p28d92f3fd8c13edcba8e5d3fa7de6bcab@eucas1p2.samsung.com>
+ <20230307090056.x3hpaxdwtlpytnf2@blixen>
+Content-Language: en-US
+From:   Hannes Reinecke <hare@suse.de>
+In-Reply-To: <20230307090056.x3hpaxdwtlpytnf2@blixen>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: _Ch0CgCnUiChFQdkhMH6EQ--.23182S3
-X-Coremail-Antispam: 1UD129KBjvJXoWxKw47KF15GF1xCFWDGr4kZwb_yoW3Jr1kpF
-        1kGFy5JrWUWw1vgr1UJw1DGFyrtr1Utw17Ar47JFyUAw48Jr1vqr1UXr1qgr1UArWkJFyU
-        A3W8Zr9rZr47JrUanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUU9014x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-        1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4j
-        6r4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
-        Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
-        I7IYx2IY67AKxVWUXVWUAwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
-        4UM4x0Y48IcVAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2kI
-        c2xKxwCYjI0SjxkI62AI1cAE67vIY487MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4
-        AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE
-        17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMI
-        IF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Zr0_Wr1U
-        MIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIda
-        VFxhVjvjDU0xZFpf9x0JUp6wZUUUUU=
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
-X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
+On 3/7/23 10:01, Pankaj Raghav wrote:
+>> @@ -57,7 +59,7 @@ static struct folio *brd_lookup_folio(struct brd_device *brd, sector_t sector)
+>>   {
+>>   	pgoff_t idx;
+>>   	struct folio *folio;
+>> -	unsigned int rd_sector_shift = brd->brd_sector_shift - SECTOR_SHIFT;
+>> +	unsigned int rd_sector_shift = brd->brd_sector_shift - brd->brd_logical_sector_shift;
+> 
+> Could we create a simple macro instead of repeating this everywhere?
+> #define RD_SECTOR_SHIFT(brd) (brd->brd_sector_shift - brd->brd_logical_sector_shift)
+> 
+Yeah, I'm not utterly happy with that one, too; this patchset is 
+primarily a mechanical conversion to avoid errors.
+Will be changing it.
 
-在 2023/02/28 9:01, Yu Kuai 写道:
-> Hi,
+>>   
+>>   	/*
+>>   	 * The folio lifetime is protected by the fact that we have opened the
+>>   			bio_io_error(bio);
+>>   			return;
+>>   		}
+>> -		sector += len >> SECTOR_SHIFT;
+>> +		sector += len >> brd->brd_logical_sector_shift;
+>>   	}
+>>   
+>>   	bio_endio(bio);
+>> @@ -353,6 +355,10 @@ static unsigned int rd_blksize = PAGE_SIZE;
+>>   module_param(rd_blksize, uint, 0444);
+>>   MODULE_PARM_DESC(rd_blksize, "Blocksize of each RAM disk in bytes.");
+>>   
+>> +static unsigned int rd_logical_blksize = SECTOR_SIZE;
+>> +module_param(rd_logical_blksize, uint, 0444);
+>> +MODULE_PARM_DESC(rd_logical_blksize, "Logical blocksize of each RAM disk in bytes.");
+>> +
+>>   MODULE_LICENSE("GPL");
+>>   MODULE_ALIAS_BLOCKDEV_MAJOR(RAMDISK_MAJOR);
+>>   MODULE_ALIAS("rd");
+>> @@ -391,6 +397,8 @@ static int brd_alloc(int i)
+>>   	list_add_tail(&brd->brd_list, &brd_devices);
+>>   	brd->brd_sector_shift = ilog2(rd_blksize);
+>>   	brd->brd_sector_size = rd_blksize;
+>> +	brd->brd_logical_sector_shift = ilog2(rd_logical_blksize);
+>> +	brd->brd_logical_sector_size = rd_logical_blksize;
 > 
-> friendly ping ...
+> We should a check here to see if logical block > rd_blksize similar
+> to what is done in blk_queue_logical_block_size()?
+>  > // physical block size should not be less than the logical block size
+> if (rd_blksize < rd_logical_blksize) {
+> 	brd->brd_logical_sector_shift = ilog2(rd_blksize);
+> 	brd->brd_logical_sector_size = rd_blksize;
+>   }
 > 
-> Thanks,
-> Kuai
-> 
-> 在 2023/02/23 17:12, Yu Kuai 写道:
->> From: Yu Kuai <yukuai3@huawei.com>
->>
->> While using iostat for raid, I observed very strange 'await'
->> occasionally, and turns out it's due to that 'ios' and 'sectors' is
->> counted in bdev_start_io_acct(), while 'nsecs' is counted in
->> bdev_end_io_acct(). I'm not sure why they are ccounted like that
->> but I think this behaviour is obviously wrong because user will get
->> wrong disk stats.
->>
->> Fix the problem by counting 'ios' and 'sectors' when io is done, like
->> what rq-based device does.
+Sure. Keith already complained about it.
 
-Can anyone help to review this change? Or is there any reason to count
-'ios' and 'sectors' when io is started?
+Cheers,
 
-Thanks,
-Kuai
->>
->> Fixes: 394ffa503bc4 ("blk: introduce generic io stat accounting help 
->> function")
->> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
->> ---
->>   block/blk-core.c              | 16 ++++++----------
->>   drivers/md/dm.c               |  6 +++---
->>   drivers/nvme/host/multipath.c |  8 ++++----
->>   include/linux/blkdev.h        |  5 ++---
->>   4 files changed, 15 insertions(+), 20 deletions(-)
->>
->> diff --git a/block/blk-core.c b/block/blk-core.c
->> index 82b5b2c53f1e..fe1d320f5f07 100644
->> --- a/block/blk-core.c
->> +++ b/block/blk-core.c
->> @@ -953,16 +953,11 @@ void update_io_ticks(struct block_device *part, 
->> unsigned long now, bool end)
->>       }
->>   }
->> -unsigned long bdev_start_io_acct(struct block_device *bdev,
->> -                 unsigned int sectors, enum req_op op,
->> +unsigned long bdev_start_io_acct(struct block_device *bdev, enum 
->> req_op op,
->>                    unsigned long start_time)
->>   {
->> -    const int sgrp = op_stat_group(op);
->> -
->>       part_stat_lock();
->>       update_io_ticks(bdev, start_time, false);
->> -    part_stat_inc(bdev, ios[sgrp]);
->> -    part_stat_add(bdev, sectors[sgrp], sectors);
->>       part_stat_local_inc(bdev, in_flight[op_is_write(op)]);
->>       part_stat_unlock();
->> @@ -978,13 +973,12 @@ EXPORT_SYMBOL(bdev_start_io_acct);
->>    */
->>   unsigned long bio_start_io_acct(struct bio *bio)
->>   {
->> -    return bdev_start_io_acct(bio->bi_bdev, bio_sectors(bio),
->> -                  bio_op(bio), jiffies);
->> +    return bdev_start_io_acct(bio->bi_bdev, bio_op(bio), jiffies);
->>   }
->>   EXPORT_SYMBOL_GPL(bio_start_io_acct);
->>   void bdev_end_io_acct(struct block_device *bdev, enum req_op op,
->> -              unsigned long start_time)
->> +              unsigned int sectors, unsigned long start_time)
->>   {
->>       const int sgrp = op_stat_group(op);
->>       unsigned long now = READ_ONCE(jiffies);
->> @@ -992,6 +986,8 @@ void bdev_end_io_acct(struct block_device *bdev, 
->> enum req_op op,
->>       part_stat_lock();
->>       update_io_ticks(bdev, now, true);
->> +    part_stat_inc(bdev, ios[sgrp]);
->> +    part_stat_add(bdev, sectors[sgrp], sectors);
->>       part_stat_add(bdev, nsecs[sgrp], jiffies_to_nsecs(duration));
->>       part_stat_local_dec(bdev, in_flight[op_is_write(op)]);
->>       part_stat_unlock();
->> @@ -1001,7 +997,7 @@ EXPORT_SYMBOL(bdev_end_io_acct);
->>   void bio_end_io_acct_remapped(struct bio *bio, unsigned long 
->> start_time,
->>                     struct block_device *orig_bdev)
->>   {
->> -    bdev_end_io_acct(orig_bdev, bio_op(bio), start_time);
->> +    bdev_end_io_acct(orig_bdev, bio_op(bio), bio_sectors(bio), 
->> start_time);
->>   }
->>   EXPORT_SYMBOL_GPL(bio_end_io_acct_remapped);
->> diff --git a/drivers/md/dm.c b/drivers/md/dm.c
->> index eace45a18d45..f5cc330bb549 100644
->> --- a/drivers/md/dm.c
->> +++ b/drivers/md/dm.c
->> @@ -512,10 +512,10 @@ static void dm_io_acct(struct dm_io *io, bool end)
->>           sectors = io->sectors;
->>       if (!end)
->> -        bdev_start_io_acct(bio->bi_bdev, sectors, bio_op(bio),
->> -                   start_time);
->> +        bdev_start_io_acct(bio->bi_bdev, bio_op(bio), start_time);
->>       else
->> -        bdev_end_io_acct(bio->bi_bdev, bio_op(bio), start_time);
->> +        bdev_end_io_acct(bio->bi_bdev, bio_op(bio), sectors,
->> +                 start_time);
->>       if (static_branch_unlikely(&stats_enabled) &&
->>           unlikely(dm_stats_used(&md->stats))) {
->> diff --git a/drivers/nvme/host/multipath.c 
->> b/drivers/nvme/host/multipath.c
->> index fc39d01e7b63..9171452e2f6d 100644
->> --- a/drivers/nvme/host/multipath.c
->> +++ b/drivers/nvme/host/multipath.c
->> @@ -123,9 +123,8 @@ void nvme_mpath_start_request(struct request *rq)
->>           return;
->>       nvme_req(rq)->flags |= NVME_MPATH_IO_STATS;
->> -    nvme_req(rq)->start_time = bdev_start_io_acct(disk->part0,
->> -                    blk_rq_bytes(rq) >> SECTOR_SHIFT,
->> -                    req_op(rq), jiffies);
->> +    nvme_req(rq)->start_time = bdev_start_io_acct(disk->part0, 
->> req_op(rq),
->> +                              jiffies);
->>   }
->>   EXPORT_SYMBOL_GPL(nvme_mpath_start_request);
->> @@ -136,7 +135,8 @@ void nvme_mpath_end_request(struct request *rq)
->>       if (!(nvme_req(rq)->flags & NVME_MPATH_IO_STATS))
->>           return;
->>       bdev_end_io_acct(ns->head->disk->part0, req_op(rq),
->> -        nvme_req(rq)->start_time);
->> +             blk_rq_bytes(rq) >> SECTOR_SHIFT,
->> +             nvme_req(rq)->start_time);
->>   }
->>   void nvme_kick_requeue_lists(struct nvme_ctrl *ctrl)
->> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
->> index d1aee08f8c18..941304f17492 100644
->> --- a/include/linux/blkdev.h
->> +++ b/include/linux/blkdev.h
->> @@ -1446,11 +1446,10 @@ static inline void blk_wake_io_task(struct 
->> task_struct *waiter)
->>           wake_up_process(waiter);
->>   }
->> -unsigned long bdev_start_io_acct(struct block_device *bdev,
->> -                 unsigned int sectors, enum req_op op,
->> +unsigned long bdev_start_io_acct(struct block_device *bdev, enum 
->> req_op op,
->>                    unsigned long start_time);
->>   void bdev_end_io_acct(struct block_device *bdev, enum req_op op,
->> -        unsigned long start_time);
->> +              unsigned int sectors, unsigned long start_time);
->>   unsigned long bio_start_io_acct(struct bio *bio);
->>   void bio_end_io_acct_remapped(struct bio *bio, unsigned long 
->> start_time,
->>
-> 
-> .
-> 
+Hannes
+-- 
+Dr. Hannes Reinecke		           Kernel Storage Architect
+hare@suse.de			                  +49 911 74053 688
+SUSE Software Solutions Germany GmbH, Frankenstr. 146, 90461 Nürnberg
+Managing Directors: I. Totev, A. Myers, A. McDonald, M. B. Moerman
+(HRB 36809, AG Nürnberg)
 
