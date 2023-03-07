@@ -2,148 +2,132 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 926DEC678DB
-	for <linux-block@archiver.kernel.org>; Tue,  7 Mar 2023 09:20:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 06C03C678D4
+	for <linux-block@archiver.kernel.org>; Tue,  7 Mar 2023 09:36:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230321AbjCGJUK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 7 Mar 2023 04:20:10 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35654 "EHLO
+        id S230343AbjCGJg1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 7 Mar 2023 04:36:27 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57272 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230396AbjCGJUF (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 7 Mar 2023 04:20:05 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9EEB986DE7;
-        Tue,  7 Mar 2023 01:19:59 -0800 (PST)
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3278dD1o032155;
-        Tue, 7 Mar 2023 09:19:42 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=OjKY7gpoc92MrBAieztC3xyMvwQnw4OrLb8s0/9FybQ=;
- b=KPgOpwZypOJlaMyaSBjH+/lQRpOvhT2U5ZI20/+Dn2do+9KNOP231IVuOcib4My4gjKt
- njWdVKncdC9a92X6FYj0tzMT4OcZ8YOZlqn5yef5YWjhifkKbtCyI5pKpg1NZzKWkcb1
- Iwy1Pw3GbvbysSOu937MmhURjqj/IRxhZgBKnkD5WBr3iRob8JDlEen367A/QBVeon4E
- grj5rlNqv4IeFTcUl5mNeRhTqlmDxKbWUN16XW8Pc3uhtEsp4svTAw8E6hXEq8S7volv
- LDYJp0GBiC1uB//nqRodTukqdyPjCykAdumlrRIGy0eBad++tJhOf5EBrkBVzfEb1gZy FA== 
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3p50vn8vm0-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 07 Mar 2023 09:19:42 +0000
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 32724W9l005734;
-        Tue, 7 Mar 2023 09:19:40 GMT
-Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
-        by ppma04ams.nl.ibm.com (PPS) with ESMTPS id 3p41brc0ut-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 07 Mar 2023 09:19:39 +0000
-Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-        by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3279JaGt37093720
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 7 Mar 2023 09:19:36 GMT
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 4B7A920043;
-        Tue,  7 Mar 2023 09:19:36 +0000 (GMT)
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C8CD120040;
-        Tue,  7 Mar 2023 09:19:35 +0000 (GMT)
-Received: from [9.152.212.247] (unknown [9.152.212.247])
-        by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Tue,  7 Mar 2023 09:19:35 +0000 (GMT)
-Message-ID: <a3a4351375d51aa5e93e06bba212ba3637665885.camel@linux.ibm.com>
-Subject: Re: [syzbot] [block?] WARNING in blkdev_put (2)
-From:   Julian Ruess <julianr@linux.ibm.com>
-To:     Yu Kuai <yukuai1@huaweicloud.com>,
-        Alexander Egorenkov <egorenar@linux.ibm.com>,
-        syzbot+2bcc0d79e548c4f62a59@syzkaller.appspotmail.com
-Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com,
-        jack@suse.cz, hch@lst.de, Niklas Schnelle <schnelle@linux.ibm.com>,
-        Gerd Bayer <gbayer@linux.ibm.com>,
-        "yukuai (C)" <yukuai3@huawei.com>, julianr@linux.ibm.com
-Date:   Tue, 07 Mar 2023 10:19:35 +0100
-In-Reply-To: <26079e08-857d-6216-0921-bdef369f3316@huaweicloud.com>
-References: <87lekfne28.fsf@oc8242746057.ibm.com>
-         <f9649d501bc8c3444769418f6c26263555d9d3be.camel@linux.ibm.com>
-         <26079e08-857d-6216-0921-bdef369f3316@huaweicloud.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 3fSMVfqPKXuSzuMK4QSE5DKG1UO4rvdA
-X-Proofpoint-ORIG-GUID: 3fSMVfqPKXuSzuMK4QSE5DKG1UO4rvdA
-Content-Transfer-Encoding: base64
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+        with ESMTP id S229718AbjCGJg0 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 7 Mar 2023 04:36:26 -0500
+Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D350A88DB0
+        for <linux-block@vger.kernel.org>; Tue,  7 Mar 2023 01:36:24 -0800 (PST)
+Received: from mail02.huawei.com (unknown [172.30.67.169])
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4PW9LW54Hqz4f3nTJ
+        for <linux-block@vger.kernel.org>; Tue,  7 Mar 2023 17:36:19 +0800 (CST)
+Received: from [10.174.176.73] (unknown [10.174.176.73])
+        by APP3 (Coremail) with SMTP id _Ch0CgA35CGTBQdkdu_3EQ--.13794S3;
+        Tue, 07 Mar 2023 17:36:21 +0800 (CST)
+Subject: Re: [bug report] BUG: KASAN: slab-use-after-free in
+ bfq_setup_cooperator
+To:     Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+        Yu Kuai <yukuai1@huaweicloud.com>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Gabriele Felici <felicigb@gmail.com>,
+        Gianmarco Lusvardi <glusvardi@posteo.net>,
+        Giulio Barabino <giuliobarabino99@gmail.com>,
+        Emiliano Maccaferri <inbox@emilianomaccaferri.com>,
+        Paolo Valente <paolo.valente@linaro.org>,
+        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+        Jan Kara <jack@suse.cz>, "yukuai (C)" <yukuai3@huawei.com>
+References: <20230307071448.rzihxbm4jhbf5krj@shindev>
+ <220e7ee3-e294-753f-d9df-8957a8f047e9@huaweicloud.com>
+ <20230307091336.p2mzdo225zkoldmd@shindev>
+From:   Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <076cb738-6f44-e731-d2a6-cad4ff464ae1@huaweicloud.com>
+Date:   Tue, 7 Mar 2023 17:36:19 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
- definitions=2023-03-07_03,2023-03-06_01,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999
- suspectscore=0 adultscore=0 mlxscore=0 phishscore=0 spamscore=0
- clxscore=1011 malwarescore=0 lowpriorityscore=0 bulkscore=0
- impostorscore=0 priorityscore=1501 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2212070000 definitions=main-2303070082
+In-Reply-To: <20230307091336.p2mzdo225zkoldmd@shindev>
+Content-Type: text/plain; charset=gbk; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: _Ch0CgA35CGTBQdkdu_3EQ--.13794S3
+X-Coremail-Antispam: 1UD129KBjvJXoW7CF1kKry7Gry8Gry5CF1fXrb_yoW8uw15pa
+        1DKw4qyr1UKrW5XrWxAw40v34jyr1ayrykKrWSgrW2k3Z8XryfGF4q934I9a4Sqa18Crnx
+        Z34qq3s7Ar48JF7anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUU9214x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+        1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+        JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+        CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+        2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+        W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka
+        0xkIwI1lc7I2V7IY0VAS07AlzVAYIcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7x
+        kEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E
+        67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCw
+        CI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6rWUJVWr
+        Zr1UMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYx
+        BIdaVFxhVjvjDU0xZFpf9x0JUdHUDUUUUU=
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-T24gVHVlLCAyMDIzLTAzLTA3IGF0IDA5OjQyICswODAwLCBZdSBLdWFpIHdyb3RlOgo+IEhpLAo+
-IAo+IOWcqCAyMDIzLzAzLzA2IDIzOjAwLCBKdWxpYW4gUnVlc3Mg5YaZ6YGTOgo+ID4gT24gVGh1
-LCAyMDIzLTAzLTAyIGF0IDIwOjMzICswMTAwLCBBbGV4YW5kZXIgRWdvcmVua292IHdyb3RlOgo+
-ID4gPiAKPiA+ID4gSGksCj4gPiA+IAo+ID4gPiB3ZSBhcmUgc2VlaW5nIGEgc2ltaWxhciBwcm9i
-bGVtIG9uIHMzOTB4IGFyY2hpdGVjdHVyZSB3aGVuCj4gPiA+IHBhcnRpdGlvbmluZwo+ID4gPiBh
-IE5WTWUgZGlzayBvbiBsaW51eC1uZXh0Lgo+ID4gPiAKPiA+ID4gCj4gPiA+IMKgwqAgW8KgwqAg
-NzAuNDAzMDE1XcKgIG52bWUwbjE6IHAxCj4gPiA+IMKgwqAgW8KgwqAgNzAuNDAzMTk3XSAtLS0t
-LS0tLS0tLS1bIGN1dCBoZXJlIF0tLS0tLS0tLS0tLS0KPiA+ID4gwqDCoCBbwqDCoCA3MC40MDMx
-OTldIFdBUk5JTkc6IENQVTogOCBQSUQ6IDI0NTIgYXQgYmxvY2svYmRldi5jOjg0NQo+ID4gPiBi
-bGtkZXZfcHV0KzB4MjgwLzB4Mjk4Cj4gPiAKPiA+IC4uLgo+ID4gCj4gPiA+IFRoZSBwcm9ibGVt
-IGFwcGVhcmVkIGFib3V0IGEgd2VlayBhZ28uCj4gPiA+IAo+ID4gPiBSZWdhcmRzCj4gPiA+IEFs
-ZXgKPiA+IAo+ID4gSGkgYWxsLAo+ID4gCj4gPiBJIGJpc2VjdGVkIHRoaXMgdG86Cj4gPiAKPiA+
-IGNvbW1pdCBlNWNmZWZhOTdiY2NmOTU2ZWEwYmI2NDY0YzFmNmM4NGZkN2E4ZDlmCj4gPiBBdXRo
-b3I6IFl1IEt1YWkgPHl1a3VhaTNAaHVhd2VpLmNvbT4KPiA+IERhdGU6wqDCoCBGcmkgRmViIDE3
-IDEwOjIyOjAwIDIwMjMgKzA4MDAKPiA+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgCj4gPiDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCAKPiA+IMKgwqDCoMKgIGJsb2NrOiBmaXgg
-c2NhbiBwYXJ0aXRpb24gZm9yIGV4Y2x1c2l2ZWx5IG9wZW4gZGV2aWNlIGFnYWluCj4gCj4gWWVz
-LCB0aGFua3MgZm9yIHRoZSByZXBvcnQsIEkgZmlndXJlIG91dCB0aGF0IEkgbWFkZSBhIG1pc3Rh
-a2UgaGVyZS4KPiAKPiBGb2xsb3dpbmcgcGF0Y2ggc2hvdWxkIGZpeCB0aGlzIHByb2JsZW06Cj4g
-Cj4gZGlmZiAtLWdpdCBhL2Jsb2NrL2dlbmhkLmMgYi9ibG9jay9nZW5oZC5jCj4gaW5kZXggM2Vl
-NTU3N2UxNTg2Li4wMmQ5Y2ZiOWUwNzcgMTAwNjQ0Cj4gLS0tIGEvYmxvY2svZ2VuaGQuYwo+ICsr
-KyBiL2Jsb2NrL2dlbmhkLmMKPiBAQCAtMzg1LDcgKzM4NSw3IEBAIGludCBkaXNrX3NjYW5fcGFy
-dGl0aW9ucyhzdHJ1Y3QgZ2VuZGlzayAqZGlzaywgCj4gZm1vZGVfdCBtb2RlKQo+IMKgwqDCoMKg
-wqDCoMKgwqAgaWYgKElTX0VSUihiZGV2KSkKPiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoCByZXQgPcKgIFBUUl9FUlIoYmRldik7Cj4gwqDCoMKgwqDCoMKgwqDCoCBlbHNlCj4gLcKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgYmxrZGV2X3B1dChiZGV2LCBtb2RlKTsKPiArwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBibGtkZXZfcHV0KGJkZXYsIG1vZGUgJiB+Rk1PREVf
-RVhDTCk7Cj4gCj4gVGhhbmtzLAo+IEt1YWkKPiA+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgCj4gPiDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCAKPiA+IMKgwqDCoMKgIEFzIGV4
-cGxhaW5lZCBpbiBjb21taXQgMzYzNjlmNDZlOTE3ICgiYmxvY2s6IERvIG5vdCByZXJlYWQKPiA+
-IHBhcnRpdGlvbiB0YWJsZQo+ID4gwqDCoMKgwqAgb24gZXhjbHVzaXZlbHkgb3BlbiBkZXZpY2Ui
-KSwgcmVyZWFkIHBhcnRpdGlvbiBvbiB0aGUgZGV2aWNlCj4gPiB0aGF0Cj4gPiBpcwo+ID4gwqDC
-oMKgwqAgZXhjbHVzaXZlbHkgb3BlbmVkIGJ5IHNvbWVvbmUgZWxzZSBpcyBwcm9ibGVtYXRpYy4K
-PiA+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgCj4gPiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoCAKPiA+IMKgwqDCoMKgIFRoaXMgcGF0Y2ggd2lsbCBtYWtlIHN1cmUgcGFydGl0
-aW9uIHNjYW4gd2lsbCBvbmx5IGJlIHByb2NlZWQKPiA+IGlmCj4gPiBjdXJyZW50Cj4gPiDCoMKg
-wqDCoCB0aHJlYWQgb3BlbiB0aGUgZGV2aWNlIGV4Y2x1c2l2ZWx5LCBvciB0aGUgZGV2aWNlIGlz
-IG5vdAo+ID4gb3BlbmVkCj4gPiDCoMKgwqDCoCBleGNsdXNpdmVseSwgYW5kIGluIHRoZSBsYXRl
-ciBjYXNlLCBvdGhlciBzY2FubmVycyBhbmQKPiA+IGV4Y2x1c2l2ZQo+ID4gb3BlbmVycwo+ID4g
-wqDCoMKgwqAgd2lsbCBiZSBibG9ja2VkIHRlbXBvcmFyaWx5IHVudGlsIHBhcnRpdGlvbiBzY2Fu
-IGlzIGRvbmUuCj4gPiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoAo+ID4gwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqAgCj4gPiDCoMKgwqDCoCBGaXhlczogMTBjNzBkOTVjMGYyICgi
-YmxvY2s6IHJlbW92ZSB0aGUgYmRfb3BlbmVycyBjaGVja3MgaW4KPiA+IGJsa19kcm9wX3BhcnRp
-dGlvbnMiKQo+ID4gwqDCoMKgwqAgQ2M6IDxzdGFibGVAdmdlci5rZXJuZWwub3JnPgo+ID4gwqDC
-oMKgwqAgU3VnZ2VzdGVkLWJ5OiBKYW4gS2FyYSA8amFja0BzdXNlLmN6Pgo+ID4gwqDCoMKgwqAg
-U2lnbmVkLW9mZi1ieTogWXUgS3VhaSA8eXVrdWFpM0BodWF3ZWkuY29tPgo+ID4gwqDCoMKgwqAg
-UmV2aWV3ZWQtYnk6IENocmlzdG9waCBIZWxsd2lnIDxoY2hAbHN0LmRlPgo+ID4gwqDCoMKgwqAg
-TGluazoKPiA+IGh0dHBzOi8vbG9yZS5rZXJuZWwub3JnL3IvMjAyMzAyMTcwMjIyMDAuMzA5Mjk4
-Ny0zLXl1a3VhaTFAaHVhd2VpY2xvdWQuY29tCj4gPiDCoCAKPiA+IMKgwqDCoMKgIFNpZ25lZC1v
-ZmYtYnk6IEplbnMgQXhib2UgPGF4Ym9lQGtlcm5lbC5kaz4KPiA+IAo+ID4gCj4gPiAKPiA+IFJl
-Z2FyZHMKPiA+IEp1bGlhbgo+ID4gCj4gCgpUaGlzIHBhdGNoIHdvcmtzIGZvciBtZS4gVGhhbmtz
-IQpASmVucyBBeGJvZTogV2lsbCB0aGlzIGJlIHBhcnQgb2YgdGhlIG5leHQgNi4zLXJjPwoKUmVn
-YXJkcwpKdWxpYW4KCg==
+Hi,
+
+ÔÚ 2023/03/07 17:13, Shinichiro Kawasaki Ð´µÀ:
+> On Mar 07, 2023 / 16:57, Yu Kuai wrote:
+> [...]
+>> Thanks for the report, can you help to provide the result of add2line of
+>> following?
+>>
+>> bfq_setup_cooperator+0x120b/0x1650
+>> bfq_setup_cooperator+0xa41/0x1650
+>>
+>> That will help to locate the problem.
+> 
+> Hi, Yu thanks for looking into this. Here are the faddr2line outputs:
+> 
+> $ ./scripts/faddr2line vmlinux bfq_setup_cooperator+0x120b/0x1650
+> bfq_setup_cooperator+0x120b/0x1650:
+> bfqq_process_refs at block/bfq-iosched.c:1200
+> (inlined by) bfq_setup_stable_merge at block/bfq-iosched.c:2855
+> (inlined by) bfq_setup_cooperator at block/bfq-iosched.c:2941
+> 
+> $ ./scripts/faddr2line vmlinux bfq_setup_cooperator+0xa41/0x1650
+> bfq_setup_cooperator+0xa41/0x1650:
+> bfq_setup_cooperator at block/bfq-iosched.c:2939
+> 
+
+So, after a quick look at the code, the difference is that fd571df0ac5b
+changes the logic when bfqq_proces_refs(stable_merge_bfqq) is 0.
+
+I think perhaps following patch can work, at least 'stable_merge_bfqq'
+won't be accessed after bfq_put_stable_ref() in this case:
+
+diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+index 8a8d4441519c..881f74b3a556 100644
+--- a/block/bfq-iosched.c
++++ b/block/bfq-iosched.c
+@@ -2856,6 +2856,11 @@ bfq_setup_stable_merge(struct bfq_data *bfqd, 
+struct bfq_queue *bfqq,
+                            bfqq_process_refs(stable_merge_bfqq));
+         struct bfq_queue *new_bfqq;
+
++       /* deschedule stable merge, because done or aborted here */
++       bfq_put_stable_ref(stable_merge_bfqq);
++
++       bfqq_data->stable_merge_bfqq = NULL;
++
+         if (idling_boosts_thr_without_issues(bfqd, bfqq) ||
+             proc_ref == 0)
+                 return NULL;
+@@ -2933,11 +2938,6 @@ bfq_setup_cooperator(struct bfq_data *bfqd, 
+struct bfq_queue *bfqq,
+                         struct bfq_queue *stable_merge_bfqq =
+                                 bfqq_data->stable_merge_bfqq;
+
+-                       /* deschedule stable merge, because done or 
+aborted here */
+-                       bfq_put_stable_ref(stable_merge_bfqq);
+-
+-                       bfqq_data->stable_merge_bfqq = NULL;
+-
+                         return bfq_setup_stable_merge(bfqd, bfqq,
+                                                       stable_merge_bfqq,
+                                                       bfqq_data);
+
