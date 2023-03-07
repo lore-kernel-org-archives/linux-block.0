@@ -2,92 +2,165 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 75F6EC678D4
-	for <linux-block@archiver.kernel.org>; Tue,  7 Mar 2023 14:30:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 235AAC678D4
+	for <linux-block@archiver.kernel.org>; Tue,  7 Mar 2023 14:30:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229622AbjCGOaa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 7 Mar 2023 09:30:30 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60042 "EHLO
+        id S230057AbjCGOak (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 7 Mar 2023 09:30:40 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60436 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231389AbjCGOaD (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 7 Mar 2023 09:30:03 -0500
-Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 16B8385A4E
-        for <linux-block@vger.kernel.org>; Tue,  7 Mar 2023 06:25:44 -0800 (PST)
-Received: by mail-pj1-x1034.google.com with SMTP id bo22so13338644pjb.4
-        for <linux-block@vger.kernel.org>; Tue, 07 Mar 2023 06:25:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112; t=1678199143;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0pUswYY3Le5dkGBJavjaTXJzlJxNEqlgltV+DJqXPvw=;
-        b=1LWzC+8UAs6FlIRiLot36g/KgonVVwrjkxPT3vTtd0keATf9iQIzz73sUwUNGBVSQF
-         HqgkM5+FKLO/0Vp1LzIHue8IcBN6CxSECL9mz9Y6BEOKAaiefIxhBXoroLSz5WSi7grS
-         Vr43G55SLD4RB1GTJOQOu4Ca8Yahxit1o0UYmTyE0mv3aFbcfU7VrGbuzAJzh+AS17/H
-         ggA+RKCNBVaBu912vDZOoDv745/bc7A8/NM3XRVn94Lj/szi2JQK7mYoUZ1hz4BdD/kn
-         rTO8uWBUgxnM017VkxPYr1W5mpvceXIURS6LGkWRriF6ZcBMLBDiixV4II1qCCRH0a3B
-         Mcbg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678199143;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=0pUswYY3Le5dkGBJavjaTXJzlJxNEqlgltV+DJqXPvw=;
-        b=DCrQCfspWEGLOn7GaTbl8lsf8JqPdXWuKJ7sIj960f6ErrQYnkt8LgmofMVuFOJGEl
-         lyC77r78iOWMxi/4JTkMsqbmKXXXQ3opI2KC6ceAakMIfEliVO/mbc/zehNiUrbFWQp3
-         2nFd+lm6+BB/tX2mwdC4qf039mqrF9x77NQUv63pOPsno2/EkFiS5Xk/4gYPcULfrftj
-         ZhzRc91IoX+nWyRi+dfe0NlraiaGMOyVDJVelTLS1nYRCH2EmImBjpqvlaCdQ3sqTtHf
-         N93Xn9Pr3sGWofN0KJC9MmMo6R2f+FO8hwtVNJs1DsyHVeyoYFOw9Ew6OfdDOd8km9eb
-         v5GA==
-X-Gm-Message-State: AO0yUKWNXWn55qA5CrZU9vvSoqP4YxjgOYgCImuDrii7pPy/u02UBqiH
-        lKxyxKbyzSWDUsyxYJojpdJBug==
-X-Google-Smtp-Source: AK7set/o5QYXytOiAl3gSKlbOjvNqp2qyoU8SqKy/N5JGMecO0kNZPEAEjXPmKeiPTE4loL+L6eZ7w==
-X-Received: by 2002:a17:903:2304:b0:19e:d6f2:fefd with SMTP id d4-20020a170903230400b0019ed6f2fefdmr4933695plh.0.1678199143345;
-        Tue, 07 Mar 2023 06:25:43 -0800 (PST)
-Received: from [127.0.0.1] ([50.233.106.125])
-        by smtp.gmail.com with ESMTPSA id j14-20020a170903024e00b00198e12c499dsm8469198plh.282.2023.03.07.06.25.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 07 Mar 2023 06:25:43 -0800 (PST)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     hch@lst.de, jack@suse.cz, julianr@linux.ibm.com,
-        yukuai3@huawei.com, Yu Kuai <yukuai1@huaweicloud.com>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        yi.zhang@huawei.com, yangerkun@huawei.com
-In-Reply-To: <20230307105552.1560439-1-yukuai1@huaweicloud.com>
-References: <a3a4351375d51aa5e93e06bba212ba3637665885.camel@linux.ibm.com>
- <20230307105552.1560439-1-yukuai1@huaweicloud.com>
-Subject: Re: [PATCH] block: fix wrong mode for blkdev_put() from
- disk_scan_partitions()
-Message-Id: <167819914263.6301.8573680638025368165.b4-ty@kernel.dk>
-Date:   Tue, 07 Mar 2023 07:25:42 -0700
+        with ESMTP id S231514AbjCGOaK (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 7 Mar 2023 09:30:10 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66F18898F9
+        for <linux-block@vger.kernel.org>; Tue,  7 Mar 2023 06:24:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1678199085;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=llKKNKuvfK/m+pa2EAZRL9gIyPFDk2zTTzAuWEJgf/M=;
+        b=esVT4tOKK3JyCVNf9nizKnqvanwwOC2IefjjDjUzitWDKlY187OqegL0ZVZpROmQX/wGX8
+        SvPY74/g9i+t96qT8t6LCmyHQkJsHeYrKuqT2IoRf1z/qUaHbAxXynUnbNW4nEtnr4PKRI
+        TwCzWmp9be6KzZSePlp+Nd6hbAMyu/Y=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-235-GOXamBoqNaWafLYTKsVFeg-1; Tue, 07 Mar 2023 09:24:42 -0500
+X-MC-Unique: GOXamBoqNaWafLYTKsVFeg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E6D0885A588;
+        Tue,  7 Mar 2023 14:24:41 +0000 (UTC)
+Received: from ovpn-8-16.pek2.redhat.com (ovpn-8-16.pek2.redhat.com [10.72.8.16])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 02CE72026D4B;
+        Tue,  7 Mar 2023 14:24:38 +0000 (UTC)
+Date:   Tue, 7 Mar 2023 22:24:33 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Sagi Grimberg <sagi@grimberg.me>
+Cc:     Christoph Hellwig <hch@lst.de>, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org
+Subject: Re: [PATCH] nvme: fix handling single range discard request
+Message-ID: <ZAdJIXT4AxuYB3Do@ovpn-8-16.pek2.redhat.com>
+References: <20230303231345.119652-1-ming.lei@redhat.com>
+ <125e291a-5225-6565-e800-e6bdb6be35f3@grimberg.me>
+ <ZAZfzT02hNQ6bb8P@ovpn-8-26.pek2.redhat.com>
+ <4faf272f-470e-1c2d-d23e-752ccbb01a31@grimberg.me>
+ <ZAcqj9tM8/Dq9MNn@ovpn-8-16.pek2.redhat.com>
+ <aeb59707-00ad-bc57-9f91-ef5757de9294@grimberg.me>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.13-dev-ebd05
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aeb59707-00ad-bc57-9f91-ef5757de9294@grimberg.me>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
-On Tue, 07 Mar 2023 18:55:52 +0800, Yu Kuai wrote:
-> If disk_scan_partitions() is called with 'FMODE_EXCL',
-> blkdev_get_by_dev() will be called without 'FMODE_EXCL', however, follow
-> blkdev_put() is still called with 'FMODE_EXCL', which will cause
-> 'bd_holders' counter to leak.
+On Tue, Mar 07, 2023 at 02:31:48PM +0200, Sagi Grimberg wrote:
 > 
-> Fix the problem by using the right mode for blkdev_put().
 > 
-> [...]
+> On 3/7/23 14:14, Ming Lei wrote:
+> > On Tue, Mar 07, 2023 at 01:39:27PM +0200, Sagi Grimberg wrote:
+> > > 
+> > > 
+> > > On 3/6/23 23:49, Ming Lei wrote:
+> > > > On Mon, Mar 06, 2023 at 04:21:08PM +0200, Sagi Grimberg wrote:
+> > > > > 
+> > > > > 
+> > > > > On 3/4/23 01:13, Ming Lei wrote:
+> > > > > > When investigating one customer report on warning in nvme_setup_discard,
+> > > > > > we observed the controller(nvme/tcp) actually exposes
+> > > > > > queue_max_discard_segments(req->q) == 1.
+> > > > > > 
+> > > > > > Obviously the current code can't handle this situation, since contiguity
+> > > > > > merge like normal RW request is taken.
+> > > > > > 
+> > > > > > Fix the issue by building range from request sector/nr_sectors directly.
+> > > > > > 
+> > > > > > Fixes: b35ba01ea697 ("nvme: support ranged discard requests")
+> > > > > > Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> > > > > > ---
+> > > > > >     drivers/nvme/host/core.c | 28 +++++++++++++++++++---------
+> > > > > >     1 file changed, 19 insertions(+), 9 deletions(-)
+> > > > > > 
+> > > > > > diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+> > > > > > index c2730b116dc6..d4be525f8100 100644
+> > > > > > --- a/drivers/nvme/host/core.c
+> > > > > > +++ b/drivers/nvme/host/core.c
+> > > > > > @@ -781,16 +781,26 @@ static blk_status_t nvme_setup_discard(struct nvme_ns *ns, struct request *req,
+> > > > > >     		range = page_address(ns->ctrl->discard_page);
+> > > > > >     	}
+> > > > > > -	__rq_for_each_bio(bio, req) {
+> > > > > > -		u64 slba = nvme_sect_to_lba(ns, bio->bi_iter.bi_sector);
+> > > > > > -		u32 nlb = bio->bi_iter.bi_size >> ns->lba_shift;
+> > > > > > -
+> > > > > > -		if (n < segments) {
+> > > > > > -			range[n].cattr = cpu_to_le32(0);
+> > > > > > -			range[n].nlb = cpu_to_le32(nlb);
+> > > > > > -			range[n].slba = cpu_to_le64(slba);
+> > > > > > +	if (queue_max_discard_segments(req->q) == 1) {
+> > > > > > +		u64 slba = nvme_sect_to_lba(ns, blk_rq_pos(req));
+> > > > > > +		u32 nlb = blk_rq_sectors(req) >> (ns->lba_shift - 9);
+> > > > > > +
+> > > > > > +		range[0].cattr = cpu_to_le32(0);
+> > > > > > +		range[0].nlb = cpu_to_le32(nlb);
+> > > > > > +		range[0].slba = cpu_to_le64(slba);
+> > > > > > +		n = 1;
+> > > > > > +	} else {
+> > > > > > +		__rq_for_each_bio(bio, req) {
+> > > > > > +			u64 slba = nvme_sect_to_lba(ns, bio->bi_iter.bi_sector);
+> > > > > > +			u32 nlb = bio->bi_iter.bi_size >> ns->lba_shift;
+> > > > > > +
+> > > > > > +			if (n < segments) {
+> > > > > > +				range[n].cattr = cpu_to_le32(0);
+> > > > > > +				range[n].nlb = cpu_to_le32(nlb);
+> > > > > > +				range[n].slba = cpu_to_le64(slba);
+> > > > > > +			}
+> > > > > > +			n++;
+> > > > > >     		}
+> > > > > > -		n++;
+> > > > > >     	}
+> > > > > >     	if (WARN_ON_ONCE(n != segments)) {
+> > > > > 
+> > > > > 
+> > > > > Maybe just set segments to min(blk_rq_nr_discard_segments(req),
+> > > > > queue_max_discard_segments(req->q)) and let the existing code do
+> > > > > its thing?
+> > > > 
+> > > > What is the existing code for applying min()?
+> > > 
+> > > Was referring to this:
+> > > --
+> > > diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+> > > index 3345f866178e..dbc402587431 100644
+> > > --- a/drivers/nvme/host/core.c
+> > > +++ b/drivers/nvme/host/core.c
+> > > @@ -781,6 +781,7 @@ static blk_status_t nvme_setup_discard(struct nvme_ns
+> > > *ns, struct request *req,
+> > >                  range = page_address(ns->ctrl->discard_page);
+> > >          }
+> > > 
+> > > +       segments = min(segments, queue_max_discard_segments(req->q));
+> > 
+> > That can't work.
+> > 
+> > In case of queue_max_discard_segments(req->q) == 1, the request still
+> > can have more than one bios since the normal merge is taken for discard
+> > IOs.
+> 
+> Ah, I see, the bios are contiguous though right?
 
-Applied, thanks!
+Yes, the merge is just like normal RW.
 
-[1/1] block: fix wrong mode for blkdev_put() from disk_scan_partitions()
-      commit: 428913bce1e67ccb4dae317fd0332545bf8c9233
+> We could add a contiguity check in the loop and conditionally
+> increment n, but maybe that would probably be more complicated...
 
-Best regards,
--- 
-Jens Axboe
+That is more complicated than this patch, and the same pattern
+has been applied on virtio-blk.
 
 
+Thanks,
+Ming
 
