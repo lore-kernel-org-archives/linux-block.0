@@ -2,177 +2,92 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0058EC678D4
-	for <linux-block@archiver.kernel.org>; Tue,  7 Mar 2023 14:27:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 75F6EC678D4
+	for <linux-block@archiver.kernel.org>; Tue,  7 Mar 2023 14:30:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230129AbjCGO1k (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 7 Mar 2023 09:27:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50350 "EHLO
+        id S229622AbjCGOaa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 7 Mar 2023 09:30:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60042 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230119AbjCGO10 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 7 Mar 2023 09:27:26 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A74CE8C81F
-        for <linux-block@vger.kernel.org>; Tue,  7 Mar 2023 06:22:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1678198930;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=/gv5iBghgfjGMwQIblGY0Ee8w9OWfXa/KQ07CaskV0k=;
-        b=MMj5ZHySy20+77cXPXudrwbWYymzktDp3OfMziT3jGvu0rrh6RPgGYH+p0X59ePhxlbRRd
-        uey3FMunK4jiOPILYTSOix+oO8gMjCliOdgWkjY8FE0Tr5s4fpKkJbAn0olp24phbgqTVg
-        8ABV30uKtq3g9vpQrOfEDu2ip51Px0o=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-503-XSC25OLtMEO-Q8lwj0T0xw-1; Tue, 07 Mar 2023 09:15:35 -0500
-X-MC-Unique: XSC25OLtMEO-Q8lwj0T0xw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id EF38D38173C9;
-        Tue,  7 Mar 2023 14:15:34 +0000 (UTC)
-Received: from localhost (ovpn-8-16.pek2.redhat.com [10.72.8.16])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 275AB400DFA1;
-        Tue,  7 Mar 2023 14:15:33 +0000 (UTC)
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org
-Cc:     linux-block@vger.kernel.org, Miklos Szeredi <mszeredi@redhat.com>,
-        ZiyangZhang <ZiyangZhang@linux.alibaba.com>,
-        Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>,
-        Bernd Schubert <bschubert@ddn.com>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V2 01/17] io_uring: add IO_URING_F_FUSED and prepare for supporting OP_FUSED_CMD
-Date:   Tue,  7 Mar 2023 22:15:04 +0800
-Message-Id: <20230307141520.793891-2-ming.lei@redhat.com>
-In-Reply-To: <20230307141520.793891-1-ming.lei@redhat.com>
-References: <20230307141520.793891-1-ming.lei@redhat.com>
+        with ESMTP id S231389AbjCGOaD (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 7 Mar 2023 09:30:03 -0500
+Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 16B8385A4E
+        for <linux-block@vger.kernel.org>; Tue,  7 Mar 2023 06:25:44 -0800 (PST)
+Received: by mail-pj1-x1034.google.com with SMTP id bo22so13338644pjb.4
+        for <linux-block@vger.kernel.org>; Tue, 07 Mar 2023 06:25:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112; t=1678199143;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=0pUswYY3Le5dkGBJavjaTXJzlJxNEqlgltV+DJqXPvw=;
+        b=1LWzC+8UAs6FlIRiLot36g/KgonVVwrjkxPT3vTtd0keATf9iQIzz73sUwUNGBVSQF
+         HqgkM5+FKLO/0Vp1LzIHue8IcBN6CxSECL9mz9Y6BEOKAaiefIxhBXoroLSz5WSi7grS
+         Vr43G55SLD4RB1GTJOQOu4Ca8Yahxit1o0UYmTyE0mv3aFbcfU7VrGbuzAJzh+AS17/H
+         ggA+RKCNBVaBu912vDZOoDv745/bc7A8/NM3XRVn94Lj/szi2JQK7mYoUZ1hz4BdD/kn
+         rTO8uWBUgxnM017VkxPYr1W5mpvceXIURS6LGkWRriF6ZcBMLBDiixV4II1qCCRH0a3B
+         Mcbg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1678199143;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=0pUswYY3Le5dkGBJavjaTXJzlJxNEqlgltV+DJqXPvw=;
+        b=DCrQCfspWEGLOn7GaTbl8lsf8JqPdXWuKJ7sIj960f6ErrQYnkt8LgmofMVuFOJGEl
+         lyC77r78iOWMxi/4JTkMsqbmKXXXQ3opI2KC6ceAakMIfEliVO/mbc/zehNiUrbFWQp3
+         2nFd+lm6+BB/tX2mwdC4qf039mqrF9x77NQUv63pOPsno2/EkFiS5Xk/4gYPcULfrftj
+         ZhzRc91IoX+nWyRi+dfe0NlraiaGMOyVDJVelTLS1nYRCH2EmImBjpqvlaCdQ3sqTtHf
+         N93Xn9Pr3sGWofN0KJC9MmMo6R2f+FO8hwtVNJs1DsyHVeyoYFOw9Ew6OfdDOd8km9eb
+         v5GA==
+X-Gm-Message-State: AO0yUKWNXWn55qA5CrZU9vvSoqP4YxjgOYgCImuDrii7pPy/u02UBqiH
+        lKxyxKbyzSWDUsyxYJojpdJBug==
+X-Google-Smtp-Source: AK7set/o5QYXytOiAl3gSKlbOjvNqp2qyoU8SqKy/N5JGMecO0kNZPEAEjXPmKeiPTE4loL+L6eZ7w==
+X-Received: by 2002:a17:903:2304:b0:19e:d6f2:fefd with SMTP id d4-20020a170903230400b0019ed6f2fefdmr4933695plh.0.1678199143345;
+        Tue, 07 Mar 2023 06:25:43 -0800 (PST)
+Received: from [127.0.0.1] ([50.233.106.125])
+        by smtp.gmail.com with ESMTPSA id j14-20020a170903024e00b00198e12c499dsm8469198plh.282.2023.03.07.06.25.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 07 Mar 2023 06:25:43 -0800 (PST)
+From:   Jens Axboe <axboe@kernel.dk>
+To:     hch@lst.de, jack@suse.cz, julianr@linux.ibm.com,
+        yukuai3@huawei.com, Yu Kuai <yukuai1@huaweicloud.com>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yi.zhang@huawei.com, yangerkun@huawei.com
+In-Reply-To: <20230307105552.1560439-1-yukuai1@huaweicloud.com>
+References: <a3a4351375d51aa5e93e06bba212ba3637665885.camel@linux.ibm.com>
+ <20230307105552.1560439-1-yukuai1@huaweicloud.com>
+Subject: Re: [PATCH] block: fix wrong mode for blkdev_put() from
+ disk_scan_partitions()
+Message-Id: <167819914263.6301.8573680638025368165.b4-ty@kernel.dk>
+Date:   Tue, 07 Mar 2023 07:25:42 -0700
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.1
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.13-dev-ebd05
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Add flag IO_URING_F_FUSED and prepare for supporting IO_URING_OP_FUSED_CMD,
-which is still one type of IO_URING_OP_URING_CMD, so it is reasonable
-to reuse ->uring_cmd() for handling IO_URING_F_FUSED_CMD.
 
-Just IO_URING_F_FUSED_CMD will carry one 64byte SQE as payload which
-is handled by one slave request. The master uring command will
-provide kernel buffer to the slave request.
+On Tue, 07 Mar 2023 18:55:52 +0800, Yu Kuai wrote:
+> If disk_scan_partitions() is called with 'FMODE_EXCL',
+> blkdev_get_by_dev() will be called without 'FMODE_EXCL', however, follow
+> blkdev_put() is still called with 'FMODE_EXCL', which will cause
+> 'bd_holders' counter to leak.
+> 
+> Fix the problem by using the right mode for blkdev_put().
+> 
+> [...]
 
-Mark all existed drivers to not support IO_URING_F_FUSED_CMD, given it
-depends if driver is capable of handling the slave request.
+Applied, thanks!
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- drivers/block/ublk_drv.c  | 6 ++++++
- drivers/char/mem.c        | 4 ++++
- drivers/nvme/host/ioctl.c | 9 +++++++++
- include/linux/io_uring.h  | 7 +++++++
- 4 files changed, 26 insertions(+)
+[1/1] block: fix wrong mode for blkdev_put() from disk_scan_partitions()
+      commit: 428913bce1e67ccb4dae317fd0332545bf8c9233
 
-diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-index d1d1c8d606c8..088d9efffe6b 100644
---- a/drivers/block/ublk_drv.c
-+++ b/drivers/block/ublk_drv.c
-@@ -1271,6 +1271,9 @@ static int ublk_ch_uring_cmd(struct io_uring_cmd *cmd, unsigned int issue_flags)
- 			__func__, cmd->cmd_op, ub_cmd->q_id, tag,
- 			ub_cmd->result);
- 
-+	if (issue_flags & IO_URING_F_FUSED)
-+		return -EOPNOTSUPP;
-+
- 	if (ub_cmd->q_id >= ub->dev_info.nr_hw_queues)
- 		goto out;
- 
-@@ -2169,6 +2172,9 @@ static int ublk_ctrl_uring_cmd(struct io_uring_cmd *cmd,
- 	struct ublk_device *ub = NULL;
- 	int ret = -EINVAL;
- 
-+	if (issue_flags & IO_URING_F_FUSED)
-+		return -EOPNOTSUPP;
-+
- 	if (issue_flags & IO_URING_F_NONBLOCK)
- 		return -EAGAIN;
- 
-diff --git a/drivers/char/mem.c b/drivers/char/mem.c
-index ffb101d349f0..134ba6665194 100644
---- a/drivers/char/mem.c
-+++ b/drivers/char/mem.c
-@@ -30,6 +30,7 @@
- #include <linux/uio.h>
- #include <linux/uaccess.h>
- #include <linux/security.h>
-+#include <linux/io_uring.h>
- 
- #ifdef CONFIG_IA64
- # include <linux/efi.h>
-@@ -482,6 +483,9 @@ static ssize_t splice_write_null(struct pipe_inode_info *pipe, struct file *out,
- 
- static int uring_cmd_null(struct io_uring_cmd *ioucmd, unsigned int issue_flags)
- {
-+	if (issue_flags & IO_URING_F_FUSED)
-+		return -EOPNOTSUPP;
-+
- 	return 0;
- }
- 
-diff --git a/drivers/nvme/host/ioctl.c b/drivers/nvme/host/ioctl.c
-index 723e7d5b778f..44a171bcaa90 100644
---- a/drivers/nvme/host/ioctl.c
-+++ b/drivers/nvme/host/ioctl.c
-@@ -773,6 +773,9 @@ int nvme_ns_chr_uring_cmd(struct io_uring_cmd *ioucmd, unsigned int issue_flags)
- 	struct nvme_ns *ns = container_of(file_inode(ioucmd->file)->i_cdev,
- 			struct nvme_ns, cdev);
- 
-+	if (issue_flags & IO_URING_F_FUSED)
-+		return -EOPNOTSUPP;
-+
- 	return nvme_ns_uring_cmd(ns, ioucmd, issue_flags);
- }
- 
-@@ -878,6 +881,9 @@ int nvme_ns_head_chr_uring_cmd(struct io_uring_cmd *ioucmd,
- 	struct nvme_ns *ns = nvme_find_path(head);
- 	int ret = -EINVAL;
- 
-+	if (issue_flags & IO_URING_F_FUSED)
-+		return -EOPNOTSUPP;
-+
- 	if (ns)
- 		ret = nvme_ns_uring_cmd(ns, ioucmd, issue_flags);
- 	srcu_read_unlock(&head->srcu, srcu_idx);
-@@ -915,6 +921,9 @@ int nvme_dev_uring_cmd(struct io_uring_cmd *ioucmd, unsigned int issue_flags)
- 	struct nvme_ctrl *ctrl = ioucmd->file->private_data;
- 	int ret;
- 
-+	if (issue_flags & IO_URING_F_FUSED)
-+		return -EOPNOTSUPP;
-+
- 	/* IOPOLL not supported yet */
- 	if (issue_flags & IO_URING_F_IOPOLL)
- 		return -EOPNOTSUPP;
-diff --git a/include/linux/io_uring.h b/include/linux/io_uring.h
-index 934e5dd4ccc0..0676c5b4b5fe 100644
---- a/include/linux/io_uring.h
-+++ b/include/linux/io_uring.h
-@@ -20,6 +20,13 @@ enum io_uring_cmd_flags {
- 	IO_URING_F_SQE128		= (1 << 8),
- 	IO_URING_F_CQE32		= (1 << 9),
- 	IO_URING_F_IOPOLL		= (1 << 10),
-+
-+	/* for FUSED_CMD only */
-+	IO_URING_F_FUSED_WRITE		= (1 << 11), /* slave writes to buffer */
-+	IO_URING_F_FUSED_READ		= (1 << 12), /* slave reads from buffer */
-+	/* driver incapable of FUSED_CMD should fail cmd when seeing F_FUSED */
-+	IO_URING_F_FUSED		= IO_URING_F_FUSED_WRITE |
-+		IO_URING_F_FUSED_READ,
- };
- 
- struct io_uring_cmd {
+Best regards,
 -- 
-2.39.2
+Jens Axboe
+
+
 
