@@ -2,23 +2,23 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 972CCC6FD1E
-	for <linux-block@archiver.kernel.org>; Tue,  7 Mar 2023 22:47:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BD5D7C678D5
+	for <linux-block@archiver.kernel.org>; Tue,  7 Mar 2023 22:47:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231250AbjCGWrO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S229667AbjCGWrO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Tue, 7 Mar 2023 17:47:14 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33324 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33250 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230232AbjCGWrH (ORCPT
+        with ESMTP id S230333AbjCGWrH (ORCPT
         <rfc822;linux-block@vger.kernel.org>); Tue, 7 Mar 2023 17:47:07 -0500
 Received: from hosting.gsystem.sk (hosting.gsystem.sk [212.5.213.30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 6842A7288;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 4DD5229E15;
         Tue,  7 Mar 2023 14:47:01 -0800 (PST)
 Received: from gsql.ggedos.sk (off-20.infotel.telecom.sk [212.5.213.20])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by hosting.gsystem.sk (Postfix) with ESMTPSA id 09CF57A06FE;
-        Tue,  7 Mar 2023 23:46:49 +0100 (CET)
+        by hosting.gsystem.sk (Postfix) with ESMTPSA id 957DF7A05DC;
+        Tue,  7 Mar 2023 23:46:48 +0100 (CET)
 From:   Ondrej Zary <linux@zary.sk>
 To:     Damien Le Moal <damien.lemoal@opensource.wdc.com>,
         Sudip Mukherjee <sudipm.mukherjee@gmail.com>
@@ -27,9 +27,9 @@ Cc:     Christoph Hellwig <hch@lst.de>,
         Jens Axboe <axboe@kernel.dk>, Tim Waugh <tim@cyberelk.net>,
         linux-block@vger.kernel.org, linux-parport@lists.infradead.org,
         linux-ide@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 11/32] parport_pc: add 16-bit and 8-bit fast EPP transfer flags
-Date:   Tue,  7 Mar 2023 23:46:06 +0100
-Message-Id: <20230307224627.28011-12-linux@zary.sk>
+Subject: [PATCH 07/32] pata_parport-bpck6: remove org_* from struct ppc_storage
+Date:   Tue,  7 Mar 2023 23:46:02 +0100
+Message-Id: <20230307224627.28011-8-linux@zary.sk>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20230307224627.28011-1-linux@zary.sk>
 References: <20230307224627.28011-1-linux@zary.sk>
@@ -39,71 +39,76 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-PARPORT_EPP_FAST flag currently uses 32-bit I/O port access for data
-read/write (insl/outsl).
-Add PARPORT_EPP_FAST_16 and PARPORT_EPP_FAST_8 that use insw/outsw
-and insb/outsb (and PARPORT_EPP_FAST_32 as alias for PARPORT_EPP_FAST).
+org_data duplicates saved_r0 and org_ctrl duplicates saved_r2 in
+pi->unit. Remove them.
 
 Signed-off-by: Ondrej Zary <linux@zary.sk>
 ---
- drivers/parport/parport_pc.c | 20 ++++++++++++++++----
- include/uapi/linux/parport.h |  3 +++
- 2 files changed, 19 insertions(+), 4 deletions(-)
+ drivers/ata/pata_parport/ppc6lnx.c | 20 +++++++++-----------
+ 1 file changed, 9 insertions(+), 11 deletions(-)
 
-diff --git a/drivers/parport/parport_pc.c b/drivers/parport/parport_pc.c
-index 5784dc20fb38..eda4e4e6d4e8 100644
---- a/drivers/parport/parport_pc.c
-+++ b/drivers/parport/parport_pc.c
-@@ -298,9 +298,15 @@ static size_t parport_pc_epp_read_data(struct parport *port, void *buf,
+diff --git a/drivers/ata/pata_parport/ppc6lnx.c b/drivers/ata/pata_parport/ppc6lnx.c
+index dd9f3040f9a7..7ea8e8a31aeb 100644
+--- a/drivers/ata/pata_parport/ppc6lnx.c
++++ b/drivers/ata/pata_parport/ppc6lnx.c
+@@ -74,8 +74,6 @@ struct ppc_storage {
+ 					// 5 = EPP Word
+ 					// 6 = EPP Dword
+ 	u8	ppc_flags;
+-	u8	org_data;				// original LPT data port contents
+-	u8	org_ctrl;				// original LPT control port contents
+ 	u8	cur_ctrl;				// current control port contents
+ };
+ 
+@@ -127,17 +125,17 @@ static int ppc6_select(struct pi_adapter *pi)
+ 	if (i & 1)
+ 		outb(i, pi->port + 1);
+ 
+-	ppc->org_data = inb(pi->port);
++	pi->saved_r0 = inb(pi->port);
+ 
+-	ppc->org_ctrl = inb(pi->port + 2) & 0x5F; // readback ctrl
++	pi->saved_r2 = inb(pi->port + 2) & 0x5F; // readback ctrl
+ 
+-	ppc->cur_ctrl = ppc->org_ctrl;
++	ppc->cur_ctrl = pi->saved_r2;
+ 
+ 	ppc->cur_ctrl |= port_sel;
+ 
+ 	outb(ppc->cur_ctrl, pi->port + 2);
+ 
+-	if (ppc->org_data == 'b')
++	if (pi->saved_r0 == 'b')
+ 		outb('x', pi->port);
+ 
+ 	outb('b', pi->port);
+@@ -195,9 +193,9 @@ static int ppc6_select(struct pi_adapter *pi)
  		}
- 		return got;
  	}
--	if ((flags & PARPORT_EPP_FAST) && (length > 1)) {
--		if (!(((long)buf | length) & 0x03))
-+	if ((length > 1) && ((flags & PARPORT_EPP_FAST_32)
-+			   || flags & PARPORT_EPP_FAST_16
-+			   || flags & PARPORT_EPP_FAST_8)) {
-+		if ((flags & PARPORT_EPP_FAST_32)
-+		    && !(((long)buf | length) & 0x03))
- 			insl(EPPDATA(port), buf, (length >> 2));
-+		else if ((flags & PARPORT_EPP_FAST_16)
-+			 && !(((long)buf | length) & 0x01))
-+			insw(EPPDATA(port), buf, length >> 1);
- 		else
- 			insb(EPPDATA(port), buf, length);
- 		if (inb(STATUS(port)) & 0x01) {
-@@ -327,9 +333,15 @@ static size_t parport_pc_epp_write_data(struct parport *port, const void *buf,
- {
- 	size_t written = 0;
  
--	if ((flags & PARPORT_EPP_FAST) && (length > 1)) {
--		if (!(((long)buf | length) & 0x03))
-+	if ((length > 1) && ((flags & PARPORT_EPP_FAST_32)
-+			   || flags & PARPORT_EPP_FAST_16
-+			   || flags & PARPORT_EPP_FAST_8)) {
-+		if ((flags & PARPORT_EPP_FAST_32)
-+		    && !(((long)buf | length) & 0x03))
- 			outsl(EPPDATA(port), buf, (length >> 2));
-+		else if ((flags & PARPORT_EPP_FAST_16)
-+			 && !(((long)buf | length) & 0x01))
-+			outsw(EPPDATA(port), buf, length >> 1);
- 		else
- 			outsb(EPPDATA(port), buf, length);
- 		if (inb(STATUS(port)) & 0x01) {
-diff --git a/include/uapi/linux/parport.h b/include/uapi/linux/parport.h
-index f41388f88dc3..fe93e41fc205 100644
---- a/include/uapi/linux/parport.h
-+++ b/include/uapi/linux/parport.h
-@@ -90,6 +90,9 @@ typedef enum {
- /* Flags for block transfer operations. */
- #define PARPORT_EPP_FAST		(1<<0) /* Unreliable counts. */
- #define PARPORT_W91284PIC		(1<<1) /* have a Warp9 w91284pic in the device */
-+#define PARPORT_EPP_FAST_32		PARPORT_EPP_FAST /* 32-bit EPP transfers */
-+#define PARPORT_EPP_FAST_16		(1<<2) /* 16-bit EPP transfers */
-+#define PARPORT_EPP_FAST_8		(1<<3) /* 8-bit EPP transfers */
+-	outb(ppc->org_ctrl, pi->port + 2);
++	outb(pi->saved_r2, pi->port + 2);
  
- /* The rest is for the kernel only */
- #endif /* _UAPI_PARPORT_H_ */
+-	outb(ppc->org_data, pi->port);
++	outb(pi->saved_r0, pi->port);
+ 
+ 	return(0); // FAIL
+ }
+@@ -214,11 +212,11 @@ static void ppc6_deselect(struct pi_adapter *pi)
+ 
+ 	outb(ppc->cur_ctrl, pi->port + 2);
+ 
+-	outb(ppc->org_data, pi->port);
++	outb(pi->saved_r0, pi->port);
+ 
+-	outb((ppc->org_ctrl | port_sel), pi->port + 2);
++	outb((pi->saved_r2 | port_sel), pi->port + 2);
+ 
+-	outb(ppc->org_ctrl, pi->port + 2);
++	outb(pi->saved_r2, pi->port + 2);
+ }
+ 
+ //***************************************************************************
 -- 
 Ondrej Zary
 
