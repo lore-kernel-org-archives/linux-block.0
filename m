@@ -2,22 +2,22 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58F02C742A7
-	for <linux-block@archiver.kernel.org>; Tue,  7 Mar 2023 22:48:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FC21C6FA99
+	for <linux-block@archiver.kernel.org>; Tue,  7 Mar 2023 22:48:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231820AbjCGWsH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 7 Mar 2023 17:48:07 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33438 "EHLO
+        id S231575AbjCGWsG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 7 Mar 2023 17:48:06 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33422 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231555AbjCGWrV (ORCPT
+        with ESMTP id S231546AbjCGWrV (ORCPT
         <rfc822;linux-block@vger.kernel.org>); Tue, 7 Mar 2023 17:47:21 -0500
 Received: from hosting.gsystem.sk (hosting.gsystem.sk [212.5.213.30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 8426B9CBE4;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id E73FC9DE1A;
         Tue,  7 Mar 2023 14:47:07 -0800 (PST)
 Received: from gsql.ggedos.sk (off-20.infotel.telecom.sk [212.5.213.20])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by hosting.gsystem.sk (Postfix) with ESMTPSA id F351D7A0742;
+        by hosting.gsystem.sk (Postfix) with ESMTPSA id E109A7A0741;
         Tue,  7 Mar 2023 23:46:49 +0100 (CET)
 From:   Ondrej Zary <linux@zary.sk>
 To:     Damien Le Moal <damien.lemoal@opensource.wdc.com>,
@@ -27,9 +27,9 @@ Cc:     Christoph Hellwig <hch@lst.de>,
         Jens Axboe <axboe@kernel.dk>, Tim Waugh <tim@cyberelk.net>,
         linux-block@vger.kernel.org, linux-parport@lists.infradead.org,
         linux-ide@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 20/32] pata_parport-bpck6: merge ppc6_rd_data_blk into bpck6_read_block
-Date:   Tue,  7 Mar 2023 23:46:15 +0100
-Message-Id: <20230307224627.28011-21-linux@zary.sk>
+Subject: [PATCH 19/32] pata_parport-bpck6: merge ppc6_wr_port16_blk into bpck6_write_block
+Date:   Tue,  7 Mar 2023 23:46:14 +0100
+Message-Id: <20230307224627.28011-20-linux@zary.sk>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20230307224627.28011-1-linux@zary.sk>
 References: <20230307224627.28011-1-linux@zary.sk>
@@ -39,184 +39,75 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-ppc6_rd_data_blk is only called by bpck6_read_block. Merge
-ppc6_rd_data_blk into bpck6_read_block.
+ppc6_wr_port16_blk is only called by bpck6_write_block. Merge
+ppc6_wr_port16_blk into bpck6_write_block.
 
 Signed-off-by: Ondrej Zary <linux@zary.sk>
 ---
- drivers/ata/pata_parport/bpck6.c   | 49 +++++++++++++++-
- drivers/ata/pata_parport/ppc6lnx.c | 91 ------------------------------
- 2 files changed, 48 insertions(+), 92 deletions(-)
+ drivers/ata/pata_parport/bpck6.c   | 10 +++++++++-
+ drivers/ata/pata_parport/ppc6lnx.c | 21 ---------------------
+ 2 files changed, 9 insertions(+), 22 deletions(-)
 
 diff --git a/drivers/ata/pata_parport/bpck6.c b/drivers/ata/pata_parport/bpck6.c
-index 1c04fcaba74a..d379603424ff 100644
+index aaf6737891a5..1c04fcaba74a 100644
 --- a/drivers/ata/pata_parport/bpck6.c
 +++ b/drivers/ata/pata_parport/bpck6.c
-@@ -57,7 +57,54 @@ static void bpck6_read_block(struct pi_adapter *pi, char *buf, int len)
+@@ -37,7 +37,15 @@ static void bpck6_write_regr(struct pi_adapter *pi, int cont, int reg, int val)
  
- 	ppc6_send_cmd(pi, CMD_PREFIX_SET | PREFIX_IO16 | PREFIX_BLK);
- 	ppc6_send_cmd(pi, ATA_REG_DATA | ACCESS_PORT | ACCESS_READ);
--	ppc6_rd_data_blk(pi, buf, len);
+ static void bpck6_write_block(struct pi_adapter *pi, char *buf, int len)
+ {
+-	ppc6_wr_port16_blk(pi, ATA_REG_DATA, buf, (u32)len>>1);
++	ppc6_send_cmd(pi, REG_BLKSIZE | ACCESS_REG | ACCESS_WRITE);
++	ppc6_wr_data_byte(pi, (u8)len);
++	ppc6_wr_data_byte(pi, (u8)(len >> 8));
++	ppc6_wr_data_byte(pi, 0);
 +
-+	switch (mode_map[pi->mode]) {
-+	case PPCMODE_UNI_SW:
-+	case PPCMODE_UNI_FW:
-+		while (len) {
-+			u8 d;
-+
-+			parport_frob_control(pi->pardev->port,
-+					PARPORT_CONTROL_STROBE,
-+					PARPORT_CONTROL_INIT); /* DATA STROBE */
-+			d = parport_read_status(pi->pardev->port);
-+			d = ((d & 0x80) >> 1) | ((d & 0x38) >> 3);
-+			parport_frob_control(pi->pardev->port,
-+					PARPORT_CONTROL_STROBE,
-+					PARPORT_CONTROL_STROBE);
-+			d |= parport_read_status(pi->pardev->port) & 0xB8;
-+			*buf++ = d;
-+			len--;
-+		}
-+		break;
-+	case PPCMODE_BI_SW:
-+	case PPCMODE_BI_FW:
-+		parport_data_reverse(pi->pardev->port);
-+		while (len) {
-+			parport_frob_control(pi->pardev->port,
-+				PARPORT_CONTROL_STROBE,
-+				PARPORT_CONTROL_STROBE | PARPORT_CONTROL_INIT);
-+			*buf++ = parport_read_data(pi->pardev->port);
-+			len--;
-+		}
-+		parport_frob_control(pi->pardev->port, PARPORT_CONTROL_STROBE,
-+					0);
-+		parport_data_forward(pi->pardev->port);
-+		break;
-+	case PPCMODE_EPP_BYTE:
-+		pi->pardev->port->ops->epp_read_data(pi->pardev->port, buf, len,
-+						PARPORT_EPP_FAST_8);
-+		break;
-+	case PPCMODE_EPP_WORD:
-+		pi->pardev->port->ops->epp_read_data(pi->pardev->port, buf, len,
-+						PARPORT_EPP_FAST_16);
-+		break;
-+	case PPCMODE_EPP_DWORD:
-+		pi->pardev->port->ops->epp_read_data(pi->pardev->port, buf, len,
-+						PARPORT_EPP_FAST_32);
-+		break;
-+	}
-+
- 	ppc6_send_cmd(pi, CMD_PREFIX_RESET | PREFIX_IO16 | PREFIX_BLK);
++	ppc6_send_cmd(pi, CMD_PREFIX_SET | PREFIX_IO16 | PREFIX_BLK);
++	ppc6_send_cmd(pi, ATA_REG_DATA | ACCESS_PORT | ACCESS_WRITE);
++	ppc6_wr_data_blk(pi, buf, len);
++	ppc6_send_cmd(pi, CMD_PREFIX_RESET | PREFIX_IO16 | PREFIX_BLK);
  }
  
+ static void bpck6_read_block(struct pi_adapter *pi, char *buf, int len)
 diff --git a/drivers/ata/pata_parport/ppc6lnx.c b/drivers/ata/pata_parport/ppc6lnx.c
-index d275de3f1ead..679261e19ac5 100644
+index ac336ce1695b..d275de3f1ead 100644
 --- a/drivers/ata/pata_parport/ppc6lnx.c
 +++ b/drivers/ata/pata_parport/ppc6lnx.c
-@@ -72,7 +72,6 @@ static void ppc6_deselect(struct pi_adapter *pi);
- static void ppc6_send_cmd(struct pi_adapter *pi, u8 cmd);
- static void ppc6_wr_data_byte(struct pi_adapter *pi, u8 data);
- static u8 ppc6_rd_data_byte(struct pi_adapter *pi);
--static void ppc6_rd_data_blk(struct pi_adapter *pi, u8 *data, long count);
+@@ -75,7 +75,6 @@ static u8 ppc6_rd_data_byte(struct pi_adapter *pi);
+ static void ppc6_rd_data_blk(struct pi_adapter *pi, u8 *data, long count);
  static void ppc6_wait_for_fifo(struct pi_adapter *pi);
  static void ppc6_wr_data_blk(struct pi_adapter *pi, u8 *data, long count);
+-static void ppc6_wr_port16_blk(struct pi_adapter *pi, u8 port, u8 *data, long length);
  static void ppc6_wr_extout(struct pi_adapter *pi, u8 regdata);
-@@ -284,96 +283,6 @@ static u8 ppc6_rd_data_byte(struct pi_adapter *pi)
+ static int ppc6_open(struct pi_adapter *pi);
+ 
+@@ -478,26 +477,6 @@ static void ppc6_wr_data_blk(struct pi_adapter *pi, u8 *data, long count)
  
  //***************************************************************************
  
--static void ppc6_rd_data_blk(struct pi_adapter *pi, u8 *data, long count)
+-static void ppc6_wr_port16_blk(struct pi_adapter *pi, u8 port, u8 *data, long length)
 -{
--	switch (mode_map[pi->mode])
--	{
--		case PPCMODE_UNI_SW :
--		case PPCMODE_UNI_FW :
--		{
--			while(count)
--			{
--				u8 d;
+-	length = length << 1;
 -
--				parport_frob_control(pi->pardev->port,
--					PARPORT_CONTROL_STROBE, PARPORT_CONTROL_INIT);
+-	ppc6_send_cmd(pi, REG_BLKSIZE | ACCESS_REG | ACCESS_WRITE);
+-	ppc6_wr_data_byte(pi, (u8)length);
+-	ppc6_wr_data_byte(pi, (u8)(length >> 8));
+-	ppc6_wr_data_byte(pi, 0);
 -
--				// DELAY
+-	ppc6_send_cmd(pi, CMD_PREFIX_SET | PREFIX_IO16 | PREFIX_BLK);
 -
--				d = parport_read_status(pi->pardev->port);
+-	ppc6_send_cmd(pi, port | ACCESS_PORT | ACCESS_WRITE);
 -
--				d = ((d & 0x80) >> 1) | ((d & 0x38) >> 3);
+-	ppc6_wr_data_blk(pi, data, length);
 -
--				parport_frob_control(pi->pardev->port,
--					PARPORT_CONTROL_STROBE, PARPORT_CONTROL_STROBE);
--
--				// DELAY
--
--				d |= parport_read_status(pi->pardev->port) & 0xB8;
--
--				*data++ = d;
--				count--;
--			}
--
--			break;
--		}
--
--		case PPCMODE_BI_SW :
--		case PPCMODE_BI_FW :
--		{
--			parport_data_reverse(pi->pardev->port);
--
--			while(count)
--			{
--				parport_frob_control(pi->pardev->port, PARPORT_CONTROL_STROBE,
--					PARPORT_CONTROL_STROBE | PARPORT_CONTROL_INIT);
--
--				*data++ = parport_read_data(pi->pardev->port);
--				count--;
--			}
--
--			parport_frob_control(pi->pardev->port, PARPORT_CONTROL_STROBE, 0);
--
--			parport_data_forward(pi->pardev->port);
--
--			break;
--		}
--
--		case PPCMODE_EPP_BYTE :
--		{
--			// DELAY
--
--			pi->pardev->port->ops->epp_read_data(pi->pardev->port,
--					data, count, PARPORT_EPP_FAST_8);
--
--			break;
--		}
--
--		case PPCMODE_EPP_WORD :
--		{
--			// DELAY
--
--			pi->pardev->port->ops->epp_read_data(pi->pardev->port,
--					data, count, PARPORT_EPP_FAST_16);
--
--			break;
--		}
--
--		case PPCMODE_EPP_DWORD :
--		{
--			// DELAY
--
--			pi->pardev->port->ops->epp_read_data(pi->pardev->port,
--					data, count, PARPORT_EPP_FAST_32);
--
--			break;
--		}
--	}
--
+-	ppc6_send_cmd(pi, CMD_PREFIX_RESET | PREFIX_IO16 | PREFIX_BLK);
 -}
 -
 -//***************************************************************************
 -
- static void ppc6_wait_for_fifo(struct pi_adapter *pi)
+ static void ppc6_wr_extout(struct pi_adapter *pi, u8 regdata)
  {
- 	int i;
+ 	ppc6_send_cmd(pi, REG_VERSION | ACCESS_REG | ACCESS_WRITE);
 -- 
 Ondrej Zary
 
