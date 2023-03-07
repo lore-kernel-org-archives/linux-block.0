@@ -2,41 +2,41 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E8E4C678D5
-	for <linux-block@archiver.kernel.org>; Tue,  7 Mar 2023 14:23:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2907DC6FD1A
+	for <linux-block@archiver.kernel.org>; Tue,  7 Mar 2023 14:25:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231129AbjCGOXt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 7 Mar 2023 09:23:49 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43252 "EHLO
+        id S230440AbjCGOZo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 7 Mar 2023 09:25:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49882 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231436AbjCGOXT (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 7 Mar 2023 09:23:19 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA3929EF5
-        for <linux-block@vger.kernel.org>; Tue,  7 Mar 2023 06:17:55 -0800 (PST)
+        with ESMTP id S230310AbjCGOZY (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 7 Mar 2023 09:25:24 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E739B9078A
+        for <linux-block@vger.kernel.org>; Tue,  7 Mar 2023 06:20:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1678198590;
+        s=mimecast20190719; t=1678198752;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=n3W1bhWob2cqsJzOEtepU6FLEJePtTlcXD6B2i+jL6E=;
-        b=AnRWT8Y+aI9vksgR7u1U2Sb++E/cr6u9WcNra5wj4H3almvmr/jSZjraB4AaAzOufUUhL7
-        rcsw41SKn7XoONn8LtJ53dtiixNu9S5JDS3YOyxUfBG3auboISY2ZLnCRYJX47a/lbfXCM
-        5kgkfTZMcNB6sAOC7pLpHKiy2LMPOrI=
+        bh=P26ujjVK6+cVEWytyY3vOQfQzYjDdlY3n3B9f9x4iO4=;
+        b=dv5XSVnyQbUgZ9myS8WMc6miQgM47yVOmrDx1+DTJOuS5bQkoniMe0Szu6IhrX4X+5sZIu
+        E5nicQN6m15T9boNSGOYBTfwAoTD5TKP9BAN/xiEdnnpFkThuWC7xRiaJu50KFbCMcvpCq
+        FspVH0GTLfW+QpKLEpIIhfX1CZaoSV4=
 Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
  [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-504-QbMbx1ypNWernilKofLC1g-1; Tue, 07 Mar 2023 09:16:26 -0500
-X-MC-Unique: QbMbx1ypNWernilKofLC1g-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
+ us-mta-9-RbvNbJXBMpOmXH05u58B6Q-1; Tue, 07 Mar 2023 09:15:58 -0500
+X-MC-Unique: RbvNbJXBMpOmXH05u58B6Q-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 9E06A3C0E450;
-        Tue,  7 Mar 2023 14:16:25 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 570351C06EC0;
+        Tue,  7 Mar 2023 14:15:58 +0000 (UTC)
 Received: from localhost (ovpn-8-16.pek2.redhat.com [10.72.8.16])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id DB236140EBF4;
-        Tue,  7 Mar 2023 14:16:24 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 8DB332026D4B;
+        Tue,  7 Mar 2023 14:15:57 +0000 (UTC)
 From:   Ming Lei <ming.lei@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org
 Cc:     linux-block@vger.kernel.org, Miklos Szeredi <mszeredi@redhat.com>,
@@ -44,88 +44,54 @@ Cc:     linux-block@vger.kernel.org, Miklos Szeredi <mszeredi@redhat.com>,
         Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>,
         Bernd Schubert <bschubert@ddn.com>,
         Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V2 14/17] block: ublk_drv: support to copy any part of request pages
-Date:   Tue,  7 Mar 2023 22:15:17 +0800
-Message-Id: <20230307141520.793891-15-ming.lei@redhat.com>
+Subject: [PATCH V2 06/17] block: ublk_drv: mark device as LIVE before adding disk
+Date:   Tue,  7 Mar 2023 22:15:09 +0800
+Message-Id: <20230307141520.793891-7-ming.lei@redhat.com>
 In-Reply-To: <20230307141520.793891-1-ming.lei@redhat.com>
 References: <20230307141520.793891-1-ming.lei@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.7
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Add 'offset' to 'struct ublk_map_data', so that ublk_copy_user_pages()
-can be used to copy any sub-buffer(linear mapped) of the request.
+IO can be started before add_disk() returns, such as reading parititon table,
+then the monitor work should work for making forward progress.
 
+So mark device as LIVE before adding disk, meantime change to
+DEAD if add_disk() fails.
+
+Reviewed-by: Ziyang Zhang <ZiyangZhang@linux.alibaba.com>
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/block/ublk_drv.c | 26 ++++++++++++++++++++++----
- 1 file changed, 22 insertions(+), 4 deletions(-)
+ drivers/block/ublk_drv.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-index ba252932951c..c0cb99cb0c3c 100644
+index 088d9efffe6b..2778c14a8407 100644
 --- a/drivers/block/ublk_drv.c
 +++ b/drivers/block/ublk_drv.c
-@@ -511,19 +511,37 @@ static void ublk_copy_io_pages(struct ublk_io_iter *data,
+@@ -1605,17 +1605,18 @@ static int ublk_ctrl_start_dev(struct ublk_device *ub, struct io_uring_cmd *cmd)
+ 		set_bit(GD_SUPPRESS_PART_SCAN, &disk->state);
+ 
+ 	get_device(&ub->cdev_dev);
++	ub->dev_info.state = UBLK_S_DEV_LIVE;
+ 	ret = add_disk(disk);
+ 	if (ret) {
+ 		/*
+ 		 * Has to drop the reference since ->free_disk won't be
+ 		 * called in case of add_disk failure.
+ 		 */
++		ub->dev_info.state = UBLK_S_DEV_DEAD;
+ 		ublk_put_device(ub);
+ 		goto out_put_disk;
  	}
- }
- 
-+static bool ublk_advance_io_iter(struct ublk_io_iter *iter, unsigned int offset)
-+{
-+	struct bio *bio = iter->bio;
-+
-+	for_each_bio(bio) {
-+		if (bio->bi_iter.bi_size > offset) {
-+			iter->bio = bio;
-+			iter->iter = bio->bi_iter;
-+			bio_advance_iter(iter->bio, &iter->iter, offset);
-+			return true;
-+		}
-+		offset -= bio->bi_iter.bi_size;
-+	}
-+	return false;
-+}
-+
- /*
-  * Copy data between request pages and io_iter, and 'offset'
-  * is the start point of linear offset of request.
-  */
- static size_t ublk_copy_user_pages(const struct request *req,
--		struct iov_iter *uiter, int dir)
-+		unsigned offset, struct iov_iter *uiter, int dir)
- {
- 	struct ublk_io_iter iter = {
- 		.bio	= req->bio,
--		.iter	= req->bio->bi_iter,
- 	};
- 	size_t done = 0;
- 
-+	if (!ublk_advance_io_iter(&iter, offset))
-+		return 0;
-+
- 	while (iov_iter_count(uiter) && iter.bio) {
- 		unsigned nr_pages;
- 		size_t len, off;
-@@ -576,7 +594,7 @@ static int ublk_map_io(const struct ublk_queue *ubq, const struct request *req,
- 		import_single_range(dir, (void __user *)io->addr,
- 				rq_bytes, &iov, &iter);
- 
--		return ublk_copy_user_pages(req, &iter, dir);
-+		return ublk_copy_user_pages(req, 0, &iter, dir);
- 	}
- 	return rq_bytes;
- }
-@@ -596,7 +614,7 @@ static int ublk_unmap_io(const struct ublk_queue *ubq,
- 
- 		import_single_range(dir, (void __user *)io->addr,
- 				io->res, &iov, &iter);
--		return ublk_copy_user_pages(req, &iter, dir);
-+		return ublk_copy_user_pages(req, 0, &iter, dir);
- 	}
- 	return rq_bytes;
- }
+ 	set_bit(UB_STATE_USED, &ub->state);
+-	ub->dev_info.state = UBLK_S_DEV_LIVE;
+ out_put_disk:
+ 	if (ret)
+ 		put_disk(disk);
 -- 
 2.39.2
 
