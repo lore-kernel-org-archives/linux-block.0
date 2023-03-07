@@ -2,164 +2,186 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A9E84C6FD1A
-	for <linux-block@archiver.kernel.org>; Tue,  7 Mar 2023 15:20:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DF9DDC678D4
+	for <linux-block@archiver.kernel.org>; Tue,  7 Mar 2023 15:39:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230027AbjCGPUH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 7 Mar 2023 10:20:07 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34038 "EHLO
+        id S229648AbjCGPjO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 7 Mar 2023 10:39:14 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43616 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230240AbjCGPTk (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 7 Mar 2023 10:19:40 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3155A3C16
-        for <linux-block@vger.kernel.org>; Tue,  7 Mar 2023 07:16:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1678202206;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=99qSzzKU2KdFXld+Lq6WBJNO5mX1Yf91cqdsuF+XSsA=;
-        b=XfulSSHIGc5cx8OldLpmbZGJ8DInjLWsVgdftpRJJXqC0Lh2RWDGVRxUsD8DZyxV+LPt4s
-        xHekElMJXtx8l9FswMFnbxjCDenj4pOzN2IXaOim2RGA9iZBHdQD76RoYKc5u8qFAXJuDJ
-        c41ih5eeDYx7zutxycHDOVmhUmaq5dw=
-Received: from mail-pf1-f199.google.com (mail-pf1-f199.google.com
- [209.85.210.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-663-PVLoRONjPDKO1KdR8KPysg-1; Tue, 07 Mar 2023 10:16:36 -0500
-X-MC-Unique: PVLoRONjPDKO1KdR8KPysg-1
-Received: by mail-pf1-f199.google.com with SMTP id i7-20020a626d07000000b005d29737db06so7388392pfc.15
-        for <linux-block@vger.kernel.org>; Tue, 07 Mar 2023 07:16:26 -0800 (PST)
+        with ESMTP id S229486AbjCGPjN (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 7 Mar 2023 10:39:13 -0500
+Received: from mail-ed1-x529.google.com (mail-ed1-x529.google.com [IPv6:2a00:1450:4864:20::529])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 298426A61;
+        Tue,  7 Mar 2023 07:38:28 -0800 (PST)
+Received: by mail-ed1-x529.google.com with SMTP id s11so53920143edy.8;
+        Tue, 07 Mar 2023 07:38:28 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112; t=1678203500;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=tFbwCEdKuqYepuAAhuwT0WTQVbDTWUfJ9hO2iOl1AaE=;
+        b=gW/ebMhW6w70Qahj+bae0bYJ+mKqZR/6SWy1gHZ0St3OCNhgo8KGeazlDfBbcMCqy8
+         b7AyZXOkN93ILjw1ryZsgqAPu5hM82woEn7rOENcNrnzdPv1nYgn0WuJKrIhCaYP5UTg
+         T6HUt4Dg6ZApIfYSWa8ibjPCvAeAsVjZnVpxZGnT4n0xlzaUe4batZoVHqwf5XdBo/6u
+         OuGf83MP6khCq/lN3mAAo47WvwBz+1uebWN2zAFcumcONesN7YzcWMmxks4i1uMZcMJL
+         C+6GENUxpzB7pE4Ah2FnAhPzBMwBivYg10fOq9n+Y/dcIaiwtEEi/fomlVfleqe5iiyk
+         A/nA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678202185;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=99qSzzKU2KdFXld+Lq6WBJNO5mX1Yf91cqdsuF+XSsA=;
-        b=yIGQ6LU/RnaYunLc5joY3LeV8Ya5lr/JNAu2tJ0Xt+GaMJZ/NKTVwFNxXPLpmHLm94
-         BzcRaJfDtA0Ovsr4Sxzu4qeBSfAV2ozAacI8+uxIF3yQoEce+oI7IMfaJzvLqOhlu5Y5
-         cE4vojgz9wSuKFWqKlc5B1v/SpnDSWB8c/FAL5ndAUBMmda6NLFwwjwmQnFTKOmtZpMc
-         g/F38sZwof/1X+5LZnHmJrynSgaElf91s1wLgGdPUqUEf4zaBx8rI04mq3wOmKxPH/DP
-         NLnGciat56+bRdyg0quqL3GCcecdudVo8/7zlqVlBvRYd0/bciM0qH8p1ZB0en1YZhbH
-         tK9A==
-X-Gm-Message-State: AO0yUKW2nzL8TzQFXxLMGQoSu0vnefnqJviYepR4FNSSmGwrEjVVCSFk
-        InCHb32O3zhv3bwiHkJQoYv0NzoYpEahxvOI4CSNvRcs8r8DyzUM6I1K/vzaYejzxiu5Ap5UMVn
-        o9/cFys082+BfKMcwOjhERxo=
-X-Received: by 2002:a05:6a20:8ba2:b0:bc:f0d2:e268 with SMTP id m34-20020a056a208ba200b000bcf0d2e268mr13657292pzh.29.1678202185558;
-        Tue, 07 Mar 2023 07:16:25 -0800 (PST)
-X-Google-Smtp-Source: AK7set8rScMeHoPkW1lRtZRzrsVYRuLkfQLlDEt+6ifGK29z6JHlPj7m4fmPdiB9OP5KE3rYS0a4ww==
-X-Received: by 2002:a05:6a20:8ba2:b0:bc:f0d2:e268 with SMTP id m34-20020a056a208ba200b000bcf0d2e268mr13657266pzh.29.1678202185180;
-        Tue, 07 Mar 2023 07:16:25 -0800 (PST)
-Received: from localhost.localdomain ([240d:1a:c0d:9f00:ca6:1aff:fead:cef4])
-        by smtp.gmail.com with ESMTPSA id k9-20020a6568c9000000b005038291e5cbsm904648pgt.35.2023.03.07.07.16.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 07 Mar 2023 07:16:24 -0800 (PST)
-From:   Shigeru Yoshida <syoshida@redhat.com>
-To:     josef@toxicpanda.com, axboe@kernel.dk
-Cc:     yukuai3@huawei.com, linux-block@vger.kernel.org,
-        nbd@other.debian.org, linux-kernel@vger.kernel.org,
-        Shigeru Yoshida <syoshida@redhat.com>,
-        syzbot+6229476844294775319e@syzkaller.appspotmail.com
-Subject: [PATCH] nbd: Fix hang when connection reset by peer
-Date:   Wed,  8 Mar 2023 00:15:28 +0900
-Message-Id: <20230307151528.2532986-1-syoshida@redhat.com>
-X-Mailer: git-send-email 2.39.0
+        d=1e100.net; s=20210112; t=1678203500;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=tFbwCEdKuqYepuAAhuwT0WTQVbDTWUfJ9hO2iOl1AaE=;
+        b=4jmyIBq6FUIWpNy6VGhW8uxOFSlL87XdlJFGPCPgv7HCgxqYapNOcv6YraXcQVFN3u
+         NtgRS1qUzY/1N+aIfdG3PiYLanRg3dyXlmPUpY2Zz+nL43PBF9cPJCiYlDWnbjoMYIux
+         qmXN+n2y0xzv1lKqsjuGs0hi7h8Q7mbWqrHar70kWcZHDUKdzt8pAGAY2czul1afsd9i
+         5LCBbG9DKVmDyrVmxWbycwwrom7AyUEC1ua/nOMbOF7qlq9J+LL7fO2mo7pYzCuJgpTt
+         qeN2HYDVPMkRAD8CXhC0j33fnNHlGgYnR13BDsqlqYxu7f3lO56v2e79oCiivjnz2TMb
+         a7Bg==
+X-Gm-Message-State: AO0yUKUHP4e4k/71xAbe27F4Nb7KsWcxISUCTU7zVknhwauSrTGnN9ai
+        v+Sm13dS4Kg7cDsL1Qg1qVw=
+X-Google-Smtp-Source: AK7set/VRlSHux3kb6r3+JPz9w6c9sVGRUF9mgQpBH+4GPUys8nT30YO+O5v5VG+oSsot3VFGYjWyw==
+X-Received: by 2002:a17:906:aadb:b0:905:a46b:a725 with SMTP id kt27-20020a170906aadb00b00905a46ba725mr17227816ejb.16.1678203500192;
+        Tue, 07 Mar 2023 07:38:20 -0800 (PST)
+Received: from ?IPV6:2620:10d:c096:310::26ef? ([2620:10d:c092:600::2:d2b4])
+        by smtp.gmail.com with ESMTPSA id hy26-20020a1709068a7a00b008d92897cc29sm6245615ejc.37.2023.03.07.07.38.19
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 07 Mar 2023 07:38:20 -0800 (PST)
+Message-ID: <7e05882f-9695-895d-5e83-61006e54c4b2@gmail.com>
+Date:   Tue, 7 Mar 2023 15:37:21 +0000
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.7.2
+Subject: Re: [PATCH V2 00/17] io_uring/ublk: add IORING_OP_FUSED_CMD
+Content-Language: en-US
+To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+        io-uring@vger.kernel.org
+Cc:     linux-block@vger.kernel.org, Miklos Szeredi <mszeredi@redhat.com>,
+        ZiyangZhang <ZiyangZhang@linux.alibaba.com>,
+        Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>,
+        Bernd Schubert <bschubert@ddn.com>
+References: <20230307141520.793891-1-ming.lei@redhat.com>
+From:   Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <20230307141520.793891-1-ming.lei@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-syzbot reported hang task [1].  The following program is a simplified
-version of the reproducer:
+On 3/7/23 14:15, Ming Lei wrote:
+> Hello,
+> 
+> Add IORING_OP_FUSED_CMD, it is one special URING_CMD, which has to
+> be SQE128. The 1st SQE(master) is one 64byte URING_CMD, and the 2nd
+> 64byte SQE(slave) is another normal 64byte OP. For any OP which needs
+> to support slave OP, io_issue_defs[op].fused_slave needs to be set as 1,
+> and its ->issue() can retrieve/import buffer from master request's
+> fused_cmd_kbuf. The slave OP is actually submitted from kernel, part of
+> this idea is from Xiaoguang's ublk ebpf patchset, but this patchset
+> submits slave OP just like normal OP issued from userspace, that said,
+> SQE order is kept, and batching handling is done too.
 
-static int fd;
+ From a quick look through patches it all looks a bit complicated
+and intrusive, all over generic hot paths. I think instead we
+should be able to use registered buffer table as intermediary and
+reuse splicing. Let me try it out
 
-static void *do_ioctl(void *arg)
-{
-	ioctl(fd, (int)arg);
-	return NULL;
-}
 
-int main(void)
-{
-	int sv[2];
-	pthread_t th[2];
+> Please see detailed design in commit log of the 3th patch, and one big
+> point is how to handle buffer ownership.
+> 
+> With this way, it is easy to support zero copy for ublk/fuse device.
+> 
+> Basically userspace can specify any sub-buffer of the ublk block request
+> buffer from the fused command just by setting 'offset/len'
+> in the slave SQE for running slave OP. This way is flexible to implement
+> io mapping: mirror, stripped, ...
+> 
+> The 4th & 5th patches enable fused slave support for the following OPs:
+> 
+> 	OP_READ/OP_WRITE
+> 	OP_SEND/OP_RECV/OP_SEND_ZC
+> 
+> The other ublk patches cleans ublk driver and implement fused command
+> for supporting zero copy.
+> 
+> Follows userspace code:
+> 
+> https://github.com/ming1/ubdsrv/tree/fused-cmd-zc-v2
+> 
+> All three(loop, nbd and qcow2) ublk targets have supported zero copy by passing:
+> 
+> 	ublk add -t [loop|nbd|qcow2] -z ....
+> 
+> Basic fs mount/kernel building and builtin test are done.
+> 
+> Also add liburing test case for covering fused command based on miniublk
+> of blktest:
+> 
+> https://github.com/ming1/liburing/commits/fused_cmd_miniublk
+> 
+> Performance improvement is obvious on memory bandwidth
+> related workloads, such as, 1~2X improvement on 64K/512K BS
+> IO test on loop with ramfs backing file.
+> 
+> Any comments are welcome!
+> 
+> V2:
+> 	- don't resue io_mapped_ubuf (io_uring)
+> 	- remove REQ_F_FUSED_MASTER_BIT (io_uring)
+> 	- fix compile warning (io_uring)
+> 	- rebase on v6.3-rc1 (io_uring)
+> 	- grabbing io request reference when handling fused command
+> 	- simplify ublk_copy_user_pages() by iov iterator
+> 	- add read()/write() for userspace to read/write ublk io buffer, so
+> 	that some corner cases(read zero, passthrough request(report zones)) can
+> 	be handled easily in case of zero copy; this way also helps to switch to
+> 	zero copy completely
+> 	- misc cleanup
+> 
+> Ming Lei (17):
+>    io_uring: add IO_URING_F_FUSED and prepare for supporting OP_FUSED_CMD
+>    io_uring: increase io_kiocb->flags into 64bit
+>    io_uring: add IORING_OP_FUSED_CMD
+>    io_uring: support OP_READ/OP_WRITE for fused slave request
+>    io_uring: support OP_SEND_ZC/OP_RECV for fused slave request
+>    block: ublk_drv: mark device as LIVE before adding disk
+>    block: ublk_drv: add common exit handling
+>    block: ublk_drv: don't consider flush request in map/unmap io
+>    block: ublk_drv: add two helpers to clean up map/unmap request
+>    block: ublk_drv: clean up several helpers
+>    block: ublk_drv: cleanup 'struct ublk_map_data'
+>    block: ublk_drv: cleanup ublk_copy_user_pages
+>    block: ublk_drv: grab request reference when the request is handled by
+>      userspace
+>    block: ublk_drv: support to copy any part of request pages
+>    block: ublk_drv: add read()/write() support for ublk char device
+>    block: ublk_drv: don't check buffer in case of zero copy
+>    block: ublk_drv: apply io_uring FUSED_CMD for supporting zero copy
+> 
+>   drivers/block/ublk_drv.c       | 605 ++++++++++++++++++++++++++-------
+>   drivers/char/mem.c             |   4 +
+>   drivers/nvme/host/ioctl.c      |   9 +
+>   include/linux/io_uring.h       |  49 ++-
+>   include/linux/io_uring_types.h |  18 +-
+>   include/uapi/linux/io_uring.h  |   1 +
+>   include/uapi/linux/ublk_cmd.h  |  37 +-
+>   io_uring/Makefile              |   2 +-
+>   io_uring/fused_cmd.c           | 232 +++++++++++++
+>   io_uring/fused_cmd.h           |  11 +
+>   io_uring/io_uring.c            |  22 +-
+>   io_uring/io_uring.h            |   3 +
+>   io_uring/net.c                 |  23 +-
+>   io_uring/opdef.c               |  17 +
+>   io_uring/opdef.h               |   2 +
+>   io_uring/rw.c                  |  20 ++
+>   16 files changed, 926 insertions(+), 129 deletions(-)
+>   create mode 100644 io_uring/fused_cmd.c
+>   create mode 100644 io_uring/fused_cmd.h
+> 
 
-	if ((fd = open("/dev/nbd0", 0)) < 0)
-		return 1;
-	if (socketpair(AF_UNIX, SOCK_STREAM, 0, sv) < 0)
-		return 1;
-	if (ioctl(fd, NBD_SET_SIZE_BLOCKS, 0x1) < 0)
-		return 1;
-	if (ioctl(fd, NBD_SET_SOCK, sv[0]) < 0)
-		return 1;
-	if (pthread_create(&th[0], NULL, do_ioctl, (void *)NBD_DO_IT) < 0)
-		return 1;
-	sleep(1);
-	if (pthread_create(&th[1], NULL, do_ioctl, (void *)BLKRRPART) < 0)
-		return 1;
-	sleep(1);
-	close(sv[1]);
-	sleep(1);
-	return 0;
-}
-
-When the connection reset by peer, nbd_read_reply() in recv_work()
-returns -EOCNNRESET and wakes up the task blocking in
-nbd_start_device_ioctl().  wait_event_interruptible() returns 0 in
-this case, so inflight IOs in the queue are not cleared.  This causes
-hang task.
-
-This patch introduces new runtime flag NBD_RT_CONNECTION_RESET to
-notify connection reset by peer.  nbd_start_device_ioctl() checks this
-and clears inflight IOs accordingly.
-
-Fixes: 3fe1db626a56 ("nbd: partition nbd_read_stat() into nbd_read_reply() and nbd_handle_reply()")
-Cc: Yu Kuai <yukuai3@huawei.com>
-Link: https://syzkaller.appspot.com/bug?id=f55039d9ac10967440ca01ff24c38ccfa597efe1 [1]
-Reported-by: syzbot+6229476844294775319e@syzkaller.appspotmail.com
-Signed-off-by: Shigeru Yoshida <syoshida@redhat.com>
----
- drivers/block/nbd.c | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index 592cfa8b765a..fe861a2b063b 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -83,6 +83,7 @@ struct link_dead_args {
- #define NBD_RT_BOUND			5
- #define NBD_RT_DISCONNECT_ON_CLOSE	6
- #define NBD_RT_HAS_BACKEND_FILE		7
-+#define NBD_RT_CONNECTION_RESET		8
- 
- #define NBD_DESTROY_ON_DISCONNECT	0
- #define NBD_DISCONNECT_REQUESTED	1
-@@ -833,9 +834,13 @@ static void recv_work(struct work_struct *work)
- 
- 	while (1) {
- 		struct nbd_reply reply;
-+		int err = nbd_read_reply(nbd, args->index, &reply);
- 
--		if (nbd_read_reply(nbd, args->index, &reply))
-+		if (err) {
-+			if (err == -ECONNRESET)
-+				set_bit(NBD_RT_CONNECTION_RESET, &config->runtime_flags);
- 			break;
-+		}
- 
- 		/*
- 		 * Grab .q_usage_counter so request pool won't go away, then no
-@@ -1412,7 +1417,7 @@ static int nbd_start_device_ioctl(struct nbd_device *nbd)
- 	mutex_unlock(&nbd->config_lock);
- 	ret = wait_event_interruptible(config->recv_wq,
- 					 atomic_read(&config->recv_threads) == 0);
--	if (ret) {
-+	if (ret || test_bit(NBD_RT_CONNECTION_RESET, &config->runtime_flags)) {
- 		sock_shutdown(nbd);
- 		nbd_clear_que(nbd);
- 	}
 -- 
-2.39.0
-
+Pavel Begunkov
