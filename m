@@ -2,147 +2,245 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CF598C61DA4
-	for <linux-block@archiver.kernel.org>; Tue,  7 Mar 2023 01:42:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B4D0CC6FA99
+	for <linux-block@archiver.kernel.org>; Tue,  7 Mar 2023 01:45:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229907AbjCGBma (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 6 Mar 2023 20:42:30 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40818 "EHLO
+        id S229815AbjCGBpQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 6 Mar 2023 20:45:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45594 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229753AbjCGBma (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 6 Mar 2023 20:42:30 -0500
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D97951715D;
-        Mon,  6 Mar 2023 17:42:27 -0800 (PST)
-Received: from mail02.huawei.com (unknown [172.30.67.169])
-        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4PVyqf4MqGz4f3jJ8;
-        Tue,  7 Mar 2023 09:42:22 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-        by APP3 (Coremail) with SMTP id _Ch0CgDn4R96lgZkw5PkEQ--.64992S3;
-        Tue, 07 Mar 2023 09:42:20 +0800 (CST)
-Subject: Re: [syzbot] [block?] WARNING in blkdev_put (2)
-To:     Julian Ruess <julianr@linux.ibm.com>,
-        Alexander Egorenkov <egorenar@linux.ibm.com>,
-        syzbot+2bcc0d79e548c4f62a59@syzkaller.appspotmail.com
-Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com,
-        jack@suse.cz, hch@lst.de, Niklas Schnelle <schnelle@linux.ibm.com>,
-        Gerd Bayer <gbayer@linux.ibm.com>,
-        "yukuai (C)" <yukuai3@huawei.com>
-References: <87lekfne28.fsf@oc8242746057.ibm.com>
- <f9649d501bc8c3444769418f6c26263555d9d3be.camel@linux.ibm.com>
-From:   Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <26079e08-857d-6216-0921-bdef369f3316@huaweicloud.com>
-Date:   Tue, 7 Mar 2023 09:42:18 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        with ESMTP id S229760AbjCGBpP (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 6 Mar 2023 20:45:15 -0500
+Received: from mout.gmx.net (mout.gmx.net [212.227.15.15])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 062406B5D6;
+        Mon,  6 Mar 2023 17:44:56 -0800 (PST)
+Received: from [0.0.0.0] ([149.28.201.231]) by mail.gmx.net (mrgmx004
+ [212.227.17.184]) with ESMTPSA (Nemesis) id 1MD9X9-1piT4B30oT-00968e; Tue, 07
+ Mar 2023 02:44:39 +0100
+Message-ID: <88b2fae1-8d95-2172-7bc4-c5dfc4ff7410@gmx.com>
+Date:   Tue, 7 Mar 2023 09:44:32 +0800
 MIME-Version: 1.0
-In-Reply-To: <f9649d501bc8c3444769418f6c26263555d9d3be.camel@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: _Ch0CgDn4R96lgZkw5PkEQ--.64992S3
-X-Coremail-Antispam: 1UD129KBjvJXoW7WFy3Aw48Wr4kWFy8AF1DKFg_yoW8uF4fpF
-        Z3JFs0gF4DCr1xCay0qF1xuayrtan7Gr13XF13Aryrua9rC3s5Kr929395WrWjqrZ3Gws8
-        Zr9rKryIqa4rA3DanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUvIb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
-        6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-        vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7Cj
-        xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
-        0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
-        6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
-        Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JM4IIrI8v6xkF7I0E8cxan2IY04v7Mxk0xIA0c2IE
-        e2xFo4CEbIxvr21l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxV
-        Aqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q
-        6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6x
-        kF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWrZr1j6s0DMIIF0xvEx4A2jsIE
-        14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf
-        9x07UWE__UUUUU=
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
-X-CFilter-Loop: Reflected
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.7.0
+To:     Christoph Hellwig <hch@lst.de>, Chris Mason <clm@fb.com>,
+        Josef Bacik <josef@toxicpanda.com>,
+        David Sterba <dsterba@suse.com>
+Cc:     Damien Le Moal <damien.lemoal@wdc.com>,
+        Naohiro Aota <naohiro.aota@wdc.com>,
+        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+        Qu Wenruo <wqu@suse.com>, Jens Axboe <axboe@kernel.dk>,
+        "Darrick J. Wong" <djwong@kernel.org>, linux-block@vger.kernel.org,
+        linux-btrfs@vger.kernel.org, linux-fsdevel@vger.kernel.org
+References: <20230121065031.1139353-1-hch@lst.de>
+ <20230121065031.1139353-4-hch@lst.de>
+Content-Language: en-US
+From:   Qu Wenruo <quwenruo.btrfs@gmx.com>
+Subject: Re: [PATCH 03/34] btrfs: add a btrfs_inode pointer to struct
+ btrfs_bio
+In-Reply-To: <20230121065031.1139353-4-hch@lst.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Provags-ID: V03:K1:vioWvPrhXEM3XZfjg5PaFSq00SI/M1W7AB3kl+1cskWnWDZBIQC
+ EDg5CgwFg9MKQYsC0+2jOYBB6Dn8s1IYkxsKkACjLsfZc2sWHlMNpl609DUU81mqqISd52L
+ BLSk5E79TQb8KrbWjBM9QsiDdKzsOtJ7BxqwE8A9Qh8skMO5rwxo90eUIBNDIjQKYQApBSv
+ KjeL1+VVhaCmt7axGRNrQ==
+UI-OutboundReport: notjunk:1;M01:P0:OkWFdUm8BZA=;Nv2cdgsRhKGkDG7cC6KUXc9rD7s
+ IiFM697sVtdHb9QhoO613FC/4T81MT1SAvKN6y5kNGxxcH07I/Kn33F3FVz221dyVXrVIbhdt
+ BFcDjr1vrfo2/02V5H69izKrT09Fi13mCqwEiLal7I7TT9HLT1iW2pZ5YUvrRRZHx4+EBeNU6
+ r5vHSvc84LbYEQ3PdG3a7ABrecHyORO/DDeckic9h4AcEZjtYWGomUlDPy49C/Oduy0C9LcXZ
+ pL8Rbci3wLnAHWEh0GXWyeHz1NEZRAXchqoakkKs6XMMQr8qDZiu6tBq7bDv3A8k+5E+oFYPb
+ KGx9/Jxrqihkx6JFqjKEHoBdycjsEh17EDFknrtn/F04bf3fJPNsJXD+3Oi0kyDwbZ44iihiC
+ tibAk7K7+uweFMRIbzpbHimUe4dN9rFJnYx7aVGQI/XFwzRhEr9AvtuvtgOiCUrTP2zeWMQk/
+ YtOuadt9TvNk8MoiRWtoFSdj8/Zr9a+I3SsENpBfMzx8KWcSNP+qH8ySDpHiwt+uA5P3MAeCe
+ 3zZ41BtJsvVm3WNeLqdiDykYcuf0V6EB8yxzam8mbMCaWd9GQP4NsXzwX0AHvhgaX75tRKWyr
+ SellT8JJS//PVNTr9t6vuk8I8oY70/9dBwzImPs1Kc//iVMn5JWPNvyoivONAqJfrbJMgnDWN
+ iqfyn2IOhJreJMU0TRHbRqLGqMVPK5Mqdsq+W2Ko7sov7D4sbqAncRMDmbKs4tSx2m6e/b2I+
+ vxbRwyEJv32/jwEAZM5ss/E9ZZFwkfRuMUCZd2FEXkTPDwg6qCZFBPB2C4UnyaoOKHo59DBYW
+ EEGh1qyFoRFmNZTFzX5TWsAUsdV1Jek/hWYCGYWiI+TwDC1pJErpYX2GD+cguo+hALdItwBWE
+ L9sNOuvrbT6WqOHlhY+T89bITvICQwbZ5MHMF0wY1dDWDsPo+nNwK/6jZh16AQrc13rJYSbgY
+ uEY0s1biWHtUePOvC2vXPBBszHA=
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
 
-在 2023/03/06 23:00, Julian Ruess 写道:
-> On Thu, 2023-03-02 at 20:33 +0100, Alexander Egorenkov wrote:
->>
->> Hi,
->>
->> we are seeing a similar problem on s390x architecture when
->> partitioning
->> a NVMe disk on linux-next.
->>
->>
->>    [   70.403015]  nvme0n1: p1
->>    [   70.403197] ------------[ cut here ]------------
->>    [   70.403199] WARNING: CPU: 8 PID: 2452 at block/bdev.c:845
->> blkdev_put+0x280/0x298
-> 
-> ...
-> 
->> The problem appeared about a week ago.
->>
->> Regards
->> Alex
-> 
-> Hi all,
-> 
-> I bisected this to:
-> 
-> commit e5cfefa97bccf956ea0bb6464c1f6c84fd7a8d9f
-> Author: Yu Kuai <yukuai3@huawei.com>
-> Date:   Fri Feb 17 10:22:00 2023 +0800
->                                                                                        
->      block: fix scan partition for exclusively open device again
 
-Yes, thanks for the report, I figure out that I made a mistake here.
+On 2023/1/21 14:50, Christoph Hellwig wrote:
+> All btrfs_bio I/Os are associated with an inode.  Add a pointer to that
+> inode, which will allow to simplify a lot of calling conventions, and
+> which will be needed in the I/O completion path in the future.
+> 
+> This grow the btrfs_bio struture by a pointer, but that grows will
+> be offset by the removal of the device pointer soon.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-Following patch should fix this problem:
+With my recent restart on scrub rework, this patch makes me wonder, what 
+if scrub wants to use btrfs_bio, but don't want to pass a valid 
+btrfs_inode pointer?
 
-diff --git a/block/genhd.c b/block/genhd.c
-index 3ee5577e1586..02d9cfb9e077 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -385,7 +385,7 @@ int disk_scan_partitions(struct gendisk *disk, 
-fmode_t mode)
-         if (IS_ERR(bdev))
-                 ret =  PTR_ERR(bdev);
-         else
--               blkdev_put(bdev, mode);
-+               blkdev_put(bdev, mode & ~FMODE_EXCL);
+E.g. scrub code just wants to read certain mirror of a logical bytenr.
+This can simplify the handling of RAID56, as for data stripes the repair 
+path is the same, just try the next mirror(s).
+
+Furthermore most of the new btrfs_bio code is handling data reads by 
+triggering read-repair automatically.
+This can be unnecessary for scrub.
+
+For now, I can workaround the behavior by setting REQ_META and pass
+btree_inode as the inode, but this is only a workaround.
+This can be problematic especially if we want to merge metadata and data 
+verification behavior.
+
+Any better ideas on this?
+
+
+And since we're here, can we also have btrfs equivalent of on-stack bio?
+As scrub can benefit a lot from that, as for sector-by-sector read, we 
+want to avoid repeating allocating/freeing a btrfs_bio just for reading 
+one sector.
+(The existing behavior is using on-stack bio with bio_init/bio_uninit 
+inside scrub_recheck_block())
 
 Thanks,
-Kuai
->                                                                                        
->      As explained in commit 36369f46e917 ("block: Do not reread
-> partition table
->      on exclusively open device"), reread partition on the device that
-> is
->      exclusively opened by someone else is problematic.
->                                                                                        
->      This patch will make sure partition scan will only be proceed if
-> current
->      thread open the device exclusively, or the device is not opened
->      exclusively, and in the later case, other scanners and exclusive
-> openers
->      will be blocked temporarily until partition scan is done.
->                                                                                        
->      Fixes: 10c70d95c0f2 ("block: remove the bd_openers checks in
-> blk_drop_partitions")
->      Cc: <stable@vger.kernel.org>
->      Suggested-by: Jan Kara <jack@suse.cz>
->      Signed-off-by: Yu Kuai <yukuai3@huawei.com>
->      Reviewed-by: Christoph Hellwig <hch@lst.de>
->      Link:
-> https://lore.kernel.org/r/20230217022200.3092987-3-yukuai1@huaweicloud.com
+Qu
+> ---
+>   fs/btrfs/bio.c         | 8 ++++++--
+>   fs/btrfs/bio.h         | 5 ++++-
+>   fs/btrfs/compression.c | 3 ++-
+>   fs/btrfs/extent_io.c   | 8 ++++----
+>   fs/btrfs/inode.c       | 4 +++-
+>   5 files changed, 19 insertions(+), 9 deletions(-)
+> 
+> diff --git a/fs/btrfs/bio.c b/fs/btrfs/bio.c
+> index 8affc88b0e0a4b..2398bb263957b2 100644
+> --- a/fs/btrfs/bio.c
+> +++ b/fs/btrfs/bio.c
+> @@ -22,9 +22,11 @@ static struct bio_set btrfs_bioset;
+>    * is already initialized by the block layer.
+>    */
+>   static inline void btrfs_bio_init(struct btrfs_bio *bbio,
+> +				  struct btrfs_inode *inode,
+>   				  btrfs_bio_end_io_t end_io, void *private)
+>   {
+>   	memset(bbio, 0, offsetof(struct btrfs_bio, bio));
+> +	bbio->inode = inode;
+>   	bbio->end_io = end_io;
+>   	bbio->private = private;
+>   }
+> @@ -37,16 +39,18 @@ static inline void btrfs_bio_init(struct btrfs_bio *bbio,
+>    * a mempool.
+>    */
+>   struct bio *btrfs_bio_alloc(unsigned int nr_vecs, blk_opf_t opf,
+> +			    struct btrfs_inode *inode,
+>   			    btrfs_bio_end_io_t end_io, void *private)
+>   {
+>   	struct bio *bio;
 >   
->      Signed-off-by: Jens Axboe <axboe@kernel.dk>
-> 
-> 
-> 
-> Regards
-> Julian
-> 
-
+>   	bio = bio_alloc_bioset(NULL, nr_vecs, opf, GFP_NOFS, &btrfs_bioset);
+> -	btrfs_bio_init(btrfs_bio(bio), end_io, private);
+> +	btrfs_bio_init(btrfs_bio(bio), inode, end_io, private);
+>   	return bio;
+>   }
+>   
+>   struct bio *btrfs_bio_clone_partial(struct bio *orig, u64 offset, u64 size,
+> +				    struct btrfs_inode *inode,
+>   				    btrfs_bio_end_io_t end_io, void *private)
+>   {
+>   	struct bio *bio;
+> @@ -56,7 +60,7 @@ struct bio *btrfs_bio_clone_partial(struct bio *orig, u64 offset, u64 size,
+>   
+>   	bio = bio_alloc_clone(orig->bi_bdev, orig, GFP_NOFS, &btrfs_bioset);
+>   	bbio = btrfs_bio(bio);
+> -	btrfs_bio_init(bbio, end_io, private);
+> +	btrfs_bio_init(bbio, inode, end_io, private);
+>   
+>   	bio_trim(bio, offset >> 9, size >> 9);
+>   	bbio->iter = bio->bi_iter;
+> diff --git a/fs/btrfs/bio.h b/fs/btrfs/bio.h
+> index baaa27961cc812..8d69d0b226d99b 100644
+> --- a/fs/btrfs/bio.h
+> +++ b/fs/btrfs/bio.h
+> @@ -41,7 +41,8 @@ struct btrfs_bio {
+>   	unsigned int is_metadata:1;
+>   	struct bvec_iter iter;
+>   
+> -	/* File offset that this I/O operates on. */
+> +	/* Inode and offset into it that this I/O operates on. */
+> +	struct btrfs_inode *inode;
+>   	u64 file_offset;
+>   
+>   	/* @device is for stripe IO submission. */
+> @@ -80,8 +81,10 @@ int __init btrfs_bioset_init(void);
+>   void __cold btrfs_bioset_exit(void);
+>   
+>   struct bio *btrfs_bio_alloc(unsigned int nr_vecs, blk_opf_t opf,
+> +			    struct btrfs_inode *inode,
+>   			    btrfs_bio_end_io_t end_io, void *private);
+>   struct bio *btrfs_bio_clone_partial(struct bio *orig, u64 offset, u64 size,
+> +				    struct btrfs_inode *inode,
+>   				    btrfs_bio_end_io_t end_io, void *private);
+>   
+>   
+> diff --git a/fs/btrfs/compression.c b/fs/btrfs/compression.c
+> index 4a5aeb8dd4793a..b8e3e899974b34 100644
+> --- a/fs/btrfs/compression.c
+> +++ b/fs/btrfs/compression.c
+> @@ -344,7 +344,8 @@ static struct bio *alloc_compressed_bio(struct compressed_bio *cb, u64 disk_byte
+>   	struct bio *bio;
+>   	int ret;
+>   
+> -	bio = btrfs_bio_alloc(BIO_MAX_VECS, opf, endio_func, cb);
+> +	bio = btrfs_bio_alloc(BIO_MAX_VECS, opf, BTRFS_I(cb->inode), endio_func,
+> +			      cb);
+>   	bio->bi_iter.bi_sector = disk_bytenr >> SECTOR_SHIFT;
+>   
+>   	em = btrfs_get_chunk_map(fs_info, disk_bytenr, fs_info->sectorsize);
+> diff --git a/fs/btrfs/extent_io.c b/fs/btrfs/extent_io.c
+> index 9bd32daa9b9a6f..faf9312a46c0e1 100644
+> --- a/fs/btrfs/extent_io.c
+> +++ b/fs/btrfs/extent_io.c
+> @@ -740,7 +740,8 @@ int btrfs_repair_one_sector(struct btrfs_inode *inode, struct btrfs_bio *failed_
+>   		return -EIO;
+>   	}
+>   
+> -	repair_bio = btrfs_bio_alloc(1, REQ_OP_READ, failed_bbio->end_io,
+> +	repair_bio = btrfs_bio_alloc(1, REQ_OP_READ, failed_bbio->inode,
+> +				     failed_bbio->end_io,
+>   				     failed_bbio->private);
+>   	repair_bbio = btrfs_bio(repair_bio);
+>   	repair_bbio->file_offset = start;
+> @@ -1394,9 +1395,8 @@ static int alloc_new_bio(struct btrfs_inode *inode,
+>   	struct bio *bio;
+>   	int ret;
+>   
+> -	ASSERT(bio_ctrl->end_io_func);
+> -
+> -	bio = btrfs_bio_alloc(BIO_MAX_VECS, opf, bio_ctrl->end_io_func, NULL);
+> +	bio = btrfs_bio_alloc(BIO_MAX_VECS, opf, inode, bio_ctrl->end_io_func,
+> +			      NULL);
+>   	/*
+>   	 * For compressed page range, its disk_bytenr is always @disk_bytenr
+>   	 * passed in, no matter if we have added any range into previous bio.
+> diff --git a/fs/btrfs/inode.c b/fs/btrfs/inode.c
+> index 3c49742f0d4556..0a85e42f114cc5 100644
+> --- a/fs/btrfs/inode.c
+> +++ b/fs/btrfs/inode.c
+> @@ -8097,7 +8097,8 @@ static void btrfs_submit_direct(const struct iomap_iter *iter,
+>   		 * the allocation is backed by btrfs_bioset.
+>   		 */
+>   		bio = btrfs_bio_clone_partial(dio_bio, clone_offset, clone_len,
+> -					      btrfs_end_dio_bio, dip);
+> +					      BTRFS_I(inode), btrfs_end_dio_bio,
+> +					      dip);
+>   		btrfs_bio(bio)->file_offset = file_offset;
+>   
+>   		if (bio_op(bio) == REQ_OP_ZONE_APPEND) {
+> @@ -10409,6 +10410,7 @@ int btrfs_encoded_read_regular_fill_pages(struct btrfs_inode *inode,
+>   
+>   			if (!bio) {
+>   				bio = btrfs_bio_alloc(BIO_MAX_VECS, REQ_OP_READ,
+> +						      inode,
+>   						      btrfs_encoded_read_endio,
+>   						      &priv);
+>   				bio->bi_iter.bi_sector =
