@@ -2,143 +2,147 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F23FC64EC4
-	for <linux-block@archiver.kernel.org>; Mon,  6 Mar 2023 22:59:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF598C61DA4
+	for <linux-block@archiver.kernel.org>; Tue,  7 Mar 2023 01:42:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229659AbjCFW74 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 6 Mar 2023 17:59:56 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42520 "EHLO
+        id S229907AbjCGBma (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 6 Mar 2023 20:42:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40818 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229646AbjCFW7z (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 6 Mar 2023 17:59:55 -0500
-Received: from esa3.hgst.iphmx.com (esa3.hgst.iphmx.com [216.71.153.141])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C09932CC3
-        for <linux-block@vger.kernel.org>; Mon,  6 Mar 2023 14:59:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1678143594; x=1709679594;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=iZxmEGOWp/OXxEv+WC2yV5njZDK+QBRlzNqW4+BA9H0=;
-  b=H7jIMvsrzdwJjvfwFO+5m0U2s0c9iDCounu3lvgA1LtL1nfChRuH3bhL
-   QjUvXFiKDNwivOoc9gWlttjgiUIUdtXzeDhrI3EKTlJDobcs7TbnCABxX
-   DZKAB8xS1zv8vnWz96UC01oBVCz+Eeg+ePbOGHT7WG0/bWy2heNNIBzJP
-   CAGurMoY+31uDMrXWEi0ZPhIrgebFwtzHcnW0yNZipmLBClzI5jEnQAY/
-   zWKkGaSiQ5KUCzkNEIlAT2gIrX5j5drUgMQ74S3p/M/siDjCH5xw2taDh
-   98Ec76a2uZfyAs8D1DTVp6n5Jb9hFulb9V4S/FS4n9SDJl3taFQiod3RX
-   g==;
-X-IronPort-AV: E=Sophos;i="5.98,238,1673884800"; 
-   d="scan'208";a="229902443"
-Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 07 Mar 2023 06:59:53 +0800
-IronPort-SDR: 0ob3Z5fLPu93O+Rc2ZSDN+YrgSw+4hnanb9yP0eLW1+rGYqsIdIpwp8E4s/kFbhyNwBD84GWRU
- nIEaBUKcra+eLS6VbHqJQQlzzYaPMfRWE5UaJjG4R/cP4w9LcR08u5pL43UEirt/HjC5MmZgc0
- d2F51lf39o6+LPHupxc3LOzzQOehVGoqaKXN5VuHVvchx2XKWUSVvmmW7IQnXvlvr69T7zXitm
- plipdG6aDqz784zB+SgpIoESTyse5uGFt/KWqUxkYz1FMVSrnA6rgjh0HrGpOX6E4qEnM3Wo1/
- RPk=
-Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 06 Mar 2023 14:16:33 -0800
-IronPort-SDR: 1FShXd4PcSk9QIo8E1TKntd9xZh2z4VBtPjUb6O1L7aDyQUwHh36bjiuKM7bg55RvySKSWAEx0
- IKgQa94L/KwQTg2BB4f6Yn114h3Bhodzwm1hxwZH8dalmut0JPIelwYW06olaqRaYrsnjSNcum
- btRdzkL3rz1N1UUTzcKOdifuC5atzlDUlnaDKeIdHf2e1zYhK8PXqiuwOgaa4ldmfjF9doSTWw
- 0lFKvKIEUCNG0suUdh4ruqsz01i/lJuKolz2DYSZkoV2UiSr64AGAN6+ylMEpDCuhA4WE9DsXK
- BuU=
-WDCIronportException: Internal
-Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
-  by uls-op-cesaip02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 06 Mar 2023 14:59:53 -0800
-Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4PVvD91fq1z1RvTr
-        for <linux-block@vger.kernel.org>; Mon,  6 Mar 2023 14:59:53 -0800 (PST)
-Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
-        reason="pass (just generated, assumed good)"
-        header.d=opensource.wdc.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
-        opensource.wdc.com; h=content-transfer-encoding:content-type
-        :in-reply-to:organization:from:content-language:references:to
-        :subject:user-agent:mime-version:date:message-id; s=dkim; t=
-        1678143592; x=1680735593; bh=iZxmEGOWp/OXxEv+WC2yV5njZDK+QBRlzNq
-        W4+BA9H0=; b=Yu/TwQoJxDcY5ppEF57COV7O89ylia/4/nhYPCXOj21LZR2ANWL
-        0YaBoDMTppI9GW5yo3NsfXXi29vFavC3dmGvJyutrkMOnCm0FDiypSq9+O5v76vC
-        exdJEWLZ2eqsC62K4A5r65FI9qrwO5yC8QFkASVygFv9YqK5nKB7YQrDy08qwDKr
-        6snJivlwbpteuNq53cINOJxCRzvP+Q/b9MiFJxw//ogiEtXPLfGtrg/+YkXk98hA
-        zObVKO1q9e+9+8EtcvTg6wxPsGrbrK0T32f7vYvCBBUY6oVL2dBxvkYvEGI/QtL2
-        h9S77UEpKn2J2B/hhbpeg0RIcG+YuguECnQ==
-X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
-Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
-        by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id 041CQGiGfVd8 for <linux-block@vger.kernel.org>;
-        Mon,  6 Mar 2023 14:59:52 -0800 (PST)
-Received: from [10.225.163.60] (unknown [10.225.163.60])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4PVvD71Gqvz1RvLy;
-        Mon,  6 Mar 2023 14:59:50 -0800 (PST)
-Message-ID: <4273f666-0c69-8111-308d-173df500c288@opensource.wdc.com>
-Date:   Tue, 7 Mar 2023 07:59:49 +0900
+        with ESMTP id S229753AbjCGBma (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 6 Mar 2023 20:42:30 -0500
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D97951715D;
+        Mon,  6 Mar 2023 17:42:27 -0800 (PST)
+Received: from mail02.huawei.com (unknown [172.30.67.169])
+        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4PVyqf4MqGz4f3jJ8;
+        Tue,  7 Mar 2023 09:42:22 +0800 (CST)
+Received: from [10.174.176.73] (unknown [10.174.176.73])
+        by APP3 (Coremail) with SMTP id _Ch0CgDn4R96lgZkw5PkEQ--.64992S3;
+        Tue, 07 Mar 2023 09:42:20 +0800 (CST)
+Subject: Re: [syzbot] [block?] WARNING in blkdev_put (2)
+To:     Julian Ruess <julianr@linux.ibm.com>,
+        Alexander Egorenkov <egorenar@linux.ibm.com>,
+        syzbot+2bcc0d79e548c4f62a59@syzkaller.appspotmail.com
+Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com,
+        jack@suse.cz, hch@lst.de, Niklas Schnelle <schnelle@linux.ibm.com>,
+        Gerd Bayer <gbayer@linux.ibm.com>,
+        "yukuai (C)" <yukuai3@huawei.com>
+References: <87lekfne28.fsf@oc8242746057.ibm.com>
+ <f9649d501bc8c3444769418f6c26263555d9d3be.camel@linux.ibm.com>
+From:   Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <26079e08-857d-6216-0921-bdef369f3316@huaweicloud.com>
+Date:   Tue, 7 Mar 2023 09:42:18 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.8.0
-Subject: Re: [PATCH RESEND v4 0/18] pata_parport: protocol drivers fixes and
- cleanups
-To:     Ondrej Zary <linux@zary.sk>
-Cc:     Christoph Hellwig <hch@lst.de>,
-        Sergey Shtylyov <s.shtylyov@omp.ru>,
-        Jens Axboe <axboe@kernel.dk>, Tim Waugh <tim@cyberelk.net>,
-        linux-block@vger.kernel.org, linux-parport@lists.infradead.org,
-        linux-ide@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20230306172752.7727-1-linux@zary.sk>
-Content-Language: en-US
-From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
-Organization: Western Digital Research
-In-Reply-To: <20230306172752.7727-1-linux@zary.sk>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <f9649d501bc8c3444769418f6c26263555d9d3be.camel@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: _Ch0CgDn4R96lgZkw5PkEQ--.64992S3
+X-Coremail-Antispam: 1UD129KBjvJXoW7WFy3Aw48Wr4kWFy8AF1DKFg_yoW8uF4fpF
+        Z3JFs0gF4DCr1xCay0qF1xuayrtan7Gr13XF13Aryrua9rC3s5Kr929395WrWjqrZ3Gws8
+        Zr9rKryIqa4rA3DanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUvIb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
+        6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+        vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7Cj
+        xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
+        0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
+        6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
+        Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JM4IIrI8v6xkF7I0E8cxan2IY04v7Mxk0xIA0c2IE
+        e2xFo4CEbIxvr21l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxV
+        Aqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q
+        6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6x
+        kF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWrZr1j6s0DMIIF0xvEx4A2jsIE
+        14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf
+        9x07UWE__UUUUU=
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/7/23 02:27, Ondrej Zary wrote:
-> This patch series fixes two bugs and cleans up pata_parport protocol drivers,
-> making the code simpler with no changes in behavior (except logged messages).
-> 
-> Signed-off-by: Ondrej Zary <linux@zary.sk>
+Hi,
 
-Already queued for 6.4, but I have not pushed the branch yet.
-Thanks !
+在 2023/03/06 23:00, Julian Ruess 写道:
+> On Thu, 2023-03-02 at 20:33 +0100, Alexander Egorenkov wrote:
+>>
+>> Hi,
+>>
+>> we are seeing a similar problem on s390x architecture when
+>> partitioning
+>> a NVMe disk on linux-next.
+>>
+>>
+>>    [   70.403015]  nvme0n1: p1
+>>    [   70.403197] ------------[ cut here ]------------
+>>    [   70.403199] WARNING: CPU: 8 PID: 2452 at block/bdev.c:845
+>> blkdev_put+0x280/0x298
+> 
+> ...
+> 
+>> The problem appeared about a week ago.
+>>
+>> Regards
+>> Alex
+> 
+> Hi all,
+> 
+> I bisected this to:
+> 
+> commit e5cfefa97bccf956ea0bb6464c1f6c84fd7a8d9f
+> Author: Yu Kuai <yukuai3@huawei.com>
+> Date:   Fri Feb 17 10:22:00 2023 +0800
+>                                                                                        
+>      block: fix scan partition for exclusively open device again
 
-> ---
-> Changes in v4:
->  - dropped whitespace changes from patch 12/18
-> Changes in v3:
->  - added missing reviewed-by tags
->  - added more detailed changelog:
->    - patches 04-05 are split from v1 patch 02/12
->    - patch 06: comment-out instead of if(1)
->    - patches 11-14 are split from v1 patch 08/12
-> Changes in v2:
->  - added two bugfixes (first two patches)
->  - addressed Sergey's comments (mostly split patches)
-> 
->  drivers/ata/pata_parport/aten.c                            |  45 ++++----------
->  drivers/ata/pata_parport/bpck.c                            |  86 ++++++++------------------
->  drivers/ata/pata_parport/bpck6.c                           | 107 ++++++++-------------------------
->  drivers/ata/pata_parport/comm.c                            |  52 +++++-----------
->  drivers/ata/pata_parport/dstr.c                            |  45 ++++----------
->  drivers/ata/pata_parport/epat.c                            |  48 ++++++---------
->  drivers/ata/pata_parport/epia.c                            |  55 +++++------------
->  drivers/ata/pata_parport/fit2.c                            |  37 ++++--------
->  drivers/ata/pata_parport/fit3.c                            |  39 ++++--------
->  drivers/ata/pata_parport/friq.c                            |  56 ++++++-----------
->  drivers/ata/pata_parport/frpw.c                            |  71 ++++++----------------
->  drivers/ata/pata_parport/kbic.c                            |  66 +++++++++-----------
->  drivers/ata/pata_parport/ktti.c                            |  38 ++++--------
->  drivers/ata/pata_parport/on20.c                            |  45 ++++----------
->  drivers/ata/pata_parport/on26.c                            |  52 ++++------------
->  drivers/ata/pata_parport/pata_parport.c                    |  31 +++++-----
->  {include/linux => drivers/ata/pata_parport}/pata_parport.h |  41 ++++---------
->  17 files changed, 271 insertions(+), 643 deletions(-)
-> 
-> 
+Yes, thanks for the report, I figure out that I made a mistake here.
 
--- 
-Damien Le Moal
-Western Digital Research
+Following patch should fix this problem:
+
+diff --git a/block/genhd.c b/block/genhd.c
+index 3ee5577e1586..02d9cfb9e077 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -385,7 +385,7 @@ int disk_scan_partitions(struct gendisk *disk, 
+fmode_t mode)
+         if (IS_ERR(bdev))
+                 ret =  PTR_ERR(bdev);
+         else
+-               blkdev_put(bdev, mode);
++               blkdev_put(bdev, mode & ~FMODE_EXCL);
+
+Thanks,
+Kuai
+>                                                                                        
+>      As explained in commit 36369f46e917 ("block: Do not reread
+> partition table
+>      on exclusively open device"), reread partition on the device that
+> is
+>      exclusively opened by someone else is problematic.
+>                                                                                        
+>      This patch will make sure partition scan will only be proceed if
+> current
+>      thread open the device exclusively, or the device is not opened
+>      exclusively, and in the later case, other scanners and exclusive
+> openers
+>      will be blocked temporarily until partition scan is done.
+>                                                                                        
+>      Fixes: 10c70d95c0f2 ("block: remove the bd_openers checks in
+> blk_drop_partitions")
+>      Cc: <stable@vger.kernel.org>
+>      Suggested-by: Jan Kara <jack@suse.cz>
+>      Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+>      Reviewed-by: Christoph Hellwig <hch@lst.de>
+>      Link:
+> https://lore.kernel.org/r/20230217022200.3092987-3-yukuai1@huaweicloud.com
+>   
+>      Signed-off-by: Jens Axboe <axboe@kernel.dk>
+> 
+> 
+> 
+> Regards
+> Julian
+> 
 
