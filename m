@@ -2,22 +2,22 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A4FFC74A44
-	for <linux-block@archiver.kernel.org>; Tue,  7 Mar 2023 22:49:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F81EC6FD1E
+	for <linux-block@archiver.kernel.org>; Tue,  7 Mar 2023 22:49:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231888AbjCGWtK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 7 Mar 2023 17:49:10 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33468 "EHLO
+        id S231282AbjCGWtL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 7 Mar 2023 17:49:11 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33784 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230332AbjCGWrf (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 7 Mar 2023 17:47:35 -0500
+        with ESMTP id S231776AbjCGWrp (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 7 Mar 2023 17:47:45 -0500
 Received: from hosting.gsystem.sk (hosting.gsystem.sk [212.5.213.30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id E68AA9BA45;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 4C0F957D0C;
         Tue,  7 Mar 2023 14:47:08 -0800 (PST)
 Received: from gsql.ggedos.sk (off-20.infotel.telecom.sk [212.5.213.20])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by hosting.gsystem.sk (Postfix) with ESMTPSA id 5AE3D7A0755;
+        by hosting.gsystem.sk (Postfix) with ESMTPSA id B21D77A0771;
         Tue,  7 Mar 2023 23:46:50 +0100 (CET)
 From:   Ondrej Zary <linux@zary.sk>
 To:     Damien Le Moal <damien.lemoal@opensource.wdc.com>,
@@ -27,9 +27,9 @@ Cc:     Christoph Hellwig <hch@lst.de>,
         Jens Axboe <axboe@kernel.dk>, Tim Waugh <tim@cyberelk.net>,
         linux-block@vger.kernel.org, linux-parport@lists.infradead.org,
         linux-ide@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 24/32] pata_parport-bpck6: move ppc6_open to bpck6.c and rename
-Date:   Tue,  7 Mar 2023 23:46:19 +0100
-Message-Id: <20230307224627.28011-25-linux@zary.sk>
+Subject: [PATCH 28/32] pata_parport-bpck6: move ppc6_rd_data_byte to bpck6.c and rename
+Date:   Tue,  7 Mar 2023 23:46:23 +0100
+Message-Id: <20230307224627.28011-29-linux@zary.sk>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20230307224627.28011-1-linux@zary.sk>
 References: <20230307224627.28011-1-linux@zary.sk>
@@ -39,105 +39,151 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Move ppc6_open to bpck6.c and rename it to bpck6_open
+Move ppc6_rd_data_byte to bpck6.c and rename it to bpck6_rd_data_byte
 
 Signed-off-by: Ondrej Zary <linux@zary.sk>
 ---
- drivers/ata/pata_parport/bpck6.c   | 23 +++++++++++++++++++++--
- drivers/ata/pata_parport/ppc6lnx.c | 28 ----------------------------
- 2 files changed, 21 insertions(+), 30 deletions(-)
+ drivers/ata/pata_parport/bpck6.c   | 38 ++++++++++++++++++-
+ drivers/ata/pata_parport/ppc6lnx.c | 61 ------------------------------
+ 2 files changed, 36 insertions(+), 63 deletions(-)
 
 diff --git a/drivers/ata/pata_parport/bpck6.c b/drivers/ata/pata_parport/bpck6.c
-index 968c9f3297e3..02f16dedfd29 100644
+index 32dc9e61e80c..064696b6d68f 100644
 --- a/drivers/ata/pata_parport/bpck6.c
 +++ b/drivers/ata/pata_parport/bpck6.c
-@@ -174,6 +174,25 @@ static void bpck6_read_block(struct pi_adapter *pi, char *buf, int len)
- 	ppc6_send_cmd(pi, CMD_PREFIX_RESET | PREFIX_IO16 | PREFIX_BLK);
+@@ -37,12 +37,46 @@ static void bpck6_send_cmd(struct pi_adapter *pi, u8 cmd)
+ 	}
  }
  
-+static int bpck6_open(struct pi_adapter *pi)
++static u8 bpck6_rd_data_byte(struct pi_adapter *pi)
 +{
-+	int ret = ppc6_select(pi);
++	u8 data = 0;
 +
-+	if (ret == 0)
-+		return ret;
++	switch (mode_map[pi->mode]) {
++	case PPCMODE_UNI_SW:
++	case PPCMODE_UNI_FW:
++		parport_frob_control(pi->pardev->port, PARPORT_CONTROL_STROBE,
++							PARPORT_CONTROL_INIT);
++		data = parport_read_status(pi->pardev->port);
++		data = ((data & 0x80) >> 1) | ((data & 0x38) >> 3);
++		parport_frob_control(pi->pardev->port, PARPORT_CONTROL_STROBE,
++							PARPORT_CONTROL_STROBE);
++		data |= parport_read_status(pi->pardev->port) & 0xB8;
++		break;
++	case PPCMODE_BI_SW:
++	case PPCMODE_BI_FW:
++		parport_data_reverse(pi->pardev->port);
++		parport_frob_control(pi->pardev->port, PARPORT_CONTROL_STROBE,
++				PARPORT_CONTROL_STROBE | PARPORT_CONTROL_INIT);
++		data = parport_read_data(pi->pardev->port);
++		parport_frob_control(pi->pardev->port, PARPORT_CONTROL_STROBE, 0);
++		parport_data_forward(pi->pardev->port);
++		break;
++	case PPCMODE_EPP_BYTE:
++	case PPCMODE_EPP_WORD:
++	case PPCMODE_EPP_DWORD:
++		pi->pardev->port->ops->epp_read_data(pi->pardev->port, &data, 1, 0);
++		break;
++	}
 +
-+	pi->private = 0;
-+
-+	ppc6_send_cmd(pi, ACCESS_REG | ACCESS_WRITE | REG_RAMSIZE);
-+	ppc6_wr_data_byte(pi, RAMSIZE_128K);
-+
-+	ppc6_send_cmd(pi, ACCESS_REG | ACCESS_READ | REG_VERSION);
-+	if ((ppc6_rd_data_byte(pi) & 0x3F) == 0x0C)
-+		pi->private |= fifo_wait;
-+
-+	return ret;
++	return data;
 +}
 +
- static void bpck6_wr_extout(struct pi_adapter *pi, u8 regdata)
+ static int bpck6_read_regr(struct pi_adapter *pi, int cont, int reg)
  {
- 	ppc6_send_cmd(pi, REG_VERSION | ACCESS_REG | ACCESS_WRITE);
-@@ -184,7 +203,7 @@ static void bpck6_connect(struct pi_adapter *pi)
- {
- 	dev_dbg(&pi->dev, "connect\n");
+ 	u8 port = cont ? reg | 8 : reg;
  
--	ppc6_open(pi);
-+	bpck6_open(pi);
- 	bpck6_wr_extout(pi, 0x3);
+ 	bpck6_send_cmd(pi, port | ACCESS_PORT | ACCESS_READ);
+-	return ppc6_rd_data_byte(pi);
++	return bpck6_rd_data_byte(pi);
  }
  
-@@ -218,7 +237,7 @@ static int bpck6_probe_unit(struct pi_adapter *pi)
- 	/*LOWER DOWN TO UNIDIRECTIONAL*/
- 	pi->mode = 0;
+ static void bpck6_write_regr(struct pi_adapter *pi, int cont, int reg, int val)
+@@ -240,7 +274,7 @@ static int bpck6_open(struct pi_adapter *pi)
+ 			ppc6_wr_data_byte(pi, RAMSIZE_128K);
  
--	out = ppc6_open(pi);
-+	out = bpck6_open(pi);
+ 			bpck6_send_cmd(pi, ACCESS_REG | ACCESS_READ | REG_VERSION);
+-			if ((ppc6_rd_data_byte(pi) & 0x3F) == 0x0C)
++			if ((bpck6_rd_data_byte(pi) & 0x3F) == 0x0C)
+ 				pi->private |= fifo_wait;
  
- 	dev_dbg(&pi->dev, "ppc_open returned %2x\n", out);
- 
+ 			return 1;
 diff --git a/drivers/ata/pata_parport/ppc6lnx.c b/drivers/ata/pata_parport/ppc6lnx.c
-index 931bf67fabb9..a902ede5ecc5 100644
+index d3c3968fbfc8..838af60a0d4d 100644
 --- a/drivers/ata/pata_parport/ppc6lnx.c
 +++ b/drivers/ata/pata_parport/ppc6lnx.c
-@@ -72,7 +72,6 @@ static void ppc6_deselect(struct pi_adapter *pi);
- static void ppc6_send_cmd(struct pi_adapter *pi, u8 cmd);
+@@ -68,7 +68,6 @@
+ //***************************************************************************
+ 
  static void ppc6_wr_data_byte(struct pi_adapter *pi, u8 data);
- static u8 ppc6_rd_data_byte(struct pi_adapter *pi);
--static int ppc6_open(struct pi_adapter *pi);
+-static u8 ppc6_rd_data_byte(struct pi_adapter *pi);
  
  //***************************************************************************
  
-@@ -277,30 +276,3 @@ static u8 ppc6_rd_data_byte(struct pi_adapter *pi)
- 
- 	return(data);
+@@ -102,63 +101,3 @@ static void ppc6_wr_data_byte(struct pi_adapter *pi, u8 data)
+ 		}
+ 	}
  }
 -
 -//***************************************************************************
 -
--static int ppc6_open(struct pi_adapter *pi)
+-static u8 ppc6_rd_data_byte(struct pi_adapter *pi)
 -{
--	int ret;
+-	u8 data = 0;
 -
--	ret = ppc6_select(pi);
+-	switch (mode_map[pi->mode])
+-	{
+-		case PPCMODE_UNI_SW :
+-		case PPCMODE_UNI_FW :
+-		{
+-			parport_frob_control(pi->pardev->port,
+-				PARPORT_CONTROL_STROBE, PARPORT_CONTROL_INIT);
 -
--	if (ret == 0)
--		return(ret);
+-			// DELAY
 -
--	pi->private = 0;
+-			data = parport_read_status(pi->pardev->port);
 -
--	ppc6_send_cmd(pi, ACCESS_REG | ACCESS_WRITE | REG_RAMSIZE);
--	ppc6_wr_data_byte(pi, RAMSIZE_128K);
+-			data = ((data & 0x80) >> 1) | ((data & 0x38) >> 3);
 -
--	ppc6_send_cmd(pi, ACCESS_REG | ACCESS_READ | REG_VERSION);
+-			parport_frob_control(pi->pardev->port,
+-				PARPORT_CONTROL_STROBE, PARPORT_CONTROL_STROBE);
 -
--	if ((ppc6_rd_data_byte(pi) & 0x3F) == 0x0C)
--		pi->private |= fifo_wait;
+-			// DELAY
 -
--	return(ret);
+-			data |= parport_read_status(pi->pardev->port) & 0xB8;
+-
+-			break;
+-		}
+-
+-		case PPCMODE_BI_SW :
+-		case PPCMODE_BI_FW :
+-		{
+-			parport_data_reverse(pi->pardev->port);
+-
+-			parport_frob_control(pi->pardev->port, PARPORT_CONTROL_STROBE,
+-				PARPORT_CONTROL_STROBE | PARPORT_CONTROL_INIT);
+-
+-			data = parport_read_data(pi->pardev->port);
+-
+-			parport_frob_control(pi->pardev->port, PARPORT_CONTROL_STROBE, 0);
+-
+-			parport_data_forward(pi->pardev->port);
+-
+-			break;
+-		}
+-
+-		case PPCMODE_EPP_BYTE :
+-		case PPCMODE_EPP_WORD :
+-		case PPCMODE_EPP_DWORD :
+-		{
+-			pi->pardev->port->ops->epp_read_data(pi->pardev->port, &data, 1, 0);
+-
+-			break;
+-		}
+-	}
+-
+-	return(data);
 -}
--
--//***************************************************************************
--
 -- 
 Ondrej Zary
 
