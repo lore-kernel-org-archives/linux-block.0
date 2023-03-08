@@ -2,94 +2,103 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B8E9C6FD1C
-	for <linux-block@archiver.kernel.org>; Wed,  8 Mar 2023 18:03:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E853AC64EC4
+	for <linux-block@archiver.kernel.org>; Wed,  8 Mar 2023 18:14:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229646AbjCHSD4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 8 Mar 2023 13:03:56 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43674 "EHLO
+        id S229815AbjCHSO1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 8 Mar 2023 13:14:27 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58818 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229621AbjCHSDz (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Mar 2023 13:03:55 -0500
-Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5DE7B99BFD;
-        Wed,  8 Mar 2023 10:03:49 -0800 (PST)
-Received: from [192.168.1.103] (178.176.73.253) by msexch01.omp.ru
- (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.986.14; Wed, 8 Mar 2023
- 21:03:36 +0300
-Subject: Re: [PATCH 02/32] pata_parport-bpck6: remove useless range check from
- read/write_regr
-To:     Ondrej Zary <linux@zary.sk>,
-        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-        Sudip Mukherjee <sudipm.mukherjee@gmail.com>
-CC:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        Tim Waugh <tim@cyberelk.net>, <linux-block@vger.kernel.org>,
-        <linux-parport@lists.infradead.org>, <linux-ide@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>
-References: <20230307224627.28011-1-linux@zary.sk>
- <20230307224627.28011-3-linux@zary.sk>
-From:   Sergey Shtylyov <s.shtylyov@omp.ru>
-Organization: Open Mobile Platform
-Message-ID: <f41885da-ca87-777d-8d10-97afa140a416@omp.ru>
-Date:   Wed, 8 Mar 2023 21:03:36 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+        with ESMTP id S229729AbjCHSO0 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Mar 2023 13:14:26 -0500
+Received: from bedivere.hansenpartnership.com (bedivere.hansenpartnership.com [IPv6:2607:fcd0:100:8a00::2])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 989A9CE979;
+        Wed,  8 Mar 2023 10:13:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+        d=hansenpartnership.com; s=20151216; t=1678299229;
+        bh=Vys5iYK/+fJyyDZ24nlbuNfT76U1kxqNE2Ur4f5ljdI=;
+        h=Message-ID:Subject:From:To:Date:In-Reply-To:References:From;
+        b=f6KOEdDfPn1EKPig7w/2em9x5iNEmBMrbX78lJYFRv3Nna47sj6me8EaVXh4cn2Kg
+         DpTCaWuiGoHMrDJ6jxvQV2k/tcaAiQFYCVZyDvj3JxNehArnYFKwQ8v022Ba6vJ4PF
+         swzPF9w1bLS1LFiX54KL8cm0FaXeQfXAbkxHVsZo=
+Received: from localhost (localhost [127.0.0.1])
+        by bedivere.hansenpartnership.com (Postfix) with ESMTP id 5364D1286368;
+        Wed,  8 Mar 2023 13:13:49 -0500 (EST)
+Received: from bedivere.hansenpartnership.com ([127.0.0.1])
+        by localhost (bedivere.hansenpartnership.com [127.0.0.1]) (amavisd-new, port 10024)
+        with ESMTP id XLXb23XoE1Wf; Wed,  8 Mar 2023 13:13:49 -0500 (EST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+        d=hansenpartnership.com; s=20151216; t=1678299229;
+        bh=Vys5iYK/+fJyyDZ24nlbuNfT76U1kxqNE2Ur4f5ljdI=;
+        h=Message-ID:Subject:From:To:Date:In-Reply-To:References:From;
+        b=f6KOEdDfPn1EKPig7w/2em9x5iNEmBMrbX78lJYFRv3Nna47sj6me8EaVXh4cn2Kg
+         DpTCaWuiGoHMrDJ6jxvQV2k/tcaAiQFYCVZyDvj3JxNehArnYFKwQ8v022Ba6vJ4PF
+         swzPF9w1bLS1LFiX54KL8cm0FaXeQfXAbkxHVsZo=
+Received: from lingrow.int.hansenpartnership.com (unknown [IPv6:2601:5c4:4302:c21::c14])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (prime256v1) server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (Client did not present a certificate)
+        by bedivere.hansenpartnership.com (Postfix) with ESMTPSA id 1917B1286361;
+        Wed,  8 Mar 2023 13:13:48 -0500 (EST)
+Message-ID: <1367983d4fa09dcb63e29db2e8be3030ae6f6e8c.camel@HansenPartnership.com>
+Subject: Re: [LSF/MM/BPF TOPIC] Cloud storage optimizations
+From:   James Bottomley <James.Bottomley@HansenPartnership.com>
+To:     Matthew Wilcox <willy@infradead.org>, Theodore Ts'o <tytso@mit.edu>
+Cc:     Hannes Reinecke <hare@suse.de>,
+        Luis Chamberlain <mcgrof@kernel.org>,
+        Keith Busch <kbusch@kernel.org>,
+        Pankaj Raghav <p.raghav@samsung.com>,
+        Daniel Gomez <da.gomez@samsung.com>,
+        Javier =?ISO-8859-1?Q?Gonz=E1lez?= <javier.gonz@samsung.com>,
+        lsf-pc@lists.linux-foundation.org, linux-fsdevel@vger.kernel.org,
+        linux-mm@kvack.org, linux-block@vger.kernel.org
+Date:   Wed, 08 Mar 2023 13:13:45 -0500
+In-Reply-To: <ZAjLhkfRqwQ+vkHI@casper.infradead.org>
+References: <ZAFUYqAcPmRPLjET@kbusch-mbp.dhcp.thefacebook.com>
+         <ZAFuSSZ5vZN7/UAa@casper.infradead.org>
+         <ZAJqjM6qLrraFrrn@bombadil.infradead.org>
+         <c9f6544d-1731-4a73-a926-0e85ae9da9df@suse.de>
+         <ZAN2HYXDI+hIsf6W@casper.infradead.org>
+         <edac909b-98e5-cb6d-bb80-2f6a20a15029@suse.de>
+         <ZAOF3p+vqA6pd7px@casper.infradead.org>
+         <0b70deae-9fc7-ca33-5737-85d7532b3d33@suse.de>
+         <ZAWi5KwrsYL+0Uru@casper.infradead.org> <20230306161214.GB959362@mit.edu>
+         <ZAjLhkfRqwQ+vkHI@casper.infradead.org>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.42.4 
 MIME-Version: 1.0
-In-Reply-To: <20230307224627.28011-3-linux@zary.sk>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [178.176.73.253]
-X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
- (10.188.4.12)
-X-KSE-ServerInfo: msexch01.omp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 5.9.59, Database issued on: 03/08/2023 17:42:03
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 59
-X-KSE-AntiSpam-Info: Lua profiles 175960 [Mar 08 2023]
-X-KSE-AntiSpam-Info: Version: 5.9.59.0
-X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
-X-KSE-AntiSpam-Info: LuaCore: 507 507 08d345461d9bcca7095738422a5279ab257bb65a
-X-KSE-AntiSpam-Info: {rep_avail}
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info: {relay has no DNS name}
-X-KSE-AntiSpam-Info: {SMTP from is not routable}
-X-KSE-AntiSpam-Info: {Found in DNSBL: 178.176.73.253 in (user)
- b.barracudacentral.org}
-X-KSE-AntiSpam-Info: omp.ru:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2
-X-KSE-AntiSpam-Info: ApMailHostAddress: 178.176.73.253
-X-KSE-AntiSpam-Info: {DNS response errors}
-X-KSE-AntiSpam-Info: Rate: 59
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
- smtp.mailfrom=omp.ru;dkim=none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Heuristic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 03/08/2023 17:44:00
-X-KSE-AttachmentFiltering-Interceptor-Info: protection disabled
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 3/8/2023 4:28:00 PM
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/8/23 1:45 AM, Ondrej Zary wrote:
-
-> bpck6_read_regr() and bpck6_write_regr() check values of cont and reg
-> but there's no point in doing that. They can only be called with
-> a fixed set of values. Remove the checks.
+On Wed, 2023-03-08 at 17:53 +0000, Matthew Wilcox wrote:
+> On Mon, Mar 06, 2023 at 11:12:14AM -0500, Theodore Ts'o wrote:
+> > What HDD vendors want is to be able to have 32k or even 64k
+> > *physical* sector sizes.  This allows for much more efficient
+> > erasure codes, so it will increase their byte capacity now that
+> > it's no longer easier to get capacity boosts by squeezing the
+> > tracks closer and closer, and their have been various engineering
+> > tradeoffs with SMR, HAMR, and MAMR.  HDD vendors have been asking
+> > for this at LSF/MM, and in othervenues for ***years***.
 > 
-> Signed-off-by: Ondrej Zary <linux@zary.sk>
+> I've been reminded by a friend who works on the drive side that a
+> motivation for the SSD vendors is (essentially) the size of sector_t.
+> Once the drive needs to support more than 2/4 billion sectors, they
+> need to move to a 64-bit sector size, so the amount of memory
+> consumed by the FTL doubles, the CPU data cache becomes half as
+> effective, etc. That significantly increases the BOM for the drive,
+> and so they have to charge more.  With a 512-byte LBA, that's 2TB;
+> with a 4096-byte LBA, it's at 16TB and with a 64k LBA, they can keep
+> using 32-bit LBA numbers all the way up to 256TB.
 
+I thought the FTL operated on physical sectors and the logical to
+physical was done as a RMW through the FTL?  In which case sector_t
+shouldn't matter to the SSD vendors for FTL management because they can
+keep the logical sector size while increasing the physical one. 
+Obviously if physical size goes above the FS block size, the drives
+will behave suboptimally with RMWs, which is why 4k physical is the max
+currently.
 
-Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
+James
 
-[...]
-
-MBR, Sergey
