@@ -2,87 +2,125 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 10CB0C64EC4
-	for <linux-block@archiver.kernel.org>; Wed,  8 Mar 2023 19:55:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4B36C678D5
+	for <linux-block@archiver.kernel.org>; Wed,  8 Mar 2023 20:34:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229483AbjCHTzj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 8 Mar 2023 14:55:39 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33010 "EHLO
+        id S230247AbjCHUed (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 8 Mar 2023 15:34:33 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58972 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229482AbjCHTzi (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Mar 2023 14:55:38 -0500
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7473AF69E;
-        Wed,  8 Mar 2023 11:55:36 -0800 (PST)
-Received: by mail-pl1-f178.google.com with SMTP id a2so18783328plm.4;
-        Wed, 08 Mar 2023 11:55:36 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678305336;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=y2KyRd7VKCzbszMhr3z8iSKufATfqtl+JwH7yP0z5aM=;
-        b=vbeLSZyuWzuzIOAOtrn42rXibYs/+aGMO+HcnJ0bVpYhkUU+DpQ3HCP+Y/n1BTStYq
-         5vw8rXYHPF28syTu5QgZrsv+CqcDFgrjv8Iqr5w1zHnzu/OmH4B4009bj2XwILQjqpI7
-         rEfTqjgmSbWgH+FS+V09zuSMroFUrWG2MP2WnVrTfjnH7WlnOlgz07xOiipojaSlXTHW
-         NsS39ubjmNvC9c/oqf8H472C6lqbTTGpzn3MY2XBSfa+7Ir8PFmfL9z4RPgr93f1kG56
-         gVr8FcqepobafOs44kY5TxpFcuVd9e1B2homX7W54oy1hgtDGcziQDbMrJjg3nVt5gSk
-         3GYw==
-X-Gm-Message-State: AO0yUKXCiFhvRFoqoYMr62E4cG/9a0/WT4fbZTHvuPdCYe47UqXQpp44
-        PavkOq/09wMILxq2FV6W864=
-X-Google-Smtp-Source: AK7set8al4dgNTBDhLRAvwij2RVmfeIMBq2588DUae2qTDL/Rg9HAdFuOFFWQGXgcsP5C64t6UlfjA==
-X-Received: by 2002:a17:902:bb8c:b0:19b:c498:fd01 with SMTP id m12-20020a170902bb8c00b0019bc498fd01mr14904305pls.11.1678305336051;
-        Wed, 08 Mar 2023 11:55:36 -0800 (PST)
-Received: from [192.168.132.235] ([63.145.95.70])
-        by smtp.gmail.com with ESMTPSA id e4-20020a17090301c400b001992e74d055sm10222787plh.12.2023.03.08.11.55.34
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 08 Mar 2023 11:55:35 -0800 (PST)
-Message-ID: <5f9aee65-c321-6638-bda7-4252889f5276@acm.org>
-Date:   Wed, 8 Mar 2023 11:55:34 -0800
+        with ESMTP id S230304AbjCHUe2 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Mar 2023 15:34:28 -0500
+Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E2628B32A;
+        Wed,  8 Mar 2023 12:34:08 -0800 (PST)
+Received: from [192.168.1.103] (178.176.73.253) by msexch01.omp.ru
+ (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.986.14; Wed, 8 Mar 2023
+ 23:33:59 +0300
+Subject: Re: [PATCH 04/32] pata_parport-bpck6: pass around struct pi_adapter *
+To:     Ondrej Zary <linux@zary.sk>,
+        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+        Sudip Mukherjee <sudipm.mukherjee@gmail.com>
+CC:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        Tim Waugh <tim@cyberelk.net>, <linux-block@vger.kernel.org>,
+        <linux-parport@lists.infradead.org>, <linux-ide@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
+References: <20230307224627.28011-1-linux@zary.sk>
+ <20230307224627.28011-5-linux@zary.sk>
+From:   Sergey Shtylyov <s.shtylyov@omp.ru>
+Organization: Open Mobile Platform
+Message-ID: <6040658f-990f-8cca-eabb-09e97e09c547@omp.ru>
+Date:   Wed, 8 Mar 2023 23:33:59 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.1
-Subject: Re: [LSF/MM/BPF TOPIC] Cloud storage optimizations
+In-Reply-To: <20230307224627.28011-5-linux@zary.sk>
+Content-Type: text/plain; charset="utf-8"
 Content-Language: en-US
-To:     Hannes Reinecke <hare@suse.de>,
-        Matthew Wilcox <willy@infradead.org>
-Cc:     Luis Chamberlain <mcgrof@kernel.org>,
-        Keith Busch <kbusch@kernel.org>, Theodore Ts'o <tytso@mit.edu>,
-        Pankaj Raghav <p.raghav@samsung.com>,
-        Daniel Gomez <da.gomez@samsung.com>,
-        =?UTF-8?Q?Javier_Gonz=c3=a1lez?= <javier.gonz@samsung.com>,
-        lsf-pc@lists.linux-foundation.org, linux-fsdevel@vger.kernel.org,
-        linux-mm@kvack.org, linux-block@vger.kernel.org
-References: <Y/7L74P6jSWwOvWt@mit.edu>
- <ZAFUYqAcPmRPLjET@kbusch-mbp.dhcp.thefacebook.com>
- <ZAFuSSZ5vZN7/UAa@casper.infradead.org>
- <ZAJqjM6qLrraFrrn@bombadil.infradead.org>
- <c9f6544d-1731-4a73-a926-0e85ae9da9df@suse.de>
- <ZAN2HYXDI+hIsf6W@casper.infradead.org>
- <edac909b-98e5-cb6d-bb80-2f6a20a15029@suse.de>
- <ZAOF3p+vqA6pd7px@casper.infradead.org>
- <0b70deae-9fc7-ca33-5737-85d7532b3d33@suse.de>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <0b70deae-9fc7-ca33-5737-85d7532b3d33@suse.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-Originating-IP: [178.176.73.253]
+X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
+ (10.188.4.12)
+X-KSE-ServerInfo: msexch01.omp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 5.9.59, Database issued on: 03/08/2023 20:12:45
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 59
+X-KSE-AntiSpam-Info: Lua profiles 175961 [Mar 08 2023]
+X-KSE-AntiSpam-Info: Version: 5.9.59.0
+X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
+X-KSE-AntiSpam-Info: LuaCore: 507 507 08d345461d9bcca7095738422a5279ab257bb65a
+X-KSE-AntiSpam-Info: {rep_avail}
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info: {relay has no DNS name}
+X-KSE-AntiSpam-Info: {SMTP from is not routable}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 178.176.73.253 in (user)
+ b.barracudacentral.org}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 178.176.73.253 in (user)
+ dbl.spamhaus.org}
+X-KSE-AntiSpam-Info: d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;omp.ru:7.1.1;127.0.0.199:7.1.2
+X-KSE-AntiSpam-Info: ApMailHostAddress: 178.176.73.253
+X-KSE-AntiSpam-Info: {DNS response errors}
+X-KSE-AntiSpam-Info: Rate: 59
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
+ smtp.mailfrom=omp.ru;dkim=none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Heuristic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 03/08/2023 20:15:00
+X-KSE-AttachmentFiltering-Interceptor-Info: protection disabled
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 3/8/2023 5:25:00 PM
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/5/23 03:22, Hannes Reinecke wrote:
-> My point being that zones are just there because the I/O stack can only 
-> deal with sectors up to 4k. If the I/O stack would be capable of dealing
-> with larger LBAs one could identify a zone with an LBA, and the entire 
-> issue of append-only and sequential writes would be moot.
-> Even the entire concept of zones becomes irrelevant as the OS would 
-> trivially only write entire zones.
+On 3/8/23 1:45 AM, Ondrej Zary wrote:
 
-That's not correct. Even if the block layer core would support logical 
-block sizes of 1 GiB or higher, a logical block size of 16 KiB will 
-yield better performance than logical block size = zone size. The write 
-amplification factor (WAF) would be huge for databases if the logical 
-block size would be much larger than the typical amount of data written 
-during a database update (16 KiB?).
+> Remove Interface typedef, pass around struct pi_adapter * down to all
+> functions instead. Remove PPCSTRUCT define.
+> 
+> Signed-off-by: Ondrej Zary <linux@zary.sk>
 
-Bart.
+Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
+
+   I had some nit tho -- see below...
+
+[...]
+
+> diff --git a/drivers/ata/pata_parport/bpck6.c b/drivers/ata/pata_parport/bpck6.c
+> index fa1f7d4fe3cb..bc128a2c444e 100644
+> --- a/drivers/ata/pata_parport/bpck6.c
+> +++ b/drivers/ata/pata_parport/bpck6.c
+[...]
+>  static void bpck6_connect(struct pi_adapter *pi)
+>  {
+> +	struct ppc_storage *ppc = (void *)(pi->private);
+
+   Parens around pi->private are unnecessary here and elsewhere...
+
+[...]
+> diff --git a/drivers/ata/pata_parport/ppc6lnx.c b/drivers/ata/pata_parport/ppc6lnx.c
+> index 5e5521d3b1dd..f12bb019fc61 100644
+> --- a/drivers/ata/pata_parport/ppc6lnx.c
+> +++ b/drivers/ata/pata_parport/ppc6lnx.c
+[...]
+> @@ -101,26 +101,27 @@ typedef struct ppc_storage {
+[...]
+>  //***************************************************************************
+>  
+> -static int ppc6_select(Interface *ppc)
+> +static int ppc6_select(struct pi_adapter *pi)
+>  {
+> +	struct ppc_storage *ppc = (void *)(pi->private);
+
+   Parens around pi->private are unnecessary here and elsewhere...
+
+[...]
+
+MBR, Sergey
