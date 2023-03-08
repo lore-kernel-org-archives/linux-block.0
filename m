@@ -2,89 +2,113 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01369C6FD19
-	for <linux-block@archiver.kernel.org>; Wed,  8 Mar 2023 20:43:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D9ED9C6FD19
+	for <linux-block@archiver.kernel.org>; Wed,  8 Mar 2023 21:08:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230358AbjCHUna (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 8 Mar 2023 15:43:30 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44376 "EHLO
+        id S229754AbjCHVIn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 8 Mar 2023 16:08:43 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48508 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230335AbjCHUn3 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Mar 2023 15:43:29 -0500
-Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8719F5AB6F;
-        Wed,  8 Mar 2023 12:43:27 -0800 (PST)
-Received: from [192.168.1.103] (178.176.73.253) by msexch01.omp.ru
- (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.986.14; Wed, 8 Mar 2023
- 23:43:25 +0300
-Subject: Re: [PATCH 07/32] pata_parport-bpck6: remove org_* from struct
- ppc_storage
-To:     Ondrej Zary <linux@zary.sk>,
-        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-        Sudip Mukherjee <sudipm.mukherjee@gmail.com>
-CC:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        Tim Waugh <tim@cyberelk.net>, <linux-block@vger.kernel.org>,
-        <linux-parport@lists.infradead.org>, <linux-ide@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>
-References: <20230307224627.28011-1-linux@zary.sk>
- <20230307224627.28011-8-linux@zary.sk>
-From:   Sergey Shtylyov <s.shtylyov@omp.ru>
-Organization: Open Mobile Platform
-Message-ID: <bf18e70f-9260-feff-ace2-db0df20073b8@omp.ru>
-Date:   Wed, 8 Mar 2023 23:43:24 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+        with ESMTP id S229475AbjCHVIm (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Mar 2023 16:08:42 -0500
+Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9111B7B9A8
+        for <linux-block@vger.kernel.org>; Wed,  8 Mar 2023 13:08:40 -0800 (PST)
+Received: by mail-pj1-x102e.google.com with SMTP id x34so175267pjj.0
+        for <linux-block@vger.kernel.org>; Wed, 08 Mar 2023 13:08:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fromorbit-com.20210112.gappssmtp.com; s=20210112; t=1678309720;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=uQjAWnx5lQ/2cENFz0YdGZbVbhOf2bedNqDxQZfmLmE=;
+        b=DC948+R6ch+RYEfp2Fh69Wc5fEuezDxGyjm5a2ojDEmAJabOsIgx14BASBdNePqbO7
+         A1sw5VdAMlS5De8EQ1Mm1vUNzQNIf8mMGPmHf6r/y99zKv0JSCyUIT8mU6KxsnmQiIGd
+         2B7JuvDg8ms78MFJG+iPG8At90jWfpGWObImE5SBbRydaL5IUtud20x8Y8wdTtN/9Z/W
+         FzgSTkckrxVQvBO3vI9A4viY2HXPPIyGkYnjb7ahWkZxK/znzbWaSMEhWHYPxrHDOVw0
+         dduyixO5zIoWd/R5IIIWgSjIMTiv4qyyJ8WE80iykm3ooAeKS7B1hW5TcRKXHes0mAAN
+         iYKA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1678309720;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=uQjAWnx5lQ/2cENFz0YdGZbVbhOf2bedNqDxQZfmLmE=;
+        b=iTRSdNBPegc8l4pap1K3AAcTVMq+LUGumEO09MVQyiTdZiZa6DqcqQP2Uputx2lwa5
+         w0xEQYcjlodPCWVuaEdIA/Em67Frnv+wLYzegEA7BqGdbCUdwwuJsWe6zST337bGn6/F
+         knCK69bHzY+2X8Q06Et6tcBIRFGtKd1K6m2tzvuFC9MVd+MOm25kHN0Frj5d7gaHfWt0
+         hBYHLomK0Dz4iStS0153V1Flg50Nx1DTJeHpbLGDZchfE8QxrI6WoyEIlnzabNmuaHc7
+         fFKlMAIbA39zo+vYvrG6c+OIW8EgjK4TNKz7gS0ZEW2PJ/2XdC6IVWQVZJf5lHFFoE+M
+         4M9Q==
+X-Gm-Message-State: AO0yUKUmwL4/8Tfpa/RRqMYicUuwE1s3bwvmhZgfkTl733Wkz26LetHg
+        l1IRSJmba5rmS+AlzDNIME+dKg==
+X-Google-Smtp-Source: AK7set8/nCJPbgdHyS22yS22YNGDj4za3NiHgaPgzaWsI9o9vVTaHqTsc2ZqcZJtvgEtszxlzM/WcA==
+X-Received: by 2002:a17:902:d38c:b0:19d:16e4:ac20 with SMTP id e12-20020a170902d38c00b0019d16e4ac20mr18011067pld.63.1678309719618;
+        Wed, 08 Mar 2023 13:08:39 -0800 (PST)
+Received: from dread.disaster.area (pa49-186-4-237.pa.vic.optusnet.com.au. [49.186.4.237])
+        by smtp.gmail.com with ESMTPSA id kq3-20020a170903284300b0019b9a075f1fsm10217942plb.80.2023.03.08.13.08.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 08 Mar 2023 13:08:39 -0800 (PST)
+Received: from dave by dread.disaster.area with local (Exim 4.92.3)
+        (envelope-from <david@fromorbit.com>)
+        id 1pa11Y-006QqV-6V; Thu, 09 Mar 2023 08:08:36 +1100
+Date:   Thu, 9 Mar 2023 08:08:36 +1100
+From:   Dave Chinner <david@fromorbit.com>
+To:     David Howells <dhowells@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, Al Viro <viro@zeniv.linux.org.uk>,
+        Christoph Hellwig <hch@infradead.org>,
+        Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>,
+        Jeff Layton <jlayton@kernel.org>,
+        David Hildenbrand <david@redhat.com>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Logan Gunthorpe <logang@deltatee.com>,
+        Hillf Danton <hdanton@sina.com>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        John Hubbard <jhubbard@nvidia.com>
+Subject: Re: [PATCH v17 09/14] iomap: Don't get an reference on ZERO_PAGE for
+ direct I/O block zeroing
+Message-ID: <20230308210836.GV2825702@dread.disaster.area>
+References: <20230308165251.2078898-1-dhowells@redhat.com>
+ <20230308165251.2078898-10-dhowells@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20230307224627.28011-8-linux@zary.sk>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [178.176.73.253]
-X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
- (10.188.4.12)
-X-KSE-ServerInfo: msexch01.omp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 5.9.59, Database issued on: 03/08/2023 20:18:45
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 0
-X-KSE-AntiSpam-Info: Lua profiles 175961 [Mar 08 2023]
-X-KSE-AntiSpam-Info: Version: 5.9.59.0
-X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
-X-KSE-AntiSpam-Info: LuaCore: 507 507 08d345461d9bcca7095738422a5279ab257bb65a
-X-KSE-AntiSpam-Info: {rep_avail}
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info: 127.0.0.199:7.1.2;omp.ru:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1
-X-KSE-AntiSpam-Info: ApMailHostAddress: 178.176.73.253
-X-KSE-AntiSpam-Info: Rate: 0
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
- smtp.mailfrom=omp.ru;dkim=none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Heuristic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 03/08/2023 20:21:00
-X-KSE-AttachmentFiltering-Interceptor-Info: protection disabled
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 3/8/2023 5:25:00 PM
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230308165251.2078898-10-dhowells@redhat.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/8/23 1:46 AM, Ondrej Zary wrote:
-
-> org_data duplicates saved_r0 and org_ctrl duplicates saved_r2 in
-> pi->unit. Remove them.
+On Wed, Mar 08, 2023 at 04:52:46PM +0000, David Howells wrote:
+> ZERO_PAGE can't go away, no need to hold an extra reference.
 > 
-> Signed-off-by: Ondrej Zary <linux@zary.sk>
+> Signed-off-by: David Howells <dhowells@redhat.com>
+> Reviewed-by: David Hildenbrand <david@redhat.com>
+> Reviewed-by: John Hubbard <jhubbard@nvidia.com>
+> cc: Al Viro <viro@zeniv.linux.org.uk>
+> cc: David Hildenbrand <david@redhat.com>
+> cc: linux-fsdevel@vger.kernel.org
+> ---
+>  fs/iomap/direct-io.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/fs/iomap/direct-io.c b/fs/iomap/direct-io.c
+> index f771001574d0..850fb9870c2f 100644
+> --- a/fs/iomap/direct-io.c
+> +++ b/fs/iomap/direct-io.c
+> @@ -202,7 +202,7 @@ static void iomap_dio_zero(const struct iomap_iter *iter, struct iomap_dio *dio,
+>  	bio->bi_private = dio;
+>  	bio->bi_end_io = iomap_dio_bio_end_io;
+>  
+> -	get_page(page);
+> +	bio_set_flag(bio, BIO_NO_PAGE_REF);
+>  	__bio_add_page(bio, page, len, 0);
+>  	iomap_dio_submit_bio(iter, dio, bio, pos);
+>  }
 
-Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
+Looks fine.
 
-[...]
-
-MBR, Sergey
-
-
+Reviewed-by: Dave Chinner <dchinner@redhat.com>
+-- 
+Dave Chinner
+david@fromorbit.com
