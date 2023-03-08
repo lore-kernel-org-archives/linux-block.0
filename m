@@ -2,41 +2,41 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5115C64EC4
-	for <linux-block@archiver.kernel.org>; Wed,  8 Mar 2023 16:54:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 76DDCC64EC4
+	for <linux-block@archiver.kernel.org>; Wed,  8 Mar 2023 16:54:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229932AbjCHQx7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 8 Mar 2023 11:53:59 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48138 "EHLO
+        id S229952AbjCHQyF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 8 Mar 2023 11:54:05 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49152 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229903AbjCHQx4 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Mar 2023 11:53:56 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 036B832CFC
-        for <linux-block@vger.kernel.org>; Wed,  8 Mar 2023 08:53:06 -0800 (PST)
+        with ESMTP id S229913AbjCHQyA (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Mar 2023 11:54:00 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0BB165D276
+        for <linux-block@vger.kernel.org>; Wed,  8 Mar 2023 08:53:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1678294385;
+        s=mimecast20190719; t=1678294395;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=fokk7Crx10kBwBR9E3z6e4T6rL1k7XhHeFqewFVvsVE=;
-        b=JNwMXr6YtGXSbto+DP8v25A4Is4jwxisP3zmxqf0BYsPhvtBj7fUhcqu1pZak19vufjjD2
-        BS7BRPqPQddoaPUINF+y7y9HDO3HzWGbtDaRueON9YS7ZG532rshmSQhVCCdevpAs/kS0f
-        g8g0dJmj0/omWOS2aHpXv4ykWYjCR/M=
+        bh=74aMisHJvcrsbS5g8R7662ZNEA+1A6hMiypJVvVd5yo=;
+        b=A19B4Ey6DrGvG1Ba6N287qxFG+OW30I6UoYxhi1jRGDOBeE0jLxJc+v9J11XGoCZ/epWzL
+        IYNVdrouN5rCNEDkNSALw6V7pWqt5/0Il8mU3H+RH+PVZ47xXR5u3203dbdu+HUstj8ErU
+        gThOZGshCThokiD3geE53q7t5Kj56WM=
 Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
  [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-194-7CVrQpdMObaxQx7KSWspRQ-1; Wed, 08 Mar 2023 11:53:04 -0500
-X-MC-Unique: 7CVrQpdMObaxQx7KSWspRQ-1
+ us-mta-629-CMD8rN7nNP6tp5tN6HG62A-1; Wed, 08 Mar 2023 11:53:11 -0500
+X-MC-Unique: CMD8rN7nNP6tp5tN6HG62A-1
 Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id EB104100F90A;
-        Wed,  8 Mar 2023 16:53:03 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id DFF60100F909;
+        Wed,  8 Mar 2023 16:53:09 +0000 (UTC)
 Received: from warthog.procyon.org.uk (unknown [10.33.36.18])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id BA1FE492C3E;
-        Wed,  8 Mar 2023 16:53:01 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id AE39D492C3E;
+        Wed,  8 Mar 2023 16:53:07 +0000 (UTC)
 From:   David Howells <dhowells@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>, Al Viro <viro@zeniv.linux.org.uk>,
         Christoph Hellwig <hch@infradead.org>
@@ -50,13 +50,13 @@ Cc:     David Howells <dhowells@redhat.com>,
         Linus Torvalds <torvalds@linux-foundation.org>,
         linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        Miklos Szeredi <miklos@szeredi.hu>,
         Christoph Hellwig <hch@lst.de>,
         John Hubbard <jhubbard@nvidia.com>,
+        Miklos Szeredi <miklos@szeredi.hu>,
         linux-unionfs@vger.kernel.org
-Subject: [PATCH v17 02/14] splice: Make do_splice_to() generic and export it
-Date:   Wed,  8 Mar 2023 16:52:39 +0000
-Message-Id: <20230308165251.2078898-3-dhowells@redhat.com>
+Subject: [PATCH v17 04/14] overlayfs: Implement splice-read
+Date:   Wed,  8 Mar 2023 16:52:41 +0000
+Message-Id: <20230308165251.2078898-5-dhowells@redhat.com>
 In-Reply-To: <20230308165251.2078898-1-dhowells@redhat.com>
 References: <20230308165251.2078898-1-dhowells@redhat.com>
 MIME-Version: 1.0
@@ -66,100 +66,75 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Rename do_splice_to() to vfs_splice_read() and export it so that it can be
-used as a helper when calling down to a lower layer filesystem as it
-performs all the necessary checks[1].
+Implement splice-read for overlayfs by passing the request down a layer
+rather than going through generic_file_splice_read() which is going to be
+changed to assume that ->read_folio() is present on buffered files.
 
 Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Miklos Szeredi <miklos@szeredi.hu>
 cc: Christoph Hellwig <hch@lst.de>
 cc: Jens Axboe <axboe@kernel.dk>
 cc: Al Viro <viro@zeniv.linux.org.uk>
 cc: John Hubbard <jhubbard@nvidia.com>
 cc: David Hildenbrand <david@redhat.com>
 cc: Matthew Wilcox <willy@infradead.org>
+cc: Miklos Szeredi <miklos@szeredi.hu>
 cc: linux-unionfs@vger.kernel.org
 cc: linux-block@vger.kernel.org
 cc: linux-fsdevel@vger.kernel.org
 cc: linux-mm@kvack.org
-Link: https://lore.kernel.org/r/CAJfpeguGksS3sCigmRi9hJdUec8qtM9f+_9jC1rJhsXT+dV01w@mail.gmail.com/ [1]
 ---
- fs/splice.c            | 27 ++++++++++++++++++++-------
- include/linux/splice.h |  3 +++
- 2 files changed, 23 insertions(+), 7 deletions(-)
 
-diff --git a/fs/splice.c b/fs/splice.c
-index abd21a455a2b..90ccd3666dca 100644
---- a/fs/splice.c
-+++ b/fs/splice.c
-@@ -851,12 +851,24 @@ static long do_splice_from(struct pipe_inode_info *pipe, struct file *out,
- 	return out->f_op->splice_write(pipe, out, ppos, len, flags);
+Notes:
+    ver #17)
+     - Use vfs_splice_read() helper rather than open-coding checks.
+    
+    ver #15)
+     - Remove redundant FMODE_CAN_ODIRECT check on real file.
+     - Do rw_verify_area() on the real file, not the overlay file.
+     - Fix a file leak.
+
+ fs/overlayfs/file.c | 23 ++++++++++++++++++++++-
+ 1 file changed, 22 insertions(+), 1 deletion(-)
+
+diff --git a/fs/overlayfs/file.c b/fs/overlayfs/file.c
+index 7c04f033aadd..86197882ff35 100644
+--- a/fs/overlayfs/file.c
++++ b/fs/overlayfs/file.c
+@@ -419,6 +419,27 @@ static ssize_t ovl_write_iter(struct kiocb *iocb, struct iov_iter *iter)
+ 	return ret;
  }
  
--/*
-- * Attempt to initiate a splice from a file to a pipe.
-+/**
-+ * vfs_splice_read - Read data from a file and splice it into a pipe
-+ * @in:		File to splice from
-+ * @ppos:	Input file offset
-+ * @pipe:	Pipe to splice to
-+ * @len:	Number of bytes to splice
-+ * @flags:	Splice modifier flags (SPLICE_F_*)
-+ *
-+ * Splice the requested amount of data from the input file to the pipe.  This
-+ * is synchronous as the caller must hold the pipe lock across the entire
-+ * operation.
-+ *
-+ * If successful, it returns the amount of data spliced, 0 if it hit the EOF or
-+ * a hole and a negative error code otherwise.
-  */
--static long do_splice_to(struct file *in, loff_t *ppos,
--			 struct pipe_inode_info *pipe, size_t len,
--			 unsigned int flags)
-+long vfs_splice_read(struct file *in, loff_t *ppos,
-+		     struct pipe_inode_info *pipe, size_t len,
-+		     unsigned int flags)
- {
- 	unsigned int p_space;
- 	int ret;
-@@ -879,6 +891,7 @@ static long do_splice_to(struct file *in, loff_t *ppos,
- 		return warn_unsupported(in, "read");
- 	return in->f_op->splice_read(in, ppos, pipe, len, flags);
- }
-+EXPORT_SYMBOL_GPL(vfs_splice_read);
++static ssize_t ovl_splice_read(struct file *in, loff_t *ppos,
++			       struct pipe_inode_info *pipe, size_t len,
++			       unsigned int flags)
++{
++	const struct cred *old_cred;
++	struct fd real;
++	ssize_t ret;
++
++	ret = ovl_real_fdget(in, &real);
++	if (ret)
++		return ret;
++
++	old_cred = ovl_override_creds(file_inode(in)->i_sb);
++	ret = vfs_splice_read(real.file, ppos, pipe, len, flags);
++	revert_creds(old_cred);
++	ovl_file_accessed(in);
++
++	fdput(real);
++	return ret;
++}
++
+ /*
+  * Calling iter_file_splice_write() directly from overlay's f_op may deadlock
+  * due to lock order inversion between pipe->mutex in iter_file_splice_write()
+@@ -695,7 +716,7 @@ const struct file_operations ovl_file_operations = {
+ 	.fallocate	= ovl_fallocate,
+ 	.fadvise	= ovl_fadvise,
+ 	.flush		= ovl_flush,
+-	.splice_read    = generic_file_splice_read,
++	.splice_read    = ovl_splice_read,
+ 	.splice_write   = ovl_splice_write,
  
- /**
-  * splice_direct_to_actor - splices data directly between two non-pipes
-@@ -949,7 +962,7 @@ ssize_t splice_direct_to_actor(struct file *in, struct splice_desc *sd,
- 		size_t read_len;
- 		loff_t pos = sd->pos, prev_pos = pos;
- 
--		ret = do_splice_to(in, &pos, pipe, len, flags);
-+		ret = vfs_splice_read(in, &pos, pipe, len, flags);
- 		if (unlikely(ret <= 0))
- 			goto out_release;
- 
-@@ -1097,7 +1110,7 @@ long splice_file_to_pipe(struct file *in,
- 	pipe_lock(opipe);
- 	ret = wait_for_space(opipe, flags);
- 	if (!ret)
--		ret = do_splice_to(in, offset, opipe, len, flags);
-+		ret = vfs_splice_read(in, offset, opipe, len, flags);
- 	pipe_unlock(opipe);
- 	if (ret > 0)
- 		wakeup_pipe_readers(opipe);
-diff --git a/include/linux/splice.h b/include/linux/splice.h
-index a55179fd60fc..8f052c3dae95 100644
---- a/include/linux/splice.h
-+++ b/include/linux/splice.h
-@@ -76,6 +76,9 @@ extern ssize_t splice_to_pipe(struct pipe_inode_info *,
- 			      struct splice_pipe_desc *);
- extern ssize_t add_to_pipe(struct pipe_inode_info *,
- 			      struct pipe_buffer *);
-+long vfs_splice_read(struct file *in, loff_t *ppos,
-+		     struct pipe_inode_info *pipe, size_t len,
-+		     unsigned int flags);
- extern ssize_t splice_direct_to_actor(struct file *, struct splice_desc *,
- 				      splice_direct_actor *);
- extern long do_splice(struct file *in, loff_t *off_in,
+ 	.copy_file_range	= ovl_copy_file_range,
 
