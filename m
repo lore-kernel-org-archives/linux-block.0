@@ -2,125 +2,141 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E516C6FD1E
-	for <linux-block@archiver.kernel.org>; Wed,  8 Mar 2023 16:23:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DCBF9C678D5
+	for <linux-block@archiver.kernel.org>; Wed,  8 Mar 2023 16:53:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230002AbjCHQXz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 8 Mar 2023 11:23:55 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35314 "EHLO
+        id S229905AbjCHQx5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 8 Mar 2023 11:53:57 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48280 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229949AbjCHQXu (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Mar 2023 11:23:50 -0500
-Received: from mail-wm1-x32a.google.com (mail-wm1-x32a.google.com [IPv6:2a00:1450:4864:20::32a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35170B8579;
-        Wed,  8 Mar 2023 08:23:49 -0800 (PST)
-Received: by mail-wm1-x32a.google.com with SMTP id o38-20020a05600c512600b003e8320d1c11so2286085wms.1;
-        Wed, 08 Mar 2023 08:23:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1678292627;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Y4IZ92EpBEKYcl2ZJKg5u1/HykSPMLGytpx3Q6cANxw=;
-        b=KXeejlC+4XVExK3kgXB+euBTRMQEj40ANiAPfPW+XYr+wRhSgvqApNVIjjHpJGF0L+
-         bbso+oH9rZGiInEKaP+TezjfMPqwSIZqy1Llp1GQMQ5AtDutB6TVvDjZc0pt+DXzhx4K
-         eqbJ7zSNsyX6gvU1htknTH7LJdMCJzfnTju34WT3C+TkrIsoPf0kuGMe3Gai+4Ng1GAw
-         LPAkOiIuJamrMoLxnlhb2OMCTDpyDjgAJk+n6+EXbjkFq2EnAEs4BaoxZbPj/P8/55Eu
-         I3LHOwSX21UdYcHn/vA65H62F6o62ltFmRzIVHXnT3+maGDjfPM9ZQXk9AGkypVMcqPS
-         iL0A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678292627;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Y4IZ92EpBEKYcl2ZJKg5u1/HykSPMLGytpx3Q6cANxw=;
-        b=2IITwvrJY6vFjypdSw2TQAJgcE3L+VTMcMh1Z5iUPaAxxLKpzhu5tqTwtJHdwxy+0O
-         M8wm2AWyT1UaZAFBY3smuONjbiP7CEAKpXJu2vR5KabqhfOjQzpox4F5S7Gigeqme7Gl
-         UEzTJhhLBf51VSPLm0dI6NWDFlyty5ezVyxyF/WFeq+9MfvgMwKM6TqOdeZWGWxdqMdJ
-         BgfAxn69cHp8Do9DTWk8klgQxKgBl9WLQA2CE2E1uGYDGwJ3aKHqhb9gYpLNwbH8FuQS
-         AEP2FnsZ5WKjEH7oms8xSXHZj9kty2TWh/0p+E8vB8wUICQAflf4J0afpZFtU9ehTNvx
-         y6wA==
-X-Gm-Message-State: AO0yUKW3VR7rTlkxM7rtwH25lPBsLmQIpCaLfzBiCLWpmDcQ6ltQfFQ+
-        4lq9YfcMprstRSZ3f8CfhMgAy+U3mAE=
-X-Google-Smtp-Source: AK7set9rIk17PWmTxE+WV4EzbQdNDEsZpNTjws7HY60vQ/y94IIfjoh2KD1fUbA5J632E/xYAXub9w==
-X-Received: by 2002:a05:600c:4e8b:b0:3d2:392e:905f with SMTP id f11-20020a05600c4e8b00b003d2392e905fmr16807225wmq.24.1678292627409;
-        Wed, 08 Mar 2023 08:23:47 -0800 (PST)
-Received: from [192.168.8.100] (188.30.85.94.threembb.co.uk. [188.30.85.94])
-        by smtp.gmail.com with ESMTPSA id l10-20020a7bc44a000000b003e21dcccf9fsm19880128wmi.16.2023.03.08.08.23.46
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 08 Mar 2023 08:23:47 -0800 (PST)
-Message-ID: <7cdea685-98d3-e24d-8282-87cb44ae6174@gmail.com>
-Date:   Wed, 8 Mar 2023 16:22:15 +0000
+        with ESMTP id S229634AbjCHQxx (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Mar 2023 11:53:53 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C2DF1CF45
+        for <linux-block@vger.kernel.org>; Wed,  8 Mar 2023 08:53:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1678294386;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=dL8s47Tp1nK8GIg8PijNkCrDLEgPha2fkCIMRUXm1zk=;
+        b=hTMhpU9/JD0HBvjCuHgXAMJK4XcAjZlC0neCx+1s1T5MwxKOIPRPPYSiXLp/1H1PiQcILL
+        l1m9VsdA7zRHIC/0cQP6dtoQiD4WNJgFSnM6JlzHmtbrzNVpL03clSunYlN0Yjez/mWbqm
+        WWWaMMxAI+323FuVCX9yooZ54WMChb4=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-609-Q9XiGVkBM5CVEEGBMEseQA-1; Wed, 08 Mar 2023 11:53:02 -0500
+X-MC-Unique: Q9XiGVkBM5CVEEGBMEseQA-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 0ADFE2810C15;
+        Wed,  8 Mar 2023 16:53:01 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.33.36.18])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 08E1F492B04;
+        Wed,  8 Mar 2023 16:52:58 +0000 (UTC)
+From:   David Howells <dhowells@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>, Al Viro <viro@zeniv.linux.org.uk>,
+        Christoph Hellwig <hch@infradead.org>
+Cc:     David Howells <dhowells@redhat.com>,
+        Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>,
+        Jeff Layton <jlayton@kernel.org>,
+        David Hildenbrand <david@redhat.com>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Logan Gunthorpe <logang@deltatee.com>,
+        Hillf Danton <hdanton@sina.com>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        Christoph Hellwig <hch@lst.de>,
+        John Hubbard <jhubbard@nvidia.com>
+Subject: [PATCH v17 01/14] splice: Clean up direct_splice_read() a bit
+Date:   Wed,  8 Mar 2023 16:52:38 +0000
+Message-Id: <20230308165251.2078898-2-dhowells@redhat.com>
+In-Reply-To: <20230308165251.2078898-1-dhowells@redhat.com>
+References: <20230308165251.2078898-1-dhowells@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.2
-Subject: Re: [PATCH V2 00/17] io_uring/ublk: add IORING_OP_FUSED_CMD
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org,
-        linux-block@vger.kernel.org, Miklos Szeredi <mszeredi@redhat.com>,
-        ZiyangZhang <ZiyangZhang@linux.alibaba.com>,
-        Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>,
-        Bernd Schubert <bschubert@ddn.com>
-References: <20230307141520.793891-1-ming.lei@redhat.com>
- <7e05882f-9695-895d-5e83-61006e54c4b2@gmail.com>
- <ZAff9usDuyXxIPt9@ovpn-8-16.pek2.redhat.com>
-Content-Language: en-US
-From:   Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <ZAff9usDuyXxIPt9@ovpn-8-16.pek2.redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/8/23 01:08, Ming Lei wrote:
-> On Tue, Mar 07, 2023 at 03:37:21PM +0000, Pavel Begunkov wrote:
->> On 3/7/23 14:15, Ming Lei wrote:
->>> Hello,
->>>
->>> Add IORING_OP_FUSED_CMD, it is one special URING_CMD, which has to
->>> be SQE128. The 1st SQE(master) is one 64byte URING_CMD, and the 2nd
->>> 64byte SQE(slave) is another normal 64byte OP. For any OP which needs
->>> to support slave OP, io_issue_defs[op].fused_slave needs to be set as 1,
->>> and its ->issue() can retrieve/import buffer from master request's
->>> fused_cmd_kbuf. The slave OP is actually submitted from kernel, part of
->>> this idea is from Xiaoguang's ublk ebpf patchset, but this patchset
->>> submits slave OP just like normal OP issued from userspace, that said,
->>> SQE order is kept, and batching handling is done too.
->>
->>  From a quick look through patches it all looks a bit complicated
->> and intrusive, all over generic hot paths. I think instead we
-> 
-> Really? The main change to generic hot paths are adding one 'true/false'
-> parameter to io_init_req(). For others, the change is just check on
-> req->flags or issue_flags, which is basically zero cost.
+Do a couple of cleanups to direct_splice_read():
 
-Extra flag in io_init_req() but also exporting it, which is an
-internal function, to non-core code. Additionally it un-inlines it
-and even looks recurse calls it (max depth 2). From a quick look,
-there is some hand coded ->cached_refs manipulations, it takes extra
-space in generic sections of io_kiocb. It makes all cmd users to
-check for IO_URING_F_FUSED. There is also a two-way dependency b/w
-requests, which never plays out well, e.g. I still hate how linked
-timeouts stick out in generic paths.
+ (1) Cast to struct page **, not void *.
 
-Depending on SQE128 also doesn't seem right, though it can be dealt
-with, e.g. sth like how it's done with links requests.
+ (2) Simplify the calculation of the number of pages to keep/reclaim in
+     direct_splice_read().
 
->> should be able to use registered buffer table as intermediary and
->> reuse splicing. Let me try it out
-> 
-> I will take a look at you patch, but last time, Linus has pointed out that
-> splice isn't one good way, in which buffer ownership transferring is one big
-> issue for writing data to page retrieved from pipe.
+Suggested-by: Christoph Hellwig <hch@infradead.org>
+Signed-off-by: David Howells <dhowells@redhat.com>
+cc: Jens Axboe <axboe@kernel.dk>
+cc: Christoph Hellwig <hch@lst.de>
+cc: Al Viro <viro@zeniv.linux.org.uk>
+cc: David Hildenbrand <david@redhat.com>
+cc: John Hubbard <jhubbard@nvidia.com>
+cc: linux-mm@kvack.org
+cc: linux-block@vger.kernel.org
+cc: linux-fsdevel@vger.kernel.org
+---
+ fs/splice.c | 19 +++++++------------
+ 1 file changed, 7 insertions(+), 12 deletions(-)
 
-There are no real pipes, better to say io_uring replaces a pipe,
-and splice bits are used to get pages from a file. Though, there
-will be some common problems. Thanks for the link, I'll need to
-get through it first, thanks for the link
+diff --git a/fs/splice.c b/fs/splice.c
+index 2e76dbb81a8f..abd21a455a2b 100644
+--- a/fs/splice.c
++++ b/fs/splice.c
+@@ -295,7 +295,7 @@ ssize_t direct_splice_read(struct file *in, loff_t *ppos,
+ 	struct kiocb kiocb;
+ 	struct page **pages;
+ 	ssize_t ret;
+-	size_t used, npages, chunk, remain, reclaim;
++	size_t used, npages, chunk, remain, keep = 0;
+ 	int i;
+ 
+ 	/* Work out how much data we can actually add into the pipe */
+@@ -309,7 +309,7 @@ ssize_t direct_splice_read(struct file *in, loff_t *ppos,
+ 	if (!bv)
+ 		return -ENOMEM;
+ 
+-	pages = (void *)(bv + npages);
++	pages = (struct page **)(bv + npages);
+ 	npages = alloc_pages_bulk_array(GFP_USER, npages, pages);
+ 	if (!npages) {
+ 		kfree(bv);
+@@ -332,11 +332,8 @@ ssize_t direct_splice_read(struct file *in, loff_t *ppos,
+ 	kiocb.ki_pos = *ppos;
+ 	ret = call_read_iter(in, &kiocb, &to);
+ 
+-	reclaim = npages * PAGE_SIZE;
+-	remain = 0;
+ 	if (ret > 0) {
+-		reclaim -= ret;
+-		remain = ret;
++		keep = DIV_ROUND_UP(ret, PAGE_SIZE);
+ 		*ppos = kiocb.ki_pos;
+ 		file_accessed(in);
+ 	} else if (ret < 0) {
+@@ -349,14 +346,12 @@ ssize_t direct_splice_read(struct file *in, loff_t *ppos,
+ 	}
+ 
+ 	/* Free any pages that didn't get touched at all. */
+-	reclaim /= PAGE_SIZE;
+-	if (reclaim) {
+-		npages -= reclaim;
+-		release_pages(pages + npages, reclaim);
+-	}
++	if (keep < npages)
++		release_pages(pages + keep, npages - keep);
+ 
+ 	/* Push the remaining pages into the pipe. */
+-	for (i = 0; i < npages; i++) {
++	remain = ret;
++	for (i = 0; i < keep; i++) {
+ 		struct pipe_buffer *buf = pipe_head_buf(pipe);
+ 
+ 		chunk = min_t(size_t, remain, PAGE_SIZE);
 
-
-> https://lore.kernel.org/linux-block/CAJfpeguQ3xn2-6svkkVXJ88tiVfcDd-eKi1evzzfvu305fMoyw@mail.gmail.com/
-
--- 
-Pavel Begunkov
