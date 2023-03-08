@@ -2,128 +2,298 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 109F9C678D5
-	for <linux-block@archiver.kernel.org>; Wed,  8 Mar 2023 02:09:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01AF2C678D5
+	for <linux-block@archiver.kernel.org>; Wed,  8 Mar 2023 02:12:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229542AbjCHCJH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 7 Mar 2023 21:09:07 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58664 "EHLO
+        id S229695AbjCHCMX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 7 Mar 2023 21:12:23 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60888 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229582AbjCHCJF (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 7 Mar 2023 21:09:05 -0500
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A02C49CFD1;
-        Tue,  7 Mar 2023 18:09:03 -0800 (PST)
-Received: from mail02.huawei.com (unknown [172.30.67.169])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4PWbMt5fNPz4f3nTX;
-        Wed,  8 Mar 2023 10:08:58 +0800 (CST)
-Received: from huaweicloud.com (unknown [10.175.127.227])
-        by APP3 (Coremail) with SMTP id _Ch0CgDHcyE47gdkBs8gEg--.52407S4;
-        Wed, 08 Mar 2023 10:08:58 +0800 (CST)
-From:   Yu Kuai <yukuai1@huaweicloud.com>
-To:     jack@suse.cz, shinichiro.kawasaki@wdc.com,
-        paolo.valente@linaro.org, axboe@kernel.dk, glusvardi@posteo.net,
-        damien.lemoal@opensource.wdc.com, felicigb@gmail.com,
-        inbox@emilianomaccaferri.com
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        yukuai3@huawei.com, yukuai1@huaweicloud.com, yi.zhang@huawei.com,
-        yangerkun@huawei.com
-Subject: [PATCH] block, bfq: fix uaf for 'stable_merge_bfqq'
-Date:   Wed,  8 Mar 2023 10:32:08 +0800
-Message-Id: <20230308023208.379465-1-yukuai1@huaweicloud.com>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <4e6e1606-1d9e-9903-8a44-ccac58a1fe06@kernel.dk>
-References: <4e6e1606-1d9e-9903-8a44-ccac58a1fe06@kernel.dk>
+        with ESMTP id S229483AbjCHCMW (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 7 Mar 2023 21:12:22 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 04C36A2F39
+        for <linux-block@vger.kernel.org>; Tue,  7 Mar 2023 18:11:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1678241467;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=LjIhpLNu1/FM8k7JR4dHiHXMiEFei7baHUdSFdODfCY=;
+        b=XfUbkMlnAaMI3aZ+tg3LFcSd22cG3bGZz9ynmJidCnS/y8NdE5s4y182zHZx6i0I7Q8s/h
+        fbHa6sewhxrnv+IUGsgz4tlXmMSOtT2XqUlT5ZFZXf1QoUA0yFFyovBDvi/EyCKw2YczdS
+        EuInX6LPjLkZVlUOnL6Hv83jf9qAxsU=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-235-X-y8KCpiMPyakzG6Xo6J1w-1; Tue, 07 Mar 2023 21:11:05 -0500
+X-MC-Unique: X-y8KCpiMPyakzG6Xo6J1w-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 405A529AA2C1;
+        Wed,  8 Mar 2023 02:11:05 +0000 (UTC)
+Received: from ovpn-8-16.pek2.redhat.com (ovpn-8-17.pek2.redhat.com [10.72.8.17])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id C7F914035711;
+        Wed,  8 Mar 2023 02:10:59 +0000 (UTC)
+Date:   Wed, 8 Mar 2023 10:10:54 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Pavel Begunkov <asml.silence@gmail.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org,
+        linux-block@vger.kernel.org, Miklos Szeredi <mszeredi@redhat.com>,
+        ZiyangZhang <ZiyangZhang@linux.alibaba.com>,
+        Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>,
+        Bernd Schubert <bschubert@ddn.com>, ming.lei@redhat.com
+Subject: Re: [PATCH V2 00/17] io_uring/ublk: add IORING_OP_FUSED_CMD
+Message-ID: <ZAfurtfY4lXa8sxX@ovpn-8-16.pek2.redhat.com>
+References: <20230307141520.793891-1-ming.lei@redhat.com>
+ <7e05882f-9695-895d-5e83-61006e54c4b2@gmail.com>
+ <ce96f7e7-1315-7154-f540-1a3ff0215674@gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: _Ch0CgDHcyE47gdkBs8gEg--.52407S4
-X-Coremail-Antispam: 1UD129KBjvJXoW7Kr45XryUWF4kKry7Jr48Crg_yoW5JrWkpa
-        1DKw4avr1rJrW5XrWxAw40vF98tr43Ar9FyryrW347uw1DJrySvFsF9ayI9Fn2vr48CFnx
-        Xw1qqas2kr48JrDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUvY14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-        1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-        JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-        CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-        2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-        W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2
-        Y2ka0xkIwI1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4
-        xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43
-        MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I
-        0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWrZr1j6s0DMIIF0xvEx4A2jsIE14v2
-        6r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0J
-        UdHUDUUUUU=
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ce96f7e7-1315-7154-f540-1a3ff0215674@gmail.com>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.1
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Yu Kuai <yukuai3@huawei.com>
+On Tue, Mar 07, 2023 at 05:17:04PM +0000, Pavel Begunkov wrote:
+> On 3/7/23 15:37, Pavel Begunkov wrote:
+> > On 3/7/23 14:15, Ming Lei wrote:
+> > > Hello,
+> > > 
+> > > Add IORING_OP_FUSED_CMD, it is one special URING_CMD, which has to
+> > > be SQE128. The 1st SQE(master) is one 64byte URING_CMD, and the 2nd
+> > > 64byte SQE(slave) is another normal 64byte OP. For any OP which needs
+> > > to support slave OP, io_issue_defs[op].fused_slave needs to be set as 1,
+> > > and its ->issue() can retrieve/import buffer from master request's
+> > > fused_cmd_kbuf. The slave OP is actually submitted from kernel, part of
+> > > this idea is from Xiaoguang's ublk ebpf patchset, but this patchset
+> > > submits slave OP just like normal OP issued from userspace, that said,
+> > > SQE order is kept, and batching handling is done too.
+> > 
+> >  From a quick look through patches it all looks a bit complicated
+> > and intrusive, all over generic hot paths. I think instead we
+> > should be able to use registered buffer table as intermediary and
+> > reuse splicing. Let me try it out
+> 
+> Here we go, isolated in a new opcode, and in the end should work
+> with any file supporting splice. It's a quick prototype, it's lacking
+> and there are many obvious fatal bugs. It also needs some optimisations,
+> improvements on how executed by io_uring and extra stuff like
+> memcpy ops and fixed buf recv/send. I'll clean it up.
+> 
+> I used a test below, it essentially does zc recv.
+> 
+> https://github.com/isilence/liburing/commit/81fe705739af7d9b77266f9aa901c1ada870739d
+> 
+> 
+> From 87ad9e8e3aed683aa040fb4b9ae499f8726ba393 Mon Sep 17 00:00:00 2001
+> Message-Id: <87ad9e8e3aed683aa040fb4b9ae499f8726ba393.1678208911.git.asml.silence@gmail.com>
+> From: Pavel Begunkov <asml.silence@gmail.com>
+> Date: Tue, 7 Mar 2023 17:01:44 +0000
+> Subject: [POC 1/1] io_uring: splicing into reg buf table
+> 
+> EXTREMELY BUGGY! Not for inclusion.
+> 
+> Add a new operation called IORING_OP_SPLICE_FROM,
+> which splices from a file into the registered buffer table. This is
+> done in a zerocopy fashion with a caveat that the user won't have
+> direct access to the data, however it can use it with any io_uring
+> request supporting registered buffers.
+> 
+> Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
+> ---
+>  include/uapi/linux/io_uring.h |  1 +
+>  io_uring/io_uring.c           |  4 +-
+>  io_uring/opdef.c              | 10 ++++
+>  io_uring/splice.c             | 98 +++++++++++++++++++++++++++++++++++
+>  io_uring/splice.h             |  3 ++
+>  5 files changed, 114 insertions(+), 2 deletions(-)
+> 
+> diff --git a/include/uapi/linux/io_uring.h b/include/uapi/linux/io_uring.h
+> index 709de6d4feb2..a91ce1d2ebd7 100644
+> --- a/include/uapi/linux/io_uring.h
+> +++ b/include/uapi/linux/io_uring.h
+> @@ -223,6 +223,7 @@ enum io_uring_op {
+>  	IORING_OP_URING_CMD,
+>  	IORING_OP_SEND_ZC,
+>  	IORING_OP_SENDMSG_ZC,
+> +	IORING_OP_SPLICE_FROM,
+>  	/* this goes last, obviously */
+>  	IORING_OP_LAST,
+> diff --git a/io_uring/io_uring.c b/io_uring/io_uring.c
+> index 7625597b5227..b7389a6ea190 100644
+> --- a/io_uring/io_uring.c
+> +++ b/io_uring/io_uring.c
+> @@ -2781,8 +2781,8 @@ static __cold void io_ring_ctx_free(struct io_ring_ctx *ctx)
+>  	io_wait_rsrc_data(ctx->file_data);
+>  	mutex_lock(&ctx->uring_lock);
+> -	if (ctx->buf_data)
+> -		__io_sqe_buffers_unregister(ctx);
+> +	// if (ctx->buf_data)
+> +	// 	__io_sqe_buffers_unregister(ctx);
+>  	if (ctx->file_data)
+>  		__io_sqe_files_unregister(ctx);
+>  	io_cqring_overflow_kill(ctx);
+> diff --git a/io_uring/opdef.c b/io_uring/opdef.c
+> index cca7c5b55208..28d4fa42676b 100644
+> --- a/io_uring/opdef.c
+> +++ b/io_uring/opdef.c
+> @@ -428,6 +428,13 @@ const struct io_issue_def io_issue_defs[] = {
+>  		.prep			= io_eopnotsupp_prep,
+>  #endif
+>  	},
+> +	[IORING_OP_SPLICE_FROM] = {
+> +		.needs_file		= 1,
+> +		.unbound_nonreg_file	= 1,
+> +		// .pollin			= 1,
+> +		.prep			= io_splice_from_prep,
+> +		.issue			= io_splice_from,
+> +	}
+>  };
+> @@ -648,6 +655,9 @@ const struct io_cold_def io_cold_defs[] = {
+>  		.fail			= io_sendrecv_fail,
+>  #endif
+>  	},
+> +	[IORING_OP_SPLICE_FROM] = {
+> +		.name			= "SPLICE_FROM",
+> +	}
+>  };
+>  const char *io_uring_get_opcode(u8 opcode)
+> diff --git a/io_uring/splice.c b/io_uring/splice.c
+> index 2a4bbb719531..0467e9f46e99 100644
+> --- a/io_uring/splice.c
+> +++ b/io_uring/splice.c
+> @@ -8,11 +8,13 @@
+>  #include <linux/namei.h>
+>  #include <linux/io_uring.h>
+>  #include <linux/splice.h>
+> +#include <linux/nospec.h>
+>  #include <uapi/linux/io_uring.h>
+>  #include "io_uring.h"
+>  #include "splice.h"
+> +#include "rsrc.h"
+>  struct io_splice {
+>  	struct file			*file_out;
+> @@ -119,3 +121,99 @@ int io_splice(struct io_kiocb *req, unsigned int issue_flags)
+>  	io_req_set_res(req, ret, 0);
+>  	return IOU_OK;
+>  }
+> +
+> +struct io_splice_from {
+> +	struct file			*file;
+> +	loff_t				off;
+> +	u64				len;
+> +};
+> +
+> +
+> +int io_splice_from_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
+> +{
+> +	struct io_splice_from *sp = io_kiocb_to_cmd(req, struct io_splice_from);
+> +
+> +	if (unlikely(sqe->splice_flags || sqe->splice_fd_in || sqe->ioprio ||
+> +		     sqe->addr || sqe->addr3))
+> +		return -EINVAL;
+> +
+> +	req->buf_index = READ_ONCE(sqe->buf_index);
+> +
+> +	sp->len = READ_ONCE(sqe->len);
+> +	if (unlikely(!sp->len))
+> +		return -EINVAL;
+> +
+> +	sp->off = READ_ONCE(sqe->off);
+> +	return 0;
+> +}
+> +
+> +int io_splice_from(struct io_kiocb *req, unsigned int issue_flags)
+> +{
+> +	struct io_splice_from *sp = io_kiocb_to_cmd(req, struct io_splice_from);
+> +	loff_t *ppos = (sp->off == -1) ? NULL : &sp->off;
+> +	struct io_mapped_ubuf *imu;
+> +	struct pipe_inode_info *pi;
+> +	struct io_ring_ctx *ctx;
+> +	unsigned int pipe_tail;
+> +	int ret, i, nr_pages;
+> +	u16 index;
+> +
+> +	if (!sp->file->f_op->splice_read)
+> +		return -ENOTSUPP;
+> +
+> +	pi = alloc_pipe_info();
 
-Before commit fd571df0ac5b ("block, bfq: turn bfqq_data into an array
-in bfq_io_cq"), process reference is read before bfq_put_stable_ref(),
-and it's safe if bfq_put_stable_ref() put the last reference, because
-process reference will be 0 and 'stable_merge_bfqq' won't be accessed
-in this case. However, the commit changed the order and  will cause
-uaf for 'stable_merge_bfqq'.
+The above should be replaced with direct pipe, otherwise every time
+allocating one pipe inode really hurts performance.
 
-In order to emphasize that bfq_put_stable_ref() can drop the last
-reference, fix the problem by moving bfq_put_stable_ref() to the end of
-bfq_setup_stable_merge().
+> +	if (!pi)
+> +		return -ENOMEM;
+> +	pi->readers = 1;
+> +
+> +	ret = sp->file->f_op->splice_read(sp->file, ppos, pi, sp->len, 0);
+> +	if (ret < 0)
+> +		goto done;
+> +
+> +	nr_pages = pipe_occupancy(pi->head, pi->tail);
+> +	imu = kvmalloc(struct_size(imu, bvec, nr_pages), GFP_KERNEL);
+> +	if (!imu)
+> +		goto done;
+> +
+> +	ret = 0;
+> +	pipe_tail = pi->tail;
+> +	for (i = 0; !pipe_empty(pi->head, pipe_tail); i++) {
+> +		unsigned int mask = pi->ring_size - 1; // kill mask
+> +		struct pipe_buffer *buf = &pi->bufs[pipe_tail & mask];
+> +
+> +		bvec_set_page(&imu->bvec[i], buf->page, buf->len, buf->offset);
+> +		ret += buf->len;
+> +		pipe_tail++;
+> +	}
+> +	if (WARN_ON_ONCE(i != nr_pages))
+> +		return -EFAULT;
+> +
+> +	ctx = req->ctx;
+> +	io_ring_submit_lock(ctx, issue_flags);
+> +	if (unlikely(req->buf_index >= ctx->nr_user_bufs)) {
+> +		/* TODO: cleanup pages */
+> +		ret = -EFAULT;
+> +		kvfree(imu);
+> +		goto done_unlock;
+> +	}
+> +	index = array_index_nospec(req->buf_index, ctx->nr_user_bufs);
+> +	if (ctx->user_bufs[index] != ctx->dummy_ubuf) {
+> +		/* TODO: cleanup pages */
+> +		kvfree(imu);
+> +		ret = -EFAULT;
+> +		goto done_unlock;
+> +	}
+> +
+> +	imu->ubuf = 0;
+> +	imu->ubuf_end = ret;
+> +	imu->nr_bvecs = nr_pages;
+> +	ctx->user_bufs[index] = imu;
 
-Fixes: fd571df0ac5b ("block, bfq: turn bfqq_data into an array in bfq_io_cq")
-Reported-and-tested-by: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Link: https://lore.kernel.org/linux-block/20230307071448.rzihxbm4jhbf5krj@shindev/
-Signed-off-by: Yu Kuai <yukuai3@huawei.com>
----
- block/bfq-iosched.c | 18 +++++++++---------
- 1 file changed, 9 insertions(+), 9 deletions(-)
+Your patch looks like transferring pages ownership to io_uring fixed
+buffer, but unfortunately it can't be done in this way. splice is
+supposed for moving data, not transfer buffer ownership.
 
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index 8a8d4441519c..d9ed3108c17a 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -2854,11 +2854,11 @@ bfq_setup_stable_merge(struct bfq_data *bfqd, struct bfq_queue *bfqq,
- {
- 	int proc_ref = min(bfqq_process_refs(bfqq),
- 			   bfqq_process_refs(stable_merge_bfqq));
--	struct bfq_queue *new_bfqq;
-+	struct bfq_queue *new_bfqq = NULL;
- 
--	if (idling_boosts_thr_without_issues(bfqd, bfqq) ||
--	    proc_ref == 0)
--		return NULL;
-+	bfqq_data->stable_merge_bfqq = NULL;
-+	if (idling_boosts_thr_without_issues(bfqd, bfqq) || proc_ref == 0)
-+		goto out;
- 
- 	/* next function will take at least one ref */
- 	new_bfqq = bfq_setup_merge(bfqq, stable_merge_bfqq);
-@@ -2873,6 +2873,11 @@ bfq_setup_stable_merge(struct bfq_data *bfqd, struct bfq_queue *bfqq,
- 			new_bfqq_data->stably_merged = true;
- 		}
- 	}
-+
-+out:
-+	/* deschedule stable merge, because done or aborted here */
-+	bfq_put_stable_ref(stable_merge_bfqq);
-+
- 	return new_bfqq;
- }
- 
-@@ -2933,11 +2938,6 @@ bfq_setup_cooperator(struct bfq_data *bfqd, struct bfq_queue *bfqq,
- 			struct bfq_queue *stable_merge_bfqq =
- 				bfqq_data->stable_merge_bfqq;
- 
--			/* deschedule stable merge, because done or aborted here */
--			bfq_put_stable_ref(stable_merge_bfqq);
--
--			bfqq_data->stable_merge_bfqq = NULL;
--
- 			return bfq_setup_stable_merge(bfqd, bfqq,
- 						      stable_merge_bfqq,
- 						      bfqq_data);
--- 
-2.31.1
+https://lore.kernel.org/linux-block/CAJfpeguQ3xn2-6svkkVXJ88tiVfcDd-eKi1evzzfvu305fMoyw@mail.gmail.com/
+
+1) pages are actually owned by device side(ublk, here: sp->file), but we want to
+loan them to io_uring normal OPs.
+
+2) after these pages are used by io_uring normal OPs, these pages have
+been returned back to sp->file, and the notification has to be done
+explicitly, because page is owned by sp->file of splice_read().
+
+3) pages RW direction has to limited strictly, and in case of ublk/fuse,
+device pages can only be read or write which depends on user io request
+direction.
+
+Also IMO it isn't good to add one buffer to ctx->user_bufs[] oneshot and
+retrieve it oneshot, and it can be set via req->imu simply in one fused
+command.
+
+Thanks,
+Ming
 
