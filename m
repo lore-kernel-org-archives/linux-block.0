@@ -2,89 +2,193 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AC78DC64EC4
-	for <linux-block@archiver.kernel.org>; Wed,  8 Mar 2023 16:07:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B53EEC678D5
+	for <linux-block@archiver.kernel.org>; Wed,  8 Mar 2023 16:18:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232490AbjCHQHV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 8 Mar 2023 11:07:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57312 "EHLO
+        id S229963AbjCHQSj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 8 Mar 2023 11:18:39 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51826 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232446AbjCHQG7 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Mar 2023 11:06:59 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 624C4C888C
-        for <linux-block@vger.kernel.org>; Wed,  8 Mar 2023 08:04:49 -0800 (PST)
+        with ESMTP id S230107AbjCHQSi (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Mar 2023 11:18:38 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD9B0BDD23
+        for <linux-block@vger.kernel.org>; Wed,  8 Mar 2023 08:17:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1678291488;
+        s=mimecast20190719; t=1678292263;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=2NWMkFGTVgULUDjAwqmBVEBtedj5eFLtnY35SqecmsU=;
-        b=K+6l1rjV6OR3/IxRBZASubxx0UXuuNDrtFGupLF7CTrDmUT0sQCM6745Ucma2c5qBZcIYq
-        ezAn9wrrELesygl5nb9S7n3ok97y2OCPt2JV9YgcRZz3gN1kAPm2vZOzc3rZxFBZR8sumI
-        pSUpWj2Cj4eyoLTSPz8q/xofQGNqi7E=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=wT0bOwIurNPu04VZHoA/6oaAulTGzpLXdNBB6RkBKL8=;
+        b=RQx1PMTiERt/9ieEtmt9qlS5Ij7qT+vHQ+bWDIERvQHBf/ytrwCWR1JsCT09sSLtiZWckF
+        g8fk+Rp6FcYih4V112Gi+9qEJK7rgFn8EikV0WpghuBM9G27umanfoF9501WGEG+vVgZVz
+        v1pKv3n1lNg7eNk+D71jZ7B2n6UGHhM=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-512-sBNcmhvQO3ucJLvWDaxBBQ-1; Wed, 08 Mar 2023 11:04:43 -0500
-X-MC-Unique: sBNcmhvQO3ucJLvWDaxBBQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
+ us-mta-199-E0eW84TUPZCZ-62HJDLN3w-1; Wed, 08 Mar 2023 11:17:40 -0500
+X-MC-Unique: E0eW84TUPZCZ-62HJDLN3w-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 384B687B2A6;
-        Wed,  8 Mar 2023 16:04:42 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.33.36.18])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id C38C42026D4B;
-        Wed,  8 Mar 2023 16:04:39 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <20230308155609.GA21508@lst.de>
-References: <20230308155609.GA21508@lst.de> <CAJfpeguGksS3sCigmRi9hJdUec8qtM9f+_9jC1rJhsXT+dV01w@mail.gmail.com> <20230308143754.1976726-1-dhowells@redhat.com> <20230308143754.1976726-4-dhowells@redhat.com> <2011735.1678290876@warthog.procyon.org.uk>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     dhowells@redhat.com, Miklos Szeredi <miklos@szeredi.hu>,
-        Jens Axboe <axboe@kernel.dk>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Christoph Hellwig <hch@infradead.org>,
-        Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>,
-        Jeff Layton <jlayton@kernel.org>,
-        David Hildenbrand <david@redhat.com>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        Hillf Danton <hdanton@sina.com>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        John Hubbard <jhubbard@nvidia.com>,
-        linux-unionfs@vger.kernel.org
-Subject: Re: [PATCH v16 03/13] overlayfs: Implement splice-read
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 90B56380451D;
+        Wed,  8 Mar 2023 16:17:39 +0000 (UTC)
+Received: from ovpn-8-17.pek2.redhat.com (ovpn-8-17.pek2.redhat.com [10.72.8.17])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 834B8C15BA0;
+        Wed,  8 Mar 2023 16:17:33 +0000 (UTC)
+Date:   Thu, 9 Mar 2023 00:17:28 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Pavel Begunkov <asml.silence@gmail.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org,
+        linux-block@vger.kernel.org, Miklos Szeredi <mszeredi@redhat.com>,
+        ZiyangZhang <ZiyangZhang@linux.alibaba.com>,
+        Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>,
+        Bernd Schubert <bschubert@ddn.com>, ming.lei@redhat.com
+Subject: Re: [PATCH V2 00/17] io_uring/ublk: add IORING_OP_FUSED_CMD
+Message-ID: <ZAi1GKgHfLcDL2jM@ovpn-8-17.pek2.redhat.com>
+References: <20230307141520.793891-1-ming.lei@redhat.com>
+ <7e05882f-9695-895d-5e83-61006e54c4b2@gmail.com>
+ <ce96f7e7-1315-7154-f540-1a3ff0215674@gmail.com>
+ <ZAfurtfY4lXa8sxX@ovpn-8-16.pek2.redhat.com>
+ <effb2361-b66e-2678-ef86-5f9565c4ad9a@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <2012342.1678291479.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date:   Wed, 08 Mar 2023 16:04:39 +0000
-Message-ID: <2012343.1678291479@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <effb2361-b66e-2678-ef86-5f9565c4ad9a@gmail.com>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Christoph Hellwig <hch@lst.de> wrote:
+On Wed, Mar 08, 2023 at 02:46:48PM +0000, Pavel Begunkov wrote:
+> On 3/8/23 02:10, Ming Lei wrote:
+> > On Tue, Mar 07, 2023 at 05:17:04PM +0000, Pavel Begunkov wrote:
+> > > On 3/7/23 15:37, Pavel Begunkov wrote:
+> > > > On 3/7/23 14:15, Ming Lei wrote:
+> > > > > Hello,
+> > > > > 
+> > > > > Add IORING_OP_FUSED_CMD, it is one special URING_CMD, which has to
+> > > > > be SQE128. The 1st SQE(master) is one 64byte URING_CMD, and the 2nd
+> > > > > 64byte SQE(slave) is another normal 64byte OP. For any OP which needs
+> > > > > to support slave OP, io_issue_defs[op].fused_slave needs to be set as 1,
+> > > > > and its ->issue() can retrieve/import buffer from master request's
+> > > > > fused_cmd_kbuf. The slave OP is actually submitted from kernel, part of
+> > > > > this idea is from Xiaoguang's ublk ebpf patchset, but this patchset
+> > > > > submits slave OP just like normal OP issued from userspace, that said,
+> > > > > SQE order is kept, and batching handling is done too.
+> > > > 
+> > > >   From a quick look through patches it all looks a bit complicated
+> > > > and intrusive, all over generic hot paths. I think instead we
+> > > > should be able to use registered buffer table as intermediary and
+> > > > reuse splicing. Let me try it out
+> > > 
+> > > Here we go, isolated in a new opcode, and in the end should work
+> > > with any file supporting splice. It's a quick prototype, it's lacking
+> > > and there are many obvious fatal bugs. It also needs some optimisations,
+> > > improvements on how executed by io_uring and extra stuff like
+> > > memcpy ops and fixed buf recv/send. I'll clean it up.
+> > > 
+> > > I used a test below, it essentially does zc recv.
+> > > 
+> > > https://github.com/isilence/liburing/commit/81fe705739af7d9b77266f9aa901c1ada870739d
+> > > 
+> [...]
+> > > +int io_splice_from(struct io_kiocb *req, unsigned int issue_flags)
+> > > +{
+> > > +	struct io_splice_from *sp = io_kiocb_to_cmd(req, struct io_splice_from);
+> > > +	loff_t *ppos = (sp->off == -1) ? NULL : &sp->off;
+> > > +	struct io_mapped_ubuf *imu;
+> > > +	struct pipe_inode_info *pi;
+> > > +	struct io_ring_ctx *ctx;
+> > > +	unsigned int pipe_tail;
+> > > +	int ret, i, nr_pages;
+> > > +	u16 index;
+> > > +
+> > > +	if (!sp->file->f_op->splice_read)
+> > > +		return -ENOTSUPP;
+> > > +
+> > > +	pi = alloc_pipe_info();
+> > 
+> > The above should be replaced with direct pipe, otherwise every time
+> > allocating one pipe inode really hurts performance.
+> 
+> We don't even need to alloc it dynanically, could be just
+> on stack. There is a long list of TODOs I can add, e.g.
+> polling support, retries, nowait, caching imu and so on.
+> 
+> [...]
+> > Your patch looks like transferring pages ownership to io_uring fixed
+> > buffer, but unfortunately it can't be done in this way. splice is
+> > supposed for moving data, not transfer buffer ownership.
+> 
+> Borrowing rather than transferring. It's not obvious since it's
+> not implemented in the patch, but the buffer should be eventually
+> returned using the splice's ->release callback.
 
-> On Wed, Mar 08, 2023 at 03:54:36PM +0000, David Howells wrote:
-> > Using do_splice_to() as a helper is probably a good idea, though both =
-Willy
-> > and Christoph seem to dislike it.
-> =
+What is the splice's ->release() callback? Is pipe buffer's
+release()? If yes, there is at least the following two problems:
 
-> That's not true.  What I'm fundamentlly against is pointless wrappers
-> like the call_* that add no value.  do_splice_to adds useful checks,
-> so if properly named and documented, I'm absolutely in favour.
+1) it requires the buffer to be saved(for calling its callback and use its private
+data to return back the whole buffer) in the pipe until it is consumed, which becomes
+one sync interface like splice syscall, and can't cross multiple io_uring OPs or
+per-buffer pipe inode is needed
 
-Fair enough.  Rename to vfs_splice_read() okay with you?
+2) pipe buffer's get()/release() works on per-buffer/page level, but
+we need to borrow the whole buffer, and the whole buffer could be used
+by arbitrary number of OPs, such as one IO buffer needs to be used for
+handling mirror or stripped targets, so when we know the buffer can be released?
 
-David
+And basically it can't be known by kernel, and only application knows
+when to release it.
+
+Anyway, please post the whole patch, otherwise it is hard to see
+the whole picture, and devil is always in details, especially Linus
+mentioned splice can't be used in this way.
+
+> 
+> > https://lore.kernel.org/linux-block/CAJfpeguQ3xn2-6svkkVXJ88tiVfcDd-eKi1evzzfvu305fMoyw@mail.gmail.com/
+> > 
+> > 1) pages are actually owned by device side(ublk, here: sp->file), but we want to
+> > loan them to io_uring normal OPs.
+> > 
+> > 2) after these pages are used by io_uring normal OPs, these pages have
+> > been returned back to sp->file, and the notification has to be done
+> > explicitly, because page is owned by sp->file of splice_read().
+> 
+> Right, see above, they're going to be returned back via ->release.
+
+How?
+
+> 
+> > 3) pages RW direction has to limited strictly, and in case of ublk/fuse,
+> > device pages can only be read or write which depends on user io request
+> > direction.
+> 
+> Yes, I know, and directions will be needed anyway for DMA mappings and
+> different p2p cases in the future, but again a bunch of things is
+> omitted here.
+
+Please don't omitted it and it is one fundamental security problem.
+
+> 
+> > 
+> > Also IMO it isn't good to add one buffer to ctx->user_bufs[] oneshot and
+> > retrieve it oneshot, and it can be set via req->imu simply in one fused
+> > command.
+> 
+> That's one of the points though. It's nice if not necessary (for a generic
+> feature) to be able to do multiple ops on the data. For instance, if we
+> have a memcpy request, we can link it to this splice / zc recv, memcpy
+> necessary headers to the userspace and let it decide how to proceed with
+> data.
+
+I feel it could be one big problem for buffer borrowing to cross more than one
+OPs, and when can the buffer be returned back?
+
+memory copy can be done simply by device's read/write interface, please see
+patch 15.
+
+
+Thanks,
+Ming
 
