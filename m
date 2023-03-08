@@ -2,298 +2,64 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01AF2C678D5
-	for <linux-block@archiver.kernel.org>; Wed,  8 Mar 2023 02:12:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B6CDC64EC4
+	for <linux-block@archiver.kernel.org>; Wed,  8 Mar 2023 03:48:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229695AbjCHCMX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 7 Mar 2023 21:12:23 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60888 "EHLO
+        id S229586AbjCHDsW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 7 Mar 2023 22:48:22 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55420 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229483AbjCHCMW (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 7 Mar 2023 21:12:22 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 04C36A2F39
-        for <linux-block@vger.kernel.org>; Tue,  7 Mar 2023 18:11:07 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1678241467;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=LjIhpLNu1/FM8k7JR4dHiHXMiEFei7baHUdSFdODfCY=;
-        b=XfUbkMlnAaMI3aZ+tg3LFcSd22cG3bGZz9ynmJidCnS/y8NdE5s4y182zHZx6i0I7Q8s/h
-        fbHa6sewhxrnv+IUGsgz4tlXmMSOtT2XqUlT5ZFZXf1QoUA0yFFyovBDvi/EyCKw2YczdS
-        EuInX6LPjLkZVlUOnL6Hv83jf9qAxsU=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-235-X-y8KCpiMPyakzG6Xo6J1w-1; Tue, 07 Mar 2023 21:11:05 -0500
-X-MC-Unique: X-y8KCpiMPyakzG6Xo6J1w-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 405A529AA2C1;
-        Wed,  8 Mar 2023 02:11:05 +0000 (UTC)
-Received: from ovpn-8-16.pek2.redhat.com (ovpn-8-17.pek2.redhat.com [10.72.8.17])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id C7F914035711;
-        Wed,  8 Mar 2023 02:10:59 +0000 (UTC)
-Date:   Wed, 8 Mar 2023 10:10:54 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Pavel Begunkov <asml.silence@gmail.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org,
-        linux-block@vger.kernel.org, Miklos Szeredi <mszeredi@redhat.com>,
-        ZiyangZhang <ZiyangZhang@linux.alibaba.com>,
-        Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>,
-        Bernd Schubert <bschubert@ddn.com>, ming.lei@redhat.com
-Subject: Re: [PATCH V2 00/17] io_uring/ublk: add IORING_OP_FUSED_CMD
-Message-ID: <ZAfurtfY4lXa8sxX@ovpn-8-16.pek2.redhat.com>
-References: <20230307141520.793891-1-ming.lei@redhat.com>
- <7e05882f-9695-895d-5e83-61006e54c4b2@gmail.com>
- <ce96f7e7-1315-7154-f540-1a3ff0215674@gmail.com>
+        with ESMTP id S229468AbjCHDsV (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 7 Mar 2023 22:48:21 -0500
+Received: from out30-110.freemail.mail.aliyun.com (out30-110.freemail.mail.aliyun.com [115.124.30.110])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B5AD80925;
+        Tue,  7 Mar 2023 19:48:19 -0800 (PST)
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R181e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046056;MF=ziyangzhang@linux.alibaba.com;NM=1;PH=DS;RN=4;SR=0;TI=SMTPD_---0VdNfgny_1678247296;
+Received: from 30.97.56.232(mailfrom:ZiyangZhang@linux.alibaba.com fp:SMTPD_---0VdNfgny_1678247296)
+          by smtp.aliyun-inc.com;
+          Wed, 08 Mar 2023 11:48:16 +0800
+Message-ID: <3e5c7542-e4ad-202f-6dbb-fdea37bd62d7@linux.alibaba.com>
+Date:   Wed, 8 Mar 2023 11:48:15 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ce96f7e7-1315-7154-f540-1a3ff0215674@gmail.com>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.1
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.6.1
+Subject: Re: [PATCH V2 06/17] block: ublk_drv: mark device as LIVE before
+ adding disk
+Content-Language: en-US
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     linux-block@vger.kernel.org, io-uring@vger.kernel.org,
+        Jens Axboe <axboe@kernel.dk>
+References: <20230307141520.793891-1-ming.lei@redhat.com>
+ <20230307141520.793891-7-ming.lei@redhat.com>
+From:   Ziyang Zhang <ZiyangZhang@linux.alibaba.com>
+In-Reply-To: <20230307141520.793891-7-ming.lei@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Mar 07, 2023 at 05:17:04PM +0000, Pavel Begunkov wrote:
-> On 3/7/23 15:37, Pavel Begunkov wrote:
-> > On 3/7/23 14:15, Ming Lei wrote:
-> > > Hello,
-> > > 
-> > > Add IORING_OP_FUSED_CMD, it is one special URING_CMD, which has to
-> > > be SQE128. The 1st SQE(master) is one 64byte URING_CMD, and the 2nd
-> > > 64byte SQE(slave) is another normal 64byte OP. For any OP which needs
-> > > to support slave OP, io_issue_defs[op].fused_slave needs to be set as 1,
-> > > and its ->issue() can retrieve/import buffer from master request's
-> > > fused_cmd_kbuf. The slave OP is actually submitted from kernel, part of
-> > > this idea is from Xiaoguang's ublk ebpf patchset, but this patchset
-> > > submits slave OP just like normal OP issued from userspace, that said,
-> > > SQE order is kept, and batching handling is done too.
-> > 
-> >  From a quick look through patches it all looks a bit complicated
-> > and intrusive, all over generic hot paths. I think instead we
-> > should be able to use registered buffer table as intermediary and
-> > reuse splicing. Let me try it out
+On 2023/3/7 22:15, Ming Lei wrote:
+> IO can be started before add_disk() returns, such as reading parititon table,
+> then the monitor work should work for making forward progress.
 > 
-> Here we go, isolated in a new opcode, and in the end should work
-> with any file supporting splice. It's a quick prototype, it's lacking
-> and there are many obvious fatal bugs. It also needs some optimisations,
-> improvements on how executed by io_uring and extra stuff like
-> memcpy ops and fixed buf recv/send. I'll clean it up.
+> So mark device as LIVE before adding disk, meantime change to
+> DEAD if add_disk() fails.
 > 
-> I used a test below, it essentially does zc recv.
-> 
-> https://github.com/isilence/liburing/commit/81fe705739af7d9b77266f9aa901c1ada870739d
-> 
-> 
-> From 87ad9e8e3aed683aa040fb4b9ae499f8726ba393 Mon Sep 17 00:00:00 2001
-> Message-Id: <87ad9e8e3aed683aa040fb4b9ae499f8726ba393.1678208911.git.asml.silence@gmail.com>
-> From: Pavel Begunkov <asml.silence@gmail.com>
-> Date: Tue, 7 Mar 2023 17:01:44 +0000
-> Subject: [POC 1/1] io_uring: splicing into reg buf table
-> 
-> EXTREMELY BUGGY! Not for inclusion.
-> 
-> Add a new operation called IORING_OP_SPLICE_FROM,
-> which splices from a file into the registered buffer table. This is
-> done in a zerocopy fashion with a caveat that the user won't have
-> direct access to the data, however it can use it with any io_uring
-> request supporting registered buffers.
-> 
-> Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
+> Reviewed-by: Ziyang Zhang <ZiyangZhang@linux.alibaba.com>
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
 > ---
->  include/uapi/linux/io_uring.h |  1 +
->  io_uring/io_uring.c           |  4 +-
->  io_uring/opdef.c              | 10 ++++
->  io_uring/splice.c             | 98 +++++++++++++++++++++++++++++++++++
->  io_uring/splice.h             |  3 ++
->  5 files changed, 114 insertions(+), 2 deletions(-)
-> 
-> diff --git a/include/uapi/linux/io_uring.h b/include/uapi/linux/io_uring.h
-> index 709de6d4feb2..a91ce1d2ebd7 100644
-> --- a/include/uapi/linux/io_uring.h
-> +++ b/include/uapi/linux/io_uring.h
-> @@ -223,6 +223,7 @@ enum io_uring_op {
->  	IORING_OP_URING_CMD,
->  	IORING_OP_SEND_ZC,
->  	IORING_OP_SENDMSG_ZC,
-> +	IORING_OP_SPLICE_FROM,
->  	/* this goes last, obviously */
->  	IORING_OP_LAST,
-> diff --git a/io_uring/io_uring.c b/io_uring/io_uring.c
-> index 7625597b5227..b7389a6ea190 100644
-> --- a/io_uring/io_uring.c
-> +++ b/io_uring/io_uring.c
-> @@ -2781,8 +2781,8 @@ static __cold void io_ring_ctx_free(struct io_ring_ctx *ctx)
->  	io_wait_rsrc_data(ctx->file_data);
->  	mutex_lock(&ctx->uring_lock);
-> -	if (ctx->buf_data)
-> -		__io_sqe_buffers_unregister(ctx);
-> +	// if (ctx->buf_data)
-> +	// 	__io_sqe_buffers_unregister(ctx);
->  	if (ctx->file_data)
->  		__io_sqe_files_unregister(ctx);
->  	io_cqring_overflow_kill(ctx);
-> diff --git a/io_uring/opdef.c b/io_uring/opdef.c
-> index cca7c5b55208..28d4fa42676b 100644
-> --- a/io_uring/opdef.c
-> +++ b/io_uring/opdef.c
-> @@ -428,6 +428,13 @@ const struct io_issue_def io_issue_defs[] = {
->  		.prep			= io_eopnotsupp_prep,
->  #endif
->  	},
-> +	[IORING_OP_SPLICE_FROM] = {
-> +		.needs_file		= 1,
-> +		.unbound_nonreg_file	= 1,
-> +		// .pollin			= 1,
-> +		.prep			= io_splice_from_prep,
-> +		.issue			= io_splice_from,
-> +	}
->  };
-> @@ -648,6 +655,9 @@ const struct io_cold_def io_cold_defs[] = {
->  		.fail			= io_sendrecv_fail,
->  #endif
->  	},
-> +	[IORING_OP_SPLICE_FROM] = {
-> +		.name			= "SPLICE_FROM",
-> +	}
->  };
->  const char *io_uring_get_opcode(u8 opcode)
-> diff --git a/io_uring/splice.c b/io_uring/splice.c
-> index 2a4bbb719531..0467e9f46e99 100644
-> --- a/io_uring/splice.c
-> +++ b/io_uring/splice.c
-> @@ -8,11 +8,13 @@
->  #include <linux/namei.h>
->  #include <linux/io_uring.h>
->  #include <linux/splice.h>
-> +#include <linux/nospec.h>
->  #include <uapi/linux/io_uring.h>
->  #include "io_uring.h"
->  #include "splice.h"
-> +#include "rsrc.h"
->  struct io_splice {
->  	struct file			*file_out;
-> @@ -119,3 +121,99 @@ int io_splice(struct io_kiocb *req, unsigned int issue_flags)
->  	io_req_set_res(req, ret, 0);
->  	return IOU_OK;
->  }
-> +
-> +struct io_splice_from {
-> +	struct file			*file;
-> +	loff_t				off;
-> +	u64				len;
-> +};
-> +
-> +
-> +int io_splice_from_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
-> +{
-> +	struct io_splice_from *sp = io_kiocb_to_cmd(req, struct io_splice_from);
-> +
-> +	if (unlikely(sqe->splice_flags || sqe->splice_fd_in || sqe->ioprio ||
-> +		     sqe->addr || sqe->addr3))
-> +		return -EINVAL;
-> +
-> +	req->buf_index = READ_ONCE(sqe->buf_index);
-> +
-> +	sp->len = READ_ONCE(sqe->len);
-> +	if (unlikely(!sp->len))
-> +		return -EINVAL;
-> +
-> +	sp->off = READ_ONCE(sqe->off);
-> +	return 0;
-> +}
-> +
-> +int io_splice_from(struct io_kiocb *req, unsigned int issue_flags)
-> +{
-> +	struct io_splice_from *sp = io_kiocb_to_cmd(req, struct io_splice_from);
-> +	loff_t *ppos = (sp->off == -1) ? NULL : &sp->off;
-> +	struct io_mapped_ubuf *imu;
-> +	struct pipe_inode_info *pi;
-> +	struct io_ring_ctx *ctx;
-> +	unsigned int pipe_tail;
-> +	int ret, i, nr_pages;
-> +	u16 index;
-> +
-> +	if (!sp->file->f_op->splice_read)
-> +		return -ENOTSUPP;
-> +
-> +	pi = alloc_pipe_info();
 
-The above should be replaced with direct pipe, otherwise every time
-allocating one pipe inode really hurts performance.
+Hi Ming,
 
-> +	if (!pi)
-> +		return -ENOMEM;
-> +	pi->readers = 1;
-> +
-> +	ret = sp->file->f_op->splice_read(sp->file, ppos, pi, sp->len, 0);
-> +	if (ret < 0)
-> +		goto done;
-> +
-> +	nr_pages = pipe_occupancy(pi->head, pi->tail);
-> +	imu = kvmalloc(struct_size(imu, bvec, nr_pages), GFP_KERNEL);
-> +	if (!imu)
-> +		goto done;
-> +
-> +	ret = 0;
-> +	pipe_tail = pi->tail;
-> +	for (i = 0; !pipe_empty(pi->head, pipe_tail); i++) {
-> +		unsigned int mask = pi->ring_size - 1; // kill mask
-> +		struct pipe_buffer *buf = &pi->bufs[pipe_tail & mask];
-> +
-> +		bvec_set_page(&imu->bvec[i], buf->page, buf->len, buf->offset);
-> +		ret += buf->len;
-> +		pipe_tail++;
-> +	}
-> +	if (WARN_ON_ONCE(i != nr_pages))
-> +		return -EFAULT;
-> +
-> +	ctx = req->ctx;
-> +	io_ring_submit_lock(ctx, issue_flags);
-> +	if (unlikely(req->buf_index >= ctx->nr_user_bufs)) {
-> +		/* TODO: cleanup pages */
-> +		ret = -EFAULT;
-> +		kvfree(imu);
-> +		goto done_unlock;
-> +	}
-> +	index = array_index_nospec(req->buf_index, ctx->nr_user_bufs);
-> +	if (ctx->user_bufs[index] != ctx->dummy_ubuf) {
-> +		/* TODO: cleanup pages */
-> +		kvfree(imu);
-> +		ret = -EFAULT;
-> +		goto done_unlock;
-> +	}
-> +
-> +	imu->ubuf = 0;
-> +	imu->ubuf_end = ret;
-> +	imu->nr_bvecs = nr_pages;
-> +	ctx->user_bufs[index] = imu;
+Without this patch, if we fail to read partition table(Could this
+happen?)and EIO is returned, then START_DEV may hang forever, right?
+I may have encountered such error before and I think this bug is introduced
+by:
+bbae8d1f526b(ublk_drv: consider recovery feature in aborting mechanism)
+which change the behavior of monitor_work. So shall we add a fixes tag, such
+as:
+Fixes: bbae8d1f526b("ublk_drv: consider recovery feature in aborting mechanism")
 
-Your patch looks like transferring pages ownership to io_uring fixed
-buffer, but unfortunately it can't be done in this way. splice is
-supposed for moving data, not transfer buffer ownership.
-
-https://lore.kernel.org/linux-block/CAJfpeguQ3xn2-6svkkVXJ88tiVfcDd-eKi1evzzfvu305fMoyw@mail.gmail.com/
-
-1) pages are actually owned by device side(ublk, here: sp->file), but we want to
-loan them to io_uring normal OPs.
-
-2) after these pages are used by io_uring normal OPs, these pages have
-been returned back to sp->file, and the notification has to be done
-explicitly, because page is owned by sp->file of splice_read().
-
-3) pages RW direction has to limited strictly, and in case of ublk/fuse,
-device pages can only be read or write which depends on user io request
-direction.
-
-Also IMO it isn't good to add one buffer to ctx->user_bufs[] oneshot and
-retrieve it oneshot, and it can be set via req->imu simply in one fused
-command.
-
-Thanks,
-Ming
-
+Regards,
+Zhang
