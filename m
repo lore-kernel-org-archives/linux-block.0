@@ -2,86 +2,166 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15348C64EC4
-	for <linux-block@archiver.kernel.org>; Wed,  8 Mar 2023 07:45:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30582C64EC4
+	for <linux-block@archiver.kernel.org>; Wed,  8 Mar 2023 08:00:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229606AbjCHHp0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 8 Mar 2023 02:45:26 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48840 "EHLO
+        id S229732AbjCHH76 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 8 Mar 2023 02:59:58 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37606 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229623AbjCHHpZ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Mar 2023 02:45:25 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5475B99C07
-        for <linux-block@vger.kernel.org>; Tue,  7 Mar 2023 23:44:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1678261478;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=LoVcvJyVYNZQgjrYfBlIMLAPlM+tY6ZIFyFH/nFof5A=;
-        b=XrYAIuA9izJKjuwKrRRAUsUdWPCFSZG9p3+SebK/fSedZ4w8YWuTz7da7BzNnmviQxfFT4
-        oHY5Lst92Zw0c2/qHX2bHQz3jAP7Jg5RucRm+Yngcl1xnVckX3Q8b+muuVezYIuGwTqubJ
-        7CCkZTNOaIfvkDQojTOWmHzUKsb9+C4=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-279-AHxDAfxrM9y0kA_Mp-N38w-1; Wed, 08 Mar 2023 02:44:37 -0500
-X-MC-Unique: AHxDAfxrM9y0kA_Mp-N38w-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 65D3B3C0ED59;
-        Wed,  8 Mar 2023 07:44:35 +0000 (UTC)
-Received: from ovpn-8-16.pek2.redhat.com (ovpn-8-23.pek2.redhat.com [10.72.8.23])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 11AD1C15BA0;
-        Wed,  8 Mar 2023 07:44:31 +0000 (UTC)
-Date:   Wed, 8 Mar 2023 15:44:26 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Ziyang Zhang <ZiyangZhang@linux.alibaba.com>
-Cc:     linux-block@vger.kernel.org, io-uring@vger.kernel.org,
-        Jens Axboe <axboe@kernel.dk>, ming.lei@redhat.com
-Subject: Re: [PATCH V2 06/17] block: ublk_drv: mark device as LIVE before
- adding disk
-Message-ID: <ZAg82vq4bDC64YH/@ovpn-8-16.pek2.redhat.com>
-References: <20230307141520.793891-1-ming.lei@redhat.com>
- <20230307141520.793891-7-ming.lei@redhat.com>
- <3e5c7542-e4ad-202f-6dbb-fdea37bd62d7@linux.alibaba.com>
+        with ESMTP id S229558AbjCHH75 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Mar 2023 02:59:57 -0500
+Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7AE639475D
+        for <linux-block@vger.kernel.org>; Tue,  7 Mar 2023 23:59:56 -0800 (PST)
+Received: by mail-pf1-x42c.google.com with SMTP id n5so9659663pfv.11
+        for <linux-block@vger.kernel.org>; Tue, 07 Mar 2023 23:59:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fromorbit-com.20210112.gappssmtp.com; s=20210112; t=1678262396;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=oErMbovgNlM1fHmldHtqwkgHhSfzOswt1j6nL2mFsxo=;
+        b=fiikSj48Ilmf1vGJNiI3Bq/tguYc41vQm7Wv71k+P26+1xYdYHczpadicL85OTqWpl
+         U6NgRMu82A0NHUhz+qaoqyMW/MBvAos1JcIz5Ci30MHMEgpN3Efy5wucE0LVoqE02Rn4
+         GqceS5pTWt5mQ6VyIQboQr6gW3TVX/RlrbPi6hPLu1VhuQyw5IQIpJhcLRKbnd+S1RsE
+         RuHTYzkLCyADd8bKD0vBez9bXsu1UTO6mx2e09vG0uGkUYtnWlz7XW/yqw7MKzE3kvL5
+         JPf+3rN6lFzPWYllqvI4I8A5EZfdXQcNqF0hbc4jXIbMi7pITxFgi4Q61TmDsGQ+kaJy
+         5MBw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1678262396;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=oErMbovgNlM1fHmldHtqwkgHhSfzOswt1j6nL2mFsxo=;
+        b=wPZOfJOyHteMZhOgC2SA9U0o+fJUW02lOQA63KebyAqBWtnn54WR0ta8jQH5nO8FgC
+         Y55RZRFfYg95gF7P2/ffWYA7vXf8wy7WpWmSkC0VCAd14c0C9uURlARQ6SEn+qCI+0cE
+         A1p7zRh1DBhpG3ldfbdJcclJ8kiC/4KaeIhfEe/9uGrZjBp+ZK8msiyGdBcUmDq0rCI6
+         EHqZk+e2S5S2nUwQJv3ldv9+RyPik4cRuLK3kaP30ObM3nqZ3qTQXA2FhOkBzzJNm9Lb
+         u0mabKH6xPYT3Gq3It/RR8QcOef3tte5uLYVwgvUFYpD0TzHHV2OnooRgIPydCajIzP0
+         xjEQ==
+X-Gm-Message-State: AO0yUKUat/QbdvhYmjYZQeAT8sO7BZ9Ggvms3I+rM7UaguoxqRdfdSyF
+        RKyfn37+8iD+qq5x3iJuzrgvNg==
+X-Google-Smtp-Source: AK7set8bsOinXE0KQbcPQOZUDb0oKVCU2EyTeRsMoZqI+23n5Roy2RhtB13Lmukyu/y+AOZsaMHOxg==
+X-Received: by 2002:a62:1991:0:b0:5e2:434d:116b with SMTP id 139-20020a621991000000b005e2434d116bmr13162108pfz.23.1678262395850;
+        Tue, 07 Mar 2023 23:59:55 -0800 (PST)
+Received: from dread.disaster.area (pa49-186-4-237.pa.vic.optusnet.com.au. [49.186.4.237])
+        by smtp.gmail.com with ESMTPSA id s1-20020aa78281000000b0059435689e36sm9159908pfm.170.2023.03.07.23.59.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 07 Mar 2023 23:59:55 -0800 (PST)
+Received: from dave by dread.disaster.area with local (Exim 4.92.3)
+        (envelope-from <david@fromorbit.com>)
+        id 1pZoiG-006DN9-PH; Wed, 08 Mar 2023 18:59:52 +1100
+Date:   Wed, 8 Mar 2023 18:59:52 +1100
+From:   Dave Chinner <david@fromorbit.com>
+To:     Luis Chamberlain <mcgrof@kernel.org>
+Cc:     Matthew Wilcox <willy@infradead.org>,
+        "Darrick J. Wong" <djwong@kernel.org>,
+        James Bottomley <James.Bottomley@hansenpartnership.com>,
+        Keith Busch <kbusch@kernel.org>, Theodore Ts'o <tytso@mit.edu>,
+        Pankaj Raghav <p.raghav@samsung.com>,
+        Daniel Gomez <da.gomez@samsung.com>,
+        lsf-pc@lists.linux-foundation.org, linux-fsdevel@vger.kernel.org,
+        linux-mm@kvack.org, linux-block@vger.kernel.org
+Subject: Re: [LSF/MM/BPF TOPIC] Cloud storage optimizations
+Message-ID: <20230308075952.GU2825702@dread.disaster.area>
+References: <Y/7L74P6jSWwOvWt@mit.edu>
+ <ZAFUYqAcPmRPLjET@kbusch-mbp.dhcp.thefacebook.com>
+ <ZAFuSSZ5vZN7/UAa@casper.infradead.org>
+ <f68905c5785b355b621847974d620fb59f021a41.camel@HansenPartnership.com>
+ <ZAL0ifa66TfMinCh@casper.infradead.org>
+ <2600732b9ed0ddabfda5831aff22fd7e4270e3be.camel@HansenPartnership.com>
+ <ZAN0JkklyCRIXVo6@casper.infradead.org>
+ <ZAQXduwAcAtIZHkB@bombadil.infradead.org>
+ <ZAQicyYR0kZgrzIr@casper.infradead.org>
+ <ZAgnHzUYkpQB+Uzi@bombadil.infradead.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <3e5c7542-e4ad-202f-6dbb-fdea37bd62d7@linux.alibaba.com>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
+In-Reply-To: <ZAgnHzUYkpQB+Uzi@bombadil.infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Mar 08, 2023 at 11:48:15AM +0800, Ziyang Zhang wrote:
-> On 2023/3/7 22:15, Ming Lei wrote:
-> > IO can be started before add_disk() returns, such as reading parititon table,
-> > then the monitor work should work for making forward progress.
+On Tue, Mar 07, 2023 at 10:11:43PM -0800, Luis Chamberlain wrote:
+> On Sun, Mar 05, 2023 at 05:02:43AM +0000, Matthew Wilcox wrote:
+> > On Sat, Mar 04, 2023 at 08:15:50PM -0800, Luis Chamberlain wrote:
+> > > On Sat, Mar 04, 2023 at 04:39:02PM +0000, Matthew Wilcox wrote:
+> > > > XFS already works with arbitrary-order folios. 
+> > > 
+> > > But block sizes > PAGE_SIZE is work which is still not merged. It
+> > > *can* be with time. That would allow one to muck with larger block
+> > > sizes than 4k on x86-64 for instance. Without this, you can't play
+> > > ball.
 > > 
-> > So mark device as LIVE before adding disk, meantime change to
-> > DEAD if add_disk() fails.
-> > 
-> > Reviewed-by: Ziyang Zhang <ZiyangZhang@linux.alibaba.com>
-> > Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> > ---
+> > Do you mean that XFS is checking that fs block size <= PAGE_SIZE and
+> > that check needs to be dropped?  If so, I don't see where that happens.
 > 
-> Hi Ming,
+> None of that. Back in 2018 Chinner had prototyped XFS support with
+> larger block size > PAGE_SIZE:
 > 
-> Without this patch, if we fail to read partition table(Could this
-> happen?)and EIO is returned, then START_DEV may hang forever, right?
-> I may have encountered such error before and I think this bug is introduced
-> by:
-> bbae8d1f526b(ublk_drv: consider recovery feature in aborting mechanism)
-> which change the behavior of monitor_work. So shall we add a fixes tag, such
-> as:
-> Fixes: bbae8d1f526b("ublk_drv: consider recovery feature in aborting mechanism")
+> https://lwn.net/ml/linux-fsdevel/20181107063127.3902-1-david@fromorbit.com/
 
-Even without the above commit, monitor work still may not be started
-because of ub->dev_info.state == UBLK_S_DEV_DEAD.
+Having a working BS > PS implementation on XFS based on variable
+page order support in the page cache goes back over a
+decade before that.
 
-thanks, 
-Ming
+Christoph Lameter did the page cache work, and I added support for
+XFS back in 2007. THe total change to XFS required can be seen in
+this simple patch:
 
+https://lore.kernel.org/linux-mm/20070423093152.GI32602149@melbourne.sgi.com/
+
+That was when the howls of anguish about high order allocations
+Willy mentioned started....
+
+> I just did a quick attempt to rebased it and most of the left over work
+> is actually on IOMAP for writeback and zero / writes requiring a new
+> zero-around functionality. All bugs on the rebase are my own, only compile
+> tested so far, and not happy with some of the changes I had to make so
+> likely could use tons more love:
+> 
+> https://git.kernel.org/pub/scm/linux/kernel/git/mcgrof/linux.git/log/?h=20230307-larger-bs-then-ps-xfs
+
+On a current kernel, that patchset is fundamentally broken as we
+have multi-page folio support in XFS and iomap - the patchset is
+inherently PAGE_SIZE based and it will do the the wrong thing with
+PAGE_SIZE based zero-around.
+
+IOWs, IOMAP_F_ZERO_AROUND does not need to exist any more, nor
+should any of the custom hooks it triggered in different operations
+for zero-around.  That's because we should now be using the same
+approach to BS > PS as we first used back in 2007. We already
+support multi-page folios in the page cache, so all the zero-around
+and partial folio uptodate tracking we need is already in place.
+
+Hence, like Willy said, all we need to do is have
+filemap_get_folio(FGP_CREAT) always allocate at least filesystem
+block sized and aligned folio and insert them into the mapping tree.
+Multi-page folios will always need to be sized as an integer
+multiple of the filesystem block size, but once we ensure size and
+alignment of folios in the page cache, we get everything else for
+free.
+
+/me cues the howls of anguish over memory fragmentation....
+
+> But it should give you an idea of what type of things filesystems need to do.
+
+Not really. it gives you an idea of what filesystems needed to do 5
+years ago to support BS > PS. We're living in the age of folios now,
+not pages.  Willy starting work on folios was why I dropped that
+patch set, firstly because it was going to make the iomap conversion
+to folios harder, and secondly, we realised that none of it was
+necessary if folios supported multi-page constructs in the page
+cache natively.
+
+IOWs, multi-page folios in the page cache should make BS > PS mostly
+trivial to support for any filesystem or block device that doesn't
+have some other dependency on PAGE_SIZE objects in the page cache
+(e.g. bufferheads).
+
+Cheers,
+
+Dave.
+-- 
+Dave Chinner
+david@fromorbit.com
