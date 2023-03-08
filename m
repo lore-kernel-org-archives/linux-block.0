@@ -2,91 +2,86 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 75D6FC64EC4
-	for <linux-block@archiver.kernel.org>; Wed,  8 Mar 2023 06:11:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 15348C64EC4
+	for <linux-block@archiver.kernel.org>; Wed,  8 Mar 2023 07:45:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229484AbjCHGL4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 8 Mar 2023 01:11:56 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56436 "EHLO
+        id S229606AbjCHHp0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 8 Mar 2023 02:45:26 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48840 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229468AbjCHGLz (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Mar 2023 01:11:55 -0500
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E0B1C9966E;
-        Tue,  7 Mar 2023 22:11:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
-        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=kFiWdSXsDRyUdkfb3HjCmx1t0YC4hjoPY9eR9uAa6+Q=; b=NvDaIkAj1wtFy37ee/EzZw1Iix
-        deZ8dUCepTujFUFcOhuGL+TvdXdEhsYnbweuuMB4KvgcMnOIMHtQFjKIcJm2a2Js1gPfXiH1Q6cMq
-        ima7B+Lu9Wm9ECTZqzfcbQvsvjPnHgnlRdLRVTJSg5nqxwGCUx4LmUDxaY0HrzBo8v0dKnORAWTCS
-        3PiNhaoxQEZ+KqAvcc9CuUYGaijhhKUqJcAYiXADdm7F7E1O9FDHry3+HEy28XXidXYOGqe+hWqtv
-        K4R+JtOHhKGbosbtnocNbhZEiecfBfjwfhtFTkWcD+U8iY/tN43+GBTzB63rtwjYqcSRyLtgxDqaz
-        TUkzk/DA==;
-Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1pZn1b-003fPd-Df; Wed, 08 Mar 2023 06:11:43 +0000
-Date:   Tue, 7 Mar 2023 22:11:43 -0800
-From:   Luis Chamberlain <mcgrof@kernel.org>
-To:     Matthew Wilcox <willy@infradead.org>,
-        "Darrick J. Wong" <djwong@kernel.org>,
-        Dave Chinner <david@fromorbit.com>
-Cc:     James Bottomley <James.Bottomley@hansenpartnership.com>,
-        Keith Busch <kbusch@kernel.org>, Theodore Ts'o <tytso@mit.edu>,
-        Pankaj Raghav <p.raghav@samsung.com>,
-        Daniel Gomez <da.gomez@samsung.com>,
-        lsf-pc@lists.linux-foundation.org, linux-fsdevel@vger.kernel.org,
-        linux-mm@kvack.org, linux-block@vger.kernel.org
-Subject: Re: [LSF/MM/BPF TOPIC] Cloud storage optimizations
-Message-ID: <ZAgnHzUYkpQB+Uzi@bombadil.infradead.org>
-References: <Y/7L74P6jSWwOvWt@mit.edu>
- <ZAFUYqAcPmRPLjET@kbusch-mbp.dhcp.thefacebook.com>
- <ZAFuSSZ5vZN7/UAa@casper.infradead.org>
- <f68905c5785b355b621847974d620fb59f021a41.camel@HansenPartnership.com>
- <ZAL0ifa66TfMinCh@casper.infradead.org>
- <2600732b9ed0ddabfda5831aff22fd7e4270e3be.camel@HansenPartnership.com>
- <ZAN0JkklyCRIXVo6@casper.infradead.org>
- <ZAQXduwAcAtIZHkB@bombadil.infradead.org>
- <ZAQicyYR0kZgrzIr@casper.infradead.org>
+        with ESMTP id S229623AbjCHHpZ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Mar 2023 02:45:25 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5475B99C07
+        for <linux-block@vger.kernel.org>; Tue,  7 Mar 2023 23:44:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1678261478;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=LoVcvJyVYNZQgjrYfBlIMLAPlM+tY6ZIFyFH/nFof5A=;
+        b=XrYAIuA9izJKjuwKrRRAUsUdWPCFSZG9p3+SebK/fSedZ4w8YWuTz7da7BzNnmviQxfFT4
+        oHY5Lst92Zw0c2/qHX2bHQz3jAP7Jg5RucRm+Yngcl1xnVckX3Q8b+muuVezYIuGwTqubJ
+        7CCkZTNOaIfvkDQojTOWmHzUKsb9+C4=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-279-AHxDAfxrM9y0kA_Mp-N38w-1; Wed, 08 Mar 2023 02:44:37 -0500
+X-MC-Unique: AHxDAfxrM9y0kA_Mp-N38w-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 65D3B3C0ED59;
+        Wed,  8 Mar 2023 07:44:35 +0000 (UTC)
+Received: from ovpn-8-16.pek2.redhat.com (ovpn-8-23.pek2.redhat.com [10.72.8.23])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 11AD1C15BA0;
+        Wed,  8 Mar 2023 07:44:31 +0000 (UTC)
+Date:   Wed, 8 Mar 2023 15:44:26 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Ziyang Zhang <ZiyangZhang@linux.alibaba.com>
+Cc:     linux-block@vger.kernel.org, io-uring@vger.kernel.org,
+        Jens Axboe <axboe@kernel.dk>, ming.lei@redhat.com
+Subject: Re: [PATCH V2 06/17] block: ublk_drv: mark device as LIVE before
+ adding disk
+Message-ID: <ZAg82vq4bDC64YH/@ovpn-8-16.pek2.redhat.com>
+References: <20230307141520.793891-1-ming.lei@redhat.com>
+ <20230307141520.793891-7-ming.lei@redhat.com>
+ <3e5c7542-e4ad-202f-6dbb-fdea37bd62d7@linux.alibaba.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZAQicyYR0kZgrzIr@casper.infradead.org>
-Sender: Luis Chamberlain <mcgrof@infradead.org>
+In-Reply-To: <3e5c7542-e4ad-202f-6dbb-fdea37bd62d7@linux.alibaba.com>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sun, Mar 05, 2023 at 05:02:43AM +0000, Matthew Wilcox wrote:
-> On Sat, Mar 04, 2023 at 08:15:50PM -0800, Luis Chamberlain wrote:
-> > On Sat, Mar 04, 2023 at 04:39:02PM +0000, Matthew Wilcox wrote:
-> > > XFS already works with arbitrary-order folios. 
+On Wed, Mar 08, 2023 at 11:48:15AM +0800, Ziyang Zhang wrote:
+> On 2023/3/7 22:15, Ming Lei wrote:
+> > IO can be started before add_disk() returns, such as reading parititon table,
+> > then the monitor work should work for making forward progress.
 > > 
-> > But block sizes > PAGE_SIZE is work which is still not merged. It
-> > *can* be with time. That would allow one to muck with larger block
-> > sizes than 4k on x86-64 for instance. Without this, you can't play
-> > ball.
+> > So mark device as LIVE before adding disk, meantime change to
+> > DEAD if add_disk() fails.
+> > 
+> > Reviewed-by: Ziyang Zhang <ZiyangZhang@linux.alibaba.com>
+> > Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> > ---
 > 
-> Do you mean that XFS is checking that fs block size <= PAGE_SIZE and
-> that check needs to be dropped?  If so, I don't see where that happens.
+> Hi Ming,
+> 
+> Without this patch, if we fail to read partition table(Could this
+> happen?)and EIO is returned, then START_DEV may hang forever, right?
+> I may have encountered such error before and I think this bug is introduced
+> by:
+> bbae8d1f526b(ublk_drv: consider recovery feature in aborting mechanism)
+> which change the behavior of monitor_work. So shall we add a fixes tag, such
+> as:
+> Fixes: bbae8d1f526b("ublk_drv: consider recovery feature in aborting mechanism")
 
-None of that. Back in 2018 Chinner had prototyped XFS support with
-larger block size > PAGE_SIZE:
+Even without the above commit, monitor work still may not be started
+because of ub->dev_info.state == UBLK_S_DEV_DEAD.
 
-https://lwn.net/ml/linux-fsdevel/20181107063127.3902-1-david@fromorbit.com/
+thanks, 
+Ming
 
-I just did a quick attempt to rebased it and most of the left over work
-is actually on IOMAP for writeback and zero / writes requiring a new
-zero-around functionality. All bugs on the rebase are my own, only compile
-tested so far, and not happy with some of the changes I had to make so
-likely could use tons more love:
-
-https://git.kernel.org/pub/scm/linux/kernel/git/mcgrof/linux.git/log/?h=20230307-larger-bs-then-ps-xfs
-
-But it should give you an idea of what type of things filesystems need to do.
-
-And so, each fs would need to decide if they want to support this sort
-of work. It is important from a support perspective, otherwise its hard
-to procure > 4 PAGE_SIZE systems.
-
-  Luis
