@@ -2,92 +2,128 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E682AC678D5
-	for <linux-block@archiver.kernel.org>; Wed,  8 Mar 2023 01:09:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 109F9C678D5
+	for <linux-block@archiver.kernel.org>; Wed,  8 Mar 2023 02:09:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229951AbjCHBJU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 7 Mar 2023 20:09:20 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46880 "EHLO
+        id S229542AbjCHCJH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 7 Mar 2023 21:09:07 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58664 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229610AbjCHBJT (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 7 Mar 2023 20:09:19 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D343EA2F01
-        for <linux-block@vger.kernel.org>; Tue,  7 Mar 2023 17:08:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1678237699;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=dYDAMHZIsmMwagaEDhVssXFOJ/xumgqcigzIaKITBKw=;
-        b=c7sBBmMbRvp+px6Z7ZEwHWEMOhAAUXrVEMe/nQfv8+7lo3qhoJQzTf0zOQ6ds+Fh8xN537
-        vAkDyuR2TOIGKrz0kqzxnnLqroOiJYkEwof1O38d2HVqkBtTrVu57wnAluZuYsJUjZsmFq
-        J+6+DT33+9q0FNfj0wJWPt/cktVXPuo=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-361-qPPHIJrrNG2baLDLN2RsjA-1; Tue, 07 Mar 2023 20:08:16 -0500
-X-MC-Unique: qPPHIJrrNG2baLDLN2RsjA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 2B3E1185A794;
-        Wed,  8 Mar 2023 01:08:16 +0000 (UTC)
-Received: from ovpn-8-16.pek2.redhat.com (ovpn-8-17.pek2.redhat.com [10.72.8.17])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 37F9E2026D4B;
-        Wed,  8 Mar 2023 01:08:10 +0000 (UTC)
-Date:   Wed, 8 Mar 2023 09:08:06 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Pavel Begunkov <asml.silence@gmail.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org,
-        linux-block@vger.kernel.org, Miklos Szeredi <mszeredi@redhat.com>,
-        ZiyangZhang <ZiyangZhang@linux.alibaba.com>,
-        Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>,
-        Bernd Schubert <bschubert@ddn.com>, ming.lei@redhat.com
-Subject: Re: [PATCH V2 00/17] io_uring/ublk: add IORING_OP_FUSED_CMD
-Message-ID: <ZAff9usDuyXxIPt9@ovpn-8-16.pek2.redhat.com>
-References: <20230307141520.793891-1-ming.lei@redhat.com>
- <7e05882f-9695-895d-5e83-61006e54c4b2@gmail.com>
+        with ESMTP id S229582AbjCHCJF (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 7 Mar 2023 21:09:05 -0500
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A02C49CFD1;
+        Tue,  7 Mar 2023 18:09:03 -0800 (PST)
+Received: from mail02.huawei.com (unknown [172.30.67.169])
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4PWbMt5fNPz4f3nTX;
+        Wed,  8 Mar 2023 10:08:58 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.175.127.227])
+        by APP3 (Coremail) with SMTP id _Ch0CgDHcyE47gdkBs8gEg--.52407S4;
+        Wed, 08 Mar 2023 10:08:58 +0800 (CST)
+From:   Yu Kuai <yukuai1@huaweicloud.com>
+To:     jack@suse.cz, shinichiro.kawasaki@wdc.com,
+        paolo.valente@linaro.org, axboe@kernel.dk, glusvardi@posteo.net,
+        damien.lemoal@opensource.wdc.com, felicigb@gmail.com,
+        inbox@emilianomaccaferri.com
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yukuai3@huawei.com, yukuai1@huaweicloud.com, yi.zhang@huawei.com,
+        yangerkun@huawei.com
+Subject: [PATCH] block, bfq: fix uaf for 'stable_merge_bfqq'
+Date:   Wed,  8 Mar 2023 10:32:08 +0800
+Message-Id: <20230308023208.379465-1-yukuai1@huaweicloud.com>
+X-Mailer: git-send-email 2.31.1
+In-Reply-To: <4e6e1606-1d9e-9903-8a44-ccac58a1fe06@kernel.dk>
+References: <4e6e1606-1d9e-9903-8a44-ccac58a1fe06@kernel.dk>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <7e05882f-9695-895d-5e83-61006e54c4b2@gmail.com>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: _Ch0CgDHcyE47gdkBs8gEg--.52407S4
+X-Coremail-Antispam: 1UD129KBjvJXoW7Kr45XryUWF4kKry7Jr48Crg_yoW5JrWkpa
+        1DKw4avr1rJrW5XrWxAw40vF98tr43Ar9FyryrW347uw1DJrySvFsF9ayI9Fn2vr48CFnx
+        Xw1qqas2kr48JrDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUvY14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+        1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+        JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+        CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+        2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+        W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2
+        Y2ka0xkIwI1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4
+        xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43
+        MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I
+        0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWrZr1j6s0DMIIF0xvEx4A2jsIE14v2
+        6r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0J
+        UdHUDUUUUU=
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Mar 07, 2023 at 03:37:21PM +0000, Pavel Begunkov wrote:
-> On 3/7/23 14:15, Ming Lei wrote:
-> > Hello,
-> > 
-> > Add IORING_OP_FUSED_CMD, it is one special URING_CMD, which has to
-> > be SQE128. The 1st SQE(master) is one 64byte URING_CMD, and the 2nd
-> > 64byte SQE(slave) is another normal 64byte OP. For any OP which needs
-> > to support slave OP, io_issue_defs[op].fused_slave needs to be set as 1,
-> > and its ->issue() can retrieve/import buffer from master request's
-> > fused_cmd_kbuf. The slave OP is actually submitted from kernel, part of
-> > this idea is from Xiaoguang's ublk ebpf patchset, but this patchset
-> > submits slave OP just like normal OP issued from userspace, that said,
-> > SQE order is kept, and batching handling is done too.
-> 
-> From a quick look through patches it all looks a bit complicated
-> and intrusive, all over generic hot paths. I think instead we
+From: Yu Kuai <yukuai3@huawei.com>
 
-Really? The main change to generic hot paths are adding one 'true/false'
-parameter to io_init_req(). For others, the change is just check on
-req->flags or issue_flags, which is basically zero cost.
+Before commit fd571df0ac5b ("block, bfq: turn bfqq_data into an array
+in bfq_io_cq"), process reference is read before bfq_put_stable_ref(),
+and it's safe if bfq_put_stable_ref() put the last reference, because
+process reference will be 0 and 'stable_merge_bfqq' won't be accessed
+in this case. However, the commit changed the order and  will cause
+uaf for 'stable_merge_bfqq'.
 
-> should be able to use registered buffer table as intermediary and
-> reuse splicing. Let me try it out
+In order to emphasize that bfq_put_stable_ref() can drop the last
+reference, fix the problem by moving bfq_put_stable_ref() to the end of
+bfq_setup_stable_merge().
 
-I will take a look at you patch, but last time, Linus has pointed out that
-splice isn't one good way, in which buffer ownership transferring is one big
-issue for writing data to page retrieved from pipe.
+Fixes: fd571df0ac5b ("block, bfq: turn bfqq_data into an array in bfq_io_cq")
+Reported-and-tested-by: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Link: https://lore.kernel.org/linux-block/20230307071448.rzihxbm4jhbf5krj@shindev/
+Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+---
+ block/bfq-iosched.c | 18 +++++++++---------
+ 1 file changed, 9 insertions(+), 9 deletions(-)
 
-https://lore.kernel.org/linux-block/CAJfpeguQ3xn2-6svkkVXJ88tiVfcDd-eKi1evzzfvu305fMoyw@mail.gmail.com/
-
-
-Thanks, 
-Ming
+diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+index 8a8d4441519c..d9ed3108c17a 100644
+--- a/block/bfq-iosched.c
++++ b/block/bfq-iosched.c
+@@ -2854,11 +2854,11 @@ bfq_setup_stable_merge(struct bfq_data *bfqd, struct bfq_queue *bfqq,
+ {
+ 	int proc_ref = min(bfqq_process_refs(bfqq),
+ 			   bfqq_process_refs(stable_merge_bfqq));
+-	struct bfq_queue *new_bfqq;
++	struct bfq_queue *new_bfqq = NULL;
+ 
+-	if (idling_boosts_thr_without_issues(bfqd, bfqq) ||
+-	    proc_ref == 0)
+-		return NULL;
++	bfqq_data->stable_merge_bfqq = NULL;
++	if (idling_boosts_thr_without_issues(bfqd, bfqq) || proc_ref == 0)
++		goto out;
+ 
+ 	/* next function will take at least one ref */
+ 	new_bfqq = bfq_setup_merge(bfqq, stable_merge_bfqq);
+@@ -2873,6 +2873,11 @@ bfq_setup_stable_merge(struct bfq_data *bfqd, struct bfq_queue *bfqq,
+ 			new_bfqq_data->stably_merged = true;
+ 		}
+ 	}
++
++out:
++	/* deschedule stable merge, because done or aborted here */
++	bfq_put_stable_ref(stable_merge_bfqq);
++
+ 	return new_bfqq;
+ }
+ 
+@@ -2933,11 +2938,6 @@ bfq_setup_cooperator(struct bfq_data *bfqd, struct bfq_queue *bfqq,
+ 			struct bfq_queue *stable_merge_bfqq =
+ 				bfqq_data->stable_merge_bfqq;
+ 
+-			/* deschedule stable merge, because done or aborted here */
+-			bfq_put_stable_ref(stable_merge_bfqq);
+-
+-			bfqq_data->stable_merge_bfqq = NULL;
+-
+ 			return bfq_setup_stable_merge(bfqd, bfqq,
+ 						      stable_merge_bfqq,
+ 						      bfqq_data);
+-- 
+2.31.1
 
