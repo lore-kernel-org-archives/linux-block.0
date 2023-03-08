@@ -2,336 +2,246 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2AAB8C64EC4
-	for <linux-block@archiver.kernel.org>; Wed,  8 Mar 2023 16:56:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E4974C6FD1E
+	for <linux-block@archiver.kernel.org>; Wed,  8 Mar 2023 16:58:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229986AbjCHQ4L (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 8 Mar 2023 11:56:11 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49152 "EHLO
+        id S229971AbjCHQ6d (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 8 Mar 2023 11:58:33 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52482 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230028AbjCHQy4 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Mar 2023 11:54:56 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7BA3D32CFC
-        for <linux-block@vger.kernel.org>; Wed,  8 Mar 2023 08:54:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1678294445;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=wIv6ZNbH3Ki2xdrllrhfS/sHz0g6FqNgkKM7E37nfig=;
-        b=dLyI1KxyLvOLyIL2A3ZXT8KCND0hBbDNf1fa9Ys9ci2MG7YHrUFPVaf4frbXK/WKY2fZ/x
-        oDkUqV32K4rrixpDuhAVSjV/PxdLaP8NiMSd19BrFRkwPQdg7obfoMLQRbjGyzHEMHEUNz
-        VQk5xgHt9osZSVWlxHJDMhvpDro0/7Q=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-463-FGF7m3Z8PdaOO6M-cPXt0A-1; Wed, 08 Mar 2023 11:53:58 -0500
-X-MC-Unique: FGF7m3Z8PdaOO6M-cPXt0A-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 6D3001C12981;
-        Wed,  8 Mar 2023 16:52:58 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.33.36.18])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 18677492C3E;
-        Wed,  8 Mar 2023 16:52:56 +0000 (UTC)
-From:   David Howells <dhowells@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>, Al Viro <viro@zeniv.linux.org.uk>,
-        Christoph Hellwig <hch@infradead.org>
-Cc:     David Howells <dhowells@redhat.com>,
-        Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>,
-        Jeff Layton <jlayton@kernel.org>,
-        David Hildenbrand <david@redhat.com>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        Hillf Danton <hdanton@sina.com>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org
-Subject: [PATCH v17 00/14] splice, block: Use page pinning and kill ITER_PIPE
-Date:   Wed,  8 Mar 2023 16:52:37 +0000
-Message-Id: <20230308165251.2078898-1-dhowells@redhat.com>
+        with ESMTP id S230031AbjCHQ6G (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Mar 2023 11:58:06 -0500
+Received: from mail-wm1-x32b.google.com (mail-wm1-x32b.google.com [IPv6:2a00:1450:4864:20::32b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B509D5151;
+        Wed,  8 Mar 2023 08:56:30 -0800 (PST)
+Received: by mail-wm1-x32b.google.com with SMTP id bg16-20020a05600c3c9000b003eb34e21bdfso1801730wmb.0;
+        Wed, 08 Mar 2023 08:56:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112; t=1678294582;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=8aawLgdTyGrR288varEmmF/Y/ULImrZS2HNqkf0hRec=;
+        b=cFS174NQxecQ+yipN6X2+qQG/mwkHvlgxmN/aW93fcFjdTPsi0ZzG+FBRfYAMhLPY/
+         o4MHIzwIstBqbZ+HZdnHhQ7Dsvsx1fPWdipMzoU3V8HDnDSjnXqo3oYVstxej7r7/WKK
+         kOuOsyiJZdgBYn3uAUgME8TS+IXKQ2/tbJmiDYqTHDa0LLG97lOBNFckR5qVWEkdAYLt
+         ppjpma8uSMAaMZUvMb/SpjlIjPrWyeXCfWZCRIIPJ8UHun+TOGEAB+V4mYAdAscL7kU8
+         DskIlFSFHG1QtMiJd7z6itgdNKf+uc/7VD7GJ2Q+J6lqhHn9UfaR0ewFS026bQAP2LTm
+         cj2A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1678294582;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=8aawLgdTyGrR288varEmmF/Y/ULImrZS2HNqkf0hRec=;
+        b=06NRPKj1LCX5xrlDNX3r+jiMM+6bAW1cUcFrwl3wSyy/DmojUATzb69P5FCq30BHVv
+         5gYePMPs15EyhY0tkQTDnh1aujjeRcWIu0/ofz8Nr3K5DLP5s1kUO4Jv7/TLDintGGAN
+         q4tv5dmss6S6ODEdKsj6TCnM3s4qL5M75cohN0AmryDMcJx4+7m9d0b1ZP194N4wq6Cp
+         tGDLkQ8f2qdAAWp17yBaEtHc858MCp1Wc03PMSILXr6Ru/bRH8nxqbMn1hLgg9wOn1G9
+         16+sr5trDZC9v/p9+vfMBa9r92TYgGNpwZMrOsZvSzAsZJ5FPBidyV1+bjpG+TxQ6AiD
+         JuyA==
+X-Gm-Message-State: AO0yUKWtPOiqVznO+vH1qsC89IoXZyutp9W/QwhwgBdoO+BPOxwXGz68
+        J7JPoJaKZAR1rkHshbzDsZusxOcLj8w=
+X-Google-Smtp-Source: AK7set/VEIDpJXbnE4Qp5h8mXE/hLGy1cRJIa97Rn5tsxcpFdocolLh3rlzllJ4qmjsmq+whyjWY9w==
+X-Received: by 2002:a05:600c:1c9c:b0:3ea:4af0:3475 with SMTP id k28-20020a05600c1c9c00b003ea4af03475mr16761043wms.1.1678294582145;
+        Wed, 08 Mar 2023 08:56:22 -0800 (PST)
+Received: from [192.168.8.100] (188.28.103.91.threembb.co.uk. [188.28.103.91])
+        by smtp.gmail.com with ESMTPSA id p7-20020a5d48c7000000b002c71d206329sm15645709wrs.55.2023.03.08.08.56.20
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 08 Mar 2023 08:56:21 -0800 (PST)
+Message-ID: <9f08445c-1f1e-a8e8-be93-4a97ec631d32@gmail.com>
+Date:   Wed, 8 Mar 2023 16:54:45 +0000
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.10
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.7.2
+Subject: Re: [PATCH V2 00/17] io_uring/ublk: add IORING_OP_FUSED_CMD
+Content-Language: en-US
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org,
+        linux-block@vger.kernel.org, Miklos Szeredi <mszeredi@redhat.com>,
+        ZiyangZhang <ZiyangZhang@linux.alibaba.com>,
+        Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>,
+        Bernd Schubert <bschubert@ddn.com>
+References: <20230307141520.793891-1-ming.lei@redhat.com>
+ <7e05882f-9695-895d-5e83-61006e54c4b2@gmail.com>
+ <ce96f7e7-1315-7154-f540-1a3ff0215674@gmail.com>
+ <ZAfurtfY4lXa8sxX@ovpn-8-16.pek2.redhat.com>
+ <effb2361-b66e-2678-ef86-5f9565c4ad9a@gmail.com>
+ <ZAi1GKgHfLcDL2jM@ovpn-8-17.pek2.redhat.com>
+From:   Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <ZAi1GKgHfLcDL2jM@ovpn-8-17.pek2.redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Jens, Al, Christoph,
+On 3/8/23 16:17, Ming Lei wrote:
+> On Wed, Mar 08, 2023 at 02:46:48PM +0000, Pavel Begunkov wrote:
+>> On 3/8/23 02:10, Ming Lei wrote:
+>>> On Tue, Mar 07, 2023 at 05:17:04PM +0000, Pavel Begunkov wrote:
+>>>> On 3/7/23 15:37, Pavel Begunkov wrote:
+>>>>> On 3/7/23 14:15, Ming Lei wrote:
+>>>>>> Hello,
+>>>>>>
+>>>>>> Add IORING_OP_FUSED_CMD, it is one special URING_CMD, which has to
+>>>>>> be SQE128. The 1st SQE(master) is one 64byte URING_CMD, and the 2nd
+>>>>>> 64byte SQE(slave) is another normal 64byte OP. For any OP which needs
+>>>>>> to support slave OP, io_issue_defs[op].fused_slave needs to be set as 1,
+>>>>>> and its ->issue() can retrieve/import buffer from master request's
+>>>>>> fused_cmd_kbuf. The slave OP is actually submitted from kernel, part of
+>>>>>> this idea is from Xiaoguang's ublk ebpf patchset, but this patchset
+>>>>>> submits slave OP just like normal OP issued from userspace, that said,
+>>>>>> SQE order is kept, and batching handling is done too.
+>>>>>
+>>>>>    From a quick look through patches it all looks a bit complicated
+>>>>> and intrusive, all over generic hot paths. I think instead we
+>>>>> should be able to use registered buffer table as intermediary and
+>>>>> reuse splicing. Let me try it out
+>>>>
+>>>> Here we go, isolated in a new opcode, and in the end should work
+>>>> with any file supporting splice. It's a quick prototype, it's lacking
+>>>> and there are many obvious fatal bugs. It also needs some optimisations,
+>>>> improvements on how executed by io_uring and extra stuff like
+>>>> memcpy ops and fixed buf recv/send. I'll clean it up.
+>>>>
+>>>> I used a test below, it essentially does zc recv.
+>>>>
+>>>> https://github.com/isilence/liburing/commit/81fe705739af7d9b77266f9aa901c1ada870739d
+>>>>
+>> [...]
+>>>> +int io_splice_from(struct io_kiocb *req, unsigned int issue_flags)
+>>>> +{
+>>>> +	struct io_splice_from *sp = io_kiocb_to_cmd(req, struct io_splice_from);
+>>>> +	loff_t *ppos = (sp->off == -1) ? NULL : &sp->off;
+>>>> +	struct io_mapped_ubuf *imu;
+>>>> +	struct pipe_inode_info *pi;
+>>>> +	struct io_ring_ctx *ctx;
+>>>> +	unsigned int pipe_tail;
+>>>> +	int ret, i, nr_pages;
+>>>> +	u16 index;
+>>>> +
+>>>> +	if (!sp->file->f_op->splice_read)
+>>>> +		return -ENOTSUPP;
+>>>> +
+>>>> +	pi = alloc_pipe_info();
+>>>
+>>> The above should be replaced with direct pipe, otherwise every time
+>>> allocating one pipe inode really hurts performance.
+>>
+>> We don't even need to alloc it dynanically, could be just
+>> on stack. There is a long list of TODOs I can add, e.g.
+>> polling support, retries, nowait, caching imu and so on.
+>>
+>> [...]
+>>> Your patch looks like transferring pages ownership to io_uring fixed
+>>> buffer, but unfortunately it can't be done in this way. splice is
+>>> supposed for moving data, not transfer buffer ownership.
+>>
+>> Borrowing rather than transferring. It's not obvious since it's
+>> not implemented in the patch, but the buffer should be eventually
+>> returned using the splice's ->release callback.
+> 
+> What is the splice's ->release() callback? Is pipe buffer's
+> release()? If yes, there is at least the following two problems:
 
-The first half of this patchset kills off ITER_PIPE to avoid a race between
-truncate, iov_iter_revert() on the pipe and an as-yet incomplete DMA to a
-bio with unpinned/unref'ed pages from an O_DIRECT splice read.  This causes
-memory corruption[2].  Instead, we use filemap_splice_read(), which invokes
-the buffered file reading code and splices from the pagecache into the
-pipe; direct_splice_read(), which bulk-allocates a buffer, reads into it
-and then pushes the filled pages into the pipe; or handle it in
-filesystem-specific code.
+Right
 
- (1) Simplify the calculations for the number of pages to be reclaimed in
-     direct_splice_read().
+> 1) it requires the buffer to be saved(for calling its callback and use its private
+> data to return back the whole buffer) in the pipe until it is consumed, which becomes
+> one sync interface like splice syscall, and can't cross multiple io_uring OPs or
+> per-buffer pipe inode is needed
 
- (2) Turn do_splice_to() into a helper so that it can be used by overlayfs
-     and coda to perform the checks on the lower fs.
+We don't mix data from different sources, it's reasonable to expect
+that all buffers will have the same callback, then it'll be saved
+in struct io_mapped_ubuf. That's sth should definitely be checked and
+rejected if happens.
 
- (3) Provide shmem with its own splice_read to handle non-existent pages
-     in the pagecache.  We don't want a ->read_folio() as we don't want to
-     populate holes, but filemap_get_pages() requires it.
+> 2) pipe buffer's get()/release() works on per-buffer/page level, but
+> we need to borrow the whole buffer, and the whole buffer could be used
 
- (4) Provide overlayfs with its own splice_read to call down to a lower
-     layer as overlayfs doesn't provide ->read_folio().
+Surely that can be improved.
 
- (5) Provide coda with its own splice_read to call down to a lower layer as
-     coda doesn't provide ->read_folio().
+> by arbitrary number of OPs, such as one IO buffer needs to be used for
+> handling mirror or stripped targets, so when we know the buffer can be released?
 
- (6) Direct ->splice_read to direct_splice_read() in tty, procfs, kernfs
-     and random files as they just copy to the output buffer and don't
-     splice pages.
+There is a separate efficient lifetime semantic for io_uring's registered
+buffers, which don't involve any get/put. It'll be freed according to it,
+i.e. when the userspace asks it to be removed and there are no more
+inflight requests.
 
- (7) Change generic_file_splice_read() to just switch between
-     filemap_splice_read() and direct_splice_read() rather than using
-     ITER_PIPE.
+> And basically it can't be known by kernel, and only application knows
+> when to release it.
+> 
+> Anyway, please post the whole patch, otherwise it is hard to see
+> the whole picture, and devil is always in details, especially Linus
+> mentioned splice can't be used in this way.
 
- (8) Remove ITER_PIPE and its paraphernalia as generic_file_splice_read()
-     was the only user.
+Sure
 
-The second half of the patchset rolls page-pinning out to the bio struct
-and the block layer, using iov_iter_extract_pages() to get pages and noting
-with BIO_PAGE_PINNED if the data pages attached to a bio are pinned.  If
-the data pages come from a non-user-backed iterator, then the pages are
-left unpinned and unref'd, relying on whoever set up the I/O to do the
-retaining
+> 
+>>
+>>> https://lore.kernel.org/linux-block/CAJfpeguQ3xn2-6svkkVXJ88tiVfcDd-eKi1evzzfvu305fMoyw@mail.gmail.com/
+>>>
+>>> 1) pages are actually owned by device side(ublk, here: sp->file), but we want to
+>>> loan them to io_uring normal OPs.
+>>>
+>>> 2) after these pages are used by io_uring normal OPs, these pages have
+>>> been returned back to sp->file, and the notification has to be done
+>>> explicitly, because page is owned by sp->file of splice_read().
+>>
+>> Right, see above, they're going to be returned back via ->release.
+> 
+> How?
 
- (9) Don't hold a ref on ZERO_PAGE in iomap_dio_zero().
+I admit, I shouldn't have skipped it even for a quick POC. It'll save
+->release() in struct io_mapped_ubuf and call it when the buffer is
+freed from io_uring perspective, that is there are no more requests
+using it and the user requested it to be removed.
 
-(10) Fix bio_flagged() so that it doesn't prevent a gcc optimisation.
+>>> 3) pages RW direction has to limited strictly, and in case of ublk/fuse,
+>>> device pages can only be read or write which depends on user io request
+>>> direction.
+>>
+>> Yes, I know, and directions will be needed anyway for DMA mappings and
+>> different p2p cases in the future, but again a bunch of things is
+>> omitted here.
+> 
+> Please don't omitted it and it is one fundamental security problem.
 
-(11) Make the bio struct carry a pair of flags to indicate the cleanup
-     mode.  BIO_NO_PAGE_REF is replaced with BIO_PAGE_REFFED (indicating
-     FOLL_GET was used) and BIO_PAGE_PINNED (indicating FOLL_PIN was used)
-     is added.
+That's not interesting for a design concept with a huge warning.
+io_import_fixed() already takes a dir argument, we just need to check
+it against the buffer's one.
 
-     BIO_PAGE_REFFED will go away, but at the moment fs/direct-io.c sets it
-     and this series does not fully address that file.
 
-(12) Add a function, bio_release_page(), to release a page appropriately to
-     the cleanup mode indicated by the BIO_PAGE_* flags.
+>>> Also IMO it isn't good to add one buffer to ctx->user_bufs[] oneshot and
+>>> retrieve it oneshot, and it can be set via req->imu simply in one fused
+>>> command.
+>>
+>> That's one of the points though. It's nice if not necessary (for a generic
+>> feature) to be able to do multiple ops on the data. For instance, if we
+>> have a memcpy request, we can link it to this splice / zc recv, memcpy
+>> necessary headers to the userspace and let it decide how to proceed with
+>> data.
+> 
+> I feel it could be one big problem for buffer borrowing to cross more than one
+> OPs, and when can the buffer be returned back?
 
-(13) Make bio_iov_iter_get_pages() use iov_iter_extract_pages() to retain
-     the pages appropriately and clean them up later.
+Described above
 
-(14) Make bio_map_user_iov() also use iov_iter_extract_pages().
+> memory copy can be done simply by device's read/write interface, please see
+> patch 15.
 
-I've pushed the patches here also:
+I don't think I understand how it looks in the userspace, maybe it's
+only applicable to ublk? but it seems that the concept of having one op
+producing a buffer and another consuming it don't go well with multi
+use in general case, especially stretched in time.
 
-	https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/log/?h=iov-extract
+E.g. you recv data, some of which is an application protocol header
+that should be looked at by the user and the rest is data that might
+be sent out somewhere else.
 
-David
+Am I wrong?
 
-Changes:
-========
-ver #17)
- - Rename do_splice_to() to vfs_splice_read() and export it so that it can
-   be a helper and make overlayfs and coda use it, allowing duplicate
-   checks to be removed.
-
-ver #16)
- - The filemap_get_pages() changes are now upstream.
- - filemap_splice_read() and direct_splice_read() are now upstream.
- - iov_iter_extract_pages() is now upstream.
-
-ver #15)
- - Fixed up some errors in overlayfs_splice_read().
-
-ver #14)
- - Some changes to generic_file_buffered_splice_read():
-   - Rename to filemap_splice_read() and move to mm/filemap.c.
-   - Create a helper, pipe_head_buf().
-   - Use init_sync_kiocb().
- - Some changes to generic_file_direct_splice_read():
-   - Use alloc_pages_bulk_array() rather than alloc_pages_bulk_list().
-   - Use release_pages() instead of __free_page() in a loop.
-   - Rename to direct_splice_read().
- - Rearrange the patches to implement filemap_splice_read() and
-   direct_splice_read() separately to changing generic_file_splice_read().
- - Don't call generic_file_splice_read() when there isn't a ->read_folio().
- - Insert patches to fix read_folio-less cases:
-   - Make tty, procfs, kernfs and (u)random use direct_splice_read().
-   - Make overlayfs and coda call down to a lower layer.
-   - Give shmem its own splice-read that doesn't insert missing pages.
- - Fixed a min() with mixed type args on some arches.
-
-ver #13)
- - Only use allocation in advance and ITER_BVEC for DIO read-splice.
- - Make buffered read-splice get pages directly from the pagecache.
- - Alter filemap_get_pages() & co. so that it doesn't need an iterator.
-
-ver #12)
- - Added the missing __bitwise on the iov_iter_extraction_t typedef.
- - Rebased on -rc7.
- - Don't specify FOLL_PIN to pin_user_pages_fast().
- - Inserted patch at front to fix race between DIO read and truncation that
-   caused memory corruption when iov_iter_revert() got called on an
-   ITER_PIPE iterator[2].
- - Inserted a patch after that to remove the now-unused ITER_PIPE and its
-   helper functions.
- - Removed the ITER_PIPE bits from iov_iter_extract_pages().
-
-ver #11)
- - Fix iov_iter_extract_kvec_pages() to include the offset into the page in
-   the returned starting offset.
- - Use __bitwise for the extraction flags
-
-ver #10)
- - Fix use of i->kvec in iov_iter_extract_bvec_pages() to be i->bvec.
- - Drop bio_set_cleanup_mode(), open coding it instead.
-
-ver #9)
- - It's now not permitted to use FOLL_PIN outside of mm/, so:
- - Change iov_iter_extract_mode() into iov_iter_extract_will_pin() and
-   return true/false instead of FOLL_PIN/0.
- - Drop of folio_put_unpin() and page_put_unpin() and instead call
-   unpin_user_page() (and put_page()) directly as necessary.
- - Make __bio_release_pages() call bio_release_page() instead of
-   unpin_user_page() as there's no BIO_* -> FOLL_* translation to do.
- - Drop the FOLL_* renumbering patch.
- - Change extract_flags to extraction_flags.
-
-ver #8)
- - Import Christoph Hellwig's changes.
-   - Split the conversion-to-extraction patch.
-   - Drop the extract_flags arg from iov_iter_extract_mode().
-   - Don't default bios to BIO_PAGE_REFFED, but set explicitly.
- - Switch FOLL_PIN and FOLL_GET when renumbering so PIN is at bit 0.
- - Switch BIO_PAGE_PINNED and BIO_PAGE_REFFED so PINNED is at bit 0.
- - We should always be using FOLL_PIN (not FOLL_GET) for DIO, so adjust the
-   patches for that.
-
-ver #7)
- - For now, drop the parts to pass the I/O direction to iov_iter_*pages*()
-   as it turned out to be a lot more complicated, with places not setting
-   IOCB_WRITE when they should, for example.
- - Drop all the patches that changed things other then the block layer's
-   bio handling.  The netfslib and cifs changes can go into a separate
-   patchset.
- - Add support for extracting pages from KVEC-type iterators.
- - When extracting from BVEC/KVEC, skip over empty vecs at the front.
-
-ver #6)
- - Fix write() syscall and co. not setting IOCB_WRITE.
- - Added iocb_is_read() and iocb_is_write() to check IOCB_WRITE.
- - Use op_is_write() in bio_copy_user_iov().
- - Drop the iterator direction checks from smbd_recv().
- - Define FOLL_SOURCE_BUF and FOLL_DEST_BUF and pass them in as part of
-   gup_flags to iov_iter_get/extract_pages*().
- - Replace iov_iter_get_pages*2() with iov_iter_get_pages*() and remove.
- - Add back the function to indicate the cleanup mode.
- - Drop the cleanup_mode return arg to iov_iter_extract_pages().
- - Provide a helper to clean up a page.
- - Renumbered FOLL_GET and FOLL_PIN and made BIO_PAGE_REFFED/PINNED have
-   the same numerical values, enforced with an assertion.
- - Converted AF_ALG, SCSI vhost, generic DIO, FUSE, splice to pipe, 9P and
-   NFS.
- - Added in the patches to make CIFS do top-to-bottom iterators and use
-   various of the added extraction functions.
- - Added a pair of work-in-progess patches to make sk_buff fragments store
-   FOLL_GET and FOLL_PIN.
-
-ver #5)
- - Replace BIO_NO_PAGE_REF with BIO_PAGE_REFFED and split into own patch.
- - Transcribe FOLL_GET/PIN into BIO_PAGE_REFFED/PINNED flags.
- - Add patch to allow bio_flagged() to be combined by gcc.
-
-ver #4)
- - Drop the patch to move the FOLL_* flags to linux/mm_types.h as they're
-   no longer referenced by linux/uio.h.
- - Add ITER_SOURCE/DEST cleanup patches.
- - Make iov_iter/netfslib iter extraction patches use ITER_SOURCE/DEST.
- - Allow additional gup_flags to be passed into iov_iter_extract_pages().
- - Add struct bio patch.
-
-ver #3)
- - Switch to using EXPORT_SYMBOL_GPL to prevent indirect 3rd-party access
-   to get/pin_user_pages_fast()[1].
-
-ver #2)
- - Rolled the extraction cleanup mode query function into the extraction
-   function, returning the indication through the argument list.
- - Fixed patch 4 (extract to scatterlist) to actually use the new
-   extraction API.
-
-Link: https://lore.kernel.org/r/Y3zFzdWnWlEJ8X8/@infradead.org/ [1]
-Link: https://lore.kernel.org/r/000000000000b0b3c005f3a09383@google.com/ [2]
-Link: https://lore.kernel.org/r/166697254399.61150.1256557652599252121.stgit@warthog.procyon.org.uk/ # rfc
-Link: https://lore.kernel.org/r/166722777223.2555743.162508599131141451.stgit@warthog.procyon.org.uk/ # rfc
-Link: https://lore.kernel.org/r/166732024173.3186319.18204305072070871546.stgit@warthog.procyon.org.uk/ # rfc
-Link: https://lore.kernel.org/r/166869687556.3723671.10061142538708346995.stgit@warthog.procyon.org.uk/ # rfc
-Link: https://lore.kernel.org/r/166920902005.1461876.2786264600108839814.stgit@warthog.procyon.org.uk/ # v2
-Link: https://lore.kernel.org/r/166997419665.9475.15014699817597102032.stgit@warthog.procyon.org.uk/ # v3
-Link: https://lore.kernel.org/r/167305160937.1521586.133299343565358971.stgit@warthog.procyon.org.uk/ # v4
-Link: https://lore.kernel.org/r/167344725490.2425628.13771289553670112965.stgit@warthog.procyon.org.uk/ # v5
-Link: https://lore.kernel.org/r/167391047703.2311931.8115712773222260073.stgit@warthog.procyon.org.uk/ # v6
-Link: https://lore.kernel.org/r/20230120175556.3556978-1-dhowells@redhat.com/ # v7
-Link: https://lore.kernel.org/r/20230123173007.325544-1-dhowells@redhat.com/ # v8
-Link: https://lore.kernel.org/r/20230124170108.1070389-1-dhowells@redhat.com/ # v9
-Link: https://lore.kernel.org/r/20230125210657.2335748-1-dhowells@redhat.com/ # v10
-Link: https://lore.kernel.org/r/20230126141626.2809643-1-dhowells@redhat.com/ # v11
-Link: https://lore.kernel.org/r/20230207171305.3716974-1-dhowells@redhat.com/ # v12
-Link: https://lore.kernel.org/r/20230209102954.528942-1-dhowells@redhat.com/ # v13
-Link: https://lore.kernel.org/r/20230214171330.2722188-1-dhowells@redhat.com/ # v14
-Link: https://lore.kernel.org/r/20230308143754.1976726-1-dhowells@redhat.com/ # v16
-
-Additional patches that got folded in:
-
-Link: https://lore.kernel.org/r/20230213134619.2198965-1-dhowells@redhat.com/ # v1
-Link: https://lore.kernel.org/r/20230213153301.2338806-1-dhowells@redhat.com/ # v2
-Link: https://lore.kernel.org/r/20230214083710.2547248-1-dhowells@redhat.com/ # v3
-
-Christoph Hellwig (1):
-  block: Replace BIO_NO_PAGE_REF with BIO_PAGE_REFFED with inverted
-    logic
-
-David Howells (13):
-  splice: Clean up direct_splice_read() a bit
-  splice: Make do_splice_to() generic and export it
-  shmem: Implement splice-read
-  overlayfs: Implement splice-read
-  coda: Implement splice-read
-  tty, proc, kernfs, random: Use direct_splice_read()
-  splice: Do splice read from a file without using ITER_PIPE
-  iov_iter: Kill ITER_PIPE
-  iomap: Don't get an reference on ZERO_PAGE for direct I/O block
-    zeroing
-  block: Fix bio_flagged() so that gcc can better optimise it
-  block: Add BIO_PAGE_PINNED and associated infrastructure
-  block: Convert bio_iov_iter_get_pages to use iov_iter_extract_pages
-  block: convert bio_map_user_iov to use iov_iter_extract_pages
-
- block/bio.c               |  29 +--
- block/blk-map.c           |  22 +-
- block/blk.h               |  12 ++
- drivers/char/random.c     |   4 +-
- drivers/tty/tty_io.c      |   4 +-
- fs/cifs/cifsfs.c          |   8 +-
- fs/cifs/cifsfs.h          |   3 -
- fs/cifs/file.c            |  16 --
- fs/coda/file.c            |  29 ++-
- fs/direct-io.c            |   2 +
- fs/iomap/direct-io.c      |   1 -
- fs/kernfs/file.c          |   2 +-
- fs/overlayfs/file.c       |  23 +-
- fs/proc/inode.c           |   4 +-
- fs/proc/proc_sysctl.c     |   2 +-
- fs/proc_namespace.c       |   6 +-
- fs/splice.c               |  76 +++----
- include/linux/bio.h       |   5 +-
- include/linux/blk_types.h |   3 +-
- include/linux/splice.h    |   3 +
- include/linux/uio.h       |  14 --
- lib/iov_iter.c            | 429 +-------------------------------------
- mm/filemap.c              |   4 +-
- mm/shmem.c                | 124 ++++++++++-
- 24 files changed, 274 insertions(+), 551 deletions(-)
-
+-- 
+Pavel Begunkov
