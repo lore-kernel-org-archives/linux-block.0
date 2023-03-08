@@ -2,57 +2,64 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9ED9C6FD19
-	for <linux-block@archiver.kernel.org>; Wed,  8 Mar 2023 21:08:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 164ACC64EC4
+	for <linux-block@archiver.kernel.org>; Wed,  8 Mar 2023 22:45:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229754AbjCHVIn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 8 Mar 2023 16:08:43 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48508 "EHLO
+        id S229513AbjCHWpP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 8 Mar 2023 17:45:15 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43556 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229475AbjCHVIm (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Mar 2023 16:08:42 -0500
-Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9111B7B9A8
-        for <linux-block@vger.kernel.org>; Wed,  8 Mar 2023 13:08:40 -0800 (PST)
-Received: by mail-pj1-x102e.google.com with SMTP id x34so175267pjj.0
-        for <linux-block@vger.kernel.org>; Wed, 08 Mar 2023 13:08:40 -0800 (PST)
+        with ESMTP id S229984AbjCHWos (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Mar 2023 17:44:48 -0500
+Received: from mail-ed1-x52a.google.com (mail-ed1-x52a.google.com [IPv6:2a00:1450:4864:20::52a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E1B76CF0E3
+        for <linux-block@vger.kernel.org>; Wed,  8 Mar 2023 14:44:40 -0800 (PST)
+Received: by mail-ed1-x52a.google.com with SMTP id cy23so71789561edb.12
+        for <linux-block@vger.kernel.org>; Wed, 08 Mar 2023 14:44:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fromorbit-com.20210112.gappssmtp.com; s=20210112; t=1678309720;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=uQjAWnx5lQ/2cENFz0YdGZbVbhOf2bedNqDxQZfmLmE=;
-        b=DC948+R6ch+RYEfp2Fh69Wc5fEuezDxGyjm5a2ojDEmAJabOsIgx14BASBdNePqbO7
-         A1sw5VdAMlS5De8EQ1Mm1vUNzQNIf8mMGPmHf6r/y99zKv0JSCyUIT8mU6KxsnmQiIGd
-         2B7JuvDg8ms78MFJG+iPG8At90jWfpGWObImE5SBbRydaL5IUtud20x8Y8wdTtN/9Z/W
-         FzgSTkckrxVQvBO3vI9A4viY2HXPPIyGkYnjb7ahWkZxK/znzbWaSMEhWHYPxrHDOVw0
-         dduyixO5zIoWd/R5IIIWgSjIMTiv4qyyJ8WE80iykm3ooAeKS7B1hW5TcRKXHes0mAAN
-         iYKA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678309720;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=linux-foundation.org; s=google; t=1678315479;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=uQjAWnx5lQ/2cENFz0YdGZbVbhOf2bedNqDxQZfmLmE=;
-        b=iTRSdNBPegc8l4pap1K3AAcTVMq+LUGumEO09MVQyiTdZiZa6DqcqQP2Uputx2lwa5
-         w0xEQYcjlodPCWVuaEdIA/Em67Frnv+wLYzegEA7BqGdbCUdwwuJsWe6zST337bGn6/F
-         knCK69bHzY+2X8Q06Et6tcBIRFGtKd1K6m2tzvuFC9MVd+MOm25kHN0Frj5d7gaHfWt0
-         hBYHLomK0Dz4iStS0153V1Flg50Nx1DTJeHpbLGDZchfE8QxrI6WoyEIlnzabNmuaHc7
-         fFKlMAIbA39zo+vYvrG6c+OIW8EgjK4TNKz7gS0ZEW2PJ/2XdC6IVWQVZJf5lHFFoE+M
-         4M9Q==
-X-Gm-Message-State: AO0yUKUmwL4/8Tfpa/RRqMYicUuwE1s3bwvmhZgfkTl733Wkz26LetHg
-        l1IRSJmba5rmS+AlzDNIME+dKg==
-X-Google-Smtp-Source: AK7set8/nCJPbgdHyS22yS22YNGDj4za3NiHgaPgzaWsI9o9vVTaHqTsc2ZqcZJtvgEtszxlzM/WcA==
-X-Received: by 2002:a17:902:d38c:b0:19d:16e4:ac20 with SMTP id e12-20020a170902d38c00b0019d16e4ac20mr18011067pld.63.1678309719618;
-        Wed, 08 Mar 2023 13:08:39 -0800 (PST)
-Received: from dread.disaster.area (pa49-186-4-237.pa.vic.optusnet.com.au. [49.186.4.237])
-        by smtp.gmail.com with ESMTPSA id kq3-20020a170903284300b0019b9a075f1fsm10217942plb.80.2023.03.08.13.08.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 08 Mar 2023 13:08:39 -0800 (PST)
-Received: from dave by dread.disaster.area with local (Exim 4.92.3)
-        (envelope-from <david@fromorbit.com>)
-        id 1pa11Y-006QqV-6V; Thu, 09 Mar 2023 08:08:36 +1100
-Date:   Thu, 9 Mar 2023 08:08:36 +1100
-From:   Dave Chinner <david@fromorbit.com>
+        bh=RgHOh6/Mv9MfzuVql9i7aCQo+w921G9eVyn2ZtvpMeA=;
+        b=ChLxkbti85NFZ2bXwntnqX7+pCAtU4R9zEVz+IPKSMidHCU6Q4i/ZCObD+qtLN80tz
+         Sfw9PfBByt/3fUuxZt8p9LPYyj9aQ08wzzhiW/+AvvgwawrPayjAVA6haeyRjF8wLACL
+         tLURNvFC6q6DhwOgPzPCA/5SieMbhAg2+lQnU=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1678315479;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=RgHOh6/Mv9MfzuVql9i7aCQo+w921G9eVyn2ZtvpMeA=;
+        b=idc+m7/eOmj3m1u5Up+PyCyw0o9ki++Nm3fqdP+byOPZmCAtPGJcqp+Lwrr4/JPPwN
+         rL2gyRXicSfm4omz+IWFgotjZ6rPoDkK/e9XdFWrxYC2ExnSfcwo1bimNPkWbLjVbJGG
+         szDIWRJvc5/8FdAwTbq6JeIWb4lqH2RfPlJ1pMainPu76FpWi/sOVgQEcstYPoMWodCq
+         uSpHadGH8eCaL0nYiIroeVh7sgT9ry+YlRx4BJ5e75LwpFoFq3qnwQG7kzFYBzcVjHOe
+         8jm9sTD6ObXuaVFfh5GbIVgbPLeDCZL2m5K4j3eTR4mEBv0J8dZjCqRaAWxaouDrgblh
+         +99w==
+X-Gm-Message-State: AO0yUKV2qnfcS7rLKQ/uXKCBFPIRRASjfy3OA2IkSQnD/zkSXfHVNHSS
+        lUsimjZ9ytyDoI/coWxiE/S8N3/xdbjFLcP0eBGGQ729
+X-Google-Smtp-Source: AK7set+4xSwChGw0SHsIQ6+6vWvMRcAD/nzdoRCITpw8vnx1i60oLgaVuAad1SENzeRMSOrgvMolEg==
+X-Received: by 2002:a17:906:4c8e:b0:8af:447a:ff8e with SMTP id q14-20020a1709064c8e00b008af447aff8emr17442988eju.20.1678315479139;
+        Wed, 08 Mar 2023 14:44:39 -0800 (PST)
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com. [209.85.128.44])
+        by smtp.gmail.com with ESMTPSA id si9-20020a170906cec900b008c5075f5331sm7931294ejb.165.2023.03.08.14.44.38
+        for <linux-block@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 08 Mar 2023 14:44:38 -0800 (PST)
+Received: by mail-wm1-f44.google.com with SMTP id p23-20020a05600c1d9700b003ead4835046so2820443wms.0
+        for <linux-block@vger.kernel.org>; Wed, 08 Mar 2023 14:44:38 -0800 (PST)
+X-Received: by 2002:a50:8750:0:b0:4c2:ed2:1196 with SMTP id
+ 16-20020a508750000000b004c20ed21196mr10973452edv.5.1678315158081; Wed, 08 Mar
+ 2023 14:39:18 -0800 (PST)
+MIME-Version: 1.0
+References: <20230308165251.2078898-1-dhowells@redhat.com> <20230308165251.2078898-4-dhowells@redhat.com>
+In-Reply-To: <20230308165251.2078898-4-dhowells@redhat.com>
+From:   Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Wed, 8 Mar 2023 14:39:00 -0800
+X-Gmail-Original-Message-ID: <CAHk-=wjYR3h5Q-_i3Q2Et=P8WsrjwNA20fYpEQf9nafHwBNALA@mail.gmail.com>
+Message-ID: <CAHk-=wjYR3h5Q-_i3Q2Et=P8WsrjwNA20fYpEQf9nafHwBNALA@mail.gmail.com>
+Subject: Re: [PATCH v17 03/14] shmem: Implement splice-read
 To:     David Howells <dhowells@redhat.com>
 Cc:     Jens Axboe <axboe@kernel.dk>, Al Viro <viro@zeniv.linux.org.uk>,
         Christoph Hellwig <hch@infradead.org>,
@@ -61,54 +68,61 @@ Cc:     Jens Axboe <axboe@kernel.dk>, Al Viro <viro@zeniv.linux.org.uk>,
         David Hildenbrand <david@redhat.com>,
         Jason Gunthorpe <jgg@nvidia.com>,
         Logan Gunthorpe <logang@deltatee.com>,
-        Hillf Danton <hdanton@sina.com>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        John Hubbard <jhubbard@nvidia.com>
-Subject: Re: [PATCH v17 09/14] iomap: Don't get an reference on ZERO_PAGE for
- direct I/O block zeroing
-Message-ID: <20230308210836.GV2825702@dread.disaster.area>
-References: <20230308165251.2078898-1-dhowells@redhat.com>
- <20230308165251.2078898-10-dhowells@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230308165251.2078898-10-dhowells@redhat.com>
+        Hillf Danton <hdanton@sina.com>, linux-fsdevel@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, Daniel Golle <daniel@makrotopia.org>,
+        Guenter Roeck <groeck7@gmail.com>,
+        Christoph Hellwig <hch@lst.de>,
+        John Hubbard <jhubbard@nvidia.com>,
+        Hugh Dickins <hughd@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Mar 08, 2023 at 04:52:46PM +0000, David Howells wrote:
-> ZERO_PAGE can't go away, no need to hold an extra reference.
-> 
-> Signed-off-by: David Howells <dhowells@redhat.com>
-> Reviewed-by: David Hildenbrand <david@redhat.com>
-> Reviewed-by: John Hubbard <jhubbard@nvidia.com>
-> cc: Al Viro <viro@zeniv.linux.org.uk>
-> cc: David Hildenbrand <david@redhat.com>
-> cc: linux-fsdevel@vger.kernel.org
-> ---
->  fs/iomap/direct-io.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/fs/iomap/direct-io.c b/fs/iomap/direct-io.c
-> index f771001574d0..850fb9870c2f 100644
-> --- a/fs/iomap/direct-io.c
-> +++ b/fs/iomap/direct-io.c
-> @@ -202,7 +202,7 @@ static void iomap_dio_zero(const struct iomap_iter *iter, struct iomap_dio *dio,
->  	bio->bi_private = dio;
->  	bio->bi_end_io = iomap_dio_bio_end_io;
->  
-> -	get_page(page);
-> +	bio_set_flag(bio, BIO_NO_PAGE_REF);
->  	__bio_add_page(bio, page, len, 0);
->  	iomap_dio_submit_bio(iter, dio, bio, pos);
->  }
+On Wed, Mar 8, 2023 at 8:53=E2=80=AFAM David Howells <dhowells@redhat.com> =
+wrote:
+>
+> The new filemap_splice_read() has an implicit expectation via
+> filemap_get_pages() that ->read_folio() exists if ->readahead() doesn't
+> fully populate the pagecache of the file it is reading from[1], potential=
+ly
+> leading to a jump to NULL if this doesn't exist.  shmem, however, (and by
+> extension, tmpfs, ramfs and rootfs), doesn't have ->read_folio(),
 
-Looks fine.
+This patch is the only one in your series that I went "Ugh, that's
+really ugly" for.
 
-Reviewed-by: Dave Chinner <dchinner@redhat.com>
--- 
-Dave Chinner
-david@fromorbit.com
+Do we really want to basically duplicate all of filemap_splice_read()?
+
+I get the feeling that the zeropage case just isn't so important that
+we'd need to duplicate filemap_splice_read() just for that, and I
+think that the code should either
+
+ (a) just make a silly "read_folio()" for shmfs that just clears the page.
+
+     Ugly but maybe simple and not horrid?
+
+or
+
+ (b) teach filemap_splice_read() that a NULL 'read_folio' function
+means "use the zero page"
+
+     That might not be splice() itself, but maybe in
+filemap_get_pages() or something.
+
+or
+
+ (c) go even further, and teach read_folio() in general about file
+holes, and allow *any* filesystem to read zeroes that way in general
+without creating a folio for it.
+
+in a perfect world, if done well I think shmem_file_read_iter() should
+go away, and it could use generic_file_read_iter too.
+
+I dunno. Maybe shm really is *so* special that this is the right way
+to do things, but I did react quite negatively to this patch. So not a
+complete NAK, but definitely a "do we _really_ have to do this?"
+
+                       Linus
