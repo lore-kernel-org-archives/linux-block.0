@@ -2,41 +2,41 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DD6D6C74A44
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C68F2C742A7
 	for <linux-block@archiver.kernel.org>; Wed,  8 Mar 2023 14:40:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232171AbjCHOkO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 8 Mar 2023 09:40:14 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48740 "EHLO
+        id S232212AbjCHOkP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 8 Mar 2023 09:40:15 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49142 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232127AbjCHOja (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Mar 2023 09:39:30 -0500
+        with ESMTP id S232026AbjCHOje (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Mar 2023 09:39:34 -0500
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 14DD02387D
-        for <linux-block@vger.kernel.org>; Wed,  8 Mar 2023 06:38:33 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74C037F01F
+        for <linux-block@vger.kernel.org>; Wed,  8 Mar 2023 06:38:37 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1678286312;
+        s=mimecast20190719; t=1678286316;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=T0MgyEE2up5lyn6F4xZiFP7ZLu50ZEhkrR3VW4b8xrI=;
-        b=HmnW8TyXP+zvAR2zLGKBQT1W+LZSTT+Tq3o/Hg3NwCuwI+QF4Rtm15RmU1fAwLETKzaUlC
-        XFbm3hQQ71z8zRCgYPVMTxnUZYo9X19Vh2TUdOGYjV8Xg8EM9ro6IdyDcvHey0afflwUDv
-        HXD7Sc3mc0RI8ttQbHoGrg2Ytbf47OU=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=7b6tezcmsCRtrHxO2uDV+B0gtFM5s5ObrJQQe5H2QZI=;
+        b=e7Aem0NXHxsA+J5vWJppHl5KSR/CNv4yv/EMRTzW12/LAzzQAhuBn+3qONOTL2ThE8jgus
+        3ys53nI2+tsjpKPdSpqB4Yvh3Eet87d+cBfUZLsFBtHHtkQBC+aE19TKueGVoYu0Wdl2RG
+        Pcq/O4OLoJXYnZ66sXQIUWMVYR9hKh8=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-349-LwKNUDAjOYOokcFxinhM6A-1; Wed, 08 Mar 2023 09:38:26 -0500
-X-MC-Unique: LwKNUDAjOYOokcFxinhM6A-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+ us-mta-63-tDBcsQw1OWOKllv3Uzl2mQ-1; Wed, 08 Mar 2023 09:38:35 -0500
+X-MC-Unique: tDBcsQw1OWOKllv3Uzl2mQ-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 5AD9F101A55E;
-        Wed,  8 Mar 2023 14:38:22 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 09511384D043;
+        Wed,  8 Mar 2023 14:38:33 +0000 (UTC)
 Received: from warthog.procyon.org.uk (unknown [10.33.36.18])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 71FC01121314;
-        Wed,  8 Mar 2023 14:38:20 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 067E8492B07;
+        Wed,  8 Mar 2023 14:38:30 +0000 (UTC)
 From:   David Howells <dhowells@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>, Al Viro <viro@zeniv.linux.org.uk>,
         Christoph Hellwig <hch@infradead.org>
@@ -50,42 +50,126 @@ Cc:     David Howells <dhowells@redhat.com>,
         Linus Torvalds <torvalds@linux-foundation.org>,
         linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        Christoph Hellwig <hch@lst.de>,
         John Hubbard <jhubbard@nvidia.com>
-Subject: [PATCH v16 08/13] iomap: Don't get an reference on ZERO_PAGE for direct I/O block zeroing
-Date:   Wed,  8 Mar 2023 14:37:49 +0000
-Message-Id: <20230308143754.1976726-9-dhowells@redhat.com>
+Subject: [PATCH v16 12/13] block: Convert bio_iov_iter_get_pages to use iov_iter_extract_pages
+Date:   Wed,  8 Mar 2023 14:37:53 +0000
+Message-Id: <20230308143754.1976726-13-dhowells@redhat.com>
 In-Reply-To: <20230308143754.1976726-1-dhowells@redhat.com>
 References: <20230308143754.1976726-1-dhowells@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-ZERO_PAGE can't go away, no need to hold an extra reference.
+This will pin pages or leave them unaltered rather than getting a ref on
+them as appropriate to the iterator.
+
+The pages need to be pinned for DIO rather than having refs taken on them to
+prevent VM copy-on-write from malfunctioning during a concurrent fork() (the
+result of the I/O could otherwise end up being affected by/visible to the
+child process).
 
 Signed-off-by: David Howells <dhowells@redhat.com>
-Reviewed-by: David Hildenbrand <david@redhat.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
 Reviewed-by: John Hubbard <jhubbard@nvidia.com>
 cc: Al Viro <viro@zeniv.linux.org.uk>
-cc: David Hildenbrand <david@redhat.com>
-cc: linux-fsdevel@vger.kernel.org
+cc: Jens Axboe <axboe@kernel.dk>
+cc: Jan Kara <jack@suse.cz>
+cc: Matthew Wilcox <willy@infradead.org>
+cc: Logan Gunthorpe <logang@deltatee.com>
+cc: linux-block@vger.kernel.org
 ---
- fs/iomap/direct-io.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/fs/iomap/direct-io.c b/fs/iomap/direct-io.c
-index f771001574d0..850fb9870c2f 100644
---- a/fs/iomap/direct-io.c
-+++ b/fs/iomap/direct-io.c
-@@ -202,7 +202,7 @@ static void iomap_dio_zero(const struct iomap_iter *iter, struct iomap_dio *dio,
- 	bio->bi_private = dio;
- 	bio->bi_end_io = iomap_dio_bio_end_io;
+Notes:
+    ver #10)
+     - Drop bio_set_cleanup_mode(), open coding it instead.
+    
+    ver #8)
+     - Split the patch up a bit [hch].
+     - We should only be using pinned/non-pinned pages and not ref'd pages,
+       so adjust the comments appropriately.
+    
+    ver #7)
+     - Don't treat BIO_PAGE_REFFED/PINNED as being the same as FOLL_GET/PIN.
+    
+    ver #5)
+     - Transcribe the FOLL_* flags returned by iov_iter_extract_pages() to
+       BIO_* flags and got rid of bi_cleanup_mode.
+     - Replaced BIO_NO_PAGE_REF to BIO_PAGE_REFFED in the preceding patch.
+
+ block/bio.c | 23 ++++++++++++-----------
+ 1 file changed, 12 insertions(+), 11 deletions(-)
+
+diff --git a/block/bio.c b/block/bio.c
+index 51ae957cc4b6..fc98c1c723ca 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -1204,7 +1204,7 @@ static int bio_iov_add_page(struct bio *bio, struct page *page,
+ 	}
  
--	get_page(page);
-+	bio_set_flag(bio, BIO_NO_PAGE_REF);
- 	__bio_add_page(bio, page, len, 0);
- 	iomap_dio_submit_bio(iter, dio, bio, pos);
+ 	if (same_page)
+-		put_page(page);
++		bio_release_page(bio, page);
+ 	return 0;
  }
+ 
+@@ -1218,7 +1218,7 @@ static int bio_iov_add_zone_append_page(struct bio *bio, struct page *page,
+ 			queue_max_zone_append_sectors(q), &same_page) != len)
+ 		return -EINVAL;
+ 	if (same_page)
+-		put_page(page);
++		bio_release_page(bio, page);
+ 	return 0;
+ }
+ 
+@@ -1229,10 +1229,10 @@ static int bio_iov_add_zone_append_page(struct bio *bio, struct page *page,
+  * @bio: bio to add pages to
+  * @iter: iov iterator describing the region to be mapped
+  *
+- * Pins pages from *iter and appends them to @bio's bvec array. The
+- * pages will have to be released using put_page() when done.
+- * For multi-segment *iter, this function only adds pages from the
+- * next non-empty segment of the iov iterator.
++ * Extracts pages from *iter and appends them to @bio's bvec array.  The pages
++ * will have to be cleaned up in the way indicated by the BIO_PAGE_PINNED flag.
++ * For a multi-segment *iter, this function only adds pages from the next
++ * non-empty segment of the iov iterator.
+  */
+ static int __bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
+ {
+@@ -1264,9 +1264,9 @@ static int __bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
+ 	 * result to ensure the bio's total size is correct. The remainder of
+ 	 * the iov data will be picked up in the next bio iteration.
+ 	 */
+-	size = iov_iter_get_pages(iter, pages,
+-				  UINT_MAX - bio->bi_iter.bi_size,
+-				  nr_pages, &offset, extraction_flags);
++	size = iov_iter_extract_pages(iter, &pages,
++				      UINT_MAX - bio->bi_iter.bi_size,
++				      nr_pages, extraction_flags, &offset);
+ 	if (unlikely(size <= 0))
+ 		return size ? size : -EFAULT;
+ 
+@@ -1299,7 +1299,7 @@ static int __bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
+ 	iov_iter_revert(iter, left);
+ out:
+ 	while (i < nr_pages)
+-		put_page(pages[i++]);
++		bio_release_page(bio, pages[i++]);
+ 
+ 	return ret;
+ }
+@@ -1334,7 +1334,8 @@ int bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
+ 		return 0;
+ 	}
+ 
+-	bio_set_flag(bio, BIO_PAGE_REFFED);
++	if (iov_iter_extract_will_pin(iter))
++		bio_set_flag(bio, BIO_PAGE_PINNED);
+ 	do {
+ 		ret = __bio_iov_iter_get_pages(bio, iter);
+ 	} while (!ret && iov_iter_count(iter) && !bio_full(bio, 0));
 
