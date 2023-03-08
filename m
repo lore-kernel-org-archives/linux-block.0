@@ -2,166 +2,158 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30582C64EC4
-	for <linux-block@archiver.kernel.org>; Wed,  8 Mar 2023 08:00:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BF51C678D5
+	for <linux-block@archiver.kernel.org>; Wed,  8 Mar 2023 08:51:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229732AbjCHH76 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 8 Mar 2023 02:59:58 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37606 "EHLO
+        id S230188AbjCHIvX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 8 Mar 2023 03:51:23 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35048 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229558AbjCHH75 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Mar 2023 02:59:57 -0500
-Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7AE639475D
-        for <linux-block@vger.kernel.org>; Tue,  7 Mar 2023 23:59:56 -0800 (PST)
-Received: by mail-pf1-x42c.google.com with SMTP id n5so9659663pfv.11
-        for <linux-block@vger.kernel.org>; Tue, 07 Mar 2023 23:59:56 -0800 (PST)
+        with ESMTP id S230203AbjCHIvS (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Mar 2023 03:51:18 -0500
+Received: from mail-ed1-x536.google.com (mail-ed1-x536.google.com [IPv6:2a00:1450:4864:20::536])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CBB0CB420B
+        for <linux-block@vger.kernel.org>; Wed,  8 Mar 2023 00:51:05 -0800 (PST)
+Received: by mail-ed1-x536.google.com with SMTP id g3so62787198eda.1
+        for <linux-block@vger.kernel.org>; Wed, 08 Mar 2023 00:51:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fromorbit-com.20210112.gappssmtp.com; s=20210112; t=1678262396;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=oErMbovgNlM1fHmldHtqwkgHhSfzOswt1j6nL2mFsxo=;
-        b=fiikSj48Ilmf1vGJNiI3Bq/tguYc41vQm7Wv71k+P26+1xYdYHczpadicL85OTqWpl
-         U6NgRMu82A0NHUhz+qaoqyMW/MBvAos1JcIz5Ci30MHMEgpN3Efy5wucE0LVoqE02Rn4
-         GqceS5pTWt5mQ6VyIQboQr6gW3TVX/RlrbPi6hPLu1VhuQyw5IQIpJhcLRKbnd+S1RsE
-         RuHTYzkLCyADd8bKD0vBez9bXsu1UTO6mx2e09vG0uGkUYtnWlz7XW/yqw7MKzE3kvL5
-         JPf+3rN6lFzPWYllqvI4I8A5EZfdXQcNqF0hbc4jXIbMi7pITxFgi4Q61TmDsGQ+kaJy
-         5MBw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678262396;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=owltronix-com.20210112.gappssmtp.com; s=20210112; t=1678265464;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=oErMbovgNlM1fHmldHtqwkgHhSfzOswt1j6nL2mFsxo=;
-        b=wPZOfJOyHteMZhOgC2SA9U0o+fJUW02lOQA63KebyAqBWtnn54WR0ta8jQH5nO8FgC
-         Y55RZRFfYg95gF7P2/ffWYA7vXf8wy7WpWmSkC0VCAd14c0C9uURlARQ6SEn+qCI+0cE
-         A1p7zRh1DBhpG3ldfbdJcclJ8kiC/4KaeIhfEe/9uGrZjBp+ZK8msiyGdBcUmDq0rCI6
-         EHqZk+e2S5S2nUwQJv3ldv9+RyPik4cRuLK3kaP30ObM3nqZ3qTQXA2FhOkBzzJNm9Lb
-         u0mabKH6xPYT3Gq3It/RR8QcOef3tte5uLYVwgvUFYpD0TzHHV2OnooRgIPydCajIzP0
-         xjEQ==
-X-Gm-Message-State: AO0yUKUat/QbdvhYmjYZQeAT8sO7BZ9Ggvms3I+rM7UaguoxqRdfdSyF
-        RKyfn37+8iD+qq5x3iJuzrgvNg==
-X-Google-Smtp-Source: AK7set8bsOinXE0KQbcPQOZUDb0oKVCU2EyTeRsMoZqI+23n5Roy2RhtB13Lmukyu/y+AOZsaMHOxg==
-X-Received: by 2002:a62:1991:0:b0:5e2:434d:116b with SMTP id 139-20020a621991000000b005e2434d116bmr13162108pfz.23.1678262395850;
-        Tue, 07 Mar 2023 23:59:55 -0800 (PST)
-Received: from dread.disaster.area (pa49-186-4-237.pa.vic.optusnet.com.au. [49.186.4.237])
-        by smtp.gmail.com with ESMTPSA id s1-20020aa78281000000b0059435689e36sm9159908pfm.170.2023.03.07.23.59.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 07 Mar 2023 23:59:55 -0800 (PST)
-Received: from dave by dread.disaster.area with local (Exim 4.92.3)
-        (envelope-from <david@fromorbit.com>)
-        id 1pZoiG-006DN9-PH; Wed, 08 Mar 2023 18:59:52 +1100
-Date:   Wed, 8 Mar 2023 18:59:52 +1100
-From:   Dave Chinner <david@fromorbit.com>
-To:     Luis Chamberlain <mcgrof@kernel.org>
-Cc:     Matthew Wilcox <willy@infradead.org>,
-        "Darrick J. Wong" <djwong@kernel.org>,
-        James Bottomley <James.Bottomley@hansenpartnership.com>,
-        Keith Busch <kbusch@kernel.org>, Theodore Ts'o <tytso@mit.edu>,
-        Pankaj Raghav <p.raghav@samsung.com>,
-        Daniel Gomez <da.gomez@samsung.com>,
-        lsf-pc@lists.linux-foundation.org, linux-fsdevel@vger.kernel.org,
-        linux-mm@kvack.org, linux-block@vger.kernel.org
-Subject: Re: [LSF/MM/BPF TOPIC] Cloud storage optimizations
-Message-ID: <20230308075952.GU2825702@dread.disaster.area>
-References: <Y/7L74P6jSWwOvWt@mit.edu>
- <ZAFUYqAcPmRPLjET@kbusch-mbp.dhcp.thefacebook.com>
- <ZAFuSSZ5vZN7/UAa@casper.infradead.org>
- <f68905c5785b355b621847974d620fb59f021a41.camel@HansenPartnership.com>
- <ZAL0ifa66TfMinCh@casper.infradead.org>
- <2600732b9ed0ddabfda5831aff22fd7e4270e3be.camel@HansenPartnership.com>
- <ZAN0JkklyCRIXVo6@casper.infradead.org>
- <ZAQXduwAcAtIZHkB@bombadil.infradead.org>
- <ZAQicyYR0kZgrzIr@casper.infradead.org>
- <ZAgnHzUYkpQB+Uzi@bombadil.infradead.org>
+        bh=2UnwWt1JB4GUlkYJWYTbVJrds3HL5hzeUBTo+KI4WgM=;
+        b=cUQCaqnTHY6CDaOisn9ksjZ0PVT7+HkvhadjdS1VRnUxHXgQf6MzelZOT8LKUH9Gn2
+         q53scBFMJSNm8rLID/kcq5XcsiE5rM6k+sV3+M6w0h4TdsyoW24wy5MVJbyrknDaIzZN
+         Zi5tcddm+cnT+hCfdYrXQmioZdbWbD+Q7whti7slH+d63Zg30EAACbkdNIMCuVJcz2fR
+         FrWILvHY2XWNdtcLB7KgjkyZwtx5eyiGIhTGbWdvKEgHJMLR2PA/IF85rc7aPypSPI8F
+         cmEBq7DlU0+oq+sgtr6ZQpNX1L+9dw5FJz082rfyzf50BUqNoCaW1ATQ36tioYyyAGME
+         0nrw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1678265464;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=2UnwWt1JB4GUlkYJWYTbVJrds3HL5hzeUBTo+KI4WgM=;
+        b=Ga93ROcj+BerjECgxNatYENtLgYH+iWFIgwxQPJoZ49YuLtWyOxwqrJMt8rTfgs8fT
+         k3UkxyQV7cbaVRCIElrZj56YeY9JqSJov+iIXRjPt5OX497pDIHa7UR/YNQJpmW58OAs
+         cHc9gxWGjATZHTH/9+cAYL2S8F3jvudeYY+nxYmYzgMTuAKocppjfNqJJXl5ye5hjblL
+         FPgRYYyliVQhfCePgwv4lIi1kSnWD+zjxmxx5+Rq8fNyPQacv/uOWDEKxv8orfLj4mcn
+         pKCNptiAKKDDku8gPfB9eCcHknLsB5CpevSWOthoNx/z0ZPZLVBK89uwf97vwZa62vML
+         GJdQ==
+X-Gm-Message-State: AO0yUKWRCC7B9x0DGkAP/M3oYkJfsR5/14IVjGwm1NCyadnuTvdEmhtP
+        G0MSMbJ+dUnt88iK+fEWVvhcdbDu3ZmLRM9wNRBfKg==
+X-Google-Smtp-Source: AK7set/f9Wzd0vwxHPq9Wigihj53lwHbxxJBU0ydC62i7UUGBx4GnheECHVG0TU7Dk1XFJZeQZKhpBQoDKnJAd3DSsA=
+X-Received: by 2002:a17:906:b10d:b0:8b1:7ac3:85d3 with SMTP id
+ u13-20020a170906b10d00b008b17ac385d3mr8248125ejy.9.1678265464327; Wed, 08 Mar
+ 2023 00:51:04 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZAgnHzUYkpQB+Uzi@bombadil.infradead.org>
+References: <Y+EWCwqSisu3l0Sz@T590> <889dfe23-2e9e-c787-8c20-32f2c40509b5@suse.de>
+In-Reply-To: <889dfe23-2e9e-c787-8c20-32f2c40509b5@suse.de>
+From:   Hans Holmberg <hans@owltronix.com>
+Date:   Wed, 8 Mar 2023 09:50:53 +0100
+Message-ID: <CANr-nt2S2KWuhDtaK6QAjDK2njGB+rcVjPvHjK1MB9_m+z9Wrg@mail.gmail.com>
+Subject: Re: [LSF/MM/BPF BoF]: extend UBLK to cover real storage hardware
+To:     Hannes Reinecke <hare@suse.de>
+Cc:     Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org,
+        lsf-pc@lists.linux-foundation.org,
+        Liu Xiaodong <xiaodong.liu@intel.com>,
+        Jim Harris <james.r.harris@intel.com>,
+        Hans Holmberg <Hans.Holmberg@wdc.com>,
+        =?UTF-8?Q?Matias_Bj=C3=B8rling?= <Matias.Bjorling@wdc.com>,
+        "hch@lst.de" <hch@lst.de>, Stefan Hajnoczi <stefanha@redhat.com>,
+        ZiyangZhang <ZiyangZhang@linux.alibaba.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Mar 07, 2023 at 10:11:43PM -0800, Luis Chamberlain wrote:
-> On Sun, Mar 05, 2023 at 05:02:43AM +0000, Matthew Wilcox wrote:
-> > On Sat, Mar 04, 2023 at 08:15:50PM -0800, Luis Chamberlain wrote:
-> > > On Sat, Mar 04, 2023 at 04:39:02PM +0000, Matthew Wilcox wrote:
-> > > > XFS already works with arbitrary-order folios. 
-> > > 
-> > > But block sizes > PAGE_SIZE is work which is still not merged. It
-> > > *can* be with time. That would allow one to muck with larger block
-> > > sizes than 4k on x86-64 for instance. Without this, you can't play
-> > > ball.
-> > 
-> > Do you mean that XFS is checking that fs block size <= PAGE_SIZE and
-> > that check needs to be dropped?  If so, I don't see where that happens.
-> 
-> None of that. Back in 2018 Chinner had prototyped XFS support with
-> larger block size > PAGE_SIZE:
-> 
-> https://lwn.net/ml/linux-fsdevel/20181107063127.3902-1-david@fromorbit.com/
+This is a great topic, so I'd like to be part of it as well.
 
-Having a working BS > PS implementation on XFS based on variable
-page order support in the page cache goes back over a
-decade before that.
-
-Christoph Lameter did the page cache work, and I added support for
-XFS back in 2007. THe total change to XFS required can be seen in
-this simple patch:
-
-https://lore.kernel.org/linux-mm/20070423093152.GI32602149@melbourne.sgi.com/
-
-That was when the howls of anguish about high order allocations
-Willy mentioned started....
-
-> I just did a quick attempt to rebased it and most of the left over work
-> is actually on IOMAP for writeback and zero / writes requiring a new
-> zero-around functionality. All bugs on the rebase are my own, only compile
-> tested so far, and not happy with some of the changes I had to make so
-> likely could use tons more love:
-> 
-> https://git.kernel.org/pub/scm/linux/kernel/git/mcgrof/linux.git/log/?h=20230307-larger-bs-then-ps-xfs
-
-On a current kernel, that patchset is fundamentally broken as we
-have multi-page folio support in XFS and iomap - the patchset is
-inherently PAGE_SIZE based and it will do the the wrong thing with
-PAGE_SIZE based zero-around.
-
-IOWs, IOMAP_F_ZERO_AROUND does not need to exist any more, nor
-should any of the custom hooks it triggered in different operations
-for zero-around.  That's because we should now be using the same
-approach to BS > PS as we first used back in 2007. We already
-support multi-page folios in the page cache, so all the zero-around
-and partial folio uptodate tracking we need is already in place.
-
-Hence, like Willy said, all we need to do is have
-filemap_get_folio(FGP_CREAT) always allocate at least filesystem
-block sized and aligned folio and insert them into the mapping tree.
-Multi-page folios will always need to be sized as an integer
-multiple of the filesystem block size, but once we ensure size and
-alignment of folios in the page cache, we get everything else for
-free.
-
-/me cues the howls of anguish over memory fragmentation....
-
-> But it should give you an idea of what type of things filesystems need to do.
-
-Not really. it gives you an idea of what filesystems needed to do 5
-years ago to support BS > PS. We're living in the age of folios now,
-not pages.  Willy starting work on folios was why I dropped that
-patch set, firstly because it was going to make the iomap conversion
-to folios harder, and secondly, we realised that none of it was
-necessary if folios supported multi-page constructs in the page
-cache natively.
-
-IOWs, multi-page folios in the page cache should make BS > PS mostly
-trivial to support for any filesystem or block device that doesn't
-have some other dependency on PAGE_SIZE objects in the page cache
-(e.g. bufferheads).
+It would be great to figure out what latency overhead we could expect
+of ublk in the future, clarifying what use cases ublk could cater for.
+This will help a lot in making decisions on what to implement
+in-kernel vs user space.
 
 Cheers,
+Hans
 
-Dave.
--- 
-Dave Chinner
-david@fromorbit.com
+On Mon, Feb 6, 2023 at 6:54=E2=80=AFPM Hannes Reinecke <hare@suse.de> wrote=
+:
+>
+> On 2/6/23 16:00, Ming Lei wrote:
+> > Hello,
+> >
+> > So far UBLK is only used for implementing virtual block device from
+> > userspace, such as loop, nbd, qcow2, ...[1].
+> >
+> > It could be useful for UBLK to cover real storage hardware too:
+> >
+> > - for fast prototype or performance evaluation
+> >
+> > - some network storages are attached to host, such as iscsi and nvme-tc=
+p,
+> > the current UBLK interface doesn't support such devices, since it needs
+> > all LUNs/Namespaces to share host resources(such as tag)
+> >
+> > - SPDK has supported user space driver for real hardware
+> >
+> > So propose to extend UBLK for supporting real hardware device:
+> >
+> > 1) extend UBLK ABI interface to support disks attached to host, such
+> > as SCSI Luns/NVME Namespaces
+> >
+> > 2) the followings are related with operating hardware from userspace,
+> > so userspace driver has to be trusted, and root is required, and
+> > can't support unprivileged UBLK device
+> >
+> > 3) how to operating hardware memory space
+> > - unbind kernel driver and rebind with uio/vfio
+> > - map PCI BAR into userspace[2], then userspace can operate hardware
+> > with mapped user address via MMIO
+> >
+> > 4) DMA
+> > - DMA requires physical memory address, UBLK driver actually has
+> > block request pages, so can we export request SG list(each segment
+> > physical address, offset, len) into userspace? If the max_segments
+> > limit is not too big(<=3D64), the needed buffer for holding SG list
+> > can be small enough.
+> >
+> > - small amount of physical memory for using as DMA descriptor can be
+> > pre-allocated from userspace, and ask kernel to pin pages, then still
+> > return physical address to userspace for programming DMA
+> >
+> > - this way is still zero copy
+> >
+> > 5) notification from hardware: interrupt or polling
+> > - SPDK applies userspace polling, this way is doable, but
+> > eat CPU, so it is only one choice
+> >
+> > - io_uring command has been proved as very efficient, if io_uring
+> > command is applied(similar way with UBLK for forwarding blk io
+> > command from kernel to userspace) to uio/vfio for delivering interrupt,
+> > which should be efficient too, given batching processes are done after
+> > the io_uring command is completed
+> >
+> > - or it could be flexible by hybrid interrupt & polling, given
+> > userspace single pthread/queue implementation can retrieve all
+> > kinds of inflight IO info in very cheap way, and maybe it is likely
+> > to apply some ML model to learn & predict when IO will be completed
+> >
+> > 6) others?
+> >
+> >
+> Good idea.
+> I'd love to have this discussion.
+>
+> Cheers,
+>
+> Hannes
+> --
+> Dr. Hannes Reinecke                Kernel Storage Architect
+> hare@suse.de                              +49 911 74053 688
+> SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 N=C3=BCrnberg
+> HRB 36809 (AG N=C3=BCrnberg), Gesch=C3=A4ftsf=C3=BChrer: Ivo Totev, Andre=
+w
+> Myers, Andrew McDonald, Martje Boudien Moerman
+>
