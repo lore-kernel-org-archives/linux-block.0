@@ -2,150 +2,90 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3BA9C678D5
-	for <linux-block@archiver.kernel.org>; Wed,  8 Mar 2023 10:21:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73364C678D5
+	for <linux-block@archiver.kernel.org>; Wed,  8 Mar 2023 10:28:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230423AbjCHKV5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 8 Mar 2023 05:21:57 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52104 "EHLO
+        id S230518AbjCHK2r (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 8 Mar 2023 05:28:47 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35308 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230413AbjCHKVy (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Mar 2023 05:21:54 -0500
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30F35B718A;
-        Wed,  8 Mar 2023 02:21:47 -0800 (PST)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id E51CB21A3B;
-        Wed,  8 Mar 2023 10:21:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1678270905; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=F944mO70bNuhhzlAmwBrF8ILmVHrf5QndLIFiW3fWqQ=;
-        b=Uor112j+nKuuTcvlSceiA1u3OTwLKPgulqt7sD+up5rG7BKrtwG7xF4H2EkGWQTxQqMFIu
-        BiK1zL3syTOrdeRIufJnYIGtbw3uJBJGkPkOp4OYT+S2JVzP9oWVao2om1YZFmnyNQ18RN
-        ACswBQkiFszrHcLg9wsi5XpZCIch/l0=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1678270905;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=F944mO70bNuhhzlAmwBrF8ILmVHrf5QndLIFiW3fWqQ=;
-        b=XaWQZg/C8ar9O6LbL1akRXF/he7A8NhyTSXoXlgbX2hHv0BUpA45zisleCUVrfQRf3q89N
-        NEJ+HYNi3JH3U2AQ==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id D4C461391B;
-        Wed,  8 Mar 2023 10:21:45 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id xRoDNLlhCGTIWQAAMHmgww
-        (envelope-from <jack@suse.cz>); Wed, 08 Mar 2023 10:21:45 +0000
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-        id 5530BA0709; Wed,  8 Mar 2023 11:21:45 +0100 (CET)
-Date:   Wed, 8 Mar 2023 11:21:45 +0100
-From:   Jan Kara <jack@suse.cz>
-To:     Yu Kuai <yukuai1@huaweicloud.com>
-Cc:     jack@suse.cz, shinichiro.kawasaki@wdc.com,
-        paolo.valente@linaro.org, axboe@kernel.dk, glusvardi@posteo.net,
-        damien.lemoal@opensource.wdc.com, felicigb@gmail.com,
-        inbox@emilianomaccaferri.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, yukuai3@huawei.com,
-        yi.zhang@huawei.com, yangerkun@huawei.com
-Subject: Re: [PATCH] block, bfq: fix uaf for 'stable_merge_bfqq'
-Message-ID: <20230308102145.fezf4uj6qtqyxj6d@quack3>
-References: <4e6e1606-1d9e-9903-8a44-ccac58a1fe06@kernel.dk>
- <20230308023208.379465-1-yukuai1@huaweicloud.com>
+        with ESMTP id S230487AbjCHK2W (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Mar 2023 05:28:22 -0500
+Received: from mail-lj1-x231.google.com (mail-lj1-x231.google.com [IPv6:2a00:1450:4864:20::231])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C9EF5A6CB;
+        Wed,  8 Mar 2023 02:28:20 -0800 (PST)
+Received: by mail-lj1-x231.google.com with SMTP id f16so16040328ljq.10;
+        Wed, 08 Mar 2023 02:28:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112; t=1678271298;
+        h=content-transfer-encoding:content-language:in-reply-to:mime-version
+         :user-agent:date:message-id:from:references:cc:to:subject:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=+PM2e55u2rWAuFlB5GNjH23zKw43jDtkXtVhBxiEPjU=;
+        b=g+Hr/wgHRNzChCV24AI87kc2NpZiOoXZNV8xwq4nZS5w56+FWkliUVb2RqVfDS4BZO
+         8x5l0Ne9KSE1YeSpAMXf/491XGTZahDnyW+OF5LSNzI5P98JJbrwTWwfYPkRUkJnNeYG
+         +Af4TOowwCL7ySTkuPfVFuQI9vE59oQX0amxznbGlObVhB3aflB05fCLlhpTh9pOPUYo
+         0S0n17rkTC5qj5uHyqfKtLzKQ/i6yu4fUE+qtMDqUU7wrL3re2zabAbBUYtG4f9jP4lA
+         +Id0Qo3BBgOChEz65poiurixsfaAMv26bybmGJgCbzh5Wl976+6C+RnfEkesg1CKRqI3
+         BgXA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1678271298;
+        h=content-transfer-encoding:content-language:in-reply-to:mime-version
+         :user-agent:date:message-id:from:references:cc:to:subject
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=+PM2e55u2rWAuFlB5GNjH23zKw43jDtkXtVhBxiEPjU=;
+        b=aDAtSaJA5VsJ6Hh8JRz4tDeuudSivcwUJNLQbOnrPyxhO/oadvfRiOtMJmzi/etjgy
+         XQo43S6kz6kPTtIWh6gnnOcvlldf95VUX6F4kFJfAcI7EJDNjT8o+KFj9a9PbePqTxLu
+         AIk+kVLBE+JdCHwc4addFBjLMQboavehqHn/da6a0h6XwK+aQytSx69QiajZAMYPmumU
+         scAylwRwxHjQK/lm1kLrmZGiOdxh72L3PA3yp9s8hjLZPIUYMT4ra10BSlIu2jFz1Bfw
+         S/ub0AjQoDLQrOyiqjLfXP9axQCCqSIYHvdXe/0XuYi11PiBaAdtUyvdQ5T++5LD8SsM
+         iPBQ==
+X-Gm-Message-State: AO0yUKUzcYHDzHKYJwfdzzUACyjB7V+w0tIEVMOIz/fwEsKMLh8maVwd
+        e0ie5sKqUf+pLjYTlFALKvuZ305mMNE=
+X-Google-Smtp-Source: AK7set8zAN1JLxIDiwx7Z116PrzNfWnAFx+agVATcvYLkaabN8CSjIG2PJjJvw3vurZMUwS7F9nxvA==
+X-Received: by 2002:a2e:7004:0:b0:295:b0f0:cc6d with SMTP id l4-20020a2e7004000000b00295b0f0cc6dmr4752590ljc.4.1678271298052;
+        Wed, 08 Mar 2023 02:28:18 -0800 (PST)
+Received: from [192.168.1.103] ([31.173.83.210])
+        by smtp.gmail.com with ESMTPSA id u14-20020a2e91ce000000b0029597ebacd0sm2450020ljg.64.2023.03.08.02.28.17
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 08 Mar 2023 02:28:17 -0800 (PST)
+Subject: Re: [PATCH 01/32] pata_parport-bpck6: remove useless defines
+To:     Ondrej Zary <linux@zary.sk>,
+        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+        Sudip Mukherjee <sudipm.mukherjee@gmail.com>
+Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        Tim Waugh <tim@cyberelk.net>, linux-block@vger.kernel.org,
+        linux-parport@lists.infradead.org, linux-ide@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20230307224627.28011-1-linux@zary.sk>
+ <20230307224627.28011-2-linux@zary.sk>
+From:   Sergei Shtylyov <sergei.shtylyov@gmail.com>
+Message-ID: <da4e2244-30ae-a518-997f-726ea3222154@gmail.com>
+Date:   Wed, 8 Mar 2023 13:28:16 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230308023208.379465-1-yukuai1@huaweicloud.com>
+In-Reply-To: <20230307224627.28011-2-linux@zary.sk>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed 08-03-23 10:32:08, Yu Kuai wrote:
-> From: Yu Kuai <yukuai3@huawei.com>
-> 
-> Before commit fd571df0ac5b ("block, bfq: turn bfqq_data into an array
-> in bfq_io_cq"), process reference is read before bfq_put_stable_ref(),
-> and it's safe if bfq_put_stable_ref() put the last reference, because
-> process reference will be 0 and 'stable_merge_bfqq' won't be accessed
-> in this case. However, the commit changed the order and  will cause
-> uaf for 'stable_merge_bfqq'.
-> 
-> In order to emphasize that bfq_put_stable_ref() can drop the last
-> reference, fix the problem by moving bfq_put_stable_ref() to the end of
-> bfq_setup_stable_merge().
-> 
-> Fixes: fd571df0ac5b ("block, bfq: turn bfqq_data into an array in bfq_io_cq")
-> Reported-and-tested-by: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-> Link: https://lore.kernel.org/linux-block/20230307071448.rzihxbm4jhbf5krj@shindev/
-> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+Hello!
 
-Looks good to me (with or without getting rid of the stable_merge_bfqq)
-variable. Feel free to add:
+  (Sending via my Gmail account, as the OMP SMTP server rejects mails...) 
 
-Reviewed-by: Jan Kara <jack@suse.cz>
+On 3/8/23 1:45 AM, Ondrej Zary wrote:
 
-								Honza
-
-> ---
->  block/bfq-iosched.c | 18 +++++++++---------
->  1 file changed, 9 insertions(+), 9 deletions(-)
+> Almost all the ATAPI_ defines are unused. Remove them and use
+> ATA_REG_DATA instead of ATAPI_DATA.
 > 
-> diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-> index 8a8d4441519c..d9ed3108c17a 100644
-> --- a/block/bfq-iosched.c
-> +++ b/block/bfq-iosched.c
-> @@ -2854,11 +2854,11 @@ bfq_setup_stable_merge(struct bfq_data *bfqd, struct bfq_queue *bfqq,
->  {
->  	int proc_ref = min(bfqq_process_refs(bfqq),
->  			   bfqq_process_refs(stable_merge_bfqq));
-> -	struct bfq_queue *new_bfqq;
-> +	struct bfq_queue *new_bfqq = NULL;
->  
-> -	if (idling_boosts_thr_without_issues(bfqd, bfqq) ||
-> -	    proc_ref == 0)
-> -		return NULL;
-> +	bfqq_data->stable_merge_bfqq = NULL;
-> +	if (idling_boosts_thr_without_issues(bfqd, bfqq) || proc_ref == 0)
-> +		goto out;
->  
->  	/* next function will take at least one ref */
->  	new_bfqq = bfq_setup_merge(bfqq, stable_merge_bfqq);
-> @@ -2873,6 +2873,11 @@ bfq_setup_stable_merge(struct bfq_data *bfqd, struct bfq_queue *bfqq,
->  			new_bfqq_data->stably_merged = true;
->  		}
->  	}
-> +
-> +out:
-> +	/* deschedule stable merge, because done or aborted here */
-> +	bfq_put_stable_ref(stable_merge_bfqq);
-> +
->  	return new_bfqq;
->  }
->  
-> @@ -2933,11 +2938,6 @@ bfq_setup_cooperator(struct bfq_data *bfqd, struct bfq_queue *bfqq,
->  			struct bfq_queue *stable_merge_bfqq =
->  				bfqq_data->stable_merge_bfqq;
->  
-> -			/* deschedule stable merge, because done or aborted here */
-> -			bfq_put_stable_ref(stable_merge_bfqq);
-> -
-> -			bfqq_data->stable_merge_bfqq = NULL;
-> -
->  			return bfq_setup_stable_merge(bfqd, bfqq,
->  						      stable_merge_bfqq,
->  						      bfqq_data);
-> -- 
-> 2.31.1
-> 
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+> Signed-off-by: Ondrej Zary <linux@zary.sk>
+
+Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
+
+[...]
+
+MBR, Sergey
