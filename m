@@ -2,41 +2,41 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D264AC74A5B
-	for <linux-block@archiver.kernel.org>; Wed,  8 Mar 2023 16:54:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 960DBC678D5
+	for <linux-block@archiver.kernel.org>; Wed,  8 Mar 2023 16:54:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229894AbjCHQyJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 8 Mar 2023 11:54:09 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48908 "EHLO
+        id S229994AbjCHQyd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 8 Mar 2023 11:54:33 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49472 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229874AbjCHQyC (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Mar 2023 11:54:02 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E28F649894
-        for <linux-block@vger.kernel.org>; Wed,  8 Mar 2023 08:53:11 -0800 (PST)
+        with ESMTP id S229986AbjCHQyJ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Mar 2023 11:54:09 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 041FD61A8E
+        for <linux-block@vger.kernel.org>; Wed,  8 Mar 2023 08:53:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1678294391;
+        s=mimecast20190719; t=1678294399;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=n2MkOxcvB8unEejbMWkMEf534o0h2+e07KJxot0+dsE=;
-        b=REQe703Uk6gd81YHTqgZekG1+bSzV+Z8Mp+d0cNgwfbaKiIMfpt+RCa2esZeUnKT53R/wY
-        7/+0VwbN2fwzoWTtVzyCtY0M1M9DEVZcM8Vt5aJBsG85WEE5TyNVTSJMEWZDu95sXPbvOJ
-        mw97JaHaCRyNICL1UWH5DfzULuCovPg=
+        bh=WFhWed43Sc7081L0WA9mMaa7Q22YwjW6QNRxMcW8x9U=;
+        b=ClKivCZByRKaowOlV33BYuet6GAES+7m175jVIATInKIdmjKz61+gEtY35YZ1uvuquX0tQ
+        huhqKjxtfqkfx6gE6E+YCIW9jnHI+Jnajyzdn2U4k8jBfnF/h2K0ZoFhLbfZjUiEGOtPmh
+        CGn9YLzJOt7MSWUbIRIo9LUTkJSuHv8=
 Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
  [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-253-uC0SAgkeM7aQ7FeHN1dj7w-1; Wed, 08 Mar 2023 11:53:08 -0500
-X-MC-Unique: uC0SAgkeM7aQ7FeHN1dj7w-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
+ us-mta-286-n7_IuBJlMQ-LcFthELANRQ-1; Wed, 08 Mar 2023 11:53:17 -0500
+X-MC-Unique: n7_IuBJlMQ-LcFthELANRQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id EBC6F886C61;
-        Wed,  8 Mar 2023 16:53:06 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 3D8BE8027FD;
+        Wed,  8 Mar 2023 16:53:16 +0000 (UTC)
 Received: from warthog.procyon.org.uk (unknown [10.33.36.18])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 8E7602166B26;
-        Wed,  8 Mar 2023 16:53:04 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id C81E414171B6;
+        Wed,  8 Mar 2023 16:53:13 +0000 (UTC)
 From:   David Howells <dhowells@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>, Al Viro <viro@zeniv.linux.org.uk>,
         Christoph Hellwig <hch@infradead.org>
@@ -50,191 +50,171 @@ Cc:     David Howells <dhowells@redhat.com>,
         Linus Torvalds <torvalds@linux-foundation.org>,
         linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        Daniel Golle <daniel@makrotopia.org>,
-        Guenter Roeck <groeck7@gmail.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Christoph Hellwig <hch@lst.de>,
         John Hubbard <jhubbard@nvidia.com>,
-        Hugh Dickins <hughd@google.com>
-Subject: [PATCH v17 03/14] shmem: Implement splice-read
-Date:   Wed,  8 Mar 2023 16:52:40 +0000
-Message-Id: <20230308165251.2078898-4-dhowells@redhat.com>
+        Miklos Szeredi <miklos@szeredi.hu>,
+        Arnd Bergmann <arnd@arndb.de>
+Subject: [PATCH v17 06/14] tty, proc, kernfs, random: Use direct_splice_read()
+Date:   Wed,  8 Mar 2023 16:52:43 +0000
+Message-Id: <20230308165251.2078898-7-dhowells@redhat.com>
 In-Reply-To: <20230308165251.2078898-1-dhowells@redhat.com>
 References: <20230308165251.2078898-1-dhowells@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.7
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The new filemap_splice_read() has an implicit expectation via
-filemap_get_pages() that ->read_folio() exists if ->readahead() doesn't
-fully populate the pagecache of the file it is reading from[1], potentially
-leading to a jump to NULL if this doesn't exist.  shmem, however, (and by
-extension, tmpfs, ramfs and rootfs), doesn't have ->read_folio(),
-
-Work around this by equipping shmem with its own splice-read
-implementation, based on filemap_splice_read(), but able to paste in
-zero_page when there's a page missing.
+Use direct_splice_read() for tty, procfs, kernfs and random files rather
+than going through generic_file_splice_read() as they just copy the file
+into the output buffer and don't splice pages.  This avoids the need for
+them to have a ->read_folio() to satisfy filemap_splice_read().
 
 Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Daniel Golle <daniel@makrotopia.org>
-cc: Guenter Roeck <groeck7@gmail.com>
+Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 cc: Christoph Hellwig <hch@lst.de>
 cc: Jens Axboe <axboe@kernel.dk>
 cc: Al Viro <viro@zeniv.linux.org.uk>
 cc: John Hubbard <jhubbard@nvidia.com>
 cc: David Hildenbrand <david@redhat.com>
 cc: Matthew Wilcox <willy@infradead.org>
-cc: Hugh Dickins <hughd@google.com>
+cc: Miklos Szeredi <miklos@szeredi.hu>
+cc: Arnd Bergmann <arnd@arndb.de>
 cc: linux-block@vger.kernel.org
 cc: linux-fsdevel@vger.kernel.org
 cc: linux-mm@kvack.org
-Link: https://lore.kernel.org/r/Y+pdHFFTk1TTEBsO@makrotopia.org/ [1]
 ---
- mm/shmem.c | 124 ++++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 123 insertions(+), 1 deletion(-)
+ drivers/char/random.c | 4 ++--
+ drivers/tty/tty_io.c  | 4 ++--
+ fs/kernfs/file.c      | 2 +-
+ fs/proc/inode.c       | 4 ++--
+ fs/proc/proc_sysctl.c | 2 +-
+ fs/proc_namespace.c   | 6 +++---
+ 6 files changed, 11 insertions(+), 11 deletions(-)
 
-diff --git a/mm/shmem.c b/mm/shmem.c
-index 448f393d8ab2..3cbec1d56112 100644
---- a/mm/shmem.c
-+++ b/mm/shmem.c
-@@ -2719,6 +2719,128 @@ static ssize_t shmem_file_read_iter(struct kiocb *iocb, struct iov_iter *to)
- 	return retval ? retval : error;
- }
+diff --git a/drivers/char/random.c b/drivers/char/random.c
+index ce3ccd172cc8..792713616ba8 100644
+--- a/drivers/char/random.c
++++ b/drivers/char/random.c
+@@ -1546,7 +1546,7 @@ const struct file_operations random_fops = {
+ 	.compat_ioctl = compat_ptr_ioctl,
+ 	.fasync = random_fasync,
+ 	.llseek = noop_llseek,
+-	.splice_read = generic_file_splice_read,
++	.splice_read = direct_splice_read,
+ 	.splice_write = iter_file_splice_write,
+ };
  
-+static bool zero_pipe_buf_try_steal(struct pipe_inode_info *pipe,
-+				    struct pipe_buffer *buf)
-+{
-+	return false;
-+}
-+
-+static const struct pipe_buf_operations zero_pipe_buf_ops = {
-+	.release	= generic_pipe_buf_release,
-+	.try_steal	= zero_pipe_buf_try_steal,
-+	.get		= generic_pipe_buf_get,
-+};
-+
-+static size_t splice_zeropage_into_pipe(struct pipe_inode_info *pipe,
-+					loff_t fpos, size_t size)
-+{
-+	size_t offset = fpos & ~PAGE_MASK;
-+
-+	size = min_t(size_t, size, PAGE_SIZE - offset);
-+
-+	if (!pipe_full(pipe->head, pipe->tail, pipe->max_usage)) {
-+		struct pipe_buffer *buf = pipe_head_buf(pipe);
-+
-+		*buf = (struct pipe_buffer) {
-+			.ops	= &zero_pipe_buf_ops,
-+			.page	= ZERO_PAGE(0),
-+			.offset	= offset,
-+			.len	= size,
-+		};
-+		get_page(buf->page);
-+		pipe->head++;
-+	}
-+
-+	return size;
-+}
-+
-+static ssize_t shmem_file_splice_read(struct file *in, loff_t *ppos,
-+				      struct pipe_inode_info *pipe,
-+				      size_t len, unsigned int flags)
-+{
-+	struct inode *inode = file_inode(in);
-+	struct address_space *mapping = inode->i_mapping;
-+	struct folio *folio = NULL;
-+	size_t total_spliced = 0, used, npages, n, part;
-+	loff_t isize;
-+	int error = 0;
-+
-+	/* Work out how much data we can actually add into the pipe */
-+	used = pipe_occupancy(pipe->head, pipe->tail);
-+	npages = max_t(ssize_t, pipe->max_usage - used, 0);
-+	len = min_t(size_t, len, npages * PAGE_SIZE);
-+
-+	do {
-+		if (*ppos >= i_size_read(inode))
-+			break;
-+
-+		error = shmem_get_folio(inode, *ppos / PAGE_SIZE, &folio, SGP_READ);
-+		if (error) {
-+			if (error == -EINVAL)
-+				error = 0;
-+			break;
-+		}
-+		if (folio) {
-+			folio_unlock(folio);
-+
-+			if (folio_test_hwpoison(folio)) {
-+				error = -EIO;
-+				break;
-+			}
-+		}
-+
-+		/*
-+		 * i_size must be checked after we know the pages are Uptodate.
-+		 *
-+		 * Checking i_size after the check allows us to calculate
-+		 * the correct value for "nr", which means the zero-filled
-+		 * part of the page is not copied back to userspace (unless
-+		 * another truncate extends the file - this is desired though).
-+		 */
-+		isize = i_size_read(inode);
-+		if (unlikely(*ppos >= isize))
-+			break;
-+		part = min_t(loff_t, isize - *ppos, len);
-+
-+		if (folio) {
-+			/*
-+			 * If users can be writing to this page using arbitrary
-+			 * virtual addresses, take care about potential aliasing
-+			 * before reading the page on the kernel side.
-+			 */
-+			if (mapping_writably_mapped(mapping))
-+				flush_dcache_folio(folio);
-+			folio_mark_accessed(folio);
-+			/*
-+			 * Ok, we have the page, and it's up-to-date, so we can
-+			 * now splice it into the pipe.
-+			 */
-+			n = splice_folio_into_pipe(pipe, folio, *ppos, part);
-+			folio_put(folio);
-+			folio = NULL;
-+		} else {
-+			n = splice_zeropage_into_pipe(pipe, *ppos, len);
-+		}
-+
-+		if (!n)
-+			break;
-+		len -= n;
-+		total_spliced += n;
-+		*ppos += n;
-+		in->f_ra.prev_pos = *ppos;
-+		if (pipe_full(pipe->head, pipe->tail, pipe->max_usage))
-+			break;
-+
-+		cond_resched();
-+	} while (len);
-+
-+	if (folio)
-+		folio_put(folio);
-+
-+	file_accessed(in);
-+	return total_spliced ? total_spliced : error;
-+}
-+
- static loff_t shmem_file_llseek(struct file *file, loff_t offset, int whence)
- {
- 	struct address_space *mapping = file->f_mapping;
-@@ -3938,7 +4060,7 @@ static const struct file_operations shmem_file_operations = {
- 	.read_iter	= shmem_file_read_iter,
- 	.write_iter	= generic_file_write_iter,
+@@ -1557,7 +1557,7 @@ const struct file_operations urandom_fops = {
+ 	.compat_ioctl = compat_ptr_ioctl,
+ 	.fasync = random_fasync,
+ 	.llseek = noop_llseek,
+-	.splice_read = generic_file_splice_read,
++	.splice_read = direct_splice_read,
+ 	.splice_write = iter_file_splice_write,
+ };
+ 
+diff --git a/drivers/tty/tty_io.c b/drivers/tty/tty_io.c
+index 36fb945fdad4..9d117e579dfb 100644
+--- a/drivers/tty/tty_io.c
++++ b/drivers/tty/tty_io.c
+@@ -466,7 +466,7 @@ static const struct file_operations tty_fops = {
+ 	.llseek		= no_llseek,
+ 	.read_iter	= tty_read,
+ 	.write_iter	= tty_write,
+-	.splice_read	= generic_file_splice_read,
++	.splice_read	= direct_splice_read,
+ 	.splice_write	= iter_file_splice_write,
+ 	.poll		= tty_poll,
+ 	.unlocked_ioctl	= tty_ioctl,
+@@ -481,7 +481,7 @@ static const struct file_operations console_fops = {
+ 	.llseek		= no_llseek,
+ 	.read_iter	= tty_read,
+ 	.write_iter	= redirected_tty_write,
+-	.splice_read	= generic_file_splice_read,
++	.splice_read	= direct_splice_read,
+ 	.splice_write	= iter_file_splice_write,
+ 	.poll		= tty_poll,
+ 	.unlocked_ioctl	= tty_ioctl,
+diff --git a/fs/kernfs/file.c b/fs/kernfs/file.c
+index e4a50e4ff0d2..9d23b8141db7 100644
+--- a/fs/kernfs/file.c
++++ b/fs/kernfs/file.c
+@@ -1011,7 +1011,7 @@ const struct file_operations kernfs_file_fops = {
+ 	.release	= kernfs_fop_release,
+ 	.poll		= kernfs_fop_poll,
  	.fsync		= noop_fsync,
 -	.splice_read	= generic_file_splice_read,
-+	.splice_read	= shmem_file_splice_read,
++	.splice_read	= direct_splice_read,
  	.splice_write	= iter_file_splice_write,
- 	.fallocate	= shmem_fallocate,
- #endif
+ };
+ 
+diff --git a/fs/proc/inode.c b/fs/proc/inode.c
+index f495fdb39151..711f12706469 100644
+--- a/fs/proc/inode.c
++++ b/fs/proc/inode.c
+@@ -591,7 +591,7 @@ static const struct file_operations proc_iter_file_ops = {
+ 	.llseek		= proc_reg_llseek,
+ 	.read_iter	= proc_reg_read_iter,
+ 	.write		= proc_reg_write,
+-	.splice_read	= generic_file_splice_read,
++	.splice_read	= direct_splice_read,
+ 	.poll		= proc_reg_poll,
+ 	.unlocked_ioctl	= proc_reg_unlocked_ioctl,
+ 	.mmap		= proc_reg_mmap,
+@@ -617,7 +617,7 @@ static const struct file_operations proc_reg_file_ops_compat = {
+ static const struct file_operations proc_iter_file_ops_compat = {
+ 	.llseek		= proc_reg_llseek,
+ 	.read_iter	= proc_reg_read_iter,
+-	.splice_read	= generic_file_splice_read,
++	.splice_read	= direct_splice_read,
+ 	.write		= proc_reg_write,
+ 	.poll		= proc_reg_poll,
+ 	.unlocked_ioctl	= proc_reg_unlocked_ioctl,
+diff --git a/fs/proc/proc_sysctl.c b/fs/proc/proc_sysctl.c
+index 5851eb5bc726..e49f99657d1c 100644
+--- a/fs/proc/proc_sysctl.c
++++ b/fs/proc/proc_sysctl.c
+@@ -869,7 +869,7 @@ static const struct file_operations proc_sys_file_operations = {
+ 	.poll		= proc_sys_poll,
+ 	.read_iter	= proc_sys_read,
+ 	.write_iter	= proc_sys_write,
+-	.splice_read	= generic_file_splice_read,
++	.splice_read	= direct_splice_read,
+ 	.splice_write	= iter_file_splice_write,
+ 	.llseek		= default_llseek,
+ };
+diff --git a/fs/proc_namespace.c b/fs/proc_namespace.c
+index 846f9455ae22..492abbbeff5e 100644
+--- a/fs/proc_namespace.c
++++ b/fs/proc_namespace.c
+@@ -324,7 +324,7 @@ static int mountstats_open(struct inode *inode, struct file *file)
+ const struct file_operations proc_mounts_operations = {
+ 	.open		= mounts_open,
+ 	.read_iter	= seq_read_iter,
+-	.splice_read	= generic_file_splice_read,
++	.splice_read	= direct_splice_read,
+ 	.llseek		= seq_lseek,
+ 	.release	= mounts_release,
+ 	.poll		= mounts_poll,
+@@ -333,7 +333,7 @@ const struct file_operations proc_mounts_operations = {
+ const struct file_operations proc_mountinfo_operations = {
+ 	.open		= mountinfo_open,
+ 	.read_iter	= seq_read_iter,
+-	.splice_read	= generic_file_splice_read,
++	.splice_read	= direct_splice_read,
+ 	.llseek		= seq_lseek,
+ 	.release	= mounts_release,
+ 	.poll		= mounts_poll,
+@@ -342,7 +342,7 @@ const struct file_operations proc_mountinfo_operations = {
+ const struct file_operations proc_mountstats_operations = {
+ 	.open		= mountstats_open,
+ 	.read_iter	= seq_read_iter,
+-	.splice_read	= generic_file_splice_read,
++	.splice_read	= direct_splice_read,
+ 	.llseek		= seq_lseek,
+ 	.release	= mounts_release,
+ };
 
