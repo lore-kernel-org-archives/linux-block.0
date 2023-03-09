@@ -2,229 +2,193 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 81908C64EC4
-	for <linux-block@archiver.kernel.org>; Thu,  9 Mar 2023 15:25:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6E78C61DA4
+	for <linux-block@archiver.kernel.org>; Thu,  9 Mar 2023 17:23:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229613AbjCIPZJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 9 Mar 2023 10:25:09 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42252 "EHLO
+        id S230007AbjCIRXv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 9 Mar 2023 12:23:51 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43616 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231271AbjCIPYs (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 9 Mar 2023 10:24:48 -0500
-Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CDAA020A3A;
-        Thu,  9 Mar 2023 07:24:05 -0800 (PST)
-Received: from pps.filterd (m0246617.ppops.net [127.0.0.1])
-        by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3297eXVj028682;
-        Thu, 9 Mar 2023 15:23:42 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=to : cc : subject :
- from : message-id : references : date : in-reply-to : content-type :
- mime-version; s=corp-2022-7-12;
- bh=3xlw70ADtUHzuyLxVSwfRRS3JsBxFlKXTkj+4oZ/sPE=;
- b=dPyHCBJtPabY5jaMAxGf5bNoNyt8iUOvAAGJOejLy44vwGkfxQuCr/OUr80meV0xEr+w
- exvmFHr7c65Uy3XAWvHZWUhiTJ/dWRlk4T1aEBycSYfPtHnupwAwu9tH2+x9voes93P3
- jQlm7sw6H+drb0nmq1QUpkYb83hAo0H35RXY0JX/qmO6OhKHgItCaWOMN9UJC8BYIK5i
- N1X4y3bBtLGtK5bXvVLZTZ7UXWQ+Y23DQqo6sdQY184IUx1LHd5WnbaryAm2IhLMNoH0
- JEXwtSv1vUgW82a5kByEoopH/qeSEgPW9kDnD5+bwAAbLFsMMcQvISbahFbs+gv/ppv/ jw== 
-Received: from phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta03.appoci.oracle.com [138.1.37.129])
-        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3p416wtyuf-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 09 Mar 2023 15:23:42 +0000
-Received: from pps.filterd (phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-        by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (8.17.1.5/8.17.1.5) with ESMTP id 329EpC2X026693;
-        Thu, 9 Mar 2023 15:23:41 GMT
-Received: from nam10-bn7-obe.outbound.protection.outlook.com (mail-bn7nam10lp2109.outbound.protection.outlook.com [104.47.70.109])
-        by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 3p6g9vbem4-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 09 Mar 2023 15:23:41 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=kr3qG92Mxbuxz1+C3aiG0NukDEEKZkAlbOhlRatmGYWztP5BG7hZ9U/WZIqInqGKnLhFT2Qef+Xr+9LX9l82bCzmzdglPaoQTff1UXD12hUETuqVb92dXWTW6XS71Jr2zr7z1Syv49NwWLgWLQoZH/KGWtlnzr4IngQwBksLSS421wSqthvpPBkrmD8MQMHZ1ZJ0xoOdRUwBl1RZwlZtZDY9tqiXMUHb5KlwKTOfD4ME3ly0j/ZXg5AqdqJMpDf21dLOSmfmDiHAoTlNsuFrLxUa1N960JNuCV76Pq+CUwXvIJnX4aeeBpWjTd0702EktPLIK2jHuiHNtw7M8GUd6Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=3xlw70ADtUHzuyLxVSwfRRS3JsBxFlKXTkj+4oZ/sPE=;
- b=Jav9e/8yCXfLf6xs76Dcdifgp9Wp71uDD2r/St9bgS5C5rMgaOPAOgjaHxkWm8qIoybSSteomnZW/15W29P4E8Wx8FjL2aFt8i1autWQSgBLDerksNXVvdlpmB1YOYcySFa3g7wjt+7Fbp+sudT+t6uscNl/gHOBXxV66dRIPVzsxPg0O3xp+8S5a7uJ6AKkGb8S9OQ1Aa5cxI0PdlzRDd0OtM/nU7IeUH0k2q1dAEaPGfYrC/Hd/HUgl1WfGRo4OL3NNfCHomI2xQCcYawwpLATWFIJUONLT+pP1Dsjp2CjxhOJYfCUO1rNx+NEMwhkQi0e4dv3VO4XIy/AmKIjVw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=3xlw70ADtUHzuyLxVSwfRRS3JsBxFlKXTkj+4oZ/sPE=;
- b=d9lBtJwsPBMVj6nR5kJAH/scML5JLpsw/1wAC99CWu8u+WSh6O7FzTt4k7JyqZeknip6Hlxoos1FIa9oT4C/hmHeWRZ+aCVUAdtq+fLvJaxI6N1aQgI0z9yyTZsjNc9Tbqu2tcICdEeKBQ0+Ii7FzCbtmigMeDrUEloScb9F88A=
-Received: from PH0PR10MB4759.namprd10.prod.outlook.com (2603:10b6:510:3d::12)
- by DM6PR10MB4363.namprd10.prod.outlook.com (2603:10b6:5:21e::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6178.19; Thu, 9 Mar
- 2023 15:23:38 +0000
-Received: from PH0PR10MB4759.namprd10.prod.outlook.com
- ([fe80::8ef9:5939:13aa:d6a2]) by PH0PR10MB4759.namprd10.prod.outlook.com
- ([fe80::8ef9:5939:13aa:d6a2%8]) with mapi id 15.20.6178.019; Thu, 9 Mar 2023
- 15:23:38 +0000
-To:     James Bottomley <James.Bottomley@HansenPartnership.com>
-Cc:     Javier =?utf-8?Q?Gonz=C3=A1lez?= <javier.gonz@samsung.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        Theodore Ts'o <tytso@mit.edu>, Hannes Reinecke <hare@suse.de>,
-        Luis Chamberlain <mcgrof@kernel.org>,
-        Keith Busch <kbusch@kernel.org>,
-        Pankaj Raghav <p.raghav@samsung.com>,
-        Daniel Gomez <da.gomez@samsung.com>,
-        lsf-pc@lists.linux-foundation.org, linux-fsdevel@vger.kernel.org,
-        linux-mm@kvack.org, linux-block@vger.kernel.org
-Subject: Re: [LSF/MM/BPF TOPIC] Cloud storage optimizations
-From:   "Martin K. Petersen" <martin.petersen@oracle.com>
-Organization: Oracle Corporation
-Message-ID: <yq11qlygevs.fsf@ca-mkp.ca.oracle.com>
-References: <c9f6544d-1731-4a73-a926-0e85ae9da9df@suse.de>
-        <ZAN2HYXDI+hIsf6W@casper.infradead.org>
-        <edac909b-98e5-cb6d-bb80-2f6a20a15029@suse.de>
-        <ZAOF3p+vqA6pd7px@casper.infradead.org>
-        <0b70deae-9fc7-ca33-5737-85d7532b3d33@suse.de>
-        <ZAWi5KwrsYL+0Uru@casper.infradead.org>
-        <20230306161214.GB959362@mit.edu>
-        <ZAjLhkfRqwQ+vkHI@casper.infradead.org>
-        <CGME20230308181355eucas1p1c94ffee59e210fb762540c888e8eae8a@eucas1p1.samsung.com>
-        <1367983d4fa09dcb63e29db2e8be3030ae6f6e8c.camel@HansenPartnership.com>
-        <20230309080434.tnr33rhzh3a5yc5q@ArmHalley.local>
-        <260064c68b61f4a7bc49f09499e1c107e2a28f31.camel@HansenPartnership.com>
-Date:   Thu, 09 Mar 2023 10:23:31 -0500
-In-Reply-To: <260064c68b61f4a7bc49f09499e1c107e2a28f31.camel@HansenPartnership.com>
-        (James Bottomley's message of "Thu, 09 Mar 2023 08:11:35 -0500")
-Content-Type: text/plain
-X-ClientProxiedBy: AM9P193CA0012.EURP193.PROD.OUTLOOK.COM
- (2603:10a6:20b:21e::17) To PH0PR10MB4759.namprd10.prod.outlook.com
- (2603:10b6:510:3d::12)
+        with ESMTP id S230502AbjCIRXm (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 9 Mar 2023 12:23:42 -0500
+Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18CBA18B35;
+        Thu,  9 Mar 2023 09:23:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1678382621; x=1709918621;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=K3OoSeBFVBCAzSn/NYt4XYgke9k0N2/YyslC9mwV60k=;
+  b=QqUpvchfRr0Rjz9GotcBEVLLC25ztIdoSiFwViUJiLs5qQX5LFpffH7N
+   KXAvw+BgD26F1wAHnNfeQNDnpyIKCX6So7kfUvvROJMu5QD3aa5tAwm6J
+   Q/YoQWjOyRDgYPZuCMM0qiHvJ5sBaVnfgxnZsikW75xMBdsJi+8K0rkVp
+   U6frhLOG1ZWxxPErmCBq0yJAJeXyVigSl2+YbGfp91XXCsM+YbDBhfdbj
+   l7KhlOVf8d3emdBCT8aZXXTEvluadxWgnH0Hr1OEtvgadUVUV9msjXPqD
+   IoTZiYs6m8Qhwl+cImPKW0mnWGaFwbxwk4FTJUgADV5pjw7cLoDQA3NoB
+   Q==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10644"; a="335210897"
+X-IronPort-AV: E=Sophos;i="5.98,247,1673942400"; 
+   d="scan'208";a="335210897"
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Mar 2023 09:23:38 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10644"; a="923335333"
+X-IronPort-AV: E=Sophos;i="5.98,247,1673942400"; 
+   d="scan'208";a="923335333"
+Received: from lkp-server01.sh.intel.com (HELO b613635ddfff) ([10.239.97.150])
+  by fmsmga006.fm.intel.com with ESMTP; 09 Mar 2023 09:23:35 -0800
+Received: from kbuild by b613635ddfff with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1paJzK-000371-35;
+        Thu, 09 Mar 2023 17:23:34 +0000
+Date:   Fri, 10 Mar 2023 01:22:59 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+        io-uring@vger.kernel.org
+Cc:     oe-kbuild-all@lists.linux.dev, linux-block@vger.kernel.org,
+        Miklos Szeredi <mszeredi@redhat.com>,
+        ZiyangZhang <ZiyangZhang@linux.alibaba.com>,
+        Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>,
+        Bernd Schubert <bschubert@ddn.com>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: Re: [PATCH V2 05/17] io_uring: support OP_SEND_ZC/OP_RECV for fused
+ slave request
+Message-ID: <202303100159.i9Bzx24n-lkp@intel.com>
+References: <20230307141520.793891-6-ming.lei@redhat.com>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR10MB4759:EE_|DM6PR10MB4363:EE_
-X-MS-Office365-Filtering-Correlation-Id: bf69a389-4fd7-45f9-0790-08db20b241d8
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: pDI9Wkjtj71G0HI5Ub7Y8ZNglzcg1u21YX54n+s6p0m7odB+/JR4slsJrrfXT8s4u/Or6NGAxwlf5oI+qNlj54zIKYGJoffJMqvAnaL0gkMvtn/FZzqZM+hhFGiPLhT0vI4e/NUeCJO1JAKylc+g/BSwx5j4KR8hav0s9SoOC5CScL/wJmq9IJM6GivahtkiYFvPIpVVNrQ+S3nbUAu3MaizGa80OWZuksROgZgfJl0AmUj4TYl6e23rTemf/VZgx3NiE8FgClAajkTCZo3b/FJavrwVPfvIG8Y9/30qkrPorSTXg7x6b9FVbWYXKEqt0AIaqVBE+bbACtjDIlwgcmZUaDuOHcU7HOE+WdS/LKUutVn5Z+k4IiyXjDHdOiAYCiKu7wNtYMr2gHnQnEChHJZvzlMsj0L6K0WH8h4pGZlUqAr2h4W0t6TE9VBEQjZEu/q2LAJkW23Gz+W1807OtVHpeijfK9t2WqSLKD8NGAl/EwcLG4K/X08YSN6kNLbSmvuuMuNJeVc3QsS0BB6mZ/D62WUmWHTeoEwoEEaWdfvAyTyZY6G/wGET14JNsfJ899mrHYAeS+quMcbvRM5B7LNxE4RazgTSIsAxtMCwLKRfm/C5nN9NGZytvYwifULs+as5qpheCvvEqJs87Uw0+g==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR10MB4759.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(136003)(346002)(376002)(366004)(39860400002)(396003)(451199018)(66899018)(2906002)(5660300002)(7416002)(26005)(8676002)(8936002)(66946007)(41300700001)(66476007)(66556008)(4326008)(6916009)(316002)(54906003)(86362001)(36916002)(478600001)(6486002)(38100700002)(6666004)(6512007)(6506007)(186003)(83380400001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?5biNZEKHXMz3crCmXLXTCjt8U+cvqTe/09Q8Lva/wOy5seSGCZ2bRPA+dk9Z?=
- =?us-ascii?Q?TVKulIEwpx+/pnuacouz+0VHPlFMZeXJ8V2qUZwrRIfUV02+3BA19Bozt34C?=
- =?us-ascii?Q?ZhJ1+IsIQKgyjsUAVSqJoEaccRlugiZZWXpUpKGPm7rwqjH3yGvK92YYH/RE?=
- =?us-ascii?Q?EF7vCtm3XipkCXrWpabi/8TL9VJNCK7Pk4fG2IM6i4AArXX/XPdRtAqWMSv4?=
- =?us-ascii?Q?kHJq3e19MT/49q15NwgP4s4xtkjojDYqVIM6c9ldBjEt2L8o0x7HWNyPt9P5?=
- =?us-ascii?Q?FghO5pdDL4RgMCGqS0e2nDyD5VeK4kAj0bS0M3FhxHj1s7E2CszP8e7HBjFK?=
- =?us-ascii?Q?hULFnilVb03R7tsjFWeu5bRDioWpgoZA+EIIjp+G+zfRkoW1bcoLakKMpffg?=
- =?us-ascii?Q?Txlnhz/smFmFtl44xB0jQKI0zFScCxNso0ez9J7ZnLxzfbg1F89NyJ/IXCa1?=
- =?us-ascii?Q?fjQP2ITAvLrXtEIuRX/pwijpKZpti3PGaqrXLcR/baVre5zYgtAaFB1pnGhc?=
- =?us-ascii?Q?UO2uoy7BKZIPzdj809n6EywAZUx+s+3WgyzUgCMsqXr9xiXugViF4Nea/0qe?=
- =?us-ascii?Q?1jFc/SSxnhYDoWA3JcmDFZlrbicmG38c/0ndF6pdvvEgTGVEz2hrVreZfWgw?=
- =?us-ascii?Q?xcTnwrJGVfcM2sqc1GRiSnf3dj7tFiHzIAl1LyFdqu97RmmyvWFxRLAv9Puu?=
- =?us-ascii?Q?FGIlG3Z5X+ONTqoky0iIOhyXOgoN7hFMtSL329lCQoCSwtHxSQ00QLg4GjLk?=
- =?us-ascii?Q?FgDyt+eOf1rvDczE9VfVWvfziFEtuQSXPZQMc6YHEUE6+Dy1En3fuac9sSNx?=
- =?us-ascii?Q?rT9ynZz6nHz0eIR91XNfsL52jBLIwCqDwcMzVCtf1ZPBLvUykLQlTSHvmfqx?=
- =?us-ascii?Q?PL7Iv5VdKlj0KkQRWTpHGw2RiteoNB/RbXNtbwj+ento9P7jBz9fyuwgA9b3?=
- =?us-ascii?Q?Wg0vgULGNATjlpEbeDFwoOp4dvkmZT8MStjTNX/W6Q5Az4q6xh+nGhvEkQ+C?=
- =?us-ascii?Q?tEH5p41THCgj56VcYJIhcYerCU7eDT0eANsOmlLps801ROrpeH3UNtYWC5it?=
- =?us-ascii?Q?7XV9L8/F0HMzWrFWossvNfghND3uweS/u5VsBcscmlrpvgqLAvN3iUdPqgPu?=
- =?us-ascii?Q?NRcQXZhn4124kwg0zI8yWZz+N55+kGWaF6XbN7UNO3rx/o92lblOYXfMk5N1?=
- =?us-ascii?Q?kmgyq0GiLXKlEPaLIMNuTG/IPheRGYzrgV+/lyLnStzutEgSjZpO3Pxc8kIR?=
- =?us-ascii?Q?2vWh3067w+5Etr6+WEPb7gxF60hlXBX+LIz7Il7emKXX9PTlKxJ2bm2cYHyV?=
- =?us-ascii?Q?AGJ2duk2mRqQMl4wUa2QhNDFcPmUgb8iKgetXBZUEpawLVTk9KYjTEDPWVB6?=
- =?us-ascii?Q?deyOFgAS8CgVfTn/IHEkzyAAzWTHG8M/0VTeYq1tr16flJd0rKoIkvJp1HdT?=
- =?us-ascii?Q?T1V22FXBEUrheEhwYXQEUDSDXSWNjo2xYTSWO/HbCL0Dg1G8QClKRu/W5m7a?=
- =?us-ascii?Q?vg5iopzr6HWqMIit64dW6fruR6XsWUP3y30hpVznjpLto3YZPXCPlCRfWpFG?=
- =?us-ascii?Q?olLnXRhPuG/7EsxMc8xO3dv9qKzO9kPPB3oilzVP7sPeJKoKaQnkkofePP7g?=
- =?us-ascii?Q?1Q=3D=3D?=
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: =?us-ascii?Q?tSvol7gStI/g6xbRmbBWw7y87yRs+I3B3HASzykvgFlJosoui7sFbf/Q87EM?=
- =?us-ascii?Q?AZxRJwMb2FRGi3gWTFCO1PH7vpoFhCe30BcVBAK+eaBKU5G+wD+lIqbqsLLm?=
- =?us-ascii?Q?jdIngXCioQtnr8S3WC6OWVWg02u1A6++4nWJUh2M04Gutlf4YSa69e+lZAOa?=
- =?us-ascii?Q?O9XudDCCqfFg7C74wgijXsyiLl9+HjTFBnu2Fkr3I/agttDcAoP89KTYbKmr?=
- =?us-ascii?Q?2LCHGMvmzJJ+t0vbghoHLdHbcwVqn9tuz5BpNil5XN30qfoEX+gIwOWN9fo1?=
- =?us-ascii?Q?OIJQ7f2dNei5VPMn4JxhyAehFg96VEXDu+E16EOOYTsvDMEFdMFnwwLfITLe?=
- =?us-ascii?Q?YWzer2Nkg9XFDYVTPVCLgFtSAnzmcRXLJmu6TADcV23q0Mjhopx448owrk2h?=
- =?us-ascii?Q?YgJhtA/SzLoRlWxnzD4NeDtGLrm4jLXYNiJVqL5p9q9XtBs2CYjw1TPoPt/6?=
- =?us-ascii?Q?mQKWFPXQjtokKYmbQeiRluoL2tWivYtgpy1Vhrll6sDbMgoL68UGCvD8wR85?=
- =?us-ascii?Q?nVxxb6DRUBl55O7aguV5moZiKCWG8ePlMLRs5IqjTiNCfPhKbpX7hqAcNFn9?=
- =?us-ascii?Q?jUqP+/di/YRh1KkH5PE+l0a8BZWRv7obD+kz+xfqC8QXcdw24KupCVqEolJb?=
- =?us-ascii?Q?vvtMduFCmdOUtOrCWDNPzyttAv9isndNdjzvptCSA06g3VSrrUQGWEXBm8E6?=
- =?us-ascii?Q?3LSK+1pvAlhWF8wj0N/WWrHJ2sLZq+7rq6NjEAiVTj90eD04CHP/0t0TnxPS?=
- =?us-ascii?Q?D9SAlFiRIBbpZ1NpW/2OLNK/d2iaDHiI14XDQv0RyxYKh8fpFD4/cFynr6d5?=
- =?us-ascii?Q?yWstHIsgrbIKwX1tOARuFUQr6X/kZRebd2DmTWL5j6TQNVWFtKOiroVYdu5k?=
- =?us-ascii?Q?mW6DehKjvvsg62dJHL1dCZOagm0mWuI0oVkH2S+qpzSK3jjrNlY0+fzdh3eu?=
- =?us-ascii?Q?JW7aq6RvAyL62QN2xaa+7Mk6+UWAIxj15cH9M/dCi7URzVE+ehNe5yx+mz1N?=
- =?us-ascii?Q?WVNw8yfyvFd10ZwhFJQxdi1rgvCduic1aea1nXeYrOSiSzvKeJGJKLKWQH/0?=
- =?us-ascii?Q?v/O+pHpt?=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: bf69a389-4fd7-45f9-0790-08db20b241d8
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR10MB4759.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Mar 2023 15:23:38.5251
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: l8mm3+jrYrmKyseI7aF5uVe7NYzedfJt4j+mZPH65/Zbs2++2ciGlo/U3AFgPePCSTTuh0DqFdQHcNGkIud3FwDIoVJFeX81tN8He6zFgtg=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR10MB4363
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
- definitions=2023-03-09_08,2023-03-09_01,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 mlxlogscore=999
- adultscore=0 bulkscore=0 spamscore=0 malwarescore=0 mlxscore=0
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2212070000 definitions=main-2303090121
-X-Proofpoint-GUID: gglm9HGFGdRrWOV6je5N8CvT-0bNpn_e
-X-Proofpoint-ORIG-GUID: gglm9HGFGdRrWOV6je5N8CvT-0bNpn_e
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230307141520.793891-6-ming.lei@redhat.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Hi Ming,
 
-James,
+I love your patch! Perhaps something to improve:
 
-> Well a decade ago we did a lot of work to support 4k sector devices.
-> Ultimately the industry went with 512 logical/4k physical devices
-> because of problems with non-Linux proprietary OSs but you could still
-> use 4k today if you wanted (I've actually still got a working 4k SCSI
-> drive), so why is no NVMe device doing that?
+[auto build test WARNING on axboe-block/for-next]
+[also build test WARNING on linus/master v6.3-rc1 next-20230309]
+[cannot apply to char-misc/char-misc-testing char-misc/char-misc-next char-misc/char-misc-linus]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-FWIW, I have SATA, SAS, and NVMe devices that report 4KB logical.
+url:    https://github.com/intel-lab-lkp/linux/commits/Ming-Lei/io_uring-add-IO_URING_F_FUSED-and-prepare-for-supporting-OP_FUSED_CMD/20230307-222928
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git for-next
+patch link:    https://lore.kernel.org/r/20230307141520.793891-6-ming.lei%40redhat.com
+patch subject: [PATCH V2 05/17] io_uring: support OP_SEND_ZC/OP_RECV for fused slave request
+config: sparc64-randconfig-s031-20230308 (https://download.01.org/0day-ci/archive/20230310/202303100159.i9Bzx24n-lkp@intel.com/config)
+compiler: sparc64-linux-gcc (GCC) 12.1.0
+reproduce:
+        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+        chmod +x ~/bin/make.cross
+        # apt-get install sparse
+        # sparse version: v0.6.4-39-gce1a6720-dirty
+        # https://github.com/intel-lab-lkp/linux/commit/0a921da27026b3ba08aeceb432dd983480281344
+        git remote add linux-review https://github.com/intel-lab-lkp/linux
+        git fetch --no-tags linux-review Ming-Lei/io_uring-add-IO_URING_F_FUSED-and-prepare-for-supporting-OP_FUSED_CMD/20230307-222928
+        git checkout 0a921da27026b3ba08aeceb432dd983480281344
+        # save the config file
+        mkdir build_dir && cp config build_dir/.config
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.1.0 make.cross C=1 CF='-fdiagnostic-prefix -D__CHECK_ENDIAN__' O=build_dir ARCH=sparc64 olddefconfig
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.1.0 make.cross C=1 CF='-fdiagnostic-prefix -D__CHECK_ENDIAN__' O=build_dir ARCH=sparc64 SHELL=/bin/bash
 
-The reason the industry converged on 512e is that the performance
-problems were solved by ensuring correct alignment and transfer length.
+If you fix the issue, kindly add following tag where applicable
+| Reported-by: kernel test robot <lkp@intel.com>
+| Link: https://lore.kernel.org/oe-kbuild-all/202303100159.i9Bzx24n-lkp@intel.com/
 
-Almost every I/O we submit is a multiple of 4KB. So if things are
-properly aligned wrt. the device's physical block size, it is irrelevant
-whether we express CDB fields in units of 512 bytes or 4KB. We're still
-transferring the same number of bytes.
+sparse warnings: (new ones prefixed by >>)
+   io_uring/net.c: note: in included file (through io_uring/io_uring.h):
+   io_uring/slist.h:116:29: sparse: sparse: no newline at end of file
+   io_uring/net.c: note: in included file (through io_uring/io_uring.h):
+   include/linux/io_uring_types.h:179:37: sparse: sparse: array of flexible structures
+>> io_uring/net.c:385:49: sparse: sparse: cast removes address space '__user' of expression
+   io_uring/net.c:880:49: sparse: sparse: cast removes address space '__user' of expression
+   io_uring/net.c:1135:49: sparse: sparse: cast removes address space '__user' of expression
 
-In addition 512e had two additional advantages that 4Kn didn't:
+vim +/__user +385 io_uring/net.c
 
-1. Legacy applications doing direct I/O and expecting 512-byte blocks
-   kept working (albeit with a penalty for writes smaller than a
-   physical block).
-
-2. For things like PI where the 16-bit CRC is underwhelming wrt.
-   detecting errors in 4096 bytes of data, leaving the protection
-   interval at 512 bytes was also a benefit. So while 4Kn adoption
-   looked strong inside enterprise disk arrays initially, several
-   vendors ended up with 512e for PI reasons.
-
-Once I/Os from the OS were properly aligned, there was just no
-compelling reason for anyone to go with 4Kn and having to deal with
-multiple SKUs, etc.
-
-For NVMe 4Kn was prevalent for a while but drives have started
-gravitating towards 512n/512e. Perhaps because of (1) above. Plus
-whatever problems there may be on other platforms as you mentioned...
-
-> This is not to say I think larger block sizes is in any way a bad idea
-> ... I just think that given the history, it will be driven by
-> application needs rather than what the manufacturers tell us.
-
-I think it would be beneficial for Linux to support filesystem blocks
-larger than the page size. Based on experience outlined above, I am not
-convinced larger logical block sizes will get much traction. But that
-doesn't prevent devices from advertising larger physical/minimum/optimal
-I/O sizes and for us to handle those more gracefully than we currently
-do.
+   343	
+   344	int io_send(struct io_kiocb *req, unsigned int issue_flags)
+   345	{
+   346		struct sockaddr_storage __address;
+   347		struct io_sr_msg *sr = io_kiocb_to_cmd(req, struct io_sr_msg);
+   348		struct msghdr msg;
+   349		struct socket *sock;
+   350		unsigned flags;
+   351		int min_ret = 0;
+   352		int ret;
+   353	
+   354		msg.msg_name = NULL;
+   355		msg.msg_control = NULL;
+   356		msg.msg_controllen = 0;
+   357		msg.msg_namelen = 0;
+   358		msg.msg_ubuf = NULL;
+   359	
+   360		if (sr->addr) {
+   361			if (req_has_async_data(req)) {
+   362				struct io_async_msghdr *io = req->async_data;
+   363	
+   364				msg.msg_name = &io->addr;
+   365			} else {
+   366				ret = move_addr_to_kernel(sr->addr, sr->addr_len, &__address);
+   367				if (unlikely(ret < 0))
+   368					return ret;
+   369				msg.msg_name = (struct sockaddr *)&__address;
+   370			}
+   371			msg.msg_namelen = sr->addr_len;
+   372		}
+   373	
+   374		if (!(req->flags & REQ_F_POLLED) &&
+   375		    (sr->flags & IORING_RECVSEND_POLL_FIRST))
+   376			return io_setup_async_addr(req, &__address, issue_flags);
+   377	
+   378		sock = sock_from_file(req->file);
+   379		if (unlikely(!sock))
+   380			return -ENOTSOCK;
+   381	
+   382		if (!(req->flags & REQ_F_FUSED_SLAVE))
+   383			ret = import_ubuf(ITER_SOURCE, sr->buf, sr->len, &msg.msg_iter);
+   384		else
+ > 385			ret = io_import_kbuf_for_slave((u64)sr->buf, sr->len,
+   386					ITER_SOURCE, &msg.msg_iter, req);
+   387		if (unlikely(ret))
+   388			return ret;
+   389	
+   390		flags = sr->msg_flags;
+   391		if (issue_flags & IO_URING_F_NONBLOCK)
+   392			flags |= MSG_DONTWAIT;
+   393		if (flags & MSG_WAITALL)
+   394			min_ret = iov_iter_count(&msg.msg_iter);
+   395	
+   396		msg.msg_flags = flags;
+   397		ret = sock_sendmsg(sock, &msg);
+   398		if (ret < min_ret) {
+   399			if (ret == -EAGAIN && (issue_flags & IO_URING_F_NONBLOCK))
+   400				return io_setup_async_addr(req, &__address, issue_flags);
+   401	
+   402			if (ret > 0 && io_net_retry(sock, flags)) {
+   403				sr->len -= ret;
+   404				sr->buf += ret;
+   405				sr->done_io += ret;
+   406				req->flags |= REQ_F_PARTIAL_IO;
+   407				return io_setup_async_addr(req, &__address, issue_flags);
+   408			}
+   409			if (ret == -ERESTARTSYS)
+   410				ret = -EINTR;
+   411			req_set_fail(req);
+   412		}
+   413		if (ret >= 0)
+   414			ret += sr->done_io;
+   415		else if (sr->done_io)
+   416			ret = sr->done_io;
+   417		io_req_set_res(req, ret, 0);
+   418		return IOU_OK;
+   419	}
+   420	
 
 -- 
-Martin K. Petersen	Oracle Linux Engineering
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests
