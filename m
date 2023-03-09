@@ -2,239 +2,195 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD9C3C64EC4
-	for <linux-block@archiver.kernel.org>; Thu,  9 Mar 2023 21:23:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E4DD9C6FD1C
+	for <linux-block@archiver.kernel.org>; Thu,  9 Mar 2023 21:29:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230268AbjCIVXd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 9 Mar 2023 16:23:33 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60604 "EHLO
+        id S231228AbjCIV27 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 9 Mar 2023 16:28:59 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39224 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230154AbjCIVXc (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 9 Mar 2023 16:23:32 -0500
-Received: from todd.t-8ch.de (todd.t-8ch.de [159.69.126.157])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B7212822D;
-        Thu,  9 Mar 2023 13:23:29 -0800 (PST)
-Date:   Thu, 9 Mar 2023 21:23:24 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=weissschuh.net;
-        s=mail; t=1678397007;
-        bh=GrC8UO3MRO30WqZh4ZE+sZ9XOWxhBf0m/DVAmL383do=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=ZS/IytsmBRrdRPyl0/XQIXpPeTiDVVSZd9Q8ktF3hlkmO/sBf//twEb9jfEj7fOFm
-         sETwZfYT1VjFEsEkWlX6de5LwCI+GwP9cyJfQwmtC09GI6AqRBeBRuk+mzQOM/kZIH
-         tWsYO0rnXinCh75xRsx1Ll5Rwbi6IQtJW1kzpve8=
-From:   Thomas =?utf-8?Q?Wei=C3=9Fschuh?= <linux@weissschuh.net>
-To:     Mirsad Goran Todorovac <mirsad.todorovac@alu.unizg.hr>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Subject: Re: [PATCH] block: don't embed integrity_kobj into gendisk
-Message-ID: <0ac9777c-7586-494f-bbc5-87f14f645b12@t-8ch.de>
-References: <20230309-kobj_release-gendisk_integrity-v1-1-a240f54eac60@weissschuh.net>
- <d85ba503-d93c-3483-25e1-6043d4af444f@alu.unizg.hr>
+        with ESMTP id S229923AbjCIV26 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 9 Mar 2023 16:28:58 -0500
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88776637FB;
+        Thu,  9 Mar 2023 13:28:49 -0800 (PST)
+Received: from pps.filterd (m0246632.ppops.net [127.0.0.1])
+        by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 329Kwo8Z015953;
+        Thu, 9 Mar 2023 21:28:25 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=to : cc : subject :
+ from : message-id : references : date : in-reply-to : content-type :
+ mime-version; s=corp-2022-7-12;
+ bh=NqQxzGPjidhwY3xuGHLkpgFFE2OJr1EmRyAuefl65CI=;
+ b=OMdU3oFhEFzrqATpaGVfla/qzpEQxbHwgJzlv+iVFWXQU6Pj9X8H30NcOHuCvFw9CA0k
+ 14+6iJqHczjep7YlBTUjXP/eLc+50LFdfPqMFdyljLtz1tbP28w1DLUn7wMFReAJR3Hg
+ bj2FMCn2MA0kYJIoLUO/zgWaD7WNVfeA4YRMptaUNnBEvMkA8nxKYPFTT/VwVDwri/7l
+ WMRReM21kBZjD/5ZbBxy1NTHJBukHO1L2OI0oTmpJYTsgSokwZB652XOhPZ1FD0jRxN7
+ 3Ml3Eq7GW77rjvFecb6MrBrOR2h/1Xfo6VdN0rYDJKIXnQADgbrj3C/FtZ+kKmX6LJ5T tw== 
+Received: from phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta02.appoci.oracle.com [147.154.114.232])
+        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3p417ckus9-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 09 Mar 2023 21:28:25 +0000
+Received: from pps.filterd (phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+        by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (8.17.1.5/8.17.1.5) with ESMTP id 329JuwNn020778;
+        Thu, 9 Mar 2023 21:28:24 GMT
+Received: from nam11-dm6-obe.outbound.protection.outlook.com (mail-dm6nam11lp2171.outbound.protection.outlook.com [104.47.57.171])
+        by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 3p6fua2jfw-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 09 Mar 2023 21:28:24 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=JmcrzbypdZ1lMoPbzNgVFT5DmKZBuP/qcGNScSNVbF9DqTQlP65ErPLU6JwtFbYZ1PFghaG9BPpicyFoOyITC0fRsE780VWR0Q4rit9Q37mz8tD71RFUBFa25YhfHPH04/P2O6UUwu9P2Nt37kbMvNzU8wCUHLr7O1SYPM1q89DW4gcJ1NJ2VmVB6d9acrI37nlIo1wEN6yPw9wr1JkVh9GoSKp14DZs1twNfK10Nbu4yDASpNTtz6oMQyY7soV9HA8Iq+yoRcnn7QXbFVEEJRu8LRFxTH0dLWzhjgfc5LOI8hdT1hyX5+Cjd3+EouUj4VTXubBwLxZY00MrjtVZdg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=NqQxzGPjidhwY3xuGHLkpgFFE2OJr1EmRyAuefl65CI=;
+ b=haCV9U9N4RmrdWV8htGrfqJ0lkIXwTOk1pjR83TCwmJgC+BZQvSHEpT0MrzTCyZsnR1D7/TCthPmhTZ6QDt29/F7s14X7o0FSajZnbgiuSqko7B9OpkAgYO5QsYMYz+exKUl/GG0D9M5qdORPf+OZ++Dy1Kp+CQztzfCHvYawIIp5Yqw/lOf0IsTrdXj4moLQErq0GWAKVDNDHWYpZ5Xg6zwp3/5OCbKZz7N7oMgspOKf/CGvM7u2GGDjQ5LMTMBtDVK6oFeCTYvnET9axiZCw2DsewvzgvByHEX0SceSEYKAj6DMAK8HIR/DJnk/01BfompdqyPPvwTYiBVPuNWJQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=NqQxzGPjidhwY3xuGHLkpgFFE2OJr1EmRyAuefl65CI=;
+ b=TIhRwt6FS99pFAM9o8Rkcn3m20J0rHhM0G4yPi7DXKDAHzr9eNBM+NsWTSh8yJ5of7X/56RbXfMhQPMIDY/0NysTUesCT5Yc8TqcPZWMYy1V9TDEWdwrVoCuIPqPx1EtZ5SLy8nWoEvvKj+kOxHGgKOvD/UmbfRiiiKtWDNykAM=
+Received: from PH0PR10MB4759.namprd10.prod.outlook.com (2603:10b6:510:3d::12)
+ by BN0PR10MB5159.namprd10.prod.outlook.com (2603:10b6:408:116::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6178.19; Thu, 9 Mar
+ 2023 21:28:21 +0000
+Received: from PH0PR10MB4759.namprd10.prod.outlook.com
+ ([fe80::8ef9:5939:13aa:d6a2]) by PH0PR10MB4759.namprd10.prod.outlook.com
+ ([fe80::8ef9:5939:13aa:d6a2%8]) with mapi id 15.20.6178.019; Thu, 9 Mar 2023
+ 21:28:21 +0000
+To:     Luis Chamberlain <mcgrof@kernel.org>
+Cc:     James Bottomley <James.Bottomley@hansenpartnership.com>,
+        Dan Helmick <dan.helmick@samsung.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Javier =?utf-8?Q?Gonz=C3=A1lez?= <javier.gonz@samsung.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        Theodore Ts'o <tytso@mit.edu>, Hannes Reinecke <hare@suse.de>,
+        Keith Busch <kbusch@kernel.org>,
+        Pankaj Raghav <p.raghav@samsung.com>,
+        Daniel Gomez <da.gomez@samsung.com>,
+        lsf-pc@lists.linux-foundation.org, linux-fsdevel@vger.kernel.org,
+        linux-mm@kvack.org, linux-block@vger.kernel.org
+Subject: Re: [LSF/MM/BPF TOPIC] Cloud storage optimizations
+From:   "Martin K. Petersen" <martin.petersen@oracle.com>
+Organization: Oracle Corporation
+Message-ID: <yq1ttytbox9.fsf@ca-mkp.ca.oracle.com>
+References: <0b70deae-9fc7-ca33-5737-85d7532b3d33@suse.de>
+        <ZAWi5KwrsYL+0Uru@casper.infradead.org>
+        <20230306161214.GB959362@mit.edu>
+        <ZAjLhkfRqwQ+vkHI@casper.infradead.org>
+        <CGME20230308181355eucas1p1c94ffee59e210fb762540c888e8eae8a@eucas1p1.samsung.com>
+        <1367983d4fa09dcb63e29db2e8be3030ae6f6e8c.camel@HansenPartnership.com>
+        <20230309080434.tnr33rhzh3a5yc5q@ArmHalley.local>
+        <260064c68b61f4a7bc49f09499e1c107e2a28f31.camel@HansenPartnership.com>
+        <yq11qlygevs.fsf@ca-mkp.ca.oracle.com>
+        <f929f8d8e61da345be525ab06d4bb34ed2ce878b.camel@HansenPartnership.com>
+        <ZApMC8NLDfI6/ImD@bombadil.infradead.org>
+Date:   Thu, 09 Mar 2023 16:28:15 -0500
+In-Reply-To: <ZApMC8NLDfI6/ImD@bombadil.infradead.org> (Luis Chamberlain's
+        message of "Thu, 9 Mar 2023 13:13:47 -0800")
+Content-Type: text/plain
+X-ClientProxiedBy: LO2P265CA0027.GBRP265.PROD.OUTLOOK.COM
+ (2603:10a6:600:61::15) To PH0PR10MB4759.namprd10.prod.outlook.com
+ (2603:10b6:510:3d::12)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <d85ba503-d93c-3483-25e1-6043d4af444f@alu.unizg.hr>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR10MB4759:EE_|BN0PR10MB5159:EE_
+X-MS-Office365-Filtering-Correlation-Id: 087202da-411c-4fa3-c669-08db20e53529
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: H8YzpA26JSvWoqi7q2mdqnGljeQjtcdSZt7JWIs0O/oGbMH6U3xGzzOX2Iyo5uuKQxirdDNTNYEHbuJnb1BgBUMsn5OHplH8HhxgU9YbZ+u/YP2pq3MwmWXux5mJKlic4AZyyudc1ZI6yXUNlWdolMy4UFKvfehMjGIVAg6QQE7JvSgCHf9Jbz572ZXoO6aZhUy1/pG08yMoU2zNSNWX55Zzio5aeqseq0iN2sW1s7AG8YTK1eYH2EMPUKopUz8RfmvWFRGv5j1qSDbcxGektwvyon3B+OfLpWf/Wa1tCglntzj40vW8QFH8IKEjgBkeMjgDltgwS2UScRxYpxtoORFV3Nz4wqoykwMJnbWDhYcn6qoqNjXnqLweCkyzohodatkYrigz9rZ7TaLdOwrZ+VEK6FV5od5M8CQgXV2vLihhF59mF+aLgFuJJcPu7EeNE3U8XiA2P2PcLQ1POBDawt1xeh+En5p9C7cdtKwQxsVGiZrHQOWn5VOeCBLCOot+/qX7jVUHEzMusDBgPa66WFqEfSRt+4nFrknO1h4FfHZyKTAIRqeC+Ihxhp+l3DiCw8VO/7/cURi6G4SMK0TnlzP4ZjdxqIQuZJjsZkKbSqaNObigHWPkAucaj3Zv+02o25nUjRCw3Y4EPSwVY93PCw==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR10MB4759.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(39860400002)(346002)(396003)(376002)(136003)(366004)(451199018)(66946007)(2906002)(7416002)(5660300002)(26005)(8676002)(4744005)(8936002)(4326008)(66556008)(66476007)(6916009)(316002)(54906003)(86362001)(36916002)(478600001)(6486002)(38100700002)(6666004)(6506007)(41300700001)(6512007)(186003)(83380400001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?hczFBxNQJamlAlgRgO8yKvMA4CIQh4SpOuySHnWubaHJNvGOTp5/vmRQyJNC?=
+ =?us-ascii?Q?+36VSOzUe5mCqa7ziM51akgDRsYpAC7Ks1EUTaOXgIY5jScwWiunmhaGsoXZ?=
+ =?us-ascii?Q?0m6AZlhueQlv5SGt+1jJpwGPGvKiZl0j92/F/Kbp2bfHTaz0/7hbwYhZlFOu?=
+ =?us-ascii?Q?pMlOduBZ4hOcNv4AO45NcRG4W7PbIx0zAQh8BbR+MtDhrOO5dpnW/bj2Du3U?=
+ =?us-ascii?Q?HTXrS8OTBSiIi7cz7X3Am11RrTAvhiKHu7Xr0kgStuFdi1eQX+Ut6AhQqw9A?=
+ =?us-ascii?Q?wlHNo6nYmcJzuo+EllEaSZM5P3OoLo9vcEj4DhptyXLlwl2Gt6f4NhvIUv1P?=
+ =?us-ascii?Q?cxsYcyIECMJnOp0Xokv+RxSZTRITIrRAFbTbLPTIjv20k6Qg1u99ZwnbUzDs?=
+ =?us-ascii?Q?hOF/l1klYNv5vrOLCdT4F8i53bjxiK4MzL2useMI42X/4XdARXnH3r6oTrrM?=
+ =?us-ascii?Q?5NfDqNpSn27NN8s8RW2/asZBgE6rN1tUbZhF+tXF5VFzz1hXyI25CP7flPOr?=
+ =?us-ascii?Q?29LtsCNNZN8IinzWNxnETX08zPhACMkkmpD7pTFteC3oZcoZRrwA+7390LYL?=
+ =?us-ascii?Q?0F1C45OQ2mWc3rRUydspFiofEfdkWuBE+XzVLVgRmNEQ3/ZL4/tLt/XbXpkX?=
+ =?us-ascii?Q?XH6TuRao7gxEM196uPfTXq1mH5qDHX+KwgdSddqo7sOKphVKoneVNvwi/w3f?=
+ =?us-ascii?Q?TgQ9cU/xZBxUZXezn0QHTVzfqJFshKT8iFTzdOcDdt99JMS2iVxN6DyvgZ6p?=
+ =?us-ascii?Q?XOOVMWYrAdVkWpLHoLR3uU0QKxDy8Aq7fYWdMmggMlbR/lb1CBb17Liy4iEX?=
+ =?us-ascii?Q?8e4/QxmZJ/OCIuRELshD6iYXJwvKY3T02zTRqLVYZCEX2nXMEnPwh9uV+08c?=
+ =?us-ascii?Q?pUCqmIY2QKP/fyJvGbCxuBWPKW9dYGpR4+boXXgDxy1u0jo8LZ+ddeXww+PO?=
+ =?us-ascii?Q?QL5Ue9b0QnaHebBfWEMZBrcF1ZVLeuFTnE7iiR2uSo8I+vmX79kZtK+q7hGN?=
+ =?us-ascii?Q?qNYI9kGDjyZc6AvRwT4w7nVJu7oFoRyi0RIMX8DqMYw7zztXwW0UKJxXjJyk?=
+ =?us-ascii?Q?AyWgvBFqFt8kzAHiegh8ahCFX70bhzsC8qrVwecBLPOwwOy984wUUOJYEoCZ?=
+ =?us-ascii?Q?d6LZ3iMgeVDcJWFzS2lxP0ma7ZVbUJmTFgPWFK1xtNruysgebg8EJBKI6BEF?=
+ =?us-ascii?Q?X7Ss7zSEd5QTR2Gv5dh9A6p3TPGxQ9j+awlO1mb+DDlCqDaqKTtwkfuRBSXi?=
+ =?us-ascii?Q?9gTMww6uY5p+wNk9sHu9sDniTpXjafEFrX/nxDm7NeX8341qdyI/RDniLPZ9?=
+ =?us-ascii?Q?/uFcvzAHHBmT1ZpdE/Pp2/6ukf6YYQTUnztz3Yfej13lVf6m77n+mOuo38/h?=
+ =?us-ascii?Q?CZJl3Cxyn51pVi62/JEBHa6/MFRe390EXlp3jce2J0GzThsgHIxnG5D4VK5t?=
+ =?us-ascii?Q?xracUkqOC2NLjrQDMxH9nMmdTT55uQ+n12qHMtO6OSvSNdQ8y8/SUSbF0+9e?=
+ =?us-ascii?Q?RCvSD1sUcn2c/BwKQcMzaIG9HH4CMtOjH5pdgQ1su8QD3Qq81J5vbtDfZFOF?=
+ =?us-ascii?Q?1mSk37bnznfe17lWyWJT0SNgcTqKLDNZyWAF4KPstaUKd3gvzb/ar4rbr1u1?=
+ =?us-ascii?Q?Cg=3D=3D?=
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: =?us-ascii?Q?n+/x3XgMGhdsWTr/u3WT7MOA7JWYHMFzgwTyNQkedhOXwM6t7cObIuLSBztW?=
+ =?us-ascii?Q?p4IoiCuyI2RVypjiD/5rLY+9Zz+ZFdwSMasH8SJjTrmKwwEWRnn+za997mcf?=
+ =?us-ascii?Q?H3u2qMimnlNDdzlrpHC1pcYVtL5H2L/fJhfY7mcreSFjf3507wKqAQ/zDSfM?=
+ =?us-ascii?Q?qCN35l2wCkJ22Q1NDuR4I9ocl27OXOsiHbEFxeoBpQAJy0tpJzDNnJIX24LW?=
+ =?us-ascii?Q?cTu0EKREsUBml1uQrmGh2y/yt8QWcFynC1+Fa9me2p0rhKpV8xBs7efzm8i5?=
+ =?us-ascii?Q?e1IzmVP/H1WAJMDM//h5Bdorred6rtPbGNXRJ7vfVJ0QOEWlL6OZfhekJW0l?=
+ =?us-ascii?Q?ng9AKiBTUcejJHRt4SVAyoWyrEPd4jHCskKGWoKvhda8PHsaGJ+/bbz16UM1?=
+ =?us-ascii?Q?7E1sSDCsUdYw+d0t5mM0mq3NK8FmnUY8Beqo64PWhNCwdH6THCLBP2ZoA9w3?=
+ =?us-ascii?Q?dUXRnUekBCOvvSJD6CBrCPbMFQjC7yPPCbH9cH1RFrBDYCDCOVmI8Br6RuNB?=
+ =?us-ascii?Q?yc0fn34tUjweHVHyrEJfl2gdb9pTQo4FxiDOquhUNPJK3+BD/v4Ym7ZCSsRS?=
+ =?us-ascii?Q?Us08QbHn4vK21VEXQs1SvVtqp3P0gE0rijN1OlGdpwGLhsdDXbYN5WwszJAi?=
+ =?us-ascii?Q?7vYV8+nwlrBrW9GKXtcqO1/LNMw8vS/Mx1cO+SSkoCmA1ORBoNUOSpWEuKhx?=
+ =?us-ascii?Q?QcZVWDRycAhqBl3dFGe1M/wU/+fJN/V61cEDJoCen3VzNaXuEqqb5H1V0+5e?=
+ =?us-ascii?Q?gsqZfcxrqFGrDFUppMOGLvak5KVvCuorO7t3MHw1ABwrLbx18EXViiHeXwAB?=
+ =?us-ascii?Q?BvEDEvVQ4ZciVeOblbQawlDQK+vZmwulk0gkkZbhb9qStFFjDztOHZn3CeY6?=
+ =?us-ascii?Q?Y3ddiNQm3l3SxHx8lW5xu3DdOhdiwjZ4sUPcZ+LjIpD7pBKeLAKSl+X3QDH+?=
+ =?us-ascii?Q?wnXjrgai9u03Udd9WOVSDyFudxPRn0qL1GV/nLyVwzBfYTY2yscITKkoPXNI?=
+ =?us-ascii?Q?3C8Hv4xtglxXPKzVL2kNBT2DxppgngsOgCv3Qmo2ivMftoNoDakgTOvGEkHr?=
+ =?us-ascii?Q?V9aGNOM1?=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 087202da-411c-4fa3-c669-08db20e53529
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR10MB4759.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Mar 2023 21:28:21.5680
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: vBK0FpWq/sxo5L8V6kXG/kJzxK8RDAB79wxFlDAY8SkeQDYw6ExXLOi+U+DoxwhTc1a3Q/0FzcQGjCeoblCrd+I1ZiUo4Kt4DfZ95+uYSrY=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN0PR10MB5159
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
+ definitions=2023-03-09_12,2023-03-09_01,2023-02-09_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 adultscore=0
+ phishscore=0 suspectscore=0 malwarescore=0 spamscore=0 bulkscore=0
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2212070000 definitions=main-2303090173
+X-Proofpoint-GUID: Wr_lZ7O1_5uT7KM05q6GawKFU7_UB_4e
+X-Proofpoint-ORIG-GUID: Wr_lZ7O1_5uT7KM05q6GawKFU7_UB_4e
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-+Cc Andy
 
-Answer below.
+Luis,
 
-On Thu, Mar 09, 2023 at 10:05:32PM +0100, Mirsad Goran Todorovac wrote:
-> On 09. 03. 2023. 21:23, Thomas Weißschuh wrote:
-> > A struct kobject is only supposed to be embedded into objects which
-> > lifetime it will manage.
-> > Objects of type struct gendisk however are refcounted by their part0
-> > block_device.
-> > Therefore the integrity_kobj should not be embedded but split into its
-> > own independently managed object.
-> > 
-> > This will also provide a proper .release function for the ktype which
-> > avoid warnings like the following:
-> > kobject: 'integrity' (000000005198bea8): does not have a release() function, it is broken and must be fixed.
-> > 
-> > While modifying blk_integrity_del() also drop the explicit call to
-> > kobject_uevent(KOBJ_REMOVE) as the driver care will do this
-> > automatically.
-> > 
-> > Reported-by: Mirsad Todorovac <mirsad.todorovac@alu.unizg.hr>
-> > Link: https://lore.kernel.org/lkml/60b2b66c-22c9-1d38-ed1c-7b7d95e32720@alu.unizg.hr/
-> > Signed-off-by: Thomas Weißschuh <linux@weissschuh.net>
-> > ---
-> >  block/blk-integrity.c  | 32 ++++++++++++++++++++++++--------
-> >  include/linux/blkdev.h |  2 +-
-> >  2 files changed, 25 insertions(+), 9 deletions(-)
-> > 
-> > diff --git a/block/blk-integrity.c b/block/blk-integrity.c
-> > index 8f01d786f5cb..40adf33f5535 100644
-> > --- a/block/blk-integrity.c
-> > +++ b/block/blk-integrity.c
-> > @@ -218,10 +218,15 @@ struct integrity_sysfs_entry {
-> >  	ssize_t (*store)(struct blk_integrity *, const char *, size_t);
-> >  };
-> >  
-> > +static inline struct gendisk *integrity_kobj_to_disk(struct kobject *kobj)
-> > +{
-> > +	return dev_to_disk(kobj_to_dev(kobj->parent));
-> > +}
-> > +
-> >  static ssize_t integrity_attr_show(struct kobject *kobj, struct attribute *attr,
-> >  				   char *page)
-> >  {
-> > -	struct gendisk *disk = container_of(kobj, struct gendisk, integrity_kobj);
-> > +	struct gendisk *disk = integrity_kobj_to_disk(kobj);
-> >  	struct blk_integrity *bi = &disk->queue->integrity;
-> >  	struct integrity_sysfs_entry *entry =
-> >  		container_of(attr, struct integrity_sysfs_entry, attr);
-> > @@ -233,7 +238,7 @@ static ssize_t integrity_attr_store(struct kobject *kobj,
-> >  				    struct attribute *attr, const char *page,
-> >  				    size_t count)
-> >  {
-> > -	struct gendisk *disk = container_of(kobj, struct gendisk, integrity_kobj);
-> > +	struct gendisk *disk = integrity_kobj_to_disk(kobj);
-> >  	struct blk_integrity *bi = &disk->queue->integrity;
-> >  	struct integrity_sysfs_entry *entry =
-> >  		container_of(attr, struct integrity_sysfs_entry, attr);
-> > @@ -356,9 +361,15 @@ static const struct sysfs_ops integrity_ops = {
-> >  	.store	= &integrity_attr_store,
-> >  };
-> >  
-> > +static void integrity_release(struct kobject *kobj)
-> > +{
-> > +	kfree(kobj);
-> > +}
-> > +
-> >  static const struct kobj_type integrity_ktype = {
-> >  	.default_groups = integrity_groups,
-> >  	.sysfs_ops	= &integrity_ops,
-> > +	.release        = integrity_release,
-> >  };
-> >  
-> >  static blk_status_t blk_integrity_nop_fn(struct blk_integrity_iter *iter)
-> > @@ -442,16 +453,21 @@ int blk_integrity_add(struct gendisk *disk)
-> >  {
-> >  	int ret;
-> >  
-> > -	ret = kobject_init_and_add(&disk->integrity_kobj, &integrity_ktype,
-> > +	disk->integrity_kobj = kmalloc(sizeof(*disk->integrity_kobj), GFP_KERNEL);
-> > +	if (!disk->integrity_kobj)
-> > +		return -ENOMEM;
-> > +
-> > +	ret = kobject_init_and_add(disk->integrity_kobj, &integrity_ktype,
-> >  				   &disk_to_dev(disk)->kobj, "%s", "integrity");
-> > -	if (!ret)
-> > -		kobject_uevent(&disk->integrity_kobj, KOBJ_ADD);
-> > +	if (ret)
-> > +		kobject_put(disk->integrity_kobj);
-> > +	else
-> > +		kobject_uevent(disk->integrity_kobj, KOBJ_ADD);
-> > +
-> >  	return ret;
-> >  }
-> >  
-> >  void blk_integrity_del(struct gendisk *disk)
-> >  {
-> > -	kobject_uevent(&disk->integrity_kobj, KOBJ_REMOVE);
-> > -	kobject_del(&disk->integrity_kobj);
-> > -	kobject_put(&disk->integrity_kobj);
-> > +	kobject_put(disk->integrity_kobj);
-> >  }
-> > diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-> > index d1aee08f8c18..2fbfb3277a2b 100644
-> > --- a/include/linux/blkdev.h
-> > +++ b/include/linux/blkdev.h
-> > @@ -164,7 +164,7 @@ struct gendisk {
-> >  	atomic_t sync_io;		/* RAID */
-> >  	struct disk_events *ev;
-> >  #ifdef  CONFIG_BLK_DEV_INTEGRITY
-> > -	struct kobject integrity_kobj;
-> > +	struct kobject *integrity_kobj;
-> >  #endif	/* CONFIG_BLK_DEV_INTEGRITY */
-> >  
-> >  #ifdef CONFIG_BLK_DEV_ZONED
-> > 
-> > ---
-> > base-commit: 44889ba56cbb3d51154660ccd15818bc77276696
-> > change-id: 20230309-kobj_release-gendisk_integrity-e26c0bc126aa
-> > 
-> > Best regards,
-> 
-> Hello Thomas,
-> 
-> Thank you for Cc:-ing me on this.
-> 
-> The patch applied successfully against 6.3-rc1 commit 44889ba56cbb Merge tag 'net-6.3-rc2'
-> and I'm just in a build with
-> 
-> CONFIG_DEBUG_KOBJECT=y
-> CONFIG_DEBUG_KOBJECT_RELEASE=y
-> 
-> However, I can see remotely whether the kernel is operating, but not these special messages
-> that are emitted past rsyslog's end of lifetime. It looks like it will require physical
-> access to the box tomorrow morning, Lord willing.
-> 
-> I hate to object to your solution, still, I fail to see how it releases 
-> 
-> security/integrity/iint.c:
-> 175 static int __init integrity_iintcache_init(void)
-> 176 {
-> 177         iint_cache =
-> 178             kmem_cache_create("iint_cache", sizeof(struct integrity_iint_cache),
-> 179                               0, SLAB_PANIC, init_once);
-> 180         return 0;
-> 181 }
-> 182 DEFINE_LSM(integrity) = {
-> 183         .name = "integrity",
-> 184         .init = integrity_iintcache_init,
-> 185 };
-> 
-> It is declared here:
-> 
-> 26 static struct kmem_cache *iint_cache __read_mostly;
-> 
-> so it ought to be kmem_cache_destroy()-ed from this module, unless there is something that
-> is not obvious nor transparent.
-> 
-> Can you help me see what I'm doing wrong?
+> A big future question is of course how / when to use these for
+> filesystems.  Should there be, for instance a 'mkfs --optimal-bs' or
+> something which may look whatever hints the media uses ? Or do we just
+> leaves the magic incantations to the admins?
 
-I think this has nothing to do with security/integrity/iint.c.
+mkfs already considers the reported queue limits (for the filesystems
+most people use, anyway).
 
-Instead the problem are these snippets from block/blk-integrity.c:
+The problem is mainly that the devices don't report them. At least not
+very often in the NVMe space. For SCSI devices, reporting these
+parameters is quite common.
 
-/* line 359: kobj_type without .release */
-static const struct kobj_type integrity_ktype = {
-	.default_groups = integrity_groups,
-	.sysfs_ops	= &integrity_ops,
-};
-
-/* line 445: registration of kobject "integrity" with that type */
-ret = kobject_init_and_add(&disk->integrity_kobj, &integrity_ktype,
-			   &disk_to_dev(disk)->kobj, "%s", "integrity");
-
-These kobjects represent the directories /sys/block/*/integrity/.
-
-The patch below can be used to easily diagnose this during kobject
-initialization instead of cleanup, which seems much more useful.
-
-It probably makes sense to move the
-pr_debug("does not have a release() function");
-to kobject_init() in general.
-
-diff --git a/lib/kobject.c b/lib/kobject.c
-index 6e2f0bee3560..2708f8344e9b 100644
---- a/lib/kobject.c
-+++ b/lib/kobject.c
-@@ -341,6 +341,8 @@ void kobject_init(struct kobject *kobj, const struct kobj_type *ktype)
- 		dump_stack();
- 	}
- 
-+	WARN(!ktype->release, "KOBJECT %p, %p: no release function\n", kobj, ktype);
-+
- 	kobject_init_internal(kobj);
- 	kobj->ktype = ktype;
- 	return;
+-- 
+Martin K. Petersen	Oracle Linux Engineering
