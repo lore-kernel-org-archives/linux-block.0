@@ -2,93 +2,206 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44D27C64EC4
-	for <linux-block@archiver.kernel.org>; Thu,  9 Mar 2023 03:28:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EEDA5C6FD1F
+	for <linux-block@archiver.kernel.org>; Thu,  9 Mar 2023 07:50:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229652AbjCID2L (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 8 Mar 2023 22:28:11 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49208 "EHLO
+        id S230176AbjCIHuM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 9 Mar 2023 02:50:12 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45544 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229462AbjCID2J (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Mar 2023 22:28:09 -0500
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6E0911EFEA
-        for <linux-block@vger.kernel.org>; Wed,  8 Mar 2023 19:28:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
-        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=NpyOst0aug1wpFJ+wMLEd7XR9byordlOSIR7ZuITUlE=; b=1SkSCUsE73G9VSkRDnH+RI+ZvO
-        ERzAF6ohriPDvA0d5itwjTNVo76F5ATAIIbHHHd36Tn1IQH5R+ne4mbDr9TrS/q7EdUgYF5ktfCuc
-        hXg8J/qwxWgY2DtwbtxD7ToB9OWbAx/8NZNo8DnSaeDLK/9ncB2oLUKzrjnLaRxGVhjhFXXILFTA7
-        ZopchGOVBMQ/tQEswshi24o2tfq9t3BpkUr27qWPpn7sDzdGzCMD+66GsyKoQDumRGf35gtcS6LGI
-        Qwix6sg4mRUAajhorJaRZL+bxaSSFicvQDscja1SrRHUoItKW8gJ0Q9e9m5CcCZQTtl68ros/g1qV
-        t1Siabfg==;
-Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1pa6wk-007e9D-Ji; Thu, 09 Mar 2023 03:28:02 +0000
-Date:   Wed, 8 Mar 2023 19:28:02 -0800
-From:   Luis Chamberlain <mcgrof@kernel.org>
-To:     Matthew Wilcox <willy@infradead.org>
-Cc:     Hannes Reinecke <hare@suse.de>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org, Keith Busch <kbusch@kernel.org>
-Subject: Re: [PATCH 1/5] brd: convert to folios
-Message-ID: <ZAlSQviNuTBqQN42@bombadil.infradead.org>
-References: <20230306120127.21375-1-hare@suse.de>
- <20230306120127.21375-2-hare@suse.de>
- <ZAYk5wOUaXAIouQ5@casper.infradead.org>
- <76613838-fa4c-7f3e-3417-7a803fafc6c2@suse.de>
- <ZAboHUp/YUkEs/D1@casper.infradead.org>
+        with ESMTP id S230400AbjCIHtz (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 9 Mar 2023 02:49:55 -0500
+Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DFFC31B57E;
+        Wed,  8 Mar 2023 23:48:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1678348087; x=1709884087;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=qeq63lYyfAfHhk1xOZ63kvMHWyrmYCAuvEirxhJBR10=;
+  b=aHbMw2sJC+pcbNjD3bNWzCfc/TKAzBmRJ3ISsKlEfMqJXIcgMgTcZeSV
+   0htCjOaT8ezP5SrqT27VybUOOezQwi6QrJCGn/90K0d30l1cR1A/VirwQ
+   JlwhEiCP+POUP5RaqudXLVNJjqd+e8zf3NCq2Xb+kOpNPfr1LCdwQC95E
+   HBAulC4YnFI+oSXfrBrZEwHBlGTUnU2e1iEoBDHUDSkm4WUIKhJy2sAC7
+   xKYiHsqKaRfqbdo29feFbyiUnbUcuZ9PZXyuJ5rrx/vvVY5vrrGaEsnKu
+   fxT70C5POExKAT02ggRaTm/wK3Z0IpQuHEtAkpECVZJTFNbRPTUp2+bb4
+   g==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10643"; a="401216047"
+X-IronPort-AV: E=Sophos;i="5.98,245,1673942400"; 
+   d="scan'208";a="401216047"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Mar 2023 23:47:16 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10643"; a="766333568"
+X-IronPort-AV: E=Sophos;i="5.98,245,1673942400"; 
+   d="scan'208";a="766333568"
+Received: from lkp-server01.sh.intel.com (HELO b613635ddfff) ([10.239.97.150])
+  by FMSMGA003.fm.intel.com with ESMTP; 08 Mar 2023 23:47:14 -0800
+Received: from kbuild by b613635ddfff with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1paAza-0002ko-0I;
+        Thu, 09 Mar 2023 07:47:14 +0000
+Date:   Thu, 9 Mar 2023 15:46:49 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+        io-uring@vger.kernel.org
+Cc:     oe-kbuild-all@lists.linux.dev, linux-block@vger.kernel.org,
+        Miklos Szeredi <mszeredi@redhat.com>,
+        ZiyangZhang <ZiyangZhang@linux.alibaba.com>,
+        Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>,
+        Bernd Schubert <bschubert@ddn.com>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: Re: [PATCH V2 05/17] io_uring: support OP_SEND_ZC/OP_RECV for fused
+ slave request
+Message-ID: <202303091544.WIDavyIo-lkp@intel.com>
+References: <20230307141520.793891-6-ming.lei@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZAboHUp/YUkEs/D1@casper.infradead.org>
-Sender: Luis Chamberlain <mcgrof@infradead.org>
+In-Reply-To: <20230307141520.793891-6-ming.lei@redhat.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Mar 07, 2023 at 07:30:37AM +0000, Matthew Wilcox wrote:
-> On Tue, Mar 07, 2023 at 07:55:32AM +0100, Hannes Reinecke wrote:
-> > On 3/6/23 18:37, Matthew Wilcox wrote:
-> > > On Mon, Mar 06, 2023 at 01:01:23PM +0100, Hannes Reinecke wrote:
-> > > > -	page = alloc_page(gfp | __GFP_ZERO | __GFP_HIGHMEM);
-> > > > -	if (!page)
-> > > > +	folio = folio_alloc(gfp | __GFP_ZERO, 0);
-> > > > +	if (!folio)
-> > > 
-> > > Did you drop HIGHMEM support on purpose?
-> > 
-> > No; I thought that folios would be doing that implicitely.
-> > Will be re-adding.
-> 
-> We can't ... not all filesystems want to allocate every folio from
-> HIGHMEM.  eg for superblocks, it often makes more sense to allocate the
-> folio from lowmem than allocate it from highmem and keep it kmapped.
-> The only GFP flag that folios force-set is __GFP_COMP because folios by
-> definition are compound pages.
+Hi Ming,
 
-Just some historical information here. Some commit logs would seem
-to make it seem that __GFP_HIGHMEM was added to support DAX, but it's
-not the case. When DAX suport was removed from brd the __GFP_HIGHMEM
-removed was removed by mistake, and later fixed through commit
-f6b50160a06d4 ("brd: re-enable __GFP_HIGHMEM in brd_insert_page()").
-But that doesn't tell us what the default were before.
+I love your patch! Perhaps something to improve:
 
-To avoid future removals maybe we should document why we care?
+[auto build test WARNING on axboe-block/for-next]
+[also build test WARNING on linus/master v6.3-rc1 next-20230309]
+[cannot apply to char-misc/char-misc-testing char-misc/char-misc-next char-misc/char-misc-linus]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-See these commits:
+url:    https://github.com/intel-lab-lkp/linux/commits/Ming-Lei/io_uring-add-IO_URING_F_FUSED-and-prepare-for-supporting-OP_FUSED_CMD/20230307-222928
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git for-next
+patch link:    https://lore.kernel.org/r/20230307141520.793891-6-ming.lei%40redhat.com
+patch subject: [PATCH V2 05/17] io_uring: support OP_SEND_ZC/OP_RECV for fused slave request
+config: i386-randconfig-a003 (https://download.01.org/0day-ci/archive/20230309/202303091544.WIDavyIo-lkp@intel.com/config)
+compiler: gcc-11 (Debian 11.3.0-8) 11.3.0
+reproduce (this is a W=1 build):
+        # https://github.com/intel-lab-lkp/linux/commit/0a921da27026b3ba08aeceb432dd983480281344
+        git remote add linux-review https://github.com/intel-lab-lkp/linux
+        git fetch --no-tags linux-review Ming-Lei/io_uring-add-IO_URING_F_FUSED-and-prepare-for-supporting-OP_FUSED_CMD/20230307-222928
+        git checkout 0a921da27026b3ba08aeceb432dd983480281344
+        # save the config file
+        mkdir build_dir && cp config build_dir/.config
+        make W=1 O=build_dir ARCH=i386 olddefconfig
+        make W=1 O=build_dir ARCH=i386 SHELL=/bin/bash
 
-9db5579be4bb5 ("rewrite rd")               initial commit with highmem
-cb9cd2ef0bbb4 ("rd: support XIP")          forces highmem if XIP, but already set
-a7a97fc9ff6c2 ("brd: rename XIP to DAX")   renames the config to DAX
-26defe34e48e1 ("fix brd allocation flags") tries to fix the confusion but makes it worse
+If you fix the issue, kindly add following tag where applicable
+| Reported-by: kernel test robot <lkp@intel.com>
+| Link: https://lore.kernel.org/oe-kbuild-all/202303091544.WIDavyIo-lkp@intel.com/
 
-And so commit f6b50160a06d4 ("brd: re-enable __GFP_HIGHMEM in brd_insert_page()")
-seems to be correct in re-adding it, adn commit cb9cd2ef0bbb4 ("rd: support XIP")
-made things confusing assuming we wanted only highmem when DAX was
-enabled.
+All warnings (new ones prefixed by >>):
 
-So we only want highmem just because it's been there since it was first added.
-That's all.
+   In file included from include/linux/bits.h:6,
+                    from include/linux/bitops.h:6,
+                    from include/linux/kernel.h:22,
+                    from io_uring/net.c:2:
+   include/vdso/bits.h:7:40: warning: left shift count >= width of type [-Wshift-count-overflow]
+       7 | #define BIT(nr)                 (UL(1) << (nr))
+         |                                        ^~
+   include/linux/io_uring_types.h:475:35: note: in expansion of macro 'BIT'
+     475 |         REQ_F_FUSED_SLAVE       = BIT(REQ_F_FUSED_SLAVE_BIT),
+         |                                   ^~~
+   io_uring/net.c: In function 'io_send':
+>> io_uring/net.c:385:48: warning: cast from pointer to integer of different size [-Wpointer-to-int-cast]
+     385 |                 ret = io_import_kbuf_for_slave((u64)sr->buf, sr->len,
+         |                                                ^
+   io_uring/net.c: In function 'io_recv':
+   io_uring/net.c:880:48: warning: cast from pointer to integer of different size [-Wpointer-to-int-cast]
+     880 |                 ret = io_import_kbuf_for_slave((u64)sr->buf, sr->len, ITER_DEST,
+         |                                                ^
+   io_uring/net.c: In function 'io_send_zc':
+   io_uring/net.c:1135:48: warning: cast from pointer to integer of different size [-Wpointer-to-int-cast]
+    1135 |                 ret = io_import_kbuf_for_slave((u64)zc->buf, zc->len,
+         |                                                ^
 
-  Luis
+
+vim +385 io_uring/net.c
+
+   343	
+   344	int io_send(struct io_kiocb *req, unsigned int issue_flags)
+   345	{
+   346		struct sockaddr_storage __address;
+   347		struct io_sr_msg *sr = io_kiocb_to_cmd(req, struct io_sr_msg);
+   348		struct msghdr msg;
+   349		struct socket *sock;
+   350		unsigned flags;
+   351		int min_ret = 0;
+   352		int ret;
+   353	
+   354		msg.msg_name = NULL;
+   355		msg.msg_control = NULL;
+   356		msg.msg_controllen = 0;
+   357		msg.msg_namelen = 0;
+   358		msg.msg_ubuf = NULL;
+   359	
+   360		if (sr->addr) {
+   361			if (req_has_async_data(req)) {
+   362				struct io_async_msghdr *io = req->async_data;
+   363	
+   364				msg.msg_name = &io->addr;
+   365			} else {
+   366				ret = move_addr_to_kernel(sr->addr, sr->addr_len, &__address);
+   367				if (unlikely(ret < 0))
+   368					return ret;
+   369				msg.msg_name = (struct sockaddr *)&__address;
+   370			}
+   371			msg.msg_namelen = sr->addr_len;
+   372		}
+   373	
+   374		if (!(req->flags & REQ_F_POLLED) &&
+   375		    (sr->flags & IORING_RECVSEND_POLL_FIRST))
+   376			return io_setup_async_addr(req, &__address, issue_flags);
+   377	
+   378		sock = sock_from_file(req->file);
+   379		if (unlikely(!sock))
+   380			return -ENOTSOCK;
+   381	
+   382		if (!(req->flags & REQ_F_FUSED_SLAVE))
+   383			ret = import_ubuf(ITER_SOURCE, sr->buf, sr->len, &msg.msg_iter);
+   384		else
+ > 385			ret = io_import_kbuf_for_slave((u64)sr->buf, sr->len,
+   386					ITER_SOURCE, &msg.msg_iter, req);
+   387		if (unlikely(ret))
+   388			return ret;
+   389	
+   390		flags = sr->msg_flags;
+   391		if (issue_flags & IO_URING_F_NONBLOCK)
+   392			flags |= MSG_DONTWAIT;
+   393		if (flags & MSG_WAITALL)
+   394			min_ret = iov_iter_count(&msg.msg_iter);
+   395	
+   396		msg.msg_flags = flags;
+   397		ret = sock_sendmsg(sock, &msg);
+   398		if (ret < min_ret) {
+   399			if (ret == -EAGAIN && (issue_flags & IO_URING_F_NONBLOCK))
+   400				return io_setup_async_addr(req, &__address, issue_flags);
+   401	
+   402			if (ret > 0 && io_net_retry(sock, flags)) {
+   403				sr->len -= ret;
+   404				sr->buf += ret;
+   405				sr->done_io += ret;
+   406				req->flags |= REQ_F_PARTIAL_IO;
+   407				return io_setup_async_addr(req, &__address, issue_flags);
+   408			}
+   409			if (ret == -ERESTARTSYS)
+   410				ret = -EINTR;
+   411			req_set_fail(req);
+   412		}
+   413		if (ret >= 0)
+   414			ret += sr->done_io;
+   415		else if (sr->done_io)
+   416			ret = sr->done_io;
+   417		io_req_set_res(req, ret, 0);
+   418		return IOU_OK;
+   419	}
+   420	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests
