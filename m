@@ -2,193 +2,168 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C6E78C61DA4
-	for <linux-block@archiver.kernel.org>; Thu,  9 Mar 2023 17:23:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DB3CC64EC4
+	for <linux-block@archiver.kernel.org>; Thu,  9 Mar 2023 20:24:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230007AbjCIRXv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 9 Mar 2023 12:23:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43616 "EHLO
+        id S229612AbjCIUX6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 9 Mar 2023 15:23:58 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50556 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230502AbjCIRXm (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 9 Mar 2023 12:23:42 -0500
-Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18CBA18B35;
-        Thu,  9 Mar 2023 09:23:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1678382621; x=1709918621;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=K3OoSeBFVBCAzSn/NYt4XYgke9k0N2/YyslC9mwV60k=;
-  b=QqUpvchfRr0Rjz9GotcBEVLLC25ztIdoSiFwViUJiLs5qQX5LFpffH7N
-   KXAvw+BgD26F1wAHnNfeQNDnpyIKCX6So7kfUvvROJMu5QD3aa5tAwm6J
-   Q/YoQWjOyRDgYPZuCMM0qiHvJ5sBaVnfgxnZsikW75xMBdsJi+8K0rkVp
-   U6frhLOG1ZWxxPErmCBq0yJAJeXyVigSl2+YbGfp91XXCsM+YbDBhfdbj
-   l7KhlOVf8d3emdBCT8aZXXTEvluadxWgnH0Hr1OEtvgadUVUV9msjXPqD
-   IoTZiYs6m8Qhwl+cImPKW0mnWGaFwbxwk4FTJUgADV5pjw7cLoDQA3NoB
-   Q==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10644"; a="335210897"
-X-IronPort-AV: E=Sophos;i="5.98,247,1673942400"; 
-   d="scan'208";a="335210897"
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Mar 2023 09:23:38 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10644"; a="923335333"
-X-IronPort-AV: E=Sophos;i="5.98,247,1673942400"; 
-   d="scan'208";a="923335333"
-Received: from lkp-server01.sh.intel.com (HELO b613635ddfff) ([10.239.97.150])
-  by fmsmga006.fm.intel.com with ESMTP; 09 Mar 2023 09:23:35 -0800
-Received: from kbuild by b613635ddfff with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1paJzK-000371-35;
-        Thu, 09 Mar 2023 17:23:34 +0000
-Date:   Fri, 10 Mar 2023 01:22:59 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-        io-uring@vger.kernel.org
-Cc:     oe-kbuild-all@lists.linux.dev, linux-block@vger.kernel.org,
-        Miklos Szeredi <mszeredi@redhat.com>,
-        ZiyangZhang <ZiyangZhang@linux.alibaba.com>,
-        Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>,
-        Bernd Schubert <bschubert@ddn.com>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: Re: [PATCH V2 05/17] io_uring: support OP_SEND_ZC/OP_RECV for fused
- slave request
-Message-ID: <202303100159.i9Bzx24n-lkp@intel.com>
-References: <20230307141520.793891-6-ming.lei@redhat.com>
+        with ESMTP id S229521AbjCIUX5 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 9 Mar 2023 15:23:57 -0500
+Received: from todd.t-8ch.de (todd.t-8ch.de [IPv6:2a01:4f8:c010:41de::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6186C61A8E;
+        Thu,  9 Mar 2023 12:23:55 -0800 (PST)
+From:   =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=weissschuh.net;
+        s=mail; t=1678393432;
+        bh=V4DiMXUAlaGpfb/ouDcwZ5s91T1/n4kCKJbIR1SgzHI=;
+        h=From:Date:Subject:To:Cc:From;
+        b=hlHN4mXUUUBTbBJFqaJF7k+nJCiPDj/Z3QEkvw6FEn9xdqnWK+A2HNT3usVShSIDT
+         71P3alBdfZEaxv8ACbID5ASh3W8+GfRbve3rltWGMovSp14my2J8kwyY7ZeugODuYi
+         spAOLYdNQCu1RGW+OIQi18JV2fNKLr/HO+iG4vmY=
+Date:   Thu, 09 Mar 2023 20:23:41 +0000
+Subject: [PATCH] block: don't embed integrity_kobj into gendisk
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230307141520.793891-6-ming.lei@redhat.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+Message-Id: <20230309-kobj_release-gendisk_integrity-v1-1-a240f54eac60@weissschuh.net>
+X-B4-Tracking: v=1; b=H4sIAExACmQC/x2NUQrCMBAFr1L220CaQkGvIlKS9JmuDVvZtKKU3
+ t3o5wyPeTsVKKPQpdlJ8eLCi1RoTw3FyUuC4bEyOes629mzmZfwGBQZvsAkyMhlHlhWJOX1Y+D
+ 6aENsXe891Uj4zYJ6iVPNyJZzlU/Fnd//1+vtOL7NDnmNhQAAAA==
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Mirsad Todorovac <mirsad.todorovac@alu.unizg.hr>,
+        =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>
+X-Mailer: b4 0.12.1
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1678393429; l=4201;
+ i=linux@weissschuh.net; s=20221212; h=from:subject:message-id;
+ bh=V4DiMXUAlaGpfb/ouDcwZ5s91T1/n4kCKJbIR1SgzHI=;
+ b=W6X3J/kXyiZzwSPLstGMD/Bk9b0badxTht4HARLoN7LcMySEjbAfIwmwC95nozbZYhwcI6Tto
+ 9WqQsHMJNL4AtTbo+NoleObSHXdhGjBpBg73pBPmNyNn+BVAnfgUNds
+X-Developer-Key: i=linux@weissschuh.net; a=ed25519;
+ pk=KcycQgFPX2wGR5azS7RhpBqedglOZVgRPfdFSPB1LNw=
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Ming,
+A struct kobject is only supposed to be embedded into objects which
+lifetime it will manage.
+Objects of type struct gendisk however are refcounted by their part0
+block_device.
+Therefore the integrity_kobj should not be embedded but split into its
+own independently managed object.
 
-I love your patch! Perhaps something to improve:
+This will also provide a proper .release function for the ktype which
+avoid warnings like the following:
+kobject: 'integrity' (000000005198bea8): does not have a release() function, it is broken and must be fixed.
 
-[auto build test WARNING on axboe-block/for-next]
-[also build test WARNING on linus/master v6.3-rc1 next-20230309]
-[cannot apply to char-misc/char-misc-testing char-misc/char-misc-next char-misc/char-misc-linus]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+While modifying blk_integrity_del() also drop the explicit call to
+kobject_uevent(KOBJ_REMOVE) as the driver care will do this
+automatically.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Ming-Lei/io_uring-add-IO_URING_F_FUSED-and-prepare-for-supporting-OP_FUSED_CMD/20230307-222928
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git for-next
-patch link:    https://lore.kernel.org/r/20230307141520.793891-6-ming.lei%40redhat.com
-patch subject: [PATCH V2 05/17] io_uring: support OP_SEND_ZC/OP_RECV for fused slave request
-config: sparc64-randconfig-s031-20230308 (https://download.01.org/0day-ci/archive/20230310/202303100159.i9Bzx24n-lkp@intel.com/config)
-compiler: sparc64-linux-gcc (GCC) 12.1.0
-reproduce:
-        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
-        chmod +x ~/bin/make.cross
-        # apt-get install sparse
-        # sparse version: v0.6.4-39-gce1a6720-dirty
-        # https://github.com/intel-lab-lkp/linux/commit/0a921da27026b3ba08aeceb432dd983480281344
-        git remote add linux-review https://github.com/intel-lab-lkp/linux
-        git fetch --no-tags linux-review Ming-Lei/io_uring-add-IO_URING_F_FUSED-and-prepare-for-supporting-OP_FUSED_CMD/20230307-222928
-        git checkout 0a921da27026b3ba08aeceb432dd983480281344
-        # save the config file
-        mkdir build_dir && cp config build_dir/.config
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.1.0 make.cross C=1 CF='-fdiagnostic-prefix -D__CHECK_ENDIAN__' O=build_dir ARCH=sparc64 olddefconfig
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.1.0 make.cross C=1 CF='-fdiagnostic-prefix -D__CHECK_ENDIAN__' O=build_dir ARCH=sparc64 SHELL=/bin/bash
+Reported-by: Mirsad Todorovac <mirsad.todorovac@alu.unizg.hr>
+Link: https://lore.kernel.org/lkml/60b2b66c-22c9-1d38-ed1c-7b7d95e32720@alu.unizg.hr/
+Signed-off-by: Thomas Weißschuh <linux@weissschuh.net>
+---
+ block/blk-integrity.c  | 32 ++++++++++++++++++++++++--------
+ include/linux/blkdev.h |  2 +-
+ 2 files changed, 25 insertions(+), 9 deletions(-)
 
-If you fix the issue, kindly add following tag where applicable
-| Reported-by: kernel test robot <lkp@intel.com>
-| Link: https://lore.kernel.org/oe-kbuild-all/202303100159.i9Bzx24n-lkp@intel.com/
+diff --git a/block/blk-integrity.c b/block/blk-integrity.c
+index 8f01d786f5cb..40adf33f5535 100644
+--- a/block/blk-integrity.c
++++ b/block/blk-integrity.c
+@@ -218,10 +218,15 @@ struct integrity_sysfs_entry {
+ 	ssize_t (*store)(struct blk_integrity *, const char *, size_t);
+ };
+ 
++static inline struct gendisk *integrity_kobj_to_disk(struct kobject *kobj)
++{
++	return dev_to_disk(kobj_to_dev(kobj->parent));
++}
++
+ static ssize_t integrity_attr_show(struct kobject *kobj, struct attribute *attr,
+ 				   char *page)
+ {
+-	struct gendisk *disk = container_of(kobj, struct gendisk, integrity_kobj);
++	struct gendisk *disk = integrity_kobj_to_disk(kobj);
+ 	struct blk_integrity *bi = &disk->queue->integrity;
+ 	struct integrity_sysfs_entry *entry =
+ 		container_of(attr, struct integrity_sysfs_entry, attr);
+@@ -233,7 +238,7 @@ static ssize_t integrity_attr_store(struct kobject *kobj,
+ 				    struct attribute *attr, const char *page,
+ 				    size_t count)
+ {
+-	struct gendisk *disk = container_of(kobj, struct gendisk, integrity_kobj);
++	struct gendisk *disk = integrity_kobj_to_disk(kobj);
+ 	struct blk_integrity *bi = &disk->queue->integrity;
+ 	struct integrity_sysfs_entry *entry =
+ 		container_of(attr, struct integrity_sysfs_entry, attr);
+@@ -356,9 +361,15 @@ static const struct sysfs_ops integrity_ops = {
+ 	.store	= &integrity_attr_store,
+ };
+ 
++static void integrity_release(struct kobject *kobj)
++{
++	kfree(kobj);
++}
++
+ static const struct kobj_type integrity_ktype = {
+ 	.default_groups = integrity_groups,
+ 	.sysfs_ops	= &integrity_ops,
++	.release        = integrity_release,
+ };
+ 
+ static blk_status_t blk_integrity_nop_fn(struct blk_integrity_iter *iter)
+@@ -442,16 +453,21 @@ int blk_integrity_add(struct gendisk *disk)
+ {
+ 	int ret;
+ 
+-	ret = kobject_init_and_add(&disk->integrity_kobj, &integrity_ktype,
++	disk->integrity_kobj = kmalloc(sizeof(*disk->integrity_kobj), GFP_KERNEL);
++	if (!disk->integrity_kobj)
++		return -ENOMEM;
++
++	ret = kobject_init_and_add(disk->integrity_kobj, &integrity_ktype,
+ 				   &disk_to_dev(disk)->kobj, "%s", "integrity");
+-	if (!ret)
+-		kobject_uevent(&disk->integrity_kobj, KOBJ_ADD);
++	if (ret)
++		kobject_put(disk->integrity_kobj);
++	else
++		kobject_uevent(disk->integrity_kobj, KOBJ_ADD);
++
+ 	return ret;
+ }
+ 
+ void blk_integrity_del(struct gendisk *disk)
+ {
+-	kobject_uevent(&disk->integrity_kobj, KOBJ_REMOVE);
+-	kobject_del(&disk->integrity_kobj);
+-	kobject_put(&disk->integrity_kobj);
++	kobject_put(disk->integrity_kobj);
+ }
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index d1aee08f8c18..2fbfb3277a2b 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -164,7 +164,7 @@ struct gendisk {
+ 	atomic_t sync_io;		/* RAID */
+ 	struct disk_events *ev;
+ #ifdef  CONFIG_BLK_DEV_INTEGRITY
+-	struct kobject integrity_kobj;
++	struct kobject *integrity_kobj;
+ #endif	/* CONFIG_BLK_DEV_INTEGRITY */
+ 
+ #ifdef CONFIG_BLK_DEV_ZONED
 
-sparse warnings: (new ones prefixed by >>)
-   io_uring/net.c: note: in included file (through io_uring/io_uring.h):
-   io_uring/slist.h:116:29: sparse: sparse: no newline at end of file
-   io_uring/net.c: note: in included file (through io_uring/io_uring.h):
-   include/linux/io_uring_types.h:179:37: sparse: sparse: array of flexible structures
->> io_uring/net.c:385:49: sparse: sparse: cast removes address space '__user' of expression
-   io_uring/net.c:880:49: sparse: sparse: cast removes address space '__user' of expression
-   io_uring/net.c:1135:49: sparse: sparse: cast removes address space '__user' of expression
+---
+base-commit: 44889ba56cbb3d51154660ccd15818bc77276696
+change-id: 20230309-kobj_release-gendisk_integrity-e26c0bc126aa
 
-vim +/__user +385 io_uring/net.c
-
-   343	
-   344	int io_send(struct io_kiocb *req, unsigned int issue_flags)
-   345	{
-   346		struct sockaddr_storage __address;
-   347		struct io_sr_msg *sr = io_kiocb_to_cmd(req, struct io_sr_msg);
-   348		struct msghdr msg;
-   349		struct socket *sock;
-   350		unsigned flags;
-   351		int min_ret = 0;
-   352		int ret;
-   353	
-   354		msg.msg_name = NULL;
-   355		msg.msg_control = NULL;
-   356		msg.msg_controllen = 0;
-   357		msg.msg_namelen = 0;
-   358		msg.msg_ubuf = NULL;
-   359	
-   360		if (sr->addr) {
-   361			if (req_has_async_data(req)) {
-   362				struct io_async_msghdr *io = req->async_data;
-   363	
-   364				msg.msg_name = &io->addr;
-   365			} else {
-   366				ret = move_addr_to_kernel(sr->addr, sr->addr_len, &__address);
-   367				if (unlikely(ret < 0))
-   368					return ret;
-   369				msg.msg_name = (struct sockaddr *)&__address;
-   370			}
-   371			msg.msg_namelen = sr->addr_len;
-   372		}
-   373	
-   374		if (!(req->flags & REQ_F_POLLED) &&
-   375		    (sr->flags & IORING_RECVSEND_POLL_FIRST))
-   376			return io_setup_async_addr(req, &__address, issue_flags);
-   377	
-   378		sock = sock_from_file(req->file);
-   379		if (unlikely(!sock))
-   380			return -ENOTSOCK;
-   381	
-   382		if (!(req->flags & REQ_F_FUSED_SLAVE))
-   383			ret = import_ubuf(ITER_SOURCE, sr->buf, sr->len, &msg.msg_iter);
-   384		else
- > 385			ret = io_import_kbuf_for_slave((u64)sr->buf, sr->len,
-   386					ITER_SOURCE, &msg.msg_iter, req);
-   387		if (unlikely(ret))
-   388			return ret;
-   389	
-   390		flags = sr->msg_flags;
-   391		if (issue_flags & IO_URING_F_NONBLOCK)
-   392			flags |= MSG_DONTWAIT;
-   393		if (flags & MSG_WAITALL)
-   394			min_ret = iov_iter_count(&msg.msg_iter);
-   395	
-   396		msg.msg_flags = flags;
-   397		ret = sock_sendmsg(sock, &msg);
-   398		if (ret < min_ret) {
-   399			if (ret == -EAGAIN && (issue_flags & IO_URING_F_NONBLOCK))
-   400				return io_setup_async_addr(req, &__address, issue_flags);
-   401	
-   402			if (ret > 0 && io_net_retry(sock, flags)) {
-   403				sr->len -= ret;
-   404				sr->buf += ret;
-   405				sr->done_io += ret;
-   406				req->flags |= REQ_F_PARTIAL_IO;
-   407				return io_setup_async_addr(req, &__address, issue_flags);
-   408			}
-   409			if (ret == -ERESTARTSYS)
-   410				ret = -EINTR;
-   411			req_set_fail(req);
-   412		}
-   413		if (ret >= 0)
-   414			ret += sr->done_io;
-   415		else if (sr->done_io)
-   416			ret = sr->done_io;
-   417		io_req_set_res(req, ret, 0);
-   418		return IOU_OK;
-   419	}
-   420	
-
+Best regards,
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests
+Thomas Weißschuh <linux@weissschuh.net>
+
