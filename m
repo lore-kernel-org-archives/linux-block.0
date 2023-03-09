@@ -2,88 +2,54 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A173C64EC4
-	for <linux-block@archiver.kernel.org>; Thu,  9 Mar 2023 02:29:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C5BEC678D5
+	for <linux-block@archiver.kernel.org>; Thu,  9 Mar 2023 03:12:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229614AbjCIC3p (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 8 Mar 2023 21:29:45 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57146 "EHLO
+        id S229621AbjCIDMJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 8 Mar 2023 22:12:09 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55496 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229558AbjCIC3o (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Mar 2023 21:29:44 -0500
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5CDCD9E679
-        for <linux-block@vger.kernel.org>; Wed,  8 Mar 2023 18:29:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
-        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=salT6MNlKGmE/7wMi5HFyNriJe6kIvhEm5yPrtpnuPE=; b=ORSFGdkWKi3J5rRx+ZSjvaI6tL
-        e2xS2KmV8gNbgKMCkDDk2LicGfhHiyLu6Mb8PSmq6TFu4RCONv/liR+5ckX0nLIGEzq4dZXmitjVr
-        ae+cIGtWfaCmn/bWdot8SBRX7UomTb12OlpxoNUKY5NZIKeNfXJfNWlhlgnYUYAYL06IehTm9jfIX
-        q0JQTwwokDwh1gS1/gJ69qFHxDSzJ1Mqvt0A873z8mxbKnqJOIUkT//z23JWlIPa52QGt6AluQZvh
-        2zXodryKK5Oil5dKEWydFFDUL80NKldRdr7ZHjZbgpBz5XWP/WWJcChfjJZ2uDNXw+p2aM1g6bAyF
-        F7tJNjmA==;
-Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1pa62G-007WmG-Om; Thu, 09 Mar 2023 02:29:40 +0000
-Date:   Wed, 8 Mar 2023 18:29:40 -0800
-From:   Luis Chamberlain <mcgrof@kernel.org>
-To:     Hannes Reinecke <hare@suse.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Matthew Wilcox <willy@infradead.org>,
-        Keith Busch <kbusch@kernel.org>,
-        Pankaj Raghav <p.raghav@samsung.com>,
-        Daniel Gomez <da.gomez@samsung.com>
-Subject: Re: [PATCH 1/5] brd: convert to folios
-Message-ID: <ZAlElDl6Jphcb2F3@bombadil.infradead.org>
-References: <20230306120127.21375-1-hare@suse.de>
- <20230306120127.21375-2-hare@suse.de>
+        with ESMTP id S229522AbjCIDMI (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Mar 2023 22:12:08 -0500
+Received: from out30-113.freemail.mail.aliyun.com (out30-113.freemail.mail.aliyun.com [115.124.30.113])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 24E7F7EA3B;
+        Wed,  8 Mar 2023 19:12:05 -0800 (PST)
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R811e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045168;MF=ziyangzhang@linux.alibaba.com;NM=1;PH=DS;RN=7;SR=0;TI=SMTPD_---0VdRapbN_1678331522;
+Received: from 30.97.56.238(mailfrom:ZiyangZhang@linux.alibaba.com fp:SMTPD_---0VdRapbN_1678331522)
+          by smtp.aliyun-inc.com;
+          Thu, 09 Mar 2023 11:12:03 +0800
+Message-ID: <7c5498a7-26ac-406c-1f52-4a66ef268525@linux.alibaba.com>
+Date:   Thu, 9 Mar 2023 11:12:02 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230306120127.21375-2-hare@suse.de>
-Sender: Luis Chamberlain <mcgrof@infradead.org>
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.6.1
+From:   Ziyang Zhang <ZiyangZhang@linux.alibaba.com>
+Subject: Re: [PATCH V2 09/17] block: ublk_drv: add two helpers to clean up
+ map/unmap request
+To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Miklos Szeredi <mszeredi@redhat.com>,
+        io-uring@vger.kernel.org,
+        Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>,
+        Bernd Schubert <bschubert@ddn.com>
+References: <20230307141520.793891-1-ming.lei@redhat.com>
+ <20230307141520.793891-10-ming.lei@redhat.com>
+Content-Language: en-US
+In-Reply-To: <20230307141520.793891-10-ming.lei@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Mar 06, 2023 at 01:01:23PM +0100, Hannes Reinecke wrote:
-> Convert the driver to work on folios instead of pages.
+On 2023/3/7 22:15, Ming Lei wrote:
+> Add two helpers for checking if map/unmap is needed, since we may have
+> passthrough request which needs map or unmap in future, such as for
+> supporting report zones.
 > 
-> Signed-off-by: Hannes Reinecke <hare@suse.de>
+> Meantime don't mark ublk_copy_user_pages as inline since this function
+> is a bit fat now.
+> 
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
 > ---
->  drivers/block/brd.c | 171 ++++++++++++++++++++++----------------------
->  1 file changed, 85 insertions(+), 86 deletions(-)
-> 
-> diff --git a/drivers/block/brd.c b/drivers/block/brd.c
-> index 34177f1bd97d..7efc276c4963 100644
-> --- a/drivers/block/brd.c
-> +++ b/drivers/block/brd.c
-> @@ -28,8 +28,8 @@
->  #include <linux/uaccess.h>
->  
->  /*
-> - * Each block ramdisk device has a radix_tree brd_pages of pages that stores
-> - * the pages containing the block device's contents. A brd page's ->index is
-> + * Each block ramdisk device has a radix_tree brd_folios of folios that stores
-                                                            ^^^^^^^^^
-> + * the folios containing the block device's contents. A brd folio's ->index is
-      ^^^^^^^^^^
 
-So we end up with:
-
-"a radix_tree brd_folios of folios that stores the folios containing ..."
-
-What about:
-
-"a radix_tree brd_folios that stores folios containing"
-
-Other than that, looks good:
-
-Reviewed-by: Luis Chamberlain <mcgrof@kernel.org>
-
-So another thing, I think I counted about 5-8 grammatical rules which
-could be bundled up into *one* SmPL grammar patch which could then be
-used to automatically do similar tasks elsewhere.
-
-  Luis
+Reviewed-by: Ziyang Zhang <ZiyangZhang@linux.alibaba.com>
