@@ -2,206 +2,166 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EEDA5C6FD1F
-	for <linux-block@archiver.kernel.org>; Thu,  9 Mar 2023 07:50:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E024C61DA4
+	for <linux-block@archiver.kernel.org>; Thu,  9 Mar 2023 08:04:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230176AbjCIHuM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 9 Mar 2023 02:50:12 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45544 "EHLO
+        id S229717AbjCIIEn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 9 Mar 2023 03:04:43 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49642 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230400AbjCIHtz (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 9 Mar 2023 02:49:55 -0500
-Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DFFC31B57E;
-        Wed,  8 Mar 2023 23:48:07 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1678348087; x=1709884087;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=qeq63lYyfAfHhk1xOZ63kvMHWyrmYCAuvEirxhJBR10=;
-  b=aHbMw2sJC+pcbNjD3bNWzCfc/TKAzBmRJ3ISsKlEfMqJXIcgMgTcZeSV
-   0htCjOaT8ezP5SrqT27VybUOOezQwi6QrJCGn/90K0d30l1cR1A/VirwQ
-   JlwhEiCP+POUP5RaqudXLVNJjqd+e8zf3NCq2Xb+kOpNPfr1LCdwQC95E
-   HBAulC4YnFI+oSXfrBrZEwHBlGTUnU2e1iEoBDHUDSkm4WUIKhJy2sAC7
-   xKYiHsqKaRfqbdo29feFbyiUnbUcuZ9PZXyuJ5rrx/vvVY5vrrGaEsnKu
-   fxT70C5POExKAT02ggRaTm/wK3Z0IpQuHEtAkpECVZJTFNbRPTUp2+bb4
-   g==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10643"; a="401216047"
-X-IronPort-AV: E=Sophos;i="5.98,245,1673942400"; 
-   d="scan'208";a="401216047"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Mar 2023 23:47:16 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10643"; a="766333568"
-X-IronPort-AV: E=Sophos;i="5.98,245,1673942400"; 
-   d="scan'208";a="766333568"
-Received: from lkp-server01.sh.intel.com (HELO b613635ddfff) ([10.239.97.150])
-  by FMSMGA003.fm.intel.com with ESMTP; 08 Mar 2023 23:47:14 -0800
-Received: from kbuild by b613635ddfff with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1paAza-0002ko-0I;
-        Thu, 09 Mar 2023 07:47:14 +0000
-Date:   Thu, 9 Mar 2023 15:46:49 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-        io-uring@vger.kernel.org
-Cc:     oe-kbuild-all@lists.linux.dev, linux-block@vger.kernel.org,
-        Miklos Szeredi <mszeredi@redhat.com>,
-        ZiyangZhang <ZiyangZhang@linux.alibaba.com>,
-        Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>,
-        Bernd Schubert <bschubert@ddn.com>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: Re: [PATCH V2 05/17] io_uring: support OP_SEND_ZC/OP_RECV for fused
- slave request
-Message-ID: <202303091544.WIDavyIo-lkp@intel.com>
-References: <20230307141520.793891-6-ming.lei@redhat.com>
+        with ESMTP id S229521AbjCIIEl (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 9 Mar 2023 03:04:41 -0500
+Received: from mailout1.w1.samsung.com (mailout1.w1.samsung.com [210.118.77.11])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 715A561AB8
+        for <linux-block@vger.kernel.org>; Thu,  9 Mar 2023 00:04:38 -0800 (PST)
+Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
+        by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20230309080436euoutp01e02286ae4839f57543770e72a936ec37~KsZe5G43b2978429784euoutp01L
+        for <linux-block@vger.kernel.org>; Thu,  9 Mar 2023 08:04:36 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20230309080436euoutp01e02286ae4839f57543770e72a936ec37~KsZe5G43b2978429784euoutp01L
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1678349076;
+        bh=JuaC8xy+LESWr72k9kG7on+4+U/x14WcXmhVPg6qWoY=;
+        h=Date:From:To:CC:Subject:In-Reply-To:References:From;
+        b=BGReSbmPjwLCXUUAlVMN02h7+J8fuglVW1do27w6KijZ9XXUrNJAPcHtt7smrTp1+
+         kYOx0SHqORCoiTOYX95Gi52ccwocQnrdL5gr8SzPmhUrvWYuQHfKvTN+U7LgIWQtJq
+         0KEC85OLkIQgpYJhaX/eUNeSmQGB7VeNCRYejajw=
+Received: from eusmges3new.samsung.com (unknown [203.254.199.245]) by
+        eucas1p2.samsung.com (KnoxPortal) with ESMTP id
+        20230309080436eucas1p2976b5a51e92d229a32b814e06789ae17~KsZeqbn1f0485004850eucas1p2Z;
+        Thu,  9 Mar 2023 08:04:36 +0000 (GMT)
+Received: from eucas1p1.samsung.com ( [182.198.249.206]) by
+        eusmges3new.samsung.com (EUCPMTA) with SMTP id 2C.8F.10014.31399046; Thu,  9
+        Mar 2023 08:04:36 +0000 (GMT)
+Received: from eusmtrp2.samsung.com (unknown [182.198.249.139]) by
+        eucas1p2.samsung.com (KnoxPortal) with ESMTPA id
+        20230309080435eucas1p27d38e373074eeedee7e01db6dc6bac63~KsZeTeRsW0485404854eucas1p2f;
+        Thu,  9 Mar 2023 08:04:35 +0000 (GMT)
+Received: from eusmgms1.samsung.com (unknown [182.198.249.179]) by
+        eusmtrp2.samsung.com (KnoxPortal) with ESMTP id
+        20230309080435eusmtrp24d695ac77fe86041d6800de52629a7e5~KsZeSbJ_e1984219842eusmtrp2L;
+        Thu,  9 Mar 2023 08:04:35 +0000 (GMT)
+X-AuditID: cbfec7f5-b8bff7000000271e-81-6409931331c7
+Received: from eusmtip2.samsung.com ( [203.254.199.222]) by
+        eusmgms1.samsung.com (EUCPMTA) with SMTP id 2A.06.08862.31399046; Thu,  9
+        Mar 2023 08:04:35 +0000 (GMT)
+Received: from CAMSVWEXC02.scsc.local (unknown [106.1.227.72]) by
+        eusmtip2.samsung.com (KnoxPortal) with ESMTPA id
+        20230309080435eusmtip2e00b4ae933e6792446c2c2e348367c28~KsZeGEsC43221532215eusmtip2C;
+        Thu,  9 Mar 2023 08:04:35 +0000 (GMT)
+Received: from localhost (106.110.32.122) by CAMSVWEXC02.scsc.local
+        (2002:6a01:e348::6a01:e348) with Microsoft SMTP Server (TLS) id 15.0.1497.2;
+        Thu, 9 Mar 2023 08:04:34 +0000
+Date:   Thu, 9 Mar 2023 09:04:34 +0100
+From:   Javier =?utf-8?B?R29uesOhbGV6?= <javier.gonz@samsung.com>
+To:     James Bottomley <James.Bottomley@HansenPartnership.com>
+CC:     Matthew Wilcox <willy@infradead.org>,
+        Theodore Ts'o <tytso@mit.edu>, Hannes Reinecke <hare@suse.de>,
+        Luis Chamberlain <mcgrof@kernel.org>,
+        Keith Busch <kbusch@kernel.org>,
+        Pankaj Raghav <p.raghav@samsung.com>,
+        Daniel Gomez <da.gomez@samsung.com>,
+        <lsf-pc@lists.linux-foundation.org>,
+        <linux-fsdevel@vger.kernel.org>, <linux-mm@kvack.org>,
+        <linux-block@vger.kernel.org>
+Subject: Re: [LSF/MM/BPF TOPIC] Cloud storage optimizations
+Message-ID: <20230309080434.tnr33rhzh3a5yc5q@ArmHalley.local>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="utf-8"; format="flowed"
 Content-Disposition: inline
-In-Reply-To: <20230307141520.793891-6-ming.lei@redhat.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <1367983d4fa09dcb63e29db2e8be3030ae6f6e8c.camel@HansenPartnership.com>
+X-Originating-IP: [106.110.32.122]
+X-ClientProxiedBy: CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347) To
+        CAMSVWEXC02.scsc.local (2002:6a01:e348::6a01:e348)
+X-Brightmail-Tracker: H4sIAAAAAAAAA02SWUwTURSGc2fa6W2T6rSC3qBobHgCRUWiA7hhiPbFRENAY6JS6UjBUrCL
+        4o4IKOCCJYqWRggiVETQQhWTooJSaCEqahRQIUJxAyyLAoYIdhiMvH3n/P+5Of/JhbjYwvWC
+        sSotrVbJlBJCwLlv+/18qUcOX768wgkoa6Eeo+5dhJS+7i2gatr9KGuNnUN1lE1yqUe9NTjV
+        mt0DqLRzv3nU+JiR2CCQXtE7CGmlyVdqLs0gpOYhPU+a01oCpCnN9bi0sumodNi8cCvcKVgj
+        p5WxB2n1snVRAkXhpB0kVoiSOvPKuclgUJgJ+BCRgUh/v5jIBAIoJk0AGZ/kYmzxE6DelkaC
+        cYnJYYBaK5WZAE5NJJsWsp4SgNLtqdMDbk9PlZHHFpUAXR64SDATHNIHFacqmIcIcj16VdyO
+        M+xBhqCfpQWA8ePkBIasgylcRpjjFswGK2BYSK5F3WVXeCyLkP2ak8MwTgajjAHGD908H5VM
+        QLa9CJ225E29zyfDUVf+V4KNKUHdX/sBy8eRo6p9amlE5vPReP4HLiuEIceQEWd5DvreUMVj
+        eQGafJiPsbwftTRnTXu06IbLhrNXCUEXmpVsOxT9Ou/E2PYs1NovYleb5b507rRbiM6mi7OB
+        j2FGLsOMXIb/uQwzchUATimYR+s08TG0ZqWKPuSvkcVrdKoY/+iEeDNw/6ymiYZf1cD0fdC/
+        DmAQ1AEEcYmHcNQLysVCuezwEVqdsEetU9KaOjAfciTzhH5r7dFiMkampffTdCKt/qdikO+V
+        jEGHR1CGf3pbVx/fVRsaXV3g2hla0Wmrj420BMo2Pcl6IEy361Xvon1F3kVZu4B3U1BRYLWn
+        4HSDMznNcvWO4aUtorAq5cDcsADPjz7PUt9sHu7Y/l42N/JBQNveDrOO+LLZWBtw9+noaFTh
+        dr/GoRXV4dldLwKDFqTt7hxrt6621x/Rms/vKDq2tXEkZ+zx+yiX7l78uZLeZ2fkESLbyEHv
+        k547ujeeMK3y5kcGr/t8c8/R8teXFsdt+PF5iWOkZxscaLn8qelpouW2Zjzpeh9M2/fn0cnZ
+        ivXKF4r61FWPUxLsmMgQtrhztK9td+iXOC9H5i19V7cisUDrHB5xnTqw5ZuEo1HIVvjiao3s
+        L69qhQDIAwAA
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrIIsWRmVeSWpSXmKPExsVy+t/xe7rCkzlTDGadUbXYs2gSk8XGfg6L
+        SYeuMVrsvaVtsWfvSRaLe2v+s1rse72X2eLGhKeMFq09P9ktfv+Yw+bA5TFt0ik2j80rtDw2
+        repk89j0aRK7x+Qbyxk9ms4cZfbYfLra4/MmuQCOKD2bovzSklSFjPziElulaEMLIz1DSws9
+        IxNLPUNj81grI1MlfTublNSczLLUIn27BL2MRf9PMhasF6y4P3sdawPjR94uRg4OCQETiYYV
+        cl2MXBxCAksZJVb1LGLpYuQEistIfLrykR3CFpb4c62LDaLoI6PEqeV7mCGczYwSc753sIFM
+        YhFQkVjWkgHSwCZgL3Fp2S1mEFtEwFriy6oFjCD1zAL/mCSW77zECpIQBkpsmrWHEcTmFbCV
+        eLxmGjvE0FYWibcfVzJDJAQlTs58AnYSs4CFxMz55xlBljELSEss/8cBEZaXaN46G6ycUyBY
+        4tH8F2wQVytJPH7xlhHCrpX4/PcZ4wRGkVlIps5CMnUWwtRZSKYuYGRZxSiSWlqcm55bbKhX
+        nJhbXJqXrpecn7uJERjX24793LyDcd6rj3qHGJk4GA8xSnAwK4nwfpfiSBHiTUmsrEotyo8v
+        Ks1JLT7EaAoMoonMUqLJ+cDEklcSb2hmYGpoYmZpYGppZqwkzutZ0JEoJJCeWJKanZpakFoE
+        08fEwSnVwNTbPul96YWtFZdkX1s+vX/46lTf+/vty5k2JB7XFeDtEdkWovbSuKbx4P/cl/e1
+        0s+ez9uol/nfpuqLENdDuX8RmpLS698v+pZgdNB43fLG3tUGh9fvy5p53H1RYrZHtsqTgIBS
+        kznyyd+v3O81P/coaF/tLpU7GVvWskZvLD/fFCWxXGjqM7XmZ3ZvdoReXMJyW/GWbfqeBqEN
+        LqxCtSIzq51U//1tSc03O/9Qb6q38fq5Wjee217ts/4uVOzv0zmL8dipZbd8ixuaggX1ZaON
+        Dp++rHuZydkn8/+TxAP2HTr9SmGVyzW5XSJXOLrXBsuEGdjGXzANqvl3QHcL24Qtpxxu8s3t
+        9Gh/6L8xSomlOCPRUIu5qDgRAM/sJkF0AwAA
+X-CMS-MailID: 20230309080435eucas1p27d38e373074eeedee7e01db6dc6bac63
+X-Msg-Generator: CA
+X-RootMTR: 20230308181355eucas1p1c94ffee59e210fb762540c888e8eae8a
+X-EPHeader: CA
+CMS-TYPE: 201P
+X-CMS-RootMailID: 20230308181355eucas1p1c94ffee59e210fb762540c888e8eae8a
+References: <c9f6544d-1731-4a73-a926-0e85ae9da9df@suse.de>
+        <ZAN2HYXDI+hIsf6W@casper.infradead.org>
+        <edac909b-98e5-cb6d-bb80-2f6a20a15029@suse.de>
+        <ZAOF3p+vqA6pd7px@casper.infradead.org>
+        <0b70deae-9fc7-ca33-5737-85d7532b3d33@suse.de>
+        <ZAWi5KwrsYL+0Uru@casper.infradead.org> <20230306161214.GB959362@mit.edu>
+        <ZAjLhkfRqwQ+vkHI@casper.infradead.org>
+        <CGME20230308181355eucas1p1c94ffee59e210fb762540c888e8eae8a@eucas1p1.samsung.com>
+        <1367983d4fa09dcb63e29db2e8be3030ae6f6e8c.camel@HansenPartnership.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Ming,
+On 08.03.2023 13:13, James Bottomley wrote:
+>On Wed, 2023-03-08 at 17:53 +0000, Matthew Wilcox wrote:
+>> On Mon, Mar 06, 2023 at 11:12:14AM -0500, Theodore Ts'o wrote:
+>> > What HDD vendors want is to be able to have 32k or even 64k
+>> > *physical* sector sizes.  This allows for much more efficient
+>> > erasure codes, so it will increase their byte capacity now that
+>> > it's no longer easier to get capacity boosts by squeezing the
+>> > tracks closer and closer, and their have been various engineering
+>> > tradeoffs with SMR, HAMR, and MAMR.  HDD vendors have been asking
+>> > for this at LSF/MM, and in othervenues for ***years***.
+>>
+>> I've been reminded by a friend who works on the drive side that a
+>> motivation for the SSD vendors is (essentially) the size of sector_t.
+>> Once the drive needs to support more than 2/4 billion sectors, they
+>> need to move to a 64-bit sector size, so the amount of memory
+>> consumed by the FTL doubles, the CPU data cache becomes half as
+>> effective, etc. That significantly increases the BOM for the drive,
+>> and so they have to charge more.  With a 512-byte LBA, that's 2TB;
+>> with a 4096-byte LBA, it's at 16TB and with a 64k LBA, they can keep
+>> using 32-bit LBA numbers all the way up to 256TB.
+>
+>I thought the FTL operated on physical sectors and the logical to
+>physical was done as a RMW through the FTL?  In which case sector_t
+>shouldn't matter to the SSD vendors for FTL management because they can
+>keep the logical sector size while increasing the physical one.
+>Obviously if physical size goes above the FS block size, the drives
+>will behave suboptimally with RMWs, which is why 4k physical is the max
+>currently.
+>
 
-I love your patch! Perhaps something to improve:
+FTL designs are complex. We have ways to maintain sector sizes under 64
+bits, but this is a common industry problem.
 
-[auto build test WARNING on axboe-block/for-next]
-[also build test WARNING on linus/master v6.3-rc1 next-20230309]
-[cannot apply to char-misc/char-misc-testing char-misc/char-misc-next char-misc/char-misc-linus]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+The media itself does not normally oeprate at 4K. Page siges can be 16K,
+32K, etc. Increasing the block size would allow for better host/device
+cooperation. As Ted mentions, this has been a requirement for HDD and
+SSD vendor for years. It seems to us that the time is right now and that
+we have mechanisms in Linux to do the plumbing. Folios is ovbiously a
+big part of this.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Ming-Lei/io_uring-add-IO_URING_F_FUSED-and-prepare-for-supporting-OP_FUSED_CMD/20230307-222928
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git for-next
-patch link:    https://lore.kernel.org/r/20230307141520.793891-6-ming.lei%40redhat.com
-patch subject: [PATCH V2 05/17] io_uring: support OP_SEND_ZC/OP_RECV for fused slave request
-config: i386-randconfig-a003 (https://download.01.org/0day-ci/archive/20230309/202303091544.WIDavyIo-lkp@intel.com/config)
-compiler: gcc-11 (Debian 11.3.0-8) 11.3.0
-reproduce (this is a W=1 build):
-        # https://github.com/intel-lab-lkp/linux/commit/0a921da27026b3ba08aeceb432dd983480281344
-        git remote add linux-review https://github.com/intel-lab-lkp/linux
-        git fetch --no-tags linux-review Ming-Lei/io_uring-add-IO_URING_F_FUSED-and-prepare-for-supporting-OP_FUSED_CMD/20230307-222928
-        git checkout 0a921da27026b3ba08aeceb432dd983480281344
-        # save the config file
-        mkdir build_dir && cp config build_dir/.config
-        make W=1 O=build_dir ARCH=i386 olddefconfig
-        make W=1 O=build_dir ARCH=i386 SHELL=/bin/bash
-
-If you fix the issue, kindly add following tag where applicable
-| Reported-by: kernel test robot <lkp@intel.com>
-| Link: https://lore.kernel.org/oe-kbuild-all/202303091544.WIDavyIo-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
-   In file included from include/linux/bits.h:6,
-                    from include/linux/bitops.h:6,
-                    from include/linux/kernel.h:22,
-                    from io_uring/net.c:2:
-   include/vdso/bits.h:7:40: warning: left shift count >= width of type [-Wshift-count-overflow]
-       7 | #define BIT(nr)                 (UL(1) << (nr))
-         |                                        ^~
-   include/linux/io_uring_types.h:475:35: note: in expansion of macro 'BIT'
-     475 |         REQ_F_FUSED_SLAVE       = BIT(REQ_F_FUSED_SLAVE_BIT),
-         |                                   ^~~
-   io_uring/net.c: In function 'io_send':
->> io_uring/net.c:385:48: warning: cast from pointer to integer of different size [-Wpointer-to-int-cast]
-     385 |                 ret = io_import_kbuf_for_slave((u64)sr->buf, sr->len,
-         |                                                ^
-   io_uring/net.c: In function 'io_recv':
-   io_uring/net.c:880:48: warning: cast from pointer to integer of different size [-Wpointer-to-int-cast]
-     880 |                 ret = io_import_kbuf_for_slave((u64)sr->buf, sr->len, ITER_DEST,
-         |                                                ^
-   io_uring/net.c: In function 'io_send_zc':
-   io_uring/net.c:1135:48: warning: cast from pointer to integer of different size [-Wpointer-to-int-cast]
-    1135 |                 ret = io_import_kbuf_for_slave((u64)zc->buf, zc->len,
-         |                                                ^
-
-
-vim +385 io_uring/net.c
-
-   343	
-   344	int io_send(struct io_kiocb *req, unsigned int issue_flags)
-   345	{
-   346		struct sockaddr_storage __address;
-   347		struct io_sr_msg *sr = io_kiocb_to_cmd(req, struct io_sr_msg);
-   348		struct msghdr msg;
-   349		struct socket *sock;
-   350		unsigned flags;
-   351		int min_ret = 0;
-   352		int ret;
-   353	
-   354		msg.msg_name = NULL;
-   355		msg.msg_control = NULL;
-   356		msg.msg_controllen = 0;
-   357		msg.msg_namelen = 0;
-   358		msg.msg_ubuf = NULL;
-   359	
-   360		if (sr->addr) {
-   361			if (req_has_async_data(req)) {
-   362				struct io_async_msghdr *io = req->async_data;
-   363	
-   364				msg.msg_name = &io->addr;
-   365			} else {
-   366				ret = move_addr_to_kernel(sr->addr, sr->addr_len, &__address);
-   367				if (unlikely(ret < 0))
-   368					return ret;
-   369				msg.msg_name = (struct sockaddr *)&__address;
-   370			}
-   371			msg.msg_namelen = sr->addr_len;
-   372		}
-   373	
-   374		if (!(req->flags & REQ_F_POLLED) &&
-   375		    (sr->flags & IORING_RECVSEND_POLL_FIRST))
-   376			return io_setup_async_addr(req, &__address, issue_flags);
-   377	
-   378		sock = sock_from_file(req->file);
-   379		if (unlikely(!sock))
-   380			return -ENOTSOCK;
-   381	
-   382		if (!(req->flags & REQ_F_FUSED_SLAVE))
-   383			ret = import_ubuf(ITER_SOURCE, sr->buf, sr->len, &msg.msg_iter);
-   384		else
- > 385			ret = io_import_kbuf_for_slave((u64)sr->buf, sr->len,
-   386					ITER_SOURCE, &msg.msg_iter, req);
-   387		if (unlikely(ret))
-   388			return ret;
-   389	
-   390		flags = sr->msg_flags;
-   391		if (issue_flags & IO_URING_F_NONBLOCK)
-   392			flags |= MSG_DONTWAIT;
-   393		if (flags & MSG_WAITALL)
-   394			min_ret = iov_iter_count(&msg.msg_iter);
-   395	
-   396		msg.msg_flags = flags;
-   397		ret = sock_sendmsg(sock, &msg);
-   398		if (ret < min_ret) {
-   399			if (ret == -EAGAIN && (issue_flags & IO_URING_F_NONBLOCK))
-   400				return io_setup_async_addr(req, &__address, issue_flags);
-   401	
-   402			if (ret > 0 && io_net_retry(sock, flags)) {
-   403				sr->len -= ret;
-   404				sr->buf += ret;
-   405				sr->done_io += ret;
-   406				req->flags |= REQ_F_PARTIAL_IO;
-   407				return io_setup_async_addr(req, &__address, issue_flags);
-   408			}
-   409			if (ret == -ERESTARTSYS)
-   410				ret = -EINTR;
-   411			req_set_fail(req);
-   412		}
-   413		if (ret >= 0)
-   414			ret += sr->done_io;
-   415		else if (sr->done_io)
-   416			ret = sr->done_io;
-   417		io_req_set_res(req, ret, 0);
-   418		return IOU_OK;
-   419	}
-   420	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests
