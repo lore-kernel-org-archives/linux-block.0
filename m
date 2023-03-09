@@ -2,104 +2,73 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F74DC64EC4
-	for <linux-block@archiver.kernel.org>; Thu,  9 Mar 2023 14:07:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DF464C64EC4
+	for <linux-block@archiver.kernel.org>; Thu,  9 Mar 2023 14:26:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231638AbjCIOH2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 9 Mar 2023 09:07:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40944 "EHLO
+        id S231335AbjCIO06 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 9 Mar 2023 09:26:58 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48844 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231645AbjCIOGx (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 9 Mar 2023 09:06:53 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C77CB18A86;
-        Thu,  9 Mar 2023 06:05:40 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 700F5B81EED;
-        Thu,  9 Mar 2023 14:05:39 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1CD33C433D2;
-        Thu,  9 Mar 2023 14:05:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1678370738;
-        bh=xJ7YPrTfTthbYoyo8UtH2onMzmwtgbsrsuyUa9lXPAE=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=dmztQVg5CIS8T690ZZtBtC6IlnrcP7PqLeuT8DjrijPjpNg2SxZAeYmM5PzoNc/H7
-         er5fix33obktnrmBYc0X7CA59basYJ3ltJEGA2F9wjpLFMSHBpI6UMGjKnwvbHUTGd
-         FTkFktQ8RRAfqly2xui9EyDGPOQO6oUnUl3MJL+sDEvOmA42HcAk8Ph7PxFqXQXnwF
-         9381JT3MVOZOc8GalYXITxcLggI5BOSU6t/DLTQOnaUWTzuJhNJBFSutu+mtQ3rd9/
-         EkCczClEm5xdnnfmLqC1Sfp8FcJtsSgB5i+d+JwRU6vtDg7lkb2Bkd+YItg3+d6c4r
-         VwqmtL+h0w4fg==
-Date:   Thu, 9 Mar 2023 07:05:34 -0700
-From:   Keith Busch <kbusch@kernel.org>
-To:     James Bottomley <James.Bottomley@HansenPartnership.com>
-Cc:     Javier =?iso-8859-1?Q?Gonz=E1lez?= <javier.gonz@samsung.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        Theodore Ts'o <tytso@mit.edu>, Hannes Reinecke <hare@suse.de>,
-        Luis Chamberlain <mcgrof@kernel.org>,
-        Pankaj Raghav <p.raghav@samsung.com>,
-        Daniel Gomez <da.gomez@samsung.com>,
-        lsf-pc@lists.linux-foundation.org, linux-fsdevel@vger.kernel.org,
-        linux-mm@kvack.org, linux-block@vger.kernel.org
-Subject: Re: [LSF/MM/BPF TOPIC] Cloud storage optimizations
-Message-ID: <ZAnnrhUG1B+r1nd0@kbusch-mbp.dhcp.thefacebook.com>
-References: <edac909b-98e5-cb6d-bb80-2f6a20a15029@suse.de>
- <ZAOF3p+vqA6pd7px@casper.infradead.org>
- <0b70deae-9fc7-ca33-5737-85d7532b3d33@suse.de>
- <ZAWi5KwrsYL+0Uru@casper.infradead.org>
- <20230306161214.GB959362@mit.edu>
- <ZAjLhkfRqwQ+vkHI@casper.infradead.org>
- <CGME20230308181355eucas1p1c94ffee59e210fb762540c888e8eae8a@eucas1p1.samsung.com>
- <1367983d4fa09dcb63e29db2e8be3030ae6f6e8c.camel@HansenPartnership.com>
- <20230309080434.tnr33rhzh3a5yc5q@ArmHalley.local>
- <260064c68b61f4a7bc49f09499e1c107e2a28f31.camel@HansenPartnership.com>
+        with ESMTP id S231531AbjCIO05 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 9 Mar 2023 09:26:57 -0500
+Received: from mail-wm1-x330.google.com (mail-wm1-x330.google.com [IPv6:2a00:1450:4864:20::330])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1F5ED29439
+        for <linux-block@vger.kernel.org>; Thu,  9 Mar 2023 06:26:56 -0800 (PST)
+Received: by mail-wm1-x330.google.com with SMTP id j19-20020a05600c191300b003eb3e1eb0caso3732500wmq.1
+        for <linux-block@vger.kernel.org>; Thu, 09 Mar 2023 06:26:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112; t=1678372014;
+        h=content-transfer-encoding:subject:to:mime-version:from:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=Yf2ahHvlY2IXDyPqkpKQ3Qkug7WIJL4NOmqcaxPWKDU=;
+        b=NN8fDHs3guzY9CMMaCb9h6c9yjjx29Z13ygG325eorYAWi+UwN2oV1ajb5kiKAvn8u
+         Nj+PpBMnoofN/BWDQpA4lZMQNR2oTdBcEbP91vIQgUhMUVgU3FfoUBXVw9OibDBe5jNU
+         D7Dhp8eZMh/Y9ixR92vhtoIe3Ba1YRcu3+FwO0Jyx/Xl3g7tLLFJb311tQh/zoXf0QrC
+         h8cTHmx82nSHUBfaNiJnq56rPrPMmSf3TcWB+AjV2TPchmbM1h6+1YT3b1+SZ1rmYD/N
+         KjeSFLRbTqyvyCcKobb6tN1rRQTPu5WfkJ4MEBN6iay6S2xGNQr2xzjUQdUXXdfyMuGf
+         FMrQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1678372014;
+        h=content-transfer-encoding:subject:to:mime-version:from:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Yf2ahHvlY2IXDyPqkpKQ3Qkug7WIJL4NOmqcaxPWKDU=;
+        b=2c2dUhNVDh12LbzN6Ddh5Dd0YFvsA+vF9XTyr53y627LM1U1VeINN/pVtP6JkoJqJd
+         tIiUBciF9fZhdyC6bX5o3upPJ48S1CZa4B0l40BwUOhuSRjbfW9dursMuGdDYEP1f9jn
+         VFLmmiGtIMvwtUu+WDweQ2mcwBagTXS3DZsQ03O+ENmYqTeDFUQ5AEyntI2gDO2Y7m9w
+         TY8LpObtbySfIIqF/ruGjrEjo+qBPr3isps3J+e0iQqRTkouWZgvCR6iv32yegCGoHsc
+         e0jkQS7WzWz4BXaLJN3h+Z4TZNDcQoyLXekYmmSp6wnBHMjBEPXh2SWXnMYjfotd5OoM
+         dGVQ==
+X-Gm-Message-State: AO0yUKV3I1ksLwqT5b+rE6jCQvGn9xzvpuWalpkiq/qhU8dN0f/zh7NR
+        mNacYRl3ESTTG8ATYQXfUQb6yigejpE=
+X-Google-Smtp-Source: AK7set9csJ2XXbhJuI3e+AGHMWIMNF6AOJ9F/gWwF4QIPi72YIeHxX1mOTdgaIIzeC17uI4cr7vHxA==
+X-Received: by 2002:a05:600c:1d03:b0:3ea:840c:e8ff with SMTP id l3-20020a05600c1d0300b003ea840ce8ffmr17945672wms.3.1678372014527;
+        Thu, 09 Mar 2023 06:26:54 -0800 (PST)
+Received: from DESKTOP-8VK398V ([125.62.90.127])
+        by smtp.gmail.com with ESMTPSA id c23-20020a7bc017000000b003de2fc8214esm12655wmb.20.2023.03.09.06.26.53
+        for <linux-block@vger.kernel.org>
+        (version=TLS1 cipher=ECDHE-ECDSA-AES128-SHA bits=128/128);
+        Thu, 09 Mar 2023 06:26:54 -0800 (PST)
+Message-ID: <6409ecae.7b0a0220.b426e.00fd@mx.google.com>
+Date:   Thu, 09 Mar 2023 06:26:54 -0800 (PST)
+X-Google-Original-Date: 9 Mar 2023 19:26:53 +0500
+From:   krewkaydenr843@gmail.com
+X-Google-Original-From: KrewKaydenr843@gmail.com
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <260064c68b61f4a7bc49f09499e1c107e2a28f31.camel@HansenPartnership.com>
+To:     linux-block@vger.kernel.org
+Subject: Estimate To Bid
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Mar 09, 2023 at 08:11:35AM -0500, James Bottomley wrote:
-> On Thu, 2023-03-09 at 09:04 +0100, Javier González wrote:
-> > FTL designs are complex. We have ways to maintain sector sizes under
-> > 64 bits, but this is a common industry problem.
-> > 
-> > The media itself does not normally oeprate at 4K. Page siges can be
-> > 16K, 32K, etc.
-> 
-> Right, and we've always said if we knew what this size was we could
-> make better block write decisions.  However, today if you look what
-> most NVMe devices are reporting, it's a bit sub-optimal:
+Hi,=0D=0A=0D=0ACrown Estimation, LLC is experts in providing cost=
+ing and takeoff solutions to GC's and Sub's. We are based in NJ. =
+We do estimate all types of construction projects including resid=
+ential, commercial, new build and federal government projects.=0D=0A=
+=0D=0Aplease send me the plans if you have any job for a quote on=
+ our service charges before getting started.=0D=0A=0D=0AYou may a=
+sk for any type of samples.Thanks.=0D=0A=0D=0ABest Regards,=0D=0A=
+Krew Kaydenr=0D=0AMarketing Manager=0D=0ACrown Estimation, LLC=0D=0A
 
-Your sample size may be off if your impression is that "most" NVMe drives
-report themselves this way. :)
- 
-> jejb@lingrow:/sys/block/nvme1n1/queue> cat logical_block_size 
-> 512
-> jejb@lingrow:/sys/block/nvme1n1/queue> cat physical_block_size 
-> 512
-> jejb@lingrow:/sys/block/nvme1n1/queue> cat optimal_io_size 
-> 0
-> 
-> If we do get Linux to support large block sizes, are we actually going
-> to get better information out of the devices?
-> 
-> >  Increasing the block size would allow for better host/device
-> > cooperation. As Ted mentions, this has been a requirement for HDD and
-> > SSD vendor for years. It seems to us that the time is right now and
-> > that we have mechanisms in Linux to do the plumbing. Folios is
-> > ovbiously a big part of this.
-> 
-> Well a decade ago we did a lot of work to support 4k sector devices.
-> Ultimately the industry went with 512 logical/4k physical devices
-> because of problems with non-Linux proprietary OSs but you could still
-> use 4k today if you wanted (I've actually still got a working 4k SCSI
-> drive), so why is no NVMe device doing that?
-
-In my experience, all but the cheapest consumer grade nvme devices report 4k
-logical. They all support an option to emulate 512b if you really wanted it to,
-but the more optimal 4k is the most common default for server grade nvme.
