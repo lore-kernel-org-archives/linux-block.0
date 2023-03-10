@@ -2,129 +2,189 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC1DAC64EC4
-	for <linux-block@archiver.kernel.org>; Fri, 10 Mar 2023 10:19:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BFBDC6FA99
+	for <linux-block@archiver.kernel.org>; Fri, 10 Mar 2023 13:42:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230016AbjCJKTq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 10 Mar 2023 05:19:46 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41944 "EHLO
+        id S229659AbjCJNmt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 10 Mar 2023 08:42:49 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38382 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229876AbjCJKTp (ORCPT
+        with ESMTP id S229737AbjCJNms (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 10 Mar 2023 05:19:45 -0500
-Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4452B69CC1;
-        Fri, 10 Mar 2023 02:19:38 -0800 (PST)
-Received: from [192.168.1.103] (178.176.75.58) by msexch01.omp.ru
- (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.986.14; Fri, 10 Mar
- 2023 13:19:29 +0300
-Subject: Re: [PATCH 04/32] pata_parport-bpck6: pass around struct pi_adapter *
-To:     Ondrej Zary <linux@zary.sk>
-CC:     Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-        Sudip Mukherjee <sudipm.mukherjee@gmail.com>,
-        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        Tim Waugh <tim@cyberelk.net>, <linux-block@vger.kernel.org>,
-        <linux-parport@lists.infradead.org>, <linux-ide@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>
-References: <20230307224627.28011-1-linux@zary.sk>
- <20230307224627.28011-5-linux@zary.sk>
- <6040658f-990f-8cca-eabb-09e97e09c547@omp.ru>
- <202303092158.50217.linux@zary.sk>
-From:   Sergey Shtylyov <s.shtylyov@omp.ru>
-Organization: Open Mobile Platform
-Message-ID: <d9e601b1-8689-a438-de2d-481839ec6e97@omp.ru>
-Date:   Fri, 10 Mar 2023 13:19:29 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+        Fri, 10 Mar 2023 08:42:48 -0500
+Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6E16111FBE;
+        Fri, 10 Mar 2023 05:42:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1678455766; x=1709991766;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=B7DzPLaV7PYb4CwSpTmT+8+euC7hqUSnfgzb906Ua98=;
+  b=WdQ2vBt70GPXYXFZ0WbzXJ2qFSgU2LgdsMjPiuTk0wD2YG1lMjVsHN75
+   cq6woPjW9MWilW6kXxOHc+0ow2Q1JHOtAb1nkPzDZWmQstLkXKuhyXWob
+   +3Ta6rmkqFQefiA5UZmzU8OqDleBi4ALy6Y2iO6begFOgqtZPBhue24Q2
+   Z5M///3CRGYcnG5CECvk0IvKm548a4frPUwy7bM6CGnaI3QpU5FjUpcsa
+   N6k0wbw4mLhhjRd7wlf3pwskCFQAibI0plvHzcC6y15FlV7taxSZ1FJSQ
+   5HjsTlFn0Y8kd9Cek45XNOpxDYbDIEg6H5dGXosgkDtr3wyDyQOvJTn2U
+   g==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10644"; a="338281408"
+X-IronPort-AV: E=Sophos;i="5.98,249,1673942400"; 
+   d="scan'208";a="338281408"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Mar 2023 05:42:46 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10644"; a="627814390"
+X-IronPort-AV: E=Sophos;i="5.98,249,1673942400"; 
+   d="scan'208";a="627814390"
+Received: from smile.fi.intel.com ([10.237.72.54])
+  by orsmga003.jf.intel.com with ESMTP; 10 Mar 2023 05:42:44 -0800
+Received: from andy by smile.fi.intel.com with local (Exim 4.96)
+        (envelope-from <andriy.shevchenko@linux.intel.com>)
+        id 1pad18-000tdW-1a;
+        Fri, 10 Mar 2023 15:42:42 +0200
+Date:   Fri, 10 Mar 2023 15:42:42 +0200
+From:   Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To:     Mirsad Todorovac <mirsad.todorovac@alu.unizg.hr>
+Cc:     Thomas =?iso-8859-1?Q?Wei=DFschuh?= <linux@weissschuh.net>,
+        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Subject: Re: [PATCH] block: don't embed integrity_kobj into gendisk
+Message-ID: <ZAsz0lvdS60nFwJx@smile.fi.intel.com>
+References: <20230309-kobj_release-gendisk_integrity-v1-1-a240f54eac60@weissschuh.net>
+ <d85ba503-d93c-3483-25e1-6043d4af444f@alu.unizg.hr>
+ <0ac9777c-7586-494f-bbc5-87f14f645b12@t-8ch.de>
+ <d10f18b4-56cf-8a55-b12f-79b1163d8841@alu.unizg.hr>
+ <7f977a5d-8302-4a32-9dce-f6d7637b2555@t-8ch.de>
+ <dc4f7684-2bec-ece2-17bd-ecaaaa5d5c69@alu.unizg.hr>
 MIME-Version: 1.0
-In-Reply-To: <202303092158.50217.linux@zary.sk>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [178.176.75.58]
-X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
- (10.188.4.12)
-X-KSE-ServerInfo: msexch01.omp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 5.9.59, Database issued on: 03/10/2023 09:59:29
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 59
-X-KSE-AntiSpam-Info: Lua profiles 176004 [Mar 10 2023]
-X-KSE-AntiSpam-Info: Version: 5.9.59.0
-X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
-X-KSE-AntiSpam-Info: LuaCore: 507 507 08d345461d9bcca7095738422a5279ab257bb65a
-X-KSE-AntiSpam-Info: {rep_avail}
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info: {relay has no DNS name}
-X-KSE-AntiSpam-Info: {SMTP from is not routable}
-X-KSE-AntiSpam-Info: {Found in DNSBL: 178.176.75.58 in (user)
- dbl.spamhaus.org}
-X-KSE-AntiSpam-Info: omp.ru:7.1.1;127.0.0.199:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1
-X-KSE-AntiSpam-Info: ApMailHostAddress: 178.176.75.58
-X-KSE-AntiSpam-Info: {DNS response errors}
-X-KSE-AntiSpam-Info: Rate: 59
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
- smtp.mailfrom=omp.ru;dkim=none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Heuristic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 03/10/2023 10:02:00
-X-KSE-AttachmentFiltering-Interceptor-Info: protection disabled
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 3/10/2023 7:05:00 AM
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <dc4f7684-2bec-ece2-17bd-ecaaaa5d5c69@alu.unizg.hr>
+Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/9/23 11:58 PM, Ondrej Zary wrote:
-[...]
-
->>> Remove Interface typedef, pass around struct pi_adapter * down to all
->>> functions instead. Remove PPCSTRUCT define.
->>>
->>> Signed-off-by: Ondrej Zary <linux@zary.sk>
->>
->> Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
->>
->>    I had some nit tho -- see below...
->>
->> [...]
->>
->>> diff --git a/drivers/ata/pata_parport/bpck6.c b/drivers/ata/pata_parport/bpck6.c
->>> index fa1f7d4fe3cb..bc128a2c444e 100644
->>> --- a/drivers/ata/pata_parport/bpck6.c
->>> +++ b/drivers/ata/pata_parport/bpck6.c
->> [...]
->>>  static void bpck6_connect(struct pi_adapter *pi)
->>>  {
->>> +	struct ppc_storage *ppc = (void *)(pi->private);
->>
->>    Parens around pi->private are unnecessary here and elsewhere...
->>
->> [...]
->>> diff --git a/drivers/ata/pata_parport/ppc6lnx.c b/drivers/ata/pata_parport/ppc6lnx.c
->>> index 5e5521d3b1dd..f12bb019fc61 100644
->>> --- a/drivers/ata/pata_parport/ppc6lnx.c
->>> +++ b/drivers/ata/pata_parport/ppc6lnx.c
->> [...]
->>> @@ -101,26 +101,27 @@ typedef struct ppc_storage {
->> [...]
->>>  //***************************************************************************
->>>  
->>> -static int ppc6_select(Interface *ppc)
->>> +static int ppc6_select(struct pi_adapter *pi)
->>>  {
->>> +	struct ppc_storage *ppc = (void *)(pi->private);
->>
->>    Parens around pi->private are unnecessary here and elsewhere...
+On Fri, Mar 10, 2023 at 09:52:51AM +0100, Mirsad Todorovac wrote:
+> Hi, Thomas,
 > 
-> Yes, missed that. But it's "fixed" in patch 9 by removing this code :)
+> The good news is that the
+> 
+> "kobject: 'integrity' (000000001aa7f87a): does not have a release() function"
+> 
+> is now removed:
+> 
+> https://domac.alu.hr/~mtodorov/linux/bugreports/integrity/fix/20230310_082429.jpg
+> 
+> On 3/10/23 00:26, Thomas Weißschuh wrote:
+> > On Thu, Mar 09, 2023 at 10:46:50PM +0100, Mirsad Goran Todorovac wrote:
+> > > On 09. 03. 2023. 22:23, Thomas Weißschuh wrote:
+> > > 
+> > > Very well, but who then destroys the cache crated here:
+> > > 
+> > > security/integrity/iint.c:177-179
+> > > > 177         iint_cache =
+> > > > 178             kmem_cache_create("iint_cache", sizeof(struct integrity_iint_cache),
+> > > > 179                               0, SLAB_PANIC, init_once);
+> > > 
+> > > I assumed that it must have been done from iint.c because iint_cache is
+> > > static?
+> > 
+> > It doesn't seem like anything destroys this cache.
+> > 
+> > I'm not sure this is a problem though as iint.c can not be built as module.
+> 
+> Maybe I was just scolded when I relied on exit() to do the memory deallocation
+> from heap automatically in userspace programs. :-/
+> 
+> I suppose this cache is destroyed when virtual Linux machine is shutdown.
+> 
+> Still, it might seem prudent for all of the objects to be destroyed before shutting
+> down the kernel, assuring the call of proper destructors, and in the right order.
+> 
+> > At least it's not a problem with kobjects as those are not used here.
+> 
+> I begin to understand.
+> 
+> security/integrity/iint.c:
+> 175 static int __init integrity_iintcache_init(void)
+> 176 {
+> 177         iint_cache =
+> 178             kmem_cache_create("iint_cache", sizeof(struct integrity_iint_cache),
+> 179                               0, SLAB_PANIC, init_once);
+> 180         return 0;
+> 181 }
+> 182 DEFINE_LSM(integrity) = {
+> 183         .name = "integrity",
+> 184         .init = integrity_iintcache_init,
+> 185 };
+> 
+> and struct lsm_info
+> 
+> include/linux/lsm_hooks.h:
+> 1721 struct lsm_info {
+> 1722         const char *name;       /* Required. */
+> 1723         enum lsm_order order;   /* Optional: default is LSM_ORDER_MUTABLE */
+> 1724         unsigned long flags;    /* Optional: flags describing LSM */
+> 1725         int *enabled;           /* Optional: controlled by CONFIG_LSM */
+> 1726         int (*init)(void);      /* Required. */
+> 1727         struct lsm_blob_sizes *blobs; /* Optional: for blob sharing. */
+> 1728 };
+> 
+> Here a proper destructor might be prudent to add.
+> 
+> Naive try could be like this:
+> 
+> diff --git a/include/linux/lsm_hooks.h b/include/linux/lsm_hooks.h
+> index 6e156d2acffc..d5a6ab9b5eb2 100644
+> --- a/include/linux/lsm_hooks.h
+> +++ b/include/linux/lsm_hooks.h
+> @@ -1724,6 +1724,7 @@ struct lsm_info {
+>         unsigned long flags;    /* Optional: flags describing LSM */
+>         int *enabled;           /* Optional: controlled by CONFIG_LSM */
+>         int (*init)(void);      /* Required. */
+> +       int (*release)(void);   /* Release associated resources */
+>         struct lsm_blob_sizes *blobs; /* Optional: for blob sharing. */
+>  };
+> 
+> diff --git a/security/integrity/iint.c b/security/integrity/iint.c
+> index 8638976f7990..3f69eb702b2e 100644
+> --- a/security/integrity/iint.c
+> +++ b/security/integrity/iint.c
+> @@ -179,9 +179,16 @@ static int __init integrity_iintcache_init(void)
+>                               0, SLAB_PANIC, init_once);
+>         return 0;
+>  }
+> +
+> +static int __exit integrity_iintcache_release(void)
+> +{
+> +       kmem_cache_destroy(iint_cache);
+> +}
+> +
+>  DEFINE_LSM(integrity) = {
+>         .name = "integrity",
+>         .init = integrity_iintcache_init,
+> +       .release = integrity_iintcache_release,
+>  };
+> 
+> However, I lack insight of who should invoke .release() on 'integrity',
+> in 10.7 million lines of *.c and *.h files. Obviously, now no one is
+> expecting .release in LSM modules. But there might be a need for the
+> proper cleanup.
+> 
+> For it is not a kobject as you already observed? :-/
 
-   Yeah, saw that later... Nevermind then. :-)
+I think you may prepare a formal patch and Cc to Greg KH, who knows
+the kobject code well and this warning in particular.
 
-MBR, Sergey
+I believe, even if a dead code, the destructor to have is a good code
+behaviour, since it is might be called on the __exitcall.
+
+-- 
+With Best Regards,
+Andy Shevchenko
+
+
