@@ -2,42 +2,42 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A5F7EC6FA99
-	for <linux-block@archiver.kernel.org>; Fri, 10 Mar 2023 16:21:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EE75BC6FA99
+	for <linux-block@archiver.kernel.org>; Fri, 10 Mar 2023 16:21:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231400AbjCJQVC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 10 Mar 2023 11:21:02 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51392 "EHLO
+        id S230280AbjCJQVv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 10 Mar 2023 11:21:51 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33944 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231426AbjCJQUe (ORCPT
+        with ESMTP id S230373AbjCJQVV (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 10 Mar 2023 11:20:34 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9D33109768
-        for <linux-block@vger.kernel.org>; Fri, 10 Mar 2023 08:15:26 -0800 (PST)
+        Fri, 10 Mar 2023 11:21:21 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A03C80E1E
+        for <linux-block@vger.kernel.org>; Fri, 10 Mar 2023 08:16:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1678464867;
+        s=mimecast20190719; t=1678464921;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=6woSO0hLQ5AOX8ml8J8Kv2DAmsiAIUA/7xq1WhwbYPM=;
-        b=HXdk6ZYDBSbeQnXa3yITnN8j/riy/cTiVn+WL+aQW+SIGzzoRdu3x437Oy3hZu6up0nBoX
-        gZv4cH6wLb4RD79htKtjBiGU1xeAazI9dB6Nk4kU5SaTPqkIwi8BacywqVrzSvTiQpXgTv
-        XvgK4ouWlH8Xghz5xj8SeVvIMTBSUgU=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=uORM3Xhzjyx5pSXtVFHzrrBAkab8IB4YL2yYQbG2PCU=;
+        b=ZyEPq0AuIXEVNUrcuv5AmRAs64qvoP1NYelB6yo5pfYQWMrFXBRpvp0V1r+TkLS8BPKW/L
+        z80/QnV4m1jAQ3sDg9UDkIIaoAvpJb8YbocaGeVUC3G2q8Pn1uN52h2c7llyUL7haMefOY
+        uk9c96F1B+nhMmDZKQ28RtF0ZkB3X/8=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-47-HSShDvcENL6mqIOrmek3JA-1; Fri, 10 Mar 2023 11:08:14 -0500
-X-MC-Unique: HSShDvcENL6mqIOrmek3JA-1
+ us-mta-627-vhIr2a09NJ-Bi14QG2KogA-1; Fri, 10 Mar 2023 11:08:11 -0500
+X-MC-Unique: vhIr2a09NJ-Bi14QG2KogA-1
 Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id A2559882824;
-        Fri, 10 Mar 2023 16:08:08 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 00B1938041DD;
+        Fri, 10 Mar 2023 16:08:11 +0000 (UTC)
 Received: from thuth.com (unknown [10.45.224.202])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id E6A5F492B00;
-        Fri, 10 Mar 2023 16:08:06 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id DE54C492C3E;
+        Fri, 10 Mar 2023 16:08:08 +0000 (UTC)
 From:   Thomas Huth <thuth@redhat.com>
 To:     linux-kernel@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>
 Cc:     linux-arch@vger.kernel.org, Chas Williams <3chas3@gmail.com>,
@@ -45,9 +45,9 @@ Cc:     linux-arch@vger.kernel.org, Chas Williams <3chas3@gmail.com>,
         linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
         linux-atm-general@lists.sourceforge.net, netdev@vger.kernel.org,
         Christoph Hellwig <hch@infradead.org>
-Subject: [PATCH v2 3/5] Move bp_type_idx to include/linux/hw_breakpoint.h
-Date:   Fri, 10 Mar 2023 17:07:55 +0100
-Message-Id: <20230310160757.199253-4-thuth@redhat.com>
+Subject: [PATCH v2 4/5] pktcdvd: Remove CONFIG_CDROM_PKTCDVD_WCACHE from uapi header
+Date:   Fri, 10 Mar 2023 17:07:56 +0100
+Message-Id: <20230310160757.199253-5-thuth@redhat.com>
 In-Reply-To: <20230310160757.199253-1-thuth@redhat.com>
 References: <20230310160757.199253-1-thuth@redhat.com>
 MIME-Version: 1.0
@@ -57,87 +57,81 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Palmer Dabbelt <palmer@dabbelt.com>
+CONFIG_* switches should not be exposed in uapi headers, thus let's get
+rid of the USE_WCACHING macro here (which was also named way to generic)
+and integrate the logic directly in the only function that needs it.
 
-This has a "#ifdef CONFIG_*" that used to be exposed to userspace.
-
-The names in here are so generic that I don't think it's a good idea
-to expose them to userspace (or even the rest of the kernel).  There are
-multiple in-kernel users, so it's been moved to a kernel header file.
-
-Signed-off-by: Palmer Dabbelt <palmer@dabbelt.com>
-Reviewed-by: Andrew Waterman <waterman@eecs.berkeley.edu>
-Reviewed-by: Albert Ou <aou@eecs.berkeley.edu>
-Message-Id: <1447119071-19392-10-git-send-email-palmer@dabbelt.com>
-[thuth: Remove it also from tools/include/uapi/linux/hw_breakpoint.h]
-Reviewed-by: Arnd Bergmann <arnd@arndb.de>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+Suggested-by: Christoph Hellwig <hch@infradead.org>
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- include/linux/hw_breakpoint.h            | 10 ++++++++++
- include/uapi/linux/hw_breakpoint.h       | 10 ----------
- tools/include/uapi/linux/hw_breakpoint.h | 10 ----------
- 3 files changed, 10 insertions(+), 20 deletions(-)
+ drivers/block/pktcdvd.c      | 13 +++++++++----
+ include/uapi/linux/pktcdvd.h | 11 -----------
+ 2 files changed, 9 insertions(+), 15 deletions(-)
 
-diff --git a/include/linux/hw_breakpoint.h b/include/linux/hw_breakpoint.h
-index f319bd26b030..7fbb45911273 100644
---- a/include/linux/hw_breakpoint.h
-+++ b/include/linux/hw_breakpoint.h
-@@ -7,6 +7,16 @@
+diff --git a/drivers/block/pktcdvd.c b/drivers/block/pktcdvd.c
+index 2f1a92509271..5ae2a80db2c3 100644
+--- a/drivers/block/pktcdvd.c
++++ b/drivers/block/pktcdvd.c
+@@ -1869,12 +1869,12 @@ static noinline_for_stack int pkt_probe_settings(struct pktcdvd_device *pd)
+ /*
+  * enable/disable write caching on drive
+  */
+-static noinline_for_stack int pkt_write_caching(struct pktcdvd_device *pd,
+-						int set)
++static noinline_for_stack int pkt_write_caching(struct pktcdvd_device *pd)
+ {
+ 	struct packet_command cgc;
+ 	struct scsi_sense_hdr sshdr;
+ 	unsigned char buf[64];
++	bool set = IS_ENABLED(CONFIG_CDROM_PKTCDVD_WCACHE);
+ 	int ret;
  
- #ifdef CONFIG_HAVE_HW_BREAKPOINT
+ 	init_cdrom_command(&cgc, buf, sizeof(buf), CGC_DATA_READ);
+@@ -1890,7 +1890,12 @@ static noinline_for_stack int pkt_write_caching(struct pktcdvd_device *pd,
+ 	if (ret)
+ 		return ret;
  
-+enum bp_type_idx {
-+	TYPE_INST	= 0,
-+#if defined(CONFIG_HAVE_MIXED_BREAKPOINTS_REGS)
-+	TYPE_DATA	= 0,
-+#else
-+	TYPE_DATA	= 1,
-+#endif
-+	TYPE_MAX
-+};
-+
- extern int __init init_hw_breakpoint(void);
+-	buf[pd->mode_offset + 10] |= (!!set << 2);
++	/*
++	 * use drive write caching -- we need deferred error handling to be
++	 * able to successfully recover with this option (drive will return good
++	 * status as soon as the cdb is validated).
++	 */
++	buf[pd->mode_offset + 10] |= (set << 2);
  
- static inline void hw_breakpoint_init(struct perf_event_attr *attr)
-diff --git a/include/uapi/linux/hw_breakpoint.h b/include/uapi/linux/hw_breakpoint.h
-index 965e4d8606d8..1575d3ca6f0d 100644
---- a/include/uapi/linux/hw_breakpoint.h
-+++ b/include/uapi/linux/hw_breakpoint.h
-@@ -22,14 +22,4 @@ enum {
- 	HW_BREAKPOINT_INVALID   = HW_BREAKPOINT_RW | HW_BREAKPOINT_X,
- };
+ 	cgc.buflen = cgc.cmd[8] = 2 + ((buf[0] << 8) | (buf[1] & 0xff));
+ 	ret = pkt_mode_select(pd, &cgc);
+@@ -2085,7 +2090,7 @@ static int pkt_open_write(struct pktcdvd_device *pd)
+ 		return -EIO;
+ 	}
  
--enum bp_type_idx {
--	TYPE_INST 	= 0,
--#ifdef CONFIG_HAVE_MIXED_BREAKPOINTS_REGS
--	TYPE_DATA	= 0,
+-	pkt_write_caching(pd, USE_WCACHING);
++	pkt_write_caching(pd);
+ 
+ 	ret = pkt_get_max_speed(pd, &write_speed);
+ 	if (ret)
+diff --git a/include/uapi/linux/pktcdvd.h b/include/uapi/linux/pktcdvd.h
+index 9cbb55d21c94..6a5552dfd6af 100644
+--- a/include/uapi/linux/pktcdvd.h
++++ b/include/uapi/linux/pktcdvd.h
+@@ -29,17 +29,6 @@
+  */
+ #define PACKET_WAIT_TIME	(HZ * 5 / 1000)
+ 
+-/*
+- * use drive write caching -- we need deferred error handling to be
+- * able to successfully recover with this option (drive will return good
+- * status as soon as the cdb is validated).
+- */
+-#if defined(CONFIG_CDROM_PKTCDVD_WCACHE)
+-#define USE_WCACHING		1
 -#else
--	TYPE_DATA	= 1,
+-#define USE_WCACHING		0
 -#endif
--	TYPE_MAX
--};
 -
- #endif /* _UAPI_LINUX_HW_BREAKPOINT_H */
-diff --git a/tools/include/uapi/linux/hw_breakpoint.h b/tools/include/uapi/linux/hw_breakpoint.h
-index 965e4d8606d8..1575d3ca6f0d 100644
---- a/tools/include/uapi/linux/hw_breakpoint.h
-+++ b/tools/include/uapi/linux/hw_breakpoint.h
-@@ -22,14 +22,4 @@ enum {
- 	HW_BREAKPOINT_INVALID   = HW_BREAKPOINT_RW | HW_BREAKPOINT_X,
- };
- 
--enum bp_type_idx {
--	TYPE_INST 	= 0,
--#ifdef CONFIG_HAVE_MIXED_BREAKPOINTS_REGS
--	TYPE_DATA	= 0,
--#else
--	TYPE_DATA	= 1,
--#endif
--	TYPE_MAX
--};
--
- #endif /* _UAPI_LINUX_HW_BREAKPOINT_H */
+ /*
+  * No user-servicable parts beyond this point ->
+  */
 -- 
 2.31.1
 
