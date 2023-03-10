@@ -2,214 +2,147 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D8C6C6FD19
-	for <linux-block@archiver.kernel.org>; Fri, 10 Mar 2023 07:59:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7105C6FD1C
+	for <linux-block@archiver.kernel.org>; Fri, 10 Mar 2023 08:24:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230016AbjCJH7i (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 10 Mar 2023 02:59:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42202 "EHLO
+        id S230099AbjCJIYb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 10 Mar 2023 03:24:31 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56292 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229943AbjCJH7f (ORCPT
+        with ESMTP id S229552AbjCJIY3 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 10 Mar 2023 02:59:35 -0500
-Received: from mailout2.w1.samsung.com (mailout2.w1.samsung.com [210.118.77.12])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 96BC1E1931
-        for <linux-block@vger.kernel.org>; Thu,  9 Mar 2023 23:59:33 -0800 (PST)
-Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
-        by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id 20230310075930euoutp020087b2be0ab7d2a133cafbc9ac469ebd~K-_UNrcMI0841608416euoutp02f
-        for <linux-block@vger.kernel.org>; Fri, 10 Mar 2023 07:59:30 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w1.samsung.com 20230310075930euoutp020087b2be0ab7d2a133cafbc9ac469ebd~K-_UNrcMI0841608416euoutp02f
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1678435170;
-        bh=PimTtV2xHIocHqP2C+En+WnmhKxhh5/j7Aded0ia+kU=;
-        h=Date:From:To:CC:Subject:In-Reply-To:References:From;
-        b=SHMtnsauZtuZy7eARn+dgLJ19MXzT0UwfR5HtREwtRIhNNuKt7WKSY7NlEiWli1Oa
-         l6bPN4YbTnfcMaG0woEsMYKspTn1T/ek8afIzbRDJRLAQkYY2sQW17zr3u/M8IdLFG
-         CFCpKgNDUto0dGuoIoFSFkDRO5DapC6hosB2PgWg=
-Received: from eusmges1new.samsung.com (unknown [203.254.199.242]) by
-        eucas1p1.samsung.com (KnoxPortal) with ESMTP id
-        20230310075930eucas1p16d3608cbea90732ba9c3387ace884cbf~K-_T_7dH41088410884eucas1p1A;
-        Fri, 10 Mar 2023 07:59:30 +0000 (GMT)
-Received: from eucas1p2.samsung.com ( [182.198.249.207]) by
-        eusmges1new.samsung.com (EUCPMTA) with SMTP id 70.F0.09503.263EA046; Fri, 10
-        Mar 2023 07:59:30 +0000 (GMT)
-Received: from eusmtrp1.samsung.com (unknown [182.198.249.138]) by
-        eucas1p1.samsung.com (KnoxPortal) with ESMTPA id
-        20230310075929eucas1p1063b67e2f0f2d37e4ab75b16b8cf19d5~K-_TpDcqu1087110871eucas1p15;
-        Fri, 10 Mar 2023 07:59:29 +0000 (GMT)
-Received: from eusmgms2.samsung.com (unknown [182.198.249.180]) by
-        eusmtrp1.samsung.com (KnoxPortal) with ESMTP id
-        20230310075929eusmtrp181b7c3da465b447c055e25d0be4afea0~K-_Tob8dA3126731267eusmtrp1j;
-        Fri, 10 Mar 2023 07:59:29 +0000 (GMT)
-X-AuditID: cbfec7f2-e8fff7000000251f-b8-640ae362ed3c
-Received: from eusmtip1.samsung.com ( [203.254.199.221]) by
-        eusmgms2.samsung.com (EUCPMTA) with SMTP id E5.A0.09583.163EA046; Fri, 10
-        Mar 2023 07:59:29 +0000 (GMT)
-Received: from CAMSVWEXC02.scsc.local (unknown [106.1.227.72]) by
-        eusmtip1.samsung.com (KnoxPortal) with ESMTPA id
-        20230310075929eusmtip1b52b89013e48dc68c336ce29feecca38~K-_TdcQgG1058610586eusmtip1x;
-        Fri, 10 Mar 2023 07:59:29 +0000 (GMT)
-Received: from localhost (106.110.32.122) by CAMSVWEXC02.scsc.local
-        (2002:6a01:e348::6a01:e348) with Microsoft SMTP Server (TLS) id 15.0.1497.2;
-        Fri, 10 Mar 2023 07:59:28 +0000
-Date:   Fri, 10 Mar 2023 08:59:28 +0100
-From:   Javier =?utf-8?B?R29uesOhbGV6?= <javier.gonz@samsung.com>
-To:     James Bottomley <James.Bottomley@HansenPartnership.com>
-CC:     Matthew Wilcox <willy@infradead.org>,
-        Theodore Ts'o <tytso@mit.edu>, Hannes Reinecke <hare@suse.de>,
-        Luis Chamberlain <mcgrof@kernel.org>,
-        Keith Busch <kbusch@kernel.org>,
-        Pankaj Raghav <p.raghav@samsung.com>,
-        Daniel Gomez <da.gomez@samsung.com>,
-        <lsf-pc@lists.linux-foundation.org>,
-        <linux-fsdevel@vger.kernel.org>, <linux-mm@kvack.org>,
-        <linux-block@vger.kernel.org>
-Subject: Re: [LSF/MM/BPF TOPIC] Cloud storage optimizations
-Message-ID: <20230310075928.zcuiep3f2vpxbfdo@ArmHalley.local>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"; format="flowed"
-Content-Disposition: inline
+        Fri, 10 Mar 2023 03:24:29 -0500
+Received: from APC01-TYZ-obe.outbound.protection.outlook.com (mail-tyzapc01on2100.outbound.protection.outlook.com [40.107.117.100])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D98A5FA8CC;
+        Fri, 10 Mar 2023 00:24:27 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=maYJWKLGfXJK1xEoQgq6J7Ic2EL5msGt9Ut1Bb/pw3vtHnm/TUTwiV0wChIb8yXL62ggEZaar0U7G0oLwPCDMABdtM0ilINcAKJUb2E6ou/YATS04Vowb607npnQ0bnKCWZMCYw5dPrhp12epiLM9ef73fLXcPWyl8uflrW+kBtfcRXzLV9wKpiyX2qy04Bf2ADc/u3GH9FApWn+0YkHGQJfzLvoqehmFEcIoHVq7fyvYdAs5zNlcCtCsvTr82kPGYyhBTbVsTU44gQGFBnC5yu1RVj/9IQdJskeSV+roFc0vMFIBdW9nmHCYeZWTgfflIwDpBGGLcHXMv1+T5H72Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=YB24UzYT8fYvSZtDtqyFDzx4FEZM+BL/2udeGnDmwKA=;
+ b=YH1+IZO4iLEyeMU9rVNIPGBSWfzlfDcTd9mGghmqxT37ud1/X1T892hW5qUnb5yZ3PJIP+H2bUv1+a50T/xawN+8gR+Spy2iBJvL1UL7vor5igGAyx+4oAx+JvSGMAVPDXIwNkNiMo3PLwSpY08cg7MUqwPHGBfshcqa1JzU3kd15T0Vo33U/CpdulHCjZISoy0UjGF6kJL3jnRLZbBE3CvDWU+iCeIWRnzqAGxu3PDdiRZk/TiDpM6OMiEupSOkScur4GiG/R+UwkWyzZmao/Erk74lRUoytaKfOq1iHKi1uhid3oEdjaguHrwoZ1v+EbcdiDj0TdWL2dNMKLvU6g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=vivo.com; dmarc=pass action=none header.from=vivo.com;
+ dkim=pass header.d=vivo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vivo.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=YB24UzYT8fYvSZtDtqyFDzx4FEZM+BL/2udeGnDmwKA=;
+ b=a31cEvM0AcQ4v6cPwb3EHPBy9oCp/JUxlgm36fEVCJLlYSMY7QqOBOBywYjgXO4cCTAphB3vHrVxJUK7WIDgAHRImZXkyr8bVD8KnBl42j20PXfzvKp+pcroNZyH9fZVcDM1cAyS61LHEF/r3U53Ojw2Kmdct1GGrVF4uobo07rj74XSkVN5X37m61I9WA+2yyVn4ljBn4w8RnJjiO5T6qw5Ef6h9vbbOWV/k+dy/e5UsqAH73apXheZ/330/BukTDuptzI6SNy6xZMyULJ/kSGOXcwf6pX1d+uC1shblxCwmfdZkWGR9YXIXMmVZcBsBCe2+XHbxRwhQDZNScXeMQ==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=vivo.com;
+Received: from SEZPR06MB5269.apcprd06.prod.outlook.com (2603:1096:101:78::6)
+ by PSAPR06MB4309.apcprd06.prod.outlook.com (2603:1096:301:8f::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6178.19; Fri, 10 Mar
+ 2023 08:24:24 +0000
+Received: from SEZPR06MB5269.apcprd06.prod.outlook.com
+ ([fe80::daf6:5ebb:a93f:1869]) by SEZPR06MB5269.apcprd06.prod.outlook.com
+ ([fe80::daf6:5ebb:a93f:1869%9]) with mapi id 15.20.6178.019; Fri, 10 Mar 2023
+ 08:24:24 +0000
+From:   Yangtao Li <frank.li@vivo.com>
+To:     axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Yangtao Li <frank.li@vivo.com>
+Subject: [PATCH] block: add queue_logical_block_mask() and bdev_logical_block_mask()
+Date:   Fri, 10 Mar 2023 16:24:13 +0800
+Message-Id: <20230310082413.58141-1-frank.li@vivo.com>
+X-Mailer: git-send-email 2.35.1
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <260064c68b61f4a7bc49f09499e1c107e2a28f31.camel@HansenPartnership.com>
-X-Originating-IP: [106.110.32.122]
-X-ClientProxiedBy: CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347) To
-        CAMSVWEXC02.scsc.local (2002:6a01:e348::6a01:e348)
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFtrOKsWRmVeSWpSXmKPExsWy7djP87pJj7lSDNp2sljsWTSJyWJjP4fF
-        pEPXGC323tK22LP3JIvFvTX/WS32vd7LbHFjwlNGi9aen+wWv3/MYXPg8pg26RSbx+YVWh6b
-        VnWyeWz6NIndY/KN5YweTWeOMntsPl3t8XmTXABHFJdNSmpOZllqkb5dAlfGhQkfmQqeKVZM
-        7P3I0sD4XqqLkZNDQsBE4ta0DrYuRi4OIYEVjBK9K4+zQjhfGCWurDkJ5XxmlNjf9pUZpmXl
-        kkfMEInljBJf3zUxwlU1H3sONWwLo8S/F91MIC0sAqoSTy6uYwOx2QTsJS4tuwU2SkTAWuLL
-        qgVg3cwC/5gk9nxsYgVJCAMlNs3awwhi8wrYSnx8tpYZwhaUODnzCQuIzSxgJdH5AaSeA8iW
-        llj+jwMiLC/RvHU2M0iYUyBYYl1LLsTVShKPX7xlhLBrJU5tucUEslZCYDanxOmfK5kgEi4S
-        L28cY4OwhSVeHd/CDmHLSJye3MMCYWdLXDzTDQ2KEonF74+B7ZIAOrnvTA5E2FHia+8TJogw
-        n8SNt4IQl/FJTNo2HaqaV6KjTWgCo8osJG/NQvLWLIS3ZiF5awEjyypG8dTS4tz01GLDvNRy
-        veLE3OLSvHS95PzcTYzAtHX63/FPOxjnvvqod4iRiYPxEKMEB7OSCO93KY4UId6UxMqq1KL8
-        +KLSnNTiQ4zSHCxK4rzatieThQTSE0tSs1NTC1KLYLJMHJxSDUyL6vL3fN1wmOtmtvuahOm+
-        J1Jipj968pwx/U2AY+mzKwIP9r0+37Tpm+2GtT8jK/0bmnYVV/bO9ws+JBzLZpibdvlj0YvA
-        DcL9v9a4WZquChTIyc++r1A3dY2y0+0lHHMu7f85YXGSleW+ioib55PPMbcKbvz7dnbGFoUn
-        sqIb7NtilHcefx6wa06C1pFiPetPun7cCdrWdvfcbyys1D7uutXonPIrxpYHtfpWK1cseX33
-        QKTP9Hkf1bbKzmP0Ubr57sqFZ1PO8/5TWLGE99ZiZp3yuO1X5d9nnnMVvt9auazsXGwBpym3
-        fgqj2XaTK3EOU/36cyed8z94g/ei3ilW/VWhgt3vTnjd1tAQaTurxFKckWioxVxUnAgA7418
-        2soDAAA=
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrEIsWRmVeSWpSXmKPExsVy+t/xu7qJj7lSDM5s17LYs2gSk8XGfg6L
-        SYeuMVrsvaVtsWfvSRaLe2v+s1rse72X2eLGhKeMFq09P9ktfv+Yw+bA5TFt0ik2j80rtDw2
-        repk89j0aRK7x+Qbyxk9ms4cZfbYfLra4/MmuQCOKD2bovzSklSFjPziElulaEMLIz1DSws9
-        IxNLPUNj81grI1MlfTublNSczLLUIn27BL2MCxM+MhU8U6yY2PuRpYHxvVQXIyeHhICJxMol
-        j5i7GLk4hASWMkrcPnaaGSIhI/Hpykd2CFtY4s+1LjaIoo+MEtM6OlghnC2MEuuPnADrYBFQ
-        lXhycR0biM0mYC9xadktsLiIgLXEl1ULGEEamAX+MUks33mJFSQhDJTYNGsPI4jNK2Ar8fHZ
-        Wqg7lrNIXDn0lgUiIShxcuYTMJtZwEJi5vzzQA0cQLa0xPJ/HBBheYnmrbOZQcKcAsES61py
-        Ia5Wknj84i0jhF0r8fnvM8YJjCKzkAydhWToLIShs5AMXcDIsopRJLW0ODc9t9hIrzgxt7g0
-        L10vOT93EyMwsrcd+7llB+PKVx/1DjEycTAeYpTgYFYS4f0uxZEixJuSWFmVWpQfX1Sak1p8
-        iNEUGEQTmaVEk/OBqSWvJN7QzMDU0MTM0sDU0sxYSZzXs6AjUUggPbEkNTs1tSC1CKaPiYNT
-        qoGpk+UNa+2sTgcf1+enO0/f022fUMrIq5IzS7u+596EP2wC3J4F2ydOD+5dlfEsZP6vBz5M
-        N5jMP1S92yW+3Oid+JRZxhonm3fwS8s6ZzY7CnUGsfw6aVtweBfv1t3p7zT6zTUY0368dJ1v
-        tVPoaPbfHlHzsxqnbqUnfDpw4GZy11vz/S1qS/fZZSmenyK01TQ6avPbT1OZ/PLWNbKHhkSr
-        hjtyZ4t+r7TXnOSe4fLaVWX6jCzm2xPeVRd1Wtg/sK5+Z/bzxMIfF2RnLpvWo/w96uellZx6
-        JQu4+aOacg+d4jrZ0TpDLU8+9dOLFuOzVxev3LRLft+7qGpl3ZP6s2MPemzt+vlO5LAq1ySf
-        f15KLMUZiYZazEXFiQALT+uKdQMAAA==
-X-CMS-MailID: 20230310075929eucas1p1063b67e2f0f2d37e4ab75b16b8cf19d5
-X-Msg-Generator: CA
-X-RootMTR: 20230308181355eucas1p1c94ffee59e210fb762540c888e8eae8a
-X-EPHeader: CA
-CMS-TYPE: 201P
-X-CMS-RootMailID: 20230308181355eucas1p1c94ffee59e210fb762540c888e8eae8a
-References: <edac909b-98e5-cb6d-bb80-2f6a20a15029@suse.de>
-        <ZAOF3p+vqA6pd7px@casper.infradead.org>
-        <0b70deae-9fc7-ca33-5737-85d7532b3d33@suse.de>
-        <ZAWi5KwrsYL+0Uru@casper.infradead.org> <20230306161214.GB959362@mit.edu>
-        <ZAjLhkfRqwQ+vkHI@casper.infradead.org>
-        <CGME20230308181355eucas1p1c94ffee59e210fb762540c888e8eae8a@eucas1p1.samsung.com>
-        <1367983d4fa09dcb63e29db2e8be3030ae6f6e8c.camel@HansenPartnership.com>
-        <20230309080434.tnr33rhzh3a5yc5q@ArmHalley.local>
-        <260064c68b61f4a7bc49f09499e1c107e2a28f31.camel@HansenPartnership.com>
+Content-Type: text/plain
+X-ClientProxiedBy: SG2PR04CA0199.apcprd04.prod.outlook.com
+ (2603:1096:4:187::13) To SEZPR06MB5269.apcprd06.prod.outlook.com
+ (2603:1096:101:78::6)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SEZPR06MB5269:EE_|PSAPR06MB4309:EE_
+X-MS-Office365-Filtering-Correlation-Id: b33c5f41-b69e-479e-71fd-08db2140db33
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: JYR1iyLtonOk5q0x0Jw+sxJ1Lyfjh44vGST0h3TxxBcGsdHGoWKYfE9YQGGefM8qWA4+fDTPfTYKfbABSB7oxuS0zCnlwh8dfpwgs3QaKgKInbr91y6tsQ9MOFvidIdYCAUeF0UgcLMKeQIvtsOrO7PVzMmS64nrSdGdnKJ823sPer7U0za0pAsIkqkgSGPDd5G3Vn5iJq3pvi8aWazqs9pdUK9mc9U+x4X+lGe1M9kMQL57J5lMZzBt+Nomn/6E7xMpFj3NfYb0pGJ8jxD7jeAqx+7wWPvB5n4TB1iUeI8lDGMxFJk6IeuHavF/jQugg5JGN6SwCtIvKbxDB6l0miqi4Kt7bXtUDP82yrk/M8Ris3is6qiArLy+4UhDAOI8MZgSMBz9+Em6GYm27L1oEV6tR23siS2wHZgX+DVII0krMspW0kcLiVZVXR++QBShRhX6vMfxID+9KaTJ9e3GJQpfxP4YC/A3D7QjKxV80c1LJ3PcTWq0t0IYE7bCeSNlfK76ZiVxpbkRZK6wupW7XyJV1g5Zq5eH/CyTHvZ5k1h+ZHrLLCP5E7ghHZ8/O8M/uGBUh7pVLoN2m6H/dCeACFDkFgjdBTWfBkdvvbQ2vYqZCeseHbHeeqK04Nqu+Tee1peNkpN8ej37xp5L1xp1STgCBYeKXDOnHjmbTJY7wzop07d/hXNtzPTS2BI4mog0
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SEZPR06MB5269.apcprd06.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(4636009)(366004)(39860400002)(136003)(346002)(396003)(376002)(451199018)(316002)(36756003)(6506007)(38350700002)(86362001)(38100700002)(41300700001)(6512007)(1076003)(6666004)(26005)(107886003)(83380400001)(186003)(2616005)(8936002)(5660300002)(478600001)(52116002)(6486002)(966005)(6916009)(2906002)(4326008)(66556008)(66476007)(66946007)(8676002);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?W3PgL9yhbeG4Nux0J2Vn+q/F9a0+qmv6uHn4TxjyRHvw6ZlzUyeyF1IBEWLu?=
+ =?us-ascii?Q?c0kpqvKtjtABaowujlbkCii4Qrwym5O7ur8QiH6K73/iShdoPwcVhbBgEc8I?=
+ =?us-ascii?Q?vJNjLoy29/xonehrA8AXWhlpmT6wFcF03CQTdcORblruQx76Bd2N3GvDTdfw?=
+ =?us-ascii?Q?LnErH13t4gCA8HmoaJKogq9wOyrDtF4vh54GJnL/W+tCj4BvQGsYE5v1az1k?=
+ =?us-ascii?Q?rLuCcZ8pgkeP/PyMuOc2LhAH2tvMCQTyZoiFA+DUlRL/7htBravFnX/ZQwkl?=
+ =?us-ascii?Q?WPpSkeUsri4CGmi4FKoUClWeGmOsHwVDBNdigoQmr2fC+Afgm2I7a1LtNd2g?=
+ =?us-ascii?Q?J+WHipymR6Q33soQkMAI16uIlQnYLItc9kB2Hw4/IhJDdpEu4dIo73CxdZBn?=
+ =?us-ascii?Q?kD/vAUWipTCluZiwBYOY53WkwIm/s6eUFMPWHsiKRLyp14cpRRq/pcdow0DU?=
+ =?us-ascii?Q?T0mjvKpoA9Gmdfb8+3Ux/bupNCaGSrj/tFWkI0pUWDCOT2u32nrR1vOc9+8I?=
+ =?us-ascii?Q?gW1fzneE6sDukPv2LWT1Y+FFWvQWsgbnbdKX/EtLJI/WdLk9X2SNHyz5Swaz?=
+ =?us-ascii?Q?ysqORIlCLsaaygyvJgP0gN2Gzri9pG2dSSkkSpSPy9qrQV1gLCgW6T/7sJS4?=
+ =?us-ascii?Q?fGbEIpILdOuU/JiUGxgwGzj88CAwM9QyRhESca3kE479xMe/MbXCCy9Kdt+8?=
+ =?us-ascii?Q?60NZx3Domlat2RyN2R2pe8uYAskIghDCtONCqvfHHzg/NnCgRbKq76RimIpN?=
+ =?us-ascii?Q?Ay57ayHJdOQa7g355uIbmsEer7TrC2Zm+8xBnZZU+r21Nt3yk9zRa2WH1q64?=
+ =?us-ascii?Q?5GG1A3kdy2luCXXBTDb9PP20rLaMvMzDpvZh6VaAiL58ewKIKJBL7qr6dHZO?=
+ =?us-ascii?Q?ypzDnWO/8fmqaI8ywJgnMQp5avh0iK27OEW8AdP76OybxNdnvguDwnkd+nIj?=
+ =?us-ascii?Q?dNGqRAv0g6N4gY4WnKJ/Lzr/wlZcWw+2yq31nMYYrjrwyHNS8pDrmoMEjfLp?=
+ =?us-ascii?Q?553ola4pvgX5c37LFVSIozhtOjv7JBRZwV10FOd0dFaP9k/ZzxIFHNQZ91Cl?=
+ =?us-ascii?Q?JAX0wuPqGFi7utfNMFdgfwMn7o9Xn+c+PazGaEwagX0np2Gx7x54vLM7mWtx?=
+ =?us-ascii?Q?k98YXC+30dAYpLoeaZlBzhJIEJo2lcd2by4Ldo1tJ7C7U2CtH49iSt9WaXiL?=
+ =?us-ascii?Q?vElWxQyDdTZ2Qasupiwz1IPeX9dlBOBGFmh6jJgapSIH5qX7hQG5MEStFIqg?=
+ =?us-ascii?Q?bDZIc5Yu3MY5h++S+AAU/YNMA3m7ak3E9307RPUweGKAPHkziX/Yj8ildP3N?=
+ =?us-ascii?Q?GwPcNANZ2QR7n7/ilK3v6y9OC4br6ap+zvaqyoxil5b3bYaLESo64wxAoSWL?=
+ =?us-ascii?Q?vazbW++xuQqzT9Z8KBnqRg1RuC6LjMTMnrbmlAj+Lfe2KD9gCOTpSQPyq6B1?=
+ =?us-ascii?Q?l4nrfFR6WuL1XnSrh2DA3j/4oh77WMACQ7ZPA3I7W5gbjPbvYRjI1DBI+Kkr?=
+ =?us-ascii?Q?WebPTsRnTlJvcPe06PAiRemh9xSiLS+toyHFSyZfIsf1id1HuXpKTfOVQJZw?=
+ =?us-ascii?Q?4fD8wjioW8xN7tq7oQPHrGnDvNuX9IPrH6taMOht?=
+X-OriginatorOrg: vivo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b33c5f41-b69e-479e-71fd-08db2140db33
+X-MS-Exchange-CrossTenant-AuthSource: SEZPR06MB5269.apcprd06.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Mar 2023 08:24:24.5230
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 923e42dc-48d5-4cbe-b582-1a797a6412ed
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: rs6203TA7g3jCAVdWnTxW9GnHWnNuYbIDthO82nII06aCiAF9AoXxyrmQkJRUVY3hbVH4pPfymA/fMT1H8K52g==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PSAPR06MB4309
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 09.03.2023 08:11, James Bottomley wrote:
->On Thu, 2023-03-09 at 09:04 +0100, Javier González wrote:
->> On 08.03.2023 13:13, James Bottomley wrote:
->> > On Wed, 2023-03-08 at 17:53 +0000, Matthew Wilcox wrote:
->> > > On Mon, Mar 06, 2023 at 11:12:14AM -0500, Theodore Ts'o wrote:
->> > > > What HDD vendors want is to be able to have 32k or even 64k
->> > > > *physical* sector sizes.  This allows for much more efficient
->> > > > erasure codes, so it will increase their byte capacity now that
->> > > > it's no longer easier to get capacity boosts by squeezing the
->> > > > tracks closer and closer, and their have been various
->> > > > engineering tradeoffs with SMR, HAMR, and MAMR.  HDD vendors
->> > > > have been asking for this at LSF/MM, and in othervenues for
->> > > > ***years***.
->> > >
->> > > I've been reminded by a friend who works on the drive side that a
->> > > motivation for the SSD vendors is (essentially) the size of
->> > > sector_t. Once the drive needs to support more than 2/4 billion
->> > > sectors, they need to move to a 64-bit sector size, so the amount
->> > > of memory consumed by the FTL doubles, the CPU data cache becomes
->> > > half as effective, etc. That significantly increases the BOM for
->> > > the drive, and so they have to charge more.  With a 512-byte LBA,
->> > > that's 2TB; with a 4096-byte LBA, it's at 16TB and with a 64k
->> > > LBA, they can keep using 32-bit LBA numbers all the way up to
->> > > 256TB.
->> >
->> > I thought the FTL operated on physical sectors and the logical to
->> > physical was done as a RMW through the FTL?  In which case sector_t
->> > shouldn't matter to the SSD vendors for FTL management because they
->> > can keep the logical sector size while increasing the physical one.
->> > Obviously if physical size goes above the FS block size, the drives
->> > will behave suboptimally with RMWs, which is why 4k physical is the
->> > max currently.
->> >
->>
->> FTL designs are complex. We have ways to maintain sector sizes under
->> 64 bits, but this is a common industry problem.
->>
->> The media itself does not normally oeprate at 4K. Page siges can be
->> 16K, 32K, etc.
->
->Right, and we've always said if we knew what this size was we could
->make better block write decisions.  However, today if you look what
->most NVMe devices are reporting, it's a bit sub-optimal:
->
->jejb@lingrow:/sys/block/nvme1n1/queue> cat logical_block_size
->512
->jejb@lingrow:/sys/block/nvme1n1/queue> cat physical_block_size
->512
->jejb@lingrow:/sys/block/nvme1n1/queue> cat optimal_io_size
->0
->
->If we do get Linux to support large block sizes, are we actually going
->to get better information out of the devices?
+Introduce queue_logical_block_mask() and bdev_logical_block_mask()
+to simplify code, which replace (queue_logical_block_size(q) - 1)
+and (bdev_logical_block_size(bdev) - 1).
 
-We already have this through the NVMe Optimal Performance parameters
-(see Dan's response for this). Note that these values are already
-implemented in the kernel. If I recall properly, Bart was the one doing
-this work.
+Signed-off-by: Yangtao Li <frank.li@vivo.com>
+---
+Like wo done for fs.
+This round we add helpers and start converting in the next cycle.
+https://lore.kernel.org/lkml/20230309124035.15820-1-frank.li@vivo.com/
+ include/linux/blkdev.h | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-More over, from the vendor side, it is a challenge to expose larger LBAs
-without wide support in OSs. I am confident that if we are pushing for
-this work and we see it fits existing FSs, we will see vendors exposing
-new LBA formats in the beginning (same as we have 512b and 4K in the
-same drive), and eventually focusing only on larger LBA sizes.
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index d1aee08f8c18..a68a704e5ea5 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -1173,11 +1173,21 @@ static inline unsigned queue_logical_block_size(const struct request_queue *q)
+ 	return retval;
+ }
+ 
++static inline unsigned int queue_logical_block_mask(const struct request_queue *q)
++{
++	return queue_logical_block_size(q) - 1;
++}
++
+ static inline unsigned int bdev_logical_block_size(struct block_device *bdev)
+ {
+ 	return queue_logical_block_size(bdev_get_queue(bdev));
+ }
+ 
++static inline unsigned int bdev_logical_block_mask(struct block_device *bdev)
++{
++	return bdev_logical_block_size(bdev) - 1;
++}
++
+ static inline unsigned int queue_physical_block_size(const struct request_queue *q)
+ {
+ 	return q->limits.physical_block_size;
+-- 
+2.25.1
 
->
->>  Increasing the block size would allow for better host/device
->> cooperation. As Ted mentions, this has been a requirement for HDD and
->> SSD vendor for years. It seems to us that the time is right now and
->> that we have mechanisms in Linux to do the plumbing. Folios is
->> ovbiously a big part of this.
->
->Well a decade ago we did a lot of work to support 4k sector devices.
->Ultimately the industry went with 512 logical/4k physical devices
->because of problems with non-Linux proprietary OSs but you could still
->use 4k today if you wanted (I've actually still got a working 4k SCSI
->drive), so why is no NVMe device doing that?
-
-Most NVMe devices report 4K today. Actually 512b is mostly an
-optimization targeted at read-heavy workloads.
-
->
->This is not to say I think larger block sizes is in any way a bad idea
->... I just think that given the history, it will be driven by
->application needs rather than what the manufacturers tell us.
-
-I see more and more that this deserves a session at LSF/MM
