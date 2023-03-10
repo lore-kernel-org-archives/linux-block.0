@@ -2,74 +2,102 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CD87C74A4B
-	for <linux-block@archiver.kernel.org>; Fri, 10 Mar 2023 19:34:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 17A48C6FD1E
+	for <linux-block@archiver.kernel.org>; Fri, 10 Mar 2023 20:07:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230060AbjCJTeI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 10 Mar 2023 14:34:08 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57082 "EHLO
+        id S231267AbjCJUHQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 10 Mar 2023 15:07:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51232 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230355AbjCJTd4 (ORCPT
+        with ESMTP id S230427AbjCJUHM (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 10 Mar 2023 14:33:56 -0500
-Received: from mail-ua1-x931.google.com (mail-ua1-x931.google.com [IPv6:2607:f8b0:4864:20::931])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52CA4618BE;
-        Fri, 10 Mar 2023 11:33:49 -0800 (PST)
-Received: by mail-ua1-x931.google.com with SMTP id v48so4261296uad.6;
-        Fri, 10 Mar 2023 11:33:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1678476828;
-        h=to:subject:message-id:date:from:in-reply-to:references:mime-version
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=I1tsoDHbRLd4Gsv2f3QvtJYgVrLylBlGS0wxu++9jiA=;
-        b=C1qXAnzf+O6M8E4oJ1KpcT85YoiCJY0D3cxSx7khMiO/Wh9FWZLM8RkYLSt6GNKnV8
-         8xsttC2yZrVAEb/t6XNV/njYre/AlINl6ixvvI6vBHfTCKKybKz0GOyj4vzTOnMZhgVh
-         wnozj9sEzYJ0demzenhAO9CFrPMqIUWkqqY5bZXyd2JnpgV/HRNtX/niSkOqLYS9gwnh
-         sZduIkN3POpFIladN4uSRZfMWuPKvVKBq4UQeRxj5bg/fxSUyuRZT0Hn0E0zPoOqG2nZ
-         +mkIhWciUzwTvfL9XQs0xjt9ZpVPn0iUm/tZTLlXI0u8SxrDffwecxcOi8gvOCZCISa9
-         tjXg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678476828;
-        h=to:subject:message-id:date:from:in-reply-to:references:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=I1tsoDHbRLd4Gsv2f3QvtJYgVrLylBlGS0wxu++9jiA=;
-        b=Tyd+HhXIVoCLuQFZrwhLV7TBJaCfGbzgTnxmaGdHJGucvgXj3gWVT29iZlthNHtYfk
-         ilbbfOJ5UZ6GUh0w/dgm0afMc3EdusWgxtJ5U/bBepL6LJ3SesB5NJTpF8F00ZqiDq5f
-         qZvE+RwmCVmp9f35sWaTezTq0YiMKbUuGCTaRwD3KD/AWCTqczyLEQPtD5W/NBQQes6H
-         PM9HjEmAxoz0mnovkLA5JH5g8oHIlowzWv5jQW5vy+4xxFGYTQs9YCAjGN+t4f1zEDPa
-         0VbOECUVSXmTZdLrjkxzkeTje5nAaKPQ3F96hVVQ5UxWDQY5HPadE+PmmBFg/hBuRPe7
-         N8Sw==
-X-Gm-Message-State: AO0yUKUOiGEf/XBJUJ6ArtUd8Z4p6UEp7+sh1tSnVV0w09VkrgOCAEch
-        4nm7dTC7GgBnTTEURRV/GY0A0XFIfximFFH21+ieKhWXAfm0FG22
-X-Google-Smtp-Source: AK7set9KRzPYK0gGoSDnMf/s/6uN1AuDxWAQvoeWKltmWdl/WPVumAR6jyG+9JpItD7bT5IZr7vw4dAnUeAx/gS/4q4=
-X-Received: by 2002:a1f:4384:0:b0:41d:fe99:4633 with SMTP id
- q126-20020a1f4384000000b0041dfe994633mr16805286vka.2.1678476828197; Fri, 10
- Mar 2023 11:33:48 -0800 (PST)
-MIME-Version: 1.0
-References: <CAOCAAm7AEY9tkZpu2j+Of91fCE4UuE_PqR0UqNv2p2mZM9kqKw@mail.gmail.com>
-In-Reply-To: <CAOCAAm7AEY9tkZpu2j+Of91fCE4UuE_PqR0UqNv2p2mZM9kqKw@mail.gmail.com>
-From:   Mike Cloaked <mike.cloaked@gmail.com>
-Date:   Fri, 10 Mar 2023 19:33:37 +0000
-Message-ID: <CAOCAAm4reGhz400DSVrh0BetYD3Ljr2CZen7_3D4gXYYdB4SKQ@mail.gmail.com>
-Subject: Re: Possible kernel fs block code regression in 6.2.3 umounting usb drives
-To:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+        Fri, 10 Mar 2023 15:07:12 -0500
+Received: from wout5-smtp.messagingengine.com (wout5-smtp.messagingengine.com [64.147.123.21])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 425D9126F06;
+        Fri, 10 Mar 2023 12:07:09 -0800 (PST)
+Received: from compute6.internal (compute6.nyi.internal [10.202.2.47])
+        by mailout.west.internal (Postfix) with ESMTP id 407C932003C0;
+        Fri, 10 Mar 2023 15:07:06 -0500 (EST)
+Received: from imap51 ([10.202.2.101])
+  by compute6.internal (MEProxy); Fri, 10 Mar 2023 15:07:06 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
+        :cc:content-type:content-type:date:date:from:from:in-reply-to
+        :in-reply-to:message-id:mime-version:references:reply-to:sender
+        :subject:subject:to:to; s=fm1; t=1678478825; x=1678565225; bh=0a
+        Ymj5tx8ig6QH6sJhzcEPY7Nw5ZBynuJPqxTvDXknM=; b=X5SC3oGJ1EZkFs8ADD
+        QVEjij51GN0LONEbpD6hZlYAnCAyOxHB/gFebYyrdKkWFPpYeZ8Ekojii9DGHmhk
+        NuBEKgBccRnqnpkf1bwkTbG11Wx6ZsIYpEcAjpvDZwqR+r8If9LLEn3/3tKl5jiR
+        KIXh71Rvp5EdS8mY+Vv6InffJAiSovUyHbykouSLymLzscVVo4JAdCHSEMTfRFbj
+        kufQxdZbwlk6CjcOy1VRp48RBpwGu2jRTDwJ3oRtPok05nduJx58UG6oBsp0Hi/q
+        sYvXorvn29xBldNcEVVc5Ce/4US4FzQCRi9b++9OBz4s/c5OwEmgHrWPnCi80hSp
+        Ve3g==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:cc:content-type:content-type:date:date
+        :feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+        :message-id:mime-version:references:reply-to:sender:subject
+        :subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
+        :x-sasl-enc; s=fm1; t=1678478825; x=1678565225; bh=0aYmj5tx8ig6Q
+        H6sJhzcEPY7Nw5ZBynuJPqxTvDXknM=; b=emaikchmYYs5S9yN9qw7620/5cxeP
+        a3pzILMyUL+Iz3TjbcPSeUXhgluPzTHXu8eshOEMhlwZ+3pantwcpDBDUcd094Ms
+        yIHZwVPKdwGZuAWeMmyA72Ef8Oh+qipTK7xSr3tbXRyyNBYAJXzMuiuGpEqWC8p6
+        wYyXGsZOITWS8h5trFBjkrAHuvxaqgefwN/KYDFuubn6liRXjPXhUpZatSA71ukZ
+        LaGMcwPgrJsjT55ocE/nyMeVyKwSNgR1UuGCNS2ova0zrXDx3FwOUN9LMspMbt4W
+        9sor26Ysa7FuEcRPKgHz64QhVDVvJYj/gmOnGGf6uftFm3EEsaaEGZ+mA==
+X-ME-Sender: <xms:6Y0LZL4hM-WTjE7oYScaxRaC4bmFlHc401-aeXrUMWqRgx2kKUepdw>
+    <xme:6Y0LZA4uNK5KMORPICWxUj4OoL7PjxR6CmxGyKuukUMu0uZ2a1LwmkdjW2z7179bY
+    PHFEXcxs0wf0zlhi2U>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvhedrvddukedguddvlecutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
+    necuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+    enucfjughrpefofgggkfgjfhffhffvvefutgesthdtredtreertdenucfhrhhomhepfdet
+    rhhnugcuuegvrhhgmhgrnhhnfdcuoegrrhhnugesrghrnhgusgdruggvqeenucggtffrrg
+    htthgvrhhnpeffheeugeetiefhgeethfejgfdtuefggeejleehjeeutefhfeeggefhkedt
+    keetffenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpe
+    grrhhnugesrghrnhgusgdruggv
+X-ME-Proxy: <xmx:6Y0LZCeI4J1F1ejZsac9taQx3HQQ2wtWYwOz_LvnafEMtTHfkqPJ9w>
+    <xmx:6Y0LZMJuxI1NjEo29mH0yiYmAjDPykYQR8yQqSilWZSRTP7yTZDQ8w>
+    <xmx:6Y0LZPI4QWu68qVcwMHW6SDIGnvwPH3fgeJCqxq3TQaguypMs_GxNQ>
+    <xmx:6Y0LZMpXXbTU9riN2MVYqmKlpXj3JzLs5aTumgZAio8D2aERXyZr0Q>
+Feedback-ID: i56a14606:Fastmail
+Received: by mailuser.nyi.internal (Postfix, from userid 501)
+        id 9843DB60086; Fri, 10 Mar 2023 15:07:05 -0500 (EST)
+X-Mailer: MessagingEngine.com Webmail Interface
+User-Agent: Cyrus-JMAP/3.9.0-alpha0-206-g57c8fdedf8-fm-20230227.001-g57c8fded
+Mime-Version: 1.0
+Message-Id: <1a2c5d85-049c-4512-be39-1319fa790924@app.fastmail.com>
+In-Reply-To: <20230310160757.199253-1-thuth@redhat.com>
+References: <20230310160757.199253-1-thuth@redhat.com>
+Date:   Fri, 10 Mar 2023 21:06:44 +0100
+From:   "Arnd Bergmann" <arnd@arndb.de>
+To:     "Thomas Huth" <thuth@redhat.com>, linux-kernel@vger.kernel.org
+Cc:     Linux-Arch <linux-arch@vger.kernel.org>,
+        "Chas Williams" <3chas3@gmail.com>,
+        "Palmer Dabbelt" <palmer@dabbelt.com>, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org,
+        linux-atm-general@lists.sourceforge.net,
+        Netdev <netdev@vger.kernel.org>,
+        "Christoph Hellwig" <hch@infradead.org>
+Subject: Re: [PATCH v2 0/5] Remove #ifdef CONFIG_* from uapi headers (2023 edition)
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-With kerne. 6.2.3 if I simply plug in a usb external drive, mount it
-and umount it, then the journal has a kernel Oops and I have submitted
-a bug report, that includes the journal output, at
-https://bugzilla.kernel.org/show_bug.cgi?id=217174
+On Fri, Mar 10, 2023, at 17:07, Thomas Huth wrote:
+> uapi headers should not use the kernel-internal CONFIG switches.
+> Palmer Dabbelt sent some patches to clean this up a couple of years
+> ago, but unfortunately some of those patches never got merged.
+> So here's a rebased version of those patches - since they are rather
+> trivial, I hope it's OK for everybody if they could go through Arnd's
+> "generic include/asm header files" branch.
+>
+> v2:
+> - Added Reviewed-bys from v1
+> - Changed the CONFIG_CDROM_PKTCDVD_WCACHE patch according to Christoph's
+>   suggestion
+> - Added final patch to clean the list in scripts/headers_install.sh
 
-As soon as the usb drive is unmounted, the kernel Oops occurs, and the
-machine hangs on shutdown and needs a hard reboot.
+Thanks for the rebase, applied to the asm-generic tree now, as I'm
+fairly optimistic they are all good.
 
-I have reproduced the same issue on three different machines, and in
-each case downgrading back to kernel 6.2.2 resolves the issue and it
-no longer occurs.
-
-This would seem to be a regression in kernel 6.2.3
-
-Mike C
+    Arnd
