@@ -2,121 +2,149 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D56E6C6FD1F
-	for <linux-block@archiver.kernel.org>; Fri, 10 Mar 2023 16:51:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC3EBC6FD1F
+	for <linux-block@archiver.kernel.org>; Fri, 10 Mar 2023 17:09:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230383AbjCJQvM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 10 Mar 2023 11:51:12 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38512 "EHLO
+        id S231405AbjCJRJH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 10 Mar 2023 12:09:07 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46540 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230458AbjCJQuc (ORCPT
+        with ESMTP id S230448AbjCJRHt (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 10 Mar 2023 11:50:32 -0500
-Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BEFC713480C;
-        Fri, 10 Mar 2023 08:47:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1678466860; x=1710002860;
-  h=from:to:subject:date:message-id:in-reply-to:references:
-   mime-version:content-transfer-encoding;
-  bh=GUE2klioiCUZxp/OgoQzXCq9RQkFrhiLvLdVx5qpQ9s=;
-  b=XgHqTARj0TPabh2T/N51XATBtqbwxJw02v9x8cGVucBc5C1U+a3KoXaL
-   lt7UND59Uet6n7qFptwB8k0/Vq4Vsr6TduxaS4uVUMVrT9gqahJJfQrfm
-   4FppnYTVdUrPIWbsRl2gWfkZUMdmhRsKDU1CCzDYbQPW7pYMRkjv33USC
-   HjwATU3GjVlcrLooi99lUYvfpOwvSrAWBF2ekXHeI/IYg4TSGGxsJZEPb
-   V7Cb4KIipIHK45GA6oxhe7X4hJe1AY6/ahyUDCOiGF5oSsKHz+2q1JVll
-   dhZKi6+mBER2mGQcjGMjAVIpx3Gr+sW+oq9FWI9DVapFpWhRvyxQJXEQw
-   A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10645"; a="320621153"
-X-IronPort-AV: E=Sophos;i="5.98,250,1673942400"; 
-   d="scan'208";a="320621153"
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Mar 2023 08:45:13 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10645"; a="746778640"
-X-IronPort-AV: E=Sophos;i="5.98,250,1673942400"; 
-   d="scan'208";a="746778640"
-Received: from black.fi.intel.com ([10.237.72.28])
-  by fmsmga004.fm.intel.com with ESMTP; 10 Mar 2023 08:45:11 -0800
-Received: by black.fi.intel.com (Postfix, from userid 1003)
-        id 6D93C59E; Fri, 10 Mar 2023 18:45:53 +0200 (EET)
-From:   Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To:     Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Fri, 10 Mar 2023 12:07:49 -0500
+Received: from mail5.swissbit.com (mail5.swissbit.com [148.251.244.252])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EBE3B18B19;
+        Fri, 10 Mar 2023 09:06:39 -0800 (PST)
+Received: from mail5.swissbit.com (localhost [127.0.0.1])
+        by DDEI (Postfix) with ESMTP id BB9393A2B24;
+        Fri, 10 Mar 2023 18:06:34 +0100 (CET)
+Received: from mail5.swissbit.com (localhost [127.0.0.1])
+        by DDEI (Postfix) with ESMTP id A48383A2B18;
+        Fri, 10 Mar 2023 18:06:34 +0100 (CET)
+X-TM-AS-ERS: 10.181.10.103-127.5.254.253
+X-TM-AS-SMTP: 1.0 bXgxLmRtei5zd2lzc2JpdC5jb20= Y2xvZWhsZUBoeXBlcnN0b25lLmNvb
+        Q==
+X-DDEI-TLS-USAGE: Used
+Received: from mx1.dmz.swissbit.com (mx.dmz.swissbit.com [10.181.10.103])
+        by mail5.swissbit.com (Postfix) with ESMTPS;
+        Fri, 10 Mar 2023 18:06:34 +0100 (CET)
+From:   =?utf-8?B?Q2hyaXN0aWFuIEzDtmhsZQ==?= <CLoehle@hyperstone.com>
+To:     Ulf Hansson <ulf.hansson@linaro.org>
+CC:     "linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>,
         Jens Axboe <axboe@kernel.dk>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v2 9/9] pktcdvd: Sort headers
-Date:   Fri, 10 Mar 2023 18:45:49 +0200
-Message-Id: <20230310164549.22133-10-andriy.shevchenko@linux.intel.com>
-X-Mailer: git-send-email 2.39.1
-In-Reply-To: <20230310164549.22133-1-andriy.shevchenko@linux.intel.com>
-References: <20230310164549.22133-1-andriy.shevchenko@linux.intel.com>
+        Wenchao Chen <wenchao.chen666@gmail.com>,
+        Adrian Hunter <adrian.hunter@intel.com>,
+        Avri Altman <avri.altman@wdc.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: RE: [RFC PATCH] mmc: core: Disable REQ_FUA if the eMMC supports an
+ internal cache
+Thread-Topic: [RFC PATCH] mmc: core: Disable REQ_FUA if the eMMC supports an
+ internal cache
+Thread-Index: AQHZTRVhGw7IamWdbkW+N3YLAv3UBK70EaAwgAADtICAACp0AA==
+Date:   Fri, 10 Mar 2023 17:06:32 +0000
+Message-ID: <4a2c5b752968496ca72966f80e148d47@hyperstone.com>
+References: <20230302144330.274947-1-ulf.hansson@linaro.org>
+ <54cee7de4ab7479db74b21e64e5f53cf@hyperstone.com>
+ <CAPDyKFq-qToEX+qiuHirNbcuedii_f0KKuHiPAv7+tydrUTpqQ@mail.gmail.com>
+In-Reply-To: <CAPDyKFq-qToEX+qiuHirNbcuedii_f0KKuHiPAv7+tydrUTpqQ@mail.gmail.com>
+Accept-Language: en-US, de-DE
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+Content-Type: text/plain;
+        charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-TMASE-Version: DDEI-5.1-9.0.1002-27496.001
+X-TMASE-Result: 10--32.656200-10.000000
+X-TMASE-MatchedRID: UGkmQMDcUOnUL3YCMmnG4vHkpkyUphL9dwX/SSKrKHjKV5hCFWDUirX9
+        hnMqzl+7X64KjR1hKzpMCgkc3/BmTYd/gi/Pxf7NPMcAlOC0qrDhx1VJT84rPRHfiujuTbedXH3
+        W+57nGflI/gFRC4jJyCcntLVR9yI1xONdUAdRajMR3SGennXG69FBNyU0Q3FE7zyq0taM3pjxhu
+        T2TM8RaFGyxACqIZ7HSH8ogO2fTuw5rof3b4z0VKtK3oodxPaxsVwPMKjZm1ZcZUa13Wf//3VXQ
+        3/qdw5y8+PJOD6ybejCnfj2t9y5LAHth38hX4u2HFAJdqqxfclpeZ1cXZibx1DlkDrrCwNSuLOn
+        20yiTmb4uMbkNFIz6Mqv4cKQcFXisK6XZdVVEg/P01G0ZRd+f5XdNEOUjtKuXfXw2EpveOVdvdj
+        b5Iwdbstt6YaNEW8D4oYOs4DZ8uEzB98Fjsee54h/ebSxR/Hn37jcLTY9yERXPwnnY5XL5Jw6cu
+        pP5YJ9PaFSMG/LkqMyNCoZMgfGS/tzqsXu3a66olVO7uyOCDUArX6cHuDjb5soi2XrUn/J+ZL5o
+        +vRV7xKWdTfwsJjy2LHjeGkjh9X3QfwsVk0Ubv+efAnnZBiL6nKAIYoU8L4F5iXm5LZACA=
+X-TMASE-SNAP-Result: 1.821001.0001-0-1-22:0,33:0,34:0-0
+X-TMASE-INERTIA: 0-0;;;;
+X-TMASE-XGENCLOUD: 15e7a894-2ef4-418f-8141-0474105ff189-0-0-200-0
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Sort the headers in alphabetic order in order to ease
-the maintenance for this part.
-
-Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Reviewed-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
----
- drivers/block/pktcdvd.c | 31 ++++++++++++++++---------------
- 1 file changed, 16 insertions(+), 15 deletions(-)
-
-diff --git a/drivers/block/pktcdvd.c b/drivers/block/pktcdvd.c
-index 22048739a245..93597bde9c33 100644
---- a/drivers/block/pktcdvd.c
-+++ b/drivers/block/pktcdvd.c
-@@ -46,29 +46,30 @@
- 
- #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
- 
--#include <linux/pktcdvd.h>
--#include <linux/module.h>
--#include <linux/types.h>
--#include <linux/kernel.h>
-+#include <linux/backing-dev.h>
- #include <linux/compat.h>
--#include <linux/kthread.h>
-+#include <linux/debugfs.h>
-+#include <linux/device.h>
- #include <linux/errno.h>
--#include <linux/spinlock.h>
- #include <linux/file.h>
--#include <linux/proc_fs.h>
--#include <linux/seq_file.h>
--#include <linux/miscdevice.h>
- #include <linux/freezer.h>
-+#include <linux/kernel.h>
-+#include <linux/kthread.h>
-+#include <linux/miscdevice.h>
-+#include <linux/module.h>
- #include <linux/mutex.h>
-+#include <linux/nospec.h>
-+#include <linux/pktcdvd.h>
-+#include <linux/proc_fs.h>
-+#include <linux/seq_file.h>
- #include <linux/slab.h>
--#include <linux/backing-dev.h>
-+#include <linux/spinlock.h>
-+#include <linux/types.h>
-+#include <linux/uaccess.h>
-+
-+#include <scsi/scsi.h>
- #include <scsi/scsi_cmnd.h>
- #include <scsi/scsi_ioctl.h>
--#include <scsi/scsi.h>
--#include <linux/debugfs.h>
--#include <linux/device.h>
--#include <linux/nospec.h>
--#include <linux/uaccess.h>
- 
- #include <asm/unaligned.h>
- 
--- 
-2.39.1
+DQo+Pg0KPj4gSSBoYXZlIGJlbmNobWFya2VkIHRoZSBGVUEvQ2FjaGUgYmVoYXZpb3IgYSBiaXQu
+DQo+PiBJIGRvbid0IGhhdmUgYW4gYWN0dWFsIGZpbGVzeXN0ZW0gYmVuY2htYXJrIHRoYXQgZG9l
+cyB3aGF0IEkgd2FudGVkIGFuZCBpcyBlYXN5IHRvIHBvcnQgdG8gdGhlIHRhcmdldCBzbyBJIHVz
+ZWQ6DQo+Pg0KPj4gIyBjYWxsIHdpdGgNCj4+ICMgZm9yIGxvb3AgaW4gezEuLjN9OyBkbyBzdWRv
+IGRkIGlmPS9kZXYvdXJhbmRvbSBicz0xTSANCj4+IG9mPS9kZXYvbW1jYmxrMjsgZG9uZTsgZm9y
+IGxvb3AgaW4gezEuLjV9OyBkbyB0aW1lIA0KPj4gLi9maWxlc3lzdGVtYmVuY2htYXJrLnNoOyB1
+bW91bnQgL21udDsgZG9uZQ0KPj4gbWtmcy5leHQ0IC1GIC9kZXYvbW1jYmxrMg0KPj4gbW91bnQg
+L2Rldi9tbWNibGsyIC9tbnQNCj4+IGZvciBpIGluIHsxLi4zfQ0KPj4gZG8NCj4+IGNwIC1yIGxp
+bnV4LTYuMi4yIC9tbnQvJGkNCj4+IGRvbmUNCj4+IGZvciBpIGluIHsxLi4zfQ0KPj4gZG8NCj4+
+IHJtIC1yIC9tbnQvJGkNCj4+IGRvbmUNCj4+IGZvciBpIGluIHsxLi4zfQ0KPj4gZG8NCj4+IGNw
+IC1yIGxpbnV4LTYuMi4yIC9tbnQvJGkNCj4+IGRvbmUNCj4+DQo+Pg0KPj4gSSBmb3VuZCBhIGNv
+dXBsZSBvZiBEVVRzIHRoYXQgSSBjYW4gbGluaywgSSBhbHNvIHRlc3RlZCBvbmUgaW5kdXN0cmlh
+bCBjYXJkLg0KPj4NCj4+IERVVDE6IGJsdWUgUENCIEZvcmVzZWUgZU1NQw0KPj4gaHR0cHM6Ly9w
+aW5lNjQuY29tL3Byb2R1Y3QvMzJnYi1lbW1jLW1vZHVsZS8NCj4+IERVVDI6IGdyZWVuIFBDQiBT
+aWxpY29uR28gZU1NQw0KPj4gQ291bGRuJ3QgZmluZCB0aGF0IG9uZSBvbmxpbmUgYW55bW9yZSB1
+bmZvcnR1bmF0ZWx5DQo+PiBEVVQzOiBvcmFuZ2UgaGFyZGtlcm5lbCBQQ0IgOEdCDQo+PiBodHRw
+czovL3d3dy5oYXJka2VybmVsLmNvbS9zaG9wLzhnYi1lbW1jLW1vZHVsZS1jMi1hbmRyb2lkLw0K
+Pj4gRFVUNDogb3JhbmdlIGhhcmRrZXJuZWwgUENCIHdoaXRlIGRvdA0KPj4gaHR0cHM6Ly9ybHgu
+c2svZW4vb2Ryb2lkLzMxOTgtMTZnYi1lbW1jLTUwLW1vZHVsZS14dTMtYW5kcm9pZC1mb3Itb2Ry
+bw0KPj4gaWQteHUzLmh0bWwNCj4+IERVVDU6IEluZHVzdHJpYWwgY2FyZA0KPg0KPiBUaGFua3Mg
+YSBsb3QgZm9yIGhlbHBpbmcgb3V0IHdpdGggdGVzdGluZyEgTXVjaCBhcHByZWNpYXRlZCENCg0K
+Tm8gcHJvYmxlbSwgZ2xhZCB0byBiZSBvZiBoZWxwLg0KDQo+DQo+Pg0KPj4NCj4+IFRoZSB0ZXN0
+IGlzc3VlZCA0NjEgRE9fUkVMX1dSIGR1cmluZyBvbmUgb2YgdGhlIGl0ZXJhdGlvbnMgZm9yIERV
+VDUNCj4+DQo+PiBEVVQxOg0KPj4gQ2FjaGUsIG5vIEZVQToNCj4+IDEzOjA0LjQ5DQo+PiAxMzox
+My44Mg0KPj4gMTM6MzAuNTkNCj4+IDEzOjI4OjEzDQo+PiAxMzoyMDo2NA0KPj4gRlVBOg0KPj4g
+MTM6MzAuMzINCj4+IDEzOjM2LjI2DQo+PiAxMzoxMC44Ng0KPj4gMTM6MzIuNTINCj4+IDEzOjQ4
+LjU5DQo+Pg0KPj4gRFVUMjoNCj4+IEZVQToNCj4+IDg6MTEuMjQNCj4+IDc6NDcuNzMNCj4+IDc6
+NDguMDANCj4+IDc6NDguMTgNCj4+IDc6NDcuMzgNCj4+IENhY2hlLCBubyBGVUE6DQo+PiA4OjEw
+LjMwDQo+PiA3OjQ4Ljk3DQo+PiA3OjQ4LjQ3DQo+PiA3OjQ3LjkzDQo+PiA3OjQ0LjE4DQo+Pg0K
+Pj4gRFVUMzoNCj4+IENhY2hlLCBubyBGVUE6DQo+PiA3OjAyLjgyDQo+PiA2OjU4Ljk0DQo+PiA3
+OjAzLjIwDQo+PiA3OjAwLjI3DQo+PiA3OjAwLjg4DQo+PiBGVUE6DQo+PiA3OjA1LjQzDQo+PiA3
+OjAzLjQ0DQo+PiA3OjA0LjgyDQo+PiA3OjAzLjI2DQo+PiA3OjA0Ljc0DQo+Pg0KPj4gRFVUNDoN
+Cj4+IEZVQToNCj4+IDc6MjMuOTINCj4+IDc6MjAuMTUNCj4+IDc6MjAuNTINCj4+IDc6MTkuMTAN
+Cj4+IDc6MjAuNzENCj4+IENhY2hlLCBubyBGVUE6DQo+PiA3OjIwLjIzDQo+PiA3OjIwLjQ4DQo+
+PiA3OjE5Ljk0DQo+PiA3OjE4LjkwDQo+PiA3OjE5Ljg4DQo+DQo+IFdpdGhvdXQgZ29pbmcgaW50
+byB0aGUgZGV0YWlscyBvZiB0aGUgYWJvdmUsIGl0IHNlZW1zIGxpa2UgZm9yIERVVDEsIERVVDIs
+IERVVDMgYW5kIERVVDQgdGhlcmUgYSBnb29kIHJlYXNvbnMgdG8gd2h5IHdlIHNob3VsZCBtb3Zl
+IGZvcndhcmQgd2l0aCAkc3ViamVjdCBwYXRjaC4NCj4NCj4gRG8geW91IGFncmVlPw0KDQpUaGF0
+IGlzIGEgZ29vZCBxdWVzdGlvbiwgdGhhdCdzIHdoeSBJIGp1c3QgcG9zdGVkIHRoZSBkYXRhIHdp
+dGhvdXQgZnVydGhlciBjb21tZW50IGZyb20gbXkgc2lkZS4NCkkgd2FzIGhvbmVzdGx5IGV4cGVj
+dGluZyB0aGUgZGlmZmVyZW5jZSB0byBiZSBtdWNoIGhpZ2hlciwgZ2l2ZW4gdGhlIG9yaWdpbmFs
+IHBhdGNoLg0KSWYgdGhpcyBpcyByZXByZXNlbnRhdGl2ZSBmb3IgbW9zdCBjYXJkcywgeW91IHdv
+dWxkIHJlcXVpcmUgcXVpdGUgYW4gdW51c3VhbCB3b3JrbG9hZCB0byBhY3R1YWxseSBub3RpY2Ug
+dGhlIGRpZmZlcmVuY2UgSU1PLg0KSWYgdGhlcmUgYXJlIGNhcmRzIHdoZXJlIHRoZSBkaWZmZXJl
+bmNlIGlzIG11Y2ggbW9yZSBzaWduaWZpY2FudCB0aGVuIG9mIGNvdXJzZSBhIHF1aXJrIHdvdWxk
+IGJlIG5pY2VyLg0KT24gdGhlIG90aGVyIHNpZGUgSSBkb24ndCBzZWUgd2h5IG5vdCBhbmQgYW55
+IGltcHJvdmVtZW50IGlzIGEgZ29vZCBvbmU/DQoNCj4NCj4+DQo+PiBDYWNoZSwgbm8gRlVBOg0K
+Pj4gNzoxOS4zNg0KPj4gNzowMi4xMQ0KPj4gNzowMS41Mw0KPj4gNzowMS4zNQ0KPj4gNzowMC4z
+Nw0KPj4gQ2FjaGUsIG5vIEZVQSBDUUU6DQo+PiA3OjE3LjU1DQo+PiA3OjAwLjczDQo+PiA2OjU5
+LjI1DQo+PiA2OjU4LjQ0DQo+PiA2OjU4LjYwDQo+PiBGVUE6DQo+PiA3OjE1LjEwDQo+PiA2OjU4
+Ljk5DQo+PiA2OjU4Ljk0DQo+PiA2OjU5LjE3DQo+PiA2OjYwLjAwDQo+PiBGVUEgQ1FFOg0KPj4g
+NzoxMS4wMw0KPj4gNjo1OC4wNA0KPj4gNjo1Ni44OQ0KPj4gNjo1Ni40Mw0KPj4gNjo1NjoyOA0K
+Pj4NCj4+IElmIGFueW9uZSBoYXMgYW55IGNvbW1lbnRzIG9yIGRpc2FncmVlcyB3aXRoIHRoZSBi
+ZW5jaG1hcmssIG9yIGhhcyBhIHNwZWNpZmljIGVNTUMgdG8gdGVzdCwgbGV0IG1lIGtub3cuDQo+
+DQo+IElmIEkgdW5kZXJzdGFuZCBjb3JyZWN0bHksIGZvciBEVVQ1LCBpdCBzZWVtcyBsaWtlIHVz
+aW5nIEZVQSBtYXkgYmUgc2xpZ2h0bHkgYmV0dGVyIHRoYW4ganVzdCBjYWNoZS1mbHVzaGluZywg
+cmlnaHQ/DQoNClRoYXQgaXMgY29ycmVjdCwgSSBzcGVjaWZpY2FsbHkgdGVzdGVkIHdpdGggdGhp
+cyBjYXJkIGFzIHVuZGVyIHRoZSBhc3N1bXB0aW9uIHRoYXQgcmVsaWFibGUgd3JpdGUgaXMgd2l0
+aG91dCBtdWNoIGFkZGl0aW9uYWwgY29zdCwgdGhlIERDTUQgd291bGQgYmUgc2xpZ2h0bHkgd29y
+c2UgZm9yIHBlcmZvcm1hbmNlIGFuZCBTWU5DIGEgYml0IHdvcnNlLg0KDQo+DQo+IEZvciBDUUUs
+IGl0IHNlZW1zIGxpa2UgRlVBIGNvdWxkIGJlIHNsaWdodGx5IGV2ZW4gYmV0dGVyLCBhdCBsZWFz
+dCBmb3IgRFVUNS4gIERvIHlvdSBrbm93IGlmIFJFUV9PUF9GTFVTSCB0cmFuc2xhdGVzIGludG8g
+TU1DX0lTU1VFX0RDTUQgb3IgTU1DX0lTU1VFX1NZTkMgZm9yIHlvdXIgY2FzZT8gU2VlIG1tY19j
+cWVfaXNzdWVfdHlwZSgpLg0KSXQgaXMgU1lOQyAodGhpcyBpcyBzZGhjaS1vZi1hcmFzYW4gb24g
+cmszMzk5LCBubyBEQ01EKSwgYnV0IGV2ZW4gU1lOQyBpcyBub3QgdG9vIGJhZCBoZXJlIGl0IHNl
+ZW1zLCBjb3VsZCBvZiBjb3Vyc2UgYmUgd29yc2UgaWYgdGhlIHdvcmtsb2FkIHdhcyBsZXNzIHNl
+cXVlbnRpYWwuDQoNCj4NCj4gV2hlbiBpdCBjb21lcyB0byBDUUUsIG1heWJlIEFkcmlhbiBoYXZl
+IHNvbWUgYWRkaXRpb25hbCB0aG91Z2h0cyBhcm91bmQgdGhpcz8gUGVyaGFwcyB3ZSBzaG91bGQg
+a2VlcCB1c2luZyBSRVFfRlVBLCBpZiB3ZSBoYXZlIENRRT8NClN1cmUsIEknbSBhbHNvIGludGVy
+ZXN0ZWQgaW4gQWRyaWFuJ3MgdGFrZSBvbiB0aGlzLg0KDQpSZWdhcmRzLA0KQ2hyaXN0aWFuDQoN
+Ckh5cGVyc3RvbmUgR21iSCB8IFJlaWNoZW5hdXN0ci4gMzlhICB8IDc4NDY3IEtvbnN0YW56Ck1h
+bmFnaW5nIERpcmVjdG9yOiBEci4gSmFuIFBldGVyIEJlcm5zLgpDb21tZXJjaWFsIHJlZ2lzdGVy
+IG9mIGxvY2FsIGNvdXJ0czogRnJlaWJ1cmcgSFJCMzgxNzgy
 
