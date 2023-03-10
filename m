@@ -2,67 +2,93 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C0A30C64EC4
-	for <linux-block@archiver.kernel.org>; Thu,  9 Mar 2023 23:26:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F124C64EC4
+	for <linux-block@archiver.kernel.org>; Fri, 10 Mar 2023 01:10:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230407AbjCIX05 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 9 Mar 2023 18:26:57 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52198 "EHLO
+        id S229459AbjCJBKm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 9 Mar 2023 20:10:42 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47348 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229823AbjCIX0z (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 9 Mar 2023 18:26:55 -0500
-Received: from todd.t-8ch.de (todd.t-8ch.de [159.69.126.157])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00B221033A2;
-        Thu,  9 Mar 2023 15:26:54 -0800 (PST)
-Date:   Thu, 9 Mar 2023 23:26:44 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=weissschuh.net;
-        s=mail; t=1678404413;
-        bh=ux9NVh/SJtqN4uPNVCVjQcIF51NeF7WtFGZPYrwhnms=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=tNHAlZ4tTynjTBhZNO16V0LxrPNdrSz+TnjI0442bxnlHLzVeWJKEly1Ew/X7CqQg
-         jUgVchU6pEx/ruVYvtNyaLTeSuGfG9WteuSjQOqB8Lsj+0je3DU2AFyNMOJnRMgEwh
-         8MuQaG3RPQRbkWcxXvM77Vo2Fh0gbc/rR+PLJJJA=
-From:   Thomas =?utf-8?Q?Wei=C3=9Fschuh?= <linux@weissschuh.net>
-To:     Mirsad Goran Todorovac <mirsad.todorovac@alu.unizg.hr>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Subject: Re: [PATCH] block: don't embed integrity_kobj into gendisk
-Message-ID: <7f977a5d-8302-4a32-9dce-f6d7637b2555@t-8ch.de>
-References: <20230309-kobj_release-gendisk_integrity-v1-1-a240f54eac60@weissschuh.net>
- <d85ba503-d93c-3483-25e1-6043d4af444f@alu.unizg.hr>
- <0ac9777c-7586-494f-bbc5-87f14f645b12@t-8ch.de>
- <d10f18b4-56cf-8a55-b12f-79b1163d8841@alu.unizg.hr>
+        with ESMTP id S229445AbjCJBKm (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 9 Mar 2023 20:10:42 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BFBBAE6FD9
+        for <linux-block@vger.kernel.org>; Thu,  9 Mar 2023 17:10:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1678410601;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=1LmAQNxfkawZ4Zhhl1CDRfMOHINbxJRAadUkOd0oelI=;
+        b=IGTREealuE3DlLsrWvJuz78ilVVtsWfV2LiePTLLm6zVTKpqAZpOIAsHbPkjLo/+VEcyPk
+        X0+7fJkrGoSlowaIOakk2Wu6udlN4YIGxogxtYSSXX5elX6d/h5q/sTa31ZQhvmdB3ukBV
+        Q23jFqnj8ZrksG2DpveFobgFFKSTLH4=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-232-WquuTt9QOU-qG4bK4rd3Vw-1; Thu, 09 Mar 2023 20:09:59 -0500
+X-MC-Unique: WquuTt9QOU-qG4bK4rd3Vw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 36B493804064;
+        Fri, 10 Mar 2023 01:09:59 +0000 (UTC)
+Received: from localhost (ovpn-8-16.pek2.redhat.com [10.72.8.16])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 6C08E40BC781;
+        Fri, 10 Mar 2023 01:09:58 +0000 (UTC)
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Chris Leech <cleech@redhat.com>,
+        Marco Patalano <mpatalan@redhat.com>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH] blk-mq: fix "bad unlock balance detected" on q->srcu in __blk_mq_run_dispatch_ops
+Date:   Fri, 10 Mar 2023 09:09:13 +0800
+Message-Id: <20230310010913.1014789-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <d10f18b4-56cf-8a55-b12f-79b1163d8841@alu.unizg.hr>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Mar 09, 2023 at 10:46:50PM +0100, Mirsad Goran Todorovac wrote:
-> On 09. 03. 2023. 22:23, Thomas Weißschuh wrote:
-> 
-> Very well, but who then destroys the cache crated here:
-> 
-> security/integrity/iint.c:177-179
-> > 177         iint_cache =
-> > 178             kmem_cache_create("iint_cache", sizeof(struct integrity_iint_cache),
-> > 179                               0, SLAB_PANIC, init_once);
-> 
-> I assumed that it must have been done from iint.c because iint_cache is
-> static?
+From: Chris Leech <cleech@redhat.com>
 
-It doesn't seem like anything destroys this cache.
+The 'q' parameter of the macro __blk_mq_run_dispatch_ops may not be one
+local variable, such as, it is rq->q, then request queue pointed by
+this variable could be changed to another queue in case of
+BLK_MQ_F_TAG_QUEUE_SHARED after 'dispatch_ops' returns, then
+'bad unlock balance' is triggered.
 
-I'm not sure this is a problem though as iint.c can not be built as module.
+Fixes the issue by adding one local variable for doing srcu lock/unlock.
 
-At least it's not a problem with kobjects as those are not used here.
+Fixes: 2a904d00855f ("blk-mq: remove hctx_lock and hctx_unlock")
+Cc: Marco Patalano <mpatalan@redhat.com>
+Signed-off-by: Chris Leech <cleech@redhat.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ block/blk-mq.h | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-> BTW, moving check for !ktype->release to kobject_init() is great for it
-> might make such problems noticed in dmesg, rather than taking screenshots.
-> 
-> Regards,
+diff --git a/block/blk-mq.h b/block/blk-mq.h
+index ef59fee62780..a7482d2cc82e 100644
+--- a/block/blk-mq.h
++++ b/block/blk-mq.h
+@@ -378,12 +378,13 @@ static inline bool hctx_may_queue(struct blk_mq_hw_ctx *hctx,
+ #define __blk_mq_run_dispatch_ops(q, check_sleep, dispatch_ops)	\
+ do {								\
+ 	if ((q)->tag_set->flags & BLK_MQ_F_BLOCKING) {		\
++		struct blk_mq_tag_set *__tag_set = (q)->tag_set; \
+ 		int srcu_idx;					\
+ 								\
+ 		might_sleep_if(check_sleep);			\
+-		srcu_idx = srcu_read_lock((q)->tag_set->srcu);	\
++		srcu_idx = srcu_read_lock(__tag_set->srcu);	\
+ 		(dispatch_ops);					\
+-		srcu_read_unlock((q)->tag_set->srcu, srcu_idx);	\
++		srcu_read_unlock(__tag_set->srcu, srcu_idx);	\
+ 	} else {						\
+ 		rcu_read_lock();				\
+ 		(dispatch_ops);					\
+-- 
+2.39.2
+
