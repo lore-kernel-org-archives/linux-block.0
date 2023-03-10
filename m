@@ -2,145 +2,93 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 75C2FC6FA99
-	for <linux-block@archiver.kernel.org>; Fri, 10 Mar 2023 22:40:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E09BCC6FD1E
+	for <linux-block@archiver.kernel.org>; Fri, 10 Mar 2023 22:55:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231553AbjCJWkh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 10 Mar 2023 17:40:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38830 "EHLO
+        id S231584AbjCJWyl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 10 Mar 2023 17:54:41 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36932 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231328AbjCJWkb (ORCPT
+        with ESMTP id S231864AbjCJWyQ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 10 Mar 2023 17:40:31 -0500
-Received: from todd.t-8ch.de (todd.t-8ch.de [IPv6:2a01:4f8:c010:41de::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 50A0712CBC2;
-        Fri, 10 Mar 2023 14:40:25 -0800 (PST)
-From:   =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=weissschuh.net;
-        s=mail; t=1678488023;
-        bh=+UTAaXGkgmAmWSjDuYQAkSUNuPdrcalL9bcOhrDdMuQ=;
-        h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-        b=OQ8tyTwN5R40txrQUsBdTu+rcZWbmZoMOeUNXbMCOjhN1/Sg2FGZjL0FyEoNZorJ/
-         Ycuu5chL06HeN493xHqo2z04KS6fGv0omZs//xzjERvkfVZh/DBMIUUqxVrqxo2nII
-         Tqupoqaog3m/qGvvdxjSvEv45axu/YoAhEJyfpEs=
-Date:   Fri, 10 Mar 2023 22:40:04 +0000
-Subject: [PATCH v2 3/4] blk-integrity: register sysfs attributes on struct
- device
+        Fri, 10 Mar 2023 17:54:16 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26E7C5FA46;
+        Fri, 10 Mar 2023 14:53:27 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id CB0B5B8242E;
+        Fri, 10 Mar 2023 22:53:22 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 25656C433EF;
+        Fri, 10 Mar 2023 22:53:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1678488801;
+        bh=8rw2KDCKekrHmNc8hHv1I2pH/HRctBmo8/l54PCIy2A=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=Bhfc0hKMNKyuw2V5FZpRwfs/xZOQNGvate7GE4kfHCmL9nZjLiejBFph1vGWYUzwC
+         RRIw7e+Jb22yIwDYnsuAQNCG9yhB46M3d3vut7435FUeCFSOutvKmeTuxcoyjQitkx
+         laNHtCV2J6F19e7K4/t01sk5dXalEXq6qL7uGY1P83seaRtQuMlkbkcS2VksCbkWSK
+         n2L1QHsoODZzmkcPvgbKS/R2TcvtBqpuQEGi0X33JE81zLv2QYZUg+MS5JT3zzn0E4
+         XSrr0yM7yH653naETdFzsarXDsLhsvTvMsi39k8LXndQ5X/oFV1BH+jlVR6QfH4LRY
+         Os/Jd8npksCfA==
+Date:   Fri, 10 Mar 2023 14:53:19 -0800
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     stable@vger.kernel.org, Sasha Levin <sashal@kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        Mike Cloaked <mike.cloaked@gmail.com>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Yu Kuai <yukuai3@huawei.com>, Genes Lists <lists@sapience.com>
+Subject: Re: Possible kernel fs block code regression in 6.2.3 umounting usb
+ drives
+Message-ID: <ZAu030xtaPBGFPBS@sol.localdomain>
+References: <CAOCAAm7AEY9tkZpu2j+Of91fCE4UuE_PqR0UqNv2p2mZM9kqKw@mail.gmail.com>
+ <CAOCAAm4reGhz400DSVrh0BetYD3Ljr2CZen7_3D4gXYYdB4SKQ@mail.gmail.com>
+ <ZAuPkCn49urWBN5P@sol.localdomain>
+ <ZAuQOHnfa7xGvzKI@sol.localdomain>
+ <ad021e89-c05c-f85a-2210-555837473734@kernel.dk>
+ <88b36c03-780f-61a5-4a66-e69072aa7536@sapience.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Message-Id: <20230309-kobj_release-gendisk_integrity-v2-3-761a50d71900@weissschuh.net>
-References: <20230309-kobj_release-gendisk_integrity-v2-0-761a50d71900@weissschuh.net>
-In-Reply-To: <20230309-kobj_release-gendisk_integrity-v2-0-761a50d71900@weissschuh.net>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>
-X-Mailer: b4 0.12.1
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1678488015; l=3028;
- i=linux@weissschuh.net; s=20221212; h=from:subject:message-id;
- bh=+UTAaXGkgmAmWSjDuYQAkSUNuPdrcalL9bcOhrDdMuQ=;
- b=hIgrVmHSDQ+sqtFKQql3Y2uN1i1jm49G9gDuB+fGgjgl9Jsi8TneswZKYnJ8fb+C5fSEfSL6B
- VgguqewROs8ALZ/5NzMxCF4hJahwRwF0Jn09Ryc70BtzlxVjdWvuf/S
-X-Developer-Key: i=linux@weissschuh.net; a=ed25519;
- pk=KcycQgFPX2wGR5azS7RhpBqedglOZVgRPfdFSPB1LNw=
+In-Reply-To: <88b36c03-780f-61a5-4a66-e69072aa7536@sapience.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The "integrity" kobject only acted as a holder for static sysfs entries.
-It also was embedded into struct gendisk without managing it, violating
-assumptions of the driver core.
+On Fri, Mar 10, 2023 at 04:08:21PM -0500, Genes Lists wrote:
+> On 3/10/23 15:23, Jens Axboe wrote:
+> > On 3/10/23 1:16 PM, Eric Biggers wrote:
+> ...
+> > But I would revert:
+> > 
+> > bfe46d2efe46c5c952f982e2ca94fe2ec5e58e2a
+> > 57a425badc05c2e87e9f25713e5c3c0298e4202c
+> > 
+> > in that order from 6.2.3 and see if that helps. Adding Yu.
+> > 
+> Confirm the 2 Reverts fixed in my tests as well (nvme + sata drives).
+> Nasty crash - some needed to be power cycled as they hung on shutdown.
+> 
+> Thank you!
+> 
+> gene
+> 
+> 
 
-Instead register the sysfs entries directly onto the struct device.
+Great, thanks.  BTW, 6.1 is also affected.  A simple reproducer is to run:
 
-Signed-off-by: Thomas Weißschuh <linux@weissschuh.net>
----
- block/blk-integrity.c | 50 +++++---------------------------------------------
- 1 file changed, 5 insertions(+), 45 deletions(-)
+	dmsetup create dev --table "0 128 zero"
+	dmsetup remove dev
 
-diff --git a/block/blk-integrity.c b/block/blk-integrity.c
-index e1c3e3591c82..79eb21482036 100644
---- a/block/blk-integrity.c
-+++ b/block/blk-integrity.c
-@@ -212,33 +212,6 @@ bool blk_integrity_merge_bio(struct request_queue *q, struct request *req,
- 	return true;
- }
- 
--static ssize_t integrity_attr_show(struct kobject *kobj, struct attribute *attr,
--				   char *page)
--{
--	struct gendisk *disk = container_of(kobj, struct gendisk, integrity_kobj);
--	struct device *dev = disk_to_dev(disk);
--	struct device_attribute *dev_attr =
--		container_of(attr, struct device_attribute, attr);
--
--	return dev_attr->show(dev, dev_attr, page);
--}
--
--static ssize_t integrity_attr_store(struct kobject *kobj,
--				    struct attribute *attr, const char *page,
--				    size_t count)
--{
--	struct gendisk *disk = container_of(kobj, struct gendisk, integrity_kobj);
--	struct device *dev = disk_to_dev(disk);
--	struct device_attribute *dev_attr =
--		container_of(attr, struct device_attribute, attr);
--	ssize_t ret = 0;
--
--	if (dev_attr->store)
--		ret = dev_attr->store(dev, dev_attr, page, count);
--
--	return ret;
--}
--
- static inline struct blk_integrity *dev_to_bi(struct device *dev)
- {
- 	return &dev_to_disk(dev)->queue->integrity;
-@@ -340,17 +313,12 @@ static struct attribute *integrity_attrs[] = {
- 	&dev_attr_device_is_integrity_capable.attr,
- 	NULL
- };
--ATTRIBUTE_GROUPS(integrity);
- 
--static const struct sysfs_ops integrity_ops = {
--	.show	= &integrity_attr_show,
--	.store	= &integrity_attr_store,
-+static const struct attribute_group integrity_group  = {
-+	.name = "integrity", .attrs = integrity_attrs,
- };
- 
--static const struct kobj_type integrity_ktype = {
--	.default_groups = integrity_groups,
--	.sysfs_ops	= &integrity_ops,
--};
-+__ATTRIBUTE_GROUPS(integrity);
- 
- static blk_status_t blk_integrity_nop_fn(struct blk_integrity_iter *iter)
- {
-@@ -431,18 +399,10 @@ EXPORT_SYMBOL(blk_integrity_unregister);
- 
- int blk_integrity_add(struct gendisk *disk)
- {
--	int ret;
--
--	ret = kobject_init_and_add(&disk->integrity_kobj, &integrity_ktype,
--				   &disk_to_dev(disk)->kobj, "%s", "integrity");
--	if (!ret)
--		kobject_uevent(&disk->integrity_kobj, KOBJ_ADD);
--	return ret;
-+	return device_add_groups(disk_to_dev(disk), integrity_groups);
- }
- 
- void blk_integrity_del(struct gendisk *disk)
- {
--	kobject_uevent(&disk->integrity_kobj, KOBJ_REMOVE);
--	kobject_del(&disk->integrity_kobj);
--	kobject_put(&disk->integrity_kobj);
-+	device_remove_groups(disk_to_dev(disk), integrity_groups);
- }
+The following kconfigs are needed for the bug to be hit:
 
--- 
-2.39.2
+	CONFIG_BLK_CGROUP=y
+	CONFIG_BLK_DEV_THROTTLING=y
+	CONFIG_BLK_DEV_THROTTLING_LOW=y
 
+Sasha or Greg, can you please revert the indicated commits from 6.1 and 6.2?
+
+- Eric
