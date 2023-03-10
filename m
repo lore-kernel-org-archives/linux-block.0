@@ -2,53 +2,53 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 41D0EC6FA99
-	for <linux-block@archiver.kernel.org>; Fri, 10 Mar 2023 16:50:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2265CC64EC4
+	for <linux-block@archiver.kernel.org>; Fri, 10 Mar 2023 16:50:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231540AbjCJQup (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S231728AbjCJQup (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Fri, 10 Mar 2023 11:50:45 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40516 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33260 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231567AbjCJQuX (ORCPT
+        with ESMTP id S231563AbjCJQuX (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Fri, 10 Mar 2023 11:50:23 -0500
 Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98F25119FBC;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 97C42119400;
         Fri, 10 Mar 2023 08:47:29 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
   t=1678466849; x=1710002849;
   h=from:to:subject:date:message-id:in-reply-to:references:
    mime-version:content-transfer-encoding;
-  bh=P+cQavtHY/atkpwjlQlWntsoa6QJUnXRT+Gt23ep0Ww=;
-  b=U5EmXpjlHG/y/fH3YBzhKZzG5Z3JbUlVvBCg+UXhU21WFuFhQELNaIZq
-   vSAmKCdr4schqYC79A7b40AzUC0RblE9rDZ5949THcLvTqyb4lAM5TlSD
-   gnHPjp/2TEIY+dBw0fcbWytahqrd7Lsxh1cy3CVyFy9omp+mt5loPEGmv
-   bKH2iIpJqeoVPWPtt55WgLvjxZgkwM+BiY9zfBig+7lTtxVoFvITaKaoV
-   QgiBIkorFLoSWmNSZsE77P14PeUn+rF6/ectolpXTx6Zf2dCuxoZ/a0Ph
-   avDujkhd2dyr0NWBckzmRldSSkjDHgsYfKIotgIlgen4Sa7EWAnzzGdsg
-   A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10645"; a="320621121"
+  bh=eyTEBx+P5LFmDblqHINk1Ff4ftWqw30rcM/wV51VRd4=;
+  b=UvbRx/WdYp6JasE1wIiwTMgyaQUxPg8wXJb4B71+iMjWBCL56TACvZgE
+   KYWj9XWnX2BQu7xpkv5+UmaNfvA9IiHybuqpbTrC+J+D9A25eHWs2YANa
+   NiK6kAsCVkav1+BJpc6/ZNkgx5K7guUTEjxF5flQwfKRE4MgD9bhke6aI
+   9dHMZHRSSGUjyomPqb7Oc5r3tm5jNhFx+yOyBdQHQRsUsr2TO5iSaoqBg
+   0S2K6Yf6kkAolGjnJ4mTMe2cTem7LErjGAcx295nFs6NAfjaT5i6NmXwD
+   d/2Eap9h4t/jaAxzyzjgfWRxB6bGL/iQjwPcghc0AD54Ms6OYp+4kl36R
+   w==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10645"; a="320621147"
 X-IronPort-AV: E=Sophos;i="5.98,250,1673942400"; 
-   d="scan'208";a="320621121"
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Mar 2023 08:45:11 -0800
+   d="scan'208";a="320621147"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Mar 2023 08:45:13 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10645"; a="746778621"
+X-IronPort-AV: E=McAfee;i="6500,9779,10645"; a="677874311"
 X-IronPort-AV: E=Sophos;i="5.98,250,1673942400"; 
-   d="scan'208";a="746778621"
+   d="scan'208";a="677874311"
 Received: from black.fi.intel.com ([10.237.72.28])
-  by fmsmga004.fm.intel.com with ESMTP; 10 Mar 2023 08:45:08 -0800
+  by orsmga002.jf.intel.com with ESMTP; 10 Mar 2023 08:45:11 -0800
 Received: by black.fi.intel.com (Postfix, from userid 1003)
-        id 2BF7C354; Fri, 10 Mar 2023 18:45:53 +0200 (EET)
+        id 46BBC367; Fri, 10 Mar 2023 18:45:53 +0200 (EET)
 From:   Andy Shevchenko <andriy.shevchenko@linux.intel.com>
 To:     Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
         Jens Axboe <axboe@kernel.dk>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v2 3/9] pktcdvd: use sysfs_emit() to instead of scnprintf()
-Date:   Fri, 10 Mar 2023 18:45:43 +0200
-Message-Id: <20230310164549.22133-4-andriy.shevchenko@linux.intel.com>
+Subject: [PATCH v2 6/9] pktcdvd: Use DEFINE_SHOW_ATTRIBUTE() to simplify code
+Date:   Fri, 10 Mar 2023 18:45:46 +0200
+Message-Id: <20230310164549.22133-7-andriy.shevchenko@linux.intel.com>
 X-Mailer: git-send-email 2.39.1
 In-Reply-To: <20230310164549.22133-1-andriy.shevchenko@linux.intel.com>
 References: <20230310164549.22133-1-andriy.shevchenko@linux.intel.com>
@@ -58,29 +58,56 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Follow the advice of the Documentation/filesystems/sysfs.rst and show()
-should only use sysfs_emit() or sysfs_emit_at() when formatting the
-value to be returned to user space.
+Use DEFINE_SHOW_ATTRIBUTE() helper macro to simplify the code.
+No functional change.
 
 Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
 Reviewed-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 ---
- drivers/block/pktcdvd.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/block/pktcdvd.c | 23 +++--------------------
+ 1 file changed, 3 insertions(+), 20 deletions(-)
 
 diff --git a/drivers/block/pktcdvd.c b/drivers/block/pktcdvd.c
-index ad4336ae9927..98a5c388eabf 100644
+index a53d21dbf2ab..2c5441303e55 100644
 --- a/drivers/block/pktcdvd.c
 +++ b/drivers/block/pktcdvd.c
-@@ -339,7 +339,7 @@ static ssize_t device_map_show(struct class *c, struct class_attribute *attr,
- 		struct pktcdvd_device *pd = pkt_devs[idx];
- 		if (!pd)
- 			continue;
--		n += sprintf(data+n, "%s %u:%u %u:%u\n",
-+		n += sysfs_emit_at(data, n, "%s %u:%u %u:%u\n",
- 			pd->disk->disk_name,
- 			MAJOR(pd->pkt_dev), MINOR(pd->pkt_dev),
- 			MAJOR(pd->bdev->bd_dev),
+@@ -504,24 +504,7 @@ static int pkt_seq_show(struct seq_file *m, void *p)
+ 			pd->write_congestion_on);
+ 	return 0;
+ }
+-
+-static int pkt_debugfs_seq_show(struct seq_file *m, void *p)
+-{
+-	return pkt_seq_show(m, p);
+-}
+-
+-static int pkt_debugfs_fops_open(struct inode *inode, struct file *file)
+-{
+-	return single_open(file, pkt_debugfs_seq_show, inode->i_private);
+-}
+-
+-static const struct file_operations debug_fops = {
+-	.open		= pkt_debugfs_fops_open,
+-	.read		= seq_read,
+-	.llseek		= seq_lseek,
+-	.release	= single_release,
+-	.owner		= THIS_MODULE,
+-};
++DEFINE_SHOW_ATTRIBUTE(pkt_seq);
+ 
+ static void pkt_debugfs_dev_new(struct pktcdvd_device *pd)
+ {
+@@ -531,8 +514,8 @@ static void pkt_debugfs_dev_new(struct pktcdvd_device *pd)
+ 	if (!pd->dfs_d_root)
+ 		return;
+ 
+-	pd->dfs_f_info = debugfs_create_file("info", 0444,
+-					     pd->dfs_d_root, pd, &debug_fops);
++	pd->dfs_f_info = debugfs_create_file("info", 0444, pd->dfs_d_root,
++					     pd, &pkt_seq_fops);
+ }
+ 
+ static void pkt_debugfs_dev_remove(struct pktcdvd_device *pd)
 -- 
 2.39.1
 
