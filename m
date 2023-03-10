@@ -2,191 +2,214 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3084AC64EC4
-	for <linux-block@archiver.kernel.org>; Fri, 10 Mar 2023 01:16:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D8C6C6FD19
+	for <linux-block@archiver.kernel.org>; Fri, 10 Mar 2023 07:59:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229621AbjCJBQP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 9 Mar 2023 20:16:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52652 "EHLO
+        id S230016AbjCJH7i (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 10 Mar 2023 02:59:38 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42202 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229453AbjCJBQO (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 9 Mar 2023 20:16:14 -0500
-Received: from mailout2.w2.samsung.com (mailout2.w2.samsung.com [211.189.100.12])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8004FDDB3A;
-        Thu,  9 Mar 2023 17:16:11 -0800 (PST)
-Received: from uscas1p1.samsung.com (unknown [182.198.245.206])
-        by mailout2.w2.samsung.com (KnoxPortal) with ESMTP id 20230310011606usoutp028ff7a36ba109ecace415a993c1d4b157~K6eHAmKnK1452214522usoutp02i;
-        Fri, 10 Mar 2023 01:16:06 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w2.samsung.com 20230310011606usoutp028ff7a36ba109ecace415a993c1d4b157~K6eHAmKnK1452214522usoutp02i
+        with ESMTP id S229943AbjCJH7f (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 10 Mar 2023 02:59:35 -0500
+Received: from mailout2.w1.samsung.com (mailout2.w1.samsung.com [210.118.77.12])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 96BC1E1931
+        for <linux-block@vger.kernel.org>; Thu,  9 Mar 2023 23:59:33 -0800 (PST)
+Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
+        by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id 20230310075930euoutp020087b2be0ab7d2a133cafbc9ac469ebd~K-_UNrcMI0841608416euoutp02f
+        for <linux-block@vger.kernel.org>; Fri, 10 Mar 2023 07:59:30 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w1.samsung.com 20230310075930euoutp020087b2be0ab7d2a133cafbc9ac469ebd~K-_UNrcMI0841608416euoutp02f
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1678410967;
-        bh=m0Ow2bytomyXCbdVijWryXq7yza/hXO0VMWtfpb0usY=;
-        h=From:To:CC:Subject:Date:In-Reply-To:References:From;
-        b=Jf7bOhEw13P7w4Ne3B/8VOp05OyWnwcINZoFcDpMH98iGztdH5g4J4QnipU3WCYtk
-         PN6j9qwpItJ3zmXQzM7KqVTptMxyYweNhIwt76Tdi3U8tOD1ZAxtngrfFrZ2abaihv
-         xBbHo2lUQirF4dstdCcT5q6UcZrYNZm/muLtEidM=
-Received: from ussmges2new.samsung.com (u111.gpu85.samsung.co.kr
-        [203.254.195.111]) by uscas1p2.samsung.com (KnoxPortal) with ESMTP id
-        20230310011606uscas1p226bd91ecc566d4d8225de90fb8e583e3~K6eG3IbZb0687506875uscas1p2Z;
-        Fri, 10 Mar 2023 01:16:06 +0000 (GMT)
-Received: from uscas1p1.samsung.com ( [182.198.245.206]) by
-        ussmges2new.samsung.com (USCPEMTA) with SMTP id 84.44.49129.6D48A046; Thu, 
-        9 Mar 2023 20:16:06 -0500 (EST)
-Received: from ussmgxs2new.samsung.com (u91.gpu85.samsung.co.kr
-        [203.254.195.91]) by uscas1p1.samsung.com (KnoxPortal) with ESMTP id
-        20230310011606uscas1p12996a276699fd22c03f06ed017bb3ba9~K6eGayM6V0604406044uscas1p1h;
-        Fri, 10 Mar 2023 01:16:06 +0000 (GMT)
-X-AuditID: cbfec36f-eddff7000001bfe9-59-640a84d69ac5
-Received: from SSI-EX4.ssi.samsung.com ( [105.128.2.145]) by
-        ussmgxs2new.samsung.com (USCPEXMTA) with SMTP id 4F.A6.17110.6D48A046; Thu, 
-        9 Mar 2023 20:16:06 -0500 (EST)
-Received: from SSI-EX4.ssi.samsung.com (105.128.2.229) by
-        SSI-EX4.ssi.samsung.com (105.128.2.229) with Microsoft SMTP Server
-        (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
-        15.1.2375.24; Thu, 9 Mar 2023 17:16:05 -0800
-Received: from SSI-EX4.ssi.samsung.com ([105.128.5.229]) by
-        SSI-EX4.ssi.samsung.com ([105.128.5.229]) with mapi id 15.01.2375.024; Thu,
-        9 Mar 2023 17:16:05 -0800
-From:   Dan Helmick <dan.helmick@samsung.com>
-To:     "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Luis Chamberlain <mcgrof@kernel.org>
-CC:     James Bottomley <James.Bottomley@hansenpartnership.com>,
-        =?iso-8859-1?Q?Javier_Gonz=E1lez?= <javier.gonz@samsung.com>,
-        Matthew Wilcox <willy@infradead.org>,
+        s=mail20170921; t=1678435170;
+        bh=PimTtV2xHIocHqP2C+En+WnmhKxhh5/j7Aded0ia+kU=;
+        h=Date:From:To:CC:Subject:In-Reply-To:References:From;
+        b=SHMtnsauZtuZy7eARn+dgLJ19MXzT0UwfR5HtREwtRIhNNuKt7WKSY7NlEiWli1Oa
+         l6bPN4YbTnfcMaG0woEsMYKspTn1T/ek8afIzbRDJRLAQkYY2sQW17zr3u/M8IdLFG
+         CFCpKgNDUto0dGuoIoFSFkDRO5DapC6hosB2PgWg=
+Received: from eusmges1new.samsung.com (unknown [203.254.199.242]) by
+        eucas1p1.samsung.com (KnoxPortal) with ESMTP id
+        20230310075930eucas1p16d3608cbea90732ba9c3387ace884cbf~K-_T_7dH41088410884eucas1p1A;
+        Fri, 10 Mar 2023 07:59:30 +0000 (GMT)
+Received: from eucas1p2.samsung.com ( [182.198.249.207]) by
+        eusmges1new.samsung.com (EUCPMTA) with SMTP id 70.F0.09503.263EA046; Fri, 10
+        Mar 2023 07:59:30 +0000 (GMT)
+Received: from eusmtrp1.samsung.com (unknown [182.198.249.138]) by
+        eucas1p1.samsung.com (KnoxPortal) with ESMTPA id
+        20230310075929eucas1p1063b67e2f0f2d37e4ab75b16b8cf19d5~K-_TpDcqu1087110871eucas1p15;
+        Fri, 10 Mar 2023 07:59:29 +0000 (GMT)
+Received: from eusmgms2.samsung.com (unknown [182.198.249.180]) by
+        eusmtrp1.samsung.com (KnoxPortal) with ESMTP id
+        20230310075929eusmtrp181b7c3da465b447c055e25d0be4afea0~K-_Tob8dA3126731267eusmtrp1j;
+        Fri, 10 Mar 2023 07:59:29 +0000 (GMT)
+X-AuditID: cbfec7f2-e8fff7000000251f-b8-640ae362ed3c
+Received: from eusmtip1.samsung.com ( [203.254.199.221]) by
+        eusmgms2.samsung.com (EUCPMTA) with SMTP id E5.A0.09583.163EA046; Fri, 10
+        Mar 2023 07:59:29 +0000 (GMT)
+Received: from CAMSVWEXC02.scsc.local (unknown [106.1.227.72]) by
+        eusmtip1.samsung.com (KnoxPortal) with ESMTPA id
+        20230310075929eusmtip1b52b89013e48dc68c336ce29feecca38~K-_TdcQgG1058610586eusmtip1x;
+        Fri, 10 Mar 2023 07:59:29 +0000 (GMT)
+Received: from localhost (106.110.32.122) by CAMSVWEXC02.scsc.local
+        (2002:6a01:e348::6a01:e348) with Microsoft SMTP Server (TLS) id 15.0.1497.2;
+        Fri, 10 Mar 2023 07:59:28 +0000
+Date:   Fri, 10 Mar 2023 08:59:28 +0100
+From:   Javier =?utf-8?B?R29uesOhbGV6?= <javier.gonz@samsung.com>
+To:     James Bottomley <James.Bottomley@HansenPartnership.com>
+CC:     Matthew Wilcox <willy@infradead.org>,
         Theodore Ts'o <tytso@mit.edu>, Hannes Reinecke <hare@suse.de>,
+        Luis Chamberlain <mcgrof@kernel.org>,
         Keith Busch <kbusch@kernel.org>,
         Pankaj Raghav <p.raghav@samsung.com>,
         Daniel Gomez <da.gomez@samsung.com>,
-        "lsf-pc@lists.linux-foundation.org" 
         <lsf-pc@lists.linux-foundation.org>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-        "linux-mm@kvack.org" <linux-mm@kvack.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: RE: [LSF/MM/BPF TOPIC] Cloud storage optimizations
-Thread-Topic: [LSF/MM/BPF TOPIC] Cloud storage optimizations
-Thread-Index: AQHZUswbWM8PXXLn2UKrVhzh6Ch5Aa7y9q84gAAuGYA=
-Date:   Fri, 10 Mar 2023 01:16:05 +0000
-Message-ID: <dfd0405cf7eb4b9ea8cccba97e31d25d@samsung.com>
-In-Reply-To: <yq1ttytbox9.fsf@ca-mkp.ca.oracle.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [105.128.2.176]
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+        <linux-fsdevel@vger.kernel.org>, <linux-mm@kvack.org>,
+        <linux-block@vger.kernel.org>
+Subject: Re: [LSF/MM/BPF TOPIC] Cloud storage optimizations
+Message-ID: <20230310075928.zcuiep3f2vpxbfdo@ArmHalley.local>
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrKKsWRmVeSWpSXmKPExsWy7djXc7rXWrhSDE690LTYs2gSk8XGfg6L
-        SYeuMVrsvaVtsWfvSRaLe2v+s1rse72X2WL58X9MFjcmPGW0aO35yW7x+8ccNgduj2mTTrF5
-        bF6h5bFpVSebx6ZPk9g9Jt9YzujRdOYos8fHp7dYPDafrvb4vEkugDOKyyYlNSezLLVI3y6B
-        K+PkhodsBdfFKvrvLmFqYDwn1MXIySEhYCKxe/VVti5GLg4hgZWMEkdu/2GHcFqZJBqnb2CF
-        qfq14zpU1VpGifuzGqGcj4wSO6Z9gGpZyihx4NN5FpAWNgFtiVuvdwG1c3CICMRKbJ1uBVLD
-        LHCGReJ7wyE2kBphAWuJff8mMkPU2EhMOCUJEhYRsJI4198LVsIioCpx58UkZhCbFyj+ZsNP
-        FpByTgFjiT07rEHCjAJiEt9PrWECsZkFxCVuPZnPBHG0oMSi2XuYIWwxiX+7HrJB2IoS97+/
-        ZIeo15O4MXUKG4StLbFs4WuoVYISJ2c+YYGol5Q4uOIGC8j5EgL/OSQu7JoANdRFou//dEYI
-        W1ri791lTBBF6xglFr75wQbhzGCU+Ni2A6rDWuLhpYdQp/JJ/P31iHECo/IsJJfPQnLVLCRX
-        zUJy1QJGllWM4qXFxbnpqcVGeanlesWJucWleel6yfm5mxiBKe30v8P5Oxiv3/qod4iRiYPx
-        EKMEB7OSCO93KY4UId6UxMqq1KL8+KLSnNTiQ4zSHCxK4ryGtieThQTSE0tSs1NTC1KLYLJM
-        HJxSDUwhXcxXU0/sOnDn13MuHqPS4wbxvEGlXww2Se4q6GfIE+2SuKX9Qjnl882qvxrPmwov
-        eTlXs2r/V3p0NjnQ8FlOztYziyVZGTq2CL39yb78tMO/qd9KfnpzLdMynHQs44mwntbO02pT
-        l52ffEx82vIzt/5fKzHYqJ5+vH/qSvfWdw+FptR/P3a7u+K3WP2p6ZFRZ903vKn5LS92c8lp
-        uawjD/QnM8TeXVvVPo+ldPbK5c8kp6z9HZzcdHmC7Ty9yCNPfd6tZ3p94pF6aMKarxPunV8u
-        wCwm+uOrRE+L1yTBg4aWN9ufdTd+/mFkmH3CdmnhDeHtKWVHGZccEjqW9NWo1XFus09IRKxo
-        kG/wcpUPSizFGYmGWsxFxYkA7DML+NgDAAA=
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFrrKIsWRmVeSWpSXmKPExsWS2cA0UfdaC1eKwep1PBZ7Fk1istjYz2Ex
-        6dA1Rou9t7Qt9uw9yWJxb81/Vot9r/cyWyw//o/J4saEp4wWrT0/2S1+/5jD5sDtMW3SKTaP
-        zSu0PDat6mTz2PRpErvH5BvLGT2azhxl9vj49BaLx+bT1R6fN8kFcEZx2aSk5mSWpRbp2yVw
-        ZZzc8JCt4LpYRf/dJUwNjOeEuhg5OSQETCR+7bjO1sXIxSEksJpRYs/tj6wQzkdGiesTJrBA
-        OEsZJW6+38IO0sImoC1x6/UuoCoODhGBWImt061AapgFzrBIfG84xAZSIyxgLbHv30RmiBob
-        iQmnJEHCIgJWEuf6e8FKWARUJe68mMQMYvMCxd9s+Am1ayKrxI6mpywgvZwCxhJ7dliD1DAK
-        iEl8P7WGCcRmFhCXuPVkPhPEBwISS/acZ4awRSVePv7HCmErStz//pIdol5P4sbUKWwQtrbE
-        soWvofYKSpyc+YQFol5S4uCKGywTGMVnIVkxC0n7LCTts5C0L2BkWcUoXlpcnJteUWyUl1qu
-        V5yYW1yal66XnJ+7iREY86f/HY7ewXj71ke9Q4xMHIyHGCU4mJVEeL9LcaQI8aYkVlalFuXH
-        F5XmpBYfYpTmYFES530ZNTFeSCA9sSQ1OzW1ILUIJsvEwSnVwLSe+6dE+uwOg+x6njsyF362
-        xN3ia75xcK1rNXMI29V9s/jc9I0PcuS4LtRqW3yjsSJzzbnHRSfWvXyzNePmn63VCqGOD5TX
-        zDDYNmlZ5XKuT9WGU1ulPSYkvbXSKda9ua7wvKOGb1KI/+ma2eV6ah4Nza11hukdOr6/9z/5
-        XNd/cpYhs/rbTT/PWjy47PNHxNnl2r2zXwU6A89GmD6f4qSyP9pbg30Wn3Ii8+eyXvY1TlEz
-        /TJX1WbP/mq8dJvVXH65m5I745pnheXt7bXbfk+0UN7tUqv6ncqwxS6fIq4lrE1XE5fiiVq/
-        cM2f5kuHlJbdm1Gj+ObLnZwn3qndEvNneW7c6nTUSzTvT/jVH0osxRmJhlrMRcWJAPo+7Gxo
-        AwAA
-X-CMS-MailID: 20230310011606uscas1p12996a276699fd22c03f06ed017bb3ba9
-CMS-TYPE: 301P
+Content-Type: text/plain; charset="utf-8"; format="flowed"
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <260064c68b61f4a7bc49f09499e1c107e2a28f31.camel@HansenPartnership.com>
+X-Originating-IP: [106.110.32.122]
+X-ClientProxiedBy: CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347) To
+        CAMSVWEXC02.scsc.local (2002:6a01:e348::6a01:e348)
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFtrOKsWRmVeSWpSXmKPExsWy7djP87pJj7lSDNp2sljsWTSJyWJjP4fF
+        pEPXGC323tK22LP3JIvFvTX/WS32vd7LbHFjwlNGi9aen+wWv3/MYXPg8pg26RSbx+YVWh6b
+        VnWyeWz6NIndY/KN5YweTWeOMntsPl3t8XmTXABHFJdNSmpOZllqkb5dAlfGhQkfmQqeKVZM
+        7P3I0sD4XqqLkZNDQsBE4ta0DrYuRi4OIYEVjBK9K4+zQjhfGCWurDkJ5XxmlNjf9pUZpmXl
+        kkfMEInljBJf3zUxwlU1H3sONWwLo8S/F91MIC0sAqoSTy6uYwOx2QTsJS4tuwU2SkTAWuLL
+        qgVg3cwC/5gk9nxsYgVJCAMlNs3awwhi8wrYSnx8tpYZwhaUODnzCQuIzSxgJdH5AaSeA8iW
+        llj+jwMiLC/RvHU2M0iYUyBYYl1LLsTVShKPX7xlhLBrJU5tucUEslZCYDanxOmfK5kgEi4S
+        L28cY4OwhSVeHd/CDmHLSJye3MMCYWdLXDzTDQ2KEonF74+B7ZIAOrnvTA5E2FHia+8TJogw
+        n8SNt4IQl/FJTNo2HaqaV6KjTWgCo8osJG/NQvLWLIS3ZiF5awEjyypG8dTS4tz01GLDvNRy
+        veLE3OLSvHS95PzcTYzAtHX63/FPOxjnvvqod4iRiYPxEKMEB7OSCO93KY4UId6UxMqq1KL8
+        +KLSnNTiQ4zSHCxK4rzatieThQTSE0tSs1NTC1KLYLJMHJxSDUyL6vL3fN1wmOtmtvuahOm+
+        J1Jipj968pwx/U2AY+mzKwIP9r0+37Tpm+2GtT8jK/0bmnYVV/bO9ws+JBzLZpibdvlj0YvA
+        DcL9v9a4WZquChTIyc++r1A3dY2y0+0lHHMu7f85YXGSleW+ioib55PPMbcKbvz7dnbGFoUn
+        sqIb7NtilHcefx6wa06C1pFiPetPun7cCdrWdvfcbyys1D7uutXonPIrxpYHtfpWK1cseX33
+        QKTP9Hkf1bbKzmP0Ubr57sqFZ1PO8/5TWLGE99ZiZp3yuO1X5d9nnnMVvt9auazsXGwBpym3
+        fgqj2XaTK3EOU/36cyed8z94g/ei3ilW/VWhgt3vTnjd1tAQaTurxFKckWioxVxUnAgA7418
+        2soDAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrEIsWRmVeSWpSXmKPExsVy+t/xu7qJj7lSDM5s17LYs2gSk8XGfg6L
+        SYeuMVrsvaVtsWfvSRaLe2v+s1rse72X2eLGhKeMFq09P9ktfv+Yw+bA5TFt0ik2j80rtDw2
+        repk89j0aRK7x+Qbyxk9ms4cZfbYfLra4/MmuQCOKD2bovzSklSFjPziElulaEMLIz1DSws9
+        IxNLPUNj81grI1MlfTublNSczLLUIn27BL2MCxM+MhU8U6yY2PuRpYHxvVQXIyeHhICJxMol
+        j5i7GLk4hASWMkrcPnaaGSIhI/Hpykd2CFtY4s+1LjaIoo+MEtM6OlghnC2MEuuPnADrYBFQ
+        lXhycR0biM0mYC9xadktsLiIgLXEl1ULGEEamAX+MUks33mJFSQhDJTYNGsPI4jNK2Ar8fHZ
+        Wqg7lrNIXDn0lgUiIShxcuYTMJtZwEJi5vzzQA0cQLa0xPJ/HBBheYnmrbOZQcKcAsES61py
+        Ia5Wknj84i0jhF0r8fnvM8YJjCKzkAydhWToLIShs5AMXcDIsopRJLW0ODc9t9hIrzgxt7g0
+        L10vOT93EyMwsrcd+7llB+PKVx/1DjEycTAeYpTgYFYS4f0uxZEixJuSWFmVWpQfX1Sak1p8
+        iNEUGEQTmaVEk/OBqSWvJN7QzMDU0MTM0sDU0sxYSZzXs6AjUUggPbEkNTs1tSC1CKaPiYNT
+        qoGpk+UNa+2sTgcf1+enO0/f022fUMrIq5IzS7u+596EP2wC3J4F2ydOD+5dlfEsZP6vBz5M
+        N5jMP1S92yW+3Oid+JRZxhonm3fwS8s6ZzY7CnUGsfw6aVtweBfv1t3p7zT6zTUY0368dJ1v
+        tVPoaPbfHlHzsxqnbqUnfDpw4GZy11vz/S1qS/fZZSmenyK01TQ6avPbT1OZ/PLWNbKHhkSr
+        hjtyZ4t+r7TXnOSe4fLaVWX6jCzm2xPeVRd1Wtg/sK5+Z/bzxMIfF2RnLpvWo/w96uellZx6
+        JQu4+aOacg+d4jrZ0TpDLU8+9dOLFuOzVxev3LRLft+7qGpl3ZP6s2MPemzt+vlO5LAq1ySf
+        f15KLMUZiYZazEXFiQALT+uKdQMAAA==
+X-CMS-MailID: 20230310075929eucas1p1063b67e2f0f2d37e4ab75b16b8cf19d5
+X-Msg-Generator: CA
+X-RootMTR: 20230308181355eucas1p1c94ffee59e210fb762540c888e8eae8a
+X-EPHeader: CA
+CMS-TYPE: 201P
 X-CMS-RootMailID: 20230308181355eucas1p1c94ffee59e210fb762540c888e8eae8a
-References: <0b70deae-9fc7-ca33-5737-85d7532b3d33@suse.de>
+References: <edac909b-98e5-cb6d-bb80-2f6a20a15029@suse.de>
+        <ZAOF3p+vqA6pd7px@casper.infradead.org>
+        <0b70deae-9fc7-ca33-5737-85d7532b3d33@suse.de>
         <ZAWi5KwrsYL+0Uru@casper.infradead.org> <20230306161214.GB959362@mit.edu>
         <ZAjLhkfRqwQ+vkHI@casper.infradead.org>
         <CGME20230308181355eucas1p1c94ffee59e210fb762540c888e8eae8a@eucas1p1.samsung.com>
         <1367983d4fa09dcb63e29db2e8be3030ae6f6e8c.camel@HansenPartnership.com>
         <20230309080434.tnr33rhzh3a5yc5q@ArmHalley.local>
         <260064c68b61f4a7bc49f09499e1c107e2a28f31.camel@HansenPartnership.com>
-        <yq11qlygevs.fsf@ca-mkp.ca.oracle.com>
-        <f929f8d8e61da345be525ab06d4bb34ed2ce878b.camel@HansenPartnership.com>
-        <ZApMC8NLDfI6/ImD@bombadil.infradead.org>
-        <yq1ttytbox9.fsf@ca-mkp.ca.oracle.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-> -----Original Message-----
-> From: Martin K. Petersen [mailto:martin.petersen@oracle.com]
-> Sent: Thursday, March 9, 2023 2:28 PM
-> To: Luis Chamberlain <mcgrof@kernel.org>
-> Cc: James Bottomley <James.Bottomley@hansenpartnership.com>; Dan
-> Helmick <dan.helmick@samsung.com>; Martin K. Petersen
-> <martin.petersen@oracle.com>; Javier Gonz=E1lez
-> <javier.gonz@samsung.com>; Matthew Wilcox <willy@infradead.org>;
-> Theodore Ts'o <tytso@mit.edu>; Hannes Reinecke <hare@suse.de>; Keith
-> Busch <kbusch@kernel.org>; Pankaj Raghav <p.raghav@samsung.com>;
-> Daniel Gomez <da.gomez@samsung.com>; lsf-pc@lists.linux-foundation.org;
-> linux-fsdevel@vger.kernel.org; linux-mm@kvack.org; linux-
-> block@vger.kernel.org
-> Subject: Re: [LSF/MM/BPF TOPIC] Cloud storage optimizations
->=20
->=20
-> Luis,
->=20
-> > A big future question is of course how / when to use these for
-> > filesystems.  Should there be, for instance a 'mkfs --optimal-bs' or
-> > something which may look whatever hints the media uses ? Or do we just
-> > leaves the magic incantations to the admins?
->=20
-> mkfs already considers the reported queue limits (for the filesystems mos=
-t
-> people use, anyway).
->=20
-> The problem is mainly that the devices don't report them. At least not ve=
-ry
-> often in the NVMe space. For SCSI devices, reporting these parameters is
-> quite common.
->=20
-> --
-> Martin K. Petersen	Oracle Linux Engineering
+On 09.03.2023 08:11, James Bottomley wrote:
+>On Thu, 2023-03-09 at 09:04 +0100, Javier González wrote:
+>> On 08.03.2023 13:13, James Bottomley wrote:
+>> > On Wed, 2023-03-08 at 17:53 +0000, Matthew Wilcox wrote:
+>> > > On Mon, Mar 06, 2023 at 11:12:14AM -0500, Theodore Ts'o wrote:
+>> > > > What HDD vendors want is to be able to have 32k or even 64k
+>> > > > *physical* sector sizes.  This allows for much more efficient
+>> > > > erasure codes, so it will increase their byte capacity now that
+>> > > > it's no longer easier to get capacity boosts by squeezing the
+>> > > > tracks closer and closer, and their have been various
+>> > > > engineering tradeoffs with SMR, HAMR, and MAMR.  HDD vendors
+>> > > > have been asking for this at LSF/MM, and in othervenues for
+>> > > > ***years***.
+>> > >
+>> > > I've been reminded by a friend who works on the drive side that a
+>> > > motivation for the SSD vendors is (essentially) the size of
+>> > > sector_t. Once the drive needs to support more than 2/4 billion
+>> > > sectors, they need to move to a 64-bit sector size, so the amount
+>> > > of memory consumed by the FTL doubles, the CPU data cache becomes
+>> > > half as effective, etc. That significantly increases the BOM for
+>> > > the drive, and so they have to charge more.  With a 512-byte LBA,
+>> > > that's 2TB; with a 4096-byte LBA, it's at 16TB and with a 64k
+>> > > LBA, they can keep using 32-bit LBA numbers all the way up to
+>> > > 256TB.
+>> >
+>> > I thought the FTL operated on physical sectors and the logical to
+>> > physical was done as a RMW through the FTL?  In which case sector_t
+>> > shouldn't matter to the SSD vendors for FTL management because they
+>> > can keep the logical sector size while increasing the physical one.
+>> > Obviously if physical size goes above the FS block size, the drives
+>> > will behave suboptimally with RMWs, which is why 4k physical is the
+>> > max currently.
+>> >
+>>
+>> FTL designs are complex. We have ways to maintain sector sizes under
+>> 64 bits, but this is a common industry problem.
+>>
+>> The media itself does not normally oeprate at 4K. Page siges can be
+>> 16K, 32K, etc.
+>
+>Right, and we've always said if we knew what this size was we could
+>make better block write decisions.  However, today if you look what
+>most NVMe devices are reporting, it's a bit sub-optimal:
+>
+>jejb@lingrow:/sys/block/nvme1n1/queue> cat logical_block_size
+>512
+>jejb@lingrow:/sys/block/nvme1n1/queue> cat physical_block_size
+>512
+>jejb@lingrow:/sys/block/nvme1n1/queue> cat optimal_io_size
+>0
+>
+>If we do get Linux to support large block sizes, are we actually going
+>to get better information out of the devices?
 
-Support for the NVMe Optimal Performance parameters is increasing in the ve=
-ndor ecosystem.  Customers are requiring this more and more from the vendor=
-s.  For example, the OCP DC NVMe SSD spec has NVMe-AD-2 and NVMe-OPT-7 [1].=
-  Momentum is continuing as Optimal Read parameters were recently added to =
-NVMe too.  More companies adding these parameters as a drive requirement to=
- drive vendors would definitely help the momentum further. =20
+We already have this through the NVMe Optimal Performance parameters
+(see Dan's response for this). Note that these values are already
+implemented in the kernel. If I recall properly, Bart was the one doing
+this work.
 
-I think there has been confusion among the vendors in the past on how to se=
-t various values for the best Host behavior.  There are multiple (sometimes=
- minor) inflection points in the performance of a drive.  Sure.  4KB is too=
- small to report by the drive, but shall we report our 16KB, 128KB, or some=
- other inflection?  How big of a value can we push this?  We would always f=
-avor the bigger number. =20
+More over, from the vendor side, it is a challenge to expose larger LBAs
+without wide support in OSs. I am confident that if we are pushing for
+this work and we see it fits existing FSs, we will see vendors exposing
+new LBA formats in the beginning (same as we have 512b and 4K in the
+same drive), and eventually focusing only on larger LBA sizes.
 
-There are benefits for both Host and Drive (HDD and SSD) to have larger IOs=
-.  Even if you have a drive reporting incorrect optimal parameters today, o=
-ne can incubate the SW changes with larger IOs.  If nothing else, you'll in=
-stantly save on the overheads of communicating the higher number of command=
-s.  Further doing an IO sized to be a multiple of the optimal parameters is=
- also optimal.  Enabling anything in the range 16KB - 64KB would likely be =
-a great start. =20
+>
+>>  Increasing the block size would allow for better host/device
+>> cooperation. As Ted mentions, this has been a requirement for HDD and
+>> SSD vendor for years. It seems to us that the time is right now and
+>> that we have mechanisms in Linux to do the plumbing. Folios is
+>> ovbiously a big part of this.
+>
+>Well a decade ago we did a lot of work to support 4k sector devices.
+>Ultimately the industry went with 512 logical/4k physical devices
+>because of problems with non-Linux proprietary OSs but you could still
+>use 4k today if you wanted (I've actually still got a working 4k SCSI
+>drive), so why is no NVMe device doing that?
 
-[1] https://www.opencompute.org/documents/datacenter-nvme-ssd-specification=
--v2-0r21-pdf
+Most NVMe devices report 4K today. Actually 512b is mostly an
+optimization targeted at read-heavy workloads.
 
+>
+>This is not to say I think larger block sizes is in any way a bad idea
+>... I just think that given the history, it will be driven by
+>application needs rather than what the manufacturers tell us.
 
-Dan
+I see more and more that this deserves a session at LSF/MM
