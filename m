@@ -2,151 +2,109 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F724C74A4B
-	for <linux-block@archiver.kernel.org>; Fri, 10 Mar 2023 20:16:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 80AF6C6FA99
+	for <linux-block@archiver.kernel.org>; Fri, 10 Mar 2023 20:17:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231446AbjCJUQd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 10 Mar 2023 15:16:33 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40144 "EHLO
+        id S231478AbjCJURn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 10 Mar 2023 15:17:43 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41850 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231421AbjCJUQ2 (ORCPT
+        with ESMTP id S230102AbjCJURc (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 10 Mar 2023 15:16:28 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C6C6312DDD7
-        for <linux-block@vger.kernel.org>; Fri, 10 Mar 2023 12:15:33 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1678479333;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=ySNF9VklMnLNMFFSlXUm9DSmVb0PMck6UAVDHRxOWTI=;
-        b=UBVApivxgnLPK00WUs95ReAGLQuV3oNNaC/IEkddxYtvMpn7sNg1N7THRwVqlxpiYY1v8Y
-        Oa2rTGUSEvRKftDLi3zzIMCISGG10LhtpVNYe28C8xSKMvFK0xoOUk6vskIyd7W8B1WC8H
-        eOZ2pOdoavFVhEovy83qgQHeOjhgmF4=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-67-l6gRyfhQNuOgRsi4_uQD8A-1; Fri, 10 Mar 2023 15:15:28 -0500
-X-MC-Unique: l6gRyfhQNuOgRsi4_uQD8A-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        Fri, 10 Mar 2023 15:17:32 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9975F12EAFE;
+        Fri, 10 Mar 2023 12:17:00 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id D3A5E858F09;
-        Fri, 10 Mar 2023 20:15:27 +0000 (UTC)
-Received: from green.redhat.com (unknown [10.2.16.147])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 1EA8C4014CF3;
-        Fri, 10 Mar 2023 20:15:27 +0000 (UTC)
-From:   Eric Blake <eblake@redhat.com>
-To:     josef@toxicpanda.com, linux-block@vger.kernel.org,
-        nbd@other.debian.org
-Cc:     philipp.reisner@linbit.com, lars.ellenberg@linbit.com,
-        christoph.boehmwalder@linbit.com, corbet@lwn.net,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 1/3] uapi nbd: improve doc links to userspace spec
-Date:   Fri, 10 Mar 2023 14:15:23 -0600
-Message-Id: <20230310201525.2615385-2-eblake@redhat.com>
-In-Reply-To: <20230310201525.2615385-1-eblake@redhat.com>
-References: <20230310201525.2615385-1-eblake@redhat.com>
+        by ams.source.kernel.org (Postfix) with ESMTPS id 8B3E4B823B0;
+        Fri, 10 Mar 2023 20:16:59 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2F438C433D2;
+        Fri, 10 Mar 2023 20:16:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1678479418;
+        bh=D4DGMOutQIagUSkQSfayXkAW83Yt6sHT11ClPGwvv3g=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=SfLZqwiqB+4qdjVAnpc7fysl5QdvXXucG1ABItriZUuvRvbN5a9SzXtfj5VTTRB3w
+         BduuUA/pAlevJ7qpQj9Le0yTGkal3f0M7BO6c9HoVVzOMWGlc5lwYb15azC2nYU9y0
+         jk9K/rKDgjnyVv8vahvgwJhSJi3nJNIya0iAS/DrDL3nz7QvybmnYr4gA8GSkb/IJa
+         mDVCrDdg9bgMfwa183GzMe6Or8PPZoMgM+WmvIdnbFJtkGXx/FpU2RjEpF2mcLD+Q1
+         HXiDEPAwqOwT8Kpf3NdbdthtGURBqTHol1h2zyQA1S74jHluh49RVZ/LcmxHqokW/B
+         aPA5TTmm/bbzg==
+Date:   Fri, 10 Mar 2023 12:16:56 -0800
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Mike Cloaked <mike.cloaked@gmail.com>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        stable@vger.kernel.org
+Subject: Re: Possible kernel fs block code regression in 6.2.3 umounting usb
+ drives
+Message-ID: <ZAuQOHnfa7xGvzKI@sol.localdomain>
+References: <CAOCAAm7AEY9tkZpu2j+Of91fCE4UuE_PqR0UqNv2p2mZM9kqKw@mail.gmail.com>
+ <CAOCAAm4reGhz400DSVrh0BetYD3Ljr2CZen7_3D4gXYYdB4SKQ@mail.gmail.com>
+ <ZAuPkCn49urWBN5P@sol.localdomain>
 MIME-Version: 1.0
-Content-type: text/plain
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZAuPkCn49urWBN5P@sol.localdomain>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The uapi <linux/nbd.h> header intentionally documents only the NBD
-server features that the kernel module will utilize as a client.  But
-while it already had one mention of skipped bits due to userspace
-extensions, it did not actually direct the reader to the canonical
-source to learn about those extensions.
+On Fri, Mar 10, 2023 at 12:14:10PM -0800, Eric Biggers wrote:
+> On Fri, Mar 10, 2023 at 07:33:37PM +0000, Mike Cloaked wrote:
+> > With kerne. 6.2.3 if I simply plug in a usb external drive, mount it
+> > and umount it, then the journal has a kernel Oops and I have submitted
+> > a bug report, that includes the journal output, at
+> > https://bugzilla.kernel.org/show_bug.cgi?id=217174
+> > 
+> > As soon as the usb drive is unmounted, the kernel Oops occurs, and the
+> > machine hangs on shutdown and needs a hard reboot.
+> > 
+> > I have reproduced the same issue on three different machines, and in
+> > each case downgrading back to kernel 6.2.2 resolves the issue and it
+> > no longer occurs.
+> > 
+> > This would seem to be a regression in kernel 6.2.3
+> > 
+> > Mike C
+> 
+> Thanks for reporting this!  If this is reliably reproducible and is known to be
+> a regression between v6.2.2 and v6.2.3, any chance you could bisect it to find
+> out the exact commit that introduced the bug?
+> 
+> For reference I'm also copying the stack trace from bugzilla below:
+> 
+> BUG: kernel NULL pointer dereference, address: 0000000000000028
+>  #PF: supervisor read access in kernel mode
+>  #PF: error_code(0x0000) - not-present page
+>  PGD 0 P4D 0
+>  Oops: 0000 [#1] PREEMPT SMP PTI
+>  CPU: 9 PID: 1118 Comm: lvcreate Tainted: G                T  6.2.3-1>
+>  Hardware name: To Be Filled By O.E.M. To Be Filled By O.E.M./Z370 Ex>
+>  RIP: 0010:blk_throtl_update_limit_valid+0x1f/0x110
 
-While touching comments, fix an outdated reference that listed only
-READ and WRITE as commands.
+BTW, the block/ commits between v6.2.2 and v6.2.3 were:
 
-The documentation file also had a stale link to sourceforge; nbd
-ditched that several years ago in favor of github.
+	blk-mq: avoid sleep in blk_mq_alloc_request_hctx
+	blk-mq: remove stale comment for blk_mq_sched_mark_restart_hctx
+	blk-mq: wait on correct sbitmap_queue in blk_mq_mark_tag_wait
+	blk-mq: Fix potential io hung for shared sbitmap per tagset
+	blk-mq: correct stale comment of .get_budget
+	block: sync mixed merged request's failfast with 1st bio's
+	block: Fix io statistics for cgroup in throttle path
+	block: bio-integrity: Copy flags when bio_integrity_payload is cloned
+	block: use proper return value from bio_failfast()
+	blk-iocost: fix divide by 0 error in calc_lcoefs()
+	blk-cgroup: dropping parent refcount after pd_free_fn() is done
+	blk-cgroup: synchronize pd_free_fn() from blkg_free_workfn() and blkcg_deactivate_policy()
+	block: don't allow multiple bios for IOCB_NOWAIT issue
+	block: clear bio->bi_bdev when putting a bio back in the cache
+	block: be a bit more careful in checking for NULL bdev while polling
 
-Signed-off-by: Eric Blake <eblake@redhat.com>
----
- Documentation/admin-guide/blockdev/nbd.rst |  2 +-
- include/uapi/linux/nbd.h                   | 15 ++++++++++++---
- 2 files changed, 13 insertions(+), 4 deletions(-)
+Without having any in-depth knowledge here, I think "blk-cgroup: synchronize
+pd_free_fn() from blkg_free_workfn() and blkcg_deactivate_policy()" looks the
+most suspicious here...  I see that AUTOSEL selected it from a 3-patch series
+without backporting patch 2, maybe that could be it?  Anyway, just a hunch.
 
-diff --git a/Documentation/admin-guide/blockdev/nbd.rst b/Documentation/admin-guide/blockdev/nbd.rst
-index d78dfe559dcf..faf2ac4b1509 100644
---- a/Documentation/admin-guide/blockdev/nbd.rst
-+++ b/Documentation/admin-guide/blockdev/nbd.rst
-@@ -14,7 +14,7 @@ to borrow disk space from another computer.
- Unlike NFS, it is possible to put any filesystem on it, etc.
-
- For more information, or to download the nbd-client and nbd-server
--tools, go to http://nbd.sf.net/.
-+tools, go to https://github.com/NetworkBlockDevice/nbd.
-
- The nbd kernel module need only be installed on the client
- system, as the nbd-server is completely in userspace. In fact,
-diff --git a/include/uapi/linux/nbd.h b/include/uapi/linux/nbd.h
-index 20d6cc91435d..8797387caaf7 100644
---- a/include/uapi/linux/nbd.h
-+++ b/include/uapi/linux/nbd.h
-@@ -11,6 +11,8 @@
-  *            Cleanup PARANOIA usage & code.
-  * 2004/02/19 Paul Clements
-  *            Removed PARANOIA, plus various cleanup and comments
-+ * 2023 Copyright Red Hat
-+ *            Link to userspace extensions.
-  */
-
- #ifndef _UAPILINUX_NBD_H
-@@ -30,12 +32,18 @@
- #define NBD_SET_TIMEOUT _IO( 0xab, 9 )
- #define NBD_SET_FLAGS   _IO( 0xab, 10)
-
-+/*
-+ * See also https://github.com/NetworkBlockDevice/nbd/blob/master/doc/proto.md
-+ * for additional userspace extensions not yet utilized in the kernel module.
-+ */
-+
- enum {
- 	NBD_CMD_READ = 0,
- 	NBD_CMD_WRITE = 1,
- 	NBD_CMD_DISC = 2,
- 	NBD_CMD_FLUSH = 3,
- 	NBD_CMD_TRIM = 4
-+	/* userspace defines additional extension commands */
- };
-
- /* values for flags field, these are server interaction specific. */
-@@ -64,14 +72,15 @@ enum {
- #define NBD_REQUEST_MAGIC 0x25609513
- #define NBD_REPLY_MAGIC 0x67446698
- /* Do *not* use magics: 0x12560953 0x96744668. */
-+/* magic 0x668e33ef for structured reply not supported by kernel yet */
-
- /*
-  * This is the packet used for communication between client and
-  * server. All data are in network byte order.
-  */
- struct nbd_request {
--	__be32 magic;
--	__be32 type;	/* == READ || == WRITE 	*/
-+	__be32 magic;	/* NBD_REQUEST_MAGIC	*/
-+	__be32 type;	/* See NBD_CMD_*	*/
- 	char handle[8];
- 	__be64 from;
- 	__be32 len;
-@@ -82,7 +91,7 @@ struct nbd_request {
-  * it has completed an I/O request (or an error occurs).
-  */
- struct nbd_reply {
--	__be32 magic;
-+	__be32 magic;		/* NBD_REPLY_MAGIC	*/
- 	__be32 error;		/* 0 = ok, else error	*/
- 	char handle[8];		/* handle you got from request	*/
- };
--- 
-2.39.2
-
+- Eric
