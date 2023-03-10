@@ -2,126 +2,74 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A773C74A5B
-	for <linux-block@archiver.kernel.org>; Fri, 10 Mar 2023 20:14:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7146DC6FA99
+	for <linux-block@archiver.kernel.org>; Fri, 10 Mar 2023 20:16:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231313AbjCJUOQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 10 Mar 2023 15:14:16 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37756 "EHLO
+        id S229612AbjCJUQU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 10 Mar 2023 15:16:20 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40146 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229933AbjCJUOO (ORCPT
+        with ESMTP id S230061AbjCJUQT (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 10 Mar 2023 15:14:14 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1609F12CBBC;
-        Fri, 10 Mar 2023 12:14:13 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        Fri, 10 Mar 2023 15:16:19 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C6D8312DDE5
+        for <linux-block@vger.kernel.org>; Fri, 10 Mar 2023 12:15:33 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1678479333;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=hnVD7krrqQ4+GWMqPVcp+YfvImsOsWxKBMH5y3xz1f0=;
+        b=LlJUSvml86ILjhXIZ49GeY9Bx9GXOZRY6+3y1xRXRWyx93ZeUY0dUODiBhwthhUqaKOhGN
+        FlBxolr7oKmobiz1r1xC2+RQPuR1oEvgTsQGmLhxt/a3lmE95JvUXU/F7XKBjb6xsPsVTg
+        7UV/o+ZuzRI/Zgj2sXLsff7GKjT1r74=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-17-HfmnwJteMI691XAYC91cyg-1; Fri, 10 Mar 2023 15:15:27 -0500
+X-MC-Unique: HfmnwJteMI691XAYC91cyg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id B8D75B822C2;
-        Fri, 10 Mar 2023 20:14:11 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 578AAC433D2;
-        Fri, 10 Mar 2023 20:14:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1678479250;
-        bh=FSvN0dMMOIBal+krA5fTetvx6l6nuLKvzSK+sAbhgiA=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=U0l4qrR6LKxW7/w82/tVMbCJVD1vicHfXGsBaVPcgnD0WOykHWSPU4tbANimy2No/
-         QOAx7HIe8xf7kvAKCYGghKebx76Bgs+Ph0WWoD7+reWWpN9MDXhxDBXffzkOkx144i
-         sFG642df2Umtdr4MdDEelvAUEexay8BwrVqJfrpLGX/lwhhPWL9jstuLqMDl5L6JY6
-         h5JUwXFiuvsLxqm5cltSRqwznt7CUJfx1cvGkWB4bpl7Pi4vqs8Expp5pz2D4AW6X+
-         SWIhwqAhkxvsAXzLK1tmFLgdvLzTvQohP5Qs20DPDaXme/x8BR/WqikoyNNVVRVM2Z
-         6XI/Fqf5O2hlQ==
-Date:   Fri, 10 Mar 2023 12:14:08 -0800
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Mike Cloaked <mike.cloaked@gmail.com>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        stable@vger.kernel.org
-Subject: Re: Possible kernel fs block code regression in 6.2.3 umounting usb
- drives
-Message-ID: <ZAuPkCn49urWBN5P@sol.localdomain>
-References: <CAOCAAm7AEY9tkZpu2j+Of91fCE4UuE_PqR0UqNv2p2mZM9kqKw@mail.gmail.com>
- <CAOCAAm4reGhz400DSVrh0BetYD3Ljr2CZen7_3D4gXYYdB4SKQ@mail.gmail.com>
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 010283C0E463;
+        Fri, 10 Mar 2023 20:15:27 +0000 (UTC)
+Received: from green.redhat.com (unknown [10.2.16.147])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 2A85E40BC781;
+        Fri, 10 Mar 2023 20:15:26 +0000 (UTC)
+From:   Eric Blake <eblake@redhat.com>
+To:     josef@toxicpanda.com, linux-block@vger.kernel.org,
+        nbd@other.debian.org
+Cc:     philipp.reisner@linbit.com, lars.ellenberg@linbit.com,
+        christoph.boehmwalder@linbit.com, corbet@lwn.net,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH 0/3] nbd: s/handle/cookie/
+Date:   Fri, 10 Mar 2023 14:15:22 -0600
+Message-Id: <20230310201525.2615385-1-eblake@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAOCAAm4reGhz400DSVrh0BetYD3Ljr2CZen7_3D4gXYYdB4SKQ@mail.gmail.com>
+Content-type: text/plain
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Mar 10, 2023 at 07:33:37PM +0000, Mike Cloaked wrote:
-> With kerne. 6.2.3 if I simply plug in a usb external drive, mount it
-> and umount it, then the journal has a kernel Oops and I have submitted
-> a bug report, that includes the journal output, at
-> https://bugzilla.kernel.org/show_bug.cgi?id=217174
-> 
-> As soon as the usb drive is unmounted, the kernel Oops occurs, and the
-> machine hangs on shutdown and needs a hard reboot.
-> 
-> I have reproduced the same issue on three different machines, and in
-> each case downgrading back to kernel 6.2.2 resolves the issue and it
-> no longer occurs.
-> 
-> This would seem to be a regression in kernel 6.2.3
-> 
-> Mike C
+A 64-bit integer is easier to deal with than char[8], and has no
+difference over the wire.  This series stems from a review of a patch
+I first submitted to the userspace NBD documentation:
 
-Thanks for reporting this!  If this is reliably reproducible and is known to be
-a regression between v6.2.2 and v6.2.3, any chance you could bisect it to find
-out the exact commit that introduced the bug?
+https://lists.debian.org/nbd/2023/03/msg00031.html
 
-For reference I'm also copying the stack trace from bugzilla below:
+Eric Blake (3):
+  uapi nbd: improve doc links to userspace spec
+  uapi nbd: add cookie alias to handle
+  block nbd: use req.cookie instead of req.handle
 
-BUG: kernel NULL pointer dereference, address: 0000000000000028
- #PF: supervisor read access in kernel mode
- #PF: error_code(0x0000) - not-present page
- PGD 0 P4D 0
- Oops: 0000 [#1] PREEMPT SMP PTI
- CPU: 9 PID: 1118 Comm: lvcreate Tainted: G                T  6.2.3-1>
- Hardware name: To Be Filled By O.E.M. To Be Filled By O.E.M./Z370 Ex>
- RIP: 0010:blk_throtl_update_limit_valid+0x1f/0x110
- Code: 90 90 90 90 90 90 90 90 90 90 90 0f 1f 44 00 00 41 54 49 89 fc>
- RSP: 0018:ffffb5fd01b47bb8 EFLAGS: 00010046
- RAX: 0000000000000000 RBX: ffff9d09040d8000 RCX: 0000000000000000
- RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
- RBP: ffffffff97b2f648 R08: 0000000000000000 R09: 0000000000000000
- R10: 0000000000000000 R11: 0000000000000000 R12: ffff9d090fce2c00
- R13: ffff9d090aedf060 R14: ffff9d090aedf1c8 R15: ffff9d090aedf0d8
- FS:  00007f3896fc7240(0000) GS:ffff9d109f040000(0000) knlGS:00000000>
- CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
- CR2: 0000000000000028 CR3: 0000000111ce4003 CR4: 00000000003706e0
- DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
- DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
- Call Trace:
-  <TASK>
-  throtl_pd_offline+0x40/0x70
-  blkcg_deactivate_policy+0xab/0x140
-  ? __pfx_dev_remove+0x10/0x10 [dm_mod]
-  blk_throtl_exit+0x45/0x80
-  disk_release+0x4a/0xf0
-  device_release+0x34/0x90
-  kobject_put+0x97/0x1d0
-  cleanup_mapped_device+0xe0/0x170 [dm_mod]
-  __dm_destroy+0x120/0x1e0 [dm_mod]
-  dev_remove+0x11b/0x190 [dm_mod]
-  ctl_ioctl+0x302/0x5b0 [dm_mod]
-  dm_ctl_ioctl+0xe/0x20 [dm_mod]
-  __x64_sys_ioctl+0x9c/0xe0
-  do_syscall_64+0x5c/0x90
-  entry_SYSCALL_64_after_hwframe+0x72/0xdc
- RIP: 0033:0x7f389745653f
- Code: 00 48 89 44 24 18 31 c0 48 8d 44 24 60 c7 04 24 10 00 00 00 48>
- RSP: 002b:00007ffe5499e4f0 EFLAGS: 00000246 ORIG_RAX: 00000000000000>
- RAX: ffffffffffffffda RBX: 000055d198c3bec0 RCX: 00007f389745653f
- RDX: 000055d1994501b0 RSI: 00000000c138fd04 RDI: 0000000000000003
- RBP: 0000000000000006 R08: 000055d197547088 R09: 00007ffe5499e3a0
- R10: 0000000000000000 R11: 0000000000000246 R12: 000055d1974d10d6
- R13: 000055d199450260 R14: 000055d1974d10c7 R15: 000055d197545bbb
-  </TASK>
- Modules linked in: dm_cache_smq dm_cache dm_persistent_data dm_bio_p>
-  soundcore pcspkr intel_wmi_thunderbolt i2c_smbus mei sysimgblt inpu>
- CR2: 0000000000000028
- ---[ end trace 0000000000000000 ]---
- RIP: 0010:blk_throtl_update_limit_valid+0x1f/0x110
- Code: 90 90 90 90 90 90 90 90 90 90 90 0f 1f 44 00 00 41 54 49 89 fc>
+ Documentation/admin-guide/blockdev/nbd.rst |  2 +-
+ drivers/block/nbd.c                        |  4 ++--
+ include/uapi/linux/nbd.h                   | 25 +++++++++++++++++-----
+ 3 files changed, 23 insertions(+), 8 deletions(-)
+
+-- 
+2.39.2
+
