@@ -2,25 +2,24 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 04373C74A4B
-	for <linux-block@archiver.kernel.org>; Sat, 11 Mar 2023 17:07:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01E0DC61DA4
+	for <linux-block@archiver.kernel.org>; Sat, 11 Mar 2023 19:30:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229766AbjCKRHW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 11 Mar 2023 12:07:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41824 "EHLO
+        id S229823AbjCKTaR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 11 Mar 2023 14:30:17 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54180 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229469AbjCKRHV (ORCPT
+        with ESMTP id S229846AbjCKTaP (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 11 Mar 2023 12:07:21 -0500
+        Sat, 11 Mar 2023 14:30:15 -0500
 Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 159B831E20;
-        Sat, 11 Mar 2023 09:07:20 -0800 (PST)
-Received: from [192.168.1.103] (178.176.77.159) by msexch01.omp.ru
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 36B57637D0;
+        Sat, 11 Mar 2023 11:30:13 -0800 (PST)
+Received: from [192.168.1.103] (31.173.84.174) by msexch01.omp.ru
  (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.986.14; Sat, 11 Mar
- 2023 20:07:11 +0300
-Subject: Re: [PATCH 08/32] pata_parport-bpck6: remove mode from struct
- ppc_storage
+ 2023 22:30:05 +0300
+Subject: Re: [PATCH 09/32] pata_parport-bpck6: remove struct ppc_storage
 To:     Ondrej Zary <linux@zary.sk>,
         Damien Le Moal <damien.lemoal@opensource.wdc.com>,
         Sudip Mukherjee <sudipm.mukherjee@gmail.com>
@@ -29,24 +28,24 @@ CC:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
         <linux-parport@lists.infradead.org>, <linux-ide@vger.kernel.org>,
         <linux-kernel@vger.kernel.org>
 References: <20230307224627.28011-1-linux@zary.sk>
- <20230307224627.28011-9-linux@zary.sk>
+ <20230307224627.28011-10-linux@zary.sk>
 From:   Sergey Shtylyov <s.shtylyov@omp.ru>
 Organization: Open Mobile Platform
-Message-ID: <6747930c-697b-2f9b-0c97-4aa2d1ef9bb4@omp.ru>
-Date:   Sat, 11 Mar 2023 20:07:10 +0300
+Message-ID: <428a44be-f610-139e-d8b0-b73d590b983a@omp.ru>
+Date:   Sat, 11 Mar 2023 22:30:04 +0300
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.10.1
 MIME-Version: 1.0
-In-Reply-To: <20230307224627.28011-9-linux@zary.sk>
+In-Reply-To: <20230307224627.28011-10-linux@zary.sk>
 Content-Type: text/plain; charset="utf-8"
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [178.176.77.159]
+X-Originating-IP: [31.173.84.174]
 X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
  (10.188.4.12)
 X-KSE-ServerInfo: msexch01.omp.ru, 9
 X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 5.9.59, Database issued on: 03/11/2023 16:42:21
+X-KSE-AntiSpam-Version: 5.9.59, Database issued on: 03/11/2023 19:04:58
 X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
 X-KSE-AntiSpam-Method: none
 X-KSE-AntiSpam-Rate: 59
@@ -58,10 +57,13 @@ X-KSE-AntiSpam-Info: {rep_avail}
 X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
 X-KSE-AntiSpam-Info: {relay has no DNS name}
 X-KSE-AntiSpam-Info: {SMTP from is not routable}
-X-KSE-AntiSpam-Info: {Found in DNSBL: 178.176.77.159 in (user)
+X-KSE-AntiSpam-Info: {Found in DNSBL: 31.173.84.174 in (user)
  b.barracudacentral.org}
-X-KSE-AntiSpam-Info: d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;omp.ru:7.1.1;127.0.0.199:7.1.2
-X-KSE-AntiSpam-Info: ApMailHostAddress: 178.176.77.159
+X-KSE-AntiSpam-Info: {Found in DNSBL: 31.173.84.174 in (user)
+ dbl.spamhaus.org}
+X-KSE-AntiSpam-Info: 127.0.0.199:7.1.2;31.173.84.174:7.7.3,7.4.1;omp.ru:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1
+X-KSE-AntiSpam-Info: {iprep_blacklist}
+X-KSE-AntiSpam-Info: ApMailHostAddress: 31.173.84.174
 X-KSE-AntiSpam-Info: {DNS response errors}
 X-KSE-AntiSpam-Info: Rate: 59
 X-KSE-AntiSpam-Info: Status: not_detected
@@ -71,10 +73,10 @@ X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
 X-KSE-Antiphishing-Info: Clean
 X-KSE-Antiphishing-ScanningType: Heuristic
 X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 03/11/2023 16:45:00
+X-KSE-Antiphishing-Bases: 03/11/2023 19:08:00
 X-KSE-AttachmentFiltering-Interceptor-Info: protection disabled
 X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 3/11/2023 2:00:00 PM
+X-KSE-Antivirus-Info: Clean, bases: 3/11/2023 5:20:00 PM
 X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
@@ -82,13 +84,34 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 On 3/8/23 1:46 AM, Ondrej Zary wrote:
 
-> introduce mode_map[] that maps bpck6 modes to ppc6 modes and use it to
-> replace mode in ppc_storage
+> Store the remaining two variables (cur_ctrl and ppc_flags) in struct
+
+   s/variables/fields/, maybe?
+
+> ppc_storage directly in pi->private and remove struct ppc_storage.
 > 
 > Signed-off-by: Ondrej Zary <linux@zary.sk>
+[...]
 
 Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
 
+> diff --git a/drivers/ata/pata_parport/ppc6lnx.c b/drivers/ata/pata_parport/ppc6lnx.c
+> index 75f9748d8de5..ee8cee6bae7c 100644
+> --- a/drivers/ata/pata_parport/ppc6lnx.c
+> +++ b/drivers/ata/pata_parport/ppc6lnx.c
+> @@ -64,10 +64,8 @@
+>  
+>  //***************************************************************************
+>  
+> -struct ppc_storage {
+> -	u8	ppc_flags;
+> -	u8	cur_ctrl;				// current control port contents
+> -};
+> +#define CUR_CTRL	(((u8 *)&pi->private)[0])
+> +#define PPC_FLAGS	(((u8 *)&pi->private)[1])
+
+   Hm, that's a creative abuse of *unsigned long*... :-)
+
 [...]
- 
+
 MBR, Sergey
