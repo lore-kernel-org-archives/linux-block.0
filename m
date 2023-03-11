@@ -2,25 +2,24 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CBE21C74A44
-	for <linux-block@archiver.kernel.org>; Sat, 11 Mar 2023 20:09:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E7E09C6FD1C
+	for <linux-block@archiver.kernel.org>; Sat, 11 Mar 2023 20:12:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229457AbjCKUJz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 11 Mar 2023 15:09:55 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51552 "EHLO
+        id S229704AbjCKUMN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 11 Mar 2023 15:12:13 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53160 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229450AbjCKUJy (ORCPT
+        with ESMTP id S229450AbjCKUMM (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 11 Mar 2023 15:09:54 -0500
+        Sat, 11 Mar 2023 15:12:12 -0500
 Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 613AC26597;
-        Sat, 11 Mar 2023 12:09:52 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5CC4F4E5CD;
+        Sat, 11 Mar 2023 12:12:10 -0800 (PST)
 Received: from [192.168.1.103] (31.173.84.174) by msexch01.omp.ru
  (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.986.14; Sat, 11 Mar
- 2023 23:09:44 +0300
-Subject: Re: [PATCH 11/32] parport_pc: add 16-bit and 8-bit fast EPP transfer
- flags
+ 2023 23:12:02 +0300
+Subject: Re: [PATCH 14/32] pata_parport-bpck6: remove PPC_FLAGS
 To:     Ondrej Zary <linux@zary.sk>,
         Damien Le Moal <damien.lemoal@opensource.wdc.com>,
         Sudip Mukherjee <sudipm.mukherjee@gmail.com>
@@ -29,15 +28,15 @@ CC:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
         <linux-parport@lists.infradead.org>, <linux-ide@vger.kernel.org>,
         <linux-kernel@vger.kernel.org>
 References: <20230307224627.28011-1-linux@zary.sk>
- <20230307224627.28011-12-linux@zary.sk>
+ <20230307224627.28011-15-linux@zary.sk>
 From:   Sergey Shtylyov <s.shtylyov@omp.ru>
 Organization: Open Mobile Platform
-Message-ID: <460ae7d7-a12d-cef3-4343-ac633e15016f@omp.ru>
-Date:   Sat, 11 Mar 2023 23:09:44 +0300
+Message-ID: <efe36a6f-4583-a5b2-4242-4129c3089ed6@omp.ru>
+Date:   Sat, 11 Mar 2023 23:12:02 +0300
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.10.1
 MIME-Version: 1.0
-In-Reply-To: <20230307224627.28011-12-linux@zary.sk>
+In-Reply-To: <20230307224627.28011-15-linux@zary.sk>
 Content-Type: text/plain; charset="utf-8"
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -46,7 +45,7 @@ X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
  (10.188.4.12)
 X-KSE-ServerInfo: msexch01.omp.ru, 9
 X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 5.9.59, Database issued on: 03/11/2023 19:45:10
+X-KSE-AntiSpam-Version: 5.9.59, Database issued on: 03/11/2023 19:53:14
 X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
 X-KSE-AntiSpam-Method: none
 X-KSE-AntiSpam-Rate: 59
@@ -62,8 +61,7 @@ X-KSE-AntiSpam-Info: {Found in DNSBL: 31.173.84.174 in (user)
  b.barracudacentral.org}
 X-KSE-AntiSpam-Info: {Found in DNSBL: 31.173.84.174 in (user)
  dbl.spamhaus.org}
-X-KSE-AntiSpam-Info: 31.173.84.174:7.7.3,7.4.1;omp.ru:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2
-X-KSE-AntiSpam-Info: {iprep_blacklist}
+X-KSE-AntiSpam-Info: omp.ru:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2
 X-KSE-AntiSpam-Info: ApMailHostAddress: 31.173.84.174
 X-KSE-AntiSpam-Info: {DNS response errors}
 X-KSE-AntiSpam-Info: Rate: 59
@@ -74,7 +72,7 @@ X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
 X-KSE-Antiphishing-Info: Clean
 X-KSE-Antiphishing-ScanningType: Heuristic
 X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 03/11/2023 19:49:00
+X-KSE-Antiphishing-Bases: 03/11/2023 19:56:00
 X-KSE-AttachmentFiltering-Interceptor-Info: protection disabled
 X-KSE-Antivirus-Interceptor-Info: scan successful
 X-KSE-Antivirus-Info: Clean, bases: 3/11/2023 6:14:00 PM
@@ -85,71 +83,13 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 On 3/8/23 1:46 AM, Ondrej Zary wrote:
 
-> PARPORT_EPP_FAST flag currently uses 32-bit I/O port access for data
-> read/write (insl/outsl).
-> Add PARPORT_EPP_FAST_16 and PARPORT_EPP_FAST_8 that use insw/outsw
-> and insb/outsb (and PARPORT_EPP_FAST_32 as alias for PARPORT_EPP_FAST).
+> pi->private is now not used for any other purpose, so store wait_fifo
+> flag directly there and remove PPC_FLAGS define.
 > 
 > Signed-off-by: Ondrej Zary <linux@zary.sk>
-> ---
->  drivers/parport/parport_pc.c | 20 ++++++++++++++++----
->  include/uapi/linux/parport.h |  3 +++
->  2 files changed, 19 insertions(+), 4 deletions(-)
-> 
-> diff --git a/drivers/parport/parport_pc.c b/drivers/parport/parport_pc.c
-> index 5784dc20fb38..eda4e4e6d4e8 100644
-> --- a/drivers/parport/parport_pc.c
-> +++ b/drivers/parport/parport_pc.c
-> @@ -298,9 +298,15 @@ static size_t parport_pc_epp_read_data(struct parport *port, void *buf,
->  		}
->  		return got;
->  	}
-> -	if ((flags & PARPORT_EPP_FAST) && (length > 1)) {
-> -		if (!(((long)buf | length) & 0x03))
-> +	if ((length > 1) && ((flags & PARPORT_EPP_FAST_32)
-> +			   || flags & PARPORT_EPP_FAST_16
-> +			   || flags & PARPORT_EPP_FAST_8)) {
 
-   Why not:
-
-> +		if ((flags & PARPORT_EPP_FAST_32)
-> +		    && !(((long)buf | length) & 0x03))
->  			insl(EPPDATA(port), buf, (length >> 2));
-> +		else if ((flags & PARPORT_EPP_FAST_16)
-> +			 && !(((long)buf | length) & 0x01))
-> +			insw(EPPDATA(port), buf, length >> 1);
->  		else
->  			insb(EPPDATA(port), buf, length);
->  		if (inb(STATUS(port)) & 0x01) {
-> @@ -327,9 +333,15 @@ static size_t parport_pc_epp_write_data(struct parport *port, const void *buf,
->  {
->  	size_t written = 0;
->  
-> -	if ((flags & PARPORT_EPP_FAST) && (length > 1)) {
-> -		if (!(((long)buf | length) & 0x03))
-> +	if ((length > 1) && ((flags & PARPORT_EPP_FAST_32)
-> +			   || flags & PARPORT_EPP_FAST_16
-
-   I think it's preferred that an operator is left at the end of a broken up line...
-
-> +			   || flags & PARPORT_EPP_FAST_8)) {
-
-	if (length > 1 && (flags & (PARPORT_EPP_FAST_32 |
-				    PARPORT_EPP_FAST_16 |
-			   	    PARPORT_EPP_FAST_8)) {
-
-> +		if ((flags & PARPORT_EPP_FAST_32)
-> +		    && !(((long)buf | length) & 0x03))
-
-  Again, leave && on the higher line...
-
->  			outsl(EPPDATA(port), buf, (length >> 2));
-> +		else if ((flags & PARPORT_EPP_FAST_16)
-> +			 && !(((long)buf | length) & 0x01))
-> +			outsw(EPPDATA(port), buf, length >> 1);
->  		else
->  			outsb(EPPDATA(port), buf, length);
->  		if (inb(STATUS(port)) & 0x01) {
 [...]
+
+Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
 
 MBR, Sergey
